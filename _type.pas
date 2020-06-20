@@ -114,7 +114,7 @@ TUID = record
 
    _itattack:byte;
    _fastturn,
-   _altdeath,
+   _fdeath,
    _itbuilder,
    _itbarea,
    _itwarea,

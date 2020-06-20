@@ -680,10 +680,12 @@ begin
     begin
         if(remove=false)then
         begin
-           if(_altdeath=false)then fastdeath:=false;
+           if(_fdeath=false)then fastdeath:=false;
            if(_itmech)or(bld=false)then fastdeath:=true;
 
-           //_unit_effect(pu,ueff_death,adeath);
+           {$IFDEF _FULLGAME}
+           _ueff_death(pu,fastdeath);
+           {$ENDIF}
         end;
 
         if(sel)then _unit_selcntdec(pu);

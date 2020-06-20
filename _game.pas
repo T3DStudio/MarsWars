@@ -180,6 +180,10 @@ begin
           _unitCreate(map_psx[p]    , map_psy[p]    ,utbl_start[race],p,true);
           //_unitCreate(map_psx[p]    , map_psy[p]    ,UID_LostSoul,p,true);
           _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
+          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
+          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
+          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
+          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
          { if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);
           if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);
           if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);
@@ -581,6 +585,7 @@ begin
    {$ELSE}
    if(net_nstat=ns_clnt)then net_GClient;
    _rpls_code;
+   if(_uclord_c=0)then _MusicCheck;
    {$ENDIF}
 
    if(G_Started)then

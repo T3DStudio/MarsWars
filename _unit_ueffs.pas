@@ -1,9 +1,15 @@
 
-procedure _ueff_eff(pu:PTUnit;efft:byte;adv:boolean);
+{
+_ueff2snd - main sounds
+_ueffeid  - additional effect
+_ueffeids - effect sound
+}
+
+procedure _ueff_eff(pu:PTUnit;efft:byte;adv,mainsnd:boolean);
 begin
    with (pu^) do
    begin
-      PlayUSND(_ueff2snd(uid,efft,adv),pu);
+      if(mainsnd)then PlayUSND(_ueff2snd(uid,efft,adv),pu);
       with puid^ do
       begin
          PlayUSND(_ueffeids[adv,efft],pu);
@@ -15,19 +21,9 @@ end;
 procedure _ueff_create(pu:PTUnit);
 begin
    with (pu^) do
-   begin
-      if(_menu=false)then
-       if(bld=false)then
-       begin
-          if(player=HPlayer)then PlayUSND(_ueff2snd(uid,ueff_startb,buff[ub_advanced]>0));
-          _ueff_eff(pu,ueff_startb,buff[ub_advanced]>0);
-       end
-       else
-       begin
-          if(player=HPlayer)then PlayUSND(_ueff2snd(uid,ueff_create,buff[ub_advanced]>0));
-          _ueff_eff(pu,ueff_create,buff[ub_advanced]>0);
-       end;
-   end;
+    if(bld=false)
+    then _ueff_eff(pu,ueff_startb,buff[ub_advanced]>0,(player=HPlayer))
+    else _ueff_eff(pu,ueff_create,buff[ub_advanced]>0,(player=HPlayer));
 end;
 
 procedure _ueff_foot(pu:PTUnit);
@@ -38,8 +34,7 @@ begin
       then dec(foota,1)
       else
       begin
-         PlayUSND(_ueff2snd(uid,ueff_foot,buff[ub_advanced]>0),pu);
-         _ueff_eff(pu,ueff_foot,buff[ub_advanced]>0);
+         _ueff_eff(pu,ueff_foot,buff[ub_advanced]>0,true);
          foota:=puid^._foota;
       end;
    end;
@@ -47,11 +42,15 @@ end;
 
 procedure _ueff_pain(pu:PTUnit);
 begin
+   with (pu^) do _ueff_eff(pu,ueff_pain,buff[ub_advanced]>0,true);
+end;
+
+procedure _ueff_death(pu:PTUnit;fd:boolean);
+begin
    with (pu^) do
-   begin
-      PlayUSND(_ueff2snd(uid,ueff_pain,buff[ub_advanced]>0),pu);
-      _ueff_eff(pu,ueff_pain,buff[ub_advanced]>0);
-   end;
+    if(fd)
+    then _ueff_eff(pu,ueff_fdeath,buff[ub_advanced]>0,true)
+    else _ueff_eff(pu,ueff_death ,buff[ub_advanced]>0,true);
 end;
 
 {procedure _unit_effect(pu:PTUnit;efft:byte;alt:boolean=false);

@@ -1,5 +1,5 @@
 
-{function loadMSC(fn:shortstring):pMIX_MUSIC;
+function loadMSC(fn:shortstring):pMIX_MUSIC;
 begin
    loadMSC:=nil;
 
@@ -7,7 +7,7 @@ begin
    loadMSC:=MIX_LOADMUS(@fn[1]);
 
    if(loadMSC=nil)then WriteError(fn);
-end;  }
+end;
 
 function loadSND(fn:shortstring):pMIX_CHUNK;
 begin
@@ -19,19 +19,17 @@ begin
    if(loadSND=nil)then WriteError(fn);
 end;
 
-{procedure PlayMSC(m:pMIX_MUSIC);
+procedure PlayMSC(m:pMIX_MUSIC);
 begin
    if(snd_usesnd=false)then exit;
 
    MIX_PLAYMUSIC(m,0);
    MIX_VOLUMEMUSIC(snd_mvolume);
-end; }
+end;
 
 procedure PlayGSND(s:pMIX_CHUNK);
 begin
-   writeln(1);
    if(s=nil)or(snd_usesnd=false)then exit;
-   writeln(snd_svolume);
 
    MIX_VOLUMECHUNK(s,snd_svolume);
    MIX_PLAYCHANNEL(-1,s,0);
@@ -62,29 +60,8 @@ begin
     end;
 end;
 
-{procedure PlayTSND(uid,stp:byte);
-var i:byte;
-begin
-   with _tuids[uid] do
-    if(_ueffsndn[stp]>0)then PlaySND(_ueffsnds[stp,random(_ueffsndn[stp])]);
-end;  }
 
-{procedure PlaySSND(pu:PTUnit;stp:byte);
-begin
-   if(pu=nil)or(snd_usesnd=false)or(_rpls_step>1)or(_menu)then exit;
-
-   with(pu^)do
-   begin
-      with _players[player] do
-       if(_nhp3(vx,vy,team)=false)then exit;
-
-      PlayTSND(uid,stp);
-   end;
-end;  }
-
-
-
-{procedure _MusicCheck;
+procedure _MusicCheck;
 begin
    if(snd_usesnd=false)then exit;
    if(snd_mls>0)then
@@ -146,7 +123,7 @@ begin
        snd_ml[m1]:=snd_ml[m2];
        snd_ml[m2]:=d;
     end;
-end;}
+end;
 
 procedure _InitSound;
 begin
@@ -156,8 +133,8 @@ begin
 
    if (MIX_OPENAUDIO(AUDIO_FREQUENCY, AUDIO_FORMAT,AUDIO_CHANNELS, AUDIO_CHUNKSIZE)<>0) then begin WriteError(SDL_GetError);exit;end;
 
-   //load_music;
-   //shaflemusic;
+   load_music;
+   shaflemusic;
 
    snd_click       :=loadSND('click.wav');
    snd_chat        :=loadSND('chat.wav');
