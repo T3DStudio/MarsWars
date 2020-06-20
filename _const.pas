@@ -209,6 +209,7 @@ uo_uteleport         = 14;
 uo_spawndron         = 15;
 uo_archresur         = 16;
 uo_botrepair         = 17;
+uo_spawnlost         = 18;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

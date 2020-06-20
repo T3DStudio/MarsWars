@@ -165,7 +165,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=24+td
    else
-     if(a_rld>aw_rlda)or(buff[ub_cast]>0)
+     if(a_rld>aw_rlda)or(buff[ub_cast]>vid_h2fps)
      then an:=16+td
      else
      begin

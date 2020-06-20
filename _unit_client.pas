@@ -2,7 +2,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////// SERVER
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure _wudata_byte(bt:byte;rpl:boolean);
@@ -64,6 +64,7 @@ begin
           SetBBit(@_bts2,0, buff[ub_teleff   ]>0);
           SetBBit(@_bts2,1, buff[ub_invuln   ]>0);
           SetBBit(@_bts2,2, buff[ub_born     ]>0);
+          SetBBit(@_bts2,3, buff[ub_cast     ]>0);
 
           SetBBit(@_bts1,4, buff[ub_invis    ]>0);
           SetBBit(@_bts1,5, buff[ub_pain     ]>0);
@@ -283,6 +284,8 @@ end;
 
 {$IFDEF _FULLGAME}
 
+// player counters
+
 procedure _ncl_create(pu:PTUnit);
 begin
    with pu^ do
@@ -352,6 +355,8 @@ begin
       end;
    end;
 end;
+
+// Compare unit states: previous[0] and new
 
 procedure _netSetUcl(cu:PTUnit);
 var pu:PTUnit;
@@ -450,10 +455,10 @@ begin
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////   CLIENT
 ////////////////////////////////////////////////////////////////////////////////
 
-function _rudata_byte(rpl:boolean;def:byte=0):byte;
+function _rudata_byte(rpl:boolean;def:byte    =0):byte;
 begin
    if(rpl=false)
    then _rudata_byte:=net_readbyte
@@ -467,7 +472,7 @@ begin
    else begin {$I-} BlockRead(_rpls_file,_rudata_sint,SizeOf(_rudata_sint));if(ioresult<>0)then _rudata_sint:=def; {$I+} end;
 end;
 
-function _rudata_int(rpl:boolean;def:integer=0):integer;
+function _rudata_int(rpl:boolean;def:integer  =0):integer;
 begin
    if(rpl=false)
    then _rudata_int:=net_readint
@@ -478,7 +483,7 @@ function _rudata_card(rpl:boolean;def:cardinal=0):cardinal;
 begin
    if(rpl=false)
    then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(_rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card :=def; {$I+} end;
+   else begin {$I-} BlockRead(_rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card:=def; {$I+} end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -515,6 +520,7 @@ begin
       buff[ub_teleff   ]:=_buffst[GetBBit(@_bts2,0)];
       buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,1)];
       buff[ub_born     ]:=_buffst[GetBBit(@_bts2,2)];
+      buff[ub_cast     ]:=_buffst[GetBBit(@_bts2,3)];
 
       if(_dvsn)
       then _vsn:=_rudata_byte(rpl)

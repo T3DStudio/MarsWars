@@ -183,7 +183,7 @@ begin
           _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
           _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
           _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
-          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Imp,p,true);
+          _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Pain,p,true);
          { if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);
           if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);
           if(race=r_uac)then _unitCreate(map_psx[p]    , map_psy[p]    ,UID_Dron,p,true);

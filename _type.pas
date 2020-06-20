@@ -182,9 +182,11 @@ TUnit = record
    uo_tar: array[0..MaxOrderList] of integer;
    uo_id : array[0..MaxOrderList] of byte;
 
-   ca_x,ca_y: shortint;
+   ca_x,
+   ca_y  : shortint;
+   ca_tar: integer;
+   ca_id : byte;
 
-   ca_id,
    uo_n,
    up_t,un_t,
    player,

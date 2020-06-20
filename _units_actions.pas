@@ -299,11 +299,7 @@ begin
       if(_tuids[suid]._uf>uf_ground)
       then _unitCreate(vx,vy,suid,player,true,true)
       else _unitCreate(vx,vy+_r+_tuids[suid]._r,suid,player,true,true);
-      if(_lcu>0)and(uo_rallpos in _orders)then
-      begin
-         _unit_setorder(_lcup,0,un_rtar,un_rx,un_ry,true,false);
-         _lcup^.buff[ub_born]:=vid_h2fps;
-      end;
+      if(_lcu>0)and(uo_rallpos in _orders)then _unit_setorder(_lcup,uo_rightcl,un_rtar,un_rx,un_ry,true,false);
    end;
 end;
 
@@ -337,7 +333,7 @@ begin
    with(pu^)do
     with(puid^)do
     begin
-       if(uo_id[0]=0)
+       if(uo_id[0]=uo_rightcl)
        or(_chabil (uo_id[0],uid,player,uo_tar[0],bld,speed)=false)
        or(_chabilt(uo_id[0]    ,player,uo_tar[0]          )=false)then
        begin
@@ -528,6 +524,19 @@ begin
                 dec(cmana,_toids[uo_id[0]].rmana);
                 _nextOrder(pu);
              end;
+       uo_spawnlost:
+             if(buff[ub_cast]=0)then
+             begin
+                //calc point
+                _unitCreate(vx,vy,UID_LostSoul,player,true,true);
+                if(_lcu>0)then
+                begin
+                   _lcup^.mdir:=mdir;
+                   _lcup^.tdir:=tdir;
+                end;
+                buff[ub_cast]:=vid_fps;
+                _nextOrder(pu);
+             end;
        uo_destroy: _unit_kill(pu,false,false);
        else
           if(_toids[uo_id[0]].r2attack)then
@@ -611,26 +620,38 @@ begin
            {$IFDEF _FULLGAME}
            PlayUSND(aw_snd,pu);
            {$ENDIF}
-           if(aw_type=wpt_msle)
-           then _miss_add(_tx,_ty,_msx,_msy,_ttar,aw_mid,player,_tuf,0)
+           case aw_type of
+           wpt_msle : _miss_add(_tx,_ty,_msx,_msy,_ttar,aw_mid,player,_tuf,0);
            else
-            if(OnlySVCode)and(_ttar>0)then
-             case aw_type of
-             wpt_resur: _tu^.buff[ub_resur]:=vid_2fps;
-             wpt_heal : begin
-                           inc(_tu^.hits,aw_mdmg);
-                           if(_tu^.hits>_tu^.puid^._mhits)then _tu^.hits:=_tu^.puid^._mhits;
-                        end;
-             wpt_ddmg : _unit_damage(_tu,aw_mdmg,1);
-             end;
+             if(OnlySVCode)and(_ttar>0)then
+              case aw_type of
+             wpt_resur : _tu^.buff[ub_resur]:=vid_2fps;
+             wpt_heal  : begin
+                            inc(_tu^.hits,aw_mdmg);
+                            if(_tu^.hits>_tu^.puid^._mhits)then _tu^.hits:=_tu^.puid^._mhits;
+                         end;
+             wpt_ddmg  : _unit_damage(_tu,aw_mdmg,1);
+             wpt_uspwn : begin
+                            _unitCreate(vx,vy,aw_mid,player,true,true);
+                            if(_lcu>0)then
+                            begin
+                               _unit_setorder(_lcup,uo_rightcl,_ttar,_tx,_ty,true,false);
+                               _lcup^.mdir:=mdir;
+                               _lcup^.tdir:=tdir;
+                            end;
+                         end;
+              end;
+           end;
         end;
 
         if(OnlySVCode)and(a_weap=_wp)then
         begin
+           ca_tar:=0;
            if(_ttar>0)then
            begin
               inc(_tx,(_tu^.x-_tu^.vx)*2);
               inc(_ty,(_tu^.y-_tu^.vy)*2);
+              ca_tar:=_tu^.unum;
            end;
            ca_x :=calc_cx(_tx-_msx,(_tuf=uf_soaring));
            ca_y :=calc_cx(_ty-_msy,(_tuf=uf_fly    ));

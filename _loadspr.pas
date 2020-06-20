@@ -741,6 +741,9 @@ begin
    with _toids[uo_botrepair] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_drone[11].surf);
                                                                                 _okey1:=btn2key(_obtnx,_obtny); end;
 
+   with _toids[uo_spawnlost] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_pain[23].surf);
+                                                                                _okey1:=btn2key(_obtnx,_obtny); end;
+
    for iu:=0 to 255 do
     with _toids[iu] do
      if(_okey1=0)

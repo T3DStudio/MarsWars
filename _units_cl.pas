@@ -153,15 +153,16 @@ begin
    with _toids[uo_patrol   ] do begin rspd:=true; rtar:=at_map;                             cattack:=true;toall:=true;end;
    with _toids[uo_spatrol  ] do begin rspd:=true; rtar:=at_map;                             cattack:=true;toall:=true;end;
    with _toids[uo_attack   ] do begin rtar:=at_map+at_aenemy;rtaru:=[0..255];r2attack:=true;cattack:=true;toall:=true;end;
-   with _toids[uo_auto     ] do begin rnbld:=true; toall:=true;  end;
+   with _toids[uo_auto     ] do begin rnbld:=true;                                                        toall:=true;end;
    with _toids[uo_unload   ] do begin                                                                     toall:=true;end;
    with _toids[uo_upload   ] do begin rtar:=at_aown;         rtaru:=[0..255];                                         end;
    with _toids[uo_rallpos  ] do begin rtar:=at_map+at_aall;  rnbld:=true; rtaru:=[0..255];                toall:=true;end;
    with _toids[uo_destroy  ] do begin rnbld:=true;                                                        toall:=true;end;
    with _toids[uo_uteleport] do begin rtar:=at_aown+at_builds+at_bld;rtaru:=[UID_HTeleport];              toall:=true;end;
    with _toids[uo_spawndron] do begin rmana:=50;rulimit:=true;                                            toall:=true;end;
-   with _toids[uo_archresur] do begin rtar:=at_resur;  cauto:=true;rtaru:=[0..255];r2attack:=true;                    end;
-   with _toids[uo_botrepair] do begin rtar:=at_mrepair;cauto:=true;rtaru:=[0..255];r2attack:=true;        toall:=true;end;
+   with _toids[uo_archresur] do begin rtar:=at_resur;  cauto:=true; rtaru:=[0..255];r2attack:=true;                   end;
+   with _toids[uo_botrepair] do begin rtar:=at_mrepair;cauto:=true; rtaru:=[0..255];r2attack:=true;       toall:=true;end;
+   with _toids[uo_spawnlost] do begin rulimit:=true;                                                      toall:=true;end;
 
    with _toids[uo_prod] do
    begin
@@ -219,7 +220,7 @@ UID_Imp :
           _itattack:= atm_always;
           _urace   := r_hell;
           att(0,0 ,0 ,65,0,MID_Imp,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
-          att(1,-1,15,60,0,0      ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[UID_Imp]    );
+          att(1,-1,15,60,0,0      ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[1..255]     );
        end;
 UID_Demon:
        begin
@@ -233,7 +234,7 @@ UID_Demon:
           _renerg  := 1;
           _itattack:= atm_always;
           _urace   := r_hell;
-          att(0,-1,30,60,0,0      ,wpr_any,wpt_ddmg,uo_attack,at_aenemy+at_ground,[0..255] );
+          att(0,-1,30,60,0,0      ,wpr_any,wpt_ddmg,uo_attack,at_aenemy+at_ground,[1..255] );
        end;
 UID_CacoDemon:
       begin
@@ -248,8 +249,8 @@ UID_CacoDemon:
          _itattack:= atm_always;
          _urace   := r_hell;
          _zfall   := 60;
-         att(0,0 ,0 ,75,0,MID_Cacodemon,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i]    );
-         att(1,-1,20,60,0,0            ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[UID_Cacodemon] );
+         att(0,0 ,0 ,75,0,MID_Cacodemon,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
+         att(1,-1,20,60,0,0            ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[1..255]     );
       end;
 UID_Knight:
       begin
@@ -264,7 +265,7 @@ UID_Knight:
          _itattack:= atm_always;
          _urace   := r_hell;
          att(0,0 ,0 ,75,0,MID_Baron,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
-         att(1,-1,40,60,0,0        ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[UID_Knight] );
+         att(1,-1,40,60,0,0        ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[1..255]     );
       end;
 UID_Cyberdemon:
       begin
@@ -281,6 +282,7 @@ UID_Cyberdemon:
          _ruid    := UID_HMonastery;
          _itattack:= atm_always;
          _urace   := r_hell;
+         att(0,0 ,0 ,65,0,MID_HRocket,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
       end;
 UID_Mastermind:
       begin
@@ -306,11 +308,13 @@ UID_Pain:
          _mspeed  := 8;
          _srng    := 310;
          _painc   := 3;
-         //_a_rldr  := 95;
          _ctime   := vid_fps*60;
          _renerg  := 5;
          _ruid    := UID_HFortress;
          _urace   := r_hell;
+         _itattack:= atm_always;
+         att(0,0,0,90,0,UID_LostSoul ,wpr_any,wpt_uspwn,uo_attack,at_aenemy,[1..255]);
+         _orders:=[uo_spawnlost]
       end;
 UID_Revenant:
       begin
@@ -836,12 +840,12 @@ UID_URocketL:
 //                                                                    DEATH                           PAIN                          CREATE                        MELEE ATTACK           DISTANCE ATTACK
        UID_Imp            : begin _btny:= 0;_btnx:=0; _anims  := 11;  snd(2 ,ueff_death ,snd_impd1  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_impc1 );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
                                                                       snd(2 ,ueff_death ,snd_impd2  );snd(2,ueff_create,snd_impc2 );
-                                                                      snd(2 ,ueff_fdeath,nil,EID_Gavno,0,snd_meat);     end;
-       UID_LostSoul       : begin _btny:= 0;_btnx:=1;                 snd(2 ,ueff_death ,snd_pexp   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_d0    );asnd(1,snd_d0     ,-2);                       end;
-       UID_Demon          : begin _btny:= 0;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_demond );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_demonc);asnd(1,snd_demona ,-2);                       end;
+                                                                      snd(2 ,ueff_fdeath,nil,EID_Gavno,0,snd_meat);                 end;
+       UID_LostSoul       : begin _btny:= 0;_btnx:=1;                 snd(2 ,ueff_death ,snd_pexp   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_d0    );asnd(0,snd_d0     ,-2);                       end;
+       UID_Demon          : begin _btny:= 0;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_demond );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_demonc);asnd(0,snd_demona ,-2);                       end;
        UID_Cacodemon      : begin _btny:= 0;_btnx:=3;                 snd(2 ,ueff_death ,snd_cacod  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cacoc );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);end;
        UID_Knight         : begin _btny:= 0;_btnx:=4; _anims  := 11;  snd(0 ,ueff_death ,snd_knightd);snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_knight);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
-                                                                      snd(1 ,ueff_death ,snd_barond );                  end; //snd_baron
+                                                                      snd(1 ,ueff_death ,snd_barond );                              end; //snd_baron
        UID_Cyberdemon     : begin _btny:= 0;_btnx:=5; _anims  := 10;  snd(2 ,ueff_death ,snd_cyberd );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cyberc);                       asnd(0,snd_launch ,-2);end;
        UID_Mastermind     : begin _btny:= 1;_btnx:=0; _anims  := 10;  snd(2 ,ueff_death ,snd_mindd  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_mindc );                       asnd(0,snd_shotgun,-2);end;
        UID_Pain           : begin _btny:= 1;_btnx:=1; _anims  := 6 ;  snd(2 ,ueff_death ,snd_pain_d );snd(2,ueff_pain  ,snd_pain_p);snd(2,ueff_create,snd_pain_c);                       asnd(0,snd_d0     ,-2);end;
@@ -860,7 +864,8 @@ UID_URocketL:
 
 
        UID_Dron           : begin                                    snd(2 ,ueff_fdeath,nil,EID_Exp,0,snd_exp);snd(2,ueff_create,snd_dron0 );
-                                                                                                               snd(2,ueff_create,snd_dron1 );asnd(0,snd_cast2 ,-2);end;
+                                                                                                               snd(2,ueff_create,snd_dron1 );
+                                                                     asnd(0,snd_cast2 ,-2);end;
        UID_Sergant        : begin _btny:= 0;_btnx:=0; _anims  := 17; end;
        UID_Commando       : begin _btny:= 0;_btnx:=1; _anims  := 14; end;
        UID_Medic          : begin _btny:= 0;_btnx:=2; _anims  := 17; end;
