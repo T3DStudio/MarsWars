@@ -292,14 +292,35 @@ begin
 end;
 
 procedure _barrack_spawn(pu:PTUnit;suid:byte);
+const ditstepx : array[0..7] of integer = (1,1 , 0,-1,-1,-1,0,1);
+const ditstepy : array[0..7] of integer = (0,-1,-1,-1,0 , 1,1,1);
+var tx,
+    ty:integer;
+    sd:byte;
 begin
    with (pu^) do
    with (puid^) do
    begin
-      if(_tuids[suid]._uf>uf_ground)
-      then _unitCreate(vx,vy,suid,player,true,true)
-      else _unitCreate(vx,vy+_r+_tuids[suid]._r,suid,player,true,true);
-      if(_lcu>0)and(uo_rallpos in _orders)then _unit_setorder(_lcup,uo_rightcl,un_rtar,un_rx,un_ry,true,false);
+      if(_tuids[suid]._uf>uf_ground)and(_itbuild)then
+      begin
+         tx:=x;
+         ty:=y;
+      end
+      else
+      begin
+         sd:=((tdir+23) mod 360) div 45;
+         ty:=_r+_tuids[suid]._r;
+         tx:=x+ditstepx[sd]*ty;
+         ty:=y+ditstepy[sd]*ty;
+      end;
+
+      _unitCreate(tx,ty,suid,player,true,true);
+      if(_lcu>0)then
+      begin
+         if(uo_rallpos in _orders)then _unit_setorder(_lcup,uo_rightcl,un_rtar,un_rx,un_ry,true,false);
+         _lcup^.mdir:=mdir;
+         _lcup^.tdir:=tdir;
+      end;
    end;
 end;
 
@@ -528,12 +549,7 @@ begin
              if(buff[ub_cast]=0)then
              begin
                 //calc point
-                _unitCreate(vx,vy,UID_LostSoul,player,true,true);
-                if(_lcu>0)then
-                begin
-                   _lcup^.mdir:=mdir;
-                   _lcup^.tdir:=tdir;
-                end;
+                _barrack_spawn(pu,UID_LostSoul);
                 buff[ub_cast]:=vid_fps;
                 _nextOrder(pu);
              end;
