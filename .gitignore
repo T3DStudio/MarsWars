@@ -4,6 +4,8 @@
 *.bat
 *.bmp
 *.png
+*.zip
+*.rar
 cfg
 *.xlsx
 sound/*
