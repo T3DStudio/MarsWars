@@ -611,7 +611,7 @@ k_kbaddr             : set of Char = ['0'..'9','.',':'];
 AUDIO_FREQUENCY      : INTEGER = MIX_DEFAULT_FREQUENCY; //22050;
 AUDIO_FORMAT         : WORD    = AUDIO_S16;
 AUDIO_CHANNELS       : INTEGER = 1;
-AUDIO_CHUNKSIZE      : INTEGER = 1024;  //4096;
+AUDIO_CHUNKSIZE      : INTEGER = 1024;                  //4096;
                                            // 60 120 180 240 315 390 450 510 575 660
 _cl_pnua             : array[0..9] of byte = (20,40 ,60 ,80 ,105,130,150,170,195,220);
 

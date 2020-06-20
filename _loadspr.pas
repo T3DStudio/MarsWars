@@ -711,23 +711,6 @@ begin
    ui_UIMBTNS[r_uac ,0,1]:=UID_UVehicleFactory;
    ui_UIMBTNS[r_uac ,1,1]:=UID_URocketL;
 
-  { with _taids[0            ] do begin amarc   :=c_lime; end;
-   with _taids[aid_move     ] do begin _btnx:=0;_btny:=0; ahkey1:=SDLK_Q;    ahchar:='Q';    abtn:=spr_b_move;   amarc:=c_lime;end;
-   with _taids[aid_hold     ] do begin _btnx:=1;_btny:=0; ahkey1:=SDLK_W;    ahchar:='W';    abtn:=spr_b_hold;   end;
-   with _taids[aid_patrol   ] do begin _btnx:=2;_btny:=0; ahkey1:=SDLK_E;    ahchar:='E';    abtn:=spr_b_patrol; amarc:=c_red;end;
-   with _taids[aid_attack   ] do begin _btnx:=0;_btny:=1; ahkey1:=SDLK_A;    ahchar:='A';    abtn:=spr_b_attack; amarc:=c_red;end;
-   with _taids[aid_stop     ] do begin _btnx:=1;_btny:=1; ahkey1:=SDLK_S;    ahchar:='S';    abtn:=spr_b_stop;   end;
-   with _taids[aid_destroy  ] do begin _btnx:=2;_btny:=1; ahkey1:=SDLK_D;
-                                                          ahkey2:=SDLK_LCtrl;ahchar:='Ctr+D';abtn:=spr_b_delete; end;
-   with _taids[aid_rallpos  ] do begin _btnx:=2;_btny:=2; ahkey1:=SDLK_C;    ahchar:='C';    abtn:=spr_b_ralpos; amarc:=c_lime;end;
-   with _taids[aid_unload   ] do begin _btnx:=2;_btny:=2; ahkey1:=SDLK_C;    ahchar:='C';    abtn:=spr_b_unload; end;
-   with _taids[aid_upload   ] do begin _btnx:=1;_btny:=2; ahkey1:=SDLK_X;    ahchar:='X';    abtn:=spr_b_upload; end;
-
-   with _taids[aid_spwndron ] do begin _btnx:=0;_btny:=2; ahkey1:=SDLK_Z;    ahchar:='Z';    abtn:=_tuids[UID_Dron]._ubtn;end;
-   with _taids[aid_botrep   ] do begin _btnx:=0;_btny:=2; ahkey1:=SDLK_Z;    ahchar:='Z';    abtn:=LoadBtnFS(spr_drone[11].surf);sound_start:=snd_cast2;end;
-   with _taids[aid_resurect ] do begin _btnx:=0;_btny:=2; ahkey1:=SDLK_Z;    ahchar:='Z';    abtn:=LoadBtnFS(spr_archvile[70].surf);sound_start:=snd_meat;end;
-   //  }
-
    for iu:=0 to 255 do
     with _toids[iu] do
     begin

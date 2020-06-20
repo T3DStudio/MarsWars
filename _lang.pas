@@ -80,7 +80,7 @@ begin
       _odesc := sd;
 
       _ohint := _oname;
-      if(_okeyc<>'')then _ohint:=_ohint+' ('+#18+_okeyc+#25+')';
+      if(_okeyc<>'')then _ohint:=_ohint+' ('+#18+_okeyc+#25+')'+#13+#22+_odesc+#25+#13;
    end;
 end;
 
@@ -563,6 +563,18 @@ begin
    setUnitStr(UID_Tank       ,'Танк'               ,'');
    setUnitStr(UID_Flyer      ,'Истребитель'        ,'');
 
+
+   SetOrderStr(uo_move     ,'Двигаться'     ,'');
+   SetOrderStr(uo_attack   ,'Атаковать'     ,'Правый клик - переключить автоматический поиск цели.');
+   SetOrderStr(uo_patrol   ,'Патрулировать' ,'');
+   SetOrderStr(uo_stop     ,'Стоп'          ,'');
+   SetOrderStr(uo_hold     ,'Удерживать позицию'    ,'');
+   SetOrderStr(uo_upload   ,'Погрузить юнит'        ,'');
+   SetOrderStr(uo_unload   ,'Выгрузить всех'        ,'');
+   SetOrderStr(uo_rallpos  ,'Устновить пункт сбора' ,'');
+   SetOrderStr(uo_destroy  ,'Destroy'               ,'');
+   SetOrderStr(uo_spawndron,'Создать дрона'         ,_tuids[UID_Dron]._udesc);
+   SetOrderStr(uo_auto     ,'Switch auto mode'      ,'');
 
    _AddReqStr;
 

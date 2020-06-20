@@ -111,6 +111,7 @@ end;
 procedure WriteError(erstr:shortstring);
 var f:Text;
 begin
+   writeln(erstr);
    {$I-}
    Assign(f,outlogfn);
    if FileExists(outlogfn) then Append(f) else Rewrite(f);

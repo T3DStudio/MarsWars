@@ -236,6 +236,7 @@ begin
          m_vry:=vid_mh;
       end;
       vid_mredraw:=true;
+      PlayGSND(snd_click);
    end;
 
    if(k_ml=2)then              // left button pressed
@@ -553,9 +554,6 @@ begin
    else
      if(m_chat)then ui_chat_str:=menu_sf(ui_chat_str,k_kbstr,ChatLen);
    end;
-
-   if(k_ml=2)or(k_mr=2)then PlayGSND(snd_click);
-   //right or left click
 
    inc(m_vx,mv_x);
    inc(m_vy,mv_y);

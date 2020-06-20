@@ -7,7 +7,7 @@ program T3D_RTS;
   {$APPTYPE CONSOLE}
   //{$APPTYPE GUI}     // FULL GAME
 {$ELSE}
-  {$APPTYPE CONSOLE} // DED SERVER
+  {$APPTYPE CONSOLE}   // DED SERVER
 {$ENDIF}
 
 uses SysUtils, SDL, SDL_Net
@@ -86,7 +86,7 @@ begin
    {$ENDIF}
    end;
 
-   {$IFNDEF _FULLGAME}
+   {$IFDEF _FULLGAME}
    cfg_write;
    {$ENDIF}
 end.

@@ -160,6 +160,7 @@ end;
 procedure D_UIText;
 var i:byte;
 begin
+   // Chat messages
    if(_igchat)or(_rpls_log)then
    begin
       for i:=0 to MaxNetChat do _draw_text(_screen,ui_chatx,ui_chaty2-txt_line_h3*i,net_clchatm[i],ta_left,255,c_white);
@@ -173,6 +174,7 @@ begin
         dec(ui_chat_shlm,1);
      end;
 
+   // Game status
    case G_Status of
    0            : ;
    1..MaxPlayers: _draw_text(_screen,ui_xpws,font_w,str_pause ,ta_Fmiddle,255,_players[G_Status].color);
@@ -191,6 +193,7 @@ begin
    _draw_text(_screen,ui_xpws,0,b2s(G_Status)+' '+b2s(anb_Terrain[map_trt])+' '+b2s(map_trt) ,ta_Fmiddle,255,c_white);
 
 
+   // hints
    with _players[HPlayer] do
     if(m_vx>ui_mmwidth)then
      if(0<=m_by)and(m_by<=ui_p_btnsh)then
@@ -228,7 +231,10 @@ begin
         if(ui_p_rsecx<=m_bx)and(m_bx<ui_p_xsbtns)then
         begin
            i:=ui_UIABTNS[ui_lsuc,m_bx-ui_p_rsecx,m_by];
-           if(i>0)then _draw_text(_screen,ui_p_rhintx,ui_rpabily,_toids[i]._ohint,ta_Left,255,c_white);
+           if(i>0)then
+           begin
+              _draw_text(_screen,ui_p_rhintx,ui_rpabily,_toids[i]._ohint,ta_Left,255,c_white);
+           end;
         end;
       end
       else
@@ -254,7 +260,6 @@ begin
            SDL_SetAlpha(surf,SDL_SRCALPHA,255);
         end;
         circleColor(_screen,m_vx,m_vy,_r,m_brcolor);
-
      end;
 
    D_Panel;

@@ -4,7 +4,7 @@ procedure _missile_effect(m:integer);
 begin
    with _missiles[m] do
    begin
-      case mid of
+{      case mid of
 MID_ArchFire : begin PlaySND(snd_exp,nil); exit; end;
 MID_Imp,
 MID_Cacodemon,
@@ -29,9 +29,9 @@ MID_SShot,
                                         if(random(4)=0)then PlaySND(snd_rico,nil);
                                         continue;
                                      end;
-      end;
+      end;  }
 
-      _effect_add(vx,vy,d+50,mid);
+      //_effect_add(vx,vy,d+50,mid);
    end;
 end;
 

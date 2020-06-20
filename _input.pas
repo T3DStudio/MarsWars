@@ -124,15 +124,15 @@ begin
 
          if(oid=po_uorder)or(oid=po_uordera)then
           if(0<=ox0)and(ox0<=255)then
+           with _tuids[ui_lsuc] do
            with _toids[ox0] do
-            if((rtar and at_anytar)>0)then
+            if{(ox0 in _orders)and}((rtar and at_anytar)>0)then
             begin
-               with _tuids[ui_lsuc] do
-                case _com_sndn of
-                0: ;
-                1:   PlayUSND(_com_snds[0]);
-                else PlayUSND(_com_snds[random(_com_sndn)]);
-                end;
+               case _com_sndn of
+               0: ;
+               1:   PlayUSND(_com_snds[0]);
+               else PlayUSND(_com_snds[random(_com_sndn)]);
+               end;
 
                if(oy0>0)then
                begin

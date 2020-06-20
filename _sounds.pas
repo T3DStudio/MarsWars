@@ -29,7 +29,9 @@ end; }
 
 procedure PlayGSND(s:pMIX_CHUNK);
 begin
+   writeln(1);
    if(s=nil)or(snd_usesnd=false)then exit;
+   writeln(snd_svolume);
 
    MIX_VOLUMECHUNK(s,snd_svolume);
    MIX_PLAYCHANNEL(-1,s,0);
@@ -223,31 +225,31 @@ begin
    snd_man_d       :=loadSND('d_man_d.wav');
    snd_man_p       :=loadSND('d_man_p.wav');
    snd_man_c       :=loadSND('d_man_c.wav');
-   snd_hshoot      :=loadSND('d_a.wav');
+   snd_hshoot      :=loadSND('d_a.wav'    );
    snd_rev_c       :=loadSND('d_rev_c.wav');
    snd_rev_m       :=loadSND('d_rev_m.wav');
    snd_rev_d       :=loadSND('d_rev_d.wav');
    snd_rev_a       :=loadSND('d_rev_a.wav');
-   snd_rev_ac      :=loadSND('d_rev_ac.wav');
-   snd_cubes       :=loadSND('cube_s.wav');
-   snd_launch      :=loadSND('launch.wav');
-   snd_pistol      :=loadSND('h_u0_a.WAV');
-   snd_shotgun     :=loadSND('h_u1_a.wav');
-   snd_rico        :=loadSND('rico1.wav');
-   snd_ssg         :=loadSND('ssg.wav');
-   snd_bfgs        :=loadSND('h_u5_a.wav');
-   snd_bfgepx      :=loadSND('bfg_exp.wav');
-   snd_plasmas     :=loadSND('h_u4_a.wav');
-   snd_cast2       :=loadSND('rep.wav');
-   snd_cast        :=loadSND('h_u0_r.WAV');
-   snd_uupgr       :=loadSND('uup.WAV');
-   snd_hupgr       :=loadSND('hup.WAV');
-   snd_alarm       :=loadSND('alarm.wav');
+   snd_rev_ac      :=loadSND('d_rev_ac.wav'    );
+   snd_cubes       :=loadSND('cube_s.wav'      );
+   snd_launch      :=loadSND('launch.wav'      );
+   snd_pistol      :=loadSND('h_u0_a.WAV'      );
+   snd_shotgun     :=loadSND('h_u1_a.wav'      );
+   snd_rico        :=loadSND('rico1.wav'       );
+   snd_ssg         :=loadSND('ssg.wav'         );
+   snd_bfgs        :=loadSND('h_u5_a.wav'      );
+   snd_bfgepx      :=loadSND('bfg_exp.wav'     );
+   snd_plasmas     :=loadSND('h_u4_a.wav'      );
+   snd_cast2       :=loadSND('rep.wav'         );
+   snd_cast        :=loadSND('h_u0_r.WAV'      );
+   snd_uupgr       :=loadSND('uup.WAV'         );
+   snd_hupgr       :=loadSND('hup.WAV'         );
+   snd_alarm       :=loadSND('alarm.wav'       );
    snd_hellbar     :=loadSND('hellbarracks.wav');
-   snd_hell        :=loadSND('hell.wav');
-   snd_ubuild      :=loadSND('build.wav');
+   snd_hell        :=loadSND('hell.wav'        );
+   snd_ubuild      :=loadSND('build.wav'       );
 
-   snd_usesnd:=true;
+   snd_usesnd      :=true;
 end;
 
 
