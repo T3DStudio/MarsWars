@@ -128,7 +128,8 @@ TUID = record
 
    _ueffsnds : array[false..true,0.._ueffs_ctypen-1,0..MaxUIDSnds-1] of pMIX_CHUNK;
    _ueffsndn : array[false..true,0.._ueffs_ctypen-1] of byte;
-   _ueffeid  : array[false..true,0.._ueffs_ctypen-1] of byte;
+   _ueffeid1 : array[false..true,0.._ueffs_ctypen-1] of byte;
+   _ueffeid2 : array[false..true,0.._ueffs_ctypen-1] of byte;
    _ueffeids : array[false..true,0.._ueffs_ctypen-1] of pMIX_CHUNK;
    _com_snds : array[0..MaxUIDSnds-1] of pMIX_CHUNK;
    _com_sndn : byte;

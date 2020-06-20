@@ -2,6 +2,7 @@
 {
 _ueff2snd - main sounds
 _ueffeid  - additional effect
+_ueffeid  - additional terrain effect
 _ueffeids - effect sound
 }
 
@@ -13,7 +14,8 @@ begin
       with puid^ do
       begin
          PlayUSND(_ueffeids[adv,efft],pu);
-         _effect_uadd(pu,_ueffeid[adv,efft]);
+         _effect_uadd(pu,_ueffeid1[adv,efft]);
+         _effect_uadd(pu,_ueffeid2[adv,efft],-5);
       end;
    end;
 end;
@@ -52,43 +54,4 @@ begin
     then _ueff_eff(pu,ueff_fdeath,buff[ub_advanced]>0,true)
     else _ueff_eff(pu,ueff_death ,buff[ub_advanced]>0,true);
 end;
-
-{procedure _unit_effect(pu:PTUnit;efft:byte;alt:boolean=false);
-begin
-   with (pu^) do
-   begin
-      case efft of
-      ueff_startb,
-      ueff_create  : buff[ub_born]:=vid_h2fps;
-      end;
-      {$IFDEF _FULLGAME}
-      case efft of
-    ueff_startb,
-    ueff_create  : if(_menu=false)then
-                    if(bld=false)
-                    then PlayGSND(_ueff2snd(uid,ueff_startb))
-                    else PlayGSND(_ueff2snd(uid,ueff_create));
-    ueff_death,
-    ueff_adeath  : begin
-                      if(alt=false)
-                      then PlayUSND(_ueff2snd(uid,ueff_death ),pu)
-                      else PlayUSND(_ueff2snd(uid,ueff_adeath),pu);
-                   end;
-    ueff_command : if(_menu=false)then PlayGSND(_ueff2snd(uid,efft));
-    {ueff_pain   :;
-    ueff_death   :;
-    ueff_dattack :;
-    ueff_mattack :;
-    ueff_foot}
-      else
-         {PlayUSND(_ueff2snd(uid,efft ),pu);
-         with puid^ do
-         begin
-            PlayUSND(_ueffeids[efft],pu);
-            _effect_uadd(pu,_ueffeid[efft]);
-         end;
-      end;
-      {$ENDIF}
-   end;
-end; } }
 

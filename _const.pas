@@ -415,7 +415,6 @@ _ueffs_ctypen        = 6;
 MaxUIDSnds           = 3;
 
 
-
 LiquidMR             = 4;
 _buffst              : array[false..true] of smallint = (0,_bufinf);
 

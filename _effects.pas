@@ -68,9 +68,13 @@ begin
      end;
 end;
 
-procedure _effect_uadd(pu:PTUnit;ee:byte);
+procedure _effect_uadd(pu:PTUnit;ee:byte;d:integer=-32000);
 begin
-   with (pu^) do _effect_add(vx,vy,vy+map_flydpth[uf]+1,ee);
+   with (pu^) do
+   begin
+      if(d=-32000)then d:=vy+map_flydpth[uf]+1;
+      _effect_add(vx,vy,d,ee);
+   end;
 end;
 
 procedure _effectsCycle(draw:boolean);

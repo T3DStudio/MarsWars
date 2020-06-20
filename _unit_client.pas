@@ -388,8 +388,8 @@ begin
 
          _unit_upgr(cu);
 
-         //if(hits>ndead_hits)and(inapc=0)then
-         // if(pu^.hits>0)then _ueff_death(cu,false);
+         if(hits>ndead_hits)and(inapc=0)then
+          if(pu^.hits>0)then _ueff_death(cu,hits<=idead_hits);
       end
       else
        if(pu^.hits>dead_hits)and(hits>dead_hits)then // a to a
@@ -415,12 +415,13 @@ begin
           else
            if(pu^.hits>0)and(hits<=0)then // a to d
            begin
-              //_ueff_death(cu,hits<=idead_hits);
+              _ueff_death(cu,hits<=idead_hits);
            end
            else                             // a to a or d to d
-           begin
-              if(pu^.buff[ub_pain]=0)and(buff[ub_pain]>0)then _ueff_pain(pu);
-           end;
+            if(hits>0)then
+            begin
+               if(pu^.buff[ub_pain]=0)and(buff[ub_pain]>0)then _ueff_pain(pu);
+            end;
 
           if(pu^.buff[ub_born  ]=0)and(buff[ub_born  ]>0)then _ueff_create(cu);
 

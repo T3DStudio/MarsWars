@@ -66,14 +66,14 @@ const
 {$ENDIF}
 var i,a:byte;
 {$IFDEF _FULLGAME}
-procedure snd(advt:byte;sndt:byte;sndc:pMIX_CHUNK=nil;eid:byte=0;eids:pMIX_CHUNK=nil);
+procedure snd(advt:byte;sndt:byte;sndc:pMIX_CHUNK=nil;eid1:byte=0;eid2:byte=0;eids:pMIX_CHUNK=nil);
 var adv:boolean;
 begin
    with _tuids[i] do
    begin
       adv:=false;
       if(advt=1)then adv:=true;
-      if(advt>1)then snd(1,sndt,sndc,eid,eids);
+      if(advt>1)then snd(1,sndt,sndc,eid1,eid2,eids);
 
       if(sndc<>nil)then   // sound
        if(_ueffsndn[adv,sndt]<MaxUIDSnds)then
@@ -81,7 +81,8 @@ begin
           _ueffsnds[adv,sndt,_ueffsndn[adv,sndt]]:=sndc;
           inc(_ueffsndn[adv,sndt],1);
        end;
-      if(eid  >0  )then _ueffeid [adv,sndt]:=eid;  // effect
+      if(eid1 >0  )then _ueffeid1[adv,sndt]:=eid1; // effect 1
+      if(eid2 >0  )then _ueffeid2[adv,sndt]:=eid2; // effect 2
       if(eids<>nil)then _ueffeids[adv,sndt]:=eids; // effect sound
    end;
 end;
@@ -835,12 +836,12 @@ UID_URocketL:
 //                                                                    DEATH                           PAIN                          CREATE                        MELEE ATTACK           DISTANCE ATTACK
        UID_Imp            : begin _btny:= 0;_btnx:=0; _anims  := 11;  snd(2 ,ueff_death ,snd_impd1  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_impc1 );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
                                                                       snd(2 ,ueff_death ,snd_impd2  );snd(2,ueff_create,snd_impc2 );
-                                                                      snd(2 ,ueff_fdeath,nil,EID_Gavno,snd_meat);end;
+                                                                      snd(2 ,ueff_fdeath,nil,EID_Gavno,0,snd_meat);     end;
        UID_LostSoul       : begin _btny:= 0;_btnx:=1;                 snd(2 ,ueff_death ,snd_pexp   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_d0    );asnd(1,snd_d0     ,-2);                       end;
        UID_Demon          : begin _btny:= 0;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_demond );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_demonc);asnd(1,snd_demona ,-2);                       end;
        UID_Cacodemon      : begin _btny:= 0;_btnx:=3;                 snd(2 ,ueff_death ,snd_cacod  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cacoc );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);end;
        UID_Knight         : begin _btny:= 0;_btnx:=4; _anims  := 11;  snd(0 ,ueff_death ,snd_knightd);snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_knight);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
-                                                                      snd(1 ,ueff_death ,snd_barond );end; //snd_baron
+                                                                      snd(1 ,ueff_death ,snd_barond );                  end; //snd_baron
        UID_Cyberdemon     : begin _btny:= 0;_btnx:=5; _anims  := 10;  snd(2 ,ueff_death ,snd_cyberd );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cyberc);                       asnd(0,snd_launch ,-2);end;
        UID_Mastermind     : begin _btny:= 1;_btnx:=0; _anims  := 10;  snd(2 ,ueff_death ,snd_mindd  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_mindc );                       asnd(0,snd_shotgun,-2);end;
        UID_Pain           : begin _btny:= 1;_btnx:=1; _anims  := 6 ;  snd(2 ,ueff_death ,snd_pain_d );snd(2,ueff_pain  ,snd_pain_p);snd(2,ueff_create,snd_pain_c);                       asnd(0,snd_d0     ,-2);end;
@@ -858,8 +859,8 @@ UID_URocketL:
 
 
 
-       UID_Dron           : begin                                    snd(2 ,ueff_fdeath,nil,EID_Exp,snd_exp);snd(2,ueff_create,snd_dron0 );
-                                                                                                             snd(2,ueff_create,snd_dron1 );asnd(0,snd_cast2 ,-2);end;
+       UID_Dron           : begin                                    snd(2 ,ueff_fdeath,nil,EID_Exp,0,snd_exp);snd(2,ueff_create,snd_dron0 );
+                                                                                                               snd(2,ueff_create,snd_dron1 );asnd(0,snd_cast2 ,-2);end;
        UID_Sergant        : begin _btny:= 0;_btnx:=0; _anims  := 17; end;
        UID_Commando       : begin _btny:= 0;_btnx:=1; _anims  := 14; end;
        UID_Medic          : begin _btny:= 0;_btnx:=2; _anims  := 17; end;
@@ -883,10 +884,10 @@ UID_URocketL:
        UID_ZBomber,
        UID_ZMajor,
        UID_ZBFG      : begin
-                          snd(2,ueff_create,snd_z_s1);snd(2,ueff_death ,snd_z_d1);               snd(2,ueff_pain  ,snd_z_p );
+                          snd(2,ueff_create,snd_z_s1);snd(2,ueff_death ,snd_z_d1);                snd(2,ueff_pain  ,snd_z_p );
                           snd(2,ueff_create,snd_z_s2);snd(2,ueff_death ,snd_z_d2);
                           snd(2,ueff_create,snd_z_s3);snd(2,ueff_death ,snd_z_d3);
-                                                      snd(2,ueff_fdeath,nil,EID_Gavno,snd_meat);
+                                                      snd(2,ueff_fdeath,nil,EID_Gavno,0,snd_meat);
                        end;
        UID_Scout,
        UID_Medic,
@@ -897,7 +898,7 @@ UID_URocketL:
        UID_BFG       : begin
                           snd(2,ueff_create,snd_uac_u0);csnd(snd_uac_u0);snd(2,ueff_death,snd_ud1);
                           snd(2,ueff_create,snd_uac_u1);csnd(snd_uac_u1);snd(2,ueff_death,snd_ud2);
-                          snd(2,ueff_create,snd_uac_u2);csnd(snd_uac_u2);snd(2,ueff_fdeath,nil,EID_Gavno,snd_meat);
+                          snd(2,ueff_create,snd_uac_u2);csnd(snd_uac_u2);snd(2,ueff_fdeath,nil,EID_Gavno,0,snd_meat);
                        end;
        UID_FAPC,
        UID_APC,
@@ -907,7 +908,7 @@ UID_URocketL:
                           snd(2,ueff_create,snd_uac_u0);csnd(snd_uac_u0);
                           snd(2,ueff_create,snd_uac_u1);csnd(snd_uac_u1);
                           snd(2,ueff_create,snd_uac_u2);csnd(snd_uac_u2);
-                          snd(2,ueff_fdeath,nil,EID_Exp2,snd_exp);
+                          snd(2,ueff_fdeath,nil,EID_Exp2,0,snd_exp);
                        end;
        end;
 
@@ -933,11 +934,21 @@ UID_URocketL:
        end;
 
        case _urace of
-       r_hell : if(_itbuild)
-                then snd(2,ueff_startb,snd_cubes)
+       r_hell : if(_itbuild)then
+                begin
+                   snd(2,ueff_startb,snd_cubes);
+                   if(_r<=45 )
+                   then snd(2,ueff_fdeath,snd_exp2,EID_BExp ,EID_db_h1,nil)
+                   else snd(2,ueff_fdeath,snd_exp2,EID_BBExp,EID_db_h0,nil);
+                end
                 else snd(2,ueff_startb,snd_teleport);
-       r_uac  : if(_itbuild)
-                then snd(2,ueff_startb,snd_ubuild)
+       r_uac  : if(_itbuild)then
+                begin
+                   snd(2,ueff_startb,snd_ubuild);
+                   if(_r<=45 )
+                   then snd(2,ueff_fdeath,snd_exp2,EID_BExp ,EID_db_u1,nil)
+                   else snd(2,ueff_fdeath,snd_exp2,EID_BBExp,EID_db_u0,nil);
+                end
                 else snd(2,ueff_startb,snd_teleport);
        end;
 
