@@ -125,7 +125,6 @@ TUID = record
    _solid   :boolean;
 
    {$IFDEF _FULLGAME}
-
    _ueffsnds : array[false..true,0.._ueffs_ctypen-1,0..MaxUIDSnds-1] of pMIX_CHUNK;
    _ueffsndn : array[false..true,0.._ueffs_ctypen-1] of byte;
    _ueffeid1 : array[false..true,0.._ueffs_ctypen-1] of byte;
@@ -308,6 +307,14 @@ TMissile = record
    pora,pains:byte;
    homing    :boolean;
    depuids   :TSoB;
+   {$IFDEF _FULLGAME}
+   _meeff,
+   _meeffn,
+   _mteff,
+   _mtefff,
+   _mesndc:byte;
+   _mesnd :pMIX_CHUNK;
+   {$ENDIF}
 end;
 
 {$IFDEF _FULLGAME}

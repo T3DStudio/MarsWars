@@ -260,31 +260,32 @@ begin
    setUnitStr(UID_UPTurret       ,'UAC Plasma turret'          ,'Defensive structure.');
    setUnitStr(UID_URocketL       ,'UAC Rocket Launcher Station','Provide a missile strike.');
 
-   setUnitStr(UID_Dron       ,'UAC Dron'         ,'Builder. Can repair mechanical units.');
-   setUnitStr(UID_Medic      ,'Medic'            ,'');
-   setUnitStr(UID_Sergant    ,'Sergant'          ,'');
-   setUnitStr(UID_Commando   ,'Commando'         ,'');
-   setUnitStr(UID_Bomber     ,'Artillery soldier','');
-   setUnitStr(UID_Major      ,'Major'            ,'');
-   setUnitStr(UID_BFG        ,'BFG Marine'       ,'');
-   setUnitStr(UID_FAPC       ,'Air APC'          ,'');
-   setUnitStr(UID_APC        ,'Ground APC'       ,'');
-   setUnitStr(UID_Terminator ,'UAC Terminator'   ,'');
-   setUnitStr(UID_Tank       ,'UAC Tank'         ,'');
-   setUnitStr(UID_Flyer      ,'UAC Fighter'      ,'');
+   setUnitStr(UID_Dron       ,'UAC Dron'           ,'Builder. Can repair mechanical units.');
+   setUnitStr(UID_Medic      ,'Medic'              ,'');
+   setUnitStr(UID_Sergant    ,'Sergant'            ,'');
+   setUnitStr(UID_Commando   ,'Commando'           ,'');
+   setUnitStr(UID_Bomber     ,'Artillery soldier'  ,'');
+   setUnitStr(UID_Major      ,'Major'              ,'');
+   setUnitStr(UID_BFG        ,'BFG Marine'         ,'');
+   setUnitStr(UID_FAPC       ,'Air APC'            ,'');
+   setUnitStr(UID_APC        ,'Ground APC'         ,'');
+   setUnitStr(UID_Terminator ,'UAC Terminator'     ,'');
+   setUnitStr(UID_Tank       ,'UAC Tank'           ,'');
+   setUnitStr(UID_Flyer      ,'UAC Fighter'        ,'');
 
 
-   SetOrderStr(uo_move     ,'Move'  ,'');
-   SetOrderStr(uo_attack   ,'Attack','Right click to switch auto target search.');
-   SetOrderStr(uo_patrol   ,'Patrol','');
-   SetOrderStr(uo_stop     ,'Stop'  ,'');
-   SetOrderStr(uo_hold     ,'Hold position'      ,'');
-   SetOrderStr(uo_upload   ,'Upload unit'        ,'');
-   SetOrderStr(uo_unload   ,'Unload all units'   ,'');
-   SetOrderStr(uo_rallpos  ,'Set rally-point'    ,'');
-   SetOrderStr(uo_destroy  ,'Destroy'            ,'');
-   SetOrderStr(uo_spawndron,'Create UAC Drone'   ,_tuids[UID_Dron]._udesc);
-   SetOrderStr(uo_auto     ,'Switch auto mode'   ,'');
+   SetOrderStr(uo_move       ,'Move'               ,'');
+   SetOrderStr(uo_attack     ,'Attack'             ,'Right click to switch auto target search.');
+   SetOrderStr(uo_patrol     ,'Patrol'             ,'');
+   SetOrderStr(uo_stop       ,'Stop'               ,'');
+   SetOrderStr(uo_hold       ,'Hold position'      ,'');
+   SetOrderStr(uo_upload     ,'Upload unit'        ,'');
+   SetOrderStr(uo_unload     ,'Unload all units'   ,'');
+   SetOrderStr(uo_rallpos    ,'Set rally-point'    ,'');
+   SetOrderStr(uo_destroy    ,'Destroy'            ,'');
+   SetOrderStr(uo_spawndron  ,'Create UAC Drone'   ,_tuids[UID_Dron]._udesc);
+   SetOrderStr(uo_auto       ,'Switch auto mode'   ,'');
+   SetOrderStr(uo_spawnlost  ,'Spawn Lost Soul'    ,'');
 
 
    _AddReqStr;

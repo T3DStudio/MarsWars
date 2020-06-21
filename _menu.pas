@@ -271,12 +271,15 @@ begin
                if(m_vx>=304)
                then snd_svolume:=127
                else snd_svolume:=m_vx-177;
-          1: if(m_vx<=177)
-             then snd_mvolume:=0
-             else
-               if(m_vx>=304)
-               then snd_mvolume:=127
-               else snd_mvolume:=m_vx-177;
+          1: begin
+                if(m_vx<=177)
+                then snd_mvolume:=0
+                else
+                  if(m_vx>=304)
+                  then snd_mvolume:=127
+                  else snd_mvolume:=m_vx-177;
+                MIX_VOLUMEMUSIC(snd_mvolume);
+             end;
           end;
          if(menu_s3=ms3_vid)then
           case p of

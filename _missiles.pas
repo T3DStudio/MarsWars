@@ -1,5 +1,6 @@
 
 {
+classic missile speed
 imp      10
 caco     10
 revenant 10
@@ -14,23 +15,23 @@ begin
    _miss_set:=false;
    with _missiles[m] do
     case mid of
-    MID_Imp           : begin step:=15 ;dam :=12 ;depuids:=[UID_Imp      ];end;
-    MID_Cacodemon     : begin step:=15 ;dam :=30 ;depuids:=[UID_Cacodemon];end;
-    MID_Baron         : begin step:=20 ;dam :=50 ;depuids:=[UID_Knight   ];end;
-    MID_HRocket       : begin step:=20 ;dam :=100;sr :=45 ; end;
-    MID_URocket       : begin step:=20 ;dam :=55 ;sr :=45 ; end;
-    MID_Granade       : begin step:=9  ;dam :=50 ;sr :=45 ; pora:=2;       end;
-    MID_Mine          : begin           dam:=180 ;sr :=100; end;
-    MID_ArchFire      : begin           dam:=100 ;sr :=13 ; end;
-    MID_Revenant      : begin step:=15; dam:=30  ;depuids:=[UID_Revenant ];end;
-    MID_Mancubus      : begin step:=20; dam:=45  ;depuids:=[UID_Mancubus ];end;
-    MID_BPlasma       : begin step:=20; dam:=20  ;          end;
-    MID_YPlasma       : begin step:=20; dam:=15  ;          end;
-    MID_BFG           : begin step:=10; dam:=110 ;sr :=120; end;
+    MID_Imp           : begin step:=15 ;dam:=12 ;           depuids:=[UID_Imp      ];end;
+    MID_Cacodemon     : begin step:=15 ;dam:=30 ;           depuids:=[UID_Cacodemon];end;
+    MID_Baron         : begin step:=20 ;dam:=50 ;           depuids:=[UID_Knight   ];end;
+    MID_HRocket       : begin step:=20 ;dam:=100; sr :=45 ;                          end;
+    MID_URocket       : begin step:=20 ;dam:=55 ; sr :=45 ;                          end;
+    MID_Granade       : begin step:=9  ;dam:=50 ; sr :=45 ; pora:=2;                 end;
+    MID_Mine          : begin           dam:=180; sr :=100;                          end;
+    MID_ArchFire      : begin           dam:=100; sr :=13 ;                          end;
+    MID_Revenant      : begin step:=15; dam:=30 ;           depuids:=[UID_Revenant ];end;
+    MID_Mancubus      : begin step:=20; dam:=45 ;           depuids:=[UID_Mancubus ];end;
+    MID_BPlasma       : begin step:=20; dam:=20 ;                                    end;
+    MID_YPlasma       : begin step:=20; dam:=15 ;                                    end;
+    MID_BFG           : begin step:=10; dam:=110; sr :=120;                          end;
     MID_TBullet,
-    MID_Bullet        : begin           dam:=6;  end;
-    MID_Bulletx2      : begin           dam:=12; end;
-    MID_Blizzard      : begin step:=200;dam:=225; sr :=175; end;
+    MID_Bullet        : begin           dam:=6  ;                                    end;
+    MID_Bulletx2      : begin           dam:=12 ;                                    end;
+    MID_Blizzard      : begin step:=200;dam:=225; sr :=175;                          end;
     MID_SShot         :
        begin
           sr :=dist2(x,y,vx,vy) div 4;
@@ -49,9 +50,48 @@ begin
           mtars:=8;
        end;
 
-      else exit;
-      end;
+    else exit;
+    end;
    _miss_set:=true;
+
+   {$IFDEF _FULLGAME}
+   with _missiles[m] do
+   begin
+      _meeff :=0;
+      _meeffn:=1;
+      _mteff :=0;
+      _mtefff:=0;
+      _mesndc:=1;
+      _mesnd :=nil;
+      case mid of
+    MID_Imp,
+    MID_Cacodemon,
+    MID_Baron,
+    MID_Mancubus,
+    MID_BPlasma,
+    MID_YPlasma   : begin _mesnd:=snd_pexp;   _meeff:=mid; end;
+    MID_BFG       : begin _mesnd:=snd_bfgepx; _meeff:=mid; end;
+    MID_Revenant,
+    MID_Granade,
+    MID_URocket,
+    MID_HRocket,
+    MID_ArchFire  : begin _mesnd:=snd_exp;     end;
+    MID_Blizzard  : begin _mesnd:=snd_exp2;   _meeff:=EID_BBExp;  end;
+    MID_SShot     : begin _mesnd:=snd_rico;   _meeff:=mid_Bullet; _mesndc:=5;_meeffn:=4; end;
+    MID_SSShot    : begin _mesnd:=snd_rico;   _meeff:=mid_Bullet; _mesndc:=5;_meeffn:=6; end;
+    MID_Bullet,
+    MID_Bulletx2,
+    MID_TBullet   : begin _mesnd:=snd_rico;   _meeff:=mid_Bullet; _mesndc:=5; end;
+      end;
+      case mid of
+    MID_URocket,
+    MID_HRocket,
+    MID_Granade   : begin _mteff:=MID_Bullet; _mtefff:=4; end;
+    MID_Blizzard  : begin _mteff:=EID_Exp;    _mtefff:=3; end;
+      end;
+   end;
+   {$ENDIF}
+
 end;
 
 procedure _miss_add(mx,my,mvx,mvy,mtar:integer;msid,mpl,mft,mflags:byte);
@@ -96,11 +136,13 @@ begin
        then vst:=1
        else vst:=dd div step;
 
-       if((mflags and mf_2xspd )>0)then vst:=vst div 2
-  else if((mflags and mf_insta )>0)then vst:=1;
-       if((mflags and mf_ihhdam)>0)then inc(dam,dam shl 2);
-       if((mflags and mf_ihdam )>0)then inc(dam,dam shl 1);
+       if((mflags and mf_2xspd )>0)then vst:=vst div 2;
+       if((mflags and mf_insta )>0)then vst:=1;
+
+       if((mflags and mf_ihhdam)>0)then inc(dam,dam div 4);
+       if((mflags and mf_ihdam )>0)then inc(dam,dam div 2);
        if((mflags and mf_i1dam )>0)then inc(dam,dam);
+       if((mflags and mf_homing)>0)then if(tar>0)then homing:=true;
 
        if(vst<=0)then vst:=1;
 
@@ -112,9 +154,9 @@ begin
 end;
 
 procedure _missle_damage(m:integer);
-var tu: PTUnit;
-teams : boolean;
-d,damd: integer;
+var tu : PTUnit;
+teams  : boolean;
+d,damd : integer;
 begin
    with _missiles[m] do
    begin
@@ -135,13 +177,15 @@ begin
            d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.puid^._r;
            if(sr=0)then dec(d,10);
 
+           // damage x
+
            if(d<=0)then // direct
            begin
               dec(mtars,1);
               _unit_damage(tu,damd,pains);
            end
            else
-            if(sr>0)and(d<sr)then
+            if(sr>0)and(d<sr)then // splash
             begin
                dec(mtars,1);
                damd:=trunc(damd*(1-(d/sr)) );

@@ -1,4 +1,10 @@
 
+/////////////////////////////////////////////////////////////////////////////////
+////
+////   UNIT EFFECTS
+////
+////////
+
 {
 _ueff2snd - main sounds
 _ueffeid  - additional effect
@@ -54,4 +60,33 @@ begin
     then _ueff_eff(pu,ueff_fdeath,buff[ub_advanced]>0,true)
     else _ueff_eff(pu,ueff_death ,buff[ub_advanced]>0,true);
 end;
+
+/////////////////////////////////////////////////////////////////////////////////
+////
+////   MISSILE EFFECTS
+////
+////////
+
+procedure _missile_effect(m:integer);
+var i :byte;
+    d,
+    sl:integer;
+begin
+   with _missiles[m] do
+   begin
+      with _players[HPlayer] do
+       if(_nhp3(vx,vy,team)=false)then exit;
+
+      d :=map_flydpth[mf]+vy;
+      sl:=sr*2;
+      for i:=1 to _meeffn do _effect_add(vx-sr+random(sl),vy-sr+random(sl),d,_meeff);
+
+      case _mesndc of
+      0  : ;
+      1  : PlayUSND(_mesnd);
+      else if(random(_mesndc)=0)then PlayUSND(_mesnd);
+      end;
+   end;
+end;
+
 

@@ -159,6 +159,7 @@ atm_always           = 10;
 wpr_any              = 0;
 wpr_adv              = 1;
 wpr_nadv             = 2;
+wpr_netst            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -277,6 +278,7 @@ mf_insta             = %01000000;
 mf_ihhdam            = %00100000;
 mf_ihdam             = %00010000;
 mf_i1dam             = %00001000;
+mf_homing            = %00000100;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -392,8 +394,8 @@ MaxOrderList         = 63;
 _mms                 = 126;
 _d2shi               = abs(dead_hits div 126)+1;   // 5
 
-                                                                         // hell  uac
-race_pstyle          : array[false..true,1..race_n] of boolean = {units :}((true ,false),  // true = warpgate / false - classic
+                                                               //           hell  uac
+race_pstyle          : array[false..true,1..race_n] of boolean = {units :}((false,false),  // true = warpgate / false - classic
                                                                  {builds:} (true ,false)); // true = classic  / false = uac(dron)
 race_bsmana          : array[false..true,1..race_n] of byte    = {units :}((5    ,0    ),  // units
                                                                  {builds:} (25   ,0    )); // builds

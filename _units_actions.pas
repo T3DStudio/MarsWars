@@ -546,11 +546,10 @@ begin
                 _nextOrder(pu);
              end;
        uo_spawnlost:
-             if(buff[ub_cast]=0)then
+             if(buff[ub_cast]=0)and(a_rld=0)then
              begin
-                //calc point
                 _barrack_spawn(pu,UID_LostSoul);
-                buff[ub_cast]:=vid_fps;
+                buff[ub_cast]:=vid_fps+vid_h2fps;
                 _nextOrder(pu);
              end;
        uo_destroy: _unit_kill(pu,false,false);
@@ -587,7 +586,7 @@ begin
 end;
 
 function calc_cx(iw:integer;m2:boolean):shortint;
-const _mm = 960;
+const _mm = 1000;
 begin
    if(iw<-_mm)then iw:=-_mm;
    if(iw> _mm)then iw:= _mm;
@@ -603,18 +602,10 @@ begin
     with(puid^)do
      with _players[player] do
      begin
-        if(OnlySVCode)then
-        begin
-           _msx:=vx;
-           _msy:=vy;
-        end
-        else
-        begin
-           _msx:=x;
-           _msy:=y;
-        end;
+        _msx:=vx;
+        _msy:=vy;
 
-        if(_ttar>0)then
+        if(0<_ttar)and(_ttar<=MaxUnits)then
         begin
            _tu  :=@_units[_ttar];
            _tx  := _calcMslPoint(_msx,_tu,true );
@@ -627,7 +618,7 @@ begin
         if(a_rld=0)then
         begin
            a_weap:=_wp;
-           a_rld:=_a_weap[a_weap].aw_rldt;
+           a_rld :=_a_weap[a_weap].aw_rldt;
         end;
 
         with _a_weap[a_weap] do
@@ -648,7 +639,7 @@ begin
                          end;
              wpt_ddmg  : _unit_damage(_tu,aw_mdmg,1);
              wpt_uspwn : begin
-                            _unitCreate(vx,vy,aw_mid,player,true,true);
+                            _barrack_spawn(pu,UID_LostSoul);
                             if(_lcu>0)then
                             begin
                                _unit_setorder(_lcup,uo_rightcl,_ttar,_tx,_ty,true,false);
@@ -663,7 +654,7 @@ begin
         if(OnlySVCode)and(a_weap=_wp)then
         begin
            ca_tar:=0;
-           if(_ttar>0)then
+           if(0<_ttar)and(_ttar<=MaxUnits)then
            begin
               inc(_tx,(_tu^.x-_tu^.vx)*2);
               inc(_ty,(_tu^.y-_tu^.vy)*2);
@@ -677,7 +668,7 @@ begin
 end;
 
 
-
+// server attack
 procedure _unit_attack(pu:PTUnit);
 var tu:PTUnit;
     i,
@@ -719,19 +710,25 @@ begin
      end;
 end;
 
+// client attack
 procedure _unit_clattack(pu:PTUnit);
-var __uf:byte;
+var ca_uf:byte;
 begin
    with(pu^)do
    begin
-      __uf:=0;
-      if(abs(ca_x mod 2)=1)then
-      begin
-         __uf:=uf_soaring;
-      end
+      if(0<ca_tar)and(ca_tar<=MaxUnits)
+      then _unit_attproc(pu,ca_tar,0,0,0,a_weap)
       else
-        if(abs(ca_y mod 2)=1)then __uf:=uf_fly;
-      _unit_attproc(pu,0,x+(ca_x shl 3),y+(ca_y shl 3),__uf,a_weap);
+        if(ca_x>0)then
+        begin
+           ca_uf:=0;
+           if(abs(ca_x mod 2)=1)
+           then ca_uf:=uf_soaring
+           else
+             if(abs(ca_y mod 2)=1)
+             then ca_uf:=uf_fly;
+           _unit_attproc(pu,0,x+(ca_x shl 3),y+(ca_y shl 3),ca_uf,a_weap);
+        end;
    end;
 end;
 
@@ -765,17 +762,15 @@ begin
         end;
 
         tdir:=mdir;
-        if(onlySVCode=false)then
-        begin
-           if(ca_x<>0)then _unit_clattack(pu);
-        end
+        if(onlySVCode=false)
+        then _unit_clattack(pu)
         else
           if(inapc=0)then
           begin
              _unit_order(pu);
 
              if(uclord=_uclord_c)and(un_rtar>0)and(un_rtar<=MaxUnits)then
-              if(_uvision(team,@_units[un_rtar]))then
+              if(_uvision(team,@_units[un_rtar]))and(_units[un_rtar].inapc=0)then
               begin
                  un_rx:=_units[un_rtar].vx;
                  un_ry:=_units[un_rtar].vy;

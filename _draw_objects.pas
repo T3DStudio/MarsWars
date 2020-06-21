@@ -1,46 +1,9 @@
 
-
-procedure _missile_effect(m:integer);
-begin
-   with _missiles[m] do
-   begin
-{      case mid of
-MID_ArchFire : begin PlaySND(snd_exp,nil); exit; end;
-MID_Imp,
-MID_Cacodemon,
-MID_Baron,
-MID_Mancubus,
-MID_BPlasma,
-MID_YPlasma   : PlaySND(snd_pexp,nil);
-MID_BFG       : PlaySND(snd_bfgepx,nil);
-MID_Revenant,
-MID_Granade,
-MID_URocket,
-MID_HRocket   : PlaySND(snd_exp,nil);
-MID_Blizzard  : PlaySND(snd_exp2,nil);
-MID_SShot,
-                       MID_SSShot,
-                       MID_Bullet,
-                       MID_Bulletx2,
-                       MID_TBullet : begin
-                                        if(mf=uf_ground)then
-                                         if(mid in [MID_SShot,MID_SSShot])then
-                                          for u:=1 to mtars do _effect_add(vx-sr+random(sr shl 1),vy-sr+random(sr shl 1),d+40,mid_Bullet);
-                                        if(random(4)=0)then PlaySND(snd_rico,nil);
-                                        continue;
-                                     end;
-      end;  }
-
-      //_effect_add(vx,vy,d+50,mid);
-   end;
-end;
-
 /////////////////////////////////////////////////////////////////////////////////
 ////
 ////   UNITS
 ////
 ////////
-
 
 function _udpth(pu:PTUnit):integer;
 begin
@@ -556,17 +519,13 @@ begin
          spr:=@spr_dummy;
         end;
 
-        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
+        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_mw   +spr^.hw))and
           ((vid_vy-spr^.hh)<y)and(y<(vid_vy+ui_panely+spr^.hh))then
         begin
            d:=map_flydpth[mf]+vy;
 
-           case mid of
-             MID_URocket,
-             MID_HRocket,
-             MID_Granade  : if((vst mod 4)=0)then _effect_add(vx,vy,d-1,MID_Bullet);
-             MID_Blizzard : if((vst mod 3)=0)then _effect_add(vx,vy,d-1,EID_Exp);
-           end;
+           if(_mtefff>0)then
+            if((vst mod _mtefff)=0)then _effect_add(vx,vy,d,_mteff);
 
            _sl_add(vx-spr^.hw, vy-spr^.hh,d,0,0,0,false,spr^.surf,255,0,0,0,0,'',0,0);
         end;

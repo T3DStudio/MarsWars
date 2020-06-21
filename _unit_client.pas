@@ -214,8 +214,13 @@ begin
 
             if(a_rld>0)then
             begin
-               _wudata_sint(ca_x,rpl);
-               _wudata_sint(ca_y,rpl);
+               if((_a_weap[a_weap].aw_req and wpr_netst)>0)
+               then _wudata_int(ca_tar,rpl)
+               else
+               begin
+                  _wudata_sint(ca_x,rpl);
+                  _wudata_sint(ca_y,rpl);
+               end;
             end;
          end;
       end;
@@ -372,7 +377,6 @@ begin
         vy:=y;
 
         _unit_upgr(cu);
-
         _ncl_create(cu);
 
         if(hits>0)and(buff[ub_born]>0)then _ueff_create(cu);
@@ -389,9 +393,8 @@ begin
          vx:=x;
          vy:=y;
 
-         _ncl_remove(pu);
-
          _unit_upgr(cu);
+         _ncl_remove(pu);
 
          if(hits>ndead_hits)and(inapc=0)then
           if(pu^.hits>0)then _ueff_death(cu,hits<=idead_hits);
@@ -399,16 +402,12 @@ begin
       else
        if(pu^.hits>dead_hits)and(hits>dead_hits)then // a to a
        begin
-          if(pu^.uid<>uid)then
-          begin
-             _unit_def(cu);
-          end;
-
-          _ncl_remove(pu);
-
-          _ncl_create(cu);
+          if(pu^.uid<>uid)then _unit_def(cu);
 
           _unit_upgr(cu);
+
+          _ncl_remove(pu);
+          _ncl_create(cu);
 
           if(pu^.hits<=0)and(hits>0)then // d to a
           begin
@@ -436,6 +435,14 @@ begin
           begin
              _unit_sfog(cu);
              _unit_mmcoords(cu);
+             if(pu^.buff[ub_teleff]=0)and(buff[ub_teleff]>0)then
+             begin
+                vx:=x;
+                vy:=y;
+                _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
+                _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
+                if(_nhp3(vx,vy,player) or _nhp3(pu^.vx,pu^.vy,player))then PlayUSND(snd_teleport);
+             end;
              if(speed>0)then vstp:=UnitStepNum;
              if(mv_x<>x)or(mv_y<>y)then mdir:=p_dir(mv_x,mv_y,x,y);
              mv_x:=x;
@@ -444,13 +451,6 @@ begin
           end
           else
             if(pains>0)then dec(pains,1);
-
-          if(pu^.buff[ub_teleff]=0)and(buff[ub_teleff]>0)then
-          begin
-             _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
-             _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-             PlayUSND(snd_teleport,cu);
-          end;
        end;
 end;
 
@@ -580,6 +580,7 @@ begin
          inapc    :=0;
          ca_x     :=0;
          ca_y     :=0;
+         ca_tar   :=0;
          aattack  :=false;
          aorder   :=0;
          FillChar(buff,SizeOf(buff),0);
@@ -667,8 +668,14 @@ begin
             begin
                a_weap:=_bts2;
                if(a_weap>MaxAttacks)then a_weap:=MaxAttacks;
-               ca_x  :=_rudata_sint(rpl);
-               ca_y  :=_rudata_sint(rpl);
+
+               if((puid^._a_weap[a_weap].aw_req and wpr_netst)>0)
+               then ca_tar:=_rudata_int(rpl)
+               else
+               begin
+                  ca_x  :=_rudata_sint(rpl);
+                  ca_y  :=_rudata_sint(rpl);
+               end;
             end;
          end;
       end
