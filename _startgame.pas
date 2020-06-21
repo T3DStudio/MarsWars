@@ -91,8 +91,9 @@ begin
 
    StartParams;
 
-   FillChar(_tuids,sizeof(_tuids),0);
-   FillChar(_toids,SizeOf(_toids),0);
+   FillChar(_tuids ,sizeof(_tuids ),0);
+   FillChar(_toids ,SizeOf(_toids ),0);
+   FillChar(_tupids,SizeOf(_tupids),0);
 
    {$IFDEF _FULLGAME}
    cfg_read;
@@ -107,7 +108,7 @@ begin
 
    {$ENDIF}
 
-   InitUnits;
+   InitGameData;
    _InitNET;
    Map_randommap;
    DefGameObjects;

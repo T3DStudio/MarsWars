@@ -372,9 +372,9 @@ begin
                begin
                   bc:=ui_UIPBTNS[uibx-1,uiby,ui_tab,_players[HPlayer].race];
                   if(bc>0)then
-                   with _tuids[bc] do
-                    case ui_tab of
-                     0,1: begin
+                   case ui_tab of
+                     0,1: with _tuids[bc] do
+                          begin
                              if(_ukey2>0)and(ko<>_ukey2)then continue;
                              if(_ukey1=k)then
                              begin
@@ -382,8 +382,16 @@ begin
                                 exit;
                              end;
                           end;
-                       2:;
-                    end;
+                       2: with _tupids[bc] do
+                          begin
+                             if(_ukey2>0)and(ko<>_ukey2)then continue;
+                             if(_ukey1=k)then
+                             begin
+                                _PanelClick(false,uibx,uiby);
+                                exit;
+                             end;
+                          end;
+                   end;
                end
                else
                begin

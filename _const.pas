@@ -280,6 +280,20 @@ mf_ihdam             = %00010000;
 mf_i1dam             = %00001000;
 mf_homing            = %00000100;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Upgrade ID
+//
+
+// Hell upgrades
+up_hell_dattack      = 1;
+up_hell_mattack      = 2;
+up_hell_uarmor       = 3;
+up_hell_barmor       = 4;
+
+// UAC upgrades
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Units ID
@@ -346,25 +360,30 @@ UID_URocketL         = 59;
 
 singleuids           = [1..60];
 
-MID_Imp              = 2;
-MID_Cacodemon        = 3;
-MID_Baron            = 4;
-MID_HRocket          = 5;
-MID_Revenant         = 6;
-MID_Mancubus         = 7;
-MID_YPlasma          = 8;
-MID_BPlasma          = 9;
-MID_Bullet           = 10;
-MID_Bulletx2         = 11;
-MID_TBullet          = 12;
-MID_SShot            = 13;
-MID_SSShot           = 14;
-MID_BFG              = 15;
-MID_Granade          = 16;
-MID_Mine             = 17;
-MID_Blizzard         = 18;
-MID_URocket          = 19;
-MID_ArchFire         = 20;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Missile ID
+//
+
+MID_Imp              = 1;
+MID_Cacodemon        = 2;
+MID_Baron            = 3;
+MID_HRocket          = 4;
+MID_Revenant         = 5;
+MID_Mancubus         = 6;
+MID_YPlasma          = 7;
+MID_BPlasma          = 8;
+MID_Bullet           = 9;
+MID_Bulletx2         = 10;
+MID_TBullet          = 11;
+MID_SShot            = 12;
+MID_SSShot           = 13;
+MID_BFG              = 14;
+MID_Granade          = 15;
+MID_Mine             = 16;
+MID_Blizzard         = 17;
+MID_URocket          = 18;
+MID_ArchFire         = 19;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

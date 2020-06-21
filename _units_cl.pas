@@ -51,7 +51,7 @@ begin
    end;
 end;
 
-procedure InitUnits;
+procedure InitGameData;
 {$IFDEF _FULLGAME}
 const
      btnhkeys1 : array[0..ui_p_btnsh,0..ui_p_lsecwi] of cardinal =
@@ -139,6 +139,20 @@ begin
    end;
 end;
 begin
+   // upgrades
+   with _tupids[up_hell_dattack] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
+   with _tupids[up_hell_mattack] do begin _upcnt:=4 ; _uprenerg:=4 ; _uptime:=60 ; end;
+   with _tupids[up_hell_uarmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
+   with _tupids[up_hell_barmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=180; end;
+
+   for i:=0 to 255 do
+    with _tupids[i] do
+    begin
+       // seconds to ticks
+       _uptime:=vid_fps*_uptime;
+    end;
+
+   // unit orders
    with _toids[uo_rightcl  ] do
    begin
       rtar    :=at_map+at_aall;
@@ -170,8 +184,12 @@ begin
       rtar   := at_map;
    end;
 
+   // Start base
+
    utbl_start[r_hell]:=UID_HKeep;
    utbl_start[r_uac ]:=UID_UCommandCenter;
+
+   // Units
 
    for i:=0 to 255 do
     with _tuids[i] do
@@ -805,7 +823,30 @@ UID_URocketL:
        if(_itbuild=false)then _orders:=_orders+[uo_uteleport];
        _orders:=_orders+[uo_destroy,uo_upload,uo_auto];
 
-       {$IFDEF _FULLGAME}
+    end;
+
+   {$IFDEF _FULLGAME}
+
+   with _tupids[up_hell_dattack] do begin _btnx:=0 ; _btny:=0 ; end;
+   with _tupids[up_hell_mattack] do begin _btnx:=1 ; _btny:=0 ; end;
+   with _tupids[up_hell_uarmor ] do begin _btnx:=0 ; _btny:=1 ; end;
+   with _tupids[up_hell_barmor ] do begin _btnx:=0 ; _btny:=2 ; end;
+
+   for i:=0 to 255 do
+    with _tupids[i] do
+    begin
+
+       if(_ukey1=0)then
+        if(_btnx<=ui_p_lsecwi)and(_btny<=ui_p_btnsh)then
+        begin
+           _ukey1:=btnhkeys1[_btny,_btnx];
+           _ukey2:=btnhkeys2[_btny,_btnx];
+        end;
+    end;
+
+   for i:=0 to 255 do
+    with _tuids[i] do
+    begin
        _fr      := (_r div fog_cw)+1;
        _anims   := 0;
        _btnx    := 255;
@@ -984,101 +1025,8 @@ UID_URocketL:
              _ukeyc:='???+'+_ukeyc;
           end;
        end;
-
-       {$ENDIF}
     end;
 
+   {$ENDIF}
 end;
-{
-{$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
-{$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-procedure _unit_deff(pu:PTUnit;deff:boolean);
-begin
-   with (pu^) do
-   with (puid^) do
-   with _players[player] do
-   begin
-      if(_itbuild)then
-      begin
-
-      end;
-
-
-      if(deff)then
-      begin
-         if(_itbuild)then
-         begin
-            if(uid=UID_Mine)then
-            begin
-               PlaySND(snd_exp,pu);
-               _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_Exp);
-            end
-            else
-            begin
-               if(race=r_hell)and(hits<200)and(bld=false)then
-               begin
-                  if(_r<41)
-                  then _effect_add(vx,vy+5 ,-5,eid_db_h1)
-                  else _effect_add(vx,vy+10,-5,eid_db_h0);
-                  exit;
-               end;
-               PlaySND(snd_exp2,pu);
-               if(_r>48)then
-               begin
-                  _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_BBExp);
-                  if(race=r_hell)
-                  then _effect_add(vx,vy+10,-10,eid_db_h0)
-                  else _effect_add(vx,vy+10,-10,eid_db_u0);
-               end
-               else
-               begin
-                  _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_BExp);
-                  if(race=r_hell)
-                  then _effect_add(vx,vy+10,-10,eid_db_h1)
-                  else _effect_add(vx,vy+10,-10,eid_db_u1);
-               end;
-            end;
-         end
-         else
-           if(_gavnodth)then
-            if(_uf>uf_ground)then
-            begin
-               PlaySND(snd_exp,pu);
-               _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_Exp);
-            end
-            else
-            begin
-               PlaySND(snd_meat,pu);
-               _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_Gavno);
-            end
-           else
-            case uid of
-        UID_Dron :   begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_Exp);
-                     end;
-        UID_APC,
-        UID_FAPC   : begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_BExp);
-                     end;
-        UID_Flyer,
-        UID_Terminator,
-        UID_Tank   : begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[_uf]+vy,EID_Exp2);
-                     end;
-            end;
-      end
-      else
-      case uid of
-    UID_LostSoul   : PlaySND(,pu);
-
-    UID_Demon      : PlaySND(,pu);
-    UID_Cacodemon  : PlaySND(,pu);
-    UID_Knight     : if(buff[ub_advanced]=0)
-                     then PlaySND(,pu)
-                     else PlaySND(,pu);
-
-}
 

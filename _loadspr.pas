@@ -496,7 +496,7 @@ procedure _loadGfx;
 var x : integer;
 begin
    _dsurf      := _createSurf(2,2);
-   _menu_surf  := _createSurf(vid_minw,vid_minh);
+   _menu_surf  := _createSurf(vid_minw  ,vid_minh  );
    ui_tminimap := _createSurf(ui_mmwidth,ui_mmwidth);
    ui_uminimap := _createSurf(ui_mmwidth,ui_mmwidth);
    boxColor(ui_uminimap,0,0,ui_uminimap^.w,ui_uminimap^.h,c_black);
@@ -530,23 +530,22 @@ begin
    rectangleColor(spr_btnaut,0,0,vid_BW-2,vid_BW-2,c_yellow);
    rectangleColor(spr_btnaut,1,1,vid_BW-3,vid_BW-3,c_dyellow);
 
-   spr_b_cancle   := LoadBtn('b_cancle');
+   spr_b_cancle   := LoadBtn('b_cancle' );
    spr_b_delete   := LoadBtn('b_destroy');
-   spr_b_attack   := LoadBtn('b_attack');
-   spr_b_patrol   := LoadBtn('b_patrol');
-   spr_b_move     := LoadBtn('b_move');
-   spr_b_stop     := LoadBtn('b_stop');
-   spr_b_hold     := LoadBtn('b_hold');
-   spr_b_selall   := LoadBtn('b_selall');
-   spr_b_unload   := LoadBtn('b_unload');
-   spr_b_upload   := LoadBtn('b_upload');
-
-   spr_rspeed     := LoadBtn('b_rfast');
-   spr_rskip      := LoadBtn('b_rskip');
-   spr_rpause     := LoadBtn('b_rstop');
-   spr_rfog       := LoadBtn('b_rfog');
-   spr_rlog       := LoadBtn('b_rlog');
-   spr_rvis       := LoadBtn('b_rvis');
+   spr_b_attack   := LoadBtn('b_attack' );
+   spr_b_patrol   := LoadBtn('b_patrol' );
+   spr_b_move     := LoadBtn('b_move'   );
+   spr_b_stop     := LoadBtn('b_stop'   );
+   spr_b_hold     := LoadBtn('b_hold'   );
+   spr_b_selall   := LoadBtn('b_selall' );
+   spr_b_unload   := LoadBtn('b_unload' );
+   spr_b_upload   := LoadBtn('b_upload' );
+   spr_rspeed     := LoadBtn('b_rfast'  );
+   spr_rskip      := LoadBtn('b_rskip'  );
+   spr_rpause     := LoadBtn('b_rstop'  );
+   spr_rfog       := LoadBtn('b_rfog'   );
+   spr_rlog       := LoadBtn('b_rlog'   );
+   spr_rvis       := LoadBtn('b_rvis'   );
 
    for x:=1 to race_n do _lstr(@spr_detect[x],str_f_race[x]+'detect');
 
@@ -557,16 +556,23 @@ begin
    fog_surf[true]:= _createSurf(fog_cr*2,fog_cr*2);
    boxColor(fog_surf[true],0,0,fog_surf[true]^.w,fog_surf[true]^.h,c_purple);
    filledcircleColor(fog_surf[true],fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(fog_surf[true],SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_GetPixelColor(fog_surf[true],0,0));
+   SDL_SetColorKey(fog_surf[true],SDL_SRCCOLORKEY or SDL_RLEACCEL,sdl_GetPixelColor(fog_surf[true],0,0));
 
-   _lstr(@spr_mp[r_hell],str_f_race[r_hell]+'h_mp');
-   _lstr(@spr_db_h0     ,str_f_race[r_hell]+'db_h0');
-   _lstr(@spr_db_h1     ,str_f_race[r_hell]+'db_h1');
-   _lstr(@spr_HAltar    ,str_f_race[r_hell]+'h_altar');
-   _lstr(@spr_HTotem    ,str_f_race[r_hell]+'h_b7');
-   _lstr(@spr_HMonastery,str_f_race[r_hell]+'h_b6');
-   _lstr(@spr_HFortress ,str_f_race[r_hell]+'h_fortess');
-   _lstr(@spr_HBar      ,str_f_race[r_hell]+'h_hbarrak');
+   _lstr(@spr_db_h0      ,str_f_race[r_hell]+'db_h0'      );
+   _lstr(@spr_db_h1      ,str_f_race[r_hell]+'db_h1'      );
+   _lstr(@spr_HAltar     ,str_f_race[r_hell]+'h_altar'    );
+   _lstr(@spr_HTotem     ,str_f_race[r_hell]+'h_b7'       );
+   _lstr(@spr_HMonastery ,str_f_race[r_hell]+'h_b6'       );
+   _lstr(@spr_HFortress  ,str_f_race[r_hell]+'h_fortess'  );
+   _lstr(@spr_HBar       ,str_f_race[r_hell]+'h_hbarrak'  );
+   _lstr(@spr_mp[r_hell] ,str_f_race[r_hell]+'h_mp'       );
+   _lstr(@spr_mp[r_uac ] ,str_f_race[r_uac ]+'u_mp'       );
+   _lstr(@spr_db_u0      ,str_f_race[r_uac ]+'db_u0'      );
+   _lstr(@spr_db_u1      ,str_f_race[r_uac ]+'db_u1'      );
+   _lstr(@spr_mine       ,str_f_race[r_uac ]+'u_mine'     );
+   _lstr(@spr_toxin      ,str_f_race[r_uac ]+'toxin'      );
+   _lstr(@spr_gear       ,str_f_race[r_uac ]+'gear'       );
+
 
    for x:=0 to 28 do _lstr(@spr_lostsoul   [x],str_f_race[r_hell]+'h_u0_' +b2s(x));
    for x:=0 to 52 do _lstr(@spr_imp        [x],str_f_race[r_hell]+'h_u1_' +b2s(x));
@@ -591,31 +597,24 @@ begin
    for x:=0 to 52 do _lstr(@spr_ZMajor     [x],str_f_race[r_hell]+'h_z4_' +b2s(x));
    for x:=0 to 52 do _lstr(@spr_ZBFG       [x],str_f_race[r_hell]+'h_z5_' +b2s(x));
 
-   _lstr(@spr_db_u0     ,str_f_race[r_uac]+'db_u0');
-   _lstr(@spr_db_u1     ,str_f_race[r_uac]+'db_u1');
-   _lstr(@spr_mine      ,str_f_race[r_uac]+'u_mine');
-   _lstr(@spr_toxin     ,str_f_race[r_uac]+'toxin');
-   _lstr(@spr_gear      ,str_f_race[r_uac]+'gear');
-   _lstr(@spr_mp[r_uac ],str_f_race[r_uac]+'u_mp');
+   for x:=0 to 15 do _lstr(@spr_drone      [x],str_f_race[r_uac ]+'uacd'  +b2s(x));
+   for x:=0 to 44 do _lstr(@spr_scout      [x],str_f_race[r_uac ]+'u_u1_' +b2s(x));
+   for x:=0 to 52 do _lstr(@spr_medic      [x],str_f_race[r_uac ]+'u_u0_' +b2s(x));
+   for x:=0 to 44 do _lstr(@spr_sergant    [x],str_f_race[r_uac ]+'u_u2_' +b2s(x));
+   for x:=0 to 44 do _lstr(@spr_ssergant   [x],str_f_race[r_uac ]+'u_u2s_'+b2s(x));
+   for x:=0 to 52 do _lstr(@spr_commando   [x],str_f_race[r_uac ]+'u_u3_' +b2s(x));
+   for x:=0 to 44 do _lstr(@spr_bomber     [x],str_f_race[r_uac ]+'u_u4_' +b2s(x));
+   for x:=0 to 15 do _lstr(@spr_fmajor     [x],str_f_race[r_uac ]+'u_u5j_'+b2s(x));
+   for x:=0 to 44 do _lstr(@spr_major      [x],str_f_race[r_uac ]+'u_u5_' +b2s(x));
+   for x:=0 to 44 do _lstr(@spr_BFG        [x],str_f_race[r_uac ]+'u_u6_' +b2s(x));
+   for x:=0 to 15 do _lstr(@spr_FAPC       [x],str_f_race[r_uac ]+'u_u8_' +b2s(x));
+   for x:=0 to 15 do _lstr(@spr_APC        [x],str_f_race[r_uac ]+'uac_tank_' +b2s(x));
+   for x:=0 to 55 do _lstr(@spr_Terminator [x],str_f_race[r_uac ]+'u_u9_' +b2s(x));
+   for x:=0 to 23 do _lstr(@spr_Tank       [x],str_f_race[r_uac ]+'u_u10_'+b2s(x));
+   for x:=0 to 15 do _lstr(@spr_Flyer      [x],str_f_race[r_uac ]+'u_u11_'+b2s(x));
 
-   for x:=0 to 15 do _lstr(@spr_drone      [x],str_f_race[r_uac]+'uacd'  +b2s(x));
-   for x:=0 to 44 do _lstr(@spr_scout      [x],str_f_race[r_uac]+'u_u1_' +b2s(x));
-   for x:=0 to 52 do _lstr(@spr_medic      [x],str_f_race[r_uac]+'u_u0_' +b2s(x));
-   for x:=0 to 44 do _lstr(@spr_sergant    [x],str_f_race[r_uac]+'u_u2_' +b2s(x));
-   for x:=0 to 44 do _lstr(@spr_ssergant   [x],str_f_race[r_uac]+'u_u2s_'+b2s(x));
-   for x:=0 to 52 do _lstr(@spr_commando   [x],str_f_race[r_uac]+'u_u3_' +b2s(x));
-   for x:=0 to 44 do _lstr(@spr_bomber     [x],str_f_race[r_uac]+'u_u4_' +b2s(x));
-   for x:=0 to 15 do _lstr(@spr_fmajor     [x],str_f_race[r_uac]+'u_u5j_'+b2s(x));
-   for x:=0 to 44 do _lstr(@spr_major      [x],str_f_race[r_uac]+'u_u5_' +b2s(x));
-   for x:=0 to 44 do _lstr(@spr_BFG        [x],str_f_race[r_uac]+'u_u6_' +b2s(x));
-   for x:=0 to 15 do _lstr(@spr_FAPC       [x],str_f_race[r_uac]+'u_u8_' +b2s(x));
-   for x:=0 to 15 do _lstr(@spr_APC        [x],str_f_race[r_uac]+'uac_tank_' +b2s(x));
-   for x:=0 to 55 do _lstr(@spr_Terminator [x],str_f_race[r_uac]+'u_u9_' +b2s(x));
-   for x:=0 to 23 do _lstr(@spr_Tank       [x],str_f_race[r_uac]+'u_u10_'+b2s(x));
-   for x:=0 to 15 do _lstr(@spr_Flyer      [x],str_f_race[r_uac]+'u_u11_'+b2s(x));
-
-   for x:=0 to 15 do _lstr(@spr_tur        [x],str_f_race[r_uac]+'ut_'+b2s(x));
-   for x:=0 to 7  do _lstr(@spr_rtur       [x],str_f_race[r_uac]+'u_rt_'+b2s(x));
+   for x:=0 to 15 do _lstr(@spr_tur        [x],str_f_race[r_uac ]+'ut_'   +b2s(x));
+   for x:=0 to 7  do _lstr(@spr_rtur       [x],str_f_race[r_uac ]+'u_rt_' +b2s(x));
 
    for x:=0 to 3 do
    begin
@@ -626,44 +625,45 @@ begin
       _lstr(@spr_HTower          [x],str_f_race[r_hell]+'h_b4_' +b2s(x));
       _lstr(@spr_HTeleport       [x],str_f_race[r_hell]+'h_b5_' +b2s(x));
 
-      _lstr(@spr_UCommandCenter  [x],str_f_race[r_uac]+'u_b0_' +b2s(x));
-      _lstr(@spr_UMilitaryUnit   [x],str_f_race[r_uac]+'u_b1_' +b2s(x));
-      _lstr(@spr_UGenerator      [x],str_f_race[r_uac]+'u_b2_' +b2s(x));
-      _lstr(@spr_UWeaponFactory  [x],str_f_race[r_uac]+'u_b3_' +b2s(x));
-      _lstr(@spr_UTurret         [x],str_f_race[r_uac]+'u_b4_' +b2s(x));
-      _lstr(@spr_URadar          [x],str_f_race[r_uac]+'u_b5_' +b2s(x));
-      _lstr(@spr_UVehicleFactory [x],str_f_race[r_uac]+'u_b6_' +b2s(x));
-      _lstr(@spr_UPTurret        [x],str_f_race[r_uac]+'u_b7_' +b2s(x));
-      _lstr(@spr_URocketL        [x],str_f_race[r_uac]+'u_b8_' +b2s(x));
-      _lstr(@spr_URTurret        [x],str_f_race[r_uac]+'u_b9_' +b2s(x));
+      _lstr(@spr_UCommandCenter  [x],str_f_race[r_uac ]+'u_b0_' +b2s(x));
+      _lstr(@spr_UMilitaryUnit   [x],str_f_race[r_uac ]+'u_b1_' +b2s(x));
+      _lstr(@spr_UGenerator      [x],str_f_race[r_uac ]+'u_b2_' +b2s(x));
+      _lstr(@spr_UWeaponFactory  [x],str_f_race[r_uac ]+'u_b3_' +b2s(x));
+      _lstr(@spr_UTurret         [x],str_f_race[r_uac ]+'u_b4_' +b2s(x));
+      _lstr(@spr_URadar          [x],str_f_race[r_uac ]+'u_b5_' +b2s(x));
+      _lstr(@spr_UVehicleFactory [x],str_f_race[r_uac ]+'u_b6_' +b2s(x));
+      _lstr(@spr_UPTurret        [x],str_f_race[r_uac ]+'u_b7_' +b2s(x));
+      _lstr(@spr_URocketL        [x],str_f_race[r_uac ]+'u_b8_' +b2s(x));
+      _lstr(@spr_URTurret        [x],str_f_race[r_uac ]+'u_b9_' +b2s(x));
    end;
 
-   for x:=0 to 5 do _lstr(@spr_eff_eb  [x],'ef_eb'  +b2s(x));
-   for x:=0 to 8 do _lstr(@spr_eff_ebb [x],'ef_ebb' +b2s(x));
-   for x:=0 to 5 do _lstr(@spr_eff_tel [x],'ef_tel_'+b2s(x));
-   for x:=0 to 2 do _lstr(@spr_eff_exp [x],'ef_exp_'+b2s(x));
-   for x:=0 to 4 do _lstr(@spr_eff_exp2[x],'exp2_'  +b2s(x));
-   for x:=0 to 7 do _lstr(@spr_eff_g   [x],'g_'     +b2s(x));
-   for x:=0 to 2 do _lstr(@spr_blood   [x],'blood'  +b2s(x));
+   for x:=0 to 5 do _lstr(@spr_eff_eb   [x],'ef_eb'  +b2s(x));
+   for x:=0 to 8 do _lstr(@spr_eff_ebb  [x],'ef_ebb' +b2s(x));
+   for x:=0 to 5 do _lstr(@spr_eff_tel  [x],'ef_tel_'+b2s(x));
+   for x:=0 to 2 do _lstr(@spr_eff_exp  [x],'ef_exp_'+b2s(x));
+   for x:=0 to 4 do _lstr(@spr_eff_exp2 [x],'exp2_'  +b2s(x));
+   for x:=0 to 7 do _lstr(@spr_eff_g    [x],'g_'     +b2s(x));
+   for x:=0 to 2 do _lstr(@spr_blood    [x],'blood'  +b2s(x));
 
-   for x:=0 to 3  do _lstr(@spr_h_p0[x],str_f_race[r_hell]+'h_p0_'+b2s(x));
-   for x:=0 to 3  do _lstr(@spr_h_p1[x],str_f_race[r_hell]+'h_p1_'+b2s(x));
-   for x:=0 to 3  do _lstr(@spr_h_p2[x],str_f_race[r_hell]+'h_p2_'+b2s(x));
-   for x:=0 to 7  do _lstr(@spr_h_p3[x],str_f_race[r_hell]+'h_p3_'+b2s(x));
-   for x:=0 to 10 do _lstr(@spr_h_p4[x],str_f_race[r_hell]+'h_p4_'+b2s(x));
-   for x:=0 to 7  do _lstr(@spr_h_p5[x],str_f_race[r_hell]+'h_p5_'+b2s(x));
-   for x:=0 to 7  do _lstr(@spr_h_p6[x],str_f_race[r_hell]+'h_p6_'+b2s(x));
-   for x:=0 to 5  do _lstr(@spr_h_p7[x],str_f_race[r_hell]+'h_p7_'+b2s(x));
+   for x:=0 to 3  do _lstr(@spr_h_p0    [x],str_f_race[r_hell]+'h_p0_'  +b2s(x));
+   for x:=0 to 3  do _lstr(@spr_h_p1    [x],str_f_race[r_hell]+'h_p1_'  +b2s(x));
+   for x:=0 to 3  do _lstr(@spr_h_p2    [x],str_f_race[r_hell]+'h_p2_'  +b2s(x));
+   for x:=0 to 7  do _lstr(@spr_h_p3    [x],str_f_race[r_hell]+'h_p3_'  +b2s(x));
+   for x:=0 to 10 do _lstr(@spr_h_p4    [x],str_f_race[r_hell]+'h_p4_'  +b2s(x));
+   for x:=0 to 7  do _lstr(@spr_h_p5    [x],str_f_race[r_hell]+'h_p5_'  +b2s(x));
+   for x:=0 to 7  do _lstr(@spr_h_p6    [x],str_f_race[r_hell]+'h_p6_'  +b2s(x));
+   for x:=0 to 5  do _lstr(@spr_h_p7    [x],str_f_race[r_hell]+'h_p7_'  +b2s(x));
 
-   for x:=0 to 5  do _lstr(@spr_u_p0    [x],str_f_race[r_uac]+'u_p0_'  +b2s(x));
-   for x:=0 to 3  do _lstr(@spr_u_p1    [x],str_f_race[r_uac]+'u_p1_'  +b2s(x));
-   for x:=0 to 5  do _lstr(@spr_u_p2    [x],str_f_race[r_uac]+'u_p2_'  +b2s(x));
-   for x:=0 to 7  do _lstr(@spr_u_p3    [x],str_f_race[r_uac]+'u_p3_'  +b2s(x));
-   for x:=0 to 3  do _lstr(@spr_eff_bfg [x],str_f_race[r_uac]+'ef_bfg_'+b2s(x));
+   for x:=0 to 5  do _lstr(@spr_u_p0    [x],str_f_race[r_uac ]+'u_p0_'  +b2s(x));
+   for x:=0 to 3  do _lstr(@spr_u_p1    [x],str_f_race[r_uac ]+'u_p1_'  +b2s(x));
+   for x:=0 to 5  do _lstr(@spr_u_p2    [x],str_f_race[r_uac ]+'u_p2_'  +b2s(x));
+   for x:=0 to 7  do _lstr(@spr_u_p3    [x],str_f_race[r_uac ]+'u_p3_'  +b2s(x));
+   for x:=0 to 3  do _lstr(@spr_eff_bfg [x],str_f_race[r_uac ]+'ef_bfg_'+b2s(x));
 
    spr_b_ralpos  := _createSurf(vid_BW-1,vid_BW-1);
    _draw_surf(spr_b_ralpos,vid_hBW-20,vid_hBW-(spr_mp[r_hell].hh),spr_mp[r_hell].surf);
    _draw_surf(spr_b_ralpos,vid_hBW+4 ,vid_hBW-(spr_mp[r_uac ].hh),spr_mp[r_uac ].surf);
+
 
    _loadMapThemes;
    _loadDecs;
@@ -730,7 +730,6 @@ begin
    with _toids[uo_destroy  ] do begin _obtnx:=2;_obtny:=1; _obtn:=spr_b_delete; _okey1:=btn2key(_obtnx,_obtny);
                                                                                 _okey2:=SDLK_LCtrl;
                                                                                 _okey3:=SDLK_Delete;            end;
-
    with _toids[uo_upload   ] do begin _obtnx:=1;_obtny:=2; _obtn:=spr_b_upload; _okey1:=btn2key(_obtnx,_obtny); end;
    with _toids[uo_unload   ] do begin _obtnx:=2;_obtny:=2; _obtn:=spr_b_unload; _okey1:=btn2key(_obtnx,_obtny); end;
    with _toids[uo_rallpos  ] do begin _obtnx:=2;_obtny:=2; _obtn:=spr_b_ralpos; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_lime;    end;
@@ -743,6 +742,13 @@ begin
 
    with _toids[uo_spawnlost] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_pain[23].surf);
                                                                                 _okey1:=btn2key(_obtnx,_obtny); end;
+
+   {
+   with _tupids[up_hell_dattack] do begin _btnx:=0 ; _btny:=0 ; end;
+   with _tupids[up_hell_mattack] do begin _btnx:=1 ; _btny:=0 ; end;
+   with _tupids[up_hell_uarmor ] do begin _btnx:=0 ; _btny:=1 ; end;
+   with _tupids[up_hell_barmor ] do begin _btnx:=0 ; _btny:=2 ; end;
+   }
 
    for iu:=0 to 255 do
     with _toids[iu] do

@@ -287,11 +287,15 @@ TUPID = record
    _uptime  :integer;
 
    {$IFDEF _FULLGAME}
-   _upbtn :pSDL_Surface;
+   _upbtn   :pSDL_Surface;
    _upname,
    _updesc,
    _uphint,
-   _upkeyc:shortstring;
+   _upkeyc  :shortstring;
+   _btnx,
+   _btny    :byte;
+   _ukey1,
+   _ukey2   :cardinal;
    {$ENDIF}
 end;
 
