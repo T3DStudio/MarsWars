@@ -12,13 +12,6 @@ SDL_BUTTON_WHEELDOWN: GetKeyName:='Mouse wheel down';
    end
 end;
 
-procedure _addStr(ps:pshortstring;s,p:shortstring);
-begin
-   if(ps^='')
-   then ps^:=s
-   else ps^:=ps^+p+s
-end;
-
 procedure reqadd(req:pshortstring;st:shortstring);
 begin
    if(req^='')then
@@ -38,18 +31,22 @@ begin
       with _tuids[u] do
       begin
          req:='';
-         if(_ruid >0)then reqadd(@req,_tuids [_ruid]._uname);
-         if(_rupgr>0)then reqadd(@req,_tupids[_ruid]._upname);
+         if(_ruid >0)then reqadd(@req,_tuids [_ruid ]._uname );
+         if(_rupgr>0)then reqadd(@req,_tupids[_rupgr]._upname);
          _uhint:=_uhint+req;
       end;
       with _tupids[u] do
       begin
          req:='';
+         if(_upruid >0)then reqadd(@req,_tuids [_upruid ]._uname );
+         if(_uprupgr>0)then reqadd(@req,_tupids[_uprupgr]._upname);
          _uphint:=_uphint+req;
       end;
       with _toids[u] do
       begin
          req:='';
+         if(ruid >0)then reqadd(@req,_tuids [ruid ]._uname );
+         if(rupgr>0)then reqadd(@req,_tupids[rupgr]._upname);
          _ohint:=_ohint+req;
       end;
    end;
@@ -66,12 +63,21 @@ begin
       if(_ukeyc<>'')then _uhint:=_uhint+' ('+#18+_ukeyc+#25+')';
 
       _uhint:=_uhint+'  ['+#22+'T: '+#25+i2s(_ctime div vid_fps)+#19+'  E: '+#25+b2s(_renerg)+']'+#13+#22+_udesc+#25+#13;
-
-      //rmana
    end;
 end;
+procedure setUpgrStr(uid:byte;nm,ds:shortstring);
+begin
+   with _tupids[uid] do
+   begin
+      _upname:=nm;
+      _updesc:=ds;
 
+      _uphint:=_upname;
+      if(_upkeyc<>'')then _uphint:=_uphint+' ('+#18+_upkeyc+#25+')';
 
+      _uphint:=_uphint+'  ['+#22+'T: '+#25+i2s(_uptime div vid_fps)+#19+'  E: '+#25+b2s(_uprenerg)+']'+#13+#22+_updesc+#25+#13;
+   end;
+end;
 procedure SetOrderStr(oid:byte;sn,sd:shortstring);
 begin
    with _toids[oid] do

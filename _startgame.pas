@@ -134,6 +134,7 @@ begin
    else HPlayer:=0;
    {$ELSE}
    _MakeUnitBtn;
+   _MakeTabsBTN;
    _LoadUIPanelBTNs;
    if(_lng)then lng_eng;
    swLNG;

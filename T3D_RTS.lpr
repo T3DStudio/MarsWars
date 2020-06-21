@@ -38,6 +38,7 @@ uses SysUtils, SDL, SDL_Net
         {$INCLUDE _draw.pas}
         {$INCLUDE _loadThemes.pas}
         {$INCLUDE _loadspr.pas}
+        {$INCLUDE _objcldata.pas}
 {$ENDIF}
    {$INCLUDE _map.pas}
    {$INCLUDE _units_cl.pas}

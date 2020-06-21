@@ -292,6 +292,7 @@ TUPID = record
    _updesc,
    _uphint,
    _upkeyc  :shortstring;
+   _urace,
    _btnx,
    _btny    :byte;
    _ukey1,

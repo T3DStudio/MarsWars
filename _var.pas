@@ -355,6 +355,8 @@ spr_rfog,
 spr_rlog
                  : pSDL_Surface;
 
+spr_upgrs        : array[1..race_n,0..24] of pSDL_Surface;
+
 spr_detect       : array[1..race_n] of TUSprite;
 
 spr_uitab        : array[0..2] of pSDL_Surface;
