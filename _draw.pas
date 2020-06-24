@@ -130,7 +130,7 @@ begin
 
         //i2s(fsr)+' '+i2s(buff[ub_invis])+' '+
         //if(bld)then         +i2s(uo_id)+' '+i2s(uo_tar)+#12+i2s(ua_id)+' '+i2s(ua_tar)+#12+i2s(a_tar)+#12+b2s(player)+' '+#12+b2pm[sel]
-         _draw_text(_screen,ix,iy,i2s(buff[ub_teleff]), ta_left,255, _players[player].color); //+i2s(ua_id)+' '+i2s(uo_tar)+' '+i2s(a_tar)
+         _draw_text(_screen,ix,iy,i2s(up_r), ta_left,255, _players[player].color); //+i2s(ua_id)+' '+i2s(uo_tar)+' '+i2s(a_tar)
 
         //if(apcc>0)then
         //_draw_text(_screen,ix,iy,i2s(a_tar), ta_left,255, _players[player].color);

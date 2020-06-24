@@ -238,6 +238,7 @@ ui_bldblda       : array[false..true] of integer;
 ui_uidipts       : array[byte] of integer;
 ui_uidiptu       : integer = 0;
 ui_uidiptb       : integer = 0;
+ui_upgripts      : array[byte] of integer;
 
 ordx,
 ordy             : array[byte] of integer;
@@ -355,7 +356,7 @@ spr_rfog,
 spr_rlog
                  : pSDL_Surface;
 
-spr_upgrs        : array[1..race_n,0..24] of pSDL_Surface;
+spr_b_upgrs      : array[byte] of pSDL_Surface;
 
 spr_detect       : array[1..race_n] of TUSprite;
 

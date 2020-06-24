@@ -116,37 +116,38 @@ begin
       with _players[HPlayer] do
       if(sarmy>0)then
       begin
-        if(ox0=0)then
-         for i:=0 to 255 do
-          if(uid_s[i]>0)then
-           with _tuids[i] do
-            if(_mspeed=0)and not(uo_rallpos in _orders)then exit;
+         if(ox0=0)then
+          for i:=0 to 255 do
+           if(uid_s[i]>0)then
+            with _tuids[i] do
+             if(_mspeed=0)and not(uo_rallpos in _orders)then exit;
 
          if(oid=po_uorder)or(oid=po_uordera)then
           if(0<=ox0)and(ox0<=255)then
            with _tuids[ui_lsuc] do
-           with _toids[ox0] do
-            if{(ox0 in _orders)and}((rtar and at_anytar)>0)then
-            begin
-               case _com_sndn of
-               0: ;
-               1:   PlayUSND(_com_snds[0]);
-               else PlayUSND(_com_snds[random(_com_sndn)]);
-               end;
+            if(ox0<>uo_prod)then
+             with _toids[ox0] do
+              if(ox0 in _orders)and((rtar and at_anytar)>0)then
+              begin
+                 case _com_sndn of
+                 0: ;
+                 1:   PlayUSND(_com_snds[0]);
+                 else PlayUSND(_com_snds[random(_com_sndn)]);
+                 end;
 
-               if(oy0>0)then
-               begin
-                  ui_umark_u :=oy0;
-                  ui_umark_ut:=vid_h3fps;
-               end
-               else
-                 if(ox0=0)then
-                  if(rghtatt)
-                  then _click_eff(ox1,oy1,vid_h4fps,_toids[uo_attack]._omarc)
-                  else _click_eff(ox1,oy1,vid_h4fps,_toids[uo_move  ]._omarc)
+                 if(oy0>0)then
+                 begin
+                    ui_umark_u :=oy0;
+                    ui_umark_ut:=vid_h3fps;
+                 end
                  else
-                   if(_omarc>0)then _click_eff(ox1,oy1,vid_h4fps,_omarc);
-            end;
+                   if(ox0=0)then
+                    if(rghtatt)
+                    then _click_eff(ox1,oy1,vid_h4fps,_toids[uo_attack]._omarc)
+                    else _click_eff(ox1,oy1,vid_h4fps,_toids[uo_move  ]._omarc)
+                   else
+                     if(_omarc>0)then _click_eff(ox1,oy1,vid_h4fps,_omarc);
+              end;
       end;
    end;
 end;
@@ -290,7 +291,9 @@ begin
                      then _player_s_o(uo_prod,-bc,0 ,0, po_uorder ,HPlayer)
                      else _player_s_o(uo_prod,-bc,-1,0, po_uorder ,HPlayer);
               end;
-          2: ;
+          2: if(rc=false)
+             then _player_s_o(uo_prod,bc,0 ,0, po_uorder ,HPlayer)
+             else _player_s_o(uo_prod,bc,-1,0, po_uorder ,HPlayer);
              end;
          end;
       end

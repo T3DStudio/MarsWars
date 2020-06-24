@@ -79,7 +79,7 @@ begin
    with _tupids[up_hell_uarmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
    with _tupids[up_hell_barmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=180; end;
 
-   for i:=0 to 255 do
+   for i:=1 to 255 do
     with _tupids[i] do
     begin
        // seconds to ticks
@@ -748,15 +748,15 @@ UID_URocketL:
          with _a_weap[a] do
          begin
             if(aw_rlds=0)then aw_rlds:=aw_rldt;
-            if(_itattack>0)and(aw_rldt>0)then _orders:=_orders+[aw_order];
+            if(_itattack>0)and(aw_rldt>0)then _orders:=_orders+[aw_order,uo_rightcl];
          end;
-       if(_itbarrack)or(i in [UID_UCommandCenter])then _orders:=_orders+[uo_rallpos];
-       if(_mspeed>0     )then _orders:=_orders+[uo_smove,uo_move,uo_spatrol,uo_patrol,uo_hold,uo_stop];
+       if(_itbarrack)or(i in [UID_UCommandCenter])then _orders:=_orders+[uo_rallpos,uo_rightcl];
+       if(_mspeed>0     )then _orders:=_orders+[uo_smove,uo_move,uo_spatrol,uo_patrol,uo_hold,uo_stop,uo_rightcl];
        if(_itbuilder    )
-       or(_itbarrack    )then _orders:=_orders+[uo_prod     ];
-       if(_itbuild=false)then _orders:=_orders+[uo_uteleport];
+       or(_itbarrack    )
+       or(_itsmith      )then _orders:=_orders+[uo_prod     ];
+       if(_itbuild=false)then _orders:=_orders+[uo_uteleport,uo_rightcl];
        _orders:=_orders+[uo_destroy,uo_upload,uo_auto];
-
     end;
 
 end;

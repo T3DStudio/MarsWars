@@ -77,20 +77,15 @@ var i:byte;
   end;
 
 begin
-   with _tupids[up_hell_dattack] do begin _btnx:=0 ; _btny:=0 ; end;
-   with _tupids[up_hell_mattack] do begin _btnx:=1 ; _btny:=0 ; end;
-   with _tupids[up_hell_uarmor ] do begin _btnx:=0 ; _btny:=1 ; end;
-   with _tupids[up_hell_barmor ] do begin _btnx:=0 ; _btny:=2 ; end;
-
    /////////////////////////////////////////////////////////////////////////////
    //
    // UPGRADES
    //
 
-   with _tupids[up_hell_dattack] do begin _btnx:=0 ; _btny:=0 ; end;
-   with _tupids[up_hell_mattack] do begin _btnx:=1 ; _btny:=0 ; end;
-   with _tupids[up_hell_uarmor ] do begin _btnx:=0 ; _btny:=1 ; end;
-   with _tupids[up_hell_barmor ] do begin _btnx:=0 ; _btny:=2 ; end;
+   with _tupids[up_hell_dattack] do begin _urace:=r_hell; _btnx:=0 ; _btny:=0 ; end;
+   with _tupids[up_hell_mattack] do begin _urace:=r_hell; _btnx:=1 ; _btny:=0 ; end;
+   with _tupids[up_hell_uarmor ] do begin _urace:=r_hell; _btnx:=0 ; _btny:=1 ; end;
+   with _tupids[up_hell_barmor ] do begin _urace:=r_hell; _btnx:=0 ; _btny:=2 ; end;
 
    for i:=0 to 255 do
     with _tupids[i] do
@@ -112,34 +107,51 @@ begin
    for i:=0 to 255 do
     with _toids[i] do
     begin
+       _obtn :=_dsurf;
        _omarc:=c_white;
-       if(i in [0,uo_upload,uo_prod,uo_uteleport])then _oidi:=uo_move;
+       if(i in [uo_rightcl,uo_upload,uo_prod,uo_uteleport])then _oidi:=uo_move;
        if(i in [uo_smove,uo_auto])then _oidi:=uo_stop;
        if(i = uo_spatrol)then _oidi:=uo_patrol;
     end;
 
    with _toids[uo_smove    ] do begin _obtnx:=255;_omarc:=c_lime;  end;
    with _toids[uo_spatrol  ] do begin _obtnx:=255;_omarc:=c_yellow;end;
-   with _toids[uo_move     ] do begin _obtnx:=0;_obtny:=0; _obtn:=spr_b_move;   _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_lime;    end;
-   with _toids[uo_hold     ] do begin _obtnx:=1;_obtny:=0; _obtn:=spr_b_hold;   _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_patrol   ] do begin _obtnx:=2;_obtny:=0; _obtn:=spr_b_patrol; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_yellow;  end;
-   with _toids[uo_attack   ] do begin _obtnx:=0;_obtny:=1; _obtn:=spr_b_attack; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_red;     end;
-   with _toids[uo_stop     ] do begin _obtnx:=1;_obtny:=1; _obtn:=spr_b_stop;   _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_destroy  ] do begin _obtnx:=2;_obtny:=1; _obtn:=spr_b_delete; _okey1:=btn2key(_obtnx,_obtny);
-                                                                                _okey2:=SDLK_LCtrl;
-                                                                                _okey3:=SDLK_Delete;            end;
-   with _toids[uo_upload   ] do begin _obtnx:=1;_obtny:=2; _obtn:=spr_b_upload; _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_unload   ] do begin _obtnx:=2;_obtny:=2; _obtn:=spr_b_unload; _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_rallpos  ] do begin _obtnx:=2;_obtny:=2; _obtn:=spr_b_ralpos; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_lime;    end;
-   with _toids[uo_spawndron] do begin _obtnx:=0;_obtny:=2; _obtn:=_tuids[UID_Dron]._ubtn;
-                                                                                _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_archresur] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_archvile[70].surf);
-                                                                                _okey1:=btn2key(_obtnx,_obtny); end;
-   with _toids[uo_botrepair] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_drone[11].surf);
-                                                                                _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_move     ] do begin _obtnx:=0;  _obtny:=0; _obtn:=spr_b_move;   _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_lime;    end;
+   with _toids[uo_hold     ] do begin _obtnx:=1;  _obtny:=0; _obtn:=spr_b_hold;   _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_patrol   ] do begin _obtnx:=2;  _obtny:=0; _obtn:=spr_b_patrol; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_yellow;  end;
+   with _toids[uo_attack   ] do begin _obtnx:=0;  _obtny:=1; _obtn:=spr_b_attack; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_red;     end;
+   with _toids[uo_stop     ] do begin _obtnx:=1;  _obtny:=1; _obtn:=spr_b_stop;   _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_destroy  ] do begin _obtnx:=2;  _obtny:=1; _obtn:=spr_b_delete; _okey1:=btn2key(_obtnx,_obtny);
+                                                                                  _okey2:=SDLK_LCtrl;
+                                                                                  _okey3:=SDLK_Delete;            end;
+   with _toids[uo_upload   ] do begin _obtnx:=1;  _obtny:=2; _obtn:=spr_b_upload; _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_unload   ] do begin _obtnx:=2;  _obtny:=2; _obtn:=spr_b_unload; _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_rallpos  ] do begin _obtnx:=2;  _obtny:=2; _obtn:=spr_b_ralpos; _okey1:=btn2key(_obtnx,_obtny); _omarc:=c_lime;    end;
+   with _toids[uo_spawndron] do begin _obtnx:=0;  _obtny:=2; _obtn:=_tuids[UID_Dron]._ubtn;
+                                                                                  _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_archresur] do begin _obtnx:=0;  _obtny:=2; _obtn:=LoadBtnFS(spr_archvile[70].surf);
+                                                                                  _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_botrepair] do begin _obtnx:=0;  _obtny:=2; _obtn:=LoadBtnFS(spr_drone[11].surf);
+                                                                                  _okey1:=btn2key(_obtnx,_obtny); end;
+   with _toids[uo_spawnlost] do begin _obtnx:=0;  _obtny:=2; _obtn:=LoadBtnFS(spr_pain[23].surf);
+                                                                                  _okey1:=btn2key(_obtnx,_obtny); end;
 
-   with _toids[uo_spawnlost] do begin _obtnx:=0;_obtny:=2; _obtn:=LoadBtnFS(spr_pain[23].surf);
-                                                                                _okey1:=btn2key(_obtnx,_obtny); end;
+   for i:=0 to 255 do
+    with _toids[i] do
+     if(_okey1=0)
+     then _okeyc:=''
+     else
+     begin
+        _okeyc:=UpperCase(GetKeyName(_okey1));
+        case _okey2 of
+      SDLK_LCtrl : _okeyc:='Ctr+'+_okeyc;
+      SDLK_LShift: _okeyc:='Sft+'+_okeyc;
+      SDLK_LAlt  : _okeyc:='Alt+'+_okeyc;
+        0        : ;
+        else       _okeyc:='???+'+_okeyc;
+        end;
+        if(_okey3>0)then _okeyc:=_okeyc+' '+UpperCase(GetKeyName(_okey3))
+     end;
 
    /////////////////////////////////////////////////////////////////////////////
    //
@@ -180,22 +192,22 @@ begin
        UID_URocketL       : begin _btny:= 2;_btnx:=2; end;
 
 
-//                                                                    DEATH                           PAIN                          CREATE                        MELEE ATTACK           DISTANCE ATTACK
-       UID_Imp            : begin _btny:= 0;_btnx:=0; _anims  := 11;  snd(2 ,ueff_death ,snd_impd1  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_impc1 );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
+//                                                                    DEATH                           PAIN                          CREATE                                                    MELEE ATTACK           DISTANCE ATTACK
+       UID_Imp            : begin _btny:= 0;_btnx:=0; _anims  := 11;  snd(2 ,ueff_death ,snd_impd1  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_impc1 ,EID_Teleport,0,snd_teleport);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
                                                                       snd(2 ,ueff_death ,snd_impd2  );snd(2,ueff_create,snd_impc2 );
                                                                       snd(2 ,ueff_fdeath,nil,EID_Gavno,0,snd_meat);                 end;
-       UID_LostSoul       : begin _btny:= 0;_btnx:=1;                 snd(2 ,ueff_death ,snd_pexp   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_d0    );asnd(0,snd_d0     ,-2);                       end;
-       UID_Demon          : begin _btny:= 0;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_demond );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_demonc);asnd(0,snd_demona ,-2);                       end;
-       UID_Cacodemon      : begin _btny:= 0;_btnx:=3;                 snd(2 ,ueff_death ,snd_cacod  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cacoc );asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);end;
-       UID_Knight         : begin _btny:= 0;_btnx:=4; _anims  := 11;  snd(0 ,ueff_death ,snd_knightd);snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_knight);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
+       UID_LostSoul       : begin _btny:= 0;_btnx:=1;                 snd(2 ,ueff_death ,snd_pexp   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_d0    ,EID_Teleport,0,snd_teleport);asnd(0,snd_d0     ,-2);                       end;
+       UID_Demon          : begin _btny:= 0;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_demond );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_demonc,EID_Teleport,0,snd_teleport);asnd(0,snd_demona ,-2);                       end;
+       UID_Cacodemon      : begin _btny:= 0;_btnx:=3;                 snd(2 ,ueff_death ,snd_cacod  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cacoc ,EID_Teleport,0,snd_teleport);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);end;
+       UID_Knight         : begin _btny:= 0;_btnx:=4; _anims  := 11;  snd(0 ,ueff_death ,snd_knightd);snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_knight,EID_Teleport,0,snd_teleport);asnd(1,snd_hmelee ,-2);asnd(0,snd_hshoot ,-2);
                                                                       snd(1 ,ueff_death ,snd_barond );                              end; //snd_baron
-       UID_Cyberdemon     : begin _btny:= 0;_btnx:=5; _anims  := 10;  snd(2 ,ueff_death ,snd_cyberd );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cyberc);                       asnd(0,snd_launch ,-2);end;
-       UID_Mastermind     : begin _btny:= 1;_btnx:=0; _anims  := 10;  snd(2 ,ueff_death ,snd_mindd  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_mindc );                       asnd(0,snd_shotgun,-2);end;
-       UID_Pain           : begin _btny:= 1;_btnx:=1; _anims  := 6 ;  snd(2 ,ueff_death ,snd_pain_d );snd(2,ueff_pain  ,snd_pain_p);snd(2,ueff_create,snd_pain_c);                       asnd(0,snd_d0     ,-2);end;
-       UID_Revenant       : begin _btny:= 1;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_rev_d  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_rev_c );asnd(1,snd_rev_m  ,-2);asnd(0,snd_rev_a  ,-2);end;
-       UID_Mancubus       : begin _btny:= 1;_btnx:=3; _anims  := 9 ;  snd(2 ,ueff_death ,snd_man_d  );snd(2,ueff_pain  ,snd_man_p );snd(2,ueff_create,snd_man_c );                       asnd(0,snd_man_a  , 0);end;
-       UID_Arachnotron    : begin _btny:= 1;_btnx:=4; _anims  := 10;  snd(2 ,ueff_death ,snd_ar_d   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_ar_c  );                       asnd(0,snd_plasmas, 0);end;
-       UID_Archvile       : begin _btny:= 1;_btnx:=5; _anims  := 15;  snd(2 ,ueff_death ,snd_arch_d );snd(2,ueff_pain  ,snd_arch_p);snd(2,ueff_create,snd_arch_c);asnd(1,snd_meat   ,-2);asnd(0,snd_arch_a ,-2);end;
+       UID_Cyberdemon     : begin _btny:= 0;_btnx:=5; _anims  := 10;  snd(2 ,ueff_death ,snd_cyberd );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_cyberc,EID_Teleport,0,snd_teleport);                       asnd(0,snd_launch ,-2);end;
+       UID_Mastermind     : begin _btny:= 1;_btnx:=0; _anims  := 10;  snd(2 ,ueff_death ,snd_mindd  );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_mindc ,EID_Teleport,0,snd_teleport);                       asnd(0,snd_shotgun,-2);end;
+       UID_Pain           : begin _btny:= 1;_btnx:=1; _anims  := 6 ;  snd(2 ,ueff_death ,snd_pain_d );snd(2,ueff_pain  ,snd_pain_p);snd(2,ueff_create,snd_pain_c,EID_Teleport,0,snd_teleport);                       asnd(0,snd_d0     ,-2);end;
+       UID_Revenant       : begin _btny:= 1;_btnx:=2; _anims  := 14;  snd(2 ,ueff_death ,snd_rev_d  );snd(2,ueff_pain  ,snd_z_p   );snd(2,ueff_create,snd_rev_c ,EID_Teleport,0,snd_teleport);asnd(1,snd_rev_m  ,-2);asnd(0,snd_rev_a  ,-2);end;
+       UID_Mancubus       : begin _btny:= 1;_btnx:=3; _anims  := 9 ;  snd(2 ,ueff_death ,snd_man_d  );snd(2,ueff_pain  ,snd_man_p );snd(2,ueff_create,snd_man_c ,EID_Teleport,0,snd_teleport);                       asnd(0,snd_man_a  , 0);end;
+       UID_Arachnotron    : begin _btny:= 1;_btnx:=4; _anims  := 10;  snd(2 ,ueff_death ,snd_ar_d   );snd(2,ueff_pain  ,snd_dpain );snd(2,ueff_create,snd_ar_c  ,EID_Teleport,0,snd_teleport);                       asnd(0,snd_plasmas, 0);end;
+       UID_Archvile       : begin _btny:= 1;_btnx:=5; _anims  := 15;  snd(2 ,ueff_death ,snd_arch_d );snd(2,ueff_pain  ,snd_arch_p);snd(2,ueff_create,snd_arch_c,EID_Teleport,0,snd_teleport);asnd(1,snd_meat   ,-2);asnd(0,snd_arch_a ,-2);end;
 
        UID_ZFormer        : begin _btny:= 2;_btnx:=0; _anims  := 17; end;
        UID_ZSergant       : begin _btny:= 2;_btnx:=1; _anims  := 17; end;
@@ -358,13 +370,8 @@ begin
       begin
          if(_btnx<=ui_p_lsecwi)and(_btny<=ui_p_btnsh)then
           if(_urace in [1..race_n])then ui_UIPBTNS[_btnx,_btny,2,_urace]:=iu;
-
-         _upbtn:=_dsurf;
       end;
-
-      with _toids[iu] do _obtn:=_dsurf;
    end;
-
 
    // quick select pannel
    ui_UIMBTNS[r_hell,0,0]:=UID_HKeep;
@@ -378,22 +385,7 @@ begin
    ui_UIMBTNS[r_uac ,1,1]:=UID_URocketL;
 
 
-   for iu:=0 to 255 do
-    with _toids[iu] do
-     if(_okey1=0)
-     then _okeyc:=''
-     else
-     begin
-        _okeyc:=UpperCase(GetKeyName(_okey1));
-        case _okey2 of
-      SDLK_LCtrl : _okeyc:='Ctr+'+_okeyc;
-      SDLK_LShift: _okeyc:='Sft+'+_okeyc;
-      SDLK_LAlt  : _okeyc:='Alt+'+_okeyc;
-        0        : ;
-        else       _okeyc:='???+'+_okeyc;
-        end;
-        if(_okey3>0)then _okeyc:=_okeyc+' '+UpperCase(GetKeyName(_okey3))
-     end;
+
 
 
    for iu:=0 to 255 do

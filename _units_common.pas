@@ -525,15 +525,16 @@ begin
    with (puid^) do
     if(up_r=0)and(bld)and(_itsmith)then
      with _players[player] do
-      if(_upgrBC(player,up))then
+      if(_upgrBC(player,up)=false)then
        if(_tupids[up]._uptime>0)then
        begin
-          up_r:=0;
           up_t:=up;
+          up_r:=_tupids[up_t]._uptime;
           inc(upgrip[up_t],1);
           inc(upgrsip,1);
           inc(cenerg,_tupids[up_t]._uprenerg);
           _unit_supt:=true;
+
        end;
 end;
 function _unit_cupt(pu:PTUnit;up:byte=0):boolean;

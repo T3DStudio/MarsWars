@@ -122,7 +122,6 @@ begin
                   if(uc>0)then
                    with _toids[uc] do
                     if(ui_su_bld)or(rnbld)then
-                     //_drawBtn(ui_panel,ui_p_rsecx+ux,uy,_obtn,(uc in ui_su_abil),(uc in ui_su_aut),false,_okhnb);
                      _drawBtn(ui_panel,ui_p_rsecx+ux,uy,_obtn,(uc in ui_su_abil),(uc in ui_su_aut),not _chabil(uc,ui_lsuc,HPlayer,0,ui_su_bld,ui_su_spd),_okhnb);
                end;
            end;
@@ -145,13 +144,17 @@ begin
            case ui_tab of
            0  : begin
                    uc:=ui_UIPBTNS[ux,uy,ui_tab,race];
-                   if(uc>0)then _drawBtn(ui_panel,1+ux,uy,_tuids[uc]._ubtn,(m_brtar=-uc),false,(_checkBldPrc(HPlayer,true )=false) or _unitBC(HPlayer,uc) or (_chprodmana(uc,HPlayer)=false),i2s(ui_uidipts[uc]),c_white,i2s(ui_bldblds[uc])          ,b2s(uid_s[uc]),b2s(uid_e[uc]),'',0, uid_e[uc]>=_tuids[uc]._max);
+                   if(uc>0)then _drawBtn(ui_panel,1+ux,uy,_tuids[uc]._ubtn,(m_brtar=-uc) ,false,(_checkBldPrc(HPlayer,true )=false) or _unitBC(HPlayer,uc) or (_chprodmana(uc,HPlayer)=false),i2s(ui_uidipts[uc]),c_white,i2s(ui_bldblds[uc])          ,b2s(uid_s[uc]),b2s(uid_e[uc]),'',0, uid_e[uc]>=_tuids[uc]._max);
                 end;
            1  : begin
                    uc:=ui_UIPBTNS[ux,uy,ui_tab,race];
-                   if(uc>0)then _drawBtn(ui_panel,1+ux,uy,_tuids[uc]._ubtn,(m_brtar=-uc),false,(_checkBldPrc(HPlayer,false)=false) or _unitBC(HPlayer,uc) or (_chprodmana(uc,HPlayer)=false),i2s(ui_uidipts[uc]),c_white,i2s(uidip[uc]+ui_bldblds[uc]),b2s(uid_s[uc]),b2s(uid_e[uc]),'',0, uid_e[uc]>=_tuids[uc]._max);
+                   if(uc>0)then _drawBtn(ui_panel,1+ux,uy,_tuids[uc]._ubtn,(m_brtar=-uc) ,false,(_checkBldPrc(HPlayer,false)=false) or _unitBC(HPlayer,uc) or (_chprodmana(uc,HPlayer)=false),i2s(ui_uidipts[uc]),c_white,i2s(uidip[uc]+ui_bldblds[uc]),b2s(uid_s[uc]),b2s(uid_e[uc]),'',0, uid_e[uc]>=_tuids[uc]._max);
                 end;
-           2  : ;
+           2  : begin
+                   uc:=ui_UIPBTNS[ux,uy,ui_tab,race];
+                   if(uc>0)then _drawBtn(ui_panel,1+ux,uy,spr_b_upgrs[uc] ,(upgrip[uc]>0),false,((_upgrBC(HPlayer,uc) or (upgrsip>=_smths))and(upgrip[uc]=0) ), i2s(ui_upgripts[uc]),c_white,'', i2s(upgr[uc]) );
+
+                end;
            end;
       end;
    end;
@@ -225,7 +228,13 @@ begin
                    end;
                end;
             end;
-        2 : ;
+        2 : begin
+               if(1<=m_bx)and(m_bx<ui_p_lsecwi)then
+               begin
+                  i:=ui_UIPBTNS[m_bx-1,m_by,ui_tab,race];
+                  if(i>0)then _draw_text(_screen,ui_p_lhintx,ui_chaty3,_tupids[i]._uphint,ta_Left,255,c_white);
+               end;
+            end;
         end;
 
         if(ui_p_rsecx<=m_bx)and(m_bx<ui_p_xsbtns)then

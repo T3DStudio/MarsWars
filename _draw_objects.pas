@@ -158,6 +158,12 @@ begin
                   if(ui_uidipts[un_t]=0)or(sh<ui_uidipts[un_t])then ui_uidipts[un_t]:=sh;
                   if(ui_uidiptu=0)or(sh<ui_uidiptu)then ui_uidiptu:=sh;
                end;
+              if(_itsmith)then
+               if(up_r>0)then
+               begin
+                  sh:=(up_r div vid_fps)+1;
+                  ui_upgripts[up_t]:=sh;
+               end;
               if(m_brush=uo_prod)and(m_brtar<0)then _addPrcR(pu);
               if(sel)then
                if(ui_lsuc=uid)then
@@ -252,7 +258,7 @@ begin
                  if(player=HPlayer)then
                  begin
                     if(_itbarrack)and(un_r>0)then _sl_add(vx-vid_hBW, smy-vid_hBW,dp+1,0,c_white,0,true,_tuids [un_t]._ubtn ,255,0,(un_r div vid_fps)+1,0,0,'',0,0);
-                    if(_itsmith  )and(up_r>0)then _sl_add(vx-vid_hBW, smy-vid_hBW,dp+1,0,c_white,0,true,_tupids[up_t]._upbtn,255,0,(up_r div vid_fps)+1,0,0,'',0,0);
+                    if(_itsmith  )and(up_r>0)then _sl_add(vx-vid_hBW, smy-vid_hBW,dp+1,0,c_white,0,true,spr_b_upgrs[up_t]   ,255,0,(up_r div vid_fps)+1,0,0,'',0,0);
                  end;
 
                  if(_urace>0)then
@@ -549,10 +555,11 @@ begin
 
    if(m_brtar>0)then m_brtar:=0;
 
-   FillChar(ordx      ,SizeOf(ordx      ),0);
-   FillChar(ordy      ,SizeOf(ordy      ),0);
-   FillChar(ui_bldblds,SizeOf(ui_bldblds),0);
-   FillChar(ui_uidipts,SizeOf(ui_uidipts),0);
+   FillChar(ordx       ,SizeOf(ordx       ),0);
+   FillChar(ordy       ,SizeOf(ordy       ),0);
+   FillChar(ui_bldblds ,SizeOf(ui_bldblds ),0);
+   FillChar(ui_uidipts ,SizeOf(ui_uidipts ),0);
+   FillChar(ui_upgripts,SizeOf(ui_upgripts),0);
    ui_lsuc    := 0;
    ui_bldrrsi := 0;
    ui_uidiptu := 0;

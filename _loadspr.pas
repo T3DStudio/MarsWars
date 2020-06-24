@@ -387,10 +387,10 @@ begin
    MakeCrater;
 end;
 
-function LoadBtn(fn:string):pSDL_Surface;
+function LoadBtn(fn:string;log:boolean=true):pSDL_Surface;
 var ts:pSDl_Surface;
 begin
-   ts:=loadIMG(fn,false);
+   ts:=loadIMG(fn,false,log);
    LoadBtn:=_createSurf(vid_BW-1,vid_BW-1);
    if(ts^.h>vid_BW)
    then _draw_surf(LoadBtn,vid_hBW-(ts^.w div 2),0,ts)
@@ -547,6 +547,9 @@ begin
    spr_rlog       := LoadBtn('b_rlog'   );
    spr_rvis       := LoadBtn('b_rvis'   );
 
+   spr_b_upgrs[x]:=_dsurf;
+   for x:=1 to 255 do spr_b_upgrs[x]:=LoadBtn('b_up'+b2s(x),false);
+
    for x:=1 to race_n do _lstr(@spr_detect[x],str_f_race[x]+'detect');
 
    fog_surf[false]:= _createSurf(fog_cw,fog_cw);
@@ -572,7 +575,6 @@ begin
    _lstr(@spr_mine       ,str_f_race[r_uac ]+'u_mine'     );
    _lstr(@spr_toxin      ,str_f_race[r_uac ]+'toxin'      );
    _lstr(@spr_gear       ,str_f_race[r_uac ]+'gear'       );
-
 
    for x:=0 to 28 do _lstr(@spr_lostsoul   [x],str_f_race[r_hell]+'h_u0_' +b2s(x));
    for x:=0 to 52 do _lstr(@spr_imp        [x],str_f_race[r_hell]+'h_u1_' +b2s(x));

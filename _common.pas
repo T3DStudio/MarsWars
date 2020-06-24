@@ -203,6 +203,7 @@ begin
      _upgrBC := (not (uid in upgr_a))
               or((menerg-cenerg)<_uprenerg)
               or(upgr[uid]>=_upcnt)
+              or(upgrip[uid]>0)
               or((_upruid>0)and(uid_eb[_upruid]=0))
               or((_uprupgr>0)and(upgr[_uprupgr]=0));
 end;
@@ -372,14 +373,15 @@ begin
 
                if(_chprodmana(aidtar,pl)=false)then exit;
 
-               if(_unitBC(pl,aidtar))then exit;
+               //if(_unitBC(pl,aidtar))then exit;
             end
             else
-            if(0<aidtar)and(aidtar<=255)then
-            begin
-
-            end
-            else exit;
+             if(0<aidtar)and(aidtar<=255)then
+             begin
+                if(_tuids[uid]._itsmith=false)then exit;
+                //if(_upgrBC(pl,aidtar))then exit;
+             end
+             else exit;
          end;
          if(rulimit)and(army>=MaxPlayerUnits)then exit;
          if(rmana>0)and(cmana<rmana  )then exit;

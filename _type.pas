@@ -287,7 +287,6 @@ TUPID = record
    _uptime  :integer;
 
    {$IFDEF _FULLGAME}
-   _upbtn   :pSDL_Surface;
    _upname,
    _updesc,
    _uphint,

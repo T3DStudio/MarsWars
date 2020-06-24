@@ -48,14 +48,7 @@ begin
        _playerSetState(p);
 
        uid_a      := singleuids;
-
-       {ai_pushpart:= 2;
-       ai_maxarmy := 100;
-       ai_attack  := 0;}
-
-       //_bc_ss(@a_build,[0..8]);
-       //_bc_ss(@a_units,[0..11]);
-       //_bc_ss(@a_upgr ,[0..MaxUpgrs]);
+       upgr_a     := [1..255];
    end;
 
    with _players[0] do
