@@ -227,28 +227,6 @@ begin
    end;
 end;
 
-{
-procedure _wpdata(rpl:boolean);
-var i,n,u,y:byte;
-begin
-   _wudata_byte(G_plstat,rpl);
-   if(G_plstat>0)then
-    for i:=1 to MaxPlayers do
-     with _players[i] do
-      if((G_plstat and (1 shl i))>0)then
-       for n:=0 to _utsh do
-       begin
-          y:=0;
-          u:=n*2;
-          if(u<=_uts)then y:=y or  upgr[u];
-          inc(u,1);
-          if(u<=_uts)then y:=y or (upgr[u] shl 4);
-          _wudata_byte(y,rpl);
-       end;
-end;
-
-}
-
 procedure _wupgrades(pp:byte;rpl:boolean);
 var i,p,
     b,v:byte;
@@ -265,7 +243,7 @@ begin
          with _tupids[i] do
           if(_urace=race)or(_urace=255)then
           begin
-             if((b mod 2)=1)then
+             if((b mod 2)=0)then
              begin
                 v:=upgr[i];
                 w:=true;
@@ -730,6 +708,7 @@ begin
                   ca_x  :=_rudata_sint(rpl);
                   ca_y  :=_rudata_sint(rpl);
                end;
+               if(ca_tar<0)or(MaxUnits<ca_tar)then ca_tar:=0;
             end;
          end;
       end
@@ -745,6 +724,31 @@ begin
    end;
 
    _netSetUcl(pu);
+end;
+
+procedure _rupgrades(pp:byte;rpl:boolean);
+var i,p,
+    b,v:byte;
+begin
+   for p:=1 to MaxPlayers do
+    if((pp and (1 shl p))>0)then
+     with _players[p] do
+     begin
+        v:=0;
+        b:=0;
+        for i:=1 to 255 do
+         with _tupids[i] do
+          if(_urace=race)or(_urace=255)then
+          begin
+             if((b mod 2)=0)then
+             begin
+                v:=_rudata_byte(rpl);
+                upgr[i]:=v and %00001111;
+             end
+             else upgr[i]:=v shr 4;
+             inc(b,1);
+          end;
+     end;
 end;
 
 procedure _rclient_reclcustp(PNU,mxun:word);
@@ -804,8 +808,7 @@ begin
        end;
       if((gstp mod vid_fps)=0)then
       begin
-         //for i:=1 to MaxPlayers do
-         // with _players[i] do BlockRead(_rpls_file,upgr,sizeof(upgr));
+         _rupgrades(pp,rpl);
       end;
 
       uint:=_rudata_int(rpl);
