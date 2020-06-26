@@ -385,9 +385,6 @@ begin
    ui_UIMBTNS[r_uac ,1,1]:=UID_URocketL;
 
 
-
-
-
    for iu:=0 to 255 do
     with _tuids[iu] do
      for it:=1 to 255 do

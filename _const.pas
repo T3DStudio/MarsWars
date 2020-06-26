@@ -292,6 +292,10 @@ up_hell_mattack      = 2;
 up_hell_uarmor       = 3;
 up_hell_barmor       = 4;
 
+up_common_x2bldspd   = 250;
+up_common_x2uspawn   = 251;
+up_common_invuln     = 252;
+
 // UAC upgrades
 
 ////////////////////////////////////////////////////////////////////////////////

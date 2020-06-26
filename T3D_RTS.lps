@@ -419,7 +419,7 @@
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
         <TopLine Value="273"/>
-        <CursorPos X="61" Y="287"/>
+        <CursorPos Y="295"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit46>
@@ -578,7 +578,7 @@
         <Filename Value="_units_common.pas"/>
         <EditorIndex Value="22"/>
         <TopLine Value="522"/>
-        <CursorPos X="13" Y="547"/>
+        <CursorPos X="49" Y="535"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit66>
@@ -592,9 +592,10 @@
       </Unit67>
       <Unit68>
         <Filename Value="_units_cl.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="21"/>
-        <TopLine Value="58"/>
-        <CursorPos X="12" Y="82"/>
+        <TopLine Value="67"/>
+        <CursorPos X="85" Y="82"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit68>
@@ -624,10 +625,9 @@
       </Unit71>
       <Unit72>
         <Filename Value="_unit_client.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="25"/>
-        <TopLine Value="720"/>
-        <CursorPos X="14" Y="737"/>
+        <TopLine Value="674"/>
+        <CursorPos X="75" Y="694"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit72>
@@ -665,13 +665,13 @@
       <Unit77>
         <Filename Value="_objcldata.pas"/>
         <EditorIndex Value="19"/>
-        <TopLine Value="182"/>
-        <CursorPos X="189" Y="195"/>
+        <TopLine Value="356"/>
+        <CursorPos X="83" Y="368"/>
         <UsageCount Value="18"/>
         <Loaded Value="True"/>
       </Unit77>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="_loadspr.pas"/>
         <Caret Line="549" Column="12" TopLine="529"/>
@@ -784,6 +784,10 @@
         <Filename Value="_unit_client.pas"/>
         <Caret Line="753" Column="15" TopLine="725"/>
       </Position28>
+      <Position29>
+        <Filename Value="_units_cl.pas"/>
+        <Caret Line="82" Column="12" TopLine="58"/>
+      </Position29>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

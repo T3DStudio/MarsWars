@@ -481,6 +481,7 @@ end;
 ////
 ////////
 
+// start unit production
 function _unit_sunt(pu:PTUnit;ut:byte):boolean;
 begin
    _unit_sunt:=false;
@@ -489,7 +490,7 @@ begin
     if(un_r=0)and(bld)and(_itbarrack)then
      with _players[player] do
       if(_unitBC(player,ut)=false)then
-       if(_tuids[ut]._ctime>0)then
+       if(_tuids[ut]._ctime>0)and(_tuids[ut]._urace=_urace)then
        begin
           un_t:=ut;
 
@@ -501,6 +502,7 @@ begin
           _unit_sunt:=true;
        end;
 end;
+// cancel unit production
 function _unit_cunt(pu:PTUnit;ut:byte=0):boolean;
 begin
    _unit_cunt:=false;
@@ -518,6 +520,7 @@ begin
      end;
 end;
 
+// start upgrade production
 function _unit_supt(pu:PTUnit;up:byte):boolean;
 begin
    _unit_supt:=false;
@@ -526,7 +529,7 @@ begin
     if(up_r=0)and(bld)and(_itsmith)then
      with _players[player] do
       if(_upgrBC(player,up)=false)then
-       if(_tupids[up]._uptime>0)then
+       if(_tupids[up]._uptime>0)and(_tupids[up]._urace=_urace)then
        begin
           up_t:=up;
           up_r:=_tupids[up_t]._uptime;
@@ -537,6 +540,7 @@ begin
 
        end;
 end;
+// cancel upgrade production
 function _unit_cupt(pu:PTUnit;up:byte=0):boolean;
 begin
    _unit_cupt:=false;

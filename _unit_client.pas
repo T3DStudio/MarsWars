@@ -699,7 +699,7 @@ begin
             if(_bts2 < %00000011)then
             begin
                a_weap:=_bts2;
-               if(a_weap>MaxAttacks)then a_weap:=MaxAttacks;
+               if(a_weap>MaxAttacks)then a_weap:=0;
 
                if((puid^._a_weap[a_weap].aw_req and wpr_netst)>0)
                then ca_tar:=_rudata_int(rpl)

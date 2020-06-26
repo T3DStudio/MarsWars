@@ -74,16 +74,21 @@ begin
 end;
 begin
    // upgrades
-   with _tupids[up_hell_dattack] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
-   with _tupids[up_hell_mattack] do begin _upcnt:=4 ; _uprenerg:=4 ; _uptime:=60 ; end;
-   with _tupids[up_hell_uarmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
-   with _tupids[up_hell_barmor ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=180; end;
+   with _tupids[up_hell_dattack   ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
+   with _tupids[up_hell_mattack   ] do begin _upcnt:=4 ; _uprenerg:=4 ; _uptime:=60 ; end;
+   with _tupids[up_hell_uarmor    ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
+   with _tupids[up_hell_barmor    ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=180; end;
+
+   with _tupids[up_common_x2bldspd] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
+   with _tupids[up_common_x2uspawn] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
+   with _tupids[up_common_invuln  ] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
 
    for i:=1 to 255 do
     with _tupids[i] do
     begin
        // seconds to ticks
        _uptime:=vid_fps*_uptime;
+       if(_upcnt>15)then _upcnt:=15;
     end;
 
    // unit orders
