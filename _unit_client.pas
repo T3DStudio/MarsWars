@@ -65,7 +65,6 @@ begin
           SetBBit(@_bts2,1, buff[ub_invuln   ]>0);
           SetBBit(@_bts2,2, buff[ub_born     ]>0);
           SetBBit(@_bts2,3, buff[ub_cast     ]>0);
-
           SetBBit(@_bts1,4, buff[ub_invis    ]>0);
           SetBBit(@_bts1,5, buff[ub_pain     ]>0);
 

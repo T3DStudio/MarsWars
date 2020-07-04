@@ -221,13 +221,10 @@ ui_lsuc          : byte = 0;
 ui_uasprites     : array[byte] of PTUSprite;
 ui_umark_u       : integer = 0;
 ui_umark_ut      : byte = 0;
-ui_su_mana       : byte = 0;
 ui_su_abil       : set of byte = [];
 ui_su_bld        : boolean = false;
 ui_su_aut        : set of byte = [];
 ui_su_spd        : integer = 0;
-
-//ui_nrslave       : integer = 0;
 
 ui_bldrrsx       : array[1..MaxPlayerUnits] of integer;
 ui_bldrrsy       : array[1..MaxPlayerUnits] of integer;

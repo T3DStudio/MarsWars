@@ -153,12 +153,13 @@ atm_always           = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Weapon: requirements to attacker
+//  Weapon: requirements to attacker  and some flags
 //
 
 wpr_any              = 0;
 wpr_adv              = 1;
 wpr_nadv             = 2;
+wpr_2msl             = 3;
 wpr_netst            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,12 +262,12 @@ at_ground            = %0000000000011000; // 3 ground only
 
 at_anytar            = at_map+at_unit;
 at_aall              = at_unit+at_hita;
-at_aown              = at_unit+at_hita+at_ownp;
-at_aally             = at_unit+at_hita+at_owna;
-at_aenemy            = at_unit+at_hita+at_owne;
+at_aown              = at_aall+at_ownp;
+at_aally             = at_aall+at_owna;
+at_aenemy            = at_aall+at_owne;
 at_resur             = at_unit+at_hitd+at_owna;
 at_mrepair           = at_unit+at_hith+at_owna+at_mechs+at_bld;
-at_aground           = at_unit+at_hita+at_owne+at_ground;
+at_aground           = at_aenemy+at_ground;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -292,8 +293,8 @@ up_hell_mattack      = 2;
 up_hell_uarmor       = 3;
 up_hell_barmor       = 4;
 
-up_common_x2bldspd   = 250;
-up_common_x2uspawn   = 251;
+up_common_prodspd    = 250;
+up_common_uspawn     = 251;
 up_common_invuln     = 252;
 
 // UAC upgrades

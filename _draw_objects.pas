@@ -547,7 +547,6 @@ end;
 procedure D_objects;
 var u : integer;
 begin
-   ui_su_mana := 0;
    ui_su_abil := [];
    ui_su_bld  := false;
    ui_su_aut  := [];
@@ -603,7 +602,7 @@ begin
    begin
       if(alpha<255)then SDL_SetAlpha(surf,SDL_SRCALPHA,alpha);
       if(r>=0)
-      then _draw_surf(_screen,x-hw,y-hh,surf)
+      then _draw_surf(_screen,x-hw,y-hh     ,surf)
       else _draw_surf(_screen,x-hw,y-surf^.h,surf);
       if(alpha<255)then SDL_SetAlpha(surf,SDL_SRCALPHA,255);
    end;
@@ -675,6 +674,7 @@ begin
         sox:=vx;
         soy:=vy;
         ioy:=vy;
+
         for k:=0 to uo_n do
         begin
            case p of
@@ -685,6 +685,7 @@ begin
            if(uo_id[k]=uo_prod)then
            begin
               if(uo_tar[k]<-255)or(0<=uo_tar[k])then continue;
+              if not((_tuids[-uo_tar[k]]._itbuild)and(race_pstyle[true,_players[player].race]=false))then break;
               if(sel)then _arrow(sox,soy,uo_x[k],uo_y[k],_toids[uo_id[k]]._omarc,false);
               with _tuids[-uo_tar[k]] do _drawSprMap(ui_uasprites[-uo_tar[k]],uo_x[k],uo_y[k],_r,128,c_gray);
               sox:=uo_x[k];
@@ -692,6 +693,9 @@ begin
               ioy:=soy;
            end
            else
+            if(uo_n=0)
+            then continue
+            else
              if((_toids[uo_id[k]].rtar and at_anytar)>0)then
              begin
                 if(uo_x[k]>0)then

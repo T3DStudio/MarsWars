@@ -291,7 +291,7 @@ begin
      end;
 end;
 
-procedure _barrack_spawn(pu:PTUnit;suid:byte);
+procedure _barrack_spawn(pu:PTUnit;suid:byte;spawneff:boolean=true);
 const ditstepx : array[0..7] of integer = (1,1 , 0,-1,-1,-1,0,1);
 const ditstepy : array[0..7] of integer = (0,-1,-1,-1,0 , 1,1,1);
 var tx,
@@ -314,7 +314,7 @@ begin
          ty:=y+ditstepy[sd]*ty;
       end;
 
-      _unitCreate(tx,ty,suid,player,true,true);
+      _unitCreate(tx,ty,suid,player,true,spawneff);
       if(_lcu>0)then
       begin
          if(uo_rallpos in _orders)then _unit_setorder(_lcup,uo_rightcl,un_rtar,un_rx,un_ry,true,false);
@@ -541,14 +541,14 @@ begin
        uo_spawndron:
              with _players[player] do
              begin
-                _barrack_spawn(pu,UID_Dron);
+                _barrack_spawn(pu,UID_Dron,false);
                 dec(cmana,_toids[uo_id[0]].rmana);
                 _nextOrder(pu);
              end;
        uo_spawnlost:
              if(buff[ub_cast]=0)and(a_rld=0)then
              begin
-                _barrack_spawn(pu,UID_LostSoul);
+                _barrack_spawn(pu,UID_LostSoul,false);
                 buff[ub_cast]:=vid_fps+vid_h2fps;
                 _nextOrder(pu);
              end;
@@ -638,7 +638,8 @@ begin
                             if(_tu^.hits>_tu^.puid^._mhits)then _tu^.hits:=_tu^.puid^._mhits;
                          end;
              wpt_ddmg  : _unit_damage(_tu,aw_mdmg,1);
-             wpt_uspwn : begin
+             wpt_uspwn : if((army+uidsip)<MaxPlayerUnits)then
+                         begin
                             _barrack_spawn(pu,UID_LostSoul);
                             if(_lcu>0)then
                             begin

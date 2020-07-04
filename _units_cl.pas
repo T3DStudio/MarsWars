@@ -79,8 +79,8 @@ begin
    with _tupids[up_hell_uarmor    ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=240; end;
    with _tupids[up_hell_barmor    ] do begin _upcnt:=4 ; _uprenerg:=5 ; _uptime:=180; end;
 
-   with _tupids[up_common_x2bldspd] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
-   with _tupids[up_common_x2uspawn] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
+   with _tupids[up_common_prodspd ] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
+   with _tupids[up_common_uspawn  ] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
    with _tupids[up_common_invuln  ] do begin _upcnt:=15; _uprenerg:=0 ; _uptime:=1  ; end;
 
    for i:=1 to 255 do
@@ -232,7 +232,6 @@ UID_Cyberdemon:
          _mspeed  := 9;
          _srng    := 260;
          _painc   := 13;
-         //_a_rldr  := 65;
          _ctime   := vid_fps*120;
          _max     := 1;
          _renerg  := 10;
@@ -249,13 +248,13 @@ UID_Mastermind:
          _mspeed  := 9;
          _srng    := 260;
          _painc   := 13;
-         //_a_rldr  := 9;
          _ctime   := vid_fps*120;
          _max     := 1;
          _renerg  := 10;
          _ruid    := UID_HMonastery;
          _itattack:= atm_always;
          _urace   := r_hell;
+         att(0,0 ,0 ,14,0,MID_Bulletx2,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
       end;
 UID_Pain:
       begin
@@ -280,15 +279,14 @@ UID_Revenant:
          _uf      := uf_ground;
          _mspeed  := 11;
          _srng    := 280;
-         //_ratt    := 0;
          _painc   := 7;
-         //_a_rldr  := 70;
          _ctime   := vid_fps*60;
          _renerg  := 5;
          _ruid    := UID_HFortress;
          _itattack:= atm_always;
          _urace   := r_hell;
-         //_mdamage := 25;
+         att(0,0 ,0 ,70,0,MID_Revenant,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
+         att(2,-1,25,60,0,0           ,wpr_any,wpt_ddmg,uo_attack,at_aenemy,[1..255]     );
       end;
 UID_Mancubus:
       begin
@@ -297,14 +295,13 @@ UID_Mancubus:
          _uf      := uf_ground;
          _mspeed  := 5;
          _srng    := 280;
-         //_ratt    := 0;
          _painc   := 6;
-         //_a_rldr  := 150;
          _ctime   := vid_fps*60;
          _renerg  := 6;
          _ruid    := UID_HFortress;
          _itattack:= atm_always;
          _urace   := r_hell;
+         att(0,0 ,0 ,150,0,MID_Mancubus,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
       end;
 UID_Arachnotron:
       begin
@@ -313,14 +310,13 @@ UID_Arachnotron:
          _uf      := uf_ground;
          _mspeed  := 8;
          _srng    := 280;
-         //_ratt    := 0;
          _painc   := 4;
-         //_a_rldr  := 15;
          _ctime   := vid_fps*60;
          _renerg  := 6;
          _ruid    := UID_HFortress;
          _itattack:= atm_always;
          _urace   := r_hell;
+         att(0,0 ,0 ,15,0,MID_YPlasma,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
       end;
 UID_ArchVile:
       begin
@@ -338,6 +334,98 @@ UID_ArchVile:
          _itattack:= atm_always;
          _urace   := r_hell;
          att(0,-1,0,60,0,0,wpr_any,wpt_resur,uo_archresur);
+         //att(1,0 ,0 ,15,0,MID_YPlasma,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255]-[i] );
+      end;
+
+UID_ZFormer:
+      begin
+         _mhits   := 50;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 12;
+         _srng    := 240;
+         _painc   := 0;
+         _ctime   := vid_fps*5;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,50,0,MID_Bullet,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
+      end;
+UID_ZSergant:
+      begin
+         _mhits   := 60;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 12;
+         _srng    := 240;
+         _painc   := 0;
+         _ctime   := vid_fps*10;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,60,0,MID_SShot  ,wpr_any,wpt_msle,uo_attack,at_aground,[1..255] );
+      end;
+UID_ZCommando:
+      begin
+         _mhits   := 70;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 11;
+         _srng    := 250;
+         _painc   := 0;
+         _ctime   := vid_fps*20;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,13,0,MID_Bullet,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
+      end;
+UID_ZBomber:
+      begin
+         _mhits   := 70;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 10;
+         _srng    := 250;
+         _painc   := 0;
+         _ctime   := vid_fps*40;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,80,0,MID_Granade,wpr_any,wpt_msle,uo_attack,at_aground,[1..255] );
+      end;
+UID_ZMajor:
+      begin
+         _mhits   := 70;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 11;
+         _srng    := 260;
+         _painc   := 0;
+         _ctime   := vid_fps*30;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,15,0,MID_BPlasma,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
+      end;
+UID_ZBFG:
+      begin
+         _mhits   := 80;
+         _r       := 12;
+         _uf      := uf_ground;
+         _mspeed  := 9;
+         _srng    := 260;
+         _painc   := 0;
+         _ctime   := vid_fps*90;
+         _renerg  := 1;
+         _itattack:= atm_always;
+         _urace   := r_hell;
+         _ruid    := UID_HMilitaryUnit;
+         att(0,0 ,0 ,150,140,MID_BFG,wpr_any,wpt_msle,uo_attack,at_aenemy,[1..255] );
       end;
 
        ////////////////////////////////////////////////////////////////////////////////

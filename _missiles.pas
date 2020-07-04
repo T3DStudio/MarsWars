@@ -86,7 +86,7 @@ begin
       case mid of
     MID_URocket,
     MID_HRocket,
-    MID_Granade   : begin _mteff:=MID_Bullet; _mtefff:=4; end;
+    MID_Granade   : begin _mteff:=MID_Bullet; _mtefff:=4; _meeff:=mid; end;
     MID_Blizzard  : begin _mteff:=EID_Exp;    _mtefff:=3; end;
       end;
    end;
