@@ -129,7 +129,7 @@ begin
 
        if(_miss_set(m0)=false)then exit;
 
-       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;
+       dir:=((p_dir(vx,vy,x,y,0)+23) mod 360) div 45;
        dd :=dist2(x,y,vx,vy);
 
        if(step=0)

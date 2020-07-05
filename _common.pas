@@ -48,13 +48,15 @@ begin
    if(x<0)then sign:=-1;
 end;
 
-function p_dir(x0,y0,x1,y1:integer):integer;
+function p_dir(x0,y0,x1,y1,cdir:integer):integer;
 var vx,vy,avx,avy:integer;
     res:single;
 begin
    p_dir:=270;
    vx:=x1-x0;
    vy:=y1-y0;
+
+   p_dir:=cdir;
 
    if(vx=0)and(vy=0)then exit;
 

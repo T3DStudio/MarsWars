@@ -341,7 +341,7 @@ begin
        if((rtar and at_anytar)>0)then
         with(puid^)do
         begin
-           if(uo_x[0]>=0)and(_fastturn)and(speed>0)then mdir := p_dir(x,y,uo_x[0],uo_y[0]);
+           if(uo_x[0]>=0)and(_fastturn)and(speed>0)then mdir := p_dir(x,y,uo_x[0],uo_y[0],mdir);
         end;
    end;
 end;
@@ -469,7 +469,7 @@ begin
                    if(x=uo_x[0])and(y=uo_y[0])then
                    begin
                       repeat _uordl_roll(pu);until uo_id[0] in [uo_patrol,uo_spatrol];
-                      if(_fastturn)then mdir :=p_dir(x,y,uo_x[0],uo_y[0]);
+                      if(_fastturn)then mdir :=p_dir(x,y,uo_x[0],uo_y[0],mdir);
                    end;
                    mv_x:=uo_x[0];
                    mv_y:=uo_y[0];
@@ -541,7 +541,7 @@ begin
        uo_spawndron:
              with _players[player] do
              begin
-                _barrack_spawn(pu,UID_Dron,false);
+                _barrack_spawn(pu,UID_Dron,true);
                 dec(cmana,_toids[uo_id[0]].rmana);
                 _nextOrder(pu);
              end;
@@ -628,7 +628,29 @@ begin
            PlayUSND(aw_snd,pu);
            {$ENDIF}
            case aw_type of
-           wpt_msle : _miss_add(_tx,_ty,_msx,_msy,_ttar,aw_mid,player,_tuf,0);
+           wpt_msle  : _miss_add(_tx,_ty,_msx,_msy,_ttar,aw_mid,player,_tuf,0);
+           wpt_uspwn : if((army+uidsip)<MaxPlayerUnits)then
+                       begin
+                          if(OnlySVCode)then
+                          begin
+                             _barrack_spawn(pu,aw_mid,false);
+                             if(_lcu>0)then
+                             begin
+                                {$IFDEF _FULLGAME}
+                                PlayUSND(_ueff2snd(aw_mid,ueff_create,false),pu);
+                                {$ENDIF}
+                                _unit_setorder(_lcup,uo_rightcl,_ttar,_tx,_ty,true,false);
+                                _lcup^.mdir:=mdir;
+                                _lcup^.tdir:=tdir;
+                             end;
+                          end;
+                       end
+                       else
+                       begin
+                          {$IFDEF _FULLGAME}
+                          PlayUSND(_ueff2snd(aw_mid,ueff_death,false),pu);
+                          {$ENDIF}
+                       end;
            else
              if(OnlySVCode)and(_ttar>0)then
               case aw_type of
@@ -638,16 +660,6 @@ begin
                             if(_tu^.hits>_tu^.puid^._mhits)then _tu^.hits:=_tu^.puid^._mhits;
                          end;
              wpt_ddmg  : _unit_damage(_tu,aw_mdmg,1);
-             wpt_uspwn : if((army+uidsip)<MaxPlayerUnits)then
-                         begin
-                            _barrack_spawn(pu,UID_LostSoul);
-                            if(_lcu>0)then
-                            begin
-                               _unit_setorder(_lcup,uo_rightcl,_ttar,_tx,_ty,true,false);
-                               _lcup^.mdir:=mdir;
-                               _lcup^.tdir:=tdir;
-                            end;
-                         end;
               end;
            end;
         end;
@@ -657,14 +669,14 @@ begin
            ca_tar:=0;
            if(0<_ttar)and(_ttar<=MaxUnits)then
            begin
-              inc(_tx,(_tu^.x-_tu^.vx)*2);
-              inc(_ty,(_tu^.y-_tu^.vy)*2);
+              //inc(_tx,(_tu^.x-_tu^.vx)*2);
+              //inc(_ty,(_tu^.y-_tu^.vy)*2);
               ca_tar:=_tu^.unum;
            end;
            ca_x :=calc_cx(_tx-_msx,(_tuf=uf_soaring));
            ca_y :=calc_cx(_ty-_msy,(_tuf=uf_fly    ));
         end;
-        if(_itattack>=atm_inmove)and(inapc=0)then tdir:=p_dir(_msx,_msy,_msx+ca_x,_msy+ca_y);
+        if(_itattack>=atm_inmove)and(inapc=0)then tdir:=p_dir(_msx,_msy,_msx+ca_x,_msy+ca_y,tdir);
      end;
 end;
 
@@ -720,7 +732,7 @@ begin
       if(0<ca_tar)and(ca_tar<=MaxUnits)
       then _unit_attproc(pu,ca_tar,0,0,0,a_weap)
       else
-        if(ca_x>0)then
+        if(ca_x<>0)then
         begin
            ca_uf:=0;
            if(abs(ca_x mod 2)=1)
@@ -762,7 +774,7 @@ begin
            exit;
         end;
 
-        tdir:=mdir;
+
         if(onlySVCode=false)
         then _unit_clattack(pu)
         else
@@ -786,6 +798,8 @@ begin
           begin
              if(a_tar>0)and(bld)then _unit_attack(pu);
           end;
+
+        if(a_rld=0)then tdir:=mdir;
      end;
 end;
 

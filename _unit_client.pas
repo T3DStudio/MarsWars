@@ -475,7 +475,7 @@ begin
                 if(_nhp3(vx,vy,player) or _nhp3(pu^.vx,pu^.vy,player))then PlayUSND(snd_teleport);
              end;
              if(speed>0)then vstp:=UnitStepNum;
-             if(mv_x<>x)or(mv_y<>y)then mdir:=p_dir(mv_x,mv_y,x,y);
+             if(mv_x<>x)or(mv_y<>y)then mdir:=p_dir(mv_x,mv_y,x,y,mdir);
              mv_x:=x;
              mv_y:=y;
              pains:=net_unmvsts;

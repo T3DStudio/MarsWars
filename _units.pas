@@ -48,7 +48,7 @@ begin
            begin
               x:=mv_x;
               y:=mv_y;
-              mdir:=p_dir(vx,vy,x,y);
+              mdir:=p_dir(vx,vy,x,y,mdir);
            end
            else
            begin
@@ -56,7 +56,7 @@ begin
               then mdist:=8+random(25)
               else mdist:=60;
 
-              mdir:=dir_turn(mdir,p_dir(x,y,mv_x,mv_y),mdist);
+              mdir:=dir_turn(mdir,p_dir(x,y,mv_x,mv_y,mdir),mdist);
 
               x:=x+round(speed*cos(mdir*degtorad));
               y:=y-round(speed*sin(mdir*degtorad));

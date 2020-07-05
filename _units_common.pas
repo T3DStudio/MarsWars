@@ -864,7 +864,7 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
-         mdir:=(360+mdir-(dir_diff(mdir,p_dir(vx,vy,x,y)) div 2 )) mod 360;
+         mdir:=(360+mdir-(dir_diff(mdir,p_dir(vx,vy,x,y,mdir)) div 2 )) mod 360;
 
          if(pi^.x=pi^.uo_x[0])and(pi^.y=pi^.uo_y[0])and(uo_tar[0]=0)then
          begin
@@ -905,7 +905,7 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
-         if(a_rld=0)then mdir:=p_dir(vx,vy,x,y);
+         if(a_rld=0)then mdir:=p_dir(vx,vy,x,y,mdir);
 
          td:=dist2(uo_x[0],uo_y[0],pd^.x,pd^.y)-puid^._r-pd^.r;
          if(td<=2)then
