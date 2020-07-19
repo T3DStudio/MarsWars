@@ -246,7 +246,7 @@ end;
 
 function net_LastinIP:cardinal;
 begin
-   net_LastinIP:=net_buf^.address.host;
+   net_LastinIP  :=net_buf^.address.host;
 end;
 
 function net_LastinPort:word;
@@ -267,7 +267,7 @@ begin
       else cpl:=stl;
 
       for i:=0 to MaxPlayers do
-       if((pls and (1 shl i))>0)or(HPlayer=i)or(i=0)then
+       if((pls and (1 shl i))>0)or(pl=i)or(i=0)then
         with _players[i] do
         begin
            for t:=MaxNetChat-1 downto 0 do chatm[t+1]:=chatm[t];

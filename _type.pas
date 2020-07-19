@@ -242,7 +242,7 @@ TPlayer = record
    _brcks,    // barracks
    _sbrcks,   // selected barracks
    _smths,    // smiths
-   _ssmths
+   _ssmths    // selected smiths
            : integer;
 
    uid_e   : array[byte] of integer;  // exists
@@ -254,14 +254,14 @@ TPlayer = record
    uid_sb  : integer;                 // selected buildings
    uid_su  : integer;                 // selected units
 
-   uidsip  : integer;                 // units in progress count (barracks)
+   uidsip  : integer;                 // units in progress count (all)
    uidip   : array[byte] of integer;  // units in progress count each uid
    uid_a   : TSob;                    // allowed units and buildings
 
-   upgr_a  : TSob;
-   upgrsip : integer;                 // upgrades in progress count (smiths)
+   upgrsip : integer;                 // upgrades in progress count (all)
    upgrip  : array[byte] of integer;  // upgrades in progress count each upid
-   upgr    : array[byte] of byte;
+   upgr    : array[byte] of byte;     // upgrades
+   upgr_a  : TSob;                    // allowed upgrades
 
    ai_skill: byte;
 
@@ -368,15 +368,31 @@ end;
 PTUSprite = ^TUSprite;
 
 TSModel = record
+   sa : array['A'..'S',1..8] of TUSprite;
+
    {
-   name + A
-          B    ????????????????????????????????/
-          C
-          D
-          E
-          F
+   name + A - walk   #1  + 1-8 - direction
+          B - walk   #2
+          C - walk   #3
+          D - walk   #4
+          E - walk   #5
+          F - walk   #6
+          G - attack #1
+          H - attack #2
+          I - cast
+          J - death  #1
+          K - death  #2
+          L - death  #3
+          M - death  #4
+          N - death  #5
+          O - death  #6
+          P - death  #7
+          Q - death  #8
+          R - death  #9
+          S - death  #10
    }
 end;
+PTSModel = ^TSModel;
 
 TMapTheme = record
    _adecn,

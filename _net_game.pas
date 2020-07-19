@@ -108,14 +108,14 @@ begin
    '-h',
    '-help':
       begin
-         net_chat_add('MarsWars dedicated server, v'+str_ver,0,255);
-         net_chat_add('New map: -m seed size lakes obstacles' ,0,255);
-         net_chat_add('Game mode: -s -scrimish, -f2 -2 bases',0,255);
-         net_chat_add('-f3 - 3 bases',0,255);
-         net_chat_add('Add AI: -ai slot(1-6,0-any) skill(1-6)',0,255);
-         net_chat_add('team(1-6) race(r/h/u)',0,255);
-         net_chat_add('Remove all AI players: -noai',0,255);
-         net_chat_add('Fill free slots: -fai x(0-no,1-6)',0,255);
+         net_chat_add('MarsWars dedicated server, v'+str_ver   ,0,255);
+         net_chat_add('New map: -m seed size lakes obstacles'  ,0,255);
+         net_chat_add('Game mode: -s -scrimish, -f2 -2 bases'  ,0,255);
+         net_chat_add('-f3 - 3 bases'                          ,0,255);
+         net_chat_add('Add AI: -ai slot(1-6,0-any) skill(1-6)' ,0,255);
+         net_chat_add('team(1-6) race(r/h/u)'                  ,0,255);
+         net_chat_add('Remove all AI players: -noai'           ,0,255);
+         net_chat_add('Fill free slots: -fai x(0-no,1-6)'      ,0,255);
       end;
    '-m':
       if(a<5)then
@@ -320,7 +320,7 @@ nmid_connect:
          begin
             if(mid=nmid_plout)then
             begin
-               net_chat_add(_players[pid].name+str_plout,255,0);
+               net_chat_add(_players[pid].name+str_plout ,0,255);
                if(G_Started=false)then _players[pid].state:=ps_none;
                continue;
             end;

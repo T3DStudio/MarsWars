@@ -134,6 +134,14 @@ begin
    end;
 end;
 
+procedure _lsmdl(sm:PTSModel;fn:string);
+begin
+   with (sm^) do
+   begin
+
+   end;
+end;
+
 procedure _loadDecs;
 var i:byte;
    fn:string;
@@ -425,7 +433,7 @@ begin
    xx:=vid_hBW-2;
    spr_uitab[0]:=_createSurf(vid_BW-1,vid_BW-1);
    _draw_surf(spr_uitab[0],-xx,-xx,_tuids[UID_UCommandCenter]._ubtn);
-   _draw_surf(spr_uitab[0], xx,-xx,_tuids[UID_UMilitaryUnit]._ubtn);
+   _draw_surf(spr_uitab[0], xx,-xx,_tuids[UID_UMilitaryUnit ]._ubtn);
    _draw_surf(spr_uitab[0],-xx, xx,_tuids[UID_HKeep]._ubtn);
    _draw_surf(spr_uitab[0], xx, xx,_tuids[UID_HGate]._ubtn);
 
