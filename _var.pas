@@ -136,7 +136,6 @@ map_mmvh         : integer;
 map_ADecn        : integer = 0;
 map_ADecs        : array of TADec;
 map_Liquidc      : array[byte] of cardinal;
-
 map_themes       : array of TMapTheme;
 map_themen       : byte = 0;
 map_themec       : byte = 0;

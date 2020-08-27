@@ -674,7 +674,6 @@ begin
    _draw_surf(spr_b_ralpos,vid_hBW-20,vid_hBW-(spr_mp[r_hell].hh),spr_mp[r_hell].surf);
    _draw_surf(spr_b_ralpos,vid_hBW+4 ,vid_hBW-(spr_mp[r_uac ].hh),spr_mp[r_uac ].surf);
 
-
    _loadMapThemes;
    _loadDecs;
 end;

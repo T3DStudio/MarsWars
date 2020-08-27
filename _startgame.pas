@@ -82,12 +82,7 @@ procedure _StartGame;
 begin
    randomize;
    _CYCLE:=false;
-
    new(_EVENT);
-   {$IFDEF _FULLGAME}
-   new(_RECT);
-   fps_ns:=0;
-   {$ENDIF}
 
    StartParams;
 
@@ -96,6 +91,9 @@ begin
    FillChar(_tupids,SizeOf(_tupids),0);
 
    {$IFDEF _FULLGAME}
+   new(_RECT);
+   fps_ns:=0;
+
    cfg_read;
 
    _InitVideo;
