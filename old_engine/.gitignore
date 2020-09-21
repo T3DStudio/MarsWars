@@ -7,7 +7,7 @@
 *.zip
 *.rar
 cfg
-*.docx
+#*.docx
 *.xlsx
 sound/*
 save/*

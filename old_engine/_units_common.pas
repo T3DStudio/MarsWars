@@ -534,7 +534,7 @@ begin
 
    if(tu^.buff[ub_notarget]>0)or(tu^.buff[ub_invuln]>0)or(tu^.inapc>0)then exit;
 
-   if(uu^.uid=UID_UCommandCenter)and(tu^.uf=uf_ground)then exit;
+   if(uu^.uid=UID_UCommandCenter)and(uu^.uf=uf_ground)then exit;
 
    teams:=(_players[tu^.player].team=_players[uu^.player].team);
 
@@ -982,11 +982,14 @@ begin
                       end;
 
          UID_Tank,
-         UID_Arachnotron,
          UID_Revenant:
                       if(buff[ub_advanced]>0)
                       then ar:=325
                       else ar:=250;
+         UID_Arachnotron:
+                      if(buff[ub_advanced]>0)
+                      then arf:=350
+                      else arf:=ar;
 
          UID_APC:     if(buff[ub_advanced]>0)
                       then apcm:=6

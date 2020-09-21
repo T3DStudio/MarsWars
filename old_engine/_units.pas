@@ -413,19 +413,22 @@ end;
 
 function _unit_OnDecorCheck(ux,uy:integer):boolean;
 const dr = 64;
-var i,dx,dy,ud:integer;
+var i,dx,dy,ud,dp:integer;
 begin
    dx:=ux div dcw;if(dx<0)then dx:=0;if(dx>dcn)then dx:=dcn;
    dy:=uy div dcw;if(dy<0)then dy:=0;if(dy>dcn)then dy:=dcn;
    _unit_OnDecorCheck:=false;
+   dp:=0;
 
    with map_dcell[dx,dy] do
     for i:=1 to n do
      with map_dds[l[i-1]] do
       if(r>0)and(t>0)then
       begin
-         ud:=(dist2(x,y,ux,uy)-r)+dr;
-         if(ud<0)then
+         ud:=(dist2(x,y,ux,uy)-r);
+         if(ud<0)then inc(dp,1);
+         inc(ud,dr);
+         if(ud<0)or(dp>1)then
          begin
             _unit_OnDecorCheck:=true;
             exit;
@@ -1966,7 +1969,9 @@ begin
                if(teams=false)then
                begin
                   if not(tu^.uid in [UID_HEye,UID_Mine])then
-                   _unit_damage(t,upgr[upgr_paina],upgr[upgr_paina],player);
+                   if(tu^.mech)
+                   then _unit_damage(t,upgr[upgr_paina],upgr[upgr_paina]*3,player)
+                   else _unit_damage(t,upgr[upgr_paina],upgr[upgr_paina]  ,player);
                end
                else tu^.buff[ub_toxin]:=-vid_fps;
           end;
@@ -2006,11 +2011,7 @@ begin
 
                {$IFDEF _FULLGAME}PlaySND(snd_plasmas,u);{$ENDIF}
                _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,player,uf_soaring,false);
-               buff[ub_clcast2]:=vid_hfps;
-
-               //{$IFDEF _FULLGAME}PlaySND(snd_launch,u);{$ENDIF}
-               //_miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_HRocket,player,tu1^.uf,false);
-               //buff[ub_clcast2]:=vid_3fps;
+               buff[ub_clcast2]:=10;
             end;
          UID_Engineer :
             if(inapc>0)and(onlySVCode)then

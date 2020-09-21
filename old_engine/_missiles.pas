@@ -76,7 +76,7 @@ MID_Bullet     : begin dam:=6  ; vst:=1;         sr :=0  ;       end;
 MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=35 ; vst:=sr div 50; sr :=0  ;       end;
+MID_Flyer      : begin dam:=35 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
@@ -116,9 +116,9 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   
            if(upgr[upgr_attack]>0)then
             case mid of
 MID_SShot,
-MID_SSShot,
 MID_Imp,
 MID_BPlasma    : inc(dam,upgr[upgr_attack]*2);
+MID_SSShot,
 MID_YPlasma,
 MID_Revenant,
 MID_RevenantS,
@@ -132,7 +132,7 @@ MID_Mine       : inc(dam,upgr[upgr_attack]*3);
 MID_ArchFire,
 MID_Granade,
 MID_Tank       : inc(dam,upgr[upgr_attack]*5);
-
+MID_Blizzard   : ;
             else inc(dam,upgr[upgr_attack]);
             end;
 
@@ -279,15 +279,17 @@ begin
               end;
 
               if(tu^.uf>uf_ground)then
-               if(tu^.isbuild=false)then
-              case mid of
-              MID_BPlasma,
-              MID_Imp         : _d50 (@damd);
-              MID_Cacodemon,
-              MID_Revenant,
-              MID_RevenantS,
-              MID_Mancubus,
-              MID_Baron       : _d75 (@damd);
+              begin
+                 if(tu^.isbuild=false)then
+                 case mid of
+                 MID_BPlasma,
+                 MID_Imp         : _d50 (@damd);
+                 MID_Cacodemon,
+                 MID_Revenant,
+                 MID_RevenantS,
+                 MID_Mancubus,
+                 MID_Baron       : _d75 (@damd);
+                 end;
               end
               else
               case mid of
@@ -295,6 +297,7 @@ begin
               MID_Flyer       : _d50 (@damd);
               end;
 
+             if(tu^.isbuild=false)then
               if(tu^.uf>uf_soaring)then
               case mid of
               MID_Blizzard    : if(tu^.isbuild=false)then _d50 (@damd);
@@ -359,6 +362,7 @@ begin
                 if(mid in [MID_HRocket,MID_Tank,MID_Granade])then
                 begin
                    if(tu^.uid in [UID_Cyberdemon,UID_Mastermind,UID_Tank])then exit;
+                   if(tu^.uid in armor_lite)then damd:=damd div 2;
                 end;
 
                 {$IFDEF _FULLGAME}
@@ -369,7 +373,6 @@ begin
                    else _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood);
                 end;
                 {$ENDIF}
-                //if(tu^.uid in armor_lite)then damd:=damd div 2;
 
                 if(mid=MID_BFG)then
                 begin

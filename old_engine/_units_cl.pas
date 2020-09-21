@@ -83,7 +83,7 @@ begin
          rld_a  := 25;
          anims  := 12;
          mdmg   := 10;
-         trt    := vid_fps*6;
+         trt    := vid_fps*5;
          renerg := 1;
       end;
       if(uid=UID_Demon) then
@@ -213,14 +213,14 @@ begin
          sr     := 250;
          ar     := 300;
          ucl    := 9;
-         painc  := 5;
+         painc  := 4;
          rld_r  := 150;
          anims  := 10;
          trt    := vid_fps*60;
          renerg := 6;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
-         arf    :=(ar div 4)*3;
+         arf    :=(ar div 2);
       end;
       if(uid=UID_Arachnotron) then
       begin
@@ -597,7 +597,7 @@ begin
          renerg := 6;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
-         arf    :=(sr div 4)*3;
+         //arf    :=(sr div 4)*3;
       end;
       if(uid=UID_Tank)then
       begin
@@ -637,7 +637,7 @@ begin
 
       if(uid=UID_UCommandCenter)then
       begin
-         mhits  := 3000;
+         mhits  := 4000;
          uf     := uf_ground;
          sr     := base_rA[0];
          ar     := 250;

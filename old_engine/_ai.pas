@@ -328,6 +328,7 @@ begin
          then ucl:=Tw2
          else ucl:=Tw1;
          if(twrs>1)and(u_e[true,0]<2)then exit;
+         if(twrs>8)and(alrm=false)then exit;
          if(twrs>=bnms^[ucl])then exit;
          end;
       end;
@@ -708,7 +709,7 @@ end;
 
 procedure ai_buildactions(u:integer);
 const maxb = 21;
-      maxt = 27;
+      maxt = 25;
 var blds: TCntr;
     t,
     twrs: integer;
@@ -724,14 +725,16 @@ begin
       2   : blds[0]:=3;
       3   : blds[0]:=8;
       4   : blds[0]:=11;
-      else  blds[0]:=16;
+      else  if(menerg>100)and(race=r_hell)
+            then blds[0]:=11
+            else blds[0]:=16;
       end;
       blds[1]:=min2(max2(2,(menerg div 6)+u_e[true,0]-u_e[true,3]),maxb);
       blds[3]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
       blds[4]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
       blds[7]:=blds[4];
 
-      if(ucl=0)and(speed=0)then ai_trybuild(x,y,sr,player,(alrm_r<base_rr)and(ai_skill>1),@blds,twrs);
+      if(ucl=0)and(speed=0)then ai_trybuild(x,y,sr,player,(alrm_r<base_rr)and(ai_skill>2),@blds,twrs);
       if(ucl=1)then ai_utr(u,0);
       if(ucl=3)then ai_ups(u);
 
@@ -794,10 +797,13 @@ begin
                   end;
       UID_UCommandCenter:
                   begin
-                     if(order<4)then
-                      if(u_e[isbuild,ucl]>10)
-                      then order:=5         //
-                      else order:=4;
+                     case order of
+                     0  : if(u_e[isbuild,ucl]> 10)
+                          then order:=5
+                          else order:=4;
+                     5  : if(u_e[isbuild,ucl]<=10)then order:=4;
+                     else
+                     end;
 
                      case order of
                       4: begin
@@ -808,20 +814,16 @@ begin
                              if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)
                              then ai_CCAttack(u)
                              else ai_CCOut(u);
-
                          end;
-                      5: begin
-                            if(speed=0)and(upgr[upgr_ucomatt]>0)then _unit_action(u);
-                            if(speed>0)then
-                             if(u_e[isbuild,ucl]>10)
-                             then ai_CCAttack(u)
-                             else ai_CCOut(u);
-                         end;
+                      5: if(speed>0)
+                         then ai_CCAttack(u)
+                         else
+                           if(upgr[upgr_ucomatt]>0)then _unit_action(u);
                       end;
                   end;
       UID_URocketL:
                   if(rld=0)and(upgr[upgr_blizz]>0)then
-                   if(ai_uc_a<ai_uc_e)and(ai_uc_e>3)then _unit_URocketL(u);
+                   if(ai_uc_a<ai_uc_e)and(ai_uc_e>4)then _unit_URocketL(u);
       end;
 
       {$IFDEF _FULLGAME}
@@ -929,7 +931,7 @@ begin
                end;
       end;
 
-      if(u_c[true]=0)then order:=2;
+      if(u_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
    end;
 end;
 
