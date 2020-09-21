@@ -679,7 +679,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
               begin
                  case o_id of
                uo_select     : _lsuc:=uid;
-               uo_setorder   : order:=o_x0;
+               uo_setorder,
+               uo_addorder   : order:=o_x0;
                uo_delete     : _unit_kill(u,false,o_x0>0);
                uo_move       : begin
                                   uo_x :=o_x0;

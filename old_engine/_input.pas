@@ -171,6 +171,8 @@ begin
                     sdlk_C      : HPlayer:=2;
                     sdlk_R      : HPlayer:=3;
                     sdlk_T      : HPlayer:=4;
+                    sdlk_Y      : HPlayer:=5;
+                    sdlk_F      : HPlayer:=6;
            end;
            exit;
         end;
@@ -182,9 +184,12 @@ begin
                                if (k_ctrl>1)
                                then _player_s_o(ko,0,0,0,uo_setorder,HPlayer)
                                else
-                                 if(k_dbl>0)and(ordx[ko]>0)and(ko>0)
-                                 then _moveHumView(ordx[ko] , ordy[ko])
-                                 else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
+                                 if (k_alt>1)
+                                 then _player_s_o(ko,0,0,0,uo_addorder,HPlayer)
+                                 else
+                                   if(k_dbl>0)and(ordx[ko]>0)and(ko>0)
+                                   then _moveHumView(ordx[ko] , ordy[ko])
+                                   else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
                             end;
           sdlk_delete    :  _player_s_o(k_ctrl,0,0,0,uo_delete,HPlayer);
           sdlk_space     :  _player_s_o(k_ctrl,0,0,0,uo_action,HPlayer);

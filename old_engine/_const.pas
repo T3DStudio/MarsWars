@@ -105,6 +105,7 @@ uo_move                = 8;
 uo_delete              = 9;
 uo_action              = 10;
 uo_specsel             = 11;
+uo_addorder            = 12;
 
 ua_move                = 1;
 ua_amove               = 2;

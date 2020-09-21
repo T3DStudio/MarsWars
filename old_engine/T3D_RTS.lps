@@ -16,8 +16,8 @@
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="497"/>
-        <CursorPos X="61" Y="499"/>
+        <TopLine Value="86"/>
+        <CursorPos X="12" Y="108"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -70,10 +70,9 @@
       </Unit7>
       <Unit8>
         <Filename Value="_input.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="30"/>
-        <TopLine Value="21"/>
-        <CursorPos X="70" Y="36"/>
+        <TopLine Value="166"/>
+        <CursorPos X="66" Y="188"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -127,9 +126,10 @@
       </Unit14>
       <Unit15>
         <Filename Value="_game.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="26"/>
-        <TopLine Value="45"/>
-        <CursorPos X="4" Y="69"/>
+        <TopLine Value="724"/>
+        <CursorPos X="71" Y="746"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit15>
@@ -259,7 +259,7 @@
         <Loaded Value="True"/>
       </Unit31>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="_type.pas"/>
         <Caret Line="96" Column="79" TopLine="88"/>
@@ -373,13 +373,9 @@
         <Caret Line="731" Column="42" TopLine="704"/>
       </Position28>
       <Position29>
-        <Filename Value="_units.pas"/>
-        <Caret Line="2009" Column="43" TopLine="2179"/>
+        <Filename Value="_input.pas"/>
+        <Caret Line="188" Column="66" TopLine="166"/>
       </Position29>
-      <Position30>
-        <Filename Value="_units.pas"/>
-        <Caret Line="2011" Column="36" TopLine="2121"/>
-      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
