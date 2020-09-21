@@ -1,0 +1,17 @@
+*.dbg
+*.exe
+*.txt
+*.bat
+*.bmp
+*.png
+*.zip
+*.rar
+cfg
+*.xlsx
+sound/*
+save/*
+replay/*
+music/*
+lib/*
+graphic/*
+backup/*
