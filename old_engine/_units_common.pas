@@ -357,6 +357,7 @@ begin
       inc(army,1);
       inc(u_e[isbuild,ucl],1);
       inc(u_c[isbuild],1);
+      inc(uid_e[uid],1);
 
       if(ubld)then
       begin
@@ -369,6 +370,7 @@ begin
          end;
          inc(u_eb[isbuild,ucl],1);
          inc(menerg,generg);
+         inc(uid_b[uid],1);
       end
       else
       begin
@@ -433,20 +435,18 @@ end;
 procedure _unit_startb(bx,by:integer;bt,bp:byte);
 begin
    with _players[bp] do
-     if(_bldCndt(bp,bt)=false)then
-      if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
+    if(_bldCndt(bp,bt)=false)then
+     if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
+      if(_unit_grbcol(bx,by,_ulst[cl2uid[race,true,bt]].r,bp,true)=0)then
       begin
-         if(_unit_grbcol(bx,by,_ulst[cl2uid[race,true,bt]].r,bp,true)=0)then
+         _unit_add(bx,by,cl2uid[race,true,bt],bp,false);
+         if(_lcu>0)then
          begin
-            _unit_add(bx,by,cl2uid[race,true,bt],bp,false);
-            if(_lcu>0)then
-            begin
-               bld_r:=vid_fps+u_c[true];
-               inc(cenerg,_ulst[cl2uid[race,true,bt]].renerg);
-               {$IFDEF _FULLGAME}
-               if(bp=HPlayer)then PlaySND(snd_build[race],0);
-               {$ENDIF}
-            end;
+            bld_r:=vid_fps+u_c[true];
+            inc(cenerg,_ulst[cl2uid[race,true,bt]].renerg);
+            {$IFDEF _FULLGAME}
+            if(bp=HPlayer)then PlaySND(snd_build[race],0);
+            {$ENDIF}
          end;
       end;
 end;

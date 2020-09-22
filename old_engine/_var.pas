@@ -265,7 +265,7 @@ m_vx,
 m_vy              : integer;
 m_ldblclk,
 m_sbuildc         : cardinal;
-m_sbuild,
+m_sbuild          : integer;
 m_bx,
 m_by              : byte;
 m_vmove           : boolean = false;
@@ -487,7 +487,7 @@ spr_cursor        : pSDL_Surface;
 spr_b_b           : array[1..2,0.._uts] of pSDL_Surface;
 spr_b_u           : array[1..2,0.._uts] of pSDL_Surface;
 spr_b_up          : array[1..2,0..MaxUpgrs] of pSDL_Surface;
-spr_tabs          : array[0..2] of pSDL_Surface;
+spr_tabs          : array[0..3] of pSDL_Surface;
 
 spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 
@@ -542,9 +542,9 @@ str_MPlayers      : shortstring;
 str_npnua,
 str_pnua          : array[0..9] of shortstring;
 str_cmpd          : array[0..CMPMaxSkills] of shortstring;
-str_hint_t        : array[0..2] of shortstring;
+str_hint_t        : array[0..3] of shortstring;
 str_hint_m        : array[0..2] of shortstring;
-str_hint          : array[0..2,1..2,0.._uts] of shortstring;
+str_hint          : array[0..3,1..2,0.._uts] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 str_svld_errors   : array[1..4] of shortstring;
 str_camp_t        : array[0..MaxMissions] of shortstring;

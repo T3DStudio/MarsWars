@@ -31,30 +31,32 @@ var spr:PTUSprite;
      sy:integer;
 begin
    with _players[HPlayer]do
-    if(m_sbuild<=_uts)then
-    begin
-       sy:=cl2uid[race,true,m_sbuild];
-       u:=@_ulst[sy];
-       spr:=_unit_spr(u);
-       circleColor(_screen,m_vx,m_vy,u^.r,m_sbuildc);
+   case m_sbuild of
+   0.._uts:
+   begin
+      sy :=cl2uid[race,true,m_sbuild];
+      u  :=@_ulst[sy];
+      spr:=_unit_spr(u);
+      circleColor(_screen,m_vx,m_vy,u^.r,m_sbuildc);
 
-       sy:=0;
+      sy:=0;
 
-       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
-       _draw_surf(_screen,m_vx-spr^.hw,m_vy-spr^.hh-sy,spr^.surf);
-       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
+      _draw_surf(_screen,m_vx-spr^.hw,m_vy-spr^.hh-sy,spr^.surf);
+      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-       if(m_sbuild in [4,7])then circleColor(_screen,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
+      if(m_sbuild in [4,7])then circleColor(_screen,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
 
-       for i:=0 to _uts do
-        if(ui_bldrs_x[i]<>0)then circleColor(_screen,ui_bldrs_x[i]-vid_vx,ui_bldrs_y[i]-vid_vy,ui_bldrs_r[i],c_white);
+      for i:=0 to _uts do
+       if(ui_bldrs_x[i]<>0)then circleColor(_screen,ui_bldrs_x[i]-vid_vx,ui_bldrs_y[i]-vid_vy,ui_bldrs_r[i],c_white);
 
-       if(g_mode=gm_ct)then
-        for i:=1 to MaxPlayers do
-         with g_ct_pl[i] do circleColor(_screen,px-vid_vx,py-vid_vy,base_r,c_blue);
+      if(g_mode=gm_ct)then
+       for i:=1 to MaxPlayers do
+        with g_ct_pl[i] do circleColor(_screen,px-vid_vx,py-vid_vy,base_r,c_blue);
 
-       rectangleColor(_screen,build_b-vid_vx,build_b-vid_vy,map_b1-vid_vx,map_b1-vid_vy,c_white);
-    end;
+      rectangleColor(_screen,build_b-vid_vx,build_b-vid_vy,map_b1-vid_vx,map_b1-vid_vy,c_white);
+   end;
+   end;
 end;
 
 procedure D_OrderIcons;
@@ -140,7 +142,7 @@ begin
       if(_rpls_rst< rpl_rhead)then
       begin
          D_BuildUI;
-         if(race=r_uac)and(u_s[true,8]>0)then circleColor(_screen,m_vx,m_vy,blizz_r,c_gray); //rectangleColor(_screen,m_vx-blizz_w,m_vy-blizz_w,m_vx+blizz_w,m_vy+blizz_w,c_gray);
+         if(race=r_uac)and(u_s[true,8]>0)then circleColor(_screen,m_vx,m_vy,blizz_r,c_gray);
       end;
 
       D_Timer(ui_textx,2,g_step,ta_left,str_time);
@@ -158,25 +160,17 @@ begin
          D_minimap;
          _draw_surf(_uipanel,0,0,spr_panel);
 
-         _draw_surf(_uipanel,0      ,ui_tabsy,spr_tabs[0]);
-         _draw_surf(_uipanel,vid_BW ,ui_tabsy,spr_tabs[1]);
-         _draw_surf(_uipanel,vid_2BW,ui_tabsy,spr_tabs[2]);
+         for ux:=0 to 3 do _draw_surf(_uipanel,ux*vid_tBW+1,ui_tabsy+1,spr_tabs[ux]);
 
-         ux:=1+(vid_bw*ui_tab);
+         ux:=1+(vid_tBW*ui_tab);
          uy:=ui_tabsy+2;
-         rectangleColor(_uipanel,ux+1,uy,ux+vid_BW-3,ui_bottomsy-2,c_lime);
-
-         if(_rpls_rst< rpl_rhead)then
-         begin
-            ux:=1+(vid_bw*2);
-            boxColor(_uipanel,ux+1,uy,ux+vid_BW-2,ui_bottomsy-2,c_ablack);
-         end;
+         rectangleColor(_uipanel,ux+1,uy,ux+vid_tBW-3,ui_bottomsy-2,c_lime);
 
          if(ui_upgrl>0)then
          begin
-            ux:=vid_bw;
-            _draw_text(_uipanel,ux+4       ,uy+2 ,i2s((ui_upgrl div vid_fps)+1),ta_left ,255,c_white);
-            _draw_text(_uipanel,ux+vid_BW-2,uy+18,b2s(ui_upgrc)                ,ta_right,255,c_yellow);
+            ux:=vid_2tBW;
+            _draw_text(_uipanel,ux+4,uy+2 ,i2s((ui_upgrl div vid_fps)+1),ta_left,255,c_white);
+            _draw_text(_uipanel,ux+4,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
          end;
 
          uy:=(13*vid_BW)+4;
@@ -192,7 +186,8 @@ begin
          _draw_text(_uipanel,ui_armyx   ,ui_iy,b2s(u_c[true ]),ta_right,255,c_green);
          _draw_text(_uipanel,ui_armyx+2 ,ui_iy,b2s(army      ),ta_left ,255,c_white);
 
-         if(ui_tab=0)then
+         case ui_tab of
+         0:
          begin
             for ui:=0 to 8 do
             begin
@@ -229,8 +224,11 @@ begin
                     end;
                end;
             end;
+         end;
 
-            for ui:=0 to 11 do
+         1:
+         begin
+            for ui:=0 to 18 do
             begin
                if(cl2uid[race ,false,ui]=0)then continue;
                if(u_e[false,ui]=0)then
@@ -245,7 +243,7 @@ begin
                 else spr_b_u[race,ui]:=spr_b_baron;
 
                ux:=(ui mod 3);
-               uy:=(ui div 3)+3;
+               uy:=(ui div 3);
 
                _drawBtn(_uipanel,ux,uy,spr_b_u[race,ui],false,_untCndt(HPlayer,ui) or (wb=(u_e[true,1]-ui_blds[1])));
                _drawBtnt(_uipanel,ux,uy,
@@ -253,7 +251,7 @@ begin
                c_white                                  ,c_dyellow        ,c_lime             ,ui_muc[u_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
 
-            if(_rpls_rst<rpl_rhead)then
+            {if(_rpls_rst<rpl_rhead)then
             begin
                _drawBtn(_uipanel,0,8,spr_b_action,false,false);
                _drawBtn(_uipanel,1,8,spr_b_delete,false,false);
@@ -293,10 +291,10 @@ begin
                         '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
                         0 ,0 ,c_lime            ,c_orange          ,0 );
                      end;
-            end;
+            end;}
          end;
 
-         if(ui_tab=1)then
+         2:
          begin
             for ui:=0 to MaxUpgrs do
             begin
@@ -314,14 +312,13 @@ begin
             end;
          end;
 
-         if(ui_tab=2)then
+         3:
          begin
             _drawBtn(_uipanel,0,0,spr_b_rfast,_fsttime  ,false);
             _drawBtn(_uipanel,1,0,spr_b_rskip,false     ,false);
             _drawBtn(_uipanel,2,0,spr_b_rstop,g_paused>0,false);
             _drawBtn(_uipanel,0,1,spr_b_rfog ,_fog      ,false);
             _drawBtn(_uipanel,1,1,spr_b_rlog ,_rpls_log ,false);
-
 
             for ui:=0 to MaxPlayers do
             begin
@@ -335,6 +332,8 @@ begin
                if(ui=HPlayer)then rectangleColor(_uipanel,ux+2,uy+2,ux+vid_bw-2,uy+vid_bw-2,c_lime);
             end;
          end;
+         else
+         end;
       end;
    end;
    _draw_surf(_screen,0,0,_uipanel);
@@ -346,7 +345,7 @@ begin
    if(m_bx<3)and(m_by>=3)and(m_by<=13)then
    begin
       case m_by of
-      3  : if(m_vy>ui_tabsy)then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_bx],ta_left,255,c_white);
+      3  : if(m_vy>ui_tabsy)then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW],ta_left,255,c_white);
       13 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;
@@ -363,21 +362,22 @@ begin
                         then exit
                         else
                           if((G_addon=false)and(cl2uid[race ,true,i] in t2))then exit;
-               9 ..20 : if(_bc_g(a_units,i-9)=false)or(cl2uid[race ,false,i-9]=0)
+               end;
+           1 : case i of
+               0..18  : if(_bc_g(a_units,i)=false)or(cl2uid[race ,false,i]=0)
                         then exit
                         else
-                          if((G_addon=false)and(cl2uid[race ,false,i-9] in t2))then exit;
-               24..26 : if(_rpls_rst>=rpl_rhead)then exit;
+                          if((G_addon=false)and(cl2uid[race ,false,i] in t2))then exit;
                end;
-           1 :begin
-                 if(i<=MaxUpgrs)then
-                 begin
-                    if(_bc_g(a_upgr,i)=false)then exit;
-                    if(g_addon=false)and(i>=upgr_2tier)then exit;
-                 end;
-                 //if(_rpls_rst>=rpl_rhead)and(i=23)then exit;
-              end;
-           2 :;
+           2 : begin
+                  if(i<=MaxUpgrs)then
+                  begin
+                     if(_bc_g(a_upgr,i)=false)then exit;
+                     if(g_addon=false)and(i>=upgr_2tier)then exit;
+                  end;
+                  //if(_rpls_rst>=rpl_rhead)and(i=23)then exit;
+               end;
+           3 :;
            end;
            _draw_text(_screen,ui_textx,vid_mh-30,str_hint[ui_tab,race,i],ta_left,255,c_white);
         end;

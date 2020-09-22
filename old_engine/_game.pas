@@ -641,9 +641,9 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
               if(o_id=uo_specsel)then
                case o_x0 of
                   0 : if(isbuild=false)then sel:=true else if(o_y0=0)then sel:=false;
-                  1 : if(ubx[5]=u)then sel:=true else if(o_y0=0)then sel:=false;
-                  2 : if(ubx[8]=u)then sel:=true else if(o_y0=0)then sel:=false;
-                  3 : if(ubx[6]=u)then sel:=true else if(o_y0=0)then sel:=false;
+               else
+                  if(o_x0 in _sbs_ucls)then
+                   if(ubx[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
                end;
 
               if(o_id=uo_action)then

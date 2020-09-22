@@ -167,7 +167,6 @@ upgr_mainr             = 11; // main sr
 upgr_pinkspd           = 12; // demon speed
 upgr_mines             = 12; // mines for engineers
 
-
 upgr_misfst            = 13; // missiles fast
 upgr_minesen           = 13; // mine-sensor
 
@@ -240,11 +239,12 @@ UID_Arachnotron        = 11;
 UID_Archvile           = 12;
 UID_HEye               = 13;
 UID_ZFormer            = 15;
-UID_ZSergant           = 16;
-UID_ZCommando          = 17;
-UID_ZBomber            = 18;
-UID_ZMajor             = 19;
-UID_ZBFG               = 20;
+UID_ZEngineer          = 16;
+UID_ZSergant           = 17;
+UID_ZCommando          = 18;
+UID_ZBomber            = 19;
+UID_ZMajor             = 20;
+UID_ZBFG               = 21;
 
 
 UID_Engineer           = 31;
@@ -376,6 +376,8 @@ hinvuln_time           = (vid_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 
+_sbs_ucls              = [5,6,8];
+
 {$IFDEF _FULLGAME}
 
 _buffst                : array[false..true] of smallint = (0,_bufinf);
@@ -420,9 +422,12 @@ vid_uialrm_t           = vid_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
 vid_uialrm_n           = 10;
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
-vid_BW                 = 45;
+vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panel              = vid_BW*3;
+vid_tBW                = vid_panel div 4;
+vid_2tBW               = vid_tBW*2;
+vid_3tBW               = vid_panel div 4;
 vid_hBW                = vid_BW div 2;
 vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
@@ -432,11 +437,11 @@ vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
 
-ui_h3bw                = vid_BW div 3;
+ui_h3bw                = vid_BW-vid_tBW;
 ui_bottomsy            = vid_BW*4;
 ui_tabsy               = vid_panel+ui_h3bw;
 ui_hwp                 = vid_panel div 2;
-ui_iy                  = vid_panel+4;
+ui_iy                  = vid_panel+3;
 ui_energx              = (ui_hwp+ui_h3bw) div 2;
 ui_armyx               = (ui_hwp+ui_h3bw+vid_panel) div 2;
 ui_textx               = vid_panel+4;
@@ -512,7 +517,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 181840;
+svld_size              = 181841;
 rpl_size               = 1574;
 
 rpl_none               = 0;
@@ -559,7 +564,6 @@ CMPMaxSkills           = 6;
 
 chat_shlm_t            = vid_fps*5;
 
-
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MVSCR_';
 str_loading            : shortstring = 'LOADING...'+#0;
@@ -571,9 +575,7 @@ str_svld_ext           : shortstring = '.mws';
 str_rpls_dir           : shortstring = 'replay\';
 str_rpls_ext           : shortstring = '.mwr';
 
-
 chat_type              : array[false..true] of char = ('|',' ');
-hot_keys               : array[0..23] of char = ('Q','W','E','A','S','D','Z','X','C','R','T','Y','F','G','H','V','B','N','U','I','O','J','K','L');
 
 k_chrtt                = vid_fps div 3;
 k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];

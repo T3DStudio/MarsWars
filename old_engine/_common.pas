@@ -181,7 +181,7 @@ begin
    if(_bldCndt=false)then
    with _players[pl] do
    with _ulst[cl2uid[race,true,bucl]] do
-   _bldCndt:=((ruid <255)and(u_eb[_ulst[ruid].isbuild,_ulst[ruid].ucl]=0))
+   _bldCndt:=((ruid <255)and(uid_b[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
            or(u_e[true,bucl]>=max);
@@ -201,7 +201,7 @@ begin
    if(_untCndt=false)then
    with _players[pl] do
    with _ulst[cl2uid[race,false,bucl]] do
-   _untCndt:=((ruid <255)and(u_eb[_ulst[ruid].isbuild,_ulst[ruid].ucl]=0))
+   _untCndt:=((ruid <255)and(uid_b[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
            or(trt=0)
@@ -244,7 +244,7 @@ begin
    if(_upgrreq=false)and(upgrade_ruid[race,up]<255)then
    begin
       ruid:=upgrade_ruid[race,up];
-      _upgrreq:=u_eb[_ulst[ruid].isbuild,_ulst[ruid].ucl]=0;
+      _upgrreq:=uid_b[ruid]=0;
    end;
 end;
 
@@ -616,11 +616,13 @@ begin
    vlineColor(spr_panel,ui_hwp        ,vid_panel,vid_panel+ui_h3bw,c_white);
    vlineColor(spr_panel,ui_hwp+ui_h3bw,vid_panel,vid_panel+ui_h3bw,c_white);
 
-   vlineColor(spr_panel,vid_BW ,vid_panel+ui_h3bw,vid_mh,c_white);
-   vlineColor(spr_panel,vid_2BW,vid_panel+ui_h3bw,vid_mh,c_white);
+   for y:=0 to 3 do vlineColor(spr_panel,y*vid_tBW,vid_panel+ui_h3bw,vid_panel+vid_BW,c_white);
 
-   characterColor(spr_panel,ui_ex,ui_iy,'E',c_aqua  );
-   characterColor(spr_panel,ui_ax,ui_iy,'A',c_orange);
+   vlineColor(spr_panel,vid_BW ,vid_panel+vid_BW,vid_mh,c_white);
+   vlineColor(spr_panel,vid_2BW,vid_panel+vid_BW,vid_mh,c_white);
+
+   characterColor(spr_panel,ui_ex-1,ui_iy,'E',c_aqua  );
+   characterColor(spr_panel,ui_ax-2,ui_iy,'A',c_orange);
 
    y:=ui_bottomsy;
    while (y<vid_mh) do

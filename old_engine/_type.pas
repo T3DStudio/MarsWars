@@ -87,7 +87,8 @@ o_x1,o_y1  :integer;
    u_s     : array[false..true,0.._uts] of byte;
    u_c     : array[false..true] of byte;
    ubx     : array[0.._uts] of integer;
-   u_uidb  : array[0..255 ] of byte;
+   uid_e,
+   uid_b   : array[0..255 ] of byte;
 
    ai_pushpart,
    ai_maxarmy,

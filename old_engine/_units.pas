@@ -640,6 +640,7 @@ begin
           _unit_cupgrade(u);
 
           dec(u_eb[isbuild,ucl],1);
+          dec(uid_b[uid],1);
           dec(menerg,generg);
           if(ucl=0)then dec(bldrs,1);
        end;
@@ -655,6 +656,7 @@ begin
        dec(army,1);
        dec(u_e[isbuild,ucl],1);
        dec(u_c[isbuild],1);
+       dec(uid_e[uid],1);
     end;
 end;
 
@@ -1108,10 +1110,6 @@ UID_UPTurret:  if(g_addon)then
                    PlaySND(snd_build[r_uac],u);
                    {$ENDIF}
                    _unit_morph(u,UID_URTurret,false);
-                   {inc(cenerg,renerg);
-                   hits:=50;
-                   bld :=false;
-                   dec(u_eb[isbuild,ucl]);  }
                 end;
      end;
 end;
@@ -2348,6 +2346,7 @@ begin
                          hits:=mhits;
                          bld :=true;
                          inc(u_eb[isbuild,ucl],1);
+                         inc(uid_b[uid],1);
 
                          inc(menerg,generg);
                          dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg);

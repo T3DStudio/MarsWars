@@ -397,7 +397,7 @@ begin
 
 ////////////////////////////////////////////////////////////////////////////////
 
-      if(uid=UID_Engineer)then
+      if(uid in [UID_Engineer,UID_ZEngineer])then
       begin
          mhits  := 100;
          r      := 12;
@@ -412,6 +412,17 @@ begin
          trt    := vid_fps*8;
          renerg := 1;
          arf    :=(sr div 4)*3;
+         if(uid=UID_ZEngineer)then
+         begin
+            painc  := 3;
+            ucl    := 12;
+            speed  := 10;
+            anims  := 14;
+            rld_a  := 22;
+            trt    := vid_fps*15;
+            ar     := 64;
+            ruid   := UID_HMilitaryUnit;
+         end;
       end;
       if(uid in [UID_Medic,UID_ZFormer])then
       begin
@@ -435,6 +446,7 @@ begin
             anims  := 14;
             rld_a  := 22;
             trt    := vid_fps*5;
+            ruid   := UID_HMilitaryUnit;
          end;
          arf    :=(sr div 4)*3;
       end;
@@ -453,11 +465,11 @@ begin
          renerg := 2;
          if(uid=UID_ZSergant)then
          begin
-            renerg := 1;
             painc  := 3;
             ucl    := 12;
             speed  := 10;
             anims  := 14;
+            ruid   := UID_HMilitaryUnit;
          end;
          arf    :=(sr div 4)*3;
       end;
@@ -476,10 +488,10 @@ begin
          renerg := 2;
          if(uid=UID_ZCommando)then
          begin
-            renerg := 1;
             painc  := 3;
             ucl    := 12;
             rld_r  := 10;
+            ruid   := UID_HMilitaryUnit;
          end;
          arf    :=220;
       end;
@@ -498,9 +510,9 @@ begin
          renerg := 4;
          if(uid=UID_ZBomber)then
          begin
-            renerg := 1;
             painc  := 3;
             ucl    := 12;
+            ruid   := UID_HMilitaryUnit;
          end
          else
          ruid   := UID_UWeaponFactory;
@@ -520,9 +532,9 @@ begin
          renerg := 4;
          if(uid=UID_ZMajor)then
          begin
-            renerg := 1;
             painc  := 3;
             ucl    := 12;
+            ruid   := UID_HMilitaryUnit;
          end
          else
          ruid   := UID_UWeaponFactory;
@@ -542,9 +554,9 @@ begin
          renerg := 5;
          if(uid=UID_ZBFG)then
          begin
-            renerg := 1;
             painc  := 3;
             ucl    := 12;
+            ruid   := UID_HMilitaryUnit;
          end
          else
          ruid   := UID_UWeaponFactory;
@@ -985,13 +997,13 @@ begin
    cl2uid[r_hell,false,9 ]:=UID_Mancubus;
    cl2uid[r_hell,false,10]:=UID_Arachnotron;
    cl2uid[r_hell,false,11]:=UID_Archvile;
-
    cl2uid[r_hell,false,12]:=UID_ZFormer;
-   cl2uid[r_hell,false,13]:=UID_ZSergant;
-   cl2uid[r_hell,false,14]:=UID_ZCommando;
-   cl2uid[r_hell,false,15]:=UID_ZBomber;
-   cl2uid[r_hell,false,16]:=UID_ZMajor;
-   cl2uid[r_hell,false,17]:=UID_ZBFG;
+   cl2uid[r_hell,false,13]:=UID_ZEngineer;
+   cl2uid[r_hell,false,14]:=UID_ZSergant;
+   cl2uid[r_hell,false,15]:=UID_ZCommando;
+   cl2uid[r_hell,false,16]:=UID_ZBomber;
+   cl2uid[r_hell,false,17]:=UID_ZMajor;
+   cl2uid[r_hell,false,18]:=UID_ZBFG;
 
    cl2uid[r_uac ,true ,0 ]:=UID_UCommandCenter;
    cl2uid[r_uac ,true ,1 ]:=UID_UMilitaryUnit;

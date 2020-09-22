@@ -464,7 +464,8 @@ begin
    spr_c_phobos   := LoadIMG('M_PHOBOS' ,false,true);
    spr_c_deimos   := LoadIMG('M_DEIMOS' ,false,true);
 
-   for x:=0 to 2 do spr_tabs[x]:=loadIMG('tabs'+b2s(x),true,true);
+   for x:=0 to 2 do spr_tabs[x]:=LoadBtn('tabs'+b2s(x),vid_tbw);
+   spr_tabs[3]:=LoadBtnFS(spr_b_action,vid_tbw);
 
    for x:=0 to MaxUpgrs do
    begin

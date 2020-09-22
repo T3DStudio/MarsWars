@@ -126,8 +126,7 @@ begin
       case k of
       sdlk_tab: begin
                    inc(ui_tab,1);
-                   ui_tab:=ui_tab mod 3;
-                   if(_rpls_rst< rpl_rhead)and(ui_tab=2)then ui_tab:=0;
+                   ui_tab:=ui_tab mod 4;
                 end;
        1:begin end;
       else
@@ -164,8 +163,8 @@ begin
                                    if(G_Paused>0)
                                    then G_Paused:=0
                                    else G_Paused:=200;
-                    sdlk_S      : _rpls_log:=not _rpls_log;
                     sdlk_A      : _fog:=not _fog;
+                    sdlk_S      : _rpls_log:=not _rpls_log;
                     sdlk_Z      : HPlayer:=0;
                     sdlk_X      : HPlayer:=1;
                     sdlk_C      : HPlayer:=2;
@@ -179,6 +178,15 @@ begin
 
         if(G_Paused=0)then
         case k of
+          sdlk_Q : ;
+          sdlk_W : ;
+          sdlk_E : ;
+          sdlk_A : ;
+          sdlk_S : ;
+          sdlk_D : ;
+          sdlk_Z : ;
+          sdlk_X : ;
+          sdlk_C : ;
           sdlk_0..sdlk_9 :  begin
                                ko:=_event^.key.keysym.sym-sdlk_0;
                                if (k_ctrl>1)
@@ -202,15 +210,18 @@ begin
 
           case ui_tab of
           0 : case k of
-            sdlk_Q      : m_sbuild:=0;
-            sdlk_W      : m_sbuild:=1;
-            sdlk_E      : m_sbuild:=2;
-            sdlk_A      : m_sbuild:=3;
-            sdlk_S      : m_sbuild:=4;
-            sdlk_D      : m_sbuild:=5;
-            sdlk_Z      : m_sbuild:=6;
-            sdlk_X      : m_sbuild:=7;
-            sdlk_C      : m_sbuild:=8;
+            sdlk_R      : m_sbuild:=0;
+            sdlk_T      : m_sbuild:=1;
+            sdlk_Y      : m_sbuild:=2;
+            sdlk_F      : m_sbuild:=3;
+            sdlk_G      : m_sbuild:=4;
+            sdlk_H      : m_sbuild:=5;
+            sdlk_V      : m_sbuild:=6;
+            sdlk_B      : m_sbuild:=7;
+            sdlk_N      : m_sbuild:=8;
+              end;
+          1 : if(k_ctrl=0)then
+              case k of
             sdlk_R      : _player_s_o(-4,0 ,0,0, uo_action  ,HPlayer);
             sdlk_T      : _player_s_o(-4,1 ,0,0, uo_action  ,HPlayer);
             sdlk_Y      : _player_s_o(-4,2 ,0,0, uo_action  ,HPlayer);
@@ -220,38 +231,50 @@ begin
             sdlk_V      : _player_s_o(-4,6 ,0,0, uo_action  ,HPlayer);
             sdlk_B      : _player_s_o(-4,7 ,0,0, uo_action  ,HPlayer);
             sdlk_N      : _player_s_o(-4,8 ,0,0, uo_action  ,HPlayer);
-            sdlk_U      : _player_s_o(-4,9 ,0,0, uo_action  ,HPlayer);
-            sdlk_I      : _player_s_o(-4,10,0,0, uo_action  ,HPlayer);
-            sdlk_O      : _player_s_o(-4,11,0,0, uo_action  ,HPlayer);
-            sdlk_M      : _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+              end
+              else
+              case k of
+            sdlk_R      : _player_s_o(-4,9 ,0,0, uo_action  ,HPlayer);
+            sdlk_T      : _player_s_o(-4,10,0,0, uo_action  ,HPlayer);
+            sdlk_Y      : _player_s_o(-4,11,0,0, uo_action  ,HPlayer);
+            sdlk_F      : _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+            sdlk_G      : _player_s_o(-4,13,0,0, uo_action  ,HPlayer);
+            sdlk_H      : _player_s_o(-4,14,0,0, uo_action  ,HPlayer);
+            sdlk_V      : _player_s_o(-4,15,0,0, uo_action  ,HPlayer);
+            sdlk_B      : _player_s_o(-4,16,0,0, uo_action  ,HPlayer);
+            sdlk_N      : _player_s_o(-4,17,0,0, uo_action  ,HPlayer);
               end;
-          1 : case k of
-            sdlk_Q      : _player_s_o(-2,0 ,0,0, uo_action  ,HPlayer);
-            sdlk_W      : _player_s_o(-2,1 ,0,0, uo_action  ,HPlayer);
-            sdlk_E      : _player_s_o(-2,2 ,0,0, uo_action  ,HPlayer);
-            sdlk_A      : _player_s_o(-2,3 ,0,0, uo_action  ,HPlayer);
-            sdlk_S      : _player_s_o(-2,4 ,0,0, uo_action  ,HPlayer);
-            sdlk_D      : _player_s_o(-2,5 ,0,0, uo_action  ,HPlayer);
-            sdlk_Z      : _player_s_o(-2,6 ,0,0, uo_action  ,HPlayer);
-            sdlk_X      : _player_s_o(-2,7 ,0,0, uo_action  ,HPlayer);
-            sdlk_C      : _player_s_o(-2,8 ,0,0, uo_action  ,HPlayer);
-            sdlk_R      : _player_s_o(-2,9 ,0,0, uo_action  ,HPlayer);
-            sdlk_T      : _player_s_o(-2,10,0,0, uo_action  ,HPlayer);
-            sdlk_Y      : _player_s_o(-2,11,0,0, uo_action  ,HPlayer);
-            sdlk_F      : _player_s_o(-2,12,0,0, uo_action  ,HPlayer);
-            sdlk_G      : _player_s_o(-2,13,0,0, uo_action  ,HPlayer);
-            sdlk_H      : _player_s_o(-2,14,0,0, uo_action  ,HPlayer);
-            sdlk_V      : _player_s_o(-2,15,0,0, uo_action  ,HPlayer);
-            sdlk_B      : _player_s_o(-2,16,0,0, uo_action  ,HPlayer);
-            sdlk_N      : _player_s_o(-2,17,0,0, uo_action  ,HPlayer);
-            sdlk_U      : _player_s_o(-2,18,0,0, uo_action  ,HPlayer);
-            sdlk_I      : _player_s_o(-2,19,0,0, uo_action  ,HPlayer);
-            sdlk_O      : _player_s_o(-2,20,0,0, uo_action  ,HPlayer);
-            sdlk_J      : _player_s_o(-2,21,0,0, uo_action  ,HPlayer);
-            sdlk_K      : _player_s_o(-2,22,0,0, uo_action  ,HPlayer);
-            sdlk_M      : _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
-            end;
-          2 : ;
+          2 : if(k_ctrl=0)then
+              case k of
+            sdlk_R      : _player_s_o(-2,0 ,0,0, uo_action  ,HPlayer);
+            sdlk_T      : _player_s_o(-2,1 ,0,0, uo_action  ,HPlayer);
+            sdlk_Y      : _player_s_o(-2,2 ,0,0, uo_action  ,HPlayer);
+            sdlk_F      : _player_s_o(-2,3 ,0,0, uo_action  ,HPlayer);
+            sdlk_G      : _player_s_o(-2,4 ,0,0, uo_action  ,HPlayer);
+            sdlk_H      : _player_s_o(-2,5 ,0,0, uo_action  ,HPlayer);
+            sdlk_V      : _player_s_o(-2,6 ,0,0, uo_action  ,HPlayer);
+            sdlk_B      : _player_s_o(-2,7 ,0,0, uo_action  ,HPlayer);
+            sdlk_N      : _player_s_o(-2,8 ,0,0, uo_action  ,HPlayer);
+            sdlk_U      : _player_s_o(-2,9 ,0,0, uo_action  ,HPlayer);
+            sdlk_I      : _player_s_o(-2,10,0,0, uo_action  ,HPlayer);
+            sdlk_O      : _player_s_o(-2,11,0,0, uo_action  ,HPlayer);
+            sdlk_J      : _player_s_o(-2,12,0,0, uo_action  ,HPlayer);
+            sdlk_K      : _player_s_o(-2,13,0,0, uo_action  ,HPlayer);
+            sdlk_L      : _player_s_o(-2,14,0,0, uo_action  ,HPlayer);
+              end
+              else
+              case k of
+            sdlk_R      : _player_s_o(-2,15,0,0, uo_action  ,HPlayer);
+            sdlk_T      : _player_s_o(-2,16,0,0, uo_action  ,HPlayer);
+            sdlk_Y      : _player_s_o(-2,17,0,0, uo_action  ,HPlayer);
+            sdlk_F      : _player_s_o(-2,18,0,0, uo_action  ,HPlayer);
+            sdlk_G      : _player_s_o(-2,19,0,0, uo_action  ,HPlayer);
+            sdlk_H      : _player_s_o(-2,20,0,0, uo_action  ,HPlayer);
+            sdlk_V      : _player_s_o(-2,21,0,0, uo_action  ,HPlayer);
+            sdlk_B      : _player_s_o(-2,22,0,0, uo_action  ,HPlayer);
+            sdlk_N      : _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+              end;
+          3 : ;
           end;
         end;
       end;
@@ -394,34 +417,21 @@ begin
    if(m_sbuild<=_uts) then
     with _players[HPlayer] do
     begin
-       if(m_sbuild=5)and(u_e[true,5]>0)then
+       if(m_sbuild in _sbs_ucls)and(u_e[true,m_sbuild]>0)then
        begin
-          _player_s_o(1,k_shift,0,0,uo_specsel ,HPlayer);
+          _player_s_o(m_sbuild,k_shift,0,0,uo_specsel ,HPlayer);
           m_sbuild:=255;
        end
        else
-        if(m_sbuild=6)and(u_e[true,6]>0)then
-        begin
-           _player_s_o(3,k_shift,0,0,uo_specsel ,HPlayer);
-           m_sbuild:=255;
-        end
-        else
-         if(m_sbuild=8)and(u_e[true,8]>0)then
-         begin
-            _player_s_o(2,k_shift,0,0,uo_specsel ,HPlayer);
-            m_sbuild:=255;
-         end
-         else
-           if _bldCndt(HPlayer,m_sbuild)
-           then m_sbuild:=255
-           else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
-                then m_sbuildc:=c_blue
-                else case _unit_grbcol(m_mx,m_my,_ulst[cl2uid[race,true,m_sbuild]].r,HPlayer,true) of
-                     1 : m_sbuildc:=c_red;
-                     2 : m_sbuildc:=c_blue;
-                     else
-                         m_sbuildc:=c_lime;
-                     end;
+         if _bldCndt(HPlayer,m_sbuild)
+         then m_sbuild:=255
+         else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
+              then m_sbuildc:=c_blue
+              else case _unit_grbcol(m_mx,m_my,_ulst[cl2uid[race,true,m_sbuild]].r,HPlayer,true) of
+                   1 :  m_sbuildc:=c_red;
+                   2 :  m_sbuildc:=c_blue;
+                   else m_sbuildc:=c_lime;
+                   end;
     end;
 end;
 
@@ -454,13 +464,13 @@ begin
            end;
       end
       else
-        if(vid_panel>=m_vy)then    // minimap
+        if(vid_panel>=m_vy)then      // minimap
         begin
         end
         else                         // panel
         begin
            PlaySNDM(snd_click);
-           if(m_by=13)then           // buttons
+           if(m_by=12)then           // buttons
             case m_bx of
              0 : ToggleMenu;
              1 : ;
@@ -470,11 +480,7 @@ begin
            else
             if(m_by=3)then //tabs
             begin
-               if(m_vy>ui_tabsy)then
-                if(_rpls_rst>=rpl_rhead)
-                then ui_tab:=m_bx
-                else
-                  if(m_bx<2)then ui_tab:=m_bx;
+               if(m_bx<3)and(m_vy>ui_tabsy)then ui_tab:=m_vx div vid_tBW;
             end
             else
                with _players[HPlayer] do
@@ -486,23 +492,27 @@ begin
                           m_sbuild:=((m_by-4)*3)+(m_bx mod 3);
                           _chkbld;
                        end;
-                       if(6<m_by)and(m_by<12)then
-                       begin
-                          u:=((m_by-7)*3)+(m_bx mod 3);
-                          if(u<12)
-                          then _player_s_o(-4,u,0,0, uo_action  ,HPlayer)
-                          else
-                            if(u=12)and(race=r_hell)then _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
-                       end;
-                       if(m_by=12)then
+
+                       {if(m_by=12)then
                        begin
                           if(m_bx=0)then _player_s_o(1,0,0,0, uo_action  ,HPlayer);
                           if(m_bx=1)then _player_s_o(0,0,0,0, uo_delete  ,HPlayer);
                           if(m_bx=2)then _player_s_o(0,0,0,0, uo_action  ,HPlayer);
-                       end;
+                       end; }
+                    end;
+                1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
+                    begin
+                      if(3<m_by)and(m_by<8)then
+                      begin
+                         u:=((m_by-4)*3)+(m_bx mod 3);
+                         if(u<12)
+                         then _player_s_o(-4,u,0,0, uo_action  ,HPlayer)
+                         else ;
+                           //if(u=12)and(race=r_hell)then _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+                      end;
                     end;
 
-                1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
+                2 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                     begin
                        if(3<m_by)and(m_by<12)then
                        begin
@@ -510,7 +520,7 @@ begin
                           if(u<=_uts)then _player_s_o(-2,u,0,0, uo_action  ,HPlayer);
                        end;
                     end;
-                2 : if(_rpls_rst>=rpl_runit)then
+                3 : if(_rpls_rst>=rpl_runit)then
                     begin
                         if(m_by=4)then
                         begin
@@ -593,23 +603,22 @@ begin
             case ui_tab of
             0 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                 begin
-                   if(ubx[6]>0)then
-                    with _units[ubx[6]] do if(m_by=6)and(m_bx=0)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[6],uo_move,HPlayer);
+                   if(ubx[6]>0)then with _units[ubx[6]] do if(m_by=6)and(m_bx=0)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[6],uo_move,HPlayer);
                    if(race=r_hell)then
                    begin
-                      if(ubx[5]>0)then
-                       with _units[ubx[5]] do if(m_by=5)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[5],uo_move,HPlayer);
-
-                      if(ubx[8]>0)then
-                       with _units[ubx[8]] do if(m_by=6)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[8],uo_move,HPlayer);
-                   end;
-                   if(6<m_by)and(m_by<12)then
-                   begin
-                      u:=((m_by-7)*3)+(m_bx mod 3);
-                      if(u<12)then _player_s_o(-5,u,0,0, uo_action  ,HPlayer);
+                   if(ubx[5]>0)then with _units[ubx[5]] do if(m_by=5)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[5],uo_move,HPlayer);
+                   if(ubx[8]>0)then with _units[ubx[8]] do if(m_by=6)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[8],uo_move,HPlayer);
                    end;
                 end;
             1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
+                begin
+                   if(3<m_by)and(m_by<8)then
+                   begin
+                      u:=((m_by-4)*3)+(m_bx mod 3);
+                      if(u<12)then _player_s_o(-5,u,0,0, uo_action  ,HPlayer);
+                   end;
+                end;
+            2 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                 begin
                    if(3<m_by)and(m_by<12)then
                    begin
@@ -617,7 +626,7 @@ begin
                       if(u<=_uts)then _player_s_o(-3,u,0,0, uo_action  ,HPlayer);
                    end;
                 end;
-            2 : if(_rpls_rst>=rpl_runit)then
+            3 : if(_rpls_rst>=rpl_runit)then
                 begin
                    if(m_by=4)and(m_bx=1)then _rpls_step:=vid_hfps*10;
                 end;
