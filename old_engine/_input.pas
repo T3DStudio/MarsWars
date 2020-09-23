@@ -520,9 +520,9 @@ begin
                           if(u<=_uts)then _player_s_o(-2,u,0,0, uo_action  ,HPlayer);
                        end;
                     end;
-                3 : if(_rpls_rst>=rpl_runit)then
+                3 : if(_rpls_rst>=rpl_rhead)then
                     begin
-                        if(m_by=4)then
+                        if(m_by=7)then
                         begin
                            if(m_bx=0)then _fsttime:=not _fsttime;
                            if(m_bx=1)then _rpls_step:=vid_hfps*2;
@@ -532,24 +532,24 @@ begin
                              then G_Paused:=0
                              else G_Paused:=200;
                         end;
-                        if(m_by=5)then
+                        if(m_by=8)then
                         begin
                            if(m_bx=0)then _fog:=not _fog;
                            if(m_bx=1)then _rpls_log:=not _rpls_log;
                         end;
-                        if(m_by=6)then
+                        if(m_by=9)then
                         begin
                            if(m_bx=0)then HPlayer:=0;
                            if(m_bx=1)then HPlayer:=1;
                            if(m_bx=2)then HPlayer:=2;
                         end;
-                       if(m_by=7)then
+                       if(m_by=10)then
                        begin
                           if(m_bx=0)then HPlayer:=3;
                           if(m_bx=1)then HPlayer:=4;
                           if(m_bx=2)then HPlayer:=5;
                        end;
-                       if(m_by=8)then
+                       if(m_by=11)then
                        begin
                           if(m_bx=0)then HPlayer:=6;
                        end;
@@ -626,9 +626,9 @@ begin
                       if(u<=_uts)then _player_s_o(-3,u,0,0, uo_action  ,HPlayer);
                    end;
                 end;
-            3 : if(_rpls_rst>=rpl_runit)then
+            3 : if(_rpls_rst>=rpl_rhead)then
                 begin
-                   if(m_by=4)and(m_bx=1)then _rpls_step:=vid_hfps*10;
+                   if(m_by=7)and(m_bx=1)then _rpls_step:=vid_hfps*10;
                 end;
             end;
          end;

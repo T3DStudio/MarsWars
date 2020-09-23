@@ -596,6 +596,7 @@ procedure _makeScrSurf;
 const
   ui_ex              = 4;
   ui_ax              = ui_ex+ui_hwp+1;
+  ystop              = vid_BW*13;
 var y:integer;
 begin
    if(_uipanel<>nil)then sdl_freesurface(_uipanel);
@@ -618,14 +619,14 @@ begin
 
    for y:=0 to 3 do vlineColor(spr_panel,y*vid_tBW,vid_panel+ui_h3bw,vid_panel+vid_BW,c_white);
 
-   vlineColor(spr_panel,vid_BW ,vid_panel+vid_BW,vid_mh,c_white);
-   vlineColor(spr_panel,vid_2BW,vid_panel+vid_BW,vid_mh,c_white);
+   vlineColor(spr_panel,vid_BW ,vid_panel+vid_BW,ystop,c_white);
+   vlineColor(spr_panel,vid_2BW,vid_panel+vid_BW,ystop,c_white);
 
    characterColor(spr_panel,ui_ex-1,ui_iy,'E',c_aqua  );
    characterColor(spr_panel,ui_ax-2,ui_iy,'A',c_orange);
 
    y:=ui_bottomsy;
-   while (y<vid_mh) do
+   while (y<=ystop) do
    begin
       hlineColor(spr_panel,0,vid_panel,y,c_white);
       inc(y,vid_BW);

@@ -421,9 +421,6 @@ begin
           FillChar(vsnt,SizeOf(vsnt),0);
           FillChar(vsni,SizeOf(vsni),0);
 
-          //ai_basex:= x;
-          //ai_basey:= y;
-
           _unit_def(_lcu);
           _unit_sclass(_lcup);
 
@@ -460,7 +457,7 @@ begin
       begin
          if(_ulst[cl2uid[race,false,ut]].max=1)then inc(wbhero,1);
 
-         utrain:=ut;
+         {utrain:=ut;
          if(ut in [12..17])then
           if(uid<>UID_HMilitaryUnit)or(race<>r_hell)
           then exit
@@ -469,7 +466,7 @@ begin
             begin
                if not(rld_a in [12..17])then rld_a:=12;
                utrain:=rld_a;
-            end;
+            end;  }
 
          inc(wb,1);
          inc(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
@@ -1038,8 +1035,9 @@ begin
          UID_UPTurret,
          UID_URTurret:if(sr<>towers_sr[upgr[upgr_towers]])then
                       begin
-                         sr:=towers_sr[upgr[upgr_towers]];
-                         ar:=sr;
+                         sr :=towers_sr[upgr[upgr_towers]];
+                         ar :=sr;
+                         arf:=(ar div 5)*4;
                          {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}
                       end;
        end;

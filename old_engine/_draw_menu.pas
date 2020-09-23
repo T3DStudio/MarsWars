@@ -188,9 +188,13 @@ begin
 
                  if(menu_s3=ms3_vido)then
                  begin
+                    y:=_yl(3);
+                    vlineColor(_menu_surf,ui_menu_ssr_x6,y,y+ui_menu_ssr_ys,c_gray);
                     y:=_yt(3);
+
                     _draw_text(_menu_surf,i,y, str_resol, ta_left,255,c_white);
-                    _draw_text(_menu_surf,t-ui_menu_ssr_xhs+6,y, i2s(m_vrx)+'x'+i2s(m_vry), ta_middle,255,mic(true,(m_vrx=vid_mw)and(m_vry=vid_mh)));
+                    _draw_text(_menu_surf,ui_menu_ssr_xt0,y, i2s(m_vrx), ta_middle,255,mic(true,(m_vrx<>vid_mw) ));
+                    _draw_text(_menu_surf,ui_menu_ssr_xt1,y, i2s(m_vry), ta_middle,255,mic(true,(m_vry<>vid_mh) ));
                     _draw_text(_menu_surf,ui_menu_ssr_x4+ui_menu_ssr_xhs,y, str_apply, ta_middle,255,mic((m_vrx<>vid_mw)or(m_vry<>vid_mh),false));
                     vlineColor(_menu_surf,ui_menu_ssr_x4,y-6,y+12,c_gray);
                     vlineColor(_menu_surf,ui_menu_ssr_x5,y-6,y+12,c_gray);

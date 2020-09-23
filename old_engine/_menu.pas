@@ -191,12 +191,24 @@ begin
       // video
       16 : if(m_vx>ui_menu_ssr_x5)then
            begin
-              if(m_vrx=800)and(m_vry=600)then
-              begin m_vrx:=960; m_vry:=720; end
+              if(m_vx<ui_menu_ssr_x6)then
+              begin
+                 case m_vrx of
+                 vid_minw : m_vrx:=960;
+                 960      : m_vrx:=1024;
+                 1024     : m_vrx:=1280;
+                 1280     : m_vrx:=vid_maxw;
+                 else       m_vrx:=vid_minw;
+                 end;
+              end
               else
-                if(m_vrx=960)and(m_vry=720)
-                then begin m_vrx:=1024;m_vry:=768;end
-                else begin m_vrx:=800; m_vry:=600;end;
+              begin
+                 case m_vry of
+                 vid_minh : m_vry:=720;
+                 720      : m_vry:=vid_maxh;
+                 else       m_vry:=vid_minh;
+                 end;
+              end;
            end
            else
             if(m_vx>ui_menu_ssr_x4)then

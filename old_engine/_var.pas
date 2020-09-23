@@ -493,6 +493,7 @@ spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 
 /// text
 
+str_all,
 str_orders,
 str_req,
 str_language,

@@ -494,7 +494,6 @@ begin
                  begin
                     dec(upgr[upgr_6bld],1);
                     tu^.buff[ub_advanced]:=_bufinf;
-                    tu^.hits:=tu^.mhits;
                     {$IFDEF _FULLGAME}
                     _unit_PowerUpEff(uo_tar,snd_hupgr);
                     {$ENDIF}
@@ -511,7 +510,6 @@ begin
                  begin
                     dec(upgr[upgr_6bld],1);
                     buff[ub_advanced]:=_bufinf;
-                    hits:=mhits;
                     {$IFDEF _FULLGAME}
                     _unit_PowerUpEff(u,snd_hupgr);
                     {$ENDIF}

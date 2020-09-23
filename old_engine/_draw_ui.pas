@@ -173,7 +173,7 @@ begin
             _draw_text(_uipanel,ux+4,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
          end;
 
-         uy:=(13*vid_BW)+4;
+         uy:=(12*vid_BW)+8;
          _draw_text(_uipanel,vid_hBW,uy,str_menu ,ta_middle,255,c_white);
          if(net_nstat>ns_none)and(G_WTeam=255)then
           if(g_paused>0)
@@ -313,20 +313,21 @@ begin
          end;
 
          3:
+         if(_rpls_rst>=rpl_rhead)then
          begin
-            _drawBtn(_uipanel,0,0,spr_b_rfast,_fsttime  ,false);
-            _drawBtn(_uipanel,1,0,spr_b_rskip,false     ,false);
-            _drawBtn(_uipanel,2,0,spr_b_rstop,g_paused>0,false);
-            _drawBtn(_uipanel,0,1,spr_b_rfog ,_fog      ,false);
-            _drawBtn(_uipanel,1,1,spr_b_rlog ,_rpls_log ,false);
+            _drawBtn(_uipanel,0,3,spr_b_rfast,_fsttime  ,false);
+            _drawBtn(_uipanel,1,3,spr_b_rskip,false     ,false);
+            _drawBtn(_uipanel,2,3,spr_b_rstop,g_paused>0,false);
+            _drawBtn(_uipanel,0,4,spr_b_rfog ,_fog      ,false);
+            _drawBtn(_uipanel,1,4,spr_b_rlog ,_rpls_log ,false);
 
             for ui:=0 to MaxPlayers do
             begin
                ux:=(ui mod 3)*vid_bw;
-               uy:=ui_bottomsy+vid_2bw+(ui div 3)*vid_bw;
+               uy:=ui_bottomsy+((ui div 3)+5)*vid_bw;
 
                if(ui=0)
-               then _draw_text(_uipanel,ux+3,uy+6,'all',ta_left,255,c_white)
+               then _draw_text(_uipanel,ux+3,uy+6,str_all,ta_left,255,c_white)
                else _draw_text(_uipanel,ux+3,uy+6,_players[ui].name,ta_left,5,plcolor[ui]);
 
                if(ui=HPlayer)then rectangleColor(_uipanel,ux+2,uy+2,ux+vid_bw-2,uy+vid_bw-2,c_lime);
@@ -346,7 +347,7 @@ begin
    begin
       case m_by of
       3  : if(m_vy>ui_tabsy)then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW],ta_left,255,c_white);
-      13 : begin
+      12 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;
               _draw_text(_screen,ui_textx,vid_mh-30,str_hint_m[m_bx],ta_left,255,c_white);
@@ -375,9 +376,14 @@ begin
                      if(_bc_g(a_upgr,i)=false)then exit;
                      if(g_addon=false)and(i>=upgr_2tier)then exit;
                   end;
-                  //if(_rpls_rst>=rpl_rhead)and(i=23)then exit;
+                  //
                end;
-           3 :;
+           3 : if(_rpls_rst>=rpl_rhead)then
+               begin
+                  if(i<9)then exit;
+               end
+               else
+                  if(i>8)then exit;
            end;
            _draw_text(_screen,ui_textx,vid_mh-30,str_hint[ui_tab,race,i],ta_left,255,c_white);
         end;

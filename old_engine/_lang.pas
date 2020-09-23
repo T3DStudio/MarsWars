@@ -1,3 +1,10 @@
+procedure _mkHStrXY(tab,i,x,y:byte;STR:string);
+begin
+   if(i=255)then i:=(y div 3)+x;
+   if(i>_uts)then exit;
+   str_hint[tab,r_hell,i ] := STR;
+   str_hint[tab,r_uac ,i ] := str_hint[tab,r_hell,i ];
+end;
 
 procedure _mkHStrUid(uid:byte;NAME,DESCR:string);
 begin
@@ -196,6 +203,7 @@ begin
    str_language          := 'UI language';
    str_req               := 'Requirements: ';
    str_orders            := 'Unit groups: ';
+   str_all               := 'All';
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;
@@ -378,29 +386,20 @@ begin
    _mkHStr(2,r_uac ,upgr_rturrets,'Rocket turrets'         ,'Turrets can upgrade to Rocket turrets.'           );
    _mkHStr(2,r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for Command Center.'            );
 
-   {str_hint[2,r_hell,0 ] := 'Faster game speed ('+#18+'Q'+#25+')';
-   str_hint[2,r_hell,1 ] := 'Left click: skip 2 seconds ('+#18+'W'+#25+')'+#11+'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')';
-   str_hint[2,r_hell,2 ] := 'Pause ('+#18+'E'+#25+')';
-   str_hint[2,r_hell,3 ] := 'Fog of war ('+#18+'A'+#25+')';
-   str_hint[2,r_hell,4 ] := 'List of game messages ('+#18+'S'+#25+')';
-   str_hint[2,r_hell,6 ] := 'All players ('+#18+'Z'+#25+')';
-   str_hint[2,r_hell,7 ] := 'Red player [#1] ('+#18+'X'+#25+')';
-   str_hint[2,r_hell,8 ] := 'Orange player [#2] ('+#18+'C'+#25+')';
-   str_hint[2,r_hell,9 ] := 'Yellow player [#3] ('+#18+'R'+#25+')';
-   str_hint[2,r_hell,10] := 'Green player [#4] ('+#18+'T'+#25+')';
-   str_hint[2,r_hell,11] := 'Aqua player [#5] ('+#18+'Y'+#25+')';
-   str_hint[2,r_hell,12] := 'Blue player [#6] ('+#18+'F'+#25+')';
-   str_hint[2,r_uac ,0 ] := str_hint[2,r_hell,0 ];
-   str_hint[2,r_uac ,1 ] := str_hint[2,r_hell,1 ];
-   str_hint[2,r_uac ,2 ] := str_hint[2,r_hell,2 ];
-   str_hint[2,r_uac ,3 ] := str_hint[2,r_hell,3 ];
-   str_hint[2,r_uac ,6 ] := str_hint[2,r_hell,6 ];
-   str_hint[2,r_uac ,7 ] := str_hint[2,r_hell,7 ];
-   str_hint[2,r_uac ,8 ] := str_hint[2,r_hell,8 ];
-   str_hint[2,r_uac ,9 ] := str_hint[2,r_hell,9 ];
-   str_hint[2,r_uac ,10] := str_hint[2,r_hell,10];
-   str_hint[2,r_uac ,11] := str_hint[2,r_hell,11];
-   str_hint[2,r_uac ,12] := str_hint[2,r_hell,12];
+   _mkHStrXY(3,9 ,0,0,'Faster game speed ('    +#18+'Q'+#25+')');
+   _mkHStrXY(3,10,0,0,'Left click: skip 2 seconds ('+#18+'W'+#25+')'+#11+'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')');
+   _mkHStrXY(3,11,0,0,'Pause ('                +#18+'E'+#25+')');
+   _mkHStrXY(3,12,0,0,'Fog of war ('           +#18+'A'+#25+')');
+   _mkHStrXY(3,13,0,0,'List of game messages ('+#18+'S'+#25+')');
+   _mkHStrXY(3,14,0,0,'All players ('          +#18+'Z'+#25+')');
+   _mkHStrXY(3,15,0,0,'Red player [#1] ('      +#18+'X'+#25+')');
+   _mkHStrXY(3,16,0,0,'Orange player [#2] ('   +#18+'C'+#25+')');
+   _mkHStrXY(3,17,0,0,'Yellow player [#3] ('   +#18+'R'+#25+')');
+   _mkHStrXY(3,18,0,0,'Green player [#4] ('    +#18+'T'+#25+')');
+   _mkHStrXY(3,19,0,0,'Aqua player [#5] ('     +#18+'Y'+#25+')');
+   _mkHStrXY(3,20,0,0,'Blue player [#6] ('     +#18+'F'+#25+')');
+   {
+
 
    str_hint[0,r_uac ,21] := 'Mines';
    str_hint[0,r_hell,21] := 'Zombie ('+#18+'M'+#25+')'+#11+#17+str_req+#25+'Hell '+str_un_name[UID_UMilitaryUnit];
@@ -601,6 +600,7 @@ begin
   str_language          := 'Язык интерфейса';
   str_req               := 'Требования: ';
   str_orders            := 'Отряды: ';
+  str_all               := 'Все';
 
   str_starta            := 'Начальная база:';
   str_startat[0]        := '1 '+#19+'строитель'+#25;
@@ -728,30 +728,21 @@ begin
   _mkHStr(2,r_uac ,upgr_rturrets,'Ракетные турели'          ,'Обычные турели могут быть улучшены до ракетных.'          );
   _mkHStr(2,r_uac ,upgr_bldenrg ,'Встроенный генератор'     ,'Дополнительна энергия для Командного Центра.'             );
 
- { str_hint[2,r_hell,0 ] := 'Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')';
-  str_hint[2,r_hell,1 ] := 'Левый клик: пропустить 2 секунды ('+#18+'W'+#25+')'+#11+'Правый клик: пропустить 10 секунд ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')';
-  str_hint[2,r_hell,2 ] := 'Пауза ('+#18+'E'+#25+')';
-  str_hint[2,r_hell,3 ] := 'Туман войны ('+#18+'A'+#25+')';
-  str_hint[2,r_hell,4 ] := 'Список игровых сообщений ('+#18+'S'+#25+')';
-  str_hint[2,r_hell,6 ] := 'Все игроки (' +#18+'Z'+#25+')';
-  str_hint[2,r_hell,7 ] := 'Красный игрок [#1] ('+#18+'X'+#25+')';
-  str_hint[2,r_hell,8 ] := 'Оранжевый игрок [#2] (' +#18+'C'+#25+')';
-  str_hint[2,r_hell,9 ] := 'Желтый игрок [#3] ('+#18+'R'+#25+')';
-  str_hint[2,r_hell,10] := 'Зеленый игрок [#4] ('  +#18+'T'+#25+')';
-  str_hint[2,r_hell,11] := 'Бирюзовый игрок [#5] ('  +#18+'Y'+#25+')';
-  str_hint[2,r_hell,12] := 'Синий игрок [#6] ('  +#18+'F'+#25+')';
-  str_hint[2,r_uac ,0 ] := str_hint[2,r_hell,0 ];
-  str_hint[2,r_uac ,1 ] := str_hint[2,r_hell,1 ];
-  str_hint[2,r_uac ,2 ] := str_hint[2,r_hell,2 ];
-  str_hint[2,r_uac ,3 ] := str_hint[2,r_hell,3 ];
-  str_hint[2,r_uac ,6 ] := str_hint[2,r_hell,6 ];
-  str_hint[2,r_uac ,7 ] := str_hint[2,r_hell,7 ];
-  str_hint[2,r_uac ,8 ] := str_hint[2,r_hell,8 ];
-  str_hint[2,r_uac ,9 ] := str_hint[2,r_hell,9 ];
-  str_hint[2,r_uac ,10] := str_hint[2,r_hell,10];
-  str_hint[2,r_uac ,11] := str_hint[2,r_hell,11];
-  str_hint[2,r_uac ,12] := str_hint[2,r_hell,12];
 
+  _mkHStrXY(3,9 ,0,0,'Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')');
+  _mkHStrXY(3,10,0,0,'Левый клик: пропустить 2 секунды ('+#18+'W'+#25+')'+#11+'Правый клик: пропустить 10 секунд ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')');
+  _mkHStrXY(3,11,0,0,'Пауза ('                   +#18+'E'+#25+')');
+  _mkHStrXY(3,12,0,0,'Туман войны ('             +#18+'A'+#25+')');
+  _mkHStrXY(3,13,0,0,'Список игровых сообщений ('+#18+'S'+#25+')');
+  _mkHStrXY(3,14,0,0,'Все игроки ('              +#18+'Z'+#25+')');
+  _mkHStrXY(3,15,0,0,'Красный игрок [#1] ('      +#18+'X'+#25+')');
+  _mkHStrXY(3,16,0,0,'Оранжевый игрок [#2] ('    +#18+'C'+#25+')');
+  _mkHStrXY(3,17,0,0,'Желтый игрок [#3] ('       +#18+'R'+#25+')');
+  _mkHStrXY(3,18,0,0,'Зеленый игрок [#4] ('      +#18+'T'+#25+')');
+  _mkHStrXY(3,19,0,0,'Бирюзовый игрок [#5] ('    +#18+'Y'+#25+')');
+  _mkHStrXY(3,20,0,0,'Синий игрок [#6] ('        +#18+'F'+#25+')');
+
+ {
   str_hint[0,r_uac ,21] := 'Мины';
   str_hint[0,r_hell,21] := 'Зомби ('+#18+'M'+#25+')'+#11+#17+str_req+#25+'Адская '+str_un_name[UID_UMilitaryUnit];
   str_hint[0,r_hell,22] := 'Адский Глаз';

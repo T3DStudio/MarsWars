@@ -230,7 +230,6 @@ begin
                if(tu^.uid=UID_LostSoul)and(u_e[false,7]>0)then exit;
                dec(upgr[upgr_6bld],1);
                tu^.buff[ub_advanced]:=_bufinf;
-               tu^.hits:=tu^.mhits;
                {$IFDEF _FULLGAME}
                _unit_PowerUpEff(uc,snd_hupgr);
                {$ENDIF}

@@ -261,6 +261,7 @@ begin
    with _units[u] do
    with _players[player] do
    begin
+      inc(uid_e[uid],1);
       inc(u_e[isbuild,ucl],1);
       inc(u_c[isbuild]);
       inc(army,1);
@@ -275,6 +276,7 @@ begin
           then inc(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
+             inc(uid_b[uid],1);
              inc(u_eb[isbuild,ucl],1);
              if(ubx[ucl]=0)then ubx[ucl]:=u;
              case ucl of
@@ -301,6 +303,7 @@ begin
    with _units[u] do
    with _players[player] do
    begin
+      dec(uid_e[uid],1);
       dec(u_e[isbuild,ucl],1);
       dec(u_c[isbuild]);
       dec(army,1);
@@ -315,6 +318,7 @@ begin
           then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
+             dec(uid_b[uid],1);
              dec(u_eb[isbuild,ucl],1);
              if(ubx[ucl]=u)then ubx[ucl]:=0;
              case ucl of
