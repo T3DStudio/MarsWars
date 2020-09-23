@@ -44,7 +44,7 @@ begin
        ai_attack   := 0;
 
        _bc_ss(@a_build,[0..8]);
-       _bc_ss(@a_units,[0..11]);
+       _bc_ss(@a_units,[0..18]);
        _bc_ss(@a_upgr ,[0..MaxUpgrs]);
    end;
 

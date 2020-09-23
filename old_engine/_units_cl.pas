@@ -415,12 +415,11 @@ begin
          if(uid=UID_ZEngineer)then
          begin
             painc  := 3;
-            ucl    := 12;
-            speed  := 10;
-            anims  := 14;
-            rld_a  := 22;
+            ucl    := 13;
+            speed  := 16;
+            anims  := 22;
+            rld_a  := 0;
             trt    := vid_fps*15;
-            ar     := 64;
             ruid   := UID_HMilitaryUnit;
          end;
       end;
@@ -466,7 +465,7 @@ begin
          if(uid=UID_ZSergant)then
          begin
             painc  := 3;
-            ucl    := 12;
+            ucl    := 14;
             speed  := 10;
             anims  := 14;
             ruid   := UID_HMilitaryUnit;
@@ -489,7 +488,7 @@ begin
          if(uid=UID_ZCommando)then
          begin
             painc  := 3;
-            ucl    := 12;
+            ucl    := 15;
             rld_r  := 10;
             ruid   := UID_HMilitaryUnit;
          end;
@@ -511,7 +510,7 @@ begin
          if(uid=UID_ZBomber)then
          begin
             painc  := 3;
-            ucl    := 12;
+            ucl    := 16;
             ruid   := UID_HMilitaryUnit;
          end
          else
@@ -533,7 +532,7 @@ begin
          if(uid=UID_ZMajor)then
          begin
             painc  := 3;
-            ucl    := 12;
+            ucl    := 17;
             ruid   := UID_HMilitaryUnit;
          end
          else
@@ -555,7 +554,7 @@ begin
          if(uid=UID_ZBFG)then
          begin
             painc  := 3;
-            ucl    := 12;
+            ucl    := 18;
             ruid   := UID_HMilitaryUnit;
          end
          else

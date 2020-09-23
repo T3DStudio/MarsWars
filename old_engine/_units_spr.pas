@@ -23,6 +23,17 @@ begin
    _unit_spr:=@spr_LostSoul[td+an];
 end;
 
+UID_ZEngineer:
+begin
+   td:=((dir+23) mod 360) div 45;
+
+   if(wanim)then inc(anim,anims);
+   anim:=anim mod 400;
+   an:=4*td+(anim div 100);
+
+   _unit_spr:=@spr_ZEngineer[an];
+end;
+
 UID_Imp,       // common 0-47, pain, 1 attack
 UID_Demon,
 UID_ZFormer,
@@ -472,6 +483,7 @@ UID_Baron:
 begin td:=48+abs(hits div 8);if(td>52)then td:=52;if(buff[ub_advanced]>0)then _unit_spr:=@spr_Baron    [td]else _unit_spr:=@spr_Knight  [td];end;//48-52
 UID_Sergant:
 begin td:=40+abs(hits div 8);if(td>44)then td:=44;if(buff[ub_advanced]>0)then _unit_spr:=@spr_SSergant [td]else _unit_spr:=@spr_Sergant [td];end;//48-52
+UID_ZEngineer,
 UID_ZSergant:
 begin td:=48+abs(hits div 8);if(td>52)then td:=52;if(buff[ub_advanced]>0)then _unit_spr:=@spr_ZSSergant[td]else _unit_spr:=@spr_ZSergant[td];end;//48-52
 

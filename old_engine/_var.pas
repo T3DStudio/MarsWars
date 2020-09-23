@@ -377,6 +377,7 @@ spr_arachnotron   : array[0..69] of TUsprite;
 spr_archvile      : array[0..85] of TUsprite;
 
 spr_ZFormer       : array[0..52] of TUSprite;
+spr_ZEngineer     : array[0..31] of TUSprite;
 spr_ZSergant      : array[0..52] of TUSprite;
 spr_ZSSergant     : array[0..52] of TUSprite;
 spr_ZCommando     : array[0..59] of TUSprite;

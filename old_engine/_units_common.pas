@@ -45,6 +45,7 @@ UID_Flyer  : case random(3) of
              2 : PlaySND(snd_uac_u2,0);
              end;
 UID_ZFormer,
+UID_ZEngineer,
 UID_ZSergant,
 UID_ZCommando,
 UID_ZBomber,
@@ -68,7 +69,7 @@ r_hell : case ucl of
          1    : PlaySND(snd_imp   ,0);
          10   : PlaySND(snd_ar_act,0);
          11   : PlaySND(snd_arch_a,0);
-         12,
+         12..18,
          9    : PlaySND(snd_zomb  ,0);
          8    : PlaySND(snd_rev_ac,0);
          end;
@@ -197,6 +198,7 @@ begin
        UID_Pain        : PlaySND(snd_pain_p,u);
        UID_Revenant,
        UID_Imp,
+       UID_ZEngineer,
        UID_ZFormer,
        UID_ZSergant,
        UID_ZCommando,
@@ -457,17 +459,7 @@ begin
       begin
          if(_ulst[cl2uid[race,false,ut]].max=1)then inc(wbhero,1);
 
-         {utrain:=ut;
-         if(ut in [12..17])then
-          if(uid<>UID_HMilitaryUnit)or(race<>r_hell)
-          then exit
-          else
-            if(state<>ps_comp)then
-            begin
-               if not(rld_a in [12..17])then rld_a:=12;
-               utrain:=rld_a;
-            end;  }
-
+         utrain:=ut;
          inc(wb,1);
          inc(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
          rld:=_ulst[cl2uid[race,false,utrain]].trt;
@@ -562,19 +554,14 @@ begin
    if(tu^.uf=uf_fly)then
    begin
       if(uu^.uid in [UID_Demon,
-                     UID_Mine ])then exit;
+                     UID_Mine,
+                     UID_ZEngineer])then exit;
    end;
 
    if(tu^.uid in [UID_Mancubus,UID_Arachnotron])and(tu^.uid=uu^.uid)then exit;
 
    if(uu^.uid in [UID_Bomber,UID_ZBomber,UID_Tank])then
     if(utd<=rocket_sr)or(tu^.uf>uf_ground)then exit;
-
-   {if not(tu^.uid in [UID_UCommandCenter])then
-   begin
-      if(uu^.uid=UID_UCommandCenter)then
-       if(tu^.uf>uf_ground)then exit;
-   end;  }
 
    if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(u<>t)then exit;
 
@@ -603,7 +590,7 @@ begin
    begin
       melee:=false;
 
-      if(uid in [UID_Demon,UID_LostSoul])then melee:=true;
+      if(uid in [UID_Demon,UID_LostSoul,UID_ZEngineer])then melee:=true;
       if(tar1>0)then
       begin
          tu:=@_units[tar1];

@@ -119,11 +119,22 @@ begin
                         PlaySND(snd_exp,u);
                         _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BExp);
                      end;
+        UID_ZEngineer:
+                     begin
+                        PlaySND(snd_exp,u);
+                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
+                        buff[ub_stopafa]:=vid_3fps;
+                     end;
             end;
          end;
       end
       else
       case uid of
+    UID_ZEngineer  : begin
+                        PlaySND(snd_exp,u);
+                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
+                        buff[ub_stopafa]:=vid_2fps;
+                     end;
     UID_LostSoul   : PlaySND(snd_pexp,u);
     UID_Imp        : if(random(2)=0)
                      then PlaySND(snd_impd1,u)
@@ -361,21 +372,10 @@ begin
                   begin
                      if(rld>0)then
                      begin
-                        if(uid=UID_HMilitaryUnit)then
+                        if(utrain<_uts)then
                         begin
-                           case utrain of
-                            0..11 : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_b_u[r_hell,utrain],255,0,(rld div vid_fps)+1,0,0,'',0);
-                            12    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZFormer  [23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                            13    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZSergant [23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                            14    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZCommando[23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                            15    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZBomber  [23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                            16    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZMajor   [23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                            17    : _sl_add(vx-24, smy-24,dp,0,c_gray,0,true,spr_ZBFG     [23].surf,255,0,(rld div vid_fps)+1,0,0,'',0);
-                           end;
-                        end;
-                        if(utrain<12)then
-                        begin
-                           if(uid=UID_HGate        )then _sl_add(vx-24,smy-24,dp,0,c_gray,0,true,spr_b_u[r_hell,utrain],255,0,(rld div vid_fps)+1,0,0,'',0);
+                           if(uid=UID_HMilitaryUnit)
+                           or(uid=UID_HGate        )then _sl_add(vx-24,smy-24,dp,0,c_gray,0,true,spr_b_u[r_hell,utrain],255,0,(rld div vid_fps)+1,0,0,'',0);
                            if(uid=UID_UMilitaryUnit)then _sl_add(vx-24,smy-24,dp,0,c_gray,0,true,spr_b_u[r_uac ,utrain],255,0,(rld div vid_fps)+1,0,0,'',0);
                         end;
                         if(utrain<=MaxUpgrs)then
@@ -764,7 +764,7 @@ begin
         else
           if not(uid in gavno)
           then deff:=false;
-        if(mech)or(uid in [UID_LostSoul,UID_Pain])then deff:=true;
+        if(mech)or(uid in [UID_LostSoul,UID_Pain,UID_ZEngineer])then deff:=true;
 
         buff[ub_pain]:=vid_fps;
         {$IFDEF _FULLGAME}
@@ -1350,8 +1350,8 @@ begin
                       hits:=ndead_hits;
 
                       case tu1^.uid of
-                      UID_Medic,
-                      UID_Engineer : _unit_add(tu1^.vx,tu1^.vy,UID_ZFormer  ,player,true);
+                      UID_Medic    : _unit_add(tu1^.vx,tu1^.vy,UID_ZFormer  ,player,true);
+                      UID_Engineer : _unit_add(tu1^.vx,tu1^.vy,UID_ZEngineer,player,true);
                       UID_Sergant  : _unit_add(tu1^.vx,tu1^.vy,UID_ZSergant ,player,true);
                       UID_Commando : _unit_add(tu1^.vx,tu1^.vy,UID_ZCommando,player,true);
                       UID_Bomber   : _unit_add(tu1^.vx,tu1^.vy,UID_ZBomber  ,player,true);
@@ -1666,6 +1666,11 @@ begin
                   rld:=rld_r;
                end;
 
+         UID_ZEngineer:
+               begin
+                  _miss_add(vx,vy,vx,vy,0,MID_Mine,player,0,true);
+                  if(OnlySVCode)then _unit_kill(u,false,true);
+               end;
          UID_Mine:
                if(buff[ub_advanced]=0)and(tar1d<40)and(tu1^.uf<uf_fly)then
                begin

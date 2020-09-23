@@ -80,7 +80,7 @@ begin
          end;
       end;
 
-      if(ucl<18)then
+      if(ucl<19)then
       begin
          REQ:='';
          uid  :=cl2uid[rc,false,ucl];

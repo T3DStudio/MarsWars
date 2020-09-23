@@ -532,6 +532,7 @@ begin
    for x:=0 to 85 do spr_archvile   [x]:=_lstr('h_u11_'+b2s(x));
 
    for x:=0 to 52 do spr_ZFormer    [x]:=_lstr('h_z0_' +b2s(x));
+   for x:=0 to 31 do spr_ZEngineer  [x]:=_lstr('h_z0s_'+b2s(x));
    for x:=0 to 52 do spr_ZSergant   [x]:=_lstr('h_z1_' +b2s(x));
    for x:=0 to 52 do spr_ZSSergant  [x]:=_lstr('h_z1s_'+b2s(x));
    for x:=0 to 59 do spr_ZCommando  [x]:=_lstr('h_z2_' +b2s(x));

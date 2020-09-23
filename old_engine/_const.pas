@@ -298,9 +298,9 @@ UID_Portal             = 90;
 
 t2                     = [UID_URocketL,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
-marines                = [UID_Engineer,UID_Medic,UID_Sergant,UID_Commando,UID_Bomber,UID_Major,UID_BFG];
-zimbas                 = [UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
-gavno                  = marines+[UID_Imp]+zimbas;
+marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
+zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
+gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron,UID_ZFormer..UID_ZBFG];
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 whocaninapc            = marines+[UID_APC,UID_Terminator,UID_Tank];
@@ -521,7 +521,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 181841;
+svld_size              = 183633;
 rpl_size               = 1574;
 
 rpl_none               = 0;

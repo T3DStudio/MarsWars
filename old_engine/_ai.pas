@@ -82,9 +82,10 @@ begin
      case ai_skill of //
      0,1  : ;
      2    : _bc_sa(@a_units,[12..13]);
-     3    : _bc_sa(@a_units,[12..15]);
-     else   _bc_sa(@a_units,[12..17]);
+     3    : _bc_sa(@a_units,[12..16]);
+     else   _bc_sa(@a_units,[12..18]);
      end;
+    if(race=r_uac)then _bc_sa(@a_units,[12..18]);
    end;
 end;
 

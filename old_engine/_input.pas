@@ -502,13 +502,10 @@ begin
                     end;
                 1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                     begin
-                      if(3<m_by)and(m_by<8)then
+                      if(3<m_by)and(m_by<11)then
                       begin
                          u:=((m_by-4)*3)+(m_bx mod 3);
-                         if(u<12)
-                         then _player_s_o(-4,u,0,0, uo_action  ,HPlayer)
-                         else ;
-                           //if(u=12)and(race=r_hell)then _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+                         if(u<19)then _player_s_o(-4,u,0,0, uo_action  ,HPlayer)
                       end;
                     end;
 
@@ -522,8 +519,8 @@ begin
                     end;
                 3 : if(_rpls_rst>=rpl_rhead)then
                     begin
-                        if(m_by=7)then
-                        begin
+                        case m_by of
+                     7 :begin
                            if(m_bx=0)then _fsttime:=not _fsttime;
                            if(m_bx=1)then _rpls_step:=vid_hfps*2;
                            if(m_bx=2)then
@@ -532,27 +529,24 @@ begin
                              then G_Paused:=0
                              else G_Paused:=200;
                         end;
-                        if(m_by=8)then
-                        begin
+                     8 :begin
                            if(m_bx=0)then _fog:=not _fog;
                            if(m_bx=1)then _rpls_log:=not _rpls_log;
                         end;
-                        if(m_by=9)then
-                        begin
+                     9 :begin
                            if(m_bx=0)then HPlayer:=0;
                            if(m_bx=1)then HPlayer:=1;
                            if(m_bx=2)then HPlayer:=2;
                         end;
-                       if(m_by=10)then
-                       begin
-                          if(m_bx=0)then HPlayer:=3;
-                          if(m_bx=1)then HPlayer:=4;
-                          if(m_bx=2)then HPlayer:=5;
-                       end;
-                       if(m_by=11)then
-                       begin
+                     10:begin
+                           if(m_bx=0)then HPlayer:=3;
+                           if(m_bx=1)then HPlayer:=4;
+                           if(m_bx=2)then HPlayer:=5;
+                        end;
+                     11:begin
                           if(m_bx=0)then HPlayer:=6;
-                       end;
+                        end;
+                        end;
                     end;
                  end;
         end;
@@ -612,10 +606,10 @@ begin
                 end;
             1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                 begin
-                   if(3<m_by)and(m_by<8)then
+                   if(3<m_by)and(m_by<11)then
                    begin
                       u:=((m_by-4)*3)+(m_bx mod 3);
-                      if(u<12)then _player_s_o(-5,u,0,0, uo_action  ,HPlayer);
+                      if(u<19)then _player_s_o(-5,u,0,0, uo_action  ,HPlayer);
                    end;
                 end;
             2 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
