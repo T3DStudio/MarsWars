@@ -386,6 +386,16 @@ begin
    _mkHStr(2,r_uac ,upgr_rturrets,'Rocket turrets'         ,'Turrets can upgrade to Rocket turrets.'           );
    _mkHStr(2,r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for Command Center.'            );
 
+   _mkHStrXY(3,0 ,0,0,'Move, ignore enemies ('    +#18+'Q'+#25+')');
+   _mkHStrXY(3,1 ,0,0,'Stop, ignore enemies ('    +#18+'W'+#25+')');
+   _mkHStrXY(3,2 ,0,0,'Patrol, ignore enemies ('  +#18+'E'+#25+')');
+   _mkHStrXY(3,3 ,0,0,'Move, attack enemies ('    +#18+'A'+#25+')');
+   _mkHStrXY(3,4 ,0,0,'Stop, attack enemies ('    +#18+'S'+#25+')');
+   _mkHStrXY(3,5 ,0,0,'Patrol, attack enemies ('  +#18+'D'+#25+')');
+   _mkHStrXY(3,6 ,0,0,'Action ('          +#18+'Ctrl'+#25+'+'+#18+'Space'+#25+')');
+   _mkHStrXY(3,7 ,0,0,'Select all units ('+#18+'F2'+#25+')');
+   _mkHStrXY(3,8 ,0,0,'Destroy ('         +#18+'Delete'+#25+')');
+
    _mkHStrXY(3,9 ,0,0,'Faster game speed ('    +#18+'Q'+#25+')');
    _mkHStrXY(3,10,0,0,'Left click: skip 2 seconds ('+#18+'W'+#25+')'+#11+'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')');
    _mkHStrXY(3,11,0,0,'Pause ('                +#18+'E'+#25+')');
@@ -398,6 +408,9 @@ begin
    _mkHStrXY(3,18,0,0,'Green player [#4] ('    +#18+'T'+#25+')');
    _mkHStrXY(3,19,0,0,'Aqua player [#5] ('     +#18+'Y'+#25+')');
    _mkHStrXY(3,20,0,0,'Blue player [#6] ('     +#18+'F'+#25+')');
+
+   str_hint[0,r_uac ,20] := 'Mines';
+   str_hint[0,r_hell,20] := 'Hell Eye';
    {
 
 
@@ -742,10 +755,10 @@ begin
   _mkHStrXY(3,19,0,0,'Бирюзовый игрок [#5] ('    +#18+'Y'+#25+')');
   _mkHStrXY(3,20,0,0,'Синий игрок [#6] ('        +#18+'F'+#25+')');
 
+
+  str_hint[0,r_uac ,20] := 'Мины';
+  str_hint[0,r_hell,20] := 'Адские Глаза';
  {
-  str_hint[0,r_uac ,21] := 'Мины';
-  str_hint[0,r_hell,21] := 'Зомби ('+#18+'M'+#25+')'+#11+#17+str_req+#25+'Адская '+str_un_name[UID_UMilitaryUnit];
-  str_hint[0,r_hell,22] := 'Адский Глаз';
 
   str_hint[0,r_hell,24] := 'Дейсвтие ('      +#18+'Ctrl'+#25+'+'+#18+'Space'+#25+')';
   str_hint[0,r_hell,25] := 'Уничтожить ('    +#18+'Delete'+#25+')';

@@ -86,6 +86,7 @@ o_x1,o_y1  :integer;
    u_eb    : array[false..true,0.._uts] of byte;
    u_s     : array[false..true,0.._uts] of byte;
    u_c     : array[false..true] of byte;
+   u_cs    : array[false..true] of byte;
    ubx     : array[0.._uts] of integer;
    uid_e,
    uid_b   : array[0..255 ] of byte;

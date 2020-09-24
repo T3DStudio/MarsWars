@@ -449,8 +449,14 @@ begin
    spr_cursor     := loadIMG('cursor'   ,true ,true);
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
-   spr_b_cancle   := LoadBtn('b_cancle' ,vid_bw);
    spr_b_delete   := LoadBtn('b_destroy',vid_bw);
+   spr_b_attack   := LoadBtn('b_attack' ,vid_bw);
+   spr_b_move     := LoadBtn('b_move'   ,vid_bw);
+   spr_b_patrol   := LoadBtn('b_patrol' ,vid_bw);
+   spr_b_apatrol  := LoadBtn('b_apatrol',vid_bw);
+   spr_b_stop     := LoadBtn('b_stop'   ,vid_bw);
+   spr_b_astop    := LoadBtn('b_astop'  ,vid_bw);
+   spr_b_selall   := LoadBtn('b_selall' ,vid_bw);
 
    spr_b_rfast    := LoadBtn('b_rfast'  ,vid_bw);
    spr_b_rskip    := LoadBtn('b_rskip'  ,vid_bw);
@@ -620,12 +626,6 @@ begin
       spr_b_u[r_uac ,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_BW);
       spr_ui_oico[r_uac ,false,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_oiw);
    end;
-
-   //,
-   //spr_b_baron,
-
-   spr_b_zimba := LoadBtnFS(spr_ZFormer[21].surf,vid_BW);
-   spr_b_heye  := LoadBtnFS(spr_HEye.surf       ,vid_BW);
 
    LoadDecors;
 end;

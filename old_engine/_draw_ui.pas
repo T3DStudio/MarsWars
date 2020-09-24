@@ -224,6 +224,24 @@ begin
                     end;
                end;
             end;
+
+            ux:=0;
+            uy:=7;
+
+            case race of
+            r_hell : begin
+                        _drawBtn (_uipanel,ux,uy,spr_b_b[race,12],false,u_e[true,12]=0);
+                        _drawBtnt(_uipanel,ux,uy,
+                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
+                        0 ,0 ,c_lime            ,c_orange          ,0);
+                     end;
+            r_uac  : begin
+                        _drawBtn (_uipanel,ux,uy,spr_b_b[race,12],false,u_e[true,12]=0);
+                        _drawBtnt(_uipanel,ux,uy,
+                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
+                        0 ,0 ,c_lime            ,c_orange          ,0 );
+                     end;
+            end;
          end;
 
          1:
@@ -250,48 +268,6 @@ begin
                b2s(((ui_trnt[ui]+vid_ifps) div vid_fps)),b2s(ui_trntc[ui]),b2s(u_s [false,ui]),b2s(u_e [false,ui])                                    ,b2s(ui_apc[ui]),
                c_white                                  ,c_dyellow        ,c_lime             ,ui_muc[u_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
-
-            {if(_rpls_rst<rpl_rhead)then
-            begin
-               _drawBtn(_uipanel,0,8,spr_b_action,false,false);
-               _drawBtn(_uipanel,1,8,spr_b_delete,false,false);
-               _drawBtn(_uipanel,2,8,spr_b_cancle,false,false);
-            end;
-
-            ux:=0;
-            uy:=7;
-
-            case race of
-            r_hell :
-                     begin
-                        _drawBtn(_uipanel,ux,uy,spr_b_zimba,false,false);
-
-                        ui_trnt[30]:=32000;
-                        ui_trnt[31]:=0;
-                        for ui:=12 to 17 do
-                        begin
-                           if(ui_trnt[ui]>0)and(ui_trnt[ui]<ui_trnt[30])then ui_trnt[30]:=ui_trnt[ui];
-                           inc(ui_trnt[31],ui_trntc[ui]);
-                        end;
-                        if(ui_trnt[30]=32000)then ui_trnt[30]:=0;
-
-                        _drawBtnt(_uipanel,ux,uy,
-                        b2s(((ui_trnt[30]+vid_ifps) div vid_fps)),b2s(ui_trnt[31]),b2s(u_s [false,12]),b2s(u_e [false,12]),b2s(ui_apc[12]),
-                        c_white                                  ,c_dyellow       ,c_lime             ,c_orange           ,c_purple);
-
-                        _drawBtn(_uipanel,ux+1,uy,spr_b_heye,false,false);
-                        _drawBtnt(_uipanel,ux+1,uy,
-                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
-                        0 ,0 ,c_lime            ,c_orange          ,0);
-                     end;
-            r_uac  :
-                     begin
-                        _drawBtn(_uipanel,0,7,spr_b_up[r_uac,upgr_mines],false,u_e[true,12]=0);
-                        _drawBtnt(_uipanel,ux,uy,
-                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
-                        0 ,0 ,c_lime            ,c_orange          ,0 );
-                     end;
-            end;}
          end;
 
          2:
@@ -332,8 +308,22 @@ begin
 
                if(ui=HPlayer)then rectangleColor(_uipanel,ux+2,uy+2,ux+vid_bw-2,uy+vid_bw-2,c_lime);
             end;
-         end;
+         end
          else
+         begin
+            _drawBtn(_uipanel,0,0,spr_b_move   ,false,false);
+            _drawBtn(_uipanel,1,0,spr_b_stop   ,false,false);
+            _drawBtn(_uipanel,2,0,spr_b_patrol ,false,false);
+
+            _drawBtn(_uipanel,0,1,spr_b_attack ,false,false);
+            _drawBtn(_uipanel,1,1,spr_b_astop  ,false,false);
+            _drawBtn(_uipanel,2,1,spr_b_apatrol,false,false);
+
+            _drawBtn(_uipanel,0,2,spr_b_action ,false,false);
+            _drawBtn(_uipanel,1,2,spr_b_selall ,false,false);
+            _drawBtn(_uipanel,2,2,spr_b_delete ,false,false);
+         end;
+
          end;
       end;
    end;

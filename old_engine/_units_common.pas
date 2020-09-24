@@ -693,7 +693,8 @@ begin
            dec(buff[i],1);
            if(i=ub_stopafa)and(OnlySVCode)then
             if(bld)and(speed>0)and(tar1=0)then
-             if(buff[i]=0)then dir:=p_dir(x,y,uo_x,uo_y);
+             if(buff[i]=0)then
+              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);
         end
         else
           if(buff[i]<0)then inc(buff[i],1);

@@ -465,6 +465,8 @@ begin
    end;
 
    _draw_surf(_screen,mv_x,mv_y,_menu_surf);
+
+   _draw_surf(_screen,m_vx,m_vy,spr_cursor);
 end;
 
 

@@ -178,15 +178,13 @@ begin
 
         if(G_Paused=0)then
         case k of
-          sdlk_Q : ;
-          sdlk_W : ;
-          sdlk_E : ;
-          sdlk_A : ;
-          sdlk_S : ;
-          sdlk_D : ;
-          sdlk_Z : ;
-          sdlk_X : ;
-          sdlk_C : ;
+          sdlk_Q : m_sbuild:=-1;
+          sdlk_W : _player_s_o(2,0,0,0,uo_action ,HPlayer);
+          sdlk_E : m_sbuild:=-2;
+          sdlk_A : m_sbuild:=-3;
+          sdlk_S : _player_s_o(2,1,0,0,uo_action ,HPlayer);
+          sdlk_D : m_sbuild:=-4;
+          sdlk_Z : _player_s_o(1,0,0,0,uo_action ,HPlayer);
           sdlk_0..sdlk_9 :  begin
                                ko:=_event^.key.keysym.sym-sdlk_0;
                                if (k_ctrl>1)
@@ -199,15 +197,9 @@ begin
                                    then _moveHumView(ordx[ko] , ordy[ko])
                                    else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
                             end;
-          sdlk_delete    :  _player_s_o(k_ctrl,0,0,0,uo_delete,HPlayer);
-          sdlk_space     :  _player_s_o(k_ctrl,0,0,0,uo_action,HPlayer);
+          sdlk_delete    :  _player_s_o(k_ctrl,0,0,0,uo_delete ,HPlayer);
+          sdlk_F2        :  _player_s_o(0     ,0,0,0,uo_specsel,HPlayer);
         else
-          if(k_ctrl>1)and(k=sdlk_A)then
-          begin
-             _player_s_o(0,0,0,0,uo_specsel ,HPlayer);
-             exit;
-          end;
-
           case ui_tab of
           0 : case k of
             sdlk_R      : m_sbuild:=0;
@@ -414,7 +406,8 @@ end;
 
 procedure _chkbld;
 begin
-   if(m_sbuild<=_uts) then
+   case m_sbuild of
+   0.._uts:
     with _players[HPlayer] do
     begin
        if(m_sbuild in _sbs_ucls)and(u_e[true,m_sbuild]>0)then
@@ -433,6 +426,10 @@ begin
                    else m_sbuildc:=c_lime;
                    end;
     end;
+-1,-2,
+-3,-4: with _players[HPlayer] do if(u_cs[false]=0)then m_sbuild:=255;
+   else
+   end;
 end;
 
 procedure g_mouse;
@@ -451,21 +448,43 @@ begin
    begin
       if(vid_panel<=m_vx)then        // map
       begin
-         if(m_sbuild=255)then
-         begin
+         case m_sbuild of
+255    : begin
             m_sxs:=m_mx;
             m_sys:=m_my;
-         end
-         else
-           if(m_sbuildc=c_lime)then
-           begin
-              _player_s_o(m_mx,m_my,m_sbuild,0, uo_build  ,HPlayer);
-              m_sbuild:=255;
-           end;
+         end;
+0.._uts: if(m_sbuildc=c_lime)then
+         begin
+            _player_s_o(m_mx,m_my,m_sbuild,0, uo_build  ,HPlayer);
+            m_sbuild:=255;
+         end;
+-1,-2,
+-3,-4  : begin
+            _player_s_o(2,m_sbuild,m_mx,m_my, uo_action  ,HPlayer);
+            if(m_sbuild>-3)
+            then _click_eff(m_mx,m_my,vid_hhfps,c_lime)
+            else _click_eff(m_mx,m_my,vid_hhfps,c_red );
+            m_sbuild:=255;
+         end;
+         end;
       end
       else
         if(vid_panel>=m_vy)then      // minimap
         begin
+           case m_sbuild of
+           -1,-2,
+           -3,-4  : begin
+                       ai_bx:=trunc(m_vx/map_mmcx);
+                       ai_by:=trunc(m_vy/map_mmcx);
+                       _player_s_o(2,m_sbuild,ai_bx,ai_by, uo_action  ,HPlayer);
+                       if(m_sbuild>-3)
+                       then _click_eff(ai_bx,ai_by,vid_hhfps,c_lime)
+                       else _click_eff(ai_bx,ai_by,vid_hhfps,c_red );
+                       m_sbuild:=255;
+                       exit;
+                    end;
+           else ui_panelmmm:=true;
+           end;
         end
         else                         // panel
         begin
@@ -492,13 +511,6 @@ begin
                           m_sbuild:=((m_by-4)*3)+(m_bx mod 3);
                           _chkbld;
                        end;
-
-                       {if(m_by=12)then
-                       begin
-                          if(m_bx=0)then _player_s_o(1,0,0,0, uo_action  ,HPlayer);
-                          if(m_bx=1)then _player_s_o(0,0,0,0, uo_delete  ,HPlayer);
-                          if(m_bx=2)then _player_s_o(0,0,0,0, uo_action  ,HPlayer);
-                       end; }
                     end;
                 1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                     begin
@@ -547,28 +559,54 @@ begin
                           if(m_bx=0)then HPlayer:=6;
                         end;
                         end;
+                    end
+                    else
+                    begin
+                       case m_by of
+                       4 :case m_bx of
+                          0: m_sbuild:=-1;
+                          1: _player_s_o(1,0,0,0, uo_action  ,HPlayer);
+                          2: m_sbuild:=-2;
+                          end;
+                       5 :case m_bx of
+                          0: m_sbuild:=-3;
+                          1: _player_s_o(1,1,0,0, uo_action  ,HPlayer);
+                          2: m_sbuild:=-4;
+                          end;
+                       6 :case m_bx of
+                          0: _player_s_o(1,0,0,0, uo_action  ,HPlayer);
+                          1: _player_s_o(0,0,0,0, uo_specsel ,HPlayer);
+                          2: _player_s_o(0,0,0,0, uo_delete  ,HPlayer);
+                          end;
+                       end;
+                       _chkbld;
                     end;
                  end;
         end;
    end;
 
-   if(k_ml=1)and(m_sxs>-1)then //select
+   if(k_ml=1)then
    begin
-      if(m_ldblclk>0)
-      then
-        if(k_shift<2)
-        then _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_dblselect  ,HPlayer)
-        else _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_adblselect ,HPlayer)
-      else
-        if(k_shift<2)
-        then _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_select ,HPlayer)
-        else _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_aselect,HPlayer);
+      ui_panelmmm:=false;
 
-      m_sxs:=-1;
-      m_ldblclk:=vid_hhfps;
+      if(m_sxs>-1)then //select
+      begin
+         if(m_ldblclk>0)
+         then
+           if(k_shift<2)
+           then _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_dblselect  ,HPlayer)
+           else _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_adblselect ,HPlayer)
+         else
+           if(k_shift<2)
+           then _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_select ,HPlayer)
+           else _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_aselect,HPlayer);
+
+         m_sxs:=-1;
+         m_ldblclk:=vid_hhfps;
+      end;
    end;
 
-   if(k_ml>2)and(m_sxs=-1){and(G_Paused=0)}then
+   if(ui_panelmmm)and(m_sxs=-1)then
     if(vid_panel>=m_vx)and(vid_panel>=m_vy)then
     begin
        vid_vx:=trunc(m_vx/map_mmcx)-((vid_mw+vid_panel) shr 1);
@@ -578,7 +616,7 @@ begin
 
    if(k_mr=2)then  // right button
    begin
-      if(m_sbuild<255)
+      if(m_sbuild<>255)
       then m_sbuild:=255
       else
        if(vid_panel<m_vx) then   // map

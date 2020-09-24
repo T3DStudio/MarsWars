@@ -225,7 +225,7 @@ begin
            begin
               if(bld)then
               begin
-                 if(ucl=0)and(m_sbuild<=_uts)and(speed=0)then
+                 if(ucl=0)and(0<=m_sbuild)and(m_sbuild<=_uts)and(speed=0)then
                   if((vid_vx+vid_panel-sr)<vx)and(vx<(vid_vx+vid_mw+sr))and
                     ((vid_vy          -sr)<vy)and(vy<(vid_vy+vid_mh+sr))then _addUIBldrs(x,y,sr);
 
@@ -303,7 +303,7 @@ begin
                     if(ucl in [4,7])then ro:=sr;
                     if(UID in [UID_HSymbol])and(upgr[upgr_b478tel]>0)then ro:=sr;
                  end;
-                 if(m_sbuild<=_uts)then ro:=r;
+                 if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r;
               end;
 
               if(wanim)then
@@ -626,7 +626,11 @@ begin
    with _units[u] do
    with _players[player] do
    begin
-      if(sel)then dec(u_s[isbuild,ucl],1);
+      if(sel)then
+      begin
+         dec(u_s [isbuild,ucl],1);
+         dec(u_cs[isbuild],1);
+      end;
       sel:=false;
 
       if(isbuild)then
@@ -2222,7 +2226,8 @@ begin
                      {$ENDIF}
                      if(tu^.sel)then
                      begin
-                        dec(u_s[tu^.isbuild,tu^.ucl],1);
+                        dec(u_s [tu^.isbuild,tu^.ucl],1);
+                        dec(u_cs[tu^.isbuild],1);
                         tu^.sel:=false;
                      end;
                   end;
@@ -2297,7 +2302,11 @@ begin
           begin
              if(k_shift>2)then
              begin
-                if(sel)then dec(u_s[isbuild,ucl],1);
+                if(sel)then
+                begin
+                   dec(u_s [isbuild,ucl],1);
+                   dec(u_cs[isbuild],1);
+                end;
                 sel:=false;
              end;
 

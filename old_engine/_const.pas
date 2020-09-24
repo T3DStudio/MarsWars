@@ -521,7 +521,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 183633;
+svld_size              = 183661;
 rpl_size               = 1574;
 
 rpl_none               = 0;

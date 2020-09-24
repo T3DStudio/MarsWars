@@ -270,7 +270,11 @@ begin
 
       if(hits>0)and(inapc=0)then
       begin
-         if(sel)then inc(u_s[isbuild,ucl],1);
+         if(sel)then
+         begin
+            inc(u_s [isbuild,ucl],1);
+            inc(u_cs[isbuild],1);
+         end;
          if(isbuild)then
           if(bld=false)
           then inc(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
@@ -312,7 +316,11 @@ begin
 
       if(hits>0)and(inapc=0)then
       begin
-         if(sel)then dec(u_s[isbuild,ucl],1);
+         if(sel)then
+         begin
+            dec(u_s [isbuild,ucl],1);
+            dec(u_cs[isbuild],1);
+         end;
          if(isbuild)then
           if(bld=false)
           then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)

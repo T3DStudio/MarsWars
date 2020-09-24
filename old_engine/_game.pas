@@ -712,7 +712,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                   end;
                                end;
                uo_action     : case o_x0 of
-                                  0 :
+                                {  0 :
                                     if(isbuild=false)then
                                     begin
                                        uo_x:=x;
@@ -726,8 +726,30 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                          case ucl of
                                          1: _unit_ctraining(u);
                                          3: _unit_cupgrade(u);
+                                         end;   }
+                                  2 : if(speed>0)then
+                                      begin
+                                         case o_y0 of
+                                         0,1:
+                                         begin
+                                            uo_x:=x;
+                                            uo_y:=y;
+                                            uo_tar:=0;
                                          end;
-                             1..30000 : _unit_action(u);
+                                         -1,-3:
+                                         begin
+                                            uo_x:=o_x1;
+                                            uo_y:=o_y1;
+                                            uo_tar:=0;
+                                            if(_canmove(u))then dir:=p_dir(x,y,uo_x,uo_y);
+                                         end;
+                                         end;
+                                         case o_y0 of
+                                         0,-1,-2 : uo_id:=ua_move;
+                                         1,-3,-4 : uo_id:=ua_amove;
+                                         end;
+                                      end;
+                                  1 : _unit_action(u);
                                  -2 : _unit_supgrade(u,o_y0);
                                  -3 : if(rld>0)and(ucl=3)and(isbuild)and(bld)and(utrain=o_y0)then _unit_cupgrade(u);
                                  -4 : _unit_straining(u,o_y0);
@@ -735,12 +757,20 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                end;
                  end;
 
-                 if(psel=false)then inc(u_s[isbuild,ucl],1);
+                 if(psel=false)then
+                 begin
+                    inc(u_s [isbuild,ucl],1);
+                    inc(u_cs[isbuild],1);
+                 end;
                  inc(scnt,1);
               end
               else
               begin
-                 if(psel=true)then dec(u_s[isbuild,ucl],1);
+                 if(psel=true)then
+                 begin
+                    dec(u_s [isbuild,ucl],1);
+                    dec(u_cs[isbuild],1);
+                 end;
                  if(o_id=uo_setorder)and(order=o_x0)then order:=0;
               end;
            end;

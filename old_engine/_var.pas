@@ -276,6 +276,7 @@ ui_mc_y,
 ui_mc_a           : integer;
 ui_mc_c           : cardinal;
 
+ui_panelmmm       : boolean = false;
 ui_tab            : byte = 0;
 ui_bldrs_x        : array[0.._uts] of integer;
 ui_bldrs_y        : array[0.._uts] of integer;
@@ -475,10 +476,15 @@ spr_b_rfog,
 spr_b_rlog,
 spr_b_rstop,
 spr_b_action,
-spr_b_cancle,
+spr_b_attack,
+spr_b_move,
+spr_b_patrol,
+spr_b_apatrol,
+spr_b_stop,
+spr_b_astop,
+spr_b_selall,
+//spr_b_cancle,
 spr_b_delete,
-spr_b_zimba,
-spr_b_heye,
 spr_b_knight,
 spr_b_baron,
 spr_iob_knight,
