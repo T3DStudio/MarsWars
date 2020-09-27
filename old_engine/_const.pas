@@ -109,7 +109,8 @@ uo_addorder            = 12;
 
 ua_move                = 1;
 ua_amove               = 2;
-ua_unload              = 3;
+ua_hold                = 3;
+ua_unload              = 4;
 
 ub_advanced            = 0;
 ub_pain                = 1;
@@ -117,7 +118,7 @@ ub_toxin               = 2;
 ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
-ub_stopafa             = 6;
+//ub_stopafa             = 6;
 ub_clcast2             = 7;
 ub_clcast              = 8;
 ub_invis               = 9;
@@ -346,8 +347,8 @@ regen_per              = vid_fps*2;
 _uclord_p              = vid_hfps+1;
 vistime                = _uclord_p+1;
 gavno_dth_h            = -45;
-dead_hits              = -10*vid_fps;
-idead_hits             = dead_hits+vid_2fps;
+dead_hits              = -12*vid_fps;
+idead_hits             = dead_hits+vid_3fps;
 ndead_hits             = dead_hits-1;
 radar_time             = vid_fps*30;
 radar_rlda             : array[0..5] of integer = (radar_time-vid_fps*3,radar_time-vid_fps*5,radar_time-vid_fps*7,radar_time-vid_fps*9,radar_time-vid_fps*11,radar_time-vid_fps*13);
@@ -521,7 +522,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 183661;
+svld_size              = 189829;
 rpl_size               = 1574;
 
 rpl_none               = 0;

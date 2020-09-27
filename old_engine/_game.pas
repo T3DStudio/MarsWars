@@ -685,6 +685,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                uo_move       : begin
                                   uo_x :=o_x0;
                                   uo_y :=o_y0;
+                                  uo_bx:=-1;
 
                                   case uid of
                                    UID_HKeep      : _unit_bteleport(u);
@@ -702,12 +703,19 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                                     end;
                                    UID_HSymbol,
                                    UID_HTower,
-                                   UID_HTotem     : _unit_b247teleport(u);
+                                   UID_HTotem     : begin
+                                                       _unit_b247teleport(u);
+                                                       if(o_y1<>u)then uo_tar:=o_y1;
+                                                    end;
                                    else
                                      if(o_y1<>u)then uo_tar:=o_y1;
-                                     if(o_x1>0)
+                                     if(o_x1>0)or(isbuild)
                                      then uo_id:=ua_amove
-                                     else uo_id:=ua_move;
+                                     else
+                                     begin
+                                        uo_id:=ua_move;
+                                        tar1 :=0;
+                                     end;
                                      if(_canmove(u))then dir:=p_dir(x,y,uo_x,uo_y);
                                   end;
                                end;
@@ -732,20 +740,33 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                          case o_y0 of
                                          0,1:
                                          begin
-                                            uo_x:=x;
-                                            uo_y:=y;
+                                            uo_x  :=x;
+                                            uo_y  :=y;
+                                            uo_bx :=-1;
+                                            tar1  :=0;
                                             uo_tar:=0;
                                          end;
-                                         -1,-3:
+                                         -4..-1:
                                          begin
-                                            uo_x:=o_x1;
-                                            uo_y:=o_y1;
+                                            uo_x  :=o_x1;
+                                            uo_y  :=o_y1;
+                                            uo_bx :=-1;
                                             uo_tar:=0;
                                             if(_canmove(u))then dir:=p_dir(x,y,uo_x,uo_y);
+                                            case o_y0 of
+                                            -2,-4: begin
+                                                      uo_bx:=x;
+                                                      uo_by:=y;
+                                                   end;
+                                            end;
                                          end;
                                          end;
                                          case o_y0 of
-                                         0,-1,-2 : uo_id:=ua_move;
+                                         0       : uo_id:=ua_hold;
+                                         -1,-2   : begin
+                                                   uo_id:=ua_move;
+                                                   tar1 :=0;
+                                                   end;
                                          1,-3,-4 : uo_id:=ua_amove;
                                          end;
                                       end;

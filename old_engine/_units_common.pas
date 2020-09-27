@@ -155,7 +155,7 @@ begin
      if(HPlayer=0)and(_rpls_rst>=rpl_rhead)
      then _checkvision:=2
      else
-       if(_uvision(_players[HPlayer].team,u,false))then
+       if(_uvision(_players[HPlayer].team,@_units[u],false))then
         if(team=_players[HPlayer].team)
         then _checkvision:=2
         else _checkvision:=1;
@@ -416,6 +416,10 @@ begin
           vy      := y;
           uo_x    := x;
           uo_y    := y;
+          uo_bx   := -1;
+          uo_by   := -1;
+          mv_x    := x;
+          mv_y    := y;
           sel     := false;
           apcc    := 0;
           unum    := _lcu;
@@ -505,51 +509,47 @@ begin
       end;
 end;
 
-function _unit_chktar(u,t,utd:integer):boolean;
-var uu,tu:PTUnit;
- teams:boolean;
+function _unit_chktar(uu,tu:PTUnit;utd:integer;teams:boolean):boolean;
 begin
-   uu:=@_units[u];
-   tu:=@_units[t];
-
    _unit_chktar:=false;
 
-   if(uu^.uo_id<>ua_amove)
-   then exit
-   else
-     if(uu^.uo_tar>0)then
-      if(_players[uu^.player].team<>_players[_units[uu^.uo_tar].player].team)then
-       if(uu^.uo_tar<>t)then exit;
-
-   if(tu^.buff[ub_notarget]>0)or(tu^.buff[ub_invuln]>0)or(tu^.inapc>0)then exit;
+   if(tu^.hits<=dead_hits)
+   or(tu^.buff[ub_notarget]>0)
+   //or(tu^.buff[ub_invuln  ]>0)
+   or(tu^.inapc>0)
+   then exit;
 
    if(uu^.uid=UID_UCommandCenter)and(uu^.uf=uf_ground)then exit;
 
-   teams:=(_players[tu^.player].team=_players[uu^.player].team);
-
    if(teams=false)then
    begin
-      if(_uvision(_players[uu^.player].team,t,false)=false)then exit;
+      if(_uvision(_players[uu^.player].team,tu,false)=false)then exit;
    end;
 
    if(tu^.hits<=0)then
    begin
-      if(tu^.hits<=dead_hits)then exit;
-      if(tu^.buff[ub_stopafa]>0)then exit;
+      if(tu^.hits<idead_hits)then exit;
       case uu^.uid of
       UID_ArchVile :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in arch_res)or(teams=false)then exit;
       UID_LostSoul :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in marines )then exit;
       else
         exit;
       end;
-   end;
-
-   if(uu^.arf>-1)and(uu^.uf=uf_ground)and(tu^.uf=uf_fly)then
-   begin
-      if(utd>=uu^.arf)then exit;
    end
    else
-     if(utd>=uu^.ar)then exit;
+     if(teams)then
+      if(uu^.uid in [UID_Medic,UID_Engineer])then
+      begin
+         if(uu^.inapc>0)then exit;
+         if(tu^.buff[ub_pain]>0)or(tu^.hits>=tu^.mhits)then exit;
+         case uu^.uid of
+           UID_Medic    : if(tu^.mech)then exit;
+           UID_Engineer : if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
+         end;
+      end
+      else exit;
+
+   if(teams)then exit;
 
    if(tu^.uf=uf_fly)then
    begin
@@ -563,47 +563,129 @@ begin
    if(uu^.uid in [UID_Bomber,UID_ZBomber,UID_Tank])then
     if(utd<=rocket_sr)or(tu^.uf>uf_ground)then exit;
 
-   if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(u<>t)then exit;
-
-   if(teams)and(tu^.hits>0)then
-   begin
-      if(uu^.uid in [UID_Medic,UID_Engineer])then
-      begin
-         if(uu^.inapc>0)then exit;
-         if(tu^.buff[ub_pain]>0)or(tu^.hits>=tu^.mhits)then exit;
-         case uu^.uid of
-           UID_Medic    : if(tu^.mech)then exit;
-           UID_Engineer : if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
-         end;
-      end
-      else exit;
-   end;
+   if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(uu<>tu)then exit;
 
    _unit_chktar:=true;
 end;
 
-procedure _unit_swmelee(u:integer);
-var tu:PTUnit;
-   dtr:integer;
+function _unit_melee(uu,tu:PTUnit;teams:boolean):boolean;
 begin
+   _unit_melee:=true;
+
+   case uu^.uid of
+   UID_Demon,
+   UID_LostSoul,
+   UID_ZEngineer : exit;
+   UID_Imp,
+   UID_Cacodemon,
+   UID_Baron,
+   UID_Revenant  : if(uu^.uid=tu^.uid)then exit;
+   UID_Medic,
+   UID_Engineer,
+   UID_ArchVile  : if(teams)then exit;
+   end;
+
+   _unit_melee:=false;
+end;
+{
+function _canattacktar(pu,tu:PTUnit;voobshe:boolean;wp:byte=255;sd:integer=-1):byte;
+var td:integer;
+begin
+   _canattacktar:=0;
+
+   with(pu^)do
+    with(puid^)do
+    begin
+       if(wp>MaxAttacks)then exit;
+
+       if(sd= -1)then sd:=dist(x,y,tu^.x,tu^.y);
+
+       if(a_rng[wp]<0)then
+       begin
+          if(inapc>0)then exit;
+          td:=sd-(_r+tu^.puid^._r+speed)
+       end
+       else
+         if(a_rng[wp]=0)
+         then td:=sd-srng
+         else td:=sd-a_rng[wp];
+
+       if(td<=0)
+       then _canattacktar:=2
+       else
+         if(speed>0)and(uo_id[0]<>uo_hold)and(inapc=0)then
+          if(voobshe)
+          then _canattacktar:=1
+          else
+            if(sd<=srng)then _canattacktar:=1;
+    end;
+}
+
+function _canattack(u:integer):boolean;
+begin
+   _canattack:=false;
    with _units[u] do
    begin
-      melee:=false;
+      if not(uid in whocanattack)then exit;
 
-      if(uid in [UID_Demon,UID_LostSoul,UID_ZEngineer])then melee:=true;
-      if(tar1>0)then
+      if(isbuild)then
       begin
-         tu:=@_units[tar1];
-         if(uid in [UID_Imp,UID_Cacodemon,UID_Baron,UID_Revenant])then
-         begin
-            if(uid=tu^.uid)then melee:=true;
-            dtr:=tar1d;
-            dec(dtr,r+tu^.r);
-            if(dtr<=melee_r)and(abs(uf-tu^.uf)<2)then melee:=true;
-         end;
-         if(uid in [UID_Medic,UID_Engineer,UID_ArchVile])then
-          if(_players[tu^.player].team=_players[player].team)then melee:=true;
+         if(bld=false)then exit;
+      end
+      else
+        case mech of
+        false: if(buff[ub_pain ]>0)
+               or(buff[ub_toxin]>0)
+               or(buff[ub_gear ]>0)then exit;
+        true : if(buff[ub_gear ]>0)
+               or(buff[ub_toxin]>0)then exit;
+        end;
+
+      if(inapc>0)then
+       if(_units[inapc].uid<>UID_APC)or(_units[inapc].inapc>0)then exit;
+
+      _canattack:=true;
+   end;
+end;
+
+function _unit_target(u,t,td:integer;voobshe:boolean):byte;
+var
+uu,tu:PTUnit;
+melee,
+teams:boolean;
+md   :integer;
+begin
+   _unit_target:=0;
+
+   uu:=@_units[u];
+   tu:=@_units[t];
+
+   teams:=_players[uu^.player].team=_players[tu^.player].team;
+   if(_unit_chktar(uu,tu,td,teams))then
+   begin
+      melee:=_unit_melee(uu,tu,teams);
+
+      if(melee)
+      then md:=td-(uu^.r+tu^.r+uu^.speed)
+      else
+      begin
+         if(uu^.arf>-1)and(uu^.uf=uf_ground)and(tu^.uf=uf_fly)
+         then md:=td-uu^.arf
+         else md:=td-uu^.ar;
       end;
+
+      if(md<=0)then
+      begin
+         if(melee)
+         then _unit_target:=3
+         else _unit_target:=2;
+      end
+      else
+        if(uu^.speed>0)then
+         if(voobshe)
+         then _unit_target:=1
+         else
+           if(td<=uu^.sr)then _unit_target:=1;
    end;
 end;
 
@@ -659,7 +741,7 @@ begin
       if(tx>map_mw)then tx:=map_mw;
       if(ty>map_mw)then ty:=map_mw;
       {$IFDEF _FULLGAME}
-      if(_uvision(_players[HPlayer].team,u,true))then
+      if(_uvision(_players[HPlayer].team,@_units[u],true))then
        if(_nhp(vx,vy)or _nhp(tx,ty))then PlaySND(snd_teleport,0);
       _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
       _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
@@ -691,15 +773,17 @@ begin
         if(buff[i]>0)then
         begin
            dec(buff[i],1);
-           if(i=ub_stopafa)and(OnlySVCode)then
+           {if(i=ub_stopafa)and(OnlySVCode)then
             if(bld)and(speed>0)and(tar1=0)then
              if(buff[i]=0)then
-              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);
+              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y); }
         end
         else
           if(buff[i]<0)then inc(buff[i],1);
 
-      if(onlySVCode)or(uid in whocanattack)or(uid in [UID_URocketL])then
+      if(onlySVCode)
+      or(uid in whocanattack)
+      or(uid in [UID_URocketL])then
        if(rld>0)then dec(rld,1);
 
       for i:=0 to MaxPlayers do
@@ -769,7 +853,7 @@ begin
           //_lcup^.buff[ub_born    ]:=0;
           {$IFDEF _FULLGAME}
           if(_nhp(x,y))then
-           if(_uvision(_players[HPlayer].team,u,true))then _unit_createsound(UID_LostSoul);
+           if(_uvision(_players[HPlayer].team,@_units[u],true))then _unit_createsound(UID_LostSoul);
           {$ENDIF}
        end
        else
@@ -799,7 +883,7 @@ function _canmove(u:integer):boolean;
 begin
    with(_units[u])do
    begin
-   _canmove:=false;
+      _canmove:=false;
 
       if(onlySVCode=false)and(speed>0)then
       begin
@@ -807,36 +891,21 @@ begin
          exit;
       end;
 
-      if(speed=0)or(buff[ub_stopafa]>0)then exit;
-
-      if(uo_tar=tar1)and(uo_tar>0)then
-       if(melee=false)
-       then exit
-       else
-         if(tar1d<(r+_units[tar1].r+melee_r))then exit;
+      if(speed=0)then exit;
 
       case uid of
+        UID_Flyer,
         UID_Terminator,
-        UID_Tank : if(rld>0)
-                   or(buff[ub_gear ]>0)
-                   or(buff[ub_toxin]>0)
-                   then exit;
-        UID_Flyer: if(buff[ub_gear ]>0)
-                   or(buff[ub_toxin]>0)
-                   then exit
-                   else
-                     if(buff[ub_advanced]=0)then
-                      if(rld>0)then exit;
+        UID_Tank,
         UID_UTransport,
         UID_APC,
         UID_FAPC : if(buff[ub_gear ]>0)
                    or(buff[ub_toxin]>0) then exit;
         UID_UCommandCenter : if(buff[ub_clcast]>0)then exit;
       else
-        if(rld>0)
-        or(buff[ub_pain ]>0)
+        if(buff[ub_pain ]>0)
         or(buff[ub_toxin]>0)
-        or(buff[ub_gear]>0)        then exit;
+        or(buff[ub_gear ]>0)then exit;
       end;
 
       _canmove:=true;
@@ -942,6 +1011,16 @@ begin
                             rld_r:=60;
                             rld_a:=30;
                          end;
+                      end;
+         UID_Imp    : if(buff[ub_advanced]<=0)then
+                      begin
+                         rld_r :=vid_fps;
+                         rld_a:=rld_r-20;
+                      end
+                      else
+                      begin
+                         rld_r:=vid_fps-20;
+                         rld_a:=rld_r-15;
                       end;
 
          UID_URadar : begin

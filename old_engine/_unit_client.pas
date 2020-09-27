@@ -82,7 +82,7 @@ var sh :shortint;
 begin
    with _units[u] do
    begin
-      if(_uvision(_players[_pl].team,u,true))or(rpl)
+      if(_uvision(_players[_pl].team,@_units[u],true))or(rpl)
       then sh:=_hi2S(hits,mhits,_shcf)
       else sh:=-128;
 

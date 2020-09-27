@@ -455,7 +455,7 @@ begin
    spr_b_patrol   := LoadBtn('b_patrol' ,vid_bw);
    spr_b_apatrol  := LoadBtn('b_apatrol',vid_bw);
    spr_b_stop     := LoadBtn('b_stop'   ,vid_bw);
-   spr_b_astop    := LoadBtn('b_astop'  ,vid_bw);
+   spr_b_hold     := LoadBtn('b_hold'   ,vid_bw);
    spr_b_selall   := LoadBtn('b_selall' ,vid_bw);
 
    spr_b_rfast    := LoadBtn('b_rfast'  ,vid_bw);

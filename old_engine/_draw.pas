@@ -273,7 +273,7 @@ begin
 
         if(hits>0){and(uid=UID_URocketL)}then
         begin
-           _draw_text(_screen,ix,iy,i2s(uo_id), ta_left,255, plcolor[player]);
+           _draw_text(_screen,ix,iy,i2s(tar1), ta_left,255, plcolor[player]);
            //if(tar1>0)then lineColor(_screen,ix,iy,_units[tar1].x-vid_vx,_units[tar1].y-vid_vy,c_white);
             //lineColor(_screen,ix+10,iy+10,uo_x-vid_vx,uo_y-vid_vy,c_white);  and(player=HPlayer)
         end;
@@ -313,26 +313,9 @@ begin
    D_ui;
    D_UIText;
    if(m_sxs>-1)then rectangleColor(_screen,m_sxs-vid_vx, m_sys-vid_vy, m_vx, m_vy, plcolor[HPlayer]);
-
-   case m_sbuild of
-   -1,
-   -2 : begin
-           circleColor(_screen,m_vx,m_vy,10,c_lime);
-           hlineColor(_screen,m_vx-12,m_vx+12,m_vy,c_lime);
-           vlineColor(_screen,m_vx,m_vy-12,m_vy+12,c_lime);
-        end;
-   -3,
-   -4 : begin
-           circleColor(_screen,m_vx,m_vy,10,c_red);
-           hlineColor(_screen,m_vx-12,m_vx+12,m_vy,c_red);
-           vlineColor(_screen,m_vx,m_vy-12,m_vy+12,c_red);
-        end;
-   else _draw_surf(_screen,m_vx,m_vy,spr_cursor);
-   end;
-
+   d_uimouse;
 
    if(_testmode>1)and(net_nstat=0)then _draw_dbg;
-
 end;
 
 

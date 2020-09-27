@@ -35,6 +35,8 @@ TUnit = record
    alrm_r,
    tar1,
    tar1d,
+   mv_x,mv_y,
+   uo_bx,uo_by,
    uo_tar,
    uo_x,
    uo_y    : integer;

@@ -214,12 +214,12 @@ begin
                      else _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[5]].rld),0,0,0,0,c_aqua);
                6 : if(ubx[6]>0)then
                     case race of
-                    r_hell: if(upgr[upgr_6bld]   >0)then _drawBtnt(_uipanel,ux,uy,'','','','',b2s(upgr[upgr_6bld])   ,0,0,0,0,c_red);
+                    r_hell: if(upgr[upgr_6bld]   >0)then _drawBtnt(_uipanel,ux,uy,'','','','',b2s(upgr[upgr_6bld])   ,0,0,0,0,c_red );
                     r_uac : if(_units[ubx[6]].rld>0)then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[6]].rld),0,0,0,0,c_aqua);
                     end;
                8 : if(ubx[8]>0)then
                     case race of
-                    r_hell: if(upgr[upgr_hinvuln]>0)then _drawBtnt(_uipanel,ux,uy,'',''                     ,'','',b2s(upgr[upgr_hinvuln]),0,0,0,0,c_red);
+                    r_hell: if(upgr[upgr_hinvuln]>0)then _drawBtnt(_uipanel,ux,uy,'',''                     ,'','',b2s(upgr[upgr_hinvuln]),0,0    ,0,0,c_red );
                     r_uac : if(upgr[upgr_blizz  ]>0)then _drawBtnt(_uipanel,ux,uy,'',b2s(upgr[upgr_blizz  ]),'','',r2s(_units[ubx[8]].rld),0,c_red,0,0,c_aqua);
                     end;
                end;
@@ -312,11 +312,11 @@ begin
          else
          begin
             _drawBtn(_uipanel,0,0,spr_b_move   ,false,false);
-            _drawBtn(_uipanel,1,0,spr_b_stop   ,false,false);
+            _drawBtn(_uipanel,1,0,spr_b_hold   ,false,false);
             _drawBtn(_uipanel,2,0,spr_b_patrol ,false,false);
 
             _drawBtn(_uipanel,0,1,spr_b_attack ,false,false);
-            _drawBtn(_uipanel,1,1,spr_b_astop  ,false,false);
+            _drawBtn(_uipanel,1,1,spr_b_stop   ,false,false);
             _drawBtn(_uipanel,2,1,spr_b_apatrol,false,false);
 
             _drawBtn(_uipanel,0,2,spr_b_action ,false,false);
@@ -423,5 +423,22 @@ begin
      end;
 end;
 
-
+procedure d_uimouse;
+var c:cardinal;
+begin
+   c:=0;
+   case m_sbuild of
+   -1,
+   -2 : c:=c_lime;
+   -3,
+   -4 : c:=c_red;
+   else _draw_surf(_screen,m_vx,m_vy,spr_cursor);
+   end;
+   if(c<>0)then
+   begin
+      circleColor(_screen,m_vx,m_vy,10,c);
+      hlineColor(_screen,m_vx-12,m_vx+12,m_vy,c);
+      vlineColor(_screen,m_vx,m_vy-12,m_vy+12,c);
+   end;
+end;
 

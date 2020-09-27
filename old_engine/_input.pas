@@ -178,13 +178,16 @@ begin
 
         if(G_Paused=0)then
         case k of
-          sdlk_Q : m_sbuild:=-1;
-          sdlk_W : _player_s_o(2,0,0,0,uo_action ,HPlayer);
-          sdlk_E : m_sbuild:=-2;
-          sdlk_A : m_sbuild:=-3;
-          sdlk_S : _player_s_o(2,1,0,0,uo_action ,HPlayer);
-          sdlk_D : m_sbuild:=-4;
-          sdlk_Z : _player_s_o(1,0,0,0,uo_action ,HPlayer);
+          sdlk_space     : if(k_ctrl>0)
+                           then _player_s_o(2,0,0,0,uo_action ,HPlayer)
+                           else _player_s_o(2,1,0,0,uo_action ,HPlayer);
+          sdlk_Q         : m_sbuild:=-1;
+          sdlk_W         : _player_s_o(2,0,0,0,uo_action ,HPlayer);
+          sdlk_E         : m_sbuild:=-2;
+          sdlk_A         : m_sbuild:=-3;
+          sdlk_S         : _player_s_o(2,1,0,0,uo_action ,HPlayer);
+          sdlk_D         : m_sbuild:=-4;
+          sdlk_Z         : _player_s_o(1,0,0,0,uo_action ,HPlayer);
           sdlk_0..sdlk_9 :  begin
                                ko:=_event^.key.keysym.sym-sdlk_0;
                                if (k_ctrl>1)
@@ -395,7 +398,7 @@ begin
     for i:=1 to MaxUnits do
      with _units[i] do
       if(hits>0)and(inapc=0)then
-       if(_uvision(_players[HPlayer].team,i,false))then
+       if(_uvision(_players[HPlayer].team,@_units[i],false))then
         if(dist2(vx,vy,tx,ty)<r)then
         begin
            if(player=HPlayer)and(sc=1)and(sel=true)then continue;
@@ -427,7 +430,7 @@ begin
                    end;
     end;
 -1,-2,
--3,-4: with _players[HPlayer] do if(u_cs[false]=0)then m_sbuild:=255;
+-3,-4 : with _players[HPlayer] do if(u_cs[false]=0)then m_sbuild:=255;
    else
    end;
 end;
@@ -565,12 +568,12 @@ begin
                        case m_by of
                        4 :case m_bx of
                           0: m_sbuild:=-1;
-                          1: _player_s_o(1,0,0,0, uo_action  ,HPlayer);
+                          1: _player_s_o(2,0,0,0, uo_action  ,HPlayer);
                           2: m_sbuild:=-2;
                           end;
                        5 :case m_bx of
                           0: m_sbuild:=-3;
-                          1: _player_s_o(1,1,0,0, uo_action  ,HPlayer);
+                          1: _player_s_o(2,1,0,0, uo_action  ,HPlayer);
                           2: m_sbuild:=-4;
                           end;
                        6 :case m_bx of
@@ -621,12 +624,12 @@ begin
       else
        if(vid_panel<m_vx) then   // map
        begin
-          _player_s_o(m_mx,m_my,byte((k_ctrl>0)=m_a_inv),_whoInPoint(m_mx,m_my),uo_move,HPlayer);
+          _player_s_o(m_mx,m_my,byte(false=m_a_inv),_whoInPoint(m_mx,m_my),uo_move,HPlayer);
        end
        else
          if (vid_panel>m_vy) then  // mini-map
          begin
-            _player_s_o(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx),byte((k_ctrl>0)=m_a_inv),0,uo_move,HPlayer);
+            _player_s_o(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx),byte(false=m_a_inv),0,uo_move,HPlayer);
          end
          else
          begin// panel

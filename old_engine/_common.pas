@@ -418,12 +418,12 @@ begin
    Close(f);
 end;
 
-function _uvision(uteam:byte;tu:integer;onlyvis:boolean):boolean;
+function _uvision(uteam:byte;tu:PTUnit;onlyvis:boolean):boolean;
 begin
    if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
    then _uvision:=true
    else
-    with _units[tu] do
+    with tu^ do
      if(buff[ub_invis]=0)or(hits<=0)or(onlyvis)
      then _uvision:=(vsnt[uteam]>0)
      else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
