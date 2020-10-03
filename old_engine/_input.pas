@@ -383,22 +383,32 @@ begin
     end;
 end;
 
-function _whoInPoint(tx,ty:integer):integer;
+function _whoInPoint(tx,ty,tt:integer):integer;
 var i,sc:integer;
+    htm :byte;
+function _ch(utm:byte):boolean;
+begin
+   _ch:=true;
+   if(tt=1)then _ch:=utm<>htm;
+   if(tt=2)then _ch:=utm= htm;
+end;
 begin
    sc:=0;
    with _players[HPlayer]do
-    for i:=0 to _uts do
-    begin
-       inc(sc,u_s[false,i]);
-       inc(sc,u_s[true ,i]);
-    end;
+   begin
+      for i:=0 to _uts do
+      begin
+         inc(sc,u_s[false,i]);
+         inc(sc,u_s[true ,i]);
+      end;
+      htm:=team;
+   end;
    _whoInPoint:=0;
    if(_nhp(tx,ty))then
     for i:=1 to MaxUnits do
      with _units[i] do
-      if(hits>0)and(inapc=0)then
-       if(_uvision(_players[HPlayer].team,@_units[i],false))then
+      if(hits>0)and(inapc=0)and(_ch(_players[player].team))then
+       if(_uvision(htm,@_units[i],false))then
         if(dist2(vx,vy,tx,ty)<r)then
         begin
            if(player=HPlayer)and(sc=1)and(sel=true)then continue;
@@ -430,9 +440,29 @@ begin
                    end;
     end;
 -1,-2,
--3,-4 : with _players[HPlayer] do if(u_cs[false]=0)then m_sbuild:=255;
+-3,-4 : if(ui_uimove=0)then m_sbuild:=255;
    else
    end;
+end;
+
+procedure _command(x,y:integer);
+var t:integer;
+begin
+   t:=0;
+   case m_sbuild of
+   -1 : t:=_whoInPoint(x,y,2);
+   -3 : t:=_whoInPoint(x,y,1);
+   end;
+   if(t>0)
+   then _player_s_o(x,y,byte(m_sbuild=-3),t,uo_move,HPlayer)
+   else
+   begin
+      _player_s_o(2,m_sbuild,x,y, uo_action  ,HPlayer);
+      if(m_sbuild>-3)
+      then _click_eff(x,y,vid_hhfps,c_lime)
+      else _click_eff(x,y,vid_hhfps,c_red );
+   end;
+   m_sbuild:=255;
 end;
 
 procedure g_mouse;
@@ -462,13 +492,7 @@ begin
             m_sbuild:=255;
          end;
 -1,-2,
--3,-4  : begin
-            _player_s_o(2,m_sbuild,m_mx,m_my, uo_action  ,HPlayer);
-            if(m_sbuild>-3)
-            then _click_eff(m_mx,m_my,vid_hhfps,c_lime)
-            else _click_eff(m_mx,m_my,vid_hhfps,c_red );
-            m_sbuild:=255;
-         end;
+-3,-4  : _command(m_mx,m_my);
          end;
       end
       else
@@ -476,17 +500,8 @@ begin
         begin
            case m_sbuild of
            -1,-2,
-           -3,-4  : begin
-                       ai_bx:=trunc(m_vx/map_mmcx);
-                       ai_by:=trunc(m_vy/map_mmcx);
-                       _player_s_o(2,m_sbuild,ai_bx,ai_by, uo_action  ,HPlayer);
-                       if(m_sbuild>-3)
-                       then _click_eff(ai_bx,ai_by,vid_hhfps,c_lime)
-                       else _click_eff(ai_bx,ai_by,vid_hhfps,c_red );
-                       m_sbuild:=255;
-                       exit;
-                    end;
-           else ui_panelmmm:=true;
+           -3,-4  : _command(trunc(m_vx/map_mmcx),trunc(m_vy/map_mmcx));
+           else     ui_panelmmm:=true;
            end;
         end
         else                         // panel
@@ -624,7 +639,7 @@ begin
       else
        if(vid_panel<m_vx) then   // map
        begin
-          _player_s_o(m_mx,m_my,byte(false=m_a_inv),_whoInPoint(m_mx,m_my),uo_move,HPlayer);
+          _player_s_o(m_mx,m_my,byte(false=m_a_inv),_whoInPoint(m_mx,m_my,0),uo_move,HPlayer);
        end
        else
          if (vid_panel>m_vy) then  // mini-map

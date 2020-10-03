@@ -392,25 +392,25 @@ begin
    _mkHStrXY(3,3 ,0,0,'Move, attack enemies ('    +#18+'A'+#25+')');
    _mkHStrXY(3,4 ,0,0,'Stop, attack enemies ('    +#18+'S'+#25+')');
    _mkHStrXY(3,5 ,0,0,'Patrol, attack enemies ('  +#18+'D'+#25+')');
-   _mkHStrXY(3,6 ,0,0,'Action ('          +#18+'Ctrl'+#25+'+'+#18+'Space'+#25+')');
-   _mkHStrXY(3,7 ,0,0,'Select all units ('+#18+'F2'+#25+')');
-   _mkHStrXY(3,8 ,0,0,'Destroy ('         +#18+'Delete'+#25+')');
+   _mkHStrXY(3,6 ,0,0,'Action ('             +#18+'Z'     +#25+')');
+   _mkHStrXY(3,7 ,0,0,'Select all units ('   +#18+'F2'    +#25+')');
+   _mkHStrXY(3,8 ,0,0,'Destroy ('            +#18+'Delete'+#25+')');
 
    _mkHStrXY(3,9 ,0,0,'Faster game speed ('    +#18+'Q'+#25+')');
    _mkHStrXY(3,10,0,0,'Left click: skip 2 seconds ('+#18+'W'+#25+')'+#11+'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')');
    _mkHStrXY(3,11,0,0,'Pause ('                +#18+'E'+#25+')');
    _mkHStrXY(3,12,0,0,'Fog of war ('           +#18+'A'+#25+')');
    _mkHStrXY(3,13,0,0,'List of game messages ('+#18+'S'+#25+')');
-   _mkHStrXY(3,14,0,0,'All players ('          +#18+'Z'+#25+')');
-   _mkHStrXY(3,15,0,0,'Red player [#1] ('      +#18+'X'+#25+')');
-   _mkHStrXY(3,16,0,0,'Orange player [#2] ('   +#18+'C'+#25+')');
-   _mkHStrXY(3,17,0,0,'Yellow player [#3] ('   +#18+'R'+#25+')');
-   _mkHStrXY(3,18,0,0,'Green player [#4] ('    +#18+'T'+#25+')');
-   _mkHStrXY(3,19,0,0,'Aqua player [#5] ('     +#18+'Y'+#25+')');
-   _mkHStrXY(3,20,0,0,'Blue player [#6] ('     +#18+'F'+#25+')');
+   _mkHStrXY(3,15,0,0,'All players ('          +#18+'Z'+#25+')');
+   _mkHStrXY(3,16,0,0,'Red player [#1] ('      +#18+'X'+#25+')');
+   _mkHStrXY(3,17,0,0,'Orange player [#2] ('   +#18+'C'+#25+')');
+   _mkHStrXY(3,18,0,0,'Yellow player [#3] ('   +#18+'R'+#25+')');
+   _mkHStrXY(3,19,0,0,'Green player [#4] ('    +#18+'T'+#25+')');
+   _mkHStrXY(3,20,0,0,'Aqua player [#5] ('     +#18+'Y'+#25+')');
+   _mkHStrXY(3,21,0,0,'Blue player [#6] ('     +#18+'F'+#25+')');
 
-   str_hint[0,r_uac ,20] := 'Mines';
-   str_hint[0,r_hell,20] := 'Hell Eye';
+   str_hint[0,r_uac ,21] := 'Mines';
+   str_hint[0,r_hell,21] := 'Hell Eye';
    {
 
 
@@ -747,17 +747,17 @@ begin
   _mkHStrXY(3,11,0,0,'Пауза ('                   +#18+'E'+#25+')');
   _mkHStrXY(3,12,0,0,'Туман войны ('             +#18+'A'+#25+')');
   _mkHStrXY(3,13,0,0,'Список игровых сообщений ('+#18+'S'+#25+')');
-  _mkHStrXY(3,14,0,0,'Все игроки ('              +#18+'Z'+#25+')');
-  _mkHStrXY(3,15,0,0,'Красный игрок [#1] ('      +#18+'X'+#25+')');
-  _mkHStrXY(3,16,0,0,'Оранжевый игрок [#2] ('    +#18+'C'+#25+')');
-  _mkHStrXY(3,17,0,0,'Желтый игрок [#3] ('       +#18+'R'+#25+')');
-  _mkHStrXY(3,18,0,0,'Зеленый игрок [#4] ('      +#18+'T'+#25+')');
-  _mkHStrXY(3,19,0,0,'Бирюзовый игрок [#5] ('    +#18+'Y'+#25+')');
-  _mkHStrXY(3,20,0,0,'Синий игрок [#6] ('        +#18+'F'+#25+')');
+  _mkHStrXY(3,15,0,0,'Все игроки ('              +#18+'Z'+#25+')');
+  _mkHStrXY(3,16,0,0,'Красный игрок [#1] ('      +#18+'X'+#25+')');
+  _mkHStrXY(3,17,0,0,'Оранжевый игрок [#2] ('    +#18+'C'+#25+')');
+  _mkHStrXY(3,18,0,0,'Желтый игрок [#3] ('       +#18+'R'+#25+')');
+  _mkHStrXY(3,19,0,0,'Зеленый игрок [#4] ('      +#18+'T'+#25+')');
+  _mkHStrXY(3,20,0,0,'Бирюзовый игрок [#5] ('    +#18+'Y'+#25+')');
+  _mkHStrXY(3,21,0,0,'Синий игрок [#6] ('        +#18+'F'+#25+')');
 
 
-  str_hint[0,r_uac ,20] := 'Мины';
-  str_hint[0,r_hell,20] := 'Адские Глаза';
+  str_hint[0,r_uac ,21] := 'Мины';
+  str_hint[0,r_hell,21] := 'Адские Глаза';
  {
 
   str_hint[0,r_hell,24] := 'Дейсвтие ('      +#18+'Ctrl'+#25+'+'+#18+'Space'+#25+')';

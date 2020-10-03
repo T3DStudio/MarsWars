@@ -457,7 +457,7 @@ begin
    spr_b_stop     := LoadBtn('b_stop'   ,vid_bw);
    spr_b_hold     := LoadBtn('b_hold'   ,vid_bw);
    spr_b_selall   := LoadBtn('b_selall' ,vid_bw);
-
+   spr_b_cancel   := LoadBtn('b_cancle' ,vid_bw);
    spr_b_rfast    := LoadBtn('b_rfast'  ,vid_bw);
    spr_b_rskip    := LoadBtn('b_rskip'  ,vid_bw);
    spr_b_rfog     := LoadBtn('b_fog'    ,vid_bw);

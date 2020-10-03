@@ -709,14 +709,14 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                                     end;
                                    else
                                      if(o_y1<>u)then uo_tar:=o_y1;
-                                     if(o_x1>0)or(isbuild)
+                                     if(o_x1>0)or(speed=0)
                                      then uo_id:=ua_amove
                                      else
                                      begin
                                         uo_id:=ua_move;
                                         tar1 :=0;
                                      end;
-                                     if(_canmove(u))then dir:=p_dir(x,y,uo_x,uo_y);
+                                     _unit_turn(u);
                                   end;
                                end;
                uo_action     : case o_x0 of
@@ -752,7 +752,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                             uo_y  :=o_y1;
                                             uo_bx :=-1;
                                             uo_tar:=0;
-                                            if(_canmove(u))then dir:=p_dir(x,y,uo_x,uo_y);
+                                            _unit_turn(u);
                                             case o_y0 of
                                             -2,-4: begin
                                                       uo_bx:=x;
@@ -772,9 +772,9 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                       end;
                                   1 : _unit_action(u);
                                  -2 : _unit_supgrade(u,o_y0);
-                                 -3 : if(rld>0)and(ucl=3)and(isbuild)and(bld)and(utrain=o_y0)then _unit_cupgrade(u);
+                                 -3 : if(utrain=o_y0)then _unit_cupgrade(u);
                                  -4 : _unit_straining(u,o_y0);
-                                 -5 : if(rld>0)and(ucl=1)and(isbuild)and(bld)and(utrain=o_y0)then _unit_ctraining(u);
+                                 -5 : if(utrain=o_y0)then _unit_ctraining(u);
                                end;
                  end;
 
@@ -1103,8 +1103,13 @@ begin
          FillChar(ui_bldrs_x,SizeOf(ui_bldrs_x),0);
          FillChar(ui_trnt   ,SizeOf(ui_trnt   ),0);
          FillChar(ui_trntc  ,SizeOf(ui_trntc  ),0);
-         ui_upgrc:=0;
-         ui_upgrl:=0;
+         ui_bldsc    :=0;
+         ui_uiaction :=0;
+         ui_uselected:=0;
+         ui_uimove   :=0;
+         ui_upgrc    :=0;
+         ui_upgrl    :=0;
+         ui_trntca   :=0;
          FillChar(ui_orderu ,SizeOf(ui_orderu ),0);
          FillChar(ui_upgrct ,SizeOf(ui_upgrct ),0);
          FillChar(ui_upgr   ,SizeOf(ui_upgr   ),0);

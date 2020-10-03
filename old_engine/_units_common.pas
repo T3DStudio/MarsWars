@@ -519,8 +519,6 @@ begin
    or(tu^.inapc>0)
    then exit;
 
-   if(uu^.uid=UID_UCommandCenter)and(uu^.uf=uf_ground)then exit;
-
    if(teams=false)then
    begin
       if(_uvision(_players[uu^.player].team,tu,false)=false)then exit;
@@ -540,16 +538,22 @@ begin
      if(teams)then
       if(uu^.uid in [UID_Medic,UID_Engineer])then
       begin
-         if(uu^.inapc>0)then exit;
+         //if(uu^.inapc>0)then exit;
          if(tu^.buff[ub_pain]>0)or(tu^.hits>=tu^.mhits)then exit;
          case uu^.uid of
-           UID_Medic    : if(tu^.mech)then exit;
-           UID_Engineer : if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
+         UID_Medic    : if(tu^.mech)or(uu^.inapc>0)then exit;
+         UID_Engineer : begin
+                        if(0<uu^.inapc)and(uu^.inapc<=MaxUnits)then
+                         if(tu<>@_units[uu^.inapc])then exit;
+                        if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
+                        end;
          end;
       end
       else exit;
 
-   if(teams)then exit;
+   if(uu^.uid=UID_UCommandCenter)and(uu^.uf=uf_ground)then exit;
+
+   //if(teams)then exit;
 
    if(tu^.uf=uf_fly)then
    begin
@@ -587,39 +591,6 @@ begin
 
    _unit_melee:=false;
 end;
-{
-function _canattacktar(pu,tu:PTUnit;voobshe:boolean;wp:byte=255;sd:integer=-1):byte;
-var td:integer;
-begin
-   _canattacktar:=0;
-
-   with(pu^)do
-    with(puid^)do
-    begin
-       if(wp>MaxAttacks)then exit;
-
-       if(sd= -1)then sd:=dist(x,y,tu^.x,tu^.y);
-
-       if(a_rng[wp]<0)then
-       begin
-          if(inapc>0)then exit;
-          td:=sd-(_r+tu^.puid^._r+speed)
-       end
-       else
-         if(a_rng[wp]=0)
-         then td:=sd-srng
-         else td:=sd-a_rng[wp];
-
-       if(td<=0)
-       then _canattacktar:=2
-       else
-         if(speed>0)and(uo_id[0]<>uo_hold)and(inapc=0)then
-          if(voobshe)
-          then _canattacktar:=1
-          else
-            if(sd<=srng)then _canattacktar:=1;
-    end;
-}
 
 function _canattack(u:integer):boolean;
 begin
@@ -648,9 +619,9 @@ begin
    end;
 end;
 
-function _unit_target(u,t,td:integer;voobshe:boolean):byte;
+function _unit_target(u:integer;tu:PTUnit;td:integer;voobshe:boolean):byte;
 var
-uu,tu:PTUnit;
+uu   :PTUnit;
 melee,
 teams:boolean;
 md   :integer;
@@ -658,21 +629,20 @@ begin
    _unit_target:=0;
 
    uu:=@_units[u];
-   tu:=@_units[t];
 
    teams:=_players[uu^.player].team=_players[tu^.player].team;
    if(_unit_chktar(uu,tu,td,teams))then
    begin
       melee:=_unit_melee(uu,tu,teams);
 
-      if(melee)
-      then md:=td-(uu^.r+tu^.r+uu^.speed)
+      if(melee)then
+        if(uu^.uf>uf_ground)
+        then md:=td-(uu^.r+tu^.r)
+        else md:=td-(uu^.r+tu^.r+uu^.speed)
       else
-      begin
-         if(uu^.arf>-1)and(uu^.uf=uf_ground)and(tu^.uf=uf_fly)
-         then md:=td-uu^.arf
-         else md:=td-uu^.ar;
-      end;
+        if(uu^.arf>-1)and(uu^.uf=uf_ground)and(tu^.uf=uf_fly)
+        then md:=td-uu^.arf
+        else md:=td-uu^.ar;
 
       if(md<=0)then
       begin
@@ -773,10 +743,10 @@ begin
         if(buff[i]>0)then
         begin
            dec(buff[i],1);
-           {if(i=ub_stopafa)and(OnlySVCode)then
+           if(i=ub_stopafa)and(OnlySVCode)then
             if(bld)and(speed>0)and(tar1=0)then
              if(buff[i]=0)then
-              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y); }
+              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);
         end
         else
           if(buff[i]<0)then inc(buff[i],1);
@@ -891,7 +861,7 @@ begin
          exit;
       end;
 
-      if(speed=0)then exit;
+      if(speed=0)or(buff[ub_stopafa]>0)then exit;
 
       case uid of
         UID_Flyer,
@@ -901,7 +871,7 @@ begin
         UID_APC,
         UID_FAPC : if(buff[ub_gear ]>0)
                    or(buff[ub_toxin]>0) then exit;
-        UID_UCommandCenter : if(buff[ub_clcast]>0)then exit;
+        UID_UCommandCenter: ;
       else
         if(buff[ub_pain ]>0)
         or(buff[ub_toxin]>0)
@@ -910,6 +880,16 @@ begin
 
       _canmove:=true;
    end;
+end;
+
+procedure _unit_turn(u:integer);
+begin
+   with _units[u] do
+    if(_canmove(u))then
+    begin
+       if not(uid in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
+       //:=0;
+    end;
 end;
 
 procedure _unit_upgr(u:integer);

@@ -626,7 +626,7 @@ begin
         if(skipif)or(_r=0)or(alrm_r<_r)then
         begin
            if(alrm_b)and(isbuild=false)then exit;
-           if(uo_x=x)and(uo_y=y)then
+           if(uo_x=alrm_x)and(uo_y=alrm_y)then
            begin
               uo_x:=x-base_r+random(base_rr);
               uo_y:=y-base_r+random(base_rr);
@@ -646,6 +646,11 @@ procedure ai_settar(u,tx,ty,tr,tr2:integer);
 begin
    with _units[u] do
    begin
+      if(uo_x=tx)and(uo_y=ty)then
+      begin
+         tr :=base_r;
+         tr2:=base_rr;
+      end;
       if(tr>0)then
       begin
          if(tr2=0)then tr2:=tr*2;
@@ -936,7 +941,7 @@ begin
 end;
 
 procedure _unit_ai1(u:integer);
-var ud:integer;
+var ud: integer;
 begin
    with _units[u] do
    with _players[player] do
@@ -1059,7 +1064,6 @@ begin
 
          if(race=r_hell)and(alrm_x>0)then ai_useteleport(u);
       end;
-
 
       if(uo_x>map_mw)then uo_x:=map_mw;
       if(uo_y>map_mw)then uo_y:=map_mw;

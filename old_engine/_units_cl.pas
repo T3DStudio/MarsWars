@@ -570,7 +570,7 @@ begin
          ucl    := 7;
          mech   := true;
          apcm   := 10;
-         rld_r  := 110;
+         rld_r  := 30;
          trt    := vid_fps*25;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
@@ -587,6 +587,7 @@ begin
          apcm   := 4;
          apcs   := 8;
          anims  := 17;
+         rld_r  := 30;
          trt    := vid_fps*25;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
@@ -658,6 +659,7 @@ begin
          isbuild:= true;
          renerg := 8;
          ctime  := 90;
+         rld_r  := 30;
       end;
       if(uid=UID_UMilitaryUnit)then
       begin
@@ -942,7 +944,7 @@ begin
    _setUPGR(r_hell,upgr_mainonr   ,60 ,1 ,2 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_b478tel   ,30 ,15,1 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_hinvuln   ,180,3 ,10,upgr_2tier,UID_HAltar    );
-   _setUPGR(r_hell,upgr_bldenrg   ,180,4 ,4 ,upgr_2tier,UID_HAltar    );
+   _setUPGR(r_hell,upgr_bldenrg   ,180,2 ,4 ,upgr_2tier,UID_HAltar    );
 
    _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255,255);
    _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255,255);
@@ -959,7 +961,7 @@ begin
    _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,2 ,255,255);
    _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
    _setUPGR(r_uac ,upgr_6bld      ,180,1 ,8 ,255,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,8 ,255,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,10,255,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_blizz     ,180,8 ,10,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,4 ,upgr_2tier,UID_UVehicleFactory);

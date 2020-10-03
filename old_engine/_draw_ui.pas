@@ -166,11 +166,21 @@ begin
          uy:=ui_tabsy+2;
          rectangleColor(_uipanel,ux+1,uy,ux+vid_tBW-3,ui_bottomsy-2,c_lime);
 
+         ux:=0;
+         if(u_cs[true]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[true]),ta_left,255,c_lime  );
+         if(ui_bldsc  >0)then _draw_text(_uipanel,ux+3,uy+12,i2s(ui_bldsc  ),ta_left,255,c_yellow);
+         if(u_c [true]>0)then _draw_text(_uipanel,ux+3,uy+24,i2s(u_c [true]),ta_left,255,c_orange);
+
+         ux:=vid_tBW;
+         if(u_cs[false]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[false]),ta_left,255,c_lime  );
+         if(ui_trntca  >0)then _draw_text(_uipanel,ux+3,uy+12,i2s(ui_trntca  ),ta_left,255,c_yellow);
+         if(u_c [false]>0)then _draw_text(_uipanel,ux+3,uy+24,i2s(u_c [false]),ta_left,255,c_orange);
+
          if(ui_upgrl>0)then
          begin
             ux:=vid_2tBW;
-            _draw_text(_uipanel,ux+4,uy+2 ,i2s((ui_upgrl div vid_fps)+1),ta_left,255,c_white);
-            _draw_text(_uipanel,ux+4,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
+            _draw_text(_uipanel,ux+3,uy+2 ,i2s((ui_upgrl div vid_fps)+1),ta_left,255,c_white);
+            _draw_text(_uipanel,ux+3,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
          end;
 
          uy:=(12*vid_BW)+8;
@@ -183,8 +193,7 @@ begin
          _draw_text(_uipanel,ui_energx  ,ui_iy,#19+i2s(menerg-cenerg),ta_right,255,c_aqua );
          _draw_text(_uipanel,ui_energx+2,ui_iy,i2s(menerg)           ,ta_left ,255,c_white);
 
-         _draw_text(_uipanel,ui_armyx   ,ui_iy,b2s(u_c[true ]),ta_right,255,c_green);
-         _draw_text(_uipanel,ui_armyx+2 ,ui_iy,b2s(army      ),ta_left ,255,c_white);
+         _draw_text(_uipanel,ui_armyx ,ui_iy,b2s(army      ),ta_middle,255,c_white);
 
          case ui_tab of
          0:
@@ -268,6 +277,8 @@ begin
                b2s(((ui_trnt[ui]+vid_ifps) div vid_fps)),b2s(ui_trntc[ui]),b2s(u_s [false,ui]),b2s(u_e [false,ui])                                    ,b2s(ui_apc[ui]),
                c_white                                  ,c_dyellow        ,c_lime             ,ui_muc[u_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
+
+            _drawBtn (_uipanel,2,7,spr_b_cancel,false,false);
          end;
 
          2:
@@ -311,17 +322,17 @@ begin
          end
          else
          begin
-            _drawBtn(_uipanel,0,0,spr_b_move   ,false,false);
-            _drawBtn(_uipanel,1,0,spr_b_hold   ,false,false);
-            _drawBtn(_uipanel,2,0,spr_b_patrol ,false,false);
+            _drawBtn(_uipanel,0,0,spr_b_move   ,false,ui_uimove=0);
+            _drawBtn(_uipanel,1,0,spr_b_hold   ,false,ui_uimove=0);
+            _drawBtn(_uipanel,2,0,spr_b_patrol ,false,ui_uimove=0);
 
-            _drawBtn(_uipanel,0,1,spr_b_attack ,false,false);
-            _drawBtn(_uipanel,1,1,spr_b_stop   ,false,false);
-            _drawBtn(_uipanel,2,1,spr_b_apatrol,false,false);
+            _drawBtn(_uipanel,0,1,spr_b_attack ,false,ui_uimove=0);
+            _drawBtn(_uipanel,1,1,spr_b_stop   ,false,ui_uimove=0);
+            _drawBtn(_uipanel,2,1,spr_b_apatrol,false,ui_uimove=0);
 
-            _drawBtn(_uipanel,0,2,spr_b_action ,false,false);
+            _drawBtn(_uipanel,0,2,spr_b_action ,false,ui_uiaction=0);
             _drawBtn(_uipanel,1,2,spr_b_selall ,false,false);
-            _drawBtn(_uipanel,2,2,spr_b_delete ,false,false);
+            _drawBtn(_uipanel,2,2,spr_b_delete ,false,ui_uselected=0);
          end;
 
          end;

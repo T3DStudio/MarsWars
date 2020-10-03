@@ -118,7 +118,7 @@ ub_toxin               = 2;
 ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
-//ub_stopafa             = 6;
+ub_stopafa             = 6;
 ub_clcast2             = 7;
 ub_clcast              = 8;
 ub_invis               = 9;
@@ -307,6 +307,9 @@ demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 whocaninapc            = marines+[UID_APC,UID_Terminator,UID_Tank];
 whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
+whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
+
+slowturn               = [UID_APC,UID_Tank];
 
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
 type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];

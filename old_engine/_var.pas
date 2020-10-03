@@ -284,13 +284,18 @@ ui_bldrs_r        : array[0.._uts] of integer;
 ui_muc            : array[false..true] of cardinal;
 ui_mupc           : array[false..true] of cardinal;
 ui_trnt           : array[0.._uts] of integer;
-ui_trntc          : array[0.._uts] of byte;
+ui_trntc          : array[0.._uts] of integer;
+ui_trntca         : integer = 0;
+ui_uimove         : integer = 0;
+ui_uselected      : integer = 0;
+ui_uiaction       : integer = 0;
 ui_upgrc          : byte;
 ui_upgrct         : array[0.._uts] of byte;
 ui_upgrl          : integer = 0;
 ui_upgr           : array[0.._uts] of integer;
-ui_apc            : array[0.._uts] of byte;
-ui_blds           : array[0.._uts] of byte;
+ui_apc            : array[0.._uts] of integer;
+ui_blds           : array[0.._uts] of integer;
+ui_bldsc          : integer;
 ui_alrms          : array[0..vid_uialrm_n] of TAlarm;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -483,6 +488,7 @@ spr_b_apatrol,
 spr_b_stop,
 spr_b_hold,
 spr_b_selall,
+spr_b_cancel,
 spr_b_delete,
 spr_b_knight,
 spr_b_baron,

@@ -670,7 +670,7 @@ begin
          _rudata_bstat(u,rpl);
 
          if(inapc>0)
-         then inapc:=_rudata_int(rpl,0)
+         then inapc:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)))
          else
          begin
             if(sh>0)then
@@ -687,7 +687,7 @@ begin
 
          if(sh>0)then
          begin
-            if(tar1=-1)then tar1:=_rudata_int(rpl,0);
+            if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
             if(isbuild)and(bld)then
             begin
                if(uid=UID_URadar)then
@@ -823,7 +823,7 @@ begin
    begin
       _rpls_pnu:=_PNU;
       if(_rpls_pnu=0)then _rpls_pnu:=1;
-      UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN;
+      UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
       if(UnitStepNum=0)then UnitStepNum:=1;
    end;
 
