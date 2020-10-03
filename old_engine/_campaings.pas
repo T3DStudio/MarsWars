@@ -1,4 +1,39 @@
 
+{if(uid=UID_Portal)and(buff[ub_advanced]>0)and(rld=0)then
+begin
+   repeat
+      inc(utrain,1);
+      utrain:=utrain mod 32;
+      if(g_addon=false)and(utrain>6)then continue;
+   until (_cmp_untCndt(rld_a,utrain)=false)or(utrain=31);
+
+   if(utrain<31)then
+   begin
+      _lcu:=0;
+
+      case g_mode of
+        gm_coop: if(random(2)=0)
+                 then rld:=cl2uid[r_hell,false,utrain]
+                 else rld:=cl2uid[r_uac ,false,utrain];
+      else
+         rld:=cl2uid[race,false,utrain];
+      end;
+
+      if(rld<>UID_FAPC)then
+       if(u_e[false,utrain]<_ulst[rld].max)then _unit_add(x-60+random(120),y-60+random(120),rld,rld_a,true);
+
+      if(_lcu>0)then
+      begin
+         {$IFDEF _FULLGAME}
+         PlaySND(snd_teleport,u);
+         _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+1,EID_Teleport);
+         {$ENDIF}
+         if(g_mode=gm_coop)and(player=0)then _lcup^.buff[ub_advanced]:=_bufinf;
+      end;
+   end;
+   rld:=rld_r;
+end;  }
+
 procedure _cmp_initmap;
 var x:byte;
 begin

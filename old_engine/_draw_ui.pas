@@ -198,7 +198,7 @@ begin
          case ui_tab of
          0:
          begin
-            for ui:=0 to 8 do
+            for ui:=0 to 23 do
             begin
                if(cl2uid[race ,true,ui]=0)then continue;
                if(u_e[true,ui]=0)then
@@ -233,29 +233,11 @@ begin
                     end;
                end;
             end;
-
-            ux:=0;
-            uy:=7;
-
-            case race of
-            r_hell : begin
-                        _drawBtn (_uipanel,ux,uy,spr_b_b[race,12],false,u_e[true,12]=0);
-                        _drawBtnt(_uipanel,ux,uy,
-                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
-                        0 ,0 ,c_lime            ,c_orange          ,0);
-                     end;
-            r_uac  : begin
-                        _drawBtn (_uipanel,ux,uy,spr_b_b[race,12],false,u_e[true,12]=0);
-                        _drawBtnt(_uipanel,ux,uy,
-                        '','',b2s(u_s [true,12]),b2s(u_e [true,12]),'',
-                        0 ,0 ,c_lime            ,c_orange          ,0 );
-                     end;
-            end;
          end;
 
          1:
          begin
-            for ui:=0 to 18 do
+            for ui:=0 to 23 do
             begin
                if(cl2uid[race ,false,ui]=0)then continue;
                if(u_e[false,ui]=0)then
@@ -277,8 +259,6 @@ begin
                b2s(((ui_trnt[ui]+vid_ifps) div vid_fps)),b2s(ui_trntc[ui]),b2s(u_s [false,ui]),b2s(u_e [false,ui])                                    ,b2s(ui_apc[ui]),
                c_white                                  ,c_dyellow        ,c_lime             ,ui_muc[u_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
-
-            _drawBtn (_uipanel,2,7,spr_b_cancel,false,false);
          end;
 
          2:
@@ -294,19 +274,19 @@ begin
                _drawBtn(_uipanel,ux,uy,spr_b_up[race,ui],ui_upgr[ui]>0, _upgrreq(HPlayer,ui) or (ui_upgrc=(u_e[true,3]-ui_blds[3]))or(ubx[3]=0));
 
                _drawBtnt(_uipanel,ux,uy,
-               b2s(((ui_upgr[ui]+vid_ifps) div vid_fps)),b2s(ui_upgrct[ui]),b2s(upgr[ui])                          ,'','',
-               c_white                                  ,c_dyellow         ,ui_mupc[upgr[ui]>=upgrade_cnt[race,ui]],0 ,0);
+               b2s(((ui_upgr[ui]+vid_ifps) div vid_fps)),b2s(ui_upgrct[ui]),'',b2s(upgr[ui]),'',
+               c_white                                  ,c_dyellow         ,0 ,ui_muc [upgr[ui]>=upgrade_cnt[race,ui]] ,0);
             end;
          end;
 
          3:
          if(_rpls_rst>=rpl_rhead)then
          begin
-            _drawBtn(_uipanel,0,3,spr_b_rfast,_fsttime  ,false);
-            _drawBtn(_uipanel,1,3,spr_b_rskip,false     ,false);
-            _drawBtn(_uipanel,2,3,spr_b_rstop,g_paused>0,false);
-            _drawBtn(_uipanel,0,4,spr_b_rfog ,_fog      ,false);
-            _drawBtn(_uipanel,1,4,spr_b_rlog ,_rpls_log ,false);
+            _drawBtn(_uipanel,0,3,spr_b_rfog ,_fog      ,false);
+            _drawBtn(_uipanel,1,3,spr_b_rlog ,_rpls_log ,false);
+            _drawBtn(_uipanel,0,4,spr_b_rfast,_fsttime  ,false);
+            _drawBtn(_uipanel,1,4,spr_b_rskip,false     ,false);
+            _drawBtn(_uipanel,2,4,spr_b_rstop,g_paused>0,false);
 
             for ui:=0 to MaxPlayers do
             begin
@@ -333,6 +313,8 @@ begin
             _drawBtn(_uipanel,0,2,spr_b_action ,false,ui_uiaction=0);
             _drawBtn(_uipanel,1,2,spr_b_selall ,false,false);
             _drawBtn(_uipanel,2,2,spr_b_delete ,false,ui_uselected=0);
+
+            _drawBtn(_uipanel,2,3,spr_b_cancel,false,false);
          end;
 
          end;
@@ -342,7 +324,7 @@ begin
 end;
 
 procedure D_hints;
-var i:byte;
+var i,uid:byte;
 begin
    if(m_bx<3)and(m_by>=3)and(m_by<=13)then
    begin
@@ -360,16 +342,32 @@ begin
         begin
            case ui_tab of
            0 : case i of
-               0 ..8  : if(_bc_g(a_build,i)=false)or(cl2uid[race ,true,i]=0)
-                        then exit
-                        else
-                          if((G_addon=false)and(cl2uid[race ,true,i] in t2))then exit;
+               0 ..23 : begin
+                           uid:=cl2uid[race ,true,i];
+                           if(uid=0)
+                           then exit
+                           else
+                             if(uid_e[uid]=0)then
+                             begin
+                                if(_bc_g(a_build,i)=false)then exit;
+                                if((G_addon=false)and(uid in t2))then exit;
+                             end;
+                           _draw_text(_screen,ui_textx,vid_mh-30,str_un_hint[uid],ta_left,255,c_white);
+                        end;
                end;
            1 : case i of
-               0..18  : if(_bc_g(a_units,i)=false)or(cl2uid[race ,false,i]=0)
-                        then exit
-                        else
-                          if((G_addon=false)and(cl2uid[race ,false,i] in t2))then exit;
+               0..23  : begin
+                           uid:=cl2uid[race ,false,i];
+                           if(uid=0)
+                           then exit
+                           else
+                             if(uid_e[uid]=0)then
+                             begin
+                                if(_bc_g(a_units,i)=false)then exit;
+                                if((G_addon=false)and(uid in t2))then exit;
+                             end;
+                           _draw_text(_screen,ui_textx,vid_mh-30,str_un_hint[uid],ta_left,255,c_white);
+                        end;
                end;
            2 : begin
                   if(i<=MaxUpgrs)then
@@ -377,16 +375,18 @@ begin
                      if(_bc_g(a_upgr,i)=false)then exit;
                      if(g_addon=false)and(i>=upgr_2tier)then exit;
                   end;
-                  //
+                  _draw_text(_screen,ui_textx,vid_mh-30,str_up_hint[i+(race*_uts)],ta_left,255,c_white);
                end;
-           3 : if(_rpls_rst>=rpl_rhead)then
-               begin
-                  if(i<9)then exit;
-               end
-               else
-                  if(i>8)then exit;
+           3 : begin
+                  if(_rpls_rst>=rpl_rhead)then
+                  begin
+                     if(i=11)or(i<9)then exit;
+                  end
+                  else
+                     if(i<>11)and(i>8)then exit;
+                  _draw_text(_screen,ui_textx,vid_mh-30,str_hint[ui_tab,race,i],ta_left,255,c_white);
+               end;
            end;
-           _draw_text(_screen,ui_textx,vid_mh-30,str_hint[ui_tab,race,i],ta_left,255,c_white);
         end;
       end;
    end;

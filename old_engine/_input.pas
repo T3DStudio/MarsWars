@@ -152,19 +152,19 @@ begin
         if(_rpls_rst>=rpl_rhead)then
         begin
            case k of
-                    sdlk_Q      : _fsttime:=not _fsttime;
-                    sdlk_W      : if(k_ctrl>1)
+                    sdlk_Q      : _fog:=not _fog;
+                    sdlk_W      : _rpls_log:=not _rpls_log;
+                    sdlk_A      : _fsttime:=not _fsttime;
+                    sdlk_S      : if(k_ctrl>1)
                                   then _rpls_step:=vid_hfps*10
                                   else
                                     if(k_alt>1)
                                     then _rpls_step:=vid_hfps*60
                                     else _rpls_step:=vid_hfps*2;
-                    sdlk_E      : if(_rpls_rst<rpl_end)then
+                    sdlk_D      : if(_rpls_rst<rpl_end)then
                                    if(G_Paused>0)
                                    then G_Paused:=0
                                    else G_Paused:=200;
-                    sdlk_A      : _fog:=not _fog;
-                    sdlk_S      : _rpls_log:=not _rpls_log;
                     sdlk_Z      : HPlayer:=0;
                     sdlk_X      : HPlayer:=1;
                     sdlk_C      : HPlayer:=2;
@@ -178,9 +178,6 @@ begin
 
         if(G_Paused=0)then
         case k of
-          sdlk_space     : if(k_ctrl>0)
-                           then _player_s_o(2,0,0,0,uo_action ,HPlayer)
-                           else _player_s_o(2,1,0,0,uo_action ,HPlayer);
           sdlk_Q         : m_sbuild:=-1;
           sdlk_W         : _player_s_o(2,0,0,0,uo_action ,HPlayer);
           sdlk_E         : m_sbuild:=-2;
@@ -188,6 +185,10 @@ begin
           sdlk_S         : _player_s_o(2,1,0,0,uo_action ,HPlayer);
           sdlk_D         : m_sbuild:=-4;
           sdlk_Z         : _player_s_o(1,0,0,0,uo_action ,HPlayer);
+          sdlk_C         : case ui_tab of
+                           1 : _player_s_o(-5,-1,0,0,uo_action ,HPlayer);
+                           2 : _player_s_o(-3,-1,0,0,uo_action ,HPlayer);
+                           end;
           sdlk_0..sdlk_9 :  begin
                                ko:=_event^.key.keysym.sym-sdlk_0;
                                if (k_ctrl>1)
@@ -551,6 +552,10 @@ begin
                     begin
                         case m_by of
                      7 :begin
+                           if(m_bx=0)then _fog:=not _fog;
+                           if(m_bx=1)then _rpls_log:=not _rpls_log;
+                        end;
+                     8 :begin
                            if(m_bx=0)then _fsttime:=not _fsttime;
                            if(m_bx=1)then _rpls_step:=vid_hfps*2;
                            if(m_bx=2)then
@@ -558,10 +563,6 @@ begin
                              if(G_Paused>0)
                              then G_Paused:=0
                              else G_Paused:=200;
-                        end;
-                     8 :begin
-                           if(m_bx=0)then _fog:=not _fog;
-                           if(m_bx=1)then _rpls_log:=not _rpls_log;
                         end;
                      9 :begin
                            if(m_bx=0)then HPlayer:=0;
@@ -678,7 +679,7 @@ begin
                 end;
             3 : if(_rpls_rst>=rpl_rhead)then
                 begin
-                   if(m_by=7)and(m_bx=1)then _rpls_step:=vid_hfps*10;
+                   if(m_by=8)and(m_bx=1)then _rpls_step:=vid_hfps*10;
                 end;
             end;
          end;

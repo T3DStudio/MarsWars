@@ -186,12 +186,13 @@ begin
    with _players[player] do
    begin
       if(tu^.isbuild)and(tu^.uf=uf_ground)and(tu^.speed=0)then
-       if(ud<ai_bd)and(tu^.ucl<9)and(tu^.buff[ub_invis]=0)then
-       begin
-          ai_bd:=ud;
-          ai_bx:=tu^.x;
-          ai_by:=tu^.y;
-       end;
+       if(ud<ai_bd)and(tu^.buff[ub_invis]=0)then
+        if not(tu^.uid in [UID_Mine,UID_HEye])then
+        begin
+           ai_bd:=ud;
+           ai_bx:=tu^.x;
+           ai_by:=tu^.y;
+        end;
 
       if(tu^.isbuild=false)then
        if(ud<ai_ud)then
@@ -876,7 +877,6 @@ begin
             end;
         end;
 
-
       case ai_attack of
       0,1 : begin
                if(ai_attack=1)then
@@ -922,21 +922,22 @@ begin
        else
          if(ucl>2)and(max>1)then order:=0;
 
+      if(u_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
+
       case g_mode of
       gm_inv : if(player<>0)then order:=0;
       gm_coop: if(player= 0)then
                begin
                   order:=0;
-                  if(dist2(x,y,map_psx[0],map_psy[0])>base_ir)then
+                  if(dist2(x,y,map_psx[0],map_psy[0])>base_ir)and(tar1=0)then
                   begin
+                      uo_id :=ua_move;
                       tar1  :=0;
                       tar1d :=32000;
                       alrm_r:=32000;
                   end;
                end;
       end;
-
-      if(u_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
    end;
 end;
 
@@ -992,6 +993,9 @@ begin
                end;
             end;
 
+            //if(player=0)and(g_mode=gm_coop)
+            //then ai_settar(u,ai_bx,ai_by,base_r,base_rr)
+            //else
             if(alrm_r<32000)then
             begin
                if(alrm_r<base_r)or(order=2)or(alrm_b)or((g_mode=gm_inv)and(alrm_r<base_3r))or(ai_bx=0)

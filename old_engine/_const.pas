@@ -226,6 +226,7 @@ MID_Blizzard           = 120;
 MID_ArchFire           = 121;
 MID_Flyer              = 122;
 
+
 UID_LostSoul           = 1;
 UID_Imp                = 2;
 UID_Demon              = 3;
@@ -263,17 +264,17 @@ UID_Flyer              = 42;
 UID_Mine               = 43;
 UID_UTransport         = 44;
 
-UID_HMilitaryUnit      = 50;
-UID_HKeep              = 51;
-UID_HGate              = 52;
-UID_HSymbol            = 53;
-UID_HPools             = 54;
-UID_HTower             = 55;
-UID_HTeleport          = 56;
-UID_HMonastery         = 57;
-UID_HTotem             = 58;
-UID_HAltar             = 59;
-UID_HFortress          = 60;
+UID_HKeep              = 50;
+UID_HGate              = 51;
+UID_HSymbol            = 52;
+UID_HPools             = 53;
+UID_HTower             = 54;
+UID_HTeleport          = 55;
+UID_HMonastery         = 56;
+UID_HTotem             = 57;
+UID_HAltar             = 58;
+UID_HFortress          = 59;
+UID_HMilitaryUnit      = 60;
 
 UID_UCommandCenter     = 61;
 UID_UMilitaryUnit      = 62;
@@ -296,6 +297,10 @@ UID_UCBuild            = 77;
 UID_USPort             = 78;
 
 UID_Portal             = 90;
+UID_CoopPortal         = 91;
+
+uids_hell              = [UID_LostSoul..UID_ZBFG,UID_HKeep..UID_HMilitaryUnit];
+uids_uac               = [UID_Engineer..UID_UTransport,UID_UCommandCenter..UID_USPort];
 
 t2                     = [UID_URocketL,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
@@ -308,6 +313,8 @@ whocaninapc            = marines+[UID_APC,UID_Terminator,UID_Tank];
 whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
 whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
+
+coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
 slowturn               = [UID_APC,UID_Tank];
 

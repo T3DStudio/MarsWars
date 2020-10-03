@@ -367,7 +367,7 @@ begin
               if(buff[ub_invis    ]>0 )then inv:=128;
               if(buff[ub_invuln   ]>10)then mc:=c_awhite;
 
-              if(g_mode=gm_inv)and(player=0)then mc:=c_ablack;
+              if(g_mode in [gm_inv,gm_coop])and(player=0)then mc:=c_ablack;
 
               dp:=_udpth(u);
 
@@ -520,9 +520,8 @@ begin
        _unit_dec_Rcntrs(u);
 
        if(G_WTeam=255)then
-        if(player<>0)or(g_mode<>gm_inv)then
-         if(army=0)
-         {$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+        if(player<>0)or not(g_mode in [gm_inv,gm_coop])then
+         if(army=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          and(state>ps_none)then net_chat_add(name+str_player_def,player,255);
     end;
 end;
@@ -764,7 +763,7 @@ begin
             arm:=0;
          end;
 
-         if(g_mode=gm_inv)and(player=0)then dam:=dam div 2;
+         if(g_mode in [gm_inv,gm_coop])and(player=0)then dam:=dam div 2;
       end;
 
       dec(dam,arm);
@@ -2045,13 +2044,14 @@ begin
    end;
 end;
 
-function _u1_spawn(u,sx:integer):boolean;
+function _u1_spawn(u,sx,sy:integer):boolean;
 begin
   _u1_spawn:=false;
    with _units[u] do
     with _players[player] do
     begin
-       _unit_add(x+sx,y+r+_ulst[cl2uid[race,false,utrain]].r,cl2uid[race,false,utrain],player,true);
+       if(sy=32000)then sy:=r;
+       _unit_add(x+sx,y+sy+_ulst[cl2uid[race,false,utrain]].r,cl2uid[race,false,utrain],player,true);
        if(_lcu>0)then
        begin
           _u1_spawn:=true;
@@ -2059,6 +2059,7 @@ begin
           _lcup^.uo_y   :=uo_y;
           _lcup^.uo_id  :=uo_id;
           _lcup^.uo_tar :=uo_tar;
+          _unit_turn(_lcu);
 
           if(uid=uid_HGate)then
           begin
@@ -2072,6 +2073,31 @@ begin
     end;
 end;
 
+procedure _unit_portalspawn(u:integer;uids:TSoB);
+begin
+   with _units[u] do
+   with _players[player] do
+   if(rld=0)then
+   begin
+      repeat
+         inc(utrain,1);
+      until utrain in uids;
+
+      _unit_add(x,y,utrain,player,true);
+
+      if(_lcu>0)then
+      begin
+         _lcup^.buff[ub_teleeff]:=vid_fps;
+         {$IFDEF _FULLGAME}
+         PlaySND(snd_teleport,u);
+         _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+5,EID_Teleport);
+         {$ENDIF}
+      end;
+
+      rld:=army;
+   end;
+end;
+
 procedure _unit_code2(u:integer);
 begin
    with _units[u] do
@@ -2079,7 +2105,6 @@ begin
    begin
       if(onlySVCode)then
       begin
-
          {$IFDEF _FULLGAME}
          if(player=0)and(_testdmg)then
           if(sel)then
@@ -2124,7 +2149,7 @@ begin
             else
               if(bld=false)then
               begin
-                 if(menerg<cenerg){or(bldrs=0)  }
+                 if(menerg<cenerg)
                  then _unit_kill(u,false,false)
                  else
                    if(buff[ub_pain]=0)then
@@ -2165,9 +2190,9 @@ begin
                           rld:=0;
                           dec(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
 
-                          if(_u1_spawn(u,0))and(player=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(cl2uid[race,false,utrain]);{$ELSE};{$ENDIF}
+                          if(_u1_spawn(u,0,32000))and(player=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(cl2uid[race,false,utrain]);{$ELSE};{$ENDIF}
 
-                          if(buff[ub_advanced]>0)then _u1_spawn(u,30);
+                          if(buff[ub_advanced]>0)then _u1_spawn(u,30,32000);
                        end;
 
                     if(ucl=3)then
@@ -2187,82 +2212,13 @@ begin
                        end;
                  end;
 
-                 if(uid=UID_Portal)and(buff[ub_advanced]>0)and(rld=0)then
-                 begin
-                    repeat
-                       inc(utrain,1);
-                       utrain:=utrain mod 32;
-                       if(g_addon=false)and(utrain>6)then continue;
-                    until (_cmp_untCndt(rld_a,utrain)=false)or(utrain=31);
-
-                    if(utrain<31)then
-                    begin
-                       _lcu:=0;
-
-                       case g_mode of
-                         gm_coop: if(random(2)=0)
-                                  then rld:=cl2uid[r_hell,false,utrain]
-                                  else rld:=cl2uid[r_uac ,false,utrain];
-                       else
-                          rld:=cl2uid[race,false,utrain];
-                       end;
-
-                       if(rld<>UID_FAPC)then
-                        if(u_e[false,utrain]<_ulst[rld].max)then _unit_add(x-60+random(120),y-60+random(120),rld,rld_a,true);
-
-                       if(_lcu>0)then
-                       begin
-                          {$IFDEF _FULLGAME}
-                          PlaySND(snd_teleport,u);
-                          _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+1,EID_Teleport);
-                          {$ENDIF}
-                          if(g_mode=gm_coop)and(player=0)then _lcup^.buff[ub_advanced]:=_bufinf;
-                       end;
-                    end;
-                    rld:=rld_r;
-                 end;
-                 {if(uid=UID_USPort)and(rld=0)then
-                 begin
-                    _lcu:=0;
-                    _unit_add(x,y,UID_UTransport,player,true);
-                    if(_lcu>0)then
-                    begin
-                       {$IFDEF _FULLGAME}
-                       ui_addalrm(mmx,mmy,isbuild);
-                       {$ENDIF}
-
-                       uo_x:=random(map_mw);
-                       uo_y:=random(map_mw);
-
-                       case random(2) of
-                         0 : if(uo_x>3000)
-                             then uo_x:=map_mw
-                             else uo_x:=0;
-                         1 : if(uo_y>3000)
-                             then uo_y:=map_mw
-                             else uo_y:=0;
-                       end;
-
-                       _lcup^.uo_x:= uo_x;
-                       _lcup^.uo_y:= uo_y;
-                       _lcup^.vsnt[_players[HPlayer].team]:=_bufinf;
-                    end;
-
-                    rld:=rld_r;
-                 end;}
-
+                 if(uid=UID_CoopPortal)then _unit_portalspawn(u,coopspawn);
               end;
          end;
       end;
 
-      if(hits<=0)then exit;
-
-      if(isbuild)and(bld)then
+      if(hits>0)and(isbuild)and(bld)then
        if(ubx[ucl]=0)then ubx[ucl]:=u;
-
-
-
-      //if(_canattack(u))then _unit_attack(u);
    end;
 end;
 
@@ -2588,24 +2544,16 @@ end;
 
 procedure _make_coop;
 begin
-   if(onlySVCode)then
-   begin
-      _unit_add(map_psx[0]+75,map_psy[0]+75,UID_Portal,0,true);
-      _units[1].buff[ub_advanced]:=_bufinf;
-      _units[1].rld_a:=0;
-      _unit_add(map_psx[0]-80 ,map_psy[0]-80,UID_HFortress,0,true);
-      _unit_add(map_psx[0]+125,map_psy[0]-90,UID_HMilitaryUnit,0,true);
-      _unit_add(map_psx[0]-125,map_psy[0]+90,UID_HMilitaryUnit,0,true);
-   end;
+   if(onlySVCode)then _unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
 
    with _players[0] do
    begin
-      ai_skill:=7;
+      ai_skill:=4;
       _setAI(0);
       ai_attack:=0;
       ai_pushpart:=100;
-      _bc_ss(@a_units,[0..21]);
-      _bc_ss(@a_build,[3,4,6,7]);
+      _bc_ss(@a_units,[]);
+      _bc_ss(@a_build,[]);
       _upgr_ss(@upgr ,[0..MaxUpgrs],race,10);
       _bc_us  (@a_upgr ,upgr_b478tel);
       upgr[upgr_b478tel]:=0;

@@ -267,12 +267,12 @@ begin
            if(sel)then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);
         end;
 
+        if(player=HPlayer)then
+         lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);
 
         _draw_text(_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa]), ta_left,255, plcolor[player]);
 
         if(inapc>0)then continue;
-
-
 
         if(hits>0){and(uid=UID_URocketL)}then
         begin
@@ -292,7 +292,7 @@ begin
          then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_black)
          else
            if(alrm_x<>0)then
-            lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,plcolor[player]);
+
 
         _draw_text(_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_left,255, plcolor[player]);// }
 

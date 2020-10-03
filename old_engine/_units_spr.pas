@@ -449,6 +449,7 @@ UID_HMilitaryUnit  : _unit_spr:=@spr_HBar;
 UID_UCBuild        : _unit_spr:=@spr_cbuild[anims];
 UID_USPort         : _unit_spr:=@spr_sport[anims];
 
+UID_CoopPortal,
 UID_Portal         : _unit_spr:=@spr_u_portal;
 
     end

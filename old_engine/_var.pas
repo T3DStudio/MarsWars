@@ -282,7 +282,7 @@ ui_bldrs_x        : array[0.._uts] of integer;
 ui_bldrs_y        : array[0.._uts] of integer;
 ui_bldrs_r        : array[0.._uts] of integer;
 ui_muc            : array[false..true] of cardinal;
-ui_mupc           : array[false..true] of cardinal;
+//ui_mupc           : array[false..true] of cardinal;
 ui_trnt           : array[0.._uts] of integer;
 ui_trntc          : array[0.._uts] of integer;
 ui_trntca         : integer = 0;
@@ -566,8 +566,10 @@ str_camp_m        : array[0..MaxMissions] of shortstring;
 
 str_un_name,
 str_un_descr,
+str_un_hint,
 str_up_name,
-str_up_descr      : array[0..255] of shortstring;
+str_up_descr,
+str_up_hint       : array[0..255] of shortstring;
 
 str_connect,
 str_svup,

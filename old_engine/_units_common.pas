@@ -86,6 +86,7 @@ begin
    _udpth:=0;
    with _units[u] do
     case uid of
+UID_CoopPortal,
 UID_Portal   : _udpth:=-5;
 UID_HTeleport: _udpth:=-4;
 UID_HSymbol,
@@ -445,6 +446,9 @@ begin
          _unit_add(bx,by,cl2uid[race,true,bt],bp,false);
          if(_lcu>0)then
          begin
+            {$IFDEF _FULLGAME}
+            if(_warpten=false)then
+            {$ENDIF}
             bld_r:=vid_fps+u_c[true];
             inc(cenerg,_ulst[cl2uid[race,true,bt]].renerg);
             {$IFDEF _FULLGAME}
