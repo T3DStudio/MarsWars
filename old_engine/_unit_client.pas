@@ -112,34 +112,34 @@ begin
          begin
             if(uid in whocanattack)and(tar1>0)then _wudata_int(tar1,rpl);
             if(isbuild)and(bld)then
-            begin
-               if(uid=UID_URadar)then
-                if(rpl)or(_players[_pl].team=_players[player].team)then
-                begin
-                   if(rld<=0)
-                   then i:=0
-                   else i:=(rld div vid_fps)+1;
-                   _wudata_byte(i,rpl);
-                   if(i>19)then
-                   begin
-                      _wudata_int(uo_x ,rpl);
-                      _wudata_int(uo_y ,rpl);
-                   end;
-                end;
-               if(uid=UID_URocketL)then
-               begin
-                  if(rld<=0)
-                  then i:=0
-                  else i:=rld;
-                  _wudata_byte(i,rpl);
-                  if(i>0)then
+             case uid of
+               UID_URadar:
+                  if(rpl)or(_players[_pl].team=_players[player].team)then
                   begin
-                     _wudata_int(uo_x ,rpl);
-                     _wudata_int(uo_y ,rpl);
+                     if(rld<=0)
+                     then i:=0
+                     else i:=(rld div vid_fps)+1;
+                     _wudata_byte(i,rpl);
+                     if(i>19)then
+                     begin
+                        _wudata_int(uo_x ,rpl);
+                        _wudata_int(uo_y ,rpl);
+                     end;
                   end;
-               end;
-               //
-            end;
+               UID_URocketL:
+                  begin
+                     if(rld<=0)
+                     then i:=0
+                     else i:=(rld div vid_fps)+1;
+                     _wudata_byte(i,rpl);
+                     if(i>0)then
+                     begin
+                        _wudata_int(uo_x ,rpl);
+                        _wudata_int(uo_y ,rpl);
+                     end;
+                  end;
+             end;
+
 
             if(rpl=false)and(player=_pl)then
             begin
@@ -689,8 +689,8 @@ begin
          begin
             if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
             if(isbuild)and(bld)then
-            begin
-               if(uid=UID_URadar)then
+             case uid of
+              UID_URadar:
                 if(rpl)or(_players[_pl].team=_players[player].team)then
                 begin
                    i  :=_rudata_byte(rpl,0);
@@ -703,28 +703,20 @@ begin
                       uo_y:=_rudata_int(rpl,-1000);
                    end;
                 end;
-               if(uid=UID_URocketL)then
-               begin
-                  if(rld=0)then
-                  begin
-                     rld :=_rudata_byte(rpl,0);
-                     if(rld>0)then
-                     begin
-                        uo_x:=_rudata_int(rpl,0);
-                        uo_y:=_rudata_int(rpl,0);
-                     end;
-                  end
-                  else
-                  begin
-                     rld_a:=_rudata_byte(rpl,0);
-                     if(rld_a>0)then
-                     begin
-                        _rudata_int(rpl,0);
-                        _rudata_int(rpl,0);
-                     end;
-                  end;
-               end;
-            end;
+              UID_URocketL:
+                begin
+                   i  :=_rudata_byte(rpl,0);
+                   if(i=0)
+                   then rld:=0
+                   else rld:=i*vid_fps-1;
+
+                   if(i>0)then
+                   begin
+                      uo_x:=_rudata_int(rpl,0);
+                      uo_y:=_rudata_int(rpl,0);
+                   end;
+                end;
+             end;
 
             if(rpl=false)and(player=HPlayer)then
             begin

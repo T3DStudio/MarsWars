@@ -2314,6 +2314,9 @@ begin
             if(tu^.uid=UID_UVehicleFactory)then
              if(tdm<=melee_r)and(tu^.rld=0)and(isbuild=false)then
              begin
+                uo_x  :=x;
+                uo_y  :=y;
+                uo_tar:=0;
                 if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]=0)then
                 begin
                    _unit_UACUpgr(u,tu);
@@ -2321,9 +2324,6 @@ begin
                    uo_y  :=tu^.uo_y;
                    uo_tar:=tu^.uo_tar;
                 end;
-                uo_x  :=x;
-                uo_y  :=y;
-                uo_tar:=0;
                 exit;
              end;
          end;

@@ -696,12 +696,6 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                    UID_HGate,
                                    UID_UMilitaryUnit,
                                    UID_HMilitaryUnit,
-                                   UID_HTeleport  : begin
-                                                       if(o_y1<>u)then uo_tar:=o_y1;
-                                                       if(o_x1>0)
-                                                       then uo_id:=ua_amove
-                                                       else uo_id:=ua_move;
-                                                    end;
                                    UID_HSymbol,
                                    UID_HTower,
                                    UID_HTotem     : begin

@@ -338,7 +338,9 @@ begin
    if(m_bx<3)and(m_by>=3)and(m_by<=13)then
    begin
       case m_by of
-      3  : if(m_vy>ui_tabsy)then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW],ta_left,255,c_white);
+      3  : if(m_vy>ui_tabsy)
+           then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW ],ta_left,255,c_white)
+           else _draw_text(_screen,ui_textx,vid_mh-30,str_hint_a[m_vx div vid_2tBW],ta_left,255,c_white);
       12 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;

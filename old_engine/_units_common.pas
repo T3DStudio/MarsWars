@@ -703,7 +703,7 @@ procedure _teleport_rld(tu:PTUnit;ur:integer);
 begin
    with tu^ do
     with _players[player] do
-     if(upgr[upgr_5bld] in [0..3])then rld:=ur-((ur div 4)*upgr[upgr_5bld]);
+     if(upgr[upgr_5bld] in [0..3])then rld:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
 end;
 
 procedure _unit_teleport(u,tx,ty:integer);
@@ -756,8 +756,7 @@ begin
           if(buff[i]<0)then inc(buff[i],1);
 
       if(onlySVCode)
-      or(uid in whocanattack)
-      or(uid in [UID_URocketL])then
+      or(uid in whocanattack)then
        if(rld>0)then dec(rld,1);
 
       for i:=0 to MaxPlayers do

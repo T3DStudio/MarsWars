@@ -560,6 +560,7 @@ str_npnua,
 str_pnua          : array[0..9] of shortstring;
 str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
+str_hint_a        : array[0..1] of shortstring;
 str_hint_m        : array[0..2] of shortstring;
 str_hint          : array[0..3,1..2,0.._uts] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');

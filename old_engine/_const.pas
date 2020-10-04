@@ -312,7 +312,6 @@ demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 whocaninapc            = marines+[UID_APC,UID_Terminator,UID_Tank];
 whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
-whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
@@ -365,7 +364,6 @@ radar_rlda             : array[0..5] of integer = (radar_time-vid_fps*3,radar_ti
 radar_rsg              : array[0..5] of integer = (200,225,250,275,300,325);
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
-ut2                    : array[1..2] of byte = (6,8);
 missile_mr             = 500;
 gear_time              : array[false..true] of byte = (vid_fps,vid_fps*2);
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
@@ -373,8 +371,6 @@ dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 rocket_sr              = 45;
 map_ffly_fapc          : array[false..true] of byte = (3,6);
 towers_sr              : array[0..4] of integer = (250,265,290,305,320);
-//blizz_w                = 200;
-//blizz_ww               = blizz_w*2;
 blizz_r                = 150;
 mech_adv_rel           : array[false..true] of integer = (vid_fps*12,vid_fps*6);
 uac_adv_rel            : array[false..true] of integer = (vid_fps*3,vid_fps);
@@ -390,6 +386,8 @@ _d2shi                 = abs(dead_hits div 126)+1;   // 5
 _sbs_ucls              = [5,6,8];
 
 {$IFDEF _FULLGAME}
+
+whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
 
 _buffst                : array[false..true] of smallint = (0,_bufinf);
 
