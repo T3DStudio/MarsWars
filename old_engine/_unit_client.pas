@@ -68,7 +68,7 @@ begin
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
       SetBBit(@_bts1,5, (uid in whocanattack)and(tar1>0));
-      SetBBit(@_bts1,6, sel                 ); // and(_pl=player) (rpl=false)
+      SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
       _wudata_byte(_bts1,rpl);

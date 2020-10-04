@@ -80,9 +80,11 @@ begin
 end;
 
 procedure _rpls_code;
+const vxyc = 5;
 var  i :byte;
      fn:shortstring;
      fs:cardinal;
+_vx,_vy:byte;
 begin
    if(G_Started=false)or(_rpls_rst=rpl_none)then
    begin
@@ -118,6 +120,7 @@ begin
                          _rpls_fileo:=true;
                          _rpls_u    :=101;
                          _rpls_nwrch:=true;
+                         _rpls_vidm :=false;
 
                          BlockWrite(_rpls_file,Ver        ,SizeOf(Ver     ));
                          BlockWrite(_rpls_file,map_seed   ,SizeOf(map_seed));
@@ -149,11 +152,16 @@ begin
                    end;
      rpl_wunit   : if((vid_rtui mod 2)=0) then
                    begin
-                      i:=0;
-                      if(_rpls_nwrch)then i:=%10000000;
-                      i:=i+(G_Paused and %01111111);
+                      _vx:=byte(vid_vx shr vxyc);
+                      _vy:=byte(vid_vy shr vxyc);
 
-                      if(_rpls_nwrch)or(G_Paused=0)then
+                      i:=0;
+                      if(_rpls_nwrch    )then i:=i or %10000000;
+                      if(_rpls_vidx<>_vx)
+                      or(_rpls_vidy<>_vy)then i:=i or %01000000;
+                      i:=i or (G_Paused and %00111111);
+
+                      if((i and %11000000)>0)or(G_Paused=0)then
                       begin
                          {$I-}
                          BlockWrite(_rpls_file,i,sizeof(i));
@@ -161,6 +169,13 @@ begin
                          begin
                             BlockWrite(_rpls_file,net_chat,sizeof(net_chat));
                             _rpls_nwrch:=false;
+                         end;
+                         if((i and %01000000)>0)then
+                         begin
+                            _rpls_vidx:=_vx;
+                            _rpls_vidy:=_vy;
+                            BlockWrite(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
+                            BlockWrite(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
                          end;
                          {$I+}
 
@@ -278,6 +293,7 @@ begin
                             _rpls_fileo:=true;
                             _rpls_rst  :=rpl_runit;
                             _rpls_pnu  :=0;
+                            _rpls_vidm :=false;
 
                             Map_premap;
                             _makeMMB;
@@ -294,44 +310,55 @@ begin
                    end;
      rpl_runit   : if((vid_rtui mod 2)=0)then
                    begin
-                        if(eof(_rpls_file)or(ioresult<>0))then
-                        begin
-                           _rpls_fileo:=false;
-                           _rpls_rst:=rpl_end;
-                           close(_rpls_file);
-                           G_Paused:=1;
-                           _fsttime:=false;
-                           exit;
-                        end;
+                       if(eof(_rpls_file)or(ioresult<>0))then
+                       begin
+                          _rpls_fileo:=false;
+                          _rpls_rst:=rpl_end;
+                          close(_rpls_file);
+                          G_Paused:=1;
+                          _fsttime:=false;
+                          exit;
+                       end;
 
-                        if(_rpls_step<=0)then _rpls_step:=1;
-                        while (_rpls_step>0) do
-                        begin
-                           {$I-}
-                           BlockRead(_rpls_file,i,SizeOf(i));
+                       if(_rpls_step<=0)then _rpls_step:=1;
+                       while (_rpls_step>0) do
+                       begin
+                          {$I-}
+                          BlockRead(_rpls_file,i,SizeOf(i));
 
-                           G_Paused:=i and %01111111;
+                          G_Paused:=i and %00111111;
 
-                           if((i and %10000000)>0)then
-                           begin
-                              BlockRead(_rpls_file,net_chat,sizeof(net_chat));
-                              net_chat_shlm:=chat_shlm_t;
-                              vid_mredraw  :=true;
-                              PlaySNDM(snd_chat);
-                           end;
-                           {$I+}
+                          if((i and %10000000)>0)then
+                          begin
+                             BlockRead(_rpls_file,net_chat,sizeof(net_chat));
+                             net_chat_shlm:=chat_shlm_t;
+                             vid_mredraw  :=true;
+                             PlaySNDM(snd_chat);
+                          end;
+                          if((i and %01000000)>0)then
+                          begin
+                             BlockRead(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
+                             BlockRead(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
+                          end;
+                          {$I+}
 
-                           if(G_Paused=0)then _rclinet_gframe(0,true);
+                          if(G_Paused=0)then _rclinet_gframe(0,true);
 
                           if (_rpls_step>1)then _effectsCycle(false,false);
                           dec(_rpls_step,1);
-                        end;
-                        _rpls_step:=1;
+                       end;
+                       _rpls_step:=1;
+
+                       if(_rpls_vidm)then
+                       begin
+                          vid_vx:=(vid_vx+integer(_rpls_vidx shl vxyc)) div 2;
+                          vid_vy:=(vid_vy+integer(_rpls_vidy shl vxyc)) div 2;
+                          _view_bounds;
+                       end;
                    end;
 
      rpl_end     : begin G_Paused:=1; end;
      end;
-
 end;
 
 procedure _rpls_sel;

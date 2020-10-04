@@ -208,7 +208,7 @@ begin
            or(u_e[false,bucl]>=max)
            or((max=1)and(wbhero>0));
 end;
-function _cmp_untCndt(pl,bucl:byte):boolean;
+{function _cmp_untCndt(pl,bucl:byte):boolean;
 begin
    with _players[pl] do
    with _ulst[cl2uid[race,false,bucl]] do
@@ -218,7 +218,7 @@ _cmp_untCndt:=((army+wb)>=MaxPlayerUnits)
             or(trt=0)
             or((max=1)and(wbhero>0))
             or((G_addon=false)and(bucl>ut2[race]));
-end;
+end; }
 
 function _upgrreq(player,up:byte):boolean;
 var ruid:byte;
@@ -662,9 +662,9 @@ begin
    _plsOut:=(r=c)and(c>0);
 end;
 
-function _uvision(uteam:byte;tu:integer;onlyvis:boolean):boolean;
+function _uvision(uteam:byte;tu:PTUnit;onlyvis:boolean):boolean;
 begin
-   with _units[tu] do
+   with tu^ do
     if(buff[ub_invis]=0)or(hits<=0)or(onlyvis)
     then _uvision:=(vsnt[uteam]>0)
     else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);

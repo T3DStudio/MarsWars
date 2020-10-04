@@ -223,6 +223,9 @@ _rpls_ls          : integer = 0;
 _rpls_sm          : integer = 0;
 _rpls_step        : integer = 1;
 _rpls_nwrch       : boolean = false;
+_rpls_vidx        : byte = 0;
+_rpls_vidy        : byte = 0;
+_rpls_vidm        : boolean = false;
 _rpls_log         : boolean = false;
 
 _cmp_sm           : integer = 0;
@@ -480,6 +483,7 @@ spr_b_rskip,
 spr_b_rfog,
 spr_b_rlog,
 spr_b_rstop,
+spr_b_rvis,
 spr_b_action,
 spr_b_attack,
 spr_b_move,

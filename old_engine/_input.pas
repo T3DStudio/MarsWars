@@ -165,13 +165,14 @@ begin
                                    if(G_Paused>0)
                                    then G_Paused:=0
                                    else G_Paused:=200;
-                    sdlk_Z      : HPlayer:=0;
-                    sdlk_X      : HPlayer:=1;
-                    sdlk_C      : HPlayer:=2;
-                    sdlk_R      : HPlayer:=3;
-                    sdlk_T      : HPlayer:=4;
-                    sdlk_Y      : HPlayer:=5;
-                    sdlk_F      : HPlayer:=6;
+                    sdlk_Z      : _rpls_vidm:=not _rpls_vidm;
+                    sdlk_C      : HPlayer:=0;
+                    sdlk_R      : HPlayer:=1;
+                    sdlk_T      : HPlayer:=2;
+                    sdlk_Y      : HPlayer:=3;
+                    sdlk_F      : HPlayer:=4;
+                    sdlk_G      : HPlayer:=5;
+                    sdlk_H      : HPlayer:=6;
            end;
            exit;
         end;
@@ -300,7 +301,7 @@ begin
    while (SDL_PollEvent( _event )>0) do
     CASE (_event^.type_) OF
       SDL_MOUSEMOTION    : begin
-                              if(m_vmove)and(_menu=false)and(G_Started){and(G_Paused=0)}then
+                              if(m_vmove)and(_menu=false)and(G_Started)then
                               begin
                                  dec(vid_vx,_event^.motion.x-m_vx);
                                  dec(vid_vy,_event^.motion.y-m_vy);
@@ -321,7 +322,7 @@ begin
                               case (_event^.button.button) of
                             SDL_BUTTON_left      : if (k_ml=0) then k_ml:=2;
                             SDL_BUTTON_right     : if (k_mr=0) then k_mr:=2;
-                            SDL_BUTTON_middle    : if(_menu=false)and(G_Started){and(G_Paused=0)}then m_vmove:=true;
+                            SDL_BUTTON_middle    : if(_menu=false)and(G_Started)and(_rpls_vidm=false)then m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
@@ -430,7 +431,7 @@ begin
           m_sbuild:=255;
        end
        else
-         if _bldCndt(HPlayer,m_sbuild)
+         if _bldCndt(HPlayer,m_sbuild)and(bld_r=0)
          then m_sbuild:=255
          else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
               then m_sbuildc:=c_blue
@@ -490,7 +491,8 @@ begin
 0.._uts: if(m_sbuildc=c_lime)then
          begin
             _player_s_o(m_mx,m_my,m_sbuild,0, uo_build  ,HPlayer);
-            m_sbuild:=255;
+            //m_sbuild:=255;
+            _chkbld;
          end;
 -1,-2,
 -3,-4  : _command(m_mx,m_my);
@@ -502,7 +504,7 @@ begin
            case m_sbuild of
            -1,-2,
            -3,-4  : _command(trunc(m_vx/map_mmcx),trunc(m_vy/map_mmcx));
-           else     ui_panelmmm:=true;
+           else     if(_rpls_vidm=false)then ui_panelmmm:=true;
            end;
         end
         else                         // panel
@@ -564,19 +566,21 @@ begin
                              then G_Paused:=0
                              else G_Paused:=200;
                         end;
-                     9 :begin
-                           if(m_bx=0)then HPlayer:=0;
-                           if(m_bx=1)then HPlayer:=1;
-                           if(m_bx=2)then HPlayer:=2;
-                        end;
-                     10:begin
-                           if(m_bx=0)then HPlayer:=3;
-                           if(m_bx=1)then HPlayer:=4;
-                           if(m_bx=2)then HPlayer:=5;
-                        end;
-                     11:begin
-                          if(m_bx=0)then HPlayer:=6;
-                        end;
+                     9 : case m_bx of
+                           0: _rpls_vidm:=not _rpls_vidm;
+                           1: ;
+                           2: HPlayer:=0;
+                         end;
+                     10: case m_bx of
+                           0: HPlayer:=1;
+                           1: HPlayer:=2;
+                           2: HPlayer:=3;
+                         end;
+                     11: case m_bx of
+                           0: HPlayer:=4;
+                           1: HPlayer:=5;
+                           2: HPlayer:=6;
+                         end;
                         end;
                     end
                     else
@@ -712,7 +716,7 @@ end;
 
 procedure g_keyboard;
 begin
-   if(m_vmove=false) then _view_move;
+   if(m_vmove=false)and(_rpls_vidm=false)then _view_move;
    if(_igchat)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen2);
 end;
 

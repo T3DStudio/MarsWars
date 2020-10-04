@@ -977,6 +977,7 @@ begin
                       end;
 
          UID_Mine  :  buff[ub_invis]:=_bufinf;
+         UID_ZEngineer,
          UID_Commando:buff[ub_invis]:=buff[ub_advanced];
          UID_Demon :  begin
                          buff[ub_invis]:=buff[ub_advanced];

@@ -37,7 +37,9 @@ begin
       sy :=cl2uid[race,true,m_sbuild];
       u  :=@_ulst[sy];
       spr:=_unit_spr(u);
-      circleColor(_screen,m_vx,m_vy,u^.r,m_sbuildc);
+      if(bld_r>0)and(m_sbuildc=c_lime)
+      then circleColor(_screen,m_vx,m_vy,u^.r,c_green)
+      else circleColor(_screen,m_vx,m_vy,u^.r,m_sbuildc);
 
       sy:=0;
 
@@ -106,11 +108,11 @@ end;
 
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
 begin
-   if(surf=_dsurf)then exit;
+   //if(surf=_dsurf)then exit;
    x:=x*vid_BW+1;
    y:=ui_bottomsy+y*vid_BW+1;
    _draw_surf(tar,x,y,surf);
-   if(sel )then rectangleColor(tar,x+1,y+1,x+vid_BW-3,y+vid_BW-3,c_lime)
+   if(sel)then rectangleColor(tar,x+1,y+1,x+vid_BW-3,y+vid_BW-3,c_lime)
    else
      if(dsbl)then boxColor(tar,x,y,x+vid_BW-2,y+vid_BW-2,c_ablack);
 end;
@@ -287,17 +289,24 @@ begin
             _drawBtn(_uipanel,0,4,spr_b_rfast,_fsttime  ,false);
             _drawBtn(_uipanel,1,4,spr_b_rskip,false     ,false);
             _drawBtn(_uipanel,2,4,spr_b_rstop,g_paused>0,false);
+            _drawBtn(_uipanel,0,5,spr_b_rvis ,_rpls_vidm,false);
+
+            ux:=2;
+            uy:=5;
 
             for ui:=0 to MaxPlayers do
             begin
-               ux:=(ui mod 3)*vid_bw;
-               uy:=ui_bottomsy+((ui div 3)+5)*vid_bw;
-
                if(ui=0)
-               then _draw_text(_uipanel,ux+3,uy+6,str_all,ta_left,255,c_white)
-               else _draw_text(_uipanel,ux+3,uy+6,_players[ui].name,ta_left,5,plcolor[ui]);
+               then _drawBtnt(_uipanel,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0)
+               else _drawBtnt(_uipanel,ux,uy,_players[ui].name,'','','','',plcolor[ui],0,0,0,0);
+               _drawBtn(_uipanel,ux,uy,_dsurf,ui=HPlayer,_players[ui].army=0);
 
-               if(ui=HPlayer)then rectangleColor(_uipanel,ux+2,uy+2,ux+vid_bw-2,uy+vid_bw-2,c_lime);
+               inc(ux,1);
+               if(ux>2)then
+               begin
+                  ux:=0;
+                  inc(uy,1);
+               end;
             end;
          end
          else

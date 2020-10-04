@@ -95,8 +95,6 @@ begin
 
    onlySVCode :=true;
 
-
-
    FillChar(_missiles,SizeOf(_missiles)   ,0);
 
    FillChar(_units   ,SizeOf(_units  )   ,0);
@@ -168,6 +166,7 @@ begin
    cmp_ait2p:=0;
 
    _rpls_pnu:=0;
+   _rpls_vidm:=false;
    {$ELSE}
    {$ENDIF}
 end;
@@ -706,8 +705,9 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                    UID_HSymbol,
                                    UID_HTower,
                                    UID_HTotem     : begin
-                                                       _unit_b247teleport(u);
-                                                       if(o_y1<>u)then uo_tar:=o_y1;
+                                                       if(o_y1<>u)
+                                                       then uo_tar:=o_y1
+                                                       else _unit_b247teleport(u);
                                                     end;
                                    else
                                      if(o_y1<>u)then uo_tar:=o_y1;

@@ -2370,7 +2370,7 @@ begin
               end;
            end
            else
-             if(tu^.buff[ub_advanced]>0)and(td>base_r)then
+             if(tu^.buff[ub_advanced]>0)and(td>base_rr)then
               if(tu^.rld=0)then
               begin
                  _unit_teleport(u,tu^.x,tu^.y);
