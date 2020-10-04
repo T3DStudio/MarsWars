@@ -45,26 +45,26 @@ begin
              ai_maxarmy :=100;
           end;
       4 : begin  // UV
-             _bc_ss(@a_build,[0..8 ]);
+             _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
           end;
       5 : begin  // Nightmare
-             _bc_ss(@a_build,[0..8 ]);
+             _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr],race,1);
           end;
       6 : begin  // Super Nightmare
-             _bc_ss(@a_build,[0..8 ]);
+             _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld],race,1);
           end;
       7 : begin  // HELL
-             _bc_ss(@a_build,[0..8 ]);
+             _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
@@ -78,14 +78,16 @@ begin
 
     if(g_mode=gm_ct)or(ai_skill>5)then ai_attack:=1;
 
-    if(race=r_hell)then
-     case ai_skill of //
-     0,1  : ;
-     2    : _bc_sa(@a_units,[12..13]);
-     3    : _bc_sa(@a_units,[12..16]);
-     else   _bc_sa(@a_units,[12..18]);
-     end;
-    if(race=r_uac)then _bc_sa(@a_units,[12..18]);
+    case race of
+    r_hell:
+      case ai_skill of //
+      0,1  : ;
+      2    : _bc_sa(@a_units,[12..13]);
+      3    : _bc_sa(@a_units,[12..16]);
+      else   _bc_sa(@a_units,[12..18]);
+      end;
+    end;
+    //if(race=r_uac)then _bc_sa(@a_units,[12..18]);
    end;
 end;
 
@@ -307,6 +309,7 @@ const
   Adv = 6;
   Tw2 = 7;
   X8  = 8;
+  Tw3 = 10;
 var d:single;
     maxe,
     l:integer;
@@ -324,10 +327,13 @@ begin
          end;
    Smt : if(u_e[true,ucl]>=bnms^[ucl])then exit;
    Tw1,
-   Tw2 : begin
-         if(random(2)=0)
-         then ucl:=Tw2
-         else ucl:=Tw1;
+   Tw2,
+   Tw3: begin
+         case random(3) of
+         0: ucl:=Tw1;
+         1: ucl:=Tw2;
+         2: ucl:=Tw3;
+         end;
          if(twrs>1)and(u_e[true,0]<2)then exit;
          if(twrs>8)and(alrm=false)then exit;
          if(twrs>=bnms^[ucl])then exit;
@@ -344,7 +350,7 @@ begin
    maxe:=_ai_get_max_enrg(bp,false);
 
    bt:=255;
-   set_bld(random(9),100);
+   set_bld(random(12),100);
 
    if(g_mode<>gm_coop)or(bp<>0)then
    with _players[bp] do
@@ -724,7 +730,7 @@ begin
    with _units[u] do
    with _players[player] do
    begin
-      twrs:=u_e[true,4]+u_e[true,7];
+      twrs:=u_e[true,4]+u_e[true,7]+u_e[true,10];
 
       case ai_skill of
       0,1 : blds[0]:=1;
@@ -735,16 +741,17 @@ begin
             then blds[0]:=11
             else blds[0]:=16;
       end;
-      blds[1]:=min2(max2(2,(menerg div 6)+u_e[true,0]-u_e[true,3]),maxb);
-      blds[3]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
-      blds[4]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
-      blds[7]:=blds[4];
+      blds[1 ]:=min2(max2(2,(menerg div 6)+u_e[true,0]-u_e[true,3]),maxb);
+      blds[3 ]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
+      blds[4 ]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
+      blds[7 ]:=blds[4];
+      blds[10]:=blds[4];
 
       if(ucl=0)and(speed=0)then ai_trybuild(x,y,sr,player,(alrm_r<base_rr)and(ai_skill>2),@blds,twrs);
       if(ucl=1)then ai_utr(u,0);
       if(ucl=3)then ai_ups(u);
 
-      twrs:=u_eb[true,4]+u_eb[true,7];
+      twrs:=u_eb[true,4]+u_eb[true,7]+u_eb[true,10];
 
       if(ai_skill>2)then
       case uid of
@@ -789,8 +796,6 @@ begin
                           if(rld_a>0)then dec(rld_a,1);
                           if(rld_a<=0)then _unit_kill(u,false,false);
                        end;
-       UID_UTurret,
-       UID_UPTurret  : if(alrm_r>base_rr)and(_uclord<10)then _unit_action(u);
       end;
 
       if(ai_skill>1)then
@@ -844,6 +849,7 @@ begin
                            if(u_e[true,3]>blds[3])then _unit_kill(u,false,false);
       UID_UTurret,
       UID_UPTurret,
+      UID_URTurret,
       UID_HTower        : if(alrm_r>base_rr)and(twrs>blds[4])then _unit_kill(u,false,false);
       UID_HTotem        : if(buff[ub_invis]=0)then
                            if(alrm_r>base_rr)and(twrs>blds[4])then _unit_kill(u,false,false);

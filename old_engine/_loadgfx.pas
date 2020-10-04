@@ -603,8 +603,9 @@ begin
       spr_ui_oico[r_uac ,true,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,true ,x]])^.surf,vid_oiw);
    end;
 
-   _draw_surf(spr_b_b[r_uac ,4],vid_hBW-spr_tur[6].hw,0,spr_tur[4].surf);
-   _draw_surf(spr_b_b[r_uac ,7],vid_hBW-spr_tur[7].hw,0,spr_tur[0].surf);
+   _draw_surf(spr_b_b[r_uac ,4 ],vid_hBW-spr_tur [6].hw,0,spr_tur [4].surf);
+   _draw_surf(spr_b_b[r_uac ,7 ],vid_hBW-spr_tur [7].hw,0,spr_tur [0].surf);
+   _draw_surf(spr_b_b[r_uac ,10],vid_hBW-spr_rtur[7].hw,0,spr_rtur[6].surf);
 
    for x:=0 to _uts do
    begin

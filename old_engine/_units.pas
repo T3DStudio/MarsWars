@@ -317,7 +317,7 @@ begin
               begin
                  if(sel)then
                  begin
-                    if(ucl in [4,7])then ro:=sr;
+                    if(speed=0)and(UID in whocanattack)then ro:=sr;
                     if(UID in [UID_HSymbol])and(upgr[upgr_b478tel]>0)then ro:=sr;
                  end;
                  if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r;
@@ -954,16 +954,6 @@ UID_LostSoul:   if(upgr[upgr_vision]>0)then
                    {$ENDIF}
                    _unit_morph(u,UID_HEye,true);
                    order:=0;
-                end;
-UID_UTurret,
-UID_UPTurret:  if(g_addon)then
-                if(upgr[upgr_rturrets]>0)and(u_eb[true,6]>0)then
-                if((menerg-cenerg)>=renerg)then
-                begin
-                   {$IFDEF _FULLGAME}
-                   PlaySND(snd_build[r_uac],u);
-                   {$ENDIF}
-                   _unit_morph(u,UID_URTurret,false);
                 end;
      end;
 end;
@@ -1938,7 +1928,7 @@ begin
 
       tar1d   := 32000;
       tar1    := 0;
-      push    := solid and _canmove(u) and (rld=0);
+      push    := solid and _canmove(u) {and (rld=0)};
       if(alrm_r<0)
       then inc(alrm_r,1)
       else alrm_r:=32000;

@@ -23,11 +23,17 @@ const hot_keys : array[0..15] of char = ('R','T','Y','F','G','H','V','B','N','U'
 begin
    _gHK:='';
    case tab of
-   0  : if(ucl<9)then _gHK:=#18+hot_keys[ucl]+#25;
+   0  : if(ucl<18)then
+         if(ucl<9)
+         then _gHK:=#18+hot_keys[ucl]+#25
+         else _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-9]+#25;
    1  : if(ucl<24)then
          if(ucl<9)
          then _gHK:=#18+hot_keys[ucl]+#25
-         else _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-9]+#25 ;
+         else
+           if(ucl<18)
+           then _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-9]+#25
+           else _gHK:=#18+hot_keys[ucl-9]+#25;
    2  : if(ucl<24)then
          if(ucl<15)
          then _gHK:=#18+hot_keys[ucl]+#25
@@ -257,7 +263,7 @@ begin
    str_hint_t[2]         := 'Researches';
    str_hint_t[3]         := 'Controls';
 
-   str_hint_a[0]         := 'Energy (free/max)';
+   str_hint_a[0]         := 'Energy ('+#19+'free'+#25+'/max)';
    str_hint_a[1]         := 'Army (unit+buildings)';
 
    str_hint_m[0]         := 'Menu (' +#18+'Esc'+#25+')';
@@ -619,7 +625,7 @@ begin
   str_svup[true ]       := 'Выкл. сервер';
   str_connect[false]    := 'Подключится';
   str_connect[true ]    := 'Откл.';
-  str_pnu               := 'Размер/качество:';
+  str_pnu               := 'Размер/качество: ';
   str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
   str_sver              := 'Другая версия!';

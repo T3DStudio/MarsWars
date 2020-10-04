@@ -302,7 +302,7 @@ UID_CoopPortal         = 91;
 uids_hell              = [UID_LostSoul..UID_ZBFG,UID_HKeep..UID_HMilitaryUnit];
 uids_uac               = [UID_Engineer..UID_UTransport,UID_UCommandCenter..UID_USPort];
 
-t2                     = [UID_URocketL,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
+t2                     = [UID_URocketL,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
@@ -463,10 +463,10 @@ ui_menu_map_ys         = 19;
 ui_menu_map_x0         = ((ui_menu_map_zx0+ui_menu_map_zx1) div 2)- vid_panel;
 ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panel div 2);
 ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panel;
-ui_menu_map_rx1        = ui_menu_map_zx1-16;
+ui_menu_map_rx1        = ui_menu_map_zx1-12;
 ui_menu_map_y1         = ui_menu_map_y0+(ui_menu_map_ys*7);
 ui_menu_map_tx0        = ui_menu_map_rx0+6;
-ui_menu_map_tx1        = ui_menu_map_rx0+(vid_panel div 2)-6;
+ui_menu_map_tx1        = ui_menu_map_rx0+((ui_menu_map_rx1-ui_menu_map_rx0) div 2);
 
 ui_menu_ssr_x0         = 76;
 ui_menu_ssr_y0         = 326;

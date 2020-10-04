@@ -206,7 +206,8 @@ begin
           sdlk_F2        :  _player_s_o(0     ,0,0,0,uo_specsel,HPlayer);
         else
           case ui_tab of
-          0 : case k of
+          0 : if(k_ctrl=0)then
+              case k of
             sdlk_R      : m_sbuild:=0;
             sdlk_T      : m_sbuild:=1;
             sdlk_Y      : m_sbuild:=2;
@@ -216,6 +217,18 @@ begin
             sdlk_V      : m_sbuild:=6;
             sdlk_B      : m_sbuild:=7;
             sdlk_N      : m_sbuild:=8;
+              end
+              else
+              case k of
+            sdlk_R      : m_sbuild:=9;
+            sdlk_T      : m_sbuild:=10;
+            sdlk_Y      : m_sbuild:=11;
+            sdlk_F      : m_sbuild:=12;
+            sdlk_G      : m_sbuild:=13;
+            sdlk_H      : m_sbuild:=14;
+            sdlk_V      : m_sbuild:=15;
+            sdlk_B      : m_sbuild:=16;
+            sdlk_N      : m_sbuild:=17;
               end;
           1 : if(k_ctrl=0)then
               case k of
@@ -228,6 +241,9 @@ begin
             sdlk_V      : _player_s_o(-4,6 ,0,0, uo_action  ,HPlayer);
             sdlk_B      : _player_s_o(-4,7 ,0,0, uo_action  ,HPlayer);
             sdlk_N      : _player_s_o(-4,8 ,0,0, uo_action  ,HPlayer);
+            sdlk_U      : _player_s_o(-4,18,0,0, uo_action  ,HPlayer);
+            sdlk_I      : _player_s_o(-4,19,0,0, uo_action  ,HPlayer);
+            sdlk_O      : _player_s_o(-4,20,0,0, uo_action  ,HPlayer);
               end
               else
               case k of
@@ -269,7 +285,7 @@ begin
             sdlk_H      : _player_s_o(-2,20,0,0, uo_action  ,HPlayer);
             sdlk_V      : _player_s_o(-2,21,0,0, uo_action  ,HPlayer);
             sdlk_B      : _player_s_o(-2,22,0,0, uo_action  ,HPlayer);
-            sdlk_N      : _player_s_o(-4,12,0,0, uo_action  ,HPlayer);
+            sdlk_N      : _player_s_o(-2,23,0,0, uo_action  ,HPlayer);
               end;
           3 : ;
           end;
@@ -527,7 +543,7 @@ begin
                 case ui_tab of
                 0 :  if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                      begin
-                       if(3<m_by)and(m_by<7)then     //builds
+                       if(3<m_by)and(m_by<10)then     //builds
                        begin
                           m_sbuild:=((m_by-4)*3)+(m_bx mod 3);
                           _chkbld;

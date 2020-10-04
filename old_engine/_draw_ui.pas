@@ -47,7 +47,7 @@ begin
       _draw_surf(_screen,m_vx-spr^.hw,m_vy-spr^.hh-sy,spr^.surf);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-      if(m_sbuild in [4,7])then circleColor(_screen,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
+      if(m_sbuild in [4,7,10])then circleColor(_screen,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
 
       for i:=0 to _uts do
        if(ui_bldrs_x[i]<>0)then circleColor(_screen,ui_bldrs_x[i]-vid_vx,ui_bldrs_y[i]-vid_vy,ui_bldrs_r[i],c_white);
@@ -108,7 +108,6 @@ end;
 
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
 begin
-   //if(surf=_dsurf)then exit;
    x:=x*vid_BW+1;
    y:=ui_bottomsy+y*vid_BW+1;
    _draw_surf(tar,x,y,surf);
@@ -214,7 +213,7 @@ begin
 
                _drawBtn (_uipanel,ux,uy,spr_b_b[race,ui],m_sbuild=ui,_bldCndt(HPlayer,ui));
                _drawBtnt(_uipanel,ux,uy,
-               b2s(ui_blds[ ui]),'',b2s(u_s [true,ui]),b2s(u_e [true,ui])                                     ,''     ,
+               b2s(ui_blds[ ui]),'',b2s(u_s [true,ui]),b2s(u_e [true,ui])                                   ,'',
                c_dyellow        ,0 ,c_lime            ,ui_muc[u_e[true,ui]>=_ulst[cl2uid[race,true,ui]].max],c_white);
 
                case ui of

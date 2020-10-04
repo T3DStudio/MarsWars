@@ -749,22 +749,6 @@ begin
          ctime  := 20;
          ruid   := UID_UWeaponFactory;
       end;
-      if(uid=UID_URTurret) then
-      begin
-         mhits  := 500;
-         uf     := uf_ground;
-         sr     := 250;
-         ucl    := 4;
-         r      := 17;
-         isbuild:= true;
-         rld_r  := 90;
-         rld_a  := 0;
-         anims  := 2;
-         renerg := 2;
-         ctime  := 20;
-         ruid   := UID_UWeaponFactory;
-         arf    := (sr div 5)*4;
-      end;
       if(uid=UID_URocketL) then
       begin
          mhits  := 500;
@@ -779,6 +763,23 @@ begin
          ctime  := 30;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
+      end;
+      if(uid=UID_URTurret) then
+      begin
+         mhits  := 500;
+         uf     := uf_ground;
+         sr     := 250;
+         ucl    := 10;
+         r      := 17;
+         isbuild:= true;
+         rld_r  := 90;
+         rld_a  := 0;
+         anims  := 2;
+         renerg := 4;
+         ctime  := 30;
+         ruid   := UID_UVehicleFactory;
+         rupgr  := upgr_rturrets;
+         arf    := (sr div 5)*4;
       end;
       if(uid=UID_Mine) then
       begin
