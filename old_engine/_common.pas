@@ -596,7 +596,7 @@ procedure _makeScrSurf;
 const
   ui_ex              = 4;
   ui_ax              = ui_ex+ui_hwp+1;
-  ystop              = vid_BW*13;
+  ystop              = vid_BW*14;
 var y:integer;
 begin
    if(_uipanel<>nil)then sdl_freesurface(_uipanel);

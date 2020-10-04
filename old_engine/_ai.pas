@@ -633,7 +633,7 @@ begin
         if(skipif)or(_r=0)or(alrm_r<_r)then
         begin
            if(alrm_b)and(isbuild=false)then exit;
-           if(uo_x=alrm_x)and(uo_y=alrm_y)then
+           if(x=alrm_x)and(y=alrm_y)then
            begin
               uo_x:=x-base_r+random(base_rr);
               uo_y:=y-base_r+random(base_rr);
@@ -999,9 +999,6 @@ begin
                end;
             end;
 
-            //if(player=0)and(g_mode=gm_coop)
-            //then ai_settar(u,ai_bx,ai_by,base_r,base_rr)
-            //else
             if(alrm_r<32000)then
             begin
                if(alrm_r<base_r)or(order=2)or(alrm_b)or((g_mode=gm_inv)and(alrm_r<base_3r))or(ai_bx=0)
@@ -1038,7 +1035,7 @@ begin
          begin
             case uid of
             UID_FAPC: ai_outalrm(u,250,false);
-            UID_APC : ai_outalrm(u,220,false);
+            UID_APC : ai_outalrm(u,225,false);
             UID_Engineer,
             UID_Medic:if(alrm_r<=sr)then
                       begin

@@ -199,7 +199,7 @@ begin
                     vlineColor(_menu_surf,ui_menu_ssr_x4,y-6,y+12,c_gray);
                     vlineColor(_menu_surf,ui_menu_ssr_x5,y-6,y+12,c_gray);
 
-                    y:=_yt(4);
+                    y:=_yt(5);
                     _draw_text(_menu_surf,i ,y, str_fullscreen, ta_left ,255, mic(true,false));
                     _draw_text(_menu_surf,t ,y, b2pm[not _fscr],ta_right,255, mic(true,false));
                  end;

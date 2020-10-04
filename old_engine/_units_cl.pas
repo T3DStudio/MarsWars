@@ -409,7 +409,7 @@ begin
          rld_a  := 25;
          anims  := 18;
          mdmg   := 6;
-         trt    := vid_fps*8;
+         trt    := vid_fps*15;
          renerg := 1;
          arf    :=(sr div 4)*3;
          if(uid=UID_ZEngineer)then
@@ -435,7 +435,7 @@ begin
          rld_a  := 30;
          anims  := 18;
          mdmg   := 6;
-         trt    := vid_fps*8;
+         trt    := vid_fps*15;
          renerg := 1;
          if(uid=UID_ZFormer)then
          begin
@@ -913,6 +913,7 @@ end;
 procedure initUnits;
 var i,rc:byte;
 begin
+   FillChar(cl2uid,SizeOf(cl2uid),0);
    FillChar(_ulst,sizeof(_ulst),0);
    for i:=0 to 255 do
    begin
@@ -971,6 +972,7 @@ begin
    _setUPGR(r_hell,upgr_b478tel   ,30 ,15,1 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_hinvuln   ,180,3 ,10,upgr_2tier,UID_HAltar    );
    _setUPGR(r_hell,upgr_bldenrg   ,180,2 ,4 ,upgr_2tier,UID_HAltar    );
+   //_setUPGR(r_hell,upgr_liqwalk   ,180,1 ,4 ,upgr_2tier,UID_HAltar    );
 
    _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255,255);
    _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255,255);
@@ -996,71 +998,9 @@ begin
    _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_rturrets  ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_bldenrg   ,180,2 ,4 ,upgr_2tier,UID_UVehicleFactory);
+   //_setUPGR(r_uac ,upgr_liqwalk   ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
 
-   FillChar(cl2uid,SizeOf(cl2uid),0);
    initUnits;
-
-
-
-   {cl2uid[r_hell,true ,0 ]:=UID_HKeep;
-   cl2uid[r_hell,true ,1 ]:=UID_HGate;
-   cl2uid[r_hell,true ,2 ]:=UID_HSymbol;
-   cl2uid[r_hell,true ,3 ]:=UID_HPools;
-   cl2uid[r_hell,true ,4 ]:=UID_HTower;
-   cl2uid[r_hell,true ,5 ]:=UID_HTeleport;
-   cl2uid[r_hell,true ,6 ]:=UID_HMonastery;
-   cl2uid[r_hell,true ,7 ]:=UID_HTotem;
-   cl2uid[r_hell,true ,8 ]:=UID_HAltar;
-   cl2uid[r_hell,true ,9 ]:=UID_HMilitaryUnit;
-   cl2uid[r_hell,true ,21]:=UID_HEye;
-
-   cl2uid[r_hell,false,0 ]:=UID_LostSoul;
-   cl2uid[r_hell,false,1 ]:=UID_Imp;
-   cl2uid[r_hell,false,2 ]:=UID_Demon;
-   cl2uid[r_hell,false,3 ]:=UID_Cacodemon;
-   cl2uid[r_hell,false,4 ]:=UID_Baron;
-   cl2uid[r_hell,false,5 ]:=UID_Cyberdemon;
-   cl2uid[r_hell,false,6 ]:=UID_Mastermind;
-   cl2uid[r_hell,false,7 ]:=UID_Pain;
-   cl2uid[r_hell,false,8 ]:=UID_Revenant;
-   cl2uid[r_hell,false,9 ]:=UID_Mancubus;
-   cl2uid[r_hell,false,10]:=UID_Arachnotron;
-   cl2uid[r_hell,false,11]:=UID_Archvile;
-   cl2uid[r_hell,false,12]:=UID_ZFormer;
-   cl2uid[r_hell,false,13]:=UID_ZEngineer;
-   cl2uid[r_hell,false,14]:=UID_ZSergant;
-   cl2uid[r_hell,false,15]:=UID_ZCommando;
-   cl2uid[r_hell,false,16]:=UID_ZBomber;
-   cl2uid[r_hell,false,17]:=UID_ZMajor;
-   cl2uid[r_hell,false,18]:=UID_ZBFG;
-
-   cl2uid[r_uac ,true ,0 ]:=UID_UCommandCenter;
-   cl2uid[r_uac ,true ,1 ]:=UID_UMilitaryUnit;
-   cl2uid[r_uac ,true ,2 ]:=UID_UGenerator;
-   cl2uid[r_uac ,true ,3 ]:=UID_UWeaponFactory;
-   cl2uid[r_uac ,true ,4 ]:=UID_UTurret;
-   cl2uid[r_uac ,true ,5 ]:=UID_URadar;
-   cl2uid[r_uac ,true ,6 ]:=UID_UVehicleFactory;
-   cl2uid[r_uac ,true ,7 ]:=UID_UPTurret;
-   cl2uid[r_uac ,true ,8 ]:=UID_URocketL;
-   cl2uid[r_uac ,true ,18]:=UID_UCBuild;
-   cl2uid[r_uac, true ,21]:=UID_Mine;
-
-   cl2uid[r_uac ,false,0 ]:=UID_Engineer;
-   cl2uid[r_uac ,false,1 ]:=UID_Medic;
-   cl2uid[r_uac ,false,2 ]:=UID_Sergant;
-   cl2uid[r_uac ,false,3 ]:=UID_Commando;
-   cl2uid[r_uac ,false,4 ]:=UID_Bomber;
-   cl2uid[r_uac ,false,5 ]:=UID_Major;
-   cl2uid[r_uac ,false,6 ]:=UID_BFG;
-   cl2uid[r_uac ,false,7 ]:=UID_FAPC;
-   cl2uid[r_uac ,false,8 ]:=UID_APC;
-   cl2uid[r_uac ,false,9 ]:=UID_Terminator;
-   cl2uid[r_uac ,false,10]:=UID_Tank;
-   cl2uid[r_uac ,false,11]:=UID_Flyer;
-
-   cl2uid[r_uac ,false,21]:=UID_UTransport; }
-
 
    {$IFDEF _FULLGAME}
    InitFogR;

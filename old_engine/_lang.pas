@@ -34,7 +34,7 @@ begin
            if(ucl<18)
            then _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-9]+#25
            else _gHK:=#18+hot_keys[ucl-9]+#25;
-   2  : if(ucl<24)then
+   2  : if(ucl<26)then
          if(ucl<15)
          then _gHK:=#18+hot_keys[ucl]+#25
          else _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-15]+#25 ;
@@ -61,15 +61,21 @@ begin
    begin
       REQ  :='';
       NAME :=str_un_name [uid];
+      if(NAME='')then continue;
       DESCR:=str_un_descr[uid];
       with _ulst[uid] do
       begin
          if(renerg>0)
          then ENRG:=b2s(renerg)
          else ENRG:='';
-         if(bld_s>0)
-         then TIME:=i2s(mhits div bld_s div 2)
-         else TIME:='';
+         case isbuild of
+         true :if(bld_s>0)
+               then TIME:=i2s(mhits div bld_s div 2)
+               else TIME:='';
+         false:if(trt>0)
+               then TIME:=i2s(trt div vid_fps)
+               else TIME:='';
+         end;
          if(ruid <255)then REQ:=str_un_name[ruid];
          if(rupgr<255)then
          begin
@@ -96,10 +102,12 @@ begin
    begin
       REQ  :='';
       uid  :=ucl+(_uts*rc);
-      enrg :=b2s(_pne_r[rc,ucl]);
-      TIME :=i2s(upgrade_time[rc ,ucl  ] div vid_fps);
       NAME :=str_up_name [uid];
       DESCR:=str_up_descr[uid];
+      if(NAME='')then continue;
+
+      enrg :=b2s(_pne_r[rc,ucl]);
+      TIME :=i2s(upgrade_time[rc ,ucl] div vid_fps);
 
       if(upgrade_ruid [rc,ucl]<255)then REQ:=str_un_name[upgrade_ruid[rc,ucl]];
       if(upgrade_rupgr[rc,ucl]<255)then
@@ -327,6 +335,7 @@ begin
    _mkHStrUpid(r_hell,upgr_b478tel ,'Short distance teleportation'   ,'Hell Symbols, Towers and Totems can teleport to short distance.' );
    _mkHStrUpid(r_hell,upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
    _mkHStrUpid(r_hell,upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
+   //_mkHStrUpid(r_hell,upgr_liqwalk ,'Hell Run'                       ,'Hell units can walk on liquids.'                                 );
 
 
    _mkHStrUid(UID_UCommandCenter  ,'UAC Command Center'         ,'Builds base.'                    );
@@ -380,6 +389,7 @@ begin
    _mkHStrUpid(r_uac ,upgr_turarm  ,'Turrets armor'          ,'Additional armor for turrets.'                    );
    _mkHStrUpid(r_uac ,upgr_rturrets,'Rocket turrets'         ,'Turrets can upgrade to Rocket turrets.'           );
    _mkHStrUpid(r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for Command Center.'            );
+   //_mkHStrUpid(r_uac ,upgr_liqwalk ,'Protective Suits'       ,'UAC Infantry can walk on liquids.'                );
 
    t:='ignore enemies';
    _mkHStrXY(3,0 ,0,0,'Move, '+t+' ('      +#18+'Q'+#25+')');
@@ -680,6 +690,7 @@ begin
                                                                   ,'Адские Символы, Башни и Тотемы могут телепортироваться на короткое расстояние.');
   _mkHStrUpid(r_hell,upgr_hinvuln ,'Неуязвимость'                   ,'Сферы неуязвимости для Адского Алтаря.'                                  );
   _mkHStrUpid(r_hell,upgr_bldenrg ,'Встроеный адский символ'        ,'Дополнительная энергия для Адской Крепости.'                             );
+  //_mkHStrUpid(r_hell,upgr_liqwalk ,'Адский бег'                     ,'Юниты Ада могут ходить по жидкостям.'                                    );
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу.'                    );
   _mkHStrUid(UID_UMilitaryUnit   ,'Войсковая Часть'        ,'Тренирует юнитов.'               );
@@ -731,6 +742,7 @@ begin
   _mkHStrUpid(r_uac ,upgr_turarm  ,'Защита для турелей'       ,'Дополнительное увеличение защиты Турелей.'                );
   _mkHStrUpid(r_uac ,upgr_rturrets,'Ракетные турели'          ,'Обычные турели могут быть улучшены до ракетных.'          );
   _mkHStrUpid(r_uac ,upgr_bldenrg ,'Встроенный генератор'     ,'Дополнительна энергия для Командного Центра.'             );
+  //_mkHStrUpid(r_uac ,upgr_liqwalk ,'Защитные костюмы'         ,'Пехота может ходить по жидкостям.'                        );
 
   t:='игнорировать врагов';
   _mkHStrXY(3,0 ,0,0,'Двигаться, '    +t+' ('+#18+'Q'+#25+')');

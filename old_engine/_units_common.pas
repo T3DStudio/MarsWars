@@ -532,7 +532,7 @@ begin
    begin
       if(tu^.hits<idead_hits)then exit;
       case uu^.uid of
-      UID_ArchVile :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in arch_res)or(teams=false)then exit;
+      UID_ArchVile :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in arch_res)or(teams=false)or(tu^.hits>-vid_fps)then exit;
       UID_LostSoul :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in marines )then exit;
       else
         exit;
@@ -662,6 +662,17 @@ begin
            if(td<=uu^.sr)then _unit_target:=1;
    end;
 end;
+
+{function _canwalkliq(uid,player:byte):boolean;
+begin
+   _canwalkliq:=false;
+   with _players[player] do
+    if(upgr[upgr_liqwalk]>0)then
+     case race of
+     r_hell: _canwalkliq:=true;
+     r_uac : if(uid in marines)then _canwalkliq:=true;
+     end;
+end;}
 
 function _itcanapc(uu,tu:PTUnit):boolean;
 begin

@@ -223,7 +223,7 @@ begin
                 map_ptrt:=255;
                 MakeTerrain;
              end;
-      17 : begin _fscr:=not _fscr; _MakeScreen;end;
+      18 : begin _fscr:=not _fscr; _MakeScreen;end;
 
       // sounds
       26 : if(ui_menu_ssr_x2>=m_vx)

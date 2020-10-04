@@ -267,8 +267,12 @@ begin
            if(sel)then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);
         end;
 
-        //if(player=HPlayer)then
-        // lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);  i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+        if(hits>0)and(inapc=0)then
+        if(player=HPlayer)then
+        begin
+           lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+           lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
+        end;
 
         _draw_text(_screen,ix,iy,i2s(rld), ta_left,255, plcolor[player]);
 

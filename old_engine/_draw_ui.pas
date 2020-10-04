@@ -169,13 +169,13 @@ begin
 
          ux:=0;
          if(u_cs[true]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[true]),ta_left,255,c_lime  );
-         if(ui_bldsc  >0)then _draw_text(_uipanel,ux+3,uy+12,i2s(ui_bldsc  ),ta_left,255,c_yellow);
-         if(u_c [true]>0)then _draw_text(_uipanel,ux+3,uy+24,i2s(u_c [true]),ta_left,255,c_orange);
+         if(ui_bldsc  >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(ui_bldsc  ),ta_left,255,c_yellow);
+         if(u_c [true]>0)then _draw_text(_uipanel,ux+3,uy+20,i2s(u_c [true]),ta_left,255,c_orange);
 
          ux:=vid_tBW;
          if(u_cs[false]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[false]),ta_left,255,c_lime  );
-         if(ui_trntca  >0)then _draw_text(_uipanel,ux+3,uy+12,i2s(ui_trntca  ),ta_left,255,c_yellow);
-         if(u_c [false]>0)then _draw_text(_uipanel,ux+3,uy+24,i2s(u_c [false]),ta_left,255,c_orange);
+         if(ui_trntca  >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(ui_trntca  ),ta_left,255,c_yellow);
+         if(u_c [false]>0)then _draw_text(_uipanel,ux+3,uy+20,i2s(u_c [false]),ta_left,255,c_orange);
 
          if(ui_upgrl>0)then
          begin
@@ -184,7 +184,7 @@ begin
             _draw_text(_uipanel,ux+3,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
          end;
 
-         uy:=(12*vid_BW)+8;
+         uy:=(13*vid_BW)+8;
          _draw_text(_uipanel,vid_hBW,uy,str_menu ,ta_middle,255,c_white);
          if(net_nstat>ns_none)and(G_WTeam=255)then
           if(g_paused>0)
@@ -205,7 +205,7 @@ begin
                if(u_e[true,ui]=0)then
                begin
                   if(_bc_g(a_build,ui)=false)then continue;
-                  if((G_addon=false)and(cl2uid[race,true,ui] in t2))then break;
+                  if((G_addon=false)and(cl2uid[race,true,ui] in t2))then continue;
                end;
 
                ux:=(ui mod 3);
@@ -244,7 +244,7 @@ begin
                if(u_e[false,ui]=0)then
                begin
                   if(_bc_g(a_units,ui)=false)then continue;
-                  if((G_addon=false)and(cl2uid[race,false,ui] in t2))then break;
+                  if((G_addon=false)and(cl2uid[race,false,ui] in t2))then continue;
                end;
 
                if(ui=4)and(race=r_hell)then
@@ -318,8 +318,8 @@ begin
             _drawBtn(_uipanel,1,1,spr_b_stop   ,false,ui_uimove=0);
             _drawBtn(_uipanel,2,1,spr_b_apatrol,false,ui_uimove=0);
 
-            _drawBtn(_uipanel,0,2,spr_b_action ,false,ui_uiaction=0);
-            _drawBtn(_uipanel,1,2,spr_b_selall ,false,false);
+            _drawBtn(_uipanel,0,2,spr_b_action ,false,ui_uiaction=0 );
+            _drawBtn(_uipanel,1,2,spr_b_selall ,false,ui_batlu=0    );
             _drawBtn(_uipanel,2,2,spr_b_delete ,false,ui_uselected=0);
 
             _drawBtn(_uipanel,2,3,spr_b_cancel,false,false);
@@ -340,7 +340,7 @@ begin
       3  : if(m_vy>ui_tabsy)
            then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW ],ta_left,255,c_white)
            else _draw_text(_screen,ui_textx,vid_mh-30,str_hint_a[m_vx div vid_2tBW],ta_left,255,c_white);
-      12 : begin
+      13 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;
               _draw_text(_screen,ui_textx,vid_mh-30,str_hint_m[m_bx],ta_left,255,c_white);

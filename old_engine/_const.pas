@@ -119,7 +119,7 @@ ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
 ub_stopafa             = 6;
-//ub_clcast2             = 7;
+ub_slooow              = 7;
 ub_clcast              = 8;
 ub_invis               = 9;
 ub_detect              = 10;
@@ -140,6 +140,8 @@ DID_BRock              = 5;
 DID_SRock              = 6;
 DID_Other              = 7;
 
+dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
+
 DID_R                  : array[0..7] of integer = (0,65,125,185,250,100,60,17);
 
 upgr_attack            = 0;  // distance attack
@@ -150,7 +152,7 @@ upgr_melee             = 3;  // melee attack / repair/health upgr
 upgr_regen             = 4;  // hell
 upgr_mspeed            = 4;  // uac
 
-upgr_pains             = 5; // pain state
+upgr_pains             = 5;  // pain state
 upgr_plsmt             = 5;  // plasma turrent for turret and apcs
 
 upgr_vision            = 6;  // detectors
@@ -197,6 +199,11 @@ upgr_rturrets          = 22; // rocket turrets
 
 upgr_bldenrg           = 23; // additional energy
 
+//upgr_liqwalk           = 24;
+
+//upgr_msouls            = 25;
+//upgr_defibl            = 25;
+
 upgr_advbld            = 28;
 upgr_advbar            = 29;
 
@@ -239,14 +246,14 @@ UID_Revenant           = 9;
 UID_Mancubus           = 10;
 UID_Arachnotron        = 11;
 UID_Archvile           = 12;
-UID_HEye               = 13;
-UID_ZFormer            = 15;
-UID_ZEngineer          = 16;
-UID_ZSergant           = 17;
-UID_ZCommando          = 18;
-UID_ZBomber            = 19;
-UID_ZMajor             = 20;
-UID_ZBFG               = 21;
+UID_ZFormer            = 13;
+UID_ZEngineer          = 14;
+UID_ZSergant           = 15;
+UID_ZCommando          = 16;
+UID_ZBomber            = 17;
+UID_ZMajor             = 18;
+UID_ZBFG               = 19;
+UID_HEye               = 20;
 
 
 UID_Engineer           = 31;
@@ -431,7 +438,7 @@ vid_uialrm_t           = vid_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
 vid_uialrm_n           = 10;
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
-vid_BW                 = 48;
+vid_BW                 = 44;
 vid_2BW                = vid_BW*2;
 vid_panel              = vid_BW*3;
 vid_tBW                = vid_panel div 4;

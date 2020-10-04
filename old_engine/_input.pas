@@ -286,6 +286,8 @@ begin
             sdlk_V      : _player_s_o(-2,21,0,0, uo_action  ,HPlayer);
             sdlk_B      : _player_s_o(-2,22,0,0, uo_action  ,HPlayer);
             sdlk_N      : _player_s_o(-2,23,0,0, uo_action  ,HPlayer);
+            sdlk_U      : _player_s_o(-2,24,0,0, uo_action  ,HPlayer);
+            sdlk_I      : _player_s_o(-2,25,0,0, uo_action  ,HPlayer);
               end;
           3 : ;
           end;
@@ -526,7 +528,7 @@ begin
         else                         // panel
         begin
            PlaySNDM(snd_click);
-           if(m_by=12)then           // buttons
+           if(m_by=13)then           // buttons
             case m_bx of
              0 : ToggleMenu;
              1 : ;
@@ -560,7 +562,7 @@ begin
 
                 2 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                     begin
-                       if(3<m_by)and(m_by<12)then
+                       if(3<m_by)and(m_by<13)then
                        begin
                           u:=((m_by-4)*3)+(m_bx mod 3);
                           if(u<=_uts)then _player_s_o(-2,u,0,0, uo_action  ,HPlayer);
@@ -691,7 +693,7 @@ begin
                 end;
             2 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                 begin
-                   if(3<m_by)and(m_by<12)then
+                   if(3<m_by)and(m_by<13)then
                    begin
                       u:=((m_by-4)*3)+(m_bx mod 3);
                       if(u<=_uts)then _player_s_o(-3,u,0,0, uo_action  ,HPlayer);

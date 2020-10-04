@@ -247,6 +247,8 @@ begin
              if(uid in whocanaction)then inc(ui_uiaction,1);
           end;
        end;
+
+       if(speed>0)and(uid in whocanattack)then inc(ui_batlu,1);
     end;
 end;
 
@@ -316,10 +318,18 @@ begin
               if(isbuild)then
               begin
                  if(sel)then
-                 begin
-                    if(speed=0)and(UID in whocanattack)then ro:=sr;
-                    if(UID in [UID_HSymbol])and(upgr[upgr_b478tel]>0)then ro:=sr;
-                 end;
+                  case uid of
+                  UID_UTurret,
+                  UID_UPTurret,
+                  UID_URTurret,
+                  UID_HTower,
+                  UID_HTotem,
+                  UID_Mine,
+                  UID_HEye     : ro:=ar;
+                  UID_HSymbol  :if(upgr[upgr_b478tel]>0)then ro:=sr;
+                  else
+                  if(ucl=0)and(speed=0)then ro:=sr;
+                  end;
                  if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r;
               end;
 
@@ -1054,8 +1064,7 @@ begin
    with map_dcell[dx,dy] do
     for i:=1 to n do
      with map_dds[l[i-1]] do
-      if(r>0)and(t>0)then
-       _unit_dpush(u,l[i-1]);
+      if(r>0)and(t>0)then _unit_dpush(u,l[i-1]);
 end;
 
 procedure _unit_npush2(u:integer);
@@ -1122,6 +1131,8 @@ begin
                   false: if(upgr[upgr_mspeed ]>0)then inc(spup,upgr[upgr_mspeed ]);
                   end;
               end;
+              if(buff[ub_slooow]>0)then spup:=spup div 2;
+
 
               if(mdist>70)
               then mdist:=8+random(25)
@@ -1908,9 +1919,9 @@ end;
 
 procedure _unit_code1(u:integer);
 var uc,
-    ud  :integer;
-    tu  :PTUnit;
-    push:boolean;
+    ud   :integer;
+    tu   :PTUnit;
+    push :boolean;
 begin
    with _units[u] do
    with _players[player] do
@@ -1922,13 +1933,12 @@ begin
 
       if(state=ps_comp)then _unit_ai0(u);
 
-      if(uf>uf_ground)and(apcm>0)then
-       if(uo_id=ua_unload)then
-        if(_unit_OnDecorCheck(x,y))then uo_id:=ua_move;
+      if(uf>uf_ground)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)then
+       if(_unit_OnDecorCheck(x,y))then uo_id:=ua_move;
 
       tar1d   := 32000;
       tar1    := 0;
-      push    := solid and _canmove(u) {and (rld=0)};
+      push    := solid and _canmove(u);
       if(alrm_r<0)
       then inc(alrm_r,1)
       else alrm_r:=32000;
@@ -2348,11 +2358,7 @@ begin
                   if(tu^.buff[ub_cnttrans]>0)
                   then exit
                   else
-                    if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then
-                    begin
-                       tu^.buff[ub_cnttrans]:=vid_hfps;
-                       exit;
-                    end;
+                    if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then exit;
 
                  _unit_teleport(u,tu^.uo_x,tu^.uo_y);
                  _teleport_rld(tu,mhits);

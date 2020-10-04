@@ -639,7 +639,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
               if(o_id=uo_specsel)then
                case o_x0 of
-                  0 : if(isbuild=false)then sel:=true else if(o_y0=0)then sel:=false;
+                  0 : if(speed>0)and(uid in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
                else
                   if(o_x0 in _sbs_ucls)then
                    if(ubx[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
@@ -1091,6 +1091,7 @@ begin
          ui_upgrc    :=0;
          ui_upgrl    :=0;
          ui_trntca   :=0;
+         ui_batlu    :=0;
          FillChar(ui_orderu ,SizeOf(ui_orderu ),0);
          FillChar(ui_upgrct ,SizeOf(ui_upgrct ),0);
          FillChar(ui_upgr   ,SizeOf(ui_upgr   ),0);

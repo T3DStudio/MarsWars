@@ -10,17 +10,11 @@ begin
         ro:=0;
         if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r-bld_dec_mr;
 
-        case t of
-            DID_LiquidR1,
-            DID_LiquidR2,
-            DID_LiquidR3,
-            DID_LiquidR4:
-                         begin
-                            if(onlyspr=false)then inc(a,1);
-                            a:=a mod vid_2fps;
-                            spr:=@spr_liquid[(a div vid_hfps)+1,t-DID_LiquidR1];
-                         end;
-        else
+        if(t in dids_liquids)then
+        begin
+           if(onlyspr=false)then inc(a,1);
+           a:=a mod vid_2fps;
+           spr:=@spr_liquid[(a div vid_hfps)+1,t-DID_LiquidR1];
         end;
 
         if((vid_vx-spr^.hw+vid_panel)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
@@ -43,7 +37,7 @@ end;
 procedure map_bminimap;
 begin
    sdl_FillRect(_bminimap,nil,0);
-   _bmm_draw([DID_liquidR1,DID_liquidR2,DID_liquidR3,DID_liquidR4]);
+   _bmm_draw(dids_liquids);
    _bmm_draw([DID_other,DID_srock,DID_brock]);
 end;
 
@@ -230,8 +224,8 @@ begin
    map_flydpth[uf_soaring] := map_mw;
    map_flydpth[uf_fly    ] := map_mw*2;
    map_mmcx    := (vid_panel-2)/map_mw;
-   map_mmvw    := trunc((vid_mw-vid_panel)*map_mmcx);
-   map_mmvh    := trunc( vid_mh*map_mmcx);
+   map_mmvw    := trunc((vid_mw-vid_panel)*map_mmcx)+1;
+   map_mmvh    := trunc( vid_mh*map_mmcx)+1;
    map_prmm    := round(g_ct_pr*map_mmcx);
    {$ENDIF}
 end;
@@ -416,11 +410,11 @@ begin
      if(t>0)then
      begin
         ir:=0;
-        if(td in [DID_LiquidR1..DID_LiquidR4])and(t in [DID_LiquidR1..DID_LiquidR4])then ir:=DID_R[td] div 2;
+        if(td in dids_liquids)and(t in dids_liquids)then ir:=DID_R[td] div 2;
         if(td in [DID_SRock,DID_BRock])then
         begin
-           if(t in [DID_SRock,DID_BRock       ])then ir:= DID_R[td]-20;
-           if(t in [DID_LiquidR1..DID_LiquidR4])then ir:=-DID_R[td];
+           if(t in [DID_SRock,DID_BRock])then ir:= DID_R[td]-20;
+           if(t in dids_liquids         )then ir:=-DID_R[td];
         end;
 
         if(dist2(x,y,ix,iy)<=(r+ir))then
