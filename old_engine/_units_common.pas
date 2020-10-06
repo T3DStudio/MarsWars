@@ -640,9 +640,15 @@ begin
       melee:=_unit_melee(uu,tu,teams);
 
       if(melee)then
+      begin
         if(uu^.uf>uf_ground)
         then md:=td-(uu^.r+tu^.r)
-        else md:=td-(uu^.r+tu^.r+uu^.speed)
+        else md:=td-(uu^.r+tu^.r+uu^.speed);
+        case uu^.uid of
+        UID_Engineer,
+        UID_Medic   : dec(md,32);
+        end;
+      end
       else
         if(uu^.arf>-1)and(uu^.uf=uf_ground)and(tu^.uf=uf_fly)
         then md:=td-uu^.arf
@@ -655,7 +661,7 @@ begin
          else _unit_target:=2;
       end
       else
-        if(uu^.speed>0)then
+        if(uu^.speed>0)and(melee)then
          if(voobshe)
          then _unit_target:=1
          else
@@ -663,16 +669,6 @@ begin
    end;
 end;
 
-{function _canwalkliq(uid,player:byte):boolean;
-begin
-   _canwalkliq:=false;
-   with _players[player] do
-    if(upgr[upgr_liqwalk]>0)then
-     case race of
-     r_hell: _canwalkliq:=true;
-     r_uac : if(uid in marines)then _canwalkliq:=true;
-     end;
-end;}
 
 function _itcanapc(uu,tu:PTUnit):boolean;
 begin
@@ -885,7 +881,7 @@ begin
         UID_APC,
         UID_FAPC : if(buff[ub_gear ]>0)
                    or(buff[ub_toxin]>0) then exit;
-        UID_UCommandCenter: ;
+        UID_UCommandCenter: if(buff[ub_clcast]>0)then exit;
       else
         if(buff[ub_pain ]>0)
         or(buff[ub_toxin]>0)

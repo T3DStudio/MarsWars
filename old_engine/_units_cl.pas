@@ -283,7 +283,7 @@ begin
          generg := 6;
          isbuild:= true;
          renerg := 8;
-         ctime  := 75;
+         ctime  := 80;
       end;
       if(uid in [UID_HGate,UID_HMilitaryUnit]) then
       begin
@@ -349,7 +349,7 @@ begin
          solid  := false;
          max    := 1;
          renerg := 4;
-         ctime  := 25;
+         ctime  := 30;
       end;
       if(uid=UID_HMonastery)then
       begin
@@ -409,7 +409,7 @@ begin
          rld_a  := 25;
          anims  := 18;
          mdmg   := 6;
-         trt    := vid_fps*15;
+         trt    := vid_fps*10;
          renerg := 1;
          arf    :=(sr div 4)*3;
          if(uid=UID_ZEngineer)then
@@ -435,7 +435,7 @@ begin
          rld_a  := 30;
          anims  := 18;
          mdmg   := 6;
-         trt    := vid_fps*15;
+         trt    := vid_fps*10;
          renerg := 1;
          if(uid=UID_ZFormer)then
          begin
@@ -658,7 +658,7 @@ begin
          generg := 6;
          isbuild:= true;
          renerg := 8;
-         ctime  := 90;
+         ctime  := 80;
          rld_r  := 30;
       end;
       if(uid=UID_UMilitaryUnit)then
@@ -747,7 +747,7 @@ begin
          anims  := 2;
          renerg := 2;
          ctime  := 20;
-         ruid   := UID_UWeaponFactory;
+         ruid   := UID_UVehicleFactory;
       end;
       if(uid=UID_URocketL) then
       begin
@@ -972,7 +972,6 @@ begin
    _setUPGR(r_hell,upgr_b478tel   ,30 ,15,1 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_hinvuln   ,180,3 ,10,upgr_2tier,UID_HAltar    );
    _setUPGR(r_hell,upgr_bldenrg   ,180,2 ,4 ,upgr_2tier,UID_HAltar    );
-   //_setUPGR(r_hell,upgr_liqwalk   ,180,1 ,4 ,upgr_2tier,UID_HAltar    );
 
    _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255,255);
    _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255,255);
@@ -998,7 +997,6 @@ begin
    _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_rturrets  ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_bldenrg   ,180,2 ,4 ,upgr_2tier,UID_UVehicleFactory);
-   //_setUPGR(r_uac ,upgr_liqwalk   ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
 
    initUnits;
 

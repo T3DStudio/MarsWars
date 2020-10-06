@@ -271,8 +271,8 @@ begin
    str_hint_t[2]         := 'Researches';
    str_hint_t[3]         := 'Controls';
 
-   str_hint_a[0]         := 'Energy ('+#19+'free'+#25+'/max)';
-   str_hint_a[1]         := 'Army (unit+buildings)';
+   str_hint_a[0]         := 'Energy ('+#19+'free'+#25+' / max)';
+   str_hint_a[1]         := 'Army (units + buildings)';
 
    str_hint_m[0]         := 'Menu (' +#18+'Esc'+#25+')';
    str_hint_m[2]         := 'Pause ('+#18+'Pause/Break'+#25+')';
@@ -647,10 +647,10 @@ begin
   str_hint_t[2]         := 'Исследования';
   str_hint_t[3]         := 'Запись';
 
-  str_hint_m[0]         := 'Меню ('          +#18+'Esc'+#25+')';
-  str_hint_m[2]         := 'Пауза ('         +#18+'Pause/Break'+#25+')';
+  str_hint_m[0]         := 'Меню (' +#18+'Esc'+#25+')';
+  str_hint_m[2]         := 'Пауза ('+#18+'Pause/Break'+#25+')';
 
-  str_hint_a[0]         := 'Энергия (свободная/максимальная)';
+  str_hint_a[0]         := 'Энергия (свободная / максимальная)';
   str_hint_a[1]         := 'Армия (юниты и здания)';
 
   _mkHStrUid(UID_HKeep        ,'Адская Крепость' ,'Строит базу.'                          );

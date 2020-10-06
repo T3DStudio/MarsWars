@@ -45,27 +45,30 @@ begin
                _effect_add(vx,vy-6,map_flydpth[uf]+vy,UID_HEye);
             end
             else
-               if(race=r_hell)and(hits<200)and(bld=false)then
-               begin
-                  if(r<41)
-                  then _effect_add(vx,vy+5 ,-5,eid_db_h1)
-                  else _effect_add(vx,vy+10,-5,eid_db_h0);
-                  exit;
-               end;
+               if(uf=uf_ground)then
+                if(race=r_hell)and(hits<200)and(bld=false)then
+                begin
+                   if(r<41)
+                   then _effect_add(vx,vy+5 ,-5,eid_db_h1)
+                   else _effect_add(vx,vy+10,-5,eid_db_h0);
+                   exit;
+                end;
                PlaySND(snd_exp2,u);
                if(r>48)then
                begin
                   _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BBExp);
-                  if(race=r_hell)
-                  then _effect_add(vx,vy+10,-10,eid_db_h0)
-                  else _effect_add(vx,vy+10,-10,eid_db_u0);
+                  if(uf=uf_ground)then
+                   if(race=r_hell)
+                   then _effect_add(vx,vy+10,-10,eid_db_h0)
+                   else _effect_add(vx,vy+10,-10,eid_db_u0);
                end
                else
                begin
                   _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BExp);
-                  if(race=r_hell)
-                  then _effect_add(vx,vy+10,-10,eid_db_h1)
-                  else _effect_add(vx,vy+10,-10,eid_db_u1);
+                  if(uf=uf_ground)then
+                   if(race=r_hell)
+                   then _effect_add(vx,vy+10,-10,eid_db_h1)
+                   else _effect_add(vx,vy+10,-10,eid_db_u1);
                end;
             end;
          end
@@ -1382,7 +1385,15 @@ begin
                   begin
                      if(tu1^.buff[ub_pain]=0)then
                      begin
-                        {$IFDEF _FULLGAME}PlaySND(snd_cast2,u);{$ENDIF}
+                        {$IFDEF _FULLGAME}
+                        PlaySND(snd_cast2,u);
+                        if(inapc=0)then
+                        begin
+                           ux:=tu1^.r shr 1;
+                           uy:=tu1^.r;
+                           _effect_add(tu1^.x-ux+random(uy),tu1^.y-ux+random(uy),tu1^.y+50,MID_BPlasma);
+                        end;
+                        {$ENDIF}
                         if(inapc=tar1)
                         then rld:=rld_r+rld_r
                         else rld:=rld_r;
@@ -1408,7 +1419,12 @@ begin
                   begin
                      if(tu1^.buff[ub_pain]=0)then
                      begin
-                        {$IFDEF _FULLGAME}PlaySND(snd_cast,u);{$ENDIF}
+                        {$IFDEF _FULLGAME}
+                        PlaySND(snd_cast,u);
+                        ux:=tu1^.r shr 1;
+                        uy:=tu1^.r;
+                        _effect_add(tu1^.x-ux+random(uy),tu1^.y-ux+random(uy),tu1^.y+50,MID_YPlasma);
+                        {$ENDIF}
                         rld:=rld_r;
                         if(onlySVCode)then
                         begin
@@ -1498,7 +1514,8 @@ begin
                      _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,player,_tuf(uf,tu1^.uf),false);
                   end;
                   rld:=rld_r;
-               end;
+               end
+               else exit;
          UID_Terminator:
                begin
                   if(buff[ub_advanced]>0)then
@@ -1593,7 +1610,9 @@ begin
                   {$IFDEF _FULLGAME}PlaySND(snd_plasmas,u);{$ENDIF}
                   _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,player,_tuf(uf,tu1^.uf),false);
                   rld:=rld_r;
-               end;
+               end
+               else exit;
+         else exit;
          end;
       end;
 
@@ -1646,15 +1665,17 @@ begin
               dir:=p_dir(x,y,tu1^.x,tu1^.y);
               _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BFG,player,uf_soaring,false);
            end;
+       else exit;
        end;
 
       _addtoint(@vsnt[_players[tu1^.player].team],vid_fps);
-      if(_players[tu1^.player].team<>_players[player].team)then
-      begin
-         tu1^.alrm_r:=-1;
-         tu1^.alrm_x:=x;
-         tu1^.alrm_y:=y;
-      end;
+      if(OnlySVCode)then
+       if(_players[tu1^.player].team<>_players[player].team)then
+       begin
+          tu1^.alrm_r:=-1;
+          tu1^.alrm_x:=x;
+          tu1^.alrm_y:=y;
+       end;
    end;
 end;
 
@@ -1782,6 +1803,7 @@ begin
                  end;
               end
               else
+                if(state=ps_comp)then
                  if(isbuild=false)and(tu^.alrm_r<base_rr)then
                   if(tu^.isbuild)or(tu^.alrm_r<0)then
                    if not(tu^.uid in [UID_Mine,UID_HEye])then
@@ -1789,7 +1811,8 @@ begin
                     begin
                        alrm_x:=tu^.alrm_x;
                        alrm_y:=tu^.alrm_y;
-                       alrm_r:=ud;
+                       //alrm_r:=ud;
+                       alrm_r:=dist2(x,y,alrm_x,alrm_y);
                        if(tu^.isbuild)then alrm_b:=true;
                     end;
          end;

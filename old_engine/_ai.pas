@@ -812,7 +812,7 @@ begin
                      0  : if(u_e[isbuild,ucl]> 10)
                           then order:=5
                           else order:=4;
-                     5  : if(u_e[isbuild,ucl]<=10)then order:=4;
+                     5  : if(u_e[isbuild,ucl]<=10)or(upgr[upgr_ucomatt]=0)then order:=4;
                      else
                      end;
 
@@ -822,7 +822,7 @@ begin
                              if(alrm_r<=sr)and(speed=0)then _unit_action(u);
 
                             if(speed>0)then
-                             if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)
+                             if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)and(upgr[upgr_ucomatt]>0)
                              then ai_CCAttack(u)
                              else ai_CCOut(u);
                          end;
@@ -955,6 +955,7 @@ begin
    begin
       uo_id :=ua_amove;
       uo_tar:=0;
+      uo_bx :=0;
 
       if(isbuild)
       then ai_buildactions(u)
