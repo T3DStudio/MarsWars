@@ -275,7 +275,7 @@ begin
            //lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(_screen,ix,iy,i2s(rld), ta_left,255, plcolor[player]);
+        _draw_text(_screen,ix,iy,i2s(alrm_r), ta_left,255, plcolor[player]);
 
         if(inapc>0)then continue;
 

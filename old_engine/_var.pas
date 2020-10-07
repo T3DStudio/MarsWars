@@ -44,6 +44,7 @@ _lcu              : integer = 0;
 _lcup             : PTUnit;
 cl2uid            : array[1..2,false..true,0.._uts] of byte;
 
+tar1p             : integer;
 ai_pt,
 ai_ptd,
 ai_uc_e,

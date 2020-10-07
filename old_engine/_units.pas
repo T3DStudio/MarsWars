@@ -1161,9 +1161,10 @@ var tu1 :PTUnit;
     mdam:integer;
 function _tuf(uu_uf,tu_uf:byte):byte;
 begin
-   _tuf:=tu_uf;
-   if(uu_uf=uf_fly)and(tu_uf<uf_fly)then _tuf:=uf_soaring;
-   if(uu_uf<uf_fly)and(tu_uf=uf_fly)then _tuf:=uf_soaring;
+    if(tu_uf>uu_uf)
+    then _tuf:=uu_uf
+    else _tuf:=tu_uf;
+   if(abs(uu_uf-tu_uf)>1)then _tuf:=uf_soaring;
 end;
 begin
    with _units[u] do
@@ -1612,7 +1613,6 @@ begin
                   rld:=rld_r;
                end
                else exit;
-         else exit;
          end;
       end;
 
@@ -1665,7 +1665,6 @@ begin
               dir:=p_dir(x,y,tu1^.x,tu1^.y);
               _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BFG,player,uf_soaring,false);
            end;
-       else exit;
        end;
 
       _addtoint(@vsnt[_players[tu1^.player].team],vid_fps);
@@ -1679,81 +1678,72 @@ begin
    end;
 end;
 
-
-
-function _TarPrio(u,ntar:PTUnit):boolean;
+function _TarPrioPR(uu,tu:PTUnit):integer;
 begin
-   _TarPrio:=true;
-   with u^ do
+   _TarPrioPR:=0;
+
+   with uu^ do
    begin
       with _players[player]do
        if(state=ps_comp)and(ai_skill>3)and(melee=false)then
        begin
-          if(ntar^.uid in [UID_Pain,UID_BFG,UID_ZBFG])then exit;
+          if(tu^.uid in [UID_Pain,UID_BFG,UID_ZBFG])then
+          begin
+             _TarPrioPR:=10;
+             exit;
+          end;
        end;
 
-      case uid of
-       UID_Demon      : if(ntar^.uf=uf_ground)then exit;
-       UID_Imp        : if(uid<>ntar^.uid)and(ntar^.mech=false)and(ntar^.uf=uf_ground)then exit;
-       UID_Cacodemon  : if(uid<>ntar^.uid)and(ntar^.uf=uf_ground)then exit;
-       UID_Baron      : if(uid<>ntar^.uid)and(ntar^.uf=uf_ground)and not(ntar^.uid in armor_lite)then exit;
-       UID_Bomber,
-       UID_Tank,
-       UID_Mancubus   : if(ntar^.isbuild)then exit;
-       UID_Engineer   : if(buff[ub_advanced]=0)then
-                        begin
-                           if(ntar^.mech=false)and(ntar^.uid in armor_lite)then exit;
-                        end
-                        else
-                          if(ntar^.mech)and(ntar^.buff[ub_toxin]<vid_hfps)then exit;
-       UID_Medic      : if(buff[ub_advanced]=0)then
-                        begin
-                           if(ntar^.mech=false)and(ntar^.uid in armor_lite)then exit;
-                        end
-                        else
-                          if(ntar^.mech=false)and(ntar^.buff[ub_toxin]<vid_hfps)then exit;
-       UID_APC,
-       UID_FAPC       : if(apcc=0)then
-                         if(ntar^.mech=false)and(ntar^.uid in armor_lite)then exit;
-       UID_Sergant,
-       UID_ZSergant   : if(ntar^.mech=false)and(ntar^.uf=uf_ground)then exit;
-       UID_Commando,
-       UID_ZCommando,
-       UID_Terminator,
-       UID_Mastermind,
-       UID_UTurret    : if(ntar^.mech=false)and(ntar^.uid in armor_lite)then exit;
-       UID_HTower,
-       UID_Revenant   : if(ntar^.mech)and(ntar^.isbuild=false)then exit;
-       UID_UPTurret,
-       UID_Major      : if not(ntar^.uid in armor_lite)and(ntar^.mech)and(ntar^.isbuild=false)then exit;
-       UID_Mine       : if(ntar^.uf<uf_fly)then exit;
-       UID_BFG        : if not(ntar^.uid in [UID_LostSoul,UID_Demon])then exit;
-       UID_Arachnotron,
-       UID_Flyer      : if(ntar^.uf>uf_ground)then exit;
-       UID_Archvile   : if(ntar^.isbuild=false)and(ntar^.ucl>2)then exit;
-      else
-       exit;
+      case uu^.uid of
+      UID_Imp        : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and(tu^.mech=false)then _TarPrioPR:=1;
+      UID_Cacodemon  : if(uid<>tu^.uid)and(tu^.uf=uf_ground)then _TarPrioPR:=1;
+      UID_Baron      : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and not(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_Bomber,
+      UID_Tank,
+      UID_Mancubus   : if(tu^.isbuild)then _TarPrioPR:=1;
+      UID_Engineer   : if(buff[ub_advanced]=0)then
+                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;end
+                       else  if(tu^.mech)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=1;
+      UID_Medic      : if(buff[ub_advanced]=0)then
+                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;end
+                       else  if(tu^.mech=false)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=1;
+      UID_APC,
+      UID_FAPC       : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_Sergant,
+      UID_ZSergant   : if(tu^.mech=false)and(tu^.uf=uf_ground)then _TarPrioPR:=1;
+      UID_Commando,
+      UID_ZCommando,
+      UID_Terminator,
+      UID_Mastermind,
+      UID_UTurret    : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_HTower,
+      UID_Revenant   : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=1;
+      UID_UPTurret,
+      UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=1;
+      UID_Mine       : if(tu^.uf<uf_fly)then _TarPrioPR:=1;
+      UID_BFG        : if not(tu^.uid in [UID_LostSoul,UID_Demon])then _TarPrioPR:=1;
+      UID_Arachnotron,
+      UID_Flyer      : if(tu^.uf>uf_ground)then _TarPrioPR:=1;
+      UID_Archvile   : if(tu^.isbuild=false)and(tu^.ucl>2)then _TarPrioPR:=1;
       end;
    end;
-   _TarPrio:=false;
 end;
 
 function _TarPrioDT(u,ntar:PTUnit;ud:integer):boolean;
-var ptar:PTUnit;
+var ntar1p:integer;
 begin
    _TarPrioDT:=true;
-   with u^ do
-   begin
-      if(tar1=0)then exit;
-      ptar:=@_units[tar1];
 
-      if(_TarPrio(u,ntar)=false)then
-      begin
-         if(_TarPrio(u,ptar)=false)and(ud<tar1d)then exit;
-      end
-      else
-        if(_TarPrio(u,ptar)=false)or(ud<tar1d)then exit;
+   ntar1p:=_TarPrioPR(u,ntar);
+   if(ntar1p=tar1p)then
+    if(ud<u^.tar1d)then exit;
+
+   if(ntar1p>tar1p)then
+   begin
+      tar1p:=ntar1p;
+      exit;
    end;
+
    _TarPrioDT:=false;
 end;
 
@@ -1811,7 +1801,6 @@ begin
                     begin
                        alrm_x:=tu^.alrm_x;
                        alrm_y:=tu^.alrm_y;
-                       //alrm_r:=ud;
                        alrm_r:=dist2(x,y,alrm_x,alrm_y);
                        if(tu^.isbuild)then alrm_b:=true;
                     end;
@@ -1827,10 +1816,7 @@ begin
               if(upgr[upgr_paina]>0)and(ud<sr)then
                if(teams=false)then
                begin
-                  if not(tu^.uid in [UID_HEye,UID_Mine])then
-                   if(tu^.mech)
-                   then _unit_damage(t,upgr[upgr_paina],upgr[upgr_paina]*3,player)
-                   else _unit_damage(t,upgr[upgr_paina],upgr[upgr_paina]  ,player);
+                  if not(tu^.uid in [UID_HEye,UID_Mine])then  _unit_damage(t,upgr[upgr_paina] shl 1,upgr[upgr_paina],player);
                end
                else tu^.buff[ub_toxin]:=-vid_fps;
           end;
@@ -1862,10 +1848,28 @@ begin
       then alrm_r:=0
       else alrm_r:=32000;
 
-      if(inapc>0)then
+      tar1d   := 32000;
+      tar1    := 0;
+      tar1p   := 0;
+
+      if(0<inapc)and(inapc<=MaxUnits)then
       begin
          if(_units[inapc].inapc>0)then exit;
          vsnt:=_units[inapc].vsnt;
+
+         if(OnlySVCode)then
+         case uid of
+         UID_Engineer: begin
+                          tu:=@_units[inapc];
+                          if(tu^.buff[ub_pain]=0)then
+                           if(tu^.hits<tu^.mhits)then
+                           begin
+                              tar1 :=inapc;
+                              tar1d:=0;
+                              tar1p:=11;
+                           end;
+                       end;
+         end;
       end;
 
       for uc:=1 to MaxUnits do
@@ -1879,20 +1883,6 @@ begin
              if(tu^.hits>0)and(tu^.inapc=0)then _unit_tardetect(u,uc,ud);
           end;
        end;
-
-      if(OnlySVCode)then
-      case uid of
-      UID_Engineer: if(0<inapc)and(inapc<=MaxUnits)then
-                    begin
-                       tu:=@_units[inapc];
-                       if(tu^.buff[ub_pain]=0)then
-                        if(tu^.hits<tu^.mhits)then
-                        begin
-                           tar1 :=inapc;
-                           tar1d:=0;
-                        end;
-                    end;
-      end;
 
       {$IFDEF _FULLGAME}
       if(player=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
@@ -1961,6 +1951,7 @@ begin
 
       tar1d   := 32000;
       tar1    := 0;
+      tar1p   := 0;
       push    := solid and _canmove(u);
       if(alrm_r<0)
       then inc(alrm_r,1)
