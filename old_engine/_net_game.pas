@@ -174,7 +174,11 @@ begin
             begin
                net_chat_add(_players[pid].name+str_plout,pid,255);
                //_kill_player(pid);
-               if(G_Started=false)then _players[pid].state:=ps_none;
+               if(G_Started=false)then
+               begin
+                  _players[pid].state:=ps_none;
+                  _playerSetState(pid);
+               end;
                exit;
             end;
 

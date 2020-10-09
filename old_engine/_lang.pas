@@ -157,7 +157,7 @@ begin
    str_plname            := 'Player name';
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
-   str_maction           := 'Right click';
+   str_maction           := 'Right click action';
    str_maction2[true ]   := #18+'Move'+#25;
    str_maction2[false]   := #17+'Move'+#25+'+'+#17+'attack'+#25;
    str_race[r_random]    := #25+'RANDOM'+#25;
@@ -335,7 +335,6 @@ begin
    _mkHStrUpid(r_hell,upgr_b478tel ,'Short distance teleportation'   ,'Hell Symbols, Towers and Totems can teleport to short distance.' );
    _mkHStrUpid(r_hell,upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
    _mkHStrUpid(r_hell,upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
-   //_mkHStrUpid(r_hell,upgr_liqwalk ,'Hell Run'                       ,'Hell units can walk on liquids.'                                 );
 
 
    _mkHStrUid(UID_UCommandCenter  ,'UAC Command Center'         ,'Builds base.'                    );
@@ -389,7 +388,6 @@ begin
    _mkHStrUpid(r_uac ,upgr_turarm  ,'Turrets armor'          ,'Additional armor for turrets.'                    );
    _mkHStrUpid(r_uac ,upgr_rturrets,'Rocket turrets'         ,'Turrets can upgrade to Rocket turrets.'           );
    _mkHStrUpid(r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for Command Center.'            );
-   //_mkHStrUpid(r_uac ,upgr_liqwalk ,'Protective Suits'       ,'UAC Infantry can walk on liquids.'                );
 
    t:='ignore enemies';
    _mkHStrXY(3,0 ,0,0,'Move, '+t+' ('      +#18+'Q'+#25+')');
@@ -402,16 +400,17 @@ begin
    _mkHStrXY(3,6 ,0,0,'Action ('           +#18+'Z'     +#25+')');
    _mkHStrXY(3,7 ,0,0,'Select all units (' +#18+'F2'    +#25+')');
    _mkHStrXY(3,8 ,0,0,'Destroy ('          +#18+'Delete'+#25+')');
+   _mkHStrXY(3,10,0,0,str_maction+    ' (' +#18+'X'     +#25+')');
    _mkHStrXY(3,11,0,0,'Cancel production ('+#18+'C'     +#25+')');
 
    _mkHStrXY(3,9 ,0,0,'Fog of war ('           +#18+'Q'+#25+')');
-   _mkHStrXY(3,10,0,0,'List of game messages ('+#18+'W'+#25+')');
    _mkHStrXY(3,12,0,0,'Faster game speed ('    +#18+'A'+#25+')');
    _mkHStrXY(3,13,0,0,'Left click: skip 2 seconds ('+#18+'S'+#25+')'+#11+
                       'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'S'+#25+')'+#11+
                       'Skip 1 minute ('+#18+'Alt'+#25+'+'+#18+'S'+#25+')' );
    _mkHStrXY(3,14,0,0,'Pause ('                +#18+'D'+#25+')');
    _mkHStrXY(3,15,0,0,'Player POV ('           +#18+'Z'+#25+')');
+   _mkHStrXY(3,16,0,0,'List of game messages ('+#18+'X'+#25+')');
    _mkHStrXY(3,17,0,0,'All players ('          +#18+'C'+#25+')');
    _mkHStrXY(3,18,0,0,'Red player [#1] ('      +#18+'R'+#25+')');
    _mkHStrXY(3,19,0,0,'Orange player [#2] ('   +#18+'T'+#25+')');
@@ -568,7 +567,7 @@ begin
   str_mousescrl         := 'Прокр. мышью:';
   str_fullscreen        := 'В окне:';
   str_plname            := 'Имя игрока';
-  str_maction           := 'Правый клик';
+  str_maction           := 'Действие на правый клик';
   str_maction2[true ]   := #18+'Движение'+#25;
   str_maction2[false]   := #17+'Движение'+#25+'+'+#17+'атака'+#25;
   str_race[r_random]    := #22+'случ.'+#25;
@@ -690,7 +689,6 @@ begin
                                                                   ,'Адские Символы, Башни и Тотемы могут телепортироваться на короткое расстояние.');
   _mkHStrUpid(r_hell,upgr_hinvuln ,'Неуязвимость'                   ,'Сферы неуязвимости для Адского Алтаря.'                                  );
   _mkHStrUpid(r_hell,upgr_bldenrg ,'Встроеный адский символ'        ,'Дополнительная энергия для Адской Крепости.'                             );
-  //_mkHStrUpid(r_hell,upgr_liqwalk ,'Адский бег'                     ,'Юниты Ада могут ходить по жидкостям.'                                    );
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу.'                    );
   _mkHStrUid(UID_UMilitaryUnit   ,'Войсковая Часть'        ,'Тренирует юнитов.'               );
@@ -742,7 +740,6 @@ begin
   _mkHStrUpid(r_uac ,upgr_turarm  ,'Защита для турелей'       ,'Дополнительное увеличение защиты Турелей.'                );
   _mkHStrUpid(r_uac ,upgr_rturrets,'Ракетные турели'          ,'Обычные турели могут быть улучшены до ракетных.'          );
   _mkHStrUpid(r_uac ,upgr_bldenrg ,'Встроенный генератор'     ,'Дополнительна энергия для Командного Центра.'             );
-  //_mkHStrUpid(r_uac ,upgr_liqwalk ,'Защитные костюмы'         ,'Пехота может ходить по жидкостям.'                        );
 
   t:='игнорировать врагов';
   _mkHStrXY(3,0 ,0,0,'Двигаться, '    +t+' ('+#18+'Q'+#25+')');
@@ -755,16 +752,17 @@ begin
   _mkHStrXY(3,6 ,0,0,'Действие ('            +#18+'Z'     +#25+')');
   _mkHStrXY(3,7 ,0,0,'Выбрать всех юнитов (' +#18+'F2'    +#25+')');
   _mkHStrXY(3,8 ,0,0,'Уничтожить ('          +#18+'Delete'+#25+')');
-  _mkHStrXY(3,11,0,0,'Отмена производства (' +#18+'C'+#25+')');
+  _mkHStrXY(3,10,0,0,str_maction+       ' (' +#18+'X'     +#25+')');
+  _mkHStrXY(3,11,0,0,'Отмена производства (' +#18+'C'     +#25+')');
 
   _mkHStrXY(3,9 ,0,0,'Туман войны ('             +#18+'Q'+#25+')');
-  _mkHStrXY(3,10,0,0,'Список игровых сообщений ('+#18+'W'+#25+')');
   _mkHStrXY(3,12,0,0,'Включить/выключить ускоренный просмотр ('+#18+'A'+#25+')');
   _mkHStrXY(3,13,0,0,'Левый клик: пропустить 2 секунды (' +#18+'S'+#25+')'+#11+
                      'Правый клик: пропустить 10 секунд ('+#18+'Ctrl'+#25+'+'+#18+'S'+#25+')'+#11+
                      'Пропустить 1 минуту ('              +#18+'Alt'+#25+'+'+#18+'S'+#25+')' );
   _mkHStrXY(3,14,0,0,'Пауза ('                   +#18+'D'+#25+')');
   _mkHStrXY(3,15,0,0,'Камера игрока ('           +#18+'Z'+#25+')');
+  _mkHStrXY(3,16,0,0,'Список игровых сообщений ('+#18+'X'+#25+')');
   _mkHStrXY(3,17,0,0,'Все игроки ('              +#18+'C'+#25+')');
   _mkHStrXY(3,18,0,0,'Красный игрок [#1] ('      +#18+'R'+#25+')');
   _mkHStrXY(3,19,0,0,'Оранжевый игрок [#2] ('    +#18+'T'+#25+')');

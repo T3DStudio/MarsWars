@@ -196,15 +196,18 @@ begin
    snd_bfgepx      :=loadSND('bfg_exp.wav');
    snd_plasmas     :=loadSND('h_u4_a.wav');
    snd_cast2       :=loadSND('rep.wav');
-   snd_cast        :=loadSND('h_u0_r.WAV');
-   snd_uupgr       :=loadSND('uup.WAV');
-   snd_hupgr       :=loadSND('hup.WAV');
+   snd_cast        :=loadSND('h_u0_r.wav');
+   snd_uupgr       :=loadSND('uup.wav');
+   snd_hupgr       :=loadSND('hup.wav');
    snd_alarm       :=loadSND('alarm.wav');
    snd_hellbar     :=loadSND('hellbarracks.wav');
    snd_hell        :=loadSND('hell.wav');
    snd_hpower      :=loadSND('hpower.wav');
    snd_fly_a1      :=loadSND('flyer_a1.wav');
    snd_fly_a       :=loadSND('flyer_a.wav');
+   snd_jetpoff     :=loadSND('jetpoff.wav');
+   snd_jetpon      :=loadSND('jetpon.wav');
+   snd_oof         :=loadSND('oof.wav');
 
    snd_build[r_uac ]:=loadSND('build.wav');
    snd_build[r_hell]:=snd_cubes;

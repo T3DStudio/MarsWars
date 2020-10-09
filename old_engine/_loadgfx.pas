@@ -462,6 +462,7 @@ begin
    spr_b_rlog     := LoadBtn('b_log'    ,vid_bw);
    spr_b_rstop    := LoadBtn('b_rstop'  ,vid_bw);
    spr_b_rvis     := LoadBtn('b_rvis'   ,vid_bw);
+   spr_b_rclck    := LoadBtn('b_rclick' ,vid_bw);
 
    spr_c_earth    := LoadIMG('M_EARTH'  ,false,true);
    spr_c_mars     := LoadIMG('M_MARS'   ,false,true);

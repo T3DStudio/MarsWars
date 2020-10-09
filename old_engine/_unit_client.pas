@@ -140,7 +140,6 @@ begin
                   end;
              end;
 
-
             if(rpl=false)and(player=_pl)then
             begin
                if(sel)then _wudata_byte(order,rpl);
@@ -283,6 +282,8 @@ begin
              inc(uid_b[uid],1);
              inc(u_eb[isbuild,ucl],1);
              if(ubx[ucl]=0)then ubx[ucl]:=u;
+             if(0<ubx[ucl])and(ubx[ucl]<=MaxUnits)then
+              if(_units[ubx[ucl]].ucl<>ucl)then ubx[ucl]:=u;
              case ucl of
               0 : inc(bldrs,1);
               1 : if(rld>0)then
@@ -466,7 +467,11 @@ begin
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then _unit_deff(u,hits<=idead_hits);
+              if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
+              begin
+                 _unit_deff(u,hits<=idead_hits);
+                 rld:=0;
+              end;
 
             if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,0);
 
@@ -492,6 +497,13 @@ begin
              case uid of
              UID_ArchVile: PlaySND(snd_meat,u);
              UID_Pain    : _pain_action(u);
+             end;
+
+            if(uid in [UID_Major,UID_ZMajor])then
+             if(buff[ub_advanced]>0)and(hits>0)and(pu^.hits>0)then
+             begin
+                if(pu^.uf=uf_ground)and(uf>uf_ground)then PlaySND(snd_jetpon ,u);
+                if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,u);
              end;
 
             if(pu^.buff[ub_gear]=0)and(buff[ub_gear]>0)then PlaySND(snd_uupgr,u);
@@ -709,7 +721,6 @@ begin
                    if(i=0)
                    then rld:=0
                    else rld:=i*vid_fps-1;
-
                    if(i>0)then
                    begin
                       uo_x:=_rudata_int(rpl,0);
@@ -815,7 +826,7 @@ begin
    begin
       _rpls_pnu:=_PNU;
       if(_rpls_pnu=0)then _rpls_pnu:=1;
-      UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
+      UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+2;
       if(UnitStepNum=0)then UnitStepNum:=1;
    end;
 
@@ -835,7 +846,7 @@ begin
        menerg:=0;
        inc(menerg,u_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
        inc(menerg,u_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
-       if(G_startb=4)then inc(menerg,100);
+       if(G_startb=5)then inc(menerg,100);
     end;
 end;
 {$ENDIF}

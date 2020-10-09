@@ -145,7 +145,7 @@ m_vry,
 mv_x,
 mv_y              : integer;
 
-PlayerName        : shortstring = 'Player';
+PlayerName        : shortstring = 'DoomPlayer';
 PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
 PlayerRace        : byte = 0;
@@ -482,6 +482,7 @@ spr_c_deimos ,
 spr_b_rfast,
 spr_b_rskip,
 spr_b_rfog,
+spr_b_rclck,
 spr_b_rlog,
 spr_b_rstop,
 spr_b_rvis,
@@ -598,6 +599,9 @@ snd_curm          : byte = 1;
 
 snd_build         : array[1..2] of pMIX_CHUNK;
 
+snd_jetpoff,
+snd_jetpon,
+snd_oof,
 snd_alarm,
 snd_uupgr,
 snd_hupgr,

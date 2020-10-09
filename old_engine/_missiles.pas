@@ -210,6 +210,7 @@ begin
               if(tu^.uid in armor_lite)then
                  case mid of
                  MID_Blizzard   : _d25 (@damd);
+                 MID_BFG,
                  MID_Baron,
                  MID_HRocket,
                  MID_Mancubus,

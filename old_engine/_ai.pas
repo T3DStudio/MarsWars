@@ -653,7 +653,8 @@ procedure ai_settar(u,tx,ty,tr,tr2:integer);
 begin
    with _units[u] do
    begin
-      if(uo_x=tx)and(uo_y=ty)then
+      //if(uo_x=tx)and(uo_y=ty)then
+      if(x=tx)and(y=ty)then
       begin
          tr :=base_r;
          tr2:=base_rr;
@@ -720,8 +721,8 @@ begin
 end;
 
 procedure ai_buildactions(u:integer);
-const maxb = 21;
-      maxt = 25;
+const maxb = 20;
+      maxt = 20;
 var blds: TCntr;
     t,
     twrs: integer;
@@ -747,9 +748,11 @@ begin
       blds[7 ]:=blds[4];
       blds[10]:=blds[4];
 
-      if(ucl=0)and(speed=0)then ai_trybuild(x,y,sr,player,(alrm_r<base_rr)and(ai_skill>2),@blds,twrs);
-      if(ucl=1)then ai_utr(u,0);
-      if(ucl=3)then ai_ups(u);
+      case ucl of
+      0: if(speed=0)then ai_trybuild(x,y,sr,player,(alrm_r<base_rr)and(ai_skill>2),@blds,twrs);
+      1: ai_utr(u,0);
+      3: ai_ups(u);
+      end;
 
       twrs:=u_eb[true,4]+u_eb[true,7]+u_eb[true,10];
 
@@ -805,18 +808,28 @@ begin
                      uo_x:=random(map_mw);
                      uo_y:=random(map_mw);
                      _unit_bteleport(u);
-                  end;
+                  end
+                  else
+                    if(u_eb[true,0]>11)and(upgr[upgr_paina]>1)and(u_c[false]>40)and(ai_skill>3)then
+                    begin
+                       uo_x:=alrm_x-base_r+random(base_rr);
+                       uo_y:=alrm_y-base_r+random(base_rr);
+                       _unit_bteleport(u);
+                    end;
+
       UID_UCommandCenter:
                   begin
                      case order of
                      0  : if(u_e[isbuild,ucl]> 10)
                           then order:=5
                           else order:=4;
-                     5  : if(u_e[isbuild,ucl]<=10)or(upgr[upgr_ucomatt]=0)then order:=4;
+                     5  : if(u_e[isbuild,ucl]<=10)or(upgr[upgr_ucomatt]=0)then order:=6;
+                     6  : if(u_e[isbuild,ucl]> 10)then order:=5;
                      else
                      end;
 
                      case order of
+                      6,
                       4: begin
                             if(hits<1500)or(ai_uc_e>5)or(ai_uc_a<3)then
                              if(alrm_r<=sr)and(speed=0)then _unit_action(u);
@@ -1031,6 +1044,11 @@ begin
          end;
 
          if(g_mode=gm_inv)and(player=0)then exit;
+
+         case uid of
+         UID_Major,
+         UID_ZMajor: if(uf=uf_ground)then _unit_action(u);
+         end;
 
          if(ai_skill>2)then
          begin

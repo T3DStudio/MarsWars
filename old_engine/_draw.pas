@@ -271,11 +271,11 @@ begin
         if(player=HPlayer)then
         begin
            lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
-           lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
-           //lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
+           if(uo_x>0)then
+            lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(_screen,ix,iy,i2s(alrm_r), ta_left,255, plcolor[player]);
+        _draw_text(_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, plcolor[player]);
 
         if(inapc>0)then continue;
 

@@ -392,6 +392,8 @@ _d2shi                 = abs(dead_hits div 126)+1;   // 5
 
 _sbs_ucls              = [5,6,8];
 
+fly_height             = 30;
+
 {$IFDEF _FULLGAME}
 
 whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
@@ -610,7 +612,6 @@ LiquidAnim             = 4;
 crater_ri              = 4;
 crater_r               : array[1..crater_ri] of integer = (33,60,88,110);
 
-fly_height             = 30;
 
 {$ELSE }
 

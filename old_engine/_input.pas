@@ -153,7 +153,6 @@ begin
         begin
            case k of
                     sdlk_Q      : _fog:=not _fog;
-                    sdlk_W      : _rpls_log:=not _rpls_log;
                     sdlk_A      : _fsttime:=not _fsttime;
                     sdlk_S      : if(k_ctrl>1)
                                   then _rpls_step:=vid_hfps*10
@@ -166,6 +165,7 @@ begin
                                    then G_Paused:=0
                                    else G_Paused:=200;
                     sdlk_Z      : _rpls_vidm:=not _rpls_vidm;
+                    sdlk_X      : _rpls_log:=not _rpls_log;
                     sdlk_C      : HPlayer:=0;
                     sdlk_R      : HPlayer:=1;
                     sdlk_T      : HPlayer:=2;
@@ -186,6 +186,7 @@ begin
           sdlk_S         : _player_s_o(2,1,0,0,uo_action ,HPlayer);
           sdlk_D         : m_sbuild:=-4;
           sdlk_Z         : _player_s_o(1,0,0,0,uo_action ,HPlayer);
+          sdlk_X         : m_a_inv:=not m_a_inv;
           sdlk_C         : case ui_tab of
                            1 : _player_s_o(-5,-1,0,0,uo_action ,HPlayer);
                            2 : _player_s_o(-3,-1,0,0,uo_action ,HPlayer);
@@ -571,9 +572,9 @@ begin
                 3 : if(_rpls_rst>=rpl_rhead)then
                     begin
                         case m_by of
-                     7 :begin
-                           if(m_bx=0)then _fog:=not _fog;
-                           if(m_bx=1)then _rpls_log:=not _rpls_log;
+                     7 :case m_bx of
+                        0: _fog:=not _fog;
+                        1: ;
                         end;
                      8 :begin
                            if(m_bx=0)then _fsttime:=not _fsttime;
@@ -586,7 +587,7 @@ begin
                         end;
                      9 : case m_bx of
                            0: _rpls_vidm:=not _rpls_vidm;
-                           1: ;
+                           1: _rpls_log :=not _rpls_log;
                            2: HPlayer:=0;
                          end;
                      10: case m_bx of
@@ -618,6 +619,10 @@ begin
                           0: _player_s_o(1,0,0,0, uo_action  ,HPlayer);
                           1: _player_s_o(0,0,0,0, uo_specsel ,HPlayer);
                           2: _player_s_o(0,0,0,0, uo_delete  ,HPlayer);
+                          end;
+                       7 :case m_bx of
+                          1: m_a_inv:=not m_a_inv;
+                          2: _player_s_o(-6,0,0,0,uo_action ,HPlayer);
                           end;
                        end;
                        _chkbld;

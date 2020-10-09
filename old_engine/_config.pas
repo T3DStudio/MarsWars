@@ -12,6 +12,7 @@ begin
    if (vr='fscr' )then _fscr       :=(vl=b2pm[true,2]);
    if (vr='vmm'  )then vid_vmm     :=(vl=b2pm[true,2]);
    if (vr='saddr')then net_cl_svstr:= vl;
+   if (vr='sport')then net_sv_pstr := vl;
    if (vr='lng'  )then _lng        :=(vl=b2pm[true,2]);
    if (vr='mai'  )then m_a_inv     :=(vl=b2pm[true,2]);
    if (vr='vidmw')then vid_mw      :=vlb;
@@ -72,6 +73,7 @@ begin
    m_vrx:=vid_mw;
    m_vry:=vid_mh;
    net_cl_saddr;
+   net_sv_sport;
 end;
 
 procedure cfg_write;
@@ -80,22 +82,23 @@ begin
    assign(f,cfgfn);
    {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
 
-   writeln(f,'sndv' ,'=',snd_svolume);
-   writeln(f,'mscv' ,'=',snd_mvolume);
-   writeln(f,'name' ,'=',PlayerName);
-   writeln(f,'fscr' ,'=',b2pm[_fscr,2]);
-   writeln(f,'vspd' ,'=',vid_vmspd);
+   writeln(f,'sndv' ,'=',snd_svolume    );
+   writeln(f,'mscv' ,'=',snd_mvolume    );
+   writeln(f,'name' ,'=',PlayerName     );
+   writeln(f,'fscr' ,'=',b2pm[_fscr,2]  );
+   writeln(f,'vspd' ,'=',vid_vmspd      );
    writeln(f,'vmm'  ,'=',b2pm[vid_vmm,2]);
-   writeln(f,'saddr','=',net_cl_svstr);
-   writeln(f,'lng'  ,'=',b2pm[_lng,2]);
+   writeln(f,'saddr','=',net_cl_svstr   );
+   writeln(f,'sport','=',net_sv_pstr    );
+   writeln(f,'lng'  ,'=',b2pm[_lng,2]   );
    writeln(f,'mai'  ,'=',b2pm[m_a_inv,2]);
-   writeln(f,'vidmw','=',vid_mw);
-   writeln(f,'vidmh','=',vid_mh);
-   writeln(f,'rpnui','=',_rpls_pnui);
-   writeln(f,'npnui','=',net_pnui);
-   writeln(f,'gsb'  ,'=',G_startb );
+   writeln(f,'vidmw','=',vid_mw         );
+   writeln(f,'vidmh','=',vid_mh         );
+   writeln(f,'rpnui','=',_rpls_pnui     );
+   writeln(f,'npnui','=',net_pnui       );
+   writeln(f,'gsb'  ,'=',G_startb       );
    writeln(f,'gsp'  ,'=',b2pm[G_shpos,2]);
-   writeln(f,'gai'  ,'=',G_aislots);
+   writeln(f,'gai'  ,'=',G_aislots      );
 
    close(f);
 end;

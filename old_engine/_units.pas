@@ -958,8 +958,8 @@ UID_Pain     :  if(_canmove(u))and(rld=0)then
                    rld:=rld_r;
                    _pain_action(u);
                 end;
-UID_Mine      : if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_bufinf;
-UID_LostSoul:   if(upgr[upgr_vision]>0)then
+UID_Mine     :  if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_bufinf;
+UID_LostSoul :  if(upgr[upgr_vision]>0)then
                 begin
                    {$IFDEF _FULLGAME}
                    _effect_add(vx,vy,vy+1,UID_LostSoul);
@@ -968,6 +968,24 @@ UID_LostSoul:   if(upgr[upgr_vision]>0)then
                    _unit_morph(u,UID_HEye,true);
                    order:=0;
                 end;
+UID_Major,
+UID_ZMajor   : if(buff[ub_advanced]>0)and(buff[ub_clcast]=0)then
+               begin
+                  if(uf>uf_ground)then
+                   if(_unit_OnDecorCheck(x,y))then exit;
+
+                  if(buff[ub_cast]>0)
+                  then buff[ub_cast]:=0
+                  else buff[ub_cast]:=_bufinf;
+
+                  buff[ub_clcast]:=vid_fps;
+
+                  {$IFDEF _FULLGAME}
+                  if(buff[ub_cast]>0)
+                  then PlaySND(snd_jetpon,u)
+                  else PlaySND(snd_jetpoff,u);
+                  {$ENDIF}
+               end;
      end;
 end;
 
@@ -1109,6 +1127,20 @@ begin
       {$ENDIF}
    end
    else
+   begin
+      case uid of
+      UID_Major,
+      UID_ZMajor:if(_unit_flyup(u,2+(uf*fly_height)))then
+                 begin
+                   {$IFDEF _FULLGAME}
+                   case uid of
+                   UID_Major : PlaySND(snd_oof ,u);
+                   UID_ZMajor: PlaySND(snd_z_p ,u);
+                   end;
+                   {$ENDIF}
+                end;
+      end;
+
     if(onlySVCode)then
      if(_canmove(u))then
       if(x=vx)and(y=vy)then
@@ -1153,6 +1185,7 @@ begin
            _unit_sfog(u);
            {$ENDIF}
         end;
+   end;
 end;
 
 procedure _unit_attack(u:integer);
@@ -1162,9 +1195,11 @@ var tu1 :PTUnit;
 function _tuf(uu_uf,tu_uf:byte):byte;
 begin
     if(tu_uf>uu_uf)
-    then _tuf:=uu_uf
-    else _tuf:=tu_uf;
-   if(abs(uu_uf-tu_uf)>1)then _tuf:=uf_soaring;
+    then _tuf:=tu_uf
+    else
+     if(abs(uu_uf-tu_uf)>1)
+     then _tuf:=uf_soaring
+     else _tuf:=uu_uf;
 end;
 begin
    with _units[u] do
@@ -1694,37 +1729,40 @@ begin
           end;
        end;
 
+      if(tu^.isbuild=false)then inc(_TarPrioPR,1);
+      if(tu^.buff[ub_invuln]=0)then inc(_TarPrioPR,1);
+
       case uu^.uid of
-      UID_Imp        : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and(tu^.mech=false)then _TarPrioPR:=1;
-      UID_Cacodemon  : if(uid<>tu^.uid)and(tu^.uf=uf_ground)then _TarPrioPR:=1;
-      UID_Baron      : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and not(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_Imp        : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and(tu^.mech=false)then _TarPrioPR:=5;
+      UID_Cacodemon  : if(uid<>tu^.uid)and(tu^.uf=uf_ground)then _TarPrioPR:=5;
+      UID_Baron      : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and not(tu^.uid in armor_lite)then _TarPrioPR:=5;
       UID_Bomber,
       UID_Tank,
-      UID_Mancubus   : if(tu^.isbuild)then _TarPrioPR:=1;
+      UID_Mancubus   : if(tu^.isbuild)then _TarPrioPR:=5;
       UID_Engineer   : if(buff[ub_advanced]=0)then
-                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;end
-                       else  if(tu^.mech)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=1;
+                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;end
+                       else  if(tu^.mech)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=5;
       UID_Medic      : if(buff[ub_advanced]=0)then
-                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;end
-                       else  if(tu^.mech=false)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=1;
+                       begin if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;end
+                       else  if(tu^.mech=false)and(tu^.buff[ub_toxin]<vid_hfps)then _TarPrioPR:=5;
       UID_APC,
-      UID_FAPC       : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_FAPC       : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;
       UID_Sergant,
-      UID_ZSergant   : if(tu^.mech=false)and(tu^.uf=uf_ground)then _TarPrioPR:=1;
+      UID_ZSergant   : if(tu^.mech=false)and(tu^.uf=uf_ground)then _TarPrioPR:=5;
       UID_Commando,
       UID_ZCommando,
       UID_Terminator,
       UID_Mastermind,
-      UID_UTurret    : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=1;
+      UID_UTurret    : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;
       UID_HTower,
-      UID_Revenant   : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=1;
+      UID_Revenant   : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
       UID_UPTurret,
-      UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=1;
-      UID_Mine       : if(tu^.uf<uf_fly)then _TarPrioPR:=1;
-      UID_BFG        : if not(tu^.uid in [UID_LostSoul,UID_Demon])then _TarPrioPR:=1;
+      UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
+      UID_Mine       : if(tu^.uf<uf_fly)then _TarPrioPR:=5;
+      UID_BFG        : if not(tu^.uid in [UID_LostSoul,UID_Demon])then _TarPrioPR:=5;
       UID_Arachnotron,
-      UID_Flyer      : if(tu^.uf>uf_ground)then _TarPrioPR:=1;
-      UID_Archvile   : if(tu^.isbuild=false)and(tu^.ucl>2)then _TarPrioPR:=1;
+      UID_Flyer      : if(tu^.uf>uf_ground)then _TarPrioPR:=5;
+      UID_Archvile   : if(tu^.isbuild=false)and(tu^.ucl>2)then _TarPrioPR:=5;
       end;
    end;
 end;
@@ -1781,29 +1819,36 @@ begin
 
             if(onlySVCode)and(vision)then  _unit_aiUBC(u,tu,ud,teams);
 
-            if(ud<alrm_r)then
-             if(_player_sight(player,tu,vision))then
-              if(teams=false)then
-              begin
-                 if(alrm_b=false)and(tu^.buff[ub_invuln]=0)then
-                 begin
-                    alrm_x:=tu^.x;
-                    alrm_y:=tu^.y;
-                    alrm_r:=ud;
-                 end;
-              end
-              else
-                if(state=ps_comp)then
+            //
+            if(_player_sight(player,tu,vision))then
+             if(teams=false)then
+             begin
+                if(tu^.buff[ub_invuln]=0)then
+                 if(alrm_b=false)or(ud<base_rr)then
+                  if(ud<alrm_r)then
+                  begin
+                     alrm_x:=tu^.x;
+                     alrm_y:=tu^.y;
+                     alrm_r:=ud;
+                     alrm_b:=false;
+                  end;
+             end
+             else
+               if(state=ps_comp)then
+                if not(tu^.uid in [UID_Mine,UID_HEye])then
                  if(isbuild=false)and(tu^.alrm_r<base_rr)then
                   if(tu^.isbuild)or(tu^.alrm_r<0)then
-                   if not(tu^.uid in [UID_Mine,UID_HEye])then
-                    if(ud<base_3r)or(order<>2)then
-                    begin
-                       alrm_x:=tu^.alrm_x;
-                       alrm_y:=tu^.alrm_y;
-                       alrm_r:=dist2(x,y,alrm_x,alrm_y);
-                       if(tu^.isbuild)then alrm_b:=true;
-                    end;
+                  begin
+                     ud:=dist2(x,y,tu^.alrm_x,tu^.alrm_y);
+                     if(ud<alrm_r)or((tu^.isbuild)and(alrm_b=false))then
+                      if(ud<base_3r)or(order<>2)then
+                      begin
+                         alrm_x:=tu^.alrm_x;
+                         alrm_y:=tu^.alrm_y;
+                         alrm_r:=ud;
+                         if(tu^.isbuild)then alrm_b:=true;
+                      end;
+                  end;
          end;
       end;
 

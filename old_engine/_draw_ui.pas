@@ -284,11 +284,12 @@ begin
          if(_rpls_rst>=rpl_rhead)then
          begin
             _drawBtn(_uipanel,0,3,spr_b_rfog ,_fog      ,false);
-            _drawBtn(_uipanel,1,3,spr_b_rlog ,_rpls_log ,false);
+
             _drawBtn(_uipanel,0,4,spr_b_rfast,_fsttime  ,false);
             _drawBtn(_uipanel,1,4,spr_b_rskip,false     ,false);
             _drawBtn(_uipanel,2,4,spr_b_rstop,g_paused>0,false);
             _drawBtn(_uipanel,0,5,spr_b_rvis ,_rpls_vidm,false);
+            _drawBtn(_uipanel,1,5,spr_b_rlog ,_rpls_log ,false);
 
             ux:=2;
             uy:=5;
@@ -322,7 +323,8 @@ begin
             _drawBtn(_uipanel,1,2,spr_b_selall ,false,ui_batlu=0    );
             _drawBtn(_uipanel,2,2,spr_b_delete ,false,ui_uselected=0);
 
-            _drawBtn(_uipanel,2,3,spr_b_cancel,false,false);
+            _drawBtn(_uipanel,1,3,spr_b_rclck  ,m_a_inv   ,false);
+            _drawBtn(_uipanel,2,3,spr_b_cancel ,false,false);
          end;
 
          end;

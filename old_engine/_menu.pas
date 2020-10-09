@@ -152,7 +152,7 @@ begin
 
    if(k_ml=2)or(k_mr=2) then   //right or left click
    begin
-      //if(_m_sel=22)then net_cl_saddr;
+      if(_m_sel=90)then net_cl_saddr;
       if(_m_sel=11 )then _players[HPlayer].name:=PlayerName;
       c_m_sel;
       if not(_m_sel in [16,17])then begin m_vrx:=vid_mw;m_vry:=vid_mh; end;
@@ -358,6 +358,7 @@ begin
               else
               begin
                  net_nstat:=ns_srvr;
+                 net_sv_sport;
                  if(net_UpSocket=false)then
                  begin
                     net_dispose;
@@ -385,6 +386,7 @@ begin
               else
               begin
                  net_nstat:=ns_clnt;
+                 net_cl_saddr;
                  if(net_UpSocket)
                  then net_m_error:=str_connecting
                  else

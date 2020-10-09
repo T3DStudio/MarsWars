@@ -233,6 +233,34 @@ begin;
    end;
 end;
 
+function _unit_flyup(u,z:integer):boolean;
+var st:integer;
+begin
+   _unit_flyup:=false;
+   with _units[u] do
+    if(shadow<>z)then
+    begin
+       st:=z-shadow;
+       if(abs(st)<=2)then
+       begin
+          shadow:=z;
+          if(st<0)then _unit_flyup:=true;
+          exit;
+       end
+       else
+       begin
+          st:=sign(st)*2;
+          inc(shadow,st);
+       end;
+       if(OnlySVCode)then
+       begin
+          if(uo_y=y)then dec(uo_y,st);
+          dec(y ,st);
+          dec(vy,st);
+       end;
+    end;
+end;
+
 procedure _unit_movevis(u:integer);
 begin
    with _units[u] do
@@ -542,22 +570,23 @@ begin
      if(teams)then
       if(uu^.uid in [UID_Medic,UID_Engineer])then
       begin
-         //if(uu^.inapc>0)then exit;
          if(tu^.buff[ub_pain]>0)or(tu^.hits>=tu^.mhits)then exit;
          case uu^.uid of
-         UID_Medic    : if(tu^.mech)or(uu^.inapc>0)then exit;
+         UID_Medic    : begin
+                           if(tu^.mech)or(uu^.inapc>0)then exit;
+                           if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(uu<>tu)then exit;
+                        end;
          UID_Engineer : begin
-                        if(0<uu^.inapc)and(uu^.inapc<=MaxUnits)then
-                         if(tu<>@_units[uu^.inapc])then exit;
-                        if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
+                           if(0<uu^.inapc)and(uu^.inapc<=MaxUnits)then
+                            if(tu<>@_units[uu^.inapc])then exit;
+                           if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
                         end;
          end;
       end
       else exit;
 
-   if(uu^.uid=UID_UCommandCenter)and(uu^.uf=uf_ground)then exit;
-
-   //if(teams)then exit;
+   if(uu^.uid=UID_UCommandCenter)then
+    if(uu^.uf=uf_ground)or(tu^.uf>uf_ground)then exit;
 
    if(tu^.uf=uf_fly)then
    begin
@@ -570,8 +599,6 @@ begin
 
    if(uu^.uid in [UID_Bomber,UID_ZBomber,UID_Tank])then
     if(utd<=rocket_sr)or(tu^.uf>uf_ground)then exit;
-
-   if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(uu<>tu)then exit;
 
    _unit_chktar:=true;
 end;
@@ -896,10 +923,7 @@ procedure _unit_turn(u:integer);
 begin
    with _units[u] do
     if(_canmove(u))then
-    begin
-       if not(uid in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
-       //:=0;
-    end;
+     if not(uid in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
 procedure _unit_upgr(u:integer);
@@ -1111,6 +1135,19 @@ begin
                          else
                             if(upgr[upgr_vision ]>2)then buff[ub_invis]:=_bufinf;
                       end;
+         UID_Major,
+         UID_ZMajor : begin
+                         if(buff[ub_advanced]>0)and(buff[ub_cast]>0)then
+                         begin
+                            uf   :=uf_fly;
+                            speed:=13;
+                         end
+                         else
+                         begin
+                            uf   :=uf_ground;
+                            speed:=9;
+                         end;
+                      end;
        end;
 
        if(buff[ub_advanced]>0)then
@@ -1124,14 +1161,6 @@ begin
            end
            else shadow:=uaccc_fly;
 
-          if(uf<uf_fly)then
-           if(uid in [UID_Major,UID_ZMajor])then
-           begin
-              speed :=13;
-              uf    :=uf_fly;
-              {$IFDEF _FULLGAME}shadow:=2+(uf*fly_height);{$ENDIF}
-           end;
-
           if(uid=UID_Mine)then
            if(sr<250)then
            begin
@@ -1142,14 +1171,6 @@ begin
        else
        begin
           if(uid=UID_UCommandCenter)then shadow:=buff[ub_clcast];
-
-          if(uf>uf_ground)then
-           if(uid in [UID_Major,UID_ZMajor])then
-           begin
-              speed :=9;
-              uf    :=uf_ground;
-              {$IFDEF _FULLGAME}shadow:=2+(uf*fly_height);{$ENDIF}
-           end;
 
           if(G_Addon=false)then
            if(uid=UID_Baron)then buff[ub_advanced]:=_bufinf;
