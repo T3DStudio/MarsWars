@@ -1,5 +1,5 @@
 # MarsWars
-RTS based on DOOM 2 Universe!
+RTS game based on DOOM 2 Universe!
 
 
 Discord server of project: discord.gg/gCupVGM
