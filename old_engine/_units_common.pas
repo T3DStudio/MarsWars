@@ -92,6 +92,12 @@ UID_HTeleport: _udpth:=-4;
 UID_HSymbol,
 UID_HAltar   : _udpth:=-3;
 UID_Mine     : _udpth:=-2;
+UID_UCommandCenter: if(uf>uf_ground)
+                    then _udpth:=map_flydpth[uf_soaring]+vy
+                    else
+                      if(hits>0)
+                      then _udpth:=map_flydpth[uf]+vy
+                      else _udpth:=vy;
     else
       if(hits>0)
       then _udpth:=map_flydpth[uf]+vy

@@ -204,7 +204,9 @@ begin
                                    else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
                             end;
           sdlk_delete    :  _player_s_o(k_ctrl,0,0,0,uo_delete ,HPlayer);
-          sdlk_F2        :  _player_s_o(0     ,0,0,0,uo_specsel,HPlayer);
+          sdlk_F2        : if(k_dbl>0)
+                           then _moveHumView(ordx[10], ordy[10])
+                           else _player_s_o(0,0,0,0,uo_specsel,HPlayer);
         else
           case ui_tab of
           0 : if(k_ctrl=0)then

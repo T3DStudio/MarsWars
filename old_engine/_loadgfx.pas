@@ -1,32 +1,26 @@
 
-function SDL_GETpixel(srf:PSDL_SURFACE;x,y:word):cardinal;
-var bpp,r,g,b:byte;
+procedure SDL_SETpixel(srf:PSDL_SURFACE;x,y:integer;color:cardinal);
+var bpp:byte;
 begin
-   SDL_GETpixel:=0;
+   if(x<0)or(srf^.w<=x)
+   or(y<0)or(srf^.h<=y)then exit;
 
    bpp:=srf^.format^.BytesPerPixel;
 
-   case bpp of
-      1:SDL_GETpixel:=TBa(srf^.pixels^)[(y*srf^.pitch)+x];
-      2:SDL_GETpixel:=TWa(srf^.pixels^)[(y*srf^.pitch)+x];
-      3:begin
-           if(SDL_byteorder = SDL_big_endian)then
-           begin
-              r:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)];
-              g:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+1];
-              b:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+2];
-           end
-           else
-           begin
-              b:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)];
-              g:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+1];
-              r:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+2];
-           end;
-           SDL_GETpixel:=(r shl 16)+(g shl 8)+b;
-        end;
-      4:SDL_GETpixel:=TCa(srf^.pixels^)[y*srf^.w+x];
-   else
-   end;
+   move( (@(color))^, (srf^.pixels+(y*srf^.pitch)+x*bpp)^, bpp);
+end;
+
+function SDL_GETpixel(srf:PSDL_SURFACE;x,y:integer):cardinal;
+var bpp:byte;
+begin
+   SDL_GETpixel:=0;
+
+   if(x<0)or(srf^.w<=x)
+   or(y<0)or(srf^.h<=y)then exit;
+
+   bpp:=srf^.format^.BytesPerPixel;
+
+   move( (srf^.pixels+(y*srf^.pitch)+x*bpp)^, (@SDL_GETpixel)^, bpp);
 end;
 
 function _loadsrf(fn:string):pSDL_SURFACE;
@@ -53,7 +47,7 @@ begin
    if(loadIMG=_dsurf)then loadIMG:=_loadsrf(str_folder_gr+fn+'.bmp');
    if(loadIMG=_dsurf)and(log)then WriteLog(str_folder_gr+fn);
 
-   if(trns)and(loadIMG<>_dsurf)then SDL_SetColorKey(loadIMG,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(loadIMG,0,0));
+   if(trns)and(loadIMG<>_dsurf)then SDL_SetColorKey(loadIMG,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(loadIMG,0,0));
 end;
 
 procedure _FreeSF(sf:PSDL_Surface);
@@ -96,7 +90,7 @@ begin
              sdl_freesurface(surf);
              surf:=nil;
           end;
-          surf:=sdl_createRGBSurface(0,ld,ld,vid_bpp,0,0,0,0);
+          surf:=_createSurf(ld,ld);
 
           x:=-l*(ts^.w div 4);
           while (x<ld) do
@@ -250,7 +244,7 @@ begin
    ter_h:=ter_s^.h;
    w:=vid_mw+(ter_w shl 1)-vid_panel;
    h:=vid_mh+(ter_h shl 1);
-   vid_terrain:=sdl_createRGBSurface(0,w,h,vid_bpp,0,0,0,0);
+   vid_terrain:=_createSurf(w,h);
    x:=0;
 
    while (x<w) do
@@ -267,15 +261,6 @@ begin
    sdl_freesurface(ter_s);
 end;
 
-function to32(c:cardinal):cardinal;
-var r,g,b:byte;
-begin
-   r:=(c and $00FF0000) shr 16;
-   g:=(c and $0000FF00) shr 8;
-   b:=(c and $000000FF);
-   to32:=255+(b shl 8)+(g shl 16)+(r shl 24)
-end;
-
 function _xasurf(s:PSDL_Surface;xa,ya:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
@@ -286,8 +271,9 @@ begin
     begin
        if(xa)then sx:=s^.w-x else sx:=x-1;
        if(ya)then sy:=s^.h-y else sy:=y-1;
-       c:=to32(SDL_GETpixel(s,x-1,y-1));
-       pixelColor(_xasurf,sx,sy,c);
+       c:=SDL_GETpixel(s,x-1,y-1);
+
+       SDL_SETpixel(_xasurf,sx,sy,c);
     end;
 end;
 
@@ -384,7 +370,7 @@ begin
    for i:=0 to 255 do
    begin
       c:=chr(i);
-      font_ca[c]:=sdl_createRGBSurface(0,font_w,font_w,vid_bpp,0,0,0,0);
+      font_ca[c]:=_createSurf(font_w,font_w);
       SDL_FillRect(font_ca[c],nil,0);
       SDL_SetColorKey(font_ca[c],SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
 

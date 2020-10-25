@@ -258,7 +258,7 @@ _lng              : boolean = false;
 
 ordn,
 ordx,
-ordy              : array[0..9] of integer;
+ordy              : array[0..10] of integer;
 
 _m_sel,
 m_sxs,

@@ -4,36 +4,14 @@ var bpp,r,g,b:byte;
 begin
    sdl_GetPixelColor:=0;
 
-   bpp:=srf^.format^.BytesPerPixel;
+   if(x<0)or(srf^.w<=x)
+   or(y<0)or(srf^.h<=y)then exit;
 
    if(srf^.w=0)or(srf^.h=0)then exit;
 
-   if(x>=srf^.w)then x:=srf^.w-1;
-   if(y>=srf^.h)then y:=srf^.h-1;
-   if(x<0)then x:=0;
-   if(y<0)then y:=0;
+   bpp:=srf^.format^.BytesPerPixel;
 
-   case bpp of
-      1:sdl_GetPixelColor:=TBa(srf^.pixels^)[(y*srf^.pitch)+x];
-      2:sdl_GetPixelColor:=TWa(srf^.pixels^)[(y*srf^.pitch)+x];
-      3:begin
-           if(SDL_BYTEORDER = SDL_big_endian)then
-           begin
-              r:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)];
-              g:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+1];
-              b:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+2];
-           end
-           else
-           begin
-              b:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)];
-              g:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+1];
-              r:=TBa(srf^.pixels^)[(y*srf^.pitch)+(x*bpp)+2];
-           end;
-           sdl_GetPixelColor:=(r shl 16)+(g shl 8)+b;
-        end;
-      4:sdl_GetPixelColor:=TCa(srf^.pixels^)[y*srf^.w+x];
-   else
-   end;
+   move( (srf^.pixels+(y*srf^.pitch)+x*bpp)^, (@SDL_GETpixel)^, bpp);   
 end;
 
 function _loadsrf(fn:string;default:pSDL_Surface=nil):pSDL_SURFACE;

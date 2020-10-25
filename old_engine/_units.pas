@@ -182,6 +182,22 @@ begin
    end;
 end;
 
+procedure _orders(x,y:integer;i:byte);
+begin
+   if(ordx[i]=0)then
+   begin
+      ordx[i]:=x;
+      ordy[i]:=y;
+   end
+   else
+    //if(dist2(x,y,ordx[i],ordy[i])<base_ir)then
+    begin
+       ordx[i]:=(ordx[i]+x) div 2;
+       ordy[i]:=(ordy[i]+y) div 2;
+    end;
+   inc(ordn[i],1);
+end;
+
 procedure _unit_uidata(u:integer);
 begin
    with _units[u] do
@@ -190,20 +206,11 @@ begin
     begin
        if(order<10)then
        begin
-          if(ordx[order]=0)then
-          begin
-             ordx[order]:=x;
-             ordy[order]:=y;
-          end
-          else
-           if(dist2(x,y,ordx[order],ordy[order])<base_ir)then
-           begin
-              ordx[order]:=(ordx[order]+x) div 2;
-              ordy[order]:=(ordy[order]+y) div 2;
-           end;
-          inc(ordn[order],1);
+          _orders(x,y,order);
           ui_orderu[order,isbuild]:=ui_orderu[order,isbuild]+[ucl];
        end;
+
+       if(speed>0)and(uid in whocanattack)then _orders(x,y,10);
 
        if(isbuild)then
        begin
