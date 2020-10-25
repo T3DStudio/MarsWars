@@ -955,7 +955,7 @@ begin
    _setUPGR(r_hell,upgr_regen     ,120,2 ,3 ,255,255);
    _setUPGR(r_hell,upgr_pains     ,60 ,4 ,2 ,255,255);
    _setUPGR(r_hell,upgr_vision    ,120,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_towers    ,120,3 ,3 ,255,255);
+   _setUPGR(r_hell,upgr_towers    ,120,4 ,3 ,255,255);
    _setUPGR(r_hell,upgr_5bld      ,120,3 ,2 ,255,255);
    _setUPGR(r_hell,upgr_mainm     ,180,1 ,3 ,255,255);
    _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255,255);
@@ -980,7 +980,7 @@ begin
    _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,2 ,255,255);
    _setUPGR(r_uac ,upgr_vision    ,120,1 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_towers    ,120,3 ,3 ,255,255);
+   _setUPGR(r_uac ,upgr_towers    ,120,4 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_5bld      ,120,3 ,2 ,255,255);
    _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,4 ,upgr_mainm,255);
