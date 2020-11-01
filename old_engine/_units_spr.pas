@@ -15,7 +15,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=16
    else
-     if(rld>rld_a)
+     if(rld_t>rld_a)
      then an:=8
      else
        if(wanim)then an:=8;
@@ -47,7 +47,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=40+td
    else
-     if(rld>rld_a)
+     if(rld_t>rld_a)
      then an:=32+td
      else
      begin
@@ -78,8 +78,8 @@ begin
    if(buff[ub_pain]>0)
    then an:=48+td
    else
-     if(rld>0)
-     then if (rld>rld_a)
+     if(rld_t>0)
+     then if(rld_t>rld_a)
           then an:=32+td
           else an:=40+td
      else
@@ -99,7 +99,7 @@ begin
    begin
       an:=0;
       if(buff[ub_pain]=0)then
-       if(rld>0)then an:=8;
+       if(rld_t>0)then an:=8;
 
       _unit_spr:=@spr_ZFMajor[an+td];
    end
@@ -108,7 +108,7 @@ begin
       if(buff[ub_pain]>0)
       then an:=40+td
       else
-        if(rld>0)
+        if(rld_t>0)
         then an:=32+td
         else
         begin
@@ -126,7 +126,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=16+td
    else
-     if(rld>rld_a)
+     if(rld_t>rld_a)
      then an:=8+td
      else an:=td;
 
@@ -139,10 +139,10 @@ begin
    if(buff[ub_pain]>0)
    then an:=64+td
    else
-     if(rld>0)then
+     if(rld_t>0)then
      begin
         an:=48+(td*2);
-        if(rld>rld_a)then inc(an,1);
+        if(rld_t>rld_a)then inc(an,1);
      end
      else
      begin
@@ -160,7 +160,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=24+td
    else
-     if(rld>rld_a)or(buff[ub_cast]>0)
+     if(rld_t>rld_a)or(buff[ub_cast]>0)
      then an:=16+td
      else
      begin
@@ -178,7 +178,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=56+td
    else
-     if(rld>0)
+     if(rld_t>0)
      then an:=48+td
      else
      begin
@@ -196,7 +196,7 @@ begin
    if(buff[ub_pain]>0)
    then an:=64+td
    else
-     if(rld>revenant_ra[melee])
+     if(rld_t>revenant_ra[melee])
      then if(melee)
           then an:=48+td
           else an:=56+td
@@ -216,8 +216,8 @@ begin
    if(buff[ub_pain]>0)
    then an:=64+td
    else
-     if(rld>0)and(tar1>0)
-     then if(rld>120)or(((rld div 20) mod 2)=0)
+     if(rld_t>0)and(tar1>0)
+     then if(rld_t>120)or(((rld_t div 20) mod 2)=0)
           then an:=48+td            //50
           else an:=56+td
      else
@@ -239,9 +239,9 @@ begin
      if(buff[ub_cast]>0)
      then an:=64+td
      else
-       if(rld>0)then
+       if(rld_t>0)then
        begin
-            if(rld>rld_a)
+            if(rld_t>rld_a)
             then an:=48+td
             else an:=56+td
        end
@@ -279,7 +279,7 @@ UID_BFG:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(rld>rld_a)
+   if(rld_t>rld_a)
    then an:=32+td
    else
    begin
@@ -302,7 +302,7 @@ UID_Medic:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(rld>rld_a)
+   if(rld_t>rld_a)
    then if(melee)
         then an:=40+td
         else an:=32+td
@@ -320,8 +320,8 @@ UID_Commando:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(rld>0)
-   then if (rld>rld_a)
+   if(rld_t>0)
+   then if(rld_t>rld_a)
         then an:=32+td
         else an:=40+td
    else
@@ -341,13 +341,13 @@ begin
    if(uf>uf_ground)then
    begin
       an:=0;
-      if(rld>0) then an:=8;
+      if(rld_t>0) then an:=8;
 
       _unit_spr:=@spr_FMajor[an+td];
    end
    else
    begin
-      if(rld>0)
+      if(rld_t>0)
       then an:=32+td
       else
       begin
@@ -363,7 +363,7 @@ UID_Tank:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(rld>rld_a)
+   if(rld_t>rld_a)
    then an:=16+td
    else
    begin
@@ -378,7 +378,7 @@ end;
 UID_Terminator:
 begin
    td:=((dir+23) mod 360) div 45;
-   if(rld>rld_a)//and(tar>0) //32   //40
+   if(rld_t>rld_a)//and(tar>0) //32   //40
    then
      if(buff[ub_clcast]>45)
      then an:=32+td
@@ -398,7 +398,7 @@ begin
    td:=((dir+23) mod 360) div 45;
 
    an:=0;
-   if(rld>rld_a) then an:=8;
+   if(rld_t>rld_a) then an:=8;
 
    _unit_spr:=@spr_Flyer[an+td];
 end;
@@ -412,9 +412,13 @@ end;
 
 
 UID_HKeep          : begin if(bld)then _unit_spr:=@spr_HKeep          [3] else _unit_spr:=@spr_Hkeep          [(hits*3) div mhits];end;
-UID_HGate          : begin if(bld)then _unit_spr:=@spr_HGate          [3] else _unit_spr:=@spr_HGate          [(hits*3) div mhits];end;
+UID_HGate          : if(buff[ub_advanced]>0)
+                then begin if(bld)then _unit_spr:=@spr_HAGate         [3] else _unit_spr:=@spr_HAGate         [(hits*3) div mhits];end
+                else begin if(bld)then _unit_spr:=@spr_HGate          [3] else _unit_spr:=@spr_HGate          [(hits*3) div mhits];end;
 UID_HSymbol        : begin if(bld)then _unit_spr:=@spr_HSymbol        [3] else _unit_spr:=@spr_HSymbol        [(hits*3) div mhits];end;
-UID_HPools         : begin if(bld)then _unit_spr:=@spr_HPools         [3] else _unit_spr:=@spr_HPools         [(hits*3) div mhits];end;
+UID_HPools         : if(buff[ub_advanced]>00)
+                then begin if(bld)then _unit_spr:=@spr_HAPools        [3] else _unit_spr:=@spr_HAPools        [(hits*3) div mhits];end
+                else begin if(bld)then _unit_spr:=@spr_HPools         [3] else _unit_spr:=@spr_HPools         [(hits*3) div mhits];end;
 UID_HTower         : begin if(bld)then _unit_spr:=@spr_HTower         [3] else _unit_spr:=@spr_HTower         [(hits*3) div mhits];end;
 UID_HTeleport      : begin if(bld)then _unit_spr:=@spr_HTeleport      [3] else _unit_spr:=@spr_HTeleport      [(hits*3) div mhits];end;
 
@@ -423,17 +427,26 @@ UID_HTotem         : _unit_spr:=@spr_HTotem;
 UID_HAltar         : _unit_spr:=@spr_HAltar;
 UID_HFortress      : _unit_spr:=@spr_HFortress;
 UID_HEye           : _unit_spr:=@spr_HEye;
+UID_HCommandCenter : begin if(bld)then _unit_spr:=@spr_HCC            [3] else _unit_spr:=@spr_HCC            [(hits*3) div mhits];end;
+UID_HMilitaryUnit  : if(buff[ub_advanced]>0)
+                then begin if(bld)then _unit_spr:=@spr_HMUnita        [3] else _unit_spr:=@spr_HMUnita        [(hits*3) div mhits];end
+                else begin if(bld)then _unit_spr:=@spr_HMUnit         [3] else _unit_spr:=@spr_HMUnit         [(hits*3) div mhits];end;
 
 UID_UCommandCenter : begin if(bld)then _unit_spr:=@spr_UCommandCenter [3] else _unit_spr:=@spr_UCommandCenter [(hits*3) div mhits];end;
-UID_UMilitaryUnit  : begin if(bld)then _unit_spr:=@spr_UMilitaryUnit  [3] else _unit_spr:=@spr_UMilitaryUnit  [(hits*3) div mhits];end;
+UID_UMilitaryUnit  : if(buff[ub_advanced]>0)
+                then begin if(bld)then _unit_spr:=@spr_UAMilitaryUnit [3] else _unit_spr:=@spr_UAMilitaryUnit [(hits*3) div mhits];end
+                else begin if(bld)then _unit_spr:=@spr_UMilitaryUnit  [3] else _unit_spr:=@spr_UMilitaryUnit  [(hits*3) div mhits];end;
 UID_UGenerator     : begin if(bld)then _unit_spr:=@spr_UGenerator     [3] else _unit_spr:=@spr_UGenerator     [(hits*3) div mhits];end;
-UID_UWeaponFactory : begin if(bld)then _unit_spr:=@spr_UWeaponFactory [3] else _unit_spr:=@spr_UWeaponFactory [(hits*3) div mhits];end;
+UID_UWeaponFactory : if(buff[ub_advanced]>0)
+                then begin if(bld)then _unit_spr:=@spr_UAWeaponFactory[3] else _unit_spr:=@spr_UAWeaponFactory[(hits*3) div mhits];end
+                else begin if(bld)then _unit_spr:=@spr_UWeaponFactory [3] else _unit_spr:=@spr_UWeaponFactory [(hits*3) div mhits];end;
 UID_UTurret        : begin if(bld)then _unit_spr:=@spr_UTurret        [3] else _unit_spr:=@spr_UTurret        [(hits*3) div mhits];end;
 UID_URadar         : begin if(bld)then _unit_spr:=@spr_URadar         [3] else _unit_spr:=@spr_URadar         [(hits*3) div mhits];end;
 UID_UVehicleFactory: begin if(bld)then _unit_spr:=@spr_UVehicleFactory[3] else _unit_spr:=@spr_UVehicleFactory[(hits*3) div mhits];end;
 UID_UPTurret       : begin if(bld)then _unit_spr:=@spr_UPTurret       [3] else _unit_spr:=@spr_UPTurret       [(hits*3) div mhits];end;
 UID_URTurret       : begin if(bld)then _unit_spr:=@spr_URTurret       [3] else _unit_spr:=@spr_URTurret       [(hits*3) div mhits];end;
 UID_URocketL       : begin if(bld)then _unit_spr:=@spr_URocketL       [3] else _unit_spr:=@spr_URocketL       [(hits*3) div mhits];end;
+UID_UNuclearPlant  : begin if(bld)then _unit_spr:=@spr_UNuclearPlant  [3] else _unit_spr:=@spr_UNuclearPlant  [(hits*3) div mhits];end;
 
 UID_UBaseMil       : _unit_spr:=@spr_ubase[0];
 UID_UBaseCom       : _unit_spr:=@spr_ubase[1];
@@ -444,10 +457,8 @@ UID_UBaseLab       : _unit_spr:=@spr_ubase[5];
 
 UID_Mine           : _unit_spr:=@spr_Mine;
 
-UID_HMilitaryUnit  : _unit_spr:=@spr_HBar;
-
 UID_UCBuild        : _unit_spr:=@spr_cbuild[anims];
-UID_USPort         : _unit_spr:=@spr_sport[anims];
+UID_USPort         : _unit_spr:=@spr_sport [anims];
 
 UID_CoopPortal,
 UID_Portal         : _unit_spr:=@spr_u_portal;

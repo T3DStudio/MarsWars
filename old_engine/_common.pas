@@ -134,6 +134,10 @@ begin
    else dir_turn:=(360+d1+(spd*sign(d))) mod 360;
 end;
 
+function randomr(r:integer):integer;
+begin
+   randomr:=random(r)-random(r);
+end;
 
 procedure _addtoint(bt:pinteger;val:integer);
 begin
@@ -173,7 +177,7 @@ begin
    with _players[pl] do
     _bldCndt:=(bld_r>0)
             or(cl2uid[race,true,bucl]=0)
-            or(bldrs=0)
+            or(n_builders<=0)
             or(army>=MaxPlayerUnits)
             or(_bc_g(a_build,bucl)=false)
             or((G_addon=false)and(cl2uid[race,true,bucl] in t2));
@@ -181,10 +185,10 @@ begin
    if(_bldCndt=false)then
    with _players[pl] do
    with _ulst[cl2uid[race,true,bucl]] do
-   _bldCndt:=((ruid <255)and(uid_b[ruid]=0))
+   _bldCndt:=((ruid <255)and(uid_eb[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
-           or(u_e[true,bucl]>=max);
+           or(ucl_e[true,bucl]>=max);
 end;
 function _untCndt(pl,bucl:byte):boolean;
 begin
@@ -192,33 +196,21 @@ begin
    then _untCndt:=true
    else
    with _players[pl] do
-    _untCndt:=((army+wb)>=MaxPlayerUnits)
+    _untCndt:=((army+uproda)>=MaxPlayerUnits)
             or(cl2uid[race,false,bucl]=0)
             or(_bc_g(a_units,bucl)=false)
-            or(u_eb[true,1]=0)
+            or(n_barracks<=0)
             or((G_addon=false)and(cl2uid[race,false,bucl] in t2));
 
    if(_untCndt=false)then
    with _players[pl] do
    with _ulst[cl2uid[race,false,bucl]] do
-   _untCndt:=((ruid <255)and(uid_b[ruid]=0))
+   _untCndt:=((ruid <255)and(uid_eb[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
            or(trt=0)
-           or(u_e[false,bucl]>=max)
-           or((max=1)and(wbhero>0));
+           or((ucl_e[false,bucl]+uprodc[bucl])>=max);
 end;
-{function _cmp_untCndt(pl,bucl:byte):boolean;
-begin
-   with _players[pl] do
-   with _ulst[cl2uid[race,false,bucl]] do
-_cmp_untCndt:=((army+wb)>=MaxPlayerUnits)
-            or(_bc_g(a_units,bucl)=false)
-            or(u_e[false,bucl]>=max)
-            or(trt=0)
-            or((max=1)and(wbhero>0))
-            or((G_addon=false)and(bucl>ut2[race]));
-end; }
 
 function _upgrreq(player,up:byte):boolean;
 var ruid:byte;
@@ -230,6 +222,7 @@ begin
      _upgrreq:=(upgrade_time[race,up]=0)
              or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
              or(_bc_g(a_upgr,up)=false)
+             or(n_smiths<=0)
              or((menerg-cenerg)<_pne_r[race,up])
              or((up>=upgr_2tier)and(G_addon=false));
 
@@ -244,7 +237,7 @@ begin
    if(_upgrreq=false)and(upgrade_ruid[race,up]<255)then
    begin
       ruid:=upgrade_ruid[race,up];
-      _upgrreq:=uid_b[ruid]=0;
+      _upgrreq:=uid_eb[ruid]=0;
    end;
 end;
 
@@ -538,11 +531,11 @@ procedure _addUIBldrs(tx,ty,tr:integer);
 var i:byte;
 begin
    for i:=0 to _uts do
-    if(ui_bldrs_x[i]=0)then
+    if(ui_builders_x[i]=0)then
     begin
-       ui_bldrs_x[i]:=tx;
-       ui_bldrs_y[i]:=ty;
-       ui_bldrs_r[i]:=tr;
+       ui_builders_x[i]:=tx;
+       ui_builders_y[i]:=ty;
+       ui_builders_r[i]:=tr;
        break;
     end;
 end;

@@ -10,7 +10,7 @@ end;
 procedure _effect_add(ex,ey,ed:integer; ee:byte);
 var e:integer;
 begin
-   if(_menu=false)then
+   if(_menu=false)and(_draw)then
     for e:=1 to vid_mvs do
      with _effects[e] do
       if(t=0)and(t2=0)then
@@ -61,7 +61,9 @@ begin
            eid_db_u1     : begin t:=1; t2:=dead_time;    end;
            EID_Gavno     : begin t:=63; anl:=7; ans:=-8;t2:=dead_time; end;
            EID_ArchFire  : begin t:=57; anl:=7; ans:= 8 ;end;
-           UID_HMilitaryUnit
+           EID_HMU,
+           EID_HCC,
+           EID_HAMU
                          : t:=vid_fps;
          else
            t:=0;
@@ -137,8 +139,9 @@ begin
         EID_db_h1      : spr:=@spr_db_h1;
         EID_db_u0      : spr:=@spr_db_u0;
         EID_db_u1      : spr:=@spr_db_u1;
-        UID_HMilitaryUnit
-                       : begin spr:=@spr_UMilitaryUnit[3]; alpha:=t*4; end;
+        EID_HMU        : begin spr:=@spr_UMilitaryUnit [3]; alpha:=t*4; end;
+        EID_HAMU       : begin spr:=@spr_UAMilitaryUnit[3]; alpha:=t*4; end;
+        EID_HCC        : begin spr:=@spr_UCommandCenter[3]; alpha:=t*4; end;
         EID_Gavno      : spr:=@spr_eff_g[ea]; // 0 .. 7   63
         EID_Blood      : begin spr:=@spr_blood[ea]; if(t>15)and(onlyspr=false)then inc(y,1); end;
         EID_ArchFire   : spr:=@spr_h_p6[ea];
@@ -159,8 +162,7 @@ begin
         if(draw)then
         if((vid_vx+vid_panel-spr^.hw)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
           ((vid_vy-spr^.hh)          <y)and(y<(vid_vy+vid_mh+spr^.hh))then
-          _sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
-
+          _sl_add_eff(x,y,d,msk,spr,alpha);
      end;
 end;
 

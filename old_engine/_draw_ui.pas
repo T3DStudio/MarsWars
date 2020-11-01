@@ -50,7 +50,7 @@ begin
       if(m_sbuild in [4,7,10])then circleColor(_screen,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
 
       for i:=0 to _uts do
-       if(ui_bldrs_x[i]<>0)then circleColor(_screen,ui_bldrs_x[i]-vid_vx,ui_bldrs_y[i]-vid_vy,ui_bldrs_r[i],c_white);
+       if(ui_builders_x[i]<>0)then circleColor(_screen,ui_builders_x[i]-vid_vx,ui_builders_y[i]-vid_vy,ui_builders_r[i],c_white);
 
       if(g_mode=gm_ct)then
        for i:=1 to MaxPlayers do
@@ -134,7 +134,7 @@ end;
 
 
 procedure D_ui;
-var ui,ux,uy:integer;
+var ui,ux,uy,uid:integer;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div vid_fps)+1) end;
 begin
@@ -143,7 +143,7 @@ begin
       if(_rpls_rst< rpl_rhead)then
       begin
          D_BuildUI;
-         if(race=r_uac)and(u_s[true,8]>0)then circleColor(_screen,m_vx,m_vy,blizz_r,c_gray);
+         if(race=r_uac)and(ucl_s[true,8]>0)then circleColor(_screen,m_vx,m_vy,blizz_r,c_gray);
       end;
 
       D_Timer(ui_textx,2,g_step,ta_left,str_time);
@@ -168,20 +168,20 @@ begin
          rectangleColor(_uipanel,ux+1,uy,ux+vid_tBW-3,ui_bottomsy-2,c_lime);
 
          ux:=0;
-         if(u_cs[true]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[true]),ta_left,255,c_lime  );
-         if(ui_bldsc  >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(ui_bldsc  ),ta_left,255,c_yellow);
-         if(u_c [true]>0)then _draw_text(_uipanel,ux+3,uy+20,i2s(u_c [true]),ta_left,255,c_orange);
+         if(ucl_cs[true] >0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(ucl_cs[true] ),ta_left,255,c_lime  );
+         if(ui_bldsc     >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(ui_bldsc     ),ta_left,255,c_yellow);
+         if(ucl_c [true] >0)then _draw_text(_uipanel,ux+3,uy+20,i2s(ucl_c [true] ),ta_left,255,c_orange);
 
          ux:=vid_tBW;
-         if(u_cs[false]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(u_cs[false]),ta_left,255,c_lime  );
-         if(ui_trntca  >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(ui_trntca  ),ta_left,255,c_yellow);
-         if(u_c [false]>0)then _draw_text(_uipanel,ux+3,uy+20,i2s(u_c [false]),ta_left,255,c_orange);
+         if(ucl_cs[false]>0)then _draw_text(_uipanel,ux+3,uy+2 ,i2s(ucl_cs[false]),ta_left,255,c_lime  );
+         if(uproda       >0)then _draw_text(_uipanel,ux+3,uy+10,i2s(uproda       ),ta_left,255,c_yellow);
+         if(ucl_c [false]>0)then _draw_text(_uipanel,ux+3,uy+20,i2s(ucl_c [false]),ta_left,255,c_orange);
 
-         if(ui_upgrl>0)then
+         if(ui_upgr_time>0)then
          begin
             ux:=vid_2tBW;
-            _draw_text(_uipanel,ux+3,uy+2 ,i2s((ui_upgrl div vid_fps)+1),ta_left,255,c_white);
-            _draw_text(_uipanel,ux+3,uy+12,b2s(ui_upgrc)                ,ta_left,255,c_yellow);
+            _draw_text(_uipanel,ux+3,uy+2 ,i2s((ui_upgr_time div vid_fps)+1),ta_left,255,c_white );
+            _draw_text(_uipanel,ux+3,uy+12,i2s(pproda)                      ,ta_left,255,c_yellow);
          end;
 
          uy:=(13*vid_BW)+8;
@@ -201,8 +201,10 @@ begin
          begin
             for ui:=0 to 23 do
             begin
-               if(cl2uid[race ,true,ui]=0)then continue;
-               if(u_e[true,ui]=0)then
+               uid:=cl2uid[race ,true ,ui];
+               if(uid=0)then continue;
+
+               if(ucl_e[true,ui]=0)then
                begin
                   if(_bc_g(a_build,ui)=false)then continue;
                   if((G_addon=false)and(cl2uid[race,true,ui] in t2))then continue;
@@ -211,27 +213,28 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn (_uipanel,ux,uy,spr_b_b[race,ui],m_sbuild=ui,_bldCndt(HPlayer,ui));
+               _drawBtn (_uipanel,ux,uy,spr_b_b[race,ui],m_sbuild=ui,_bldCndt(HPlayer,ui) or not(uid in ui_prod_builds));
                _drawBtnt(_uipanel,ux,uy,
-               b2s(ui_blds[ ui]),'',b2s(u_s [true,ui]),b2s(u_e [true,ui])                                   ,'',
-               c_dyellow        ,0 ,c_lime            ,ui_muc[u_e[true,ui]>=_ulst[cl2uid[race,true,ui]].max],c_white);
+               b2s(ui_blds[ ui]),'',b2s(ucl_s [true,ui]),b2s   (ucl_e [true,ui])                                ,''     ,
+               c_dyellow        ,0 ,c_lime              ,ui_muc[ucl_e[true,ui]>=_ulst[cl2uid[race,true,ui]].max],c_white);
 
                case ui of
-               5 : if(ubx[5]>0)then
-                    if(_units[ubx[5]].rld>0)then
+               5 : if(ucl_x[5]>0)then
+                    if(_units[ucl_x[5]].rld_t>0)then
                      if(race=r_uac)
-                     then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[5]].rld),0,0,0,0,ui_rad_rld[_units[ubx[5]].rld>_units[ubx[5]].rld_a])
-                     else _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[5]].rld),0,0,0,0,c_aqua);
-               6 : if(ubx[6]>0)then
+                     then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ucl_x[5]].rld_t),0,0,0,0,ui_rad_rld[_units[ucl_x[5]].rld_t>_units[ucl_x[5]].rld_a])
+                     else _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ucl_x[5]].rld_t),0,0,0,0,c_aqua);
+               6 : if(ucl_x[6]>0)then
                     case race of
-                    r_hell: if(upgr[upgr_6bld]   >0)then _drawBtnt(_uipanel,ux,uy,'','','','',b2s(upgr[upgr_6bld])   ,0,0,0,0,c_red );
-                    r_uac : if(_units[ubx[6]].rld>0)then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[6]].rld),0,0,0,0,c_aqua);
+                    r_hell: if(upgr[upgr_6bld]       >0)then _drawBtnt(_uipanel,ux,uy,'','','','',b2s(upgr  [upgr_6bld])     ,0,0,0,0,c_red );
+                    r_uac : if(_units[ucl_x[6]].rld_t>0)then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ucl_x[6]].rld_t),0,0,0,0,c_aqua);
                     end;
-               8 : if(ubx[8]>0)then
+               8 : if(ucl_x[8]>0)then
                     case race of
-                    r_hell: if(upgr[upgr_hinvuln]>0)then _drawBtnt(_uipanel,ux,uy,'',''                     ,'','',b2s(upgr[upgr_hinvuln]),0,0    ,0,0,c_red );
-                    r_uac : if(upgr[upgr_blizz  ]>0)then _drawBtnt(_uipanel,ux,uy,'',b2s(upgr[upgr_blizz  ]),'','',r2s(_units[ubx[8]].rld),0,c_red,0,0,c_aqua);
+                    r_hell: if(upgr[upgr_hinvuln]>0)then _drawBtnt(_uipanel,ux,uy,'',''                     ,'','',b2s(upgr[upgr_hinvuln])    ,0,0    ,0,0,c_red );
+                    r_uac : if(upgr[upgr_blizz  ]>0)then _drawBtnt(_uipanel,ux,uy,'',b2s(upgr[upgr_blizz  ]),'','',r2s(_units[ucl_x[8]].rld_t),0,c_red,0,0,c_aqua);
                     end;
+               9 : if(ucl_x[9]>0)then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ucl_x[9]].rld_t),0,0,0,0,c_aqua);
                end;
             end;
          end;
@@ -240,8 +243,9 @@ begin
          begin
             for ui:=0 to 23 do
             begin
-               if(cl2uid[race ,false,ui]=0)then continue;
-               if(u_e[false,ui]=0)then
+               uid:=cl2uid[race ,false,ui];
+               if(uid=0)then continue;
+               if(ucl_e[false,ui]=0)then
                begin
                   if(_bc_g(a_units,ui)=false)then continue;
                   if((G_addon=false)and(cl2uid[race,false,ui] in t2))then continue;
@@ -255,10 +259,10 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn(_uipanel,ux,uy,spr_b_u[race,ui],false,_untCndt(HPlayer,ui) or (wb=(u_e[true,1]-ui_blds[1])));
+               _drawBtn(_uipanel,ux,uy,spr_b_u[race,ui],false,_untCndt(HPlayer,ui) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(_uipanel,ux,uy,
-               b2s(((ui_trnt[ui]+vid_ifps) div vid_fps)),b2s(ui_trntc[ui]),b2s(u_s [false,ui]),b2s(u_e [false,ui])                                    ,b2s(ui_apc[ui]),
-               c_white                                  ,c_dyellow        ,c_lime             ,ui_muc[u_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
+               b2s(((ui_units_ptime[ui]+vid_ifps) div vid_fps)),b2s(uprodc[ui])+#13+b2s(ui_prod_units[uid]),b2s(ucl_s [false,ui]),b2s(   ucl_e[false,ui])                                    ,b2s(ui_units_inapc[ui]),
+               c_white                                         ,c_dyellow      ,c_lime               ,ui_muc[ucl_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
          end;
 
@@ -272,7 +276,7 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn(_uipanel,ux,uy,spr_b_up[race,ui],ui_upgr[ui]>0, _upgrreq(HPlayer,ui) or (ui_upgrc=(u_e[true,3]-ui_blds[3]))or(ubx[3]=0));
+               _drawBtn(_uipanel,ux,uy,spr_b_up[race,ui],ui_upgr[ui]>0, _upgrreq(HPlayer,ui) or (pproda>=pprodm)or(ucl_x[3]=0));
 
                _drawBtnt(_uipanel,ux,uy,
                b2s(((ui_upgr[ui]+vid_ifps) div vid_fps)),b2s(ui_upgrct[ui]),'',b2s(upgr[ui]),'',
@@ -311,20 +315,20 @@ begin
          end
          else
          begin
-            _drawBtn(_uipanel,0,0,spr_b_move   ,false,ui_uimove=0);
-            _drawBtn(_uipanel,1,0,spr_b_hold   ,false,ui_uimove=0);
-            _drawBtn(_uipanel,2,0,spr_b_patrol ,false,ui_uimove=0);
+            _drawBtn(_uipanel,0,0,spr_b_move   ,false,ui_uimove=0   );
+            _drawBtn(_uipanel,1,0,spr_b_hold   ,false,ui_uimove=0   );
+            _drawBtn(_uipanel,2,0,spr_b_patrol ,false,ui_uimove=0   );
 
-            _drawBtn(_uipanel,0,1,spr_b_attack ,false,ui_uimove=0);
-            _drawBtn(_uipanel,1,1,spr_b_stop   ,false,ui_uimove=0);
-            _drawBtn(_uipanel,2,1,spr_b_apatrol,false,ui_uimove=0);
+            _drawBtn(_uipanel,0,1,spr_b_attack ,false,ui_uimove=0   );
+            _drawBtn(_uipanel,1,1,spr_b_stop   ,false,ui_uimove=0   );
+            _drawBtn(_uipanel,2,1,spr_b_apatrol,false,ui_uimove=0   );
 
             _drawBtn(_uipanel,0,2,spr_b_action ,false,ui_uiaction=0 );
-            _drawBtn(_uipanel,1,2,spr_b_selall ,false,ui_batlu=0    );
-            _drawBtn(_uipanel,2,2,spr_b_delete ,false,ui_uselected=0);
+            _drawBtn(_uipanel,1,2,spr_b_selall ,false,ui_battle_units=0);
+            _drawBtn(_uipanel,2,2,spr_b_delete ,false,(ucl_cs[false]+ucl_cs[true])=0);
 
-            _drawBtn(_uipanel,1,3,spr_b_rclck  ,m_a_inv   ,false);
-            _drawBtn(_uipanel,2,3,spr_b_cancel ,false,false);
+            _drawBtn(_uipanel,1,3,spr_b_rclck  ,m_a_inv   ,false    );
+            _drawBtn(_uipanel,2,3,spr_b_cancel ,false     ,false    );
          end;
 
          end;
@@ -335,17 +339,19 @@ end;
 
 procedure D_hints;
 var i,uid:byte;
+    ty:integer;
 begin
    if(m_bx<3)and(m_by>=3)and(m_by<=13)then
    begin
+      ty:=vid_mh-40;
       case m_by of
       3  : if(m_vy>ui_tabsy)
-           then _draw_text(_screen,ui_textx,vid_mh-30,str_hint_t[m_vx div vid_tBW ],ta_left,255,c_white)
-           else _draw_text(_screen,ui_textx,vid_mh-30,str_hint_a[m_vx div vid_2tBW],ta_left,255,c_white);
+           then _draw_text(_screen,ui_textx,ty,str_hint_t[m_vx div vid_tBW ],ta_left,255,c_white)
+           else _draw_text(_screen,ui_textx,ty,str_hint_a[m_vx div vid_2tBW],ta_left,255,c_white);
       13 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;
-              _draw_text(_screen,ui_textx,vid_mh-30,str_hint_m[m_bx],ta_left,255,c_white);
+              _draw_text(_screen,ui_textx,ty,str_hint_m[m_bx],ta_left,255,c_white);
            end;
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
@@ -364,7 +370,7 @@ begin
                                 if(_bc_g(a_build,i)=false)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           _draw_text(_screen,ui_textx,vid_mh-30,str_un_hint[uid],ta_left,255,c_white);
+                           _draw_text(_screen,ui_textx,ty,str_un_hint[uid],ta_left,255,c_white);
                         end;
                end;
            1 : case i of
@@ -378,7 +384,7 @@ begin
                                 if(_bc_g(a_units,i)=false)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           _draw_text(_screen,ui_textx,vid_mh-30,str_un_hint[uid],ta_left,255,c_white);
+                           _draw_text(_screen,ui_textx,ty,str_un_hint[uid],ta_left,255,c_white);
                         end;
                end;
            2 : begin
@@ -387,7 +393,7 @@ begin
                      if(_bc_g(a_upgr,i)=false)then exit;
                      if(g_addon=false)and(i>=upgr_2tier)then exit;
                   end;
-                  _draw_text(_screen,ui_textx,vid_mh-30,str_up_hint[i+(race*_uts)],ta_left,255,c_white);
+                  _draw_text(_screen,ui_textx,ty,str_up_hint[i+(race*_uts)],ta_left,255,c_white);
                end;
            3 : begin
                   if(_rpls_rst>=rpl_rhead)then
@@ -396,7 +402,7 @@ begin
                   end
                   else
                      if(i<>11)and(i>8)then exit;
-                  _draw_text(_screen,ui_textx,vid_mh-30,str_hint[ui_tab,race,i],ta_left,255,c_white);
+                  _draw_text(_screen,ui_textx,ty,str_hint[ui_tab,race,i],ta_left,255,c_white);
                end;
            end;
         end;

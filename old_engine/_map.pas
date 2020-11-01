@@ -19,7 +19,7 @@ begin
 
         if((vid_vx-spr^.hw+vid_panel)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
           ((vid_vy-spr^.hh)          <y)and(y<(vid_vy+vid_mh+spr^.hh))then
-           _sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
+           _sl_add_dec(x,y,dpth,shh,spr,255,ro);
      end;
 end;
 

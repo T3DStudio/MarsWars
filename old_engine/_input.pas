@@ -67,26 +67,32 @@ begin
       begin
          su:=0;
          cmsnd:=false;
-         for i:=0 to _uts do inc(su,u_s[false,i]);
+         for i:=1 to 255 do
+          with _ulst[i] do
+           if(speed>0)then inc(su,uid_s[i]);
          if(su>0)then cmsnd:=true;
-         if(upgr[upgr_mainm]>0)then inc(su,u_s[true,0]);
-         inc(su,u_s[true,1]+u_s[true,5]+u_s[true,4]+u_s[true,7]);
+         if(upgr[upgr_mainm]>0)then inc(su,ucl_s[true,0]);
+         inc(su,ucl_s[true,5]+ucl_s[true,4]+ucl_s[true,7]);
+         for i:=1 to 255 do
+          with _ulst[i] do
+           if(isbarrack)then inc(su,uid_s[i]);
+         inc(su,uid_s[UID_HCommandCenter]);
          if(race=r_uac )then
          begin
-            if(upgr[upgr_blizz]>0)then inc(su,u_s[true,8]);
-            inc(su,u_s[true,6]);
-            inc(su,u_s[true,0]);
+            if(upgr[upgr_blizz]>0)then inc(su,ucl_s[true,8]);
+            inc(su,ucl_s[true,6]);
+            inc(su,ucl_s[true,0]);
          end;
          if(race=r_hell)then
          begin
-            if(upgr[upgr_6bld]>0)then inc(su,u_s[true,6]);
+            if(upgr[upgr_6bld]>0)then inc(su,ucl_s[true,6]);
             if(upgr[upgr_b478tel]>0)then
             begin
-               inc(su,u_s[true,2]);
-               inc(su,u_s[true,8]);
+               inc(su,ucl_s[true,2]);
+               inc(su,ucl_s[true,8]);
             end;
          end;
-         for i:=_uts downto 0 do if(u_s[false,i]>0)then break;
+         for i:=_uts downto 0 do if(ucl_s[false,i]>0)then break;
       end;
 
       if(oid=uo_move)and(su>0)then
@@ -421,8 +427,8 @@ begin
    begin
       for i:=0 to _uts do
       begin
-         inc(sc,u_s[false,i]);
-         inc(sc,u_s[true ,i]);
+         inc(sc,ucl_s[false,i]);
+         inc(sc,ucl_s[true ,i]);
       end;
       htm:=team;
    end;
@@ -441,12 +447,13 @@ begin
 end;
 
 procedure _chkbld;
+var uid:byte;
 begin
    case m_sbuild of
    0.._uts:
     with _players[HPlayer] do
     begin
-       if(m_sbuild in _sbs_ucls)and(u_e[true,m_sbuild]>0)then
+       if(m_sbuild in _sbs_ucls)and(ucl_e[true,m_sbuild]>0)then
        begin
           _player_s_o(m_sbuild,k_shift,0,0,uo_specsel ,HPlayer);
           m_sbuild:=255;
@@ -456,11 +463,20 @@ begin
          then m_sbuild:=255
          else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
               then m_sbuildc:=c_blue
-              else case _unit_grbcol(m_mx,m_my,_ulst[cl2uid[race,true,m_sbuild]].r,HPlayer,true) of
-                   1 :  m_sbuildc:=c_red;
-                   2 :  m_sbuildc:=c_blue;
-                   else m_sbuildc:=c_lime;
-                   end;
+              else
+              begin
+                 uid:=cl2uid[race,true,m_sbuild];
+                 if not(uid in ui_prod_builds)then
+                 begin
+                    m_sbuild:=255;
+                    exit;
+                 end;
+                 case _unit_grbcol(m_mx,m_my,_ulst[uid].r,HPlayer,uid,true) of
+                 1 :  m_sbuildc:=c_red;
+                 2 :  m_sbuildc:=c_blue;
+                 else m_sbuildc:=c_lime;
+                 end;
+              end;
     end;
 -1,-2,
 -3,-4 : if(ui_uimove=0)then m_sbuild:=255;
@@ -683,11 +699,11 @@ begin
             case ui_tab of
             0 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then
                 begin
-                   if(ubx[6]>0)then with _units[ubx[6]] do if(m_by=6)and(m_bx=0)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[6],uo_move,HPlayer);
+                   if(ucl_x[6]>0)then with _units[ucl_x[6]] do if(m_by=6)and(m_bx=0)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ucl_x[6],uo_move,HPlayer);
                    if(race=r_hell)then
                    begin
-                   if(ubx[5]>0)then with _units[ubx[5]] do if(m_by=5)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[5],uo_move,HPlayer);
-                   if(ubx[8]>0)then with _units[ubx[8]] do if(m_by=6)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ubx[8],uo_move,HPlayer);
+                   if(ucl_x[5]>0)then with _units[ucl_x[5]] do if(m_by=5)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ucl_x[5],uo_move,HPlayer);
+                   if(ucl_x[8]>0)then with _units[ucl_x[8]] do if(m_by=6)and(m_bx=2)then _player_s_o(x,y,byte((k_ctrl>0)=m_a_inv),ucl_x[8],uo_move,HPlayer);
                    end;
                 end;
             1 : if(G_Paused=0)and(_rpls_rst<rpl_runit)then

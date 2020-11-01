@@ -261,7 +261,7 @@ begin
    sdl_freesurface(ter_s);
 end;
 
-function _xasurf(s:PSDL_Surface;xa,ya:boolean):PSDL_Surface;
+function _xasurf(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
@@ -275,6 +275,7 @@ begin
 
        SDL_SETpixel(_xasurf,sx,sy,c);
     end;
+   if(trans)then SDL_SetColorKey(_xasurf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(_xasurf,0,0));
 end;
 
 procedure LPTUSpriteL(l:PTUSpriteL;str:shortstring;it:pinteger);
@@ -297,7 +298,7 @@ begin
 
       with t do
       begin
-         surf:=_xasurf(l^[it^-1].surf,true,false);
+         surf:=_xasurf(l^[it^-1].surf,true,false,false);
          SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,surf^.w-1,0));
       end;
       inc(it^,1);
@@ -483,6 +484,10 @@ begin
    spr_mp[r_hell] := _lstr('h_mp');
    spr_mp[r_uac ] := _lstr('u_mp');
 
+//   spr_HABar      := spr_HBar;
+//   with spr_HABar do surf:=_xasurf(surf,true,false,true);
+
+
    _draw_surf(_uipanel,0,0,spr_panel);
 
    for x:=0 to 3 do spr_eff_bfg [x]:= _lstr('ef_bfg_'+b2s(x));
@@ -561,21 +566,32 @@ begin
       spr_HGate           [x]:=_lstr('h_b1_' +b2s(x));
       spr_HSymbol         [x]:=_lstr('h_b2_' +b2s(x));
       spr_HPools          [x]:=_lstr('h_b3_' +b2s(x));
+      spr_HAPools         [x]:=_lstr('h_b3_' +b2s(x)+'a');
       spr_HTower          [x]:=_lstr('h_b4_' +b2s(x));
       spr_HTeleport       [x]:=_lstr('h_b5_' +b2s(x));
+      spr_HCC             [x]:=_lstr('h_hcc_' +b2s(x));
+      spr_HMUnit          [x]:=_lstr('h_hbar_'+b2s(x));
+      spr_HMUnita         [x]:=_lstr('h_hbar_'+b2s(x)+'a');
 
       spr_UCommandCenter  [x]:=_lstr('u_b0_' +b2s(x));
       spr_UMilitaryUnit   [x]:=_lstr('u_b1_' +b2s(x));
+      spr_UAMilitaryUnit  [x]:=_lstr('u_b1_' +b2s(x)+'a');
       spr_UGenerator      [x]:=_lstr('u_b2_' +b2s(x));
       spr_UWeaponFactory  [x]:=_lstr('u_b3_' +b2s(x));
+      spr_UAWeaponFactory [x]:=_lstr('u_b3_' +b2s(x)+'a');
       spr_UTurret         [x]:=_lstr('u_b4_' +b2s(x));
       spr_URadar          [x]:=_lstr('u_b5_' +b2s(x));
       spr_UVehicleFactory [x]:=_lstr('u_b6_' +b2s(x));
       spr_UPTurret        [x]:=_lstr('u_b7_' +b2s(x));
       spr_URocketL        [x]:=_lstr('u_b8_' +b2s(x));
       spr_URTurret        [x]:=_lstr('u_b9_' +b2s(x));
+      spr_UNuclearPlant   [x]:=_lstr('u_b10_'+b2s(x));
 
       spr_cbuild          [x]:=_lstr('build' +b2s(x));
+
+      if(x=0)
+      then spr_HAGate     [x]:=spr_HGate[x]
+      else spr_HAGate     [x]:=_lstr('h_b1_' +b2s(x-1)+'a');
    end;
 
    for x:=0 to 5 do spr_ubase[x]:=_lstr('u_base' +b2s(x));

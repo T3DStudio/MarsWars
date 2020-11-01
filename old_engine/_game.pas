@@ -43,7 +43,7 @@ begin
        ai_maxarmy  := 100;
        ai_attack   := 0;
 
-       _bc_ss(@a_build,[0..11]);
+       _bc_ss(@a_build,[0..14]);
        _bc_ss(@a_units,[0..18]);
        _bc_ss(@a_upgr ,[0..MaxUpgrs]);
    end;
@@ -406,37 +406,15 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                     0 : if(speed>0)and(uid in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
                  else
                     if(o_x0 in _sbs_ucls)then
-                     if(ubx[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
+                     if(ucl_x[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
                  end;
 
                 if(o_id=uo_action)then
                  case o_x0 of
-                 -2 : if(rld=0)and(ucl=3)and(isbuild)and(bld)then
-                       if(u_s[true,3]=0)then                      // start upgr
-                       begin
-                          _unit_supgrade(u,o_y0);
-                          break;
-                       end;
-                 -3 : if(rld>0)and(ucl=3)and(isbuild)and(bld)then
-                       if(utrain=o_y0)or(o_y0=-1)then
-                        if(u_s[true,3]=0)then                     // cancle upgr
-                        begin
-                           _unit_cupgrade(u);
-                           break;
-                        end;
-                 -4 : if(rld=0)and(ucl=1)and(isbuild)and(bld)then
-                       if(u_s[true,1]=0)then                      // start training
-                       begin
-                          _unit_straining(u,o_y0);
-                          break;
-                       end;
-                 -5 : if(rld>0)and(ucl=1)and(isbuild)and(bld)then
-                       if(utrain=o_y0)or(o_y0=-1)then
-                        if(u_s[true,1]=0)then                     // cancle training
-                        begin
-                           _unit_ctraining(u);
-                           break;
-                        end;
+                 -2 : if(s_smiths  =0)and(_unit_supgrade (u,o_y0))then break;   // start upgr
+                 -3 : if(s_smiths  =0)and(_unit_cupgrade (u,o_y0))then break;   // cancle upgr
+                 -4 : if(s_barracks=0)and(_unit_straining(u,o_y0))then break;   // start training
+                 -5 : if(s_barracks=0)and(_unit_ctraining(u,o_y0))then break;   // cancle training
                  end;
 
                 if(sel)then
@@ -516,30 +494,22 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                       end;
                                   1 : _unit_action(u);
                                  -2 : _unit_supgrade(u,o_y0);
-                                 -3 : if(utrain=o_y0)or(o_y0=-1)then _unit_cupgrade(u);
+                                 -3 : _unit_cupgrade(u,o_y0);
                                  -4 : _unit_straining(u,o_y0);
-                                 -5 : if(utrain=o_y0)or(o_y0=-1)then _unit_ctraining(u);
+                                 -5 : _unit_ctraining(u,o_y0);
                                  -6 : case ucl of
-                                      1:  _unit_ctraining(u);
-                                      3: _unit_cupgrade(u);
+                                      1: _unit_ctraining(u,-1);
+                                      3: _unit_cupgrade (u,-1);
                                       end;
                                end;
                    end;
 
-                   if(psel=false)then
-                   begin
-                      inc(u_s [isbuild,ucl],1);
-                      inc(u_cs[isbuild],1);
-                   end;
+                   if(psel=false)then _unit_inc_selc(u);
                    inc(scnt,1);
                 end
                 else
                 begin
-                   if(psel=true)then
-                   begin
-                      dec(u_s [isbuild,ucl],1);
-                      dec(u_cs[isbuild],1);
-                   end;
+                   if(psel=true)then _unit_dec_selc(u);
                    if(o_id=uo_setorder)and(order=o_x0)then order:=0;
                 end;
              end;
@@ -642,7 +612,7 @@ begin
    a:=0;
    for i:=1 to MaxPlayers do
     with _players[i] do
-    if(state=ps_play)then inc(a,u_c[false]);
+    if(state=ps_play)then inc(a,ucl_c[false]);
 
    dec(g_inv_t, g_inv_wn*vid_fps*2);
    dec(g_inv_t,(a div 15)*vid_fps);
@@ -852,25 +822,25 @@ begin
       if(G_paused=0)then
       begin
          {$IFDEF _FULLGAME}
-         FillChar(ui_bldrs_x,SizeOf(ui_bldrs_x),0);
-         FillChar(ui_trnt   ,SizeOf(ui_trnt   ),0);
-         FillChar(ui_trntc  ,SizeOf(ui_trntc  ),0);
-         ui_bldsc    :=0;
-         ui_uiaction :=0;
-         ui_uselected:=0;
-         ui_uimove   :=0;
-         ui_upgrc    :=0;
-         ui_upgrl    :=0;
-         ui_trntca   :=0;
-         ui_batlu    :=0;
-         FillChar(ui_orderu ,SizeOf(ui_orderu ),0);
-         FillChar(ui_upgrct ,SizeOf(ui_upgrct ),0);
-         FillChar(ui_upgr   ,SizeOf(ui_upgr   ),0);
-         FillChar(ui_apc    ,SizeOf(ui_apc    ),0);
-         FillChar(ui_blds   ,SizeOf(ui_blds   ),0);
-         FillChar(ordn      ,SizeOf(ordn      ),0);
-         FillChar(ordx      ,SizeOf(ordx      ),0);
-         FillChar(ordy      ,SizeOf(ordy      ),0);
+         FillChar(ui_builders_x ,SizeOf(ui_builders_x ),0);
+         FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
+         FillChar(ui_units_prodc,SizeOf(ui_units_prodc),0);
+         ui_units_proda :=0;
+         ui_upgr_time   :=0;
+         ui_bldsc       :=0;
+         ui_uiaction    :=0;
+         ui_uimove      :=0;
+         ui_battle_units:=0;
+         ui_prod_builds :=[];
+         FillChar(ui_prod_units ,SizeOf(ui_prod_units),0);
+         FillChar(ui_orderu     ,SizeOf(ui_orderu ),0);
+         FillChar(ui_upgrct     ,SizeOf(ui_upgrct ),0);
+         FillChar(ui_upgr       ,SizeOf(ui_upgr   ),0);
+         FillChar(ui_units_inapc,SizeOf(ui_units_inapc),0);
+         FillChar(ui_blds       ,SizeOf(ui_blds   ),0);
+         FillChar(ordn          ,SizeOf(ordn      ),0);
+         FillChar(ordx          ,SizeOf(ordx      ),0);
+         FillChar(ordy          ,SizeOf(ordy      ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
          {$ENDIF}
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;

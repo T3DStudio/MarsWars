@@ -42,7 +42,7 @@ NetTickN               = 2;
 
 MaxPlayers             = 6;
 MaxPlayerUnits         = 110;
-MaxDoodads             = 600;
+MaxDoodads             = 650;
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxNetChat             = 16;
 MaxNetBuffer           = 4096;
@@ -199,10 +199,7 @@ upgr_rturrets          = 22; // rocket turrets
 
 upgr_bldenrg           = 23; // additional energy
 
-//upgr_liqwalk           = 24;
-
-//upgr_msouls            = 25;
-//upgr_defibl            = 25;
+upgr_prodatm           = 24; // 9 class building reload time
 
 upgr_advbld            = 28;
 upgr_advbar            = 29;
@@ -271,16 +268,17 @@ UID_Flyer              = 42;
 UID_Mine               = 43;
 UID_UTransport         = 44;
 
-UID_HKeep              = 50;
-UID_HGate              = 51;
-UID_HSymbol            = 52;
-UID_HPools             = 53;
-UID_HTower             = 54;
-UID_HTeleport          = 55;
-UID_HMonastery         = 56;
-UID_HTotem             = 57;
-UID_HAltar             = 58;
-UID_HFortress          = 59;
+UID_HKeep              = 49;
+UID_HGate              = 50;
+UID_HSymbol            = 51;
+UID_HPools             = 52;
+UID_HTower             = 53;
+UID_HTeleport          = 54;
+UID_HMonastery         = 55;
+UID_HTotem             = 56;
+UID_HAltar             = 57;
+UID_HFortress          = 58;
+UID_HCommandCenter     = 59;
 UID_HMilitaryUnit      = 60;
 
 UID_UCommandCenter     = 61;
@@ -293,20 +291,22 @@ UID_UVehicleFactory    = 67;
 UID_UPTurret           = 68;
 UID_URocketL           = 69;
 UID_URTurret           = 70;
+UID_UNuclearPlant      = 71;
 
-UID_UBaseMil           = 71;
-UID_UBaseCom           = 72;
-UID_UBaseGen           = 73;
-UID_UBaseRef           = 74;
-UID_UBaseNuc           = 75;
-UID_UBaseLab           = 76;
-UID_UCBuild            = 77;
-UID_USPort             = 78;
+UID_UBaseMil           = 72;
+UID_UBaseCom           = 73;
+UID_UBaseGen           = 74;
+UID_UBaseRef           = 75;
+UID_UBaseNuc           = 76;
+UID_UBaseLab           = 77;
+UID_UCBuild            = 78;
+UID_USPort             = 79;
+
 
 UID_Portal             = 90;
 UID_CoopPortal         = 91;
 
-uids_hell              = [UID_LostSoul..UID_ZBFG,UID_HKeep..UID_HMilitaryUnit];
+uids_hell              = [UID_LostSoul..UID_ZBFG,UID_HEye,UID_HKeep..UID_HMilitaryUnit];
 uids_uac               = [UID_Engineer..UID_UTransport,UID_UCommandCenter..UID_USPort];
 
 t2                     = [UID_URocketL,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
@@ -316,8 +316,7 @@ zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,
 gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron,UID_ZFormer..UID_ZBFG];
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
-whocaninapc            = marines+[UID_APC,UID_Terminator,UID_Tank];
-whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
+whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
@@ -327,8 +326,7 @@ slowturn               = [UID_APC,UID_Tank];
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
 type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
-clnet_rld              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory,UID_UVehicleFactory,UID_HTeleport];
-clnet_utr              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory];
+clnet_rld              = [UID_UVehicleFactory,UID_HTeleport,UID_UNuclearPlant,UID_HFortress];
 
 {
 0    UID_HKeep,UID_HFortress    UID_UCommandCenter     UID_LostSoul        UID_Engineer
@@ -389,10 +387,13 @@ pain_time              = vid_hfps;
 hinvuln_time           = (vid_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
+advprod_rld            : array[false..true] of integer = (vid_fps*120,vid_fps*60);
 
 _sbs_ucls              = [5,6,8];
 
 fly_height             = 30;
+
+MaxUnitProds           = 1;
 
 {$IFDEF _FULLGAME}
 
@@ -425,6 +426,9 @@ EID_db_u1              = 212;
 EID_Blood              = 213;
 EID_ArchFire           = 214;
 EID_HUpgr              = 215;
+EID_HAMU               = 216;
+EID_HMU                = 218;
+EID_HCC                = 219;
 
 vid_ifps               = vid_fps-1;
 vid_bpp                = 32;
@@ -436,6 +440,7 @@ vid_ab                 = 100;
 vid_mvs                = 500; // max vis sprites;
 vid_rtuir              = 6;
 vid_rtuis              = vid_fps div vid_rtuir;
+vid_rtuish             = vid_rtuis div 2;
 vid_uialrm_t           = vid_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
 vid_uialrm_n           = 10;
@@ -539,7 +544,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 189829;
+svld_size              = 219833;
 rpl_size               = 1574;
 
 rpl_none               = 0;

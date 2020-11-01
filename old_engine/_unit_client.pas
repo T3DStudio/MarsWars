@@ -76,9 +76,27 @@ begin
    end;
 end;
 
+function _wrld(r:pinteger;rpl:boolean):byte;
+begin
+   if(r^<=0)
+   then _wrld:=0
+   else _wrld:=(r^ div vid_fps)+1;
+   _wudata_byte(_wrld,rpl);
+end;
+
+procedure _wprod(u:integer;rpl:boolean);
+var i: byte;
+begin
+   with _units[u] do
+    for i:=0 to MaxUnitProds do
+     case ucl of
+     1: if(_wrld(@uprod_r[i],rpl)>0)then _wudata_byte(uprod_t[i],rpl);
+     3: if(_wrld(@pprod_r[i],rpl)>0)then _wudata_byte(pprod_t[i],rpl);
+     end;
+end;
+
 procedure _wudata(u:integer;rpl:boolean;_pl:byte);
 var sh :shortint;
-    i  :byte;
 begin
    with _units[u] do
    begin
@@ -116,11 +134,7 @@ begin
                UID_URadar:
                   if(rpl)or(_players[_pl].team=_players[player].team)then
                   begin
-                     if(rld<=0)
-                     then i:=0
-                     else i:=(rld div vid_fps)+1;
-                     _wudata_byte(i,rpl);
-                     if(i>19)then
+                     if(_wrld(@rld_t,rpl)>19)then
                      begin
                         _wudata_int(uo_x ,rpl);
                         _wudata_int(uo_y ,rpl);
@@ -128,11 +142,7 @@ begin
                   end;
                UID_URocketL:
                   begin
-                     if(rld<=0)
-                     then i:=0
-                     else i:=(rld div vid_fps)+1;
-                     _wudata_byte(i,rpl);
-                     if(i>0)then
+                     if(_wrld(@rld_t,rpl)>0)then
                      begin
                         _wudata_int(uo_x ,rpl);
                         _wudata_int(uo_y ,rpl);
@@ -147,14 +157,8 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uid in clnet_rld)then
-                     begin
-                        if(rld<=0)
-                        then i:=0
-                        else i:=(rld div vid_fps)+1;
-                        _wudata_byte(i,rpl);
-                     end;
-                     if(uid in clnet_utr)then _wudata_byte(utrain,rpl);
+                     if(uid in clnet_rld )then _wrld(@rld_t,rpl);
+                     if(isbarrack)or(issmith)then _wprod(u,rpl);
                   end;
                   if(sel)then
                    if(uid in whocanmp)then
@@ -256,94 +260,106 @@ begin
 end;
 
 procedure _ucInc(u:integer);
+var i,_puid:byte;
 begin
    with _units[u] do
    with _players[player] do
    begin
       inc(uid_e[uid],1);
-      inc(u_e[isbuild,ucl],1);
-      inc(u_c[isbuild]);
+      inc(ucl_e[isbuild,ucl],1);
+      inc(ucl_c[isbuild]);
       inc(army,1);
 
       if(inapc>0)then inc(_units[inapc].apcc,apcs);
 
       if(hits>0)and(inapc=0)then
       begin
-         if(sel)then
-         begin
-            inc(u_s [isbuild,ucl],1);
-            inc(u_cs[isbuild],1);
-         end;
+         if(sel)then _unit_inc_selc(u);
          if(isbuild)then
           if(bld=false)
           then inc(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
-             inc(uid_b[uid],1);
-             inc(u_eb[isbuild,ucl],1);
-             if(ubx[ucl]=0)then ubx[ucl]:=u;
-             if(0<ubx[ucl])and(ubx[ucl]<=MaxUnits)then
-              if(_units[ubx[ucl]].ucl<>ucl)then ubx[ucl]:=u;
-             case ucl of
-              0 : inc(bldrs,1);
-              1 : if(rld>0)then
-                  begin
-                     if(_ulst[cl2uid[race,false,utrain]].max=1)then inc(wbhero,1);
-                     inc(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
-                     inc(wb,1);
-                  end;
-              3 : if(rld>0)then
-                  begin
-                     inc(cenerg,_pne_r[race,utrain]);
-                     inc(upgrinp[utrain],1);
-                  end;
-             end;
+             inc(uid_eb[uid],1);
+             inc(ucl_eb[isbuild,ucl],1);
+             if(ucl_x[ucl]=0)then ucl_x[ucl]:=u;
+             if(0<ucl_x[ucl])and(ucl_x[ucl]<=MaxUnits)then
+              if(_units[ucl_x[ucl]].ucl<>ucl)then ucl_x[ucl]:=u;
+             if(uid_x[uid]=0)then uid_x[uid]:=u;
+
+             _unit_done_inc_cntrs(u);
+
+             if(isbarrack)then
+              for i:=0 to MaxUnitProds do
+               if(uprod_r[i]>0)then
+               begin
+                  _puid:=cl2uid[race,false,uprod_t[i]];
+
+                  inc(uproda,1);
+                  inc(uprodc[uprod_t[i]],1);
+                  inc(uprodu[_puid],1);
+                  inc(cenerg,_ulst[_puid].renerg);
+               end;
+             if(issmith)then
+              for i:=0 to MaxUnitProds do
+               if(pprod_r[i]>0)then
+               begin
+                  inc(pproda,1);
+                  inc(cenerg,_pne_r[race,pprod_t[i] ]);
+                  inc(upgrinp[ pprod_t[i] ],1);
+               end;
           end;
       end;
    end;
 end;
 
 procedure _ucDec(u:integer);
+var i,_puid:byte;
 begin
    with _units[u] do
    with _players[player] do
    begin
       dec(uid_e[uid],1);
-      dec(u_e[isbuild,ucl],1);
-      dec(u_c[isbuild]);
+      dec(ucl_e[isbuild,ucl],1);
+      dec(ucl_c[isbuild]);
       dec(army,1);
 
       if(inapc>0)then dec(_units[inapc].apcc,apcs);
 
       if(hits>0)and(inapc=0)then
       begin
-         if(sel)then
-         begin
-            dec(u_s [isbuild,ucl],1);
-            dec(u_cs[isbuild],1);
-         end;
+         if(sel)then _unit_dec_selc(u);
          if(isbuild)then
           if(bld=false)
           then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
-             dec(uid_b[uid],1);
-             dec(u_eb[isbuild,ucl],1);
-             if(ubx[ucl]=u)then ubx[ucl]:=0;
-             case ucl of
-              0 : dec(bldrs,1);
-              1 : if(rld>0)then
-                  begin
-                     if(_ulst[cl2uid[race,false,utrain]].max=1)then dec(wbhero,1);
-                     dec(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
-                     dec(wb,1);
-                  end;
-              3 : if(rld>0)then
-                  begin
-                     dec(cenerg,_pne_r[race,utrain]);
-                     dec(upgrinp[utrain],1);
-                  end;
-             end;
+             dec(uid_eb[uid],1);
+             dec(ucl_eb[isbuild,ucl],1);
+             if(ucl_x[ucl]=u)then ucl_x[ucl]:=0;
+             if(uid_x[uid]=u)then uid_x[uid]:=0;
+
+             _unit_done_dec_cntrs(u);
+
+             if(isbarrack)then
+              for i:=0 to MaxUnitProds do
+               if(uprod_r[i]>0)then
+               begin
+                  _puid:=cl2uid[race,false,uprod_t[i]];
+
+                  dec(uproda,1);
+                  dec(uprodc[uprod_t[i]],1);
+                  dec(uprodu[_puid],1);
+                  dec(cenerg,_ulst[_puid].renerg);
+               end;
+             if(issmith)then
+              for i:=0 to MaxUnitProds do
+               if(pprod_r[i]>0)then
+               begin
+                  dec(pproda,1);
+                  dec(cenerg,_pne_r[race,pprod_t[i] ]);
+                  dec(upgrinp[ pprod_t[i] ],1);
+               end;
           end;
       end;
    end;
@@ -368,7 +384,15 @@ begin
              end;
           UID_HMilitaryUnit:
              begin
-                _effect_add(vx,vy,vy+1,UID_HMilitaryUnit);
+                if(buff[ub_advanced]>0)
+                then _effect_add(vx,vy,vy+1,EID_HAMU)
+                else _effect_add(vx,vy,vy+1,EID_HMU);
+                PlaySND(snd_hellbar,u);
+                shadow :=0;
+             end;
+          UID_HCommandCenter:
+             begin
+                _effect_add(vx,vy,vy+1,EID_HCC);
                 PlaySND(snd_hellbar,u);
                 shadow :=0;
              end;
@@ -470,7 +494,7 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
               begin
                  _unit_deff(u,hits<=idead_hits);
-                 rld:=0;
+                 rld_t:=0;
               end;
 
             if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,0);
@@ -484,10 +508,10 @@ begin
             end;
 
             if(uid=UID_URadar)then
-             if(bld)and(pu^.rld=0)and(rld>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,0);
+             if(bld)and(pu^.rld_t=0)and(rld_t>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,0);
 
             if(uid=UID_URocketL)then
-             if(bld)and(pu^.rld=0)and(rld>0)then
+             if(bld)and(pu^.rld_t=0)and(rld_t>0)then
              begin
                 _uac_rocketl_eff(u);
                 _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,player,uf_soaring,false);
@@ -495,7 +519,7 @@ begin
 
             if(pu^.buff[ub_cast]=0)and(buff[ub_cast]>0)then
              case uid of
-             UID_ArchVile: PlaySND(snd_meat,u);
+             UID_ArchVile: ;
              UID_Pain    : _pain_action(u);
              end;
 
@@ -506,7 +530,8 @@ begin
                 if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,u);
              end;
 
-            if(pu^.buff[ub_gear]=0)and(buff[ub_gear]>0)then PlaySND(snd_uupgr,u);
+            if(pu^.buff[ub_gear ]=0)and(buff[ub_gear ]>0)then PlaySND(snd_uupgr,u);
+            if(pu^.buff[ub_resur]=0)and(buff[ub_resur]>0)then PlaySND(snd_meat ,u);
 
             if(race=r_hell)and(isbuild=false)and(hits>0)then
             begin
@@ -517,7 +542,7 @@ begin
                if(pu^.buff[ub_pain    ]=0)and(buff[ub_pain    ]>0)then _unit_painsnd(u);
             end;
 
-            if(uid=UID_UCommandCenter)then
+            if(uid in [UID_UCommandCenter,UID_HCommandCenter])then
             begin
                if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
                begin
@@ -660,6 +685,25 @@ begin
    end;
 end;
 
+function _rrld(r:pinteger;rpl:boolean):byte;
+begin
+   _rrld  :=_rudata_byte(rpl,0);
+   if(_rrld=0)
+   then r^:=0
+   else r^:=_rrld*vid_fps-1;
+end;
+
+procedure _rprod(u:integer;rpl:boolean);
+var i: byte;
+begin
+   with _units[u] do
+    for i:=0 to MaxUnitProds do
+     case ucl of
+     1: if(_rrld(@uprod_r[i],rpl)>0)then uprod_t[i]:=_rudata_byte(rpl,0);
+     3: if(_rrld(@pprod_r[i],rpl)>0)then pprod_t[i]:=_rudata_byte(rpl,0);
+     end;
+end;
+
 procedure _rudata(u:integer;rpl:boolean;_pl:byte);
 var sh:shortint;
     i :byte;
@@ -705,11 +749,7 @@ begin
               UID_URadar:
                 if(rpl)or(_players[_pl].team=_players[player].team)then
                 begin
-                   i  :=_rudata_byte(rpl,0);
-                   if(i=0)
-                   then rld:=0
-                   else rld:=i*vid_fps-1;
-                   if(i>19)then
+                   if(_rrld(@rld_t,rpl)>19)then
                    begin
                       uo_x:=_rudata_int(rpl,-1000);
                       uo_y:=_rudata_int(rpl,-1000);
@@ -717,11 +757,7 @@ begin
                 end;
               UID_URocketL:
                 begin
-                   i  :=_rudata_byte(rpl,0);
-                   if(i=0)
-                   then rld:=0
-                   else rld:=i*vid_fps-1;
-                   if(i>0)then
+                   if(_rrld(@rld_t,rpl)>0)then
                    begin
                       uo_x:=_rudata_int(rpl,0);
                       uo_y:=_rudata_int(rpl,0);
@@ -736,14 +772,8 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uid in clnet_rld)then
-                     begin
-                        i  :=_rudata_byte(rpl,0);
-                        if(i=0)
-                        then rld:=0
-                        else rld:=i*vid_fps-1;
-                     end;
-                     if(uid in clnet_utr)then utrain:=_rudata_byte(rpl,0);
+                     if(uid in clnet_rld )then _rrld(@rld_t,rpl);
+                     if(isbarrack)or(issmith)then _rprod(u,rpl);
                   end;
                   if(sel)then
                    if(uid in whocanmp)then
@@ -844,8 +874,8 @@ begin
     with _players[i] do
     begin
        menerg:=0;
-       inc(menerg,u_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
-       inc(menerg,u_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
+       inc(menerg,ucl_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
+       inc(menerg,ucl_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
        if(G_startb=5)then inc(menerg,100);
     end;
 end;

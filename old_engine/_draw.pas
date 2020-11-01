@@ -1,10 +1,7 @@
-{
-x,y,depth,shadow z, rectangle color, amask color, spr, alpha, bar cx,
-}
 
 procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:pSDL_surface;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
 begin
-   if(vid_vsls<vid_mvs){and(G_Paused=0)}and(_menu=false)then
+   if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
       inc(vid_vsls,1);
       with vid_vsl[vid_vsls] do
@@ -24,6 +21,58 @@ begin
          cll := acll;
          rct := arct;
          ro  := aro;
+      end;
+   end;
+end;
+//_sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
+procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTUSprite;ainv:byte;aro:integer);
+begin
+   if(vid_vsls<vid_mvs)and(_menu=false)then
+   begin
+      inc(vid_vsls,1);
+      with vid_vsl[vid_vsls] do
+      begin
+         x   := ax-vid_vx-aspr^.hw;
+         y   := ay-vid_vy-aspr^.hh;
+         d   := ad;
+         sh  := ash;
+         s   := aspr^.surf;
+         rc  := 0;
+         msk := 0;
+         inv := ainv;
+         bar := 0;
+         clu := 0;
+         cru := '';
+         crl := 0;
+         cll := 0;
+         rct := false;
+         ro  := aro;
+      end;
+   end;
+end;
+//_sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
+procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTUSprite;ainv:byte);
+begin
+   if(vid_vsls<vid_mvs)and(_menu=false)then
+   begin
+      inc(vid_vsls,1);
+      with vid_vsl[vid_vsls] do
+      begin
+         x   := ax-vid_vx-aspr^.hw;
+         y   := ay-vid_vy-aspr^.hh;
+         d   := ad;
+         sh  := 0;
+         s   := aspr^.surf;
+         rc  := 0;
+         msk := amsk;
+         inv := ainv;
+         bar := 0;
+         clu := 0;
+         cru := '';
+         crl := 0;
+         cll := 0;
+         rct := false;
+         ro  := 0;
       end;
    end;
 end;
@@ -56,7 +105,7 @@ begin
           sy:=s^.h-(s^.h shr 3);
           filledellipseColor(_screen,x+sx,y+sy+sh,sx,s^.h shr 2,c_ablack);
        end;
-       SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,inv);
+       if(inv<255)then SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,inv);
 
        if(inv>0)then _draw_surf(_screen,x,y,s);
 
@@ -98,7 +147,7 @@ begin
 
        y:=sy;
 
-       SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,255);
+       if(inv<255)then SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
        dec(vid_vsls,1);
     end;
@@ -233,16 +282,16 @@ begin
     begin
        ix:=170+89*u;
 
-       _draw_text(_screen,ix,80,b2s(u_cs[false]), ta_middle,255, plcolor[u]);
+       _draw_text(_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, plcolor[u]);
 
-       _draw_text(_screen,ix,90,b2s(army)+' '+b2s(u_c[false]) , ta_middle,255, plcolor[u]);
+       _draw_text(_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, plcolor[u]);
 
        _draw_text(_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxarmy)+' '+b2s(ai_attack) , ta_middle,255, plcolor[u]);
        _draw_text(_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, plcolor[u]);
 
 
-       for iy:=0 to 8  do _draw_text(_screen,ix,130+iy*10,b2s(u_e[true ,iy])+'/'+b2s(u_eb[true ,iy])+' '+b2s(u_s[true ,iy])+' '+i2s(ubx[iy]), ta_left,255, plcolor[u]);
-       for iy:=0 to 11 do _draw_text(_screen,ix,230+iy*10,b2s(u_e[false,iy])+' '+b2s(u_s[false,iy]), ta_left,255, plcolor[u]);
+       for iy:=0 to 8  do _draw_text(_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[iy]), ta_left,255, plcolor[u]);
+       for iy:=0 to 11 do _draw_text(_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, plcolor[u]);
     end;
 
    if(k_ctrl>2)then
@@ -335,6 +384,8 @@ begin
    if(_menu)
    then D_Menu
    else D_Game;
+
+   if(_testmode>0)then _draw_text(_screen,vid_mw,0,c2s(fps_tt), ta_right,255, c_white);
 
    sdl_flip(_screen);
 end;

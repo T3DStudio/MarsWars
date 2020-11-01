@@ -67,7 +67,7 @@ MID_Baron      : begin dam:=50 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_RevenantS,
 MID_Revenant   : begin dam:=30 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
-MID_YPlasma    : begin dam:=15 ; vst:=sr div 16; sr :=0  ;       end;
+MID_YPlasma    : begin dam:=10 ; vst:=sr div 16; sr :=0  ;       end;
 MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=15 ;       end;
 
 MID_MBullet,
@@ -76,7 +76,7 @@ MID_Bullet     : begin dam:=6  ; vst:=1;         sr :=0  ;       end;
 MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=35 ; vst:=sr div 60; sr :=0  ;       end;
+MID_Flyer      : begin dam:=18 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
@@ -105,10 +105,8 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   
         if(tar>0)and(mid<>MID_RevenantS)then
         begin
            tu:=@_units[tar];
-           mx:=tu^.r shr 1;
-           my:=tu^.r;
-           inc(x,random(my)-mx);
-           inc(y,random(my)-mx);
+           inc(x,randomr(tu^.r));
+           inc(y,randomr(tu^.r));
         end;
 
         with _players[player] do
@@ -264,7 +262,7 @@ begin
                    else
                    // buildings
                    case mid of
-                   MID_Flyer,
+                   //MID_Flyer,
                    MID_Archfire    : _d50 (@damd);
                    MID_Bulletx2    : _d25 (@damd);
                    MID_Blizzard,
@@ -281,6 +279,10 @@ begin
 
               if(tu^.uf>uf_ground)then
               begin
+                 case mid of
+                 MID_YPlasma,
+                 MID_Flyer       : _d200(@damd);
+                 end;
                  if(tu^.isbuild=false)then
                  case mid of
                  MID_BPlasma,
@@ -291,12 +293,8 @@ begin
                  MID_Mancubus,
                  MID_Baron       : _d75 (@damd);
                  end;
-              end
-              else
-              case mid of
-              MID_YPlasma,
-              MID_Flyer       : _d50 (@damd);
               end;
+
 
              if(tu^.isbuild=false)then
               if(tu^.uf>uf_soaring)then
@@ -500,7 +498,7 @@ begin
                 MID_Flyer    : _effect_add(vx,vy,d-1,MID_Flyer);
               end;
 
-              _sl_add(vx-spr^.hw, vy-spr^.hh,d,0,0,0,false,spr^.surf,255,0,0,0,0,'',0);
+              _sl_add_eff(vx,vy,d,0,spr,255);
            end
            else
            begin
@@ -531,7 +529,7 @@ begin
               begin
                  if(mf=uf_ground)then
                   if(mid in [MID_SShot,MID_SSShot])then
-                   for u:=1 to mtars do _effect_add(vx-sr+random(sr shl 1),vy-sr+random(sr shl 1),d+40,mid_Bullet);
+                   for u:=1 to mtars do _effect_add(vx+randomr(sr),vy+randomr(sr),d+40,mid_Bullet);
                  continue;
               end;
 

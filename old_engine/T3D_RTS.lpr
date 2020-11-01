@@ -76,6 +76,8 @@ begin
       InputGame;
       CodeGame;
       if(_draw)then DrawGame;
+
+      fps_tt:=SDL_GetTicks-fps_cs;
    {$ELSE}
       while (SDL_PollEvent(_EVENT)>0) do
        CASE (_EVENT^.type_) OF

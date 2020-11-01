@@ -23,7 +23,7 @@ const hot_keys : array[0..15] of char = ('R','T','Y','F','G','H','V','B','N','U'
 begin
    _gHK:='';
    case tab of
-   0  : if(ucl<18)then
+   0  : if(ucl<12)then
          if(ucl<9)
          then _gHK:=#18+hot_keys[ucl]+#25
          else _gHK:=#18+'Ctrl'+#25+'+'+#18+hot_keys[ucl-9]+#25;
@@ -51,15 +51,44 @@ begin
    end;
 end;
 
+function _addstr(s,ad:shortstring):shortstring;
+begin
+   if(s='')
+   then _addstr:=ad
+   else _addstr:=s+', '+ad;
+end;
+
+function findprd(uid:byte;bld:boolean):shortstring;
+var i:byte;
+begin
+   findprd:='';
+   for i:=0 to 255 do
+   begin
+      if(bld=false)then
+       if not(uid in uids_units  [i])then continue;
+
+      if(bld)then
+       if not(uid in uids_builder[i])then continue;
+
+       findprd:=_addstr(findprd,str_un_name[i]);
+   end;
+
+   if(findprd<>'')then
+    if(bld)
+    then findprd:=#18+str_bprod+#25+findprd
+    else findprd:=#18+str_uprod+#25+findprd;
+end;
+
 procedure _makeHints;
 var rc,
 ucl,uid       :byte;
-  ENRG,NAME,HK,
+ENRG ,NAME,HK,PROD,
 DESCR,TIME,REQ:shortstring;
 begin
    for uid:=0 to 255 do
    begin
       REQ  :='';
+      PROD :='';
       NAME :=str_un_name [uid];
       if(NAME='')then continue;
       DESCR:=str_un_descr[uid];
@@ -76,16 +105,16 @@ begin
                then TIME:=i2s(trt div vid_fps)
                else TIME:='';
          end;
-         if(ruid <255)then REQ:=str_un_name[ruid];
+         PROD:=findprd(uid,isbuild);
+         if(ruid <255)then REQ:=_addstr(REQ,str_un_name[ruid]);
          if(rupgr<255)then
          begin
-            if(REQ<>'')then REQ:=REQ+', ';
             rc:=0;
             if(uid in uids_hell)then rc:=r_hell;
             if(uid in uids_uac )then rc:=r_uac;
             if(rc in [r_hell,r_uac])
-            then REQ:=REQ+str_up_name[rupgr+(_uts*rc)]
-            else REQ:=REQ+'#'+b2s(rupgr);
+            then REQ:=_addstr(REQ,str_up_name[rupgr+(_uts*rc)])
+            else REQ:=_addstr(REQ,'#'+b2s(rupgr)              );
          end;
       end;
       str_un_hint[uid]:= NAME;
@@ -94,7 +123,8 @@ begin
       if(TIME<>'')then str_un_hint[uid]:=str_un_hint[uid]+' ['+#16+TIME+#25+']';
       if(ENRG<>'')then str_un_hint[uid]:=str_un_hint[uid]+' {'+#19+ENRG+#25+'}';
       str_un_hint[uid]:=str_un_hint[uid]+#11+DESCR+#11;
-      if(REQ<>'')then str_un_hint[uid]:= str_un_hint[uid]+#17+str_req+#25+REQ;
+      if(PROD<>'')then str_un_hint[uid]:= str_un_hint[uid]+PROD+#11;
+      if(REQ <>'')then str_un_hint[uid]:= str_un_hint[uid]+#17+str_req+#25+REQ;
    end;
 
    for rc:=1 to 2 do
@@ -199,6 +229,8 @@ begin
    str_req               := 'Requirements: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
+   str_uprod             := 'Produced by: ';
+   str_bprod             := 'Constructed by: ';
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;
@@ -278,18 +310,19 @@ begin
    str_hint_m[2]         := 'Pause ('+#18+'Pause/Break'+#25+')';
 
 
-   _mkHStrUid(UID_HKeep        ,'Hell Keep'         ,'Builds base.'                 );
-   _mkHStrUid(UID_HGate        ,'Hell Gate'         ,'Summons units.'               );
-   _mkHStrUid(UID_HSymbol      ,'Hell Symbol'       ,'Generates energy.'            );
-   _mkHStrUid(UID_HPools       ,'Hell Pools'        ,'Research upgrades.'           );
-   _mkHStrUid(UID_HTower       ,'Hell Tower'        ,'Defensive structure.'         );
-   _mkHStrUid(UID_HTeleport    ,'Hell Teleport'     ,'Teleports units to any place.');
-   _mkHStrUid(UID_HMonastery   ,'Hell Monastery'    ,'Upgrades units.'                    );
-   _mkHStrUid(UID_HTotem       ,'Hell Totem'        ,'Advanced defensive structure.'      );
-   _mkHStrUid(UID_HAltar       ,'Hell Altar'        ,'Casts "Invulnerability" on units.'  );
-   _mkHStrUid(UID_HFortress    ,'Hell Fortress'     ,'');
-   _mkHStrUid(UID_HMilitaryUnit,'Hell Military Unit','Corrupted UAC Military Unit.');
-   _mkHStrUid(UID_HEye         ,'Hell Eye'          ,'');
+   _mkHStrUid(UID_HKeep         ,'Hell Keep'          ,'Builds base.'                 );
+   _mkHStrUid(UID_HGate         ,'Hell Gate'          ,'Summons units.'               );
+   _mkHStrUid(UID_HSymbol       ,'Hell Symbol'        ,'Generates energy.'            );
+   _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Research upgrades.'           );
+   _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
+   _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units to any place.');
+   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,'Upgrades units.'                    );
+   _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.'      );
+   _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" on units.'  );
+   _mkHStrUid(UID_HFortress     ,'Hell Fortress'      ,'Allowing upgrade production buildings. Generates energy.');
+   _mkHStrUid(UID_HCommandCenter,'Hell Command Center','Corrupted UAC Command Center.');
+   _mkHStrUid(UID_HMilitaryUnit ,'Hell Military Unit' ,'Corrupted UAC Military Unit.' );
+   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'');
 
    _mkHStrUid(UID_LostSoul   ,'Lost Soul'      ,'');
    _mkHStrUid(UID_Imp        ,'Imp'            ,'');
@@ -347,6 +380,7 @@ begin
    _mkHStrUid(UID_UPTurret        ,'UAC Plasma turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_URocketL        ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
    _mkHStrUid(UID_URTurret        ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
+   _mkHStrUid(UID_UNuclearPlant   ,'UAC Nuclear Plant'          ,'Allowing upgrade production buildings. Generates energy.');
    _mkHStrUid(UID_Mine            ,'Mine','');
 
    _mkHStrUid(UID_Engineer   ,'Engineer'         ,'');
@@ -607,6 +641,8 @@ begin
   str_req               := 'Требования: ';
   str_orders            := 'Отряды: ';
   str_all               := 'Все';
+  str_uprod             := 'Создается в: ';
+  str_bprod             := 'Строит: ';
 
   str_starta            := 'Начальная база:';
   str_startat[0]        := '1 '+#19+'строитель'+#25;
@@ -652,17 +688,18 @@ begin
   str_hint_a[0]         := 'Энергия (свободная / максимальная)';
   str_hint_a[1]         := 'Армия (юниты и здания)';
 
-  _mkHStrUid(UID_HKeep        ,'Адская Крепость' ,'Строит базу.'                          );
-  _mkHStrUid(UID_HGate        ,'Адские Врата'    ,'Призывает юнитов.'                     );
-  _mkHStrUid(UID_HSymbol      ,'Адский Символ'   ,'Производит энергию.'                   );
-  _mkHStrUid(UID_HPools       ,'Адские Омуты'    ,'Исследует улучшения.'                  );
-  _mkHStrUid(UID_HTower       ,'Адская Башня'    ,'Защитное сооружение.'                  );
-  _mkHStrUid(UID_HTeleport    ,'Адский Телепорт' ,'Перемещает юнитов в любую точку карты.');
-  _mkHStrUid(UID_HMonastery   ,'Адский Монастырь','Улучшает юнитов.'                      );
-  _mkHStrUid(UID_HTotem       ,'Адский Тотем'    ,'Продвинутое защитное сооружение.'      );
-  _mkHStrUid(UID_HAltar       ,'Адский Алтарь'   ,'Временно делает юнитов неуязвимыми.'   );
-  _mkHStrUid(UID_HFortress    ,'Адский Замок'    ,'Временно делает юнитов неуязвимыми.'   );
-  _mkHStrUid(UID_HMilitaryUnit,'Проклятая Войсковая часть','Позволяет производить зомби.' );
+  _mkHStrUid(UID_HKeep         ,'Адская Крепость' ,'Строит базу.'                          );
+  _mkHStrUid(UID_HGate         ,'Адские Врата'    ,'Призывает юнитов.'                     );
+  _mkHStrUid(UID_HSymbol       ,'Адский Символ'   ,'Производит энергию.'                   );
+  _mkHStrUid(UID_HPools        ,'Адские Омуты'    ,'Исследует улучшения.'                  );
+  _mkHStrUid(UID_HTower        ,'Адская Башня'    ,'Защитное сооружение.'                  );
+  _mkHStrUid(UID_HTeleport     ,'Адский Телепорт' ,'Перемещает юнитов в любую точку карты.');
+  _mkHStrUid(UID_HMonastery    ,'Адский Монастырь','Улучшает юнитов.'                      );
+  _mkHStrUid(UID_HTotem        ,'Адский Тотем'    ,'Продвинутое защитное сооружение.'      );
+  _mkHStrUid(UID_HAltar        ,'Адский Алтарь'   ,'Временно делает юнитов неуязвимыми.'   );
+  _mkHStrUid(UID_HFortress     ,'Адский Замок'    ,'Позволяет улучшать производственные здания. Производит энергию.'   );
+  _mkHStrUid(UID_HCommandCenter,'Проклятый Командный Центр','');
+  _mkHStrUid(UID_HMilitaryUnit ,'Проклятая Войсковая часть','Позволяет производить зомби.' );
 
   _mkHStrUpid(r_hell,upgr_attack  ,'Улучшение дальней атаки'        ,''                                         );
   _mkHStrUpid(r_hell,upgr_armor   ,'Улучшение защиты юнитов'        ,''                                         );
@@ -686,7 +723,7 @@ begin
   _mkHStrUpid(r_hell,upgr_bldrep  ,'Восстановление зданий'          ,'Поврежденные здания медленно восстанавливают себя.'                      );
   _mkHStrUpid(r_hell,upgr_mainonr ,'Свободная телепортация'         ,'Адская Крепость может перемещаться на скалы, озера и др. препятствия.'   );
   _mkHStrUpid(r_hell,upgr_b478tel ,'Телепортация на короткие дистанции'
-                                                                  ,'Адские Символы, Башни и Тотемы могут телепортироваться на короткое расстояние.');
+                                                                    ,'Адские Символы, Башни и Тотемы могут телепортироваться на короткое расстояние.');
   _mkHStrUpid(r_hell,upgr_hinvuln ,'Неуязвимость'                   ,'Сферы неуязвимости для Адского Алтаря.'                                  );
   _mkHStrUpid(r_hell,upgr_bldenrg ,'Встроеный адский символ'        ,'Дополнительная энергия для Адской Крепости.'                             );
 
@@ -700,6 +737,7 @@ begin
   _mkHStrUid(UID_UPTurret        ,'Плазменная Турель'      ,'Продвинутое защитное сооружение.');
   _mkHStrUid(UID_URocketL        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
   _mkHStrUid(UID_URTurret        ,'Ракетная Турель'        ,'Продвинутое защитное сооружение.');
+  _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_Mine            ,'Мина','');
 
   _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');

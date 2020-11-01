@@ -32,6 +32,9 @@ _missiles         : array[1..MaxUnits   ] of TMissile;
 _uclord_c         : integer = 0;
 _uregen_c         : integer = 0;
 
+uids_builder,
+uids_units,
+uids_apc          : array[0..255] of TSoB;
 _ulst             : array[byte] of TUnit;
 upgrade_time      : array[1..2,0.._uts] of integer;
 upgrade_cnt       : array[1..2,0.._uts] of byte;
@@ -68,7 +71,6 @@ vid_mredraw       : boolean = true;
 map_seed          : cardinal = 1;
 map_seed2         : word = 0;
 map_mw            : integer = 5000;
-//map_mwc           : integer = 0;
 map_aifly         : boolean = false;
 map_b1            : integer;
 map_obs           : byte = 1;
@@ -125,7 +127,7 @@ _minimap,
 _bminimap,
 _SCREEN,
 _menu_surf        : pSDL_SURFACE;
-_vflags           : cardinal = SDL_SWSURFACE;
+_vflags           : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
 _RECT             : pSDL_RECT;
 
@@ -282,22 +284,22 @@ ui_mc_c           : cardinal;
 
 ui_panelmmm       : boolean = false;
 ui_tab            : byte = 0;
-ui_bldrs_x        : array[0.._uts] of integer;
-ui_bldrs_y        : array[0.._uts] of integer;
-ui_bldrs_r        : array[0.._uts] of integer;
 ui_muc            : array[false..true] of cardinal;
-ui_trnt           : array[0.._uts] of integer;
-ui_trntc          : array[0.._uts] of integer;
-ui_trntca         : integer = 0;
-ui_uimove         : integer = 0;
-ui_uselected      : integer = 0;
-ui_uiaction       : integer = 0;
-ui_batlu          : integer = 0;
-ui_upgrc          : byte;
+ui_builders_x     : array[0.._uts] of integer;
+ui_builders_y     : array[0.._uts] of integer;
+ui_builders_r     : array[0.._uts] of integer;
+ui_units_ptime    : array[0.._uts] of integer;
+ui_units_prodc    : array[0.._uts] of integer;
+ui_units_proda    : integer = 0;
+ui_uimove         : integer = 0; // ui move buttons
+ui_uiaction       : integer = 0; // ui action button
+ui_battle_units   : integer = 0; // ui select all button
 ui_upgrct         : array[0.._uts] of byte;
-ui_upgrl          : integer = 0;
+ui_upgr_time      : integer = 0;
 ui_upgr           : array[0.._uts] of integer;
-ui_apc            : array[0.._uts] of integer;
+ui_units_inapc    : array[0.._uts] of integer;
+ui_prod_units     : array[0..255 ] of integer;
+ui_prod_builds    : TSoB;
 ui_blds           : array[0.._uts] of integer;
 ui_bldsc          : integer;
 ui_alrms          : array[0..vid_uialrm_n] of TAlarm;
@@ -345,6 +347,7 @@ c_ablack,
 c_purple,
 c_black           : cardinal;
 
+fps_tt,
 fps_cs,
 fps_ns            : cardinal;
 
@@ -416,22 +419,31 @@ spr_rtur          : array[0..7 ] of TUSprite;
 
 spr_HKeep,
 spr_HGate,
+spr_HAGate,
 spr_HSymbol,
 spr_HPools,
+spr_HAPools,
 spr_HTower,
-spr_HTeleport     : array[0..3]  of TUsprite;
+spr_HTeleport,
+spr_HCC,
+spr_HMUnit,
+spr_HMUnita
+                  : array[0..3]  of TUsprite;
 
 //spr_HTa : TUsprite;
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
+spr_UAMilitaryUnit,
 spr_UGenerator,
 spr_UWeaponFactory,
+spr_UAWeaponFactory,
 spr_UTurret,
 spr_URadar,
 spr_UVehicleFactory,
 spr_UPTurret,
 spr_URTurret,
+spr_UNuclearPlant,
 spr_URocketL      : array[0..3]  of TUsprite;
 
 spr_eff_bfg       : array[0..3] of TUsprite; //ef_bfg_
@@ -514,6 +526,8 @@ spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 str_all,
 str_orders,
 str_req,
+str_uprod,
+str_bprod,
 str_language,
 str_resol,
 str_apply,

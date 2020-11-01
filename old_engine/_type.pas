@@ -12,11 +12,11 @@ TUnit = record
    vx,vy,
    x,y,
    anim,r,sr,ar,arf,anims,
-   speed,dir,rld,trt,
+   speed,dir,rld_t,trt,
    mhits,rld_a,rld_r,
    bld_s,
    hits,
-   unum    : integer;
+   unum     : integer;
 
    renerg,
    _fr,
@@ -24,12 +24,19 @@ TUnit = record
    generg,uf,
    _uclord,
    vstp,order,
-   player,utrain,
-   uid,max,shadow,
+   player,
+   uid,max,
+   shadow,
    ucl,
-   ruid,rupgr     : byte;
+   ruid,rupgr
+            : byte;
 
-   alrm_b  : boolean;
+   uprod_r,
+   pprod_r  : array[0..MaxUnitProds] of integer;
+   uprod_t,
+   pprod_t  : array[0..MaxUnitProds] of byte;
+
+   alrm_b   : boolean;
    alrm_x,
    alrm_y,
    alrm_r,
@@ -39,26 +46,29 @@ TUnit = record
    uo_bx,uo_by,
    uo_tar,
    uo_x,
-   uo_y    : integer;
-   uo_id   : byte;
+   uo_y     : integer;
+   uo_id    : byte;
 
-   inapc   : integer;
+   inapc    : integer;
    painc,
    pains,
    apcc,
    apcm,
-   apcs    : byte;
+   apcs     : byte;
 
-   _shcf   : single;
+   _shcf    : single;
 
-   buff    : array[0.._ubuffs] of integer;
+   buff     : array[0.._ubuffs] of integer;
    vsni,
-   vsnt    : array[0..MaxPlayers] of integer;
+   vsnt     : array[0..MaxPlayers] of integer;
 
    isbuild,
+   isbuilder,
+   issmith,
+   isbarrack,
    mech,bld,solid,
    wanim,melee,
-   sel     : boolean;
+   sel      : boolean;
 end;
 PTUnit = ^TUnit;
 
@@ -71,8 +81,7 @@ TPlayer = record
 
    army,team,
    race,state,
-   bld_r,mrace,
-   wbhero
+   bld_r,mrace
            : byte;
 
    cenerg,
@@ -84,29 +93,45 @@ TPlayer = record
 o_x0,o_y0,
 o_x1,o_y1  :integer;
 
-   u_e     : array[false..true,0.._uts] of byte;
-   u_eb    : array[false..true,0.._uts] of byte;
-   u_s     : array[false..true,0.._uts] of byte;
-   u_c     : array[false..true] of byte;
-   u_cs    : array[false..true] of byte;
-   ubx     : array[0.._uts] of integer;
+   ucl_e,                                           // existed class
+   ucl_eb,                                          // existed class bld=true and hits>0
+   ucl_s   : array[false..true,0.._uts] of integer; // selected
+   ucl_x   : array[0.._uts] of integer;             // first unit class
+
    uid_e,
-   uid_b   : array[0..255 ] of byte;
+   uid_eb,
+   uid_s,
+   uid_x   : array[0..255 ] of integer;
+
+   ucl_c,                                           // count buildings/units
+   ucl_cs  : array[false..true] of integer;         // count selected buildings/units
+
+   uprodc  : array[0.._uts] of integer;
+   uprodu  : array[0..255 ] of integer;
+   uprodm,
+   uproda  : integer;
+
+   pprodm,
+   pproda  : integer;
+   upgrinp,
+   upgr    : upgrar;
+
+   a_upgr,
+   a_build,
+   a_units : cardinal;
 
    ai_pushpart,
    ai_maxarmy,
    ai_attack,
    ai_skill: byte;
 
-   //cpupgr,
-   a_upgr,
-   a_build,
-   a_units : cardinal;
+   s_builders,
+   s_barracks,
+   s_smiths,
+   n_builders,
+   n_barracks,
+   n_smiths: integer;
 
-   upgrinp,
-   upgr    : upgrar;
-
-   wb,bldrs,
    PNU     : byte;
    n_u,
    ttl     : integer;
@@ -127,11 +152,6 @@ TCTPoint = record
 end;
 
 {$IFDEF _FULLGAME}
-
-TBa = array[0..0] of byte;
-TWa = array[0..0] of word;
-TCa = array[0..0] of cardinal;
-
 TSoc = set of char;
 
 string6 = string[6];

@@ -66,58 +66,58 @@ begin
    with _players[bp] do
     while true do
      case tr of
-    0: if(tr in bblds)and(u_e[true,tr]<thc)then
+    0: if(tr in bblds)and(ucl_e[true,tr]<thc)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=3;
-    1: if(tr in bblds)and(u_e[true,tr]<brc)then
+    1: if(tr in bblds)and(ucl_e[true,tr]<brc)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=2;
-    2: if(tr in bblds)and(u_e[true,tr]<gc)then
+    2: if(tr in bblds)and(ucl_e[true,tr]<gc)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=5;
-    3: if(tr in bblds)and(u_e[true,tr]=0)then
+    3: if(tr in bblds)and(ucl_e[true,tr]=0)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=1;
-    5: if(tr in bblds)and(u_e[true,tr]=0)then
+    5: if(tr in bblds)and(ucl_e[true,tr]=0)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=6;
-    6: if(tr in bblds)and(u_e[true,tr]=0)then   // and(u_e[true,3]>0)
+    6: if(tr in bblds)and(ucl_e[true,tr]=0)then   // and(ucl_e[true,3]>0)
        begin
           _cmp_chucl:=tr;
           break;
        end
        else tr:=8;
-    8: if(tr in bblds)and(u_e[true,tr]=0)then   // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
+    8: if(tr in bblds)and(ucl_e[true,tr]=0)then   // and(ucl_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
        begin
           _cmp_chucl:=tr;
           break;
        end
        else
-         if((i mod 2)=0)                        // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
+         if((i mod 2)=0)                        // and(ucl_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
          then tr:=7
          else tr:=4;
-    4: if(tr in bblds)and(u_e[true,tr]<twc)then
+    4: if(tr in bblds)and(ucl_e[true,tr]<twc)then
        begin
           _cmp_chucl:=tr;
           break;
        end
        else break;
-    7: if(tr in bblds)and(u_e[true,tr]<twc)then
+    7: if(tr in bblds)and(ucl_e[true,tr]<twc)then
        begin
           _cmp_chucl:=tr;
           break;
@@ -196,27 +196,27 @@ begin
             begin
                if(race=r_hell)and(ucl=1)and(9 in bblds)then ucl:=9;
                if(race=r_uac )and(ucl=0)and(9 in bblds)then ucl:=9;
-               if(_unit_grbcol(tx,ty,_ulst[cl2uid[race,true,ucl]].r,255,true)=0)then
+               if(_unit_grbcol(tx,ty,_ulst[cl2uid[race,true,ucl]].r,255,0,true)=0)then
                begin
                   _unit_add(tx,ty,cl2uid[race,true,ucl],pbp,true);
                   if(31 in uulds)then _effect_add(tx,ty,9999,EID_Teleport);
                end;
             end;
 
-          if(u_c[false]>=ai_maxarmy)then continue;
+          if(ucl_c[false]>=ai_maxarmy)then continue;
           ucl:=i mod 12;
 
           if(race=r_uac)then
            case ucl of
-           7 : if(u_e[false,ucl]>2)then continue;
-           8 : if(u_e[false,ucl]>4)then continue;
+           7 : if(ucl_e[false,ucl]>2)then continue;
+           8 : if(ucl_e[false,ucl]>4)then continue;
            end;
           if(race=r_hell)then
            case ucl of
-           8 : if(u_e[false,ucl]>9)then continue;
+           8 : if(ucl_e[false,ucl]>9)then continue;
            end;
 
-          if(ucl in uulds)and(u_e[false,ucl]<_ulst[cl2uid[race,false,ucl]].max)then
+          if(ucl in uulds)and(ucl_e[false,ucl]<_ulst[cl2uid[race,false,ucl]].max)then
           _unit_add(tx-60,ty-60,cl2uid[race,false,ucl],pbp,true);
           if(31 in uulds)then _effect_add(tx-60,ty-60,9999,EID_Teleport);
        end;
@@ -268,20 +268,20 @@ begin
                _unit_add(ix,iy,cl2uid[race,true,ucl],pbp,true);
             end;
 
-          if(u_c[false]>=ai_maxarmy)then continue;
+          if(ucl_c[false]>=ai_maxarmy)then continue;
           ucl:=i mod 12;
 
           if(race=r_uac)then
            case ucl of
-           7 : if(u_e[false,ucl]>2)then continue;
-           8 : if(u_e[false,ucl]>4)then continue;
+           7 : if(ucl_e[false,ucl]>2)then continue;
+           8 : if(ucl_e[false,ucl]>4)then continue;
            end;
 
-          if(ucl in uulds)and(u_e[false,ucl]<_ulst[cl2uid[race,false,ucl]].max)then
+          if(ucl in uulds)and(ucl_e[false,ucl]<_ulst[cl2uid[race,false,ucl]].max)then
            _unit_add(ix-60,iy-60,cl2uid[race,false,ucl],pbp,true);
        end;
    end;
-   until (u_c[false]>=ai_maxarmy)or(ucl=255)or(i>=MaxPlayerUnits);
+   until (ucl_c[false]>=ai_maxarmy)or(ucl=255)or(i>=MaxPlayerUnits);
 end;  }
 
 procedure cmp_code;
@@ -289,7 +289,7 @@ var i:integer;
 begin
    case _cmp_sel of
    0 : begin
-          i:=_players[1].u_c[false];
+          i:=_players[1].ucl_c[false];
           if(i<8 )then i:=8;
           _units[1].rld_r:=i;
 
@@ -308,7 +308,7 @@ begin
 
           if((g_step mod 300)=0)then
            with _players[0] do
-            if(u_e[false,4]<4)then
+            if(ucl_e[false,4]<4)then
             begin
                _effect_add(map_psx[0],map_psx[0],9999,EID_Teleport);
                _unit_add(map_psx[0],map_psx[0],UID_Baron,0,true);
@@ -316,7 +316,7 @@ begin
             end;
 
           if(team_army[2]<5)then G_WTeam:=1;
-          if(_players[0].u_e[true,15]=0)then G_WTeam:=2;
+          if(_players[0].ucl_e[true,15]=0)then G_WTeam:=2;
        end;
    1 : begin
           if(team_army[2]<5)then G_WTeam:=1;
@@ -324,7 +324,7 @@ begin
        end;
 
    2 : begin
-          i:=_players[1].u_c[false];
+          i:=_players[1].ucl_c[false];
           if(i<8 )then i:=8;
           if(i>15)then dec(i,8);
           _units[1].rld_r:=i;
@@ -344,7 +344,7 @@ begin
           end;
 
           if(team_army[2]<4)then G_WTeam:=1;
-          if(_players[0].u_e[true,15]=0)then G_WTeam:=2;
+          if(_players[0].ucl_e[true,15]=0)then G_WTeam:=2;
        end;
    3 : begin
           if(G_Step=67000)then
@@ -391,7 +391,7 @@ begin
            end;
 
           if(G_Step<71940)then
-           if(_players[0].u_e[true,8]<5)then G_WTeam:=2;
+           if(_players[0].ucl_e[true,8]<5)then G_WTeam:=2;
 
           if(team_army[2]<4)then G_WTeam:=1;
        end;
