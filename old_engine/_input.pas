@@ -104,13 +104,13 @@ begin
             ui_umark_t:=vid_hfps;
             if(ox1>0)then
             begin
-               if(_players[_units[oy1].player].team<>_players[HPlayer].team)
+               if(_players[_units[oy1].playern].team<>_players[HPlayer].team)
                then _click_eff(ox0,oy0,vid_hhfps,c_red)
                else _click_eff(ox0,oy0,vid_hhfps,c_aqua);
             end
             else
             begin
-               if(_players[_units[oy1].player].team<>_players[HPlayer].team)
+               if(_players[_units[oy1].playern].team<>_players[HPlayer].team)
                then _click_eff(ox0,oy0,vid_hhfps,c_orange)
                else _click_eff(ox0,oy0,vid_hhfps,c_blue);
             end;
@@ -436,11 +436,11 @@ begin
    if(_nhp(tx,ty))then
     for i:=1 to MaxUnits do
      with _units[i] do
-      if(hits>0)and(inapc=0)and(_ch(_players[player].team))then
+      if(hits>0)and(inapc=0)and(_ch(_players[playern].team))then
        if(_uvision(htm,@_units[i],false))then
         if(dist2(vx,vy,tx,ty)<r)then
         begin
-           if(player=HPlayer)and(sc=1)and(sel=true)then continue;
+           if(playern=HPlayer)and(sc=1)and(sel=true)then continue;
            _whoInPoint:=i;
            break;
        end;

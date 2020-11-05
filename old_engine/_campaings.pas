@@ -203,7 +203,7 @@ begin
                end;
             end;
 
-          if(ucl_c[false]>=ai_maxarmy)then continue;
+         // if(ucl_c[false]>=ai_maxarmy)then continue;
           ucl:=i mod 12;
 
           if(race=r_uac)then
@@ -287,7 +287,7 @@ end;  }
 procedure cmp_code;
 var i:integer;
 begin
-   case _cmp_sel of
+   {case _cmp_sel of
    0 : begin
           i:=_players[1].ucl_c[false];
           if(i<8 )then i:=8;
@@ -303,7 +303,7 @@ begin
              _unit_add(map_psx[0]+100,map_psx[0]-100,UID_HTower,0,true);
              _unit_add(map_psx[0]-100,map_psx[0]+100,UID_HTower,0,true);
              _unit_add(map_psx[0]+100,map_psx[0]+100,UID_HTower,0,true);
-             PlaySND(snd_teleport,0);
+             PlaySND(snd_teleport,nil);
           end;
 
           if((g_step mod 300)=0)then
@@ -340,7 +340,7 @@ begin
              _unit_add(map_psx[0]-100,map_psx[0]+100,UID_HTower,0,true);
              _unit_add(map_psx[0]+100,map_psx[0]+100,UID_HTower,0,true);
 
-             PlaySND(snd_teleport,0);
+             PlaySND(snd_teleport,nil);
           end;
 
           if(team_army[2]<4)then G_WTeam:=1;
@@ -403,13 +403,13 @@ begin
              _unit_add(map_psx[0]+100,map_psy[0]+200,UID_Pain,0,true);with _lcup^ do begin buff[ub_advanced]:=255;_effect_add(x,y,9999,EID_Teleport);end;
              _unit_add(map_psx[0]+200,map_psy[0]-400,UID_Pain,0,true);with _lcup^ do begin buff[ub_advanced]:=255;_effect_add(x,y,9999,EID_Teleport);end;
              _unit_add(map_psx[0]-200,map_psy[0]+400,UID_Pain,0,true);with _lcup^ do begin buff[ub_advanced]:=255;_effect_add(x,y,9999,EID_Teleport);end;
-             PlaySND(snd_teleport,0);
+             PlaySND(snd_teleport,nil);
           end;
           if(G_Step=180)then
           begin
              _cmp_createbase(map_psx[0]+200,map_psy[0]-200,270 ,1,4        ,UID_HMonastery,[0..7],[0..6,31]);
              _unit_add(map_psx[0]-200,map_psy[0]+200,UID_HMonastery,0,true);with _lcup^ do begin buff[ub_advanced]:=255;_effect_add(x,y,9999,EID_Teleport);end;
-             PlaySND(snd_teleport,0);
+             PlaySND(snd_teleport,nil);
           end;
           if(G_Step=400)then
           begin
@@ -431,7 +431,7 @@ begin
           if(G_Step=100)then
           begin
              _cmp_createbase(map_psx[0],map_psy[0],0  ,1,5        ,UID_HFortress           ,[0..6],[0..6,31]);
-             PlaySND(snd_teleport,0);
+             PlaySND(snd_teleport,nil);
           end;
           if(G_Step>120)then
           begin
@@ -442,7 +442,7 @@ begin
    7 : begin
            if(team_army[2]<1)then G_WTeam:=1;
        end;
-   end;
+   end; }
 end;
 
 

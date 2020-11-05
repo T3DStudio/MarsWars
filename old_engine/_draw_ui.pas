@@ -215,7 +215,7 @@ begin
 
                _drawBtn (_uipanel,ux,uy,spr_b_b[race,ui],m_sbuild=ui,_bldCndt(HPlayer,ui) or not(uid in ui_prod_builds));
                _drawBtnt(_uipanel,ux,uy,
-               b2s(ui_blds[ ui]),'',b2s(ucl_s [true,ui]),b2s   (ucl_e [true,ui])                                ,''     ,
+               b2s(ui_blds[ ui]),'',b2s(ucl_s [true,ui]),b2s   (ucl_e[true,ui])                                 ,''     ,
                c_dyellow        ,0 ,c_lime              ,ui_muc[ucl_e[true,ui]>=_ulst[cl2uid[race,true,ui]].max],c_white);
 
                case ui of
@@ -261,7 +261,7 @@ begin
 
                _drawBtn(_uipanel,ux,uy,spr_b_u[race,ui],false,_untCndt(HPlayer,ui) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(_uipanel,ux,uy,
-               b2s(((ui_units_ptime[ui]+vid_ifps) div vid_fps)),b2s(uprodc[ui])+#13+b2s(ui_prod_units[uid]),b2s(ucl_s [false,ui]),b2s(   ucl_e[false,ui])                                    ,b2s(ui_units_inapc[ui]),
+               b2s(((ui_units_ptime[ui]+vid_ifps) div vid_fps)),b2s(uprodc[ui]),b2s(ucl_s [false,ui]),b2s(   ucl_e[false,ui])                                    ,b2s(ui_units_inapc[ui]),
                c_white                                         ,c_dyellow      ,c_lime               ,ui_muc[ucl_e[false,ui]>=_ulst[cl2uid[race,false,ui]].max],c_purple);
             end;
          end;

@@ -340,9 +340,9 @@ end;
 
 procedure net_chat_clear;
 begin
-   FillChar(net_chat,sizeof(net_chat),#0);
-   FillChar(net_chatss,sizeof(net_chatss),0);
-   FillChar(net_chatls,sizeof(net_chatls),0);
+   FillChar(net_chat  ,sizeof(net_chat  ),#0);
+   FillChar(net_chatss,sizeof(net_chatss),0 );
+   FillChar(net_chatls,sizeof(net_chatls),0 );
 end;
 
 procedure net_readchat;

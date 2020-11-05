@@ -39,9 +39,14 @@ begin
        _playerSetState(p);
        ready:=false;
 
-       ai_pushpart := 2;
-       ai_maxarmy  := 100;
-       ai_attack   := 0;
+       ai_pushtime := vid_fps*30;
+       ai_pushmin  := 55;
+       ai_pushuids := [];
+       ai_towngrd  := 3;
+       ai_maxunits := 100;
+       ai_flags    := $FFFFFFFF;
+       ai_pushtimei:= 0;
+       ai_pushfrmi := 0;
 
        _bc_ss(@a_build,[0..14]);
        _bc_ss(@a_units,[0..18]);
@@ -55,7 +60,6 @@ begin
       a_build  :=0;
       a_units  :=0;
       a_upgr   :=0;
-      ai_attack:=2;
    end;
 
    {$IFDEF _FULLGAME}
@@ -354,8 +358,12 @@ end;
 {$ENDIF}
 
 procedure _u_ord(pl:byte);
-var u,_u,scnt,scntm:integer;
+var
+u,_u,
+scnt,
+scntm:integer;
  psel:boolean;
+pu   :PTUnit;
 begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
@@ -385,8 +393,9 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
          while (u<>_u) do
          begin
-            with _units[u] do
-             if(hits>0)and(inapc=0)and(pl=player)then
+            pu:=@_units[u];
+            with pu^ do
+             if(hits>0)and(inapc=0)and(pl=playern)then
              begin
                 psel:=sel;
                 if(o_id=uo_select)or((o_id=uo_aselect)and(not sel))then
@@ -411,10 +420,10 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
                 if(o_id=uo_action)then
                  case o_x0 of
-                 -2 : if(s_smiths  =0)and(_unit_supgrade (u,o_y0))then break;   // start upgr
-                 -3 : if(s_smiths  =0)and(_unit_cupgrade (u,o_y0))then break;   // cancle upgr
-                 -4 : if(s_barracks=0)and(_unit_straining(u,o_y0))then break;   // start training
-                 -5 : if(s_barracks=0)and(_unit_ctraining(u,o_y0))then break;   // cancle training
+                 -2 : if(s_smiths  =0)and(_unit_supgrade (pu,o_y0))then break;   // start upgr
+                 -3 : if(s_smiths  =0)and(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
+                 -4 : if(s_barracks=0)and(_unit_straining(pu,o_y0))then break;   // start training
+                 -5 : if(s_barracks=0)and(_unit_ctraining(pu,o_y0))then break;   // cancle training
                  end;
 
                 if(sel)then
@@ -423,16 +432,16 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                uo_select     : _lsuc:=uid;
                uo_setorder,
                uo_addorder   : order:=o_x0;
-               uo_delete     : _unit_kill(u,false,o_x0>0);
+               uo_delete     : _unit_kill(pu,false,o_x0>0);
                uo_move       : begin
                                   uo_x :=o_x0;
                                   uo_y :=o_y0;
                                   uo_bx:=-1;
 
                                   case uid of
-                                   UID_HKeep      : _unit_bteleport(u);
-                                   UID_URadar     : _unit_uradar(u);
-                                   UID_URocketL   : _unit_URocketL(u);
+                                   UID_HKeep      : _unit_bteleport(pu);
+                                   UID_URadar     : _unit_uradar   (pu);
+                                   UID_URocketL   : _unit_URocketL (pu);
                                    UID_HMonastery : if(o_y1<>u)then uo_tar:=o_y1;
                                    UID_HGate,
                                    UID_UMilitaryUnit,
@@ -442,7 +451,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                    UID_HTotem     : begin
                                                        if(o_y1<>u)and(o_y1<>0)
                                                        then uo_tar:=o_y1
-                                                       else _unit_b247teleport(u);
+                                                       else _unit_b247teleport(pu);
                                                     end;
                                    else
                                      if(o_y1<>u)then uo_tar:=o_y1;
@@ -453,7 +462,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                         uo_id:=ua_move;
                                         tar1 :=0;
                                      end;
-                                     _unit_turn(u);
+                                     _unit_turn(pu);
                                   end;
                                end;
                uo_action     : case o_x0 of
@@ -474,7 +483,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                             uo_y  :=o_y1;
                                             uo_bx :=-1;
                                             uo_tar:=0;
-                                            _unit_turn(u);
+                                            _unit_turn(pu);
                                             case o_y0 of
                                             -2,-4: begin
                                                       uo_bx:=x;
@@ -492,24 +501,24 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                          1,-3,-4 : uo_id:=ua_amove;
                                          end;
                                       end;
-                                  1 : _unit_action(u);
-                                 -2 : _unit_supgrade(u,o_y0);
-                                 -3 : _unit_cupgrade(u,o_y0);
-                                 -4 : _unit_straining(u,o_y0);
-                                 -5 : _unit_ctraining(u,o_y0);
+                                  1 : _unit_action   (pu);
+                                 -2 : _unit_supgrade (pu,o_y0);
+                                 -3 : _unit_cupgrade (pu,o_y0);
+                                 -4 : _unit_straining(pu,o_y0);
+                                 -5 : _unit_ctraining(pu,o_y0);
                                  -6 : case ucl of
-                                      1: _unit_ctraining(u,-1);
-                                      3: _unit_cupgrade (u,-1);
+                                      1: _unit_ctraining(pu,-1);
+                                      3: _unit_cupgrade (pu,-1);
                                       end;
                                end;
                    end;
 
-                   if(psel=false)then _unit_inc_selc(u);
+                   if(psel=false)then _unit_inc_selc(pu);
                    inc(scnt,1);
                 end
                 else
                 begin
-                   if(psel=true)then _unit_dec_selc(u);
+                   if(psel=true)then _unit_dec_selc(pu);
                    if(o_id=uo_setorder)and(order=o_x0)then order:=0;
                 end;
              end;
@@ -528,6 +537,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 end;
 
 procedure PlayersCycle;
+const _pushtimee = 5;
+      _pushtimes = _uclord_p+_pushtimee;
 var p:byte;
 begin
    for p:=0 to MaxPlayers do
@@ -555,6 +566,22 @@ begin
            _u_ord(p);
 
            if(bld_r>0)then dec(bld_r,1);
+
+           if(state=ps_comp)then
+           begin
+              if(ai_pushtimei>0)then
+              begin
+                 dec(ai_pushtimei,1);
+                 if(ai_pushtimei=_pushtimes)then ai_pushfrmi:=max2(1,ucl_c[false]-ai_towngrd);
+                 if(ai_pushtimei=_pushtimee)then ai_pushfrmi:=0;
+
+                 if(ai_pushtimei=0)then
+                  if(ucl_c[false]>=ai_pushmin)then ai_pushtimei:=1;
+              end
+              else
+                if(ucl_c[false]>=ai_pushmin)or(army>101)then
+                 if(cf(@ai_flags,@aif_dattack))then ai_pushtimei:=ai_pushtime;
+           end;
         end;
      end;
 
@@ -655,7 +682,7 @@ begin
          if(g_inv_t=0)then
          begin
             {$IFDEF _FULLGAME}
-            PlaySND(snd_teleport,0);
+            PlaySND(snd_teleport,nil);
             {$ENDIF}
             for i:=1 to g_inv_mn do
             begin
@@ -792,8 +819,8 @@ begin
       for i:=1 to MaxUnits do
        with _units[i] do
         if(hits>0)and(inapc=0)then
-         with _players[player] do
-          if(team<>t)then _unit_kill(i,false,false);
+         with _players[playern] do
+          if(team<>t)then _unit_kill(@_units[i],false,false);
    end;
 end;
 

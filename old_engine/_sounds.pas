@@ -46,15 +46,13 @@ begin
    end;
 end;
 
-procedure PlaySND(s:pMIX_CHUNK;u:integer);
+procedure PlaySND(s:pMIX_CHUNK;pu:PTUnit);
 begin
    if(s=nil)or(_menu)or(_draw=false)then exit;
 
-   if(u>0)then
-    with _units[u] do
-     if(_nhp3(x,y,player)=false)then exit;
-    //
-     //if(_uvision(_players[HPlayer].team,u,true)=false)or(_nhp(x,y)=false)then exit;
+   if(pu<>nil)then
+    with pu^ do
+     if(_nhp3(x,y,playern)=false)then exit;
 
    MIX_VOLUMECHUNK(s,snd_svolume);
    MIX_PLAYCHANNEL(-1,s,0);
@@ -116,53 +114,53 @@ begin
    _music;
    shaflemusic;
 
-   snd_click       :=loadSND('click.wav');
-   snd_chat        :=loadSND('chat.wav');
-   snd_inapc       :=loadSND('inapc.wav');
-   snd_ccup        :=loadSND('ccup.wav');
-   snd_radar       :=loadSND('radar.wav');
-   snd_teleport    :=loadSND('teleport.wav');
-   snd_pexp        :=loadSND('p_exp.wav');
-   snd_exp         :=loadSND('explode.wav');
-   snd_exp2        :=loadSND('explode2.wav');
-   snd_meat        :=loadSND('gv.wav');
-   snd_d0          :=loadSND('d_u0.wav');
-   snd_ar_act      :=loadSND('d_ar_act.wav');
-   snd_ar_d        :=loadSND('d_ar_d.wav');
-   snd_ar_c        :=loadSND('d_ar_c.wav');
-   snd_ar_f        :=loadSND('d_ar_f.wav');
-   snd_arch_a      :=loadSND('d_arch_a.wav');
+   snd_click       :=loadSND('click.wav'    );
+   snd_chat        :=loadSND('chat.wav'     );
+   snd_inapc       :=loadSND('inapc.wav'    );
+   snd_ccup        :=loadSND('ccup.wav'     );
+   snd_radar       :=loadSND('radar.wav'    );
+   snd_teleport    :=loadSND('teleport.wav' );
+   snd_pexp        :=loadSND('p_exp.wav'    );
+   snd_exp         :=loadSND('explode.wav'  );
+   snd_exp2        :=loadSND('explode2.wav' );
+   snd_meat        :=loadSND('gv.wav'       );
+   snd_d0          :=loadSND('d_u0.wav'     );
+   snd_ar_act      :=loadSND('d_ar_act.wav' );
+   snd_ar_d        :=loadSND('d_ar_d.wav'   );
+   snd_ar_c        :=loadSND('d_ar_c.wav'   );
+   snd_ar_f        :=loadSND('d_ar_f.wav'   );
+   snd_arch_a      :=loadSND('d_arch_a.wav' );
    snd_arch_at     :=loadSND('d_arch_at.wav');
-   snd_arch_d      :=loadSND('d_arch_d.wav');
-   snd_arch_p      :=loadSND('d_arch_p.wav');
-   snd_arch_c      :=loadSND('d_arch_c.wav');
-   snd_arch_f      :=loadSND('d_arch_f.wav');
-   snd_demonc      :=loadSND('d_u2.wav');
-   snd_demona      :=loadSND('d_u2_a.wav');
-   snd_demond      :=loadSND('d_u2_d.wav');
-   snd_hmelee      :=loadSND('d_melee.wav');
-   snd_demon1      :=loadSND('d_0.wav');
-   snd_imp         :=loadSND('d_imp.wav');
-   snd_impd1       :=loadSND('d_u1_d1.wav');
-   snd_impd2       :=loadSND('d_u1_d2.wav');
-   snd_impc1       :=loadSND('d_u1_s1.wav');
-   snd_impc2       :=loadSND('d_u1_s2.wav');
-   snd_dpain       :=loadSND('d_p.wav');
-   snd_cacoc       :=loadSND('d_u3.wav');
-   snd_cacod       :=loadSND('d_u3_d.wav');
-   snd_baronc      :=loadSND('d_u4.wav');
-   snd_barond      :=loadSND('d_u4_d.wav');
-   snd_knight      :=loadSND('knight.wav');
-   snd_knightd     :=loadSND('knightd.wav');
-   snd_cyberc      :=loadSND('d_u5.wav');
-   snd_cyberd      :=loadSND('d_u5_d.wav');
-   snd_cyberf      :=loadSND('d_u5_f.wav');
-   snd_mindc       :=loadSND('d_u6.wav');
-   snd_mindd       :=loadSND('d_u6_d.wav');
-   snd_mindf       :=loadSND('d_u6_f.wav');
-   snd_pain_c      :=loadSND('d_pain_c.wav');
-   snd_pain_p      :=loadSND('d_pain_p.wav');
-   snd_pain_d      :=loadSND('d_pain_d.wav');
+   snd_arch_d      :=loadSND('d_arch_d.wav' );
+   snd_arch_p      :=loadSND('d_arch_p.wav' );
+   snd_arch_c      :=loadSND('d_arch_c.wav' );
+   snd_arch_f      :=loadSND('d_arch_f.wav' );
+   snd_demonc      :=loadSND('d_u2.wav'     );
+   snd_demona      :=loadSND('d_u2_a.wav'   );
+   snd_demond      :=loadSND('d_u2_d.wav'   );
+   snd_hmelee      :=loadSND('d_melee.wav'  );
+   snd_demon1      :=loadSND('d_0.wav'      );
+   snd_imp         :=loadSND('d_imp.wav'    );
+   snd_impd1       :=loadSND('d_u1_d1.wav'  );
+   snd_impd2       :=loadSND('d_u1_d2.wav'  );
+   snd_impc1       :=loadSND('d_u1_s1.wav'  );
+   snd_impc2       :=loadSND('d_u1_s2.wav'  );
+   snd_dpain       :=loadSND('d_p.wav'      );
+   snd_cacoc       :=loadSND('d_u3.wav'     );
+   snd_cacod       :=loadSND('d_u3_d.wav'   );
+   snd_baronc      :=loadSND('d_u4.wav'     );
+   snd_barond      :=loadSND('d_u4_d.wav'   );
+   snd_knight      :=loadSND('knight.wav'   );
+   snd_knightd     :=loadSND('knightd.wav'  );
+   snd_cyberc      :=loadSND('d_u5.wav'     );
+   snd_cyberd      :=loadSND('d_u5_d.wav'   );
+   snd_cyberf      :=loadSND('d_u5_f.wav'   );
+   snd_mindc       :=loadSND('d_u6.wav'     );
+   snd_mindd       :=loadSND('d_u6_d.wav'   );
+   snd_mindf       :=loadSND('d_u6_f.wav'   );
+   snd_pain_c      :=loadSND('d_pain_c.wav' );
+   snd_pain_p      :=loadSND('d_pain_p.wav' );
+   snd_pain_d      :=loadSND('d_pain_d.wav' );
    snd_uac_u0      :=loadSND('uac_u0.wav');
    snd_uac_u1      :=loadSND('uac_u1.wav');
    snd_uac_u2      :=loadSND('uac_u2.wav');
@@ -201,7 +199,7 @@ begin
    snd_hupgr       :=loadSND('hup.wav');
    snd_alarm       :=loadSND('alarm.wav');
    snd_hellbar     :=loadSND('hellbarracks.wav');
-   snd_hell        :=loadSND('hell.wav');
+   snd_hell        :=loadSND('hell.wav'     );
    snd_hpower      :=loadSND('hpower.wav');
    snd_fly_a1      :=loadSND('flyer_a1.wav');
    snd_fly_a       :=loadSND('flyer_a.wav');

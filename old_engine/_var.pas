@@ -48,6 +48,9 @@ _lcup             : PTUnit;
 cl2uid            : array[1..2,false..true,0.._uts] of byte;
 
 tar1p             : integer;
+ai_builders,
+ai_uprods,
+ai_pprods,
 ai_pt,
 ai_ptd,
 ai_uc_e,

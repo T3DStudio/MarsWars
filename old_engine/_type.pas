@@ -5,6 +5,84 @@ integer  = Smallint;
 pinteger = ^integer;
 
 TSob = set of byte;
+PTSoB = ^TSob;
+
+upgrar = array[0.._uts] of byte;
+Pupgrar = ^upgrar;
+
+TPlayer = record
+   name    : shortstring;
+
+   army,team,
+   race,state,
+   bld_r,mrace
+           : byte;
+
+   cenerg,
+   menerg  : integer;
+
+   ready   : boolean;
+
+   o_id    : byte;
+o_x0,o_y0,
+o_x1,o_y1  :integer;
+
+   ucl_e,                                           // existed class
+   ucl_eb,                                          // existed class bld=true and hits>0
+   ucl_s   : array[false..true,0.._uts] of integer; // selected
+   ucl_x   : array[0.._uts] of integer;             // first unit class
+
+   uid_e,
+   uid_eb,
+   uid_s,
+   uid_x   : array[0..255 ] of integer;
+
+   ucl_c,                                           // count buildings/units
+   ucl_cs  : array[false..true] of integer;         // count selected buildings/units
+
+   uprodc  : array[0.._uts] of integer;
+   uprodu  : array[0..255 ] of integer;
+   uprodm,
+   uproda  : integer;
+
+   pprodm,
+   pproda  : integer;
+   upgrinp,
+   upgr    : upgrar;
+
+   a_upgr,
+   a_build,
+   a_units : cardinal;
+
+   ai_pushfrmi,
+   ai_pushtimei,
+   ai_pushtime
+           : integer;
+   ai_pushuids
+           : TSoB;
+   ai_pushmin,
+   ai_towngrd,
+   ai_maxunits
+           : integer;
+   ai_flags: cardinal;
+   ai_skill: byte;
+
+   s_builders,
+   s_barracks,
+   s_smiths,
+   n_builders,
+   n_barracks,
+   n_smiths: integer;
+
+   PNU     : byte;
+   n_u,
+   ttl     : integer;
+   nip     : cardinal;
+   nport   : word;
+end;
+PTPlayer = ^TPlayer;
+
+TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
    mmx,mmy,mmr,
@@ -24,7 +102,7 @@ TUnit = record
    generg,uf,
    _uclord,
    vstp,order,
-   player,
+   playern,
    uid,max,
    shadow,
    ucl,
@@ -71,75 +149,6 @@ TUnit = record
    sel      : boolean;
 end;
 PTUnit = ^TUnit;
-
-upgrar = array[0.._uts] of byte;
-Pupgrar = ^upgrar;
-
-
-TPlayer = record
-   name    : shortstring;
-
-   army,team,
-   race,state,
-   bld_r,mrace
-           : byte;
-
-   cenerg,
-   menerg  : integer;
-
-   ready   : boolean;
-
-   o_id    : byte;
-o_x0,o_y0,
-o_x1,o_y1  :integer;
-
-   ucl_e,                                           // existed class
-   ucl_eb,                                          // existed class bld=true and hits>0
-   ucl_s   : array[false..true,0.._uts] of integer; // selected
-   ucl_x   : array[0.._uts] of integer;             // first unit class
-
-   uid_e,
-   uid_eb,
-   uid_s,
-   uid_x   : array[0..255 ] of integer;
-
-   ucl_c,                                           // count buildings/units
-   ucl_cs  : array[false..true] of integer;         // count selected buildings/units
-
-   uprodc  : array[0.._uts] of integer;
-   uprodu  : array[0..255 ] of integer;
-   uprodm,
-   uproda  : integer;
-
-   pprodm,
-   pproda  : integer;
-   upgrinp,
-   upgr    : upgrar;
-
-   a_upgr,
-   a_build,
-   a_units : cardinal;
-
-   ai_pushpart,
-   ai_maxarmy,
-   ai_attack,
-   ai_skill: byte;
-
-   s_builders,
-   s_barracks,
-   s_smiths,
-   n_builders,
-   n_barracks,
-   n_smiths: integer;
-
-   PNU     : byte;
-   n_u,
-   ttl     : integer;
-   nip     : cardinal;
-   nport   : word;
-end;
-
-TPList = array[0..MaxPlayers] of TPLayer;
 
 TMissile = record
    x,y,vx,vy,dam,vst,tar,sr,dir,mtars,ntars:integer;
@@ -212,7 +221,7 @@ end;
 PTDoodad = ^TDoodad;
 TDCell = record
    n:integer;
-   l:array of integer;
+   l:array of PTDoodad;
 end;
 
 

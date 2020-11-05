@@ -135,7 +135,7 @@ begin
             begin
                inc(n,1);
                setlength(l,n);
-               l[n-1]:=d;
+               l[n-1]:=@map_dds[d];
             end;
            inc(dx0,1);
         end;

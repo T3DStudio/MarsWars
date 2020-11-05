@@ -275,6 +275,11 @@ begin
 
    //_draw_text(_screen,750,0,b2pm[map_ffly] , ta_right,255, c_white);
 
+   with _players[HPlayer] do
+   begin
+      _draw_text(_screen,vid_panel,200,i2s(ai_pushtimei) , ta_left,255, c_white);
+      _draw_text(_screen,vid_panel,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
+   end;
 
    if(k_shift>2) then
    for u:=0 to MaxPlayers do
@@ -286,7 +291,7 @@ begin
 
        _draw_text(_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, plcolor[u]);
 
-       _draw_text(_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxarmy)+' '+b2s(ai_attack) , ta_middle,255, plcolor[u]);
+       _draw_text(_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, plcolor[u]);
        _draw_text(_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, plcolor[u]);
 
 
@@ -313,18 +318,19 @@ begin
         begin
            circleColor(_screen,ix,iy,r,c_gray);
            circleColor(_screen,ix,iy,sr,c_gray);
-           if(sel)then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);
+           if(sel)then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[playern]);
         end;
 
         if(hits>0)and(inapc=0)then
-        if(player=HPlayer)then
+        if(playern=HPlayer)then
         begin
-           lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+           if(alrm_x>0)then
+            lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
            if(uo_x>0)then
             lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, plcolor[player]);
+        _draw_text(_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, plcolor[playern]);
 
         if(inapc>0)then continue;
 

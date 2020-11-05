@@ -56,6 +56,9 @@ begin
      else upgr^[i]:=lvl;
 end;
 
+function cf(c,f:pcardinal):boolean;
+begin cf:=(c^ and f^)>0;end;
+
 function FileExists(FName:shortstring):Boolean;
 var F:File;
 begin
@@ -175,6 +178,7 @@ begin
    then _bldCndt:=true
    else
    with _players[pl] do
+   begin
     _bldCndt:=(bld_r>0)
             or(cl2uid[race,true,bucl]=0)
             or(n_builders<=0)
@@ -183,12 +187,12 @@ begin
             or((G_addon=false)and(cl2uid[race,true,bucl] in t2));
 
    if(_bldCndt=false)then
-   with _players[pl] do
    with _ulst[cl2uid[race,true,bucl]] do
    _bldCndt:=((ruid <255)and(uid_eb[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
            or(ucl_e[true,bucl]>=max);
+   end;
 end;
 function _untCndt(pl,bucl:byte):boolean;
 begin
@@ -196,6 +200,7 @@ begin
    then _untCndt:=true
    else
    with _players[pl] do
+   begin
     _untCndt:=((army+uproda)>=MaxPlayerUnits)
             or(cl2uid[race,false,bucl]=0)
             or(_bc_g(a_units,bucl)=false)
@@ -203,22 +208,22 @@ begin
             or((G_addon=false)and(cl2uid[race,false,bucl] in t2));
 
    if(_untCndt=false)then
-   with _players[pl] do
    with _ulst[cl2uid[race,false,bucl]] do
    _untCndt:=((ruid <255)and(uid_eb[ruid]=0))
            or((rupgr<255)and(upgr[rupgr]=0))
            or((menerg-cenerg)<renerg)
            or(trt=0)
            or((ucl_e[false,bucl]+uprodc[bucl])>=max);
+   end;
 end;
-
-function _upgrreq(player,up:byte):boolean;
+function _upgrreq(pl,up:byte):boolean;
 var ruid:byte;
 begin
    if(up>MaxUpgrs)
    then _upgrreq:=true
    else
-   with _players[player] do
+   with _players[pl] do
+   begin
      _upgrreq:=(upgrade_time[race,up]=0)
              or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
              or(_bc_g(a_upgr,up)=false)
@@ -226,18 +231,17 @@ begin
              or((menerg-cenerg)<_pne_r[race,up])
              or((up>=upgr_2tier)and(G_addon=false));
 
-   with _players[player] do
    if(_upgrreq=false)then
     if(upgrade_mfrg[race,up])
     then _upgrreq:=(upgr[up]+upgrinp[up])>=upgrade_cnt[race,up]
     else _upgrreq:=(upgrinp[up]>0)
                  or(upgr[up]>=upgrade_cnt[race,up]);
 
-   with _players[player] do
    if(_upgrreq=false)and(upgrade_ruid[race,up]<255)then
    begin
       ruid:=upgrade_ruid[race,up];
       _upgrreq:=uid_eb[ruid]=0;
+   end;
    end;
 end;
 

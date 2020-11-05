@@ -1,7 +1,7 @@
 
 const
 
-ver                    : byte = 225;
+ver                    : byte = 230;
 
 degtorad               = pi/180;
 
@@ -67,7 +67,7 @@ _pnua                  : array[0..9] of byte = (55,75,95,115,135,155,175,195,215
 ClientTTL              = vid_fps*10;
 
 outlogfn               : shortstring = 'out.txt';
-str_ver                = 'v49';
+str_ver                = 'v50';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2020 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');
@@ -111,6 +111,32 @@ ua_move                = 1;
 ua_amove               = 2;
 ua_hold                = 3;
 ua_unload              = 4;
+
+aif_dattack            : cardinal = 1       ; // default attack sequense
+aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
+aif_pushair            : cardinal = 1 shl 2 ; // push only air
+aif_pushgrnd           : cardinal = 1 shl 3 ; // push only air
+aif_help               : cardinal = 1 shl 4 ; // help allies
+aif_hrrsmnt            : cardinal = 1 shl 5 ; // attacks with small forces
+aif_usex5              : cardinal = 1 shl 6 ; // use teleport and radar
+aif_nofogblds          : cardinal = 1 shl 7 ; // AI see enemy buildings through fog
+aif_nofogunts          : cardinal = 1 shl 8 ; // AI see enemy units through fog
+aif_alrmtwrs           : cardinal = 1 shl 9 ; // Builders build towers when alarm near
+aif_CCescape           : cardinal = 1 shl 10; // CC and HK escape from alarm
+aif_CCattack           : cardinal = 1 shl 11; // CC and HK attack
+aif_buildseq1          : cardinal = 1 shl 12; // Base build order
+aif_buildseq2          : cardinal = 1 shl 13; // Adv build order
+aif_usex6              : cardinal = 1 shl 14; // Use advanced units
+aif_usex8              : cardinal = 1 shl 15; // Use hell altar and rocket l station
+aif_smarttpri          : cardinal = 1 shl 16; // Smart target priority
+aif_upgrseq1           : cardinal = 1 shl 17; // Base upgr order
+aif_upgrseq2           : cardinal = 1 shl 18; // Adv upgr order
+aif_twrtlprt           : cardinal = 1 shl 19; // Hell Towers teleportation
+aif_specblds           : cardinal = 1 shl 20; // Mines and Hell Eyes managment
+aif_usex9              : cardinal = 1 shl 21; // Use adnvanced buildings
+aif_destrblds          : cardinal = 1 shl 22; // Destroy buildngs
+aif_unitaacts          : cardinal = 1 shl 23; // Units micro and actions
+aif_useapcs            : cardinal = 1 shl 24; // Use transports
 
 ub_advanced            = 0;
 ub_pain                = 1;
@@ -544,7 +570,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 219833;
+svld_size              = 219889;
 rpl_size               = 1574;
 
 rpl_none               = 0;

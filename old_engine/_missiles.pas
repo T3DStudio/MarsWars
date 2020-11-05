@@ -10,7 +10,7 @@ procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
-   with _players[pu^.player] do
+   with _players[pu^.playern] do
     if(upgr[upgr_melee]>0)then
      case race of
        r_hell : inc(damage,upgr[upgr_melee]*4);
@@ -21,15 +21,9 @@ begin
    UID_LostSoul: begin
                     if(tu^.mech               )then _d25 (@damage) else
                     if(tu^.uf=uf_ground       )then _d50 (@damage);
-                    //if(tu^.uid in armor_lite  )then _d100(@damage) else
-                    //if(tu^.uid in armor_medium)then _d100(@damage) else
-                    //if(tu^.uid in armor_heavy )then _d50 (@damage);
                  end;
    UID_Demon   : begin
                     if(tu^.mech               )then _d50 (@damage);
-                    //if(tu^.uid in armor_lite  )then _d100(@damage);// else
-                    //if(tu^.uid in armor_medium)then _d100(@damage) else
-                    //if(tu^.uid in armor_heavy )then _d100(@damage)
                  end;
    end;
 
@@ -176,7 +170,7 @@ begin
       if(tu^.hits>0)and(_miduid(mid,tu^.uid))and(tu^.inapc=0)then
         if(abs(mf-tu^.uf)<2)then
         begin
-           teams:=_players[player].team=_players[tu^.player].team;
+           teams:=_players[player].team=_players[tu^.playern].team;
            damd :=dam;
 
            if(teams)then
@@ -341,7 +335,7 @@ begin
               dec(mtars,1);
               inc(ntars,1);
 
-              if(onlySVCode)then _unit_damage(tar,damd,p,player);
+              if(onlySVCode)then _unit_damage(@_units[tar],damd,p,player);
            end
            else
              if(sr>0)and(d<sr)then
@@ -354,7 +348,7 @@ begin
                    else _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood );
                    {$ENDIF}
                    dec(mtars,1);
-                   _unit_damage(tar,damd,p,player);
+                   _unit_damage(@_units[tar],damd,p,player);
                    exit;
                 end;
 
@@ -387,7 +381,7 @@ begin
                 if(onlySVCode)then
                 begin
                    damd:=trunc(damd*(1-(d/sr)) );
-                   _unit_damage(tar,damd,p,player);
+                   _unit_damage(@_units[tar],damd,p,player);
                 end;
              end;
         end;
@@ -461,7 +455,7 @@ begin
            begin
               _effect_add(vx,vy+10,-10,eid_db_h0);
               _effect_add(vx,vy,map_flydpth[mf]+vy+5,EID_BBExp);
-              PlaySND(snd_exp,0);
+              PlaySND(snd_exp,nil);
               continue;
            end;
            if(mb_s0<vst)and(vst<mb_s1)then continue;
@@ -503,26 +497,26 @@ begin
            else
            begin
               case mid of
-                 MID_Flyer   : PlaySND(snd_fly_a1,0);
-                 MID_ArchFire: begin PlaySND(snd_exp,0); exit; end;
+                 MID_Flyer   : PlaySND(snd_fly_a1,nil);
+                 MID_ArchFire: begin PlaySND(snd_exp,nil); exit; end;
                  MID_Imp,
                  MID_Cacodemon,
                  MID_Baron,
                  MID_Mancubus,
                  MID_BPlasma,
-                 MID_YPlasma : PlaySND(snd_pexp,0);
-                 MID_BFG     : PlaySND(snd_bfgepx,0);
+                 MID_YPlasma : PlaySND(snd_pexp,nil);
+                 MID_BFG     : PlaySND(snd_bfgepx,nil);
                  MID_Revenant,
                  MID_Granade,
                  MID_Tank,
-                 MID_HRocket : PlaySND(snd_exp,0);
-                 MID_Blizzard: PlaySND(snd_exp2,0);
+                 MID_HRocket : PlaySND(snd_exp,nil);
+                 MID_Blizzard: PlaySND(snd_exp2,nil);
                  MID_SShot,
                  MID_SSShot,
                  MID_MBullet,
                  MID_Bullet,
                  MID_Bulletx2,
-                 MID_TBullet : if(random(4)=0)then PlaySND(snd_rico,0);
+                 MID_TBullet : if(random(4)=0)then PlaySND(snd_rico,nil);
               end;
 
               if(mid in [MID_SShot,MID_SSShot,MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])then

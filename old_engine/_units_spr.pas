@@ -467,7 +467,7 @@ UID_Portal         : _unit_spr:=@spr_u_portal;
    else
     if(hits>dead_hits)then
     case uid of
-UID_Cacodemon:begin td:=24+abs(hits div 8 );if(td>29)then td:=29;_unit_spr:=@spr_Cacodemon[td];end;//24-29
+UID_Cacodemon  : begin td:=24+abs(hits div 8 );if(td>29)then td:=29;_unit_spr:=@spr_Cacodemon  [td];end; //24-29
 
 UID_Imp        : begin td:=48+abs(hits div 8 );if(td>52)then td:=52;_unit_spr:=@spr_Imp        [td];end; // 48-52
 UID_Demon      : begin td:=48+abs(hits div 8 );if(td>53)then td:=53;_unit_spr:=@spr_Demon      [td];end; // 48-53
