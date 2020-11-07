@@ -305,6 +305,8 @@ begin
          _view_bounds;
          G_Started:=true;
          _menu:=false;
+
+         for vr:=0 to MaxPlayers do _setAI(vr);
       end;
       close(f);
    end;

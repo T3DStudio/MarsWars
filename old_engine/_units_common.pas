@@ -886,8 +886,7 @@ begin
       if(tx>map_mw)then tx:=map_mw;
       if(ty>map_mw)then ty:=map_mw;
       {$IFDEF _FULLGAME}
-      if(_uvision(_players[HPlayer].team,pu,true))then
-       if(_nhp(vx,vy)or _nhp(tx,ty))then PlaySND(snd_teleport,nil);
+      if(_nhp(vx,vy)or _nhp(tx,ty))then PlaySND(snd_teleport,nil);
       _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
       _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
       {$ENDIF}

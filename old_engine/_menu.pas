@@ -315,7 +315,7 @@ begin
            end;
 
       // CAMP SCIRMISH MULTIPLAY
-      70 : if not(G_Started) and false then menu_s2:=ms2_camp;
+      //70 : if not(G_Started)then menu_s2:=ms2_camp;
       71 : if not(G_Started and(menu_s2=ms2_camp))then begin p:=menu_s2;menu_s2:=ms2_scir;if(p=ms2_camp)then Map_premap;end;
       72 : if not(G_Started and(menu_s2=ms2_camp))then begin menu_s2:=ms2_mult; if(m_chat)then _m_sel:=100; end;
 
@@ -333,7 +333,7 @@ begin
               g_startb:=g_startb mod 6;
            end;
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; _makeMMB; end;
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,7);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
@@ -459,7 +459,7 @@ begin
                 if(team>1)then dec(team,1);
            end;
 
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,7);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
       84 : _scrollV(@_rpls_pnui,-1,0,9);

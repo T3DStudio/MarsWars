@@ -1952,23 +1952,23 @@ begin
 
             if(onlySVCode)and(vision)then _unit_aiUBC(pu,tu,ud,teams);
 
-            if(teams=false)then
-            begin
-               if(tu^.buff[ub_invuln]=0)then
-                if(alrm_b=false)or(ud<base_rr)then
-                 if(ud<alrm_r)then
-                 begin
-                    alrm_x:=tu^.x;
-                    alrm_y:=tu^.y;
-                    alrm_r:=ud;
-                    alrm_b:=false;
-                 end;
-            end
-            else
-              if(state=ps_comp)then
-               if(tu^.isbuild)or(tu^.alrm_r<0)then
-                if(isbuild=false)and(tu^.alrm_r<base_rr)then
-                 if(_player_sight(playern,tu,vision))then
+            if(_player_sight(playern,tu,vision))then
+             if(teams=false)then
+             begin
+                if(tu^.buff[ub_invuln]=0)then
+                 if(alrm_b=false)or(ud<base_rr)then
+                  if(ud<alrm_r)then
+                  begin
+                     alrm_x:=tu^.x;
+                     alrm_y:=tu^.y;
+                     alrm_r:=ud;
+                     alrm_b:=false;
+                  end;
+             end
+             else
+               if(state=ps_comp)then
+                if(tu^.isbuild)or(tu^.alrm_r<0)then
+                 if(isbuild=false)and(tu^.alrm_r<base_rr)then
                   if not(tu^.uid in [UID_Mine,UID_HEye])then
                   begin
                      ud:=dist2(x,y,tu^.alrm_x,tu^.alrm_y);
@@ -2121,7 +2121,7 @@ begin
 
       if(g_mode=gm_ct)and(isbuild=false)then _unit_cp(pu);
 
-      if(state=ps_comp)then _unit_ai0(pu);
+      if(state=ps_comp)then ai_code1(pu);
 
       if(uf>uf_ground)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)then
        if(_unit_OnDecorCheck(x,y))then uo_id:=ua_move;
@@ -2748,26 +2748,16 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure _make_coop;
+{procedure _make_coop;
 begin
    if(onlySVCode)then _unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
 
-   with _players[0] do
-   begin
-      ai_skill:=4;
-      _setAI(0);
-      ai_flags   :=0;
-      ai_maxunits:=100;
-      _bc_ss(@a_units,[]);
-      _bc_ss(@a_build,[]);
-      _upgr_ss(@upgr ,[0..MaxUpgrs],race,10);
-      _bc_us  (@a_upgr ,upgr_b478tel);
-      upgr[upgr_b478tel]:=0;
-   end;
+   _players[0].ai_skill:=250;
+   _setAI(0);
    {$IFDEF _FULLGAME}
    plcolor[0]:=c_purple;
    {$ENDIF}
-end;
+end;       }
 
 
 

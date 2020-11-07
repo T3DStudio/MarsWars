@@ -137,6 +137,10 @@ aif_usex9              : cardinal = 1 shl 21; // Use adnvanced buildings
 aif_destrblds          : cardinal = 1 shl 22; // Destroy buildngs
 aif_unitaacts          : cardinal = 1 shl 23; // Units micro and actions
 aif_useapcs            : cardinal = 1 shl 24; // Use transports
+aif_hrsmntapcs         : cardinal = 1 shl 25; // transport harrasment
+aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
+aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
+aif_stayathome         : cardinal = 1 shl 28; //
 
 ub_advanced            = 0;
 ub_pain                = 1;
@@ -401,6 +405,7 @@ dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 rocket_sr              = 45;
 map_ffly_fapc          : array[false..true] of byte = (3,6);
+map_gapc               : array[false..true] of byte = (8,5);
 towers_sr              : array[0..5] of integer = (250,265,280,295,310,325);
 blizz_r                = 150;
 mech_adv_rel           : array[false..true] of integer = (vid_fps*12,vid_fps*6);
@@ -408,7 +413,7 @@ uac_adv_rel            : array[false..true] of integer = (vid_fps*3,vid_fps);
 g_ct_pr                = 150;
 g_ct_ct                : array[1..2] of integer = (vid_fps*10,vid_fps*5);
 bld_dec_mr             = 8;
-def_ai                 = 4;
+def_ai                 = 5;
 pain_time              = vid_hfps;
 hinvuln_time           = (vid_fps*30);
 _mms                   = 126;
@@ -570,7 +575,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 219889;
+svld_size              = 220169;
 rpl_size               = 1574;
 
 rpl_none               = 0;

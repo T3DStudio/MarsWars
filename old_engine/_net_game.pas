@@ -383,7 +383,7 @@ begin
             begin
                _menu:=false;
                onlySVCode:=false;
-               if(g_mode=gm_coop)then _make_coop;
+               //if(g_mode=gm_coop)then _make_coop;
                _moveHumView(map_psx[HPlayer] , map_psy[HPlayer]);
             end
             else

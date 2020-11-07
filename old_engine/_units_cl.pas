@@ -423,7 +423,7 @@ begin
          ctime  := 90;
          ruid   := UID_HMonastery;
          isbuilder:=true;
-         uids_builder[uid]:=[UID_HKeep..UID_HFortress];
+         uids_builder[uid]:=[UID_HKeep..UID_HAltar];
       end;
 
 ////////////////////////////////////////////////////////////////////////////////

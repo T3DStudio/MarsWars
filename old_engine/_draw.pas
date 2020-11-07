@@ -324,8 +324,16 @@ begin
         if(hits>0)and(inapc=0)then
         if(playern=HPlayer)then
         begin
-           if(alrm_x>0)then
-            lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+           if(isbuild)then
+           begin
+              if(alrm_x>0)then
+               lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+           end
+           else
+           begin
+              if(alrm_x>0)then
+               lineColor(_screen,ix,iy,alrm_x-vid_vx,alrm_y-vid_vy,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa])
+           end;
            if(uo_x>0)then
             lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;

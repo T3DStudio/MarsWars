@@ -9,32 +9,62 @@ const ucl_com = 0;
       ucl_bx8 = 8;
       ucl_bx9 = 9;
 
+
+
 procedure _setAI(p:byte);
 begin
    with _players[p] do
    begin
-      ai_pushtime := vid_fps*30;
+      ai_pushtime := vid_fps*2;    // 6+ skill
       ai_pushmin  := 55;
       ai_pushuids := [];
       ai_towngrd  := 3;
-      ai_maxunits := 100;
-      ai_flags    := $FFFFFFFF;
+      ai_maxunits := MaxPlayerUnits;
+
+                          ai_flags :=            aif_dattack    + aif_help     + aif_pushair;
+      if(ai_skill>=2)then ai_flags := ai_flags + aif_buildseq1;
+      if(ai_skill>=3)then ai_flags := ai_flags + aif_alrmtwrs   + aif_upgrseq1 + aif_usex5    + aif_useapcs   + aif_usex6     + aif_detecatcs;
+      if(ai_skill>=4)then ai_flags := ai_flags + aif_hrrsmnt    + aif_CCescape + aif_specblds + aif_buildseq2 + aif_unitaacts + aif_smarttpri + aif_upgrseq2 + aif_smartbar;
+      if(ai_skill>=5)then ai_flags := ai_flags + aif_CCattack   + aif_usex8    + aif_twrtlprt + aif_usex9     + aif_destrblds;
+      if(ai_skill>=6)then ai_flags := ai_flags + aif_nofogblds;
+      if(ai_skill>=7)then ai_flags := ai_flags + aif_hrsmntapcs;
+      if(ai_skill>=8)then ai_flags := ai_flags + aif_nofogunts;
 
       case ai_skill of
-      1 : begin  //
+      0 : begin
+             _bc_ss(@a_build,[]);
+             _bc_ss(@a_units,[]);
+             _bc_ss(@a_upgr ,[]);
+
+             ai_pushtime := vid_fps;
+             ai_towngrd  := 100;
+             ai_maxunits := 0;
+             ai_pushmin  := 0;
+          end;
+      1 : begin
+             _bc_ss(@a_build,[0..2]);
+             _bc_ss(@a_units,[0..2]);
+             _bc_ss(@a_upgr ,[    ]);
+
+             ai_pushtime := vid_fps*240;
+             ai_towngrd  := 9;
+             ai_maxunits := 10;
+             ai_pushmin  := ai_maxunits-5;
+          end;
+      2 : begin
              _bc_ss(@a_build,[0..3]);
              case race of
              r_hell: _bc_ss(@a_units,[0..3  ]);
              r_uac : _bc_ss(@a_units,[0..3,7]);
              end;
-             _bc_ss(@a_upgr ,[0..4,6]);
+             _bc_ss(@a_upgr ,[0..5,6]);
 
-             ai_pushtime := vid_fps*300;
-             ai_pushmin  := 23;
+             ai_pushtime := vid_fps*240;
              ai_towngrd  := 17;
              ai_maxunits := 25;
+             ai_pushmin  := ai_maxunits-5;
           end;
-      2 : begin
+      3 : begin
              _bc_ss(@a_build,[0..6]);
              case race of
              r_hell: _bc_ss(@a_units,[0..4  ]);
@@ -43,12 +73,12 @@ begin
              _bc_ss(@a_upgr ,[0..upgr_2tier-1]);
 
              ai_pushtime := vid_fps*240;
-             ai_towngrd  := 30;
+             ai_towngrd  := 20;
              ai_maxunits := 35;
-             ai_pushmin  :=ai_maxunits-5;
+             ai_pushmin  := ai_maxunits-5;
           end;
-      3 : begin  // HMP
-             _bc_ss(@a_build,[0..7]);
+      4 : begin  // HMP
+             _bc_ss(@a_build,[0..7,9]);
              case race of
              r_hell: _bc_ss(@a_units,[0..5,8..10]);
              r_uac : _bc_ss(@a_units,[0..9      ]);
@@ -58,33 +88,49 @@ begin
              ai_pushtime := vid_fps*180;
              ai_towngrd  := 10;
              ai_maxunits := 45;
-             ai_pushmin  :=ai_maxunits-5;
+             ai_pushmin  := ai_maxunits-5;
           end;
-      4 : begin  // UV
+      5 : begin  // UV
              _bc_ss(@a_build,[0..14]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             ai_pushtime := vid_fps*60;
           end;
-      5 : begin  // Nightmare
+      6 : begin  // Nightmare
              _bc_ss(@a_build,[0..14]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr],race,1);
           end;
-      6 : begin  // Super Nightmare
+      7 : begin  // Super Nightmare
              _bc_ss(@a_build,[0..14]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld],race,1);
           end;
-      7 : begin  // HELL
+      8 : begin  // HELL
              _bc_ss(@a_build,[0..14]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld,upgr_advbar],race,1);
+          end;
+      250:begin // assault AI
+            _bc_ss(@a_build,[]);
+            _bc_ss(@a_units,[]);
+            _bc_ss(@a_upgr ,[]);
+
+            ai_pushtime := vid_fps;
+            ai_towngrd  := 100;
+            ai_maxunits := 0;
+            ai_pushmin  := 0;
+
+            ai_flags:=aif_unitaacts+aif_detecatcs+aif_smarttpri+aif_stayathome;
+
+            _upgr_ss(@upgr ,[0..MaxUpgrs],race,10);
+            exit;
           end;
       else
          a_build:=0;
@@ -92,16 +138,33 @@ begin
          a_upgr :=0;
       end;
 
-     // if(g_mode=gm_ct)or(ai_skill>5)then ai_attack:=2;
-
       case race of
       r_hell:
-        case ai_skill of //
-      0,1  : _bc_sa(@a_units,[12    ]);
-      2    : _bc_sa(@a_units,[12..13]);
-      3    : _bc_sa(@a_units,[12..15]);
-        else _bc_sa(@a_units,[12..18]);
-        end;
+         begin
+            if(map_aifly)then
+            begin
+               ai_flags   :=ai_flags+aif_pushuids;
+               ai_pushuids:=[UID_Imp,UID_Cacodemon,UID_LostSoul,UID_Pain,UID_Cyberdemon,UID_Mastermind];
+            end
+            else ai_flags   :=ai_flags+aif_pushgrnd;
+            case ai_skill of //
+          0,1  : _bc_sa(@a_units,[12    ]);
+          2    : _bc_sa(@a_units,[12..13]);
+          3    : _bc_sa(@a_units,[12..15]);
+            else _bc_sa(@a_units,[12..18]);
+            end;
+         end;
+      r_uac :
+         begin
+            ai_flags   :=ai_flags+aif_pushgrnd;
+         end;
+      end;
+
+      if(g_mode=gm_inv)then
+      begin
+         if(cf(@ai_flags,@aif_dattack   ))then ai_flags:=ai_flags xor aif_dattack;
+         if(cf(@ai_flags,@aif_hrsmntapcs))then ai_flags:=ai_flags xor aif_hrsmntapcs;
+         if(cf(@ai_flags,@aif_hrrsmnt   ))then ai_flags:=ai_flags xor aif_hrrsmnt;
       end;
    end;
 end;
@@ -124,7 +187,7 @@ begin
    end;
 end;
 
-procedure _unit_ai0(pu:PTUnit);
+procedure ai_code1(pu:PTUnit);
 begin
    ai_uc_e := 0;
    ai_uc_a := 0;
@@ -204,12 +267,27 @@ begin
                    if(tu^.uid=UID_Mine)then inc(ai_uc_a,1);
       UID_HCommandCenter,
       UID_UCommandCenter:
-                if(ud<sr)then
-                 if(tu^.isbuild=false)
-                 or((tu^.uid=uid)and(tu^.speed>0)and(upgr[upgr_ucomatt]>0))then
-                  if(teams)
-                  then inc(ai_uc_a,tu^.ucl)
-                  else inc(ai_uc_e,tu^.ucl);
+                begin
+                   if(uid_x[uid]=unum)and(tu^.uid=uid)then
+                   begin
+                      if(ai_apcd=32000)then
+                      begin
+                         ai_apcd:=10;
+                         order:=4;
+                      end;
+                      dec(ai_apcd,1);
+                      if(ai_apcd<=0)
+                      then tu^.order:=4
+                      else tu^.order:=5;
+                   end;
+
+                   if(ud<sr)then
+                    if(tu^.isbuild=false)
+                    or((tu^.uid=uid)and(tu^.speed>0)and(upgr[upgr_ucomatt]>0))then
+                     if(teams)
+                     then inc(ai_uc_a,tu^.ucl)
+                     else inc(ai_uc_e,tu^.ucl);
+                end;
       else
        if(ud<sr)then
         if(teams)
@@ -333,8 +411,9 @@ begin
       case ai_skill of
       0  : _ai_get_max_enrg:=8;
       1  : _ai_get_max_enrg:=10;
-      2  : _ai_get_max_enrg:=25;
-      3  : _ai_get_max_enrg:=45;
+      2  : _ai_get_max_enrg:=15;
+      3  : _ai_get_max_enrg:=25;
+      4  : _ai_get_max_enrg:=45;
       else _ai_get_max_enrg:=61;
       end;
       if(rrr)then inc(_ai_get_max_enrg,5);
@@ -396,7 +475,6 @@ ucl_bx9: ucl:=9;
       if(ucl_e[true,ucl]>=cnt)then exit;
    end;
    if(_bldCndt(bp,ucl))then exit;
-
    bt:=ucl;
 end;
 
@@ -406,7 +484,6 @@ begin
    bt:=255;
    set_bld(random(15),100);
 
-   if(g_mode<>gm_coop)or(bp>0)then
    with _players[bp] do
    begin
       if(cf(@ai_flags,@aif_buildseq1))then
@@ -430,7 +507,8 @@ begin
             set_bld(ucl_com,3 );
             set_bld(ucl_gen,10);
             set_bld(ucl_com,2 );
-         end;
+         end
+         else set_bld(ucl_smt,1 );
          set_bld(ucl_gen,8);
          if(upgr[upgr_bldenrg]>2)then
          begin
@@ -481,130 +559,117 @@ begin
     end;
 end;
 
+
+procedure ai_bar_st(pu:PTUnit;_ucl:byte;cnt:integer);
+begin
+   with pu^ do
+    with _players[playern] do
+     if((ucl_e[false,_ucl]+uprodc[_ucl])<cnt)then _unit_straining(pu,_ucl);
+end;
+
 procedure ai_utr(pu:PTUnit;m:integer);
 begin
    with pu^ do
    with _players[playern] do
    if(ucl_c[false]<ai_maxunits)then
    begin
-      case m of
-0:    if(uid=UID_HMilitaryUnit)
-      then _unit_straining(pu,12+random(7))
-      else
-        if(ucl_x[1]=unum)
-        then ai_utr(pu,1)   // choose
-        else
-          if(map_aifly)and(g_mode<>gm_inv)
-          then ai_utr(pu,2)
-          else ai_utr(pu,3);
+      if(uid=UID_HMilitaryUnit)then
+      begin
+         _unit_straining(pu,12+random(7));
+         exit;
+      end;
 
-1:    if(ai_skill<2)then    // u1
-       case race of
-      r_hell: ai_utr(pu,3);
-      r_uac : begin
-                 if(ucl_e[false,7]<1)then _unit_straining(pu,7);
-                 ai_utr(pu,3);
-              end;
-       end
-      else
-        case race of
-         r_hell :  begin
-                      if(ucl_e[false,5 ]<1 )then _unit_straining(pu,5 ); // cyb
-                      if(ucl_e[false,6 ]<1 )then _unit_straining(pu,6 ); // mind
-                      if(ucl_e[false,0 ]<2 )then _unit_straining(pu,0 ); // lost
-                      if(map_aifly)then
-                      if(ucl_e[false,10]<5 )then _unit_straining(pu,10); // arach
-                      if(ai_uprod_status(pu)=false)then
-                       if(map_aifly)
-                       then ai_utr(pu,2)
-                       else ai_utr(pu,3);
-                   end;
-
-         r_uac  :  begin
-                      if(ucl_e[false,0]<3)and(upgr[upgr_mines]>0)then _unit_straining(pu,0);
-                      if(ucl_e[false,7]<map_ffly_fapc[map_aifly])then _unit_straining(pu,7);
-                      if(ai_skill>2)then
-                       case g_addon of
-                        false: if(ucl_e[false,8]<8)then _unit_straining(pu,8);
-                        true : if(ucl_e[false,8]<5)then _unit_straining(pu,8);
-                       end;
-                      if(ai_uprod_status(pu)=false)then
-                       if(map_aifly)
-                       then ai_utr(pu,2)
-                       else ai_utr(pu,3);
-                   end;
-        end;
-2:                                   // fly
-        case race of
-         r_hell : if(ucl_c[false]<15)
-                  then ai_utr(pu,3)
-                  else
-                    case random(3) of
-                    0 : _unit_straining(pu,0);
-                    1 : _unit_straining(pu,3);
-                    2 : if(ucl_e[false,7]<7)
-                        then _unit_straining(pu,7)
-                        else _unit_straining(pu,0);
-                    end;
-         r_uac  :  ai_utr(pu,3);
-        end;
-
-3:    if(ucl_c[false]<10)               // default
-      then _unit_straining(pu,random(3))
-      else
-       case race of
-       r_hell : begin
-                   m:=random(12);
-                   if(alrm_r<base_r)or(ucl_c[false]<10)
-                   then m:=random(4)
-                   else
-                   begin
-                      if(ucl_e[true,1]<15)then
-                       if(ucl_e[false,3]<10)then _unit_straining(pu,3);
-                      if(_uclord>15)
-                      then begin if(ucl_e[false,8]<8 )then _unit_straining(pu,8);end
-                      else begin if(ucl_e[false,4]<8 )then _unit_straining(pu,4);end;
-                   end;
-                   case m of
-                    1,
-                    12: if(ai_skill>3)and(ucl_e[true,1]<10)then m:=3;
-                    7 : if(ucl_e[false,7]<6)
-                        then _unit_straining(pu,7)
-                        else ai_utr(pu,3);
-                   else
-                    _unit_straining(pu,m);
-                   end;
+      if(cf(@ai_flags,@aif_smartbar)=false)then
+      begin
+         m:=random(12);
+         case race of
+         r_uac: case m of
+                7: if(ucl_e[false,7]>=min2(map_ffly_fapc[map_aifly],ai_skill))then exit;
+                8: if(ucl_e[false,8]>=min2(map_gapc[g_addon]       ,ai_skill))then exit;
                 end;
-       r_uac  : begin
-                   if(g_addon)and(random(2)=0)
-                   then _unit_straining(pu,9+random(3))
-                   else
-                   begin
-                      if(alrm_r<base_r)or(ucl_c[false]<10)
-                      then m:=random(4)
-                      else
-                      begin
-                         if(ucl_e[false,3]<8)then _unit_straining(pu,3);
-                         if(ucl_e[false,5]<8)then _unit_straining(pu,5);
-                         if(ucl_e[false,6]<5)then _unit_straining(pu,6);
-                         if(map_aifly)then _unit_straining(pu,11);
-                         m:=random(7);
-                      end;
-
-                      if(m<2)then
-                       if(ucl_e[false,m]>=8)then m:=2+random(4);
-
-                      _unit_straining(pu,m);
-                   end;
+         r_hell:if(map_aifly)then
+                begin
+                   ai_bar_st(pu,3 ,10);
+                   ai_bar_st(pu,0 ,10);
                 end;
-       end;
+         end;
+         _unit_straining(pu,m);
+         exit;
+      end;
 
+      case race of  // default
+r_hell : begin
+            ai_bar_st(pu,5 ,1);
+            ai_bar_st(pu,6 ,1);
+            ai_bar_st(pu,0 ,2);
+
+            if(map_aifly)then
+            begin
+               ai_bar_st(pu,10,5);
+               if(ucl_c[false]<15)
+               then _unit_straining(pu,random(3))
+               else
+                 case random(3) of
+               0 : _unit_straining(pu,0);
+               1 : _unit_straining(pu,3);
+               2 : if(ucl_e[false,7]<7)
+                   then _unit_straining(pu,7)
+                   else _unit_straining(pu,0);
+                 end;
+            end
+            else
+            begin
+               ai_bar_st(pu,8 ,10);
+               ai_bar_st(pu,10,5 );
+               m:=random(12);
+               if(alrm_r<base_r)or(ucl_c[false]<10)
+               then m:=random(4)
+               else
+               begin
+                  if(uprodm<15)then
+                   ai_bar_st(pu,3,10);
+                  ai_bar_st(pu,4,8);
+               end;
+
+               _unit_straining(pu,m);
+            end;
+         end;
+
+r_uac  : begin
+            if(upgr[upgr_mines]>0)then
+            ai_bar_st(pu,0,5);
+            ai_bar_st(pu,7,map_ffly_fapc[map_aifly]);
+            ai_bar_st(pu,8,map_gapc[g_addon]       );
+
+            if(g_addon)and(random(2)=0)
+            then m:=9+random(3)
+            else
+            begin
+               if(alrm_r<base_r)or(ucl_c[false]<10)
+               then m:=random(4)
+               else
+               begin
+                  ai_bar_st(pu,3, 10);
+                  ai_bar_st(pu,5 ,10);
+                  ai_bar_st(pu,6 ,5 );
+                  if(map_aifly)then
+                  ai_bar_st(pu,11,10);
+                  m:=random(7);
+               end;
+
+               if(m<2)then
+                if(ucl_e[false,m]>=8)then m:=2+random(4);
+            end;
+
+            _unit_straining(pu,m);
+         end;
       end;
    end;
 end;
 
 procedure ai_useteleport(pu:PTUnit);
 var tu:PTUnit;
+   ax,ay,
     ust,
     u2t:integer;
     pi:pinteger;
@@ -653,13 +718,15 @@ begin
           else exit;
           end;
 
+          ax:=uo_x;
+          ay:=uo_y;
           uo_x:=tu^.x;
           uo_y:=tu^.y;
 
           if(u2t<tu^.r)and(tu^.rld_t=0)then
           begin
-             tu^.uo_x:=(alrm_x-sign(alrm_x-x)*base_r)-randomr(base_r);
-             tu^.uo_y:=(alrm_y-sign(alrm_y-y)*base_r)-randomr(base_r);
+             tu^.uo_x:=(ax-sign(ax-x)*base_r)-randomr(base_r);
+             tu^.uo_y:=(ay-sign(ay-y)*base_r)-randomr(base_r);
 
              if(uf=uf_ground)then
               if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then exit;
@@ -717,11 +784,14 @@ begin
    end;
 end;
 
-function ai_outalrm(pu:PTUnit;_r:integer;skipif:boolean):boolean;
+function ai_outalrm(pu:PTUnit;_r:integer;skipif,skipab:boolean):boolean;
 begin
    ai_outalrm:=false;
    with pu^ do
    begin
+      if(skipab=false)then
+       if(alrm_b)then exit;
+
       if(min2(x,abs(map_mw-x))<sr)
       or(min2(y,abs(map_mw-y))<sr)then
       begin
@@ -731,7 +801,6 @@ begin
       else
         if(skipif)or(_r=0)or(alrm_r<_r)then
         begin
-           if(alrm_b)and(isbuild=false)then exit;
            if(x=alrm_x)and(y=alrm_y)then
            begin
               uo_x:=x-randomr(base_r);
@@ -784,7 +853,7 @@ end;
 procedure ai_CCAttack(pu:PTUnit);
 begin
    with pu^ do
-    if(ai_outalrm(pu,225,(ai_uc_a=0)and(ai_uc_e>0))=false)then
+    if(ai_outalrm(pu,225,(ai_uc_a=0)and(ai_uc_e>0),true)=false)then
      if(alrm_x>0)
      then ai_settar(pu,alrm_x,alrm_y,base_r)
      else ai_target(pu);
@@ -793,8 +862,8 @@ end;
 procedure ai_CCOut(pu:PTUnit);
 begin
    with pu^ do
-    if(ai_outalrm(pu,base_ir,false)=false)then
-     if(ai_bx>0)and(dist2(x,y,ai_bx,ai_by)>base_ir)
+    if(ai_outalrm(pu,base_ir,false,true)=false)then
+     if(base_ir<ai_bd)and(ai_bd<32000)
      then ai_settar(pu,ai_bx,ai_by,base_r)
      else
      begin
@@ -803,10 +872,8 @@ begin
      end;
 end;
 
-//procedure
-
 procedure ai_buildingAI(pu:PTUnit);
-const maxb = 22;
+const maxb : array[false..true] of integer = (18, 22);
       maxt = 18;
 var bucls: TSoB;
     t,
@@ -824,9 +891,10 @@ begin
       // CCs
       case ai_skill of
       0,1 : n_com:=1;
-      2   : n_com:=3;
-      3   : n_com:=8;
-      4   : n_com:=12;
+      2   : n_com:=2;
+      3   : n_com:=4;
+      4   : n_com:=9;
+      5   : n_com:=12;
       else  if(menerg>100)and(race=r_hell)
             then n_com:=12
             else n_com:=16;
@@ -834,11 +902,11 @@ begin
       if(ai_builders<n_com)then bucls:=bucls+[ucl_com];
 
       // Smiths
-      n_smt:=min3(ai_CheckUpgrs(playern),ai_skill,menerg div 11);
+      n_smt:=max2(1,min3(ai_CheckUpgrs(playern),ai_skill,menerg div 11));
       if(ai_pprods<n_smt)then bucls:=bucls+[ucl_smt];
 
       // Bars
-      n_bar:=min2(max2(2,(menerg div 6)+n_com-n_smt),maxb);
+      n_bar:=min2(max2(2,(menerg div 6)+n_com-n_smt),maxb[ucl_eb[true,9]>0]);
       if(ai_uprods<n_bar)then bucls:=bucls+[ucl_bar];
 
       // Towers
@@ -873,18 +941,9 @@ UID_HKeep :
                _unit_bteleport(pu);
             end;
 
-{UID_HCommandCenter,
+UID_HCommandCenter,
 UID_UCommandCenter:
          begin
-            case order of
-          0 : if(ai_builders>10)
-              then order:=5
-              else order:=4;
-          5 : if(ai_builders<=10)or(upgr[upgr_ucomatt]=0)then order:=6;
-          6 : if(ai_builders> 10)then order:=5;
-            else
-            end;
-
             case order of
           6,
           4 : begin
@@ -901,7 +960,7 @@ UID_UCommandCenter:
               else
                 if(upgr[upgr_ucomatt]>0)then _unit_action(pu);
             end;
-         end; }
+         end;
 UID_URocketL:
          if(rld_t=0)and(upgr[upgr_blizz]>0)then
           if(ai_uc_a<ai_uc_e)and(ai_uc_e>4)then
@@ -1008,16 +1067,23 @@ begin
    with pu^ do
    with _players[playern] do
    begin
+      if(inapc>0)then
+      begin
+         ai_deforder(@_units[inapc]);
+         order:=2;
+         exit;
+      end;
+
       if(cf(@ai_flags,@aif_pushuids))then
        if not(uid in ai_pushuids)then exit;
 
-      if(cf(@ai_flags,@aif_pushair))then
-       if(uf=uf_ground)then exit;
+      if(uf=uf_ground)then
+       if(cf(@ai_flags,@aif_pushgrnd)=false)then exit;
 
-      if(cf(@ai_flags,@aif_pushgrnd))then
-       if(uf>uf_ground)then exit;
+      if(uf>uf_ground)then
+       if(cf(@ai_flags,@aif_pushair )=false)then exit;
 
-      dec(ai_pushfrmi,1);
+      ai_pushfrmi:=max2(0,ai_pushfrmi-apcc-1);
       order:=2;
    end;
 end;
@@ -1027,12 +1093,6 @@ begin
    with pu^ do
    with _players[playern] do
    begin
-      {{$IFDEF _FULLGAME}
-      if(menu_s2=ms2_camp)then
-       if(g_step<cmp_ait2p)then order:=0;
-      {$ENDIF}   }
-
-
       if(ai_pushfrmi>0)then
        if(cf(@ai_flags,@aif_dattack))then ai_deforder(pu);
 
@@ -1041,13 +1101,28 @@ begin
          case uid of
 UID_LostSoul : order:=2;
 UID_Imp,
-UID_Demon    : if(uid_eb[uid]>8)then order:=2;
+UID_Demon    : if(uid_eb[uid]>5)then order:=3;
          end;
       end;
 
+      if(apcm>0)then
+       if(apcc=apcm)and(army>105)then
+        if(cf(@ai_flags,@aif_hrsmntapcs))then order:=3;
+
       if(ucl_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
 
-
+      if(base_r<ai_bd)and(ai_bd<32000)then
+      if(cf(@ai_flags,@aif_stayathome))then
+      begin
+         order:=0;
+         if(tar1=0)then
+         begin
+             uo_id :=ua_move;
+             tar1  :=0;
+             tar1d :=32000;
+             alrm_r:=32000;
+         end;
+      end;
 
       {if(ai_pushpart<100)then
        if(army>100)or(ucl_c[false]>=ai_maxarmy)then
@@ -1135,14 +1210,10 @@ begin
    with pu^ do
    with _players[playern] do
    begin
-     { {$IFDEF _FULLGAME}
-      if(menu_s2=ms2_camp)and(uid=UID_UTransport)then exit;
-      {$ENDIF}   }
-
       if(order<>1)then
       begin
-         if(order=0)then
-         begin
+         case order of
+       0:begin
             ai_uorder(pu);
 
             case order of
@@ -1175,13 +1246,15 @@ begin
                end;
             end;
          end;
+         end;
+
 
          if(alrm_r<32000)then  // active alarm
          begin
             if(alrm_r<nra[g_mode=gm_inv])         // alarm near
             or(order=2)                           // attack group
             or(alrm_b )                           // building alarm
-            or(ai_bx=0)                           // no buldings
+            or(ai_bd=32000)                       // no buldings
             then ai_settar(pu,alrm_x,alrm_y,0)
             else
               if(g_mode=gm_ct)and(ai_pt>0)
@@ -1203,7 +1276,7 @@ begin
               if(g_mode=gm_ct)and(ai_pt>0)
               then with g_ct_pl[ai_pt] do ai_settar(pu,px,py,base_r)
               else
-                if(ai_bx>0)
+                if(ai_bd<32000)
                 then ai_settar(pu,ai_bx,ai_by,base_r)
                 else ai_target(pu);
            end;
@@ -1216,40 +1289,48 @@ begin
       UID_ZMajor: if(uf=uf_ground)then _unit_action(pu);
       end;
 
+      case uid of
+UID_Engineer:if(alrm_r<=sr)then
+             begin
+                if(cf(@ai_flags,@aif_unitaacts))then
+                 if(melee=false)and(buff[ub_advanced]=0)and(alrm_b=false)then ai_outalrm(pu,0,false,false);
+                if(cf(@ai_flags,@aif_detecatcs))then
+                 if(uid=UID_Engineer)and(ai_uc_a<1)then _unit_action(pu);
+             end;
+UID_LostSoul:if(ucl_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)then
+             begin
+                if(cf(@ai_flags,@aif_unitaacts))then
+                 _unit_kill(pu,false,false)
+             end
+             else
+               if(alrm_r<180)and(ai_uc_a<2)then
+                if(cf(@ai_flags,@aif_detecatcs))then _unit_action(pu);
+      end;
+
+
       if(cf(@ai_flags,@aif_unitaacts))then
       case uid of
-UID_FAPC:    ai_outalrm(pu,250,false);
-UID_APC :    ai_outalrm(pu,225,false);
-UID_Engineer,
+UID_FAPC:    ai_outalrm(pu,250,false,true);
+UID_APC :    ai_outalrm(pu,225,false,true);
 UID_Medic:   if(alrm_r<=sr)then
-             begin
-                if(melee=false)and(buff[ub_advanced]=0)and(alrm_b=false)then ai_outalrm(pu,0,false);
-                if(uid=UID_Engineer)and(ai_uc_a<1)then _unit_action(pu);
-             end;
+              if(melee=false)and(buff[ub_advanced]=0)and(alrm_b=false)then ai_outalrm(pu,0,false,false);
 UID_ArchVile:
-             if(melee=false)and(alrm_b=false)then ai_outalrm(pu,ar,false);
-UID_LostSoul:
-             begin
-                if(ucl_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)
-                then _unit_kill(pu,false,false)
-                else
-                  if(alrm_r<180)and(ai_uc_a<2)then _unit_action(pu);
-             end;
-UID_Pain :   if(ai_skill>3)then
+             if(melee=false)and(alrm_b=false)then ai_outalrm(pu,ar,false,false);
+UID_Pain :
              begin
                 if(alrm_r<base_ir)then _unit_action(pu);
-                ai_outalrm(pu,base_r,false);
+                ai_outalrm(pu,base_r,false,true);
              end;
 UID_Flyer:   if(buff[ub_advanced]>0)then
               if(ai_uc_a<1)then
                if(ai_ux>0)
                then ai_settar(pu,ai_ux,ai_uy,base_r)
                else
-                 if(ai_bx>0)
+                 if(ai_bd<32000)
                  then ai_settar(pu,ai_bx,ai_by,base_r)
-                 else ai_outalrm(pu,base_rr,false)
+                 else ai_outalrm(pu,base_rr,false,false)
                else
-                 if(tar1d<230)then ai_outalrm(pu,0,false);
+                 if(tar1d<230)then ai_outalrm(pu,0,false,false);
       end;
 
       if(cf(@ai_flags,@aif_usex5))then ai_useteleport(pu);

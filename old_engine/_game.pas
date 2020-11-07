@@ -225,13 +225,14 @@ procedure _CreateStartPositionsSkirmish;
 var p:byte;
 begin
    GModeTeams(g_mode);
-   if(g_mode=gm_coop)then _make_coop;
-   if(g_mode=gm_inv)then
-    with _players[0] do
-    begin
-       _upgr_ss(@upgr ,[0..20],r_hell,1);
-       ai_skill:=6;
-    end;
+   case g_mode of
+   gm_coop: begin
+            with _players[0] do ai_skill:=250;
+            _unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
+            end;
+   gm_inv : with _players[0] do ai_skill:=8;
+   end;
+
 
    for p:=1 to MaxPlayers do
     with _players[p] do
@@ -537,8 +538,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 end;
 
 procedure PlayersCycle;
-const _pushtimee = 5;
-      _pushtimes = _uclord_p+_pushtimee;
+const _pushtimes = _uclord_p;
 var p:byte;
 begin
    for p:=0 to MaxPlayers do
@@ -572,11 +572,8 @@ begin
               if(ai_pushtimei>0)then
               begin
                  dec(ai_pushtimei,1);
-                 if(ai_pushtimei=_pushtimes)then ai_pushfrmi:=max2(1,ucl_c[false]-ai_towngrd);
-                 if(ai_pushtimei=_pushtimee)then ai_pushfrmi:=0;
-
-                 if(ai_pushtimei=0)then
-                  if(ucl_c[false]>=ai_pushmin)then ai_pushtimei:=1;
+                 if(ai_pushtimei=_pushtimes)then ai_pushfrmi :=max2(1,ucl_c[false]-ai_towngrd);
+                 if(ai_pushtimei=0         )then ai_pushfrmi:=0;
               end
               else
                 if(ucl_c[false]>=ai_pushmin)or(army>101)then

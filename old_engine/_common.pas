@@ -292,11 +292,11 @@ dead_hits   : _hI2S:=-127;
    end;
 end;
 
-function ai_name(ain:byte):string;
+function ai_name(ain:byte):shortstring;
 begin
    if(ain=0)
    then ai_name:=str_ps_none
-   else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(21-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
+   else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(22-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
 end;
 
 

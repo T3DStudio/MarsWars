@@ -123,8 +123,8 @@ begin
       if(TIME<>'')then str_un_hint[uid]:=str_un_hint[uid]+' ['+#16+TIME+#25+']';
       if(ENRG<>'')then str_un_hint[uid]:=str_un_hint[uid]+' {'+#19+ENRG+#25+'}';
       str_un_hint[uid]:=str_un_hint[uid]+#11+DESCR+#11;
-      if(PROD<>'')then str_un_hint[uid]:= str_un_hint[uid]+PROD+#11;
-      if(REQ <>'')then str_un_hint[uid]:= str_un_hint[uid]+#17+str_req+#25+REQ;
+      if(REQ <>'')then str_un_hint[uid]:= str_un_hint[uid]+#17+str_req+#25+REQ+#11 else str_un_hint[uid]:= str_un_hint[uid]+#11;
+      if(PROD<>'')then str_un_hint[uid]:= str_un_hint[uid]+PROD;
    end;
 
    for rc:=1 to 2 do
