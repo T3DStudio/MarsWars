@@ -120,8 +120,8 @@ begin
   if(vid_rtui=0)and(_menu=false)and(_draw)then
    with pu^ do
     if(isbuild)
-    then filledCircleColor(_minimap,mmx,mmy,mmr,plcolor[playern])
-    else pixelColor       (_minimap,mmx,mmy,    plcolor[playern]);
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,plcolor[playern])
+    else pixelColor       (r_minimap,mmx,mmy,    plcolor[playern]);
 end;
 
 procedure _sf(tx,ty:integer);
@@ -844,11 +844,7 @@ begin
    _itcanapc:=false;
    if(tu^.uf>uf_ground)then exit;
    if((uu^.apcm-uu^.apcc)>=tu^.apcs)then
-    if(tu^.uid in uids_apc[uu^.uid])then
-    begin
-
-       _itcanapc:=true;
-    end;
+    if(tu^.uid in uids_apc[uu^.uid])then _itcanapc:=true;
 end;
 
 function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
@@ -886,7 +882,7 @@ begin
       if(tx>map_mw)then tx:=map_mw;
       if(ty>map_mw)then ty:=map_mw;
       {$IFDEF _FULLGAME}
-      if(_nhp(vx,vy)or _nhp(tx,ty))then PlaySND(snd_teleport,nil);
+      if(_nhp3(vx,vy,HPlayer)or _nhp3(tx,ty,HPlayer))then PlaySND(snd_teleport,nil);
       _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
       _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
       {$ENDIF}

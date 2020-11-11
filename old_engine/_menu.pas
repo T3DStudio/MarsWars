@@ -155,7 +155,7 @@ begin
       if(_m_sel=90)then net_cl_saddr;
       if(_m_sel=11 )then _players[HPlayer].name:=PlayerName;
       c_m_sel;
-      if not(_m_sel in [16,17])then begin m_vrx:=vid_mw;m_vry:=vid_mh; end;
+      if not(_m_sel in [16,17])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
       vid_mredraw:=true;
       PlaySNDM(snd_click);
    end;
@@ -187,6 +187,13 @@ begin
       10 : vid_vmm:=not vid_vmm;
       11 : if not ((net_nstat=ns_none)and(G_Started=false))then _m_sel:=0;
       12 : begin _lng:=not _lng;swLNG;end;
+      13 : begin
+              inc(vid_ppos,1);
+              vid_ppos:=vid_ppos mod 4;
+              _ScreenSurfaces;
+              map_ptrt:=255;
+              MakeTerrain;
+           end;
 
       // video
       16 : if(m_vx>ui_menu_ssr_x5)then
@@ -212,14 +219,13 @@ begin
            end
            else
             if(m_vx>ui_menu_ssr_x4)then
-             if(m_vrx<>vid_mw)or(m_vry<>vid_mh)then
+             if(m_vrx<>vid_vw)or(m_vry<>vid_vh)then
              begin
-                vid_mw:=m_vrx;
-                vid_mh:=m_vry;
+                vid_vw:=m_vrx;
+                vid_vh:=m_vry;
 
-                calcVRV;
                 _MakeScreen;
-                _makeScrSurf;
+                _ScreenSurfaces;
                 map_ptrt:=255;
                 MakeTerrain;
              end;
@@ -387,6 +393,7 @@ begin
               begin
                  net_nstat:=ns_clnt;
                  net_cl_saddr;
+                 _rpls_pnu:=0;
                  if(net_UpSocket)
                  then net_m_error:=str_connecting
                  else

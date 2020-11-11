@@ -58,11 +58,13 @@ dcn                    = MaxSMapW div dcw;
 build_b                = 5;
 
 _uts                   = 31;         //0-31
-_utsh                  = _uts div 2; //0-15
 _ubuffs                = 15;
-MaxUpgrs               = 23;
+MaxUpgrs               = 24;
+_clupgrs               = _uts div 2; //0-15
+                                             // 60 140 220 300 380 460 540 620 700 780
+_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,195);
 
-_pnua                  : array[0..9] of byte = (55,75,95,115,135,155,175,195,215,235);
+//_pnua                  : array[0..9] of byte = (55,75,95,115,135,155,175,195,215,235);
 
 ClientTTL              = vid_fps*10;
 
@@ -229,7 +231,7 @@ upgr_rturrets          = 22; // rocket turrets
 
 upgr_bldenrg           = 23; // additional energy
 
-upgr_prodatm           = 24; // 9 class building reload time
+upgr_9bld              = 24; // 9 class building reload time
 
 upgr_advbld            = 28;
 upgr_advbar            = 29;
@@ -478,8 +480,8 @@ vid_uialrm_n           = 10;
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
 vid_BW                 = 44;
 vid_2BW                = vid_BW*2;
-vid_panel              = vid_BW*3;
-vid_tBW                = vid_panel div 4;
+vid_panelw             = vid_BW*3;
+vid_tBW                = vid_panelw div 4;
 vid_2tBW               = vid_tBW*2;
 //vid_3tBW               = vid_panel div 4;
 vid_hBW                = vid_BW div 2;
@@ -493,21 +495,20 @@ vid_camp_m             = 11;
 
 ui_h3bw                = vid_BW-vid_tBW;
 ui_bottomsy            = vid_BW*4;
-ui_tabsy               = vid_panel+ui_h3bw;
-ui_hwp                 = vid_panel div 2;
-ui_iy                  = vid_panel+3;
+ui_tabsy               = vid_panelw+ui_h3bw;
+ui_hwp                 = vid_panelw div 2;
+ui_iy                  = vid_panelw+3;
 ui_energx              = (ui_hwp+ui_h3bw) div 2;
-ui_armyx               = (ui_hwp+ui_h3bw+vid_panel) div 2;
-ui_textx               = vid_panel+4;
+ui_armyx               = (ui_hwp+ui_h3bw+vid_panelw) div 2;
 
 ui_menu_map_zx0        = 76;
 ui_menu_map_zy0        = 110;
 ui_menu_map_zx1        = 381;
 ui_menu_map_zy1        = 289;
 ui_menu_map_ys         = 19;
-ui_menu_map_x0         = ((ui_menu_map_zx0+ui_menu_map_zx1) div 2)- vid_panel;
-ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panel div 2);
-ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panel;
+ui_menu_map_x0         = ((ui_menu_map_zx0+ui_menu_map_zx1) div 2)- vid_panelw;
+ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2);
+ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panelw;
 ui_menu_map_rx1        = ui_menu_map_zx1-12;
 ui_menu_map_y1         = ui_menu_map_y0+(ui_menu_map_ys*7);
 ui_menu_map_tx0        = ui_menu_map_rx0+6;
@@ -592,7 +593,7 @@ fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_cxr                = fog_cr-fog_chw;
-fog_vfwm               = ((vid_maxw-vid_panel) div fog_cw)+1;
+fog_vfwm               = ((vid_maxw-vid_panelw) div fog_cw)+1;
 fog_vfhm               = (vid_maxh div fog_cw)+1;
 
 ta_left                = 0;

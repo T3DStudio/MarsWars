@@ -14,6 +14,7 @@ G_shpos           : boolean = false;
 G_aislots         : byte = 5;
 G_step            : cardinal = 0;
 G_plstat          : byte = 0;
+G_nunits          : integer = 0;
 
 g_inv_mn          : byte = 0;
 g_inv_wn          : byte = 0;
@@ -123,13 +124,13 @@ _testmode         : byte = 0;
 _testdmg          : boolean = false;
 _fsttime          : boolean = false;
 
-spr_panel,
-_uipanel,
-_dsurf,
-_minimap,
-_bminimap,
-_SCREEN,
-_menu_surf        : pSDL_SURFACE;
+r_panel,
+r_uipanel,
+r_empty,
+r_minimap,
+r_bminimap,
+r_screen,
+r_menu            : pSDL_SURFACE;
 _vflags           : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
 _RECT             : pSDL_RECT;
@@ -157,16 +158,17 @@ PlayerRace        : byte = 0;
 
 plcolor           : array[0..MaxPlayers] of cardinal;
 
-vid_mw            : integer = 800;
-vid_mh            : integer = 600;
+vid_vw            : integer = 800;
+vid_vh            : integer = 600;
+vid_sw            : integer = 800;
+vid_sh            : integer = 600;
 vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = 794;
 vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0; //vid_mw+vid_ab;
 vid_mha           : integer = 0; //vid_mh+vid_ab*2;
-vid_uiuphx        : integer = 0;
-vid_ingamecl      : byte = 0;
+
 
 vid_terrain       : pSDL_SURFACE;
 vid_rtui          : byte = 0;
@@ -243,6 +245,11 @@ vid_vmspd         : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
 vid_vmm           : boolean = false;
+vid_ppos          : byte = 0;
+vid_panelx        : integer = 0;
+vid_panely        : integer = 0;
+vid_mapx          : integer = 0;
+vid_mapy          : integer = 0;
 
 vid_vsl           : array[1..vid_mvs] of TVisSpr;
 vid_vsls          : word = 0;
@@ -312,6 +319,9 @@ ui_msk            : byte = 0;
 ui_msks           : shortint = 0;
 ui_orderu         : array[0..9,false..true] of TSob;
 ui_rad_rld        : array[false..true] of cardinal;
+ui_uiuphx         : integer = 0;
+ui_ingamecl       : byte = 0;
+ui_textx          : integer = 0;
 
 k_dbl,
 k_l,
@@ -526,6 +536,8 @@ spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 
 /// text
 
+str_panelposp     : array[0..3] of shortstring;
+str_panelpos,
 str_all,
 str_orders,
 str_req,

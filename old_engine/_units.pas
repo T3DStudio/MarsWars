@@ -14,8 +14,8 @@ begin
         if(spr=@spr_dummy)then exit;
 
         if(_unit_fogrev(pu))then
-         if ((vid_vx+vid_panel-spr^.hw)<vx)and(vx<(vid_vx+vid_mw+spr^.hw))and
-            ((vid_vy          -spr^.hh)<vy)and(vy<(vid_vy+vid_mh+spr^.hh))then
+         if ((vid_vx-spr^.hw)<vx)and(vx<(vid_vx+vid_sw+spr^.hw))and
+            ((vid_vy-spr^.hh)<vy)and(vy<(vid_vy+vid_sh+spr^.hh))then
          begin
             anim:=abs(hits-idead_hits);
             if(anim>255)then anim:=255;
@@ -247,8 +247,8 @@ begin
              ui_prod_builds := ui_prod_builds + uids_builder[uid];
              if(isbuilder)and(0<=m_sbuild)and(m_sbuild<=_uts)and(speed=0)then
               if(cl2uid[race,true,m_sbuild] in uids_builder[uid])then
-               if((vid_vx+vid_panel-sr)<vx)and(vx<(vid_vx+vid_mw+sr))and
-                 ((vid_vy          -sr)<vy)and(vy<(vid_vy+vid_mh+sr))then _addUIBldrs(x,y,sr);
+               if((vid_vx-sr)<vx)and(vx<(vid_vx+vid_sw+sr))and
+                 ((vid_vy-sr)<vy)and(vy<(vid_vy+vid_sh+sr))then _addUIBldrs(x,y,sr);
 
              for i:=0 to MaxUnitProds do
               if(i>0)and(buff[ub_advanced]<=0)
@@ -351,8 +351,8 @@ begin
               end;
            end;
 
-           if ((vid_vx+vid_panel-spr^.hw)<vx )and(vx <(vid_vx+vid_mw+spr^.hw))and
-              ((vid_vy-sh       -spr^.hh)<smy)and(smy<(vid_vy+vid_mh+spr^.hh)) then
+           if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
+              ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
            begin
               dp :=0;
               inv:=255;
@@ -1082,7 +1082,7 @@ UID_HGate    : if(buff[ub_advanced]=0)then
                    if(ucl_x[9]<=0)or(MaxUnits<ucl_x[9])then exit;
                    if(_units[ucl_x[9]].rld_t>0)
                    then exit
-                   else _units[ucl_x[9]].rld_t:=advprod_rld[upgr[upgr_prodatm]>0];
+                   else _units[ucl_x[9]].rld_t:=advprod_rld[upgr[upgr_9bld]>0];
                    _unit_dec_Kcntrs(pu);
                    if(bld_s=0)then bld_s:=1;
                    hits:=100;
@@ -1950,7 +1950,7 @@ begin
          begin
             vision:=_uvision(team,tu,false);
 
-            if(onlySVCode)and(vision)then _unit_aiUBC(pu,tu,ud,teams);
+            if(onlySVCode)and(state=ps_comp)and(vision)then _unit_aiUBC(pu,tu,ud,teams);
 
             if(_player_sight(playern,tu,vision))then
              if(teams=false)then

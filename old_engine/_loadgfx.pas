@@ -26,7 +26,7 @@ end;
 function _loadsrf(fn:string):pSDL_SURFACE;
 var tmp:pSDL_SURFACE;
 begin
-   _loadsrf:=_dsurf;
+   _loadsrf:=r_empty;
    if(not FileExists(fn))then exit;
 
    fn:=fn+#0;
@@ -43,16 +43,16 @@ function loadIMG(fn:string;trns,log:boolean):pSDL_SURFACE;
 begin
    loadIMG:=_loadsrf(str_folder_gr+fn+'.png');
 
-   if(loadIMG=_dsurf)then loadIMG:=_loadsrf(str_folder_gr+fn+'.jpg');
-   if(loadIMG=_dsurf)then loadIMG:=_loadsrf(str_folder_gr+fn+'.bmp');
-   if(loadIMG=_dsurf)and(log)then WriteLog(str_folder_gr+fn);
+   if(loadIMG=r_empty)then loadIMG:=_loadsrf(str_folder_gr+fn+'.jpg');
+   if(loadIMG=r_empty)then loadIMG:=_loadsrf(str_folder_gr+fn+'.bmp');
+   if(loadIMG=r_empty)and(log)then WriteLog(str_folder_gr+fn);
 
-   if(trns)and(loadIMG<>_dsurf)then SDL_SetColorKey(loadIMG,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(loadIMG,0,0));
+   if(trns)and(loadIMG<>r_empty)then SDL_SetColorKey(loadIMG,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(loadIMG,0,0));
 end;
 
 procedure _FreeSF(sf:PSDL_Surface);
 begin
-   if(sf<>nil)and(sf<>_dsurf)then
+   if(sf<>nil)and(sf<>r_empty)then
    begin
       sdl_FreeSurface(sf);
       sf:=nil;
@@ -242,8 +242,8 @@ begin
    ter_s:=loadIMG(fn,false,false);
    ter_w:=ter_s^.w;
    ter_h:=ter_s^.h;
-   w:=vid_mw+(ter_w shl 1)-vid_panel;
-   h:=vid_mh+(ter_h shl 1);
+   w:=vid_sw+(ter_w shl 1);
+   h:=vid_sh+(ter_h shl 1);
    vid_terrain:=_createSurf(w,h);
    x:=0;
 
@@ -391,17 +391,14 @@ end;
 procedure LoadGraphics;
 var x:integer;
 begin
-   _makeScrSurf;
-   if(_uipanel  =nil)then begin WriteError; exit; end;
+   r_empty:=_createSurf(1,1);
+   if(r_empty    =nil)then begin WriteError; exit; end;
 
-   _dsurf:=_createSurf(1,1);
-   if(_dsurf    =nil)then begin WriteError; exit; end;
+   r_minimap :=_createSurf(vid_panelw-1,vid_panelw-1);
+   if(r_minimap  =nil)then begin WriteError; exit; end;
 
-   _minimap :=_createSurf(vid_panel-1,vid_panel-1);
-   if(_minimap  =nil)then begin WriteError; exit; end;
-
-   _bminimap:=_createSurf(vid_panel-1,vid_panel-1);
-   if(_bminimap =nil)then begin WriteError; exit; end;
+   r_bminimap:=_createSurf(vid_panelw-1,vid_panelw-1);
+   if(r_bminimap =nil)then begin WriteError; exit; end;
 
    ui_muc [false]:=c_dorange;
    ui_muc [true ]:=c_gray;
@@ -411,7 +408,7 @@ begin
 
    spr_dummy.hh:=1;
    spr_dummy.hw:=1;
-   spr_dummy.surf:=_dsurf;
+   spr_dummy.surf:=r_empty;
 
    LoadFont;
 
@@ -426,10 +423,10 @@ begin
 
    spr_mback:= loadIMG('mback'   ,false,true);
 
-   _menu_surf:=_createSurf(spr_mback^.w,spr_mback^.h);
+   r_menu:=_createSurf(spr_mback^.w,spr_mback^.h);
 
-   mv_x:=(vid_mw-spr_mback^.w) div 2;
-   mv_y:=(vid_mh-spr_mback^.h) div 2;
+   mv_x:=(vid_vw-spr_mback^.w) div 2;
+   mv_y:=(vid_vh-spr_mback^.h) div 2;
 
    spr_cursor     := loadIMG('cursor'   ,true ,true);
 
@@ -483,12 +480,6 @@ begin
 
    spr_mp[r_hell] := _lstr('h_mp');
    spr_mp[r_uac ] := _lstr('u_mp');
-
-//   spr_HABar      := spr_HBar;
-//   with spr_HABar do surf:=_xasurf(surf,true,false,true);
-
-
-   _draw_surf(_uipanel,0,0,spr_panel);
 
    for x:=0 to 3 do spr_eff_bfg [x]:= _lstr('ef_bfg_'+b2s(x));
    for x:=0 to 5 do spr_eff_eb  [x]:= _lstr('ef_eb'  +b2s(x));

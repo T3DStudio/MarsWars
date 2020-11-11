@@ -10,7 +10,6 @@ const ucl_com = 0;
       ucl_bx9 = 9;
 
 
-
 procedure _setAI(p:byte);
 begin
    with _players[p] do
@@ -51,7 +50,7 @@ begin
              ai_maxunits := 10;
              ai_pushmin  := ai_maxunits-5;
           end;
-      2 : begin
+      2 : begin  // ITYTD
              _bc_ss(@a_build,[0..3]);
              case race of
              r_hell: _bc_ss(@a_units,[0..3  ]);
@@ -64,7 +63,7 @@ begin
              ai_maxunits := 25;
              ai_pushmin  := ai_maxunits-5;
           end;
-      3 : begin
+      3 : begin  // HNTR
              _bc_ss(@a_build,[0..6]);
              case race of
              r_hell: _bc_ss(@a_units,[0..4  ]);
@@ -1123,82 +1122,6 @@ UID_Demon    : if(uid_eb[uid]>5)then order:=3;
              alrm_r:=32000;
          end;
       end;
-
-      {if(ai_pushpart<100)then
-       if(army>100)or(ucl_c[false]>=ai_maxarmy)then
-        if(_uclord>=ai_pushpart)or(apcc>0)
-        then order:=2
-        else
-        begin
-           if(g_mode=gm_coop)then order:=2;
-           if(ai_skill>2)then
-            case race of
-            r_hell : if(ucl<=2)then order:=2;
-            r_uac  : if(apcm>0)then order:=2;
-            end;
-        end;
-
-      case ai_attack of
-      0,1 : begin
-               if(ai_attack=1)then
-                case race of
-               r_hell : if(ucl<=3)and(ucl_c[false]>15)then order:=2;
-               r_uac  : if(apcm>0)then order:=2;
-                end;
-
-               // harrasment
-               if(ai_skill>2)then
-                if(_uclord=15)and(apcc=apcm)then
-                 if(map_aifly=false)or(uf>uf_ground)then order:=3;
-
-               if(uid=UID_LostSoul)then order:=2;
-
-               if(army<100)then
-               begin
-                  if(ai_skill>1)then
-                   if(uid=UID_Demon)then
-                    if(ucl_e[isbuild,ucl]<8)
-                    then order:=0
-                    else order:=2;
-
-                  if(ai_skill>2)then
-                  begin
-                     if(uid=UID_Imp)then
-                      if(ucl_c[false]>15)
-                      then order:=2
-                      else
-                       if(ucl_e [isbuild,ucl]<8)
-                       or(ucl_eb[true,5]=0)
-                       then order:=0
-                       else order:=2;
-                  end;
-               end;
-            end;
-      2   : order:=2;
-      end;
-
-      if(order<>2)and(race=r_hell)and(map_aifly)and(uf=uf_ground)then
-       if(ucl_x[5]=0)
-       then order:=0
-       else
-         if(ucl>2)and(max>1)then order:=0;
-
-      if(ucl_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
-
-      case g_mode of
-      gm_inv : if(playern<>0)then order:=0;
-      gm_coop: if(playern= 0)then
-               begin
-                  order:=0;
-                  if(dist2(x,y,map_psx[0],map_psy[0])>base_ir)and(tar1=0)then
-                  begin
-                      uo_id :=ua_move;
-                      tar1  :=0;
-                      tar1d :=32000;
-                      alrm_r:=32000;
-                  end;
-               end;
-      end;  }
    end;
 end;
 

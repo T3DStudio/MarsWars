@@ -3,6 +3,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+
+procedure _wudata_string(s:shortstring;rpl:boolean);
+var sl,x:byte;
+       c:char;
+begin
+   if(rpl=false)
+   then net_writestring(s)
+   else
+   begin
+      sl:=length(s);
+      {$I-}
+      BlockWrite(_rpls_file,sl,SizeOf(sl));
+      for x:=1 to sl do
+      begin
+         c:=s[x];
+         BlockWrite(_rpls_file,c,SizeOf(c));
+      end;
+      {$I+}
+   end;
+end;
+
+procedure _wudata_chat(p:byte;rpl:boolean);
+var i:byte;
+begin
+   if(rpl=false)
+   then net_writechat(p)
+   else for i:=0 to MaxNetChat do _wudata_string(net_chat[p,i],rpl);
+end;
+
 procedure _wudata_byte(bt:byte;rpl:boolean);
 begin
    if(rpl=false)
@@ -176,27 +205,25 @@ end;
 procedure _wpdata(rpl:boolean);
 var i,n,u,y:byte;
 begin
-   _wudata_byte(G_plstat,rpl);
-   if(G_plstat>0)then
-    for i:=1 to MaxPlayers do
-     with _players[i] do
-      if((G_plstat and (1 shl i))>0)then
-       for n:=0 to _utsh do
-       begin
-          y:=0;
-          u:=n*2;
-          if(u<=_uts)then y:=y or  upgr[u];
-          inc(u,1);
-          if(u<=_uts)then y:=y or (upgr[u] shl 4);
-          _wudata_byte(y,rpl);
-       end;
+   for i:=1 to MaxPlayers do
+    with _players[i] do
+     if((G_plstat and (1 shl i))>0)then
+      for n:=0 to _clupgrs do
+      begin
+         y:=0;
+         u:=n*2;
+         if(u<=MaxUpgrs)then y:=y or  upgr[u];
+         inc(u,1);
+         if(u<=MaxUpgrs)then y:=y or (upgr[u] shl 4);
+         _wudata_byte(y,rpl);
+      end;
 end;
 
 procedure _wclinet_gframe(_pl:byte;rpl:boolean);
-var    i: byte;
-    gstp: cardinal;
-    _PNU: pbyte;
-    _N_U: pinteger;
+var i: byte;
+ gstp: cardinal;
+ _N_U: pinteger;
+ _PNU: integer;
 begin
    _wudata_card(G_Step,rpl);
 
@@ -213,40 +240,45 @@ begin
    else i:=vid_hfps;
 
    if((gstp mod i)=0)then
-   begin
-      _wpdata(rpl);
-
-      if(g_mode=gm_inv)then
-      begin
-         _wudata_byte(g_inv_wn,rpl);
-         _wudata_int (g_inv_t ,rpl);
-      end;
-      if(g_mode=gm_ct)then
-       for i:=1 to MaxPlayers do
-        _wudata_byte(g_ct_pl[i].pl,rpl);
-   end;
+    case g_mode of
+gm_inv:begin
+          _wudata_byte(g_inv_wn,rpl);
+          _wudata_int (g_inv_t ,rpl);
+       end;
+gm_ct :for i:=1 to MaxPlayers do _wudata_byte(g_ct_pl[i].pl,rpl);
+    end;
 
    if(rpl)then
    begin
-      _PNU:=@_pnua[_rpls_pnui];
+      _PNU:=_cl_pnua[_rpls_pnui];
       _N_U:=@_rpls_u;
    end
    else
    begin
-      _PNU:=@_players[_pl].PNU;
+      _PNU:=_players[_pl].PNU;
       _N_U:=@_players[_pl].n_u;
    end;
 
-   _wudata_byte(_PNU^,rpl);
-   _wudata_int (_N_U^,rpl);
-   for i:=1 to _PNU^ do
+   CalcPLNU;
+
+   _wudata_byte(G_plstat,rpl);
+   if(G_plstat>0)then
    begin
-      inc(_N_U^,1);
+      _wudata_byte(_PNU,rpl);
+      _PNU:=_PNU*4;
+      if(_PNU>G_nunits)then _PNU:=G_nunits;
 
-      if(_N_U^<1)then _N_U^:=1;
-      if(_N_U^>MaxUnits)then _N_U^:=1;
+      if((gstp mod i)=0)then _wpdata(rpl);
 
-      _wudata(@_units[_N_U^],rpl,_pl);
+      _wudata_int(_N_U^,rpl);
+      for i:=1 to _PNU do
+      begin
+         repeat
+           inc(_N_U^,1);
+           if(_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
+         until ( G_plstat and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
+         _wudata(@_units[_N_U^],rpl,_pl);
+      end;
    end;
 end;
 
@@ -614,6 +646,36 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+function _rudata_string(rpl:boolean):shortstring;
+var sl,x:byte;
+       c:char;
+begin
+   if(rpl=false)
+   then _rudata_string:=net_readstring
+   else
+   begin
+      sl:=0;
+      _rudata_string:='';
+      {$I-}
+      BlockRead(_rpls_file,sl,SizeOf(sl));
+      for x:=1 to sl do
+      begin
+         c:=#0;
+         BlockRead(_rpls_file,c,SizeOf(c));
+         _rudata_string:=_rudata_string+c;
+      end;
+      {$I+}
+   end;
+end;
+
+procedure  _rudata_chat(p:byte;rpl:boolean);
+var i:byte;
+begin
+   if(rpl=false)
+   then net_readchat(p)
+   else for i:=0 to MaxNetChat do net_chat[p,i]:=_rudata_string(rpl);
+end;
+
 function _rudata_byte(rpl:boolean;def:byte):byte;
 begin
    if(rpl=false)
@@ -800,26 +862,31 @@ end;
 procedure _rpdata(rpl:boolean);
 var i,o,u,y:byte;
 begin
-   G_plstat:=_rudata_byte(rpl,0);
+   for i:=1 to MaxPlayers do
+    if((G_plstat and (1 shl i))>0)then
+     with _players[i] do
+      for o:=0 to _clupgrs do
+      begin
+         y:=_rudata_byte(rpl,0);
+         u:=o*2;
+         if(u<=MaxUpgrs)then upgr[u]:=min2(upgrade_cnt[race,u],y and %00001111);
+         inc(u,1);
+         if(u<=MaxUpgrs)then upgr[u]:=min2(upgrade_cnt[race,u],y shr 4);
+      end;
+end;
 
-   if(G_plstat>0)then
-    for i:=1 to MaxPlayers do
-     if((G_plstat and (1 shl i))>0)then
-      with _players[i] do
-       for o:=0 to _utsh do
-       begin
-          y:=_rudata_byte(rpl,0);
-          u:=o*2;
-          if(u<=_uts)then upgr[u]:= y and %00001111;
-          inc(u,1);
-          if(u<=_uts)then upgr[u]:= y shr 4;
-       end;
+procedure ClNUnits;
+var i:byte;
+begin
+   G_nunits:=0;
+   for i:=1 to MaxPlayers do
+    if((G_plstat and (1 shl i))>0)then inc(G_nunits,MaxPlayerUnits);
 end;
 
 procedure _rclinet_gframe(_pl:byte;rpl:boolean);
 var gstp: cardinal;
-    _PNU,
     i   : byte;
+    _PNU,
     _N_U: integer;
 begin
    G_Step:=_rudata_card(rpl,G_Step);
@@ -837,50 +904,58 @@ begin
    else i:=vid_hfps;
 
    if((gstp mod i)=0)then
-   begin
-      _rpdata(rpl);
-
-      if(g_mode=gm_inv)then
-      begin
-         _PNU:=g_inv_wn;
-         g_inv_wn:=_rudata_byte(rpl,0);
-         if(g_inv_wn>_PNU)then PlaySND(snd_teleport,nil);
-         g_inv_t :=_rudata_int (rpl,0);
-      end;
-      if(g_mode=gm_ct)then
-       for i:=1 to MaxPlayers do
-        g_ct_pl[i].pl:=_rudata_byte(rpl,0);
-   end;
-
-   _PNU:=_rudata_byte(rpl,0);
-
-   if(_PNU<>_rpls_pnu)then
-   begin
-      _rpls_pnu:=_PNU;
-      if(_rpls_pnu=0)then _rpls_pnu:=1;
-      UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+2;
-      if(UnitStepNum=0)then UnitStepNum:=1;
-   end;
-
-   _N_U:=_rudata_int (rpl,0);
-   for i:=1 to _PNU do
-   begin
-      inc(_N_U,1);
-
-      if(_N_U<1       )then _N_U:=1;
-      if(_N_U>MaxUnits)then _N_U:=1;
-
-      _units[_N_U].unum:=_N_U;
-      _rudata(@_units[_N_U],rpl,_pl);
-   end;
-   for i:=0 to MaxPlayers do
-    with _players[i] do
-    begin
-       menerg:=0;
-       inc(menerg,ucl_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
-       inc(menerg,ucl_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
-       if(G_startb=5)then inc(menerg,100);
+    case g_mode of
+gm_inv:begin
+          _PNU:=g_inv_wn;
+          g_inv_wn:=_rudata_byte(rpl,0);
+          if(g_inv_wn>_PNU)then PlaySND(snd_teleport,nil);
+          g_inv_t :=_rudata_int (rpl,0);
+       end;
+gm_ct: for i:=1 to MaxPlayers do g_ct_pl[i].pl:=_rudata_byte(rpl,0);
     end;
+
+   G_plstat:=_rudata_byte(rpl,0);
+   if(G_plstat>0)then
+   begin
+      _PNU:=_rudata_byte(rpl,0)*4;
+
+      if(_PNU<0)then exit;
+
+      ClNUnits;
+
+      if(_PNU>G_nunits)then _PNU:=G_nunits;
+
+      if(_PNU<>_rpls_pnu)then
+      begin
+         _rpls_pnu:=_PNU;
+         if(_rpls_pnu<=0)then _rpls_pnu:=1;
+         UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+2;
+         if(UnitStepNum=0)then UnitStepNum:=1;
+      end;
+
+      if((gstp mod i)=0)then _rpdata(rpl);
+
+      _N_U:=_rudata_int(rpl,0);
+      for i:=1 to _PNU do
+      begin
+         repeat
+           inc(_N_U,1);
+           if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
+         until ( G_plstat and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0 ;
+         _units[_N_U].unum:=_N_U;
+         _rudata(@_units[_N_U],rpl,_pl);
+      end;
+
+      for i:=0 to MaxPlayers do
+       with _players[i] do
+       begin
+          menerg:=0;
+          inc(menerg,ucl_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
+          inc(menerg,ucl_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
+          inc(menerg,ucl_eb[true,9]*_ulst[cl2uid[race,true,9]].generg);
+          if(G_startb=5)then inc(menerg,100);
+       end;
+   end;
 end;
 {$ENDIF}
 

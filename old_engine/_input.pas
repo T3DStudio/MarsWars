@@ -516,9 +516,9 @@ begin
 
    _chkbld;
 
-   if(k_ml=2)then                    // left button
+   {if(k_ml=2)then                    // left button
    begin
-      if(vid_panel<=m_vx)then        // map
+      if(vid_panelw<=m_vx)then        // map
       begin
          case m_sbuild of
 255    : begin
@@ -536,7 +536,7 @@ begin
          end;
       end
       else
-        if(vid_panel>=m_vy)then      // minimap
+        if(vid_panelw>=m_vy)then      // minimap
         begin
            case m_sbuild of
            -1,-2,
@@ -658,8 +658,8 @@ begin
          if(m_ldblclk>0)
          then
            if(k_shift<2)
-           then _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_dblselect  ,HPlayer)
-           else _player_s_o(vid_vx+vid_panel,vid_vy, vid_vx+vid_mw,vid_vy+vid_mh, uo_adblselect ,HPlayer)
+           then _player_s_o(vid_vx+vid_panelw,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh, uo_dblselect  ,HPlayer)
+           else _player_s_o(vid_vx+vid_panelw,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh, uo_adblselect ,HPlayer)
          else
            if(k_shift<2)
            then _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_select ,HPlayer)
@@ -671,10 +671,9 @@ begin
    end;
 
    if(ui_panelmmm)and(m_sxs=-1)then
-    if(vid_panel>=m_vx)and(vid_panel>=m_vy)then
+    if(vid_panelw>=m_vx)and(vid_panelw>=m_vy)then
     begin
-       vid_vx:=trunc(m_vx/map_mmcx)-((vid_mw+vid_panel) shr 1);
-       vid_vy:=trunc(m_vy/map_mmcx)-( vid_mh            shr 1);
+       _moveHumView(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx));
        _view_bounds;
     end;
 
@@ -683,12 +682,12 @@ begin
       if(m_sbuild<>255)
       then m_sbuild:=255
       else
-       if(vid_panel<m_vx) then   // map
+       if(vid_panelw<m_vx) then   // map
        begin
           _player_s_o(m_mx,m_my,byte(false=m_a_inv),_whoInPoint(m_mx,m_my,0),uo_move,HPlayer);
        end
        else
-         if (vid_panel>m_vy) then  // mini-map
+         if (vid_panelw>m_vy) then  // mini-map
          begin
             _player_s_o(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx),byte(false=m_a_inv),0,uo_move,HPlayer);
          end
@@ -728,7 +727,7 @@ begin
                 end;
             end;
          end;
-   end;
+   end;  }
 end;
 
 procedure _move_v_m;

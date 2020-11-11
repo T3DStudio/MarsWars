@@ -17,8 +17,8 @@ begin
            spr:=@spr_liquid[(a div vid_hfps)+1,t-DID_LiquidR1];
         end;
 
-        if((vid_vx-spr^.hw+vid_panel)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
-          ((vid_vy-spr^.hh)          <y)and(y<(vid_vy+vid_mh+spr^.hh))then
+        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_sw+spr^.hw))and
+          ((vid_vy-spr^.hh)<y)and(y<(vid_vy+vid_sh+spr^.hh))then
            _sl_add_dec(x,y,dpth,shh,spr,255,ro);
      end;
 end;
@@ -30,13 +30,13 @@ begin
     with map_dds[d] do
      if(t in sd)then
       if(mmr>0)
-      then FilledcircleColor(_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor(_bminimap,mmx,mmy,mmc);
+      then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
+      else pixelColor(r_bminimap,mmx,mmy,mmc);
 end;
 
 procedure map_bminimap;
 begin
-   sdl_FillRect(_bminimap,nil,0);
+   sdl_FillRect(r_bminimap,nil,0);
    _bmm_draw(dids_liquids);
    _bmm_draw([DID_other,DID_srock,DID_brock]);
 end;
@@ -56,23 +56,23 @@ begin
 
       c:=plcolor[i];
 
-      characterColor(_minimap,x-3,y-3,start_char,c);
-      circleColor(_minimap,x,y,trunc(base_r*map_mmcx),c);
+      characterColor(r_minimap,x-3,y-3,start_char,c);
+      circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
 
       if(g_mode=gm_ct)and(i>0)then
        with g_ct_pl[i] do
-        filledcircleColor(_minimap,mpx,mpy,map_prmm,c_aqua);
+        filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
    end;
 end;
 
 procedure _makeMMB;
 begin
-   sdl_FillRect(_minimap,nil,0);
+   sdl_FillRect(r_minimap,nil,0);
    map_bminimap;
-   _draw_surf(_minimap,0,0,_bminimap);
+   _draw_surf(r_minimap,0,0,r_bminimap);
    if(g_shpos)or(g_mode in [gm_inv,gm_2fort,gm_3fort,gm_coop])then map_dstarts;
-   _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,_minimap);
-   rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+_minimap^.w,ui_menu_map_y0+_minimap^.h,c_white);
+   _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
+   rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
    vid_mredraw:=true;
 end;
 
@@ -213,7 +213,6 @@ begin
    then map_aifly := false
    else map_aifly := ((map_liq+map_obs)>6)and(map_obs>2)and(map_liq>1);
    map_b1      := map_mw-build_b;
-   //map_mwc     := map_mw div 2;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then
    begin
@@ -223,9 +222,9 @@ begin
    map_flydpth[uf_ground ] := 0;
    map_flydpth[uf_soaring] := map_mw;
    map_flydpth[uf_fly    ] := map_mw*2;
-   map_mmcx    := (vid_panel-2)/map_mw;
-   map_mmvw    := trunc((vid_mw-vid_panel)*map_mmcx)+1;
-   map_mmvh    := trunc( vid_mh*map_mmcx)+1;
+   map_mmcx    := (vid_panelw-2)/map_mw;
+   map_mmvw    := trunc(vid_sw*map_mmcx)+1;
+   map_mmvh    := trunc(vid_sh*map_mmcx)+1;
    map_prmm    := round(g_ct_pr*map_mmcx);
    {$ENDIF}
 end;

@@ -15,13 +15,15 @@ begin
    if (vr='sport')then net_sv_pstr := vl;
    if (vr='lng'  )then _lng        :=(vl=b2pm[true,2]);
    if (vr='mai'  )then m_a_inv     :=(vl=b2pm[true,2]);
-   if (vr='vidmw')then vid_mw      :=vlb;
-   if (vr='vidmh')then vid_mh      :=vlb;
+   if (vr='vidvw')then vid_vw      :=vlb;
+   if (vr='vidvh')then vid_vh      :=vlb;
    if (vr='gsb'  )then G_startb    :=vlb;
    if (vr='gsp'  )then G_shpos     :=(vl=b2pm[true,2]);
    if (vr='gai'  )then G_aislots   :=vlb;
    if (vr='rpnui')then _rpls_pnui  :=vlb;
    if (vr='npnui')then net_pnui    :=vlb;
+   if (vr='ppos' )then vid_ppos    :=vlb;
+
 end;
 
 procedure cfg_parse_str(s:string);
@@ -58,20 +60,21 @@ begin
 
       if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
 
-      if(vid_mw<vid_minw)then vid_mw:=vid_minw;
-      if(vid_mh<vid_minh)then vid_mh:=vid_minh;
-      if(vid_mw>vid_maxw)then vid_mw:=vid_maxw;
-      if(vid_mh>vid_maxh)then vid_mh:=vid_maxh;
+      if(vid_vw<vid_minw)then vid_vw:=vid_minw;
+      if(vid_vh<vid_minh)then vid_vh:=vid_minh;
+      if(vid_vw>vid_maxw)then vid_vw:=vid_maxw;
+      if(vid_vh>vid_maxh)then vid_vh:=vid_maxh;
 
       if(G_aislots>7)then G_aislots:=7;
       if(G_startb >5)then G_startb :=5;
 
       if(_rpls_pnui>9)then  _rpls_pnui:=9;
       if(net_pnui  >9)then  net_pnui  :=9;
+      if(vid_ppos  >3)then  net_pnui  :=0;
    end;
    swLNG;
-   m_vrx:=vid_mw;
-   m_vry:=vid_mh;
+   m_vrx:=vid_vw;
+   m_vry:=vid_vh;
    net_cl_saddr;
    net_sv_sport;
 end;
@@ -92,13 +95,14 @@ begin
    writeln(f,'sport','=',net_sv_pstr    );
    writeln(f,'lng'  ,'=',b2pm[_lng,2]   );
    writeln(f,'mai'  ,'=',b2pm[m_a_inv,2]);
-   writeln(f,'vidmw','=',vid_mw         );
-   writeln(f,'vidmh','=',vid_mh         );
+   writeln(f,'vidvw','=',vid_vw         );
+   writeln(f,'vidvh','=',vid_vh         );
    writeln(f,'rpnui','=',_rpls_pnui     );
    writeln(f,'npnui','=',net_pnui       );
    writeln(f,'gsb'  ,'=',G_startb       );
    writeln(f,'gsp'  ,'=',b2pm[G_shpos,2]);
    writeln(f,'gai'  ,'=',G_aislots      );
+   writeln(f,'ppos' ,'=',vid_ppos       );
 
    close(f);
 end;

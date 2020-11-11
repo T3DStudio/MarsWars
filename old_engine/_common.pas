@@ -56,18 +56,22 @@ begin
      else upgr^[i]:=lvl;
 end;
 
+procedure CalcPLNU;
+var p:byte;
+begin
+   G_plstat:=0;
+   G_nunits:=0;
+   for p:=0 to MaxPlayers do
+    with _players[p] do
+     if(army>0)and(state>ps_none)then
+     begin
+        G_plstat:=G_plstat or (1 shl p);
+        inc(G_nunits,MaxPlayerUnits);
+     end;
+end;
+
 function cf(c,f:pcardinal):boolean;
 begin cf:=(c^ and f^)>0;end;
-
-function FileExists(FName:shortstring):Boolean;
-var F:File;
-begin
-{$I-}Assign(F,FName);
-     Reset(F,1);
-   if IoResult=0 then
-   begin FileExists:=True; Close(F);end
-   else  FileExists:=false;{$I+}
-end;
 
 function sign(x:integer):shortint;
 begin
@@ -444,8 +448,10 @@ end;
 function _nhp3(x,y:integer;player:byte):boolean;
 begin
    _nhp3:=false;
-   if((vid_vx+vid_panel)<x)and(x<(vid_vx+vid_mw))and
-     ((vid_vy          )<y)and(y<(vid_vy+vid_mh))then
+   dec(x,vid_vx);
+   dec(y,vid_vy);
+   if(0<x)and(x<vid_sw)and
+     (0<y)and(y<vid_sh)then
    begin
       if(player<=MaxPlayers)then
        if(_players[player].team=_players[HPlayer].team)or((_rpls_rst>=rpl_rhead)and(player=0))then
@@ -454,14 +460,14 @@ begin
           exit;
        end;
 
-      if(_fog=false)or(_fog_pgrid(x-vid_vx-vid_panel,y-vid_vy))then _nhp3:=true;
+      if(_fog=false)or(_fog_pgrid(x,y))then _nhp3:=true;
    end;
 end;
 
 function _nhp(x,y:integer):boolean;
 begin
-   _nhp:=((vid_vx+vid_panel)<x)and(x<(vid_vx+vid_mw))and
-         ((vid_vy          )<y)and(y<(vid_vy+vid_mh));
+   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))and
+         (vid_vy<y)and(y<(vid_vy+vid_sh));
 end;
 
 procedure _scrollV(i:pinteger;s,min,max:integer);
@@ -481,7 +487,7 @@ begin
       s:=str_screenshot+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
-   sdl_saveBMP(_screen,@s[1]);
+   sdl_saveBMP(r_screen,@s[1]);
 end;
 
 function rgba2c(r,g,b,a:byte):cardinal;
@@ -491,14 +497,14 @@ end;
 
 procedure _view_bounds;
 begin
-   if (vid_vx<-vid_panel) then vid_vx:=-vid_panel;
+   if (vid_vx<0) then vid_vx:=0;
    if (vid_vy<0) then vid_vy:=0;
-   if ((vid_vx+vid_mw)>map_mw) then vid_vx:=map_mw-vid_mw;
-   if ((vid_vy+vid_mh)>map_mw) then vid_vy:=map_mw-vid_mh;
+   if ((vid_vx+vid_sw)>map_mw) then vid_vx:=map_mw-vid_sw;
+   if ((vid_vy+vid_sh)>map_mw) then vid_vy:=map_mw-vid_sh;
 
-   vid_mmvx:=trunc((vid_vx+vid_panel)*map_mmcx);
+   vid_mmvx:=trunc(vid_vx*map_mmcx);
    vid_mmvy:=trunc(vid_vy*map_mmcx);
-   vid_fsx :=(vid_vx+vid_panel) div fog_cw;
+   vid_fsx :=vid_vx div fog_cw;
    vid_fsy :=vid_vy div fog_cw;
    vid_fex :=vid_fsx+fog_vfw;
    vid_fey :=vid_fsy+fog_vfh;
@@ -506,8 +512,8 @@ end;
 
 procedure _moveHumView(mx,my:integer);
 begin
-   vid_vx:=mx-((vid_mw+vid_panel) shr 1);
-   vid_vy:=my-( vid_mh            shr 1);
+   vid_vx:=mx-(vid_sw shr 1);
+   vid_vy:=my-(vid_sh shr 1);
    _view_bounds;
 end;
 
@@ -547,8 +553,11 @@ end;
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   vid_mwa:= vid_mw+vid_ab*2+vid_panel;
-   vid_mha:= vid_mh+vid_ab*2;
+   MaxTDecsS:=(vid_sw*vid_sh) div 11000;
+   setlength(_TDecs,MaxTDecsS);
+
+   vid_mwa:= vid_sw+vid_ab*2;
+   vid_mha:= vid_sh+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
    iy:=(map_seed2*5+ix) mod vid_mwa;
@@ -564,82 +573,147 @@ begin
    end;
 end;
 
-procedure calcVRV;
+procedure _vidvars;
 begin
-   vid_vmb_x1   := vid_mw-vid_vmb_x0;
-   vid_vmb_y1   := vid_mh-vid_vmb_y0;
-   vid_mwa      := vid_mw+vid_ab;
-   vid_mha      := vid_mh+vid_ab*2;
-   vid_uiuphx   := vid_panel+((vid_mw-vid_panel) div 2);
+   vid_vmb_x1   := vid_vw-vid_vmb_x0;
+   vid_vmb_y1   := vid_vh-vid_vmb_y0;
+
+   ui_textx     := vid_mapx+4;
+
+   ui_uiuphx   := vid_sw div 2;
+
+   ui_ingamecl:=(vid_sw-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
-      mv_x:=(vid_mw-spr_mback^.w) div 2;
-      mv_y:=(vid_mh-spr_mback^.h) div 2;
+      mv_x:=(vid_vw-spr_mback^.w) div 2;
+      mv_y:=(vid_vh-spr_mback^.h) div 2;
    end;
-   fog_vfw   :=((vid_mw-vid_panel) div fog_cw)+1;
-   fog_vfh   :=(vid_mh div fog_cw)+1;
+   fog_vfw   :=(vid_sw div fog_cw)+1;
+   fog_vfh   :=(vid_sh div fog_cw)+1;
 
-   map_mmvw    := trunc((vid_mw-vid_panel)*map_mmcx);
-   map_mmvh    := trunc( vid_mh*map_mmcx);
+   map_mmvw    := trunc(vid_sw*map_mmcx);
+   map_mmvh    := trunc(vid_sh*map_mmcx);
    _view_bounds;
-
-   MaxTDecsS:=(vid_mw*vid_mh) div 11000;
-   setlength(_TDecs,MaxTDecsS);
 
    Map_tdmake;
 end;
 
-procedure _makeScrSurf;
+procedure _ScreenSurfaces;
 const
   ui_ex              = 4;
   ui_ax              = ui_ex+ui_hwp+1;
   ystop              = vid_BW*14;
 var y:integer;
 begin
-   if(_uipanel<>nil)then sdl_freesurface(_uipanel);
-   _uipanel:=_createSurf(vid_panel+1,vid_mh);
+   if(r_uipanel<>nil)then sdl_freesurface(r_uipanel);
+   if(r_panel  <>nil)then sdl_freesurface(r_panel  );
 
-   if(spr_panel<>nil)then sdl_freesurface(spr_panel);
-   spr_panel:=_createSurf(vid_panel+1,vid_mh);
-
-   hlineColor(spr_panel,0,spr_panel^.w,0        ,c_white);
-   hlineColor(spr_panel,0,spr_panel^.w,vid_panel,c_white);
-   hlineColor(spr_panel,0,spr_panel^.w,vid_panel+ui_h3bw,c_white);
-   hlineColor(spr_panel,0,spr_panel^.w,vid_panel+vid_BW ,c_white);
-
-   vlineColor(spr_panel,0        ,0,vid_mh,c_white);
-   vlineColor(spr_panel,vid_panel,0,vid_mh,c_white);
-
-   vlineColor(spr_panel,ui_h3bw       ,vid_panel,vid_panel+ui_h3bw,c_white);
-   vlineColor(spr_panel,ui_hwp        ,vid_panel,vid_panel+ui_h3bw,c_white);
-   vlineColor(spr_panel,ui_hwp+ui_h3bw,vid_panel,vid_panel+ui_h3bw,c_white);
-
-   for y:=0 to 3 do vlineColor(spr_panel,y*vid_tBW,vid_panel+ui_h3bw,vid_panel+vid_BW,c_white);
-
-   vlineColor(spr_panel,vid_BW ,vid_panel+vid_BW,ystop,c_white);
-   vlineColor(spr_panel,vid_2BW,vid_panel+vid_BW,ystop,c_white);
-
-   characterColor(spr_panel,ui_ex-1,ui_iy,'E',c_aqua  );
-   characterColor(spr_panel,ui_ax-2,ui_iy,'A',c_orange);
-
-   y:=ui_bottomsy;
-   while (y<=ystop) do
+   if(vid_ppos<2)then // left-right
    begin
-      hlineColor(spr_panel,0,vid_panel,y,c_white);
-      inc(y,vid_BW);
+      vid_sw:=vid_vw-vid_panelw;
+      vid_sh:=vid_vh;
+
+      if(vid_ppos=0)
+      then vid_mapx:=vid_panelw
+      else vid_mapx:=0;
+      vid_mapy:=0;
+
+      if(vid_ppos=0)
+      then vid_panelx:=0
+      else vid_panelx:=vid_sw;
+      vid_panely:=0;
+
+      r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
+      r_panel  :=_createSurf(vid_panelw+1,vid_vh);
+
+      hlineColor(r_panel,0,r_panel^.w,0                 ,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw        ,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw+ui_h3bw,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw+vid_BW ,c_white);
+
+      vlineColor(r_panel,0             ,0         ,vid_vh            ,c_white);
+      vlineColor(r_panel,vid_panelw    ,0         ,vid_vh            ,c_white);
+
+      vlineColor(r_panel,ui_h3bw       ,vid_panelw,vid_panelw+ui_h3bw,c_white);
+      vlineColor(r_panel,ui_hwp        ,vid_panelw,vid_panelw+ui_h3bw,c_white);
+      vlineColor(r_panel,ui_hwp+ui_h3bw,vid_panelw,vid_panelw+ui_h3bw,c_white);
+
+      for y:=0 to 3 do
+       vlineColor(r_panel,y*vid_tBW,vid_panelw+ui_h3bw,vid_panelw+vid_BW,c_white);
+
+      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,ystop,c_white);
+      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,ystop,c_white);
+
+      characterColor(r_panel,ui_ex-1,ui_iy,'E',c_aqua  );
+      characterColor(r_panel,ui_ax-2,ui_iy,'A',c_orange);
+
+      y:=ui_bottomsy;
+      while (y<=ystop) do
+      begin
+         hlineColor(r_panel,0,vid_panelw,y,c_white);
+         inc(y,vid_BW);
+      end;
+   end
+   else
+   begin
+      vid_sw:=vid_vw;
+      vid_sh:=vid_vh-vid_panelw;
+
+      vid_mapx:=0;
+      if(vid_ppos=2)
+      then vid_mapy:=vid_panelw
+      else vid_mapy:=0;
+
+      vid_panelx:=0;
+      if(vid_ppos=2)
+      then vid_panely:=0
+      else vid_panely:=vid_sh;
+
+      r_uipanel:=_createSurf(vid_sw,vid_panelw+1);
+      r_panel  :=_createSurf(vid_sw,vid_panelw+1);
+
+      vlineColor(r_panel,0                 ,0,r_panel^.w,c_white);
+      vlineColor(r_panel,vid_panelw        ,0,r_panel^.w,c_white);
+      vlineColor(r_panel,vid_panelw+ui_h3bw,0,r_panel^.w,c_white);
+      vlineColor(r_panel,vid_panelw+vid_BW ,0,r_panel^.w,c_white);
+
+      hlineColor(r_panel,0         ,vid_vw            ,0             ,c_white);
+      hlineColor(r_panel,0         ,vid_vw            ,vid_panelw    ,c_white);
+
+      {hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_h3bw       ,c_white);
+      hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_hwp        ,c_white);
+      hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_hwp+ui_h3bw,c_white);  }
+
+      for y:=0 to 3 do
+      hlineColor(r_panel,vid_panelw+ui_h3bw,vid_panelw+vid_BW,y*vid_tBW,c_white);
+
+      hlineColor(r_panel,vid_panelw+vid_BW,ystop,vid_BW ,c_white);
+      hlineColor(r_panel,vid_panelw+vid_BW,ystop,vid_2BW,c_white);
+
+      y:=ui_bottomsy;
+      while (y<=ystop) do
+      begin
+         vlineColor(r_panel,y,vid_panelw,0,c_white);
+         inc(y,vid_BW);
+      end;
    end;
+
+   _draw_surf(r_uipanel,0,0,r_panel);
+
+   _vidvars;
 end;
 
 procedure _MakeScreen;
 begin
-   if (_screen<>nil) then sdl_freesurface(_screen);
+   if (r_screen<>nil) then sdl_freesurface(r_screen);
 
    if(_fscr)
-   then _screen:=SDL_SetVideoMode( vid_mw, vid_mh, vid_bpp, _vflags + SDL_FULLSCREEN)
-   else _screen:=SDL_SetVideoMode( vid_mw, vid_mh, vid_bpp, _vflags);
-   vid_ingamecl:=(vid_mw-vid_panel-font_w) div font_w;
+   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags + SDL_FULLSCREEN)
+   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags);
 
-   if(_screen=nil)then begin WriteError; exit; end;
+   if(r_screen=nil)then begin WriteError; exit; end;
+
+   _ScreenSurfaces;
 end;
 
 {$ELSE}

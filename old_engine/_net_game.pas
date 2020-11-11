@@ -350,7 +350,7 @@ begin
             _rpls_nwrch:=true;
          end;
          net_chatls[HPlayer]:=i;
-         net_readchat;
+         net_readchat(HPlayer);
          net_chat_shlm:=chat_shlm_t;
       end;
 
@@ -421,12 +421,12 @@ begin
          net_writebyte  (PlayerRace);
          net_writebool  (PlayerReady);
          net_writebyte  (net_chatls[HPlayer]);
-         net_writebyte  (_pnua[net_pnui]);
+         net_writebyte  (_cl_pnua[net_pnui]);
       end
       else
       begin
          net_writebyte(nmid_clinf);
-         net_writebyte(_pnua[net_pnui]);
+         net_writebyte(_cl_pnua[net_pnui]);
          net_writebyte(net_chatls[HPlayer]);
       end;
       net_send(net_cl_svip,net_cl_svport);

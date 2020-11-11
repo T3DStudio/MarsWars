@@ -78,14 +78,14 @@ end;
 
 procedure LoadingScreen;
 begin
-   SDL_FillRect(_screen,nil,0);
-   stringColor(_screen,(vid_mw div 2)-40, vid_mh div 2,@str_loading[1],c_yellow);
-   SDL_FLIP(_screen);
+   SDL_FillRect(r_screen,nil,0);
+   stringColor(r_screen,(vid_vw div 2)-40, vid_vh div 2,@str_loading[1],c_yellow);
+   SDL_FLIP(r_screen);
 end;
 
 
 
-procedure D_timer(x,y:integer;time:cardinal;ta:byte;str:string);
+procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string);
 var m,s,h:cardinal;
     hs,ms,ss:string;
 begin
@@ -102,7 +102,7 @@ begin
    if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
    str:=str+ms+':'+ss;
-   _draw_text(_screen,x,y,str,ta,255,c_white);
+   _draw_text(tar,x,y,str,ta,255,c_white);
 end;
 
 procedure ui_addalrm(aax,aay:integer;aab:boolean);

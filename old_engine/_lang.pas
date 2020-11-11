@@ -231,6 +231,11 @@ begin
    str_all               := 'All';
    str_uprod             := 'Produced by: ';
    str_bprod             := 'Constructed by: ';
+   str_panelpos          := 'Control panel position';
+   str_panelposp[0]      := #18+'Left' +#25;
+   str_panelposp[1]      := #16+'Right'+#25;
+   str_panelposp[2]      := #17+'Up'   +#25;
+   str_panelposp[3]      := #19+'Down' +#25;
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;
@@ -265,22 +270,22 @@ begin
    str_npnua[9]          := #19+'x10';
 
    str_cmpd[0]           := #20+'I`m too young to die'+#25;
-   str_cmpd[1]           := #19+'Hey, not too rough'+#25;
-   str_cmpd[2]           := #18+'Hurt me plenty'+#25;
-   str_cmpd[3]           := #17+'Ultra-Violence'+#25;
-   str_cmpd[4]           := #16+'Unholy massacre'+#25;
-   str_cmpd[5]           := #15+'Nightmare'+#25;
-   str_cmpd[6]           := #14+'HELL'+#25;
+   str_cmpd[1]           := #19+'Hey, not too rough'  +#25;
+   str_cmpd[2]           := #18+'Hurt me plenty'      +#25;
+   str_cmpd[3]           := #17+'Ultra-Violence'      +#25;
+   str_cmpd[4]           := #16+'Unholy massacre'     +#25;
+   str_cmpd[5]           := #15+'Nightmare'           +#25;
+   str_cmpd[6]           := #14+'HELL'                +#25;
 
    str_gmodet            := 'Game mode:';
-   str_gmode[gm_scir ]   := #18+'Skirmish'+#25;
-   str_gmode[gm_2fort]   := #16+'Two bases'+#25;
+   str_gmode[gm_scir ]   := #18+'Skirmish'   +#25;
+   str_gmode[gm_2fort]   := #16+'Two bases'  +#25;
    str_gmode[gm_3fort]   := #17+'Three bases'+#25;
    str_gmode[gm_ct   ]   := #19+'Capturing points'+#25;
-   str_gmode[gm_inv  ]   := #20+'Invasion'+#25;
-   str_gmode[gm_coop ]   := #15+'Assault'+#25;
+   str_gmode[gm_inv  ]   := #20+'Invasion'   +#25;
+   str_gmode[gm_coop ]   := #15+'Assault'    +#25;
 
-   str_addon[false]      := #16+'UDOOM'+#25;
+   str_addon[false]      := #16+'UDOOM' +#25;
    str_addon[true ]      := #18+'DOOM 2'+#25;
 
    str_team              := 'Team:';
@@ -368,7 +373,7 @@ begin
    _mkHStrUpid(r_hell,upgr_b478tel ,'Short distance teleportation'   ,'Hell Symbols, Towers and Totems can teleport to short distance.' );
    _mkHStrUpid(r_hell,upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
    _mkHStrUpid(r_hell,upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
-
+   _mkHStrUpid(r_hell,upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown.'                                     );
 
    _mkHStrUid(UID_UCommandCenter  ,'UAC Command Center'         ,'Builds base.'                    );
    _mkHStrUid(UID_UMilitaryUnit   ,'UAC Military unit'          ,'Trains units.'                   );
@@ -422,6 +427,7 @@ begin
    _mkHStrUpid(r_uac ,upgr_turarm  ,'Turrets armor'          ,'Additional armor for turrets.'                    );
    _mkHStrUpid(r_uac ,upgr_rturrets,'Rocket turrets'         ,'Turrets can upgrade to Rocket turrets.'           );
    _mkHStrUpid(r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for Command Center.'            );
+   _mkHStrUpid(r_uac ,upgr_9bld    ,'Nuclear Plant upgrade'  ,'Decrease Nuclear Plant cooldown.'                 );
 
    t:='ignore enemies';
    _mkHStrXY(3,0 ,0,0,'Move, '+t+' ('      +#18+'Q'+#25+')');
@@ -643,6 +649,11 @@ begin
   str_all               := 'Все';
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
+  str_panelpos          := 'Положение игровой панели';
+  str_panelposp[0]      := #18+'Слева' +#25;
+  str_panelposp[1]      := #16+'Справа'+#25;
+  str_panelposp[2]      := #17+'Вверху'+#25;
+  str_panelposp[3]      := #19+'Внизу' +#25;
 
   str_starta            := 'Начальная база:';
   str_startat[0]        := '1 '+#19+'строитель'+#25;

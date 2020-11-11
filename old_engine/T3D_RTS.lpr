@@ -38,6 +38,7 @@ uses SysUtils, SDL, SDL_Net
         {$include _draw_com.pas}
         {$include _draw_menu.pas}
         {$include _draw_ui.pas}
+        {$include _draw_game.pas}
         {$include _draw.pas}
         {$include _effects.pas}
         {$include _loadgfx.pas}

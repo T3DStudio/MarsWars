@@ -160,8 +160,8 @@ begin
            end;
 
         if(draw)then
-        if((vid_vx+vid_panel-spr^.hw)<x)and(x<(vid_vx+vid_mw+spr^.hw))and
-          ((vid_vy-spr^.hh)          <y)and(y<(vid_vy+vid_mh+spr^.hh))then
+        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_sw+spr^.hw))and
+          ((vid_vy-spr^.hh)<y)and(y<(vid_vy+vid_sh+spr^.hh))then
           _sl_add_eff(x,y,d,msk,spr,alpha);
      end;
 end;

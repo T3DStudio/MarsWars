@@ -345,7 +345,7 @@ begin
    FillChar(net_chatls,sizeof(net_chatls),0 );
 end;
 
-procedure net_readchat;
+procedure net_readchat(p:byte);
 var i:byte;
 begin
    for i:=0 to MaxNetChat do net_chat[HPlayer,i]:=net_readstring;

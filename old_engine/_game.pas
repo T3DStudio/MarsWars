@@ -134,7 +134,7 @@ begin
    _fsttime:=false;
    _warpten:=false;
 
-   vid_vx:=-vid_panel;
+   vid_vx:=-vid_panelw;
    vid_vy:=0;
    _view_bounds;
 
@@ -184,7 +184,7 @@ begin
     if(state=PS_Comp)then
      begin
         inc(ai_skill,1);
-        if(ai_skill>7)then ai_skill:=1;
+        if(ai_skill>8)then ai_skill:=1;
         name:=ai_name(ai_skill);
      end;
 end;
@@ -312,8 +312,8 @@ begin
        else _CMPMap;
        vid_rtui:=2;
        _makeMMB;
-       sdl_FillRect(_minimap,nil,0);
-       D_ui;
+       sdl_FillRect(r_minimap,nil,0);
+       //D_ui;
     end;
 end;
 

@@ -7,12 +7,12 @@ begin
 
    if SDL_Init(SDL_INIT_VIDEO)<>0 then begin WriteError; exit; end;
 
+   NEW(_rect);
+
    SDL_putenv('SDL_VIDEO_WINDOW_POS');
    SDL_putenv('SDL_VIDEO_CENTERED=1');
 
-   calcVRV;
    SDL_WM_SetCaption(@str_wcaption[1], nil );
-   _MakeScreen;
 
    c_dred    :=rgba2c(190,  0,  0,255);
    c_red     :=rgba2c(255,  0,  0,255);
@@ -38,9 +38,17 @@ begin
    c_ablack  :=rgba2c(0  ,  0,  0,128);
    c_lava    :=rgba2c(222,80 ,  0,255);
 
+   _MakeScreen;
+
    InitVideo:=true;
 
    LoadingScreen;
+
+   SDL_ShowCursor(0);
+   SDL_enableUNICODE(1);
+
+   LoadGraphics;
+   _cmp_initmap;
 end;
 
 procedure StartParams;
@@ -89,16 +97,9 @@ begin
    lng_eng;
    cfg_read;
 
-   NEW(_rect);
-
    if not(InitVideo) then exit;
    if not(InitSound) then exit;
 
-   SDL_ShowCursor(0);
-   SDL_enableUNICODE(1);
-
-   LoadGraphics;
-   _cmp_initmap;
    {$ENDIF}
 
    NEW(_event);
