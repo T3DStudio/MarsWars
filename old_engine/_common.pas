@@ -448,14 +448,11 @@ begin
    if(player<=MaxPlayers)then
    case vid_plcolors of
    0: p_color:=PlayerColor[player];
-   1: if(player=HPlayer)
-      then p_color:=c_lime
-      else
-        if(_players[HPlayer].team=_players[player].team)
-        then p_color:=c_yellow
-        else p_color:=c_red;
-   2: if(player=HPlayer)
-      then p_color:=c_white
+   1,
+   2: if(player=HPlayer)then
+        if(vid_plcolors=1)
+        then p_color:=c_lime
+        else p_color:=c_white
       else
         if(_PickPTeam(g_mode,HPlayer)=_PickPTeam(g_mode,player))
         then p_color:=c_yellow

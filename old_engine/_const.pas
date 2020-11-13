@@ -640,8 +640,6 @@ k_kbdig                : set of Char = ['0'..'9'];
 k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
 
-//_net_pnua              : array[0..4] of byte = (50,100,150,200,250);
-
 LiquidAnim             = 4;
 
 crater_ri              = 4;

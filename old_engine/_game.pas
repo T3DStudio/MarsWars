@@ -70,7 +70,7 @@ begin
       name :=PlayerName;
    end;
 
-   PlayerColor[0]:=c_white;
+   PlayerColor[0]:=c_purple;
    PlayerColor[1]:=c_red;
    PlayerColor[2]:=c_orange;
    PlayerColor[3]:=c_yellow;
@@ -306,7 +306,6 @@ begin
        else _CMPMap;
        vid_rtui:=2;
        _makeMMB;
-       sdl_FillRect(r_minimap,nil,0);
        d_Panel(r_uipanel);
     end;
 end;

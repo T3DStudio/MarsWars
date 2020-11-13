@@ -197,7 +197,6 @@ begin
       14 : begin
               inc(vid_plcolors,1);
               vid_plcolors:=vid_plcolors mod 5;
-              _makeMMB;
            end;
 
       // video
@@ -344,7 +343,7 @@ begin
               inc(g_startb,1);
               g_startb:=g_startb mod 6;
            end;
-      78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; _makeMMB; end;
+      78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; end;
       79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 

@@ -474,6 +474,7 @@ procedure D_Menu;
 begin
    if(vid_mredraw)then
    begin
+      _makeMMB;
       d_updmenu(r_menu);
       vid_mredraw:=false;
    end;

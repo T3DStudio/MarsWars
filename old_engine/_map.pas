@@ -23,59 +23,6 @@ begin
      end;
 end;
 
-procedure _bmm_draw(sd:TSob);
-var d:integer;
-begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t in sd)then
-      if(mmr>0)
-      then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor(r_bminimap,mmx,mmy,mmc);
-end;
-
-procedure map_bminimap;
-begin
-   sdl_FillRect(r_bminimap,nil,0);
-   _bmm_draw(dids_liquids);
-   _bmm_draw([DID_other,DID_srock,DID_brock]);
-end;
-
-procedure map_dstarts;
-const start_char : char = '+';
-var i  :byte;
-    x,y:integer;
-    c  :cardinal;
-begin
-   for i:=0 to MaxPlayers do
-   begin
-      if(g_mode=gm_inv)and(i=0)then continue;
-
-      x:=trunc(map_psx[i]*map_mmcx);
-      y:=trunc(map_psy[i]*map_mmcx);
-
-      c:=p_color(i);
-
-      characterColor(r_minimap,x-3,y-3,start_char,c);
-         circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
-
-      if(g_mode=gm_ct)and(i>0)then
-       with g_ct_pl[i] do
-        filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
-   end;
-end;
-
-procedure _makeMMB;
-begin
-   sdl_FillRect(r_minimap,nil,0);
-   map_bminimap;
-   _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_shpos)or(g_mode in [gm_inv,gm_2fort,gm_3fort,gm_coop])then map_dstarts;
-   _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
-   rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
-   vid_mredraw:=true;
-end;
-
 procedure _dds_spr;
 var d:integer;
 begin

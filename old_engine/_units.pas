@@ -417,7 +417,8 @@ begin
               if(buff[ub_invis ]>0 )then inv:=128;
               if(buff[ub_invuln]>10)then mc:=c_awhite;
 
-              if(g_mode in [gm_inv,gm_coop])and(playern=0)and(isbuild=false)then mc:=c_ablack;
+              if(playern=0)and(isbuild=false)then
+               if(g_mode in [gm_inv,gm_coop])then mc:=c_ablack;
 
               dp:=_udpth(pu);
 
@@ -431,10 +432,11 @@ begin
                      if(uid<>UID_URTurret)and(rld_t>rld_a)then t:=t+8;
                      case uid of
                      UID_UTurret,
-                     UID_UPTurret: _sl_add(vx-spr_tur [t].hw, smy-spr^.hh,dp,0,0,0,false,spr_tur [t].surf,inv,0,0,0,0,'',0);
-                     UID_URTurret: with spr_rtur[t] do _sl_add(vx-hw, smy-spr^.hh-hh,dp,0,0,0,false,surf,inv,0,0,0,0,'',0);
+                     UID_UPTurret: _sl_add_eff(vx,smy,dp,0,@spr_tur [t],inv);
+                     UID_URTurret: _sl_add_eff(vx,smy,dp,0,@spr_rtur[t],inv);
                      end;
                   end;
+
                   if(playern=HPlayer)then
                   begin
                      for t:=0 to MaxUnitProds do
