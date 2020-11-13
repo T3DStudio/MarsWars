@@ -1,5 +1,14 @@
 
 
+procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
+begin
+   _rect^.x:=x;
+   _rect^.y:=y;
+   _rect^.w:=sur^.w;
+   _rect^.h:=sur^.h;
+   SDL_BLITSURFACE(sur,nil,tar,_rect);
+end;
+
 
 procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:string;al,chrs:byte;tc:cardinal);
 var ss,i,o:byte;
@@ -30,7 +39,7 @@ begin
          c:=s[i];
 
          case c of
-         #0..#6  : begin cl:=plcolor[ord(c)];if(i<ss)then continue;end; //tc:=cl;
+         #0..#6  : begin cl:=p_color(ord(c));if(i<ss)then continue;end; //tc:=cl;
          #11..#13: ;
          #14     : begin cl:=c_purple       ;if(i<ss)then continue;end;
          #15     : begin cl:=c_red          ;if(i<ss)then continue;end;
@@ -83,7 +92,14 @@ begin
    SDL_FLIP(r_screen);
 end;
 
-
+procedure _unit_minimap(pu:PTUnit);
+begin
+  if(vid_rtui=0)and(_menu=false)and(_draw)then
+   with pu^ do
+    if(isbuild)
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(playern))
+    else pixelColor       (r_minimap,mmx,mmy,    p_color(playern));
+end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string);
 var m,s,h:cardinal;

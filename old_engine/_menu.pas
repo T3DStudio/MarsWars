@@ -176,7 +176,7 @@ begin
 
       // game settings
       6  : ;
-      7  : ;
+      7  : begin inc(vid_uhbars,1);vid_uhbars:=vid_uhbars mod 3; end;
       8  : m_a_inv:=not m_a_inv;
       9  : if(ui_menu_ssr_x2>=m_vx)
            then vid_vmspd:=0
@@ -193,6 +193,11 @@ begin
               _ScreenSurfaces;
               map_ptrt:=255;
               MakeTerrain;
+           end;
+      14 : begin
+              inc(vid_plcolors,1);
+              vid_plcolors:=vid_plcolors mod 5;
+              _makeMMB;
            end;
 
       // video
@@ -211,7 +216,8 @@ begin
               else
               begin
                  case m_vry of
-                 vid_minh : m_vry:=720;
+                 vid_minh : m_vry:=680;
+                 680      : m_vry:=720;
                  720      : m_vry:=vid_maxh;
                  else       m_vry:=vid_minh;
                  end;
@@ -435,7 +441,6 @@ begin
               _cmp_sel:=_cmp_sm+((m_vy-ui_menu_csm_y0) div ui_menu_csm_ys)-2;
               if(_cmp_sel>=MaxMissions)then _cmp_sel:=MaxMissions-1;
            end;
-
       else
 
       end;

@@ -9,7 +9,7 @@ begin
 
    _draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
 
-   d_uimouse(r_screen,vid_mapx,vid_mapy);
+   d_uimouse(r_screen);
 
    if(_testmode>1)and(net_nstat=0)then _draw_dbg;
 end;

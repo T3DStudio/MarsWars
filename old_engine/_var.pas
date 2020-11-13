@@ -156,7 +156,7 @@ PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
 PlayerRace        : byte = 0;
 
-plcolor           : array[0..MaxPlayers] of cardinal;
+PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
@@ -168,7 +168,6 @@ vid_vmb_x1        : integer = 794;
 vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0; //vid_mw+vid_ab;
 vid_mha           : integer = 0; //vid_mh+vid_ab*2;
-
 
 vid_terrain       : pSDL_SURFACE;
 vid_rtui          : byte = 0;
@@ -244,6 +243,8 @@ vid_vy            : integer = 0;
 vid_vmspd         : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
+vid_uhbars        : byte = 0;
+vid_plcolors      : byte = 0;
 vid_vmm           : boolean = false;
 vid_ppos          : byte = 0;
 vid_panelx        : integer = 0;
@@ -260,7 +261,7 @@ fog_vfw           : byte = 0;
 fog_vfh           : byte = 0;
 _fog              : boolean = true;
 _fcx              : array[0..MFogM,0..MFogM] of byte;
-fog_surf          : array[false..true] of pSDL_Surface;
+fog_surf          : pSDL_Surface;
 vid_fsx           : integer = 0;
 vid_fsy           : integer = 0;
 vid_fex           : integer = 0;
@@ -283,7 +284,7 @@ m_ldblclk,
 m_sbuildc         : cardinal;
 m_sbuild          : integer;
 m_bx,
-m_by              : byte;
+m_by              : integer;
 m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 
@@ -319,9 +320,17 @@ ui_msk            : byte = 0;
 ui_msks           : shortint = 0;
 ui_orderu         : array[0..9,false..true] of TSob;
 ui_rad_rld        : array[false..true] of cardinal;
+
 ui_uiuphx         : integer = 0;
 ui_ingamecl       : byte = 0;
-ui_textx          : integer = 0;
+ui_textx          : integer = 0;  // timer/chat screen X
+ui_texty          : integer = 0;  // timer/chat screen Y
+ui_hinty          : integer = 0;  // hints screen Y
+ui_chaty          : integer = 0;  // chat screen Y
+ui_oicox          : integer = 0;  // order icons screen X
+ui_iy             : integer = 0;
+ui_energx         : integer = 0;
+ui_armyx          : integer = 0;
 
 k_dbl,
 k_l,
@@ -536,8 +545,13 @@ spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 
 /// text
 
+
+str_pcolors       : array[0..4] of shortstring;
+str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
 str_panelpos,
+str_uhbar,
+str_pcolor,
 str_all,
 str_orders,
 str_req,

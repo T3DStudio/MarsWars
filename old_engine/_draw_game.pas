@@ -154,15 +154,6 @@ begin
 
        dec(vid_vsls,1);
     end;
-
-   if(ui_mc_a>0)then
-   begin
-      sx:=ui_mc_a;
-      sy:=sx shr 1;
-      ellipseColor(tar,ui_mc_x-vid_vx,ui_mc_y-vid_vy,sx,sy,ui_mc_c);
-
-      dec(ui_mc_a,1);
-   end;
 end;
 
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
@@ -224,8 +215,7 @@ begin
          if(_fog)then
          begin
             case fog_grid[cx,cy] of
-               0 : _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, fog_surf[true ]);
-               1 : _draw_surf(tar,ssx-fog_cxr, ssy-fog_cxr, fog_surf[false]);
+               0 : _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, fog_surf);
             else
             end;
             fog_grid[cx,cy]:=0;
@@ -241,7 +231,7 @@ begin
     for cx:=1 to MaxPlayers do
      with g_ct_pl[cx] do
      begin
-        circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,plcolor[pl]);
+        circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,p_color(pl));
         //if(_testmode)then _draw_text(r_screen,px-vid_vx,py-vid_vy,i2s(ct) , ta_left,255, plcolor[pl]);
      end;
 
@@ -269,6 +259,7 @@ end;
 
 procedure _draw_dbg;
 var u,ix,iy:integer;
+    c:cardinal;
 begin
    //_draw_text(r_screen,750,0,i2s(m_mx)+' '+i2s(m_my) , ta_right,255, c_white);
    //_draw_text(r_screen,750,0,i2s(spr_tdecsi), ta_right,255, c_white);
@@ -287,16 +278,18 @@ begin
     begin
        ix:=170+89*u;
 
-       _draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, plcolor[u]);
+       c:=p_color(u);
 
-       _draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, plcolor[u]);
+       _draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
 
-       _draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, plcolor[u]);
-       _draw_text(r_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, plcolor[u]);
+       _draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
+
+       _draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
+       _draw_text(r_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, c);
 
 
-       for iy:=0 to 8  do _draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[iy]), ta_left,255, plcolor[u]);
-       for iy:=0 to 11 do _draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, plcolor[u]);
+       for iy:=0 to 8  do _draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[iy]), ta_left,255, c);
+       for iy:=0 to 11 do _draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
     end;
 
    if(k_ctrl>2)then
@@ -318,7 +311,7 @@ begin
         begin
            circleColor(r_screen,ix,iy,r,c_gray);
            circleColor(r_screen,ix,iy,sr,c_gray);
-           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[playern]);
+           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(playern));
         end;
 
         if(hits>0)and(inapc=0)then
@@ -338,7 +331,7 @@ begin
             lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, plcolor[playern]);
+        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, p_color(playern));
 
         if(inapc>0)then continue;
 

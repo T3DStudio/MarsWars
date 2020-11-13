@@ -115,15 +115,6 @@ begin
    end;
 end;
 
-procedure _unit_minimap(pu:PTUnit);
-begin
-  if(vid_rtui=0)and(_menu=false)and(_draw)then
-   with pu^ do
-    if(isbuild)
-    then filledCircleColor(r_minimap,mmx,mmy,mmr,plcolor[playern])
-    else pixelColor       (r_minimap,mmx,mmy,    plcolor[playern]);
-end;
-
 procedure _sf(tx,ty:integer);
 begin
    if(0<=tx)and(0<=ty)and(tx<=fog_vfw)and(ty<=fog_vfh)then fog_grid[tx,ty]:=2;

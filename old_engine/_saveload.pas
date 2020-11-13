@@ -155,7 +155,7 @@ _effects
 map_dds
 vid_vx
 vid_vy
-plcolor
+PlayerColor
 G_Step
 vid_rtui
 m_sbuild
@@ -207,7 +207,7 @@ begin
    BlockWrite(f,map_dds    ,SizeOf(map_dds  ));
    BlockWrite(f,vid_vx     ,SizeOf(vid_vx   ));
    BlockWrite(f,vid_vy     ,SizeOf(vid_vy   ));
-   BlockWrite(f,plcolor    ,SizeOf(plcolor  ));
+   BlockWrite(f,PlayerColor,SizeOf(PlayerColor));
    BlockWrite(f,G_Step     ,SizeOf(G_Step   ));
    BlockWrite(f,vid_rtui   ,SizeOf(vid_rtui ));
    BlockWrite(f,m_sbuild   ,SizeOf(m_sbuild ));
@@ -277,7 +277,7 @@ begin
          BlockRead(f,map_dds    ,SizeOf(map_dds  ));
          BlockRead(f,vid_vx     ,SizeOf(vid_vx   ));
          BlockRead(f,vid_vy     ,SizeOf(vid_vy   ));
-         BlockRead(f,plcolor    ,SizeOf(plcolor  ));
+         BlockRead(f,PlayerColor,SizeOf(PlayerColor));
          BlockRead(f,G_Step     ,SizeOf(G_Step   ));
          BlockRead(f,vid_rtui   ,SizeOf(vid_rtui ));
          BlockRead(f,m_sbuild   ,SizeOf(m_sbuild ));

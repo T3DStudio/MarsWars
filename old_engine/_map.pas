@@ -54,10 +54,10 @@ begin
       x:=trunc(map_psx[i]*map_mmcx);
       y:=trunc(map_psy[i]*map_mmcx);
 
-      c:=plcolor[i];
+      c:=p_color(i);
 
       characterColor(r_minimap,x-3,y-3,start_char,c);
-      circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
+         circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
 
       if(g_mode=gm_ct)and(i>0)then
        with g_ct_pl[i] do

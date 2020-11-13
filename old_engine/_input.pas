@@ -97,6 +97,8 @@ begin
 
       if(oid=uo_move)and(su>0)then
       begin
+         inc(ox0,vid_mapx);
+         inc(oy0,vid_mapy);
          if(cmsnd)then _unit_comssnd(i,_players[HPlayer].race);
          if(oy1>0)then
          begin
@@ -507,18 +509,26 @@ end;
 procedure g_mouse;
 var u:integer;
 begin
-   m_mx :=m_vx+vid_vx;
-   m_my :=m_vy+vid_vy;
-   m_bx :=m_vx div vid_BW;
-   m_by :=m_vy div vid_BW;
+   m_mx :=m_vx+vid_vx-vid_mapx;
+   m_my :=m_vy+vid_vy-vid_mapy;
+   if(vid_ppos<2)then
+   begin
+      u:=m_vx-vid_panelx;m_bx :=u div vid_BW;if(u<0)then dec(m_bx,1);
+      u:=m_vy-vid_panely;m_by :=u div vid_BW;if(u<0)then dec(m_by,1);
+   end
+   else
+   begin
+      u:=m_vy-vid_panely;m_bx :=u div vid_BW;if(u<0)then dec(m_bx,1);
+      u:=m_vx-vid_panelx;m_by :=u div vid_BW;if(u<0)then dec(m_by,1);
+   end;
 
    if(m_ldblclk>0)then dec(m_ldblclk,1);
 
    _chkbld;
 
-   {if(k_ml=2)then                    // left button
+   if(k_ml=2)then                    // left button
    begin
-      if(vid_panelw<=m_vx)then        // map
+      if(m_bx<0)or(3<=m_bx)then        // map
       begin
          case m_sbuild of
 255    : begin
@@ -528,7 +538,6 @@ begin
 0.._uts: if(m_sbuildc=c_lime)then
          begin
             _player_s_o(m_mx,m_my,m_sbuild,0, uo_build  ,HPlayer);
-            //m_sbuild:=255;
             _chkbld;
          end;
 -1,-2,
@@ -536,11 +545,11 @@ begin
          end;
       end
       else
-        if(vid_panelw>=m_vy)then      // minimap
+        if(m_by<3)then      // minimap
         begin
            case m_sbuild of
            -1,-2,
-           -3,-4  : _command(trunc(m_vx/map_mmcx),trunc(m_vy/map_mmcx));
+           -3,-4  : _command(trunc((m_vx-vid_mapx)/map_mmcx),trunc((m_vy-vid_mapy)/map_mmcx));
            else     if(_rpls_vidm=false)then ui_panelmmm:=true;
            end;
         end
@@ -557,7 +566,14 @@ begin
            else
             if(m_by=3)then //tabs
             begin
-               if(m_bx<3)and(m_vy>ui_tabsy)then ui_tab:=m_vx div vid_tBW;
+               dec(m_vx,vid_panelx);
+               dec(m_vy,vid_panely);
+               case vid_ppos of
+               0,1: if(m_vy>ui_tabsy)then ui_tab:=m_vx div vid_tBW;
+               2,3: if(m_vx>ui_tabsy)then ui_tab:=m_vy div vid_tBW;
+               end;
+               inc(m_vx,vid_panelx);
+               inc(m_vy,vid_panely);
             end
             else
                with _players[HPlayer] do
@@ -594,15 +610,14 @@ begin
                         0: _fog:=not _fog;
                         1: ;
                         end;
-                     8 :begin
-                           if(m_bx=0)then _fsttime:=not _fsttime;
-                           if(m_bx=1)then _rpls_step:=vid_hfps*2;
-                           if(m_bx=2)then
-                            if(_rpls_rst<rpl_end)then
-                             if(G_Paused>0)
-                             then G_Paused:=0
-                             else G_Paused:=200;
-                        end;
+                     8 : case m_bx of
+                           0: _fsttime:=not _fsttime;
+                           1: _rpls_step:=vid_hfps*2;
+                           2: if(_rpls_rst<rpl_end)then
+                               if(G_Paused>0)
+                               then G_Paused:=0
+                               else G_Paused:=200;
+                         end;
                      9 : case m_bx of
                            0: _rpls_vidm:=not _rpls_vidm;
                            1: _rpls_log :=not _rpls_log;
@@ -671,25 +686,24 @@ begin
    end;
 
    if(ui_panelmmm)and(m_sxs=-1)then
-    if(vid_panelw>=m_vx)and(vid_panelw>=m_vy)then
-    begin
-       _moveHumView(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx));
-       _view_bounds;
-    end;
+   begin
+      _moveHumView(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx));
+      _view_bounds;
+   end;
 
    if(k_mr=2)then  // right button
    begin
       if(m_sbuild<>255)
       then m_sbuild:=255
       else
-       if(vid_panelw<m_vx) then   // map
+       if(m_bx<0)or(3<=m_bx)then        // map
        begin
           _player_s_o(m_mx,m_my,byte(false=m_a_inv),_whoInPoint(m_mx,m_my,0),uo_move,HPlayer);
        end
        else
-         if (vid_panelw>m_vy) then  // mini-map
+         if(m_by<3)then      // minimap
          begin
-            _player_s_o(trunc(m_vx/map_mmcx), trunc(m_vy/map_mmcx),byte(false=m_a_inv),0,uo_move,HPlayer);
+            _player_s_o(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx),byte(false=m_a_inv),0,uo_move,HPlayer);
          end
          else
          begin// panel
@@ -727,7 +741,7 @@ begin
                 end;
             end;
          end;
-   end;  }
+   end;
 end;
 
 procedure _move_v_m;

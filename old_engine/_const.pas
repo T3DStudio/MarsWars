@@ -482,6 +482,7 @@ vid_BW                 = 44;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;
 vid_tBW                = vid_panelw div 4;
+vid_thBW               = vid_tBW div 2;
 vid_2tBW               = vid_tBW*2;
 //vid_3tBW               = vid_panel div 4;
 vid_hBW                = vid_BW div 2;
@@ -492,14 +493,11 @@ vid_oips               = 2*vid_oiw+vid_oisw;
 vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
-
-ui_h3bw                = vid_BW-vid_tBW;
 ui_bottomsy            = vid_BW*4;
-ui_tabsy               = vid_panelw+ui_h3bw;
+ui_h3bw                = vid_BW-vid_tBW;
 ui_hwp                 = vid_panelw div 2;
-ui_iy                  = vid_panelw+3;
-ui_energx              = (ui_hwp+ui_h3bw) div 2;
-ui_armyx               = (ui_hwp+ui_h3bw+vid_panelw) div 2;
+
+ui_tabsy               = vid_panelw+ui_h3bw;
 
 ui_menu_map_zx0        = 76;
 ui_menu_map_zy0        = 110;
@@ -593,8 +591,8 @@ fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_cxr                = fog_cr-fog_chw;
-fog_vfwm               = ((vid_maxw-vid_panelw) div fog_cw)+1;
-fog_vfhm               = (vid_maxh div fog_cw)+1;
+fog_vfwm               = (vid_maxw div fog_cw)+2;
+fog_vfhm               = (vid_maxh div fog_cw)+2;
 
 ta_left                = 0;
 ta_middle              = 1;

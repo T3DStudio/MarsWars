@@ -66,10 +66,6 @@ begin
       vlineColor(tar, ui_menu_pls_zxc, ui_menu_pls_zy0, ui_menu_pls_zy0+_yl(MaxPlayers),c_gray );
       vlineColor(tar, ui_menu_pls_zxe, ui_menu_pls_zy0, ui_menu_pls_zy0+_yl(MaxPlayers),c_gray );
 
-      //hlineColor(tar, ui_menu_pls_zxn, ui_menu_pls_zxe, ui_menu_pls_zy0+_yl(MaxPlayers),c_gray );
-
-
-
       for p:=1 to MaxPlayers do
        with _players[p] do
        begin
@@ -89,7 +85,7 @@ begin
              if G_Started or (net_nstat=ns_clnt) or ((net_nstat<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
              if(g_mode in [gm_2fort,gm_3fort,gm_inv,gm_coop])then c:=c_gray;
-             _draw_text(tar,ui_menu_pls_zxtt, u,b2s(_PickPTeam(p)), ta_middle, 255, c);
+             _draw_text(tar,ui_menu_pls_zxtt, u,b2s(_PickPTeam(g_mode,p)), ta_middle, 255, c);
              if((G_plstat and (1 shl p))=0)and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_gray);
           end
           else
@@ -97,9 +93,9 @@ begin
             begin
                _draw_text(tar,ui_menu_pls_zxnt, u,str_ps_comp+' '+b2s(G_aislots), ta_left, 255,c_gray);
                _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random], ta_middle,255, c_gray);
-               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(_PickPTeam(p)), ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(_PickPTeam(g_mode,p)), ta_middle,255, c_gray);
             end;
-          boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,plcolor[p]);
+          boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,p_color(p));
        end;
 
       rectangleColor(tar,ui_menu_pls_zxn,ui_menu_pls_zy0,ui_menu_pls_zxe,ui_menu_pls_zy1,c_white);
@@ -162,8 +158,12 @@ begin
                  t:=ui_menu_ssr_x3;
                  if(menu_s3=ms3_game)then
                  begin
+                    y:=_yt(3);
+                    _draw_text(tar,i,y, str_uhbar             , ta_left ,255,c_white);
+                    _draw_text(tar,t,y, str_uhbars[vid_uhbars], ta_right,255,c_white);
+
                     y:=_yt(4);
-                    _draw_text(tar,i,y, str_maction, ta_left,255,c_white);
+                    _draw_text(tar,i,y, str_maction          , ta_left ,255,c_white);
                     _draw_text(tar,t,y, str_maction2[m_a_inv], ta_right,255,c_white);
 
                     y:=_yt(5);
@@ -188,6 +188,10 @@ begin
                     y:=_yt(9);
                     _draw_text(tar,i ,y, str_panelpos           , ta_left ,255, c_white);
                     _draw_text(tar,t ,y, str_panelposp[vid_ppos], ta_right,255, c_white);
+
+                    y:=_yt(10);
+                    _draw_text(tar,i ,y, str_pcolor               , ta_left ,255, c_white);
+                    _draw_text(tar,t ,y, str_pcolors[vid_plcolors], ta_right,255, c_white);
                  end;
 
                  if(menu_s3=ms3_vido)then
@@ -440,7 +444,7 @@ begin
                        if(t=HPlayer)or(t=0)then continue;
 
                        if(net_chat_tar and (1 shl t))>0
-                       then c:=plcolor[t]
+                       then c:=p_color(t)
                        else c:=c_gray;
 
                        _draw_text(tar,i-ui_menu_csm_ys, y+6, '#'+b2s(t), ta_middle,255, c);

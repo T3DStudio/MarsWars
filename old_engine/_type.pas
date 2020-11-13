@@ -68,6 +68,7 @@ o_x1,o_y1  :integer;
    ai_flags: cardinal;
    ai_skill: byte;
 
+
    s_builders,
    s_barracks,
    s_smiths,

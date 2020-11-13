@@ -236,6 +236,16 @@ begin
    str_panelposp[1]      := #16+'Right'+#25;
    str_panelposp[2]      := #17+'Up'   +#25;
    str_panelposp[3]      := #19+'Down' +#25;
+   str_uhbar             := 'Health bars';
+   str_uhbars[0]         := #18+'selected'+#25+','+#15+'damaged'+#25;
+   str_uhbars[1]         := #19+'always'+#25;
+   str_uhbars[2]         := #16+'only '+#18+'selected'+#25;
+   str_pcolor            := 'Players colors';
+   str_pcolors[0]        := #22+'default'+#25;
+   str_pcolors[1]        := #18+'own '+#17+'ally '+#15+'enemy'+#25;
+   str_pcolors[2]        := #22+'own '+#17+'ally '+#15+'enemy'+#25;
+   str_pcolors[3]        := #14+'teams'+#25;
+   str_pcolors[4]        := #22+'own '+#14+'teams'+#25;
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;
@@ -608,8 +618,8 @@ begin
   str_fullscreen        := 'В окне:';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
-  str_maction2[true ]   := #18+'Движение'+#25;
-  str_maction2[false]   := #17+'Движение'+#25+'+'+#17+'атака'+#25;
+  str_maction2[true ]   := #18+'движение'+#25;
+  str_maction2[false]   := #17+'движ.'+#25+'+'+#15+'атака'+#25;
   str_race[r_random]    := #22+'случ.'+#25;
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
@@ -650,10 +660,20 @@ begin
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
   str_panelpos          := 'Положение игровой панели';
-  str_panelposp[0]      := #18+'Слева' +#25;
-  str_panelposp[1]      := #16+'Справа'+#25;
-  str_panelposp[2]      := #17+'Вверху'+#25;
-  str_panelposp[3]      := #19+'Внизу' +#25;
+  str_panelposp[0]      := #18+'слева' +#25;
+  str_panelposp[1]      := #16+'справа'+#25;
+  str_panelposp[2]      := #17+'вверху'+#25;
+  str_panelposp[3]      := #19+'внизу' +#25;
+  str_uhbar             := 'Полоски здоровья';
+  str_uhbars[0]         := #18+'выбранные'+#25+','+#15+'поврежд.'+#25;
+  str_uhbars[1]         := #19+'всегда'+#25;
+  str_uhbars[2]         := #16+'только '+#18+'выбранные'+#25;
+  str_pcolor            := 'Цвета игроков';
+  str_pcolors[0]        := #22+'по умолчанию'+#25;
+  str_pcolors[1]        := #18+'свои '+#17+'союзн. '+#15+'враги'+#25;
+  str_pcolors[2]        := #22+'свои '+#17+'союзн. '+#15+'враги'+#25;
+  str_pcolors[3]        := #14+'команды'+#25;
+  str_pcolors[4]        := #22+'свои '+#14+'команды'+#25;
 
   str_starta            := 'Начальная база:';
   str_startat[0]        := '1 '+#19+'строитель'+#25;

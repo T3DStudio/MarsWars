@@ -304,39 +304,31 @@ begin
 end;
 
 
-procedure GModeTeams(gm:byte);
+function _PickPTeam(gm,p:byte):byte;
 begin
-   case gm of
-     gm_2fort : begin
-                   _players[0].team:=0;
-                   _players[1].team:=1;
-                   _players[2].team:=1;
-                   _players[3].team:=1;
-                   _players[4].team:=2;
-                   _players[5].team:=2;
-                   _players[6].team:=2;
-                end;
-     gm_3fort : begin
-                   _players[0].team:=0;
-                   _players[1].team:=1;
-                   _players[2].team:=1;
-                   _players[3].team:=2;
-                   _players[4].team:=2;
-                   _players[5].team:=3;
-                   _players[6].team:=3;
-                end;
-     gm_coop,
-     gm_inv   : begin
-                   _players[0].team:=0;
-                   _players[1].team:=1;
-                   _players[2].team:=1;
-                   _players[3].team:=1;
-                   _players[4].team:=1;
-                   _players[5].team:=1;
-                   _players[6].team:=1;
-                end;
+   if(p=0)
+   then _PickPTeam:=0
    else
-   end;
+     case gm of
+     gm_2fort: case p of
+               1..3: _PickPTeam:=1;
+               4..6: _PickPTeam:=4;
+               end;
+     gm_3fort: case p of
+               1,2 : _PickPTeam:=2;
+               3,4 : _PickPTeam:=4;
+               5,6 : _PickPTeam:=6;
+               end;
+     gm_coop,
+     gm_inv  : _PickPTeam:=1;
+     else      _PickPTeam:=_players[p].team;
+     end;
+end;
+
+procedure GModeTeams(gm:byte);
+var i:byte;
+begin
+   for i:=0 to MaxPlayers do _players[i].team:=_PickPTeam(gm,i);
 end;
 
 function _plst(p:integer):char;
@@ -362,53 +354,8 @@ begin
    end;
 end;
 
-function _PickPTeam(p:byte):byte;
-begin
-   if(p=0)
-   then _PickPTeam:=0
-   else
-     case g_mode of
-     gm_2fort: _PickPTeam:=((p-1) div 3)+1;
-     gm_3fort: _PickPTeam:=((p-1) div 2)+1;
-     gm_coop,
-     gm_inv  : _PickPTeam:=1;
-     else _PickPTeam:=_players[p].team;
-     end;
-end;
 
 {$IFDEF _FULLGAME}
-
-function _createSurf(tw,th:integer):pSDL_Surface;
-var ts1,ts2:pSDL_Surface;
-begin
-   _createSurf:=nil;
-   ts1:=sdl_createRGBSurface(0,tw,th,vid_bpp,0,0,0,0);
-   if(ts1=nil)then
-   begin
-      WriteError;
-      HALT;
-   end
-   else
-   begin
-      ts2:=sdl_displayformat(ts1);
-      SDL_FreeSurface(ts1);
-      if(ts2=nil)then
-      begin
-         WriteError;
-         HALT;
-      end;
-      _createSurf:=ts2;
-   end;
-end;
-
-procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
-begin
-   _rect^.x:=x;
-   _rect^.y:=y;
-   _rect^.w:=sur^.w;
-   _rect^.h:=sur^.h;
-   SDL_BLITSURFACE(sur,nil,tar,_rect);
-end;
 
 procedure WriteLog(mess:shortstring);
 var f:Text;
@@ -495,6 +442,32 @@ begin
    rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
+function p_color(player:byte):cardinal;
+begin
+   p_color:=0;
+   if(player<=MaxPlayers)then
+   case vid_plcolors of
+   0: p_color:=PlayerColor[player];
+   1: if(player=HPlayer)
+      then p_color:=c_lime
+      else
+        if(_players[HPlayer].team=_players[player].team)
+        then p_color:=c_yellow
+        else p_color:=c_red;
+   2: if(player=HPlayer)
+      then p_color:=c_white
+      else
+        if(_PickPTeam(g_mode,HPlayer)=_PickPTeam(g_mode,player))
+        then p_color:=c_yellow
+        else p_color:=c_red;
+   3: p_color:=PlayerColor[_PickPTeam(g_mode,player)];
+   4: if(player=HPlayer)
+      then p_color:=c_white
+      else p_color:=PlayerColor[_PickPTeam(g_mode,player)];
+   else
+   end;
+end;
+
 procedure _view_bounds;
 begin
    if (vid_vx<0) then vid_vx:=0;
@@ -502,8 +475,8 @@ begin
    if ((vid_vx+vid_sw)>map_mw) then vid_vx:=map_mw-vid_sw;
    if ((vid_vy+vid_sh)>map_mw) then vid_vy:=map_mw-vid_sh;
 
-   vid_mmvx:=trunc(vid_vx*map_mmcx);
-   vid_mmvy:=trunc(vid_vy*map_mmcx);
+   vid_mmvx:=round(vid_vx*map_mmcx);
+   vid_mmvy:=round(vid_vy*map_mmcx);
    vid_fsx :=vid_vx div fog_cw;
    vid_fsy :=vid_vy div fog_cw;
    vid_fex :=vid_fsx+fog_vfw;
@@ -550,171 +523,7 @@ begin
     end;
 end;
 
-procedure Map_tdmake;
-var i,ix,iy,rn:integer;
-begin
-   MaxTDecsS:=(vid_sw*vid_sh) div 11000;
-   setlength(_TDecs,MaxTDecsS);
 
-   vid_mwa:= vid_sw+vid_ab*2;
-   vid_mha:= vid_sh+vid_ab*2;
-
-   ix:=longint(map_seed) mod vid_mwa;
-   iy:=(map_seed2*5+ix) mod vid_mwa;
-   rn:=ix*iy;
-   for i:=1 to MaxTDecsS do
-   with _TDecs[i-1] do
-   begin
-      inc(rn,17);
-      ix:=_genx(ix+rn,vid_mwa,false);
-      iy:=_genx(iy+sqr(ix*i),vid_mha,false);
-      x :=ix;
-      y :=iy;
-   end;
-end;
-
-procedure _vidvars;
-begin
-   vid_vmb_x1   := vid_vw-vid_vmb_x0;
-   vid_vmb_y1   := vid_vh-vid_vmb_y0;
-
-   ui_textx     := vid_mapx+4;
-
-   ui_uiuphx   := vid_sw div 2;
-
-   ui_ingamecl:=(vid_sw-font_w) div font_w;
-   if(spr_mback<>nil)then
-   begin
-      mv_x:=(vid_vw-spr_mback^.w) div 2;
-      mv_y:=(vid_vh-spr_mback^.h) div 2;
-   end;
-   fog_vfw   :=(vid_sw div fog_cw)+1;
-   fog_vfh   :=(vid_sh div fog_cw)+1;
-
-   map_mmvw    := trunc(vid_sw*map_mmcx);
-   map_mmvh    := trunc(vid_sh*map_mmcx);
-   _view_bounds;
-
-   Map_tdmake;
-end;
-
-procedure _ScreenSurfaces;
-const
-  ui_ex              = 4;
-  ui_ax              = ui_ex+ui_hwp+1;
-  ystop              = vid_BW*14;
-var y:integer;
-begin
-   if(r_uipanel<>nil)then sdl_freesurface(r_uipanel);
-   if(r_panel  <>nil)then sdl_freesurface(r_panel  );
-
-   if(vid_ppos<2)then // left-right
-   begin
-      vid_sw:=vid_vw-vid_panelw;
-      vid_sh:=vid_vh;
-
-      if(vid_ppos=0)
-      then vid_mapx:=vid_panelw
-      else vid_mapx:=0;
-      vid_mapy:=0;
-
-      if(vid_ppos=0)
-      then vid_panelx:=0
-      else vid_panelx:=vid_sw;
-      vid_panely:=0;
-
-      r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
-      r_panel  :=_createSurf(vid_panelw+1,vid_vh);
-
-      hlineColor(r_panel,0,r_panel^.w,0                 ,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw        ,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw+ui_h3bw,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw+vid_BW ,c_white);
-
-      vlineColor(r_panel,0             ,0         ,vid_vh            ,c_white);
-      vlineColor(r_panel,vid_panelw    ,0         ,vid_vh            ,c_white);
-
-      vlineColor(r_panel,ui_h3bw       ,vid_panelw,vid_panelw+ui_h3bw,c_white);
-      vlineColor(r_panel,ui_hwp        ,vid_panelw,vid_panelw+ui_h3bw,c_white);
-      vlineColor(r_panel,ui_hwp+ui_h3bw,vid_panelw,vid_panelw+ui_h3bw,c_white);
-
-      for y:=0 to 3 do
-       vlineColor(r_panel,y*vid_tBW,vid_panelw+ui_h3bw,vid_panelw+vid_BW,c_white);
-
-      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,ystop,c_white);
-      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,ystop,c_white);
-
-      characterColor(r_panel,ui_ex-1,ui_iy,'E',c_aqua  );
-      characterColor(r_panel,ui_ax-2,ui_iy,'A',c_orange);
-
-      y:=ui_bottomsy;
-      while (y<=ystop) do
-      begin
-         hlineColor(r_panel,0,vid_panelw,y,c_white);
-         inc(y,vid_BW);
-      end;
-   end
-   else
-   begin
-      vid_sw:=vid_vw;
-      vid_sh:=vid_vh-vid_panelw;
-
-      vid_mapx:=0;
-      if(vid_ppos=2)
-      then vid_mapy:=vid_panelw
-      else vid_mapy:=0;
-
-      vid_panelx:=0;
-      if(vid_ppos=2)
-      then vid_panely:=0
-      else vid_panely:=vid_sh;
-
-      r_uipanel:=_createSurf(vid_sw,vid_panelw+1);
-      r_panel  :=_createSurf(vid_sw,vid_panelw+1);
-
-      vlineColor(r_panel,0                 ,0,r_panel^.w,c_white);
-      vlineColor(r_panel,vid_panelw        ,0,r_panel^.w,c_white);
-      vlineColor(r_panel,vid_panelw+ui_h3bw,0,r_panel^.w,c_white);
-      vlineColor(r_panel,vid_panelw+vid_BW ,0,r_panel^.w,c_white);
-
-      hlineColor(r_panel,0         ,vid_vw            ,0             ,c_white);
-      hlineColor(r_panel,0         ,vid_vw            ,vid_panelw    ,c_white);
-
-      {hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_h3bw       ,c_white);
-      hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_hwp        ,c_white);
-      hlineColor(r_panel,vid_panelw,vid_panelw+ui_h3bw,ui_hwp+ui_h3bw,c_white);  }
-
-      for y:=0 to 3 do
-      hlineColor(r_panel,vid_panelw+ui_h3bw,vid_panelw+vid_BW,y*vid_tBW,c_white);
-
-      hlineColor(r_panel,vid_panelw+vid_BW,ystop,vid_BW ,c_white);
-      hlineColor(r_panel,vid_panelw+vid_BW,ystop,vid_2BW,c_white);
-
-      y:=ui_bottomsy;
-      while (y<=ystop) do
-      begin
-         vlineColor(r_panel,y,vid_panelw,0,c_white);
-         inc(y,vid_BW);
-      end;
-   end;
-
-   _draw_surf(r_uipanel,0,0,r_panel);
-
-   _vidvars;
-end;
-
-procedure _MakeScreen;
-begin
-   if (r_screen<>nil) then sdl_freesurface(r_screen);
-
-   if(_fscr)
-   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags + SDL_FULLSCREEN)
-   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags);
-
-   if(r_screen=nil)then begin WriteError; exit; end;
-
-   _ScreenSurfaces;
-end;
 
 {$ELSE}
 

@@ -317,6 +317,7 @@ var spr : PTUSprite;
 b0,b2,b3: byte;
     b1  : string6;
     rct : boolean;
+
 begin
    with pu^ do
     if(hits>0)and(inapc=0)then
@@ -364,7 +365,7 @@ begin
               b2 :=0;
               b3 :=0;
               rct:=false;
-              rc :=plcolor[playern];
+              rc :=p_color(playern);
               ro :=0;
 
               if(isbuild)then
@@ -404,7 +405,14 @@ begin
                     end;
                  end;
               end;
-              if(hits<mhits)or(rct)then sb:=hits/mhits;
+
+              if(rct)
+              then sb:=hits/mhits
+              else
+                case vid_uhbars of
+              0: if(hits<mhits)then sb:=hits/mhits;
+              1: sb:=hits/mhits;
+                end;
 
               if(buff[ub_invis ]>0 )then inv:=128;
               if(buff[ub_invuln]>10)then mc:=c_awhite;

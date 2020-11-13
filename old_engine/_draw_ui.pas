@@ -1,5 +1,5 @@
 
-procedure D_Alarms;
+procedure d_Alarms;
 var i,r:byte;
 begin
    for i:=0 to vid_uialrm_n do
@@ -19,15 +19,15 @@ begin
      begin
         if(ct>0)and((G_Step mod 20)>10)
         then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray)
-        else circleColor(r_minimap,mpx,mpy,map_prmm,plcolor[pl]);
+        else circleColor(r_minimap,mpx,mpy,map_prmm,p_color(pl));
      end;
 end;
 
-procedure D_Minimap(tar:pSDL_Surface);
+procedure d_Minimap(tar:pSDL_Surface);
 begin
    rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh, c_white);
 
-   D_Alarms;
+   d_Alarms;
 
    _draw_surf(tar,1,1,r_minimap);
    _draw_surf(r_minimap,0,0,r_bminimap);
@@ -47,22 +47,19 @@ begin
       u  :=@_ulst[sy];
       spr:=_unit_spr(u);
       if(bld_r>0)and(m_sbuildc=c_lime)
-      then circleColor(tar,lx+m_vx,ly+m_vy,u^.r,c_green)
-      else circleColor(tar,lx+m_vx,ly+m_vy,u^.r,m_sbuildc);
+      then circleColor(tar,m_vx,m_vy,u^.r,c_green)
+      else circleColor(tar,m_vx,m_vy,u^.r,m_sbuildc);
 
       sy:=0;
 
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
-      _draw_surf(tar,lx+m_vx-spr^.hw,ly+m_vy-spr^.hh-sy,spr^.surf);
+      _draw_surf(tar,m_vx-spr^.hw,m_vy-spr^.hh-sy,spr^.surf);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
       if(m_sbuild in [4,7,10])then
-       circleColor(tar,
-       lx+m_vx,
-       ly+m_vy,
-       towers_sr[upgr[upgr_towers]],
-       c_gray);
+       circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray);
 
+      // build areas
       for i:=0 to _uts do
        if(ui_builders_x[i]<>0)then
         circleColor(tar,
@@ -85,18 +82,18 @@ begin
    end;
 end;
 
-procedure D_OrderIcons(tar:pSDL_Surface;lx,ly:integer);
+procedure D_OrderIcons(tar:pSDL_Surface);
 const rown = 6;
 var  x,y,y0:integer;
      c,i,n :byte;
      b     :boolean;
 begin
-   y  :=ly+2+vid_oiw;
+   y  :=ui_texty+vid_oiw;
    for i:=1 to 9 do
    begin
       n  :=0;
-      y0 := -1;
-      x  :=lx+vid_sw-vid_oiw*2;
+      y0 :=-1;
+      x  :=ui_oicox;
       for b:=false to true do
       begin
          for c:=0 to _uts do
@@ -123,41 +120,89 @@ begin
           end;
       end;
       if(y0=-1)then y0:=y+4;
-      _draw_text(tar,lx+vid_sw,y0   ,b2s(i)      ,ta_right,255,c_white);
-      _draw_text(tar,lx+vid_sw,y0+10,i2s(ordn[i]),ta_right,255,c_gray);
+      _draw_text(tar,ui_oicox,y0   ,b2s(i)      ,ta_right,255,c_white);
+      _draw_text(tar,ui_oicox,y0+10,i2s(ordn[i]),ta_right,255,c_gray);
       inc(y,vid_oihw);
    end;
-   _draw_text(tar,lx+vid_sw-4,ly+2,str_orders,ta_right,255,c_white);
+   _draw_text(tar,ui_oicox-4,ui_texty+2,str_orders,ta_right,255,c_white);
 end;
 
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
+var ux,uy:integer;
 begin
-   x:=x*vid_BW+1;
-   y:=ui_bottomsy+y*vid_BW+1;
-   _draw_surf(tar,x,y,surf);
-   if(sel)then rectangleColor(tar,x+1,y+1,x+vid_BW-3,y+vid_BW-3,c_lime)
+   if(vid_ppos<2)then
+   begin
+      ux:=x*vid_BW+1;
+      uy:=ui_bottomsy+y*vid_BW+1;
+   end
    else
-     if(dsbl)then boxColor(tar,x,y,x+vid_BW-2,y+vid_BW-2,c_ablack);
+   begin
+      ux:=ui_bottomsy+y*vid_BW+1;
+      uy:=x*vid_BW+1;
+   end;
+   _draw_surf(tar,ux,uy,surf);
+   if(sel)then rectangleColor(tar,ux+1,uy+1,ux+vid_BW-3,uy+vid_BW-3,c_lime)
+   else
+     if(dsbl)then boxColor(tar,ux,uy,ux+vid_BW-2,uy+vid_BW-2,c_ablack);
 end;
 
 procedure _drawBtnt(tar:pSDL_Surface;x,y:integer;
 lu1 ,lu2 ,ru ,rd ,ld :shortstring;
 clu1,clu2,cru,crd,cld:cardinal);
-var ui_dBW:integer;
+var ux,uy,ui_dBW:integer;
+function cs(ps:pshortstring):boolean;begin cs:=(ps^<>'')and(ps^[1]<>'0'); end;
 begin
-   x:=x*vid_BW+1;
-   y:=ui_bottomsy+y*vid_BW+1;
+   if(vid_ppos<2)then
+   begin
+      ux:=x*vid_BW+1;
+      uy:=ui_bottomsy+y*vid_BW+1;
+   end
+   else
+   begin
+      ux:=ui_bottomsy+y*vid_BW+1;
+      uy:=x*vid_BW+1;
+   end;
    ui_dBW:=vid_BW-font_w-3;
 
-   if(lu1<>'')and(lu1[1]<>'0')then _draw_text(tar,x+2       ,y+3       ,lu1,ta_left  ,5,clu1);
-   if(lu2<>'')and(lu2[1]<>'0')then _draw_text(tar,x+2       ,y+5+font_w,lu2,ta_left  ,5,clu2);
-   if(ru <>'')and(ru [1]<>'0')then _draw_text(tar,x+vid_BW-3,y+3       ,ru ,ta_right ,5,cru );
-   if(rd <>'')and(rd [1]<>'0')then _draw_text(tar,x+vid_BW-3,y+ui_dBW  ,rd ,ta_right ,5,crd );
-   if(ld <>'')and(ld [1]<>'0')then _draw_text(tar,x+2       ,y+ui_dBW  ,ld ,ta_left  ,5,cld );
+   if(cs(@lu1))then _draw_text(tar,ux+2       ,uy+3       ,lu1,ta_left  ,5,clu1);
+   if(cs(@lu2))then _draw_text(tar,ux+2       ,uy+5+font_w,lu2,ta_left  ,5,clu2);
+   if(cs(@ru ))then _draw_text(tar,ux+vid_BW-3,uy+3       ,ru ,ta_right ,5,cru );
+   if(cs(@rd ))then _draw_text(tar,ux+vid_BW-3,uy+ui_dBW  ,rd ,ta_right ,5,crd );
+   if(cs(@ld ))then _draw_text(tar,ux+2       ,uy+ui_dBW  ,ld ,ta_left  ,5,cld );
 end;
 
-procedure d_uipanel(tar:pSDL_Surface);
-const vid_tsBW = vid_tBW-3;
+procedure d_TextBTN(tar:pSDL_Surface;bx,by:integer;txt:pshortstring;c:cardinal);
+var ux,uy:integer;
+begin
+   if(vid_ppos<2)then
+   begin
+      ux:=bx*vid_BW+vid_hBW;
+      uy:=ui_bottomsy+by*vid_BW+8;
+   end
+   else
+   begin
+      ux:=ui_bottomsy+by*vid_BW+vid_hBW;
+      uy:=bx*vid_BW+8;
+   end;
+
+   _draw_text(tar,ux,uy,txt^,ta_middle,6,c);
+end;
+
+procedure d_tabbtn(tar,btn:pSDL_Surface;
+bx,by,
+i1,i2,i3:integer;
+c1,c2,c3:cardinal;
+sel:boolean);
+begin
+   _draw_surf(tar,bx,by,btn);
+   if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_tBW-3,c_lime);
+
+   if(i1>0)then _draw_text(tar,bx+3,by+2 ,i2s(i1),ta_left,255,c1);
+   if(i2>0)then _draw_text(tar,bx+3,by+11,i2s(i2),ta_left,255,c2);
+   if(i3>0)then _draw_text(tar,bx+3,by+22,i2s(i3),ta_left,255,c3);
+end;
+
+procedure d_Panel(tar:pSDL_Surface);
 var ui,ux,uy,uid:integer;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div vid_fps)+1) end;
@@ -166,58 +211,46 @@ begin
    begin
       _draw_surf(tar,0,0,r_panel);
 
-
-      if(vid_ppos<3)then
+      for ui:=0 to 3 do
       begin
-         for ux:=0 to 3 do _draw_surf(tar,ux*vid_tBW+1,ui_tabsy+1,spr_tabs[ux]);
+         if(vid_ppos<2)then
+         begin
+            ux:=ui*vid_tBW+1;
+            uy:=ui_tabsy+1;
+         end
+         else
+         begin
+            ux:=ui_tabsy+1;
+            uy:=ui*vid_tBW+1;
+         end;
 
-         ux:=1+(vid_tBW*ui_tab);
-         uy:=ui_tabsy+2;
-         rectangleColor(tar,ux+1,uy,ux+vid_tBW-3,ui_bottomsy-2,c_lime);
+         case ui of
+         0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_bldsc,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
+         1: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[false],uproda  ,ucl_c [false], c_lime ,c_yellow,c_orange, ui=ui_tab);
+         2: begin if(pproda>0)then uid:=(ui_upgr_time div vid_fps)+1 else uid:=0;
+            d_tabbtn(tar,spr_tabs[ui],ux,uy, uid          ,pproda  ,0            , c_white,c_yellow,0       , ui=ui_tab);
+            end;
+         3: d_tabbtn(tar,spr_tabs[ui],ux,uy, 0            ,0       ,0            , 0      ,0       ,0       , ui=ui_tab);
+         end;
+      end;
+
+      d_TextBTN(tar,0,9,@str_menu,c_white);
+      if(net_nstat>ns_none)and(G_WTeam=255)then
+       if(g_paused>0)
+       then d_TextBTN(tar,2,9,@str_pause,p_color(g_paused))
+       else d_TextBTN(tar,2,9,@str_pause,c_white          );
+
+      if(vid_ppos<2)then
+      begin
+         _draw_text(tar,ui_energx  ,ui_iy,#19+i2s(menerg-cenerg),ta_right ,255,c_aqua );
+         _draw_text(tar,ui_energx+2,ui_iy,i2s(menerg)           ,ta_left  ,255,c_white);
       end
       else
       begin
-         for uy:=0 to 3 do _draw_surf(tar,ui_tabsy+1,ux*vid_tBW+1,spr_tabs[uy]);
-
-         ux:=ui_tabsy+2;
-         uy:=1+(vid_tBW*ui_tab);
-         rectangleColor(tar,ux+1,uy,ux+vid_tsBW,uy+vid_tsBW,c_lime);
+         _draw_text(tar,ui_energx  ,ui_iy-6,#19+i2s(menerg-cenerg),ta_middle ,255,c_aqua );
+         _draw_text(tar,ui_energx+2,ui_iy+6,i2s(menerg)           ,ta_middle ,255,c_white);
       end;
-
-      if(vid_ppos<3)
-      then ux:=0
-      else uy:=0;
-      if(ucl_cs[true] >0)then _draw_text(tar,ux+3,uy+2 ,i2s(ucl_cs[true] ),ta_left,255,c_lime  );
-      if(ui_bldsc     >0)then _draw_text(tar,ux+3,uy+10,i2s(ui_bldsc     ),ta_left,255,c_yellow);
-      if(ucl_c [true] >0)then _draw_text(tar,ux+3,uy+20,i2s(ucl_c [true] ),ta_left,255,c_orange);
-
-      if(vid_ppos<3)
-      then ux:=vid_tBW
-      else uy:=vid_tBW;
-      if(ucl_cs[false]>0)then _draw_text(tar,ux+3,uy+2 ,i2s(ucl_cs[false]),ta_left,255,c_lime  );
-      if(uproda       >0)then _draw_text(tar,ux+3,uy+10,i2s(uproda       ),ta_left,255,c_yellow);
-      if(ucl_c [false]>0)then _draw_text(tar,ux+3,uy+20,i2s(ucl_c [false]),ta_left,255,c_orange);
-
-      if(ui_upgr_time>0)then
-      begin
-         if(vid_ppos<3)
-         then ux:=vid_2tBW
-         else uy:=vid_2tBW;
-         _draw_text(tar,ux+3,uy+2 ,i2s((ui_upgr_time div vid_fps)+1),ta_left,255,c_white );
-         _draw_text(tar,ux+3,uy+12,i2s(pproda)                      ,ta_left,255,c_yellow);
-      end;
-
-      uy:=(13*vid_BW)+8;
-      _draw_text(tar,vid_hBW,uy,str_menu ,ta_middle,255,c_white);
-      if(net_nstat>ns_none)and(G_WTeam=255)then
-       if(g_paused>0)
-       then _draw_text(tar,vid_2BW+vid_hBW,uy,str_pause,ta_middle,255,plcolor[g_paused])
-       else _draw_text(tar,vid_2BW+vid_hBW,uy,str_pause,ta_middle,255,c_white);
-
-      _draw_text(tar,ui_energx  ,ui_iy,#19+i2s(menerg-cenerg),ta_right,255,c_aqua );
-      _draw_text(tar,ui_energx+2,ui_iy,i2s(menerg)           ,ta_left ,255,c_white);
-
-      _draw_text(tar,ui_armyx ,ui_iy,b2s(army      ),ta_middle,255,c_white);
+      _draw_text(tar,ui_armyx   ,ui_iy,b2s(army  )           ,ta_middle,255,c_white);
 
       case ui_tab of
       0:
@@ -325,7 +358,7 @@ begin
          begin
             if(ui=0)
             then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0)
-            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',plcolor[ui],0,0,0,0);
+            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0);
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
             inc(ux,1);
@@ -358,53 +391,61 @@ begin
    end;
 end;
 
-procedure d_mapui(tar:pSDL_Surface;lx,ly:integer);
+procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
+var sx,sy:integer;
 begin
    if(_rpls_rst< rpl_rhead)then
    begin
       D_BuildUI(tar,lx,ly);
       with _players[HPlayer] do
-       if(race=r_uac)and(ucl_s[true,8]>0)then circleColor(tar,lx+m_vx,ly+m_vy,blizz_r,c_gray);
+       if(race=r_uac)and(ucl_s[true,8]>0)then circleColor(tar,m_vx,m_vy,blizz_r,c_gray);
+
+      if(ui_mc_a>0)then
+      begin
+         sx:=ui_mc_a;
+         sy:=sx shr 1;
+         ellipseColor(tar,ui_mc_x-vid_vx,ui_mc_y-vid_vy,sx,sy,ui_mc_c);
+
+         dec(ui_mc_a,1);
+      end;
    end;
-
-   D_Timer(tar,lx+ui_textx,ly+2,g_step,ta_left,str_time);
-   if(G_WTeam=255)then
-    if(g_mode=gm_inv)then
-    begin
-       D_Timer(tar,lx+ui_textx,ly+14,g_inv_t,ta_left,str_inv_time+b2s(g_inv_wn)+', '+str_time);
-       if(_players[0].army>0)then _draw_text(tar,lx+ui_textx,ly+26,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
-    end;
-
-   D_OrderIcons(tar,lx,ly);
 end;
 
-procedure D_baseui(tar:pSDL_Surface;lx,ly:integer);
+procedure d_PanelUI(tar:pSDL_Surface;lx,ly:integer);
 begin
-   d_mapui(tar,lx,ly);
+   d_MapMouse(tar,lx,ly);
 
    if(vid_rtui=2)then
    begin
-      d_minimap(r_panel  );
-      d_uipanel(r_uipanel);
+      d_MiniMap(r_panel  );
+      d_Panel  (r_uipanel);
    end;
 end;
 
-procedure D_hints(tar:pSDL_Surface);
-var i,uid:byte;
-    ty:integer;
+procedure d_Hints(tar:pSDL_Surface);
+var i,
+   uid:byte;
+    hs:pshortstring;
 begin
-   if(m_bx<3)and(m_by>=3)and(m_by<=13)then
+   if(0<=m_bx)and(m_bx<3)and(3<=m_by)and(m_by<=16)then
    begin
-      ty:=tar^.h-40;
+      hs:=nil;
       case m_by of
-      3  : if(m_vy>ui_tabsy)
-           then _draw_text(tar,ui_textx,ty,str_hint_t[m_vx div vid_tBW ],ta_left,255,c_white)
-           else _draw_text(tar,ui_textx,ty,str_hint_a[m_vx div vid_2tBW],ta_left,255,c_white);
+      3  : case (vid_ppos<2) of
+           true :if(m_vy>ui_tabsy)
+                 then hs:=@str_hint_t[(m_vx-vid_panelx) div vid_tBW ]
+                 else hs:=@str_hint_a[(m_vx-vid_panelx) div vid_2tBW];
+           false:if(m_vx>ui_tabsy)
+                 then hs:=@str_hint_t[(m_vy-vid_panely) div vid_tBW ]
+                 else ;
+           end;
       13 : begin
               if(m_bx=2)then
                if(net_nstat=ns_none)or(G_WTeam<255)then exit;
-              _draw_text(tar,ui_textx,ty,str_hint_m[m_bx],ta_left,255,c_white);
+              hs:=@str_hint_m[m_bx];
            end;
+      15 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[0];
+      16 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[1];
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
         with _players[HPlayer] do
@@ -422,7 +463,7 @@ begin
                                 if(_bc_g(a_build,i)=false)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           _draw_text(tar,ui_textx,ty,str_un_hint[uid],ta_left,255,c_white);
+                           hs:=@str_un_hint[uid];
                         end;
                end;
            1 : case i of
@@ -436,7 +477,7 @@ begin
                                 if(_bc_g(a_units,i)=false)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           _draw_text(tar,ui_textx,ty,str_un_hint[uid],ta_left,255,c_white);
+                           hs:=@str_un_hint[uid];
                         end;
                end;
            2 : begin
@@ -445,7 +486,7 @@ begin
                      if(_bc_g(a_upgr,i)=false)then exit;
                      if(g_addon=false)and(i>=upgr_2tier)then exit;
                   end;
-                  _draw_text(tar,ui_textx,ty,str_up_hint[i+(race*_uts)],ta_left,255,c_white);
+                  hs:=@str_up_hint[i+(race*_uts)];
                end;
            3 : begin
                   if(_rpls_rst>=rpl_rhead)then
@@ -454,33 +495,34 @@ begin
                   end
                   else
                      if(i<>11)and(i>8)then exit;
-                  _draw_text(tar,ui_textx,ty,str_hint[ui_tab,race,i],ta_left,255,c_white);
+                  hs:=@str_hint[ui_tab,race,i];
                end;
            end;
         end;
       end;
+      if(hs=nil)then exit;
+      _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,255,c_white);
    end;
 end;
 
-procedure D_UIText(tar:pSDL_Surface;lx,ly:integer);
+procedure D_UIText(tar:pSDL_Surface);
 var i:byte;
 begin
    if(_igchat)or(_rpls_log)then
    begin
-      for i:=0 to MaxNetChat do _draw_text(tar,lx+ui_textx,ly+vid_sh-60-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
-      if(_rpls_log=false)then   _draw_text(tar,lx+ui_textx,ly+vid_sh-50     ,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
+      for i:=0 to MaxNetChat do _draw_text(tar,ui_textx,ui_chaty-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
+      if(_rpls_log=false)then   _draw_text(tar,ui_textx,ui_hinty     ,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then
      begin
-        _draw_text(tar,lx+ui_textx,ly+vid_sh-60,net_chat[HPlayer,0],ta_left,255,c_white);
+        _draw_text(tar,ui_textx,ui_chaty,net_chat[HPlayer,0],ta_left,255,c_white);
         dec(net_chat_shlm,1);
-     end;
-
-   D_hints(tar);
+     end
+     else d_Hints(tar);
 
    if(_rpls_rst=rpl_end)
-   then _draw_text(tar,lx+ui_uiuphx,ly+2,str_repend,ta_middle,255,c_white)
+   then _draw_text(tar,ui_uiuphx,ui_texty,str_repend,ta_middle,255,c_white)
    else
     if(_rpls_rst<rpl_rhead)then
      with _players[HPlayer] do
@@ -488,23 +530,33 @@ begin
         if(G_WTeam=255)then
         begin
            if(menu_s2<>ms2_camp)then
-            if(_players[HPlayer].army=0)then _draw_text(tar,lx+ui_uiuphx,ly+2,str_lose  ,ta_middle,255,c_red);
+            if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
             if(net_nstat=ns_clnt)and(net_cl_svttl=ClientTTL)
-            then _draw_text(tar,lx+ui_uiuphx,ly+12,str_waitsv,ta_middle,255,plcolor[net_cl_svpl])
-            else _draw_text(tar,lx+ui_uiuphx,ly+12,str_pause ,ta_middle,255,plcolor[G_paused]);
+            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,p_color(net_cl_svpl))
+            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,p_color(G_paused   ));
         end
         else
           begin
              if(G_WTeam=team)
-             then _draw_text(tar,lx+ui_uiuphx,ly+2,str_win   ,ta_middle,255,c_lime)
-             else _draw_text(tar,lx+ui_uiuphx,ly+2,str_lose  ,ta_middle,255,c_red);
+             then _draw_text(tar,ui_uiuphx,ui_texty,str_win   ,ta_middle,255,c_lime)
+             else _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
              exit;
           end;
      end;
+
+   d_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time);
+   if(G_WTeam=255)then
+    if(g_mode=gm_inv)then
+    begin
+       D_Timer(tar,ui_textx,ui_texty+14,g_inv_t,ta_left,str_inv_time+b2s(g_inv_wn)+', '+str_time);
+       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+26,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+    end;
+
+   d_OrderIcons(tar);
 end;
 
-procedure d_uimouse(tar:pSDL_Surface;lx,ly:integer);
+procedure d_UIMouse(tar:pSDL_Surface);
 var c:cardinal;
 begin
    c:=0;
@@ -513,22 +565,21 @@ begin
    -2 : c:=c_lime;
    -3,
    -4 : c:=c_red;
-   else _draw_surf(tar,lx+m_vx,ly+m_vy,spr_cursor);
+   else _draw_surf(tar,m_vx,m_vy,spr_cursor);
    end;
    if(c<>0)then
    begin
-      circleColor(tar,lx+m_vx   ,ly+m_vy,10,        c);
-      hlineColor (tar,lx+m_vx-12,ly+m_vx+12,m_vy   ,c);
-      vlineColor (tar,lx+m_vx   ,ly+m_vy-12,m_vy+12,c);
+      circleColor(tar,m_vx   ,m_vy,10,        c);
+      hlineColor (tar,m_vx-12,m_vx+12,m_vy   ,c);
+      vlineColor (tar,m_vx   ,m_vy-12,m_vy+12,c);
    end;
 end;
 
 procedure d_ui(tar:pSDL_Surface;lx,ly:integer);
 begin
-   d_baseui(tar,lx,ly);
-   d_UIText(tar,lx,ly);
-   if(m_sxs>-1)then
-   rectangleColor(tar,lx+m_sxs-vid_vx, ly+m_sys-vid_vy, lx+m_vx, ly+m_vy, plcolor[HPlayer]);
+   d_PanelUI(tar,lx,ly);
+   d_UIText(tar);
+   if(m_sxs>-1)then rectangleColor(tar,lx+m_sxs-vid_vx, ly+m_sys-vid_vy, m_vx, m_vy, p_color(HPlayer));
 end;
 
 

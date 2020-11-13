@@ -70,13 +70,13 @@ begin
       name :=PlayerName;
    end;
 
-   plcolor[0]:=c_white;
-   plcolor[1]:=c_red;
-   plcolor[2]:=c_orange;
-   plcolor[3]:=c_yellow;
-   plcolor[4]:=c_lime;
-   plcolor[5]:=c_aqua;
-   plcolor[6]:=c_blue;
+   PlayerColor[0]:=c_white;
+   PlayerColor[1]:=c_red;
+   PlayerColor[2]:=c_orange;
+   PlayerColor[3]:=c_yellow;
+   PlayerColor[4]:=c_lime;
+   PlayerColor[5]:=c_aqua;
+   PlayerColor[6]:=c_blue;
 
    {$ELSE}
    HPLayer:=0;
@@ -94,7 +94,6 @@ begin
    G_Step   :=0;
    G_Paused :=0;
    G_WTeam  :=255;
-   //G_Mode   :=gm_scir;
    G_plstat :=255;
 
    onlySVCode :=true;
@@ -219,8 +218,6 @@ end;
 
 {$ENDIF}
 
-
-
 procedure _CreateStartPositionsSkirmish;
 var p:byte;
 begin
@@ -232,7 +229,6 @@ begin
             end;
    gm_inv : with _players[0] do ai_skill:=8;
    end;
-
 
    for p:=1 to MaxPlayers do
     with _players[p] do
@@ -253,16 +249,16 @@ begin
           case G_startb of
           0 : _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
           1 : begin
-                 _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
+                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
                  _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
               end;
           2 : begin
-                 _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
+                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
                  _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
                  _unit_add(map_psx[p]+115,map_psy[p],cl2uid[race,true,2],p,true);
               end;
           3 : begin
-                 _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
+                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
                  _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
                  _unit_add(map_psx[p]+115,map_psy[p],cl2uid[race,true,2],p,true);
                  _unit_add(map_psx[p],map_psy[p]+150,cl2uid[race,true,1],p,true);
@@ -278,7 +274,6 @@ begin
               end;
           end;
 
-
           if(state=ps_play)then ai_skill:=def_ai;
           _setAI(p);
        end;
@@ -290,7 +285,6 @@ begin
    _moveHumView(map_psx[HPlayer] , map_psy[HPlayer]);
    {$ENDIF}
 end;
-
 
 
 {$IFDEF _FULLGAME}
@@ -313,7 +307,7 @@ begin
        vid_rtui:=2;
        _makeMMB;
        sdl_FillRect(r_minimap,nil,0);
-       //D_ui;
+       d_Panel(r_uipanel);
     end;
 end;
 

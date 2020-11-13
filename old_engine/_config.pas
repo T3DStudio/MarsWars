@@ -23,7 +23,8 @@ begin
    if (vr='rpnui')then _rpls_pnui  :=vlb;
    if (vr='npnui')then net_pnui    :=vlb;
    if (vr='ppos' )then vid_ppos    :=vlb;
-
+   if (vr='uhbar')then vid_uhbars  :=vlb;
+   if (vr='plcol')then vid_plcolors:=vlb;
 end;
 
 procedure cfg_parse_str(s:string);
@@ -65,12 +66,14 @@ begin
       if(vid_vw>vid_maxw)then vid_vw:=vid_maxw;
       if(vid_vh>vid_maxh)then vid_vh:=vid_maxh;
 
-      if(G_aislots>7)then G_aislots:=7;
+      if(G_aislots>8)then G_aislots:=8;
       if(G_startb >5)then G_startb :=5;
 
-      if(_rpls_pnui>9)then  _rpls_pnui:=9;
-      if(net_pnui  >9)then  net_pnui  :=9;
-      if(vid_ppos  >3)then  net_pnui  :=0;
+      if(_rpls_pnui  >9)then  _rpls_pnui:=9;
+      if(net_pnui    >9)then  net_pnui  :=9;
+      if(vid_ppos    >3)then  vid_ppos  :=0;
+      if(vid_uhbars  >2)then  vid_uhbars:=0;
+      if(vid_plcolors>4)then  vid_plcolors:=0;
    end;
    swLNG;
    m_vrx:=vid_vw;
@@ -103,6 +106,8 @@ begin
    writeln(f,'gsp'  ,'=',b2pm[G_shpos,2]);
    writeln(f,'gai'  ,'=',G_aislots      );
    writeln(f,'ppos' ,'=',vid_ppos       );
+   writeln(f,'uhbar','=',vid_uhbars     );
+   writeln(f,'plcol','=',vid_plcolors   );
 
    close(f);
 end;

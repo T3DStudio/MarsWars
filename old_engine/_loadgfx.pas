@@ -1,4 +1,27 @@
 
+function _createSurf(tw,th:integer):pSDL_Surface;
+var ts1,ts2:pSDL_Surface;
+begin
+   _createSurf:=nil;
+   ts1:=sdl_createRGBSurface(0,tw,th,vid_bpp,0,0,0,0);
+   if(ts1=nil)then
+   begin
+      WriteError;
+      HALT;
+   end
+   else
+   begin
+      ts2:=sdl_displayformat(ts1);
+      SDL_FreeSurface(ts1);
+      if(ts2=nil)then
+      begin
+         WriteError;
+         HALT;
+      end;
+      _createSurf:=ts2;
+   end;
+end;
+
 procedure SDL_SETpixel(srf:PSDL_SURFACE;x,y:integer;color:cardinal);
 var bpp:byte;
 begin
@@ -367,7 +390,7 @@ var i:byte;
  fspr:pSDL_Surface;
 begin
    ccc:=(1 shl 24)-1;
-   fspr:=loadIMG('rufont',false,true);
+   fspr:=loadIMG('font',false,true);
    for i:=0 to 255 do
    begin
       c:=chr(i);
@@ -375,15 +398,11 @@ begin
       SDL_FillRect(font_ca[c],nil,0);
       SDL_SetColorKey(font_ca[c],SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
 
-      if(192<=i)then
-      begin
-         _rect^.x:=ord(i-192)*font_w;
-         _rect^.y:=0;
-         _rect^.w:=font_w;
-         _rect^.h:=font_w;
-         SDL_BLITSURFACE(fspr,_rect,font_ca[c],nil);
-      end
-      else characterColor(font_ca[c],0,0,c,c_white);
+      _rect^.x:=ord(i)*font_w;
+      _rect^.y:=0;
+      _rect^.w:=font_w;
+      _rect^.h:=font_w;
+      SDL_BLITSURFACE(fspr,_rect,font_ca[c],nil);
    end;
    _FreeSF(fspr);
 end;
@@ -391,35 +410,26 @@ end;
 procedure LoadGraphics;
 var x:integer;
 begin
-   r_empty:=_createSurf(1,1);
-   if(r_empty    =nil)then begin WriteError; exit; end;
-
+   r_empty   :=_createSurf(1,1);
    r_minimap :=_createSurf(vid_panelw-1,vid_panelw-1);
-   if(r_minimap  =nil)then begin WriteError; exit; end;
-
    r_bminimap:=_createSurf(vid_panelw-1,vid_panelw-1);
-   if(r_bminimap =nil)then begin WriteError; exit; end;
 
-   ui_muc [false]:=c_dorange;
-   ui_muc [true ]:=c_gray;
+   ui_muc    [false]:=c_dorange;
+   ui_muc    [true ]:=c_gray;
 
    ui_rad_rld[false]:=c_aqua;
    ui_rad_rld[true ]:=c_yellow;
 
-   spr_dummy.hh:=1;
-   spr_dummy.hw:=1;
+   spr_dummy.hh  :=1;
+   spr_dummy.hw  :=1;
    spr_dummy.surf:=r_empty;
 
    LoadFont;
 
-   fog_surf[false]:= _createSurf(fog_cw,fog_cw);
-   boxColor(fog_surf[false],0,0,fog_cw,fog_cw,c_black);
-   SDL_SetAlpha(fog_surf[false],SDL_SRCALPHA or SDL_RLEACCEL,128);
-
-   fog_surf[true]:= _createSurf(fog_cr*2,fog_cr*2);
-   boxColor(fog_surf[true],0,0,fog_surf[true]^.w,fog_surf[true]^.h,c_purple);
-   filledcircleColor(fog_surf[true],fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(fog_surf[true],SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(fog_surf[true],0,0));
+   fog_surf := _createSurf(fog_cr*2,fog_cr*2);
+   boxColor(fog_surf,0,0,fog_surf^.w,fog_surf^.h,c_purple);
+   filledcircleColor(fog_surf,fog_cr,fog_cr,fog_cr,c_black);
+   SDL_SetColorKey(fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(fog_surf,0,0));
 
    spr_mback:= loadIMG('mback'   ,false,true);
 
@@ -481,108 +491,106 @@ begin
    spr_mp[r_hell] := _lstr('h_mp');
    spr_mp[r_uac ] := _lstr('u_mp');
 
-   for x:=0 to 3 do spr_eff_bfg [x]:= _lstr('ef_bfg_'+b2s(x));
-   for x:=0 to 5 do spr_eff_eb  [x]:= _lstr('ef_eb'  +b2s(x));
-   for x:=0 to 8 do spr_eff_ebb [x]:= _lstr('ef_ebb' +b2s(x));
-   for x:=0 to 5 do spr_eff_tel [x]:= _lstr('ef_tel_'+b2s(x));
-   for x:=0 to 2 do spr_eff_exp [x]:= _lstr('ef_exp_'+b2s(x));
-   for x:=0 to 4 do spr_eff_exp2[x]:= _lstr('exp2_'  +b2s(x));
-   for x:=0 to 7 do spr_eff_g   [x]:= _lstr('g_'     +b2s(x));
+   for x:=0 to 3  do spr_eff_bfg    [x]:=_lstr('ef_bfg_'+b2s(x));
+   for x:=0 to 5  do spr_eff_eb     [x]:=_lstr('ef_eb'  +b2s(x));
+   for x:=0 to 8  do spr_eff_ebb    [x]:=_lstr('ef_ebb' +b2s(x));
+   for x:=0 to 5  do spr_eff_tel    [x]:=_lstr('ef_tel_'+b2s(x));
+   for x:=0 to 2  do spr_eff_exp    [x]:=_lstr('ef_exp_'+b2s(x));
+   for x:=0 to 4  do spr_eff_exp2   [x]:=_lstr('exp2_'  +b2s(x));
+   for x:=0 to 7  do spr_eff_g      [x]:=_lstr('g_'     +b2s(x));
+   for x:=0 to 3  do spr_h_p0       [x]:=_lstr('h_p0_'  +b2s(x));
+   for x:=0 to 3  do spr_h_p1       [x]:=_lstr('h_p1_'  +b2s(x));
+   for x:=0 to 3  do spr_h_p2       [x]:=_lstr('h_p2_'  +b2s(x));
+   for x:=0 to 7  do spr_h_p3       [x]:=_lstr('h_p3_'  +b2s(x));
+   for x:=0 to 10 do spr_h_p4       [x]:=_lstr('h_p4_'  +b2s(x));
+   for x:=0 to 7  do spr_h_p5       [x]:=_lstr('h_p5_'  +b2s(x));
+   for x:=0 to 7  do spr_h_p6       [x]:=_lstr('h_p6_'  +b2s(x));
+   for x:=0 to 5  do spr_h_p7       [x]:=_lstr('h_p7_'  +b2s(x));
+   for x:=0 to 5  do spr_u_p0       [x]:=_lstr('u_p0_'  +b2s(x));
+   for x:=0 to 3  do spr_u_p1       [x]:=_lstr('u_p1_'  +b2s(x));
+   for x:=0 to 5  do spr_u_p2       [x]:=_lstr('u_p2_'  +b2s(x));
+   for x:=0 to 3  do spr_u_p3       [x]:=_lstr('u_p3_'  +b2s(x));
 
-   for x:=0 to 3  do spr_h_p0[x]:= _lstr('h_p0_'+b2s(x));
-   for x:=0 to 3  do spr_h_p1[x]:= _lstr('h_p1_'+b2s(x));
-   for x:=0 to 3  do spr_h_p2[x]:= _lstr('h_p2_'+b2s(x));
-   for x:=0 to 7  do spr_h_p3[x]:= _lstr('h_p3_'+b2s(x));
-   for x:=0 to 10 do spr_h_p4[x]:= _lstr('h_p4_'+b2s(x));
-   for x:=0 to 7  do spr_h_p5[x]:= _lstr('h_p5_'+b2s(x));
-   for x:=0 to 7  do spr_h_p6[x]:= _lstr('h_p6_'+b2s(x));
-   for x:=0 to 5  do spr_h_p7[x]:= _lstr('h_p7_'+b2s(x));
+   for x:=0 to 2  do spr_blood      [x]:=_lstr('blood'  +b2s(x));
 
-   for x:=0 to 5  do spr_u_p0[x]:= _lstr('u_p0_'+b2s(x));
-   for x:=0 to 3  do spr_u_p1[x]:= _lstr('u_p1_'+b2s(x));
-   for x:=0 to 5  do spr_u_p2[x]:= _lstr('u_p2_'+b2s(x));
-   for x:=0 to 3  do spr_u_p3[x]:= _lstr('u_p3_'+b2s(x));
+   for x:=0 to 28 do spr_lostsoul   [x]:=_lstr('h_u0_'  +b2s(x));
+   for x:=0 to 52 do spr_imp        [x]:=_lstr('h_u1_'  +b2s(x));
+   for x:=0 to 53 do spr_demon      [x]:=_lstr('h_u2_'  +b2s(x));
+   for x:=0 to 29 do spr_cacodemon  [x]:=_lstr('h_u3_'  +b2s(x));
+   for x:=0 to 52 do spr_baron      [x]:=_lstr('h_u4_'  +b2s(x));
+   for x:=0 to 52 do spr_knight     [x]:=_lstr('h_u4k_' +b2s(x));
+   for x:=0 to 56 do spr_cyberdemon [x]:=_lstr('h_u5_'  +b2s(x));
+   for x:=0 to 81 do spr_mastermind [x]:=_lstr('h_u6_'  +b2s(x));
+   for x:=0 to 37 do spr_pain       [x]:=_lstr('h_u7_'  +b2s(x));
+   for x:=0 to 76 do spr_revenant   [x]:=_lstr('h_u8_'  +b2s(x));
+   for x:=0 to 78 do spr_mancubus   [x]:=_lstr('h_u9_'  +b2s(x));
+   for x:=0 to 69 do spr_arachnotron[x]:=_lstr('h_u10_' +b2s(x));
+   for x:=0 to 85 do spr_archvile   [x]:=_lstr('h_u11_' +b2s(x));
 
-   for x:=0 to 2  do spr_blood[x]:= _lstr('blood'+b2s(x));
+   for x:=0 to 52 do spr_ZFormer    [x]:=_lstr('h_z0_'  +b2s(x));
+   for x:=0 to 31 do spr_ZEngineer  [x]:=_lstr('h_z0s_' +b2s(x));
+   for x:=0 to 52 do spr_ZSergant   [x]:=_lstr('h_z1_'  +b2s(x));
+   for x:=0 to 52 do spr_ZSSergant  [x]:=_lstr('h_z1s_' +b2s(x));
+   for x:=0 to 59 do spr_ZCommando  [x]:=_lstr('h_z2_'  +b2s(x));
+   for x:=0 to 52 do spr_ZBomber    [x]:=_lstr('h_z3_'  +b2s(x));
+   for x:=0 to 15 do spr_ZFMajor    [x]:=_lstr('h_z4j_' +b2s(x));
+   for x:=0 to 52 do spr_ZMajor     [x]:=_lstr('h_z4_'  +b2s(x));
+   for x:=0 to 52 do spr_ZBFG       [x]:=_lstr('h_z5_'  +b2s(x));
 
-   for x:=0 to 28 do spr_lostsoul   [x]:=_lstr('h_u0_' +b2s(x));
-   for x:=0 to 52 do spr_imp        [x]:=_lstr('h_u1_' +b2s(x));
-   for x:=0 to 53 do spr_demon      [x]:=_lstr('h_u2_' +b2s(x));
-   for x:=0 to 29 do spr_cacodemon  [x]:=_lstr('h_u3_' +b2s(x));
-   for x:=0 to 52 do spr_baron      [x]:=_lstr('h_u4_' +b2s(x));
-   for x:=0 to 52 do spr_knight     [x]:=_lstr('h_u4k_'+b2s(x));
-   for x:=0 to 56 do spr_cyberdemon [x]:=_lstr('h_u5_' +b2s(x));
-   for x:=0 to 81 do spr_mastermind [x]:=_lstr('h_u6_' +b2s(x));
-   for x:=0 to 37 do spr_pain       [x]:=_lstr('h_u7_' +b2s(x));
-   for x:=0 to 76 do spr_revenant   [x]:=_lstr('h_u8_' +b2s(x));
-   for x:=0 to 78 do spr_mancubus   [x]:=_lstr('h_u9_' +b2s(x));
-   for x:=0 to 69 do spr_arachnotron[x]:=_lstr('h_u10_'+b2s(x));
-   for x:=0 to 85 do spr_archvile   [x]:=_lstr('h_u11_'+b2s(x));
-
-   for x:=0 to 52 do spr_ZFormer    [x]:=_lstr('h_z0_' +b2s(x));
-   for x:=0 to 31 do spr_ZEngineer  [x]:=_lstr('h_z0s_'+b2s(x));
-   for x:=0 to 52 do spr_ZSergant   [x]:=_lstr('h_z1_' +b2s(x));
-   for x:=0 to 52 do spr_ZSSergant  [x]:=_lstr('h_z1s_'+b2s(x));
-   for x:=0 to 59 do spr_ZCommando  [x]:=_lstr('h_z2_' +b2s(x));
-   for x:=0 to 52 do spr_ZBomber    [x]:=_lstr('h_z3_' +b2s(x));
-   for x:=0 to 15 do spr_ZFMajor    [x]:=_lstr('h_z4j_'+b2s(x));
-   for x:=0 to 52 do spr_ZMajor     [x]:=_lstr('h_z4_' +b2s(x));
-   for x:=0 to 52 do spr_ZBFG       [x]:=_lstr('h_z5_' +b2s(x));
-
-   for x:=0 to 44 do spr_engineer   [x]:=_lstr('u_u1_' +b2s(x));
-   for x:=0 to 52 do spr_medic      [x]:=_lstr('u_u0_' +b2s(x));
-   for x:=0 to 44 do spr_sergant    [x]:=_lstr('u_u2_' +b2s(x));
-   for x:=0 to 44 do spr_ssergant   [x]:=_lstr('u_u2s_'+b2s(x));
-   for x:=0 to 52 do spr_commando   [x]:=_lstr('u_u3_' +b2s(x));
-   for x:=0 to 44 do spr_bomber     [x]:=_lstr('u_u4_' +b2s(x));
-   for x:=0 to 15 do spr_fmajor     [x]:=_lstr('u_u5j_'+b2s(x));
-   for x:=0 to 44 do spr_major      [x]:=_lstr('u_u5_' +b2s(x));
-   for x:=0 to 44 do spr_BFG        [x]:=_lstr('u_u6_' +b2s(x));
-   for x:=0 to 15 do spr_FAPC       [x]:=_lstr('u_u8_' +b2s(x));
+   for x:=0 to 44 do spr_engineer   [x]:=_lstr('u_u1_'  +b2s(x));
+   for x:=0 to 52 do spr_medic      [x]:=_lstr('u_u0_'  +b2s(x));
+   for x:=0 to 44 do spr_sergant    [x]:=_lstr('u_u2_'  +b2s(x));
+   for x:=0 to 44 do spr_ssergant   [x]:=_lstr('u_u2s_' +b2s(x));
+   for x:=0 to 52 do spr_commando   [x]:=_lstr('u_u3_'  +b2s(x));
+   for x:=0 to 44 do spr_bomber     [x]:=_lstr('u_u4_'  +b2s(x));
+   for x:=0 to 15 do spr_fmajor     [x]:=_lstr('u_u5j_' +b2s(x));
+   for x:=0 to 44 do spr_major      [x]:=_lstr('u_u5_'  +b2s(x));
+   for x:=0 to 44 do spr_BFG        [x]:=_lstr('u_u6_'  +b2s(x));
+   for x:=0 to 15 do spr_FAPC       [x]:=_lstr('u_u8_'  +b2s(x));
    for x:=0 to 15 do spr_APC        [x]:=_lstr('uac_tank_' +b2s(x));
-   for x:=0 to 55 do spr_Terminator [x]:=_lstr('u_u9_' +b2s(x));
-   for x:=0 to 23 do spr_Tank       [x]:=_lstr('u_u10_'+b2s(x));
-   for x:=0 to 15 do spr_Flyer      [x]:=_lstr('u_u11_'+b2s(x));
+   for x:=0 to 55 do spr_Terminator [x]:=_lstr('u_u9_'  +b2s(x));
+   for x:=0 to 23 do spr_Tank       [x]:=_lstr('u_u10_' +b2s(x));
+   for x:=0 to 15 do spr_Flyer      [x]:=_lstr('u_u11_' +b2s(x));
 
-   for x:=0 to 15 do spr_tur        [x]:=_lstr('ut_'+b2s(x));
-   for x:=0 to 7  do spr_rtur       [x]:=_lstr('u_rt_'+b2s(x));
+   for x:=0 to 15 do spr_tur        [x]:=_lstr('ut_'    +b2s(x));
+   for x:=0 to 7  do spr_rtur       [x]:=_lstr('u_rt_'  +b2s(x));
 
    for x:=0 to 7  do spr_trans      [x]:=_lstr('transport'+b2s(x));
 
-   for x:=0 to 1  do spr_sport      [x]:=_lstr('sport'+b2s(x));
+   for x:=0 to 1  do spr_sport      [x]:=_lstr('sport'  +b2s(x));
 
    for x:=0 to 3 do
    begin
-      spr_HKeep           [x]:=_lstr('h_b0_' +b2s(x));
-      spr_HGate           [x]:=_lstr('h_b1_' +b2s(x));
-      spr_HSymbol         [x]:=_lstr('h_b2_' +b2s(x));
-      spr_HPools          [x]:=_lstr('h_b3_' +b2s(x));
-      spr_HAPools         [x]:=_lstr('h_b3_' +b2s(x)+'a');
-      spr_HTower          [x]:=_lstr('h_b4_' +b2s(x));
-      spr_HTeleport       [x]:=_lstr('h_b5_' +b2s(x));
+      spr_HKeep           [x]:=_lstr('h_b0_'  +b2s(x));
+      spr_HGate           [x]:=_lstr('h_b1_'  +b2s(x));
+      spr_HSymbol         [x]:=_lstr('h_b2_'  +b2s(x));
+      spr_HPools          [x]:=_lstr('h_b3_'  +b2s(x));
+      spr_HAPools         [x]:=_lstr('h_b3_'  +b2s(x)+'a');
+      spr_HTower          [x]:=_lstr('h_b4_'  +b2s(x));
+      spr_HTeleport       [x]:=_lstr('h_b5_'  +b2s(x));
       spr_HCC             [x]:=_lstr('h_hcc_' +b2s(x));
       spr_HMUnit          [x]:=_lstr('h_hbar_'+b2s(x));
       spr_HMUnita         [x]:=_lstr('h_hbar_'+b2s(x)+'a');
 
-      spr_UCommandCenter  [x]:=_lstr('u_b0_' +b2s(x));
-      spr_UMilitaryUnit   [x]:=_lstr('u_b1_' +b2s(x));
-      spr_UAMilitaryUnit  [x]:=_lstr('u_b1_' +b2s(x)+'a');
-      spr_UGenerator      [x]:=_lstr('u_b2_' +b2s(x));
-      spr_UWeaponFactory  [x]:=_lstr('u_b3_' +b2s(x));
-      spr_UAWeaponFactory [x]:=_lstr('u_b3_' +b2s(x)+'a');
-      spr_UTurret         [x]:=_lstr('u_b4_' +b2s(x));
-      spr_URadar          [x]:=_lstr('u_b5_' +b2s(x));
-      spr_UVehicleFactory [x]:=_lstr('u_b6_' +b2s(x));
-      spr_UPTurret        [x]:=_lstr('u_b7_' +b2s(x));
-      spr_URocketL        [x]:=_lstr('u_b8_' +b2s(x));
-      spr_URTurret        [x]:=_lstr('u_b9_' +b2s(x));
-      spr_UNuclearPlant   [x]:=_lstr('u_b10_'+b2s(x));
+      spr_UCommandCenter  [x]:=_lstr('u_b0_'  +b2s(x));
+      spr_UMilitaryUnit   [x]:=_lstr('u_b1_'  +b2s(x));
+      spr_UAMilitaryUnit  [x]:=_lstr('u_b1_'  +b2s(x)+'a');
+      spr_UGenerator      [x]:=_lstr('u_b2_'  +b2s(x));
+      spr_UWeaponFactory  [x]:=_lstr('u_b3_'  +b2s(x));
+      spr_UAWeaponFactory [x]:=_lstr('u_b3_'  +b2s(x)+'a');
+      spr_UTurret         [x]:=_lstr('u_b4_'  +b2s(x));
+      spr_URadar          [x]:=_lstr('u_b5_'  +b2s(x));
+      spr_UVehicleFactory [x]:=_lstr('u_b6_'  +b2s(x));
+      spr_UPTurret        [x]:=_lstr('u_b7_'  +b2s(x));
+      spr_URocketL        [x]:=_lstr('u_b8_'  +b2s(x));
+      spr_URTurret        [x]:=_lstr('u_b9_'  +b2s(x));
+      spr_UNuclearPlant   [x]:=_lstr('u_b10_' +b2s(x));
 
-      spr_cbuild          [x]:=_lstr('build' +b2s(x));
+      spr_cbuild          [x]:=_lstr('build'  +b2s(x));
 
       if(x=0)
       then spr_HAGate     [x]:=spr_HGate[x]
-      else spr_HAGate     [x]:=_lstr('h_b1_' +b2s(x-1)+'a');
+      else spr_HAGate     [x]:=_lstr('h_b1_'  +b2s(x-1)+'a');
    end;
 
    for x:=0 to 5 do spr_ubase[x]:=_lstr('u_base' +b2s(x));
@@ -623,3 +631,202 @@ begin
 
    LoadDecors;
 end;
+
+
+
+procedure Map_tdmake;
+var i,ix,iy,rn:integer;
+begin
+   MaxTDecsS:=(vid_sw*vid_sh) div 11000;
+   setlength(_TDecs,MaxTDecsS);
+
+   vid_mwa:= vid_sw+vid_ab*2;
+   vid_mha:= vid_sh+vid_ab*2;
+
+   ix:=longint(map_seed) mod vid_mwa;
+   iy:=(map_seed2*5+ix) mod vid_mwa;
+   rn:=ix*iy;
+   for i:=1 to MaxTDecsS do
+   with _TDecs[i-1] do
+   begin
+      inc(rn,17);
+      ix:=_genx(ix+rn,vid_mwa,false);
+      iy:=_genx(iy+sqr(ix*i),vid_mha,false);
+      x :=ix;
+      y :=iy;
+   end;
+end;
+
+procedure _vidvars;
+begin
+   vid_vmb_x1   := vid_vw-vid_vmb_x0;
+   vid_vmb_y1   := vid_vh-vid_vmb_y0;
+
+   ui_textx     := vid_mapx+4;
+   ui_texty     := vid_mapy+4;
+   ui_hinty     := vid_mapy+vid_sh-60;
+   ui_chaty     := ui_hinty-10;
+   ui_oicox     := vid_mapx+vid_sw-4;
+
+   ui_uiuphx   := vid_mapx+(vid_sw div 2);
+
+   ui_ingamecl:=(vid_sw-font_w) div font_w;
+   if(spr_mback<>nil)then
+   begin
+      mv_x:=(vid_vw-spr_mback^.w) div 2;
+      mv_y:=(vid_vh-spr_mback^.h) div 2;
+   end;
+   fog_vfw   :=(vid_sw div fog_cw)+2;
+   fog_vfh   :=(vid_sh div fog_cw)+2;
+
+   map_mmvw    := round(vid_sw*map_mmcx);
+   map_mmvh    := round(vid_sh*map_mmcx);
+   _view_bounds;
+
+   Map_tdmake;
+end;
+
+procedure _ScreenSurfaces;
+const
+  ui_ex = 3;
+  ui_ax = ui_ex+vid_BW;
+  ystop = 14;
+var i,y:integer;
+begin
+   if(r_uipanel<>nil)then sdl_freesurface(r_uipanel);
+   if(r_panel  <>nil)then sdl_freesurface(r_panel  );
+
+   if(vid_ppos<2)then // left-right
+   begin
+      vid_sw:=vid_vw-vid_panelw;
+      vid_sh:=vid_vh;
+
+      if(vid_ppos=0)
+      then vid_mapx:=vid_panelw
+      else vid_mapx:=0;
+      vid_mapy:=0;
+
+      if(vid_ppos=0)
+      then vid_panelx:=0
+      else vid_panelx:=vid_sw;
+      vid_panely:=0;
+
+      r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
+      r_panel  :=_createSurf(vid_panelw+1,vid_vh);
+
+      vlineColor(r_panel,0             ,0         ,vid_vh            ,c_white);
+      vlineColor(r_panel,vid_panelw    ,0         ,vid_vh            ,c_white);
+
+      hlineColor(r_panel,0,r_panel^.w,0                 ,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw        ,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw+ui_h3bw,c_white);
+      hlineColor(r_panel,0,r_panel^.w,vid_panelw+vid_BW ,c_white);
+
+      vlineColor(r_panel,ui_h3bw       ,vid_panelw,vid_panelw+ui_h3bw,c_white);
+      vlineColor(r_panel,ui_hwp        ,vid_panelw,vid_panelw+ui_h3bw,c_white);
+      vlineColor(r_panel,ui_hwp+ui_h3bw,vid_panelw,vid_panelw+ui_h3bw,c_white);
+
+      for y:=0 to 3 do
+       vlineColor(r_panel,y*vid_tBW,vid_panelw+ui_h3bw,vid_panelw+vid_BW,c_white);
+
+      y:=vid_BW*14;
+      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
+      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
+
+      ui_iy     := vid_panelw+3;
+      ui_energx := (ui_hwp+ui_h3bw) div 2;
+      ui_armyx  := (ui_hwp+ui_h3bw+vid_panelw) div 2;
+
+      characterColor(r_panel,ui_ex,ui_iy,'E',c_aqua  );
+      characterColor(r_panel,ui_ax,ui_iy,'A',c_orange);
+
+      i:=4;
+      y:=vid_BW*i;
+      while (i<=ystop) do
+      begin
+         hlineColor(r_panel,0,vid_panelw,y,c_white);
+         inc(i,1);
+         inc(y,vid_BW);
+      end;
+   end
+   else
+   begin
+      vid_sw:=vid_vw;
+      vid_sh:=vid_vh-vid_panelw;
+
+      vid_mapx:=0;
+      if(vid_ppos=2)
+      then vid_mapy:=vid_panelw-1
+      else vid_mapy:=0;
+
+      vid_panelx:=0;
+      if(vid_ppos=2)
+      then vid_panely:=0
+      else vid_panely:=vid_sh;
+
+      r_uipanel:=_createSurf(vid_sw,vid_panelw+1);
+      r_panel  :=_createSurf(vid_sw,vid_panelw+1);
+
+      hlineColor(r_panel,0         ,vid_vw            ,0             ,c_white);
+      hlineColor(r_panel,0         ,vid_vw            ,vid_panelw    ,c_white);
+
+      vlineColor(r_panel,0                 ,0,r_panel^.w,c_white);
+      vlineColor(r_panel,vid_panelw        ,0,r_panel^.w,c_white);
+
+      vlineColor(r_panel,vid_panelw+ui_h3bw,0,r_panel^.w,c_white);
+      vlineColor(r_panel,vid_panelw+vid_BW ,0,r_panel^.w,c_white);
+
+      for y:=0 to 3 do
+      hlineColor(r_panel,vid_panelw+ui_h3bw,vid_panelw+vid_BW,y*vid_tBW,c_white);
+
+      y:=vid_BW*14;
+      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
+      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
+
+      //vlineColor(r_panel,y+ui_h3bw       ,0,ui_h3bw,c_white);
+      //vlineColor(r_panel,y+ui_hwp        ,0,ui_h3bw,c_white);
+      //vlineColor(r_panel,y+ui_hwp+ui_h3bw,0,ui_h3bw,c_white);
+      vlineColor(r_panel,y+vid_BW  ,0,vid_BW,c_white);
+      vlineColor(r_panel,y+vid_BW*2,0,vid_BW,c_white);
+      vlineColor(r_panel,y+vid_BW*3,0,vid_BW,c_white);
+      hlineColor(r_panel,y+vid_BW  ,y+vid_BW*3,vid_BW  ,c_white);
+
+      ui_iy     := 3;
+      ui_energx := y+vid_BW+vid_hBW+2;
+      ui_armyx  := y+vid_BW*2+vid_hBW;
+
+      inc(y,vid_BW);
+      characterColor(r_panel,y+ui_ex-1,ui_iy,'E',c_aqua  );
+      characterColor(r_panel,y+ui_ax+1,ui_iy,'A',c_orange);
+
+      ui_iy := 23;
+
+      i:=4;
+      y:=vid_BW*i;
+      while (i<=ystop) do
+      begin
+         vlineColor(r_panel,y,0,vid_panelw,c_white);
+         inc(i,1);
+         inc(y,vid_BW);
+      end;
+   end;
+
+   _draw_surf(r_uipanel,0,0,r_panel);
+
+   _vidvars;
+end;
+
+procedure _MakeScreen;
+begin
+   if (r_screen<>nil) then sdl_freesurface(r_screen);
+
+   if(_fscr)
+   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags + SDL_FULLSCREEN)
+   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags);
+
+   if(r_screen=nil)then begin WriteError; exit; end;
+
+   _ScreenSurfaces;
+end;
+
+
