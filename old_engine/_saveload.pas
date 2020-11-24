@@ -17,7 +17,7 @@ begin
 
    _svld_stat:='';
 
-   fn:=str_svld_dir+_svld_l[_svld_ls]+str_svld_ext;
+   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
    if(_svld_l[_svld_ls]<>'')then
     if(FileExists(fn))then
     begin
@@ -62,9 +62,9 @@ begin
             BlockRead(f,vr,sizeof(map_liq  ));
             if(vr>7)then _svld_stat:=_svld_stat+str_m_liq+'??'
                     else _svld_stat:=_svld_stat+str_m_liq+_str_mx[vr]+#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_lqt  ));vr:=0;
-            BlockRead(f,vr,sizeof(map_trt  ));vr:=0;
-            BlockRead(f,vr,sizeof(map_crt  ));vr:=0;
+            BlockRead(f,vr,sizeof(theme_map_lqt  ));vr:=0;
+            BlockRead(f,vr,sizeof(theme_map_trt  ));vr:=0;
+            BlockRead(f,vr,sizeof(theme_map_crt  ));vr:=0;
             BlockRead(f,vr,sizeof(map_hell ));vr:=0;
             BlockRead(f,vr,sizeof(map_obs  ));_svld_stat:=_svld_stat+str_m_obs+_str_mx[vr]+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]    +#13+' ';vr:=0;
@@ -114,7 +114,7 @@ begin
    _svld_sm:=0;
    _svld_ln:=0;
    setlength(_svld_l,0);
-   if(FindFirst(str_svld_dir+'*'+str_svld_ext,faReadonly,info)=0)then
+   if(FindFirst(str_f_svld+'*'+str_e_svld,faReadonly,info)=0)then
     repeat
        s:=info.Name;
        delete(s,length(s)-3,4);
@@ -178,7 +178,7 @@ cmp_ait2p
 procedure _svld_save;
 var f:file;
 begin
-   assign(f,str_svld_dir+_svld_str+str_svld_ext);
+   assign(f,str_f_svld+_svld_str+str_e_svld);
    {$I-}rewrite(f,1);{$I+} if (ioresult<>0) then exit;
 
 
@@ -190,9 +190,9 @@ begin
    BlockWrite(f,map_seed2  ,SizeOf(map_seed2));
    BlockWrite(f,map_mw     ,SizeOf(map_mw   ));
    BlockWrite(f,map_liq    ,SizeOf(map_liq  ));
-   BlockWrite(f,map_lqt    ,SizeOf(map_lqt  ));
-   BlockWrite(f,map_trt    ,SizeOf(map_trt  ));
-   BlockWrite(f,map_crt    ,SizeOf(map_crt  ));
+   BlockWrite(f,theme_map_lqt    ,SizeOf(theme_map_lqt  ));
+   BlockWrite(f,theme_map_trt    ,SizeOf(theme_map_trt  ));
+   BlockWrite(f,theme_map_crt    ,SizeOf(theme_map_crt  ));
    BlockWrite(f,map_obs    ,SizeOf(map_obs  ));
    BlockWrite(f,map_hell   ,SizeOf(map_hell ));
    BlockWrite(f,g_addon    ,SizeOf(g_addon  ));
@@ -238,10 +238,11 @@ procedure _svld_load;
 var f:file;
    fn:shortstring;
    vr:byte=0;
+   u:integer;
 begin
    if(_svld_ls<0)or(_svld_ls>=_svld_ln)then exit;
 
-   fn:=str_svld_dir+_svld_l[_svld_ls]+str_svld_ext;
+   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
   if(_svld_l[_svld_ls]<>'')then
    if(FileExists(fn))then
    begin
@@ -260,9 +261,9 @@ begin
          BlockRead(f,map_seed2  ,SizeOf(map_seed2));
          BlockRead(f,map_mw     ,SizeOf(map_mw   ));
          BlockRead(f,map_liq    ,SizeOf(map_liq  ));
-         BlockRead(f,map_lqt    ,SizeOf(map_lqt  ));
-         BlockRead(f,map_trt    ,SizeOf(map_trt  ));
-         BlockRead(f,map_crt    ,SizeOf(map_crt  ));
+         BlockRead(f,theme_map_lqt    ,SizeOf(theme_map_lqt  ));
+         BlockRead(f,theme_map_trt    ,SizeOf(theme_map_trt  ));
+         BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt  ));
          BlockRead(f,map_obs    ,SizeOf(map_obs  ));
          BlockRead(f,map_hell   ,SizeOf(map_hell ));
          BlockRead(f,g_addon    ,SizeOf(g_addon  ));
@@ -299,7 +300,7 @@ begin
          MakeLiquid;
          _refresh_dmcells;
          _makeMMB;
-         _dds_spr;
+         //_dds_spr;
          g_inv_calcmm;
 
          _view_bounds;
@@ -307,6 +308,10 @@ begin
          _menu:=false;
 
          for vr:=0 to MaxPlayers do _setAI(vr);
+
+         for u:=1 to MaxUnits do
+          with _units[u] do
+           player:=@_players[playeri];
       end;
       close(f);
    end;
@@ -316,7 +321,7 @@ procedure _svld_delete;
 var fn:string;
 begin
    if(_svld_ls<0)or(_svld_ls>=_svld_ln)then exit;
-   fn:=str_svld_dir+_svld_l[_svld_ls]+str_svld_ext;
+   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);

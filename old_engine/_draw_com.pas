@@ -85,7 +85,7 @@ begin
    end;
 end;
 
-procedure LoadingScreen;
+procedure _LoadingScreen;
 begin
    SDL_FillRect(r_screen,nil,0);
    stringColor(r_screen,(vid_vw div 2)-40, vid_vh div 2,@str_loading[1],c_yellow);
@@ -97,8 +97,8 @@ begin
   if(vid_rtui=0)and(_menu=false)and(_draw)then
    with pu^ do
     if(isbuild)
-    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(playern))
-    else pixelColor       (r_minimap,mmx,mmy,    p_color(playern));
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(player^.pnum))
+    else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
 end;
 
 procedure _bmm_draw(sd:TSob);

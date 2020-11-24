@@ -4,7 +4,7 @@ begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
       inc(vid_vsls,1);
-      with vid_vsl[vid_vsls] do
+      with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx;
          y   := ay-vid_vy;
@@ -25,12 +25,12 @@ begin
    end;
 end;
 //_sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
-procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTUSprite;ainv:byte;aro:integer);
+procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro:integer);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
       inc(vid_vsls,1);
-      with vid_vsl[vid_vsls] do
+      with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx-aspr^.hw;
          y   := ay-vid_vy-aspr^.hh;
@@ -51,12 +51,12 @@ begin
    end;
 end;
 //_sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
-procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTUSprite;ainv:byte);
+procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWSprite;ainv:byte);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
       inc(vid_vsls,1);
-      with vid_vsl[vid_vsls] do
+      with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx-aspr^.hw;
          y   := ay-vid_vy-aspr^.hh;
@@ -79,12 +79,12 @@ end;
 
 procedure _sv_sort;
 var i,u:word;
-    dt:TVisSpr;
+    dt:PTVisSpr;
 begin
    if(vid_vsls>1)then
     for i:=1 to vid_vsls do
      for u:=1 to (vid_vsls-1) do
-      if (vid_vsl[u].d<vid_vsl[u+1].d) then
+      if (vid_vsl[u]^.d<vid_vsl[u+1]^.d) then
       begin
         dt:=vid_vsl[u];
         vid_vsl[u]:=vid_vsl[u+1];
@@ -97,7 +97,7 @@ var sx,sy:integer;
 begin
    _sv_sort;
    while(vid_vsls>0)do
-    with vid_vsl[vid_vsls] do
+    with vid_vsl[vid_vsls]^ do
     begin
        inc(x,lx);
        inc(y,ly);
@@ -157,10 +157,10 @@ begin
 end;
 
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
-var i,
+var i,t,
   ix,iy,s:integer;
     vx,vy:integer;
-    spr  :PTUsprite;
+    spr  :PTMWSprite;
 begin
    _draw_surf(tar,
    lx-vid_vx mod ter_w,
@@ -170,34 +170,38 @@ begin
    vx:=vid_vx-vid_ab;
    vy:=vid_vy-vid_ab;
 
-   for i:=1 to MaxTDecsS do
-    with _TDecs[i-1] do
-    begin
-       ix:=x-vx+vid_mwa;
-       iy:=y-vy+vid_mha;
+   if(theme_decaln>0)then
+    for i:=1 to MaxTDecsS do
+     with _TDecs[i-1] do
+     begin
+        ix:=x-vx+vid_mwa;
+        iy:=y-vy+vid_mha;
 
-       s:=abs(i+(iy div vid_mha)+(ix div vid_mwa)) mod t_decsi;
+        s:=abs(i+(iy div vid_mha)+(ix div vid_mwa)) mod theme_decaln;
 
-       case s of
-       0: continue;
-       1..crater_ri: spr:=@spr_crater[s];
-       else
-         if(spr_tdecsi>0)
-         then spr:=@spr_tdecs[s-crater_ri-1]
-         else continue;
-       end;
+        t:=theme_decals[s];
+        if(t<0)
+        then spr:=@spr_crater[-t]
+        else spr:=@theme_spr_decals[t];
 
-       ix:=ix mod vid_mwa;
-       iy:=iy mod vid_mha;
+        ix:=ix mod vid_mwa;
+        iy:=iy mod vid_mha;
 
-       if(ix<0)then ix:=vid_mwa+ix;
-       if(iy<0)then iy:=vid_mha+iy;
+        ix:=ix mod vid_mwa;
+        iy:=iy mod vid_mha;
 
-       dec(ix,vid_ab);
-       dec(iy,vid_ab);
+        if(ix<0)then ix:=vid_mwa+ix;
+        if(iy<0)then iy:=vid_mha+iy;
 
-       _draw_surf(tar,lx+ix-spr^.hw,ly+iy-spr^.hh,spr^.surf);
-    end;
+        dec(ix,vid_ab);
+        dec(iy,vid_ab);
+
+        //dec(ix,vid_ab+lx-spr^.hw);
+        //dec(iy,vid_ab+ly-spr^.hh);
+
+        with spr^ do
+        _draw_surf(tar,ix-hw,iy-hh,spr^.surf);
+     end;
 end;
 
 procedure d_fog(tar:pSDL_Surface;lx,ly:integer);
@@ -311,11 +315,11 @@ begin
         begin
            circleColor(r_screen,ix,iy,r,c_gray);
            circleColor(r_screen,ix,iy,sr,c_gray);
-           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(playern));
+           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
         end;
 
         if(hits>0)and(inapc=0)then
-        if(playern=HPlayer)then
+        if(playeri=HPlayer)then
         begin
            if(isbuild)then
            begin
@@ -331,7 +335,7 @@ begin
             lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b], ta_left,255, p_color(playern));
+        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, p_color(playeri));
 
         if(inapc>0)then continue;
 

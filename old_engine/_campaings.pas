@@ -370,7 +370,7 @@ begin
 
           if(G_Step=72000)then
           begin
-             map_lqt:=3;
+             theme_map_lqt:=3;
              MakeLiquid;
              for i:=1 to MaxDoodads do
               with map_dds[i] do

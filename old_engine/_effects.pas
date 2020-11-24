@@ -76,7 +76,7 @@ end;
 procedure _effectsCycle(draw,onlyspr:boolean);
 var ei,ea,
  alpha:integer;
-   spr:PTUSprite;
+   spr:PTMWSprite;
    msk:cardinal;
 begin
    for ei:=1 to vid_mvs do
@@ -160,8 +160,7 @@ begin
            end;
 
         if(draw)then
-        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_sw+spr^.hw))and
-          ((vid_vy-spr^.hh)<y)and(y<(vid_vy+vid_sh+spr^.hh))then
+         if(_rectvis(x,y,spr^.hw,spr^.hh))then
           _sl_add_eff(x,y,d,msk,spr,alpha);
      end;
 end;

@@ -10,7 +10,7 @@ procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
-   with _players[pu^.playern] do
+   with pu^.player^ do
     if(upgr[upgr_melee]>0)then
      case race of
        r_hell : inc(damage,upgr[upgr_melee]*4);
@@ -170,7 +170,7 @@ begin
       if(tu^.hits>0)and(_miduid(mid,tu^.uid))and(tu^.inapc=0)then
         if(abs(mf-tu^.uf)<2)then
         begin
-           teams:=_players[player].team=_players[tu^.playern].team;
+           teams:=_players[player].team=tu^.player^.team;
            damd :=dam;
 
            if(teams)then
@@ -394,7 +394,7 @@ const  mb_s0 = vid_fps div 6;
 var m,u:integer;
     {$IFDEF _FULLGAME}
     d  :integer;
-    spr:PTUSprite;
+    spr:PTMWSprite;
     {$ENDIF}
 begin
    for m:=1 to MaxUnits do
@@ -479,7 +479,7 @@ begin
         else spr:=@spr_dummy;
         end;
 
-        if(_nhp3(vx,vy,player))then
+        if(_nhp3(vx,vy,@_players[player]))then
         begin
            d:=map_flydpth[mf]+vy;
            if(vst>0)then

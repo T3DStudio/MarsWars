@@ -1,10 +1,10 @@
 
 {$IFDEF _FULLGAME}
 procedure _unit_dvis(pu:PTUnit);
-var spr : PTUSprite;
+var spr : PTMWSprite;
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if(hits>dead_hits)then
      begin
         if(hits<idead_hits)then exit;
@@ -41,7 +41,7 @@ end;
 procedure _unit_deff(pu:PTUnit;deff:boolean);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(deff)then
       begin
@@ -196,7 +196,7 @@ procedure _unit_uiprodcnts(pu:PTUnit;pn:integer);
 var i,t:byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(isbarrack)then
       begin
@@ -229,8 +229,8 @@ procedure _unit_uidata(pu:PTUnit);
 var i:byte;
 begin
    with pu^ do
-   if(playern=HPlayer)and(G_Paused=0)then
-    with _players[playern] do
+   if(playeri=HPlayer)and(G_Paused=0)then
+    with player^ do
     begin
        if(order<10)then
        begin
@@ -256,7 +256,7 @@ begin
               else _unit_uiprodcnts(pu,i);
 
              if(sel)then
-              if(uid in whocanmp)then _sl_add(uo_x-spr_mp[race].hw, uo_y-spr_mp[race].surf^.h,uo_y-spr_mp[race].hh,0,0,0,false,spr_mp[race].surf,255,0,0,0,0,'',0);
+              if(uid in whocanmp)then _sl_add(uo_x-spr_mp[race].hw, uo_y-spr_mp[race].h,uo_y-spr_mp[race].hh,0,0,0,false,spr_mp[race].surf,255,0,0,0,0,'',0);
           end
           else
           begin
@@ -307,7 +307,7 @@ end;
 
 procedure _unit_vis(pu:PTUnit;nanim:boolean);
 const _btnas : array[false..true] of integer = (vid_hBW,vid_BW);
-var spr : PTUSprite;
+var spr : PTMWSprite;
      dp,smy,
      inv,t,ro,
      sh : integer;
@@ -321,7 +321,7 @@ b0,b2,b3: byte;
 begin
    with pu^ do
     if(hits>0)and(inapc=0)then
-    with _players[playern] do
+    with player^ do
      begin
         _unit_uidata(pu);
 
@@ -365,7 +365,7 @@ begin
               b2 :=0;
               b3 :=0;
               rct:=false;
-              rc :=p_color(playern);
+              rc :=p_color(playeri);
               ro :=0;
 
               if(isbuild)then
@@ -388,14 +388,14 @@ begin
 
               if(wanim)then _unit_foot(pu);
 
-              if((sel)and(playern=HPlayer))
+              if((sel)and(playeri=HPlayer))
               or(k_alt>1)
               or((ui_umark_u=unum)and(vid_rtui>vid_rtuish))then
               begin
                  rct:=true;
                  if(buff[ub_advanced ]>0)then b1:=b1+adv_char;
                  if(buff[ub_detect   ]>0)then b1:=b1+hp_detect;
-                 if(playern=HPlayer)then
+                 if(playeri=HPlayer)then
                  begin
                     if(order>0)then b0:=order;
                     if(apcm>0)then
@@ -417,7 +417,7 @@ begin
               if(buff[ub_invis ]>0 )then inv:=128;
               if(buff[ub_invuln]>10)then mc:=c_awhite;
 
-              if(playern=0)and(isbuild=false)then
+              if(playeri=0)and(isbuild=false)then
                if(g_mode in [gm_inv,gm_coop])then mc:=c_ablack;
 
               dp:=_udpth(pu);
@@ -437,7 +437,7 @@ begin
                      end;
                   end;
 
-                  if(playern=HPlayer)then
+                  if(playeri=HPlayer)then
                   begin
                      for t:=0 to MaxUnitProds do
                      begin
@@ -522,7 +522,7 @@ begin
    begin
       buff[ub_gear    ]:=gear_time[mech];
       buff[ub_advanced]:=_bufinf;
-      with _players[tu^.playern] do
+      with tu^.player^ do
       begin
          if(mech)
          then tu^.rld_t:=mech_adv_rel[(g_addon=false)or(upgr[upgr_6bld2]>0)]
@@ -537,7 +537,7 @@ end;
 procedure _unit_inc_selc(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       inc(ucl_s [isbuild,ucl],1);
       inc(ucl_cs[isbuild],1);
@@ -550,7 +550,7 @@ end;
 procedure _unit_dec_selc(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       dec(ucl_s [isbuild,ucl],1);
       dec(ucl_cs[isbuild],1);
@@ -564,7 +564,7 @@ end;
 procedure _unit_desel(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(sel)then
       begin
@@ -582,7 +582,7 @@ end;
 procedure _unit_dec_Kcntrs(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       _unit_desel(pu);
 
@@ -610,7 +610,7 @@ end;
 procedure _unit_dec_Rcntrs(pu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        dec(army,1);
        dec(ucl_e[isbuild,ucl],1);
@@ -622,14 +622,14 @@ end;
 procedure _unit_remove(pu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        _unit_dec_Rcntrs(pu);
 
        if(G_WTeam=255)then
-        if(playern>0)or not(g_mode in [gm_inv,gm_coop])then
+        if(playeri>0)or not(g_mode in [gm_inv,gm_coop])then
          if(army=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-         and(state>ps_none)then net_chat_add(name+str_player_def,playern,255);
+         and(state>ps_none)then net_chat_add(name+str_player_def,playeri,255);
     end;
 end;
 
@@ -639,7 +639,7 @@ var
     uc  : integer;
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if(hits>dead_hits)then
      begin
         _unit_counters(pu);
@@ -700,7 +700,7 @@ begin
                buff[ub_born ]:=vid_fps;
                {$IFDEF _FULLGAME}
                _unit_fsrclc(pu);
-               if(playern=HPlayer)then _unit_createsound(uid);
+               if(playeri=HPlayer)then _unit_createsound(uid);
                {$ENDIF}
             end;
          end;
@@ -722,7 +722,7 @@ var i :integer;
 begin
    with pu^ do
    if(unum>0)then
-   with _players[playern] do
+   with player^ do
    begin
       if(nodead=false)then
       begin
@@ -808,7 +808,7 @@ begin
 
       arm:=0;
 
-      with _players[playern] do
+      with player^ do
       begin
          if(isbuild)then
          begin
@@ -868,7 +868,7 @@ begin
             arm:=0;
          end;
 
-         if(g_mode in [gm_inv,gm_coop])and(playern=0)then dam:=dam div 2;
+         if(g_mode in [gm_inv,gm_coop])and(playeri=0)then dam:=dam div 2;
       end;
 
       dec(dam,arm);
@@ -906,7 +906,7 @@ begin
 
                  if(uid in [UID_Mancubus,UID_ArchVile,UID_ZBFG])then rld_t:=0;
 
-                 with _players[playern] do
+                 with player^ do
                   if(race=r_hell)then
                    if(upgr[upgr_pains]>0)then inc(pains,upgr[upgr_pains]*3);
                  {$IFDEF _FULLGAME}
@@ -925,12 +925,12 @@ var i:byte;
 begin
    with pu^ do
     if(bld)then
-     with _players[playern] do
+     with player^ do
       if(rld_t=0)and(race=r_uac)then
        if(upgr[upgr_blizz]>0)and(rld_t=0)then
        begin
           for i:=0 to MaxPlayers do _addtoint(@vsnt[i],vid_2fps);
-          _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playern,uf_soaring,false);
+          _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,false);
           rld_t:=vid_fps*10;
           dec(upgr[upgr_blizz],1);
           {$IFDEF _FULLGAME}
@@ -942,7 +942,7 @@ end;
 procedure _unit_bteleport(pu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if(bld)then
       if(upgr[upgr_mainm]>0)and(buff[ub_clcast]=0)then
        if(_unit_grbcol(uo_x,uo_y,r,255,0,upgr[upgr_mainonr]=0)=0)then
@@ -970,7 +970,7 @@ end;
 procedure _unit_b247teleport(pu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if(bld)then
       if(upgr[upgr_b478tel]>0)and(buff[ub_clcast]=0)then
        if(dist2(x,y,uo_x,uo_y)<sr)and(_unit_grbcol(uo_x,uo_y,r,255,0,true)=0)then
@@ -985,7 +985,7 @@ end;
 procedure _unit_morph(pu:PTUnit;nuid:byte;ubld:boolean);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        _unit_dec_Kcntrs(pu);
        _unit_dec_Rcntrs(pu);
@@ -1001,7 +1001,7 @@ procedure _unit_action(pu:PTUnit);
 begin
    with pu^ do
    if(bld)then
-    with _players[playern] do
+    with player^ do
      case uid of
 UID_HCommandCenter,
 UID_UCommandCenter:
@@ -1042,7 +1042,7 @@ UID_UCommandCenter:
                  end;
 UID_Engineer :  if(army<MaxPlayerUnits)and(upgr[upgr_mines]>0)and(menerg>0)and(inapc=0)and(buff[ub_cast]=0)then
                 begin
-                   _unit_add(vx,vy,UID_Mine,playern,true);
+                   _unit_add(vx,vy,UID_Mine,playeri,true);
                    buff[ub_cast]:=vid_hfps;
                 end;
 UID_APC,
@@ -1059,7 +1059,7 @@ UID_LostSoul :  if(upgr[upgr_vision]>0)then
                 begin
                    {$IFDEF _FULLGAME}
                    _effect_add(vx,vy,vy+1,UID_LostSoul);
-                   if(playern=HPlayer)then PlaySND(snd_hellbar,nil);
+                   if(playeri=HPlayer)then PlaySND(snd_hellbar,nil);
                    {$ENDIF}
                    _unit_morph(pu,UID_HEye,true);
                    order:=0;
@@ -1200,7 +1200,7 @@ end;
 procedure _unit_npush2(pu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if(speed>0)and(uf=uf_ground)and(solid)then _unit_npush(pu);
 end;
 
@@ -1231,7 +1231,7 @@ begin
          uo_id:=ua_move;
       end;
       {$IFDEF _FULLGAME}
-      if(playern=HPlayer)then
+      if(playeri=HPlayer)then
        if(tu^.sel)then inc(ui_units_inapc[ucl],1);
       {$ENDIF}
    end
@@ -1267,7 +1267,7 @@ begin
               spup:=speed;
 
               if(uid=UID_UTransport)and(buff[ub_pain]>0)then dec(spup,2);
-              with _players[playern] do
+              with player^ do
               begin
                  if(race=r_uac)and(isbuild=false)then
                   case mech of
@@ -1339,7 +1339,7 @@ begin
        _unit_kill(pu,true,true);
        hits:=ndead_hits;
 
-       _unit_add(tu1^.vx,tu1^.vy,zuid,playern,true);
+       _unit_add(tu1^.vx,tu1^.vy,zuid,playeri,true);
        if(_lcu=0)then exit;
 
        _lcup^.buff[ub_advanced]:=oadv;
@@ -1368,7 +1368,7 @@ begin
                                 PlaySND(snd_hellbar,pu);
                              end;
           else
-            if(playern=HPlayer)then _unit_createsound(_lcup^.uid);
+            if(playeri=HPlayer)then _unit_createsound(_lcup^.uid);
           end;
           {$ENDIF}
        end;
@@ -1422,25 +1422,25 @@ begin
                   {$ENDIF}
                   rld_t:=rld_r;
 
-                  _unit_damage(tu1,mdam,2,playern);
+                  _unit_damage(tu1,mdam,2,playeri);
                end;
          UID_Imp      :
                begin
                   if(melee)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hmelee,pu);{$ENDIF}
-                     _unit_damage(tu1,mdam,1,playern);
+                     _unit_damage(tu1,mdam,1,playeri);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hshoot,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Imp,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Imp,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   rld_t:=rld_r;
                end;
          UID_Demon    :
                begin
-                  _unit_damage(tu1,mdam,1,playern);
+                  _unit_damage(tu1,mdam,1,playeri);
                   {$IFDEF _FULLGAME}PlaySND(snd_demona,pu);{$ENDIF}
                   rld_t:=rld_r;
                end;
@@ -1449,12 +1449,12 @@ begin
                   if(melee)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hmelee,pu);{$ENDIF}
-                     _unit_damage(tu1,mdam,1,playern);
+                     _unit_damage(tu1,mdam,1,playeri);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hshoot,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Cacodemon,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Cacodemon,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   rld_t:=rld_r;
                end;
@@ -1463,25 +1463,25 @@ begin
                   if(melee)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hmelee,pu);{$ENDIF}
-                     _unit_damage(tu1,mdam,1,playern);
+                     _unit_damage(tu1,mdam,1,playeri);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_hshoot,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Baron,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Baron,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   rld_t:=rld_r;
                end;
          UID_Cyberdemon:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_launch,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_HRocket,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_HRocket,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_Mastermind:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_Pain      :
@@ -1494,19 +1494,19 @@ begin
                   if(melee)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_rev_m,pu);{$ENDIF}
-                     _unit_damage(tu1,mdam,1,playern);
+                     _unit_damage(tu1,mdam,1,playeri);
                      rld_t:=rld_r shr 1;
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_rev_a,pu);{$ENDIF}
 
-                     with _players[playern] do
+                     with player^ do
                       if(upgr[upgr_revmis]>0)
                       then ux:=MID_RevenantS
                       else ux:=MID_Revenant;
 
-                     _miss_add(tu1^.x,tu1^.y,vx,vy-16,tar1,ux,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy-16,tar1,ux,playeri,_tuf(uf,tu1^.uf),false);
 
                      rld_t:=rld_r;
                   end;
@@ -1519,9 +1519,9 @@ begin
          UID_Arachnotron:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_plasmas,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_YPlasma,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_YPlasma,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
-                  _addtoint(@tu1^.vsnt[_players[playern].team],vid_fps);
+                  _addtoint(@tu1^.vsnt[player^.team],vid_fps);
                end;
          UID_ArchVile :
                begin
@@ -1576,8 +1576,8 @@ begin
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
                      if(buff[ub_advanced]=0)
-                     then _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet ,playern,_tuf(uf,tu1^.uf),false)
-                     else _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_MBullet,playern,_tuf(uf,tu1^.uf),false);
+                     then _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet ,playeri,_tuf(uf,tu1^.uf),false)
+                     else _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_MBullet,playeri,_tuf(uf,tu1^.uf),false);
                      rld_t:=rld_r;
                   end;
                end;
@@ -1604,15 +1604,15 @@ begin
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
                      if(buff[ub_advanced]=0)
-                     then _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet ,playern,_tuf(uf,tu1^.uf),false)
-                     else _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_TBullet,playern,_tuf(uf,tu1^.uf),false);
+                     then _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet ,playeri,_tuf(uf,tu1^.uf),false)
+                     else _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_TBullet,playeri,_tuf(uf,tu1^.uf),false);
                      rld_t:=rld_r;
                   end;
                end;
          UID_ZFormer:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
 
@@ -1623,39 +1623,39 @@ begin
                   if(buff[ub_advanced]>0)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_ssg,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_SSShot,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_SSShot,playeri,_tuf(uf,tu1^.uf),false);
                      inc(rld_t,10);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_SShot ,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_SShot ,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                end;
          UID_ZCommando:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_Commando:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_Bomber,
          UID_ZBomber:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_launch,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy-6,tar1,MID_Granade,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy-6,tar1,MID_Granade,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_Major,
          UID_ZMajor:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_plasmas,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_BFG,
@@ -1666,18 +1666,18 @@ begin
                end;
          UID_APC,
          UID_FAPC :
-               with _players[playern] do
+               with player^ do
                if(upgr[upgr_plsmt]>0)then
                begin
                   if(upgr[upgr_plsmt]=1)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu); {$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet  ,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet  ,playeri,_tuf(uf,tu1^.uf),false);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu); {$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   rld_t:=rld_r;
                end
@@ -1687,37 +1687,37 @@ begin
                   if(buff[ub_advanced]>0)then
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playeri,_tuf(uf,tu1^.uf),false);
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_pistol,pu);{$ENDIF}
-                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet  ,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bullet  ,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   rld_t:=rld_r;
                end;
          UID_Tank:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_exp,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Tank,playern,_tuf(uf,tu1^.uf),true);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Tank,playeri,_tuf(uf,tu1^.uf),true);
                   rld_t:=rld_r;
                end;
          UID_Flyer:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_fly_a,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Flyer,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Flyer,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
 
          UID_ZEngineer:
                begin
-                  _miss_add(vx,vy,vx,vy,0,MID_Mine,playern,0,true);
+                  _miss_add(vx,vy,vx,vy,0,MID_Mine,playeri,0,true);
                   if(OnlySVCode)then _unit_kill(pu,false,true);
                end;
          UID_Mine:
                if(buff[ub_advanced]=0)and(tar1d<40)and(tu1^.uf<uf_fly)then
                begin
-                  _miss_add(vx,vy,vx,vy,0,MID_Mine,playern,0,true);
+                  _miss_add(vx,vy,vx,vy,0,MID_Mine,playeri,0,true);
                   if(OnlySVCode)then _unit_kill(pu,false,true);
                end
                else exit;
@@ -1725,17 +1725,17 @@ begin
                begin
                   if(tu1^.uid=UID_Revenant)then
                   begin
-                     _miss_add(tu1^.x,tu1^.y,vx,vy-26,tar1,MID_Cacodemon,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy-26,tar1,MID_Cacodemon,playeri,_tuf(uf,tu1^.uf),false);
                      {$IFDEF _FULLGAME}PlaySND(snd_hshoot,pu);{$ENDIF}
                   end
                   else
                   begin
                      {$IFDEF _FULLGAME}PlaySND(snd_rev_a,pu); {$ENDIF}
-                     with _players[playern] do
+                     with player^ do
                       if(upgr[upgr_revmis]>0)
                       then ux:=MID_RevenantS
                       else ux:=MID_Revenant;
-                     _miss_add(tu1^.x,tu1^.y,vx,vy-26,tar1,ux,playern,_tuf(uf,tu1^.uf),false);
+                     _miss_add(tu1^.x,tu1^.y,vx,vy-26,tar1,ux,playeri,_tuf(uf,tu1^.uf),false);
                   end;
                   {$IFDEF _FULLGAME}_effect_add(vx,vy-26,vy+1,MID_Revenant);{$ENDIF}
                   rld_t:=rld_r;
@@ -1754,36 +1754,36 @@ begin
          UID_UTurret:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_shotgun,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Bulletx2,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_UPTurret:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_plasmas,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy-15,tar1,MID_BPlasma,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy-15,tar1,MID_BPlasma,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_URTurret:
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_launch,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy-20,tar1,MID_HRocket,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy-20,tar1,MID_HRocket,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end;
          UID_UCommandCenter :
-               with _players[playern] do
+               with player^ do
                if(uf>uf_ground)and(upgr[upgr_ucomatt]>0)and(race=r_uac)then
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_plasmas,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BPlasma,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end
                else exit;
          UID_HCommandCenter :
-               with _players[playern] do
+               with player^ do
                if(uf>uf_ground)and(race=r_hell)then
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_hshoot,pu);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Imp,playern,_tuf(uf,tu1^.uf),false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_Imp,playeri,_tuf(uf,tu1^.uf),false);
                   rld_t:=rld_r;
                end
                else exit;
@@ -1794,19 +1794,19 @@ begin
        case uid of
         UID_HTotem,
         UID_ArchVile :
-           if(tu1^.playern<>playern)then
+           if(tu1^.playeri<>playeri)then
            begin
               if(rld_t=rld_a)
-              then _miss_add(tu1^.x,tu1^.y,tu1^.x,tu1^.y,0,MID_ArchFire,playern,_tuf(uf,tu1^.uf),false)
+              then _miss_add(tu1^.x,tu1^.y,tu1^.x,tu1^.y,0,MID_ArchFire,playeri,_tuf(uf,tu1^.uf),false)
               else
               begin
-                 _addtoint(@tu1^.vsnt[_players[playern].team],vid_fps);
-                 _addtoint(@tu1^.vsni[_players[playern].team],vid_fps);
+                 _addtoint(@tu1^.vsnt[player^.team],vid_fps);
+                 _addtoint(@tu1^.vsni[player^.team],vid_fps);
 
                  if((rld_t mod 20)=0)then dir:=p_dir(x,y,tu1^.x,tu1^.y);
                  {$IFDEF _FULLGAME}
                  if((rld_t mod 40)=0)then
-                  if(_nhp3(tu1^.x,tu1^.y,playern))then
+                  if(_nhp3(tu1^.x,tu1^.y,player))then
                   begin
                      PlaySND(snd_arch_f,tu1);
                      if(tu1^.isbuild)and(tu1^.r>20)then
@@ -1826,8 +1826,8 @@ begin
               30:begin
                     dir:=p_dir(x,y,tu1^.x,tu1^.y);
                     {$IFDEF _FULLGAME} PlaySND(snd_hshoot,pu); {$ENDIF}
-                    _miss_add(tu1^.x,tu1^.y,vx-7,vy-7,tar1,MID_Mancubus,playern,_tuf(uf,tu1^.uf),false);
-                    _miss_add(tu1^.x,tu1^.y,vx+7,vy+7,tar1,MID_Mancubus,playern,_tuf(uf,tu1^.uf),false);
+                    _miss_add(tu1^.x,tu1^.y,vx-7,vy-7,tar1,MID_Mancubus,playeri,_tuf(uf,tu1^.uf),false);
+                    _miss_add(tu1^.x,tu1^.y,vx+7,vy+7,tar1,MID_Mancubus,playeri,_tuf(uf,tu1^.uf),false);
                  end;
               end;
            end;
@@ -1836,13 +1836,13 @@ begin
            if(rld_t=70)then
            begin
               dir:=p_dir(x,y,tu1^.x,tu1^.y);
-              _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BFG,playern,uf_soaring,false);
+              _miss_add(tu1^.x,tu1^.y,vx,vy,tar1,MID_BFG,playeri,uf_soaring,false);
            end;
        end;
 
-      _addtoint(@vsnt[_players[tu1^.playern].team],vid_fps);
+      _addtoint(@vsnt[tu1^.player^.team],vid_fps);
       if(OnlySVCode)then
-       if(_players[tu1^.playern].team<>_players[playern].team)then
+       if(tu1^.player^.team<>player^.team)then
        begin
           tu1^.alrm_r:=-1;
           tu1^.alrm_x:=x;
@@ -1857,7 +1857,7 @@ begin
 
    with uu^ do
    begin
-      with _players[playern] do
+      with player^ do
        if(state=ps_comp)and(cf(@ai_flags,@aif_smarttpri))and(melee=false)then
        begin
           if(tu^.uid in [UID_Pain,UID_BFG,UID_ZBFG])then
@@ -1952,9 +1952,9 @@ var
 begin
    with pu^ do
    begin
-      with _players[playern] do
+      with player^ do
       begin
-         teams:=(team=_players[tu^.playern].team);
+         teams:=(team=tu^.player^.team);
 
          if(tu^.hits>0)then
          begin
@@ -1962,7 +1962,7 @@ begin
 
             if(onlySVCode)and(state=ps_comp)and(vision)then _unit_aiUBC(pu,tu,ud,teams);
 
-            if(_player_sight(playern,tu,vision))then
+            if(_player_sight(playeri,tu,vision))then
              if(teams=false)then
              begin
                 if(tu^.buff[ub_invuln]=0)then
@@ -1997,14 +1997,14 @@ begin
 
       if(onlySVCode)then
       begin
-         with _players[playern] do
+         with player^ do
           if(bld)and(tu^.hits>0)then
           begin
              if(uid=UID_HKeep)then
               if(upgr[upgr_paina]>0)and(ud<sr)then
                if(teams=false)then
                begin
-                  if not(tu^.uid in [UID_HEye,UID_Mine])then  _unit_damage(tu,upgr[upgr_paina] shl 1,upgr[upgr_paina],playern);
+                  if not(tu^.uid in [UID_HEye,UID_Mine])then  _unit_damage(tu,upgr[upgr_paina] shl 1,upgr[upgr_paina],playeri);
                end
                else tu^.buff[ub_toxin]:=-vid_fps;
           end;
@@ -2072,7 +2072,7 @@ begin
        end;
 
       {$IFDEF _FULLGAME}
-      if(playern=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
+      if(playeri=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
       {$ENDIF}
    end;
 end;
@@ -2082,7 +2082,7 @@ var i : byte;
     ud:integer;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       for i:=1 to MaxPlayers do
        with g_ct_pl[i] do
@@ -2095,7 +2095,7 @@ begin
            else
              if(ct>=g_ct_ct[race])then
              begin
-                pl:=playern;
+                pl:=playeri;
                 ct:=0;
              end;
 
@@ -2124,7 +2124,7 @@ var uc,
     push :boolean;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       ai_pt :=0;
       ai_ptd:=32000;
@@ -2187,7 +2187,7 @@ begin
 
              dec(ud,r+tu^.r);
 
-             if(playern=tu^.playern)then
+             if(playeri=tu^.playeri)then
              begin
                 if(state=ps_comp)then
                  if(_unit_aiC(pu,tu,ud))then continue;
@@ -2221,7 +2221,7 @@ begin
       _unit_npush2(pu);
 
       {$IFDEF _FULLGAME}
-      if(playern=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
+      if(playeri=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
       {$ENDIF}
 
       case uid of
@@ -2245,11 +2245,11 @@ var suid:byte;
 begin
   _u1_spawn:=false;
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        if(sy=32000)then sy:=r;
        suid:=cl2uid[race,false,uprod_t[pn] ];
-       _unit_add(x+sx,y+sy+_ulst[suid].r,suid,playern,true);
+       _unit_add(x+sx,y+sy+_ulst[suid].r,suid,playeri,true);
        if(_lcu>0)then
        begin
           _u1_spawn:=true;
@@ -2274,7 +2274,7 @@ end;
 procedure _unit_portalspawn(pu:PTUnit;uids:TSoB);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    if(rld_t=0)then
    begin
       repeat
@@ -2282,7 +2282,7 @@ begin
          if(rld_a>255)or(rld_a<0)then rld_a:=0;
       until rld_a in uids;
 
-      _unit_add(x,y,rld_a,playern,true);
+      _unit_add(x,y,rld_a,playeri,true);
 
       if(_lcu>0)then
       begin
@@ -2301,7 +2301,7 @@ procedure _unit_prod(pu:PTUnit);
 var t,i,_uid:byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    for i:=0 to MaxUnitProds do
    begin
      if(isbarrack)then
@@ -2314,7 +2314,7 @@ begin
          else
            if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
            begin
-              if(_u1_spawn(pu,i*30,32000,i))and(playern=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
+              if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
 
               if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
 
@@ -2341,12 +2341,12 @@ end;
 procedure _unit_code2(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(onlySVCode)then
       begin
          {$IFDEF _FULLGAME}
-         if(playern=0)and(_testdmg)then
+         if(playeri=0)and(_testdmg)then
           if(sel)then
           begin
              if(k_shift>2)then _unit_desel(pu);
@@ -2446,12 +2446,12 @@ begin
          td :=dist2(x,y,tu^.x,tu^.y);
          tdm:=td-(r+tu^.r);
 
-         if(playern=tu^.playern)then
+         if(playeri=tu^.playeri)then
          begin
             /// HELL ADV
             if(uid=UID_HMonastery)and(tu^.isbuild=false)then
             begin
-               with _players[playern] do
+               with player^ do
                 if(tu^.buff[ub_advanced]=0)and(bld)and(upgr[upgr_6bld]>0)and(buff[ub_advanced]>0)then
                 begin
                    dec(upgr[upgr_6bld],1);
@@ -2467,7 +2467,7 @@ begin
             end;
             if(tu^.uid=UID_HMonastery)and(isbuild=false)then
             begin
-               with _players[playern] do
+               with player^ do
                 if(buff[ub_advanced]=0)and(tu^.bld)and(upgr[upgr_6bld]>0)then
                 begin
                    dec(upgr[upgr_6bld],1);
@@ -2484,7 +2484,7 @@ begin
             /// HELL INVULN
             if(uid=UID_HAltar)and(tu^.isbuild=false)then
             begin
-               with _players[playern] do
+               with player^ do
                 if(tu^.buff[ub_invuln]=0)and(bld)and(upgr[upgr_hinvuln]>0)then
                 begin
                    dec(upgr[upgr_hinvuln],1);
@@ -2500,7 +2500,7 @@ begin
             end;
             if(tu^.uid=UID_HAltar)and(isbuild=false)then
             begin
-               with _players[playern] do
+               with player^ do
                 if(buff[ub_invuln]=0)and(tu^.bld)and(upgr[upgr_hinvuln]>0)then
                 begin
                    dec(upgr[upgr_hinvuln],1);
@@ -2532,10 +2532,10 @@ begin
              end;
          end;
 
-         teams:=(_players[playern].team=_players[tu^.playern].team);
+         teams:=(player^.team=tu^.player^.team);
 
          if(teams=false)then
-          if(_uvision(_players[playern].team,tu,false)=false)then
+          if(_uvision(player^.team,tu,false)=false)then
           begin
              uo_tar:=0;
              exit;
@@ -2690,7 +2690,7 @@ procedure _unit_nfog(pu:PTUnit);
 var i : byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       _addtoint(@vsnt[team],vistime);
       _addtoint(@vsni[team],vistime);
@@ -2701,7 +2701,7 @@ begin
            for i:=0 to MaxPlayers do
            begin
               _addtoint(@vsnt[i],vid_fps);
-              if(g_mode<>gm_inv)or(playern>0)then _addtoint(@vsni[i],vid_fps);
+              if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],vid_fps);
            end;
        end;
    end;

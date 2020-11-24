@@ -171,7 +171,7 @@ end;
 procedure ai_cnt_blds(pu,tu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    if(tu^.isbuild)then
    begin
       if(tu^.isbuilder)then inc(ai_builders,1);
@@ -203,7 +203,7 @@ begin
    ai_cnt_blds(pu,pu);
 
    with pu^ do
-    with _players[playern] do
+    with player^ do
      case uid of
        UID_URocketL  : if(rld_t=0)then
                        begin
@@ -234,7 +234,7 @@ procedure _unit_aiUBC(pu,tu:PTUnit;ud:integer;teams:boolean);
 const bweight : array[false..true] of integer = (1,5);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       case uid of
       UID_LostSoul,
@@ -300,7 +300,7 @@ function _unit_aiC(pu,tu:PTUnit;ud:integer):boolean;
 begin
    _unit_aiC:=true;
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       ai_cnt_blds(pu,tu);
 
@@ -473,7 +473,7 @@ ucl_bx9: ucl:=9;
       if not(cl2uid[race,true,ucl] in uids_builder[builderuid])then exit;
       if(ucl_e[true,ucl]>=cnt)then exit;
    end;
-   if(_bldCndt(bp,ucl))then exit;
+   if(_bldCndt(@_players[bp],ucl))then exit;
    bt:=ucl;
 end;
 
@@ -562,14 +562,14 @@ end;
 procedure ai_bar_st(pu:PTUnit;_ucl:byte;cnt:integer);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
      if((ucl_e[false,_ucl]+uprodc[_ucl])<cnt)then _unit_straining(pu,_ucl);
 end;
 
 procedure ai_utr(pu:PTUnit;m:integer);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    if(ucl_c[false]<ai_maxunits)then
    begin
       if(uid=UID_HMilitaryUnit)then
@@ -674,7 +674,7 @@ var tu:PTUnit;
     pi:pinteger;
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        pi:=@uid_x[UID_HTeleport];
        if(0<pi^)and(pi^<=MaxUnits)then
@@ -741,7 +741,7 @@ procedure ai_upgrs(pu:PTUnit);
 var npt:byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(cf(@ai_flags,@aif_upgrseq1))then
       begin
@@ -779,7 +779,7 @@ begin
          end;
       end;
       npt:=random(MaxUpgrs+1);
-      if(upgr[npt]<ai_upgrlvl(playern,npt))then _unit_supgrade(pu,npt);
+      if(upgr[npt]<ai_upgrlvl(playeri,npt))then _unit_supgrade(pu,npt);
    end;
 end;
 
@@ -883,7 +883,7 @@ var bucls: TSoB;
     n_twr:integer;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       bucls:=[ucl_gen,ucl_bx5,ucl_bx6,ucl_bx8,ucl_bx9];
 
@@ -901,7 +901,7 @@ begin
       if(ai_builders<n_com)then bucls:=bucls+[ucl_com];
 
       // Smiths
-      n_smt:=max2(1,min3(ai_CheckUpgrs(playern),ai_skill,menerg div 11));
+      n_smt:=max2(1,min3(ai_CheckUpgrs(playeri),ai_skill,menerg div 11));
       if(ai_pprods<n_smt)then bucls:=bucls+[ucl_smt];
 
       // Bars
@@ -916,7 +916,7 @@ begin
       if(c_twr<n_twr)then bucls:=bucls+[ucl_twr];
 
       if(isbuilder)and
-        (speed  =0)then ai_trybuild(x,y,sr,playern,uid,(alrm_r<base_rr)and(cf(@ai_flags,@aif_alrmtwrs)),@bucls);
+        (speed  =0)then ai_trybuild(x,y,sr,playeri,uid,(alrm_r<base_rr)and(cf(@ai_flags,@aif_alrmtwrs)),@bucls);
       if(isbarrack)then ai_utr(pu,0);
       if(issmith  )then ai_upgrs(pu);
 
@@ -1040,7 +1040,7 @@ UID_HGate:
       case uid of
 UID_HSymbol,
 UID_UGenerator:
-         if(bld)and(menerg>_ai_get_max_enrg(playern,true))then _unit_kill(pu,false,false);
+         if(bld)and(menerg>_ai_get_max_enrg(playeri,true))then _unit_kill(pu,false,false);
 UID_UMilitaryUnit,
 UID_HMilitaryUnit,
 UID_HGate:
@@ -1064,7 +1064,7 @@ end;
 procedure ai_deforder(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(inapc>0)then
       begin
@@ -1090,7 +1090,7 @@ end;
 procedure ai_uorder(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(ai_pushfrmi>0)then
        if(cf(@ai_flags,@aif_dattack))then ai_deforder(pu);
@@ -1131,7 +1131,7 @@ const nra : array[false..true] of integer = (base_r,base_3r);
 var ud: integer;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       if(order<>1)then
       begin
@@ -1263,7 +1263,7 @@ end;
 procedure _unit_ai1(pu:PTUnit);
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       uo_id :=ua_amove;
       uo_tar:=0;

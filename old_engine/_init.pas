@@ -11,44 +11,18 @@ begin
 
    SDL_putenv('SDL_VIDEO_WINDOW_POS');
    SDL_putenv('SDL_VIDEO_CENTERED=1');
-
-   SDL_WM_SetCaption(@str_wcaption[1], nil );
-
-   c_dred    :=rgba2c(190,  0,  0,255);
-   c_red     :=rgba2c(255,  0,  0,255);
-   c_ared    :=rgba2c(255,  0,  0,42 );
-   c_orange  :=rgba2c(255,140,  0,255);
-   c_dorange :=rgba2c(230, 96,  0,255);
-   c_brown   :=rgba2c(140, 90, 10,255);
-   c_yellow  :=rgba2c(255,255,  0,255);
-   c_dyellow :=rgba2c(220,220,  0,255);
-   c_lime    :=rgba2c(  0,255,  0,255);
-   c_aqua    :=rgba2c(  0,255,255,255);
-   c_purple  :=rgba2c(255,0  ,255,255);
-   c_green   :=rgba2c(  0,150,  0,255);
-   c_dblue   :=rgba2c(100,100,192,255);
-   c_blue    :=rgba2c( 50,50 ,255,255);
-   c_ablue   :=rgba2c( 50,50 ,255,24 );
-   c_white   :=rgba2c(255,255,255,255);
-   c_awhite  :=rgba2c(255,255,255,40 );
-   c_gray    :=rgba2c(120,120,120,255);
-   c_dgray   :=rgba2c(70 ,70 ,70 ,255);
-   c_agray   :=rgba2c(80 , 80, 80,128);
-   c_black   :=rgba2c(0  ,  0,  0,255);
-   c_ablack  :=rgba2c(0  ,  0,  0,128);
-   c_lava    :=rgba2c(222,80 ,  0,255);
-
-   _MakeScreen;
-
-   InitVideo:=true;
-
-   LoadingScreen;
-
    SDL_ShowCursor(0);
    SDL_enableUNICODE(1);
 
-   LoadGraphics;
+   SDL_WM_SetCaption(@str_wcaption[1], nil );
+
+   _GfxColors;
+   _MakeScreen;
+   _LoadingScreen;
+   _LoadGraphics;
    _cmp_initmap;
+
+   InitVideo:=true;
 end;
 
 procedure StartParams;

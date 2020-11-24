@@ -35,6 +35,9 @@ begin
       _draw_text(tar,ui_menu_map_tx0,_yt(1), str_m_siz+i2s(map_mw)      , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_liq+_str_mx[map_liq] , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_obs+_str_mx[map_obs] , ta_left  ,255, mic(c,false));
+
+      _draw_text(tar,ui_menu_map_tx1,_yt(4), theme_name                 , ta_middle,255, c_white     );
+
       _draw_text(tar,ui_menu_map_tx1,_yt(6), str_mrandom                , ta_middle,255, mic(c,false));
    end
    else

@@ -9,7 +9,7 @@ vr,t,hp:byte;
 begin
    _rpls_stat:='';
 
-   fn:=str_rpls_dir+_rpls_l[_rpls_ls]+str_rpls_ext;
+   fn:=str_f_rpls+_rpls_l[_rpls_ls]+str_e_rpls;
   if(_rpls_l[_rpls_ls]<>'')then
    if(FileExists(fn))then
    begin
@@ -117,7 +117,7 @@ begin
                          exit;
                       end;
 
-                      assign(_rpls_file,str_rpls_dir+_rpls_lrname+str_rpls_ext);
+                      assign(_rpls_file,str_f_rpls+_rpls_lrname+str_e_rpls);
                  {$I-}rewrite(_rpls_file,1);{$I+}
                       if(ioresult<>0)then
                       begin
@@ -210,7 +210,7 @@ begin
                          exit;
                       end;
 
-                      fn:=str_rpls_dir+_rpls_l[_rpls_ls]+str_rpls_ext;
+                      fn:=str_f_rpls+_rpls_l[_rpls_ls]+str_e_rpls;
 
                       if(not FileExists(fn))then
                       begin
@@ -307,7 +307,7 @@ begin
 
                             Map_premap;
                             _makeMMB;
-                            _dds_spr;
+                            //_dds_spr;
                             _moveHumView(map_psx[Hplayer] , map_psy[Hplayer]);
 
                             ui_tab:=2;
@@ -386,7 +386,7 @@ begin
    _rpls_sm:=0;
    _rpls_ln:=0;
    setlength(_rpls_l,0);
-   if(FindFirst(str_rpls_dir+'*'+str_rpls_ext,faReadonly,info)=0)then
+   if(FindFirst(str_f_rpls+'*'+str_e_rpls,faReadonly,info)=0)then
     repeat
        s:=info.Name;
        delete(s,length(s)-3,4);
@@ -406,7 +406,7 @@ procedure _rpls_delete;
 var fn:string;
 begin
    if(_rpls_ls<0)or(_rpls_ls>=_rpls_ln)then exit;
-   fn:=str_rpls_dir+_rpls_l[_rpls_ls]+str_rpls_ext;
+   fn:=str_f_rpls+_rpls_l[_rpls_ls]+str_e_rpls;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);

@@ -1,57 +1,78 @@
 {$IFDEF _FULLGAME}
+
+procedure _dds_anim(d:integer;sprl:PTUSpriteL;anml:PTThemeAnimL;lst:PTIntList;lstn:pinteger;first:boolean);
+begin
+   if(lstn^>0)then
+    with map_dds[d] do
+     if(animt>0)or(first)then
+     begin
+        dec(animt,1);
+        if(animt<=0)then
+        begin
+           if(animn<0)then
+           begin
+              animn:= d mod lstn^;
+              animn:= lst^[animn];
+           end
+           else
+           begin
+              animn:=anml^[animn].anext;
+           end;
+           animt:=anml^[animn].atime;
+           shh  :=anml^[animn].sh;
+           ox   :=anml^[animn].xo;
+           oy   :=anml^[animn].yo;
+           spr  :=@sprl^[animn];
+        end;
+     end;
+end;
+
 procedure _dds_p(onlyspr:boolean);
-var d,
+var d,vx,vy,
     ro :integer;
 begin
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then
      begin
+        vx:=x+ox;
+        vy:=y+oy;
+        if(_rectvis(vx,vy,255,255)=false)then continue;
+
         ro:=0;
         if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r-bld_dec_mr;
 
-        if(t in dids_liquids)then
-        begin
-           if(onlyspr=false)then inc(a,1);
-           a:=a mod vid_2fps;
-           spr:=@spr_liquid[(a div vid_hfps)+1,t-DID_LiquidR1];
+        if(onlyspr=false)or(spr=pspr_dummy)then
+        case t of
+        DID_LiquidR1,
+        DID_LiquidR2,
+        DID_LiquidR3,
+        DID_LiquidR4 : begin
+                          if(theme_liquid_animt<2)
+                          then spr:=@spr_liquid[((G_Step div theme_liquid_animm) mod LiquidAnim)+1,animn]
+                          else spr:=@spr_liquid[1,animn];
+                       end;
+        DID_Other    : _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
+        DID_SRock    : _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
+        DID_BRock    : _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
         end;
 
-        if((vid_vx-spr^.hw)<x)and(x<(vid_vx+vid_sw+spr^.hw))and
-          ((vid_vy-spr^.hh)<y)and(y<(vid_vy+vid_sh+spr^.hh))then
-           _sl_add_dec(x,y,dpth,shh,spr,255,ro);
+        if(_rectvis(vx,vy,spr^.hw,spr^.hh))then
+        begin
+           _sl_add_dec(vx,vy,dpth,shh,spr,255,ro);
+           if(pspr<>nil)then _sl_add_dec(vx,vy,-10000,shh,pspr,255,ro);
+        end;
      end;
 end;
 
-procedure _dds_spr;
-var d:integer;
+procedure map_seed2theme;
 begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-    begin
-       spr :=@spr_dummy;
-
-       case t of
-       DID_other : if(map_hell)then begin if(spr_decshi  >0)then begin a := d mod spr_decshi;   spr := @spr_decsh  [a];end; end else if(spr_decsi  >0)then begin a := d mod spr_decsi;   spr := @spr_decs  [a];end;
-       DID_Srock : if(map_hell)then begin if(spr_srockshi>0)then begin a := d mod spr_srockshi; spr := @spr_srocksh[a];end; end else if(spr_srocksi>0)then begin a := d mod spr_srocksi; spr := @spr_srocks[a];end;
-       DID_Brock : if(map_hell)then begin if(spr_brockshi>0)then begin a := d mod spr_brockshi; spr := @spr_brocksh[a];end; end else if(spr_brocksi>0)then begin a := d mod spr_brocksi; spr := @spr_brocks[a];end;
-       end;
-    end;
-end;
-
-procedure Map_lqttrt;
-begin
-   map_hell:=false;
-   map_trt :=1+(((map_seed and $0000FF00) shr 8 ) mod 23);
-   map_crt :=  (((map_seed and $00FF0000) shr 16) mod 24);
-   if(map_trt=7)
-   then map_lqt:=map_seed mod 4
-   else map_lqt:=map_seed mod 5;
-   if(map_trt in [0,17])then
-   begin
-      map_lqt :=4;
-      map_hell:=true;
-   end;
+   SetTheme(
+   map_seed and 15,
+   -((map_seed and $00000FF0) shr 4 ),
+   -((map_seed and $000FF000) shr 12),
+   -((map_seed and $0FF00000) shr 20),
+   -((map_seed and $F0000000) shr 28));
 end;
 
 {$ENDIF}
@@ -98,13 +119,13 @@ begin
      if(t=0)then
      begin
         case dt of
-        DID_Other,
         DID_LiquidR1,
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4,
+        DID_Brock,
         DID_Srock,
-        DID_Brock     : begin
+        DID_Other     : begin
                            t := dt;
                            r := DID_R[t];
                         end;
@@ -115,37 +136,46 @@ begin
         y:=dy;
 
         {$IFDEF _FULLGAME}
-        dpth:= y;
-        shh := 0;
-        a   := 0;
+        dpth := y;
+        shh  := 0;
+        animn:= -1;
+        animt:= 0;
+        spr  := pspr_dummy;
+        pspr := nil;
+        ox   := 0;
+        oy   := 0;
 
         case t of
-        DID_other  :  begin
-                         shh  := 1;
-                         mmc  := c_gray;
-                      end;
         DID_LiquidR1,
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4: begin
                          dpth := -5;
-                         mmc  := map_mm_liqc;
+                         mmc  := theme_liquid_color;
+                         animn:= t;
+                         pspr := @spr_liquidb[animn];
                       end;
+        DID_other  :  begin
+                         shh  := 1;
+                         mmc  := c_gray;
+                         _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
+                      end;
+
         DID_Srock  :  begin
                          dpth := 0;
                          mmc  := c_dgray;
+                         _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
                       end;
         DID_Brock  :  begin
                          dpth := 0;
                          mmc  := c_dgray;
+                         _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
                       end;
         end;
 
         mmx:=round(x*map_mmcx);
         mmy:=round(y*map_mmcx);
-        if(r<20)
-        then mmr:=1
-        else mmr:=round(r*map_mmcx);
+        mmr:=max2(1,round(r*map_mmcx));
         {$ENDIF}
 
         break;
@@ -463,21 +493,18 @@ begin
    _refresh_dmcells;
    {$IFDEF _FULLGAME}
    _makeMMB;
-   _dds_spr;
+   //_dds_spr;
    {$ENDIF}
 end;
 
 procedure Map_randomseed;
 begin
-   map_seed :=random($FFFFFFFF)+SDL_GetTicks;
-   {$IFDEF _FULLGAME}
-   map_lqttrt;
-   {$ENDIF}
+   map_seed :=random($FFFFFFFF)+(SDL_GetTicks shl 5);
 end;
 
 procedure Map_randommap;
 begin
-   map_randomseed;
+   Map_randomseed;
 
    map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/500)*500;
    map_liq:=random(8);
@@ -489,9 +516,11 @@ begin
    Map_Vars;
    MSkirmishStarts;
    {$IFDEF _FULLGAME}
-   Map_lqttrt;
+   Map_seed2theme;
    MakeTerrain;
+   MakeCrater;
    MakeLiquid;
+   MakeLiquidBack;
    {$ENDIF}
    Map_Make;
 end;

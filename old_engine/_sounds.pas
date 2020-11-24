@@ -2,13 +2,13 @@
 
 function loadMSC(fn:string):pMIX_MUSIC;
 begin
-   fn:=str_msc_fold+fn+#0;
+   fn:=str_f_msc+fn+#0;
    loadMSC:=MIX_LOADMUS(@fn[1]);
 end;
 
 function loadSND(fn:string):pMIX_CHUNK;
 begin
-   fn:=str_snd_fold+fn+#0;
+   fn:=str_f_snd+fn+#0;
    loadSND:=mix_loadwav(@fn[1]);
 end;
 
@@ -52,7 +52,7 @@ begin
 
    if(pu<>nil)then
     with pu^ do
-     if(_nhp3(x,y,playern)=false)then exit;
+     if(_nhp3(x,y,player)=false)then exit;
 
    MIX_VOLUMECHUNK(s,snd_svolume);
    MIX_PLAYCHANNEL(-1,s,0);
@@ -73,7 +73,7 @@ begin
    snd_mls:=0;
    setlength(snd_ml,0);
 
-   if(FindFirst(str_msc_fold+'*.ogg',faReadonly,info)=0)then
+   if(FindFirst(str_f_msc+'*.ogg',faReadonly,info)=0)then
     repeat
        s:=info.Name;
        if(s<>'')then

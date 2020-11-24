@@ -161,7 +161,7 @@ begin
             if(isbuild)and(bld)then
              case uid of
                UID_URadar:
-                  if(rpl)or(_players[_pl].team=_players[playern].team)then
+                  if(rpl)or(_players[_pl].team=player^.team)then
                   begin
                      if(_wrld(@rld_t,rpl)>19)then
                      begin
@@ -179,7 +179,7 @@ begin
                   end;
              end;
 
-            if(rpl=false)and(playern=_pl)then
+            if(rpl=false)and(playeri=_pl)then
             begin
                if(sel)then _wudata_byte(order,rpl);
                if(isbuild)then
@@ -295,7 +295,7 @@ procedure _ucInc(pu:PTUnit);
 var i,_puid:byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       inc(uid_e[uid],1);
       inc(ucl_e[isbuild,ucl],1);
@@ -349,7 +349,7 @@ procedure _ucDec(pu:PTUnit);
 var i,_puid:byte;
 begin
    with pu^ do
-   with _players[playern] do
+   with player^ do
    begin
       dec(uid_e[uid],1);
       dec(ucl_e[isbuild,ucl],1);
@@ -400,7 +400,7 @@ end;
 procedure _netClUCreateEff(pu,tu:PTUnit);
 begin
    with pu^ do
-    with _players[playern] do
+    with player^ do
     begin
        vx:=x;
        vy:=y;
@@ -411,7 +411,7 @@ begin
           UID_Heye:
              begin
                 shadow :=1;
-                if(playern=HPlayer)then PlaySND(snd_hellbar,nil);
+                if(playeri=HPlayer)then PlaySND(snd_hellbar,nil);
                 _effect_add(vx,vy,vy+1,UID_LostSoul);
              end;
           UID_HMilitaryUnit:
@@ -429,7 +429,7 @@ begin
                 shadow :=0;
              end;
           else
-             if(playern=HPlayer)and(bld=false)then
+             if(playeri=HPlayer)and(bld=false)then
               if(tu^.bld=true)or(tu^.hits<0)then PlaySND(snd_build[race],nil);
              shadow :=0;
           end
@@ -437,7 +437,7 @@ begin
        else
          if(buff[ub_born]>0)then
          begin
-            if(playern=HPlayer)then _unit_createsound(uid);
+            if(playeri=HPlayer)then _unit_createsound(uid);
          end;
 
        if(buff[ub_teleeff]>0)then
@@ -453,7 +453,7 @@ var pu:PTUnit;
 begin
    pu:=@_units[0];
    with uu^ do
-    with _players[playern] do
+    with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // d to a
      begin
         _unit_def(uu);
@@ -529,7 +529,7 @@ begin
                  rld_t:=0;
               end;
 
-            if(pu^.inapc<>inapc)and(_nhp3(x,y,playern))then PlaySND(snd_inapc,nil);
+            if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,nil);
 
             if(pu^.inapc=0)and(inapc>0)then
             begin
@@ -546,7 +546,7 @@ begin
              if(bld)and(pu^.rld_t=0)and(rld_t>0)then
              begin
                 _uac_rocketl_eff(uu);
-                _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playern,uf_soaring,false);
+                _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,false);
              end;
 
             if(pu^.buff[ub_cast]=0)and(buff[ub_cast]>0)then
@@ -614,8 +614,8 @@ begin
                if(pu^.buff[ub_teleeff]=0)and(buff[ub_teleeff]>0)then
                 if(uid=UID_HKeep)then
                 begin
-                   if(_nhp3(x,y,playern))
-                   or(_nhp3(pu^.x,pu^.y,playern))then PlaySND(snd_cubes,nil);
+                   if(_nhp3(x,y,player))
+                   or(_nhp3(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
                    _effect_add(pu^.x,pu^.y,0,EID_HKT_h);
                    _effect_add(x    ,y    ,0,EID_HKT_s);
                    buff[ub_clcast]:=vid_fps;
@@ -626,8 +626,8 @@ begin
                 begin
                    vx:=x;
                    vy:=y;
-                   if(_nhp3(vx,vy,playern))
-                   or(_nhp3(pu^.vx,pu^.vy,playern))then PlaySND(snd_teleport,nil);
+                   if(_nhp3(vx,vy,player))
+                   or(_nhp3(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
                    _effect_add(vx    ,vy    ,    vy+map_flydpth[uf]+1,EID_Teleport);
                    _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
                 end;
@@ -775,7 +775,8 @@ begin
    _units[0]:=uu^;
    with uu^ do
    begin
-      playern:=(unum-1) div MaxPlayerUnits;
+      playeri:=(unum-1) div MaxPlayerUnits;
+      player :=@_players[playeri];
       sh:=_rudata_sint(rpl,-128);
       if(sh>-127)then
       begin
@@ -811,7 +812,7 @@ begin
             if(isbuild)and(bld)then
              case uid of
               UID_URadar:
-                if(rpl)or(_players[_pl].team=_players[playern].team)then
+                if(rpl)or(_players[_pl].team=player^.team)then
                 begin
                    if(_rrld(@rld_t,rpl)>19)then
                    begin
@@ -829,7 +830,7 @@ begin
                 end;
              end;
 
-            if(rpl=false)and(playern=HPlayer)then
+            if(rpl=false)and(playeri=HPlayer)then
             begin
                if(sel)then order:=_rudata_byte(rpl,0);
                if(isbuild)then

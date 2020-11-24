@@ -188,8 +188,8 @@ begin
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
    str_maction           := 'Right click action';
-   str_maction2[true ]   := #18+'Move'+#25;
-   str_maction2[false]   := #17+'Move'+#25+'+'+#17+'attack'+#25;
+   str_maction2[true ]   := #18+'move'+#25;
+   str_maction2[false]   := #18+'move'+#25+'+'+#15+'attack'+#25;
    str_race[r_random]    := #25+'RANDOM'+#25;
    str_race[r_hell  ]    := #16+'HELL'+#25;
    str_race[r_uac   ]    := #18+'UAC'+#25;
@@ -237,7 +237,7 @@ begin
    str_panelposp[2]      := #17+'Up'   +#25;
    str_panelposp[3]      := #19+'Down' +#25;
    str_uhbar             := 'Health bars';
-   str_uhbars[0]         := #18+'selected'+#25+','+#15+'damaged'+#25;
+   str_uhbars[0]         := #18+'selected'+#25+'+'+#15+'damaged'+#25;
    str_uhbars[1]         := #19+'always'+#25;
    str_uhbars[2]         := #16+'only '+#18+'selected'+#25;
    str_pcolor            := 'Players colors';
@@ -619,7 +619,7 @@ begin
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
   str_maction2[true ]   := #18+'движение'+#25;
-  str_maction2[false]   := #17+'движ.'+#25+'+'+#15+'атака'+#25;
+  str_maction2[false]   := #18+'движ.'+#25+'+'+#15+'атака'+#25;
   str_race[r_random]    := #22+'случ.'+#25;
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
@@ -665,7 +665,7 @@ begin
   str_panelposp[2]      := #17+'вверху'+#25;
   str_panelposp[3]      := #19+'внизу' +#25;
   str_uhbar             := 'Полоски здоровья';
-  str_uhbars[0]         := #18+'выбранные'+#25+','+#15+'поврежд.'+#25;
+  str_uhbars[0]         := #18+'выбранные'+#25+'+'+#15+'поврежд.'+#25;
   str_uhbars[1]         := #19+'всегда'+#25;
   str_uhbars[2]         := #16+'только '+#18+'выбранные'+#25;
   str_pcolor            := 'Цвета игроков';

@@ -46,7 +46,7 @@ upgrade_mfrg      : array[1..2,0.._uts] of boolean;
 _lsuc             : byte = 0;
 _lcu              : integer = 0;
 _lcup             : PTUnit;
-cl2uid            : array[1..2,false..true,0.._uts] of byte;
+cl2uid            : array[0..r_cnt,false..true,0.._uts] of byte;
 
 tar1p             : integer;
 ai_builders,
@@ -64,7 +64,7 @@ ai_bx,
 ai_by,
 ai_bd             : integer;
 
-_pne_r            : array[1..2,0.._uts] of byte;
+_pne_r            : array[0..r_cnt,0.._uts] of byte;
 
 HPlayer           : byte = 1;
 
@@ -130,6 +130,7 @@ r_empty,
 r_minimap,
 r_bminimap,
 r_screen,
+r_dterrain,
 r_menu            : pSDL_SURFACE;
 _vflags           : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
@@ -179,16 +180,10 @@ font_ca           : array[char] of pSDL_SURFACE;
 
 _effects          : array[1..vid_mvs     ] of TEff;
 
-MaxTDecsS         : byte = 0;      //960 720
+MaxTDecsS         : integer = 0;      //960 720
 _TDecs            : array of TTDec;
 
-map_trt           : byte=0;
-map_ptrt          : byte = 255;
-map_crt           : byte=0;
-map_pcrt          : byte = 255;
-map_lqt           : byte=0;
-map_plqt          : byte = 255;
-map_mm_liqc       : cardinal = 0;
+
 map_mmcx          : single;
 map_mmvw,
 map_mmvh,
@@ -252,7 +247,7 @@ vid_panely        : integer = 0;
 vid_mapx          : integer = 0;
 vid_mapy          : integer = 0;
 
-vid_vsl           : array[1..vid_mvs] of TVisSpr;
+vid_vsl           : array[1..vid_mvs] of PTVisSpr;
 vid_vsls          : word = 0;
 
 fog_grid          : array[0..fog_vfwm,0..fog_vfhm] of byte;
@@ -373,71 +368,113 @@ fps_tt,
 fps_cs,
 fps_ns            : cardinal;
 
-spr_liquid        : array[1..LiquidAnim,0..3] of TUSprite;
-spr_tdecs,
-spr_tdecsh,
-spr_decs,
-spr_decsh,
-spr_srocks,
-spr_srocksh,
-spr_brocks,
-spr_brocksh
-                  : TUSpriteL;
-spr_tdecsi,
-spr_tdecshi,
-spr_decsi,
-spr_decshi,
-spr_srocksi,
-spr_srockshi,
-spr_brocksi,
-spr_brockshi,
-t_decsi           : integer;
+//theme
 
-spr_crater        : array[1..crater_ri] of TUSprite;
+theme_i           : integer = 0;
+theme_n           : integer = 0;
+theme_name        : shortstring;
 
-spr_dummy         : TUsprite;
+theme_liquid_animt: byte;
+theme_liquid_animm: byte;
+theme_liquid_color: cardinal = 0;
 
-spr_lostsoul      : array[0..28] of TUsprite;
-spr_imp           : array[0..52] of TUsprite;
-spr_demon         : array[0..53] of TUsprite;
-spr_cacodemon     : array[0..29] of TUsprite;
-spr_baron         : array[0..52] of TUsprite;
-spr_knight        : array[0..52] of TUsprite;
-spr_cyberdemon    : array[0..56] of TUsprite;
-spr_mastermind    : array[0..81] of TUsprite;
-spr_pain          : array[0..37] of TUsprite;
-spr_revenant      : array[0..76] of TUsprite;
-spr_mancubus      : array[0..78] of TUsprite;
-spr_arachnotron   : array[0..69] of TUsprite;
-spr_archvile      : array[0..85] of TUsprite;
+theme_map_trt     : integer=0;
+theme_map_ptrt    : integer = -1;
+theme_map_crt     : integer=0;
+theme_map_pcrt    : integer = -1;
+theme_map_lqt     : integer=0;
+theme_map_plqt    : integer = -1;
+theme_map_blqt    : integer=0;
+theme_map_pblqt   : integer = -1;
+theme_map_blqtt   : byte = 0;
 
-spr_ZFormer       : array[0..52] of TUSprite;
-spr_ZEngineer     : array[0..31] of TUSprite;
-spr_ZSergant      : array[0..52] of TUSprite;
-spr_ZSSergant     : array[0..52] of TUSprite;
-spr_ZCommando     : array[0..59] of TUSprite;
-spr_ZBomber       : array[0..52] of TUSprite;
-spr_ZFMajor       : array[0..15] of TUSprite;
-spr_ZMajor        : array[0..52] of TUSprite;
-spr_ZBFG          : array[0..52] of TUSprite;
+theme_decals,
+theme_decors,
+theme_srocks,
+theme_brocks,
+theme_craters,
+theme_liquids,
+theme_bliquids,
+theme_terrains    : TIntList;
+theme_decaln,
+theme_decorn,
+theme_srockn,
+theme_brockn,
+theme_cratern,
+theme_liquidn,
+theme_bliquidn,
+theme_terrainn    : integer;
 
-spr_engineer      : array[0..44] of TUSprite;
-spr_medic         : array[0..52] of TUSprite;
-spr_sergant       : array[0..44] of TUSprite;
-spr_ssergant      : array[0..44] of TUSprite;
-spr_commando      : array[0..52] of TUSprite;
-spr_bomber        : array[0..44] of TUSprite;
-spr_fmajor        : array[0..15] of TUSprite;
-spr_major         : array[0..44] of TUSprite;
-spr_BFG           : array[0..44] of TUSprite;
-spr_FAPC          : array[0..15] of TUSprite;
-spr_APC           : array[0..15] of TUSprite;
-spr_Terminator    : array[0..55] of TUSprite;
-spr_Tank          : array[0..23] of TUSprite;
-spr_Flyer         : array[0..15] of TUSprite;
+theme_spr_decals,
+theme_spr_decors,
+theme_spr_srocks,
+theme_spr_brocks,
+theme_spr_liquids,
+theme_spr_terrains: TUSpriteL;
+theme_spr_decaln,
+theme_spr_decorn,
+theme_spr_srockn,
+theme_spr_brockn,
+theme_spr_liquidn,
+theme_spr_terrainn: integer;
 
-spr_tur           : array[0..15] of TUSprite;
-spr_rtur          : array[0..7 ] of TUSprite;
+theme_anm_decors,
+theme_anm_srocks,
+theme_anm_brocks  : TThemeAnimL;
+
+theme_anm_liquids : array of byte;     // animation type
+theme_ant_liquids : array of byte;     // animation period
+theme_clr_liquids : array of cardinal; // minimap color
+
+spr_liquidb       : array[1..LiquidRs ] of TMWSprite;
+spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWSprite;
+spr_crater        : array[1..crater_ri] of TMWSprite;
+
+
+spr_dummy         : TMWSprite;
+pspr_dummy        : PTMWSprite;
+
+spr_lostsoul      : array[0..28] of TMWSprite;
+spr_imp           : array[0..52] of TMWSprite;
+spr_demon         : array[0..53] of TMWSprite;
+spr_cacodemon     : array[0..29] of TMWSprite;
+spr_baron         : array[0..52] of TMWSprite;
+spr_knight        : array[0..52] of TMWSprite;
+spr_cyberdemon    : array[0..56] of TMWSprite;
+spr_mastermind    : array[0..81] of TMWSprite;
+spr_pain          : array[0..37] of TMWSprite;
+spr_revenant      : array[0..76] of TMWSprite;
+spr_mancubus      : array[0..78] of TMWSprite;
+spr_arachnotron   : array[0..69] of TMWSprite;
+spr_archvile      : array[0..85] of TMWSprite;
+
+spr_ZFormer       : array[0..52] of TMWSprite;
+spr_ZEngineer     : array[0..31] of TMWSprite;
+spr_ZSergant      : array[0..52] of TMWSprite;
+spr_ZSSergant     : array[0..52] of TMWSprite;
+spr_ZCommando     : array[0..59] of TMWSprite;
+spr_ZBomber       : array[0..52] of TMWSprite;
+spr_ZFMajor       : array[0..15] of TMWSprite;
+spr_ZMajor        : array[0..52] of TMWSprite;
+spr_ZBFG          : array[0..52] of TMWSprite;
+
+spr_engineer      : array[0..44] of TMWSprite;
+spr_medic         : array[0..52] of TMWSprite;
+spr_sergant       : array[0..44] of TMWSprite;
+spr_ssergant      : array[0..44] of TMWSprite;
+spr_commando      : array[0..52] of TMWSprite;
+spr_bomber        : array[0..44] of TMWSprite;
+spr_fmajor        : array[0..15] of TMWSprite;
+spr_major         : array[0..44] of TMWSprite;
+spr_BFG           : array[0..44] of TMWSprite;
+spr_FAPC          : array[0..15] of TMWSprite;
+spr_APC           : array[0..15] of TMWSprite;
+spr_Terminator    : array[0..55] of TMWSprite;
+spr_Tank          : array[0..23] of TMWSprite;
+spr_Flyer         : array[0..15] of TMWSprite;
+
+spr_tur           : array[0..15] of TMWSprite;
+spr_rtur          : array[0..7 ] of TMWSprite;
 
 spr_HKeep,
 spr_HGate,
@@ -450,9 +487,9 @@ spr_HTeleport,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita
-                  : array[0..3]  of TUsprite;
+                  : array[0..3]  of TMWSprite;
 
-//spr_HTa : TUsprite;
+//spr_HTa : TMWSprite;
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
@@ -466,33 +503,33 @@ spr_UVehicleFactory,
 spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,
-spr_URocketL      : array[0..3]  of TUsprite;
+spr_URocketL      : array[0..3]  of TMWSprite;
 
-spr_eff_bfg       : array[0..3] of TUsprite; //ef_bfg_
-spr_eff_eb        : array[0..5] of TUsprite; //ef_eb
-spr_eff_ebb       : array[0..8] of TUsprite; //ef_ebb
-spr_eff_tel       : array[0..5] of TUsprite; //ef_tel
-spr_eff_exp       : array[0..2] of TUsprite; //ef_exp_
-spr_eff_exp2      : array[0..4] of TUsprite; //exp2_
-spr_eff_g         : array[0..7] of TUsprite; //g_
-spr_h_p0          : array[0..3] of TUSprite;
-spr_h_p1          : array[0..3] of TUSprite;
-spr_h_p2          : array[0..3] of TUSprite;
-spr_h_p3          : array[0..7] of TUSprite;
-spr_h_p4          : array[0..10]of TUSprite;
-spr_h_p5          : array[0..7] of TUSprite;
-spr_h_p6          : array[0..7] of TUSprite;
-spr_h_p7          : array[0..5] of TUSprite;
-spr_u_p0          : array[0..5] of TUSprite;
-spr_u_p1          : array[0..3] of TUSprite;
-spr_u_p2          : array[0..5] of TUSprite;
-spr_u_p3          : array[0..3] of TUSprite;
-spr_trans         : array[0..7] of TUSprite;
-spr_sport         : array[0..1] of TUSprite;
-spr_blood         : array[0..2] of TUSprite;
-spr_ubase         : array[0..5] of TUSprite;
-spr_cbuild        : array[0..3] of TUSprite;
-spr_mp            : array[1..2] of TUsprite;
+spr_eff_bfg       : array[0..3] of TMWSprite; //ef_bfg_
+spr_eff_eb        : array[0..5] of TMWSprite; //ef_eb
+spr_eff_ebb       : array[0..8] of TMWSprite; //ef_ebb
+spr_eff_tel       : array[0..5] of TMWSprite; //ef_tel
+spr_eff_exp       : array[0..2] of TMWSprite; //ef_exp_
+spr_eff_exp2      : array[0..4] of TMWSprite; //exp2_
+spr_eff_g         : array[0..7] of TMWSprite; //g_
+spr_h_p0          : array[0..3] of TMWSprite;
+spr_h_p1          : array[0..3] of TMWSprite;
+spr_h_p2          : array[0..3] of TMWSprite;
+spr_h_p3          : array[0..7] of TMWSprite;
+spr_h_p4          : array[0..10]of TMWSprite;
+spr_h_p5          : array[0..7] of TMWSprite;
+spr_h_p6          : array[0..7] of TMWSprite;
+spr_h_p7          : array[0..5] of TMWSprite;
+spr_u_p0          : array[0..5] of TMWSprite;
+spr_u_p1          : array[0..3] of TMWSprite;
+spr_u_p2          : array[0..5] of TMWSprite;
+spr_u_p3          : array[0..3] of TMWSprite;
+spr_trans         : array[0..7] of TMWSprite;
+spr_sport         : array[0..1] of TMWSprite;
+spr_blood         : array[0..2] of TMWSprite;
+spr_ubase         : array[0..5] of TMWSprite;
+spr_cbuild        : array[0..3] of TMWSprite;
+spr_mp            : array[1..2] of TMWSprite;
 spr_gear,
 spr_toxin,
 spr_mine,
@@ -506,7 +543,7 @@ spr_db_h0,
 spr_db_h1,
 spr_db_u0,
 spr_db_u1,
-spr_u_portal      : TUSprite;
+spr_u_portal      : TMWSprite;
 
 spr_c_mars,
 spr_c_hell,
@@ -536,12 +573,12 @@ spr_iob_knight,
 spr_iob_baron,
 spr_mback,
 spr_cursor        : pSDL_Surface;
-spr_b_b           : array[1..2,0.._uts] of pSDL_Surface;
-spr_b_u           : array[1..2,0.._uts] of pSDL_Surface;
-spr_b_up          : array[1..2,0..MaxUpgrs] of pSDL_Surface;
+spr_b_b           : array[1..r_cnt,0.._uts] of pSDL_Surface;
+spr_b_u           : array[1..r_cnt,0.._uts] of pSDL_Surface;
+spr_b_up          : array[1..r_cnt,0..MaxUpgrs] of pSDL_Surface;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
-spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
+spr_ui_oico       : array[1..r_cnt,false..true,0.._uts] of pSDL_Surface;
 
 /// text
 
@@ -607,7 +644,7 @@ str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_a        : array[0..1] of shortstring;
 str_hint_m        : array[0..2] of shortstring;
-str_hint          : array[0..3,1..2,0.._uts] of shortstring;
+str_hint          : array[0..3,1..r_cnt,0.._uts] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 str_svld_errors   : array[1..4] of shortstring;
 str_camp_t        : array[0..MaxMissions] of shortstring;
@@ -640,7 +677,7 @@ snd_ml            : array of pMIX_MUSIC;
 snd_mls           : integer = 0;
 snd_curm          : byte = 1;
 
-snd_build         : array[1..2] of pMIX_CHUNK;
+snd_build         : array[1..r_cnt] of pMIX_CHUNK;
 
 snd_jetpoff,
 snd_jetpon,

@@ -155,14 +155,18 @@ function _gen(x:integer):integer;
 begin
    _gen:=map_seed2*5+167;
    map_seed2:=_gen;
-   _gen:=abs(_gen mod x);
+   if(x=0)
+   then _gen:=0
+   else _gen:=abs(_gen mod x);
    inc(map_seed2,17);
 end;
 
 function _genx(x,m:integer;newn:boolean):integer;
 begin
    _genx:=(x*5)+integer(map_seed+map_seed2);
-   _genx:=abs(_genx mod m);
+   if(m=0)
+   then _genx:=0
+   else _genx:=abs(_genx mod m);
    if(newn)then inc(map_seed2,67);
 end;
 
@@ -176,12 +180,12 @@ begin
    Close(f);
 end;
 
-function _bldCndt(pl,bucl:byte):boolean;
+function _bldCndt(pl:PTPlayer;bucl:byte):boolean;
 begin
    if(bucl>_uts)
    then _bldCndt:=true
    else
-   with _players[pl] do
+   with pl^ do
    begin
     _bldCndt:=(bld_r>0)
             or(cl2uid[race,true,bucl]=0)
@@ -198,12 +202,12 @@ begin
            or(ucl_e[true,bucl]>=max);
    end;
 end;
-function _untCndt(pl,bucl:byte):boolean;
+function _untCndt(pl:PTPlayer;bucl:byte):boolean;
 begin
    if(bucl>_uts)
    then _untCndt:=true
    else
-   with _players[pl] do
+   with pl^ do
    begin
     _untCndt:=((army+uproda)>=MaxPlayerUnits)
             or(cl2uid[race,false,bucl]=0)
@@ -220,13 +224,13 @@ begin
            or((ucl_e[false,bucl]+uprodc[bucl])>=max);
    end;
 end;
-function _upgrreq(pl,up:byte):boolean;
+function _upgrreq(pl:PTPlayer;up:byte):boolean;
 var ruid:byte;
 begin
    if(up>MaxUpgrs)
    then _upgrreq:=true
    else
-   with _players[pl] do
+   with pl^ do
    begin
      _upgrreq:=(upgrade_time[race,up]=0)
              or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
@@ -392,7 +396,14 @@ begin
    if(0<=cx)and(cx<=fog_vfwm)and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
 end;
 
-function _nhp3(x,y:integer;player:byte):boolean;
+
+function _rectvis(x,y,hw,hh:integer):boolean;
+begin
+   _rectvis:=((vid_vx-hw)<x)and(x<(vid_vx+vid_sw+hw))
+          and((vid_vy-hh)<y)and(y<(vid_vy+vid_sh+hh));
+end;
+
+function _nhp3(x,y:integer;player:PTPlayer):boolean;
 begin
    _nhp3:=false;
    dec(x,vid_vx);
@@ -400,8 +411,8 @@ begin
    if(0<x)and(x<vid_sw)and
      (0<y)and(y<vid_sh)then
    begin
-      if(player<=MaxPlayers)then
-       if(_players[player].team=_players[HPlayer].team)or((_rpls_rst>=rpl_rhead)and(player=0))then
+      if(player<>nil)then
+       if(player^.team=_players[HPlayer].team)or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
        begin
           _nhp3:=true;
           exit;

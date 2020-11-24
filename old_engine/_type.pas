@@ -15,7 +15,8 @@ TPlayer = record
 
    army,team,
    race,state,
-   bld_r,mrace
+   bld_r,mrace,
+   pnum
            : byte;
 
    cenerg,
@@ -83,7 +84,6 @@ o_x1,o_y1  :integer;
    nport   : word;
 end;
 PTPlayer = ^TPlayer;
-
 TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
@@ -104,7 +104,7 @@ TUnit = record
    generg,uf,
    _uclord,
    vstp,order,
-   playern,
+   playeri,
    uid,max,
    shadow,
    ucl,
@@ -149,6 +149,8 @@ TUnit = record
    mech,bld,solid,
    wanim,melee,
    sel      : boolean;
+
+   player   : PTPlayer;
 end;
 PTUnit = ^TUnit;
 
@@ -167,13 +169,14 @@ TSoc = set of char;
 
 string6 = string[6];
 
-TUSprite = record
+TMWSprite = record
    surf:pSDL_Surface;
+   w,h,
    hw,hh:integer;
 end;
-PTUSprite = ^TUSprite;
+PTMWSprite = ^TMWSprite;
 
-TUSpriteL = array of TUSprite;
+TUSpriteL = array of TMWSprite;
 PTUSpriteL = ^TUSpriteL;
 
 TTDec = record
@@ -198,12 +201,24 @@ TVisSpr = record
    cru   : string6;
    rct   : boolean;
 end;
-
+PTVisSpr = ^TVisSpr;
 
 TAlarm = record
    ax,ay,at:integer;
    ab:boolean;
 end;
+
+TIntList = array of integer;
+PTIntList = ^TIntList;
+
+TThemeAnim = record
+   xo,yo,
+   sh,
+   anext,
+   atime:integer
+end;
+TThemeAnimL = array of TThemeAnim;
+PTThemeAnimL = ^TThemeAnimL;
 
 {$ELSE}
 
@@ -214,10 +229,12 @@ TDoodad = record
    t:byte;
 
    {$IFDEF _FULLGAME}
-   a,dpth,shh,
-   mmx,mmy,mmr:integer;
-   spr   :PTUSprite;
-   mmc   :cardinal;
+   animn,animt,
+   dpth,shh,ox,oy,
+   mmx,mmy,mmr :integer;
+   spr,
+   pspr        :PTMWSprite;
+   mmc         :cardinal;
    {$ENDIF}
 end;
 PTDoodad = ^TDoodad;

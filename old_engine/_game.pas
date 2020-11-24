@@ -8,6 +8,9 @@ begin
    _players[p0]:=_players[p1];
    _players[p1]:=tp;
 
+   _players[p0].pnum:=p0;
+   _players[p1].pnum:=p1;
+
    if(HPlayer=p1)then HPlayer:=p0
    else
      if(HPlayer=p0)then HPlayer:=p1;
@@ -38,6 +41,7 @@ begin
        state:=ps_none;
        _playerSetState(p);
        ready:=false;
+       pnum :=p;
 
        ai_pushtime := vid_fps*30;
        ai_pushmin  := 55;
@@ -389,7 +393,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
          begin
             pu:=@_units[u];
             with pu^ do
-             if(hits>0)and(inapc=0)and(pl=playern)then
+             if(hits>0)and(inapc=0)and(pl=playeri)then
              begin
                 psel:=sel;
                 if(o_id=uo_select)or((o_id=uo_aselect)and(not sel))then
@@ -809,7 +813,7 @@ begin
       for i:=1 to MaxUnits do
        with _units[i] do
         if(hits>0)and(inapc=0)then
-         with _players[playern] do
+         with player^ do
           if(team<>t)then _unit_kill(@_units[i],false,false);
    end;
 end;

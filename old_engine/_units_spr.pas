@@ -1,5 +1,5 @@
 
-function _unit_spr(u:PTUnit):PTUSprite;
+function _unit_spr(u:PTUnit):PTMWSprite;
 var an,td:integer;
 begin
    _unit_spr:=@spr_dummy;

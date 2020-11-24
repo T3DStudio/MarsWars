@@ -191,7 +191,7 @@ begin
               inc(vid_ppos,1);
               vid_ppos:=vid_ppos mod 4;
               _ScreenSurfaces;
-              map_ptrt:=255;
+              theme_map_ptrt:=255;
               MakeTerrain;
            end;
       14 : begin
@@ -231,7 +231,7 @@ begin
 
                 _MakeScreen;
                 _ScreenSurfaces;
-                map_ptrt:=255;
+                theme_map_ptrt:=255;
                 MakeTerrain;
              end;
       18 : begin _fscr:=not _fscr; _MakeScreen;end;
