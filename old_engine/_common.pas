@@ -424,8 +424,8 @@ end;
 
 function _nhp(x,y:integer):boolean;
 begin
-   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))and
-         (vid_vy<y)and(y<(vid_vy+vid_sh));
+   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))
+      and(vid_vy<y)and(y<(vid_vy+vid_sh));
 end;
 
 procedure _scrollV(i:pinteger;s,min,max:integer);
@@ -457,7 +457,7 @@ function p_color(player:byte):cardinal;
 begin
    p_color:=0;
    if(player<=MaxPlayers)then
-   case vid_plcolors of
+    case vid_plcolors of
    0: p_color:=PlayerColor[player];
    1,
    2: if(player=HPlayer)then
@@ -472,8 +472,8 @@ begin
    4: if(player=HPlayer)
       then p_color:=c_white
       else p_color:=PlayerColor[_PickPTeam(g_mode,player)];
-   else
-   end;
+    else
+    end;
 end;
 
 procedure _view_bounds;

@@ -62,11 +62,8 @@ begin
             BlockRead(f,vr,sizeof(map_liq  ));
             if(vr>7)then _svld_stat:=_svld_stat+str_m_liq+'??'
                     else _svld_stat:=_svld_stat+str_m_liq+_str_mx[vr]+#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(theme_map_lqt  ));vr:=0;
-            BlockRead(f,vr,sizeof(theme_map_trt  ));vr:=0;
-            BlockRead(f,vr,sizeof(theme_map_crt  ));vr:=0;
-            BlockRead(f,vr,sizeof(map_hell ));vr:=0;
             BlockRead(f,vr,sizeof(map_obs  ));_svld_stat:=_svld_stat+str_m_obs+_str_mx[vr]+#13+' ';vr:=0;
+            BlockRead(f,vr,sizeof(theme_i  ));vr:=0;
             BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]    +#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));_svld_stat:=_svld_stat+str_gmode[vr]      +#13+#25;vr:=0;
             BlockRead(f,vr,sizeof(g_startb ));vr:=0;
@@ -139,10 +136,8 @@ map_seed
 map_seed2
 map_mw
 map_lqt
-map_trt
-map_crt
 map_obs
-map_hell
+theme_i
 g_addon
 g_mode
 g_starta
@@ -173,6 +168,10 @@ ui_alrms
 map_psx
 map_psy
 cmp_ait2p
+theme_map_lqt
+theme_map_blqt
+theme_map_trt
+theme_map_crt
 }
 
 procedure _svld_save;
@@ -181,48 +180,48 @@ begin
    assign(f,str_f_svld+_svld_str+str_e_svld);
    {$I-}rewrite(f,1);{$I+} if (ioresult<>0) then exit;
 
-
-   BlockWrite(f,Ver        ,SizeOf(ver      ));
-   BlockWrite(f,menu_s2    ,SizeOf(menu_s2  ));
-   BlockWrite(f,_cmp_sel   ,SizeOf(_cmp_sel ));
-   BlockWrite(f,cmp_skill  ,SizeOf(cmp_skill));
-   BlockWrite(f,map_seed   ,SizeOf(map_seed ));
-   BlockWrite(f,map_seed2  ,SizeOf(map_seed2));
-   BlockWrite(f,map_mw     ,SizeOf(map_mw   ));
-   BlockWrite(f,map_liq    ,SizeOf(map_liq  ));
-   BlockWrite(f,theme_map_lqt    ,SizeOf(theme_map_lqt  ));
-   BlockWrite(f,theme_map_trt    ,SizeOf(theme_map_trt  ));
-   BlockWrite(f,theme_map_crt    ,SizeOf(theme_map_crt  ));
-   BlockWrite(f,map_obs    ,SizeOf(map_obs  ));
-   BlockWrite(f,map_hell   ,SizeOf(map_hell ));
-   BlockWrite(f,g_addon    ,SizeOf(g_addon  ));
-   BlockWrite(f,g_mode     ,SizeOf(g_mode   ));
-   BlockWrite(f,g_startb   ,SizeOf(g_startb ));
-   BlockWrite(f,g_shpos    ,SizeOf(g_shpos  ));
-   BlockWrite(f,HPlayer    ,SizeOf(HPlayer  ));
-   BlockWrite(f,_players   ,SizeOf(TPList   ));
-   BlockWrite(f,_units     ,SizeOf(_units   ));
-   BlockWrite(f,_missiles  ,SizeOf(_missiles));
-   BlockWrite(f,_effects   ,SizeOf(_effects ));
-   BlockWrite(f,map_dds    ,SizeOf(map_dds  ));
-   BlockWrite(f,vid_vx     ,SizeOf(vid_vx   ));
-   BlockWrite(f,vid_vy     ,SizeOf(vid_vy   ));
-   BlockWrite(f,PlayerColor,SizeOf(PlayerColor));
-   BlockWrite(f,G_Step     ,SizeOf(G_Step   ));
-   BlockWrite(f,vid_rtui   ,SizeOf(vid_rtui ));
-   BlockWrite(f,m_sbuild   ,SizeOf(m_sbuild ));
-   BlockWrite(f,g_inv_wn   ,SizeOf(g_inv_wn ));
-   BlockWrite(f,g_inv_t    ,SizeOf(g_inv_t  ));
-   BlockWrite(f,g_inv_wt   ,SizeOf(g_inv_wt ));
-   BlockWrite(f,g_ct_pl    ,SizeOf(g_ct_pl  ));
-   BlockWrite(f,_uclord_c  ,SizeOf(_uclord_c));
-   BlockWrite(f,_uregen_c  ,SizeOf(_uregen_c));
-   BlockWrite(f,G_WTeam    ,SizeOf(G_WTeam  ));
-   BlockWrite(f,team_army  ,SizeOf(team_army));
-   BlockWrite(f,ui_alrms   ,SizeOf(ui_alrms ));
-   BlockWrite(f,map_psx    ,SizeOf(map_psx  ));
-   BlockWrite(f,map_psy    ,SizeOf(map_psy  ));
-   BlockWrite(f,cmp_ait2p  ,SizeOf(cmp_ait2p));
+   BlockWrite(f,ver            ,SizeOf(ver            ));
+   BlockWrite(f,menu_s2        ,SizeOf(menu_s2        ));
+   BlockWrite(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
+   BlockWrite(f,cmp_skill      ,SizeOf(cmp_skill      ));
+   BlockWrite(f,map_seed       ,SizeOf(map_seed       ));
+   BlockWrite(f,map_seed2      ,SizeOf(map_seed2      ));
+   BlockWrite(f,map_mw         ,SizeOf(map_mw         ));
+   BlockWrite(f,map_liq        ,SizeOf(map_liq        ));
+   BlockWrite(f,map_obs        ,SizeOf(map_obs        ));
+   BlockWrite(f,theme_i        ,SizeOf(theme_i        ));
+   BlockWrite(f,g_addon        ,SizeOf(g_addon        ));
+   BlockWrite(f,g_mode         ,SizeOf(g_mode         ));
+   BlockWrite(f,g_startb       ,SizeOf(g_startb       ));
+   BlockWrite(f,g_shpos        ,SizeOf(g_shpos        ));
+   BlockWrite(f,HPlayer        ,SizeOf(HPlayer        ));
+   BlockWrite(f,_players       ,SizeOf(TPList         ));
+   BlockWrite(f,_units         ,SizeOf(_units         ));
+   BlockWrite(f,_missiles      ,SizeOf(_missiles      ));
+   BlockWrite(f,_effects       ,SizeOf(_effects       ));
+   BlockWrite(f,map_dds        ,SizeOf(map_dds        ));
+   BlockWrite(f,vid_vx         ,SizeOf(vid_vx         ));
+   BlockWrite(f,vid_vy         ,SizeOf(vid_vy         ));
+   BlockWrite(f,PlayerColor    ,SizeOf(PlayerColor    ));
+   BlockWrite(f,G_Step         ,SizeOf(G_Step         ));
+   BlockWrite(f,vid_rtui       ,SizeOf(vid_rtui       ));
+   BlockWrite(f,m_sbuild       ,SizeOf(m_sbuild       ));
+   BlockWrite(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
+   BlockWrite(f,g_inv_t        ,SizeOf(g_inv_t        ));
+   BlockWrite(f,g_inv_wt       ,SizeOf(g_inv_wt       ));
+   BlockWrite(f,g_ct_pl        ,SizeOf(g_ct_pl        ));
+   BlockWrite(f,_uclord_c      ,SizeOf(_uclord_c      ));
+   BlockWrite(f,_uregen_c      ,SizeOf(_uregen_c      ));
+   BlockWrite(f,G_WTeam        ,SizeOf(G_WTeam        ));
+   BlockWrite(f,team_army      ,SizeOf(team_army      ));
+   BlockWrite(f,ui_alrms       ,SizeOf(ui_alrms       ));
+   BlockWrite(f,map_psx        ,SizeOf(map_psx        ));
+   BlockWrite(f,map_psy        ,SizeOf(map_psy        ));
+   BlockWrite(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
+   BlockWrite(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
+   BlockWrite(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
+   BlockWrite(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
+   BlockWrite(f,theme_map_crt  ,SizeOf(theme_map_crt  ));
 
    close(f);
 
@@ -249,61 +248,61 @@ begin
       assign(f,fn);
       {$I-}reset(f,1);{$I+} if (ioresult<>0) then exit;
       if(FileSize(f)<>svld_size)then begin close(f); exit; end;
-      BlockRead(f,Vr,SizeOf(ver));
-      if(vr=Ver)then
+      BlockRead(f,vr,SizeOf(ver));
+      if(vr=ver)then
       begin
          DefGameObjects;
 
-         BlockRead(f,menu_s2    ,SizeOf(menu_s2  ));
-         BlockRead(f,_cmp_sel   ,SizeOf(_cmp_sel ));
-         BlockRead(f,cmp_skill  ,SizeOf(cmp_skill));
-         BlockRead(f,map_seed   ,SizeOf(map_seed ));
-         BlockRead(f,map_seed2  ,SizeOf(map_seed2));
-         BlockRead(f,map_mw     ,SizeOf(map_mw   ));
-         BlockRead(f,map_liq    ,SizeOf(map_liq  ));
-         BlockRead(f,theme_map_lqt    ,SizeOf(theme_map_lqt  ));
-         BlockRead(f,theme_map_trt    ,SizeOf(theme_map_trt  ));
-         BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt  ));
-         BlockRead(f,map_obs    ,SizeOf(map_obs  ));
-         BlockRead(f,map_hell   ,SizeOf(map_hell ));
-         BlockRead(f,g_addon    ,SizeOf(g_addon  ));
-         BlockRead(f,g_mode     ,SizeOf(g_mode   ));
-         BlockRead(f,g_startb   ,SizeOf(g_startb ));
-         BlockRead(f,g_shpos    ,SizeOf(g_shpos  ));
-         BlockRead(f,HPlayer    ,SizeOf(HPlayer  ));
-         BlockRead(f,_players   ,SizeOf(TPList   ));
-         BlockRead(f,_units     ,SizeOf(_units   ));
-         BlockRead(f,_missiles  ,SizeOf(_missiles));
-         BlockRead(f,_effects   ,SizeOf(_effects ));
-         BlockRead(f,map_dds    ,SizeOf(map_dds  ));
-         BlockRead(f,vid_vx     ,SizeOf(vid_vx   ));
-         BlockRead(f,vid_vy     ,SizeOf(vid_vy   ));
-         BlockRead(f,PlayerColor,SizeOf(PlayerColor));
-         BlockRead(f,G_Step     ,SizeOf(G_Step   ));
-         BlockRead(f,vid_rtui   ,SizeOf(vid_rtui ));
-         BlockRead(f,m_sbuild   ,SizeOf(m_sbuild ));
-         BlockRead(f,g_inv_wn   ,SizeOf(g_inv_wn ));
-         BlockRead(f,g_inv_t    ,SizeOf(g_inv_t  ));
-         BlockRead(f,g_inv_wt   ,SizeOf(g_inv_wt ));
-         BlockRead(f,g_ct_pl    ,SizeOf(g_ct_pl  ));
-         BlockRead(f,_uclord_c  ,SizeOf(_uclord_c));
-         BlockRead(f,_uregen_c  ,SizeOf(_uregen_c));
-         BlockRead(f,G_WTeam    ,SizeOf(G_WTeam  ));
-         BlockRead(f,team_army  ,SizeOf(team_army));
-         BlockRead(f,ui_alrms   ,SizeOf(ui_alrms ));
-         BlockRead(f,map_psx    ,SizeOf(map_psx  ));
-         BlockRead(f,map_psy    ,SizeOf(map_psy  ));
-         BlockRead(f,cmp_ait2p  ,SizeOf(cmp_ait2p));
+         BlockRead(f,menu_s2        ,SizeOf(menu_s2        ));
+         BlockRead(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
+         BlockRead(f,cmp_skill      ,SizeOf(cmp_skill      ));
+         BlockRead(f,map_seed       ,SizeOf(map_seed       ));
+         BlockRead(f,map_seed2      ,SizeOf(map_seed2      ));
+         BlockRead(f,map_mw         ,SizeOf(map_mw         ));
+         BlockRead(f,map_liq        ,SizeOf(map_liq        ));
+         BlockRead(f,map_obs        ,SizeOf(map_obs        ));
+         BlockRead(f,theme_i        ,SizeOf(theme_i        ));map_seed2theme;
+         BlockRead(f,g_addon        ,SizeOf(g_addon        ));
+         BlockRead(f,g_mode         ,SizeOf(g_mode         ));
+         BlockRead(f,g_startb       ,SizeOf(g_startb       ));
+         BlockRead(f,g_shpos        ,SizeOf(g_shpos        ));
+         BlockRead(f,HPlayer        ,SizeOf(HPlayer        ));
+         BlockRead(f,_players       ,SizeOf(TPList         ));
+         BlockRead(f,_units         ,SizeOf(_units         ));
+         BlockRead(f,_missiles      ,SizeOf(_missiles      ));
+         BlockRead(f,_effects       ,SizeOf(_effects       ));
+         BlockRead(f,map_dds        ,SizeOf(map_dds        ));
+         BlockRead(f,vid_vx         ,SizeOf(vid_vx         ));
+         BlockRead(f,vid_vy         ,SizeOf(vid_vy         ));
+         BlockRead(f,PlayerColor    ,SizeOf(PlayerColor    ));
+         BlockRead(f,G_Step         ,SizeOf(G_Step         ));
+         BlockRead(f,vid_rtui       ,SizeOf(vid_rtui       ));
+         BlockRead(f,m_sbuild       ,SizeOf(m_sbuild       ));
+         BlockRead(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
+         BlockRead(f,g_inv_t        ,SizeOf(g_inv_t        ));
+         BlockRead(f,g_inv_wt       ,SizeOf(g_inv_wt       ));
+         BlockRead(f,g_ct_pl        ,SizeOf(g_ct_pl        ));
+         BlockRead(f,_uclord_c      ,SizeOf(_uclord_c      ));
+         BlockRead(f,_uregen_c      ,SizeOf(_uregen_c      ));
+         BlockRead(f,G_WTeam        ,SizeOf(G_WTeam        ));
+         BlockRead(f,team_army      ,SizeOf(team_army      ));
+         BlockRead(f,ui_alrms       ,SizeOf(ui_alrms       ));
+         BlockRead(f,map_psx        ,SizeOf(map_psx        ));
+         BlockRead(f,map_psy        ,SizeOf(map_psy        ));
+         BlockRead(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
+         BlockRead(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
+         BlockRead(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
+         BlockRead(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
+         BlockRead(f,theme_map_crt  ,SizeOf(theme_map_crt  ));
 
          map_vars;
-         MakeTerrain;
-         MakeLiquid;
+         map_tllbc;
          _refresh_dmcells;
          _makeMMB;
-         //_dds_spr;
+         _map_dds;
          g_inv_calcmm;
-
          _view_bounds;
+
          G_Started:=true;
          _menu:=false;
 

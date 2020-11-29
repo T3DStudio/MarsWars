@@ -19,7 +19,7 @@ begin
          begin
             anim:=abs(hits-idead_hits);
             if(anim>255)then anim:=255;
-            _sl_add_dec(vx,vy,_udpth(pu),0,spr,anim,0);
+            _sl_add_dec(vx,vy,_udpth(pu),0,spr,anim,0,0,0);
          end;
      end;
 end;
@@ -479,9 +479,10 @@ begin
 
                if(buff[ub_toxin]>0)then
                 if(mech)
-                then _sl_add_dec(vx, smy-spr^.hh-spr_gear .hh-7,dp,0,@spr_gear ,255,0)
-                else _sl_add_dec(vx, smy-spr^.hh-spr_toxin.hh-7,dp,0,@spr_toxin,255,0);
-               if(buff[ub_gear ]>0)then _sl_add_dec(vx, smy-spr^.hh-spr_gear.hh-7,dp,0,@spr_gear,255,0);
+                then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
+                else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);
+               if(buff[ub_gear ]>0)then
+                     _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);
 
               _sl_add(vx-spr^.hw, smy-spr^.hh,dp,sh,rc,mc,rct,spr^.surf,inv,sb,b0,b2,b3,b1,ro);
            end;

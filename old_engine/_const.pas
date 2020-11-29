@@ -511,12 +511,13 @@ EID_HMU                = 218;
 EID_HCC                = 219;
 
 vid_ifps               = vid_fps-1;
+
 vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
 vid_maxw               = 1360;
 vid_maxh               = 768;
-vid_ab                 = 100;
+vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
 vid_rtuir              = 6;
 vid_rtuis              = vid_fps div vid_rtuir;
@@ -621,7 +622,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 223281;
+svld_size              = 231087;
 rpl_size               = 1574;
 
 rpl_none               = 0;
@@ -693,6 +694,16 @@ LiquidRs               = 4;
 
 crater_ri              = 4;
 crater_r               : array[1..crater_ri] of integer = (33,60,88,110);
+
+theme_n                = 8;
+theme_name             : array[0..theme_n-1] of shortstring = (#18+'TECH BASE'  ,
+                                                               #20+'TECH BASE'  ,
+                                                                   'PLANET'     ,
+                                                                   'PLANET MOON',
+                                                               #16+'CAVES'      ,
+                                                               #20+'ICE CAVES'  ,
+                                                               #16+'HELL'       ,
+                                                               #17+'HELL CAVES' );
 
 {$ELSE }
 

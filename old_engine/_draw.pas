@@ -17,7 +17,7 @@ end;
 
 procedure DrawGame;
 begin
-   SDL_FillRect(r_screen,nil,0);
+   sdl_FillRect(r_screen,nil,0);
 
    if(_menu)
    then d_Menu

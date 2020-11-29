@@ -190,32 +190,6 @@ begin
    if(itb)then filledcircleColor(surf,r,r,r-(r div 6)-5,c_purple);
 end;
 
-procedure MakeLiquidBack;
-var ts :psdl_surface;
-    i  :byte;
-begin
-   if(theme_map_pblqt=theme_map_blqt)and(theme_map_blqt>0)then exit;
-   theme_map_pblqt:=theme_map_blqt;
-
-   if(theme_map_blqt<0)or(theme_map_blqt>=theme_bliquidn)
-   then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_bliquids[theme_map_blqt]].surf;
-
-   for i:=1 to LiquidRs do
-    with spr_liquidb[i] do
-    begin
-       w:=DID_R[i]*2+30;
-       h:=w;
-       _FreeSF(surf);
-       surf:=_createSurf(w,w);
-       hw:=w div 2;
-       hh:=hw;
-       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_map_blqtt,true);
-       boxColor(surf,0,0,w,w,rgba2c(0,0,0,30));
-       SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
-    end;
-end;
-
 procedure MakeLiquid;
 var ts : psdl_surface;
 a,i,
@@ -224,19 +198,19 @@ begin
    if(theme_map_plqt=theme_map_lqt)and(theme_map_plqt>0)then exit;
    theme_map_plqt:=theme_map_lqt;
 
-   if(theme_map_lqt<0)or(theme_map_lqt>=theme_liquidn)then
+   if(theme_map_lqt<0)or(theme_map_lqt>=theme_spr_liquidn)then
    begin
-      ts   :=r_dterrain;
+      ts                :=r_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
       theme_liquid_animm:=vid_hfps;
    end
    else
    begin
-      ts   :=theme_spr_liquids[theme_liquids[theme_map_lqt]].surf;
-      theme_liquid_animt:=theme_anm_liquids[theme_liquids[theme_map_lqt]];
-      theme_liquid_color:=theme_clr_liquids[theme_liquids[theme_map_lqt]];
-      theme_liquid_animm:=theme_ant_liquids[theme_liquids[theme_map_lqt]];
+      ts                :=theme_spr_liquids[theme_map_lqt].surf;
+      theme_liquid_animt:=theme_anm_liquids[theme_map_lqt];
+      theme_liquid_color:=theme_clr_liquids[theme_map_lqt];
+      theme_liquid_animm:=theme_ant_liquids[theme_map_lqt];
    end;
 
    case theme_liquid_animt of
@@ -273,6 +247,32 @@ begin
      end;
 end;
 
+procedure MakeLiquidBack;
+var ts :psdl_surface;
+    i  :byte;
+begin
+   if(theme_map_pblqt=theme_map_blqt)and(theme_map_blqt>0)then exit;
+   theme_map_pblqt:=theme_map_blqt;
+
+   if(theme_map_blqt<0)or(theme_map_blqt>=theme_spr_terrainn)
+   then ts := r_dterrain
+   else ts := theme_spr_terrains[theme_map_blqt].surf;
+
+   for i:=1 to LiquidRs do
+    with spr_liquidb[i] do
+    begin
+       w:=DID_R[i]*2+30;
+       h:=w;
+       _FreeSF(surf);
+       surf:=_createSurf(w,w);
+       hw:=w div 2;
+       hh:=hw;
+       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_map_blqtt,true);
+       boxColor(surf,0,0,w,w,rgba2c(0,0,0,50));
+       SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
+    end;
+end;
+
 procedure MakeCrater;
 var ts : psdl_surface;
     i  : integer;
@@ -280,9 +280,9 @@ begin
    if(theme_map_pcrt=theme_map_crt)and(theme_map_pcrt>0)then exit;
    theme_map_pcrt:=theme_map_crt;
 
-   if(theme_map_crt<0)or(theme_map_crt>=theme_cratern)
+   if(theme_map_crt<0)or(theme_map_crt>=theme_spr_terrainn)
    then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_craters[theme_map_crt]].surf;
+   else ts := theme_spr_terrains[theme_map_crt].surf;
 
    for i:=1 to crater_ri do
     with spr_crater[i] do
@@ -294,7 +294,7 @@ begin
        hw:=crater_r[i];
        hh:=hw;
        _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_map_blqtt,false);
-       boxColor(surf,0,0,w,w,rgba2c(0,0,0,60));
+       boxColor(surf,0,0,w,w,rgba2c(0,0,0,70));
        SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
     end;
 end;
@@ -312,7 +312,7 @@ begin
       vid_terrain:=nil;
    end;
 
-   if(theme_map_trt<0)or(theme_map_trt>=theme_terrainn)then
+   if(theme_map_trt<0)or(theme_map_trt>=theme_spr_terrainn)then
    begin
       ter_w:=1;
       ter_h:=1;
@@ -321,7 +321,7 @@ begin
    end
    else
    begin
-      ter_s:=theme_spr_terrains[theme_terrains[theme_map_trt]].surf;
+      ter_s:=theme_spr_terrains[theme_map_trt].surf;
 
       ter_w:=ter_s^.w;
       ter_h:=ter_s^.h;
@@ -341,6 +341,8 @@ begin
       end;
    end;
 end;
+
+
 
 function LoadBtn(fn:shortstring;bw:integer):pSDL_Surface;
 var ts:pSDl_Surface;
@@ -623,24 +625,24 @@ end;
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   MaxTDecsS:=(vid_sw*vid_sh) div 11000;
+   MaxTDecsS:=(vid_sw*vid_sh) div 10000;
    setlength(_TDecs,MaxTDecsS);
 
    vid_mwa:= vid_sw+vid_ab*2;
    vid_mha:= vid_sh+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
-   iy:=(map_seed2*5+ix) mod vid_mwa;
+   iy:=(map_seed2*5+ix)  mod vid_mha;
    rn:=ix*iy;
    for i:=1 to MaxTDecsS do
-   with _TDecs[i-1] do
-   begin
-      inc(rn,17);
-      ix:=_genx(ix+rn,vid_mwa,false);
-      iy:=_genx(iy+sqr(ix*i),vid_mha,false);
-      x :=ix;
-      y :=iy;
-   end;
+    with _TDecs[i-1] do
+    begin
+       inc(rn,17);
+       ix:=_genx(ix+rn       ,vid_mwa,false);
+       iy:=_genx(iy+sqr(ix*i),vid_mha,false);
+       x :=ix;
+       y :=iy;
+    end;
 end;
 
 procedure _vidvars;
@@ -785,8 +787,8 @@ begin
       ui_armyx  := y+vid_BW*2+vid_hBW;
 
       inc(y,vid_BW);
-      characterColor(r_panel,y+ui_ex-1,ui_iy,'E',c_aqua  );
-      characterColor(r_panel,y+ui_ax+1,ui_iy,'A',c_orange);
+      characterColor(r_panel,y       +2,ui_iy,'E',c_aqua  );
+      characterColor(r_panel,y+vid_BW+2,ui_iy,'A',c_orange);
 
       ui_iy := 23;
 

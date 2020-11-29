@@ -554,6 +554,11 @@ begin
     end;
 
    d_OrderIcons(tar);
+
+   {_draw_text(tar,ui_textx,120,'terrain: '+i2s(theme_map_trt )+' ('+i2s(theme_map_ptrt )+') /'+i2s(theme_terrainn)   ,ta_left,255,c_white);
+   _draw_text(tar,ui_textx,130,'crater:  '+i2s(theme_map_crt )+' ('+i2s(theme_map_pcrt )+') /'+i2s(theme_liquidn )   ,ta_left,255,c_white);
+   _draw_text(tar,ui_textx,140,'liquid:  '+i2s(theme_map_lqt )+' ('+i2s(theme_map_plqt )+') /'+i2s(theme_liquidn )   ,ta_left,255,c_white);
+   _draw_text(tar,ui_textx,150,'bliquid: '+i2s(theme_map_blqt)+' ('+i2s(theme_map_pblqt)+') /'+i2s(theme_bliquidn)   ,ta_left,255,c_white);}
 end;
 
 procedure d_UIMouse(tar:pSDL_Surface);

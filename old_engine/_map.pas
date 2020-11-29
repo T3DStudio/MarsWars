@@ -9,7 +9,7 @@ begin
         dec(animt,1);
         if(animt<=0)then
         begin
-           if(animn<0)then
+           if(animn<0)or(first)then
            begin
               animn:= d mod lstn^;
               animn:= lst^[animn];
@@ -18,26 +18,28 @@ begin
            begin
               animn:=anml^[animn].anext;
            end;
-           animt:=anml^[animn].atime;
-           shh  :=anml^[animn].sh;
-           ox   :=anml^[animn].xo;
-           oy   :=anml^[animn].yo;
+           animt:=_theme_anim_time(anml^[animn].atime);
+           shh  := anml^[animn].sh;
+           ox   := anml^[animn].xo;
+           oy   := anml^[animn].yo;
            spr  :=@sprl^[animn];
+           case anml^[animn].depth of
+           0    : dpth :=y;
+           else   dpth :=anml^[animn].depth;
+           end;
         end;
      end;
 end;
 
 procedure _dds_p(onlyspr:boolean);
-var d,vx,vy,
+var d,
     ro :integer;
 begin
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then
      begin
-        vx:=x+ox;
-        vy:=y+oy;
-        if(_rectvis(vx,vy,255,255)=false)then continue;
+        if(_rectvis(x,y,255,255)=false)then continue;
 
         ro:=0;
         if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r-bld_dec_mr;
@@ -57,12 +59,20 @@ begin
         DID_BRock    : _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
         end;
 
-        if(_rectvis(vx,vy,spr^.hw,spr^.hh))then
+        if(_rectvis(x+ox,y+oy,spr^.hw,spr^.hh))then
         begin
-           _sl_add_dec(vx,vy,dpth,shh,spr,255,ro);
-           if(pspr<>nil)then _sl_add_dec(vx,vy,-10000,shh,pspr,255,ro);
+           _sl_add_dec(x,y,dpth,shh,spr,255,ro,ox,oy);
+           if(pspr<>nil)then _sl_add_dec(x,y,-10000,0,pspr,255,ro,ox,oy);
         end;
      end;
+end;
+
+procedure map_tllbc;
+begin
+   MakeTerrain;
+   MakeCrater;
+   MakeLiquid;
+   MakeLiquidBack;
 end;
 
 procedure map_seed2theme;
@@ -73,6 +83,54 @@ begin
    -((map_seed and $000FF000) shr 12),
    -((map_seed and $0FF00000) shr 20),
    -((map_seed and $F0000000) shr 28));
+end;
+
+procedure _map_dds;
+var d:integer;
+begin
+   for d:=1 to MaxDoodads do
+    with map_dds[d] do
+     if(t>0)then
+     begin
+        dpth := y;
+        shh  := 0;
+        animn:= -1;
+        animt:= 0;
+        spr  := pspr_dummy;
+        pspr := nil;
+        ox   := 0;
+        oy   := 0;
+
+        case t of
+        DID_LiquidR1,
+        DID_LiquidR2,
+        DID_LiquidR3,
+        DID_LiquidR4: begin
+                         dpth := -5;
+                         mmc  := theme_liquid_color;
+                         animn:= t;
+                         pspr := @spr_liquidb[animn];
+                      end;
+        DID_other  :  begin
+                         shh  := 1;
+                         mmc  := c_gray;
+                         _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
+                      end;
+
+        DID_Srock  :  begin
+                         mmc  := c_dgray;
+                         _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
+                      end;
+        DID_Brock  :  begin
+                         mmc  := c_dgray;
+                         _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
+                      end;
+        end;
+
+        mmx:=round(x*map_mmcx);
+        mmy:=round(y*map_mmcx);
+        mmr:=max2(1,round(r*map_mmcx));
+     end;
 end;
 
 {$ENDIF}
@@ -134,49 +192,6 @@ begin
 
         x:=dx;
         y:=dy;
-
-        {$IFDEF _FULLGAME}
-        dpth := y;
-        shh  := 0;
-        animn:= -1;
-        animt:= 0;
-        spr  := pspr_dummy;
-        pspr := nil;
-        ox   := 0;
-        oy   := 0;
-
-        case t of
-        DID_LiquidR1,
-        DID_LiquidR2,
-        DID_LiquidR3,
-        DID_LiquidR4: begin
-                         dpth := -5;
-                         mmc  := theme_liquid_color;
-                         animn:= t;
-                         pspr := @spr_liquidb[animn];
-                      end;
-        DID_other  :  begin
-                         shh  := 1;
-                         mmc  := c_gray;
-                         _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
-                      end;
-
-        DID_Srock  :  begin
-                         dpth := 0;
-                         mmc  := c_dgray;
-                         _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
-                      end;
-        DID_Brock  :  begin
-                         dpth := 0;
-                         mmc  := c_dgray;
-                         _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
-                      end;
-        end;
-
-        mmx:=round(x*map_mmcx);
-        mmy:=round(y*map_mmcx);
-        mmr:=max2(1,round(r*map_mmcx));
-        {$ENDIF}
 
         break;
      end;
@@ -402,7 +417,7 @@ begin
 end;
 
 
-procedure Map_Make;
+procedure map_make;
 const dpostime = 300;
 var i,ix,iy,lqs,rks,hrks,ddc,cnt:integer;
     di: byte;
@@ -492,8 +507,8 @@ begin
 
    _refresh_dmcells;
    {$IFDEF _FULLGAME}
+   _map_dds;
    _makeMMB;
-   //_dds_spr;
    {$ENDIF}
 end;
 
@@ -513,16 +528,13 @@ end;
 
 procedure Map_premap;
 begin
-   Map_Vars;
-   MSkirmishStarts;
+   map_vars;
+   mSkirmishStarts;
    {$IFDEF _FULLGAME}
-   Map_seed2theme;
-   MakeTerrain;
-   MakeCrater;
-   MakeLiquid;
-   MakeLiquidBack;
+   map_seed2theme;
+   map_tllbc;
    {$ENDIF}
-   Map_Make;
+   map_Make;
 end;
 
 

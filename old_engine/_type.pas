@@ -190,7 +190,8 @@ end;
 
 TVisSpr = record
    s     : PSDL_Surface;
-   x,y,ro,
+   x,y,xo,yo,
+   ro,
    d,sh  : integer;
    rc,msk: cardinal;
    inv   : byte;
@@ -212,6 +213,7 @@ TIntList = array of integer;
 PTIntList = ^TIntList;
 
 TThemeAnim = record
+   depth,
    xo,yo,
    sh,
    anext,
@@ -232,9 +234,9 @@ TDoodad = record
    animn,animt,
    dpth,shh,ox,oy,
    mmx,mmy,mmr :integer;
+   mmc         :cardinal;
    spr,
    pspr        :PTMWSprite;
-   mmc         :cardinal;
    {$ENDIF}
 end;
 PTDoodad = ^TDoodad;

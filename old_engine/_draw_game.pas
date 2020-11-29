@@ -21,11 +21,13 @@ begin
          cll := acll;
          rct := arct;
          ro  := aro;
+         xo  := 0;
+         yo  := 0;
       end;
    end;
 end;
 //_sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
-procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro:integer);
+procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro,axo,ayo:integer);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -47,6 +49,8 @@ begin
          cll := 0;
          rct := false;
          ro  := aro;
+         xo  := axo;
+         yo  := ayo;
       end;
    end;
 end;
@@ -73,6 +77,8 @@ begin
          cll := 0;
          rct := false;
          ro  := 0;
+         xo  := 0;
+         yo  := 0;
       end;
    end;
 end;
@@ -99,8 +105,8 @@ begin
    while(vid_vsls>0)do
     with vid_vsl[vid_vsls]^ do
     begin
-       inc(x,lx);
-       inc(y,ly);
+       inc(x,lx+xo);
+       inc(y,ly+yo);
 
        if(sh>0)then
        begin
@@ -111,6 +117,9 @@ begin
        if(inv<255)then SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,inv);
 
        if(inv>0)then _draw_surf(tar,x,y,s);
+
+       dec(x,xo);
+       dec(y,yo);
 
        if(msk>0)or(ro>0)then
        begin
@@ -187,20 +196,13 @@ begin
         ix:=ix mod vid_mwa;
         iy:=iy mod vid_mha;
 
-        ix:=ix mod vid_mwa;
-        iy:=iy mod vid_mha;
-
         if(ix<0)then ix:=vid_mwa+ix;
         if(iy<0)then iy:=vid_mha+iy;
 
-        dec(ix,vid_ab);
-        dec(iy,vid_ab);
+        inc(ix,lx-vid_ab);
+        inc(iy,ly-vid_ab);
 
-        //dec(ix,vid_ab+lx-spr^.hw);
-        //dec(iy,vid_ab+ly-spr^.hh);
-
-        with spr^ do
-        _draw_surf(tar,ix-hw,iy-hh,spr^.surf);
+        with spr^ do _draw_surf(tar,ix-hw,iy-hh,spr^.surf);
      end;
 end;
 

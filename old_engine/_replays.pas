@@ -305,9 +305,7 @@ begin
                             _rpls_pnu  :=0;
                             _rpls_vidm :=false;
 
-                            Map_premap;
-                            _makeMMB;
-                            //_dds_spr;
+                            map_premap;
                             _moveHumView(map_psx[Hplayer] , map_psy[Hplayer]);
 
                             ui_tab:=2;

@@ -189,7 +189,6 @@ map_mmvw,
 map_mmvh,
 map_prmm          : integer;
 map_flydpth       : array[0..2] of integer;
-map_hell          : boolean = true;
 
 cmp_skill         : byte = 3;
 cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
@@ -371,8 +370,6 @@ fps_ns            : cardinal;
 //theme
 
 theme_i           : integer = 0;
-theme_n           : integer = 0;
-theme_name        : shortstring;
 
 theme_liquid_animt: byte;
 theme_liquid_animm: byte;
