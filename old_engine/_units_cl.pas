@@ -988,8 +988,8 @@ begin
    FillChar(uids_builder,SizeOf(uids_builder),0);
    FillChar(uids_units  ,SizeOf(uids_units  ),0);
    FillChar(uids_apc    ,SizeOf(uids_apc    ),0);
-   FillChar(cl2uid,SizeOf(cl2uid),0);
-   FillChar(_ulst,sizeof(_ulst),0);
+   FillChar(cl2uid      ,SizeOf(cl2uid      ),0);
+   FillChar(_ulst       ,SizeOf(_ulst       ),0);
    for i:=0 to 255 do
    begin
       _ulst[i].uid:=i;
@@ -1022,23 +1022,23 @@ begin
    FillChar(upgrade_cnt  ,SizeOf(upgrade_cnt  ),1);
    FillChar(upgrade_rupgr,SizeOf(upgrade_rupgr),0);
    FillChar(upgrade_rupgr,SizeOf(upgrade_ruid ),0);
-                              // time lvl enr rupgr ruid
-   _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_build     ,120,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_melee     ,60 ,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_regen     ,120,2 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_pains     ,60 ,4 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_vision    ,120,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_towers    ,120,4 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_5bld      ,120,3 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_mainm     ,180,1 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_mainr     ,120,2 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_misfst    ,120,1 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_6bld      ,20 ,15,8 ,255,UID_HMonastery);
-   _setUPGR(r_hell,upgr_2tier     ,180,1 ,10,255,UID_HMonastery);
+                              // time lvl enr rupgr     ruid
+   _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255       ,255);
+   _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255       ,255);
+   _setUPGR(r_hell,upgr_build     ,120,4 ,4 ,255       ,255);
+   _setUPGR(r_hell,upgr_melee     ,60 ,3 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_regen     ,120,2 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_pains     ,60 ,4 ,2 ,255       ,255);
+   _setUPGR(r_hell,upgr_vision    ,120,3 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_towers    ,120,4 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_5bld      ,120,3 ,2 ,255       ,255);
+   _setUPGR(r_hell,upgr_mainm     ,180,1 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_mainr     ,120,2 ,2 ,255       ,255);
+   _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,3 ,255       ,255);
+   _setUPGR(r_hell,upgr_misfst    ,120,1 ,2 ,255       ,255);
+   _setUPGR(r_hell,upgr_6bld      ,20 ,15,8 ,255       ,UID_HMonastery);
+   _setUPGR(r_hell,upgr_2tier     ,180,1 ,10,255       ,UID_HMonastery);
    _setUPGR(r_hell,upgr_revtele   ,120,1 ,3 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_revmis    ,120,1 ,2 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_totminv   ,120,1 ,2 ,upgr_2tier,UID_HMonastery);
@@ -1049,22 +1049,22 @@ begin
    _setUPGR(r_hell,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_HFortress );
    _setUPGR(r_hell,upgr_9bld      ,180,1 ,4 ,upgr_2tier,UID_HFortress );
 
-   _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_build     ,180,4 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_melee     ,60 ,3 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_vision    ,120,1 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_towers    ,120,4 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_5bld      ,120,3 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255,255);
+   _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255       ,255);
+   _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255       ,255);
+   _setUPGR(r_uac ,upgr_build     ,180,4 ,4 ,255       ,255);
+   _setUPGR(r_uac ,upgr_melee     ,60 ,3 ,3 ,255       ,255);
+   _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,3 ,255       ,255);
+   _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,2 ,255       ,255);
+   _setUPGR(r_uac ,upgr_vision    ,120,1 ,3 ,255       ,255);
+   _setUPGR(r_uac ,upgr_towers    ,120,4 ,3 ,255       ,255);
+   _setUPGR(r_uac ,upgr_5bld      ,120,3 ,2 ,255       ,255);
+   _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255       ,255);
    _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,4 ,upgr_mainm,255);
-   _setUPGR(r_uac ,upgr_mainr     ,120,2 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,2 ,255,255);
+   _setUPGR(r_uac ,upgr_mainr     ,120,2 ,2 ,255       ,255);
+   _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,2 ,255       ,255);
    _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
-   _setUPGR(r_uac ,upgr_6bld      ,180,1 ,8 ,255,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,10,255,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_6bld      ,180,1 ,8 ,255       ,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,10,255       ,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_blizz     ,180,8 ,10,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,4 ,upgr_2tier,UID_UVehicleFactory);

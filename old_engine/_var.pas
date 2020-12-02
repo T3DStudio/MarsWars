@@ -383,7 +383,8 @@ theme_map_lqt     : integer=0;
 theme_map_plqt    : integer = -1;
 theme_map_blqt    : integer=0;
 theme_map_pblqt   : integer = -1;
-theme_map_blqtt   : byte = 0;
+theme_liquid_style: byte = 0;
+theme_crater_style: byte = 0;
 
 theme_decals,
 theme_decors,

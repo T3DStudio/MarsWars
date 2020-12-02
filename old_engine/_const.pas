@@ -115,8 +115,8 @@ ua_unload              = 4;
 
 aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
-aif_pushair            : cardinal = 1 shl 2 ; // push only air
-aif_pushgrnd           : cardinal = 1 shl 3 ; // push only air
+aif_pushair            : cardinal = 1 shl 2 ; // push air
+aif_pushgrnd           : cardinal = 1 shl 3 ; // push ground
 aif_help               : cardinal = 1 shl 4 ; // help allies
 aif_hrrsmnt            : cardinal = 1 shl 5 ; // attacks with small forces
 aif_usex5              : cardinal = 1 shl 6 ; // use teleport and radar
@@ -461,7 +461,7 @@ mech_adv_rel           : array[false..true] of integer = (vid_fps*12,vid_fps*6);
 uac_adv_rel            : array[false..true] of integer = (vid_fps*3,vid_fps);
 g_ct_pr                = 150;
 g_ct_ct                : array[1..r_cnt] of integer = (vid_fps*10,vid_fps*5);
-bld_dec_mr             = 8;
+bld_dec_mr             = 6;
 def_ai                 = 5;
 pain_time              = vid_hfps;
 hinvuln_time           = (vid_fps*30);
@@ -700,8 +700,8 @@ theme_name             : array[0..theme_n-1] of shortstring = (#18+'TECH BASE'  
                                                                #20+'TECH BASE'  ,
                                                                    'PLANET'     ,
                                                                    'PLANET MOON',
-                                                               #16+'CAVES'      ,
-                                                               #20+'ICE CAVES'  ,
+                                                               #21+'CAVES'      ,
+                                                               #19+'ICE CAVES'  ,
                                                                #16+'HELL'       ,
                                                                #17+'HELL CAVES' );
 

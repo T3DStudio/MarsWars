@@ -76,12 +76,12 @@ begin
 
    {$ENDIF}
 
-   NEW(_event);
-
    if not(InitNET)   then exit;
 
    Map_randommap;
    DefGameObjects;
+
+   NEW(_event);
 
    _CYCLE:=true;
 

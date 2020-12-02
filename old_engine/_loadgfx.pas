@@ -152,6 +152,8 @@ begin
       inc(x,ts^.w);
    end;
 
+   if(rrs>1)then exit;
+
    if(rrs=0)then
    begin
       case animst of
@@ -267,7 +269,7 @@ begin
        surf:=_createSurf(w,w);
        hw:=w div 2;
        hh:=hw;
-       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_map_blqtt,true);
+       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_liquid_style,true);
        boxColor(surf,0,0,w,w,rgba2c(0,0,0,50));
        SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
     end;
@@ -293,7 +295,7 @@ begin
        surf:=_createSurf(w,w);
        hw:=crater_r[i];
        hh:=hw;
-       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_map_blqtt,false);
+       _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_crater_style,false);
        boxColor(surf,0,0,w,w,rgba2c(0,0,0,70));
        SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
     end;
@@ -681,8 +683,17 @@ const
   ystop = 14;
 var i,y:integer;
 
-procedure pline(x0,y0,x1,y1:integer);
+procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
+   if(vid_ppos<2)
+   then lineColor(r_panel,x0,y0,x1,y1,color)
+   else lineColor(r_panel,y0,x0,y1,x1,color);
+end;
+procedure prect(x0,y0,x1,y1:integer;color:cardinal);
+begin
+   if(vid_ppos<2)
+   then rectangleColor(r_panel,x0,y0,x1,y1,color)
+   else rectangleColor(r_panel,y0,x0,y1,x1,color);
 end;
 
 begin
@@ -708,20 +719,9 @@ begin
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
       r_panel  :=_createSurf(vid_panelw+1,vid_vh);
 
-      vlineColor(r_panel,0             ,0         ,vid_vh            ,c_white);
-      vlineColor(r_panel,vid_panelw    ,0         ,vid_vh            ,c_white);
-
-      hlineColor(r_panel,0,r_panel^.w,0                 ,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw        ,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw+ui_h3bw,c_white);
-      hlineColor(r_panel,0,r_panel^.w,vid_panelw+vid_BW ,c_white);
-
       vlineColor(r_panel,ui_h3bw       ,vid_panelw,vid_panelw+ui_h3bw,c_white);
       vlineColor(r_panel,ui_hwp        ,vid_panelw,vid_panelw+ui_h3bw,c_white);
       vlineColor(r_panel,ui_hwp+ui_h3bw,vid_panelw,vid_panelw+ui_h3bw,c_white);
-
-      for y:=0 to 3 do
-       vlineColor(r_panel,y*vid_tBW,vid_panelw+ui_h3bw,vid_panelw+vid_BW,c_white);
 
       y:=vid_BW*14;
       vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
@@ -733,15 +733,6 @@ begin
 
       characterColor(r_panel,ui_ex,ui_iy,'E',c_aqua  );
       characterColor(r_panel,ui_ax,ui_iy,'A',c_orange);
-
-      i:=4;
-      y:=vid_BW*i;
-      while (i<=ystop) do
-      begin
-         hlineColor(r_panel,0,vid_panelw,y,c_white);
-         inc(i,1);
-         inc(y,vid_BW);
-      end;
    end
    else
    begin
@@ -756,22 +747,10 @@ begin
       vid_panelx:=0;
       if(vid_ppos=2)
       then vid_panely:=0
-      else vid_panely:=vid_sh;
+      else vid_panely:=vid_sh-1;
 
       r_uipanel:=_createSurf(vid_sw,vid_panelw+1);
       r_panel  :=_createSurf(vid_sw,vid_panelw+1);
-
-      hlineColor(r_panel,0         ,vid_vw            ,0             ,c_white);
-      hlineColor(r_panel,0         ,vid_vw            ,vid_panelw    ,c_white);
-
-      vlineColor(r_panel,0                 ,0,r_panel^.w,c_white);
-      vlineColor(r_panel,vid_panelw        ,0,r_panel^.w,c_white);
-
-      vlineColor(r_panel,vid_panelw+ui_h3bw,0,r_panel^.w,c_white);
-      vlineColor(r_panel,vid_panelw+vid_BW ,0,r_panel^.w,c_white);
-
-      for y:=0 to 3 do
-      hlineColor(r_panel,vid_panelw+ui_h3bw,vid_panelw+vid_BW,y*vid_tBW,c_white);
 
       y:=vid_BW*14;
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
@@ -790,16 +769,25 @@ begin
       characterColor(r_panel,y       +2,ui_iy,'E',c_aqua  );
       characterColor(r_panel,y+vid_BW+2,ui_iy,'A',c_orange);
 
-      ui_iy := 23;
+       ui_iy := 23;
+   end;
 
-      i:=4;
-      y:=vid_BW*i;
-      while (i<=ystop) do
-      begin
-         vlineColor(r_panel,y,0,vid_panelw,c_white);
-         inc(i,1);
-         inc(y,vid_BW);
-      end;
+   rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
+   pline(0,vid_panelw,vid_panelw,vid_panelw,c_white);
+
+   pline(0,vid_panelw+ui_h3bw,r_panel^.w,vid_panelw+ui_h3bw,c_white);
+   pline(0,vid_panelw+vid_BW ,r_panel^.w,vid_panelw+vid_BW ,c_white);
+
+   for y:=0 to 3 do
+   pline(y*vid_tBW,vid_panelw+ui_h3bw,y*vid_tBW,vid_panelw+vid_BW,c_white);
+
+   i:=4;
+   y:=vid_BW*i;
+   while (i<=ystop) do
+   begin
+      pline(0,y,vid_panelw,y,c_white);
+      inc(i,1);
+      inc(y,vid_BW);
    end;
 
    _draw_surf(r_uipanel,0,0,r_panel);

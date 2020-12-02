@@ -549,7 +549,7 @@ begin
         begin
            case m_sbuild of
            -1,-2,
-           -3,-4  : _command(trunc((m_vx-vid_mapx)/map_mmcx),trunc((m_vy-vid_mapy)/map_mmcx));
+           -3,-4  : _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
            else     if(_rpls_vidm=false)then ui_panelmmm:=true;
            end;
         end

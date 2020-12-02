@@ -63,8 +63,6 @@ uses SysUtils, SDL, SDL_Net
 begin
    InitGame;
 
-   writeln(SizeOf(TUnit));
-
    while (_CYCLE) do
    begin
    {$IFDEF _FULLGAME}
