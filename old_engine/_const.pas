@@ -102,16 +102,36 @@ uo_select              = 4;
 uo_aselect             = 5;
 uo_selorder            = 6;
 uo_setorder            = 7;
-uo_move                = 8;
-uo_delete              = 9;
-uo_action              = 10;
+uo_corder              = 13;
+//uo_move                = 8;
+//uo_delete              = 9;
+//uo_action              = 10;
 uo_specsel             = 11;
 uo_addorder            = 12;
+
+co_empty               = -32000;
+co_destroy             = -111;
+co_rcamove             = -101;
+co_rcmove              = -100;
+co_stand               = -90;
+co_move                = -91;
+co_patrol              = -92;
+co_astand              = -93;
+co_amove               = -94;
+co_apatrol             = -95;
+co_paction             = -79;
+co_action              = -80;
+co_supgrade            = -81;
+co_cupgrade            = -82;
+co_suprod              = -83;
+co_cuprod              = -84;
+co_pcancle             = -85;
 
 ua_move                = 1;
 ua_amove               = 2;
 ua_hold                = 3;
 ua_unload              = 4;
+ua_paction             = 5;
 
 aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
@@ -476,6 +496,43 @@ fly_height             = 30;
 MaxUnitProds           = 1;
 
 {$IFDEF _FULLGAME}
+
+_mhkeys  = 26;
+_hotkey1 : array[0.._mhkeys] of cardinal = (SDLK_R , SDLK_T , SDLK_Y ,
+                                            SDLK_F , SDLK_G , SDLK_H ,
+                                            SDLK_V , SDLK_B , SDLK_N ,
+
+                                            SDLK_U , SDLK_I , SDLK_O ,
+                                            SDLK_J , SDLK_K , SDLK_L ,
+                                            SDLK_R , SDLK_T , SDLK_Y ,
+
+                                            SDLK_F , SDLK_G , SDLK_H ,
+                                            SDLK_V , SDLK_B , SDLK_N ,
+                                            SDLK_R , SDLK_T , SDLK_Y );
+
+_hotkey2 : array[0.._mhkeys] of cardinal = (0      , 0      , 0      ,
+                                            0      , 0      , 0      ,
+                                            0      , 0      , 0      ,
+
+                                            0      , 0      , 0      ,
+                                            0      , 0      , 0      ,
+                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+
+                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
+
+_hotkeyA : array[0..11     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
+                                            SDLK_A , SDLK_S , SDLK_D ,
+                                            SDLK_Z , SDLK_M , SDLK_C ,
+                                            0      , SDLK_F2, SDLK_Delete );
+
+_hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
+                                            SDLK_A , SDLK_S , SDLK_D ,
+                                            SDLK_Z , SDLK_X , SDLK_C ,
+                                            SDLK_R , SDLK_T , SDLK_Y ,
+                                            SDLK_F , SDLK_G , SDLK_H      );
+
 
 whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
 

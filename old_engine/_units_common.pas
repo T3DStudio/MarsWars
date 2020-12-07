@@ -611,7 +611,7 @@ begin
    _unit_ctraining:=true;
 
    for i:=MaxUnitProds downto 0 do
-    if(_unit_ctraining_p(pu,ut,i))then exit;
+    if(_unit_ctraining_p(pu,ut,i))and(ut>=0)then exit;
 
    _unit_ctraining:=false;
 end;
@@ -672,9 +672,94 @@ begin
    _unit_cupgrade:=true;
 
    for i:=MaxUnitProds downto 0 do
-    if(_unit_cupgrade_p(pu,up,i))then exit;
+    if(_unit_cupgrade_p(pu,up,i))and(up>=0)then exit;
 
    _unit_cupgrade:=false;
+end;
+
+procedure _unit_inc_selc(pu:PTUnit);
+begin
+   with pu^ do
+   with player^ do
+   begin
+      inc(ucl_s [isbuild,ucl],1);
+      inc(ucl_cs[isbuild],1);
+      inc(uid_s [uid],1);
+      if(isbuilder)then inc(s_builders,1);
+      if(isbarrack)then inc(s_barracks,1);
+      if(issmith  )then inc(s_smiths  ,1);
+   end;
+end;
+procedure _unit_dec_selc(pu:PTUnit);
+begin
+   with pu^ do
+   with player^ do
+   begin
+      dec(ucl_s [isbuild,ucl],1);
+      dec(ucl_cs[isbuild],1);
+      dec(uid_s [uid],1);
+      if(isbuilder)then dec(s_builders,1);
+      if(isbarrack)then dec(s_barracks,1);
+      if(issmith  )then dec(s_smiths  ,1);
+   end;
+end;
+
+procedure _unit_desel(pu:PTUnit);
+begin
+   with pu^ do
+   with player^ do
+   begin
+      if(sel)then
+      begin
+         dec(ucl_s [isbuild,ucl],1);
+         dec(ucl_cs[isbuild],1);
+         dec(uid_s [uid],1);
+         if(isbuilder)then dec(s_builders,1);
+         if(isbarrack)then dec(s_barracks,1);
+         if(issmith  )then dec(s_smiths  ,1);
+      end;
+      sel:=false;
+   end;
+end;
+
+procedure _unit_dec_Kcntrs(pu:PTUnit);
+begin
+   with pu^ do
+   with player^ do
+   begin
+      _unit_desel(pu);
+
+      if(isbuild)then
+      begin
+         if(bld=false)
+         then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
+         else
+         begin
+            _unit_ctraining(pu,-1);
+            _unit_cupgrade (pu,-1);
+
+            dec(ucl_eb[isbuild,ucl],1);
+            dec(uid_eb[uid],1);
+            dec(menerg,generg);
+            _unit_done_dec_cntrs(pu);
+         end;
+         if(ucl_x[ucl]=unum)then ucl_x[ucl]:=0;
+      end;
+
+      if(uid_x[uid]=unum)then uid_x[uid]:=0;
+   end;
+end;
+
+procedure _unit_dec_Rcntrs(pu:PTUnit);
+begin
+   with pu^ do
+    with player^ do
+    begin
+       dec(army,1);
+       dec(ucl_e[isbuild,ucl],1);
+       dec(ucl_c[isbuild],1);
+       dec(uid_e[uid],1);
+    end;
 end;
 
 

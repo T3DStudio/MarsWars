@@ -42,7 +42,7 @@ begin
         if(_rectvis(x,y,255,255)=false)then continue;
 
         ro:=0;
-        if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r-bld_dec_mr;
+        if(0<=m_brush)and(m_brush<=_uts)then ro:=r-bld_dec_mr;
 
         if(onlyspr=false)or(spr=pspr_dummy)then
         case t of

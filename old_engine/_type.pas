@@ -86,6 +86,17 @@ end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
 
+TUID = record
+   _mhits,
+   _renerg,
+   _max,
+   _r,
+   _rsight
+
+            : integer;
+end;
+PTUID = ^TUID;
+
 TUnit = record
    mmx,mmy,mmr,
    fx,fy,fsr,

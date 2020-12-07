@@ -228,6 +228,7 @@ _rpls_vidx        : byte = 0;
 _rpls_vidy        : byte = 0;
 _rpls_vidm        : boolean = false;
 _rpls_log         : boolean = false;
+_rpls_player      : byte = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
@@ -275,8 +276,8 @@ m_my,
 m_vx,
 m_vy              : integer;
 m_ldblclk,
-m_sbuildc         : cardinal;
-m_sbuild          : integer;
+m_brushc          : cardinal;
+m_brush           : integer;
 m_bx,
 m_by              : integer;
 m_vmove           : boolean = false;

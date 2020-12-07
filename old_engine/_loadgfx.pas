@@ -297,6 +297,7 @@ begin
        hh:=hw;
        _MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_crater_style,false);
        boxColor(surf,0,0,w,w,rgba2c(0,0,0,70));
+       if(theme_crater_style<2)then
        SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0,0));
     end;
 end;

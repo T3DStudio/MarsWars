@@ -205,7 +205,7 @@ begin
    BlockWrite(f,PlayerColor    ,SizeOf(PlayerColor    ));
    BlockWrite(f,G_Step         ,SizeOf(G_Step         ));
    BlockWrite(f,vid_rtui       ,SizeOf(vid_rtui       ));
-   BlockWrite(f,m_sbuild       ,SizeOf(m_sbuild       ));
+   BlockWrite(f,m_brush        ,SizeOf(m_brush        ));
    BlockWrite(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
    BlockWrite(f,g_inv_t        ,SizeOf(g_inv_t        ));
    BlockWrite(f,g_inv_wt       ,SizeOf(g_inv_wt       ));
@@ -277,7 +277,7 @@ begin
          BlockRead(f,PlayerColor    ,SizeOf(PlayerColor    ));
          BlockRead(f,G_Step         ,SizeOf(G_Step         ));
          BlockRead(f,vid_rtui       ,SizeOf(vid_rtui       ));
-         BlockRead(f,m_sbuild       ,SizeOf(m_sbuild       ));
+         BlockRead(f,m_brush        ,SizeOf(m_brush        ));
          BlockRead(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
          BlockRead(f,g_inv_t        ,SizeOf(g_inv_t        ));
          BlockRead(f,g_inv_wt       ,SizeOf(g_inv_wt       ));

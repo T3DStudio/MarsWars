@@ -74,6 +74,8 @@ begin
    if not(InitVideo) then exit;
    if not(InitSound) then exit;
 
+   swLNG;
+
    {$ENDIF}
 
    if not(InitNET)   then exit;

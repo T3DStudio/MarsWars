@@ -6,6 +6,7 @@ procedure _d75 (d:pinteger);begin d^:=d^-(d^ div 4);end;
 procedure _d125(d:pinteger);begin d^:=d^+(d^ div 4);end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
+procedure _d225(d:pinteger);begin d^:=(d^ div 4)*9;end;
 
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
@@ -70,7 +71,7 @@ MID_Bullet     : begin dam:=6  ; vst:=1;         sr :=0  ;       end;
 MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=18 ; vst:=sr div 60; sr :=0  ;       end;
+MID_Flyer      : begin dam:=16 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
@@ -275,7 +276,7 @@ begin
               begin
                  case mid of
                  MID_YPlasma,
-                 MID_Flyer       : _d200(@damd);
+                 MID_Flyer       : _d225(@damd);
                  end;
                  if(tu^.isbuild=false)then
                  case mid of
@@ -519,14 +520,26 @@ begin
                  MID_TBullet : if(random(4)=0)then PlaySND(snd_rico,nil);
               end;
 
-              if(mid in [MID_SShot,MID_SSShot,MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])then
+              case mid of
+              MID_SShot,
+              MID_SSShot,
+              MID_Bullet,
+              MID_Bulletx2,
+              MID_TBullet,
+              MID_MBullet:
               begin
                  if(mf=uf_ground)then
                   if(mid in [MID_SShot,MID_SSShot])then
                    for u:=1 to mtars do _effect_add(vx+randomr(sr),vy+randomr(sr),d+40,mid_Bullet);
                  continue;
               end;
-
+              MID_Tank:
+              begin
+                 _effect_add(vx+15,vy+8,d+50,mid);
+                 _effect_add(vx-15,vy-8,d+42,mid);
+                 continue;
+              end;
+              end;
               _effect_add(vx,vy,d+50,mid);
            end;
         end;

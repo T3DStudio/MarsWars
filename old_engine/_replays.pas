@@ -79,16 +79,6 @@ begin
    end else _rpls_stat:=str_svld_errors[1];
 end;
 
-procedure _rpl_wchat;
-var p:byte;
-begin for p:=0 to MaxPlayers do ;//_wudata_chat(p,true);
-end;
-
-procedure _rpl_rchat;
-var p:byte;
-begin for p:=0 to MaxPlayers do ;//_rudata_chat(p,true);
-end;
-
 procedure _rpls_code;
 const vxyc = 5;
 var  i :byte;
@@ -177,7 +167,7 @@ begin
                          BlockWrite(_rpls_file,i,sizeof(i));
                          if(_rpls_nwrch)then
                          begin
-                            _rpl_wchat;
+                            _wudata_chat(HPlayer,true);
                             _rpls_nwrch:=false;
                          end;
                          if((i and %01000000)>0)then
@@ -304,6 +294,7 @@ begin
                             _rpls_rst  :=rpl_runit;
                             _rpls_pnu  :=0;
                             _rpls_vidm :=false;
+                            _rpls_player:=HPlayer;
 
                             map_premap;
                             _moveHumView(map_psx[Hplayer] , map_psy[Hplayer]);
@@ -338,7 +329,7 @@ begin
 
                           if((i and %10000000)>0)then
                           begin
-                             _rpl_rchat;
+                             _rudata_chat(_rpls_player,true);
                              net_chat_shlm:=chat_shlm_t;
                              vid_mredraw  :=true;
                              PlaySNDM(snd_chat);

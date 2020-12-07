@@ -411,7 +411,7 @@ begin
       end;
       if(uid=UID_HFortress) then
       begin
-         mhits  := 3000;
+         mhits  := 4000;
          uf     := uf_ground;
          sr     := 300;
          ucl    := 9;
@@ -421,9 +421,9 @@ begin
          renerg := 10;
          generg := 4;
          ctime  := 90;
-         ruid   := UID_HMonastery;
+         ruid   := UID_HPools;
          isbuilder:=true;
-         uids_builder[uid]:=[UID_HKeep..UID_HAltar];
+         uids_builder[uid]:=[UID_HKeep..UID_HAltar]-[UID_HFortress];
       end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,7 +609,7 @@ begin
       end;
       if(uid=UID_APC)then
       begin
-         mhits  := 350;
+         mhits  := 400;
          r      := 25;
          uf     := uf_ground;
          speed  := 15;
@@ -845,7 +845,7 @@ begin
          renerg := 10;
          generg := 10;
          ctime  := 90;
-         ruid   := UID_UVehicleFactory;
+         ruid   := UID_UWeaponFactory;
       end;
 
       if(uid=UID_Mine) then

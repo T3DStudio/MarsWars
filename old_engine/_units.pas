@@ -245,8 +245,8 @@ begin
           if(bld)then
           begin
              ui_prod_builds := ui_prod_builds + uids_builder[uid];
-             if(isbuilder)and(0<=m_sbuild)and(m_sbuild<=_uts)and(speed=0)then
-              if(cl2uid[race,true,m_sbuild] in uids_builder[uid])then
+             if(isbuilder)and(0<=m_brush)and(m_brush<=_uts)and(speed=0)then
+              if(cl2uid[race,true,m_brush] in uids_builder[uid])then
                if((vid_vx-sr)<vx)and(vx<(vid_vx+vid_sw+sr))and
                  ((vid_vy-sr)<vy)and(vy<(vid_vy+vid_sh+sr))then _addUIBldrs(x,y,sr);
 
@@ -383,7 +383,7 @@ begin
                   else
                   if(isbuilder)and(speed=0)then ro:=sr;
                   end;
-                 if(0<=m_sbuild)and(m_sbuild<=_uts)then ro:=r;
+                 if(0<=m_brush)and(m_brush<=_uts)then ro:=r;
               end;
 
               if(wanim)then _unit_foot(pu);
@@ -535,90 +535,7 @@ begin
    end;
 end;
 
-procedure _unit_inc_selc(pu:PTUnit);
-begin
-   with pu^ do
-   with player^ do
-   begin
-      inc(ucl_s [isbuild,ucl],1);
-      inc(ucl_cs[isbuild],1);
-      inc(uid_s [uid],1);
-      if(isbuilder)then inc(s_builders,1);
-      if(isbarrack)then inc(s_barracks,1);
-      if(issmith  )then inc(s_smiths  ,1);
-   end;
-end;
-procedure _unit_dec_selc(pu:PTUnit);
-begin
-   with pu^ do
-   with player^ do
-   begin
-      dec(ucl_s [isbuild,ucl],1);
-      dec(ucl_cs[isbuild],1);
-      dec(uid_s [uid],1);
-      if(isbuilder)then dec(s_builders,1);
-      if(isbarrack)then dec(s_barracks,1);
-      if(issmith  )then dec(s_smiths  ,1);
-   end;
-end;
 
-procedure _unit_desel(pu:PTUnit);
-begin
-   with pu^ do
-   with player^ do
-   begin
-      if(sel)then
-      begin
-         dec(ucl_s [isbuild,ucl],1);
-         dec(ucl_cs[isbuild],1);
-         dec(uid_s [uid],1);
-         if(isbuilder)then dec(s_builders,1);
-         if(isbarrack)then dec(s_barracks,1);
-         if(issmith  )then dec(s_smiths  ,1);
-      end;
-      sel:=false;
-   end;
-end;
-
-procedure _unit_dec_Kcntrs(pu:PTUnit);
-begin
-   with pu^ do
-   with player^ do
-   begin
-      _unit_desel(pu);
-
-      if(isbuild)then
-      begin
-         if(bld=false)
-         then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
-         else
-         begin
-            _unit_ctraining(pu,-1);
-            _unit_cupgrade (pu,-1);
-
-            dec(ucl_eb[isbuild,ucl],1);
-            dec(uid_eb[uid],1);
-            dec(menerg,generg);
-            _unit_done_dec_cntrs(pu);
-         end;
-         if(ucl_x[ucl]=unum)then ucl_x[ucl]:=0;
-      end;
-
-      if(uid_x[uid]=unum)then ucl_x[ucl]:=0;
-   end;
-end;
-
-procedure _unit_dec_Rcntrs(pu:PTUnit);
-begin
-   with pu^ do
-    with player^ do
-    begin
-       dec(army,1);
-       dec(ucl_e[isbuild,ucl],1);
-       dec(ucl_c[isbuild],1);
-       dec(uid_e[uid],1);
-    end;
-end;
 
 procedure _unit_remove(pu:PTUnit);
 begin
@@ -998,6 +915,21 @@ begin
     end;
 end;
 
+procedure _unit_start_prod_adv(pu:PTUnit);
+begin
+   with pu^ do
+    with player^ do
+     if(buff[ub_advanced]=0)and((menerg-cenerg)>=renerg)then
+     begin
+        _unit_dec_Kcntrs(pu);
+        if(bld_s=0)then bld_s:=1;
+        hits:=100;
+        bld :=false;
+        inc(cenerg,renerg);
+        buff[ub_advanced]:=_bufinf;
+     end;
+end;
+
 procedure _unit_action(pu:PTUnit);
 begin
    with pu^ do
@@ -1083,24 +1015,16 @@ UID_ZMajor   : if(buff[ub_advanced]>0)and(buff[ub_clcast]=0)then
                   else PlaySND(snd_jetpoff,pu);
                   {$ENDIF}
                end;
-UID_HMilitaryUnit,
+{UID_HMilitaryUnit,
 UID_UWeaponFactory,
 UID_HPools,
 UID_UMilitaryUnit,
-UID_HGate    : if(buff[ub_advanced]=0)then
-                if(ucl_eb[true,9]>0)and((menerg-cenerg)>=renerg)then
-                begin
-                   if(ucl_x[9]<=0)or(MaxUnits<ucl_x[9])then exit;
-                   if(_units[ucl_x[9]].rld_t>0)
-                   then exit
-                   else _units[ucl_x[9]].rld_t:=advprod_rld[upgr[upgr_9bld]>0];
-                   _unit_dec_Kcntrs(pu);
-                   if(bld_s=0)then bld_s:=1;
-                   hits:=100;
-                   bld:=false;
-                   inc(cenerg,renerg);
-                   buff[ub_advanced]:=_bufinf;
-                end;
+UID_HGate    : if(ucl_eb[true,9]>0)then
+               begin
+                  if(ucl_x[9]<=0)or(MaxUnits<ucl_x[9])then exit;
+
+               end;  }
+
      else
      end;
 end;
@@ -1221,7 +1145,7 @@ begin
       mmy    := tu^.mmy;
 
       if(tu^.uo_id<>uo_id)then
-       if(tu^.uo_id<>ua_unload)then
+       if(tu^.uo_id in [ua_hold,ua_amove,ua_move])then
        begin
           uo_id:=tu^.uo_id;
           if(uo_id<>ua_amove)then tar1 :=0;
@@ -2453,7 +2377,7 @@ begin
             if(uid=UID_HMonastery)and(tu^.isbuild=false)then
             begin
                with player^ do
-                if(tu^.buff[ub_advanced]=0)and(bld)and(upgr[upgr_6bld]>0)and(buff[ub_advanced]>0)then
+                if(tu^.buff[ub_advanced]<=0)and(bld)and(upgr[upgr_6bld]>0)and(buff[ub_advanced]>0)then
                 begin
                    dec(upgr[upgr_6bld],1);
                    tu^.buff[ub_advanced]:=_bufinf;
@@ -2482,6 +2406,35 @@ begin
                uo_tar:=0;
                exit;
             end;
+            // UAC ADV
+            if(tu^.uid=UID_UVehicleFactory)and(isbuild=false)then
+             if(tdm<=melee_r)and(tu^.rld_t=0)then
+             begin
+                uo_x  :=x;
+                uo_y  :=y;
+                uo_tar:=0;
+                if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then
+                begin
+                   _unit_UACUpgr(pu,tu);
+                   uo_x  :=tu^.uo_x;
+                   uo_y  :=tu^.uo_y;
+                   uo_tar:=tu^.uo_tar;
+                end;
+                exit;
+             end;
+            // PROD ADV
+            if(uid in [UID_HFortress,UID_UNuclearPlant])then
+             if(tu^.buff[ub_advanced]<=0)and(tu^.bld)and(rld_t<=0)then
+              if(tu^.isbarrack)or(tu^.issmith)then
+              begin
+                 _unit_start_prod_adv(tu);
+                 with player^ do
+                  rld_t :=advprod_rld[upgr[upgr_9bld]>0];
+                 uo_x  :=x;
+                 uo_y  :=y;
+                 uo_tar:=0;
+                 exit;
+              end;
             /// HELL INVULN
             if(uid=UID_HAltar)and(tu^.isbuild=false)then
             begin
@@ -2515,22 +2468,6 @@ begin
                uo_tar:=0;
                exit;
             end;
-            // UAC ADV
-            if(tu^.uid=UID_UVehicleFactory)then
-             if(tdm<=melee_r)and(tu^.rld_t=0)and(isbuild=false)then
-             begin
-                uo_x  :=x;
-                uo_y  :=y;
-                uo_tar:=0;
-                if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]=0)then
-                begin
-                   _unit_UACUpgr(pu,tu);
-                   uo_x  :=tu^.uo_x;
-                   uo_y  :=tu^.uo_y;
-                   uo_tar:=tu^.uo_tar;
-                end;
-                exit;
-             end;
          end;
 
          teams:=(player^.team=tu^.player^.team);

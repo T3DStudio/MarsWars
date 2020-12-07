@@ -1269,9 +1269,9 @@ begin
       uo_tar:=0;
       uo_bx :=-1;
 
-      if(isbuild)
+      {if(isbuild)
       then ai_buildingAI(pu)
-      else ai_unitAI(pu);
+      else ai_unitAI(pu);  }
 
       if(uo_x>map_mw)then uo_x:=map_mw;
       if(uo_y>map_mw)then uo_y:=map_mw;
