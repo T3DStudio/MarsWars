@@ -85,13 +85,12 @@ function _udpth(pu:PTUnit):integer;
 begin
    _udpth:=0;
    with pu^ do
-    case uid of
-UID_CoopPortal,
-UID_Portal   : _udpth:=-5;
+    case uidi of
+UID_UPortal  : _udpth:=-5;
 UID_HTeleport: _udpth:=-4;
 UID_HSymbol,
 UID_HAltar   : _udpth:=-3;
-UID_Mine     : _udpth:=-2;
+UID_UMine     : _udpth:=-2;
 UID_HCommandCenter,
 UID_UCommandCenter: if(uf>uf_ground)
                     then _udpth:=map_flydpth[uf_soaring]+vy
@@ -174,7 +173,7 @@ begin
        2:begin
             if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
             _unit_fogrev:=true;
-            if(uid=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
+            if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
          end;
       end;
 end;
@@ -183,7 +182,7 @@ procedure _unit_painsnd(pu:PTUnit);
 begin
    with pu^ do
    begin
-      case uid of
+      case uidi of
        UID_LostSoul,
        UID_Demon,
        UID_Cacodemon,
@@ -311,7 +310,7 @@ begin
         if(isbuild)and(bld)and(isbuilder)and(playeri=pl)then
         begin
            if(buid>0)then
-            if not (buid in uids_builder[uid])then continue;
+            if not (buid in uid^.ups_builder)then continue;
            if(dist(x,y,tx,ty)<sr)then bl:=true;
         end;
 
@@ -437,13 +436,13 @@ begin
       inc(ucl_e[isbuild,ucl],1);
       inc(ucl_c[isbuild],1);
 
-      inc(uid_e[uid],1);
+      inc(uid_e[uidi],1);
 
       if(ubld)then
       begin
          buff[ub_born]:=vid_fps;
          bld := true;
-         if(uid_x[uid]=0)then uid_x[uid]:=_lcu;
+         if(uid_x[uidi]=0)then uid_x[uidi]:=_lcu;
          if(isbuild)then
          begin
             if(ucl_x[ucl]=0)then ucl_x[ucl]:=_lcu;
@@ -451,7 +450,7 @@ begin
          end;
          inc(ucl_eb[isbuild,ucl],1);
          inc(menerg,generg);
-         inc(uid_eb[uid],1);
+         inc(uid_eb[uidi],1);
       end
       else
       begin
@@ -489,7 +488,7 @@ begin
 
           x       := ux;
           y       := uy;
-          uid     := uc;
+          uidi     := uc;
           playeri := pl;
           player  :=@_players[playeri];
           vx      := x;
@@ -555,7 +554,7 @@ begin
       begin
          _puid:=cl2uid[race,false,ut];
 
-         if not(_puid in uids_units[uid])then exit;
+         if not(_puid in uid^.ups_units)then exit;
 
          inc(uproda,1);
          inc(uprodc[ut],1);
@@ -684,7 +683,7 @@ begin
    begin
       inc(ucl_s [isbuild,ucl],1);
       inc(ucl_cs[isbuild],1);
-      inc(uid_s [uid],1);
+      inc(uid_s [uidi],1);
       if(isbuilder)then inc(s_builders,1);
       if(isbarrack)then inc(s_barracks,1);
       if(issmith  )then inc(s_smiths  ,1);
@@ -697,7 +696,7 @@ begin
    begin
       dec(ucl_s [isbuild,ucl],1);
       dec(ucl_cs[isbuild],1);
-      dec(uid_s [uid],1);
+      dec(uid_s [uidi],1);
       if(isbuilder)then dec(s_builders,1);
       if(isbarrack)then dec(s_barracks,1);
       if(issmith  )then dec(s_smiths  ,1);
@@ -713,7 +712,7 @@ begin
       begin
          dec(ucl_s [isbuild,ucl],1);
          dec(ucl_cs[isbuild],1);
-         dec(uid_s [uid],1);
+         dec(uid_s [uidi],1);
          if(isbuilder)then dec(s_builders,1);
          if(isbarrack)then dec(s_barracks,1);
          if(issmith  )then dec(s_smiths  ,1);
@@ -739,14 +738,14 @@ begin
             _unit_cupgrade (pu,-1);
 
             dec(ucl_eb[isbuild,ucl],1);
-            dec(uid_eb[uid],1);
+            dec(uid_eb[uidi],1);
             dec(menerg,generg);
             _unit_done_dec_cntrs(pu);
          end;
          if(ucl_x[ucl]=unum)then ucl_x[ucl]:=0;
       end;
 
-      if(uid_x[uid]=unum)then uid_x[uid]:=0;
+      if(uid_x[uidi]=unum)then uid_x[uidi]:=0;
    end;
 end;
 
@@ -758,7 +757,7 @@ begin
        dec(army,1);
        dec(ucl_e[isbuild,ucl],1);
        dec(ucl_c[isbuild],1);
-       dec(uid_e[uid],1);
+       dec(uid_e[uidi],1);
     end;
 end;
 
@@ -781,45 +780,45 @@ begin
    if(tu^.hits<=0)then
    begin
       if(tu^.hits<idead_hits)then exit;
-      case uu^.uid of
-      UID_ArchVile :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in arch_res)or(teams=false)or(tu^.hits>-vid_fps)then exit;
-      UID_LostSoul :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uid in marines )then exit;
+      case uu^.uidi of
+      UID_ArchVile :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uidi in arch_res)or(teams=false)or(tu^.hits>-vid_fps)then exit;
+      UID_LostSoul :if(uu^.buff[ub_advanced]=0)or(tu^.buff[ub_resur]>0)or not(tu^.uidi in marines )then exit;
       else
         exit;
       end;
    end
    else
      if(teams)then
-      if(uu^.uid in [UID_Medic,UID_Engineer])then
+      if(uu^.uidi in [UID_Medic,UID_Engineer])then
       begin
          if(tu^.buff[ub_pain]>0)or(tu^.hits>=tu^.mhits)then exit;
-         case uu^.uid of
+         case uu^.uidi of
          UID_Medic    : begin
                            if(tu^.mech)or(uu^.inapc>0)then exit;
-                           if(uu^.uid=UID_Medic)and(tu^.uid=UID_Medic)and(uu<>tu)then exit;
+                           if(uu^.uidi=UID_Medic)and(tu^.uidi=UID_Medic)and(uu<>tu)then exit;
                         end;
          UID_Engineer : begin
                            if(0<uu^.inapc)and(uu^.inapc<=MaxUnits)then
                             if(tu<>@_units[uu^.inapc])then exit;
-                           if(tu^.mech=false)or(tu^.bld=false)or(tu^.uid=UID_HEye)then exit;
+                           if(tu^.mech=false)or(tu^.bld=false)or(tu^.uidi=UID_HEye)then exit;
                         end;
          end;
       end
       else exit;
 
-   if(uu^.uid in [UID_UCommandCenter,UID_HCommandCenter])then
+   if(uu^.uidi in [UID_UCommandCenter,UID_HCommandCenter])then
     if(uu^.uf=uf_ground)or(tu^.uf>uf_ground)then exit;
 
    if(tu^.uf=uf_fly)then
    begin
-      if(uu^.uid in [UID_Demon,
-                     UID_Mine,
+      if(uu^.uidi in [UID_Demon,
+                     UID_UMine,
                      UID_ZEngineer])then exit;
    end;
 
-   if(tu^.uid in [UID_Mancubus,UID_Arachnotron])and(tu^.uid=uu^.uid)then exit;
+   if(tu^.uidi in [UID_Mancubus,UID_Arachnotron])and(tu^.uidi=uu^.uidi)then exit;
 
-   if(uu^.uid in [UID_Bomber,UID_ZBomber,UID_Tank])then
+   if(uu^.uidi in [UID_Bomber,UID_ZBomber,UID_Tank])then
     if(utd<=rocket_sr)or(tu^.uf>uf_ground)then exit;
 
    _unit_chktar:=true;
@@ -829,14 +828,14 @@ function _unit_melee(uu,tu:PTUnit;teams:boolean):boolean;
 begin
    _unit_melee:=true;
 
-   case uu^.uid of
+   case uu^.uidi of
    UID_Demon,
    UID_LostSoul,
    UID_ZEngineer : exit;
    UID_Imp,
    UID_Cacodemon,
    UID_Baron,
-   UID_Revenant  : if(uu^.uid=tu^.uid)then exit;
+   UID_Revenant  : if(uu^.uidi=tu^.uidi)then exit;
    UID_Medic,
    UID_Engineer,
    UID_ArchVile  : if(teams)then exit;
@@ -850,7 +849,7 @@ begin
    _canattack:=false;
    with pu^ do
    begin
-      if not(uid in whocanattack)then exit;
+      if not(uidi in whocanattack)then exit;
 
       if(isbuild)then
       begin
@@ -866,7 +865,7 @@ begin
         end;
 
       if(inapc>0)then
-       if(_units[inapc].uid<>UID_APC)or(_units[inapc].inapc>0)then exit;
+       if(_units[inapc].uidi<>UID_APC)or(_units[inapc].inapc>0)then exit;
 
       _canattack:=true;
    end;
@@ -890,7 +889,7 @@ begin
         if(uu^.uf>uf_ground)
         then md:=td-(uu^.r+tu^.r)
         else md:=td-(uu^.r+tu^.r+uu^.speed);
-        case uu^.uid of
+        case uu^.uidi of
         UID_Engineer,
         UID_Medic   : dec(md,32);
         end;
@@ -921,13 +920,13 @@ begin
    _itcanapc:=false;
    if(tu^.uf>uf_ground)then exit;
    if((uu^.apcm-uu^.apcc)>=tu^.apcs)then
-    if(tu^.uid in uids_apc[uu^.uid])then _itcanapc:=true;
+    if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;
 
 function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
 begin
    _move2uotar:=true;
-   if(tu^.uid=UID_HTeleport)then exit;
+   if(tu^.uidi=UID_HTeleport)then exit;
    _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.sr);
    dec(td,uu^.r+tu^.r);
    if(td<=-melee_r)then _move2uotar:=false;
@@ -1000,7 +999,7 @@ begin
           if(buff[i]<0)then inc(buff[i],1);
 
       if(onlySVCode)
-      or(uid in whocanattack)then
+      or(uidi in whocanattack)then
        if(rld_t>0)then dec(rld_t,1);
 
       for i:=0 to MaxUnitProds do
@@ -1022,7 +1021,7 @@ var td:integer;
 begin
    with uu^ do
    begin
-      if(tu^.uid=UID_URadar)and(tu^.rld_t>tu^.rld_a)then
+      if(tu^.uidi=UID_URadar)and(tu^.rld_t>tu^.rld_a)then
       begin
          td:=dist2(x,y,tu^.uo_x,tu^.uo_y);
          if(td>ud)then td:=ud;
@@ -1115,7 +1114,7 @@ begin
 
       if(speed=0)or(buff[ub_stopafa]>0)then exit;
 
-      case uid of
+      case uidi of
         UID_Flyer,
         UID_Terminator,
         UID_Tank,
@@ -1139,7 +1138,7 @@ procedure _unit_turn(pu:PTUnit);
 begin
    with pu^ do
     if(_canmove(pu))then
-     if not(uid in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
+     if not(uidi in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
 procedure _unit_upgr(pu:PTUnit);
@@ -1160,7 +1159,7 @@ begin
              if(upgr[upgr_invuln]>0)then buff[ub_invuln]:=vid_fps;
 
              if(buff[ub_advanced]=0)then
-              case uid of
+              case uidi of
                 UID_HTeleport       : if(g_addon=false)then buff[ub_advanced]:=_bufinf;
                 UID_UVehicleFactory : if(upgr[upgr_6bld]>0)then buff[ub_advanced]:=_bufinf;
               end;
@@ -1168,14 +1167,14 @@ begin
 
           if(buff[ub_detect]=0)then
            if(upgr[upgr_vision]>0)then
-            case uid of
+            case uidi of
             UID_URadar,
-            UID_Mine    : buff[ub_detect]:=_bufinf;
+            UID_UMine    : buff[ub_detect]:=_bufinf;
             end;
 
           if(buff[ub_advanced]=0)then
           begin
-             if(uid=UID_HTeleport)then
+             if(uidi=UID_HTeleport)then
               if(upgr[upgr_revtele]>0)then buff[ub_advanced]:=_bufinf;
           end;
        end;
@@ -1183,7 +1182,7 @@ begin
        begin
           if(onlySVCode)then
           begin
-             if(race=r_hell)and(hits<mhits)and(buff[ub_pain]=0)and(uid<>UID_HEye)then
+             if(race=r_hell)and(hits<mhits)and(buff[ub_pain]=0)and(uidi<>UID_HEye)then
              begin
                 case isbuild of
                 false: if(upgr[upgr_regen ]>0)then inc(hits,upgr[upgr_regen ]);
@@ -1197,7 +1196,7 @@ begin
           end;
        end;
 
-       case uid of
+       case uidi of
          UID_HCommandCenter,
          UID_UCommandCenter,
          UID_HKeep :  begin
@@ -1220,7 +1219,7 @@ begin
                          end;
                       end;
 
-         UID_Mine  :  buff[ub_invis]:=_bufinf;
+         UID_UMine  :  buff[ub_invis]:=_bufinf;
          UID_ZEngineer,
          UID_Commando:buff[ub_invis]:=buff[ub_advanced];
          UID_Demon :  begin
@@ -1338,7 +1337,7 @@ begin
                       end;
        end;
 
-       case uid of
+       case uidi of
          UID_HTotem,
          UID_HEye   : begin
                          buff[ub_invis]:=0;
@@ -1366,7 +1365,7 @@ begin
 
        if(buff[ub_advanced]>0)then
        begin
-          if(uid in [UID_UCommandCenter,UID_HCommandCenter])then
+          if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
            if(buff[ub_clcast]>0)then
            begin
               uo_y:=y;
@@ -1375,7 +1374,7 @@ begin
            end
            else shadow:=uaccc_fly;
 
-          if(uid=UID_Mine)then
+          if(uidi=UID_UMine)then
            if(sr<250)then
            begin
               sr:=250;
@@ -1384,12 +1383,12 @@ begin
        end
        else
        begin
-          if(uid in [UID_UCommandCenter,UID_HCommandCenter])then shadow:=buff[ub_clcast];
+          if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then shadow:=buff[ub_clcast];
 
           if(G_Addon=false)then
-           if(uid=UID_Baron)then buff[ub_advanced]:=_bufinf;
+           if(uidi=UID_Baron)then buff[ub_advanced]:=_bufinf;
 
-          if(uid=UID_Mine)then
+          if(uidi=UID_UMine)then
            if(sr>100)then
            begin
               sr:=100;

@@ -310,7 +310,10 @@ begin
 
          for u:=1 to MaxUnits do
           with _units[u] do
-           player:=@_players[playeri];
+          begin
+             player:=@_players[playeri];
+             uid  :=@_uids[uidi];
+          end;
       end;
       close(f);
    end;

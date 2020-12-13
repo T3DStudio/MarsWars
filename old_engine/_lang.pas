@@ -27,8 +27,11 @@ end;
 
 procedure _mkHStrUid(uid:byte;NAME,DESCR:string);
 begin
-   str_un_name [uid]:=NAME;
-   str_un_descr[uid]:=DESCR;
+   with _uids[uid] do
+   begin
+      un_name :=NAME;
+      un_descr:=DESCR;
+   end;
 end;
 
 procedure _mkHStrUpid(race,upid:byte;NAME,DESCR:string);
@@ -64,10 +67,10 @@ begin
    for i:=0 to 255 do
    begin
       case bld of
- false: if not(uid in uids_units  [i])then continue;
- true : if not(uid in uids_builder[i])then continue;
+ false: if not(uid in _uids[i].ups_units  )then continue;
+ true : if not(uid in _uids[i].ups_builder)then continue;
       end;
-      findprd:=_addstr(findprd,str_un_name[i]);
+      findprd:=_addstr(findprd,_uids[i].un_name);
    end;
 
    if(findprd<>'')then
@@ -83,12 +86,13 @@ ENRG ,NAME,HK,PROD,
 DESCR,TIME,REQ:shortstring;
 begin
    for uid:=0 to 255 do
+   with _uids[uid] do
    begin
       REQ  :='';
       PROD :='';
-      NAME :=str_un_name [uid];
+      NAME :=un_name;
       if(NAME='')then continue;
-      DESCR:=str_un_descr[uid];
+      DESCR:=un_descr;
       with _ulst[uid] do
       begin
          if(renerg>0)
@@ -102,27 +106,27 @@ begin
                then TIME:=i2s(trt div vid_fps)
                else TIME:='';
          end;
-         PROD:=findprd(uid,isbuild);
-         if(ruid <255)then REQ:=_addstr(REQ,str_un_name[ruid]);
+         PROD:=findprd(uidi,isbuild);
+         if(ruid <255)then REQ:=_addstr(REQ,_uids[ruid].un_name);
          if(rupgr<255)then
          begin
             rc:=0;
-            if(uid in uids_hell)then rc:=r_hell;
-            if(uid in uids_uac )then rc:=r_uac;
+            if(uidi in uids_hell)then rc:=r_hell;
+            if(uidi in uids_uac )then rc:=r_uac;
             if(rc in [r_hell,r_uac])
             then REQ:=_addstr(REQ,str_up_name[rupgr+(_uts*rc)])
             else REQ:=_addstr(REQ,'#'+b2s(rupgr)              );
          end;
          HK:=_gHK(ucl);
       end;
-      str_un_hint[uid]:= NAME;
+      un_hint:= NAME;
 
-      if(HK  <>'')then str_un_hint[uid]:=str_un_hint[uid]+' ('+HK+')';
-      if(TIME<>'')then str_un_hint[uid]:=str_un_hint[uid]+' ['+#16+TIME+#25+']';
-      if(ENRG<>'')then str_un_hint[uid]:=str_un_hint[uid]+' {'+#19+ENRG+#25+'}';
-      str_un_hint[uid]:=str_un_hint[uid]+#11+DESCR+#11;
-      if(REQ <>'')then str_un_hint[uid]:= str_un_hint[uid]+#17+str_req+#25+REQ+#11 else str_un_hint[uid]:= str_un_hint[uid]+#11;
-      if(PROD<>'')then str_un_hint[uid]:= str_un_hint[uid]+PROD;
+      if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
+      if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
+      if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
+      un_hint:=un_hint+#11+DESCR+#11;
+      if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
+      if(PROD<>'')then un_hint:= un_hint+PROD;
    end;
 
    for rc:=1 to 2 do
@@ -137,7 +141,7 @@ begin
       enrg :=b2s(_pne_r[rc,ucl]);
       TIME :=i2s(upgrade_time[rc ,ucl] div vid_fps);
 
-      if(upgrade_ruid [rc,ucl]<255)then REQ:=str_un_name[upgrade_ruid[rc,ucl]];
+      if(upgrade_ruid [rc,ucl]<255)then REQ:=_uids[upgrade_ruid[rc,ucl]].un_name;
       if(upgrade_rupgr[rc,ucl]<255)then
       begin
          if(REQ<>'')then REQ:=REQ+', ';
@@ -394,7 +398,7 @@ begin
    _mkHStrUid(UID_URocketL         ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
    _mkHStrUid(UID_URTurret         ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
-   _mkHStrUid(UID_Mine             ,'UAC Mine','');
+   _mkHStrUid(UID_UMine             ,'UAC Mine','');
 
    _mkHStrUid(UID_Engineer   ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic      ,'Medic'            ,'');
@@ -769,7 +773,7 @@ begin
   _mkHStrUid(UID_URocketL        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
   _mkHStrUid(UID_URTurret        ,'Ракетная Турель'        ,'Продвинутое защитное сооружение.');
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
-  _mkHStrUid(UID_Mine            ,'Мина','');
+  _mkHStrUid(UID_UMine            ,'Мина','');
 
   _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');

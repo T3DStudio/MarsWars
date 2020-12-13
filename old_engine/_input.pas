@@ -46,10 +46,10 @@ begin
       begin
          net_clearbuffer;
          net_writebyte(nmid_order);
-         net_writeint(ox0);
-         net_writeint(oy0);
-         net_writeint(ox1);
-         net_writeint(oy1);
+         net_writeint (ox0);
+         net_writeint (oy0);
+         net_writeint (ox1);
+         net_writeint (oy1);
          net_writebyte(oid);
          net_send(net_cl_svip,net_cl_svport);
       end
@@ -107,6 +107,7 @@ begin
       end;
 
       case ox0 of
+      co_paction : _click_eff(ox1,oy1,vid_hhfps,c_aqua  );
       co_rcamove : _click_eff(ox1,oy1,vid_hhfps,c_yellow);
       co_rcmove,
       co_move,
@@ -157,32 +158,31 @@ begin
    case m_brush of
    0.._uts:
     with _players[HPlayer] do
-    begin
-       if(m_brush in _sbs_ucls)and(ucl_e[true,m_brush]>0)then
-       begin
-          _player_s_o(m_brush,k_shift,0,0,uo_specsel ,HPlayer);
-          m_brush:=co_empty;
-       end
-       else
-         if _bldCndt(@_players[HPlayer],m_brush)and(bld_r=0)
-         then m_brush:=co_empty
-         else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
-              then m_brushc:=c_blue
-              else
-              begin
-                 uid:=cl2uid[race,true,m_brush];
-                 if not(uid in ui_prod_builds)then
-                 begin
-                    m_brush:=co_empty;
-                    exit;
-                 end;
-                 case _unit_grbcol(m_mx,m_my,_ulst[uid].r,HPlayer,uid,true) of
-                 1 :  m_brushc:=c_red;
-                 2 :  m_brushc:=c_blue;
-                 else m_brushc:=c_lime;
-                 end;
-              end;
-    end;
+     if(m_brush in _sbs_ucls)and(ucl_e[true,m_brush]>0)then
+     begin
+        _player_s_o(m_brush,k_shift,0,0,uo_specsel ,HPlayer);
+        m_brush:=co_empty;
+     end
+     else
+       if _bldCndt(@_players[HPlayer],m_brush)and(bld_r=0)
+       then m_brush:=co_empty
+       else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
+            then m_brushc:=c_blue
+            else
+            begin
+               uid:=cl2uid[race,true,m_brush];
+               if not(uid in ui_prod_builds)then
+               begin
+                  m_brush:=co_empty;
+                  exit;
+               end;
+               case _unit_grbcol(m_mx,m_my,_ulst[uid].r,HPlayer,uid,true) of
+               1 :  m_brushc:=c_red;
+               2 :  m_brushc:=c_blue;
+               else m_brushc:=c_lime;
+               end;
+            end;
+co_paction,
 co_move ,co_patrol,
 co_amove,co_apatrol : if(ui_uimove=0)then m_brush:=co_empty;
    else
@@ -202,6 +202,7 @@ co_amove  : begin                     // attack
                t:=_whoInPoint(x,y,1);
                _player_s_o(co_amove,t,x,y,uo_corder,HPlayer);
             end;
+co_paction,
 co_patrol,
 co_apatrol: _player_s_o(m_brush,0,x,y,uo_corder,HPlayer);
 co_empty  : begin                     // rclick
@@ -221,7 +222,7 @@ begin
    if(uid>0)then
     with _ulst[uid] do
      if(max=1)then
-      if(ucl=6)or(uid in [UID_HTeleport,UID_HAltar])then _rclickmove:=true;
+      if(ucl=6)or(uidi in [UID_HTeleport,UID_HAltar])then _rclickmove:=true;
 end;
 
 procedure _panel_click(tab,bx,by:integer;right,mid:boolean);
@@ -550,6 +551,7 @@ co_empty  : begin
                _player_s_o(m_mx,m_my,m_brush,0, uo_build  ,HPlayer);
                _chkbld;
             end;
+co_paction,
 co_move,
 co_amove,
 co_patrol,
@@ -558,10 +560,11 @@ co_apatrol: _command(m_mx,m_my);
     else
       if(m_by<3)then      // minimap
       case m_brush of
+      co_paction,
       co_move,
       co_amove,
       co_patrol,
-      co_apatrol: _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
+      co_apatrol : _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
       else        if(_rpls_vidm=false)then ui_panelmmm:=true;
       end
       else _panel_click(ui_tab,m_bx,m_by-4,false,false);     // panel
@@ -594,8 +597,8 @@ co_apatrol: _command(m_mx,m_my);
    end;
 
    if(k_mr=2)then                 // right button
-    if(m_brush<>-32000)
-    then m_brush:=-32000
+    if(m_brush<>co_empty)
+    then m_brush:=co_empty
     else
      if(m_bx<0)or(3<=m_bx)        // map
      then _command(m_mx,m_my)

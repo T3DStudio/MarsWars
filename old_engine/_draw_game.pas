@@ -341,7 +341,7 @@ begin
 
         if(inapc>0)then continue;
 
-        if(hits>0){and(uid=UID_URocketL)}then
+        if(hits>0){and(uidi=UID_URocketL)}then
         begin
            //_draw_text(r_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa]), ta_left,255, plcolor[player]);
 

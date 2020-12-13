@@ -26,16 +26,14 @@ onlySVCode        : boolean = true;
 
 UnitStepNum       : byte = 8;
 
-_units            : array[0..MaxUnits  ] of TUnit;
+_units            : array[0..MaxUnits   ] of TUnit;
 _players          : TPList;
 _missiles         : array[1..MaxUnits   ] of TMissile;
 
 _uclord_c         : integer = 0;
 _uregen_c         : integer = 0;
 
-uids_builder,
-uids_units,
-uids_apc          : array[0..255] of TSoB;
+_uids             : array[byte] of TUID;
 _ulst             : array[byte] of TUnit;
 upgrade_time      : array[1..2,0.._uts] of integer;
 upgrade_cnt       : array[1..2,0.._uts] of byte;
@@ -650,9 +648,7 @@ str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;
 str_camp_m        : array[0..MaxMissions] of shortstring;
 
-str_un_name,
-str_un_descr,
-str_un_hint,
+
 str_up_name,
 str_up_descr,
 str_up_hint       : array[0..255] of shortstring;

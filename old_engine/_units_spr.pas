@@ -6,7 +6,7 @@ begin
 
    with u^ do
    if(hits>0)then
-    case uid of
+    case uidi of
 
 UID_LostSoul :
 begin
@@ -56,7 +56,7 @@ begin
         an:=4*td+(anim div 100);
      end;
 
-   case uid of
+   case uidi of
 UID_Imp       : _unit_spr:=@spr_Imp    [an];
 UID_Demon     : _unit_spr:=@spr_Demon  [an];
 UID_ZFormer   : _unit_spr:=@spr_ZFormer[an];
@@ -288,7 +288,7 @@ begin
       an:=4*td+(anim div 100);
    end;
 
-   case uid of
+   case uidi of
 UID_Engineer  : _unit_spr:=@spr_Engineer[an];
 UID_Sergant   : if(buff[ub_advanced]>0)
                 then _unit_spr:=@spr_SSergant[an]
@@ -455,18 +455,17 @@ UID_UBaseRef       : _unit_spr:=@spr_ubase[3];
 UID_UBaseNuc       : _unit_spr:=@spr_ubase[4];
 UID_UBaseLab       : _unit_spr:=@spr_ubase[5];
 
-UID_Mine           : _unit_spr:=@spr_Mine;
+UID_UMine           : _unit_spr:=@spr_Mine;
 
 UID_UCBuild        : _unit_spr:=@spr_cbuild[anims];
 UID_USPort         : _unit_spr:=@spr_sport [anims];
 
-UID_CoopPortal,
-UID_Portal         : _unit_spr:=@spr_u_portal;
+UID_UPortal        : _unit_spr:=@spr_u_portal;
 
     end
    else
     if(hits>dead_hits)then
-    case uid of
+    case uidi of
 UID_Cacodemon  : begin td:=24+abs(hits div 8 );if(td>29)then td:=29;_unit_spr:=@spr_Cacodemon  [td];end; //24-29
 
 UID_Imp        : begin td:=48+abs(hits div 8 );if(td>52)then td:=52;_unit_spr:=@spr_Imp        [td];end; // 48-52

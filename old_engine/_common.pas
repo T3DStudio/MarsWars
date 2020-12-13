@@ -16,7 +16,7 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(minx,x,maxx:integer):integer;begin mm3:=min2(maxx,max2(x,minx)); end;
 
-procedure _bc_us(gs:pcardinal;g:byte);
+{procedure _bc_us(gs:pcardinal;g:byte);
 begin
    if(g<=_uts)then
     gs^:=gs^ xor cardinal(1 shl g);
@@ -43,7 +43,7 @@ function _bc_g(gs:cardinal;g:byte):boolean;
 begin
     _bc_g:=false;
    if(g<=_uts)then _bc_g:=(gs and cardinal(1 shl g))>0;
-end;
+end;    }
 
 procedure _upgr_ss(upgr:Pupgrar;g:TSob;race,lvl:byte);
 var i:byte;
@@ -191,7 +191,7 @@ begin
             or(cl2uid[race,true,bucl]=0)
             or(n_builders<=0)
             or(army>=MaxPlayerUnits)
-            or(_bc_g(a_build,bucl)=false)
+            or not(bucl in a_build)
             or((G_addon=false)and(cl2uid[race,true,bucl] in t2));
 
    if(_bldCndt=false)then
@@ -211,7 +211,7 @@ begin
    begin
     _untCndt:=((army+uproda)>=MaxPlayerUnits)
             or(cl2uid[race,false,bucl]=0)
-            or(_bc_g(a_units,bucl)=false)
+            or not(bucl in a_units)
             or(n_barracks<=0)
             or((G_addon=false)and(cl2uid[race,false,bucl] in t2));
 
@@ -234,7 +234,7 @@ begin
    begin
      _upgrreq:=(upgrade_time[race,up]=0)
              or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
-             or(_bc_g(a_upgr,up)=false)
+             or not(up in a_upgr)
              or(n_smiths<=0)
              or((menerg-cenerg)<_pne_r[race,up])
              or((up>=upgr_2tier)and(G_addon=false));

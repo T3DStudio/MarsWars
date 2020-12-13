@@ -7,6 +7,15 @@ pinteger = ^integer;
 TSob = set of byte;
 PTSoB = ^TSob;
 
+TUpgrade = record
+   _up_ruid,
+   _up_rupgr,
+   _up_race : byte;
+   _up_time,
+   _up_cnt,
+   _up_mfrg : boolean;
+end;
+
 upgrar = array[0.._uts] of byte;
 Pupgrar = ^upgrar;
 
@@ -53,7 +62,7 @@ o_x1,o_y1  :integer;
 
    a_upgr,
    a_build,
-   a_units : cardinal;
+   a_units : TSoB;
 
 
    ai_pushfrmi,
@@ -88,12 +97,44 @@ TPList = array[0..MaxPlayers] of TPLayer;
 
 TUID = record
    _mhits,
-   _renerg,
+   _speed,
+   _r ,
+   _sr,
    _max,
-   _r,
-   _rsight
+   _renerg,
+   _generg,
+   _ttime,
+   _btime,
+   _bstep,
+   _painc,
+   _apcs,
+   _apcm
+                : integer;
 
-            : integer;
+   _uf,
+   _ucl,
+   _ruid,
+   _rupgr       : byte;
+
+   _shcf        : single;
+
+   _isbuilding,
+   _isbuilder,
+   _issmith,
+   _isbarrack,
+   _ismech,
+   _issolid     : boolean;
+
+   ups_builder,
+   ups_units,
+   ups_apc      : TSoB;
+   {$IFDEF _FULLGAME}
+   _fr          : integer;
+
+   un_name,
+   un_descr,
+   un_hint      : shortstring;
+   {$ENDIF}
 end;
 PTUID = ^TUID;
 
@@ -116,7 +157,7 @@ TUnit = record
    _uclord,
    vstp,order,
    playeri,
-   uid,max,
+   uidi,max,
    shadow,
    ucl,
    ruid,rupgr
@@ -162,6 +203,7 @@ TUnit = record
    sel      : boolean;
 
    player   : PTPlayer;
+   uid      : PTUID;
 end;
 PTUnit = ^TUnit;
 

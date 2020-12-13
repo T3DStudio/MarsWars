@@ -1,3 +1,7 @@
+const
+
+  clnet_rld              = [UID_UVehicleFactory,UID_HTeleport,UID_UNuclearPlant,UID_HFortress];
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +100,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      SetBBit(@_bts1,5, (uid in whocanattack)and(tar1>0));
+      SetBBit(@_bts1,5, (uidi in whocanattack)and(tar1>0));
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
@@ -136,7 +140,7 @@ begin
       _wudata_sint(sh,rpl);
       if(sh>-127)then
       begin
-         _wudata_byte (uid,rpl);
+         _wudata_byte (uidi,rpl);
          _wudata_bstat(pu,rpl,_pl);
 
          if(inapc>0)
@@ -157,9 +161,9 @@ begin
 
          if(sh>0)then
          begin
-            if(uid in whocanattack)and(tar1>0)then _wudata_int(tar1,rpl);
+            if(uidi in whocanattack)and(tar1>0)then _wudata_int(tar1,rpl);
             if(isbuild)and(bld)then
-             case uid of
+             case uidi of
                UID_URadar:
                   if(rpl)or(_players[_pl].team=player^.team)then
                   begin
@@ -186,11 +190,11 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uid in clnet_rld )then _wrld(@rld_t,rpl);
+                     if(uidi in clnet_rld )then _wrld(@rld_t,rpl);
                      if(isbarrack)or(issmith)then _wprod(pu,rpl);
                   end;
                   if(sel)then
-                   if(uid in whocanmp)then
+                   if(uidi in whocanmp)then
                    begin
                       _wudata_int(uo_x ,rpl);
                       _wudata_int(uo_y ,rpl);
@@ -297,7 +301,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      inc(uid_e[uid],1);
+      inc(uid_e[uidi],1);
       inc(ucl_e[isbuild,ucl],1);
       inc(ucl_c[isbuild]);
       inc(army,1);
@@ -312,12 +316,12 @@ begin
           then inc(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
-             inc(uid_eb[uid],1);
+             inc(uid_eb[uidi],1);
              inc(ucl_eb[isbuild,ucl],1);
              if(ucl_x[ucl]=0)then ucl_x[ucl]:=unum;
              if(0<ucl_x[ucl])and(ucl_x[ucl]<=MaxUnits)then
               if(_units[ucl_x[ucl]].ucl<>ucl)then ucl_x[ucl]:=unum;
-             if(uid_x[uid]=0)then uid_x[uid]:=unum;
+             if(uid_x[uidi]=0)then uid_x[uidi]:=unum;
 
              _unit_done_inc_cntrs(pu);
 
@@ -351,7 +355,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      dec(uid_e[uid],1);
+      dec(uid_e[uidi],1);
       dec(ucl_e[isbuild,ucl],1);
       dec(ucl_c[isbuild]);
       dec(army,1);
@@ -366,10 +370,10 @@ begin
           then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
           else
           begin
-             dec(uid_eb[uid],1);
+             dec(uid_eb[uidi],1);
              dec(ucl_eb[isbuild,ucl],1);
              if(ucl_x[ucl]=unum)then ucl_x[ucl]:=0;
-             if(uid_x[uid]=unum)then uid_x[uid]:=0;
+             if(uid_x[uidi]=unum)then uid_x[uidi]:=0;
 
              _unit_done_dec_cntrs(pu);
 
@@ -407,7 +411,7 @@ begin
 
        if(isbuild)then
        begin
-          case uid of
+          case uidi of
           UID_Heye:
              begin
                 shadow :=1;
@@ -437,7 +441,7 @@ begin
        else
          if(buff[ub_born]>0)then
          begin
-            if(playeri=HPlayer)then _unit_createsound(uid);
+            if(playeri=HPlayer)then _unit_createsound(uidi);
          end;
 
        if(buff[ub_teleeff]>0)then
@@ -497,7 +501,7 @@ begin
        else
          if(pu^.hits>dead_hits)and(hits>dead_hits)then
          begin
-            if(pu^.uid<>uid)then
+            if(pu^.uidi<>uidi)then
             begin
                _unit_def(uu);
 
@@ -539,10 +543,10 @@ begin
                _unit_mmcoords(uu);
             end;
 
-            if(uid=UID_URadar)then
+            if(uidi=UID_URadar)then
              if(bld)and(pu^.rld_t=0)and(rld_t>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
 
-            if(uid=UID_URocketL)then
+            if(uidi=UID_URocketL)then
              if(bld)and(pu^.rld_t=0)and(rld_t>0)then
              begin
                 _uac_rocketl_eff(uu);
@@ -550,12 +554,12 @@ begin
              end;
 
             if(pu^.buff[ub_cast]=0)and(buff[ub_cast]>0)then
-             case uid of
+             case uidi of
              UID_ArchVile: ;
              UID_Pain    : _pain_action(uu);
              end;
 
-            if(uid in [UID_Major,UID_ZMajor])then
+            if(uidi in [UID_Major,UID_ZMajor])then
              if(buff[ub_advanced]>0)and(hits>0)and(pu^.hits>0)then
              begin
                 if(pu^.uf=uf_ground)and(uf>uf_ground)then PlaySND(snd_jetpon ,uu);
@@ -574,7 +578,7 @@ begin
                if(pu^.buff[ub_pain    ]=0)and(buff[ub_pain    ]>0)then _unit_painsnd(uu);
             end;
 
-            if(uid in [UID_UCommandCenter,UID_HCommandCenter])then
+            if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
             begin
                if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
                begin
@@ -612,7 +616,7 @@ begin
                _unit_mmcoords(uu);
 
                if(pu^.buff[ub_teleeff]=0)and(buff[ub_teleeff]>0)then
-                if(uid=UID_HKeep)then
+                if(uidi=UID_HKeep)then
                 begin
                    if(_nhp3(x,y,player))
                    or(_nhp3(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
@@ -780,9 +784,9 @@ begin
       sh:=_rudata_sint(rpl,-128);
       if(sh>-127)then
       begin
-         i   :=uid;
-         uid :=_rudata_byte(rpl,0);
-         if(i<>uid)then
+         i   :=uidi;
+         uidi :=_rudata_byte(rpl,0);
+         if(i<>uidi)then
          begin
             _unit_sclass(uu);
             FillChar(buff,SizeOf(buff),0);
@@ -810,7 +814,7 @@ begin
          begin
             if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
             if(isbuild)and(bld)then
-             case uid of
+             case uidi of
               UID_URadar:
                 if(rpl)or(_players[_pl].team=player^.team)then
                 begin
@@ -837,11 +841,11 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uid in clnet_rld )then _rrld(@rld_t,rpl);
+                     if(uidi in clnet_rld )then _rrld(@rld_t,rpl);
                      if(isbarrack)or(issmith)then _rprod(uu,rpl);
                   end;
                   if(sel)then
-                   if(uid in whocanmp)then
+                   if(uidi in whocanmp)then
                    begin
                       uo_x:=_rudata_int(rpl,0);
                       uo_y:=_rudata_int(rpl,0);

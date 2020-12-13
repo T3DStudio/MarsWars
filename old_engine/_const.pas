@@ -102,12 +102,9 @@ uo_select              = 4;
 uo_aselect             = 5;
 uo_selorder            = 6;
 uo_setorder            = 7;
-uo_corder              = 13;
-//uo_move                = 8;
-//uo_delete              = 9;
-//uo_action              = 10;
-uo_specsel             = 11;
-uo_addorder            = 12;
+uo_corder              = 8;
+uo_specsel             = 9;
+uo_addorder            = 10;
 
 co_empty               = -32000;
 co_destroy             = -111;
@@ -196,7 +193,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 DID_R                  : array[0..7] of integer = (0,65,125,185,250,105,60,17);
 
 
-{upgr_hell_attack       = 0;  // distance attack
+upgr_hell_attack       = 0;  // distance attack
 upgr_hell_armor        = 1;  // base armor
 upgr_hell_build        = 2;  // base b armor
 upgr_hell_melee        = 3;  // melee attack / repair/health upgr
@@ -222,16 +219,12 @@ upgr_hell_hinvuln      = 22; // hell invuln powerup
 upgr_hell_bldenrg      = 23; // additional energy
 upgr_hell_9bld         = 24; // 9 class building reload time
 
-upgr_advbld            = 28;
-upgr_advbar            = 29;
 
-upgr_invuln            = 31;
-
-upgr_uac_attack        = 32;  // distance attack
-upgr_uac_armor         = 33;  // base armor
-upgr_uac_build         = 34;  // base b armor
-upgr_uac_melee         = 35;  // repair/health upgr
-upgr_uac_mspeed        = 36;  // uac
+upgr_uac_attack        = 0;  // distance attack
+upgr_uac_armor         = 1;  // base armor
+upgr_uac_build         = 2;  // base b armor
+upgr_uac_melee         = 3;  // repair/health upgr
+upgr_uac_mspeed        = 4;  // infantry speed
 upgr_uac_plsmt         = 5;  // turrent for apcs
 upgr_uac_vision        = 6;  // detectors
 upgr_uac_towers        = 7;  // towers sr
@@ -252,11 +245,6 @@ upgr_uac_turarm        = 21; // turrets armor
 upgr_uac_rturrets      = 22; // rocket turrets
 upgr_uac_bldenrg       = 23; // additional energy
 upgr_uac_9bld          = 24; // 9 class building reload time
-
-upgr_advbld            = 28;
-upgr_advbar            = 29;
-
-upgr_invuln            = 31;   }
 
 
 upgr_attack            = 0;  // distance attack
@@ -348,92 +336,92 @@ MID_ArchFire           = 121;
 MID_Flyer              = 122;
 
 
-UID_LostSoul           = 1;
-UID_Imp                = 2;
-UID_Demon              = 3;
-UID_Cacodemon          = 4;
-UID_Baron              = 5;
-UID_Cyberdemon         = 6;
-UID_Mastermind         = 7;
-UID_Pain               = 8;
-UID_Revenant           = 9;
-UID_Mancubus           = 10;
-UID_Arachnotron        = 11;
-UID_Archvile           = 12;
-UID_ZFormer            = 13;
-UID_ZEngineer          = 14;
-UID_ZSergant           = 15;
-UID_ZCommando          = 16;
-UID_ZBomber            = 17;
-UID_ZMajor             = 18;
-UID_ZBFG               = 19;
-UID_HEye               = 20;
+
+UID_HKeep              = 1;
+UID_HGate              = 2;
+UID_HSymbol            = 3;
+UID_HPools             = 4;
+UID_HTower             = 5;
+UID_HTeleport          = 6;
+UID_HMonastery         = 7;
+UID_HTotem             = 8;
+UID_HAltar             = 9;
+UID_HFortress          = 10;
+UID_HEye               = 11;
+UID_HCommandCenter     = 12;
+UID_HMilitaryUnit      = 13;
+
+UID_LostSoul           = 15;
+UID_Imp                = 16;
+UID_Demon              = 17;
+UID_Cacodemon          = 18;
+UID_Baron              = 19;
+UID_Cyberdemon         = 20;
+UID_Mastermind         = 21;
+UID_Pain               = 22;
+UID_Revenant           = 23;
+UID_Mancubus           = 24;
+UID_Arachnotron        = 25;
+UID_Archvile           = 26;
+UID_ZFormer            = 27;
+UID_ZEngineer          = 28;
+UID_ZSergant           = 29;
+UID_ZCommando          = 30;
+UID_ZBomber            = 31;
+UID_ZMajor             = 32;
+UID_ZBFG               = 33;
 
 
-UID_Engineer           = 31;
-UID_Medic              = 32;
-UID_Sergant            = 33;
-UID_Commando           = 34;
-UID_Bomber             = 35;
-UID_Major              = 36;
-UID_BFG                = 37;
-UID_FAPC               = 38;
-UID_APC                = 39;
-UID_Terminator         = 40;
-UID_Tank               = 41;
-UID_Flyer              = 42;
-UID_Mine               = 43;
-UID_UTransport         = 44;
+UID_UCommandCenter     = 41;
+UID_UMilitaryUnit      = 42;
+UID_UGenerator         = 43;
+UID_UWeaponFactory     = 44;
+UID_UTurret            = 45;
+UID_URadar             = 46;
+UID_UVehicleFactory    = 47;
+UID_UPTurret           = 48;
+UID_URocketL           = 49;
+UID_URTurret           = 50;
+UID_UNuclearPlant      = 51;
+UID_UMine              = 52;
 
-UID_HKeep              = 49;
-UID_HGate              = 50;
-UID_HSymbol            = 51;
-UID_HPools             = 52;
-UID_HTower             = 53;
-UID_HTeleport          = 54;
-UID_HMonastery         = 55;
-UID_HTotem             = 56;
-UID_HAltar             = 57;
-UID_HFortress          = 58;
-UID_HCommandCenter     = 59;
-UID_HMilitaryUnit      = 60;
+UID_Engineer           = 55;
+UID_Medic              = 56;
+UID_Sergant            = 57;
+UID_Commando           = 58;
+UID_Bomber             = 59;
+UID_Major              = 60;
+UID_BFG                = 61;
+UID_FAPC               = 62;
+UID_APC                = 64;
+UID_Terminator         = 65;
+UID_Tank               = 66;
+UID_Flyer              = 67;
+UID_UTransport         = 68;
 
-UID_UCommandCenter     = 61;
-UID_UMilitaryUnit      = 62;
-UID_UGenerator         = 63;
-UID_UWeaponFactory     = 64;
-UID_UTurret            = 65;
-UID_URadar             = 66;
-UID_UVehicleFactory    = 67;
-UID_UPTurret           = 68;
-UID_URocketL           = 69;
-UID_URTurret           = 70;
-UID_UNuclearPlant      = 71;
-
-UID_UBaseMil           = 72;
-UID_UBaseCom           = 73;
-UID_UBaseGen           = 74;
-UID_UBaseRef           = 75;
-UID_UBaseNuc           = 76;
-UID_UBaseLab           = 77;
-UID_UCBuild            = 78;
-UID_USPort             = 79;
+UID_UBaseMil           = 70;
+UID_UBaseCom           = 71;
+UID_UBaseGen           = 72;
+UID_UBaseRef           = 73;
+UID_UBaseNuc           = 74;
+UID_UBaseLab           = 75;
+UID_UCBuild            = 76;
+UID_USPort             = 77;
+UID_UPortal            = 78;
 
 
-UID_Portal             = 90;
-UID_CoopPortal         = 91;
 
-uids_hell              = [UID_LostSoul..UID_ZBFG,UID_HEye,UID_HKeep..UID_HMilitaryUnit];
-uids_uac               = [UID_Engineer..UID_UTransport,UID_UCommandCenter..UID_USPort];
+uids_hell              = [1 ..40];
+uids_uac               = [41..80];
 
 t2                     = [UID_URocketL,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
 gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
-arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron,UID_ZFormer..UID_ZBFG];
+arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
-whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_Mine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
+whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_UMine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
@@ -441,9 +429,9 @@ coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 slowturn               = [UID_APC,UID_Tank];
 
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
-type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
+armor_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
-clnet_rld              = [UID_UVehicleFactory,UID_HTeleport,UID_UNuclearPlant,UID_HFortress];
+
 
 
 upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
@@ -534,7 +522,7 @@ _hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_F , SDLK_G , SDLK_H      );
 
 
-whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_Mine,UID_UTurret,UID_UPTurret];
+whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_UMine,UID_UTurret,UID_UPTurret];
 
 _buffst                : array[false..true] of smallint = (0,_bufinf);
 

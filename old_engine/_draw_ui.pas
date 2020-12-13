@@ -262,7 +262,7 @@ begin
 
             if(ucl_e[true,ui]=0)then
             begin
-               if(_bc_g(a_build,ui)=false)then continue;
+               if not(ui in a_build)then continue;
                if((G_addon=false)and(cl2uid[race,true,ui] in t2))then continue;
             end;
 
@@ -303,7 +303,7 @@ begin
             if(uid=0)then continue;
             if(ucl_e[false,ui]=0)then
             begin
-               if(_bc_g(a_units,ui)=false)then continue;
+               if not(ui in a_units)then continue;
                if((G_addon=false)and(cl2uid[race,false,ui] in t2))then continue;
             end;
 
@@ -326,7 +326,7 @@ begin
       begin
          for ui:=0 to MaxUpgrs do
          begin
-            if(_bc_g(a_upgr,ui)=false)then continue;
+            if not(ui in a_upgr)then continue;
             if((G_addon=false)and(ui>=upgr_2tier))then break;
 
             ux:=(ui mod 3);
@@ -459,10 +459,10 @@ begin
                            else
                              if(uid_e[uid]=0)then
                              begin
-                                if(_bc_g(a_build,i)=false)then exit;
+                                if not(i in a_build)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           hs:=@str_un_hint[uid];
+                           hs:=@_uids[uid].un_hint;
                         end;
                end;
            1 : case i of
@@ -473,16 +473,16 @@ begin
                            else
                              if(uid_e[uid]=0)then
                              begin
-                                if(_bc_g(a_units,i)=false)then exit;
+                                if not(i in a_units)then exit;
                                 if((G_addon=false)and(uid in t2))then exit;
                              end;
-                           hs:=@str_un_hint[uid];
+                           hs:=@_uids[uid].un_hint;
                         end;
                end;
            2 : begin
                   if(i<=MaxUpgrs)then
                   begin
-                     if(_bc_g(a_upgr,i)=false)then exit;
+                     if not(i in a_upgr)then exit;
                      if(g_addon=false)and(i>=upgr_2tier)then exit;
                   end;
                   hs:=@str_up_hint[i+(race*_uts)];

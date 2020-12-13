@@ -18,7 +18,7 @@ begin
        r_uac  : inc(damage,upgr[upgr_melee]*2);
      end;
 
-   case pu^.uid of
+   case pu^.uidi of
    UID_LostSoul: begin
                     if(tu^.mech               )then _d25 (@damage) else
                     if(tu^.uf=uf_ground       )then _d50 (@damage);
@@ -168,7 +168,7 @@ begin
    begin
       tu:=@_units[tar];
 
-      if(tu^.hits>0)and(_miduid(mid,tu^.uid))and(tu^.inapc=0)then
+      if(tu^.hits>0)and(_miduid(mid,tu^.uidi))and(tu^.inapc=0)then
         if(abs(mf-tu^.uf)<2)then
         begin
            teams:=_players[player].team=tu^.player^.team;
@@ -178,7 +178,7 @@ begin
               case mid of
               MID_SShot,
               MID_SSShot  : exit;
-              MID_ArchFire: if(tu^.uid in [UID_Archvile,UID_HTotem])then exit;
+              MID_ArchFire: if(tu^.uidi in [UID_Archvile,UID_HTotem])then exit;
               end;
 
            d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.r;
@@ -200,7 +200,7 @@ begin
               p:=1;
 
               /////////////////////////////////
-              if(tu^.uid in armor_lite)then
+              if(tu^.uidi in armor_lite)then
                  case mid of
                  MID_Blizzard   : _d25 (@damd);
                  MID_BFG,
@@ -221,7 +221,7 @@ begin
                  MID_Bulletx2    : _d150(@damd);
                  end;
 
-              if(tu^.uid in type_massive)then
+              if(tu^.uidi in armor_massive)then
                  case mid of
                  MID_SShot,
                  MID_SSShot,
@@ -313,7 +313,7 @@ begin
                   if(mid=MID_TBullet)and(tu^.mech=false)then
                   begin
                      if(tu^.buff[ub_toxin]>=0)then
-                      if(tu^.uid in marines)
+                      if(tu^.uidi in marines)
                       then begin tu^.buff[ub_toxin]:=vid_hfps; tu^.buff[ub_pain ]:=vid_hfps;end
                       else begin tu^.buff[ub_toxin]:=vid_fps;  tu^.buff[ub_pain ]:=vid_fps; end;
                   end;
@@ -355,8 +355,8 @@ begin
 
                 if(mid in [MID_HRocket,MID_Tank,MID_Granade])then
                 begin
-                   if(tu^.uid in [UID_Cyberdemon,UID_Mastermind,UID_Tank])then exit;
-                   if(tu^.uid in armor_lite)then damd:=damd div 2;
+                   if(tu^.uidi in [UID_Cyberdemon,UID_Mastermind,UID_Tank])then exit;
+                   if(tu^.uidi in armor_lite)then damd:=damd div 2;
                 end;
 
                 {$IFDEF _FULLGAME}

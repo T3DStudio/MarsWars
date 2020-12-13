@@ -58,7 +58,9 @@ begin
       isbarrack:=false;
       issmith  :=false;
 
-      if(uid=UID_LostSoul)then
+      uid:=@_uids[uidi];
+
+      if(uidi=UID_LostSoul)then
       begin
          mhits  := 90;
          r      := 10;
@@ -73,7 +75,7 @@ begin
          trt    := vid_fps*8;
          renerg := 1;
       end;
-      if(uid=UID_Imp) then
+      if(uidi=UID_Imp) then
       begin
          mhits  := 70;
          r      := 12;
@@ -89,7 +91,7 @@ begin
          trt    := vid_fps*5;
          renerg := 1;
       end;
-      if(uid=UID_Demon) then
+      if(uidi=UID_Demon) then
       begin
          mhits  := 150;
          r      := 14;
@@ -106,7 +108,7 @@ begin
          renerg := 2;
          apcs   := 2;
       end;
-      if(uid=UID_CacoDemon)then
+      if(uidi=UID_CacoDemon)then
       begin
          mhits  := 225;
          r      := 14;
@@ -122,7 +124,7 @@ begin
          renerg := 2;
          apcs   := 2;
       end;
-      if(uid=UID_Baron)then
+      if(uidi=UID_Baron)then
       begin
          mhits  := 350;
          r      := 14;
@@ -140,7 +142,7 @@ begin
          arf    :=(sr div 4)*3;
          apcs   := 3;
       end;
-      if(uid=UID_Cyberdemon)then
+      if(uidi=UID_Cyberdemon)then
       begin
          mhits  := 2000;
          r      := 20;
@@ -159,7 +161,7 @@ begin
          arf    :=(sr div 4)*3;
          apcs   := 10;
       end;
-      if(uid=UID_Mastermind) then
+      if(uidi=UID_Mastermind) then
       begin
          mhits  := 2000;
          r      := 35;
@@ -178,7 +180,7 @@ begin
          arf    :=(sr div 4)*3;
          apcs   := 10;
       end;
-      if(uid=UID_Pain)then
+      if(uidi=UID_Pain)then
       begin
          mhits  := 200;
          r      := 14;
@@ -196,7 +198,7 @@ begin
          ruid   := UID_HMonastery;
          apcs   := 2;
       end;
-      if(uid=UID_Revenant) then
+      if(uidi=UID_Revenant) then
       begin
          mhits  := 200;
          r      := 13;
@@ -214,7 +216,7 @@ begin
          ruid   := UID_HMonastery;
          apcs   := 1;
       end;
-      if(uid=UID_Mancubus) then
+      if(uidi=UID_Mancubus) then
       begin
          mhits  := 400;
          r      := 20;
@@ -233,7 +235,7 @@ begin
          arf    :=(ar div 2);
          apcs   := 4;
       end;
-      if(uid=UID_Arachnotron) then
+      if(uidi=UID_Arachnotron) then
       begin
          mhits  := 350;
          r      := 20;
@@ -251,7 +253,7 @@ begin
          rupgr  := upgr_2tier;
          apcs   := 4;
       end;
-      if(uid=UID_ArchVile) then
+      if(uidi=UID_ArchVile) then
       begin
          mhits  := 400;
          r      := 15;
@@ -271,22 +273,7 @@ begin
          apcs   := 2;
       end;
 
-      if(uid=UID_HEye) then
-      begin
-         mhits  := 240;
-         uf     := uf_ground;
-         sr     := 250;
-         ucl    := 21;
-         r      := 10;
-         isbuild:= true;
-         buff[ub_detect]:=_bufinf;
-         rld_a  := vid_fps;
-         ctime  := 0;
-         bld_s  := 0;
-      end;
-
-
-      if(uid=UID_HKeep)then
+      if(uidi=UID_HKeep)then
       begin
          mhits  := 3000;
          uf     := uf_ground;
@@ -297,9 +284,8 @@ begin
          renerg := 8;
          ctime  := 80;
          isbuilder:=true;
-         uids_builder[uid]:=[UID_HKeep..UID_HFortress];
       end;
-      if(uid=UID_HGate) then
+      if(uidi=UID_HGate) then
       begin
          mhits  := 1500;
          uf     := uf_ground;
@@ -312,9 +298,8 @@ begin
          renerg := 4;
          ctime  := 40;
          isbarrack:=true;
-         uids_units[uid]:=[UID_LostSoul..UID_Archvile];
       end;
-      if(uid=UID_HSymbol) then
+      if(uidi=UID_HSymbol) then
       begin
          mhits  := 200;
          uf     := uf_ground;
@@ -326,7 +311,7 @@ begin
          renerg := 1;
          ctime  := 10;
       end;
-      if(uid=UID_HPools) then
+      if(uidi=UID_HPools) then
       begin
          mhits  := 1000;
          uf     := uf_ground;
@@ -339,7 +324,7 @@ begin
          ctime  := 40;
          issmith:= true;
       end;
-      if(uid=UID_HTower) then
+      if(uidi=UID_HTower) then
       begin
          mhits  := 700;
          uf     := uf_ground;
@@ -352,7 +337,7 @@ begin
          renerg := 2;
          ctime  := 20;
       end;
-      if(uid=UID_HTeleport) then
+      if(uidi=UID_HTeleport) then
       begin
          mhits  := 500;
          uf     := uf_ground;
@@ -366,7 +351,7 @@ begin
          renerg := 4;
          ctime  := 30;
       end;
-      if(uid=UID_HMonastery)then
+      if(uidi=UID_HMonastery)then
       begin
          mhits  := 1000;
          uf     := uf_ground;
@@ -379,7 +364,7 @@ begin
          ctime  := 90;
          ruid   := UID_HPools;
       end;
-      if(uid=UID_HTotem) then
+      if(uidi=UID_HTotem) then
       begin
          mhits  := 600;
          uf     := uf_ground;
@@ -395,7 +380,7 @@ begin
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
       end;
-      if(uid=UID_HAltar) then
+      if(uidi=UID_HAltar) then
       begin
          mhits  := 750;
          uf     := uf_ground;
@@ -409,7 +394,7 @@ begin
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
       end;
-      if(uid=UID_HFortress) then
+      if(uidi=UID_HFortress) then
       begin
          mhits  := 4000;
          uf     := uf_ground;
@@ -423,12 +408,24 @@ begin
          ctime  := 90;
          ruid   := UID_HPools;
          isbuilder:=true;
-         uids_builder[uid]:=[UID_HKeep..UID_HAltar]-[UID_HFortress];
+      end;
+      if(uidi=UID_HEye) then
+      begin
+         mhits  := 240;
+         uf     := uf_ground;
+         sr     := 250;
+         ucl    := 21;
+         r      := 10;
+         isbuild:= true;
+         buff[ub_detect]:=_bufinf;
+         rld_a  := vid_fps;
+         ctime  := 0;
+         bld_s  := 0;
       end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-      if(uid in [UID_Engineer,UID_ZEngineer])then
+      if(uidi in [UID_Engineer,UID_ZEngineer])then
       begin
          mhits  := 100;
          r      := 12;
@@ -443,7 +440,7 @@ begin
          trt    := vid_fps*10;
          renerg := 1;
          arf    :=(sr div 4)*3;
-         if(uid=UID_ZEngineer)then
+         if(uidi=UID_ZEngineer)then
          begin
             painc  := 3;
             ucl    := 13;
@@ -454,7 +451,7 @@ begin
             //ruid   := UID_HMilitaryUnit;
          end;
       end;
-      if(uid in [UID_Medic,UID_ZFormer])then
+      if(uidi in [UID_Medic,UID_ZFormer])then
       begin
          mhits  := 100;
          r      := 12;
@@ -468,7 +465,7 @@ begin
          mdmg   := 6;
          trt    := vid_fps*10;
          renerg := 1;
-         if(uid=UID_ZFormer)then
+         if(uidi=UID_ZFormer)then
          begin
             painc  := 3;
             ucl    := 12;
@@ -480,7 +477,7 @@ begin
          end;
          arf    :=(sr div 4)*3;
       end;
-      if(uid in [UID_Sergant,UID_ZSergant])then
+      if(uidi in [UID_Sergant,UID_ZSergant])then
       begin
          mhits  := 100;
          r      := 12;
@@ -493,7 +490,7 @@ begin
          anims  := 18;
          trt    := vid_fps*10;
          renerg := 2;
-         if(uid=UID_ZSergant)then
+         if(uidi=UID_ZSergant)then
          begin
             painc  := 3;
             ucl    := 14;
@@ -503,7 +500,7 @@ begin
          end;
          arf    :=(sr div 4)*3;
       end;
-      if(uid in [UID_Commando,UID_ZCommando])then
+      if(uidi in [UID_Commando,UID_ZCommando])then
       begin
          mhits  := 100;
          r      := 12;
@@ -516,7 +513,7 @@ begin
          anims  := 15;
          trt    := vid_fps*15;
          renerg := 2;
-         if(uid=UID_ZCommando)then
+         if(uidi=UID_ZCommando)then
          begin
             painc  := 3;
             ucl    := 15;
@@ -525,7 +522,7 @@ begin
          end;
          arf    :=220;
       end;
-      if(uid in [UID_Bomber,UID_ZBomber])then
+      if(uidi in [UID_Bomber,UID_ZBomber])then
       begin
          mhits  := 100;
          r      := 12;
@@ -538,7 +535,7 @@ begin
          anims  := 14;
          trt    := vid_fps*30;
          renerg := 4;
-         if(uid=UID_ZBomber)then
+         if(uidi=UID_ZBomber)then
          begin
             painc  := 3;
             ucl    := 16;
@@ -547,7 +544,7 @@ begin
          else
          ruid   := UID_UWeaponFactory;
       end;
-      if(uid in [UID_Major,UID_ZMajor])then
+      if(uidi in [UID_Major,UID_ZMajor])then
       begin
          mhits  := 100;
          r      := 13;
@@ -560,7 +557,7 @@ begin
          anims  := 14;
          trt    := vid_fps*20;
          renerg := 4;
-         if(uid=UID_ZMajor)then
+         if(uidi=UID_ZMajor)then
          begin
             painc  := 3;
             ucl    := 17;
@@ -569,7 +566,7 @@ begin
          else
          ruid   := UID_UWeaponFactory;
       end;
-      if(uid in [UID_BFG,UID_ZBFG])then
+      if(uidi in [UID_BFG,UID_ZBFG])then
       begin
          mhits  := 100;
          r      := 12;
@@ -582,7 +579,7 @@ begin
          anims  := 14;
          trt    := vid_fps*60;
          renerg := 5;
-         if(uid=UID_ZBFG)then
+         if(uidi=UID_ZBFG)then
          begin
             painc  := 3;
             ucl    := 18;
@@ -591,7 +588,7 @@ begin
          else
          ruid   := UID_UWeaponFactory;
       end;
-      if(uid=UID_FAPC)then
+      if(uidi=UID_FAPC)then
       begin
          mhits  := 250;
          r      := 33;
@@ -605,9 +602,8 @@ begin
          trt    := vid_fps*25;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
-         uids_apc[uid]:=marines+[UID_APC,UID_Terminator..UID_Flyer];
       end;
-      if(uid=UID_APC)then
+      if(uidi=UID_APC)then
       begin
          mhits  := 400;
          r      := 25;
@@ -623,9 +619,8 @@ begin
          trt    := vid_fps*25;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
-         uids_apc[uid]:=marines;
       end;
-      if(uid=UID_Terminator)then
+      if(uidi=UID_Terminator)then
       begin
          mhits  := 350;
          r      := 16;
@@ -644,7 +639,7 @@ begin
          rupgr  := upgr_2tier;
          //arf    :=(sr div 4)*3;
       end;
-      if(uid=UID_Tank)then
+      if(uidi=UID_Tank)then
       begin
          mhits  := 400;
          r      := 20;
@@ -662,7 +657,7 @@ begin
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
       end;
-      if(uid=UID_Flyer)then
+      if(uidi=UID_Flyer)then
       begin
          mhits  := 350;
          r      := 18;
@@ -680,7 +675,7 @@ begin
       end;
 
 
-      if(uid in [UID_UCommandCenter,UID_HCommandCenter])then
+      if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
       begin
          mhits  := 4000;
          uf     := uf_ground;
@@ -695,17 +690,14 @@ begin
          rld_r  := 30;
          apcm   := 20;
          isbuilder:=true;
-         uids_builder[uid]:=[UID_UCommandCenter..UID_UNuclearPlant];
-         if(uid=UID_HCommandCenter)then
+         if(uidi=UID_HCommandCenter)then
          begin
-            uids_builder[uid]:=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HMilitaryUnit];
             ucl :=12;
-            uids_apc[uid]:=demons;
             apcm :=30;
             rld_r:=45;
          end;
       end;
-      if(uid in [UID_UMilitaryUnit,UID_HMilitaryUnit])then
+      if(uidi in [UID_UMilitaryUnit,UID_HMilitaryUnit])then
       begin
          mhits  := 1700;
          uf     := uf_ground;
@@ -716,14 +708,13 @@ begin
          renerg := 4;
          ctime  := 40;
          isbarrack:=true;
-         uids_units[uid]:=marines+[UID_APC,UID_FAPC,UID_Terminator..UID_Flyer];
-         if(uid=UID_HMilitaryUnit)then
+
+         if(uidi=UID_HMilitaryUnit)then
          begin
-            uids_units[uid]:=zimbas;
             ucl :=13;
          end;
       end;
-      if(uid=UID_UGenerator) then
+      if(uidi=UID_UGenerator) then
       begin
          mhits  := 400;
          uf     := uf_ground;
@@ -735,7 +726,7 @@ begin
          renerg := 2;
          ctime  := 20;
       end;
-      if(uid=UID_UWeaponFactory) then
+      if(uidi=UID_UWeaponFactory) then
       begin
          mhits  := 1700;
          uf     := uf_ground;
@@ -747,7 +738,7 @@ begin
          ctime  := 40;
          issmith:=true;
       end;
-      if(uid=UID_UTurret) then
+      if(uidi=UID_UTurret) then
       begin
          mhits  := 400;
          uf     := uf_ground;
@@ -761,7 +752,7 @@ begin
          renerg := 2;
          ctime  := 15;
       end;
-      if(uid=UID_URadar) then
+      if(uidi=UID_URadar) then
       begin
          mhits  := 500;
          uf     := uf_ground;
@@ -773,7 +764,7 @@ begin
          renerg := 2;
          ctime  := 30;
       end;
-      if(uid=UID_UVehicleFactory) then
+      if(uidi=UID_UVehicleFactory) then
       begin
          mhits  := 1700;
          uf     := uf_ground;
@@ -786,7 +777,7 @@ begin
          ctime  := 90;
          ruid   := UID_UWeaponFactory;
       end;
-      if(uid=UID_UPTurret) then
+      if(uidi=UID_UPTurret) then
       begin
          mhits  := 400;
          uf     := uf_ground;
@@ -801,7 +792,7 @@ begin
          ctime  := 20;
          ruid   := UID_UVehicleFactory;
       end;
-      if(uid=UID_URocketL) then
+      if(uidi=UID_URocketL) then
       begin
          mhits  := 500;
          uf     := uf_ground;
@@ -816,7 +807,7 @@ begin
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
       end;
-      if(uid=UID_URTurret) then
+      if(uidi=UID_URTurret) then
       begin
          mhits  := 500;
          uf     := uf_ground;
@@ -833,7 +824,7 @@ begin
          rupgr  := upgr_rturrets;
          arf    := (sr div 5)*4;
       end;
-      if(uid=UID_UNuclearPlant) then
+      if(uidi=UID_UNuclearPlant) then
       begin
          mhits  := 2000;
          uf     := uf_ground;
@@ -848,7 +839,7 @@ begin
          ruid   := UID_UWeaponFactory;
       end;
 
-      if(uid=UID_Mine) then
+      if(uidi=UID_UMine) then
       begin
          mhits  := 1;
          uf     := uf_ground;
@@ -863,7 +854,7 @@ begin
          bld_s  :=0;
       end;
 
-      if(uid=UID_UTransport)then
+      if(uidi=UID_UTransport)then
       begin
          mhits  := 700;
          r      := 35;
@@ -876,7 +867,7 @@ begin
          trt    := vid_fps*90;
       end;
 
-      if(uid=UID_USPort) then
+      if(uidi=UID_USPort) then
       begin
          mhits  := 6000;
          r      := 110;
@@ -890,7 +881,7 @@ begin
          rld_r  := vid_fps*180;
       end;
 
-      if(uid=UID_UCBuild) then
+      if(uidi=UID_UCBuild) then
       begin
          mhits  := 5000;
          r      := 110;
@@ -902,7 +893,7 @@ begin
          generg := 1;
          anims  := x mod 4;
       end;
-      if(uid in [UID_UBaseMil,UID_UBaseCom,UID_UBaseRef,UID_UBaseNuc,UID_UBaseLab])then
+      if(uidi in [UID_UBaseMil,UID_UBaseCom,UID_UBaseRef,UID_UBaseNuc,UID_UBaseLab])then
       begin
          mhits  := 5000;
          uf     := uf_ground;
@@ -912,7 +903,7 @@ begin
          generg := 2;
          isbuild:= true;
       end;
-      if(uid=UID_UBaseGen) then
+      if(uidi=UID_UBaseGen) then
       begin
          mhits  := 2000;
          uf     := uf_ground;
@@ -924,28 +915,14 @@ begin
          isbuild:= true;
       end;
 
-      if(uid=UID_Portal)then
+      if(uidi=UID_UPortal)then
       begin
-         mhits  := 10000;
+         mhits  := 20000;
          uf     := uf_ground;
          sr     := base_r;
          ucl    := 15;
          r      := 110;
          generg := 1;
-         isbuild:= true;
-         solid  := false;
-         rld_a  := 0;
-         rld_r  := vid_fps;
-      end;
-
-      if(uid=UID_CoopPortal)then
-      begin
-         mhits  := 20000;
-         uf     := uf_ground;
-         sr     := base_r;
-         ucl    := 16;
-         r      := 110;
-         generg := 100;
          isbuild:= true;
          solid  := false;
          rld_a  := 0;
@@ -959,8 +936,9 @@ begin
       if(ctime>0)then
       begin
          bld_s:=(mhits div 2) div ctime;
-         if(bld_s=0)then bld_s:=1;
+
       end;
+      if(bld_s<=0)then bld_s:=1;
 
       if(isbuild)then
       begin
@@ -982,17 +960,432 @@ begin
    end;
 end;
 
+procedure initUIDS;
+var i:byte;
+begin
+   for i:=0 to 255 do
+   with _uids[i] do
+   begin
+      _mhits     := 100;
+      _max       := 32000;
+      _btime     := 1;
+      _uf        := uf_ground;
+      _ucl       := _uts;
+
+      _isbuilding:=false;
+      _isbuilder :=false;
+      _issmith   :=false;
+      _isbarrack :=false;
+      _ismech    :=false;
+      _issolid   :=true;
+
+      {
+      _mhits,
+      _speed,
+      _r ,
+      _sr,
+      _max,
+      _renerg,
+      _generg,
+      _ttime,
+      _btime,
+      _bstep,
+      _painc,
+      _apcs,
+      _apcm
+                   : integer;
+      _uf,
+      _ucl,
+      _ruid,
+      _rupgr       : byte;
+
+      _shcf        : single;
+
+      _isbuilding,
+      _isbuilder,
+      _issmith,
+      _isbarrack,
+      _ismech,
+      _issolid     : boolean;       }
+
+      case i of
+//         HELL BUILDINGS   ////////////////////////////////////////////////////
+UID_HKeep:
+begin
+   _mhits     := 3000;
+   _renerg    := 8;
+   _generg    := 6;
+   _r         := 66;
+   _ucl       := 0;
+   _btime     := 90;
+
+   _isbuilding:= true;
+   _isbuilder := true;
+
+   ups_builder:= [UID_HKeep..UID_HFortress];
+end;
+UID_HGate:
+begin
+   _mhits     := 1500;
+   _renerg    := 4;
+   _ucl       := 1;
+   _btime     := 40;
+
+   _isbuilding:= true;
+   _isbarrack := true;
+
+   ups_units  := [UID_LostSoul..UID_Archvile];
+end;
+UID_HSymbol:
+begin
+   _mhits     := 200;
+   _renerg    := 1;
+   _generg    := 1;
+   _ucl       := 2;
+   _btime     := 10;
+
+   _isbuilding:= true;
+end;
+UID_HPools:
+begin
+   _mhits     := 1000;
+   _renerg    := 6;
+
+   _isbuilding:= true;
+   _issmith   := true;
+end;
+UID_HTower:
+begin
+   _mhits     := 700;
+   _renerg    := 2;
+
+   _isbuilding:= true;
+end;
+UID_HTeleport:
+begin
+   _mhits     := 500;
+   _renerg    := 4;
+
+   _isbuilding:= true;
+end;
+UID_HMonastery:
+begin
+   _mhits     := 1000;
+   _renerg    := 10;
+   _max       := 1;
+   _ruid      := UID_HPools;
+
+   _isbuilding:= true;
+end;
+UID_HTotem:
+begin
+   _mhits     := 700;
+   _renerg    := 3;
+   _ruid      := UID_HMonastery;
+   _rupgr     := upgr_2tier;
+
+   _isbuilding:= true;
+end;
+UID_HAltar:
+begin
+   _mhits     := 500;
+   _renerg    := 4;
+   _max       := 1;
+   _ruid      := UID_HMonastery;
+   _rupgr     := upgr_2tier;
+
+   _isbuilding:= true;
+end;
+UID_HFortress:
+begin
+   _mhits     := 4000;
+   _renerg    := 10;
+   _generg    := 4;
+   _max       := 1;
+   _ruid      := UID_HPools;
+
+   _isbuilding:= true;
+   _isbuilder := true;
+
+   ups_builder:=[UID_HKeep..UID_HAltar]-[UID_HFortress];
+end;
+UID_HEye:
+begin
+   _mhits     := 240;
+
+   _isbuilding:= true;
+   _issolid   := false;
+end;
+UID_HCommandCenter:  //UID_UCommandCenter
+begin
+   _mhits     := 3000;
+   _renerg    := 8;
+   _generg    := 6;
+
+   _isbuilding:= true;
+
+   ups_builder:=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HMilitaryUnit];
+   ups_apc    :=demons;
+end;
+UID_HMilitaryUnit:
+begin
+   _mhits     := 1500;
+   _renerg    := 4;
+
+   _isbuilding:=true;
+   _isbarrack :=true;
+
+   ups_units  :=zimbas;
+end;
+//////////////////////////////
+
+UID_LostSoul   :
+begin
+   _mhits     := 90;
+   _renerg    := 1;
+   _r         := 10;
+   _speed     := 23;
+end;
+UID_Imp        :
+begin
+   _mhits     := 70;
+   _renerg    := 1;
+   _r         := 11;
+   _speed     := 9;
+end;
+UID_Demon      :
+begin
+   _mhits     := 150;
+   _renerg    := 2;
+end;
+UID_Cacodemon  :
+begin
+   _mhits     := 225;
+   _renerg    := 2;
+end;
+UID_Baron      :
+begin
+   _mhits     := 350;
+   _renerg    := 4;
+end;
+UID_Cyberdemon :
+begin
+   _mhits     := 2000;
+   _renerg    := 10;
+   _max       := 1;
+end;
+UID_Mastermind :
+begin
+   _mhits     := 2000;
+   _renerg    := 10;
+   _max       := 1;
+end;
+UID_Pain       :
+begin
+end;
+UID_Revenant   :
+begin
+end;
+UID_Mancubus   :
+begin
+end;
+UID_Arachnotron:
+begin
+end;
+UID_Archvile   :
+begin
+end;
+
+UID_ZFormer    :
+begin
+end;
+UID_ZEngineer  :
+begin
+end;
+UID_ZSergant   :
+begin
+end;
+UID_ZCommando  :
+begin
+end;
+UID_ZBomber    :
+begin
+end;
+UID_ZMajor     :
+begin
+end;
+UID_ZBFG       :
+begin
+end;
+
+
+//         UAC BUILDINGS   /////////////////////////////////////////////////////
+UID_UCommandCenter:
+begin
+   _isbuilding:= true;
+   _isbuilder := true;
+
+   ups_builder:=[UID_UCommandCenter..UID_UNuclearPlant];
+end;
+UID_UMilitaryUnit:
+begin
+   _isbuilding:=true;
+   _isbarrack :=true;
+
+   ups_units:=marines+[UID_APC,UID_FAPC,UID_Terminator,UID_Tank,UID_Flyer];
+end;
+UID_UGenerator:
+begin
+   _isbuilding:=true;
+end;
+UID_UWeaponFactory:
+begin
+   _isbuilding:=true;
+   _issmith   :=true;
+end;
+UID_UTurret:
+begin
+   _isbuilding:=true;
+
+end;
+UID_URadar:
+begin
+   _isbuilding:=true;
+
+end;
+UID_UVehicleFactory :
+begin
+   _isbuilding:=true;
+
+end;
+UID_UPTurret:
+begin
+   _isbuilding:=true;
+
+end;
+UID_URocketL:
+begin
+   _isbuilding:=true;
+
+end;
+UID_URTurret:
+begin
+   _isbuilding:=true;
+
+end;
+UID_UNuclearPlant:
+begin
+   _renerg    := 10;
+   _max       := 1;
+
+   _isbuilding:=true;
+
+end;
+UID_UMine:
+begin
+
+end;
+
+
+UID_Engineer:
+begin
+end;
+UID_Medic   :
+begin
+end;
+UID_Sergant :
+begin
+end;
+UID_Commando:
+begin
+end;
+UID_Bomber  :
+begin
+end;
+UID_Major   :
+begin
+end;
+UID_BFG     :
+begin
+end;
+
+UID_FAPC:
+begin
+   ups_apc    :=marines+[UID_APC,UID_Terminator,UID_Tank,UID_Flyer];
+
+end;
+UID_APC:
+begin
+   ups_apc    :=marines;
+end;
+
+
+UID_Terminator:
+begin
+end;
+UID_Tank:
+begin
+end;
+UID_Flyer:
+begin
+end;
+UID_UTransport:
+begin
+end;
+
+UID_UBaseMil:
+begin
+end;
+UID_UBaseCom:
+begin
+end;
+UID_UBaseGen:
+begin
+end;
+UID_UBaseRef:
+begin
+end;
+UID_UBaseNuc:
+begin
+end;
+UID_UBaseLab:
+begin
+end;
+UID_UCBuild:
+begin
+end;
+UID_USPort:
+begin
+end;
+UID_UPortal:
+begin
+end;
+      end;
+
+
+      _ismech:=_ismech or _isbuilding;
+
+      _shcf:=_mhits/_mms;
+
+      {$IFDEF _FULLGAME}
+      _fr:=(_r div fog_cw)+1;
+      if(_fr<1)then _fr:=1;
+      {$ENDIF}
+   end;
+end;
+
 procedure initUnits;
 var i,rc:byte;
 begin
-   FillChar(uids_builder,SizeOf(uids_builder),0);
-   FillChar(uids_units  ,SizeOf(uids_units  ),0);
-   FillChar(uids_apc    ,SizeOf(uids_apc    ),0);
-   FillChar(cl2uid      ,SizeOf(cl2uid      ),0);
-   FillChar(_ulst       ,SizeOf(_ulst       ),0);
+   FillChar(cl2uid,SizeOf(cl2uid),0);
+   FillChar(_ulst ,SizeOf(_ulst ),0);
+   FillChar(_uids ,SizeOf(_uids ),0);
+
+   initUIDS;
+
    for i:=0 to 255 do
    begin
-      _ulst[i].uid:=i;
+      _ulst[i].uidi:=i;
       _unit_sclass(@_ulst[i]);
       with _ulst[i] do
        if(ucl<=_uts)then

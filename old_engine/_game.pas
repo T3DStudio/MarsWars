@@ -52,18 +52,18 @@ begin
        ai_pushtimei:= 0;
        ai_pushfrmi := 0;
 
-       _bc_ss(@a_build,[0..14]);
-       _bc_ss(@a_units,[0..18]);
-       _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+       a_build := [0..14];
+       a_units := [0..18];
+       a_upgr  := [0..MaxUpgrs];
    end;
 
    with _players[0] do
    begin
       race     :=r_hell;
       state    :=ps_comp;
-      a_build  :=0;
-      a_units  :=0;
-      a_upgr   :=0;
+      a_build  :=[];
+      a_units  :=[];
+      a_upgr   :=[];
    end;
 
    {$IFDEF _FULLGAME}
@@ -229,7 +229,7 @@ begin
    case g_mode of
    gm_coop: begin
             with _players[0] do ai_skill:=250;
-            _unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
+            //_unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
             end;
    gm_inv : with _players[0] do ai_skill:=8;
    end;
@@ -407,12 +407,12 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
 
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                 if(_lsuc=uid)then
+                 if(_lsuc=uidi)then
                   sel:=((o_x0-r)<=vx)and(vx<=(o_x1+r))and((o_y0-r)<=vy)and(vy<=(o_y1+r));
 
                 if(o_id=uo_specsel)then
                  case o_x0 of
-                    0 : if(speed>0)and(uid in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
+                    0 : if(speed>0)and(uidi in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
                  else
                     if(o_x0 in _sbs_ucls)then
                      if(ucl_x[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
@@ -429,7 +429,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(sel)then
                 begin
                    case o_id of
-               uo_select     : _lsuc:=uid;
+               uo_select     : _lsuc:=uidi;
                uo_setorder,
                uo_addorder   : order:=o_x0;
                uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - point
@@ -441,7 +441,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_y  :=o_y1;
                                      uo_bx :=-1;
 
-                                     case uid of
+                                     case uidi of
                                       UID_HKeep         : _unit_bteleport(pu);
                                       UID_URadar        : _unit_uradar   (pu);
                                       UID_URocketL      : _unit_URocketL (pu);
@@ -514,8 +514,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      end;
                                   end;
                     co_paction :  begin
-                                     uo_x  :=x;
-                                     uo_y  :=y;
+                                     uo_x  :=o_x1;
+                                     uo_y  :=o_y1;
                                      uo_bx :=-1;
                                      tar1  :=0;
                                      uo_tar:=0;
@@ -548,8 +548,10 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
             else inc(u,1);
          end;
 
-         if(o_id in [uo_select,uo_aselect])then
-          if(scnt=0)then _lsuc:=255;
+         case o_id of
+         uo_select,
+         uo_aselect : if(scnt=0)then _lsuc:=255;
+         end;
       end;
 
       o_id:=0;

@@ -31,9 +31,9 @@ begin
 
       case ai_skill of
       0 : begin
-             _bc_ss(@a_build,[]);
-             _bc_ss(@a_units,[]);
-             _bc_ss(@a_upgr ,[]);
+             a_build := [];
+             a_units := [];
+             a_upgr  := [];
 
              ai_pushtime := vid_fps;
              ai_towngrd  := 100;
@@ -41,9 +41,9 @@ begin
              ai_pushmin  := 0;
           end;
       1 : begin
-             _bc_ss(@a_build,[0..2]);
-             _bc_ss(@a_units,[0..2]);
-             _bc_ss(@a_upgr ,[    ]);
+             a_build := [0..2];
+             a_units := [0..2];
+             a_upgr  := [    ];
 
              ai_pushtime := vid_fps*240;
              ai_towngrd  := 9;
@@ -51,12 +51,12 @@ begin
              ai_pushmin  := ai_maxunits-5;
           end;
       2 : begin  // ITYTD
-             _bc_ss(@a_build,[0..3]);
+             a_build := [0..3];
              case race of
-             r_hell: _bc_ss(@a_units,[0..3  ]);
-             r_uac : _bc_ss(@a_units,[0..3,7]);
+             r_hell: a_units := [0..3  ];
+             r_uac : a_units := [0..3,7];
              end;
-             _bc_ss(@a_upgr ,[0..5,6]);
+             a_upgr := [0..5,6];
 
              ai_pushtime := vid_fps*240;
              ai_towngrd  := 17;
@@ -64,12 +64,12 @@ begin
              ai_pushmin  := ai_maxunits-5;
           end;
       3 : begin  // HNTR
-             _bc_ss(@a_build,[0..6]);
+             a_build := [0..6];
              case race of
-             r_hell: _bc_ss(@a_units,[0..4  ]);
-             r_uac : _bc_ss(@a_units,[0..4,7]);
+             r_hell: a_units := [0..4  ];
+             r_uac : a_units := [0..4,7];
              end;
-             _bc_ss(@a_upgr ,[0..upgr_2tier-1]);
+             a_upgr := [0..upgr_2tier-1];
 
              ai_pushtime := vid_fps*240;
              ai_towngrd  := 20;
@@ -77,12 +77,12 @@ begin
              ai_pushmin  := ai_maxunits-5;
           end;
       4 : begin  // HMP
-             _bc_ss(@a_build,[0..7,9]);
+             a_build := [0..7,9];
              case race of
-             r_hell: _bc_ss(@a_units,[0..5,8..10]);
-             r_uac : _bc_ss(@a_units,[0..9      ]);
+             r_hell: a_units := [0..5,8..10];
+             r_uac : a_units := [0..9      ];
              end;
-             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             a_upgr := [0..MaxUpgrs];
 
              ai_pushtime := vid_fps*180;
              ai_towngrd  := 10;
@@ -90,36 +90,36 @@ begin
              ai_pushmin  := ai_maxunits-5;
           end;
       5 : begin  // UV
-             _bc_ss(@a_build,[0..14]);
-             _bc_ss(@a_units,[0..11]);
-             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             a_build := [0..14];
+             a_units := [0..11];
+             a_upgr  := [0..MaxUpgrs];
              ai_pushtime := vid_fps*60;
           end;
       6 : begin  // Nightmare
-             _bc_ss(@a_build,[0..14]);
-             _bc_ss(@a_units,[0..11]);
-             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             a_build := [0..14];
+             a_units := [0..11];
+             a_upgr  := [0..MaxUpgrs];
 
              _upgr_ss(@upgr ,[upgr_mainr],race,1);
           end;
       7 : begin  // Super Nightmare
-             _bc_ss(@a_build,[0..14]);
-             _bc_ss(@a_units,[0..11]);
-             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             a_build := [0..14];
+             a_units := [0..11];
+             a_upgr  := [0..MaxUpgrs];
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld],race,1);
           end;
       8 : begin  // HELL
-             _bc_ss(@a_build,[0..14]);
-             _bc_ss(@a_units,[0..11]);
-             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+             a_build := [0..14];
+             a_units := [0..11];
+             a_upgr  := [0..MaxUpgrs];
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld,upgr_advbar],race,1);
           end;
       250:begin // assault AI
-            _bc_ss(@a_build,[]);
-            _bc_ss(@a_units,[]);
-            _bc_ss(@a_upgr ,[]);
+            a_build := [];
+            a_units := [];
+            a_upgr  := [];
 
             ai_pushtime := vid_fps;
             ai_towngrd  := 100;
@@ -132,9 +132,9 @@ begin
             exit;
           end;
       else
-         a_build:=0;
-         a_units:=0;
-         a_upgr :=0;
+         a_build:=[];
+         a_units:=[];
+         a_upgr :=[];
       end;
 
       case race of
@@ -147,10 +147,10 @@ begin
             end
             else ai_flags   :=ai_flags+aif_pushgrnd;
             case ai_skill of //
-          0,1  : _bc_sa(@a_units,[12    ]);
-          2    : _bc_sa(@a_units,[12..13]);
-          3    : _bc_sa(@a_units,[12..15]);
-            else _bc_sa(@a_units,[12..18]);
+          0,1  : a_units := [12    ];
+          2    : a_units := [12..13];
+          3    : a_units := [12..15];
+            else a_units := [12..18];
             end;
          end;
       r_uac :
@@ -204,7 +204,7 @@ begin
 
    with pu^ do
     with player^ do
-     case uid of
+     case uidi of
        UID_URocketL  : if(rld_t=0)then
                        begin
                           uo_x:=alrm_x;
@@ -236,15 +236,15 @@ begin
    with pu^ do
    with player^ do
    begin
-      case uid of
+      case uidi of
       UID_LostSoul,
       UID_HEye: if(ud<sr)then
                  if(teams)then
                  begin
-                    if(tu^.uid=UID_HEye)then inc(ai_uc_a,1);
+                    if(tu^.uidi=UID_HEye)then inc(ai_uc_a,1);
                  end
                  else
-                   if not(tu^.uid in [UID_UCommandCenter,UID_HCommandCenter])then inc(ai_uc_e,1);
+                   if not(tu^.uidi in [UID_UCommandCenter,UID_HCommandCenter])then inc(ai_uc_e,1);
       UID_URadar:
                 if(teams)and(ud<ai_apcd)and(tu^.alrm_r<=0)then
                 begin
@@ -263,11 +263,11 @@ begin
                  if(teams=false)
                  then inc(ai_uc_e,1)
                  else
-                   if(tu^.uid=UID_Mine)then inc(ai_uc_a,1);
+                   if(tu^.uidi=UID_UMine)then inc(ai_uc_a,1);
       UID_HCommandCenter,
       UID_UCommandCenter:
                 begin
-                   if(uid_x[uid]=unum)and(tu^.uid=uid)then
+                   if(uid_x[uidi]=unum)and(tu^.uidi=uidi)then
                    begin
                       if(ai_apcd=32000)then
                       begin
@@ -282,7 +282,7 @@ begin
 
                    if(ud<sr)then
                     if(tu^.isbuild=false)
-                    or((tu^.uid=uid)and(tu^.speed>0)and(upgr[upgr_ucomatt]>0))then
+                    or((tu^.uidi=uidi)and(tu^.speed>0)and(upgr[upgr_ucomatt]>0))then
                      if(teams)
                      then inc(ai_uc_a,tu^.ucl)
                      else inc(ai_uc_e,tu^.ucl);
@@ -306,7 +306,7 @@ begin
 
       if(tu^.isbuild)and(tu^.uf=uf_ground)and(tu^.speed=0)then
        if(ud<ai_bd)and(tu^.buff[ub_invis]=0)then
-        if not(tu^.uid in [UID_Mine,UID_HEye])then
+        if not(tu^.uidi in [UID_UMine,UID_HEye])then
         begin
            ai_bd:=ud;
            ai_bx:=tu^.x;
@@ -336,7 +336,7 @@ begin
            end;
 
          if(isbuild=false)and(race=r_uac)and(cf(@ai_flags,@aif_usex6))then
-          if(tu^.uid=UID_UVehicleFactory)and(buff[ub_advanced]=0)and(tu^.buff[ub_advanced]>0)and(tu^.rld_t=0)and(ud<base_rr)and(alrm_r>base_r)then
+          if(tu^.uidi=UID_UVehicleFactory)and(buff[ub_advanced]=0)and(tu^.buff[ub_advanced]>0)and(tu^.rld_t=0)and(ud<base_rr)and(alrm_r>base_r)then
           begin
              order:=1;
              uo_x :=tu^.x;
@@ -345,12 +345,12 @@ begin
           end;
 
          if(race=r_hell)then
-          case uid of
+          case uidi of
           UID_HMonastery:
             if(cf(@ai_flags,@aif_usex6))then
-            if(tu^.uid in demons)and(tu^.buff[ub_advanced]=0)and(upgr[upgr_6bld]>0)and(tu^.isbuild=false)then
+            if(tu^.uidi in demons)and(tu^.buff[ub_advanced]=0)and(upgr[upgr_6bld]>0)and(tu^.isbuild=false)then
             begin
-               if(tu^.uid=UID_LostSoul)and(ucl_e[false,7]>0)then exit;
+               if(tu^.uidi=UID_LostSoul)and(ucl_e[false,7]>0)then exit;
                dec(upgr[upgr_6bld],1);
                tu^.buff[ub_advanced]:=_bufinf;
                {$IFDEF _FULLGAME}
@@ -364,7 +364,7 @@ begin
             if(tu^.tar1>0)and(tu^.hits<tu^.mhits)then
             begin
                if(ucl_c[false]>10)then
-                if(tu^.ucl<2)or(tu^.uid in [UID_Pain,UID_ZFormer])then exit;
+                if(tu^.ucl<2)or(tu^.uidi in [UID_Pain,UID_ZFormer])then exit;
                dec(upgr[upgr_hinvuln],1);
                tu^.buff[ub_invuln]:=hinvuln_time;
                {$IFDEF _FULLGAME}
@@ -470,7 +470,7 @@ ucl_bx9: ucl:=9;
       else exit;
       end;
       if(ucl>_uts)then exit;
-      if not(cl2uid[race,true,ucl] in uids_builder[builderuid])then exit;
+      if not(cl2uid[race,true,ucl] in _uids[builderuid].ups_builder)then exit;
       if(ucl_e[true,ucl]>=cnt)then exit;
    end;
    if(_bldCndt(@_players[bp],ucl))then exit;
@@ -572,7 +572,7 @@ begin
    with player^ do
    if(ucl_c[false]<ai_maxunits)then
    begin
-      if(uid=UID_HMilitaryUnit)then
+      if(uidi=UID_HMilitaryUnit)then
       begin
          _unit_straining(pu,12+random(7));
          exit;
@@ -703,7 +703,7 @@ begin
                  if(mhits>110)then
                  begin
                     ust:=4+upgr[upgr_5bld]*2;
-                    case uid of
+                    case uidi of
                    UID_Baron:     if(ust<=_uclord)then exit;
                    UID_Cacodemon: if(ust< _uclord)then exit;
                    UID_Mastermind,
@@ -916,13 +916,13 @@ begin
       if(c_twr<n_twr)then bucls:=bucls+[ucl_twr];
 
       if(isbuilder)and
-        (speed  =0)then ai_trybuild(x,y,sr,playeri,uid,(alrm_r<base_rr)and(cf(@ai_flags,@aif_alrmtwrs)),@bucls);
+        (speed  =0)then ai_trybuild(x,y,sr,playeri,uidi,(alrm_r<base_rr)and(cf(@ai_flags,@aif_alrmtwrs)),@bucls);
       if(isbarrack)then ai_utr(pu,0);
       if(issmith  )then ai_upgrs(pu);
 
-      case uid of
+      case uidi of
 UID_HKeep :
-         if(hits<1500)and(tar1>0)and(uid_e[uid]<3)then
+         if(hits<1500)and(tar1>0)and(uid_e[uidi]<3)then
          begin
             if(cf(@ai_flags,@aif_CCescape))then
             begin
@@ -933,7 +933,7 @@ UID_HKeep :
          end
          else
            if(cf(@ai_flags,@aif_CCattack))then
-            if(uid_eb[uid]>11)and(upgr[upgr_paina]>1)and(ucl_c[false]>40)then
+            if(uid_eb[uidi]>11)and(upgr[upgr_paina]>1)and(ucl_c[false]>40)then
             begin
                uo_x:=alrm_x-randomr(base_r);
                uo_y:=alrm_y-randomr(base_r);
@@ -971,7 +971,7 @@ UID_URadar:
       end;
 
       if(cf(@ai_flags,@aif_twrtlprt))then
-      case uid of
+      case uidi of
 UID_HTotem:
          if(upgr[upgr_b478tel]>0)and(alrm_x>0)then
          begin
@@ -1003,14 +1003,14 @@ UID_HSymbol:
       end;
 
       if(cf(@ai_flags,@aif_specblds))then
-      case uid of
+      case uidi of
 UID_HEye:
          begin
             if(alrm_r<base_r)then rld_a:=vid_fps;
             if(rld_a>0)then dec(rld_a,1);
             if(rld_a<=0)or(ai_uc_a>2)or(alrm_r>base_rr)then _unit_kill(pu,false,false);
          end;
-UID_Mine:
+UID_UMine:
          begin
             t:=buff[ub_advanced];
             if(g_addon=false)or(upgr[upgr_minesen]>0)then
@@ -1024,7 +1024,7 @@ UID_Mine:
       end;
 
       if(cf(@ai_flags,@aif_usex9))then
-      case uid of
+      case uidi of
 UID_UWeaponFactory,
 UID_HPools,
 UID_UMilitaryUnit,
@@ -1037,18 +1037,18 @@ UID_HGate:
       inc(n_smt,2);
 
       if(cf(@ai_flags,@aif_destrblds))then
-      case uid of
+      case uidi of
 UID_HSymbol,
 UID_UGenerator:
          if(bld)and(menerg>_ai_get_max_enrg(playeri,true))then _unit_kill(pu,false,false);
 UID_UMilitaryUnit,
 UID_HMilitaryUnit,
 UID_HGate:
-         if(uid_x[uid]<>unum)and(bld)and(ai_uprod_status(pu)=false)then
+         if(uid_x[uidi]<>unum)and(bld)and(ai_uprod_status(pu)=false)then
           if(ai_uprods>n_bar)then _unit_kill(pu,false,false);
 UID_HPools,
 UID_UWeaponFactory:
-         if(uid_x[uid]<>unum)and(ai_uprod_status(pu)=false)then
+         if(uid_x[uidi]<>unum)and(ai_uprod_status(pu)=false)then
           if(ai_pprods>n_smt)then _unit_kill(pu,false,false);
 UID_UTurret,
 UID_UPTurret,
@@ -1074,7 +1074,7 @@ begin
       end;
 
       if(cf(@ai_flags,@aif_pushuids))then
-       if not(uid in ai_pushuids)then exit;
+       if not(uidi in ai_pushuids)then exit;
 
       if(uf=uf_ground)then
        if(cf(@ai_flags,@aif_pushgrnd)=false)then exit;
@@ -1097,10 +1097,10 @@ begin
 
       if(cf(@ai_flags,@aif_hrrsmnt))then
       begin
-         case uid of
+         case uidi of
 UID_LostSoul : order:=2;
 UID_Imp,
-UID_Demon    : if(uid_eb[uid]>5)then order:=3;
+UID_Demon    : if(uid_eb[uidi]>5)then order:=3;
          end;
       end;
 
@@ -1207,18 +1207,18 @@ begin
 
       //if(g_mode=gm_inv)and(playern=0)then exit;
 
-      case uid of
+      case uidi of
       UID_Major,
       UID_ZMajor: if(uf=uf_ground)then _unit_action(pu);
       end;
 
-      case uid of
+      case uidi of
 UID_Engineer:if(alrm_r<=sr)then
              begin
                 if(cf(@ai_flags,@aif_unitaacts))then
                  if(melee=false)and(buff[ub_advanced]=0)and(alrm_b=false)then ai_outalrm(pu,0,false,false);
                 if(cf(@ai_flags,@aif_detecatcs))then
-                 if(uid=UID_Engineer)and(ai_uc_a<1)then _unit_action(pu);
+                 if(uidi=UID_Engineer)and(ai_uc_a<1)then _unit_action(pu);
              end;
 UID_LostSoul:if(ucl_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)then
              begin
@@ -1232,7 +1232,7 @@ UID_LostSoul:if(ucl_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)then
 
 
       if(cf(@ai_flags,@aif_unitaacts))then
-      case uid of
+      case uidi of
 UID_FAPC:    ai_outalrm(pu,250,false,true);
 UID_APC :    ai_outalrm(pu,225,false,true);
 UID_Medic:   if(alrm_r<=sr)then
