@@ -51,7 +51,7 @@ begin
    cmp_mmap[6]:=spr_c_earth;
    cmp_mmap[7]:=spr_c_earth;
 end;
-
+{
 function _cmp_chucl(tr,bp,bc,i:byte;bblds:TSoB):byte;
 var thc,brc,gc,twc:byte;
 begin
@@ -1459,4 +1459,4 @@ begin
    _moveHumView(map_psx[0],map_psy[0]);
 end;
 
-
+   }

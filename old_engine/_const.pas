@@ -5,72 +5,56 @@ ver                    : byte = 230;
 
 degtorad               = pi/180;
 
-vid_fps                = 60;
-vid_hfps               = vid_fps div 2;
-vid_hhfps              = vid_hfps div 2;
-vid_2fps               = vid_fps*2;
-vid_3fps               = vid_fps*3;
-vid_mpt                = trunc(1000/vid_fps)-1;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  FRAME RATE
+//
 
-NameLen                = 13;
-ChatLen                = 38;
+fr_fps                 = 70;
+fr_hfps                = fr_fps div 2;
+fr_hhfps               = fr_hfps div 2;
+fr_2fps                = fr_fps*2;
+fr_3fps                = fr_fps*3;
+fr_mpt                 = trunc(1000/fr_fps);
 
-ns_none                = 0;
-ns_srvr                = 1;
-ns_clnt                = 2;
 
-ps_none                = 0;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  BASE
+//
+
+ps_none                = 0;  // player state
 ps_play                = 1;
 ps_comp                = 2;
 
-gm_scir                = 0;
+gm_scir                = 0;  // game mode
 gm_2fort               = 1;
 gm_3fort               = 2;
 gm_ct                  = 3;
 gm_inv                 = 4;
 gm_coop                = 5;
 
-r_cnt                  = 2;
+r_cnt                  = 2;  // race
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
-uf_ground              = 0;
-uf_soaring             = 1;
-uf_fly                 = 2;
-
-NetTickN               = 2;
-
 MaxPlayers             = 6;
 MaxPlayerUnits         = 110;
-MaxDoodads             = 650;
-MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
-MaxNetChat             = 16;
-MaxNetBuffer           = 4096;
+
 MaxSMapW               = 7000;
 MinSMapW               = 3000;
 
-ddc_div                = 1000000;
-ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div;
-
-dcw                    = 200;
-dcn                    = MaxSMapW div dcw;
-
 build_b                = 5;
 
-_uts                   = 31;         //0-31
-_ubuffs                = 15;
-MaxUpgrs               = 24;
-_clupgrs               = _uts div 2; //0-15
-                                             // 60 140 220 300 380 460 540 620 700 780
-_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,195);
+////////////////////////////////////////////////////////////////////////////////
+//
+//  BASE STRINGS
+//
 
-ClientTTL              = vid_fps*10;
-
-outlogfn               : shortstring = 'out.txt';
-str_ver                = 'v50';
+str_ver                = 'v51';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
-str_cprt               : shortstring = '[ T3DStudio (c) 2016-2020 ]';
+str_cprt               : shortstring = '[ T3DStudio (c) 2016-2021 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');
 str_ps_t               : char = '?';
 str_ps_comp            : shortstring = 'AI';
@@ -78,6 +62,26 @@ str_ps_h               : char = '<';
 str_ps_none            : shortstring = '--';
 b2pm                   : array[false..true] of string[3] = (#15+'-'+#25,#18+'+'+#25);
 _str_mx                : array[0..12] of shortstring = ('-','x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12');
+
+outlogfn               : shortstring = 'out.txt';
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  NETGAME
+//
+
+                                             // 60 140 220 300 380 460 540 620 700 780
+_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,195);
+
+ClientTTL              = fr_fps*10;
+
+NetTickN               = 2;
+MaxNetChat             = 16;
+MaxNetBuffer           = 4096;
+
+ns_none                = 0;
+ns_srvr                = 1;
+ns_clnt                = 2;
 
 nmid_startinf          = 3;
 nmid_connect           = 4;
@@ -95,6 +99,11 @@ nmid_order             = 15;
 nmid_plout             = 16;
 nmid_getinfo           = 66;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  PLAYER ORDERS
+//
+
 uo_build               = 1;
 uo_dblselect           = 2;
 uo_adblselect          = 3;
@@ -105,6 +114,11 @@ uo_setorder            = 7;
 uo_corder              = 8;
 uo_specsel             = 9;
 uo_addorder            = 10;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT OTDERS
+//
 
 co_empty               = -32000;
 co_destroy             = -111;
@@ -124,11 +138,21 @@ co_suprod              = -83;
 co_cuprod              = -84;
 co_pcancle             = -85;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT ACTIONS
+//
+
 ua_move                = 1;
 ua_amove               = 2;
 ua_hold                = 3;
 ua_unload              = 4;
 ua_paction             = 5;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  AI FLAGS
+//
 
 aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
@@ -160,6 +184,13 @@ aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
 aif_stayathome         : cardinal = 1 shl 28; //
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT BUFFs
+//
+
+_ubuffs                = 15;
+
 ub_advanced            = 0;
 ub_pain                = 1;
 ub_toxin               = 2;
@@ -180,6 +211,21 @@ ub_teleeff             = 15;
 _bufinf                = 32000;
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  OBSTACLES
+//
+
+MaxDoodads             = 650;
+
+//
+ddc_div                = 1000000;
+ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div;
+
+// doodads cell
+dcw                    = 200;
+dcn                    = MaxSMapW div dcw;
+
 DID_LiquidR1           = 1;
 DID_LiquidR2           = 2;
 DID_LiquidR3           = 3;
@@ -193,124 +239,73 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 DID_R                  : array[0..7] of integer = (0,65,125,185,250,105,60,17);
 
 
-upgr_hell_attack       = 0;  // distance attack
-upgr_hell_armor        = 1;  // base armor
-upgr_hell_build        = 2;  // base b armor
-upgr_hell_melee        = 3;  // melee attack / repair/health upgr
-upgr_hell_regen        = 4;  // hell
-upgr_hell_pains        = 5;  // pain state
-upgr_hell_heye         = 6;  // Hell Eye
-upgr_hell_towers       = 7;  // towers sr
-upgr_hell_5bld         = 8;  // Teleport/Radar
-upgr_hell_mainm        = 9;  // Main b move
-upgr_hell_paina        = 10; // decay aura
-upgr_hell_mainr        = 11; // main sr
-upgr_hell_pinkspd      = 12; // demon speed
-upgr_hell_misfst       = 13; // missiles fast
-upgr_hell_6bld         = 14; // Souls / adv
-upgr_hell_2tier        = 15; // Tier 2
-upgr_hell_revtele      = 16; // revers teleport
-upgr_hell_revmis       = 17; // revenant missile
-upgr_hell_totminv      = 18; // totem and eye invisible
-upgr_hell_bldrep       = 19; // build repair
-upgr_hell_mainonr      = 20; // main on doodabs
-upgr_hell_b478tel      = 21; // teleport towers and altars
-upgr_hell_hinvuln      = 22; // hell invuln powerup
-upgr_hell_bldenrg      = 23; // additional energy
-upgr_hell_9bld         = 24; // 9 class building reload time
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UPGRADES
+//
+
+upgr_hell_attack       = 1;  // distance attack
+upgr_hell_armor        = 2;  // base armor
+upgr_hell_build        = 3;  // base b armor
+upgr_hell_melee        = 4;  // melee attack / repair/health upgr
+upgr_hell_regen        = 5;  // hell
+upgr_hell_pains        = 6;  // pain state
+upgr_hell_heye         = 7;  // Hell Eye
+upgr_hell_towers       = 8;  // towers sr
+upgr_hell_5bld         = 9;  // Teleport/Radar
+upgr_hell_mainm        = 10; // Main b move
+upgr_hell_paina        = 11; // decay aura
+upgr_hell_mainr        = 12; // main sr
+upgr_hell_pinkspd      = 13; // demon speed
+upgr_hell_misfst       = 14; // missiles fast
+upgr_hell_6bld         = 15; // Souls / adv
+upgr_hell_2tier        = 16; // Tier 2
+upgr_hell_revtele      = 17; // revers teleport
+upgr_hell_revmis       = 18; // revenant missile
+upgr_hell_totminv      = 19; // totem and eye invisible
+upgr_hell_bldrep       = 20; // build repair
+upgr_hell_mainonr      = 21; // main on doodabs
+upgr_hell_b478tel      = 22; // teleport towers and altars
+upgr_hell_hinvuln      = 23; // hell invuln powerup
+upgr_hell_bldenrg      = 24; // additional energy
+upgr_hell_9bld         = 25; // 9 class building reload time
 
 
-upgr_uac_attack        = 0;  // distance attack
-upgr_uac_armor         = 1;  // base armor
-upgr_uac_build         = 2;  // base b armor
-upgr_uac_melee         = 3;  // repair/health upgr
-upgr_uac_mspeed        = 4;  // infantry speed
-upgr_uac_plsmt         = 5;  // turrent for apcs
-upgr_uac_vision        = 6;  // detectors
-upgr_uac_towers        = 7;  // towers sr
-upgr_uac_5bld          = 8;  // Teleport/Radar
-upgr_uac_mainm         = 9;  // Main b move
-upgr_uac_ucomatt       = 10; // CC turret
-upgr_uac_mainr         = 11; // main sr
-upgr_uac_mines         = 12; // mines for engineers
-upgr_uac_minesen       = 13; // mine-sensor
-upgr_uac_6bld          = 14; // Souls / adv
-upgr_uac_2tier         = 15; // Tier 2
-upgr_uac_blizz         = 16; // blizzard launch
-upgr_uac_mechspd       = 17; // mech speed
-upgr_uac_mecharm       = 18; // mech arm
-upgr_uac_6bld2         = 19; // 6bld upgr
-upgr_uac_mainonr       = 20; // main on doodabs
-upgr_uac_turarm        = 21; // turrets armor
-upgr_uac_rturrets      = 22; // rocket turrets
-upgr_uac_bldenrg       = 23; // additional energy
-upgr_uac_9bld          = 24; // 9 class building reload time
+upgr_uac_attack        = 31; // distance attack
+upgr_uac_armor         = 32; // base armor
+upgr_uac_build         = 33; // base b armor
+upgr_uac_melee         = 34; // repair/health upgr
+upgr_uac_mspeed        = 35; // infantry speed
+upgr_uac_plsmt         = 36; // turrent for apcs
+upgr_uac_vision        = 37; // detectors
+upgr_uac_towers        = 38; // towers sr
+upgr_uac_5bld          = 39; // Teleport/Radar
+upgr_uac_mainm         = 40; // Main b move
+upgr_uac_ucomatt       = 41; // CC turret
+upgr_uac_mainr         = 42; // main sr
+upgr_uac_mines         = 43; // mines for engineers
+upgr_uac_minesen       = 44; // mine-sensor
+upgr_uac_6bld          = 45; // Souls / adv
+upgr_uac_2tier         = 46; // Tier 2
+upgr_uac_blizz         = 47; // blizzard launch
+upgr_uac_mechspd       = 48; // mech speed
+upgr_uac_mecharm       = 49; // mech arm
+upgr_uac_6bld2         = 50; // 6bld upgr
+upgr_uac_mainonr       = 51; // main on doodabs
+upgr_uac_turarm        = 52; // turrets armor
+upgr_uac_rturrets      = 53; // rocket turrets
+upgr_uac_bldenrg       = 54; // additional energy
+upgr_uac_9bld          = 55; // 9 class building reload time
+
+upgr_advbld            = 250;
+upgr_advbar            = 251;
+upgr_invuln            = 255;
 
 
-upgr_attack            = 0;  // distance attack
-upgr_armor             = 1;  // base armor
-upgr_build             = 2;  // base b armor
-upgr_melee             = 3;  // melee attack / repair/health upgr
-
-upgr_regen             = 4;  // hell
-upgr_mspeed            = 4;  // uac
-
-upgr_pains             = 5;  // pain state
-upgr_plsmt             = 5;  // plasma turrent for turret and apcs
-
-upgr_vision            = 6;  // detectors
-
-upgr_towers            = 7;  // towers sr
-
-upgr_5bld              = 8;  // Teleport/Radar
-upgr_mainm             = 9;  // Main b move
-
-upgr_ucomatt           = 10; // CC turret
-upgr_paina             = 10; // decay aura
-
-upgr_mainr             = 11; // main sr
-
-upgr_pinkspd           = 12; // demon speed
-upgr_mines             = 12; // mines for engineers
-
-upgr_misfst            = 13; // missiles fast
-upgr_minesen           = 13; // mine-sensor
-
-upgr_6bld              = 14; // Souls / adv
-
-upgr_2tier             = 15; // Tier 2
-
-upgr_revtele           = 16; // revers teleport
-upgr_blizz             = 16; // blizzard launch
-
-upgr_revmis            = 17; // revenant missile
-upgr_mechspd           = 17; // mech speed
-
-upgr_mecharm           = 18; // mech arm
-upgr_totminv           = 18; // totem and eye invisible
-
-upgr_6bld2             = 19; // 6bld upgr
-upgr_bldrep            = 19; // build repair
-
-upgr_mainonr           = 20; // main on doodabs
-
-upgr_b478tel           = 21; // teleport towers and altars
-upgr_turarm            = 21; // turrets armor
-
-upgr_hinvuln           = 22; // hell invuln powerup
-upgr_rturrets          = 22; // rocket turrets
-
-upgr_bldenrg           = 23; // additional energy
-
-upgr_9bld              = 24; // 9 class building reload time
-
-upgr_advbld            = 28;
-upgr_advbar            = 29;
-
-upgr_invuln            = 31;
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MISSILES
+//
 
 MID_Imp                = 101;
 MID_Cacodemon          = 102;
@@ -336,6 +331,18 @@ MID_ArchFire           = 121;
 MID_Flyer              = 122;
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNITS
+//
+
+MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
+MaxUnitWeapons         = 2; //0-2
+MaxUnitProds           = 1; //0-1
+
+uf_ground              = 0;
+uf_soaring             = 1;
+uf_fly                 = 2;
 
 UID_HKeep              = 1;
 UID_HGate              = 2;
@@ -410,7 +417,6 @@ UID_USPort             = 77;
 UID_UPortal            = 78;
 
 
-
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
@@ -432,9 +438,16 @@ armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
 armor_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  OTHER
+//
 
 
-upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
+NameLen                = 13;
+ChatLen                = 38;
+
+//upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
 ai_d2alrm              : array[false..true] of integer = (150,15);
 builder_enrg           : array[0..4] of byte = (6,7,8,9,10);
 base_r                 = 350;
@@ -444,20 +457,20 @@ base_ir                = base_r+(base_r div 2);
 base_rA                : array[0..2] of integer = (280,320,360);
 uaccc_fly              = 23;
 apc_exp_damage         = 70;
-regen_per              = vid_fps*2;
-_uclord_p              = vid_hfps+1;
+regen_per              = fr_fps*2;
+_uclord_p              = fr_hfps+1;
 vistime                = _uclord_p+1;
 gavno_dth_h            = -45;
-dead_hits              = -12*vid_fps;
-idead_hits             = dead_hits+vid_3fps;
+dead_hits              = -12*fr_fps;
+idead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
-radar_time             = vid_fps*30;
-radar_rlda             : array[0..5] of integer = (radar_time-vid_fps*3,radar_time-vid_fps*5,radar_time-vid_fps*7,radar_time-vid_fps*9,radar_time-vid_fps*11,radar_time-vid_fps*13);
+radar_time             = fr_fps*30;
+radar_rlda             : array[0..5] of integer = (radar_time-fr_fps*3,radar_time-fr_fps*5,radar_time-fr_fps*7,radar_time-fr_fps*9,radar_time-fr_fps*11,radar_time-fr_fps*13);
 radar_rsg              : array[0..5] of integer = (200,225,250,275,300,325);
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
 missile_mr             = 500;
-gear_time              : array[false..true] of byte = (vid_fps,vid_fps*2);
+gear_time              : array[false..true] of byte = (fr_fps,fr_fps*2);
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 rocket_sr              = 45;
@@ -465,25 +478,30 @@ map_ffly_fapc          : array[false..true] of byte = (3,6);
 map_gapc               : array[false..true] of byte = (8,5);
 towers_sr              : array[0..5] of integer = (250,265,280,295,310,325);
 blizz_r                = 150;
-mech_adv_rel           : array[false..true] of integer = (vid_fps*12,vid_fps*6);
-uac_adv_rel            : array[false..true] of integer = (vid_fps*3,vid_fps);
+mech_adv_rel           : array[false..true] of integer = (fr_fps*12,fr_fps*6);
+uac_adv_rel            : array[false..true] of integer = (fr_fps*3,fr_fps);
 g_ct_pr                = 150;
-g_ct_ct                : array[1..r_cnt] of integer = (vid_fps*10,vid_fps*5);
+g_ct_ct                : array[1..r_cnt] of integer = (fr_fps*10,fr_fps*5);
 bld_dec_mr             = 6;
 def_ai                 = 5;
-pain_time              = vid_hfps;
-hinvuln_time           = (vid_fps*30);
+pain_time              = fr_hfps;
+hinvuln_time           = (fr_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
-advprod_rld            : array[false..true] of integer = (vid_fps*120,vid_fps*60);
+advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
 _sbs_ucls              = [5,6,8];
 
 fly_height             = 30;
 
-MaxUnitProds           = 1;
+
 
 {$IFDEF _FULLGAME}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  HOTKEYS
+//
 
 _mhkeys  = 26;
 _hotkey1 : array[0.._mhkeys] of cardinal = (SDLK_R , SDLK_T , SDLK_Y ,
@@ -535,6 +553,11 @@ hp_pshield             = #8;
 adv_char               = #10;
 revenant_ra            : array[false..true] of integer = (45,20);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  EFFECTS
+//
+
 EID_BFG                = 200;
 EID_BExp               = 201;
 EID_BBExp              = 202;
@@ -555,7 +578,12 @@ EID_HAMU               = 216;
 EID_HMU                = 218;
 EID_HCC                = 219;
 
-vid_ifps               = vid_fps-1;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  VIDEO & UI
+//
+
+fr_ifps                = fr_fps-1;
 
 vid_bpp                = 32;
 vid_minw               = 800;
@@ -565,9 +593,9 @@ vid_maxh               = 768;
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
 vid_rtuir              = 6;
-vid_rtuis              = vid_fps div vid_rtuir;
+vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
-vid_uialrm_t           = vid_fps div (vid_rtuir div 3);
+vid_uialrm_t           = fr_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
 vid_uialrm_n           = 10;
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
@@ -586,11 +614,13 @@ vid_oips               = 2*vid_oiw+vid_oisw;
 vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
+
 ui_bottomsy            = vid_BW*4;
 ui_h3bw                = vid_BW-vid_tBW;
 ui_hwp                 = vid_panelw div 2;
-
 ui_tabsy               = vid_panelw+ui_h3bw;
+ui_builder_srs         = 127;
+ui_ubtns               = 23;
 
 ui_menu_map_zx0        = 76;
 ui_menu_map_zy0        = 110;
@@ -662,10 +692,23 @@ ui_menu_csm_xt0        = ui_menu_csm_x0+8;
 ui_menu_csm_xt1        = ui_menu_csm_x0+24;
 ui_menu_csm_xt2        = ui_menu_csm_x1-8;
 
+chat_type              : array[false..true] of char = ('|',' ');
+chat_shlm_t            = fr_fps*5;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SOUND
+//
+
 AUDIO_FREQUENCY        : INTEGER = MIX_DEFAULT_FREQUENCY; //22050;
 AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SAVE/LOAD/REPLAY
+//
 
 svld_size              = 231087;
 rpl_size               = 1574;
@@ -679,6 +722,11 @@ rpl_end                = 5;
 
 SvRpLen                = 15;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  FOG
+//
+
 MFogM                  = 30;
 fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
@@ -686,6 +734,11 @@ fog_cr                 = round(fog_chw*1.45);
 fog_cxr                = fog_cr-fog_chw;
 fog_vfwm               = (vid_maxw div fog_cw)+2;
 fog_vfhm               = (vid_maxh div fog_cw)+2;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  TEXT
+//
 
 ta_left                = 0;
 ta_middle              = 1;
@@ -696,6 +749,11 @@ font_iw                = font_w-1;
 
 txt_line_h             = 5;
 txt_line_h2            = 25-font_w;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MENU
+//
 
 ms1_sett               = 0;
 ms1_svld               = 1;
@@ -712,7 +770,10 @@ ms3_sond               = 2;
 MaxMissions            = 21;
 CMPMaxSkills           = 6;
 
-chat_shlm_t            = vid_fps*5;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  BASE STRINGS
+//
 
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MVSCR_';
@@ -726,13 +787,20 @@ str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
 
-chat_type              : array[false..true] of char = ('|',' ');
+////////////////////////////////////////////////////////////////////////////////
+//
+//  INPUT
+//
 
-k_chrtt                = vid_fps div 3;
+k_chrtt                = fr_fps div 3;
 k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
 k_kbdig                : set of Char = ['0'..'9'];
 k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP THEME
+//
 
 LiquidAnim             = 4;
 LiquidRs               = 4;

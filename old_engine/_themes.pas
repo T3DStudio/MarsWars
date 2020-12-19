@@ -16,7 +16,7 @@ begin
    if(trans)then SDL_SetColorKey(_xasurf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(_xasurf,0,0));
 end;
 
-procedure LPTUSpriteL(l:PTUSpriteL;str:shortstring;it:pinteger);
+procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
 var t:TMWSprite;
     i:integer;
 procedure next;begin inc(it^,1);setlength(l^,it^);l^[it^-1]:=t;end;
@@ -125,7 +125,7 @@ begin
     else SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0  ,0));
 end;
 
-procedure ThemeSetTrans(l:PTUSpriteL;it:pinteger;str:shortstring);
+procedure ThemeSetTrans(l:PTUSpriteList;it:pinteger;str:shortstring);
 var i,o,
  _iln:integer;
  _il :TIntList;
@@ -493,16 +493,16 @@ end;
 
 
 function _theme_anim_time(base:integer):integer;
-const vid_h3fps = vid_fps div 3;
-      vid_4fps  = vid_fps*4;
+const fr_h3fps = fr_fps div 3;
+      fr_4fps  = fr_fps*4;
 begin
    case base of
-   -1 : _theme_anim_time:=random(vid_h3fps)+vid_h3fps;
-   -2 : _theme_anim_time:=random(vid_2fps )+1;
-   -3 : _theme_anim_time:=random(vid_fps  )+1;
-   -4 : _theme_anim_time:=random(vid_2fps )+1;
-   -5 : _theme_anim_time:=random(vid_3fps )+1;
-   -6 : _theme_anim_time:=random(vid_4fps )+1;
+   -1 : _theme_anim_time:=random(fr_h3fps)+fr_h3fps;
+   -2 : _theme_anim_time:=random(fr_2fps )+1;
+   -3 : _theme_anim_time:=random(fr_fps  )+1;
+   -4 : _theme_anim_time:=random(fr_2fps )+1;
+   -5 : _theme_anim_time:=random(fr_3fps )+1;
+   -6 : _theme_anim_time:=random(fr_4fps )+1;
    else if(base>0)
         then _theme_anim_time:=base
         else _theme_anim_time:=-100;

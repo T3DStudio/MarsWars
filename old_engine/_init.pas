@@ -16,6 +16,7 @@ begin
 
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
+   _InitFogR;
    _GfxColors;
    _MakeScreen;
    _LoadingScreen;

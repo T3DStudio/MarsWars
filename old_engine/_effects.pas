@@ -64,7 +64,7 @@ begin
            EID_HMU,
            EID_HCC,
            EID_HAMU
-                         : t:=vid_fps;
+                         : t:=fr_fps;
          else
            t:=0;
          end;

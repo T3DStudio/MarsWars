@@ -7,27 +7,100 @@ pinteger = ^integer;
 TSob = set of byte;
 PTSoB = ^TSob;
 
+TUWeapon = record
+  aw_type,
+  aw_rupgr,
+  aw_ruid,
+  aw_mid   : byte;
+  aw_taru  : TSob;
+  aw_tarf,
+  aw_reqf  : cardinal;
+  aw_rng,
+  aw_mdmg,
+  aw_rlds,
+  aw_rldt  : integer;
+  {$IFDEF _FULLGAME}
+  aw_rlda  : integer;
+  aw_snd   : pMIX_CHUNK;
+  {$ENDIF}
+end;
+
+
+TUID = record
+   _mhits,
+   _speed,
+   _r ,
+   _srng,
+   _max,
+   _renerg,
+   _generg,
+   _btime,
+   _bstep,
+   _tstep,
+   _painc,
+   _apcs,
+   _apcm
+                : integer;
+   _urace,
+   _uf,
+   _btni,
+   _ruid,
+   _rupgr       : byte;
+
+   _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
+
+   _shcf        : single;
+
+   _isbuilding,
+   _isbuilder,
+   _issmith,
+   _isbarrack,
+   _ismech,
+   _issolid,
+   _addon       : boolean;
+
+   ups_builder,
+   ups_units,
+   ups_apc      : TSoB;
+   {$IFDEF _FULLGAME}
+   _fr          : integer;
+   un_btn,
+   un_sbtn      : pSDL_Surface;
+   un_name,
+   un_descr,
+   un_hint      : shortstring;
+   {$ENDIF}
+end;
+PTUID = ^TUID;
 TUpgrade = record
    _up_ruid,
    _up_rupgr,
-   _up_race : byte;
+   _up_btni,
+   _up_race  : byte;
+   _up_renerg,
    _up_time,
-   _up_cnt,
-   _up_mfrg : boolean;
+   _up_max   : integer;
+   _up_addon,
+   _up_mfrg  : boolean;
+
+   {$IFDEF _FULLGAME}
+   _up_btn   : pSDL_Surface;
+   _up_name,
+   _up_descr,
+   _up_hint  : shortstring;
+   {$ENDIF}
 end;
 
-upgrar = array[0.._uts] of byte;
-Pupgrar = ^upgrar;
 
 TPlayer = record
    name    : shortstring;
 
-   army,team,
-   race,state,
-   bld_r,mrace,
-   pnum
-           : byte;
+   team,
+   race,mrace,
+   bld_r,state,
+   pnum    : byte;
 
+   army,
    cenerg,
    menerg  : integer;
 
@@ -37,32 +110,31 @@ TPlayer = record
 o_x0,o_y0,
 o_x1,o_y1  :integer;
 
-   ucl_e,                                           // existed class
-   ucl_eb,                                          // existed class bld=true and hits>0
-   ucl_s   : array[false..true,0.._uts] of integer; // selected
-   ucl_x   : array[0.._uts] of integer;             // first unit class
+   ucl_e,                                        // existed class
+   ucl_eb,                                       // existed class bld=true and hits>0
+   ucl_s   : array[false..true,byte] of integer; // selected
+   ucl_x   : array[byte] of integer;             // first unit class
 
    uid_e,
    uid_eb,
    uid_s,
-   uid_x   : array[0..255 ] of integer;
+   uid_x   : array[byte] of integer;
 
    ucl_c,                                           // count buildings/units
    ucl_cs  : array[false..true] of integer;         // count selected buildings/units
 
-   uprodc  : array[0.._uts] of integer;
-   uprodu  : array[0..255 ] of integer;
    uprodm,
    uproda  : integer;
+   uprodc  : array[byte] of integer;
+   uprodu  : array[byte] of integer;
 
    pprodm,
    pproda  : integer;
-   upgrinp,
-   upgr    : upgrar;
+   pprodu,
+   upgr    : array[byte] of byte;
 
    a_upgr,
-   a_build,
-   a_units : TSoB;
+   a_units : array[byte] of integer;
 
 
    ai_pushfrmi,
@@ -95,85 +167,36 @@ end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
 
-TUID = record
-   _mhits,
-   _speed,
-   _r ,
-   _sr,
-   _max,
-   _renerg,
-   _generg,
-   _ttime,
-   _btime,
-   _bstep,
-   _painc,
-   _apcs,
-   _apcm
-                : integer;
-
-   _uf,
-   _ucl,
-   _ruid,
-   _rupgr       : byte;
-
-   _shcf        : single;
-
-   _isbuilding,
-   _isbuilder,
-   _issmith,
-   _isbarrack,
-   _ismech,
-   _issolid     : boolean;
-
-   ups_builder,
-   ups_units,
-   ups_apc      : TSoB;
-   {$IFDEF _FULLGAME}
-   _fr          : integer;
-
-   un_name,
-   un_descr,
-   un_hint      : shortstring;
-   {$ENDIF}
-end;
-PTUID = ^TUID;
-
 TUnit = record
    mmx,mmy,mmr,
    fx,fy,fsr,
    vx,vy,
    x,y,
-   anim,r,sr,ar,arf,anims,
-   speed,dir,rld_t,trt,
-   mhits,rld_a,rld_r,
-   bld_s,
+   anim,anims,animf,
+   r,srng,
+   speed,dir,rld,
    hits,
-   unum     : integer;
+   unum,
+   shadow   : integer;
 
-   renerg,
-   _fr,
-   foot,mdmg,
-   generg,uf,
-   _uclord,
+   uf,
+   uclord,
    vstp,order,
    playeri,
-   uidi,max,
-   shadow,
-   ucl,
-   ruid,rupgr
-            : byte;
+   uidi     : byte;
 
    uprod_r,
    pprod_r  : array[0..MaxUnitProds] of integer;
    uprod_t,
    pprod_t  : array[0..MaxUnitProds] of byte;
 
-   alrm_b   : boolean;
-   alrm_x,
-   alrm_y,
-   alrm_r,
-   tar1,
-   tar1d,
+   a_weap   : byte;
+   a_arng   : array[0..MaxUnitWeapons] of integer;
+   a_tx,
+   a_ty,
+   a_rld,
+   a_tar1,
+   a_tar1d,
    mv_x,mv_y,
    uo_bx,uo_by,
    uo_tar,
@@ -181,25 +204,18 @@ TUnit = record
    uo_y     : integer;
    uo_id    : byte;
 
-   inapc    : integer;
-   painc,
+   inapc,
    pains,
-   apcc,
    apcm,
-   apcs     : byte;
-
-   _shcf    : single;
+   apcc     : integer;
 
    buff     : array[0.._ubuffs] of integer;
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
-   isbuild,
-   isbuilder,
-   issmith,
-   isbarrack,
-   mech,bld,solid,
-   wanim,melee,
+   bld,
+   solid,
+   wanim,
    sel      : boolean;
 
    player   : PTPlayer;
@@ -208,13 +224,24 @@ end;
 PTUnit = ^TUnit;
 
 TMissile = record
-   x,y,vx,vy,dam,vst,tar,sr,dir,mtars,ntars:integer;
-   player,mid,mf:byte;
+   x,y,
+   vx,vy,
+   dam,
+   vst,
+   tar,
+   sr,
+   dir,
+   mtars,
+   ntars    : integer;
+   player,
+   mid,mf   : byte;
 end;
 
 TCTPoint = record
-   px,py,mpx,mpy,ct:integer;
-   pl:byte;
+   px,py,
+   mpx,mpy,
+   ct       : integer;
+   pl       : byte;
 end;
 
 {$IFDEF _FULLGAME}
@@ -229,16 +256,25 @@ TMWSprite = record
 end;
 PTMWSprite = ^TMWSprite;
 
-TUSpriteL = array of TMWSprite;
-PTUSpriteL = ^TUSpriteL;
+TUSpriteList  = array of TMWSprite;
+PTUSpriteList = ^TUSpriteList;
 
-TTDec = record
-   x,y:integer;
+TMWSModel = record
+   sl       : TUSpriteList;
+   sn       : integer;
+end;
+PTMWSModel = ^TMWSModel;
+
+TDecal = record
+   x,y      : integer;
 end;
 
 TEff = record
-   x,y,t,t2,tm,d,anl,ans:integer;
-   e:byte;
+   x,y,
+   t,t2,tm,
+   d,
+   anl,ans  : integer;
+   e        : byte;
 end;
 
 TVisSpr = record

@@ -20,12 +20,11 @@ end;
 procedure _mkHStrXY(tab,i,x,y:byte;STR:string);
 begin
    if(i=255)then i:=(y div 3)+x;
-   if(i>_uts)then exit;
-   str_hint[tab,r_hell,i ] := STR;
-   str_hint[tab,r_uac ,i ] := str_hint[tab,r_hell,i ];
+   str_hint[tab,r_hell,i] := STR;
+   str_hint[tab,r_uac ,i] := str_hint[tab,r_hell,i ];
 end;
 
-procedure _mkHStrUid(uid:byte;NAME,DESCR:string);
+procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
    with _uids[uid] do
    begin
@@ -34,10 +33,13 @@ begin
    end;
 end;
 
-procedure _mkHStrUpid(race,upid:byte;NAME,DESCR:string);
+procedure _mkHStrUpid(upid:byte;NAME,DESCR:shortstring);
 begin
-   str_up_name [upid+(_uts*race)]:=NAME;
-   str_up_descr[upid+(_uts*race)]:=DESCR;
+   with _upids[upid] do
+   begin
+      _up_name :=NAME;
+      _up_descr:=DESCR;
+   end;
 end;
 
 function _gHK(ucl:byte):shortstring;
@@ -53,106 +55,88 @@ begin
     end;
 end;
 
-function _addstr(s,ad:shortstring):shortstring;
+procedure _addstr(s:pshortstring;ad:shortstring);
 begin
-   if(s='')
-   then _addstr:=ad
-   else _addstr:=s+', '+ad;
+   if(s^='')
+   then s^:=ad
+   else s^:=s^+', '+ad;
 end;
 
-function findprd(uid:byte;bld:boolean):shortstring;
+function findprd(uid:byte):shortstring;
 var i:byte;
+   up,
+   bp: shortstring;
 begin
+   up:='';
+   bp:='';
    findprd:='';
    for i:=0 to 255 do
    begin
-      case bld of
- false: if not(uid in _uids[i].ups_units  )then continue;
- true : if not(uid in _uids[i].ups_builder)then continue;
-      end;
-      findprd:=_addstr(findprd,_uids[i].un_name);
+      if(uid in _uids[i].ups_units  )then _addstr(@up,_uids[i].un_name);
+      if(uid in _uids[i].ups_builder)then _addstr(@bp,_uids[i].un_name);
    end;
 
-   if(findprd<>'')then
-    if(bld)
-    then findprd:=#18+str_bprod+#25+findprd
-    else findprd:=#18+str_uprod+#25+findprd;
+   if(up<>'')then _addstr(@findprd,up);
+   if(bp<>'')then _addstr(@findprd,bp);
 end;
 
 procedure _makeHints;
-var rc,
+var
 ucl,uid       :byte;
-ENRG ,NAME,HK,PROD,
-DESCR,TIME,REQ:shortstring;
+ENRG,HK,PROD,
+TIME,REQ:shortstring;
 begin
    for uid:=0 to 255 do
    with _uids[uid] do
    begin
       REQ  :='';
       PROD :='';
-      NAME :=un_name;
-      if(NAME='')then continue;
-      DESCR:=un_descr;
-      with _ulst[uid] do
-      begin
-         if(renerg>0)
-         then ENRG:=b2s(renerg)
-         else ENRG:='';
-         case isbuild of
-         true :if(bld_s>0)
-               then TIME:=i2s(mhits div bld_s div 2)
-               else TIME:='';
-         false:if(trt>0)
-               then TIME:=i2s(trt div vid_fps)
-               else TIME:='';
-         end;
-         PROD:=findprd(uidi,isbuild);
-         if(ruid <255)then REQ:=_addstr(REQ,_uids[ruid].un_name);
-         if(rupgr<255)then
-         begin
-            rc:=0;
-            if(uidi in uids_hell)then rc:=r_hell;
-            if(uidi in uids_uac )then rc:=r_uac;
-            if(rc in [r_hell,r_uac])
-            then REQ:=_addstr(REQ,str_up_name[rupgr+(_uts*rc)])
-            else REQ:=_addstr(REQ,'#'+b2s(rupgr)              );
-         end;
-         HK:=_gHK(ucl);
-      end;
-      un_hint:= NAME;
+      ENRG :='';
+      TIME :='';
+      if(un_name='')then continue;
 
+      if(_renerg>0)then ENRG:=i2s(_renerg);
+      if(_btime >0)then TIME:=i2s(_btime );
+
+      PROD:=findprd(uid);
+      if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
+      if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name);
+      HK:=_gHK(_btni);
+
+      un_hint:= un_name;
       if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
       if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
       if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
-      un_hint:=un_hint+#11+DESCR+#11;
+      un_hint:=un_hint+#11+un_descr+#11;
       if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
       if(PROD<>'')then un_hint:= un_hint+PROD;
    end;
 
-   for rc:=1 to 2 do
-   for ucl:=0 to _uts do
+   for uid:=0 to 255 do
+   with _upids[uid] do
    begin
       REQ  :='';
-      uid  :=ucl+(_uts*rc);
-      NAME :=str_up_name [uid];
-      DESCR:=str_up_descr[uid];
-      if(NAME='')then continue;
+      PROD :='';
+      ENRG :='';
+      TIME :='';
+      if(_up_name='')then continue;
 
-      enrg :=b2s(_pne_r[rc,ucl]);
-      TIME :=i2s(upgrade_time[rc ,ucl] div vid_fps);
+      if(_up_renerg>0)then ENRG :=i2s(_up_renerg);
+      if(_up_time  >0)then TIME :=i2s(_up_time div fr_fps);
 
-      if(upgrade_ruid [rc,ucl]<255)then REQ:=_uids[upgrade_ruid[rc,ucl]].un_name;
-      if(upgrade_rupgr[rc,ucl]<255)then
-      begin
-         if(REQ<>'')then REQ:=REQ+', ';
-         REQ:=REQ+str_up_name[upgrade_rupgr[rc,ucl]+(_uts*rc)];
-      end;
+      if(_up_ruid >0)then _addstr(@REQ,_uids [_up_ruid ].un_name );
+      if(_up_rupgr>0)then _addstr(@REQ,_upids[_up_rupgr]._up_name);
 
-      str_up_hint[uid]:=NAME+' ('+_gHK(ucl)+') ['+#16+TIME+#25+'] '+'{'+#19+enrg+#25+'}'+' x'+#17+b2s(upgrade_cnt[rc ,ucl ])+#25;
-      if(ucl in upgr_1[rc])then str_up_hint[uid]:= str_up_hint[uid]+#15+' *'+#25;
+      HK:=_gHK(_up_btni);
 
-      str_up_hint[uid]:=str_up_hint[uid]+#11+DESCR+#11;
-      if(REQ<>'')then str_up_hint[uid]:=str_up_hint[uid]+#17+str_req+#25+REQ;
+      _up_hint:=_up_name;
+      if(HK  <>'')then _up_hint:=_up_hint+' ('+HK+')';
+      if(TIME<>'')then _up_hint:=_up_hint+' ['+#16+TIME+#25+']';
+      if(ENRG<>'')then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
+      _up_hint:=_up_hint+' x'+#17+i2s(_up_max)+#25;
+      if(_up_mfrg)then _up_hint:=_up_hint+#15+' *'+#25;
+      _up_hint:=_up_hint+#11+_up_descr+#11;
+      if(REQ<>'')then _up_hint:=_up_hint+#17+str_req+#25+REQ;
    end;
 end;
 
@@ -361,31 +345,31 @@ begin
    _mkHStrUid(UID_ZMajor     ,'Zombie Major'   ,'');
    _mkHStrUid(UID_ZBFG       ,'Zombie BFG'     ,'');
 
-   _mkHStrUpid(r_hell,upgr_attack  ,'Range attack upgrade'       ,'Increase ranged attacks damage.'                                           );
-   _mkHStrUpid(r_hell,upgr_armor   ,'Unit armor upgrade'         ,'Increase units armor.'                                                     );
-   _mkHStrUpid(r_hell,upgr_build   ,'Buildinds armor upgrade'    ,'Increase buildings armor.'                                                 );
-   _mkHStrUpid(r_hell,upgr_melee   ,'Melee attack upgrade'       ,'Increase melee attacks damage.'                                            );
-   _mkHStrUpid(r_hell,upgr_regen   ,'Regeneration'               ,'Damaged units will slowly regenerate their health.'                        );
-   _mkHStrUpid(r_hell,upgr_pains   ,'Pain threshold'             ,'Decrease "pain state" chance.'                                             );
-   _mkHStrUpid(r_hell,upgr_vision  ,'Hell eye'                   ,'Lost Soul ability & Hell Eye sight radius.'                                );
-   _mkHStrUpid(r_hell,upgr_towers  ,'Tower range upgrade'        ,'Increase defensive structures range.'                                      );
-   _mkHStrUpid(r_hell,upgr_5bld    ,'Teleport upgrade'           ,'Decrease Hell Teleport cooldown time.'                                     );
-   _mkHStrUpid(r_hell,upgr_mainm   ,'Hell Keep teleportaion'     ,'Hell Keep can teleporting.'                                                );
-   _mkHStrUpid(r_hell,upgr_paina   ,'Decay aura'                 ,'Hell Keep will damage all enemies around.'                                 );
-   _mkHStrUpid(r_hell,upgr_mainr   ,'Hell Keep range upgrade'    ,'Increase Hell Keep sight range.'                                           );
-   _mkHStrUpid(r_hell,upgr_pinkspd ,'Demon`s anger'              ,'Increase Demon`s speed.'                                                   );
-   _mkHStrUpid(r_hell,upgr_misfst  ,'Firepower'                  ,'Increase missiles speed for Imp, Cacodemon and Baron of Hell/Hell Knight.' );
-   _mkHStrUpid(r_hell,upgr_6bld    ,'Hell power'                 ,'Allow Hell Monastery upgrades units.'                                      );
-   _mkHStrUpid(r_hell,upgr_2tier   ,'Ancient evil'               ,'New buildings, units and upgrades.'                                        );
-   _mkHStrUpid(r_hell,upgr_revtele ,'Reverse teleporting'        ,'Units can teleport back to Hell Teleport.'                           );
-   _mkHStrUpid(r_hell,upgr_revmis  ,'Revenant missile upgrade'   ,'Revenant missiles become homing.'                                    );
-   _mkHStrUpid(r_hell,upgr_totminv ,'Hell Totem and Eye invisibility',''                                                                );
-   _mkHStrUpid(r_hell,upgr_bldrep  ,'Building restoration'           ,'Damaged buildings will slowly regenerate their health.'          );
-   _mkHStrUpid(r_hell,upgr_mainonr ,'Free teleportation'             ,'Hell Keep can teleporting on obstacles.'                         );
-   _mkHStrUpid(r_hell,upgr_b478tel ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
-   _mkHStrUpid(r_hell,upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
-   _mkHStrUpid(r_hell,upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
-   _mkHStrUpid(r_hell,upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown time.'                                );
+  { _mkHStrUpid(upgr_attack  ,'Range attack upgrade'       ,'Increase ranged attacks damage.'                                           );
+   _mkHStrUpid(upgr_armor   ,'Unit armor upgrade'         ,'Increase units armor.'                                                     );
+   _mkHStrUpid(upgr_build   ,'Buildinds armor upgrade'    ,'Increase buildings armor.'                                                 );
+   _mkHStrUpid(upgr_melee   ,'Melee attack upgrade'       ,'Increase melee attacks damage.'                                            );
+   _mkHStrUpid(upgr_regen   ,'Regeneration'               ,'Damaged units will slowly regenerate their health.'                        );
+   _mkHStrUpid(upgr_pains   ,'Pain threshold'             ,'Decrease "pain state" chance.'                                             );
+   _mkHStrUpid(upgr_vision  ,'Hell eye'                   ,'Lost Soul ability & Hell Eye sight radius.'                                );
+   _mkHStrUpid(upgr_towers  ,'Tower range upgrade'        ,'Increase defensive structures range.'                                      );
+   _mkHStrUpid(upgr_5bld    ,'Teleport upgrade'           ,'Decrease Hell Teleport cooldown time.'                                     );
+   _mkHStrUpid(upgr_mainm   ,'Hell Keep teleportaion'     ,'Hell Keep can teleporting.'                                                );
+   _mkHStrUpid(upgr_paina   ,'Decay aura'                 ,'Hell Keep will damage all enemies around.'                                 );
+   _mkHStrUpid(upgr_mainr   ,'Hell Keep range upgrade'    ,'Increase Hell Keep sight range.'                                           );
+   _mkHStrUpid(upgr_pinkspd ,'Demon`s anger'              ,'Increase Demon`s speed.'                                                   );
+   _mkHStrUpid(upgr_misfst  ,'Firepower'                  ,'Increase missiles speed for Imp, Cacodemon and Baron of Hell/Hell Knight.' );
+   _mkHStrUpid(upgr_6bld    ,'Hell power'                 ,'Allow Hell Monastery upgrades units.'                                      );
+   _mkHStrUpid(upgr_2tier   ,'Ancient evil'               ,'New buildings, units and upgrades.'                                        );
+   _mkHStrUpid(upgr_revtele ,'Reverse teleporting'        ,'Units can teleport back to Hell Teleport.'                           );
+   _mkHStrUpid(upgr_revmis  ,'Revenant missile upgrade'   ,'Revenant missiles become homing.'                                    );
+   _mkHStrUpid(upgr_totminv ,'Hell Totem and Eye invisibility',''                                                                );
+   _mkHStrUpid(upgr_bldrep  ,'Building restoration'           ,'Damaged buildings will slowly regenerate their health.'          );
+   _mkHStrUpid(upgr_mainonr ,'Free teleportation'             ,'Hell Keep can teleporting on obstacles.'                         );
+   _mkHStrUpid(upgr_b478tel ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
+   _mkHStrUpid(upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
+   _mkHStrUpid(upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
+   _mkHStrUpid(upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown time.'                                );  }
 
    _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,'Builder. Generates energy.'      );
    _mkHStrUid(UID_UMilitaryUnit    ,'UAC Military unit'          ,'Produces units.'                 );
@@ -414,32 +398,32 @@ begin
    _mkHStrUid(UID_Tank       ,'UAC Tank'         ,'');
    _mkHStrUid(UID_Flyer      ,'UAC Fighter'      ,'');
 
-   _mkHStrUpid(r_uac ,upgr_attack  ,'Ranged attack upgrade'  ,'Increase ranged attacks damage.'                                    );
-   _mkHStrUpid(r_uac ,upgr_armor   ,'Infantry armor upgrade' ,'Increase infantry armor.'                                           );
-   _mkHStrUpid(r_uac ,upgr_build   ,'Buildings armor upgrade','Increase buildings armor.'                                          );
-   _mkHStrUpid(r_uac ,upgr_melee   ,'Advanced repairing and healing'
+   {_mkHStrUpid(upgr_attack  ,'Ranged attack upgrade'  ,'Increase ranged attacks damage.'                                    );
+   _mkHStrUpid(upgr_armor   ,'Infantry armor upgrade' ,'Increase infantry armor.'                                           );
+   _mkHStrUpid(upgr_build   ,'Buildings armor upgrade','Increase buildings armor.'                                          );
+   _mkHStrUpid(upgr_melee   ,'Advanced repairing and healing'
                                                              ,'Increases the efficiency of repair/healing of Engineers/Medics.'    );
-   _mkHStrUpid(r_uac ,upgr_mspeed  ,'Lightweight armor'      ,'Increase infantry move speed.'                                      );
-   _mkHStrUpid(r_uac ,upgr_plsmt   ,'APC turret'             ,'Weapon for APCs.'                                                   );
-   _mkHStrUpid(r_uac ,upgr_vision  ,'Detector device'        ,'UAC Radar and UAC Mines becomes detectors.'                         );
-   _mkHStrUpid(r_uac ,upgr_towers  ,'Turrets range upgrade'  ,'Increase defensive structures range.'                               );
-   _mkHStrUpid(r_uac ,upgr_5bld    ,'UAC Radar upgrade'          ,'Increase radar scouting time and it sight radius.'                  );
-   _mkHStrUpid(r_uac ,upgr_mainm   ,'UAC Command Center engines' ,'UAC Command Center gains ability to fly.'                           );
-   _mkHStrUpid(r_uac ,upgr_ucomatt ,'UAC Command Center turret'  ,'Flying UAC Command Center will be able to attack.'                  );
-   _mkHStrUpid(r_uac ,upgr_mainr   ,'UAC Command Center range'   ,'Increase UAC Command Center sight range.'                           );
-   _mkHStrUpid(r_uac ,upgr_mines   ,'UAC Mines'                  ,'Engineer ability.'                                                  );
-   _mkHStrUpid(r_uac ,upgr_minesen ,'Mine-sensor'            ,'UAC Mine ability.'                                                  );
-   _mkHStrUpid(r_uac ,upgr_6bld    ,'Advanced armory'        ,'Allow UAC Tech Center upgrades units.'                              );
-   _mkHStrUpid(r_uac ,upgr_2tier   ,'High technologies'      ,'New buildings, units and upgrades.'               );
-   _mkHStrUpid(r_uac ,upgr_blizz   ,'Missile strike'         ,'Missile for Rocket Launcher Station.'             );
-   _mkHStrUpid(r_uac ,upgr_mechspd ,'Advanced engines'       ,'Increase mechs move speed.'                       );
-   _mkHStrUpid(r_uac ,upgr_mecharm ,'Mech armor upgrade'     ,'Increase mechs armor.'                            );
-   _mkHStrUpid(r_uac ,upgr_6bld2   ,'Fast rearming'          ,'Decrease UAC Tech Center cooldown time.'          );
-   _mkHStrUpid(r_uac ,upgr_mainonr ,'Free placement'         ,'UAC Command center can land on obstacles.'        );
-   _mkHStrUpid(r_uac ,upgr_turarm  ,'UAC Turrets armor'      ,'Additional armor for turrets.'                    );
-   _mkHStrUpid(r_uac ,upgr_rturrets,'UAC Rocket turrets'     ,'UAC Turrets can upgrade to Rocket turrets.'       );
-   _mkHStrUpid(r_uac ,upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
-   _mkHStrUpid(r_uac ,upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'        );
+   _mkHStrUpid(upgr_mspeed  ,'Lightweight armor'      ,'Increase infantry move speed.'                                      );
+   _mkHStrUpid(upgr_plsmt   ,'APC turret'             ,'Weapon for APCs.'                                                   );
+   _mkHStrUpid(upgr_vision  ,'Detector device'        ,'UAC Radar and UAC Mines becomes detectors.'                         );
+   _mkHStrUpid(upgr_towers  ,'Turrets range upgrade'  ,'Increase defensive structures range.'                               );
+   _mkHStrUpid(upgr_5bld    ,'UAC Radar upgrade'          ,'Increase radar scouting time and it sight radius.'                  );
+   _mkHStrUpid(upgr_mainm   ,'UAC Command Center engines' ,'UAC Command Center gains ability to fly.'                           );
+   _mkHStrUpid(upgr_ucomatt ,'UAC Command Center turret'  ,'Flying UAC Command Center will be able to attack.'                  );
+   _mkHStrUpid(upgr_mainr   ,'UAC Command Center range'   ,'Increase UAC Command Center sight range.'                           );
+   _mkHStrUpid(upgr_mines   ,'UAC Mines'                  ,'Engineer ability.'                                                  );
+   _mkHStrUpid(upgr_minesen ,'Mine-sensor'            ,'UAC Mine ability.'                                                  );
+   _mkHStrUpid(upgr_6bld    ,'Advanced armory'        ,'Allow UAC Tech Center upgrades units.'                              );
+   _mkHStrUpid(upgr_2tier   ,'High technologies'      ,'New buildings, units and upgrades.'               );
+   _mkHStrUpid(upgr_blizz   ,'Missile strike'         ,'Missile for Rocket Launcher Station.'             );
+   _mkHStrUpid(upgr_mechspd ,'Advanced engines'       ,'Increase mechs move speed.'                       );
+   _mkHStrUpid(upgr_mecharm ,'Mech armor upgrade'     ,'Increase mechs armor.'                            );
+   _mkHStrUpid(upgr_6bld2   ,'Fast rearming'          ,'Decrease UAC Tech Center cooldown time.'          );
+   _mkHStrUpid(upgr_mainonr ,'Free placement'         ,'UAC Command center can land on obstacles.'        );
+   _mkHStrUpid(upgr_turarm  ,'UAC Turrets armor'      ,'Additional armor for turrets.'                    );
+   _mkHStrUpid(upgr_rturrets,'UAC Rocket turrets'     ,'UAC Turrets can upgrade to Rocket turrets.'       );
+   _mkHStrUpid(upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
+   _mkHStrUpid(upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'      ); }
 
    t:='ignore enemies';
    _mkHStrXY(3,0 ,0,0,'Move, '  +t+' ('    +#18+'Q'     +#25+')');
@@ -734,32 +718,32 @@ begin
   _mkHStrUid(UID_HCommandCenter,'Проклятый Командный Центр','Строит базу. Увеличивает энергию.');
   _mkHStrUid(UID_HMilitaryUnit ,'Проклятая Войсковая часть','Производит зомби.' );
 
-  _mkHStrUpid(r_hell,upgr_attack  ,'Улучшение дальней атаки'        ,''                                         );
-  _mkHStrUpid(r_hell,upgr_armor   ,'Улучшение защиты юнитов'        ,''                                         );
-  _mkHStrUpid(r_hell,upgr_build   ,'Улучшение защиты зданий'        ,''                                         );
-  _mkHStrUpid(r_hell,upgr_melee   ,'Улучшение ближней атаки'        ,''                                         );
-  _mkHStrUpid(r_hell,upgr_regen   ,'Регенерация'                    ,'Раненые юниты медленно восстанавливают свое здоровье.'                   );
-  _mkHStrUpid(r_hell,upgr_pains   ,'Болевой порог'                  ,'Уменьшение шанса "pain state".'                                          );
-  _mkHStrUpid(r_hell,upgr_vision  ,'Адский глаз'                    ,'Способность Lost Soul и радиус зрения Адского Глаза.'                    );
-  _mkHStrUpid(r_hell,upgr_towers  ,'Радиус атаки башен'             ,'Увеличение радиуса атаки и зрения защитных сооружений.'                  );
-  _mkHStrUpid(r_hell,upgr_5bld    ,'Улучшение телепорта'            ,'Уменьшение время перезарядки Телепорта.'                                 );
-  _mkHStrUpid(r_hell,upgr_mainm   ,'Телепортация адской крепости'   ,'Адская Крепость может перемещаться в любую свободную точку карты.'       );
-  _mkHStrUpid(r_hell,upgr_paina   ,'Аура разрушения'                ,'Адская крепость наносит урон всем врагам вокруг.'                        );
-  _mkHStrUpid(r_hell,upgr_mainr   ,'Радиус зрения адской крепости'  ,'Увеличение радиуса зрения и дистанции строительства для Aдской Крепости.');
-  _mkHStrUpid(r_hell,upgr_pinkspd ,'Злость демона'                  ,'Увеличение скорости юнита Demon.'                                        );
-  _mkHStrUpid(r_hell,upgr_6bld    ,'Адска сила'                     ,'Позволяет Адскому Монастырю улучшать своих юнитов.'                      );
-  _mkHStrUpid(r_hell,upgr_misfst  ,'Огневая мощь'                   ,'Увеличение скорсоти полета снарядов юнитов Imp, Cacodemon и Baron of Hell/Hell Knight.'                              );
-  _mkHStrUpid(r_hell,upgr_2tier   ,'Древнее зло'                    ,'Второй уровень зданий, юнитов и улучшений.'                              );
-  _mkHStrUpid(r_hell,upgr_revtele ,'Обратный телепорт'              ,'Юниты могут перемещаться обратно в Адский Телепорт.'                     );
-  _mkHStrUpid(r_hell,upgr_revmis  ,'Улучшение атаки юнита Revenant' ,'Снаряды становятся самонаводящимися.'                                    );
-  _mkHStrUpid(r_hell,upgr_totminv ,'Невидимость для Тотема и Глаза' ,'Адский Тотем и Глаз становятся невидимыми.'                              );
-  _mkHStrUpid(r_hell,upgr_bldrep  ,'Восстановление зданий'          ,'Поврежденные здания медленно восстанавливают себя.'                      );
-  _mkHStrUpid(r_hell,upgr_mainonr ,'Свободная телепортация'         ,'Адская Крепость может перемещаться на скалы, озера и др. препятствия.'   );
-  _mkHStrUpid(r_hell,upgr_b478tel ,'Телепортация на короткие дистанции'
+ { _mkHStrUpid(upgr_attack  ,'Улучшение дальней атаки'        ,''                                         );
+  _mkHStrUpid(upgr_armor   ,'Улучшение защиты юнитов'        ,''                                         );
+  _mkHStrUpid(upgr_build   ,'Улучшение защиты зданий'        ,''                                         );
+  _mkHStrUpid(upgr_melee   ,'Улучшение ближней атаки'        ,''                                         );
+  _mkHStrUpid(upgr_regen   ,'Регенерация'                    ,'Раненые юниты медленно восстанавливают свое здоровье.'                   );
+  _mkHStrUpid(upgr_pains   ,'Болевой порог'                  ,'Уменьшение шанса "pain state".'                                          );
+  _mkHStrUpid(upgr_vision  ,'Адский глаз'                    ,'Способность Lost Soul и радиус зрения Адского Глаза.'                    );
+  _mkHStrUpid(upgr_towers  ,'Радиус атаки башен'             ,'Увеличение радиуса атаки и зрения защитных сооружений.'                  );
+  _mkHStrUpid(upgr_5bld    ,'Улучшение телепорта'            ,'Уменьшение время перезарядки Телепорта.'                                 );
+  _mkHStrUpid(upgr_mainm   ,'Телепортация адской крепости'   ,'Адская Крепость может перемещаться в любую свободную точку карты.'       );
+  _mkHStrUpid(upgr_paina   ,'Аура разрушения'                ,'Адская крепость наносит урон всем врагам вокруг.'                        );
+  _mkHStrUpid(upgr_mainr   ,'Радиус зрения адской крепости'  ,'Увеличение радиуса зрения и дистанции строительства для Aдской Крепости.');
+  _mkHStrUpid(upgr_pinkspd ,'Злость демона'                  ,'Увеличение скорости юнита Demon.'                                        );
+  _mkHStrUpid(upgr_6bld    ,'Адска сила'                     ,'Позволяет Адскому Монастырю улучшать своих юнитов.'                      );
+  _mkHStrUpid(upgr_misfst  ,'Огневая мощь'                   ,'Увеличение скорсоти полета снарядов юнитов Imp, Cacodemon и Baron of Hell/Hell Knight.'                              );
+  _mkHStrUpid(upgr_2tier   ,'Древнее зло'                    ,'Второй уровень зданий, юнитов и улучшений.'                              );
+  _mkHStrUpid(upgr_revtele ,'Обратный телепорт'              ,'Юниты могут перемещаться обратно в Адский Телепорт.'                     );
+  _mkHStrUpid(upgr_revmis  ,'Улучшение атаки юнита Revenant' ,'Снаряды становятся самонаводящимися.'                                    );
+  _mkHStrUpid(upgr_totminv ,'Невидимость для Тотема и Глаза' ,'Адский Тотем и Глаз становятся невидимыми.'                              );
+  _mkHStrUpid(upgr_bldrep  ,'Восстановление зданий'          ,'Поврежденные здания медленно восстанавливают себя.'                      );
+  _mkHStrUpid(upgr_mainonr ,'Свободная телепортация'         ,'Адская Крепость может перемещаться на скалы, озера и др. препятствия.'   );
+  _mkHStrUpid(upgr_b478tel ,'Телепортация на короткие дистанции'
                                                                     ,'Адские Символы, Башни и Тотемы могут телепортироваться на короткое расстояние.');
-  _mkHStrUpid(r_hell,upgr_hinvuln ,'Неуязвимость'                   ,'Сферы неуязвимости для Адского Алтаря.'                                  );
-  _mkHStrUpid(r_hell,upgr_bldenrg ,'Встроеный адский символ'        ,'Дополнительная энергия для Адской Крепости.'                             );
-  _mkHStrUpid(r_hell,upgr_9bld    ,'Улучшение Адского Замка'        ,'Уменьшение перезарядки.'                                                 );
+  _mkHStrUpid(upgr_hinvuln ,'Неуязвимость'                   ,'Сферы неуязвимости для Адского Алтаря.'                                  );
+  _mkHStrUpid(upgr_bldenrg ,'Встроеный адский символ'        ,'Дополнительная энергия для Адской Крепости.'                             );
+  _mkHStrUpid(upgr_9bld    ,'Улучшение Адского Замка'        ,'Уменьшение перезарядки.'                                                 ); }
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу. Увеличивает энергию.');
@@ -789,31 +773,31 @@ begin
   _mkHStrUid(UID_Tank       ,'Танк'               ,'');
   _mkHStrUid(UID_Flyer      ,'Истребитель'        ,'');
 
-  _mkHStrUpid(r_uac ,upgr_attack  ,'Улучшение дальней атаки'    ,''                                );
-  _mkHStrUpid(r_uac ,upgr_armor   ,'Улучшение защиты пехоты'    ,''                                );
-  _mkHStrUpid(r_uac ,upgr_build   ,'Улучшение защиты зданий'    ,''                                );
-  _mkHStrUpid(r_uac ,upgr_melee   ,'Ремонт и лечение'           ,'Увеличение эффективности ремонта Инженером и лечения Медиком.');
-  _mkHStrUpid(r_uac ,upgr_mspeed  ,'Легковесная броня'          ,'Увеличение скорости передвижения пехоты.'                 );
-  _mkHStrUpid(r_uac ,upgr_plsmt   ,'Турель на транспорте'       ,'Оружие для транспортников.'                               );
-  _mkHStrUpid(r_uac ,upgr_vision  ,'Детекторы'                  ,'Радар и Мины становятся детекторами.'                     );
-  _mkHStrUpid(r_uac ,upgr_towers  ,'Радиус атаки турелей'       ,'Увеличение радиуса атаки и зрения защитных сооружений.'   );
-  _mkHStrUpid(r_uac ,upgr_5bld    ,'Улучшение радара'           ,'Увеличивает радиус и время разведки Радара.'              );
-  _mkHStrUpid(r_uac ,upgr_mainm   ,'Двигатели Командного центра','Командный Центр может летать.'                            );
-  _mkHStrUpid(r_uac ,upgr_ucomatt ,'Турель Командного центра'   ,'Летающий Командный Центр может атаковать.'                );
-  _mkHStrUpid(r_uac ,upgr_mainr   ,'Радиус зрения Командного центра','Увеличивает радиус зрения и дистанции строительства Командного Центра.');
-  _mkHStrUpid(r_uac ,upgr_mines   ,'Мины'                       ,'Способность Инженера.'                                    );
-  _mkHStrUpid(r_uac ,upgr_minesen ,'Мина-сенсор'                ,'Способность Мин.'                                         );
-  _mkHStrUpid(r_uac ,upgr_6bld    ,'Дополнительное вооружение'  ,'Технический Центр может улучшать юнитов.'                 );
-  _mkHStrUpid(r_uac ,upgr_2tier   ,'Выские технологии'          ,'Второй уровень зданий, юнитов и улучшений.'               );
-  _mkHStrUpid(r_uac ,upgr_blizz   ,'Ракетный удар'              ,'Снаряд для станции Ракетного Залпа.'                      );
-  _mkHStrUpid(r_uac ,upgr_mechspd ,'Продвинутые двигатели'      ,'Увеличение скорости передвижения техники.'                );
-  _mkHStrUpid(r_uac ,upgr_mecharm ,'Улучшение защиты техники'   ,''                             );
-  _mkHStrUpid(r_uac ,upgr_6bld2   ,'Быстрое перевооружение'     ,'Уменьшение времени парезарядки Технического Центра при улучшении юнитов.');
-  _mkHStrUpid(r_uac ,upgr_mainonr ,'Свободное приземление'      ,'Командный Центр может приземляться на камни, озера и др. препятствия.');
-  _mkHStrUpid(r_uac ,upgr_turarm  ,'Защита для турелей'         ,'Дополнительное увеличение защиты Турелей.'                );
-  _mkHStrUpid(r_uac ,upgr_rturrets,'Ракетные турели'            ,'Обычные турели могут быть улучшены до ракетных.'          );
-  _mkHStrUpid(r_uac ,upgr_bldenrg ,'Встроенный генератор'       ,'Дополнительна энергия для Командного Центра.'             );
-  _mkHStrUpid(r_uac ,upgr_9bld    ,'Улучшение АЭС'              ,'Уменьшение времени парезарядки АЭС.'                      );
+  {_mkHStrUpid(upgr_attack  ,'Улучшение дальней атаки'    ,''                                );
+  _mkHStrUpid(upgr_armor   ,'Улучшение защиты пехоты'    ,''                                );
+  _mkHStrUpid(upgr_build   ,'Улучшение защиты зданий'    ,''                                );
+  _mkHStrUpid(upgr_melee   ,'Ремонт и лечение'           ,'Увеличение эффективности ремонта Инженером и лечения Медиком.');
+  _mkHStrUpid(upgr_mspeed  ,'Легковесная броня'          ,'Увеличение скорости передвижения пехоты.'                 );
+  _mkHStrUpid(upgr_plsmt   ,'Турель на транспорте'       ,'Оружие для транспортников.'                               );
+  _mkHStrUpid(upgr_vision  ,'Детекторы'                  ,'Радар и Мины становятся детекторами.'                     );
+  _mkHStrUpid(upgr_towers  ,'Радиус атаки турелей'       ,'Увеличение радиуса атаки и зрения защитных сооружений.'   );
+  _mkHStrUpid(upgr_5bld    ,'Улучшение радара'           ,'Увеличивает радиус и время разведки Радара.'              );
+  _mkHStrUpid(upgr_mainm   ,'Двигатели Командного центра','Командный Центр может летать.'                            );
+  _mkHStrUpid(upgr_ucomatt ,'Турель Командного центра'   ,'Летающий Командный Центр может атаковать.'                );
+  _mkHStrUpid(upgr_mainr   ,'Радиус зрения Командного центра','Увеличивает радиус зрения и дистанции строительства Командного Центра.');
+  _mkHStrUpid(upgr_mines   ,'Мины'                       ,'Способность Инженера.'                                    );
+  _mkHStrUpid(upgr_minesen ,'Мина-сенсор'                ,'Способность Мин.'                                         );
+  _mkHStrUpid(upgr_6bld    ,'Дополнительное вооружение'  ,'Технический Центр может улучшать юнитов.'                 );
+  _mkHStrUpid(upgr_2tier   ,'Выские технологии'          ,'Второй уровень зданий, юнитов и улучшений.'               );
+  _mkHStrUpid(upgr_blizz   ,'Ракетный удар'              ,'Снаряд для станции Ракетного Залпа.'                      );
+  _mkHStrUpid(upgr_mechspd ,'Продвинутые двигатели'      ,'Увеличение скорости передвижения техники.'                );
+  _mkHStrUpid(upgr_mecharm ,'Улучшение защиты техники'   ,''                             );
+  _mkHStrUpid(upgr_6bld2   ,'Быстрое перевооружение'     ,'Уменьшение времени парезарядки Технического Центра при улучшении юнитов.');
+  _mkHStrUpid(upgr_mainonr ,'Свободное приземление'      ,'Командный Центр может приземляться на камни, озера и др. препятствия.');
+  _mkHStrUpid(upgr_turarm  ,'Защита для турелей'         ,'Дополнительное увеличение защиты Турелей.'                );
+  _mkHStrUpid(upgr_rturrets,'Ракетные турели'            ,'Обычные турели могут быть улучшены до ракетных.'          );
+  _mkHStrUpid(upgr_bldenrg ,'Встроенный генератор'       ,'Дополнительна энергия для Командного Центра.'             );
+  _mkHStrUpid(upgr_9bld    ,'Улучшение АЭС'              ,'Уменьшение времени парезарядки АЭС.'                      );  }
 
   t:='игнорировать врагов';
   _mkHStrXY(3,0 ,0,0,'Двигаться, '    +t+' ('+#18+'Q'     +#25+')');

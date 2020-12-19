@@ -1,4 +1,4 @@
-
+{
 const ucl_com = 0;
       ucl_gen = 1;
       ucl_bar = 2;
@@ -1279,5 +1279,5 @@ begin
       if(uo_y<0)then uo_y:=0;
    end;
 end;
-
+}
 

@@ -61,18 +61,16 @@ begin
 
       if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
 
-      if(vid_vw<vid_minw)then vid_vw:=vid_minw;
-      if(vid_vh<vid_minh)then vid_vh:=vid_minh;
-      if(vid_vw>vid_maxw)then vid_vw:=vid_maxw;
-      if(vid_vh>vid_maxh)then vid_vh:=vid_maxh;
+      vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
+      vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
 
       if(G_aislots>8)then G_aislots:=8;
       if(G_startb >5)then G_startb :=5;
 
-      if(_rpls_pnui  >9)then  _rpls_pnui:=9;
-      if(net_pnui    >9)then  net_pnui  :=9;
-      if(vid_ppos    >3)then  vid_ppos  :=0;
-      if(vid_uhbars  >2)then  vid_uhbars:=0;
+      if(_rpls_pnui  >9)then  _rpls_pnui  :=9;
+      if(net_pnui    >9)then  net_pnui    :=9;
+      if(vid_ppos    >3)then  vid_ppos    :=0;
+      if(vid_uhbars  >2)then  vid_uhbars  :=0;
       if(vid_plcolors>4)then  vid_plcolors:=0;
    end;
    swLNG;

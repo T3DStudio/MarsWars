@@ -1,6 +1,6 @@
 {$IFDEF _FULLGAME}
 
-procedure _dds_anim(d:integer;sprl:PTUSpriteL;anml:PTThemeAnimL;lst:PTIntList;lstn:pinteger;first:boolean);
+procedure _dds_anim(d:integer;sprl:PTUSpriteList;anml:PTThemeAnimL;lst:PTIntList;lstn:pinteger;first:boolean);
 begin
    if(lstn^>0)then
     with map_dds[d] do
@@ -42,7 +42,7 @@ begin
         if(_rectvis(x,y,255,255)=false)then continue;
 
         ro:=0;
-        if(0<=m_brush)and(m_brush<=_uts)then ro:=r-bld_dec_mr;
+        if(0<=m_brush)and(m_brush<=255)then ro:=r-bld_dec_mr;
 
         if(onlyspr=false)or(spr=pspr_dummy)then
         case t of

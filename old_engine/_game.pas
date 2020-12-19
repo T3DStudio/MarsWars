@@ -43,7 +43,7 @@ begin
        ready:=false;
        pnum :=p;
 
-       ai_pushtime := vid_fps*30;
+       ai_pushtime := fr_fps*30;
        ai_pushmin  := 55;
        ai_pushuids := [];
        ai_towngrd  := 3;
@@ -52,18 +52,16 @@ begin
        ai_pushtimei:= 0;
        ai_pushfrmi := 0;
 
-       a_build := [0..14];
-       a_units := [0..18];
-       a_upgr  := [0..MaxUpgrs];
+       //a_units := [0..18];
+      // a_upgr  := [0..MaxUpgrs];
    end;
 
    with _players[0] do
    begin
       race     :=r_hell;
       state    :=ps_comp;
-      a_build  :=[];
-      a_units  :=[];
-      a_upgr   :=[];
+     //a_units  :=[];
+      //a_upgr   :=[];
    end;
 
    {$IFDEF _FULLGAME}
@@ -190,34 +188,6 @@ begin
         if(ai_skill>8)then ai_skill:=1;
         name:=ai_name(ai_skill);
      end;
-end;
-
-procedure _dmgtest;
-var x,y,p:integer;
-begin
-   x:=100;
-   y:=100;
-
-   for p:=1 to 255 do
-    if(p in [1..70,240..250])then
-    begin
-       if(_ulst[p].r>0)then
-       begin
-          _unit_add(x,y,p,0,true);
-          with _lcup^ do
-          begin
-             mhits:=1000;
-             hits :=mhits;
-             solid:=false;
-          end;
-       end;
-       inc(y,100);
-       if(y>map_mw)then
-       begin
-          y:=100;
-          inc(x,100);
-       end;
-    end;
 end;
 
 {$ENDIF}

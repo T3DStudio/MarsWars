@@ -308,7 +308,7 @@ begin
 
         if(_testdmg)then
         begin
-           _draw_text(r_screen,ix,iy-12,i2s(bld_s), ta_left,255, c_white);
+           //_draw_text(r_screen,ix,iy-12,i2s(bld_s), ta_left,255, c_white);
            continue;
         end;
 
@@ -316,11 +316,11 @@ begin
         if(k_shift>1)then
         begin
            circleColor(r_screen,ix,iy,r,c_gray);
-           circleColor(r_screen,ix,iy,sr,c_gray);
+           circleColor(r_screen,ix,iy,srng,c_gray);
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
         end;
 
-        if(hits>0)and(inapc=0)then
+        {if(hits>0)and(inapc=0)then
         if(playeri=HPlayer)then
         begin
            if(isbuild)then
@@ -337,7 +337,7 @@ begin
             lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, p_color(playeri));
+        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, p_color(playeri));}
 
         if(inapc>0)then continue;
 

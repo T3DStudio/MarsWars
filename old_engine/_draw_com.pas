@@ -96,7 +96,7 @@ procedure _unit_minimap(pu:PTUnit);
 begin
   if(vid_rtui=0)and(_menu=false)and(_draw)then
    with pu^ do
-    if(isbuild)
+    if(uid^._isbuilding)
     then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(player^.pnum))
     else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
 end;
@@ -158,7 +158,7 @@ procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string)
 var m,s,h:cardinal;
     hs,ms,ss:string;
 begin
-   s:=time div vid_fps;
+   s:=time div fr_fps;
    m:=s div 60;
    s:=s mod 60;
    h:=m div 60;

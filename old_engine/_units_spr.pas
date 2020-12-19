@@ -4,7 +4,7 @@ var an,td:integer;
 begin
    _unit_spr:=@spr_dummy;
 
-   with u^ do
+{   with u^ do
    if(hits>0)then
     case uidi of
 
@@ -498,6 +498,29 @@ UID_ZEngineer,
 UID_ZSergant:
 begin td:=48+abs(hits div 8);if(td>52)then td:=52;if(buff[ub_advanced]>0)then _unit_spr:=@spr_ZSSergant[td]else _unit_spr:=@spr_ZSergant[td];end;//48-52
 
-    end;
+    end;  }
 end;
+
+function _uid2spr(_uid:byte):PTMWSprite;
+begin
+   with _units[0] do
+   begin
+      FillChar(buff,SizeOf(buff),0);
+      uidi:=_uid;
+      _unit_apUID(@_units[0]);
+      hits:=uid^._mhits;
+
+      with uid^ do
+       if(_isbuilding)
+       then dir:=0
+       else
+         case _urace of
+         r_hell: dir:=315;
+         r_uac : dir:=225;
+         end;
+   end;
+
+   _uid2spr:=_unit_spr(@_units[0]);
+end;
+
 

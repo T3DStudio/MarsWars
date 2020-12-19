@@ -4,17 +4,17 @@ var
 _CYCLE            : boolean = false;
 _EVENT            : pSDL_EVENT;
 
-G_Addon           : boolean = true;
-G_Started         : boolean = false;
-G_Paused          : byte = 0;
-G_WTeam           : byte = 255;
-G_mode            : byte = 0;
-G_startb          : byte = 0;
-G_shpos           : boolean = false;
-G_aislots         : byte = 5;
-G_step            : cardinal = 0;
-G_plstat          : byte = 0;
-G_nunits          : integer = 0;
+g_Addon           : boolean = true;
+g_Started         : boolean = false;
+g_Paused          : byte = 0;
+g_WTeam           : byte = 255;
+g_mode            : byte = 0;
+g_startb          : byte = 0;
+g_shpos           : boolean = false;
+g_aislots         : byte = 5;
+g_step            : cardinal = 0;
+g_plstat          : byte = 0;
+g_nunits          : integer = 0;
 
 g_inv_mn          : byte = 0;
 g_inv_wn          : byte = 0;
@@ -22,7 +22,7 @@ g_inv_t           : integer = 0;
 g_inv_wt          : integer = 0;
 g_ct_pl           : array[1..MaxPlayers] of TCTPoint;
 
-onlySVCode        : boolean = true;
+onlySVCode        : boolean = true; // only server side code
 
 UnitStepNum       : byte = 8;
 
@@ -34,19 +34,15 @@ _uclord_c         : integer = 0;
 _uregen_c         : integer = 0;
 
 _uids             : array[byte] of TUID;
-_ulst             : array[byte] of TUnit;
-upgrade_time      : array[1..2,0.._uts] of integer;
-upgrade_cnt       : array[1..2,0.._uts] of byte;
-upgrade_ruid      : array[1..2,0.._uts] of byte;
-upgrade_rupgr     : array[1..2,0.._uts] of byte;
-upgrade_mfrg      : array[1..2,0.._uts] of boolean;
+_upids            : array[byte] of TUpgrade;
+
+ui_puids          : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 
 _lsuc             : byte = 0;
 _lcu              : integer = 0;
 _lcup             : PTUnit;
-cl2uid            : array[0..r_cnt,false..true,0.._uts] of byte;
 
-tar1p             : integer;
+{tar1p             : integer;
 ai_builders,
 ai_uprods,
 ai_pprods,
@@ -60,9 +56,7 @@ ai_uy,
 ai_ud,
 ai_bx,
 ai_by,
-ai_bd             : integer;
-
-_pne_r            : array[0..r_cnt,0.._uts] of byte;
+ai_bd             : integer;  }
 
 HPlayer           : byte = 1;
 
@@ -165,11 +159,25 @@ vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = 794;
 vid_vmb_y1        : integer = 594;
-vid_mwa           : integer = 0; //vid_mw+vid_ab;
-vid_mha           : integer = 0; //vid_mh+vid_ab*2;
-
+vid_mwa           : integer = 0;
+vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_rtui          : byte = 0;
+vid_vx            : integer = 0;
+vid_vy            : integer = 0;
+vid_vmspd         : integer = 25;
+vid_mmvx,
+vid_mmvy          : integer;
+vid_uhbars        : byte = 0;
+vid_plcolors      : byte = 0;
+vid_vmm           : boolean = false;
+vid_ppos          : byte = 0;
+vid_panelx        : integer = 0;
+vid_panely        : integer = 0;
+vid_mapx          : integer = 0;
+vid_mapy          : integer = 0;
+vid_vsl           : array[1..vid_mvs] of PTVisSpr;
+vid_vsls          : word = 0;
 
 ter_w,
 ter_h             : integer;
@@ -179,8 +187,7 @@ font_ca           : array[char] of pSDL_SURFACE;
 _effects          : array[1..vid_mvs     ] of TEff;
 
 MaxTDecsS         : integer = 0;      //960 720
-_TDecs            : array of TTDec;
-
+_TDecs            : array of TDecal;
 
 map_mmcx          : single;
 map_mmvw,
@@ -231,23 +238,6 @@ _rpls_player      : byte = 0;
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
 
-vid_vx            : integer = 0;
-vid_vy            : integer = 0;
-vid_vmspd         : integer = 25;
-vid_mmvx,
-vid_mmvy          : integer;
-vid_uhbars        : byte = 0;
-vid_plcolors      : byte = 0;
-vid_vmm           : boolean = false;
-vid_ppos          : byte = 0;
-vid_panelx        : integer = 0;
-vid_panely        : integer = 0;
-vid_mapx          : integer = 0;
-vid_mapy          : integer = 0;
-
-vid_vsl           : array[1..vid_mvs] of PTVisSpr;
-vid_vsls          : word = 0;
-
 fog_grid          : array[0..fog_vfwm,0..fog_vfhm] of byte;
 fog_pgrid         : array[0..fog_vfwm,0..fog_vfhm] of byte;
 fog_vfw           : byte = 0;
@@ -261,10 +251,6 @@ vid_fex           : integer = 0;
 vid_fey           : integer = 0;
 
 _lng              : boolean = false;
-
-ordn,
-ordx,
-ordy              : array[0..10] of integer;
 
 _m_sel,
 m_sxs,
@@ -281,37 +267,39 @@ m_by              : integer;
 m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 
+ui_ordn,
+ui_ordx,
+ui_ordy           : array[0..10] of integer;
+ui_orderu         : array[0..9 ] of TSob;
 ui_mc_x,
 ui_mc_y,
 ui_mc_a           : integer;
 ui_mc_c           : cardinal;
-
 ui_panelmmm       : boolean = false;
 ui_tab            : byte = 0;
 ui_muc            : array[false..true] of cardinal;
-ui_builders_x     : array[0.._uts] of integer;
-ui_builders_y     : array[0.._uts] of integer;
-ui_builders_r     : array[0.._uts] of integer;
-ui_units_ptime    : array[0.._uts] of integer;
-ui_units_prodc    : array[0.._uts] of integer;
+ui_builders_x     : array[0..ui_builder_srs] of integer;
+ui_builders_y     : array[0..ui_builder_srs] of integer;
+ui_builders_r     : array[0..ui_builder_srs] of integer;
+ui_units_ptime    : array[byte] of integer;
+ui_units_prodc    : array[byte] of integer;
 ui_units_proda    : integer = 0;
 ui_uimove         : integer = 0; // ui move buttons
 ui_uiaction       : integer = 0; // ui action button
 ui_battle_units   : integer = 0; // ui select all button
-ui_upgrct         : array[0.._uts] of byte;
+ui_upgrct         : array[byte] of byte;
 ui_upgr_time      : integer = 0;
-ui_upgr           : array[0.._uts] of integer;
-ui_units_inapc    : array[0.._uts] of integer;
-ui_prod_units     : array[0..255 ] of integer;
+ui_upgr           : array[byte] of integer;
+ui_units_inapc    : array[byte] of integer;
+ui_prod_units     : array[byte] of integer;
 ui_prod_builds    : TSoB;
-ui_blds           : array[0.._uts] of integer;
+ui_blds           : array[byte] of integer;
 ui_bldsc          : integer;
 ui_alrms          : array[0..vid_uialrm_n] of TAlarm;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_msk            : byte = 0;
 ui_msks           : shortint = 0;
-ui_orderu         : array[0..9,false..true] of TSob;
 ui_rad_rld        : array[false..true] of cardinal;
 
 ui_uiuphx         : integer = 0;
@@ -407,7 +395,7 @@ theme_spr_decors,
 theme_spr_srocks,
 theme_spr_brocks,
 theme_spr_liquids,
-theme_spr_terrains: TUSpriteL;
+theme_spr_terrains: TUSpriteList;
 theme_spr_decaln,
 theme_spr_decorn,
 theme_spr_srockn,
@@ -570,12 +558,12 @@ spr_iob_knight,
 spr_iob_baron,
 spr_mback,
 spr_cursor        : pSDL_Surface;
-spr_b_b           : array[1..r_cnt,0.._uts] of pSDL_Surface;
-spr_b_u           : array[1..r_cnt,0.._uts] of pSDL_Surface;
-spr_b_up          : array[1..r_cnt,0..MaxUpgrs] of pSDL_Surface;
+//spr_b_b           : array[1..r_cnt,byte] of pSDL_Surface;
+//spr_b_u           : array[1..r_cnt,byte] of pSDL_Surface;
+spr_b_up          : array[1..r_cnt,0..ui_ubtns] of pSDL_Surface;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
-spr_ui_oico       : array[1..r_cnt,false..true,0.._uts] of pSDL_Surface;
+spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 
 /// text
 
@@ -641,7 +629,7 @@ str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_a        : array[0..1] of shortstring;
 str_hint_m        : array[0..2] of shortstring;
-str_hint          : array[0..3,1..r_cnt,0.._uts] of shortstring;
+str_hint          : array[0..3,1..r_cnt,byte] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 str_svld_errors   : array[1..4] of shortstring;
 str_camp_t        : array[0..MaxMissions] of shortstring;
@@ -649,9 +637,6 @@ str_camp_o        : array[0..MaxMissions] of shortstring;
 str_camp_m        : array[0..MaxMissions] of shortstring;
 
 
-str_up_name,
-str_up_descr,
-str_up_hint       : array[0..255] of shortstring;
 
 str_connect,
 str_svup,

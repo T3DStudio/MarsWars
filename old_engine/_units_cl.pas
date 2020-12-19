@@ -1,12 +1,6 @@
 
 {$IFDEF _FULLGAME}
-procedure InitFogR;
-var r,x:byte;
-begin
-   for r:=0 to MFogM do
-    for x:=0 to r do
-     _fcx[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
-end;
+
 
 procedure _unit_fsrclc(u:PTUnit);
 begin
@@ -15,14 +9,14 @@ begin
       fsr:=0;
       if(fog_cw>0)then
       begin
-         fsr:=sr div fog_cw;
+         fsr:=srng div fog_cw;
          if(fsr>MFogM)then fsr:=MFogM;
       end;
    end;
 end;
 {$ENDIF}
 
-procedure _unit_sclass(u:PTUnit);
+{procedure _unit_sclass(u:PTUnit);
 var ctime:integer;
 begin
    with u^ do
@@ -958,6 +952,36 @@ begin
 
       if(onlySVCode)then hits:=mhits;
    end;
+end;  }
+
+procedure _unit_apUID(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      uid:=@_uids[uidi];
+      with uid^ do
+      begin
+         r    := _r;
+         srng := _srng;
+         speed:= _speed;
+         uf   := _uf;
+         apcm := _apcm;
+         solid:= _issolid;
+
+         mmr  := 1;
+
+         if(_isbuilding)and(_isbarrack)then inc(uo_y,r+12);
+
+         {$IFDEF _FULLGAME}
+         if(_isbuilding)
+         then mmr   :=round(r*map_mmcx)
+         else shadow:=1+(uf*fly_height);
+
+         _unit_fsrclc(pu);
+         {$ENDIF}
+         if(onlySVCode)then hits:=_mhits;
+      end;
+   end;
 end;
 
 procedure initUIDS;
@@ -970,7 +994,9 @@ begin
       _max       := 32000;
       _btime     := 1;
       _uf        := uf_ground;
-      _ucl       := _uts;
+      _btni      := 255;
+      _apcs      := 1;
+      _urace     := r_hell;
 
       _isbuilding:=false;
       _isbuilder :=false;
@@ -978,35 +1004,6 @@ begin
       _isbarrack :=false;
       _ismech    :=false;
       _issolid   :=true;
-
-      {
-      _mhits,
-      _speed,
-      _r ,
-      _sr,
-      _max,
-      _renerg,
-      _generg,
-      _ttime,
-      _btime,
-      _bstep,
-      _painc,
-      _apcs,
-      _apcm
-                   : integer;
-      _uf,
-      _ucl,
-      _ruid,
-      _rupgr       : byte;
-
-      _shcf        : single;
-
-      _isbuilding,
-      _isbuilder,
-      _issmith,
-      _isbarrack,
-      _ismech,
-      _issolid     : boolean;       }
 
       case i of
 //         HELL BUILDINGS   ////////////////////////////////////////////////////
@@ -1016,8 +1013,9 @@ begin
    _renerg    := 8;
    _generg    := 6;
    _r         := 66;
-   _ucl       := 0;
-   _btime     := 90;
+   _srng      := base_rA[0];
+   _btni      := 0;
+   _btime     := 75;
 
    _isbuilding:= true;
    _isbuilder := true;
@@ -1028,7 +1026,9 @@ UID_HGate:
 begin
    _mhits     := 1500;
    _renerg    := 4;
-   _ucl       := 1;
+   _r         := 60;
+   _srng      := 200;
+   _btni      := 1;
    _btime     := 40;
 
    _isbuilding:= true;
@@ -1041,7 +1041,9 @@ begin
    _mhits     := 200;
    _renerg    := 1;
    _generg    := 1;
-   _ucl       := 2;
+   _r         := 24;
+   _srng      := 200;
+   _btni      := 2;
    _btime     := 10;
 
    _isbuilding:= true;
@@ -1050,6 +1052,10 @@ UID_HPools:
 begin
    _mhits     := 1000;
    _renerg    := 6;
+   _r         := 53;
+   _srng      := 200;
+   _btni      := 3;
+   _btime     := 40;
 
    _isbuilding:= true;
    _issmith   := true;
@@ -1058,13 +1064,22 @@ UID_HTower:
 begin
    _mhits     := 700;
    _renerg    := 2;
+   _r         := 21;
+   _srng      := 250;
+   _btni      := 4;
+   _btime     := 20;
 
    _isbuilding:= true;
 end;
 UID_HTeleport:
 begin
-   _mhits     := 500;
+   _mhits     := 400;
    _renerg    := 4;
+   _r         := 28;
+   _srng      := 200;
+   _btni      := 5;
+   _btime     := 30;
+   _max       := 1;
 
    _isbuilding:= true;
 end;
@@ -1072,6 +1087,10 @@ UID_HMonastery:
 begin
    _mhits     := 1000;
    _renerg    := 10;
+   _r         := 65;
+   _srng      := 200;
+   _btni      := 6;
+   _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
 
@@ -1081,8 +1100,12 @@ UID_HTotem:
 begin
    _mhits     := 700;
    _renerg    := 3;
+   _r         := 21;
+   _srng      := 250;
+   _btni      := 7;
+   _btime     := 25;
    _ruid      := UID_HMonastery;
-   _rupgr     := upgr_2tier;
+   //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
 end;
@@ -1090,9 +1113,13 @@ UID_HAltar:
 begin
    _mhits     := 500;
    _renerg    := 4;
+   _r         := 50;
+   _srng      := 200;
+   _btni      := 8;
+   _btime     := 30;
    _max       := 1;
    _ruid      := UID_HMonastery;
-   _rupgr     := upgr_2tier;
+   //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
 end;
@@ -1101,6 +1128,10 @@ begin
    _mhits     := 4000;
    _renerg    := 10;
    _generg    := 4;
+   _r         := 86;
+   _srng      := 300;
+   _btni      := 9;
+   _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
 
@@ -1112,6 +1143,12 @@ end;
 UID_HEye:
 begin
    _mhits     := 240;
+   _renerg    := 1;
+   _r         := 5;
+   _srng      := 250;
+   _btni      := 21;
+   _btime     := 1;
+   //_rupgr     := upgr_vision;
 
    _isbuilding:= true;
    _issolid   := false;
@@ -1121,6 +1158,11 @@ begin
    _mhits     := 3000;
    _renerg    := 8;
    _generg    := 6;
+   _speed     := 6;
+   _r         := 66;
+   _srng      := base_rA[0];
+   _btni      := 12;
+   _btime     := 90;
 
    _isbuilding:= true;
 
@@ -1131,6 +1173,10 @@ UID_HMilitaryUnit:
 begin
    _mhits     := 1500;
    _renerg    := 4;
+   _r         := 66;
+   _srng      := base_rA[0];
+   _btni      := 13;
+   _btime     := 40;
 
    _isbuilding:=true;
    _isbarrack :=true;
@@ -1145,6 +1191,11 @@ begin
    _renerg    := 1;
    _r         := 10;
    _speed     := 23;
+   _srng      := 250;
+   _btni      := 0;
+   _painc     := 1;
+   _btime     := 8;
+   _uf        := uf_soaring;
 end;
 UID_Imp        :
 begin
@@ -1152,76 +1203,230 @@ begin
    _renerg    := 1;
    _r         := 11;
    _speed     := 9;
+   _srng      := 250;
+   _btni      := 1;
+   _painc     := 3;
+   _btime     := 5;
 end;
 UID_Demon      :
 begin
    _mhits     := 150;
    _renerg    := 2;
+   _r         := 14;
+   _speed     := 14;
+   _srng      := 200;
+   _btni      := 2;
+   _painc     := 8;
+   _btime     := 8;
 end;
 UID_Cacodemon  :
 begin
    _mhits     := 225;
    _renerg    := 2;
+   _r         := 14;
+   _speed     := 9;
+   _srng      := 250;
+   _btni      := 3;
+   _painc     := 6;
+   _btime     := 20;
+   _apcs      := 2;
 end;
 UID_Baron      :
 begin
    _mhits     := 350;
    _renerg    := 4;
+   _r         := 14;
+   _speed     := 9;
+   _srng      := 250;
+   _btni      := 4;
+   _painc     := 8;
+   _btime     := 40;
+   _apcs      := 3;
 end;
 UID_Cyberdemon :
 begin
    _mhits     := 2000;
    _renerg    := 10;
    _max       := 1;
+   _r         := 20;
+   _speed     := 11;
+   _srng      := 250;
+   _btni      := 5;
+   _painc     := 15;
+   _btime     := 90;
+   _apcs      := 10;
+   _ruid      := UID_HMonastery;
 end;
 UID_Mastermind :
 begin
    _mhits     := 2000;
    _renerg    := 10;
    _max       := 1;
+   _r         := 35;
+   _speed     := 11;
+   _srng      := 250;
+   _btni      := 6;
+   _painc     := 15;
+   _btime     := 90;
+   _apcs      := 10;
+   _ruid      := UID_HMonastery;
 end;
 UID_Pain       :
 begin
+   _mhits     := 200;
+   _renerg    := 6;
+   _r         := 14;
+   _speed     := 9;
+   _srng      := 250;
+   _btni      := 7;
+   _painc     := 3;
+   _btime     := 40;
+   _apcs      := 2;
+   _ruid      := UID_HFortress;
 end;
 UID_Revenant   :
 begin
+   _mhits     := 200;
+   _renerg    := 4;
+   _r         := 13;
+   _speed     := 12;
+   _srng      := 250;
+   _btni      := 8;
+   _painc     := 7;
+   _btime     := 40;
+   _ruid      := UID_HFortress;
 end;
 UID_Mancubus   :
 begin
+   _mhits     := 400;
+   _renerg    := 6;
+   _r         := 20;
+   _speed     := 6;
+   _srng      := 250;
+   _btni      := 9;
+   _painc     := 4;
+   _btime     := 60;
+   _ruid      := UID_HMonastery;
+   //_rupgr     := upgr_2tier;
 end;
 UID_Arachnotron:
 begin
+   _mhits     := 350;
+   _renerg    := 6;
+   _r         := 20;
+   _speed     := 8;
+   _srng      := 250;
+   _btni      := 10;
+   _painc     := 4;
+   _btime     := 50;
+   _ruid      := UID_HMonastery;
+   //_rupgr     := upgr_2tier;
 end;
-UID_Archvile   :
+UID_Archvile:
 begin
+   _mhits     := 400;
+   _renerg    := 10;
+   _r         := 14;
+   _speed     := 15;
+   _srng      := 250;
+   _btni      := 11;
+   _painc     := 12;
+   _btime     := 90;
+   _apcs      := 2;
+   _ruid      := UID_HMonastery;
+   //_rupgr     := upgr_2tier;
 end;
 
-UID_ZFormer    :
+UID_ZFormer:
 begin
+   _mhits     := 50;
+   _renerg    := 1;
+   _r         := 12;
+   _speed     := 13;
+   _srng      := 250;
+   _btni      := 12;
+   _painc     := 1;
+   _btime     := 5;
 end;
-UID_ZEngineer  :
+UID_ZEngineer:
 begin
+   _mhits     := 100;
+   _renerg    := 2;
+   _r         := 12;
+   _speed     := 14;
+   _srng      := 200;
+   _btni      := 13;
+   _painc     := 4;
+   _btime     := 20;
 end;
-UID_ZSergant   :
+UID_ZSergant:
 begin
+   _mhits     := 80;
+   _renerg    := 2;
+   _r         := 12;
+   _speed     := 13;
+   _srng      := 241;
+   _btni      := 14;
+   _painc     := 4;
+   _btime     := 10;
 end;
-UID_ZCommando  :
+UID_ZCommando:
 begin
+   _mhits     := 100;
+   _renerg    := 2;
+   _r         := 12;
+   _speed     := 11;
+   _srng      := 250;
+   _btni      := 15;
+   _painc     := 4;
+   _btime     := 15;
 end;
-UID_ZBomber    :
+UID_ZBomber:
 begin
+   _mhits     := 100;
+   _renerg    := 4;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 16;
+   _painc     := 4;
+   _btime     := 30;
 end;
-UID_ZMajor     :
+UID_ZMajor:
 begin
+   _mhits     := 100;
+   _renerg    := 4;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 17;
+   _painc     := 4;
+   _btime     := 20;
 end;
-UID_ZBFG       :
+UID_ZBFG:
 begin
+   _mhits     := 100;
+   _renerg    := 5;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 18;
+   _painc     := 4;
+   _btime     := 60;
 end;
 
 
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
 UID_UCommandCenter:
 begin
+   _mhits     := 3500;
+   _renerg    := 8;
+   _generg    := 6;
+   _r         := 66;
+   _srng      := base_rA[0];
+   _btni      := 0;
+   _btime     := 90;
+
    _isbuilding:= true;
    _isbuilder := true;
 
@@ -1229,6 +1434,13 @@ begin
 end;
 UID_UMilitaryUnit:
 begin
+   _mhits     := 1750;
+   _renerg    := 4;
+   _r         := 66;
+   _srng      := 200;
+   _btni      := 1;
+   _btime     := 40;
+
    _isbuilding:=true;
    _isbarrack :=true;
 
@@ -1236,101 +1448,296 @@ begin
 end;
 UID_UGenerator:
 begin
+   _mhits     := 400;
+   _renerg    := 2;
+   _generg    := 2;
+   _r         := 42;
+   _srng      := 200;
+   _btni      := 2;
+   _btime     := 20;
+
    _isbuilding:=true;
 end;
 UID_UWeaponFactory:
 begin
+   _mhits     := 1750;
+   _renerg    := 6;
+   _r         := 62;
+   _srng      := 200;
+   _btni      := 3;
+   _btime     := 40;
+
    _isbuilding:=true;
    _issmith   :=true;
 end;
 UID_UTurret:
 begin
-   _isbuilding:=true;
+   _mhits     := 400;
+   _renerg    := 2;
+   _r         := 17;
+   _srng      := 250;
+   _btni      := 4;
+   _btime     := 15;
 
+   _isbuilding:=true;
 end;
 UID_URadar:
 begin
-   _isbuilding:=true;
-
-end;
-UID_UVehicleFactory :
-begin
-   _isbuilding:=true;
-
-end;
-UID_UPTurret:
-begin
-   _isbuilding:=true;
-
-end;
-UID_URocketL:
-begin
-   _isbuilding:=true;
-
-end;
-UID_URTurret:
-begin
-   _isbuilding:=true;
-
-end;
-UID_UNuclearPlant:
-begin
-   _renerg    := 10;
+   _mhits     := 500;
+   _renerg    := 4;
+   _r         := 35;
+   _srng      := 200;
+   _btni      := 5;
+   _btime     := 30;
    _max       := 1;
 
    _isbuilding:=true;
+end;
+UID_UVehicleFactory :
+begin
+   _mhits     := 1750;
+   _renerg    := 10;
+   _r         := 62;
+   _srng      := 200;
+   _btni      := 6;
+   _btime     := 90;
+   _max       := 1;
+   _ruid      := UID_UWeaponFactory;
 
+   _isbuilding:=true;
+end;
+UID_UPTurret:
+begin
+   _mhits     := 400;
+   _renerg    := 2;
+   _r         := 17;
+   _srng      := 250;
+   _btni      := 7;
+   _btime     := 20;
+   _ruid      := UID_UVehicleFactory;
+
+   _isbuilding:=true;
+end;
+UID_URocketL:
+begin
+   _mhits     := 500;
+   _renerg    := 4;
+   _r         := 40;
+   _srng      := 200;
+   _btni      := 8;
+   _btime     := 30;
+   _max       := 1;
+   _ruid      := UID_UVehicleFactory;
+   //_rupgr     := upgr_2tier;
+
+   _isbuilding:=true;
+end;
+UID_URTurret:
+begin
+   _mhits     := 400;
+   _renerg    := 2;
+   _r         := 17;
+   _srng      := 250;
+   _btni      := 10;
+   _btime     := 25;
+   _ruid      := UID_UVehicleFactory;
+   //_rupgr     := upgr_rturrets;
+
+   _isbuilding:=true;
+end;
+UID_UNuclearPlant:
+begin
+   _mhits     := 2000;
+   _renerg    := 10;
+   _generg    := 10;
+   _r         := 70;
+   _srng      := 200;
+   _btni      := 9;
+   _btime     := 90;
+   _max       := 1;
+   _ruid      := UID_UVehicleFactory;
+
+   _isbuilding:=true;
 end;
 UID_UMine:
 begin
+   _mhits     := 5;
+   _renerg    := 1;
+   _r         := 5;
+   _srng      := 100;
+   _btni      := 21;
+   _btime     := 5;
+   _btni      := 9;
 
+   _isbuilding:=true;
+   _issolid   := false;
 end;
 
-
+///////////////////////////////////
 UID_Engineer:
 begin
+   _mhits     := 100;
+   _renerg    := 1;
+   _r         := 12;
+   _speed     := 13;
+   _srng      := 200;
+   _btni      := 0;
+   _btime     := 10;
 end;
-UID_Medic   :
+UID_Medic:
 begin
+   _mhits     := 100;
+   _renerg    := 1;
+   _r         := 12;
+   _speed     := 13;
+   _srng      := 200;
+   _btni      := 1;
+   _btime     := 10;
 end;
-UID_Sergant :
+UID_Sergant:
 begin
+   _mhits     := 100;
+   _renerg    := 2;
+   _r         := 12;
+   _speed     := 13;
+   _srng      := 241;
+   _btni      := 2;
+   _btime     := 10;
 end;
 UID_Commando:
 begin
+   _mhits     := 100;
+   _renerg    := 2;
+   _r         := 12;
+   _speed     := 11;
+   _srng      := 250;
+   _btni      := 3;
+   _btime     := 15;
 end;
-UID_Bomber  :
+UID_Bomber:
 begin
+   _mhits     := 100;
+   _renerg    := 4;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 4;
+   _btime     := 30;
 end;
-UID_Major   :
+UID_Major:
 begin
+   _mhits     := 100;
+   _renerg    := 4;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 5;
+   _btime     := 20;
 end;
-UID_BFG     :
+UID_BFG:
 begin
+   _mhits     := 100;
+   _renerg    := 5;
+   _r         := 12;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 6;
+   _btime     := 60;
 end;
-
 UID_FAPC:
 begin
-   ups_apc    :=marines+[UID_APC,UID_Terminator,UID_Tank,UID_Flyer];
+   _mhits     := 250;
+   _renerg    := 3;
+   _r         := 33;
+   _speed     := 22;
+   _srng      := 250;
+   _btni      := 7;
+   _btime     := 25;
+   _apcm      := 10;
+   _apcs      := 8;
+   _ruid      := UID_UWeaponFactory;
 
+   _ismech    := true;
+
+   ups_apc    :=marines+[UID_APC,UID_Terminator,UID_Tank,UID_Flyer];
 end;
 UID_APC:
 begin
+   _mhits     := 350;
+   _renerg    := 3;
+   _r         := 25;
+   _speed     := 15;
+   _srng      := 250;
+   _btni      := 8;
+   _btime     := 25;
+   _apcm      := 10;
+   _apcs      := 10;
+   _ruid      := UID_UWeaponFactory;
+
+   _ismech    := true;
+
    ups_apc    :=marines;
 end;
-
-
 UID_Terminator:
 begin
+   _mhits     := 350;
+   _renerg    := 6;
+   _r         := 16;
+   _speed     := 14;
+   _srng      := 275;
+   _btni      := 9;
+   _btime     := 60;
+   _apcs      := 3;
+   _ruid      := UID_UVehicleFactory;
+   //_rupgr     := upgr_2tier;
+
+   _ismech    := true;
 end;
 UID_Tank:
 begin
+   _mhits     := 400;
+   _renerg    := 8;
+   _r         := 20;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 10;
+   _btime     := 60;
+   _apcs      := 7;
+   _ruid      := UID_UVehicleFactory;
+   //_rupgr     := upgr_2tier;
+
+   _ismech    := true;
 end;
 UID_Flyer:
 begin
+   _mhits     := 350;
+   _renerg    := 8;
+   _r         := 18;
+   _speed     := 19;
+   _srng      := 275;
+   _btni      := 11;
+   _btime     := 60;
+   _apcs      := 7;
+   _uf        := uf_fly;
+   _ruid      := UID_UVehicleFactory;
+   //_rupgr     := upgr_2tier;
+
+   _ismech    := true;
 end;
 UID_UTransport:
 begin
+   _mhits     := 400;
+   _renerg    := 5;
+   _r         := 36;
+   _speed     := 10;
+   _srng      := 250;
+   _btni      := 12;
+   _btime     := 60;
+   _apcm      := 30;
+   _apcs      := 10;
+   _ruid      := UID_UVehicleFactory;
+
+   _ismech    := true;
 end;
 
 UID_UBaseMil:
@@ -1362,10 +1769,16 @@ begin
 end;
       end;
 
+      if(i in uids_hell)then _urace:=r_hell;
+      if(i in uids_uac )then _urace:=r_uac;
 
       _ismech:=_ismech or _isbuilding;
 
       _shcf:=_mhits/_mms;
+
+      if(_btime >0)then _bstep:=(_mhits div 2) div _btime;
+      if(_bstep<=0)then _bstep:=1;
+      _tstep:=_btime*fr_fps;
 
       {$IFDEF _FULLGAME}
       _fr:=(_r div fog_cw)+1;
@@ -1375,48 +1788,42 @@ end;
 end;
 
 procedure initUnits;
-var i,rc:byte;
+var i:byte;
 begin
-   FillChar(cl2uid,SizeOf(cl2uid),0);
-   FillChar(_ulst ,SizeOf(_ulst ),0);
-   FillChar(_uids ,SizeOf(_uids ),0);
+   FillChar(ui_puids,SizeOf(ui_puids),0);
+   FillChar(_uids   ,SizeOf(_uids   ),0);
 
    initUIDS;
 
-   for i:=0 to 255 do
-   begin
-      _ulst[i].uidi:=i;
-      _unit_sclass(@_ulst[i]);
-      with _ulst[i] do
-       if(ucl<=_uts)then
-       begin
-          rc:=0;
-          if(i in uids_hell)then rc:=r_hell;
-          if(i in uids_uac )then rc:=r_uac;
-          if(rc>0)then
-           if(cl2uid[rc,isbuild,ucl]=0)then cl2uid[rc,isbuild,ucl]:=i;
-       end;
-   end;
+   {for i:=0 to 255 do
+    with _uids[i] do
+     if(_ucl<=_uts)and(_race>0)then
+      if(cl2uid[_race,_isbuilding,_ucl]=0)then cl2uid[_race,_isbuilding,_ucl]:=i; }
 end;
 
-procedure _setUPGR(rc,upcl,stime,cnt,enrg:integer;rupgr,ruid:byte);
+procedure _setUPGR(rc,upcl,stime,max,enrg:integer;rupgr,ruid:byte);
 begin
-   upgrade_time [rc,upcl]:=vid_fps*stime;
-   upgrade_cnt  [rc,upcl]:=cnt;
-   _pne_r       [rc,upcl]:=enrg;
-   upgrade_rupgr[rc,upcl]:=rupgr;
-   upgrade_ruid [rc,upcl]:=ruid;
-   upgrade_mfrg [rc,upcl]:=upcl in upgr_1[rc];
+   with _upids[upcl] do
+   begin
+      _up_ruid  := ruid;
+      _up_rupgr := rupgr;
+      _up_race  := rc;
+      _up_time  := stime*fr_fps;
+      _up_renerg:= enrg;
+      _up_max   := max;
+      _up_mfrg  := false;
+   end;
 end;
 
 procedure ObjTbl;
 begin
-   FillChar(upgrade_time ,SizeOf(upgrade_time ),0);
+   FillChar(_upids,SizeOf(_upids),0);
+ {  FillChar(upgrade_time ,SizeOf(upgrade_time ),0);
    FillChar(upgrade_cnt  ,SizeOf(upgrade_cnt  ),1);
    FillChar(upgrade_rupgr,SizeOf(upgrade_rupgr),0);
-   FillChar(upgrade_rupgr,SizeOf(upgrade_ruid ),0);
+   FillChar(upgrade_rupgr,SizeOf(upgrade_ruid ),0);   }
                               // time lvl enr rupgr     ruid
-   _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255       ,255);
+  { _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_build     ,120,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_melee     ,60 ,3 ,3 ,255       ,255);
@@ -1466,13 +1873,9 @@ begin
    _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_rturrets  ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_UNuclearPlant  );
-   _setUPGR(r_uac ,upgr_9bld      ,180,1 ,4 ,upgr_2tier,UID_UNuclearPlant  );
+   _setUPGR(r_uac ,upgr_9bld      ,180,1 ,4 ,upgr_2tier,UID_UNuclearPlant  );  }
 
    initUnits;
-
-   {$IFDEF _FULLGAME}
-   InitFogR;
-   {$ENDIF}
 end;
 
 

@@ -4,9 +4,9 @@ function w2s (i:word    ):shortstring;begin str(i,w2s);end;
 function c2s (i:cardinal):shortstring;begin str(i,c2s);end;
 function i2s (i:integer ):shortstring;begin str(i,i2s);end;
 //function si2s(i:single  ):shortstring;begin str(i,si2s);end;
-function s2b (str:shortstring):byte;var t:integer;begin val(str,s2b,t);end;
-function s2w (str:shortstring):word;var t:integer;begin val(str,s2w,t);end;
-function s2i (str:shortstring):integer;var t:integer;begin val(str,s2i,t);end;
+function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b,t);end;
+function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w,t);end;
+function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i,t);end;
 function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c,t);end;
 
 function max2(x1,x2   :integer):integer;begin if(x1>x2)then max2:=x1 else max2:=x2;end;
@@ -14,46 +14,18 @@ function max3(x1,x2,x3:integer):integer;begin max3:=max2(max2(x1,x2),x3);end;
 function min2(x1,x2   :integer):integer;begin if(x1<x2)then min2:=x1 else min2:=x2;end;
 function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
-function mm3(minx,x,maxx:integer):integer;begin mm3:=min2(maxx,max2(x,minx)); end;
+function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-{procedure _bc_us(gs:pcardinal;g:byte);
-begin
-   if(g<=_uts)then
-    gs^:=gs^ xor cardinal(1 shl g);
-end;
-
-procedure _bc_ss(gs:pcardinal;g:TSob);
+procedure _upgr_ss(p:byte;g:TSob;lvl:integer);
 var i:byte;
 begin
-   gs^:=0;
-   for i:=0 to _uts do
-    if(i in g)then
-     gs^:=gs^ or cardinal(1 shl i);
-end;
-
-procedure _bc_sa(gs:pcardinal;g:TSob);
-var i:byte;
-begin
-   for i:=0 to _uts do
-    if(i in g)then
-     gs^:=gs^ or cardinal(1 shl i);
-end;
-
-function _bc_g(gs:cardinal;g:byte):boolean;
-begin
-    _bc_g:=false;
-   if(g<=_uts)then _bc_g:=(gs and cardinal(1 shl g))>0;
-end;    }
-
-procedure _upgr_ss(upgr:Pupgrar;g:TSob;race,lvl:byte);
-var i:byte;
-begin
-   FillChar(upgr^,SizeOf(upgrar),0);
-   for i:=0 to _uts do
-    if(i in g)then
-     if(lvl>upgrade_cnt[race,i])
-     then upgr^[i]:=upgrade_cnt[race,i]
-     else upgr^[i]:=lvl;
+   with _players[p] do
+   begin
+      FillChar(upgr,SizeOf(upgr),0);
+      for i:=0 to 255 do
+       if(i in g)then
+        with _upids[i] do upgr[i]:=min3(a_upgr[i],_up_max,lvl);
+   end;
 end;
 
 procedure CalcPLNU;
@@ -76,8 +48,8 @@ begin cf:=(c^ and f^)>0;end;
 function sign(x:integer):shortint;
 begin
    sign:=0;
-   if (x>0) then sign:=1;
-   if (x<0) then sign:=-1;
+   if(x>0)then sign:=1;
+   if(x<0)then sign:=-1;
 end;
 
 function dist2(dx,dy,dx1,dy1:integer):integer;
@@ -91,8 +63,8 @@ end;
 
 function dist(dx,dy,dx1,dy1:integer):integer;
 begin
-   dx:=abs(dx-dx1);
-   dy:=abs(dy-dy1);
+   dx  :=abs(dx-dx1);
+   dy  :=abs(dy-dy1);
    dist:=trunc(sqrt(sqr(dx)+sqr(dy)));
 end;
 
@@ -110,7 +82,7 @@ begin
    avy:=abs(vy);
 
    if(avx>avy)
-   then res:=trunc((vy/vx)*45)
+   then res:=   trunc((vy/vx)*45)
    else res:=90-trunc((vx/vy)*45);
 
    if(vy<0)then
@@ -180,76 +152,39 @@ begin
    Close(f);
 end;
 
-function _bldCndt(pl:PTPlayer;bucl:byte):boolean;
+function _uid_cndt(pl:PTPlayer;uid:byte):boolean;
 begin
-   if(bucl>_uts)
-   then _bldCndt:=true
-   else
    with pl^ do
+   with _uids[uid] do
    begin
-    _bldCndt:=(bld_r>0)
-            or(cl2uid[race,true,bucl]=0)
-            or(n_builders<=0)
-            or(army>=MaxPlayerUnits)
-            or not(bucl in a_build)
-            or((G_addon=false)and(cl2uid[race,true,bucl] in t2));
+      if(_isbuilding)
+      then _uid_cndt:=(n_builders<=0)or(bld_r>0)
+      else _uid_cndt:=(n_barracks<=0);
 
-   if(_bldCndt=false)then
-   with _ulst[cl2uid[race,true,bucl]] do
-   _bldCndt:=((ruid <255)and(uid_eb[ruid]=0))
-           or((rupgr<255)and(upgr[rupgr]=0))
-           or((menerg-cenerg)<renerg)
-           or(ucl_e[true,bucl]>=max);
+      if(_uid_cndt=false)then
+       _uid_cndt:=((army+uproda)>=MaxPlayerUnits)
+                or((_ruid >0)and(uid_eb[_ruid ]=0))
+                or((_rupgr>0)and(upgr  [_rupgr]=0))
+                or((uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]))
+                or(cenerg<_renerg)
+                or(_btime<=0)
+                or((_addon)and(G_addon=false))
    end;
 end;
-function _untCndt(pl:PTPlayer;bucl:byte):boolean;
+function _upid_cndt(pl:PTPlayer;up:byte):boolean;
 begin
-   if(bucl>_uts)
-   then _untCndt:=true
-   else
    with pl^ do
+   with _upids[up] do
    begin
-    _untCndt:=((army+uproda)>=MaxPlayerUnits)
-            or(cl2uid[race,false,bucl]=0)
-            or not(bucl in a_units)
-            or(n_barracks<=0)
-            or((G_addon=false)and(cl2uid[race,false,bucl] in t2));
-
-   if(_untCndt=false)then
-   with _ulst[cl2uid[race,false,bucl]] do
-   _untCndt:=((ruid <255)and(uid_eb[ruid]=0))
-           or((rupgr<255)and(upgr[rupgr]=0))
-           or((menerg-cenerg)<renerg)
-           or(trt=0)
-           or((ucl_e[false,bucl]+uprodc[bucl])>=max);
-   end;
-end;
-function _upgrreq(pl:PTPlayer;up:byte):boolean;
-var ruid:byte;
-begin
-   if(up>MaxUpgrs)
-   then _upgrreq:=true
-   else
-   with pl^ do
-   begin
-     _upgrreq:=(upgrade_time[race,up]=0)
-             or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
-             or not(up in a_upgr)
-             or(n_smiths<=0)
-             or((menerg-cenerg)<_pne_r[race,up])
-             or((up>=upgr_2tier)and(G_addon=false));
-
-   if(_upgrreq=false)then
-    if(upgrade_mfrg[race,up])
-    then _upgrreq:=(upgr[up]+upgrinp[up])>=upgrade_cnt[race,up]
-    else _upgrreq:=(upgrinp[up]>0)
-                 or(upgr[up]>=upgrade_cnt[race,up]);
-
-   if(_upgrreq=false)and(upgrade_ruid[race,up]<255)then
-   begin
-      ruid:=upgrade_ruid[race,up];
-      _upgrreq:=uid_eb[ruid]=0;
-   end;
+      _upid_cndt:=
+                ((_up_ruid >0)and(uid_eb[_up_ruid ]=0))
+              or((_up_rupgr>0)and(upgr  [_up_rupgr]=0))
+              or(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgr[up]))
+              or((_up_mfrg=false)and(pprodu[up]>0))
+              or(n_smiths<=0)
+              or(cenerg<_up_renerg)
+              or(_up_time<=0)
+              or((_up_addon)and(G_addon=false));
    end;
 end;
 
@@ -271,32 +206,25 @@ end;
 
 function _hi2S(h,mh:integer;s:single):shortint;
 begin
-  if(h>=mh)
-  then _hI2S:=127
-  else
-   case h of
-0           : _hI2S:=0;
-dead_hits   : _hI2S:=-127;
+   if(h>=mh        )then _hI2S:=127  else
+   if(h =0         )then _hI2S:=0    else
+   if(h =dead_hits )then _hI2S:=-127 else
+   if(h<=ndead_hits)then _hI2S:=-128 else
+   if(dead_hits<h)and(h<0)then
+   begin
+      if(abs(h)<_d2shi)
+      then _hI2S:=-1
+      else _hI2S:=h div _d2shi;
+   end
    else
-     if(h<=ndead_hits)
-     then _hI2S:=-128
-     else
-       if(dead_hits<h)and(h<0)then
-       begin
-          if(abs(h)<_d2shi)
-          then _hI2S:=-1
-          else _hI2S:=h div _d2shi;
-       end
-       else
-       begin
-          s:=(h/s);
-          if(s<1)
-          then h:=1
-          else h:=trunc(s);
-          if(h>_mms)
-          then _hI2S:=_mms
-          else _hI2S:=h;
-       end;
+   begin
+      s:=(h/s);
+      if(s<1)
+      then h:=1
+      else h:=trunc(s);
+      if(h>_mms)
+      then _hI2S:=_mms
+      else _hI2S:=h;
    end;
 end;
 
@@ -345,12 +273,12 @@ begin
          if(g_started=false)
          then _plst:=b2pm[ready,2]
          else _plst:=str_ps_c[ps_play];
-         if(ttl>=vid_fps)then _plst:=str_ps_t;
+         if(ttl>=fr_fps)then _plst:=str_ps_t;
          {$IFDEF _FULLGAME}
          if(net_cl_svpl=p)then
          begin
             _plst:=str_ps_sv;
-            if(net_cl_svttl>=vid_fps)then _plst:=str_ps_t;
+            if(net_cl_svttl>=fr_fps)then _plst:=str_ps_t;
          end;
          {$ENDIF}
       end;
@@ -396,11 +324,15 @@ begin
    if(0<=cx)and(cx<=fog_vfwm)and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
 end;
 
-
 function _rectvis(x,y,hw,hh:integer):boolean;
 begin
    _rectvis:=((vid_vx-hw)<x)and(x<(vid_vx+vid_sw+hw))
           and((vid_vy-hh)<y)and(y<(vid_vy+vid_sh+hh));
+end;
+function _nhp(x,y:integer):boolean;
+begin
+   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))
+      and(vid_vy<y)and(y<(vid_vy+vid_sh));
 end;
 
 function _nhp3(x,y:integer;player:PTPlayer):boolean;
@@ -412,7 +344,8 @@ begin
      (0<y)and(y<vid_sh)then
    begin
       if(player<>nil)then
-       if(player^.team=_players[HPlayer].team)or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
+       if (player^.team=_players[HPlayer].team)
+       or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
        begin
           _nhp3:=true;
           exit;
@@ -422,35 +355,11 @@ begin
    end;
 end;
 
-function _nhp(x,y:integer):boolean;
-begin
-   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))
-      and(vid_vy<y)and(y<(vid_vy+vid_sh));
-end;
-
 procedure _scrollV(i:pinteger;s,min,max:integer);
 begin
    inc(i^,s);
    if(i^>max)then i^:=max;
    if(i^<min)then i^:=min;
-end;
-
-procedure _screenshot;
-var i:integer;
-    s:shortstring;
-begin
-   i:=0;
-   repeat
-      inc(i,1);
-      s:=str_screenshot+i2s(i)+'.bmp';
-   until not FileExists(s);
-   s:=s+#0;
-   sdl_saveBMP(r_screen,@s[1]);
-end;
-
-function rgba2c(r,g,b,a:byte):cardinal;
-begin
-   rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
 function p_color(player:byte):cardinal;
@@ -478,10 +387,10 @@ end;
 
 procedure _view_bounds;
 begin
-   if (vid_vx<0) then vid_vx:=0;
-   if (vid_vy<0) then vid_vy:=0;
-   if ((vid_vx+vid_sw)>map_mw) then vid_vx:=map_mw-vid_sw;
-   if ((vid_vy+vid_sh)>map_mw) then vid_vy:=map_mw-vid_sh;
+   if((vid_vx+vid_sw)>map_mw)then vid_vx:=map_mw-vid_sw;
+   if((vid_vy+vid_sh)>map_mw)then vid_vy:=map_mw-vid_sh;
+   if (vid_vx        <0     )then vid_vx:=0;
+   if (vid_vy        <0     )then vid_vy:=0;
 
    vid_mmvx:=round(vid_vx*map_mmcx);
    vid_mmvy:=round(vid_vy*map_mmcx);
@@ -521,7 +430,7 @@ end;
 procedure _addUIBldrs(tx,ty,tr:integer);
 var i:byte;
 begin
-   for i:=0 to _uts do
+   for i:=0 to ui_builder_srs do
     if(ui_builders_x[i]=0)then
     begin
        ui_builders_x[i]:=tx;
@@ -530,8 +439,6 @@ begin
        break;
     end;
 end;
-
-
 
 {$ELSE}
 

@@ -1,4 +1,4 @@
-{$IFDEF _FULLGAME}
+{{$IFDEF _FULLGAME}
 procedure _unit_mmcoords(pu:PTUnit);
 begin
    with pu^ do
@@ -286,7 +286,7 @@ begin
         if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
         {$ENDIF}
      end;
-end;
+end;   }
 
 function _unit_grbcol(tx,ty,tr:integer;pl,buid:byte;doodc:boolean):byte;
 var u,dx,dy:integer;
@@ -299,6 +299,7 @@ begin
 
    for u:=1 to MaxUnits do
     with _units[u] do
+     with uid^ do
      if(hits>0)and(speed=0)and(uf=uf_ground)and(inapc=0)then
       if(dist(x,y,tx,ty)<(tr+r))then
       begin
@@ -307,11 +308,11 @@ begin
       end
       else
        if(bl=false)then
-        if(isbuild)and(bld)and(isbuilder)and(playeri=pl)then
+        if(_isbuilding)and(bld)and(_isbuilder)and(playeri=pl)then
         begin
            if(buid>0)then
             if not (buid in uid^.ups_builder)then continue;
-           if(dist(x,y,tx,ty)<sr)then bl:=true;
+           if(dist(x,y,tx,ty)<srng)then bl:=true;
         end;
 
    if(_unit_grbcol=0)then
@@ -358,17 +359,17 @@ begin
       anim     := 0;
       uo_id    := ua_amove;
       uo_tar   := 0;
-      rld_t    := 0;
+      rld      := 0;
       pains    := 0;
       dir      := 270;
       order    := 0;
       wanim    := false;
-      tar1     := 0;
-      tar1d    := 32000;
-      alrm_x   := 0;
+      a_tar1   := 0;
+      a_tar1d  := 32000;
+      {alrm_x   := 0;
       alrm_y   := 0;
       alrm_r   := 32000;
-      alrm_b   := false;
+      alrm_b   := false; }
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
@@ -376,8 +377,8 @@ begin
       FillChar(pprod_t,SizeOf(pprod_t),0);
 
       {$IFDEF _FULLGAME}
-      _unit_mmcoords(pu);
-      _unit_sfog    (pu);
+      //_unit_mmcoords(pu);
+      //_unit_sfog    (pu);
       {$ENDIF}
    end;
 end;
@@ -385,17 +386,18 @@ end;
 procedure _unit_done_inc_cntrs(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
-      if(isbuilder)then inc(n_builders,1);
-      if(isbarrack)then
+      if(_isbuilder)then inc(n_builders,1);
+      if(_isbarrack)then
       begin
          inc(n_barracks,1);
          if(buff[ub_advanced]>0)
          then inc(uprodm,2)
          else inc(uprodm,1);
       end;
-      if(issmith  )then
+      if(_issmith  )then
       begin
          inc(n_smiths  ,1);
          if(buff[ub_advanced]>0)
@@ -407,17 +409,18 @@ end;
 procedure _unit_done_dec_cntrs(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
-      if(isbuilder)then dec(n_builders,1);
-      if(isbarrack)then
+      if(_isbuilder)then dec(n_builders,1);
+      if(_isbarrack)then
       begin
          dec(n_barracks,1);
          if(buff[ub_advanced]>0)
          then dec(uprodm,2)
          else dec(uprodm,1);
       end;
-      if(issmith  )then
+      if(_issmith  )then
       begin
          dec(n_smiths  ,1);
          if(buff[ub_advanced]>0)
@@ -430,26 +433,27 @@ end;
 procedure _unit_inc_cntrs(pu:PTUnit;ubld:boolean);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
       inc(army,1);
-      inc(ucl_e[isbuild,ucl],1);
-      inc(ucl_c[isbuild],1);
+      inc(ucl_e[_isbuilding,_btni],1);
+      inc(ucl_c[_isbuilding],1);
 
       inc(uid_e[uidi],1);
 
       if(ubld)then
       begin
-         buff[ub_born]:=vid_fps;
+         buff[ub_born]:=fr_fps;
          bld := true;
          if(uid_x[uidi]=0)then uid_x[uidi]:=_lcu;
-         if(isbuild)then
+         if(_isbuilding)then
          begin
-            if(ucl_x[ucl]=0)then ucl_x[ucl]:=_lcu;
+            if(ucl_x[_btni]=0)then ucl_x[_btni]:=_lcu;
             _unit_done_inc_cntrs(pu);
          end;
-         inc(ucl_eb[isbuild,ucl],1);
-         inc(menerg,generg);
+         inc(ucl_eb[_isbuilding,_btni],1);
+         inc(menerg,_generg);
          inc(uid_eb[uidi],1);
       end
       else
@@ -460,14 +464,14 @@ begin
    end;
 end;
 
-procedure _unit_add(ux,uy:integer;uc,pl:byte;ubld:boolean);
+procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld:boolean);
 var m,i:integer;
 begin
    with _players[pl] do
    begin
       _lcu :=0;
       _lcup:=@_units[_lcu];
-      if(uc=0)then exit;
+      if(ui=0)then exit;
       i:=MaxPlayerUnits*pl+1;
       m:=i+MaxPlayerUnits;
       while(i<m)do
@@ -481,14 +485,16 @@ begin
           end;
          inc(i,1);
       end;
+
+      FillChar(_lcup^,SizeOf(TUnit),0);
       if(_lcu>0)then
        with _lcup^ do
        begin
-          _uclord:=_lcu mod vid_hfps;
+          uclord:=_lcu mod fr_hfps;
 
           x       := ux;
           y       := uy;
-          uidi     := uc;
+          uidi    := ui;
           playeri := pl;
           player  :=@_players[playeri];
           vx      := x;
@@ -507,37 +513,32 @@ begin
           FillChar(vsni,SizeOf(vsni),0);
 
           _unit_def      (_lcup);
-          _unit_sclass   (_lcup);
+          _unit_apUID    (_lcup);
           _unit_inc_cntrs(_lcup,ubld);
        end;
    end;
 end;
 
-procedure _unit_startb(bx,by:integer;bt,bp:byte);
-var puid:byte;
+procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
-   if(_bldCndt(@_players[bp],bt)=false)then
+   if(_uid_cndt(@_players[bp],buid)=false)then
     with _players[bp] do
      if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
-     begin
-        puid:=cl2uid[race,true,bt];
-        if(puid>0)then
-        if(_unit_grbcol(bx,by,_ulst[puid].r,bp,puid,true)=0)then
-        begin
-           _unit_add(bx,by,puid,bp,false);
-           if(_lcu>0)then
-           begin
-              {$IFDEF _FULLGAME}
-              if(_warpten=false)then
-              {$ENDIF}
-              bld_r:=vid_fps+ucl_c[true];
-              inc(cenerg,_ulst[puid].renerg);
-              {$IFDEF _FULLGAME}
-              if(bp=HPlayer)then PlaySND(snd_build[race],nil);
-              {$ENDIF}
-           end;
-        end;
-     end;
+      if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
+      begin
+         _unit_add(bx,by,buid,bp,false);
+         if(_lcu>0)then
+         begin
+            {$IFDEF _FULLGAME}
+            if(_warpten=false)then
+            {$ENDIF}
+            bld_r:=fr_fps+ucl_c[true];
+            inc(cenerg,_uids[buid]._renerg);
+            {$IFDEF _FULLGAME}
+            if(bp=HPlayer)then PlaySND(snd_build[race],nil);
+            {$ENDIF}
+         end;
+      end;
 end;
 
 
@@ -760,7 +761,7 @@ begin
        dec(uid_e[uidi],1);
     end;
 end;
-
+  {
 
 function _unit_chktar(uu,tu:PTUnit;utd:integer;teams:boolean):boolean;
 begin
@@ -1397,6 +1398,6 @@ begin
        end;
     end;
 end;
-
+   }
 
 

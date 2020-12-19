@@ -28,12 +28,12 @@ uses SysUtils, SDL, SDL_Net
         {$include _sounds.pas}
      {$ENDIF}
 {$include _net_com.pas}
+{$include _units_cl.pas}
      {$IFDEF _FULLGAME}
         {$include _lang.pas}
         {$include _config.pas}
         {$include _units_spr.pas}
      {$ENDIF}
-{$include _units_cl.pas}
      {$IFDEF _FULLGAME}
         {$include _draw_com.pas}
         {$include _draw_menu.pas}

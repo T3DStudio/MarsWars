@@ -1,4 +1,4 @@
-
+          {
 {$IFDEF _FULLGAME}
 procedure _unit_dvis(pu:PTUnit);
 var spr : PTMWSprite;
@@ -2705,7 +2705,7 @@ begin
    {$IFDEF _FULLGAME}
    plcolor[0]:=c_purple;
    {$ENDIF}
-end;       }
+end;       }   }
 
 
 

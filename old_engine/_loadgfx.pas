@@ -1,4 +1,31 @@
 
+procedure _InitFogR;
+var r,x:byte;
+begin
+   for r:=0 to MFogM do
+    for x:=0 to r do
+     _fcx[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
+end;
+
+procedure _screenshot;
+var i:integer;
+    s:shortstring;
+begin
+   i:=0;
+   repeat
+      inc(i,1);
+      s:=str_screenshot+i2s(i)+'.bmp';
+   until not FileExists(s);
+   s:=s+#0;
+   sdl_saveBMP(r_screen,@s[1]);
+end;
+
+
+function rgba2c(r,g,b,a:byte):cardinal;
+begin
+   rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
+end;
+
 
 procedure _GfxColors;
 begin
@@ -205,7 +232,7 @@ begin
       ts                :=r_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
-      theme_liquid_animm:=vid_hfps;
+      theme_liquid_animm:=fr_hfps;
    end
    else
    begin
@@ -461,7 +488,7 @@ begin
    for x:=0 to 2 do spr_tabs[x]:=LoadBtn('tabs'+b2s(x),vid_tbw);
    spr_tabs[3]:=LoadBtnFS(spr_b_action,vid_tbw);
 
-   for x:=0 to MaxUpgrs do
+   for x:=0 to ui_ubtns do
    begin
    spr_b_up[r_hell,x]:=LoadBtn('b_h_up'+b2s(x),vid_bw);
    spr_b_up[r_uac ,x]:=LoadBtn('b_u_up'+b2s(x),vid_bw);
@@ -588,7 +615,7 @@ begin
       else spr_HAGate     [x]:=_lstr('h_b1_'  +b2s(x-1)+'a');
    end;
 
-   for x:=0 to _uts do
+   {for x:=0 to ui_ubtns do
    begin
       spr_b_b    [r_hell     ,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_hell,true ,x]])^.surf,vid_BW );
       spr_ui_oico[r_hell,true,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_hell,true ,x]])^.surf,vid_oiw);
@@ -619,7 +646,7 @@ begin
       with _ulst[cl2uid[r_uac ,false,x]] do dir:=225;
       spr_b_u    [r_uac       ,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_BW);
       spr_ui_oico[r_uac ,false,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_oiw);
-   end;
+   end; }
 
    InitThemes;
 end;
