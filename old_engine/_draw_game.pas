@@ -294,7 +294,7 @@ begin
        _draw_text(r_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, c);
 
 
-       for iy:=0 to 8  do _draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[iy]), ta_left,255, c);
+       for iy:=0 to 8  do _draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);
        for iy:=0 to 11 do _draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
     end;
 
@@ -306,11 +306,6 @@ begin
         ix:=x-vid_vx;
         iy:=y-vid_vy;
 
-        if(_testdmg)then
-        begin
-           //_draw_text(r_screen,ix,iy-12,i2s(bld_s), ta_left,255, c_white);
-           continue;
-        end;
 
         if(hits>0)then
         if(k_shift>1)then

@@ -961,14 +961,13 @@ begin
       uid:=@_uids[uidi];
       with uid^ do
       begin
-         r    := _r;
-         srng := _srng;
-         speed:= _speed;
-         uf   := _uf;
-         apcm := _apcm;
-         solid:= _issolid;
-
-         mmr  := 1;
+         r     := _r;
+         srng  := _srng;
+         speed := _speed;
+         uf    := _uf;
+         apcm  := _apcm;
+         solid := _issolid;
+         mmr   := 1;
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,r+12);
 
@@ -994,7 +993,7 @@ begin
       _max       := 32000;
       _btime     := 1;
       _uf        := uf_ground;
-      _btni      := 255;
+      _ucl       := 255;
       _apcs      := 1;
       _urace     := r_hell;
 
@@ -1014,7 +1013,7 @@ begin
    _generg    := 6;
    _r         := 66;
    _srng      := base_rA[0];
-   _btni      := 0;
+   _ucl       := 0;
    _btime     := 75;
 
    _isbuilding:= true;
@@ -1028,7 +1027,7 @@ begin
    _renerg    := 4;
    _r         := 60;
    _srng      := 200;
-   _btni      := 1;
+   _ucl       := 1;
    _btime     := 40;
 
    _isbuilding:= true;
@@ -1043,7 +1042,7 @@ begin
    _generg    := 1;
    _r         := 24;
    _srng      := 200;
-   _btni      := 2;
+   _ucl       := 2;
    _btime     := 10;
 
    _isbuilding:= true;
@@ -1054,7 +1053,7 @@ begin
    _renerg    := 6;
    _r         := 53;
    _srng      := 200;
-   _btni      := 3;
+   _ucl       := 3;
    _btime     := 40;
 
    _isbuilding:= true;
@@ -1066,7 +1065,7 @@ begin
    _renerg    := 2;
    _r         := 21;
    _srng      := 250;
-   _btni      := 4;
+   _ucl       := 4;
    _btime     := 20;
 
    _isbuilding:= true;
@@ -1077,7 +1076,7 @@ begin
    _renerg    := 4;
    _r         := 28;
    _srng      := 200;
-   _btni      := 5;
+   _ucl       := 5;
    _btime     := 30;
    _max       := 1;
 
@@ -1089,7 +1088,7 @@ begin
    _renerg    := 10;
    _r         := 65;
    _srng      := 200;
-   _btni      := 6;
+   _ucl       := 6;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
@@ -1102,7 +1101,7 @@ begin
    _renerg    := 3;
    _r         := 21;
    _srng      := 250;
-   _btni      := 7;
+   _ucl       := 7;
    _btime     := 25;
    _ruid      := UID_HMonastery;
    //_rupgr     := upgr_2tier;
@@ -1115,7 +1114,7 @@ begin
    _renerg    := 4;
    _r         := 50;
    _srng      := 200;
-   _btni      := 8;
+   _ucl       := 8;
    _btime     := 30;
    _max       := 1;
    _ruid      := UID_HMonastery;
@@ -1130,7 +1129,7 @@ begin
    _generg    := 4;
    _r         := 86;
    _srng      := 300;
-   _btni      := 9;
+   _ucl       := 9;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
@@ -1146,7 +1145,7 @@ begin
    _renerg    := 1;
    _r         := 5;
    _srng      := 250;
-   _btni      := 21;
+   _ucl       := 21;
    _btime     := 1;
    //_rupgr     := upgr_vision;
 
@@ -1161,7 +1160,7 @@ begin
    _speed     := 6;
    _r         := 66;
    _srng      := base_rA[0];
-   _btni      := 12;
+   _ucl       := 12;
    _btime     := 90;
 
    _isbuilding:= true;
@@ -1175,7 +1174,7 @@ begin
    _renerg    := 4;
    _r         := 66;
    _srng      := base_rA[0];
-   _btni      := 13;
+   _ucl       := 13;
    _btime     := 40;
 
    _isbuilding:=true;
@@ -1192,7 +1191,7 @@ begin
    _r         := 10;
    _speed     := 23;
    _srng      := 250;
-   _btni      := 0;
+   _ucl       := 0;
    _painc     := 1;
    _btime     := 8;
    _uf        := uf_soaring;
@@ -1204,7 +1203,7 @@ begin
    _r         := 11;
    _speed     := 9;
    _srng      := 250;
-   _btni      := 1;
+   _ucl       := 1;
    _painc     := 3;
    _btime     := 5;
 end;
@@ -1215,7 +1214,7 @@ begin
    _r         := 14;
    _speed     := 14;
    _srng      := 200;
-   _btni      := 2;
+   _ucl       := 2;
    _painc     := 8;
    _btime     := 8;
 end;
@@ -1226,7 +1225,7 @@ begin
    _r         := 14;
    _speed     := 9;
    _srng      := 250;
-   _btni      := 3;
+   _ucl       := 3;
    _painc     := 6;
    _btime     := 20;
    _apcs      := 2;
@@ -1238,7 +1237,7 @@ begin
    _r         := 14;
    _speed     := 9;
    _srng      := 250;
-   _btni      := 4;
+   _ucl       := 4;
    _painc     := 8;
    _btime     := 40;
    _apcs      := 3;
@@ -1251,7 +1250,7 @@ begin
    _r         := 20;
    _speed     := 11;
    _srng      := 250;
-   _btni      := 5;
+   _ucl       := 5;
    _painc     := 15;
    _btime     := 90;
    _apcs      := 10;
@@ -1265,7 +1264,7 @@ begin
    _r         := 35;
    _speed     := 11;
    _srng      := 250;
-   _btni      := 6;
+   _ucl       := 6;
    _painc     := 15;
    _btime     := 90;
    _apcs      := 10;
@@ -1278,7 +1277,7 @@ begin
    _r         := 14;
    _speed     := 9;
    _srng      := 250;
-   _btni      := 7;
+   _ucl       := 7;
    _painc     := 3;
    _btime     := 40;
    _apcs      := 2;
@@ -1291,7 +1290,7 @@ begin
    _r         := 13;
    _speed     := 12;
    _srng      := 250;
-   _btni      := 8;
+   _ucl       := 8;
    _painc     := 7;
    _btime     := 40;
    _ruid      := UID_HFortress;
@@ -1303,7 +1302,7 @@ begin
    _r         := 20;
    _speed     := 6;
    _srng      := 250;
-   _btni      := 9;
+   _ucl       := 9;
    _painc     := 4;
    _btime     := 60;
    _ruid      := UID_HMonastery;
@@ -1316,7 +1315,7 @@ begin
    _r         := 20;
    _speed     := 8;
    _srng      := 250;
-   _btni      := 10;
+   _ucl       := 10;
    _painc     := 4;
    _btime     := 50;
    _ruid      := UID_HMonastery;
@@ -1329,7 +1328,7 @@ begin
    _r         := 14;
    _speed     := 15;
    _srng      := 250;
-   _btni      := 11;
+   _ucl       := 11;
    _painc     := 12;
    _btime     := 90;
    _apcs      := 2;
@@ -1344,7 +1343,7 @@ begin
    _r         := 12;
    _speed     := 13;
    _srng      := 250;
-   _btni      := 12;
+   _ucl       := 12;
    _painc     := 1;
    _btime     := 5;
 end;
@@ -1355,7 +1354,7 @@ begin
    _r         := 12;
    _speed     := 14;
    _srng      := 200;
-   _btni      := 13;
+   _ucl       := 13;
    _painc     := 4;
    _btime     := 20;
 end;
@@ -1366,7 +1365,7 @@ begin
    _r         := 12;
    _speed     := 13;
    _srng      := 241;
-   _btni      := 14;
+   _ucl       := 14;
    _painc     := 4;
    _btime     := 10;
 end;
@@ -1377,7 +1376,7 @@ begin
    _r         := 12;
    _speed     := 11;
    _srng      := 250;
-   _btni      := 15;
+   _ucl       := 15;
    _painc     := 4;
    _btime     := 15;
 end;
@@ -1388,7 +1387,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 16;
+   _ucl       := 16;
    _painc     := 4;
    _btime     := 30;
 end;
@@ -1399,7 +1398,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 17;
+   _ucl       := 17;
    _painc     := 4;
    _btime     := 20;
 end;
@@ -1410,7 +1409,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 18;
+   _ucl       := 18;
    _painc     := 4;
    _btime     := 60;
 end;
@@ -1424,7 +1423,7 @@ begin
    _generg    := 6;
    _r         := 66;
    _srng      := base_rA[0];
-   _btni      := 0;
+   _ucl       := 0;
    _btime     := 90;
 
    _isbuilding:= true;
@@ -1438,7 +1437,7 @@ begin
    _renerg    := 4;
    _r         := 66;
    _srng      := 200;
-   _btni      := 1;
+   _ucl       := 1;
    _btime     := 40;
 
    _isbuilding:=true;
@@ -1453,7 +1452,7 @@ begin
    _generg    := 2;
    _r         := 42;
    _srng      := 200;
-   _btni      := 2;
+   _ucl       := 2;
    _btime     := 20;
 
    _isbuilding:=true;
@@ -1464,7 +1463,7 @@ begin
    _renerg    := 6;
    _r         := 62;
    _srng      := 200;
-   _btni      := 3;
+   _ucl       := 3;
    _btime     := 40;
 
    _isbuilding:=true;
@@ -1476,7 +1475,7 @@ begin
    _renerg    := 2;
    _r         := 17;
    _srng      := 250;
-   _btni      := 4;
+   _ucl       := 4;
    _btime     := 15;
 
    _isbuilding:=true;
@@ -1487,7 +1486,7 @@ begin
    _renerg    := 4;
    _r         := 35;
    _srng      := 200;
-   _btni      := 5;
+   _ucl       := 5;
    _btime     := 30;
    _max       := 1;
 
@@ -1499,7 +1498,7 @@ begin
    _renerg    := 10;
    _r         := 62;
    _srng      := 200;
-   _btni      := 6;
+   _ucl       := 6;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_UWeaponFactory;
@@ -1512,7 +1511,7 @@ begin
    _renerg    := 2;
    _r         := 17;
    _srng      := 250;
-   _btni      := 7;
+   _ucl       := 7;
    _btime     := 20;
    _ruid      := UID_UVehicleFactory;
 
@@ -1524,7 +1523,7 @@ begin
    _renerg    := 4;
    _r         := 40;
    _srng      := 200;
-   _btni      := 8;
+   _ucl       := 8;
    _btime     := 30;
    _max       := 1;
    _ruid      := UID_UVehicleFactory;
@@ -1538,7 +1537,7 @@ begin
    _renerg    := 2;
    _r         := 17;
    _srng      := 250;
-   _btni      := 10;
+   _ucl       := 10;
    _btime     := 25;
    _ruid      := UID_UVehicleFactory;
    //_rupgr     := upgr_rturrets;
@@ -1552,7 +1551,7 @@ begin
    _generg    := 10;
    _r         := 70;
    _srng      := 200;
-   _btni      := 9;
+   _ucl       := 9;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_UVehicleFactory;
@@ -1565,9 +1564,9 @@ begin
    _renerg    := 1;
    _r         := 5;
    _srng      := 100;
-   _btni      := 21;
+   _ucl       := 21;
    _btime     := 5;
-   _btni      := 9;
+   _ucl       := 9;
 
    _isbuilding:=true;
    _issolid   := false;
@@ -1581,7 +1580,7 @@ begin
    _r         := 12;
    _speed     := 13;
    _srng      := 200;
-   _btni      := 0;
+   _ucl       := 0;
    _btime     := 10;
 end;
 UID_Medic:
@@ -1591,7 +1590,7 @@ begin
    _r         := 12;
    _speed     := 13;
    _srng      := 200;
-   _btni      := 1;
+   _ucl       := 1;
    _btime     := 10;
 end;
 UID_Sergant:
@@ -1601,7 +1600,7 @@ begin
    _r         := 12;
    _speed     := 13;
    _srng      := 241;
-   _btni      := 2;
+   _ucl       := 2;
    _btime     := 10;
 end;
 UID_Commando:
@@ -1611,7 +1610,7 @@ begin
    _r         := 12;
    _speed     := 11;
    _srng      := 250;
-   _btni      := 3;
+   _ucl       := 3;
    _btime     := 15;
 end;
 UID_Bomber:
@@ -1621,7 +1620,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 4;
+   _ucl       := 4;
    _btime     := 30;
 end;
 UID_Major:
@@ -1631,7 +1630,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 5;
+   _ucl       := 5;
    _btime     := 20;
 end;
 UID_BFG:
@@ -1641,7 +1640,7 @@ begin
    _r         := 12;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 6;
+   _ucl       := 6;
    _btime     := 60;
 end;
 UID_FAPC:
@@ -1651,7 +1650,7 @@ begin
    _r         := 33;
    _speed     := 22;
    _srng      := 250;
-   _btni      := 7;
+   _ucl       := 7;
    _btime     := 25;
    _apcm      := 10;
    _apcs      := 8;
@@ -1668,7 +1667,7 @@ begin
    _r         := 25;
    _speed     := 15;
    _srng      := 250;
-   _btni      := 8;
+   _ucl       := 8;
    _btime     := 25;
    _apcm      := 10;
    _apcs      := 10;
@@ -1685,7 +1684,7 @@ begin
    _r         := 16;
    _speed     := 14;
    _srng      := 275;
-   _btni      := 9;
+   _ucl       := 9;
    _btime     := 60;
    _apcs      := 3;
    _ruid      := UID_UVehicleFactory;
@@ -1700,7 +1699,7 @@ begin
    _r         := 20;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 10;
+   _ucl       := 10;
    _btime     := 60;
    _apcs      := 7;
    _ruid      := UID_UVehicleFactory;
@@ -1715,7 +1714,7 @@ begin
    _r         := 18;
    _speed     := 19;
    _srng      := 275;
-   _btni      := 11;
+   _ucl       := 11;
    _btime     := 60;
    _apcs      := 7;
    _uf        := uf_fly;
@@ -1731,7 +1730,7 @@ begin
    _r         := 36;
    _speed     := 10;
    _srng      := 250;
-   _btni      := 12;
+   _ucl       := 12;
    _btime     := 60;
    _apcm      := 30;
    _apcs      := 10;
@@ -1778,7 +1777,7 @@ end;
 
       if(_btime >0)then _bstep:=(_mhits div 2) div _btime;
       if(_bstep<=0)then _bstep:=1;
-      _tstep:=_btime*fr_fps;
+      _tprod:=_btime*fr_fps;
 
       {$IFDEF _FULLGAME}
       _fr:=(_r div fog_cw)+1;

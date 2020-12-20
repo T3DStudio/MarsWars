@@ -1,4 +1,4 @@
-{{$IFDEF _FULLGAME}
+{$IFDEF _FULLGAME}
 procedure _unit_mmcoords(pu:PTUnit);
 begin
    with pu^ do
@@ -86,10 +86,10 @@ begin
    _udpth:=0;
    with pu^ do
     case uidi of
-UID_UPortal  : _udpth:=-5;
-UID_HTeleport: _udpth:=-4;
+UID_UPortal   : _udpth:=-5;
+UID_HTeleport : _udpth:=-4;
 UID_HSymbol,
-UID_HAltar   : _udpth:=-3;
+UID_HAltar    : _udpth:=-3;
 UID_UMine     : _udpth:=-2;
 UID_HCommandCenter,
 UID_UCommandCenter: if(uf>uf_ground)
@@ -161,6 +161,7 @@ function _unit_fogrev(pu:PTUnit):boolean;
 begin
    _unit_fogrev:=false;
    with pu^ do
+   with uid^ do
     with player^ do
      if(_fog=false)
      then _unit_fogrev:=true
@@ -173,7 +174,7 @@ begin
        2:begin
             if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
             _unit_fogrev:=true;
-            if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
+            //if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
          end;
       end;
 end;
@@ -260,7 +261,7 @@ procedure _unit_movevis(pu:PTUnit);
 begin
    with pu^ do
     if(vx<>x)or(vy<>y)then
-     if(speed=0)or(inapc>0)then
+     if(speed<=0)or(inapc>0)then
      begin
         vstp:=0;
         vx  :=x;
@@ -274,7 +275,7 @@ begin
         dec(vstp,1);
      end;
 end;
-
+ {
 procedure _unit_uradar(pu:PTUnit);
 begin
    with pu^ do
@@ -373,8 +374,8 @@ begin
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
-      FillChar(uprod_t,SizeOf(uprod_t),0);
-      FillChar(pprod_t,SizeOf(pprod_t),0);
+      FillChar(uprod_u,SizeOf(uprod_u),0);
+      FillChar(pprod_u,SizeOf(pprod_u),0);
 
       {$IFDEF _FULLGAME}
       //_unit_mmcoords(pu);
@@ -437,7 +438,7 @@ begin
    with player^ do
    begin
       inc(army,1);
-      inc(ucl_e[_isbuilding,_btni],1);
+      inc(ucl_e[_isbuilding,_ucl],1);
       inc(ucl_c[_isbuilding],1);
 
       inc(uid_e[uidi],1);
@@ -446,15 +447,13 @@ begin
       begin
          buff[ub_born]:=fr_fps;
          bld := true;
-         if(uid_x[uidi]=0)then uid_x[uidi]:=_lcu;
-         if(_isbuilding)then
-         begin
-            if(ucl_x[_btni]=0)then ucl_x[_btni]:=_lcu;
-            _unit_done_inc_cntrs(pu);
-         end;
-         inc(ucl_eb[_isbuilding,_btni],1);
+         if(uid_x[uidi            ]=0)then uid_x[uidi            ]:=_lcu;
+         if(ucl_x[_isbuilding,_ucl]=0)then ucl_x[_isbuilding,_ucl]:=_lcu;
+         inc(ucl_eb[_isbuilding,_ucl],1);
+         inc(uid_eb[uidi            ],1);
          inc(menerg,_generg);
-         inc(uid_eb[uidi],1);
+         inc(cenerg,_generg);
+         _unit_done_inc_cntrs(pu);
       end
       else
       begin
@@ -490,7 +489,7 @@ begin
       if(_lcu>0)then
        with _lcup^ do
        begin
-          uclord:=_lcu mod fr_hfps;
+          uclord  :=_lcu mod _uclord_p;
 
           x       := ux;
           y       := uy;
@@ -521,22 +520,20 @@ end;
 
 procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
-   if(_uid_cndt(@_players[bp],buid)=false)then
-    with _players[bp] do
-     if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
+   if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
+    if(_uid_cndt(@_players[bp],buid)=false)then
+     with _players[bp] do
       if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
       begin
          _unit_add(bx,by,buid,bp,false);
          if(_lcu>0)then
          begin
             {$IFDEF _FULLGAME}
+            if(bp=HPlayer)then PlaySND(snd_build[race],nil);
             if(_warpten=false)then
             {$ENDIF}
-            bld_r:=fr_fps+ucl_c[true];
-            inc(cenerg,_uids[buid]._renerg);
-            {$IFDEF _FULLGAME}
-            if(bp=HPlayer)then PlaySND(snd_build[race],nil);
-            {$ENDIF}
+            bld_r:=fr_fps;
+            dec(cenerg,_uids[buid]._renerg);
          end;
       end;
 end;
@@ -544,30 +541,27 @@ end;
 
 //////   Start unit prod
 //
-function _unit_straining_p(pu:PTUnit;ut,pn:integer):boolean;
-var _puid:byte;
+function _unit_straining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
 begin
    _unit_straining_p:=false;
-   with pu^ do
-    if(uprod_r[pn]=0)and(bld)and(isbarrack)and(isbuild)then
-     if(_untCndt(player,ut)=false)then
-      with player^ do
-      begin
-         _puid:=cl2uid[race,false,ut];
+   if(puid<255)then
+    with pu^ do
+    with uid^ do
+     if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_isbuilding)then
+      if(puid in ups_units)and(_uid_cndt(player,puid)=false)then
+       with player^ do
+       begin
+          inc(uproda,1);
+          inc(uprodc[_uids[puid]._ucl],1);
+          inc(uprodu[ puid],1);
+          dec(cenerg,_uids[puid]._renerg);
+          uprod_u[pn]:=puid;
+          uprod_r[pn]:=_tprod;
 
-         if not(_puid in uid^.ups_units)then exit;
-
-         inc(uproda,1);
-         inc(uprodc[ut],1);
-         inc(uprodu[_puid],1);
-         inc(cenerg,_ulst[_puid].renerg);
-         uprod_t[pn]:=ut;
-         uprod_r[pn]:=_ulst[_puid].trt;
-
-         _unit_straining_p:=true;
-      end;
+          _unit_straining_p:=true;
+       end;
 end;
-function _unit_straining(pu:PTUnit;ut:integer):boolean;
+function _unit_straining(pu:PTUnit;puid:byte):boolean;
 var i:byte;
 begin
    _unit_straining:=true;
@@ -577,41 +571,39 @@ begin
       if(i>0)then
        if(pu^.buff[ub_advanced]<=0)then break;
 
-      if(_unit_straining_p(pu,ut,i))then exit;
+      if(_unit_straining_p(pu,puid,i))then exit;
    end;
 
    _unit_straining:=false;
 end;
 /// Stop unit prod
-function _unit_ctraining_p(pu:PTUnit;ut,pn:integer):boolean;
-var _puid,
-    _pucl:byte;
+function _unit_ctraining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
 begin
    _unit_ctraining_p:=false;
    with pu^ do
-    if(uprod_r[pn]>0)and(bld)and(isbarrack)and(isbuild)then
-     if(ut<0)or(ut=uprod_t[pn])then
+   with uid^ do
+    if(uprod_r[pn]>0)and(bld)and(_isbarrack)and(_isbuilding)then
+     if(puid=255)or(puid=uprod_u[pn])then
       with player^ do
       begin
-         _puid:=cl2uid[race,false,uprod_t[pn]];
-         _pucl:=uprod_t[pn];
+         puid:=uprod_u[pn];
 
          dec(uproda,1);
-         dec(uprodc[_pucl],1);
-         dec(uprodu[_puid],1);
-         dec(cenerg,_ulst[cl2uid[race,false,_pucl]].renerg);
+         dec(uprodc[_uids[puid]._ucl],1);
+         dec(uprodu[ puid],1);
+         inc(cenerg,_uids[puid]._renerg);
          uprod_r[pn]:=0;
 
          _unit_ctraining_p:=true;
       end;
 end;
-function _unit_ctraining(pu:PTUnit;ut:integer):boolean;
+function _unit_ctraining(pu:PTUnit;puid:byte):boolean;
 var i:byte;
 begin
    _unit_ctraining:=true;
 
    for i:=MaxUnitProds downto 0 do
-    if(_unit_ctraining_p(pu,ut,i))and(ut>=0)then exit;
+    if(_unit_ctraining_p(pu,puid,i))and(puid<255)then exit;
 
    _unit_ctraining:=false;
 end;
@@ -619,24 +611,27 @@ end;
 
 //////   Start upgrade production
 //
-function _unit_supgrade_p(pu:PTUnit;up,pn:integer):boolean;
+function _unit_supgrade_p(pu:PTUnit;upid:byte;pn:integer):boolean;
 begin
    _unit_supgrade_p:=false;
-   with pu^ do
-    if(pprod_r[pn]=0)and(bld)and(issmith)and(isbuild)then
-     if(0<=up)and(up<=_uts)then
-      if(_upgrreq(player,up)=false)then
-      with player^ do
+   if(upid<255)then
+    with pu^ do
+    with uid^ do
+     if(pprod_r[pn]=0)and(bld)and(_issmith)and(_isbuilding)then
+      if(_upid_cndt(player,upid)=false)then
+       with player^ do
+       with _upids[upid] do
        begin
           inc(pproda,1);
-          inc(upgrinp[up],1);
-          inc(cenerg,_pne_r[race,up]);
-          pprod_r[pn]:=upgrade_time[race,up];
-          pprod_t[pn]:=up;
+          inc(pprodu[upid],1);
+          dec(cenerg,_up_renerg);
+          pprod_r[pn]:=_up_time;
+          pprod_u[pn]:=upid;
+
           _unit_supgrade_p:=true;
        end;
 end;
-function _unit_supgrade(pu:PTUnit;up:integer):boolean;
+function _unit_supgrade(pu:PTUnit;upid:integer):boolean;
 var i:byte;
 begin
    _unit_supgrade:=true;
@@ -646,33 +641,37 @@ begin
       if(i>0)then
        if(pu^.buff[ub_advanced]<=0)then break;
 
-      if(_unit_supgrade_p(pu,up,i))then exit;
+      if(_unit_supgrade_p(pu,upid,i))then exit;
    end;
 
    _unit_supgrade:=false;
 end;
-function _unit_cupgrade_p(pu:PTUnit;up,pn:integer):boolean;
+function _unit_cupgrade_p(pu:PTUnit;upid:byte;pn:integer):boolean;
 begin
    _unit_cupgrade_p:=false;
    with pu^ do
-    if(pprod_r[pn]>0)and(bld)and(issmith)and(isbuild)then
-     if(up<0)or(up=pprod_t[pn])then
+   with uid^ do
+    if(pprod_r[pn]>0)and(bld)and(_issmith)and(_isbuilding)then
+     if(upid=255)or(upid=pprod_u[pn])then
       with player^ do
       begin
+         upid:=pprod_u[pn];
+
          dec(pproda,1);
-         dec(cenerg,_pne_r[race,pprod_t[pn]]);
-         dec(upgrinp[pprod_t[pn]],1);
+         dec(pprodu[upid],1);
+         inc(cenerg,_upids[upid]._up_renerg);
          pprod_r[pn]:=0;
+
          _unit_cupgrade_p:=true;
        end;
 end;
-function _unit_cupgrade(pu:PTUnit;up:integer):boolean;
+function _unit_cupgrade(pu:PTUnit;puid:byte):boolean;
 var i:byte;
 begin
    _unit_cupgrade:=true;
 
    for i:=MaxUnitProds downto 0 do
-    if(_unit_cupgrade_p(pu,up,i))and(up>=0)then exit;
+    if(_unit_cupgrade_p(pu,puid,i))and(puid<255)then exit;
 
    _unit_cupgrade:=false;
 end;
@@ -680,44 +679,37 @@ end;
 procedure _unit_inc_selc(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
-      inc(ucl_s [isbuild,ucl],1);
-      inc(ucl_cs[isbuild],1);
+      inc(ucl_s [_isbuilding,_ucl],1);
+      inc(ucl_cs[_isbuilding     ],1);
       inc(uid_s [uidi],1);
-      if(isbuilder)then inc(s_builders,1);
-      if(isbarrack)then inc(s_barracks,1);
-      if(issmith  )then inc(s_smiths  ,1);
+      if(_isbuilder)then inc(s_builders,1);
+      if(_isbarrack)then inc(s_barracks,1);
+      if(_issmith  )then inc(s_smiths  ,1);
    end;
 end;
 procedure _unit_dec_selc(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
-      dec(ucl_s [isbuild,ucl],1);
-      dec(ucl_cs[isbuild],1);
+      dec(ucl_s [_isbuilding,_ucl],1);
+      dec(ucl_cs[_isbuilding     ],1);
       dec(uid_s [uidi],1);
-      if(isbuilder)then dec(s_builders,1);
-      if(isbarrack)then dec(s_barracks,1);
-      if(issmith  )then dec(s_smiths  ,1);
+      if(_isbuilder)then dec(s_builders,1);
+      if(_isbarrack)then dec(s_barracks,1);
+      if(_issmith  )then dec(s_smiths  ,1);
    end;
 end;
 
 procedure _unit_desel(pu:PTUnit);
 begin
    with pu^ do
-   with player^ do
    begin
-      if(sel)then
-      begin
-         dec(ucl_s [isbuild,ucl],1);
-         dec(ucl_cs[isbuild],1);
-         dec(uid_s [uidi],1);
-         if(isbuilder)then dec(s_builders,1);
-         if(isbarrack)then dec(s_barracks,1);
-         if(issmith  )then dec(s_smiths  ,1);
-      end;
+      if(sel)then _unit_dec_selc(pu);
       sel:=false;
    end;
 end;
@@ -725,44 +717,46 @@ end;
 procedure _unit_dec_Kcntrs(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    with player^ do
    begin
       _unit_desel(pu);
 
-      if(isbuild)then
+      if(bld=false)
+      then inc(cenerg,_uids[uidi]._renerg)
+      else
       begin
-         if(bld=false)
-         then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
-         else
-         begin
-            _unit_ctraining(pu,-1);
-            _unit_cupgrade (pu,-1);
+         _unit_ctraining(pu,255);
+         _unit_cupgrade (pu,255);
 
-            dec(ucl_eb[isbuild,ucl],1);
-            dec(uid_eb[uidi],1);
-            dec(menerg,generg);
-            _unit_done_dec_cntrs(pu);
-         end;
-         if(ucl_x[ucl]=unum)then ucl_x[ucl]:=0;
+         dec(ucl_eb[_isbuilding,_ucl],1);
+         dec(uid_eb[uidi],1);
+         dec(menerg,_generg);
+         dec(cenerg,_generg);
+
+         _unit_done_dec_cntrs(pu);
       end;
 
-      if(uid_x[uidi]=unum)then uid_x[uidi]:=0;
+      if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
+      if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
    end;
 end;
 
 procedure _unit_dec_Rcntrs(pu:PTUnit);
 begin
    with pu^ do
-    with player^ do
-    begin
-       dec(army,1);
-       dec(ucl_e[isbuild,ucl],1);
-       dec(ucl_c[isbuild],1);
-       dec(uid_e[uidi],1);
-    end;
+   with uid^ do
+   with player^ do
+   begin
+      dec(army,1);
+      dec(ucl_e[_isbuilding,_ucl],1);
+      dec(ucl_c[_isbuilding     ],1);
+      dec(uid_e[uidi],1);
+   end;
 end;
-  {
 
+
+{
 function _unit_chktar(uu,tu:PTUnit;utd:integer;teams:boolean):boolean;
 begin
    _unit_chktar:=false;
@@ -979,7 +973,7 @@ begin
       _unit_sfog(pu);
       {$ENDIF}
    end;
-end;
+end;  }
 
 procedure _unit_counters(pu:PTUnit);
 var i : byte;
@@ -991,32 +985,36 @@ begin
         if(buff[i]>0)then
         begin
            dec(buff[i],1);
-           if(i=ub_stopafa)and(OnlySVCode)then
+           {if(i=ub_stopafa)and(OnlySVCode)then
             if(bld)and(speed>0)and(tar1=0)then
              if(buff[i]=0)then
-              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);
+              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
         end
         else
           if(buff[i]<0)then inc(buff[i],1);
-
-      if(onlySVCode)
-      or(uidi in whocanattack)then
-       if(rld_t>0)then dec(rld_t,1);
-
-      for i:=0 to MaxUnitProds do
-      begin
-         if(uprod_r[i]>0)then dec(uprod_r[i],1);
-         if(pprod_r[i]>0)then dec(pprod_r[i],1);
-      end;
 
       for i:=0 to MaxPlayers do
       begin
          if(0<vsnt[i])and(vsnt[i]<_bufinf)then dec(vsnt[i],1);
          if(0<vsni[i])and(vsni[i]<_bufinf)then dec(vsni[i],1);
       end;
+
+      if(onlySVCode)then
+      begin
+         {
+         or(uidi in whocanattack)then
+         if(rld_t>0)then dec(rld_t,1); }
+
+         for i:=0 to MaxUnitProds do
+         begin
+            if(uprod_r[i]>0)then dec(uprod_r[i],1);
+            if(pprod_r[i]>0)then dec(pprod_r[i],1);
+         end;
+      end;
    end;
 end;
 
+{
 procedure _udetect(uu,tu:PTUnit;ud:integer);
 var td:integer;
 begin

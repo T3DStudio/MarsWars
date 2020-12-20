@@ -36,14 +36,14 @@ TUID = record
    _generg,
    _btime,
    _bstep,
-   _tstep,
+   _tprod,
    _painc,
    _apcs,
    _apcm
                 : integer;
    _urace,
    _uf,
-   _btni,
+   _ucl,
    _ruid,
    _rupgr       : byte;
 
@@ -112,8 +112,8 @@ o_x1,o_y1  :integer;
 
    ucl_e,                                        // existed class
    ucl_eb,                                       // existed class bld=true and hits>0
-   ucl_s   : array[false..true,byte] of integer; // selected
-   ucl_x   : array[byte] of integer;             // first unit class
+   ucl_s,                                        // selected
+   ucl_x   : array[false..true,byte] of integer;             // first unit class
 
    uid_e,
    uid_eb,
@@ -187,8 +187,8 @@ TUnit = record
 
    uprod_r,
    pprod_r  : array[0..MaxUnitProds] of integer;
-   uprod_t,
-   pprod_t  : array[0..MaxUnitProds] of byte;
+   uprod_u,
+   pprod_u  : array[0..MaxUnitProds] of byte;
 
    a_weap   : byte;
    a_arng   : array[0..MaxUnitWeapons] of integer;

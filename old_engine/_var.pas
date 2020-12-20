@@ -113,7 +113,6 @@ str_player_def : shortstring;
 
 _warpten          : boolean = false;
 _testmode         : byte = 0;
-_testdmg          : boolean = false;
 _fsttime          : boolean = false;
 
 r_panel,

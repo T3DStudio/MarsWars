@@ -19,13 +19,11 @@ end;
 procedure _playerSetState(p:integer);
 begin
    with _players[p] do
-   begin
-      case state of
-PS_None: begin ready:=false;name :=str_ps_none;end;
+    case state of
+PS_None: begin ready:=false;name :=str_ps_none;       ttl:=0;end;
 PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;end;
-PS_Play: begin ready:=false;name :=''; ttl:=0;end;
-      end;
-   end;
+PS_Play: begin ready:=false;name :='';                ttl:=0;end;
+    end;
 end;
 
 procedure DefPlayers;
@@ -35,13 +33,13 @@ begin
    for p:=0 to MaxPlayers do
     with _players[p] do
     begin
-       ai_skill   := def_ai;
-       race :=r_random;
-       team :=p;
-       state:=ps_none;
+       ai_skill := def_ai;
+       race     :=r_random;
+       team     :=p;
+       state    :=ps_none;
        _playerSetState(p);
-       ready:=false;
-       pnum :=p;
+       ready    :=false;
+       pnum     :=p;
 
        ai_pushtime := fr_fps*30;
        ai_pushmin  := 55;
@@ -81,7 +79,7 @@ begin
    PlayerColor[6]:=c_blue;
 
    {$ELSE}
-   HPLayer:=0;
+   HPlayer:=0;
    with _players[0] do
    begin
       name :='SERVER';
@@ -102,12 +100,17 @@ begin
 
    FillChar(_missiles,SizeOf(_missiles)   ,0);
 
-   FillChar(_units   ,SizeOf(_units  )   ,0);
+   FillChar(_units   ,SizeOf(_units   )   ,0);
    _lcu:=0;
-   while(_lcu<MaxUnits)do
+   while(_lcu<=MaxUnits)do
    begin
+      with _units[_lcu] do
+      begin
+         hits  :=dead_hits;
+         player:=@_players[playeri];
+         uid   :=@_units  [uidi   ];
+      end;
       inc(_lcu,1);
-      _units[_lcu].hits:=dead_hits;
    end;
 
    FillChar(g_ct_pl  ,SizeOf(g_ct_pl),  0);
@@ -220,7 +223,7 @@ begin
 
        if(state<>PS_None)then
        begin
-          case G_startb of
+          {case G_startb of
           0 : _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
           1 : begin
                  _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
@@ -246,16 +249,14 @@ begin
                  menerg:=100;
                  _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
               end;
-          end;
+          end; }
 
           if(state=ps_play)then ai_skill:=def_ai;
-          _setAI(p);
+         // _setAI(p);
        end;
     end;
 
    {$IFDEF _FULLGAME}
-   if(_testdmg)then _dmgtest;
-
    _moveHumView(map_psx[HPlayer] , map_psy[HPlayer]);
    {$ENDIF}
 end;
@@ -277,7 +278,7 @@ begin
        _menu    :=false;
        if(menu_s2<>ms2_camp)
        then _CreateStartPositionsSkirmish
-       else _CMPMap;
+       else ;//_CMPMap;
        vid_rtui:=2;
        _makeMMB;
        d_Panel(r_uipanel);
@@ -365,6 +366,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
          begin
             pu:=@_units[u];
             with pu^ do
+            with uid^ do
              if(hits>0)and(inapc=0)and(pl=playeri)then
              begin
                 psel:=sel;
@@ -381,12 +383,10 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                   sel:=((o_x0-r)<=vx)and(vx<=(o_x1+r))and((o_y0-r)<=vy)and(vy<=(o_y1+r));
 
                 if(o_id=uo_specsel)then
-                 case o_x0 of
-                    0 : if(speed>0)and(uidi in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
-                 else
-                    if(o_x0 in _sbs_ucls)then
-                     if(ucl_x[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
-                 end;
+                 if(o_x0=255)then
+                 begin if(speed>0)and(uidi in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
+                 end
+                 else  if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
                 if(o_id=uo_corder)then
                  case o_x0 of

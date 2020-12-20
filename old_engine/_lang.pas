@@ -101,7 +101,7 @@ begin
       PROD:=findprd(uid);
       if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
       if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name);
-      HK:=_gHK(_btni);
+      HK:=_gHK(_ucl);
 
       un_hint:= un_name;
       if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';

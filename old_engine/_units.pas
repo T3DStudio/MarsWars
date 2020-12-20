@@ -533,7 +533,7 @@ begin
       PlaySND(snd_uupgr,pu);
       {$ENDIF}
    end;
-end;
+end; }
 
 
 
@@ -557,72 +557,74 @@ var
     uc  : integer;
 begin
    with pu^ do
-    with player^ do
-     if(hits>dead_hits)then
-     begin
-        _unit_counters(pu);
+   with uid^ do
+   with player^ do
+    if(hits>dead_hits)then
+    begin
+       _unit_counters(pu);
 
-        if(_uclord=_uclord_c)then
-        begin
-           for uc:=1 to MaxUnits do
-            if(uc<>unum)then
-            begin
-               tu:=@_units[uc];
-               if(tu^.hits>dead_hits)then _udetect(pu,tu,dist2(x,y,tu^.x,tu^.y));
-            end;
-        end;
-
-        if(buff[ub_resur]=0)then
-        begin
-           if(onlySVCode)or(hits>-100)then dec(hits,1);
-           if(_uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
-
-           if(onlySVCode)then
+       if(uclord=_uclord_c)then
+       begin
+          for uc:=1 to MaxUnits do
+           if(uc<>unum)then
            begin
-              case uidi of
-              UID_Cacodemon: if(hits>-shadow)then
-                             begin
-                                inc(y,1);
-                                inc(vy,1);
-                                _unit_correctcoords(pu);
-                                {$IFDEF _FULLGAME}
-                                _unit_mmcoords(pu);
-                                _unit_sfog(pu);
-                                {$ENDIF}
-                             end;
-              end;
+              tu:=@_units[uc];
+              if(tu^.hits>dead_hits)then _udetect(pu,tu,dist2(x,y,tu^.x,tu^.y));
+           end;
+       end;
 
-              if(hits<=dead_hits)then
-              begin
-                 _unit_remove(pu);
-                 exit;
-              end;
-           end
-           else _unit_movevis(pu);
-        end
-        else
-         if(OnlySVCode)then
-         begin
-            if(hits<-80)then hits:=-80;
-            inc(hits,1);
-            case uidi of
-            UID_Cacodemon: if(hits>-shadow)then begin dec(vy,1);dec(y,1);end;
-            end;
-            if(hits>=0)then
-            begin
-               uo_x:=x;
-               uo_y:=y;
-               dir :=270;
-               hits:=mhits;
-               buff[ub_resur]:=0;
-               buff[ub_born ]:=vid_fps;
-               {$IFDEF _FULLGAME}
-               _unit_fsrclc(pu);
-               if(playeri=HPlayer)then _unit_createsound(uidi);
-               {$ENDIF}
-            end;
-         end;
-     end;
+       if(buff[ub_resur]=0)then
+       begin
+          if(onlySVCode)or(hits>-100)then dec(hits,1);
+          if(_uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
+
+          if(onlySVCode)then
+          begin
+             case uidi of
+             UID_Cacodemon: if(hits>-shadow)then
+                            begin
+                               inc(y,1);
+                               inc(vy,1);
+                               _unit_correctcoords(pu);
+                               {$IFDEF _FULLGAME}
+                               _unit_mmcoords(pu);
+                               _unit_sfog(pu);
+                               {$ENDIF}
+                            end;
+             end;
+
+             if(hits<=dead_hits)then
+             begin
+                _unit_remove(pu);
+                exit;
+             end;
+          end
+          else _unit_movevis(pu);
+       end
+       else
+        if(OnlySVCode)then
+        begin
+           if(hits<-80)then hits:=-80;
+           inc(hits,1);
+           case uidi of
+           UID_Cacodemon: if(hits>-shadow)then begin dec(vy,1);dec(y,1);end;
+           end;
+           if(hits>=0)then
+           begin
+              uo_id:=ua_amove;
+              uo_x :=x;
+              uo_y :=y;
+              dir  :=270;
+              hits :=_mhits;
+              buff[ub_resur]:=0;
+              buff[ub_born ]:=fr_fps;
+              {$IFDEF _FULLGAME}
+              _unit_fsrclc(pu);
+              if(playeri=HPlayer)then _unit_createsound(uidi);
+              {$ENDIF}
+           end;
+        end;
+    end;
 end;
 
 
@@ -713,7 +715,7 @@ begin
         else hits:=0;
    end;
 end;
-
+ {
 procedure _unit_damage(pu:PTUnit;dam:integer;p,pl:byte);
 const build_arm_f = 16;
        unit_arm_f = 24;
