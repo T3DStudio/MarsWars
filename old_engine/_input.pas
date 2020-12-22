@@ -68,7 +68,7 @@ begin
       with _players[HPlayer] do
       begin
          su:=0;
-         cmsnd:=false;
+        { cmsnd:=false;
          for i:=1 to 255 do
           with _ulst[i] do
            if(speed>0)then inc(su,uid_s[i]);
@@ -90,10 +90,10 @@ begin
             if(upgr[upgr_6bld   ]>0)then inc(su,ucl_s[true,6]);
          end;
          for i:=_uts downto 0 do
-          if(ucl_s[false,i]>0)then break;
+          if(ucl_s[false,i]>0)then break;  }
       end;
 
-      if(cmsnd)then _unit_comssnd(i,_players[HPlayer].race);
+     // if(cmsnd)then _unit_comssnd(i,_players[HPlayer].race);
 
       if(su<=0)then exit;
 
@@ -103,17 +103,17 @@ begin
       if(oy0>0)then
       begin
          ui_umark_u:=oy0;
-         ui_umark_t:=vid_hfps;
+         ui_umark_t:=fr_hfps;
       end;
 
       case ox0 of
-      co_paction : _click_eff(ox1,oy1,vid_hhfps,c_aqua  );
-      co_rcamove : _click_eff(ox1,oy1,vid_hhfps,c_yellow);
+      co_paction : _click_eff(ox1,oy1,fr_hhfps,c_aqua  );
+      co_rcamove : _click_eff(ox1,oy1,fr_hhfps,c_yellow);
       co_rcmove,
       co_move,
-      co_patrol  : _click_eff(ox1,oy1,vid_hhfps,c_lime  );
+      co_patrol  : _click_eff(ox1,oy1,fr_hhfps,c_lime  );
       co_amove,
-      co_apatrol : _click_eff(ox1,oy1,vid_hhfps,c_red   );
+      co_apatrol : _click_eff(ox1,oy1,fr_hhfps,c_red   );
       end;
    end;
 end;
@@ -131,11 +131,8 @@ begin
    sc:=0;
    with _players[HPlayer]do
    begin
-      for i:=0 to _uts do
-      begin
-         inc(sc,ucl_s[false,i]);
-         inc(sc,ucl_s[true ,i]);
-      end;
+      inc(sc,ucl_cs[false]);
+      inc(sc,ucl_cs[true ]);
       htm:=team;
    end;
    _whoInPoint:=0;
@@ -144,7 +141,7 @@ begin
      with _units[i] do
       if(hits>0)and(inapc=0)and(_ch(player^.team))then
        if(_uvision(htm,@_units[i],false))then
-        if(dist2(vx,vy,tx,ty)<r)then
+        if(dist2(vx,vy,tx,ty)<uid^._r)then
         begin
            if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
            _whoInPoint:=i;
@@ -153,30 +150,29 @@ begin
 end;
 
 procedure _chkbld;
-var uid:byte;
 begin
    case m_brush of
-   0.._uts:
+   0     : m_brush:=co_empty;
+   1..255:
     with _players[HPlayer] do
-     if(m_brush in _sbs_ucls)and(ucl_e[true,m_brush]>0)then
+     if(_uids[m_brush]._max=1)and(uid_e[m_brush]>0)then
      begin
         _player_s_o(m_brush,k_shift,0,0,uo_specsel ,HPlayer);
         m_brush:=co_empty;
      end
      else
-       if _bldCndt(@_players[HPlayer],m_brush)and(bld_r=0)
+       if _uid_cndt(@_players[HPlayer],m_brush)
        then m_brush:=co_empty
        else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
             then m_brushc:=c_blue
             else
             begin
-               uid:=cl2uid[race,true,m_brush];
-               if not(uid in ui_prod_builds)then
+               if not(m_brush in ui_prod_builds)then
                begin
                   m_brush:=co_empty;
                   exit;
                end;
-               case _unit_grbcol(m_mx,m_my,_ulst[uid].r,HPlayer,uid,true) of
+               case _unit_grbcol(m_mx,m_my,_uids[m_brush]._r,HPlayer,m_brush,true) of
                1 :  m_brushc:=c_red;
                2 :  m_brushc:=c_blue;
                else m_brushc:=c_lime;
@@ -220,9 +216,9 @@ function _rclickmove(uid:byte):boolean;
 begin
    _rclickmove:=false;
    if(uid>0)then
-    with _ulst[uid] do
-     if(max=1)then
-      if(ucl=6)or(uidi in [UID_HTeleport,UID_HAltar])then _rclickmove:=true;
+    with _uids[uid] do
+     if(_max=1)then
+      if(_ucl=6)or(uid in [UID_HTeleport,UID_HAltar])then _rclickmove:=true;
 end;
 
 procedure _panel_click(tab,bx,by:integer;right,mid:boolean);
@@ -248,22 +244,23 @@ begin
       case tab of
 
 0: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // builds
+   if(u<=ui_ubtns)then
    case right of
-false: begin m_brush:=u;_chkbld;end;
-true : if(ucl_x[u]>0)then
-        if(_rclickmove(cl2uid[race,true,u]))then
-         with _units[ucl_x[u]] do _command(x,y);
+false: begin m_brush:=ui_puids[race,0,u];_chkbld;end;
+true : if(ucl_x[true,u]>0)then
+        if(_rclickmove(ui_puids[race,0,u]))then
+         with _units[ucl_x[true,u]] do _command(x,y);
    end;
 
 1: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // units
-   if(u<19)then
+   if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_suprod,u,0,0, uo_corder  ,HPlayer);
 true : _player_s_o(co_cuprod,u,0,0, uo_corder  ,HPlayer);
    end;
 
 2: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // upgrades
-   if(u<=MaxUpgrs)then
+   if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_supgrade,u,0,0, uo_corder  ,HPlayer);
 true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
@@ -286,9 +283,9 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
    7 : m_a_inv:=not m_a_inv;
    8 : _player_s_o(co_pcancle,0,0,0, uo_corder  ,HPlayer);
 
-   10: if(ordx[10]>0)then
+   10: if(ui_ordx[10]>0)then
         if(k_dbl>0)
-        then _moveHumView(ordx[10], ordy[10])
+        then _moveHumView(ui_ordx[10], ui_ordy[10])
         else _player_s_o(0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0, uo_corder  ,HPlayer);
          end;
@@ -299,11 +296,11 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
      if(u=13)then
      begin
         if(mid)
-        then _rpls_step:=vid_hfps*vid_fps
+        then _rpls_step:=fr_hfps*fr_fps
         else
           if(right=false)
-          then _rpls_step:=vid_hfps*2
-          else _rpls_step:=vid_hfps*10;
+          then _rpls_step:=fr_hfps*2
+          else _rpls_step:=fr_hfps*10;
      end
      else
       if(right=false)then
@@ -391,8 +388,8 @@ begin
                                   if (k_alt>1)
                                   then _player_s_o(ko,0,0,0,uo_addorder,HPlayer)
                                   else
-                                    if(k_dbl>0)and(ordx[ko]>0)and(ko>0)
-                                    then _moveHumView(ordx[ko] , ordy[ko])
+                                    if(k_dbl>0)and(ui_ordx[ko]>0)and(ko>0)
+                                    then _moveHumView(ui_ordx[ko] , ui_ordy[ko])
                                     else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
                              end;
 
@@ -409,7 +406,7 @@ begin
            end;
 
       end;
-   k_dbl:=vid_hhfps;
+   k_dbl:=fr_hhfps;
 end;
 
 procedure _keyp(i:pbyte);
@@ -546,7 +543,7 @@ co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
             end;
-0.._uts   : if(m_brushc=c_lime)then
+1..255   : if(m_brushc=c_lime)then
             begin
                _player_s_o(m_mx,m_my,m_brush,0, uo_build  ,HPlayer);
                _chkbld;
@@ -586,7 +583,7 @@ co_apatrol: _command(m_mx,m_my);
            else _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_aselect,HPlayer);
 
          m_sxs:=-1;
-         m_ldblclk:=vid_hhfps;
+         m_ldblclk:=fr_hhfps;
       end;
    end;
 

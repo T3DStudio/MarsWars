@@ -173,7 +173,7 @@ TUnit = record
    vx,vy,
    x,y,
    anim,anims,animf,
-   r,srng,
+   srng,
    speed,dir,rld,
    hits,
    unum,

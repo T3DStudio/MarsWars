@@ -72,7 +72,7 @@ begin
 
       if(_fsttime)
       then fps_ns:=fps_cs
-      else fps_ns:=fps_cs+vid_mpt;
+      else fps_ns:=fps_cs+fr_mpt;
 
       InputGame;
       CodeGame;

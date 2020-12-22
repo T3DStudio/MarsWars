@@ -961,7 +961,6 @@ begin
       uid:=@_uids[uidi];
       with uid^ do
       begin
-         r     := _r;
          srng  := _srng;
          speed := _speed;
          uf    := _uf;
@@ -969,11 +968,11 @@ begin
          solid := _issolid;
          mmr   := 1;
 
-         if(_isbuilding)and(_isbarrack)then inc(uo_y,r+12);
+         if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
 
          {$IFDEF _FULLGAME}
          if(_isbuilding)
-         then mmr   :=round(r*map_mmcx)
+         then mmr   :=round(_r*map_mmcx)
          else shadow:=1+(uf*fly_height);
 
          _unit_fsrclc(pu);

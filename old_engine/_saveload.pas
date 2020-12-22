@@ -306,13 +306,13 @@ begin
          G_Started:=true;
          _menu:=false;
 
-         for vr:=0 to MaxPlayers do _setAI(vr);
+         //for vr:=0 to MaxPlayers do _setAI(vr);
 
          for u:=1 to MaxUnits do
           with _units[u] do
           begin
              player:=@_players[playeri];
-             uid  :=@_uids[uidi];
+             uid   :=@_uids[uidi];
           end;
       end;
       close(f);

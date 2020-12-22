@@ -372,7 +372,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                 psel:=sel;
                 if(o_id=uo_select)or((o_id=uo_aselect)and(not sel))then
                 begin
-                   sel:=((o_x0-r)<=vx)and(vx<=(o_x1+r))and((o_y0-r)<=vy)and(vy<=(o_y1+r));
+                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
+                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
                    if(speed=0)and(scntm>1)and(o_id<>uo_aselect)then sel:=false;
                    if(scnt>=scntm)then sel:=false;
                 end;
@@ -380,7 +381,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
                  if(_lsuc=uidi)then
-                  sel:=((o_x0-r)<=vx)and(vx<=(o_x1+r))and((o_y0-r)<=vy)and(vy<=(o_y1+r));
+                  sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
+                    and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
 
                 if(o_id=uo_specsel)then
                  if(o_x0=255)then
@@ -412,27 +414,28 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_bx :=-1;
 
                                      case uidi of
-                                      UID_HKeep         : _unit_bteleport(pu);
+                                      {UID_HKeep         : _unit_bteleport(pu);
                                       UID_URadar        : _unit_uradar   (pu);
-                                      UID_URocketL      : _unit_URocketL (pu);
+                                      UID_URocketL      : _unit_URocketL (pu);  }
                                       UID_HMonastery,
                                       UID_HFortress,
                                       UID_UNuclearPlant : uo_tar:=o_y0;
                                       UID_HGate,
                                       UID_UMilitaryUnit,
-                                      UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)then uo_tar:=o_y0;
+                                      UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
+                                                          then uo_tar:=o_y0;
                                       UID_HTower,
                                       UID_HTotem        : if(o_y0<>u)and(o_y0<>0)
                                                           then uo_tar:=o_y0
-                                                          else _unit_b247teleport(pu);
+                                                          else ;//_unit_b247teleport(pu);
                                       else
-                                        if(o_y0<>u   )then uo_tar:=o_y0;
+                                        if(o_y0<>u)then uo_tar:=o_y0;
                                         if(o_x0<>co_rcmove)or(speed=0)
                                         then uo_id:=ua_amove
                                         else
                                         begin
-                                           uo_id:=ua_move;
-                                           tar1 :=0;
+                                           uo_id :=ua_move;
+                                           a_tar1:=0;
                                         end;
                                         _unit_turn(pu);
                                      end;
@@ -450,8 +453,8 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                         uo_x  :=x;
                                         uo_y  :=y;
                                         uo_bx :=-1;
-                                        tar1  :=0;
                                         uo_tar:=0;
+                                        a_tar1:=0;
                                      end;
                          co_move,
                          co_patrol,
@@ -476,7 +479,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                               co_move,
                               co_patrol : begin
                                              uo_id:=ua_move;
-                                             tar1 :=0;
+                                             a_tar1:=0;
                                           end;
                               co_astand,
                               co_amove,
@@ -487,18 +490,18 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_x  :=o_x1;
                                      uo_y  :=o_y1;
                                      uo_bx :=-1;
-                                     tar1  :=0;
+                                     a_tar1:=0;
                                      uo_tar:=0;
                                      uo_id :=ua_paction;
                                   end;
-                    co_action  :  _unit_action   (pu);
+                    co_action  : ;// _unit_action   (pu);
                     co_supgrade:  _unit_supgrade (pu,o_y0);
                     co_cupgrade:  _unit_cupgrade (pu,o_y0);
                     co_suprod  :  _unit_straining(pu,o_y0);
                     co_cuprod  :  _unit_ctraining(pu,o_y0);
                     co_pcancle :  begin
-                                  _unit_ctraining(pu,-1);
-                                  _unit_cupgrade (pu,-1);
+                                  _unit_ctraining(pu,255);
+                                  _unit_cupgrade (pu,255);
                                   end;
                                end;
                    end;
@@ -528,61 +531,6 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
    end;
 end;
 
-{               uo_delete     : _unit_kill(pu,false,o_x0>0);
-               uo_move       : begin
-                                  uo_x :=o_x0;
-                                  uo_y :=o_y0;
-                                  uo_bx:=-1;
-
-
-                               end;
-               uo_action     : case o_x0 of
-                                  2 : if(speed>0)then
-                                      begin
-                                         case o_y0 of
-                                         0,1:
-                                         begin
-                                            uo_x  :=x;
-                                            uo_y  :=y;
-                                            uo_bx :=-1;
-                                            tar1  :=0;
-                                            uo_tar:=0;
-                                         end;
-                                         -4..-1:
-                                         begin
-                                            uo_x  :=o_x1;
-                                            uo_y  :=o_y1;
-                                            uo_bx :=-1;
-                                            uo_tar:=0;
-                                            _unit_turn(pu);
-                                            case o_y0 of
-                                            -2,-4: begin   // patrol
-                                                      uo_bx:=x;
-                                                      uo_by:=y;
-                                                   end;
-                                            end;
-                                         end;
-                                         end;
-                                         case o_y0 of
-                                         0       : uo_id:=ua_hold;
-                                         -1,-2   : begin
-                                                   uo_id:=ua_move;
-                                                   tar1 :=0;
-                                                   end;
-                                         1,-3,-4 : uo_id:=ua_amove;
-                                         end;
-                                      end;
-                                  1 : _unit_action   (pu);
-                                 -2 : _unit_supgrade (pu,o_y0);
-                                 -3 : _unit_cupgrade (pu,o_y0);
-                                 -4 : _unit_straining(pu,o_y0);
-                                 -5 : _unit_ctraining(pu,o_y0);
-                                 -6 : begin
-                                      _unit_ctraining(pu,-1);
-                                      _unit_cupgrade (pu,-1);
-                                      end;
-                               end;  }
-
 procedure PlayersCycle;
 const _pushtimes = _uclord_p;
 var p:byte;
@@ -593,10 +541,10 @@ begin
      begin
         if(state=PS_Play)and(p<>HPlayer)and(net_nstat=ns_srvr)then
         begin
-           if (ttl<ClientTTL)then
+           if(ttl<ClientTTL)then
            begin
-              Inc(ttl,1);
-              if(ttl=ClientTTL)or(ttl=vid_fps)then vid_mredraw:=true;
+              inc(ttl,1);
+              if(ttl=ClientTTL)or(ttl=fr_fps)then vid_mredraw:=true;
            end
            else
              if(G_Started=false)then
@@ -647,7 +595,7 @@ begin
 
          {$IFDEF _FULLGAME}
          if(menu_s2=ms2_camp)
-         then cmp_code
+         then //cmp_code
          else
          {$ENDIF}
            if(g_mode<>gm_inv)then
@@ -671,11 +619,11 @@ begin
 end;
 
 procedure g_inv_calcmm;
-const min_wave_time = vid_fps*15;
+const min_wave_time = fr_fps*15;
 var a,i:integer;
 begin
    case g_inv_wn of
-   1  : g_inv_t:=vid_fps*90;
+   1  : g_inv_t:=fr_fps*90;
    else g_inv_t:=g_inv_wt;
    end;
 
@@ -684,10 +632,10 @@ begin
     with _players[i] do
     if(state=ps_play)then inc(a,ucl_c[false]);
 
-   dec(g_inv_t, g_inv_wn*vid_fps*2);
-   dec(g_inv_t,(a div 15)*vid_fps);
-   dec(g_inv_t, ((map_mw-MaxSMapW) div 100)*vid_fps);
-   dec(g_inv_t, g_startb*5*vid_fps);
+   dec(g_inv_t, g_inv_wn*fr_fps*2);
+   dec(g_inv_t,(a div 15)*fr_fps);
+   dec(g_inv_t, ((map_mw-MaxSMapW) div 100)*fr_fps);
+   dec(g_inv_t, g_startb*5*fr_fps);
 
    if(g_inv_t<min_wave_time)then g_inv_t:=min_wave_time;
 
@@ -702,7 +650,7 @@ begin
 end;
 
 procedure g_inv_spawn;
-const max_wave_time = vid_fps*150;
+const max_wave_time = fr_fps*150;
 var i,tx,ty:integer;
   mon:byte;
 begin
@@ -829,7 +777,7 @@ begin
                       buff[ub_detect]:=_bufinf;
                    end;
                   buff[ub_advanced ]:=_bufinf;
-                  painc:=5*painc;
+                  //painc:=5*painc;
                   order:=2;
                end;
             end;
@@ -908,9 +856,9 @@ begin
          FillChar(ui_upgr       ,SizeOf(ui_upgr   ),0);
          FillChar(ui_units_inapc,SizeOf(ui_units_inapc),0);
          FillChar(ui_blds       ,SizeOf(ui_blds   ),0);
-         FillChar(ordn          ,SizeOf(ordn      ),0);
-         FillChar(ordx          ,SizeOf(ordx      ),0);
-         FillChar(ordy          ,SizeOf(ordy      ),0);
+         FillChar(ui_ordn       ,SizeOf(ui_ordn   ),0);
+         FillChar(ui_ordx       ,SizeOf(ui_ordx   ),0);
+         FillChar(ui_ordy       ,SizeOf(ui_ordy   ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
          {$ENDIF}
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;
@@ -924,7 +872,7 @@ begin
          end;
       end;
 
-      _obj_cycle(G_Paused>0);
+      //_obj_cycle(G_Paused>0);
    end;
 
    if(net_nstat=ns_srvr)then net_GServer;

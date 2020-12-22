@@ -576,7 +576,7 @@ begin
        if(buff[ub_resur]=0)then
        begin
           if(onlySVCode)or(hits>-100)then dec(hits,1);
-          if(_uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
+          if(uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
 
           if(onlySVCode)then
           begin
@@ -651,26 +651,29 @@ begin
          else
            if not(uidi in gavno)
            then deff:=false;
-         if(mech)or(uidi in [UID_LostSoul,UID_Pain,UID_ZEngineer])then deff:=true;
+         if(uid^._ismech)or(uidi in [UID_LostSoul,UID_Pain,UID_ZEngineer])then deff:=true;
 
-         buff[ub_pain]:=vid_fps;
+         buff[ub_pain]:=fr_fps;
          {$IFDEF _FULLGAME}
-         _unit_deff(pu,deff);
+         //_unit_deff(pu,deff);
          {$ENDIF}
       end;
 
       _unit_dec_Kcntrs(pu);
 
-      x     :=vx;
-      y     :=vy;
-      uo_x  :=x;
-      uo_y  :=y;
-      mv_x  :=x;
-      mv_y  :=y;
-      tar1  :=0;
-      tar1d :=32000;
-      rld_t :=0;
-      uo_tar:=0;
+      x      :=vx;
+      y      :=vy;
+      uo_x   :=x;
+      uo_y   :=y;
+      uo_bx  :=-1;
+      uo_by  :=-1;
+      uo_tar :=0;
+      mv_x   :=x;
+      mv_y   :=y;
+      a_tar1 :=0;
+      a_tar1d:=32000;
+      rld    :=0;
+
 
       for i:=1 to MaxUnits do
       if(i<>unum)then
@@ -687,9 +690,9 @@ begin
                 else
                 begin
                    tu^.inapc:=0;
-                   dec(apcc,tu^.apcs);
-                   inc(tu^.x,randomr(r));
-                   inc(tu^.y,randomr(r));
+                   dec(apcc,tu^.uid^._apcs);
+                   inc(tu^.x,randomr(uid^._r));
+                   inc(tu^.y,randomr(uid^._r));
                    tu^.uo_x:=tu^.x;
                    tu^.uo_y:=tu^.y;
                    if(tu^.hits>apc_exp_damage)then

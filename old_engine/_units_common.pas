@@ -232,7 +232,7 @@ end;
 function _unit_flyup(pu:PTUnit;z:integer):boolean;
 var st:integer;
 begin
-   _unit_flyup:=false;
+   {_unit_flyup:=false;
    with pu^ do
     if(shadow<>z)then
     begin
@@ -254,7 +254,7 @@ begin
           dec(y ,st);
           dec(vy,st);
        end;
-    end;
+    end;  }
 end;
 
 procedure _unit_movevis(pu:PTUnit);
@@ -302,7 +302,7 @@ begin
     with _units[u] do
      with uid^ do
      if(hits>0)and(speed=0)and(uf=uf_ground)and(inapc=0)then
-      if(dist(x,y,tx,ty)<(tr+r))then
+      if(dist(x,y,tx,ty)<(tr+_r))then
       begin
          _unit_grbcol:=1;
          break;
@@ -1014,20 +1014,20 @@ begin
    end;
 end;
 
-{
+
 procedure _udetect(uu,tu:PTUnit;ud:integer);
 var td:integer;
 begin
    with uu^ do
    begin
-      if(tu^.uidi=UID_URadar)and(tu^.rld_t>tu^.rld_a)then
+      {if(tu^.uidi=UID_URadar)and(tu^.rld_t>tu^.rld_a)then
       begin
          td:=dist2(x,y,tu^.uo_x,tu^.uo_y);
          if(td>ud)then td:=ud;
       end
-      else td:=ud;
+      else} td:=ud;
 
-      if(td<=(tu^.sr+r))then
+      if(td<=(tu^.srng+uid^._r))then
       begin
          if(buff[ub_invis]=0)
          then _addtoint(@vsnt[tu^.player^.team],vistime)
@@ -1041,6 +1041,7 @@ begin
    end;
 end;
 
+{
 procedure _pain_lost(pu:PTUnit;tx,ty:integer);
 begin
   with pu^ do
@@ -1097,7 +1098,7 @@ begin
 
       _pain_lost(pu,tx,ty);
    end;
-end;
+end;   }
 
 function _canmove(pu:PTUnit):boolean;
 begin
@@ -1139,7 +1140,7 @@ begin
     if(_canmove(pu))then
      if not(uidi in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
 end;
-
+   {
 procedure _unit_upgr(pu:PTUnit);
 var tt:integer;
 begin

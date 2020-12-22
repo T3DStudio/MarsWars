@@ -301,6 +301,7 @@ begin
    if(k_ctrl>2)then
    for u:=1 to MaxUnits do
     with _units[u] do
+    with uid^ do
      if(hits>dead_hits)then
      begin
         ix:=x-vid_vx;
@@ -310,7 +311,7 @@ begin
         if(hits>0)then
         if(k_shift>1)then
         begin
-           circleColor(r_screen,ix,iy,r,c_gray);
+           circleColor(r_screen,ix,iy,_r,c_gray);
            circleColor(r_screen,ix,iy,srng,c_gray);
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
         end;
