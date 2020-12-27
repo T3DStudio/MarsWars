@@ -1,7 +1,14 @@
 
 
+procedure d_AddObjSprites(noanim:boolean);
+begin
+   map_sprites(noanim);
+end;
+
 procedure d_Game;
 begin
+   d_AddObjSprites(G_Paused>0);
+
    d_terrain   (r_screen,vid_mapx,vid_mapy);
    d_SpriteList(r_screen,vid_mapx,vid_mapy);
    d_fog       (r_screen,vid_mapx,vid_mapy);
@@ -22,6 +29,8 @@ begin
    if(_menu)
    then d_Menu
    else d_Game;
+
+   _drawMWSModel(@spr_LostSoul);
 
    if(_testmode>0)then _draw_text(r_screen,vid_sw,0,c2s(fps_tt), ta_right,255, c_white);
 

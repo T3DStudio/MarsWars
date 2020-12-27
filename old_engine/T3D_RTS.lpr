@@ -23,7 +23,6 @@ uses SysUtils, SDL, SDL_Net
 {$include _var.pas}
 
 {$include _common.pas}
-
      {$IFDEF _FULLGAME}
         {$include _sounds.pas}
      {$ENDIF}
@@ -33,12 +32,12 @@ uses SysUtils, SDL, SDL_Net
         {$include _lang.pas}
         {$include _config.pas}
         {$include _units_spr.pas}
-     {$ENDIF}
-     {$IFDEF _FULLGAME}
         {$include _draw_com.pas}
         {$include _draw_menu.pas}
         {$include _draw_ui.pas}
         {$include _draw_game.pas}
+        {$include _draw_objs_units.pas}
+        {$include _draw_objs_map.pas}
         {$include _draw.pas}
         {$include _effects.pas}
         {$include _loadgfx.pas}
@@ -87,7 +86,7 @@ begin
 
       CodeGame;
 
-      SDL_Delay(vid_mpt);
+      SDL_Delay(fr_mpt);
    {$ENDIF}
    end;
 

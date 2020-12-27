@@ -4,6 +4,18 @@ var an,td:integer;
 begin
    _unit_spr:=@spr_dummy;
 
+   with u^   do
+   with uid^ do
+    if(un_smodel=spr_pdmodel)then
+     if(hits>0)then
+     begin
+
+     end
+     else
+     begin
+
+     end;
+
 {   with u^ do
    if(hits>0)then
     case uidi of

@@ -4,115 +4,116 @@
     <PathDelim Value="\"/>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="36">
+    <Units Count="38">
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="65"/>
-        <CursorPos X="29" Y="75"/>
+        <TopLine Value="20"/>
+        <CursorPos X="35" Y="39"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="593"/>
-        <CursorPos X="9" Y="623"/>
+        <TopLine Value="764"/>
+        <CursorPos Y="782"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="_type.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="97"/>
-        <CursorPos X="10" Y="124"/>
+        <TopLine Value="112"/>
+        <CursorPos X="13" Y="139"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="_var.pas"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="21"/>
-        <CursorPos X="9" Y="39"/>
+        <TopLine Value="499"/>
+        <CursorPos X="12" Y="522"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="_loadgfx.pas"/>
-        <EditorIndex Value="18"/>
-        <TopLine Value="218"/>
-        <CursorPos X="29" Y="235"/>
+        <EditorIndex Value="20"/>
+        <TopLine Value="476"/>
+        <CursorPos X="15" Y="497"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="_draw.pas"/>
-        <EditorIndex Value="15"/>
-        <CursorPos X="131"/>
+        <EditorIndex Value="17"/>
+        <TopLine Value="6"/>
+        <CursorPos X="31" Y="33"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="_common.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="137"/>
-        <CursorPos X="10" Y="155"/>
+        <TopLine Value="13"/>
+        <CursorPos X="62" Y="30"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="_init.pas"/>
-        <EditorIndex Value="34"/>
-        <CursorPos X="73" Y="14"/>
+        <EditorIndex Value="36"/>
+        <TopLine Value="5"/>
+        <CursorPos X="23" Y="13"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="_input.pas"/>
-        <EditorIndex Value="33"/>
-        <TopLine Value="149"/>
-        <CursorPos X="30" Y="155"/>
+        <EditorIndex Value="35"/>
+        <TopLine Value="618"/>
+        <CursorPos X="61" Y="615"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="_draw_menu.pas"/>
         <EditorIndex Value="12"/>
-        <TopLine Value="454"/>
-        <CursorPos X="46" Y="39"/>
+        <TopLine Value="76"/>
+        <CursorPos X="11" Y="55"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="_draw_com.pas"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="143"/>
-        <CursorPos X="18" Y="161"/>
+        <TopLine Value="117"/>
+        <CursorPos X="15" Y="143"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="_menu.pas"/>
-        <EditorIndex Value="32"/>
-        <TopLine Value="154"/>
-        <CursorPos X="69" Y="454"/>
+        <EditorIndex Value="34"/>
+        <TopLine Value="41"/>
+        <CursorPos X="28" Y="47"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="_lang.pas"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="88"/>
-        <CursorPos X="20" Y="104"/>
+        <TopLine Value="616"/>
+        <CursorPos X="62" Y="625"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="_map.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="19"/>
-        <TopLine Value="47"/>
-        <CursorPos X="17" Y="34"/>
+        <EditorIndex Value="21"/>
+        <TopLine Value="282"/>
+        <CursorPos X="25" Y="299"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -126,23 +127,23 @@
       </Unit14>
       <Unit15>
         <Filename Value="_game.pas"/>
-        <EditorIndex Value="29"/>
-        <TopLine Value="370"/>
-        <CursorPos X="24" Y="391"/>
+        <EditorIndex Value="31"/>
+        <TopLine Value="854"/>
+        <CursorPos X="55" Y="868"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="_draw_ui.pas"/>
         <EditorIndex Value="13"/>
-        <TopLine Value="385"/>
-        <CursorPos X="32" Y="402"/>
+        <TopLine Value="332"/>
+        <CursorPos X="51" Y="337"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit16>
       <Unit17>
         <Filename Value="_campaings.pas"/>
-        <EditorIndex Value="25"/>
+        <EditorIndex Value="27"/>
         <TopLine Value="1427"/>
         <CursorPos X="5" Y="1462"/>
         <UsageCount Value="102"/>
@@ -158,23 +159,23 @@
       </Unit18>
       <Unit19>
         <Filename Value="_net_game.pas"/>
-        <EditorIndex Value="26"/>
-        <TopLine Value="411"/>
-        <CursorPos X="29" Y="439"/>
+        <EditorIndex Value="28"/>
+        <TopLine Value="398"/>
+        <CursorPos X="73" Y="427"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="_sounds.pas"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="35"/>
-        <CursorPos X="40" Y="47"/>
+        <TopLine Value="21"/>
+        <CursorPos X="32" Y="26"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit20>
       <Unit21>
         <Filename Value="_units.pas"/>
-        <EditorIndex Value="23"/>
+        <EditorIndex Value="25"/>
         <TopLine Value="827"/>
         <CursorPos X="43" Y="695"/>
         <UsageCount Value="100"/>
@@ -182,31 +183,31 @@
       </Unit21>
       <Unit22>
         <Filename Value="_units_spr.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="491"/>
-        <CursorPos X="17" Y="517"/>
+        <CursorPos X="83" Y="12"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit22>
       <Unit23>
         <Filename Value="_saveload.pas"/>
-        <EditorIndex Value="30"/>
-        <TopLine Value="295"/>
-        <CursorPos X="19" Y="315"/>
+        <EditorIndex Value="32"/>
+        <TopLine Value="271"/>
+        <CursorPos X="56" Y="284"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit23>
       <Unit24>
         <Filename Value="_units_cl.pas"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="957"/>
-        <CursorPos X="30" Y="975"/>
+        <TopLine Value="1773"/>
+        <CursorPos X="30" Y="1791"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit24>
       <Unit25>
         <Filename Value="_missiles.pas"/>
-        <EditorIndex Value="20"/>
+        <EditorIndex Value="22"/>
         <TopLine Value="271"/>
         <CursorPos X="66" Y="284"/>
         <UsageCount Value="100"/>
@@ -214,15 +215,15 @@
       </Unit25>
       <Unit26>
         <Filename Value="_effects.pas"/>
-        <EditorIndex Value="16"/>
-        <TopLine Value="49"/>
-        <CursorPos X="33" Y="67"/>
+        <EditorIndex Value="18"/>
+        <TopLine Value="20"/>
+        <CursorPos X="65" Y="25"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit26>
       <Unit27>
         <Filename Value="_ai.pas"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="24"/>
         <TopLine Value="1248"/>
         <CursorPos X="2" Y="1282"/>
         <UsageCount Value="102"/>
@@ -230,7 +231,7 @@
       </Unit27>
       <Unit28>
         <Filename Value="_replays.pas"/>
-        <EditorIndex Value="31"/>
+        <EditorIndex Value="33"/>
         <TopLine Value="323"/>
         <CursorPos X="74" Y="327"/>
         <UsageCount Value="101"/>
@@ -238,17 +239,17 @@
       </Unit28>
       <Unit29>
         <Filename Value="_unit_client.pas"/>
-        <EditorIndex Value="24"/>
-        <TopLine Value="364"/>
-        <CursorPos X="11" Y="400"/>
+        <EditorIndex Value="26"/>
+        <TopLine Value="904"/>
+        <CursorPos X="30" Y="920"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit29>
       <Unit30>
         <Filename Value="_units_common.pas"/>
-        <EditorIndex Value="21"/>
-        <TopLine Value="1096"/>
-        <CursorPos X="9" Y="1101"/>
+        <EditorIndex Value="23"/>
+        <TopLine Value="311"/>
+        <CursorPos X="30" Y="328"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit30>
@@ -257,19 +258,19 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="227"/>
         <CursorPos X="26" Y="303"/>
-        <UsageCount Value="47"/>
+        <UsageCount Value="37"/>
       </Unit31>
       <Unit32>
         <Filename Value="_ded.pas"/>
-        <EditorIndex Value="28"/>
-        <TopLine Value="28"/>
-        <CursorPos X="18" Y="46"/>
+        <EditorIndex Value="30"/>
+        <TopLine Value="208"/>
+        <CursorPos X="19" Y="222"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit32>
       <Unit33>
         <Filename Value="missions\m1.pas"/>
-        <EditorIndex Value="27"/>
+        <EditorIndex Value="29"/>
         <CursorPos X="5" Y="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -277,140 +278,154 @@
       <Unit34>
         <Filename Value="_draw_game.pas"/>
         <EditorIndex Value="14"/>
-        <TopLine Value="296"/>
-        <CursorPos X="17" Y="304"/>
+        <TopLine Value="350"/>
+        <CursorPos X="25" Y="373"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="_themes.pas"/>
-        <EditorIndex Value="17"/>
-        <TopLine Value="478"/>
-        <CursorPos X="9" Y="497"/>
+        <EditorIndex Value="19"/>
+        <TopLine Value="187"/>
+        <CursorPos X="11" Y="62"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit35>
+      <Unit36>
+        <Filename Value="_draw_objs_map.pas"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="14"/>
+        <CursorPos X="44" Y="45"/>
+        <UsageCount Value="47"/>
+        <Loaded Value="True"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="_draw_objs_units.pas"/>
+        <EditorIndex Value="15"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit37>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="273" Column="36" TopLine="159"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="615" Column="34" TopLine="606"/>
       </Position1>
       <Position2>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="1028" Column="12" TopLine="1015"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="621" Column="10" TopLine="609"/>
       </Position2>
       <Position3>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="1030" Column="23" TopLine="1012"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="658" TopLine="413"/>
       </Position3>
       <Position4>
-        <Filename Value="_units.pas"/>
-        <Caret Line="654" Column="21" TopLine="649"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="621" Column="50" TopLine="605"/>
       </Position4>
       <Position5>
-        <Filename Value="_game.pas"/>
-        <Caret Line="366" Column="10" TopLine="356"/>
+        <Filename Value="_map.pas"/>
+        <Caret Line="298" Column="7" TopLine="273"/>
       </Position5>
       <Position6>
         <Filename Value="_type.pas"/>
-        <Caret Line="176" Column="4" TopLine="159"/>
+        <Caret Line="151" Column="21" TopLine="131"/>
       </Position6>
       <Position7>
-        <Filename Value="_units_cl.pas"/>
-        <Caret Line="963" Column="12" TopLine="946"/>
+        <Filename Value="_draw_game.pas"/>
+        <Caret Line="290" Column="10" TopLine="274"/>
       </Position7>
       <Position8>
-        <Filename Value="_units_cl.pas"/>
-        <Caret Line="971" Column="55" TopLine="953"/>
+        <Filename Value="_type.pas"/>
+        <Caret Line="150" Column="24" TopLine="131"/>
       </Position8>
       <Position9>
-        <Filename Value="_units_cl.pas"/>
-        <Caret Line="975" Column="30" TopLine="957"/>
+        <Filename Value="_game.pas"/>
+        <Caret Line="67" Column="12" TopLine="39"/>
       </Position9>
       <Position10>
-        <Filename Value="_draw_game.pas"/>
-        <Caret Line="313" Column="40" TopLine="296"/>
+        <Filename Value="_common.pas"/>
+        <Caret Line="35" Column="22" TopLine="5"/>
       </Position10>
       <Position11>
-        <Filename Value="_draw_game.pas"/>
-        <Caret Line="304" Column="17" TopLine="296"/>
+        <Filename Value="_type.pas"/>
+        <Caret Line="136" Column="11" TopLine="118"/>
       </Position11>
       <Position12>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="305" Column="31" TopLine="287"/>
+        <Filename Value="_common.pas"/>
+        <Caret Line="30" Column="20" TopLine="23"/>
       </Position12>
       <Position13>
-        <Filename Value="_units.pas"/>
-        <Caret Line="695" Column="43" TopLine="677"/>
+        <Filename Value="_common.pas"/>
+        <Caret Line="205" Column="68" TopLine="187"/>
       </Position13>
       <Position14>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="306" Column="70" TopLine="287"/>
+        <Filename Value="_draw_ui.pas"/>
+        <Caret Line="331" Column="24" TopLine="314"/>
       </Position14>
       <Position15>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="1101" Column="9" TopLine="1096"/>
+        <Filename Value="_common.pas"/>
+        <Caret Line="49" Column="19" TopLine="28"/>
       </Position15>
       <Position16>
-        <Filename Value="_game.pas"/>
-        <Caret Line="621" Column="27" TopLine="615"/>
+        <Filename Value="_var.pas"/>
+        <Caret Line="520" Column="31" TopLine="490"/>
       </Position16>
       <Position17>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="263" Column="33" TopLine="246"/>
+        <Filename Value="_draw_ui.pas"/>
+        <Caret Line="337" Column="51" TopLine="332"/>
       </Position17>
       <Position18>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="439" Column="29" TopLine="411"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="521" Column="33" TopLine="506"/>
       </Position18>
       <Position19>
-        <Filename Value="_game.pas"/>
-        <Caret Line="861" Column="51" TopLine="841"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="166" Column="11" TopLine="148"/>
       </Position19>
       <Position20>
-        <Filename Value="_game.pas"/>
-        <Caret Line="875" Column="9" TopLine="847"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="153" Column="11" TopLine="148"/>
       </Position20>
       <Position21>
-        <Filename Value="_saveload.pas"/>
-        <Caret Line="315" Column="19" TopLine="295"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="133" Column="29" TopLine="108"/>
       </Position21>
       <Position22>
-        <Filename Value="_input.pas"/>
-        <Caret Line="71" Column="9" TopLine="103"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="178" Column="41" TopLine="153"/>
       </Position22>
       <Position23>
-        <Filename Value="_input.pas"/>
-        <Caret Line="116" Column="41" TopLine="115"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="526" Column="60" TopLine="495"/>
       </Position23>
       <Position24>
-        <Filename Value="_input.pas"/>
-        <Caret Line="98" Column="7" TopLine="82"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="182" Column="54" TopLine="157"/>
       </Position24>
       <Position25>
-        <Filename Value="_input.pas"/>
-        <Caret Line="134" Column="19" TopLine="117"/>
+        <Filename Value="_draw_objs_map.pas"/>
+        <Caret Line="123" Column="28" TopLine="59"/>
       </Position25>
       <Position26>
-        <Filename Value="_input.pas"/>
-        <Caret Line="164" Column="48" TopLine="150"/>
+        <Filename Value="_themes.pas"/>
+        <Caret Line="233" Column="103" TopLine="209"/>
       </Position26>
       <Position27>
-        <Filename Value="_input.pas"/>
-        <Caret Line="174" Column="77" TopLine="150"/>
+        <Filename Value="_themes.pas"/>
+        <Caret Line="176" Column="12" TopLine="161"/>
       </Position27>
       <Position28>
-        <Filename Value="_input.pas"/>
-        <Caret Line="250" Column="32" TopLine="240"/>
+        <Filename Value="_draw.pas"/>
+        <Caret Line="33" Column="31" TopLine="6"/>
       </Position28>
       <Position29>
-        <Filename Value="_input.pas"/>
-        <Caret Line="248" Column="41" TopLine="225"/>
+        <Filename Value="_draw_game.pas"/>
+        <Caret Line="385" Column="31" TopLine="350"/>
       </Position29>
       <Position30>
-        <Filename Value="_input.pas"/>
-        <Caret Line="155" Column="30" TopLine="149"/>
+        <Filename Value="_units_cl.pas"/>
+        <Caret Line="1791" Column="20" TopLine="1770"/>
       </Position30>
     </JumpHistory>
     <RunParams>

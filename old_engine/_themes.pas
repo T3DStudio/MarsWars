@@ -222,11 +222,11 @@ begin
    setlength(theme_anm_brocks  ,theme_spr_brockn  );
 
    for o:=1 to theme_spr_decorn do begin FillChar(theme_anm_decors[o-1],SizeOf(theme_anm_decors[o-1]),0);theme_anm_decors[o-1].sh:=1;    end;
-   for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);                                end;
-   for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);theme_anm_brocks[o-1].depth:=1; end;
+   for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);theme_anm_srocks[o-1].depth:=0; end;
+   for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);theme_anm_brocks[o-1].depth:=0; end;
 
    //    DECORS
-   //                                          ns         atm ana xo  yo   shadow depth
+   //                                          ns         atm ana xo  yo   shadow  depth
    DecAnim(@theme_anm_decors,@theme_spr_decorn,'13,35'   ,0  ,0  ,0  ,-3  ,1      ,0);
    DecAnim(@theme_anm_decors,@theme_spr_decorn,'30,31,20,21'
                                                          ,0  ,0  ,0  ,-4  ,1      ,0);
@@ -269,7 +269,7 @@ begin
    DecAnim(@theme_anm_decors,@theme_spr_decorn,'47'      ,15 ,46 ,0  ,-17 ,1      ,0);
 
 
-   // S ROCKS                                  ns         atm ana xo  yo   shadow
+   // S ROCKS                                  ns         atm ana xo  yo   shadow  depth
    DecAnim(@theme_anm_srocks,@theme_spr_srockn,'3'       ,20 ,22 ,0  ,0   ,0      ,0); // rock with pool 1
    DecAnim(@theme_anm_srocks,@theme_spr_srockn,'22'      ,20 ,3  ,0  ,0   ,0      ,0);
 
@@ -289,7 +289,7 @@ begin
    DecAnim(@theme_anm_srocks,@theme_spr_srockn,'0'       ,-1 ,12 ,0  ,0   ,0      ,0);
 
 
-   // B ROCKS                                  ns         atm ana xo  yo   shadow
+   // B ROCKS                                  ns         atm ana xo  yo   shadow  depth
    DecAnim(@theme_anm_brocks,@theme_spr_brockn,'9'       ,-1 ,19 ,0  ,0   ,0      ,0); // tech slime canister
    DecAnim(@theme_anm_brocks,@theme_spr_brockn,'19'      ,-1 , 9 ,0  ,0   ,0      ,0);
    DecAnim(@theme_anm_brocks,@theme_spr_brockn,'11'      ,-1 ,20 ,0  ,0   ,0      ,0); // tech water canister
@@ -489,24 +489,6 @@ begin
       end;
    end;
    SetTLBlC;
-end;
-
-
-function _theme_anim_time(base:integer):integer;
-const fr_h3fps = fr_fps div 3;
-      fr_4fps  = fr_fps*4;
-begin
-   case base of
-   -1 : _theme_anim_time:=random(fr_h3fps)+fr_h3fps;
-   -2 : _theme_anim_time:=random(fr_2fps )+1;
-   -3 : _theme_anim_time:=random(fr_fps  )+1;
-   -4 : _theme_anim_time:=random(fr_2fps )+1;
-   -5 : _theme_anim_time:=random(fr_3fps )+1;
-   -6 : _theme_anim_time:=random(fr_4fps )+1;
-   else if(base>0)
-        then _theme_anim_time:=base
-        else _theme_anim_time:=-100;
-   end;
 end;
 
 

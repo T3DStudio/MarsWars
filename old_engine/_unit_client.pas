@@ -243,7 +243,7 @@ gm_inv:begin
           _wudata_byte(g_inv_wn,rpl);
           _wudata_int (g_inv_t ,rpl);
        end;
-gm_ct :for i:=1 to MaxPlayers do _wudata_byte(g_ct_pl[i].pl,rpl);
+gm_ct :for i:=1 to MaxCPoints do _wudata_byte(g_cpt_pl[i].pl,rpl);
     end;
 
    if(rpl)then
@@ -917,7 +917,7 @@ gm_inv:begin
           if(g_inv_wn>_PNU)then PlaySND(snd_teleport,nil);
           g_inv_t :=_rudata_int (rpl,0);
        end;
-gm_ct: for i:=1 to MaxPlayers do g_ct_pl[i].pl:=_rudata_byte(rpl,0);
+gm_ct: for i:=1 to MaxCPoints do g_cpt_pl[i].pl:=_rudata_byte(rpl,0);
     end;
 
    G_plstat:=_rudata_byte(rpl,0);

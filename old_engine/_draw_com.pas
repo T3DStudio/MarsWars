@@ -136,11 +136,12 @@ begin
 
       characterColor(r_minimap,x-3,y-3,start_char,c);
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
-
-      if(g_mode=gm_ct)and(i>0)then
-       with g_ct_pl[i] do
-        filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
    end;
+
+   if(g_mode=gm_ct)then
+    for i:=1 to MaxCPoints do
+     with g_cpt_pl[i] do
+      filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
 end;
 
 procedure _makeMMB;

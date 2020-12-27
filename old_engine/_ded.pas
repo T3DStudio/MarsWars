@@ -196,7 +196,7 @@ begin
    then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0)
    else with _players[p] do
         if(state<>ps_none)
-        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(_PickPTeam(p)),35, '',0)
+        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(_PickPTeam(g_mode,p)),35, '',0)
         else _screenLine(name      ,1   , _plst(p)  ,15, '---',25, '-',35, '',0);
 end;
 
@@ -219,7 +219,7 @@ begin
       vid_mredraw := false;
    end;
 
-   if(consoley<=vid_fps)then
+   if(consoley<=fr_fps)then
    begin
       case consoley of
       0 : writeln(str_wcaption,' ',str_cprt,' UPD port: ',net_sv_port);

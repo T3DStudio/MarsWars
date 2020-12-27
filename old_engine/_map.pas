@@ -1,72 +1,5 @@
 {$IFDEF _FULLGAME}
 
-procedure _dds_anim(d:integer;sprl:PTUSpriteList;anml:PTThemeAnimL;lst:PTIntList;lstn:pinteger;first:boolean);
-begin
-   if(lstn^>0)then
-    with map_dds[d] do
-     if(animt>0)or(first)then
-     begin
-        dec(animt,1);
-        if(animt<=0)then
-        begin
-           if(animn<0)or(first)then
-           begin
-              animn:= d mod lstn^;
-              animn:= lst^[animn];
-           end
-           else
-           begin
-              animn:=anml^[animn].anext;
-           end;
-           animt:=_theme_anim_time(anml^[animn].atime);
-           shh  := anml^[animn].sh;
-           ox   := anml^[animn].xo;
-           oy   := anml^[animn].yo;
-           spr  :=@sprl^[animn];
-           case anml^[animn].depth of
-           0    : dpth :=y;
-           else   dpth :=anml^[animn].depth;
-           end;
-        end;
-     end;
-end;
-
-procedure _dds_p(onlyspr:boolean);
-var d,
-    ro :integer;
-begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)then
-     begin
-        if(_rectvis(x,y,255,255)=false)then continue;
-
-        ro:=0;
-        if(0<=m_brush)and(m_brush<=255)then ro:=r-bld_dec_mr;
-
-        if(onlyspr=false)or(spr=pspr_dummy)then
-        case t of
-        DID_LiquidR1,
-        DID_LiquidR2,
-        DID_LiquidR3,
-        DID_LiquidR4 : begin
-                          if(theme_liquid_animt<2)
-                          then spr:=@spr_liquid[((G_Step div theme_liquid_animm) mod LiquidAnim)+1,animn]
-                          else spr:=@spr_liquid[1,animn];
-                       end;
-        DID_Other    : _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
-        DID_SRock    : _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
-        DID_BRock    : _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
-        end;
-
-        if(_rectvis(x+ox,y+oy,spr^.hw,spr^.hh))then
-        begin
-           _sl_add_dec(x,y,dpth,shh,spr,255,ro,ox,oy);
-           if(pspr<>nil)then _sl_add_dec(x,y,-10000,0,pspr,255,ro,ox,oy);
-        end;
-     end;
-end;
-
 procedure map_tllbc;
 begin
    MakeTerrain;
@@ -83,54 +16,6 @@ begin
    -((map_seed and $000FF000) shr 12),
    -((map_seed and $0FF00000) shr 20),
    -((map_seed and $F0000000) shr 28));
-end;
-
-procedure _map_dds;
-var d:integer;
-begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)then
-     begin
-        dpth := y;
-        shh  := 0;
-        animn:= -1;
-        animt:= 0;
-        spr  := pspr_dummy;
-        pspr := nil;
-        ox   := 0;
-        oy   := 0;
-
-        case t of
-        DID_LiquidR1,
-        DID_LiquidR2,
-        DID_LiquidR3,
-        DID_LiquidR4: begin
-                         dpth := -5;
-                         mmc  := theme_liquid_color;
-                         animn:= t;
-                         pspr := @spr_liquidb[animn];
-                      end;
-        DID_other  :  begin
-                         shh  := 1;
-                         mmc  := c_gray;
-                         _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
-                      end;
-
-        DID_Srock  :  begin
-                         mmc  := c_dgray;
-                         _dds_anim(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
-                      end;
-        DID_Brock  :  begin
-                         mmc  := c_dgray;
-                         _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
-                      end;
-        end;
-
-        mmx:=round(x*map_mmcx);
-        mmy:=round(y*map_mmcx);
-        mmr:=max2(1,round(r*map_mmcx));
-     end;
 end;
 
 {$ENDIF}
@@ -201,19 +86,9 @@ end;
 procedure map_vars;
 begin
    map_seed2   := map_seed;
-   if(g_mode=gm_inv)
-   then map_aifly := false
-   else map_aifly := ((map_liq+map_obs)>6)and(map_obs>2)and(map_liq>1);
    map_b1      := map_mw-build_b;
    {$IFDEF _FULLGAME}
-   if(menu_s2<>ms2_camp)then
-   begin
-      if(map_mw<MinSMapW)then map_mw:=MinSMapW;
-      if(map_mw>MaxSMapW)then map_mw:=MaxSMapW;
-   end;
-   map_flydpth[uf_ground ] := 0;
-   map_flydpth[uf_soaring] := map_mw;
-   map_flydpth[uf_fly    ] := map_mw*2;
+   if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
    map_mmvw    := trunc(vid_sw*map_mmcx)+1;
    map_mmvh    := trunc(vid_sh*map_mmcx)+1;
@@ -322,6 +197,7 @@ begin
          map_psx[6]:=i-u;
          map_psy[6]:=i-u;
       end;
+   gm_ct,
    gm_coop:
       begin
          map_psx[0]:=map_mw div 2;
@@ -342,6 +218,29 @@ begin
          map_psy[5]:=ix;
          map_psx[6]:=map_psx[0];
          map_psy[6]:=map_mw-ix;
+
+         if(g_mode=gm_ct)then
+         begin
+            c :=map_seed mod 360;
+            ix:=map_mw div 2;
+            iy:=360-(360 div MaxCPoints);
+            u := map_mw div 5;
+
+            for i:=1 to MaxCPoints do
+             with g_cpt_pl[i] do
+             begin
+                px:=trunc(ix+cos(c*degtorad)*u);
+                py:=trunc(ix+sin(c*degtorad)*u);
+                inc(c,iy);
+
+                {$IFDEF _FULLGAME}
+                mpx:=round(px*map_mmcx);
+                mpy:=round(py*map_mmcx);
+                {$ENDIF}
+             end;
+            map_psx[0]:=-5000;
+            map_psy[0]:=-5000;
+         end;
       end;
    else
       ix :=integer(map_seed) mod map_mw;
@@ -365,29 +264,6 @@ begin
 
          map_psx[i]:=ix;
          map_psy[i]:=iy;
-      end;
-
-      if(g_mode=gm_ct)then
-      begin
-         dst:=map_mw div 10;
-         u:=map_mw-dst;
-         for i:=1 to MaxPlayers do
-          with g_ct_pl[i] do
-          begin
-             px:=i*102;
-             py:=i*151;
-             c:=0;
-             repeat
-               px:=_genx(px+py,map_mw,true);
-               py:=_genx(py+px+c,map_mw,true);
-               inc(c,1);
-             until (_spch(px,py,base_rr-c)=false)and(px>dst)and(py>dst)and(px<u)and(py<u);
-
-             {$IFDEF _FULLGAME}
-             mpx:=round(px*map_mmcx);
-             mpy:=round(py*map_mmcx);
-             {$ENDIF}
-          end;
       end;
    end;
 end;
@@ -416,11 +292,62 @@ begin
      end;
 end;
 
+function _trysetdd(di:byte;ix,iy,i:integer):boolean;
+begin
+   //if(0<=ix)and(ix<=map_mw)and(0<=iy)and(iy<=map_mw)then
+    //if(=false)then
+   if(_dnear(di,ix,iy,i))or(_spch(ix,iy,base_ir))
+   then _trysetdd:=false
+   else
+   begin
+      _dds_a(ix,iy,di);
+      _trysetdd:=true;
+   end;
+end;
+
+function _pickdds(ix,iy,i:integer;lqs,rks:pinteger):boolean;
+var di:byte;
+begin
+   _pickdds:=false;
+   for di:=DID_liquidR1 to DID_Other do
+    case di of
+    DID_LiquidR1,
+    DID_LiquidR2,
+    DID_LiquidR3,
+    DID_LiquidR4  : if(lqs^<=0)
+                    then continue
+                    else
+                      if(_trysetdd(di,ix,iy,i))then
+                      begin
+                         _pickdds:=true;
+                         dec(lqs^,1);
+                         break;
+                      end
+                      else continue;
+    DID_SRock,
+    DID_BRock     : if(rks^<=0)
+                    then continue
+                    else
+                      if(_trysetdd(di,ix,iy,i))then
+                      begin
+                         _pickdds:=true;
+                         dec(rks^,1);
+                         break;
+                      end
+                      else continue;
+    else
+      if(_trysetdd(di,ix,iy,i))then
+      begin
+         _pickdds:=true;
+         break;
+      end
+      else continue;
+    end;
+end;
 
 procedure map_make;
 const dpostime = 300;
-var i,ix,iy,lqs,rks,hrks,ddc,cnt:integer;
-    di: byte;
+var i,ix,iy,lqs,rks,ddc,cnt:integer;
 begin
    {$IFDEF _FULLGAME}
    Map_tdmake;
@@ -428,12 +355,12 @@ begin
 
    FillChar(map_dds,SizeOf(map_dds),0);
    for ix:=0 to dcn do
-    for iy:=0 to dcn do
-     with map_dcell[ix,iy] do
-     begin
-        n:=0;
-        setlength(l,n);
-     end;
+   for iy:=0 to dcn do
+    with map_dcell[ix,iy] do
+    begin
+       n:=0;
+       setlength(l,n);
+    end;
 
    ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf));
    if(ddc>MaxDoodads)then ddc:=MaxDoodads;
@@ -460,17 +387,30 @@ begin
    begin
       lqs:=(ddc div 80)*map_liq;
    end;
-   inc(ddc,50);
-   if(ddc>MaxDoodads)then ddc:=MaxDoodads;
-
-   hrks:=rks div 2;
+   //inc(ddc,50);
+   //if(ddc>MaxDoodads)then ddc:=MaxDoodads;
 
    ix :=map_seed;
    iy :=0;
 
    for i:=1 to ddc do
    begin
-      di:=0;
+      cnt:=0;
+      while true do
+      begin
+         ix:=_genx(ix            ,map_mw,false);
+         iy:=_genx(iy+sqr(cnt+ix),map_mw,true );
+
+          if(_pickdds(ix,iy,i,@lqs,@rks))then break;
+
+         inc(cnt,1);
+         if(cnt>=dpostime)then break;
+      end;
+     // until (_spch(ix,iy,base_r+200)=false)and(_dnear(di,ix,iy,i)=false)and;
+      //if(cnt>=dpostime)then continue;
+
+
+      {di:=0;
       if(lqs>0)then
       begin
          case i mod 12 of
@@ -502,7 +442,7 @@ begin
       until (_spch(ix,iy,base_r+200)=false)and(_dnear(di,ix,iy,i)=false)and(ix>=0)and(iy>=0)and(ix<=map_mw)and(iy<=map_mw);
       if(cnt>=dpostime)then continue;
 
-      _dds_a(ix,iy,di);
+      _dds_a(ix,iy,di);  }
    end;
 
    _refresh_dmcells;

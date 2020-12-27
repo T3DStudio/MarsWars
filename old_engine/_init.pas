@@ -20,7 +20,7 @@ begin
    _GfxColors;
    _MakeScreen;
    _LoadingScreen;
-   _LoadGraphics;
+   _LoadGraphics(true);
    _cmp_initmap;
 
    InitVideo:=true;

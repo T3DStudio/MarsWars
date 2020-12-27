@@ -100,7 +100,9 @@ begin
              else ea:=anl-ea;
         end;
 
-        case e of
+        spr:=@spr_dummy;
+
+        {case e of
         UID_LostSoul   : spr:=@spr_lostsoul[ea];
         UID_Pain       : spr:=@spr_pain    [ea];
         MID_Flyer      : spr:=@spr_u_p3    [ea];
@@ -147,7 +149,8 @@ begin
         EID_ArchFire   : spr:=@spr_h_p6[ea];
         else
           spr:=@spr_dummy;
-        end;
+        end;}
+
 
         if(onlyspr=false)then
          if(t>0)

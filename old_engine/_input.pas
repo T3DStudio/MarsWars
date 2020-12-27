@@ -226,15 +226,17 @@ var u:integer;
 begin
    //writeln(tab,': ',bx,', ',by);
    PlaySNDM(snd_click);
+   dec(by,4);// 0,0 under minimap
+
    case by of
+   -1: case vid_ppos of   // tabs
+       0,1: begin dec(m_vx,vid_panelx); if(m_vy>ui_tabsy)then ui_tab:=mm3(0,m_vx div vid_tBW,3);inc(m_vx,vid_panelx);end;
+       2,3: begin dec(m_vy,vid_panely); if(m_vx>ui_tabsy)then ui_tab:=mm3(0,m_vy div vid_tBW,3);inc(m_vy,vid_panely);end;
+       end;
    9: case bx of         // buttons
       0 : ToggleMenu;
       1 : ;
       2 : if(net_nstat>ns_none)then TogglePause;
-      end;
-  -1: case vid_ppos of   // tabs
-      0,1: begin dec(m_vx,vid_panelx); if(m_vy>ui_tabsy)then ui_tab:=m_vx div vid_tBW;inc(m_vx,vid_panelx);end;
-      2,3: begin dec(m_vy,vid_panely); if(m_vx>ui_tabsy)then ui_tab:=m_vy div vid_tBW;inc(m_vy,vid_panely);end;
       end;
    else
      u:=(by*3)+(bx mod 3);
@@ -303,8 +305,8 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
           else _rpls_step:=fr_hfps*10;
      end
      else
-      if(right=false)then
-       case u of
+       if(right=false)then
+        case u of
      12: _fsttime:=not _fsttime;
      14: if(_rpls_rst<rpl_end)then
           if(G_Paused>0)
@@ -314,7 +316,7 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
      16: _rpls_log :=not _rpls_log;
      17: _fog      :=not _fog;
  20..26: HPlayer   :=u-20;
-       end;
+        end;
 
       end;
    end;
@@ -417,16 +419,16 @@ end;
 
 procedure WindowEvents;
 begin
-   _keyp(@k_u);
-   _keyp(@k_d);
-   _keyp(@k_r);
-   _keyp(@k_l);
+   _keyp(@k_u    );
+   _keyp(@k_d    );
+   _keyp(@k_r    );
+   _keyp(@k_l    );
    _keyp(@k_shift);
-   _keyp(@k_ctrl);
-   _keyp(@k_alt);
-   _keyp(@k_ml);
-   _keyp(@k_mr);
-   _keyp(@k_chrt);
+   _keyp(@k_ctrl );
+   _keyp(@k_alt  );
+   _keyp(@k_ml   );
+   _keyp(@k_mr   );
+   _keyp(@k_chrt );
    if(k_dbl>0)then dec(k_dbl,1);
 
    while (SDL_PollEvent( _event )>0) do
@@ -441,39 +443,39 @@ begin
                               m_vx:=_event^.motion.x;
                               m_vy:=_event^.motion.y;
                            end;
-      SDL_MOUSEBUTTONUP  : begin
-                              case (_event^.button.button) of
-                            SDL_BUTTON_left   : k_ml:=1;
-                            SDL_BUTTON_right  : k_mr:=1;
-                            SDL_BUTTON_middle : m_vmove:=false;
-                              else
-                              end;
+      SDL_MOUSEBUTTONUP  : case (_event^.button.button) of
+                            SDL_BUTTON_LEFT   : k_ml:=1;
+                            SDL_BUTTON_RIGHT  : k_mr:=1;
+                            SDL_BUTTON_MIDDLE : m_vmove:=false;
+                           else
                            end;
       SDL_MOUSEBUTTONDOWN: begin
                               case (_event^.button.button) of
-                            SDL_BUTTON_left      : if (k_ml=0) then k_ml:=2;
-                            SDL_BUTTON_right     : if (k_mr=0) then k_mr:=2;
-                            SDL_BUTTON_middle    : if(_menu=false)and(G_Started)and(_rpls_vidm=false)then m_vmove:=true;
+                            SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
+                            SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
+                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(_rpls_vidm=false)then m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
-
-                                                      if(_m_sel=98)then _scrollV(@_cmp_sm,1,0,MaxMissions-vid_camp_m);
-                                                      if(_m_sel=36)then _scrollV(@_svld_sm,1,0,_svld_ln-vid_svld_m-1);
-                                                      if(_m_sel=41)then _scrollV(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1);
+                                                      case _m_sel of
+                                                      98: _scrollV(@_cmp_sm,1,0,MaxMissions-vid_camp_m);
+                                                      36: _scrollV(@_svld_sm,1,0,_svld_ln-vid_svld_m-1);
+                                                      41: _scrollV(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1);
+                                                      end;
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
-
-                                                      if(_m_sel=98)then _scrollV(@_cmp_sm,-1,0,MaxMissions-vid_camp_m);
-                                                      if(_m_sel=36)then _scrollV(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1);
-                                                      if(_m_sel=41)then _scrollV(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1);
+                                                      case _m_sel of
+                                                      98: _scrollV(@_cmp_sm,-1,0,MaxMissions-vid_camp_m);
+                                                      36: _scrollV(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1);
+                                                      41: _scrollV(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1);
+                                                      end;
                                                    end;
                               else
                               end;
                            end;
-      SDL_QUITEV         : begin _CYCLE:=false; end;
+      SDL_QUITEV         : _CYCLE:=false;
       SDL_KEYUP          : begin
                               k_chrt:=1;
                               case (_event^.key.keysym.sym) of
@@ -493,18 +495,17 @@ begin
       SDL_KEYDOWN        : begin
                               k_chrt:=2;
                               k_chr :=Widechar(_event^.key.keysym.unicode);
-
                               case (_event^.key.keysym.sym) of
-                                sdlk_up     : if (k_u    =0) then k_u    :=2;
-                                sdlk_down   : if (k_d    =0) then k_d    :=2;
-                                sdlk_left   : if (k_l    =0) then k_l    :=2;
-                                sdlk_right  : if (k_r    =0) then k_r    :=2;
-                                sdlk_rshift : if (k_shift=0) then k_shift:=2;
-                                sdlk_lshift : if (k_shift=0) then k_shift:=2;
-                                sdlk_rctrl  : if (k_ctrl =0) then k_ctrl :=2;
-                                sdlk_lctrl  : if (k_ctrl =0) then k_ctrl :=2;
-                                sdlk_ralt   : if (k_alt  =0) then k_alt  :=2;
-                                sdlk_lalt   : if (k_alt  =0) then k_alt  :=2;
+                                sdlk_up     : if(k_u    =0)then k_u    :=2;
+                                sdlk_down   : if(k_d    =0)then k_d    :=2;
+                                sdlk_left   : if(k_l    =0)then k_l    :=2;
+                                sdlk_right  : if(k_r    =0)then k_r    :=2;
+                                sdlk_rshift : if(k_shift=0)then k_shift:=2;
+                                sdlk_lshift : if(k_shift=0)then k_shift:=2;
+                                sdlk_rctrl  : if(k_ctrl =0)then k_ctrl :=2;
+                                sdlk_lctrl  : if(k_ctrl =0)then k_ctrl :=2;
+                                sdlk_ralt   : if(k_alt  =0)then k_alt  :=2;
+                                sdlk_lalt   : if(k_alt  =0)then k_alt  :=2;
                                 SDLK_PRINT  : _screenshot;
                                 sdlk_escape : escape_key;
                                 sdlk_return : return_key;
@@ -523,27 +524,27 @@ begin
    m_my :=m_vy+vid_vy-vid_mapy;
    if(vid_ppos<2)then
    begin
-      u:=m_vx-vid_panelx; m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
-      u:=m_vy-vid_panely; m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
+      u:=m_vx-vid_panelx;m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
+      u:=m_vy-vid_panely;m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
    end
    else
    begin
-      u:=m_vy-vid_panely; m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
-      u:=m_vx-vid_panelx; m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
+      u:=m_vy-vid_panely;m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
+      u:=m_vx-vid_panelx;m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
    end;
 
    if(m_ldblclk>0)then dec(m_ldblclk,1);
 
    _chkbld;
 
-   if(k_ml=2)then                    // left button
+   if(k_ml=2)then                    // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
-    case m_brush of
+     case m_brush of
 co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
             end;
-1..255   : if(m_brushc=c_lime)then
+1..255    : if(m_brushc=c_lime)then
             begin
                _player_s_o(m_mx,m_my,m_brush,0, uo_build  ,HPlayer);
                _chkbld;
@@ -553,7 +554,7 @@ co_move,
 co_amove,
 co_patrol,
 co_apatrol: _command(m_mx,m_my);
-    end
+     end
     else
       if(m_by<3)then      // minimap
       case m_brush of
@@ -564,9 +565,9 @@ co_apatrol: _command(m_mx,m_my);
       co_apatrol : _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
       else        if(_rpls_vidm=false)then ui_panelmmm:=true;
       end
-      else _panel_click(ui_tab,m_bx,m_by-4,false,false);     // panel
+      else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
 
-   if(k_ml=1)then
+   if(k_ml=1)then  // LMB up
    begin
       ui_panelmmm:=false;
 
@@ -593,7 +594,7 @@ co_apatrol: _command(m_mx,m_my);
       _view_bounds;
    end;
 
-   if(k_mr=2)then                 // right button
+   if(k_mr=2)then                 // RMB down
     if(m_brush<>co_empty)
     then m_brush:=co_empty
     else
@@ -602,7 +603,7 @@ co_apatrol: _command(m_mx,m_my);
      else
        if(m_by<3)                 // minimap
        then _command(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx))
-       else _panel_click(ui_tab,m_bx,m_by-4,true,false);     // panel
+       else _panel_click(ui_tab,m_bx,m_by,true,false);     // panel
 end;
 
 procedure _move_v_m;

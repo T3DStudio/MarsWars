@@ -5,7 +5,75 @@ integer  = Smallint;
 pinteger = ^integer;
 
 TSob = set of byte;
-PTSoB = ^TSob;
+{$IFDEF _FULLGAME}
+TSoc = set of char;
+
+string6 = string[6];
+
+TMWSprite = record
+   surf:pSDL_Surface;
+   w,h,
+   hw,hh:integer;
+end;
+PTMWSprite = ^TMWSprite;
+
+TUSpriteList  = array of TMWSprite;
+PTUSpriteList = ^TUSpriteList;
+
+TMWSModel = record
+   sl       : TUSpriteList;
+   sk,
+   sn       : integer;
+end;
+PTMWSModel = ^TMWSModel;
+
+TDecal = record
+   x,y      : integer;
+end;
+
+TEff = record
+   x,y,
+   t,t2,tm,
+   d,
+   anl,ans  : integer;
+   e        : byte;
+end;
+
+TVisSpr = record
+   s        : PSDL_Surface;
+   x,y,xo,yo,
+   ro,
+   d,sh     : integer;
+   rc,msk   : cardinal;
+   inv      : byte;
+   bar      : single;
+   clu      : integer;
+   cll,
+   crl      : byte;
+   cru      : string6;
+   rct      : boolean;
+end;
+PTVisSpr = ^TVisSpr;
+
+TAlarm = record
+   ax,ay,at : integer;
+   ab       : boolean;
+end;
+
+ TIntList = array of integer;
+PTIntList = ^TIntList;
+
+TThemeAnim = record
+   depth,
+   xo,yo,
+   sh,
+   anext,
+   atime:integer
+end;
+ TThemeAnimL = array of TThemeAnim;
+PTThemeAnimL = ^TThemeAnimL;
+
+{$ENDIF}
 
 TUWeapon = record
   aw_type,
@@ -24,7 +92,6 @@ TUWeapon = record
   aw_snd   : pMIX_CHUNK;
   {$ENDIF}
 end;
-
 
 TUID = record
    _mhits,
@@ -69,6 +136,7 @@ TUID = record
    un_name,
    un_descr,
    un_hint      : shortstring;
+   un_smodel    : PTMWSModel;
    {$ENDIF}
 end;
 PTUID = ^TUID;
@@ -133,11 +201,11 @@ o_x1,o_y1  :integer;
    pprodu,
    upgr    : array[byte] of byte;
 
-   a_upgr,
+   a_upgrs,
    a_units : array[byte] of integer;
 
 
-   ai_pushfrmi,
+   {ai_pushfrmi,
    ai_pushtimei,
    ai_pushtime
            : integer;
@@ -147,7 +215,7 @@ o_x1,o_y1  :integer;
    ai_towngrd,
    ai_maxunits
            : integer;
-   ai_flags: cardinal;
+   ai_flags: cardinal;  }
    ai_skill: byte;
 
 
@@ -243,77 +311,6 @@ TCTPoint = record
    ct       : integer;
    pl       : byte;
 end;
-
-{$IFDEF _FULLGAME}
-TSoc = set of char;
-
-string6 = string[6];
-
-TMWSprite = record
-   surf:pSDL_Surface;
-   w,h,
-   hw,hh:integer;
-end;
-PTMWSprite = ^TMWSprite;
-
-TUSpriteList  = array of TMWSprite;
-PTUSpriteList = ^TUSpriteList;
-
-TMWSModel = record
-   sl       : TUSpriteList;
-   sn       : integer;
-end;
-PTMWSModel = ^TMWSModel;
-
-TDecal = record
-   x,y      : integer;
-end;
-
-TEff = record
-   x,y,
-   t,t2,tm,
-   d,
-   anl,ans  : integer;
-   e        : byte;
-end;
-
-TVisSpr = record
-   s     : PSDL_Surface;
-   x,y,xo,yo,
-   ro,
-   d,sh  : integer;
-   rc,msk: cardinal;
-   inv   : byte;
-   bar   : single;
-   clu   : integer;
-   cll,
-   crl   : byte;
-   cru   : string6;
-   rct   : boolean;
-end;
-PTVisSpr = ^TVisSpr;
-
-TAlarm = record
-   ax,ay,at:integer;
-   ab:boolean;
-end;
-
-TIntList = array of integer;
-PTIntList = ^TIntList;
-
-TThemeAnim = record
-   depth,
-   xo,yo,
-   sh,
-   anext,
-   atime:integer
-end;
-TThemeAnimL = array of TThemeAnim;
-PTThemeAnimL = ^TThemeAnimL;
-
-{$ELSE}
-
-{$ENDIF}
 
 TDoodad = record
    x,y,r:integer;

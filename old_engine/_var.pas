@@ -20,7 +20,7 @@ g_inv_mn          : byte = 0;
 g_inv_wn          : byte = 0;
 g_inv_t           : integer = 0;
 g_inv_wt          : integer = 0;
-g_ct_pl           : array[1..MaxPlayers] of TCTPoint;
+g_cpt_pl          : array[1..MaxCPoints] of TCTPoint;
 
 onlySVCode        : boolean = true; // only server side code
 
@@ -35,8 +35,6 @@ _uregen_c         : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUpgrade;
-
-ui_puids          : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 
 _lsuc             : byte = 0;
 _lcu              : integer = 0;
@@ -67,7 +65,6 @@ vid_mredraw       : boolean = true;
 map_seed          : cardinal = 1;
 map_seed2         : word = 0;
 map_mw            : integer = 5000;
-map_aifly         : boolean = false;
 map_b1            : integer;
 map_obs           : byte = 1;
 map_liq           : byte = 1;
@@ -192,7 +189,6 @@ map_mmcx          : single;
 map_mmvw,
 map_mmvh,
 map_prmm          : integer;
-map_flydpth       : array[0..2] of integer;
 
 cmp_skill         : byte = 3;
 cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
@@ -266,6 +262,7 @@ m_by              : integer;
 m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 
+ui_puids          : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_ordn,
 ui_ordx,
 ui_ordy           : array[0..10] of integer;
@@ -418,48 +415,45 @@ spr_crater        : array[1..crater_ri] of TMWSprite;
 spr_dummy         : TMWSprite;
 pspr_dummy        : PTMWSprite;
 
-spr_lostsoul      : array[0..28] of TMWSprite;
-spr_imp           : array[0..52] of TMWSprite;
-spr_demon         : array[0..53] of TMWSprite;
-spr_cacodemon     : array[0..29] of TMWSprite;
-spr_baron         : array[0..52] of TMWSprite;
-spr_knight        : array[0..52] of TMWSprite;
-spr_cyberdemon    : array[0..56] of TMWSprite;
-spr_mastermind    : array[0..81] of TMWSprite;
-spr_pain          : array[0..37] of TMWSprite;
-spr_revenant      : array[0..76] of TMWSprite;
-spr_mancubus      : array[0..78] of TMWSprite;
-spr_arachnotron   : array[0..69] of TMWSprite;
-spr_archvile      : array[0..85] of TMWSprite;
-
-spr_ZFormer       : array[0..52] of TMWSprite;
-spr_ZEngineer     : array[0..31] of TMWSprite;
-spr_ZSergant      : array[0..52] of TMWSprite;
-spr_ZSSergant     : array[0..52] of TMWSprite;
-spr_ZCommando     : array[0..59] of TMWSprite;
-spr_ZBomber       : array[0..52] of TMWSprite;
-spr_ZFMajor       : array[0..15] of TMWSprite;
-spr_ZMajor        : array[0..52] of TMWSprite;
-spr_ZBFG          : array[0..52] of TMWSprite;
-
-spr_engineer      : array[0..44] of TMWSprite;
-spr_medic         : array[0..52] of TMWSprite;
-spr_sergant       : array[0..44] of TMWSprite;
-spr_ssergant      : array[0..44] of TMWSprite;
-spr_commando      : array[0..52] of TMWSprite;
-spr_bomber        : array[0..44] of TMWSprite;
-spr_fmajor        : array[0..15] of TMWSprite;
-spr_major         : array[0..44] of TMWSprite;
-spr_BFG           : array[0..44] of TMWSprite;
-spr_FAPC          : array[0..15] of TMWSprite;
-spr_APC           : array[0..15] of TMWSprite;
-spr_Terminator    : array[0..55] of TMWSprite;
-spr_Tank          : array[0..23] of TMWSprite;
-spr_Flyer         : array[0..15] of TMWSprite;
-
-spr_tur           : array[0..15] of TMWSprite;
-spr_rtur          : array[0..7 ] of TMWSprite;
-
+spr_dmodel,
+spr_lostsoul,
+spr_imp ,
+spr_demon,
+spr_cacodemon,
+spr_baron,
+spr_knight,
+spr_cyberdemon,
+spr_mastermind,
+spr_pain,
+spr_revenant,
+spr_mancubus,
+spr_arachnotron,
+spr_archvile,
+spr_ZFormer,
+spr_ZEngineer,
+spr_ZSergant,
+spr_ZSSergant,
+spr_ZCommando,
+spr_ZBomber,
+spr_ZFMajor,
+spr_ZMajor,
+spr_ZBFG,
+spr_engineer,
+spr_medic,
+spr_sergant,
+spr_ssergant,
+spr_commando,
+spr_bomber,
+spr_fmajor,
+spr_major,
+spr_BFG,
+spr_FAPC,
+spr_APC,
+spr_Terminator,
+spr_Tank,
+spr_Flyer,
+spr_tur,
+spr_rtur,
 spr_HKeep,
 spr_HGate,
 spr_HAGate,
@@ -470,10 +464,7 @@ spr_HTower,
 spr_HTeleport,
 spr_HCC,
 spr_HMUnit,
-spr_HMUnita
-                  : array[0..3]  of TMWSprite;
-
-//spr_HTa : TMWSprite;
+spr_HMUnita,
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
@@ -487,33 +478,33 @@ spr_UVehicleFactory,
 spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,
-spr_URocketL      : array[0..3]  of TMWSprite;
+spr_URocketL,
 
-spr_eff_bfg       : array[0..3] of TMWSprite; //ef_bfg_
-spr_eff_eb        : array[0..5] of TMWSprite; //ef_eb
-spr_eff_ebb       : array[0..8] of TMWSprite; //ef_ebb
-spr_eff_tel       : array[0..5] of TMWSprite; //ef_tel
-spr_eff_exp       : array[0..2] of TMWSprite; //ef_exp_
-spr_eff_exp2      : array[0..4] of TMWSprite; //exp2_
-spr_eff_g         : array[0..7] of TMWSprite; //g_
-spr_h_p0          : array[0..3] of TMWSprite;
-spr_h_p1          : array[0..3] of TMWSprite;
-spr_h_p2          : array[0..3] of TMWSprite;
-spr_h_p3          : array[0..7] of TMWSprite;
-spr_h_p4          : array[0..10]of TMWSprite;
-spr_h_p5          : array[0..7] of TMWSprite;
-spr_h_p6          : array[0..7] of TMWSprite;
-spr_h_p7          : array[0..5] of TMWSprite;
-spr_u_p0          : array[0..5] of TMWSprite;
-spr_u_p1          : array[0..3] of TMWSprite;
-spr_u_p2          : array[0..5] of TMWSprite;
-spr_u_p3          : array[0..3] of TMWSprite;
-spr_trans         : array[0..7] of TMWSprite;
-spr_sport         : array[0..1] of TMWSprite;
-spr_blood         : array[0..2] of TMWSprite;
-spr_ubase         : array[0..5] of TMWSprite;
-spr_cbuild        : array[0..3] of TMWSprite;
-spr_mp            : array[1..2] of TMWSprite;
+spr_eff_bfg,
+spr_eff_eb,
+spr_eff_ebb,
+spr_eff_tel,
+spr_eff_exp,
+spr_eff_exp2,
+spr_eff_g,
+spr_h_p0,
+spr_h_p1,
+spr_h_p2,
+spr_h_p3,
+spr_h_p4,
+spr_h_p5,
+spr_h_p6,
+spr_h_p7,
+spr_u_p0,
+spr_u_p1,
+spr_u_p2,
+spr_u_p3,
+spr_trans,
+spr_sport,
+spr_blood,
+spr_ubase,
+spr_cbuild,
+spr_mp,
 spr_gear,
 spr_toxin,
 spr_mine,
@@ -527,7 +518,8 @@ spr_db_h0,
 spr_db_h1,
 spr_db_u0,
 spr_db_u1,
-spr_u_portal      : TMWSprite;
+spr_u_portal      : TMWSModel;
+spr_pdmodel       : PTMWSModel;
 
 spr_c_mars,
 spr_c_hell,
@@ -559,7 +551,7 @@ spr_mback,
 spr_cursor        : pSDL_Surface;
 //spr_b_b           : array[1..r_cnt,byte] of pSDL_Surface;
 //spr_b_u           : array[1..r_cnt,byte] of pSDL_Surface;
-spr_b_up          : array[1..r_cnt,0..ui_ubtns] of pSDL_Surface;
+//spr_b_up          : array[1..r_cnt,0..ui_ubtns] of pSDL_Surface;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
 spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;

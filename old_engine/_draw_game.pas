@@ -90,7 +90,7 @@ begin
    if(vid_vsls>1)then
     for i:=1 to vid_vsls do
      for u:=1 to (vid_vsls-1) do
-      if (vid_vsl[u]^.d<vid_vsl[u+1]^.d) then
+      if(vid_vsl[u]^.d<vid_vsl[u+1]^.d)then
       begin
         dt:=vid_vsl[u];
         vid_vsl[u]:=vid_vsl[u+1];
@@ -220,10 +220,7 @@ begin
          fog_pgrid[cx,cy]:=fog_grid[cx,cy];
          if(_fog)then
          begin
-            case fog_grid[cx,cy] of
-               0 : _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, fog_surf);
-            else
-            end;
+            if(fog_grid[cx,cy]=0)then _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, fog_surf);
             fog_grid[cx,cy]:=0;
          end
          else fog_grid[cx,cy]:=2;
@@ -234,8 +231,8 @@ begin
 
 
    if(g_mode=gm_ct)then
-    for cx:=1 to MaxPlayers do
-     with g_ct_pl[cx] do
+    for cx:=1 to MaxCPoints do
+     with g_cpt_pl[cx] do
      begin
         circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,p_color(pl));
         //if(_testmode)then _draw_text(r_screen,px-vid_vx,py-vid_vy,i2s(ct) , ta_left,255, plcolor[pl]);
@@ -290,7 +287,7 @@ begin
 
        _draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
 
-       _draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
+       //_draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
        _draw_text(r_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, c);
 
 
@@ -370,5 +367,22 @@ begin
 
        _draw_text(r_screen,ix,iy,i2s(u), ta_left,255, c_white);
     end; }
+end;
+
+
+procedure _drawMWSModel(mwsm:PTMWSModel);
+var i,x:integer;
+begin
+   x:=0;
+   with mwsm^ do
+   begin
+      for i:=1 to sn do
+       with sl[i-1] do
+       begin
+          _draw_surf(r_screen,x,0,surf);
+          inc(x,w);
+       end;
+      _draw_text(r_screen,0,48,i2s(sn), ta_left,255, c_white);
+   end;
 end;
 

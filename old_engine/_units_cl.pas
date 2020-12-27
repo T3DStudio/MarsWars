@@ -1783,12 +1783,29 @@ end;
       if(_fr<1)then _fr:=1;
       {$ENDIF}
    end;
+
+   {$IFDEF _FULLGAME}
+   for i:=0 to 255 do
+   with _uids[i] do
+   begin
+      un_smodel:= @spr_dmodel;
+
+      case i of
+UID_LostSoul:
+begin
+   un_smodel  := @spr_LostSoul;
+end;
+      end;
+   end;
+   {$ENDIF}
 end;
 
 procedure initUnits;
 var i:byte;
 begin
+   {$IFDEF _FULLGAME}
    FillChar(ui_puids,SizeOf(ui_puids),0);
+   {$ENDIF}
    FillChar(_uids   ,SizeOf(_uids   ),0);
 
    initUIDS;

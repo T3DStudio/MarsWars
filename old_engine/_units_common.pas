@@ -232,8 +232,8 @@ end;
 function _unit_flyup(pu:PTUnit;z:integer):boolean;
 var st:integer;
 begin
-   {_unit_flyup:=false;
-   with pu^ do
+   _unit_flyup:=false;
+  { with pu^ do
     if(shadow<>z)then
     begin
        st:=z-shadow;
@@ -325,8 +325,8 @@ begin
       end;
 
       if(g_mode=gm_ct)then
-       for u:=1 to MaxPlayers do
-        with g_ct_pl[u] do
+       for u:=1 to MaxCPoints do
+        with g_cpt_pl[u] do
          if(dist(tx,ty,px,py)<base_r)then
          begin
             _unit_grbcol:=2;

@@ -16,15 +16,41 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-procedure _upgr_ss(p:byte;g:TSob;lvl:integer);
+procedure _units_au(p:byte;g:TSob;max:integer;new:boolean);
 var i:byte;
 begin
    with _players[p] do
    begin
-      FillChar(upgr,SizeOf(upgr),0);
-      for i:=0 to 255 do
-       if(i in g)then
-        with _upids[i] do upgr[i]:=min3(a_upgr[i],_up_max,lvl);
+      if(new)then FillChar(a_units,SizeOf(a_units),0);
+      if(g<>[])then
+       for i:=0 to 255 do
+        if(i in g)then
+         with _uids[i] do a_units[i]:=min2(_max,max);
+   end;
+end;
+procedure _upgrs_au(p:byte;g:TSob;lvl:integer;new:boolean);
+var i:byte;
+begin
+   with _players[p] do
+   begin
+      if(new)then FillChar(a_upgrs,SizeOf(a_upgrs),0);
+      if(g<>[])then
+       for i:=0 to 255 do
+        if(i in g)then
+         with _upids[i] do a_units[i]:=min2(_up_max,lvl);
+   end;
+end;
+
+procedure _upgrs_ss(p:byte;g:TSob;lvl:integer;new:boolean);
+var i:byte;
+begin
+   with _players[p] do
+   begin
+      if(new)then FillChar(upgr,SizeOf(upgr),0);
+      if(g<>[])then
+       for i:=0 to 255 do
+        if(i in g)then
+         with _upids[i] do upgr[i]:=min3(a_upgrs[i],_up_max,lvl);
    end;
 end;
 
@@ -179,7 +205,7 @@ begin
       _upid_cndt:=
                 ((_up_ruid >0)and(uid_eb[_up_ruid ]=0))
               or((_up_rupgr>0)and(upgr  [_up_rupgr]=0))
-              or(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgr[up]))
+              or(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up]))
               or((_up_mfrg=false)and(pprodu[up]>0))
               or(n_smiths<=0)
               or(cenerg<_up_renerg)

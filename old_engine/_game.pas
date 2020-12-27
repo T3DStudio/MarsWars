@@ -41,16 +41,21 @@ begin
        ready    :=false;
        pnum     :=p;
 
-       ai_pushtime := fr_fps*30;
+       {ai_pushtime := fr_fps*30;
        ai_pushmin  := 55;
        ai_pushuids := [];
        ai_towngrd  := 3;
        ai_maxunits := 100;
        ai_flags    := $FFFFFFFF;
        ai_pushtimei:= 0;
-       ai_pushfrmi := 0;
+       ai_pushfrmi := 0; }
 
-       //a_units := [0..18];
+       _units_au(p,[UID_HKeep..UID_HMilitaryUnit,
+                    UID_LostSoul..UID_ZBFG,
+                    UID_UCommandCenter..UID_UNuclearPlant,
+                    UID_Engineer..UID_Tank],
+                    255,true);
+
       // a_upgr  := [0..MaxUpgrs];
    end;
 
@@ -58,8 +63,8 @@ begin
    begin
       race     :=r_hell;
       state    :=ps_comp;
-     //a_units  :=[];
-      //a_upgr   :=[];
+      _units_au(0,[],0,true);
+      _upgrs_au(0,[],0,true);
    end;
 
    {$IFDEF _FULLGAME}
@@ -70,7 +75,7 @@ begin
       name :=PlayerName;
    end;
 
-   PlayerColor[0]:=c_purple;
+   PlayerColor[0]:=c_white;
    PlayerColor[1]:=c_red;
    PlayerColor[2]:=c_orange;
    PlayerColor[3]:=c_yellow;
@@ -113,7 +118,7 @@ begin
       inc(_lcu,1);
    end;
 
-   FillChar(g_ct_pl  ,SizeOf(g_ct_pl),  0);
+   FillChar(g_cpt_pl  ,SizeOf(g_cpt_pl),  0);
 
    DefPlayers;
 
@@ -223,6 +228,8 @@ begin
 
        if(state<>PS_None)then
        begin
+          _unit_add(map_psx[p],map_psy[p],start_base[race],p,true);
+
           {case G_startb of
           0 : _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
           1 : begin
@@ -532,7 +539,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 end;
 
 procedure PlayersCycle;
-const _pushtimes = _uclord_p;
+//const _pushtimes = _uclord_p;
 var p:byte;
 begin
    for p:=0 to MaxPlayers do
@@ -561,7 +568,7 @@ begin
 
            if(bld_r>0)then dec(bld_r,1);
 
-           if(state=ps_comp)then
+           {if(state=ps_comp)then
            begin
               if(ai_pushtimei>0)then
               begin
@@ -572,7 +579,7 @@ begin
               else
                 if(ucl_c[false]>=ai_pushmin)or(army>101)then
                  if(cf(@ai_flags,@aif_dattack))then ai_pushtimei:=ai_pushtime;
-           end;
+           end; }
         end;
      end;
 
@@ -792,8 +799,8 @@ var i,t,e:integer;
 begin
    e:=0;
    t:=0;
-   for i:=1 to MaxPlayers do
-    with g_ct_pl[i] do
+   for i:=1 to MaxCPoints do
+    with g_cpt_pl[i] do
     begin
        if(ct>0)then dec(ct,1);
        if(t=0)or(t<>_players[pl].team)then
@@ -804,7 +811,7 @@ begin
        else inc(e,1);
     end;
 
-   if(e=MaxPlayers)and(G_WTeam=255)then
+   if(e=MaxCPoints)and(G_WTeam=255)then
    begin
       G_WTeam:=t;
       for i:=1 to MaxUnits do
@@ -850,15 +857,15 @@ begin
          ui_uimove      :=0;
          ui_battle_units:=0;
          ui_prod_builds :=[];
-         FillChar(ui_prod_units ,SizeOf(ui_prod_units),0);
-         FillChar(ui_orderu     ,SizeOf(ui_orderu ),0);
-         FillChar(ui_upgrct     ,SizeOf(ui_upgrct ),0);
-         FillChar(ui_upgr       ,SizeOf(ui_upgr   ),0);
+         FillChar(ui_prod_units ,SizeOf(ui_prod_units ),0);
+         FillChar(ui_orderu     ,SizeOf(ui_orderu     ),0);
+         FillChar(ui_upgrct     ,SizeOf(ui_upgrct     ),0);
+         FillChar(ui_upgr       ,SizeOf(ui_upgr       ),0);
          FillChar(ui_units_inapc,SizeOf(ui_units_inapc),0);
-         FillChar(ui_blds       ,SizeOf(ui_blds   ),0);
-         FillChar(ui_ordn       ,SizeOf(ui_ordn   ),0);
-         FillChar(ui_ordx       ,SizeOf(ui_ordx   ),0);
-         FillChar(ui_ordy       ,SizeOf(ui_ordy   ),0);
+         FillChar(ui_blds       ,SizeOf(ui_blds       ),0);
+         FillChar(ui_ordn       ,SizeOf(ui_ordn       ),0);
+         FillChar(ui_ordx       ,SizeOf(ui_ordx       ),0);
+         FillChar(ui_ordy       ,SizeOf(ui_ordy       ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
          {$ENDIF}
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;

@@ -41,6 +41,7 @@ r_uac                  = 2;
 
 MaxPlayers             = 6;
 MaxPlayerUnits         = 110;
+MaxCPoints             = 6;
 
 MaxSMapW               = 7000;
 MinSMapW               = 3000;
@@ -216,11 +217,11 @@ _bufinf                = 32000;
 //  OBSTACLES
 //
 
-MaxDoodads             = 650;
+MaxDoodads             = 700;
 
 //
 ddc_div                = 1000000;
-ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div;
+ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div; // 49
 
 // doodads cell
 dcw                    = 200;
@@ -236,7 +237,7 @@ DID_Other              = 7;
 
 dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
-DID_R                  : array[0..7] of integer = (0,65,125,185,250,105,60,17);
+DID_R                  : array[0..7] of integer = (0,250,185,125,64,105,60,17);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -420,6 +421,8 @@ UID_UPortal            = 78;
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
+start_base             : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
+
 t2                     = [UID_URocketL,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
@@ -490,11 +493,9 @@ _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
-_sbs_ucls              = [5,6,8];
-
 fly_height             = 30;
 
-
+map_flydpth            : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
 
 {$IFDEF _FULLGAME}
 

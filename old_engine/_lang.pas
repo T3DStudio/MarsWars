@@ -637,7 +637,7 @@ begin
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты:';
-  str_chattars          := 'Отправлять сообщения';
+  str_chattars          := 'Адресаты';
   str_resol             := 'Разрешение';
   str_language          := 'Язык интерфейса';
   str_req               := 'Требования: ';

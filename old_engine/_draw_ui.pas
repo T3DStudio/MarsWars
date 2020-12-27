@@ -14,8 +14,8 @@ begin
      end;
 
    if(g_mode=gm_ct)then
-    for i:=1 to MaxPlayers do
-     with g_ct_pl[i] do
+    for i:=1 to MaxCPoints do
+     with g_cpt_pl[i] do
      begin
         if(ct>0)and((G_Step mod 20)>10)
         then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray)
@@ -63,8 +63,8 @@ begin
         ui_builders_r[i],c_white);
 
       if(g_mode=gm_ct)then
-       for i:=1 to MaxPlayers do
-        with g_ct_pl[i] do
+       for i:=1 to MaxCPoints do
+        with g_cpt_pl[i] do
          circleColor(tar,
          lx+px-vid_vx,
          ly+py-vid_vy,
@@ -328,13 +328,13 @@ begin
          begin
             uid:=ui_puids[race ,ui_tab,ui];
 
-            if (a_upgr[uid]<=0)then continue;
+            if (a_upgrs[uid]<=0)then continue;
             if((G_addon=false)and(_upids[uid]._up_addon))then continue;
 
             ux:=(ui mod 3);
             uy:=(ui div 3);
 
-            _drawBtn(tar,ux,uy,spr_b_up[race,ui],ui_upgr[uid]>0, _upid_cndt(@_players[HPlayer],uid) or (pproda>=pprodm)or(n_smiths<=0));
+            _drawBtn(tar,ux,uy,_upids[uid]._up_btn,ui_upgr[uid]>0, _upid_cndt(@_players[HPlayer],uid) or (pproda>=pprodm)or(n_smiths<=0));
 
             _drawBtnt(tar,ux,uy,
             b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',

@@ -21,7 +21,7 @@ begin
       end;
 end;
 
-function A2P(sip:cardinal;sp:word;crtn:boolean):byte;
+function A2P(sip:cardinal;sp:word;cnew:boolean):byte;
 var i:byte;
 begin
    A2P:=0;
@@ -38,7 +38,7 @@ begin
          break;
       end;
 
-   if(A2P=0)and(G_Started=false)and(crtn)then A2P:=NewP(sip,sp);
+   if(A2P=0)and(G_Started=false)and(cnew)then A2P:=NewP(sip,sp);
 end;
 
 procedure net_ReadPlayerData(pid:byte);
@@ -75,6 +75,38 @@ begin
    end;
 end;
 
+procedure net_GameData(pid:byte);
+var i:byte;
+begin
+   net_writebyte(nmid_startinf);
+   net_writebool(G_Started);
+   for i:=1 to MaxPlayers do
+    with _Players[i] do
+    begin
+       net_writestring(name );
+       net_writebyte  (team );
+       net_writebyte  (mrace);
+       net_writebyte  (state);
+       net_writebool  (ready);
+       net_writeint   (ttl  );
+       if(G_Started)then
+       net_writebyte  (race);
+    end;
+
+   net_writebyte(pid);
+   net_writebyte(HPlayer);
+
+   net_writeint (map_mw   );
+   net_writebyte(map_liq  );
+   net_writebyte(map_obs  );
+   net_writecard(map_seed );
+   net_writebool(g_addon  );
+   net_writebyte(g_mode   );
+   net_writebyte(g_startb );
+   net_writebool(g_shpos  );
+   net_writebyte(g_aislots);
+end;
+
 procedure net_GServer;
 var mid,pid,i:byte;
 begin
@@ -90,15 +122,11 @@ begin
          net_writebyte(nmid_getinfo);
          net_writebyte(ver);
          net_writebool(g_started);
-         net_writebool(g_addon);
-         net_writebyte(g_mode);
+         net_writebool(g_addon  );
+         net_writebyte(g_mode   );
          for i:=1 to MaxPlayers do
           with _players[i] do
-          begin
-             net_writestring(name);
-             net_writebyte(race);
-             net_writebyte(team);
-          end;
+           net_writestring(name);
          net_send(net_lastinip,net_lastinport);
          continue;
       end;
@@ -127,33 +155,7 @@ begin
          if(G_Started=false)then net_ReadPlayerData(pid);
 
          net_clearbuffer;
-         net_writebyte(nmid_startinf);
-         net_writebool(G_Started);
-         for i:=1 to MaxPlayers do
-          with _Players[i] do
-          begin
-             net_writestring(name);
-             net_writebyte  (team);
-             net_writebyte  (race);
-             net_writebyte  (mrace);
-             net_writebyte  (state);
-             net_writebool  (ready);
-             net_writeint   (ttl);
-          end;
-
-         net_writebyte(pid);
-         net_writebyte(HPlayer);
-
-         net_writeint (map_mw   );
-         net_writebyte(map_liq  );
-         net_writebyte(map_obs  );
-         net_writecard(map_seed );
-         net_writebool(g_addon  );
-         net_writebyte(g_mode   );
-         net_writebyte(g_startb );
-         net_writebool(g_shpos  );
-         net_writebyte(g_aislots);
-
+         net_GameData(pid);
          net_send(net_lastinip,net_lastinport);
       end
       else   // other net mess
@@ -161,8 +163,8 @@ begin
          pid:=A2P(net_lastinip,net_lastinport,false);
          if(pid>0)then
          begin
-            if(mid=nmid_chat)then
-            begin
+            case mid of
+nmid_chat:  begin
                i:=net_readbyte;
                net_chat_add(net_readstring,pid,i);    // chat
                {$IFNDEF _FULLGAME}
@@ -170,39 +172,35 @@ begin
                {$ENDIF}
             end;
 
-            if(mid=nmid_plout)then
-            begin
+nmid_plout: begin
                net_chat_add(_players[pid].name+str_plout,pid,255);
-               //_kill_player(pid);
                if(G_Started=false)then
                begin
                   _players[pid].state:=ps_none;
                   _playerSetState(pid);
                end;
-               exit;
+               continue;
+            end;
             end;
 
             if(G_Started)then
-            begin
-               if(mid=nmid_order)then
-                with _players[pid]do
-                begin
-                   o_x0:=net_readint;
-                   o_y0:=net_readint;
-                   o_x1:=net_readint;
-                   o_y1:=net_readint;
-                   o_id:=net_readbyte;
-                end;
-
-               if(mid=nmid_clinf) then
-                with _players[pid] do
-                begin
-                   PNU :=net_readbyte;
-                   net_chatls[pid]:=net_readbyte;
-                end;
-
-               if(mid=nmid_pause)then
+            case mid of
+   nmid_order: with _players[pid]do
                begin
+                  o_x0:=net_readint;
+                  o_y0:=net_readint;
+                  o_x1:=net_readint;
+                  o_y1:=net_readint;
+                  o_id:=net_readbyte;
+               end;
+
+   nmid_clinf: with _players[pid] do
+               begin
+                  PNU :=net_readbyte;
+                  net_chatls[pid]:=net_readbyte;
+               end;
+
+   nmid_pause: begin
                   if(G_Paused=pid)
                   then G_Paused:=0
                   else
@@ -213,16 +211,14 @@ begin
                end;
             end
             else
-            begin
-               if(mid=nmid_swapp)then
-               begin
-                  i:=net_readbyte;
-                  _swapPlayers(i,pid);
-                  {$IFNDEF _FULLGAME}
-                  vid_mredraw:=true;
-                  {$ENDIF}
-               end;
-            end;
+             if(mid=nmid_swapp)then
+             begin
+                i:=net_readbyte;
+                _swapPlayers(i,pid);
+                {$IFNDEF _FULLGAME}
+                vid_mredraw:=true;
+                {$ENDIF}
+             end;
          end
          else
          begin
@@ -275,26 +271,25 @@ begin
 
    i:=map_mw;
    map_mw   := net_readint;
-   if(i<>map_mw  )then rm:=true;
+   rm:=rm or (i<>map_mw  );
 
    b:=map_liq;
    map_liq  := net_readbyte;
-   if(b<>map_liq )then rm:=true;
+   rm:=rm or (b<>map_liq );
 
    b:=map_obs;
    map_obs  := net_readbyte;
-   if(b<>map_obs )then rm:=true;
+   rm:=rm or (b<>map_obs );
 
    c:=map_seed;
    map_seed := net_readcard;
-   if(c<>map_seed)then rm:=true;
+   rm:=rm or (c<>map_seed);
 
    g_addon  := net_readbool;
 
    b:=g_mode;
    g_mode   := net_readbyte;
-   if(c<>g_mode  )then rm:=true;
-
+   rm:=rm or (c<>g_mode  );
 
    g_startb := net_readbyte;
    g_shpos  := net_readbool;
@@ -363,14 +358,16 @@ begin
           begin
              name := net_readstring;
              team := net_readbyte;
-             race := net_readbyte;
              mrace:= net_readbyte;
              state:= net_readbyte;
              ready:= net_readbool;
              ttl  := net_readint;
+             if(gst)
+             then race:= net_readbyte
+             else race:= mrace;
           end;
 
-         HPlayer:=net_readbyte;
+         HPlayer    :=net_readbyte;
          net_cl_svpl:=net_readbyte;
 
          net_readmap;
@@ -398,7 +395,6 @@ begin
       if(G_Started)then
       begin
          if(mid=nmid_shap)then
-         with _players[HPlayer] do
          begin
             G_paused:=net_readbyte;
 
@@ -416,9 +412,9 @@ begin
       begin
          net_writebyte  (nmid_connect);
          net_writebyte  (ver);
-         net_writestring(PlayerName);
-         net_writebyte  (PlayerTeam);
-         net_writebyte  (PlayerRace);
+         net_writestring(PlayerName );
+         net_writebyte  (PlayerTeam );
+         net_writebyte  (PlayerRace );
          net_writebool  (PlayerReady);
          net_writebyte  (net_chatls[HPlayer]);
          net_writebyte  (_cl_pnua[net_pnui]);
@@ -436,7 +432,7 @@ begin
    if(net_cl_svttl<ClientTTL)then
    begin
       inc(net_cl_svttl,1);
-      if(net_cl_svttl=fr_fps)then vid_mredraw:=true;
+      if(net_cl_svttl=fr_fps   )then vid_mredraw:=true;
       if(net_cl_svttl=ClientTTL)then G_Paused:=net_cl_svpl;
    end;
 end;

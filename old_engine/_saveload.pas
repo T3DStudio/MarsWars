@@ -209,7 +209,7 @@ begin
    BlockWrite(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
    BlockWrite(f,g_inv_t        ,SizeOf(g_inv_t        ));
    BlockWrite(f,g_inv_wt       ,SizeOf(g_inv_wt       ));
-   BlockWrite(f,g_ct_pl        ,SizeOf(g_ct_pl        ));
+   BlockWrite(f,g_cpt_pl       ,SizeOf(g_cpt_pl       ));
    BlockWrite(f,_uclord_c      ,SizeOf(_uclord_c      ));
    BlockWrite(f,_uregen_c      ,SizeOf(_uregen_c      ));
    BlockWrite(f,G_WTeam        ,SizeOf(G_WTeam        ));
@@ -281,7 +281,7 @@ begin
          BlockRead(f,g_inv_wn       ,SizeOf(g_inv_wn       ));
          BlockRead(f,g_inv_t        ,SizeOf(g_inv_t        ));
          BlockRead(f,g_inv_wt       ,SizeOf(g_inv_wt       ));
-         BlockRead(f,g_ct_pl        ,SizeOf(g_ct_pl        ));
+         BlockRead(f,g_cpt_pl       ,SizeOf(g_cpt_pl       ));
          BlockRead(f,_uclord_c      ,SizeOf(_uclord_c      ));
          BlockRead(f,_uregen_c      ,SizeOf(_uregen_c      ));
          BlockRead(f,G_WTeam        ,SizeOf(G_WTeam        ));

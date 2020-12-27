@@ -487,7 +487,7 @@ begin
    begin
       if(_m_sel=11 )then PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
 
-      if(_m_sel=37 )then _svld_str   :=menu_sf(_svld_str   ,k_kbstr,SvRpLen);
+      if(_m_sel=37 )then _svld_str :=menu_sf(_svld_str ,k_kbstr,SvRpLen);
 
       if(_m_sel=50)then
       begin

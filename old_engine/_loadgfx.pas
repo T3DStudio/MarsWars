@@ -150,15 +150,43 @@ begin
    end;
 end;
 
-function _lstr(fn:shortstring):TMWSprite;
+procedure _lstr(mws:PTMWSprite;fn:shortstring;firstload,log:boolean);
 begin
-   with _lstr do
+   with mws^ do
    begin
-      surf:=LoadIMG(fn,true,true);
+      if(firstload=false)then _FreeSF(surf);
+      surf:=LoadIMG(fn,true,log);
       w :=surf^.w;
       h :=surf^.h;
       hw:=surf^.w div 2;
       hh:=surf^.h div 2;
+   end;
+end;
+
+procedure _LoadMWSModel(mwsm:PTMWSModel;name:shortstring;firstload:boolean);
+var t:TMWSprite;
+begin
+   with mwsm^ do
+   begin
+      if(firstload=false)then
+       while(sn>0)do
+       begin
+          _FreeSF(sl[sn-1].surf);
+          dec(sn,1);
+       end;
+
+      sn:=0;
+      setlength(sl,sn);
+      while true do
+      begin
+         _lstr(@t,name+i2s(sn),firstload,false);
+         if(t.surf=r_empty)then break;
+
+         inc(sn,1);
+         setlength(sl,sn);
+         sl[sn-1]:=t;
+      end;
+      sk:=sn-1;
    end;
 end;
 
@@ -438,7 +466,8 @@ end;
 
 {$include _themes.pas}
 
-procedure _LoadGraphics;
+procedure _LoadGraphics(firstload:boolean);
+const hell_units : shortstring = 'hell\units\';
 var x:integer;
 begin
    r_empty   :=_createSurf(1,1);
@@ -447,10 +476,25 @@ begin
 
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
+
+   with spr_dummy do
+   begin
+      h   :=1;
+      w   :=1;
+      hh  :=1;
+      hw  :=1;
+      surf:=r_empty;
+   end;
    pspr_dummy:=@spr_dummy;
-   spr_dummy.hh  :=1;
-   spr_dummy.hw  :=1;
-   spr_dummy.surf:=r_empty;
+
+   with spr_dmodel do
+   begin
+      sk:=0;
+      sn:=1;
+      setlength(sl,sn);
+      sl[sk]:=spr_dummy;
+   end;
+   spr_pdmodel:=@spr_dmodel;
 
    LoadFont;
 
@@ -485,14 +529,7 @@ begin
    spr_b_rvis     := LoadBtn('b_rvis'   ,vid_bw);
    spr_b_rclck    := LoadBtn('b_rclick' ,vid_bw);
 
-   for x:=0 to 2 do spr_tabs[x]:=LoadBtn('tabs'+b2s(x),vid_tbw);
-   spr_tabs[3]:=LoadBtnFS(spr_b_action,vid_tbw);
-
-   for x:=0 to ui_ubtns do
-   begin
-   spr_b_up[r_hell,x]:=LoadBtn('b_h_up'+b2s(x),vid_bw);
-   spr_b_up[r_uac ,x]:=LoadBtn('b_u_up'+b2s(x),vid_bw);
-   end;
+   for x:=0 to 3 do spr_tabs[x]:=LoadBtn('tabs'+b2s(x),vid_tbw);
 
    spr_cursor     := loadIMG('cursor'   ,true ,true);
 
@@ -501,6 +538,16 @@ begin
    spr_c_hell     := LoadIMG('M_HELL'   ,false,true);
    spr_c_phobos   := LoadIMG('M_PHOBOS' ,false,true);
    spr_c_deimos   := LoadIMG('M_DEIMOS' ,false,true);
+
+   _LoadMWSModel(@spr_lostsoul,hell_units+'h_u0_',firstload);
+
+  //
+
+   {for x:=0 to ui_ubtns do
+   begin
+   spr_b_up[r_hell,x]:=LoadBtn('b_h_up'+b2s(x),vid_bw);
+   spr_b_up[r_uac ,x]:=LoadBtn('b_u_up'+b2s(x),vid_bw);
+   end;
 
    spr_u_portal   := _lstr('u_portal' );
    spr_db_h0      := _lstr('db_h0'    );
@@ -615,6 +662,12 @@ begin
       else spr_HAGate     [x]:=_lstr('h_b1_'  +b2s(x-1)+'a');
    end;
 
+   for x:=0 to 255 do
+    with _uids[x] do
+    begin
+       un_btn:=LoadBtnFS(_uid2spr(x)^.surf,vid_BW);
+    end;
+
    {for x:=0 to ui_ubtns do
    begin
       spr_b_b    [r_hell     ,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_hell,true ,x]])^.surf,vid_BW );
@@ -647,6 +700,7 @@ begin
       spr_b_u    [r_uac       ,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_BW);
       spr_ui_oico[r_uac ,false,x]:=LoadBtnFS(_unit_spr(@_ulst[cl2uid[r_uac ,false,x]])^.surf,vid_oiw);
    end; }
+         }
 
    InitThemes;
 end;
