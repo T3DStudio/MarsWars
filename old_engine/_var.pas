@@ -4,6 +4,11 @@ var
 _CYCLE            : boolean = false;
 _EVENT            : pSDL_EVENT;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  GAME
+//
+
 g_Addon           : boolean = true;
 g_Started         : boolean = false;
 g_Paused          : byte = 0;
@@ -22,12 +27,17 @@ g_inv_t           : integer = 0;
 g_inv_wt          : integer = 0;
 g_cpt_pl          : array[1..MaxCPoints] of TCTPoint;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  BASE
+//
+
 onlySVCode        : boolean = true; // only server side code
 
 UnitStepNum       : byte = 8;
 
-_units            : array[0..MaxUnits   ] of TUnit;
 _players          : TPList;
+_units            : array[0..MaxUnits   ] of TUnit;
 _missiles         : array[1..MaxUnits   ] of TMissile;
 
 _uclord_c         : integer = 0;
@@ -438,6 +448,7 @@ spr_ZBomber,
 spr_ZFMajor,
 spr_ZMajor,
 spr_ZBFG,
+
 spr_engineer,
 spr_medic,
 spr_sergant,
@@ -454,6 +465,7 @@ spr_Tank,
 spr_Flyer,
 spr_tur,
 spr_rtur,
+
 spr_HKeep,
 spr_HGate,
 spr_HAGate,
@@ -462,6 +474,10 @@ spr_HPools,
 spr_HAPools,
 spr_HTower,
 spr_HTeleport,
+spr_HMonastery,
+spr_HTotem,
+spr_HAltar,
+spr_HFortress,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
@@ -508,10 +524,6 @@ spr_mp,
 spr_gear,
 spr_toxin,
 spr_mine,
-spr_HFortress,
-spr_HMonastery,
-spr_HTotem,
-spr_HAltar,
 spr_HBar,
 spr_HEye,
 spr_db_h0,
@@ -554,7 +566,7 @@ spr_cursor        : pSDL_Surface;
 //spr_b_up          : array[1..r_cnt,0..ui_ubtns] of pSDL_Surface;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
-spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
+//spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 
 /// text
 

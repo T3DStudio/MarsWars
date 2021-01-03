@@ -14,6 +14,106 @@ begin
       end;
    end;
 end;
+
+
+procedure ObjTblCL;
+var i:byte;
+
+procedure setMWSM(mwsm,mwsma:PTMWSModel);
+begin
+   with _uids[i] do
+   begin
+      un_smodel[false]:= mwsm;
+      if(mwsm=nil)
+      then un_smodel[true ]:= mwsm
+      else un_smodel[true ]:= mwsma;
+   end;
+end;
+
+begin
+   FillChar(ui_puids,SizeOf(ui_puids),0);
+
+
+   for i:=0 to 255 do
+   with _uids[i] do
+   begin
+      setMWSM(@spr_dmodel,nil);
+      _animw:=20;
+      _animd:=20;
+      _animf:=0;
+
+      case i of
+UID_LostSoul:
+begin
+   setMWSM(@spr_LostSoul,nil);
+end;
+
+
+UID_HKeep:
+begin
+   setMWSM(@spr_HKeep,nil);
+end;
+UID_HGate:
+begin
+   setMWSM(@spr_HGate,@spr_HAGate);
+end;
+UID_HSymbol:
+begin
+   setMWSM(@spr_HSymbol,nil);
+end;
+UID_HPools:
+begin
+   setMWSM(@spr_HPools,@spr_HAPools);
+end;
+UID_HTower:
+begin
+   setMWSM(@spr_HTower,nil);
+end;
+UID_HTeleport:
+begin
+   setMWSM(@spr_HTeleport,nil);
+end;
+UID_HMonastery:
+begin
+   setMWSM(@spr_HMonastery,nil);
+end;
+UID_HTotem:
+begin
+   setMWSM(@spr_HTotem,nil);
+end;
+UID_HAltar:
+begin
+   setMWSM(@spr_HAltar,nil);
+end;
+UID_HFortress:
+begin
+   setMWSM(@spr_HFortress,nil);
+end;
+UID_HEye:
+begin
+   setMWSM(@spr_HEye,nil);
+end;
+UID_HCommandCenter:
+begin
+   setMWSM(@spr_HCC,nil);
+end;
+UID_HMilitaryUnit:
+begin
+   setMWSM(@spr_HMUnit,@spr_HMUnita);
+end;
+
+      end;
+
+      if(_isbuilding)
+      then ui_puids[_urace,0,_ucl]:=i
+      else ui_puids[_urace,1,_ucl]:=i;
+
+
+      _fr:=(_r div fog_cw)+1;
+      if(_fr<1)then _fr:=1;
+   end;
+end;
+
 {$ENDIF}
 
 {procedure _unit_sclass(u:PTUnit);
@@ -967,13 +1067,14 @@ begin
          apcm  := _apcm;
          solid := _issolid;
          mmr   := 1;
+         shadow:= 0;
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
 
          {$IFDEF _FULLGAME}
          if(_isbuilding)
-         then mmr   :=round(_r*map_mmcx)
-         else shadow:=1+(uf*fly_height);
+         then mmr   :=min2(1,round(_r*map_mmcx))
+         else shadow:=fly_height[uf];
 
          _unit_fsrclc(pu);
          {$ENDIF}
@@ -1777,44 +1878,9 @@ end;
       if(_btime >0)then _bstep:=(_mhits div 2) div _btime;
       if(_bstep<=0)then _bstep:=1;
       _tprod:=_btime*fr_fps;
-
-      {$IFDEF _FULLGAME}
-      _fr:=(_r div fog_cw)+1;
-      if(_fr<1)then _fr:=1;
-      {$ENDIF}
    end;
-
-   {$IFDEF _FULLGAME}
-   for i:=0 to 255 do
-   with _uids[i] do
-   begin
-      un_smodel:= @spr_dmodel;
-
-      case i of
-UID_LostSoul:
-begin
-   un_smodel  := @spr_LostSoul;
-end;
-      end;
-   end;
-   {$ENDIF}
 end;
 
-procedure initUnits;
-var i:byte;
-begin
-   {$IFDEF _FULLGAME}
-   FillChar(ui_puids,SizeOf(ui_puids),0);
-   {$ENDIF}
-   FillChar(_uids   ,SizeOf(_uids   ),0);
-
-   initUIDS;
-
-   {for i:=0 to 255 do
-    with _uids[i] do
-     if(_ucl<=_uts)and(_race>0)then
-      if(cl2uid[_race,_isbuilding,_ucl]=0)then cl2uid[_race,_isbuilding,_ucl]:=i; }
-end;
 
 procedure _setUPGR(rc,upcl,stime,max,enrg:integer;rupgr,ruid:byte);
 begin
@@ -1833,10 +1899,7 @@ end;
 procedure ObjTbl;
 begin
    FillChar(_upids,SizeOf(_upids),0);
- {  FillChar(upgrade_time ,SizeOf(upgrade_time ),0);
-   FillChar(upgrade_cnt  ,SizeOf(upgrade_cnt  ),1);
-   FillChar(upgrade_rupgr,SizeOf(upgrade_rupgr),0);
-   FillChar(upgrade_rupgr,SizeOf(upgrade_ruid ),0);   }
+
                               // time lvl enr rupgr     ruid
   { _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255       ,255);
@@ -1890,7 +1953,9 @@ begin
    _setUPGR(r_uac ,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_UNuclearPlant  );
    _setUPGR(r_uac ,upgr_9bld      ,180,1 ,4 ,upgr_2tier,UID_UNuclearPlant  );  }
 
-   initUnits;
+   FillChar(_uids   ,SizeOf(_uids   ),0);
+
+   initUIDS;
 end;
 
 

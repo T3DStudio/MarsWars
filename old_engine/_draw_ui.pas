@@ -41,7 +41,7 @@ begin
    case m_brush of
    0..255:
    begin
-      spr:=_uid2spr(m_brush);
+      spr:=_uid2spr(m_brush,false);
       with _uids[m_brush] do
        if(bld_r>0)and(m_brushc=c_lime)
        then circleColor(tar,m_vx,m_vy,_r,c_black)
@@ -306,15 +306,15 @@ begin
                   if((G_addon=false)and(_addon))then continue;
                end;
 
-               if(uid=UID_Baron)then
+               {if(uid=UID_Baron)then
                 if(g_addon)
                 then un_btn:=spr_b_knight
-                else un_btn:=spr_b_baron;
+                else un_btn:=spr_b_baron;}
 
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn(tar,ux,uy,un_btn,false,_uid_cndt(@_players[HPlayer],uid) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
+               _drawBtn (tar,ux,uy,un_btn,false,_uid_cndt(@_players[HPlayer],uid) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(tar,ux,uy,
                b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
                c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple);

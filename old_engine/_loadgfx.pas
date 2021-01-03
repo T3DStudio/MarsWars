@@ -163,7 +163,7 @@ begin
    end;
 end;
 
-procedure _LoadMWSModel(mwsm:PTMWSModel;name:shortstring;firstload:boolean);
+procedure _LoadMWSModel(mwsm:PTMWSModel;name:shortstring;_mkind:byte;firstload:boolean);
 var t:TMWSprite;
 begin
    with mwsm^ do
@@ -186,7 +186,8 @@ begin
          setlength(sl,sn);
          sl[sn-1]:=t;
       end;
-      sk:=sn-1;
+      sk   :=sn-1;
+      mkind:=_mkind;
    end;
 end;
 
@@ -467,10 +468,13 @@ end;
 {$include _themes.pas}
 
 procedure _LoadGraphics(firstload:boolean);
-const hell_units : shortstring = 'hell\units\';
+const hell_units     : shortstring = 'hell\units\';
+      hell_buildings : shortstring = 'hell\buildings\';
 var x:integer;
 begin
    r_empty   :=_createSurf(1,1);
+   SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
+
    r_minimap :=_createSurf(vid_panelw-1,vid_panelw-1);
    r_bminimap:=_createSurf(vid_panelw-1,vid_panelw-1);
 
@@ -493,6 +497,7 @@ begin
       sn:=1;
       setlength(sl,sn);
       sl[sk]:=spr_dummy;
+      mkind :=smt_effect;
    end;
    spr_pdmodel:=@spr_dmodel;
 
@@ -539,7 +544,25 @@ begin
    spr_c_phobos   := LoadIMG('M_PHOBOS' ,false,true);
    spr_c_deimos   := LoadIMG('M_DEIMOS' ,false,true);
 
-   _LoadMWSModel(@spr_lostsoul,hell_units+'h_u0_',firstload);
+   _LoadMWSModel(@spr_lostsoul,hell_units+'h_u0_',smt_lost,firstload);
+
+   _LoadMWSModel(@spr_HKeep     ,hell_buildings+'h_b0_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate     ,hell_buildings+'h_b1_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAGate    ,hell_buildings+'h_b1a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol   ,hell_buildings+'h_b2_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools    ,hell_buildings+'h_b3_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAPools   ,hell_buildings+'h_b3a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTower    ,hell_buildings+'h_b4_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTeleport ,hell_buildings+'h_b5_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMonastery,hell_buildings+'h_b6_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTotem    ,hell_buildings+'h_b7_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAltar    ,hell_buildings+'h_b8_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HFortress ,hell_buildings+'h_b9_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HCC       ,hell_buildings+'h_hcc_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMUnit    ,hell_buildings+'h_hbar_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMUnita   ,hell_buildings+'h_hbara',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HEye      ,hell_buildings+'heye_'  ,smt_buiding,firstload);
+
 
   //
 
@@ -705,6 +728,17 @@ begin
    InitThemes;
 end;
 
+
+procedure unit_icons;
+var x:integer;
+begin
+   for x:=0 to 255 do
+   with _uids[x] do
+   begin
+      un_btn := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW);
+      un_sbtn:= LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
+   end;
+end;
 
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;

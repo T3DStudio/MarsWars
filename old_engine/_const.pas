@@ -493,7 +493,7 @@ _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
-fly_height             = 30;
+fly_height             : array[0..2] of integer = (1,30,60);
 
 map_flydpth            : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
 
@@ -553,6 +553,31 @@ hp_detect              = #7;
 hp_pshield             = #8;
 adv_char               = #10;
 revenant_ra            : array[false..true] of integer = (45,20);
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SPRITE MODELS KINDS
+//
+
+smt_effect             = 0; // simple missile or effect
+smt_missile            = 1; // missile with direction
+smt_lost               = 2;
+smt_buiding            = 3;
+smt_turret             = 4;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SPRITE MODEL STATES
+//
+
+sms_walk               = 0; // & stand
+sms_pain               = 1;
+sms_cast               = 2;
+sms_attack             = 3;
+sms_death              = 4;
+sms_build              = 5;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

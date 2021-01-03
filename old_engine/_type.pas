@@ -24,6 +24,7 @@ TMWSModel = record
    sl       : TUSpriteList;
    sk,
    sn       : integer;
+   mkind    : byte;
 end;
 PTMWSModel = ^TMWSModel;
 
@@ -106,7 +107,8 @@ TUID = record
    _tprod,
    _painc,
    _apcs,
-   _apcm
+   _apcm,
+   _animw,_animd,_animf
                 : integer;
    _urace,
    _uf,
@@ -136,7 +138,7 @@ TUID = record
    un_name,
    un_descr,
    un_hint      : shortstring;
-   un_smodel    : PTMWSModel;
+   un_smodel    : array[false..true] of PTMWSModel;
    {$ENDIF}
 end;
 PTUID = ^TUID;
@@ -240,7 +242,7 @@ TUnit = record
    fx,fy,fsr,
    vx,vy,
    x,y,
-   anim,anims,animf,
+   anim,animf,
    srng,
    speed,dir,rld,
    hits,

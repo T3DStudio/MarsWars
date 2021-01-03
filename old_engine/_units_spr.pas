@@ -1,20 +1,126 @@
 
-function _unit_spr(u:PTUnit):PTMWSprite;
-var an,td:integer;
+
+function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer):PTMWSprite;  // sprite model 2 sprite
+var dd,i,o:integer;
+function aa3(b0,a,b1:integer):integer;
 begin
-   _unit_spr:=@spr_dummy;
+   if(b1<=b0)
+   then aa3:=b0
+   else
+    if(a<=b0)
+    then aa3:=b0
+    else aa3:=b0+(a mod (b1-b0+1));
+
+end;
+begin
+   _sm2s:=@spr_dummy;
+
+   with sm^ do
+   begin
+      if(sn<=0)then exit;
+
+      dd:=(abs(dir+23) mod 360) div 45; // 0..7
+
+      if(sk=0)
+      then i:=0
+      else
+      case mkind of
+smt_effect  : if(animk=sms_death)
+              then i:=mm3(0,anim,sk)
+              else i:=0;
+
+smt_missile : if(animk=sms_death)
+              then i:=mm3(8,8+anim,sk)
+              else i:=dd;
+
+smt_buiding : case animk of
+        sms_build: i:=mm3(0,anim,3);
+        sms_death: exit;
+              else i:=aa3(3,3+anim,sk);
+              end;
+
+smt_turret : case animk of
+        sms_build: i:=mm3(0,anim,3);
+        sms_attack,
+        sms_cast : begin
+                      o:=3+(aa3(0,anim,1)*8);
+                      i:=mm3(3,o+dd,sk);
+                   end;
+        sms_death: exit;
+              else i:=aa3(3,3+dd,10);
+              end;
+
+smt_lost    : case animk of
+        sms_walk : i:=dd;
+        sms_pain : i:=dd+16;
+        sms_attack,
+        sms_cast : i:=dd+8;
+        sms_death: i:=mm3(23,23+anim,sk);
+              else exit;
+              end;
+      else i:=0;
+      end;
+
+      _sm2s:=@sl[i];
+   end;
+
+   //
+end;
+
+function _unit2SMAnimK(u:PTUnit):byte;
+begin
+   _unit2SMAnimK:=sms_walk;
+
+   with u^   do
+     if(hits          <=0)then _unit2SMAnimK:=sms_death
+else if(not bld          )then _unit2SMAnimK:=sms_build
+else if(buff[ub_pain  ]>0)then _unit2SMAnimK:=sms_pain
+else if(buff[ub_cast  ]>0)
+     or(buff[ub_clcast]>0)then _unit2SMAnimK:=sms_cast
+else if(a_rld          >0)then _unit2SMAnimK:=sms_attack;
+end;
+
+function _unit2spr(u:PTUnit):PTMWSprite;
+var ak:byte;
+smodel:PTMWSModel;
+begin
+   _unit2spr:=@spr_dummy;
 
    with u^   do
    with uid^ do
-    if(un_smodel=spr_pdmodel)then
-     if(hits>0)then
-     begin
+   begin
+      smodel:=un_smodel[buff[ub_advanced]>0];
 
-     end
-     else
-     begin
+      if(smodel<>spr_pdmodel)then
+      begin
+         ak:=_unit2SMAnimK(u);
 
-     end;
+         case ak of
+sms_walk:  begin
+              if(wanim)or(_isbuilding)then
+              begin
+                 inc(anim,1);
+                 anim:=abs(anim mod 10000);
+              end;
+              if(_animw>0)
+              then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animw)
+              else _unit2spr:=_sm2s(smodel,ak,dir,0);
+           end;
+sms_attack:begin
+              _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld>_a_weap[a_weap].aw_rlda));
+           end;
+sms_death: begin
+              anim:=abs(hits);
+              if(_animd>0)
+              then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animd)
+              else _unit2spr:=_sm2s(smodel,ak,dir,0);
+           end;
+sms_build: _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
+         else
+           _unit2spr:=_sm2s(smodel,ak,dir,0);
+         end;
+      end;
+   end;
 
 {   with u^ do
    if(hits>0)then
@@ -513,26 +619,13 @@ begin td:=48+abs(hits div 8);if(td>52)then td:=52;if(buff[ub_advanced]>0)then _u
     end;  }
 end;
 
-function _uid2spr(_uid:byte):PTMWSprite;
+function _uid2spr(_uid:byte;adv:boolean):PTMWSprite;
 begin
-   with _units[0] do
-   begin
-      FillChar(buff,SizeOf(buff),0);
-      uidi:=_uid;
-      _unit_apUID(@_units[0]);
-      hits:=uid^._mhits;
-
-      with uid^ do
-       if(_isbuilding)
-       then dir:=0
-       else
-         case _urace of
-         r_hell: dir:=315;
-         r_uac : dir:=225;
-         end;
-   end;
-
-   _uid2spr:=_unit_spr(@_units[0]);
+   with _uids[_uid] do
+    case _urace of
+    r_hell: _uid2spr:=_sm2s(un_smodel[adv],sms_walk,315,0);
+    r_uac : _uid2spr:=_sm2s(un_smodel[adv],sms_walk,225,0);
+    end;
 end;
 
 

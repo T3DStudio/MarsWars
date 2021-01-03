@@ -72,10 +72,12 @@ begin
    lng_eng;
    cfg_read;
 
-   if not(InitVideo) then exit;
-   if not(InitSound) then exit;
+   if not(InitVideo)then exit;
+   if not(InitSound)then exit;
 
    swLNG;
+   ObjTblCL;
+   unit_icons;
 
    {$ENDIF}
 
@@ -89,53 +91,6 @@ begin
    _CYCLE:=true;
 
    {$IFNDEF _FULLGAME}
-   str_player_def        := ' was terminated!';
-   str_plout             := ' left the game';
-   str_starta            := 'Starting base:';
-   str_startat[0]        := '1 builder';
-   str_startat[1]        := '1 builder+ 1 gen.';
-   str_startat[2]        := '1 builder+ 2 gen.';
-   str_startat[3]        := '1 b.+ 2 gen.+ 2 b.';
-   str_startat[4]        := '2 builders';
-   str_startat[5]        := '1 b.+ 100 energy';
-   str_sstarts           := 'Show player starts:';
-   str_gmodet            := 'Game mode:';
-   str_gmode[gm_scir ]   := 'Skirmish';
-   str_gmode[gm_2fort]   := 'Two bases';
-   str_gmode[gm_3fort]   := 'Three bases';
-   str_gmode[gm_ct   ]   := 'Capturing points';
-   str_gmode[gm_inv  ]   := 'Invasion';
-   str_gmode[gm_coop ]   := 'Assault';
-   str_gaddon            := 'Game:';
-   str_addon[false]      := 'UDOOM';
-   str_addon[true ]      := 'DOOM 2';
-   str_race[r_random]    := 'RANDOM';
-   str_race[r_hell  ]    := 'HELL';
-   str_race[r_uac   ]    := 'UAC';
-   str_plname            := 'Player name';
-   str_plstat            := 'State';
-   str_team              := 'Team';
-   str_srace             := 'Race';
-   str_ready             := 'Ready';
-   str_aislots           := 'Fill empty slots:';
-   str_m_seed            := 'Seed';
-   str_m_liq             := 'Lakes';
-   str_m_siz             := 'Size';
-   str_m_obs             := 'Obstacles';
-
-   SDL_ShowCursor(SDL_ENABLE);
-   net_nstat:=ns_srvr;
-   if(net_UpSocket=false)then
-   begin
-      net_dispose;
-      net_nstat:=ns_none;
-      _CYCLE:=false;
-   end
-   else
-   begin
-      HPlayer:=0;
-      DefPlayers;
-   end;
-   vid_mredraw:=true;
+   _dedInit;
    {$ENDIF}
 end;
