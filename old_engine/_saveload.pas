@@ -300,7 +300,7 @@ begin
          _refresh_dmcells;
          _makeMMB;
          _map_dds;
-         g_inv_calcmm;
+         //g_inv_calcmm;
          _view_bounds;
 
          G_Started:=true;

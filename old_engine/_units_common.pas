@@ -59,7 +59,7 @@ UID_ZBFG
    end;
 end;
 
-procedure _unit_comssnd(ucl,race:integer);
+{procedure _unit_comssnd(ucl,race:integer);
 begin
   case race of
 r_hell : case ucl of
@@ -79,31 +79,9 @@ r_uac  : case random(3) of
          2 : PlaySND(snd_uac_u2   ,nil);
          end;
   end;
-end;
+end; }
 
-function _udpth(pu:PTUnit):integer;
-begin
-   _udpth:=0;
-   with pu^ do
-    case uidi of
-UID_UPortal   : _udpth:=-5;
-UID_HTeleport : _udpth:=-4;
-UID_HSymbol,
-UID_HAltar    : _udpth:=-3;
-UID_UMine     : _udpth:=-2;
-UID_HCommandCenter,
-UID_UCommandCenter: if(uf>uf_ground)
-                    then _udpth:=map_flydpth[uf_soaring]+vy
-                    else
-                      if(hits>0)
-                      then _udpth:=map_flydpth[uf]+vy
-                      else _udpth:=vy;
-    else
-      if(hits>0)
-      then _udpth:=map_flydpth[uf]+vy
-      else _udpth:=vy;
-    end;
-end;
+
 
 procedure _unit_PowerUpEff(pu:PTUnit;snd:pMIX_Chunk);
 begin
@@ -114,70 +92,7 @@ begin
    end;
 end;
 
-procedure _sf(tx,ty:integer);
-begin
-   if(0<=tx)and(0<=ty)and(tx<=fog_vfw)and(ty<=fog_vfh)then fog_grid[tx,ty]:=2;
-end;
 
-procedure _fog_sr(x,y,r:integer);
-var iy,i:integer;
-begin
-   for i:=0 to r do
-    for iy:=0 to _fcx[r,i] do
-    begin
-       _sf(x-i,y-iy);
-       _sf(x-i,y+iy);
-       if(i>0)then
-       begin
-          _sf(x+i,y-iy);
-          _sf(x+i,y+iy);
-       end;
-    end;
-end;
-
-procedure _unit_sfog(pu:PTUnit);
-begin
-   with pu^ do
-   begin
-      fx :=x div fog_cw;
-      fy :=y div fog_cw;
-   end;
-end;
-
-function _checkvision(pu:PTUnit):byte;
-begin
-  _checkvision:=0;
-   with pu^ do
-    if(HPlayer=0)and(_rpls_rst>=rpl_rhead)
-    then _checkvision:=2
-    else
-      if(_uvision(_players[HPlayer].team,pu,false))then
-       if(player^.team=_players[HPlayer].team)
-       then _checkvision:=2
-       else _checkvision:=1;
-end;
-
-function _unit_fogrev(pu:PTUnit):boolean;
-begin
-   _unit_fogrev:=false;
-   with pu^ do
-   with uid^ do
-    with player^ do
-     if(_fog=false)
-     then _unit_fogrev:=true
-     else
-      case _checkvision(pu) of
-       1:begin
-            if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,_fr);
-            _unit_fogrev:=true;
-         end;
-       2:begin
-            if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
-            _unit_fogrev:=true;
-            //if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
-         end;
-      end;
-end;
 
 procedure _unit_painsnd(pu:PTUnit);
 begin
@@ -357,7 +272,6 @@ begin
    with pu^ do
    begin
       inapc    := 0;
-      anim     := 0;
       uo_id    := ua_amove;
       uo_tar   := 0;
       rld      := 0;
@@ -365,8 +279,8 @@ begin
       dir      := 270;
       order    := 0;
       wanim    := false;
-      a_tar1   := 0;
-      a_tar1d  := 32000;
+      a_tar    := 0;
+      a_tard   := 32000;
       {alrm_x   := 0;
       alrm_y   := 0;
       alrm_r   := 32000;
@@ -378,8 +292,9 @@ begin
       FillChar(pprod_u,SizeOf(pprod_u),0);
 
       {$IFDEF _FULLGAME}
-      //_unit_mmcoords(pu);
-      //_unit_sfog    (pu);
+      anim     := 0;
+      _unit_mmcoords(pu);
+      _unit_sfog    (pu);
       {$ENDIF}
    end;
 end;
@@ -489,7 +404,8 @@ begin
       if(_lcu>0)then
        with _lcup^ do
        begin
-          uclord  :=_lcu mod _uclord_p;
+          uclord  := _lcu mod _uclord_p;
+          unum    := _lcu;
 
           x       := ux;
           y       := uy;
@@ -506,7 +422,7 @@ begin
           mv_y    := y;
           sel     := false;
           apcc    := 0;
-          unum    := _lcu;
+
           FillChar(buff,sizeof(buff),0);
           FillChar(vsnt,SizeOf(vsnt),0);
           FillChar(vsni,SizeOf(vsni),0);
@@ -755,8 +671,136 @@ begin
    end;
 end;
 
+{procedure _unit_prod(pu:PTUnit);
+var t,i,_uid:byte;
+begin
+   with pu^ do
+   with player^ do
+   for i:=0 to MaxUnitProds do
+   begin
+     if(isbarrack)then
+      if(uprod_r[i]>0)then
+      begin
+         t:=uprod_t[i];
+         _uid:=cl2uid[race,false,t];
+         if((army+uproda)>MaxPlayerUnits)or(menerg<cenerg)or(ucl_e[false,t]>=_ulst[_uid].max)
+         then _unit_ctraining_p(pu,-1,i)
+         else
+           if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+           begin
+              if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
+
+              if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
+
+              _unit_ctraining_p(pu,-1,i);
+           end;
+      end;
+
+     if(issmith)then
+      if(pprod_r[i]>0)then
+      begin
+         t:=pprod_t[i];
+         if(menerg<cenerg)
+         then _unit_cupgrade_p(pu,-1,i)
+         else
+           if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+           begin
+              inc(upgr[t],1);
+              _unit_cupgrade_p(pu,-1,i);
+           end;
+      end;
+   end;
+end;  }
+
+function _u1_spawn(pu:PTUnit;sx,sy,pn:integer):boolean;
+var _uid:byte;
+begin
+  _u1_spawn:=false;
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(sy=32000)then sy:=_r;
+      _uid:=uprod_u[pn];
+      _unit_add(x+sx,y+sy+_uids[_uid]._r,_uid,playeri,true);
+      if(_lcu>0)then
+      begin
+         _u1_spawn:=true;
+         _lcup^.uo_x   :=uo_x;
+         _lcup^.uo_y   :=uo_y;
+         _lcup^.uo_id  :=uo_id;
+         _lcup^.uo_tar :=uo_tar;
+         //_unit_turn(_lcup);
+
+         {if(uidi=uid_HGate)then
+         begin
+            _lcup^.buff[ub_teleeff]:=vid_fps;
+            {$IFDEF _FULLGAME}
+            PlaySND(snd_teleport,pu);
+            _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+5,EID_Teleport);
+            {$ENDIF}
+         end;  }
+      end;
+   end;
+end;
+
+procedure _unit_end_uprod(pu:PTUnit);
+var i,_uid:byte;
+begin
+   with pu^ do
+   with uid^ do
+   if(_isbarrack)then
+   with player^ do
+   for i:=0 to MaxUnitProds do
+   if(uprod_r[i]>0)then
+   begin
+       _uid:=uprod_u[i];
+
+      if((army+uproda)>MaxPlayerUnits)
+      or(cenerg<0)
+      or(uid_e[_uid]>=_uids[_uid]._max)
+      or(uid_e[_uid]>=a_units[_uid])
+      then _unit_ctraining_p(pu,255,i)
+      else
+        if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        begin
+           if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
+
+           //if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
+
+           _unit_ctraining_p(pu,255,i);
+        end
+        else dec(uprod_r[i],1);
+   end;
+end;
+
+procedure _unit_end_pprod(pu:PTUnit);
+var i,_uid:byte;
+begin
+  with pu^ do
+  with uid^ do
+  if(_issmith)then
+  with player^ do
+  for i:=0 to MaxUnitProds do
+  if(pprod_r[i]>0)then
+  begin
+      _uid:=pprod_u[i];
+     if(cenerg<0)
+     or(upgr[_uid]>=_upids[_uid]._up_max)
+     or(upgr[_uid]>=a_upgrs[_uid])
+     then _unit_cupgrade_p(pu,255,i)
+     else
+       if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+       begin
+          inc(upgr[_uid],1);
+          _unit_cupgrade_p(pu,255,i);
+       end
+       else dec(pprod_r[i],1);
+  end;
+end;
 
 {
+
 function _unit_chktar(uu,tu:PTUnit;utd:integer;teams:boolean):boolean;
 begin
    _unit_chktar:=false;
@@ -989,9 +1033,7 @@ begin
             if(bld)and(speed>0)and(tar1=0)then
              if(buff[i]=0)then
               if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
-        end
-        else
-          if(buff[i]<0)then inc(buff[i],1);
+        end;
 
       for i:=0 to MaxPlayers do
       begin
@@ -999,17 +1041,13 @@ begin
          if(0<vsni[i])and(vsni[i]<_bufinf)then dec(vsni[i],1);
       end;
 
-      if(onlySVCode)then
+      if(onlySVCode)and(bld)then
       begin
-         {
-         or(uidi in whocanattack)then
-         if(rld_t>0)then dec(rld_t,1); }
+         if(  rld>0)then dec(  rld,1);
+         if(a_rld>0)then dec(a_rld,1);
 
-         for i:=0 to MaxUnitProds do
-         begin
-            if(uprod_r[i]>0)then dec(uprod_r[i],1);
-            if(pprod_r[i]>0)then dec(pprod_r[i],1);
-         end;
+         _unit_end_uprod(pu);
+         _unit_end_pprod(pu);
       end;
    end;
 end;

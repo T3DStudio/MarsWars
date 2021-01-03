@@ -1,6 +1,515 @@
-procedure unit_sprites(noanim:boolean);
-begin
 
+function _udpth(pu:PTUnit):integer;
+begin
+   _udpth:=0;
+   with pu^ do
+    case uidi of
+UID_UPortal   : _udpth:=-5;
+UID_HTeleport : _udpth:=-4;
+UID_HSymbol,
+UID_HAltar    : _udpth:=-3;
+UID_UMine     : _udpth:=-2;
+UID_HCommandCenter,
+UID_UCommandCenter: if(uf>uf_ground)
+                    then _udpth:=map_flydpth[uf_soaring]+vy
+                    else
+                      if(hits>0)
+                      then _udpth:=map_flydpth[uf]+vy
+                      else _udpth:=vy;
+    else
+      if(hits>0)
+      then _udpth:=map_flydpth[uf]+vy
+      else _udpth:=vy;
+    end;
+end;
+
+procedure _sf(tx,ty:integer);
+begin
+   if(0<=tx)and(0<=ty)and(tx<=fog_vfw)and(ty<=fog_vfh)then fog_grid[tx,ty]:=2;
+end;
+
+procedure _fog_sr(x,y,r:integer);
+var iy,i:integer;
+begin
+   for i:=0 to r do
+    for iy:=0 to _fcx[r,i] do
+    begin
+       _sf(x-i,y-iy);
+       _sf(x-i,y+iy);
+       if(i>0)then
+       begin
+          _sf(x+i,y-iy);
+          _sf(x+i,y+iy);
+       end;
+    end;
+end;
+
+function _fog_cscr(x,y,r:integer):boolean;
+begin
+   _fog_cscr:=((vid_fsx-r)<=x)and(x<=(vid_fex+r))
+           and((vid_fsy-r)<=y)and(y<=(vid_fey+r));
+end;
+
+procedure _unit_sfog(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      fx :=x div fog_cw;
+      fy :=y div fog_cw;
+   end;
+end;
+
+function _checkvision(pu:PTUnit):byte;
+begin
+   _checkvision:=0;
+   with pu^ do
+    if(HPlayer=0)and(_rpls_rst>=rpl_rhead)
+    then _checkvision:=2
+    else
+      if(_uvision(_players[HPlayer].team,pu,false))then
+       if(player^.team=_players[HPlayer].team)
+       then _checkvision:=2
+       else _checkvision:=1;
+end;
+
+function _unit_fogrev(pu:PTUnit):boolean;
+begin
+   _unit_fogrev:=false;
+   with pu^ do
+   with uid^ do
+   with player^ do
+    if(_fog=false)
+    then _unit_fogrev:=true
+    else
+      case _checkvision(pu) of
+    1:begin
+         if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,_fr);
+         _unit_fogrev:=true;
+      end;
+    2:begin
+         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
+         _unit_fogrev:=true;
+         //if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
+      end;
+      end;
+end;
+
+
+procedure _unit_uiprodcnts(pu:PTUnit;pn:integer);
+var i,t:byte;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(_isbarrack)then
+      begin
+         for t:=1 to 255 do
+          if(t in uid^.ups_units)then inc(ui_prod_units[t],1);   //?????????????????//
+
+         if(uprod_r[pn]>0)then
+         begin
+            i:=uprod_u[pn];
+            inc(ui_units_proda,1);
+            inc(ui_units_prodc[i],1);
+            if(ui_units_ptime[i]=0)or(ui_units_ptime[i]>uprod_r[pn])then ui_units_ptime[i]:=uprod_r[pn];
+         end;
+      end;
+
+      if(_issmith)then
+      begin
+         if(pprod_r[pn]>0)then
+         begin
+            i:=pprod_u[pn];
+            //if(upgrade_mfrg[race,i])then inc(ui_upgrct[i],1);
+            if(ui_upgr_time=0)or(ui_upgr_time>pprod_r[pn])then ui_upgr_time:=pprod_r[pn];
+            if(ui_upgr[i]  =0)or(ui_upgr[i]  >pprod_r[pn])then ui_upgr[i]  :=pprod_r[pn];
+         end;
+      end;
+   end;
+end;
+
+procedure _orders(x,y:integer;i:byte);
+begin
+   if(ui_ordx[i]=0)then
+   begin
+      ui_ordx[i]:=x;
+      ui_ordy[i]:=y;
+   end
+   else
+   begin
+      ui_ordx[i]:=(ui_ordx[i]+x) div 2;
+      ui_ordy[i]:=(ui_ordy[i]+y) div 2;
+   end;
+   inc(ui_ordn[i],1);
+end;
+
+procedure _ui_counters(pu:PTUnit);
+var i:byte;
+begin
+   with pu^ do
+   if(playeri=HPlayer)and(G_Paused=0)then
+   with uid^ do
+   with player^ do
+   begin
+      if(order<10)then
+      begin
+         _orders(x,y,order);
+         ui_orderu[order]:=ui_orderu[order]+[uidi];
+      end;
+
+      if(speed>0)and(uidi in whocanattack)then
+      begin
+         inc(ui_battle_units,1);
+         _orders(x,y,10);
+      end;
+
+      if(_isbuilding)then
+      begin
+         if(bld)then
+         begin
+            ui_prod_builds := ui_prod_builds + uid^.ups_builder;
+            if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
+             if(m_brush in uid^.ups_builder)then
+              if((vid_vx-srng)<vx)and(vx<(vid_vx+vid_sw+srng))and
+                ((vid_vy-srng)<vy)and(vy<(vid_vy+vid_sh+srng))then _addUIBldrs(x,y,srng);
+              for i:=0 to MaxUnitProds do
+             if(i>0)and(buff[ub_advanced]<=0)
+             then break
+             else _unit_uiprodcnts(pu,i);
+              if(sel)then
+             //if(uidi in whocanmp)then _sl_add(uo_x-spr_mp[race].hw, uo_y-spr_mp[race].h,uo_y-spr_mp[race].hh,0,0,0,false,spr_mp[race].surf,255,0,0,0,0,'',0);
+         end
+         else
+         begin
+            //inc(ui_blds[ucl],1);
+            //inc(ui_bldsc    ,1);
+         end;
+      end;
+
+      if(sel)then
+      begin
+         if(bld)then
+         begin
+            if(speed>0)then inc(ui_uimove,1);
+            if(uidi in whocanaction)then inc(ui_uiaction,1);
+         end;
+      end;
+
+   end;
+end;
+
+procedure _unit_aspr(pu:PTUnit;noanim:boolean);
+var spr : PTMWSprite;
+     dp,smy,
+     inv,t,ro,
+     sh : integer;
+     mc,
+     rc : cardinal;
+     sb : single;
+b0,b2,b3: byte;
+    b1  : string6;
+    rct : boolean;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      _ui_counters(pu);
+
+      if(_unit_fogrev(pu))then
+      begin
+         _unit_minimap(pu);
+
+         wanim:=false;
+         {if(g_paused=0)then
+          if(_canmove(pu))then
+           wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);  }
+
+         spr:=_unit2spr(pu);
+
+         if(spr=pspr_dummy)then exit;
+
+         sh :=shadow;
+         smy:=vy;
+         if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
+            ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
+         begin
+            dp :=0;
+            inv:=255;
+            rc :=0;
+            sb :=0;
+            mc :=0;
+            b0 :=0;
+            b1 :='';
+            b2 :=0;
+            b3 :=0;
+            rct:=false;
+            rc :=p_color(playeri);
+            ro :=0;
+
+            if(_isbuilding)then
+             if(0<m_brush)and(m_brush<=255)
+             then ro:=_r
+             else
+             begin
+                {if(sel)then
+                 case uidi of
+                UID_UTurret,
+                UID_UPTurret,
+                UID_URTurret,
+                UID_HTower,
+                UID_HTotem,
+                UID_UMine,
+                UID_HEye     : ro:=ar;
+                UID_HSymbol  : if(upgr[upgr_b478tel]>0)then ro:=sr;
+                 else
+                 if(isbuilder)and(speed=0)then ro:=sr;
+                 end;   }
+             end;
+
+            //if(wanim)then _unit_foot(pu);
+
+            if((sel)and(playeri=HPlayer))
+            or(k_alt>1)
+            or((ui_umark_u=unum)and(vid_rtui>vid_rtuish))then
+            begin
+               rct:=true;
+               if(buff[ub_advanced ]>0)then b1:=b1+adv_char;
+               if(buff[ub_detect   ]>0)then b1:=b1+hp_detect;
+               if(playeri=HPlayer)then
+               begin
+                  if(order>0)then b0:=order;
+                  if(apcm>0)then
+                  begin
+                     b2:=apcm;
+                     b3:=apcc;
+                  end;
+               end;
+            end;
+
+            if(rct)
+            then sb:=hits/_mhits
+            else
+              case vid_uhbars of
+            0: if(hits<_mhits)then sb:=hits/_mhits;
+            1: sb:=hits/_mhits;
+              end;
+
+            if(buff[ub_invis ]>0 )then inv:=128;
+            if(buff[ub_invuln]>10)then mc:=c_awhite;
+
+            if(playeri=0)and(_isbuilding=false)then
+             if(g_mode in [gm_inv,gm_coop])then mc:=c_ablack;
+
+            dp:=_udpth(pu);
+
+            {if(isbuild)then
+             if(bld)then
+             begin
+                if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
+                begin
+                   if(rld_t=0)then begin if(nanim=false)then inc(dir,anims);dir:=dir mod 360;end;
+                   t:=((dir+23) mod 360) div 45;
+                   if(uidi<>UID_URTurret)and(rld_t>rld_a)then t:=t+8;
+                   case uidi of
+                   UID_UTurret,
+                   UID_UPTurret: _sl_add_eff(vx,smy,dp,0,@spr_tur [t],inv);
+                   UID_URTurret: _sl_add_eff(vx,smy,dp,0,@spr_rtur[t],inv);
+                   end;
+                end;
+
+                if(playeri=HPlayer)then
+                begin
+                   for t:=0 to MaxUnitProds do
+                   begin
+                      if(isbarrack)then
+                       if(uprod_r[t]>0)and(uprod_t[t]<=_uts    )then
+                        _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_gray,0,true,spr_b_u [race,uprod_t[t]],255,0,(uprod_r[t] div vid_fps)+1,0,0,'',0);
+
+                      if(issmith)then
+                       if(pprod_r[t]>0)and(pprod_t[t]<=MaxUpgrs)then
+                        _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_red ,0,true,spr_b_up[race,pprod_t[t]],255,0,(pprod_r[t] div vid_fps)+1,0,0,'',0);
+                   end;
+                end;
+             end
+             else
+              if(race=r_hell)then
+               case uidi of
+              UID_HMonastery,
+              UID_HTotem,
+              UID_HAltar,
+              UID_HFortress,
+              UID_HEye : begin
+                            inv:=trunc(255*hits/mhits);
+                            if(r<41)
+                            then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
+                            else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
+                            if(buff[ub_invis]>0)then inv:=inv shr 1;
+                            dec(inv,inv shr 2);
+                         end;
+               else
+                 if(hits<=127)then
+                 begin
+                    inv:=hits*2;
+                    if(r<41)
+                    then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
+                    else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
+                 end
+                 else inv:=255;
+               end;
+
+             if(buff[ub_toxin]>0)then
+              if(mech)
+              then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
+              else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);
+             if(buff[ub_gear ]>0)then
+                   _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);  }
+
+            _sl_add(vx-spr^.hw, smy-spr^.hh,dp,sh,rc,mc,rct,spr^.surf,inv,sb,b0,b2,b3,b1,ro);
+         end;
+      end;
+   end;
+end;
+
+{
+
+
+
+
+procedure _unit_foot(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      case uidi of
+        UID_Arachnotron :
+              begin
+                 inc(foot,1);
+                 foot:=foot mod 28;
+                 if(foot=0)then PlaySND(snd_ar_f,pu);
+              end;
+        UID_Cyberdemon :
+              begin
+                 inc(foot,1);
+                 foot:=foot mod 30;
+                 if(foot=0)then PlaySND(snd_cyberf,pu);
+              end;
+        UID_Mastermind :
+              begin
+                 inc(foot,1);
+                 foot:=foot mod 22;
+                 if(foot=0)then PlaySND(snd_mindf,pu);
+              end;
+      end;
+   end;
+end;
+
+procedure _unit_vis(pu:PTUnit;nanim:boolean);
+const _btnas : array[false..true] of integer = (vid_hBW,vid_BW);
+var spr : PTMWSprite;
+     dp,smy,
+     inv,t,ro,
+     sh : integer;
+     mc,
+     rc : cardinal;
+     sb : single;
+b0,b2,b3: byte;
+    b1  : string6;
+    rct : boolean;
+
+begin
+   with pu^ do
+    if(hits>0)and(inapc=0)then
+    with player^ do
+     begin
+        _unit_uidata(pu);
+
+        if(_unit_fogrev(pu))then
+        begin
+           _unit_minimap(pu);
+
+           if(uidi=UID_HKeep)then
+            if(buff[ub_clcast]>0)then exit;
+
+           wanim:=false;
+           if(g_paused=0)then
+            if(_canmove(pu))then
+             wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
+
+           spr:=_unit_spr(pu);
+           sh :=0;
+           smy:=vy;
+
+           if(shadow>0)then
+           begin
+              sh:=shadow;
+              if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
+              begin
+                 if(buff[ub_advanced]=0)
+                 then dec(smy,buff[ub_clcast])
+                 else inc(smy,buff[ub_clcast]);
+              end;
+           end;
+
+           if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
+              ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
+           begin
+              dp :=0;
+              inv:=255;
+              rc :=0;
+              sb :=0;
+              mc :=0;
+              b0 :=0;
+              b1 :='';
+              b2 :=0;
+              b3 :=0;
+              rct:=false;
+              rc :=p_color(playeri);
+              ro :=0;
+
+
+           end;
+        end;
+     end;
+end;
+}
+
+procedure _unit_dspr(pu:PTUnit;noanim:boolean);
+var spr:PTMWSprite;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+    if(hits>dead_hits)then
+    begin
+       if(hits<idead_hits)then exit;
+
+       spr:=_unit2spr(pu);
+
+       if(spr=pspr_dummy)then exit;
+
+       if(_unit_fogrev(pu))then
+        if ((vid_vx-spr^.hw)<vx)and(vx<(vid_vx+vid_sw+spr^.hw))and
+           ((vid_vy-spr^.hh)<vy)and(vy<(vid_vy+vid_sh+spr^.hh))then
+        begin
+           _sl_add_dec(vx,vy,_udpth(pu),0,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
+        end;
+    end;
+end;
+
+
+procedure unit_sprites(noanim:boolean);
+var u:integer;
+   pu:PTUnit;
+begin
+   for u:=1 to MaxUnits do
+   begin
+      pu:=@_units[u];
+      with pu^ do
+       if(hits>0)
+       then _unit_aspr(pu,noanim)
+       else _unit_dspr(pu,noanim);
+   end;
 end;
 
 

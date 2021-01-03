@@ -1,7 +1,7 @@
 
 
 function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer):PTMWSprite;  // sprite model 2 sprite
-var dd,i,o:integer;
+var dd,i:integer;
 function aa3(b0,a,b1:integer):integer;
 begin
    if(b1<=b0)
@@ -10,7 +10,6 @@ begin
     if(a<=b0)
     then aa3:=b0
     else aa3:=b0+(a mod (b1-b0+1));
-
 end;
 begin
    _sm2s:=@spr_dummy;
@@ -26,42 +25,45 @@ begin
       else
       case mkind of
 smt_effect  : if(animk=sms_death)
-              then i:=mm3(0,anim,sk)
+              then i:=anim
               else i:=0;
 
 smt_missile : if(animk=sms_death)
-              then i:=mm3(8,8+anim,sk)
+              then i:=8+anim
               else i:=dd;
 
 smt_buiding : case animk of
-        sms_build: i:=mm3(0,anim,3);
+        sms_build: i:=mm3(0,anim,2);
         sms_death: exit;
               else i:=aa3(3,3+anim,sk);
               end;
 
-smt_turret : case animk of
-        sms_build: i:=mm3(0,anim,3);
+smt_turret  : case animk of
+        sms_build: i:=mm3(0,anim,2);
         sms_attack,
-        sms_cast : begin
-                      o:=3+(aa3(0,anim,1)*8);
-                      i:=mm3(3,o+dd,sk);
-                   end;
+        sms_cast : i:=mm3(3,3+dd+(aa3(0,anim,1)*8),sk);
         sms_death: exit;
-              else i:=aa3(3,3+dd,10);
+              else i:=mm3(3,3+dd,sk);
+              end;
+
+smt_turret2 : case animk of
+        sms_build: i:=mm3(0,anim,2);
+        sms_death: exit;
+              else i:=mm3(3,3+dd,sk);
               end;
 
 smt_lost    : case animk of
         sms_walk : i:=dd;
-        sms_pain : i:=dd+16;
         sms_attack,
         sms_cast : i:=dd+8;
+        sms_pain : i:=dd+16;
         sms_death: i:=mm3(23,23+anim,sk);
               else exit;
               end;
       else i:=0;
       end;
 
-      _sm2s:=@sl[i];
+      _sm2s:=@sl[mm3(0,i,sk)];
    end;
 
    //

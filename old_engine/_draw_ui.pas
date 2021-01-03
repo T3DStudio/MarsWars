@@ -259,14 +259,14 @@ begin
             begin
                if(uid_e[uid]=0)then
                begin
-                  if(a_units[ui]<=0)then continue;
+                  if(a_units[uid]<=0)then continue;
                   if((G_addon=false)and(_addon))then continue;
                end;
 
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn (tar,ux,uy,un_btn,m_brush=ui,_uid_cndt(@_players[HPlayer],uid) or not(uid in ui_prod_builds));
+               _drawBtn (tar,ux,uy,un_btn,m_brush=uid,_uid_cndt(@_players[HPlayer],uid) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
                b2s(ui_blds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,''     ,
                c_dyellow        ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_white);
@@ -302,7 +302,7 @@ begin
             begin
                if(uid_e[uid]=0)then
                begin
-                  if(a_units[ui]<=0)then continue;
+                  if(a_units[uid]<=0)then continue;
                   if((G_addon=false)and(_addon))then continue;
                end;
 
@@ -449,57 +449,41 @@ begin
       16 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[1];
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
-        {with _players[HPlayer] do
-        if(i<=_uts)then
+
+        with _players[HPlayer] do
+        if(i<ui_ubtns)then
         begin
-           case ui_tab of
-           0 : case i of
-               0 ..23 : begin
-                           uid:=cl2uid[race ,true,i];
-                           if(uid=0)
-                           then exit
-                           else
-                             if(uid_e[uid]=0)then
-                             begin
-                                if not(i in a_build)then exit;
-                                if((G_addon=false)and(uid in t2))then exit;
-                             end;
-                           hs:=@_uids[uid].un_hint;
-                        end;
-               end;
-           1 : case i of
-               0..23  : begin
-                           uid:=cl2uid[race ,false,i];
-                           if(uid=0)
-                           then exit
-                           else
-                             if(uid_e[uid]=0)then
-                             begin
-                                if not(i in a_units)then exit;
-                                if((G_addon=false)and(uid in t2))then exit;
-                             end;
-                           hs:=@_uids[uid].un_hint;
-                        end;
-               end;
-           2 : begin
-                  if(i<=MaxUpgrs)then
-                  begin
-                     if not(i in a_upgr)then exit;
-                     if(g_addon=false)and(i>=upgr_2tier)then exit;
-                  end;
-                  hs:=@str_up_hint[i+(race*_uts)];
-               end;
-           3 : begin
-                  if(_rpls_rst>=rpl_rhead)then
-                  begin
-                     if(i<12)then exit;
-                  end
-                  else
-                     if(i>11)then exit;
-                  hs:=@str_hint[ui_tab,race,i];
-               end;
+           if(ui_tab=3)then
+           begin
+              if(_rpls_rst>=rpl_rhead)then
+              begin
+                 if(i<12)then exit;
+              end
+              else
+                 if(i>11)then exit;
+              hs:=@str_hint[ui_tab,race,i];
+           end
+           else
+           begin
+              uid:=ui_puids[race,ui_tab,i];
+              if(uid>0)then
+              case ui_tab of
+              0,1: begin
+                      if(uid_e[uid]=0)then
+                      begin
+                         if(a_units[uid]<=0)then exit;
+                         if((g_addon=false)and(_uids[uid]._addon))then exit;
+                      end;
+                      hs:=@_uids[uid].un_hint;
+                   end;
+              2  : begin
+                      if (a_upgrs[uid]<=0)then exit;
+                      if((g_addon=false)and(_upids[uid]._up_addon))then exit;
+                      hs:=@_upids[uid]._up_hint;
+                   end;
+              end;
            end;
-        end; }
+        end;
       end;
       if(hs=nil)then exit;
       _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,255,c_white);

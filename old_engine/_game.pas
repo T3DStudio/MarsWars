@@ -345,7 +345,7 @@ begin
    if(o_id>0)and(army>0)then
    begin
       case o_id of
-uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
+uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
       else
          scnt :=0;
          scntm:=100;
@@ -356,7 +356,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
             if(dist2(o_x0,o_y0,o_x1,o_y1)<4)then scntm:=1;
          end;
 
-         u :=1;
+          u:=1;
          _u:=MaxUnits;
          if(o_id=uo_corder)then
           case o_x0 of
@@ -364,7 +364,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
           co_cupgrade,
           co_cuprod,
           co_pcancle  : begin
-                           u :=MaxUnits;
+                            u:=MaxUnits;
                            _u:=1;
                         end;
           end;
@@ -442,7 +442,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                         else
                                         begin
                                            uo_id :=ua_move;
-                                           a_tar1:=0;
+                                           a_tar :=0;
                                         end;
                                         _unit_turn(pu);
                                      end;
@@ -461,7 +461,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                         uo_y  :=y;
                                         uo_bx :=-1;
                                         uo_tar:=0;
-                                        a_tar1:=0;
+                                        a_tar :=0;
                                      end;
                          co_move,
                          co_patrol,
@@ -486,7 +486,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                               co_move,
                               co_patrol : begin
                                              uo_id:=ua_move;
-                                             a_tar1:=0;
+                                             a_tar:=0;
                                           end;
                               co_astand,
                               co_amove,
@@ -497,11 +497,11 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_x  :=o_x1;
                                      uo_y  :=o_y1;
                                      uo_bx :=-1;
-                                     a_tar1:=0;
+                                     a_tar :=0;
                                      uo_tar:=0;
                                      uo_id :=ua_paction;
                                   end;
-                    co_action  : ;// _unit_action   (pu);
+                    co_action  : ;//_unit_action   (pu);
                     co_supgrade:  _unit_supgrade (pu,o_y0);
                     co_cupgrade:  _unit_cupgrade (pu,o_y0);
                     co_suprod  :  _unit_straining(pu,o_y0);
@@ -624,7 +624,7 @@ begin
       end;
    end;
 end;
-
+    {
 procedure g_inv_calcmm;
 const min_wave_time = fr_fps*15;
 var a,i:integer;
@@ -820,7 +820,7 @@ begin
          with player^ do
           if(team<>t)then _unit_kill(@_units[i],false,false);
    end;
-end;
+end;  }
 
 {$include _net_game.pas}
 
@@ -874,12 +874,12 @@ begin
          if(onlySVCode)then
          begin
             inc(G_Step,1);
-            if(g_mode=gm_ct )then _CPoints;
-            if(g_mode=gm_inv)then g_inv_spawn;
+            //if(g_mode=gm_ct )then _CPoints;
+            //if(g_mode=gm_inv)then g_inv_spawn;
          end;
       end;
 
-      //_obj_cycle(G_Paused>0);
+      _obj_cycle;
    end;
 
    if(net_nstat=ns_srvr)then net_GServer;

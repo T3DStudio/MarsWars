@@ -470,6 +470,8 @@ end;
 procedure _LoadGraphics(firstload:boolean);
 const hell_units     : shortstring = 'hell\units\';
       hell_buildings : shortstring = 'hell\buildings\';
+       uac_units     : shortstring = 'uac\units\';
+       uac_buildings : shortstring = 'uac\buildings\';
 var x:integer;
 begin
    r_empty   :=_createSurf(1,1);
@@ -562,6 +564,24 @@ begin
    _LoadMWSModel(@spr_HMUnit    ,hell_buildings+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita   ,hell_buildings+'h_hbara',smt_buiding,firstload);
    _LoadMWSModel(@spr_HEye      ,hell_buildings+'heye_'  ,smt_buiding,firstload);
+
+
+   _LoadMWSModel(@spr_UCommandCenter ,uac_buildings +'u_b0_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UMilitaryUnit  ,uac_buildings +'u_b1_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAMilitaryUnit ,uac_buildings +'u_b1a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator     ,uac_buildings +'u_b2_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory ,uac_buildings +'u_b3_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAWeaponFactory,uac_buildings +'u_b3a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UTurret        ,uac_buildings +'u_b4_'  ,smt_turret ,firstload);
+   _LoadMWSModel(@spr_URadar         ,uac_buildings +'u_b5_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UVehicleFactory,uac_buildings +'u_b6_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UPTurret       ,uac_buildings +'u_b7_'  ,smt_turret ,firstload);
+   _LoadMWSModel(@spr_URocketL       ,uac_buildings +'u_b8_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_URTurret       ,uac_buildings +'u_b9_'  ,smt_turret2,firstload);
+   _LoadMWSModel(@spr_UNuclearPlant  ,uac_buildings +'u_b10_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_Mine           ,uac_buildings +'u_mine' ,smt_buiding,firstload);
+
+   //_LoadMWSModel(@spr_Base0           ,uac_buildings +'u_mine' ,smt_buiding,firstload);
 
 
   //

@@ -324,21 +324,15 @@ begin
    Close(f);
 end;
 
-function _uvision(uteam:byte;tu:PTUnit;onlyvis:boolean):boolean;
+function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
 begin
    if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
    then _uvision:=true
    else
     with tu^ do
-     if(buff[ub_invis]=0)or(hits<=0)or(onlyvis)
+     if(buff[ub_invis]=0)or(hits<=0)or(noinvis)
      then _uvision:=(vsnt[uteam]>0)
      else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
-end;
-
-function _fog_cscr(x,y,r:integer):boolean;
-begin
-   _fog_cscr:=((vid_fsx-r)<=x)and(x<=(vid_fex+r))
-           and((vid_fsy-r)<=y)and(y<=(vid_fey+r));
 end;
 
 function _fog_pgrid(x,y:integer):boolean;

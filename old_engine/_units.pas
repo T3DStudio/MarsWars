@@ -177,318 +177,7 @@ begin
    end;
 end;
 
-procedure _orders(x,y:integer;i:byte);
-begin
-   if(ordx[i]=0)then
-   begin
-      ordx[i]:=x;
-      ordy[i]:=y;
-   end
-   else
-   begin
-      ordx[i]:=(ordx[i]+x) div 2;
-      ordy[i]:=(ordy[i]+y) div 2;
-   end;
-   inc(ordn[i],1);
-end;
 
-procedure _unit_uiprodcnts(pu:PTUnit;pn:integer);
-var i,t:byte;
-begin
-   with pu^ do
-   with player^ do
-   begin
-      if(isbarrack)then
-      begin
-         for t:=1 to 255 do
-          if(t in uid^.ups_units)then inc(ui_prod_units[t],1);   //?????????????????//
-
-         if(uprod_r[pn]>0)then
-         begin
-            i:=uprod_t[pn];
-            inc(ui_units_proda,1);
-            inc(ui_units_prodc[i],1);
-            if(ui_units_ptime[i]=0)or(ui_units_ptime[i]>uprod_r[pn])then ui_units_ptime[i]:=uprod_r[pn];
-         end;
-      end;
-
-      if(issmith)then
-      begin
-         if(pprod_r[pn]>0)then
-         begin
-            i:=pprod_t[pn];
-            if(upgrade_mfrg[race,i])then inc(ui_upgrct[i],1);
-            if(ui_upgr_time=0)or(ui_upgr_time>pprod_r[pn])then ui_upgr_time:=pprod_r[pn];
-            if(ui_upgr[i]  =0)or(ui_upgr[i]  >pprod_r[pn])then ui_upgr[i]  :=pprod_r[pn];
-         end;
-      end;
-   end;
-end;
-
-procedure _unit_uidata(pu:PTUnit);
-var i:byte;
-begin
-   with pu^ do
-   if(playeri=HPlayer)and(G_Paused=0)then
-    with player^ do
-    begin
-       if(order<10)then
-       begin
-          _orders(x,y,order);
-          ui_orderu[order,isbuild]:=ui_orderu[order,isbuild]+[ucl];
-       end;
-
-       if(speed>0)and(uidi in whocanattack)then _orders(x,y,10);
-
-       if(isbuild)then
-       begin
-          if(bld)then
-          begin
-             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
-             if(isbuilder)and(0<=m_brush)and(m_brush<=_uts)and(speed=0)then
-              if(cl2uid[race,true,m_brush] in uid^.ups_builder)then
-               if((vid_vx-sr)<vx)and(vx<(vid_vx+vid_sw+sr))and
-                 ((vid_vy-sr)<vy)and(vy<(vid_vy+vid_sh+sr))then _addUIBldrs(x,y,sr);
-
-             for i:=0 to MaxUnitProds do
-              if(i>0)and(buff[ub_advanced]<=0)
-              then break
-              else _unit_uiprodcnts(pu,i);
-
-             if(sel)then
-              if(uidi in whocanmp)then _sl_add(uo_x-spr_mp[race].hw, uo_y-spr_mp[race].h,uo_y-spr_mp[race].hh,0,0,0,false,spr_mp[race].surf,255,0,0,0,0,'',0);
-          end
-          else
-          begin
-             inc(ui_blds[ucl],1);
-             inc(ui_bldsc    ,1);
-          end;
-       end;
-
-       if(sel)then
-       begin
-          if(bld)then
-          begin
-             if(speed>0)then inc(ui_uimove,1);
-             if(uidi in whocanaction)then inc(ui_uiaction,1);
-          end;
-       end;
-
-       if(speed>0)and(uidi in whocanattack)then inc(ui_battle_units,1);
-    end;
-end;
-
-procedure _unit_foot(pu:PTUnit);
-begin
-   with pu^ do
-   begin
-      case uidi of
-        UID_Arachnotron :
-              begin
-                 inc(foot,1);
-                 foot:=foot mod 28;
-                 if(foot=0)then PlaySND(snd_ar_f,pu);
-              end;
-        UID_Cyberdemon :
-              begin
-                 inc(foot,1);
-                 foot:=foot mod 30;
-                 if(foot=0)then PlaySND(snd_cyberf,pu);
-              end;
-        UID_Mastermind :
-              begin
-                 inc(foot,1);
-                 foot:=foot mod 22;
-                 if(foot=0)then PlaySND(snd_mindf,pu);
-              end;
-      end;
-   end;
-end;
-
-procedure _unit_vis(pu:PTUnit;nanim:boolean);
-const _btnas : array[false..true] of integer = (vid_hBW,vid_BW);
-var spr : PTMWSprite;
-     dp,smy,
-     inv,t,ro,
-     sh : integer;
-     mc,
-     rc : cardinal;
-     sb : single;
-b0,b2,b3: byte;
-    b1  : string6;
-    rct : boolean;
-
-begin
-   with pu^ do
-    if(hits>0)and(inapc=0)then
-    with player^ do
-     begin
-        _unit_uidata(pu);
-
-        if(_unit_fogrev(pu))then
-        begin
-           _unit_minimap(pu);
-
-           if(uidi=UID_HKeep)then
-            if(buff[ub_clcast]>0)then exit;
-
-           wanim:=false;
-           if(g_paused=0)then
-            if(_canmove(pu))then
-             wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
-
-           spr:=_unit_spr(pu);
-           sh :=0;
-           smy:=vy;
-
-           if(shadow>0)then
-           begin
-              sh:=shadow;
-              if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
-              begin
-                 if(buff[ub_advanced]=0)
-                 then dec(smy,buff[ub_clcast])
-                 else inc(smy,buff[ub_clcast]);
-              end;
-           end;
-
-           if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
-              ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
-           begin
-              dp :=0;
-              inv:=255;
-              rc :=0;
-              sb :=0;
-              mc :=0;
-              b0 :=0;
-              b1 :='';
-              b2 :=0;
-              b3 :=0;
-              rct:=false;
-              rc :=p_color(playeri);
-              ro :=0;
-
-              if(isbuild)then
-              begin
-                 if(sel)then
-                  case uidi of
-                  UID_UTurret,
-                  UID_UPTurret,
-                  UID_URTurret,
-                  UID_HTower,
-                  UID_HTotem,
-                  UID_UMine,
-                  UID_HEye     : ro:=ar;
-                  UID_HSymbol  : if(upgr[upgr_b478tel]>0)then ro:=sr;
-                  else
-                  if(isbuilder)and(speed=0)then ro:=sr;
-                  end;
-                 if(0<=m_brush)and(m_brush<=_uts)then ro:=r;
-              end;
-
-              if(wanim)then _unit_foot(pu);
-
-              if((sel)and(playeri=HPlayer))
-              or(k_alt>1)
-              or((ui_umark_u=unum)and(vid_rtui>vid_rtuish))then
-              begin
-                 rct:=true;
-                 if(buff[ub_advanced ]>0)then b1:=b1+adv_char;
-                 if(buff[ub_detect   ]>0)then b1:=b1+hp_detect;
-                 if(playeri=HPlayer)then
-                 begin
-                    if(order>0)then b0:=order;
-                    if(apcm>0)then
-                    begin
-                       b2:=apcm;
-                       b3:=apcc;
-                    end;
-                 end;
-              end;
-
-              if(rct)
-              then sb:=hits/mhits
-              else
-                case vid_uhbars of
-              0: if(hits<mhits)then sb:=hits/mhits;
-              1: sb:=hits/mhits;
-                end;
-
-              if(buff[ub_invis ]>0 )then inv:=128;
-              if(buff[ub_invuln]>10)then mc:=c_awhite;
-
-              if(playeri=0)and(isbuild=false)then
-               if(g_mode in [gm_inv,gm_coop])then mc:=c_ablack;
-
-              dp:=_udpth(pu);
-
-              if(isbuild)then
-               if(bld)then
-               begin
-                  if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
-                  begin
-                     if(rld_t=0)then begin if(nanim=false)then inc(dir,anims);dir:=dir mod 360;end;
-                     t:=((dir+23) mod 360) div 45;
-                     if(uidi<>UID_URTurret)and(rld_t>rld_a)then t:=t+8;
-                     case uidi of
-                     UID_UTurret,
-                     UID_UPTurret: _sl_add_eff(vx,smy,dp,0,@spr_tur [t],inv);
-                     UID_URTurret: _sl_add_eff(vx,smy,dp,0,@spr_rtur[t],inv);
-                     end;
-                  end;
-
-                  if(playeri=HPlayer)then
-                  begin
-                     for t:=0 to MaxUnitProds do
-                     begin
-                        if(isbarrack)then
-                         if(uprod_r[t]>0)and(uprod_t[t]<=_uts    )then
-                          _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_gray,0,true,spr_b_u [race,uprod_t[t]],255,0,(uprod_r[t] div vid_fps)+1,0,0,'',0);
-
-                        if(issmith)then
-                         if(pprod_r[t]>0)and(pprod_t[t]<=MaxUpgrs)then
-                          _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_red ,0,true,spr_b_up[race,pprod_t[t]],255,0,(pprod_r[t] div vid_fps)+1,0,0,'',0);
-                     end;
-                  end;
-               end
-               else
-                if(race=r_hell)then
-                 case uidi of
-                UID_HMonastery,
-                UID_HTotem,
-                UID_HAltar,
-                UID_HFortress,
-                UID_HEye : begin
-                              inv:=trunc(255*hits/mhits);
-                              if(r<41)
-                              then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
-                              else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
-                              if(buff[ub_invis]>0)then inv:=inv shr 1;
-                              dec(inv,inv shr 2);
-                           end;
-                 else
-                   if(hits<=127)then
-                   begin
-                      inv:=hits*2;
-                      if(r<41)
-                      then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
-                      else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
-                   end
-                   else inv:=255;
-                 end;
-
-               if(buff[ub_toxin]>0)then
-                if(mech)
-                then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
-                else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);
-               if(buff[ub_gear ]>0)then
-                     _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);
-
-              _sl_add(vx-spr^.hw, smy-spr^.hh,dp,sh,rc,mc,rct,spr^.surf,inv,sb,b0,b2,b3,b1,ro);
-           end;
-        end;
-     end;
-end;
 
 {$ENDIF}
 
@@ -576,11 +265,13 @@ begin
        if(buff[ub_resur]=0)then
        begin
           if(onlySVCode)or(hits>-100)then dec(hits,1);
+          {$IFDEF _FULLGAME}
           if(uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
+          {$ENDIF}
 
           if(onlySVCode)then
           begin
-             case uidi of
+             {case uidi of
              UID_Cacodemon: if(hits>-shadow)then
                             begin
                                inc(y,1);
@@ -591,7 +282,7 @@ begin
                                _unit_sfog(pu);
                                {$ENDIF}
                             end;
-             end;
+             end;  }
 
              if(hits<=dead_hits)then
              begin
@@ -606,9 +297,11 @@ begin
         begin
            if(hits<-80)then hits:=-80;
            inc(hits,1);
+           {$IFDEF _FULLGAME}
            case uidi of
            UID_Cacodemon: if(hits>-shadow)then begin dec(vy,1);dec(y,1);end;
            end;
+           {$ENDIF}
            if(hits>=0)then
            begin
               uo_id:=ua_amove;
@@ -670,8 +363,8 @@ begin
       uo_tar :=0;
       mv_x   :=x;
       mv_y   :=y;
-      a_tar1 :=0;
-      a_tar1d:=32000;
+      a_tar  :=0;
+      a_tard :=32000;
       rld    :=0;
 
 
@@ -1032,17 +725,18 @@ UID_HGate    : if(ucl_eb[true,9]>0)then
 
      else
      end;
-end;
+end;  }
 
 procedure _unit_push(pu,tu:PTUnit;ud:integer);
 var ix,iy,t:integer;
 begin
    with pu^ do
+   with uid^ do
    begin
       t:=ud;
       if(tu^.speed=0)
-      then dec(ud,tu^.r)
-      else dec(ud,r+tu^.r);
+      then dec(ud,tu^.uid^._r   )
+      else dec(ud,tu^.uid^._r+_r);
 
       if(ud<0)then
       begin
@@ -1066,7 +760,7 @@ begin
 
          if(tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)and(uo_tar=0)then
          begin
-            ud:=dist2(uo_x,uo_y,tu^.x,tu^.y)-r-tu^.r;
+            ud:=dist2(uo_x,uo_y,tu^.x,tu^.y)-_r-tu^.uid^._r;
             if(ud<=0)then
             begin
                uo_x:=x;
@@ -1081,16 +775,17 @@ procedure _unit_dpush(pu:PTUnit;td:PTDoodad);
 var ix,iy,t,ud:integer;
 begin
    with pu^ do
+   with uid^ do
    begin
       ud:=dist(x,y,td^.x,td^.y);
       t :=ud;
-      dec(ud,r+td^.r-8);
+      dec(ud,_r+td^.r-8);
 
       if(ud<0)then
       begin
          if(t<=0)then t:=1;
-         ix:=trunc(ud*(td^.x-x)/t)+random(3);
-         iy:=trunc(ud*(td^.y-y)/t)+random(3);
+         ix:=trunc(ud*(td^.x-x)/t)+randomr(2);
+         iy:=trunc(ud*(td^.y-y)/t)+randomr(2);
 
          inc(x,ix);
          inc(y,iy);
@@ -1103,9 +798,9 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
-         if(rld_t=0)then dir:=(360+dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 )) mod 360;
+         if(a_rld<=0)then dir:=(360+dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 )) mod 360;
 
-         t:=dist2(uo_x,uo_y,td^.x,td^.y)-r-td^.r;
+         t:=dist2(uo_x,uo_y,td^.x,td^.y)-_r-td^.r;
          if(t<=0)then
          begin
             uo_x:=x;
@@ -1118,8 +813,8 @@ end;
 procedure _unit_npush(pu:PTUnit);
 var i,dx,dy:integer;
 begin
-   dx:=pu^.x div dcw;if(dx<0)then dx:=0;if(dx>dcn)then dx:=dcn;
-   dy:=pu^.y div dcw;if(dy<0)then dy:=0;if(dy>dcn)then dy:=dcn;
+   dx:=mm3(0,pu^.x div dcw,dcn);
+   dy:=mm3(0,pu^.y div dcw,dcn);
 
    with map_dcell[dx,dy] do
     for i:=1 to n do
@@ -1127,7 +822,7 @@ begin
       if(r>0)and(t>0)then _unit_dpush(pu,l[i-1]);
 end;
 
-procedure _unit_npush2(pu:PTUnit);
+procedure _unit_npush_dcell(pu:PTUnit);
 begin
    with pu^ do
     with player^ do
@@ -1135,7 +830,7 @@ begin
 end;
 
 procedure _unit_move(pu:PTUnit);
-var mdist,spup:integer;
+var mdist,ss:integer;
     tu:PTUnit;
 begin
    with pu^ do
@@ -1153,33 +848,19 @@ begin
        if(tu^.uo_id in [ua_hold,ua_amove,ua_move])then
        begin
           uo_id:=tu^.uo_id;
-          if(uo_id<>ua_amove)then tar1 :=0;
+          if(uo_id<>ua_amove)then a_tar:=0;
        end;
-      if(tu^.tar1=tu^.uo_tar)then
+      if(tu^.a_tar=tu^.uo_tar)then
       begin
-         tar1 :=tu^.uo_tar;
+         a_tar:=tu^.uo_tar;
          uo_id:=ua_move;
       end;
-      {$IFDEF _FULLGAME}
+      {{$IFDEF _FULLGAME}
       if(playeri=HPlayer)then
        if(tu^.sel)then inc(ui_units_inapc[ucl],1);
-      {$ENDIF}
+      {$ENDIF} }
    end
    else
-   begin
-      case uidi of
-      UID_Major,
-      UID_ZMajor:if(_unit_flyup(pu,2+(uf*fly_height)))then
-                 begin
-                   {$IFDEF _FULLGAME}
-                   case uidi of
-                   UID_Major : PlaySND(snd_oof ,pu);
-                   UID_ZMajor: PlaySND(snd_z_p ,pu);
-                   end;
-                   {$ENDIF}
-                end;
-      end;
-
     if(onlySVCode)then
      if(_canmove(pu))then
       if(x=vx)and(y=vy)then
@@ -1194,9 +875,9 @@ begin
            end
            else
            begin
-              spup:=speed;
+              ss:=speed;
 
-              if(uidi=UID_UTransport)and(buff[ub_pain]>0)then dec(spup,2);
+              {if(uidi=UID_UTransport)and(buff[ub_pain]>0)then dec(spup,2);
               with player^ do
               begin
                  if(race=r_uac)and(isbuild=false)then
@@ -1204,9 +885,10 @@ begin
                   true : if(upgr[upgr_mechspd]>0)then inc(spup,upgr[upgr_mechspd]);
                   false: if(upgr[upgr_mspeed ]>0)then inc(spup,upgr[upgr_mspeed ]);
                   end;
-              end;
-              if(buff[ub_slooow]>0)then spup:=spup div 2;
+              end; }
+              if(buff[ub_slooow]>0)then ss:=ss div 2;
 
+              if(ss<2)then ss:=2;
 
               if(mdist>70)
               then mdist:=8+random(25)
@@ -1214,19 +896,19 @@ begin
 
               dir:=dir_turn(dir,p_dir(x,y,mv_x,mv_y),mdist);
 
-              x:=x+round(spup*cos(dir*degtorad));
-              y:=y-round(spup*sin(dir*degtorad));
+              x:=x+trunc(ss*cos(dir*degtorad));
+              y:=y-trunc(ss*sin(dir*degtorad));
            end;
-           _unit_npush2(pu);
+           _unit_npush_dcell(pu);
            _unit_correctcoords(pu);
            {$IFDEF _FULLGAME}
            _unit_mmcoords(pu);
            _unit_sfog(pu);
            {$ENDIF}
         end;
-   end;
 end;
 
+{
 function _lost_pickzimba(tuid:byte):byte;
 begin
    case tuid of
@@ -2170,36 +1852,7 @@ begin
    end;
 end;
 
-function _u1_spawn(pu:PTUnit;sx,sy,pn:integer):boolean;
-var suid:byte;
-begin
-  _u1_spawn:=false;
-   with pu^ do
-    with player^ do
-    begin
-       if(sy=32000)then sy:=r;
-       suid:=cl2uid[race,false,uprod_t[pn] ];
-       _unit_add(x+sx,y+sy+_ulst[suid].r,suid,playeri,true);
-       if(_lcu>0)then
-       begin
-          _u1_spawn:=true;
-          _lcup^.uo_x   :=uo_x;
-          _lcup^.uo_y   :=uo_y;
-          _lcup^.uo_id  :=uo_id;
-          _lcup^.uo_tar :=uo_tar;
-          _unit_turn(_lcup);
 
-          if(uidi=uid_HGate)then
-          begin
-             _lcup^.buff[ub_teleeff]:=vid_fps;
-             {$IFDEF _FULLGAME}
-             PlaySND(snd_teleport,pu);
-             _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+5,EID_Teleport);
-             {$ENDIF}
-          end;
-       end;
-    end;
-end;
 
 procedure _unit_portalspawn(pu:PTUnit;uids:TSoB);
 begin
@@ -2227,46 +1880,7 @@ begin
    end;
 end;
 
-procedure _unit_prod(pu:PTUnit);
-var t,i,_uid:byte;
-begin
-   with pu^ do
-   with player^ do
-   for i:=0 to MaxUnitProds do
-   begin
-     if(isbarrack)then
-      if(uprod_r[i]>0)then
-      begin
-         t:=uprod_t[i];
-         _uid:=cl2uid[race,false,t];
-         if((army+uproda)>MaxPlayerUnits)or(menerg<cenerg)or(ucl_e[false,t]>=_ulst[_uid].max)
-         then _unit_ctraining_p(pu,-1,i)
-         else
-           if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-           begin
-              if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
 
-              if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
-
-              _unit_ctraining_p(pu,-1,i);
-           end;
-      end;
-
-     if(issmith)then
-      if(pprod_r[i]>0)then
-      begin
-         t:=pprod_t[i];
-         if(menerg<cenerg)
-         then _unit_cupgrade_p(pu,-1,i)
-         else
-           if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-           begin
-              inc(upgr[t],1);
-              _unit_cupgrade_p(pu,-1,i);
-           end;
-      end;
-   end;
-end;
 
 procedure _unit_code2(pu:PTUnit);
 begin
@@ -2627,7 +2241,7 @@ begin
            end;
       end;
    end;
-end;
+end;  }
 
 procedure _unit_nfog(pu:PTUnit);
 var i : byte;
@@ -2638,19 +2252,19 @@ begin
       _addtoint(@vsnt[team],vistime);
       _addtoint(@vsni[team],vistime);
       if(onlySVCode)then
-       if(_uclord=_uclord_c)then
+       if(uclord=_uclord_c)then
        begin
           if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
            for i:=0 to MaxPlayers do
            begin
-              _addtoint(@vsnt[i],vid_fps);
-              if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],vid_fps);
+              _addtoint(@vsnt[i],fr_fps);
+              if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],fr_fps);
            end;
        end;
    end;
 end;
 
-procedure _obj_cycle(onlyspr:boolean);
+procedure _obj_cycle;
 var u : integer;
     pu: PTUnit;
 begin
@@ -2660,43 +2274,33 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         if(onlyspr=false)then
+         _unit_nfog(pu);
+
+         if(hits>0)then
          begin
-            _unit_nfog(pu);
-
-            if(hits>0)then
-            begin
-               _unit_counters(pu);
-               _unit_upgr    (pu);
-               _unit_order   (pu);
-               _unit_move    (pu);
-               _unit_movevis (pu);
-               if(_uclord=_uclord_c)then
-                if(onlySVCode)and(inapc=0)
-                then _unit_code1  (pu)
-                else _unit_code1_n(pu);
-               if(hits>0)then _unit_code2(pu);
-            end
-            else _unit_death(pu);
-         end;
-
-         {$IFDEF _FULLGAME}
-         if(_draw)then
-          if(hits>0)
-          then _unit_vis (pu,onlyspr)
-          else _unit_dvis(pu);
-         {$ENDIF}
+            _unit_counters(pu);
+            //_unit_upgr    (pu);
+            //_unit_order   (pu);
+            _unit_move    (pu);
+            _unit_movevis (pu);
+           { if(_uclord=_uclord_c)then
+             if(onlySVCode)and(inapc=0)
+             then _unit_code1  (pu)
+             else _unit_code1_n(pu);
+            if(hits>0)then _unit_code2(pu); }
+         end
+         else ;//_unit_death(pu);
       end;
    end;
 
-   _missileCycle(onlyspr);
-   {$IFDEF _FULLGAME}
+   //_missileCycle(onlyspr);
+   {{$IFDEF _FULLGAME}
    if(_draw)then
    begin
       _dds_p(onlyspr);
       _effectsCycle(true,onlyspr);
    end;
-   {$ENDIF}
+   {$ENDIF}   }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2710,7 +2314,7 @@ begin
    {$IFDEF _FULLGAME}
    plcolor[0]:=c_purple;
    {$ENDIF}
-end;       }   }
+end;       }
 
 
 

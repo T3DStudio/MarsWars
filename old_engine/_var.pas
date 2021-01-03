@@ -426,6 +426,7 @@ spr_dummy         : TMWSprite;
 pspr_dummy        : PTMWSprite;
 
 spr_dmodel,
+
 spr_lostsoul,
 spr_imp ,
 spr_demon,
@@ -463,8 +464,7 @@ spr_APC,
 spr_Terminator,
 spr_Tank,
 spr_Flyer,
-spr_tur,
-spr_rtur,
+spr_trans,
 
 spr_HKeep,
 spr_HGate,
@@ -481,6 +481,7 @@ spr_HFortress,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
+spr_HEye,
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
@@ -495,6 +496,8 @@ spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,
 spr_URocketL,
+spr_Mine,
+//spr_u_portal,
 
 spr_eff_bfg,
 spr_eff_eb,
@@ -515,23 +518,19 @@ spr_u_p0,
 spr_u_p1,
 spr_u_p2,
 spr_u_p3,
-spr_trans,
-spr_sport,
-spr_blood,
-spr_ubase,
-spr_cbuild,
+
+spr_blood         : TMWSModel;
+spr_pdmodel       : PTMWSModel;
+
 spr_mp,
 spr_gear,
 spr_toxin,
-spr_mine,
-spr_HBar,
-spr_HEye,
+
 spr_db_h0,
 spr_db_h1,
 spr_db_u0,
-spr_db_u1,
-spr_u_portal      : TMWSModel;
-spr_pdmodel       : PTMWSModel;
+spr_db_u1         : TMWSprite;
+
 
 spr_c_mars,
 spr_c_hell,

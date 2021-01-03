@@ -120,6 +120,7 @@ TUID = record
 
    _shcf        : single;
 
+   _slowturn,
    _isbuilding,
    _isbuilder,
    _issmith,
@@ -238,16 +239,12 @@ PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
-   mmx,mmy,mmr,
-   fx,fy,fsr,
    vx,vy,
    x,y,
-   anim,animf,
    srng,
    speed,dir,rld,
    hits,
-   unum,
-   shadow   : integer;
+   unum     : integer;
 
    uf,
    uclord,
@@ -265,8 +262,8 @@ TUnit = record
    a_tx,
    a_ty,
    a_rld,
-   a_tar1,
-   a_tar1d,
+   a_tar,
+   a_tard,
    mv_x,mv_y,
    uo_bx,uo_by,
    uo_tar,
@@ -290,6 +287,14 @@ TUnit = record
 
    player   : PTPlayer;
    uid      : PTUID;
+
+   {$IFDEF _FULLGAME}
+   mmx,mmy,mmr,
+   fx,fy,fsr,
+   anim,animf,
+   shadow
+            : integer;
+   {$ENDIF}
 end;
 PTUnit = ^TUnit;
 

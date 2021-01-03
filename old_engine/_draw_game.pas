@@ -54,6 +54,33 @@ begin
       end;
    end;
 end;
+procedure _sl_add_dec2(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro,axo,ayo:integer;_cru:string6);
+begin
+   if(vid_vsls<vid_mvs)and(_menu=false)then
+   begin
+      inc(vid_vsls,1);
+      with vid_vsl[vid_vsls]^ do
+      begin
+         x   := ax-vid_vx-aspr^.hw;
+         y   := ay-vid_vy-aspr^.hh;
+         d   := ad;
+         sh  := ash;
+         s   := aspr^.surf;
+         rc  := 0;
+         msk := 0;
+         inv := ainv;
+         bar := 0;
+         clu := 0;
+         cru := _cru;
+         crl := 0;
+         cll := 0;
+         rct := false;
+         ro  := aro;
+         xo  := axo;
+         yo  := ayo;
+      end;
+   end;
+end;
 //_sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
 procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWSprite;ainv:byte);
 begin
@@ -308,9 +335,11 @@ begin
         if(hits>0)then
         if(k_shift>1)then
         begin
-           circleColor(r_screen,ix,iy,_r,c_gray);
-           circleColor(r_screen,ix,iy,srng,c_gray);
+           circleColor(r_screen,ix,iy,_r  ,c_gray);
+           circleColor(r_screen,ix,iy,srng,c_white);
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
+
+           _draw_text(r_screen,ix,iy,i2s(fsr), ta_left,255, p_color(playeri));
         end;
 
         {if(hits>0)and(inapc=0)then

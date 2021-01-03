@@ -2,7 +2,7 @@
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
-   map_sprites(noanim);
+    map_sprites(noanim);
    unit_sprites(noanim);
 end;
 
@@ -31,7 +31,7 @@ begin
    then d_Menu
    else d_Game;
 
-   _drawMWSModel(@spr_HCC);
+   //_drawMWSModel(@spr_HCC);
 
    if(_testmode>0)then _draw_text(r_screen,vid_sw,0,c2s(fps_tt), ta_right,255, c_white);
 

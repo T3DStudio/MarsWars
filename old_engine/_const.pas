@@ -565,6 +565,8 @@ smt_missile            = 1; // missile with direction
 smt_lost               = 2;
 smt_buiding            = 3;
 smt_turret             = 4;
+smt_turret2            = 5;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
