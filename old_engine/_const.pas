@@ -10,7 +10,7 @@ degtorad               = pi/180;
 //  FRAME RATE
 //
 
-fr_fps                 = 70;
+fr_fps                 = 60;
 fr_hfps                = fr_fps div 2;
 fr_hhfps               = fr_hfps div 2;
 fr_2fps                = fr_fps*2;
@@ -493,7 +493,8 @@ _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
-fly_height             : array[0..2] of integer = (1,30,60);
+fly_z                  = 30;
+fly_height             : array[0..2] of integer = (1,fly_z*uf_soaring,fly_z*uf_fly);
 
 map_flydpth            : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
 

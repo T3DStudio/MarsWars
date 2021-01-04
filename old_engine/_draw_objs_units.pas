@@ -1,4 +1,15 @@
 
+procedure _unit_minimap(pu:PTUnit);
+begin
+  if(vid_rtui=0)and(_menu=false)and(_draw)then
+   with pu^ do
+   with uid^ do
+    if(uid^._isbuilding)
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(player^.pnum))
+    else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
+end;
+
+
 function _udpth(pu:PTUnit):integer;
 begin
    _udpth:=0;
@@ -231,6 +242,8 @@ begin
          if(spr=pspr_dummy)then exit;
 
          sh :=shadow;
+
+
          smy:=vy;
          if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
             ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
@@ -366,7 +379,7 @@ begin
              if(buff[ub_gear ]>0)then
                    _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);  }
 
-            _sl_add(vx-spr^.hw, smy-spr^.hh,dp,sh,rc,mc,rct,spr^.surf,inv,sb,b0,b2,b3,b1,ro);
+            _sl_add(vx,smy,dp,sh,rc,mc,rct,spr,inv,sb,b0,b2,b3,b1,ro);
          end;
       end;
    end;

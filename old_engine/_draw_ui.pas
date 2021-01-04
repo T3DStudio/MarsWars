@@ -41,15 +41,21 @@ begin
    case m_brush of
    0..255:
    begin
+      dec(m_brushx,vid_vx);
+      dec(m_brushy,vid_vy);
+
       spr:=_uid2spr(m_brush,false);
       with _uids[m_brush] do
        if(bld_r>0)and(m_brushc=c_lime)
-       then circleColor(tar,m_vx,m_vy,_r,c_black)
-       else circleColor(tar,m_vx,m_vy,_r,m_brushc);
+       then circleColor(tar,m_brushx,m_brushy,_r,c_black)
+       else circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
 
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
-      _draw_surf(tar,m_vx-spr^.hw,m_vy-spr^.hh,spr^.surf);
+      _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+
+      inc(m_brushx,vid_vx);
+      inc(m_brushy,vid_vy);
 
       {if(m_brush in [4,7,10])then
        circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray); }
@@ -198,7 +204,7 @@ begin
 end;
 
 procedure d_Panel(tar:pSDL_Surface);
-var ui,ux,uy,uid:integer;
+var ui,ux,uy,uid,r:integer;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div fr_fps)+1) end;
 begin
@@ -266,9 +272,11 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn (tar,ux,uy,un_btn,m_brush=uid,_uid_cndt(@_players[HPlayer],uid) or not(uid in ui_prod_builds));
+               r:=_uid_cndt(@_players[HPlayer],uid);
+
+               _drawBtn (tar,ux,uy,un_btn,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
-               b2s(ui_blds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,''     ,
+               b2s(ui_blds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r)     ,
                c_dyellow        ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_white);
             end;
             {case ui of
@@ -314,7 +322,7 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn (tar,ux,uy,un_btn,false,_uid_cndt(@_players[HPlayer],uid) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
+               _drawBtn (tar,ux,uy,un_btn,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(tar,ux,uy,
                b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
                c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple);

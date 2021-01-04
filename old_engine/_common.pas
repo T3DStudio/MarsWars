@@ -178,23 +178,30 @@ begin
    Close(f);
 end;
 
-function _uid_cndt(pl:PTPlayer;uid:byte):boolean;
+function _uid_cndt(pl:PTPlayer;uid:byte):integer;
+
+function setr(ni:integer;b:boolean):boolean;
+begin setr:=false;if(b)and(_uid_cndt=0)then begin _uid_cndt:=ni;setr:=true;end;end;
+
 begin
+   _uid_cndt:=0;
    with pl^ do
    with _uids[uid] do
    begin
-      if(_isbuilding)
-      then _uid_cndt:=(n_builders<=0)or(bld_r>0)
-      else _uid_cndt:=(n_barracks<=0);
 
-      if(_uid_cndt=false)then
-       _uid_cndt:=((army+uproda)>=MaxPlayerUnits)
-                or((_ruid >0)and(uid_eb[_ruid ]=0))
-                or((_rupgr>0)and(upgr  [_rupgr]=0))
-                or((uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]))
-                or(cenerg<_renerg)
-                or(_btime<=0)
-                or((_addon)and(G_addon=false))
+      case _isbuilding of
+      true : if setr(100,(n_builders<=0)
+                       or(bld_r>0)      ) then exit;
+      false: if setr(101,(n_barracks<=0)) then exit;
+      end;
+
+      if setr(1 ,(army+uproda)>=MaxPlayerUnits  ) then exit;
+      if setr(2 ,(_ruid >0)and(uid_eb[_ruid ]=0)) then exit;
+      if setr(3 ,(_rupgr>0)and(upgr  [_rupgr]=0)) then exit;
+      if setr(5 , cenerg<_renerg                ) then exit;
+      if setr(6 , _btime<=0                     ) then exit;
+      if setr(7 ,(_addon)and(G_addon=false)     ) then exit;
+         setr(4 ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
    end;
 end;
 function _upid_cndt(pl:PTPlayer;up:byte):boolean;

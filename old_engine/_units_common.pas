@@ -204,6 +204,67 @@ begin
      end;
 end;   }
 
+procedure _building_newplace(tx,ty:integer;buid:byte;newx,newy:pinteger);
+var nrx,
+    nry,
+    nrd,
+    nrt,
+dx,dy,
+u,d,tr :integer;
+c      :single;
+begin
+   nrd:= 32000;
+   nrx:=-30000;
+   nry:=-30000;
+   nrt:=0;
+   tr :=_uids[buid]._r;
+
+   dx:=(tx div dcw);
+   dy:=(ty div dcw);
+   dec(tr,bld_dec_mr);
+   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
+    with map_dcell[dx,dy] do
+     for u:=1 to n do
+      with l[u-1]^ do
+       if(r>0)and(t>0)then
+       begin
+          d  :=dist(x,y,tx,ty)-(tr+r);
+          if(d<nrd)then
+          begin
+             nrd:=d;
+             nrx:=x;
+             nry:=y;
+             nrt:=tr+r+1;
+          end;
+       end;
+   inc(tr,bld_dec_mr);
+
+   for u:=1 to MaxUnits do
+    with _units[u] do
+     with uid^ do
+     if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc=0)then
+     begin
+        d:=dist(x,y,tx,ty)-(tr+_r);
+        if(d<nrd)then
+        begin
+           nrd:=d;
+           nrx:=x;
+           nry:=y;
+           nrt:=tr+_r+1;
+        end;
+     end;
+
+   if(nrd<-1)then
+   begin
+      c:=p_dir(nrx,nry,tx,ty)*degtorad;
+      tx:=nrx+round(nrt*cos(c));
+      ty:=nry-round(nrt*sin(c));
+   end;
+
+   newx^:=tx;
+   newy^:=ty;
+end;
+
 function _unit_grbcol(tx,ty,tr:integer;pl,buid:byte;doodc:boolean):byte;
 var u,dx,dy:integer;
    bl:boolean;
@@ -252,9 +313,10 @@ begin
 
       dec(tr,bld_dec_mr);
 
-      dx:=(tx div dcw); if(dx<0)then dx:=0;if(dx>dcn)then dx:=dcn;
-      dy:=(ty div dcw); if(dy<0)then dy:=0;if(dy>dcn)then dy:=dcn;
+      dx:=tx div dcw;
+      dy:=ty div dcw;
 
+      if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
       with map_dcell[dx,dy] do
        for u:=1 to n do
         with l[u-1]^ do
@@ -437,7 +499,7 @@ end;
 procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
    if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
-    if(_uid_cndt(@_players[bp],buid)=false)then
+    if(_uid_cndt(@_players[bp],buid)=0)then
      with _players[bp] do
       if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
       begin
@@ -464,7 +526,7 @@ begin
     with pu^ do
     with uid^ do
      if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_isbuilding)then
-      if(puid in ups_units)and(_uid_cndt(player,puid)=false)then
+      if(puid in ups_units)and(_uid_cndt(player,puid)=0)then
        with player^ do
        begin
           inc(uproda,1);
@@ -1178,6 +1240,18 @@ begin
     if(_canmove(pu))then
      if not(uidi in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
 end;
+
+procedure _unit_upgr(pu:PTUnit);
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+
+   end;
+end;
+
+
    {
 procedure _unit_upgr(pu:PTUnit);
 var tt:integer;

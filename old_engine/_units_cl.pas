@@ -156,10 +156,7 @@ end;
 
       end;
 
-      if(_isbuilding)
-      then ui_puids[_urace,0,_ucl]:=i
-      else ui_puids[_urace,1,_ucl]:=i;
-
+      ui_puids[_urace,byte(not _isbuilding),_ucl]:=i;
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;
@@ -183,13 +180,12 @@ begin
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
 
-         {$IFDEF _FULLGAME}
-         mmr   := 1;
-         shadow:= 0;
+         mmr   :=min2(1,round(_r*map_mmcx));
 
+         {$IFDEF _FULLGAME}
          if(_isbuilding)
-         then mmr   :=min2(1,round(_r*map_mmcx))
-         else shadow:=fly_height[uf];
+         then shadow:= fly_height[uf]-fly_z
+         else shadow:= fly_height[uf];
 
          _unit_fsrclc(pu);
          {$ENDIF}

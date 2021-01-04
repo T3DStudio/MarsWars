@@ -2279,7 +2279,7 @@ begin
          if(hits>0)then
          begin
             _unit_counters(pu);
-            //_unit_upgr    (pu);
+            _unit_upgr    (pu);
             //_unit_order   (pu);
             _unit_move    (pu);
             _unit_movevis (pu);

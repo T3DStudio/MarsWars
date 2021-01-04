@@ -77,7 +77,7 @@ begin
         if(_rectvis(x+ox,y+oy,spr^.hw,spr^.hh))then
         begin
            _sl_add_dec(x,y,dpth,shh,spr,255,ro,ox,oy);
-           if(pspr<>nil)then _sl_add_dec(x,y,-10000,0,pspr,255,ro,ox,oy);
+           if(pspr<>nil)then _sl_add_dec(x,y,-10000,-32000,pspr,255,ro,ox,oy);
         end;
      end;
 end;
@@ -90,7 +90,7 @@ begin
      if(t>0)then
      begin
         dpth := y;
-        shh  := 0;
+        shh  := -32000;
         animn:= -1;
         animt:= 0;
         spr  := pspr_dummy;

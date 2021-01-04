@@ -266,6 +266,8 @@ m_vx,
 m_vy              : integer;
 m_ldblclk,
 m_brushc          : cardinal;
+m_brushx,
+m_brushy,
 m_brush           : integer;
 m_bx,
 m_by              : integer;

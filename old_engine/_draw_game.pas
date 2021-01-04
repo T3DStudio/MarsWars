@@ -1,5 +1,5 @@
 
-procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:pSDL_surface;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
+procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:PTMWSprite;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -34,11 +34,11 @@ begin
       inc(vid_vsls,1);
       with vid_vsl[vid_vsls]^ do
       begin
-         x   := ax-vid_vx-aspr^.hw;
-         y   := ay-vid_vy-aspr^.hh;
+         x   := ax-vid_vx;
+         y   := ay-vid_vy;
          d   := ad;
          sh  := ash;
-         s   := aspr^.surf;
+         s   := aspr;
          rc  := 0;
          msk := 0;
          inv := ainv;
@@ -61,11 +61,11 @@ begin
       inc(vid_vsls,1);
       with vid_vsl[vid_vsls]^ do
       begin
-         x   := ax-vid_vx-aspr^.hw;
-         y   := ay-vid_vy-aspr^.hh;
+         x   := ax-vid_vx;
+         y   := ay-vid_vy;
          d   := ad;
          sh  := ash;
-         s   := aspr^.surf;
+         s   := aspr;
          rc  := 0;
          msk := 0;
          inv := ainv;
@@ -89,11 +89,11 @@ begin
       inc(vid_vsls,1);
       with vid_vsl[vid_vsls]^ do
       begin
-         x   := ax-vid_vx-aspr^.hw;
-         y   := ay-vid_vy-aspr^.hh;
+         x   := ax-vid_vx;
+         y   := ay-vid_vy;
          d   := ad;
-         sh  := 0;
-         s   := aspr^.surf;
+         sh  := -32000;
+         s   := aspr;
          rc  := 0;
          msk := amsk;
          inv := ainv;
@@ -112,7 +112,7 @@ end;
 
 procedure _sv_sort;
 var i,u:word;
-    dt:PTVisSpr;
+    dt :PTVisSpr;
 begin
    if(vid_vsls>1)then
     for i:=1 to vid_vsls do
@@ -132,18 +132,21 @@ begin
    while(vid_vsls>0)do
     with vid_vsl[vid_vsls]^ do
     begin
+       dec(x,s^.hw);
+       dec(y,s^.hh);
+
        inc(x,lx+xo);
        inc(y,ly+yo);
 
-       if(sh>0)then
+       if(sh>-s^.hh)then
        begin
-          sx:=(s^.w shr 1);
+          sx:=s^.hw;
           sy:=s^.h-(s^.h shr 3);
-          filledellipseColor(tar,x+sx,y+sy+sh,sx,s^.h shr 2,c_ablack);
+          filledellipseColor(tar,x+sx,y+sy+sh,sx,s^.hh shr 1,c_ablack);
        end;
-       if(inv<255)then SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,inv);
+       if(inv<255)then SDL_SetAlpha(s^.surf,SDL_SRCALPHA or SDL_RLEACCEL,inv);
 
-       if(inv>0)then _draw_surf(tar,x,y,s);
+       if(inv>0)then _draw_surf(tar,x,y,s^.surf);
 
        dec(x,xo);
        dec(y,yo);
@@ -186,7 +189,7 @@ begin
 
        y:=sy;
 
-       if(inv<255)then SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,255);
+       if(inv<255)then SDL_SetAlpha(s^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
        dec(vid_vsls,1);
     end;

@@ -161,7 +161,7 @@ begin
         m_brush:=co_empty;
      end
      else
-       if _uid_cndt(@_players[HPlayer],m_brush)
+       if _uid_cndt(@_players[HPlayer],m_brush)>0
        then m_brush:=co_empty
        else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
             then m_brushc:=c_blue
@@ -172,7 +172,9 @@ begin
                   m_brush:=co_empty;
                   exit;
                end;
-               case _unit_grbcol(m_mx,m_my,_uids[m_brush]._r,HPlayer,m_brush,true) of
+               _building_newplace(m_mx,m_my,m_brush,@m_brushx,@m_brushy);
+
+               case _unit_grbcol(m_brushx,m_brushy,_uids[m_brush]._r,HPlayer,m_brush,true) of
                1 :  m_brushc:=c_red;
                2 :  m_brushc:=c_blue;
                else m_brushc:=c_lime;
@@ -291,6 +293,7 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
         else _player_s_o(0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0, uo_corder  ,HPlayer);
          end;
+
          _chkbld;
       end;
    end
@@ -546,8 +549,8 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)then
             begin
-               _player_s_o(m_mx,m_my,m_brush,0, uo_build  ,HPlayer);
-               _chkbld;
+               _player_s_o(m_brushx,m_brushy,m_brush,0, uo_build  ,HPlayer);
+               //_chkbld;
             end;
 co_paction,
 co_move,

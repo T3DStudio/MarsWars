@@ -41,7 +41,7 @@ TEff = record
 end;
 
 TVisSpr = record
-   s        : PSDL_Surface;
+   s        : PTMWSprite;
    x,y,xo,yo,
    ro,
    d,sh     : integer;

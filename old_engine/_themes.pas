@@ -221,9 +221,9 @@ begin
    setlength(theme_anm_srocks  ,theme_spr_srockn  );
    setlength(theme_anm_brocks  ,theme_spr_brockn  );
 
-   for o:=1 to theme_spr_decorn do begin FillChar(theme_anm_decors[o-1],SizeOf(theme_anm_decors[o-1]),0);theme_anm_decors[o-1].sh:=1;    end;
-   for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);theme_anm_srocks[o-1].depth:=0; end;
-   for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);theme_anm_brocks[o-1].depth:=0; end;
+   for o:=1 to theme_spr_decorn do begin FillChar(theme_anm_decors[o-1],SizeOf(theme_anm_decors[o-1]),0);with theme_anm_decors[o-1] do begin sh:=1;               end;end;
+   for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);with theme_anm_srocks[o-1] do begin depth:=0;sh:=-32000; end;end;
+   for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);with theme_anm_brocks[o-1] do begin depth:=0;sh:=-32000; end;end;
 
    //    DECORS
    //                                          ns         atm ana xo  yo   shadow  depth
@@ -234,7 +234,7 @@ begin
                                                          ,0  ,0  ,0  ,-5  ,1      ,0);
    DecAnim(@theme_anm_decors,@theme_spr_decorn,'1,2,6,13'
                                                          ,0  ,0  ,0  ,-8  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'24_27'   ,0  ,0  ,0  ,-8  ,0      ,0);
+   DecAnim(@theme_anm_decors,@theme_spr_decorn,'24_27'   ,0  ,0  ,0  ,-8  ,-32000,0);
 
    DecAnim(@theme_anm_decors,@theme_spr_decorn,'34,36,29',0  ,0  ,0  ,-10 ,1      ,0);
 
@@ -270,43 +270,43 @@ begin
 
 
    // S ROCKS                                  ns         atm ana xo  yo   shadow  depth
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'3'       ,20 ,22 ,0  ,0   ,0      ,0); // rock with pool 1
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'22'      ,20 ,3  ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'3'       ,20 ,22 ,0  ,0   ,-32000 ,0); // rock with pool 1
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'22'      ,20 ,3  ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'4'       ,20 ,23 ,0  ,0   ,0      ,0); // rock with pool 2
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'23'      ,20 ,4  ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'4'       ,20 ,23 ,0  ,0   ,-32000 ,0); // rock with pool 2
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'23'      ,20 ,4  ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'9'       ,-1 ,24 ,0  ,0   ,0      ,0); // hell rocks 1
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'24'      ,-1 ,9  ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'9'       ,-1 ,24 ,0  ,0   ,-32000 ,0); // hell rocks 1
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'24'      ,-1 ,9  ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'10'      ,-1 ,25 ,0  ,0   ,0      ,0); // hell rocks 2
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'25'      ,-1 ,10 ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'10'      ,-1 ,25 ,0  ,0   ,-32000 ,0); // hell rocks 2
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'25'      ,-1 ,10 ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'11'      ,-1 ,26 ,0  ,0   ,0      ,0); // hell rocks 3
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'26'      ,-1 ,11 ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'11'      ,-1 ,26 ,0  ,0   ,-32000 ,0); // hell rocks 3
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'26'      ,-1 ,11 ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'12'      ,-1 ,0  ,0  ,0   ,0      ,0); // hell rocks 4
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'0'       ,-1 ,12 ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'12'      ,-1 ,0  ,0  ,0   ,-32000 ,0); // hell rocks 4
+   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'0'       ,-1 ,12 ,0  ,0   ,-32000 ,0);
 
 
    // B ROCKS                                  ns         atm ana xo  yo   shadow  depth
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'9'       ,-1 ,19 ,0  ,0   ,0      ,0); // tech slime canister
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'19'      ,-1 , 9 ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'11'      ,-1 ,20 ,0  ,0   ,0      ,0); // tech water canister
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'20'      ,-1 ,11 ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'9'       ,-1 ,19 ,0  ,0   ,-32000 ,0); // tech slime canister
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'19'      ,-1 , 9 ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'11'      ,-1 ,20 ,0  ,0   ,-32000 ,0); // tech water canister
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'20'      ,-1 ,11 ,0  ,0   ,-32000 ,0);
 
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'5'       ,-1 ,15 ,0  ,0   ,0      ,0); // hell rocks 1
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'15'      ,-1 ,5  ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'6'       ,-1 ,16 ,0  ,0   ,0      ,0); // hell rocks 2
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'16'      ,-1 ,6  ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'7'       ,-1 ,17 ,0  ,0   ,0      ,0); // hell rocks 3
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'17'      ,-1 ,7  ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'8'       ,-1 ,18 ,0  ,0   ,0      ,0); // hell rocks 4
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'18'      ,-1 ,8  ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'13'      ,-1 ,21 ,0  ,0   ,0      ,0); // hell rocks 5
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'21'      ,-1 ,13 ,0  ,0   ,0      ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'14'      ,-1 ,0  ,0  ,0   ,0      ,0); // hell rocks 6
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'0'       ,-1 ,14 ,0  ,0   ,0      ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'5'       ,-1 ,15 ,0  ,0   ,-32000 ,0); // hell rocks 1
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'15'      ,-1 ,5  ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'6'       ,-1 ,16 ,0  ,0   ,-32000 ,0); // hell rocks 2
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'16'      ,-1 ,6  ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'7'       ,-1 ,17 ,0  ,0   ,-32000 ,0); // hell rocks 3
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'17'      ,-1 ,7  ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'8'       ,-1 ,18 ,0  ,0   ,-32000 ,0); // hell rocks 4
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'18'      ,-1 ,8  ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'13'      ,-1 ,21 ,0  ,0   ,-32000 ,0); // hell rocks 5
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'21'      ,-1 ,13 ,0  ,0   ,-32000 ,0);
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'14'      ,-1 ,0  ,0  ,0   ,-32000 ,0); // hell rocks 6
+   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'0'       ,-1 ,14 ,0  ,0   ,-32000 ,0);
 
    // liquids
    setlength(theme_anm_liquids ,theme_spr_liquidn );

@@ -92,14 +92,7 @@ begin
    SDL_FLIP(r_screen);
 end;
 
-procedure _unit_minimap(pu:PTUnit);
-begin
-  if(vid_rtui=0)and(_menu=false)and(_draw)then
-   with pu^ do
-    if(uid^._isbuilding)
-    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(player^.pnum))
-    else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
-end;
+
 
 procedure _bmm_draw(sd:TSob);
 var d:integer;
