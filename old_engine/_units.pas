@@ -250,8 +250,6 @@ begin
    with player^ do
     if(hits>dead_hits)then
     begin
-       _unit_counters(pu);
-
        if(uclord=_uclord_c)then
        begin
           for uc:=1 to MaxUnits do
@@ -262,7 +260,7 @@ begin
            end;
        end;
 
-       if(buff[ub_resur]=0)then
+       if(buff[ub_resur]<=0)then
        begin
           if(onlySVCode)or(hits>-100)then dec(hits,1);
           {$IFDEF _FULLGAME}
@@ -813,9 +811,10 @@ end;
 procedure _unit_npush(pu:PTUnit);
 var i,dx,dy:integer;
 begin
-   dx:=mm3(0,pu^.x div dcw,dcn);
-   dy:=mm3(0,pu^.y div dcw,dcn);
+   dx:=pu^.x div dcw;
+   dy:=pu^.y div dcw;
 
+   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
    with map_dcell[dx,dy] do
     for i:=1 to n do
      with l[i-1]^ do
@@ -855,10 +854,10 @@ begin
          a_tar:=tu^.uo_tar;
          uo_id:=ua_move;
       end;
-      {{$IFDEF _FULLGAME}
+      {$IFDEF _FULLGAME}
       if(playeri=HPlayer)then
-       if(tu^.sel)then inc(ui_units_inapc[ucl],1);
-      {$ENDIF} }
+       if(tu^.sel)then inc(ui_units_inapc[uidi],1);
+      {$ENDIF}
    end
    else
     if(onlySVCode)then
@@ -1636,58 +1635,7 @@ begin
    end;
 end;
 
-procedure _unit_code1_n(pu:PTUnit);
-var uc,
-    ud:integer;
-    tu:PTUnit;
-begin
-   with pu^ do
-   begin
-      if(alrm_r<0)
-      then alrm_r:=0
-      else alrm_r:=32000;
 
-      tar1d   := 32000;
-      tar1    := 0;
-      tar1p   := 0;
-
-      if(0<inapc)and(inapc<=MaxUnits)then
-      begin
-         if(_units[inapc].inapc>0)then exit;
-         vsnt:=_units[inapc].vsnt;
-
-         if(OnlySVCode)then
-         case uidi of
-         UID_Engineer: begin
-                          tu:=@_units[inapc];
-                          if(tu^.buff[ub_pain]=0)then
-                           if(tu^.hits<tu^.mhits)then
-                           begin
-                              tar1 :=inapc;
-                              tar1d:=0;
-                              tar1p:=11;
-                           end;
-                       end;
-         end;
-      end;
-
-      for uc:=1 to MaxUnits do
-       if(uc<>unum)then
-       begin
-          tu:=@_units[uc];
-          if(tu^.hits>dead_hits)then
-          begin
-             ud:=dist2(x,y,tu^.x,tu^.y);
-             if(inapc=0)then _udetect(pu,tu,ud);
-             if(tu^.hits>0)and(tu^.inapc=0)then _unit_tardetect(pu,tu,ud);
-          end;
-       end;
-
-      {$IFDEF _FULLGAME}
-      if(playeri=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
-      {$ENDIF}
-   end;
-end;
 
 procedure _unit_cp(pu:PTUnit);
 var i : byte;
@@ -1968,6 +1916,128 @@ begin
          if(uid_x[uidi]=0)then uid_x[uidi]:=unum;
       end;
    end;
+end; }
+
+procedure _unit_mcycle(pu:PTUnit);
+var u: integer;
+   tu: PTUnit;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+
+      if(_isbuilding)and(menerg<=0)then
+      begin
+         _unit_kill(pu,false,false);
+         exit;
+      end;
+
+   end;
+end;
+
+procedure _unit_mcycle_cl(pu:PTUnit);
+var u: integer;
+   tu: PTUnit;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+
+      a_tar :=0;
+      a_tard:=32000;
+
+      for uc:=1 to MaxUnits do
+       if(uc<>unum)then
+       begin
+          tu:=@_units[uc];
+          if(tu^.hits>dead_hits)then
+          begin
+             ud:=dist2(x,y,tu^.x,tu^.y);
+             if(inapc=0)then _udetect(pu,tu,ud);
+             //if(tu^.hits>0)and(tu^.inapc=0)then _unit_tardetect(pu,tu,ud);
+          end;
+       end;
+
+      {$IFDEF _FULLGAME}
+      //if(playeri=HPlayer)and(alrm_r<srng)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
+      {$ENDIF}
+   end;
+end;
+{
+procedure _unit_code1_n(pu:PTUnit);
+var uc,
+    ud:integer;
+    tu:PTUnit;
+begin
+   with pu^ do
+   begin
+      if(alrm_r<0)
+      then alrm_r:=0
+      else alrm_r:=32000;
+
+      tar1d   := 32000;
+      tar1    := 0;
+      tar1p   := 0;
+
+      if(0<inapc)and(inapc<=MaxUnits)then
+      begin
+         if(_units[inapc].inapc>0)then exit;
+         vsnt:=_units[inapc].vsnt;
+
+         if(OnlySVCode)then
+         case uidi of
+         UID_Engineer: begin
+                          tu:=@_units[inapc];
+                          if(tu^.buff[ub_pain]=0)then
+                           if(tu^.hits<tu^.mhits)then
+                           begin
+                              tar1 :=inapc;
+                              tar1d:=0;
+                              tar1p:=11;
+                           end;
+                       end;
+         end;
+      end;
+
+      for uc:=1 to MaxUnits do
+       if(uc<>unum)then
+       begin
+          tu:=@_units[uc];
+          if(tu^.hits>dead_hits)then
+          begin
+             ud:=dist2(x,y,tu^.x,tu^.y);
+             if(inapc=0)then _udetect(pu,tu,ud);
+             if(tu^.hits>0)and(tu^.inapc=0)then _unit_tardetect(pu,tu,ud);
+          end;
+       end;
+
+      {$IFDEF _FULLGAME}
+      if(playeri=HPlayer)and(alrm_r<sr)and(alrm_b=false)then ui_addalrm(mmx,mmy,isbuild);
+      {$ENDIF}
+   end;
+end;
+}
+
+
+function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
+begin
+   _move2uotar:=true;
+   {if(tu^.uidi=UID_HTeleport)then exit;
+   _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.sr);
+   dec(td,uu^.r+tu^.r);
+   if(td<=-melee_r)then _move2uotar:=false;
+   if(tu^.playeri=uu^.playeri)then
+    if(_itcanapc(tu,uu))then
+    begin
+       _move2uotar:=true;
+       if(tu^.uf>uf_ground)and(tu^.uo_tar=0)then
+       begin
+          tu^.uo_x:=uu^.x;
+          tu^.uo_y:=uu^.y;
+       end;
+    end;}
 end;
 
 procedure _unit_uo_tar(pu:PTUnit);
@@ -1976,6 +2046,7 @@ td,tdm: integer;
 teams : boolean;
 begin
    with pu^ do
+   with uid^ do
    begin
       if(uo_tar=unum)then uo_tar:=0;
       if(uo_tar>0)and(inapc=0)then
@@ -1988,11 +2059,11 @@ begin
          end;
 
          td :=dist2(x,y,tu^.x,tu^.y);
-         tdm:=td-(r+tu^.r);
+         tdm:=td-(_r+tu^.uid^._r);
 
          if(playeri=tu^.playeri)then
          begin
-            /// HELL ADV
+            {/// HELL ADV
             if(uidi=UID_HMonastery)and(tu^.isbuild=false)then
             begin
                with player^ do
@@ -2086,7 +2157,7 @@ begin
                uo_y  :=y;
                uo_tar:=0;
                exit;
-            end;
+            end; }
          end;
 
          teams:=(player^.team=tu^.player^.team);
@@ -2099,7 +2170,7 @@ begin
           end
           else
           begin
-             tar1 :=uo_tar;
+             a_tar:=uo_tar;
              uo_id:=ua_amove;
           end;
 
@@ -2109,7 +2180,7 @@ begin
             uo_y:=tu^.vy;
          end;
 
-         if(teams)then
+         {if(teams)then
           if(tu^.uidi=UID_HTeleport)and(tu^.bld)and(isbuild=false)then
            if(td<=tu^.r)then
            begin
@@ -2138,7 +2209,7 @@ begin
               begin
                  uo_x:=x;
                  uo_y:=y;
-              end;
+              end; }
       end;
    end;
 end;
@@ -2148,34 +2219,32 @@ var tu:PTUnit;
     td:integer;
     i :byte;
 begin
+   if(onlySVCode)then
    with pu^ do
    begin
-      if(onlySVCode)then
-      begin
-         _unit_uo_tar(pu);
-         mv_x:=uo_x;
-         mv_y:=uo_y;
+      //_unit_uo_tar(pu);
+      mv_x:=uo_x;
+      mv_y:=uo_y;
 
-         if(x=uo_x)and(y=uo_y)then
-          if(uo_bx>=0)then
-          begin
-             uo_x :=uo_bx;
-             uo_bx:=x;
-             uo_y :=uo_by;
-             uo_by:=y;
-             _unit_turn(pu);
-          end
-          else
-            if(uo_id=ua_move)then uo_id:=ua_amove;
+      if(x=uo_x)and(y=uo_y)then
+       if(uo_bx>=0)then
+       begin
+          uo_x :=uo_bx;
+          uo_bx:=x;
+          uo_y :=uo_by;
+          uo_by:=y;
+          _unit_turn(pu);
+       end
+       else
+         if(uo_id=ua_move)then uo_id:=ua_amove;
 
-         if(buff[ub_stopafa]>0)then
-         begin
-            mv_x:=x;
-            mv_y:=y;
-         end;
-      end;
+       if(buff[ub_stopafa]>0)then
+       begin
+          mv_x:=x;
+          mv_y:=y;
+       end;
 
-      tar1d:=32000;
+      {tar1d:=32000;
       if(0<tar1)and(tar1<=MaxUnits)then
       begin
          tu:=@_units[tar1];
@@ -2238,10 +2307,43 @@ begin
                   end;
                  if(x<>tu^.x)or(y<>tu^.y)then dir:=p_dir(x,y,tu^.x,tu^.y);
               end;
-           end;
-      end;
+           end;  }
    end;
-end;  }
+end;
+
+
+procedure _unit_prod(pu:PTUnit);
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(bld)then
+      begin
+         if(rld>0)then dec(rld,1);
+
+         _unit_end_uprod(pu);
+         _unit_end_pprod(pu);
+      end
+      else
+        if(cenerg<0)
+        then _unit_kill(pu,false,false)
+        else
+          if(buff[ub_pain]<=0)then
+          begin
+             if(_uclord_c=uclord)then inc(hits,_bstep);
+
+              //if(upgr[upgr_advbld]>0)then inc(hits,_bstep);
+             if(hits>=_mhits){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+             begin
+                hits:=_mhits;
+                bld :=true;
+                _unit_bld_inc_cntrs(pu);
+                 inc(cenerg,_renerg);
+             end;
+          end;
+   end;
+end;
 
 procedure _unit_nfog(pu:PTUnit);
 var i : byte;
@@ -2280,16 +2382,21 @@ begin
          begin
             _unit_counters(pu);
             _unit_upgr    (pu);
-            //_unit_order   (pu);
+            _unit_order   (pu);
+            if(onlySVCode)then _unit_prod(pu);
             _unit_move    (pu);
             _unit_movevis (pu);
-           { if(_uclord=_uclord_c)then
+
+            if(uclord=_uclord_c)then
              if(onlySVCode)and(inapc=0)
-             then _unit_code1  (pu)
-             else _unit_code1_n(pu);
-            if(hits>0)then _unit_code2(pu); }
+             then _unit_mcycle   (pu)
+             else _unit_mcycle_cl(pu);
          end
-         else ;//_unit_death(pu);
+         else
+         begin
+            _unit_counters(pu);
+            _unit_death(pu);
+         end;
       end;
    end;
 

@@ -558,15 +558,34 @@ revenant_ra            : array[false..true] of integer = (45,20);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  SPRITE MODELS KINDS
+//  SPRITE MODEL KINDS
 //
 
-smt_effect             = 0; // simple missile or effect
-smt_missile            = 1; // missile with direction
-smt_lost               = 2;
-smt_buiding            = 3;
-smt_turret             = 4;
-smt_turret2            = 5;
+smt_effect             = 0;  // simple missile or effect
+smt_missile            = 1;  // missile with direction
+smt_buiding            = 2;
+smt_turret             = 3;
+smt_turret2            = 4;
+smt_lost               = 5;  //UID_Lost
+smt_imp                = 6;  //UID_Imp,UID_Demon,UID_ZFormer,UID_ZSergant,UID_ZBomber,UID_ZBFG,UID_Baron,UID_Cyberdemon:
+smt_zengineer          = 7;  //UID_ZEngineer
+smt_zcommando          = 8;  //UID_ZCommando
+smt_fmajor             = 9;  //UID_Majot,UID_ZMajor
+smt_caco               = 10; //UID_Cacodemon
+smt_mmind              = 11; //UID_Mastermind
+smt_pain               = 12; //UID_Pain
+smt_revenant           = 13; //UID_Revenant
+smt_mancubus           = 14; //UID_Mancubus
+smt_archno             = 15; //UID_Arachnotron
+smt_arch               = 16; //UID_ArachVile
+smt_apc                = 17; //UID_APC
+smt_fapc               = 18; //UID_FAPC
+smt_marine0            = 19; //UID_Engineer,UID_Sergant,UID_Bomber,UID_BFG
+smt_medic              = 20; //UID_Medic
+smt_commando           = 21; //UID_Commando
+smt_tank               = 22; //UID_Tank
+smt_terminat           = 23; //UID_Terminator
+smt_transport          = 24; //UID_Transport
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -577,9 +596,10 @@ smt_turret2            = 5;
 sms_walk               = 0; // & stand
 sms_pain               = 1;
 sms_cast               = 2;
-sms_attack             = 3;
-sms_death              = 4;
-sms_build              = 5;
+sms_dattack            = 3;
+sms_mattack            = 4;
+sms_death              = 5;
+sms_build              = 6;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -626,7 +646,7 @@ vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
 vid_uialrm_t           = fr_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
-vid_uialrm_n           = 10;
+
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
 vid_BW                 = 44;
 vid_2BW                = vid_BW*2;
@@ -643,6 +663,8 @@ vid_oips               = 2*vid_oiw+vid_oisw;
 vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
+
+ui_max_alarms          = 10;
 
 ui_bottomsy            = vid_BW*4;
 ui_h3bw                = vid_BW-vid_tBW;
@@ -815,6 +837,11 @@ str_f_svld             : shortstring = 'save\';
 str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
+
+race_dir               : array[1..r_cnt] of string = ('hell\'          ,'uac\'          );
+race_units             : array[1..r_cnt] of string = ('hell\units\'    ,'uac\units\'    );
+race_buildings         : array[1..r_cnt] of string = ('hell\buildings\','uac\buildings\');
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -10,7 +10,7 @@ end;
 
 procedure _unit_createsound(uid:integer);
 begin
-   case uid of
+{   case uid of
 UID_LostSoul   : PlaySND(snd_d0         ,nil);
 UID_Imp        : if(random(2)=0)
                  then PlaySND(snd_impc1 ,nil)
@@ -56,7 +56,7 @@ UID_ZBFG
               1 : PlaySND(snd_z_s2,nil);
               2 : PlaySND(snd_z_s3,nil);
               end;
-   end;
+   end;    }
 end;
 
 {procedure _unit_comssnd(ucl,race:integer);
@@ -83,7 +83,7 @@ end; }
 
 
 
-procedure _unit_PowerUpEff(pu:PTUnit;snd:pMIX_Chunk);
+procedure _unit_PowerUpEff(pu:PTUnit;snd:PTSoundSet);
 begin
    with pu^ do
    begin
@@ -98,7 +98,7 @@ procedure _unit_painsnd(pu:PTUnit);
 begin
    with pu^ do
    begin
-      case uidi of
+      {case uidi of
        UID_LostSoul,
        UID_Demon,
        UID_Cacodemon,
@@ -118,7 +118,7 @@ begin
        UID_ZMajor,
        UID_ZBFG        : PlaySND(snd_z_p   ,pu);
        UID_Mancubus    : PlaySND(snd_man_p ,pu);
-       end;
+       end;  }
    end;
 end;
 
@@ -190,6 +190,15 @@ begin
         dec(vstp,1);
      end;
 end;
+
+
+procedure _unit_turn(pu:PTUnit);
+begin
+   with pu^ do
+    if(_canmove(pu))then
+     if(uid^._slowturn=false)then dir:=p_dir(x,y,uo_x,uo_y);
+end;
+
  {
 procedure _unit_uradar(pu:PTUnit);
 begin
@@ -210,8 +219,8 @@ var nrx,
     nrd,
     nrt,
 dx,dy,
-u,d,tr :integer;
-c      :single;
+u,d,tr : integer;
+c      : single;
 begin
    nrd:= 32000;
    nrx:=-30000;
@@ -219,8 +228,8 @@ begin
    nrt:=0;
    tr :=_uids[buid]._r;
 
-   dx:=(tx div dcw);
-   dy:=(ty div dcw);
+   dx:=tx div dcw;
+   dy:=ty div dcw;
    dec(tr,bld_dec_mr);
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
     with map_dcell[dx,dy] do
@@ -239,10 +248,23 @@ begin
        end;
    inc(tr,bld_dec_mr);
 
+   for u:=1 to MaxCPoints do
+    with g_cpt_pl[u] do
+    begin
+       d:=dist(px,py,tx,ty)-(tr+base_r);
+       if(d<nrd)then
+       begin
+          nrd:=d;
+          nrx:=px;
+          nry:=py;
+          nrt:=tr+base_r+1;
+       end;
+    end;
+
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-     if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc=0)then
+     if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc<=0)then
      begin
         d:=dist(x,y,tx,ty)-(tr+_r);
         if(d<nrd)then
@@ -256,7 +278,7 @@ begin
 
    if(nrd<-1)then
    begin
-      c:=p_dir(nrx,nry,tx,ty)*degtorad;
+      c :=p_dir(nrx,nry,tx,ty)*degtorad;
       tx:=nrx+round(nrt*cos(c));
       ty:=nry-round(nrt*sin(c));
    end;
@@ -288,7 +310,7 @@ begin
         if(_isbuilding)and(bld)and(_isbuilder)and(playeri=pl)then
         begin
            if(buid>0)then
-            if not (buid in uid^.ups_builder)then continue;
+            if not(buid in uid^.ups_builder)then continue;
            if(dist(x,y,tx,ty)<srng)then bl:=true;
         end;
 
@@ -408,6 +430,22 @@ begin
    end;
 end;
 
+procedure _unit_bld_inc_cntrs(pu:PTUnit);
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(uid_x[uidi            ]=0)then uid_x[uidi            ]:=unum;
+      if(ucl_x[_isbuilding,_ucl]=0)then ucl_x[_isbuilding,_ucl]:=unum;
+      inc(ucl_eb[_isbuilding,_ucl],1);
+      inc(uid_eb[uidi            ],1);
+      inc(menerg,_generg);
+      inc(cenerg,_generg);
+      _unit_done_inc_cntrs(pu);
+   end;
+end;
+
 procedure _unit_inc_cntrs(pu:PTUnit;ubld:boolean);
 begin
    with pu^ do
@@ -424,18 +462,13 @@ begin
       begin
          buff[ub_born]:=fr_fps;
          bld := true;
-         if(uid_x[uidi            ]=0)then uid_x[uidi            ]:=_lcu;
-         if(ucl_x[_isbuilding,_ucl]=0)then ucl_x[_isbuilding,_ucl]:=_lcu;
-         inc(ucl_eb[_isbuilding,_ucl],1);
-         inc(uid_eb[uidi            ],1);
-         inc(menerg,_generg);
-         inc(cenerg,_generg);
-         _unit_done_inc_cntrs(pu);
+         _unit_bld_inc_cntrs(pu);
       end
       else
       begin
          bld := false;
          hits:= 1;
+         dec(cenerg,_renerg);
       end;
    end;
 end;
@@ -445,8 +478,8 @@ var m,i:integer;
 begin
    with _players[pl] do
    begin
-      _lcu :=0;
-      _lcup:=@_units[_lcu];
+      _LastCreatedUnit :=0;
+      _LastCreatedUnitP:=@_units[_LastCreatedUnit];
       if(ui=0)then exit;
       i:=MaxPlayerUnits*pl+1;
       m:=i+MaxPlayerUnits;
@@ -455,19 +488,19 @@ begin
          with _units[i] do
           if(hits<=dead_hits)then
           begin
-             _lcu :=i;
-             _lcup:=@_units[i];
+             _LastCreatedUnit :=i;
+             _LastCreatedUnitP:=@_units[i];
              break;
           end;
          inc(i,1);
       end;
 
-      FillChar(_lcup^,SizeOf(TUnit),0);
-      if(_lcu>0)then
-       with _lcup^ do
+      FillChar(_LastCreatedUnitP^,SizeOf(TUnit),0);
+      if(_LastCreatedUnit>0)then
+       with _LastCreatedUnitP^ do
        begin
-          uclord  := _lcu mod _uclord_p;
-          unum    := _lcu;
+          uclord  := _LastCreatedUnit mod _uclord_p;
+          unum    := _LastCreatedUnit;
 
           x       := ux;
           y       := uy;
@@ -489,9 +522,9 @@ begin
           FillChar(vsnt,SizeOf(vsnt),0);
           FillChar(vsni,SizeOf(vsni),0);
 
-          _unit_def      (_lcup);
-          _unit_apUID    (_lcup);
-          _unit_inc_cntrs(_lcup,ubld);
+          _unit_def      (_LastCreatedUnitP);
+          _unit_apUID    (_LastCreatedUnitP);
+          _unit_inc_cntrs(_LastCreatedUnitP,ubld);
        end;
    end;
 end;
@@ -504,14 +537,13 @@ begin
       if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
       begin
          _unit_add(bx,by,buid,bp,false);
-         if(_lcu>0)then
+         if(_LastCreatedUnit>0)then
          begin
             {$IFDEF _FULLGAME}
-            if(bp=HPlayer)then PlaySND(snd_build[race],nil);
+            if(bp=HPlayer)then PlaySND(snd_build_place[race],nil);
             if(_warpten=false)then
             {$ENDIF}
             bld_r:=fr_fps;
-            dec(cenerg,_uids[buid]._renerg);
          end;
       end;
 end;
@@ -520,13 +552,16 @@ end;
 //////   Start unit prod
 //
 function _unit_straining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
+var t:integer;
 begin
+   t:=_uid_cndt(pu^.player,puid);
+   writeln(_uids[puid].un_name,' ',t);
    _unit_straining_p:=false;
    if(puid<255)then
     with pu^ do
     with uid^ do
      if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_isbuilding)then
-      if(puid in ups_units)and(_uid_cndt(player,puid)=0)then
+      if(puid in ups_units)and(t=0)then
        with player^ do
        begin
           inc(uproda,1);
@@ -534,7 +569,7 @@ begin
           inc(uprodu[ puid],1);
           dec(cenerg,_uids[puid]._renerg);
           uprod_u[pn]:=puid;
-          uprod_r[pn]:=_tprod;
+          uprod_r[pn]:=_uids[puid]._tprod;
 
           _unit_straining_p:=true;
        end;
@@ -596,7 +631,7 @@ begin
     with pu^ do
     with uid^ do
      if(pprod_r[pn]=0)and(bld)and(_issmith)and(_isbuilding)then
-      if(_upid_cndt(player,upid)=false)then
+      if(_upid_cndt(player,upid)=0)then
        with player^ do
        with _upids[upid] do
        begin
@@ -785,21 +820,21 @@ begin
       if(sy=32000)then sy:=_r;
       _uid:=uprod_u[pn];
       _unit_add(x+sx,y+sy+_uids[_uid]._r,_uid,playeri,true);
-      if(_lcu>0)then
+      if(_LastCreatedUnit>0)then
       begin
          _u1_spawn:=true;
-         _lcup^.uo_x   :=uo_x;
-         _lcup^.uo_y   :=uo_y;
-         _lcup^.uo_id  :=uo_id;
-         _lcup^.uo_tar :=uo_tar;
-         //_unit_turn(_lcup);
+         _LastCreatedUnitP^.uo_x   :=uo_x;
+         _LastCreatedUnitP^.uo_y   :=uo_y;
+         _LastCreatedUnitP^.uo_id  :=uo_id;
+         _LastCreatedUnitP^.uo_tar :=uo_tar;
+         _unit_turn(_LastCreatedUnitP);
 
          {if(uidi=uid_HGate)then
          begin
-            _lcup^.buff[ub_teleeff]:=vid_fps;
+            _LastCreatedUnitP^.buff[ub_teleeff]:=vid_fps;
             {$IFDEF _FULLGAME}
             PlaySND(snd_teleport,pu);
-            _effect_add(_lcup^.x,_lcup^.y,_lcup^.y+map_flydpth[_lcup^.uf]+5,EID_Teleport);
+            _effect_add(_LastCreatedUnitP^.x,_LastCreatedUnitP^.y,_LastCreatedUnitP^.y+map_flydpth[_LastCreatedUnitP^.uf]+5,EID_Teleport);
             {$ENDIF}
          end;  }
       end;
@@ -860,6 +895,8 @@ begin
        else dec(pprod_r[i],1);
   end;
 end;
+
+
 
 {
 
@@ -1024,24 +1061,7 @@ begin
     if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;
 
-function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
-begin
-   _move2uotar:=true;
-   if(tu^.uidi=UID_HTeleport)then exit;
-   _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.sr);
-   dec(td,uu^.r+tu^.r);
-   if(td<=-melee_r)then _move2uotar:=false;
-   if(tu^.playeri=uu^.playeri)then
-    if(_itcanapc(tu,uu))then
-    begin
-       _move2uotar:=true;
-       if(tu^.uf>uf_ground)and(tu^.uo_tar=0)then
-       begin
-          tu^.uo_x:=uu^.x;
-          tu^.uo_y:=uu^.y;
-       end;
-    end;
-end;
+
 
 procedure _teleport_rld(tu:PTUnit;ur:integer);
 begin
@@ -1103,14 +1123,7 @@ begin
          if(0<vsni[i])and(vsni[i]<_bufinf)then dec(vsni[i],1);
       end;
 
-      if(onlySVCode)and(bld)then
-      begin
-         if(  rld>0)then dec(  rld,1);
-         if(a_rld>0)then dec(a_rld,1);
-
-         _unit_end_uprod(pu);
-         _unit_end_pprod(pu);
-      end;
+      if(a_rld>0)then dec(a_rld,1);
    end;
 end;
 
@@ -1200,46 +1213,6 @@ begin
    end;
 end;   }
 
-function _canmove(pu:PTUnit):boolean;
-begin
-   with pu^ do
-   begin
-      _canmove:=false;
-
-      if(onlySVCode=false)and(speed>0)then
-      begin
-         _canmove:=(x<>uo_x)or(y<>uo_y);
-         exit;
-      end;
-
-      if(speed=0)or(buff[ub_stopafa]>0)then exit;
-
-      case uidi of
-        UID_Flyer,
-        UID_Terminator,
-        UID_Tank,
-        UID_UTransport,
-        UID_APC,
-        UID_FAPC : if(buff[ub_gear ]>0)
-                   or(buff[ub_toxin]>0) then exit;
-        UID_UCommandCenter,
-        UID_HCommandCenter: if(buff[ub_clcast]>0)then exit;
-      else
-        if(buff[ub_pain ]>0)
-        or(buff[ub_toxin]>0)
-        or(buff[ub_gear ]>0)then exit;
-      end;
-
-      _canmove:=true;
-   end;
-end;
-
-procedure _unit_turn(pu:PTUnit);
-begin
-   with pu^ do
-    if(_canmove(pu))then
-     if not(uidi in slowturn)then dir:=p_dir(x,y,uo_x,uo_y);
-end;
 
 procedure _unit_upgr(pu:PTUnit);
 begin

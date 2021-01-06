@@ -138,7 +138,7 @@ begin
        inc(x,lx+xo);
        inc(y,ly+yo);
 
-       if(sh>-s^.hh)then
+       if(sh>-fly_z)then
        begin
           sx:=s^.hw;
           sy:=s^.h-(s^.h shr 3);

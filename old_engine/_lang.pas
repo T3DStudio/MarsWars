@@ -82,9 +82,9 @@ end;
 
 procedure _makeHints;
 var
-ucl,uid       :byte;
+uid         :byte;
 ENRG,HK,PROD,
-TIME,REQ:shortstring;
+TIME,REQ    :shortstring;
 begin
    for uid:=0 to 255 do
    with _uids[uid] do
@@ -109,7 +109,10 @@ begin
       if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
       un_hint:=un_hint+#11+un_descr+#11;
       if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
-      if(PROD<>'')then un_hint:= un_hint+PROD;
+      if(PROD<>'')then
+       if(_isbuilding)
+       then un_hint:= un_hint+str_bprod+PROD
+       else un_hint:= un_hint+str_uprod+PROD;
    end;
 
    for uid:=0 to 255 do
@@ -215,17 +218,20 @@ begin
    str_req               := 'Requirements: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
-   str_uprod             := 'Produced by: ';
-   str_bprod             := 'Constructed by: ';
+   str_uprod             := #18+'Produced by: '+#25;
+   str_bprod             := #18+'Constructed by: '+#25;
+
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := #18+'left' +#25;
    str_panelposp[1]      := #16+'right'+#25;
    str_panelposp[2]      := #17+'up'   +#25;
    str_panelposp[3]      := #19+'down' +#25;
+
    str_uhbar             := 'Health bars';
    str_uhbars[0]         := #18+'selected'+#25+'+'+#15+'damaged'+#25;
    str_uhbars[1]         := #19+'always'+#25;
    str_uhbars[2]         := #16+'only '+#18+'selected'+#25;
+
    str_pcolor            := 'Players colors';
    str_pcolors[0]        := #22+'default'+#25;
    str_pcolors[1]        := #18+'own '+#17+'ally '+#15+'enemy'+#25;

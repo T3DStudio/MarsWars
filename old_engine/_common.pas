@@ -74,7 +74,7 @@ begin cf:=(c^ and f^)>0;end;
 function sign(x:integer):shortint;
 begin
    sign:=0;
-   if(x>0)then sign:=1;
+   if(x>0)then sign:= 1;
    if(x<0)then sign:=-1;
 end;
 
@@ -139,11 +139,6 @@ begin
    else dir_turn:=(360+d1+(spd*sign(d))) mod 360;
 end;
 
-function randomr(r:integer):integer;
-begin
-   randomr:=random(r)-random(r);
-end;
-
 procedure _addtoint(bt:pinteger;val:integer);
 begin
    if(bt^<val)then bt^:=val;
@@ -168,6 +163,12 @@ begin
    if(newn)then inc(map_seed2,67);
 end;
 
+function randomr(r:integer):integer;
+begin
+   randomr:=_gen(r)-_gen(r);
+end;
+
+
 procedure WriteError;
 var f:Text;
 begin
@@ -179,45 +180,47 @@ begin
 end;
 
 function _uid_cndt(pl:PTPlayer;uid:byte):integer;
-
 function setr(ni:integer;b:boolean):boolean;
 begin setr:=false;if(b)and(_uid_cndt=0)then begin _uid_cndt:=ni;setr:=true;end;end;
-
 begin
    _uid_cndt:=0;
    with pl^ do
    with _uids[uid] do
    begin
-
       case _isbuilding of
-      true : if setr(100,(n_builders<=0)
-                       or(bld_r>0)      ) then exit;
-      false: if setr(101,(n_barracks<=0)) then exit;
+      true : begin
+             if setr(8 ,n_builders<=0) then exit;
+             if setr(9 ,bld_r      >0) then exit;
+             end;
+      false: if setr(10,n_barracks<=0) then exit;
       end;
 
       if setr(1 ,(army+uproda)>=MaxPlayerUnits  ) then exit;
       if setr(2 ,(_ruid >0)and(uid_eb[_ruid ]=0)) then exit;
       if setr(3 ,(_rupgr>0)and(upgr  [_rupgr]=0)) then exit;
-      if setr(5 , cenerg<_renerg                ) then exit;
-      if setr(6 , _btime<=0                     ) then exit;
-      if setr(7 ,(_addon)and(G_addon=false)     ) then exit;
-         setr(4 ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
+      if setr(4 , cenerg<_renerg                ) then exit;
+      if setr(5 , _btime<=0                     ) then exit;
+      if setr(6 ,(_addon)and(G_addon=false)     ) then exit;
+         setr(7 ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
    end;
 end;
-function _upid_cndt(pl:PTPlayer;up:byte):boolean;
+function _upid_cndt(pl:PTPlayer;up:byte):integer;
+function setr(ni:integer;b:boolean):boolean;
+begin setr:=false;if(b)and(_upid_cndt=0)then begin _upid_cndt:=ni;setr:=true;end;end;
 begin
+   _upid_cndt:=0;
    with pl^ do
    with _upids[up] do
    begin
-      _upid_cndt:=
-                ((_up_ruid >0)and(uid_eb[_up_ruid ]=0))
-              or((_up_rupgr>0)and(upgr  [_up_rupgr]=0))
-              or(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up]))
-              or((_up_mfrg=false)and(pprodu[up]>0))
-              or(n_smiths<=0)
-              or(cenerg<_up_renerg)
-              or(_up_time<=0)
-              or((_up_addon)and(G_addon=false));
+      if setr(11, n_smiths<=0                           ) then exit;
+
+      if setr(2 ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  ) then exit;
+      if setr(3 ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  ) then exit;
+      if setr(4 , cenerg<_up_renerg                     ) then exit;
+      if setr(5 , _up_time<=0                           ) then exit;
+      if setr(6 ,(_up_addon)and(G_addon=false)          ) then exit;
+      if setr(8 ,(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up]))) then exit;
+         setr(12,(_up_mfrg=false)and(pprodu[up]>0)      );
    end;
 end;
 
@@ -243,22 +246,21 @@ begin
    if(h =0         )then _hI2S:=0    else
    if(h =dead_hits )then _hI2S:=-127 else
    if(h<=ndead_hits)then _hI2S:=-128 else
-   if(dead_hits<h)and(h<0)then
-   begin
-      if(abs(h)<_d2shi)
-      then _hI2S:=-1
-      else _hI2S:=h div _d2shi;
-   end
-   else
-   begin
-      s:=(h/s);
-      if(s<1)
-      then h:=1
-      else h:=trunc(s);
-      if(h>_mms)
-      then _hI2S:=_mms
-      else _hI2S:=h;
-   end;
+   if (dead_hits<h)and(h<0)
+                    then _hI2S:=mm3(-126,h div _d2shi,-1)
+   else                  _hI2S:=mm3(1,trunc(s),_mms);
+
+   {if(abs(h)<_d2shi)
+   then _hI2S:=-1
+   else _hI2S:=h div _d2shi;   }
+
+   { s:=(h/s);
+    if(s<1)
+    then h:=1
+    else h:=trunc(s);
+    if(h>_mms)
+    then _hI2S:=_mms
+    else _hI2S:=h;   }
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -269,31 +271,31 @@ begin
 end;
 
 
-function _PickPTeam(gm,p:byte):byte;
+function PickPlayerTeam(gm,p:byte):byte;
 begin
    if(p=0)
-   then _PickPTeam:=0
+   then PickPlayerTeam:=0
    else
      case gm of
      gm_2fort: case p of
-               1..3: _PickPTeam:=1;
-               4..6: _PickPTeam:=4;
+               1..3: PickPlayerTeam:=1;
+               4..6: PickPlayerTeam:=4;
                end;
      gm_3fort: case p of
-               1,2 : _PickPTeam:=2;
-               3,4 : _PickPTeam:=4;
-               5,6 : _PickPTeam:=6;
+               1,2 : PickPlayerTeam:=2;
+               3,4 : PickPlayerTeam:=4;
+               5,6 : PickPlayerTeam:=6;
                end;
      gm_coop,
-     gm_inv  : _PickPTeam:=1;
-     else      _PickPTeam:=_players[p].team;
+     gm_inv  : PickPlayerTeam:=1;
+     else      PickPlayerTeam:=_players[p].team;
      end;
 end;
 
 procedure GModeTeams(gm:byte);
 var i:byte;
 begin
-   for i:=0 to MaxPlayers do _players[i].team:=_PickPTeam(gm,i);
+   for i:=0 to MaxPlayers do _players[i].team:=PickPlayerTeam(gm,i);
 end;
 
 function _plst(p:integer):char;
@@ -348,7 +350,8 @@ begin
    cx:=x div fog_cw;
    cy:=y div fog_cw;
    _fog_pgrid:=false;
-   if(0<=cx)and(cx<=fog_vfwm)and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
+   if(0<=cx)and(cx<=fog_vfwm)
+  and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
 end;
 
 function _rectvis(x,y,hw,hh:integer):boolean;
@@ -401,13 +404,13 @@ begin
         then p_color:=c_lime
         else p_color:=c_white
       else
-        if(_PickPTeam(g_mode,HPlayer)=_PickPTeam(g_mode,player))
+        if(PickPlayerTeam(g_mode,HPlayer)=PickPlayerTeam(g_mode,player))
         then p_color:=c_yellow
         else p_color:=c_red;
-   3: p_color:=PlayerColor[_PickPTeam(g_mode,player)];
+   3: p_color:=PlayerColor[PickPlayerTeam(g_mode,player)];
    4: if(player=HPlayer)
       then p_color:=c_white
-      else p_color:=PlayerColor[_PickPTeam(g_mode,player)];
+      else p_color:=PlayerColor[PickPlayerTeam(g_mode,player)];
     else
     end;
 end;
@@ -438,17 +441,9 @@ function _S2hi(sh:shortint;mh:integer;s:single):integer;
 begin
    case sh of
 127     : _S2hi:=mh;
-1..126  : begin
-             _S2hi:=trunc(sh*s);
-             if(_S2hi>=mh)then _S2hi:=mh-1;
-             if(_S2hi<=0 )then _S2hi:=1;
-          end;
+1..126  : _S2hi:=mm3(1,trunc(sh*s),mh-1);
 0       : _S2hi:=0;
--126..-1: begin
-             _S2hi:=sh*_d2shi;
-             if(_S2hi>-1)then _S2hi:=-1;
-             if(_S2hi<=dead_hits)then _S2hi:=dead_hits+1;
-          end;
+-126..-1: _S2hi:=mm3(dead_hits+1,sh*_d2shi,-1);
 -127    : _S2hi:=dead_hits;
 -128    : _S2hi:=ndead_hits;
    end;

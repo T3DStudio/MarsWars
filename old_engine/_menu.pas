@@ -166,7 +166,7 @@ begin
       1  : if(G_Started)
            then ToggleMenu
            else _CYCLE:=false;
-      2  : _StartGame;    // start/break game
+      2  : _StartStopGame;    // start/break game
 
       /// SETTINGS SAVE REPLAYS
 

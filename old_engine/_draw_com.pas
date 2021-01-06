@@ -174,8 +174,8 @@ begin
    if(_rpls_rst>=rpl_rhead)then exit;
 
    ni:=255;
-   for i:=0 to vid_uialrm_n do
-    with ui_alrms[i] do
+   for i:=0 to ui_max_alarms do
+    with ui_alarms[i] do
      if(at>0)then
       if(dist2(aax,aay,ax,ay)<=vid_uialrm_mr)and(ab=aab)then
       begin
@@ -187,8 +187,8 @@ begin
       end;
 
    if(ni=255)then
-    for i:=0 to vid_uialrm_n do
-     with ui_alrms[i] do
+    for i:=0 to ui_max_alarms do
+     with ui_alarms[i] do
       if(at=0)then
       begin
          ax:=aax;
@@ -196,7 +196,7 @@ begin
          ab:=aab;
          at:=vid_uialrm_t;
          if((vid_mmvx-vid_uialrm_ti)>ax)or(ax>(vid_mmvx+map_mmvw+vid_uialrm_ti))or   // vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh
-           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then PlaySND(snd_alarm,nil);
+           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then PlayInGameAnoncer(snd_under_attack[aab,_players[HPlayer].race]);
          break;
       end;
 end;

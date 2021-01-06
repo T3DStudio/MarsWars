@@ -80,7 +80,7 @@ var i:byte;
 begin
    net_writebyte(nmid_startinf);
    net_writebool(G_Started);
-   for i:=1 to MaxPlayers do
+   for i:=0 to MaxPlayers do
     with _Players[i] do
     begin
        net_writestring(name );
@@ -353,7 +353,7 @@ begin
       begin
          gst:=net_readbool;
 
-         for i:=1 to MaxPlayers do
+         for i:=0 to MaxPlayers do
           with _Players[i] do
           begin
              name := net_readstring;

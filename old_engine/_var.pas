@@ -46,9 +46,9 @@ _uregen_c         : integer = 0;
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUpgrade;
 
-_lsuc             : byte = 0;
-_lcu              : integer = 0;
-_lcup             : PTUnit;
+
+_LastCreatedUnit  : integer = 0;
+_LastCreatedUnitP : PTUnit;
 
 {tar1p             : integer;
 ai_builders,
@@ -202,7 +202,6 @@ map_prmm          : integer;
 
 cmp_skill         : byte = 3;
 cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
-cmp_ait2p         : word = 0;
 
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
@@ -273,42 +272,51 @@ m_bx,
 m_by              : integer;
 m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
+m_mmap_move       : boolean = false;
 
-ui_puids          : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
-ui_ordn,
-ui_ordx,
-ui_ordy           : array[0..10] of integer;
-ui_orderu         : array[0..9 ] of TSob;
-ui_mc_x,
-ui_mc_y,
-ui_mc_a           : integer;
-ui_mc_c           : cardinal;
-ui_panelmmm       : boolean = false;
+ui_UnitSelectSound: boolean = false;
 ui_tab            : byte = 0;
-ui_muc            : array[false..true] of cardinal;
-ui_builders_x     : array[0..ui_builder_srs] of integer;
-ui_builders_y     : array[0..ui_builder_srs] of integer;
-ui_builders_r     : array[0..ui_builder_srs] of integer;
+ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
+ui_alarms         : array[0..ui_max_alarms] of TAlarm;
+
+ui_orders_n,                                             //
+ui_orders_x,                                             //
+ui_orders_y       : array[0..10] of integer;             //
+ui_orders_uids    : array[0..9 ] of TSob;                //
+
+ui_mc_x,                                                 //
+ui_mc_y,                                                 // mouse click effect
+ui_mc_a           : integer;                             //
+ui_mc_c           : cardinal;                            //
+
+ui_builders_x     : array[0..ui_builder_srs] of integer; //
+ui_builders_y     : array[0..ui_builder_srs] of integer; // builders rects
+ui_builders_r     : array[0..ui_builder_srs] of integer; //
+
+ui_first_upgr_time: integer = 0;
+ui_upgr           : array[byte] of integer;
+ui_units_inapc    : array[byte] of integer;
+ui_prod_units     : array[byte] of integer;
 ui_units_ptime    : array[byte] of integer;
-ui_units_prodc    : array[byte] of integer;
-ui_units_proda    : integer = 0;
+ui_prod_builds    : TSoB;
+ui_bprods         : array[byte] of integer;
+ui_bprods_n       : integer;
 ui_uimove         : integer = 0; // ui move buttons
 ui_uiaction       : integer = 0; // ui action button
 ui_battle_units   : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
-ui_upgr_time      : integer = 0;
-ui_upgr           : array[byte] of integer;
-ui_units_inapc    : array[byte] of integer;
-ui_prod_units     : array[byte] of integer;
-ui_prod_builds    : TSoB;
-ui_blds           : array[byte] of integer;
-ui_bldsc          : integer;
-ui_alrms          : array[0..vid_uialrm_n] of TAlarm;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
+{
+
+
+
 ui_msk            : byte = 0;
 ui_msks           : shortint = 0;
-ui_rad_rld        : array[false..true] of cardinal;
+
+}
+ui_muc            : array[false..true] of cardinal; // unit max cound color
+ui_rad_rld        : array[false..true] of cardinal; // radar reload time
 
 ui_uiuphx         : integer = 0;
 ui_ingamecl       : byte = 0;
@@ -429,19 +437,19 @@ pspr_dummy        : PTMWSprite;
 
 spr_dmodel,
 
-spr_lostsoul,
-spr_imp ,
-spr_demon,
-spr_cacodemon,
-spr_baron,
-spr_knight,
-spr_cyberdemon,
-spr_mastermind,
-spr_pain,
-spr_revenant,
-spr_mancubus,
-spr_arachnotron,
-spr_archvile,
+spr_LostSoul,
+spr_Imp ,
+spr_Demon,
+spr_Cacodemon,
+spr_Baron,
+spr_Knight,
+spr_Cyberdemon,
+spr_Mastermind,
+spr_Pain,
+spr_Revenant,
+spr_Mancubus,
+spr_Arachnotron,
+spr_ArchVile,
 spr_ZFormer,
 spr_ZEngineer,
 spr_ZSergant,
@@ -452,21 +460,21 @@ spr_ZFMajor,
 spr_ZMajor,
 spr_ZBFG,
 
-spr_engineer,
-spr_medic,
-spr_sergant,
-spr_ssergant,
-spr_commando,
-spr_bomber,
-spr_fmajor,
-spr_major,
+spr_Engineer,
+spr_Medic,
+spr_Sergant,
+spr_SSergant,
+spr_Commando,
+spr_Bomber,
+spr_FMajor,
+spr_Major,
 spr_BFG,
 spr_FAPC,
 spr_APC,
 spr_Terminator,
 spr_Tank,
 spr_Flyer,
-spr_trans,
+spr_Transport,
 
 spr_HKeep,
 spr_HGate,
@@ -655,15 +663,30 @@ str_menu_s3       : array[0..2] of shortstring;
 
 // sounds
 
-snd_svolume       : byte = 64;
-snd_mvolume       : byte = 64;
-snd_ml            : array of pMIX_MUSIC;
-snd_mls           : integer = 0;
-snd_curm          : byte = 1;
+snd_svolume        : byte = 64;
+snd_mvolume        : byte = 64;
+snd_music_list     : array of pMIX_MUSIC;
+snd_music_list_size: integer = 0;
+snd_current_music  : byte = 1;
+snd_anoncer_pause  : integer = 0;
+snd_anoncer_last   : PTSoundSet;
+snd_unit_cmd_pause : integer = 0;
+snd_unit_cmd_last  : PTMWSound;
 
-snd_build         : array[1..r_cnt] of pMIX_CHUNK;
 
-snd_jetpoff,
+snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
+snd_cannot_build,
+snd_building,
+snd_constr_complete,
+snd_defeat,
+snd_not_enough_energy,
+snd_player_defeated,
+snd_upgrade_complete,
+snd_victory,
+snd_build_place
+                   : array[1..r_cnt] of PTSoundSet;
+
+{snd_jetpoff,
 snd_jetpon,
 snd_oof,
 snd_alarm,
@@ -721,17 +744,17 @@ snd_barond,
 snd_cacoc,
 snd_cacod,
 snd_dpain,
-snd_demon1,
+snd_demon1, }
 snd_click,
 snd_chat,
-snd_inapc,
+{snd_inapc,
 snd_ccup,
-snd_radar,
+snd_radar, }
 snd_teleport,
 snd_pexp,
 snd_exp,
-snd_exp2,
-snd_d0,
+snd_exp2
+{snd_d0,
 snd_meat,
 snd_ar_act,
 snd_ar_c,
@@ -754,7 +777,7 @@ snd_arch_c,
 snd_arch_f,
 snd_hellbar,
 snd_hell,
-snd_hpower        : pMIX_CHUNK;
+snd_hpower }       : PTSoundSet;
 
 
 {$ELSE}

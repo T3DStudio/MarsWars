@@ -2,8 +2,8 @@
 procedure d_Alarms;
 var i,r:byte;
 begin
-   for i:=0 to vid_uialrm_n do
-    with ui_alrms[i] do
+   for i:=0 to ui_max_alarms do
+    with ui_alarms[i] do
      if(at>0)then
      begin
         r:=(at*2) mod vid_uialrm_ti;
@@ -39,20 +39,20 @@ var spr:PTMWSprite;
 begin
    with _players[HPlayer]do
    case m_brush of
-   0..255:
+   1..255:
    begin
       dec(m_brushx,vid_vx);
       dec(m_brushy,vid_vy);
 
       spr:=_uid2spr(m_brush,false);
+      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
+      _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
+      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+
       with _uids[m_brush] do
        if(bld_r>0)and(m_brushc=c_lime)
        then circleColor(tar,m_brushx,m_brushy,_r,c_black)
        else circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
-
-      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
-      _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
-      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
       inc(m_brushx,vid_vx);
       inc(m_brushy,vid_vy);
@@ -89,6 +89,10 @@ var  x,y,y0:integer;
      c,i,n :byte;
      b     :boolean;
 begin
+
+   with _players[HPlayer] do
+   _draw_text(tar,ui_oicox-4,ui_texty+2,b2s(lselUID),ta_right,255,c_white);
+
    {y  :=ui_texty+vid_oiw;
    for i:=1 to 9 do
    begin
@@ -98,7 +102,7 @@ begin
       for b:=false to true do
       begin
          for c:=0 to 255 do
-          if(c in ui_orderu[i,b])then
+          if(c in ui_orders_uids[i,b])then
           begin
              if(y0=-1)then y0:=y+4;
              if((n mod rown)=0)then
@@ -226,9 +230,9 @@ begin
          end;
 
          case ui of
-         0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_bldsc,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
-         1: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[false],uproda  ,ucl_c [false], c_lime ,c_yellow,c_orange, ui=ui_tab);
-         2: begin if(pproda>0)then uid:=(ui_upgr_time div fr_fps)+1 else uid:=0;
+         0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_bprods_n,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
+         1: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[false],uproda     ,ucl_c [false], c_lime ,c_yellow,c_orange, ui=ui_tab);
+         2: begin if(pproda>0)then uid:=(ui_first_upgr_time div fr_fps)+1 else uid:=0;
             d_tabbtn(tar,spr_tabs[ui],ux,uy, uid          ,pproda  ,0            , c_white,c_yellow,0       , ui=ui_tab);
             end;
          3: d_tabbtn(tar,spr_tabs[ui],ux,uy, 0            ,0       ,0            , 0      ,0       ,0       , ui=ui_tab);
@@ -258,7 +262,7 @@ begin
       begin
          for ui:=0 to ui_ubtns do
          begin
-            uid:=ui_puids[race ,ui_tab,ui];
+            uid:=ui_panel_uids[race ,ui_tab,ui];
             if(uid=0)then continue;
 
             with _uids[uid] do
@@ -274,10 +278,10 @@ begin
 
                r:=_uid_cndt(@_players[HPlayer],uid);
 
-               _drawBtn (tar,ux,uy,un_btn,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
+               _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
-               b2s(ui_blds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r)     ,
-               c_dyellow        ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_white);
+               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r)     ,
+               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_white);
             end;
             {case ui of
             5 : if(ucl_x[5]>0)then
@@ -304,7 +308,7 @@ begin
       begin
          for ui:=0 to ui_ubtns do
          begin
-            uid:=ui_puids[race ,ui_tab,ui];
+            uid:=ui_panel_uids[race ,ui_tab,ui];
             if(uid=0)then continue;
             with _uids[uid] do
             begin
@@ -322,7 +326,7 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               _drawBtn (tar,ux,uy,un_btn,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
+               _drawBtn (tar,ux,uy,un_btn.surf,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(tar,ux,uy,
                b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
                c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple);
@@ -334,7 +338,7 @@ begin
       begin
          for ui:=0 to ui_ubtns do
          begin
-            uid:=ui_puids[race ,ui_tab,ui];
+            uid:=ui_panel_uids[race ,ui_tab,ui];
 
             if (a_upgrs[uid]<=0)then continue;
             if((G_addon=false)and(_upids[uid]._up_addon))then continue;
@@ -342,7 +346,7 @@ begin
             ux:=(ui mod 3);
             uy:=(ui div 3);
 
-            _drawBtn(tar,ux,uy,_upids[uid]._up_btn,ui_upgr[uid]>0, _upid_cndt(@_players[HPlayer],uid) or (pproda>=pprodm)or(n_smiths<=0));
+            _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_cndt(@_players[HPlayer],uid)>0) or (pproda>=pprodm)or(n_smiths<=0));
 
             _drawBtnt(tar,ux,uy,
             b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
@@ -473,7 +477,7 @@ begin
            end
            else
            begin
-              uid:=ui_puids[race,ui_tab,i];
+              uid:=ui_panel_uids[race,ui_tab,i];
               if(uid>0)then
               case ui_tab of
               0,1: begin

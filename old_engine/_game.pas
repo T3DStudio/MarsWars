@@ -103,30 +103,28 @@ begin
 
    onlySVCode :=true;
 
-   FillChar(_missiles,SizeOf(_missiles)   ,0);
+   FillChar(g_cpt_pl ,SizeOf(g_cpt_pl ),0);
+   FillChar(_missiles,SizeOf(_missiles),0);
 
-   FillChar(_units   ,SizeOf(_units   )   ,0);
-   _lcu:=0;
-   while(_lcu<=MaxUnits)do
+   FillChar(_units   ,SizeOf(_units   ),0);
+   _LastCreatedUnit:=0;
+   while(_LastCreatedUnit<=MaxUnits)do
    begin
-      with _units[_lcu] do
+      with _units[_LastCreatedUnit] do
       begin
          hits  :=dead_hits;
          player:=@_players[playeri];
          uid   :=@_units  [uidi   ];
       end;
-      inc(_lcu,1);
+      inc(_LastCreatedUnit,1);
    end;
-
-   FillChar(g_cpt_pl  ,SizeOf(g_cpt_pl),  0);
 
    DefPlayers;
 
    UnitStepNum:=8;
 
-   _lcu :=0;
-   _lcup:=@_units[0];
-   _lsuc:=255;
+   _LastCreatedUnit :=0;
+   _LastCreatedUnitP:=@_units[0];
 
    g_inv_wn     := 0;
    g_inv_t      := 0;
@@ -152,34 +150,29 @@ begin
 
    ui_tab :=0;
 
-   FillChar(_effects ,SizeOf(_effects )   ,0);
-
-   FillChar(ui_alrms,SizeOf(ui_alrms  )   ,0);
-
-   net_m_error:='';
+   FillChar(_effects ,SizeOf(_effects ),0);
+   FillChar(ui_alarms,SizeOf(ui_alarms),0);
 
    _igchat:=false;
-   net_chat_str:='';
    net_chat_clear;
+   net_chat_str:='';
    net_cl_svttl:=0;
-   net_cl_svpl:=0;
-
-   if(_rpls_rst>rpl_wunit)then _rpls_rst:=rpl_none;
-
-   m_sxs  :=-1;
-   m_brush:=-32000;
-
-   _fog    :=true;
-
-   _svld_str:='';
+   net_cl_svpl :=0;
+   net_m_error :='';
 
    ui_umark_u:=0;
    ui_umark_t:=0;
 
-   cmp_ait2p:=0;
+   m_sxs  :=-1;
+   m_brush:=-32000;
 
-   _rpls_pnu:=0;
+   _fog   :=true;
+
+   _svld_str:='';
+
+   _rpls_pnu :=0;
    _rpls_vidm:=false;
+   if(_rpls_rst>rpl_wunit)then _rpls_rst:=rpl_none;
    {$ELSE}
    {$ENDIF}
 end;
@@ -200,17 +193,17 @@ end;
 
 {$ENDIF}
 
-procedure _CreateStartPositionsSkirmish;
+procedure _StartSkirmish;
 var p:byte;
 begin
    GModeTeams(g_mode);
-   case g_mode of
+   {case g_mode of
    gm_coop: begin
             with _players[0] do ai_skill:=250;
             //_unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
             end;
    gm_inv : with _players[0] do ai_skill:=8;
-   end;
+   end; }
 
    for p:=1 to MaxPlayers do
     with _players[p] do
@@ -270,7 +263,7 @@ end;
 
 
 {$IFDEF _FULLGAME}
-procedure _StartGame;
+procedure _StartStopGame;
 begin
    _m_sel:=0;
    if(G_Started)then
@@ -284,7 +277,7 @@ begin
        G_Started:=true;
        _menu    :=false;
        if(menu_s2<>ms2_camp)
-       then _CreateStartPositionsSkirmish
+       then _StartSkirmish
        else ;//_CMPMap;
        vid_rtui:=2;
        _makeMMB;
@@ -295,6 +288,8 @@ end;
 procedure MakeRandomSkirmish(st:boolean);
 var p:byte;
 begin
+   if(G_Started)then exit;
+
    Map_randommap;
 
    G_mode   :=gm_scir;
@@ -327,7 +322,7 @@ begin
 
    Map_premap;
 
-   if(st)then _StartGame;
+   if(st)then _StartStopGame;
 end;
 {$ELSE}
 {$include _ded.pas}
@@ -335,11 +330,11 @@ end;
 
 procedure _u_ord(pl:byte);
 var
-u,_u,
+u,eu,
 scnt,
-scntm:integer;
- psel:boolean;
-pu   :PTUnit;
+scntm : integer;
+ psel : boolean;
+pu    : PTUnit;
 begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
@@ -348,7 +343,7 @@ begin
 uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
       else
          scnt :=0;
-         scntm:=100;
+         scntm:=MaxPlayerUnits;
          if(o_id in [uo_select,uo_aselect])then
          begin
             if(o_x0>o_x1)then begin u:=o_x1;o_x1:=o_x0;o_x0:=u;end;
@@ -356,20 +351,20 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
             if(dist2(o_x0,o_y0,o_x1,o_y1)<4)then scntm:=1;
          end;
 
-          u:=1;
-         _u:=MaxUnits;
+         u :=1;
+         eu:=MaxUnits;
          if(o_id=uo_corder)then
           case o_x0 of
           co_destroy,
           co_cupgrade,
           co_cuprod,
           co_pcancle  : begin
-                            u:=MaxUnits;
-                           _u:=1;
+                           u :=MaxUnits;
+                           eu:=1;
                         end;
           end;
 
-         while (u<>_u) do
+         while(u<>eu)do
          begin
             pu:=@_units[u];
             with pu^ do
@@ -387,7 +382,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
 
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                 if(_lsuc=uidi)then
+                 if(lselUID=uidi)then
                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
 
@@ -408,7 +403,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(sel)then
                 begin
                    case o_id of
-               uo_select     : _lsuc:=uidi;
+               uo_select     : lselUID:=uidi;
                uo_setorder,
                uo_addorder   : order:=o_x0;
                uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - point
@@ -513,7 +508,11 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                end;
                    end;
 
-                   if(psel=false)then _unit_inc_selc(pu);
+                   if(psel=false)then
+                   begin
+                      _unit_inc_selc(pu);
+                      ui_UnitSelectSound:=true;
+                   end;
                    inc(scnt,1);
                 end
                 else
@@ -523,14 +522,14 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 end;
              end;
 
-            if(u>_u)
+            if(u>eu)
             then dec(u,1)
             else inc(u,1);
          end;
 
          case o_id of
          uo_select,
-         uo_aselect : if(scnt=0)then _lsuc:=255;
+         uo_aselect : if(scnt=0)then lselUID:=255;
          end;
       end;
 
@@ -831,6 +830,8 @@ begin
    vid_rtui:=vid_rtui mod vid_rtuis;
 
    if(vid_rtui=0)then _MusicCheck;
+   if(snd_anoncer_pause >0)then dec(snd_anoncer_pause ,1);
+   if(snd_unit_cmd_pause>0)then dec(snd_unit_cmd_pause,1);
 
    if(net_nstat=ns_clnt)then net_GClient;
    _rpls_code;
@@ -844,30 +845,39 @@ begin
 
    if(G_Started)then
    begin
+      if(k_ctrl=5)then PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
+      if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
+
       if(G_paused=0)then
       begin
          {$IFDEF _FULLGAME}
          FillChar(ui_builders_x ,SizeOf(ui_builders_x ),0);
          FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
-         FillChar(ui_units_prodc,SizeOf(ui_units_prodc),0);
-         ui_units_proda :=0;
-         ui_upgr_time   :=0;
-         ui_bldsc       :=0;
-         ui_uiaction    :=0;
-         ui_uimove      :=0;
-         ui_battle_units:=0;
-         ui_prod_builds :=[];
+         ui_first_upgr_time:=0;
+         ui_bprods_n       :=0;
+         ui_uiaction       :=0;
+         ui_uimove         :=0;
+         ui_battle_units   :=0;
+         ui_prod_builds    :=[];
          FillChar(ui_prod_units ,SizeOf(ui_prod_units ),0);
-         FillChar(ui_orderu     ,SizeOf(ui_orderu     ),0);
+         FillChar(ui_orders_uids,SizeOf(ui_orders_uids),0);
          FillChar(ui_upgrct     ,SizeOf(ui_upgrct     ),0);
          FillChar(ui_upgr       ,SizeOf(ui_upgr       ),0);
          FillChar(ui_units_inapc,SizeOf(ui_units_inapc),0);
-         FillChar(ui_blds       ,SizeOf(ui_blds       ),0);
-         FillChar(ui_ordn       ,SizeOf(ui_ordn       ),0);
-         FillChar(ui_ordx       ,SizeOf(ui_ordx       ),0);
-         FillChar(ui_ordy       ,SizeOf(ui_ordy       ),0);
+         FillChar(ui_bprods     ,SizeOf(ui_bprods     ),0);
+         FillChar(ui_orders_n   ,SizeOf(ui_orders_n   ),0);
+         FillChar(ui_orders_x   ,SizeOf(ui_orders_x   ),0);
+         FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
+
+         if(ui_UnitSelectSound)then
+         begin
+            ui_UnitSelectSound:=false;
+           // _LastSelectedUID
+            // play select sound
+         end;
          {$ENDIF}
+
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;
          inc(_uregen_c,1); _uregen_c:=_uregen_c mod regen_per;
 

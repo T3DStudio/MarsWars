@@ -2,9 +2,23 @@
 {$IFDEF _FULLGAME}
 
 
-procedure _unit_fsrclc(u:PTUnit);
+function _unit_shadowz(pu:PTUnit):integer;
 begin
-   with u^ do
+   with pu^  do
+   with uid^ do
+   begin
+      if(_isbuilding=false)
+      then _unit_shadowz:= fly_height[uf]
+      else
+        if(speed<=0)
+        then _unit_shadowz:=-fly_z
+        else _unit_shadowz:=fly_height[uf]-fly_z;
+    end;
+end;
+
+procedure _unit_fsrclc(pu:PTUnit);
+begin
+   with pu^ do
    begin
       fsr:=0;
       if(fog_cw>0)then
@@ -31,21 +45,93 @@ begin
 end;
 
 begin
-   FillChar(ui_puids,SizeOf(ui_puids),0);
+   FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
 
 
    for i:=0 to 255 do
    with _uids[i] do
    begin
       setMWSM(@spr_dmodel,nil);
-      _animw:=20;
-      _animd:=20;
+      _animw:=10;
+      _animd:=10;
       _animf:=0;
 
       case i of
 UID_LostSoul:
 begin
-   setMWSM(@spr_LostSoul,nil);
+   setMWSM(@spr_lostsoul,nil);
+end;
+UID_Imp:
+begin
+   setMWSM(@spr_imp,nil);
+end;
+UID_Demon:
+begin
+   setMWSM(@spr_demon,nil);
+end;
+UID_Cacodemon:
+begin
+   setMWSM(@spr_cacodemon,nil);
+end;
+UID_Baron:
+begin
+   setMWSM(@spr_knight,@spr_baron);
+end;
+UID_Cyberdemon:
+begin
+   setMWSM(@spr_cyberdemon,nil);
+end;
+UID_Mastermind:
+begin
+   setMWSM(@spr_mastermind,nil);
+end;
+UID_Pain:
+begin
+   setMWSM(@spr_pain,nil);
+end;
+UID_Revenant:
+begin
+   setMWSM(@spr_revenant,nil);
+end;
+UID_Mancubus:
+begin
+   setMWSM(@spr_mancubus,nil);
+end;
+UID_Arachnotron:
+begin
+   setMWSM(@spr_arachnotron,nil);
+end;
+UID_Archvile:
+begin
+   setMWSM(@spr_archvile,nil);
+end;
+UID_ZFormer:
+begin
+   setMWSM(@spr_ZFormer,nil);
+end;
+UID_ZEngineer:
+begin
+   setMWSM(@spr_ZEngineer,nil);
+end;
+UID_ZSergant:
+begin
+   setMWSM(@spr_ZSergant,@spr_ZSSergant);
+end;
+UID_ZCommando:
+begin
+   setMWSM(@spr_ZCommando,nil);
+end;
+UID_ZBomber:
+begin
+   setMWSM(@spr_ZBomber,nil);
+end;
+UID_ZMajor:
+begin
+   setMWSM(@spr_ZMajor,@spr_ZFMajor);
+end;
+UID_ZBFG:
+begin
+   setMWSM(@spr_ZBFG,nil);
 end;
 
 
@@ -103,6 +189,60 @@ begin
 end;
 
 
+UID_Engineer:
+begin
+   setMWSM(@spr_Engineer,nil);
+end;
+UID_Medic:
+begin
+   setMWSM(@spr_Medic,nil);
+end;
+UID_Sergant:
+begin
+   setMWSM(@spr_Sergant,@spr_SSergant);
+end;
+UID_Commando:
+begin
+   setMWSM(@spr_Commando,nil);
+end;
+UID_Bomber:
+begin
+   setMWSM(@spr_Bomber,nil);
+end;
+UID_Major:
+begin
+   setMWSM(@spr_Major,@spr_FMajor);
+end;
+UID_BFG:
+begin
+   setMWSM(@spr_BFG,nil);
+end;
+UID_FAPC:
+begin
+   setMWSM(@spr_FAPC,nil);
+end;
+UID_APC:
+begin
+   setMWSM(@spr_APC,nil);
+end;
+UID_Terminator:
+begin
+   setMWSM(@spr_Terminator,nil);
+end;
+UID_Tank:
+begin
+   setMWSM(@spr_Tank,nil);
+end;
+UID_Flyer:
+begin
+   setMWSM(@spr_Flyer,nil);
+end;
+UID_UTransport:
+begin
+   setMWSM(@spr_Transport,nil);
+end;
+
+
 UID_UCommandCenter:
 begin
    setMWSM(@spr_UCommandCenter,nil);
@@ -121,6 +261,7 @@ begin
 end;
 UID_UTurret:
 begin
+   _animw    := 6;
    setMWSM(@spr_UTurret,nil);
 end;
 UID_URadar:
@@ -133,6 +274,8 @@ begin
 end;
 UID_UPTurret:
 begin
+   _animw    := 4;
+
    setMWSM(@spr_UPTurret,nil);
 end;
 UID_URocketL:
@@ -141,6 +284,8 @@ begin
 end;
 UID_URTurret:
 begin
+   _animw    := 2;
+
    setMWSM(@spr_URTurret,nil);
 end;
 UID_UNuclearPlant:
@@ -152,11 +297,9 @@ begin
    setMWSM(@spr_Mine,nil);
 end;
 
-
-
       end;
 
-      ui_puids[_urace,byte(not _isbuilding),_ucl]:=i;
+      ui_panel_uids[_urace,byte(not _isbuilding),_ucl]:=i;
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;
@@ -164,6 +307,55 @@ end;
 end;
 
 {$ENDIF}
+
+function _canmove(pu:PTUnit):boolean;
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      _canmove:=false;
+
+      if(onlySVCode=false)and(speed>0)then
+      begin
+         _canmove:=(x<>uo_x)or(y<>uo_y);
+         exit;
+      end;
+
+      if(speed=0)or(buff[ub_stopafa]>0)then exit;
+
+      if(_ismech)then
+      begin
+         if(_isbuilding)then
+         begin
+            if(buff[ub_clcast]>0)then exit;
+         end
+         else
+         begin
+            if(buff[ub_gear ]>0)
+            or(buff[ub_toxin]>0) then exit;
+         end;
+      end
+      else
+      begin
+         if(buff[ub_pain ]>0)
+         or(buff[ub_toxin]>0)
+         or(buff[ub_gear ]>0)then exit;
+      end;
+      {case uidi of
+        UID_Flyer,
+        UID_Terminator,
+        UID_Tank,
+        UID_UTransport,
+        UID_APC,
+        UID_FAPC :
+        UID_UCommandCenter,
+        UID_HCommandCenter: if(buff[ub_clcast]>0)then exit;
+      else
+      end; }
+
+      _canmove:=true;
+   end;
+end;
 
 procedure _unit_apUID(pu:PTUnit);
 begin
@@ -180,12 +372,10 @@ begin
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
 
-         mmr   :=min2(1,round(_r*map_mmcx));
+         mmr   := trunc(_r*map_mmcx)+1;
 
          {$IFDEF _FULLGAME}
-         if(_isbuilding)
-         then shadow:= fly_height[uf]-fly_z
-         else shadow:= fly_height[uf];
+         shadow:=_unit_shadowz(pu);
 
          _unit_fsrclc(pu);
          {$ENDIF}
@@ -270,6 +460,8 @@ begin
 
    _isbuilding:= true;
    _issmith   := true;
+
+   ups_upgrades := [];
 end;
 UID_HTower:
 begin
@@ -441,6 +633,7 @@ begin
    _painc     := 6;
    _btime     := 20;
    _apcs      := 2;
+   _uf        := uf_fly;
 end;
 UID_Baron      :
 begin
@@ -494,6 +687,7 @@ begin
    _btime     := 40;
    _apcs      := 2;
    _ruid      := UID_HFortress;
+   _uf        := uf_fly;
 end;
 UID_Revenant   :
 begin
@@ -681,6 +875,8 @@ begin
 
    _isbuilding:=true;
    _issmith   :=true;
+
+   ups_upgrades := [];
 end;
 UID_UTurret:
 begin
@@ -868,6 +1064,7 @@ begin
    _apcm      := 10;
    _apcs      := 8;
    _ruid      := UID_UWeaponFactory;
+   _uf        := uf_fly;
 
    _ismech    := true;
    _slowturn  := true;
@@ -950,6 +1147,7 @@ begin
    _apcm      := 30;
    _apcs      := 10;
    _ruid      := UID_UVehicleFactory;
+   _uf        := uf_fly;
 
    _ismech    := true;
    _slowturn  := true;

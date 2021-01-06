@@ -167,7 +167,7 @@ team_army
 ui_alrms
 map_psx
 map_psy
-cmp_ait2p
+/////////cmp_ait2p
 theme_map_lqt
 theme_map_blqt
 theme_map_trt
@@ -214,10 +214,10 @@ begin
    BlockWrite(f,_uregen_c      ,SizeOf(_uregen_c      ));
    BlockWrite(f,G_WTeam        ,SizeOf(G_WTeam        ));
    BlockWrite(f,team_army      ,SizeOf(team_army      ));
-   BlockWrite(f,ui_alrms       ,SizeOf(ui_alrms       ));
+   BlockWrite(f,ui_alarms      ,SizeOf(ui_alarms       ));
    BlockWrite(f,map_psx        ,SizeOf(map_psx        ));
    BlockWrite(f,map_psy        ,SizeOf(map_psy        ));
-   BlockWrite(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
+   //BlockWrite(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
    BlockWrite(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
    BlockWrite(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
    BlockWrite(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
@@ -286,10 +286,10 @@ begin
          BlockRead(f,_uregen_c      ,SizeOf(_uregen_c      ));
          BlockRead(f,G_WTeam        ,SizeOf(G_WTeam        ));
          BlockRead(f,team_army      ,SizeOf(team_army      ));
-         BlockRead(f,ui_alrms       ,SizeOf(ui_alrms       ));
+         BlockRead(f,ui_alarms       ,SizeOf(ui_alarms       ));
          BlockRead(f,map_psx        ,SizeOf(map_psx        ));
          BlockRead(f,map_psy        ,SizeOf(map_psy        ));
-         BlockRead(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
+         //BlockRead(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
          BlockRead(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
          BlockRead(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
          BlockRead(f,theme_map_trt  ,SizeOf(theme_map_trt  ));

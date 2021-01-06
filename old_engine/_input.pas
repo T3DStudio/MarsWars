@@ -172,7 +172,12 @@ begin
                   m_brush:=co_empty;
                   exit;
                end;
-               _building_newplace(m_mx,m_my,m_brush,@m_brushx,@m_brushy);
+               if(k_ctrl>1)then
+               begin
+                  m_brushx:=m_mx;
+                  m_brushy:=m_my;
+               end
+               else _building_newplace(m_mx,m_my,m_brush,@m_brushx,@m_brushy);
 
                case _unit_grbcol(m_brushx,m_brushy,_uids[m_brush]._r,HPlayer,m_brush,true) of
                1 :  m_brushc:=c_red;
@@ -250,24 +255,24 @@ begin
 0: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // builds
    if(u<=ui_ubtns)then
    case right of
-false: begin m_brush:=ui_puids[race,0,u];_chkbld;end;
+false: begin m_brush:=ui_panel_uids[race,0,u];_chkbld;end;
 true : if(ucl_x[true,u]>0)then
-        if(_rclickmove(ui_puids[race,0,u]))then
+        if(_rclickmove(ui_panel_uids[race,0,u]))then
          with _units[ucl_x[true,u]] do _command(x,y);
    end;
 
 1: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // units
    if(u<=ui_ubtns)then
    case right of
-false: _player_s_o(co_suprod,u,0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cuprod,u,0,0, uo_corder  ,HPlayer);
+false: _player_s_o(co_suprod,ui_panel_uids[race,1,u],0,0, uo_corder  ,HPlayer);
+true : _player_s_o(co_cuprod,ui_panel_uids[race,1,u],0,0, uo_corder  ,HPlayer);
    end;
 
 2: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // upgrades
    if(u<=ui_ubtns)then
    case right of
-false: _player_s_o(co_supgrade,u,0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
+false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer);
+true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer);
    end;
 
 3: if(_rpls_rst<rpl_rhead)then
@@ -287,9 +292,9 @@ true : _player_s_o(co_cupgrade,u,0,0, uo_corder  ,HPlayer);
    7 : m_a_inv:=not m_a_inv;
    8 : _player_s_o(co_pcancle,0,0,0, uo_corder  ,HPlayer);
 
-   10: if(ui_ordx[10]>0)then
+   10: if(ui_orders_x[10]>0)then
         if(k_dbl>0)
-        then _moveHumView(ui_ordx[10], ui_ordy[10])
+        then _moveHumView(ui_orders_x[10], ui_orders_y[10])
         else _player_s_o(0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0, uo_corder  ,HPlayer);
          end;
@@ -369,7 +374,7 @@ begin
                  if(_hotkey2[ko]<>k2)
                  or(_hotkey1[ko]= 0 )
                  or(_hotkey1[ko]<>k )then continue;
-                 _panel_click(ui_tab,ko mod 3,(ko div 3),false,false);
+                 _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false);
                  exit;
               end;
            end;
@@ -380,7 +385,7 @@ begin
                if(k=_hotkeyA[ko])then
                begin
                   if(_hotkeyA[ko]=0)then continue;
-                  _panel_click(3,ko mod 3,(ko div 3),false,false);
+                  _panel_click(3,ko mod 3,4+(ko div 3),false,false);
                   exit;
                end;
 
@@ -393,8 +398,8 @@ begin
                                   if (k_alt>1)
                                   then _player_s_o(ko,0,0,0,uo_addorder,HPlayer)
                                   else
-                                    if(k_dbl>0)and(ui_ordx[ko]>0)and(ko>0)
-                                    then _moveHumView(ui_ordx[ko] , ui_ordy[ko])
+                                    if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
+                                    then _moveHumView(ui_orders_x[ko] , ui_orders_y[ko])
                                     else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
                              end;
 
@@ -406,7 +411,7 @@ begin
           for ko:=0 to 14 do  // actions
            if(k=_hotkeyR[ko])and(_hotkeyR[ko]>0)then
            begin
-              _panel_click(3,ko mod 3,(ko div 3)+12,k_ctrl>1,k_alt>1);
+              _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1);
               exit;
            end;
 
@@ -547,11 +552,9 @@ co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
             end;
-1..255    : if(m_brushc=c_lime)then
-            begin
-               _player_s_o(m_brushx,m_brushy,m_brush,0, uo_build  ,HPlayer);
-               //_chkbld;
-            end;
+1..255    : if(m_brushc=c_lime)
+            then _player_s_o(m_brushx,m_brushy,m_brush,0, uo_build  ,HPlayer)
+            else PlayInGameAnoncer(snd_cannot_build[_players[HPlayer].race]);
 co_paction,
 co_move,
 co_amove,
@@ -566,13 +569,13 @@ co_apatrol: _command(m_mx,m_my);
       co_amove,
       co_patrol,
       co_apatrol : _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
-      else        if(_rpls_vidm=false)then ui_panelmmm:=true;
+      else        if(_rpls_vidm=false)then m_mmap_move:=true;
       end
       else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
 
    if(k_ml=1)then  // LMB up
    begin
-      ui_panelmmm:=false;
+      m_mmap_move:=false;
 
       if(m_sxs>-1)then //select
       begin
@@ -591,7 +594,7 @@ co_apatrol: _command(m_mx,m_my);
       end;
    end;
 
-   if(ui_panelmmm)and(m_sxs=-1)then
+   if(m_mmap_move)and(m_sxs=-1)then
    begin
       _moveHumView(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx));
       _view_bounds;

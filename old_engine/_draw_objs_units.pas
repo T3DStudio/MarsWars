@@ -121,8 +121,6 @@ begin
          if(uprod_r[pn]>0)then
          begin
             i:=uprod_u[pn];
-            inc(ui_units_proda,1);
-            inc(ui_units_prodc[i],1);
             if(ui_units_ptime[i]=0)or(ui_units_ptime[i]>uprod_r[pn])then ui_units_ptime[i]:=uprod_r[pn];
          end;
       end;
@@ -133,8 +131,8 @@ begin
          begin
             i:=pprod_u[pn];
             //if(upgrade_mfrg[race,i])then inc(ui_upgrct[i],1);
-            if(ui_upgr_time=0)or(ui_upgr_time>pprod_r[pn])then ui_upgr_time:=pprod_r[pn];
-            if(ui_upgr[i]  =0)or(ui_upgr[i]  >pprod_r[pn])then ui_upgr[i]  :=pprod_r[pn];
+            if(ui_first_upgr_time=0)or(ui_first_upgr_time>pprod_r[pn])then ui_first_upgr_time:=pprod_r[pn];
+            if(ui_upgr[i]  =0)or(ui_upgr[i]>pprod_r[pn])then ui_upgr[i] :=pprod_r[pn];
          end;
       end;
    end;
@@ -142,17 +140,17 @@ end;
 
 procedure _orders(x,y:integer;i:byte);
 begin
-   if(ui_ordx[i]=0)then
+   if(ui_orders_x[i]=0)then
    begin
-      ui_ordx[i]:=x;
-      ui_ordy[i]:=y;
+      ui_orders_x[i]:=x;
+      ui_orders_y[i]:=y;
    end
    else
    begin
-      ui_ordx[i]:=(ui_ordx[i]+x) div 2;
-      ui_ordy[i]:=(ui_ordy[i]+y) div 2;
+      ui_orders_x[i]:=(ui_orders_x[i]+x) div 2;
+      ui_orders_y[i]:=(ui_orders_y[i]+y) div 2;
    end;
-   inc(ui_ordn[i],1);
+   inc(ui_orders_n[i],1);
 end;
 
 procedure _ui_counters(pu:PTUnit);
@@ -166,7 +164,7 @@ begin
       if(order<10)then
       begin
          _orders(x,y,order);
-         ui_orderu[order]:=ui_orderu[order]+[uidi];
+         ui_orders_uids[order]:=ui_orders_uids[order]+[uidi];
       end;
 
       if(speed>0)and(uidi in whocanattack)then
@@ -193,8 +191,8 @@ begin
          end
          else
          begin
-            //inc(ui_blds[ucl],1);
-            //inc(ui_bldsc    ,1);
+            //inc(ui_bprods[ucl],1);
+            //inc(ui_bprods_n    ,1);
          end;
       end;
 
@@ -211,6 +209,7 @@ begin
 end;
 
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
+const _btnas: array[false..true] of integer = (0,vid_hBW);
 var spr : PTMWSprite;
      dp,smy,
      inv,t,ro,
@@ -233,14 +232,16 @@ begin
          _unit_minimap(pu);
 
          wanim:=false;
-         {if(g_paused=0)then
+         if(g_paused=0)then
           if(_canmove(pu))then
-           wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);  }
+           wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
 
          spr:=_unit2spr(pu);
 
          if(spr=pspr_dummy)then exit;
 
+         sh:=_unit_shadowz(pu);
+         inc(shadow,sign(sh-shadow));
          sh :=shadow;
 
 
@@ -317,32 +318,22 @@ begin
 
             dp:=_udpth(pu);
 
-            {if(isbuild)then
+            if(_isbuilding)then
              if(bld)then
              begin
+                if(a_rld<=0)and(noanim=false)then
                 if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
                 begin
-                   if(rld_t=0)then begin if(nanim=false)then inc(dir,anims);dir:=dir mod 360;end;
-                   t:=((dir+23) mod 360) div 45;
-                   if(uidi<>UID_URTurret)and(rld_t>rld_a)then t:=t+8;
-                   case uidi of
-                   UID_UTurret,
-                   UID_UPTurret: _sl_add_eff(vx,smy,dp,0,@spr_tur [t],inv);
-                   UID_URTurret: _sl_add_eff(vx,smy,dp,0,@spr_rtur[t],inv);
-                   end;
+                    inc(dir,_animw);
+                    dir:=dir mod 360;
                 end;
 
                 if(playeri=HPlayer)then
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(isbarrack)then
-                       if(uprod_r[t]>0)and(uprod_t[t]<=_uts    )then
-                        _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_gray,0,true,spr_b_u [race,uprod_t[t]],255,0,(uprod_r[t] div vid_fps)+1,0,0,'',0);
-
-                      if(issmith)then
-                       if(pprod_r[t]>0)and(pprod_t[t]<=MaxUpgrs)then
-                        _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy-vid_hBW,dp,0,c_red ,0,true,spr_b_up[race,pprod_t[t]],255,0,(pprod_r[t] div vid_fps)+1,0,0,'',0);
+                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy,dp,0,c_gray,0,true,@_uids [uprod_u[t]].un_btn ,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
                    end;
                 end;
              end
@@ -354,8 +345,8 @@ begin
               UID_HAltar,
               UID_HFortress,
               UID_HEye : begin
-                            inv:=trunc(255*hits/mhits);
-                            if(r<41)
+                            inv:=trunc(255*hits/_mhits);
+                            if(_r<41)
                             then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
                             else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
                             if(buff[ub_invis]>0)then inv:=inv shr 1;
@@ -365,14 +356,14 @@ begin
                  if(hits<=127)then
                  begin
                     inv:=hits*2;
-                    if(r<41)
+                    if(_r<41)
                     then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
                     else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
                  end
                  else inv:=255;
                end;
 
-             if(buff[ub_toxin]>0)then
+            { if(buff[ub_toxin]>0)then
               if(mech)
               then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
               else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);

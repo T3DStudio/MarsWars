@@ -177,6 +177,15 @@ begin
 
       sn:=0;
       setlength(sl,sn);
+
+      _lstr(@t,name,firstload,false);
+      if(t.surf<>r_empty)then
+      begin
+         inc(sn,1);
+         setlength(sl,sn);
+         sl[sn-1]:=t;
+      end;
+
       while true do
       begin
          _lstr(@t,name+i2s(sn),firstload,false);
@@ -468,10 +477,7 @@ end;
 {$include _themes.pas}
 
 procedure _LoadGraphics(firstload:boolean);
-const hell_units     : shortstring = 'hell\units\';
-      hell_buildings : shortstring = 'hell\buildings\';
-       uac_units     : shortstring = 'uac\units\';
-       uac_buildings : shortstring = 'uac\buildings\';
+
 var x:integer;
 begin
    r_empty   :=_createSurf(1,1);
@@ -546,42 +552,84 @@ begin
    spr_c_phobos   := LoadIMG('M_PHOBOS' ,false,true);
    spr_c_deimos   := LoadIMG('M_DEIMOS' ,false,true);
 
-   _LoadMWSModel(@spr_lostsoul,hell_units+'h_u0_',smt_lost,firstload);
+   _LoadMWSModel(@spr_lostsoul       ,race_units[r_hell]+'h_u0_'      ,smt_lost     ,firstload);
+   _LoadMWSModel(@spr_imp            ,race_units[r_hell]+'h_u1_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_demon          ,race_units[r_hell]+'h_u2_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_cacodemon      ,race_units[r_hell]+'h_u3_'      ,smt_caco     ,firstload);
+   _LoadMWSModel(@spr_knight         ,race_units[r_hell]+'h_u4k_'     ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_baron          ,race_units[r_hell]+'h_u4_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_cyberdemon     ,race_units[r_hell]+'h_u5_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_mastermind     ,race_units[r_hell]+'h_u6_'      ,smt_mmind    ,firstload);
+   _LoadMWSModel(@spr_pain           ,race_units[r_hell]+'h_u7_'      ,smt_pain     ,firstload);
+   _LoadMWSModel(@spr_revenant       ,race_units[r_hell]+'h_u8_'      ,smt_revenant ,firstload);
+   _LoadMWSModel(@spr_mancubus       ,race_units[r_hell]+'h_u9_'      ,smt_mancubus ,firstload);
+   _LoadMWSModel(@spr_arachnotron    ,race_units[r_hell]+'h_u10_'     ,smt_archno   ,firstload);
+   _LoadMWSModel(@spr_archvile       ,race_units[r_hell]+'h_u11_'     ,smt_arch     ,firstload);
 
-   _LoadMWSModel(@spr_HKeep     ,hell_buildings+'h_b0_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HGate     ,hell_buildings+'h_b1_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAGate    ,hell_buildings+'h_b1a'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HSymbol   ,hell_buildings+'h_b2_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HPools    ,hell_buildings+'h_b3_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAPools   ,hell_buildings+'h_b3a'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HTower    ,hell_buildings+'h_b4_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HTeleport ,hell_buildings+'h_b5_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HMonastery,hell_buildings+'h_b6_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HTotem    ,hell_buildings+'h_b7_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAltar    ,hell_buildings+'h_b8_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HFortress ,hell_buildings+'h_b9_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HCC       ,hell_buildings+'h_hcc_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HMUnit    ,hell_buildings+'h_hbar_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HMUnita   ,hell_buildings+'h_hbara',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HEye      ,hell_buildings+'heye_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ZFormer        ,race_units[r_hell]+'h_z0_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_ZEngineer      ,race_units[r_hell]+'h_z0s_'     ,smt_zengineer,firstload);
+   _LoadMWSModel(@spr_ZSergant       ,race_units[r_hell]+'h_z1_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_ZSSergant      ,race_units[r_hell]+'h_z1s_'     ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_ZCommando      ,race_units[r_hell]+'h_z2_'      ,smt_zcommando,firstload);
+   _LoadMWSModel(@spr_ZBomber        ,race_units[r_hell]+'h_z3_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_ZMajor         ,race_units[r_hell]+'h_z4_'      ,smt_imp      ,firstload);
+   _LoadMWSModel(@spr_ZFMajor        ,race_units[r_hell]+'h_z4j_'     ,smt_fmajor   ,firstload);
+   _LoadMWSModel(@spr_ZBFG           ,race_units[r_hell]+'h_z5_'      ,smt_imp      ,firstload);
 
+   _LoadMWSModel(@spr_Medic          ,race_units[r_uac ]+'u_u0_'      ,smt_medic    ,firstload);
+   _LoadMWSModel(@spr_Engineer       ,race_units[r_uac ]+'u_u1_'      ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_Sergant        ,race_units[r_uac ]+'u_u2_'      ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_SSergant       ,race_units[r_uac ]+'u_u2s_'     ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_Commando       ,race_units[r_uac ]+'u_u3_'      ,smt_commando ,firstload);
+   _LoadMWSModel(@spr_Bomber         ,race_units[r_uac ]+'u_u4_'      ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j'      ,smt_fmajor   ,firstload);
+   _LoadMWSModel(@spr_Major          ,race_units[r_uac ]+'u_u5_'      ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_marine0  ,firstload);
+   _LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_fapc     ,firstload);
+   _LoadMWSModel(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
+   _LoadMWSModel(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'      ,smt_terminat ,firstload);
+   _LoadMWSModel(@spr_Tank           ,race_units[r_uac ]+'u_u10_'     ,smt_tank     ,firstload);
+   _LoadMWSModel(@spr_Flyer          ,race_units[r_uac ]+'u_u11_'     ,smt_fmajor   ,firstload);
+   _LoadMWSModel(@spr_Transport      ,race_units[r_uac ]+'transport'  ,smt_transport,firstload);
 
-   _LoadMWSModel(@spr_UCommandCenter ,uac_buildings +'u_b0_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UMilitaryUnit  ,uac_buildings +'u_b1_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAMilitaryUnit ,uac_buildings +'u_b1a'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UGenerator     ,uac_buildings +'u_b2_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UWeaponFactory ,uac_buildings +'u_b3_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAWeaponFactory,uac_buildings +'u_b3a'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UTurret        ,uac_buildings +'u_b4_'  ,smt_turret ,firstload);
-   _LoadMWSModel(@spr_URadar         ,uac_buildings +'u_b5_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UVehicleFactory,uac_buildings +'u_b6_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UPTurret       ,uac_buildings +'u_b7_'  ,smt_turret ,firstload);
-   _LoadMWSModel(@spr_URocketL       ,uac_buildings +'u_b8_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_URTurret       ,uac_buildings +'u_b9_'  ,smt_turret2,firstload);
-   _LoadMWSModel(@spr_UNuclearPlant  ,uac_buildings +'u_b10_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_Mine           ,uac_buildings +'u_mine' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HCC            ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
 
-   //_LoadMWSModel(@spr_Base0           ,uac_buildings +'u_mine' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UMilitaryUnit  ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAMilitaryUnit ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret ,firstload);
+   _LoadMWSModel(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret ,firstload);
+   _LoadMWSModel(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2,firstload);
+   _LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
+
+   _lstr(@spr_db_h0,race_dir[r_hell]+'db_h0',firstload,true);
+   _lstr(@spr_db_h1,race_dir[r_hell]+'db_h1',firstload,true);
+   _lstr(@spr_db_u0,race_dir[r_uac ]+'db_u0',firstload,true);
+   _lstr(@spr_db_u1,race_dir[r_uac ]+'db_u1',firstload,true);
+
+   //_LoadMWSModel(@spr_Base0           ,race_buildings[r_uac ] +'u_mine' ,smt_buiding,firstload);
 
 
   //
@@ -593,16 +641,7 @@ begin
    end;
 
    spr_u_portal   := _lstr('u_portal' );
-   spr_db_h0      := _lstr('db_h0'    );
-   spr_db_h1      := _lstr('db_h1'    );
-   spr_db_u0      := _lstr('db_u0'    );
-   spr_db_u1      := _lstr('db_u1'    );
-   spr_HAltar     := _lstr('h_altar'  );
-   spr_HTotem     := _lstr('h_b7'     );
-   spr_HMonastery := _lstr('h_b6'     );
-   spr_HFortress  := _lstr('h_fortess');
-   spr_HBar       := _lstr('h_hbarrak');
-   spr_HEye       := _lstr('heye'     );
+
    spr_mine       := _lstr('u_mine'   );
    spr_toxin      := _lstr('toxin'    );
    spr_gear       := _lstr('gear'     );
@@ -630,45 +669,7 @@ begin
    for x:=0 to 5  do spr_u_p2       [x]:=_lstr('u_p2_'    +b2s(x));
    for x:=0 to 3  do spr_u_p3       [x]:=_lstr('u_p3_'    +b2s(x));
    for x:=0 to 2  do spr_blood      [x]:=_lstr('blood'    +b2s(x));
-   for x:=0 to 28 do spr_lostsoul   [x]:=_lstr('h_u0_'    +b2s(x));
-   for x:=0 to 52 do spr_imp        [x]:=_lstr('h_u1_'    +b2s(x));
-   for x:=0 to 53 do spr_demon      [x]:=_lstr('h_u2_'    +b2s(x));
-   for x:=0 to 29 do spr_cacodemon  [x]:=_lstr('h_u3_'    +b2s(x));
-   for x:=0 to 52 do spr_baron      [x]:=_lstr('h_u4_'    +b2s(x));
-   for x:=0 to 52 do spr_knight     [x]:=_lstr('h_u4k_'   +b2s(x));
-   for x:=0 to 56 do spr_cyberdemon [x]:=_lstr('h_u5_'    +b2s(x));
-   for x:=0 to 81 do spr_mastermind [x]:=_lstr('h_u6_'    +b2s(x));
-   for x:=0 to 37 do spr_pain       [x]:=_lstr('h_u7_'    +b2s(x));
-   for x:=0 to 76 do spr_revenant   [x]:=_lstr('h_u8_'    +b2s(x));
-   for x:=0 to 78 do spr_mancubus   [x]:=_lstr('h_u9_'    +b2s(x));
-   for x:=0 to 69 do spr_arachnotron[x]:=_lstr('h_u10_'   +b2s(x));
-   for x:=0 to 85 do spr_archvile   [x]:=_lstr('h_u11_'   +b2s(x));
-   for x:=0 to 52 do spr_ZFormer    [x]:=_lstr('h_z0_'    +b2s(x));
-   for x:=0 to 31 do spr_ZEngineer  [x]:=_lstr('h_z0s_'   +b2s(x));
-   for x:=0 to 52 do spr_ZSergant   [x]:=_lstr('h_z1_'    +b2s(x));
-   for x:=0 to 52 do spr_ZSSergant  [x]:=_lstr('h_z1s_'   +b2s(x));
-   for x:=0 to 59 do spr_ZCommando  [x]:=_lstr('h_z2_'    +b2s(x));
-   for x:=0 to 52 do spr_ZBomber    [x]:=_lstr('h_z3_'    +b2s(x));
-   for x:=0 to 15 do spr_ZFMajor    [x]:=_lstr('h_z4j_'   +b2s(x));
-   for x:=0 to 52 do spr_ZMajor     [x]:=_lstr('h_z4_'    +b2s(x));
-   for x:=0 to 52 do spr_ZBFG       [x]:=_lstr('h_z5_'    +b2s(x));
-   for x:=0 to 44 do spr_engineer   [x]:=_lstr('u_u1_'    +b2s(x));
-   for x:=0 to 52 do spr_medic      [x]:=_lstr('u_u0_'    +b2s(x));
-   for x:=0 to 44 do spr_sergant    [x]:=_lstr('u_u2_'    +b2s(x));
-   for x:=0 to 44 do spr_ssergant   [x]:=_lstr('u_u2s_'   +b2s(x));
-   for x:=0 to 52 do spr_commando   [x]:=_lstr('u_u3_'    +b2s(x));
-   for x:=0 to 44 do spr_bomber     [x]:=_lstr('u_u4_'    +b2s(x));
-   for x:=0 to 15 do spr_fmajor     [x]:=_lstr('u_u5j_'   +b2s(x));
-   for x:=0 to 44 do spr_major      [x]:=_lstr('u_u5_'    +b2s(x));
-   for x:=0 to 44 do spr_BFG        [x]:=_lstr('u_u6_'    +b2s(x));
-   for x:=0 to 15 do spr_FAPC       [x]:=_lstr('u_u8_'    +b2s(x));
-   for x:=0 to 15 do spr_APC        [x]:=_lstr('uac_tank_'+b2s(x));
-   for x:=0 to 55 do spr_Terminator [x]:=_lstr('u_u9_'    +b2s(x));
-   for x:=0 to 23 do spr_Tank       [x]:=_lstr('u_u10_'   +b2s(x));
-   for x:=0 to 15 do spr_Flyer      [x]:=_lstr('u_u11_'   +b2s(x));
-   for x:=0 to 15 do spr_tur        [x]:=_lstr('ut_'      +b2s(x));
-   for x:=0 to 7  do spr_rtur       [x]:=_lstr('u_rt_'    +b2s(x));
-   for x:=0 to 7  do spr_trans      [x]:=_lstr('transport'+b2s(x));
+
    for x:=0 to 1  do spr_sport      [x]:=_lstr('sport'    +b2s(x));
    for x:=0 to 5  do spr_ubase      [x]:=_lstr('u_base'   +b2s(x));
    for x:=0 to 3 do
@@ -755,8 +756,18 @@ begin
    for x:=0 to 255 do
    with _uids[x] do
    begin
-      un_btn := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW);
-      un_sbtn:= LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
+      with un_btn do
+      begin
+         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW);
+         w    := surf^.w;h    := w;
+         hw   := w div 2;hh   := hw;
+      end;
+      with un_sbtn do
+      begin
+         surf:= LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
+         w    := surf^.w;h    := w;
+         hw   := w div 2;hh   := hw;
+      end;
    end;
 end;
 

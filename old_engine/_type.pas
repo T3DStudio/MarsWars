@@ -74,6 +74,20 @@ end;
  TThemeAnimL = array of TThemeAnim;
 PTThemeAnimL = ^TThemeAnimL;
 
+TMWSound = record
+   sound  : pMIX_CHUNK;
+   last_channel,
+   ticks_length
+          : integer;
+end;
+PTMWSound = ^TMWSound;
+
+TSoundSet = record
+   snds : array of PTMWSound;
+   sndn : integer;
+end;
+PTSoundSet = ^TSoundSet;
+
 {$ENDIF}
 
 TUWeapon = record
@@ -90,7 +104,7 @@ TUWeapon = record
   aw_rldt  : integer;
   {$IFDEF _FULLGAME}
   aw_rlda  : integer;
-  aw_snd   : pMIX_CHUNK;
+  aw_snd   : PTSoundSet;
   {$ENDIF}
 end;
 
@@ -131,15 +145,27 @@ TUID = record
 
    ups_builder,
    ups_units,
+   ups_upgrades,
    ups_apc      : TSoB;
    {$IFDEF _FULLGAME}
    _fr          : integer;
    un_btn,
-   un_sbtn      : pSDL_Surface;
+   un_sbtn      : TMWSprite;
    un_name,
    un_descr,
    un_hint      : shortstring;
    un_smodel    : array[false..true] of PTMWSModel;
+
+   {
+   sound sets:
+   ready
+   move command
+   attack command
+   annoy
+   select
+   death
+
+   }
    {$ENDIF}
 end;
 PTUID = ^TUID;
@@ -155,7 +181,7 @@ TUpgrade = record
    _up_mfrg  : boolean;
 
    {$IFDEF _FULLGAME}
-   _up_btn   : pSDL_Surface;
+   _up_btn   : TMWSprite;
    _up_name,
    _up_descr,
    _up_hint  : shortstring;
@@ -184,7 +210,7 @@ o_x1,o_y1  :integer;
    ucl_e,                                        // existed class
    ucl_eb,                                       // existed class bld=true and hits>0
    ucl_s,                                        // selected
-   ucl_x   : array[false..true,byte] of integer;             // first unit class
+   ucl_x   : array[false..true,byte] of integer; // first unit class
 
    uid_e,
    uid_eb,
@@ -229,6 +255,7 @@ o_x1,o_y1  :integer;
    n_barracks,
    n_smiths: integer;
 
+   lselUID,
    PNU     : byte;
    n_u,
    ttl     : integer;
