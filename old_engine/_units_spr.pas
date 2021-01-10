@@ -307,8 +307,9 @@ sms_walk:   begin
                else _unit2spr:=_sm2s(smodel,ak,dir,0);
             end;
 sms_dattack,
-sms_mattack: _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld>_a_weap[a_weap].aw_rlda));
-
+sms_mattack: if(a_weap<=MaxUnitWeapons)
+             then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a))
+             else _unit2spr:=_sm2s(smodel,ak,dir,0);
 sms_death:  begin
                anim:=abs(hits);
                if(_animd>0)

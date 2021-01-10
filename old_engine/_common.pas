@@ -139,6 +139,11 @@ begin
    else dir_turn:=(360+d1+(spd*sign(d))) mod 360;
 end;
 
+function _UnitRange(u:integer):boolean;
+begin
+   _UnitRange:=(0<u)and(u<=MaxUnits);
+end;
+
 procedure _addtoint(bt:pinteger;val:integer);
 begin
    if(bt^<val)then bt^:=val;
@@ -339,7 +344,7 @@ begin
    then _uvision:=true
    else
     with tu^ do
-     if(buff[ub_invis]=0)or(hits<=0)or(noinvis)
+     if(buff[ub_invis]<=0)or(hits<=0)or(noinvis)
      then _uvision:=(vsnt[uteam]>0)
      else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
@@ -482,7 +487,7 @@ end;
 function _uvision(uteam:byte;tu:PTUnit;onlyvis:boolean):boolean;
 begin
    with tu^ do
-    if(buff[ub_invis]=0)or(hits<=0)or(onlyvis)
+    if(buff[ub_invis]<=0)or(hits<=0)or(onlyvis)
     then _uvision:=(vsnt[uteam]>0)
     else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;

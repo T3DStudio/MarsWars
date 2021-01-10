@@ -80,10 +80,9 @@ begin
           c:=c_white;
           if G_started or (net_nstat=ns_clnt)then c:=c_gray;
 
-          _draw_text(tar,ui_menu_pls_zxst, u,_plst(p), ta_middle,255, c);
-
           if(state<>ps_none)then
           begin
+             _draw_text(tar,ui_menu_pls_zxst, u,_plst(p)          , ta_middle, 255, c);
              _draw_text(tar,ui_menu_pls_zxnt, u, name             , ta_left  , 255, c_white);
              if G_Started or (net_nstat=ns_clnt) or ((net_nstat<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
@@ -94,10 +93,12 @@ begin
           else
             if(G_aislots)>0then
             begin
-               _draw_text(tar,ui_menu_pls_zxnt, u,str_ps_comp+' '+b2s(G_aislots), ta_left, 255,c_gray);
-               _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random], ta_middle,255, c_gray);
-               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PickPlayerTeam(g_mode,p)), ta_middle,255, c_gray);
-            end;
+               _draw_text(tar,ui_menu_pls_zxst, u,str_ps_c[ps_comp]             , ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxnt, u,str_ps_comp+' '+b2s(G_aislots), ta_left  ,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random]            , ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PickPlayerTeam(g_mode,p)) , ta_middle,255, c_gray);
+            end
+            else _draw_text(tar,ui_menu_pls_zxst, u,_plst(p), ta_middle, 255, c);
           boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,p_color(p));
        end;
 

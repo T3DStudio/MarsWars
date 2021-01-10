@@ -145,17 +145,79 @@ co_pcancle             = -85;
 //
 
 ua_move                = 1;
-ua_amove               = 2;
-ua_hold                = 3;
+ua_hold                = 2;
+ua_amove               = 3;
 ua_unload              = 4;
 ua_paction             = 5;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Conditionals for attack
+//
+
+atm_none             = 0;
+atm_always           = 1;
+atm_bunker           = 2;
+atm_sturret          = 3;
+atm_inapc            = 4;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Weapon: requirements to attacker and some flags
+//
+
+wpr_any              : cardinal =  0;
+wpr_adv              : cardinal =  1;
+wpr_nadv             : cardinal =  1 shl 1;
+wpr_zombie           : cardinal =  1 shl 2;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Target flag
+//
+
+wtr_owner_p          : cardinal =  1;         // own
+wtr_owner_a          : cardinal =  1 shl 1;   // ally
+wtr_owner_e          : cardinal =  1 shl 2;   // enemy
+
+wtr_hits_h           : cardinal =  1 shl 3;   // 0<hits<mhits
+wtr_hits_d           : cardinal =  1 shl 4;   // hits<=0
+wtr_hits_a           : cardinal =  1 shl 5;   // hits=mhits
+
+wtr_bio              : cardinal =  1 shl 6;   // non mech
+wtr_mech             : cardinal =  1 shl 7;   // mech and !building
+wtr_building         : cardinal =  1 shl 8;   // building
+
+wtr_bld              : cardinal =  1 shl 9;   // bld=true
+wtr_nbld             : cardinal =  1 shl 10;  // bld=false
+
+wtr_ground           : cardinal =  1 shl 11;
+wtr_soaring          : cardinal =  1 shl 12;
+wtr_fly              : cardinal =  1 shl 13;
+
+wtr_adv              : cardinal =  1 shl 14;
+wtr_nadv             : cardinal =  1 shl 15;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Weapon: type
+//
+
+wpt_missle           = 0;
+wpt_resurect         = 1;
+wpt_heal             = 2;
+wpt_unit             = 3;
+wpt_directdmg        = 4;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  AI FLAGS
 //
 
-aif_dattack            : cardinal = 1       ; // default attack sequense
+{aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
 aif_pushair            : cardinal = 1 shl 2 ; // push air
 aif_pushgrnd           : cardinal = 1 shl 3 ; // push ground
@@ -183,7 +245,7 @@ aif_useapcs            : cardinal = 1 shl 24; // Use transports
 aif_hrsmntapcs         : cardinal = 1 shl 25; // transport harrasment
 aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
-aif_stayathome         : cardinal = 1 shl 28; //
+aif_stayathome         : cardinal = 1 shl 28; //   }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -298,8 +360,9 @@ upgr_uac_rturrets      = 53; // rocket turrets
 upgr_uac_bldenrg       = 54; // additional energy
 upgr_uac_9bld          = 55; // 9 class building reload time
 
-upgr_advbld            = 250;
-upgr_advbar            = 251;
+upgr_fast_build        = 250;
+upgr_fast_product      = 251;
+upgr_mult_product      = 252;
 upgr_invuln            = 255;
 
 
@@ -339,6 +402,7 @@ MID_Flyer              = 122;
 
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxUnitWeapons         = 2; //0-2
+MaxWeaponShootState    = 2;
 MaxUnitProds           = 1; //0-1
 
 uf_ground              = 0;
@@ -450,6 +514,11 @@ armor_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachn
 NameLen                = 13;
 ChatLen                = 38;
 
+gavno_dth_h            = -40;
+dead_hits              = -12*fr_fps;
+idead_hits             = dead_hits+fr_3fps;
+ndead_hits             = dead_hits-1;
+
 //upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
 ai_d2alrm              : array[false..true] of integer = (150,15);
 builder_enrg           : array[0..4] of byte = (6,7,8,9,10);
@@ -463,10 +532,7 @@ apc_exp_damage         = 70;
 regen_per              = fr_fps*2;
 _uclord_p              = fr_hfps+1;
 vistime                = _uclord_p+1;
-gavno_dth_h            = -45;
-dead_hits              = -12*fr_fps;
-idead_hits             = dead_hits+fr_3fps;
-ndead_hits             = dead_hits-1;
+
 radar_time             = fr_fps*30;
 radar_rlda             : array[0..5] of integer = (radar_time-fr_fps*3,radar_time-fr_fps*5,radar_time-fr_fps*7,radar_time-fr_fps*9,radar_time-fr_fps*11,radar_time-fr_fps*13);
 radar_rsg              : array[0..5] of integer = (200,225,250,275,300,325);
@@ -533,7 +599,7 @@ _hotkey2 : array[0.._mhkeys] of cardinal = (0      , 0      , 0      ,
 _hotkeyA : array[0..11     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_A , SDLK_S , SDLK_D ,
                                             SDLK_Z , SDLK_M , SDLK_C ,
-                                            0      , SDLK_F2, SDLK_Delete );
+                                            SDLK_X , SDLK_F2, SDLK_Delete );
 
 _hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_A , SDLK_S , SDLK_D ,

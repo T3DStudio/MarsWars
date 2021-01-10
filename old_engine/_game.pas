@@ -388,7 +388,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
 
                 if(o_id=uo_specsel)then
                  if(o_x0=255)then
-                 begin if(speed>0)and(uidi in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
+                 begin if(speed>0)and(_attack>0)then sel:=true else if(o_y0=0)then sel:=false;
                  end
                  else  if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
@@ -406,7 +406,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                uo_select     : lselUID:=uidi;
                uo_setorder,
                uo_addorder   : order:=o_x0;
-               uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - point
+               uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - x,y
                     co_destroy :  _unit_kill(pu,false,o_y0>0);
                     co_rcamove,
                     co_rcmove  :  begin     // right clik
@@ -422,10 +422,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                       UID_HMonastery,
                                       UID_HFortress,
                                       UID_UNuclearPlant : uo_tar:=o_y0;
-                                      UID_HGate,
+                                      {UID_HGate,
                                       UID_UMilitaryUnit,
                                       UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
-                                                          then uo_tar:=o_y0;
+                                                          then uo_tar:=o_y0; }
                                       UID_HTower,
                                       UID_HTotem        : if(o_y0<>u)and(o_y0<>0)
                                                           then uo_tar:=o_y0
@@ -439,8 +439,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                            uo_id :=ua_move;
                                            a_tar :=0;
                                         end;
-                                        _unit_turn(pu);
+
                                      end;
+                                     _unit_turn(pu);
                                   end;
                     co_stand,
                     co_move,
@@ -477,11 +478,14 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      end;
                                      end;
                                      case o_x0 of
-                              co_stand  : uo_id:=ua_hold;
+                              co_stand  : begin
+                                             uo_id:=ua_hold;
+                                             a_tar :=0;
+                                          end;
                               co_move,
                               co_patrol : begin
-                                             uo_id:=ua_move;
-                                             a_tar:=0;
+                                             uo_id :=ua_move;
+                                             a_tar :=0;
                                           end;
                               co_astand,
                               co_amove,
@@ -496,7 +500,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_tar:=0;
                                      uo_id :=ua_paction;
                                   end;
-                    co_action  : ;//_unit_action   (pu);
+                    co_action  :  _unit_action   (pu);
                     co_supgrade:  _unit_supgrade (pu,o_y0);
                     co_cupgrade:  _unit_cupgrade (pu,o_y0);
                     co_suprod  :  _unit_straining(pu,o_y0);

@@ -478,7 +478,7 @@ begin
 end;
 }
 
-procedure _unit_dspr(pu:PTUnit;noanim:boolean);
+procedure _unit_dspr(pu:PTUnit);
 var spr:PTMWSprite;
 begin
    with pu^ do
@@ -496,7 +496,7 @@ begin
         if ((vid_vx-spr^.hw)<vx)and(vx<(vid_vx+vid_sw+spr^.hw))and
            ((vid_vy-spr^.hh)<vy)and(vy<(vid_vy+vid_sh+spr^.hh))then
         begin
-           _sl_add_dec(vx,vy,_udpth(pu),0,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
+           _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
         end;
     end;
 end;
@@ -512,7 +512,7 @@ begin
       with pu^ do
        if(hits>0)
        then _unit_aspr(pu,noanim)
-       else _unit_dspr(pu,noanim);
+       else _unit_dspr(pu);
    end;
 end;
 

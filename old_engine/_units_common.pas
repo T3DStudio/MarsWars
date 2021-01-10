@@ -211,21 +211,100 @@ begin
         if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
         {$ENDIF}
      end;
-end;   }
+end;
+}
 
-procedure _building_newplace(tx,ty:integer;buid:byte;newx,newy:pinteger);
+procedure _1c_push(tx,ty:pinteger;x0,y0,r0:integer);
+var
+vx,vy,
+  a,h:single;
+begin
+   vx :=x0-tx^;
+   vy :=y0-ty^;
+   a  :=sqrt(sqr(vx)+sqr(vy));
+   if(a=0)then exit;
+   vx :=vx/a;
+   vy :=vy/a;
+   tx^:=x0-round(r0*vx);
+   ty^:=y0-round(r0*vy);
+end;
+
+procedure _2c_push(tx,ty:pinteger;x0,y0,r0,x1,y1,r1:integer);
+var d:integer;
+vx,vy,
+  a,h:single;
+begin
+   inc(r0,1);
+   inc(r1,1);
+   d:=dist(x0,y0,x1,y1);
+   if(abs(r0-r1)<=d)and(d<=(r0+r1))and(d>0)then
+   begin
+      a:=(sqr(r0)-sqr(r1)+sqr(d))/(2*d);
+      h:=sqrt(sqr(r0)-sqr(a));
+
+      vx:=(x1-x0)/d;
+      vy:=(y1-y0)/d;
+
+      if( round(-vy*(x0-tx^)+vx*(y0-ty^)) <= 0 )then
+      begin
+         tx^:=round( x0+a*vx-(h*vy) );
+         ty^:=round( y0+a*vy+(h*vx) );
+      end
+      else
+      begin
+         tx^:=round( x0+a*vx+(h*vy) );
+         ty^:=round( y0+a*vy-(h*vx) );
+      end;
+   end
+   else _1c_push(tx,ty,x0,y0,r0);
+end;
+
+procedure _building_newplace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
+const nrl = 1;
 var nrx,
     nry,
     nrd,
-    nrt,
-dx,dy,
-u,d,tr : integer;
-c      : single;
+    nrt: array[0..nrl] of integer;
+dx,dy,o,
+u,d,tr,
+sr,dr  : integer;
+
+procedure add(ax,ay,ad,at:integer);
+var i,n:integer;
 begin
-   nrd:= 32000;
-   nrx:=-30000;
-   nry:=-30000;
-   nrt:=0;
+   // find insert i
+   i:=0;
+   while(i<=nrl)do
+   begin
+      if(ad<nrd[i])then break;
+      inc(i,1);
+   end;
+
+   if(i>nrl)then exit;
+
+   if(i<>nrl)then
+    for n:=nrl-1 downto i do
+    begin
+       nrd[i+1]:=nrd[i];
+       nrx[i+1]:=nrx[i];
+       nry[i+1]:=nry[i];
+       nrt[i+1]:=nrt[i];
+    end;
+
+   nrd[i]:=ad;
+   nrx[i]:=ax;
+   nry[i]:=ay;
+   nrt[i]:=at;
+end;
+
+begin
+   for u:=0 to nrl do
+   begin
+      nrd[u]:= 32000;
+      nrx[u]:=-2000;
+      nry[u]:=-2000;
+      nrt[u]:=0;
+   end;
    tr :=_uids[buid]._r;
 
    dx:=tx div dcw;
@@ -237,50 +316,63 @@ begin
       with l[u-1]^ do
        if(r>0)and(t>0)then
        begin
-          d  :=dist(x,y,tx,ty)-(tr+r);
-          if(d<nrd)then
-          begin
-             nrd:=d;
-             nrx:=x;
-             nry:=y;
-             nrt:=tr+r+1;
-          end;
+          o:=tr+r;
+          d:=dist(x,y,tx,ty)-o;
+          add(x,y,d,o);
        end;
    inc(tr,bld_dec_mr);
 
    for u:=1 to MaxCPoints do
     with g_cpt_pl[u] do
     begin
-       d:=dist(px,py,tx,ty)-(tr+base_r);
-       if(d<nrd)then
-       begin
-          nrd:=d;
-          nrx:=px;
-          nry:=py;
-          nrt:=tr+base_r+1;
-       end;
+       o:=base_r;
+       d:=dist(px,py,tx,ty)-o;
+       add(px,py,d,o);
     end;
 
+
+   dx:=-2000;
+   dy:=-2000;
+   sr:=32000;
+   dr:=32000;
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
      if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc<=0)then
      begin
-        d:=dist(x,y,tx,ty)-(tr+_r);
-        if(d<nrd)then
+        o:=tr+_r;
+        d:=dist(x,y,tx,ty);
+        add(x,y,d-o,o);
+
+        if(buid>0)then
+        if(_isbuilding)and(bld)and(_isbuilder)and(playeri=pl)then
         begin
-           nrd:=d;
-           nrx:=x;
-           nry:=y;
-           nrt:=tr+_r+1;
+           if not(buid in uid^.ups_builder)then continue;
+
+           o:=d-srng;
+           if(o<dr)then
+           begin
+              dx:=x;
+              dy:=y;
+              dr:=o;
+              sr:=srng;
+           end;
         end;
      end;
 
-   if(nrd<-1)then
+   if(nrd[1]<=-1)
+   then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
+   else
+     if(nrd[0]<=-1)
+     then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
+     {else
+       if(0<dr)and(dr<32000)
+       then _1c_push(@tx,@ty,dx,dy,sr-1);}
+   if(dr<32000)then
    begin
-      c :=p_dir(nrx,nry,tx,ty)*degtorad;
-      tx:=nrx+round(nrt*cos(c));
-      ty:=nry-round(nrt*sin(c));
+      d :=dist(dx,dy,tx,ty);
+      dr:=d-sr;
+      if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
    newx^:=tx;
@@ -436,8 +528,8 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_x[uidi            ]=0)then uid_x[uidi            ]:=unum;
-      if(ucl_x[_isbuilding,_ucl]=0)then ucl_x[_isbuilding,_ucl]:=unum;
+      if(uid_x[uidi            ]<=0)then uid_x[uidi            ]:=unum;
+      if(ucl_x[_isbuilding,_ucl]<=0)then ucl_x[_isbuilding,_ucl]:=unum;
       inc(ucl_eb[_isbuilding,_ucl],1);
       inc(uid_eb[uidi            ],1);
       inc(menerg,_generg);
@@ -552,16 +644,13 @@ end;
 //////   Start unit prod
 //
 function _unit_straining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
-var t:integer;
 begin
-   t:=_uid_cndt(pu^.player,puid);
-   writeln(_uids[puid].un_name,' ',t);
    _unit_straining_p:=false;
    if(puid<255)then
     with pu^ do
     with uid^ do
      if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_isbuilding)then
-      if(puid in ups_units)and(t=0)then
+      if(puid in ups_units)and(_uid_cndt(pu^.player,puid)=0)then
        with player^ do
        begin
           inc(uproda,1);
@@ -807,39 +896,51 @@ begin
            end;
       end;
    end;
-end;  }
+end;    }
 
-function _u1_spawn(pu:PTUnit;sx,sy,pn:integer):boolean;
-var _uid:byte;
+procedure _u1_spawn(pu:PTUnit;_uid,count:byte);
+var
+sr, i:integer;
+cd   :single;
+sound:boolean;
 begin
-  _u1_spawn:=false;
+   sound:=false;
    with pu^ do
    with uid^ do
-   with player^ do
    begin
-      if(sy=32000)then sy:=_r;
-      _uid:=uprod_u[pn];
-      _unit_add(x+sx,y+sy+_uids[_uid]._r,_uid,playeri,true);
-      if(_LastCreatedUnit>0)then
-      begin
-         _u1_spawn:=true;
-         _LastCreatedUnitP^.uo_x   :=uo_x;
-         _LastCreatedUnitP^.uo_y   :=uo_y;
-         _LastCreatedUnitP^.uo_id  :=uo_id;
-         _LastCreatedUnitP^.uo_tar :=uo_tar;
-         _unit_turn(_LastCreatedUnitP);
+      dir:=p_dir(x,y,uo_x,uo_y);
+      if(_uids[_uid]._uf>uf_ground)
+      then sr:=0
+      else sr :=_r;//+_uids[_uid]._r;
 
-         {if(uidi=uid_HGate)then
+      for i:=0 to count do
+      begin
+         cd:=(dir+i*15)*degtorad;
+
+         _unit_add(x+trunc(sr*cos(cd)),
+                   y-trunc(sr*sin(cd)),_uid,playeri,true);
+         if(_LastCreatedUnit>0)then
          begin
-            _LastCreatedUnitP^.buff[ub_teleeff]:=vid_fps;
-            {$IFDEF _FULLGAME}
-            PlaySND(snd_teleport,pu);
-            _effect_add(_LastCreatedUnitP^.x,_LastCreatedUnitP^.y,_LastCreatedUnitP^.y+map_flydpth[_LastCreatedUnitP^.uf]+5,EID_Teleport);
-            {$ENDIF}
-         end;  }
+            sound:=true;
+            _LastCreatedUnitP^.uo_x  :=uo_x;
+            _LastCreatedUnitP^.uo_y  :=uo_y;
+            _LastCreatedUnitP^.uo_id :=uo_id;
+            _LastCreatedUnitP^.uo_tar:=uo_tar;
+            _unit_turn(_LastCreatedUnitP);
+         end;
       end;
+
+      if(sound)then _unit_createsound(_uid);
    end;
 end;
+{if(uidi=uid_HGate)then
+begin
+   _LastCreatedUnitP^.buff[ub_teleeff]:=vid_fps;
+   {$IFDEF _FULLGAME}
+   PlaySND(snd_teleport,pu);
+   _effect_add(_LastCreatedUnitP^.x,_LastCreatedUnitP^.y,_LastCreatedUnitP^.y+map_flydpth[_LastCreatedUnitP^.uf]+5,EID_Teleport);
+   {$ENDIF}
+end;  }
 
 procedure _unit_end_uprod(pu:PTUnit);
 var i,_uid:byte;
@@ -861,13 +962,11 @@ begin
       else
         if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
         begin
-           if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
-
-           //if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
+           _u1_spawn(pu,uprod_u[i],upgr[upgr_mult_product]);
 
            _unit_ctraining_p(pu,255,i);
         end
-        else dec(uprod_r[i],1);
+        else uprod_r[i]:=max2(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
    end;
 end;
 
@@ -892,7 +991,7 @@ begin
           inc(upgr[_uid],1);
           _unit_cupgrade_p(pu,255,i);
        end
-       else dec(pprod_r[i],1);
+       else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
   end;
 end;
 
@@ -1142,10 +1241,10 @@ begin
 
       if(td<=(tu^.srng+uid^._r))then
       begin
-         if(buff[ub_invis]=0)
+         if(buff[ub_invis]<=0)
          then _addtoint(@vsnt[tu^.player^.team],vistime)
          else
-           if(tu^.buff[ub_detect]>0)and(tu^.bld)then
+           if(tu^.buff[ub_detect]>0)and(tu^.bld)and(tu^.hits>0)then
            begin
               _addtoint(@vsnt[tu^.player^.team],vistime);
               _addtoint(@vsni[tu^.player^.team],vistime);

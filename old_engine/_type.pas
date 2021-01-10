@@ -94,16 +94,17 @@ TUWeapon = record
   aw_type,
   aw_rupgr,
   aw_ruid,
-  aw_mid   : byte;
-  aw_taru  : TSob;
+  aw_oid   : byte;
+  aw_uids  : TSob;
   aw_tarf,
   aw_reqf  : cardinal;
-  aw_rng,
-  aw_mdmg,
-  aw_rlds,
-  aw_rldt  : integer;
+  aw_range,
+  aw_damage,
+  aw_count,
+  aw_rld   : byte;
+  aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
-  aw_rlda  : integer;
+  aw_rld_a : TSoB;
   aw_snd   : PTSoundSet;
   {$ENDIF}
 end;
@@ -124,6 +125,7 @@ TUID = record
    _apcm,
    _animw,_animd,_animf
                 : integer;
+   _zombieid,
    _urace,
    _uf,
    _ucl,
@@ -134,6 +136,7 @@ TUID = record
 
    _shcf        : single;
 
+   _attack      : byte;
    _slowturn,
    _isbuilding,
    _isbuilder,
@@ -156,6 +159,14 @@ TUID = record
    un_hint      : shortstring;
    un_smodel    : array[false..true] of PTMWSModel;
 
+   un_snd_ready,
+   un_snd_move,
+   un_snd_attack,
+   un_snd_annoy,
+   un_snd_select,
+   un_snd_death
+
+                : array[false..true] of PTSoundSet;
    {
    sound sets:
    ready
@@ -284,11 +295,11 @@ TUnit = record
    uprod_u,
    pprod_u  : array[0..MaxUnitProds] of byte;
 
+   a_rld,
    a_weap   : byte;
    a_arng   : array[0..MaxUnitWeapons] of integer;
    a_tx,
    a_ty,
-   a_rld,
    a_tar,
    a_tard,
    mv_x,mv_y,

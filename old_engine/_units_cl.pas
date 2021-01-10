@@ -153,10 +153,14 @@ begin
 end;
 UID_HTower:
 begin
+   _animw:=20;
+
    setMWSM(@spr_HTower,nil);
 end;
 UID_HTeleport:
 begin
+   _animw:=20;
+
    setMWSM(@spr_HTeleport,nil);
 end;
 UID_HMonastery:
@@ -341,20 +345,34 @@ begin
          or(buff[ub_toxin]>0)
          or(buff[ub_gear ]>0)then exit;
       end;
-      {case uidi of
-        UID_Flyer,
-        UID_Terminator,
-        UID_Tank,
-        UID_UTransport,
-        UID_APC,
-        UID_FAPC :
-        UID_UCommandCenter,
-        UID_HCommandCenter: if(buff[ub_clcast]>0)then exit;
-      else
-      end; }
 
       _canmove:=true;
    end;
+end;
+
+function _canattack(pu:PTUnit):boolean;
+begin
+   _canattack:=false;
+   with pu^ do
+   if(bld)then
+   with uid^ do
+   case _attack of
+    atm_none    : exit;
+    atm_bunker,
+    atm_always  : if(0<inapc)and(inapc<=MaxUnits)then
+                  begin
+                     if(_units[inapc].inapc>0)then exit;
+                     case _units[inapc].uid^._attack of
+                     atm_none,
+                     atm_sturret: exit;
+                     end;
+                  end;
+    atm_sturret : if(apcc =0)then exit;
+    atm_inapc   : if(inapc=0)then exit;
+      else exit;
+
+   end;
+   _canattack:=true;
 end;
 
 procedure _unit_apUID(pu:PTUnit);
@@ -384,6 +402,14 @@ begin
    end;
 end;
 
+{
+atm_none             = 0;
+atm_always           = 1;
+atm_bunker           = 2;
+atm_sturret          = 3;
+atm_inapc            = 4;
+}
+
 procedure initUIDS;
 var i:byte;
 begin
@@ -397,6 +423,7 @@ begin
       _ucl       := 255;
       _apcs      := 1;
       _urace     := r_hell;
+      _attack    := atm_none;
 
       _isbuilding:=false;
       _isbuilder :=false;
@@ -471,6 +498,7 @@ begin
    _srng      := 250;
    _ucl       := 4;
    _btime     := 20;
+   _attack    := atm_always;
 
    _isbuilding:= true;
 end;
@@ -508,6 +536,7 @@ begin
    _ucl       := 7;
    _btime     := 25;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
@@ -599,6 +628,7 @@ begin
    _painc     := 1;
    _btime     := 8;
    _uf        := uf_soaring;
+   _attack    := atm_always;
 end;
 UID_Imp        :
 begin
@@ -610,6 +640,7 @@ begin
    _ucl       := 1;
    _painc     := 3;
    _btime     := 5;
+   _attack    := atm_always;
 end;
 UID_Demon      :
 begin
@@ -621,6 +652,7 @@ begin
    _ucl       := 2;
    _painc     := 8;
    _btime     := 8;
+   _attack    := atm_always;
 end;
 UID_Cacodemon  :
 begin
@@ -634,6 +666,7 @@ begin
    _btime     := 20;
    _apcs      := 2;
    _uf        := uf_fly;
+   _attack    := atm_always;
 end;
 UID_Baron      :
 begin
@@ -646,6 +679,7 @@ begin
    _painc     := 8;
    _btime     := 40;
    _apcs      := 3;
+   _attack    := atm_always;
 end;
 UID_Cyberdemon :
 begin
@@ -660,6 +694,7 @@ begin
    _btime     := 90;
    _apcs      := 10;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
 end;
 UID_Mastermind :
 begin
@@ -674,6 +709,7 @@ begin
    _btime     := 90;
    _apcs      := 10;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
 end;
 UID_Pain       :
 begin
@@ -688,6 +724,7 @@ begin
    _apcs      := 2;
    _ruid      := UID_HFortress;
    _uf        := uf_fly;
+   _attack    := atm_always;
 end;
 UID_Revenant   :
 begin
@@ -700,6 +737,7 @@ begin
    _painc     := 7;
    _btime     := 40;
    _ruid      := UID_HFortress;
+   _attack    := atm_always;
 end;
 UID_Mancubus   :
 begin
@@ -712,6 +750,7 @@ begin
    _painc     := 4;
    _btime     := 60;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 end;
 UID_Arachnotron:
@@ -725,6 +764,7 @@ begin
    _painc     := 4;
    _btime     := 50;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 end;
 UID_Archvile:
@@ -739,6 +779,7 @@ begin
    _btime     := 90;
    _apcs      := 2;
    _ruid      := UID_HMonastery;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 end;
 
@@ -752,6 +793,7 @@ begin
    _ucl       := 12;
    _painc     := 1;
    _btime     := 5;
+   _attack    := atm_always;
 end;
 UID_ZEngineer:
 begin
@@ -763,6 +805,7 @@ begin
    _ucl       := 13;
    _painc     := 4;
    _btime     := 20;
+   _attack    := atm_always;
 end;
 UID_ZSergant:
 begin
@@ -774,6 +817,7 @@ begin
    _ucl       := 14;
    _painc     := 4;
    _btime     := 10;
+   _attack    := atm_always;
 end;
 UID_ZCommando:
 begin
@@ -785,6 +829,7 @@ begin
    _ucl       := 15;
    _painc     := 4;
    _btime     := 15;
+   _attack    := atm_always;
 end;
 UID_ZBomber:
 begin
@@ -796,6 +841,7 @@ begin
    _ucl       := 16;
    _painc     := 4;
    _btime     := 30;
+   _attack    := atm_always;
 end;
 UID_ZMajor:
 begin
@@ -807,6 +853,7 @@ begin
    _ucl       := 17;
    _painc     := 4;
    _btime     := 20;
+   _attack    := atm_always;
 end;
 UID_ZBFG:
 begin
@@ -818,6 +865,7 @@ begin
    _ucl       := 18;
    _painc     := 4;
    _btime     := 60;
+   _attack    := atm_always;
 end;
 
 
@@ -831,6 +879,10 @@ begin
    _srng      := base_rA[0];
    _ucl       := 0;
    _btime     := 90;
+
+   _zombieid  := UID_HCommandCenter;
+
+   _attack    := atm_always;
 
    _isbuilding:= true;
    _isbuilder := true;
@@ -846,6 +898,8 @@ begin
    _srng      := 200;
    _ucl       := 1;
    _btime     := 40;
+
+   _zombieid  := UID_HMilitaryUnit;
 
    _isbuilding:=true;
    _isbarrack :=true;
@@ -886,6 +940,7 @@ begin
    _srng      := 250;
    _ucl       := 4;
    _btime     := 15;
+   _attack    := atm_always;
 
    _isbuilding:=true;
 end;
@@ -923,6 +978,7 @@ begin
    _ucl       := 7;
    _btime     := 20;
    _ruid      := UID_UVehicleFactory;
+   _attack    := atm_always;
 
    _isbuilding:=true;
 end;
@@ -949,6 +1005,7 @@ begin
    _ucl       := 10;
    _btime     := 25;
    _ruid      := UID_UVehicleFactory;
+   _attack    := atm_always;
    //_rupgr     := upgr_rturrets;
 
    _isbuilding:=true;
@@ -976,6 +1033,7 @@ begin
    _ucl       := 21;
    _btime     := 5;
    _ucl       := 9;
+   _attack    := atm_always;
 
    _isbuilding:=true;
    _issolid   := false;
@@ -991,6 +1049,8 @@ begin
    _srng      := 200;
    _ucl       := 0;
    _btime     := 10;
+   _attack    := atm_always;
+   _zombieid  := UID_ZEngineer;
 end;
 UID_Medic:
 begin
@@ -1001,6 +1061,8 @@ begin
    _srng      := 200;
    _ucl       := 1;
    _btime     := 10;
+   _attack    := atm_always;
+   _zombieid  := UID_ZFormer;
 end;
 UID_Sergant:
 begin
@@ -1011,6 +1073,8 @@ begin
    _srng      := 241;
    _ucl       := 2;
    _btime     := 10;
+   _attack    := atm_always;
+   _zombieid  := UID_ZSergant;
 end;
 UID_Commando:
 begin
@@ -1021,6 +1085,8 @@ begin
    _srng      := 250;
    _ucl       := 3;
    _btime     := 15;
+   _attack    := atm_always;
+   _zombieid  := UID_ZCommando;
 end;
 UID_Bomber:
 begin
@@ -1031,6 +1097,8 @@ begin
    _srng      := 250;
    _ucl       := 4;
    _btime     := 30;
+   _attack    := atm_always;
+   _zombieid  := UID_ZBomber;
 end;
 UID_Major:
 begin
@@ -1041,6 +1109,8 @@ begin
    _srng      := 250;
    _ucl       := 5;
    _btime     := 20;
+   _attack    := atm_always;
+   _zombieid  := UID_ZMajor;
 end;
 UID_BFG:
 begin
@@ -1051,6 +1121,8 @@ begin
    _srng      := 250;
    _ucl       := 6;
    _btime     := 60;
+   _attack    := atm_always;
+   _zombieid  := UID_ZBFG;
 end;
 UID_FAPC:
 begin
@@ -1065,6 +1137,7 @@ begin
    _apcs      := 8;
    _ruid      := UID_UWeaponFactory;
    _uf        := uf_fly;
+   _attack    := atm_always;
 
    _ismech    := true;
    _slowturn  := true;
@@ -1083,6 +1156,7 @@ begin
    _apcm      := 10;
    _apcs      := 10;
    _ruid      := UID_UWeaponFactory;
+   _attack    := atm_always;
 
    _ismech    := true;
    _slowturn  := true;
@@ -1100,6 +1174,7 @@ begin
    _btime     := 60;
    _apcs      := 3;
    _ruid      := UID_UVehicleFactory;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
    _ismech    := true;
@@ -1115,6 +1190,7 @@ begin
    _btime     := 60;
    _apcs      := 7;
    _ruid      := UID_UVehicleFactory;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
    _ismech    := true;
@@ -1131,6 +1207,7 @@ begin
    _apcs      := 7;
    _uf        := uf_fly;
    _ruid      := UID_UVehicleFactory;
+   _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
    _ismech    := true;

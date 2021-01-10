@@ -36,9 +36,50 @@ begin
        else G_paused:=0;
 end;
 
-procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oid,pl:byte);
+procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
 var su,i:integer;
-  cmsnd:boolean;
+    guid:byte;
+begin
+   su:=0;
+
+   with _players[HPlayer] do
+   begin
+      for i:=1 to MaxUnits do
+      with _units[i] do
+      with uid^ do
+      if(hits>0)and(sel)and(playeri=HPlayer)then
+      if(speed>0)or(_isbarrack)or(_attack>0)then
+      begin
+         inc(su,1);
+         guid:=uidi;
+      end;
+   end;
+
+   if(su<=0)then exit;
+
+   // move or attack sound  guid
+
+   inc(ox1,vid_mapx);
+   inc(oy1,vid_mapy);
+
+   if(_UnitRange(tar))then
+   begin
+      ui_umark_u:=tar;
+      ui_umark_t:=fr_hfps;
+   end;
+
+   case cmd of
+   co_paction : _click_eff(ox1,oy1,fr_hhfps,c_aqua  );
+   co_rcamove : _click_eff(ox1,oy1,fr_hhfps,c_yellow);
+   co_rcmove,
+   co_move,
+   co_patrol  : _click_eff(ox1,oy1,fr_hhfps,c_lime  );
+   co_amove,
+   co_apatrol : _click_eff(ox1,oy1,fr_hhfps,c_red   );
+   end;
+end;
+
+procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oid,pl:byte);
 begin
    if(G_Paused=0)and(_rpls_rst<rpl_rhead)then
    begin
@@ -63,58 +104,7 @@ begin
            o_id:=oid;
         end;
 
-      if(oid<>uo_corder)then exit;
-
-      with _players[HPlayer] do
-      begin
-         su:=0;
-        { cmsnd:=false;
-         for i:=1 to 255 do
-          with _ulst[i] do
-           if(speed>0)then inc(su,uid_s[i]);
-         if(su>0)then cmsnd:=true;
-         if(upgr[upgr_mainm]>0)then inc(su,ucl_s[true,0]);
-         inc(su,ucl_s[true,5]+ucl_s[true,4]+ucl_s[true,7]);
-         for i:=1 to 255 do
-          with _ulst[i] do
-           if(isbarrack)then inc(su,uid_s[i]);
-         inc(su,uid_s[UID_HCommandCenter]);
-         if(race=r_uac )then
-         begin
-            if(upgr[upgr_blizz]>0)then inc(su,ucl_s[true,8]);
-            inc(su,ucl_s[true,6]);
-            inc(su,ucl_s[true,0]);
-         end;
-         if(race=r_hell)then
-         begin
-            if(upgr[upgr_6bld   ]>0)then inc(su,ucl_s[true,6]);
-         end;
-         for i:=_uts downto 0 do
-          if(ucl_s[false,i]>0)then break;  }
-      end;
-
-     // if(cmsnd)then _unit_comssnd(i,_players[HPlayer].race);
-
-      if(su<=0)then exit;
-
-      inc(ox1,vid_mapx);
-      inc(oy1,vid_mapy);
-
-      if(oy0>0)then
-      begin
-         ui_umark_u:=oy0;
-         ui_umark_t:=fr_hfps;
-      end;
-
-      case ox0 of
-      co_paction : _click_eff(ox1,oy1,fr_hhfps,c_aqua  );
-      co_rcamove : _click_eff(ox1,oy1,fr_hhfps,c_yellow);
-      co_rcmove,
-      co_move,
-      co_patrol  : _click_eff(ox1,oy1,fr_hhfps,c_lime  );
-      co_amove,
-      co_apatrol : _click_eff(ox1,oy1,fr_hhfps,c_red   );
-      end;
+      if(oid=uo_corder)then _ClientCommandEffect(ox0,oy0,ox1,oy1);
    end;
 end;
 
@@ -177,7 +167,7 @@ begin
                   m_brushx:=m_mx;
                   m_brushy:=m_my;
                end
-               else _building_newplace(m_mx,m_my,m_brush,@m_brushx,@m_brushy);
+               else _building_newplace(m_mx,m_my,m_brush,HPlayer,@m_brushx,@m_brushy);
 
                case _unit_grbcol(m_brushx,m_brushy,_uids[m_brush]._r,HPlayer,m_brush,true) of
                1 :  m_brushc:=c_red;
@@ -291,6 +281,8 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer)
    6 : _player_s_o(co_action ,0,0,0, uo_corder  ,HPlayer);
    7 : m_a_inv:=not m_a_inv;
    8 : _player_s_o(co_pcancle,0,0,0, uo_corder  ,HPlayer);
+
+   9 : m_brush:=co_paction;
 
    10: if(ui_orders_x[10]>0)then
         if(k_dbl>0)
