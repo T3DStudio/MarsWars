@@ -23,7 +23,7 @@ begin
       fsr:=0;
       if(fog_cw>0)then
       begin
-         fsr:=srng div fog_cw;
+         fsr:=srange div fog_cw;
          if(fsr>MFogM)then fsr:=MFogM;
       end;
    end;
@@ -382,7 +382,8 @@ begin
       uid:=@_uids[uidi];
       with uid^ do
       begin
-         srng  := _srng;
+         srange:= _srange;
+         arange:= _arange;
          speed := _speed;
          uf    := _uf;
          apcm  := _apcm;
@@ -424,6 +425,8 @@ begin
       _apcs      := 1;
       _urace     := r_hell;
       _attack    := atm_none;
+      _srange    := 260;
+      _arange    := -1;
 
       _isbuilding:=false;
       _isbuilder :=false;
@@ -441,7 +444,7 @@ begin
    _renerg    := 8;
    _generg    := 6;
    _r         := 66;
-   _srng      := base_rA[0];
+   _srange      := base_rA[0];
    _ucl       := 0;
    _btime     := 75;
 
@@ -455,7 +458,7 @@ begin
    _mhits     := 1500;
    _renerg    := 4;
    _r         := 60;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 1;
    _btime     := 40;
 
@@ -470,7 +473,7 @@ begin
    _renerg    := 1;
    _generg    := 1;
    _r         := 24;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 2;
    _btime     := 10;
 
@@ -481,7 +484,7 @@ begin
    _mhits     := 1000;
    _renerg    := 6;
    _r         := 53;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 3;
    _btime     := 40;
 
@@ -495,7 +498,7 @@ begin
    _mhits     := 700;
    _renerg    := 2;
    _r         := 21;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 4;
    _btime     := 20;
    _attack    := atm_always;
@@ -507,7 +510,7 @@ begin
    _mhits     := 400;
    _renerg    := 4;
    _r         := 28;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 5;
    _btime     := 30;
    _max       := 1;
@@ -519,7 +522,7 @@ begin
    _mhits     := 1000;
    _renerg    := 10;
    _r         := 65;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 6;
    _btime     := 90;
    _max       := 1;
@@ -532,7 +535,7 @@ begin
    _mhits     := 700;
    _renerg    := 3;
    _r         := 21;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 7;
    _btime     := 25;
    _ruid      := UID_HMonastery;
@@ -546,7 +549,7 @@ begin
    _mhits     := 500;
    _renerg    := 4;
    _r         := 50;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 8;
    _btime     := 30;
    _max       := 1;
@@ -561,7 +564,7 @@ begin
    _renerg    := 10;
    _generg    := 4;
    _r         := 86;
-   _srng      := 300;
+   _srange      := 300;
    _ucl       := 9;
    _btime     := 90;
    _max       := 1;
@@ -577,7 +580,7 @@ begin
    _mhits     := 240;
    _renerg    := 1;
    _r         := 5;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 21;
    _btime     := 1;
    //_rupgr     := upgr_vision;
@@ -592,7 +595,7 @@ begin
    _generg    := 6;
    _speed     := 6;
    _r         := 66;
-   _srng      := base_rA[0];
+   _srange      := base_rA[0];
    _ucl       := 12;
    _btime     := 90;
 
@@ -606,7 +609,7 @@ begin
    _mhits     := 1500;
    _renerg    := 4;
    _r         := 66;
-   _srng      := base_rA[0];
+   _srange      := base_rA[0];
    _ucl       := 13;
    _btime     := 40;
 
@@ -623,7 +626,7 @@ begin
    _renerg    := 1;
    _r         := 10;
    _speed     := 23;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 0;
    _painc     := 1;
    _btime     := 8;
@@ -636,7 +639,7 @@ begin
    _renerg    := 1;
    _r         := 11;
    _speed     := 9;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 1;
    _painc     := 3;
    _btime     := 5;
@@ -648,7 +651,7 @@ begin
    _renerg    := 2;
    _r         := 14;
    _speed     := 14;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 2;
    _painc     := 8;
    _btime     := 8;
@@ -660,7 +663,7 @@ begin
    _renerg    := 2;
    _r         := 14;
    _speed     := 9;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 3;
    _painc     := 6;
    _btime     := 20;
@@ -674,7 +677,7 @@ begin
    _renerg    := 4;
    _r         := 14;
    _speed     := 9;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 4;
    _painc     := 8;
    _btime     := 40;
@@ -688,7 +691,7 @@ begin
    _max       := 1;
    _r         := 20;
    _speed     := 11;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 5;
    _painc     := 15;
    _btime     := 90;
@@ -703,7 +706,7 @@ begin
    _max       := 1;
    _r         := 35;
    _speed     := 11;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 6;
    _painc     := 15;
    _btime     := 90;
@@ -717,7 +720,7 @@ begin
    _renerg    := 6;
    _r         := 14;
    _speed     := 9;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 7;
    _painc     := 3;
    _btime     := 40;
@@ -732,7 +735,7 @@ begin
    _renerg    := 4;
    _r         := 13;
    _speed     := 12;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 8;
    _painc     := 7;
    _btime     := 40;
@@ -745,7 +748,7 @@ begin
    _renerg    := 6;
    _r         := 20;
    _speed     := 6;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 9;
    _painc     := 4;
    _btime     := 60;
@@ -759,7 +762,7 @@ begin
    _renerg    := 6;
    _r         := 20;
    _speed     := 8;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 10;
    _painc     := 4;
    _btime     := 50;
@@ -773,7 +776,7 @@ begin
    _renerg    := 10;
    _r         := 14;
    _speed     := 15;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 11;
    _painc     := 12;
    _btime     := 90;
@@ -789,7 +792,7 @@ begin
    _renerg    := 1;
    _r         := 12;
    _speed     := 13;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 12;
    _painc     := 1;
    _btime     := 5;
@@ -801,7 +804,7 @@ begin
    _renerg    := 2;
    _r         := 12;
    _speed     := 14;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 13;
    _painc     := 4;
    _btime     := 20;
@@ -813,7 +816,7 @@ begin
    _renerg    := 2;
    _r         := 12;
    _speed     := 13;
-   _srng      := 241;
+   _srange      := 241;
    _ucl       := 14;
    _painc     := 4;
    _btime     := 10;
@@ -825,7 +828,7 @@ begin
    _renerg    := 2;
    _r         := 12;
    _speed     := 11;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 15;
    _painc     := 4;
    _btime     := 15;
@@ -837,7 +840,7 @@ begin
    _renerg    := 4;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 16;
    _painc     := 4;
    _btime     := 30;
@@ -849,7 +852,7 @@ begin
    _renerg    := 4;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 17;
    _painc     := 4;
    _btime     := 20;
@@ -861,7 +864,7 @@ begin
    _renerg    := 5;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 18;
    _painc     := 4;
    _btime     := 60;
@@ -876,7 +879,7 @@ begin
    _renerg    := 8;
    _generg    := 6;
    _r         := 66;
-   _srng      := base_rA[0];
+   _srange      := base_rA[0];
    _ucl       := 0;
    _btime     := 90;
 
@@ -895,7 +898,7 @@ begin
    _mhits     := 1750;
    _renerg    := 4;
    _r         := 66;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 1;
    _btime     := 40;
 
@@ -912,7 +915,7 @@ begin
    _renerg    := 2;
    _generg    := 2;
    _r         := 42;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 2;
    _btime     := 20;
 
@@ -923,7 +926,7 @@ begin
    _mhits     := 1750;
    _renerg    := 6;
    _r         := 62;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 3;
    _btime     := 40;
 
@@ -937,7 +940,7 @@ begin
    _mhits     := 400;
    _renerg    := 2;
    _r         := 17;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 4;
    _btime     := 15;
    _attack    := atm_always;
@@ -949,7 +952,7 @@ begin
    _mhits     := 500;
    _renerg    := 4;
    _r         := 35;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 5;
    _btime     := 30;
    _max       := 1;
@@ -961,7 +964,7 @@ begin
    _mhits     := 1750;
    _renerg    := 10;
    _r         := 62;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 6;
    _btime     := 90;
    _max       := 1;
@@ -974,7 +977,7 @@ begin
    _mhits     := 400;
    _renerg    := 2;
    _r         := 17;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 7;
    _btime     := 20;
    _ruid      := UID_UVehicleFactory;
@@ -987,7 +990,7 @@ begin
    _mhits     := 500;
    _renerg    := 4;
    _r         := 40;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 8;
    _btime     := 30;
    _max       := 1;
@@ -1001,7 +1004,7 @@ begin
    _mhits     := 400;
    _renerg    := 2;
    _r         := 17;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 10;
    _btime     := 25;
    _ruid      := UID_UVehicleFactory;
@@ -1016,7 +1019,7 @@ begin
    _renerg    := 10;
    _generg    := 10;
    _r         := 70;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 9;
    _btime     := 90;
    _max       := 1;
@@ -1029,7 +1032,7 @@ begin
    _mhits     := 5;
    _renerg    := 1;
    _r         := 5;
-   _srng      := 100;
+   _srange      := 100;
    _ucl       := 21;
    _btime     := 5;
    _ucl       := 9;
@@ -1046,7 +1049,7 @@ begin
    _renerg    := 1;
    _r         := 12;
    _speed     := 13;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 0;
    _btime     := 10;
    _attack    := atm_always;
@@ -1058,7 +1061,7 @@ begin
    _renerg    := 1;
    _r         := 12;
    _speed     := 13;
-   _srng      := 200;
+   _srange      := 200;
    _ucl       := 1;
    _btime     := 10;
    _attack    := atm_always;
@@ -1070,7 +1073,7 @@ begin
    _renerg    := 2;
    _r         := 12;
    _speed     := 13;
-   _srng      := 241;
+   _srange      := 241;
    _ucl       := 2;
    _btime     := 10;
    _attack    := atm_always;
@@ -1082,7 +1085,7 @@ begin
    _renerg    := 2;
    _r         := 12;
    _speed     := 11;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 3;
    _btime     := 15;
    _attack    := atm_always;
@@ -1094,7 +1097,7 @@ begin
    _renerg    := 4;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 4;
    _btime     := 30;
    _attack    := atm_always;
@@ -1106,7 +1109,7 @@ begin
    _renerg    := 4;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 5;
    _btime     := 20;
    _attack    := atm_always;
@@ -1118,7 +1121,7 @@ begin
    _renerg    := 5;
    _r         := 12;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 6;
    _btime     := 60;
    _attack    := atm_always;
@@ -1130,7 +1133,7 @@ begin
    _renerg    := 3;
    _r         := 33;
    _speed     := 22;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 7;
    _btime     := 25;
    _apcm      := 10;
@@ -1150,7 +1153,7 @@ begin
    _renerg    := 3;
    _r         := 25;
    _speed     := 15;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 8;
    _btime     := 25;
    _apcm      := 10;
@@ -1169,7 +1172,7 @@ begin
    _renerg    := 6;
    _r         := 16;
    _speed     := 14;
-   _srng      := 275;
+   _srange      := 275;
    _ucl       := 9;
    _btime     := 60;
    _apcs      := 3;
@@ -1185,7 +1188,7 @@ begin
    _renerg    := 8;
    _r         := 20;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 10;
    _btime     := 60;
    _apcs      := 7;
@@ -1201,7 +1204,7 @@ begin
    _renerg    := 8;
    _r         := 18;
    _speed     := 19;
-   _srng      := 275;
+   _srange      := 275;
    _ucl       := 11;
    _btime     := 60;
    _apcs      := 7;
@@ -1218,7 +1221,7 @@ begin
    _renerg    := 5;
    _r         := 36;
    _speed     := 10;
-   _srng      := 250;
+   _srange      := 250;
    _ucl       := 12;
    _btime     := 60;
    _apcm      := 30;
@@ -1265,6 +1268,8 @@ end;
       _ismech:=_ismech or _isbuilding;
 
       _shcf:=_mhits/_mms;
+
+      if(_arange<0)then _arange:=_srange;
 
       if(_btime> 0)then _bstep:=(_mhits div 2) div _btime;
       if(_bstep<=0)then _bstep:=1;

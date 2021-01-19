@@ -262,7 +262,7 @@ begin
 
        if(buff[ub_resur]<=0)then
        begin
-          if(onlySVCode)or(hits>-100)then dec(hits,1);
+          if(onlySVCode)or(hits>idead_hits)then dec(hits,1);
           {$IFDEF _FULLGAME}
           if(uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
           {$ENDIF}
@@ -296,9 +296,9 @@ begin
            if(hits<-80)then hits:=-80;
            inc(hits,1);
            {$IFDEF _FULLGAME}
-           case uidi of
+           {case uidi of
            UID_Cacodemon: if(hits>-shadow)then begin dec(vy,1);dec(y,1);end;
-           end;
+           end;  }
            {$ENDIF}
            if(hits>=0)then
            begin
@@ -311,7 +311,7 @@ begin
               buff[ub_born ]:=fr_fps;
               {$IFDEF _FULLGAME}
               _unit_fsrclc(pu);
-              if(playeri=HPlayer)then _unit_createsound(uidi);
+              if(playeri=HPlayer)then _unit_snd_ready(uidi,buff[ub_advanced]>0);
               {$ENDIF}
            end;
         end;
@@ -2040,7 +2040,7 @@ begin
       _unit_npush_dcell(pu);
 
       {$IFDEF _FULLGAME}
-      //if(playeri=HPlayer)and(alrm_r<srng)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
+      //if(playeri=HPlayer)and(alrm_r<srange)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
       {$ENDIF}
    end;
 end;
@@ -2089,7 +2089,7 @@ begin
       end;
 
       {$IFDEF _FULLGAME}
-      //if(playeri=HPlayer)and(alrm_r<srng)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
+      //if(playeri=HPlayer)and(alrm_r<srange)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
       {$ENDIF}
    end;
 end;

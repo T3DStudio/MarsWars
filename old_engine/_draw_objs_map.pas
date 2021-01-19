@@ -56,7 +56,7 @@ begin
     with map_dds[d] do
      if(t>0)then
      begin
-        if(_rectvis(x,y,255,255)=false)then continue;
+        if(_rectvis(x,y,255,255,0)=false)then continue;
 
         ro:=0;
         if(1<=m_brush)and(m_brush<=255)then ro:=r-bld_dec_mr;
@@ -74,7 +74,7 @@ begin
         DID_BRock    : _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
         end;
 
-        if(_rectvis(x+ox,y+oy,spr^.hw,spr^.hh))then
+        if(_rectvis(x+ox,y+oy,spr^.hw,spr^.hh,0))then
         begin
            _sl_add_dec(x,y,dpth,shh,spr,255,ro,ox,oy);
            if(pspr<>nil)then _sl_add_dec(x,y,-10000,-32000,pspr,255,ro,ox,oy);

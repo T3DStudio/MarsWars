@@ -191,6 +191,7 @@ nmid_plout: begin
                   o_y0:=net_readint;
                   o_x1:=net_readint;
                   o_y1:=net_readint;
+                  o_a0:=net_readbyte;
                   o_id:=net_readbyte;
                end;
 

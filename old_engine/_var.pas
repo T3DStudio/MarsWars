@@ -274,7 +274,8 @@ m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 m_mmap_move       : boolean = false;
 
-ui_UnitSelectSound: boolean = false;
+ui_UnitSelSound   : byte = 0;
+ui_UnitSelSoundp  : byte = 0;
 ui_tab            : byte = 0;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
@@ -426,6 +427,9 @@ theme_anm_brocks  : TThemeAnimL;
 theme_anm_liquids : array of byte;     // animation type
 theme_ant_liquids : array of byte;     // animation period
 theme_clr_liquids : array of cardinal; // minimap color
+
+
+
 
 spr_liquidb       : array[1..LiquidRs ] of TMWSprite;
 spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWSprite;
@@ -648,8 +652,6 @@ str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;
 str_camp_m        : array[0..MaxMissions] of shortstring;
 
-
-
 str_connect,
 str_svup,
 str_lng,
@@ -659,6 +661,7 @@ str_reset         : array[false..true] of shortstring;
 str_menu_s1,
 str_menu_s2,
 str_menu_s3       : array[0..2] of shortstring;
+
 
 
 // sounds
@@ -675,16 +678,30 @@ snd_unit_cmd_last  : PTMWSound;
 
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
-snd_cannot_build,
+snd_build_place,
 snd_building,
+snd_cannot_build,
 snd_constr_complete,
 snd_defeat,
 snd_not_enough_energy,
 snd_player_defeated,
 snd_upgrade_complete,
-snd_victory,
-snd_build_place
+snd_victory
                    : array[1..r_cnt] of PTSoundSet;
+
+
+snd_uac_cc,
+snd_uac_barracks,
+snd_uac_generator,
+snd_uac_smith,
+snd_uac_barracks,
+snd_uac_ctower,
+snd_uac_ptower,
+snd_uac_rtower,
+snd_uac_factory,
+snd_uac_tech,
+snd_uac_rls,
+snd_uac_nucl,
 
 {snd_jetpoff,
 snd_jetpon,

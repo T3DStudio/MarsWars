@@ -163,7 +163,7 @@ begin
            end;
 
         if(draw)then
-         if(_rectvis(x,y,spr^.hw,spr^.hh))then
+         if(_rectvis(x,y,spr^.hw,spr^.hh,0))then
           _sl_add_eff(x,y,d,msk,spr,alpha);
      end;
 end;

@@ -382,7 +382,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
 
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                 if(lselUID=uidi)then
+                 if(uidi=o_a0)then
                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
 
@@ -403,7 +403,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(sel)then
                 begin
                    case o_id of
-               uo_select     : lselUID:=uidi;
+               //uo_select     : lselUID:=uidi;
                uo_setorder,
                uo_addorder   : order:=o_x0;
                uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - x,y
@@ -515,7 +515,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                    if(psel=false)then
                    begin
                       _unit_inc_selc(pu);
-                      ui_UnitSelectSound:=true;
+                      //ui_UnitSelectSound:=true;
                    end;
                    inc(scnt,1);
                 end
@@ -529,11 +529,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
             if(u>eu)
             then dec(u,1)
             else inc(u,1);
-         end;
-
-         case o_id of
-         uo_select,
-         uo_aselect : if(scnt=0)then lselUID:=255;
          end;
       end;
 
@@ -874,12 +869,12 @@ begin
          FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
 
-         if(ui_UnitSelectSound)then
+         {if(ui_UnitSelectSound)then
          begin
             ui_UnitSelectSound:=false;
            // _LastSelectedUID
             // play select sound
-         end;
+         end; }
          {$ENDIF}
 
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;

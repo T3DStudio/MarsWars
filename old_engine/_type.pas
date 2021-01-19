@@ -113,7 +113,8 @@ TUID = record
    _mhits,
    _speed,
    _r ,
-   _srng,
+   _srange,
+   _arange,
    _max,
    _renerg,
    _generg,
@@ -145,6 +146,7 @@ TUID = record
    _ismech,
    _issolid,
    _addon       : boolean;
+   _advanced    : array[false..true] of boolean;
 
    ups_builder,
    ups_units,
@@ -167,16 +169,6 @@ TUID = record
    un_snd_death
 
                 : array[false..true] of PTSoundSet;
-   {
-   sound sets:
-   ready
-   move command
-   attack command
-   annoy
-   select
-   death
-
-   }
    {$ENDIF}
 end;
 PTUID = ^TUID;
@@ -214,7 +206,8 @@ TPlayer = record
 
    ready   : boolean;
 
-   o_id    : byte;
+   o_id,
+   o_a0    : byte;
 o_x0,o_y0,
 o_x1,o_y1  :integer;
 
@@ -266,7 +259,6 @@ o_x1,o_y1  :integer;
    n_barracks,
    n_smiths: integer;
 
-   lselUID,
    PNU     : byte;
    n_u,
    ttl     : integer;
@@ -279,7 +271,8 @@ TPList = array[0..MaxPlayers] of TPLayer;
 TUnit = record
    vx,vy,
    x,y,
-   srng,
+   srange,
+   arange,
    speed,dir,rld,
    hits,
    unum     : integer;
@@ -297,7 +290,6 @@ TUnit = record
 
    a_rld,
    a_weap   : byte;
-   a_arng   : array[0..MaxUnitWeapons] of integer;
    a_tx,
    a_ty,
    a_tar,

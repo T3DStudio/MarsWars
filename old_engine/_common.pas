@@ -359,10 +359,10 @@ begin
   and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
 end;
 
-function _rectvis(x,y,hw,hh:integer):boolean;
+function _rectvis(x,y,hw,hh,sh:integer):boolean;
 begin
    _rectvis:=((vid_vx-hw)<x)and(x<(vid_vx+vid_sw+hw))
-          and((vid_vy-hh)<y)and(y<(vid_vy+vid_sh+hh));
+          and((vid_vy-hh-max2(0,sh))<y)and(y<(vid_vy+vid_sh+hh));
 end;
 function _nhp(x,y:integer):boolean;
 begin

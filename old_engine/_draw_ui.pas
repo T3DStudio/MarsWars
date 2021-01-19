@@ -90,8 +90,8 @@ var  x,y,y0:integer;
      b     :boolean;
 begin
 
-   with _players[HPlayer] do
-   _draw_text(tar,ui_oicox-4,ui_texty+2,b2s(lselUID),ta_right,255,c_white);
+  // with _players[HPlayer] do
+  // .._draw_text(tar,ui_oicox-4,ui_texty+2,b2s(lselUID),ta_right,255,c_white);
 
    {y  :=ui_texty+vid_oiw;
    for i:=1 to 9 do

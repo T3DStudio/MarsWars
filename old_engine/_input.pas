@@ -79,7 +79,7 @@ begin
    end;
 end;
 
-procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oid,pl:byte);
+procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
 begin
    if(G_Paused=0)and(_rpls_rst<rpl_rhead)then
    begin
@@ -91,6 +91,7 @@ begin
          net_writeint (oy0);
          net_writeint (ox1);
          net_writeint (oy1);
+         net_writebyte(oa0);
          net_writebyte(oid);
          net_send(net_cl_svip,net_cl_svport);
       end
@@ -101,6 +102,7 @@ begin
            o_y0:=oy0;
            o_x1:=ox1;
            o_y1:=oy1;
+           o_a0:=oa0;
            o_id:=oid;
         end;
 
@@ -111,11 +113,12 @@ end;
 function _whoInPoint(tx,ty,tt:integer):integer;
 var i,sc:integer;
     htm :byte;
-function _ch(utm:byte):boolean;
+function _ch(up:PTPlayer):boolean;
 begin
    _ch:=true;
-   if(tt=1)then _ch:=utm<>htm;
-   if(tt=2)then _ch:=utm= htm;
+   if(tt=1)then _ch:=up^.team<>htm;
+   if(tt=2)then _ch:=up^.team= htm;
+   if(tt=3)then _ch:=up^.pnum=HPlayer;
 end;
 begin
    sc:=0;
@@ -129,12 +132,16 @@ begin
    if(_nhp(tx,ty))then
     for i:=1 to MaxUnits do
      with _units[i] do
-      if(hits>0)and(inapc=0)and(_ch(player^.team))then
+      if(hits>0)and(inapc=0)and(_ch(player))then
        if(_uvision(htm,@_units[i],false))then
         if(dist2(vx,vy,tx,ty)<uid^._r)then
         begin
-           if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
-           _whoInPoint:=i;
+           if(tt<=2)then
+           begin
+              if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
+              _whoInPoint:=i;
+           end
+           else _whoInPoint:=uidi;
            break;
        end;
 end;
@@ -147,7 +154,7 @@ begin
     with _players[HPlayer] do
      if(_uids[m_brush]._max=1)and(uid_e[m_brush]>0)then
      begin
-        _player_s_o(m_brush,k_shift,0,0,uo_specsel ,HPlayer);
+        _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
         m_brush:=co_empty;
      end
      else
@@ -189,20 +196,20 @@ begin
    case m_brush of
 co_move   : begin                     // move
                t:=_whoInPoint(x,y,2);
-               _player_s_o(co_move ,t,x,y,uo_corder,HPlayer);
+               _player_s_o(co_move ,t,x,y,0,uo_corder,HPlayer);
             end;
 co_amove  : begin                     // attack
                t:=_whoInPoint(x,y,1);
-               _player_s_o(co_amove,t,x,y,uo_corder,HPlayer);
+               _player_s_o(co_amove,t,x,y,0,uo_corder,HPlayer);
             end;
 co_paction,
 co_patrol,
-co_apatrol: _player_s_o(m_brush,0,x,y,uo_corder,HPlayer);
+co_apatrol: _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
 co_empty  : begin                     // rclick
                t:=_whoInPoint(x,y,0);
                if(m_a_inv)
-               then _player_s_o(co_rcmove ,t,x,y,uo_corder,HPlayer)
-               else _player_s_o(co_rcamove,t,x,y,uo_corder,HPlayer);
+               then _player_s_o(co_rcmove ,t,x,y,0,uo_corder,HPlayer)
+               else _player_s_o(co_rcamove,t,x,y,0,uo_corder,HPlayer);
             end;
    end;
 
@@ -254,15 +261,15 @@ true : if(ucl_x[true,u]>0)then
 1: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // units
    if(u<=ui_ubtns)then
    case right of
-false: _player_s_o(co_suprod,ui_panel_uids[race,1,u],0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cuprod,ui_panel_uids[race,1,u],0,0, uo_corder  ,HPlayer);
+false: _player_s_o(co_suprod,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
+true : _player_s_o(co_cuprod,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
    end;
 
 2: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // upgrades
    if(u<=ui_ubtns)then
    case right of
-false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer);
+false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
+true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
    end;
 
 3: if(_rpls_rst<rpl_rhead)then
@@ -271,24 +278,24 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0, uo_corder  ,HPlayer)
       begin
          case u of
    0 : m_brush:=co_move;
-   1 : _player_s_o(co_stand  ,0,0,0, uo_corder  ,HPlayer);
+   1 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
    2 : m_brush:=co_patrol;
 
    3 : m_brush:=co_amove;
-   4 : _player_s_o(co_astand ,0,0,0, uo_corder  ,HPlayer);
+   4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
    5 : m_brush:=co_apatrol;
 
-   6 : _player_s_o(co_action ,0,0,0, uo_corder  ,HPlayer);
+   6 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
    7 : m_a_inv:=not m_a_inv;
-   8 : _player_s_o(co_pcancle,0,0,0, uo_corder  ,HPlayer);
+   8 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
 
    9 : m_brush:=co_paction;
 
    10: if(ui_orders_x[10]>0)then
         if(k_dbl>0)
         then _moveHumView(ui_orders_x[10], ui_orders_y[10])
-        else _player_s_o(0,0,0,0,uo_specsel,HPlayer);
-   11: _player_s_o(co_destroy,0,0,0, uo_corder  ,HPlayer);
+        else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
+   11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
          end;
 
          _chkbld;
@@ -385,14 +392,14 @@ begin
            sdlk_0..sdlk_9 :  begin
                                 ko:=_event^.key.keysym.sym-sdlk_0;
                                 if (k_ctrl>1)
-                                then _player_s_o(ko,0,0,0,uo_setorder,HPlayer)
+                                then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
                                 else
                                   if (k_alt>1)
-                                  then _player_s_o(ko,0,0,0,uo_addorder,HPlayer)
+                                  then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
                                   else
                                     if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
                                     then _moveHumView(ui_orders_x[ko] , ui_orders_y[ko])
-                                    else _player_s_o(ko,k_shift,0,0,uo_selorder,HPlayer);
+                                    else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
                              end;
 
               else
@@ -545,7 +552,7 @@ co_empty  : begin
                m_sys:=m_my;
             end;
 1..255    : if(m_brushc=c_lime)
-            then _player_s_o(m_brushx,m_brushy,m_brush,0, uo_build  ,HPlayer)
+            then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
             else PlayInGameAnoncer(snd_cannot_build[_players[HPlayer].race]);
 co_paction,
 co_move,
@@ -571,15 +578,14 @@ co_apatrol: _command(m_mx,m_my);
 
       if(m_sxs>-1)then //select
       begin
-         if(m_ldblclk>0)
-         then
+         if(m_ldblclk>0)then
            if(k_shift<2)
-           then _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh, uo_dblselect  ,HPlayer)
-           else _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh, uo_adblselect ,HPlayer)
+           then _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_dblselect  ,HPlayer)
+           else _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_adblselect ,HPlayer)
          else
            if(k_shift<2)
-           then _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_select ,HPlayer)
-           else _player_s_o(m_sxs,m_sys,m_mx,m_my,uo_aselect,HPlayer);
+           then _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_select ,HPlayer)
+           else _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_aselect,HPlayer);
 
          m_sxs:=-1;
          m_ldblclk:=fr_hhfps;

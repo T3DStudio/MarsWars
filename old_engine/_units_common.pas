@@ -8,7 +8,7 @@ begin
    end;
 end;
 
-procedure _unit_createsound(uid:integer);
+procedure _unit_snd_ready(uid:byte;adv:boolean);
 begin
 {   case uid of
 UID_LostSoul   : PlaySND(snd_d0         ,nil);
@@ -349,13 +349,13 @@ begin
         begin
            if not(buid in uid^.ups_builder)then continue;
 
-           o:=d-srng;
+           o:=d-srange;
            if(o<dr)then
            begin
               dx:=x;
               dy:=y;
               dr:=o;
-              sr:=srng;
+              sr:=srange;
            end;
         end;
      end;
@@ -403,7 +403,7 @@ begin
         begin
            if(buid>0)then
             if not(buid in uid^.ups_builder)then continue;
-           if(dist(x,y,tx,ty)<srng)then bl:=true;
+           if(dist(x,y,tx,ty)<srange)then bl:=true;
         end;
 
    if(_unit_grbcol=0)then
@@ -930,7 +930,7 @@ begin
          end;
       end;
 
-      if(sound)then _unit_createsound(_uid);
+      if(sound)then _unit_snd_ready(_uid,false);
    end;
 end;
 {if(uidi=uid_HGate)then
@@ -1239,7 +1239,7 @@ begin
       end
       else} td:=ud;
 
-      if(td<=(tu^.srng+uid^._r))then
+      if(td<=(tu^.srange+uid^._r))then
       begin
          if(buff[ub_invis]<=0)
          then _addtoint(@vsnt[tu^.player^.team],vistime)

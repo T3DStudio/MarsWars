@@ -176,7 +176,7 @@ begin
     end;
 end;
 
-procedure PlayUnitCommand(ss:PTSoundSet);
+procedure PlayUnitSound(ss:PTSoundSet);
 const min_pause = fr_hfps;
 var s:PTMWSound;
 begin
@@ -273,13 +273,17 @@ begin
    snd_victory           [r]:=LoadSoundSet(race_dir[r]+'victory'              );
    end;
 
-   {snd_inapc       :=loadSND('inapc.wav'    );
-   snd_ccup        :=loadSND('ccup.wav'     );
-   snd_radar       :=loadSND('radar.wav'    );  }
    snd_teleport    :=LoadSoundSet('teleport' );
    snd_pexp        :=LoadSoundSet('p_exp'    );
    snd_exp         :=LoadSoundSet('explode'  );
    snd_exp2        :=LoadSoundSet('explode2' );
+
+
+
+
+   {snd_inapc       :=loadSND('inapc.wav'    );
+   snd_ccup        :=loadSND('ccup.wav'     );
+   snd_radar       :=loadSND('radar.wav'    );  }
    {snd_meat        :=loadSND('gv.wav'       );
    snd_d0          :=loadSND('d_u0.wav'     );
    snd_ar_act      :=loadSND('d_ar_act.wav' );

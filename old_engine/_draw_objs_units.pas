@@ -180,8 +180,8 @@ begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
             if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
              if(m_brush in uid^.ups_builder)then
-              if((vid_vx-srng)<vx)and(vx<(vid_vx+vid_sw+srng))and
-                ((vid_vy-srng)<vy)and(vy<(vid_vy+vid_sh+srng))then _addUIBldrs(x,y,srng);
+              if((vid_vx-srange)<vx)and(vx<(vid_vx+vid_sw+srange))and
+                ((vid_vy-srange)<vy)and(vy<(vid_vy+vid_sh+srange))then _addUIBldrs(x,y,srange);
               for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)
              then break
@@ -211,7 +211,7 @@ end;
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
 var spr : PTMWSprite;
-     dp,smy,
+     dp,
      inv,t,ro,
      sh : integer;
      mc,
@@ -243,11 +243,7 @@ begin
          sh:=_unit_shadowz(pu);
          inc(shadow,sign(sh-shadow));
          sh :=shadow;
-
-
-         smy:=vy;
-         if ((vid_vx   -spr^.hw)<vx )and(vx <(vid_vx+vid_sw+spr^.hw))and
-            ((vid_vy-sh-spr^.hh)<smy)and(smy<(vid_vy+vid_sh+spr^.hh)) then
+         if(_rectvis(vx,vy,spr^.hw,spr^.hh,sh))then
          begin
             dp :=0;
             inv:=255;
@@ -332,8 +328,8 @@ begin
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy,dp,0,c_gray,0,true,@_uids [uprod_u[t]].un_btn ,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
-                      if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,smy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]].un_btn ,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
                    end;
                 end;
              end
@@ -347,8 +343,8 @@ begin
               UID_HEye : begin
                             inv:=trunc(255*hits/_mhits);
                             if(_r<41)
-                            then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
-                            else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
+                            then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1,255-inv)
+                            else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0,255-inv);
                             if(buff[ub_invis]>0)then inv:=inv shr 1;
                             dec(inv,inv shr 2);
                          end;
@@ -357,8 +353,8 @@ begin
                  begin
                     inv:=hits*2;
                     if(_r<41)
-                    then _sl_add_eff(vx,smy+5 ,-5,0,@spr_db_h1,255-inv)
-                    else _sl_add_eff(vx,smy+10,-5,0,@spr_db_h0,255-inv);
+                    then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1,255-inv)
+                    else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0,255-inv);
                  end
                  else inv:=255;
                end;
@@ -370,7 +366,7 @@ begin
              if(buff[ub_gear ]>0)then
                    _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);  }
 
-            _sl_add(vx,smy,dp,sh,rc,mc,rct,spr,inv,sb,b0,b2,b3,b1,ro);
+            _sl_add(vx,vy,dp,sh,rc,mc,rct,spr,inv,sb,b0,b2,b3,b1,ro);
          end;
       end;
    end;
@@ -493,11 +489,8 @@ begin
        if(spr=pspr_dummy)then exit;
 
        if(_unit_fogrev(pu))then
-        if ((vid_vx-spr^.hw)<vx)and(vx<(vid_vx+vid_sw+spr^.hw))and
-           ((vid_vy-spr^.hh)<vy)and(vy<(vid_vy+vid_sh+spr^.hh))then
-        begin
-           _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
-        end;
+        if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then
+         _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
     end;
 end;
 
