@@ -626,19 +626,14 @@ end;
 
 procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
-   if(map_b0<bx)and(bx<map_b1)and(map_b0<by)and(by<map_b1)then
     if(_uid_cndt(@_players[bp],buid)=0)then
      with _players[bp] do
       if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
       begin
          _unit_add(bx,by,buid,bp,false);
-         if(_LastCreatedUnit>0)then
-         begin
-            {$IFDEF _FULLGAME}
-            if(bp=HPlayer)then PlaySND(snd_build_place[race],nil);
-            if(_warpten=false)then
-            {$ENDIF}
-         end;
+         {$IFDEF _FULLGAME}
+         if(_LastCreatedUnit>0)and(bp=HPlayer)then PlaySND(snd_build_place[race],nil);
+         {$ENDIF}
       end;
 end;
 
