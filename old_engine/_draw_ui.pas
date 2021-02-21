@@ -41,8 +41,8 @@ begin
    case m_brush of
    1..255:
    begin
-      dec(m_brushx,vid_vx);
-      dec(m_brushy,vid_vy);
+      dec(m_brushx,vid_vx-lx);
+      dec(m_brushy,vid_vy-ly);
 
       spr:=_uid2spr(m_brush,false);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
@@ -54,8 +54,8 @@ begin
        then circleColor(tar,m_brushx,m_brushy,_r,c_black)
        else circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
 
-      inc(m_brushx,vid_vx);
-      inc(m_brushy,vid_vy);
+      inc(m_brushx,vid_vx-lx);
+      inc(m_brushy,vid_vy-ly);
 
       {if(m_brush in [4,7,10])then
        circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray); }
@@ -77,7 +77,7 @@ begin
          base_r,c_blue);
 
       rectangleColor(tar,
-      lx+build_b-vid_vx,ly+build_b-vid_vy,
+      lx+map_b0-vid_vx,ly+map_b0-vid_vy,
       lx+map_b1 -vid_vx,ly+map_b1 -vid_vy,c_white);
    end;
    end;
@@ -153,7 +153,7 @@ end;
 
 procedure _drawBtnt(tar:pSDL_Surface;x,y:integer;
 lu1 ,lu2 ,ru ,rd ,ld :shortstring;
-clu1,clu2,cru,crd,cld:cardinal);
+clu1,clu2,cru,crd,cld:cardinal;redn:boolean);
 var ux,uy,ui_dBW:integer;
 function cs(ps:pshortstring):boolean;begin cs:=(ps^<>'')and(ps^[1]<>'0'); end;
 begin
@@ -174,6 +174,8 @@ begin
    if(cs(@ru ))then _draw_text(tar,ux+vid_BW-3,uy+3       ,ru ,ta_right ,5,cru );
    if(cs(@rd ))then _draw_text(tar,ux+vid_BW-3,uy+ui_dBW  ,rd ,ta_right ,5,crd );
    if(cs(@ld ))then _draw_text(tar,ux+2       ,uy+ui_dBW  ,ld ,ta_left  ,5,cld );
+
+   if(redn)then _draw_text(tar,ux+vid_hBW,uy+vid_hBW  ,'#',ta_middle  ,5,c_red );
 end;
 
 procedure d_TextBTN(tar:pSDL_Surface;bx,by:integer;txt:pshortstring;c:cardinal);
@@ -257,7 +259,7 @@ begin
       end;
       _draw_text(tar,ui_armyx   ,ui_iy,b2s(army)           ,ta_middle,255,c_white);
 
-      case ui_tab of
+      case ui_tab of    // buildings
       0:
       begin
          for ui:=0 to ui_ubtns do
@@ -280,8 +282,8 @@ begin
 
                _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
-               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r)     ,
-               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_white);
+               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r) ,
+               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_white,(bld_r>0)and(r=9));
             end;
             {case ui of
             5 : if(ucl_x[5]>0)then
@@ -304,7 +306,7 @@ begin
          end;
       end;
 
-      1:
+      1:      // units
       begin
          for ui:=0 to ui_ubtns do
          begin
@@ -329,7 +331,7 @@ begin
                _drawBtn (tar,ux,uy,un_btn.surf,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
                _drawBtnt(tar,ux,uy,
                b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
-               c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple);
+               c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple,false);
             end;
          end;
       end;
@@ -350,7 +352,7 @@ begin
 
             _drawBtnt(tar,ux,uy,
             b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
-            c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0);
+            c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,false);
          end;
       end;
 
@@ -370,8 +372,8 @@ begin
          for ui:=0 to MaxPlayers do
          begin
             if(ui=0)
-            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0)
-            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0);
+            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0,false)
+            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0,false);
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
             inc(ux,1);

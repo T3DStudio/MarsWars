@@ -352,6 +352,9 @@ begin
 
       _unit_dec_Kcntrs(pu);
 
+      with uid^ do
+       if(_isbuilding)then bld_r:=fr_2fps;
+
       x      :=vx;
       y      :=vy;
       uo_x   :=x;

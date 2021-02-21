@@ -160,21 +160,27 @@ begin
      else
        if _uid_cndt(@_players[HPlayer],m_brush)>0
        then m_brush:=co_empty
-       else if not((build_b<m_mx)and(m_mx<map_b1)and(build_b<m_my)and(m_my<map_b1))
-            then m_brushc:=c_blue
-            else
+       else
             begin
                if not(m_brush in ui_prod_builds)then
                begin
                   m_brush:=co_empty;
                   exit;
                end;
+
                if(k_ctrl>1)then
                begin
                   m_brushx:=m_mx;
                   m_brushy:=m_my;
                end
-               else _building_newplace(m_mx,m_my,m_brush,HPlayer,@m_brushx,@m_brushy);
+               else
+               begin
+                  _building_newplace(m_mx,m_my,m_brush,HPlayer,@m_brushx,@m_brushy);
+                  m_brushx:=mm3(map_b0,m_brushx,map_b1);
+                  m_brushy:=mm3(map_b0,m_brushy,map_b1);
+                  m_brushx:=mm3(vid_vx,m_brushx,vid_vx+vid_sw);
+                  m_brushy:=mm3(vid_vy,m_brushy,vid_vy+vid_sh);
+               end;
 
                case _unit_grbcol(m_brushx,m_brushy,_uids[m_brush]._r,HPlayer,m_brush,true) of
                1 :  m_brushc:=c_red;

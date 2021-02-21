@@ -215,9 +215,7 @@ end;
 }
 
 procedure _1c_push(tx,ty:pinteger;x0,y0,r0:integer);
-var
-vx,vy,
-  a,h:single;
+var vx,vy,a:single;
 begin
    vx :=x0-tx^;
    vy :=y0-ty^;
@@ -330,7 +328,6 @@ begin
        add(px,py,d,o);
     end;
 
-
    dx:=-2000;
    dy:=-2000;
    sr:=32000;
@@ -365,9 +362,7 @@ begin
    else
      if(nrd[0]<=-1)
      then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
-     {else
-       if(0<dr)and(dr<32000)
-       then _1c_push(@tx,@ty,dx,dy,sr-1);}
+
    if(dr<32000)then
    begin
       d :=dist(dx,dy,tx,ty);
@@ -383,8 +378,16 @@ function _unit_grbcol(tx,ty,tr:integer;pl,buid:byte;doodc:boolean):byte;
 var u,dx,dy:integer;
    bl:boolean;
 begin
-   if(pl<=MaxPlayers)
-   then bl:=false
+   if(pl<=MaxPlayers)then
+   begin
+      bl:=false;
+      if(tx<map_b0)or(map_b1<tx)
+      or(ty<map_b0)or(map_b1<ty)then
+      begin
+         _unit_grbcol:=2;
+         exit;
+      end;
+   end
    else bl:=true;
    _unit_grbcol:=0;
 
@@ -432,8 +435,8 @@ begin
 
       if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
       with map_dcell[dx,dy] do
-       for u:=1 to n do
-        with l[u-1]^ do
+       for u:=0 to n-1 do
+        with l[u]^ do
          if(r>0)and(t>0)then
           if(dist(x,y,tx,ty)<(tr+r))then
           begin
@@ -623,7 +626,7 @@ end;
 
 procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
-   if(build_b<bx)and(bx<map_b1)and(build_b<by)and(by<map_b1)then
+   if(map_b0<bx)and(bx<map_b1)and(map_b0<by)and(by<map_b1)then
     if(_uid_cndt(@_players[bp],buid)=0)then
      with _players[bp] do
       if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
@@ -635,7 +638,6 @@ begin
             if(bp=HPlayer)then PlaySND(snd_build_place[race],nil);
             if(_warpten=false)then
             {$ENDIF}
-            bld_r:=fr_fps;
          end;
       end;
 end;

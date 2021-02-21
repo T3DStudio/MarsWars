@@ -86,7 +86,7 @@ end;
 procedure map_vars;
 begin
    map_seed2   := map_seed;
-   map_b1      := map_mw-build_b;
+   map_b1      := map_mw-map_b0;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;

@@ -192,14 +192,6 @@ begin
    with pl^ do
    with _uids[uid] do
    begin
-      case _isbuilding of
-      true : begin
-             if setr(8 ,n_builders<=0) then exit;
-             if setr(9 ,bld_r      >0) then exit;
-             end;
-      false: if setr(10,n_barracks<=0) then exit;
-      end;
-
       if setr(1 ,(army+uproda)>=MaxPlayerUnits  ) then exit;
       if setr(2 ,(_ruid >0)and(uid_eb[_ruid ]=0)) then exit;
       if setr(3 ,(_rupgr>0)and(upgr  [_rupgr]=0)) then exit;
@@ -207,6 +199,14 @@ begin
       if setr(5 , _btime<=0                     ) then exit;
       if setr(6 ,(_addon)and(G_addon=false)     ) then exit;
          setr(7 ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
+
+      case _isbuilding of
+      true : begin
+             if setr(8 ,n_builders<=0) then exit;
+             if setr(9 ,bld_r      >0) then exit;
+             end;
+      false: if setr(10,n_barracks<=0) then exit;
+      end;
    end;
 end;
 function _upid_cndt(pl:PTPlayer;up:byte):integer;
@@ -402,7 +402,6 @@ begin
    p_color:=0;
    if(player<=MaxPlayers)then
     case vid_plcolors of
-   0: p_color:=PlayerColor[player];
    1,
    2: if(player=HPlayer)then
         if(vid_plcolors=1)
@@ -417,15 +416,14 @@ begin
       then p_color:=c_white
       else p_color:=PlayerColor[PickPlayerTeam(g_mode,player)];
     else
+      p_color:=PlayerColor[player];
     end;
 end;
 
 procedure _view_bounds;
 begin
-   if((vid_vx+vid_sw)>map_mw)then vid_vx:=map_mw-vid_sw;
-   if((vid_vy+vid_sh)>map_mw)then vid_vy:=map_mw-vid_sh;
-   if (vid_vx        <0     )then vid_vx:=0;
-   if (vid_vy        <0     )then vid_vy:=0;
+   vid_vx:=mm3(0,vid_vx,map_mw-vid_sw);
+   vid_vy:=mm3(0,vid_vy,map_mw-vid_sh);
 
    vid_mmvx:=round(vid_vx*map_mmcx);
    vid_mmvy:=round(vid_vy*map_mmcx);
