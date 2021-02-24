@@ -118,13 +118,12 @@ begin
       end;
       inc(_LastCreatedUnit,1);
    end;
+   _LastCreatedUnit :=0;
+   _LastCreatedUnitP:=@_units[_LastCreatedUnit];
 
    DefPlayers;
 
    UnitStepNum:=8;
-
-   _LastCreatedUnit :=0;
-   _LastCreatedUnitP:=@_units[0];
 
    g_inv_wn     := 0;
    g_inv_t      := 0;
@@ -193,68 +192,60 @@ end;
 
 {$ENDIF}
 
+procedure _CreateStartBase(x,y:integer;uid,pl,c:byte);
+var i:byte;
+r,d,xs,ys,
+   ds:integer;
+begin
+   if(c=0)
+   then _unit_add(x,y,uid,pl,true)
+   else
+   begin
+      ds :=map_mw div 2;
+      d  :=p_dir(x,y,ds,ds);
+      ds :=360 div (c+1);
+      r  :=50+c*20;
+      for i:=0 to c do
+      begin
+         xs:=x+trunc(r*cos(d*degtorad));
+         ys:=y-trunc(r*sin(d*degtorad));
+
+         _unit_add(xs,ys,uid,pl,true);
+
+         inc(d,ds);
+      end;
+   end;
+end;
+
 procedure _StartSkirmish;
 var p:byte;
 begin
-   GModeTeams(g_mode);
-   {case g_mode of
-   gm_coop: begin
-            with _players[0] do ai_skill:=250;
-            //_unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
-            end;
-   gm_inv : with _players[0] do ai_skill:=8;
-   end; }
+   for p:=0 to MaxPlayers do
+   with _players[p] do
+   begin
+      team:=PickPlayerTeam(g_mode,p);
 
-   for p:=1 to MaxPlayers do
-    with _players[p] do
-    begin
-       if(state=ps_none)then
-        if(G_aislots>0)then
-        begin
-           state   :=ps_comp;
-           ai_skill:=G_aislots;
-           race    :=r_random;
-           _playerSetState(p);
-        end;
+      if(p=0)then continue;
 
-       if(race=r_random)then race:=1+random(2);
-
-       if(state<>PS_None)then
+      if(state=ps_none)then
+       if(G_aislots>0)then
        begin
-          _unit_add(map_psx[p],map_psy[p],start_base[race],p,true);
-
-          {case G_startb of
-          0 : _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
-          1 : begin
-                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
-                 _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
-              end;
-          2 : begin
-                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
-                 _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
-                 _unit_add(map_psx[p]+115,map_psy[p],cl2uid[race,true,2],p,true);
-              end;
-          3 : begin
-                 _unit_add(map_psx[p]    ,map_psy[p],cl2uid[race,true,0],p,true);
-                 _unit_add(map_psx[p]-115,map_psy[p],cl2uid[race,true,2],p,true);
-                 _unit_add(map_psx[p]+115,map_psy[p],cl2uid[race,true,2],p,true);
-                 _unit_add(map_psx[p],map_psy[p]+150,cl2uid[race,true,1],p,true);
-                 _unit_add(map_psx[p],map_psy[p]-150,cl2uid[race,true,1],p,true);
-              end;
-          4 : begin
-                 _unit_add(map_psx[p]-100,map_psy[p]-100,cl2uid[race,true,0],p,true);
-                 _unit_add(map_psx[p]+100,map_psy[p]+100,cl2uid[race,true,0],p,true);
-              end;
-          5 : begin
-                 menerg:=100;
-                 _unit_add(map_psx[p],map_psy[p],cl2uid[race,true,0],p,true);
-              end;
-          end; }
-
-          if(state=ps_play)then ai_skill:=def_ai;
-         // _setAI(p);
+          state   :=ps_comp;
+          ai_skill:=G_aislots;
+          race    :=r_random;
+          _playerSetState(p);
        end;
-    end;
+
+      if(race=r_random)then race:=1+random(2);
+
+      if(state<>PS_None)then
+      begin
+         _CreateStartBase(map_psx[p],map_psy[p],start_base[race],p,G_startb);
+
+         if(state=ps_play)then ai_skill:=def_ai;
+        // _setAI(p);
+      end;
+   end;
 
    {$IFDEF _FULLGAME}
    _moveHumView(map_psx[HPlayer] , map_psy[HPlayer]);
@@ -293,7 +284,7 @@ begin
    Map_randommap;
 
    G_mode   :=gm_scir;
-   G_startb :=random(6);
+   G_startb :=random(gms_g_startb+1);
    g_addon  :=random(3)<>0;
 
    _swapPlayers(1,HPlayer);
@@ -353,7 +344,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
 
          u :=1;
          eu:=MaxUnits;
-         if(o_id=uo_corder)then
+         if(o_id=uo_corder)then   // reverse unit loop
           case o_x0 of
           co_destroy,
           co_cupgrade,
@@ -844,8 +835,8 @@ begin
 
    if(G_Started)then
    begin
-      if(k_ctrl=5)then PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
-      if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
+      //if(k_ctrl=5)then PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
+      //if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
 
       if(G_paused=0)then
       begin

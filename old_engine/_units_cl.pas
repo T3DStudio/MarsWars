@@ -391,9 +391,9 @@ begin
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
 
+         {$IFDEF _FULLGAME}
          mmr   := trunc(_r*map_mmcx)+1;
 
-         {$IFDEF _FULLGAME}
          shadow:=_unit_shadowz(pu);
 
          _unit_fsrclc(pu);

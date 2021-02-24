@@ -32,7 +32,7 @@ gm_2fort               = 1;
 gm_3fort               = 2;
 gm_ct                  = 3;
 gm_inv                 = 4;
-gm_coop                = 5;
+gm_aslt                = 5;
 
 r_cnt                  = 2;  // race
 r_random               = 0;
@@ -65,6 +65,14 @@ b2pm                   : array[false..true] of string[3] = (#15+'-'+#25,#18+'+'+
 _str_mx                : array[0..12] of shortstring = ('-','x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12');
 
 outlogfn               : shortstring = 'out.txt';
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Game settings borders
+//
+
+gms_g_startb           : byte = 5;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -502,7 +510,7 @@ coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 slowturn               = [UID_APC,UID_Tank];
 
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
-armor_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
+armor_massive          = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -659,13 +667,14 @@ smt_transport          = 24; //UID_Transport
 //  SPRITE MODEL STATES
 //
 
-sms_walk               = 0; // & stand
-sms_pain               = 1;
-sms_cast               = 2;
-sms_dattack            = 3;
-sms_mattack            = 4;
-sms_death              = 5;
-sms_build              = 6;
+sms_walk               = 0;
+sms_stand              = 1;
+sms_pain               = 2;
+sms_cast               = 3;
+sms_dattack            = 4;
+sms_mattack            = 5;
+sms_death              = 6;
+sms_build              = 7;
 
 
 ////////////////////////////////////////////////////////////////////////////////

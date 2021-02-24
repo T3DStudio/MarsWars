@@ -198,7 +198,7 @@ begin
          map_psy[6]:=i-u;
       end;
    gm_ct,
-   gm_coop:
+   gm_aslt:
       begin
          map_psx[0]:=map_mw div 2;
          map_psy[0]:=map_psx[0];
@@ -294,8 +294,6 @@ end;
 
 function _trysetdd(di:byte;ix,iy,i:integer):boolean;
 begin
-   //if(0<=ix)and(ix<=map_mw)and(0<=iy)and(iy<=map_mw)then
-    //if(=false)then
    if(_dnear(di,ix,iy,i))or(_spch(ix,iy,base_ir))
    then _trysetdd:=false
    else
@@ -406,43 +404,6 @@ begin
          inc(cnt,1);
          if(cnt>=dpostime)then break;
       end;
-     // until (_spch(ix,iy,base_r+200)=false)and(_dnear(di,ix,iy,i)=false)and;
-      //if(cnt>=dpostime)then continue;
-
-
-      {di:=0;
-      if(lqs>0)then
-      begin
-         case i mod 12 of
-         0..2 : di:=DID_liquidR1;
-         3..5 : di:=DID_liquidR2;
-         6..8 : di:=DID_liquidR3;
-         9..11: di:=DID_liquidR4;
-         end;
-         dec(lqs,1);
-      end
-      else
-        if(rks>0)then
-        begin
-           if(rks>hrks)
-           then di:=DID_SRock
-           else di:=DID_BRock;
-           dec(rks,1);
-        end
-        else di:=DID_other;
-
-      if(di=0)then continue;
-
-      cnt:=0;
-      repeat
-         ix:=_genx(ix            ,map_mw,false);
-         iy:=_genx(iy+sqr(cnt+ix),map_mw,true );
-         inc(cnt,1);
-         if(cnt>=dpostime)then break;
-      until (_spch(ix,iy,base_r+200)=false)and(_dnear(di,ix,iy,i)=false)and(ix>=0)and(iy>=0)and(ix<=map_mw)and(iy<=map_mw);
-      if(cnt>=dpostime)then continue;
-
-      _dds_a(ix,iy,di);  }
    end;
 
    _refresh_dmcells;

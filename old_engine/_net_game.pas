@@ -52,7 +52,7 @@ begin
       if(length(name)>NameLen)then setlength(name,NameLen);
       if(s<>name)then vid_mredraw:=true;
 
-      if(g_mode in [gm_2fort,gm_3fort,gm_inv,gm_coop])
+      if(g_mode in [gm_2fort,gm_3fort,gm_inv,gm_aslt])
       then i:=net_readbyte
       else
       begin

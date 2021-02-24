@@ -338,11 +338,7 @@ begin
               g_mode:=g_mode mod 6;
               Map_premap;
            end;
-      77 : if(net_nstat<>ns_clnt)and(not G_Started)then
-           begin
-              inc(g_startb,1);
-              g_startb:=g_startb mod 6;
-           end;
+      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@g_startb,1,0,gms_g_startb);
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; end;
       79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
@@ -470,6 +466,7 @@ begin
                 if(team>1)then dec(team,1);
            end;
 
+      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@g_startb ,-1,0,gms_g_startb);
       79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 

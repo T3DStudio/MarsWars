@@ -56,7 +56,8 @@ smt_turret2 : case animk of
               end;
 
 smt_lost    : case animk of
-        sms_walk : i:=dd;
+        sms_stand: i:=dd;
+        sms_walk,
         sms_dattack,
         sms_mattack,
         sms_cast : i:=8+dd;
@@ -66,6 +67,7 @@ smt_lost    : case animk of
               end;
 
 smt_imp     : case animk of
+        sms_stand,
         sms_walk : i:=4*dd+aa3(0,anim,3);
         sms_dattack,
         sms_mattack,
@@ -78,12 +80,14 @@ smt_imp     : case animk of
               end;
 
 smt_zengineer:case animk of
+        sms_stand,
         sms_walk : i:=4*dd+aa3(0,anim,3);
         sms_death: exit;
               else i:=4*dd;
               end;
 
 smt_zcommando:case animk of
+        sms_stand,
         sms_walk : i:=4*dd+aa3(0,anim,3);
         sms_dattack,
         sms_mattack,
@@ -102,6 +106,7 @@ smt_fmajor   :case animk of
               end;
 
 smt_caco     :case animk of
+        sms_stand,
         sms_walk : i:=dd;
         sms_dattack,
         sms_mattack,
@@ -114,6 +119,7 @@ smt_caco     :case animk of
               end;
 
 smt_mmind    :case animk of
+        sms_stand,
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_dattack,
         sms_mattack,
@@ -124,6 +130,7 @@ smt_mmind    :case animk of
               end;
 
 smt_archno   :case animk of
+        sms_stand,
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_dattack,
         sms_mattack,
@@ -134,6 +141,7 @@ smt_archno   :case animk of
               end;
 
 smt_pain     :case animk of
+        sms_stand,
         sms_walk : i:=dd*2+aa3(0,anim,1);
         sms_dattack,
         sms_mattack,
@@ -146,6 +154,7 @@ smt_pain     :case animk of
               end;
 
 smt_revenant :case animk of
+        sms_stand,
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_mattack
                  : if(anim>0)
@@ -161,6 +170,7 @@ smt_revenant :case animk of
               end;
 
 smt_mancubus :case animk of
+        sms_stand,
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_mattack,
         sms_dattack,
@@ -171,6 +181,7 @@ smt_mancubus :case animk of
               end;
 
 smt_arch     :case animk of
+        sms_stand,
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_mattack,
         sms_dattack
@@ -194,6 +205,7 @@ smt_fapc     :case animk of
 
 smt_marine0  :case animk of
         sms_build: i:=dd;
+        sms_stand,
         sms_pain,
         sms_walk : i:=dd*4+aa3(0,anim,3);
         sms_cast,
@@ -208,6 +220,7 @@ smt_marine0  :case animk of
 
 smt_medic    :case animk of
         sms_build: i:=dd;
+        sms_stand,
         sms_pain,
         sms_walk : i:=dd*4+aa3(0,anim,3);
         sms_mattack
@@ -225,6 +238,7 @@ smt_medic    :case animk of
 
 smt_commando :case animk of
         sms_build: i:=dd;
+        sms_stand,
         sms_pain,
         sms_walk : i:=dd*4+aa3(0,anim,3);
         sms_cast,
@@ -237,6 +251,7 @@ smt_commando :case animk of
 
 smt_tank     :case animk of
         sms_build: i:=dd;
+        sms_stand,
         sms_pain,
         sms_walk : i:=dd*2+aa3(0,anim,1);
         sms_cast,
@@ -250,6 +265,7 @@ smt_tank     :case animk of
 
 smt_terminat :case animk of
         sms_build: i:=dd;
+        sms_stand,
         sms_pain,
         sms_walk : i:=dd*4+aa3(0,anim,3);
         sms_cast : i:=32+dd;
@@ -267,9 +283,11 @@ smt_terminat :case animk of
 
 end;
 
-function _unit2SMAnimK(u:PTUnit):byte;
+function _unit2SMAnimK(u:PTUnit;_wanim_:boolean):byte;
 begin
-   _unit2SMAnimK:=sms_walk;
+   if(_wanim_)
+   then _unit2SMAnimK:=sms_walk
+   else _unit2SMAnimK:=sms_stand;
 
    with u^   do
      if(hits          <=0)then _unit2SMAnimK:=sms_death
@@ -293,30 +311,30 @@ begin
 
       if(smodel<>spr_pdmodel)then
       begin
-         ak:=_unit2SMAnimK(u);
+         ak:=_unit2SMAnimK(u,wanim);
 
          case ak of
-sms_walk:   begin
-              if(wanim)or(_isbuilding)then
-               begin
-                  inc(anim,1);
-                  anim:=abs(anim mod 10000);
-               end;
-               if(_animw>0)
-               then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animw)
-               else _unit2spr:=_sm2s(smodel,ak,dir,0);
-            end;
+sms_walk:    begin
+                if(wanim)or(_isbuilding)then
+                begin
+                   inc(anim,1);
+                   anim:=abs(anim mod 10000);
+                end;
+                if(_animw>0)
+                then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animw)
+                else _unit2spr:=_sm2s(smodel,ak,dir,0);
+             end;
 sms_dattack,
 sms_mattack: if(a_weap<=MaxUnitWeapons)
              then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a))
              else _unit2spr:=_sm2s(smodel,ak,dir,0);
-sms_death:  begin
-               anim:=abs(hits);
-               if(_animd>0)
-               then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animd)
-               else _unit2spr:=_sm2s(smodel,ak,dir,0);
-            end;
-sms_build:  _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
+sms_death:   begin
+                anim:=abs(hits);
+                if(_animd>0)
+                then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animd)
+                else _unit2spr:=_sm2s(smodel,ak,dir,0);
+             end;
+sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
          else
             _unit2spr:=_sm2s(smodel,ak,dir,0);
          end;
@@ -328,8 +346,8 @@ function _uid2spr(_uid:byte;adv:boolean):PTMWSprite;
 begin
    with _uids[_uid] do
     case _urace of
-    r_hell: _uid2spr:=_sm2s(un_smodel[adv],sms_walk,315,0);
-    r_uac : _uid2spr:=_sm2s(un_smodel[adv],sms_walk,225,0);
+    r_hell: _uid2spr:=_sm2s(un_smodel[adv],sms_stand,315,0);
+    r_uac : _uid2spr:=_sm2s(un_smodel[adv],sms_stand,225,0);
     end;
 end;
 

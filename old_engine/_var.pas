@@ -97,6 +97,7 @@ _rpls_file        : file;
 _rpls_u           : integer = 0;
 _rpls_pnui        : byte = 0;
 
+
 str_startat       : array[0..5] of shortstring;
 str_race          : array[0..2] of shortstring;
 str_gmode         : array[0..5] of shortstring;

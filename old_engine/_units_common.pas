@@ -926,8 +926,9 @@ begin
             _unit_turn(_LastCreatedUnitP);
          end;
       end;
-
+      {$IFDEF _FULLGAME}
       if(sound)then _unit_snd_ready(_uid,false);
+      {$ENDIF}
    end;
 end;
 {if(uidi=uid_HGate)then

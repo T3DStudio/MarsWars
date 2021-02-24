@@ -1,24 +1,38 @@
+const
+
+str_gnstarted            : shortstring = 'Not started';
+str_grun                 : shortstring = 'Run';
+str_gpaused              : shortstring = 'Paused by player #';
+str_udpport              : shortstring = ' UPD port: ';
+str_gstatus              : shortstring = 'Game status:   ';
+str_gsettings            : shortstring = 'Game settings:';
+str_map                  : shortstring = 'Map';
 
 procedure _dedInit;
 begin
    str_player_def        := ' was terminated!';
    str_plout             := ' left the game';
-   str_starta            := 'Starting base:';
+
+   str_starta            := 'Starting base:      ';
+   str_sstarts           := 'Show player starts: ';
+   str_gmodet            := 'Game mode:          ';
+   str_gaddon            := 'Game:               ';
+   str_aislots           := 'Fill empty slots:   ';
+
    str_startat[0]        := '1 builder';
-   str_startat[1]        := '1 builder+ 1 gen.';
-   str_startat[2]        := '1 builder+ 2 gen.';
-   str_startat[3]        := '1 b.+ 2 gen.+ 2 b.';
-   str_startat[4]        := '2 builders';
-   str_startat[5]        := '1 b.+ 100 energy';
-   str_sstarts           := 'Show player starts:';
-   str_gmodet            := 'Game mode:';
+   str_startat[1]        := '2 builders';
+   str_startat[2]        := '3 builders';
+   str_startat[3]        := '4 builders';
+   str_startat[4]        := '5 builders';
+   str_startat[5]        := '6 builders';
+
    str_gmode[gm_scir ]   := 'Skirmish';
    str_gmode[gm_2fort]   := 'Two bases';
    str_gmode[gm_3fort]   := 'Three bases';
    str_gmode[gm_ct   ]   := 'Capturing points';
    str_gmode[gm_inv  ]   := 'Invasion';
-   str_gmode[gm_coop ]   := 'Assault';
-   str_gaddon            := 'Game:';
+   str_gmode[gm_aslt ]   := 'Assault';
+
    str_addon[false]      := 'UDOOM';
    str_addon[true ]      := 'DOOM 2';
    str_race[r_random]    := 'RANDOM';
@@ -29,13 +43,13 @@ begin
    str_team              := 'Team';
    str_srace             := 'Race';
    str_ready             := 'Ready';
-   str_aislots           := 'Fill empty slots:';
+
    str_m_seed            := 'Seed';
    str_m_liq             := 'Lakes';
    str_m_siz             := 'Size';
    str_m_obs             := 'Obstacles';
 
-   SDL_ShowCursor(SDL_ENABLE);
+   //SDL_ShowCursor(SDL_ENABLE);
    net_nstat:=ns_srvr;
    if(net_UpSocket=false)then
    begin
@@ -181,9 +195,9 @@ begin
    '-s'  : begin g_mode:=gm_scir;  Map_premap; cmp_ffa; end;
    '-i'  : begin g_mode:=gm_inv;   Map_premap; end;
    '-c'  : begin g_mode:=gm_ct;    Map_premap; cmp_ffa; end;
-   '-a'  : begin g_mode:=gm_coop;  Map_premap; end;
+   '-a'  : begin g_mode:=gm_aslt;  Map_premap; end;
    '-ps' : g_shpos:=not g_shpos;
-   '-st' : if(a=2)then G_startb :=mm3(0,s2b(args[1])-1,5);
+   '-st' : if(a=2)then G_startb :=mm3(0,s2b(args[1])-1,gms_g_startb);
    '-fs' : if(a=2)then G_aislots:=mm3(0,s2b(args[1]),7);
    else exit;
    end;
@@ -198,7 +212,7 @@ begin
       begin
          vid_mredraw:=true;
          G_Started:=true;
-         _CreateStartPositionsSkirmish;
+         _StartSkirmish;
       end;
    end
    else
@@ -249,18 +263,18 @@ begin
    then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0)
    else with _players[p] do
         if(state<>ps_none)
-        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(_PickPTeam(g_mode,p)),35, '',0)
-        else _screenLine(name      ,1   , _plst(p)  ,15, '---',25, '-',35, '',0);
+        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0)
+        else _screenLine(name      ,1   , _plst(p)  ,15, '-----'        ,25, '-'                          ,35, '',0);
 end;
 
 function SVGameStatus:shortstring;
 begin
    if(g_started=false)
-   then SVGameStatus:='Not started'
+   then SVGameStatus:=str_gnstarted
    else
      if(G_Paused=0)
-     then SVGameStatus:='Run'
-     else SVGameStatus:='Paused by player #'+b2s(G_Paused);
+     then SVGameStatus:=str_grun
+     else SVGameStatus:=str_gpaused+b2s(G_Paused);
 end;
 
 procedure _dedScreen;
@@ -275,17 +289,17 @@ begin
    if(consoley<=fr_fps)then
    begin
       case consoley of
-      0 : writeln(str_wcaption,' ',str_cprt,' UPD port: ',net_sv_port);
-      1 : writeln('Game status: ', SVGameStatus);
-      2 : writeln('Game settings:');
+      0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_sv_port);
+      1 : writeln(str_gstatus, SVGameStatus);
+      2 : writeln(str_gsettings);
       3 : writeln('         ',str_gaddon  ,' ',str_addon[g_addon]);
       4 : writeln('         ',str_gmodet  ,' ',str_gmode[g_mode ]);
       6 : writeln('         ',str_sstarts ,' ',g_shpos);
       8 : writeln('         ',str_starta  ,' ',str_startat[g_startb]);
       10: writeln('         ',str_aislots ,' ',G_aislots);
       11: writeln;
-      12: _screenLine('Map',1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq   ,35, str_m_obs   ,45);
-      14: _screenLine(''   ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx[map_liq],35, _str_mx[map_obs],45);
+      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45);
+      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx[map_liq],35, _str_mx[map_obs],45);
       15: writeln;
       16: ps(0);
       18: ps(1);

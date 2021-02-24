@@ -98,7 +98,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      //SetBBit(@_bts1,5, (uidi in whocanattack)and(tar1>0));
+      //SetBBit(@_bts1,5, (uidi in whocanattack)and(tar1>0)); attack
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
@@ -111,7 +111,7 @@ function _wrld(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
    then _wrld:=0
-   else _wrld:=(r^ div fr_fps)+1;
+   else _wrld:=min2((r^ div fr_fps)+1,255);
    _wudata_byte(_wrld,rpl);
 end;
 
@@ -179,7 +179,7 @@ begin
 
             if(rpl=false)and(playeri=_pl)then
             begin
-               if(sel)then _wudata_byte(order,rpl); // + weapon
+               if(sel)then _wudata_byte(order,rpl);
                if(_isbuilding)then
                begin
                   if(bld)then

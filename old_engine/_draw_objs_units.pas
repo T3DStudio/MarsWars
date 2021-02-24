@@ -310,7 +310,7 @@ begin
             if(buff[ub_invuln]>10)then mc:=c_awhite;
 
             if(playeri=0)and(_isbuilding=false)then
-             if(g_mode in [gm_inv,gm_coop])then mc:=c_ablack;
+             if(g_mode in [gm_inv,gm_aslt])then mc:=c_ablack;
 
             dp:=_udpth(pu);
 

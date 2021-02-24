@@ -234,7 +234,7 @@ begin
        _unit_dec_Rcntrs(pu);
 
        if(G_WTeam=255)then
-        if(playeri>0)or not(g_mode in [gm_inv,gm_coop])then
+        if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
          if(army=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          and(state>ps_none)then net_chat_add(name+str_player_def,playeri,255);
     end;

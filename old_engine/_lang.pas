@@ -241,11 +241,11 @@ begin
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;
-   str_startat[1]        := '1 '+#19+'builder'+#25+'+ 1 '+#18+'gen.'+#25;
-   str_startat[2]        := '1 '+#19+'builder'+#25+'+ 2 '+#18+'gen.'+#25;
-   str_startat[3]        := '1 '+#19+'b.'+#25+'+ 2 '+#18+'gen.'+#25+'+ 2 '+#17+'b.'+#25;
-   str_startat[4]        := '2 '+#19+'builders'+#25;
-   str_startat[5]        := '1 '+#19+'b.'+#25+'+ 100 energy';
+   str_startat[1]        := '2 '+#19+'builders'+#25;
+   str_startat[2]        := '3 '+#19+'builders'+#25;
+   str_startat[3]        := '4 '+#19+'builders'+#25;
+   str_startat[4]        := '5 '+#19+'builders'+#25;
+   str_startat[5]        := '6 '+#19+'builders'+#25;
 
    str_sstarts           := 'Show player starts:';
 
@@ -285,7 +285,7 @@ begin
    str_gmode[gm_3fort]   := #17+'Three bases'+#25;
    str_gmode[gm_ct   ]   := #19+'Capturing points'+#25;
    str_gmode[gm_inv  ]   := #20+'Invasion'   +#25;
-   str_gmode[gm_coop ]   := #15+'Assault'    +#25;
+   str_gmode[gm_aslt ]   := #15+'Assault'    +#25;
 
    str_addon[false]      := #16+'UDOOM' +#25;
    str_addon[true ]      := #18+'DOOM 2'+#25;
@@ -672,11 +672,11 @@ begin
 
   str_starta            := 'Начальная база:';
   str_startat[0]        := '1 '+#19+'строитель'+#25;
-  str_startat[1]        := '1 '+#19+'строитель'+#25+'+ 1 '+#18+'ген.'+#25;
-  str_startat[2]        := '1 '+#19+'строитель'+#25+'+ 2 '+#18+'ген.'+#25;
-  str_startat[3]        := '1 '+#19+'стр.'+#25+'+ 2 '+#18+'ген.'+#25+'+ 2 '+#17+'б.'+#25;
-  str_startat[4]        := '2 '+#19+'строителя'+#25;
-  str_startat[5]        := '1 '+#19+'стр.'+#25+'+ 100 энергии';
+  str_startat[1]        := '2 '+#19+'строителя'+#25;
+  str_startat[2]        := '3 '+#19+'строителя'+#25;
+  str_startat[3]        := '4 '+#19+'строителя'+#25;
+  str_startat[4]        := '5 '+#19+'строителей'+#25;
+  str_startat[5]        := '6 '+#19+'строителей'+#25;
 
   str_sstarts           := 'Показывать старты:';
 
@@ -686,7 +686,7 @@ begin
   str_gmode[gm_3fort]   := #17+'Три крепости'+#25;
   str_gmode[gm_ct   ]   := #19+'Захват точек'+#25;
   str_gmode[gm_inv  ]   := #20+'Вторжение'+#25;
-  str_gmode[gm_coop ]   := #15+'Штурм'+#25;
+  str_gmode[gm_aslt ]   := #15+'Штурм'+#25;
 
   str_team              := 'Клан:';
   str_srace             := 'Раса:';

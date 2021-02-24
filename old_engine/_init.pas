@@ -81,7 +81,7 @@ begin
 
    {$ENDIF}
 
-   if not(InitNET)   then exit;
+   if not(InitNET)then exit;
 
    Map_randommap;
    DefGameObjects;

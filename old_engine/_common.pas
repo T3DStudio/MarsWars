@@ -251,7 +251,7 @@ begin
    if(h =0         )then _hI2S:=0    else
    if(h =dead_hits )then _hI2S:=-127 else
    if(h<=ndead_hits)then _hI2S:=-128 else
-   if (dead_hits<h)and(h<0)
+   if(dead_hits<h)and(h<0)
                     then _hI2S:=mm3(-126,h div _d2shi,-1)
    else                  _hI2S:=mm3(1,trunc(s),_mms);
 
@@ -291,16 +291,10 @@ begin
                3,4 : PickPlayerTeam:=4;
                5,6 : PickPlayerTeam:=6;
                end;
-     gm_coop,
+     gm_aslt,
      gm_inv  : PickPlayerTeam:=1;
      else      PickPlayerTeam:=_players[p].team;
      end;
-end;
-
-procedure GModeTeams(gm:byte);
-var i:byte;
-begin
-   for i:=0 to MaxPlayers do _players[i].team:=PickPlayerTeam(gm,i);
 end;
 
 function _plst(p:integer):char;

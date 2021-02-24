@@ -65,7 +65,7 @@ begin
             BlockRead(f,vr,sizeof(map_obs  ));_svld_stat:=_svld_stat+str_m_obs+_str_mx[vr]+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(theme_i  ));vr:=0;
             BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]    +#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(g_mode   ));_svld_stat:=_svld_stat+str_gmode[vr]      +#13+#25;vr:=0;
+            BlockRead(f,vr,sizeof(g_mode   ));_svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;vr:=0;
             BlockRead(f,vr,sizeof(g_startb ));vr:=0;
             BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
             BlockRead(f,hp,sizeof(HPlayer  ));
