@@ -210,8 +210,8 @@ begin
    vy:=vid_vy-vid_ab;
 
    if(theme_decaln>0)then
-    for i:=1 to MaxTDecsS do
-     with _TDecs[i-1] do
+    for i:=1 to _tdecaln do
+     with _tdecals[i-1] do
      begin
         ix:=x-vx+vid_mwa;
         iy:=y-vy+vid_mha;

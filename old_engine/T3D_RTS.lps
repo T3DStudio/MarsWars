@@ -8,37 +8,39 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="3" Y="4"/>
+        <TopLine Value="44"/>
+        <CursorPos X="79" Y="53"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="46"/>
-        <CursorPos X="13" Y="74"/>
+        <TopLine Value="900"/>
+        <CursorPos X="15" Y="918"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="_type.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="133"/>
-        <CursorPos X="13" Y="149"/>
+        <TopLine Value="70"/>
+        <CursorPos X="4" Y="88"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="_var.pas"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="9" Y="17"/>
+        <TopLine Value="678"/>
+        <CursorPos X="18" Y="686"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="_loadgfx.pas"/>
         <EditorIndex Value="20"/>
-        <TopLine Value="751"/>
+        <TopLine Value="115"/>
         <CursorPos X="11" Y="753"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -53,8 +55,8 @@
       <Unit6>
         <Filename Value="_common.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="283"/>
-        <CursorPos X="5" Y="298"/>
+        <TopLine Value="295"/>
+        <CursorPos X="19" Y="313"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -69,8 +71,8 @@
       <Unit8>
         <Filename Value="_input.pas"/>
         <EditorIndex Value="34"/>
-        <TopLine Value="155"/>
-        <CursorPos X="57" Y="180"/>
+        <TopLine Value="628"/>
+        <CursorPos X="8" Y="163"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -109,8 +111,8 @@
       <Unit13>
         <Filename Value="_map.pas"/>
         <EditorIndex Value="21"/>
-        <TopLine Value="341"/>
-        <CursorPos X="6" Y="296"/>
+        <TopLine Value="240"/>
+        <CursorPos X="38" Y="263"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -124,10 +126,9 @@
       </Unit14>
       <Unit15>
         <Filename Value="_game.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="30"/>
-        <TopLine Value="190"/>
-        <CursorPos X="65" Y="207"/>
+        <TopLine Value="832"/>
+        <CursorPos X="34" Y="843"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit15>
@@ -165,9 +166,10 @@
       </Unit19>
       <Unit20>
         <Filename Value="_sounds.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="235"/>
-        <CursorPos X="4" Y="281"/>
+        <TopLine Value="273"/>
+        <CursorPos X="55" Y="290"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit20>
@@ -245,8 +247,8 @@
       <Unit30>
         <Filename Value="_units_common.pas"/>
         <EditorIndex Value="23"/>
-        <TopLine Value="983"/>
-        <CursorPos X="7" Y="931"/>
+        <TopLine Value="175"/>
+        <CursorPos X="22" Y="179"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit30>
@@ -255,13 +257,13 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="227"/>
         <CursorPos X="26" Y="303"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="7"/>
       </Unit31>
       <Unit32>
         <Filename Value="_ded.pas"/>
         <EditorIndex Value="29"/>
-        <TopLine Value="190"/>
-        <CursorPos X="53" Y="29"/>
+        <TopLine Value="280"/>
+        <CursorPos X="54" Y="201"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -269,7 +271,7 @@
         <Filename Value="missions\m1.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="5" Y="4"/>
-        <UsageCount Value="90"/>
+        <UsageCount Value="84"/>
       </Unit33>
       <Unit34>
         <Filename Value="_draw_game.pas"/>
@@ -308,132 +310,144 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="80"/>
         <CursorPos X="3" Y="89"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="4"/>
       </Unit38>
       <Unit39>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\win32\windows.pp"/>
         <UnitName Value="Windows"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="4"/>
       </Unit39>
       <Unit40>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\packages\sdl\src\sdl_mixer.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="197"/>
         <CursorPos X="3" Y="215"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="7"/>
       </Unit40>
     </Units>
-    <JumpHistory Count="27" HistoryIndex="26">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="_units_cl.pas"/>
-        <Caret Line="393" TopLine="376"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="165" Column="42" TopLine="151"/>
       </Position1>
       <Position2>
-        <Filename Value="_game.pas"/>
-        <Caret Line="837" Column="49" TopLine="827"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="142" Column="10" TopLine="124"/>
       </Position2>
       <Position3>
-        <Filename Value="_ded.pas"/>
-        <Caret Line="279" Column="34" TopLine="258"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="145" Column="35" TopLine="124"/>
       </Position3>
       <Position4>
-        <Filename Value="_ded.pas"/>
-        <Caret Line="3"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="76" Column="16" TopLine="60"/>
       </Position4>
       <Position5>
-        <Filename Value="_var.pas"/>
-        <Caret Line="118" Column="31" TopLine="90"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="145" Column="19" TopLine="124"/>
       </Position5>
       <Position6>
-        <Filename Value="_const.pas"/>
-        <Caret Line="945" Column="59" TopLine="913"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="297" Column="61" TopLine="290"/>
       </Position6>
       <Position7>
-        <Filename Value="_const.pas"/>
-        <Caret Line="948" Column="55" TopLine="936"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="304" Column="88" TopLine="290"/>
       </Position7>
       <Position8>
-        <Filename Value="_ded.pas"/>
-        <Caret Line="22" Column="43" TopLine="5"/>
+        <Filename Value="_loadgfx.pas"/>
+        <Caret Line="753" Column="11" TopLine="115"/>
       </Position8>
       <Position9>
-        <Filename Value="_init.pas"/>
-        <Caret Line="84" Column="19" TopLine="62"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="312" Column="57" TopLine="284"/>
       </Position9>
       <Position10>
-        <Filename Value="_init.pas"/>
-        <Caret Line="82" Column="55" TopLine="62"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="323" Column="57" TopLine="313"/>
       </Position10>
       <Position11>
-        <Filename Value="_map.pas"/>
-        <Caret Line="394" Column="36" TopLine="373"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="287" Column="61" TopLine="268"/>
       </Position11>
       <Position12>
-        <Filename Value="_init.pas"/>
-        <Caret Line="84" Column="37" TopLine="62"/>
+        <Filename Value="_var.pas"/>
+        <Caret Line="767" TopLine="744"/>
       </Position12>
       <Position13>
-        <Filename Value="_game.pas"/>
-        <Caret Line="198" Column="17" TopLine="185"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="329" Column="17" TopLine="310"/>
       </Position13>
       <Position14>
-        <Filename Value="_common.pas"/>
-        <Caret Line="298" Column="5" TopLine="283"/>
+        <Filename Value="_var.pas"/>
+        <Caret Line="736" Column="14" TopLine="719"/>
       </Position14>
       <Position15>
-        <Filename Value="_game.pas"/>
-        <Caret Line="257" Column="4" TopLine="204"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="330" Column="18" TopLine="310"/>
       </Position15>
       <Position16>
-        <Filename Value="_const.pas"/>
-        <Caret Line="943" Column="10" TopLine="913"/>
+        <Filename Value="_var.pas"/>
+        <Caret Line="737" Column="15" TopLine="720"/>
       </Position16>
       <Position17>
-        <Filename Value="_ded.pas"/>
-        <Caret Line="34" Column="21" TopLine="7"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="331" Column="19" TopLine="310"/>
       </Position17>
       <Position18>
-        <Filename Value="T3D_RTS.lpr"/>
-        <Caret Line="4" Column="3"/>
+        <Filename Value="_var.pas"/>
+        <Caret Line="738" Column="16" TopLine="721"/>
       </Position18>
       <Position19>
-        <Filename Value="_lang.pas"/>
-        <Caret Line="288" Column="21" TopLine="271"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="332" Column="17" TopLine="310"/>
       </Position19>
       <Position20>
-        <Filename Value="_lang.pas"/>
-        <Caret Line="689" Column="18" TopLine="672"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="288" Column="12" TopLine="262"/>
       </Position20>
       <Position21>
-        <Filename Value="_draw_com.pas"/>
-        <Caret Line="145" Column="61" TopLine="127"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="110" Column="42" TopLine="95"/>
       </Position21>
       <Position22>
-        <Filename Value="_draw_menu.pas"/>
-        <Caret Line="89" Column="60" TopLine="72"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="112" Column="28" TopLine="95"/>
       </Position22>
       <Position23>
-        <Filename Value="_draw_menu.pas"/>
-        <Caret Line="363" Column="113" TopLine="346"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="113" Column="51" TopLine="95"/>
       </Position23>
       <Position24>
-        <Filename Value="_init.pas"/>
-        <Caret Line="84" Column="37" TopLine="62"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="116" Column="50" TopLine="95"/>
       </Position24>
       <Position25>
-        <Filename Value="_loadgfx.pas"/>
-        <Caret Line="753" Column="11" TopLine="751"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="118" Column="30" TopLine="95"/>
       </Position25>
       <Position26>
-        <Filename Value="_game.pas"/>
-        <Caret Line="211" Column="10" TopLine="186"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="119" Column="53" TopLine="95"/>
       </Position26>
       <Position27>
-        <Filename Value="_game.pas"/>
-        <Caret Line="201" Column="35" TopLine="184"/>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="126" Column="32" TopLine="97"/>
       </Position27>
+      <Position28>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="127" Column="75" TopLine="98"/>
+      </Position28>
+      <Position29>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="129" Column="30" TopLine="100"/>
+      </Position29>
+      <Position30>
+        <Filename Value="_sounds.pas"/>
+        <Caret Line="130" Column="48" TopLine="101"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

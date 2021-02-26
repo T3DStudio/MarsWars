@@ -52,32 +52,47 @@ begin
    end;
 end;
 
+procedure AddToSoundSet(ss:PTSoundSet;tsnd:PTMWSound);
+begin
+   if(tsnd<>nil)then
+   with ss^ do
+   begin
+      inc(sndn,1);
+      setlength(snds,sndn);
+      snds[sndn-1]:=tsnd;
+   end;
+end;
+
 function LoadSoundSet(fname:shortstring):PTSoundSet;
 var tsnd:PTMWSound;
+       i:integer;
 begin
+   i:=0;
    new(LoadSoundSet);
    with LoadSoundSet^ do
    begin
-      sndn:=0;
+      sndps:=0;
+      sndn :=0;
       setlength(snds,sndn);
 
       tsnd:=loadSND(fname);
-      if(tsnd<>nil)then
-      begin
-         inc(sndn,1);
-         setlength(snds,sndn);
-         snds[sndn-1]:=tsnd;
-      end;
+      if(tsnd<>nil)then AddToSoundSet(LoadSoundSet,tsnd);
 
       while true do
       begin
-         tsnd:=loadSND(fname+i2s(sndn));
-         if(tsnd=nil)then break;
+         tsnd:=loadSND(fname+i2s(i));
+         if(tsnd=nil)then
+          if(i=0)then
+          begin
+             inc(i,1);
+             continue;
+          end
+          else break;
 
-         inc(sndn,1);
-         setlength(snds,sndn);
-         snds[sndn-1]:=tsnd;
+         AddToSoundSet(LoadSoundSet,tsnd);
+         inc(i,1);
       end;
+      if(sndn=0)then WriteLog(fname);
    end;
 end;
 
@@ -121,7 +136,14 @@ begin
    SoundSet2Chunk:=nil;
    with ss^ do
     if(sndn>0)then
-     SoundSet2Chunk:=snds[random(sndn)];
+     if(sndn=1)
+     then SoundSet2Chunk:=snds[0]
+     else
+     begin
+        inc(sndps,1);
+        if(sndps<0)or(sndps>=sndn)then sndps:=0;
+        SoundSet2Chunk:=snds[sndps];
+     end;
 end;
 
 function PlaySoundSet(ss:PTSoundSet):PTMWSound;
@@ -250,13 +272,20 @@ begin
    if(MIX_OPENAUDIO(AUDIO_FREQUENCY,
                     AUDIO_FORMAT,
                     AUDIO_CHANNELS,
-                    AUDIO_CHUNKSIZE  )<>0) then begin WriteError; exit; end;
+                    AUDIO_CHUNKSIZE)<>0) then begin WriteError; exit; end;
 
    LoadAllMusic;
    ShafleMusicList;
 
-   snd_click:=LoadSoundSet('click');
-   snd_chat :=LoadSoundSet('chat' );
+   snd_click                :=LoadSoundSet('click'           );
+   snd_chat                 :=LoadSoundSet('chat'            );
+   snd_building_explode     :=LoadSoundSet('building_explode');
+   snd_teleport             :=LoadSoundSet('teleport'        );
+   snd_pexp                 :=LoadSoundSet('p_exp'           );
+   snd_exp                  :=LoadSoundSet('explode'         );
+   snd_mine_place           :=LoadSoundSet('mine_place'      );
+   snd_inapc                :=LoadSoundSet('inapc'           );
+   snd_meat                 :=LoadSoundSet('meat'            );
 
    for r:=1 to r_cnt do
    begin
@@ -273,18 +302,99 @@ begin
    snd_victory           [r]:=LoadSoundSet(race_dir[r]+'victory'              );
    end;
 
-   snd_teleport    :=LoadSoundSet('teleport' );
-   snd_pexp        :=LoadSoundSet('p_exp'    );
-   snd_exp         :=LoadSoundSet('explode'  );
-   snd_exp2        :=LoadSoundSet('explode2' );
+   snd_uac_cc               :=LoadSoundSet(race_buildings[r_uac ]+'command_center');
+   snd_uac_barracks         :=LoadSoundSet(race_buildings[r_uac ]+'barraks'       );
+   snd_uac_generator        :=LoadSoundSet(race_buildings[r_uac ]+'generator'     );
+   snd_uac_smith            :=LoadSoundSet(race_buildings[r_uac ]+'weapon_factory');
+   snd_uac_ctower           :=LoadSoundSet(race_buildings[r_uac ]+'chaingun_tower');
+   snd_uac_radar            :=LoadSoundSet(race_buildings[r_uac ]+'radar_on'      );
+   snd_uac_rtower           :=LoadSoundSet(race_buildings[r_uac ]+'rocket_turret' );
+   snd_uac_factory          :=LoadSoundSet(race_buildings[r_uac ]+'factory'       );
+   snd_uac_tech             :=LoadSoundSet(race_buildings[r_uac ]+'tech_center'   );
+   snd_uac_rls              :=LoadSoundSet(race_buildings[r_uac ]+'rocketstation' );
+   snd_uac_nucl             :=LoadSoundSet(race_buildings[r_uac ]+'nuclear_plant' );
+
+   snd_hell_hk              :=LoadSoundSet(race_buildings[r_hell]+'hell_keep'     );
+   snd_hell_hgate           :=LoadSoundSet(race_buildings[r_hell]+'hell_gate'     );
+   snd_hell_hsymbol         :=LoadSoundSet(race_buildings[r_hell]+'hell_symbol'   );
+   snd_hell_hpool           :=LoadSoundSet(race_buildings[r_hell]+'hell_pool'     );
+   snd_hell_htower          :=LoadSoundSet(race_buildings[r_hell]+'hell_tower'    );
+   snd_hell_hteleport       :=LoadSoundSet(race_buildings[r_hell]+'hell_teleport' );
+   snd_hell_htotem          :=LoadSoundSet(race_buildings[r_hell]+'hell_totem'    );
+   snd_hell_hmon            :=LoadSoundSet(race_buildings[r_hell]+'hell_monastery');
+   snd_hell_hfort           :=LoadSoundSet(race_buildings[r_hell]+'hell_temple'   );
+   snd_hell_haltar          :=LoadSoundSet(race_buildings[r_hell]+'hell_altar'    );
+   snd_hell_hbuild          :=LoadSoundSet(race_buildings[r_hell]+'hell_building' );
 
 
+   snd_hell_pain            :=LoadSoundSet(race_units[r_hell]+'d_p');
+   snd_hell_melee           :=LoadSoundSet(race_units[r_hell]+'d_m');
+   snd_hell_attack          :=LoadSoundSet(race_units[r_hell]+'d_a');
+   snd_hell_move            :=LoadSoundSet(race_units[r_hell]+'d_' );
+
+   snd_zimba_death          :=LoadSoundSet(race_units[r_hell]+'zimbas\d_z_d' );
+   snd_zimba_ready          :=LoadSoundSet(race_units[r_hell]+'zimbas\d_z_s' );
+   snd_zimba_pain           :=LoadSoundSet(race_units[r_hell]+'zimbas\d_z_p' );
+   snd_zimba_move           :=LoadSoundSet(race_units[r_hell]+'zimbas\d_z_ac');
+
+   snd_revenant_death       :=LoadSoundSet(race_units[r_hell]+'revenant\d_rev_d' );
+   snd_revenant_ready       :=LoadSoundSet(race_units[r_hell]+'revenant\d_rev_c' );
+   snd_revenant_melee       :=LoadSoundSet(race_units[r_hell]+'revenant\d_rev_m' );
+   snd_revenant_attack      :=LoadSoundSet(race_units[r_hell]+'revenant\d_rev_a' );
+   snd_revenant_move        :=LoadSoundSet(race_units[r_hell]+'revenant\d_rev_ac');
+
+   snd_pain_ready           :=LoadSoundSet(race_units[r_hell]+'pain\d_pain_c');
+   snd_pain_death           :=LoadSoundSet(race_units[r_hell]+'pain\d_pain_d');
+   snd_pain_pain            :=LoadSoundSet(race_units[r_hell]+'pain\d_pain_p');
+
+   snd_mastermind_ready     :=LoadSoundSet(race_units[r_hell]+'mastermind\d_u6_c');
+   snd_mastermind_death     :=LoadSoundSet(race_units[r_hell]+'mastermind\d_u6_d');
+   snd_mastermind_foot      :=LoadSoundSet(race_units[r_hell]+'mastermind\d_u6_f');
+
+   snd_mancubus_ready       :=LoadSoundSet(race_units[r_hell]+'mancubus\d_man_c');
+   snd_mancubus_death       :=LoadSoundSet(race_units[r_hell]+'mancubus\d_man_d');
+   snd_mancubus_pain        :=LoadSoundSet(race_units[r_hell]+'mancubus\d_man_p');
+   snd_mancubus_attack      :=LoadSoundSet(race_units[r_hell]+'mancubus\d_man_a');
+
+   snd_lost_move            :=LoadSoundSet(race_units[r_hell]+'lost\d_u0'     );
+
+   snd_knight_ready         :=LoadSoundSet(race_units[r_hell]+'knight\knightc');
+   snd_knight_death         :=LoadSoundSet(race_units[r_hell]+'knight\knightd');
+   snd_baron_ready          :=LoadSoundSet(race_units[r_hell]+'baron\d_u4_c'  );
+   snd_baron_death          :=LoadSoundSet(race_units[r_hell]+'baron\d_u4_d'  );
+
+   snd_imp_ready            :=LoadSoundSet(race_units[r_hell]+'imp\d_u1_s');
+   snd_imp_death            :=LoadSoundSet(race_units[r_hell]+'imp\d_u1_d');
+   snd_imp_move             :=LoadSoundSet(race_units[r_hell]+'imp\d_imp' );
+
+   snd_demon_ready          :=LoadSoundSet(race_units[r_hell]+'demon\d_u2'   );
+   snd_demon_death          :=LoadSoundSet(race_units[r_hell]+'demon\d_u2_d' );
+   snd_demon_melee          :=LoadSoundSet(race_units[r_hell]+'demon\d_u2_a' );
+
+   snd_cyber_ready          :=LoadSoundSet(race_units[r_hell]+'cyber\d_u5'   );
+   snd_cyber_death          :=LoadSoundSet(race_units[r_hell]+'cyber\d_u5_d' );
+   snd_cyber_foot           :=LoadSoundSet(race_units[r_hell]+'cyber\d_u5_f' );
+
+   snd_caco_death           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3'   );
+   snd_caco_ready           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3_d' );
+
+   snd_archvile_death       :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_d' );
+   snd_archvile_attack      :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_at');
+   snd_archvile_fire        :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_f' );
+   snd_archvile_pain        :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_p' );
+   snd_archvile_ready       :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_c' );
+   snd_archvile_move        :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_a' );
+
+   snd_arachno_death        :=LoadSoundSet(race_units[r_hell]+'arachnotron\d_ar_d');
+   snd_arachno_move         :=LoadSoundSet(race_units[r_hell]+'arachnotron\d_ar_act');
+   snd_arachno_foot         :=LoadSoundSet(race_units[r_hell]+'arachnotron\d_ar_f');
+   snd_arachno_ready        :=LoadSoundSet(race_units[r_hell]+'arachnotron\d_ar_c');
 
 
-   {snd_inapc       :=loadSND('inapc.wav'    );
+  {snd_inapc       :=loadSND('inapc.wav'    );
    snd_ccup        :=loadSND('ccup.wav'     );
-   snd_radar       :=loadSND('radar.wav'    );  }
-   {snd_meat        :=loadSND('gv.wav'       );
+   snd_radar       :=loadSND('radar.wav'    );
+   snd_meat        :=loadSND('gv.wav'       );
    snd_d0          :=loadSND('d_u0.wav'     );
    snd_ar_act      :=loadSND('d_ar_act.wav' );
    snd_ar_d        :=loadSND('d_ar_d.wav'   );

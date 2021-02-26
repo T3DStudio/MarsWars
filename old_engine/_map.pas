@@ -260,7 +260,7 @@ begin
            inc(map_seed2,1);
            if(c>500 )then dec(u,1);
            if(c>1000)then break;
-         until (_spch(ix,iy,u)=false)and(c<=2000);
+         until (_spch(ix,iy,u)=false);
 
          map_psx[i]:=ix;
          map_psy[i]:=iy;

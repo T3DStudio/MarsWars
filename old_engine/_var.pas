@@ -9,17 +9,17 @@ _EVENT            : pSDL_EVENT;
 //  GAME
 //
 
-g_Addon           : boolean = true;
-g_Started         : boolean = false;
-g_Paused          : byte = 0;
-g_WTeam           : byte = 255;
-g_mode            : byte = 0;
-g_startb          : byte = 0;
-g_shpos           : boolean = false;
-g_aislots         : byte = 5;
+g_addon           : boolean  = true;
+g_started         : boolean  = false;
+g_paused          : byte     = 0;
+g_wteam           : byte     = 255;
+g_mode            : byte     = 0;
+g_startb          : byte     = 0;
+g_shpos           : boolean  = false;
+g_aislots         : byte     = 5;
 g_step            : cardinal = 0;
-g_plstat          : byte = 0;
-g_nunits          : integer = 0;
+g_plstat          : byte     = 0;
+g_nunits          : integer  = 0;
 
 g_inv_mn          : byte = 0;
 g_inv_wn          : byte = 0;
@@ -45,7 +45,6 @@ _uregen_c         : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUpgrade;
-
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -89,14 +88,12 @@ net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
 net_nstat         : byte = 0;
 net_sv_port       : word = 10666;
 net_socket        : PUDPSocket;
-net_buf           : PUDPpacket;
+net_buf           : PUDPPacket;
 net_period        : byte = 0;
-
 
 _rpls_file        : file;
 _rpls_u           : integer = 0;
 _rpls_pnui        : byte = 0;
-
 
 str_startat       : array[0..5] of shortstring;
 str_race          : array[0..2] of shortstring;
@@ -115,7 +112,7 @@ str_gaddon,
 str_gmodet,
 str_starta,
 str_plout,
-str_player_def : shortstring;
+str_player_def    : shortstring;
 
 {$IFDEF _FULLGAME}
 
@@ -191,10 +188,10 @@ ter_h             : integer;
 
 font_ca           : array[char] of pSDL_SURFACE;
 
-_effects          : array[1..vid_mvs     ] of TEff;
+_effects          : array[1..vid_mvs] of TEff;
 
-MaxTDecsS         : integer = 0;      //960 720
-_TDecs            : array of TDecal;
+_tdecaln          : integer = 0;
+_tdecals          : array of TDecal;
 
 map_mmcx          : single;
 map_mmvw,
@@ -292,7 +289,7 @@ ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
 ui_builders_x     : array[0..ui_builder_srs] of integer; //
-ui_builders_y     : array[0..ui_builder_srs] of integer; // builders rects
+ui_builders_y     : array[0..ui_builder_srs] of integer; // builders areas
 ui_builders_r     : array[0..ui_builder_srs] of integer; //
 
 ui_first_upgr_time: integer = 0;
@@ -309,14 +306,12 @@ ui_battle_units   : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
+
 {
-
-
-
 ui_msk            : byte = 0;
 ui_msks           : shortint = 0;
-
 }
+
 ui_muc            : array[false..true] of cardinal; // unit max cound color
 ui_rad_rld        : array[false..true] of cardinal; // radar reload time
 
@@ -344,6 +339,16 @@ k_mr,
 k_chrt            : cardinal;
 k_chr             : char;
 
+
+fps_tt,
+fps_cs,
+fps_ns            : cardinal;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  COLORS
+//
+
 c_dred,
 c_awhite,
 c_red,
@@ -368,11 +373,10 @@ c_ablack,
 c_purple,
 c_black           : cardinal;
 
-fps_tt,
-fps_cs,
-fps_ns            : cardinal;
-
-//theme
+////////////////////////////////////////////////////////////////////////////////
+//
+//  THEMES
+//
 
 theme_i           : integer = 0;
 
@@ -430,7 +434,10 @@ theme_ant_liquids : array of byte;     // animation period
 theme_clr_liquids : array of cardinal; // minimap color
 
 
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SPRITES
+//
 
 spr_liquidb       : array[1..LiquidRs ] of TMWSprite;
 spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWSprite;
@@ -582,8 +589,11 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 
-/// text
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  TEST
+//
 
 str_pcolors       : array[0..4] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
@@ -664,14 +674,16 @@ str_menu_s2,
 str_menu_s3       : array[0..2] of shortstring;
 
 
-
-// sounds
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SOUND
+//
 
 snd_svolume        : byte = 64;
 snd_mvolume        : byte = 64;
 snd_music_list     : array of pMIX_MUSIC;
 snd_music_list_size: integer = 0;
-snd_current_music  : byte = 1;
+snd_current_music  : integer = 0;
 snd_anoncer_pause  : integer = 0;
 snd_anoncer_last   : PTSoundSet;
 snd_unit_cmd_pause : integer = 0;
@@ -691,17 +703,93 @@ snd_victory
                    : array[1..r_cnt] of PTSoundSet;
 
 
+
 snd_uac_cc,
 snd_uac_barracks,
 snd_uac_generator,
 snd_uac_smith,
 snd_uac_ctower,
-snd_uac_ptower,
+snd_uac_radar,
 snd_uac_rtower,
 snd_uac_factory,
 snd_uac_tech,
 snd_uac_rls,
 snd_uac_nucl,
+
+snd_hell_hk,
+snd_hell_hgate,
+snd_hell_hsymbol,
+snd_hell_hpool,
+snd_hell_htower,
+snd_hell_hteleport,
+snd_hell_htotem,
+snd_hell_hmon,
+snd_hell_hfort,
+snd_hell_haltar,
+snd_hell_hbuild,
+
+snd_zimba_death,
+snd_zimba_ready,
+snd_zimba_pain,
+snd_zimba_move,
+
+snd_hell_pain,
+snd_hell_melee,
+snd_hell_attack,
+snd_hell_move,
+
+snd_revenant_death,
+snd_revenant_ready,
+snd_revenant_melee,
+snd_revenant_attack,
+snd_revenant_move,
+
+snd_pain_ready,
+snd_pain_death,
+snd_pain_pain,
+
+snd_mastermind_ready,
+snd_mastermind_death,
+snd_mastermind_foot,
+
+snd_mancubus_ready,
+snd_mancubus_death,
+snd_mancubus_pain,
+snd_mancubus_attack,
+
+snd_lost_move,
+
+snd_knight_ready,
+snd_knight_death,
+snd_baron_ready,
+snd_baron_death,
+
+snd_imp_ready,
+snd_imp_death,
+snd_imp_move,
+
+snd_demon_ready,
+snd_demon_death,
+snd_demon_melee,
+
+snd_cyber_ready,
+snd_cyber_death,
+snd_cyber_foot,
+
+snd_caco_death,
+snd_caco_ready,
+
+snd_archvile_death,
+snd_archvile_attack,
+snd_archvile_fire,
+snd_archvile_pain,
+snd_archvile_ready,
+snd_archvile_move,
+
+snd_arachno_death,
+snd_arachno_move,
+snd_arachno_foot,
+snd_arachno_ready,
 
 {snd_jetpoff,
 snd_jetpon,
@@ -764,34 +852,20 @@ snd_dpain,
 snd_demon1, }
 snd_click,
 snd_chat,
-{snd_inapc,
+{,
 snd_ccup,
-snd_radar, }
+, }
+snd_meat,
+snd_building_explode,
+snd_mine_place,
+snd_inapc,
 snd_teleport,
 snd_pexp,
-snd_exp,
-snd_exp2
-{snd_d0,
-snd_meat,
-snd_ar_act,
-snd_ar_c,
-snd_ar_d,
-snd_ar_f,
-snd_imp,
-snd_impd1,
-snd_impd2,
-snd_impc1,
-snd_impc2,
-snd_demonc,
-snd_demona,
-snd_demond,
-snd_hmelee,
-snd_arch_a,
-snd_arch_at,
-snd_arch_d,
-snd_arch_p,
-snd_arch_c,
-snd_arch_f,
+snd_exp
+{
+,
+,
+
 snd_hellbar,
 snd_hell,
 snd_hpower }       : PTSoundSet;

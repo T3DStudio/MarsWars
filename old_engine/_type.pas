@@ -84,7 +84,8 @@ PTMWSound = ^TMWSound;
 
 TSoundSet = record
    snds : array of PTMWSound;
-   sndn : integer;
+   sndn,
+   sndps: integer;
 end;
 PTSoundSet = ^TSoundSet;
 
@@ -159,6 +160,7 @@ TUID = record
    un_name,
    un_descr,
    un_hint      : shortstring;
+
    un_smodel    : array[false..true] of PTMWSModel;
 
    un_snd_ready,

@@ -173,7 +173,6 @@ begin
    randomr:=_gen(r)-_gen(r);
 end;
 
-
 procedure WriteError;
 var f:Text;
 begin
@@ -254,18 +253,6 @@ begin
    if(dead_hits<h)and(h<0)
                     then _hI2S:=mm3(-126,h div _d2shi,-1)
    else                  _hI2S:=mm3(1,trunc(s),_mms);
-
-   {if(abs(h)<_d2shi)
-   then _hI2S:=-1
-   else _hI2S:=h div _d2shi;   }
-
-   { s:=(h/s);
-    if(s<1)
-    then h:=1
-    else h:=trunc(s);
-    if(h>_mms)
-    then _hI2S:=_mms
-    else _hI2S:=h;   }
 end;
 
 function ai_name(ain:byte):shortstring;

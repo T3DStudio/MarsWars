@@ -774,8 +774,8 @@ end;
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   MaxTDecsS:=(vid_sw*vid_sh) div 10000;
-   setlength(_TDecs,MaxTDecsS);
+   _tdecaln:=(vid_sw*vid_sh) div 10000;
+   setlength(_tdecals,_tdecaln);
 
    vid_mwa:= vid_sw+vid_ab*2;
    vid_mha:= vid_sh+vid_ab*2;
@@ -783,8 +783,8 @@ begin
    ix:=longint(map_seed) mod vid_mwa;
    iy:=(map_seed2*5+ix)  mod vid_mha;
    rn:=ix*iy;
-   for i:=1 to MaxTDecsS do
-    with _TDecs[i-1] do
+   for i:=1 to _tdecaln do
+    with _tdecals[i-1] do
     begin
        inc(rn,17);
        ix:=_genx(ix+rn       ,vid_mwa,false);

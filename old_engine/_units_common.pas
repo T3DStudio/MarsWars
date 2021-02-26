@@ -176,7 +176,7 @@ procedure _unit_movevis(pu:PTUnit);
 begin
    with pu^ do
     if(vx<>x)or(vy<>y)then
-     if(speed<=0)or(inapc>0)then
+     if{(speed<=0)or}(inapc>0)then
      begin
         vstp:=0;
         vx  :=x;
@@ -195,8 +195,9 @@ end;
 procedure _unit_turn(pu:PTUnit);
 begin
    with pu^ do
-    if(_canmove(pu))then
-     if(uid^._slowturn=false)then dir:=p_dir(x,y,uo_x,uo_y);
+    if(uid^._slowturn=false)then
+     if(_canmove(pu))then
+      dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
  {

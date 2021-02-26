@@ -363,7 +363,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
              if(hits>0)and(inapc=0)and(pl=playeri)then
              begin
                 psel:=sel;
-                if(o_id=uo_select)or((o_id=uo_aselect)and(not sel))then
+                if (o_id=uo_select )
+                or((o_id=uo_aselect)and(not sel))then
                 begin
                    sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                      and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
@@ -383,6 +384,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                  end
                  else  if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
+
                 if(o_id=uo_corder)then
                  case o_x0 of
                  co_supgrade : if(s_smiths  =0)and(_unit_supgrade (pu,o_y0))then break;   // start upgr
@@ -394,7 +396,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 if(sel)then
                 begin
                    case o_id of
-               //uo_select     : lselUID:=uidi;
                uo_setorder,
                uo_addorder   : order:=o_x0;
                uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - x,y
@@ -407,9 +408,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_bx :=-1;
 
                                      case uidi of
-                                      {UID_HKeep         : _unit_bteleport(pu);
-                                      UID_URadar        : _unit_uradar   (pu);
-                                      UID_URocketL      : _unit_URocketL (pu);  }
+                                      UID_HKeep         :;// _unit_bteleport(pu);
+                                      UID_URadar        :;// _unit_uradar   (pu);
+                                      UID_URocketL      :;// _unit_URocketL (pu);
                                       UID_HMonastery,
                                       UID_HFortress,
                                       UID_UNuclearPlant : uo_tar:=o_y0;
@@ -422,6 +423,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                                           then uo_tar:=o_y0
                                                           else ;//_unit_b247teleport(pu);
                                       else
+
                                         if(o_y0<>u)then uo_tar:=o_y0;
                                         if(o_x0<>co_rcmove)or(speed=0)
                                         then uo_id:=ua_amove
@@ -470,7 +472,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      end;
                                      case o_x0 of
                               co_stand  : begin
-                                             uo_id:=ua_hold;
+                                             uo_id :=ua_hold;
                                              a_tar :=0;
                                           end;
                               co_move,
@@ -835,7 +837,7 @@ begin
 
    if(G_Started)then
    begin
-      //if(k_ctrl=5)then PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
+      if(k_ctrl=5)then PlaySoundSet(snd_zimba_death);//PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
       //if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
 
       if(G_paused=0)then
