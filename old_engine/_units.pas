@@ -179,17 +179,18 @@ end;
 
 
 
-{$ENDIF}
+{$ENDIF}  }
 
 function _unit_OnDecorCheck(ux,uy:integer):boolean;
 const dr = 64;
 var i,dx,dy,ud,dp:integer;
 begin
-   dx:=ux div dcw;if(dx<0)then dx:=0;if(dx>dcn)then dx:=dcn;
-   dy:=uy div dcw;if(dy<0)then dy:=0;if(dy>dcn)then dy:=dcn;
+   dx:=ux div dcw;
+   dy:=uy div dcw;
    _unit_OnDecorCheck:=false;
    dp:=0;
 
+   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
    with map_dcell[dx,dy] do
     for i:=1 to n do
      with l[i-1]^ do
@@ -206,7 +207,7 @@ begin
       end;
 end;
 
-procedure _unit_UACUpgr(pu:PTUnit;tu:PTUnit);
+{procedure _unit_UACUpgr(pu:PTUnit;tu:PTUnit);
 begin
    with pu^ do
    begin
@@ -256,7 +257,7 @@ begin
            if(uc<>unum)then
            begin
               tu:=@_units[uc];
-              if(tu^.hits>dead_hits)then _udetect(pu,tu,dist2(x,y,tu^.x,tu^.y));
+              if(tu^.hits>dead_hits)then _unit_detect(pu,tu,dist2(x,y,tu^.x,tu^.y));
            end;
        end;
 
@@ -645,7 +646,7 @@ UID_UCommandCenter:
                  begin
                     if(buff[ub_advanced]=0)then
                     begin
-                       buff[ub_advanced]:= _bufinf;
+                       buff[ub_advanced]:= _ub_infinity;
                        speed            := 5;
                        uf               := uf_fly;
                        buff[ub_clcast]  := uaccc_fly;
@@ -686,7 +687,7 @@ UID_Pain     :  if(_canmove(pu))and(rld_t=0)then
                    rld_t:=rld_r;
                    _pain_action(pu);
                 end;
-UID_UMine     :  if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_bufinf;
+UID_UMine     :  if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_ub_infinity;
 UID_LostSoul :  if(upgr[upgr_vision]>0)then
                 begin
                    {$IFDEF _FULLGAME}
@@ -704,7 +705,7 @@ UID_ZMajor   : if(buff[ub_advanced]>0)and(buff[ub_clcast]=0)then
 
                   if(buff[ub_cast]>0)
                   then buff[ub_cast]:=0
-                  else buff[ub_cast]:=_bufinf;
+                  else buff[ub_cast]:=_ub_infinity;
 
                   buff[ub_clcast]:=vid_fps;
 
@@ -1941,10 +1942,14 @@ begin
       if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0)then continue;
       if(aw_rupgr>0)and(upgr  [aw_rupgr] =0)then continue;
 
+      // requirements to attacker
+
       if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then continue;
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then continue;
 
       if not(tu^.uidi in aw_uids)then continue;
+
+      // requirements to target
 
       if(cf(@aw_tarf,@wtr_owner_p ))and(playeri<>tu^.playeri       )then continue;
       if(cf(@aw_tarf,@wtr_owner_a ))and(team   <>tu^.player^.team  )then continue;
@@ -1975,7 +1980,7 @@ begin
 end;
 
 
-procedure _unit_target(pu,tu:PTUnit;ud:integer;t_weap:pinteger);
+procedure _unit_target(pu,tu:PTUnit;ud:integer;t_weap:pbyte);
 var tw:byte;
 begin
    with pu^ do
@@ -1983,13 +1988,20 @@ begin
    with player^ do
    begin
       tw:=_unit_target2weapon(pu,tu,ud,t_weap^);
-      if(tw<=t_weap^)then
-      if(ud<a_tard)then
-      begin
-         t_weap^:=tw;
-         a_tar  :=tu^.unum;
-         a_tard :=ud;
-      end;
+
+      if(tw>MaxUnitWeapons)then exit;
+
+      if(tw>t_weap^)
+      then exit
+      else
+        if(tw<t_weap^)
+        then
+        else
+          if(ud>a_tard)then exit;
+
+      t_weap^:=tw;
+      a_tar  :=tu^.unum;
+      a_tard :=ud;
    end;
 end;
 
@@ -1999,7 +2011,7 @@ var uc,
     tu: PTUnit;
 ftarget,
   push: boolean;
-t_weap: integer;
+t_weap: byte;
 begin
    with pu^ do
    with uid^ do
@@ -2025,7 +2037,7 @@ begin
          if(tu^.hits>idead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
-            _udetect(pu,tu,ud);
+            _unit_detect(pu,tu,ud);
 
             if(ftarget)then  _unit_target(pu,tu,ud,@t_weap);
 
@@ -2033,7 +2045,7 @@ begin
             begin
                if(push)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)then
-                 if(tu^.solid)and(sign(uf)=sign(tu^.uf))then _unit_push(pu,tu,ud);
+                 if(tu^.solid)and((uf=uf_ground)=(tu^.uf=uf_ground))then _unit_push(pu,tu,ud);
 
                //dec(ud,r+tu^.r);
             end;
@@ -2062,22 +2074,22 @@ begin
    begin
       if(OnlySVCode)then
       begin
-         a_tar :=0;
-         a_tard:=32000;
-         t_weap:=255;
+         a_tar  :=0;
+         a_tard :=32000;
+         t_weap :=255;
          ftarget:=_canattack(pu);
       end
       else ftarget:=false;
 
-      if(_UnitRange(inapc))then
+      if(_IsUnitRange(inapc))then
       begin
          if(_units[inapc].inapc>0)then exit;
-         vsnt  :=_units[inapc].vsnt;
+         vsnt   :=_units[inapc].vsnt;
          udetect:=false;
       end
       else udetect:=true;
 
-      if(not udetect)and(udetect=ftarget)then exit;
+      if(udetect=false)and(udetect=ftarget)then exit;  // in apc & client side
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -2086,7 +2098,7 @@ begin
          if(tu^.hits>idead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
-            if(udetect)then _udetect(pu,tu,ud);
+            if(udetect)then _unit_detect(pu,tu,ud);
             if(ftarget)then _unit_target(pu,tu,ud,@t_weap);
          end;
       end;
@@ -2171,7 +2183,7 @@ begin
     end;}
 end;
 
-procedure _unit_uo_tar(pu:PTUnit);
+{procedure _unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
 td,tdm: integer;
 teams : boolean;
@@ -2180,10 +2192,10 @@ begin
    with uid^ do
    begin
       if(uo_tar=unum)then uo_tar:=0;
-      if(_UnitRange(uo_tar))and(inapc=0)then
+      if(_IsUnitRange(uo_tar))and(inapc=0)then
       begin
          tu:=@_units[uo_tar];
-         if(_UnitRange(tu^.inapc))then
+         if(_IsUnitRange(tu^.inapc))then
          begin
             uo_tar:=0;
             exit;
@@ -2343,6 +2355,86 @@ begin
               end; }
       end;
    end;
+end; }
+
+procedure _unit_uo_tar(pu:PTUnit);
+var tu: PTUnit;
+     w: byte;
+td,tdm: integer;
+teams : boolean;
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      if(uo_tar=unum)then uo_tar:=0;
+      if(_IsUnitRange(uo_tar))then
+      begin
+         tu:=@_units[uo_tar];
+         if(_IsUnitRange(tu^.inapc))then
+         begin
+            uo_tar:=0;
+            exit;
+         end;
+         if(_uvision(player^.team,tu,false)=false)then
+         begin
+            uo_tar:=0;
+            exit;
+         end;
+
+         td :=dist2(x,y,tu^.x,tu^.y);
+         tdm:=td-(_r+tu^.uid^._r);
+
+         if(playeri=tu^.playeri)then
+         begin
+            // advancing & altar invuln
+         end;
+
+         w:=_unit_target2weapon(pu,tu,td,255);
+         if(w<=MaxUnitWeapons)then
+         begin
+            a_tar :=uo_tar;
+            a_tard:=td;
+            uo_id :=ua_amove;
+         end;
+
+         if(_move2uotar(pu,tu,td))then
+         begin
+            uo_x:=tu^.vx;
+            uo_y:=tu^.vy;
+         end;
+
+         if(_isbuilding=false)and(tu^.hits>0)and(tu^.bld)and(tu^.uid^._ability=uab_teleport)then
+          if(player^.team=tu^.player^.team)then
+           if(td<=tu^.uid^._r)then
+           begin
+              if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then
+              begin
+                 if(uf=uf_ground)then
+                  if(tu^.buff[ub_transpause]>0)
+                  then exit
+                  else
+                    if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then exit;
+
+                 _unit_teleport(pu,tu^.uo_x,tu^.uo_y);
+                 _teleport_rld(tu,_mhits);
+                 exit;
+              end;
+           end
+           else
+             if(tu^.buff[ub_advanced]>0)and(td>base_rr)then
+              if(tu^.rld<=0)then
+              begin
+                 _unit_teleport(pu,tu^.x,tu^.y);
+                 _teleport_rld(tu,_mhits);
+                 exit;
+              end
+              else
+              begin
+                 uo_x:=x;
+                 uo_y:=y;
+              end;
+      end;
+   end;
 end;
 
 procedure _unit_attack(pu:PTUnit);
@@ -2350,7 +2442,7 @@ var w:byte;
 begin
    with pu^ do
    begin
-      if(_UnitRange(a_tar)=false)then exit;
+      if(_IsUnitRange(a_tar)=false)then exit;
 
       w:=_unit_target2weapon(pu,@_units[a_tar],a_tard,255);
 
@@ -2370,8 +2462,10 @@ begin
       then //attack procedure
       else
       begin
-         if(_UnitRange(inapc)=false)then
+         if(_IsUnitRange(inapc)=false)then
          begin
+            _unit_uo_tar(pu);
+
             mv_x:=uo_x;
             mv_y:=uo_y;
 
@@ -2395,6 +2489,9 @@ begin
          end;
          if(uo_id=ua_amove)then _unit_attack(pu);
       end;
+   end;
+end;
+
 
      { //_unit_uo_tar(pu);
       mv_x:=uo_x;
@@ -2482,9 +2579,6 @@ begin
                  if(x<>tu^.x)or(y<>tu^.y)then dir:=p_dir(x,y,tu^.x,tu^.y);
               end;
            end;  }  }
-   end;
-end;
-
 
 procedure _unit_prod(pu:PTUnit);
 begin
@@ -2533,16 +2627,13 @@ begin
    begin
       _addtoint(@vsnt[team],vistime);
       _addtoint(@vsni[team],vistime);
-      if(onlySVCode)then
-       if(uclord=_uclord_c)then
-       begin
-          if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
-           for i:=0 to MaxPlayers do
-           begin
-              _addtoint(@vsnt[i],fr_fps);
-              if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],fr_fps);
-           end;
-       end;
+      if(onlySVCode)and(uclord=_uclord_c)then
+       if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
+        for i:=0 to MaxPlayers do
+        begin
+           _addtoint(@vsnt[i],fr_fps);
+           if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],fr_fps);
+        end;
    end;
 end;
 
@@ -2563,9 +2654,10 @@ begin
             _unit_counters(pu);
             _unit_upgr    (pu);
             _unit_order   (pu);
-            if(onlySVCode)then _unit_prod(pu);
             _unit_move    (pu);
             _unit_movevis (pu);
+
+            if(onlySVCode)then _unit_prod(pu);
 
             if(uclord=_uclord_c)then
              if(onlySVCode)and(inapc=0)
@@ -2579,29 +2671,9 @@ begin
          end;
       end;
    end;
-
-   //_missileCycle(onlyspr);
-   {{$IFDEF _FULLGAME}
-   if(_draw)then
-   begin
-      _dds_p(onlyspr);
-      _effectsCycle(true,onlyspr);
-   end;
-   {$ENDIF}   }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-{procedure _make_coop;
-begin
-   if(onlySVCode)then _unit_add(map_psx[0],map_psy[0],UID_CoopPortal,0,true);
-
-   _players[0].ai_skill:=250;
-   _setAI(0);
-   {$IFDEF _FULLGAME}
-   plcolor[0]:=c_purple;
-   {$ENDIF}
-end;       }
 
 
 

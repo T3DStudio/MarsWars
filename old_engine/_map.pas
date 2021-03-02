@@ -71,6 +71,7 @@ begin
         DID_Other     : begin
                            t := dt;
                            r := DID_R[t];
+                           inc(map_ddn,1);
                         end;
         else break;
         end;
@@ -87,6 +88,7 @@ procedure map_vars;
 begin
    map_seed2   := map_seed;
    map_b1      := map_mw-map_b0;
+   map_hmw     := map_mw div 2;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
@@ -114,6 +116,18 @@ begin
     end;
 end;
 
+procedure MCircleStarts(cx,cy,sdir,r:integer);
+const dstep = 360 div MaxPlayers;
+var i:byte;
+begin
+   for i:=1 to MaxPlayers do
+   begin
+      inc(sdir,dstep);
+      map_psx[i]:=trunc(cx+r*cos(sdir*degtorad));
+      map_psy[i]:=trunc(cy+r*sin(sdir*degtorad));
+   end;
+end;
+
 procedure MSkirmishStarts;
 var ix,iy,i,u,c,bb0,bb1,dst:integer;
 begin
@@ -124,6 +138,7 @@ begin
    end;
 
    case g_mode of
+   gm_aslt,
    gm_2fort :
       begin
          ix:=map_mw div 2;
@@ -139,7 +154,6 @@ begin
          dec(i,210);
          map_psx[3]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[3]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
-
 
          map_psx[4]:=map_mw-map_psx[1];
          map_psy[4]:=map_mw-map_psy[1];
@@ -177,72 +191,43 @@ begin
       end;
    gm_inv:
       begin
-         map_psx[0]:=map_mw div 2;
-         map_psy[0]:=map_psx[0];
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
 
-         u :=base_ir;
-         ix:=u div 4;
-         iy:=ix div 2;
-         i:=map_mw div 2;
-         map_psx[1]:=i+u+iy;
-         map_psy[1]:=i-ix;
-         map_psx[2]:=i-u-iy;
-         map_psy[2]:=i+ix;
-         map_psx[3]:=i+ix;
-         map_psy[3]:=i-u-iy;
-         map_psx[4]:=i-ix;
-         map_psy[4]:=i+u+iy;
-         map_psx[5]:=i+u;
-         map_psy[5]:=i+u;
-         map_psx[6]:=i-u;
-         map_psy[6]:=i-u;
+         MCircleStarts(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
-   gm_ct,
-   gm_aslt:
+   gm_ct:
       begin
-         map_psx[0]:=map_mw div 2;
-         map_psy[0]:=map_psx[0];
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
 
-         u :=map_mw div 5;
-         ix:=map_mw div 8;
-         iy:=map_mw-ix;
-         map_psx[1]:=ix;
-         map_psy[1]:=ix+u;
-         map_psx[2]:=ix;
-         map_psy[2]:=iy-u;
-         map_psx[3]:=iy;
-         map_psy[3]:=iy-u;
-         map_psx[4]:=iy;
-         map_psy[4]:=ix+u;
-         map_psx[5]:=map_psx[0];
-         map_psy[5]:=ix;
-         map_psx[6]:=map_psx[0];
-         map_psy[6]:=map_mw-ix;
+         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
 
-         if(g_mode=gm_ct)then
+         c :=map_seed mod 360;
+         ix:=map_mw div 2;
+         iy:=360-(360 div MaxCPoints);
+         u := map_mw div 5;
+
+         for i:=1 to MaxCPoints do
+         with g_cpt_pl[i] do
          begin
-            c :=map_seed mod 360;
-            ix:=map_mw div 2;
-            iy:=360-(360 div MaxCPoints);
-            u := map_mw div 5;
+            px:=trunc(ix+cos(c*degtorad)*u);
+            py:=trunc(ix+sin(c*degtorad)*u);
+            inc(c,iy);
 
-            for i:=1 to MaxCPoints do
-             with g_cpt_pl[i] do
-             begin
-                px:=trunc(ix+cos(c*degtorad)*u);
-                py:=trunc(ix+sin(c*degtorad)*u);
-                inc(c,iy);
-
-                {$IFDEF _FULLGAME}
-                mpx:=round(px*map_mmcx);
-                mpy:=round(py*map_mmcx);
-                {$ENDIF}
-             end;
-            map_psx[0]:=-5000;
-            map_psy[0]:=-5000;
+            {$IFDEF _FULLGAME}
+            mpx:=round(px*map_mmcx);
+            mpy:=round(py*map_mmcx);
+            {$ENDIF}
          end;
+         map_psx[0]:=-5000;
+         map_psy[0]:=-5000;
       end;
    else
+      if(map_sym)
+      then MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8))
+      else
+      begin
       ix :=integer(map_seed) mod map_mw;
       iy :=(map_seed2*2+integer(map_seed)) mod map_mw;
       bb0:=base_r+(map_mw-MinSMapW) div 5;
@@ -253,57 +238,76 @@ begin
       begin
          c:=0;
          u:=dst;
-         repeat
+         while true do
+         begin
            ix:=bb0+_gen(bb1);
            iy:=bb0+_gen(bb1);
            inc(c,1);
            inc(map_seed2,1);
            if(c>500 )then dec(u,1);
-           if(c>1000)then break;
-         until (_spch(ix,iy,u)=false);
+           if(c>1000)or(_spch(ix,iy,u)=false)then break;
+         end;
 
          map_psx[i]:=ix;
          map_psy[i]:=iy;
       end;
+      end;
    end;
 end;
 
-function _dnear(td:byte; ix,iy,md:integer):boolean;
+function _dnear(td:byte;ix,iy:integer):boolean;
 var d,ir:integer;
 begin
    _dnear:=false;
-   for d:=1 to md do
-    with map_dds[d] do
-     if(t>0)then
-     begin
-        ir:=0;
-        if(td in dids_liquids)and(t in dids_liquids)then ir:=DID_R[td] div 2;
-        if(td in [DID_SRock,DID_BRock])then
-        begin
-           if(t in [DID_SRock,DID_BRock])then ir:= DID_R[td]-20;
-           if(t in dids_liquids         )then ir:=-DID_R[td];
-        end;
 
-        if(dist2(x,y,ix,iy)<=(r+ir))then
-        begin
-           _dnear:=true;
-           break;
-        end;
-     end;
+   with map_dds[0] do
+   if(map_sym)then
+   begin
+      t:=td;
+      r:=DID_R[td];
+      x:=map_mw-ix;
+      y:=map_mw-iy;
+   end
+   else
+   begin
+      t:=0;
+      x:=-32000;
+      y:=-32000;
+   end;
+
+   for d:=0 to map_ddn do
+   with map_dds[d] do
+   if(t>0)then
+   begin
+      ir:=0;
+      if(td in dids_liquids)and(t in dids_liquids)then ir:=max2(DID_R[td],r)+64;
+      if(td in [DID_SRock,DID_BRock])then
+      begin
+         if(t in [DID_SRock,DID_BRock])then ir:=r+DID_R[td]-20;
+         if(t in dids_liquids         )then ir:=max2(DID_R[td],r);
+      end;
+
+      if(dist2(x,y,ix,iy)<ir)then
+      begin
+         _dnear:=true;
+         break;
+      end;
+   end;
 end;
 
-function _trysetdd(di:byte;ix,iy,i:integer):boolean;
+function _trysetdd(di:byte;ix,iy:integer):boolean;
 begin
-   if(_dnear(di,ix,iy,i))or(_spch(ix,iy,base_ir))
+   if(_dnear(di,ix,iy))or(_spch(ix,iy,base_ir))
    then _trysetdd:=false
    else
    begin
       _dds_a(ix,iy,di);
+      if(map_sym)then _dds_a(map_mw-ix,map_mw-iy,di);
       _trysetdd:=true;
    end;
 end;
 
-function _pickdds(ix,iy,i:integer;lqs,rks:pinteger):boolean;
+function _pickdds(ix,iy:integer;lqs,rks:pinteger):boolean;
 var di:byte;
 begin
    _pickdds:=false;
@@ -315,7 +319,7 @@ begin
     DID_LiquidR4  : if(lqs^<=0)
                     then continue
                     else
-                      if(_trysetdd(di,ix,iy,i))then
+                      if(_trysetdd(di,ix,iy))then
                       begin
                          _pickdds:=true;
                          dec(lqs^,1);
@@ -326,7 +330,7 @@ begin
     DID_BRock     : if(rks^<=0)
                     then continue
                     else
-                      if(_trysetdd(di,ix,iy,i))then
+                      if(_trysetdd(di,ix,iy))then
                       begin
                          _pickdds:=true;
                          dec(rks^,1);
@@ -334,7 +338,7 @@ begin
                       end
                       else continue;
     else
-      if(_trysetdd(di,ix,iy,i))then
+      if(_trysetdd(di,ix,iy))then
       begin
          _pickdds:=true;
          break;
@@ -344,24 +348,27 @@ begin
 end;
 
 procedure map_make;
-const dpostime = 300;
+const dpostime = 400;
 var i,ix,iy,lqs,rks,ddc,cnt:integer;
 begin
    {$IFDEF _FULLGAME}
    Map_tdmake;
    {$ENDIF}
 
+   map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
    for ix:=0 to dcn do
    for iy:=0 to dcn do
-    with map_dcell[ix,iy] do
-    begin
-       n:=0;
-       setlength(l,n);
-    end;
+   with map_dcell[ix,iy] do
+   begin
+      n:=0;
+      setlength(l,n);
+   end;
 
-   ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf));
+   ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
    if(ddc>MaxDoodads)then ddc:=MaxDoodads;
+
+   if(map_sym)then ddc:=ddc div 3;
 
    rks :=0;
    lqs :=0;
@@ -381,12 +388,7 @@ begin
          rks:=(i*map_obs);
       end;
    end
-   else
-   begin
-      lqs:=(ddc div 80)*map_liq;
-   end;
-   //inc(ddc,50);
-   //if(ddc>MaxDoodads)then ddc:=MaxDoodads;
+   else lqs:=(ddc div 80)*map_liq;
 
    ix :=map_seed;
    iy :=0;
@@ -399,7 +401,7 @@ begin
          ix:=_genx(ix            ,map_mw,false);
          iy:=_genx(iy+sqr(cnt+ix),map_mw,true );
 
-          if(_pickdds(ix,iy,i,@lqs,@rks))then break;
+          if(_pickdds(ix,iy,@lqs,@rks))then break;
 
          inc(cnt,1);
          if(cnt>=dpostime)then break;

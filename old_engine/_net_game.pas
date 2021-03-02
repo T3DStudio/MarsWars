@@ -100,6 +100,8 @@ begin
    net_writebyte(map_liq  );
    net_writebyte(map_obs  );
    net_writecard(map_seed );
+   net_writebool(map_sym  );
+
    net_writebool(g_addon  );
    net_writebyte(g_mode   );
    net_writebyte(g_startb );
@@ -285,6 +287,10 @@ begin
    c:=map_seed;
    map_seed := net_readcard;
    rm:=rm or (c<>map_seed);
+
+   b:=byte(map_sym);
+   map_sym  := net_readbool;
+   rm:=rm or (boolean(b)<>map_sym );
 
    g_addon  := net_readbool;
 

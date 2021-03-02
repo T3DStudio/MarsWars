@@ -407,33 +407,37 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_y  :=o_y1;
                                      uo_bx :=-1;
 
-                                     case uidi of
-                                      UID_HKeep         :;// _unit_bteleport(pu);
-                                      UID_URadar        :;// _unit_uradar   (pu);
-                                      UID_URocketL      :;// _unit_URocketL (pu);
-                                      UID_HMonastery,
-                                      UID_HFortress,
-                                      UID_UNuclearPlant : uo_tar:=o_y0;
-                                      {UID_HGate,
-                                      UID_UMilitaryUnit,
-                                      UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
-                                                          then uo_tar:=o_y0; }
-                                      UID_HTower,
-                                      UID_HTotem        : if(o_y0<>u)and(o_y0<>0)
-                                                          then uo_tar:=o_y0
-                                                          else ;//_unit_b247teleport(pu);
-                                      else
+                                     case _ability of
+                                      uab_radar: _unit_uradar(pu);
+                                     else
+                                        case uidi of
+                                         UID_HKeep         :;// _unit_bteleport(pu);
+                                         UID_URocketL      :;// _unit_URocketL (pu);
+                                         UID_HMonastery,
+                                         UID_HFortress,
+                                         UID_UNuclearPlant : uo_tar:=o_y0;
+                                         {UID_HGate,
+                                         UID_UMilitaryUnit,
+                                         UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
+                                                             then uo_tar:=o_y0; }
+                                         UID_HTower,
+                                         UID_HTotem        : if(o_y0<>u)and(o_y0<>0)
+                                                             then uo_tar:=o_y0
+                                                             else ;//_unit_b247teleport(pu);
+                                         else
 
-                                        if(o_y0<>u)then uo_tar:=o_y0;
-                                        if(o_x0<>co_rcmove)or(speed=0)
-                                        then uo_id:=ua_amove
-                                        else
-                                        begin
-                                           uo_id :=ua_move;
-                                           a_tar :=0;
+                                           if(o_y0<>u)then uo_tar:=o_y0;
+                                           if(o_x0<>co_rcmove)or(speed=0)
+                                           then uo_id:=ua_amove
+                                           else
+                                           begin
+                                              uo_id :=ua_move;
+                                              a_tar :=0;
+                                           end;
+
                                         end;
-
                                      end;
+
                                      _unit_turn(pu);
                                   end;
                     co_stand,
@@ -837,7 +841,7 @@ begin
 
    if(G_Started)then
    begin
-      if(k_ctrl=5)then PlaySoundSet(snd_zimba_death);//PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
+      //if(k_ctrl=5)then PlaySoundSet(snd_zimba_death);//PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
       //if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
 
       if(G_paused=0)then

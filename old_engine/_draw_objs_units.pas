@@ -100,7 +100,7 @@ begin
     2:begin
          if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
          _unit_fogrev:=true;
-         //if(uidi=UID_URadar)and(rld_t>rld_a)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
+         if(_ability=uab_radar)and(rld>radar_time)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
       end;
       end;
 end;
@@ -182,18 +182,18 @@ begin
              if(m_brush in uid^.ups_builder)then
               if((vid_vx-srange)<vx)and(vx<(vid_vx+vid_sw+srange))and
                 ((vid_vy-srange)<vy)and(vy<(vid_vy+vid_sh+srange))then _addUIBldrs(x,y,srange);
-              for i:=0 to MaxUnitProds do
+
+            for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)
              then break
              else _unit_uiprodcnts(pu,i);
-              if(sel)then
-             //if(uidi in whocanmp)then _sl_add(uo_x-spr_mp[race].hw, uo_y-spr_mp[race].h,uo_y-spr_mp[race].hh,0,0,0,false,spr_mp[race].surf,255,0,0,0,0,'',0);
          end
          else
          begin
             //inc(ui_bprods[ucl],1);
             //inc(ui_bprods_n    ,1);
          end;
+         if(sel)and(_UnitHaveRPoint(pu))then _sl_add_dec(uo_x,uo_y,uo_y+1,-32000,@spr_mp[_urace],255,0,0,-spr_mp[_urace].hh);
       end;
 
       if(sel)then

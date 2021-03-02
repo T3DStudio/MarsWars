@@ -32,12 +32,17 @@ TDecal = record
    x,y      : integer;
 end;
 
-TEff = record
+TEffect = record
    x,y,
-   t,t2,tm,
+   t,t2,d,
+   anims,
+   animi
+            : integer;
+   smodel   : PTMWSModel;
+   {tm,
    d,
    anl,ans  : integer;
-   e        : byte;
+   e        : byte;}
 end;
 
 TVisSpr = record
@@ -138,6 +143,7 @@ TUID = record
 
    _shcf        : single;
 
+   _ability,
    _attack      : byte;
    _slowturn,
    _isbuilding,
@@ -308,7 +314,7 @@ TUnit = record
    apcm,
    apcc     : integer;
 
-   buff     : array[0.._ubuffs] of integer;
+   buff     : array[0..MaxUnitBuffs] of integer;
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 

@@ -629,10 +629,8 @@ begin
    _lstr(@spr_db_u0,race_dir[r_uac ]+'db_u0',firstload,true);
    _lstr(@spr_db_u1,race_dir[r_uac ]+'db_u1',firstload,true);
 
-   //_LoadMWSModel(@spr_Base0           ,race_buildings[r_uac ] +'u_mine' ,smt_buiding,firstload);
-
-
-  //
+   _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
+   _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
 
    {for x:=0 to ui_ubtns do
    begin
@@ -646,8 +644,7 @@ begin
    spr_toxin      := _lstr('toxin'    );
    spr_gear       := _lstr('gear'     );
 
-   spr_mp[r_hell] := _lstr('h_mp'     );
-   spr_mp[r_uac ] := _lstr('u_mp'     );
+
 
    for x:=0 to 3  do spr_eff_bfg    [x]:=_lstr('ef_bfg_'  +b2s(x));
    for x:=0 to 5  do spr_eff_eb     [x]:=_lstr('ef_eb'    +b2s(x));
@@ -758,13 +755,13 @@ begin
    begin
       with un_btn do
       begin
-         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW);
+         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW );
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;
       with un_sbtn do
       begin
-         surf:= LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
+         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;

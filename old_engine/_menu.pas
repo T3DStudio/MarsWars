@@ -288,6 +288,7 @@ begin
       51 : begin _scrollV(@map_mw,500,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin _scrollV(@map_liq,1,0,7); Map_premap;end;
       53 : begin _scrollV(@map_obs,1,0,7); Map_premap;end;
+      54 : begin map_sym:=not map_sym; Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
 
 

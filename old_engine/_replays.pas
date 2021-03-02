@@ -19,7 +19,7 @@ begin
          _rpls_stat:=str_svld_errors[2];
          exit;
       end;
-      if(FileSize(f)<rpl_size)then
+      if(FileSize(f)<rpl_hsize)then
       begin
          close(f);
          _rpls_stat:=str_svld_errors[3];
@@ -40,6 +40,7 @@ begin
          if(vr>7)then _rpls_stat:=_rpls_stat+str_m_liq+'???'
                  else _rpls_stat:=_rpls_stat+str_m_liq+_str_mx[vr]+#13+' ';vr:=0;
          BlockRead(f,vr,sizeof(map_obs  ));_rpls_stat:=_rpls_stat+str_m_obs+_str_mx[vr]   +#13+' ';vr:=0;
+         BlockRead(f,vr,sizeof(map_sym  ));
          BlockRead(f,vr,sizeof(g_addon  ));_rpls_stat:=_rpls_stat+str_addon[vr>0]         +#13+' ';vr:=0;
          BlockRead(f,vr,sizeof(g_mode   ));_rpls_stat:=_rpls_stat+str_gmode[vr]           +#13    ;vr:=0;
          BlockRead(f,vr,sizeof(g_startb ));vr:=0;
@@ -127,6 +128,8 @@ begin
                          BlockWrite(_rpls_file,map_mw     ,SizeOf(map_mw  ));
                          BlockWrite(_rpls_file,map_liq    ,SizeOf(map_liq ));
                          BlockWrite(_rpls_file,map_obs    ,SizeOf(map_obs ));
+                         BlockWrite(_rpls_file,map_sym    ,SizeOf(map_sym ));
+
                          BlockWrite(_rpls_file,g_addon    ,SizeOf(g_addon ));
                          BlockWrite(_rpls_file,g_mode     ,SizeOf(g_mode  ));
                          BlockWrite(_rpls_file,g_startb   ,SizeOf(g_startb));
@@ -223,7 +226,7 @@ begin
                       begin
                          fs:=FileSize(_rpls_file);
 
-                         if(fs<rpl_size)then
+                         if(fs<rpl_hsize)then
                          begin
                             _rpls_fileo:=false;
                             _rpls_rst  :=rpl_none;
@@ -254,6 +257,7 @@ begin
                             BlockRead(_rpls_file,map_mw   ,SizeOf(map_mw   ));
                             BlockRead(_rpls_file,map_liq  ,SizeOf(map_liq  ));
                             BlockRead(_rpls_file,map_obs  ,SizeOf(map_obs  ));
+                            BlockRead(_rpls_file,map_sym  ,SizeOf(map_sym  ));
                             BlockRead(_rpls_file,g_addon  ,SizeOf(g_addon  ));
                             BlockRead(_rpls_file,g_mode   ,SizeOf(g_mode   ));
                             BlockRead(_rpls_file,g_startb ,SizeOf(g_startb ));

@@ -165,6 +165,7 @@ begin
    str_m_liq             := 'Lakes: ';
    str_m_siz             := 'Size: ';
    str_m_obs             := 'Obstacles: ';
+   str_m_sym             := 'Symmetric: ';
    str_map               := 'Map';
    str_players           := 'Players';
    str_mrandom           := 'Random map';
@@ -600,6 +601,7 @@ begin
   str_m_liq             := 'Озера: ';
   str_m_siz             := 'Размер: ';
   str_m_obs             := 'Преграды: ';
+  str_m_sym             := 'Симметр.: ';
   str_map               := 'Карта';
   str_players           := 'Игроки';
   str_mrandom           := 'Случайная карта';

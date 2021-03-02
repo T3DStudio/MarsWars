@@ -69,17 +69,20 @@ HPlayer           : byte = 1;
 
 team_army         : array[0..MaxPlayers] of integer;
 
-vid_mredraw       : boolean = true;
+vid_mredraw       : boolean  = true;
 
 map_seed          : cardinal = 1;
-map_seed2         : word = 0;
-map_mw            : integer = 5000;
-map_b1            : integer;
-map_obs           : byte = 1;
-map_liq           : byte = 1;
+map_seed2         : word     = 0;
+map_mw            : integer  = 5000;
+map_hmw           : integer  = 2500;
+map_b1            : integer  = 0;
+map_obs           : byte     = 1;
+map_liq           : byte     = 1;
+map_sym           : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
-map_dds           : array[1..MaxDoodads] of TDoodad;
+map_dds           : array[0..MaxDoodads] of TDoodad;
+map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
 net_chatls        : array[0..MaxPlayers] of byte; // local state
@@ -102,6 +105,7 @@ str_addon         : array[false..true] of shortstring;
 str_m_liq,
 str_m_siz,
 str_m_obs,
+str_m_sym,
 str_plname,
 str_aislots,
 str_team,
@@ -188,7 +192,7 @@ ter_h             : integer;
 
 font_ca           : array[char] of pSDL_SURFACE;
 
-_effects          : array[1..vid_mvs] of TEff;
+_effects          : array[1..vid_mvs] of TEffect;
 
 _tdecaln          : integer = 0;
 _tdecals          : array of TDecal;
@@ -544,7 +548,7 @@ spr_u_p3,
 spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel;
 
-spr_mp,
+spr_mp            : array[1..r_cnt] of TMWSprite;
 spr_gear,
 spr_toxin,
 
@@ -702,7 +706,7 @@ snd_upgrade_complete,
 snd_victory
                    : array[1..r_cnt] of PTSoundSet;
 
-
+snd_radar,
 
 snd_uac_cc,
 snd_uac_barracks,
@@ -715,6 +719,82 @@ snd_uac_factory,
 snd_uac_tech,
 snd_uac_rls,
 snd_uac_nucl,
+
+snd_uac_reload,
+snd_uac_hdeath,
+
+snd_APC_ready,
+snd_APC_move,
+
+snd_bfgmarine_ready,
+snd_bfgmarine_annoy,
+snd_bfgmarine_attack,
+snd_bfgmarine_select,
+snd_bfgmarine_move,
+
+snd_commando_ready,
+snd_commando_annoy,
+snd_commando_attack,
+snd_commando_select,
+snd_commando_move,
+
+snd_engineer_ready,
+snd_engineer_annoy,
+snd_engineer_attack,
+snd_engineer_select,
+snd_engineer_move,
+
+snd_medic_ready,
+snd_medic_annoy,
+snd_medic_select,
+snd_medic_move,
+
+snd_plasmamarine_ready,
+snd_plasmamarine_annoy,
+snd_plasmamarine_attack,
+snd_plasmamarine_select,
+snd_plasmamarine_move,
+
+snd_rocketmarine_ready,
+snd_rocketmarine_annoy,
+snd_rocketmarine_attack,
+snd_rocketmarine_select,
+snd_rocketmarine_move,
+
+snd_shotgunner_ready,
+snd_shotgunner_annoy,
+snd_shotgunner_attack,
+snd_shotgunner_select,
+snd_shotgunner_move,
+
+snd_ssg_ready,
+snd_ssg_annoy,
+snd_ssg_attack,
+snd_ssg_select,
+snd_ssg_move,
+
+snd_tank_ready,
+snd_tank_annoy,
+snd_tank_attack,
+snd_tank_select,
+snd_tank_move,
+
+snd_terminator_ready,
+snd_terminator_annoy,
+snd_terminator_attack,
+snd_terminator_select,
+snd_terminator_move,
+
+snd_transport_ready,
+snd_transport_annoy,
+snd_transport_select,
+snd_transport_move,
+
+snd_uacfighter_ready,
+snd_uacfighter_annoy,
+snd_uacfighter_attack,
+snd_uacfighter_select,
+snd_uacfighter_move,
 
 snd_hell_hk,
 snd_hell_hgate,

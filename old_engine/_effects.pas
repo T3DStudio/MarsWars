@@ -17,12 +17,16 @@ begin
       begin
          x :=ex;
          y :=ey;
-         e :=ee;
          d :=ed;
+
          t :=0;
          t2:=0;
 
-         case e of
+         {case ee of
+
+         end;}
+
+         {case e of
            UID_Pain      : begin t:=47; anl:=37; ans:= 8; end;
            UID_LostSoul  : begin t:=47; anl:=28; ans:= 8; end;
            MID_Flyer     : begin t:=15; anl:=3;  ans:= 4; end;
@@ -67,13 +71,13 @@ begin
                          : t:=fr_fps;
          else
            t:=0;
-         end;
+         end;   }
 
         break;
      end;
 end;
 
-procedure _effectsCycle(draw,onlyspr:boolean);
+procedure _effectsCycle(draw,noanim:boolean);
 var ei,ea,
  alpha:integer;
    spr:PTMWSprite;
@@ -86,7 +90,7 @@ begin
         alpha:=255;
         msk  :=0;
 
-        ea:=0;
+        {ea:=0;
         if(ans<>0)then
         begin
            ea:=t div abs(ans);
@@ -98,7 +102,7 @@ begin
              if(ea>anl)
              then ea:=0
              else ea:=anl-ea;
-        end;
+        end;}
 
         spr:=@spr_dummy;
 
@@ -152,15 +156,17 @@ begin
         end;}
 
 
-        if(onlyspr=false)then
-         if(t>0)
-         then dec(t,1)
-         else
-           if(t2>0)then
-           begin
-              dec(t2,1);
-              if(t2<255)then alpha:=t2;
-           end;
+        if(noanim=false)then
+        begin
+           if(t>0)
+           then dec(t,1)
+           else
+             if(t2>0)then
+             begin
+                dec(t2,1);
+                if(t2<255)then alpha:=t2;
+             end;
+        end;
 
         if(draw)then
          if(_rectvis(x,y,spr^.hw,spr^.hh,0))then

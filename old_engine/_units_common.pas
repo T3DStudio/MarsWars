@@ -137,10 +137,8 @@ procedure _unit_correctcoords(pu:PTUnit);
 begin;
    with pu^ do
    begin
-      if(x<1     )then x:=1;
-      if(y<1     )then y:=1;
-      if(x>map_mw)then x:=map_mw;
-      if(y>map_mw)then y:=map_mw;
+      x:=mm3(1,x,map_mw);
+      y:=mm3(1,y,map_mw);
    end;
 end;
 
@@ -200,20 +198,18 @@ begin
       dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
- {
+
 procedure _unit_uradar(pu:PTUnit);
 begin
    with pu^ do
-    if(bld)then
-     if(rld_t=0)then
-     begin
-        rld_t:=radar_time;
-        {$IFDEF _FULLGAME}
-        if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
-        {$ENDIF}
-     end;
+   if(bld)and(rld<=0)then
+   begin
+      rld:=radar_reload;
+      {$IFDEF _FULLGAME}
+      if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
+      {$ENDIF}
+   end;
 end;
-}
 
 procedure _1c_push(tx,ty:pinteger;x0,y0,r0:integer);
 var vx,vy,a:single;
@@ -311,14 +307,15 @@ begin
    dec(tr,bld_dec_mr);
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
     with map_dcell[dx,dy] do
-     for u:=1 to n do
-      with l[u-1]^ do
-       if(r>0)and(t>0)then
-       begin
-          o:=tr+r;
-          d:=dist(x,y,tx,ty)-o;
-          add(x,y,d,o);
-       end;
+     if(n>0)then
+      for u:=0 to n-1 do
+       with l[u]^ do
+        if(r>0)and(t>0)then
+        begin
+           o:=tr+r;
+           d:=dist(x,y,tx,ty)-o;
+           add(x,y,d,o);
+        end;
    inc(tr,bld_dec_mr);
 
    for u:=1 to MaxCPoints do
@@ -1159,37 +1156,35 @@ begin
     if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;
 
-
+}
 
 procedure _teleport_rld(tu:PTUnit;ur:integer);
 begin
    with tu^ do
-    with player^ do
-     if(upgr[upgr_5bld] in [0..3])then rld_t:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
+    with player^ do rld:=fr_fps;
+     //if(upgr[upgr_5bld] in [0..3])then rld_t:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
 end;
 
 procedure _unit_teleport(pu:PTUnit;tx,ty:integer);
 begin
    with pu^ do
    begin
-      if(tx<0)then tx:=0;
-      if(ty<0)then ty:=0;
-      if(tx>map_mw)then tx:=map_mw;
-      if(ty>map_mw)then ty:=map_mw;
+      tx:=mm3(0,tx,map_mw);
+      ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
       if _nhp3(vx,vy,@_players[HPlayer])
       or _nhp3(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil);
       _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
       _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
       {$ENDIF}
-      buff[ub_pain   ]:=vid_hfps;
-      buff[ub_teleeff]:=vid_fps;
-      x   :=tx;
-      y   :=ty;
-      vx  :=x;
-      vy  :=y;
-      uo_x:=x;
-      uo_y:=y;
+      //buff[ub_pain   ]:=vid_hfps;
+      buff[ub_teleeff]:=fr_fps;
+      x     :=tx;
+      y     :=ty;
+      vx    :=x;
+      vy    :=y;
+      uo_x  :=x;
+      uo_y  :=y;
       uo_tar:=0;
       _unit_correctcoords(pu);
       {$IFDEF _FULLGAME}
@@ -1197,46 +1192,46 @@ begin
       _unit_sfog(pu);
       {$ENDIF}
    end;
-end;  }
+end;
 
 procedure _unit_counters(pu:PTUnit);
-var i : byte;
+var i:byte;
 begin
    with pu^ do
    begin
-      for i:=0 to _ubuffs do
-       if(buff[i]<_bufinf)then
-        if(buff[i]>0)then
-        begin
-           dec(buff[i],1);
-           {if(i=ub_stopafa)and(OnlySVCode)then
-            if(bld)and(speed>0)and(tar1=0)then
-             if(buff[i]=0)then
-              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
-        end;
+      for i:=0 to MaxUnitBuffs do
+       if(0<buff[i])and(buff[i]<_ub_infinity)then
+       begin
+          dec(buff[i],1);
+          {if(i=ub_stopafa)and(OnlySVCode)then
+           if(bld)and(speed>0)and(tar1=0)then
+            if(buff[i]=0)then
+             if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
+       end;
 
       for i:=0 to MaxPlayers do
       begin
-         if(0<vsnt[i])and(vsnt[i]<_bufinf)then dec(vsnt[i],1);
-         if(0<vsni[i])and(vsni[i]<_bufinf)then dec(vsni[i],1);
+         if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then dec(vsnt[i],1);
+         if(0<vsni[i])and(vsni[i]<_ub_infinity)then dec(vsni[i],1);
       end;
 
       if(a_rld>0)then dec(a_rld,1);
+      if(  rld>0)then dec(  rld,1);
    end;
 end;
 
 
-procedure _udetect(uu,tu:PTUnit;ud:integer);
+procedure _unit_detect(uu,tu:PTUnit;ud:integer);
 var td:integer;
 begin
    with uu^ do
    begin
-      {if(tu^.uidi=UID_URadar)and(tu^.rld_t>tu^.rld_a)then
+      if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_time)then
       begin
          td:=dist2(x,y,tu^.uo_x,tu^.uo_y);
          if(td>ud)then td:=ud;
       end
-      else} td:=ud;
+      else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then
       begin
@@ -1318,7 +1313,9 @@ begin
    with uid^ do
    with player^ do
    begin
+      {case uid of
 
+      end; }
    end;
 end;
 

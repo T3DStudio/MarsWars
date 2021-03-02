@@ -48,7 +48,7 @@ begin
       with _units[i] do
       with uid^ do
       if(hits>0)and(sel)and(playeri=HPlayer)then
-      if(speed>0)or(_isbarrack)or(_attack>0)then
+      if(speed>0)or(_attack>0)or(_UnitHaveRPoint(@_units[i]))then
       begin
          inc(su,1);
          guid:=uidi;
@@ -62,7 +62,7 @@ begin
    inc(ox1,vid_mapx);
    inc(oy1,vid_mapy);
 
-   if(_UnitRange(tar))then
+   if(_IsUnitRange(tar))then
    begin
       ui_umark_u:=tar;
       ui_umark_t:=fr_hfps;

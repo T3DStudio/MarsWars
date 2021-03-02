@@ -139,9 +139,9 @@ begin
    else dir_turn:=(360+d1+(spd*sign(d))) mod 360;
 end;
 
-function _UnitRange(u:integer):boolean;
+function _IsUnitRange(u:integer):boolean;
 begin
-   _UnitRange:=(0<u)and(u<=MaxUnits);
+   _IsUnitRange:=(0<u)and(u<=MaxUnits);
 end;
 
 procedure _addtoint(bt:pinteger;val:integer);
@@ -317,6 +317,13 @@ begin
    if FileExists(outlogfn) then Append(f) else Rewrite(f);
    writeln(f,mess);
    Close(f);
+end;
+
+function _UnitHaveRPoint(pu:PTUnit):boolean;
+begin
+   with pu^ do
+   with uid^ do
+   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
 end;
 
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;

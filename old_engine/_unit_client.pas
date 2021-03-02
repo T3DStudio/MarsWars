@@ -187,12 +187,11 @@ begin
                      if(uidi in clnet_rld)then _wrld(@rld,rpl);
                      _wprod(pu,rpl);
                   end;
-                  if(sel)then
-                   if(uidi in whocanmp)then
-                   begin
-                      _wudata_int(uo_x ,rpl);
-                      _wudata_int(uo_y ,rpl);
-                   end;
+                  if(sel)and(_UnitHaveRPoint(pu))then
+                  begin
+                     _wudata_int(uo_x ,rpl);
+                     _wudata_int(uo_y ,rpl);
+                  end;
                end;
             end;
          end;
@@ -887,12 +886,11 @@ begin
                      if(uidi in clnet_rld)then _rrld(@rld,rpl);
                      _rprod(uu,rpl);
                   end;
-                  if(sel)then
-                   if(uidi in whocanmp)then
-                   begin
-                      uo_x:=_rudata_int(rpl,0);
-                      uo_y:=_rudata_int(rpl,0);
-                   end;
+                  if(sel)and(_UnitHaveRPoint(uu))then
+                  begin
+                     uo_x:=_rudata_int(rpl,0);
+                     uo_y:=_rudata_int(rpl,0);
+                  end;
                end;
             end;
          end;

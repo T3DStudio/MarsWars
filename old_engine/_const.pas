@@ -255,12 +255,24 @@ aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
 aif_stayathome         : cardinal = 1 shl 28; //   }
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT ABILITIES
+//
+
+uab_teleport           = 1;
+uab_uac_unit_adv       = 2;
+uab_hell_unit_adv      = 3;
+uab_building_adv       = 4;
+uab_radar              = 5;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT BUFFs
 //
 
-_ubuffs                = 15;
+MaxUnitBuffs           = 15;
 
 ub_advanced            = 0;
 ub_pain                = 1;
@@ -274,12 +286,11 @@ ub_clcast              = 8;
 ub_invis               = 9;
 ub_detect              = 10;
 ub_invuln              = 11;
-ub_notarget            = 12;
 ub_born                = 13;
-ub_cnttrans            = 14;
+ub_transpause          = 14;
 ub_teleeff             = 15;
 
-_bufinf                = 32000;
+_ub_infinity           = 32000;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -409,8 +420,8 @@ MID_Flyer              = 122;
 //
 
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
-MaxUnitWeapons         = 2; //0-2
-MaxWeaponShootState    = 2;
+MaxUnitWeapons         = 6; //0-6
+//MaxWeaponShootState    = 2;
 MaxUnitProds           = 1; //0-1
 
 uf_ground              = 0;
@@ -503,7 +514,6 @@ gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_UMine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
-whocanmp               = [UID_HGate,UID_UMilitaryUnit,UID_HTeleport,UID_UVehicleFactory,UID_HMilitaryUnit];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
@@ -541,9 +551,9 @@ regen_per              = fr_fps*2;
 _uclord_p              = fr_hfps+1;
 vistime                = _uclord_p+1;
 
-radar_time             = fr_fps*30;
-radar_rlda             : array[0..5] of integer = (radar_time-fr_fps*3,radar_time-fr_fps*5,radar_time-fr_fps*7,radar_time-fr_fps*9,radar_time-fr_fps*11,radar_time-fr_fps*13);
-radar_rsg              : array[0..5] of integer = (200,225,250,275,300,325);
+radar_reload           = fr_fps*30;
+radar_time             = radar_reload-(fr_fps*5);
+
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
 missile_mr             = 500;
@@ -618,7 +628,7 @@ _hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
 
 whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_UMine,UID_UTurret,UID_UPTurret];
 
-_buffst                : array[false..true] of smallint = (0,_bufinf);
+_buffst                : array[false..true] of smallint = (0,_ub_infinity);
 
 str_ps_sv              : char = '@';
 
@@ -836,8 +846,8 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 231087;
-rpl_size               = 1574;
+svld_size              = 231088;
+rpl_hsize              = 1575;
 
 rpl_none               = 0;
 rpl_whead              = 1;
