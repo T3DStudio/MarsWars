@@ -57,7 +57,31 @@ end;
 procedure _dds_a(dx,dy:integer;dt:byte);
 var d:integer;
 begin
-   for d:=1 to MaxDoodads do
+   if(map_ddn>=MaxDoodads)then exit;
+
+   inc(map_ddn,1);
+
+   with map_dds[map_ddn] do
+   begin
+      case dt of
+       DID_LiquidR1,
+       DID_LiquidR2,
+       DID_LiquidR3,
+       DID_LiquidR4,
+       DID_Brock,
+       DID_Srock,
+       DID_Other     : begin
+                          t := dt;
+                          r := DID_R[t];
+                       end;
+      else exit;
+      end;
+
+      x:=dx;
+      y:=dy;
+   end;
+
+   {for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t=0)then
      begin
@@ -80,7 +104,7 @@ begin
         y:=dy;
 
         break;
-     end;
+     end;}
 end;
 
 
@@ -255,7 +279,23 @@ begin
    end;
 end;
 
-function _dnear(td:byte;ix,iy:integer):boolean;
+function _dec_min_r(t1,t2:byte):integer;
+begin
+   _dec_min_r:=DID_R[t1];
+   if(t2 in dids_liquids)
+  and(t1 in dids_liquids)then
+   begin
+      _dec_min_r:=max2(DID_R[t1],DID_R[t2])+64;
+      exit;
+   end;
+   if(t2 in [DID_SRock,DID_BRock])then
+   begin
+      if(t1 in [DID_SRock,DID_BRock])then _dec_min_r:=DID_R[t1]+DID_R[t2]-20;
+      if(t1 in dids_liquids         )then _dec_min_r:=max2(DID_R[t1],DID_R[t2]);
+   end;
+end;
+
+function _dnear(td:byte;ix,iy:pinteger):boolean;
 var d,ir:integer;
 begin
    _dnear:=false;
@@ -265,8 +305,8 @@ begin
    begin
       t:=td;
       r:=DID_R[td];
-      x:=map_mw-ix;
-      y:=map_mw-iy;
+      x:=map_mw-ix^;
+      y:=map_mw-iy^;
    end
    else
    begin
@@ -278,36 +318,26 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
+   if(dist2(x,y,ix^,iy^)<_dec_min_r(t,td))then
    begin
-      ir:=0;
-      if(td in dids_liquids)and(t in dids_liquids)then ir:=max2(DID_R[td],r)+64;
-      if(td in [DID_SRock,DID_BRock])then
-      begin
-         if(t in [DID_SRock,DID_BRock])then ir:=r+DID_R[td]-20;
-         if(t in dids_liquids         )then ir:=max2(DID_R[td],r);
-      end;
-
-      if(dist2(x,y,ix,iy)<ir)then
-      begin
-         _dnear:=true;
-         break;
-      end;
+      _dnear:=true;
+      break;
    end;
 end;
 
-function _trysetdd(di:byte;ix,iy:integer):boolean;
+function _trysetdd(di:byte;ix,iy:pinteger):boolean;
 begin
-   if(_dnear(di,ix,iy))or(_spch(ix,iy,base_ir))
+   if(_dnear(di,ix,iy))or(_spch(ix^,iy^,base_ir))
    then _trysetdd:=false
    else
    begin
-      _dds_a(ix,iy,di);
-      if(map_sym)then _dds_a(map_mw-ix,map_mw-iy,di);
+      _dds_a(ix^,iy^,di);
+      if(map_sym)then _dds_a(map_mw-ix^,map_mw-iy^,di);
       _trysetdd:=true;
    end;
 end;
 
-function _pickdds(ix,iy:integer;lqs,rks:pinteger):boolean;
+function _pickdds(ix,iy,lqs,rks:pinteger):boolean;
 var di:byte;
 begin
    _pickdds:=false;
@@ -390,7 +420,7 @@ begin
    end
    else lqs:=(ddc div 80)*map_liq;
 
-   ix :=map_seed;
+   ix :=map_seed*map_obs*map_liq;
    iy :=0;
 
    for i:=1 to ddc do
@@ -398,10 +428,12 @@ begin
       cnt:=0;
       while true do
       begin
-         ix:=_genx(ix            ,map_mw,false);
-         iy:=_genx(iy+sqr(cnt+ix),map_mw,true );
+         if(map_sym)
+         then ix:=_genx(ix,map_hmw,false)
+         else ix:=_genx(ix,map_mw ,false);
+         iy:=_genx(iy+ix*cnt,map_mw,true);
 
-          if(_pickdds(ix,iy,@lqs,@rks))then break;
+         if(_pickdds(@ix,@iy,@lqs,@rks))then break;
 
          inc(cnt,1);
          if(cnt>=dpostime)then break;

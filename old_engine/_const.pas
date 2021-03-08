@@ -298,7 +298,7 @@ _ub_infinity           = 32000;
 //  OBSTACLES
 //
 
-MaxDoodads             = 700;
+MaxDoodads             = 500;
 
 //
 ddc_div                = 1000000;

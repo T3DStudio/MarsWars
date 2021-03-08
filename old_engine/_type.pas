@@ -33,10 +33,8 @@ TDecal = record
 end;
 
 TEffect = record
-   x,y,
-   t,t2,d,
-   anims,
-   animi
+   x,y,d,
+   t,t2
             : integer;
    smodel   : PTMWSModel;
    {tm,

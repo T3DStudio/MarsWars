@@ -22,8 +22,23 @@ begin
          t :=0;
          t2:=0;
 
-         {case ee of
+         smodel:=nil;
 
+         case ee of
+UID_Pain:
+         begin
+            smodel:=@spr_pain;
+
+         end;
+         else
+           exit;
+         end;
+
+         {case ee of
+         anims,
+         animi
+                  : integer;
+         smodel   : PTMWSModel;
          end;}
 
          {case e of
@@ -89,6 +104,8 @@ begin
      begin
         alpha:=255;
         msk  :=0;
+
+        //spr:=_sm2s();
 
         {ea:=0;
         if(ans<>0)then
