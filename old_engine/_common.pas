@@ -37,7 +37,7 @@ begin
       if(g<>[])then
        for i:=0 to 255 do
         if(i in g)then
-         with _upids[i] do a_units[i]:=min2(_up_max,lvl);
+         with _upids[i] do a_upgrs[i]:=min2(_up_max,lvl);
    end;
 end;
 

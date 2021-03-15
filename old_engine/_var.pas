@@ -586,9 +586,7 @@ spr_iob_knight,
 spr_iob_baron,
 spr_mback,
 spr_cursor        : pSDL_Surface;
-//spr_b_b           : array[1..r_cnt,byte] of pSDL_Surface;
-//spr_b_u           : array[1..r_cnt,byte] of pSDL_Surface;
-//spr_b_up          : array[1..r_cnt,0..ui_ubtns] of pSDL_Surface;
+spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWSprite;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;

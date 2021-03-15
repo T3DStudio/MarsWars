@@ -311,7 +311,7 @@ begin
               buff[ub_resur]:=0;
               buff[ub_born ]:=fr_fps;
               {$IFDEF _FULLGAME}
-              _unit_fsrclc(pu);
+              _unit_fog_r(pu);
               if(playeri=HPlayer)then _unit_snd_ready(uidi,buff[ub_advanced]>0);
               {$ENDIF}
            end;

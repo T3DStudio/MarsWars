@@ -95,24 +95,31 @@ begin
       TIME :='';
       if(un_name='')then continue;
 
-      if(_renerg>0)then ENRG:=i2s(_renerg);
-      if(_btime >0)then TIME:=i2s(_btime );
+      if(_ucl>=21)then
+      begin
+         un_hint:= un_name+#11+un_descr+#11;
+      end
+      else
+      begin
+         if(_renerg>0)then ENRG:=i2s(_renerg);
+         if(_btime >0)then TIME:=i2s(_btime );
 
-      PROD:=findprd(uid);
-      if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
-      if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name);
-      HK:=_gHK(_ucl);
+         PROD:=findprd(uid);
+         if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
+         if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name);
+         HK:=_gHK(_ucl);
 
-      un_hint:= un_name;
-      if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
-      if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
-      if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
-      un_hint:=un_hint+#11+un_descr+#11;
-      if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
-      if(PROD<>'')then
-       if(_isbuilding)
-       then un_hint:= un_hint+str_bprod+PROD
-       else un_hint:= un_hint+str_uprod+PROD;
+         un_hint:= un_name;
+         if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
+         if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
+         if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
+         un_hint:=un_hint+#11+un_descr+#11;
+         if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
+         if(PROD<>'')then
+          if(_isbuilding)
+          then un_hint:= un_hint+str_bprod+PROD
+          else un_hint:= un_hint+str_uprod+PROD;
+      end;
    end;
 
    for uid:=0 to 255 do
@@ -404,6 +411,8 @@ begin
    _mkHStrUid(UID_Terminator ,'UAC Terminator'   ,'');
    _mkHStrUid(UID_Tank       ,'UAC Tank'         ,'');
    _mkHStrUid(UID_Flyer      ,'UAC Fighter'      ,'');
+
+   _mkHStrUpid(upgr_uac_radar_r,'UAC Radar upgrade','Increase radar scouting radius.');
 
    {_mkHStrUpid(upgr_attack  ,'Ranged attack upgrade'  ,'Increase ranged attacks damage.'                                    );
    _mkHStrUpid(upgr_armor   ,'Infantry armor upgrade' ,'Increase infantry armor.'                                           );

@@ -16,7 +16,7 @@ begin
     end;
 end;
 
-procedure _unit_fsrclc(pu:PTUnit);
+procedure _unit_fog_r(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -31,11 +31,11 @@ end;
 
 
 procedure ObjTblCL;
-var i:byte;
+var u,i,r:byte;
 
 procedure setMWSM(mwsm,mwsma:PTMWSModel);
 begin
-   with _uids[i] do
+   with _uids[u] do
    begin
       un_smodel[false]:= mwsm;
       if(mwsm=nil)
@@ -48,15 +48,15 @@ begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
 
 
-   for i:=0 to 255 do
-   with _uids[i] do
+   for u:=0 to 255 do
+   with _uids[u] do
    begin
       setMWSM(@spr_dmodel,nil);
       _animw:=10;
       _animd:=10;
       _animf:=0;
 
-      case i of
+      case u of
 UID_LostSoul:
 begin
    setMWSM(@spr_lostsoul,nil);
@@ -303,10 +303,44 @@ end;
 
       end;
 
-      ui_panel_uids[_urace,byte(not _isbuilding),_ucl]:=i;
+      ui_panel_uids[_urace,byte(not _isbuilding),_ucl]:=u;
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;
+   end;
+
+   for r:=1 to r_cnt do
+   begin
+      i:=0;
+      for u:=0 to 255 do
+      with _upids[u] do
+      if(_up_race=r)then
+      begin
+         ui_panel_uids[r,2,i]:=u;
+         inc(i,1);
+         if(i>ui_ubtns)then break;
+      end;
+   end;
+
+   for u:=0 to 255 do
+   with _upids[u] do
+   begin
+      _up_btn:=spr_dummy;
+
+      case u of
+
+upgr_hell_b478tel:
+      begin
+         _up_btn:=spr_b_up[r_hell,21];
+      end;
+
+upgr_uac_radar_r:
+      begin
+         _up_btn:=spr_b_up[r_uac ,8];
+      end;
+
+      end;
+
    end;
 end;
 
@@ -396,7 +430,7 @@ begin
 
          shadow:=_unit_shadowz(pu);
 
-         _unit_fsrclc(pu);
+         _unit_fog_r(pu);
          {$ENDIF}
          if(onlySVCode)then hits:=_mhits;
       end;
@@ -469,13 +503,13 @@ begin
 end;
 UID_HSymbol:
 begin
-   _mhits     := 200;
+   _mhits     := 100;
    _renerg    := 1;
    _generg    := 1;
    _r         := 24;
    _srange    := 200;
    _ucl       := 2;
-   _btime     := 10;
+   _btime     := 8;
 
    _isbuilding:= true;
 end;
@@ -502,6 +536,7 @@ begin
    _ucl       := 4;
    _btime     := 20;
    _attack    := atm_always;
+   _ability   := uad_htowertele;
 
    _isbuilding:= true;
 end;
@@ -540,8 +575,9 @@ begin
    _srange    := 250;
    _ucl       := 7;
    _btime     := 25;
-   _ruid      := UID_HMonastery;
+   _ruid      := UID_HAltar;
    _attack    := atm_always;
+   _ability   := uad_htowertele;
    //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
@@ -913,13 +949,13 @@ begin
 end;
 UID_UGenerator:
 begin
-   _mhits     := 400;
+   _mhits     := 200;
    _renerg    := 2;
    _generg    := 2;
    _r         := 42;
    _srange    := 200;
    _ucl       := 2;
-   _btime     := 20;
+   _btime     := 16;
 
    _isbuilding:=true;
 end;
@@ -951,7 +987,7 @@ begin
 end;
 UID_URadar:
 begin
-   _mhits     := 500;
+   _mhits     := 400;
    _renerg    := 4;
    _r         := 35;
    _srange    := 200;
@@ -1020,7 +1056,7 @@ UID_UNuclearPlant:
 begin
    _mhits     := 2000;
    _renerg    := 10;
-   _generg    := 10;
+   _generg    := 15;
    _r         := 70;
    _srange    := 200;
    _ucl       := 9;
@@ -1038,7 +1074,7 @@ begin
    _srange    := 100;
    _ucl       := 21;
    _btime     := 5;
-   _ucl       := 9;
+   _ucl       := 21;
    _attack    := atm_always;
 
    _isbuilding:=true;
@@ -1281,7 +1317,7 @@ end;
 end;
 
 
-procedure _setUPGR(rc,upcl,stime,max,enrg:integer;rupgr,ruid:byte);
+procedure _setUPGR(rc,upcl,stime,max,enrg:integer;rupgr,ruid:byte;mfrg,addon:boolean);
 begin
    with _upids[upcl] do
    begin
@@ -1291,7 +1327,8 @@ begin
       _up_time  := stime*fr_fps;
       _up_renerg:= enrg;
       _up_max   := max;
-      _up_mfrg  := false;
+      _up_mfrg  := mfrg;
+      _up_addon := addon;
    end;
 end;
 
@@ -1299,7 +1336,15 @@ procedure ObjTbl;
 begin
    FillChar(_upids,SizeOf(_upids),0);
 
-                              // time lvl enr rupgr     ruid
+   //       race  id               time lvl enr rupgr     ruid
+
+   _setUPGR(r_hell,upgr_hell_b478tel,30 ,15  ,2  ,0         ,UID_HAltar       ,true ,true);
+
+   _setUPGR(r_uac ,upgr_uac_radar_r ,120, 3  ,4  ,0         ,0                ,false,false);
+
+
+
+
   { _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255       ,255);
    _setUPGR(r_hell,upgr_build     ,120,4 ,4 ,255       ,255);

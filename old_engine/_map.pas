@@ -252,29 +252,29 @@ begin
       then MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8))
       else
       begin
-      ix :=integer(map_seed) mod map_mw;
-      iy :=(map_seed2*2+integer(map_seed)) mod map_mw;
-      bb0:=base_r+(map_mw-MinSMapW) div 5;
-      bb1:=map_mw-(bb0*2);
-      dst:=(map_mw div 5)+base_r;
+         ix :=integer(map_seed) mod map_mw;
+         iy :=(map_seed2*2+integer(map_seed)) mod map_mw;
+         bb0:=base_r+(map_mw-MinSMapW) div 5;
+         bb1:=map_mw-(bb0*2);
+         dst:=(map_mw div 5)+base_r;
 
-      for i:=1 to MaxPlayers do
-      begin
-         c:=0;
-         u:=dst;
-         while true do
+         for i:=1 to MaxPlayers do
          begin
-           ix:=bb0+_gen(bb1);
-           iy:=bb0+_gen(bb1);
-           inc(c,1);
-           inc(map_seed2,1);
-           if(c>500 )then dec(u,1);
-           if(c>1000)or(_spch(ix,iy,u)=false)then break;
-         end;
+            c:=0;
+            u:=dst;
+            while true do
+            begin
+               ix:=bb0+_gen(bb1);
+               iy:=bb0+_gen(bb1);
+               inc(c,1);
+               inc(map_seed2,1);
+               if(c>500 )then dec(u,1);
+               if(c>1000)or(_spch(ix,iy,u)=false)then break;
+            end;
 
-         map_psx[i]:=ix;
-         map_psy[i]:=iy;
-      end;
+            map_psx[i]:=ix;
+            map_psy[i]:=iy;
+         end;
       end;
    end;
 end;
@@ -296,7 +296,7 @@ begin
 end;
 
 function _dnear(td:byte;ix,iy:pinteger):boolean;
-var d,ir:integer;
+var d:integer;
 begin
    _dnear:=false;
 

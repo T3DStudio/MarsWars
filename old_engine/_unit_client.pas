@@ -518,7 +518,7 @@ begin
 
         if(hits>0)then
         begin
-           _unit_fsrclc(uu);
+           _unit_fog_r(uu);
           // _netClUCreateEff(uu,pu);
         end;
 
@@ -565,7 +565,7 @@ begin
 
             if(pu^.hits<=0)and(hits>0)then
             begin
-               _unit_fsrclc(uu);
+               _unit_fog_r(uu);
                vx:=x;
                vy:=y;
             end

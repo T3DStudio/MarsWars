@@ -77,7 +77,7 @@ begin
 
    swLNG;
    ObjTblCL;
-   unit_icons;
+   _icons;
 
    {$ENDIF}
 

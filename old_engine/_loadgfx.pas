@@ -477,8 +477,7 @@ end;
 {$include _themes.pas}
 
 procedure _LoadGraphics(firstload:boolean);
-
-var x:integer;
+var x,r:integer;
 begin
    r_empty   :=_createSurf(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
@@ -632,6 +631,15 @@ begin
    _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
 
+   for x:=0 to spr_upgrade_icons do
+   for r:=1 to r_cnt do
+   with spr_b_up[r,x] do
+   begin
+      surf:= LoadBtn(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
+      w   := surf^.w;h    := w;
+      hw  := w div 2;hh   := hw;
+   end;
+
    {for x:=0 to ui_ubtns do
    begin
    spr_b_up[r_hell,x]:=LoadBtn('b_h_up'+b2s(x),vid_bw);
@@ -747,21 +755,21 @@ begin
 end;
 
 
-procedure unit_icons;
-var x:integer;
+procedure _icons;
+var u:byte;
 begin
-   for x:=0 to 255 do
-   with _uids[x] do
+   for u:=0 to 255 do
+   with _uids[u] do
    begin
       with un_btn do
       begin
-         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_BW );
+         surf := LoadBtnFS(_uid2spr(u,false)^.surf,vid_BW );
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;
       with un_sbtn do
       begin
-         surf := LoadBtnFS(_uid2spr(x,false)^.surf,vid_oiw);
+         surf := LoadBtnFS(_uid2spr(u,false)^.surf,vid_oiw);
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;

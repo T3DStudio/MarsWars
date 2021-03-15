@@ -142,6 +142,42 @@ begin;
    end;
 end;
 
+procedure _teleport_rld(tu:PTUnit;ur:integer);
+begin
+   with tu^ do
+    with player^ do rld:=fr_fps;
+     //if(upgr[upgr_5bld] in [0..3])then rld_t:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
+end;
+
+procedure _unit_teleport(pu:PTUnit;tx,ty:integer);
+begin
+   with pu^ do
+   begin
+      tx:=mm3(0,tx,map_mw);
+      ty:=mm3(0,ty,map_mw);
+      {$IFDEF _FULLGAME}
+      if _nhp3(vx,vy,@_players[HPlayer])
+      or _nhp3(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil);
+      _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
+      _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
+      {$ENDIF}
+      //buff[ub_pain   ]:=vid_hfps;
+      buff[ub_teleeff]:=fr_fps;
+      x     :=tx;
+      y     :=ty;
+      vx    :=x;
+      vy    :=y;
+      uo_x  :=x;
+      uo_y  :=y;
+      uo_tar:=0;
+      _unit_correctcoords(pu);
+      {$IFDEF _FULLGAME}
+      _unit_mmcoords(pu);
+      _unit_sfog(pu);
+      {$ENDIF}
+   end;
+end;
+
 function _unit_flyup(pu:PTUnit;z:integer):boolean;
 var st:integer;
 begin
@@ -198,16 +234,47 @@ begin
       dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
+procedure _unt_clear_order(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      uo_id :=ua_amove;
+      uo_tar:=0;
+      uo_x  :=x;
+      uo_y  :=y;
+      uo_bx :=-1;
+   end;
+end;
 
-procedure _unit_uradar(pu:PTUnit);
+procedure _unit_uradar(pu:PTUnit;x0,y0:integer);
 begin
    with pu^ do
    if(bld)and(rld<=0)then
    begin
-      rld:=radar_reload;
+      _unt_clear_order(pu);
+      uo_x:=x0;
+      uo_y:=y0;
+      rld :=radar_reload;
+
       {$IFDEF _FULLGAME}
       if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
       {$ENDIF}
+   end;
+end;
+
+
+
+procedure _unit_htteleport(pu:PTUnit;x0,y0:integer);
+begin
+   with pu^ do
+   if(bld)and(buff[ub_clcast]<=0)then
+   with player^ do
+   if(upgr[upgr_hell_b478tel]>0)then
+   if(dist(x,y,x0,y0)<srange)then
+   begin
+      dec(upgr[upgr_hell_b478tel],1);
+      buff[ub_clcast]:=fr_hfps;
+      _unit_teleport(pu,x0,y0);
    end;
 end;
 
@@ -852,47 +919,6 @@ begin
    end;
 end;
 
-{procedure _unit_prod(pu:PTUnit);
-var t,i,_uid:byte;
-begin
-   with pu^ do
-   with player^ do
-   for i:=0 to MaxUnitProds do
-   begin
-     if(isbarrack)then
-      if(uprod_r[i]>0)then
-      begin
-         t:=uprod_t[i];
-         _uid:=cl2uid[race,false,t];
-         if((army+uproda)>MaxPlayerUnits)or(menerg<cenerg)or(ucl_e[false,t]>=_ulst[_uid].max)
-         then _unit_ctraining_p(pu,-1,i)
-         else
-           if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-           begin
-              if(_u1_spawn(pu,i*30,32000,i))and(playeri=HPlayer)then {$IFDEF _FULLGAME}_unit_createsound(_uid);{$ELSE};{$ENDIF}
-
-              if(upgr[upgr_advbar]>0)then _u1_spawn(pu,30+i*30,32000,i);
-
-              _unit_ctraining_p(pu,-1,i);
-           end;
-      end;
-
-     if(issmith)then
-      if(pprod_r[i]>0)then
-      begin
-         t:=pprod_t[i];
-         if(menerg<cenerg)
-         then _unit_cupgrade_p(pu,-1,i)
-         else
-           if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-           begin
-              inc(upgr[t],1);
-              _unit_cupgrade_p(pu,-1,i);
-           end;
-      end;
-   end;
-end;    }
-
 procedure _u1_spawn(pu:PTUnit;_uid,count:byte);
 var
 sr, i:integer;
@@ -929,14 +955,6 @@ begin
       {$ENDIF}
    end;
 end;
-{if(uidi=uid_HGate)then
-begin
-   _LastCreatedUnitP^.buff[ub_teleeff]:=vid_fps;
-   {$IFDEF _FULLGAME}
-   PlaySND(snd_teleport,pu);
-   _effect_add(_LastCreatedUnitP^.x,_LastCreatedUnitP^.y,_LastCreatedUnitP^.y+map_flydpth[_LastCreatedUnitP^.uf]+5,EID_Teleport);
-   {$ENDIF}
-end;  }
 
 procedure _unit_end_uprod(pu:PTUnit);
 var i,_uid:byte;
@@ -1158,41 +1176,7 @@ end;
 
 }
 
-procedure _teleport_rld(tu:PTUnit;ur:integer);
-begin
-   with tu^ do
-    with player^ do rld:=fr_fps;
-     //if(upgr[upgr_5bld] in [0..3])then rld_t:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
-end;
 
-procedure _unit_teleport(pu:PTUnit;tx,ty:integer);
-begin
-   with pu^ do
-   begin
-      tx:=mm3(0,tx,map_mw);
-      ty:=mm3(0,ty,map_mw);
-      {$IFDEF _FULLGAME}
-      if _nhp3(vx,vy,@_players[HPlayer])
-      or _nhp3(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil);
-      _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-      _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
-      {$ENDIF}
-      //buff[ub_pain   ]:=vid_hfps;
-      buff[ub_teleeff]:=fr_fps;
-      x     :=tx;
-      y     :=ty;
-      vx    :=x;
-      vy    :=y;
-      uo_x  :=x;
-      uo_y  :=y;
-      uo_tar:=0;
-      _unit_correctcoords(pu);
-      {$IFDEF _FULLGAME}
-      _unit_mmcoords(pu);
-      _unit_sfog(pu);
-      {$ENDIF}
-   end;
-end;
 
 procedure _unit_counters(pu:PTUnit);
 var i:byte;
@@ -1226,7 +1210,7 @@ var td:integer;
 begin
    with uu^ do
    begin
-      if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_time)then
+      if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)then
       begin
          td:=dist2(x,y,tu^.uo_x,tu^.uo_y);
          if(td>ud)then td:=ud;
@@ -1308,14 +1292,28 @@ end;   }
 
 
 procedure _unit_upgr(pu:PTUnit);
+var i:integer;
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      {case uid of
+      case _ability of
+uab_radar: begin
+              i:=radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr_levels)];
+              if(srange<>i)then
+              begin
+                 srange:=i;
+                 {$IFDEF _FULLGAME}
+                 _unit_fog_r(pu);
+                 {$ENDIF}
+              end;
+           end;
+      end;
 
-      end; }
+      {case uid of
+      UID_URadar
+      end;  }
    end;
 end;
 

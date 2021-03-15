@@ -266,6 +266,7 @@ uab_uac_unit_adv       = 2;
 uab_hell_unit_adv      = 3;
 uab_building_adv       = 4;
 uab_radar              = 5;
+uad_htowertele         = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -327,29 +328,29 @@ DID_R                  : array[0..7] of integer = (0,250,185,125,64,105,60,17);
 //
 
 upgr_hell_attack       = 1;  // distance attack
-upgr_hell_armor        = 2;  // base armor
-upgr_hell_build        = 3;  // base b armor
-upgr_hell_melee        = 4;  // melee attack / repair/health upgr
-upgr_hell_regen        = 5;  // hell
+upgr_hell_uarmor       = 2;  // base unit armor
+upgr_hell_barmor       = 3;  // base building armor
+upgr_hell_melee        = 4;  // melee attack
+upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
-upgr_hell_heye         = 7;  // Hell Eye
-upgr_hell_towers       = 8;  // towers sr
-upgr_hell_5bld         = 9;  // Teleport/Radar
-upgr_hell_mainm        = 10; // Main b move
+upgr_hell_heye         = 7;  // hell Eye
+upgr_hell_towers       = 8;  // towers range
+upgr_hell_teleport     = 9;  // Teleport reload
+upgr_hell_hktele       = 10; // HK teleportation
 upgr_hell_paina        = 11; // decay aura
-upgr_hell_mainr        = 12; // main sr
+upgr_hell_mainr        = 12; // main range
 upgr_hell_pinkspd      = 13; // demon speed
-upgr_hell_misfst       = 14; // missiles fast
-upgr_hell_6bld         = 15; // Souls / adv
-upgr_hell_2tier        = 16; // Tier 2
+upgr_hell_misfst       = 14; // missiles speed
+upgr_hell_6bld         = 15; // Souls
+//upgr_hell_2tier        = 16; // Tier 2
 upgr_hell_revtele      = 17; // revers teleport
 upgr_hell_revmis       = 18; // revenant missile
 upgr_hell_totminv      = 19; // totem and eye invisible
-upgr_hell_bldrep       = 20; // build repair
-upgr_hell_mainonr      = 21; // main on doodabs
-upgr_hell_b478tel      = 22; // teleport towers and altars
+upgr_hell_bldrep       = 20; // build restoration
+upgr_hell_mainonr      = 21; // HK on doodabs
+upgr_hell_b478tel      = 22; // teleport towers
 upgr_hell_hinvuln      = 23; // hell invuln powerup
-upgr_hell_bldenrg      = 24; // additional energy
+//upgr_hell_bldenrg      = 24; // additional energy
 upgr_hell_9bld         = 25; // 9 class building reload time
 
 
@@ -361,14 +362,14 @@ upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_plsmt         = 36; // turrent for apcs
 upgr_uac_vision        = 37; // detectors
 upgr_uac_towers        = 38; // towers sr
-upgr_uac_5bld          = 39; // Teleport/Radar
+upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
 upgr_uac_ucomatt       = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_mines         = 43; // mines for engineers
 upgr_uac_minesen       = 44; // mine-sensor
 upgr_uac_6bld          = 45; // Souls / adv
-upgr_uac_2tier         = 46; // Tier 2
+//upgr_uac_2tier         = 46; // Tier 2
 upgr_uac_blizz         = 47; // blizzard launch
 upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
@@ -376,7 +377,7 @@ upgr_uac_6bld2         = 50; // 6bld upgr
 upgr_uac_mainonr       = 51; // main on doodabs
 upgr_uac_turarm        = 52; // turrets armor
 upgr_uac_rturrets      = 53; // rocket turrets
-upgr_uac_bldenrg       = 54; // additional energy
+//upgr_uac_bldenrg       = 54; // additional energy
 upgr_uac_9bld          = 55; // 9 class building reload time
 
 upgr_fast_build        = 250;
@@ -551,8 +552,10 @@ regen_per              = fr_fps*2;
 _uclord_p              = fr_hfps+1;
 vistime                = _uclord_p+1;
 
-radar_reload           = fr_fps*30;
-radar_time             = radar_reload-(fr_fps*5);
+radar_reload           = fr_fps*60;
+radar_btime            = radar_reload-(fr_fps*5);
+radar_upgr_levels      = 4;
+radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
@@ -639,6 +642,7 @@ hp_pshield             = #8;
 adv_char               = #10;
 revenant_ra            : array[false..true] of integer = (45,20);
 
+spr_upgrade_icons      = 24;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -926,7 +930,7 @@ str_e_rpls             : shortstring = '.mwr';
 race_dir               : array[1..r_cnt] of string = ('hell\'          ,'uac\'          );
 race_units             : array[1..r_cnt] of string = ('hell\units\'    ,'uac\units\'    );
 race_buildings         : array[1..r_cnt] of string = ('hell\buildings\','uac\buildings\');
-
+race_upgrades          : array[1..r_cnt] of string = ('hell\upgrades\' ,'uac\upgrades\' );
 
 ////////////////////////////////////////////////////////////////////////////////
 //

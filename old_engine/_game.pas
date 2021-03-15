@@ -52,9 +52,11 @@ begin
 
        _units_au(p,[UID_HKeep..UID_HMilitaryUnit,
                     UID_LostSoul..UID_ZBFG,
-                    UID_UCommandCenter..UID_UNuclearPlant,
+                    UID_UCommandCenter..UID_UMine,
                     UID_Engineer..UID_Tank],
                     255,true);
+
+       _upgrs_au(p,[0..255],255,true);
 
       // a_upgr  := [0..MaxUpgrs];
    end;
@@ -204,7 +206,7 @@ begin
       ds :=map_mw div 2;
       d  :=p_dir(x,y,ds,ds);
       ds :=360 div (c+1);
-      r  :=50+c*20;
+      r  :=50+c*18;
       for i:=0 to c do
       begin
          xs:=x+trunc(r*cos(d*degtorad));
@@ -402,13 +404,11 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                     co_destroy :  _unit_kill(pu,false,o_y0>0);
                     co_rcamove,
                     co_rcmove  :  begin     // right clik
-                                     uo_tar:=0;
-                                     uo_x  :=o_x1;
-                                     uo_y  :=o_y1;
-                                     uo_bx :=-1;
-
                                      case _ability of
-                                      uab_radar: _unit_uradar(pu);
+                                     uab_radar       : _unit_uradar(pu,o_x1,o_y1);
+                                     uad_htowertele  : if(o_y0<>u)and(o_y0<>0)and(_attack>atm_none)
+                                                       then uo_tar:=o_y0
+                                                       else _unit_htteleport(pu,o_x1,o_y1);
                                      else
                                         case uidi of
                                          UID_HKeep         :;// _unit_bteleport(pu);
@@ -425,6 +425,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                                              then uo_tar:=o_y0
                                                              else ;//_unit_b247teleport(pu);
                                          else
+                                           uo_tar:=0;
+                                           uo_x  :=o_x1;
+                                           uo_y  :=o_y1;
+                                           uo_bx :=-1;
 
                                            if(o_y0<>u)then uo_tar:=o_y0;
                                            if(o_x0<>co_rcmove)or(speed=0)
