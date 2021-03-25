@@ -34,13 +34,13 @@ end;
 
 TEffect = record
    x,y,d,
-   t,t2
+   anim_i,
+   anim_last_i,
+   anim_step,
+   anim_last_i_t,
+   anim_smstate
             : integer;
    smodel   : PTMWSModel;
-   {tm,
-   d,
-   anl,ans  : integer;
-   e        : byte;}
 end;
 
 TVisSpr = record

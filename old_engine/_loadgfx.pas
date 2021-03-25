@@ -623,10 +623,18 @@ begin
    _LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
    _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
 
-   _lstr(@spr_db_h0,race_dir[r_hell]+'db_h0',firstload,true);
-   _lstr(@spr_db_h1,race_dir[r_hell]+'db_h1',firstload,true);
-   _lstr(@spr_db_u0,race_dir[r_uac ]+'db_u0',firstload,true);
-   _lstr(@spr_db_u1,race_dir[r_uac ]+'db_u1',firstload,true);
+   _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_tel        ,effects_folder+'ef_tel_'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect ,firstload);
+
+   _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_u0          ,race_dir[r_uac ]+'db_u0'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_u1          ,race_dir[r_uac ]+'db_u1'        ,smt_effect ,firstload);
 
    _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);

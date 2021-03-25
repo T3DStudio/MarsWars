@@ -359,6 +359,8 @@ begin
    _mkHStrUid(UID_ZMajor     ,'Zombie Major'   ,'');
    _mkHStrUid(UID_ZBFG       ,'Zombie BFG'     ,'');
 
+   _mkHStrUpid(upgr_hell_b478tel,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
+
   { _mkHStrUpid(upgr_attack  ,'Range attack upgrade'       ,'Increase ranged attacks damage.'                                           );
    _mkHStrUpid(upgr_armor   ,'Unit armor upgrade'         ,'Increase units armor.'                                                     );
    _mkHStrUpid(upgr_build   ,'Buildinds armor upgrade'    ,'Increase buildings armor.'                                                 );

@@ -545,17 +545,19 @@ spr_u_p1,
 spr_u_p2,
 spr_u_p3,
 
+spr_db_h0,
+spr_db_h1,
+spr_db_u0,
+spr_db_u1,
+
 spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel;
 
 spr_mp            : array[1..r_cnt] of TMWSprite;
 spr_gear,
-spr_toxin,
+spr_toxin
 
-spr_db_h0,
-spr_db_h1,
-spr_db_u0,
-spr_db_u1         : TMWSprite;
+                  : TMWSprite;
 
 
 spr_c_mars,

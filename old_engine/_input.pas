@@ -556,6 +556,7 @@ begin
 co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
+               //_effect_add(m_mx,m_my,10000,EID_Gavno);
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
@@ -603,6 +604,8 @@ co_apatrol: _command(m_mx,m_my);
       _moveHumView(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx));
       _view_bounds;
    end;
+
+   //if(k_mr=2)then _effect_add(m_mx,m_my,10000,EID_Teleport);
 
    if(k_mr=2)then                 // RMB down
     if(m_brush<>co_empty)

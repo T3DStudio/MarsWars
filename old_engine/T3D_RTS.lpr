@@ -38,8 +38,8 @@ uses SysUtils, SDL, SDL_Net
         {$include _draw_game.pas}
         {$include _draw_objs_units.pas}
         {$include _draw_objs_map.pas}
-        {$include _draw.pas}
         {$include _effects.pas}
+        {$include _draw.pas}
         {$include _loadgfx.pas}
      {$ENDIF}
 {$include _map.pas}

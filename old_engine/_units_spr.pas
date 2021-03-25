@@ -1,5 +1,7 @@
 
 
+
+
 function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer):PTMWSprite;  // sprite model 2 sprite
 var dd,i:integer;
 function aa3(b0,a,b1:integer):integer;
@@ -13,6 +15,8 @@ begin
 end;
 begin
    _sm2s:=@spr_dummy;
+
+   if(sm=nil)then exit;
 
    with sm^ do
    begin
@@ -280,7 +284,6 @@ smt_terminat :case animk of
 
       _sm2s:=@sl[mm3(0,i,sk)];
    end;
-
 end;
 
 function _unit2SMAnimK(u:PTUnit;_wanim_:boolean):byte;

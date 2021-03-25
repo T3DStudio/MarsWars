@@ -343,8 +343,8 @@ begin
               UID_HEye : begin
                             inv:=trunc(255*hits/_mhits);
                             if(_r<41)
-                            then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1,255-inv)
-                            else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0,255-inv);
+                            then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
+                            else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
                             if(buff[ub_invis]>0)then inv:=inv shr 1;
                             dec(inv,inv shr 2);
                          end;
@@ -353,8 +353,8 @@ begin
                  begin
                     inv:=hits*2;
                     if(_r<41)
-                    then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1,255-inv)
-                    else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0,255-inv);
+                    then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
+                    else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
                  end
                  else inv:=255;
                end;

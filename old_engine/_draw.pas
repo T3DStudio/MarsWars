@@ -4,6 +4,7 @@ procedure d_AddObjSprites(noanim:boolean);
 begin
     map_sprites(noanim);
    unit_sprites(noanim);
+effects_sprites(noanim,true);
 end;
 
 procedure d_Game;
