@@ -931,6 +931,7 @@ race_dir               : array[1..r_cnt] of string = ('hell\'          ,'uac\'  
 race_units             : array[1..r_cnt] of string = ('hell\units\'    ,'uac\units\'    );
 race_buildings         : array[1..r_cnt] of string = ('hell\buildings\','uac\buildings\');
 race_upgrades          : array[1..r_cnt] of string = ('hell\upgrades\' ,'uac\upgrades\' );
+race_missiles          : array[1..r_cnt] of string = ('hell\missiles\' ,'uac\missiles\' );
 effects_folder         : shortstring = 'effs\';
 
 ////////////////////////////////////////////////////////////////////////////////

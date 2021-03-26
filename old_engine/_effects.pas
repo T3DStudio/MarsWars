@@ -10,7 +10,7 @@ end;
 procedure _effect_add(ex,ey,ed:integer; ee:byte);
 var e:integer;
 
-procedure _setEff(sm:PTMWSModel;ans,si,ei,sms,it:integer;revanim:boolean);
+procedure _setEff(sm:PTMWSModel;ans,si,ei,sms,it:integer;revanim:boolean;az:integer;amask:cardinal);
 var sc:integer;
 begin
    with _effects[e] do
@@ -18,7 +18,9 @@ begin
       x :=ex;
       y :=ey;
       d :=ed;
+      z :=az;
 
+      smask :=amask;
       smodel:=sm;
 
       anim_last_i_t:= it;
@@ -26,7 +28,7 @@ begin
       anim_step    := ans;
 
       anim_i       := si;
-      if(ei<0)
+      if(ei=-1)
       then sc := smodel^.sn
       else
         if(ei<smodel^.sn)
@@ -52,16 +54,58 @@ begin
       begin
 
          case ee of
-UID_Pain          : _setEff(@spr_pain      ,7 ,0 ,32 ,sms_death,-1       ,false);
-UID_LostSoul      : _setEff(@spr_lostsoul  ,7 ,0 ,23 ,sms_death,-1       ,false);
+UID_Pain          : _setEff(@spr_pain      ,7 ,0 ,32 ,sms_death,-1       ,false,0 ,0);
+UID_LostSoul      : _setEff(@spr_lostsoul  ,7 ,0 ,23 ,sms_death,-1       ,false,0 ,0);
+UID_HEye          : _setEff(@spr_h_p2      ,6 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
 
-EID_Teleport      : _setEff(@spr_eff_tel   ,10,0 ,-1 ,sms_death,-1       ,true );
-EID_Gavno         : _setEff(@spr_eff_g     ,7 ,0 ,-1 ,sms_death,dead_time,true );
+MID_BPlasma       : _setEff(@spr_u_p0      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_SShot,
+MID_SSShot,
+MID_Bullet,
+MID_Bulletx2,
+MID_TBullet,
+MID_MBullet       : _setEff(@spr_u_p1      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_BFG           : _setEff(@spr_u_p2      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_Flyer         : _setEff(@spr_u_p3      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
 
-EID_db_h0         : _setEff(@spr_db_h0     ,1 ,0 ,0  ,sms_death,dead_time,false);
-EID_db_h1         : _setEff(@spr_db_h1     ,1 ,0 ,0  ,sms_death,dead_time,false);
-EID_db_u0         : _setEff(@spr_db_u0     ,1 ,0 ,0  ,sms_death,dead_time,false);
-EID_db_u1         : _setEff(@spr_db_u1     ,1 ,0 ,0  ,sms_death,dead_time,false);
+MID_Imp           : _setEff(@spr_h_p0      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_Cacodemon     : _setEff(@spr_h_p1      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_Baron         : _setEff(@spr_h_p2      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+MID_Revenant,
+MID_RevenantS     : _setEff(@spr_h_p4      ,7 ,0 , 8 ,sms_death,-1       ,false,0 ,0);
+MID_YPlasma       : _setEff(@spr_h_p7      ,6 ,0 ,-1 ,sms_death,-1       ,false,0 ,0);
+
+EID_BFG           : _setEff(@spr_eff_bfg   ,6 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+
+MID_HRocket,
+MID_Granade,
+MID_Tank,
+MID_Mancubus,
+EID_Exp           : _setEff(@spr_eff_exp   ,7 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+EID_Exp2          : _setEff(@spr_eff_exp2  ,7 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+
+EID_Blood         : _setEff(@spr_blood     ,6 ,0 ,-1 ,sms_death,-1       ,true ,15,0);
+
+EID_ArchFire      : _setEff(@spr_h_p6      ,6 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+
+EID_HUpgr         : _setEff(@spr_eff_tel   ,10,0 ,-1 ,sms_death,-1       ,true ,0 ,c_ared);
+EID_Teleport      : _setEff(@spr_eff_tel   ,10,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+EID_Gavno         : _setEff(@spr_eff_g     ,7 ,0 ,-1 ,sms_death,dead_time,true ,0 ,0);
+
+EID_BExp          : _setEff(@spr_eff_eb    ,5 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+EID_BBExp         : _setEff(@spr_eff_ebb   ,6 ,0 ,-1 ,sms_death,-1       ,true ,0 ,0);
+
+EID_HKT_h,
+EID_HKT_s         : _setEff(@spr_HKeep     ,1 ,3 ,3  ,sms_walk ,fr_fps   ,false,0 ,0);
+EID_HMU           : _setEff(@spr_UCommandCenter,1,3,3,sms_walk ,fr_fps   ,false,0 ,0);
+EID_HCC           : _setEff(@spr_UMilitaryUnit ,1,3,3,sms_walk ,fr_fps   ,false,0 ,0);
+EID_HAMU          : _setEff(@spr_UAMilitaryUnit,1,3,3,sms_walk ,fr_fps   ,false,0 ,0);
+
+
+EID_db_h0         : _setEff(@spr_db_h0     ,1 ,0 ,0  ,sms_death,dead_time,false,0 ,0);
+EID_db_h1         : _setEff(@spr_db_h1     ,1 ,0 ,0  ,sms_death,dead_time,false,0 ,0);
+EID_db_u0         : _setEff(@spr_db_u0     ,1 ,0 ,0  ,sms_death,dead_time,false,0 ,0);
+EID_db_u1         : _setEff(@spr_db_u1     ,1 ,0 ,0  ,sms_death,dead_time,false,0 ,0);
          else
            exit;
          end;
@@ -72,146 +116,55 @@ EID_db_u1         : _setEff(@spr_db_u1     ,1 ,0 ,0  ,sms_death,dead_time,false)
             break;
          end;
 
-
-         {case e of
-
-           MID_Flyer     : begin t:=15; anl:=3;  ans:= 4; end;
-           MID_SShot,
-           MID_SSShot,
-           MID_Bullet,
-           MID_Bulletx2,
-           MID_TBullet,
-           MID_MBullet,
-           MID_Imp,
-           MID_Cacodemon,
-           MID_Baron     : begin t:=31; anl:=3;  ans:= 8; end;
-           UID_HEye,
-           EID_BFG       : begin t:=31; anl:=3;  ans:=-8; end;
-           EID_BExp      : begin t:=41; anl:=5;  ans:=-7; end;
-           EID_BBExp     : begin t:=62; anl:=8;  ans:=-7; end;
-           EID_HUpgr     : begin t:=65; anl:=5;  ans:=-11;end;
-           MID_YPlasma,
-           MID_BPlasma   : begin t:=23; anl:=5;  ans:=5  ;end;
-           MID_Revenant,
-           MID_RevenantS : begin t:=23; anl:=10; ans:=8  ;end;
-           EID_Blood,
-           MID_HRocket,
-           MID_Granade,
-           MID_Tank,
-           MID_Mancubus,
-           EID_Exp       : begin t:=23; anl:=2; ans:=-8 ;end;
-           EID_Exp2      : begin t:=39; anl:=4; ans:=-8 ;end;
-           MID_BFG       : begin t:=44; anl:=5; ans:= 8 ;end;
-           EID_HKT_h,
-           EID_HKT_s     : t:=60;
-
-           EID_Gavno     : begin t:=63; anl:=7; ans:=-8;t2:=dead_time; end;
-           EID_ArchFire  : begin t:=57; anl:=7; ans:= 8 ;end;
-           EID_HMU,
-           EID_HCC,
-           EID_HAMU
-                         : t:=fr_fps;
-         else
-           t:=0;
-         end;   }
-
-        break;
-     end;
+         eid:=ee;
+         break;
+      end;
 end;
 
 procedure effects_sprites(noanim,draw:boolean);
-var ei,ea,
+var ei,
  alpha:integer;
    spr:PTMWSprite;
-   msk:cardinal;
+
 begin
    for ei:=1 to vid_mvs do
     with _effects[ei] do
      if(anim_last_i_t<>0)then
      begin
         alpha:=255;
-        msk  :=0;
 
         spr:=@spr_dummy;
 
-        if(anim_last_i_t>=0)then alpha:=min2(255,anim_last_i_t);
+        if(anim_last_i_t>=0)then
+         case eid of
+EID_HMU,
+EID_HCC,
+EID_HAMU,
+EID_HKT_h   : alpha:=anim_last_i_t*4;
+EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
+         else alpha:=min2(255,anim_last_i_t);
+         end;
 
         if(noanim=false)then
         begin
-           if(anim_i<anim_last_i)
-           then inc(anim_i,1)
+           if(anim_i<>anim_last_i)then
+           begin
+              if(z>0)then begin inc(y,1);dec(z,1);end;
+              if(z<0)then begin dec(y,1);inc(z,1);end;
+              if(anim_i<anim_last_i)then inc(anim_i,1);
+              if(anim_i>anim_last_i)then dec(anim_i,1);
+           end
            else
-             if(anim_i>anim_last_i)
-             then dec(anim_i,1)
-             else
-             begin
-                if(anim_last_i_t>0)then dec(anim_last_i_t,1);
-                if(anim_last_i_t<0)then anim_last_i_t:=0;
-             end;
+           begin
+              if(anim_last_i_t>0)then dec(anim_last_i_t,1);
+              if(anim_last_i_t<0)then anim_last_i_t:=0;
+           end;
         end;
 
         spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step);
 
         if(draw)then
-         if(_rectvis(x,y,spr^.hw,spr^.hh,0))then
-          _sl_add_eff(x,y,d,msk,spr,alpha);
+         if(_rectvis(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
      end;
 end;
 
-
-{case e of
-UID_LostSoul   : spr:=@spr_lostsoul[ea];
-UID_Pain       : spr:=@spr_pain    [ea];
-MID_Flyer      : spr:=@spr_u_p3    [ea];
-MID_SShot,
-MID_SSShot,
-MID_Bullet,
-MID_Bulletx2,
-MID_TBullet,
-MID_MBullet    : spr:=@spr_u_p1    [ea];
-MID_Imp        : spr:=@spr_h_p0    [ea];
-MID_Cacodemon  : spr:=@spr_h_p1    [ea];
-MID_Baron      : spr:=@spr_h_p2    [ea];
-EID_BFG        : spr:=@spr_eff_bfg [ea];
-UID_HEye       : spr:=@spr_h_p2    [ea];
-EID_BExp       : spr:=@spr_eff_eb  [ea]; // 0 .. 5   40
-EID_BBExp      : spr:=@spr_eff_ebb [ea]; // 0 .. 8   62
-EID_HUpgr      : begin
-                  spr:=@spr_eff_tel[ea]; // 0 .. 5   65
-                  msk:=c_ared;
-                 end;
-EID_Teleport   : spr:=@spr_eff_tel [ea]; // 0 .. 5   65
-MID_YPlasma    : spr:=@spr_h_p7    [ea];
-MID_BPlasma    : spr:=@spr_u_p0    [ea];
-MID_Revenant,
-MID_RevenantS  : spr:=@spr_h_p4    [ea];
-MID_HRocket,
-MID_Granade,
-MID_Tank,
-MID_Mancubus,
-EID_Exp        : spr:=@spr_eff_exp [ea]; // 0 .. 2   23
-EID_Exp2       : spr:=@spr_eff_exp2[ea]; // 0 .. 4   39
-MID_BFG        : spr:=@spr_u_p2[5-(t div 8)];
-EID_HKT_h      : begin spr:=@spr_HKeep[3]; alpha:=t*4;    end;
-EID_HKT_s      : begin spr:=@spr_HKeep[3]; alpha:=255-t*4;end;
-EID_db_h0      : spr:=@spr_db_h0;
-EID_db_h1      : spr:=@spr_db_h1;
-EID_db_u0      : spr:=@spr_db_u0;
-EID_db_u1      : spr:=@spr_db_u1;
-EID_HMU        : begin spr:=@spr_UMilitaryUnit [3]; alpha:=t*4; end;
-EID_HAMU       : begin spr:=@spr_UAMilitaryUnit[3]; alpha:=t*4; end;
-EID_HCC        : begin spr:=@spr_UCommandCenter[3]; alpha:=t*4; end;
-EID_Gavno      : spr:=@spr_eff_g[ea]; // 0 .. 7   63
-EID_Blood      : begin spr:=@spr_blood[ea]; if(t>15)and(onlyspr=false)then inc(y,1); end;
-EID_ArchFire   : spr:=@spr_h_p6[ea];
-else
-  spr:=@spr_dummy;
-end;}
-
-{
-anim_i,
-anim_last,
-anim_as,
-anim_lastt,
-anim_smstate
-}

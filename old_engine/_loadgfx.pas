@@ -31,7 +31,7 @@ procedure _GfxColors;
 begin
    c_dred    :=rgba2c(190,  0,  0,255);
    c_red     :=rgba2c(255,  0,  0,255);
-   c_ared    :=rgba2c(255,  0,  0,42 );
+   c_ared    :=rgba2c(255,  0,  0,82 );
    c_orange  :=rgba2c(255,140,  0,255);
    c_dorange :=rgba2c(230, 96,  0,255);
    c_brown   :=rgba2c(140, 90, 10,255);
@@ -623,6 +623,24 @@ begin
    _LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
    _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
 
+   _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_u0          ,race_dir[r_uac ]+'db_u0'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_db_u1          ,race_dir[r_uac ]+'db_u1'        ,smt_effect ,firstload);
+
+   _LoadMWSModel(@spr_h_p0           ,race_missiles[r_hell]+'h_p0_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_h_p1           ,race_missiles[r_hell]+'h_p1_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_h_p2           ,race_missiles[r_hell]+'h_p2_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_h_p3           ,race_missiles[r_hell]+'h_p3_'   ,smt_missile,firstload);
+   _LoadMWSModel(@spr_h_p4           ,race_missiles[r_hell]+'h_p4_'   ,smt_missile,firstload);
+   _LoadMWSModel(@spr_h_p5           ,race_missiles[r_hell]+'h_p5_'   ,smt_missile,firstload);
+   _LoadMWSModel(@spr_h_p6           ,race_missiles[r_hell]+'h_p6_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_h_p7           ,race_missiles[r_hell]+'h_p7_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p0           ,race_missiles[r_uac ]+'u_p0_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p1           ,race_missiles[r_uac ]+'u_p1_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
+
    _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
@@ -630,11 +648,7 @@ begin
    _LoadMWSModel(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect ,firstload);
-
-   _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
-   _LoadMWSModel(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
-   _LoadMWSModel(@spr_db_u0          ,race_dir[r_uac ]+'db_u0'        ,smt_effect ,firstload);
-   _LoadMWSModel(@spr_db_u1          ,race_dir[r_uac ]+'db_u1'        ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_blood          ,effects_folder+'blood'          ,smt_effect ,firstload);
 
    _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);

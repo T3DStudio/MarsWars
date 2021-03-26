@@ -33,13 +33,15 @@ TDecal = record
 end;
 
 TEffect = record
-   x,y,d,
+   eid      : byte;
+   x,y,z,d,
    anim_i,
    anim_last_i,
    anim_step,
    anim_last_i_t,
    anim_smstate
             : integer;
+   smask    : cardinal;
    smodel   : PTMWSModel;
 end;
 
