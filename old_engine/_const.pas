@@ -268,6 +268,14 @@ uab_building_adv       = 4;
 uab_radar              = 5;
 uad_htowertele         = 6;
 
+clint_rld_abils = [
+                   uab_teleport     ,
+                   uab_uac_unit_adv ,
+                   uab_hell_unit_adv,
+                   uab_building_adv ,
+                   uab_radar
+                   ];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT BUFFs

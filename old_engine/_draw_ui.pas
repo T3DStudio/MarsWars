@@ -210,7 +210,7 @@ begin
 end;
 
 procedure d_Panel(tar:pSDL_Surface);
-var ui,ux,uy,uid,r:integer;
+var ui,ux,uy,uid,rid,rld:integer;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div fr_fps)+1) end;
 begin
@@ -280,10 +280,14 @@ begin
 
                r:=_uid_cndt(@_players[HPlayer],uid);
 
+               if(_unids[uid]._ability in clint_rld_abils)
+               then rld:=0
+               else rld:=0;
+
                _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
-               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,i2s(r) ,
-               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_white,(bld_r>0)and(r=9));
+               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,rld   ,
+               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_aqua,(bld_r>0)and(r=9));
             end;
             {case ui of
             5 : if(ucl_x[5]>0)then

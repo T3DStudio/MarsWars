@@ -420,10 +420,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                          UID_UMilitaryUnit,
                                          UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
                                                              then uo_tar:=o_y0; }
-                                         UID_HTower,
-                                         UID_HTotem        : if(o_y0<>u)and(o_y0<>0)
-                                                             then uo_tar:=o_y0
-                                                             else ;//_unit_b247teleport(pu);
                                          else
                                            uo_tar:=0;
                                            uo_x  :=o_x1;

@@ -1,7 +1,3 @@
-const
-
-  clnet_rld              = [UID_UVehicleFactory,UID_HTeleport,UID_UNuclearPlant,UID_HFortress];
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,29 +149,13 @@ begin
            end
            else
            begin
-              _wudata_byte(vx shr 5,rpl);
-              _wudata_byte(vy shr 5,rpl);
+              _wudata_byte(byte(vx shr 5),rpl);
+              _wudata_byte(byte(vy shr 5),rpl);
            end;
 
          if(sh>0)then
          begin
             //if(uidi in whocanattack)and(a_tar1>0)then _wudata_int(tar1,rpl);
-            {if(_isbuilding)and(bld)then
-             case uidi of
-               UID_URadar:
-                  if(rpl)or(_players[_pl].team=player^.team)then
-                   if(_wrld(@rld,rpl)>19)then
-                   begin
-                      _wudata_int(uo_x ,rpl);
-                      _wudata_int(uo_y ,rpl);
-                   end;
-               UID_URocketL:
-                  if(_wrld(@rld,rpl)>0)then
-                  begin
-                     _wudata_int(uo_x ,rpl);
-                     _wudata_int(uo_y ,rpl);
-                  end;
-             end; }
 
             if(rpl=false)and(playeri=_pl)then
             begin
@@ -184,7 +164,7 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uidi in clnet_rld)then _wrld(@rld,rpl);
+                     if(_ability in clint_rld_abils)then _wrld(@rld,rpl);
                      _wprod(pu,rpl);
                   end;
                   if(sel)and(_UnitHaveRPoint(pu))then
@@ -198,58 +178,34 @@ begin
       end;
    end;
 end;
-{
-procedure _wupgrades(pp:byte;rpl:boolean);
-var i,p,
-    b,v:byte;
-    w  :boolean;
-begin
-   for p:=1 to MaxPlayers do
-    if((pp and (1 shl p))>0)then
-     with _players[p] do
-     begin
-        v:=0;
-        b:=0;
-        w:=false;
-        for i:=1 to 255 do
-         with _tupids[i] do
-          if(_urace=race)or(_urace=255)then
-          begin
-             if((b mod 2)=0)then
-             begin
-                v:=upgr[i];
-                w:=true;
-             end
-             else
-             begin
-                v:=v or (upgr[i] shl 4);
-                _wudata_byte(v,rpl);
-                w:=false;
-             end;
-             inc(b,1);
-          end;
-        if(w)then _wudata_byte(v,rpl);
-     end;
-end;
 
-}
 
 procedure _wpupgr(rpl:boolean);
-var i,n,u,y:byte;
+var i,n,bp,bv:byte;
 begin
    for i:=1 to MaxPlayers do
-    with _players[i] do
-     if((G_plstat and (1 shl i))>0)then
-      for n:=0 to 255 do
-       if(race=_upids[n]._up_race)then
-       begin
-          {y:=0;
-          u:=n*2;
-          if(u<=255)then y:=y or  upgr[u];
-          inc(u,1);
-          if(u<=255)then y:=y or (upgr[u] shl 4);
-          _wudata_byte(y,rpl);  }
-       end;
+    if((G_plstat and (1 shl i))>0)then
+     with _players[i] do
+     begin
+        bp:=0;
+
+        for n:=0 to 255 do
+         if(race=_upids[n]._up_race)then
+          case bp of
+          0: begin
+                bv:=upgr[n];
+                bp:=1;
+             end;
+          1: begin
+                bv:=bv or (upgr[n] shl 4);
+                _wudata_byte(bv,rpl);
+                bp:=0;
+                bv:=0;
+             end;
+          end;
+
+        if(bp=1)then _wudata_byte(bv,rpl);
+     end;
 end;
 
 procedure _wclinet_gframe(_pl:byte;rpl:boolean);
@@ -343,10 +299,6 @@ begin
          else
          begin
             _unit_bld_inc_cntrs(pu);
-            {inc(cenerg,_generg);
-            inc(menerg,_generg);
-            inc(uid_eb[uidi],1);
-            inc(ucl_eb[_isbuilding,_ucl],1); }
 
             p:=@ucl_x[_isbuilding,_ucl];
             if(p^=0)
@@ -360,29 +312,29 @@ begin
             else if(0<p^)and(p^<=MaxUnits)then
                   if(_units[p^].uidi<>uidi)then p^:=unum;
 
-           // _unit_done_inc_cntrs(pu);
+            _unit_done_inc_cntrs(pu);
 
-             if(_isbarrack)then
-              for i:=0 to MaxUnitProds do
-               if(uprod_r[i]>0)then
-               begin
-                  _puid:=uprod_u[i];
+            if(_isbarrack)then
+             for i:=0 to MaxUnitProds do
+              if(uprod_r[i]>0)then
+              begin
+                 _puid:=uprod_u[i];
 
-                  inc(uproda,1);
-                  inc(uprodc[_uids[_puid]._ucl],1);
-                  inc(uprodu[_puid],1);
-                  dec(cenerg,_uids[_puid]._renerg);
-               end;
-             if(_issmith)then
-              for i:=0 to MaxUnitProds do
-               if(pprod_r[i]>0)then
-               begin
-                  _puid:=pprod_u[i] ;
+                 inc(uproda,1);
+                 inc(uprodc[_uids[_puid]._ucl],1);
+                 inc(uprodu[_puid],1);
+                 dec(cenerg,_uids[_puid]._renerg);
+              end;
+            if(_issmith)then
+             for i:=0 to MaxUnitProds do
+              if(pprod_r[i]>0)then
+              begin
+                 _puid:=pprod_u[i] ;
 
-                  inc(pproda,1);
-                  inc(pprodu[_puid],1);
-                  dec(cenerg,_upids[_puid]._up_renerg);
-               end;
+                 inc(pproda,1);
+                 inc(pprodu[_puid],1);
+                 dec(cenerg,_upids[_puid]._up_renerg);
+              end;
          end;
       end;
    end;
@@ -501,7 +453,7 @@ begin
    pu:=@_units[0];
    with uu^ do
     with player^ do
-     if(pu^.hits<=dead_hits)and(hits>dead_hits)then // d to a
+     if(pu^.hits<=dead_hits)and(hits>dead_hits)then // not exists to exists
      begin
         _unit_def(uu);
 
@@ -526,7 +478,7 @@ begin
         _ucInc(uu);
      end
      else
-       if(pu^.hits>dead_hits)and(hits<=dead_hits)then // a to d
+       if(pu^.hits>dead_hits)and(hits<=dead_hits)then // exists to not exists
        begin
           vx:=x;
           vy:=y;
@@ -536,8 +488,8 @@ begin
           _unit_upgr(pu);
           _ucDec(pu);
 
-          x:=-32000;
-          y:=-32000;
+          x :=-32000;
+          y :=-32000;
           vx:=x;
           vy:=y;
        end
@@ -645,8 +597,8 @@ begin
                end;
             end;
 
-            if(tar1>0)and(tar1<=MaxUnits)then tar1d:=dist2(x,y,_units[tar1].x,_units[tar1].y);
-                  }
+            if(tar1>0)and(tar1<=MaxUnits)then tar1d:=dist2(x,y,_units[tar1].x,_units[tar1].y);    }
+
             if(speed>0)then
             begin
                uo_x:=pu^.x;
@@ -683,7 +635,7 @@ begin
                begin
                   vstp:=UnitStepNum;
 
-                  dir:=p_dir(uo_x,uo_y,x,y);
+                  dir :=p_dir(uo_x,uo_y,x,y);
                end;
             end;
          end;
@@ -855,35 +807,15 @@ begin
          if(sh>0)then
          begin
            // if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
-            {if(uid^._isbuilding)and(bld)then
-             case uidi of
-              UID_URadar:
-                if(rpl)or(_players[_pl].team=player^.team)then
-                begin
-                   if(_rrld(@rld_t,rpl)>19)then
-                   begin
-                      uo_x:=_rudata_int(rpl,-1000);
-                      uo_y:=_rudata_int(rpl,-1000);
-                   end;
-                end;
-              UID_URocketL:
-                begin
-                   if(_rrld(@rld_t,rpl)>0)then
-                   begin
-                      uo_x:=_rudata_int(rpl,0);
-                      uo_y:=_rudata_int(rpl,0);
-                   end;
-                end;
-             end; }
 
-            if(rpl=false)and(playeri=HPlayer)then
+            if(rpl=false)and(playeri=_pl)then
             begin
                if(sel)then order:=_rudata_byte(rpl,0);
                if(uid^._isbuilding)then
                begin
                   if(bld)then
                   begin
-                     if(uidi in clnet_rld)then _rrld(@rld,rpl);
+                     if(uid^._ability in clint_rld_abils)then _rrld(@rld,rpl);
                      _rprod(uu,rpl);
                   end;
                   if(sel)and(_UnitHaveRPoint(uu))then
@@ -905,20 +837,33 @@ begin
    _netSetUcl(uu);
 end;
 
+
 procedure _rpdata(rpl:boolean);
-var i,o,u,y:byte;
+var i,n,bp,bv:byte;
 begin
-  { for i:=1 to MaxPlayers do
+   if(G_plstat>0)then
+   for i:=1 to MaxPlayers do
     if((G_plstat and (1 shl i))>0)then
      with _players[i] do
-      for o:=0 to _clupgrs do
-      begin
-         y:=_rudata_byte(rpl,0);
-         u:=o*2;
-         if(u<=MaxUpgrs)then upgr[u]:=min2(upgrade_cnt[race,u],y and %00001111);
-         inc(u,1);
-         if(u<=MaxUpgrs)then upgr[u]:=min2(upgrade_cnt[race,u],y shr 4);
-      end;  }
+     begin
+        bp:=0;
+
+        for n:=0 to 255 do
+        with _upids[n] do
+         if(race=_up_race)then
+         case bp of
+         0: begin
+               bv:=_rudata_byte(rpl,0);
+               upgr[n]:=min2(_up_max,bv and %00001111);
+               bp:=1;
+            end;
+         1: begin
+               upgr[n]:=min2(_up_max,bv shr 4);
+               bp:=0;
+            end;
+         end;
+
+     end;
 end;
 
 procedure ClNUnits;
@@ -991,16 +936,6 @@ gm_ct: for i:=1 to MaxCPoints do g_cpt_pl[i].pl:=_rudata_byte(rpl,0);
          _units[_N_U].unum:=_N_U;
          _rudata(@_units[_N_U],rpl,_pl);
       end;
-
-      {for i:=0 to MaxPlayers do
-       with _players[i] do
-       begin
-          menerg:=0;
-          inc(menerg,ucl_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
-          inc(menerg,ucl_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
-          inc(menerg,ucl_eb[true,9]*_ulst[cl2uid[race,true,9]].generg);
-          if(G_startb=5)then inc(menerg,100);
-       end;  }
    end;
 end;
 {$ENDIF}
