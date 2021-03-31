@@ -522,7 +522,7 @@ zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,
 gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
-whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_UMine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
+//whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_UMine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
@@ -637,7 +637,7 @@ _hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_F , SDLK_G , SDLK_H      );
 
 
-whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_UMine,UID_UTurret,UID_UPTurret];
+//whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_UMine,UID_UTurret,UID_UPTurret];
 
 _buffst                : array[false..true] of smallint = (0,_ub_infinity);
 

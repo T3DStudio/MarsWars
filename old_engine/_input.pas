@@ -190,7 +190,7 @@ begin
        end;
 co_paction,
 co_move ,co_patrol,
-co_amove,co_apatrol : if(ui_uimove=0)then m_brush:=co_empty;
+co_amove,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
    else
    end;
 end;
@@ -556,7 +556,7 @@ begin
 co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
-               _effect_add(m_mx,m_my-50,10000,EID_HCC);
+               //_effect_add(m_mx,m_my-50,10000,EID_HCC);
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
@@ -605,7 +605,7 @@ co_apatrol: _command(m_mx,m_my);
       _view_bounds;
    end;
 
-   if(k_mr=2)then _effect_add(m_mx,m_my-50,10000,EID_HMU);
+   //if(k_mr=2)then _effect_add(m_mx,m_my-50,10000,EID_HMU);
 
    if(k_mr=2)then                 // RMB down
     if(m_brush<>co_empty)

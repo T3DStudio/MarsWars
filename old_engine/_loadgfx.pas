@@ -834,11 +834,11 @@ begin
 
    ui_uiuphx    := vid_mapx+(vid_sw div 2);
 
-   ui_ingamecl:=(vid_sw-font_w) div font_w;
+   ui_ingamecl  :=(vid_sw-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
-      mv_x:=(vid_vw-spr_mback^.w) div 2;
-      mv_y:=(vid_vh-spr_mback^.h) div 2;
+      mv_x      :=(vid_vw-spr_mback^.w) div 2;
+      mv_y      :=(vid_vh-spr_mback^.h) div 2;
    end;
    fog_vfw      :=(vid_sw div fog_cw)+2;
    fog_vfh      :=(vid_sh div fog_cw)+2;

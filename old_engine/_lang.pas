@@ -359,7 +359,10 @@ begin
    _mkHStrUid(UID_ZMajor     ,'Zombie Major'   ,'');
    _mkHStrUid(UID_ZBFG       ,'Zombie BFG'     ,'');
 
-   _mkHStrUpid(upgr_hell_b478tel,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
+
+   _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease Hell Teleport cooldown time.'                           );
+   _mkHStrUpid(upgr_hell_b478tel  ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
+
 
   { _mkHStrUpid(upgr_attack  ,'Range attack upgrade'       ,'Increase ranged attacks damage.'                                           );
    _mkHStrUpid(upgr_armor   ,'Unit armor upgrade'         ,'Increase units armor.'                                                     );
@@ -369,7 +372,7 @@ begin
    _mkHStrUpid(upgr_pains   ,'Pain threshold'             ,'Decrease "pain state" chance.'                                             );
    _mkHStrUpid(upgr_vision  ,'Hell eye'                   ,'Lost Soul ability & Hell Eye sight radius.'                                );
    _mkHStrUpid(upgr_towers  ,'Tower range upgrade'        ,'Increase defensive structures range.'                                      );
-   _mkHStrUpid(upgr_5bld    ,'Teleport upgrade'           ,'Decrease Hell Teleport cooldown time.'                                     );
+
    _mkHStrUpid(upgr_mainm   ,'Hell Keep teleportaion'     ,'Hell Keep can teleporting.'                                                );
    _mkHStrUpid(upgr_paina   ,'Decay aura'                 ,'Hell Keep will damage all enemies around.'                                 );
    _mkHStrUpid(upgr_mainr   ,'Hell Keep range upgrade'    ,'Increase Hell Keep sight range.'                                           );
@@ -382,7 +385,7 @@ begin
    _mkHStrUpid(upgr_totminv ,'Hell Totem and Eye invisibility',''                                                                );
    _mkHStrUpid(upgr_bldrep  ,'Building restoration'           ,'Damaged buildings will slowly regenerate their health.'          );
    _mkHStrUpid(upgr_mainonr ,'Free teleportation'             ,'Hell Keep can teleporting on obstacles.'                         );
-   _mkHStrUpid(upgr_b478tel ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
+
    _mkHStrUpid(upgr_hinvuln ,'Invulnerability'                ,'Invulnerability spheres for Hell Altar.'                         );
    _mkHStrUpid(upgr_bldenrg ,'Built-in Hell Symbol'           ,'Additional energy for Hell Keep.'                                );
    _mkHStrUpid(upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown time.'                                );  }

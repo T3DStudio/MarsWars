@@ -145,8 +145,7 @@ end;
 procedure _teleport_rld(tu:PTUnit;ur:integer);
 begin
    with tu^ do
-    with player^ do rld:=fr_fps;
-     //if(upgr[upgr_5bld] in [0..3])then rld_t:=max2(1,ur-((ur div 4)*upgr[upgr_5bld]));
+    with player^ do rld:=max2(fr_hhfps, ur-((ur div 3)*upgr[upgr_hell_teleport]) );
 end;
 
 procedure _unit_teleport(pu:PTUnit;tx,ty:integer);

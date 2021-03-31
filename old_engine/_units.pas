@@ -2404,7 +2404,7 @@ begin
          end;
 
          if(_isbuilding=false)and(tu^.hits>0)and(tu^.bld)and(tu^.uid^._ability=uab_teleport)then
-          if(player^.team=tu^.player^.team)then
+          if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
            if(td<=tu^.uid^._r)then
            begin
               if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then

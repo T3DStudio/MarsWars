@@ -131,8 +131,8 @@ begin
          begin
             i:=pprod_u[pn];
             //if(upgrade_mfrg[race,i])then inc(ui_upgrct[i],1);
-            if(ui_first_upgr_time=0)or(ui_first_upgr_time>pprod_r[pn])then ui_first_upgr_time:=pprod_r[pn];
-            if(ui_upgr[i]  =0)or(ui_upgr[i]>pprod_r[pn])then ui_upgr[i] :=pprod_r[pn];
+            if(ui_first_upgr_time=0)or(pprod_r[pn]<ui_first_upgr_time)then ui_first_upgr_time:=pprod_r[pn];
+            if(ui_upgr[i]=0)or(ui_upgr[i]>pprod_r[pn])then ui_upgr[i]:=pprod_r[pn];
          end;
       end;
    end;
@@ -164,12 +164,12 @@ begin
       if(order<10)then
       begin
          _orders(x,y,order);
-         ui_orders_uids[order]:=ui_orders_uids[order]+[uidi];
+         ui_orders_uids[order,_isbuilding]:=ui_orders_uids[order,_isbuilding]+[uidi];
       end;
 
-      if(speed>0)and(uidi in whocanattack)then
+      if(speed>0)and(_attack>0)then
       begin
-         inc(ui_battle_units,1);
+         inc(ui_uibtn_f2,1);
          _orders(x,y,10);
       end;
 
@@ -180,29 +180,30 @@ begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
             if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
              if(m_brush in uid^.ups_builder)then
-              if((vid_vx-srange)<vx)and(vx<(vid_vx+vid_sw+srange))and
-                ((vid_vy-srange)<vy)and(vy<(vid_vy+vid_sh+srange))then _addUIBldrs(x,y,srange);
+               if(_rectvis(x,y,srange,srange,0))then _addUIBldrs(x,y,srange);
 
             for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)
              then break
              else _unit_uiprodcnts(pu,i);
-         end
-         else
-         begin
-            //inc(ui_bprods[ucl],1);
-            //inc(ui_bprods_n    ,1);
          end;
-         if(sel)and(_UnitHaveRPoint(pu))then _sl_add_dec(uo_x,uo_y,uo_y+1,-32000,@spr_mp[_urace],255,0,0,-spr_mp[_urace].hh);
+         if(sel)and(_UnitHaveRPoint(pu))then _sl_add_dec(uo_x,uo_y,32000,-32000,@spr_mp[_urace],255,0,0,-spr_mp[_urace].hh);
       end;
 
-      if(sel)then
+      if(bld)then
       begin
-         if(bld)then
+         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]=0)then ui_uid_reload[uidi]:=rld;
+
+         if(sel)then
          begin
-            if(speed>0)then inc(ui_uimove,1);
-            if(uidi in whocanaction)then inc(ui_uiaction,1);
+            if(speed>0)then inc(ui_uibtn_move,1);
+            if(_ability in [])then inc(ui_uibtn_action,1);
          end;
+      end
+      else
+      begin
+         inc(ui_uid_builds[uidi],1);
+         inc(ui_uid_buildn      ,1);
       end;
 
    end;

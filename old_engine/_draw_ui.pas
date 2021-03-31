@@ -9,7 +9,7 @@ begin
         r:=(at*2) mod vid_uialrm_ti;
         if(ab)
         then RectangleColor(r_minimap,ax-r,ay-r,ax+r,ay+r, c_white)
-        else CircleColor   (r_minimap,ax  ,ay  ,r,c_white);
+        else CircleColor   (r_minimap,ax  ,ay  ,        r, c_white);
         dec(at,1);
      end;
 
@@ -18,7 +18,7 @@ begin
      with g_cpt_pl[i] do
      begin
         if(ct>0)and((G_Step mod 20)>10)
-        then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray)
+        then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray     )
         else circleColor(r_minimap,mpx,mpy,map_prmm,p_color(pl));
      end;
 end;
@@ -29,7 +29,7 @@ begin
 
    d_Alarms;
 
-   _draw_surf(tar,1,1,r_minimap);
+   _draw_surf(tar      ,1,1,r_minimap );
    _draw_surf(r_minimap,0,0,r_bminimap);
 end;
 
@@ -45,13 +45,13 @@ begin
       dec(m_brushy,vid_vy-ly);
 
       spr:=_uid2spr(m_brush,false);
-      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
+      SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
       _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
       with _uids[m_brush] do
        if(bld_r>0)and(m_brushc=c_lime)
-       then circleColor(tar,m_brushx,m_brushy,_r,c_black)
+       then circleColor(tar,m_brushx,m_brushy,_r,c_black )
        else circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
 
       inc(m_brushx,vid_vx-lx);
@@ -78,7 +78,8 @@ begin
 
       rectangleColor(tar,
       lx+map_b0-vid_vx,ly+map_b0-vid_vy,
-      lx+map_b1 -vid_vx,ly+map_b1 -vid_vy,c_white);
+      lx+map_b1-vid_vx,ly+map_b1-vid_vy,
+      c_white);
    end;
    end;
 end;
@@ -90,10 +91,9 @@ var  x,y,y0:integer;
      b     :boolean;
 begin
 
-  // with _players[HPlayer] do
-  // .._draw_text(tar,ui_oicox-4,ui_texty+2,b2s(lselUID),ta_right,255,c_white);
+   //with _players[HPlayer] do _draw_text(tar,ui_oicox-4,ui_texty+2,b2s(lselUID),ta_right,255,c_white);
 
-   {y  :=ui_texty+vid_oiw;
+   y  :=ui_texty+vid_oiw;
    for i:=1 to 9 do
    begin
       n  :=0;
@@ -112,12 +112,13 @@ begin
              end;
              with _players[HPlayer] do
              begin
-                if(c=4)and(race=r_hell)then
+                {if(c=4)and(race=r_hell)then
                  if(g_addon)
                  then spr_ui_oico[race,b,c]:=spr_iob_knight
-                 else spr_ui_oico[race,b,c]:=spr_iob_baron;
+                 else spr_ui_oico[race,b,c]:=spr_iob_baron;}
 
-                _draw_surf(tar,x,y,spr_ui_oico[race,b,c]);
+                //_draw_surf(tar,x,y,spr_ui_oico[race,b,c]);
+                with _uids[c] do _draw_surf(tar,x,y,un_sbtn.surf);
              end;
 
              dec(x,vid_oisw);
@@ -125,11 +126,11 @@ begin
           end;
       end;
       if(y0=-1)then y0:=y+4;
-      _draw_text(tar,ui_oicox,y0   ,b2s(i)      ,ta_right,255,c_white);
-      _draw_text(tar,ui_oicox,y0+10,i2s(ordn[i]),ta_right,255,c_gray);
+      _draw_text(tar,ui_oicox,y0   ,b2s(i)             ,ta_right,255,c_white);
+      _draw_text(tar,ui_oicox,y0+10,i2s(ui_orders_n[i]),ta_right,255,c_gray);
       inc(y,vid_oihw);
    end;
-   _draw_text(tar,ui_oicox-4,ui_texty+2,str_orders,ta_right,255,c_white);  }
+   _draw_text(tar,ui_oicox-4,ui_texty+2,str_orders,ta_right,255,c_white);
 end;
 
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
@@ -210,7 +211,7 @@ begin
 end;
 
 procedure d_Panel(tar:pSDL_Surface);
-var ui,ux,uy,uid,rid,rld:integer;
+var ui,ux,uy,uid,req,rld:integer;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div fr_fps)+1) end;
 begin
@@ -232,7 +233,7 @@ begin
          end;
 
          case ui of
-         0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_bprods_n,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
+         0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_uid_buildn,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
          1: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[false],uproda     ,ucl_c [false], c_lime ,c_yellow,c_orange, ui=ui_tab);
          2: begin if(pproda>0)then uid:=(ui_first_upgr_time div fr_fps)+1 else uid:=0;
             d_tabbtn(tar,spr_tabs[ui],ux,uy, uid          ,pproda  ,0            , c_white,c_yellow,0       , ui=ui_tab);
@@ -278,35 +279,17 @@ begin
                ux:=(ui mod 3);
                uy:=(ui div 3);
 
-               r:=_uid_cndt(@_players[HPlayer],uid);
+               req:=_uid_cndt(@_players[HPlayer],uid);
 
-               if(_unids[uid]._ability in clint_rld_abils)
-               then rld:=0
+               if(_uids[uid]._ability in clint_rld_abils)
+               then rld:=ui_uid_reload[uid]
                else rld:=0;
 
-               _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(r>0) or not(uid in ui_prod_builds));
+               _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
                _drawBtnt(tar,ux,uy,
-               b2s(ui_bprods[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,rld   ,
-               c_dyellow        ,0 ,c_lime           ,ui_muc[uid_e[uid]>=_max],c_aqua,(bld_r>0)and(r=9));
+               b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(rld),
+               c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,(bld_r>0)and(req=9));
             end;
-            {case ui of
-            5 : if(ucl_x[5]>0)then
-                 if(_units[ucl_x[5]].rld_t>0)then
-                  if(race=r_uac)
-                  then _drawBtnt(tar,ux,uy,'','','','',r2s(_units[ucl_x[5]].rld_t),0,0,0,0,ui_rad_rld[_units[ucl_x[5]].rld_t>_units[ucl_x[5]].rld_a])
-                  else _drawBtnt(tar,ux,uy,'','','','',r2s(_units[ucl_x[5]].rld_t),0,0,0,0,c_aqua);
-            6 : if(ucl_x[6]>0)then
-                 case race of
-                 r_hell: if(upgr[upgr_6bld]       >0)then _drawBtnt(tar,ux,uy,'','','','',b2s(upgr  [upgr_6bld])     ,0,0,0,0,c_red );
-                 r_uac : if(_units[ucl_x[6]].rld_t>0)then _drawBtnt(tar,ux,uy,'','','','',r2s(_units[ucl_x[6]].rld_t),0,0,0,0,c_aqua);
-                 end;
-            8 : if(ucl_x[8]>0)then
-                 case race of
-                 r_hell: if(upgr[upgr_hinvuln]>0)then _drawBtnt(tar,ux,uy,'',''                     ,'','',b2s(upgr[upgr_hinvuln])    ,0,0    ,0,0,c_red );
-                 r_uac : if(upgr[upgr_blizz  ]>0)then _drawBtnt(tar,ux,uy,'',b2s(upgr[upgr_blizz  ]),'','',r2s(_units[ucl_x[8]].rld_t),0,c_red,0,0,c_aqua);
-                 end;
-            9 : if(ucl_x[9]>0)then _drawBtnt(tar,ux,uy,'','','','',r2s(_units[ucl_x[9]].rld_t),0,0,0,0,c_aqua);
-            end; }
          end;
       end;
 
@@ -390,19 +373,19 @@ begin
       end
       else
       begin
-         _drawBtn(tar,0,0,spr_b_move   ,false  ,ui_uimove=0   );
-         _drawBtn(tar,1,0,spr_b_hold   ,false  ,ui_uimove=0   );
-         _drawBtn(tar,2,0,spr_b_patrol ,false  ,ui_uimove=0   );
+         _drawBtn(tar,0,0,spr_b_move   ,false  ,ui_uibtn_move=0   );
+         _drawBtn(tar,1,0,spr_b_hold   ,false  ,ui_uibtn_move=0   );
+         _drawBtn(tar,2,0,spr_b_patrol ,false  ,ui_uibtn_move=0   );
 
-         _drawBtn(tar,0,1,spr_b_attack ,false  ,ui_uimove=0   );
-         _drawBtn(tar,1,1,spr_b_stop   ,false  ,ui_uimove=0   );
-         _drawBtn(tar,2,1,spr_b_apatrol,false  ,ui_uimove=0   );
+         _drawBtn(tar,0,1,spr_b_attack ,false  ,ui_uibtn_move=0   );
+         _drawBtn(tar,1,1,spr_b_stop   ,false  ,ui_uibtn_move=0   );
+         _drawBtn(tar,2,1,spr_b_apatrol,false  ,ui_uibtn_move=0   );
 
-         _drawBtn(tar,0,2,spr_b_action ,false  ,ui_uiaction=0 );
+         _drawBtn(tar,0,2,spr_b_action ,false  ,ui_uibtn_action=0 );
          _drawBtn(tar,1,2,spr_b_rclck  ,m_a_inv,false         );
          _drawBtn(tar,2,2,spr_b_cancel ,false  ,false         );
 
-         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_battle_units=0);
+         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_uibtn_f2=0);
          _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])=0);
       end;
 

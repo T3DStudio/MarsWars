@@ -285,7 +285,7 @@ ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_orders_n,                                             //
 ui_orders_x,                                             //
 ui_orders_y       : array[0..10] of integer;             //
-ui_orders_uids    : array[0..9 ] of TSob;                //
+ui_orders_uids    : array[0..9,false..true] of TSob;     //
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -302,11 +302,12 @@ ui_units_inapc    : array[byte] of integer;
 ui_prod_units     : array[byte] of integer;
 ui_units_ptime    : array[byte] of integer;
 ui_prod_builds    : TSoB;
-ui_bprods         : array[byte] of integer;
-ui_bprods_n       : integer;
-ui_uimove         : integer = 0; // ui move buttons
-ui_uiaction       : integer = 0; // ui action button
-ui_battle_units   : integer = 0; // ui select all button
+ui_uid_builds     : array[byte] of integer;
+ui_uid_buildn     : integer;
+ui_uid_reload     : array[byte] of integer;
+ui_uibtn_move     : integer = 0; // ui move buttons
+ui_uibtn_action   : integer = 0; // ui action button
+ui_uibtn_f2       : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
