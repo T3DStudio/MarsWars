@@ -264,8 +264,8 @@ begin
             u:=dst;
             while true do
             begin
-               ix:=bb0+_gen(bb1);
-               iy:=bb0+_gen(bb1);
+               ix:=bb0+_random(bb1);
+               iy:=bb0+_random(bb1);
                inc(c,1);
                inc(map_seed2,1);
                if(c>500 )then dec(u,1);
@@ -429,9 +429,9 @@ begin
       while true do
       begin
          if(map_sym)
-         then ix:=_genx(ix,map_hmw,false)
-         else ix:=_genx(ix,map_mw ,false);
-         iy:=_genx(iy+ix*cnt,map_mw,true);
+         then ix:=_randomx(ix,map_hmw,false)
+         else ix:=_randomx(ix,map_mw ,false);
+         iy:=_randomx(iy+ix*cnt,map_mw,true);
 
          if(_pickdds(@ix,@iy,@lqs,@rks))then break;
 

@@ -386,8 +386,8 @@ begin
                 begin
                    tu^.inapc:=0;
                    dec(apcc,tu^.uid^._apcs);
-                   inc(tu^.x,randomr(uid^._r));
-                   inc(tu^.y,randomr(uid^._r));
+                   inc(tu^.x,_randomr(uid^._r));
+                   inc(tu^.y,_randomr(uid^._r));
                    tu^.uo_x:=tu^.x;
                    tu^.uo_y:=tu^.y;
                    if(tu^.hits>apc_exp_damage)then
@@ -744,8 +744,8 @@ begin
       begin
          if(t<=0)then t:=1;
 
-         ix:=trunc(ud*(tu^.x-x)/t)+integer(2*_gen(2)-1);
-         iy:=trunc(ud*(tu^.y-y)/t)+integer(2*_gen(2)-1);
+         ix:=trunc(ud*(tu^.x-x)/t)+integer(2*_random(2)-1);
+         iy:=trunc(ud*(tu^.y-y)/t)+integer(2*_random(2)-1);
 
          inc(x,ix);
          inc(y,iy);
@@ -786,8 +786,8 @@ begin
       if(ud<0)then
       begin
          if(t<=0)then t:=1;
-         ix:=trunc(ud*(td^.x-x)/t)+integer(2*_gen(2)-1);
-         iy:=trunc(ud*(td^.y-y)/t)+integer(2*_gen(2)-1);
+         ix:=trunc(ud*(td^.x-x)/t)+integer(2*_random(2)-1);
+         iy:=trunc(ud*(td^.y-y)/t)+integer(2*_random(2)-1);
 
          inc(x,ix);
          inc(y,iy);
@@ -900,7 +900,7 @@ begin
               if(ss<2)then ss:=2;
 
               if(mdist>70)
-              then mdist:=8+_gen(25)
+              then mdist:=8+_random(25)
               else mdist:=50;
 
               dir:=dir_turn(dir,p_dir(x,y,mv_x,mv_y),mdist);
@@ -2625,14 +2625,14 @@ begin
    with pu^ do
    with player^ do
    begin
-      _addtoint(@vsnt[team],vistime);
-      _addtoint(@vsni[team],vistime);
+      _AddToInt(@vsnt[team],vistime);
+      _AddToInt(@vsni[team],vistime);
       if(onlySVCode)and(uclord=_uclord_c)then
        if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
         for i:=0 to MaxPlayers do
         begin
-           _addtoint(@vsnt[i],fr_fps);
-           if(g_mode<>gm_inv)or(playeri>0)then _addtoint(@vsni[i],fr_fps);
+           _AddToInt(@vsnt[i],fr_fps);
+           if(g_mode<>gm_inv)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
         end;
    end;
 end;

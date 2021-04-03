@@ -333,6 +333,7 @@ upgr_hell_teleport: begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_b478tel : begin _up_btn:=spr_b_up[r_hell,21]; end;
 
 upgr_uac_radar_r  : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
+upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 
       end;
 
@@ -1030,6 +1031,7 @@ begin
    _max       := 1;
    _ruid      := UID_UVehicleFactory;
    //_rupgr     := upgr_2tier;
+   _ability   := uad_uac_rstrike;
 
    _isbuilding:=true;
 end;
@@ -1333,11 +1335,11 @@ begin
 
    //         race  id               time lvl enr rupgr     ruid
 
-   _setUPGR(r_hell,upgr_hell_teleport,120,2   ,2  ,0         ,0                ,false,false);
-   _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0         ,UID_HAltar       ,true ,true );
+   _setUPGR(r_hell,upgr_hell_teleport,120,2   ,2  ,0         ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0         ,UID_HAltar         ,true ,true );
 
-   _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0         ,0                ,false,false);
-
+   _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0         ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UVehicleFactory,true ,true );
 
 
 

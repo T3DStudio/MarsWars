@@ -744,7 +744,7 @@ begin
          buff[ub_teleeff  ]:=0;
       end;
 
-      if(rpl=false)then _addtoint(@vsnt[_players[HPlayer].team],vistime);
+      if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
    end;
 end;
 

@@ -16,7 +16,7 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-procedure _units_au(p:byte;g:TSob;max:integer;new:boolean);
+procedure _units_au(p:byte;g:TSob;max:integer;new:boolean);  // allowed units
 var i:byte;
 begin
    with _players[p] do
@@ -28,7 +28,7 @@ begin
          with _uids[i] do a_units[i]:=min2(_max,max);
    end;
 end;
-procedure _upgrs_au(p:byte;g:TSob;lvl:integer;new:boolean);
+procedure _upgrs_au(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -41,7 +41,7 @@ begin
    end;
 end;
 
-procedure _upgrs_ss(p:byte;g:TSob;lvl:integer;new:boolean);
+procedure _upgrs_ss(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -71,7 +71,7 @@ end;
 function cf(c,f:pcardinal):boolean;
 begin cf:=(c^ and f^)>0;end;
 
-function sign(x:integer):shortint;
+function sign(x:integer):integer;
 begin
    sign:=0;
    if(x>0)then sign:= 1;
@@ -144,36 +144,36 @@ begin
    _IsUnitRange:=(0<u)and(u<=MaxUnits);
 end;
 
-procedure _addtoint(bt:pinteger;val:integer);
+procedure _AddToInt(bt:pinteger;val:integer);
 begin
    if(bt^<val)then bt^:=val;
 end;
 
-function _gen(x:integer):integer;
+function _random(x:integer):integer;
 begin
-   _gen:=map_seed2*5+167;
-   map_seed2:=_gen;
+   _random:=map_seed2*5+167;
+   map_seed2:=_random;
    if(x=0)
-   then _gen:=0
-   else _gen:=abs(_gen mod x);
+   then _random:=0
+   else _random:=abs(_random mod x);
    inc(map_seed2,17);
 end;
 
-function _genx(x,m:integer;newn:boolean):integer;
+function _randomx(x,m:integer;newn:boolean):integer;
 begin
-   _genx:=(x*5)+integer(map_seed+map_seed2);
+   _randomx:=(x*5)+integer(map_seed+map_seed2);
    if(m=0)
-   then _genx:=0
-   else _genx:=abs(_genx mod m);
+   then _randomx:=0
+   else _randomx:=abs(_randomx mod m);
    if(newn)then inc(map_seed2,67);
 end;
 
-function randomr(r:integer):integer;
+function _randomr(r:integer):integer;
 begin
-   randomr:=_gen(r)-_gen(r);
+   _randomr:=_random(r)-_random(r);
 end;
 
-procedure WriteError;
+procedure WriteSDLError;
 var f:Text;
 begin
    Assign(f,outlogfn);
@@ -183,48 +183,47 @@ begin
    Close(f);
 end;
 
-function _uid_cndt(pl:PTPlayer;uid:byte):integer;
-function setr(ni:integer;b:boolean):boolean;
-begin setr:=false;if(b)and(_uid_cndt=0)then begin _uid_cndt:=ni;setr:=true;end;end;
+function _uid_cndt(pl:PTPlayer;uid:byte):cardinal;
+procedure setr(ni:cardinal;b:boolean);
+begin if(b)then _uid_cndt:=_uid_cndt or ni;end;
 begin
    _uid_cndt:=0;
    with pl^ do
    with _uids[uid] do
    begin
-      if setr(1 ,(army+uproda)>=MaxPlayerUnits  ) then exit;
-      if setr(2 ,(_ruid >0)and(uid_eb[_ruid ]=0)) then exit;
-      if setr(3 ,(_rupgr>0)and(upgr  [_rupgr]=0)) then exit;
-      if setr(4 , cenerg<_renerg                ) then exit;
-      if setr(5 , _btime<=0                     ) then exit;
-      if setr(6 ,(_addon)and(G_addon=false)     ) then exit;
-         setr(7 ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
+      setr(ureq_unitlimit ,(army+uproda)>=MaxPlayerUnits  );
+      setr(ureq_ruid      ,(_ruid >0)and(uid_eb[_ruid ]=0));
+      setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]=0));
+      setr(ureq_energy    , cenerg<_renerg                );
+      setr(ureq_time      , _btime<=0                     );
+      setr(ureq_addon     ,(_addon)and(G_addon=false)     );
+      setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
 
       case _isbuilding of
       true : begin
-             if setr(8 ,n_builders<=0) then exit;
-             if setr(9 ,bld_r      >0) then exit;
+             setr(ureq_builders ,n_builders<=0);
+             setr(ureq_bld_r    ,bld_r      >0);
              end;
-      false: if setr(10,n_barracks<=0) then exit;
+      false: setr(ureq_barracks ,n_barracks<=0);
       end;
    end;
 end;
-function _upid_cndt(pl:PTPlayer;up:byte):integer;
-function setr(ni:integer;b:boolean):boolean;
-begin setr:=false;if(b)and(_upid_cndt=0)then begin _upid_cndt:=ni;setr:=true;end;end;
+function _upid_cndt(pl:PTPlayer;up:byte):cardinal;
+procedure setr(ni:cardinal;b:boolean);
+begin if(b)then _upid_cndt:=_upid_cndt or ni;end;
 begin
    _upid_cndt:=0;
    with pl^ do
    with _upids[up] do
    begin
-      if setr(11, n_smiths<=0                           ) then exit;
-
-      if setr(2 ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  ) then exit;
-      if setr(3 ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  ) then exit;
-      if setr(4 , cenerg<_up_renerg                     ) then exit;
-      if setr(5 , _up_time<=0                           ) then exit;
-      if setr(6 ,(_up_addon)and(G_addon=false)          ) then exit;
-      if setr(8 ,(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up]))) then exit;
-         setr(12,(_up_mfrg=false)and(pprodu[up]>0)      );
+      setr(ureq_ruid   ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  );
+      setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
+      setr(ureq_energy , cenerg<_up_renerg                     );
+      setr(ureq_time   , _up_time<=0                           );
+      setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
+      setr(ureq_max    ,(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up])));
+      setr(ureq_product,(_up_mfrg=false)and(pprodu[up]>0)      );
+      setr(ureq_smiths , n_smiths<=0                           );
    end;
 end;
 

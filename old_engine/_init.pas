@@ -5,7 +5,7 @@ function InitVideo:boolean;
 begin
    InitVideo:=false;
 
-   if SDL_Init(SDL_INIT_VIDEO)<>0 then begin WriteError; exit; end;
+   if SDL_Init(SDL_INIT_VIDEO)<>0 then begin WriteSDLError; exit; end;
 
    NEW(_rect);
 

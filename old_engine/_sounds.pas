@@ -267,12 +267,12 @@ var r:byte;
 begin
    InitSound:=false;
 
-   if(SDL_Init(SDL_INIT_AUDIO)<>0)then begin WriteError; exit; end;
+   if(SDL_Init(SDL_INIT_AUDIO)<>0)then begin WriteSDLError; exit; end;
 
    if(MIX_OPENAUDIO(AUDIO_FREQUENCY,
                     AUDIO_FORMAT,
                     AUDIO_CHANNELS,
-                    AUDIO_CHUNKSIZE)<>0) then begin WriteError; exit; end;
+                    AUDIO_CHUNKSIZE)<>0) then begin WriteSDLError; exit; end;
 
    LoadAllMusic;
    ShafleMusicList;

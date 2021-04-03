@@ -67,7 +67,7 @@ begin
    ts1:=sdl_createRGBSurface(0,tw,th,vid_bpp,0,0,0,0);
    if(ts1=nil)then
    begin
-      WriteError;
+      WriteSDLError;
       HALT;
    end
    else
@@ -76,7 +76,7 @@ begin
       SDL_FreeSurface(ts1);
       if(ts2=nil)then
       begin
-         WriteError;
+         WriteSDLError;
          HALT;
       end;
       _createSurf:=ts2;
@@ -231,7 +231,7 @@ begin
       begin
          case animst of
          0:   p:=e+random(e);
-         else p:=e+_genx(dir+i,e,false);
+         else p:=e+_randomx(dir+i,e,false);
          end;
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
@@ -814,8 +814,8 @@ begin
     with _tdecals[i-1] do
     begin
        inc(rn,17);
-       ix:=_genx(ix+rn       ,vid_mwa,false);
-       iy:=_genx(iy+sqr(ix*i),vid_mha,false);
+       ix:=_randomx(ix+rn       ,vid_mwa,false);
+       iy:=_randomx(iy+sqr(ix*i),vid_mha,false);
        x :=ix;
        y :=iy;
     end;
@@ -979,7 +979,7 @@ begin
    then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags + SDL_FULLSCREEN)
    else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags);
 
-   if(r_screen=nil)then begin WriteError; exit; end;
+   if(r_screen=nil)then begin WriteSDLError; exit; end;
 
    _ScreenSurfaces;
 end;

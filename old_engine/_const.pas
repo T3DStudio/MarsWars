@@ -108,6 +108,7 @@ nmid_order             = 15;
 nmid_plout             = 16;
 nmid_getinfo           = 66;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  PLAYER ORDERS
@@ -123,6 +124,25 @@ uo_setorder            = 7;
 uo_corder              = 8;
 uo_specsel             = 9;
 uo_addorder            = 10;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT & UPGRADES REQUIREMENTS BITS
+//
+
+ureq_unitlimit         : cardinal = %0000000000000001;
+ureq_ruid              : cardinal = %0000000000000010;
+ureq_rupid             : cardinal = %0000000000000100;
+ureq_energy            : cardinal = %0000000000001000;
+ureq_time              : cardinal = %0000000000010000;
+ureq_addon             : cardinal = %0000000000100000;
+ureq_max               : cardinal = %0000000001000000;
+ureq_builders          : cardinal = %0000000010000000;
+ureq_bld_r             : cardinal = %0000000100000000;
+ureq_barracks          : cardinal = %0000001000000000;
+ureq_smiths            : cardinal = %0000010000000000;
+ureq_product           : cardinal = %0000100000000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -267,13 +287,15 @@ uab_hell_unit_adv      = 3;
 uab_building_adv       = 4;
 uab_radar              = 5;
 uad_htowertele         = 6;
+uad_uac_rstrike        = 7;
 
 clint_rld_abils = [
                    uab_teleport     ,
                    uab_uac_unit_adv ,
                    uab_hell_unit_adv,
                    uab_building_adv ,
-                   uab_radar
+                   uab_radar        ,
+                   uad_uac_rstrike
                    ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -378,7 +400,7 @@ upgr_uac_mines         = 43; // mines for engineers
 upgr_uac_minesen       = 44; // mine-sensor
 upgr_uac_6bld          = 45; // Souls / adv
 //upgr_uac_2tier         = 46; // Tier 2
-upgr_uac_blizz         = 47; // blizzard launch
+upgr_uac_rstrike       = 47; // rstrike launch
 upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
 upgr_uac_6bld2         = 50; // 6bld upgr

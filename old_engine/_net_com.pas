@@ -14,7 +14,7 @@ begin
    net_buf:=SDLNet_AllocPacket(MaxNetBuffer);
    if (net_buf=nil) then
    begin
-      WriteError;
+      WriteSDLError;
       exit;
    end;
 
@@ -26,7 +26,7 @@ begin
 
    if (net_socket=nil) then
    begin
-      WriteError;
+      WriteSDLError;
       exit;
    end;
 
@@ -36,7 +36,7 @@ end;
 function InitNET:boolean;
 begin
    InitNET:=(SDLNet_Init=0);
-   if(InitNET=false)then WriteError;
+   if(InitNET=false)then WriteSDLError;
 end;
 
 procedure net_dispose;

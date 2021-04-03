@@ -1219,12 +1219,12 @@ begin
       if(td<=(tu^.srange+uid^._r))then
       begin
          if(buff[ub_invis]<=0)
-         then _addtoint(@vsnt[tu^.player^.team],vistime)
+         then _AddToInt(@vsnt[tu^.player^.team],vistime)
          else
            if(tu^.buff[ub_detect]>0)and(tu^.bld)and(tu^.hits>0)then
            begin
-              _addtoint(@vsnt[tu^.player^.team],vistime);
-              _addtoint(@vsni[tu^.player^.team],vistime);
+              _AddToInt(@vsnt[tu^.player^.team],vistime);
+              _AddToInt(@vsni[tu^.player^.team],vistime);
            end;
       end;
    end;
