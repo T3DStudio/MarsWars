@@ -44,6 +44,46 @@ begin
    end;
 end;
 
+procedure setSND(adv:boolean;ready,move,attack,annoy,select:PTSoundSet);
+var b:boolean;
+begin
+   with _uids[u] do
+   for b:=false to true do
+   begin
+      if(adv)and(b=false)then continue;
+      un_snd_ready [b]:=ready;
+      un_snd_move  [b]:=move;
+      un_snd_attack[b]:=attack;
+      un_snd_annoy [b]:=annoy;
+      un_snd_select[b]:=select;
+   end;
+end;
+
+procedure setEID (adv:boolean;ready,death,fdeath:byte);
+var b:boolean;
+begin
+   with _uids[u] do
+   for b:=false to true do
+   begin
+      if(adv)and(b=false)then continue;
+      un_eid_ready [b]:=ready;
+      un_eid_death [b]:=death;
+      un_eid_fdeath[b]:=fdeath;
+   end;
+end;
+procedure setEIDS(adv:boolean;ready,death,fdeath:PTSoundSet);
+var b:boolean;
+begin
+   with _uids[u] do
+   for b:=false to true do
+   begin
+      if(adv)and(b=false)then continue;
+      un_eid_snd_ready [b]:=ready;
+      un_eid_snd_death [b]:=death;
+      un_eid_snd_fdeath[b]:=fdeath;
+   end;
+end;
+
 begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
 
@@ -60,10 +100,16 @@ begin
 UID_LostSoul:
 begin
    setMWSM(@spr_lostsoul,nil);
+   setSND (false,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move);
+   setEID (false,EID_Teleport,0        ,u       );
+   setEIDS(false,SND_Teleport,snd_pexp ,snd_pexp);
 end;
 UID_Imp:
 begin
    setMWSM(@spr_imp,nil);
+   setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_imp_ready,snd_imp_move);
+   setEID (false,EID_Teleport,0            ,EID_Gavno);
+   setEIDS(false,SND_Teleport,snd_imp_death,snd_meat );
 end;
 UID_Demon:
 begin
@@ -142,6 +188,8 @@ end;
 UID_HGate:
 begin
    setMWSM(@spr_HGate,@spr_HAGate);
+   setEID (false,0  ,EID_BBExp           ,EID_BBExp           );
+   setEIDS(false,nil,snd_building_explode,snd_building_explode);
 end;
 UID_HSymbol:
 begin
@@ -349,7 +397,7 @@ begin
    begin
       _canmove:=false;
 
-      if(onlySVCode=false)and(speed>0)then
+      if(ServerSide=false)and(speed>0)then
       begin
          _canmove:=(x<>uo_x)or(y<>uo_y);
          exit;
@@ -428,7 +476,7 @@ begin
 
          _unit_fog_r(pu);
          {$ENDIF}
-         if(onlySVCode)then hits:=_mhits;
+         if(ServerSide)then hits:=_mhits;
       end;
    end;
 end;

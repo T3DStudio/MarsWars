@@ -157,8 +157,10 @@ begin
     end;
 end;
 
-procedure PlaySND(ss:PTSoundSet;pu:PTUnit);
+function PlaySND(ss:PTSoundSet;pu:PTUnit):boolean;
 begin
+   PlaySND:=false;
+
    if(ss=nil)
    or(_menu)
    or(_draw=false)then exit;
@@ -168,6 +170,7 @@ begin
      if(_nhp3(x,y,player)=false)then exit;
 
    PlaySoundSet(ss);
+   PlaySND:=true;
 end;
 
 procedure PlaySNDM(ss:PTSoundSet);
@@ -198,7 +201,7 @@ begin
     end;
 end;
 
-procedure PlayUnitSound(ss:PTSoundSet);
+procedure PlaySoundSet(ss:PTSoundSet);
 const min_pause = fr_hfps;
 var s:PTMWSound;
 begin

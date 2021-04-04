@@ -10,7 +10,8 @@ begin
    _rpls_stat:='';
 
    fn:=str_f_rpls+_rpls_l[_rpls_ls]+str_e_rpls;
-  if(_rpls_l[_rpls_ls]<>'')then
+
+   if(_rpls_l[_rpls_ls]<>'')then
    if(FileExists(fn))then
    begin
       assign(f,fn);
@@ -37,15 +38,17 @@ begin
          BlockRead(f,wr,sizeof(map_seed ));_rpls_stat:=str_map+': '+c2s(wr)               +#13+' ';wr:=0;
          BlockRead(f,mw,SizeOf(map_mw   ));_rpls_stat:=_rpls_stat+str_m_siz+i2s(mw)       +#13+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
-         if(vr>7)then _rpls_stat:=_rpls_stat+str_m_liq+'???'
-                 else _rpls_stat:=_rpls_stat+str_m_liq+_str_mx[vr]+#13+' ';vr:=0;
-         BlockRead(f,vr,sizeof(map_obs  ));_rpls_stat:=_rpls_stat+str_m_obs+_str_mx[vr]   +#13+' ';vr:=0;
+         if(vr>7)then _rpls_stat:=_rpls_stat+str_m_liq+'??'
+                 else _rpls_stat:=_rpls_stat+str_m_liq+_str_mx(vr)+#13+' ';vr:=0;
+         BlockRead(f,vr,sizeof(map_obs  ));
+         if(vr>7)then _rpls_stat:=_rpls_stat+str_m_obs+'??'
+                 else _rpls_stat:=_rpls_stat+str_m_obs+_str_mx(vr)+#13+' ';vr:=0;
          BlockRead(f,vr,sizeof(map_sym  ));
          BlockRead(f,vr,sizeof(g_addon  ));_rpls_stat:=_rpls_stat+str_addon[vr>0]         +#13+' ';vr:=0;
          BlockRead(f,vr,sizeof(g_mode   ));_rpls_stat:=_rpls_stat+str_gmode[vr]           +#13    ;vr:=0;
          BlockRead(f,vr,sizeof(g_startb ));vr:=0;
-         BlockRead(f,vr,sizeof(g_shpos));vr:=0;
-         BlockRead(f,hp,SizeOf(HPlayer));
+         BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
+         BlockRead(f,hp,SizeOf(HPlayer  ));
 
          //_rpls_stat:=_rpls_stat+str_players+':'+#13;
 
@@ -80,6 +83,17 @@ begin
    end else _rpls_stat:=str_svld_errors[1];
 end;
 
+procedure rpl_abort;
+begin
+   if(_rpls_fileo)then
+   begin
+      close(_rpls_file);
+      _rpls_fileo:=false;
+   end;
+   if(_rpls_rst>=rpl_rhead)then _rpls_rst  :=rpl_none;
+end;
+
+
 procedure _rpls_code;
 const vxyc = 5;
 var  i :byte;
@@ -89,14 +103,7 @@ _vx,_vy:byte;
 begin
    if(G_Started=false)or(_rpls_rst=rpl_none)then
    begin
-      if(_rpls_fileo)then
-      begin
-         {$I-}
-         close(_rpls_file);
-         {$I+}
-         _rpls_rst  :=rpl_none;
-         _rpls_fileo:=false;
-      end;
+      rpl_abort;
    end
    else
     if(G_Started)and(g_paused=0)then
@@ -104,17 +111,17 @@ begin
      rpl_whead   : begin
                       if(menu_s2=ms2_camp)then
                       begin
-                         _rpls_rst:=rpl_none;
+                         rpl_abort;
                          exit;
                       end;
 
+                      {$I-}
                       assign(_rpls_file,str_f_rpls+_rpls_lrname+str_e_rpls);
-                 {$I-}rewrite(_rpls_file,1);{$I+}
-                      if(ioresult<>0)then
-                      begin
-                         _rpls_fileo:=false;
-                         _rpls_rst  :=rpl_none;
-                      end
+                      rewrite(_rpls_file,1);
+                      {$I+}
+
+                      if(ioresult<>0)
+                      then rpl_abort
                       else
                       begin
                          _rpls_rst  :=rpl_wunit;
@@ -123,7 +130,8 @@ begin
                          _rpls_nwrch:=true;
                          _rpls_vidm :=false;
 
-                         BlockWrite(_rpls_file,Ver        ,SizeOf(Ver     ));
+                         {$I-}
+                         BlockWrite(_rpls_file,ver        ,SizeOf(ver     ));
                          BlockWrite(_rpls_file,map_seed   ,SizeOf(map_seed));
                          BlockWrite(_rpls_file,map_mw     ,SizeOf(map_mw  ));
                          BlockWrite(_rpls_file,map_liq    ,SizeOf(map_liq ));
@@ -145,12 +153,9 @@ begin
                              BlockWrite(_rpls_file,mrace,sizeof(mrace));
                              BlockWrite(_rpls_file,team ,sizeof(team ));
                           end;
+                         {$I+}
 
-                         if(ioresult<>0)then
-                         begin
-                            _rpls_fileo:=false;
-                            _rpls_rst  :=rpl_none;
-                         end;
+                         if(ioresult<>0)then rpl_abort;
                       end;
                    end;
      rpl_wunit   : if((vid_rtui mod 2)=0) then
@@ -168,6 +173,7 @@ begin
                       begin
                          {$I-}
                          BlockWrite(_rpls_file,i,sizeof(i));
+                         {$I+}
                          if(_rpls_nwrch)then
                          begin
                             _wudata_chat(HPlayer,true);
@@ -177,22 +183,16 @@ begin
                          begin
                             _rpls_vidx:=_vx;
                             _rpls_vidy:=_vy;
+                            {$I-}
                             BlockWrite(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
                             BlockWrite(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
+                            {$I+}
                          end;
-                         {$I+}
 
                          if(G_Paused=0)then _wclinet_gframe(HPlayer,true);
                       end;
 
-                      if(IOResult<>0)then
-                      begin
-                         {$I-}
-                         close(_rpls_file);
-                         {$I+}
-                         _rpls_rst  :=rpl_none;
-                         _rpls_fileo:=false;
-                      end;
+                      if(IOResult<>0)then rpl_abort;
                    end;
      rpl_rhead   : begin
                       if(_rpls_ls<0)or(_rpls_ls>=_rpls_ln)then
@@ -213,14 +213,16 @@ begin
                          exit;
                       end;
 
+                      {$I-}
                       assign(_rpls_file,fn);
-                 {$I-}reset(_rpls_file,1);{$I+}
+                      reset(_rpls_file,1);
+                      {$I+}
+
                       if(ioresult<>0)then
                       begin
-                         _rpls_fileo:=false;
-                         _rpls_rst  :=rpl_none;
+                         rpl_abort;
                          g_started  :=false;
-                         _rpls_stat:=str_svld_errors[2];
+                         _rpls_stat :=str_svld_errors[2];
                       end
                       else
                       begin
@@ -228,10 +230,9 @@ begin
 
                          if(fs<rpl_hsize)then
                          begin
-                            _rpls_fileo:=false;
-                            _rpls_rst  :=rpl_none;
+                            rpl_abort;
                             g_started  :=false;
-                            _rpls_stat:=str_svld_errors[3];
+                            _rpls_stat :=str_svld_errors[3];
                             exit;
                          end;
 
@@ -240,12 +241,10 @@ begin
                          BlockRead(_rpls_file,i,SizeOf(Ver));
                          {$I+}
 
-                         if(i<>Ver)then
+                         if(i<>ver)then
                          begin
-                            _rpls_fileo:=false;
-                            _rpls_rst  :=rpl_none;
+                            rpl_abort;
                             g_started  :=false;
-                            close(_rpls_file);
                             _rpls_stat:=str_svld_errors[4];
                          end
                          else
@@ -267,12 +266,10 @@ begin
 
                             if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
                             or(map_liq>7)or(map_obs>7)
-                            or(g_mode>5)or(g_startb>4)or(HPlayer>MaxPlayers)then
+                            or not(g_mode in gamemodes)or(g_startb>4)or(HPlayer>MaxPlayers)then
                             begin
-                               _rpls_fileo:=false;
-                               _rpls_rst  :=rpl_none;
+                               rpl_abort;
                                g_started  :=false;
-                               close(_rpls_file);
                                _rpls_stat:=str_svld_errors[4];
                                DefGameObjects;
                                exit;
@@ -294,10 +291,10 @@ begin
                             UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN;
                             if(UnitStepNum=0)then UnitStepNum:=1;
 
-                            _rpls_fileo:=true;
-                            _rpls_rst  :=rpl_runit;
-                            _rpls_pnu  :=0;
-                            _rpls_vidm :=false;
+                            _rpls_fileo :=true;
+                            _rpls_rst   :=rpl_runit;
+                            _rpls_pnu   :=0;
+                            _rpls_vidm  :=false;
                             _rpls_player:=HPlayer;
 
                             map_premap;
@@ -305,9 +302,9 @@ begin
 
                             ui_tab:=2;
                             _view_bounds;
-                            G_Started:=true;
-                            _menu:=false;
-                            onlySVCode:=false;
+                            G_Started :=true;
+                            _menu     :=false;
+                            ServerSide:=false;
                          end;
                       end;
                    end;
@@ -315,11 +312,10 @@ begin
                    begin
                        if(eof(_rpls_file)or(ioresult<>0))then
                        begin
-                          _rpls_fileo:=false;
+                          rpl_abort;
                           _rpls_rst:=rpl_end;
-                          close(_rpls_file);
-                          G_Paused:=1;
-                          _fsttime:=false;
+                          G_Paused :=1;
+                          _fsttime :=false;
                           exit;
                        end;
 
@@ -328,7 +324,7 @@ begin
                        begin
                           {$I-}
                           BlockRead(_rpls_file,i,SizeOf(i));
-
+                          {$I+}
                           G_Paused:=i and %00111111;
 
                           if((i and %10000000)>0)then
@@ -340,10 +336,11 @@ begin
                           end;
                           if((i and %01000000)>0)then
                           begin
+                             {$I-}
                              BlockRead(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
                              BlockRead(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
+                             {$I+}
                           end;
-                          {$I+}
 
                           if(G_Paused=0)then _rclinet_gframe(0,true);
 
@@ -382,7 +379,7 @@ begin
    if(FindFirst(str_f_rpls+'*'+str_e_rpls,faReadonly,info)=0)then
     repeat
        s:=info.Name;
-       delete(s,length(s)-3,4);
+       delete(s,length(s)-(length(str_e_rpls)-1),length(str_e_rpls));
        if(s<>'')then
        begin
           inc(_rpls_ln,1);
@@ -399,6 +396,7 @@ procedure _rpls_delete;
 var fn:string;
 begin
    if(_rpls_ls<0)or(_rpls_ls>=_rpls_ln)then exit;
+
    fn:=str_f_rpls+_rpls_l[_rpls_ls]+str_e_rpls;
    if(FileExists(fn))then
    begin

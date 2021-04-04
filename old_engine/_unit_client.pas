@@ -455,7 +455,7 @@ begin
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // not exists to exists
      begin
-        _unit_def(uu);
+        _unit_default(uu);
 
         if(inapc>0)then
         begin
@@ -498,7 +498,7 @@ begin
          begin
             if(pu^.uidi<>uidi)then
             begin
-               _unit_def(uu);
+               _unit_default(uu);
 
                vx:=x;
                vy:=y;

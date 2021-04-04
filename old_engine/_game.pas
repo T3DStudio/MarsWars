@@ -103,7 +103,7 @@ begin
    G_WTeam  :=255;
    G_plstat :=255;
 
-   onlySVCode :=true;
+   ServerSide :=true;
 
    FillChar(g_cpt_pl ,SizeOf(g_cpt_pl ),0);
    FillChar(_missiles,SizeOf(_missiles),0);
@@ -557,7 +557,7 @@ begin
              end;
         end;
 
-        if(G_Started)and(G_Paused=0)and(onlySVCode)then
+        if(G_Started)and(G_Paused=0)and(ServerSide)then
         begin
            _u_ord(p);
 
@@ -578,7 +578,7 @@ begin
         end;
      end;
 
-   if(G_Started)and(G_Paused=0)and(onlySVCode)then
+   if(G_Started)and(G_Paused=0)and(ServerSide)then
    begin
       if(net_nstat>ns_none)and(G_Step<60)then exit;
 
@@ -877,7 +877,7 @@ begin
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;
          inc(_uregen_c,1); _uregen_c:=_uregen_c mod regen_per;
 
-         if(onlySVCode)then
+         if(ServerSide)then
          begin
             inc(G_Step,1);
             //if(g_mode=gm_ct )then _CPoints;

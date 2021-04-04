@@ -32,17 +32,20 @@ TDecal = record
    x,y      : integer;
 end;
 
+TEID = record
+   anim_smstate: byte;
+   smodel      : PTMWSModel;
+   smask       : cardinal;
+end;
+
 TEffect = record
    eid      : byte;
    x,y,z,d,
    anim_i,
    anim_last_i,
    anim_step,
-   anim_last_i_t,
-   anim_smstate
+   anim_last_i_t
             : integer;
-   smask    : cardinal;
-   smodel   : PTMWSModel;
 end;
 
 TVisSpr = record
@@ -169,13 +172,20 @@ TUID = record
 
    un_smodel    : array[false..true] of PTMWSModel;
 
-   un_snd_ready,
+   un_eid_ready,
+   un_eid_death,
+   un_eid_fdeath
+               : array[false..true] of byte;
+   un_eid_snd_ready,
+   un_eid_snd_death,
+   un_eid_snd_fdeath
+               : array[false..true] of PTSoundSet;
+
+   un_snd_ready, //command sounds
    un_snd_move,
    un_snd_attack,
    un_snd_annoy,
-   un_snd_select,
-   un_snd_death
-
+   un_snd_select
                 : array[false..true] of PTSoundSet;
    {$ENDIF}
 end;
@@ -323,9 +333,6 @@ TUnit = record
    wanim,
    sel      : boolean;
 
-   player   : PTPlayer;
-   uid      : PTUID;
-
    {$IFDEF _FULLGAME}
    mmx,mmy,mmr,
    fx,fy,fsr,
@@ -333,8 +340,15 @@ TUnit = record
    shadow
             : integer;
    {$ENDIF}
+
+   player   : PTPlayer;
+   uid      : PTUID;
 end;
 PTUnit = ^TUnit;
+
+TMID = record
+
+end;
 
 TMissile = record
    x,y,

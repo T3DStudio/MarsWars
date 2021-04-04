@@ -16,6 +16,13 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
+function _str_mx(x:byte):shortstring;
+begin
+   if(x=0)
+   then _str_mx:='-'
+   else _str_mx:='x'+i2s(x);
+end;
+
 procedure _units_au(p:byte;g:TSob;max:integer;new:boolean);  // allowed units
 var i:byte;
 begin

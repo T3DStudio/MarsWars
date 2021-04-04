@@ -33,8 +33,8 @@ begin
 
       _draw_text(tar,ui_menu_map_tx1,_yt(0), c2s(map_seed)              , ta_middle,255, mic(c,_m_sel=50));
       _draw_text(tar,ui_menu_map_tx0,_yt(1), str_m_siz+i2s(map_mw)      , ta_left  ,255, mic(c,false));
-      _draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_liq+_str_mx[map_liq] , ta_left  ,255, mic(c,false));
-      _draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_obs+_str_mx[map_obs] , ta_left  ,255, mic(c,false));
+      _draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_liq+_str_mx(map_liq) , ta_left  ,255, mic(c,false));
+      _draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_obs+_str_mx(map_obs) , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(4), str_m_sym+b2pm   [map_sym] , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx1,_yt(5), theme_name[theme_i]        , ta_middle,255, c_white     );
 
@@ -132,7 +132,7 @@ begin
    y:=_yt(0);
    t:=ui_menu_ssr_x0+ui_menu_ssr_xhs;
    _draw_text(tar,t                 , y, str_menu_s1[ms1_sett], ta_middle, 255,mic(true,menu_s1=ms1_sett));
-   _draw_text(tar,t+ui_menu_ssr_xs  , y, str_menu_s1[ms1_svld], ta_middle, 255,mic((net_nstat=ns_none)and(onlySVcode),menu_s1=ms1_svld));
+   _draw_text(tar,t+ui_menu_ssr_xs  , y, str_menu_s1[ms1_svld], ta_middle, 255,mic((net_nstat=ns_none)and(ServerSide),menu_s1=ms1_svld));
    _draw_text(tar,t+ui_menu_ssr_xs*2, y, str_menu_s1[ms1_reps], ta_middle, 255,mic(net_nstat=ns_none,menu_s1=ms1_reps));
 
    case menu_s1 of

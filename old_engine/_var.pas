@@ -32,7 +32,7 @@ g_cpt_pl          : array[1..MaxCPoints] of TCTPoint;
 //  BASE
 //
 
-onlySVCode        : boolean = true; // only server side code
+ServerSide        : boolean = true; // only server side code
 
 UnitStepNum       : byte = 8;
 
@@ -192,6 +192,7 @@ ter_h             : integer;
 
 font_ca           : array[char] of pSDL_SURFACE;
 
+_eids             : array[byte] of TEID;
 _effects          : array[1..vid_mvs] of TEffect;
 
 _tdecaln          : integer = 0;

@@ -19,24 +19,25 @@ begin
 
    fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
    if(_svld_l[_svld_ls]<>'')then
-    if(FileExists(fn))then
-    begin
-       assign(f,fn);
-       {$I-}reset(f,1);{$I+}
-       if(ioresult<>0)then
-       begin
-          _svld_stat:=str_svld_errors[2];
-          exit;
-       end;
-       if(FileSize(f)<>svld_size)then
-       begin
-          close(f);
-          _svld_stat:=str_svld_errors[3];
-          exit;
-       end;
-       BlockRead(f,Vr,SizeOf(ver));
-       if(vr=Ver)then
-       begin
+   if(FileExists(fn))then
+   begin
+      assign(f,fn);
+      {$I-}reset(f,1);{$I+}
+      if(ioresult<>0)then
+      begin
+         _svld_stat:=str_svld_errors[2];
+         close(f);
+         exit;
+      end;
+      if(FileSize(f)<>svld_size)then
+      begin
+         _svld_stat:=str_svld_errors[3];
+         close(f);
+         exit;
+      end;
+      BlockRead(f,vr,SizeOf(ver));
+      if(vr=ver)then
+      begin
          BlockRead(f,vr,sizeof(menu_s2));
          if(vr=ms2_camp)then
          begin
@@ -58,15 +59,22 @@ begin
 
             BlockRead(f,ms,sizeof(map_seed ));_svld_stat:=str_map+': '+c2s(ms)+#13+' ';
             BlockRead(f,vr,sizeof(map_seed2));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw   ));_svld_stat:=_svld_stat+str_m_siz+w2s(mw)       +#13+' ';vr:=0;
+            BlockRead(f,mw,sizeof(map_mw   ));_svld_stat:=_svld_stat+str_m_siz+w2s(mw)+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_liq  ));
-            if(vr>7)then _svld_stat:=_svld_stat+str_m_liq+'??'
-                    else _svld_stat:=_svld_stat+str_m_liq+_str_mx[vr]+#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_obs  ));_svld_stat:=_svld_stat+str_m_obs+_str_mx[vr]+#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_sym  ));
-            BlockRead(f,vr,sizeof(theme_i  ));vr:=0;
-            BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]    +#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(g_mode   ));_svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;vr:=0;
+            if(vr>7)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
+                    else _svld_stat:=_svld_stat+str_m_liq+_str_mx(vr)+#13+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_obs  ));
+            if(vr>7)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
+                    else _svld_stat:=_svld_stat+str_m_obs+_str_mx(vr)+#13+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_sym  ));   ////////
+            BlockRead(f,vr,sizeof(theme_i  ));
+            if(vr>=theme_n)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end;  vr:=0;
+            BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]+#13+' ';vr:=0;
+            BlockRead(f,vr,sizeof(g_mode   ));
+            if not(vr in gamemodes)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
+                                   else _svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;
+
+            vr:=0;
             BlockRead(f,vr,sizeof(g_startb ));vr:=0;
             BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
             BlockRead(f,hp,sizeof(HPlayer  ));
@@ -138,6 +146,7 @@ map_seed2
 map_mw
 map_lqt
 map_obs
+map_sym
 theme_i
 g_addon
 g_mode
@@ -168,7 +177,6 @@ team_army
 ui_alrms
 map_psx
 map_psy
-/////////cmp_ait2p
 theme_map_lqt
 theme_map_blqt
 theme_map_trt
@@ -216,10 +224,9 @@ begin
    BlockWrite(f,_uregen_c      ,SizeOf(_uregen_c      ));
    BlockWrite(f,G_WTeam        ,SizeOf(G_WTeam        ));
    BlockWrite(f,team_army      ,SizeOf(team_army      ));
-   BlockWrite(f,ui_alarms      ,SizeOf(ui_alarms       ));
+   BlockWrite(f,ui_alarms      ,SizeOf(ui_alarms      ));
    BlockWrite(f,map_psx        ,SizeOf(map_psx        ));
    BlockWrite(f,map_psy        ,SizeOf(map_psy        ));
-   //BlockWrite(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
    BlockWrite(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
    BlockWrite(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
    BlockWrite(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
@@ -289,10 +296,9 @@ begin
          BlockRead(f,_uregen_c      ,SizeOf(_uregen_c      ));
          BlockRead(f,G_WTeam        ,SizeOf(G_WTeam        ));
          BlockRead(f,team_army      ,SizeOf(team_army      ));
-         BlockRead(f,ui_alarms       ,SizeOf(ui_alarms       ));
+         BlockRead(f,ui_alarms      ,SizeOf(ui_alarms     ));
          BlockRead(f,map_psx        ,SizeOf(map_psx        ));
          BlockRead(f,map_psy        ,SizeOf(map_psy        ));
-         //BlockRead(f,cmp_ait2p      ,SizeOf(cmp_ait2p      ));
          BlockRead(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
          BlockRead(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
          BlockRead(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
@@ -326,6 +332,7 @@ procedure _svld_delete;
 var fn:string;
 begin
    if(_svld_ls<0)or(_svld_ls>=_svld_ln)then exit;
+
    fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
    if(FileExists(fn))then
    begin

@@ -263,12 +263,12 @@ begin
 
        if(buff[ub_resur]<=0)then
        begin
-          if(onlySVCode)or(hits>idead_hits)then dec(hits,1);
+          if(ServerSide)or(hits>idead_hits)then dec(hits,1);
           {$IFDEF _FULLGAME}
           if(uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
           {$ENDIF}
 
-          if(onlySVCode)then
+          if(ServerSide)then
           begin
              {case uidi of
              UID_Cacodemon: if(hits>-shadow)then
@@ -292,7 +292,7 @@ begin
           else _unit_movevis(pu);
        end
        else
-        if(OnlySVCode)then
+        if(ServerSide)then
         begin
            if(hits<-80)then hits:=-80;
            inc(hits,1);
@@ -870,7 +870,7 @@ begin
       {$ENDIF}
    end
    else
-    if(onlySVCode)then
+    if(ServerSide)then
      if(_canmove(pu))then
       if(x=vx)and(y=vy)then
        if(x<>mv_x)or(y<>mv_y)then
@@ -2072,7 +2072,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(OnlySVCode)then
+      if(ServerSide)then
       begin
          a_tar  :=0;
          a_tard :=32000;
@@ -2458,7 +2458,7 @@ begin
    with pu^ do
    begin
 
-      if(onlySVCode=false)
+      if(ServerSide=false)
       then //attack procedure
       else
       begin
@@ -2627,7 +2627,7 @@ begin
    begin
       _AddToInt(@vsnt[team],vistime);
       _AddToInt(@vsni[team],vistime);
-      if(onlySVCode)and(uclord=_uclord_c)then
+      if(ServerSide)and(uclord=_uclord_c)then
        if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
         for i:=0 to MaxPlayers do
         begin
@@ -2657,10 +2657,10 @@ begin
             _unit_move    (pu);
             _unit_movevis (pu);
 
-            if(onlySVCode)then _unit_prod(pu);
+            if(ServerSide)then _unit_prod(pu);
 
             if(uclord=_uclord_c)then
-             if(onlySVCode)and(inapc=0)
+             if(ServerSide)and(inapc=0)
              then _unit_mcycle   (pu)
              else _unit_mcycle_cl(pu);
          end

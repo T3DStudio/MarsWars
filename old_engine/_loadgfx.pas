@@ -773,6 +773,7 @@ begin
    end; }
          }
 
+   initEffects;
    InitThemes;
 end;
 

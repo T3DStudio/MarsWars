@@ -377,7 +377,7 @@ begin
    if(theme_liquidn <=0)then theme_map_lqt :=-1 else begin if(liq <0)then theme_map_lqt :=abs(liq  mod theme_liquidn ) else theme_map_lqt :=min2(theme_liquidn -1,liq ); theme_map_lqt :=theme_liquids [theme_map_lqt  ];end;
 end;
 begin
-   i:=i mod theme_n;
+   if(i<0)or(i>=theme_n)then i:=abs(i) mod theme_n;
    theme_i:=i;
    case i of
    0: begin  // TECH BASE

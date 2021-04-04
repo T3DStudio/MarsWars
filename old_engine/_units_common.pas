@@ -10,53 +10,10 @@ end;
 
 procedure _unit_snd_ready(uid:byte;adv:boolean);
 begin
-{   case uid of
-UID_LostSoul   : PlaySND(snd_d0         ,nil);
-UID_Imp        : if(random(2)=0)
-                 then PlaySND(snd_impc1 ,nil)
-                 else PlaySND(snd_impc2 ,nil);
-UID_Demon      : PlaySND(snd_demonc     ,nil);
-UID_Cacodemon  : PlaySND(snd_cacoc      ,nil);
-UID_Baron      : if(G_Addon)
-                 then PlaySND(snd_knight,nil)
-                 else PlaySND(snd_baronc,nil);
-UID_Cyberdemon : PlaySND(snd_cyberc     ,nil);
-UID_Mastermind : PlaySND(snd_mindc      ,nil);
-UID_Pain       : PlaySND(snd_pain_c     ,nil);
-UID_Revenant   : PlaySND(snd_rev_c      ,nil);
-UID_Mancubus   : PlaySND(snd_man_c      ,nil);
-UID_Arachnotron: PlaySND(snd_ar_c       ,nil);
-UID_ArchVile   : PlaySND(snd_arch_c     ,nil);
-UID_Engineer,
-UID_Medic,
-UID_Sergant,
-UID_Commando,
-UID_Bomber,
-UID_Major,
-UID_BFG,
-UID_FAPC,
-UID_APC,
-UID_Terminator,
-UID_Tank,
-UID_UTransport,
-UID_Flyer  : case random(3) of
-             0 : PlaySND(snd_uac_u0,nil);
-             1 : PlaySND(snd_uac_u1,nil);
-             2 : PlaySND(snd_uac_u2,nil);
-             end;
-UID_ZFormer,
-UID_ZEngineer,
-UID_ZSergant,
-UID_ZCommando,
-UID_ZBomber,
-UID_ZMajor,
-UID_ZBFG
-            : case random(3) of
-              0 : PlaySND(snd_z_s1,nil);
-              1 : PlaySND(snd_z_s2,nil);
-              2 : PlaySND(snd_z_s3,nil);
-              end;
-   end;    }
+   with _uids[uid] do
+   begin
+      PlaySND(un_snd_ready[adv],nil);
+   end;
 end;
 
 {procedure _unit_comssnd(ucl,race:integer);
@@ -131,6 +88,19 @@ begin
    end;
 end;
 
+procedure _unit_ready_effects(pu:PTUnit;vischeck:boolean);
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      if(vischeck)then
+       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+
+      _effect_add(vx,vy,vy+1,un_eid_ready[buff[ub_advanced]>0]);
+      PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil);
+   end;
+end;
+
 {$ENDIF}
 
 procedure _unit_correctcoords(pu:PTUnit);
@@ -160,7 +130,6 @@ begin
       _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
       _effect_add(tx,ty,ty+map_flydpth[uf]+1,EID_Teleport);
       {$ENDIF}
-      //buff[ub_pain   ]:=vid_hfps;
       buff[ub_teleeff]:=fr_fps;
       x     :=tx;
       y     :=ty;
@@ -196,7 +165,7 @@ begin
           st:=sign(st)*2;
           inc(shadow,st);
        end;
-       if(OnlySVCode)then
+       if(ServerSide)then
        begin
           if(uo_y=y)then dec(uo_y,st);
           dec(y ,st);
@@ -256,11 +225,10 @@ begin
       rld :=radar_reload;
 
       {$IFDEF _FULLGAME}
-      if(onlySVCode)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
+      if(ServerSide)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
       {$ENDIF}
    end;
 end;
-
 
 
 procedure _unit_htteleport(pu:PTUnit;x0,y0:integer);
@@ -510,7 +478,7 @@ begin
    end;
 end;
 
-procedure _unit_def(pu:PTUnit);
+procedure _unit_default(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -681,7 +649,7 @@ begin
           FillChar(vsnt,SizeOf(vsnt),0);
           FillChar(vsni,SizeOf(vsni),0);
 
-          _unit_def      (_LastCreatedUnitP);
+          _unit_default  (_LastCreatedUnitP);
           _unit_apUID    (_LastCreatedUnitP);
           _unit_inc_cntrs(_LastCreatedUnitP,ubld);
        end;
@@ -922,16 +890,16 @@ procedure _u1_spawn(pu:PTUnit;_uid,count:byte);
 var
 sr, i:integer;
 cd   :single;
-sound:boolean;
+sound:byte;
 begin
-   sound:=false;
+   sound:=0;
    with pu^ do
    with uid^ do
    begin
       dir:=p_dir(x,y,uo_x,uo_y);
       if(_uids[_uid]._uf>uf_ground)
       then sr:=0
-      else sr :=_r;//+_uids[_uid]._r;
+      else sr:=_r;//+_uids[_uid]._r;
 
       for i:=0 to count do
       begin
@@ -941,16 +909,21 @@ begin
                    y-trunc(sr*sin(cd)),_uid,playeri,true);
          if(_LastCreatedUnit>0)then
          begin
-            sound:=true;
             _LastCreatedUnitP^.uo_x  :=uo_x;
             _LastCreatedUnitP^.uo_y  :=uo_y;
             _LastCreatedUnitP^.uo_id :=uo_id;
             _LastCreatedUnitP^.uo_tar:=uo_tar;
             _unit_turn(_LastCreatedUnitP);
+
+            if(_LastCreatedUnitP^.buff[ub_advanced]>0)
+            then sound:=2
+            else sound:=1;
+
+            _unit_ready_effects(_LastCreatedUnitP,true);
          end;
       end;
       {$IFDEF _FULLGAME}
-      if(sound)then _unit_snd_ready(_uid,false);
+      if(sound>0)then _unit_snd_ready(_uid,sound=2);
       {$ENDIF}
    end;
 end;
@@ -1186,7 +1159,7 @@ begin
        if(0<buff[i])and(buff[i]<_ub_infinity)then
        begin
           dec(buff[i],1);
-          {if(i=ub_stopafa)and(OnlySVCode)then
+          {if(i=ub_stopafa)and(ServerSide)then
            if(bld)and(speed>0)and(tar1=0)then
             if(buff[i]=0)then
              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
@@ -1229,65 +1202,6 @@ begin
       end;
    end;
 end;
-
-{
-procedure _pain_lost(pu:PTUnit;tx,ty:integer);
-begin
-  with pu^ do
-   with player^ do
-    begin
-       if((army+uproda)>=MaxPlayerUnits)or((playeri=0)and(g_mode=gm_inv)and(army>=g_inv_mn))
-       then _lcu:=0
-       else
-         if(OnlySVCode)
-         then _unit_add(tx,ty,UID_LostSoul,playeri,true)
-         else exit;
-       if(_lcu>0)then
-       begin
-          _lcup^.dir   :=dir;
-          _lcup^.tar1  :=tar1;
-          _lcup^.tar1d :=tar1d;
-          _lcup^.uo_id :=uo_id;
-          _lcup^.uo_tar:=uo_tar;
-          if(tar1>0)then
-          begin
-             _lcup^.uo_x  :=_units[tar1].x;
-             _lcup^.uo_y  :=_units[tar1].y;
-          end
-          else
-           if(uo_x<>x)or(uo_y<>y)then
-           begin
-              _lcup^.uo_x  :=uo_x;
-              _lcup^.uo_y  :=uo_y;
-           end;
-          _lcup^.buff[ub_advanced]:=buff[ub_advanced];
-          //_lcup^.buff[ub_born    ]:=0;
-          {$IFDEF _FULLGAME}
-          if(_nhp3(x,y,player))then _unit_createsound(UID_LostSoul);
-          {$ENDIF}
-       end
-       else
-       begin
-          {$IFDEF _FULLGAME}
-          _effect_add(tx,ty,ty+map_flydpth[uf]+1,UID_LostSoul);
-          PlaySND(snd_pexp,pu);
-          {$ENDIF}
-       end;
-    end;
-end;
-
-procedure _pain_action(pu:PTUnit);
-var dd,tx,ty:integer;
-begin
-   with pu^ do
-   begin
-      dd:=((dir+23) mod 360) div 45;
-      tx:=x+dir_stepX[dd]*15;
-      ty:=y+dir_stepY[dd]*15;
-
-      _pain_lost(pu,tx,ty);
-   end;
-end;   }
 
 
 procedure _unit_upgr(pu:PTUnit);

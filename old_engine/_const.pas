@@ -34,6 +34,8 @@ gm_ct                  = 3;
 gm_inv                 = 4;
 gm_aslt                = 5;
 
+gamemodes              = [gm_scir,gm_2fort,gm_3fort,gm_ct,gm_inv,gm_aslt];
+
 r_cnt                  = 2;  // race
 r_random               = 0;
 r_hell                 = 1;
@@ -62,7 +64,6 @@ str_ps_h               : char = '<';
 str_ps_comp            : shortstring = 'AI';
 str_ps_none            : shortstring = '--';
 b2pm                   : array[false..true] of string[3] = (#15+'-'+#25,#18+'+'+#25);
-_str_mx                : array[0..12] of shortstring = ('-','x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12');
 
 outlogfn               : shortstring = 'out.txt';
 
@@ -880,7 +881,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 231088;
+svld_size              = 241982;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
