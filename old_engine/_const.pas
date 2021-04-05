@@ -566,7 +566,7 @@ ChatLen                = 38;
 
 gavno_dth_h            = -40;
 dead_hits              = -12*fr_fps;
-idead_hits             = dead_hits+fr_3fps;
+fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
 
 //upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);

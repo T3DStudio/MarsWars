@@ -1,5 +1,4 @@
 
-{$include missions\m1.pas}
 
 
 {if(uid=UID_Portal)and(buff[ub_advanced]>0)and(rld=0)then

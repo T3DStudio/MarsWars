@@ -44,7 +44,7 @@ begin
    end;
 end;
 
-procedure setSND(adv:boolean;ready,move,attack,annoy,select:PTSoundSet);
+procedure setSND(adv:boolean;ready,move,attack,annoy,select:PTSoundSet); // command sounds
 var b:boolean;
 begin
    with _uids[u] do
@@ -59,7 +59,7 @@ begin
    end;
 end;
 
-procedure setEID (adv:boolean;ready,death,fdeath:byte);
+procedure setEID (adv:boolean;ready,death,fdeath,pain:byte);
 var b:boolean;
 begin
    with _uids[u] do
@@ -69,9 +69,10 @@ begin
       un_eid_ready [b]:=ready;
       un_eid_death [b]:=death;
       un_eid_fdeath[b]:=fdeath;
+      un_eid_pain  [b]:=pain;
    end;
 end;
-procedure setEIDS(adv:boolean;ready,death,fdeath:PTSoundSet);
+procedure setEIDS(adv:boolean;ready,death,fdeath,pain:PTSoundSet);
 var b:boolean;
 begin
    with _uids[u] do
@@ -81,6 +82,7 @@ begin
       un_eid_snd_ready [b]:=ready;
       un_eid_snd_death [b]:=death;
       un_eid_snd_fdeath[b]:=fdeath;
+      un_eid_snd_pain  [b]:=pain;
    end;
 end;
 
@@ -101,15 +103,15 @@ UID_LostSoul:
 begin
    setMWSM(@spr_lostsoul,nil);
    setSND (false,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move);
-   setEID (false,EID_Teleport,0        ,u       );
-   setEIDS(false,SND_Teleport,snd_pexp ,snd_pexp);
+   setEID (false,EID_Teleport,0        ,u       ,0);
+   setEIDS(false,SND_Teleport,snd_pexp ,snd_pexp,snd_hell_pain);
 end;
 UID_Imp:
 begin
    setMWSM(@spr_imp,nil);
    setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_imp_ready,snd_imp_move);
-   setEID (false,EID_Teleport,0            ,EID_Gavno);
-   setEIDS(false,SND_Teleport,snd_imp_death,snd_meat );
+   setEID (false,EID_Teleport,0            ,EID_Gavno,0);
+   setEIDS(false,SND_Teleport,snd_imp_death,snd_meat ,snd_zimba_pain);
 end;
 UID_Demon:
 begin
@@ -188,8 +190,6 @@ end;
 UID_HGate:
 begin
    setMWSM(@spr_HGate,@spr_HAGate);
-   setEID (false,0  ,EID_BBExp           ,EID_BBExp           );
-   setEIDS(false,nil,snd_building_explode,snd_building_explode);
 end;
 UID_HSymbol:
 begin
@@ -204,6 +204,7 @@ begin
    _animw:=20;
 
    setMWSM(@spr_HTower,nil);
+   un_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
 begin
@@ -214,22 +215,28 @@ end;
 UID_HMonastery:
 begin
    setMWSM(@spr_HMonastery,nil);
+   un_build_amode:=2;
 end;
 UID_HTotem:
 begin
    setMWSM(@spr_HTotem,nil);
+   un_build_amode:=2;
+   un_eid_bcrater_y:=15;
 end;
 UID_HAltar:
 begin
    setMWSM(@spr_HAltar,nil);
+   un_build_amode:=2;
 end;
 UID_HFortress:
 begin
    setMWSM(@spr_HFortress,nil);
+   un_build_amode:=2;
 end;
 UID_HEye:
 begin
    setMWSM(@spr_HEye,nil);
+   un_build_amode:=2;
 end;
 UID_HCommandCenter:
 begin
@@ -315,6 +322,7 @@ UID_UTurret:
 begin
    _animw    := 6;
    setMWSM(@spr_UTurret,nil);
+   un_eid_bcrater_y:=15;
 end;
 UID_URadar:
 begin
@@ -352,6 +360,33 @@ end;
       end;
 
       ui_panel_uids[_urace,byte(not _isbuilding),_ucl]:=u;
+
+      if(_isbuilding)then
+      begin
+         case _urace of
+       r_hell: begin
+               if(_r>42)
+               then un_eid_bcrater:=EID_db_h0
+               else un_eid_bcrater:=EID_db_h1;
+               if(un_build_amode=0)then un_build_amode:=1;
+               end;
+       r_uac : if(_r>42)
+               then un_eid_bcrater:=EID_db_u0
+               else un_eid_bcrater:=EID_db_u1;
+         end;
+         if(_r>42)then
+         begin
+            setEID (false,0  ,EID_BBExp           ,EID_BBExp           ,0  );
+            setEIDS(false,nil,snd_building_explode,snd_building_explode,nil);
+            if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=10;
+         end
+         else
+         begin
+            setEID (false,0  ,EID_BExp            ,EID_BExp            ,0  );
+            setEIDS(false,nil,snd_building_explode,snd_building_explode,nil);
+            if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
+         end;
+      end;
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;
@@ -468,6 +503,8 @@ begin
          solid := _issolid;
 
          if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
+
+         if(_advanced[g_addon])then buff[ub_advanced]:=_ub_infinity;
 
          {$IFDEF _FULLGAME}
          mmr   := trunc(_r*map_mmcx)+1;
@@ -765,6 +802,7 @@ begin
    _btime     := 40;
    _apcs      := 3;
    _attack    := atm_always;
+   _advanced[false]:=true;
 end;
 UID_Cyberdemon :
 begin

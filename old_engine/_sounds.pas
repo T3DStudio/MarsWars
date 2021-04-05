@@ -201,7 +201,7 @@ begin
     end;
 end;
 
-procedure PlaySoundSet(ss:PTSoundSet);
+procedure PlayCommandSound(ss:PTSoundSet);
 const min_pause = fr_hfps;
 var s:PTMWSound;
 begin

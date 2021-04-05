@@ -524,7 +524,7 @@ begin
             else
               if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
               begin
-                 //_unit_deff(uu,hits<=idead_hits);
+                 //_unit_deff(uu,hits<=fdead_hits);
                  rld:=0;
               end;
 

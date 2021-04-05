@@ -101,6 +101,29 @@ begin
    end;
 end;
 
+procedure _unit_death_effects(pu:PTUnit;fastdeath,vischeck:boolean);
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      if(vischeck)then
+       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+
+      if(fastdeath)then
+      begin
+         _effect_add(vx,vy,vy+1,un_eid_fdeath[buff[ub_advanced]>0]);
+         PlaySND(un_eid_snd_fdeath[buff[ub_advanced]>0],nil);
+      end
+      else
+      begin
+         _effect_add(vx,vy,vy+1,un_eid_death[buff[ub_advanced]>0]);
+         PlaySND(un_eid_snd_death[buff[ub_advanced]>0],nil);
+      end;
+
+      _effect_add(vx,vy+un_eid_bcrater_y,-5,un_eid_bcrater);
+   end;
+end;
+
 {$ENDIF}
 
 procedure _unit_correctcoords(pu:PTUnit);

@@ -209,11 +209,21 @@ begin
    end;
 end;
 
+function _EID2Spr(eid:byte):PTMWSprite;
+begin
+   _EID2Spr:=@spr_dummy;
+
+   with _eids[eid] do
+    if(smodel<>nil)then
+     if(smodel^.sn>0)then
+      _EID2Spr:=@smodel^.sl[0];
+end;
+
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
 var spr : PTMWSprite;
      dp,
-     inv,t,ro,
+invb,inv,t,ro,
      sh : integer;
      mc,
      rc : cardinal;
@@ -308,7 +318,7 @@ begin
               end;
 
             if(buff[ub_invis ]>0 )then inv:=128;
-            if(buff[ub_invuln]>10)then mc:=c_awhite;
+            if(buff[ub_invuln]>10)then mc :=c_awhite;
 
             if(playeri=0)and(_isbuilding=false)then
              if(g_mode in [gm_inv,gm_aslt])then mc:=c_ablack;
@@ -329,43 +339,27 @@ begin
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]].un_btn ,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]]. un_btn,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
                       if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
                    end;
                 end;
              end
              else
-              if(race=r_hell)then
-               case uidi of
-              UID_HMonastery,
-              UID_HTotem,
-              UID_HAltar,
-              UID_HFortress,
-              UID_HEye : begin
-                            inv:=trunc(255*hits/_mhits);
-                            if(_r<41)
-                            then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
-                            else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
-                            if(buff[ub_invis]>0)then inv:=inv shr 1;
-                            dec(inv,inv shr 2);
-                         end;
-               else
-                 if(hits<=127)then
+              if(un_eid_bcrater>0)and(un_build_amode>0)then
+              begin
+                 if(un_build_amode>1)then
                  begin
-                    inv:=hits*2;
-                    if(_r<41)
-                    then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
-                    else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
+                    inv :=trunc(255*hits/_mhits);
+                    invb:=255-inv;
                  end
-                 else inv:=255;
-               end;
+                 else invb:=255;
 
-            { if(buff[ub_toxin]>0)then
-              if(mech)
-              then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
-              else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);
-             if(buff[ub_gear ]>0)then
-                   _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);  }
+                 if(buff[ub_invis]>0)then invb:=invb shr 1;
+
+                 _sl_add_eff(vx,vy+un_eid_bcrater_y,-5,0,_EID2Spr(un_eid_bcrater),invb);
+              end
+              else
+                if(buff[ub_invis]>0)then inv:=inv shr 1;
 
             _sl_add(vx,vy,dp,sh,rc,mc,rct,spr,inv,sb,b0,b2,b3,b1,ro);
          end;
@@ -373,10 +367,39 @@ begin
    end;
 end;
 
+{if(race=r_hell)then
+ case uidi of
+UID_HMonastery,
+UID_HTotem,
+UID_HAltar,
+UID_HFortress,
+UID_HEye : begin
+              inv:=trunc(255*hits/_mhits);
+              if(_r<41)
+              then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
+              else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
+              if(buff[ub_invis]>0)then inv:=inv shr 1;
+              dec(inv,inv shr 2);
+           end;
+ else
+   if(hits<=127)then
+   begin
+      inv:=hits*2;
+      if(_r<41)
+      then _sl_add_eff(vx,vy+5 ,-5,0,@spr_db_h1.sl[0],255-inv)
+      else _sl_add_eff(vx,vy+10,-5,0,@spr_db_h0.sl[0],255-inv);
+   end
+   else inv:=255;
+ end; }
+
+{ if(buff[ub_toxin]>0)then
+if(mech)
+then _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7)
+else _sl_add_dec(vx, smy,dp,0,@spr_toxin,255,0, 0,-spr^.hh-spr_toxin.hh-7);
+if(buff[ub_gear ]>0)then
+     _sl_add_dec(vx, smy,dp,0,@spr_gear ,255,0, 0,-spr^.hh-spr_gear .hh-7);  }
+
 {
-
-
-
 
 procedure _unit_foot(pu:PTUnit);
 begin
@@ -483,7 +506,7 @@ begin
    with player^ do
     if(hits>dead_hits)then
     begin
-       if(hits<idead_hits)then exit;
+       if(hits<fdead_hits)then exit;
 
        spr:=_unit2spr(pu);
 
@@ -491,7 +514,7 @@ begin
 
        if(_unit_fogrev(pu))then
         if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then
-         _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-idead_hits),255),0,0,0);
+         _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0,0);
     end;
 end;
 

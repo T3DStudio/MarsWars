@@ -156,7 +156,8 @@ TUID = record
    _ismech,
    _issolid,
    _addon       : boolean;
-   _advanced    : array[false..true] of boolean;
+   _fastdeath,                                   //[adv]
+   _advanced    : array[false..true] of boolean; //[addon]
 
    ups_builder,
    ups_units,
@@ -165,20 +166,26 @@ TUID = record
    {$IFDEF _FULLGAME}
    _fr          : integer;
    un_btn,
-   un_sbtn      : TMWSprite;
+   un_sbtn      : array[false..true] of TMWSprite;
    un_name,
    un_descr,
    un_hint      : shortstring;
 
    un_smodel    : array[false..true] of PTMWSModel;
 
+   un_build_amode,
+   un_eid_bcrater   :byte;
+   un_eid_bcrater_y :integer;
+
    un_eid_ready,
    un_eid_death,
-   un_eid_fdeath
+   un_eid_fdeath,
+   un_eid_pain
                : array[false..true] of byte;
    un_eid_snd_ready,
    un_eid_snd_death,
-   un_eid_snd_fdeath
+   un_eid_snd_fdeath,
+   un_eid_snd_pain
                : array[false..true] of PTSoundSet;
 
    un_snd_ready, //command sounds

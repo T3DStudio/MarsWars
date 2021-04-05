@@ -780,19 +780,21 @@ end;
 
 procedure _icons;
 var u:byte;
+    b:boolean;
 begin
+   for b:=false to true do
    for u:=0 to 255 do
    with _uids[u] do
    begin
-      with un_btn do
+      with un_btn[b] do
       begin
-         surf := LoadBtnFS(_uid2spr(u,false)^.surf,vid_BW );
+         surf := LoadBtnFS(_uid2spr(u,b)^.surf,vid_BW );
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;
-      with un_sbtn do
+      with un_sbtn[b] do
       begin
-         surf := LoadBtnFS(_uid2spr(u,false)^.surf,vid_oiw);
+         surf := LoadBtnFS(_uid2spr(u,b)^.surf,vid_oiw);
          w    := surf^.w;h    := w;
          hw   := w div 2;hh   := hw;
       end;

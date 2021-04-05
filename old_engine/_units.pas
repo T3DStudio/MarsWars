@@ -263,7 +263,7 @@ begin
 
        if(buff[ub_resur]<=0)then
        begin
-          if(ServerSide)or(hits>idead_hits)then dec(hits,1);
+          if(ServerSide)or(hits>fdead_hits)then dec(hits,1);
           {$IFDEF _FULLGAME}
           if(uclord=_uclord_c)and(fsr>1)then dec(fsr,1);
           {$ENDIF}
@@ -328,7 +328,7 @@ begin
      if(vst>0)and(tar=pu^.unum)then tar:=0;
 end;
 
-procedure _unit_kill(pu:PTUnit;nodead,deff:boolean);
+procedure _unit_kill(pu:PTUnit;instant,fastdeath:boolean);
 var i :integer;
     tu:PTunit;
 begin
@@ -336,18 +336,13 @@ begin
    if(unum>0)then
    with player^ do
    begin
-      if(nodead=false)then
+      if(instant=false)then
       begin
-         if(uidi in [UID_Major,UID_ZMajor])and(uf>uf_ground)
-         then deff:=true
-         else
-           if not(uidi in gavno)
-           then deff:=false;
-         if(uid^._ismech)or(uidi in [UID_LostSoul,UID_Pain,UID_ZEngineer])then deff:=true;
+         with uid^ do fastdeath:=fastdeath or _fastdeath[buff[ub_advanced]>0] or _ismech;
+         buff[ub_pain]:=fr_fps; // prevent fast resurrecting
 
-         buff[ub_pain]:=fr_fps;
          {$IFDEF _FULLGAME}
-         //_unit_deff(pu,deff);
+         _unit_death_effects(pu,fastdeath,true)
          {$ENDIF}
       end;
 
@@ -402,14 +397,14 @@ begin
       end;
       _check_missiles(pu);
 
-      if(nodead)then
+      if(instant)then
       begin
          hits:=ndead_hits;
          _unit_remove(pu);
       end
       else
-        if(deff)
-        then hits:=idead_hits
+        if(fastdeath)
+        then hits:=fdead_hits
         else hits:=0;
    end;
 end;
@@ -2034,7 +2029,7 @@ begin
       if(uc<>unum)then
       begin
          tu:=@_units[uc];
-         if(tu^.hits>idead_hits)then
+         if(tu^.hits>fdead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
             _unit_detect(pu,tu,ud);
@@ -2095,7 +2090,7 @@ begin
       if(uc<>unum)then
       begin
          tu:=@_units[uc];
-         if(tu^.hits>idead_hits)then
+         if(tu^.hits>fdead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
             if(udetect)then _unit_detect(pu,tu,ud);
