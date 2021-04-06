@@ -39,8 +39,18 @@ end;
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
 var su,i:integer;
     guid:byte;
+    gadv:boolean;
+function _checkEnemy:boolean;
 begin
-   su:=0;
+   _checkEnemy:=false;
+   if(_IsUnitRange(tar))then
+    if(_units[tar].player^.team<>_players[HPlayer].team)then _checkEnemy:=true;
+end;
+
+begin
+   su  :=0;
+   guid:=0;
+   gadv:=false;
 
    with _players[HPlayer] do
    begin
@@ -48,16 +58,30 @@ begin
       with _units[i] do
       with uid^ do
       if(hits>0)and(sel)and(playeri=HPlayer)then
-      if(speed>0)or(_attack>0)or(_UnitHaveRPoint(@_units[i]))then
+      if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(@_units[i]))then
       begin
          inc(su,1);
          guid:=uidi;
+         gadv:=buff[ub_advanced]>0;
       end;
    end;
 
    if(su<=0)then exit;
 
-   // move or attack sound  guid
+   with _uids[guid] do
+   case cmd of
+   co_paction,
+   co_rcmove,
+   co_move,
+   co_astand,
+   co_stand,
+   co_patrol : PlayCommandSound(un_snd_move[gadv]);
+   co_amove,
+   co_apatrol: PlayCommandSound(un_snd_attack[gadv]);
+   co_rcamove: if(_checkEnemy)
+               then PlayCommandSound(un_snd_attack[gadv])
+               else PlayCommandSound(un_snd_move  [gadv]);
+   end;
 
    inc(ox1,vid_mapx);
    inc(oy1,vid_mapy);
@@ -557,6 +581,7 @@ co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
                //_effect_add(m_mx,m_my-50,10000,EID_HCC);
+               //PlaySoundSet(snd_engineer_attack);
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)

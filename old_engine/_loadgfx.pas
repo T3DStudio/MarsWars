@@ -56,8 +56,8 @@ begin
    ui_muc    [false]:=c_dorange;
    ui_muc    [true ]:=c_gray;
 
-   ui_rad_rld[false]:=c_aqua;
-   ui_rad_rld[true ]:=c_yellow;
+   ui_rld    [false]:=c_aqua;
+   ui_rld    [true ]:=c_yellow;
 end;
 
 function _createSurf(tw,th:integer):pSDL_Surface;

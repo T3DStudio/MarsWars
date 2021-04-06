@@ -744,8 +744,8 @@ EID_Blood              = 213;
 EID_ArchFire           = 214;
 EID_HUpgr              = 215;
 EID_HAMU               = 216;
-EID_HMU                = 218;
-EID_HCC                = 219;
+EID_HMU                = 217;
+EID_HCC                = 218;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -881,7 +881,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 241982;
+svld_size              = 238982;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

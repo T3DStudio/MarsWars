@@ -59,6 +59,8 @@ begin
    end;
 end;
 
+procedure setBuildingSND(s:PTSoundSet);begin setSND(false,s,s,s,s,s);end;
+
 procedure setEID (adv:boolean;ready,death,fdeath,pain:byte);
 var b:boolean;
 begin
@@ -86,6 +88,19 @@ begin
    end;
 end;
 
+procedure setFOOT(adv:boolean;footsnd:PTSoundSet;footanim:integer);
+var b:boolean;
+begin
+   with _uids[u] do
+   for b:=false to true do
+   begin
+      if(adv)and(b=false)then continue;
+
+      un_eid_snd_foot[b]:=footsnd;
+      un_foot_anim   [b]:=footanim;
+   end;
+end;
+
 begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
 
@@ -96,62 +111,117 @@ begin
       setMWSM(@spr_dmodel,nil);
       _animw:=10;
       _animd:=10;
-      _animf:=0;
 
       case u of
 UID_LostSoul:
 begin
    setMWSM(@spr_lostsoul,nil);
-   setSND (false,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move,snd_lost_move);
-   setEID (false,EID_Teleport,0        ,u       ,0);
+   setSND (false,snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0        ,u       ,0            );
    setEIDS(false,SND_Teleport,snd_pexp ,snd_pexp,snd_hell_pain);
 end;
 UID_Imp:
 begin
+   _animw:=7;
+   _animd:=8;
    setMWSM(@spr_imp,nil);
-   setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_imp_ready,snd_imp_move);
-   setEID (false,EID_Teleport,0            ,EID_Gavno,0);
+   setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain,snd_imp_move);
+   setEID (false,EID_Teleport,0            ,EID_Gavno,0             );
    setEIDS(false,SND_Teleport,snd_imp_death,snd_meat ,snd_zimba_pain);
+
 end;
 UID_Demon:
 begin
+   _animw:=6;
+   _animd:=9;
    setMWSM(@spr_demon,nil);
+   setSND (false,snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0              ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_demon_death,nil,snd_hell_pain );
 end;
 UID_Cacodemon:
 begin
+   _animd:=10;
    setMWSM(@spr_cacodemon,nil);
+   setSND (false,snd_caco_ready,snd_hell_move,snd_caco_ready,snd_hell_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0              ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_caco_death ,nil,snd_hell_pain );
 end;
 UID_Baron:
 begin
+   _animw:=8;
+   _animd:=10;
    setMWSM(@spr_knight,@spr_baron);
+   setSND (false,snd_knight_ready,snd_hell_move,snd_knight_ready,snd_hell_pain,snd_hell_move);
+   setSND (true ,snd_baron_ready ,snd_hell_move,snd_baron_ready ,snd_hell_pain,snd_hell_move);
+
+   setEID (false,EID_Teleport,0                ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_knight_death ,nil,snd_hell_pain );
+   setEIDS(true ,SND_Teleport,snd_baron_death  ,nil,snd_hell_pain );
 end;
 UID_Cyberdemon:
 begin
+   _animw:=8;
    setMWSM(@spr_cyberdemon,nil);
+   setSND (false,snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0              ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_cyber_death,nil,snd_hell_pain );
+   setFOOT(false,snd_cyber_foot,30);
 end;
 UID_Mastermind:
 begin
+   _animw:=7;
+   _animd:=16;
    setMWSM(@spr_mastermind,nil);
+   setSND (false,snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0                   ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_mastermind_death,nil,snd_hell_pain );
+   setFOOT(false,snd_mastermind_foot,22);
 end;
 UID_Pain:
 begin
+   _animw:=12;
    setMWSM(@spr_pain,nil);
+   setSND (false,snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
+   setEID (false,EID_Teleport,0             ,u             ,0             );
+   setEIDS(false,SND_Teleport,snd_pain_death,snd_pain_death,snd_pain_pain );
 end;
 UID_Revenant:
 begin
+   _animw:=6;
+   _animd:=9;
    setMWSM(@spr_revenant,nil);
+   setSND (false,snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
+   setEID (false,EID_Teleport,0                 ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_revenant_death,nil,snd_hell_pain );
 end;
 UID_Mancubus:
 begin
+   _animw:=10;
+   _animd:=13;
    setMWSM(@spr_mancubus,nil);
+   setSND (false,snd_mancubus_ready,snd_zimba_move,snd_mancubus_ready,snd_mancubus_pain,snd_zimba_move);
+   setEID (false,EID_Teleport,0              ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_mancubus_death ,nil,snd_mancubus_pain );
 end;
 UID_Arachnotron:
 begin
+   _animw:=8;
+   _animd:=13;
    setMWSM(@spr_arachnotron,nil);
+   setSND (false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_arachno_move,snd_arachno_move);
+   setEID (false,EID_Teleport,0              ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_arachno_death,nil,snd_hell_pain );
+   setFOOT(false,snd_arachno_foot,28);
 end;
 UID_Archvile:
 begin
+   _animw:=6;
+   _animd:=12;
    setMWSM(@spr_archvile,nil);
+   setSND (false,snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
+   setEID (false,EID_Teleport,0                   ,0  ,0             );
+   setEIDS(false,SND_Teleport,snd_archvile_death  ,nil,snd_archvile_pain );
 end;
 UID_ZFormer:
 begin
@@ -186,24 +256,29 @@ end;
 UID_HKeep:
 begin
    setMWSM(@spr_HKeep,nil);
+   setBuildingSND(snd_hell_hk);
 end;
 UID_HGate:
 begin
    setMWSM(@spr_HGate,@spr_HAGate);
+   setBuildingSND(snd_hell_hgate);
 end;
 UID_HSymbol:
 begin
    setMWSM(@spr_HSymbol,nil);
+   setBuildingSND(snd_hell_hsymbol);
 end;
 UID_HPools:
 begin
    setMWSM(@spr_HPools,@spr_HAPools);
+   setBuildingSND(snd_hell_hpool);
 end;
 UID_HTower:
 begin
    _animw:=20;
 
    setMWSM(@spr_HTower,nil);
+   setBuildingSND(snd_hell_htower);
    un_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -211,150 +286,215 @@ begin
    _animw:=20;
 
    setMWSM(@spr_HTeleport,nil);
+   setBuildingSND(snd_hell_hteleport);
 end;
 UID_HMonastery:
 begin
    setMWSM(@spr_HMonastery,nil);
+   setBuildingSND(snd_hell_hmon);
    un_build_amode:=2;
 end;
 UID_HTotem:
 begin
    setMWSM(@spr_HTotem,nil);
+   setBuildingSND(snd_hell_htotem);
    un_build_amode:=2;
-   un_eid_bcrater_y:=15;
+   un_eid_bcrater_y:=12;
 end;
 UID_HAltar:
 begin
    setMWSM(@spr_HAltar,nil);
+   setBuildingSND(snd_hell_haltar);
    un_build_amode:=2;
 end;
 UID_HFortress:
 begin
    setMWSM(@spr_HFortress,nil);
+   setBuildingSND(snd_hell_hfort);
    un_build_amode:=2;
 end;
 UID_HEye:
 begin
    setMWSM(@spr_HEye,nil);
+   setBuildingSND(snd_hell_hbuild);
    un_build_amode:=2;
 end;
 UID_HCommandCenter:
 begin
    setMWSM(@spr_HCC,nil);
+   setBuildingSND(snd_hell_hbuild);
 end;
 UID_HMilitaryUnit:
 begin
    setMWSM(@spr_HMUnit,@spr_HMUnita);
+   setBuildingSND(snd_hell_hbuild);
 end;
 
 
 UID_Engineer:
 begin
    setMWSM(@spr_Engineer,nil);
+   setSND (false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_Medic:
 begin
    setMWSM(@spr_Medic,nil);
+   setSND (false,snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_Sergant:
 begin
    setMWSM(@spr_Sergant,@spr_SSergant);
+   setSND (false,snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
+   setSND (true ,snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_Commando:
 begin
    setMWSM(@spr_Commando,nil);
+   setSND (false,snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_Bomber:
 begin
    setMWSM(@spr_Bomber,nil);
+   setSND (false,snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_Major:
 begin
    setMWSM(@spr_Major,@spr_FMajor);
+   setSND (false,snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
+
+   setEID (true ,0  ,EID_Exp,EID_Exp,0  );
+   setEIDS(true ,nil,snd_exp,snd_exp,nil);
 end;
 UID_BFG:
 begin
    setMWSM(@spr_BFG,nil);
+   setSND (false,snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
+   setEID (false,0  ,0             ,EID_Gavno,0  );
+   setEIDS(false,nil,snd_uac_hdeath,snd_meat ,nil);
 end;
 UID_FAPC:
 begin
    setMWSM(@spr_FAPC,nil);
+   setSND (false,snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
+   setEID (false,0  ,EID_BExp,EID_BExp,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 UID_APC:
 begin
    setMWSM(@spr_APC,nil);
+   setSND (false,snd_APC_ready,snd_APC_move,snd_APC_move,snd_APC_move,snd_APC_move);
+   setEID (false,0  ,EID_BExp,EID_BExp,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 UID_Terminator:
 begin
    setMWSM(@spr_Terminator,nil);
+   setSND (false,snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
+   setEID (false,0  ,EID_Exp2,EID_Exp2,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 UID_Tank:
 begin
    setMWSM(@spr_Tank,nil);
+   setSND (false,snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
+   setEID (false,0  ,EID_BExp,EID_BExp,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 UID_Flyer:
 begin
    setMWSM(@spr_Flyer,nil);
+   setSND (false,snd_uacfighter_ready,snd_uacfighter_move,snd_uacfighter_attack,snd_uacfighter_annoy,snd_uacfighter_select);
+   setEID (false,0  ,EID_Exp2,EID_Exp2,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 UID_UTransport:
 begin
    setMWSM(@spr_Transport,nil);
+   setSND (false,snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
+   setEID (false,0  ,EID_BExp,EID_BExp,0  );
+   setEIDS(false,nil,snd_exp ,snd_exp ,nil);
 end;
 
 
 UID_UCommandCenter:
 begin
    setMWSM(@spr_UCommandCenter,nil);
+   setBuildingSND(snd_uac_cc);
 end;
 UID_UMilitaryUnit:
 begin
    setMWSM(@spr_UMilitaryUnit,@spr_UAMilitaryUnit);
+   setBuildingSND(snd_uac_barracks);
 end;
 UID_UGenerator:
 begin
    setMWSM(@spr_UGenerator,nil);
+   setBuildingSND(snd_uac_generator);
 end;
 UID_UWeaponFactory:
 begin
    setMWSM(@spr_UWeaponFactory,@spr_UAWeaponFactory);
+   setBuildingSND(snd_uac_smith);
 end;
 UID_UTurret:
 begin
    _animw    := 6;
    setMWSM(@spr_UTurret,nil);
-   un_eid_bcrater_y:=15;
+   setBuildingSND(snd_uac_ctower);
+   un_eid_bcrater_y:=1;
 end;
 UID_URadar:
 begin
    setMWSM(@spr_URadar,nil);
+   setBuildingSND(snd_uac_radar);
 end;
 UID_UVehicleFactory:
 begin
    setMWSM(@spr_UVehicleFactory,nil);
+   setBuildingSND(snd_uac_tech);
 end;
 UID_UPTurret:
 begin
    _animw    := 4;
 
    setMWSM(@spr_UPTurret,nil);
+   setBuildingSND(snd_uac_ctower);
+   un_eid_bcrater_y:=1;
 end;
 UID_URocketL:
 begin
    setMWSM(@spr_URocketL,nil);
+   setBuildingSND(snd_uac_rls);
 end;
 UID_URTurret:
 begin
    _animw    := 2;
 
    setMWSM(@spr_URTurret,nil);
+   setBuildingSND(snd_uac_rtower);
+   un_eid_bcrater_y:=1;
 end;
 UID_UNuclearPlant:
 begin
    setMWSM(@spr_UNuclearPlant,nil);
+   setBuildingSND(snd_uac_nucl);
 end;
 UID_UMine:
 begin
    setMWSM(@spr_Mine,nil);
+   setBuildingSND(snd_mine_place);
 end;
 
       end;
@@ -365,19 +505,24 @@ end;
       begin
          case _urace of
        r_hell: begin
-               if(_r>42)
-               then un_eid_bcrater:=EID_db_h0
-               else un_eid_bcrater:=EID_db_h1;
-               if(un_build_amode=0)then un_build_amode:=1;
+                  if(_r>42)
+                  then un_eid_bcrater:=EID_db_h0
+                  else un_eid_bcrater:=EID_db_h1;
+                  if(un_build_amode=0)then un_build_amode:=1;
                end;
-       r_uac : if(_r>42)
-               then un_eid_bcrater:=EID_db_u0
-               else un_eid_bcrater:=EID_db_u1;
+       r_uac : begin
+                  if(_r<20)
+                  then un_eid_bcrater:=u
+                  else
+                    if(_r>42)
+                    then un_eid_bcrater:=EID_db_u0
+                    else un_eid_bcrater:=EID_db_u1;
+               end;
          end;
          if(_r>42)then
          begin
             setEID (false,0  ,EID_BBExp           ,EID_BBExp           ,0  );
-            setEIDS(false,nil,snd_building_explode,snd_building_explode,nil);
+            setEIDS(false,snd_constr_complete[_urace],snd_building_explode,snd_building_explode,nil);
             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=10;
          end
          else
@@ -472,7 +617,7 @@ begin
    case _attack of
     atm_none    : exit;
     atm_bunker,
-    atm_always  : if(0<inapc)and(inapc<=MaxUnits)then
+    atm_always  : if(_IsUnitRange(inapc))then
                   begin
                      if(_units[inapc].inapc>0)then exit;
                      case _units[inapc].uid^._attack of
@@ -482,8 +627,7 @@ begin
                   end;
     atm_sturret : if(apcc =0)then exit;
     atm_inapc   : if(inapc=0)then exit;
-      else exit;
-
+   else exit;
    end;
    _canattack:=true;
 end;
@@ -751,6 +895,8 @@ begin
    _btime     := 8;
    _uf        := uf_soaring;
    _attack    := atm_always;
+   _fastdeath[false]:=true;
+   _fastdeath[true ]:=true;
 end;
 UID_Imp        :
 begin
@@ -848,6 +994,8 @@ begin
    _ruid      := UID_HFortress;
    _uf        := uf_fly;
    _attack    := atm_always;
+   _fastdeath[false]:=true;
+   _fastdeath[true ]:=true;
 end;
 UID_Revenant   :
 begin
@@ -1160,7 +1308,7 @@ begin
    _ucl       := 21;
    _attack    := atm_always;
 
-   _isbuilding:=true;
+   _isbuilding:= true;
    _issolid   := false;
 end;
 
@@ -1386,6 +1534,8 @@ end;
 
       if(i in uids_hell)then _urace:=r_hell;
       if(i in uids_uac )then _urace:=r_uac;
+
+      if(_urace=0)then _urace:=r_hell;
 
       _ismech:=_ismech or _isbuilding;
 

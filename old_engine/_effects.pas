@@ -69,6 +69,9 @@ begin
         EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);
         EID_db_u0         : _setEID(@spr_db_u0         ,sms_death);
         EID_db_u1         : _setEID(@spr_db_u1         ,sms_death);
+        UID_UTurret       : _setEID(@spr_UTurret       ,sms_build);
+        UID_UPTurret      : _setEID(@spr_UPTurret      ,sms_build);
+        UID_URTurret      : _setEID(@spr_URTurret      ,sms_build);
       end;
    end;
 end;
@@ -100,21 +103,26 @@ begin
       anim_step    := ans;
 
       anim_i       := si;
-      if(ei=-1)
-      then sc := sm^.sn
-      else
-        if(ei<sm^.sn)
-        then sc := sm^.sn-ei
-        else sc := sm^.sn;
 
-      anim_last_i:=(sc*anim_step)-1;
-
-      if(revanim)then
+      if(ans>0)then
       begin
-         sc:=anim_i;
-         anim_i:=anim_last_i;
-         anim_last_i:=sc;
-      end;
+         if(ei=-1)
+         then sc := sm^.sn
+         else
+           if(ei<sm^.sn)
+           then sc := sm^.sn-ei
+           else sc := sm^.sn;
+
+         anim_last_i:=(sc*anim_step)-1;
+
+         if(revanim)then
+         begin
+            sc:=anim_i;
+            anim_i:=anim_last_i;
+            anim_last_i:=sc;
+         end;
+      end
+      else anim_last_i:=si;
    end;
 end;
 
@@ -126,7 +134,7 @@ begin
    if(anim_last_i_t=0)then
    begin
       case ee of
-UID_Pain          : _setEff(7 ,0 ,32 ,-1       ,false,0 );
+UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
 UID_HEye          : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
@@ -160,7 +168,7 @@ EID_Blood         : _setEff(6 ,0 ,-1 ,-1       ,true ,15);
 
 EID_ArchFire      : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
-EID_HUpgr         : _setEff(10,0 ,-1 ,-1       ,true ,0 );
+EID_HUpgr,
 EID_Teleport      : _setEff(10,0 ,-1 ,-1       ,true ,0 );
 EID_Gavno         : _setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
@@ -168,19 +176,22 @@ EID_BExp          : _setEff(5 ,0 ,-1 ,-1       ,true ,0 );
 EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HKT_h,
-EID_HKT_s         : _setEff(1 ,3 ,3  ,fr_fps   ,false,0 );
-EID_HMU           : _setEff(1 ,3 ,3  ,fr_fps   ,false,0 );
-EID_HCC           : _setEff(1 ,3 ,3  ,fr_fps   ,false,0 );
-EID_HAMU          : _setEff(1 ,3 ,3  ,fr_fps   ,false,0 );
+EID_HKT_s,
+EID_HMU,
+EID_HCC,
+EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps   ,false,0 );
 
-EID_db_h0         : _setEff(1 ,0 ,0  ,dead_time,false,0 );
-EID_db_h1         : _setEff(1 ,0 ,0  ,dead_time,false,0 );
-EID_db_u0         : _setEff(1 ,0 ,0  ,dead_time,false,0 );
-EID_db_u1         : _setEff(1 ,0 ,0  ,dead_time,false,0 );
+UID_UTurret,
+UID_UPTurret,
+UID_URTurret,
+EID_db_h0,
+EID_db_h1,
+EID_db_u0,
+EID_db_u1         : _setEff(0 ,0 ,0  ,dead_time,false,0 );
       else exit;
       end;
 
-      if(anim_step=0)then
+      if(anim_step=0)and(anim_i<>anim_last_i)then
       begin
          anim_last_i_t:=0;
          break;
@@ -232,7 +243,9 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
            end;
         end;
 
-        spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step);
+        if(anim_step>0)
+        then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step)
+        else spr:=_sm2s(smodel,anim_smstate,270,anim_i);
 
         if(draw)then
          if(_rectvis(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);

@@ -53,7 +53,7 @@ begin
        _units_au(p,[UID_HKeep..UID_HMilitaryUnit,
                     UID_LostSoul..UID_ZBFG,
                     UID_UCommandCenter..UID_UMine,
-                    UID_Engineer..UID_Tank],
+                    UID_Engineer..UID_Flyer],
                     255,true);
 
        _upgrs_au(p,[0..255],255,true);
@@ -95,6 +95,7 @@ begin
 end;
 
 procedure DefGameObjects;
+var u:integer;
 begin
    randomize;
 
@@ -109,16 +110,13 @@ begin
    FillChar(_missiles,SizeOf(_missiles),0);
 
    FillChar(_units   ,SizeOf(_units   ),0);
-   _LastCreatedUnit:=0;
-   while(_LastCreatedUnit<=MaxUnits)do
+
+   for u:=0 to MaxUnits do
+   with _units[u] do
    begin
-      with _units[_LastCreatedUnit] do
-      begin
-         hits  :=dead_hits;
-         player:=@_players[playeri];
-         uid   :=@_units  [uidi   ];
-      end;
-      inc(_LastCreatedUnit,1);
+      hits  :=dead_hits;
+      player:=@_players[playeri];
+      uid   :=@_units  [uidi   ];
    end;
    _LastCreatedUnit :=0;
    _LastCreatedUnitP:=@_units[_LastCreatedUnit];
@@ -150,6 +148,9 @@ begin
    vid_vsls:=0;
 
    ui_tab :=0;
+   ui_UnitSelectedn:=0;
+   ui_UnitSelectedp:=0;
+   ui_UnitSelected :=0;
 
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
@@ -512,7 +513,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                    if(psel=false)then
                    begin
                       _unit_inc_selc(pu);
-                      //ui_UnitSelectSound:=true;
+                      ui_UnitSelected :=uidi;
+                      ui_UnitSelecteda:=buff[ub_advanced]>0;
+                      ui_UnitSelectedb:=bld;
                    end;
                    inc(scnt,1);
                 end
@@ -866,12 +869,8 @@ begin
          FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
 
-         {if(ui_UnitSelectSound)then
-         begin
-            ui_UnitSelectSound:=false;
-           // _LastSelectedUID
-            // play select sound
-         end; }
+         PlayUnitSelect;
+
          {$ENDIF}
 
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;

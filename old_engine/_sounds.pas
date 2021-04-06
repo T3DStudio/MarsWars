@@ -48,6 +48,7 @@ begin
       begin
          sound:=t;
          ticks_length:=MIXChunkGetFPSLength(t);
+         last_channel:=-1;
       end;
    end;
 end;
@@ -146,15 +147,21 @@ begin
      end;
 end;
 
+function PlaySound(PlaySoundSet:PTMWSound):integer;
+begin
+   PlaySound:=-1;
+   if(PlaySoundSet<>nil)then
+   with PlaySoundSet^ do
+   begin
+      MIX_VOLUMECHUNK(sound,snd_svolume);
+      PlaySound:=MIX_PLAYCHANNEL(-1,sound,0);
+   end;
+end;
+
 function PlaySoundSet(ss:PTSoundSet):PTMWSound;
 begin
    PlaySoundSet:=SoundSet2Chunk(ss);
-   if(PlaySoundSet<>nil)then
-    with PlaySoundSet^ do
-    begin
-       MIX_VOLUMECHUNK(sound,snd_svolume);
-       last_channel:=MIX_PLAYCHANNEL(-1,sound,0);
-    end;
+   PlaySound(PlaySoundSet);
 end;
 
 function PlaySND(ss:PTSoundSet;pu:PTUnit):boolean;
@@ -182,44 +189,65 @@ begin
 end;
 
 procedure PlayInGameAnoncer(ss:PTSoundSet);
-const min_pause = fr_fps;
+const min_snd_pause = fr_fps;
 var s:PTMWSound;
 begin
    if(ss=nil)
    or(_menu)
    or(_draw=false)then exit;
 
-   if(snd_anoncer_pause<min_pause)then
-    if(snd_anoncer_pause<=0)or(snd_anoncer_last<>ss)then
-    begin
-       s:=PlaySoundSet(ss);
-       if(s<>nil)then
-       begin
-          snd_anoncer_last :=ss;
-          snd_anoncer_pause:=max2(min_pause,s^.ticks_length);
-       end;
-    end;
+   if(snd_anoncer_pause<min_snd_pause)then
+   if(snd_anoncer_pause<=0)or(snd_anoncer_last<>ss)then
+   begin
+      s:=PlaySoundSet(ss);
+      if(s<>nil)then
+      begin
+         snd_anoncer_last :=ss;
+         snd_anoncer_pause:=max2(min_snd_pause,s^.ticks_length);
+      end;
+   end;
 end;
 
 procedure PlayCommandSound(ss:PTSoundSet);
-const min_pause = fr_hfps;
+const min_snd_pause = fr_hfps;
 var s:PTMWSound;
 begin
    if(ss=nil)
    or(_menu)
    or(_draw=false)then exit;
 
-   if(snd_unit_cmd_pause<min_pause)then
+   if(snd_unit_cmd_pause<min_snd_pause)then
+   if(snd_unit_cmd_pause<=0)or(snd_unit_cmd_last<>ss)then
    begin
-      s:=SoundSet2Chunk(ss);
+      s:=PlaySoundSet(ss);
       if(s<>nil)then
-       if(snd_unit_cmd_pause<=0)or(snd_unit_cmd_last<>s)then
-       begin
-          mix_haltchannel(s^.last_channel);
-          mix_playchannel(s^.last_channel,s^.sound,0);
-          snd_unit_cmd_last :=s;
-          snd_unit_cmd_pause:=max2(min_pause,s^.ticks_length);
-       end;
+      begin
+         snd_unit_cmd_last :=ss;
+         snd_unit_cmd_pause:=max2(min_snd_pause,s^.ticks_length);
+      end;
+   end;
+end;
+
+procedure PlayUnitSelect;
+const annoy = 5;
+begin
+   if(ui_UnitSelected>0)then
+   begin
+      if(ui_UnitSelected<>ui_UnitSelectedp)
+      then ui_UnitSelectedn:=0
+      else
+        if(ui_UnitSelectedn<annoy)then inc(ui_UnitSelectedn,1);
+
+      with _uids[ui_UnitSelected] do
+       if(_isbuilding)and(ui_UnitSelectedb=false)
+       then PlayCommandSound(snd_building[_urace])
+       else
+        if(ui_UnitSelectedn<annoy)
+        then PlayCommandSound(un_snd_select[ui_UnitSelecteda])
+        else PlayCommandSound(un_snd_annoy [ui_UnitSelecteda]);
+
+      ui_UnitSelectedp:=ui_UnitSelected;
+      ui_UnitSelected :=0;
    end;
 end;
 
@@ -328,6 +356,9 @@ begin
    snd_uac_tech             :=LoadSoundSet(race_buildings[r_uac ]+'tech_center'    );
    snd_uac_rls              :=LoadSoundSet(race_buildings[r_uac ]+'rocketstation'  );
    snd_uac_nucl             :=LoadSoundSet(race_buildings[r_uac ]+'nuclear_plant'  );
+
+   snd_uac_suply            :=LoadSoundSet(race_buildings[r_uac ]+'supply-depot'   );
+   snd_uac_rescc            :=LoadSoundSet(race_buildings[r_uac ]+'resourse_senter');
 
    snd_uac_reload           :=LoadSoundSet(race_units[r_uac ]+'adv'                );
    snd_uac_hdeath           :=LoadSoundSet(race_units[r_uac ]+'death'              );
@@ -472,8 +503,8 @@ begin
    snd_cyber_death          :=LoadSoundSet(race_units[r_hell]+'cyber\d_u5_d' );
    snd_cyber_foot           :=LoadSoundSet(race_units[r_hell]+'cyber\d_u5_f' );
 
-   snd_caco_death           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3'   );
-   snd_caco_ready           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3_d' );
+   snd_caco_death           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3_d'   );
+   snd_caco_ready           :=LoadSoundSet(race_units[r_hell]+'caco\d_u3'     );
 
    snd_archvile_death       :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_d' );
    snd_archvile_attack      :=LoadSoundSet(race_units[r_hell]+'archvile\d_arch_at');

@@ -132,8 +132,7 @@ TUID = record
    _tprod,
    _painc,
    _apcs,
-   _apcm,
-   _animw,_animd,_animf
+   _apcm
                 : integer;
    _zombieid,
    _urace,
@@ -164,6 +163,7 @@ TUID = record
    ups_upgrades,
    ups_apc      : TSoB;
    {$IFDEF _FULLGAME}
+   _animw,_animd,
    _fr          : integer;
    un_btn,
    un_sbtn      : array[false..true] of TMWSprite;
@@ -177,11 +177,14 @@ TUID = record
    un_eid_bcrater   :byte;
    un_eid_bcrater_y :integer;
 
+   un_foot_anim: array[false..true] of integer;
+
    un_eid_ready,
    un_eid_death,
    un_eid_fdeath,
    un_eid_pain
                : array[false..true] of byte;
+   un_eid_snd_foot,
    un_eid_snd_ready,
    un_eid_snd_death,
    un_eid_snd_fdeath,

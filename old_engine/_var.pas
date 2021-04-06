@@ -277,8 +277,11 @@ m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 m_mmap_move       : boolean = false;
 
-ui_UnitSelSound   : byte = 0;
-ui_UnitSelSoundp  : byte = 0;
+ui_UnitSelected   : byte = 0;
+ui_UnitSelectedp  : byte = 0;
+ui_UnitSelectedn  : byte = 0;
+ui_UnitSelecteda  : boolean = false;
+ui_UnitSelectedb  : boolean = false;
 ui_tab            : byte = 0;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
@@ -312,14 +315,8 @@ ui_uibtn_f2       : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
-
-{
-ui_msk            : byte = 0;
-ui_msks           : shortint = 0;
-}
-
-ui_muc            : array[false..true] of cardinal; // unit max cound color
-ui_rad_rld        : array[false..true] of cardinal; // radar reload time
+ui_rld,
+ui_muc            : array[false..true] of cardinal; // unit max count color
 
 ui_uiuphx         : integer = 0;
 ui_ingamecl       : byte = 0;
@@ -693,7 +690,7 @@ snd_current_music  : integer = 0;
 snd_anoncer_pause  : integer = 0;
 snd_anoncer_last   : PTSoundSet;
 snd_unit_cmd_pause : integer = 0;
-snd_unit_cmd_last  : PTMWSound;
+snd_unit_cmd_last  : PTSoundSet;
 
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
@@ -721,6 +718,8 @@ snd_uac_factory,
 snd_uac_tech,
 snd_uac_rls,
 snd_uac_nucl,
+snd_uac_suply,
+snd_uac_rescc,
 
 snd_uac_reload,
 snd_uac_hdeath,

@@ -209,6 +209,25 @@ begin
    end;
 end;
 
+procedure _unit_foot_effects(pu:PTUnit);
+var adv:boolean;
+begin
+   with pu^ do
+   begin
+      adv:=buff[ub_advanced]>0;
+      with uid^ do
+      if(un_foot_anim[adv]>0)then
+      begin
+         dec(animf,1);
+         if(animf<=0)then
+         begin
+            PlaySND(un_eid_snd_foot[adv],nil);
+            animf:=un_foot_anim[adv];
+         end;
+      end;
+   end;
+end;
+
 function _EID2Spr(eid:byte):PTMWSprite;
 begin
    _EID2Spr:=@spr_dummy;
@@ -289,7 +308,7 @@ begin
                  end;   }
              end;
 
-            //if(wanim)then _unit_foot(pu);
+            if(wanim)then _unit_foot_effects(pu);
 
             if((sel)and(playeri=HPlayer))
             or(k_alt>1)
@@ -339,8 +358,8 @@ begin
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]]. un_btn,255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
-                      if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._advanced[g_addon]],255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn                                      ,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
                    end;
                 end;
              end
