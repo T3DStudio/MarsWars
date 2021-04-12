@@ -288,7 +288,7 @@ end;
 
 function _unit2SMAnimK(u:PTUnit;_wanim_:boolean):byte;
 begin
-   if(_wanim_)
+   if(_wanim_)or(u^.uid^._isbuilding)
    then _unit2SMAnimK:=sms_walk
    else _unit2SMAnimK:=sms_stand;
 
@@ -317,16 +317,17 @@ begin
          ak:=_unit2SMAnimK(u,wanim);
 
          case ak of
-sms_walk:    begin
+sms_walk:    if(_animw>0)then
+             begin
                 if(wanim)or(_isbuilding)then
                 begin
-                   inc(anim,1);
-                   anim:=abs(anim mod 10000);
+                   inc(anim,_animw);
+                   if(anim<0)then anim:=0;
+                   //if(anim>=1200)then anim:=anim mod 1200;
                 end;
-                if(_animw>0)
-                then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animw)
-                else _unit2spr:=_sm2s(smodel,ak,dir,0);
-             end;
+                _unit2spr:=_sm2s(smodel,ak,dir,anim div 100)
+             end
+             else _unit2spr:=_sm2s(smodel,ak,dir,0);
 sms_dattack,
 sms_mattack: if(a_weap<=MaxUnitWeapons)
              then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a))
@@ -339,7 +340,7 @@ sms_death:   begin
              end;
 sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
          else
-            _unit2spr:=_sm2s(smodel,ak,dir,0);
+             _unit2spr:=_sm2s(smodel,ak,dir,0); //stand,build
          end;
       end;
    end;

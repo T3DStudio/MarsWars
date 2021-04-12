@@ -82,7 +82,7 @@ begin
 
           if(state<>ps_none)then
           begin
-             _draw_text(tar,ui_menu_pls_zxst, u,_plst(p)          , ta_middle, 255, c);
+             _draw_text(tar,ui_menu_pls_zxst, u,_PlyerStatus(p)          , ta_middle, 255, c);
              _draw_text(tar,ui_menu_pls_zxnt, u, name             , ta_left  , 255, c_white);
              if G_Started or (net_nstat=ns_clnt) or ((net_nstat<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
@@ -98,7 +98,7 @@ begin
                _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random]            , ta_middle,255, c_gray);
                _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PickPlayerTeam(g_mode,p)) , ta_middle,255, c_gray);
             end
-            else _draw_text(tar,ui_menu_pls_zxst, u,_plst(p), ta_middle, 255, c);
+            else _draw_text(tar,ui_menu_pls_zxst, u,_PlyerStatus(p), ta_middle, 255, c);
           boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,p_color(p));
        end;
 

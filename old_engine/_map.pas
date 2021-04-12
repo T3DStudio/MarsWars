@@ -398,7 +398,7 @@ begin
    ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
    if(ddc>MaxDoodads)then ddc:=MaxDoodads;
 
-   if(map_sym)then ddc:=ddc div 3;
+   if(map_sym)then ddc:=ddc div 4;
 
    rks :=0;
    lqs :=0;

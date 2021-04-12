@@ -258,7 +258,8 @@ begin
    if(h<=ndead_hits)then _hI2S:=-128 else
    if(dead_hits<h)and(h<0)
                     then _hI2S:=mm3(-126,h div _d2shi,-1)
-   else                  _hI2S:=mm3(1,trunc(s),_mms);
+
+   else                  _hI2S:=mm3(1,trunc(h*s),_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -290,29 +291,35 @@ begin
      end;
 end;
 
-function _plst(p:integer):char;
+function _PlyerStatus(p:integer):char;
 begin
    with _players[p] do
    begin
-      _plst:=str_ps_c[state];
+      _PlyerStatus:=str_ps_c[state];
       if(state=ps_play)then
       begin
          if(g_started=false)
-         then _plst:=b2pm[ready,2]
-         else _plst:=str_ps_c[ps_play];
-         if(ttl>=fr_fps)then _plst:=str_ps_t;
+         then _PlyerStatus:=b2pm[ready,2]
+         else _PlyerStatus:=str_ps_c[ps_play];
+         if(ttl>=fr_fps)then _PlyerStatus:=str_ps_t;
          {$IFDEF _FULLGAME}
          if(net_cl_svpl=p)then
          begin
-            _plst:=str_ps_sv;
-            if(net_cl_svttl>=fr_fps)then _plst:=str_ps_t;
+            _PlyerStatus:=str_ps_sv;
+            if(net_cl_svttl>=fr_fps)then _PlyerStatus:=str_ps_t;
          end;
          {$ENDIF}
       end;
-      if(p=HPlayer)then _plst:=str_ps_h;
+      if(p=HPlayer)then _PlyerStatus:=str_ps_h;
    end;
 end;
 
+function _UnitHaveRPoint(pu:PTUnit):boolean;
+begin
+   with pu^ do
+   with uid^ do
+   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
+end;
 
 {$IFDEF _FULLGAME}
 
@@ -323,13 +330,6 @@ begin
    if FileExists(outlogfn) then Append(f) else Rewrite(f);
    writeln(f,mess);
    Close(f);
-end;
-
-function _UnitHaveRPoint(pu:PTUnit):boolean;
-begin
-   with pu^ do
-   with uid^ do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
 end;
 
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
@@ -355,7 +355,7 @@ end;
 
 function _rectvis(x,y,hw,hh,sh:integer):boolean;
 begin
-   _rectvis:=((vid_vx-hw)<x)and(x<(vid_vx+vid_sw+hw))
+   _rectvis:=((vid_vx-hw           )<x)and(x<(vid_vx+vid_sw+hw))
           and((vid_vy-hh-max2(0,sh))<y)and(y<(vid_vy+vid_sh+hh));
 end;
 function _nhp(x,y:integer):boolean;
@@ -384,7 +384,7 @@ begin
    end;
 end;
 
-procedure _scrollV(i:pinteger;s,min,max:integer);
+procedure _scrollInt(i:pinteger;s,min,max:integer);
 begin
    inc(i^,s);
    if(i^>max)then i^:=max;
@@ -446,17 +446,15 @@ begin
    end;
 end;
 
-procedure _addUIBldrs(tx,ty,tr:integer);
-var i:byte;
+procedure _addUIBuildRs(tx,ty,tr:integer);
 begin
-   for i:=0 to ui_builder_srs do
-    if(ui_builders_x[i]=0)then
-    begin
-       ui_builders_x[i]:=tx;
-       ui_builders_y[i]:=ty;
-       ui_builders_r[i]:=tr;
-       break;
-    end;
+   if(ui_builders_n>ui_builder_srs)then exit;
+
+   ui_builders_x[ui_builders_n]:=tx;
+   ui_builders_y[ui_builders_n]:=ty;
+   ui_builders_r[ui_builders_n]:=tr;
+
+   inc(ui_builders_n,1);
 end;
 
 {$ELSE}

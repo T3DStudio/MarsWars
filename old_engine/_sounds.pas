@@ -229,25 +229,29 @@ begin
 end;
 
 procedure PlayUnitSelect;
-const annoy = 5;
+const annoystart = 6;
+      annoystop  = 12;
 begin
-   if(ui_UnitSelected>0)then
+   if(ui_UnitSelectedNU>0)then
    begin
-      if(ui_UnitSelected<>ui_UnitSelectedp)
+      if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
       else
-        if(ui_UnitSelectedn<annoy)then inc(ui_UnitSelectedn,1);
+        if(ui_UnitSelectedn<annoystop)
+        then inc(ui_UnitSelectedn,1)
+        else ui_UnitSelectedn:=0;
 
-      with _uids[ui_UnitSelected] do
-       if(_isbuilding)and(ui_UnitSelectedb=false)
+      with _units[ui_UnitSelectedNU] do
+      with uid^ do
+       if(_isbuilding)and(bld=false)
        then PlayCommandSound(snd_building[_urace])
        else
-        if(ui_UnitSelectedn<annoy)
-        then PlayCommandSound(un_snd_select[ui_UnitSelecteda])
-        else PlayCommandSound(un_snd_annoy [ui_UnitSelecteda]);
+        if(ui_UnitSelectedn<annoystart)
+        then PlayCommandSound(un_snd_select[buff[ub_advanced]>0])
+        else PlayCommandSound(un_snd_annoy [buff[ub_advanced]>0]);
 
-      ui_UnitSelectedp:=ui_UnitSelected;
-      ui_UnitSelected :=0;
+      ui_UnitSelectedPU:=ui_UnitSelectedNU;
+      ui_UnitSelectedNU:=0;
    end;
 end;
 

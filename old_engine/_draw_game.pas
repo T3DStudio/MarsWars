@@ -331,9 +331,10 @@ begin
     with uid^ do
      if(hits>dead_hits)then
      begin
-        ix:=x-vid_vx;
-        iy:=y-vid_vy;
+        ix:=x-vid_vx+vid_mapx;
+        iy:=y-vid_vy+vid_mapy;
 
+        _draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, p_color(playeri));
 
         if(hits>0)then
         if(k_shift>1)then

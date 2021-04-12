@@ -333,6 +333,10 @@ begin
          {$ENDIF}
       end;
 
+      {$IFDEF _FULLGAME}
+      if(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+      {$ENDIF}
+
       _unit_dec_Kcntrs(pu);
 
       with uid^ do

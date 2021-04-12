@@ -63,12 +63,14 @@ begin
        circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray); }
 
       // build areas
-      for i:=0 to ui_builder_srs do
-       if(ui_builders_x[i]<>0)then
-        circleColor(tar,
-        lx+ui_builders_x[i]-vid_vx,
-        ly+ui_builders_y[i]-vid_vy,
-        ui_builders_r[i],c_white);
+      while(ui_builders_n>0)do
+      begin
+         dec(ui_builders_n,1);
+         circleColor(tar,
+         lx+ui_builders_x[ui_builders_n]-vid_vx,
+         ly+ui_builders_y[ui_builders_n]-vid_vy,
+         ui_builders_r[ui_builders_n],c_white);
+      end;
 
       // points
       if(g_mode=gm_ct)then

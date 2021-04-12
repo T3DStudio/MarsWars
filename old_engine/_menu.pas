@@ -13,11 +13,12 @@ begin
    end;
 end;
 
-function menu_sf(s:string;charset:TSoc;ms:byte):string;
-var sl:byte;
-     c:char;
+function menu_sf(s:shortstring;charset:TSoc;ms:byte):shortstring;
+var i:byte;
+    c:char;
 begin
-   if (k_chrt=2)or(k_chrt>k_chrtt) then
+   //if (k_chrt=2)or(k_chrt>k_chrtt) then
+   {if(k_kstring<>'')
    begin
       sl:=length(s);
       c:=k_chr;
@@ -27,6 +28,21 @@ begin
       else
         if(sl<ms)and(c<>#0)then s:=s+c;
    end;
+   menu_sf:=s;}
+
+   if(length(k_kstring)>0)then
+   for i:=1 to length(k_kstring) do
+   begin
+      c:=k_kstring[i];
+      if(c=#8)
+      then delete(s,length(s),1)
+      else
+       if(length(s)>=ms)
+       then break
+       else
+         if(c in charset)then s:=s+c;
+   end;
+   k_kstring:='';
    menu_sf:=s;
 end;
 
@@ -285,9 +301,9 @@ begin
 
       ///  MAP
       50 : ;
-      51 : begin _scrollV(@map_mw,500,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin _scrollV(@map_liq,1,0,7); Map_premap;end;
-      53 : begin _scrollV(@map_obs,1,0,7); Map_premap;end;
+      51 : begin _scrollInt(@map_mw,500,MinSMapW,MaxSMapW); Map_premap;end;
+      52 : begin _scrollInt(@map_liq,1,0,7); Map_premap;end;
+      53 : begin _scrollInt(@map_obs,1,0,7); Map_premap;end;
       54 : begin map_sym:=not map_sym; Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
 
@@ -339,9 +355,9 @@ begin
               g_mode:=g_mode mod 6;
               Map_premap;
            end;
-      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@g_startb,1,0,gms_g_startb);
+      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@g_startb,1,0,gms_g_startb);
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; end;
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,8);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
@@ -350,7 +366,7 @@ begin
             then _rpls_rst:=rpl_whead
             else _rpls_rst:=rpl_none;
       83 : if(_rpls_rst<>rpl_none)then _m_sel:=0;
-      84 : _scrollV(@_rpls_pnui,1,0,9);
+      84 : _scrollInt(@_rpls_pnui,1,0,9);
 
       //// multiplayer
       // server
@@ -407,10 +423,10 @@ begin
               menu_s1:=ms1_sett;
            end;
       90 : if(net_nstat<>ns_none)then _m_sel:=0; // addr
-      91 : if(net_nstat<>ns_srvr)then _scrollV(@net_pnui,1,0,9);
+      91 : if(net_nstat<>ns_srvr)then _scrollInt(@net_pnui,1,0,9);
       92 : if(G_Started=false)and(net_nstat<>ns_srvr)then
             if(m_vx<ui_menu_csm_x2)
-            then _scrollV(@PlayerTeam,1,1,MaxPlayers)
+            then _scrollInt(@PlayerTeam,1,1,MaxPlayers)
             else
               if(m_vx<ui_menu_csm_x3)
               then begin inc(PlayerRace,1); PlayerRace:=PlayerRace mod 3;end
@@ -432,7 +448,7 @@ begin
            end;
 
       // camps
-      97 : _scrollV(@cmp_skill,1,0,6);
+      97 : _scrollInt(@cmp_skill,1,0,6);
       98 : begin
               _cmp_sel:=_cmp_sm+((m_vy-ui_menu_csm_y0) div ui_menu_csm_ys)-2;
               if(_cmp_sel>=MaxMissions)then _cmp_sel:=MaxMissions-1;
@@ -448,9 +464,9 @@ begin
       case _m_sel of
       // MAP
       50 : begin Map_randomseed; Map_premap;end;
-      51 : begin _scrollV(@map_mw,-500,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin _scrollV(@map_liq,-1,0,7); Map_premap;end;
-      53 : begin _scrollV(@map_obs,-1,0,7); Map_premap;end;
+      51 : begin _scrollInt(@map_mw,-500,MinSMapW,MaxSMapW); Map_premap;end;
+      52 : begin _scrollInt(@map_liq,-1,0,7); Map_premap;end;
+      53 : begin _scrollInt(@map_obs,-1,0,7); Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
 
       60 : begin
@@ -467,21 +483,21 @@ begin
                 if(team>1)then dec(team,1);
            end;
 
-      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@g_startb ,-1,0,gms_g_startb);
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,8);
+      77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@g_startb ,-1,0,gms_g_startb);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,-1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
-      84 : _scrollV(@_rpls_pnui,-1,0,9);
+      84 : _scrollInt(@_rpls_pnui,-1,0,9);
 
-      91 : if(net_nstat<>ns_srvr)then _scrollV(@net_pnui,-1,0,9);
+      91 : if(net_nstat<>ns_srvr)then _scrollInt(@net_pnui,-1,0,9);
       92 : if(G_Started=false)and(net_nstat<>ns_srvr)then
-            if(m_vx<ui_menu_csm_x2)then _scrollV(@PlayerTeam,-1,1,MaxPlayers);
+            if(m_vx<ui_menu_csm_x2)then _scrollInt(@PlayerTeam,-1,1,MaxPlayers);
 
-      97 : _scrollV(@cmp_skill,-1,0,CMPMaxSkills);
+      97 : _scrollInt(@cmp_skill,-1,0,CMPMaxSkills);
       end;
    end;
 
-   if((k_chrt=2)or(k_chrt>k_chrtt)) then
+   if(length(k_kstring)>0)then
    begin
       if(_m_sel=11 )then PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
 

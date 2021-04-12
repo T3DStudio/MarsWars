@@ -64,30 +64,24 @@ begin
 
    while (_CYCLE) do
    begin
-   {$IFDEF _FULLGAME}
       fps_cs:=SDL_GetTicks;
-
-      if(fps_cs<fps_ns)then continue;
-
-      if(_fsttime)
-      then fps_ns:=fps_cs
-      else fps_ns:=fps_cs+fr_mpt;
-
+      {$IFDEF _FULLGAME}
       InputGame;
       CodeGame;
       if(_draw)then DrawGame;
-
-      fps_tt:=SDL_GetTicks-fps_cs;
-   {$ELSE}
+      {$ELSE}
       while (SDL_PollEvent(_EVENT)>0) do
        CASE (_EVENT^.type_) OF
        SDL_QUITEV  : break;
        end;
-
       CodeGame;
+      {$ENDIF}
+      fps_ns:=SDL_GetTicks-fps_cs;
+      if(fps_ns>=fr_mpt)
+      then fps_tt:=1
+      else fps_tt:=fr_mpt-fps_ns;
 
-      SDL_Delay(fr_mpt);
-   {$ENDIF}
+      SDL_Delay(fps_tt);
    end;
 
    {$IFDEF _FULLGAME}
@@ -96,4 +90,19 @@ begin
    {$ENDIF}
 end.
 
+{
+fps_cs:=SDL_GetTicks;
+
+if(fps_cs<fps_ns)then continue;
+
+if(_fsttime)
+then fps_ns:=fps_cs
+else fps_ns:=fps_cs+fr_mpt;
+
+InputGame;
+CodeGame;
+if(_draw)then DrawGame;
+
+fps_tt:=SDL_GetTicks-fps_cs;
+}
 

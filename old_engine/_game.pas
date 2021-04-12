@@ -148,9 +148,9 @@ begin
    vid_vsls:=0;
 
    ui_tab :=0;
-   ui_UnitSelectedn:=0;
-   ui_UnitSelectedp:=0;
-   ui_UnitSelected :=0;
+   ui_UnitSelectedNU:=0;
+   ui_UnitSelectedPU:=0;
+   ui_builders_n:=0;
 
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
@@ -322,6 +322,11 @@ end;
 {$include _ded.pas}
 {$ENDIF}
 
+function _CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
+begin
+   _CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
+end;
+
 procedure _u_ord(pl:byte);
 var
 u,eu,
@@ -342,7 +347,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
          begin
             if(o_x0>o_x1)then begin u:=o_x1;o_x1:=o_x0;o_x0:=u;end;
             if(o_y0>o_y1)then begin u:=o_y1;o_y1:=o_y0;o_y0:=u;end;
-            if(dist2(o_x0,o_y0,o_x1,o_y1)<4)then scntm:=1;
+            if(_CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then scntm:=1;
          end;
 
          u :=1;
@@ -513,9 +518,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                    if(psel=false)then
                    begin
                       _unit_inc_selc(pu);
-                      ui_UnitSelected :=uidi;
-                      ui_UnitSelecteda:=buff[ub_advanced]>0;
-                      ui_UnitSelectedb:=bld;
+                      {$IFDEF _FULLGAME}
+                      ui_UnitSelectedNU:=unum;
+                      {$ENDIF}
                    end;
                    inc(scnt,1);
                 end

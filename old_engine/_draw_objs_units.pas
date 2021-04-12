@@ -180,7 +180,7 @@ begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
             if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
              if(m_brush in uid^.ups_builder)then
-               if(_rectvis(x,y,srange,srange,0))then _addUIBldrs(x,y,srange);
+               if(_rectvis(x,y,srange,srange,0))then _addUIBuildRs(x,y,srange);
 
             for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)

@@ -136,6 +136,7 @@ begin
       _wudata_sint(sh,rpl);
       if(sh>-127)then
       begin
+         if(playeri=HPlayer)then writeln(unum,' ',sh,' ',hits);
          _wudata_byte (uidi,rpl);
          _wudata_bstat(pu,rpl,_pl);
 
@@ -396,7 +397,7 @@ begin
    end;
 end;
 
-{procedure _netClUCreateEff(pu,tu:PTUnit);
+procedure _netClUCreateEff(pu,tu:PTUnit;vis:boolean);
 begin
    with pu^ do
     with player^ do
@@ -404,7 +405,9 @@ begin
        vx:=x;
        vy:=y;
 
-       if(isbuild)then
+       if(vis=false)then exit;
+
+       {if(isbuild)then
        begin
           case uidi of
           UID_Heye:
@@ -437,20 +440,22 @@ begin
          if(buff[ub_born]>0)then
          begin
             if(playeri=HPlayer)then _unit_createsound(uidi);
-         end;
+         end;  }
 
        if(buff[ub_teleeff]>0)then
        begin
           _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-          PlaySND(snd_teleport,pu);
+          PlaySND(snd_teleport,nil);
        end;
     end;
-end;  }
+end;
 
 procedure _netSetUcl(uu:PTUnit);
 var pu:PTUnit;
+   vis:boolean;
 begin
    pu:=@_units[0];
+   with uu^ do vis:=_nhp3(x,y,player);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // not exists to exists
@@ -471,7 +476,7 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-          // _netClUCreateEff(uu,pu);
+           _netClUCreateEff(uu,pu,vis);
         end;
 
         _unit_upgr(uu);
@@ -482,8 +487,11 @@ begin
        begin
           vx:=x;
           vy:=y;
-          //if(pu^.hits>0)then
-          // if(hits>ndead_hits)and(inapc=0)then _unit_deff(uu,false);
+          if(pu^.hits>0)and(vis)then
+           if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,false);
+
+
+          if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           _unit_upgr(pu);
           _ucDec(pu);
@@ -503,7 +511,7 @@ begin
                vx:=x;
                vy:=y;
 
-               //_netClUCreateEff(uu,pu);
+               _netClUCreateEff(uu,pu,vis);
             end;
 
             _unit_upgr(pu);
@@ -512,8 +520,12 @@ begin
             _unit_upgr(uu);
             _ucInc(uu);
 
-            //if(hits>0)then
-            // if(pu^.buff[ub_born]=0)and(buff[ub_born]>0)then _netClUCreateEff(uu,pu);
+            if(hits>0)then
+            begin
+               if(pu^.buff[ub_born]<=0)and(buff[ub_born]>0)then _netClUCreateEff(uu,pu,vis);
+               if(pu^.sel=false)and(sel)then ui_UnitSelectedNU:=unum;
+               if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,nil);
+            end;
 
             if(pu^.hits<=0)and(hits>0)then
             begin
@@ -524,11 +536,10 @@ begin
             else
               if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
               begin
-                 //_unit_deff(uu,hits<=fdead_hits);
-                 rld:=0;
+                 if(vis)then _unit_death_effects(uu,hits<=fdead_hits,false);
+                 if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+                 //rld:=0;
               end;
-
-            //if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,nil);
 
             if(pu^.inapc=0)and(inapc>0)then
             begin

@@ -46,6 +46,15 @@ begin
    if(_IsUnitRange(tar))then
     if(_units[tar].player^.team<>_players[HPlayer].team)then _checkEnemy:=true;
 end;
+procedure _PlayCommand(ss:PTSoundSet);
+begin
+   PlayCommandSound(ss);
+   ui_UnitSelectedn:=0;
+end;
+procedure _ClickEffect(color:cardinal);
+begin
+   _click_eff(ox1,oy1,fr_hhfps,color);
+end;
 
 begin
    su  :=0;
@@ -61,8 +70,11 @@ begin
       if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(@_units[i]))then
       begin
          inc(su,1);
-         guid:=uidi;
-         gadv:=buff[ub_advanced]>0;
+         if(bld)then
+         begin
+            guid:=uidi;
+            gadv:=buff[ub_advanced]>0;
+         end;
       end;
    end;
 
@@ -75,12 +87,12 @@ begin
    co_move,
    co_astand,
    co_stand,
-   co_patrol : PlayCommandSound(un_snd_move[gadv]);
+   co_patrol : _PlayCommand(un_snd_move[gadv]);
    co_amove,
-   co_apatrol: PlayCommandSound(un_snd_attack[gadv]);
+   co_apatrol: _PlayCommand(un_snd_attack[gadv]);
    co_rcamove: if(_checkEnemy)
-               then PlayCommandSound(un_snd_attack[gadv])
-               else PlayCommandSound(un_snd_move  [gadv]);
+               then _PlayCommand(un_snd_attack[gadv])
+               else _PlayCommand(un_snd_move  [gadv]);
    end;
 
    inc(ox1,vid_mapx);
@@ -93,13 +105,13 @@ begin
    end;
 
    case cmd of
-   co_paction : _click_eff(ox1,oy1,fr_hhfps,c_aqua  );
-   co_rcamove : _click_eff(ox1,oy1,fr_hhfps,c_yellow);
+   co_paction : _ClickEffect(c_aqua  );
+   co_rcamove : _ClickEffect(c_yellow);
    co_rcmove,
    co_move,
-   co_patrol  : _click_eff(ox1,oy1,fr_hhfps,c_lime  );
+   co_patrol  : _ClickEffect(c_lime  );
    co_amove,
-   co_apatrol : _click_eff(ox1,oy1,fr_hhfps,c_red   );
+   co_apatrol : _ClickEffect(c_red   );
    end;
 end;
 
@@ -140,9 +152,11 @@ var i,sc:integer;
 function _ch(up:PTPlayer):boolean;
 begin
    _ch:=true;
-   if(tt=1)then _ch:=up^.team<>htm;
-   if(tt=2)then _ch:=up^.team= htm;
-   if(tt=3)then _ch:=up^.pnum=HPlayer;
+   case tt of
+   1  : _ch:=up^.team<>htm;
+   2  : _ch:=up^.team= htm;
+   3,4: _ch:=up^.pnum=HPlayer;
+   end;
 end;
 begin
    sc:=0;
@@ -160,12 +174,14 @@ begin
        if(_uvision(htm,@_units[i],false))then
         if(dist2(vx,vy,tx,ty)<uid^._r)then
         begin
-           if(tt<=2)then
-           begin
-              if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
-              _whoInPoint:=i;
-           end
-           else _whoInPoint:=uidi;
+           case tt of
+           1,2: begin
+                   if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
+                   _whoInPoint:=i;
+                end;
+           3  : _whoInPoint:=uidi;
+           else _whoInPoint:=i;
+           end;
            break;
        end;
 end;
@@ -175,13 +191,7 @@ begin
    case m_brush of
    0     : m_brush:=co_empty;
    1..255:
-    with _players[HPlayer] do
-     if(_uids[m_brush]._max=1)and(uid_e[m_brush]>0)then
-     begin
-        _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
-        m_brush:=co_empty;
-     end
-     else
+      with _players[HPlayer] do
        if _uid_cndt(@_players[HPlayer],m_brush)>0
        then m_brush:=co_empty
        else
@@ -275,14 +285,22 @@ begin
    else
      u:=(by*3)+(bx mod 3);
 
-     if(0<=by)and(by<9)then
+     if(0<=by)and(by<9)and(bx>=0)then
      with _players[HPlayer] do
       case tab of
 
-0: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // builds
+0: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // buildings
    if(u<=ui_ubtns)then
    case right of
-false: begin m_brush:=ui_panel_uids[race,0,u];_chkbld;end;
+false: begin
+          m_brush:=ui_panel_uids[race,0,u];
+          if(_uids[m_brush]._max=1)and(uid_e[m_brush]>0)then
+          begin
+             _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
+             m_brush:=co_empty;
+          end
+          else _chkbld;
+       end;
 true : if(ucl_x[true,u]>0)then
         if(_rclickmove(ui_panel_uids[race,0,u]))then
          with _units[ucl_x[true,u]] do _command(x,y);
@@ -378,7 +396,7 @@ begin
                              then begin if(g_mode=gm_inv)then inc(g_inv_wn,1); end
                              else _fsttime:=not _fsttime;
             sdlk_home      : _warpten:=not _warpten;
-            sdlk_pageup    : if(net_nstat<>ns_clnt) then with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
+            sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
             sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
             sdlk_backspace : _fog:=not _fog;
             SDLK_F5        : begin HPlayer:=0;exit end;
@@ -465,8 +483,11 @@ begin
    _keyp(@k_alt  );
    _keyp(@k_ml   );
    _keyp(@k_mr   );
-   _keyp(@k_chrt );
+   _keyp(@k_chart);
    if(k_dbl>0)then dec(k_dbl,1);
+
+   if(k_chart>k_chrtt)then
+    if(length(k_kstring)<255)then k_kstring:=k_kstring+k_char;
 
    while (SDL_PollEvent( _event )>0) do
     CASE (_event^.type_) OF
@@ -495,18 +516,18 @@ begin
                                                    begin
                                                       vid_mredraw:=true;
                                                       case _m_sel of
-                                                      98: _scrollV(@_cmp_sm,1,0,MaxMissions-vid_camp_m);
-                                                      36: _scrollV(@_svld_sm,1,0,_svld_ln-vid_svld_m-1);
-                                                      41: _scrollV(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1);
+                                                      98: _scrollInt(@_cmp_sm,1,0,MaxMissions-vid_camp_m);
+                                                      36: _scrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1);
+                                                      41: _scrollInt(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1);
                                                       end;
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
                                                       case _m_sel of
-                                                      98: _scrollV(@_cmp_sm,-1,0,MaxMissions-vid_camp_m);
-                                                      36: _scrollV(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1);
-                                                      41: _scrollV(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1);
+                                                      98: _scrollInt(@_cmp_sm,-1,0,MaxMissions-vid_camp_m);
+                                                      36: _scrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1);
+                                                      41: _scrollInt(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1);
                                                       end;
                                                    end;
                               else
@@ -514,7 +535,7 @@ begin
                            end;
       SDL_QUITEV         : _CYCLE:=false;
       SDL_KEYUP          : begin
-                              k_chrt:=1;
+                              k_chart:=1;
                               case (_event^.key.keysym.sym) of
                                 sdlk_up    : k_u    :=1;
                                 sdlk_down  : k_d    :=1;
@@ -530,8 +551,10 @@ begin
                               end;
                            end;
       SDL_KEYDOWN        : begin
-                              k_chrt:=2;
-                              k_chr :=Widechar(_event^.key.keysym.unicode);
+                              k_chart  :=2;
+                              k_char   :=Widechar(_event^.key.keysym.unicode);
+                              k_kstring:=k_kstring+k_char;
+
                               case (_event^.key.keysym.sym) of
                                 sdlk_up     : if(k_u    =0)then k_u    :=2;
                                 sdlk_down   : if(k_d    =0)then k_d    :=2;
@@ -552,6 +575,13 @@ begin
                            end;
     else
     end;
+end;
+
+procedure ui_SicpleClick;
+var u:integer;
+begin
+   u:=_whoInPoint(m_mx,m_my,4);
+   if(u>0)then ui_UnitSelectedNU:=u;
 end;
 
 procedure g_mouse;
@@ -615,9 +645,13 @@ co_apatrol: _command(m_mx,m_my);
            then _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_dblselect  ,HPlayer)
            else _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_adblselect ,HPlayer)
          else
-           if(k_shift<2)
-           then _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_select ,HPlayer)
-           else _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_aselect,HPlayer);
+         begin
+            if(k_shift<2)
+            then _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_select ,HPlayer)
+            else _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_aselect,HPlayer);
+
+            if(_CheckSimpleClick(m_sxs,m_sys,m_mx,m_my))then ui_SicpleClick;
+         end;
 
          m_sxs:=-1;
          m_ldblclk:=fr_hhfps;

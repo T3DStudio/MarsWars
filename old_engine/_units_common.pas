@@ -106,6 +106,8 @@ begin
    with pu^ do
    with uid^ do
    begin
+      _effect_add(vx,vy+un_eid_bcrater_y,-5,un_eid_bcrater);
+
       if(vischeck)then
        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
 
@@ -119,8 +121,6 @@ begin
          _effect_add(vx,vy,vy+1,un_eid_death[buff[ub_advanced]>0]);
          PlaySND(un_eid_snd_death[buff[ub_advanced]>0],nil);
       end;
-
-      _effect_add(vx,vy+un_eid_bcrater_y,-5,un_eid_bcrater);
    end;
 end;
 
@@ -132,6 +132,18 @@ begin;
    begin
       x:=mm3(1,x,map_mw);
       y:=mm3(1,y,map_mw);
+   end;
+end;
+
+procedure _unt_clear_order(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      uo_id :=ua_amove;
+      uo_tar:=0;
+      uo_x  :=x;
+      uo_y  :=y;
+      uo_bx :=-1;
    end;
 end;
 
@@ -158,10 +170,8 @@ begin
       y     :=ty;
       vx    :=x;
       vy    :=y;
-      uo_x  :=x;
-      uo_y  :=y;
-      uo_tar:=0;
       _unit_correctcoords(pu);
+      _unt_clear_order(pu);
       {$IFDEF _FULLGAME}
       _unit_mmcoords(pu);
       _unit_sfog(pu);
@@ -223,18 +233,6 @@ begin
     if(uid^._slowturn=false)then
      if(_canmove(pu))then
       dir:=p_dir(x,y,uo_x,uo_y);
-end;
-
-procedure _unt_clear_order(pu:PTUnit);
-begin
-   with pu^ do
-   begin
-      uo_id :=ua_amove;
-      uo_tar:=0;
-      uo_x  :=x;
-      uo_y  :=y;
-      uo_bx :=-1;
-   end;
 end;
 
 procedure _unit_uradar(pu:PTUnit;x0,y0:integer);
@@ -942,7 +940,9 @@ begin
             then sound:=2
             else sound:=1;
 
+            {$IFDEF _FULLGAME}
             _unit_ready_effects(_LastCreatedUnitP,true);
+            {$ENDIF}
          end;
       end;
       {$IFDEF _FULLGAME}

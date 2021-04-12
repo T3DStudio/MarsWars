@@ -122,7 +122,7 @@ begin
 end;
 UID_Imp:
 begin
-   _animw:=7;
+   _animw:=12;
    _animd:=8;
    setMWSM(@spr_imp,nil);
    setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain,snd_imp_move);
@@ -132,7 +132,7 @@ begin
 end;
 UID_Demon:
 begin
-   _animw:=6;
+   _animw:=15;
    _animd:=9;
    setMWSM(@spr_demon,nil);
    setSND (false,snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
@@ -149,7 +149,7 @@ begin
 end;
 UID_Baron:
 begin
-   _animw:=8;
+   _animw:=12;
    _animd:=10;
    setMWSM(@spr_knight,@spr_baron);
    setSND (false,snd_knight_ready,snd_hell_move,snd_knight_ready,snd_hell_pain,snd_hell_move);
@@ -161,7 +161,7 @@ begin
 end;
 UID_Cyberdemon:
 begin
-   _animw:=8;
+   _animw:=11;
    setMWSM(@spr_cyberdemon,nil);
    setSND (false,snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
    setEID (false,EID_Teleport,0              ,0  ,0             );
@@ -170,7 +170,7 @@ begin
 end;
 UID_Mastermind:
 begin
-   _animw:=7;
+   _animw:=11;
    _animd:=16;
    setMWSM(@spr_mastermind,nil);
    setSND (false,snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
@@ -180,7 +180,7 @@ begin
 end;
 UID_Pain:
 begin
-   _animw:=12;
+   _animw:=7;
    setMWSM(@spr_pain,nil);
    setSND (false,snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
    setEID (false,EID_Teleport,0             ,u             ,0             );
@@ -188,7 +188,7 @@ begin
 end;
 UID_Revenant:
 begin
-   _animw:=6;
+   _animw:=16;
    _animd:=9;
    setMWSM(@spr_revenant,nil);
    setSND (false,snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
@@ -206,7 +206,7 @@ begin
 end;
 UID_Arachnotron:
 begin
-   _animw:=8;
+   _animw:=11;
    _animd:=13;
    setMWSM(@spr_arachnotron,nil);
    setSND (false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_arachno_move,snd_arachno_move);
@@ -216,7 +216,7 @@ begin
 end;
 UID_Archvile:
 begin
-   _animw:=6;
+   _animw:=15;
    _animd:=12;
    setMWSM(@spr_archvile,nil);
    setSND (false,snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
@@ -225,30 +225,49 @@ begin
 end;
 UID_ZFormer:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_ZFormer,nil);
 end;
 UID_ZEngineer:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_ZEngineer,nil);
+   setEID (false,0  ,EID_Exp,EID_Exp,0  );
+   setEIDS(false,nil,snd_exp,snd_exp,nil);
 end;
 UID_ZSergant:
 begin
+   _animw:=18;
+   _animd:=8;
    setMWSM(@spr_ZSergant,@spr_ZSSergant);
 end;
 UID_ZCommando:
 begin
+   _animw:=15;
+   _animd:=8;
    setMWSM(@spr_ZCommando,nil);
 end;
 UID_ZBomber:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_ZBomber,nil);
 end;
 UID_ZMajor:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_ZMajor,@spr_ZFMajor);
+
+   setEID (true ,0  ,EID_Exp,EID_Exp,0  );
+   setEIDS(true ,nil,snd_exp,snd_exp,nil);
 end;
 UID_ZBFG:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_ZBFG,nil);
 end;
 
@@ -275,7 +294,7 @@ begin
 end;
 UID_HTower:
 begin
-   _animw:=20;
+   _animw:=5;
 
    setMWSM(@spr_HTower,nil);
    setBuildingSND(snd_hell_htower);
@@ -283,7 +302,7 @@ begin
 end;
 UID_HTeleport:
 begin
-   _animw:=20;
+   _animw:=5;
 
    setMWSM(@spr_HTeleport,nil);
    setBuildingSND(snd_hell_hteleport);
@@ -333,6 +352,8 @@ end;
 
 UID_Engineer:
 begin
+   _animw:=18;
+   _animd:=8;
    setMWSM(@spr_Engineer,nil);
    setSND (false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -340,6 +361,8 @@ begin
 end;
 UID_Medic:
 begin
+   _animw:=18;
+   _animd:=8;
    setMWSM(@spr_Medic,nil);
    setSND (false,snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -347,6 +370,8 @@ begin
 end;
 UID_Sergant:
 begin
+   _animw:=18;
+   _animd:=8;
    setMWSM(@spr_Sergant,@spr_SSergant);
    setSND (false,snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
    setSND (true ,snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
@@ -355,6 +380,8 @@ begin
 end;
 UID_Commando:
 begin
+   _animw:=15;
+   _animd:=8;
    setMWSM(@spr_Commando,nil);
    setSND (false,snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -362,6 +389,8 @@ begin
 end;
 UID_Bomber:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_Bomber,nil);
    setSND (false,snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -369,6 +398,8 @@ begin
 end;
 UID_Major:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_Major,@spr_FMajor);
    setSND (false,snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -379,6 +410,8 @@ begin
 end;
 UID_BFG:
 begin
+   _animw:=14;
+   _animd:=8;
    setMWSM(@spr_BFG,nil);
    setSND (false,snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
    setEID (false,0  ,0             ,EID_Gavno,0  );
@@ -393,6 +426,7 @@ begin
 end;
 UID_APC:
 begin
+   _animw:=17;
    setMWSM(@spr_APC,nil);
    setSND (false,snd_APC_ready,snd_APC_move,snd_APC_move,snd_APC_move,snd_APC_move);
    setEID (false,0  ,EID_BExp,EID_BExp,0  );
@@ -400,6 +434,7 @@ begin
 end;
 UID_Terminator:
 begin
+   _animw:=18;
    setMWSM(@spr_Terminator,nil);
    setSND (false,snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEID (false,0  ,EID_Exp2,EID_Exp2,0  );
@@ -407,6 +442,7 @@ begin
 end;
 UID_Tank:
 begin
+   _animw:=17;
    setMWSM(@spr_Tank,nil);
    setSND (false,snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
    setEID (false,0  ,EID_BExp,EID_BExp,0  );

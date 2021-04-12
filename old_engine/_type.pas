@@ -200,7 +200,7 @@ TUID = record
    {$ENDIF}
 end;
 PTUID = ^TUID;
-TUpgrade = record
+TUPID = record
    _up_ruid,
    _up_rupgr,
    _up_btni,
@@ -357,7 +357,8 @@ end;
 PTUnit = ^TUnit;
 
 TMID = record
-
+   {$IFDEF _FULLGAME}
+   {$ENDIF}
 end;
 
 TMissile = record

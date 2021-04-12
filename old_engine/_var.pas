@@ -44,7 +44,8 @@ _uclord_c         : integer = 0;
 _uregen_c         : integer = 0;
 
 _uids             : array[byte] of TUID;
-_upids            : array[byte] of TUpgrade;
+_upids            : array[byte] of TUPID;
+_mids             : array[byte] of TMID;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -117,6 +118,10 @@ str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
+
+fps_tt,
+fps_cs,
+fps_ns            : cardinal;
 
 {$IFDEF _FULLGAME}
 
@@ -277,11 +282,9 @@ m_vmove           : boolean = false;
 m_a_inv           : boolean = false;
 m_mmap_move       : boolean = false;
 
-ui_UnitSelected   : byte = 0;
-ui_UnitSelectedp  : byte = 0;
+ui_UnitSelectedNU : integer = 0;
+ui_UnitSelectedpU : integer = 0;
 ui_UnitSelectedn  : byte = 0;
-ui_UnitSelecteda  : boolean = false;
-ui_UnitSelectedb  : boolean = false;
 ui_tab            : byte = 0;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
@@ -296,6 +299,7 @@ ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
+ui_builders_n     : integer = 0;
 ui_builders_x     : array[0..ui_builder_srs] of integer; //
 ui_builders_y     : array[0..ui_builder_srs] of integer; // builders areas
 ui_builders_r     : array[0..ui_builder_srs] of integer; //
@@ -315,7 +319,6 @@ ui_uibtn_f2       : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
-ui_rld,
 ui_muc            : array[false..true] of cardinal; // unit max count color
 
 ui_uiuphx         : integer = 0;
@@ -339,13 +342,9 @@ k_ctrl,
 k_alt,
 k_ml,
 k_mr,
-k_chrt            : cardinal;
-k_chr             : char;
-
-
-fps_tt,
-fps_cs,
-fps_ns            : cardinal;
+k_chart           : cardinal;
+k_char            : char;
+k_kstring         : shortstring = '';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

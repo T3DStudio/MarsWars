@@ -48,8 +48,8 @@ begin
    str_m_liq             := 'Lakes';
    str_m_siz             := 'Size';
    str_m_obs             := 'Obstacles';
+   str_m_sym             := 'Symmetry';
 
-   //SDL_ShowCursor(SDL_ENABLE);
    net_nstat:=ns_srvr;
    if(net_UpSocket=false)then
    begin
@@ -159,7 +159,7 @@ begin
    '-help':
    begin
       net_chat_add('MarsWars dedicated server, '+str_ver  ,0,255);
-      net_chat_add('New map: -m [seed size lakes obs]'    ,0,255);
+      net_chat_add('New map: -m [seed size lakes obs sym]',0,255);
       net_chat_add('Add AI player: -p [R/H/U team skill]' ,0,255);
       net_chat_add('Remove all AI players: -k or -noai'   ,0,255);
       net_chat_add('Set 1..6 teams to AI players: -ffa'   ,0,255);
@@ -172,7 +172,7 @@ begin
       net_chat_add('Fill empty slots with AI: -fs 0-7'    ,0,255);
       exit;
    end;
-   '-m'  : if(a<5)
+   '-m'  : if(a<6)
            then begin Map_randommap; Map_premap;end
            else
            begin
@@ -180,6 +180,7 @@ begin
               map_mw  :=mm3(MinSMapW, (s2i(args[2]) div 500)*500, MaxSMapW);
               map_liq :=min2(7,s2b(args[3]));
               map_obs :=min2(7,s2b(args[4]));
+              map_sym :=s2i(args[5])>0;
               Map_premap;
            end;
    '-p'  : if(a<3)
@@ -206,22 +207,18 @@ end;
 
 procedure _dedCode;
 begin
-   if(G_Started=false)then
-   begin
-      if(_plsReady)then
-      begin
-         vid_mredraw:=true;
-         G_Started:=true;
-         _StartSkirmish;
-      end;
-   end
-   else
-   begin
-      if(_plsOut)then
-      begin
-         G_Started:=false;
-         DefGameObjects;
-      end;
+   case G_Started of
+false: if(_plsReady)then
+       begin
+          vid_mredraw:=true;
+          G_Started:=true;
+          _StartSkirmish;
+       end;
+true : if(_plsOut)then
+       begin
+          G_Started:=false;
+          DefGameObjects;
+       end;
    end;
 end;
 
@@ -229,7 +226,8 @@ procedure _screenLine(s1:shortstring;x1:byte;
                       s2:shortstring;x2:byte;
                       s3:shortstring;x3:byte;
                       s4:shortstring;x4:byte;
-                      s5:shortstring;x5:byte);
+                      s5:shortstring;x5:byte;
+                      s6:shortstring;x6:byte);
 var s: shortstring;
 
 procedure ss(sp:pshortstring;x:byte);
@@ -254,17 +252,18 @@ begin
    if(x3>0)then ss(@s3,x3);
    if(x4>0)then ss(@s4,x4);
    if(x5>0)then ss(@s5,x5);
+   if(x6>0)then ss(@s6,x6);
    writeln(s);
 end;
 
 procedure ps(p:byte);
 begin
    if(p=0)
-   then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0)
+   then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0, '',0)
    else with _players[p] do
         if(state<>ps_none)
-        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0)
-        else _screenLine(name      ,1   , _plst(p)  ,15, '-----'        ,25, '-'                          ,35, '',0);
+        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0, '',0)
+        else _screenLine(name      ,1   , _plst(p)  ,15, '-----'        ,25, '-'                          ,35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -298,8 +297,8 @@ begin
       8 : writeln('         ',str_starta  ,' ',str_startat[g_startb]);
       10: writeln('         ',str_aislots ,' ',G_aislots);
       11: writeln;
-      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45);
-      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx[map_liq],35, _str_mx[map_obs],45);
+      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym       ,56);
+      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2pm[map_sym][2],56);
       15: writeln;
       16: ps(0);
       18: ps(1);
