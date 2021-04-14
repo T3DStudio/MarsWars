@@ -1,4 +1,17 @@
 
+procedure initMissiles;
+var m:byte;
+begin
+   FillChar(_mids,SizeOf(_mids),0);
+
+   for m:=0 to 255 do
+   with _mids[m] do
+   begin
+
+   end;
+end;
+
+
 //procedure _d1  (d:pinteger);begin d^:=0             end;
 procedure _d25 (d:pinteger);begin d^:=d^ div 4;     end;
 procedure _d50 (d:pinteger);begin d^:=d^ div 2;     end;
@@ -8,7 +21,7 @@ procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 procedure _d225(d:pinteger);begin d^:=(d^ div 4)*9;end;
 
-
+{
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
    with pu^.player^ do
@@ -548,6 +561,6 @@ begin
 end;
 
 
-
+      }
 
 

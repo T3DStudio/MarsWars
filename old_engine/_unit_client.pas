@@ -136,7 +136,6 @@ begin
       _wudata_sint(sh,rpl);
       if(sh>-127)then
       begin
-         if(playeri=HPlayer)then writeln(unum,' ',sh,' ',hits);
          _wudata_byte (uidi,rpl);
          _wudata_bstat(pu,rpl,_pl);
 

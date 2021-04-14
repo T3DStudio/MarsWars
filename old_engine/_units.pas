@@ -1,185 +1,4 @@
-          {
-{$IFDEF _FULLGAME}
-procedure _unit_dvis(pu:PTUnit);
-var spr : PTMWSprite;
-begin
-   with pu^ do
-    with player^ do
-     if(hits>dead_hits)then
-     begin
-        if(hits<idead_hits)then exit;
 
-        spr:=_unit_spr(pu);
-
-        if(spr=@spr_dummy)then exit;
-
-        if(_unit_fogrev(pu))then
-         if ((vid_vx-spr^.hw)<vx)and(vx<(vid_vx+vid_sw+spr^.hw))and
-            ((vid_vy-spr^.hh)<vy)and(vy<(vid_vy+vid_sh+spr^.hh))then
-         begin
-            anim:=abs(hits-idead_hits);
-            if(anim>255)then anim:=255;
-            _sl_add_dec(vx,vy,_udpth(pu),0,spr,anim,0,0,0);
-         end;
-     end;
-end;
-
-procedure _pain_dead(pu:PTUnit);
-const lost_count = 3;
-var i:byte;
-begin
-   with pu^ do
-   begin
-      PlaySND(snd_pain_d,pu);
-      _effect_add(vx,vy,map_flydpth[uf]+vy,UID_Pain);
-      if(OnlySVCode)then
-       if(buff[ub_advanced]>0)then
-        for i:=1 to lost_count do _pain_lost(pu,vx-randomr(r),vy-randomr(r));
-   end;
-end;
-
-procedure _unit_deff(pu:PTUnit;deff:boolean);
-begin
-   with pu^ do
-   with player^ do
-   begin
-      if(deff)then
-      begin
-         if(isbuild)then
-         begin
-            case uidi of
-            UID_UMine:
-            begin
-               PlaySND(snd_exp,pu);
-               _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
-            end;
-            UID_HEye:
-            begin
-               PlaySND(snd_pexp,pu);
-               _effect_add(vx,vy-6,map_flydpth[uf]+vy,UID_HEye);
-            end
-            else
-               if(uf=uf_ground)then
-                if(race=r_hell)and(hits<100)and(bld=false)then
-                begin
-                   if(r<41)
-                   then _effect_add(vx,vy+5 ,-5,eid_db_h1)
-                   else _effect_add(vx,vy+10,-5,eid_db_h0);
-                   exit;
-                end;
-               PlaySND(snd_exp2,pu);
-               if(r>48)then
-               begin
-                  _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BBExp);
-                  if(uf=uf_ground)then
-                   if(race=r_hell)
-                   then _effect_add(vx,vy+10,-10,eid_db_h0)
-                   else _effect_add(vx,vy+10,-10,eid_db_u0);
-               end
-               else
-               begin
-                  _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BExp);
-                  if(uf=uf_ground)then
-                   if(race=r_hell)
-                   then _effect_add(vx,vy+10,-10,eid_db_h1)
-                   else _effect_add(vx,vy+10,-10,eid_db_u1);
-               end;
-            end;
-         end
-         else
-         case uidi of
-           UID_LostSoul : begin
-                             PlaySND(snd_pexp,pu);
-                             _effect_add(vx,vy,map_flydpth[uf]+vy,UID_LostSoul);
-                          end;
-           UID_Pain     : _pain_dead(pu);
-         else
-           if(uidi in gavno)then
-            if(uf>uf_ground)then
-            begin
-               PlaySND(snd_exp,pu);
-               _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
-            end
-            else
-            begin
-               PlaySND(snd_meat,pu);
-               _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Gavno);
-            end
-           else
-            case uidi of
-        UID_APC,
-        UID_FAPC   : begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BExp);
-                     end;
-        UID_Flyer,
-        UID_Terminator,
-        UID_Tank   : begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp2);
-                     end;
-        UID_UTransport:
-                     begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_BExp);
-                     end;
-        UID_ZEngineer:
-                     begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
-                     end;
-            end;
-         end;
-      end
-      else
-      case uidi of
-    UID_ZEngineer  : begin
-                        PlaySND(snd_exp,pu);
-                        _effect_add(vx,vy,map_flydpth[uf]+vy,EID_Exp);
-                     end;
-    UID_LostSoul   : PlaySND(snd_pexp,pu);
-    UID_Imp        : if(random(2)=0)
-                     then PlaySND(snd_impd1,pu)
-                     else PlaySND(snd_impd2,pu);
-    UID_Demon      : PlaySND(snd_demond,pu);
-    UID_Cacodemon  : PlaySND(snd_cacod,pu);
-    UID_Baron      : if(buff[ub_advanced]=0)
-                     then PlaySND(snd_knightd,pu)
-                     else PlaySND(snd_barond,pu);
-    UID_Cyberdemon : PlaySND(snd_cyberd,pu);
-    UID_Mastermind : PlaySND(snd_mindd,pu);
-    UID_Pain       : _pain_dead(pu);
-    UID_Revenant   : PlaySND(snd_rev_d,pu);
-    UID_Mancubus   : PlaySND(snd_man_d,pu);
-    UID_Arachnotron: PlaySND(snd_ar_d,pu);
-    UID_ArchVile   : PlaySND(snd_arch_d,pu);
-    UID_ZFormer,
-    UID_ZSergant,
-    UID_ZCommando,
-    UID_ZBomber,
-    UID_ZMajor,
-    UID_ZBFG       : case random(3) of
-                     0 : PlaySND(snd_z_d1,pu);
-                     1 : PlaySND(snd_z_d2,pu);
-                     2 : PlaySND(snd_z_d3,pu);
-                     end;
-    UID_Engineer,
-    UID_Medic,
-    UID_Sergant,
-    UID_Commando,
-    UID_Bomber,
-    UID_Major,
-    UID_BFG
-                 : if(random(2)=1)
-                   then PlaySND(snd_ud1,pu)
-                   else PlaySND(snd_ud2,pu);
-      end;
-   end;
-end;
-
-
-
-{$ENDIF}  }
 
 function _unit_OnDecorCheck(ux,uy:integer):boolean;
 const dr = 64;
@@ -242,8 +61,7 @@ begin
 end;
 
 procedure _unit_death(pu:PTUnit);
-var
-    tu  : PTUnit;
+var tu  : PTUnit;
     uc  : integer;
 begin
    with pu^ do
@@ -270,6 +88,13 @@ begin
 
           if(ServerSide)then
           begin
+             if(zfall>0)then
+             begin
+                dec(zfall,1);
+                inc(y ,1);
+                inc(vy,1);
+                _unit_correctcoords(pu);
+             end;
              if(hits<=dead_hits)then
              begin
                 _unit_remove(pu);
@@ -283,13 +108,16 @@ begin
         begin
            if(hits<-80)then hits:=-80;
            inc(hits,1);
-           {$IFDEF _FULLGAME}
-           {case uidi of
-           UID_Cacodemon: if(hits>-shadow)then begin dec(vy,1);dec(y,1);end;
-           end;  }
-           {$ENDIF}
+           if(zfall>0)then
+           begin
+              dec(zfall,1);
+              dec(y ,1);
+              dec(vy,1);
+              _unit_correctcoords(pu);
+           end;
            if(hits>=0)then
            begin
+              zfall:=0;
               uo_id:=ua_amove;
               uo_x :=x;
               uo_y :=y;
@@ -340,7 +168,10 @@ begin
       _unit_dec_Kcntrs(pu);
 
       with uid^ do
-       if(_isbuilding)then bld_r:=fr_2fps;
+      begin
+         if(_isbuilding)then bld_r:=fr_2fps;
+         zfall:=_zfall;
+      end;
 
       x      :=vx;
       y      :=vy;
@@ -354,7 +185,6 @@ begin
       a_tar  :=0;
       a_tard :=32000;
       rld    :=0;
-
 
       for i:=1 to MaxUnits do
       if(i<>unum)then
@@ -399,14 +229,16 @@ begin
         else hits:=0;
    end;
 end;
- {
-procedure _unit_damage(pu:PTUnit;dam:integer;p,pl:byte);
+
+procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);
 const build_arm_f = 16;
        unit_arm_f = 24;
 var arm:integer;
 begin
-  if(onlySVCode)then
+   if(ServerSide=false)then exit;
+
    with pu^ do
+   with uid^ do
    begin
       if(buff[ub_invuln]>0)or(hits<0)or(dam<0)then exit;
 
@@ -414,11 +246,11 @@ begin
 
       with player^ do
       begin
-         if(isbuild)then
+         if(_isbuilding)then
          begin
             if(bld)then
             begin
-               arm:=upgr[upgr_build];
+               {arm:=upgr[upgr_build];
                if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
                 if(g_addon=false)
                 then inc(arm,1)
@@ -427,24 +259,24 @@ begin
 
                if(dam<build_arm_f)
                then inc(arm,(dam div build_arm_f)*arm);
-               inc(arm,5);
+               inc(arm,5);  }
             end;
          end
          else
-           if(mech)then
+           if(_ismech)then
            begin
-              if(race=r_uac)then
+              {if(race=r_uac)then
               begin
                  if(dam<unit_arm_f)
                  then inc(arm,upgr[upgr_mecharm])
                  else inc(arm,(dam div unit_arm_f)*upgr[upgr_mecharm]);
 
                  inc(arm,3);
-              end;
+              end;  }
            end
            else
            begin
-              if(dam<unit_arm_f)
+              {if(dam<unit_arm_f)
               then inc(arm,upgr[upgr_armor])
               else inc(arm,(dam div unit_arm_f)*upgr[upgr_armor]);
 
@@ -455,24 +287,15 @@ begin
               UID_Archvile  : inc(arm,3);
               else
                  if(uidi in armor_massive)then inc(arm,3);
-              end;
+              end;}
            end;
 
-         if(buff[ub_advanced]>0)then
-         begin
-            case uidi of
-              UID_Baron : inc(arm,dam div 2); //dam:=;
-            else
-            end;
+         case uidi of
+UID_Baron : if(buff[ub_advanced]>0)then inc(arm,dam div 2);
+         else
          end;
 
-         if(uidi in [UID_HEye,UID_UMine])then
-         begin
-            dam:=hits;
-            arm:=0;
-         end;
-
-         if(g_mode in [gm_inv,gm_coop])and(playeri=0)then dam:=dam div 2;
+         if(g_mode in [gm_inv,gm_aslt])and(playeri=0)then dam:=dam div 2;
       end;
 
       dec(dam,arm);
@@ -488,14 +311,12 @@ begin
       begin
          dec(hits,dam);
 
-         if(mech)then
-         begin
-            buff[ub_pain]:=vid_2fps;
-         end
+         if(_ismech)
+         then buff[ub_pain]:=fr_2fps
          else
-           if(painc>0)and(buff[ub_pain]=0)then
+           if(_painc>0)and(painc>0)and(buff[ub_pain]=0)then
            begin
-              if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
+              //if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
 
               if(p>pains)
               then pains:=0
@@ -505,16 +326,16 @@ begin
               begin
                  pains:=painc;
 
-                 buff[ub_pain   ]:=pain_time;
-                 buff[ub_stopafa]:=pain_time;
+                 buff[ub_pain      ]:=pain_time;
+                 buff[ub_stopattack]:=pain_time;
 
-                 if(uidi in [UID_Mancubus,UID_ArchVile,UID_ZBFG])then rld_t:=0;
+                { if(uidi in [UID_Mancubus,UID_ArchVile,UID_ZBFG])then rld_t:=0;
 
                  with player^ do
                   if(race=r_hell)then
-                   if(upgr[upgr_pains]>0)then inc(pains,upgr[upgr_pains]*3);
+                   if(upgr[upgr_pains]>0)then inc(pains,upgr[upgr_pains]*3); }
                  {$IFDEF _FULLGAME}
-                 _unit_painsnd(pu);
+                 _unit_pain_effects(pu,true);
                  {$ENDIF}
               end;
            end;
@@ -523,7 +344,7 @@ begin
 end;
 
 {$Include _missiles.pas}
-
+{
 procedure _unit_URocketL(pu:PTUnit);
 var i:byte;
 begin
@@ -1842,7 +1663,7 @@ begin
              else
                if(uo_id=ua_move)then uo_id:=ua_amove;
 
-             if(buff[ub_stopafa]>0)then
+             if(buff[ub_stopattack]>0)then
              begin
                 mv_x:=x;
                 mv_y:=y;

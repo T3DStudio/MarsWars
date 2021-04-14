@@ -131,6 +131,7 @@ TUID = record
    _bstep,
    _tprod,
    _painc,
+   _zfall,
    _apcs,
    _apcm
                 : integer;
@@ -298,7 +299,7 @@ TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
    vx,vy,
-   x,y,
+   x,y,zfall,
    srange,
    arange,
    speed,dir,rld,
@@ -330,6 +331,7 @@ TUnit = record
    uo_id    : byte;
 
    inapc,
+   painc,
    pains,
    apcm,
    apcc     : integer;
@@ -340,10 +342,12 @@ TUnit = record
 
    bld,
    solid,
-   wanim,
    sel      : boolean;
 
    {$IFDEF _FULLGAME}
+
+   wanim    : boolean;
+
    mmx,mmy,mmr,
    fx,fy,fsr,
    anim,animf,
@@ -357,7 +361,15 @@ end;
 PTUnit = ^TUnit;
 
 TMID = record
+   _mtars,
+   _srange,
+   _damage,
+   _speed    : integer;
    {$IFDEF _FULLGAME}
+   ms_smodel : PTMWSModel;
+
+   ms_eid_fly,
+   ms_eid_death : byte;
    {$ENDIF}
 end;
 
@@ -369,7 +381,6 @@ TMissile = record
    tar,
    sr,
    dir,
-   mtars,
    ntars    : integer;
    player,
    mid,mf   : byte;

@@ -619,7 +619,7 @@ begin
          exit;
       end;
 
-      if(speed=0)or(buff[ub_stopafa]>0)then exit;
+      if(speed=0)or(buff[ub_stopattack]>0)then exit;
 
       if(_ismech)then
       begin
@@ -680,9 +680,10 @@ begin
          speed := _speed;
          uf    := _uf;
          apcm  := _apcm;
+         painc := _painc;
          solid := _issolid;
 
-         if(_isbuilding)and(_isbarrack)then inc(uo_y,_r+12);
+         if(_isbuilding)and(_isbarrack)then inc(uo_y,_r);
 
          if(_advanced[g_addon])then buff[ub_advanced]:=_ub_infinity;
 
@@ -971,6 +972,7 @@ begin
    _apcs      := 2;
    _uf        := uf_fly;
    _attack    := atm_always;
+   _zfall     := fly_height[uf_fly];
 end;
 UID_Baron      :
 begin

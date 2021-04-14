@@ -124,6 +124,19 @@ begin
    end;
 end;
 
+procedure _unit_pain_effects(pu:PTUnit;vischeck:boolean);
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      if(vischeck)then
+       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+
+      _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
+      PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil);
+   end;
+end;
+
 {$ENDIF}
 
 procedure _unit_correctcoords(pu:PTUnit);
@@ -1182,7 +1195,7 @@ begin
        if(0<buff[i])and(buff[i]<_ub_infinity)then
        begin
           dec(buff[i],1);
-          {if(i=ub_stopafa)and(ServerSide)then
+          {if(i=ub_stopattack)and(ServerSide)then
            if(bld)and(speed>0)and(tar1=0)then
             if(buff[i]=0)then
              if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}

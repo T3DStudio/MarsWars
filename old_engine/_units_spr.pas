@@ -323,7 +323,7 @@ sms_walk:    if(_animw>0)then
                 begin
                    inc(anim,_animw);
                    if(anim<0)then anim:=0;
-                   //if(anim>=1200)then anim:=anim mod 1200;
+                   //if(anim>=1100)then anim:=anim mod 1100;
                 end;
                 _unit2spr:=_sm2s(smodel,ak,dir,anim div 100)
              end
@@ -340,7 +340,7 @@ sms_death:   begin
              end;
 sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
          else
-             _unit2spr:=_sm2s(smodel,ak,dir,0); //stand,build
+             _unit2spr:=_sm2s(smodel,ak,dir,0); //stand,pain
          end;
       end;
    end;
