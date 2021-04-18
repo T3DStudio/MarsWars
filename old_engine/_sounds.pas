@@ -327,6 +327,11 @@ begin
    snd_inapc                :=LoadSoundSet('inapc'           );
    snd_meat                 :=LoadSoundSet('meat'            );
 
+   snd_rico                 :=LoadSoundSet(missiles_folder+'rico'            );
+   snd_bfg_exp              :=LoadSoundSet(missiles_folder+'bfg_exp'         );
+   snd_flyer_s              :=LoadSoundSet(missiles_folder+'flyer_s'         );
+   snd_flyer_a              :=LoadSoundSet(missiles_folder+'flyer_a'         );
+
    for r:=1 to r_cnt do
    begin
    snd_under_attack[true ,r]:=LoadSoundSet(race_dir[r]+'base_under_attack'         );

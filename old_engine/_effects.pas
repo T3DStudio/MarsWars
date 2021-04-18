@@ -17,6 +17,7 @@ begin
    with _eids[x] do
    begin
       anim_smstate:=sms_death;
+      smodel:=spr_pdmodel;
       case x of
         UID_Pain          : _setEID(@spr_pain          ,sms_death);
         UID_LostSoul      : _setEID(@spr_lostsoul      ,sms_death);

@@ -87,34 +87,13 @@ begin
           {$ENDIF}
 
           if(ServerSide)then
-          begin
-             if(zfall>0)then
-             begin
-                dec(zfall,1);
-                inc(y ,1);
-                inc(vy,1);
-                _unit_correctcoords(pu);
-             end;
-             if(hits<=dead_hits)then
-             begin
-                _unit_remove(pu);
-                exit;
-             end;
-          end
-          else _unit_movevis(pu);
+           if(hits<=dead_hits)then _unit_remove(pu);
        end
        else
         if(ServerSide)then
         begin
            if(hits<-80)then hits:=-80;
            inc(hits,1);
-           if(zfall>0)then
-           begin
-              dec(zfall,1);
-              dec(y ,1);
-              dec(vy,1);
-              _unit_correctcoords(pu);
-           end;
            if(hits>=0)then
            begin
               zfall:=0;
@@ -135,12 +114,12 @@ begin
 end;
 
 
-procedure _check_missiles(pu:PTUnit);
+procedure _check_missiles(u:integer);
 var i:integer;
 begin
    for i:=1 to MaxUnits do
     with _missiles[i] do
-     if(vst>0)and(tar=pu^.unum)then tar:=0;
+     if(vst>0)and(tar=u)then tar:=0;
 end;
 
 procedure _unit_kill(pu:PTUnit;instant,fastdeath:boolean);
@@ -170,7 +149,8 @@ begin
       with uid^ do
       begin
          if(_isbuilding)then bld_r:=fr_2fps;
-         zfall:=_zfall;
+         if(_zfall>0)and(uf>uf_ground)then zfall:=_zfall;
+         if(_zfall<0)and(uf=uf_ground)then zfall:=_zfall;
       end;
 
       x      :=vx;
@@ -216,7 +196,7 @@ begin
              end;
          end;
       end;
-      _check_missiles(pu);
+      _check_missiles(unum);
 
       if(instant)then
       begin
@@ -1840,7 +1820,6 @@ begin
             _unit_upgr    (pu);
             _unit_order   (pu);
             _unit_move    (pu);
-            _unit_movevis (pu);
 
             if(ServerSide)then _unit_prod(pu);
 
@@ -1854,8 +1833,12 @@ begin
             _unit_counters(pu);
             _unit_death(pu);
          end;
+
+         _unit_movevis (pu);
       end;
    end;
+
+   _missileCycle;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

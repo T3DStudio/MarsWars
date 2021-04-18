@@ -270,9 +270,9 @@ begin
 
          if(spr=pspr_dummy)then exit;
 
-         sh:=_unit_shadowz(pu);
-         inc(shadow,sign(sh-shadow));
+         inc(shadow,sign(_unit_shadowz(pu)-shadow));
          sh :=shadow;
+
          if(_rectvis(vx,vy,spr^.hw,spr^.hh,sh))then
          begin
             dp :=0;

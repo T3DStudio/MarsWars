@@ -590,7 +590,6 @@ radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,3
 
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
-missile_mr             = 500;
 gear_time              : array[false..true] of byte = (fr_fps,fr_fps*2);
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
@@ -964,6 +963,7 @@ race_buildings         : array[1..r_cnt] of string = ('hell\buildings\','uac\bui
 race_upgrades          : array[1..r_cnt] of string = ('hell\upgrades\' ,'uac\upgrades\' );
 race_missiles          : array[1..r_cnt] of string = ('hell\missiles\' ,'uac\missiles\' );
 effects_folder         : shortstring = 'effs\';
+missiles_folder        : shortstring = 'missiles\';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

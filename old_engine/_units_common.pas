@@ -192,51 +192,38 @@ begin
    end;
 end;
 
-function _unit_flyup(pu:PTUnit;z:integer):boolean;
+procedure _unit_zfall(pu:PTUnit);
 var st:integer;
 begin
-   _unit_flyup:=false;
-  { with pu^ do
-    if(shadow<>z)then
-    begin
-       st:=z-shadow;
-       if(abs(st)<=2)then
-       begin
-          shadow:=z;
-          if(st<0)then _unit_flyup:=true;
-          exit;
-       end
-       else
-       begin
-          st:=sign(st)*2;
-          inc(shadow,st);
-       end;
-       if(ServerSide)then
-       begin
-          if(uo_y=y)then dec(uo_y,st);
-          dec(y ,st);
-          dec(vy,st);
-       end;
-    end;  }
+   with pu^ do
+   if(zfall<>0)then
+   begin
+      st:=sign(zfall);
+      dec(zfall,st);
+      inc(y    ,st);
+      inc(vy   ,st);
+      _unit_correctcoords(pu);
+   end;
 end;
 
 procedure _unit_movevis(pu:PTUnit);
 begin
+   if(ServerSide)then _unit_zfall(pu);
    with pu^ do
-    if(vx<>x)or(vy<>y)then
-     if{(speed<=0)or}(inapc>0)then
-     begin
-        vstp:=0;
-        vx  :=x;
-        vy  :=y;
-     end
-     else
-     begin
-        if(vstp=0)then vstp:=UnitStepNum;
-        inc(vx,(x-vx) div vstp);
-        inc(vy,(y-vy) div vstp);
-        dec(vstp,1);
-     end;
+   if(vx<>x)or(vy<>y)then
+    if(inapc>0)then
+    begin
+       vstp:=0;
+       vx  :=x;
+       vy  :=y;
+    end
+    else
+    begin
+       if(vstp=0)then vstp:=UnitStepNum;
+       inc(vx,(x-vx) div vstp);
+       inc(vy,(y-vy) div vstp);
+       dec(vstp,1);
+    end;
 end;
 
 
