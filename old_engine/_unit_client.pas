@@ -227,11 +227,12 @@ begin
 
    if((gstp mod i)=0)then
     case g_mode of
-gm_inv:begin
-          _wudata_byte(g_inv_wn,rpl);
-          _wudata_int (g_inv_t ,rpl);
-       end;
-gm_ct :for i:=1 to MaxCPoints do _wudata_byte(g_cpt_pl[i].pl,rpl);
+gm_inv : begin
+            _wudata_byte(g_inv_wave_n,rpl);
+            _wudata_int (g_inv_time  ,rpl);
+         end;
+gm_ct  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].pl,rpl);
+gm_royl: _wudata_int(g_royal_r,rpl);
     end;
 
    if(rpl)then
@@ -906,13 +907,14 @@ begin
 
    if((gstp mod i)=0)then
     case g_mode of
-gm_inv:begin
-          _PNU:=g_inv_wn;
-          g_inv_wn:=_rudata_byte(rpl,0);
-          if(g_inv_wn>_PNU)then PlaySND(snd_teleport,nil);
-          g_inv_t :=_rudata_int (rpl,0);
-       end;
-gm_ct: for i:=1 to MaxCPoints do g_cpt_pl[i].pl:=_rudata_byte(rpl,0);
+gm_inv : begin
+            _PNU:=g_inv_wave_n;
+            g_inv_wave_n:=_rudata_byte(rpl,0);
+            if(g_inv_wave_n>_PNU)then PlaySND(snd_teleport,nil);
+            g_inv_time :=_rudata_int (rpl,0);
+         end;
+gm_ct  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
+gm_royl: g_royal_r:=_rudata_int(rpl,0);
     end;
 
    G_plstat:=_rudata_byte(rpl,0);

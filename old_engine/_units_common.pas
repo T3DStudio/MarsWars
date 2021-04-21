@@ -374,7 +374,7 @@ begin
    inc(tr,bld_dec_mr);
 
    for u:=1 to MaxCPoints do
-    with g_cpt_pl[u] do
+    with g_cpoints[u] do
     begin
        o:=base_r;
        d:=dist(px,py,tx,ty)-o;
@@ -472,7 +472,7 @@ begin
 
       if(g_mode=gm_ct)then
        for u:=1 to MaxCPoints do
-        with g_cpt_pl[u] do
+        with g_cpoints[u] do
          if(dist(tx,ty,px,py)<base_r)then
          begin
             _unit_grbcol:=2;

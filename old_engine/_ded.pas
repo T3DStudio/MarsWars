@@ -32,6 +32,7 @@ begin
    str_gmode[gm_ct   ]   := 'Capturing points';
    str_gmode[gm_inv  ]   := 'Invasion';
    str_gmode[gm_aslt ]   := 'Assault';
+   str_gmode[gm_royl ]   := 'Royal Battle';
 
    str_addon[false]      := 'UDOOM';
    str_addon[true ]      := 'DOOM 2';
@@ -166,6 +167,7 @@ begin
       net_chat_add('Game moddes: -s - scirmish'           ,0,255);
       net_chat_add('  -f2/3- 2/3 fortress, -i - invasion' ,0,255);
       net_chat_add('  -c - capturing points, -a - assault',0,255);
+      net_chat_add('  -rb - royal battle'                 ,0,255);
       net_chat_add('  -ud/-d2 - UDOOM/DOOM 2 mode'        ,0,255);
       net_chat_add('Show/hide player starts: -ps'         ,0,255);
       net_chat_add('Starting base options: -st 1-6'       ,0,255);
@@ -197,6 +199,7 @@ begin
    '-i'  : begin g_mode:=gm_inv;   Map_premap; end;
    '-c'  : begin g_mode:=gm_ct;    Map_premap; cmp_ffa; end;
    '-a'  : begin g_mode:=gm_aslt;  Map_premap; end;
+   '-rb' : begin g_mode:=gm_royl;  Map_premap; end;
    '-ps' : g_shpos:=not g_shpos;
    '-st' : if(a=2)then G_startb :=mm3(0,s2b(args[1])-1,gms_g_startb);
    '-fs' : if(a=2)then G_aislots:=mm3(0,s2b(args[1]),7);

@@ -46,7 +46,7 @@ MID_RevenantS: begin
                end;
       end;
 
-      // death
+      // death sound
       case m of
 MID_Mancubus,
 MID_YPlasma,
@@ -182,12 +182,15 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   
          then mtars:=MaxUnits
          else mtars:=1;
 
-        if(tar>0)and(mid<>MID_RevenantS)then
-        begin
-           tu:=@_units[tar];
-           inc(x,_randomr(tu^.uid^._r));
-           inc(y,_randomr(tu^.uid^._r));
-        end;
+        if(mid=MID_RevenantS)
+        then homing:=true
+        else
+          if(tar>0)then
+          begin
+             tu:=@_units[tar];
+             inc(x,_randomr(tu^.uid^._missile_r));
+             inc(y,_randomr(tu^.uid^._missile_r));
+          end;
 
        { with _players[player] do
         begin
@@ -391,7 +394,7 @@ begin
            end; }
          end;
 
-         if(d<=0)and(ntars=0)then // direct
+         if(d<=0)and(ntars=0)then // direct and first target
          begin
             if(ServerSide)then
              if(tu^.buff[ub_invuln]=0)then
@@ -399,7 +402,7 @@ begin
                 if(mid=MID_TBullet)and(tu^.uid^._ismech=false)then
                 begin
                    if(tu^.buff[ub_toxin]>=0)then
-                    if(tu^.uidi in marines)
+                    if(tu^.uidi in armor_lite)
                     then begin tu^.buff[ub_toxin]:=fr_hfps; tu^.buff[ub_pain ]:=fr_hfps;end
                     else begin tu^.buff[ub_toxin]:=fr_fps;  tu^.buff[ub_pain ]:=fr_fps; end;
                 end;
@@ -411,18 +414,14 @@ begin
              end;
 
             {$IFDEF _FULLGAME}
-            if(mid in [MID_SShot,MID_SSShot,MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])then
-            begin
-               if(tu^.uid^._ismech)
-               then _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,MID_Bullet)
-               else _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood);
-            end;
+            if(mid in [MID_SShot,MID_SSShot,MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])
+            then _unit_bullet_puff(tu);
             {$ENDIF}
 
             dec(mtars,1);
             inc(ntars,1);
 
-            if(ServerSide)then _unit_damage(@_units[tar],damd,p,player);
+            if(ServerSide)then _unit_damage(tu,damd,p,player);
          end
          else
            if(sr>0)and(d<sr)then
@@ -430,9 +429,7 @@ begin
               if(mid in [MID_SShot,MID_SSShot])then
               begin
                  {$IFDEF _FULLGAME}
-                 if(tu^.uid^._ismech)
-                 then _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,MID_Bullet)
-                 else _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood );
+                 _unit_bullet_puff(tu);
                  {$ENDIF}
                  dec(mtars,1);
                  _unit_damage(@_units[tar],damd,p,player);
@@ -446,12 +443,8 @@ begin
               end;
 
               {$IFDEF _FULLGAME}
-              if(mid in [MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])then
-              begin
-                 if(tu^.uid^._ismech)
-                 then _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,MID_Bullet)
-                 else _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood);
-              end;
+              if(mid in [MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])
+              then _unit_bullet_puff(tu);
               {$ENDIF}
 
               if(mid=MID_BFG)then
@@ -468,7 +461,7 @@ begin
               if(ServerSide)then
               begin
                  damd:=trunc(damd*(1-(d/sr)) );
-                 _unit_damage(@_units[tar],damd,p,player);
+                 _unit_damage(tu,damd,p,player);
               end;
            end;
       end;
@@ -484,13 +477,12 @@ begin
    with _missiles[m] do
    if(vst>0)then
    begin
-      if(mid=MID_RevenantS)then
-       if(tar>0)then
-       begin
-          x  :=_units[tar].x;
-          y  :=_units[tar].y;
-          mf :=_units[tar].uf;
-       end;
+      if(homing)and(tar>0)then
+      begin
+         x  :=_units[tar].x;
+         y  :=_units[tar].y;
+         mf :=_units[tar].uf;
+      end;
 
       if(mid=MID_Blizzard)then
       begin
@@ -516,16 +508,23 @@ begin
       MID_Granade  : dec(vy,vst div 3);
       end;
 
-      if(dam>0)and(vst=0)then
-       if _IsUnitRange(tar)and(mtars=1)
-       then _missle_damage(m)
-       else
-         for u:=1 to MaxUnits do
-         begin
-            tar:=u;
-            _missle_damage(m);
-            if(mtars<=0)then break;
-         end;
+      if(vst=0)then
+      begin
+         if(dam>0)then
+          if _IsUnitRange(tar)and(mtars=1)
+          then _missle_damage(m)
+          else
+            for u:=1 to MaxUnits do
+            begin
+               tar:=u;
+               _missle_damage(m);
+               if(mtars<=0)then break;
+            end;
+
+         {$IFDEF _FULLGAME}
+         _missile_explode_effect(m);
+         {$ENDIF}
+      end;
    end;
 end;
 

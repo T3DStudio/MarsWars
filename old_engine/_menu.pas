@@ -17,19 +17,6 @@ function menu_sf(s:shortstring;charset:TSoc;ms:byte):shortstring;
 var i:byte;
     c:char;
 begin
-   //if (k_chrt=2)or(k_chrt>k_chrtt) then
-   {if(k_kstring<>'')
-   begin
-      sl:=length(s);
-      c:=k_chr;
-      if not(c in charset) then c:=#0;
-      if(k_chr=#8)
-      then delete(s,sl,1)
-      else
-        if(sl<ms)and(c<>#0)then s:=s+c;
-   end;
-   menu_sf:=s;}
-
    if(length(k_kstring)>0)then
    for i:=1 to length(k_kstring) do
    begin
@@ -349,12 +336,7 @@ begin
 
       // game options
       75 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
-      76 : if(net_nstat<>ns_clnt)and(not G_Started)then
-           begin
-              inc(g_mode,1);
-              g_mode:=g_mode mod 6;
-              Map_premap;
-           end;
+      76 : if(net_nstat<>ns_clnt)and(not G_Started)then begin _bnext(@g_mode,true,@gamemodes);Map_premap;end;
       77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@g_startb,1,0,gms_g_startb);
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; end;
       79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,1,0,8);

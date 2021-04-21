@@ -1,6 +1,7 @@
 
 
 procedure _rpls_pre;
+const pl_n_ch : array[false..true] of char = ('#','*');
 var   f:file;
 vr,t,hp:byte;
      fn:shortstring;
@@ -35,17 +36,19 @@ begin
          vr:=0;
          mw:=0;
          wr:=0;
-         BlockRead(f,wr,sizeof(map_seed ));_rpls_stat:=str_map+': '+c2s(wr)               +#13+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw   ));_rpls_stat:=_rpls_stat+str_m_siz+i2s(mw)       +#13+' ';mw:=0;
+         BlockRead(f,wr,sizeof(map_seed ));_rpls_stat:=str_map+': '+c2s(wr)        +#13+' ';wr:=0;
+         BlockRead(f,mw,SizeOf(map_mw   ));_rpls_stat:=_rpls_stat+str_m_siz+i2s(mw)+#13+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
-         if(vr>7)then _rpls_stat:=_rpls_stat+str_m_liq+'??'
-                 else _rpls_stat:=_rpls_stat+str_m_liq+_str_mx(vr)+#13+' ';vr:=0;
+         if(vr<=7)then begin _rpls_stat:=_rpls_stat+str_m_liq+_str_mx(vr)+#13+' '; end
+                  else begin _rpls_stat:=str_svld_errors[4];close(f);exit;         end;
          BlockRead(f,vr,sizeof(map_obs  ));
-         if(vr>7)then _rpls_stat:=_rpls_stat+str_m_obs+'??'
-                 else _rpls_stat:=_rpls_stat+str_m_obs+_str_mx(vr)+#13+' ';vr:=0;
+         if(vr<=7)then begin _rpls_stat:=_rpls_stat+str_m_obs+_str_mx(vr)+#13+' '; end
+                  else begin _rpls_stat:=str_svld_errors[4];close(f);exit;         end;
          BlockRead(f,vr,sizeof(map_sym  ));
-         BlockRead(f,vr,sizeof(g_addon  ));_rpls_stat:=_rpls_stat+str_addon[vr>0]         +#13+' ';vr:=0;
-         BlockRead(f,vr,sizeof(g_mode   ));_rpls_stat:=_rpls_stat+str_gmode[vr]           +#13    ;vr:=0;
+         BlockRead(f,vr,sizeof(g_addon  ));_rpls_stat:=_rpls_stat+str_addon[vr>0]+#13+' ';
+         BlockRead(f,vr,sizeof(g_mode   ));
+         if(vr in gamemodes)then begin _rpls_stat:=_rpls_stat+str_gmode[vr]+#13;    end
+                            else begin _rpls_stat:=str_svld_errors[4];close(f);exit;end;
          BlockRead(f,vr,sizeof(g_startb ));vr:=0;
          BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
@@ -55,9 +58,9 @@ begin
          for vr:=1 to MaxPlayers do
          begin
             BlockRead(f,fn ,sizeof(fn));
-            if(vr=hp)
-            then _rpls_stat:=_rpls_stat+chr(vr)+'*'+#25+fn
-            else _rpls_stat:=_rpls_stat+chr(vr)+'#'+#25+fn;
+
+            _rpls_stat:=_rpls_stat+chr(vr)+pl_n_ch[vr=hp]+#25+fn;
+
             t:=0;
             BlockRead(f,t,1);
             if(t=PS_none)then
@@ -69,7 +72,7 @@ begin
             begin
                BlockRead(f,t ,1);
                BlockRead(f,t ,1);
-               if(t<3)
+               if(t<=r_cnt)
                then _rpls_stat:=_rpls_stat+','+str_race[t][2]
                else _rpls_stat:=_rpls_stat+',?';
                BlockRead(f,t ,1); _rpls_stat:=_rpls_stat+','+b2s(t)+#13;
@@ -126,7 +129,7 @@ begin
                       begin
                          _rpls_rst  :=rpl_wunit;
                          _rpls_fileo:=true;
-                         _rpls_u    :=101;
+                         _rpls_u    :=MaxPlayerUnits+1;
                          _rpls_nwrch:=true;
                          _rpls_vidm :=false;
 
@@ -266,7 +269,7 @@ begin
 
                             if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
                             or(map_liq>7)or(map_obs>7)
-                            or not(g_mode in gamemodes)or(g_startb>4)or(HPlayer>MaxPlayers)then
+                            or not(g_mode in gamemodes)or(g_startb>gms_g_startb)or(HPlayer>MaxPlayers)then
                             begin
                                rpl_abort;
                                g_started  :=false;
@@ -300,8 +303,8 @@ begin
                             map_premap;
                             _moveHumView(map_psx[Hplayer] , map_psy[Hplayer]);
 
-                            ui_tab:=2;
                             _view_bounds;
+                            ui_tab    :=2;
                             G_Started :=true;
                             _menu     :=false;
                             ServerSide:=false;

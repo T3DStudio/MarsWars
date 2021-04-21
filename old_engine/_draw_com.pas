@@ -133,7 +133,7 @@ begin
 
    if(g_mode=gm_ct)then
     for i:=1 to MaxCPoints do
-     with g_cpt_pl[i] do
+     with g_cpoints[i] do
       filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
 end;
 

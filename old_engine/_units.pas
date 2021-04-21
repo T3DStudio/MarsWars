@@ -1183,6 +1183,13 @@ begin
       a_tard  := 32000;
       t_weap  := 255;
 
+      if(g_mode=gm_royl)then
+       if((dist(x,y,map_hmw,map_hmw)+_missile_r)>=g_royal_r)then
+       begin
+          _unit_kill(pu,false,false);
+          exit;
+       end;
+
       if(_isbuilding)and(menerg<=0)then
       begin
          _unit_kill(pu,false,false);

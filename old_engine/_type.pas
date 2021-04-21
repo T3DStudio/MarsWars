@@ -4,7 +4,8 @@ type
 integer  = Smallint;
 pinteger = ^integer;
 
-TSob = set of byte;
+TSob  = set of byte;
+PTSob = ^TSob;
 {$IFDEF _FULLGAME}
 TSoc = set of char;
 
@@ -130,7 +131,7 @@ end;
 TUID = record
    _mhits,
    _speed,
-   _r ,
+   _r,_missile_r,
    _srange,
    _arange,
    _max,
@@ -381,6 +382,7 @@ TMissile = record
    ntars    : integer;
    player,
    mid,mf   : byte;
+   homing   : boolean;
 end;
 
 TCTPoint = record

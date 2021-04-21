@@ -21,11 +21,12 @@ g_step            : cardinal = 0;
 g_plstat          : byte     = 0;
 g_nunits          : integer  = 0;
 
-g_inv_mn          : byte = 0;
-g_inv_wn          : byte = 0;
-g_inv_t           : integer = 0;
-g_inv_wt          : integer = 0;
-g_cpt_pl          : array[1..MaxCPoints] of TCTPoint;
+g_inv_monsters    : byte = 0;
+g_inv_wave_n      : byte = 0;
+g_inv_time        : integer = 0;
+g_inv_wave_t      : integer = 0;
+g_cpoints         : array[1..MaxCPoints] of TCTPoint;
+g_royal_r         : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -99,9 +100,9 @@ _rpls_file        : file;
 _rpls_u           : integer = 0;
 _rpls_pnui        : byte = 0;
 
-str_startat       : array[0..5] of shortstring;
-str_race          : array[0..2] of shortstring;
-str_gmode         : array[0..5] of shortstring;
+str_startat       : array[0..gms_g_startb] of shortstring;
+str_race          : array[0..r_cnt] of shortstring;
+str_gmode         : array[0..gm_cnt] of shortstring;
 str_addon         : array[false..true] of shortstring;
 str_m_liq,
 str_m_siz,

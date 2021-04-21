@@ -65,6 +65,7 @@ begin
    while (_CYCLE) do
    begin
       fps_cs:=SDL_GetTicks;
+
       {$IFDEF _FULLGAME}
       InputGame;
       CodeGame;
@@ -76,10 +77,14 @@ begin
        end;
       CodeGame;
       {$ENDIF}
+
       fps_ns:=SDL_GetTicks-fps_cs;
-      if(fps_ns>=fr_mpt)
-      then fps_tt:=1
-      else fps_tt:=fr_mpt-fps_ns;
+      if(_fsttime)
+      then continue
+      else
+        if(fps_ns>=fr_mpt)
+        then fps_tt:=1
+        else fps_tt:=fr_mpt-fps_ns;
 
       SDL_Delay(fps_tt);
    end;
@@ -89,20 +94,4 @@ begin
    cfg_write;
    {$ENDIF}
 end.
-
-{
-fps_cs:=SDL_GetTicks;
-
-if(fps_cs<fps_ns)then continue;
-
-if(_fsttime)
-then fps_ns:=fps_cs
-else fps_ns:=fps_cs+fr_mpt;
-
-InputGame;
-CodeGame;
-if(_draw)then DrawGame;
-
-fps_tt:=SDL_GetTicks-fps_cs;
-}
 

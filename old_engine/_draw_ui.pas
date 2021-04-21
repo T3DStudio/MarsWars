@@ -13,14 +13,16 @@ begin
         dec(at,1);
      end;
 
-   if(g_mode=gm_ct)then
-    for i:=1 to MaxCPoints do
-     with g_cpt_pl[i] do
-     begin
+   case g_mode of
+gm_ct:
+      for i:=1 to MaxCPoints do
+       with g_cpoints[i] do
         if(ct>0)and((G_Step mod 20)>10)
         then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray     )
         else circleColor(r_minimap,mpx,mpy,map_prmm,p_color(pl));
-     end;
+gm_royl:
+      circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
+   end;
 end;
 
 procedure d_Minimap(tar:pSDL_Surface);
@@ -72,10 +74,10 @@ begin
          ui_builders_r[ui_builders_n],c_white);
       end;
 
-      // points
+      // points areas
       if(g_mode=gm_ct)then
        for i:=1 to MaxCPoints do
-        with g_cpt_pl[i] do
+        with g_cpoints[i] do
          circleColor(tar,
          lx+px-vid_vx,
          ly+py-vid_vy,
@@ -522,12 +524,14 @@ begin
         end;
      end;
 
-   // TIMER adn INVASION
+   // TIMER
    d_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time);
+
+   // INVASION
    if(G_WTeam=255)then
     if(g_mode=gm_inv)then
     begin
-       D_Timer(tar,ui_textx,ui_texty+14,g_inv_t,ta_left,str_inv_time+b2s(g_inv_wn)+', '+str_time);
+       D_Timer(tar,ui_textx,ui_texty+14,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
        if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+26,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
     end;
 

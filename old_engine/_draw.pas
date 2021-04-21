@@ -13,7 +13,7 @@ begin
 
    d_terrain   (r_screen,vid_mapx,vid_mapy);
    d_SpriteList(r_screen,vid_mapx,vid_mapy);
-   d_fog       (r_screen,vid_mapx,vid_mapy);
+   d_foglayer  (r_screen,vid_mapx,vid_mapy);
    d_ui        (r_screen,vid_mapx,vid_mapy);
 
    _draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
@@ -34,7 +34,7 @@ begin
 
    //_drawMWSModel(@spr_HCC);
 
-   if(_testmode>0)then _draw_text(r_screen,vid_sw,0,c2s(fps_tt), ta_right,255, c_white);
+   if(_testmode>0)then _draw_text(r_screen,vid_sw,0,c2s(fps_tt)+' '+b2pm[_fsttime], ta_right,255, c_white);
 
    sdl_flip(r_screen);
 end;

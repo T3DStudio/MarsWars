@@ -106,7 +106,7 @@ begin
 
    ServerSide :=true;
 
-   FillChar(g_cpt_pl ,SizeOf(g_cpt_pl ),0);
+   FillChar(g_cpoints ,SizeOf(g_cpoints ),0);
    FillChar(_missiles,SizeOf(_missiles),0);
 
    FillChar(_units   ,SizeOf(_units   ),0);
@@ -125,9 +125,10 @@ begin
 
    UnitStepNum:=8;
 
-   g_inv_wn     := 0;
-   g_inv_t      := 0;
-   g_inv_wt     := 0;
+   g_inv_wave_n := 0;
+   g_inv_time   := 0;
+   g_inv_wave_t := 0;
+   g_royal_r    := 0;
 
    _uclord_c    := 0;
    _uregen_c    := 0;
@@ -223,6 +224,8 @@ end;
 procedure _StartSkirmish;
 var p:byte;
 begin
+   g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
+
    for p:=0 to MaxPlayers do
    with _players[p] do
    begin
@@ -239,7 +242,7 @@ begin
           _playerSetState(p);
        end;
 
-      if(race=r_random)then race:=1+random(2);
+      if(race=r_random)then race:=1+random(r_cnt);
 
       if(state<>PS_None)then
       begin
@@ -883,6 +886,9 @@ begin
 
          if(ServerSide)then
          begin
+            if(_uclord_c=0)then
+             if(g_royal_r>0)then dec(g_royal_r,1);
+
             inc(G_Step,1);
             //if(g_mode=gm_ct )then _CPoints;
             //if(g_mode=gm_inv)then g_inv_spawn;

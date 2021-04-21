@@ -220,6 +220,8 @@ begin
 
          MCircleStarts(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
+   gm_royl:
+      MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
    gm_ct:
       begin
          map_psx[0]:=map_hmw;
@@ -233,7 +235,7 @@ begin
          u := map_mw div 5;
 
          for i:=1 to MaxCPoints do
-         with g_cpt_pl[i] do
+         with g_cpoints[i] do
          begin
             px:=trunc(ix+cos(c*degtorad)*u);
             py:=trunc(ix+sin(c*degtorad)*u);

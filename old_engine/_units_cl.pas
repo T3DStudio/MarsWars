@@ -1575,6 +1575,8 @@ end;
 
       if(_urace=0)then _urace:=r_hell;
 
+      _missile_r:=trunc(_r/1.4);
+
       _ismech:=_ismech or _isbuilding;
 
       _shcf:=_mhits/_mms;

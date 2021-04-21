@@ -203,6 +203,24 @@ EID_db_u1         : _setEff(0 ,0 ,0  ,dead_time,false,0 );
    end;
 end;
 
+procedure _unit_bullet_puff(tu:PTUnit);
+begin
+   with tu^ do
+    with uid^ do
+     if(_ismech)
+     then _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),vy+map_flydpth[uf]+1,MID_Bullet)
+     else _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),vy+map_flydpth[uf]+1,EID_Blood );
+end;
+
+procedure _missile_explode_effect(m:integer);
+begin
+   with _missiles[m] do
+   begin
+
+   end;
+end;
+
+
 procedure effects_sprites(noanim,draw:boolean);
 var ei,
  alpha:integer;

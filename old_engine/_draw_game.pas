@@ -236,7 +236,7 @@ begin
      end;
 end;
 
-procedure d_fog(tar:pSDL_Surface;lx,ly:integer);
+procedure d_foglayer(tar:pSDL_Surface;lx,ly:integer);
 var cx,cy,ssx,ssy,sty:integer;
 begin
    ssx:=lx-(vid_vx and %0000000000011111); //mod fog_cw;
@@ -260,13 +260,14 @@ begin
    end;
 
 
-   if(g_mode=gm_ct)then
-    for cx:=1 to MaxCPoints do
-     with g_cpt_pl[cx] do
-     begin
+   case g_mode of
+gm_ct:
+      for cx:=1 to MaxCPoints do
+       with g_cpoints[cx] do
         circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,p_color(pl));
-        //if(_testmode)then _draw_text(r_screen,px-vid_vx,py-vid_vy,i2s(ct) , ta_left,255, plcolor[pl]);
-     end;
+gm_royl:
+      circleColor(tar,lx+map_hmw-vid_vx,lx+map_hmw-vid_vy,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
+   end;
 
    {if(menu_s2=ms2_camp)then
    begin

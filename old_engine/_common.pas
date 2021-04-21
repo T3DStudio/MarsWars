@@ -323,6 +323,16 @@ end;
 
 {$IFDEF _FULLGAME}
 
+procedure _bnext(pb:pbyte;fwrd:boolean;pset:PTSoB);
+begin
+   if(pset^=[])then exit;
+   repeat
+     if(fwrd)
+     then inc(pb^,1)
+     else dec(pb^,1);
+   until pb^ in pset^
+end;
+
 procedure WriteLog(mess:shortstring);
 var f:Text;
 begin

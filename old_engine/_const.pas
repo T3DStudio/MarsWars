@@ -33,8 +33,10 @@ gm_3fort               = 2;
 gm_ct                  = 3;
 gm_inv                 = 4;
 gm_aslt                = 5;
+gm_royl                = 6;
 
-gamemodes              = [gm_scir,gm_2fort,gm_3fort,gm_ct,gm_inv,gm_aslt];
+gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_ct,gm_inv,gm_aslt,gm_royl];
+gm_cnt                 = 6;
 
 r_cnt                  = 2;  // race
 r_random               = 0;
@@ -72,7 +74,7 @@ outlogfn               : shortstring = 'out.txt';
 //  Game settings borders
 //
 
-gms_g_startb           : byte = 5;
+gms_g_startb           = 5;
 
 
 ////////////////////////////////////////////////////////////////////////////////
