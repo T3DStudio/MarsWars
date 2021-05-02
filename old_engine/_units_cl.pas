@@ -474,6 +474,11 @@ begin
    setMWSM(@spr_UMilitaryUnit,@spr_UAMilitaryUnit);
    setBuildingSND(snd_uac_barracks);
 end;
+UID_UFactory:
+begin
+   setMWSM(@spr_UFactory,@spr_UAFactory);
+   setBuildingSND(snd_uac_factory);
+end;
 UID_UGenerator:
 begin
    setMWSM(@spr_UGenerator,nil);
@@ -484,7 +489,7 @@ begin
    setMWSM(@spr_UWeaponFactory,@spr_UAWeaponFactory);
    setBuildingSND(snd_uac_smith);
 end;
-UID_UTurret:
+UID_UCTurret:
 begin
    _animw    := 6;
    setMWSM(@spr_UTurret,nil);
@@ -496,7 +501,7 @@ begin
    setMWSM(@spr_URadar,nil);
    setBuildingSND(snd_uac_radar);
 end;
-UID_UVehicleFactory:
+UID_UTechCenter:
 begin
    setMWSM(@spr_UVehicleFactory,nil);
    setBuildingSND(snd_uac_tech);
@@ -509,7 +514,7 @@ begin
    setBuildingSND(snd_uac_ctower);
    un_eid_bcrater_y:=1;
 end;
-UID_URocketL:
+UID_URMStation:
 begin
    setMWSM(@spr_URocketL,nil);
    setBuildingSND(snd_uac_rls);
@@ -737,12 +742,12 @@ begin
 UID_HKeep:
 begin
    _mhits     := 3000;
-   _renerg    := 8;
-   _generg    := 6;
+   _renerg    := 10;
+   _generg    := 8;
    _r         := 66;
    _srange    := base_rA[0];
    _ucl       := 0;
-   _btime     := 75;
+   _btime     := 60;
 
    _isbuilding:= true;
    _isbuilder := true;
@@ -755,7 +760,7 @@ begin
    _renerg    := 4;
    _r         := 60;
    _srange    := 200;
-   _ucl       := 1;
+   _ucl       := 3;
    _btime     := 40;
 
    _isbuilding:= true;
@@ -768,7 +773,7 @@ begin
    _mhits     := 100;
    _renerg    := 1;
    _generg    := 1;
-   _r         := 24;
+   _r         := 20;
    _srange    := 200;
    _ucl       := 2;
    _btime     := 8;
@@ -781,7 +786,7 @@ begin
    _renerg    := 6;
    _r         := 53;
    _srange    := 200;
-   _ucl       := 3;
+   _ucl       := 9;
    _btime     := 40;
 
    _isbuilding:= true;
@@ -795,7 +800,7 @@ begin
    _renerg    := 2;
    _r         := 21;
    _srange    := 250;
-   _ucl       := 4;
+   _ucl       := 6;
    _btime     := 20;
    _attack    := atm_always;
    _ability   := uad_htowertele;
@@ -808,7 +813,7 @@ begin
    _renerg    := 4;
    _r         := 28;
    _srange    := 200;
-   _ucl       := 5;
+   _ucl       := 12;
    _btime     := 30;
    _max       := 1;
    _ability   := uab_teleport;
@@ -822,10 +827,11 @@ begin
    _renerg    := 10;
    _r         := 65;
    _srange    := 200;
-   _ucl       := 6;
+   _ucl       := 10;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
+   _ability   := uab_hell_unit_adv;
 
    _isbuilding:= true;
 end;
@@ -850,13 +856,14 @@ begin
    _renerg    := 4;
    _r         := 50;
    _srange    := 200;
-   _ucl       := 8;
+   _ucl       := 13;
    _btime     := 30;
    _max       := 1;
    _ruid      := UID_HMonastery;
    //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
+   _issmith   := true;
 end;
 UID_HFortress:
 begin
@@ -865,7 +872,7 @@ begin
    _generg    := 4;
    _r         := 86;
    _srange    := 300;
-   _ucl       := 9;
+   _ucl       := 11;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
@@ -890,13 +897,13 @@ begin
 end;
 UID_HCommandCenter:  //UID_UCommandCenter
 begin
-   _mhits     := 3000;
-   _renerg    := 8;
-   _generg    := 6;
+   _mhits     := 2500;
+   _renerg    := 10;
+   _generg    := 8;
    _speed     := 6;
    _r         := 66;
    _srange    := base_rA[0];
-   _ucl       := 12;
+   _ucl       := 1;
    _btime     := 90;
 
    _isbuilding:= true;
@@ -910,7 +917,7 @@ begin
    _renerg    := 4;
    _r         := 66;
    _srange    := base_rA[0];
-   _ucl       := 13;
+   _ucl       := 4;
    _btime     := 40;
 
    _isbuilding:=true;
@@ -1181,9 +1188,9 @@ end;
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
 UID_UCommandCenter:
 begin
-   _mhits     := 3500;
-   _renerg    := 8;
-   _generg    := 6;
+   _mhits     := 2500;
+   _renerg    := 10;
+   _generg    := 8;
    _r         := 66;
    _srange    := base_rA[0];
    _ucl       := 0;
@@ -1205,7 +1212,7 @@ begin
    _renerg    := 4;
    _r         := 66;
    _srange    := 200;
-   _ucl       := 1;
+   _ucl       := 3;
    _btime     := 40;
 
    _zombieid  := UID_HMilitaryUnit;
@@ -1213,7 +1220,21 @@ begin
    _isbuilding:=true;
    _isbarrack :=true;
 
-   ups_units:=marines+[UID_APC,UID_FAPC,UID_Terminator,UID_Tank,UID_Flyer];
+   ups_units:=marines;
+end;
+UID_UFactory:
+begin
+   _mhits     := 1750;
+   _renerg    := 4;
+   _r         := 66;
+   _srange    := 200;
+   _ucl       := 4;
+   _btime     := 40;
+
+   _isbuilding:=true;
+   _isbarrack :=true;
+
+   ups_units:=[UID_APC,UID_FAPC,UID_Terminator,UID_Tank,UID_Flyer];
 end;
 UID_UGenerator:
 begin
@@ -1233,7 +1254,7 @@ begin
    _renerg    := 6;
    _r         := 62;
    _srange    := 200;
-   _ucl       := 3;
+   _ucl       := 9;
    _btime     := 40;
 
    _isbuilding:=true;
@@ -1241,13 +1262,13 @@ begin
 
    ups_upgrades := [];
 end;
-UID_UTurret:
+UID_UCTurret:
 begin
    _mhits     := 400;
    _renerg    := 2;
    _r         := 17;
    _srange    := 250;
-   _ucl       := 4;
+   _ucl       := 6;
    _btime     := 15;
    _attack    := atm_always;
 
@@ -1259,20 +1280,20 @@ begin
    _renerg    := 4;
    _r         := 35;
    _srange    := 200;
-   _ucl       := 5;
+   _ucl       := 12;
    _btime     := 30;
    _max       := 1;
    _ability   := uab_radar;
 
    _isbuilding:=true;
 end;
-UID_UVehicleFactory :
+UID_UTechCenter :
 begin
    _mhits     := 1750;
    _renerg    := 10;
    _r         := 62;
    _srange    := 200;
-   _ucl       := 6;
+   _ucl       := 10;
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_UWeaponFactory;
@@ -1287,21 +1308,21 @@ begin
    _srange    := 250;
    _ucl       := 7;
    _btime     := 20;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _attack    := atm_always;
 
    _isbuilding:=true;
 end;
-UID_URocketL:
+UID_URMStation:
 begin
    _mhits     := 500;
    _renerg    := 4;
    _r         := 40;
    _srange    := 200;
-   _ucl       := 8;
+   _ucl       := 13;
    _btime     := 30;
    _max       := 1;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    //_rupgr     := upgr_2tier;
    _ability   := uad_uac_rstrike;
 
@@ -1313,9 +1334,9 @@ begin
    _renerg    := 2;
    _r         := 17;
    _srange    := 250;
-   _ucl       := 10;
+   _ucl       := 8;
    _btime     := 25;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _attack    := atm_always;
    //_rupgr     := upgr_rturrets;
 
@@ -1328,10 +1349,10 @@ begin
    _generg    := 15;
    _r         := 70;
    _srange    := 200;
-   _ucl       := 9;
+   _ucl       := 11;
    _btime     := 90;
    _max       := 1;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
 
    _isbuilding:=true;
 end;
@@ -1446,7 +1467,6 @@ begin
    _btime     := 25;
    _apcm      := 10;
    _apcs      := 8;
-   _ruid      := UID_UWeaponFactory;
    _uf        := uf_fly;
    _attack    := atm_always;
 
@@ -1466,7 +1486,6 @@ begin
    _btime     := 25;
    _apcm      := 10;
    _apcs      := 10;
-   _ruid      := UID_UWeaponFactory;
    _attack    := atm_always;
 
    _ismech    := true;
@@ -1484,7 +1503,7 @@ begin
    _ucl       := 9;
    _btime     := 60;
    _apcs      := 3;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
@@ -1500,7 +1519,7 @@ begin
    _ucl       := 10;
    _btime     := 60;
    _apcs      := 7;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
@@ -1517,7 +1536,7 @@ begin
    _btime     := 60;
    _apcs      := 7;
    _uf        := uf_fly;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _attack    := atm_always;
    //_rupgr     := upgr_2tier;
 
@@ -1534,7 +1553,7 @@ begin
    _btime     := 60;
    _apcm      := 30;
    _apcs      := 10;
-   _ruid      := UID_UVehicleFactory;
+   _ruid      := UID_UTechCenter;
    _uf        := uf_fly;
 
    _ismech    := true;
@@ -1615,7 +1634,7 @@ begin
    _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0         ,UID_HAltar         ,true ,true );
 
    _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0         ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UVehicleFactory,true ,true );
+   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UTechCenter,true ,true );
 
 
 
@@ -1659,15 +1678,15 @@ begin
    _setUPGR(r_uac ,upgr_mainr     ,120,2 ,2 ,255       ,255);
    _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,2 ,255       ,255);
    _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
-   _setUPGR(r_uac ,upgr_6bld      ,180,1 ,8 ,255       ,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,10,255       ,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_blizz     ,180,8 ,10,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,4 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_6bld2     ,120,1 ,2 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mainonr   ,60 ,1 ,2 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_rturrets  ,180,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_6bld      ,180,1 ,8 ,255       ,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_2tier     ,180,1 ,10,255       ,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_blizz     ,180,8 ,10,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,3 ,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,4 ,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_6bld2     ,120,1 ,2 ,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_mainonr   ,60 ,1 ,2 ,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UTechCenter);
+   _setUPGR(r_uac ,upgr_rturrets  ,180,1 ,4 ,upgr_2tier,UID_UTechCenter);
    _setUPGR(r_uac ,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_UNuclearPlant  );
    _setUPGR(r_uac ,upgr_9bld      ,180,1 ,4 ,upgr_2tier,UID_UNuclearPlant  );  }
 

@@ -70,7 +70,7 @@ begin
         EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);
         EID_db_u0         : _setEID(@spr_db_u0         ,sms_death);
         EID_db_u1         : _setEID(@spr_db_u1         ,sms_death);
-        UID_UTurret       : _setEID(@spr_UTurret       ,sms_build);
+        UID_UCTurret       : _setEID(@spr_UTurret       ,sms_build);
         UID_UPTurret      : _setEID(@spr_UPTurret      ,sms_build);
         UID_URTurret      : _setEID(@spr_URTurret      ,sms_build);
       end;
@@ -182,7 +182,7 @@ EID_HMU,
 EID_HCC,
 EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps   ,false,0 );
 
-UID_UTurret,
+UID_UCTurret,
 UID_UPTurret,
 UID_URTurret,
 EID_db_h0,

@@ -236,9 +236,10 @@ TPlayer = record
 
    team,
    race,mrace,
-   bld_r,state,
+   state,
    pnum    : byte;
 
+   build_cd,
    army,
    cenerg,
    menerg  : integer;

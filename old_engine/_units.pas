@@ -148,7 +148,7 @@ begin
 
       with uid^ do
       begin
-         if(_isbuilding)then bld_r:=fr_2fps;
+         if(_isbuilding)then build_cd:=min2(build_cd+fr_3fps,max_build_reload);
          if(_zfall>0)and(uf>uf_ground)then zfall:=_zfall;
          if(_zfall<0)and(uf=uf_ground)then zfall:=_zfall;
       end;
@@ -231,7 +231,7 @@ begin
             if(bld)then
             begin
                {arm:=upgr[upgr_build];
-               if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
+               if(uidi in [UID_UCTurret,UID_UPTurret,UID_URTurret])then
                 if(g_addon=false)
                 then inc(arm,1)
                 else

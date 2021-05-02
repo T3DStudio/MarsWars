@@ -445,11 +445,11 @@ begin
    begin
       case _m_sel of
       // MAP
-      50 : begin Map_randomseed; Map_premap;end;
+      50 : begin Map_randomseed;                             Map_premap;end;
       51 : begin _scrollInt(@map_mw,-500,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin _scrollInt(@map_liq,-1,0,7); Map_premap;end;
-      53 : begin _scrollInt(@map_obs,-1,0,7); Map_premap;end;
-      56 : begin Map_randommap; Map_premap;end;
+      52 : begin _scrollInt(@map_liq,-1,0,7);                Map_premap;end;
+      53 : begin _scrollInt(@map_obs,-1,0,7);                Map_premap;end;
+      56 : begin Map_randommap;                              Map_premap;end;
 
       60 : begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
@@ -498,7 +498,7 @@ begin
          net_sv_sport;
       end;
       if(_m_sel=90 )then net_cl_svstr:=menu_sf(net_cl_svstr,k_kbaddr,21);
-      if(_m_sel=100)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen);
+      if(_m_sel=100)then net_chat_str:=menu_sf(net_chat_str,k_kbstr ,ChatLen);
 
       vid_mredraw:=true;
    end;

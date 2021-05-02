@@ -421,7 +421,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      else
                                         case uidi of
                                          UID_HKeep         :;// _unit_bteleport(pu);
-                                         UID_URocketL      :;// _unit_URocketL (pu);
+                                         UID_URMStation      :;// _unit_URocketL (pu);
                                          UID_HMonastery,
                                          UID_HFortress,
                                          UID_UNuclearPlant : uo_tar:=o_y0;
@@ -572,7 +572,7 @@ begin
         begin
            _u_ord(p);
 
-           if(bld_r>0)then dec(bld_r,1);
+           if(build_cd>0)then dec(build_cd,1);
 
            {if(state=ps_comp)then
            begin

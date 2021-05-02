@@ -209,7 +209,7 @@ begin
       case _isbuilding of
       true : begin
              setr(ureq_builders ,n_builders<=0);
-             setr(ureq_bld_r    ,bld_r      >0);
+             setr(ureq_bld_r    ,build_cd   >0);
              end;
       false: setr(ureq_barracks ,n_barracks<=0);
       end;

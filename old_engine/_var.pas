@@ -510,6 +510,8 @@ spr_HEye,
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
+spr_UFactory,
+spr_UAFactory,
 spr_UAMilitaryUnit,
 spr_UGenerator,
 spr_UWeaponFactory,

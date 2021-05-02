@@ -295,7 +295,7 @@ begin
              begin
                 {if(sel)then
                  case uidi of
-                UID_UTurret,
+                UID_UCTurret,
                 UID_UPTurret,
                 UID_URTurret,
                 UID_HTower,
@@ -348,7 +348,7 @@ begin
              if(bld)then
              begin
                 if(a_rld<=0)and(noanim=false)then
-                if(uidi in [UID_UTurret,UID_UPTurret,UID_URTurret])then
+                if(uidi in [UID_UCTurret,UID_UPTurret,UID_URTurret])then
                 begin
                     inc(dir,_animw);
                     dir:=dir mod 360;

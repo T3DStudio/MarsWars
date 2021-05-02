@@ -499,16 +499,17 @@ UID_ZBFG               = 33;
 
 UID_UCommandCenter     = 41;
 UID_UMilitaryUnit      = 42;
-UID_UGenerator         = 43;
-UID_UWeaponFactory     = 44;
-UID_UTurret            = 45;
+UID_UFactory           = 43;
+UID_UGenerator         = 44;
+UID_UWeaponFactory     = 45;
 UID_URadar             = 46;
-UID_UVehicleFactory    = 47;
-UID_UPTurret           = 48;
-UID_URocketL           = 49;
-UID_URTurret           = 50;
-UID_UNuclearPlant      = 51;
-UID_UMine              = 52;
+UID_URMStation           = 47;
+UID_UTechCenter        = 48;
+UID_UCTurret           = 49;
+UID_UPTurret           = 50;
+UID_URTurret           = 51;
+UID_UNuclearPlant      = 52;
+UID_UMine              = 53;
 
 UID_Engineer           = 55;
 UID_Medic              = 56;
@@ -540,7 +541,7 @@ uids_uac               = [41..80];
 
 start_base             : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
 
-t2                     = [UID_URocketL,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
+t2                     = [UID_URMStation,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
 
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
@@ -589,6 +590,8 @@ radar_reload           = fr_fps*60;
 radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
+
+max_build_reload       = fr_fps*12;
 
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;

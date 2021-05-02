@@ -393,16 +393,17 @@ begin
 
    _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,'Builder. Generates energy.'      );
    _mkHStrUid(UID_UMilitaryUnit    ,'UAC Military unit'          ,'Produces units.'                 );
+   _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
    _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,'Researches and upgrades.'        );
-   _mkHStrUid(UID_UTurret          ,'UAC Chaingun Turret'        ,'Defensive structure.'            );
+   _mkHStrUid(UID_UCTurret         ,'UAC Chaingun Turret'        ,'Defensive structure.'            );
    _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map.'                    );
-   _mkHStrUid(UID_UVehicleFactory  ,'UAC Tech Center'            ,'Upgrades units.'                 );
+   _mkHStrUid(UID_UTechCenter      ,'UAC Tech Center'            ,'Upgrades units.'                 );
    _mkHStrUid(UID_UPTurret         ,'UAC Plasma turret'          ,'Advanced defensive structure.'   );
-   _mkHStrUid(UID_URocketL         ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
+   _mkHStrUid(UID_URMStation         ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
    _mkHStrUid(UID_URTurret         ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
-   _mkHStrUid(UID_UMine             ,'UAC Mine','');
+   _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
    _mkHStrUid(UID_Engineer   ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic      ,'Medic'            ,'');
@@ -775,17 +776,18 @@ begin
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу. Увеличивает энергию.');
-  _mkHStrUid(UID_UMilitaryUnit   ,'Войсковая Часть'        ,'Производит юнитов.'               );
+  _mkHStrUid(UID_UMilitaryUnit   ,'Войсковая Часть'        ,'Производит тренирует пехоту.'     );
+  _mkHStrUid(UID_UFactory        ,'Фабрика'                ,'Производит технику.'              );
   _mkHStrUid(UID_UGenerator      ,'Генератор'              ,'Увеличивает энергию.'             );
   _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'       ,'Исследования и улучшения.'        );
-  _mkHStrUid(UID_UTurret         ,'Пулеметная Турель'      ,'Защитное сооружение.'             );
+  _mkHStrUid(UID_UCTurret        ,'Пулеметная Турель'      ,'Защитное сооружение.'             );
   _mkHStrUid(UID_URadar          ,'Радар'                  ,'Раскрывает карту.'                );
-  _mkHStrUid(UID_UVehicleFactory ,'Технический Центр'      ,'Улучшает юнитов.'                 );
+  _mkHStrUid(UID_UTechCenter     ,'Технический Центр'      ,'Улучшает юнитов.'                 );
   _mkHStrUid(UID_UPTurret        ,'Плазменная Турель'      ,'Продвинутое защитное сооружение.' );
-  _mkHStrUid(UID_URocketL        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
+  _mkHStrUid(UID_URMStation        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
   _mkHStrUid(UID_URTurret        ,'Ракетная Турель'        ,'Продвинутое защитное сооружение.');
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
-  _mkHStrUid(UID_UMine            ,'Мина','');
+  _mkHStrUid(UID_UMine           ,'Мина','');
 
   _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');

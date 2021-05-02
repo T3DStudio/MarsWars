@@ -219,7 +219,7 @@ begin
    gstp:=G_Step shr 1;
    if(rpl=false)then
     if((gstp mod fr_hhfps)=0)then
-     with _players[_pl] do _wudata_byte(bld_r,rpl);
+     with _players[_pl] do _wrld(@build_cd,rpl);
 
    if(rpl)
    then i:=fr_fps
@@ -552,7 +552,7 @@ begin
             {if(uidi=UID_URadar)then
              if(bld)and(pu^.rld_t=0)and(rld_t>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
 
-            if(uidi=UID_URocketL)then
+            if(uidi=UID_URMStation)then
              if(bld)and(pu^.rld_t=0)and(rld_t>0)then
              begin
                 _uac_rocketl_eff(uu);
@@ -898,7 +898,7 @@ begin
     if(rpl=false)then
      with _players[_pl] do
      begin
-        bld_r:=_rudata_byte(rpl,0);
+         _rrld(@build_cd,rpl);
      end;
 
    if(rpl)

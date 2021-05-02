@@ -618,6 +618,8 @@ begin
    _LoadMWSModel(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2,firstload);
    _LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAFactory      ,race_buildings[r_uac ] +'u_b11_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UFactory       ,race_buildings[r_uac ] +'u_b12_',smt_buiding,firstload);
    _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
 
    _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);

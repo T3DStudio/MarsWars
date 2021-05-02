@@ -53,9 +53,7 @@ begin
          _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-         if(bld_r>0)and(m_brushc=c_lime)
-         then circleColor(tar,m_brushx,m_brushy,_r,c_black )
-         else circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
+         circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
       end;
 
       inc(m_brushx,vid_vx-lx);
@@ -149,7 +147,7 @@ end;
 
 procedure _drawBtnt(tar:pSDL_Surface;x,y:integer;
 lu1 ,lu2 ,ru ,rd ,ld :shortstring;
-clu1,clu2,cru,crd,cld:cardinal;redn:boolean);
+clu1,clu2,cru,crd,cld:cardinal;ms:shortstring);
 var ux,uy,ui_dBW:integer;
 function cs(ps:pshortstring):boolean;begin cs:=(ps^<>'')and(ps^[1]<>'0'); end;
 begin
@@ -171,7 +169,7 @@ begin
    if(cs(@rd ))then _draw_text(tar,ux+vid_BW-3,uy+ui_dBW  ,rd ,ta_right ,5,crd );
    if(cs(@ld ))then _draw_text(tar,ux+2       ,uy+ui_dBW  ,ld ,ta_left  ,5,cld );
 
-   if(redn)then _draw_text(tar,ux+vid_hBW,uy+vid_hBW  ,'#',ta_middle  ,5,c_red );
+   if(cs(@ms ))then _draw_text(tar,ux+vid_hBW,uy+vid_hBW  ,ms ,ta_middle  ,5,c_red );
 end;
 
 procedure d_TextBTN(tar:pSDL_Surface;bx,by:integer;txt:pshortstring;c:cardinal);
@@ -283,7 +281,7 @@ begin
             _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
             _drawBtnt(tar,ux,uy,
             b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(rld),
-            c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,cf(@req,@ureq_bld_r));
+            c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,r2s(build_cd));
          end;
       end;
 
@@ -307,7 +305,7 @@ begin
             _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
             b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
-            c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,false);
+            c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,'');
          end;
       end;
 
@@ -326,7 +324,7 @@ begin
 
          _drawBtnt(tar,ux,uy,
          b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
-         c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,false);
+         c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
       end;
 
       3:
@@ -345,8 +343,8 @@ begin
          for ui:=0 to MaxPlayers do
          begin
             if(ui=0)
-            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0,false)
-            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0,false);
+            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0,'')
+            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0,'');
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
             inc(ux,1);
