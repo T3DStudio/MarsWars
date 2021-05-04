@@ -1,6 +1,5 @@
 {$IFDEF _FULLGAME}
 
-
 function InitVideo:boolean;
 begin
    InitVideo:=false;
@@ -75,6 +74,7 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
+   initMissiles;
    swLNG;
    ObjTblCL;
    _icons;

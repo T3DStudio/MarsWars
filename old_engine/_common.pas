@@ -146,9 +146,14 @@ begin
    else dir_turn:=(360+d1+(spd*sign(d))) mod 360;
 end;
 
-function _IsUnitRange(u:integer):boolean;
+function _IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
-   _IsUnitRange:=(0<u)and(u<=MaxUnits);
+   _IsUnitRange:=false;
+   if(0<u)and(u<=MaxUnits)then
+   begin
+      _IsUnitRange:=true;
+      if(ppu<>nil)then ppu^:=@_units[u];
+   end;
 end;
 
 procedure _AddToInt(bt:pinteger;val:integer);
@@ -158,12 +163,11 @@ end;
 
 function _random(x:integer):integer;
 begin
-   _random:=map_seed2*5+167;
-   map_seed2:=_random;
+   map_seed2:=map_seed2*5+word(x*167)+word(map_seed);
    if(x=0)
    then _random:=0
-   else _random:=abs(_random mod x);
-   inc(map_seed2,17);
+   else _random:=abs(map_seed2 mod x);
+   inc(map_seed2,map_seed2*7+113+_random);
 end;
 
 function _randomx(x,m:integer;newn:boolean):integer;
@@ -172,7 +176,7 @@ begin
    if(m=0)
    then _randomx:=0
    else _randomx:=abs(_randomx mod m);
-   if(newn)then inc(map_seed2,67);
+   if(newn)then inc(map_seed2,67+m+x);
 end;
 
 function _randomr(r:integer):integer;
@@ -258,7 +262,6 @@ begin
    if(h<=ndead_hits)then _hI2S:=-128 else
    if(dead_hits<h)and(h<0)
                     then _hI2S:=mm3(-126,h div _d2shi,-1)
-
    else                  _hI2S:=mm3(1,trunc(h*s),_mms);
 end;
 
@@ -276,16 +279,16 @@ begin
    then PickPlayerTeam:=0
    else
      case gm of
+     gm_aslt,
      gm_2fort: case p of
                1..3: PickPlayerTeam:=1;
-               4..6: PickPlayerTeam:=4;
+               4..6: PickPlayerTeam:=2;
                end;
      gm_3fort: case p of
-               1,2 : PickPlayerTeam:=2;
-               3,4 : PickPlayerTeam:=4;
-               5,6 : PickPlayerTeam:=6;
+               1,2 : PickPlayerTeam:=1;
+               3,4 : PickPlayerTeam:=2;
+               5,6 : PickPlayerTeam:=3;
                end;
-     gm_aslt,
      gm_inv  : PickPlayerTeam:=1;
      else      PickPlayerTeam:=_players[p].team;
      end;
@@ -314,10 +317,9 @@ begin
    end;
 end;
 
-function _UnitHaveRPoint(pu:PTUnit):boolean;
+function _UnitHaveRPoint(uid:byte):boolean;
 begin
-   with pu^ do
-   with uid^ do
+   with _uids[uid] do
    _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
 end;
 

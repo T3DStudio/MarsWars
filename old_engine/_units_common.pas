@@ -909,9 +909,9 @@ end;
 
 procedure _u1_spawn(pu:PTUnit;_uid,count:byte);
 var
-sr, i:integer;
-cd   :single;
-sound:byte;
+sr,i  :integer;
+cd    :single;
+sound :byte;
 begin
    sound:=0;
    with pu^ do
@@ -934,7 +934,8 @@ begin
             _LastCreatedUnitP^.uo_y  :=uo_y;
             _LastCreatedUnitP^.uo_id :=uo_id;
             _LastCreatedUnitP^.uo_tar:=uo_tar;
-            _unit_turn(_LastCreatedUnitP);
+            _LastCreatedUnitP^.dir   :=dir;
+            //_unit_turn(_LastCreatedUnitP);
 
             if(_LastCreatedUnitP^.buff[ub_advanced]>0)
             then sound:=2
@@ -1245,6 +1246,9 @@ uab_radar: begin
                  {$ENDIF}
               end;
            end;
+uab_uac_unit_adv:
+           if(upgr[upgr_uac_6bld]>0)then buff[ub_advanced]:=_ub_infinity;
+
       end;
 
       {case uid of

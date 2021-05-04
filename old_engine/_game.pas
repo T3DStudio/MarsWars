@@ -861,10 +861,10 @@ begin
          FillChar(ui_builders_x ,SizeOf(ui_builders_x ),0);
          FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
          ui_first_upgr_time:=0;
-         ui_uid_buildn       :=0;
-         ui_uibtn_action       :=0;
-         ui_uibtn_move         :=0;
-         ui_uibtn_f2   :=0;
+         ui_uid_buildn     :=0;
+         ui_uibtn_action   :=0;
+         ui_uibtn_move     :=0;
+         ui_uibtn_f2       :=0;
          ui_prod_builds    :=[];
          FillChar(ui_prod_units ,SizeOf(ui_prod_units ),0);
          FillChar(ui_orders_uids,SizeOf(ui_orders_uids),0);
@@ -878,7 +878,6 @@ begin
          if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
 
          PlayUnitSelect;
-
          {$ENDIF}
 
          inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;

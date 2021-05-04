@@ -164,10 +164,10 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(_ability in clint_rld_abils)then _wrld(@rld,rpl);
+                     if(_ability in client_rld_abils)then _wrld(@rld,rpl);
                      _wprod(pu,rpl);
                   end;
-                  if(sel)and(_UnitHaveRPoint(pu))then
+                  if(sel)and(_UnitHaveRPoint(pu^.uidi))then
                   begin
                      _wudata_int(uo_x ,rpl);
                      _wudata_int(uo_y ,rpl);
@@ -826,10 +826,10 @@ begin
                begin
                   if(bld)then
                   begin
-                     if(uid^._ability in clint_rld_abils)then _rrld(@rld,rpl);
+                     if(uid^._ability in client_rld_abils)then _rrld(@rld,rpl);
                      _rprod(uu,rpl);
                   end;
-                  if(sel)and(_UnitHaveRPoint(uu))then
+                  if(sel)and(_UnitHaveRPoint(uu^.uidi))then
                   begin
                      uo_x:=_rudata_int(rpl,0);
                      uo_y:=_rudata_int(rpl,0);
@@ -894,8 +894,8 @@ begin
    G_Step:=_rudata_card(rpl,G_Step);
 
    gstp:=G_Step shr 1;
-   if((gstp mod fr_hhfps)=0)then
-    if(rpl=false)then
+   if(rpl=false)then
+    if((gstp mod fr_hhfps)=0)then
      with _players[_pl] do
      begin
          _rrld(@build_cd,rpl);

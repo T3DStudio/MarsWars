@@ -60,6 +60,7 @@ begin
         EID_Teleport      : _setEID(@spr_eff_tel       ,sms_death);
         EID_Gavno         : _setEID(@spr_eff_g         ,sms_death);
         EID_BExp          : _setEID(@spr_eff_eb        ,sms_death);
+        MID_Blizzard,
         EID_BBExp         : _setEID(@spr_eff_ebb       ,sms_death);
         EID_HKT_h,
         EID_HKT_s         : _setEID(@spr_HKeep         ,sms_walk );
@@ -128,7 +129,7 @@ begin
 end;
 
 begin
-   if(_menu)or(_draw=false)or(_eids[ee].smodel=nil)then exit;
+   if(_menu)or(g_paused>0)or(_draw=false)or(_eids[ee].smodel=nil)then exit;
 
    for e:=1 to vid_mvs do
    with _effects[e] do
@@ -174,6 +175,7 @@ EID_Teleport      : _setEff(10,0 ,-1 ,-1       ,true ,0 );
 EID_Gavno         : _setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
 EID_BExp          : _setEff(5 ,0 ,-1 ,-1       ,true ,0 );
+MID_Blizzard,
 EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HKT_h,
@@ -212,14 +214,77 @@ begin
      else _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),vy+map_flydpth[uf]+1,EID_Blood );
 end;
 
+{
+ms_smodel    : PTMWSModel;
+ms_eid_fly_st: integer;
+ms_snd_death_ch,
+ms_eid_fly,
+ms_eid_death : byte;
+ms_snd_death : PTSoundSet;
+
+x,y,
+vx,vy,
+dam,
+vst,
+tar,
+sr,
+dir,
+ystep,
+mtars,
+ntars    : integer;
+player,
+mid,mf   : byte;
+homing   : boolean;
+}
+
 procedure _missile_explode_effect(m:integer);
 begin
    with _missiles[m] do
+   with _mids[mid] do
    begin
+      if(_nhp3(vx,vy,@_players[player]))then
+      begin
+         if(ms_alt_death=false)
+         then _effect_add(vx,vy,vy+map_flydpth[mf],mid)
+         else
+         begin
+            sr:=trunc(sr*0.75);
+            while(mtars>0)do
+            begin
+               _effect_add(vx-_randomr(sr),vy-_randomr(sr),vy+map_flydpth[mf],mid);
+               dec(mtars,1);
+            end;
+         end;
 
+
+         //if(ms_eid_death>0)then _effect_add(vx,vy,vy+map_flydpth[mf],ms_eid_death);
+         if(ms_eid_decal>0)then _effect_add(vx,vy,-6                ,ms_eid_decal);
+
+         if(ms_snd_death_ch>0)then
+          if(random(ms_snd_death_ch)>0)then exit;
+
+         PlaySND(ms_snd_death,nil);
+      end;
    end;
 end;
 
+procedure missiles_sprites(noanim,draw:boolean);
+var  m:integer;
+   spr:PTMWSprite;
+begin
+   for m:=1 to MaxMissiles do
+   with _missiles[m] do
+   with _mids[mid] do
+   if(vst>0)then
+   begin
+      spr:=@spr_dummy;
+
+      spr:=_sm2s(ms_smodel,sms_stand,dir,0);
+
+      if(draw)then
+       if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,vy+map_flydpth[mf],0,spr,255);
+   end;
+end;
 
 procedure effects_sprites(noanim,draw:boolean);
 var ei,

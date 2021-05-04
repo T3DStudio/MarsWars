@@ -11,7 +11,7 @@ end;
 procedure map_seed2theme;
 begin
    SetTheme(
-   map_seed and 15,
+      map_seed and $0000000F,
    -((map_seed and $00000FF0) shr 4 ),
    -((map_seed and $000FF000) shr 12),
    -((map_seed and $0FF00000) shr 20),
@@ -35,10 +35,10 @@ begin
     with map_dds[d] do
      if(t>0)then
      begin
-        dx0:=(x-r-dcw) div dcw;if(dx0<0)then dx0:=0;if(dx0>dcn)then dx0:=dcn;
-        dy0:=(y-r-dcw) div dcw;if(dy0<0)then dy0:=0;if(dy0>dcn)then dy0:=dcn;
-        dx1:=(x+r+dcw) div dcw;if(dx1<0)then dx1:=0;if(dx1>dcn)then dx1:=dcn;
-        dy1:=(y+r+dcw) div dcw;if(dy1<0)then dy1:=0;if(dy1>dcn)then dy1:=dcn;
+        dx0:=mm3(0,(x-r-dcw) div dcw,dcn);
+        dy0:=mm3(0,(y-r-dcw) div dcw,dcn);
+        dx1:=mm3(0,(x+r+dcw) div dcw,dcn);
+        dy1:=mm3(0,(y+r+dcw) div dcw,dcn);
         while(dx0<=dx1)do
         begin
            for dy:=dy0 to dy1 do
@@ -53,58 +53,29 @@ begin
      end;
 end;
 
-
 procedure _dds_a(dx,dy:integer;dt:byte);
-var d:integer;
 begin
    if(map_ddn>=MaxDoodads)then exit;
 
-   inc(map_ddn,1);
-
-   with map_dds[map_ddn] do
-   begin
-      case dt of
-       DID_LiquidR1,
-       DID_LiquidR2,
-       DID_LiquidR3,
-       DID_LiquidR4,
-       DID_Brock,
-       DID_Srock,
-       DID_Other     : begin
-                          t := dt;
-                          r := DID_R[t];
-                       end;
-      else exit;
-      end;
-
-      x:=dx;
-      y:=dy;
+   case dt of
+   DID_LiquidR1,
+   DID_LiquidR2,
+   DID_LiquidR3,
+   DID_LiquidR4,
+   DID_Brock,
+   DID_Srock,
+   DID_Other     : begin
+                      inc(map_ddn,1);
+                      with map_dds[map_ddn] do
+                      begin
+                         t:=dt;
+                         r:=DID_R[t];
+                         x:=dx;
+                         y:=dy;
+                      end;
+                   end;
+   else
    end;
-
-   {for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t=0)then
-     begin
-        case dt of
-        DID_LiquidR1,
-        DID_LiquidR2,
-        DID_LiquidR3,
-        DID_LiquidR4,
-        DID_Brock,
-        DID_Srock,
-        DID_Other     : begin
-                           t := dt;
-                           r := DID_R[t];
-                           inc(map_ddn,1);
-                        end;
-        else break;
-        end;
-
-        x:=dx;
-        y:=dy;
-
-        break;
-     end;}
 end;
 
 
@@ -133,22 +104,32 @@ begin
    _spch:=false;
 
    for p:=0 to MaxPlayers do
-    if(dist2(x,y,map_psx[p],map_psy[p])<m)then
-    begin
-       _spch:=true;
-       break;
-    end;
+   if(dist2(x,y,map_psx[p],map_psy[p])<m)then
+   begin
+      _spch:=true;
+      break;
+   end;
 end;
 
 procedure MCircleStarts(cx,cy,sdir,r:integer);
 const dstep = 360 div MaxPlayers;
 var i:byte;
 begin
+   sdir:=abs(sdir mod 360);
    for i:=1 to MaxPlayers do
    begin
       inc(sdir,dstep);
-      map_psx[i]:=trunc(cx+r*cos(sdir*degtorad));
-      map_psy[i]:=trunc(cy+r*sin(sdir*degtorad));
+      map_psx[i]:=cx+trunc(r*cos(sdir*degtorad));
+      map_psy[i]:=cy+trunc(r*sin(sdir*degtorad));
+   end;
+   for cx:=1 to 32 do
+   begin
+      i:=_randomx(sdir,MaxPlayers,false)+1;
+      r:=_randomx(cx+i,MaxPlayers,false)+1;
+      if(i=r)then continue;
+
+      cy:=map_psx[i];map_psx[i]:=map_psx[r];map_psx[r]:=cy;
+      cy:=map_psy[i];map_psy[i]:=map_psy[r];map_psy[r]:=cy;
    end;
 end;
 
@@ -162,7 +143,6 @@ begin
    end;
 
    case g_mode of
-   gm_aslt,
    gm_2fort :
       begin
          ix:=map_mw div 2;
@@ -227,7 +207,7 @@ begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
 
-         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 9));
 
          c :=map_seed mod 360;
          ix:=map_mw div 2;
@@ -248,6 +228,23 @@ begin
          end;
          map_psx[0]:=-5000;
          map_psy[0]:=-5000;
+      end;
+   gm_aslt:
+      begin
+         c  :=map_seed mod 360;
+         bb0:=base_rr-100;
+         bb1:=map_hmw-(map_mw div 10);
+         for i:=1 to 3 do
+         begin
+            map_psx[i  ]:=map_hmw+trunc(cos(c*degtorad)*bb0);
+            map_psy[i  ]:=map_hmw+trunc(sin(c*degtorad)*bb0);
+            inc(c,60);
+            map_psx[i+3]:=map_hmw+trunc(cos(c*degtorad)*bb1);
+            map_psy[i+3]:=map_hmw+trunc(sin(c*degtorad)*bb1);
+            inc(c,60);
+         end;
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
       end;
    else
       if(map_sym)
@@ -292,7 +289,7 @@ begin
    end;
    if(t2 in [DID_SRock,DID_BRock])then
    begin
-      if(t1 in [DID_SRock,DID_BRock])then _dec_min_r:=DID_R[t1]+DID_R[t2]-20;
+      if(t1 in [DID_SRock,DID_BRock])then _dec_min_r:=     DID_R[t1]+DID_R[t2]-20;
       if(t1 in dids_liquids         )then _dec_min_r:=max2(DID_R[t1],DID_R[t2]);
    end;
 end;
@@ -327,9 +324,25 @@ begin
    end;
 end;
 
+function _checkPlace(di:byte;ix,iy:integer):boolean;
+begin
+   _checkPlace:=false;
+   if(_dnear(di,@ix,@iy))
+   or(_spch (ix,iy,base_ir))
+   then _checkPlace:=true
+   else
+     if(map_sym)and(g_mode in [gm_aslt,gm_3fort])then
+     begin
+        ix:=map_mw-ix;
+        iy:=map_mw-iy;
+        if(_dnear(di,@ix,@iy))
+        or(_spch (ix,iy,base_ir))then _checkPlace:=true;
+     end;
+end;
+
 function _trysetdd(di:byte;ix,iy:pinteger):boolean;
 begin
-   if(_dnear(di,ix,iy))or(_spch(ix^,iy^,base_ir))
+   if(_checkPlace(di,ix^,iy^))
    then _trysetdd:=false
    else
    begin
@@ -384,7 +397,7 @@ const dpostime = 400;
 var i,ix,iy,lqs,rks,ddc,cnt:integer;
 begin
    {$IFDEF _FULLGAME}
-   Map_tdmake;
+   map_tdmake;
    {$ENDIF}
 
    map_ddn:=0;
@@ -410,17 +423,17 @@ begin
       i  :=(ddc div 8);
       if(map_liq>0)then
       begin
-         ix:=(i*map_obs);
-         lqs:=(ix div 8)*map_liq;
-         rks:=ix-lqs;
+         ix :=(i*map_obs);
+         lqs:=max2(map_liq,(ix div 8)*map_liq);
+         rks:=max2(map_obs,ix-lqs);
       end
       else
       begin
          lqs:=0;
-         rks:=(i*map_obs);
+         rks:=max2(map_obs,i*map_obs);
       end;
    end
-   else lqs:=(ddc div 80)*map_liq;
+   else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 
    ix :=map_seed*map_obs*map_liq;
    iy :=0;
@@ -458,9 +471,10 @@ procedure Map_randommap;
 begin
    Map_randomseed;
 
-   map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/500)*500;
+   map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/StepSMap)*StepSMap;
    map_liq:=random(8);
    map_obs:=random(8);
+   map_sym:=random(2)>0;
 end;
 
 procedure Map_premap;

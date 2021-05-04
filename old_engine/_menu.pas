@@ -288,7 +288,7 @@ begin
 
       ///  MAP
       50 : ;
-      51 : begin _scrollInt(@map_mw,500,MinSMapW,MaxSMapW); Map_premap;end;
+      51 : begin _scrollInt(@map_mw,StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin _scrollInt(@map_liq,1,0,7); Map_premap;end;
       53 : begin _scrollInt(@map_obs,1,0,7); Map_premap;end;
       54 : begin map_sym:=not map_sym; Map_premap;end;
@@ -446,7 +446,7 @@ begin
       case _m_sel of
       // MAP
       50 : begin Map_randomseed;                             Map_premap;end;
-      51 : begin _scrollInt(@map_mw,-500,MinSMapW,MaxSMapW); Map_premap;end;
+      51 : begin _scrollInt(@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin _scrollInt(@map_liq,-1,0,7);                Map_premap;end;
       53 : begin _scrollInt(@map_obs,-1,0,7);                Map_premap;end;
       56 : begin Map_randommap;                              Map_premap;end;
@@ -481,24 +481,21 @@ begin
 
    if(length(k_kstring)>0)then
    begin
-      if(_m_sel=11 )then PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
-
-      if(_m_sel=37 )then _svld_str :=menu_sf(_svld_str ,k_kbstr,SvRpLen);
-
-      if(_m_sel=50)then
-      begin
-         map_seed:=s2c(menu_sf(c2s(map_seed),k_kbdig,10));
-         map_premap;
+      case _m_sel of
+      11 : PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
+      37 : _svld_str :=menu_sf(_svld_str ,k_kbstr,SvRpLen);
+      50 : begin
+              map_seed:=s2c(menu_sf(c2s(map_seed),k_kbdig,10));
+              map_premap;
+           end;
+      83 : _rpls_lrname:=menu_sf(_rpls_lrname,k_kbstr,SvRpLen);
+      87 : begin
+              net_sv_pstr:=menu_sf(net_sv_pstr,k_kbdig,5);
+              net_sv_sport;
+           end;
+      90 : net_cl_svstr:=menu_sf(net_cl_svstr,k_kbaddr,21);
+      100: net_chat_str:=menu_sf(net_chat_str,k_kbstr ,ChatLen);
       end;
-
-      if(_m_sel=83 )then _rpls_lrname:=menu_sf(_rpls_lrname,k_kbstr,SvRpLen);
-      if(_m_sel=87 )then
-      begin
-         net_sv_pstr:=menu_sf(net_sv_pstr,k_kbdig,5);
-         net_sv_sport;
-      end;
-      if(_m_sel=90 )then net_cl_svstr:=menu_sf(net_cl_svstr,k_kbaddr,21);
-      if(_m_sel=100)then net_chat_str:=menu_sf(net_chat_str,k_kbstr ,ChatLen);
 
       vid_mredraw:=true;
    end;

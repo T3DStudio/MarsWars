@@ -2,9 +2,10 @@
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
-    map_sprites(noanim);
-   unit_sprites(noanim);
-effects_sprites(noanim,true);
+     map_sprites(noanim);
+    unit_sprites(noanim);
+ effects_sprites(noanim,_draw);
+missiles_sprites(noanim,_draw);
 end;
 
 procedure d_Game;

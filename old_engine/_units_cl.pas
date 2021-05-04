@@ -603,6 +603,7 @@ upgr_hell_b478tel : begin _up_btn:=spr_b_up[r_hell,21]; end;
 
 upgr_uac_radar_r  : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
+upgr_uac_6bld2    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
 
       end;
 
@@ -650,6 +651,7 @@ begin
 end;
 
 function _canattack(pu:PTUnit):boolean;
+var tu:PTUnit;
 begin
    _canattack:=false;
    with pu^ do
@@ -658,10 +660,10 @@ begin
    case _attack of
     atm_none    : exit;
     atm_bunker,
-    atm_always  : if(_IsUnitRange(inapc))then
+    atm_always  : if(_IsUnitRange(inapc,@tu))then
                   begin
-                     if(_units[inapc].inapc>0)then exit;
-                     case _units[inapc].uid^._attack of
+                     if(tu^.inapc>0)then exit;
+                     case tu^.uid^._attack of
                      atm_none,
                      atm_sturret: exit;
                      end;
@@ -773,7 +775,7 @@ begin
    _mhits     := 100;
    _renerg    := 1;
    _generg    := 1;
-   _r         := 20;
+   _r         := 22;
    _srange    := 200;
    _ucl       := 2;
    _btime     := 8;
@@ -1634,7 +1636,8 @@ begin
    _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0         ,UID_HAltar         ,true ,true );
 
    _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0         ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UTechCenter,true ,true );
+   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UTechCenter    ,true ,true );
+   _setUPGR(r_uac ,upgr_uac_6bld2    ,120, 1  ,4  ,0         ,UID_UTechCenter    ,false,true );
 
 
 

@@ -103,8 +103,10 @@ TMID = record
    ms_eid_fly_st: integer;
    ms_snd_death_ch,
    ms_eid_fly,
-   ms_eid_death : byte;
+   //ms_eid_death,
+   ms_eid_decal : byte;
    ms_snd_death : PTSoundSet;
+   ms_alt_death : boolean;
 end;
 
 {$ENDIF}
@@ -370,6 +372,7 @@ TUnit = record
    uid      : PTUID;
 end;
 PTUnit = ^TUnit;
+PPTUnit = ^PTUnit;
 
 TMissile = record
    x,y,
@@ -379,6 +382,7 @@ TMissile = record
    tar,
    sr,
    dir,
+   ystep,
    mtars,
    ntars    : integer;
    player,

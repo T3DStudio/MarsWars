@@ -49,6 +49,7 @@ MaxCPoints             = 6;
 
 MaxSMapW               = 7000;
 MinSMapW               = 3000;
+StepSMap               = 250;
 
 map_b0                 = 5;
 
@@ -292,7 +293,7 @@ uab_radar              = 5;
 uad_htowertele         = 6;
 uad_uac_rstrike        = 7;
 
-clint_rld_abils = [
+client_rld_abils = [
                    uab_teleport     ,
                    uab_uac_unit_adv ,
                    uab_hell_unit_adv,
@@ -401,7 +402,7 @@ upgr_uac_ucomatt       = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_mines         = 43; // mines for engineers
 upgr_uac_minesen       = 44; // mine-sensor
-upgr_uac_6bld          = 45; // Souls / adv
+upgr_uac_6bld          = 45; // adv
 //upgr_uac_2tier         = 46; // Tier 2
 upgr_uac_rstrike       = 47; // rstrike launch
 upgr_uac_mechspd       = 48; // mech speed
@@ -457,6 +458,7 @@ MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxUnitWeapons         = 6; //0-6
 //MaxWeaponShootState    = 2;
 MaxUnitProds           = 1; //0-1
+MaxMissiles            = MaxUnits;
 
 uf_ground              = 0;
 uf_soaring             = 1;
@@ -503,7 +505,7 @@ UID_UFactory           = 43;
 UID_UGenerator         = 44;
 UID_UWeaponFactory     = 45;
 UID_URadar             = 46;
-UID_URMStation           = 47;
+UID_URMStation         = 47;
 UID_UTechCenter        = 48;
 UID_UCTurret           = 49;
 UID_UPTurret           = 50;
@@ -595,7 +597,7 @@ max_build_reload       = fr_fps*12;
 
 eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
-gear_time              : array[false..true] of byte = (fr_fps,fr_fps*2);
+
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 rocket_sr              = 45;
@@ -603,8 +605,8 @@ map_ffly_fapc          : array[false..true] of byte = (3,6);
 map_gapc               : array[false..true] of byte = (8,5);
 towers_sr              : array[0..5] of integer = (250,265,280,295,310,325);
 blizz_r                = 150;
-mech_adv_rel           : array[false..true] of integer = (fr_fps*12,fr_fps*6);
-uac_adv_rel            : array[false..true] of integer = (fr_fps*3,fr_fps);
+uac_adv_rel            : array[false..true,false..true] of integer = ((fr_fps*3,fr_fps),(fr_fps*12,fr_fps*6));
+gear_time              : array[false..true] of integer = (fr_fps,fr_fps*2);
 g_ct_pr                = 150;
 g_ct_ct                : array[1..r_cnt] of integer = (fr_fps*10,fr_fps*5);
 bld_dec_mr             = 6;
@@ -885,7 +887,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 238982;
+svld_size              = 243636;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

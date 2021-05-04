@@ -393,6 +393,18 @@ begin
         //if(sel)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
 
+   if(k_ctrl>2)then
+   for u:=1 to MaxMissiles do
+   with _missiles[u] do
+   if(vst>0)then
+   begin
+      ix:=vx-vid_vx+vid_mapx;
+      iy:=vy-vid_vy+vid_mapy;
+
+      circleColor(r_screen,ix,iy,5,c_lime);
+      _draw_text(r_screen,ix,iy,i2s(dir), ta_left,255, c_white);
+   end;
+
    {for u:=0 to 255 do
     if(ordx[u]>0)then
     begin

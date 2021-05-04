@@ -39,7 +39,7 @@ UnitStepNum       : byte = 8;
 
 _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
-_missiles         : array[1..MaxUnits   ] of TMissile;
+_missiles         : array[1..MaxMissiles] of TMissile;
 
 _uclord_c         : integer = 0;
 _uregen_c         : integer = 0;
@@ -125,6 +125,8 @@ fps_cs,
 fps_ns            : cardinal;
 
 {$IFDEF _FULLGAME}
+
+tmpmid            : byte = MID_Imp;
 
 _warpten          : boolean = false;
 _testmode         : byte = 0;

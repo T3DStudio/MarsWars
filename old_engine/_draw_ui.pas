@@ -274,7 +274,7 @@ begin
 
             req:=_uid_cndt(@_players[HPlayer],uid);
 
-            if(_uids[uid]._ability in clint_rld_abils)
+            if(_uids[uid]._ability in client_rld_abils)
             then rld:=ui_uid_reload[uid]
             else rld:=0;
 

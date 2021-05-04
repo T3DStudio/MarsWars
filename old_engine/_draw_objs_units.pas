@@ -187,7 +187,7 @@ begin
              then break
              else _unit_uiprodcnts(pu,i);
          end;
-         if(sel)and(_UnitHaveRPoint(pu))then _sl_add_dec(uo_x,uo_y,32000,-32000,@spr_mp[_urace],255,0,0,-spr_mp[_urace].hh);
+         if(sel)and(_UnitHaveRPoint(pu^.uidi))then _sl_add_dec(uo_x,uo_y,32000,-32000,@spr_mp[_urace],255,0,0,-spr_mp[_urace].hh);
       end;
 
       if(bld)then

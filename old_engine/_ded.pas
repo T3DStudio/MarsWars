@@ -179,7 +179,7 @@ begin
            else
            begin
               map_seed:=s2c(args[1]);
-              map_mw  :=mm3(MinSMapW, (s2i(args[2]) div 500)*500, MaxSMapW);
+              map_mw  :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
               map_liq :=min2(7,s2b(args[3]));
               map_obs :=min2(7,s2b(args[4]));
               map_sym :=s2i(args[5])>0;
