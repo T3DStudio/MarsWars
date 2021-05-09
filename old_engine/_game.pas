@@ -414,36 +414,26 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                     co_rcamove,
                     co_rcmove  :  begin     // right clik
                                      case _ability of
-                                     uab_radar       : _unit_uradar(pu,o_x1,o_y1);
+                                     uad_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
+                                     uab_radar       : _unit_uradar  (pu,o_x1,o_y1);
                                      uad_htowertele  : if(o_y0<>u)and(o_y0<>0)and(_attack>atm_none)
                                                        then uo_tar:=o_y0
                                                        else _unit_htteleport(pu,o_x1,o_y1);
+                                     uab_hell_unit_adv,
+                                     uab_building_adv: uo_tar:=o_y0;
                                      else
-                                        case uidi of
-                                         UID_HKeep         :;// _unit_bteleport(pu);
-                                         UID_URMStation      :;// _unit_URocketL (pu);
-                                         UID_HMonastery,
-                                         UID_HFortress,
-                                         UID_UNuclearPlant : uo_tar:=o_y0;
-                                         {UID_HGate,
-                                         UID_UMilitaryUnit,
-                                         UID_HMilitaryUnit : if(o_y0<>u)and(o_y0<>0)
-                                                             then uo_tar:=o_y0; }
-                                         else
-                                           uo_tar:=0;
-                                           uo_x  :=o_x1;
-                                           uo_y  :=o_y1;
-                                           uo_bx :=-1;
+                                        uo_tar:=0;
+                                        uo_x  :=o_x1;
+                                        uo_y  :=o_y1;
+                                        uo_bx :=-1;
 
-                                           if(o_y0<>u)then uo_tar:=o_y0;
-                                           if(o_x0<>co_rcmove)or(speed=0)
-                                           then uo_id:=ua_amove
-                                           else
-                                           begin
-                                              uo_id :=ua_move;
-                                              a_tar :=0;
-                                           end;
-
+                                        if(o_y0<>u)then uo_tar:=o_y0;
+                                        if(o_x0<>co_rcmove)or(speed<=0)
+                                        then uo_id:=ua_amove
+                                        else
+                                        begin
+                                           uo_id :=ua_move;
+                                           a_tar :=0;
                                         end;
                                      end;
 

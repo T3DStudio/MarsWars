@@ -197,8 +197,8 @@ begin
    end;
 end;
 
-procedure _MakeLiquidTemplate(surf,ts:pSDL_Surface;xs,ys,d,r:integer;animst,rrs:byte;itb:boolean);
-var x,y,dir,i,e,p:integer;
+procedure _MakeLiquidTemplate(surf,ts:pSDL_Surface;xs,ys,d,r:integer;animst,animstyle:byte;itb:boolean);
+var x,y,dir,i,e,p,rand:integer;
 begin
    boxColor(surf,0,0,d,d,c_purple);
 
@@ -214,31 +214,33 @@ begin
       inc(x,ts^.w);
    end;
 
-   if(rrs>1)then exit;
+   if(animstyle>1)then exit;
 
-   if(rrs=0)then
+   if(animstyle=0)then
    begin
       case animst of
       0:   e:=d div 22;
       else e:=d div 32;
       end;
-      dir:=0;
-      i:=r+e;
+      rand:=0;
+      dir :=0;
+      i   :=r+e;
       while(dir<=360)do
       begin
          case animst of
          0:   p:=e+random(e);
-         else p:=e+_randomx(dir+i,e,false);
+         else p:=e+((dir*i+rand) mod e);
          end;
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
          filledcircleColor(surf,x,y,p,c_purple);
          inc(dir,8);
+         inc(rand,13);
       end;
    end;
 
    dir:=0;
-   case rrs of
+   case animstyle of
    0: i:=r div 10;
    1: i:=-5;
    end;
@@ -280,7 +282,7 @@ begin
    case theme_liquid_animt of
    0: begin
          wsp:=(ts^.w div 4)*((map_seed  mod 3)-1);
-         hsp:=(ts^.h div 4)*((abs(map_seed2) mod 3)-1);
+         hsp:=(ts^.h div 4)*((abs(map_iseed) mod 3)-1);
          if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
       end;
    else
@@ -699,14 +701,14 @@ begin
    vid_mha:= vid_sh+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
-   iy:=(map_seed2*5+ix)  mod vid_mha;
+   iy:=(map_iseed*5+ix)  mod vid_mha;
    rn:=ix*iy;
    for i:=1 to _tdecaln do
     with _tdecals[i-1] do
     begin
        inc(rn,17);
-       ix:=_randomx(ix+rn       ,vid_mwa,false);
-       iy:=_randomx(iy+sqr(ix*i),vid_mha,false);
+       ix:=_randomx(ix+rn       ,vid_mwa);
+       iy:=_randomx(iy+sqr(ix*i),vid_mha);
        x :=ix;
        y :=iy;
     end;

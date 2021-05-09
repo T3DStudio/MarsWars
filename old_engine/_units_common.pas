@@ -251,6 +251,34 @@ begin
    end;
 end;
 
+procedure _unit_umstrike_create(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,false);
+      {$IFDEF _FULLGAME}
+      _uac_rocketl_eff(pu);
+      {$ENDIF}
+   end;
+end;
+
+procedure _unit_umstrike(pu:PTUnit;x0,y0:integer);
+var i:byte;
+begin
+   with pu^ do
+   if(bld)and(rld<=0)then
+   with player^ do
+   if(upgr[upgr_uac_rstrike]>0)then
+   begin
+      uo_x:=x0;
+      uo_y:=y0;
+      for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_2fps);
+      rld:=mstrike_reload;
+      dec(upgr[upgr_uac_rstrike],1);
+      _unit_umstrike_create(pu);
+   end;
+end;
+
 
 procedure _unit_htteleport(pu:PTUnit;x0,y0:integer);
 begin
@@ -1160,17 +1188,17 @@ begin
            if(td<=uu^.sr)then _unit_target:=1;
    end;
 end;
-
+}
 
 function _itcanapc(uu,tu:PTUnit):boolean;
 begin
    _itcanapc:=false;
    if(tu^.uf>uf_ground)then exit;
-   if((uu^.apcm-uu^.apcc)>=tu^.apcs)then
+   if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
     if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;
 
-}
+
 
 
 

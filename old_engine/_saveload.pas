@@ -58,7 +58,7 @@ begin
             BlockRead(f,vr,sizeof(cmp_skill));vr:=0;
 
             BlockRead(f,ms,sizeof(map_seed ));_svld_stat:=str_map+': '+c2s(ms)+#13+' ';
-            BlockRead(f,vr,sizeof(map_seed2));vr:=0;
+            BlockRead(f,vr,sizeof(map_iseed));vr:=0;
             BlockRead(f,mw,sizeof(map_mw   ));_svld_stat:=_svld_stat+str_m_siz+w2s(mw)+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_liq  ));
             if(vr>7)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
@@ -142,7 +142,7 @@ menu_s2
 _cmp_sel
 cmp_skill
 map_seed
-map_seed2
+map_iseed
 map_mw
 map_lqt
 map_obs
@@ -178,6 +178,7 @@ team_army
 ui_alrms
 map_psx
 map_psy
+map_rpos
 theme_map_lqt
 theme_map_blqt
 theme_map_trt
@@ -195,7 +196,7 @@ begin
    BlockWrite(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
    BlockWrite(f,cmp_skill      ,SizeOf(cmp_skill      ));
    BlockWrite(f,map_seed       ,SizeOf(map_seed       ));
-   BlockWrite(f,map_seed2      ,SizeOf(map_seed2      ));
+   BlockWrite(f,map_iseed      ,SizeOf(map_iseed      ));
    BlockWrite(f,map_mw         ,SizeOf(map_mw         ));
    BlockWrite(f,map_liq        ,SizeOf(map_liq        ));
    BlockWrite(f,map_obs        ,SizeOf(map_obs        ));
@@ -229,6 +230,7 @@ begin
    BlockWrite(f,ui_alarms      ,SizeOf(ui_alarms      ));
    BlockWrite(f,map_psx        ,SizeOf(map_psx        ));
    BlockWrite(f,map_psy        ,SizeOf(map_psy        ));
+   BlockWrite(f,map_rpos       ,SizeOf(map_rpos       ));
    BlockWrite(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
    BlockWrite(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
    BlockWrite(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
@@ -268,7 +270,7 @@ begin
          BlockRead(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
          BlockRead(f,cmp_skill      ,SizeOf(cmp_skill      ));
          BlockRead(f,map_seed       ,SizeOf(map_seed       ));
-         BlockRead(f,map_seed2      ,SizeOf(map_seed2      ));
+         BlockRead(f,map_iseed      ,SizeOf(map_iseed      ));
          BlockRead(f,map_mw         ,SizeOf(map_mw         ));
          BlockRead(f,map_liq        ,SizeOf(map_liq        ));
          BlockRead(f,map_obs        ,SizeOf(map_obs        ));
@@ -302,6 +304,7 @@ begin
          BlockRead(f,ui_alarms      ,SizeOf(ui_alarms      ));
          BlockRead(f,map_psx        ,SizeOf(map_psx        ));
          BlockRead(f,map_psy        ,SizeOf(map_psy        ));
+         BlockRead(f,map_rpos       ,SizeOf(map_rpos       ));
          BlockRead(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
          BlockRead(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
          BlockRead(f,theme_map_trt  ,SizeOf(theme_map_trt  ));

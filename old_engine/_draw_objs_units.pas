@@ -540,15 +540,20 @@ end;
 
 procedure unit_sprites(noanim:boolean);
 var u:integer;
-   pu:PTUnit;
+pu,tu:PTUnit;
 begin
    for u:=1 to MaxUnits do
    begin
       pu:=@_units[u];
       with pu^ do
-       if(hits>0)
-       then _unit_aspr(pu,noanim)
-       else _unit_dspr(pu);
+       if(_IsUnitRange(inapc,@tu))then
+       begin
+          if(tu^.sel)and(G_paused=0)and(playeri=HPlayer)then inc(ui_units_inapc[uidi],1);
+       end
+       else
+         if(hits<=0)
+         then _unit_dspr(pu)
+         else _unit_aspr(pu,noanim);
    end;
 end;
 

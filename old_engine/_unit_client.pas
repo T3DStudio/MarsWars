@@ -73,11 +73,31 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure _wudata_bstat(pu:PTUnit;rpl:boolean;_pl:byte);
+function _udata_ability_progress(pu:PTUnit;_pl:byte):boolean;
+function _res(b:boolean):boolean;
+begin
+   if(_pl=pu^.playeri)
+   then _res:=(pu^.rld>0)
+   else _res:=b;
+end;
+begin
+   _udata_ability_progress:=false;
+   with pu^ do
+   with uid^ do
+   case _ability of
+uab_radar      : _udata_ability_progress:=_res(rld>radar_btime);
+uad_uac_rstrike: _udata_ability_progress:=_res(rld>mstrike_reload_client);
+   end;
+end;
+
+
+
+procedure _wudata_bstat(pu:PTUnit;rpl:boolean;_pl:byte;warld:pboolean);
 var _bts1,
     _bts2:byte;
 begin
    with pu^ do
+   with uid^ do
    begin
       _bts1:=0;
       _bts2:=0;
@@ -88,6 +108,8 @@ begin
       SetBBit(@_bts2,3, buff[ub_born     ]>0);
       SetBBit(@_bts2,4, buff[ub_invuln   ]>0);
       SetBBit(@_bts2,5, buff[ub_teleeff  ]>0);
+      warld^:=_udata_ability_progress(pu,_pl);
+      SetBBit(@_bts2,6, warld^);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -125,6 +147,7 @@ end;
 
 procedure _wudata(pu:PTUnit;rpl:boolean;_pl:byte);
 var sh :shortint;
+ warld :boolean;
 begin
    with pu^ do
    with uid^ do
@@ -137,7 +160,7 @@ begin
       if(sh>-127)then
       begin
          _wudata_byte (uidi,rpl);
-         _wudata_bstat(pu,rpl,_pl);
+         _wudata_bstat(pu,rpl,_pl,@warld);
 
          if(inapc>0)
          then _wudata_int(inapc,rpl)
@@ -157,6 +180,13 @@ begin
          begin
             //if(uidi in whocanattack)and(a_tar1>0)then _wudata_int(tar1,rpl);
 
+            if(warld)then
+            begin
+               _wrld(@rld,rpl);
+               _wudata_int(uo_x ,rpl);
+               _wudata_int(uo_y ,rpl);
+            end;
+
             if(rpl=false)and(playeri=_pl)then
             begin
                if(sel)then _wudata_byte(order,rpl);
@@ -174,6 +204,7 @@ begin
                   end;
                end;
             end;
+
          end;
       end;
    end;
@@ -458,7 +489,7 @@ begin
    with uu^ do vis:=_nhp3(x,y,player);
    with uu^ do
     with player^ do
-     if(pu^.hits<=dead_hits)and(hits>dead_hits)then // not exists to exists
+     if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
         _unit_default(uu);
 
@@ -483,7 +514,7 @@ begin
         _ucInc(uu);
      end
      else
-       if(pu^.hits>dead_hits)and(hits<=dead_hits)then // exists to not exists
+       if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
        begin
           vx:=x;
           vy:=y;
@@ -744,6 +775,7 @@ begin
          buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,4)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,5)];
+         if(GetBBit(@_bts2,6))then rld:=-1;
       end
       else
       begin
@@ -801,8 +833,11 @@ begin
          hits:=_S2hi(sh,uid^._mhits,uid^._shcf);
          _rudata_bstat(uu,rpl);
 
-         if(inapc>0)
-         then inapc:=mm3(0,_rudata_int(rpl,0),MaxUnits)
+         if(inapc>0)then
+         begin
+            inapc:=_rudata_int(rpl,0);
+            if(inapc<1)or(inapc>MaxUnits)then inapc:=0;
+         end
          else
            if(sh>0)then
            begin
@@ -811,13 +846,20 @@ begin
            end
            else
            begin
-              x:=integer(_rudata_byte(rpl,x) shl 5)+(x mod 32);
-              y:=integer(_rudata_byte(rpl,x) shl 5)+(y mod 32);
+              x:=integer(_rudata_byte(rpl,0) shl 5)+(x mod 32);
+              y:=integer(_rudata_byte(rpl,0) shl 5)+(y mod 32);
            end;
 
          if(sh>0)then
          begin
            // if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
+
+            if(rld=-1)then
+            begin
+               _rrld(@rld,rpl);
+               uo_x:=_rudata_int(rpl,0);
+               uo_y:=_rudata_int(rpl,0);
+            end;
 
             if(rpl=false)and(playeri=_pl)then
             begin

@@ -292,14 +292,13 @@ uab_building_adv       = 4;
 uab_radar              = 5;
 uad_htowertele         = 6;
 uad_uac_rstrike        = 7;
+uad_spawnlost          = 100;
 
 client_rld_abils = [
                    uab_teleport     ,
                    uab_uac_unit_adv ,
                    uab_hell_unit_adv,
-                   uab_building_adv ,
-                   uab_radar        ,
-                   uad_uac_rstrike
+                   uab_building_adv
                    ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -588,10 +587,13 @@ regen_per              = fr_fps*2;
 _uclord_p              = fr_hfps+1;
 vistime                = _uclord_p+1;
 
-radar_reload           = fr_fps*60;
+radar_reload           = fr_fps*40;
 radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
+
+mstrike_reload         = fr_fps*10;
+mstrike_reload_client  = mstrike_reload-(fr_fps*3);
 
 max_build_reload       = fr_fps*12;
 
@@ -887,7 +889,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 243636;
+svld_size              = 243637;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

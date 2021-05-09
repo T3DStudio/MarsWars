@@ -81,7 +81,8 @@ end;
 
 procedure map_vars;
 begin
-   map_seed2   := map_seed;
+   map_iseed   := map_seed;
+   map_rpos    := 0;
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
    {$IFDEF _FULLGAME}
@@ -124,8 +125,8 @@ begin
    end;
    for cx:=1 to 32 do
    begin
-      i:=_randomx(sdir,MaxPlayers,false)+1;
-      r:=_randomx(cx+i,MaxPlayers,false)+1;
+      i:=_random(MaxPlayers)+1;
+      r:=_random(MaxPlayers)+1;
       if(i=r)then continue;
 
       cy:=map_psx[i];map_psx[i]:=map_psx[r];map_psx[r]:=cy;
@@ -210,9 +211,9 @@ begin
          MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 9));
 
          c :=map_seed mod 360;
+         u :=map_mw div 5;
          ix:=map_mw div 2;
          iy:=360-(360 div MaxCPoints);
-         u := map_mw div 5;
 
          for i:=1 to MaxCPoints do
          with g_cpoints[i] do
@@ -251,9 +252,9 @@ begin
       then MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8))
       else
       begin
-         ix :=integer(map_seed) mod map_mw;
-         iy :=(map_seed2*2+integer(map_seed)) mod map_mw;
-         bb0:=base_r+(map_mw-MinSMapW) div 5;
+         ix :=abs(integer(map_seed)) mod map_mw;
+         iy :=0;
+         bb0:=base_r+(map_mw-MinSMapW) div 6;
          bb1:=map_mw-(bb0*2);
          dst:=(map_mw div 5)+base_r;
 
@@ -266,7 +267,6 @@ begin
                ix:=bb0+_random(bb1);
                iy:=bb0+_random(bb1);
                inc(c,1);
-               inc(map_seed2,1);
                if(c>500 )then dec(u,1);
                if(c>1000)or(_spch(ix,iy,u)=false)then break;
             end;
@@ -435,7 +435,7 @@ begin
    end
    else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 
-   ix :=map_seed*map_obs*map_liq;
+   ix :=map_seed;
    iy :=0;
 
    for i:=1 to ddc do
@@ -443,10 +443,8 @@ begin
       cnt:=0;
       while true do
       begin
-         if(map_sym)
-         then ix:=_randomx(ix,map_hmw,false)
-         else ix:=_randomx(ix,map_mw ,false);
-         iy:=_randomx(iy+ix*cnt,map_mw,true);
+         ix:=_randomx(ix,map_mw );
+         iy:=_randomx(iy+ix*cnt,map_mw);
 
          if(_pickdds(@ix,@iy,@lqs,@rks))then break;
 

@@ -611,7 +611,7 @@ begin
 co_empty  : begin
                m_sxs:=m_mx;
                m_sys:=m_my;
-               _missile_add(vid_vx+400,vid_vy+250,m_mx,m_my,0,tmpmid,HPlayer,uf_ground,false);
+               //_missile_add(vid_vx+400,vid_vy+250,m_mx,m_my,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(m_mx,m_my-50,10000,EID_HCC);
                //PlaySoundSet(snd_engineer_attack);
             end;

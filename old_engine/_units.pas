@@ -255,7 +255,9 @@ UID_Baron : if(buff[ub_advanced]>0)then inc(arm,dam div 2);
          else
          end;
 
-         if(g_mode in [gm_inv,gm_aslt])and(playeri=0)then dam:=dam div 2;
+         case g_mode of
+gm_inv    : if(playeri=0)then dam:=dam div 2;
+         end;
       end;
 
       dec(dam,arm);
@@ -276,7 +278,7 @@ UID_Baron : if(buff[ub_advanced]>0)then inc(arm,dam div 2);
          else
            if(_painc>0)and(painc>0)and(buff[ub_pain]=0)then
            begin
-              //if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
+              if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
 
               if(p>pains)
               then pains:=0
@@ -303,26 +305,9 @@ UID_Baron : if(buff[ub_advanced]>0)then inc(arm,dam div 2);
    end;
 end;
 
-{$Include _missiles.pas}
+
 {
-procedure _unit_URocketL(pu:PTUnit);
-var i:byte;
-begin
-   with pu^ do
-    if(bld)then
-     with player^ do
-      if(rld_t=0)and(race=r_uac)then
-       if(upgr[upgr_blizz]>0)and(rld_t=0)then
-       begin
-          for i:=0 to MaxPlayers do _addtoint(@vsnt[i],vid_2fps);
-          _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,false);
-          rld_t:=vid_fps*10;
-          dec(upgr[upgr_blizz],1);
-          {$IFDEF _FULLGAME}
-          _uac_rocketl_eff(pu);
-          {$ENDIF}
-       end;
-end;
+
 
 procedure _unit_bteleport(pu:PTUnit);
 begin
@@ -399,10 +384,17 @@ end; }
 
 procedure _unit_action(pu:PTUnit);
 begin
-{   with pu^ do
+   with pu^ do
    if(bld)then
-   with player^ do
-   case uidi of
+   with uid^ do
+   if(apcc>0)
+   then uo_id:=ua_unload
+   else
+     with player^ do
+     case _ability of
+uad_spawnlost: ;
+     end;
+{   case uidi of
 UID_HCommandCenter,
 UID_UCommandCenter:
                 if(apcc>0)
@@ -482,7 +474,7 @@ UID_ZMajor   : if(buff[ub_advanced]>0)and(buff[ub_clcast]=0)then
                   else PlaySND(snd_jetpoff,pu);
                   {$ENDIF}
                end;
-{UID_HMilitaryUnit,
+UID_HMilitaryUnit,
 UID_UWeaponFactory,
 UID_HPools,
 UID_UMilitaryUnit,
@@ -490,7 +482,7 @@ UID_HGate    : if(ucl_eb[true,9]>0)then
                begin
                   if(ucl_x[9]<=0)or(MaxUnits<ucl_x[9])then exit;
 
-               end;  }
+               end;
 
    else
    end;  }
@@ -511,17 +503,14 @@ begin
       begin
          if(tu^.x=x)and(tu^.y=y)then
          begin
-            if(t<2)then t:=2;
-            if(sel)then writeln('eq',t,' ',_randomr(2),' ',_randomr(2),' ',_randomr(2),' ',_randomr(2),' ',_randomr(2),' ',_randomr(2));
-            inc(x,t*_randomr(2));
-            inc(y,t*_randomr(2));
+            inc(x,_randomr(2));
+            inc(y,_randomr(2));
          end
          else
          begin
             if(t<=0)then t:=1;
             inc(x,trunc(ud*(tu^.x-x)/t));
             inc(y,trunc(ud*(tu^.y-y)/t));
-            if(sel)then writeln('neq');
          end;
 
          vstp:=UnitStepNum;
@@ -548,7 +537,7 @@ begin
 end;
 
 procedure _unit_dpush(pu:PTUnit;td:PTDoodad);
-var ix,iy,t,ud:integer;
+var t,ud:integer;
 begin
    with pu^ do
    with uid^ do
@@ -559,12 +548,17 @@ begin
 
       if(ud<0)then
       begin
-         if(t<=0)then t:=1;
-         ix:=trunc(ud*(td^.x-x)/t)+integer(2*_random(2));
-         iy:=trunc(ud*(td^.y-y)/t)+integer(2*_random(2));
-
-         inc(x,ix);
-         inc(y,iy);
+         if(td^.x=x)and(td^.y=y)then
+         begin
+            inc(x,_randomr(2));
+            inc(y,_randomr(2));
+         end
+         else
+         begin
+            if(t<=0)then t:=1;
+            inc(x,trunc(ud*(td^.x-x)/t));
+            inc(y,trunc(ud*(td^.y-y)/t));
+         end;
 
          vstp:=UnitStepNum;
 
@@ -602,13 +596,13 @@ end;
 procedure _unit_npush_dcell(pu:PTUnit);
 begin
    with pu^ do
-    with player^ do
-     if(speed>0)and(uf=uf_ground)and(solid)then _unit_npush(pu);
+    if(speed>0)and(uf=uf_ground)and(solid)then _unit_npush(pu);
 end;
 
 procedure _unit_move(pu:PTUnit);
 var mdist,ss:integer;
-    tu:PTUnit;
+    ddir    :single;
+    tu      :PTUnit;
 begin
    with pu^ do
    if(inapc>0)then
@@ -639,8 +633,7 @@ begin
       fx     := tu^.fx;
       fy     := tu^.fy;
 
-      if(playeri=HPlayer)then
-       if(tu^.sel)then inc(ui_units_inapc[uidi],1);
+
       {$ENDIF}
    end
    else
@@ -649,46 +642,48 @@ begin
       if(x=vx)and(y=vy)then
        if(x<>mv_x)or(y<>mv_y)then
        begin
-           mdist:=dist2(x,y,mv_x,mv_y);
-           if(mdist<=speed)then
-           begin
-              x:=mv_x;
-              y:=mv_y;
-              dir:=p_dir(vx,vy,x,y);
-           end
-           else
-           begin
-              ss:=speed;
+          ss:=speed;
 
-              {if(uidi=UID_UTransport)and(buff[ub_pain]>0)then dec(spup,2);
-              with player^ do
-              begin
-                 if(race=r_uac)and(isbuild=false)then
-                  case mech of
-                  true : if(upgr[upgr_mechspd]>0)then inc(spup,upgr[upgr_mechspd]);
-                  false: if(upgr[upgr_mspeed ]>0)then inc(spup,upgr[upgr_mspeed ]);
-                  end;
-              end; }
-              if(buff[ub_slooow]>0)then ss:=ss div 2;
+          if(buff[ub_slooow]>0)then ss:=ss div 2;
 
-              if(ss<2)then ss:=2;
+          if(ss<2)then ss:=2;
 
-              if(mdist>70)
-              then mdist:=8+_random(25)
-              else mdist:=50;
+          mdist:=dist2(x,y,mv_x,mv_y);
+          if(mdist<=speed)then
+          begin
+             x:=mv_x;
+             y:=mv_y;
+             dir:=p_dir(vx,vy,x,y);
+          end
+          else
+          begin
+             {if(uidi=UID_UTransport)and(buff[ub_pain]>0)then dec(spup,2);
+             with player^ do
+             begin
+                if(race=r_uac)and(isbuild=false)then
+                 case mech of
+                 true : if(upgr[upgr_mechspd]>0)then inc(spup,upgr[upgr_mechspd]);
+                 false: if(upgr[upgr_mspeed ]>0)then inc(spup,upgr[upgr_mspeed ]);
+                 end;
+             end; }
 
-              dir:=dir_turn(dir,p_dir(x,y,mv_x,mv_y),mdist);
+             if(mdist>70)
+             then mdist:=8+_random(25)
+             else mdist:=50;
 
-              x:=x+trunc(ss*cos(dir*degtorad));
-              y:=y-trunc(ss*sin(dir*degtorad));
-           end;
-           _unit_npush_dcell(pu);
-           _unit_correctcoords(pu);
-           {$IFDEF _FULLGAME}
-           _unit_mmcoords(pu);
-           _unit_sfog(pu);
-           {$ENDIF}
-        end;
+             dir:=dir_turn(dir,p_dir(x,y,mv_x,mv_y),mdist);
+
+             ddir:=dir*degtorad;
+             x:=x+trunc(ss*cos(ddir));
+             y:=y-trunc(ss*sin(ddir));
+          end;
+          _unit_npush_dcell(pu);
+          _unit_correctcoords(pu);
+          {$IFDEF _FULLGAME}
+          _unit_mmcoords(pu);
+          _unit_sfog(pu);
+          {$ENDIF}
+       end;
 end;
 
 {
@@ -871,15 +866,16 @@ begin
       if(cf(@aw_tarf,@wtr_hits_a  ))and (tu^.hits<=0                )then continue;
 
       if(cf(@aw_tarf,@wtr_bio     ))and (tu^.uid^._ismech           )then continue;
-      if(cf(@aw_tarf,@wtr_mech    ))and (tu^.uid^._ismech=false     )then continue;
-      if(cf(@aw_tarf,@wtr_building))and (tu^.uid^._isbuilding       )then continue;
+      if(cf(@aw_tarf,@wtr_mech    ))and((tu^.uid^._ismech=false)
+                                      or(tu^.uid^._isbuilding      ))then continue;
+      if(cf(@aw_tarf,@wtr_building))and (tu^.uid^._isbuilding=false )then continue;
 
       if(cf(@aw_tarf,@wtr_bld     ))and (tu^.bld=false              )then continue;
       if(cf(@aw_tarf,@wtr_nbld    ))and (tu^.bld                    )then continue;
 
-      if(cf(@aw_tarf,@wtr_ground  ))and (tu^.uf<>uf_ground          )then continue;
-      if(cf(@aw_tarf,@wtr_soaring ))and (tu^.uf<>wtr_soaring        )then continue;
-      if(cf(@aw_tarf,@wtr_fly     ))and (tu^.uf<>wtr_fly            )then continue;
+      if(cf(@aw_tarf,@wtr_ground  ))and (tu^.uf> uf_ground          )then continue;
+      if(cf(@aw_tarf,@wtr_soaring ))and (tu^.uf<>uf_soaring         )then continue;
+      if(cf(@aw_tarf,@wtr_fly     ))and (tu^.uf< uf_fly             )then continue;
 
       if(cf(@aw_tarf,@wtr_adv     ))and (tu^.buff[ub_advanced]<=0   )then continue;
       if(cf(@aw_tarf,@wtr_nadv    ))and (tu^.buff[ub_advanced]> 0   )then continue;
@@ -919,6 +915,7 @@ procedure _unit_mcycle(pu:PTUnit);
 var uc,
     ud: integer;
     tu: PTUnit;
+cunload,
 ftarget,
   push: boolean;
 t_weap: byte;
@@ -944,6 +941,11 @@ begin
          exit;
       end;
 
+
+      cunload:=true;
+      if(uf>uf_ground)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)then
+       if(_unit_OnDecorCheck(x,y))then cunload:=false;
+
       push    := solid and _canmove(pu);
       ftarget := _canattack(pu);
 
@@ -954,17 +956,66 @@ begin
          if(tu^.hits>fdead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
-            _unit_detect(pu,tu,ud);
 
-            if(ftarget)then  _unit_target(pu,tu,ud,@t_weap);
+            if(tu^.inapc<=0)then
+            begin
+               _unit_detect(pu,tu,ud);
+               if(ftarget)then  _unit_target(pu,tu,ud,@t_weap);
+            end;
 
             if(tu^.hits>0)then
             begin
+               if(tu^.inapc>0)then // unload
+               begin
+                  if(tu^.inapc=unum)and(uo_id=ua_unload)and(cunload)then
+                  begin
+                     if(apcc>0)then
+                     begin
+                        dec(apcc,tu^.uid^._apcs);
+                        tu^.inapc:=0;
+                        tu^.x    :=x-_random(_r);
+                        tu^.y    :=y-_random(_r);
+                        tu^.uo_x :=tu^.x;
+                        tu^.uo_y :=tu^.y;
+                     end;
+                     if(apcc=0)then
+                     begin
+                        {$IFDEF _FULLGAME}
+                        PlaySND(snd_inapc,pu);
+                        {$ENDIF}
+                        uo_id:=ua_amove;
+                     end;
+                  end;
+                  continue;
+               end;
+
                if(push)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)then
                  if(tu^.solid)and((uf=uf_ground)=(tu^.uf=uf_ground))then _unit_push(pu,tu,ud);
 
-               //dec(ud,r+tu^.r);
+               dec(ud,_r+tu^.uid^._r);
+
+               if(player=tu^.player)then
+               begin
+
+                  if(ud<melee_r)then
+                   if(uo_tar=uc)or(tu^.uo_tar=unum)then
+                    if(_itcanapc(pu,tu))then
+                    begin
+                       //if(state=ps_comp)and(order<>1)then tu^.order:=order;
+                       inc(apcc,tu^.uid^._apcs);
+                       tu^.inapc:=unum;
+                       tu^.a_tar:=0;
+                       if(    uo_tar=uc  )then     uo_tar:=0;
+                       if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
+                       _unit_desel(tu);
+                       {$IFDEF _FULLGAME}
+                       PlaySND(snd_inapc,pu);
+                       {$ENDIF}
+                       continue;
+                    end;
+
+               end;
             end;
          end;
       end;
@@ -1006,7 +1057,7 @@ begin
       end
       else udetect:=true;
 
-      if(udetect=false)and(udetect=ftarget)then exit;  // in apc & client side
+      if(udetect=false)and(ftarget=false)then exit;  // in apc & client side
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then

@@ -74,7 +74,8 @@ team_army         : array[0..MaxPlayers] of integer;
 vid_mredraw       : boolean  = true;
 
 map_seed          : cardinal = 1;
-map_seed2         : word     = 0;
+map_rpos          : byte = 0;
+map_iseed         : word     = 0;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
