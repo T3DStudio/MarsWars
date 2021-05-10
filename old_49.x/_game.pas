@@ -479,7 +479,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      _unit_turn(u);
                                   end;
                                end;
-               uo_paction    : if(speed>0)then
+               uo_paction    : if(speed>0)and(uo_id<>ua_paction)then
                                begin
                                   uo_x  :=o_x0;
                                   uo_y  :=o_y0;
@@ -487,6 +487,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                   uo_tar:=0;
                                   uo_id :=ua_paction;
                                   _unit_turn(u);
+                                  break;
                                end;
                uo_action     : case o_x0 of
                                   2 : if(speed>0)then

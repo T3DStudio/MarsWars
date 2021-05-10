@@ -67,7 +67,7 @@ _pnua                  : array[0..9] of byte = (55,75,95,115,135,155,175,195,215
 ClientTTL              = vid_fps*60;
 
 outlogfn               : shortstring = 'out.txt';
-str_ver                = 'v49.1';
+str_ver                = 'v49.2';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2021 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');

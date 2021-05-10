@@ -732,7 +732,7 @@ begin
                 end;
             3 : if(_rpls_rst>=rpl_rhead)then
                 begin
-                   if(m_by=8)and(m_bx=1)then _rpls_step:=vid_hfps*10;
+                   if(m_by=9)and(m_bx=1)then _rpls_step:=vid_hfps*10;
                 end;
             end;
          end;

@@ -791,6 +791,12 @@ begin
               end;
            end;
 
+         if(uid=UID_LostSoul)and(g_addon)then
+         begin
+            arm:=0;
+            inc(p,4);
+         end;
+
          if(buff[ub_advanced]>0)then
          begin
             case uid of
@@ -845,7 +851,10 @@ begin
 
                  with _players[player] do
                   if(race=r_hell)then
-                   if(upgr[upgr_pains]>0)then inc(pains,upgr[upgr_pains]*4);
+                   if(upgr[upgr_pains]>0)then
+                    if(uid=UID_LostSoul)
+                    then inc(pains,upgr[upgr_pains])
+                    else inc(pains,upgr[upgr_pains]*4);
                  {$IFDEF _FULLGAME}
                  _unit_painsnd(u);
                  {$ENDIF}
