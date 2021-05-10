@@ -414,9 +414,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                     co_rcamove,
                     co_rcmove  :  begin     // right clik
                                      case _ability of
-                                     uad_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
+                                     uab_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
                                      uab_radar       : _unit_uradar  (pu,o_x1,o_y1);
-                                     uad_htowertele  : if(o_y0<>u)and(o_y0<>0)and(_attack>atm_none)
+                                     uab_htowertele  : if(o_y0<>u)and(o_y0<>0)and(_attack>atm_none)
                                                        then uo_tar:=o_y0
                                                        else _unit_htteleport(pu,o_x1,o_y1);
                                      uab_hell_unit_adv,
@@ -494,7 +494,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      uo_bx :=-1;
                                      a_tar :=0;
                                      uo_tar:=0;
-                                     uo_id :=ua_paction;
+                                     if((_ability=0)and(apcc<=0))or(speed<=0)
+                                     then uo_id:=ua_amove
+                                     else uo_id:=ua_paction;
                                   end;
                     co_action  :  _unit_action   (pu);
                     co_supgrade:  _unit_supgrade (pu,o_y0);

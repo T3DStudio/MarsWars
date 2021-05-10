@@ -16,30 +16,6 @@ begin
    end;
 end;
 
-{procedure _unit_comssnd(ucl,race:integer);
-begin
-  case race of
-r_hell : case ucl of
-         0,2,3,
-         4,5,
-         6,7  : PlaySND(snd_demon1,nil);
-         1    : PlaySND(snd_imp   ,nil);
-         10   : PlaySND(snd_ar_act,nil);
-         11   : PlaySND(snd_arch_a,nil);
-         12..18,
-         9    : PlaySND(snd_zomb  ,nil);
-         8    : PlaySND(snd_rev_ac,nil);
-         end;
-r_uac  : case random(3) of
-         0 : PlaySND(snd_uac_u0   ,nil);
-         1 : PlaySND(snd_uac_u1   ,nil);
-         2 : PlaySND(snd_uac_u2   ,nil);
-         end;
-  end;
-end; }
-
-
-
 procedure _unit_PowerUpEff(pu:PTUnit;snd:PTSoundSet);
 begin
    with pu^ do
@@ -49,33 +25,13 @@ begin
    end;
 end;
 
-
-
 procedure _unit_painsnd(pu:PTUnit);
 begin
    with pu^ do
+   with uid^ do
    begin
-      {case uidi of
-       UID_LostSoul,
-       UID_Demon,
-       UID_Cacodemon,
-       UID_Baron,
-       UID_Cyberdemon,
-       UID_Mastermind,
-       UID_Arachnotron : PlaySND(snd_dpain ,pu);
-       UID_ArchVile    : PlaySND(snd_arch_p,pu);
-       UID_Pain        : PlaySND(snd_pain_p,pu);
-       UID_Revenant,
-       UID_Imp,
-       UID_ZEngineer,
-       UID_ZFormer,
-       UID_ZSergant,
-       UID_ZCommando,
-       UID_ZBomber,
-       UID_ZMajor,
-       UID_ZBFG        : PlaySND(snd_z_p   ,pu);
-       UID_Mancubus    : PlaySND(snd_man_p ,pu);
-       end;  }
+      PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil);
+      _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
    end;
 end;
 
@@ -134,6 +90,15 @@ begin
 
       _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
       PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil);
+   end;
+end;
+
+procedure _pain_lost_fail(pu:PTUnit;tx,ty:integer);
+begin
+   if(_nhp3(tx,ty,pu^.player))then
+   begin
+      _effect_add(tx,ty,ty+map_flydpth[pu^.uf]+1,UID_LostSoul);
+      PlaySND(snd_pexp,nil);
    end;
 end;
 
@@ -1034,6 +999,103 @@ begin
 end;
 
 
+
+procedure _pain_lost(pu:PTUnit;tx,ty:integer);
+var tu:PTUnit;
+begin
+   with pu^ do
+   with player^ do
+   begin
+      if((army+uproda)>=MaxPlayerUnits)
+      then _LastCreatedUnit:=0
+      else
+        if(ServerSide)
+        then _unit_add(tx,ty,UID_LostSoul,playeri,true)
+        else exit;
+
+      if(_LastCreatedUnit>0)then
+      begin
+         _LastCreatedUnitP^.dir   :=dir;
+         _LastCreatedUnitP^.a_tar :=a_tar;
+         _LastCreatedUnitP^.a_tard:=a_tard;
+         _LastCreatedUnitP^.uo_id :=uo_id;
+         _LastCreatedUnitP^.uo_tar:=uo_tar;
+         if(_IsUnitRange(a_tar,@tu))then
+         begin
+            _LastCreatedUnitP^.uo_x  :=tu^.x;
+            _LastCreatedUnitP^.uo_y  :=tu^.y;
+         end
+         else
+          if(uo_x<>x)or(uo_y<>y)then
+          begin
+             _LastCreatedUnitP^.uo_x  :=uo_x;
+             _LastCreatedUnitP^.uo_y  :=uo_y;
+          end;
+         _LastCreatedUnitP^.buff[ub_advanced]:=buff[ub_advanced];
+         {$IFDEF _FULLGAME}
+         //if(_nhp3(tx,ty,player))then _unit_createsound(UID_LostSoul);
+         {$ENDIF}
+      end
+      {$IFDEF _FULLGAME}
+      else _pain_lost_fail(pu,tx,ty)
+      {$ENDIF};
+
+
+      //
+
+      { if((army+wb)>=MaxPlayerUnits)or((player=0)and(g_mode=gm_inv)and(army>=g_inv_mn))
+       then _lcu:=0
+       else
+         if(OnlySVCode)
+         then _unit_add(tx,ty,UID_LostSoul,player,true)
+         else exit;
+       if(_lcu>0)then
+       begin
+          _lcup^.dir   :=dir;
+          _lcup^.tar1  :=tar1;
+          _lcup^.tar1d :=tar1d;
+          _lcup^.uo_id :=uo_id;
+          _lcup^.uo_tar:=uo_tar;
+          if(tar1>0)then
+          begin
+             _lcup^.uo_x  :=_units[tar1].x;
+             _lcup^.uo_y  :=_units[tar1].y;
+          end
+          else
+           if(uo_x<>x)or(uo_y<>y)then
+           begin
+              _lcup^.uo_x  :=uo_x;
+              _lcup^.uo_y  :=uo_y;
+           end;
+          _lcup^.buff[ub_advanced]:=buff[ub_advanced];
+          //_lcup^.buff[ub_born    ]:=0;
+          {$IFDEF _FULLGAME}
+          if(_nhp(x,y))then
+           if(_uvision(_players[HPlayer].team,@_units[u],true))then _unit_createsound(UID_LostSoul);
+          {$ENDIF}
+       end
+       else
+       begin
+          {$IFDEF _FULLGAME}
+          _effect_add(tx,ty,ty+map_flydpth[uf]+1,UID_LostSoul);
+          PlaySND(snd_pexp,u);
+          {$ENDIF}
+       end; }
+   end;
+end;
+
+
+
+procedure _pain_lost_spawn(pu:PTUnit);
+var dd:integer;
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      dd:=_DIR360(dir+23) div 45;
+      _pain_lost(pu,x+dir_stepX[dd]*_r,y+dir_stepY[dd]*_r);
+   end;
+end;
 
 {
 

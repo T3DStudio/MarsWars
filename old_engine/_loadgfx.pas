@@ -523,6 +523,7 @@ begin
 
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
+   spr_b_paction  := LoadBtn('b_paction',vid_bw);
    spr_b_delete   := LoadBtn('b_destroy',vid_bw);
    spr_b_attack   := LoadBtn('b_attack' ,vid_bw);
    spr_b_move     := LoadBtn('b_move'   ,vid_bw);

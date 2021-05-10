@@ -366,9 +366,10 @@ begin
          _drawBtn(tar,2,1,spr_b_apatrol,false  ,ui_uibtn_move=0   );
 
          _drawBtn(tar,0,2,spr_b_action ,false  ,ui_uibtn_action=0 );
-         _drawBtn(tar,1,2,spr_b_rclck  ,m_a_inv,false         );
-         _drawBtn(tar,2,2,spr_b_cancel ,false  ,false         );
+         _drawBtn(tar,1,2,spr_b_rclck  ,m_a_inv,false             );
+         _drawBtn(tar,2,2,spr_b_cancel ,false  ,false             );
 
+         _drawBtn(tar,0,3,spr_b_paction,false  ,ui_uibtn_action=0 );
          _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_uibtn_f2=0);
          _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])=0);
       end;
@@ -389,7 +390,7 @@ begin
         if(uid_s[sx]>0)then
          with _uids[sx] do
          case _ability of
-uad_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,m_vx,m_vy,blizz_r,c_gray);
+uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,m_vx,m_vy,blizz_r,c_gray);
          end;
 
       if(ui_mc_a>0)then //click effect

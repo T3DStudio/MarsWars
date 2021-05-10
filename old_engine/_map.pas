@@ -284,7 +284,7 @@ begin
    if(t2 in dids_liquids)
   and(t1 in dids_liquids)then
    begin
-      _dec_min_r:=max2(DID_R[t1],DID_R[t2])+64;
+      _dec_min_r:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 6)-(DID_R[t2] div 6);//max2(DID_R[t1],DID_R[t2])+64;
       exit;
    end;
    if(t2 in [DID_SRock,DID_BRock])then
@@ -352,10 +352,10 @@ begin
    end;
 end;
 
-function _pickdds(ix,iy,lqs,rks:pinteger):boolean;
+function _PickDoodad(ix,iy,lqs,rks:pinteger):boolean;
 var di:byte;
 begin
-   _pickdds:=false;
+   _PickDoodad:=false;
    for di:=DID_liquidR1 to DID_Other do
     case di of
     DID_LiquidR1,
@@ -366,7 +366,7 @@ begin
                     else
                       if(_trysetdd(di,ix,iy))then
                       begin
-                         _pickdds:=true;
+                         _PickDoodad:=true;
                          dec(lqs^,1);
                          break;
                       end
@@ -377,7 +377,7 @@ begin
                     else
                       if(_trysetdd(di,ix,iy))then
                       begin
-                         _pickdds:=true;
+                         _PickDoodad:=true;
                          dec(rks^,1);
                          break;
                       end
@@ -385,7 +385,7 @@ begin
     else
       if(_trysetdd(di,ix,iy))then
       begin
-         _pickdds:=true;
+         _PickDoodad:=true;
          break;
       end
       else continue;
@@ -446,7 +446,7 @@ begin
          ix:=_randomx(ix,map_mw );
          iy:=_randomx(iy+ix*cnt,map_mw);
 
-         if(_pickdds(@ix,@iy,@lqs,@rks))then break;
+         if(_PickDoodad(@ix,@iy,@lqs,@rks))then break;
 
          inc(cnt,1);
          if(cnt>=dpostime)then break;

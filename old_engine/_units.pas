@@ -392,7 +392,7 @@ begin
    else
      with player^ do
      case _ability of
-uad_spawnlost: ;
+uab_spawnlost: ;
      end;
 {   case uidi of
 UID_HCommandCenter,
@@ -521,7 +521,7 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
-         dir:=(360+dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 )) mod 360;
+         dir:=_DIR360(dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 ));
 
          if(tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)and(uo_tar=0)then
          begin
@@ -568,7 +568,7 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
-         if(a_rld<=0)then dir:=(360+dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 )) mod 360;
+         if(a_rld<=0)then dir:=_DIR360(dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 ));
 
          t:=dist2(uo_x,uo_y,td^.x,td^.y)-_r-td^.r;
          if(t<=0)then
@@ -1460,17 +1460,41 @@ begin
             mv_x:=uo_x;
             mv_y:=uo_y;
 
-            if(x=uo_x)and(y=uo_y)then
-             if(uo_bx>=0)then
-             begin
-                uo_x :=uo_bx;
-                uo_bx:=x;
-                uo_y :=uo_by;
-                uo_by:=y;
-                _unit_turn(pu);
-             end
-             else
-               if(uo_id=ua_move)then uo_id:=ua_amove;
+            if(uo_id=ua_paction)then
+            begin
+               {if((uid^._ability=0)and(apcc<=0))or(speed<=0)
+               then uo_id:=ua_amove
+               else}
+                 case uid^._ability of
+uab_spawnlost:     begin
+                      mv_x:=x;
+                      mv_y:=y;
+                      if(buff[ub_cast]<=0)then
+                      begin
+                         _pain_lost_spawn(pu);
+                         buff[ub_cast]:=fr_fps;
+                      end;
+                   end
+                 else
+                   if(x=uo_x)and(y=uo_y)then
+                   begin
+                      uo_id:=ua_amove;
+                      _unit_action(pu);
+                   end;
+                 end
+            end
+            else
+             if(x=uo_x)and(y=uo_y)then
+              if(uo_bx>=0)then
+              begin
+                 uo_x :=uo_bx;
+                 uo_bx:=x;
+                 uo_y :=uo_by;
+                 uo_by:=y;
+                 _unit_turn(pu);
+              end
+              else
+                if(uo_id=ua_move)then uo_id:=ua_amove;
 
              if(buff[ub_stopattack]>0)then
              begin

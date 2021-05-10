@@ -86,7 +86,7 @@ begin
    with uid^ do
    case _ability of
 uab_radar      : _udata_ability_progress:=_res(rld>radar_btime);
-uad_uac_rstrike: _udata_ability_progress:=_res(rld>mstrike_reload_client);
+uab_uac_rstrike: _udata_ability_progress:=_res(rld>mstrike_reload_client);
    end;
 end;
 

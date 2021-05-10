@@ -400,7 +400,7 @@ begin
    _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map.'                    );
    _mkHStrUid(UID_UTechCenter      ,'UAC Tech Center'            ,'Upgrades units.'                 );
    _mkHStrUid(UID_UPTurret         ,'UAC Plasma turret'          ,'Advanced defensive structure.'   );
-   _mkHStrUid(UID_URMStation         ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
+   _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
    _mkHStrUid(UID_URTurret         ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
@@ -460,6 +460,7 @@ begin
    _mkHStrXY(3,6 ,0,0,'Action ('           +#18+'Z'     +#25+')');
    _mkHStrXY(3,7 ,0,0,str_maction+ ' ('    +#18+'M'     +#25+')');
    _mkHStrXY(3,8 ,0,0,'Cancel production ('+#18+'C'     +#25+')');
+   _mkHStrXY(3,9 ,0,0,'Action at point ('  +#18+'X'     +#25+')');
    _mkHStrXY(3,10,0,0,'Select all units (' +#18+'F2'    +#25+')');
    _mkHStrXY(3,11,0,0,'Destroy ('          +#18+'Delete'+#25+')');
 
@@ -840,6 +841,7 @@ begin
   _mkHStrXY(3,6 ,0,0,'Действие ('            +#18+'Z'     +#25+')');
   _mkHStrXY(3,7 ,0,0,str_maction+       ' (' +#18+'M'     +#25+')');
   _mkHStrXY(3,8 ,0,0,'Отмена производства (' +#18+'C'     +#25+')');
+  _mkHStrXY(3,9 ,0,0,'Действие в точке ('    +#18+'X'     +#25+')');
   _mkHStrXY(3,10,0,0,'Выбрать всех юнитов (' +#18+'F2'    +#25+')');
   _mkHStrXY(3,11,0,0,'Уничтожить ('          +#18+'Delete'+#25+')');
 

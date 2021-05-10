@@ -138,6 +138,12 @@ begin
    dir_diff:=((( (dir1-dir2) mod 360) + 540) mod 360) - 180;
 end;
 
+function _DIR360(d:integer):integer;
+begin
+   _DIR360:=d mod 360;
+   if(_DIR360<0)then _DIR360:=_DIR360+360;
+end;
+
 function dir_turn(d1,d2,spd:integer):integer;
 var d:integer;
 begin
@@ -145,9 +151,11 @@ begin
 
    if abs(d)<=spd
    then dir_turn:=d2
-   else dir_turn:=(d1+(spd*sign(d))) mod 360;
-   if(dir_turn<0)then dir_turn:=360+dir_turn;
+   else dir_turn:=d1+(spd*sign(d));
+   dir_turn:=_DIR360(dir_turn);
 end;
+
+
 
 function _IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin

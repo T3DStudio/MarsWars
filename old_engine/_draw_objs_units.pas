@@ -197,7 +197,7 @@ begin
          if(sel)then
          begin
             if(speed>0)then inc(ui_uibtn_move,1);
-            if(_ability in [])then inc(ui_uibtn_action,1);
+            if(_ability in [uab_spawnlost])or(apcc>0)then inc(ui_uibtn_action,1);
          end;
       end
       else

@@ -290,9 +290,9 @@ uab_uac_unit_adv       = 2;
 uab_hell_unit_adv      = 3;
 uab_building_adv       = 4;
 uab_radar              = 5;
-uad_htowertele         = 6;
-uad_uac_rstrike        = 7;
-uad_spawnlost          = 100;
+uab_htowertele         = 6;
+uab_uac_rstrike        = 7;
+uab_spawnlost          = 100;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -602,6 +602,7 @@ melee_r                = 8;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
+
 rocket_sr              = 45;
 map_ffly_fapc          : array[false..true] of byte = (3,6);
 map_gapc               : array[false..true] of byte = (8,5);

@@ -23,8 +23,8 @@ begin
       if(sn<=0)then exit;
 
       if(mkind=smt_fapc)
-      then dd:=(abs(dir+12) mod 360) div 23  // 0..15
-      else dd:=(abs(dir+23) mod 360) div 45; // 0..7
+      then dd:=_DIR360(dir+12) div 23  // 0..15
+      else dd:=_DIR360(dir+23) div 45; // 0..7
 
       if(sk=0)
       then i:=0
@@ -286,13 +286,13 @@ smt_terminat :case animk of
    end;
 end;
 
-function _unit2SMAnimK(u:PTUnit;_wanim_:boolean):byte;
+function _unit2SMAnimK(pu:PTUnit;_wanim_:boolean):byte;
 begin
-   if(_wanim_)or(u^.uid^._isbuilding)
+   if(_wanim_)or(pu^.uid^._isbuilding)
    then _unit2SMAnimK:=sms_walk
    else _unit2SMAnimK:=sms_stand;
 
-   with u^   do
+   with pu^   do
      if(hits          <=0)then _unit2SMAnimK:=sms_death
 else if(not bld          )then _unit2SMAnimK:=sms_build
 else if(buff[ub_pain  ]>0)then _unit2SMAnimK:=sms_pain
@@ -340,7 +340,7 @@ sms_death:   begin
              end;
 sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
          else
-             _unit2spr:=_sm2s(smodel,ak,dir,0); //stand,pain
+             _unit2spr:=_sm2s(smodel,ak,dir,0); //stand,pain,cast
          end;
       end;
    end;

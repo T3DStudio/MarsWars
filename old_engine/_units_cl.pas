@@ -805,7 +805,7 @@ begin
    _ucl       := 6;
    _btime     := 20;
    _attack    := atm_always;
-   _ability   := uad_htowertele;
+   _ability   := uab_htowertele;
 
    _isbuilding:= true;
 end;
@@ -847,7 +847,7 @@ begin
    _btime     := 25;
    _ruid      := UID_HAltar;
    _attack    := atm_always;
-   _ability   := uad_htowertele;
+   _ability   := uab_htowertele;
    //_rupgr     := upgr_2tier;
 
    _isbuilding:= true;
@@ -1041,6 +1041,7 @@ begin
    _ruid      := UID_HFortress;
    _uf        := uf_fly;
    _attack    := atm_always;
+   _ability   := uab_spawnlost;
    _fastdeath[false]:=true;
    _fastdeath[true ]:=true;
 end;
@@ -1326,7 +1327,7 @@ begin
    _max       := 1;
    _ruid      := UID_UTechCenter;
    //_rupgr     := upgr_2tier;
-   _ability   := uad_uac_rstrike;
+   _ability   := uab_uac_rstrike;
 
    _isbuilding:=true;
 end;
