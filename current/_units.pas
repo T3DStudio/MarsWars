@@ -143,7 +143,7 @@ begin
       mv_x   :=x;
       mv_y   :=y;
       a_tar  :=0;
-      a_tard :=32000;
+      //a_tard :=32000;
       rld    :=0;
 
       for i:=1 to MaxUnits do
@@ -833,67 +833,86 @@ end;
 
 }
 
+function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte):boolean;
+begin
+   _target_weapon_check:=false;
+   if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
+   with pu^ do
+   with uid^ do
+   with player^ do
+   with _a_weap[cw] do
+   begin
+      // Distance requirements
+
+      //aw_range
+      //if(aw_range>0)then if()
+
+      // UID and UPID requirements
+
+      if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0)then exit;
+      if(aw_rupgr>0)and(upgr  [aw_rupgr] =0)then exit;
+
+      // requirements to attacker
+
+      if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then exit;
+      if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
+
+      if not(tu^.uidi in aw_uids)then exit;
+
+      // requirements to target
+
+      if(cf(@aw_tarf,@wtr_owner_p ))and (playeri<>tu^.playeri       )then exit;
+      if(cf(@aw_tarf,@wtr_owner_a ))and (team   <>tu^.player^.team  )then exit;
+      if(cf(@aw_tarf,@wtr_owner_e ))and (team   = tu^.player^.team  )then exit;
+
+      if(cf(@aw_tarf,@wtr_hits_h  ))and((tu^.hits<=0)
+                                      or(tu^.uid^._mhits<=tu^.hits ))then exit;
+      if(cf(@aw_tarf,@wtr_hits_d  ))and (tu^.hits> 0                )then exit;
+      if(cf(@aw_tarf,@wtr_hits_a  ))and (tu^.hits<=0                )then exit;
+
+      if(cf(@aw_tarf,@wtr_bio     ))and (tu^.uid^._ismech           )then exit;
+      if(cf(@aw_tarf,@wtr_mech    ))and((tu^.uid^._ismech=false)
+                                      or(tu^.uid^._isbuilding      ))then exit;
+      if(cf(@aw_tarf,@wtr_building))and (tu^.uid^._isbuilding=false )then exit;
+
+      if(cf(@aw_tarf,@wtr_bld     ))and (tu^.bld=false              )then exit;
+      if(cf(@aw_tarf,@wtr_nbld    ))and (tu^.bld                    )then exit;
+
+      if(cf(@aw_tarf,@wtr_ground  ))and (tu^.uf> uf_ground          )then exit;
+      if(cf(@aw_tarf,@wtr_soaring ))and (tu^.uf<>uf_soaring         )then exit;
+      if(cf(@aw_tarf,@wtr_fly     ))and (tu^.uf< uf_fly             )then exit;
+
+      if(cf(@aw_tarf,@wtr_adv     ))and (tu^.buff[ub_advanced]<=0   )then exit;
+      if(cf(@aw_tarf,@wtr_nadv    ))and (tu^.buff[ub_advanced]> 0   )then exit;
+   end;
+   _target_weapon_check:=true;
+end;
+
 function _unit_target2weapon(pu,tu:PTUnit;ud:integer;cw:byte):byte;
 var i:byte;
 begin
    _unit_target2weapon:=255;
    if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
-   with pu^ do
-   with uid^ do
-   with player^ do
-   for i:=0 to min2(cw,MaxUnitWeapons) do
-   with _a_weap[i] do
+   if(cw>MaxUnitWeapons)then cw:=MaxUnitWeapons;
+   for i:=0 to cw do
+   if(_target_weapon_check(pu,tu,ud,i))then
    begin
-      if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0)then continue;
-      if(aw_rupgr>0)and(upgr  [aw_rupgr] =0)then continue;
-
-      // requirements to attacker
-
-      if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then continue;
-      if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then continue;
-
-      if not(tu^.uidi in aw_uids)then continue;
-
-      // requirements to target
-
-      if(cf(@aw_tarf,@wtr_owner_p ))and (playeri<>tu^.playeri       )then continue;
-      if(cf(@aw_tarf,@wtr_owner_a ))and (team   <>tu^.player^.team  )then continue;
-      if(cf(@aw_tarf,@wtr_owner_e ))and (team   = tu^.player^.team  )then continue;
-
-      if(cf(@aw_tarf,@wtr_hits_h  ))and((tu^.hits<=0)
-                                      or(tu^.uid^._mhits<=tu^.hits ))then continue;
-      if(cf(@aw_tarf,@wtr_hits_d  ))and (tu^.hits> 0                )then continue;
-      if(cf(@aw_tarf,@wtr_hits_a  ))and (tu^.hits<=0                )then continue;
-
-      if(cf(@aw_tarf,@wtr_bio     ))and (tu^.uid^._ismech           )then continue;
-      if(cf(@aw_tarf,@wtr_mech    ))and((tu^.uid^._ismech=false)
-                                      or(tu^.uid^._isbuilding      ))then continue;
-      if(cf(@aw_tarf,@wtr_building))and (tu^.uid^._isbuilding=false )then continue;
-
-      if(cf(@aw_tarf,@wtr_bld     ))and (tu^.bld=false              )then continue;
-      if(cf(@aw_tarf,@wtr_nbld    ))and (tu^.bld                    )then continue;
-
-      if(cf(@aw_tarf,@wtr_ground  ))and (tu^.uf> uf_ground          )then continue;
-      if(cf(@aw_tarf,@wtr_soaring ))and (tu^.uf<>uf_soaring         )then continue;
-      if(cf(@aw_tarf,@wtr_fly     ))and (tu^.uf< uf_fly             )then continue;
-
-      if(cf(@aw_tarf,@wtr_adv     ))and (tu^.buff[ub_advanced]<=0   )then continue;
-      if(cf(@aw_tarf,@wtr_nadv    ))and (tu^.buff[ub_advanced]> 0   )then continue;
-
       _unit_target2weapon:=i;
-      break
+      break;
    end;
 end;
 
 
-procedure _unit_target(pu,tu:PTUnit;ud:integer;t_weap:pbyte);
+procedure _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte);
 var tw:byte;
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      tw:=_unit_target2weapon(pu,tu,ud,t_weap^);
+      if(_uvision(team,tu,false)=false)then exit;
+
+      tw:=_unit_target2weapon(pu,tu,ud,t_weap^,nil);
 
       if(tw>MaxUnitWeapons)then exit;
 
@@ -903,16 +922,16 @@ begin
         if(tw<t_weap^)
         then
         else
-          if(ud>a_tard)then exit;
+          if(ud>a_tard^)then exit;
 
       t_weap^:=tw;
       a_tar  :=tu^.unum;
-      a_tard :=ud;
+      a_tard^:=ud;
    end;
 end;
 
 procedure _unit_mcycle(pu:PTUnit);
-var uc,
+var uc,a_tard,
     ud: integer;
     tu: PTUnit;
 cunload,
@@ -941,7 +960,6 @@ begin
          exit;
       end;
 
-
       cunload:=true;
       if(uf>uf_ground)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)then
        if(_unit_OnDecorCheck(x,y))then cunload:=false;
@@ -960,7 +978,7 @@ begin
             if(tu^.inapc<=0)then
             begin
                _unit_detect(pu,tu,ud);
-               if(ftarget)then  _unit_target(pu,tu,ud,@t_weap);
+               if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap);
             end;
 
             if(tu^.hits>0)then
@@ -1029,7 +1047,7 @@ begin
 end;
 
 procedure _unit_mcycle_cl(pu:PTUnit);
-var uc,
+var uc,a_tard,
     ud : integer;
     tu : PTUnit;
 t_weap : byte;
@@ -1067,7 +1085,7 @@ begin
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
             if(udetect)then _unit_detect(pu,tu,ud);
-            if(ftarget)then _unit_target(pu,tu,ud,@t_weap);
+            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap);
          end;
       end;
 
@@ -1076,6 +1094,8 @@ begin
       {$ENDIF}
    end;
 end;
+
+
 {
 procedure _unit_code1_n(pu:PTUnit);
 var uc,
@@ -1381,11 +1401,10 @@ uab_uac_unit_adv:
             end;
          end;
 
-         w:=_unit_target2weapon(pu,tu,td,255);
+         w:=_unit_target2weapon(pu,tu,td,255,nil);
          if(w<=MaxUnitWeapons)then
          begin
             a_tar :=uo_tar;
-            a_tard:=td;
             uo_id :=ua_amove;
          end;
 
@@ -1433,12 +1452,21 @@ procedure _unit_attack(pu:PTUnit);
 var w:byte;
    tu:PTUnit;
 begin
-   with pu^ do
+  { with pu^ do
+   if(a_rld<=0)then
    begin
       if(_IsUnitRange(a_tar,@tu)=false)then exit;
 
-      w:=_unit_target2weapon(pu,tu,a_tard,255);
-   end;
+      w:=_unit_target2weapon(pu,tu,-1,255,nil);
+
+      if(w>MaxUnitWeapons)then
+      begin
+         a_tar:=0;
+         exit;
+      end;
+
+      // attack code
+   end;      }
 end;
 
 procedure _unit_order(pu:PTUnit);
@@ -1461,45 +1489,40 @@ begin
             mv_y:=uo_y;
 
             if(uo_id=ua_paction)then
-            begin
-               {if((uid^._ability=0)and(apcc<=0))or(speed<=0)
-               then uo_id:=ua_amove
-               else}
-                 case uid^._ability of
-uab_spawnlost:     begin
-                      mv_x:=x;
-                      mv_y:=y;
-                      if(buff[ub_cast]<=0)then
-                      begin
-                         _pain_lost_spawn(pu);
-                         buff[ub_cast]:=fr_fps;
-                      end;
-                   end
-                 else
-                   if(x=uo_x)and(y=uo_y)then
+             case uid^._ability of
+uab_spawnlost:  begin
+                   mv_x:=x;
+                   mv_y:=y;
+                   if(buff[ub_cast]<=0)then
                    begin
-                      uo_id:=ua_amove;
-                      _unit_action(pu);
+                      _pain_lost_spawn(pu);
+                      buff[ub_cast]:=fr_fps;
                    end;
-                 end
-            end
+                end
+             else
+                if(x=uo_x)and(y=uo_y)then
+                begin
+                   uo_id:=ua_amove;
+                   _unit_action(pu);
+                end;
+             end
             else
-             if(x=uo_x)and(y=uo_y)then
-              if(uo_bx>=0)then
-              begin
-                 uo_x :=uo_bx;
-                 uo_bx:=x;
-                 uo_y :=uo_by;
-                 uo_by:=y;
-                 _unit_turn(pu);
-              end
-              else
-                if(uo_id=ua_move)then uo_id:=ua_amove;
+              if(x=uo_x)and(y=uo_y)then
+               if(uo_bx>=0)then
+               begin
+                  uo_x :=uo_bx;
+                  uo_bx:=x;
+                  uo_y :=uo_by;
+                  uo_by:=y;
+                  _unit_turn(pu);
+               end
+               else
+                 if(uo_id=ua_move)then uo_id:=ua_amove;
 
-             if(buff[ub_stopattack]>0)then
-             begin
-                mv_x:=x;
-                mv_y:=y;
+            if(buff[ub_stopattack]>0)then
+            begin
+               mv_x:=x;
+               mv_y:=y;
             end;
          end;
          if(uo_id=ua_amove)then _unit_attack(pu);
@@ -1507,93 +1530,6 @@ uab_spawnlost:     begin
    end;
 end;
 
-
-     { //_unit_uo_tar(pu);
-      mv_x:=uo_x;
-      mv_y:=uo_y;
-
-      if(x=uo_x)and(y=uo_y)then
-       if(uo_bx>=0)then
-       begin
-          uo_x :=uo_bx;
-          uo_bx:=x;
-          uo_y :=uo_by;
-          uo_by:=y;
-          _unit_turn(pu);
-       end
-       else
-         if(uo_id=ua_move)then uo_id:=ua_amove;
-
-       if(buff[ub_stopafa]>0)then
-       begin
-          mv_x:=x;
-          mv_y:=y;
-       end;
-
-      {tar1d:=32000;
-      if(0<tar1)and(tar1<=MaxUnits)then
-      begin
-         tu:=@_units[tar1];
-         td:=dist2(x,y,tu^.x,tu^.y);
-         i :=_unit_target(pu,tu,td,false);
-         if(onlySVCode)then
-           case i of
-         0 : tar1 :=0;
-         1 : begin
-                mv_x :=tu^.x;
-                mv_y :=tu^.y;
-                tar1d:=td;
-             end;
-         2,3
-           : begin
-                tar1d:=td;
-                melee:=(i=3);
-                if(_canattack(pu))then _unit_attack(pu);
-                if(inapc>0)then exit;
-                if(tar1=uo_tar)then
-                begin
-                   uo_x:=x;
-                   uo_y:=y;
-                end
-                else
-                  if(tar1<>unum)then
-                   case uidi of
-                   UID_Flyer : if(buff[ub_advanced]>0)then exit;
-                   UID_APC,
-                   UID_FAPC,
-                   UID_UCommandCenter,
-                   UID_HCommandCenter: exit;
-                   else
-                   end;
-                mv_x :=x;
-                mv_y :=y;
-                if(x<>tu^.x)or(y<>tu^.y)then dir:=p_dir(x,y,tu^.x,tu^.y);
-                if(rld_t>0)and(buff[ub_stopafa]=0)then
-                 if(_uclord_p>rld_t)
-                 then buff[ub_stopafa]:=_uclord_p
-                 else buff[ub_stopafa]:=rld_t;
-             end;
-           end
-         else
-           case i of
-          2,3
-            : begin
-                 tar1d:=td;
-                 melee:=(i=3);
-                 if(_canattack(pu))then _unit_attack(pu);
-                 if(inapc>0)then exit;
-                 if(tar1<>unum)then
-                  case uidi of
-                  UID_Flyer : if(buff[ub_advanced]>0)then exit;
-                  UID_APC,
-                  UID_FAPC,
-                  UID_UCommandCenter,
-                  UID_HCommandCenter: exit;
-                  else
-                  end;
-                 if(x<>tu^.x)or(y<>tu^.y)then dir:=p_dir(x,y,tu^.x,tu^.y);
-              end;
-           end;  }  }
 
 procedure _unit_prod(pu:PTUnit);
 begin

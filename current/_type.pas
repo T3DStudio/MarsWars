@@ -335,7 +335,7 @@ TUnit = record
    a_tx,
    a_ty,
    a_tar,
-   a_tard,
+   //a_tard,
    mv_x,mv_y,
    uo_bx,uo_by,
    uo_tar,

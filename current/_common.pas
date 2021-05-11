@@ -351,6 +351,17 @@ begin
    _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
 end;
 
+function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
+begin
+   if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
+   then _uvision:=true
+   else
+    with tu^ do
+     if(buff[ub_invis]<=0)or(hits<=0)or(noinvis)
+     then _uvision:=(vsnt[uteam]>0)
+     else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
+end;
+
 {$IFDEF _FULLGAME}
 
 procedure _bnext(pb:pbyte;fwrd:boolean;pset:PTSoB);
@@ -370,17 +381,6 @@ begin
    if FileExists(outlogfn) then Append(f) else Rewrite(f);
    writeln(f,mess);
    Close(f);
-end;
-
-function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
-begin
-   if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
-   then _uvision:=true
-   else
-    with tu^ do
-     if(buff[ub_invis]<=0)or(hits<=0)or(noinvis)
-     then _uvision:=(vsnt[uteam]>0)
-     else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
 
 function _fog_pgrid(x,y:integer):boolean;

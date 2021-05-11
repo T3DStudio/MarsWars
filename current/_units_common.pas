@@ -505,7 +505,7 @@ begin
       order    := 0;
       wanim    := false;
       a_tar    := 0;
-      a_tard   := 32000;
+      //a_tard   := 32000;
       {alrm_x   := 0;
       alrm_y   := 0;
       alrm_r   := 32000;
@@ -1017,7 +1017,7 @@ begin
       begin
          _LastCreatedUnitP^.dir   :=dir;
          _LastCreatedUnitP^.a_tar :=a_tar;
-         _LastCreatedUnitP^.a_tard:=a_tard;
+         //_LastCreatedUnitP^.a_tard:=a_tard;
          _LastCreatedUnitP^.uo_id :=uo_id;
          _LastCreatedUnitP^.uo_tar:=uo_tar;
          if(_IsUnitRange(a_tar,@tu))then
@@ -1296,11 +1296,8 @@ var td:integer;
 begin
    with uu^ do
    begin
-      if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)then
-      begin
-         td:=dist2(x,y,tu^.uo_x,tu^.uo_y);
-         if(td>ud)then td:=ud;
-      end
+      if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)
+      then td:=min2(ud,dist2(x,y,tu^.uo_x,tu^.uo_y))
       else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then
