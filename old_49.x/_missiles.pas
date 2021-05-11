@@ -14,7 +14,7 @@ begin
     if(upgr[upgr_melee]>0)then
      case race of
        r_hell : inc(damage,upgr[upgr_melee]*5);
-       r_uac  : inc(damage,upgr[upgr_melee]*2);
+       r_uac  : inc(damage,upgr[upgr_melee]*3);
      end;
 
    case pu^.uid of
@@ -68,7 +68,7 @@ MID_RevenantS,
 MID_Revenant   : begin dam:=30 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_YPlasma    : begin dam:=15 ; vst:=sr div 18; sr :=0  ;       end;
-MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=15 ;       end;
+MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=12 ;       end;
 
 MID_MBullet,
 MID_TBullet,

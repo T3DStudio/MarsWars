@@ -8,15 +8,15 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="16" Y="8"/>
+        <CursorPos X="41" Y="16"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="29" Y="10"/>
+        <TopLine Value="365"/>
+        <CursorPos X="44" Y="371"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -174,8 +174,8 @@
       <Unit21>
         <Filename Value="_units.pas"/>
         <EditorIndex Value="23"/>
-        <TopLine Value="799"/>
-        <CursorPos X="56" Y="805"/>
+        <TopLine Value="1868"/>
+        <CursorPos X="33" Y="1874"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -196,17 +196,18 @@
       </Unit23>
       <Unit24>
         <Filename Value="_units_cl.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="44"/>
-        <CursorPos X="21" Y="65"/>
+        <TopLine Value="484"/>
+        <CursorPos X="22" Y="526"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit24>
       <Unit25>
         <Filename Value="_missiles.pas"/>
         <EditorIndex Value="19"/>
-        <TopLine Value="275"/>
-        <CursorPos X="29" Y="282"/>
+        <TopLine Value="267"/>
+        <CursorPos X="29" Y="287"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit25>
@@ -220,8 +221,8 @@
       <Unit27>
         <Filename Value="_ai.pas"/>
         <EditorIndex Value="20"/>
-        <TopLine Value="778"/>
-        <CursorPos X="64" Y="792"/>
+        <TopLine Value="70"/>
+        <CursorPos X="55" Y="191"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit27>
@@ -244,8 +245,8 @@
       <Unit30>
         <Filename Value="_units_common.pas"/>
         <EditorIndex Value="21"/>
-        <TopLine Value="1007"/>
-        <CursorPos X="11" Y="1004"/>
+        <TopLine Value="1018"/>
+        <CursorPos X="27" Y="718"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit30>
@@ -261,18 +262,18 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="655"/>
         <CursorPos X="3" Y="672"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit32>
       <Unit33>
         <Filename Value="_dedscr.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit33>
       <Unit34>
         <Filename Value="_ded.pas"/>
         <EditorIndex Value="26"/>
         <CursorPos X="48" Y="12"/>
-        <UsageCount Value="57"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
@@ -280,22 +281,22 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="179"/>
         <CursorPos X="18" Y="206"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit35>
       <Unit36>
         <Filename Value="missions\m1.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="5" Y="4"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="22"/>
       </Unit36>
       <Unit37>
         <Filename Value="MarsWars.dbg"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit37>
     </Units>
-    <JumpHistory Count="26" HistoryIndex="25">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="_input.pas"/>
         <Caret Line="473" Column="87" TopLine="450"/>
@@ -400,6 +401,18 @@
         <Filename Value="_loadgfx.pas"/>
         <Caret Line="436" Column="41" TopLine="426"/>
       </Position26>
+      <Position27>
+        <Filename Value="_ai.pas"/>
+        <Caret Line="365" Column="69" TopLine="604"/>
+      </Position27>
+      <Position28>
+        <Filename Value="_units.pas"/>
+        <Caret Line="805" Column="56" TopLine="2641"/>
+      </Position28>
+      <Position29>
+        <Filename Value="_units.pas"/>
+        <Caret Line="2027" Column="11" TopLine="2072"/>
+      </Position29>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

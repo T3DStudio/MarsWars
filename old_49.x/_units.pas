@@ -1895,7 +1895,7 @@ begin
                          alrm_x:=tu^.alrm_x;
                          alrm_y:=tu^.alrm_y;
                          alrm_r:=ud;
-                         if(tu^.isbuild)then alrm_b:=true;
+                         if(tu^.isbuild)and(tu^.uf=uf_ground)then alrm_b:=true;
                       end;
                   end;
          end;

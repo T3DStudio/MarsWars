@@ -720,10 +720,10 @@ begin
    or(tu^.inapc>0)
    then exit;
 
-   if(tu^.buff[ub_invuln  ]>0)then
+   if(tu^.buff[ub_invuln]>0)then
     with _players[uu^.player] do
      if(state=ps_comp)then
-     if(uu^.player=0)or(ai_skill>4)then exit;
+     if(uu^.player=0)or(ai_skill>2)then exit;
 
    if(teams=false)then
    begin

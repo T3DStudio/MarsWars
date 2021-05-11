@@ -523,7 +523,7 @@ begin
          speed  := 9;
          sr     := 250;
          ucl    := 5;
-         rld_r  := 15;
+         rld_r  := 14;
          rld_a  := 0;
          anims  := 14;
          trt    := vid_fps*20;

@@ -294,6 +294,7 @@ begin
       3  : _ai_get_max_enrg:=45;
       else _ai_get_max_enrg:=65;
       end;
+      if(g_mode in [gm_3fort,gm_2fort,gm_inv])then inc(_ai_get_max_enrg,10);
       if(rrr)then inc(_ai_get_max_enrg,4);
    end;
 end;
@@ -359,7 +360,9 @@ begin
       begin
          if(ai_skill>3)then
          begin
-            set_bld(Com,6);
+            if(ai_skill>4)
+            then set_bld(Com,6+g_startb)
+            else set_bld(Com,7);
             set_bld(Bar,8);
             if(upgr[upgr_2tier]>0)then set_bld(X8,1);
             set_bld(Com,4);
@@ -622,14 +625,13 @@ begin
                _unit_supgrade(u,upgr_ucomatt);
             end;
             if(map_aifly )then _unit_supgrade(u,upgr_mainonr);
-            if(menerg<100)then _unit_supgrade(u,upgr_bldenrg);
+            _unit_supgrade(u,upgr_bldenrg);
             if(race=r_hell)then
             begin
                if(map_aifly)then _unit_supgrade(u,upgr_melee);
                if(upgr[upgr_bldrep]=0)then _unit_supgrade(u,upgr_bldrep);
                _unit_supgrade(u,upgr_revmis);
             end;
-
          end;
       end;
       npt:=random(MaxUpgrs+1);
@@ -1116,8 +1118,8 @@ begin
                       end;
             UID_Pain :if(ai_skill>3)then
                       begin
-                         if(alrm_r<base_ir)then _unit_action(u);
-                         ai_outalrm(u,base_r,false);
+                         if(alrm_r<32000)then _unit_action(u);
+                         ai_outalrm(u,base_rr,false);
                       end;
             {UID_Flyer:if(buff[ub_advanced]>0)then
                        if(ai_uc_a<1)then
