@@ -292,7 +292,12 @@ begin
       1  : _ai_get_max_enrg:=10;
       2  : _ai_get_max_enrg:=25;
       3  : _ai_get_max_enrg:=45;
-      else _ai_get_max_enrg:=65;
+      4  : if(race=r_uac)
+           then _ai_get_max_enrg:=72
+           else _ai_get_max_enrg:=65;
+      else if(race=r_uac)
+           then _ai_get_max_enrg:=80
+           else _ai_get_max_enrg:=65;
       end;
       if(g_mode in [gm_3fort,gm_2fort,gm_inv])then inc(_ai_get_max_enrg,10);
       if(rrr)then inc(_ai_get_max_enrg,4);
@@ -489,8 +494,9 @@ begin
                       if(u_e[true,1]<15)then
                        if(u_e[false,3]<10)then _unit_straining(u,3);
                       if(_uclord>15)
-                      then begin if(u_e[false,8]<8 )then _unit_straining(u,8);end
+                      then begin if(u_e[false,8]<5 )then _unit_straining(u,8);end
                       else begin if(u_e[false,4]<8 )then _unit_straining(u,4);end;
+                      if(u_e[false,10]<5 )then _unit_straining(u,10);
                    end;
                    case m of
                     1,
@@ -503,7 +509,7 @@ begin
                    end;
                 end;
        r_uac  : begin
-                   if(g_addon)and(random(2)=0)
+                   if(g_addon)and(random(3)>0)
                    then _unit_straining(u,9+random(3))
                    else
                    begin
@@ -1121,16 +1127,6 @@ begin
                          if(alrm_r<32000)then _unit_action(u);
                          ai_outalrm(u,base_rr,false);
                       end;
-            {UID_Flyer:if(buff[ub_advanced]>0)then
-                       if(ai_uc_a<1)then
-                        if(ai_ux>0)
-                        then ai_settar(u,ai_ux,ai_uy,base_r)
-                        else
-                          if(ai_bx>0)
-                          then ai_settar(u,ai_bx,ai_by,base_r)
-                          else ai_outalrm(u,base_rr,false)
-                       else
-                         if(tar1d<230)then ai_outalrm(u,0,false);  }
             end;
          end;
 

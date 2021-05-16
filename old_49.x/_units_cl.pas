@@ -195,8 +195,8 @@ begin
          sr     := 250;
          ucl    := 8;
          painc  := 7;
-         rld_r  := 75;
-         rld_a  := 45;
+         rld_r  := 65;
+         rld_a  := 40;
          anims  := 16;
          mdmg   := 35;
          trt    := vid_fps*40;
@@ -228,12 +228,11 @@ begin
          uf     := uf_ground;
          speed  := 8;
          sr     := 250;
-         ar     := 250;
          ucl    := 10;
          painc  := 4;
-         rld_r  := 14;
+         rld_r  := 20;
          anims  := 11;
-         trt    := vid_fps*50;
+         trt    := vid_fps*60;
          renerg := 6;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
@@ -252,7 +251,7 @@ begin
          rld_a  := 65;
          anims  := 15;
          trt    := vid_fps*90;
-         renerg := 10;
+         renerg := 12;
          ruid   := UID_HAltar;
          rupgr  := upgr_2tier;
       end;
@@ -468,20 +467,20 @@ begin
             speed  := 10;
             anims  := 14;
             ruid   := UID_HMilitaryUnit;
+            arf    :=(sr div 4)*3;
          end;
-         arf    :=(sr div 4)*3;
       end;
       if(uid in [UID_Commando,UID_ZCommando])then
       begin
          mhits  := 100;
          r      := 12;
          uf     := uf_ground;
-         speed  := 11;
+         speed  := 12;
          sr     := 250;
          ucl    := 3;
          rld_r  := 8;
          rld_a  := 3;
-         anims  := 15;
+         anims  := 16;
          trt    := vid_fps*15;
          renerg := 2;
          if(uid=UID_ZCommando)then
@@ -490,8 +489,8 @@ begin
             ucl    := 15;
             rld_r  := 10;
             ruid   := UID_HMilitaryUnit;
+            arf    := 220;
          end;
-         arf    :=220;
       end;
       if(uid in [UID_Bomber,UID_ZBomber])then
       begin
@@ -593,7 +592,7 @@ begin
       end;
       if(uid=UID_Terminator)then
       begin
-         mhits  := 350;
+         mhits  := 400;
          r      := 16;
          uf     := uf_ground;
          speed  := 14;
@@ -612,7 +611,7 @@ begin
       end;
       if(uid=UID_Tank)then
       begin
-         mhits  := 400;
+         mhits  := 450;
          r      := 20;
          uf     := uf_ground;
          speed  := 10;

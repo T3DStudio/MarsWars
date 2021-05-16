@@ -1803,13 +1803,14 @@ begin
       UID_Terminator,
       UID_Mastermind,
       UID_UTurret    : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;
-      UID_HTower,
-      UID_Revenant   : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
+      UID_Arachnotron
+                     : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
       UID_UPTurret,
       UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
       UID_Mine       : if(tu^.uf<uf_fly)then _TarPrioPR:=5;
       UID_BFG        : if not(tu^.uid in [UID_LostSoul,UID_Demon])then _TarPrioPR:=5;
-      UID_Arachnotron,
+      UID_HTower,
+      UID_Revenant,
       UID_Flyer      : if(tu^.uf>uf_ground)then _TarPrioPR:=5;
       UID_Archvile   : if(tu^.isbuild=false)and(tu^.ucl>2)then _TarPrioPR:=5;
       end;
@@ -2575,7 +2576,6 @@ UID_Pain: begin
                 else
                   if(tar1<>u)then
                    case uid of
-                   //UID_Flyer : if(buff[ub_advanced]>0)then exit;
                    UID_APC,
                    UID_FAPC,
                    UID_UCommandCenter : exit;

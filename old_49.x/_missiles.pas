@@ -6,7 +6,7 @@ procedure _d75 (d:pinteger);begin d^:=d^-(d^ div 4);end;
 procedure _d125(d:pinteger);begin d^:=d^+(d^ div 4);end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
-
+procedure _d300(d:pinteger);begin d^:=d^*3;         end;
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
@@ -65,15 +65,15 @@ MID_Imp        : begin dam:=10 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Cacodemon  : begin dam:=30 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Baron      : begin dam:=50 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin dam:=30 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
+MID_Revenant   : begin dam:=40 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
-MID_YPlasma    : begin dam:=15 ; vst:=sr div 18; sr :=0  ;       end;
 MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=12 ;       end;
 
 MID_MBullet,
 MID_TBullet,
 MID_Bullet     : begin dam:=6  ; vst:=1;         sr :=0  ;       end;
 MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
+MID_YPlasma    : begin dam:=15 ; vst:=sr div 18; sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
 MID_Flyer      : begin dam:=35 ; vst:=sr div 60; sr :=0  ;       end;
@@ -106,9 +106,8 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   
         begin
            tu:=@_units[tar];
            mx:=tu^.r shr 1;
-           my:=tu^.r;
-           inc(x,random(my)-mx);
-           inc(y,random(my)-mx);
+           inc(x,_randomr(mx));
+           inc(y,_randomr(mx));
         end;
 
         with _players[player] do
@@ -217,11 +216,10 @@ begin
                  MID_Mancubus,
                  MID_Granade,
                  MID_Tank,
+                 MID_YPlasma,
                  MID_BPlasma,
                  MID_SShot,
                  MID_SSShot      : _d50 (@damd);
-                 MID_Revenant,
-                 MID_RevenantS   : _d75 (@damd);
                  MID_Cacodemon   : _d125(@damd);
                  MID_MBullet,
                  MID_TBullet,
@@ -240,7 +238,6 @@ begin
                  end;
 
               if(tu^.mech)then
-              begin
                  case mid of
                  MID_SShot,
                  MID_SSShot,
@@ -255,8 +252,7 @@ begin
                    // mechs
                    if(tu^.isbuild=false)then
                    case mid of
-                   MID_Revenant,
-                   MID_RevenantS,
+                   MID_YPlasma     : _d200(@damd);
                    MID_BPlasma     : _d150(@damd);
                    MID_Granade,
                    MID_Mancubus    : _d50 (@damd);
@@ -265,6 +261,8 @@ begin
                    else
                    // buildings
                    case mid of
+                   MID_RevenantS,
+                   MID_Revenant,
                    MID_Flyer,
                    MID_Archfire    : _d50 (@damd);
                    MID_Bulletx2    : _d25 (@damd);
@@ -273,31 +271,29 @@ begin
                    MID_Mancubus,
                    MID_Granade,
                    MID_Tank        : _d150(@damd);
-                   MID_Revenant,
-                   MID_RevenantS,
+                   MID_YPlasma,
                    MID_BPlasma     : _d75 (@damd);
                    end;
                  end;
-              end;
 
               if(tu^.uf>uf_ground)then
               begin
                  if(tu^.isbuild=false)then
                  case mid of
+                 MID_YPlasma,
                  MID_BPlasma,
                  MID_Imp         : _d50 (@damd);
                  MID_Cacodemon,
-                 MID_Revenant,
-                 MID_RevenantS,
                  MID_Mancubus,
                  MID_Baron       : _d75 (@damd);
                  end;
               end
-              else
-              case mid of
-              MID_YPlasma,
-              MID_Flyer       : _d50 (@damd);
-              end;
+              else  //uf_ground
+                 case mid of
+                 MID_Revenant,
+                 MID_RevenantS,
+                 MID_Flyer       : _d50 (@damd);
+                 end;
 
              if(tu^.isbuild=false)then
               if(tu^.uf>uf_soaring)then

@@ -1235,12 +1235,13 @@ begin
                       end;
 
          UID_Tank,
-         UID_Revenant:
+         UID_Arachnotron
+                     :
                       if(buff[ub_advanced]>0)
                       then ar:=325
                       else ar:=250;
          UID_Flyer,
-         UID_Arachnotron:
+         UID_Revenant:
                       if(buff[ub_advanced]>0)
                       then arf:=350
                       else arf:=ar;
