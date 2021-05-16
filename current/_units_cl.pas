@@ -117,8 +117,8 @@ UID_LostSoul:
 begin
    setMWSM(@spr_lostsoul,nil);
    setSND (false,snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0        ,u       ,0            );
-   setEIDS(false,SND_Teleport,snd_pexp ,snd_pexp,snd_hell_pain);
+   setEID (false,0  ,0        ,u       ,0            );
+   setEIDS(false,nil,snd_pexp ,snd_pexp,snd_hell_pain);
 end;
 UID_Imp:
 begin
@@ -126,8 +126,8 @@ begin
    _animd:=8;
    setMWSM(@spr_imp,nil);
    setSND (false,snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain,snd_imp_move);
-   setEID (false,EID_Teleport,0            ,EID_Gavno,0             );
-   setEIDS(false,SND_Teleport,snd_imp_death,snd_meat ,snd_zimba_pain);
+   setEID (false,0  ,0            ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_imp_death,snd_meat ,snd_zimba_pain);
 
 end;
 UID_Demon:
@@ -136,16 +136,16 @@ begin
    _animd:=9;
    setMWSM(@spr_demon,nil);
    setSND (false,snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0              ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_demon_death,nil,snd_hell_pain );
+   setEID (false,0  ,0              ,0  ,0             );
+   setEIDS(false,nil,snd_demon_death,nil,snd_hell_pain );
 end;
 UID_Cacodemon:
 begin
    _animd:=10;
    setMWSM(@spr_cacodemon,nil);
    setSND (false,snd_caco_ready,snd_hell_move,snd_caco_ready,snd_hell_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0              ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_caco_death ,nil,snd_hell_pain );
+   setEID (false,0  ,0              ,0  ,0             );
+   setEIDS(false,nil,snd_caco_death ,nil,snd_hell_pain );
 end;
 UID_Baron:
 begin
@@ -155,18 +155,18 @@ begin
    setSND (false,snd_knight_ready,snd_hell_move,snd_knight_ready,snd_hell_pain,snd_hell_move);
    setSND (true ,snd_baron_ready ,snd_hell_move,snd_baron_ready ,snd_hell_pain,snd_hell_move);
 
-   setEID (false,EID_Teleport,0                ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_knight_death ,nil,snd_hell_pain );
-   setEIDS(true ,SND_Teleport,snd_baron_death  ,nil,snd_hell_pain );
+   setEID (false,0  ,0                ,0  ,0             );
+   setEIDS(false,nil,snd_knight_death ,nil,snd_hell_pain );
+   setEIDS(true ,nil,snd_baron_death  ,nil,snd_hell_pain );
 end;
 UID_Cyberdemon:
 begin
    _animw:=11;
    setMWSM(@spr_cyberdemon,nil);
    setSND (false,snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0              ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_cyber_death,nil,snd_hell_pain );
-   setFOOT(false,snd_cyber_foot,30);
+   setEID (false,0  ,0              ,0  ,0             );
+   setEIDS(false,nil,snd_cyber_death,nil,snd_hell_pain );
+   setFOOT(false,nil,30);
 end;
 UID_Mastermind:
 begin
@@ -174,8 +174,8 @@ begin
    _animd:=16;
    setMWSM(@spr_mastermind,nil);
    setSND (false,snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0                   ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_mastermind_death,nil,snd_hell_pain );
+   setEID (false,0  ,0                   ,0  ,0             );
+   setEIDS(false,nil,snd_mastermind_death,nil,snd_hell_pain );
    setFOOT(false,snd_mastermind_foot,22);
 end;
 UID_Pain:
@@ -183,8 +183,8 @@ begin
    _animw:=7;
    setMWSM(@spr_pain,nil);
    setSND (false,snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
-   setEID (false,EID_Teleport,0             ,u             ,0             );
-   setEIDS(false,SND_Teleport,snd_pain_death,snd_pain_death,snd_pain_pain );
+   setEID (false,0  ,0             ,u             ,0             );
+   setEIDS(false,nil,snd_pain_death,snd_pain_death,snd_pain_pain );
 end;
 UID_Revenant:
 begin
@@ -192,8 +192,8 @@ begin
    _animd:=9;
    setMWSM(@spr_revenant,nil);
    setSND (false,snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
-   setEID (false,EID_Teleport,0                 ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_revenant_death,nil,snd_hell_pain );
+   setEID (false,0  ,0                 ,0  ,0             );
+   setEIDS(false,nil,snd_revenant_death,nil,snd_hell_pain );
 end;
 UID_Mancubus:
 begin
@@ -201,8 +201,8 @@ begin
    _animd:=13;
    setMWSM(@spr_mancubus,nil);
    setSND (false,snd_mancubus_ready,snd_zimba_move,snd_mancubus_ready,snd_mancubus_pain,snd_zimba_move);
-   setEID (false,EID_Teleport,0              ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_mancubus_death ,nil,snd_mancubus_pain );
+   setEID (false,0  ,0              ,0  ,0             );
+   setEIDS(false,nil,snd_mancubus_death ,nil,snd_mancubus_pain );
 end;
 UID_Arachnotron:
 begin
@@ -210,8 +210,8 @@ begin
    _animd:=13;
    setMWSM(@spr_arachnotron,nil);
    setSND (false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_arachno_move,snd_arachno_move);
-   setEID (false,EID_Teleport,0              ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_arachno_death,nil,snd_hell_pain );
+   setEID (false,0  ,0              ,0  ,0             );
+   setEIDS(false,nil,snd_arachno_death,nil,snd_hell_pain );
    setFOOT(false,snd_arachno_foot,28);
 end;
 UID_Archvile:
@@ -220,8 +220,8 @@ begin
    _animd:=12;
    setMWSM(@spr_archvile,nil);
    setSND (false,snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
-   setEID (false,EID_Teleport,0                   ,0  ,0             );
-   setEIDS(false,SND_Teleport,snd_archvile_death  ,nil,snd_archvile_pain );
+   setEID (false,0  ,0                   ,0  ,0             );
+   setEIDS(false,nil,snd_archvile_death  ,nil,snd_archvile_pain );
 end;
 UID_ZFormer:
 begin
@@ -591,6 +591,7 @@ end;
       end;
    end;
 
+   // upgrades
    for u:=0 to 255 do
    with _upids[u] do
    begin
@@ -655,22 +656,22 @@ var tu:PTUnit;
 begin
    _canattack:=false;
    with pu^ do
-   if(bld)then
+   if(bld)and(hits>0)then
    with uid^ do
    case _attack of
-    atm_none    : exit;
-    atm_bunker,
-    atm_always  : if(_IsUnitRange(inapc,@tu))then
-                  begin
-                     if(tu^.inapc>0)then exit;
-                     case tu^.uid^._attack of
-                     atm_none,
-                     atm_sturret: exit;
-                     end;
-                  end;
-    atm_sturret : if(apcc =0)then exit;
-    atm_inapc   : if(inapc=0)then exit;
-   else exit;
+   atm_bunker,
+   atm_always  : if(_IsUnitRange(inapc,@tu))then
+                 begin
+                    if(tu^.inapc>0)then exit;
+                    case tu^.uid^._attack of
+                    atm_always,
+                    atm_none,
+                    atm_sturret: exit;
+                    end;
+                 end;
+   atm_sturret : if(apcc <=0)then exit;
+   atm_inapc   : if(inapc<=0)then exit;
+   else exit; //atm_none
    end;
    _canattack:=true;
 end;
@@ -716,6 +717,25 @@ atm_inapc            = 4;
 
 procedure initUIDS;
 var i:byte;
+procedure _weapon(aa,wtype:byte;range,count:integer;reload,oid,ruid,rupid:byte;tarf,reqf:cardinal;uids,reload_s:TSoB);
+begin
+   with _uids[i] do
+   with _a_weap[aa] do
+   begin
+      aw_type   :=wtype;
+      aw_range  :=range;
+      aw_count  :=count;
+      aw_rld    :=reload;
+      aw_oid    :=oid;
+      aw_ruid   :=ruid;
+      aw_rupgr  :=rupid;
+      aw_tarf   :=tarf;
+      aw_reqf   :=reqf;
+      aw_rld_s  :=reload_s;
+      aw_uids   :=uids;
+   end;
+end;
+
 begin
    for i:=0 to 255 do
    with _uids[i] do
@@ -943,6 +963,7 @@ begin
    _attack    := atm_always;
    _fastdeath[false]:=true;
    _fastdeath[true ]:=true;
+   _weapon(0,wpt_directdmg,-10,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_any,[0..255],[fr_fps]);
 end;
 UID_Imp        :
 begin
@@ -955,6 +976,7 @@ begin
    _painc     := 3;
    _btime     := 5;
    _attack    := atm_always;
+   _weapon(0,wpt_missle,0,0,fr_fps,MID_Imp,0,0,wtrset_enemy_alive,wpr_any,[0..255]-[UID_Imp],[fr_fps]);
 end;
 UID_Demon      :
 begin

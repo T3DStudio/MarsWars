@@ -335,16 +335,19 @@ begin
         ix:=x-vid_vx+vid_mapx;
         iy:=y-vid_vy+vid_mapy;
 
-        _draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, p_color(playeri));
+        //_draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, p_color(playeri));
 
         if(hits>0)then
-        if(k_shift>1)then
+        //if(k_shift>1)then
         begin
            circleColor(r_screen,ix,iy,_r  ,c_gray);
            circleColor(r_screen,ix,iy,srange,c_white);
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
 
-           _draw_text(r_screen,ix,iy,i2s(fsr), ta_left,255, p_color(playeri));
+           _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, p_color(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(a_tar), ta_left,255, p_color(playeri));
+           _draw_text(r_screen,ix,iy+20,b2s(a_rld), ta_left,255, p_color(playeri));
+
         end;
 
         {if(hits>0)and(inapc=0)then

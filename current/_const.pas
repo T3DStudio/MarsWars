@@ -187,11 +187,11 @@ ua_paction             = 5;
 //  Conditionals for attack
 //
 
-atm_none             = 0;
-atm_always           = 1;
-atm_bunker           = 2;
-atm_sturret          = 3;
-atm_inapc            = 4;
+atm_none             = 0;   // cant attack
+atm_always           = 1;   // can attack
+atm_bunker           = 2;   // can attack, units inside can attack too
+atm_sturret          = 3;   // can attack when somebody inside
+atm_inapc            = 4;   // can attack only when
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,9 +200,9 @@ atm_inapc            = 4;
 //
 
 wpr_any              : cardinal =  0;
-wpr_adv              : cardinal =  1;
-wpr_nadv             : cardinal =  1 shl 1;
-wpr_zombie           : cardinal =  1 shl 2;
+wpr_adv              : cardinal =  %0000000000000001;
+wpr_nadv             : cardinal =  %0000000000000010;
+wpr_zombie           : cardinal =  %0000000000000100;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,27 +210,24 @@ wpr_zombie           : cardinal =  1 shl 2;
 //  Target flag
 //
 
-wtr_owner_p          : cardinal =  1;         // own
-wtr_owner_a          : cardinal =  1 shl 1;   // ally
-wtr_owner_e          : cardinal =  1 shl 2;   // enemy
+wtr_owner_p          : cardinal = %000000000000000000000001;  // own
+wtr_owner_a          : cardinal = %000000000000000000000010;  // ally
+wtr_owner_e          : cardinal = %000000000000000000000100;  // enemy
+wtr_hits_h           : cardinal = %000000000000000000001000;  // 0<hits<mhits
+wtr_hits_d           : cardinal = %000000000000000000010000;  // hits<=0
+wtr_hits_a           : cardinal = %000000000000000000100000;  // hits=mhits
+wtr_bio              : cardinal = %000000000000000001000000;  // non mech
+wtr_mech             : cardinal = %000000000000000010000000;  // mech and !building
+wtr_building         : cardinal = %000000000000000100000000;  // building
+wtr_bld              : cardinal = %000000000000001000000000;  // bld=true
+wtr_nbld             : cardinal = %000000000000010000000000;  // bld=false
+wtr_ground           : cardinal = %000000000000100000000000;
+wtr_soaring          : cardinal = %000000000001000000000000;
+wtr_fly              : cardinal = %000000000010000000000000;
+wtr_adv              : cardinal = %000000000100000000000000;
+wtr_nadv             : cardinal = %000000001000000000000000;
 
-wtr_hits_h           : cardinal =  1 shl 3;   // 0<hits<mhits
-wtr_hits_d           : cardinal =  1 shl 4;   // hits<=0
-wtr_hits_a           : cardinal =  1 shl 5;   // hits=mhits
-
-wtr_bio              : cardinal =  1 shl 6;   // non mech
-wtr_mech             : cardinal =  1 shl 7;   // mech and !building
-wtr_building         : cardinal =  1 shl 8;   // building
-
-wtr_bld              : cardinal =  1 shl 9;   // bld=true
-wtr_nbld             : cardinal =  1 shl 10;  // bld=false
-
-wtr_ground           : cardinal =  1 shl 11;
-wtr_soaring          : cardinal =  1 shl 12;
-wtr_fly              : cardinal =  1 shl 13;
-
-wtr_adv              : cardinal =  1 shl 14;
-wtr_nadv             : cardinal =  1 shl 15;
+wtrset_enemy_alive   : cardinal = %000000001111111111111100;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

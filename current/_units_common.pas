@@ -505,6 +505,7 @@ begin
       order    := 0;
       wanim    := false;
       a_tar    := 0;
+      a_weap   := 0;
       //a_tard   := 32000;
       {alrm_x   := 0;
       alrm_y   := 0;

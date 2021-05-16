@@ -120,8 +120,7 @@ TUWeapon = record
   aw_tarf,
   aw_reqf  : cardinal;
   aw_range,
-  aw_damage,
-  aw_count,
+  aw_count: integer;
   aw_rld   : byte;
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
@@ -190,19 +189,19 @@ TUID = record
    un_eid_bcrater   :byte;
    un_eid_bcrater_y :integer;
 
-   un_foot_anim: array[false..true] of integer;
+   un_foot_anim : array[false..true] of integer;
 
    un_eid_ready,
    un_eid_death,
    un_eid_fdeath,
    un_eid_pain
-               : array[false..true] of byte;
+                : array[false..true] of byte;
    un_eid_snd_foot,
    un_eid_snd_ready,
    un_eid_snd_death,
    un_eid_snd_fdeath,
    un_eid_snd_pain
-               : array[false..true] of PTSoundSet;
+                : array[false..true] of PTSoundSet;
 
    un_snd_ready, //command sounds
    un_snd_move,

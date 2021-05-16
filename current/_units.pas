@@ -833,20 +833,21 @@ end;
 
 }
 
-function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte):boolean;
+function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte;checkvis,nosrangecheck:boolean):byte;
+var awr:integer;
 begin
-   _target_weapon_check:=false;
+   _target_weapon_check:=0;
+
+   if(checkvis)then
+    if(_uvision(pu^.player^.team,tu,false)=false)then exit;
+   if(cw>MaxUnitWeapons)then exit;
    if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
+
    with pu^ do
    with uid^ do
    with player^ do
    with _a_weap[cw] do
    begin
-      // Distance requirements
-
-      //aw_range
-      //if(aw_range>0)then if()
-
       // UID and UPID requirements
 
       if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0)then exit;
@@ -861,42 +862,68 @@ begin
 
       // requirements to target
 
-      if(cf(@aw_tarf,@wtr_owner_p ))and (playeri<>tu^.playeri       )then exit;
-      if(cf(@aw_tarf,@wtr_owner_a ))and (team   <>tu^.player^.team  )then exit;
-      if(cf(@aw_tarf,@wtr_owner_e ))and (team   = tu^.player^.team  )then exit;
+      if(cf(@aw_tarf,@wtr_owner_p )=false)and(playeri =tu^.playeri       )then exit;
+      if(cf(@aw_tarf,@wtr_owner_a )=false)and(team    =tu^.player^.team  )then exit;
+      if(cf(@aw_tarf,@wtr_owner_e )=false)and(team   <>tu^.player^.team  )then exit;
 
-      if(cf(@aw_tarf,@wtr_hits_h  ))and((tu^.hits<=0)
-                                      or(tu^.uid^._mhits<=tu^.hits ))then exit;
-      if(cf(@aw_tarf,@wtr_hits_d  ))and (tu^.hits> 0                )then exit;
-      if(cf(@aw_tarf,@wtr_hits_a  ))and (tu^.hits<=0                )then exit;
+      if(cf(@aw_tarf,@wtr_hits_h  )=false)and
+                                 (0<tu^.hits)and(tu^.hits<tu^.uid^._mhits)then exit;
 
-      if(cf(@aw_tarf,@wtr_bio     ))and (tu^.uid^._ismech           )then exit;
-      if(cf(@aw_tarf,@wtr_mech    ))and((tu^.uid^._ismech=false)
-                                      or(tu^.uid^._isbuilding      ))then exit;
-      if(cf(@aw_tarf,@wtr_building))and (tu^.uid^._isbuilding=false )then exit;
+      if(cf(@aw_tarf,@wtr_hits_d  )=false)and(tu^.hits<=0                )then exit;
+      if(cf(@aw_tarf,@wtr_hits_a  )=false)and(tu^.hits =tu^.uid^._mhits  )then exit;
 
-      if(cf(@aw_tarf,@wtr_bld     ))and (tu^.bld=false              )then exit;
-      if(cf(@aw_tarf,@wtr_nbld    ))and (tu^.bld                    )then exit;
+      if(cf(@aw_tarf,@wtr_bio     )=false)and(tu^.uid^._ismech=false     )then exit;
+      if(cf(@aw_tarf,@wtr_mech    )=false)and
+                        (tu^.uid^._ismech)and(tu^.uid^._isbuilding=false )then exit;
+      if(cf(@aw_tarf,@wtr_building)=false)and(tu^.uid^._isbuilding       )then exit;
 
-      if(cf(@aw_tarf,@wtr_ground  ))and (tu^.uf> uf_ground          )then exit;
-      if(cf(@aw_tarf,@wtr_soaring ))and (tu^.uf<>uf_soaring         )then exit;
-      if(cf(@aw_tarf,@wtr_fly     ))and (tu^.uf< uf_fly             )then exit;
+      if(cf(@aw_tarf,@wtr_bld     )=false)and(tu^.bld                    )then exit;
+      if(cf(@aw_tarf,@wtr_nbld    )=false)and(tu^.bld =false             )then exit;
 
-      if(cf(@aw_tarf,@wtr_adv     ))and (tu^.buff[ub_advanced]<=0   )then exit;
-      if(cf(@aw_tarf,@wtr_nadv    ))and (tu^.buff[ub_advanced]> 0   )then exit;
+      if(cf(@aw_tarf,@wtr_ground  )=false)and(tu^.uf = uf_ground         )then exit;
+      if(cf(@aw_tarf,@wtr_soaring )=false)and(tu^.uf = uf_soaring        )then exit;
+      if(cf(@aw_tarf,@wtr_fly     )=false)and(tu^.uf = uf_fly            )then exit;
+
+      if(cf(@aw_tarf,@wtr_adv     )=false)and(tu^.buff[ub_advanced]> 0   )then exit;
+      if(cf(@aw_tarf,@wtr_nadv    )=false)and(tu^.buff[ub_advanced]<=0   )then exit;
+
+      // Distance requirements
+
+      if(aw_range=0)
+      then awr:=srange-ud
+      else
+        if(aw_range<0)then
+        begin
+           if(_IsUnitRange(inapc,nil))then exit;
+           awr:=ud-(_r+tu^.uid^._r-aw_range);
+        end
+        else awr:=ud-aw_range;
+
+      if(awr<0)
+      then _target_weapon_check:=2      // can attack now
+      else
+        if(speed>0)and(uo_id<>ua_hold)and(_IsUnitRange(inapc,nil)=false)then
+         if(ud<=srange)or(nosrangecheck)
+         then _target_weapon_check:=1  // need move closer
+         else exit;                    // target too far
    end;
-   _target_weapon_check:=true;
 end;
 
-function _unit_target2weapon(pu,tu:PTUnit;ud:integer;cw:byte):byte;
-var i:byte;
+function _unit_target2weapon(pu,tu:PTUnit;ud:integer;cw:byte;action:pbyte):byte;
+var i,a:byte;
 begin
    _unit_target2weapon:=255;
+
+   if(_uvision(pu^.player^.team,tu,false)=false)then exit;
    if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
    if(cw>MaxUnitWeapons)then cw:=MaxUnitWeapons;
+   if(action<>nil)then action^:=0;
+
    for i:=0 to cw do
-   if(_target_weapon_check(pu,tu,ud,i))then
    begin
+      a:=_target_weapon_check(pu,tu,ud,i,false,action<>nil);
+      if(a=0)then continue;
+      if(action<>nil)then action^:=a;
       _unit_target2weapon:=i;
       break;
    end;
@@ -908,10 +935,7 @@ var tw:byte;
 begin
    with pu^ do
    with uid^ do
-   with player^ do
    begin
-      if(_uvision(team,tu,false)=false)then exit;
-
       tw:=_unit_target2weapon(pu,tu,ud,t_weap^,nil);
 
       if(tw>MaxUnitWeapons)then exit;
@@ -1408,7 +1432,7 @@ uab_uac_unit_adv:
             uo_id :=ua_amove;
          end;
 
-         if(_move2uotar(pu,tu,td))then
+         if(_move2uotar(pu,tu,tdm))then
          begin
             uo_x:=tu^.vx;
             uo_y:=tu^.vy;
@@ -1449,83 +1473,141 @@ uab_uac_unit_adv:
 end;
 
 procedure _unit_attack(pu:PTUnit);
-var w:byte;
+var w,a:byte;
    tu:PTUnit;
-begin
-  { with pu^ do
-   if(a_rld<=0)then
-   begin
-      if(_IsUnitRange(a_tar,@tu)=false)then exit;
-
-      w:=_unit_target2weapon(pu,tu,-1,255,nil);
-
-      if(w>MaxUnitWeapons)then
-      begin
-         a_tar:=0;
-         exit;
-      end;
-
-      // attack code
-   end;      }
-end;
-
-procedure _unit_order(pu:PTUnit);
-var tu:PTUnit;
-    td:integer;
-    i :byte;
 begin
    with pu^ do
    begin
+      if(_canattack(pu)=false)then exit;
+      if(_IsUnitRange(a_tar,@tu)=false)then exit;
 
-      if(ServerSide=false)
-      then //attack procedure
+      if(a_rld<=0)then
+      begin
+         w:=_unit_target2weapon(pu,tu,-1,255,@a);
+
+         if(w>MaxUnitWeapons)or(a=0)then
+         begin
+            a_tar:=0;
+            exit;
+         end;
+
+         a_weap:=w;
+      end
       else
       begin
-         if(_IsUnitRange(inapc,nil)=false)then
+         a:=_target_weapon_check(pu,tu,-1,a_weap,true,false);
+         if(a=0)then
          begin
-            _unit_uo_tar(pu);
+            a_tar:=0;
+            exit;
+         end;
+      end;
 
-            mv_x:=uo_x;
-            mv_y:=uo_y;
+      if(ServerSide)then
+      case a of
+      0: exit;
+      1: begin
+            mv_x:=tu^.x;
+            mv_y:=tu^.y;
+            exit;
+         end;
+      else
+         mv_x:=x;
+         mv_y:=y;
+      end;
 
-            if(uo_id=ua_paction)then
-             case uid^._ability of
+      // attack code
+      with uid^ do
+      with _a_weap[a_weap] do
+      begin
+         if(a_rld=0)then
+         begin
+            a_rld:=aw_rld;
+            {$IFDEF _FULLGAME}
+            PlaySND(aw_snd,pu);
+            {$ENDIF}
+         end;
+
+         if(a_rld in aw_rld_s)then
+         case aw_type of
+wpt_missle  : _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,false);
+wpt_unit    : ;
+         else
+            if(ServerSide)then
+            case aw_type of
+wpt_resurect : tu^.buff[ub_resur]:=fr_2fps;
+wpt_heal     : tu^.hits:=min2(tu^.hits+aw_count,tu^.uid^._mhits);
+wpt_directdmg: _unit_damage(tu,aw_count,2,playeri);
+            end;
+         end;
+      end;
+
+
+      {
+      aw_type,
+      aw_rupgr,
+      aw_ruid,
+      aw_oid   : byte;
+      aw_uids  : TSob;
+      aw_tarf,
+      aw_reqf  : cardinal;
+      aw_range,
+      aw_count: integer;
+      aw_rld   : byte;
+      aw_rld_s : TSoB;
+
+      }
+   end;
+end;
+
+procedure _unit_order(pu:PTUnit);
+begin
+   with pu^ do
+   if(ServerSide=false)
+   then _unit_attack(pu)
+   else
+   begin
+      if(_IsUnitRange(inapc,nil)=false)then
+      begin
+         _unit_uo_tar(pu);
+
+         mv_x:=uo_x;
+         mv_y:=uo_y;
+
+         if(uo_id=ua_paction)then
+          case uid^._ability of
 uab_spawnlost:  begin
                    mv_x:=x;
                    mv_y:=y;
-                   if(buff[ub_cast]<=0)then
-                   begin
-                      _pain_lost_spawn(pu);
-                      buff[ub_cast]:=fr_fps;
-                   end;
-                end
-             else
-                if(x=uo_x)and(y=uo_y)then
-                begin
                    uo_id:=ua_amove;
                    _unit_action(pu);
-                end;
-             end
-            else
-              if(x=uo_x)and(y=uo_y)then
-               if(uo_bx>=0)then
-               begin
-                  uo_x :=uo_bx;
-                  uo_bx:=x;
-                  uo_y :=uo_by;
-                  uo_by:=y;
-                  _unit_turn(pu);
-               end
-               else
-                 if(uo_id=ua_move)then uo_id:=ua_amove;
-
-            if(buff[ub_stopattack]>0)then
+                   uo_id:=ua_paction;
+                end
+          else
+             if(x=uo_x)and(y=uo_y)then
+             begin
+                uo_id:=ua_amove;
+                _unit_action(pu);
+             end;
+          end
+         else
+           if(x=uo_x)and(y=uo_y)then
+            if(uo_bx>=0)then
             begin
-               mv_x:=x;
-               mv_y:=y;
-            end;
-         end;
-         if(uo_id=ua_amove)then _unit_attack(pu);
+               uo_x :=uo_bx;
+               uo_bx:=x;
+               uo_y :=uo_by;
+               uo_by:=y;
+               _unit_turn(pu);
+            end
+            else
+              if(uo_id=ua_move)then uo_id:=ua_amove;
+      end;
+      if(uo_id=ua_amove)then _unit_attack(pu);
+      if(buff[ub_stopattack]>0)then
+      begin
+         mv_x:=x;
+         mv_y:=y;
       end;
    end;
 end;
