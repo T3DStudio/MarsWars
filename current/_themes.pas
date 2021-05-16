@@ -17,7 +17,7 @@ begin
 end;
 
 procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
-var t:TMWSprite;
+var t:TMWTexture;
     i:integer;
 procedure next;begin inc(it^,1);setlength(l^,it^);l^[it^-1]:=t;end;
 begin
@@ -117,7 +117,7 @@ begin
    end;
 end;
 
-procedure _SetTrans(spr:PTMWSprite;xa:boolean);
+procedure _SetTrans(spr:PTMWTexture;xa:boolean);
 begin
    with spr^ do
     if(xa)

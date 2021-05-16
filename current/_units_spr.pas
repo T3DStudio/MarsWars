@@ -2,7 +2,7 @@
 
 
 
-function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer):PTMWSprite;  // sprite model 2 sprite
+function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer):PTMWTexture;  // sprite model 2 sprite
 var dd,i:integer;
 function aa3(b0,a,b1:integer):integer;
 begin
@@ -301,7 +301,7 @@ else if(buff[ub_cast  ]>0)
 else if(a_rld          >0)then _unit2SMAnimK:=sms_dattack; //sms_mattack
 end;
 
-function _unit2spr(u:PTUnit):PTMWSprite;
+function _unit2spr(u:PTUnit):PTMWTexture;
 var ak:byte;
 smodel:PTMWSModel;
 begin
@@ -346,7 +346,7 @@ sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits);
    end;
 end;
 
-function _uid2spr(_uid:byte;adv:boolean):PTMWSprite;
+function _uid2spr(_uid:byte;adv:boolean):PTMWTexture;
 begin
    with _uids[_uid] do
     case _urace of

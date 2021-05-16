@@ -445,13 +445,13 @@ theme_clr_liquids : array of cardinal; // minimap color
 //  SPRITES
 //
 
-spr_liquidb       : array[1..LiquidRs ] of TMWSprite;
-spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWSprite;
-spr_crater        : array[1..crater_ri] of TMWSprite;
+spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
+spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWTexture;
+spr_crater        : array[1..crater_ri] of TMWTexture;
 
 
-spr_dummy         : TMWSprite;
-pspr_dummy        : PTMWSprite;
+spr_dummy         : TMWTexture;
+pspr_dummy        : PTMWTexture;
 
 spr_dmodel,
 
@@ -557,11 +557,11 @@ spr_db_u1,
 spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel;
 
-spr_mp            : array[1..r_cnt] of TMWSprite;
+spr_mp            : array[1..r_cnt] of TMWTexture;
 spr_gear,
 spr_toxin
 
-                  : TMWSprite;
+                  : TMWTexture;
 
 
 spr_c_mars,
@@ -593,7 +593,7 @@ spr_iob_knight,
 spr_iob_baron,
 spr_mback,
 spr_cursor        : pSDL_Surface;
-spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWSprite;
+spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_tabs          : array[0..3] of pSDL_Surface;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;

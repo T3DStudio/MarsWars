@@ -228,7 +228,7 @@ begin
    end;
 end;
 
-function _EID2Spr(eid:byte):PTMWSprite;
+function _EID2Spr(eid:byte):PTMWTexture;
 begin
    _EID2Spr:=@spr_dummy;
 
@@ -240,7 +240,7 @@ end;
 
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
-var spr : PTMWSprite;
+var spr : PTMWTexture;
      dp,
 invb,inv,t,ro,
      sh : integer;
@@ -518,7 +518,7 @@ end;
 }
 
 procedure _unit_dspr(pu:PTUnit);
-var spr:PTMWSprite;
+var spr:PTMWTexture;
 begin
    with pu^ do
    with uid^ do

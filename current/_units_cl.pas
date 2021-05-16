@@ -707,14 +707,6 @@ begin
    end;
 end;
 
-{
-atm_none             = 0;
-atm_always           = 1;
-atm_bunker           = 2;
-atm_sturret          = 3;
-atm_inapc            = 4;
-}
-
 procedure initUIDS;
 var i:byte;
 procedure _weapon(aa,wtype:byte;range,count:integer;reload,oid,ruid,rupid:byte;tarf,reqf:cardinal;uids,reload_s:TSoB);
@@ -731,8 +723,10 @@ begin
       aw_rupgr  :=rupid;
       aw_tarf   :=tarf;
       aw_reqf   :=reqf;
-      aw_rld_s  :=reload_s;
       aw_uids   :=uids;
+      if(reload_s<>[])
+      then aw_rld_s:=reload_s
+      else aw_rld_s:=[aw_rld];
    end;
 end;
 
@@ -963,7 +957,7 @@ begin
    _attack    := atm_always;
    _fastdeath[false]:=true;
    _fastdeath[true ]:=true;
-   _weapon(0,wpt_directdmg,-10,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_any,[0..255],[fr_fps]);
+   _weapon(0,wpt_directdmg,-8,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_any,[0..255],[]);
 end;
 UID_Imp        :
 begin
@@ -976,7 +970,8 @@ begin
    _painc     := 3;
    _btime     := 5;
    _attack    := atm_always;
-   _weapon(0,wpt_missle,0,0,fr_fps,MID_Imp,0,0,wtrset_enemy_alive,wpr_any,[0..255]-[UID_Imp],[fr_fps]);
+   _weapon(0,wpt_missle   ,350,0 ,fr_fps,MID_Imp,0,0,wtrset_enemy_alive,wpr_any,[0..255]-[UID_Imp],[]);
+   _weapon(1,wpt_directdmg,-8 ,10,fr_fps,0      ,0,0,wtrset_enemy_alive,wpr_any,[UID_Imp]         ,[]);
 end;
 UID_Demon      :
 begin
@@ -1221,7 +1216,7 @@ begin
    _ucl       := 0;
    _btime     := 90;
 
-   _zombieid  := UID_HCommandCenter;
+   _zombie_uid:= UID_HCommandCenter;
 
    _attack    := atm_always;
 
@@ -1240,7 +1235,7 @@ begin
    _ucl       := 3;
    _btime     := 40;
 
-   _zombieid  := UID_HMilitaryUnit;
+   _zombie_uid:= UID_HMilitaryUnit;
 
    _isbuilding:=true;
    _isbarrack :=true;
@@ -1407,7 +1402,7 @@ begin
    _ucl       := 0;
    _btime     := 10;
    _attack    := atm_always;
-   _zombieid  := UID_ZEngineer;
+   _zombie_uid:= UID_ZEngineer;
 end;
 UID_Medic:
 begin
@@ -1419,7 +1414,7 @@ begin
    _ucl       := 1;
    _btime     := 10;
    _attack    := atm_always;
-   _zombieid  := UID_ZFormer;
+   _zombie_uid:= UID_ZFormer;
 end;
 UID_Sergant:
 begin
@@ -1431,7 +1426,7 @@ begin
    _ucl       := 2;
    _btime     := 10;
    _attack    := atm_always;
-   _zombieid  := UID_ZSergant;
+   _zombie_uid:= UID_ZSergant;
 end;
 UID_Commando:
 begin
@@ -1443,7 +1438,7 @@ begin
    _ucl       := 3;
    _btime     := 15;
    _attack    := atm_always;
-   _zombieid  := UID_ZCommando;
+   _zombie_uid:= UID_ZCommando;
 end;
 UID_Bomber:
 begin
@@ -1455,7 +1450,7 @@ begin
    _ucl       := 4;
    _btime     := 30;
    _attack    := atm_always;
-   _zombieid  := UID_ZBomber;
+   _zombie_uid:= UID_ZBomber;
 end;
 UID_Major:
 begin
@@ -1467,7 +1462,7 @@ begin
    _ucl       := 5;
    _btime     := 20;
    _attack    := atm_always;
-   _zombieid  := UID_ZMajor;
+   _zombie_uid:= UID_ZMajor;
 end;
 UID_BFG:
 begin
@@ -1479,7 +1474,7 @@ begin
    _ucl       := 6;
    _btime     := 60;
    _attack    := atm_always;
-   _zombieid  := UID_ZBFG;
+   _zombie_uid:= UID_ZBFG;
 end;
 UID_FAPC:
 begin
@@ -1622,6 +1617,10 @@ end;
       _missile_r:=trunc(_r/1.4);
 
       _ismech:=_ismech or _isbuilding;
+
+      if(_isbuilding)
+      then _zombie_hits:=_mhits div 2
+      else _zombie_hits:=_mhits;
 
       _shcf:=_mhits/_mms;
 

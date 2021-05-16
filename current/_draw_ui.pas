@@ -36,7 +36,7 @@ begin
 end;
 
 procedure d_BuildUI(tar:pSDL_Surface;lx,ly:integer);
-var spr:PTMWSprite;
+var spr:PTMWTexture;
       i:integer;
 begin
    with _players[HPlayer]do

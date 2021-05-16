@@ -1,5 +1,5 @@
 
-procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:PTMWSprite;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
+procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:PTMWTexture;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -27,7 +27,7 @@ begin
    end;
 end;
 //_sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
-procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro,axo,ayo:integer);
+procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,ayo:integer);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -54,7 +54,7 @@ begin
       end;
    end;
 end;
-procedure _sl_add_dec2(ax,ay,ad,ash:integer;aspr:PTMWSprite;ainv:byte;aro,axo,ayo:integer;_cru:string6);
+procedure _sl_add_dec2(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,ayo:integer;_cru:string6);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -82,7 +82,7 @@ begin
    end;
 end;
 //_sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
-procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWSprite;ainv:byte);
+procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWTexture;ainv:byte);
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
@@ -199,7 +199,7 @@ procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
 var i,t,
   ix,iy,s:integer;
     vx,vy:integer;
-    spr  :PTMWSprite;
+    spr  :PTMWTexture;
 begin
    _draw_surf(tar,
    lx-vid_vx mod ter_w,

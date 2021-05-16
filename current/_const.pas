@@ -207,7 +207,7 @@ wpr_zombie           : cardinal =  %0000000000000100;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Target flag
+//  Target requirements flags
 //
 
 wtr_owner_p          : cardinal = %000000000000000000000001;  // own

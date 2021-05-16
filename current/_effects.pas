@@ -270,7 +270,7 @@ end;
 
 procedure missiles_sprites(noanim,draw:boolean);
 var  m:integer;
-   spr:PTMWSprite;
+   spr:PTMWTexture;
 begin
    for m:=1 to MaxMissiles do
    with _missiles[m] do
@@ -289,7 +289,7 @@ end;
 procedure effects_sprites(noanim,draw:boolean);
 var ei,
  alpha:integer;
-   spr:PTMWSprite;
+   spr:PTMWTexture;
 
 begin
    for ei:=1 to vid_mvs do

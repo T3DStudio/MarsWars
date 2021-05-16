@@ -6,19 +6,27 @@ pinteger = ^integer;
 
 TSob  = set of byte;
 PTSob = ^TSob;
+
 {$IFDEF _FULLGAME}
 TSoc = set of char;
 
 string6 = string[6];
 
-TMWSprite = record
+TColor = record
+   r,g,b,a:byte;
+   c      :cardinal;
+end;
+
+PTColor = ^TColor;
+
+TMWTexture = record
    surf:pSDL_Surface;
    w,h,
    hw,hh:integer;
 end;
-PTMWSprite = ^TMWSprite;
+PTMWTexture = ^TMWTexture;
 
-TUSpriteList  = array of TMWSprite;
+TUSpriteList  = array of TMWTexture;
 PTUSpriteList = ^TUSpriteList;
 
 TMWSModel = record
@@ -50,7 +58,7 @@ TEffect = record
 end;
 
 TVisSpr = record
-   s        : PTMWSprite;
+   s        : PTMWTexture;
    x,y,xo,yo,
    ro,
    d,sh     : integer;
@@ -144,9 +152,10 @@ TUID = record
    _painc,
    _zfall,
    _apcs,
-   _apcm
+   _apcm,
+   _zombie_hits
                 : integer;
-   _zombieid,
+   _zombie_uid,
    _urace,
    _uf,
    _ucl,
@@ -178,7 +187,7 @@ TUID = record
    _animw,_animd,
    _fr          : integer;
    un_btn,
-   un_sbtn      : array[false..true] of TMWSprite;
+   un_sbtn      : array[false..true] of TMWTexture;
    un_name,
    un_descr,
    un_hint      : shortstring;
@@ -224,7 +233,7 @@ TUPID = record
    _up_mfrg  : boolean;
 
    {$IFDEF _FULLGAME}
-   _up_btn   : TMWSprite;
+   _up_btn   : TMWTexture;
    _up_name,
    _up_descr,
    _up_hint  : shortstring;
@@ -406,7 +415,7 @@ TDoodad = record
    mmx,mmy,mmr :integer;
    mmc         :cardinal;
    spr,
-   pspr        :PTMWSprite;
+   pspr        :PTMWTexture;
    {$ENDIF}
 end;
 PTDoodad = ^TDoodad;

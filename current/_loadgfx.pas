@@ -147,7 +147,7 @@ begin
    end;
 end;
 
-procedure _lstr(mws:PTMWSprite;fn:shortstring;firstload,log:boolean);
+procedure _lstr(mws:PTMWTexture;fn:shortstring;firstload,log:boolean);
 begin
    with mws^ do
    begin
@@ -161,7 +161,7 @@ begin
 end;
 
 procedure _LoadMWSModel(mwsm:PTMWSModel;name:shortstring;_mkind:byte;firstload:boolean);
-var t:TMWSprite;
+var t:TMWTexture;
 begin
    with mwsm^ do
    begin

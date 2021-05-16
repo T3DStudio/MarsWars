@@ -838,9 +838,11 @@ var awr:integer;
 begin
    _target_weapon_check:=0;
 
+
    if(checkvis)then
     if(_uvision(pu^.player^.team,tu,false)=false)then exit;
    if(cw>MaxUnitWeapons)then exit;
+   if(tu^.hits<=fdead_hits)then exit;
    if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
 
    with pu^ do
@@ -848,15 +850,30 @@ begin
    with player^ do
    with _a_weap[cw] do
    begin
+      // Weapon type requirements
+
+      case aw_type of
+wpt_resurect : if(tu^.buff[ub_resur]>0)
+               or(tu^.buff[ub_pain ]>0)
+               or(tu^.hits<=fdead_hits)
+               or(tu^.hits>0          )then exit;
+wpt_heal     : if(tu^.hits<=0)
+               or(tu^.hits>=tu^.uid^._mhits)
+               or(tu^.bld=false       )then exit;
+      end;
+
       // UID and UPID requirements
 
       if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0)then exit;
       if(aw_rupgr>0)and(upgr  [aw_rupgr] =0)then exit;
 
-      // requirements to attacker
+      // requirements to attacker and some flags
 
       if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then exit;
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
+
+      if(cf(@aw_reqf,@wpr_zombie))then
+       if(tu^.bld=false)or(tu^.uid^._zombie_uid=0)or(hits>tu^.uid^._zombie_hits)then exit;
 
       if not(tu^.uidi in aw_uids)then exit;
 
@@ -890,7 +907,7 @@ begin
       // Distance requirements
 
       if(aw_range=0)
-      then awr:=srange-ud
+      then awr:=ud-srange
       else
         if(aw_range<0)then
         begin
@@ -915,6 +932,7 @@ begin
    _unit_target2weapon:=255;
 
    if(_uvision(pu^.player^.team,tu,false)=false)then exit;
+   if(tu^.hits<=fdead_hits)then exit;
    if(ud<0)then ud:=dist2(pu^.x,pu^.y,tu^.x,tu^.y);
    if(cw>MaxUnitWeapons)then cw:=MaxUnitWeapons;
    if(action<>nil)then action^:=0;
@@ -1536,7 +1554,7 @@ wpt_unit    : ;
             if(ServerSide)then
             case aw_type of
 wpt_resurect : tu^.buff[ub_resur]:=fr_2fps;
-wpt_heal     : tu^.hits:=min2(tu^.hits+aw_count,tu^.uid^._mhits);
+wpt_heal     : if(tu^.hits>0)then tu^.hits:=min2(tu^.hits+aw_count,tu^.uid^._mhits);
 wpt_directdmg: _unit_damage(tu,aw_count,2,playeri);
             end;
          end;
