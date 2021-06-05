@@ -765,7 +765,6 @@ begin
    if(tu^.uf=uf_fly)then
    begin
       if(uu^.uid in [UID_Demon,
-                     UID_Mine,
                      UID_ZEngineer])then exit;
    end;
 
@@ -1180,7 +1179,10 @@ begin
                          end;
                       end;
 
-         UID_Mine  :  buff[ub_invis]:=_bufinf;
+         UID_Mine  :  begin
+                         buff[ub_invis]:=_bufinf;
+                         if(upgr[upgr_minesen]>0)then buff[ub_advanced]:=_bufinf;
+                      end;
          UID_ZEngineer,
          UID_Commando:buff[ub_invis]:=buff[ub_advanced];
          UID_Demon :  begin
@@ -1356,7 +1358,7 @@ begin
            else shadow:=uaccc_fly;
 
           if(uid=UID_Mine)then
-           if(sr<250)then
+           if(sr<>250)then
            begin
               sr:=250;
               {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}
@@ -1370,7 +1372,7 @@ begin
            if(uid=UID_Baron)then buff[ub_advanced]:=_bufinf;
 
           if(uid=UID_Mine)then
-           if(sr>100)then
+           if(sr<>100)then
            begin
               sr:=100;
               {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}

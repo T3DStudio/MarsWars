@@ -830,12 +830,7 @@ begin
                           if(rld_a<=0)or(ai_uc_a>2)or(alrm_r>base_rr)then _unit_kill(u,false,false);
                        end;
        UID_Mine      : begin
-                          t:=buff[ub_advanced];
-                          if(g_addon=false)or(upgr[upgr_minesen]>0)then
-                           if(alrm_r<100)
-                           then buff[ub_advanced]:=0
-                           else buff[ub_advanced]:=_bufinf;
-                          if(alrm_r<base_r)or(t<>buff[ub_advanced])then rld_a:=vid_fps;
+                          if(alrm_r<base_r)then rld_a:=vid_fps;
                           if(rld_a>0)then dec(rld_a,1);
                           if(rld_a<=0)then _unit_kill(u,false,false);
                        end;

@@ -997,16 +997,12 @@ UID_UCommandCenter:
 UID_Engineer :  if(army<MaxPlayerUnits)and(upgr[upgr_mines]>0)and(menerg>0)and(inapc=0)and(buff[ub_cast]=0)then
                 begin
                    _unit_add(vx,vy,UID_Mine,player,true);
-                   if(_lcu>0)then
-                    if(upgr[upgr_minesen]>0)then
-                     _lcup^.buff[ub_advanced]:=_bufinf;
                    buff[ub_cast]:=vid_hfps;
                 end;
 UID_APC,
 UID_FAPC     :  if(apcc>0)then uo_id:=ua_unload;
 
 UID_Pain     :  _pain_action_code(u);
-UID_Mine     :  if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_bufinf;
 UID_LostSoul :  if(upgr[upgr_vision]>0)then
                 begin
                    {$IFDEF _FULLGAME}
@@ -1634,12 +1630,12 @@ begin
                   if(OnlySVCode)then _unit_kill(u,false,true);
                end;
          UID_Mine:
-               if(buff[ub_advanced]=0)and(tar1d<40)and(tu1^.uf<uf_fly)then
                begin
-                  _miss_add(vx,vy,vx,vy,0,MID_Mine,player,0,true);
-                  if(OnlySVCode)then _unit_kill(u,false,true);
-               end
-               else exit;
+                  //_miss_add(vx,vy,vx,vy,0,MID_Mine,player,0,true);
+                  //if(OnlySVCode)then _unit_kill(u,false,true);
+                  _miss_add(vx,vy,vx,vy,0,MID_BFG,player,0,true);
+                  rld:=rld_r;
+               end;
          UID_HTower:
                begin
                   if(tu1^.uid=UID_Revenant)then

@@ -790,8 +790,9 @@ begin
          isbuild:= true;
          solid  := false;
          buff[ub_invis]:=_bufinf;
-         ctime  :=0;
-         bld_s  :=0;
+         ctime  := 0;
+         bld_s  := 0;
+         rld_r  := 240;
       end;
 
       if(uid=UID_UTransport)then
