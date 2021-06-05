@@ -482,7 +482,7 @@ begin
 end;
 
 procedure _netSetUcl(uu:PTUnit);
-var pu:PTUnit;
+var pu,tu:PTUnit;
    vis:boolean;
 begin
    pu:=@_units[0];
@@ -493,10 +493,10 @@ begin
      begin
         _unit_default(uu);
 
-        if(inapc>0)then
+        if(_IsUnitRange(inapc,@tu))then
         begin
-           x:=_units[inapc].x;
-           y:=_units[inapc].y;
+           x:=tu^.x;
+           y:=tu^.y;
            _unit_sfog(uu);
            _unit_mmcoords(uu);
         end;

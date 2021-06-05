@@ -129,8 +129,9 @@ begin
       with uid^ do
       begin
          if(_isbuilding)then build_cd:=min2(build_cd+fr_3fps,max_build_reload);
-         if(_zfall>0)and(uf>uf_ground)then zfall:=_zfall;
-         if(_zfall<0)and(uf=uf_ground)then zfall:=_zfall;
+         {if(_zfall>0)and(uf>uf_ground)then zfall:=_zfall;
+         if(_zfall<0)and(uf=uf_ground)then zfall:=_zfall;}
+         zfall:=_zfall;
       end;
 
       x      :=vx;
@@ -143,7 +144,6 @@ begin
       mv_x   :=x;
       mv_y   :=y;
       a_tar  :=0;
-      //a_tard :=32000;
       rld    :=0;
 
       for i:=1 to MaxUnits do
@@ -838,7 +838,6 @@ var awr:integer;
 begin
    _target_weapon_check:=0;
 
-
    if(checkvis)then
     if(_uvision(pu^.player^.team,tu,false)=false)then exit;
    if(cw>MaxUnitWeapons)then exit;
@@ -856,7 +855,7 @@ begin
 wpt_resurect : if(tu^.buff[ub_resur]>0)
                or(tu^.buff[ub_pain ]>0)
                or(tu^.hits<=fdead_hits)
-               or(tu^.hits>0          )then exit;
+               or(tu^.hits> 0         )then exit;
 wpt_heal     : if(tu^.hits<=0)
                or(tu^.hits>=tu^.uid^._mhits)
                or(tu^.bld=false       )then exit;
@@ -869,13 +868,15 @@ wpt_heal     : if(tu^.hits<=0)
 
       // requirements to attacker and some flags
 
+      if not(tu^.uidi in aw_uids)then exit;
+
       if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then exit;
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
 
       if(cf(@aw_reqf,@wpr_zombie))then
-       if(tu^.bld=false)or(tu^.uid^._zombie_uid=0)or(hits>tu^.uid^._zombie_hits)then exit;
-
-      if not(tu^.uidi in aw_uids)then exit;
+       if(tu^.bld=false)
+       or(tu^.uid^._zombie_uid=0)
+       or(hits>tu^.uid^._zombie_hits)then exit;
 
       // requirements to target
 
@@ -909,12 +910,12 @@ wpt_heal     : if(tu^.hits<=0)
       if(aw_range=0)
       then awr:=ud-srange
       else
-        if(aw_range<0)then
-        begin
-           if(_IsUnitRange(inapc,nil))then exit;
-           awr:=ud-(_r+tu^.uid^._r-aw_range);
-        end
-        else awr:=ud-aw_range;
+        if(aw_range>0)
+        then awr:=ud-aw_range
+        else
+          if(_IsUnitRange(inapc,nil))
+          then exit
+          else awr:=ud-(_r+tu^.uid^._r-aw_range);
 
       if(awr<0)
       then _target_weapon_check:=2      // can attack now
@@ -1525,9 +1526,9 @@ begin
       case a of
       0: exit;
       1: begin
-            mv_x:=tu^.x;
-            mv_y:=tu^.y;
-            exit;
+         mv_x:=tu^.x;
+         mv_y:=tu^.y;
+         exit;
          end;
       else
          mv_x:=x;
@@ -1541,40 +1542,41 @@ begin
          if(a_rld=0)then
          begin
             a_rld:=aw_rld;
+            dir:=p_dir(x,y,uo_x,uo_y);
             {$IFDEF _FULLGAME}
             PlaySND(aw_snd,pu);
             {$ENDIF}
+            if(ServerSide)then
+            buff[ub_stopattack]:=max2(aw_rld,_uclord_p);
          end;
 
          if(a_rld in aw_rld_s)then
-         case aw_type of
-wpt_missle  : _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,false);
-wpt_unit    : ;
-         else
-            if(ServerSide)then
+         begin
+            dir:=p_dir(x,y,mv_x,mv_y);
             case aw_type of
-wpt_resurect : tu^.buff[ub_resur]:=fr_2fps;
+wpt_missle     : _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,false);
+wpt_unit       : with player^ do
+                 if((army+uproda)>=MaxPlayerUnits)then
+                 begin
+                    // dead effect
+                 end
+                 else
+                   if(ServerSide)then
+                   begin
+                   end;
+            else
+               if(ServerSide)then
+               case aw_type of
+wpt_resurect : begin
+               tu^.buff[ub_resur]:=fr_2fps;
+               tu^.zfall:=-tu^.uid^._zfall;
+               end;
 wpt_heal     : if(tu^.hits>0)then tu^.hits:=min2(tu^.hits+aw_count,tu^.uid^._mhits);
 wpt_directdmg: _unit_damage(tu,aw_count,2,playeri);
+               end;
             end;
          end;
       end;
-
-
-      {
-      aw_type,
-      aw_rupgr,
-      aw_ruid,
-      aw_oid   : byte;
-      aw_uids  : TSob;
-      aw_tarf,
-      aw_reqf  : cardinal;
-      aw_range,
-      aw_count: integer;
-      aw_rld   : byte;
-      aw_rld_s : TSoB;
-
-      }
    end;
 end;
 

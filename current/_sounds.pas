@@ -147,11 +147,11 @@ begin
      end;
 end;
 
-function PlaySound(PlaySoundSet:PTMWSound):integer;
+function PlaySound(Sound:PTMWSound):integer;
 begin
    PlaySound:=-1;
-   if(PlaySoundSet<>nil)then
-   with PlaySoundSet^ do
+   if(Sound<>nil)then
+   with Sound^ do
    begin
       MIX_VOLUMECHUNK(sound,snd_svolume);
       PlaySound:=MIX_PLAYCHANNEL(-1,sound,0);
@@ -216,8 +216,8 @@ begin
    or(_menu)
    or(_draw=false)then exit;
 
-   if(snd_unit_cmd_pause<min_snd_pause)then
-   if(snd_unit_cmd_pause<=0)or(snd_unit_cmd_last<>ss)then
+   //if(snd_unit_cmd_pause<min_snd_pause)then
+   if(snd_unit_cmd_pause<=min_snd_pause)or(snd_unit_cmd_last<>ss)then
    begin
       s:=PlaySoundSet(ss);
       if(s<>nil)then

@@ -10,13 +10,7 @@ begin
 end;
 
 
-procedure draw_line(tar:PTMWTexture;x0,y0,x1,y1:integer;color:PTColor);
-begin
-   with color^ do
-   lineRGBA(tar^.surf,x0,y0,x1,y1,r,g,b,a);
-end;
-
-procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:shortstring;al,chrs:byte;tc:cardinal);
+procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:string;al,chrs:byte;tc:cardinal);
 var ss,i,o:byte;
     ix:integer;
      c:char;

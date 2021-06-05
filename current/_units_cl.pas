@@ -1117,6 +1117,7 @@ begin
    _ruid      := UID_HMonastery;
    _attack    := atm_always;
    //_rupgr     := upgr_2tier;
+   _weapon(0,wpt_resurect,-8,0,fr_fps,0,0,0,wtrset_resurect,wpr_any,[0..255],[]);
 end;
 
 UID_ZFormer:
