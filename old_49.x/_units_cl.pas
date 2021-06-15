@@ -561,7 +561,7 @@ begin
       if(uid=UID_FAPC)then
       begin
          mhits  := 250;
-         r      := 33;
+         r      := 30;
          uf     := uf_fly;
          speed  := 22;
          sr     := 250;
@@ -647,7 +647,7 @@ begin
 
       if(uid=UID_UCommandCenter)then
       begin
-         mhits  := 2500;
+         mhits  := 3000;
          uf     := uf_ground;
          sr     := base_rA[0];
          ar     := 250;
@@ -657,7 +657,7 @@ begin
          isbuild:= true;
          renerg := builder_enrg[0]+2;
          ctime  := 80;
-         rld_r  := 30;
+         rld_r  := vid_fps*10;
       end;
       if(uid=UID_UMilitaryUnit)then
       begin
@@ -785,6 +785,7 @@ begin
          uf     := uf_ground;
          speed  := 0;
          sr     := 100;
+         ar     := 100;
          ucl    := 21;
          r      := 5;
          isbuild:= true;
@@ -984,7 +985,7 @@ begin
    _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,4 ,upgr_mainm,255);
    _setUPGR(r_uac ,upgr_mainr     ,120,2 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,2 ,255,255);
+   _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,4 ,255,255);
    _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
    _setUPGR(r_uac ,upgr_6bld      ,120,1 ,12,255,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_2tier     ,120,1 ,12,255,UID_UVehicleFactory);

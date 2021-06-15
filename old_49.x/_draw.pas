@@ -235,6 +235,7 @@ begin
    //_draw_text(_screen,750,0,b2pm[map_ffly] , ta_right,255, c_white);
 
 
+
    if(k_shift>2) then
    for u:=0 to MaxPlayers do
     with _players[u] do
@@ -267,7 +268,7 @@ begin
            continue;
         end;}
 
-        if(hits>0)then
+        {if(hits>0)then
         if(k_shift>1)and(sel)then
         begin
            circleColor(_screen,ix,iy,r,c_gray);
@@ -288,7 +289,7 @@ begin
 
            if(ai_bx>0)then
             lineColor(_screen,ix,iy,ai_bx-vid_vx,ai_by-vid_vy,c_lime);
-        end;
+        end; }
 
         _draw_text(_screen,ix,iy,i2s(rld_a)+#13+b2pm[alrm_b], ta_left,255, plcolor[player]);
 
@@ -297,6 +298,7 @@ begin
         if(hits>0){and(uid=UID_URocketL)}then
         begin
            //_draw_text(_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stopafa]), ta_left,255, plcolor[player]);
+           _draw_text(_screen,ix,iy,i2s(u)+#13+i2s(r), ta_left,255, plcolor[player]);
 
            //if(tar1>0)then lineColor(_screen,ix,iy,_units[tar1].x-vid_vx,_units[tar1].y-vid_vy,c_white);
             //lineColor(_screen,ix+10,iy+10,uo_x-vid_vx,uo_y-vid_vy,c_white);  and(player=HPlayer)

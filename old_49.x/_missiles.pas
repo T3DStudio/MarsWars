@@ -7,6 +7,12 @@ procedure _d125(d:pinteger);begin d^:=d^+(d^ div 4);end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 procedure _d300(d:pinteger);begin d^:=d^*3;         end;
+procedure _dbfg(r:integer;d:pinteger);
+var i:integer;
+begin
+   i:=mm3(-2,(r-15) div 2,4);
+   if(i<>0)then d^:=d^+(d^ div 4)*i;
+end;
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
@@ -69,6 +75,7 @@ MID_Revenant   : begin dam:=40 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=12 ;       end;
 
+MID_MineShock  : begin dam:=2  ; vst:=1;         sr :=100;       end;
 MID_MBullet,
 MID_TBullet,
 MID_Bullet     : begin dam:=6  ; vst:=1;         sr :=0  ;       end;
@@ -210,7 +217,7 @@ begin
               if(tu^.uid in armor_lite)then
                  case mid of
                  MID_Blizzard   : _d50 (@damd);
-                 MID_BFG,
+                 //MID_BFG,
                  MID_Baron,
                  MID_HRocket,
                  MID_Mancubus,
@@ -244,7 +251,7 @@ begin
                  MID_MBullet,
                  MID_TBullet,
                  MID_Bullet      : _d25 (@damd);
-                 MID_BFG,
+                 //MID_BFG,
                  MID_Cacodemon,
                  MID_Imp         : _d50 (@damd);
                  MID_Baron       : _d75 (@damd);
@@ -296,16 +303,32 @@ begin
                  end;
 
              if(tu^.isbuild=false)then
-              if(tu^.uf>uf_soaring)then
-              case mid of
-              MID_Blizzard    : if(tu^.isbuild=false)then _d75 (@damd);
-              MID_SShot,
-              MID_SSShot      : _d50 (@damd);
-              end;
+             begin
+                if(tu^.uf>uf_soaring)then
+                case mid of
+                MID_Blizzard    : if(tu^.isbuild=false)then _d75 (@damd);
+                MID_SShot,
+                MID_SSShot      : _d50 (@damd);
+                end;
+
+                if(tu^.uf=uf_soaring)then
+                case mid of
+                MID_SShot,
+                MID_SSShot,
+                MID_MBullet,
+                MID_TBullet,
+                MID_Bullet,
+                MID_Bulletx2    : _d150 (@damd);
+                end;
+             end;
 
               case mid of
               MID_SShot       : p:=2;
               MID_SSShot      : p:=4;
+              MID_BFG         : begin
+                                   _dbfg(tu^.r,@damd);
+                                   if(tu^.isbuild)then _d50 (@damd);
+                                end;
               end;
            end;
 
@@ -327,13 +350,28 @@ begin
                      tu^.buff[ub_pain ]:=vid_fps;
                   end;
                end;
+              if(mid=MID_MineShock)then
+              begin
+                 if(tu^.isbuild=false)and(teams=false)then
+                 begin
+                    if(onlySVCode)then
+                    begin
+                       tu^.buff[ub_toxin]:=vid_3hfps;
+                       tu^.buff[ub_pain ]:=vid_3hfps;
+                    end;
+                    {$IFDEF _FULLGAME}
+                    _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,MID_BPlasma);
+                    {$ENDIF}
+                 end
+                 else exit;
+              end;
 
               {$IFDEF _FULLGAME}
               if(mid in [MID_SShot,MID_SSShot,MID_Bullet,MID_Bulletx2,MID_TBullet,MID_MBullet])then
               begin
                  if(tu^.mech)
                  then _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,MID_Bullet)
-                 else _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood);
+                 else _effect_add(x,y,tu^.vy+map_flydpth[tu^.uf]+1,EID_Blood );
               end;
               {$ENDIF}
 
@@ -355,6 +393,21 @@ begin
                    dec(mtars,1);
                    _unit_damage(tar,damd,p,player);
                    exit;
+                end;
+                if(mid=MID_MineShock)then
+                begin
+                   if(tu^.isbuild=false)and(teams=false)then
+                   begin
+                      if(onlySVCode)then
+                      begin
+                         tu^.buff[ub_toxin]:=vid_3hfps;
+                         tu^.buff[ub_pain ]:=vid_3hfps;
+                      end;
+                      {$IFDEF _FULLGAME}
+                      _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,MID_BPlasma);
+                      {$ENDIF}
+                   end
+                   else exit;
                 end;
 
                 if(mid in [MID_HRocket,MID_Tank,MID_Granade,UID_Archvile])then

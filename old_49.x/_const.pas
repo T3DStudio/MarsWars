@@ -8,6 +8,8 @@ degtorad               = pi/180;
 vid_fps                = 60;
 vid_hfps               = vid_fps div 2;
 vid_hhfps              = vid_hfps div 2;
+vid_hhhfps             = vid_hhfps div 2;
+vid_3hfps              = vid_hfps*3;
 vid_2fps               = vid_fps*2;
 vid_3fps               = vid_fps*3;
 vid_mpt                = trunc(1000/vid_fps)-1;
@@ -234,6 +236,7 @@ MID_Mine               = 119;
 MID_Blizzard           = 120;
 MID_ArchFire           = 121;
 MID_Flyer              = 122;
+MID_MineShock          = 123;
 
 
 UID_LostSoul           = 1;

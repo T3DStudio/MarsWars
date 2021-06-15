@@ -73,7 +73,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      SetBBit(@_bts1,5, (uid in whocanattack)and(tar1>0));
+      SetBBit(@_bts1,5, (uid in whocanattack)and(tar1>0) ); //and(rld>max2(0,rld_r-vid_3fps))
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 

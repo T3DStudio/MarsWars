@@ -354,8 +354,20 @@ end;
 {$include _ded.pas}
 {$ENDIF}
 
+function f2sel(u:integer):boolean;
+begin
+   f2sel:=false;
+   with _units[u] do
+   begin
+      if(speed<=0)then exit;
+      if not(uid in whocanattack)then exit;
+      if(uo_id=ua_paction)then exit;
+   end;
+   f2sel:=true;
+end;
+
 procedure _u_ord(pl:byte);
-var u,_u,scnt,scntm:integer;
+var u,_u,scnt,scntm,cstep:integer;
  psel:boolean;
 begin
    with _players[pl] do
@@ -373,18 +385,18 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
             if(dist2(o_x0,o_y0,o_x1,o_y1)<4)then scntm:=1;
          end;
 
-         u :=1;
-         _u:=MaxUnits;
+         cstep:=1;
+         u    :=1;
          if(o_id=uo_action)then
           case o_x0 of
           -3,
           -5: begin
-                 u :=MaxUnits;
-                 _u:=1;
+                 cstep:=-1;
+                 u    :=MaxUnits;
               end;
           end;
 
-         while (u<>_u) do
+         for _u:=1 to MaxUnits do
          begin
             with _units[u] do
              if(hits>0)and(inapc=0)and(pl=player)then
@@ -404,7 +416,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
                 if(o_id=uo_specsel)then
                  case o_x0 of
-                    0 : if(speed>0)and(uid in whocanattack)then sel:=true else if(o_y0=0)then sel:=false;
+                    0 : if(f2sel(u))then sel:=true else if(o_y0=0)then sel:=false;
                  else
                     if(o_x0 in _sbs_ucls)then
                      if(ubx[o_x0]=u)then sel:=true else if(o_y0=0)then sel:=false;
@@ -479,7 +491,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                                      _unit_turn(u);
                                   end;
                                end;
-               uo_paction    : if(speed>0)and(uo_id<>ua_paction)then
+               uo_paction    : if(speed>0)and((uo_id<>ua_paction)or((u_cs[true]+u_cs[false])=1))then
                                begin
                                   uo_x  :=o_x0;
                                   uo_y  :=o_y0;
@@ -555,9 +567,7 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
                 end;
              end;
 
-            if(u>_u)
-            then dec(u,1)
-            else inc(u,1);
+            inc(u,cstep);
          end;
 
          if(o_id in [uo_select,uo_aselect])then

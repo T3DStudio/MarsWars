@@ -760,7 +760,16 @@ begin
       else exit;
 
    if(uu^.uid=UID_UCommandCenter)then
-    if(uu^.uf=uf_ground)then exit;
+    if(uu^.uf=uf_ground)
+    then exit
+    else
+      if(tu^.uf>uf_ground)and(tu^.uid<>UID_UCommandCenter)then exit;
+
+   if(tu^.isbuild)then
+    case uu^.uid of
+    UID_Mine,
+    UID_ArchVile : exit;
+    end;
 
    if(tu^.uf=uf_fly)then
    begin
@@ -1353,7 +1362,7 @@ begin
            begin
               uo_y:=y;
               vy  :=y;
-              shadow:=uaccc_fly-buff[ub_clcast]
+              shadow:=uaccc_fly-buff[ub_clcast];
            end
            else shadow:=uaccc_fly;
 
@@ -1377,6 +1386,11 @@ begin
               sr:=100;
               {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}
            end;
+       end;
+
+       if(uid=UID_UCommandCenter)then
+       begin
+          rld_r:=_ulst[uid].rld_r;
        end;
     end;
 end;

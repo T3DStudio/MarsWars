@@ -41,6 +41,7 @@ begin
            EID_BBExp     : begin t:=62; anl:=8;  ans:=-7; end;
            EID_HUpgr     : begin t:=65; anl:=5;  ans:=-11;end;
            EID_Teleport  : begin t:=65; anl:=5;  ans:=-11;end;
+           MID_MineShock,
            MID_YPlasma,
            MID_BPlasma   : begin t:=23; anl:=5;  ans:=5  ;end;
            MID_Revenant,
@@ -121,6 +122,7 @@ begin
                          end;
         EID_Teleport   : spr:=@spr_eff_tel [ea]; // 0 .. 5   65
         MID_YPlasma    : spr:=@spr_h_p7    [ea];
+        MID_MineShock,
         MID_BPlasma    : spr:=@spr_u_p0    [ea];
         MID_Revenant,
         MID_RevenantS  : spr:=@spr_h_p4    [ea];

@@ -347,7 +347,7 @@ begin
    _mkHStrUid(UID_UPTurret        ,'UAC Plasma turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_URocketL        ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
    _mkHStrUid(UID_URTurret        ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
-   _mkHStrUid(UID_Mine            ,'Mine','');
+   _mkHStrUid(UID_Mine            ,'Shock Mine','');
 
    _mkHStrUid(UID_Engineer   ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic      ,'Medic'            ,'');
@@ -376,8 +376,8 @@ begin
    _mkHStrUpid(r_uac ,upgr_mainm   ,'Command Center engines' ,'Command Center gains ability to fly.'                               );
    _mkHStrUpid(r_uac ,upgr_ucomatt ,'Command Center turret'  ,'Flying Command Center will be able to attack.'                      );
    _mkHStrUpid(r_uac ,upgr_mainr   ,'Command Center range'   ,'Increased Command Center view/build range.'                         );
-   _mkHStrUpid(r_uac ,upgr_mines   ,'Mines'                  ,'Engineer ability.'                                                  );
-   _mkHStrUpid(r_uac ,upgr_minesen ,'Mine-sensor'            ,'Mine ability.'                                                      );
+   _mkHStrUpid(r_uac ,upgr_mines   ,'Shock Mines'            ,'Engineer ability.'                                                  );
+   _mkHStrUpid(r_uac ,upgr_minesen ,'Mine-sensor'            ,'Increase Mine sight range.'                                         );
    _mkHStrUpid(r_uac ,upgr_6bld    ,'Advanced armory'        ,'Tech Center will be able to upgrade own units.'                     );
    _mkHStrUpid(r_uac ,upgr_2tier   ,'High technologies'      ,'New 2 buildings, units and upgrades.'             );
    _mkHStrUpid(r_uac ,upgr_blizz   ,'Missile strike'         ,'Missile for Rocket Launcher Station.'             );
@@ -701,7 +701,7 @@ begin
   _mkHStrUid(UID_UPTurret        ,'Плазменная Турель'      ,'Продвинутое защитное сооружение.');
   _mkHStrUid(UID_URocketL        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
   _mkHStrUid(UID_URTurret        ,'Ракетная Турель'        ,'Продвинутое защитное сооружение.');
-  _mkHStrUid(UID_Mine            ,'Мина','');
+  _mkHStrUid(UID_Mine            ,'Шоковая Мина'           , '');
 
   _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');
@@ -729,8 +729,8 @@ begin
   _mkHStrUpid(r_uac ,upgr_mainm   ,'Двигатели Командного центра','Командный Центр может летать.'                          );
   _mkHStrUpid(r_uac ,upgr_ucomatt ,'Турель Командного центра' ,'Летающий Командный Центр может атаковать.'                );
   _mkHStrUpid(r_uac ,upgr_mainr   ,'Радиус зрения Командного центра','Увеличивает радиус зрения и дистанции строительства Командного Центра.');
-  _mkHStrUpid(r_uac ,upgr_mines   ,'Мины'                     ,'Способность Инженера.'                                    );
-  _mkHStrUpid(r_uac ,upgr_minesen ,'Мина-сенсор'              ,'Способность Мин.'                                         );
+  _mkHStrUpid(r_uac ,upgr_mines   ,'Шоковые мины'             ,'Способность Инженера.'                                    );
+  _mkHStrUpid(r_uac ,upgr_minesen ,'Мина-сенсор'              ,'Увеличивает радиус обзора Мин.'                           );
   _mkHStrUpid(r_uac ,upgr_6bld    ,'Дополнительное вооружение','Технический Центр может улучшать юнитов.'                 );
   _mkHStrUpid(r_uac ,upgr_2tier   ,'Выские технологии'        ,'Второй уровень зданий, юнитов и улучшений.'               );
   _mkHStrUpid(r_uac ,upgr_blizz   ,'Ракетный удар'            ,'Снаряд для станции Ракетного Залпа.'                      );
