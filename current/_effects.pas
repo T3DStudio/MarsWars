@@ -71,7 +71,7 @@ begin
         EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);
         EID_db_u0         : _setEID(@spr_db_u0         ,sms_death);
         EID_db_u1         : _setEID(@spr_db_u1         ,sms_death);
-        UID_UCTurret       : _setEID(@spr_UTurret       ,sms_build);
+        UID_UCTurret      : _setEID(@spr_UTurret       ,sms_build);
         UID_UPTurret      : _setEID(@spr_UPTurret      ,sms_build);
         UID_URTurret      : _setEID(@spr_URTurret      ,sms_build);
       end;
@@ -279,7 +279,7 @@ begin
    begin
       spr:=@spr_dummy;
 
-      spr:=_sm2s(ms_smodel,sms_stand,dir,0);
+      spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
        if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,vy+map_flydpth[mf],0,spr,255);
@@ -290,7 +290,7 @@ procedure effects_sprites(noanim,draw:boolean);
 var ei,
  alpha:integer;
    spr:PTMWTexture;
-
+anim_stat:byte;
 begin
    for ei:=1 to vid_mvs do
     with _effects[ei] do
@@ -328,8 +328,8 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
         end;
 
         if(anim_step>0)
-        then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step)
-        else spr:=_sm2s(smodel,anim_smstate,270,anim_i);
+        then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
+        else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
          if(_rectvis(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);

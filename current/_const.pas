@@ -723,10 +723,11 @@ sms_walk               = 0;
 sms_stand              = 1;
 sms_pain               = 2;
 sms_cast               = 3;
-sms_dattack            = 4;
-sms_mattack            = 5;
-sms_death              = 6;
-sms_build              = 7;
+sms_dready             = 4;
+sms_dattack            = 5;
+sms_mattack            = 6;
+sms_death              = 7;
+sms_build              = 8;
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -59,7 +59,34 @@ begin
    end;
 end;
 
+procedure _CalcDefaultRLDA(a,s:PTSoB);
+var i,x:byte;
+
+procedure setline(a0,a1:byte);
+begin
+   while(a0<>a1)do
+   begin
+      a^:=a^+[a1];
+      if(a0<a1)
+      then dec(a1,1)
+      else inc(a1,1);
+   end;
+end;
+
+begin
+   i :=255;
+   x :=255;
+
+   for i:=255 downto 0 do
+    if(i in s^)or(i=0)then
+    begin
+       if(x<255)then setline((i+x) div 2,x);
+       x:=i;
+    end;
+end;
+
 procedure setBuildingSND(s:PTSoundSet);begin setSND(false,s,s,s,s,s);end;
+var w:byte;
 
 procedure setEID (adv:boolean;ready,death,fdeath,pain:byte);
 var b:boolean;
@@ -573,6 +600,10 @@ end;
             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
          end;
       end;
+
+      for w:=0 to MaxUnitWeapons do
+       with _a_weap[w] do
+        if(aw_rld_a=[])then _CalcDefaultRLDA(@aw_rld_a,@aw_rld_s);
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;

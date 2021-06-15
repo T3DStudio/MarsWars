@@ -1552,7 +1552,7 @@ begin
 
          if(a_rld in aw_rld_s)then
          begin
-            dir:=p_dir(x,y,mv_x,mv_y);
+            dir:=p_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,false);
 wpt_unit       : with player^ do

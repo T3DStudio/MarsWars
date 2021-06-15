@@ -330,6 +330,19 @@ begin
    _CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
+function f2select(pu:PTUnit):boolean;
+begin
+   f2select:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(speed <=0)then exit;
+      if(_attack=0)then exit;
+      if(uo_id=ua_paction)then exit;
+   end;
+   f2select:=true;
+end;
+
 procedure _u_ord(pl:byte);
 var
 u,eu,
@@ -354,7 +367,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
          end;
 
          u :=1;
-         eu:=MaxUnits;
+         eu:=MaxUnits+1;
          if(o_id=uo_corder)then   // reverse unit loop
           case o_x0 of
           co_destroy,
@@ -362,7 +375,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
           co_cuprod,
           co_pcancle  : begin
                            u :=MaxUnits;
-                           eu:=1;
+                           eu:=0;
                         end;
           end;
 
@@ -390,9 +403,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
 
                 if(o_id=uo_specsel)then
-                 if(o_x0=255)then
-                 begin if(speed>0)and(_attack>0)then sel:=true else if(o_y0=0)then sel:=false;
-                 end
+                 if(o_x0<1)or(255<o_x0)then
+                 begin if(f2select(pu)        )then sel:=true else if(o_y0=0)then sel:=false; end
                  else  if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
 
