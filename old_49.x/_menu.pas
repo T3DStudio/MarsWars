@@ -333,7 +333,7 @@ begin
               if(g_startb>5)then g_startb:=0;
            end;
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; _makeMMB; end;
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,7);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
@@ -465,7 +465,7 @@ begin
               else g_startb:=5;
            end;
 
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,7);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollV(@G_aislots,-1,0,8);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
       84 : _scrollV(@_rpls_pnui,-1,0,9);

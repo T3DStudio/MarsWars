@@ -43,7 +43,7 @@ uf_fly                 = 2;
 NetTickN               = 2;
 
 MaxPlayers             = 6;
-MaxPlayerUnits         = 110;
+MaxPlayerUnits         = 115;
 MaxDoodads             = 600;
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxNetChat             = 16;
@@ -547,7 +547,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 189831;
+svld_size              = 196901;
 rpl_size               = 1574;
 
 rpl_none               = 0;

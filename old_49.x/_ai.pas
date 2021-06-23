@@ -56,14 +56,21 @@ begin
 
              //_upgr_ss(@upgr ,[upgr_mainr],race,1);
           end;
-      6 : begin  // Super Nightmare
+      6 : begin  // Nightmare
+             _bc_ss(@a_build,[0..11]);
+             _bc_ss(@a_units,[0..11]);
+             _bc_ss(@a_upgr ,[0..MaxUpgrs]);
+
+             _upgr_ss(@upgr ,[upgr_mainr],race,1);
+          end;
+      7 : begin  // Super Nightmare
              _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
              _upgr_ss(@upgr ,[upgr_mainr,upgr_advbld],race,1);
           end;
-      7 : begin  // HELL
+      8 : begin  // HELL
              _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
@@ -76,7 +83,7 @@ begin
        a_upgr :=0;
     end;
 
-    if(g_mode=gm_ct)or(ai_skill>5)then ai_attack:=1;
+    if(g_mode=gm_ct)or(ai_skill>6)then ai_attack:=1;
 
     case race of
     r_hell:
@@ -292,12 +299,9 @@ begin
       1  : _ai_get_max_enrg:=10;
       2  : _ai_get_max_enrg:=25;
       3  : _ai_get_max_enrg:=45;
-      4  : if(race=r_uac)
-           then _ai_get_max_enrg:=72
-           else _ai_get_max_enrg:=65;
-      else if(race=r_uac)
-           then _ai_get_max_enrg:=80
-           else _ai_get_max_enrg:=65;
+      4  : _ai_get_max_enrg:=72;
+      5  : _ai_get_max_enrg:=85;
+      else _ai_get_max_enrg:=100;
       end;
       if(g_mode in [gm_3fort,gm_2fort,gm_inv])then inc(_ai_get_max_enrg,10);
       if(rrr)then inc(_ai_get_max_enrg,4);
@@ -608,9 +612,10 @@ begin
    begin
       if(ai_skill>2)then
       begin
-         if(g_mode<>gm_inv)then _unit_supgrade(u,upgr_mainm);
+         if(g_mode<>gm_inv     )then _unit_supgrade(u,upgr_mainm);
          if(upgr[upgr_vision]=0)then _unit_supgrade(u,upgr_vision);
-         if(upgr[upgr_mainr ]=0)or(u_e[true,0]<3)then _unit_supgrade(u,upgr_mainr);
+         if(upgr[upgr_mainr ]=0)
+         or(u_e[true,0]<3      )then _unit_supgrade(u,upgr_mainr);
          if(u=ubx[3])then
           case race of
           r_hell: if(g_addon)then _unit_supgrade(u,upgr_2tier);
@@ -760,11 +765,10 @@ begin
       2   : blds[0]:=3;
       3   : blds[0]:=8;
       4   : blds[0]:=11;
-      else  if(menerg>100)and(race=r_hell)
-            then blds[0]:=11
-            else blds[0]:=16;
+      5   : blds[0]:=13;
+      else  blds[0]:=16;
       end;
-      blds[1 ]:=min2(max2(2,(menerg div 6)+u_e[true,0]-u_e[true,3]),maxb);
+      blds[1 ]:=min2(max2(2,(menerg div 7)+u_e[true,0]-u_e[true,3]),maxb);
       blds[3 ]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
       blds[4 ]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
       blds[7 ]:=blds[4];
@@ -812,8 +816,9 @@ begin
                            _unit_b247teleport(u);
                         end
                         else
-                         if(alrm_x>0)and(sr<alrm_r)and(alrm_r<base_rr)and(rld<=0)then
+                         if(alrm_x>0)and(alrm_r<32000)and(rld<=0)then    //and(sr<alrm_r)and
                          begin
+                            if(ai_skill<5)and(alrm_r>base_rr)then exit;
                             uo_x:=x+random(sr)*sign(alrm_x-x);
                             uo_y:=y+random(sr)*sign(alrm_y-y);
                             _unit_b247teleport(u);
@@ -999,6 +1004,11 @@ begin
        else
          if(ucl>2)and(max>1)then order:=0;
 
+      if(ai_skill>3)and(army>60)then
+      begin
+         if(uid=UID_Demon)and(buff[ub_advanced]>0)then order:=2;
+      end;
+
       if(u_c[true]=0)or(buff[ub_invuln]>0)then order:=2;
 
       case g_mode of
@@ -1117,7 +1127,7 @@ begin
                          else
                            if(alrm_r<180)and(ai_uc_a<2)then _unit_action(u);
                       end;
-            UID_Pain :if(ai_skill>3)then
+            UID_Pain :if(ai_skill>4)then
                       begin
                          if(alrm_r<32000)then _unit_action(u);
                          ai_outalrm(u,base_rr,false);

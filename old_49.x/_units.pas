@@ -758,8 +758,9 @@ begin
                 else
                  if(upgr[upgr_turarm]>0)then inc(arm,upgr[upgr_turarm]);
 
-               if(dam<build_arm_f)
+               if(dam>=build_arm_f)
                then inc(arm,(dam div build_arm_f)*arm);
+
                inc(arm,5);
             end;
          end
@@ -768,18 +769,20 @@ begin
            begin
               if(race=r_uac)then
               begin
-                 if(dam<unit_arm_f)
-                 then inc(arm,upgr[upgr_mecharm])
-                 else inc(arm,(dam div unit_arm_f)*upgr[upgr_mecharm]);
+                 arm:=upgr[upgr_mecharm];
+
+                 if(dam>=unit_arm_f)
+                 then inc(arm,(dam div unit_arm_f)*arm);
 
                  inc(arm,3);
               end;
            end
            else
            begin
-              if(dam<unit_arm_f)
-              then inc(arm,upgr[upgr_armor])
-              else inc(arm,(dam div unit_arm_f)*upgr[upgr_armor]);
+              arm:=upgr[upgr_armor];
+
+              if(dam>=unit_arm_f)
+              then inc(arm,(dam div unit_arm_f)*arm);
 
               case uid of
               UID_Demon,
@@ -800,7 +803,7 @@ begin
          if(buff[ub_advanced]>0)then
          begin
             case uid of
-              UID_Baron : inc(arm,dam div 2); //dam:=;
+              UID_Baron : inc(arm,dam div 2);
             else
             end;
          end;
@@ -919,7 +922,7 @@ begin
    with _units[u] do
     with _players[player] do
      if(bld)then
-      if(upgr[upgr_b478tel]>0)and(buff[ub_clcast]=0)then
+      if(upgr[upgr_b478tel]>0)and(buff[ub_clcast]<=0)then
        if(dist2(x,y,uo_x,uo_y)<sr)and(_unit_grbcol(uo_x,uo_y,r,255,true)=0)then
        begin
           dec(upgr[upgr_b478tel],1);
@@ -1773,17 +1776,30 @@ begin
    with uu^ do
    begin
       with _players[player]do
-       if(state=ps_comp)and(ai_skill>3)and(melee=false)then
-       begin
-          if(tu^.uid in [UID_Pain,UID_BFG,UID_ZBFG])then
-          begin
-             _TarPrioPR:=10;
-             exit;
-          end;
-       end;
+      begin
+         if(state=ps_comp)and(ai_skill>3)and(melee=false)then
+         begin
+            if(tu^.uid in [UID_Pain,UID_BFG,UID_ZBFG])then
+            begin
+               _TarPrioPR:=10;
+               exit;
+            end;
+            if(ai_skill>4)then
+             if(tu^.uid in [UID_HEye,UID_Mine])then
+             begin
+                _TarPrioPR:=10;
+                exit;
+             end;
+         end;
 
-      if(tu^.isbuild=false)then inc(_TarPrioPR,1);
-      if(tu^.buff[ub_invuln]=0)then inc(_TarPrioPR,1);
+         if(tu^.isbuild=false)
+         then inc(_TarPrioPR,1)
+         else
+           if(ai_skill>4)and(tu^.bld=false)then inc(_TarPrioPR,1);
+         if(tu^.buff[ub_invuln]<=0)then inc(_TarPrioPR,1);
+      end;
+
+
 
       case uu^.uid of
       UID_Imp        : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and(tu^.mech=false)then _TarPrioPR:=5;
@@ -1850,7 +1866,7 @@ begin
     if(vision)
     then exit
     else
-     if(ai_skill>4)and(tu^.isbuild)and(tu^.speed=0)and(tu^.buff[ub_invis]=0)then exit;
+     if(ai_skill>5)and(tu^.isbuild)and(tu^.speed=0)and(tu^.buff[ub_invis]=0)then exit;
 
    _player_sight:=false;
 end;
@@ -1926,7 +1942,7 @@ begin
               if(upgr[upgr_paina]>0)and(ud<sr)then
                if(teams=false)then
                begin
-                  if not(tu^.uid in [UID_HEye,UID_Mine])then _unit_damage(t,upgr[upgr_paina] shl 1,upgr[upgr_paina],player);
+                  if not(tu^.uid in [UID_HEye,UID_Mine,UID_Demon])then _unit_damage(t,upgr[upgr_paina] shl 1,upgr[upgr_paina],player);
                end
                else tu^.buff[ub_toxin]:=-vid_fps;
           end;

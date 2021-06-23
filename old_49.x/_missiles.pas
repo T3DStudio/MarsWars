@@ -71,7 +71,7 @@ MID_Imp        : begin dam:=10 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Cacodemon  : begin dam:=30 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Baron      : begin dam:=50 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin dam:=40 ; vst:=sr div 11; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
+MID_Revenant   : begin dam:=40 ; vst:=sr div 15; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=12 ;       end;
 
@@ -126,15 +126,15 @@ MID_Imp,
 MID_BPlasma    : inc(dam,upgr[upgr_attack]*2);
 MID_SSShot,
 MID_YPlasma,
-MID_Revenant,
-MID_RevenantS,
 MID_Flyer,
 MID_HRocket,
 MID_BFG,
-MID_Mancubus,
 MID_Cacodemon,
-MID_Baron,
 MID_Mine       : inc(dam,upgr[upgr_attack]*3);
+MID_Baron,
+MID_Revenant,
+MID_RevenantS,
+MID_Mancubus   : inc(dam,upgr[upgr_attack]*4);
 MID_ArchFire,
 MID_Granade,
 MID_Tank       : inc(dam,upgr[upgr_attack]*5);
@@ -268,8 +268,8 @@ begin
                    else
                    // buildings
                    case mid of
-                   MID_RevenantS,
-                   MID_Revenant,
+                   //MID_RevenantS,
+                   //MID_Revenant,
                    MID_Flyer,
                    MID_Archfire    : _d50 (@damd);
                    MID_Bulletx2    : _d25 (@damd);
@@ -278,7 +278,7 @@ begin
                    MID_Mancubus,
                    MID_Granade,
                    MID_Tank        : _d150(@damd);
-                   MID_YPlasma,
+                   MID_YPlasma     : _d50 (@damd);
                    MID_BPlasma     : _d75 (@damd);
                    end;
                  end;

@@ -647,7 +647,7 @@ begin
 
       if(uid=UID_UCommandCenter)then
       begin
-         mhits  := 3000;
+         mhits  := 2500;
          uf     := uf_ground;
          sr     := base_rA[0];
          ar     := 250;
@@ -961,7 +961,7 @@ begin
    _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255,255);
    _setUPGR(r_hell,upgr_mainr     ,120,2 ,2 ,255,255);
    _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_misfst    ,120,1 ,2 ,255,255);
+   _setUPGR(r_hell,upgr_misfst    ,60 ,1 ,2 ,255,255);
    _setUPGR(r_hell,upgr_6bld      ,20 ,15,12,255,UID_HMonastery);
    _setUPGR(r_hell,upgr_2tier     ,120,1 ,12,255,UID_HMonastery);
    _setUPGR(r_hell,upgr_revtele   ,120,1 ,3 ,upgr_2tier,UID_HMonastery);

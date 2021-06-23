@@ -118,7 +118,7 @@ begin
            end;
    '-p'  : if(a<4)
            then with _players[pl] do NewAI(race,team,4)
-           else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),7));
+           else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),8));
    '-ffa': cmp_ffa;
    '-noai',
    '-k'  : RemoveAI;

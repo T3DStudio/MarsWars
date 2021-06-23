@@ -180,7 +180,7 @@ begin
     if(state=PS_Comp)then
      begin
         inc(ai_skill,1);
-        if(ai_skill>7)then ai_skill:=1;
+        if(ai_skill>8)then ai_skill:=1;
         name:=ai_name(ai_skill);
      end;
 end;

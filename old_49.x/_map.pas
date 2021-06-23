@@ -282,7 +282,7 @@ begin
 gm_2fort :
       begin
          ix:=map_mw div 2;
-         iy:=base_rr+(map_mw div 25);
+         iy:=base_rr+(map_mw div 20);
          u :=ix-(map_mw div 7);
          i :=map_seed mod 360;
 
