@@ -38,7 +38,7 @@ begin
    with _uids[u] do
    begin
       un_smodel[false]:= mwsm;
-      if(mwsm=nil)
+      if(mwsma=nil)
       then un_smodel[true ]:= mwsm
       else un_smodel[true ]:= mwsma;
    end;
@@ -247,19 +247,24 @@ begin
    _animd:=12;
    setMWSM(@spr_archvile,nil);
    setSND (false,snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
-   setEID (false,0  ,0                   ,0  ,0             );
+   setEID (false,0  ,0                   ,0  ,0                 );
    setEIDS(false,nil,snd_archvile_death  ,nil,snd_archvile_pain );
 end;
+
 UID_ZFormer:
 begin
    _animw:=14;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSM(@spr_ZFormer,nil);
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
 end;
 UID_ZEngineer:
 begin
    _animw:=14;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSM(@spr_ZEngineer,nil);
    setEID (false,0  ,EID_Exp,EID_Exp,0  );
    setEIDS(false,nil,snd_exp,snd_exp,nil);
@@ -268,18 +273,27 @@ UID_ZSergant:
 begin
    _animw:=18;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSM(@spr_ZSergant,@spr_ZSSergant);
 end;
 UID_ZCommando:
 begin
    _animw:=15;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSM(@spr_ZCommando,nil);
 end;
 UID_ZBomber:
 begin
    _animw:=14;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSM(@spr_ZBomber,nil);
 end;
 UID_ZMajor:
@@ -287,7 +301,10 @@ begin
    _animw:=14;
    _animd:=8;
    setMWSM(@spr_ZMajor,@spr_ZFMajor);
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
 
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEIDS(true ,nil,snd_exp,snd_exp,nil);
 end;
@@ -295,6 +312,9 @@ UID_ZBFG:
 begin
    _animw:=14;
    _animd:=8;
+   setSND (false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
+   setEID (false,0  ,0              ,EID_Gavno,0             );
+   setEIDS(false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSM(@spr_ZBFG,nil);
 end;
 
@@ -631,11 +651,12 @@ end;
       case u of
 
 upgr_hell_teleport: begin _up_btn:=spr_b_up[r_hell,8 ]; end;
+upgr_hell_6bld    : begin _up_btn:=spr_b_up[r_hell,14]; end;
 upgr_hell_b478tel : begin _up_btn:=spr_b_up[r_hell,21]; end;
 
 upgr_uac_radar_r  : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
-upgr_uac_6bld2    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
+upgr_uac_6bld     : begin _up_btn:=spr_b_up[r_uac ,14]; end;
 
       end;
 
@@ -686,10 +707,23 @@ function _canattack(pu:PTUnit):boolean;
 var tu:PTUnit;
 begin
    _canattack:=false;
-   with pu^ do
-   if(bld)and(hits>0)then
+   with pu^  do
    with uid^ do
-   case _attack of
+   begin
+      if(bld=false)or(hits<=0)then exit;
+
+      if(_isbuilding=false)then
+      begin
+         if(_ismech=false)then
+         begin
+            if(buff[ub_pain]>0)then exit;
+
+         end;
+         if(buff[ub_gear]>0)then exit;
+      end;
+
+      with uid^ do
+      case _attack of
    atm_bunker,
    atm_always  : if(_IsUnitRange(inapc,@tu))then
                  begin
@@ -702,7 +736,8 @@ begin
                  end;
    atm_sturret : if(apcc <=0)then exit;
    atm_inapc   : if(inapc<=0)then exit;
-   else exit; //atm_none
+      else exit; //atm_none
+      end;
    end;
    _canattack:=true;
 end;
@@ -988,7 +1023,8 @@ begin
    _attack    := atm_always;
    _fastdeath[false]:=true;
    _fastdeath[true ]:=true;
-   _weapon(0,wpt_directdmg,-8,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_any,[0..255],[]);
+   _weapon(0,wpt_directdmg,-8,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_adv+wpr_zombie,[0..255],[]);
+   _weapon(1,wpt_directdmg,-8,10,fr_fps,0,0,0,wtrset_enemy_alive,wpr_any           ,[0..255],[]);
 end;
 UID_Imp        :
 begin
@@ -1222,6 +1258,7 @@ begin
    _painc     := 4;
    _btime     := 20;
    _attack    := atm_always;
+   //_ability   := uab_jetpack;
 end;
 UID_ZBFG:
 begin
@@ -1349,6 +1386,7 @@ begin
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_UWeaponFactory;
+   _ability   := uab_uac__unit_adv;
 
    _isbuilding:=true;
 end;
@@ -1495,6 +1533,7 @@ begin
    _btime     := 20;
    _attack    := atm_always;
    _zombie_uid:= UID_ZMajor;
+   //_ability   := uab_jetpack;
 end;
 UID_BFG:
 begin
@@ -1684,14 +1723,15 @@ procedure ObjTbl;
 begin
    FillChar(_upids,SizeOf(_upids),0);
 
-   //         race  id               time lvl enr rupgr     ruid
+   //         race  id               time lvl enr  rupgr        ruid
 
-   _setUPGR(r_hell,upgr_hell_teleport,120,2   ,2  ,0         ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0         ,UID_HAltar         ,true ,true );
+   _setUPGR(r_hell,upgr_hell_teleport,120,2   ,2  ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_6bld    ,20 ,15  ,12 ,0            ,UID_HMonastery     ,true ,true );
+   _setUPGR(r_hell,upgr_hell_b478tel ,30 ,15  ,2  ,0            ,UID_HAltar         ,true ,true );
 
-   _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0         ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0         ,UID_UTechCenter    ,true ,true );
-   _setUPGR(r_uac ,upgr_uac_6bld2    ,120, 1  ,4  ,0         ,UID_UTechCenter    ,false,true );
+   _setUPGR(r_uac ,upgr_uac_radar_r  ,120, 3  ,4  ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_rstrike  ,120, 6  ,10 ,0            ,UID_UTechCenter    ,true ,true );
+   _setUPGR(r_uac ,upgr_uac_6bld     ,120, 2  ,12 ,0            ,UID_UTechCenter    ,false,false);
 
 
 

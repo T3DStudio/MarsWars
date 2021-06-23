@@ -49,11 +49,13 @@ begin
    with pu^ do
    with uid^ do
    begin
+      if(playeri=HPlayer)then
+       PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil);
+
       if(vischeck)then
        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
 
       _effect_add(vx,vy,vy+1,un_eid_ready[buff[ub_advanced]>0]);
-      PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil);
    end;
 end;
 
@@ -104,7 +106,7 @@ end;
 
 {$ENDIF}
 
-procedure _unit_correctcoords(pu:PTUnit);
+procedure _unit_correctXY(pu:PTUnit);
 begin;
    with pu^ do
    begin
@@ -113,11 +115,12 @@ begin;
    end;
 end;
 
-procedure _unt_clear_order(pu:PTUnit);
+procedure _unit_clear_order(pu:PTUnit;clearid:boolean);
 begin
    with pu^ do
    begin
-      uo_id :=ua_amove;
+      if(clearid)
+      then uo_id :=ua_amove;
       uo_tar:=0;
       uo_x  :=x;
       uo_y  :=y;
@@ -148,8 +151,8 @@ begin
       y     :=ty;
       vx    :=x;
       vy    :=y;
-      _unit_correctcoords(pu);
-      _unt_clear_order(pu);
+      _unit_correctXY(pu);
+      _unit_clear_order(pu,false);
       {$IFDEF _FULLGAME}
       _unit_mmcoords(pu);
       _unit_sfog(pu);
@@ -167,7 +170,7 @@ begin
       dec(zfall,st);
       inc(y    ,st);
       inc(vy   ,st);
-      _unit_correctcoords(pu);
+      _unit_correctXY(pu);
    end;
 end;
 
@@ -205,7 +208,7 @@ begin
    with pu^ do
    if(bld)and(rld<=0)then
    begin
-      _unt_clear_order(pu);
+      _unit_clear_order(pu,true);
       uo_x:=x0;
       uo_y:=y0;
       rld :=radar_reload;
@@ -618,10 +621,10 @@ end;
 procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld:boolean);
 var m,i:integer;
 begin
+   _LastCreatedUnit :=0;
+   _LastCreatedUnitP:=@_units[_LastCreatedUnit];
    with _players[pl] do
    begin
-      _LastCreatedUnit :=0;
-      _LastCreatedUnitP:=@_units[_LastCreatedUnit];
       if(ui=0)then exit;
       i:=MaxPlayerUnits*pl+1;
       m:=i+MaxPlayerUnits;
@@ -994,6 +997,9 @@ begin
        begin
           inc(upgr[_uid],1);
           _unit_cupgrade_p(pu,255,i);
+          {$IFDEF _FULLGAME}
+          if(playeri=HPlayer)then PlayInGameAnoncer(snd_upgrade_complete[_urace]);
+          {$ENDIF}
        end
        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
   end;
@@ -1287,7 +1293,6 @@ begin
       end;
 
       if(a_rld>0)then dec(a_rld,1);
-      if(  rld>0)then dec(  rld,1);
    end;
 end;
 
@@ -1334,14 +1339,39 @@ uab_radar: begin
                  {$ENDIF}
               end;
            end;
-uab_uac_unit_adv:
+uab_uac__unit_adv:
            if(upgr[upgr_uac_6bld]>0)then buff[ub_advanced]:=_ub_infinity;
-
       end;
 
-      {case uid of
-      UID_URadar
-      end;  }
+      case uidi of
+UID_Major,
+UID_ZMajor:
+           if(buff[ub_advanced]>0)then
+           begin
+              if(uf<>uf_fly)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 PlaySND(snd_jetpon ,pu);
+                 {$ENDIF}
+                 zfall:=-fly_height[uf_fly];
+              end;
+              uf   :=uf_fly;
+              speed:=_speed+4;
+           end
+           else
+           begin
+              if(uf<>uf_ground)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 PlaySND(snd_jetpoff,pu);
+                 {$ENDIF}
+                 zfall:= fly_height[uf_ground];
+              end;
+              uf   :=uf_ground;
+              speed:=_speed;
+           end;
+      end;
+
    end;
 end;
 

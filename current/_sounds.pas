@@ -158,10 +158,16 @@ begin
    end;
 end;
 
-function PlaySoundSet(ss:PTSoundSet):PTMWSound;
+function PlaySoundSet(ss:PTSoundSet;channel:pinteger):PTMWSound;
+var i:integer;
 begin
    PlaySoundSet:=SoundSet2Chunk(ss);
-   PlaySound(PlaySoundSet);
+
+   if(channel<>nil)then
+    if(channel^>-1)then MIX_HALTCHANNEL(channel^);
+
+   i:=PlaySound(PlaySoundSet);
+   if(channel<>nil)then channel^:=i;
 end;
 
 function PlaySND(ss:PTSoundSet;pu:PTUnit):boolean;
@@ -176,7 +182,7 @@ begin
     with pu^ do
      if(_nhp3(x,y,player)=false)then exit;
 
-   PlaySoundSet(ss);
+   PlaySoundSet(ss,nil);
    PlaySND:=true;
 end;
 
@@ -185,21 +191,20 @@ begin
    if(ss=nil)
    or(_draw=false)then exit;
 
-   PlaySoundSet(ss);
+   PlaySoundSet(ss,nil);
 end;
 
 procedure PlayInGameAnoncer(ss:PTSoundSet);
-const min_snd_pause = fr_fps;
+const min_snd_pause = fr_hhfps;
 var s:PTMWSound;
 begin
    if(ss=nil)
    or(_menu)
    or(_draw=false)then exit;
 
-   if(snd_anoncer_pause<min_snd_pause)then
-   if(snd_anoncer_pause<=0)or(snd_anoncer_last<>ss)then
+   if(snd_anoncer_pause<=min_snd_pause)or(snd_anoncer_last<>ss)then
    begin
-      s:=PlaySoundSet(ss);
+      s:=PlaySoundSet(ss,@snd_anoncer_channel);
       if(s<>nil)then
       begin
          snd_anoncer_last :=ss;
@@ -216,14 +221,13 @@ begin
    or(_menu)
    or(_draw=false)then exit;
 
-   //if(snd_unit_cmd_pause<min_snd_pause)then
-   if(snd_unit_cmd_pause<=min_snd_pause)or(snd_unit_cmd_last<>ss)then
+   if(snd_unitcmd_pause<=min_snd_pause)or(snd_unitcmd_last<>ss)then
    begin
-      s:=PlaySoundSet(ss);
+      s:=PlaySoundSet(ss,@snd_unitcmd_channel);
       if(s<>nil)then
       begin
-         snd_unit_cmd_last :=ss;
-         snd_unit_cmd_pause:=max2(min_snd_pause,s^.ticks_length);
+         snd_unitcmd_last :=ss;
+         snd_unitcmd_pause:=max2(min_snd_pause,s^.ticks_length);
       end;
    end;
 end;
@@ -354,6 +358,9 @@ begin
 
    snd_radar                :=LoadSoundSet(race_dir[r_uac]+'radar');
 
+   snd_jetpoff              :=LoadSoundSet(race_dir[r_uac]+'jetpoff');
+   snd_jetpon               :=LoadSoundSet(race_dir[r_uac]+'jetpon' );
+
    snd_uac_cc               :=LoadSoundSet(race_buildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=LoadSoundSet(race_buildings[r_uac ]+'barraks'        );
    snd_uac_generator        :=LoadSoundSet(race_buildings[r_uac ]+'generator'      );
@@ -451,6 +458,8 @@ begin
    // HELL
    //
 
+   snd_hell_uadv            :=LoadSoundSet(race_dir[r_hell]+'unit_advance'  );
+
    snd_hell_hk              :=LoadSoundSet(race_buildings[r_hell]+'hell_keep'     );
    snd_hell_hgate           :=LoadSoundSet(race_buildings[r_hell]+'hell_gate'     );
    snd_hell_hsymbol         :=LoadSoundSet(race_buildings[r_hell]+'hell_symbol'   );
@@ -462,7 +471,6 @@ begin
    snd_hell_hfort           :=LoadSoundSet(race_buildings[r_hell]+'hell_temple'   );
    snd_hell_haltar          :=LoadSoundSet(race_buildings[r_hell]+'hell_altar'    );
    snd_hell_hbuild          :=LoadSoundSet(race_buildings[r_hell]+'hell_building' );
-
 
    snd_hell_pain            :=LoadSoundSet(race_units[r_hell]+'d_p');
    snd_hell_melee           :=LoadSoundSet(race_units[r_hell]+'d_m');

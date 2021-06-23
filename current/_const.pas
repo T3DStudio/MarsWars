@@ -44,7 +44,7 @@ r_hell                 = 1;
 r_uac                  = 2;
 
 MaxPlayers             = 6;
-MaxPlayerUnits         = 110;
+MaxPlayerUnits         = 115;
 MaxCPoints             = 6;
 
 MaxSMapW               = 7000;
@@ -284,17 +284,18 @@ aif_stayathome         : cardinal = 1 shl 28; //   }
 //
 
 uab_teleport           = 1;
-uab_uac_unit_adv       = 2;
+uab_uac__unit_adv      = 2;
 uab_hell_unit_adv      = 3;
 uab_building_adv       = 4;
 uab_radar              = 5;
 uab_htowertele         = 6;
 uab_uac_rstrike        = 7;
+//uab_jetpack            = 8;
 uab_spawnlost          = 100;
 
 client_rld_abils = [
                    uab_teleport     ,
-                   uab_uac_unit_adv ,
+                   uab_uac__unit_adv,
                    uab_hell_unit_adv,
                    uab_building_adv
                    ];
@@ -404,7 +405,7 @@ upgr_uac_6bld          = 45; // adv
 upgr_uac_rstrike       = 47; // rstrike launch
 upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
-upgr_uac_6bld2         = 50; // 6bld upgr
+//upgr_uac_6bld2         = 50; // 6bld upgr
 upgr_uac_mainonr       = 51; // main on doodabs
 upgr_uac_turarm        = 52; // turrets armor
 upgr_uac_rturrets      = 53; // rocket turrets
@@ -601,13 +602,19 @@ melee_r                = 8;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
+uac_adv_base_reload    : array[false..true] of integer = (fr_fps*2,fr_fps*6);
+gear_time              : array[false..true] of integer = (fr_fps  ,fr_fps*2);
+
+
+
+
+
 rocket_sr              = 45;
 map_ffly_fapc          : array[false..true] of byte = (3,6);
 map_gapc               : array[false..true] of byte = (8,5);
 towers_sr              : array[0..5] of integer = (250,265,280,295,310,325);
 blizz_r                = 150;
-uac_adv_rel            : array[false..true,false..true] of integer = ((fr_fps*3,fr_fps),(fr_fps*12,fr_fps*6));
-gear_time              : array[false..true] of integer = (fr_fps,fr_fps*2);
+
 g_ct_pr                = 150;
 g_ct_ct                : array[1..r_cnt] of integer = (fr_fps*10,fr_fps*5);
 bld_dec_mr             = 6;
@@ -889,7 +896,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 243637;
+svld_size              = 250497;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

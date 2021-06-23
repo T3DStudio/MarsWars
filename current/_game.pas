@@ -841,8 +841,8 @@ begin
    vid_rtui:=vid_rtui mod vid_rtuis;
 
    if(vid_rtui=0)then _MusicCheck;
-   if(snd_anoncer_pause >0)then dec(snd_anoncer_pause ,1);
-   if(snd_unit_cmd_pause>0)then dec(snd_unit_cmd_pause,1);
+   if(snd_anoncer_pause>0)then dec(snd_anoncer_pause,1);
+   if(snd_unitcmd_pause>0)then dec(snd_unitcmd_pause,1);
 
    if(net_nstat=ns_clnt)then net_GClient;
    _rpls_code;

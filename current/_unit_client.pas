@@ -116,7 +116,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      //SetBBit(@_bts1,5, (uidi in whocanattack)and(tar1>0)); attack
+      SetBBit(@_bts1,5, a_tar>0             );
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
@@ -178,7 +178,7 @@ begin
 
          if(sh>0)then
          begin
-            //if(uidi in whocanattack)and(a_tar1>0)then _wudata_int(tar1,rpl);
+            if(a_tar>0)then _wudata_int(a_tar,rpl);
 
             if(warld)then
             begin
@@ -761,7 +761,7 @@ begin
       buff[ub_advanced ]:=_buffst[GetBBit(@_bts1,2)];
       buff[ub_pain     ]:=_buffst[GetBBit(@_bts1,3)];
       buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,4)];
-     // if(GetBBit(@_bts1,5))then tar1:=-1 else tar1:=0;
+      if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       sel:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
       then _bts2:=_rudata_byte(rpl,0)
@@ -852,7 +852,7 @@ begin
 
          if(sh>0)then
          begin
-           // if(tar1=-1)then tar1:=max2(0,min2(MaxUnits,_rudata_int(rpl,0)));
+            if(a_tar=-1)then a_tar:=mm3(0,_rudata_int(rpl,0),MaxUnits);
 
             if(rld=-1)then
             begin

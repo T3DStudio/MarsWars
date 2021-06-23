@@ -192,7 +192,7 @@ begin
 
       if(bld)then
       begin
-         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]=0)then ui_uid_reload[uidi]:=rld;
+         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<=fr_fps)then ui_uid_reload[uidi]:=rld;
 
          if(sel)then
          begin

@@ -274,13 +274,9 @@ begin
 
             req:=_uid_cndt(@_players[HPlayer],uid);
 
-            if(_uids[uid]._ability in client_rld_abils)
-            then rld:=ui_uid_reload[uid]
-            else rld:=0;
-
             _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
             _drawBtnt(tar,ux,uy,
-            b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(rld),
+            b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(ui_uid_reload[uid]),
             c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,r2s(build_cd));
          end;
       end;

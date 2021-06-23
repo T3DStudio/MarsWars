@@ -581,7 +581,7 @@ begin
    _LoadMWSModel(@spr_SSergant       ,race_units[r_uac ]+'u_u2s_'     ,smt_marine0  ,firstload);
    _LoadMWSModel(@spr_Commando       ,race_units[r_uac ]+'u_u3_'      ,smt_commando ,firstload);
    _LoadMWSModel(@spr_Bomber         ,race_units[r_uac ]+'u_u4_'      ,smt_marine0  ,firstload);
-   _LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j'      ,smt_fmajor   ,firstload);
+   _LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   ,firstload);
    _LoadMWSModel(@spr_Major          ,race_units[r_uac ]+'u_u5_'      ,smt_marine0  ,firstload);
    _LoadMWSModel(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_marine0  ,firstload);
    _LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_fapc     ,firstload);

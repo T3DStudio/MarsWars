@@ -695,8 +695,10 @@ snd_music_list_size: integer = 0;
 snd_current_music  : integer = 0;
 snd_anoncer_pause  : integer = 0;
 snd_anoncer_last   : PTSoundSet;
-snd_unit_cmd_pause : integer = 0;
-snd_unit_cmd_last  : PTSoundSet;
+snd_anoncer_channel: integer = -1;
+snd_unitcmd_channel: integer = -1;
+snd_unitcmd_pause  : integer = 0;
+snd_unitcmd_last   : PTSoundSet;
 
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
@@ -815,6 +817,8 @@ snd_hell_hfort,
 snd_hell_haltar,
 snd_hell_hbuild,
 
+snd_hell_uadv,
+
 snd_zimba_death,
 snd_zimba_ready,
 snd_zimba_pain,
@@ -878,8 +882,7 @@ snd_arachno_move,
 snd_arachno_foot,
 snd_arachno_ready,
 
-{snd_jetpoff,
-snd_jetpon,
+{
 snd_oof,
 snd_alarm,
 snd_uupgr,
@@ -936,6 +939,8 @@ snd_cacoc,
 snd_cacod,
 snd_dpain,
 snd_demon1, }
+snd_jetpoff,
+snd_jetpon,
 snd_click,
 snd_chat,
 snd_rico,

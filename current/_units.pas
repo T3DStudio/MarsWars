@@ -129,8 +129,6 @@ begin
       with uid^ do
       begin
          if(_isbuilding)then build_cd:=min2(build_cd+fr_3fps,max_build_reload);
-         {if(_zfall>0)and(uf>uf_ground)then zfall:=_zfall;
-         if(_zfall<0)and(uf=uf_ground)then zfall:=_zfall;}
          zfall:=_zfall;
       end;
 
@@ -437,8 +435,6 @@ UID_Engineer :  if(army<MaxPlayerUnits)and(upgr[upgr_mines]>0)and(menerg>0)and(i
                    _unit_add(vx,vy,UID_UMine,playeri,true);
                    buff[ub_cast]:=vid_hfps;
                 end;
-UID_APC,
-UID_FAPC     :  if(apcc>0)then uo_id:=ua_unload;
 
 UID_Pain     :  if(_canmove(pu))and(rld_t=0)then
                 begin
@@ -515,7 +511,7 @@ begin
 
          vstp:=UnitStepNum;
 
-         _unit_correctcoords(pu);
+         _unit_correctXY(pu);
          {$IFDEF _FULLGAME}
          _unit_mmcoords(pu);
          _unit_sfog(pu);
@@ -562,7 +558,7 @@ begin
 
          vstp:=UnitStepNum;
 
-         _unit_correctcoords(pu);
+         _unit_correctXY(pu);
          {$IFDEF _FULLGAME}
          _unit_mmcoords(pu);
          _unit_sfog(pu);
@@ -632,8 +628,6 @@ begin
       mmy    := tu^.mmy;
       fx     := tu^.fx;
       fy     := tu^.fy;
-
-
       {$ENDIF}
    end
    else
@@ -678,7 +672,7 @@ begin
              y:=y-trunc(ss*sin(ddir));
           end;
           _unit_npush_dcell(pu);
-          _unit_correctcoords(pu);
+          _unit_correctXY(pu);
           {$IFDEF _FULLGAME}
           _unit_mmcoords(pu);
           _unit_sfog(pu);
@@ -874,9 +868,13 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
 
       if(cf(@aw_reqf,@wpr_zombie))then
-       if(tu^.bld=false)
-       or(tu^.uid^._zombie_uid=0)
-       or(hits>tu^.uid^._zombie_hits)then exit;
+      begin
+         if(tu^.bld=false)
+         or(tu^.uid^._zombie_uid =0)
+         or(tu^.uid^._zombie_hits<hits)
+         or(tu^.hits<=fdead_hits)then exit;
+         if(tu^.hits<=0)and(tu^.uid^._isbuilding)then exit;
+      end;
 
       // requirements to target
 
@@ -963,7 +961,7 @@ begin
       then exit
       else
         if(tw<t_weap^)
-        then
+        then // high weapon priority
         else
           if(ud>a_tard^)then exit;
 
@@ -1034,8 +1032,8 @@ begin
                      begin
                         dec(apcc,tu^.uid^._apcs);
                         tu^.inapc:=0;
-                        tu^.x    :=x-_random(_r);
-                        tu^.y    :=y-_random(_r);
+                        tu^.x    :=x-_randomr(_r);
+                        tu^.y    :=y-_randomr(_r);
                         tu^.uo_x :=tu^.x;
                         tu^.uo_y :=tu^.y;
                      end;
@@ -1390,15 +1388,65 @@ end; }
 
 procedure _unit_uac_unit_adv(pu,tu:PTUnit);
 begin
-   with pu^ do
+   with pu^  do
    with uid^ do
    begin
-      buff[ub_gear    ]:=gear_time[_ismech];
       buff[ub_advanced]:=_ub_infinity;
-      tu^.rld:=uac_adv_rel[_ismech,(g_addon=false)or(tu^.player^.upgr[upgr_uac_6bld2]>0)];
+      buff[ub_gear    ]:=gear_time[_ismech];
+
+      if(tu^.player^.upgr[upgr_uac_6bld]>0)
+      then tu^.rld:=uac_adv_base_reload[_ismech] div tu^.player^.upgr[upgr_uac_6bld]
+      else tu^.rld:=uac_adv_base_reload[_ismech];
+
       {$IFDEF _FULLGAME}
       PlaySND(snd_uac_reload,pu);
       {$ENDIF}
+   end;
+end;
+
+function _ability_uac__unit_adv(pu,tu:PTUnit;tdm:integer):boolean;
+begin
+   _ability_uac__unit_adv:=false;
+   with pu^  do
+   with uid^ do
+   if(tdm<=speed)and(tu^.rld<=0)and(_isbuilding=false)then
+   begin
+      if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then _unit_uac_unit_adv(pu,tu);
+      uo_x  :=tu^.uo_x;
+      uo_y  :=tu^.uo_y;
+      uo_tar:=tu^.uo_tar;
+      _ability_uac__unit_adv:=true;
+   end;
+end;
+
+procedure _unit_hell_unit_adv(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      buff[ub_advanced]:=_ub_infinity;
+      {$IFDEF _FULLGAME}
+      _unit_PowerUpEff(pu,snd_hell_uadv);
+      {$ENDIF}
+   end;
+end;
+
+function _ability_hell_unit_adv(pu,tu:PTUnit):boolean;
+begin
+   _ability_hell_unit_adv:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(_isbuilding=false)then
+       with tu^.player^ do
+        if(tu^.bld)then
+         if(buff[ub_advanced]<=0)and(upgr[upgr_hell_6bld]>0)then
+         begin
+            dec(upgr[upgr_hell_6bld],1);
+            _unit_hell_unit_adv(pu);
+         end;
+      _unit_clear_order(tu,false);
+      _unit_clear_order(pu,false);
+      _ability_hell_unit_adv:=true;
    end;
 end;
 
@@ -1433,14 +1481,14 @@ begin
 
             // target units
             case tu^.uid^._ability of
-uab_uac_unit_adv:
-            if(tdm<=speed)and(tu^.rld<=0)and(_isbuilding=false)then
-            begin
-               if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then _unit_uac_unit_adv(pu,tu);
-               uo_x  :=tu^.uo_x;
-               uo_y  :=tu^.uo_y;
-               uo_tar:=tu^.uo_tar;
+uab_uac__unit_adv: if(_ability_uac__unit_adv(pu,tu,tdm))then exit;
+uab_hell_unit_adv: if(_ability_hell_unit_adv(pu,tu    ))then exit;
+
             end;
+
+            case _ability of
+uab_hell_unit_adv: if(_ability_hell_unit_adv(tu,pu    ))then exit;
+
             end;
          end;
 
@@ -1489,6 +1537,47 @@ uab_uac_unit_adv:
               end;
       end;
    end;
+end;
+
+procedure _resurrect(tu:PTUnit);
+begin
+   with tu^ do
+   begin
+      buff[ub_resur]:=fr_2fps;
+      zfall:=-uid^._zfall;
+   end;
+end;
+
+procedure _makezimba(pu,tu:PTUnit);
+var _h:single;
+    _o:byte;
+    _d,
+    _a:integer;
+begin
+   _h:=tu^.hits/tu^.uid^._mhits;
+   _d:=tu^.dir;
+   _o:=pu^.order;
+   _a:=tu^.buff[ub_advanced];
+
+   _unit_kill(pu,true,true);
+
+   _unit_add(tu^.x,tu^.y,tu^.uid^._zombie_uid,pu^.playeri,true);
+   if(_LastCreatedUnit>0)then
+   with _LastCreatedUnitP^ do
+   begin
+      order:=_o;
+      dir  :=_d;
+      buff[ub_advanced]:=_a;
+      hits :=trunc(uid^._mhits*_h);
+      if(hits<=0)then
+      begin
+         _unit_dec_Kcntrs(_LastCreatedUnitP);
+         _resurrect(_LastCreatedUnitP);
+      end
+      else _unit_snd_ready(uidi,buff[ub_advanced]>0);
+   end;
+
+   _unit_kill(tu,true,true);
 end;
 
 procedure _unit_attack(pu:PTUnit);
@@ -1567,12 +1656,11 @@ wpt_unit       : with player^ do
             else
                if(ServerSide)then
                case aw_type of
-wpt_resurect : begin
-               tu^.buff[ub_resur]:=fr_2fps;
-               tu^.zfall:=-tu^.uid^._zfall;
-               end;
+wpt_resurect : _resurrect(tu);
 wpt_heal     : if(tu^.hits>0)then tu^.hits:=min2(tu^.hits+aw_count,tu^.uid^._mhits);
-wpt_directdmg: _unit_damage(tu,aw_count,2,playeri);
+wpt_directdmg: if(cf(@aw_reqf,@wpr_zombie))
+               then _makezimba(pu,tu)
+               else _unit_damage(tu,aw_count,2,playeri);
                end;
             end;
          end;

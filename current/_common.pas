@@ -348,7 +348,7 @@ end;
 function _UnitHaveRPoint(uid:byte):boolean;
 begin
    with _uids[uid] do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac_unit_adv]);
+   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac__unit_adv]);
 end;
 
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
