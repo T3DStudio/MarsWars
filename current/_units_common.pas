@@ -44,30 +44,40 @@ begin
    end;
 end;
 
-procedure _unit_ready_effects(pu:PTUnit;vischeck:boolean);
+procedure _unit_ready_effects(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
    with uid^ do
    begin
       if(playeri=HPlayer)then
-       PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil);
+       if(_isbuilding)
+       then PlayInGameAnoncer(snd_constr_complete[_urace])
+       else PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil);
 
-      if(vischeck)then
-       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+      if(vischeck<>nil)then
+      begin
+         if(vischeck^=false)then exit
+      end
+      else
+         if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
 
       _effect_add(vx,vy,vy+1,un_eid_ready[buff[ub_advanced]>0]);
    end;
 end;
 
-procedure _unit_death_effects(pu:PTUnit;fastdeath,vischeck:boolean);
+procedure _unit_death_effects(pu:PTUnit;fastdeath:boolean;vischeck:pboolean);
 begin
    with pu^ do
    with uid^ do
    begin
       _effect_add(vx,vy+un_eid_bcrater_y,-5,un_eid_bcrater);
 
-      if(vischeck)then
-       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+      if(vischeck<>nil)then
+      begin
+         if(vischeck^=false)then exit
+      end
+      else
+        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
 
       if(fastdeath)then
       begin
@@ -82,13 +92,17 @@ begin
    end;
 end;
 
-procedure _unit_pain_effects(pu:PTUnit;vischeck:boolean);
+procedure _unit_pain_effects(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
    with uid^ do
    begin
-      if(vischeck)then
-       if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+      if(vischeck<>nil)then
+      begin
+         if(vischeck^=false)then exit
+      end
+      else
+        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
 
       _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
       PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil);
@@ -105,6 +119,18 @@ begin
 end;
 
 {$ENDIF}
+
+procedure _unit_asapc(pu,apc:PTUnit);
+begin
+   pu^.x  :=apc^.x;
+   pu^.y  :=apc^.y;
+   {$IFDEF _FULLGAME}
+   pu^.fx :=apc^.fx;
+   pu^.fy :=apc^.fy;
+   pu^.mmx:=apc^.mmx;
+   pu^.mmy:=apc^.mmy;
+   {$ENDIF}
+end;
 
 procedure _unit_correctXY(pu:PTUnit);
 begin;
@@ -187,7 +213,7 @@ begin
     end
     else
     begin
-       if(vstp=0)then vstp:=UnitStepNum;
+       if(vstp<=0)then vstp:=UnitStepNum;
        inc(vx,(x-vx) div vstp);
        inc(vy,(y-vy) div vstp);
        dec(vstp,1);
@@ -575,6 +601,22 @@ begin
    end;
 end;
 
+procedure _unit_bld_dec_cntrs(pu:PTUnit);
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
+      if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
+      dec(ucl_eb[_isbuilding,_ucl],1);
+      dec(uid_eb[uidi            ],1);
+      dec(menerg,_generg);
+      dec(cenerg,_generg);
+      _unit_done_dec_cntrs(pu);
+   end;
+end;
+
 procedure _unit_bld_inc_cntrs(pu:PTUnit);
 begin
    with pu^ do
@@ -939,7 +981,7 @@ begin
             else sound:=1;
 
             {$IFDEF _FULLGAME}
-            _unit_ready_effects(_LastCreatedUnitP,true);
+            _unit_ready_effects(_LastCreatedUnitP,nil);
             {$ENDIF}
          end;
       end;

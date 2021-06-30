@@ -73,26 +73,8 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _udata_ability_progress(pu:PTUnit;_pl:byte):boolean;
-function _res(b:boolean):boolean;
-begin
-   if(_pl=pu^.playeri)
-   then _res:=(pu^.rld>0)
-   else _res:=b;
-end;
-begin
-   _udata_ability_progress:=false;
-   with pu^ do
-   with uid^ do
-   case _ability of
-uab_radar      : _udata_ability_progress:=_res(rld>radar_btime);
-uab_uac_rstrike: _udata_ability_progress:=_res(rld>mstrike_reload_client);
-   end;
-end;
 
-
-
-procedure _wudata_bstat(pu:PTUnit;rpl:boolean;_pl:byte;warld:pboolean);
+procedure _wudata_bstat(pu:PTUnit;rpl:boolean;_pl:byte);
 var _bts1,
     _bts2:byte;
 begin
@@ -108,8 +90,6 @@ begin
       SetBBit(@_bts2,3, buff[ub_born     ]>0);
       SetBBit(@_bts2,4, buff[ub_invuln   ]>0);
       SetBBit(@_bts2,5, buff[ub_teleeff  ]>0);
-      warld^:=_udata_ability_progress(pu,_pl);
-      SetBBit(@_bts2,6, warld^);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -147,7 +127,6 @@ end;
 
 procedure _wudata(pu:PTUnit;rpl:boolean;_pl:byte);
 var sh :shortint;
- warld :boolean;
 begin
    with pu^ do
    with uid^ do
@@ -160,7 +139,7 @@ begin
       if(sh>-127)then
       begin
          _wudata_byte (uidi,rpl);
-         _wudata_bstat(pu,rpl,_pl,@warld);
+         _wudata_bstat(pu,rpl,_pl);
 
          if(inapc>0)
          then _wudata_int(inapc,rpl)
@@ -180,12 +159,13 @@ begin
          begin
             if(a_tar>0)then _wudata_int(a_tar,rpl);
 
-            if(warld)then
-            begin
-               _wrld(@rld,rpl);
-               _wudata_int(uo_x ,rpl);
-               _wudata_int(uo_y ,rpl);
-            end;
+            if(buff[ub_cast]>0)then
+             if(_ability in client_cast_abils)then
+             begin
+                _wrld(@rld,rpl);
+                _wudata_int(uo_x ,rpl);
+                _wudata_int(uo_y ,rpl);
+             end;
 
             if(rpl=false)and(playeri=_pl)then
             begin
@@ -323,7 +303,7 @@ begin
 
       if(inapc>0)then inc(_units[inapc].apcc,_apcs);
 
-      if(hits>0)and(inapc=0)then
+      if(hits>0)and(inapc<=0)then
       begin
          if(sel)then _unit_inc_selc(pu);
          if(bld=false)
@@ -428,15 +408,22 @@ begin
    end;
 end;
 
-procedure _netClUCreateEff(pu,tu:PTUnit;vis:boolean);
+procedure _ucCreateEffect(uu,pu:PTUnit;vis:boolean);
 begin
-   with pu^ do
-    with player^ do
-    begin
-       vx:=x;
-       vy:=y;
+   with uu^     do
+   with uid^    do
+   with player^ do
+   begin
+      vx:=x;
+      vy:=y;
 
-       if(vis=false)then exit;
+      if(bld)
+      then _unit_ready_effects(uu,@vis)
+      else
+        if(playeri=HPlayer)then PlaySND(snd_build_place[_urace],nil);
+
+      if(vis=false)then exit;
+
 
        {if(isbuild)then
        begin
@@ -473,12 +460,12 @@ begin
             if(playeri=HPlayer)then _unit_createsound(uidi);
          end;  }
 
-       if(buff[ub_teleeff]>0)then
-       begin
-          _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-          PlaySND(snd_teleport,nil);
-       end;
-    end;
+      if(buff[ub_teleeff]>0)then
+      begin
+         _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
+         PlaySND(snd_teleport,nil);
+      end;
+   end;
 end;
 
 procedure _netSetUcl(uu:PTUnit);
@@ -493,24 +480,19 @@ begin
      begin
         _unit_default(uu);
 
-        if(_IsUnitRange(inapc,@tu))then
-        begin
-           x:=tu^.x;
-           y:=tu^.y;
-           _unit_sfog(uu);
-           _unit_mmcoords(uu);
-        end;
+        if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
 
         vx:=x;
         vy:=y;
 
+        _unit_upgr(uu);
+
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           _netClUCreateEff(uu,pu,vis);
+           _ucCreateEffect(uu,pu,vis);
         end;
 
-        _unit_upgr(uu);
         _ucInc(uu);
      end
      else
@@ -519,8 +501,7 @@ begin
           vx:=x;
           vy:=y;
           if(pu^.hits>0)and(vis)then
-           if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,false);
-
+           if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,@vis);
 
           if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
@@ -541,8 +522,6 @@ begin
 
                vx:=x;
                vy:=y;
-
-               _netClUCreateEff(uu,pu,vis);
             end;
 
             _unit_upgr(pu);
@@ -553,32 +532,32 @@ begin
 
             if(hits>0)then
             begin
-               if(pu^.buff[ub_born]<=0)and(buff[ub_born]>0)then _netClUCreateEff(uu,pu,vis);
-               if(pu^.sel=false)and(sel)then ui_UnitSelectedNU:=unum;
-               if(pu^.inapc<>inapc)and(_nhp3(x,y,player))then PlaySND(snd_inapc,nil);
+               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
+               or(pu^.uidi<>uidi)
+               or(pu^.hits<=0   )then _netClUCreateEff(uu,pu,vis);
+
+               if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
+               if(pu^.inapc<>inapc)and(vis)then PlaySND(snd_inapc,nil);
             end;
 
             if(pu^.hits<=0)and(hits>0)then
             begin
                _unit_fog_r(uu);
-               vx:=x;
-               vy:=y;
+               //vx:=x;
+               //vy:=y;
             end
             else
               if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
               begin
-                 if(vis)then _unit_death_effects(uu,hits<=fdead_hits,false);
+                 _unit_death_effects(uu,hits<=fdead_hits,@vis);
                  if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  //rld:=0;
               end;
 
-            if(pu^.inapc=0)and(inapc>0)then
-            begin
-               x:=_units[inapc].x;
-               y:=_units[inapc].y;
-               _unit_sfog(uu);
-               _unit_mmcoords(uu);
-            end;
+            if(pu^.inapc=0)then
+             if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
+
+
 
             {if(uidi=UID_URadar)then
              if(bld)and(pu^.rld_t=0)and(rld_t>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
@@ -643,8 +622,8 @@ begin
 
             if(speed>0)then
             begin
-               uo_x:=pu^.x;
-               uo_y:=pu^.y;
+               uo_bx:=pu^.x;
+               uo_by:=pu^.y;
             end;
 
             if(pu^.x<>x)or(pu^.y<>y)then
@@ -677,7 +656,7 @@ begin
                begin
                   vstp:=UnitStepNum;
 
-                  dir :=p_dir(uo_x,uo_y,x,y);
+                  dir :=p_dir(uo_bx,uo_by,x,y);
                end;
             end;
          end;
@@ -775,7 +754,6 @@ begin
          buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,4)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,5)];
-         if(GetBBit(@_bts2,6))then rld:=-1;
       end
       else
       begin
@@ -836,7 +814,7 @@ begin
          if(inapc>0)then
          begin
             inapc:=_rudata_int(rpl,0);
-            if(inapc<1)or(inapc>MaxUnits)then inapc:=0;
+            if(_IsUnitRange(inapc,nil)=false)then inapc:=0;
          end
          else
            if(sh>0)then
@@ -852,14 +830,19 @@ begin
 
          if(sh>0)then
          begin
-            if(a_tar=-1)then a_tar:=mm3(0,_rudata_int(rpl,0),MaxUnits);
-
-            if(rld=-1)then
+            if(a_tar=-1)then
             begin
-               _rrld(@rld,rpl);
-               uo_x:=_rudata_int(rpl,0);
-               uo_y:=_rudata_int(rpl,0);
+               a_tar:=_rudata_int(rpl,0);
+               if(_IsUnitRange(a_tar,nil)=false)then a_tar:=0;
             end;
+
+            if(_ability in client_cast_abils)then
+             if(buff[ub_cast]>0)then
+             begin
+                _rrld(@rld,rpl);
+                uo_x:=_rudata_int(rpl,0);
+                uo_y:=_rudata_int(rpl,0);
+             end;
 
             if(rpl=false)and(playeri=_pl)then
             begin
@@ -974,7 +957,7 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
       begin
          _rpls_pnu:=_PNU;
          if(_rpls_pnu<=0)then _rpls_pnu:=1;
-         UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+2;
+         UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
          if(UnitStepNum=0)then UnitStepNum:=1;
       end;
 

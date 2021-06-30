@@ -290,7 +290,7 @@ begin
    if(h<=ndead_hits)then _hI2S:=-128 else
    if(dead_hits<h)and(h<0)
                     then _hI2S:=mm3(-126,h div _d2shi,-1)
-   else                  _hI2S:=mm3(1,trunc(h*s),_mms);
+   else                  _hI2S:=mm3(1,trunc(h/s),_mms);
 end;
 
 function ai_name(ain:byte):shortstring;

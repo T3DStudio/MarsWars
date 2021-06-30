@@ -299,6 +299,10 @@ client_rld_abils = [
                    uab_hell_unit_adv,
                    uab_building_adv
                    ];
+client_cast_abils= [
+                   uab_radar,
+                   uab_uac_rstrike
+                   ];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -605,7 +609,7 @@ dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 uac_adv_base_reload    : array[false..true] of integer = (fr_fps*2,fr_fps*6);
 gear_time              : array[false..true] of integer = (fr_fps  ,fr_fps*2);
 
-
+building_adv_reload    : array[false..true] of integer = (fr_fps*60,fr_fps*30);
 
 
 

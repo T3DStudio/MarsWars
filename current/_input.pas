@@ -652,7 +652,8 @@ co_apatrol: _command(m_mx,m_my);
             then _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_select ,HPlayer)
             else _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_aselect,HPlayer);
 
-            if(_CheckSimpleClick(m_sxs,m_sys,m_mx,m_my))then ui_SicpleClick;
+            if(G_Paused=0)and(_rpls_rst<rpl_runit)then
+             if(_CheckSimpleClick(m_sxs,m_sys,m_mx,m_my))then ui_SicpleClick;
          end;
 
          m_sxs:=-1;

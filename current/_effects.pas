@@ -129,7 +129,7 @@ begin
 end;
 
 begin
-   if(_menu)or(g_paused>0)or(_draw=false)or(_eids[ee].smodel=nil)then exit;
+   if(_menu)or(g_paused>0)or(_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
 
    for e:=1 to vid_mvs do
    with _effects[e] do

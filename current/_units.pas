@@ -116,7 +116,7 @@ begin
          buff[ub_pain]:=fr_fps; // prevent fast resurrecting
 
          {$IFDEF _FULLGAME}
-         _unit_death_effects(pu,fastdeath,true)
+         _unit_death_effects(pu,fastdeath,nil);
          {$ENDIF}
       end;
 
@@ -295,7 +295,7 @@ gm_inv    : if(playeri=0)then dam:=dam div 2;
                   if(race=r_hell)then
                    if(upgr[upgr_pains]>0)then inc(pains,upgr[upgr_pains]*3); }
                  {$IFDEF _FULLGAME}
-                 _unit_pain_effects(pu,true);
+                 _unit_pain_effects(pu,nil);
                  {$ENDIF}
               end;
            end;
@@ -601,11 +601,9 @@ var mdist,ss:integer;
     tu      :PTUnit;
 begin
    with pu^ do
-   if(inapc>0)then
+   if(_IsUnitRange(inapc,@tu))then
    begin
-      tu     :=@_units[inapc];
-      x      := tu^.x;
-      y      := tu^.y;
+      _unit_asapc(pu,tu);
       if(tu^.uo_id in [ua_move,ua_hold,ua_amove])then
       begin
          uo_id  := tu^.uo_id;
@@ -623,12 +621,6 @@ begin
          a_tar:=tu^.uo_tar;
          uo_id:=ua_move;
       end;  }
-      {$IFDEF _FULLGAME}
-      mmx    := tu^.mmx;
-      mmy    := tu^.mmy;
-      fx     := tu^.fx;
-      fy     := tu^.fy;
-      {$ENDIF}
    end
    else
     if(ServerSide)then
@@ -1404,21 +1396,6 @@ begin
    end;
 end;
 
-function _ability_uac__unit_adv(pu,tu:PTUnit;tdm:integer):boolean;
-begin
-   _ability_uac__unit_adv:=false;
-   with pu^  do
-   with uid^ do
-   if(tdm<=speed)and(tu^.rld<=0)and(_isbuilding=false)then
-   begin
-      if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then _unit_uac_unit_adv(pu,tu);
-      uo_x  :=tu^.uo_x;
-      uo_y  :=tu^.uo_y;
-      uo_tar:=tu^.uo_tar;
-      _ability_uac__unit_adv:=true;
-   end;
-end;
-
 procedure _unit_hell_unit_adv(pu:PTUnit);
 begin
    with pu^ do
@@ -1430,15 +1407,50 @@ begin
    end;
 end;
 
+procedure _unit_building_start_adv(pu:PTUnit);
+begin
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      _unit_bld_dec_cntrs(pu);
+      buff[ub_advanced]:=_ub_infinity;
+      bld := false;
+      hits:= 1;
+      dec(cenerg,_renerg);
+   end;
+end;
+
+function _ability_uac__unit_adv(pu,tu:PTUnit;tdm:integer):boolean;
+begin
+   // pu - target
+   // tu - caster
+   _ability_uac__unit_adv:=false;
+   with pu^  do
+   with uid^ do
+   if(tdm<=speed)and(tu^.rld<=0)and(_isbuilding=false)and(tu^.hits>0)then
+   begin
+      if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then _unit_uac_unit_adv(pu,tu);
+      uo_x  :=tu^.uo_x;
+      uo_y  :=tu^.uo_y;
+      uo_tar:=tu^.uo_tar;
+      _ability_uac__unit_adv:=true;
+   end;
+end;
+
+
+
 function _ability_hell_unit_adv(pu,tu:PTUnit):boolean;
 begin
+   // pu - target
+   // tu - caster
    _ability_hell_unit_adv:=false;
    with pu^  do
    with uid^ do
    begin
-      if(_isbuilding=false)then
+      if(_isbuilding=false)and(bld)then
        with tu^.player^ do
-        if(tu^.bld)then
+        if(tu^.bld)and(tu^.hits>0)then
          if(buff[ub_advanced]<=0)and(upgr[upgr_hell_6bld]>0)then
          begin
             dec(upgr[upgr_hell_6bld],1);
@@ -1447,6 +1459,71 @@ begin
       _unit_clear_order(tu,false);
       _unit_clear_order(pu,false);
       _ability_hell_unit_adv:=true;
+   end;
+end;
+
+function _ability_building_adv(pu,tu:PTUnit):boolean;
+begin
+   // pu - target
+   // tu - caster
+   _ability_building_adv:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(_isbuilding)and(bld)and(_ability=0)then
+       if(_isbarrack)or(_issmith)then
+       if(tu^.uid^._isbuilding)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)then
+        if(buff[ub_advanced]<=0)then
+        begin
+           _unit_building_start_adv(pu);
+           tu^.rld:=building_adv_reload[tu^.buff[ub_advanced]>0];
+           {$IFDEF _FULLGAME}
+           PlayCommandSound(snd_building[_urace]);
+           {$ENDIF}
+        end;
+
+      tu^.uo_tar:=0;
+
+      _ability_building_adv:=true;
+   end;
+end;
+
+function _ability_teleport(pu,tu:PTUnit;td:integer):boolean;
+begin
+   _ability_teleport:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(_isbuilding=false)and(tu^.hits>0)and(tu^.bld)then
+       if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
+        if(td<=tu^.uid^._r)then
+        begin
+           if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then
+           begin
+              if(uf=uf_ground)then
+               if(tu^.buff[ub_transpause]>0)
+               then exit
+               else
+                 if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then exit;
+
+              _unit_teleport(pu,tu^.uo_x,tu^.uo_y);
+              _teleport_rld(tu,_mhits);
+              _ability_teleport:=true;
+           end;
+        end
+        else
+          if(tu^.buff[ub_advanced]>0)and(td>base_rr)then
+           if(tu^.rld<=0)then
+           begin
+              _unit_teleport(pu,tu^.x,tu^.y);
+              _teleport_rld(tu,_mhits);
+              _ability_teleport:=true;
+           end
+           else
+           begin
+              uo_x:=x;
+              uo_y:=y;
+           end;
    end;
 end;
 
@@ -1483,12 +1560,12 @@ begin
             case tu^.uid^._ability of
 uab_uac__unit_adv: if(_ability_uac__unit_adv(pu,tu,tdm))then exit;
 uab_hell_unit_adv: if(_ability_hell_unit_adv(pu,tu    ))then exit;
-
+//uab_building_adv : if(_ability_building_adv (pu,tu    ))then exit;
             end;
 
             case _ability of
 uab_hell_unit_adv: if(_ability_hell_unit_adv(tu,pu    ))then exit;
-
+uab_building_adv : if(_ability_building_adv (tu,pu    ))then exit;
             end;
          end;
 
@@ -1505,36 +1582,9 @@ uab_hell_unit_adv: if(_ability_hell_unit_adv(tu,pu    ))then exit;
             uo_y:=tu^.vy;
          end;
 
-         if(_isbuilding=false)and(tu^.hits>0)and(tu^.bld)and(tu^.uid^._ability=uab_teleport)then
-          if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
-           if(td<=tu^.uid^._r)then
-           begin
-              if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then
-              begin
-                 if(uf=uf_ground)then
-                  if(tu^.buff[ub_transpause]>0)
-                  then exit
-                  else
-                    if(_unit_OnDecorCheck(tu^.uo_x,tu^.uo_y))then exit;
-
-                 _unit_teleport(pu,tu^.uo_x,tu^.uo_y);
-                 _teleport_rld(tu,_mhits);
-                 exit;
-              end;
-           end
-           else
-             if(tu^.buff[ub_advanced]>0)and(td>base_rr)then
-              if(tu^.rld<=0)then
-              begin
-                 _unit_teleport(pu,tu^.x,tu^.y);
-                 _teleport_rld(tu,_mhits);
-                 exit;
-              end
-              else
-              begin
-                 uo_x:=x;
-                 uo_y:=y;
-              end;
+         case tu^.uid^._ability of
+uab_teleport: _ability_teleport(pu,tu,td);
+         end;
       end;
    end;
 end;
@@ -1723,8 +1773,8 @@ end;
 
 procedure _unit_prod(pu:PTUnit);
 begin
-   with pu^ do
-   with uid^ do
+   with pu^     do
+   with uid^    do
    with player^ do
    begin
       if(bld)then
@@ -1756,14 +1806,14 @@ begin
                 _unit_bld_inc_cntrs(pu);
                 inc(cenerg,_renerg);
                 {$IFDEF _FULLGAME}
-                if(_isbuilding)and(playeri=HPlayer)then PlayInGameAnoncer(snd_constr_complete[_urace]);
+                _unit_ready_effects(pu,nil);
                 {$ENDIF}
              end;
           end;
    end;
 end;
 
-procedure _unit_nfog(pu:PTUnit);
+procedure _unit_reveal(pu:PTUnit);
 var i : byte;
 begin
    with pu^ do
@@ -1791,7 +1841,7 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         _unit_nfog(pu);
+         _unit_reveal(pu);
 
          if(hits>0)then
          begin

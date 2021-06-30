@@ -21,11 +21,7 @@ begin
    with pu^ do
    begin
       fsr:=0;
-      if(fog_cw>0)then
-      begin
-         fsr:=srange div fog_cw;
-         if(fsr>MFogM)then fsr:=MFogM;
-      end;
+      if(fog_cw>0)then fsr:=min2(srange div fog_cw,MFogM);
    end;
 end;
 
@@ -674,7 +670,7 @@ begin
 
       if(ServerSide=false)and(speed>0)then
       begin
-         _canmove:=(x<>uo_x)or(y<>uo_y);
+         _canmove:=(x<>uo_bx)or(y<>uo_by);
          exit;
       end;
 
@@ -958,6 +954,7 @@ begin
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_HPools;
+   _ability   := uab_building_adv;
 
    _isbuilding:= true;
    _isbuilder := true;
@@ -1443,6 +1440,7 @@ begin
    _btime     := 90;
    _max       := 1;
    _ruid      := UID_UTechCenter;
+   _ability   := uab_building_adv;
 
    _isbuilding:=true;
 end;

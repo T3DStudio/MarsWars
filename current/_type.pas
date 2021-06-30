@@ -323,13 +323,13 @@ TUnit = record
    x,y,zfall,
    srange,
    arange,
-   speed,dir,rld,
+   speed,dir,rld,vstp,
    hits,
    unum     : integer;
 
    uf,
    uclord,
-   vstp,order,
+   order,
    playeri,
    uidi     : byte;
 
