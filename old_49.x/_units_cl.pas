@@ -167,7 +167,6 @@ begin
          trt    := vid_fps*90;
          renerg := 8;
          ruid   := UID_HMonastery;
-         //arf    :=(sr div 4)*3;
       end;
       if(uid=UID_Pain)then
       begin
@@ -280,7 +279,7 @@ begin
          r      := 66;
          generg := builder_enrg[0];
          isbuild:= true;
-         renerg := builder_enrg[0]+2;
+         renerg := builder_enrg[0];
          ctime  := 60;
       end;
       if(uid in [UID_HGate,UID_HMilitaryUnit]) then
@@ -295,12 +294,12 @@ begin
          generg := 0;
          isbuild:= true;
          rld_a  := 12;
-         renerg := 4;
+         renerg := 10;
          ctime  := 40;
       end;
       if(uid=UID_HSymbol) then
       begin
-         mhits  := 125;
+         mhits  := 100;
          uf     := uf_ground;
          sr     := 200;
          ucl    := 2;
@@ -319,7 +318,7 @@ begin
          r      := 53;
          generg := 0;
          isbuild:= true;
-         renerg := 6;
+         renerg := 10;
          ctime  := 40;
       end;
       if(uid=UID_HTower) then
@@ -358,7 +357,7 @@ begin
          r      := 65;
          isbuild:= true;
          max    := 1;
-         renerg := 10;
+         renerg := 12;
          ctime  := 90;
          ruid   := UID_HPools;
       end;
@@ -607,7 +606,6 @@ begin
          renerg := 6;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
-         //arf    :=(sr div 4)*3;
       end;
       if(uid=UID_Tank)then
       begin
@@ -655,7 +653,7 @@ begin
          r      := 66;
          generg := builder_enrg[0];
          isbuild:= true;
-         renerg := builder_enrg[0]+2;
+         renerg := builder_enrg[0];
          ctime  := 80;
          rld_r  := vid_fps*10;
       end;
@@ -667,12 +665,12 @@ begin
          ucl    := 1;
          r      := 66;
          isbuild:= true;
-         renerg := 4;
+         renerg := 10;
          ctime  := 40;
       end;
       if(uid=UID_UGenerator) then
       begin
-         mhits  := 250;
+         mhits  := 200;
          uf     := uf_ground;
          sr     := 200;
          ucl    := 2;
@@ -690,7 +688,7 @@ begin
          ucl    := 3;
          r      := 62;
          isbuild:= true;
-         renerg := 6;
+         renerg := 10;
          ctime  := 40;
       end;
       if(uid=UID_UTurret) then
@@ -728,7 +726,7 @@ begin
          r      := 62;
          isbuild:= true;
          max    := 1;
-         renerg := 10;
+         renerg := 12;
          ctime  := 90;
          ruid   := UID_UWeaponFactory;
       end;
@@ -746,6 +744,7 @@ begin
          renerg := 2;
          ctime  := 20;
          ruid   := UID_UVehicleFactory;
+         arf    := (sr div 5)*4;
       end;
       if(uid=UID_URocketL) then
       begin
@@ -954,12 +953,12 @@ begin
    _setUPGR(r_hell,upgr_melee     ,60 ,3 ,3 ,255,255);
    _setUPGR(r_hell,upgr_regen     ,120,2 ,3 ,255,255);
    _setUPGR(r_hell,upgr_pains     ,60 ,3 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_vision    ,120,3 ,3 ,255,255);
+   _setUPGR(r_hell,upgr_vision    ,60 ,3 ,3 ,255,255);
    _setUPGR(r_hell,upgr_towers    ,120,3 ,3 ,255,255);
    _setUPGR(r_hell,upgr_5bld      ,120,3 ,2 ,255,255);
    _setUPGR(r_hell,upgr_mainm     ,180,1 ,3 ,255,255);
    _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_mainr     ,120,2 ,2 ,255,255);
+   _setUPGR(r_hell,upgr_mainr     ,60 ,2 ,2 ,255,255);
    _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,3 ,255,255);
    _setUPGR(r_hell,upgr_misfst    ,60 ,1 ,2 ,255,255);
    _setUPGR(r_hell,upgr_6bld      ,20 ,15,12,255,UID_HMonastery);
@@ -979,12 +978,12 @@ begin
    _setUPGR(r_uac ,upgr_melee     ,60 ,3 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_vision    ,120,1 ,3 ,255,255);
+   _setUPGR(r_uac ,upgr_vision    ,60 ,1 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_towers    ,120,3 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_5bld      ,120,3 ,2 ,255,255);
    _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255,255);
    _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,4 ,upgr_mainm,255);
-   _setUPGR(r_uac ,upgr_mainr     ,120,2 ,2 ,255,255);
+   _setUPGR(r_uac ,upgr_mainr     ,60 ,2 ,2 ,255,255);
    _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,4 ,255,255);
    _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
    _setUPGR(r_uac ,upgr_6bld      ,120,1 ,12,255,UID_UVehicleFactory);

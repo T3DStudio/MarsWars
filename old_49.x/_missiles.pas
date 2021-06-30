@@ -10,7 +10,7 @@ procedure _d300(d:pinteger);begin d^:=d^*3;         end;
 procedure _dbfg(r:integer;d:pinteger);
 var i:integer;
 begin
-   i:=mm3(-2,(r-15) div 2,4);
+   i:=mm3(-4,trunc((r-15)/1.5),4);
    if(i<>0)then d^:=d^+(d^ div 4)*i;
 end;
 
@@ -71,7 +71,7 @@ MID_Imp        : begin dam:=10 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Cacodemon  : begin dam:=30 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Baron      : begin dam:=50 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin dam:=40 ; vst:=sr div 15; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
+MID_Revenant   : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Mancubus   : begin dam:=35 ; vst:=sr div 8 ; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_ArchFire   : begin dam:=90 ; vst:=1;         sr :=12 ;       end;
 
@@ -83,7 +83,7 @@ MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
 MID_YPlasma    : begin dam:=15 ; vst:=sr div 18; sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=35 ; vst:=sr div 60; sr :=0  ;       end;
+MID_Flyer      : begin dam:=15 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
@@ -122,19 +122,18 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   
            if(upgr[upgr_attack]>0)then
             case mid of
 MID_SShot,
-MID_Imp,
 MID_BPlasma    : inc(dam,upgr[upgr_attack]*2);
-MID_SSShot,
+MID_Imp,
 MID_YPlasma,
-MID_Flyer,
 MID_HRocket,
-MID_BFG,
-MID_Cacodemon,
-MID_Mine       : inc(dam,upgr[upgr_attack]*3);
-MID_Baron,
 MID_Revenant,
 MID_RevenantS,
+MID_Cacodemon,
+MID_Mine       : inc(dam,upgr[upgr_attack]*3);
+MID_SSShot,
+MID_Baron,
 MID_Mancubus   : inc(dam,upgr[upgr_attack]*4);
+MID_BFG,
 MID_ArchFire,
 MID_Granade,
 MID_Tank       : inc(dam,upgr[upgr_attack]*5);
@@ -196,13 +195,7 @@ begin
               end;
 
            d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.r;
-           if(sr=0)then
-            case mid of
-            MID_BPlasma,
-            MID_YPlasma,
-            MID_Flyer   : dec(d,15)
-            else          dec(d,10);
-            end;
+           if(sr=0)then dec(d,15);
            if(d<0)then d:=0;
 
            if(OnlySVCode)then
@@ -216,13 +209,12 @@ begin
               /////////////////////////////////
               if(tu^.uid in armor_lite)then
                  case mid of
-                 MID_Blizzard   : _d50 (@damd);
-                 //MID_BFG,
-                 MID_Baron,
-                 MID_HRocket,
-                 MID_Mancubus,
                  MID_Granade,
                  MID_Tank,
+                 MID_HRocket,
+                 MID_Mancubus   : _d25 (@damd);
+                 MID_Blizzard   : _d50 (@damd);
+                 MID_Baron,
                  MID_YPlasma,
                  MID_BPlasma,
                  MID_SShot,
@@ -268,9 +260,6 @@ begin
                    else
                    // buildings
                    case mid of
-                   //MID_RevenantS,
-                   //MID_Revenant,
-                   MID_Flyer,
                    MID_Archfire    : _d50 (@damd);
                    MID_Bulletx2    : _d25 (@damd);
                    MID_Blizzard    : _d200(@damd);
@@ -294,13 +283,13 @@ begin
                  MID_Mancubus,
                  MID_Baron       : _d75 (@damd);
                  end;
-              end
-              else  //uf_ground
+
                  case mid of
+                 MID_Flyer,
                  MID_Revenant,
-                 MID_RevenantS,
-                 MID_Flyer       : _d50 (@damd);
+                 MID_RevenantS   : _d300(@damd);
                  end;
+              end;
 
              if(tu^.isbuild=false)then
              begin

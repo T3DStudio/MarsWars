@@ -1473,19 +1473,15 @@ begin
                      begin
                         {$IFDEF _FULLGAME}
                         PlaySND(snd_cast2,u);
-                        if(inapc=0)then
-                        begin
-                           ux:=tu1^.r shr 1;
-                           uy:=tu1^.r;
-                           _effect_add(tu1^.x-ux+random(uy),tu1^.y-ux+random(uy),tu1^.y+50,MID_BPlasma);
-                        end;
+                        ux:=tu1^.r shr 1;
+                        _effect_add(tu1^.x-_randomr(ux),tu1^.y-_randomr(ux),tu1^.y+50,MID_BPlasma);
                         {$ENDIF}
                         if(inapc=tar1)
                         then rld:=rld_r+rld_r
                         else rld:=rld_r;
                         if(onlySVCode)then
                         begin
-                           inc(tu1^.hits,mdmg);
+                           inc(tu1^.hits,mdam);
                            if(tu1^.hits>tu1^.mhits)then tu1^.hits:=tu1^.mhits;
                         end;
                      end;
@@ -1508,13 +1504,12 @@ begin
                         {$IFDEF _FULLGAME}
                         PlaySND(snd_cast,u);
                         ux:=tu1^.r shr 1;
-                        uy:=tu1^.r;
-                        _effect_add(tu1^.x-ux+random(uy),tu1^.y-ux+random(uy),tu1^.y+50,MID_YPlasma);
+                        _effect_add(tu1^.x-_randomr(ux),tu1^.y-_randomr(ux),tu1^.y+50,MID_YPlasma);
                         {$ENDIF}
                         rld:=rld_r;
                         if(onlySVCode)then
                         begin
-                           inc(tu1^.hits,mdmg);
+                           inc(tu1^.hits,mdam);
                            if(tu1^.hits>tu1^.mhits)then tu1^.hits:=tu1^.mhits;
                            if not(tu1^.uid in marines)then tu1^.buff[ub_pain]:=vid_hfps;
                         end;
@@ -1692,7 +1687,7 @@ begin
                if(uf>uf_ground)and(upgr[upgr_ucomatt]>0)and(race=r_uac)then
                begin
                   {$IFDEF _FULLGAME}PlaySND(snd_pexp,u);{$ENDIF}
-                  _miss_add(tu1^.x,tu1^.y,vx,vy+10,tar1,MID_BFG,player,uf_ground,false);
+                  _miss_add(tu1^.x,tu1^.y,vx,vy+10,tar1,MID_BFG,player,_tuf(uf,tu1^.uf),false);
                   rld:=rld_r;
                end
                else exit;

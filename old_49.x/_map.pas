@@ -525,7 +525,7 @@ procedure Map_randommap;
 begin
    map_randomseed;
 
-   map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/500)*500;
+   map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/SMapStep)*SMapStep;
    map_liq:=random(8);
    map_obs:=random(8);
 end;

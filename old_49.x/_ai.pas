@@ -731,17 +731,25 @@ begin
 end;
 
 procedure ai_CCOut(u:integer);
+var d:integer;
 begin
    with _units[u] do
    begin
       if(ai_outalrm(u,base_ir,false)=false)then
       begin
-          if(ai_bx>0)and(dist2(x,y,ai_bx,ai_by)>base_ir)
-          then ai_settar(u,ai_bx,ai_by,base_r)
-          else
+          if(ai_bx>0)then
           begin
-             ai_settar(u,x    ,y    ,base_r);
-             _unit_action(u);
+             d:=dist2(x,y,ai_bx,ai_by);
+             if(d>base_ir)
+             then ai_settar(u,ai_bx,ai_by,base_r)
+             else
+               if(d<base_hr)
+               then ai_settar(u,x-(x-ai_bx),y-(ai_by-y),base_hr)
+               else
+               begin
+                  ai_settar(u,x    ,y    ,base_r);
+                  _unit_action(u);
+               end;
           end;
       end;
    end;
@@ -889,12 +897,14 @@ begin
                              if(alrm_r<=sr)and(speed=0)then _unit_action(u);
 
                             if(speed>0)then
-                               if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)and(upgr[upgr_ucomatt]>0)
-                               then ai_CCAttack(u)
-                               else
-                                 if(g_mode=gm_royl)and(_check_royal_r(x,y,base_3r))
-                                 then ai_settar(u,map_cx,map_cx,base_r)
-                                 else ai_CCOut(u);
+                             if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)and(upgr[upgr_ucomatt]>0)
+                             then ai_CCAttack(u)
+                             else
+                               if(g_mode=gm_royl)and(_check_royal_r(x,y,base_3r))
+                               then ai_settar(u,map_cx,map_cx,base_r)
+                               else ai_CCOut(u);
+
+                            if(alrm_r>base_rr)and(speed>0)then _unit_action(u);
                          end;
                       5: if(speed>0)
                          then ai_CCAttack(u)

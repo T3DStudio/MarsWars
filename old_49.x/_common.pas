@@ -303,7 +303,7 @@ function ai_name(ain:byte):string;
 begin
    if(ain=0)
    then ai_name:=str_ps_none
-   else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(21-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
+   else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(22-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
 end;
 
 

@@ -274,7 +274,7 @@ begin
 
       ///  MAP
       50 : ;
-      51 : begin _scrollV(@map_mw,500,MinSMapW,MaxSMapW); Map_premap;end;
+      51 : begin _scrollV(@map_mw,SMapStep,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin _scrollV(@map_liq,1,0,7); Map_premap;end;
       53 : begin _scrollV(@map_obs,1,0,7); Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
@@ -440,7 +440,7 @@ begin
       case _m_sel of
       // MAP
       50 : begin Map_randomseed; Map_premap;end;
-      51 : begin _scrollV(@map_mw,-500,MinSMapW,MaxSMapW); Map_premap;end;
+      51 : begin _scrollV(@map_mw,-SMapStep,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin _scrollV(@map_liq,-1,0,7); Map_premap;end;
       53 : begin _scrollV(@map_obs,-1,0,7); Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;

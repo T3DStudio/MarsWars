@@ -111,13 +111,13 @@ begin
            else
            begin
               map_seed:=s2c(args[1]);
-              map_mw  :=mm3(MinSMapW, (s2i(args[2]) div 500)*500, MaxSMapW);
+              map_mw  :=mm3(MinSMapW, (s2i(args[2]) div SMapStep)*SMapStep, MaxSMapW);
               map_liq :=min2(7,s2b(args[3]));
               map_obs :=min2(7,s2b(args[4]));
               Map_premap;
            end;
    '-p'  : if(a<4)
-           then with _players[pl] do NewAI(race,team,4)
+           then with _players[pl] do NewAI(race,team,5)
            else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),8));
    '-ffa': cmp_ffa;
    '-noai',

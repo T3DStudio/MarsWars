@@ -1201,8 +1201,8 @@ begin
                          begin
                             speed:=20;
                             anims:=18;
-                            rld_r:=35;
-                            rld_a:=18;
+                            rld_r:=30;
+                            rld_a:=15;
                          end
                          else
                          begin
@@ -1271,7 +1271,6 @@ begin
          UID_ZBomber,
          UID_ZCommando,
          UID_ZFormer,
-         UID_Cacodemon,
          UID_Bomber,
          UID_BFG:
                       begin
@@ -1287,6 +1286,7 @@ begin
                          end;
                       end;
 
+         UID_Cacodemon,
          UID_Cyberdemon:
                       begin
                          if(buff[ub_advanced]>0)
@@ -1325,9 +1325,7 @@ begin
                          begin
                             sr :=tt;
                             ar :=sr;
-                            if(G_addon)
-                            then arf:=(ar div 5)*4
-                            else arf:=-1;
+                            if(arf>-1)then arf:=(ar div 5)*4;
                             {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}
                          end;
                       end;
