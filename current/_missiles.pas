@@ -122,7 +122,7 @@ begin
    _unit_melee_damage:=damage;
 end; }
 
-procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl,mft:byte;instant:boolean);
+procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl,mfst,mfet:byte;adddmg:integer);
 var m:integer;
     tu:PTUnit;
 begin
@@ -137,7 +137,8 @@ begin
       tar    := mtar;
       mid    := msid;
       player := mpl;
-      mf     := mft;
+      mfe    := mfet;
+      mfs    := mfst;
       mtars  := 0;
       ntars  := 0;
       ystep  := 0;
@@ -177,24 +178,26 @@ MID_SSShot     : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) di
          exit;
       end;
 
-      if(vst<=0)or(instant)then vst:=1;
+      if(vst<=0)then vst:=1;
 
-        if(mtars=0)then
-         if(tar=0)or(sr>0)
-         then mtars:=MaxUnits
-         else mtars:=1;
+      if(mtars=0)then
+       if(tar=0)or(sr>0)
+       then mtars:=MaxUnits
+       else mtars:=1;
 
-        if(mid=MID_RevenantS)
-        then homing:=true
-        else
-          if(_IsUnitRange(tar,@tu))then
-          begin
-             inc(x,_randomr(tu^.uid^._missile_r));
-             inc(y,_randomr(tu^.uid^._missile_r));
-          end;
+      inc(dam,adddmg);
 
-        break;
-     end;
+      if(mid=MID_RevenantS)
+      then homing:=true
+      else
+        if(_IsUnitRange(tar,@tu))then
+        begin
+           inc(x,_randomr(tu^.uid^._missile_r));
+           inc(y,_randomr(tu^.uid^._missile_r));
+        end;
+
+      break;
+   end;
 end;
 
 { with _players[player] do
@@ -260,7 +263,7 @@ begin
       tu:=@_units[tar];
 
       if(tu^.hits>0)and(_miduid(mid,tu^.uidi))and(tu^.inapc=0)then
-      if(abs(mf-tu^.uf)<2)then
+      if(abs(mfs-tu^.uf)<2)then
       begin
          teams:=_players[player].team=tu^.player^.team;
          damd :=dam;
@@ -442,7 +445,7 @@ begin
               begin
                  if(teams)then exit;
                  {$IFDEF _FULLGAME}
-                 _effect_add(tu^.vx,tu^.vy,tu^.vy+map_flydpth[tu^.uf]+1,EID_BFG);
+                 _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),EID_BFG);
                  {$ENDIF}
               end;
 
@@ -484,7 +487,7 @@ begin
       begin
          x  :=tu^.x;
          y  :=tu^.y;
-         mf :=tu^.uf;
+         mfs:=tu^.uf;
       end;
 
       if(mid=MID_Blizzard)then
@@ -530,7 +533,7 @@ begin
       else
         with _mids[mid] do
          if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
-          if((vst mod ms_eid_fly_st)=0)then _effect_add(vx,vy,vy+map_flydpth[mf],ms_eid_fly);
+          if((vst mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_depth(vy,mfs),ms_eid_fly);
        {$ENDIF};
    end;
 end;

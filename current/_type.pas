@@ -122,11 +122,14 @@ end;
 TUWeapon = record
   aw_type,
   aw_rupgr,
+  aw_rupgr_l,
+  aw_dupgr,
   aw_ruid,
   aw_oid   : byte;
   aw_uids  : TSob;
   aw_tarf,
   aw_reqf  : cardinal;
+  aw_dupgr_s,
   aw_range,
   aw_count: integer;
   aw_rld   : byte;
@@ -393,7 +396,8 @@ TMissile = record
    mtars,
    ntars    : integer;
    player,
-   mid,mf   : byte;
+   mid,
+   mfe,mfs  : byte;
    homing   : boolean;
 end;
 
@@ -405,8 +409,8 @@ TCTPoint = record
 end;
 
 TDoodad = record
-   x,y,r:integer;
-   t:byte;
+   x,y,r :integer;
+   t     :byte;
 
    {$IFDEF _FULLGAME}
    animn,animt,

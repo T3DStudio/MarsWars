@@ -170,7 +170,7 @@ begin
    if(channel<>nil)then channel^:=i;
 end;
 
-function PlaySND(ss:PTSoundSet;pu:PTUnit):boolean;
+function PlaySND(ss:PTSoundSet;pu:PTUnit;visdata:pboolean):boolean;
 begin
    PlaySND:=false;
 
@@ -178,9 +178,14 @@ begin
    or(_menu)
    or(_draw=false)then exit;
 
-   if(pu<>nil)then
-    with pu^ do
-     if(_nhp3(x,y,player)=false)then exit;
+   if(visdata<>nil)then
+   begin
+      if(visdata^=false)then exit;
+   end
+   else
+     if(pu<>nil)then
+      with pu^ do
+       if(_nhp3(x,y,player)=false)then exit;
 
    PlaySoundSet(ss,nil);
    PlaySND:=true;
@@ -349,6 +354,7 @@ begin
    snd_player_defeated   [r]:=LoadSoundSet(race_dir[r]+'player_defeated'           );
    snd_upgrade_complete  [r]:=LoadSoundSet(race_dir[r]+'upgrade_complete'          );
    snd_victory           [r]:=LoadSoundSet(race_dir[r]+'victory'                   );
+   snd_unit_adv          [r]:=LoadSoundSet(race_dir[r]+'unit_adv'                  );
    end;
 
    /////////////////////////////////////////////////////////////////////////////////
@@ -376,7 +382,6 @@ begin
    snd_uac_suply            :=LoadSoundSet(race_buildings[r_uac ]+'supply-depot'   );
    snd_uac_rescc            :=LoadSoundSet(race_buildings[r_uac ]+'resourse_senter');
 
-   snd_uac_reload           :=LoadSoundSet(race_units[r_uac ]+'adv'                );
    snd_uac_hdeath           :=LoadSoundSet(race_units[r_uac ]+'death'              );
 
    snd_APC_ready            :=LoadSoundSet(race_units[r_uac ]+'APC\UAC_im_find2'   );
@@ -458,8 +463,6 @@ begin
    // HELL
    //
 
-   snd_hell_uadv            :=LoadSoundSet(race_dir[r_hell]+'unit_advance'  );
-
    snd_hell_hk              :=LoadSoundSet(race_buildings[r_hell]+'hell_keep'     );
    snd_hell_hgate           :=LoadSoundSet(race_buildings[r_hell]+'hell_gate'     );
    snd_hell_hsymbol         :=LoadSoundSet(race_buildings[r_hell]+'hell_symbol'   );
@@ -471,6 +474,8 @@ begin
    snd_hell_hfort           :=LoadSoundSet(race_buildings[r_hell]+'hell_temple'   );
    snd_hell_haltar          :=LoadSoundSet(race_buildings[r_hell]+'hell_altar'    );
    snd_hell_hbuild          :=LoadSoundSet(race_buildings[r_hell]+'hell_building' );
+   snd_hell_eye             :=LoadSoundSet(race_buildings[r_hell]+'hell_eye'      );
+
 
    snd_hell_pain            :=LoadSoundSet(race_units[r_hell]+'d_p');
    snd_hell_melee           :=LoadSoundSet(race_units[r_hell]+'d_m');

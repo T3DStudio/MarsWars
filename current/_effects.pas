@@ -210,8 +210,8 @@ begin
    with tu^ do
     with uid^ do
      if(_ismech)
-     then _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),vy+map_flydpth[uf]+1,MID_Bullet)
-     else _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),vy+map_flydpth[uf]+1,EID_Blood );
+     then _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),_depth(vy+1,uf),MID_Bullet)
+     else _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),_depth(vy+1,uf),EID_Blood );
 end;
 
 {
@@ -245,13 +245,13 @@ begin
       if(_nhp3(vx,vy,@_players[player]))then
       begin
          if(ms_alt_death=false)
-         then _effect_add(vx,vy,vy+map_flydpth[mf],mid)
+         then _effect_add(vx,vy,_depth(vy,mfs),mid)
          else
          begin
             sr:=trunc(sr*0.75);
             while(mtars>0)do
             begin
-               _effect_add(vx-_randomr(sr),vy-_randomr(sr),vy+map_flydpth[mf],mid);
+               _effect_add(vx-_randomr(sr),vy-_randomr(sr),_depth(vy,mfs),mid);
                dec(mtars,1);
             end;
          end;
@@ -263,7 +263,7 @@ begin
          if(ms_snd_death_ch>0)then
           if(random(ms_snd_death_ch)>0)then exit;
 
-         PlaySND(ms_snd_death,nil);
+         PlaySND(ms_snd_death,nil,nil);
       end;
    end;
 end;
@@ -282,7 +282,7 @@ begin
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,vy+map_flydpth[mf],0,spr,255);
+       if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
    end;
 end;
 

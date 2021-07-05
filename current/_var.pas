@@ -710,7 +710,8 @@ snd_defeat,
 snd_not_enough_energy,
 snd_player_defeated,
 snd_upgrade_complete,
-snd_victory
+snd_victory,
+snd_unit_adv
                    : array[1..r_cnt] of PTSoundSet;
 
 snd_radar,
@@ -729,7 +730,6 @@ snd_uac_nucl,
 snd_uac_suply,
 snd_uac_rescc,
 
-snd_uac_reload,
 snd_uac_hdeath,
 
 snd_APC_ready,
@@ -816,8 +816,7 @@ snd_hell_hmon,
 snd_hell_hfort,
 snd_hell_haltar,
 snd_hell_hbuild,
-
-snd_hell_uadv,
+snd_hell_eye,
 
 snd_zimba_death,
 snd_zimba_ready,

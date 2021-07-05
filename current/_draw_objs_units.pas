@@ -9,6 +9,10 @@ begin
     else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
 end;
 
+function _depth(y,f:integer):integer;
+begin
+   _depth:=map_flydepths[f]+y;
+end;
 
 function _udpth(pu:PTUnit):integer;
 begin
@@ -22,14 +26,14 @@ UID_HAltar    : _udpth:=-3;
 UID_UMine     : _udpth:=-2;
 UID_HCommandCenter,
 UID_UCommandCenter: if(uf>uf_ground)
-                    then _udpth:=map_flydpth[uf_soaring]+vy
+                    then _udpth:=_depth(uf_soaring,vy)
                     else
                       if(hits>0)
-                      then _udpth:=map_flydpth[uf]+vy
+                      then _udpth:=_depth(vy,uf)
                       else _udpth:=vy;
     else
       if(hits>0)
-      then _udpth:=map_flydpth[uf]+vy
+      then _udpth:=_depth(vy,uf)
       else _udpth:=vy;
     end;
 end;
@@ -221,7 +225,7 @@ begin
          dec(animf,1);
          if(animf<=0)then
          begin
-            PlaySND(un_eid_snd_foot[adv],nil);
+            PlaySND(un_eid_snd_foot[adv],nil,nil);
             animf:=un_foot_anim[adv];
          end;
       end;

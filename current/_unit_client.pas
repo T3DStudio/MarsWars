@@ -408,6 +408,8 @@ begin
    end;
 end;
 
+
+
 procedure _ucCreateEffect(uu,pu:PTUnit;vis:boolean);
 begin
    with uu^     do
@@ -420,7 +422,7 @@ begin
       if(bld)
       then _unit_ready_effects(uu,@vis)
       else
-        if(playeri=HPlayer)then PlaySND(snd_build_place[_urace],nil);
+        if(playeri=HPlayer)then PlaySND(snd_build_place[_urace],nil,@vis);
 
       if(vis=false)then exit;
 
@@ -462,8 +464,8 @@ begin
 
       if(buff[ub_teleeff]>0)then
       begin
-         _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-         PlaySND(snd_teleport,nil);
+         _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
+         PlaySND(snd_teleport,nil,@vis);
       end;
    end;
 end;
@@ -490,7 +492,11 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           _ucCreateEffect(uu,pu,vis);
+           if(buff[ub_born]>0)then
+            if(uid^._isbuilding=false)
+            then _ucCreateEffect(uu,pu,vis)
+            else
+              if(bld=false)and(playeri=HPlayer)then PlaySND(snd_build_place[race],nil,nil);
         end;
 
         _ucInc(uu);
@@ -501,7 +507,12 @@ begin
           vx:=x;
           vy:=y;
           if(pu^.hits>0)and(vis)then
-           if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,@vis);
+          begin
+             if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,@vis);
+
+             //
+             if(hits=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,uf),@vis);
+          end;
 
           if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
@@ -518,10 +529,10 @@ begin
          begin
             if(pu^.uidi<>uidi)then
             begin
-               _unit_default(uu);
-
                vx:=x;
                vy:=y;
+
+               if(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.uf),@vis);
             end;
 
             _unit_upgr(pu);
@@ -533,11 +544,18 @@ begin
             if(hits>0)then
             begin
                if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
-               or(pu^.uidi<>uidi)
-               or(pu^.hits<=0   )then _netClUCreateEff(uu,pu,vis);
+               or((pu^.bld=false)and(bld))then _ucCreateEffect(uu,pu,vis);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
-               if(pu^.inapc<>inapc)and(vis)then PlaySND(snd_inapc,nil);
+               if(pu^.inapc<>inapc)and(vis)then PlaySND(snd_inapc,nil,@vis);
+
+               if(pu^.buff[ub_cast]<=0)and(buff[ub_cast]>0)and(bld)then
+                case uid^._ability of
+                0:;
+               uab_uac_rstrike : _unit_umstrike_create(uu);
+               uab_radar       : if(team=_players[HPlayer].team)then PlaySND(snd_radar,nil,@vis);
+               uab_spawnlost   : _pain_lost_spawn(pu);
+                end;
             end;
 
             if(pu^.hits<=0)and(hits>0)then
@@ -551,24 +569,20 @@ begin
               begin
                  _unit_death_effects(uu,hits<=fdead_hits,@vis);
                  if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
-                 //rld:=0;
+                 rld:=0;
               end;
 
             if(pu^.inapc=0)then
              if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
 
-
-
-            {if(uidi=UID_URadar)then
-             if(bld)and(pu^.rld_t=0)and(rld_t>0)and(team=_players[HPlayer].team)then PlaySND(snd_radar,nil);
-
-            if(uidi=UID_URMStation)then
-             if(bld)and(pu^.rld_t=0)and(rld_t>0)then
-             begin
-                _uac_rocketl_eff(uu);
-                _miss_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,false);
+            if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced ]>0)then
+             case uid^._urace of
+             r_hell: _unit_hell_unit_adv(uu);
+             r_uac : _unit_uac_unit_adv (uu,nil);
              end;
+            if(pu^.buff[ub_resur   ]=0)and(buff[ub_resur]>0)then PlaySND(snd_meat ,uu,@vis);
 
+            {
             if(pu^.buff[ub_cast]=0)and(buff[ub_cast]>0)then
              case uidi of
              UID_ArchVile: ;
@@ -582,8 +596,7 @@ begin
                 if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,uu);
              end;
 
-            if(pu^.buff[ub_gear ]=0)and(buff[ub_gear ]>0)then PlaySND(snd_uupgr,uu);
-            if(pu^.buff[ub_resur]=0)and(buff[ub_resur]>0)then PlaySND(snd_meat ,uu);
+
 
             if(race=r_hell)and(isbuild=false)and(hits>0)then
             begin
@@ -806,6 +819,7 @@ begin
          if(i<>uidi)then
          begin
             _unit_apUID(uu);
+            _unit_default(uu);
             FillChar(buff,SizeOf(buff),0);
          end;
          hits:=_S2hi(sh,uid^._mhits,uid^._shcf);
@@ -836,7 +850,7 @@ begin
                if(_IsUnitRange(a_tar,nil)=false)then a_tar:=0;
             end;
 
-            if(_ability in client_cast_abils)then
+            if(uid^._ability in client_cast_abils)then
              if(buff[ub_cast]>0)then
              begin
                 _rrld(@rld,rpl);
@@ -875,8 +889,9 @@ end;
 
 
 procedure _rpdata(rpl:boolean);
-var i,n,bp,bv:byte;
+var i,n,bp,bv,lu,anoncer:byte;
 begin
+   anoncer:=0;
    if(G_plstat>0)then
    for i:=1 to MaxPlayers do
     if((G_plstat and (1 shl i))>0)then
@@ -890,16 +905,21 @@ begin
          case bp of
          0: begin
                bv:=_rudata_byte(rpl,0);
+               lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv and %00001111);
+               if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=1;
             end;
          1: begin
+               lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv shr 4);
+               if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=0;
             end;
          end;
-
      end;
+
+   if(anoncer>0)then PlayInGameAnoncer(snd_upgrade_complete[anoncer]);
 end;
 
 procedure ClNUnits;
@@ -935,7 +955,7 @@ begin
 gm_inv : begin
             _PNU:=g_inv_wave_n;
             g_inv_wave_n:=_rudata_byte(rpl,0);
-            if(g_inv_wave_n>_PNU)then PlaySND(snd_teleport,nil);
+            if(g_inv_wave_n>_PNU)then PlaySND(snd_teleport,nil,nil);
             g_inv_time :=_rudata_int (rpl,0);
          end;
 gm_ct  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);

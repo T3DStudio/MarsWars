@@ -290,8 +290,8 @@ uab_building_adv       = 4;
 uab_radar              = 5;
 uab_htowertele         = 6;
 uab_uac_rstrike        = 7;
-//uab_jetpack            = 8;
 uab_spawnlost          = 100;
+uab_morph2heye         = 101;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -328,6 +328,7 @@ ub_transpause          = 14;
 ub_teleeff             = 15;
 
 _ub_infinity           = 32000;
+b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -363,10 +364,10 @@ DID_R                  : array[0..7] of integer = (0,250,185,125,64,105,60,17);
 //  UPGRADES
 //
 
-upgr_hell_attack       = 1;  // distance attack
+upgr_hell_dattack      = 1;  // distance attack
 upgr_hell_uarmor       = 2;  // base unit armor
 upgr_hell_barmor       = 3;  // base building armor
-upgr_hell_melee        = 4;  // melee attack
+upgr_hell_mattack      = 4;  // melee attack
 upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
 upgr_hell_heye         = 7;  // hell Eye
@@ -391,12 +392,12 @@ upgr_hell_9bld         = 25; // 9 class building reload time
 
 
 upgr_uac_attack        = 31; // distance attack
-upgr_uac_armor         = 32; // base armor
-upgr_uac_build         = 33; // base b armor
+upgr_uac_uarmor        = 32; // base armor
+upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
-upgr_uac_plsmt         = 36; // turrent for apcs
-upgr_uac_vision        = 37; // detectors
+upgr_uac_apcgun        = 36; // turrent for apcs
+upgr_uac_detect        = 37; // detectors
 upgr_uac_towers        = 38; // towers sr
 upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
@@ -421,6 +422,14 @@ upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
 
+upgr_race_bio_armor    : array[1..r_cnt] of byte = (upgr_hell_uarmor,upgr_uac_uarmor);
+upgr_race_mech_armor   : array[1..r_cnt] of byte = (0,upgr_uac_mecharm);
+upgr_race_build_armor  : array[1..r_cnt] of byte = (upgr_hell_barmor,upgr_uac_barmor);
+upgr_race_bio_regen    : array[1..r_cnt] of byte = (upgr_hell_regen,0);
+upgr_race_mech_regen   : array[1..r_cnt] of byte = (0,0);
+upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep,0);
+upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0,upgr_uac_mspeed);
+upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0,upgr_uac_mechspd);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -457,9 +466,8 @@ MID_Flyer              = 122;
 //
 
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
-MaxUnitWeapons         = 6; //0-6
-//MaxWeaponShootState    = 2;
-MaxUnitProds           = 1; //0-1
+MaxUnitWeapons         = 15; //0-15
+MaxUnitProds           = 1;  //0-1
 MaxMissiles            = MaxUnits;
 
 uf_ground              = 0;
@@ -600,7 +608,7 @@ mstrike_reload_client  = mstrike_reload-(fr_fps*3);
 
 max_build_reload       = fr_fps*12;
 
-eye_rsg                : array[0..5] of integer = (250,275,300,325,350,375);
+eye_range              : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
@@ -632,7 +640,7 @@ advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 fly_z                  = 30;
 fly_height             : array[0..2] of integer = (1,fly_z*uf_soaring,fly_z*uf_fly);
 
-map_flydpth            : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
+map_flydepths          : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
 
 {$IFDEF _FULLGAME}
 
@@ -900,7 +908,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 250497;
+svld_size              = 252107;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

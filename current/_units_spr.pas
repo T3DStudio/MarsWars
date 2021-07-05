@@ -314,8 +314,7 @@ begin
      if(hits          <=0)then _unit2SMAnimK:=sms_death
 else if(not bld          )then _unit2SMAnimK:=sms_build
 else if(buff[ub_pain  ]>0)then _unit2SMAnimK:=sms_pain
-else if(buff[ub_cast  ]>0)
-     or(buff[ub_clcast]>0)then _unit2SMAnimK:=sms_cast
+else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
 else if(a_rld          >0)and(a_weap<=MaxUnitWeapons)then
       with _a_weap[a_weap] do
        if(aw_range>=0)then
