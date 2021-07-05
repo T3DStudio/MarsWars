@@ -163,7 +163,7 @@ begin
      then _checkvision:=2
      else
        if(_uvision(_players[HPlayer].team,@_units[u],false))then
-        if(team=_players[HPlayer].team)
+        if(team=_players[HPlayer].team)or(_players[HPlayer].team=0)
         then _checkvision:=2
         else _checkvision:=1;
 end;
@@ -997,7 +997,7 @@ begin
 
       if(td<=(tu^.sr+r))then
       begin
-         if(buff[ub_invis]=0)
+         if(buff[ub_invis]<=0)
          then _addtoint(@vsnt[_players[tu^.player].team],vistime)
          else
            if(tu^.buff[ub_detect]>0)and(tu^.bld)then
@@ -1005,6 +1005,8 @@ begin
               _addtoint(@vsnt[_players[tu^.player].team],vistime);
               _addtoint(@vsni[_players[tu^.player].team],vistime);
            end;
+         if(player<>tu^.player)then
+          if(tu^.vsnt[0]>0)then _addtoint(@vsnt[0],vistime);
       end;
    end;
 end;

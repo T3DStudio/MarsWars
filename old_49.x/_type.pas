@@ -78,6 +78,8 @@ TPlayer = record
    cenerg,
    menerg  : integer;
 
+   aobserver,
+   observer,
    ready   : boolean;
 
    o_id    : byte;

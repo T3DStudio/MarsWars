@@ -201,6 +201,11 @@ begin
            ai_bd:=ud;
            ai_bx:=tu^.x;
            ai_by:=tu^.y;
+           if(sel)then
+           begin
+              dbgai_bx:=ai_bx;
+              dbgai_by:=ai_by;
+           end;
         end;
 
       if(tu^.isbuild=false)then
@@ -376,19 +381,19 @@ begin
             if(upgr[upgr_2tier]>0)then set_bld(X8,1);
             set_bld(Com,4);
             set_bld(Bar,5);
-            set_bld(Gen,16);
+            set_bld(Gen,20);
             set_bld(X5 ,1);
             set_bld(Adv,1);
             set_bld(Smt,1);
             set_bld(Com,2);
-            set_bld(Gen,10+upgr[upgr_mainr]);
+            set_bld(Gen,10+upgr[upgr_mainr]+ai_skill);
             set_bld(Com,2);
          end;
-         set_bld(Gen,7);
+         set_bld(Gen,7+ai_skill);
          set_bld(Tw1,2);
          set_bld(Bar,2);
          set_bld(Tw1,1);
-         set_bld(Gen,4);
+         set_bld(Gen,4+ai_skill);
          set_bld(Bar,1);
          if(alrm)then set_bld(Tw1,15);
       end;
@@ -664,7 +669,7 @@ begin
       else
         if(skipif)or(_r=0)or(alrm_r<_r)then
         begin
-           if(alrm_b)and(isbuild=false)then exit;
+           //if(alrm_b)and(isbuild=false)then exit;
            if(x=alrm_x)and(y=alrm_y)then
            begin
               uo_x:=x-_randomr(base_r);
@@ -672,8 +677,8 @@ begin
            end
            else
            begin
-              uo_x:=x-(alrm_x-x);
-              uo_y:=y-(alrm_y-y);
+              uo_x:=x-(alrm_x-x)*10;
+              uo_y:=y-(alrm_y-y)*10;
            end;
         end
         else exit;
@@ -756,7 +761,7 @@ begin
 end;
 
 procedure ai_buildactions(u:integer);
-const maxb = 20;
+const maxb = 24;
       maxt = 20;
 var blds: TCntr;
     t,
@@ -776,7 +781,7 @@ begin
       5   : blds[0]:=13;
       else  blds[0]:=16;
       end;
-      blds[1 ]:=min2(max2(2,(menerg div 7)+u_e[true,0]-u_e[true,3]),maxb);
+      blds[1 ]:=min2(max2(1,(menerg div 7)+u_e[true,0]-u_e[true,3]),maxb);
       blds[3 ]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
       blds[4 ]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
       blds[7 ]:=blds[4];

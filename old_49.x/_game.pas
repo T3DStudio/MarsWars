@@ -19,7 +19,7 @@ begin
    begin
       case state of
 PS_None: begin ready:=false;name :=str_ps_none;end;
-PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;end;
+PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;observer:=false;aobserver:=true; end;
 PS_Play: begin ready:=false;name :=''; ttl:=0;end;
       end;
    end;
@@ -272,12 +272,15 @@ gm_royl:g_royal_r   := trunc(sqrt( sqr(map_cx)*2 ));
        if(race=r_random)then race:=1+random(2);
 
        if(state<>PS_None)then
-       begin
-          _CreateStartBase(map_psx[p],map_psy[p],cl2uid[race,true,0],p,G_startb);
+        if(observer)
+        then team:=0
+        else
+        begin
+           _CreateStartBase(map_psx[p],map_psy[p],cl2uid[race,true,0],p,G_startb);
 
-          if(state=ps_play)then ai_skill:=def_ai;
-          _setAI(p);
-       end;
+           if(state=ps_play)then ai_skill:=def_ai;
+           _setAI(p);
+        end;
     end;
 
    {$IFDEF _FULLGAME}
@@ -601,7 +604,7 @@ begin
              end;
         end;
 
-        if(G_Started)and(G_Paused=0)and(onlySVCode)then
+        if(G_Started)and(G_Paused=0)and(onlySVCode)and(observer=false)then
         begin
            _u_ord(p);
 

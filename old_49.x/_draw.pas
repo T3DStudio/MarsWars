@@ -278,7 +278,7 @@ begin
 
 
            //if(sel)then lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,plcolor[player]);
-        end;
+        end; }
 
         if(hits>0)and(inapc=0)and(sel)then
         if(player=HPlayer)then
@@ -288,12 +288,12 @@ begin
             lineColor(_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
 
            if(ai_bx>0)then
-            lineColor(_screen,ix,iy,ai_bx-vid_vx,ai_by-vid_vy,c_lime);
-        end; }
+            lineColor(_screen,ix,iy,dbgai_bx-vid_vx,dbgai_by-vid_vy,c_lime);
+        end;
 
-        _draw_text(_screen,ix,iy,i2s(rld_a)+#13+b2pm[alrm_b], ta_left,255, plcolor[player]);
+        _draw_text(_screen,ix,iy,i2s(alrm_r), ta_left,255, plcolor[player]);
 
-        if(inapc>0)then continue;
+       { if(inapc>0)then continue;
 
         if(hits>0){and(uid=UID_URocketL)}then
         begin
@@ -302,7 +302,7 @@ begin
 
            //if(tar1>0)then lineColor(_screen,ix,iy,_units[tar1].x-vid_vx,_units[tar1].y-vid_vy,c_white);
             //lineColor(_screen,ix+10,iy+10,uo_x-vid_vx,uo_y-vid_vy,c_white);  and(player=HPlayer)
-        end;
+        end;   }
 
          //_draw_text(_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
          //if(sel)then            i2s(vsnt[_players[player].team])+#13+i2s(vsni[_players[player].team])

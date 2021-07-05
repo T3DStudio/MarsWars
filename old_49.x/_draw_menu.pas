@@ -86,10 +86,16 @@ begin
           if(state<>ps_none)then
           begin
              _draw_text(_menu_surf,ui_menu_pls_zxnt, u, name             , ta_left  , 255, c_white);
-             if G_Started or (net_nstat=ns_clnt) or ((net_nstat<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
-             _draw_text(_menu_surf,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
-             if(g_mode in [gm_2fort,gm_3fort,gm_inv])then c:=c_gray;
-             _draw_text(_menu_surf,ui_menu_pls_zxtt, u,b2s(_PickPTeam(p)), ta_middle, 255, c);
+             if G_Started or observer or (net_nstat=ns_clnt) or ((net_nstat<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
+
+             if(observer=false)
+             then _draw_text(_menu_surf,ui_menu_pls_zxrt, u,str_race[mrace], ta_middle, 255, c)
+             else _draw_text(_menu_surf,ui_menu_pls_zxrt, u,str_obs        , ta_middle, 255, c);
+
+             if(g_mode in [gm_2fort,gm_3fort,gm_inv])or(observer)then c:=c_gray;
+             if(observer)
+             then _draw_text(_menu_surf,ui_menu_pls_zxtt, u,'-', ta_middle, 255, c)
+             else _draw_text(_menu_surf,ui_menu_pls_zxtt, u,b2s(_PickPTeam(p)), ta_middle, 255, c);
              if((G_plstat and (1 shl p))=0)and(G_Started)then lineColor(_menu_surf,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_gray);
           end
           else
@@ -420,6 +426,14 @@ begin
                     _draw_text(_menu_surf,ui_menu_csm_x3+6, y, str_ready+b2pm[PlayerReady]     , ta_left  ,255, mic((net_nstat<>ns_srvr)and(G_Started=false),false));
                     vlineColor(_menu_surf,ui_menu_csm_x2  , t,i, c_gray);
                     vlineColor(_menu_surf,ui_menu_csm_x3  , t,i, c_gray);
+
+                    y:=_yt(9);
+                    t:=_yl(9);
+                    i:=t+ui_menu_csm_ys;
+                    vlineColor(_menu_surf,ui_menu_csm_xc  , t,i, c_gray);
+                    _draw_text(_menu_surf,ui_menu_csm_xt0 , y, str_observer +b2pm[PlayerObs ]  , ta_left  ,255, mic((G_Started=false),false));
+                    _draw_text(_menu_surf,ui_menu_csm_xt2 , y, str_aobserver+b2pm[PlayerAObs]  , ta_right ,255, mic(true,false));
+
 
                     y:=_yt(10);
                     _draw_text(_menu_surf,ui_menu_csm_xt0, y, str_chattars, ta_left,255, c_white);

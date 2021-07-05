@@ -55,6 +55,8 @@ ai_apcd,
 ai_ux,
 ai_uy,
 ai_ud,
+dbgai_bx,
+dbgai_by,
 ai_bx,
 ai_by,
 ai_bd             : integer;
@@ -152,6 +154,8 @@ PlayerName        : shortstring = 'DoomPlayer';
 PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
 PlayerRace        : byte = 0;
+PlayerObs         : boolean = false;
+PlayerAObs        : boolean = false;
 
 plcolor           : array[0..MaxPlayers] of cardinal;
 
@@ -517,6 +521,9 @@ spr_ui_oico       : array[1..2,false..true,0.._uts] of pSDL_Surface;
 
 /// text
 
+str_obs,
+str_observer,
+str_aobserver,
 str_all,
 str_orders,
 str_req,

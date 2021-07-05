@@ -199,6 +199,9 @@ begin
    str_req               := 'Requirements: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
+   str_aobserver         := 'Allow obs.: ';
+   str_observer          := 'Observer: ';
+   str_obs               := 'OBS';
 
    str_starta            := 'Starting base:';
    str_startat[0]        := '1 '+#19+'builder'+#25;

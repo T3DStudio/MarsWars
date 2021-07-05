@@ -803,7 +803,9 @@ begin
          if(buff[ub_advanced]>0)then
          begin
             case uid of
-              UID_Baron : inc(arm,dam div 2);
+              UID_Baron : if(g_addon)
+                          then inc(arm,dam div 2)
+                          else inc(arm,dam div 3);
             else
             end;
          end;
@@ -931,21 +933,6 @@ begin
           buff[ub_teleeff]:=vid_fps;
        end;
 end;
-
-{procedure _unit_morph(u:integer;nuid:byte;ubld:boolean);
-begin
-   with _units[u] do
-    with _players[player] do
-    begin
-       _unit_dec_Kcntrs(u);
-       _unit_dec_Rcntrs(u);
-
-       uid :=nuid;
-       _unit_sclass(@_units[u]);
-
-       _unit_inc_cntrs(u,ubld);
-    end;
-end; }
 
 procedure _pain_action_code(u:integer);
 begin
@@ -1801,6 +1788,7 @@ begin
       UID_Cacodemon  : if(uid<>tu^.uid)and(tu^.uf=uf_ground)then _TarPrioPR:=5;
       UID_Baron      : if(uid<>tu^.uid)and(tu^.uf=uf_ground)and not(tu^.uid in armor_lite)then _TarPrioPR:=5;
       UID_Cyberdemon,
+      UID_ZBomber,
       UID_Bomber,
       UID_Tank,
       UID_Mancubus   : if(tu^.isbuild)then _TarPrioPR:=5;
@@ -1819,10 +1807,10 @@ begin
       UID_Terminator,
       UID_Mastermind,
       UID_UTurret    : if(tu^.mech=false)and(tu^.uid in armor_lite)then _TarPrioPR:=5;
-      UID_Arachnotron
-                     : if(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
+      UID_Arachnotron,
       UID_UPTurret,
-      UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)then _TarPrioPR:=5;
+      UID_ZMajor,
+      UID_Major      : if not(tu^.uid in armor_lite)and(tu^.mech)and(tu^.isbuild=false)and(tu^.uf=uf_ground)then _TarPrioPR:=5;
       UID_Mine       : if(tu^.uf<uf_fly)then _TarPrioPR:=5;
       UID_BFG        : if not(tu^.uid in [UID_LostSoul,UID_Demon])then _TarPrioPR:=5;
       UID_HTower,
@@ -2662,6 +2650,7 @@ begin
                       _addtoint(@vsnt[i],vid_fps);
                       if(g_mode<>gm_inv)or(player<>0)then _addtoint(@vsni[i],vid_fps);
                    end;
+                  if(aobserver)then _addtoint(@vsnt[0],vid_fps);
                end;
            end;
 

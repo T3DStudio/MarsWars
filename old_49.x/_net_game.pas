@@ -70,6 +70,10 @@ begin
       ready:=net_readbool;
       if((i>0)<>ready)then vid_mredraw:=true;
 
+      i:=byte(observer);
+      observer:=net_readbool;
+      if((i>0)<>observer)then vid_mredraw:=true;
+
       net_chatls[pid]:=net_readbyte;
       PNU            :=net_readbyte;
    end;
@@ -77,6 +81,7 @@ end;
 
 procedure net_GServer;
 var mid,pid,i:byte;
+    b:boolean;
 begin
    net_clearbuffer;
 
@@ -96,8 +101,12 @@ begin
           with _players[i] do
           begin
              net_writestring(name);
-             net_writebyte(race);
-             net_writebyte(team);
+             net_writebool(observer);
+             if(observer=false)then
+             begin
+                net_writebyte(race);
+                net_writebyte(team);
+             end;
           end;
          net_send(net_lastinip,net_lastinport);
          continue;
@@ -138,6 +147,7 @@ begin
              net_writebyte  (mrace);
              net_writebyte  (state);
              net_writebool  (ready);
+             net_writebool  (observer);
              net_writeint   (ttl);
           end;
 
@@ -199,8 +209,11 @@ begin
                if(mid=nmid_clinf) then
                 with _players[pid] do
                 begin
-                   PNU :=net_readbyte;
+                   PNU            :=net_readbyte;
                    net_chatls[pid]:=net_readbyte;
+                   b:=aobserver;
+                   aobserver      :=net_readbool;
+                   if(aobserver<>b)then vid_mredraw:=true;
                 end;
 
                if(mid=nmid_pause)then
@@ -359,13 +372,14 @@ begin
          for i:=1 to MaxPlayers do
           with _Players[i] do
           begin
-             name := net_readstring;
-             team := net_readbyte;
-             race := net_readbyte;
-             mrace:= net_readbyte;
-             state:= net_readbyte;
-             ready:= net_readbool;
-             ttl  := net_readint;
+             name    := net_readstring;
+             team    := net_readbyte;
+             race    := net_readbyte;
+             mrace   := net_readbyte;
+             state   := net_readbyte;
+             ready   := net_readbool;
+             observer:= net_readbool;
+             ttl     := net_readint;
           end;
 
          HPlayer:=net_readbyte;
@@ -417,6 +431,7 @@ begin
          net_writebyte  (PlayerTeam);
          net_writebyte  (PlayerRace);
          net_writebool  (PlayerReady);
+         net_writebool  (PlayerObs);
          net_writebyte  (net_chatls[HPlayer]);
          net_writebyte  (_pnua[net_pnui]);
       end
@@ -425,6 +440,7 @@ begin
          net_writebyte(nmid_clinf);
          net_writebyte(_pnua[net_pnui]);
          net_writebyte(net_chatls[HPlayer]);
+         net_writebool(PlayerAObs);
       end;
       net_send(net_cl_svip,net_cl_svport);
    end;

@@ -150,7 +150,7 @@ begin
                          end;
                       end;
                    end;
-     rpl_wunit   : if((vid_rtui mod 2)=0) then
+     rpl_wunit   : if((vid_rtui mod 2)=0)then
                    begin
                       _vx:=byte((vid_vx+vid_panel) shr vxyc);
                       _vy:=byte(vid_vy shr vxyc);

@@ -182,7 +182,7 @@ begin
 end;
 
 begin
-   s:='                                                                      ';
+   s:='                                                                                ';
    if(x1>0)then ss(@s1,x1);
    if(x2>0)then ss(@s2,x2);
    if(x3>0)then ss(@s3,x3);
@@ -194,11 +194,13 @@ end;
 procedure ps(p:byte);
 begin
    if(p=0)
-   then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0)
+   then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, 'Obs. vision',42)
    else with _players[p] do
-        if(state<>ps_none)
-        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(_PickPTeam(p)),35, '',0)
-        else _screenLine(name      ,1   , _plst(p)  ,15, '---',25, '-',35, '',0);
+        if(state=ps_none)
+        then _screenLine(name      ,1   , _plst(p)  ,15, '---',25, '-',35, '',42)
+        else if(observer=false)
+             then _screenLine(name ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(_PickPTeam(p)),35, ''             ,42)
+             else _screenLine(name ,1   , _plst(p)  ,15, 'observer'     ,25, ''                ,35, b2pm[aobserver],42)
 end;
 
 function SVGameStatus:shortstring;
@@ -232,7 +234,7 @@ begin
       8 : writeln('         ',str_starta  ,' ',str_startat[g_startb]);
       10: writeln('         ',str_aislots ,' ',G_aislots);
       11: writeln;
-      12: _screenLine('Map',1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq   ,35, str_m_obs   ,45);
+      12: _screenLine('Map',1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45);
       14: _screenLine(''   ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx[map_liq],35, _str_mx[map_obs],45);
       15: writeln;
       16: ps(0);

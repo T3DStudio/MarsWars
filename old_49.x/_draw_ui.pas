@@ -204,6 +204,7 @@ begin
 
          _draw_text(_uipanel,ui_armyx ,ui_iy,b2s(army      ),ta_middle,255,c_white);
 
+         if(observer=false)then
          case ui_tab of
          0:
          begin
@@ -359,7 +360,7 @@ begin
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
         with _players[HPlayer] do
-        if(i<=_uts)then
+        if(i<=_uts)and(observer=false)then
         begin
            case ui_tab of
            0 : case i of
@@ -439,13 +440,15 @@ begin
         if(G_WTeam=255)then
         begin
            if(menu_s2<>ms2_camp)then
-            if(_players[HPlayer].army=0)then _draw_text(_screen,vid_uiuphx,2,str_lose  ,ta_middle,255,c_red);
+            with _players[HPlayer] do
+             if(army=0)and(observer=false)then _draw_text(_screen,vid_uiuphx,2,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
             if(net_nstat=ns_clnt)and(net_cl_svttl=ClientTTL)
             then _draw_text(_screen,vid_uiuphx,12,str_waitsv,ta_middle,255,plcolor[net_cl_svpl])
             else _draw_text(_screen,vid_uiuphx,12,str_pause ,ta_middle,255,plcolor[G_paused]);
         end
         else
+          if(_players[HPlayer].observer=false)then
           begin
              if(G_WTeam=team)
              then _draw_text(_screen,vid_uiuphx,2,str_win   ,ta_middle,255,c_lime)

@@ -291,6 +291,7 @@ begin
                   if (state<>ps_none)
                   then state:=PS_None
                   else state:=PS_Comp;
+                  observer:=false;
 
                   _playerSetState(p);
                end;
@@ -299,6 +300,7 @@ begin
            begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
+               if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
                begin
                   inc(race,1);
@@ -310,6 +312,7 @@ begin
            begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
+               if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
                 if(team<MaxPlayers)then inc(team,1);
            end;
@@ -406,6 +409,9 @@ begin
               if(m_vx<ui_menu_csm_x3)
               then begin inc(PlayerRace,1); PlayerRace:=PlayerRace mod 3;end
               else PlayerReady:=not PlayerReady;
+      93 : if(m_vx<ui_menu_csm_xc)
+           then begin if(G_Started=false)then PlayerObs:=not PlayerObs;end
+           else PlayerAObs:=not PlayerAObs;
       95 : begin
               p:=((m_vx-ui_menu_csm_x0) div ui_menu_csm_2ys)+1;
               if(p<>HPlayer)and(p<=MaxPlayers)then
@@ -455,6 +461,7 @@ begin
            begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
+               if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
                 if(team>1)then dec(team,1);
            end;
@@ -505,5 +512,9 @@ begin
 
    inc(m_vx,mv_x);
    inc(m_vy,mv_y);
+
+
+   if(net_nstat<>ns_clnt)then
+    with _players[HPlayer] do observer:=PlayerObs;
 end;
 

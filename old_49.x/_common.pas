@@ -373,7 +373,9 @@ begin
      gm_2fort: _PickPTeam:=((p-1) div 3)+1;
      gm_3fort: _PickPTeam:=((p-1) div 2)+1;
      gm_inv  : _PickPTeam:=1;
-     else _PickPTeam:=_players[p].team;
+     else if(_players[p].observer)
+          then _PickPTeam:=0
+          else _PickPTeam:=_players[p].team;
      end;
 end;
 

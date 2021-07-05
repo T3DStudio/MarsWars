@@ -503,7 +503,7 @@ begin
          rld_a  := 80;
          anims  := 14;
          trt    := vid_fps*30;
-         renerg := 4;
+         renerg := 3;
          if(uid=UID_ZBomber)then
          begin
             painc  := 3;
@@ -559,7 +559,7 @@ begin
       end;
       if(uid=UID_FAPC)then
       begin
-         mhits  := 250;
+         mhits  := 300;
          r      := 30;
          uf     := uf_fly;
          speed  := 22;
@@ -568,13 +568,13 @@ begin
          mech   := true;
          apcm   := 10;
          rld_r  := 30;
-         trt    := vid_fps*25;
+         trt    := vid_fps*30;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
       end;
       if(uid=UID_APC)then
       begin
-         mhits  := 350;
+         mhits  := 450;
          r      := 25;
          uf     := uf_ground;
          speed  := 15;
@@ -585,7 +585,7 @@ begin
          apcs   := 8;
          anims  := 17;
          rld_r  := 30;
-         trt    := vid_fps*25;
+         trt    := vid_fps*30;
          renerg := 3;
          ruid   := UID_UWeaponFactory;
       end;
@@ -655,7 +655,7 @@ begin
          isbuild:= true;
          renerg := builder_enrg[0];
          ctime  := 80;
-         rld_r  := vid_fps*10;
+         rld_r  := vid_fps*15;
       end;
       if(uid=UID_UMilitaryUnit)then
       begin
@@ -678,7 +678,7 @@ begin
          generg := 2;
          isbuild:= true;
          renerg := 2;
-         ctime  := 16;
+         ctime  := 14;
       end;
       if(uid=UID_UWeaponFactory) then
       begin
