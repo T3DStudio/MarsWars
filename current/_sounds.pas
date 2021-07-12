@@ -330,12 +330,20 @@ begin
    snd_chat                 :=LoadSoundSet('chat'            );
    snd_building_explode     :=LoadSoundSet('building_explode');
    snd_teleport             :=LoadSoundSet('teleport'        );
-   snd_pexp                 :=LoadSoundSet('p_exp'           );
    snd_exp                  :=LoadSoundSet('explode'         );
    snd_mine_place           :=LoadSoundSet('mine_place'      );
    snd_inapc                :=LoadSoundSet('inapc'           );
    snd_meat                 :=LoadSoundSet('meat'            );
 
+   snd_pexp                 :=LoadSoundSet(missiles_folder+'p_exp'           );
+   snd_launch               :=LoadSoundSet(missiles_folder+'launch'          );
+   snd_pistol               :=LoadSoundSet(missiles_folder+'pistol'          );
+   snd_shotgun              :=LoadSoundSet(missiles_folder+'shotgun'         );
+   snd_ssg                  :=LoadSoundSet(missiles_folder+'ssg'             );
+   snd_plasma               :=LoadSoundSet(missiles_folder+'plasma'          );
+   snd_bfg_shot             :=LoadSoundSet(missiles_folder+'bfg_shot'        );
+   snd_healing              :=LoadSoundSet(missiles_folder+'healing'         );
+   snd_electro              :=LoadSoundSet(missiles_folder+'electro'         );
    snd_rico                 :=LoadSoundSet(missiles_folder+'rico'            );
    snd_bfg_exp              :=LoadSoundSet(missiles_folder+'bfg_exp'         );
    snd_flyer_s              :=LoadSoundSet(missiles_folder+'flyer_s'         );
@@ -477,6 +485,8 @@ begin
    snd_hell_eye             :=LoadSoundSet(race_buildings[r_hell]+'hell_eye'      );
 
 
+
+   snd_hell_invuln          :=LoadSoundSet(race_units[r_hell]+'invuln');
    snd_hell_pain            :=LoadSoundSet(race_units[r_hell]+'d_p');
    snd_hell_melee           :=LoadSoundSet(race_units[r_hell]+'d_m');
    snd_hell_attack          :=LoadSoundSet(race_units[r_hell]+'d_a');

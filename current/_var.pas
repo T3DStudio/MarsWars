@@ -46,7 +46,7 @@ _uregen_c         : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
-_mids             : array[byte] of TMID;
+
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -199,10 +199,11 @@ vid_vsls          : word = 0;
 ter_w,
 ter_h             : integer;
 
-font_ca           : array[char] of pSDL_SURFACE;
+font_ca           : array[char] of TMWTexture;
 
 _eids             : array[byte] of TEID;
 _effects          : array[1..vid_mvs] of TEffect;
+_mids             : array[byte] of TMID;
 
 _tdecaln          : integer = 0;
 _tdecals          : array of TDecal;
@@ -823,6 +824,7 @@ snd_zimba_ready,
 snd_zimba_pain,
 snd_zimba_move,
 
+snd_hell_invuln,
 snd_hell_pain,
 snd_hell_melee,
 snd_hell_attack,
@@ -882,70 +884,26 @@ snd_arachno_foot,
 snd_arachno_ready,
 
 {
-snd_oof,
 snd_alarm,
-snd_uupgr,
-snd_hupgr,
-snd_cast,
-snd_cast2,
-snd_bfgs,
-snd_bfgepx,
-snd_plasmas,
-snd_ssg,
-
+snd_cubes,
+snd_hshoot,
+}
 snd_pistol,
 snd_shotgun,
-snd_launch,
-snd_cubes,
-snd_rev_c,
-snd_rev_m,
-snd_rev_d,
-snd_rev_a,
-snd_rev_ac,
-snd_hshoot,
-snd_man_a,
-snd_man_d,
-snd_man_p,
-snd_man_c,
-snd_zomb,
-snd_ud1,
-snd_ud2,
-snd_z_p,
-snd_z_d1,
-snd_z_d2,
-snd_z_d3,
-snd_z_s1,
-snd_z_s2,
-snd_z_s3,
-
-snd_uac_u0,
-snd_uac_u1,
-snd_uac_u2,
-snd_pain_c,
-snd_pain_p,
-snd_pain_d,
-snd_mindc,
-snd_mindd,
-snd_mindf,
-snd_cyberc,
-snd_cyberd,
-snd_cyberf,
-snd_knight,
-snd_knightd,
-snd_baronc,
-snd_barond,
-snd_cacoc,
-snd_cacod,
-snd_dpain,
-snd_demon1, }
+snd_ssg,
+snd_plasma,
+snd_bfg_shot,
+snd_bfg_exp,
+snd_healing,
+snd_electro,
 snd_jetpoff,
 snd_jetpon,
 snd_click,
 snd_chat,
 snd_rico,
-snd_bfg_exp,
 snd_flyer_s,
 snd_flyer_a,
+snd_launch,
 {,
 snd_ccup,
 , }

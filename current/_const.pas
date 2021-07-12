@@ -15,6 +15,7 @@ fr_hfps                = fr_fps div 2;
 fr_hhfps               = fr_hfps div 2;
 fr_2fps                = fr_fps*2;
 fr_3fps                = fr_fps*3;
+fr_4fps                = fr_fps*4;
 fr_mpt                 = trunc(1000/fr_fps);
 
 
@@ -83,8 +84,8 @@ gms_g_startb           = 5;
 //  NETGAME
 //
 
-                                             // 60 140 220 300 380 460 540 620 700 780
-_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,195);
+                                             // 60 140 220 300 380 460 540 620 700 800
+_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
 ClientTTL              = fr_fps*10;
 
@@ -203,7 +204,8 @@ wpr_any              : cardinal =  0;
 wpr_adv              : cardinal =  %0000000000000001;
 wpr_nadv             : cardinal =  %0000000000000010;
 wpr_zombie           : cardinal =  %0000000000000100;
-
+wpr_sspos            : cardinal =  %0000000000001000;
+wpr_cast             : cardinal =  %0000000000010000;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -227,6 +229,8 @@ wtr_fly              : cardinal = %000000000010000000000000;
 wtr_adv              : cardinal = %000000000100000000000000;
 wtr_nadv             : cardinal = %000000001000000000000000;
 
+wtrset_enemy_alive_ground
+                     : cardinal = %000000001101111111111100;
 wtrset_enemy_alive   : cardinal = %000000001111111111111100;
 wtrset_resurect      : cardinal = %000000001111111111010011;
 
@@ -292,6 +296,7 @@ uab_htowertele         = 6;
 uab_uac_rstrike        = 7;
 uab_spawnlost          = 100;
 uab_morph2heye         = 101;
+uab_umine              = 102;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -313,7 +318,7 @@ MaxUnitBuffs           = 15;
 
 ub_advanced            = 0;
 ub_pain                = 1;
-ub_toxin               = 2;
+ub_stun                = 2;
 ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
@@ -404,7 +409,7 @@ upgr_uac_mainm         = 40; // Main b move
 upgr_uac_ucomatt       = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_mines         = 43; // mines for engineers
-upgr_uac_minesen       = 44; // mine-sensor
+//upgr_uac_minesen       = 44; // mine-sensor
 upgr_uac_6bld          = 45; // adv
 //upgr_uac_2tier         = 46; // Tier 2
 upgr_uac_rstrike       = 47; // rstrike launch

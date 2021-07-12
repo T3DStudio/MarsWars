@@ -1,5 +1,17 @@
 
 
+procedure _draw_texture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
+begin
+   with sur^ do
+   begin
+      _rect^.x:=x;
+      _rect^.y:=y;
+      _rect^.w:=sur^.w;
+      _rect^.h:=sur^.h;
+      SDL_BLITSURFACE(surf,nil,tar,_rect);
+   end;
+end;
+
 procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
 begin
    _rect^.x:=x;
@@ -61,7 +73,7 @@ begin
              boxColor(sur,ix,y,ix+font_iw,y+font_iw,cl);
            end;
 
-           _draw_surf(sur,ix,y,font_ca[c]);
+           _draw_texture(sur,ix,y,@font_ca[c]);
 
            inc(o,1);
            inc(ix,font_w);

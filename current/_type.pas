@@ -136,7 +136,10 @@ TUWeapon = record
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
   aw_rld_a : TSoB;
-  aw_snd   : PTSoundSet;
+  aw_snd_shot,
+  aw_snd_start: PTSoundSet;
+  aw_eid_shot,
+  aw_eid_start: byte;
   {$ENDIF}
 end;
 
@@ -171,6 +174,7 @@ TUID = record
 
    _ability,
    _attack      : byte;
+   _barrack_teleport,
    _slowturn,
    _isbuilding,
    _isbuilder,

@@ -84,7 +84,7 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_toxin    ]>0);
+      SetBBit(@_bts2,0, buff[ub_stun    ]>0);
       SetBBit(@_bts2,1, buff[ub_gear     ]>0);
       SetBBit(@_bts2,2, buff[ub_resur    ]>0);
       SetBBit(@_bts2,3, buff[ub_born     ]>0);
@@ -96,7 +96,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      SetBBit(@_bts1,5, a_tar>0             );
+      SetBBit(@_bts1,5,(a_tar>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
@@ -157,7 +157,7 @@ begin
 
          if(sh>0)then
          begin
-            if(a_tar>0)then _wudata_int(a_tar,rpl);
+            if(a_tar>0)and(a_rld>0)then _wudata_int(a_tar,rpl);
 
             if(buff[ub_cast]>0)then
              if(_ability in client_cast_abils)then
@@ -301,7 +301,7 @@ begin
       inc(ucl_c[_isbuilding],1);
       inc(army,1);
 
-      if(inapc>0)then inc(_units[inapc].apcc,_apcs);
+      if(_IsUnitRange(inapc,nil))then inc(_units[inapc].apcc,_apcs);
 
       if(hits>0)and(inapc<=0)then
       begin
@@ -364,7 +364,7 @@ begin
       dec(ucl_c[_isbuilding],1);
       dec(army,1);
 
-      if(inapc>0)then dec(_units[inapc].apcc,_apcs);
+      if(_IsUnitRange(inapc,nil))then dec(_units[inapc].apcc,_apcs);
 
       if(hits>0)and(inapc=0)then
       begin
@@ -409,64 +409,24 @@ begin
 end;
 
 
-
-procedure _ucCreateEffect(uu,pu:PTUnit;vis:boolean);
+procedure _ucCreateEffect(uu:PTUnit;vis:pboolean);
 begin
    with uu^     do
-   with uid^    do
-   with player^ do
    begin
       vx:=x;
       vy:=y;
+      _unit_ready_effects(uu,vis);
+   end;
+end;
 
-      if(bld)
-      then _unit_ready_effects(uu,@vis)
-      else
-        if(playeri=HPlayer)then PlaySND(snd_build_place[_urace],nil,@vis);
-
-      if(vis=false)then exit;
-
-
-       {if(isbuild)then
-       begin
-          case uidi of
-          UID_Heye:
-             begin
-                shadow :=1;
-                if(playeri=HPlayer)then PlaySND(snd_hellbar,nil);
-                _effect_add(vx,vy,vy+1,UID_LostSoul);
-             end;
-          UID_HMilitaryUnit:
-             begin
-                if(buff[ub_advanced]>0)
-                then _effect_add(vx,vy,vy+1,EID_HAMU)
-                else _effect_add(vx,vy,vy+1,EID_HMU);
-                PlaySND(snd_hellbar,pu);
-                shadow :=0;
-             end;
-          UID_HCommandCenter:
-             begin
-                _effect_add(vx,vy,vy+1,EID_HCC);
-                PlaySND(snd_hellbar,pu);
-                shadow :=0;
-             end;
-          else
-             if(playeri=HPlayer)and(bld=false)then
-              if(tu^.bld=true)or(tu^.hits<0)then PlaySND(snd_build[race],nil);
-             shadow :=0;
-          end
-       end
-       else
-         if(buff[ub_born]>0)then
-         begin
-            if(playeri=HPlayer)then _unit_createsound(uidi);
-         end;  }
-
-      if(buff[ub_teleeff]>0)then
-      begin
-         _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
-         PlaySND(snd_teleport,nil,@vis);
-      end;
+procedure _teleEff(pu:PTUnit;vis:pboolean);
+begin
+   with pu^ do
+   begin
+      vx:=x;
+      vy:=y;
+      _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
+      PlaySND(snd_teleport,nil,vis);
    end;
 end;
 
@@ -492,11 +452,9 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           if(buff[ub_born]>0)then
-            if(uid^._isbuilding=false)
-            then _ucCreateEffect(uu,pu,vis)
-            else
-              if(bld=false)and(playeri=HPlayer)then PlaySND(snd_build_place[race],nil,nil);
+           if(buff[ub_born]>0)then _ucCreateEffect(uu,@vis);
+
+           if(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
         end;
 
         _ucInc(uu);
@@ -504,25 +462,30 @@ begin
      else
        if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
        begin
+          _unit_upgr(pu);
+
           vx:=x;
           vy:=y;
           if(pu^.hits>0)and(vis)then
           begin
-             if(hits>ndead_hits)and(inapc=0)then _unit_death_effects(uu,true,@vis);
+             if(hits>ndead_hits)and(inapc=0)then
+             begin
+                if(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
 
-             //
-             if(hits=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,uf),@vis);
+                _unit_death_effects(uu,true,@vis);
+             end;
+
+             if(hits<=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,uf),@vis);
           end;
 
           if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
-          _unit_upgr(pu);
           _ucDec(pu);
 
-          x :=-32000;
+          {x :=-32000;
           y :=-32000;
           vx:=x;
-          vy:=y;
+          vy:=y; }
        end
        else
          if(pu^.hits>dead_hits)and(hits>dead_hits)then
@@ -543,26 +506,48 @@ begin
 
             if(hits>0)then
             begin
-               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
-               or((pu^.bld=false)and(bld))then _ucCreateEffect(uu,pu,vis);
+               if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
+
+               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))then _ucCreateEffect(uu,@vis);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
                if(pu^.inapc<>inapc)and(vis)then PlaySND(snd_inapc,nil,@vis);
 
-               if(pu^.buff[ub_cast]<=0)and(buff[ub_cast]>0)and(bld)then
-                case uid^._ability of
-                0:;
+               if(bld)then
+               begin
+                  if(pu^.buff[ub_cast]<=0)and(buff[ub_cast]>0)then
+                   case uid^._ability of
+               0:;
                uab_uac_rstrike : _unit_umstrike_create(uu);
                uab_radar       : if(team=_players[HPlayer].team)then PlaySND(snd_radar,nil,@vis);
-               uab_spawnlost   : _pain_lost_spawn(pu);
-                end;
+               uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
+                   end;
+
+                  if(uid^._isbuilding=false)then
+                  begin
+                     if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced ]>0)then
+                      case uid^._urace of
+                r_hell: _unit_hell_unit_adv(uu);
+                r_uac : _unit_uac_unit_adv (uu,nil);
+                      end;
+
+                     if(pu^.buff[ub_invuln  ]=0)and(buff[ub_invuln  ]>0)then _unit_PowerUpEff(uu,snd_hell_invuln);
+                  end;
+
+                  {if(uidi in [UID_Major,UID_ZMajor])then
+                   if(pu^.hits>0)then
+                   begin
+                      if(pu^.uf=uf_ground)and(uf>uf_ground)then PlaySND(snd_jetpon ,uu,@vis);
+                      if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,uu,@vis);
+                   end;}
+               end;
             end;
 
             if(pu^.hits<=0)and(hits>0)then
             begin
                _unit_fog_r(uu);
-               //vx:=x;
-               //vy:=y;
+               vx:=x;
+               vy:=y;
             end
             else
               if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
@@ -575,38 +560,7 @@ begin
             if(pu^.inapc=0)then
              if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
 
-            if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced ]>0)then
-             case uid^._urace of
-             r_hell: _unit_hell_unit_adv(uu);
-             r_uac : _unit_uac_unit_adv (uu,nil);
-             end;
-            if(pu^.buff[ub_resur   ]=0)and(buff[ub_resur]>0)then PlaySND(snd_meat ,uu,@vis);
-
             {
-            if(pu^.buff[ub_cast]=0)and(buff[ub_cast]>0)then
-             case uidi of
-             UID_ArchVile: ;
-             UID_Pain    : _pain_action(uu);
-             end;
-
-            if(uidi in [UID_Major,UID_ZMajor])then
-             if(buff[ub_advanced]>0)and(hits>0)and(pu^.hits>0)then
-             begin
-                if(pu^.uf=uf_ground)and(uf>uf_ground)then PlaySND(snd_jetpon ,uu);
-                if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,uu);
-             end;
-
-
-
-            if(race=r_hell)and(isbuild=false)and(hits>0)then
-            begin
-               if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then _unit_PowerUpEff(uu,snd_hupgr );
-               if(pu^.buff[ub_invuln  ]=0)and(buff[ub_invuln  ]>0)then _unit_PowerUpEff(uu,snd_hpower);
-
-               if(buff[ub_teleeff]=0)then
-               if(pu^.buff[ub_pain    ]=0)and(buff[ub_pain    ]>0)then _unit_painsnd(uu);
-            end;
-
             if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
             begin
                if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
@@ -630,8 +584,7 @@ begin
                   uf   := uf_fly;
                end;
             end;
-
-            if(tar1>0)and(tar1<=MaxUnits)then tar1d:=dist2(x,y,_units[tar1].x,_units[tar1].y);    }
+   }
 
             if(speed>0)then
             begin
@@ -761,7 +714,7 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_toxin    ]:=_buffst[GetBBit(@_bts2,0)];
+         buff[ub_stun    ]:=_buffst[GetBBit(@_bts2,0)];
          buff[ub_gear     ]:=_buffst[GetBBit(@_bts2,1)];
          buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,2)];
          buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
@@ -770,7 +723,7 @@ begin
       end
       else
       begin
-         buff[ub_toxin    ]:=0;
+         buff[ub_stun    ]:=0;
          buff[ub_gear     ]:=0;
          buff[ub_resur    ]:=0;
          buff[ub_born     ]:=0;

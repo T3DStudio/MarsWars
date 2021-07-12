@@ -460,15 +460,18 @@ begin
    for i:=0 to 255 do
    begin
       c:=chr(i);
-      font_ca[c]:=_createSurf(font_w,font_w);
-      SDL_FillRect(font_ca[c],nil,0);
-      SDL_SetColorKey(font_ca[c],SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+      with font_ca[c] do
+      begin
+         surf:=_createSurf(font_w,font_w);
+         SDL_FillRect(surf,nil,0);
+         SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+      end;
 
       _rect^.x:=ord(i)*font_w;
       _rect^.y:=0;
       _rect^.w:=font_w;
       _rect^.h:=font_w;
-      SDL_BLITSURFACE(fspr,_rect,font_ca[c],nil);
+      SDL_BLITSURFACE(fspr,_rect,font_ca[c].surf,nil);
    end;
    _FreeSF(fspr);
 end;

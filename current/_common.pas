@@ -353,9 +353,11 @@ end;
 
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
 begin
+   {$IFDEF _FULLGAME}
    if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
    then _uvision:=true
    else
+   {$ENDIF}
     with tu^ do
      if(buff[ub_invis]<=0)or(hits<=0)or(noinvis)
      then _uvision:=(vsnt[uteam]>0)
@@ -512,14 +514,6 @@ begin
         if (ttl=ClientTTL) then inc(r,1);
      end;
    _plsOut:=(r=c)and(c>0);
-end;
-
-function _uvision(uteam:byte;tu:PTUnit;onlyvis:boolean):boolean;
-begin
-   with tu^ do
-    if(buff[ub_invis]<=0)or(hits<=0)or(onlyvis)
-    then _uvision:=(vsnt[uteam]>0)
-    else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
 
 {$ENDIF}

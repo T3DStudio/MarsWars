@@ -49,12 +49,15 @@ end;
 procedure _unit_ready_effects(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
+   if(hits>0)then
    with uid^ do
    begin
-      if(playeri=HPlayer)then PlayInGameAnoncer(un_snd_ready[buff[ub_advanced]>0]);
-       {if(_isbuilding)
-       then PlayInGameAnoncer(snd_constr_complete[_urace])
-       else PlaySND(un_snd_ready[buff[ub_advanced]>0],nil,nil); }
+      if(playeri=HPlayer)then
+       if(bld)
+       then PlayInGameAnoncer(un_snd_ready[buff[ub_advanced]>0])
+       else PlayInGameAnoncer(snd_build_place[_urace]);
+
+      if(bld=false)then exit;
 
       if(vischeck<>nil)then
       begin
@@ -123,6 +126,32 @@ begin
 
    _effect_add(tx,ty,dy,UID_LostSoul);
    PlaySND(snd_pexp,nil,nil);
+end;
+
+procedure _unit_attack_effects(pu:PTUnit;start:boolean;vischeck:pboolean);
+begin
+   with pu^ do
+   with uid^ do
+   with _a_weap[a_weap] do
+   begin
+      if(vischeck<>nil)then
+      begin
+         if(vischeck^=false)then exit
+      end
+      else
+        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+
+      if(start)then
+      begin
+         _effect_add(vx,vy,vy+1,aw_eid_start);
+         PlaySND(aw_snd_start,nil,nil);
+      end
+      else
+      begin
+         _effect_add(vx,vy,vy+1,aw_eid_shot );
+         PlaySND(aw_snd_shot,nil,nil);
+      end;
+   end;
 end;
 
 {$ENDIF}
@@ -542,7 +571,6 @@ begin
       pains    := 0;
       dir      := 270;
       order    := 0;
-      wanim    := false;
       a_tar    := 0;
       a_weap   := 0;
       //a_tard   := 32000;
@@ -557,6 +585,7 @@ begin
       FillChar(pprod_u,SizeOf(pprod_u),0);
 
       {$IFDEF _FULLGAME}
+      wanim    := false;
       anim     := 0;
       _unit_mmcoords(pu);
       _unit_sfog    (pu);
@@ -643,7 +672,7 @@ begin
    end;
 end;
 
-procedure _unit_inc_cntrs(pu:PTUnit;ubld:boolean);
+procedure _unit_inc_cntrs(pu:PTUnit;ubld,born:boolean);
 begin
    with pu^ do
    with uid^ do
@@ -655,22 +684,27 @@ begin
 
       inc(uid_e[uidi],1);
 
-      if(ubld)then
-      begin
-         buff[ub_born]:=fr_fps;
-         bld := true;
-         _unit_bld_inc_cntrs(pu);
-      end
+      bld:=ubld;
+
+      if(ubld)
+      then _unit_bld_inc_cntrs(pu)
       else
       begin
-         bld := false;
          hits:= 1;
          dec(cenerg,_renerg);
+      end;
+
+      if(born)then
+      begin
+         buff[ub_born]:=fr_fps;
+         {$IFDEF _FULLGAME}
+         _unit_ready_effects(_LastCreatedUnitP,nil);
+         {$ENDIF}
       end;
    end;
 end;
 
-procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld:boolean);
+procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld,born:boolean);
 var m,i:integer;
 begin
    _LastCreatedUnit :=0;
@@ -721,22 +755,17 @@ begin
 
           _unit_default  (_LastCreatedUnitP);
           _unit_apUID    (_LastCreatedUnitP);
-          _unit_inc_cntrs(_LastCreatedUnitP,ubld);
+          _unit_inc_cntrs(_LastCreatedUnitP,ubld,born);
        end;
    end;
 end;
 
 procedure _unit_startb(bx,by:integer;buid,bp:byte);
 begin
-    if(_uid_cndt(@_players[bp],buid)=0)then
-     with _players[bp] do
-      if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
-      begin
-         _unit_add(bx,by,buid,bp,false);
-         {$IFDEF _FULLGAME}
-         if(_LastCreatedUnit>0)and(bp=HPlayer)then PlaySND(snd_build_place[race],nil,nil);
-         {$ENDIF}
-      end;
+   if(_uid_cndt(@_players[bp],buid)=0)then
+    with _players[bp] do
+     if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
+      _unit_add(bx,by,buid,bp,false,true);
 end;
 
 
@@ -974,7 +1003,7 @@ begin
          cd:=(dir+i*15)*degtorad;
 
          _unit_add(x+trunc(sr*cos(cd)),
-                   y-trunc(sr*sin(cd)),_uid,playeri,true);
+                   y-trunc(sr*sin(cd)),_uid,playeri,true,true);
          if(_LastCreatedUnit>0)then
          begin
             _LastCreatedUnitP^.uo_x  :=uo_x;
@@ -982,10 +1011,14 @@ begin
             _LastCreatedUnitP^.uo_id :=uo_id;
             _LastCreatedUnitP^.uo_tar:=uo_tar;
             _LastCreatedUnitP^.dir   :=dir;
-
-            {$IFDEF _FULLGAME}
-            _unit_ready_effects(_LastCreatedUnitP,nil);   // дулируется звук
-            {$ENDIF}
+            if(_barrack_teleport)then
+            begin
+               _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
+               {$IFDEF _FULLGAME}
+               if _nhp3(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
+               _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.uf),EID_Teleport);
+               {$ENDIF}
+            end;
          end;
       end;
    end;
@@ -1049,7 +1082,7 @@ end;
 
 
 
-procedure _pain_lost(pu:PTUnit;tx,ty:integer);
+procedure _unit_spawn(pu:PTUnit;tx,ty:integer;auid:byte);
 var tu:PTUnit;
 begin
    with pu^ do
@@ -1059,7 +1092,7 @@ begin
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
-        then _unit_add(tx,ty,UID_LostSoul,playeri,true)
+        then _unit_add(tx,ty,auid,playeri,true,true)
         else exit;
 
       if(_LastCreatedUnit>0)then
@@ -1080,25 +1113,25 @@ begin
              _LastCreatedUnitP^.uo_y  :=uo_y;
           end;
          _LastCreatedUnitP^.buff[ub_advanced]:=buff[ub_advanced];
-         {$IFDEF _FULLGAME}
-         _unit_ready_effects(_LastCreatedUnitP,nil);
-         {$ENDIF}
       end
       {$IFDEF _FULLGAME}
-      else _pain_lost_fail(tx,ty,_depth(ty+1,uf),nil)
+      else
+        case auid of
+UID_LostSoul: _pain_lost_fail(tx,ty,_depth(ty+1,uf),nil);
+        end;
       {$ENDIF};
    end;
 end;
 
 
-procedure _pain_lost_spawn(pu:PTUnit);
+procedure _ability_unit_spawn(pu:PTUnit;auid:byte);
 var dd:integer;
 begin
    with pu^ do
    with uid^ do
    begin
       dd:=_DIR360(dir+23) div 45;
-      _pain_lost(pu,x+dir_stepX[dd]*_r,y+dir_stepY[dd]*_r);
+      _unit_spawn(pu,x+dir_stepX[dd]*_r,y+dir_stepY[dd]*_r,auid);
    end;
 end;
 
@@ -1259,6 +1292,13 @@ UID_HEye:  begin
                  {$ENDIF}
               end;
            end;
+UID_UMine: if(upgr[upgr_uac_mines]>1)and(srange<250)then
+           begin
+              srange:=250;
+              {$IFDEF _FULLGAME}
+              _unit_fog_r(pu);
+              {$ENDIF}
+           end;
       end;
 
       // REGENERATION
@@ -1277,264 +1317,5 @@ UID_HEye:  begin
    end;
 end;
 
-
-   {
-procedure _unit_upgr(pu:PTUnit);
-var tt:integer;
-begin
-   with pu^ do
-    with player^ do
-    begin
-       if(isbuild)and(bld=false)then exit;
-       if(hits<=0)then exit;
-
-       if(_uclord_c=_uclord)then
-       begin
-          if(onlySVCode)then
-          begin
-             if(g_mode=gm_inv)and(playeri=0)then solid:=false;
-
-             if(upgr[upgr_invuln]>0)then buff[ub_invuln]:=vid_fps;
-
-             if(buff[ub_advanced]=0)then
-              case uidi of
-                UID_HTeleport       : if(g_addon=false)then buff[ub_advanced]:=_bufinf;
-                UID_UVehicleFactory : if(upgr[upgr_6bld]>0)then buff[ub_advanced]:=_bufinf;
-              end;
-          end;
-
-          if(buff[ub_detect]=0)then
-           if(upgr[upgr_vision]>0)then
-            case uidi of
-            UID_URadar,
-            UID_UMine    : buff[ub_detect]:=_bufinf;
-            end;
-
-          if(buff[ub_advanced]=0)then
-          begin
-             if(uidi=UID_HTeleport)then
-              if(upgr[upgr_revtele]>0)then buff[ub_advanced]:=_bufinf;
-          end;
-       end;
-       if(_uregen_c=_uclord)then
-       begin
-          if(onlySVCode)then
-          begin
-             if(race=r_hell)and(hits<mhits)and(buff[ub_pain]=0)and(uidi<>UID_HEye)then
-             begin
-                case isbuild of
-                false: if(upgr[upgr_regen ]>0)then inc(hits,upgr[upgr_regen ]);
-                true : if(g_addon=false)
-                       then inc(hits,2)
-                       else
-                         if(upgr[upgr_bldrep]>0)then inc(hits,upgr[upgr_bldrep]);    //
-                end;
-                if(hits>mhits)then hits:=mhits;
-             end;
-          end;
-       end;
-
-       case uidi of
-         UID_HCommandCenter,
-         UID_UCommandCenter,
-         UID_HKeep :  begin
-                         tt:=upgr[upgr_mainr];
-                         if(tt>2)then tt:=2;
-                         tt:=base_rA[tt];
-                         if(sr<>tt)then
-                         begin
-                            sr:=tt;
-                            {$IFDEF _FULLGAME} _unit_fsrclc(pu);{$ENDIF}
-                         end;
-
-                         tt:=upgr[upgr_bldenrg];
-                         if(tt>4)then tt:=4;
-                         tt:=builder_enrg[tt];
-                         if(generg<>tt)then
-                         begin
-                            if(onlySVCode)then inc(menerg,tt-generg);
-                            generg:=tt;
-                         end;
-                      end;
-
-         UID_UMine  :  buff[ub_invis]:=_bufinf;
-         UID_ZEngineer,
-         UID_Commando:buff[ub_invis]:=buff[ub_advanced];
-         UID_Demon :  begin
-                         buff[ub_invis]:=buff[ub_advanced];
-
-                         if(upgr[upgr_pinkspd]>0)then
-                         begin
-                            speed:=20;
-                            anims:=18;
-                            rld_r:=35;
-                            rld_a:=18;
-                         end
-                         else
-                         begin
-                            speed:=14;
-                            anims:=15;
-                            rld_r:=60;
-                            rld_a:=30;
-                         end;
-                      end;
-         UID_Imp    : if(buff[ub_advanced]<=0)then
-                      begin
-                         rld_r :=vid_fps;
-                         rld_a:=rld_r-20;
-                      end
-                      else
-                      begin
-                         rld_r:=vid_fps-20;
-                         rld_a:=rld_r-15;
-                      end;
-
-         UID_URadar : begin
-                         tt:=upgr[upgr_5bld];
-                         if(tt>5)then tt:=5;
-                         rld_a:=radar_rlda[tt];
-                         tt:=radar_rsg[tt];
-                         if(sr<>tt)then
-                         begin
-                            sr:=tt;
-                            {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-                         end;
-                      end;
-         UID_HEye:    begin
-                         tt:=upgr[upgr_vision];
-                         if(tt>5)then tt:=5;
-                         tt:=eye_rsg[tt];
-                         if(sr<>tt)then
-                         begin
-                            sr:=tt;
-                            {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-                         end;
-                      end;
-
-         UID_Tank,
-         UID_Revenant:
-                      if(buff[ub_advanced]>0)
-                      then ar:=325
-                      else ar:=250;
-         UID_Arachnotron:
-                      if(buff[ub_advanced]>0)
-                      then arf:=350
-                      else arf:=ar;
-
-         UID_APC:     if(buff[ub_advanced]>0)
-                      then apcm:=6
-                      else apcm:=4;
-         UID_FAPC:    if(buff[ub_advanced]>0)
-                      then apcm:=14
-                      else apcm:=10;
-         UID_ZBFG,
-         UID_ZBomber,
-         UID_ZCommando,
-         UID_ZFormer,
-         UID_Cacodemon,
-         UID_Bomber,
-         UID_BFG:
-                      begin
-                         if(buff[ub_advanced]>0)
-                         then tt:=275
-                         else tt:=250;
-
-                         if(sr<>tt)then
-                         begin
-                            sr:=tt;
-                            ar:=tt;
-                            {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-                         end;
-                      end;
-
-         UID_Cyberdemon,
-         UID_Mastermind:
-                      begin
-                         if(buff[ub_advanced]>0)
-                         then tt:=300
-                         else tt:=250;
-
-                         if(sr<>tt)then
-                         begin
-                            sr:=tt;
-                            ar:=tt;
-                            {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-                         end;
-                      end;
-
-         UID_HTower,
-         UID_HTotem,
-         UID_UTurret,
-         UID_UPTurret,
-         UID_URTurret:if(sr<>towers_sr[upgr[upgr_towers]])then
-                      begin
-                         sr :=towers_sr[upgr[upgr_towers]];
-                         ar :=sr;
-                         arf:=(ar div 5)*4;
-                         {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-                      end;
-       end;
-
-       case uidi of
-         UID_HTotem,
-         UID_HEye   : begin
-                         buff[ub_invis]:=0;
-                         if(g_addon)then
-                         begin
-                            if(upgr[upgr_totminv]>0)then buff[ub_invis]:=_bufinf;
-                         end
-                         else
-                            if(upgr[upgr_vision ]>2)then buff[ub_invis]:=_bufinf;
-                      end;
-         UID_Major,
-         UID_ZMajor : begin
-                         if(buff[ub_advanced]>0)and(buff[ub_cast]>0)then
-                         begin
-                            uf   :=uf_fly;
-                            speed:=13;
-                         end
-                         else
-                         begin
-                            uf   :=uf_ground;
-                            speed:=9;
-                         end;
-                      end;
-       end;
-
-       if(buff[ub_advanced]>0)then
-       begin
-          if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
-           if(buff[ub_clcast]>0)then
-           begin
-              uo_y:=y;
-              vy  :=y;
-              shadow:=uaccc_fly-buff[ub_clcast]
-           end
-           else shadow:=uaccc_fly;
-
-          if(uidi=UID_UMine)then
-           if(sr<250)then
-           begin
-              sr:=250;
-              {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-           end;
-       end
-       else
-       begin
-          if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then shadow:=buff[ub_clcast];
-
-          if(G_Addon=false)then
-           if(uidi=UID_Baron)then buff[ub_advanced]:=_bufinf;
-
-          if(uidi=UID_UMine)then
-           if(sr>100)then
-           begin
-              sr:=100;
-              {$IFDEF _FULLGAME}_unit_fsrclc(pu);{$ENDIF}
-           end;
-       end;
-    end;
-end;
-   }
 
 

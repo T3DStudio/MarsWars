@@ -62,10 +62,10 @@ MID_YPlasma,
 MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
+MID_Mine,
 MID_Baron    : ms_snd_death:=snd_pexp;
 MID_Blizzard,
 MID_Tank,
-MID_Mine,
 MID_Granade,
 MID_HRocket,
 MID_Revenant,
@@ -167,7 +167,7 @@ MID_Flyer      : begin dam:=16 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; ystep:=3;end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
-MID_Mine       : begin dam:=175; vst:=1;         sr :=100;       end;
+MID_Mine       : begin dam:=5  ; vst:=1;         sr :=100;       end;
 MID_Blizzard   : begin dam:=250; vst:=fr_fps;    sr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
 MID_SShot      : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) div 8,30);mtars:=3;
                        dam:=8 +(30-sr);{ [9  28] }               end;
@@ -246,6 +246,7 @@ MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
 MID_Revenant,
 MID_RevenantS : if(uid=UID_Revenant   )then exit;
+MID_Mine      : if(uid=UID_UMine      )then exit;
    end;
 
    _miduid:=true;
@@ -268,22 +269,18 @@ begin
          teams:=_players[player].team=tu^.player^.team;
          damd :=dam;
 
-         if(teams)then
+         if(teams)and(sr>0)then
           case mid of
+          MID_BFG,
+          MID_Mine,
           MID_SShot,
-          MID_SSShot  : exit;
-          MID_ArchFire: if(tu^.uidi in [UID_Archvile,UID_HTotem])then exit;
+          MID_SSShot,
+          MID_ArchFire: exit;
           end;
 
          d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
-         if(sr=0)then
-          case mid of
-          MID_BPlasma,
-          MID_YPlasma,
-          MID_Flyer   : dec(d,15)
-          else          dec(d,10);
-          end;
-         if(d<0)then d:=0;
+         if(sr=0)then dec(d,10);
+         if(d <0)then d:=0;
 
          if(ServerSide)then
          begin
@@ -405,17 +402,16 @@ begin
             if(ServerSide)then
              if(tu^.buff[ub_invuln]=0)then
              begin
-                if(mid=MID_TBullet)and(tu^.uid^._ismech=false)then
+                if((mid=MID_TBullet)and(tu^.uid^._ismech=false))
+                or((mid=MID_MBullet)and(tu^.uid^._ismech)and(tu^.uid^._isbuilding=false))
+                or (mid=MID_Mine)then
                 begin
-                   if(tu^.uidi in armor_lite)
-                   then begin tu^.buff[ub_toxin]:=fr_hfps; tu^.buff[ub_pain ]:=fr_hfps;end
-                   else begin tu^.buff[ub_toxin]:=fr_fps;  tu^.buff[ub_pain ]:=fr_fps; end;
+                   tu^.buff[ub_stun]:=fr_fps;
+                   tu^.buff[ub_pain]:=fr_fps;
                 end;
-                if(mid=MID_MBullet)and(tu^.uid^._ismech)and(tu^.uid^._isbuilding=false)then
-                begin
-                   tu^.buff[ub_toxin]:=fr_fps;
-                   tu^.buff[ub_pain ]:=fr_fps;
-                end;
+                {$IFDEF _FULLGAME}
+                if(mid=MID_Mine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
+                {$ENDIF}
              end;
 
             {$IFDEF _FULLGAME}
@@ -437,17 +433,22 @@ begin
                  _unit_bullet_puff(tu);
                  {$ENDIF}
                  dec(mtars,1);
-                 _unit_damage(@_units[tar],damd,p,player);
+                 _unit_damage(tu,damd,p,player);
                  exit;
               end;
 
-              if(mid=MID_BFG)then
-              begin
-                 if(teams)then exit;
-                 {$IFDEF _FULLGAME}
-                 _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),EID_BFG);
-                 {$ENDIF}
-              end;
+              {$IFDEF _FULLGAME}
+              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),EID_BFG);
+              {$ENDIF}
+              if(ServerSide)then
+               if(mid=MID_Mine)then
+               begin
+                  tu^.buff[ub_stun]:=fr_fps;
+                  tu^.buff[ub_pain ]:=fr_fps;
+                  {$IFDEF _FULLGAME}
+                  _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
+                  {$ENDIF}
+               end;
 
               if(mid in [MID_HRocket,MID_Tank,MID_Granade])then
               begin
@@ -465,7 +466,7 @@ begin
 
               if(ServerSide)then
               begin
-                 damd:=trunc(damd*(1-(d/sr)) );
+                 damd:=mm3(0,trunc(damd*(1-(d/sr))),dam);
                  _unit_damage(tu,damd,p,player);
               end;
            end;

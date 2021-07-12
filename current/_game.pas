@@ -202,7 +202,7 @@ r,d,xs,ys,
    ds:integer;
 begin
    if(c=0)
-   then _unit_add(x,y,uid,pl,true)
+   then _unit_add(x,y,uid,pl,true,false)
    else
    begin
       ds :=map_mw div 2;
@@ -214,7 +214,7 @@ begin
          xs:=x+trunc(r*cos(d*degtorad));
          ys:=y-trunc(r*sin(d*degtorad));
 
-         _unit_add(xs,ys,uid,pl,true);
+         _unit_add(xs,ys,uid,pl,true,false);
 
          inc(d,ds);
       end;
@@ -509,6 +509,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      if((_ability=0)and(apcc<=0))or(speed<=0)
                                      then uo_id:=ua_amove
                                      else uo_id:=ua_paction;
+                                     _unit_turn(pu);
                                   end;
                     co_action  :  _unit_action   (pu);
                     co_supgrade:  _unit_supgrade (pu,o_y0);

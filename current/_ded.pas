@@ -265,8 +265,8 @@ begin
    then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0, '',0)
    else with _players[p] do
         if(state<>ps_none)
-        then _screenLine(name      ,1   , _plst(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0, '',0)
-        else _screenLine(name      ,1   , _plst(p)  ,15, '-----'        ,25, '-'                          ,35, '',0, '',0);
+        then _screenLine(name      ,1   , _PlyerStatus(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0, '',0)
+        else _screenLine(name      ,1   , _PlyerStatus(p)  ,15, '-----'        ,25, '-'                          ,35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;

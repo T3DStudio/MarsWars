@@ -345,8 +345,8 @@ begin
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, p_color(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, p_color(playeri));
-           _draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, p_color(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(a_tar) , ta_left,255, p_color(playeri));
+           //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, p_color(playeri));
 
         end;
 

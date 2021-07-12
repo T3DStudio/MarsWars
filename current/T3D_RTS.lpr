@@ -27,8 +27,9 @@ uses SysUtils, SDL, SDL_Net
         {$include _sounds.pas}
      {$ENDIF}
 {$include _net_com.pas}
-{$include _units_cl.pas}
+{$include _units_uid.pas}
      {$IFDEF _FULLGAME}
+        {$include _units_cl.pas}
         {$include _lang.pas}
         {$include _config.pas}
         {$include _units_spr.pas}
@@ -80,9 +81,11 @@ begin
       {$ENDIF}
 
       fps_ns:=SDL_GetTicks-fps_cs;
+      {$IFDEF _FULLGAME}
       if(_fsttime)
       then continue
       else
+      {$ENDIF}
         if(fps_ns>=fr_mpt)
         then fps_tt:=1
         else fps_tt:=fr_mpt-fps_ns;

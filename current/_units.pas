@@ -87,7 +87,6 @@ begin
               {$IFDEF _FULLGAME}
               _unit_fog_r(pu);
               _unit_ready_effects(pu,nil);
-              //if(playeri=HPlayer)then _unit_snd_ready(uidi,buff[ub_advanced]>0);
               {$ENDIF}
            end;
         end;
@@ -355,28 +354,34 @@ end; }
 procedure _unit_action(pu:PTUnit);
 begin
    with pu^ do
-   if(bld)then
+   if(_canmove(pu))then
    with uid^ do
    if(apcc>0)
    then uo_id:=ua_unload
    else
+     if(inapc=0)then
      with player^ do
      case _ability of
 uab_spawnlost  : if(buff[ub_cast]<=0)and(buff[ub_clcast]<=0)then
                  begin
                     buff[ub_cast  ]:=fr_hfps;
                     buff[ub_clcast]:=fr_2fps;
-                    _pain_lost_spawn(pu);
+                    _ability_unit_spawn(pu,UID_LostSoul);
                  end;
-uab_morph2heye : if(upgr[upgr_hell_heye]>0)then
+uab_morph2heye : if(upgr[upgr_hell_heye]>0)and(menerg>0)then
                  begin
                     _unit_kill(pu,true,true);
-                    _unit_add(vx,vy,UID_HEye,playeri,true);
+                    _unit_add(vx,vy,UID_HEye,playeri,true,true);
                     buff[ub_cast]:=fr_fps;
                     {$IFDEF _FULLGAME}
                     _pain_lost_fail(vx,vy,_depth(vy+1,uf),nil);
-                    if(_LastCreatedUnit>0)then _unit_ready_effects(_LastCreatedUnitP,nil);
                     {$ENDIF}
+                 end;
+uab_umine      : if(upgr[upgr_uac_mines]>0)and(buff[ub_clcast]<=0)then
+                 if((army+uproda)<MaxPlayerUnits)and(menerg>0)then
+                 begin
+                    _unit_add(vx,vy,UID_UMine,playeri,true,true);
+                    buff[ub_clcast]:=fr_fps;
                  end;
      end;
 {   case uidi of
@@ -417,56 +422,6 @@ UID_UCommandCenter:
                          uo_y:=y;
                       end;
                  end;
-UID_Engineer :  if(army<MaxPlayerUnits)and(upgr[upgr_mines]>0)and(menerg>0)and(inapc=0)and(buff[ub_cast]=0)then
-                begin
-                   _unit_add(vx,vy,UID_UMine,playeri,true);
-                   buff[ub_cast]:=vid_hfps;
-                end;
-
-UID_Pain     :  if(_canmove(pu))and(rld_t=0)then
-                begin
-                   buff[ub_cast]:=vid_hfps;
-                   rld_t:=rld_r;
-                   _pain_action(pu);
-                end;
-UID_UMine     :  if(upgr[upgr_minesen]>0)then if(buff[ub_advanced]>0)then buff[ub_advanced]:=0 else buff[ub_advanced]:=_ub_infinity;
-UID_LostSoul :  if(upgr[upgr_vision]>0)then
-                begin
-                   {$IFDEF _FULLGAME}
-                   _effect_add(vx,vy,vy+1,UID_LostSoul);
-                   if(playeri=HPlayer)then PlaySND(snd_hellbar,nil);
-                   {$ENDIF}
-                   _unit_morph(pu,UID_HEye,true);
-                   order:=0;
-                end;
-UID_Major,
-UID_ZMajor   : if(buff[ub_advanced]>0)and(buff[ub_clcast]=0)then
-               begin
-                  if(uf>uf_ground)then
-                   if(_unit_OnDecorCheck(x,y))then exit;
-
-                  if(buff[ub_cast]>0)
-                  then buff[ub_cast]:=0
-                  else buff[ub_cast]:=_ub_infinity;
-
-                  buff[ub_clcast]:=vid_fps;
-
-                  {$IFDEF _FULLGAME}
-                  if(buff[ub_cast]>0)
-                  then PlaySND(snd_jetpon ,pu)
-                  else PlaySND(snd_jetpoff,pu);
-                  {$ENDIF}
-               end;
-UID_HMilitaryUnit,
-UID_UWeaponFactory,
-UID_HPools,
-UID_UMilitaryUnit,
-UID_HGate    : if(ucl_eb[true,9]>0)then
-               begin
-                  if(ucl_x[9]<=0)or(MaxUnits<ucl_x[9])then exit;
-
-               end;
-
    else
    end;  }
 end;
@@ -893,7 +848,7 @@ wpt_heal     : if(tu^.hits<=0)
           then exit
           else awr:=ud-(_r+tu^.uid^._r-aw_range);
 
-      if(awr<0)
+      if(awr<0)or(ServerSide=false)
       then _target_weapon_check:=2      // can attack now
       else
         if(speed>0)and(uo_id<>ua_hold)and(_IsUnitRange(inapc,nil)=false)then
@@ -1373,7 +1328,7 @@ begin
 
    _unit_kill(pu,true,true);
 
-   _unit_add(tu^.x,tu^.y,tu^.uid^._zombie_uid,pu^.playeri,true);
+   _unit_add(tu^.x,tu^.y,tu^.uid^._zombie_uid,pu^.playeri,true,true);
    if(_LastCreatedUnit>0)then
    with _LastCreatedUnitP^ do
    begin
@@ -1383,10 +1338,10 @@ begin
       hits :=trunc(uid^._mhits*_h);
       if(hits<=0)then
       begin
+         buff[ub_born]:=0;
          _unit_dec_Kcntrs(_LastCreatedUnitP);
          _resurrect(_LastCreatedUnitP);
-      end
-      else _unit_ready_effects(pu,nil);
+      end;
    end;
 
    _unit_kill(tu,true,true);
@@ -1408,7 +1363,7 @@ begin
 
          if(w>MaxUnitWeapons)or(a=0)then
          begin
-            a_tar:=0;
+            if(ServerSide)then a_tar:=0;
             exit;
          end;
 
@@ -1419,27 +1374,30 @@ begin
          a:=_target_weapon_check(pu,tu,-1,a_weap,true,false);
          if(a=0)then
          begin
-            a_tar:=0;
+            if(ServerSide)then a_tar:=0;
             exit;
          end;
       end;
 
       upgradd:=0;
 
-      if(a=0)
-      then exit
+      case a of
+      0: exit;
+      1: begin
+            if(ServerSide)then
+            begin
+               mv_x:=tu^.x;
+               mv_y:=tu^.y;
+            end;
+            exit;
+         end;
       else
-       if(ServerSide)then
-        case a of
-        1: begin
-              mv_x:=tu^.x;
-              mv_y:=tu^.y;
-              exit;
-           end;
-        else
-           mv_x:=x;
-           mv_y:=y;
-        end;
+         if(ServerSide)then
+         begin
+            mv_x:=x;
+            mv_y:=y;
+         end;
+      end;
 
       // attack code
       with uid^ do
@@ -1448,41 +1406,34 @@ begin
          if(a_rld=0)then
          begin
             a_rld:=aw_rld;
-            dir:=p_dir(x,y,uo_x,uo_y);
+            dir  :=p_dir(x,y,uo_x,uo_y);
+            if(ServerSide)then buff[ub_stopattack]:=max2(aw_rld,_uclord_p);
             {$IFDEF _FULLGAME}
-            PlaySND(aw_snd,pu,nil);
+            _unit_attack_effects(pu,true,nil);
             {$ENDIF}
-            if(ServerSide)then
-             buff[ub_stopattack]:=max2(aw_rld,_uclord_p);
          end;
 
          if(a_rld in aw_rld_s)then
          begin
+            {$IFDEF _FULLGAME}
+            _unit_attack_effects(pu,false,nil);
+            {$ENDIF}
             upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
-            dir:=p_dir(x,y,tu^.x,tu^.y);
+            dir    :=p_dir(x,y,tu^.x,tu^.y);
             case aw_type of
-wpt_missle     : _missile_add(tu^.x,
-                              tu^.y,
-                              vx,vy,
-                              a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
-wpt_unit       : with player^ do
-                 if((army+uproda)>=MaxPlayerUnits)then
-                 begin
-                    // dead effect
-                 end
-                 else
-                   if(ServerSide)then
-                   begin
-                   end;
+wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
+                 then _missile_add(   vx,   vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                 else _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+wpt_unit       : _ability_unit_spawn(pu,aw_oid);
             else
                if(ServerSide)then
-               case aw_type of
+                case aw_type of
 wpt_resurect : _resurrect(tu);
 wpt_heal     : if(tu^.hits>0)then tu^.hits:=min2(tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
 wpt_directdmg: if(cf(@aw_reqf,@wpr_zombie))
                then _makezimba(pu,tu)
                else _unit_damage(tu,aw_count+upgradd,2,playeri);
-               end;
+                end;
             end;
          end;
       end;
