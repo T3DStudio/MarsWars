@@ -761,7 +761,7 @@ begin
 end;
 
 procedure ai_buildactions(u:integer);
-const maxb = 24;
+const maxb = 25;
       maxt = 20;
 var blds: TCntr;
     t,
@@ -781,7 +781,7 @@ begin
       5   : blds[0]:=13;
       else  blds[0]:=16;
       end;
-      blds[1 ]:=min2(max2(1,(menerg div 7)+u_e[true,0]-u_e[true,3]),maxb);
+      blds[1 ]:=min2(max2(1,(menerg div 10)+u_e[true,0]-u_e[true,3]),maxb);
       blds[3 ]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
       blds[4 ]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
       blds[7 ]:=blds[4];
