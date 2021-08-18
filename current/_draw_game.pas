@@ -3,7 +3,7 @@ procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:PTMWT
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
-      inc(vid_vsls,1);
+      vid_vsls+=1;
       with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx;
@@ -31,7 +31,7 @@ procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,ay
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
-      inc(vid_vsls,1);
+      vid_vsls+=1;
       with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx;
@@ -58,7 +58,7 @@ procedure _sl_add_dec2(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,a
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
-      inc(vid_vsls,1);
+      vid_vsls+=1;
       with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx;
@@ -86,7 +86,7 @@ procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWTexture;ainv:byte)
 begin
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
-      inc(vid_vsls,1);
+      vid_vsls+=1;
       with vid_vsl[vid_vsls]^ do
       begin
          x   := ax-vid_vx;
@@ -132,11 +132,11 @@ begin
    while(vid_vsls>0)do
     with vid_vsl[vid_vsls]^ do
     begin
-       dec(x,s^.hw);
-       dec(y,s^.hh);
+       x-=s^.hw;
+       y-=s^.hh;
 
-       inc(x,lx+xo);
-       inc(y,ly+yo);
+       x+=lx+xo;
+       y+=ly+yo;
 
        if(sh>-fly_z)then
        begin
@@ -148,8 +148,8 @@ begin
 
        if(inv>0)then _draw_surf(tar,x,y,s^.surf);
 
-       dec(x,xo);
-       dec(y,yo);
+       x-=xo;
+       y-=yo;
 
        if(msk>0)or(ro>0)then
        begin
@@ -191,7 +191,7 @@ begin
 
        if(inv<255)then SDL_SetAlpha(s^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-       dec(vid_vsls,1);
+       vid_vsls-=1;
     end;
 end;
 
@@ -229,8 +229,8 @@ begin
         if(ix<0)then ix:=vid_mwa+ix;
         if(iy<0)then iy:=vid_mha+iy;
 
-        inc(ix,lx-vid_ab);
-        inc(iy,ly-vid_ab);
+        ix+=lx-vid_ab;
+        iy+=ly-vid_ab;
 
         with spr^ do _draw_surf(tar,ix-hw,iy-hh,spr^.surf);
      end;
@@ -254,9 +254,9 @@ begin
             fog_grid[cx,cy]:=0;
          end
          else fog_grid[cx,cy]:=2;
-         inc(ssy,fog_cw);
+         ssy+=fog_cw;
       end;
-      inc(ssx,fog_cw);
+      ssx+=fog_cw;
    end;
 
 
@@ -429,7 +429,7 @@ begin
        with sl[i-1] do
        begin
           _draw_surf(r_screen,x,0,surf);
-          inc(x,w);
+          x+=w;
        end;
       _draw_text(r_screen,0,48,i2s(sn), ta_left,255, c_white);
    end;

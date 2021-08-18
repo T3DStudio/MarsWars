@@ -123,10 +123,10 @@ begin
    if(FindFirst(str_f_svld+'*'+str_e_svld,faReadonly,info)=0)then
     repeat
        s:=info.Name;
-       delete(s,length(s)-3,4);
+       delete(s,length(s)-(length(str_e_svld)-1),length(str_e_svld));
        if(s<>'')then
        begin
-          inc(_svld_ln,1);
+          _svld_ln+=1;
           setlength(_svld_l,_svld_ln);
           _svld_l[_svld_ln-1]:=s;
        end;

@@ -229,9 +229,9 @@ begin
    if(zfall<>0)then
    begin
       st:=sign(zfall);
-      dec(zfall,st);
-      inc(y    ,st);
-      inc(vy   ,st);
+      zfall-=st;
+      y    +=st;
+      vy   +=st;
       _unit_correctXY(pu);
    end;
 end;
@@ -250,9 +250,9 @@ begin
     else
     begin
        if(vstp<=0)then vstp:=UnitStepNum;
-       inc(vx,(x-vx) div vstp);
-       inc(vy,(y-vy) div vstp);
-       dec(vstp,1);
+       vx  +=(x-vx) div vstp;
+       vy  +=(y-vy) div vstp;
+       vstp-=1;
     end;
 end;
 
@@ -306,7 +306,7 @@ begin
       uo_y:=y0;
       for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_2fps);
       rld:=mstrike_reload;
-      dec(upgr[upgr_uac_rstrike],1);
+      upgr[upgr_uac_rstrike]-=1;
       _unit_umstrike_create(pu);
       buff[ub_cast]:=fr_fps;
    end;
@@ -321,7 +321,7 @@ begin
    if(upgr[upgr_hell_b478tel]>0)then
    if(dist(x,y,x0,y0)<srange)then
    begin
-      dec(upgr[upgr_hell_b478tel],1);
+      upgr[upgr_hell_b478tel]-=1;
       buff[ub_clcast]:=fr_hfps;
       _unit_teleport(pu,x0,y0);
    end;
@@ -345,8 +345,8 @@ var d:integer;
 vx,vy,
   a,h:single;
 begin
-   inc(r0,1);
-   inc(r1,1);
+   r0+=1;
+   r1+=1;
    d:=dist(x0,y0,x1,y1);
    if(abs(r0-r1)<=d)and(d<=(r0+r1))and(d>0)then
    begin
@@ -388,7 +388,7 @@ begin
    while(i<=nrl)do
    begin
       if(ad<nrd[i])then break;
-      inc(i,1);
+      i+=1;
    end;
 
    if(i>nrl)then exit;
@@ -420,7 +420,7 @@ begin
 
    dx:=tx div dcw;
    dy:=ty div dcw;
-   dec(tr,bld_dec_mr);
+   tr-=bld_dec_mr;
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
     with map_dcell[dx,dy] do
      if(n>0)then
@@ -432,7 +432,7 @@ begin
            d:=dist(x,y,tx,ty)-o;
            add(x,y,d,o);
         end;
-   inc(tr,bld_dec_mr);
+   tr+=bld_dec_mr;
 
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
@@ -542,7 +542,7 @@ begin
 
       if(doodc=false)then exit;
 
-      dec(tr,bld_dec_mr);
+      tr-=bld_dec_mr;
 
       dx:=tx div dcw;
       dy:=ty div dcw;
@@ -599,20 +599,20 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(_isbuilder)then inc(n_builders,1);
+      if(_isbuilder)then n_builders+=1;
       if(_isbarrack)then
       begin
-         inc(n_barracks,1);
+         n_barracks+=1;
          if(buff[ub_advanced]>0)
-         then inc(uprodm,2)
-         else inc(uprodm,1);
+         then uprodm+=2
+         else uprodm+=1;
       end;
       if(_issmith  )then
       begin
-         inc(n_smiths  ,1);
+         n_smiths+=1;
          if(buff[ub_advanced]>0)
-         then inc(pprodm,2)
-         else inc(pprodm,1);
+         then pprodm+=2
+         else pprodm+=1;
       end;
    end;
 end;
@@ -622,20 +622,20 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(_isbuilder)then dec(n_builders,1);
+      if(_isbuilder)then n_builders-=1;
       if(_isbarrack)then
       begin
-         dec(n_barracks,1);
+         n_barracks-=1;
          if(buff[ub_advanced]>0)
-         then dec(uprodm,2)
-         else dec(uprodm,1);
+         then uprodm-=2
+         else uprodm-=1;
       end;
       if(_issmith  )then
       begin
-         dec(n_smiths  ,1);
+         n_smiths-=1;
          if(buff[ub_advanced]>0)
-         then dec(pprodm,2)
-         else dec(pprodm,1);
+         then pprodm-=2
+         else pprodm-=1;
       end;
    end;
 end;
@@ -648,10 +648,10 @@ begin
    begin
       if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
       if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
-      dec(ucl_eb[_isbuilding,_ucl],1);
-      dec(uid_eb[uidi            ],1);
-      dec(menerg,_generg);
-      dec(cenerg,_generg);
+      ucl_eb[_isbuilding,_ucl]-=1;
+      uid_eb[uidi            ]-=1;
+      menerg-=_generg;
+      cenerg-=_generg;
       _unit_done_dec_cntrs(pu);
    end;
 end;
@@ -664,10 +664,10 @@ begin
    begin
       if(uid_x[uidi            ]<=0)then uid_x[uidi            ]:=unum;
       if(ucl_x[_isbuilding,_ucl]<=0)then ucl_x[_isbuilding,_ucl]:=unum;
-      inc(ucl_eb[_isbuilding,_ucl],1);
-      inc(uid_eb[uidi            ],1);
-      inc(menerg,_generg);
-      inc(cenerg,_generg);
+      ucl_eb[_isbuilding,_ucl]+=1;
+      uid_eb[uidi            ]+=1;
+      menerg+=_generg;
+      cenerg+=_generg;
       _unit_done_inc_cntrs(pu);
    end;
 end;
@@ -678,11 +678,10 @@ begin
    with uid^ do
    with player^ do
    begin
-      inc(army,1);
-      inc(ucl_e[_isbuilding,_ucl],1);
-      inc(ucl_c[_isbuilding],1);
-
-      inc(uid_e[uidi],1);
+      army+=1;
+      ucl_e[_isbuilding,_ucl]+=1;
+      ucl_c[_isbuilding     ]+=1;
+      uid_e[uidi            ]+=1;
 
       bld:=ubld;
 
@@ -690,8 +689,8 @@ begin
       then _unit_bld_inc_cntrs(pu)
       else
       begin
-         hits:= 1;
-         dec(cenerg,_renerg);
+         hits  := 1;
+         cenerg-=_renerg;
       end;
 
       if(born)then
@@ -723,7 +722,7 @@ begin
              _LastCreatedUnitP:=@_units[i];
              break;
           end;
-         inc(i,1);
+         i+=1;
       end;
 
       FillChar(_LastCreatedUnitP^,SizeOf(TUnit),0);
@@ -781,10 +780,10 @@ begin
       if(puid in ups_units)and(_uid_cndt(pu^.player,puid)=0)then
        with player^ do
        begin
-          inc(uproda,1);
-          inc(uprodc[_uids[puid]._ucl],1);
-          inc(uprodu[ puid],1);
-          dec(cenerg,_uids[puid]._renerg);
+          uproda+=1;
+          uprodc[_uids[puid]._ucl]+=1;
+          uprodu[ puid           ]+=1;
+          cenerg-=_uids[puid]._renerg;
           uprod_u[pn]:=puid;
           uprod_r[pn]:=_uids[puid]._tprod;
 
@@ -818,10 +817,10 @@ begin
       begin
          puid:=uprod_u[pn];
 
-         dec(uproda,1);
-         dec(uprodc[_uids[puid]._ucl],1);
-         dec(uprodu[ puid],1);
-         inc(cenerg,_uids[puid]._renerg);
+         uproda-=1;
+         uprodc[_uids[puid]._ucl]-=1;
+         uprodu[ puid           ]-=1;
+         cenerg+=_uids[puid]._renerg;
          uprod_r[pn]:=0;
 
          _unit_ctraining_p:=true;
@@ -852,9 +851,9 @@ begin
        with player^ do
        with _upids[upid] do
        begin
-          inc(pproda,1);
-          inc(pprodu[upid],1);
-          dec(cenerg,_up_renerg);
+          pproda+=1;
+          pprodu[upid]+=1;
+          cenerg-=_up_renerg;
           pprod_r[pn]:=_up_time;
           pprod_u[pn]:=upid;
 
@@ -887,9 +886,9 @@ begin
       begin
          upid:=pprod_u[pn];
 
-         dec(pproda,1);
-         dec(pprodu[upid],1);
-         inc(cenerg,_upids[upid]._up_renerg);
+         pproda-=1;
+         pprodu[upid]-=1;
+         cenerg+=_upids[upid]._up_renerg;
          pprod_r[pn]:=0;
 
          _unit_cupgrade_p:=true;
@@ -906,32 +905,32 @@ begin
    _unit_cupgrade:=false;
 end;
 
-procedure _unit_inc_selc(pu:PTUnit);
+procedure _unit_counters_inc_select(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      inc(ucl_s [_isbuilding,_ucl],1);
-      inc(ucl_cs[_isbuilding     ],1);
-      inc(uid_s [uidi],1);
-      if(_isbuilder)then inc(s_builders,1);
-      if(_isbarrack)then inc(s_barracks,1);
-      if(_issmith  )then inc(s_smiths  ,1);
+      ucl_s [_isbuilding,_ucl]+=1;
+      ucl_cs[_isbuilding     ]+=1;
+      uid_s [uidi            ]+=1;
+      if(_isbuilder)then s_builders+=1;
+      if(_isbarrack)then s_barracks+=1;
+      if(_issmith  )then s_smiths  +=1;
    end;
 end;
-procedure _unit_dec_selc(pu:PTUnit);
+procedure _unit_counters_dec_select(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      dec(ucl_s [_isbuilding,_ucl],1);
-      dec(ucl_cs[_isbuilding     ],1);
-      dec(uid_s [uidi],1);
-      if(_isbuilder)then dec(s_builders,1);
-      if(_isbarrack)then dec(s_barracks,1);
-      if(_issmith  )then dec(s_smiths  ,1);
+      ucl_s [_isbuilding,_ucl]-=1;
+      ucl_cs[_isbuilding     ]-=1;
+      uid_s [uidi            ]-=1;
+      if(_isbuilder)then s_builders-=1;
+      if(_isbarrack)then s_barracks-=1;
+      if(_issmith  )then s_smiths  -=1;
    end;
 end;
 
@@ -939,7 +938,7 @@ procedure _unit_desel(pu:PTUnit);
 begin
    with pu^ do
    begin
-      if(sel)then _unit_dec_selc(pu);
+      if(sel)then _unit_counters_dec_select(pu);
       sel:=false;
    end;
 end;
@@ -953,16 +952,16 @@ begin
       _unit_desel(pu);
 
       if(bld=false)
-      then inc(cenerg,_uids[uidi]._renerg)
+      then cenerg+=_uids[uidi]._renerg
       else
       begin
          _unit_ctraining(pu,255);
          _unit_cupgrade (pu,255);
 
-         dec(ucl_eb[_isbuilding,_ucl],1);
-         dec(uid_eb[uidi],1);
-         dec(menerg,_generg);
-         dec(cenerg,_generg);
+         ucl_eb[_isbuilding,_ucl]-=1;
+         uid_eb[uidi            ]-=1;
+         menerg-=_generg;
+         cenerg-=_generg;
 
          _unit_done_dec_cntrs(pu);
       end;
@@ -978,10 +977,10 @@ begin
    with uid^ do
    with player^ do
    begin
-      dec(army,1);
-      dec(ucl_e[_isbuilding,_ucl],1);
-      dec(ucl_c[_isbuilding     ],1);
-      dec(uid_e[uidi],1);
+      army-=1;
+      ucl_e[_isbuilding,_ucl]-=1;
+      ucl_c[_isbuilding     ]-=1;
+      uid_e[uidi            ]-=1;
    end;
 end;
 
@@ -1070,7 +1069,7 @@ begin
      else
        if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
        begin
-          inc(upgr[_uid],1);
+          upgr[_uid]+=1;
           _unit_cupgrade_p(pu,255,i);
           {$IFDEF _FULLGAME}
           if(playeri=HPlayer)then PlayInGameAnoncer(snd_upgrade_complete[_urace]);
@@ -1153,7 +1152,7 @@ begin
       for i:=0 to MaxUnitBuffs do
        if(0<buff[i])and(buff[i]<_ub_infinity)then
        begin
-          dec(buff[i],1);
+          buff[i]-=1;
           {if(i=ub_stopattack)and(ServerSide)then
            if(bld)and(speed>0)and(tar1=0)then
             if(buff[i]=0)then
@@ -1162,14 +1161,14 @@ begin
 
       for i:=0 to MaxPlayers do
       begin
-         if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then dec(vsnt[i],1);
-         if(0<vsni[i])and(vsni[i]<_ub_infinity)then dec(vsni[i],1);
+         if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then vsnt[i]-=1;
+         if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;
       end;
 
-      if(a_rld>0)then dec(a_rld,1);
+      if(a_rld>0)then a_rld-=1;
 
       if(bld)then
-       if(rld>0)then dec(rld,1);
+       if(rld>0)then rld-=1;
    end;
 end;
 

@@ -13,7 +13,7 @@ var i:integer;
 begin
    i:=0;
    repeat
-      inc(i,1);
+      i+=1;
       s:=str_screenshot+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
@@ -169,7 +169,7 @@ begin
        while(sn>0)do
        begin
           _FreeSF(sl[sn-1].surf);
-          dec(sn,1);
+          sn-=1;
        end;
 
       sn:=0;
@@ -178,7 +178,7 @@ begin
       _lstr(@t,name,firstload,false);
       if(t.surf<>r_empty)then
       begin
-         inc(sn,1);
+         sn+=1;
          setlength(sl,sn);
          sl[sn-1]:=t;
       end;
@@ -188,7 +188,7 @@ begin
          _lstr(@t,name+i2s(sn),firstload,false);
          if(t.surf=r_empty)then break;
 
-         inc(sn,1);
+         sn+=1;
          setlength(sl,sn);
          sl[sn-1]:=t;
       end;
@@ -209,9 +209,9 @@ begin
       while (y<d) do
       begin
          _draw_surf(surf,x,y,ts);
-         inc(y,ts^.h);
+         y+=ts^.h;
       end;
-      inc(x,ts^.w);
+      x+=ts^.w;
    end;
 
    if(animstyle>1)then exit;
@@ -234,8 +234,8 @@ begin
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
          filledcircleColor(surf,x,y,p,c_purple);
-         inc(dir,8);
-         inc(rand,13);
+         dir +=8;
+         rand+=13;
       end;
    end;
 
@@ -248,7 +248,7 @@ begin
    while(dir<=360)do
    begin
       p:=r-i;
-      inc(dir,3);
+      dir+=3;
       x:=r+trunc(d*cos(dir*degtorad));
       y:=r+trunc(d*sin(dir*degtorad));
       filledcircleColor(surf,x,y,p,c_purple);
@@ -402,9 +402,9 @@ begin
          while (y<w) do
          begin
             _draw_surf(vid_terrain,x,y,ter_s);
-            inc(y,ter_s^.h);
+            y+=ter_s^.h;
          end;
-         inc(x,ter_s^.w);
+         x+=ter_s^.w;
       end;
    end;
 end;
@@ -710,7 +710,7 @@ begin
    for i:=1 to _tdecaln do
     with _tdecals[i-1] do
     begin
-       inc(rn,17);
+       rn+=17;
        ix:=_randomx(ix+rn       ,vid_mwa);
        iy:=_randomx(iy+sqr(ix*i),vid_mha);
        x :=ix;
@@ -836,7 +836,7 @@ begin
       ui_energx := y+vid_BW+vid_hBW+2;
       ui_armyx  := y+vid_BW*2+vid_hBW;
 
-      inc(y,vid_BW);
+      y+=vid_BW;
       characterColor(r_panel,y       +2,ui_iy,'E',c_aqua  );
       characterColor(r_panel,y+vid_BW+2,ui_iy,'A',c_orange);
 
@@ -857,8 +857,8 @@ begin
    while (i<=ystop) do
    begin
       pline(0,y,vid_panelw,y,c_white);
-      inc(i,1);
-      inc(y,vid_BW);
+      i+=1;
+      y+=vid_BW;
    end;
 
    _draw_surf(r_uipanel,0,0,r_panel);

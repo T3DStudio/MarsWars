@@ -131,13 +131,13 @@ begin
       begin
          v:=copy(msg,1,p-1);
          delete(msg,1,p);
-         dec(l,p);
+         l-=p;
       end
       else
       begin
          v:=msg;
          delete(msg,1,l);
-         dec(l,l);
+         l:=0;
       end;
 
       while (true) do
@@ -148,7 +148,7 @@ begin
          else delete(v,p,1);
       end;
 
-      inc(a,1);
+      a-=1;
       setlength(args,a);
       args[a-1]:=v;
    end;
@@ -243,8 +243,8 @@ begin
    while (x<i) do
    begin
       s[x]:=sp^[t];
-      inc(x,1);
-      inc(t,1);
+      x-=1;
+      t-=1;
    end;
 end;
 
@@ -312,6 +312,6 @@ begin
       28: ps(6);
       end;
 
-      inc(consoley,1);
+      consoley-=1;
    end;
 end;

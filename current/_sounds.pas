@@ -58,7 +58,7 @@ begin
    if(tsnd<>nil)then
    with ss^ do
    begin
-      inc(sndn,1);
+      sndn+=1;
       setlength(snds,sndn);
       snds[sndn-1]:=tsnd;
    end;
@@ -85,13 +85,13 @@ begin
          if(tsnd=nil)then
           if(i=0)then
           begin
-             inc(i,1);
+             i+=1;
              continue;
           end
           else break;
 
          AddToSoundSet(LoadSoundSet,tsnd);
-         inc(i,1);
+         i+=1;
       end;
       if(sndn=0)then WriteLog(fname);
    end;
@@ -124,7 +124,7 @@ begin
     begin
        if(G_started)and(snd_music_list_size>1)then
        begin
-          inc(snd_current_music,1);
+          snd_current_music+=1;
           if(snd_current_music>=snd_music_list_size)then snd_current_music:=1;
        end
        else snd_current_music:=0;
@@ -141,7 +141,7 @@ begin
      then SoundSet2Chunk:=snds[0]
      else
      begin
-        inc(sndps,1);
+        sndps+=1;
         if(sndps<0)or(sndps>=sndn)then sndps:=0;
         SoundSet2Chunk:=snds[sndps];
      end;
@@ -247,7 +247,7 @@ begin
       then ui_UnitSelectedn:=0
       else
         if(ui_UnitSelectedn<annoystop)
-        then inc(ui_UnitSelectedn,1)
+        then ui_UnitSelectedn+=1
         else ui_UnitSelectedn:=0;
 
       with _units[ui_UnitSelectedNU] do
@@ -275,7 +275,7 @@ begin
       begin
          setlength(snd_music_list,snd_music_list_size+1);
          snd_music_list[snd_music_list_size]:=loadMSC(s);
-         Inc(snd_music_list_size,1);
+         snd_music_list_size+=1;
       end;
    until (FindNext(info)<>0);
    FindClose(info);

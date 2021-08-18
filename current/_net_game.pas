@@ -258,7 +258,7 @@ nmid_plout: begin
          end;
       end;
 
-   inc(net_period,1);
+   net_period+=1;
    net_period:=net_period mod fr_hfps;
 end;
 
@@ -435,10 +435,11 @@ begin
       net_send(net_cl_svip,net_cl_svport);
    end;
 
-   inc(net_period,1);net_period:=net_period mod fr_hfps;
+   net_period+=1;
+   net_period:=net_period mod fr_hfps;
    if(net_cl_svttl<ClientTTL)then
    begin
-      inc(net_cl_svttl,1);
+      net_cl_svttl+=1;
       if(net_cl_svttl=fr_fps   )then vid_mredraw:=true;
       if(net_cl_svttl=ClientTTL)then G_Paused:=net_cl_svpl;
    end;

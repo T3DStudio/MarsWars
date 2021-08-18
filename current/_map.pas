@@ -44,11 +44,11 @@ begin
            for dy:=dy0 to dy1 do
             with map_dcell[dx0,dy] do
             begin
-               inc(n,1);
+               n+=1;
                setlength(l,n);
                l[n-1]:=@map_dds[d];
             end;
-           inc(dx0,1);
+           dx0+=1;
         end;
      end;
 end;
@@ -65,7 +65,7 @@ begin
    DID_Brock,
    DID_Srock,
    DID_Other     : begin
-                      inc(map_ddn,1);
+                      map_ddn+=1;
                       with map_dds[map_ddn] do
                       begin
                          t:=dt;
@@ -119,7 +119,7 @@ begin
    sdir:=abs(sdir mod 360);
    for i:=1 to MaxPlayers do
    begin
-      inc(sdir,dstep);
+      sdir+=dstep;
       map_psx[i]:=cx+trunc(r*cos(sdir*degtorad));
       map_psy[i]:=cy+trunc(r*sin(sdir*degtorad));
    end;
@@ -153,10 +153,10 @@ begin
 
          map_psx[1]:=trunc(ix+cos(i*degtorad)*u);
          map_psy[1]:=trunc(ix+sin(i*degtorad)*u);
-         inc(i,105);
+         i+=105;
          map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
-         dec(i,210);
+         i-=210;
          map_psx[3]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[3]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
@@ -180,14 +180,14 @@ begin
          map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
-         inc(c,120);
+         c+=120;
          map_psx[3]:=trunc(ix+cos(c*degtorad)*u);
          map_psy[3]:=trunc(ix+sin(c*degtorad)*u);
          i:=c+100;
          map_psx[4]:=map_psx[3]+trunc(cos(i*degtorad)*iy);
          map_psy[4]:=map_psy[3]+trunc(sin(i*degtorad)*iy);
 
-         inc(c,120);
+         c+=120;
          map_psx[5]:=trunc(ix+cos(c*degtorad)*u);
          map_psy[5]:=trunc(ix+sin(c*degtorad)*u);
          i:=c+100;
@@ -220,7 +220,7 @@ begin
          begin
             px:=trunc(ix+cos(c*degtorad)*u);
             py:=trunc(ix+sin(c*degtorad)*u);
-            inc(c,iy);
+            c+=iy;
 
             {$IFDEF _FULLGAME}
             mpx:=round(px*map_mmcx);
@@ -239,10 +239,10 @@ begin
          begin
             map_psx[i  ]:=map_hmw+trunc(cos(c*degtorad)*bb0);
             map_psy[i  ]:=map_hmw+trunc(sin(c*degtorad)*bb0);
-            inc(c,60);
+            c+=60;
             map_psx[i+3]:=map_hmw+trunc(cos(c*degtorad)*bb1);
             map_psy[i+3]:=map_hmw+trunc(sin(c*degtorad)*bb1);
-            inc(c,60);
+            c+=60;
          end;
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
@@ -266,8 +266,8 @@ begin
             begin
                ix:=bb0+_random(bb1);
                iy:=bb0+_random(bb1);
-               inc(c,1);
-               if(c>500 )then dec(u,1);
+               c+=1;
+               if(c>500 )then u-=1;
                if(c>1000)or(_spch(ix,iy,u)=false)then break;
             end;
 
@@ -367,7 +367,7 @@ begin
                       if(_trysetdd(di,ix,iy))then
                       begin
                          _PickDoodad:=true;
-                         dec(lqs^,1);
+                         lqs^-=1;
                          break;
                       end
                       else continue;
@@ -378,7 +378,7 @@ begin
                       if(_trysetdd(di,ix,iy))then
                       begin
                          _PickDoodad:=true;
-                         dec(rks^,1);
+                         rks^-=1;
                          break;
                       end
                       else continue;
@@ -448,7 +448,7 @@ begin
 
          if(_PickDoodad(@ix,@iy,@lqs,@rks))then break;
 
-         inc(cnt,1);
+         cnt+=1;
          if(cnt>=dpostime)then break;
       end;
    end;

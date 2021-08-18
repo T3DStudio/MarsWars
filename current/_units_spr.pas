@@ -351,7 +351,7 @@ sms_walk:    if(_animw>0)then
              begin
                 if(wanim)or(_isbuilding)then
                 begin
-                   inc(anim,_animw);
+                   anim+=_animw;
                    if(anim<0)then anim:=0;
                    //if(anim>=1100)then anim:=anim mod 1100;
                 end;

@@ -26,7 +26,7 @@ begin
       while (i<ui_menu_map_y1) do
       begin
          hlineColor(tar,ui_menu_map_rx0,ui_menu_map_rx1,i,c_gray);
-         inc(i,ui_menu_map_ys);
+         i+=ui_menu_map_ys;
       end;
 
       c:=not((net_nstat=ns_clnt) or G_Started);
@@ -126,7 +126,7 @@ begin
    while (i<ui_menu_ssr_x1) do
    begin
       vlineColor(tar,i,t,t+ui_menu_ssr_ys,c_white);
-      inc(i,ui_menu_ssr_xs);
+      i+=ui_menu_ssr_xs;
    end;
 
    y:=_yt(0);
@@ -149,12 +149,12 @@ begin
                  while (i<ui_menu_ssr_x1) do
                  begin
                     vlineColor(tar,i,t,t-ui_menu_ssr_ys,c_white);
-                    inc(i,ui_menu_ssr_xs);
+                    i+=ui_menu_ssr_xs;
                  end;
 
                  while (t<ui_menu_ssr_y1) do
                  begin
-                    inc(t,ui_menu_ssr_ys);
+                    t+=ui_menu_ssr_ys;
                     hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssr_x1,t,c_gray);
                  end;
 
@@ -309,7 +309,7 @@ begin
    while (i<ui_menu_csm_x1) do
    begin
       vlineColor(tar,i,t,t+ui_menu_csm_ys,c_white);
-      inc(i,ui_menu_csm_xs);
+      i+=ui_menu_csm_xs;
    end;
 
    y:=_yt(0);
@@ -332,7 +332,7 @@ begin
                        hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y+ui_menu_csm_ys,c_gray);
                     end;
                     _draw_text(tar,ui_menu_csm_xt0,y+6,str_camp_t[i],ta_left,255,mic(not g_started,i=_cmp_sel));
-                    inc(y,ui_menu_csm_ys);
+                    y+=ui_menu_csm_ys;
                  end;
               end;
    ms2_scir : begin
@@ -340,7 +340,7 @@ begin
 
                  while (t<ui_menu_csm_y1) do
                  begin
-                    inc(t,ui_menu_csm_ys);
+                    t+=ui_menu_csm_ys;
                     hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,t,c_gray);
                  end;
 
@@ -403,7 +403,7 @@ begin
 
                     while (t<ui_menu_csm_y1) do
                     begin
-                       inc(t,ui_menu_csm_ys);
+                       t+=ui_menu_csm_ys;
                        hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,t,c_gray);
                     end;
 

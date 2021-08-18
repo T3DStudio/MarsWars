@@ -57,7 +57,6 @@
     <Parsing>
       <SyntaxOptions>
         <SyntaxMode Value="fpc"/>
-        <CStyleOperator Value="False"/>
         <AllowLabel Value="False"/>
         <CPPInline Value="False"/>
         <UseAnsiStrings Value="False"/>

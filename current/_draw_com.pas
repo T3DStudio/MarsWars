@@ -35,7 +35,7 @@ begin
       begin
          o:=0;
          for i:=1 to ss do
-          if not(s[i] in [#0..#4,#14..#25])then inc(o,1);
+          if not(s[i] in [#0..#4,#14..#25])then o+=1;
 
          case al of
          ta_middle: ix:=x-((o*font_w)shr 1);
@@ -75,8 +75,8 @@ begin
 
            _draw_texture(sur,ix,y,@font_ca[c]);
 
-           inc(o,1);
-           inc(ix,font_w);
+           o  += 1;
+           ix += font_w;
          end;
 
          if(al=ta_left)then
@@ -85,12 +85,12 @@ begin
              if(i<ss)then o:=0;
 
              ix:=x;
-             inc(y,font_w);
+             y +=font_w;
              case c of
-             #11 : inc(y,2);
-             #12 : inc(y,txt_line_h2);
-             #13 : inc(y,txt_line_h);
-             else  inc(y,txt_line_h);
+             #11 : y+=2;
+             #12 : y+=txt_line_h2;
+             #13 : y+=txt_line_h;
+             else  y+=txt_line_h;
              end;
           end;
       end;

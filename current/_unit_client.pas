@@ -296,18 +296,18 @@ begin
    with uid^ do
    with player^ do
    begin
-      inc(uid_e[uidi],1);
-      inc(ucl_e[_isbuilding,_ucl],1);
-      inc(ucl_c[_isbuilding],1);
-      inc(army,1);
+      army+=1;
+      ucl_e[_isbuilding,_ucl]+=1;
+      ucl_c[_isbuilding     ]+=1;
+      uid_e[uidi            ]+=1;
 
-      if(_IsUnitRange(inapc,nil))then inc(_units[inapc].apcc,_apcs);
+      if(_IsUnitRange(inapc,nil))then _units[inapc].apcc+=_apcs;
 
       if(hits>0)and(inapc<=0)then
       begin
-         if(sel)then _unit_inc_selc(pu);
+         if(sel)then _unit_counters_inc_select(pu);
          if(bld=false)
-         then dec(cenerg,_renerg)
+         then cenerg-=_renerg
          else
          begin
             _unit_bld_inc_cntrs(pu);
@@ -359,16 +359,16 @@ begin
    with uid^ do
    with player^ do
    begin
-      dec(uid_e[uidi],1);
-      dec(ucl_e[_isbuilding,_ucl],1);
-      dec(ucl_c[_isbuilding],1);
-      dec(army,1);
+      army-=1;
+      ucl_e[_isbuilding,_ucl]-=1;
+      ucl_c[_isbuilding     ]-=1;
+      uid_e[uidi            ]-=1;
 
       if(_IsUnitRange(inapc,nil))then dec(_units[inapc].apcc,_apcs);
 
       if(hits>0)and(inapc=0)then
       begin
-         if(sel)then _unit_dec_selc(pu);
+         if(sel)then _unit_counters_dec_select(pu);
          if(bld=false)
          then inc(cenerg,_renerg)
          else

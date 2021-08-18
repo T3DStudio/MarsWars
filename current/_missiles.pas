@@ -185,15 +185,15 @@ MID_SSShot     : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) di
        then mtars:=MaxUnits
        else mtars:=1;
 
-      inc(dam,adddmg);
+      dam+=adddmg;
 
       if(mid=MID_RevenantS)
       then homing:=true
       else
         if(_IsUnitRange(tar,@tu))then
         begin
-           inc(x,_randomr(tu^.uid^._missile_r));
-           inc(y,_randomr(tu^.uid^._missile_r));
+           x+=_randomr(tu^.uid^._missile_r);
+           y+=_randomr(tu^.uid^._missile_r);
         end;
 
       break;
@@ -279,7 +279,7 @@ begin
           end;
 
          d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
-         if(sr=0)then dec(d,10);
+         if(sr=0)then d-=10;
          if(d <0)then d:=0;
 
          if(ServerSide)then
@@ -419,8 +419,8 @@ begin
             then _unit_bullet_puff(tu);
             {$ENDIF}
 
-            dec(mtars,1);
-            inc(ntars,1);
+            mtars-=1;
+            ntars+=1;
 
             if(ServerSide)then _unit_damage(tu,damd,p,player);
          end
@@ -432,7 +432,7 @@ begin
                  {$IFDEF _FULLGAME}
                  _unit_bullet_puff(tu);
                  {$ENDIF}
-                 dec(mtars,1);
+                 mtars-=1;
                  _unit_damage(tu,damd,p,player);
                  exit;
               end;
@@ -461,8 +461,8 @@ begin
               then _unit_bullet_puff(tu);
               {$ENDIF}
 
-              dec(mtars,1);
-              inc(ntars,1);
+              mtars-=1;
+              ntars+=1;
 
               if(ServerSide)then
               begin
@@ -494,7 +494,7 @@ begin
       if(mid=MID_Blizzard)then
       begin
          if(vst>mb_s1)
-         then dec(vy,fr_fps)
+         then vy-=fr_fps
          else
            if(vst=mb_s1)then
            begin
@@ -502,16 +502,16 @@ begin
               vy:=y-(fr_fps*mb_s0);
            end
            else
-             if(vst<=mb_s0)then inc(vy,fr_fps);
+             if(vst<=mb_s0)then vy+=fr_fps;
       end
       else
       begin
-         inc(vx,(x-vx) div vst);
-         inc(vy,(y-vy) div vst);
+         vx+=(x-vx) div vst;
+         vy+=(y-vy) div vst;
       end;
-      dec(vst,1);
+      vst-=1;
 
-      if(ystep>0)then dec(vy,vst div ystep);
+      if(ystep>0)then vy-=vst div ystep;
 
       if(vst=0)then
       begin

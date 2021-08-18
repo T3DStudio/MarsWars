@@ -188,8 +188,8 @@ begin
    with _players[p] do
     if(state=PS_Comp)then
      begin
-        inc(ai_skill,1);
-        if(ai_skill>8)then ai_skill:=1;
+        ai_skill+=1;
+        if(ai_skill>gms_g_maxai)then ai_skill:=1;
         name:=ai_name(ai_skill);
      end;
 end;
@@ -216,7 +216,7 @@ begin
 
          _unit_add(xs,ys,uid,pl,true,false);
 
-         inc(d,ds);
+         d+=ds;
       end;
    end;
 end;
@@ -525,27 +525,73 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
 
                    if(psel=false)then
                    begin
-                      _unit_inc_selc(pu);
+                      _unit_counters_inc_select(pu);
                       {$IFDEF _FULLGAME}
                       ui_UnitSelectedNU:=unum;
                       {$ENDIF}
                    end;
-                   inc(scnt,1);
+                   scnt+=1;
                 end
                 else
                 begin
-                   if(psel=true)then _unit_dec_selc(pu);
+                   if(psel=true)then _unit_counters_dec_select(pu);
                    if(o_id=uo_setorder)and(order=o_x0)then order:=0;
                 end;
              end;
 
             if(u>eu)
-            then dec(u,1)
-            else inc(u,1);
+            then u-=1
+            else u+=1;
          end;
       end;
 
       o_id:=0;
+   end;
+end;
+
+procedure Endgame;
+var p:byte;
+begin
+   if(not G_Started)
+   or(G_Paused=0)
+   or(not ServerSide)then exit;
+
+   if(net_nstat>ns_none)and(G_Step<fr_fps)then exit;
+
+   G_plstat:=0;
+   for p:=0 to MaxPlayers do
+    with _players[p] do
+     if(army>0)and(state>ps_none)then G_plstat:=G_plstat or (1 shl p);
+
+   if(G_WTeam=255)then
+   begin
+      FillChar(team_army,SizeOf(team_army),0);
+      G_WTeam:=255;
+      for p:=0 to MaxPlayers do
+       with _players[p] do
+        if(state>ps_none)then team_army[team]+=army;
+
+      {$IFDEF _FULLGAME}
+      if(menu_s2=ms2_camp)
+      then //cmp_code
+      else
+      {$ENDIF}
+       if(g_mode<>gm_inv)then
+        for p:=0 to MaxPlayers do
+         if(team_army[p]>0)then
+          if(G_WTeam<255)then
+          begin
+             G_WTeam:=255;
+             break;
+          end
+          else G_WTeam:=p;
+   end
+   else
+   begin
+      G_Paused:=1;
+      {$IFDEF _FULLGAME}
+      _draw:=true;
+      {$ENDIF}
    end;
 end;
 
@@ -561,7 +607,7 @@ begin
         begin
            if(ttl<ClientTTL)then
            begin
-              inc(ttl,1);
+              ttl+=1;
               if(ttl=ClientTTL)or(ttl=fr_fps)then vid_mredraw:=true;
            end
            else
@@ -577,63 +623,11 @@ begin
         begin
            _u_ord(p);
 
-           if(build_cd>0)then dec(build_cd,1);
-
-           {if(state=ps_comp)then
-           begin
-              if(ai_pushtimei>0)then
-              begin
-                 dec(ai_pushtimei,1);
-                 if(ai_pushtimei=_pushtimes)then ai_pushfrmi :=max2(1,ucl_c[false]-ai_towngrd);
-                 if(ai_pushtimei=0         )then ai_pushfrmi:=0;
-              end
-              else
-                if(ucl_c[false]>=ai_pushmin)or(army>101)then
-                 if(cf(@ai_flags,@aif_dattack))then ai_pushtimei:=ai_pushtime;
-           end; }
+           if(build_cd>0)then build_cd-=1;
         end;
      end;
 
-   if(G_Started)and(G_Paused=0)and(ServerSide)then
-   begin
-      if(net_nstat>ns_none)and(G_Step<60)then exit;
-
-      G_plstat:=0;
-      for p:=0 to MaxPlayers do
-       with _players[p] do
-        if(army>0)and(state>ps_none)then G_plstat:=G_plstat or (1 shl p);
-
-      if(G_WTeam=255)then
-      begin
-         FillChar(team_army,SizeOf(team_army),0);
-         G_WTeam:=255;
-         for p:=0 to MaxPlayers do
-          with _players[p] do
-           if(state>ps_none)then inc(team_army[team],army);
-
-         {$IFDEF _FULLGAME}
-         if(menu_s2=ms2_camp)
-         then //cmp_code
-         else
-         {$ENDIF}
-           if(g_mode<>gm_inv)then
-            for p:=0 to MaxPlayers do
-             if(team_army[p]>0)then
-              if(G_WTeam<255)then
-              begin
-                 G_WTeam:=255;
-                 break;
-              end
-              else G_WTeam:=p;
-      end
-      else
-      begin
-         G_Paused:=1;
-         {$IFDEF _FULLGAME}
-         _draw:=true;
-         {$ENDIF}
-      end;
-   end;
+   Endgame;
 end;
     {
 procedure g_inv_calcmm;
@@ -838,12 +832,12 @@ end;  }
 procedure CodeGame;
 begin
    {$IFDEF _FULLGAME}
-   inc(vid_rtui,1);
+   vid_rtui+=1;
    vid_rtui:=vid_rtui mod vid_rtuis;
 
    if(vid_rtui=0)then _MusicCheck;
-   if(snd_anoncer_pause>0)then dec(snd_anoncer_pause,1);
-   if(snd_unitcmd_pause>0)then dec(snd_unitcmd_pause,1);
+   if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
+   if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
 
    if(net_nstat=ns_clnt)then net_GClient;
    _rpls_code;
@@ -880,20 +874,20 @@ begin
          FillChar(ui_orders_n   ,SizeOf(ui_orders_n   ),0);
          FillChar(ui_orders_x   ,SizeOf(ui_orders_x   ),0);
          FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
-         if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
+         if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
 
          PlayUnitSelect;
          {$ENDIF}
 
-         inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;
-         inc(_uregen_c,1); _uregen_c:=_uregen_c mod regen_per;
+         _uclord_c+=1; _uclord_c:=_uclord_c mod _uclord_p;
+         _uregen_c+=1; _uregen_c:=_uregen_c mod regen_per;
 
          if(ServerSide)then
          begin
             if(_uclord_c=0)then
-             if(g_royal_r>0)then dec(g_royal_r,1);
+             if(g_royal_r>0)then g_royal_r-=1;
 
-            inc(G_Step,1);
+            G_Step+=1;
             //if(g_mode=gm_ct )then _CPoints;
             //if(g_mode=gm_inv)then g_inv_spawn;
          end;

@@ -69,7 +69,7 @@ begin
       if(hits>0)and(sel)and(playeri=HPlayer)then
       if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(_units[i].uidi))then
       begin
-         inc(su,1);
+         su+=1;
          if(bld)then
          begin
             guid:=uidi;
@@ -95,8 +95,8 @@ begin
                else _PlayCommand(un_snd_move  [gadv]);
    end;
 
-   inc(ox1,vid_mapx);
-   inc(oy1,vid_mapy);
+   ox1+=vid_mapx;
+   oy1+=vid_mapy;
 
    if(_IsUnitRange(tar,nil))then
    begin
@@ -162,8 +162,8 @@ begin
    sc:=0;
    with _players[HPlayer]do
    begin
-      inc(sc,ucl_cs[false]);
-      inc(sc,ucl_cs[true ]);
+      sc+=ucl_cs[false];
+      sc+=ucl_cs[true ];
       htm:=team;
    end;
    _whoInPoint:=0;
@@ -269,12 +269,12 @@ var u:integer;
 begin
    //writeln(tab,': ',bx,', ',by);
    PlaySNDM(snd_click);
-   dec(by,4);// 0,0 under minimap
+   by-=4;// 0,0 under minimap
 
    case by of
    -1: case vid_ppos of   // tabs
-       0,1: begin dec(m_vx,vid_panelx); if(m_vy>ui_tabsy)then ui_tab:=mm3(0,m_vx div vid_tBW,3);inc(m_vx,vid_panelx);end;
-       2,3: begin dec(m_vy,vid_panely); if(m_vx>ui_tabsy)then ui_tab:=mm3(0,m_vy div vid_tBW,3);inc(m_vy,vid_panely);end;
+       0,1: begin m_vx-=vid_panelx; if(m_vy>ui_tabsy)then ui_tab:=mm3(0,m_vx div vid_tBW,3);m_vx+=vid_panelx;end;
+       2,3: begin m_vy-=vid_panely; if(m_vx>ui_tabsy)then ui_tab:=mm3(0,m_vy div vid_tBW,3);m_vy+=vid_panely;end;
        end;
    9 : case bx of         // buttons
        0 : ToggleMenu;
@@ -384,7 +384,7 @@ begin
    else
       case k of
       sdlk_tab: begin
-                   inc(ui_tab,1);
+                   ui_tab+=1;
                    ui_tab:=ui_tab mod 4;
                 end;
       1       : begin end;
@@ -392,7 +392,7 @@ begin
         if(_testmode>0)and(net_nstat=0)then
          case k of
             sdlk_end       : if(k_ctrl>2)
-                             then begin if(g_mode=gm_inv)then inc(g_inv_wave_n,1); end
+                             then begin if(g_mode=gm_inv)then g_inv_wave_n+=1; end
                              else _fsttime:=not _fsttime;
             sdlk_home      : _warpten:=not _warpten;
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
@@ -467,8 +467,8 @@ end;
 
 procedure _keyp(i:pbyte);
 begin
-   if (i^>1)and(i^<255) then inc(i^,1); //
-   if (i^=1) then i^:=0;
+   if(i^>1)and(i^<255)then i^+=1;
+   if(i^=1)then i^:=0;
 end;
 
 procedure WindowEvents;
@@ -483,7 +483,7 @@ begin
    _keyp(@k_ml   );
    _keyp(@k_mr   );
    _keyp(@k_chart);
-   if(k_dbl>0)then dec(k_dbl,1);
+   if(k_dbl>0)then k_dbl-=1;
 
    if(k_chart>k_chrtt)then
     if(length(k_kstring)<255)then k_kstring:=k_kstring+k_char;
@@ -493,8 +493,8 @@ begin
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(_menu=false)and(G_Started)then
                               begin
-                                 dec(vid_vx,_event^.motion.x-m_vx);
-                                 dec(vid_vy,_event^.motion.y-m_vy);
+                                 vid_vx-=_event^.motion.x-m_vx;
+                                 vid_vy-=_event^.motion.y-m_vy;
                                  _view_bounds;
                               end;
                               m_vx:=_event^.motion.x;
@@ -520,7 +520,7 @@ begin
                                                       41: _scrollInt(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1 );
                                                       end;
                                                    end
-                                                   else dec(tmpmid,1);
+                                                   else tmpmid-=1;
                             SDL_BUTTON_WHEELUP   : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
@@ -530,7 +530,7 @@ begin
                                                       41: _scrollInt(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1 );
                                                       end;
                                                    end
-                                                   else inc(tmpmid,1);
+                                                   else tmpmid+=1;
                               else
                               end;
                            end;
@@ -592,16 +592,16 @@ begin
    m_my :=m_vy+vid_vy-vid_mapy;
    if(vid_ppos<2)then
    begin
-      u:=m_vx-vid_panelx;m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
-      u:=m_vy-vid_panely;m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
+      u:=m_vx-vid_panelx;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
+      u:=m_vy-vid_panely;m_by:=u div vid_BW;if(u<0)then m_by-=1;
    end
    else
    begin
-      u:=m_vy-vid_panely;m_bx:=u div vid_BW;if(u<0)then dec(m_bx,1);
-      u:=m_vx-vid_panelx;m_by:=u div vid_BW;if(u<0)then dec(m_by,1);
+      u:=m_vy-vid_panely;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
+      u:=m_vx-vid_panelx;m_by:=u div vid_BW;if(u<0)then m_by-=1;
    end;
 
-   if(m_ldblclk>0)then dec(m_ldblclk,1);
+   if(m_ldblclk>0)then m_ldblclk-=1;
 
    _chkbld;
 
@@ -683,10 +683,10 @@ end;
 
 procedure _move_v_m;
 begin
-   if(m_vx<vid_vmb_x0)then dec(vid_vx,vid_vmspd);
-   if(m_vy<vid_vmb_y0)then dec(vid_vy,vid_vmspd);
-   if(m_vx>vid_vmb_x1)then inc(vid_vx,vid_vmspd);
-   if(m_vy>vid_vmb_y1)then inc(vid_vy,vid_vmspd);
+   if(m_vx<vid_vmb_x0)then vid_vx-=vid_vmspd;
+   if(m_vy<vid_vmb_y0)then vid_vy-=vid_vmspd;
+   if(m_vx>vid_vmb_x1)then vid_vx+=vid_vmspd;
+   if(m_vy>vid_vmb_y1)then vid_vy+=vid_vmspd;
 end;
 
 procedure _view_move;
@@ -697,10 +697,10 @@ begin
 
    if(vid_vmm)then _move_v_m;
 
-   if (k_u>1) then dec(vid_vy,vid_vmspd);
-   if (k_l>1) then dec(vid_vx,vid_vmspd);
-   if (k_d>1) then inc(vid_vy,vid_vmspd);
-   if (k_r>1) then inc(vid_vx,vid_vmspd);
+   if(k_u>1)then vid_vy-=vid_vmspd;
+   if(k_l>1)then vid_vx-=vid_vmspd;
+   if(k_d>1)then vid_vy+=vid_vmspd;
+   if(k_r>1)then vid_vx+=vid_vmspd;
 
    if(vx<>vid_vx)or(vy<>vid_vy)then _view_bounds;
 end;

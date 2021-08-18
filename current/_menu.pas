@@ -150,8 +150,8 @@ end;
 procedure g_menu;
 var p:byte;
 begin
-   dec(m_vx,mv_x);
-   dec(m_vy,mv_y);
+   m_vx-=mv_x;
+   m_vy-=mv_y;
 
    if(k_ml=2)or(k_mr=2) then   //right or left click
    begin
@@ -179,7 +179,7 @@ begin
 
       // game settings
       6  : ;
-      7  : begin inc(vid_uhbars,1);vid_uhbars:=vid_uhbars mod 3; end;
+      7  : begin vid_uhbars+=1;vid_uhbars:=vid_uhbars mod 3; end;
       8  : m_a_inv:=not m_a_inv;
       9  : if(ui_menu_ssr_x2>=m_vx)
            then vid_vmspd:=0
@@ -191,14 +191,14 @@ begin
       11 : if not ((net_nstat=ns_none)and(G_Started=false))then _m_sel:=0;
       12 : begin _lng:=not _lng;swLNG;end;
       13 : begin
-              inc(vid_ppos,1);
+              vid_ppos+=1;
               vid_ppos:=vid_ppos mod 4;
               _ScreenSurfaces;
               theme_map_ptrt:=255;
               MakeTerrain;
            end;
       14 : begin
-              inc(vid_plcolors,1);
+              vid_plcolors+=1;
               vid_plcolors:=vid_plcolors mod 5;
            end;
 
@@ -316,7 +316,7 @@ begin
               with _players[p] do
                if(state=ps_comp)or(p=HPlayer)then
                begin
-                  inc(race,1);
+                  race+=1;
                   race:=race mod 3;
                   mrace:=race;
                end;
@@ -326,7 +326,7 @@ begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
                if(state=ps_comp)or(p=HPlayer)then
-                if(team<MaxPlayers)then inc(team,1);
+                if(team<MaxPlayers)then team+=1;
            end;
 
       // CAMP SCIRMISH MULTIPLAY
@@ -339,7 +339,7 @@ begin
       76 : if(net_nstat<>ns_clnt)and(not G_Started)then begin _bnext(@g_mode,true,@gamemodes);Map_premap;end;
       77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@g_startb,1,0,gms_g_startb);
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; end;
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,1,0,8);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,1,0,gms_g_maxai);
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
@@ -411,7 +411,7 @@ begin
             then _scrollInt(@PlayerTeam,1,1,MaxPlayers)
             else
               if(m_vx<ui_menu_csm_x3)
-              then begin inc(PlayerRace,1); PlayerRace:=PlayerRace mod 3;end
+              then begin PlayerRace+=1; PlayerRace:=PlayerRace mod 3;end
               else PlayerReady:=not PlayerReady;
       95 : begin
               p:=((m_vx-ui_menu_csm_x0) div ui_menu_csm_2ys)+1;
@@ -445,11 +445,11 @@ begin
    begin
       case _m_sel of
       // MAP
-      50 : begin Map_randomseed;                             Map_premap;end;
+      50 : begin Map_randomseed;                                  Map_premap;end;
       51 : begin _scrollInt(@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin _scrollInt(@map_liq,-1,0,7);                Map_premap;end;
-      53 : begin _scrollInt(@map_obs,-1,0,7);                Map_premap;end;
-      56 : begin Map_randommap;                              Map_premap;end;
+      52 : begin _scrollInt(@map_liq,-1,0,7);                     Map_premap;end;
+      53 : begin _scrollInt(@map_obs,-1,0,7);                     Map_premap;end;
+      56 : begin Map_randommap;                                   Map_premap;end;
 
       60 : begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
@@ -462,11 +462,11 @@ begin
               p:=((m_vy-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
                if(state=ps_comp)or(p=HPlayer)then
-                if(team>1)then dec(team,1);
+                if(team>1)then team-=1;
            end;
 
       77 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@g_startb ,-1,0,gms_g_startb);
-      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,-1,0,8);
+      79 : if(net_nstat<>ns_clnt)and(not G_Started)then _scrollInt(@G_aislots,-1,0,gms_g_maxai );
       80 : if(net_nstat<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
       84 : _scrollInt(@_rpls_pnui,-1,0,9);
@@ -501,7 +501,7 @@ begin
    end;
 
 
-   inc(m_vx,mv_x);
-   inc(m_vy,mv_y);
+   m_vx+=mv_x;
+   m_vy+=mv_y;
 end;
 

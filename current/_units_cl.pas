@@ -41,8 +41,8 @@ begin
    begin
       a^:=a^+[a1];
       if(a0<a1)
-      then dec(a1,1)
-      else inc(a1,1);
+      then a1-=1
+      else a1+=1;
    end;
 end;
 begin
@@ -648,7 +648,7 @@ end;
       if(_up_race=r)then
       begin
          ui_panel_uids[r,2,i]:=u;
-         inc(i,1);
+         i+=1;
          if(i>ui_ubtns)then break;
       end;
    end;

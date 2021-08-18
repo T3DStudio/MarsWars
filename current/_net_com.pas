@@ -79,7 +79,7 @@ begin
    if (net_buf^.len<=MaxNetBuffer) then
    begin
       net_readbyte:=(net_buf^.data+net_buf^.len)^;
-      inc(net_buf^.len,1);
+      net_buf^.len += 1;
    end
 end;
 
@@ -89,7 +89,7 @@ begin
    if (net_buf^.len<=MaxNetBuffer) then
    begin
       net_readsint:=(net_buf^.data+net_buf^.len)^;
-      inc(net_buf^.len,1);
+      net_buf^.len += 1;
    end
 end;
 
@@ -109,7 +109,7 @@ begin
    if (net_buf^.len<MaxNetBuffer) then
    begin
       move((net_buf^.data+net_buf^.len)^, (@net_readint)^, 2);
-      inc(net_buf^.len,2);
+      net_buf^.len += 2;
    end
 end;
 
@@ -119,7 +119,7 @@ begin
    if (net_buf^.len<MaxNetBuffer) then
    begin
       move((net_buf^.data+net_buf^.len)^, (@net_readword)^, 2);
-      inc(net_buf^.len,2);
+      net_buf^.len += 2;
    end
 end;  }
 
@@ -129,7 +129,7 @@ begin
    if (net_buf^.len<(MaxNetBuffer-2)) then
    begin
       move((net_buf^.data+net_buf^.len)^, (@net_readcard)^, 4);
-      inc(net_buf^.len,4);
+      net_buf^.len += 4;
    end
 end;
 
@@ -142,7 +142,7 @@ begin
    while (sl>0) do
    begin
       net_readstring:=net_readstring+net_readchar;
-      Dec(sl,1);
+      sl-=1;
    end;
 end;
 
@@ -153,7 +153,7 @@ begin
    if (net_buf^.len<=MaxNetBuffer) then
    begin
       (net_buf^.data+net_buf^.len)^:=b;
-      Inc(net_buf^.len,1);
+      net_buf^.len += 1;
    end;
 end;
 
@@ -162,7 +162,7 @@ begin
    if (net_buf^.len<=MaxNetBuffer) then
    begin
       (net_buf^.data+net_buf^.len)^:=b;
-      Inc(net_buf^.len,1);
+      net_buf^.len += 1;
    end;
 end;
 
@@ -183,7 +183,7 @@ begin
    if (net_buf^.len<MaxNetBuffer) then
    begin
       move( (@b)^, (net_buf^.data+net_buf^.len  )^,2 );
-      Inc(net_buf^.len,2);
+      net_buf^.len += 2;
    end;
 end;
 
@@ -192,7 +192,7 @@ begin
    if (net_buf^.len<MaxNetBuffer) then
    begin
       move( (@b)^, (net_buf^.data+net_buf^.len  )^,2 );
-      Inc(net_buf^.len,2);
+      net_buf^.len += 2;
    end;
 end;}
 
@@ -201,7 +201,7 @@ begin
    if (net_buf^.len<(MaxNetBuffer-2)) then
    begin
       move( (@b)^, (net_buf^.data+net_buf^.len  )^,4 );
-      Inc(net_buf^.len,4);
+      net_buf^.len += 4;
    end;
 end;
 
@@ -209,14 +209,14 @@ procedure net_writestring(s:shortstring);
 var sl,x:byte;
 begin
    sl:=length(s);
-   x:=1;
+   x :=1;
 
    net_writebyte(sl);
 
    while (net_buf^.len<=MaxNetBuffer)and(x<=sl) do
    begin
       net_writechar(s[x]);
-      Inc(x,1);
+      x += 1;
    end;
 end;
 
@@ -255,7 +255,7 @@ begin
        begin
           for t:=MaxNetChat-1 downto 0 do net_chat[i,t+1]:=net_chat[i,t];
 
-          inc(net_chatss[i],1);
+          net_chatss[i]+=1;
 
           if(pl<=MaxPlayers)then
           begin
@@ -267,7 +267,7 @@ begin
        end;
 
       delete(msg,0,cpl);
-      dec(stl,cpl);
+      stl-=cpl;
    end;
 
    {$IFDEF _FULLGAME}
@@ -296,7 +296,7 @@ begin
     for i:=1 to l do
      if(s[i]='.')then
      begin
-        inc(r,1);
+        r += 1;
         if(r>3)then break;
      end
      else e[r]:=s2b(b2s(e[r])+s[i]);
@@ -320,17 +320,19 @@ begin
       sip:='';
       sp :=net_cl_svstr;
       delete(sp,1,i);
-   end else
+   end
+   else
     if(i=sl)or(i=0) then
     begin
        sip:=net_cl_svstr;
        if(i=sl)then delete(sip,sl,1);
        sp:='0';
-    end else
-     begin
-        sip:=copy(net_cl_svstr,1,i-1);
-        sp :=copy(net_cl_svstr,i+1,sl-i);
-     end;
+    end
+    else
+    begin
+       sip:=copy(net_cl_svstr,1,i-1);
+       sp :=copy(net_cl_svstr,i+1,sl-i);
+    end;
 
    net_cl_svip   :=ip2c(sip);
    net_cl_svport :=swap(s2w(sp));

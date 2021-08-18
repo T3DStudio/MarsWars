@@ -161,6 +161,8 @@ TUID = record
    _apcm,
    _zombie_hits
                 : integer;
+
+   _upgr_armor,
    _zombie_uid,
    _urace,
    _uf,

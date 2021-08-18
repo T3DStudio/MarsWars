@@ -64,14 +64,14 @@ begin
       vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
 
-      if(G_aislots>8)then G_aislots:=8;
-      if(G_startb >5)then G_startb :=5;
+      if(G_aislots>gms_g_maxai )then G_aislots:=gms_g_maxai;
+      if(G_startb >gms_g_startb)then G_startb :=gms_g_startb;
 
-      if(_rpls_pnui  >9)then  _rpls_pnui  :=9;
-      if(net_pnui    >9)then  net_pnui    :=9;
-      if(vid_ppos    >3)then  vid_ppos    :=0;
-      if(vid_uhbars  >2)then  vid_uhbars  :=0;
-      if(vid_plcolors>4)then  vid_plcolors:=0;
+      if(_rpls_pnui  >9)then _rpls_pnui  :=9;
+      if(net_pnui    >9)then net_pnui    :=9;
+      if(vid_ppos    >3)then vid_ppos    :=0;
+      if(vid_uhbars  >2)then vid_uhbars  :=0;
+      if(vid_plcolors>4)then vid_plcolors:=0;
    end;
    swLNG;
    m_vrx:=vid_vw;

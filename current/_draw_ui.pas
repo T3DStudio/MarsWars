@@ -10,7 +10,7 @@ begin
         if(ab)
         then RectangleColor(r_minimap,ax-r,ay-r,ax+r,ay+r, c_white)
         else CircleColor   (r_minimap,ax  ,ay  ,        r, c_white);
-        dec(at,1);
+        at-=1;
      end;
 
    case g_mode of
@@ -43,8 +43,8 @@ begin
    case m_brush of
    1..255:
    begin
-      dec(m_brushx,vid_vx-lx);
-      dec(m_brushy,vid_vy-ly);
+      m_brushx-=vid_vx-lx;
+      m_brushy-=vid_vy-ly;
 
       with _uids[m_brush] do
       begin
@@ -56,8 +56,8 @@ begin
          circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
       end;
 
-      inc(m_brushx,vid_vx-lx);
-      inc(m_brushy,vid_vy-ly);
+      m_brushx+=vid_vx-lx;
+      m_brushy+=vid_vy-ly;
 
       {if(m_brush in [4,7,10])then
        circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray); }
@@ -65,7 +65,7 @@ begin
       // build areas
       while(ui_builders_n>0)do
       begin
-         dec(ui_builders_n,1);
+         ui_builders_n-=1;
          circleColor(tar,
          lx+ui_builders_x[ui_builders_n]-vid_vx,
          ly+ui_builders_y[ui_builders_n]-vid_vy,
@@ -109,19 +109,19 @@ begin
          if(y0=-1)then y0:=y+4;
          if((n mod rown)=0)then
          begin
-            if(n>0)then inc(y,vid_oisw);
+            if(n>0)then y+=vid_oisw;
             x:=ui_oicox-vid_oips;
          end;
          with _players[HPlayer] do
           with _uids[c] do _draw_surf(tar,x,y,un_sbtn[_advanced[g_addon]].surf);
 
-         dec(x,vid_oisw);
-         inc(n,1);
+         x-=vid_oisw;
+         n+=1;
       end;
       if(y0=-1)then y0:=y+4;
       _draw_text(tar,ui_oicox,y0   ,b2s(i)             ,ta_right,255,c_white);
       _draw_text(tar,ui_oicox,y0+10,i2s(ui_orders_n[i]),ta_right,255,c_gray );
-      inc(y,vid_oihw);
+      y+=vid_oihw;
    end;
    _draw_text(tar,ui_oicox-4,ui_texty+2,str_orders,ta_right,255,c_white);
 end;
@@ -343,11 +343,11 @@ begin
             else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0,'');
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
-            inc(ux,1);
+            ux+=1;
             if(ux>2)then
             begin
                ux:=0;
-               inc(uy,1);
+               uy+=1;
             end;
          end;
       end
@@ -395,7 +395,7 @@ uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,m_vx,m_vy,bliz
          sy:=sx shr 1;
          ellipseColor(tar,ui_mc_x-vid_vx,ui_mc_y-vid_vy,sx,sy,ui_mc_c);
 
-         dec(ui_mc_a,1);
+         ui_mc_a-=1;
       end;
    end;
 end;
@@ -491,7 +491,7 @@ begin
      if(net_chat_shlm>0)then
      begin
         _draw_text(tar,ui_textx,ui_chaty,net_chat[HPlayer,0],ta_left,255,c_white);
-        dec(net_chat_shlm,1);
+        net_chat_shlm-=1;
      end
      else d_Hints(tar);
 

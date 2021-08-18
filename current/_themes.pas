@@ -19,7 +19,7 @@ end;
 procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
 var t:TMWTexture;
     i:integer;
-procedure next;begin inc(it^,1);setlength(l^,it^);l^[it^-1]:=t;end;
+procedure next;begin it^+=1;setlength(l^,it^);l^[it^-1]:=t;end;
 begin
    it^ :=0;
    i   :=0;
@@ -42,7 +42,7 @@ begin
       end;
       next;
 
-      inc(i,1);
+      i+=1;
    end;
 
    if(it^=0)then
@@ -54,7 +54,7 @@ end;
 
 procedure IntListAdd(_il:PTIntList;_iln:pinteger;k:integer);
 begin
-   inc(_iln^,1);
+   _iln^+=1;
    setlength(_il^,_iln^);
    _il^[_iln^-1]:=k;
 end;
@@ -106,7 +106,7 @@ begin
                   IntListAdd(_il,_iln,p);
                   if(p=l)
                   then break
-                  else inc(p,sign(l-p));
+                  else p+=sign(l-p);
                end;
             end;
          end

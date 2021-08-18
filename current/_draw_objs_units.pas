@@ -222,7 +222,7 @@ begin
       with uid^ do
       if(un_foot_anim[adv]>0)then
       begin
-         dec(animf,1);
+         animf-=1;
          if(animf<=0)then
          begin
             PlaySND(un_eid_snd_foot[adv],nil,nil);
@@ -552,7 +552,7 @@ begin
       with pu^ do
        if(_IsUnitRange(inapc,@tu))then
        begin
-          if(tu^.sel)and(G_paused=0)and(playeri=HPlayer)then inc(ui_units_inapc[uidi],1);
+          if(tu^.sel)and(G_paused=0)and(playeri=HPlayer)then ui_units_inapc[uidi]+=1;
        end
        else
          if(hits<=0)

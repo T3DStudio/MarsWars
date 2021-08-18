@@ -45,7 +45,7 @@ r_hell                 = 1;
 r_uac                  = 2;
 
 MaxPlayers             = 6;
-MaxPlayerUnits         = 115;
+MaxPlayerUnits         = 120;
 MaxCPoints             = 6;
 
 MaxSMapW               = 7000;
@@ -77,6 +77,7 @@ outlogfn               : shortstring = 'out.txt';
 //
 
 gms_g_startb           = 5;
+gms_g_maxai            = 8;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -913,7 +914,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 252107;
+svld_size              = 259037;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

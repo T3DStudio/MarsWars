@@ -23,7 +23,7 @@ begin
     with map_dds[d] do
      if(animt>0)or(first)then
      begin
-        dec(animt,1);
+        animt-=1;
         if(animt<=0)then
         begin
            if(animn<0)or(first)then

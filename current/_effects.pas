@@ -7,7 +7,6 @@ begin
    begin
       smodel      :=sm;
       anim_smstate:=sms;
-
    end;
 end;
 begin
@@ -252,10 +251,9 @@ begin
             while(mtars>0)do
             begin
                _effect_add(vx-_randomr(sr),vy-_randomr(sr),_depth(vy,mfs),mid);
-               dec(mtars,1);
+               mtars-=1;
             end;
          end;
-
 
          //if(ms_eid_death>0)then _effect_add(vx,vy,vy+map_flydpth[mf],ms_eid_death);
          if(ms_eid_decal>0)then _effect_add(vx,vy,-6                ,ms_eid_decal);
@@ -315,14 +313,14 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
         begin
            if(anim_i<>anim_last_i)then
            begin
-              if(z>0)then begin inc(y,1);dec(z,1);end;
-              if(z<0)then begin dec(y,1);inc(z,1);end;
-              if(anim_i<anim_last_i)then inc(anim_i,1);
-              if(anim_i>anim_last_i)then dec(anim_i,1);
+              if(z>0)then begin y+=1;z-=1;end;
+              if(z<0)then begin y-=1;z+=1;end;
+              if(anim_i<anim_last_i)then anim_i+=1;
+              if(anim_i>anim_last_i)then anim_i-=1;
            end
            else
            begin
-              if(anim_last_i_t>0)then dec(anim_last_i_t,1);
+              if(anim_last_i_t>0)then anim_last_i_t-=1;
               if(anim_last_i_t<0)then anim_last_i_t:=0;
            end;
         end;

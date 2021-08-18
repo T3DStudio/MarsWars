@@ -73,7 +73,7 @@ begin
      if(army>0)and(state>ps_none)then
      begin
         G_plstat:=G_plstat or (1 shl p);
-        inc(G_nunits,MaxPlayerUnits);
+        G_nunits+=MaxPlayerUnits;
      end;
 end;
 
@@ -194,7 +194,7 @@ const a = 4;
       98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249
       );
 begin
-   inc(map_rpos,1);
+   map_rpos+=1;
    map_iseed:=map_iseed*a+t[map_rpos];
    if(m=0)
    then _random:=0
@@ -203,7 +203,7 @@ end;
 
 function _randomx(x,m:integer):integer;
 begin
-   inc(map_iseed,word(x));
+   map_iseed+=word(x);
    _randomx:=_random(m);
 end;
 
@@ -276,8 +276,8 @@ begin
     with _players[p] do
      if(state=ps_play)then
      begin
-        inc(c,1);
-        if(ready)or(p=HPlayer)then inc(r,1);
+        c+=1;
+        if(ready)or(p=HPlayer)then r+=1;
      end;
    _plsReady:=(r=c)and(c>0);
 end;
@@ -371,8 +371,8 @@ begin
    if(pset^=[])then exit;
    repeat
      if(fwrd)
-     then inc(pb^,1)
-     else dec(pb^,1);
+     then pb^+=1
+     else pb^-=1
    until pb^ in pset^
 end;
 
@@ -409,8 +409,8 @@ end;
 function _nhp3(x,y:integer;player:PTPlayer):boolean;
 begin
    _nhp3:=false;
-   dec(x,vid_vx);
-   dec(y,vid_vy);
+   x-=vid_vx;
+   y-=vid_vy;
    if(0<x)and(x<vid_sw)and
      (0<y)and(y<vid_sh)then
    begin
@@ -428,7 +428,7 @@ end;
 
 procedure _scrollInt(i:pinteger;s,min,max:integer);
 begin
-   inc(i^,s);
+   i^+=s;
    if(i^>max)then i^:=max;
    if(i^<min)then i^:=min;
 end;
@@ -496,7 +496,7 @@ begin
    ui_builders_y[ui_builders_n]:=ty;
    ui_builders_r[ui_builders_n]:=tr;
 
-   inc(ui_builders_n,1);
+   ui_builders_n+=1;
 end;
 
 {$ELSE}
@@ -510,8 +510,8 @@ begin
     with _Players[i] do
      if (state=PS_Play) then
      begin
-        inc(c,1);
-        if (ttl=ClientTTL) then inc(r,1);
+        c+=1;
+        if(ttl=ClientTTL)then r+=1;
      end;
    _plsOut:=(r=c)and(c>0);
 end;
