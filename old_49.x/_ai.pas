@@ -56,12 +56,12 @@ begin
 
              //_upgr_ss(@upgr ,[upgr_mainr],race,1);
           end;
-      6 : begin  // Nightmare
+      6 : begin  // hell masacre
              _bc_ss(@a_build,[0..11]);
              _bc_ss(@a_units,[0..11]);
              _bc_ss(@a_upgr ,[0..MaxUpgrs]);
 
-             _upgr_ss(@upgr ,[upgr_mainr],race,1);
+             _upgr_ss(@upgr ,[upgr_attack,upgr_mainr],race,1);
           end;
       7 : begin  // Super Nightmare
              _bc_ss(@a_build,[0..11]);
@@ -279,7 +279,7 @@ begin
    end;
 end;
 
-function ai_CheckUpgrs(pl:byte):byte;
+{function ai_CheckUpgrs(pl:byte):byte;
 var i:byte;
 begin
    ai_CheckUpgrs:=0;
@@ -293,7 +293,7 @@ begin
        then inc(ai_CheckUpgrs,upgrade_cnt[race,i])
        else
         if(upgr[i]<ai_upgrlvl(pl,i))then inc(ai_CheckUpgrs,1);
-end;
+end;  }
 
 function _ai_get_max_enrg(pl:byte;rrr:boolean):byte;
 begin
@@ -302,11 +302,11 @@ begin
       case ai_skill of
       0  : _ai_get_max_enrg:=5;
       1  : _ai_get_max_enrg:=10;
-      2  : _ai_get_max_enrg:=25;
-      3  : _ai_get_max_enrg:=45;
-      4  : _ai_get_max_enrg:=72;
-      5  : _ai_get_max_enrg:=85;
-      else _ai_get_max_enrg:=100;
+      2  : _ai_get_max_enrg:=30;
+      3  : _ai_get_max_enrg:=60;
+      4  : _ai_get_max_enrg:=85;
+      5  : _ai_get_max_enrg:=95;
+      else _ai_get_max_enrg:=110;
       end;
       if(g_mode in [gm_3fort,gm_2fort,gm_inv])then inc(_ai_get_max_enrg,10);
       if(rrr)then inc(_ai_get_max_enrg,4);
@@ -339,7 +339,7 @@ begin
    Bar : if(u_e[true,ucl]>=bnms^[ucl])then exit;
    Gen : begin
          if(menerg>=maxe)then exit;
-         if(race=r_uac)then cnt:=(cnt div 2);
+         if(race=r_uac)then cnt:=cnt-(cnt div 2);
          end;
    Smt : if(u_e[true,ucl]>=bnms^[ucl])then exit;
    Tw1,
@@ -381,20 +381,29 @@ begin
             if(upgr[upgr_2tier]>0)then set_bld(X8,1);
             set_bld(Com,4);
             set_bld(Bar,5);
-            set_bld(Gen,20);
+            if(u_eb[true,0]>0)then set_bld(Gen,30);
             set_bld(X5 ,1);
             set_bld(Adv,1);
             set_bld(Smt,1);
-            set_bld(Com,2);
-            set_bld(Gen,10+upgr[upgr_mainr]+ai_skill);
+            if(u_eb[true,0]>0)then set_bld(Gen,12+upgr[upgr_mainr]+ai_skill);
             set_bld(Com,2);
          end;
-         set_bld(Gen,7+ai_skill);
-         set_bld(Tw1,2);
-         set_bld(Bar,2);
-         set_bld(Tw1,1);
-         set_bld(Gen,4+ai_skill);
-         set_bld(Bar,1);
+         if(u_eb[true,1]>0)then set_bld(Tw1,2);
+         if(ai_skill>4)then
+         begin
+            set_bld(Bar,1);
+            set_bld(Gen,11+ai_skill);
+         end
+         else
+         begin
+            set_bld(Bar,2);
+            set_bld(Gen,7+ai_skill);
+            set_bld(Bar,1);
+         end;
+         //set_bld(Gen,4+ai_skill);
+         //set_bld(Bar,1);
+         //if(G_step<=vid_2fps)then
+         // if(bp>3)then set_bld(Gen,4+ai_skill);
          if(alrm)then set_bld(Tw1,15);
       end;
    end;
@@ -623,12 +632,29 @@ begin
          or(u_e[true,0]<3      )then _unit_supgrade(u,upgr_mainr);
          if(u=ubx[3])then
           case race of
-          r_hell: if(g_addon)then _unit_supgrade(u,upgr_2tier);
+          r_hell: begin
+                     if(g_addon)then _unit_supgrade(u,upgr_2tier);
+                     if(u_eb[true,6]>0)then _unit_supgrade(u,upgr_6bld);
+                  end;
           r_uac : if(g_addon)and(random(2)=0)
                   then _unit_supgrade(u,upgr_2tier)
                   else _unit_supgrade(u,upgr_6bld );
           end;
          if(race=r_uac)then _unit_supgrade(u,upgr_plsmt);
+
+         if(ai_skill>4)then
+          if(u_e[true,3]>3)then
+          begin
+             _unit_supgrade(u,upgr_attack);
+             _unit_supgrade(u,upgr_armor );
+             if(race=r_uac)then
+             begin
+                _unit_supgrade(u,upgr_mecharm );
+                _unit_supgrade(u,upgr_mechspd );
+             end;
+             _unit_supgrade(u,upgr_melee );
+             _unit_supgrade(u,upgr_mspeed);
+          end;
          if(ai_skill>3)then
          begin
             if(race=r_hell)
@@ -725,46 +751,37 @@ end;
 procedure ai_CCAttack(u:integer);
 begin
    with _units[u] do
-   begin
-      if(ai_outalrm(u,225,(ai_uc_a=0)and(ai_uc_e>0))=false)then
-      begin
-         if(alrm_x>0)
-         then ai_settar(u,alrm_x  ,alrm_y  ,base_r)
-         else ai_target(u);
-      end;
-   end;
+    if(ai_outalrm(u,225,(ai_uc_a=0)and(ai_uc_e>0))=false)then
+     if(alrm_x>0)
+     then ai_settar(u,alrm_x  ,alrm_y  ,base_r)
+     else ai_target(u);
 end;
 
 procedure ai_CCOut(u:integer);
 var d:integer;
 begin
    with _units[u] do
-   begin
-      if(ai_outalrm(u,base_ir,false)=false)then
-      begin
-          if(ai_bx>0)then
+    if(ai_outalrm(u,base_ir,false)=false)then
+     if(ai_bx>0)then
+     begin
+        d:=dist2(x,y,ai_bx,ai_by);
+        if(d>base_ir)
+        then ai_settar(u,ai_bx,ai_by,base_r)
+        else
+          if(d<base_hr)
+          then ai_settar(u,x-(x-ai_bx),y-(ai_by-y),base_hr)
+          else
           begin
-             d:=dist2(x,y,ai_bx,ai_by);
-             if(d>base_ir)
-             then ai_settar(u,ai_bx,ai_by,base_r)
-             else
-               if(d<base_hr)
-               then ai_settar(u,x-(x-ai_bx),y-(ai_by-y),base_hr)
-               else
-               begin
-                  ai_settar(u,x    ,y    ,base_r);
-                  _unit_action(u);
-               end;
+             ai_settar(u,x    ,y    ,base_r);
+             _unit_action(u);
           end;
-      end;
-   end;
+     end;
 end;
 
 procedure ai_buildactions(u:integer);
 const maxb = 25;
       maxt = 20;
 var blds: TCntr;
-    t,
     twrs: integer;
 begin
    FillChar(blds,SizeOf(blds),0);
@@ -777,12 +794,16 @@ begin
       0,1 : blds[0]:=1;
       2   : blds[0]:=3;
       3   : blds[0]:=8;
-      4   : blds[0]:=11;
-      5   : blds[0]:=13;
+      4   : blds[0]:=12;
       else  blds[0]:=16;
       end;
       blds[1 ]:=min2(max2(1,(menerg div 10)+u_e[true,0]-u_e[true,3]),maxb);
-      blds[3 ]:=min3(ai_CheckUpgrs(player),ai_skill+2,menerg div 11);
+
+      case race of
+      r_uac : blds[3 ]:=min2(ai_skill+2,menerg div 25);  //ai_CheckUpgrs(player)
+      r_hell: blds[3 ]:=min2(ai_skill+2,menerg div 30);
+      end;
+
       blds[4 ]:=min2(u_eb[true,0]*4,max2(5,maxt-u_eb[true,1]));
       blds[7 ]:=blds[4];
       blds[10]:=blds[4];
@@ -887,11 +908,11 @@ begin
                           end
                           else
                             if(order=0)then
-                             if(u_e[isbuild,ucl]> 10)
+                             if(u_e[isbuild,ucl]> 12)
                              then order:=5
                              else order:=4;
-                     5  : if(u_e[isbuild,ucl]<=10)or(upgr[upgr_ucomatt]=0)then order:=6;
-                     6  : if(u_e[isbuild,ucl]> 10)then order:=5;
+                     5  : if(u_e[isbuild,ucl]<=12)or(upgr[upgr_ucomatt]=0)then order:=6;
+                     6  : if(u_e[isbuild,ucl]> 12)then order:=5;
                      else
                      end;
 
@@ -1134,7 +1155,8 @@ begin
                          if(uid=UID_Engineer)and(ai_uc_a<1)then _unit_action(u);
                       end;
             UID_ArchVile:
-                      if(melee=false)and(alrm_b=false)then ai_outalrm(u,base_r,false);
+                      if(melee=false)then ai_outalrm(u,base_r,false);
+            UID_Revenant: ai_outalrm(u,sr,false);
             UID_LostSoul:
                       begin
                          if(u_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)

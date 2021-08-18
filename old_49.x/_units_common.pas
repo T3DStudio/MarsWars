@@ -1276,9 +1276,12 @@ begin
          UID_Bomber,
          UID_BFG:
                       begin
-                         if(buff[ub_advanced]>0)
-                         then tt:=275
-                         else tt:=250;
+                         if(buff[ub_advanced]<=0)
+                         then tt:=250
+                         else
+                           if(g_addon)
+                           then tt:=275
+                           else tt:=300;
 
                          if(sr<>tt)then
                          begin
@@ -1350,11 +1353,20 @@ begin
                          begin
                             uf   :=uf_fly;
                             speed:=13;
+                            tt   :=275;
                          end
                          else
                          begin
                             uf   :=uf_ground;
                             speed:=9;
+                            tt   :=250;
+                         end;
+
+                         if(sr<>tt)then
+                         begin
+                            sr:=tt;
+                            ar:=tt;
+                            {$IFDEF _FULLGAME}_unit_fsrclc(@_units[u]);{$ENDIF}
                          end;
                       end;
        end;

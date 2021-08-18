@@ -67,7 +67,7 @@ begin
          rld_a  := 20;
          mdmg   := 10;
          trt    := vid_fps*8;
-         renerg := 1;
+         renerg := 3;
       end;
       if(uid=UID_Imp) then
       begin
@@ -83,7 +83,7 @@ begin
          anims  := 12;
          mdmg   := 10;
          trt    := vid_fps*5;
-         renerg := 1;
+         renerg := 2;
       end;
       if(uid=UID_Demon) then
       begin
@@ -99,7 +99,7 @@ begin
          anims  := 15;
          mdmg   := 40;
          trt    := vid_fps*8;
-         renerg := 2;
+         renerg := 4;
       end;
       if(uid=UID_CacoDemon)then
       begin
@@ -114,7 +114,7 @@ begin
          rld_a  := 45;
          mdmg   := 30;
          trt    := vid_fps*20;
-         renerg := 2;
+         renerg := 4;
       end;
       if(uid=UID_Baron)then
       begin
@@ -130,8 +130,10 @@ begin
          anims  := 12;
          mdmg   := 50;
          trt    := vid_fps*40;
-         renerg := 4;
-         arf    :=(sr div 4)*3;
+         renerg := 6;
+         if(g_addon)
+         then arf:=(sr div 4)*3
+         else arf:= sr div 2;
       end;
       if(uid=UID_Cyberdemon)then
       begin
@@ -147,7 +149,7 @@ begin
          anims  := 11;
          max    := 1;
          trt    := vid_fps*90;
-         renerg := 8;
+         renerg := 12;
          ruid   := UID_HMonastery;
          arf    :=(sr div 4)*3;
       end;
@@ -165,7 +167,7 @@ begin
          anims  := 11;
          max    := 1;
          trt    := vid_fps*90;
-         renerg := 8;
+         renerg := 12;
          ruid   := UID_HMonastery;
       end;
       if(uid=UID_Pain)then
@@ -178,11 +180,11 @@ begin
          ar     := 350;
          ucl    := 7;
          painc  := 3;
-         rld_r  := 95;
-         rld_a  := 70;
+         rld_r  := vid_2fps;
+         rld_a  := vid_fps;
          anims  := 7;
          trt    := vid_fps*40;
-         renerg := 6;
+         renerg := 10;
          ruid   := UID_HMonastery;
       end;
       if(uid=UID_Revenant) then
@@ -192,6 +194,7 @@ begin
          uf     := uf_ground;
          speed  := 12;
          sr     := 250;
+         arf    := 275;
          ucl    := 8;
          painc  := 7;
          rld_r  := 65;
@@ -199,7 +202,7 @@ begin
          anims  := 16;
          mdmg   := 35;
          trt    := vid_fps*40;
-         renerg := 4;
+         renerg := 8;
          ruid   := UID_HMonastery;
       end;
       if(uid=UID_Mancubus) then
@@ -215,7 +218,7 @@ begin
          rld_r  := 150;
          anims  := 10;
          trt    := vid_fps*60;
-         renerg := 6;
+         renerg := 10;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
          arf    :=(ar div 2);
@@ -232,7 +235,7 @@ begin
          rld_r  := 20;
          anims  := 11;
          trt    := vid_fps*60;
-         renerg := 6;
+         renerg := 10;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
       end;
@@ -250,7 +253,7 @@ begin
          rld_a  := 65;
          anims  := 15;
          trt    := vid_fps*90;
-         renerg := 12;
+         renerg := 16;
          ruid   := UID_HAltar;
          rupgr  := upgr_2tier;
       end;
@@ -331,7 +334,7 @@ begin
          generg := 0;
          isbuild:= true;
          rld_r  := 40;
-         renerg := 2;
+         renerg := 4;
          ctime  := 20;
       end;
       if(uid=UID_HTeleport) then
@@ -372,7 +375,7 @@ begin
          isbuild:= true;
          rld_r  := 140;
          rld_a  := 65;
-         renerg := 3;
+         renerg := 6;
          ctime  := 25;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
@@ -386,7 +389,7 @@ begin
          r      := 50;
          isbuild:= true;
          max    := 1;
-         renerg := 4;
+         renerg := 8;
          ctime  := 30;
          ruid   := UID_HMonastery;
          rupgr  := upgr_2tier;
@@ -407,7 +410,7 @@ begin
          anims  := 18;
          mdmg   := 6;
          trt    := vid_fps*10;
-         renerg := 1;
+         renerg := 2;
          arf    :=(sr div 4)*3;
          if(uid=UID_ZEngineer)then
          begin
@@ -433,7 +436,7 @@ begin
          anims  := 18;
          mdmg   := 6;
          trt    := vid_fps*10;
-         renerg := 1;
+         renerg := 2;
          if(uid=UID_ZFormer)then
          begin
             painc  := 3;
@@ -481,7 +484,7 @@ begin
          rld_a  := 3;
          anims  := 16;
          trt    := vid_fps*15;
-         renerg := 2;
+         renerg := 4;
          if(uid=UID_ZCommando)then
          begin
             painc  := 3;
@@ -503,7 +506,7 @@ begin
          rld_a  := 80;
          anims  := 14;
          trt    := vid_fps*30;
-         renerg := 3;
+         renerg := 6;
          if(uid=UID_ZBomber)then
          begin
             painc  := 3;
@@ -525,7 +528,7 @@ begin
          rld_a  := 0;
          anims  := 14;
          trt    := vid_fps*20;
-         renerg := 4;
+         renerg := 6;
          if(uid=UID_ZMajor)then
          begin
             painc  := 3;
@@ -547,7 +550,7 @@ begin
          rld_a  := 40;
          anims  := 14;
          trt    := vid_fps*60;
-         renerg := 5;
+         renerg := 8;
          if(uid=UID_ZBFG)then
          begin
             painc  := 3;
@@ -569,7 +572,7 @@ begin
          apcm   := 10;
          rld_r  := 30;
          trt    := vid_fps*30;
-         renerg := 3;
+         renerg := 6;
          ruid   := UID_UWeaponFactory;
       end;
       if(uid=UID_APC)then
@@ -586,7 +589,7 @@ begin
          anims  := 17;
          rld_r  := 30;
          trt    := vid_fps*30;
-         renerg := 3;
+         renerg := 6;
          ruid   := UID_UWeaponFactory;
       end;
       if(uid=UID_Terminator)then
@@ -603,7 +606,7 @@ begin
          rld_a  := 0;
          anims  := 18;
          trt    := vid_fps*60;
-         renerg := 6;
+         renerg := 10;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
       end;
@@ -621,7 +624,7 @@ begin
          rld_a  := 85;
          anims  := 17;
          trt    := vid_fps*60;
-         renerg := 8;
+         renerg := 12;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
       end;
@@ -637,7 +640,7 @@ begin
          rld_r  := 30;
          rld_a  := (rld_r div 3)*2;
          trt    := vid_fps*60;
-         renerg := 8;
+         renerg := 12;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
       end;
@@ -702,7 +705,7 @@ begin
          rld_r  := 14;
          rld_a  := rld_r div 2;
          anims  := 3;
-         renerg := 2;
+         renerg := 4;
          ctime  := 15;
       end;
       if(uid=UID_URadar) then
@@ -714,7 +717,7 @@ begin
          r      := 35;
          isbuild:= true;
          max    := 1;
-         renerg := 2;
+         renerg := 4;
          ctime  := 30;
       end;
       if(uid=UID_UVehicleFactory) then
@@ -741,7 +744,7 @@ begin
          rld_r  := 15;
          rld_a  := rld_r div 2;
          anims  := 2;
-         renerg := 2;
+         renerg := 6;
          ctime  := 20;
          ruid   := UID_UVehicleFactory;
          arf    := (sr div 5)*4;
@@ -756,7 +759,7 @@ begin
          r      := 40;
          isbuild:= true;
          max    := 1;
-         renerg := 4;
+         renerg := 8;
          ctime  := 30;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_2tier;
@@ -772,7 +775,7 @@ begin
          rld_r  := 90;
          rld_a  := 0;
          anims  := 2;
-         renerg := 4;
+         renerg := 8;
          ctime  := 30;
          ruid   := UID_UVehicleFactory;
          rupgr  := upgr_rturrets;
@@ -947,55 +950,55 @@ begin
    FillChar(upgrade_rupgr,SizeOf(upgrade_rupgr),0);
    FillChar(upgrade_rupgr,SizeOf(upgrade_ruid ),0);
                               // time lvl enr rupgr ruid
-   _setUPGR(r_hell,upgr_attack    ,180,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_armor     ,180,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_build     ,120,4 ,4 ,255,255);
-   _setUPGR(r_hell,upgr_melee     ,60 ,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_regen     ,120,2 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_pains     ,60 ,3 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_vision    ,60 ,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_towers    ,120,3 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_5bld      ,120,3 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_mainm     ,180,1 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_paina     ,120,2 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_mainr     ,60 ,2 ,2 ,255,255);
-   _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,3 ,255,255);
-   _setUPGR(r_hell,upgr_misfst    ,60 ,1 ,2 ,255,255);
+   _setUPGR(r_hell,upgr_attack    ,180,4 ,8 ,255,255);
+   _setUPGR(r_hell,upgr_armor     ,180,4 ,8 ,255,255);
+   _setUPGR(r_hell,upgr_build     ,120,4 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_melee     ,60 ,3 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_regen     ,120,2 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_pains     ,60 ,3 ,4 ,255,255);
+   _setUPGR(r_hell,upgr_vision    ,60 ,3 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_towers    ,120,3 ,4 ,255,255);
+   _setUPGR(r_hell,upgr_5bld      ,120,3 ,4 ,255,255);
+   _setUPGR(r_hell,upgr_mainm     ,180,1 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_paina     ,120,2 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_mainr     ,60 ,2 ,6 ,255,255);
+   _setUPGR(r_hell,upgr_pinkspd   ,60 ,1 ,4 ,255,255);
+   _setUPGR(r_hell,upgr_misfst    ,60 ,1 ,4 ,255,255);
    _setUPGR(r_hell,upgr_6bld      ,20 ,15,12,255,UID_HMonastery);
    _setUPGR(r_hell,upgr_2tier     ,120,1 ,12,255,UID_HMonastery);
-   _setUPGR(r_hell,upgr_revtele   ,120,1 ,3 ,upgr_2tier,UID_HMonastery);
-   _setUPGR(r_hell,upgr_revmis    ,120,1 ,2 ,upgr_2tier,UID_HMonastery);
-   _setUPGR(r_hell,upgr_totminv   ,120,1 ,2 ,upgr_2tier,UID_HMonastery);
-   _setUPGR(r_hell,upgr_bldrep    ,120,3 ,2 ,upgr_2tier,UID_HMonastery);
-   _setUPGR(r_hell,upgr_mainonr   ,60 ,1 ,2 ,upgr_2tier,UID_HMonastery);
-   _setUPGR(r_hell,upgr_b478tel   ,30 ,15,1 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_revtele   ,120,1 ,6 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_revmis    ,120,1 ,4 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_totminv   ,120,1 ,6 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_bldrep    ,120,3 ,6 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_mainonr   ,60 ,1 ,4 ,upgr_2tier,UID_HMonastery);
+   _setUPGR(r_hell,upgr_b478tel   ,30 ,15,4 ,upgr_2tier,UID_HMonastery);
    _setUPGR(r_hell,upgr_hinvuln   ,180,1 ,12,upgr_2tier,UID_HAltar    );
-   _setUPGR(r_hell,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_HAltar    );
+   _setUPGR(r_hell,upgr_bldenrg   ,180,3 ,8 ,upgr_2tier,UID_HAltar    );
 
-   _setUPGR(r_uac ,upgr_attack    ,180,4 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_armor     ,120,5 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_build     ,180,4 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_melee     ,60 ,3 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_vision    ,60 ,1 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_towers    ,120,3 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_5bld      ,120,3 ,2 ,255,255);
-   _setUPGR(r_uac ,upgr_mainm     ,180,1 ,3 ,255,255);
-   _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,4 ,upgr_mainm,255);
-   _setUPGR(r_uac ,upgr_mainr     ,60 ,2 ,2 ,255,255);
+   _setUPGR(r_uac ,upgr_attack    ,180,4 ,8 ,255,255);
+   _setUPGR(r_uac ,upgr_armor     ,120,5 ,6 ,255,255);
+   _setUPGR(r_uac ,upgr_build     ,180,4 ,8 ,255,255);
+   _setUPGR(r_uac ,upgr_melee     ,60 ,3 ,6 ,255,255);
+   _setUPGR(r_uac ,upgr_mspeed    ,60 ,2 ,4 ,255,255);
+   _setUPGR(r_uac ,upgr_plsmt     ,120,2 ,6 ,255,255);
+   _setUPGR(r_uac ,upgr_vision    ,60 ,1 ,6 ,255,255);
+   _setUPGR(r_uac ,upgr_towers    ,120,3 ,4 ,255,255);
+   _setUPGR(r_uac ,upgr_5bld      ,120,3 ,4 ,255,255);
+   _setUPGR(r_uac ,upgr_mainm     ,180,1 ,6 ,255,255);
+   _setUPGR(r_uac ,upgr_ucomatt   ,180,1 ,8 ,upgr_mainm,255);
+   _setUPGR(r_uac ,upgr_mainr     ,60 ,2 ,6 ,255,255);
    _setUPGR(r_uac ,upgr_mines     ,60 ,1 ,4 ,255,255);
-   _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,2 ,upgr_mines,255);
+   _setUPGR(r_uac ,upgr_minesen   ,60 ,1 ,4 ,upgr_mines,255);
    _setUPGR(r_uac ,upgr_6bld      ,120,1 ,12,255,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_2tier     ,120,1 ,12,255,UID_UVehicleFactory);
    _setUPGR(r_uac ,upgr_blizz     ,180,8 ,12,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,4 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_6bld2     ,120,1 ,2 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_mainonr   ,60 ,1 ,2 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_turarm    ,120,2 ,3 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_rturrets  ,120,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
-   _setUPGR(r_uac ,upgr_bldenrg   ,180,3 ,4 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_mechspd   ,120,2 ,6 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_mecharm   ,180,4 ,8 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_6bld2     ,120,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_mainonr   ,60 ,1 ,4 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_turarm    ,120,2 ,6 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_rturrets  ,120,1 ,6 ,upgr_2tier,UID_UVehicleFactory);
+   _setUPGR(r_uac ,upgr_bldenrg   ,180,3 ,8 ,upgr_2tier,UID_UVehicleFactory);
 
    initUnits;
 

@@ -7,6 +7,7 @@ procedure _d125(d:pinteger);begin d^:=d^+(d^ div 4);end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 procedure _d300(d:pinteger);begin d^:=d^*3;         end;
+procedure _d400(d:pinteger);begin d^:=d^*4;         end;
 procedure _dbfg(r:integer;d:pinteger);
 var i:integer;
 begin
@@ -20,7 +21,7 @@ begin
     if(upgr[upgr_melee]>0)then
      case race of
        r_hell : inc(damage,upgr[upgr_melee]*5);
-       r_uac  : inc(damage,upgr[upgr_melee]*3);
+       r_uac  : inc(damage,upgr[upgr_melee]*2);
      end;
 
    case pu^.uid of
@@ -74,17 +75,17 @@ MID_Bulletx2   : begin dam:=12 ; vst:=1;         sr :=0  ;       end;
 MID_YPlasma    : begin dam:=15 ; vst:=sr div 18; sr :=0  ;       end;
 MID_BPlasma    : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       end;
 MID_BFG        : begin dam:=125; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=15 ; vst:=sr div 60; sr :=0  ;       end;
+MID_Flyer      : begin dam:=10 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
 MID_Mine       : begin dam:=175; vst:=1;         sr :=100;       end;
 MID_Blizzard   : begin dam:=300; vst:=vid_fps;   sr :=blizz_r;   dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
-MID_SShot      : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   mtars:=3;
+MID_SShot      : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   mtars:=4;
                                                  if(sr>40)then sr:=40;
                                                  if(sr<10)then sr:=10;
                        dam:=4+(40-sr);{ [4  44] }                end;
-MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 5;   mtars:=5;
+MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 5;   mtars:=6;
                                                  if(sr>50)then sr:=50;
                                                  if(sr<10)then sr:=10;
                        dam:=8+(50-sr);{ [8  58] }                end;
@@ -203,13 +204,13 @@ begin
                  MID_Granade,
                  MID_Tank,
                  MID_HRocket,
-                 MID_Mancubus   : _d25 (@damd);
-                 MID_Blizzard   : _d50 (@damd);
+                 MID_Mancubus    : _d25 (@damd);
+                 MID_Blizzard    : _d50 (@damd);
                  MID_Baron,
                  MID_YPlasma,
-                 MID_BPlasma,
+                 MID_BPlasma     : _d50 (@damd);
                  MID_SShot,
-                 MID_SSShot      : _d50 (@damd);
+                 MID_SSShot      : _d75 (@damd);
                  MID_Cacodemon   : _d125(@damd);
                  MID_MBullet,
                  MID_TBullet,
@@ -272,7 +273,7 @@ begin
                  end;
 
                  case mid of
-                 MID_Flyer,
+                 MID_Flyer       : _d400(@damd);
                  MID_Revenant,
                  MID_RevenantS   : _d300(@damd);
                  end;
@@ -289,7 +290,7 @@ begin
                 case mid of
                 MID_Blizzard    : if(tu^.isbuild=false)then _d75 (@damd);
                 MID_SShot,
-                MID_SSShot      : _d50 (@damd);
+                MID_SSShot      : _d75 (@damd);
                 end;
 
                 if(tu^.uf=uf_soaring)then

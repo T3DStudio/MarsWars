@@ -43,7 +43,7 @@ uf_fly                 = 2;
 NetTickN               = 2;
 
 MaxPlayers             = 6;
-MaxPlayerUnits         = 115;
+MaxPlayerUnits         = 120;
 MaxDoodads             = 600;
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxNetChat             = 16;
@@ -65,7 +65,7 @@ _utsh                  = _uts div 2; //0-15
 _ubuffs                = 15;
 MaxUpgrs               = 23;
 
-_pnua                  : array[0..9] of byte = (55,75,95,115,135,155,175,195,215,235);
+_pnua                  : array[0..9] of byte = (60,75,95,115,135,155,175,195,215,235);
 
 ClientTTL              = vid_fps*60;
 
@@ -549,7 +549,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 196901;
+svld_size              = 203971;
 rpl_size               = 1574;
 
 rpl_none               = 0;

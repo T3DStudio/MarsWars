@@ -350,7 +350,7 @@ begin
                                                    begin
                                                       vid_mredraw:=true;
 
-                                                      if(_m_sel=98)then _scrollV(@_cmp_sm,1,0,MaxMissions-vid_camp_m);
+                                                      if(_m_sel=98)then _scrollV(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
                                                       if(_m_sel=36)then _scrollV(@_svld_sm,1,0,_svld_ln-vid_svld_m-1);
                                                       if(_m_sel=41)then _scrollV(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1);
                                                    end;
@@ -358,7 +358,7 @@ begin
                                                    begin
                                                       vid_mredraw:=true;
 
-                                                      if(_m_sel=98)then _scrollV(@_cmp_sm,-1,0,MaxMissions-vid_camp_m);
+                                                      if(_m_sel=98)then _scrollV(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
                                                       if(_m_sel=36)then _scrollV(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1);
                                                       if(_m_sel=41)then _scrollV(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1);
                                                    end;

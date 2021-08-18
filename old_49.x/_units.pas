@@ -407,6 +407,7 @@ begin
                   end;
                   if(uid=UID_UCommandCenter)and(upgr[upgr_ucomatt]>0)then
                   begin
+                     t:=0;
                      if(uf=uf_ground)
                      then t:=0
                      else
@@ -752,6 +753,9 @@ begin
             if(bld)then
             begin
                arm:=upgr[upgr_build];
+
+               if(uid in [UID_HTower,UID_HTotem,UID_UTurret,UID_UPTurret,UID_URTurret])then inc(arm,1);
+
                if(uid in [UID_UTurret,UID_UPTurret,UID_URTurret])then
                 if(g_addon=false)
                 then inc(arm,1)
@@ -796,7 +800,7 @@ begin
 
          if(uid=UID_LostSoul)and(g_addon)then
          begin
-            arm:=0;
+            arm:=upgr[upgr_armor];
             inc(p,4);
          end;
 
@@ -816,7 +820,12 @@ begin
             arm:=0;
          end;
 
-         if(g_mode in [gm_inv])and(player=0)then dam:=dam div 2;
+         if(g_mode in [gm_inv])and(player=0)then
+          case uid of
+    UID_Baron: dam:=dam-(dam div 3);
+    UID_ZBFG : dam:=dam div 3;
+          else dam:=dam div 2;
+          end;
       end;
 
       dec(dam,arm);

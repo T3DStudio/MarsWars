@@ -671,7 +671,7 @@ begin
    dec(g_inv_t, g_inv_wn*vid_fps*2);
    dec(g_inv_t,(a div 10)*vid_fps);
    dec(g_inv_t, ((map_mw-MaxSMapW) div 100)*vid_fps);
-   dec(g_inv_t, g_startb*15*vid_fps);
+   dec(g_inv_t, g_startb*18*vid_fps);
 
    if(g_inv_t<min_wave_time)then g_inv_t:=min_wave_time;
 
@@ -711,14 +711,14 @@ begin
             {$IFDEF _FULLGAME}
             PlaySND(snd_teleport,0);
             {$ENDIF}
-            j:=(g_inv_wn*2)+(g_startb*2)+(map_mw div 400);
+            j:=(g_inv_wn*2)+(g_startb*4)+(map_mw div 400);
             for i:=1 to g_inv_mn do
             begin
                mon:=UID_CacoDemon;
                case g_inv_wn of
                1 : mon:=UID_ZFormer;
                2 : case i of
-                   1..2: mon:=UID_Baron
+                   1..5: mon:=UID_Baron
                    else
                        case i mod 2 of
                        0 : mon:=UID_ZFormer;
@@ -726,8 +726,8 @@ begin
                        end;
                    end;
                3 : case i of
-                   1   : mon:=UID_Cyberdemon;
-                   2..8: mon:=UID_Baron
+                   1    : mon:=UID_Cyberdemon;
+                   2..12: mon:=UID_Baron
                    else
                        case i mod 7 of
                        0 : mon:=UID_ZFormer;
@@ -740,10 +740,10 @@ begin
                    end;
                4 : case i of
                    1..3 : mon:=UID_Cyberdemon;
-                   4..15: mon:=UID_Baron
+                   7..20: mon:=UID_Baron
                    else
                        case i mod 7 of
-                       0 : mon:=UID_ZFormer;
+                       0 : mon:=UID_ZBFG;
                        1 : mon:=UID_ZSergant;
                        2 : mon:=UID_ZCommando;
                        3 : mon:=UID_ZBomber;
@@ -752,11 +752,11 @@ begin
                        end;
                    end;
                5 : case i of
-                   1..4 : mon:=UID_Cyberdemon;
-                   5..20: mon:=UID_Baron;
+                   1..5 : mon:=UID_Cyberdemon;
+                   7..30: mon:=UID_Baron;
                    else
                        case i mod 7 of
-                       0 : mon:=UID_ZFormer;
+                       0 : mon:=UID_ZBFG;
                        1 : mon:=UID_ZSergant;
                        2 : mon:=UID_ZCommando;
                        3 : mon:=UID_ZBomber;
@@ -766,8 +766,8 @@ begin
                    end;
                6 : mon:=UID_Demon;
                7 : case i of
-                   1..4 : mon:=UID_Cyberdemon;
-                   5..20: mon:=UID_Baron;
+                   1 ..7 : mon:=UID_Cyberdemon;
+                   11..35: mon:=UID_Baron;
                    else
                        mon:=UID_Cacodemon;
                    end;
@@ -780,7 +780,7 @@ begin
                     end
                   else
                     case i mod g_inv_wn of
-                    0 : mon:=UID_ZFormer;
+                    0 : mon:=UID_ZBFG;
                     1 : mon:=UID_ZSergant;
                     2 : mon:=UID_ZCommando;
                     3 : mon:=UID_ZBomber;
