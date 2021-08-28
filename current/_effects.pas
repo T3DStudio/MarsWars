@@ -241,7 +241,7 @@ begin
    with _missiles[m] do
    with _mids[mid] do
    begin
-      if(_nhp3(vx,vy,@_players[player]))then
+      if(_PointInScreen2(vx,vy,@_players[player]))then
       begin
          if(ms_alt_death=false)
          then _effect_add(vx,vy,_depth(vy,mfs),mid)
@@ -280,7 +280,7 @@ begin
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
+       if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
    end;
 end;
 
@@ -330,7 +330,7 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
         else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
-         if(_rectvis(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
+         if(_RectInScreen(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
      end;
 end;
 

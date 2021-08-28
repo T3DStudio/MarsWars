@@ -1,56 +1,6 @@
-const
-
-str_gnstarted            : shortstring = 'Not started';
-str_grun                 : shortstring = 'Run';
-str_gpaused              : shortstring = 'Paused by player #';
-str_udpport              : shortstring = ' UPD port: ';
-str_gstatus              : shortstring = 'Game status:   ';
-str_gsettings            : shortstring = 'Game settings:';
-str_map                  : shortstring = 'Map';
 
 procedure _dedInit;
 begin
-   str_player_def        := ' was terminated!';
-   str_plout             := ' left the game';
-
-   str_starta            := 'Starting base:      ';
-   str_sstarts           := 'Show player starts: ';
-   str_gmodet            := 'Game mode:          ';
-   str_gaddon            := 'Game:               ';
-   str_aislots           := 'Fill empty slots:   ';
-
-   str_startat[0]        := '1 builder';
-   str_startat[1]        := '2 builders';
-   str_startat[2]        := '3 builders';
-   str_startat[3]        := '4 builders';
-   str_startat[4]        := '5 builders';
-   str_startat[5]        := '6 builders';
-
-   str_gmode[gm_scir ]   := 'Skirmish';
-   str_gmode[gm_2fort]   := 'Two bases';
-   str_gmode[gm_3fort]   := 'Three bases';
-   str_gmode[gm_ct   ]   := 'Capturing points';
-   str_gmode[gm_inv  ]   := 'Invasion';
-   str_gmode[gm_aslt ]   := 'Assault';
-   str_gmode[gm_royl ]   := 'Royal Battle';
-
-   str_addon[false]      := 'UDOOM';
-   str_addon[true ]      := 'DOOM 2';
-   str_race[r_random]    := 'RANDOM';
-   str_race[r_hell  ]    := 'HELL';
-   str_race[r_uac   ]    := 'UAC';
-   str_plname            := 'Player name';
-   str_plstat            := 'State';
-   str_team              := 'Team';
-   str_srace             := 'Race';
-   str_ready             := 'Ready';
-
-   str_m_seed            := 'Seed';
-   str_m_liq             := 'Lakes';
-   str_m_siz             := 'Size';
-   str_m_obs             := 'Obstacles';
-   str_m_sym             := 'Symmetry';
-
    net_nstat:=ns_srvr;
    if(net_UpSocket=false)then
    begin
@@ -63,6 +13,7 @@ begin
       HPlayer:=0;
       DefPlayers;
    end;
+
    vid_mredraw:=true;
 end;
 
@@ -211,7 +162,7 @@ end;
 procedure _dedCode;
 begin
    case G_Started of
-false: if(_plsReady)then
+false: if(_PlayersReady)then
        begin
           vid_mredraw:=true;
           G_Started:=true;
@@ -240,11 +191,11 @@ begin
    t:=length(s);
    if(i>t)then i:=t;
    t:=1;
-   while (x<i) do
+   while(x<i)do
    begin
       s[x]:=sp^[t];
-      x-=1;
-      t-=1;
+      x+=1;
+      t+=1;
    end;
 end;
 
@@ -285,7 +236,7 @@ begin
    begin
       clrscr;
       consoley:=0;
-      vid_mredraw := false;
+      vid_mredraw:=false;
    end;
 
    if(consoley<=fr_fps)then
@@ -294,11 +245,11 @@ begin
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_sv_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
-      3 : writeln('         ',str_gaddon  ,' ',str_addon[g_addon]);
-      4 : writeln('         ',str_gmodet  ,' ',str_gmode[g_mode ]);
-      6 : writeln('         ',str_sstarts ,' ',g_shpos);
+      3 : writeln('         ',str_gaddon  ,' ',str_addon  [g_addon] );
+      4 : writeln('         ',str_gmodet  ,' ',str_gmode  [g_mode ] );
+      6 : writeln('         ',str_sstarts ,' ',g_shpos              );
       8 : writeln('         ',str_starta  ,' ',str_startat[g_startb]);
-      10: writeln('         ',str_aislots ,' ',G_aislots);
+      10: writeln('         ',str_aislots ,' ',G_aislots            );
       11: writeln;
       12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym       ,56);
       14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2pm[map_sym][2],56);
@@ -312,6 +263,6 @@ begin
       28: ps(6);
       end;
 
-      consoley-=1;
+      consoley+=1;
    end;
 end;

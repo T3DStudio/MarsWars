@@ -94,36 +94,26 @@ net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
 net_nstat         : byte = 0;
 net_sv_port       : word = 10666;
 net_socket        : PUDPSocket;
-net_buf           : PUDPPacket;
+net_buffer        : PUDPPacket;
+net_bufpos        : integer = 0;
 net_period        : byte = 0;
 
 _rpls_file        : file;
 _rpls_u           : integer = 0;
 _rpls_pnui        : byte = 0;
 
-str_startat       : array[0..gms_g_startb] of shortstring;
-str_race          : array[0..r_cnt] of shortstring;
-str_gmode         : array[0..gm_cnt] of shortstring;
-str_addon         : array[false..true] of shortstring;
-str_m_liq,
-str_m_siz,
-str_m_obs,
-str_m_sym,
-str_plname,
-str_aislots,
-str_team,
-str_srace,
-str_ready,
-str_sstarts,
-str_gaddon,
-str_gmodet,
-str_starta,
-str_plout,
-str_player_def    : shortstring;
-
 fps_tt,
 fps_cs,
 fps_ns            : cardinal;
+
+{wtrset_enemy_alive_ground,
+wtrset_enemy_alive_fly,
+wtrset_enemy_alive,
+wtrset_enemy_alive_mech,
+wtrset_enemy_alive_buildings,
+wtrset_enemy_alive_ground_buildings,
+wtrset_enemy_alive_bio,
+wtrset_resurect   : cardinal;  }
 
 {$IFDEF _FULLGAME}
 
@@ -605,6 +595,25 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 //  TEST
 //
 
+str_startat       : array[0..gms_g_startb] of shortstring;
+str_race          : array[0..r_cnt] of shortstring;
+str_gmode         : array[0..gm_cnt] of shortstring;
+str_addon         : array[false..true] of shortstring;
+str_m_liq,
+str_m_siz,
+str_m_obs,
+str_m_sym,
+str_plname,
+str_aislots,
+str_team,
+str_srace,
+str_ready,
+str_sstarts,
+str_gaddon,
+str_gmodet,
+str_starta,
+str_plout,
+str_player_def    : shortstring;
 str_pcolors       : array[0..4] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
@@ -926,8 +935,6 @@ snd_hpower }       : PTSoundSet;
 {$ELSE}
 
 consoley : integer = 0;
-str_m_seed,
-str_plstat: shortstring;
 
 {$ENDIF}
 

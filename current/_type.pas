@@ -136,8 +136,10 @@ TUWeapon = record
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
   aw_rld_a : TSoB;
+  aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
+  aw_eid_target,
   aw_eid_shot,
   aw_eid_start: byte;
   {$ENDIF}
@@ -148,7 +150,6 @@ TUID = record
    _speed,
    _r,_missile_r,
    _srange,
-   _arange,
    _max,
    _renerg,
    _generg,
@@ -185,8 +186,10 @@ TUID = record
    _ismech,
    _issolid,
    _addon       : boolean;
-   _fastdeath,                                   //[adv]
+   //_fastdeath,                                   //[adv]
    _advanced    : array[false..true] of boolean; //[addon]
+   _fastdeath_hits
+                : array[false..true] of integer;
 
    ups_builder,
    ups_units,
@@ -331,7 +334,6 @@ TUnit = record
    vx,vy,
    x,y,zfall,
    srange,
-   arange,
    speed,dir,rld,vstp,
    hits,
    unum     : integer;

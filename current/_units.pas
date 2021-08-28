@@ -107,12 +107,11 @@ var i :integer;
     tu:PTunit;
 begin
    with pu^ do
-   if(unum>0)then
    with player^ do
    begin
       if(instant=false)then
       begin
-         with uid^ do fastdeath:=fastdeath or _fastdeath[buff[ub_advanced]>0] or _ismech;
+         with uid^ do fastdeath:=fastdeath or (_fastdeath_hits[buff[ub_advanced]>0]>=0) or _ismech;
          buff[ub_pain]:=fr_fps; // prevent fast resurrecting
 
          {$IFDEF _FULLGAME}
@@ -265,7 +264,7 @@ gm_inv    : if(playeri=0)then dam:=dam div 2;
        else dam:=0;
 
       if(hits<=dam)
-      then _unit_kill(pu,false,(hits-dam)<gavno_dth_h)
+      then _unit_kill(pu,false,(hits-dam)<=_fastdeath_hits[buff[ub_advanced]>0])
       else
       begin
          hits-=dam;
@@ -774,7 +773,7 @@ wpt_heal     : if(tu^.hits<=0)
 
       // UID and UPID requirements
 
-      if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0           )then exit;
+      if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0         )then exit;
       if(aw_rupgr>0)and(upgr  [aw_rupgr]< aw_rupgr_l)then exit;
 
       // requirements to attacker and some flags
@@ -1332,9 +1331,9 @@ begin
 end;
 
 procedure _unit_attack(pu:PTUnit);
-var w,a: byte;
-     tu: PTUnit;
-upgradd: integer;
+var w,a  : byte;
+     tu  : PTUnit;
+upgradd,c: integer;
 begin
    with pu^ do
    begin
@@ -1390,12 +1389,24 @@ begin
          if(a_rld=0)then
          begin
             a_rld:=aw_rld;
-            dir  :=p_dir(x,y,uo_x,uo_y);
+            dir    :=p_dir(x,y,tu^.x,tu^.y);
+            //dir  :=p_dir(x,y,uo_x,uo_y);
             if(ServerSide)then buff[ub_stopattack]:=max2(aw_rld,_uclord_p);
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,nil);
             {$ENDIF}
          end;
+
+         {$IFDEF _FULLGAME}
+         if(aw_eid_target>0)then
+          if(_PointInScreen2(tu^.vx,tu^.vy,@_players[HPlayer])=false)then exit;
+          begin
+             if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),aw_eid_target);
+             if(aw_snd_target<>nil)then
+              if((G_Step mod fr_fps  )=0)then PlaySND(aw_snd_target,tu,nil);
+          end;
+         {$ENDIF}
+
 
          if(a_rld in aw_rld_s)then
          begin
@@ -1407,7 +1418,18 @@ begin
             case aw_type of
 wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
                  then _missile_add(   vx,   vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
-                 else _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                 else
+                   if(aw_count=0)
+                   then _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                   else
+                     if(aw_count>0)
+                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                     else
+                       if(aw_count<0)then
+                       begin
+                          _missile_add(tu^.x,tu^.y,vx-aw_count,vy-aw_count,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx+aw_count,vy+aw_count,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                       end;
 wpt_unit       : _ability_unit_spawn(pu,aw_oid);
             else
                if(ServerSide)then

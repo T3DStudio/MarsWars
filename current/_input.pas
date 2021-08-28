@@ -167,7 +167,7 @@ begin
       htm:=team;
    end;
    _whoInPoint:=0;
-   if(_nhp(tx,ty))then
+   if(_PointInScreen(tx,ty))then
     for i:=1 to MaxUnits do
      with _units[i] do
       if(hits>0)and(inapc=0)and(_ch(player))then

@@ -19,7 +19,7 @@ gm_ct:
        with g_cpoints[i] do
         if(ct>0)and((G_Step mod 20)>10)
         then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray     )
-        else circleColor(r_minimap,mpx,mpy,map_prmm,p_color(pl));
+        else circleColor(r_minimap,mpx,mpy,map_prmm,_PlayerColor(pl));
 gm_royl:
       circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
    end;
@@ -239,7 +239,7 @@ begin
       d_TextBTN(tar,0,9,@str_menu,c_white);
       if(net_nstat>ns_none)and(G_WTeam=255)then
        if(g_paused>0)
-       then d_TextBTN(tar,2,9,@str_pause,p_color(g_paused))
+       then d_TextBTN(tar,2,9,@str_pause,_PlayerColor(g_paused))
        else d_TextBTN(tar,2,9,@str_pause,c_white          );
 
       if(vid_ppos<2)then
@@ -340,7 +340,7 @@ begin
          begin
             if(ui=0)
             then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0,'')
-            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',p_color(ui),0,0,0,0,'');
+            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',_PlayerColor(ui),0,0,0,0,'');
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
             ux+=1;
@@ -508,8 +508,8 @@ begin
             if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
             if(net_nstat=ns_clnt)and(net_cl_svttl=ClientTTL)
-            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,p_color(net_cl_svpl))
-            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,p_color(G_paused   ));
+            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,_PlayerColor(net_cl_svpl))
+            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,_PlayerColor(G_paused   ));
         end
         else
         begin
@@ -557,7 +557,7 @@ procedure d_ui(tar:pSDL_Surface;lx,ly:integer);
 begin
    d_PanelUI(tar,lx,ly);
    d_UIText(tar);
-   if(m_sxs>-1)then rectangleColor(tar,lx+m_sxs-vid_vx, ly+m_sys-vid_vy, m_vx, m_vy, p_color(HPlayer));
+   if(m_sxs>-1)then rectangleColor(tar,lx+m_sxs-vid_vx, ly+m_sys-vid_vy, m_vx, m_vy, _PlayerColor(HPlayer));
 end;
 
 

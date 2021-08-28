@@ -1,30 +1,54 @@
 
+const
+
+cfg_key_name    : shortstring = 'player_name';
+cfg_key_sndv    : shortstring = 'sound_volume';
+cfg_key_mscv    : shortstring = 'music_volume';
+cfg_key_vspd    : shortstring = 'scroll_speed';
+cfg_key_fscr    : shortstring = 'fullscreen';
+cfg_key_vmm     : shortstring = 'mouse_scroll';
+cfg_key_saddr   : shortstring = 'server_addr';
+cfg_key_sport   : shortstring = 'server_port';
+cfg_key_lng     : shortstring = 'language';
+cfg_key_mai     : shortstring = 'right_mouse_action';
+cfg_key_vidvw   : shortstring = 'vid_width';
+cfg_key_vidvh   : shortstring = 'vid_height';
+cfg_key_gsb     : shortstring = 'g_start_base';
+cfg_key_gsp     : shortstring = 'g_show_positions';
+cfg_key_gai     : shortstring = 'g_default_ai';
+cfg_key_rpnui   : shortstring = 'UPT_replay';
+cfg_key_npnui   : shortstring = 'UPT_network';
+cfg_key_ppos    : shortstring = 'vid_panel';
+cfg_key_uhbar   : shortstring = 'vid_health_bars';
+cfg_key_plcol   : shortstring = 'vid_player_colors';
+
+
 
 procedure cfg_setval(vr,vl:string);
 var vlb:word;
 begin
    vlb:=s2w(vl);
 
-   if (vr='name' )then PlayerName  := vl;
-   if (vr='sndv' )then snd_svolume := vlb;
-   if (vr='mscv' )then snd_mvolume := vlb;
-   if (vr='vspd' )then vid_vmspd   := vlb;
-   if (vr='fscr' )then _fscr       :=(vl=b2pm[true,2]);
-   if (vr='vmm'  )then vid_vmm     :=(vl=b2pm[true,2]);
-   if (vr='saddr')then net_cl_svstr:= vl;
-   if (vr='sport')then net_sv_pstr := vl;
-   if (vr='lng'  )then _lng        :=(vl=b2pm[true,2]);
-   if (vr='mai'  )then m_a_inv     :=(vl=b2pm[true,2]);
-   if (vr='vidvw')then vid_vw      :=vlb;
-   if (vr='vidvh')then vid_vh      :=vlb;
-   if (vr='gsb'  )then G_startb    :=vlb;
-   if (vr='gsp'  )then G_shpos     :=(vl=b2pm[true,2]);
-   if (vr='gai'  )then G_aislots   :=vlb;
-   if (vr='rpnui')then _rpls_pnui  :=vlb;
-   if (vr='npnui')then net_pnui    :=vlb;
-   if (vr='ppos' )then vid_ppos    :=vlb;
-   if (vr='uhbar')then vid_uhbars  :=vlb;
-   if (vr='plcol')then vid_plcolors:=vlb;
+   if (vr=cfg_key_name )then PlayerName  := vl;
+   if (vr=cfg_key_sndv )then snd_svolume := vlb;
+   if (vr=cfg_key_mscv )then snd_mvolume := vlb;
+   if (vr=cfg_key_vspd )then vid_vmspd   := vlb;
+   if (vr=cfg_key_fscr )then _fscr       :=(vl=b2pm[true,2]);
+   if (vr=cfg_key_vmm  )then vid_vmm     :=(vl=b2pm[true,2]);
+   if (vr=cfg_key_saddr)then net_cl_svstr:= vl;
+   if (vr=cfg_key_sport)then net_sv_pstr := vl;
+   if (vr=cfg_key_lng  )then _lng        :=(vl=b2pm[true,2]);
+   if (vr=cfg_key_mai  )then m_a_inv     :=(vl=b2pm[true,2]);
+   if (vr=cfg_key_vidvw)then vid_vw      :=vlb;
+   if (vr=cfg_key_vidvh)then vid_vh      :=vlb;
+   if (vr=cfg_key_gsb  )then G_startb    :=vlb;
+   if (vr=cfg_key_gsp  )then G_shpos     :=(vl=b2pm[true,2]);
+   if (vr=cfg_key_gai  )then G_aislots   :=vlb;
+   if (vr=cfg_key_rpnui)then _rpls_pnui  :=vlb;
+   if (vr=cfg_key_npnui)then net_pnui    :=vlb;
+   if (vr=cfg_key_ppos )then vid_ppos    :=vlb;
+   if (vr=cfg_key_uhbar)then vid_uhbars  :=vlb;
+   if (vr=cfg_key_plcol)then vid_plcolors:=vlb;
 end;
 
 procedure cfg_parse_str(s:string);
@@ -84,28 +108,28 @@ procedure cfg_write;
 var f:text;
 begin
    assign(f,cfgfn);
-   {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
+{$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
 
-   writeln(f,'sndv' ,'=',snd_svolume    );
-   writeln(f,'mscv' ,'=',snd_mvolume    );
-   writeln(f,'name' ,'=',PlayerName     );
-   writeln(f,'fscr' ,'=',b2pm[_fscr,2]  );
-   writeln(f,'vspd' ,'=',vid_vmspd      );
-   writeln(f,'vmm'  ,'=',b2pm[vid_vmm,2]);
-   writeln(f,'saddr','=',net_cl_svstr   );
-   writeln(f,'sport','=',net_sv_pstr    );
-   writeln(f,'lng'  ,'=',b2pm[_lng,2]   );
-   writeln(f,'mai'  ,'=',b2pm[m_a_inv,2]);
-   writeln(f,'vidvw','=',vid_vw         );
-   writeln(f,'vidvh','=',vid_vh         );
-   writeln(f,'rpnui','=',_rpls_pnui     );
-   writeln(f,'npnui','=',net_pnui       );
-   writeln(f,'gsb'  ,'=',G_startb       );
-   writeln(f,'gsp'  ,'=',b2pm[G_shpos,2]);
-   writeln(f,'gai'  ,'=',G_aislots      );
-   writeln(f,'ppos' ,'=',vid_ppos       );
-   writeln(f,'uhbar','=',vid_uhbars     );
-   writeln(f,'plcol','=',vid_plcolors   );
+   writeln(f,cfg_key_name ,'=',PlayerName     );
+   writeln(f,cfg_key_sndv ,'=',snd_svolume    );
+   writeln(f,cfg_key_mscv ,'=',snd_mvolume    );
+   writeln(f,cfg_key_fscr ,'=',b2pm[_fscr,2]  );
+   writeln(f,cfg_key_vspd ,'=',vid_vmspd      );
+   writeln(f,cfg_key_vmm  ,'=',b2pm[vid_vmm,2]);
+   writeln(f,cfg_key_saddr,'=',net_cl_svstr   );
+   writeln(f,cfg_key_sport,'=',net_sv_pstr    );
+   writeln(f,cfg_key_lng  ,'=',b2pm[_lng,2]   );
+   writeln(f,cfg_key_mai  ,'=',b2pm[m_a_inv,2]);
+   writeln(f,cfg_key_vidvw,'=',vid_vw         );
+   writeln(f,cfg_key_vidvh,'=',vid_vh         );
+   writeln(f,cfg_key_rpnui,'=',_rpls_pnui     );
+   writeln(f,cfg_key_npnui,'=',net_pnui       );
+   writeln(f,cfg_key_gsb  ,'=',G_startb       );
+   writeln(f,cfg_key_gsp  ,'=',b2pm[G_shpos,2]);
+   writeln(f,cfg_key_gai  ,'=',G_aislots      );
+   writeln(f,cfg_key_ppos ,'=',vid_ppos       );
+   writeln(f,cfg_key_uhbar,'=',vid_uhbars     );
+   writeln(f,cfg_key_plcol,'=',vid_plcolors   );
 
    close(f);
 end;

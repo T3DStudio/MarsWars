@@ -2,7 +2,8 @@
 
 procedure net_clearbuffer;
 begin
-   net_buf^.len:=0;
+   net_buffer^.len:=0;
+   net_bufpos     :=0;
 end;
 
 function net_UpSocket:boolean;
@@ -11,8 +12,8 @@ begin
 
    net_period:=0;
 
-   net_buf:=SDLNet_AllocPacket(MaxNetBuffer);
-   if (net_buf=nil) then
+   net_buffer:=SDLNet_AllocPacket(MaxNetBuffer);
+   if (net_buffer=nil) then
    begin
       WriteSDLError;
       exit;
@@ -41,10 +42,10 @@ end;
 
 procedure net_dispose;
 begin
-   if(net_buf<>nil)then
+   if(net_buffer<>nil)then
    begin
-      SDLNet_FreePacket(net_buf);
-      net_buf:=nil;
+      SDLNet_FreePacket(net_buffer);
+      net_buffer:=nil;
    end;
 
    if(net_socket<>nil)then
@@ -58,39 +59,43 @@ end;
 
 procedure net_send(ip:cardinal; port:word);
 begin
-   net_buf^.address.host:=ip;
-   net_buf^.address.port:=port;
-   SDLNet_UDP_Send(net_socket,-1,net_buf)
+   net_buffer^.len         :=net_bufpos;
+   net_buffer^.address.host:=ip;
+   net_buffer^.address.port:=port;
+   SDLNet_UDP_Send(net_socket,-1,net_buffer);
 end;
-
 
 function net_receive:integer;
 begin
    net_clearbuffer;
-   net_receive:=SDLNet_UDP_Recv(net_Socket,net_buf);
-   net_buf^.len:=0;
+   net_receive:=SDLNet_UDP_Recv(net_socket,net_buffer);
 end;
 
+
 // READ   //////////////////////////////////////////////////////////////////
+
+procedure net_buff(w:boolean;vs:integer;p:pointer);
+begin
+   if(net_bufpos>MaxNetBuffer)then exit;
+   if((MaxNetBuffer-net_bufpos)<vs)then exit;
+   if(w=false)and((net_buffer^.len-net_bufpos)<vs)then exit;
+
+   if(w)
+   then move(p^,(net_buffer^.data+net_bufpos)^,     vs)
+   else move(   (net_buffer^.data+net_bufpos)^, p^, vs);
+   inc(net_bufpos,vs);
+end;
 
 function net_readbyte:byte;
 begin
    net_readbyte:=0;
-   if (net_buf^.len<=MaxNetBuffer) then
-   begin
-      net_readbyte:=(net_buf^.data+net_buf^.len)^;
-      net_buf^.len += 1;
-   end
+   net_buff(false,SizeOf(net_readbyte),@net_readbyte);
 end;
 
 function net_readsint:shortint;
 begin
    net_readsint:=0;
-   if (net_buf^.len<=MaxNetBuffer) then
-   begin
-      net_readsint:=(net_buf^.data+net_buf^.len)^;
-      net_buf^.len += 1;
-   end
+   net_buff(false,SizeOf(net_readsint),@net_readsint);
 end;
 
 function net_readchar:char;
@@ -106,64 +111,51 @@ end;
 function net_readint:integer;
 begin
    net_readint:=0;
-   if (net_buf^.len<MaxNetBuffer) then
-   begin
-      move((net_buf^.data+net_buf^.len)^, (@net_readint)^, 2);
-      net_buf^.len += 2;
-   end
+   net_buff(false,SizeOf(net_readint),@net_readint);
 end;
 
-{function net_readword:word;
+function net_readword:word;
 begin
    net_readword:=0;
-   if (net_buf^.len<MaxNetBuffer) then
-   begin
-      move((net_buf^.data+net_buf^.len)^, (@net_readword)^, 2);
-      net_buf^.len += 2;
-   end
-end;  }
+   net_buff(false,SizeOf(net_readword),@net_readword);
+end;
 
 function net_readcard:cardinal;
 begin
    net_readcard:=0;
-   if (net_buf^.len<(MaxNetBuffer-2)) then
-   begin
-      move((net_buf^.data+net_buf^.len)^, (@net_readcard)^, 4);
-      net_buf^.len += 4;
-   end
+   net_buff(false,SizeOf(net_readcard),@net_readcard);
+end;
+
+function net_readsingle:single;
+begin
+   net_readsingle:=0;
+   net_buff(false,SizeOf(net_readsingle),@net_readsingle);
 end;
 
 function net_readstring:shortstring;
-var sl:integer;
+var sl:byte;
 begin
    net_readstring:='';
    sl:=net_readbyte;
-   if ((net_buf^.len+sl)>MaxNetBuffer) then sl:=MaxNetBuffer-net_buf^.len;
-   while (sl>0) do
+   if((net_bufpos+sl)>MaxNetBuffer)then sl:=MaxNetBuffer-net_bufpos;
+   while(sl>0)do
    begin
       net_readstring:=net_readstring+net_readchar;
       sl-=1;
    end;
 end;
 
+
 // WRITE       /////////////////////////////////////////////////////////////////
 
 procedure net_writebyte(b:byte);
 begin
-   if (net_buf^.len<=MaxNetBuffer) then
-   begin
-      (net_buf^.data+net_buf^.len)^:=b;
-      net_buf^.len += 1;
-   end;
+   net_buff(true,SizeOf(b),@b);
 end;
 
 procedure net_writesint(b:shortint);
 begin
-   if (net_buf^.len<=MaxNetBuffer) then
-   begin
-      (net_buf^.data+net_buf^.len)^:=b;
-      net_buf^.len += 1;
-   end;
+   net_buff(true,SizeOf(b),@b);
 end;
 
 procedure net_writechar(b:char);
@@ -173,36 +165,27 @@ end;
 
 procedure net_writebool(b:boolean);
 begin
-   if b
-   then net_writebyte(1)
-   else net_writebyte(0);
+   net_writebyte(byte(b));
 end;
 
 procedure net_writeint(b:integer);
 begin
-   if (net_buf^.len<MaxNetBuffer) then
-   begin
-      move( (@b)^, (net_buf^.data+net_buf^.len  )^,2 );
-      net_buf^.len += 2;
-   end;
+   net_buff(true,SizeOf(b),@b);
 end;
 
-{procedure net_writeword(b:word);
+procedure net_writeword(b:word);
 begin
-   if (net_buf^.len<MaxNetBuffer) then
-   begin
-      move( (@b)^, (net_buf^.data+net_buf^.len  )^,2 );
-      net_buf^.len += 2;
-   end;
-end;}
+   net_buff(true,SizeOf(b),@b);
+end;
 
 procedure net_writecard(b:cardinal);
 begin
-   if (net_buf^.len<(MaxNetBuffer-2)) then
-   begin
-      move( (@b)^, (net_buf^.data+net_buf^.len  )^,4 );
-      net_buf^.len += 4;
-   end;
+   net_buff(true,SizeOf(b),@b);
+end;
+
+procedure net_writesingle(b:single);
+begin
+   net_buff(true,SizeOf(b),@b);
 end;
 
 procedure net_writestring(s:shortstring);
@@ -213,10 +196,10 @@ begin
 
    net_writebyte(sl);
 
-   while (net_buf^.len<=MaxNetBuffer)and(x<=sl) do
+   while (net_bufpos<=MaxNetBuffer)and(x<=sl) do
    begin
       net_writechar(s[x]);
-      x += 1;
+      x+=1;
    end;
 end;
 
@@ -224,12 +207,12 @@ end;
 
 function net_LastinIP:cardinal;
 begin
-   net_LastinIP:=net_buf^.address.host;
+   net_LastinIP:=net_buffer^.address.host;
 end;
 
 function net_LastinPort:word;
 begin
-   net_LastinPort:=net_buf^.address.port;
+   net_LastinPort:=net_buffer^.address.port;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +269,7 @@ begin
    net_sv_pstr:=w2s(net_sv_port);
 end;
 
-function ip2c(s:string):cardinal;
+function ip2c(s:shortstring):cardinal;
 var i,l,r:byte;
     e:array[0..3] of byte = (0,0,0,0);
 begin
@@ -305,12 +288,15 @@ end;
 
 function c2ip(c:cardinal):string;
 begin
-   c2ip:=b2s(c and $FF )+'.'+b2s((c and $FF00) shr 8)+'.'+b2s((c and $FF0000) shr 16)+'.'+b2s((c and $FF000000) shr 24);
+   c2ip:=b2s (c and $FF      )
+    +'.'+b2s((c and $FF00    ) shr 8 )
+    +'.'+b2s((c and $FF0000  ) shr 16)
+    +'.'+b2s((c and $FF000000) shr 24);
 end;
 
 procedure net_cl_saddr;
-var sp,sip:string;
-    i,sl:byte;
+var sp,sip:shortstring;
+      i,sl:byte;
 begin
    sl:=length(net_cl_svstr);
 
@@ -347,7 +333,7 @@ begin
    FillChar(net_chatls,sizeof(net_chatls),0 );
 end;
 
-procedure net_readchat(p:byte);
+procedure net_readchat;
 var i:byte;
 begin
    for i:=0 to MaxNetChat do net_chat[HPlayer,i]:=net_readstring;

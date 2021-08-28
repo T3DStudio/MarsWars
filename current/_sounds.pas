@@ -185,7 +185,7 @@ begin
    else
      if(pu<>nil)then
       with pu^ do
-       if(_nhp3(x,y,player)=false)then exit;
+       if(_PointInScreen2(x,y,player)=false)then exit;
 
    PlaySoundSet(ss,nil);
    PlaySND:=true;

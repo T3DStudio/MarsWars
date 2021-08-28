@@ -11,11 +11,17 @@ degtorad               = pi/180;
 //
 
 fr_fps                 = 60;
-fr_hfps                = fr_fps div 2;
+fr_hfps                = fr_fps  div 2;
+fr_3hfps               = fr_fps  div 3;
 fr_hhfps               = fr_hfps div 2;
+fr_6hfps               = fr_fps  div 6;
+fr_8hfps               = fr_fps  div 8;
+fr_1h1fps              = fr_hfps*3;
 fr_2fps                = fr_fps*2;
+fr_mancubus_r          = fr_2fps+fr_hfps+10;
 fr_3fps                = fr_fps*3;
 fr_4fps                = fr_fps*4;
+fr_3h2fps              = fr_3hfps*2;
 fr_mpt                 = trunc(1000/fr_fps);
 
 
@@ -53,6 +59,8 @@ MinSMapW               = 3000;
 StepSMap               = 250;
 
 map_b0                 = 5;
+
+uidall                 = [0..255];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -213,27 +221,32 @@ wpr_cast             : cardinal =  %0000000000010000;
 //  Target requirements flags
 //
 
-wtr_owner_p          : cardinal = %000000000000000000000001;  // own
-wtr_owner_a          : cardinal = %000000000000000000000010;  // ally
-wtr_owner_e          : cardinal = %000000000000000000000100;  // enemy
-wtr_hits_h           : cardinal = %000000000000000000001000;  // 0<hits<mhits
-wtr_hits_d           : cardinal = %000000000000000000010000;  // hits<=0
-wtr_hits_a           : cardinal = %000000000000000000100000;  // hits=mhits
-wtr_bio              : cardinal = %000000000000000001000000;  // non mech
-wtr_mech             : cardinal = %000000000000000010000000;  // mech and !building
-wtr_building         : cardinal = %000000000000000100000000;  // building
-wtr_bld              : cardinal = %000000000000001000000000;  // bld=true
-wtr_nbld             : cardinal = %000000000000010000000000;  // bld=false
-wtr_ground           : cardinal = %000000000000100000000000;
-wtr_soaring          : cardinal = %000000000001000000000000;
-wtr_fly              : cardinal = %000000000010000000000000;
-wtr_adv              : cardinal = %000000000100000000000000;
-wtr_nadv             : cardinal = %000000001000000000000000;
+wtr_owner_p                                    : cardinal = %000000000000000000000001;  // own
+wtr_owner_a                                    : cardinal = %000000000000000000000010;  // ally
+wtr_owner_e                                    : cardinal = %000000000000000000000100;  // enemy
+wtr_hits_h                                     : cardinal = %000000000000000000001000;  // 0<hits<mhits
+wtr_hits_d                                     : cardinal = %000000000000000000010000;  // hits<=0
+wtr_hits_a                                     : cardinal = %000000000000000000100000;  // hits=mhits
+wtr_bio                                        : cardinal = %000000000000000001000000;  // non mech
+wtr_mech                                       : cardinal = %000000000000000010000000;  // mech and !building
+wtr_building                                   : cardinal = %000000000000000100000000;  // building
+wtr_bld                                        : cardinal = %000000000000001000000000;  // bld=true
+wtr_nbld                                       : cardinal = %000000000000010000000000;  // bld=false
+wtr_ground                                     : cardinal = %000000000000100000000000;
+wtr_soaring                                    : cardinal = %000000000001000000000000;
+wtr_fly                                        : cardinal = %000000000010000000000000;
+wtr_adv                                        : cardinal = %000000000100000000000000;
+wtr_nadv                                       : cardinal = %000000001000000000000000;
 
-wtrset_enemy_alive_ground
-                     : cardinal = %000000001101111111111100;
-wtrset_enemy_alive   : cardinal = %000000001111111111111100;
-wtrset_resurect      : cardinal = %000000001111111111010011;
+wtrset_enemy_alive_ground                      : cardinal = %000000001101111111101100;
+wtrset_enemy_alive_fly                         : cardinal = %000000001111011111101100;
+wtrset_enemy_alive                             : cardinal = %000000001111111111101100;
+wtrset_enemy_alive_mech                        : cardinal = %000000001111111010101100;
+wtrset_enemy_alive_buildings                   : cardinal = %000000001111111100101100;
+wtrset_enemy_alive_nbuildings                  : cardinal = %000000001111111011101100;
+wtrset_enemy_alive_ground_buildings            : cardinal = %000000001100111100101100;
+wtrset_enemy_alive_bio                         : cardinal = %000000001111111001101100;
+wtrset_resurect                                : cardinal = %000000001111111111010011;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -585,7 +598,6 @@ armor_massive          = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachno
 NameLen                = 13;
 ChatLen                = 38;
 
-gavno_dth_h            = -40;
 dead_hits              = -12*fr_fps;
 fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
@@ -1031,6 +1043,40 @@ theme_name             : array[0..theme_n-1] of shortstring = (#18+'TECH BASE'  
                                                                #17+'HELL CAVES' );
 
 {$ELSE }
+
+
+str_gnstarted            : shortstring = 'Not started';
+str_grun                 : shortstring = 'Run';
+str_gpaused              : shortstring = 'Paused by player #';
+str_udpport              : shortstring = ' UPD port: ';
+str_gstatus              : shortstring = 'Game status:   ';
+str_gsettings            : shortstring = 'Game settings:';
+str_map                  : shortstring = 'Map';
+
+str_m_seed               : shortstring = 'Seed';
+str_m_liq                : shortstring = 'Lakes';
+str_m_siz                : shortstring = 'Size';
+str_m_obs                : shortstring = 'Obstacles';
+str_m_sym                : shortstring = 'Symmetry';
+str_aislots              : shortstring = 'Fill empty slots:   ';
+str_sstarts              : shortstring = 'Show player starts: ';
+str_gaddon               : shortstring = 'Game:               ';
+str_gmodet               : shortstring = 'Game mode:          ';
+str_starta               : shortstring = 'Starting base:      ';
+str_plname               : shortstring = 'Player name';
+str_plout                : shortstring = ' left the game';
+str_player_def           : shortstring = ' was terminated!';
+
+str_plstat               : shortstring = 'State';
+str_team                 : shortstring = 'Team';
+str_srace                : shortstring = 'Race';
+str_ready                : shortstring = 'Ready';
+
+str_startat              : array[0..gms_g_startb] of shortstring = ('1 builder','2 builders','3 builders','4 builders','5 builders','6 builders');
+str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
+str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
+str_addon                : array[false..true    ] of shortstring = ('UDOOM','DOOM 2');
+
 
 {$ENDIF}
 

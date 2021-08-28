@@ -352,7 +352,7 @@ begin
             _rpls_nwrch:=true;
          end;
          net_chatls[HPlayer]:=i;
-         net_readchat(HPlayer);
+         net_readchat;
          net_chat_shlm:=chat_shlm_t;
       end;
 

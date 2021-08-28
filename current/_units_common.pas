@@ -31,7 +31,7 @@ begin
    with uid^ do
    begin
       PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
    end;
 end;
 
@@ -39,7 +39,7 @@ procedure _uac_rocketl_eff(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _effect_add(vx,vy-15,vy+10,EID_Exp2);
+      _effect_add(vx,vy-15,_depth(vy+10,uf),EID_Exp2);
       if(playeri=HPlayer)
       then PlaySND(snd_exp,nil,nil)
       else PlaySND(snd_exp,pu ,nil);
@@ -64,10 +64,10 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+         if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
 
       PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,vy+1,un_eid_ready[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_ready[buff[ub_advanced]>0]);
    end;
 end;
 
@@ -83,11 +83,11 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
 
       if(fastdeath)then
       begin
-         _effect_add(vx,vy,vy+1,un_eid_fdeath[buff[ub_advanced]>0]);
+         _effect_add(vx,vy,_depth(vy+1,uf),un_eid_fdeath[buff[ub_advanced]>0]);
          PlaySND(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
       end
       else
@@ -108,9 +108,9 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
 
-      _effect_add(vx,vy,vy+1,un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
       PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
    end;
 end;
@@ -122,7 +122,7 @@ begin
       if(vischeck^=false)then exit
    end
    else
-     if(_nhp3(tx,ty,@_players[HPlayer])=false)then exit;
+     if(_PointInScreen2(tx,ty,@_players[HPlayer])=false)then exit;
 
    _effect_add(tx,ty,dy,UID_LostSoul);
    PlaySND(snd_pexp,nil,nil);
@@ -139,16 +139,16 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_nhp3(vx,vy,@_players[HPlayer])=false)then exit;
+        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
 
       if(start)then
       begin
-         _effect_add(vx,vy,vy+1,aw_eid_start);
+         _effect_add(vx,vy,_depth(vy+1,uf),aw_eid_start);
          PlaySND(aw_snd_start,nil,nil);
       end
       else
       begin
-         _effect_add(vx,vy,vy+1,aw_eid_shot );
+         _effect_add(vx,vy,_depth(vy+1,uf),aw_eid_shot );
          PlaySND(aw_snd_shot,nil,nil);
       end;
    end;
@@ -203,8 +203,8 @@ begin
       tx:=mm3(0,tx,map_mw);
       ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
-      if _nhp3(vx,vy,@_players[HPlayer])
-      or _nhp3(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil,nil);
+      if _PointInScreen2(vx,vy,@_players[HPlayer])
+      or _PointInScreen2(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
       _effect_add(tx,ty,_depth(ty+1,uf),EID_Teleport);
       {$ENDIF}
@@ -1014,7 +1014,7 @@ begin
             begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
-               if _nhp3(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
+               if _PointInScreen2(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
                _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.uf),EID_Teleport);
                {$ENDIF}
             end;

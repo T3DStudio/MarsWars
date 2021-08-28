@@ -76,7 +76,7 @@ begin
 
    initMissiles;
    swLNG;
-   ObjTblCL;
+   InitUIDDataCL;
    _icons;
 
    {$ENDIF}

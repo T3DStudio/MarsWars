@@ -51,7 +51,7 @@ begin
          c:=s[i];
 
          case c of
-         #0..#6  : begin cl:=p_color(ord(c));if(i<ss)then continue;end; //tc:=cl;
+         #0..#6  : begin cl:=_PlayerColor(ord(c));if(i<ss)then continue;end; //tc:=cl;
          #11..#13: ;
          #14     : begin cl:=c_purple       ;if(i<ss)then continue;end;
          #15     : begin cl:=c_red          ;if(i<ss)then continue;end;
@@ -137,7 +137,7 @@ begin
       x:=trunc(map_psx[i]*map_mmcx);
       y:=trunc(map_psy[i]*map_mmcx);
 
-      c:=p_color(i);
+      c:=_PlayerColor(i);
 
       characterColor(r_minimap,x-3,y-3,start_char,c);
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);

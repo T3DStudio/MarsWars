@@ -316,7 +316,7 @@ else if(not bld          )then _unit2SMAnimK:=sms_build
 else if(buff[ub_pain  ]>0)
      or(buff[ub_stun  ]>0)then _unit2SMAnimK:=sms_pain
 else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
-else if(a_rld          >0)and(a_weap<=MaxUnitWeapons)then
+else if(a_rld          >0)and(a_weap<=MaxUnitWeapons)and(a_tar>0)then
       with _a_weap[a_weap] do
        if(cf(@aw_reqf,@wpr_cast))
        then _unit2SMAnimK:=sms_cast

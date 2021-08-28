@@ -22,10 +22,10 @@ function _str_mx(x:byte):shortstring;
 begin
    if(x=0)
    then _str_mx:='-'
-   else _str_mx:='x'+i2s(x);
+   else _str_mx:='x'+b2s(x);
 end;
 
-procedure _units_au(p:byte;g:TSob;max:integer;new:boolean);  // allowed units
+procedure _player_allowed_units(p:byte;g:TSob;max:integer;new:boolean);  // allowed units
 var i:byte;
 begin
    with _players[p] do
@@ -37,7 +37,7 @@ begin
          with _uids[i] do a_units[i]:=min2(_max,max);
    end;
 end;
-procedure _upgrs_au(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
+procedure _player_allowed_upgrds(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -50,7 +50,7 @@ begin
    end;
 end;
 
-procedure _upgrs_ss(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
+procedure _player_current_upgrds(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -154,8 +154,6 @@ begin
    else dir_turn:=d1+(spd*sign(d));
    dir_turn:=_DIR360(dir_turn);
 end;
-
-
 
 function _IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
@@ -266,7 +264,7 @@ begin
    end;
 end;
 
-function _plsReady:boolean;
+function _PlayersReady:boolean;
 var p,c,r:byte;
 begin
    c:=0;
@@ -279,18 +277,18 @@ begin
         c+=1;
         if(ready)or(p=HPlayer)then r+=1;
      end;
-   _plsReady:=(r=c)and(c>0);
+   _PlayersReady:=(r=c)and(c>0);
 end;
 
-function _hi2S(h,mh:integer;s:single):shortint;
+function _Hi2Si(h,mh:integer;s:single):shortint;
 begin
-   if(h>=mh        )then _hI2S:=127  else
-   if(h =0         )then _hI2S:=0    else
-   if(h =dead_hits )then _hI2S:=-127 else
-   if(h<=ndead_hits)then _hI2S:=-128 else
+   if(h>=mh        )then _Hi2Si:=127  else
+   if(h =0         )then _Hi2Si:=0    else
+   if(h =dead_hits )then _Hi2Si:=-127 else
+   if(h<=ndead_hits)then _Hi2Si:=-128 else
    if(dead_hits<h)and(h<0)
-                    then _hI2S:=mm3(-126,h div _d2shi,-1)
-   else                  _hI2S:=mm3(1,trunc(h/s),_mms);
+                    then _Hi2Si:=mm3(-126,h div _d2shi,-1)
+   else                  _Hi2Si:=mm3(1,trunc(h/s),_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -395,20 +393,20 @@ begin
   and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
 end;
 
-function _rectvis(x,y,hw,hh,sh:integer):boolean;
+function _RectInScreen(x,y,hw,hh,sh:integer):boolean;
 begin
-   _rectvis:=((vid_vx-hw           )<x)and(x<(vid_vx+vid_sw+hw))
-          and((vid_vy-hh-max2(0,sh))<y)and(y<(vid_vy+vid_sh+hh));
+   _RectInScreen:=((vid_vx-hw           )<x)and(x<(vid_vx+vid_sw+hw))
+               and((vid_vy-hh-max2(0,sh))<y)and(y<(vid_vy+vid_sh+hh));
 end;
-function _nhp(x,y:integer):boolean;
+function _PointInScreen(x,y:integer):boolean;
 begin
-   _nhp:=(vid_vx<x)and(x<(vid_vx+vid_sw))
-      and(vid_vy<y)and(y<(vid_vy+vid_sh));
+   _PointInScreen:=(vid_vx<x)and(x<(vid_vx+vid_sw))
+                and(vid_vy<y)and(y<(vid_vy+vid_sh));
 end;
 
-function _nhp3(x,y:integer;player:PTPlayer):boolean;
+function _PointInScreen2(x,y:integer;player:PTPlayer):boolean;
 begin
-   _nhp3:=false;
+   _PointInScreen2:=false;
    x-=vid_vx;
    y-=vid_vy;
    if(0<x)and(x<vid_sw)and
@@ -418,11 +416,11 @@ begin
        if (player^.team=_players[HPlayer].team)
        or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
        begin
-          _nhp3:=true;
+          _PointInScreen2:=true;
           exit;
        end;
 
-      if(_fog=false)or(_fog_pgrid(x,y))then _nhp3:=true;
+      if(_fog=false)or(_fog_pgrid(x,y))then _PointInScreen2:=true;
    end;
 end;
 
@@ -433,26 +431,26 @@ begin
    if(i^<min)then i^:=min;
 end;
 
-function p_color(player:byte):cardinal;
+function _PlayerColor(player:byte):cardinal;
 begin
-   p_color:=0;
+   _PlayerColor:=0;
    if(player<=MaxPlayers)then
     case vid_plcolors of
    1,
    2: if(player=HPlayer)then
         if(vid_plcolors=1)
-        then p_color:=c_lime
-        else p_color:=c_white
+        then _PlayerColor:=c_lime
+        else _PlayerColor:=c_white
       else
         if(PickPlayerTeam(g_mode,HPlayer)=PickPlayerTeam(g_mode,player))
-        then p_color:=c_yellow
-        else p_color:=c_red;
-   3: p_color:=PlayerColor[PickPlayerTeam(g_mode,player)];
+        then _PlayerColor:=c_yellow
+        else _PlayerColor:=c_red;
+   3: _PlayerColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
    4: if(player=HPlayer)
-      then p_color:=c_white
-      else p_color:=PlayerColor[PickPlayerTeam(g_mode,player)];
+      then _PlayerColor:=c_white
+      else _PlayerColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
     else
-      p_color:=PlayerColor[player];
+      _PlayerColor:=PlayerColor[player];
     end;
 end;
 
@@ -476,15 +474,15 @@ begin
    _view_bounds;
 end;
 
-function _S2hi(sh:shortint;mh:integer;s:single):integer;
+function _Si2Hi(sh:shortint;mh:integer;s:single):integer;
 begin
    case sh of
-127     : _S2hi:=mh;
-1..126  : _S2hi:=mm3(1,trunc(sh*s),mh-1);
-0       : _S2hi:=0;
--126..-1: _S2hi:=mm3(dead_hits+1,sh*_d2shi,-1);
--127    : _S2hi:=dead_hits;
--128    : _S2hi:=ndead_hits;
+127     : _Si2Hi:=mh;
+1..126  : _Si2Hi:=mm3(1,trunc(sh*s),mh-1);
+0       : _Si2Hi:=0;
+-126..-1: _Si2Hi:=mm3(dead_hits+1,sh*_d2shi,-1);
+-127    : _Si2Hi:=dead_hits;
+-128    : _Si2Hi:=ndead_hits;
    end;
 end;
 

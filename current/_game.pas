@@ -50,13 +50,13 @@ begin
        ai_pushtimei:= 0;
        ai_pushfrmi := 0; }
 
-       _units_au(p,[UID_HKeep..UID_HMilitaryUnit,
+       _player_allowed_units(p,[UID_HKeep..UID_HMilitaryUnit,
                     UID_LostSoul..UID_ZBFG,
                     UID_UCommandCenter..UID_UMine,
                     UID_Engineer..UID_Flyer],
                     255,true);
 
-       _upgrs_au(p,[0..255],255,true);
+       _player_allowed_upgrds(p,[0..255],255,true);
 
       // a_upgr  := [0..MaxUpgrs];
    end;
@@ -65,8 +65,8 @@ begin
    begin
       race     :=r_hell;
       state    :=ps_comp;
-      _units_au(0,[],0,true);
-      _upgrs_au(0,[],0,true);
+      _player_allowed_units(0,[],0,true);
+      _player_allowed_upgrds(0,[],0,true);
    end;
 
    {$IFDEF _FULLGAME}
@@ -269,7 +269,7 @@ begin
       DefGameObjects;
    end
    else
-    if(_plsReady)then
+    if(_PlayersReady)then
     begin
        G_Started:=true;
        _menu    :=false;
@@ -345,7 +345,7 @@ end;
 
 procedure _u_ord(pl:byte);
 var
-u,eu,
+_su,_eu,
 scnt,
 scntm : integer;
  psel : boolean;
@@ -361,27 +361,27 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
          scntm:=MaxPlayerUnits;
          if(o_id in [uo_select,uo_aselect])then
          begin
-            if(o_x0>o_x1)then begin u:=o_x1;o_x1:=o_x0;o_x0:=u;end;
-            if(o_y0>o_y1)then begin u:=o_y1;o_y1:=o_y0;o_y0:=u;end;
+            if(o_x0>o_x1)then begin _su:=o_x1;o_x1:=o_x0;o_x0:=_su;end;
+            if(o_y0>o_y1)then begin _su:=o_y1;o_y1:=o_y0;o_y0:=_su;end;
             if(_CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then scntm:=1;
          end;
 
-         u :=1;
-         eu:=MaxUnits+1;
+         _su :=1;
+         _eu:=MaxUnits+1;
          if(o_id=uo_corder)then   // reverse unit loop
           case o_x0 of
           co_destroy,
           co_cupgrade,
           co_cuprod,
           co_pcancle  : begin
-                           u :=MaxUnits;
-                           eu:=0;
+                           _su :=MaxUnits;
+                           _eu:=0;
                         end;
           end;
 
-         while(u<>eu)do
+         while(_su<>_eu)do
          begin
-            pu:=@_units[u];
+            pu:=@_units[_su];
             with pu^ do
             with uid^ do
              if(hits>0)and(inapc=0)and(pl=playeri)then
@@ -428,7 +428,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                      case _ability of
                                      uab_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
                                      uab_radar       : _unit_uradar  (pu,o_x1,o_y1);
-                                     uab_htowertele  : if(o_y0<>u)and(o_y0<>0)and(_attack>atm_none)
+                                     uab_htowertele  : if(o_y0<>_su)and(o_y0<>0)and(_attack>atm_none)
                                                        then uo_tar:=o_y0
                                                        else _unit_htteleport(pu,o_x1,o_y1);
                                      uab_hell_unit_adv,
@@ -439,7 +439,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                                         uo_y  :=o_y1;
                                         uo_bx :=-1;
 
-                                        if(o_y0<>u)then uo_tar:=o_y0;
+                                        if(o_y0<>_su)then uo_tar:=o_y0;
                                         if(o_x0<>co_rcmove)or(speed<=0)
                                         then uo_id:=ua_amove
                                         else
@@ -539,9 +539,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
                 end;
              end;
 
-            if(u>eu)
-            then u-=1
-            else u+=1;
+            if(_su>_eu)
+            then _su-=1
+            else _su+=1;
          end;
       end;
 
@@ -891,9 +891,8 @@ begin
             //if(g_mode=gm_ct )then _CPoints;
             //if(g_mode=gm_inv)then g_inv_spawn;
          end;
+         _obj_cycle;
       end;
-
-      _obj_cycle;
    end;
 
    if(net_nstat=ns_srvr)then net_GServer;

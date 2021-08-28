@@ -264,7 +264,7 @@ begin
 gm_ct:
       for cx:=1 to MaxCPoints do
        with g_cpoints[cx] do
-        circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,p_color(pl));
+        circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,_PlayerColor(pl));
 gm_royl:
       circleColor(tar,lx+map_hmw-vid_vx,lx+map_hmw-vid_vy,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
@@ -312,7 +312,7 @@ begin
     begin
        ix:=170+89*u;
 
-       c:=p_color(u);
+       c:=_PlayerColor(u);
 
        _draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
 
@@ -335,18 +335,18 @@ begin
         ix:=x-vid_vx+vid_mapx;
         iy:=y-vid_vy+vid_mapy;
 
-        //_draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, p_color(playeri));
+        //_draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, _PlayerColor(playeri));
 
         if(hits>0)then
         //if(k_shift>1)then
         begin
            circleColor(r_screen,ix,iy,_r  ,c_gray);
            circleColor(r_screen,ix,iy,srange,c_white);
-           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,p_color(player^.pnum));
+           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,_PlayerColor(player^.pnum));
 
-           _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, p_color(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(a_tar) , ta_left,255, p_color(playeri));
-           //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, p_color(playeri));
+           _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, _PlayerColor(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(a_tar) , ta_left,255, _PlayerColor(playeri));
+           //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, _PlayerColor(playeri));
 
         end;
 
@@ -367,7 +367,7 @@ begin
             lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,c_white);
         end;
 
-        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, p_color(playeri));}
+        _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, _PlayerColor(playeri));}
 
         if(inapc>0)then continue;
 

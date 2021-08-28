@@ -132,7 +132,7 @@ begin
    with uid^ do
    begin
       if(_uvision(_players[_pl].team,pu,true))or(rpl)
-      then sh:=_hi2S(hits,_mhits,_shcf)
+      then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
       _wudata_sint(sh,rpl);
@@ -435,7 +435,7 @@ var pu,tu:PTUnit;
    vis:boolean;
 begin
    pu:=@_units[0];
-   with uu^ do vis:=_nhp3(x,y,player);
+   with uu^ do vis:=_PointInScreen2(x,y,player);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
@@ -600,8 +600,8 @@ begin
                {if(pu^.buff[ub_teleeff]=0)and(buff[ub_teleeff]>0)then
                 if(uidi=UID_HKeep)then
                 begin
-                   if(_nhp3(x,y,player))
-                   or(_nhp3(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
+                   if(_PointInScreen2(x,y,player))
+                   or(_PointInScreen2(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
                    _effect_add(pu^.x,pu^.y,0,EID_HKT_h);
                    _effect_add(x    ,y    ,0,EID_HKT_s);
                    buff[ub_clcast]:=vid_fps;
@@ -612,8 +612,8 @@ begin
                 begin
                    vx:=x;
                    vy:=y;
-                   if(_nhp3(vx,vy,player))
-                   or(_nhp3(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
+                   if(_PointInScreen2(vx,vy,player))
+                   or(_PointInScreen2(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
                    _effect_add(vx    ,vy    ,    vy+map_flydpth[uf]+1,EID_Teleport);
                    _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
                 end; }
@@ -658,7 +658,7 @@ procedure  _rudata_chat(p:byte;rpl:boolean);
 var i:byte;
 begin
    if(rpl=false)
-   then net_readchat(p)
+   then net_readchat
    else for i:=0 to MaxNetChat do net_chat[p,i]:=_rudata_string(rpl);
 end;
 
@@ -775,7 +775,7 @@ begin
             _unit_default(uu);
             FillChar(buff,SizeOf(buff),0);
          end;
-         hits:=_S2hi(sh,uid^._mhits,uid^._shcf);
+         hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
          _rudata_bstat(uu,rpl);
 
          if(inapc>0)then

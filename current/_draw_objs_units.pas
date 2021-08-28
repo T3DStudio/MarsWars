@@ -5,8 +5,8 @@ begin
    with pu^ do
    with uid^ do
     if(uid^._isbuilding)
-    then filledCircleColor(r_minimap,mmx,mmy,mmr,p_color(player^.pnum))
-    else pixelColor       (r_minimap,mmx,mmy,    p_color(player^.pnum));
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,_PlayerColor(player^.pnum))
+    else pixelColor       (r_minimap,mmx,mmy,    _PlayerColor(player^.pnum));
 end;
 
 function _depth(y,f:integer):integer;
@@ -184,7 +184,7 @@ begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
             if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
              if(m_brush in uid^.ups_builder)then
-               if(_rectvis(x,y,srange,srange,0))then _addUIBuildRs(x,y,srange);
+               if(_RectInScreen(x,y,srange,srange,0))then _addUIBuildRs(x,y,srange);
 
             for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)
@@ -277,7 +277,7 @@ begin
          inc(shadow,sign(_unit_shadowz(pu)-shadow));
          sh :=shadow;
 
-         if(_rectvis(vx,vy,spr^.hw,spr^.hh,sh))then
+         if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,sh))then
          begin
             dp :=0;
             inv:=255;
@@ -289,7 +289,7 @@ begin
             b2 :=0;
             b3 :=0;
             rct:=false;
-            rc :=p_color(playeri);
+            rc :=_PlayerColor(playeri);
             ro :=0;
 
             if(_isbuilding)then
@@ -536,7 +536,7 @@ begin
        if(spr=pspr_dummy)then exit;
 
        if(_unit_fogrev(pu))then
-        if(_rectvis(vx,vy,spr^.hw,spr^.hh,0))then
+        if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,0))then
          _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0,0);
     end;
 end;

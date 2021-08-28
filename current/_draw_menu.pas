@@ -99,7 +99,7 @@ begin
                _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PickPlayerTeam(g_mode,p)) , ta_middle,255, c_gray);
             end
             else _draw_text(tar,ui_menu_pls_zxst, u,_PlyerStatus(p), ta_middle, 255, c);
-          boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,p_color(p));
+          boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,_PlayerColor(p));
        end;
 
       rectangleColor(tar,ui_menu_pls_zxn,ui_menu_pls_zy0,ui_menu_pls_zxe,ui_menu_pls_zy1,c_white);
@@ -448,7 +448,7 @@ begin
                        if(t=HPlayer)or(t=0)then continue;
 
                        if(net_chat_tar and (1 shl t))>0
-                       then c:=p_color(t)
+                       then c:=_PlayerColor(t)
                        else c:=c_gray;
 
                        _draw_text(tar,i-ui_menu_csm_ys, y+6, '#'+b2s(t), ta_middle,255, c);
@@ -466,7 +466,7 @@ begin
    _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
    _draw_text(tar, 70,554, str_exit [G_Started], ta_middle,255, c_white);
-   _draw_text(tar,730,554, str_reset[G_Started], ta_middle,255, mic((net_nstat<>ns_clnt)and (G_Started or _plsReady),false));
+   _draw_text(tar,730,554, str_reset[G_Started], ta_middle,255, mic((net_nstat<>ns_clnt)and (G_Started or _PlayersReady),false));
 
    D_MMap    (tar);
    D_MPlayers(tar);
