@@ -112,6 +112,17 @@ begin
       aw_eid_shot :=eid_shot;
    end;
 end;
+procedure setWeaponTEID(aa:byte;snd_target:PTSoundSet;eid_target:byte;rld_a:TSoB);
+begin
+   with _uids[u] do
+   for aa:=aa to MaxUnitWeapons do
+   with _a_weap[aa] do
+   begin
+      aw_snd_target:=snd_target;
+      aw_eid_target:=eid_target;
+      if(rld_a<>[])then aw_rld_a:=rld_a;
+   end;
+end;
 
 begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
@@ -214,7 +225,7 @@ begin
    setEffectEID (false,0  ,0                 ,0  ,0             );
    setEffectSND (false,nil,snd_revenant_death,nil,snd_hell_pain);
    setWeaponESND(0,nil,snd_revenant_attack,0,0);
-   setWeaponESND(8,nil,snd_revenant_melee ,0,0);
+   setWeaponESND(4,nil,snd_revenant_melee ,0,0);
 end;
 UID_Mancubus:
 begin
@@ -234,7 +245,7 @@ begin
    setCommandSND(false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_arachno_move,snd_arachno_move);
    setEffectEID (false,0  ,0              ,0  ,0             );
    setEffectSND (false,nil,snd_arachno_death,nil,snd_hell_pain );
-   setFOOT      (false,snd_arachno_foot,28);
+   setFOOT      (false,snd_arachno_foot,26);
    setWeaponESND(0,nil,snd_plasma,0,0);
 end;
 UID_Archvile:
@@ -247,12 +258,7 @@ begin
    setEffectSND (false,nil,snd_archvile_death  ,nil,snd_archvile_pain );
    setWeaponESND(0,nil,snd_meat       ,0,0);
    setWeaponESND(1,snd_archvile_attack,nil,0,0);
-   with _a_weap[1] do
-   begin
-      aw_rld_a:=[0..65];
-      aw_snd_target:=snd_archvile_fire;
-      aw_eid_target:=EID_ArchFire;
-   end;
+   setWeaponTEID(1,snd_archvile_fire  ,EID_ArchFire,[0..65]);
 end;
 
 UID_ZFormer:
@@ -267,7 +273,7 @@ begin
 end;
 UID_ZEngineer:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (@spr_ZEngineer,nil);
@@ -282,8 +288,8 @@ begin
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (@spr_ZSergant,@spr_ZSSergant);
-   setWeaponESND(0,nil,snd_shotgun,0,0);
-   setWeaponESND(1,nil,snd_ssg    ,0,0);
+   setWeaponESND(0,nil,snd_ssg    ,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
 end;
 UID_ZCommando:
 begin
@@ -293,7 +299,7 @@ begin
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (@spr_ZCommando,nil);
-   setWeaponESND(0,nil,snd_pistol,0,0);
+   setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
 UID_ZBomber:
 begin
@@ -355,6 +361,7 @@ begin
 
    setMWSModel(@spr_HTower,nil);
    setBuildingSND(snd_hell_htower);
+   setWeaponESND(0,nil,snd_revenant_attack,0,MID_Imp);
    un_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -376,6 +383,8 @@ begin
    setBuildingSND(snd_hell_htotem);
    un_build_amode:=2;
    un_eid_bcrater_y:=12;
+   setWeaponESND(0,snd_archvile_attack,nil,0,0);
+   setWeaponTEID(0,snd_archvile_fire  ,EID_ArchFire,[0..65]);
 end;
 UID_HAltar:
 begin

@@ -316,14 +316,14 @@ else if(not bld          )then _unit2SMAnimK:=sms_build
 else if(buff[ub_pain  ]>0)
      or(buff[ub_stun  ]>0)then _unit2SMAnimK:=sms_pain
 else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
-else if(a_rld          >0)and(a_weap<=MaxUnitWeapons)and(a_tar>0)then
-      with _a_weap[a_weap] do
+else if(a_rld          >0)and(a_aweap<=MaxUnitWeapons)then
+      with _a_weap[a_aweap] do
        if(cf(@aw_reqf,@wpr_cast))
        then _unit2SMAnimK:=sms_cast
        else
          if(aw_range>=0)then
          begin
-            if(a_rld in aw_rld_a)
+            if(a_rld in aw_rld_a)//and(_IsUnitRange(a_tar,nil))
             then _unit2SMAnimK:=sms_dattack
             else _unit2SMAnimK:=sms_dready;
          end
@@ -347,11 +347,11 @@ begin
          ak:=_unit2SMAnimK(u,wanim);
 
          case ak of
-sms_walk:    if(_animw>0)then
+sms_walk:    if(animw>0)then
              begin
                 if(wanim)or(_isbuilding)then
                 begin
-                   anim+=_animw;
+                   anim+=animw;
                    if(anim<0)then anim:=0;
                    //if(anim>=1100)then anim:=anim mod 1100;
                 end;

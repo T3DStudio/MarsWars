@@ -148,7 +148,7 @@ begin
       end
       else
       begin
-         _effect_add(vx,vy,_depth(vy+1,uf),aw_eid_shot );
+         _effect_add(vx+aw_x,vy+aw_y,_depth(vy+1,uf),aw_eid_shot );
          PlaySND(aw_snd_shot,nil,nil);
       end;
    end;
@@ -1243,7 +1243,7 @@ UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
               begin
                  speed :=_speed+7;
                  {$IFDEF _FULLGAME}
-                 //animw:=20;
+                 animw :=_animw+3;
                  {$ENDIF}
               end;
            end
@@ -1252,7 +1252,7 @@ UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
              begin
                 speed :=_speed;
                 {$IFDEF _FULLGAME}
-                //animw:=20;
+                animw :=_animw;
                 {$ENDIF}
              end;
 UID_Major,
@@ -1281,23 +1281,29 @@ UID_ZMajor:
               uf   :=uf_ground;
               speed:=_speed;
            end;
-UID_HEye:  begin
-              i:=eye_range[mm3(0,upgr[upgr_hell_heye],5)];
-              if(srange<>i)then
-              begin
-                 srange:=i;
-                 {$IFDEF _FULLGAME}
-                 _unit_fog_r(pu);
-                 {$ENDIF}
-              end;
-           end;
-UID_UMine: if(upgr[upgr_uac_mines]>1)and(srange<250)then
+UID_HCommandCenter,
+UID_UCommandCenter:
+           if(buff[ub_advanced]>0)then
            begin
-              srange:=250;
-              {$IFDEF _FULLGAME}
-              _unit_fog_r(pu);
-              {$ENDIF}
+              speed:=_speed;
+           end
+           else
+           begin
+              speed:=0;
            end;
+      end;
+
+      // SRANGE
+      if(_upgr_srange>0)and(_upgr_srange_step>0)then
+      begin
+         i:=_srange+(upgr[_upgr_srange]*_upgr_srange_step);
+         if(srange<>i)then
+         begin
+            srange:=i;
+            {$IFDEF _FULLGAME}
+            _unit_fog_r(pu);
+            {$ENDIF}
+         end;
       end;
 
       // REGENERATION

@@ -58,6 +58,7 @@ begin
                             end;
         EID_Teleport      : _setEID(@spr_eff_tel       ,sms_death);
         EID_Gavno         : _setEID(@spr_eff_g         ,sms_death);
+        MID_Mine,
         EID_BExp          : _setEID(@spr_eff_eb        ,sms_death);
         MID_Blizzard,
         EID_BBExp         : _setEID(@spr_eff_ebb       ,sms_death);
@@ -173,6 +174,7 @@ EID_HUpgr,
 EID_Teleport      : _setEff(10,0 ,-1 ,-1       ,true ,0 );
 EID_Gavno         : _setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
+MID_Mine,
 EID_BExp          : _setEff(5 ,0 ,-1 ,-1       ,true ,0 );
 MID_Blizzard,
 EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );

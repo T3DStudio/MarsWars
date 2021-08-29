@@ -18,6 +18,7 @@ MID_Cacodemon: ms_smodel:=@spr_h_p1;
 MID_Baron    : ms_smodel:=@spr_h_p2;
 MID_Blizzard,
 MID_Granade,
+MID_Mine,
 MID_HRocket  : ms_smodel:=@spr_h_p3;
 MID_Revenant : ms_smodel:=@spr_h_p4;
 MID_RevenantS: ms_smodel:=@spr_h_p4;
@@ -35,7 +36,7 @@ MID_SSShot   : begin
                end;
 MID_BFG      : ms_smodel:=@spr_u_p2;
 MID_Tank,
-MID_Mine     : ;
+MID_StunMine     : ;
 MID_ArchFire : ;
 MID_Flyer    : ms_smodel:=@spr_u_p3;
       end;
@@ -62,9 +63,11 @@ MID_YPlasma,
 MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
-MID_Mine,
 MID_Baron    : ms_snd_death:=snd_pexp;
+MID_StunMine : ms_snd_death:=snd_electro;
+MID_ArchFire,
 MID_Blizzard,
+MID_Mine,
 MID_Tank,
 MID_Granade,
 MID_HRocket,
@@ -167,7 +170,8 @@ MID_Flyer      : begin dam:=16 ; vst:=sr div 60; sr :=0  ;       end;
 MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
 MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; ystep:=3;end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
-MID_Mine       : begin dam:=5  ; vst:=1;         sr :=100;       end;
+MID_StunMine   : begin dam:=5  ; vst:=1;         sr :=100;       end;
+MID_Mine       : begin dam:=150; vst:=1;         sr :=100;       end;
 MID_Blizzard   : begin dam:=250; vst:=fr_fps;    sr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
 MID_SShot      : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) div 8,30);mtars:=3;
                        dam:=8 +(30-sr);{ [9  28] }               end;
@@ -186,6 +190,9 @@ MID_SSShot     : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) di
        else mtars:=1;
 
       dam+=adddmg;
+
+      if(mid=MID_Revenant)then
+       if(_players[player].upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
 
       if(mid=MID_RevenantS)
       then homing:=true
@@ -246,7 +253,7 @@ MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
 MID_Revenant,
 MID_RevenantS : if(uid=UID_Revenant   )then exit;
-MID_Mine      : if(uid=UID_UMine      )then exit;
+MID_StunMine  : if(uid=UID_UMine      )then exit;
    end;
 
    _miduid:=true;
@@ -272,7 +279,7 @@ begin
          if(teams)and(sr>0)then
           case mid of
           MID_BFG,
-          MID_Mine,
+          MID_StunMine,
           MID_SShot,
           MID_SSShot,
           MID_ArchFire: exit;
@@ -404,13 +411,13 @@ begin
              begin
                 if((mid=MID_TBullet)and(tu^.uid^._ismech=false))
                 or((mid=MID_MBullet)and(tu^.uid^._ismech)and(tu^.uid^._isbuilding=false))
-                or (mid=MID_Mine)then
+                or (mid=MID_StunMine)then
                 begin
                    tu^.buff[ub_stun]:=fr_fps;
                    tu^.buff[ub_pain]:=fr_fps;
                 end;
                 {$IFDEF _FULLGAME}
-                if(mid=MID_Mine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
+                if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
                 {$ENDIF}
              end;
 
@@ -433,6 +440,7 @@ begin
                  _unit_bullet_puff(tu);
                  {$ENDIF}
                  mtars-=1;
+                 ntars+=1;
                  _unit_damage(tu,damd,p,player);
                  exit;
               end;
@@ -441,7 +449,7 @@ begin
               if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),EID_BFG);
               {$ENDIF}
               if(ServerSide)then
-               if(mid=MID_Mine)then
+               if(mid=MID_StunMine)then
                begin
                   tu^.buff[ub_stun]:=fr_fps;
                   tu^.buff[ub_pain ]:=fr_fps;

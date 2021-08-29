@@ -215,6 +215,8 @@ wpr_nadv             : cardinal =  %0000000000000010;
 wpr_zombie           : cardinal =  %0000000000000100;
 wpr_sspos            : cardinal =  %0000000000001000;
 wpr_cast             : cardinal =  %0000000000010000;
+wpr_tvis             : cardinal =  %0000000000100000;
+wpr_suicide          : cardinal =  %0000000001000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -473,10 +475,11 @@ MID_SSShot             = 115;
 MID_BFG                = 116;
 MID_Granade            = 117;
 MID_Tank               = 118;
-MID_Mine               = 119;
+MID_StunMine           = 119;
 MID_Blizzard           = 120;
 MID_ArchFire           = 121;
 MID_Flyer              = 122;
+MID_Mine               = 123;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -626,7 +629,6 @@ mstrike_reload_client  = mstrike_reload-(fr_fps*3);
 
 max_build_reload       = fr_fps*12;
 
-eye_range              : array[0..5] of integer = (250,275,300,325,350,375);
 melee_r                = 8;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
@@ -926,7 +928,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 259037;
+svld_size              = 262401;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

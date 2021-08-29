@@ -129,6 +129,8 @@ TUWeapon = record
   aw_uids  : TSob;
   aw_tarf,
   aw_reqf  : cardinal;
+  aw_x,
+  aw_y,
   aw_dupgr_s,
   aw_range,
   aw_count: integer;
@@ -160,9 +162,11 @@ TUID = record
    _zfall,
    _apcs,
    _apcm,
-   _zombie_hits
+   _zombie_hits,
+   _upgr_srange_step
                 : integer;
 
+   _upgr_srange,
    _upgr_armor,
    _zombie_uid,
    _urace,
@@ -186,10 +190,9 @@ TUID = record
    _ismech,
    _issolid,
    _addon       : boolean;
-   //_fastdeath,                                   //[adv]
    _advanced    : array[false..true] of boolean; //[addon]
    _fastdeath_hits
-                : array[false..true] of integer;
+                : array[false..true] of integer; //[adv]
 
    ups_builder,
    ups_units,
@@ -351,6 +354,7 @@ TUnit = record
 
    a_rld,
    a_weap   : byte;
+
    a_tx,
    a_ty,
    a_tar,
@@ -376,9 +380,10 @@ TUnit = record
    sel      : boolean;
 
    {$IFDEF _FULLGAME}
-
+   a_aweap  : byte;
    wanim    : boolean;
 
+   animw,
    mmx,mmy,mmr,
    fx,fy,fsr,
    anim,animf,

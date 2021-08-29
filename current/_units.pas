@@ -336,11 +336,11 @@ end;
 procedure _unit_action(pu:PTUnit);
 begin
    with pu^ do
-   if(_canmove(pu))then
    with uid^ do
    if(apcc>0)
    then uo_id:=ua_unload
    else
+    if(_canmove(pu))then
      if(inapc=0)then
      with player^ do
      case _ability of
@@ -1390,11 +1390,17 @@ begin
          begin
             a_rld:=aw_rld;
             dir    :=p_dir(x,y,tu^.x,tu^.y);
-            //dir  :=p_dir(x,y,uo_x,uo_y);
-            if(ServerSide)then buff[ub_stopattack]:=max2(aw_rld,_uclord_p);
+            if(ServerSide)then buff[ub_stopattack]:=max2(a_rld,_uclord_p);
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,nil);
+            a_aweap:=a_weap;
             {$ENDIF}
+         end;
+
+         if(uclord=_uclord_c)then
+         begin
+            if(cf(@aw_reqf,@wpr_tvis))then _AddToInt(@tu^.vsnt[player^.team],vistime);
+            _AddToInt(@vsnt[tu^.player^.team],vistime);
          end;
 
          {$IFDEF _FULLGAME}
@@ -1407,28 +1413,28 @@ begin
           end;
          {$ENDIF}
 
-
          if(a_rld in aw_rld_s)then
          begin
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,false,nil);
             {$ENDIF}
-            upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
+            if(aw_dupgr>0)and(aw_dupgr_s>0)then
+             upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
             dir    :=p_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
-                 then _missile_add(   vx,   vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
                  else
                    if(aw_count=0)
-                   then _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
                    else
                      if(aw_count>0)
-                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
                      else
                        if(aw_count<0)then
                        begin
-                          _missile_add(tu^.x,tu^.y,vx-aw_count,vy-aw_count,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
-                          _missile_add(tu^.x,tu^.y,vx+aw_count,vy+aw_count,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
                        end;
 wpt_unit       : _ability_unit_spawn(pu,aw_oid);
             else
@@ -1441,6 +1447,9 @@ wpt_directdmg: if(cf(@aw_reqf,@wpr_zombie))
                else _unit_damage(tu,aw_count+upgradd,2,playeri);
                 end;
             end;
+
+            if(ServerSide)then
+             if(cf(@aw_reqf,@wpr_suicide))then _unit_kill(pu,false,true);
          end;
       end;
    end;
@@ -1491,10 +1500,16 @@ uab_spawnlost:  begin
       end;
       if(uo_id=ua_amove)then _unit_attack(pu);
       if(buff[ub_stopattack]>0)then
-      begin
-         mv_x:=x;
-         mv_y:=y;
-      end;
+       if(buff[ub_stopattack]=1)then
+       begin
+          buff[ub_stopattack]:=0;
+          _unit_turn(pu);
+       end
+       else
+       begin
+          mv_x:=x;
+          mv_y:=y;
+       end;
    end;
 end;
 
