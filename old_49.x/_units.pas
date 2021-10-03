@@ -788,20 +788,13 @@ begin
               if(dam>=unit_arm_f)
               then inc(arm,(dam div unit_arm_f)*arm);
 
-              case uid of
-              UID_Demon,
-              UID_Cacodemon : inc(arm,2);
-              UID_Baron,
-              UID_Archvile  : inc(arm,3);
-              else
-                 if(uid in type_massive)then inc(arm,3);
-              end;
+              if not (uid in armor_lite)then inc(arm,2);
            end;
 
          if(uid=UID_LostSoul)and(g_addon)then
          begin
             arm:=upgr[upgr_armor];
-            inc(p,4);
+            p+=2;
          end;
 
          if(buff[ub_advanced]>0)then
@@ -1786,7 +1779,11 @@ begin
          if(tu^.isbuild=false)
          then inc(_TarPrioPR,1)
          else
-           if(ai_skill>4)and(tu^.bld=false)then inc(_TarPrioPR,1);
+           if(ai_skill>4)then
+            if(tu^.bld=false)
+            then inc(_TarPrioPR,1)
+            else
+              if(tu^.ucl=0)then inc(_TarPrioPR,1);
          if(tu^.buff[ub_invuln]<=0)then inc(_TarPrioPR,1);
       end;
 

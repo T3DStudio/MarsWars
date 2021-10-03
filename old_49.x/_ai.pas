@@ -441,7 +441,7 @@ procedure ai_utr(u,m:integer);
 begin
    with _units[u] do
    with _players[player] do
-   if(u_c[false]<ai_maxarmy)then
+   if(u_c[false]<ai_maxarmy)and(rld<=0)then
    begin
       case m of
 0:    if(ubx[1]=u)

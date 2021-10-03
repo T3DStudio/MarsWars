@@ -331,7 +331,7 @@ coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 slowturn               = [UID_APC,UID_Tank];
 
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
-type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
+//type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
 clnet_rld              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory,UID_UVehicleFactory,UID_HTeleport];
 clnet_utr              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory];
@@ -355,11 +355,11 @@ clnet_utr              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUn
 15
 }
 
-urocketl_rld           = vid_fps*15;
+urocketl_rld           = vid_fps*30;
 bld_r_max              = vid_fps*12;
 upgr_1                 : array[1..2] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
 ai_d2alrm              : array[false..true] of integer = (150,15);
-builder_enrg           : array[0..4] of byte = (12,13,14,15,16);
+builder_enrg           : array[0..4] of byte = (10,11,12,13,14);
 base_r                 = 350;
 base_hr                = base_r div 2;
 base_rr                = base_r*2;

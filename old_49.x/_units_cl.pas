@@ -66,8 +66,8 @@ begin
          rld_r  := 60;
          rld_a  := 20;
          mdmg   := 10;
-         trt    := vid_fps*8;
-         renerg := 3;
+         trt    := vid_fps*10;
+         renerg := 2;
       end;
       if(uid=UID_Imp) then
       begin
@@ -98,7 +98,7 @@ begin
          rld_a  := 25;
          anims  := 15;
          mdmg   := 40;
-         trt    := vid_fps*8;
+         trt    := vid_fps*10;
          renerg := 4;
       end;
       if(uid=UID_CacoDemon)then
@@ -183,7 +183,7 @@ begin
          rld_r  := vid_2fps;
          rld_a  := vid_fps;
          anims  := 7;
-         trt    := vid_fps*40;
+         trt    := vid_fps*45;
          renerg := 10;
          ruid   := UID_HMonastery;
       end;
@@ -201,7 +201,7 @@ begin
          rld_a  := 40;
          anims  := 16;
          mdmg   := 35;
-         trt    := vid_fps*40;
+         trt    := vid_fps*45;
          renerg := 8;
          ruid   := UID_HMonastery;
       end;
@@ -275,14 +275,14 @@ begin
 
       if(uid=UID_HKeep)then
       begin
-         mhits  := 3000;
+         mhits  := 2500;
          uf     := uf_ground;
          sr     := base_rA[0];
          ucl    := 0;
          r      := 66;
          generg := builder_enrg[0];
          isbuild:= true;
-         renerg := builder_enrg[0];
+         renerg := builder_enrg[0]+6;
          ctime  := 60;
       end;
       if(uid in [UID_HGate,UID_HMilitaryUnit]) then
@@ -292,13 +292,13 @@ begin
          sr     := 200;
          ucl    := 1;
          if(uid=UID_HMilitaryUnit)
-         then r      := 70
-         else r      := 60;
+         then r := 70
+         else r := 60;
          generg := 0;
          isbuild:= true;
          rld_a  := 12;
-         renerg := 10;
-         ctime  := 40;
+         renerg := 14;
+         ctime  := 45;
       end;
       if(uid=UID_HSymbol) then
       begin
@@ -321,8 +321,8 @@ begin
          r      := 53;
          generg := 0;
          isbuild:= true;
-         renerg := 10;
-         ctime  := 40;
+         renerg := 14;
+         ctime  := 45;
       end;
       if(uid=UID_HTower) then
       begin
@@ -360,7 +360,7 @@ begin
          r      := 65;
          isbuild:= true;
          max    := 1;
-         renerg := 12;
+         renerg := 16;
          ctime  := 90;
          ruid   := UID_HPools;
       end;
@@ -469,8 +469,8 @@ begin
             speed  := 10;
             anims  := 14;
             ruid   := UID_HMilitaryUnit;
-            arf    :=(sr div 4)*3;
          end;
+         arf    :=(sr div 2);
       end;
       if(uid in [UID_Commando,UID_ZCommando])then
       begin
@@ -656,20 +656,20 @@ begin
          r      := 66;
          generg := builder_enrg[0];
          isbuild:= true;
-         renerg := builder_enrg[0];
-         ctime  := 80;
+         renerg := builder_enrg[0]+4;
+         ctime  := 60;
          rld_r  := vid_fps*15;
       end;
       if(uid=UID_UMilitaryUnit)then
       begin
-         mhits  := 1700;
+         mhits  := 1750;
          uf     := uf_ground;
          sr     := 200;
          ucl    := 1;
          r      := 66;
          isbuild:= true;
-         renerg := 10;
-         ctime  := 40;
+         renerg := 14;
+         ctime  := 45;
       end;
       if(uid=UID_UGenerator) then
       begin
@@ -691,8 +691,8 @@ begin
          ucl    := 3;
          r      := 62;
          isbuild:= true;
-         renerg := 10;
-         ctime  := 40;
+         renerg := 14;
+         ctime  := 45;
       end;
       if(uid=UID_UTurret) then
       begin
@@ -729,7 +729,7 @@ begin
          r      := 62;
          isbuild:= true;
          max    := 1;
-         renerg := 12;
+         renerg := 16;
          ctime  := 90;
          ruid   := UID_UWeaponFactory;
       end;

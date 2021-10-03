@@ -60,7 +60,7 @@ begin
 
         case mid of
 MID_Imp        : begin dam:=10 ; vst:=sr div 8 ; sr :=0  ;       end;
-MID_Cacodemon  : begin dam:=30 ; vst:=sr div 8 ; sr :=0  ;       end;
+MID_Cacodemon  : begin dam:=25 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_Baron      : begin dam:=50 ; vst:=sr div 8 ; sr :=0  ;       end;
 MID_RevenantS,
 MID_Revenant   : begin dam:=15 ; vst:=sr div 15; sr :=0  ;       dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
@@ -81,11 +81,11 @@ MID_Granade    : begin dam:=50 ; vst:=sr div 10; sr :=rocket_sr; end;
 MID_Tank       : begin dam:=75 ; vst:=1;         sr :=rocket_sr; end;
 MID_Mine       : begin dam:=175; vst:=1;         sr :=100;       end;
 MID_Blizzard   : begin dam:=300; vst:=vid_fps;   sr :=blizz_r;   dir:=((p_dir(vx,vy,x,y)+23) mod 360) div 45;end;
-MID_SShot      : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   mtars:=4;
-                                                 if(sr>40)then sr:=40;
+MID_SShot      : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 7;   mtars:=2;
+                                                 if(sr>30)then sr:=40;
                                                  if(sr<10)then sr:=10;
                        dam:=4+(40-sr);{ [4  44] }                end;
-MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 5;   mtars:=6;
+MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 6;   mtars:=4;
                                                  if(sr>50)then sr:=50;
                                                  if(sr<10)then sr:=10;
                        dam:=8+(50-sr);{ [8  58] }                end;
@@ -113,8 +113,8 @@ MID_SSShot     : begin           vst:=1;         sr :=dist2(x,y,vx,vy) div 5;   
         begin
            if(upgr[upgr_attack]>0)then
             case mid of
-MID_SShot,
 MID_BPlasma    : inc(dam,upgr[upgr_attack]*2);
+MID_SShot,
 MID_Imp,
 MID_YPlasma,
 MID_HRocket,
@@ -204,26 +204,28 @@ begin
                  MID_Granade,
                  MID_Tank,
                  MID_HRocket,
-                 MID_Mancubus    : _d25 (@damd);
-                 MID_Blizzard    : _d50 (@damd);
                  MID_Baron,
+                 MID_Mancubus    : _d25 (@damd);
+                 MID_Blizzard,
                  MID_YPlasma,
-                 MID_BPlasma     : _d50 (@damd);
+                 MID_BPlasma,
                  MID_SShot,
-                 MID_SSShot      : _d75 (@damd);
-                 MID_Cacodemon   : _d125(@damd);
+                 MID_SSShot      : _d50 (@damd);
+                 MID_Cacodemon   : _d150(@damd);
                  MID_MBullet,
                  MID_TBullet,
                  MID_Bullet,
                  MID_Bulletx2    : _d150(@damd);
-                 end;
-
-              if(tu^.uid in type_massive)then
+                 end
+             else
+             if(tu^.mech=false)then
                  case mid of
+                 MID_Imp         : _d125(@damd);
                  MID_MBullet,
                  MID_TBullet,
                  MID_Bullet      : _d50 (@damd);
-                 MID_Cacodemon   : _d75 (@damd);
+                 MID_SShot,
+                 MID_SSShot      : _d150(@damd);
                  end;
 
               if(tu^.mech)then
@@ -242,8 +244,10 @@ begin
                    case mid of
                    MID_YPlasma,
                    MID_BPlasma     : _d200(@damd);
-                   MID_Granade,
-                   MID_Mancubus    : _d50 (@damd);
+                   MID_Tank,
+                   MID_HRocket,
+                   MID_Granade     : _d50 (@damd);
+                   MID_Mancubus,
                    MID_Bulletx2    : _d75 (@damd);
                    end
                    else
