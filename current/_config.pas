@@ -25,48 +25,51 @@ cfg_key_plcol   : shortstring = 'vid_player_colors';
 
 
 procedure cfg_setval(vr,vl:string);
-var vlb:word;
+var vlw:word;
 begin
-   vlb:=s2w(vl);
+   vlw:=s2w(vl);
 
-   if (vr=cfg_key_name )then PlayerName  := vl;
-   if (vr=cfg_key_sndv )then snd_svolume := vlb;
-   if (vr=cfg_key_mscv )then snd_mvolume := vlb;
-   if (vr=cfg_key_vspd )then vid_vmspd   := vlb;
-   if (vr=cfg_key_fscr )then _fscr       :=(vl=b2pm[true,2]);
-   if (vr=cfg_key_vmm  )then vid_vmm     :=(vl=b2pm[true,2]);
-   if (vr=cfg_key_saddr)then net_cl_svstr:= vl;
-   if (vr=cfg_key_sport)then net_sv_pstr := vl;
-   if (vr=cfg_key_lng  )then _lng        :=(vl=b2pm[true,2]);
-   if (vr=cfg_key_mai  )then m_a_inv     :=(vl=b2pm[true,2]);
-   if (vr=cfg_key_vidvw)then vid_vw      :=vlb;
-   if (vr=cfg_key_vidvh)then vid_vh      :=vlb;
-   if (vr=cfg_key_gsb  )then G_startb    :=vlb;
-   if (vr=cfg_key_gsp  )then G_shpos     :=(vl=b2pm[true,2]);
-   if (vr=cfg_key_gai  )then G_aislots   :=vlb;
-   if (vr=cfg_key_rpnui)then _rpls_pnui  :=vlb;
-   if (vr=cfg_key_npnui)then net_pnui    :=vlb;
-   if (vr=cfg_key_ppos )then vid_ppos    :=vlb;
-   if (vr=cfg_key_uhbar)then vid_uhbars  :=vlb;
-   if (vr=cfg_key_plcol)then vid_plcolors:=vlb;
+   if(vr=cfg_key_name )then PlayerName  := vl;
+   if(vr=cfg_key_sndv )then snd_svolume := vlw;
+   if(vr=cfg_key_mscv )then snd_mvolume := vlw;
+   if(vr=cfg_key_vspd )then vid_vmspd   := vlw;
+   if(vr=cfg_key_fscr )then _fscr       :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_vmm  )then vid_vmm     :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_saddr)then net_cl_svstr:= vl;
+   if(vr=cfg_key_sport)then net_sv_pstr := vl;
+   if(vr=cfg_key_lng  )then _lng        :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_mai  )then m_a_inv     :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_vidvw)then vid_vw      := vlw;
+   if(vr=cfg_key_vidvh)then vid_vh      := vlw;
+   if(vr=cfg_key_gsb  )then G_startb    := vlw;
+   if(vr=cfg_key_gsp  )then G_shpos     :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_gai  )then G_aislots   := vlw;
+   if(vr=cfg_key_rpnui)then _rpls_pnui  := vlw;
+   if(vr=cfg_key_npnui)then net_pnui    := vlw;
+   if(vr=cfg_key_ppos )then vid_ppos    := vlw;
+   if(vr=cfg_key_uhbar)then vid_uhbars  := vlw;
+   if(vr=cfg_key_plcol)then vid_plcolors:= vlw;
 end;
 
-procedure cfg_parse_str(s:string);
-var vr,vl:string;
+procedure cfg_parse_str(s:shortstring);
+var vr,vl:shortstring;
     i:byte;
 begin
    vr:='';
    vl:='';
    i :=pos('=',s);
-   vr:=copy(s,1,i-1);
-   delete(s,1,i);
-   vl:=s;
+   if(i>0)then
+   begin
+      vr:=copy(s,1,i-1);
+      delete(s,1,i);
+      vl:=s;
+   end;
    cfg_setval(vr,vl);
 end;
 
 procedure cfg_read;
 var f:text;
-    s:string;
+    s:shortstring;
 begin
    if FileExists(cfgfn) then
    begin
@@ -91,11 +94,11 @@ begin
       if(G_aislots>gms_g_maxai )then G_aislots:=gms_g_maxai;
       if(G_startb >gms_g_startb)then G_startb :=gms_g_startb;
 
-      if(_rpls_pnui  >9)then _rpls_pnui  :=9;
-      if(net_pnui    >9)then net_pnui    :=9;
-      if(vid_ppos    >3)then vid_ppos    :=0;
-      if(vid_uhbars  >2)then vid_uhbars  :=0;
-      if(vid_plcolors>4)then vid_plcolors:=0;
+      if(_rpls_pnui  >_cl_pnun)then _rpls_pnui  :=_cl_pnun;
+      if(net_pnui    >_cl_pnun)then net_pnui    :=_cl_pnun;
+      if(vid_ppos    >3       )then vid_ppos    :=0;
+      if(vid_uhbars  >2       )then vid_uhbars  :=0;
+      if(vid_plcolors>4       )then vid_plcolors:=0;
    end;
    swLNG;
    m_vrx:=vid_vw;

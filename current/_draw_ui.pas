@@ -14,7 +14,7 @@ begin
      end;
 
    case g_mode of
-gm_ct:
+gm_cptp:
       for i:=1 to MaxCPoints do
        with g_cpoints[i] do
         if(ct>0)and((G_Step mod 20)>10)
@@ -73,7 +73,7 @@ begin
       end;
 
       // points areas
-      if(g_mode=gm_ct)then
+      if(g_mode=gm_cptp)then
        for i:=1 to MaxCPoints do
         with g_cpoints[i] do
          circleColor(tar,

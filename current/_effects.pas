@@ -245,11 +245,12 @@ begin
    begin
       if(_PointInScreen2(vx,vy,@_players[player]))then
       begin
-         if(ms_alt_death=false)
+         if(ms_bullet_death=false)
          then _effect_add(vx,vy,_depth(vy,mfs),mid)
          else
          begin
             sr:=trunc(sr*0.75);
+            if(mtars>10)then mtars:=10;
             while(mtars>0)do
             begin
                _effect_add(vx-_randomr(sr),vy-_randomr(sr),_depth(vy,mfs),mid);

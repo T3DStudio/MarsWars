@@ -193,7 +193,7 @@ end;
 procedure _teleport_rld(tu:PTUnit;ur:integer);
 begin
    with tu^ do
-    with player^ do rld:=max2(fr_hhfps, ur-((ur div 3)*upgr[upgr_hell_teleport]) );
+    with player^ do rld:=max2(fr_4hfps, ur-((ur div 3)*upgr[upgr_hell_teleport]) );
 end;
 
 procedure _unit_teleport(pu:PTUnit;tx,ty:integer);
@@ -322,7 +322,7 @@ begin
    if(dist(x,y,x0,y0)<srange)then
    begin
       upgr[upgr_hell_b478tel]-=1;
-      buff[ub_clcast]:=fr_hfps;
+      buff[ub_clcast]:=fr_2hfps;
       _unit_teleport(pu,x0,y0);
    end;
 end;
@@ -531,7 +531,7 @@ begin
          exit;
       end;
 
-      if(g_mode=gm_ct)then
+      if(g_mode=gm_cptp)then
        for u:=1 to MaxCPoints do
         with g_cpoints[u] do
          if(dist(tx,ty,px,py)<base_r)then
@@ -1304,6 +1304,24 @@ UID_UCommandCenter:
             _unit_fog_r(pu);
             {$ENDIF}
          end;
+      end;
+      case uid of
+UID_Major,
+UID_ZMajor,
+UID_ZCommando:
+           begin
+              if(buff[ub_advanced]>0)
+              then i:=_srange+50
+              else i:=_srange;
+
+              if(srange<>i)then
+              begin
+                 srange:=i;
+                 {$IFDEF _FULLGAME}
+                 _unit_fog_r(pu);
+                 {$ENDIF}
+              end;
+           end;
       end;
 
       // REGENERATION

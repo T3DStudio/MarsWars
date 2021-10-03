@@ -269,7 +269,7 @@ begin
       ts                :=r_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
-      theme_liquid_animm:=fr_hfps;
+      theme_liquid_animm:=fr_2hfps;
    end
    else
    begin
@@ -281,7 +281,7 @@ begin
 
    case theme_liquid_animt of
    0: begin
-         wsp:=(ts^.w div 4)*((map_seed  mod 3)-1);
+         wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
          hsp:=(ts^.h div 4)*((abs(map_iseed) mod 3)-1);
          if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
       end;

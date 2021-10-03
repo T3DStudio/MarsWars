@@ -346,7 +346,7 @@ begin
      case _ability of
 uab_spawnlost  : if(buff[ub_cast]<=0)and(buff[ub_clcast]<=0)then
                  begin
-                    buff[ub_cast  ]:=fr_hfps;
+                    buff[ub_cast  ]:=fr_2hfps;
                     buff[ub_clcast]:=fr_2fps;
                     _ability_unit_spawn(pu,UID_LostSoul);
                  end;

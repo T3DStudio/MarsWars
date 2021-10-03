@@ -229,12 +229,12 @@ begin
 
    gstp:=G_Step shr 1;
    if(rpl=false)then
-    if((gstp mod fr_hhfps)=0)then
+    if((gstp mod fr_4hfps)=0)then
      with _players[_pl] do _wrld(@build_cd,rpl);
 
    if(rpl)
    then i:=fr_fps
-   else i:=fr_hfps;
+   else i:=fr_2hfps;
 
    if((gstp mod i)=0)then
     case g_mode of
@@ -242,7 +242,7 @@ gm_inv : begin
             _wudata_byte(g_inv_wave_n,rpl);
             _wudata_int (g_inv_time  ,rpl);
          end;
-gm_ct  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].pl,rpl);
+gm_cptp  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].pl,rpl);
 gm_royl: _wudata_int(g_royal_r,rpl);
     end;
 
@@ -893,7 +893,7 @@ begin
 
    gstp:=G_Step shr 1;
    if(rpl=false)then
-    if((gstp mod fr_hhfps)=0)then
+    if((gstp mod fr_4hfps)=0)then
      with _players[_pl] do
      begin
          _rrld(@build_cd,rpl);
@@ -901,7 +901,7 @@ begin
 
    if(rpl)
    then i:=fr_fps
-   else i:=fr_hfps;
+   else i:=fr_2hfps;
 
    if((gstp mod i)=0)then
     case g_mode of
@@ -911,7 +911,7 @@ gm_inv : begin
             if(g_inv_wave_n>_PNU)then PlaySND(snd_teleport,nil,nil);
             g_inv_time :=_rudata_int (rpl,0);
          end;
-gm_ct  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
+gm_cptp  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
 gm_royl: g_royal_r:=_rudata_int(rpl,0);
     end;
 

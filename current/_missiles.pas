@@ -9,7 +9,7 @@ begin
    with _mids[m] do
    begin
       ms_smodel   :=spr_pdmodel;
-      ms_alt_death:=false;
+      ms_bullet_death:=false;
 
       // sprite moddel
       case m of
@@ -28,11 +28,11 @@ MID_BPlasma  : ms_smodel:=@spr_u_p0;
 MID_Bullet,
 MID_Bulletx2,
 MID_TBullet,
-MID_MBullet  : ms_smodel:=@spr_u_p1;
+MID_MBullet,
 MID_SShot,
 MID_SSShot   : begin
                ms_smodel:=@spr_u_p1;
-               ms_alt_death:=true;
+               ms_bullet_death:=true;
                end;
 MID_BFG      : ms_smodel:=@spr_u_p2;
 MID_Tank,
@@ -185,7 +185,7 @@ MID_SSShot     : begin           vst:=1;         sr :=mm3(10,dist2(x,y,vx,vy) di
       if(vst<=0)then vst:=1;
 
       if(mtars=0)then
-       if(tar=0)or(sr>0)
+       if(tar<=0)or(sr>0)
        then mtars:=MaxUnits
        else mtars:=1;
 
@@ -535,6 +535,7 @@ begin
             end;
 
          {$IFDEF _FULLGAME}
+         //if(_mids[mid].ms_bullet_death)and(mtars<=0)then continue;
          _missile_explode_effect(m);
          {$ENDIF}
       end

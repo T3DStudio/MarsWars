@@ -291,7 +291,7 @@ begin
    str_gmode[gm_scir ]   := #18+'Skirmish'    +#25;
    str_gmode[gm_2fort]   := #16+'Two bases'   +#25;
    str_gmode[gm_3fort]   := #17+'Three bases' +#25;
-   str_gmode[gm_ct   ]   := #19+'Capturing points'+#25;
+   str_gmode[gm_cptp   ]   := #19+'Capturing points'+#25;
    str_gmode[gm_inv  ]   := #20+'Invasion'    +#25;
    str_gmode[gm_aslt ]   := #14+'Assault'     +#25;
    str_gmode[gm_royl ]   := #15+'Royal Battle'+#25;
@@ -704,7 +704,7 @@ begin
   str_gmode[gm_scir ]   := #18+'Схватка'+#25;
   str_gmode[gm_2fort]   := #16+'Две крепости'+#25;
   str_gmode[gm_3fort]   := #17+'Три крепости'+#25;
-  str_gmode[gm_ct   ]   := #19+'Захват точек'+#25;
+  str_gmode[gm_cptp   ]   := #19+'Захват точек'+#25;
   str_gmode[gm_inv  ]   := #20+'Вторжение'+#25;
   str_gmode[gm_aslt ]   := #14+'Штурм'+#25;
   str_gmode[gm_royl ]   := #15+'Королевская битва'+#25;

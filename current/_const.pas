@@ -11,18 +11,18 @@ degtorad               = pi/180;
 //
 
 fr_fps                 = 60;
-fr_hfps                = fr_fps  div 2;
-fr_3hfps               = fr_fps  div 3;
-fr_hhfps               = fr_hfps div 2;
-fr_6hfps               = fr_fps  div 6;
-fr_8hfps               = fr_fps  div 8;
-fr_1h1fps              = fr_hfps*3;
+fr_2hfps               = fr_fps div 2;
+fr_3hfps               = fr_fps div 3;
+fr_4hfps               = fr_fps div 4;
+fr_6hfps               = fr_fps div 6;
+fr_8hfps               = fr_fps div 8;
+fr_2h3fps              = fr_2hfps*3;
 fr_2fps                = fr_fps*2;
-fr_mancubus_r          = fr_2fps+fr_hfps+10;
 fr_3fps                = fr_fps*3;
 fr_4fps                = fr_fps*4;
 fr_3h2fps              = fr_3hfps*2;
 fr_mpt                 = trunc(1000/fr_fps);
+fr_mancubus_r          = fr_2fps+fr_2hfps+10;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,12 +37,12 @@ ps_comp                = 2;
 gm_scir                = 0;  // game mode
 gm_2fort               = 1;
 gm_3fort               = 2;
-gm_ct                  = 3;
+gm_cptp                = 3;
 gm_inv                 = 4;
 gm_aslt                = 5;
 gm_royl                = 6;
 
-gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_ct,gm_inv,gm_aslt,gm_royl];
+gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_aslt,gm_royl];
 gm_cnt                 = 6;
 
 r_cnt                  = 2;  // race
@@ -52,7 +52,7 @@ r_uac                  = 2;
 
 MaxPlayers             = 6;
 MaxPlayerUnits         = 120;
-MaxCPoints             = 6;
+MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
 MinSMapW               = 3000;
@@ -79,6 +79,7 @@ b2pm                   : array[false..true] of string[3] = (#15+'-'+#25,#18+'+'+
 
 outlogfn               : shortstring = 'out.txt';
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Game settings borders
@@ -93,8 +94,9 @@ gms_g_maxai            = 8;
 //  NETGAME
 //
 
-                                             // 60 140 220 300 380 460 540 620 700 800
-_cl_pnua               : array[0..9] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
+_cl_pnun               = 9;
+                                                    // 60 140 220 300 380 460 540 620 700 800
+_cl_pnua               : array[0.._cl_pnun] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
 ClientTTL              = fr_fps*10;
 
@@ -197,11 +199,11 @@ ua_paction             = 5;
 //  Conditionals for attack
 //
 
-atm_none             = 0;   // cant attack
-atm_always           = 1;   // can attack
-atm_bunker           = 2;   // can attack, units inside can attack too
-atm_sturret          = 3;   // can attack when somebody inside
-atm_inapc            = 4;   // can attack only when
+atm_none               = 0;   // cant attack
+atm_always             = 1;   // can attack
+atm_bunker             = 2;   // can attack, units inside can attack too
+atm_sturret            = 3;   // can attack when somebody inside
+atm_inapc              = 4;   // can attack only when inapc
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -442,15 +444,15 @@ upgr_fast_build        = 250;
 upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
-
-upgr_race_bio_armor    : array[1..r_cnt] of byte = (upgr_hell_uarmor,upgr_uac_uarmor);
-upgr_race_mech_armor   : array[1..r_cnt] of byte = (0,upgr_uac_mecharm);
-upgr_race_build_armor  : array[1..r_cnt] of byte = (upgr_hell_barmor,upgr_uac_barmor);
-upgr_race_bio_regen    : array[1..r_cnt] of byte = (upgr_hell_regen,0);
-upgr_race_mech_regen   : array[1..r_cnt] of byte = (0,0);
-upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep,0);
-upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0,upgr_uac_mspeed);
-upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0,upgr_uac_mechspd);
+                                                 // HELL               UAC
+upgr_race_bio_armor    : array[1..r_cnt] of byte = (upgr_hell_uarmor , upgr_uac_uarmor );
+upgr_race_mech_armor   : array[1..r_cnt] of byte = (0                , upgr_uac_mecharm);
+upgr_race_build_armor  : array[1..r_cnt] of byte = (upgr_hell_barmor , upgr_uac_barmor );
+upgr_race_bio_regen    : array[1..r_cnt] of byte = (upgr_hell_regen  , 0               );
+upgr_race_mech_regen   : array[1..r_cnt] of byte = (0                , 0               );
+upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0               );
+upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
+upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -496,6 +498,13 @@ uf_ground              = 0;
 uf_soaring             = 1;
 uf_fly                 = 2;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UIDs
+//
+
+// HELL
+
 UID_HKeep              = 1;
 UID_HGate              = 2;
 UID_HSymbol            = 3;
@@ -530,6 +539,7 @@ UID_ZBomber            = 31;
 UID_ZMajor             = 32;
 UID_ZBFG               = 33;
 
+// UAC
 
 UID_UCommandCenter     = 41;
 UID_UMilitaryUnit      = 42;
@@ -582,7 +592,6 @@ zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,
 gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
-//whocanattack           = demons+marines+[UID_Terminator..UID_Flyer,UID_UMine,UID_APC,UID_FAPC,UID_HTower,UID_HTotem,UID_HCommandCenter,UID_UCommandCenter,UID_UTurret,UID_UPTurret,UID_URTurret];
 
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
@@ -616,7 +625,7 @@ base_rA                : array[0..2] of integer = (280,320,360);
 uaccc_fly              = 23;
 apc_exp_damage         = 70;
 regen_per              = fr_fps*2;
-_uclord_p              = fr_hfps+1;
+_uclord_p              = fr_2hfps+1;
 vistime                = _uclord_p+1;
 
 radar_reload           = fr_fps*40;
@@ -651,7 +660,7 @@ g_ct_pr                = 150;
 g_ct_ct                : array[1..r_cnt] of integer = (fr_fps*10,fr_fps*5);
 bld_dec_mr             = 6;
 def_ai                 = 5;
-pain_time              = fr_hfps;
+pain_time              = fr_2hfps;
 hinvuln_time           = (fr_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
@@ -706,7 +715,6 @@ _hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_F , SDLK_G , SDLK_H      );
 
 
-//whocanaction           = [UID_Engineer,UID_UCommandCenter,UID_APC,UID_FAPC,UID_LostSoul,UID_Pain,UID_UMine,UID_UTurret,UID_UPTurret];
 
 _buffst                : array[false..true] of smallint = (0,_ub_infinity);
 
@@ -928,7 +936,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 262401;
+svld_size              = 262365;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
@@ -1005,11 +1013,11 @@ str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
 
-race_dir               : array[1..r_cnt] of string = ('hell\'          ,'uac\'          );
-race_units             : array[1..r_cnt] of string = ('hell\units\'    ,'uac\units\'    );
-race_buildings         : array[1..r_cnt] of string = ('hell\buildings\','uac\buildings\');
-race_upgrades          : array[1..r_cnt] of string = ('hell\upgrades\' ,'uac\upgrades\' );
-race_missiles          : array[1..r_cnt] of string = ('hell\missiles\' ,'uac\missiles\' );
+race_dir               : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
+race_units             : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
+race_buildings         : array[1..r_cnt] of shortstring = ('hell\buildings\','uac\buildings\');
+race_upgrades          : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
+race_missiles          : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
 effects_folder         : shortstring = 'effs\';
 missiles_folder        : shortstring = 'missiles\';
 

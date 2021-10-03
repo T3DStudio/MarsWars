@@ -321,7 +321,7 @@ begin
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
-   setWeaponESND(0,nil,snd_plasma,0,0);
+   setWeaponESND(0    ,nil,snd_plasma,0,0);
 end;
 UID_ZBFG:
 begin

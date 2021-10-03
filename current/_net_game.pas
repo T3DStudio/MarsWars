@@ -259,7 +259,7 @@ nmid_plout: begin
       end;
 
    net_period+=1;
-   net_period:=net_period mod fr_hfps;
+   net_period:=net_period mod fr_2hfps;
 end;
 
 {$IFDEF _FULLGAME}
@@ -285,7 +285,7 @@ begin
    rm:=rm or (b<>map_obs );
 
    c:=map_seed;
-   map_seed := net_readcard;
+   map_seed:=net_readcard;
    rm:=rm or (c<>map_seed);
 
    b:=byte(map_sym);
@@ -436,7 +436,7 @@ begin
    end;
 
    net_period+=1;
-   net_period:=net_period mod fr_hfps;
+   net_period:=net_period mod fr_2hfps;
    if(net_cl_svttl<ClientTTL)then
    begin
       net_cl_svttl+=1;

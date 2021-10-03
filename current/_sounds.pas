@@ -200,7 +200,7 @@ begin
 end;
 
 procedure PlayInGameAnoncer(ss:PTSoundSet);
-const min_snd_pause = fr_hhfps;
+const min_snd_pause = fr_4hfps;
 var s:PTMWSound;
 begin
    if(ss=nil)
@@ -219,7 +219,7 @@ begin
 end;
 
 procedure PlayCommandSound(ss:PTSoundSet);
-const min_snd_pause = fr_hfps;
+const min_snd_pause = fr_2hfps;
 var s:PTMWSound;
 begin
    if(ss=nil)

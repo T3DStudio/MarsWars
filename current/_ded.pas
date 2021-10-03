@@ -129,7 +129,7 @@ begin
            then begin Map_randommap; Map_premap;end
            else
            begin
-              map_seed:=s2c(args[1]);
+              _SetRandomSeed(s2c(args[1]));
               map_mw  :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
               map_liq :=min2(7,s2b(args[3]));
               map_obs :=min2(7,s2b(args[4]));

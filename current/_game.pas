@@ -888,7 +888,7 @@ begin
              if(g_royal_r>0)then g_royal_r-=1;
 
             G_Step+=1;
-            //if(g_mode=gm_ct )then _CPoints;
+            //if(g_mode=gm_cptp )then _CPoints;
             //if(g_mode=gm_inv)then g_inv_spawn;
          end;
          _obj_cycle;

@@ -81,8 +81,8 @@ end;
 
 procedure map_vars;
 begin
-   map_iseed   := map_seed;
-   map_rpos    := 0;
+   map_iseed   := word(map_seed);
+   map_rpos    := byte(map_seed);
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
    {$IFDEF _FULLGAME}
@@ -203,7 +203,7 @@ begin
       end;
    gm_royl:
       MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-   gm_ct:
+   gm_cptp:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
@@ -413,7 +413,7 @@ begin
    ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
    if(ddc>MaxDoodads)then ddc:=MaxDoodads;
 
-   if(map_sym)then ddc:=ddc div 4;
+   if(map_sym)then ddc:=ddc div 3;
 
    rks :=0;
    lqs :=0;
@@ -443,8 +443,8 @@ begin
       cnt:=0;
       while true do
       begin
-         ix:=_randomx(ix,map_mw );
-         iy:=_randomx(iy+ix*cnt,map_mw);
+         ix:=_randomx(ix,map_mw);
+         iy:=_randomx(iy,map_mw); //+ix*cnt
 
          if(_PickDoodad(@ix,@iy,@lqs,@rks))then break;
 
@@ -462,7 +462,7 @@ end;
 
 procedure Map_randomseed;
 begin
-   map_seed :=random($FFFFFFFF)+(SDL_GetTicks shl 5);
+   map_seed:=random($FFFFFFFF)+(SDL_GetTicks shl 5);
 end;
 
 procedure Map_randommap;

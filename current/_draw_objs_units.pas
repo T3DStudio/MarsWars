@@ -274,8 +274,8 @@ begin
 
          if(spr=pspr_dummy)then exit;
 
-         inc(shadow,sign(_unit_shadowz(pu)-shadow));
-         sh :=shadow;
+         shadow+=sign(_unit_shadowz(pu)-shadow);
+         sh    :=shadow;
 
          if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,sh))then
          begin

@@ -143,7 +143,7 @@ begin
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
    end;
 
-   if(g_mode=gm_ct)then
+   if(g_mode=gm_cptp)then
     for i:=1 to MaxCPoints do
      with g_cpoints[i] do
       filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);

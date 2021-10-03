@@ -261,7 +261,7 @@ begin
 
 
    case g_mode of
-gm_ct:
+gm_cptp:
       for cx:=1 to MaxCPoints do
        with g_cpoints[cx] do
         circleColor(tar,lx+px-vid_vx,ly+py-vid_vy,g_ct_pr,_PlayerColor(pl));
@@ -345,7 +345,7 @@ begin
            if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,_PlayerColor(player^.pnum));
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, _PlayerColor(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(a_tar) , ta_left,255, _PlayerColor(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(shadow) , ta_left,255, _PlayerColor(playeri));
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, _PlayerColor(playeri));
 
         end;

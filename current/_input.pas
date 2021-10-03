@@ -53,7 +53,7 @@ begin
 end;
 procedure _ClickEffect(color:cardinal);
 begin
-   _click_eff(ox1,oy1,fr_hhfps,color);
+   _click_eff(ox1,oy1,fr_4hfps,color);
 end;
 
 begin
@@ -101,7 +101,7 @@ begin
    if(_IsUnitRange(tar,nil))then
    begin
       ui_umark_u:=tar;
-      ui_umark_t:=fr_hfps;
+      ui_umark_t:=fr_2hfps;
    end;
 
    case cmd of
@@ -352,11 +352,11 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      if(u=13)then
      begin
         if(mid)
-        then _rpls_step:=fr_hfps*fr_fps
+        then _rpls_step:=fr_2hfps*fr_fps
         else
           if(right=false)
-          then _rpls_step:=fr_hfps*2
-          else _rpls_step:=fr_hfps*10;
+          then _rpls_step:=fr_2hfps*2
+          else _rpls_step:=fr_2hfps*10;
      end
      else
        if(right=false)then
@@ -462,7 +462,7 @@ begin
            end;
 
       end;
-   k_dbl:=fr_hhfps;
+   k_dbl:=fr_4hfps;
 end;
 
 procedure _keyp(i:pbyte);
@@ -657,7 +657,7 @@ co_apatrol: _command(m_mx,m_my);
          end;
 
          m_sxs:=-1;
-         m_ldblclk:=fr_hhfps;
+         m_ldblclk:=fr_4hfps;
       end;
    end;
 
