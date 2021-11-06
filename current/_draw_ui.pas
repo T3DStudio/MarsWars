@@ -245,14 +245,14 @@ begin
       if(vid_ppos<2)then
       begin
          _draw_text(tar,ui_energx  ,ui_iy,#19+i2s(cenerg),ta_right,255,c_aqua );
-         _draw_text(tar,ui_energx+2,ui_iy,i2s(menerg)    ,ta_left ,255,c_white);
+         _draw_text(tar,ui_energx+2,ui_iy,    i2s(menerg),ta_left ,255,c_white);
       end
       else
       begin
          _draw_text(tar,ui_energx  ,ui_iy-6,#19+i2s(cenerg),ta_middle,255,c_aqua );
-         _draw_text(tar,ui_energx+2,ui_iy+6,i2s(menerg)    ,ta_middle,255,c_white);
+         _draw_text(tar,ui_energx+2,ui_iy+6,    i2s(menerg),ta_middle,255,c_white);
       end;
-      _draw_text(tar,ui_armyx   ,ui_iy,b2s(army)           ,ta_middle,255,c_white);
+      _draw_text(tar,ui_armyx   ,ui_iy,i2s(armylimit+uprodl),ta_middle,255,ui_limit[armylimit>=MaxPlayerLimit]);
 
       case ui_tab of    // buildings
       0:
@@ -272,7 +272,7 @@ begin
             ux:=(ui mod 3);
             uy:=(ui div 3);
 
-            req:=_uid_cndt(@_players[HPlayer],uid);
+            req:=_uid_conditionals(@_players[HPlayer],uid);
 
             _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
             _drawBtnt(tar,ux,uy,
@@ -298,7 +298,7 @@ begin
             ux:=(ui mod 3);
             uy:=(ui div 3);
 
-            _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,false,(_uid_cndt(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
+            _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
             b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
             c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,'');
@@ -316,7 +316,7 @@ begin
          ux:=(ui mod 3);
          uy:=(ui div 3);
 
-         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_cndt(@_players[HPlayer],uid)>0) or (pproda>=pprodm)or(n_smiths<=0));
+         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0) or (pproda>=pprodm)or(n_smiths<=0));
 
          _drawBtnt(tar,ux,uy,
          b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
@@ -339,7 +339,7 @@ begin
          for ui:=0 to MaxPlayers do
          begin
             if(ui=0)
-            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white    ,0,0,0,0,'')
+            then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white         ,0,0,0,0,'')
             else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',_PlayerColor(ui),0,0,0,0,'');
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
@@ -366,7 +366,7 @@ begin
          _drawBtn(tar,2,2,spr_b_cancel ,false  ,false             );
 
          _drawBtn(tar,0,3,spr_b_paction,false  ,ui_uibtn_action=0 );
-         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_uibtn_f2=0);
+         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_uibtn_f2    =0 );
          _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])=0);
       end;
 

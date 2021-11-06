@@ -55,6 +55,8 @@ begin
 
    ui_muc    [false]:=c_dorange;
    ui_muc    [true ]:=c_gray;
+   ui_limit  [false]:=c_white;
+   ui_limit  [true ]:=c_red;
 end;
 
 function _createSurf(tw,th:integer):pSDL_Surface;

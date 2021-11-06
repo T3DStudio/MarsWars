@@ -12,7 +12,7 @@ vid_hhhfps             = vid_hhfps div 2;
 vid_3hfps              = vid_hfps*3;
 vid_2fps               = vid_fps*2;
 vid_3fps               = vid_fps*3;
-vid_mpt                = trunc(1000/vid_fps)-1;
+vid_mpt                = trunc(1000/vid_fps);
 
 NameLen                = 13;
 ChatLen                = 38;
@@ -51,6 +51,7 @@ MaxNetBuffer           = 4096;
 MaxSMapW               = 7000;
 MinSMapW               = 3000;
 SMapStep               = 250;
+MaxCapturePoints       = 3;
 
 ddc_div                = 1000000;
 ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div;
@@ -129,7 +130,7 @@ ub_clcast              = 8;
 ub_invis               = 9;
 ub_detect              = 10;
 ub_invuln              = 11;
-ub_notarget            = 12;
+ub_pboost              = 12;
 ub_born                = 13;
 ub_cnttrans            = 14;
 ub_teleeff             = 15;
@@ -180,7 +181,7 @@ upgr_minesen           = 13; // mine-sensor
 
 upgr_6bld              = 14; // Souls / adv
 
-upgr_2tier             = 15; // Tier 2
+upgr_boost             = 15; // Tier 2
 
 upgr_revtele           = 16; // revers teleport
 upgr_blizz             = 16; // blizzard launch
@@ -333,7 +334,7 @@ slowturn               = [UID_APC,UID_Tank];
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
 //type_massive           = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
 
-clnet_rld              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory,UID_UVehicleFactory,UID_HTeleport];
+clnet_rld              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory,UID_UVehicleFactory,UID_HTeleport,UID_HMonastery];
 clnet_utr              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUnit,UID_UWeaponFactory];
 
 {
@@ -354,6 +355,9 @@ clnet_utr              = [UID_HGate,UID_HPools,UID_UMilitaryUnit,UID_HMilitaryUn
 14
 15
 }
+
+boost_time             = vid_fps*20;
+boost_rld              = vid_fps*60;
 
 urocketl_rld           = vid_fps*30;
 bld_r_max              = vid_fps*12;
@@ -402,6 +406,9 @@ _d2shi                 = abs(dead_hits div 126)+1;   // 5
 _sbs_ucls              = [5,6,8];
 
 fly_height             = 30;
+
+CCtx                   = 4;
+CCty                   = 11;
 
 {$IFDEF _FULLGAME}
 
@@ -549,7 +556,7 @@ AUDIO_FORMAT           : WORD    = AUDIO_S16;
 AUDIO_CHANNELS         : INTEGER = 1;
 AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 
-svld_size              = 203971;
+svld_size              = 203935;
 rpl_size               = 1574;
 
 rpl_none               = 0;

@@ -27,7 +27,7 @@ UID_ZEngineer:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(wanim)then inc(anim,anims);
+   if(wanim)then anim+=anims;
    anim:=anim mod 400;
    an:=4*td+(anim div 100);
 
@@ -51,7 +51,7 @@ begin
      then an:=32+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 400;
         an:=4*td+(anim div 100);
      end;
@@ -84,7 +84,7 @@ begin
           else an:=40+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 400;
         an:=4*td+(anim div 100);
      end;
@@ -112,7 +112,7 @@ begin
         then an:=32+td
         else
         begin
-           if(wanim)then inc(anim,anims);
+           if(wanim)then anim+=anims;
            anim:=anim mod 400;
            an:=4*td+(anim div 100);
         end;
@@ -142,11 +142,11 @@ begin
      if(rld>0)then
      begin
         an:=48+(td*2);
-        if(rld>rld_a)then inc(an,1);
+        if(rld>rld_a)then an+=1;
      end
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 600;
         an:=6*td+(anim div 100);
      end;
@@ -164,7 +164,7 @@ begin
      then an:=16+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 200;
         an:=2*td+(anim div 100);
      end;
@@ -182,7 +182,7 @@ begin
      then an:=48+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 600;
         an:=6*td+(anim div 100);
      end;
@@ -202,7 +202,7 @@ begin
           else an:=56+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 600;
         an:=6*td+(anim div 100);
      end;
@@ -222,7 +222,7 @@ begin
           else an:=56+td
      else
      begin
-        if(wanim)then inc(anim,anims);
+        if(wanim)then anim+=anims;
         anim:=anim mod 600;
         an:=6*td+(anim div 100);
      end;
@@ -247,7 +247,7 @@ begin
        end
        else
        begin
-          if(wanim)then inc(anim,anims);
+          if(wanim)then anim+=anims;
           anim:=anim mod 600;
           an:=6*td+(anim div 100);
        end;
@@ -259,7 +259,7 @@ UID_APC:
 begin
    td:=((dir+23) mod 360) div 45;
 
-   if(wanim)then inc(anim,anims);
+   if(wanim)then anim+=anims;
    anim:=anim mod 200;
    an:=2*td+(anim div 100);
 
@@ -283,7 +283,7 @@ begin
    then an:=32+td
    else
    begin
-      if(wanim)then inc(anim,anims);
+      if(wanim)then anim+=anims;
       anim:=anim mod 400;
       an:=4*td+(anim div 100);
    end;
@@ -308,7 +308,7 @@ begin
         else an:=32+td
    else
    begin
-      if(wanim)then inc(anim,anims);
+      if(wanim)then anim+=anims;
       anim:=anim mod 400;
       an:=4*td+(anim div 100);
    end;
@@ -326,7 +326,7 @@ begin
         else an:=40+td
    else
    begin
-      if(wanim)then inc(anim,anims);
+      if(wanim)then anim+=anims;
       anim:=anim mod 400;
       an:=4*td+(anim div 100);
    end;
@@ -351,7 +351,7 @@ begin
       then an:=32+td
       else
       begin
-         if(wanim)then inc(anim,anims);
+         if(wanim)then anim+=anims;
          anim:=anim mod 400;
          an:=4*td+(anim div 100);
       end;
@@ -367,7 +367,7 @@ begin
    then an:=16+td
    else
    begin
-      if(wanim)then inc(anim,anims);
+      if(wanim)then anim+=anims;
       anim:=anim mod 200;
       an:=2*td+(anim div 100);
    end;
@@ -385,7 +385,7 @@ begin
      else an:=40+td
    else
    begin
-      if(wanim)then inc(anim,anims);
+      if(wanim)then anim+=anims;
       anim:=anim mod 400;
       an:=4*td+(anim div 100);
    end;

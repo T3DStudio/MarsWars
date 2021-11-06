@@ -45,7 +45,7 @@ begin
                   pts^:=pts^+[p];
                   if(p=l)
                   then break
-                  else inc(p,sign(l-p));
+                  else p+=sign(l-p);
                end;
             end;
          end
@@ -75,7 +75,7 @@ begin
       begin
          v:=copy(s,1,p-1);
          delete(s,1,p);
-         inc(l,p);
+         l+=p;
       end
       else
       begin
@@ -133,7 +133,7 @@ begin
          end;
       end;
 
-      inc(a,1);
+      a+=1;
    end;
 end;
 
@@ -201,18 +201,18 @@ begin
    if(inthb)
    and(_ades<>[])and(_tdes<>[])and(_liqs<>[])and(_ters<>[])and(_brcs<>[])and(_srcs<>[])then
    begin
-      inc(map_themen,1);
+      map_themen+=1;
       setlength(map_themes,map_themen);
       with (map_themes[map_themen-1]) do
       begin
          for t:=0 to 255 do
          begin
-            if(t in _ades)then begin inc(_adecn,1);setlength(_adecs,_adecn);_adecs[_adecn-1]:=t;end;
-            if(t in _tdes)then begin inc(_tdecn,1);setlength(_tdecs,_tdecn);_tdecs[_tdecn-1]:=t;end;
-            if(t in _liqs)then begin inc(_liqdn,1);setlength(_liqds,_liqdn);_liqds[_liqdn-1]:=t;end;
-            if(t in _ters)then begin inc(_terrn,1);setlength(_terrs,_terrn);_terrs[_terrn-1]:=t;end;
-            if(t in _brcs)then begin inc(_brckn,1);setlength(_brcks,_brckn);_brcks[_brckn-1]:=t;end;
-            if(t in _srcs)then begin inc(_srckn,1);setlength(_srcks,_srckn);_srcks[_srckn-1]:=t;end;
+            if(t in _ades)then begin _adecn+=1;setlength(_adecs,_adecn);_adecs[_adecn-1]:=t;end;
+            if(t in _tdes)then begin _tdecn+=1;setlength(_tdecs,_tdecn);_tdecs[_tdecn-1]:=t;end;
+            if(t in _liqs)then begin _liqdn+=1;setlength(_liqds,_liqdn);_liqds[_liqdn-1]:=t;end;
+            if(t in _ters)then begin _terrn+=1;setlength(_terrs,_terrn);_terrs[_terrn-1]:=t;end;
+            if(t in _brcs)then begin _brckn+=1;setlength(_brcks,_brckn);_brcks[_brckn-1]:=t;end;
+            if(t in _srcs)then begin _srckn+=1;setlength(_srcks,_srckn);_srcks[_srckn-1]:=t;end;
          end;
          _name:=_tname;
       end;
@@ -236,7 +236,7 @@ begin
        _srckn:=0;setlength(_srcks,0);
        _name:='';
 
-       dec(map_themen,1);
+       map_themen-=1;
     end;
    setlength(map_themes,0);
    FillChar(map_Liquidc ,SizeOf(map_Liquidc) ,0);
@@ -296,7 +296,7 @@ begin
 
    if(map_themen=0)then
    begin
-      inc(map_themen,1);
+      map_themen+=1;
       setlength(map_themes,map_themen);
       with map_themes[map_themen-1] do
       begin

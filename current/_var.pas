@@ -88,6 +88,9 @@ map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
+pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
+pf_pathgrid_tmp   : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
+
 net_chatls        : array[0..MaxPlayers] of byte; // local state
 net_chatss        : array[0..MaxPlayers] of byte; // server state
 net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
@@ -106,14 +109,15 @@ fps_tt,
 fps_cs,
 fps_ns            : cardinal;
 
-{wtrset_enemy_alive_ground,
-wtrset_enemy_alive_fly,
 wtrset_enemy_alive,
+wtrset_enemy_alive_ground,
+wtrset_enemy_alive_fly,
 wtrset_enemy_alive_mech,
 wtrset_enemy_alive_buildings,
+wtrset_enemy_alive_nbuildings,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
-wtrset_resurect   : cardinal;  }
+wtrset_resurect   : cardinal;
 
 {$IFDEF _FULLGAME}
 
@@ -315,6 +319,7 @@ ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_muc            : array[false..true] of cardinal; // unit max count color
+ui_limit          : array[false..true] of cardinal; // unit limit colors
 
 ui_uiuphx         : integer = 0;
 ui_ingamecl       : byte = 0;
@@ -551,7 +556,6 @@ spr_pdmodel       : PTMWSModel;
 spr_mp            : array[1..r_cnt] of TMWTexture;
 spr_gear,
 spr_toxin
-
                   : TMWTexture;
 
 
@@ -596,9 +600,9 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 //
 
 str_startat       : array[0..gms_g_startb] of shortstring;
-str_race          : array[0..r_cnt] of shortstring;
-str_gmode         : array[0..gm_cnt] of shortstring;
-str_addon         : array[false..true] of shortstring;
+str_race          : array[0..r_cnt       ] of shortstring;
+str_gmode         : array[0..gm_cnt      ] of shortstring;
+str_addon         : array[false..true    ] of shortstring;
 str_m_liq,
 str_m_siz,
 str_m_obs,
@@ -913,6 +917,7 @@ snd_rico,
 snd_flyer_s,
 snd_flyer_a,
 snd_launch,
+snd_CCup,
 {,
 snd_ccup,
 , }

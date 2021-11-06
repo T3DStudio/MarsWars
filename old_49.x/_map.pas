@@ -12,7 +12,7 @@ begin
 
         if(t in dids_liquids)then
         begin
-           if(onlyspr=false)then inc(a,1);
+           if(onlyspr=false)then a+=1;
            a:=a mod vid_2fps;
            spr:=@spr_liquid[(a div vid_hfps)+1,t-DID_LiquidR1];
         end;
@@ -58,11 +58,12 @@ begin
 
       characterColor(_minimap,x-3,y-3,start_char,c);
       circleColor(_minimap,x,y,trunc(base_r*map_mmcx),c);
-
-      if(g_mode=gm_ct)and(i>0)then
-       with g_ct_pl[i] do
-        filledcircleColor(_minimap,mpx,mpy,map_prmm,c_aqua);
    end;
+
+   if(g_mode=gm_ct)then
+    for i:=1 to MaxCapturePoints do
+     with g_cpoints[i] do
+      filledcircleColor(_minimap,mpx,mpy,map_prmm,c_aqua);
 end;
 
 procedure _makeMMB;
@@ -133,11 +134,11 @@ begin
            for dy:=dy0 to dy1 do
             with map_dcell[dx0,dy] do
             begin
-               inc(n,1);
+               n+=1;
                setlength(l,n);
                l[n-1]:=d;
             end;
-           inc(dx0,1);
+           dx0+=1;
         end;
      end;
 end;
@@ -254,7 +255,7 @@ var i:byte;
 begin
    for i:=1 to MaxPlayers do
    begin
-      inc(sdir,dstep);
+      sdir+=dstep;
       map_psx[i]:=trunc(cx+r*cos(sdir*degtorad));
       map_psy[i]:=trunc(cy+r*sin(sdir*degtorad));
    end;
@@ -288,10 +289,10 @@ gm_2fort :
 
          map_psx[1]:=trunc(ix+cos(i*degtorad)*u);
          map_psy[1]:=trunc(ix+sin(i*degtorad)*u);
-         inc(i,105);
+         i+=105;
          map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
-         dec(i,210);
+         i-=210;
          map_psx[3]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[3]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
@@ -316,14 +317,14 @@ gm_3fort:
          map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
-         inc(c,120);
+         c+=120;
          map_psx[3]:=trunc(ix+cos(c*degtorad)*u);
          map_psy[3]:=trunc(ix+sin(c*degtorad)*u);
          i:=c+100;
          map_psx[4]:=map_psx[3]+trunc(cos(i*degtorad)*iy);
          map_psy[4]:=map_psy[3]+trunc(sin(i*degtorad)*iy);
 
-         inc(c,120);
+         c+=120;
          map_psx[5]:=trunc(ix+cos(c*degtorad)*u);
          map_psy[5]:=trunc(ix+sin(c*degtorad)*u);
          i:=c+100;
@@ -349,15 +350,15 @@ gm_ct:begin
 
          c :=map_seed mod 360;
          ix:=map_mw div 2;
-         iy:=360-(360 div MaxPlayers);
+         iy:=360-(360 div MaxCapturePoints);
          u := map_mw div 5;
 
-         for i:=1 to MaxPlayers do
-         with g_ct_pl[i] do
+         for i:=1 to MaxCapturePoints do
+         with g_cpoints[i] do
          begin
             px:=trunc(ix+cos(c*degtorad)*u);
             py:=trunc(ix+sin(c*degtorad)*u);
-            inc(c,iy);
+            c+=iy;
 
             {$IFDEF _FULLGAME}
             mpx:=round(px*map_mmcx);
@@ -381,9 +382,9 @@ gm_ct:begin
          repeat
            ix:=bb0+_gen(bb1);
            iy:=bb0+_gen(bb1);
-           inc(c,1);
-           inc(map_seed2,1);
-           if(c>500 )then dec(u,1);
+           c+=1;
+           map_seed2+=1;
+           if(c>500 )then u-=1;
            if(c>1000)then break;
          until (_spch(ix,iy,u)=false)and(c<=2000);
 
@@ -461,7 +462,7 @@ begin
    begin
       lqs:=(ddc div 80)*map_liq;
    end;
-   inc(ddc,50);
+   ddc+=50;
    if(ddc>MaxDoodads)then ddc:=MaxDoodads;
 
    hrks:=rks div 2;
@@ -480,7 +481,7 @@ begin
          6..8 : di:=DID_liquidR3;
          9..11: di:=DID_liquidR4;
          end;
-         dec(lqs,1);
+         lqs-=1;
       end
       else
         if(rks>0)then
@@ -488,7 +489,7 @@ begin
            if(rks>hrks)
            then di:=DID_SRock
            else di:=DID_BRock;
-           dec(rks,1);
+           rks-=1;
         end
         else di:=DID_other;
 
@@ -498,7 +499,7 @@ begin
       repeat
          ix:=_genx(ix            ,map_mw,false);
          iy:=_genx(iy+sqr(cnt+ix),map_mw,true );
-         inc(cnt,1);
+         cnt+=1;
          if(cnt>=dpostime)then break;
       until (_spch(ix,iy,base_r+200)=false)and(_dnear(di,ix,iy,i)=false)and(ix>=0)and(iy>=0)and(ix<=map_mw)and(iy<=map_mw);
       if(cnt>=dpostime)then continue;

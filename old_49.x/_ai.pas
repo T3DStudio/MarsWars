@@ -31,7 +31,7 @@ begin
              begin
                 _bc_ss(@a_units,[0..4]);
              end;
-             _bc_ss(@a_upgr ,[0..upgr_2tier-1]);
+             _bc_ss(@a_upgr ,[0..upgr_boost-1]);
 
              ai_maxarmy :=45;
              ai_pushpart:=10;
@@ -148,10 +148,10 @@ begin
       UID_HEye: if(ud<sr)then
                  if(teams)then
                  begin
-                    if(tu^.uid=UID_HEye)then inc(ai_uc_a,1);
+                    if(tu^.uid=UID_HEye)then ai_uc_a+=1;
                  end
                  else
-                   if(tu^.uid<>UID_UCommandCenter)then inc(ai_uc_e,1);
+                   if(tu^.uid<>UID_UCommandCenter)then ai_uc_e+=1;
       UID_URadar:
                 if(teams)and(ud<ai_apcd)and(tu^.alrm_r<=0)then
                 begin
@@ -163,27 +163,27 @@ begin
                 if(tu^.buff[ub_invuln]=0)then
                  if(dist2(uo_x,uo_y,tu^.x,tu^.y)<=blizz_r)and(tu^.speed<13)then
                   if(teams)
-                  then inc(ai_uc_a,bweight[tu^.isbuild])
-                  else inc(ai_uc_e,bweight[tu^.isbuild]);
+                  then ai_uc_a+=bweight[tu^.isbuild]
+                  else ai_uc_e+=bweight[tu^.isbuild];
       UID_Engineer:
                 if(ud<150)then
                  if(teams)then
                  begin
-                    if(tu^.uid=UID_Mine)then inc(ai_uc_a,1)
+                    if(tu^.uid=UID_Mine)then ai_uc_a+=1
                  end
-                 else inc(ai_uc_e,1);
+                 else ai_uc_e+=1;
       UID_UCommandCenter:
                 if(ud<sr)then
                  if(tu^.isbuild=false)
                  or((tu^.uid=uid)and(tu^.speed>0)and(upgr[upgr_ucomatt]>0))then
                   if(teams)
-                  then inc(ai_uc_a,1)
-                  else inc(ai_uc_e,1);
+                  then ai_uc_a+=1
+                  else ai_uc_e+=1;
       else
        if(ud<sr)then
         if(teams)
-        then inc(ai_uc_a,1)
-        else inc(ai_uc_e,1);
+        then ai_uc_a+=1
+        else ai_uc_e+=1;
       end;
    end;
 end;
@@ -241,15 +241,26 @@ begin
          if(race=r_hell)then
           case uid of
           UID_HMonastery:
-            if(tu^.uid in demons)and(tu^.buff[ub_advanced]=0)and(upgr[upgr_6bld]>0)and(tu^.isbuild=false)then
+            if(tu^.isbuild=false)then
             begin
-               if(tu^.uid=UID_LostSoul)and(u_e[false,7]>0)then exit;
-               dec(upgr[upgr_6bld],1);
-               tu^.buff[ub_advanced]:=_bufinf;
-               {$IFDEF _FULLGAME}
-               _unit_PowerUpEff(uc,snd_hupgr);
-               {$ENDIF}
-            end;
+               if(tu^.uid in demons)and(tu^.buff[ub_advanced]=0)and(upgr[upgr_6bld]>0)then
+               begin
+                  if(tu^.uid=UID_LostSoul)and(u_e[false,7]>0)then exit;
+                  upgr[upgr_6bld]-=1;
+                  tu^.buff[ub_advanced]:=_bufinf;
+                  {$IFDEF _FULLGAME}
+                  _unit_PowerUpEff(uc,snd_hupgr);
+                  {$ENDIF}
+               end;
+            end
+            else
+             if(rld<=0)and(tu^.buff[ub_pboost]<=0)and(upgr[upgr_boost]>0)then
+              if(tu^.ucl=1)or(tu^.ucl=3)then
+               if(tu^.rld>boost_time)then
+               begin
+                  tu^.buff[ub_pboost]:=boost_time;
+                  rld:=boost_rld;
+               end;
 
           UID_HAltar:
             if(tu^.buff[ub_invuln]=0)and(upgr[upgr_hinvuln]>0)and(tu^.isbuild=false)then
@@ -257,12 +268,23 @@ begin
             begin
                if(u_c[false]>10)then
                 if(tu^.ucl<2)or(tu^.uid in [UID_Pain,UID_ZFormer])then exit;
-               dec(upgr[upgr_hinvuln],1);
+               upgr[upgr_hinvuln]-=1;
                tu^.buff[ub_invuln]:=hinvuln_time;
                {$IFDEF _FULLGAME}
                _unit_PowerUpEff(uc,snd_hpower);
                {$ENDIF}
             end;
+          end;
+         if(race=r_uac)then
+          case uid of
+          UID_UVehicleFactory:
+             if(tu^.isbuild)and(rld<=0)and(tu^.buff[ub_pboost]<=0)and(upgr[upgr_boost]>0)then
+              if(tu^.ucl=1)or(tu^.ucl=3)then
+               if(tu^.rld>boost_time)then
+               begin
+                  tu^.buff[ub_pboost]:=boost_time;
+                  rld:=boost_rld;
+               end;
           end;
       end;
    end;
@@ -279,22 +301,6 @@ begin
    end;
 end;
 
-{function ai_CheckUpgrs(pl:byte):byte;
-var i:byte;
-begin
-   ai_CheckUpgrs:=0;
-
-   with _players[pl] do
-    for i:=0 to MaxUpgrs do
-     if(g_addon=false)and(i>=upgr_2tier)
-     then break
-     else
-       if(upgrade_mfrg[race,i])
-       then inc(ai_CheckUpgrs,upgrade_cnt[race,i])
-       else
-        if(upgr[i]<ai_upgrlvl(pl,i))then inc(ai_CheckUpgrs,1);
-end;  }
-
 function _ai_get_max_enrg(pl:byte;rrr:boolean):byte;
 begin
    with _players[pl] do
@@ -308,8 +314,8 @@ begin
       5  : _ai_get_max_enrg:=95;
       else _ai_get_max_enrg:=110;
       end;
-      if(g_mode in [gm_3fort,gm_2fort,gm_inv])then inc(_ai_get_max_enrg,10);
-      if(rrr)then inc(_ai_get_max_enrg,4);
+      if(g_mode in [gm_3fort,gm_2fort,gm_inv])then _ai_get_max_enrg+=10;
+      if(rrr)then _ai_get_max_enrg+=4;
    end;
 end;
 
@@ -378,7 +384,7 @@ begin
             then set_bld(Com,6+g_startb)
             else set_bld(Com,7);
             set_bld(Bar,8);
-            if(upgr[upgr_2tier]>0)then set_bld(X8,1);
+            if(upgr[upgr_boost]>0)then set_bld(X8,1);
             set_bld(Com,4);
             set_bld(Bar,5);
             if(u_eb[true,0]>0)then set_bld(Gen,30);
@@ -393,6 +399,8 @@ begin
          begin
             set_bld(Bar,1);
             set_bld(Gen,11+ai_skill);
+            //if(g_mode=gm_2fort)then
+            if(2<u_eb[true,0])and(u_eb[true,0]<8)then set_bld(Com,(menerg+4) shr 3);
          end
          else
          begin
@@ -400,10 +408,6 @@ begin
             set_bld(Gen,7+ai_skill);
             set_bld(Bar,1);
          end;
-         //set_bld(Gen,4+ai_skill);
-         //set_bld(Bar,1);
-         //if(G_step<=vid_2fps)then
-         // if(bp>3)then set_bld(Gen,4+ai_skill);
          if(alrm)then set_bld(Tw1,15);
       end;
    end;
@@ -633,11 +637,11 @@ begin
          if(u=ubx[3])then
           case race of
           r_hell: begin
-                     if(g_addon)then _unit_supgrade(u,upgr_2tier);
+                     _unit_supgrade(u,upgr_boost);
                      if(u_eb[true,6]>0)then _unit_supgrade(u,upgr_6bld);
                   end;
-          r_uac : if(g_addon)and(random(2)=0)
-                  then _unit_supgrade(u,upgr_2tier)
+          r_uac : if(random(2)=0)
+                  then _unit_supgrade(u,upgr_boost)
                   else _unit_supgrade(u,upgr_6bld );
           end;
          if(race=r_uac)then _unit_supgrade(u,upgr_plsmt);
@@ -778,6 +782,20 @@ begin
      end;
 end;
 
+function ai_CCAlarm(u:integer):boolean;
+begin
+   ai_CCAlarm:=true;
+   with _units[u] do
+   begin
+      if(alrm_r<=sr)then
+       if(hits<1500)or(ai_uc_e>5)or(ai_uc_a<3)then exit;
+      if(g_mode=gm_royl)and(_check_royal_r(x,y,base_rr))then exit;
+      with _players[player] do
+       if(ai_skill>=4)and(upgr[upgr_ucomatt]>0)and(u=ubx[0])and(u_eb[true,0]>10)then exit;
+   end;
+   ai_CCAlarm:=false;
+end;
+
 procedure ai_buildactions(u:integer);
 const maxb = 25;
       maxt = 20;
@@ -794,8 +812,8 @@ begin
       0,1 : blds[0]:=1;
       2   : blds[0]:=3;
       3   : blds[0]:=8;
-      4   : blds[0]:=12;
-      else  blds[0]:=16;
+      4   : blds[0]:=13;
+      else  blds[0]:=17;
       end;
       blds[1 ]:=min2(max2(1,(menerg div 10)+u_e[true,0]-u_e[true,3]),maxb);
 
@@ -816,9 +834,13 @@ begin
 
       twrs:=u_eb[true,4]+u_eb[true,7]+u_eb[true,10];
 
-      if(ai_skill>2)then
+      if(ai_skill>1)then
       case uid of
        UID_URadar    : if(ai_apcd<32000)then _unit_uradar(u);
+      end;
+
+      if(ai_skill>2)then
+      case uid of
        UID_HTotem    : if(upgr[upgr_b478tel]>0)then
                        begin
                           if(g_mode=gm_royl)and(_check_royal_r(x,y,base_r))then
@@ -865,12 +887,12 @@ begin
                        end;
        UID_HEye      : begin
                           if(alrm_r<base_r)then rld_a:=vid_fps;
-                          if(rld_a>0)then dec(rld_a,1);
+                          if(rld_a>0)then rld_a-=1;
                           if(rld_a<=0)or(ai_uc_a>2)or(alrm_r>base_rr)then _unit_kill(u,false,false);
                        end;
        UID_Mine      : begin
                           if(alrm_r<base_r)then rld_a:=vid_fps;
-                          if(rld_a>0)then dec(rld_a,1);
+                          if(rld_a>0)then rld_a-=1;
                           if(rld_a<=0)then _unit_kill(u,false,false);
                        end;
       end;
@@ -900,50 +922,18 @@ begin
 
       UID_UCommandCenter:
                   begin
-                     case order of
-                     4,
-                     0  : if(g_mode=gm_royl)then
-                          begin
-                             if(_check_royal_r(x,y,base_rr))then order:=7;
-                          end
-                          else
-                            if(order=0)then
-                             if(u_e[isbuild,ucl]> 12)
-                             then order:=5
-                             else order:=4;
-                     5  : if(u_e[isbuild,ucl]<=12)or(upgr[upgr_ucomatt]=0)then order:=6;
-                     6  : if(u_e[isbuild,ucl]> 12)then order:=5;
-                     else
-                     end;
+                     if(speed<=0)and(ai_CCAlarm(u))then _unit_action(u) ;
 
-                     case order of
-                      6,
-                      4: begin
-                            if(hits<1500)or(ai_uc_e>5)or(ai_uc_a<3)then
-                             if(alrm_r<=sr)and(speed=0)then _unit_action(u);
+                     if(speed>0)then
+                      if(upgr[upgr_ucomatt]>0)and( ((u=ubx[0])and(u_eb[true,0]>10))or(alrm_r<base_rr))
+                      then ai_CCAttack(u)
+                      else
+                        if(g_mode=gm_royl)and(_check_royal_r(x,y,base_3r))
+                        then ai_settar(u,map_cx,map_cx,base_r)
+                        else ai_CCOut(u);
 
-                            if(speed>0)then
-                             if(u_e[isbuild,ucl]>8)and(alrm_r<base_rr)and(upgr[upgr_ucomatt]>0)
-                             then ai_CCAttack(u)
-                             else
-                               if(g_mode=gm_royl)and(_check_royal_r(x,y,base_3r))
-                               then ai_settar(u,map_cx,map_cx,base_r)
-                               else ai_CCOut(u);
-
-                            if(alrm_r>base_rr)and(speed>0)then _unit_action(u);
-                         end;
-                      5: if(speed>0)
-                         then ai_CCAttack(u)
-                         else
-                           if(upgr[upgr_ucomatt]>0)or(g_mode=gm_royl)then _unit_action(u);
-                      7: if(speed<=0)
-                         then _unit_action(u)
-                         else
-                         begin
-                            ai_settar(u,map_cx,map_cx,min2(g_royal_r,base_rr));
-                            if(dist2(map_cx,map_cx,x,y)<(g_royal_r shl 1))then order:=4;
-                         end;
-                      end;
+                     if(alrm_r>base_rr)and(speed>0)then
+                      if(u<>ubx[0])or(u_eb[true,0]<=10)then _unit_action(u);
                   end;
       UID_URocketL:
                   if(rld=0)and(upgr[upgr_blizz]>0)then
@@ -1067,6 +1057,11 @@ begin
       then ai_buildactions(u)
       else
       begin
+         if(ai_skill>3)then
+          case uid of
+          UID_ArchVile: if(alrm_r<base_r){and(ai_uc_a>0)and(rld<rld_a)}then uo_id :=ua_move;
+          end;
+
          {$IFDEF _FULLGAME}
          if(menu_s2=ms2_camp)and(uid=UID_UTransport)then exit;
          {$ENDIF}
@@ -1112,7 +1107,7 @@ begin
                then ai_settar(u,alrm_x,alrm_y,0)
                else
                  if(g_mode=gm_ct)and(ai_pt>0)
-                 then with g_ct_pl[ai_pt] do ai_settar(u,px,py,base_r)
+                 then with g_cpoints[ai_pt] do ai_settar(u,px,py,base_r)
                  else
                    if(order<>3)
                    then ai_settar(u,ai_bx,ai_by,base_r)
@@ -1128,7 +1123,7 @@ begin
               3: if(ai_target(u))then order:=2;
               else
                  if(g_mode=gm_ct)and(ai_pt>0)
-                 then with g_ct_pl[ai_pt] do ai_settar(u,px,py,base_r)
+                 then with g_cpoints[ai_pt] do ai_settar(u,px,py,base_r)
                  else
                    if(ai_bx>0)
                    then ai_settar(u,ai_bx,ai_by,base_r)
@@ -1143,9 +1138,17 @@ begin
          UID_ZMajor: if(uf=uf_ground)then _unit_action(u);
          end;
 
+         if(ai_skill>1)then
+          case uid of
+            UID_LostSoul:
+                         if(u_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)
+                         then _unit_kill(u,false,false)
+                         else
+                           if(alrm_r<180)and(ai_uc_a<2)then _unit_action(u);
+          end;
+
          if(ai_skill>2)then
-         begin
-            case uid of
+          case uid of
             UID_FAPC: ai_outalrm(u,250,false);
             UID_APC : ai_outalrm(u,225,false);
             UID_Engineer,
@@ -1155,22 +1158,15 @@ begin
                          if(uid=UID_Engineer)and(ai_uc_a<1)then _unit_action(u);
                       end;
             UID_ArchVile:
-                      if(melee=false)then ai_outalrm(u,base_r,false);
+                      if(melee=false)then ai_outalrm(u,ar,false);
             UID_Revenant: ai_outalrm(u,sr,false);
-            UID_LostSoul:
-                      begin
-                         if(u_e[false,0]>10)and(alrm_r=32000)and(g_mode=gm_inv)
-                         then _unit_kill(u,false,false)
-                         else
-                           if(alrm_r<180)and(ai_uc_a<2)then _unit_action(u);
-                      end;
+
             UID_Pain :if(ai_skill>4)then
                       begin
                          if(alrm_r<32000)then _unit_action(u);
                          ai_outalrm(u,base_rr,false);
                       end;
-            end;
-         end;
+          end;
 
          if(race=r_hell)and(alrm_x>0)then ai_useteleport(u);
 

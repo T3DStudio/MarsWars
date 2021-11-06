@@ -206,15 +206,6 @@ EID_db_u1         : _setEff(0 ,0 ,0  ,dead_time,false,0 );
    end;
 end;
 
-procedure _unit_bullet_puff(tu:PTUnit);
-begin
-   with tu^ do
-    with uid^ do
-     if(_ismech)
-     then _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),_depth(vy+1,uf),MID_Bullet)
-     else _effect_add(x-_randomr(_missile_r),y-_randomr(_missile_r),_depth(vy+1,uf),EID_Blood );
-end;
-
 {
 ms_smodel    : PTMWSModel;
 ms_eid_fly_st: integer;
@@ -239,33 +230,27 @@ homing   : boolean;
 }
 
 procedure _missile_explode_effect(m:integer);
+var i,o,r:byte;
 begin
    with _missiles[m] do
    with _mids[mid] do
+   if(_PointInScreen2(vx,vy,@_players[player]))then
    begin
-      if(_PointInScreen2(vx,vy,@_players[player]))then
+      o:=ms_eid_death_cnt[ms_eid_bio_death];
+      r:=ms_eid_death_r  [ms_eid_bio_death];
+      if(r<2)or(o<2)then
       begin
-         if(ms_bullet_death=false)
-         then _effect_add(vx,vy,_depth(vy,mfs),mid)
-         else
-         begin
-            sr:=trunc(sr*0.75);
-            if(mtars>10)then mtars:=10;
-            while(mtars>0)do
-            begin
-               _effect_add(vx-_randomr(sr),vy-_randomr(sr),_depth(vy,mfs),mid);
-               mtars-=1;
-            end;
-         end;
-
-         //if(ms_eid_death>0)then _effect_add(vx,vy,vy+map_flydpth[mf],ms_eid_death);
-         if(ms_eid_decal>0)then _effect_add(vx,vy,-6                ,ms_eid_decal);
-
-         if(ms_snd_death_ch>0)then
-          if(random(ms_snd_death_ch)>0)then exit;
-
-         PlaySND(ms_snd_death,nil,nil);
+         r:=0;
+         o:=1;
       end;
+      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_depth(vy,mfs),ms_eid_death[ms_eid_bio_death]);
+
+      if(ms_eid_decal>0)then _effect_add(vx,vy,-6,ms_eid_decal);
+
+      if(ms_snd_death_ch[ms_eid_bio_death]>0)then
+       if(random(ms_snd_death_ch[ms_eid_bio_death])>0)then exit;
+
+      PlaySND(ms_snd_death[ms_eid_bio_death],nil,nil);
    end;
 end;
 

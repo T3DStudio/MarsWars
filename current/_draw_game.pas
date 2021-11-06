@@ -340,12 +340,12 @@ begin
         if(hits>0)then
         //if(k_shift>1)then
         begin
-           circleColor(r_screen,ix,iy,_r  ,c_gray);
-           circleColor(r_screen,ix,iy,srange,c_white);
-           if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,_PlayerColor(player^.pnum));
+          // circleColor(r_screen,ix,iy,_r  ,c_gray);
+          // circleColor(r_screen,ix,iy,srange,c_white);
+           //if(sel)then lineColor(r_screen,ix,iy,uo_x-vid_vx,uo_y-vid_vy,_PlayerColor(player^.pnum));
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, _PlayerColor(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(shadow) , ta_left,255, _PlayerColor(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(buff[ub_advanced]) , ta_left,255, _PlayerColor(playeri));
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, _PlayerColor(playeri));
 
         end;

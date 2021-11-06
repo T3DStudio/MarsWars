@@ -142,7 +142,7 @@ begin
         UID_HMilitaryUnit
                        : begin spr:=@spr_UMilitaryUnit[3]; alpha:=t*4; end;
         EID_Gavno      : spr:=@spr_eff_g[ea]; // 0 .. 7   63
-        EID_Blood      : begin spr:=@spr_blood[ea]; if(t>15)and(onlyspr=false)then inc(y,1); end;
+        EID_Blood      : begin spr:=@spr_blood[ea]; if(t>15)and(onlyspr=false)then y+=1; end;
         EID_ArchFire   : spr:=@spr_h_p6[ea];
         else
           spr:=@spr_dummy;
@@ -150,11 +150,11 @@ begin
 
         if(onlyspr=false)then
          if(t>0)
-         then dec(t,1)
+         then t-=1
          else
            if(t2>0)then
            begin
-              dec(t2,1);
+              t2-=1;
               if(t2<255)then alpha:=t2;
            end;
 

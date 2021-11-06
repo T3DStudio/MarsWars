@@ -156,6 +156,99 @@ end;
 
 {$ENDIF}
 
+function _canmove(pu:PTUnit):boolean;
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      _canmove:=false;
+
+      if(ServerSide=false)and(speed>0)then
+      begin
+         _canmove:=(x<>uo_bx)or(y<>uo_by);
+         exit;
+      end;
+
+      if(speed<=0)or(buff[ub_stopattack]>0)or(bld=false)then exit;
+
+
+      if(_ukbuilding)then
+        if(buff[ub_clcast]>0)then exit;
+
+      if(_ukmech)then
+        if(buff[ub_gear  ]>0)
+        or(buff[ub_stun  ]>0)then exit;
+
+      if(_ukbio)then
+        if(buff[ub_pain  ]>0)
+        or(buff[ub_cast  ]>0)
+        or(buff[ub_stun  ]>0)
+        or(buff[ub_gear  ]>0)then exit;
+
+      _canmove:=true;
+   end;
+end;
+
+function _canattack(pu:PTUnit):boolean;
+var tu:PTUnit;
+begin
+   _canattack:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(bld=false)or(hits<=0)or(_attack=atm_none)then exit;
+
+      if(_ukbuilding)then
+        if(buff[ub_clcast]>0)then exit;
+
+      if(_ukmech)then
+        if(buff[ub_gear  ]>0)
+        or(buff[ub_stun  ]>0)then exit;
+
+      if(_ukbio)then
+        if(buff[ub_pain  ]>0)
+        or(buff[ub_cast  ]>0)
+        or(buff[ub_stun  ]>0)
+        or(buff[ub_gear  ]>0)then exit;
+
+      case _attack of
+   atm_bunker,
+   atm_always  : if(_IsUnitRange(inapc,@tu))then
+                 begin
+                    if(tu^.inapc>0)then exit;
+                    case tu^.uid^._attack of
+                    atm_always,
+                    atm_none,
+                    atm_sturret: exit;
+                    end;
+                 end;
+   atm_sturret : if(apcc <=0)then exit;
+   atm_inapc   : if(inapc<=0)then exit;
+      else exit;
+      end;
+   end;
+   _canattack:=true;
+end;
+
+function _canability(pu:PTUnit):boolean;
+begin
+   _canability:=false;
+   with pu^     do
+   with uid^    do
+   if(_ability>0)then
+   with player^ do
+   begin
+      if(bld=false)or(hits<=0)then exit;
+
+      if(_ability_rupgr>0)then
+       if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;
+
+      if(_ability_ruid>0)then
+       if(uid_eb[_ability_ruid]<=0)then exit;
+   end;
+   _canability:=true;
+end;
+
 procedure _unit_asapc(pu,apc:PTUnit);
 begin
    pu^.x  :=apc^.x;
@@ -229,6 +322,8 @@ begin
    if(zfall<>0)then
    begin
       st:=sign(zfall);
+      if(x=uo_x)
+     and(y=uo_y)then uo_y+=st;
       zfall-=st;
       y    +=st;
       vy   +=st;
@@ -326,6 +421,8 @@ begin
       _unit_teleport(pu,x0,y0);
    end;
 end;
+
+
 
 procedure _1c_push(tx,ty:pinteger;x0,y0,r0:integer);
 var vx,vy,a:single;
@@ -449,27 +546,25 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-     if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc<=0)then
-     begin
-        o:=tr+_r;
-        d:=dist(x,y,tx,ty);
-        add(x,y,d-o,o);
+      if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc<=0)then
+      begin
+         o:=tr+_r;
+         d:=dist(x,y,tx,ty);
+         add(x,y,d-o,o);
 
-        if(buid>0)then
-        if(_isbuilding)and(bld)and(_isbuilder)and(playeri=pl)then
-        begin
-           if not(buid in uid^.ups_builder)then continue;
-
-           o:=d-srange;
-           if(o<dr)then
-           begin
-              dx:=x;
-              dy:=y;
-              dr:=o;
-              sr:=srange;
-           end;
-        end;
-     end;
+         if(buid>0)then   // ?????????????????????
+          if(isbuildarea)and(bld)and(playeri=pl)then
+          begin
+             o:=d-srange;
+             if(o<dr)then
+             begin
+                dx:=x;
+                dy:=y;
+                dr:=o;
+                sr:=srange;
+             end;
+          end;
+       end;
 
    if(nrd[1]<=-1)
    then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
@@ -488,77 +583,117 @@ begin
    newy^:=ty;
 end;
 
-function _unit_grbcol(tx,ty,tr:integer;pl,buid:byte;doodc:boolean):byte;
+
+function _collisionr(tx,ty,tr,uskip:integer;obstacles:boolean):byte;
 var u,dx,dy:integer;
-   bl:boolean;
 begin
-   if(pl<=MaxPlayers)then
-   begin
-      bl:=false;
-      if(tx<map_b0)or(map_b1<tx)
-      or(ty<map_b0)or(map_b1<ty)then
+   _collisionr:=0;
+
+   for u:=1 to MaxUnits do
+    if(u<>uskip)then
+     with _units[u] do
+      with uid^ do
+       if(hits>0)and(speed<=0)and(uf=uf_ground)and(_IsUnitRange(inapc,nil)=false)then
+        if(dist(x,y,tx,ty)<(tr+_r))then
+        begin
+           _collisionr:=2;
+           exit;
+        end;
+
+   if(g_mode=gm_cptp)then
+    for u:=1 to MaxCPoints do
+     with g_cpoints[u] do
+      if(dist(tx,ty,px,py)<base_r)then
       begin
-         _unit_grbcol:=2;
+         _collisionr:=3;
          exit;
       end;
-   end
-   else bl:=true;
-   _unit_grbcol:=0;
+
+   if(obstacles=false)then exit;
+
+   tr-=bld_dec_mr;
+
+   dx:=tx div dcw;
+   dy:=ty div dcw;
+
+   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
+    with map_dcell[dx,dy] do
+     for u:=0 to n-1 do
+      with l[u]^ do
+       if(r>0)and(t>0)then
+        if(dist(x,y,tx,ty)<(tr+r))then
+        begin
+           _collisionr:=4;
+           exit;
+        end;
+end;
+
+function _InBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
+var u:integer;
+inrange,ebuilder:boolean;
+begin
+   _InBuildArea:=0;
+
+   if(tx<map_b0)or(map_b1<tx)
+   or(ty<map_b0)or(map_b1<ty)then
+   begin
+      _InBuildArea:=2;
+      exit;
+   end;
+
+   tr+=_uids[buid]._r;
+
+   inrange :=false;
+   ebuilder:=false;
 
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-     if(hits>0)and(speed=0)and(uf=uf_ground)and(inapc=0)then
-      if(dist(x,y,tx,ty)<(tr+_r))then
+      if(hits>0)and(_IsUnitRange(inapc,nil)=false)and(bld)and(playeri=pl)then
       begin
-         _unit_grbcol:=1;
-         break;
-      end
-      else
-       if(bl=false)then
-        if(_isbuilding)and(bld)and(_isbuilder)and(playeri=pl)then
-        begin
-           if(buid>0)then
-            if not(buid in uid^.ups_builder)then continue;
-           if(dist(x,y,tx,ty)<srange)then bl:=true;
-        end;
+         if(_isbuilder)and(ebuilder=false)then
+          if(buid in ups_builder)then ebuilder:=true;
 
-   if(_unit_grbcol=0)then
-   begin
-      if(bl=false)and(pl<=MaxPlayers)then
-      begin
-         _unit_grbcol:=2;
-         exit;
-      end;
-
-      if(g_mode=gm_cptp)then
-       for u:=1 to MaxCPoints do
-        with g_cpoints[u] do
-         if(dist(tx,ty,px,py)<base_r)then
+         if(isbuildarea)and(inrange=false)then
          begin
-            _unit_grbcol:=2;
-            exit;
+            if(_ukbuilding)then
+             if(speed>0)or(uf>uf_ground)then continue;
+            if(dist(x,y,tx,ty)<srange)then inrange:=true;
          end;
 
-      if(doodc=false)then exit;
+         if(ebuilder)and(inrange)then break;
+      end;
 
-      tr-=bld_dec_mr;
-
-      dx:=tx div dcw;
-      dy:=ty div dcw;
-
-      if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-      with map_dcell[dx,dy] do
-       for u:=0 to n-1 do
-        with l[u]^ do
-         if(r>0)and(t>0)then
-          if(dist(x,y,tx,ty)<(tr+r))then
-          begin
-             _unit_grbcol:=1;
-             break;
-          end;
-   end;
+   if(ebuilder=false)
+   then _InBuildArea:=1
+   else
+      if(inrange=false)then _InBuildArea:=2;
 end;
+
+function _CheckBuildPlace(tx,ty,tr,uskip:integer;pl,buid:byte;obstacles:boolean):byte;
+var i:byte;
+begin
+   _CheckBuildPlace:=0;
+
+   {
+   0 :  m_brushc:=c_lime;
+   1 :  m_brushc:=c_red;
+   2 :  m_brushc:=c_blue;
+   else m_brushc:=c_gray;
+   }
+
+   i:=_InBuildArea(tx,ty,0,buid,pl);
+   case i of
+   0  : ;
+   2  : begin _CheckBuildPlace:=2;exit;end;
+   else begin _CheckBuildPlace:=3;exit;end;
+   end;
+
+   i:=_collisionr(tx,ty,tr+_uids[buid]._r,uskip,obstacles);
+   if(i>0)then _CheckBuildPlace:=1;
+end;
+
+
 
 procedure _unit_default(pu:PTUnit);
 begin
@@ -647,8 +782,8 @@ begin
    with player^ do
    begin
       if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
-      if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
-      ucl_eb[_isbuilding,_ucl]-=1;
+      if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
+      ucl_eb[_ukbuilding,_ucl]-=1;
       uid_eb[uidi            ]-=1;
       menerg-=_generg;
       cenerg-=_generg;
@@ -663,8 +798,8 @@ begin
    with player^ do
    begin
       if(uid_x[uidi            ]<=0)then uid_x[uidi            ]:=unum;
-      if(ucl_x[_isbuilding,_ucl]<=0)then ucl_x[_isbuilding,_ucl]:=unum;
-      ucl_eb[_isbuilding,_ucl]+=1;
+      if(ucl_x[_ukbuilding,_ucl]<=0)then ucl_x[_ukbuilding,_ucl]:=unum;
+      ucl_eb[_ukbuilding,_ucl]+=1;
       uid_eb[uidi            ]+=1;
       menerg+=_generg;
       cenerg+=_generg;
@@ -679,8 +814,9 @@ begin
    with player^ do
    begin
       army+=1;
-      ucl_e[_isbuilding,_ucl]+=1;
-      ucl_c[_isbuilding     ]+=1;
+      armylimit+=_limituse;
+      ucl_e[_ukbuilding,_ucl]+=1;
+      ucl_c[_ukbuilding     ]+=1;
       uid_e[uidi            ]+=1;
 
       bld:=ubld;
@@ -759,11 +895,11 @@ begin
    end;
 end;
 
-procedure _unit_startb(bx,by:integer;buid,bp:byte);
+procedure _unit_start_build(bx,by:integer;buid,bp:byte);
 begin
-   if(_uid_cndt(@_players[bp],buid)=0)then
+   if(_uid_conditionals(@_players[bp],buid)=0)then
     with _players[bp] do
-     if(_unit_grbcol(bx,by,_uids[buid]._r,bp,buid,true)=0)then
+     if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)then
       _unit_add(bx,by,buid,bp,false,true);
 end;
 
@@ -776,11 +912,12 @@ begin
    if(puid<255)then
     with pu^ do
     with uid^ do
-     if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_isbuilding)then
-      if(puid in ups_units)and(_uid_cndt(pu^.player,puid)=0)then
+     if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_ukbuilding)then
+      if(puid in ups_units)and(_uid_conditionals(pu^.player,puid)=0)then
        with player^ do
        begin
           uproda+=1;
+          uprodl+=_uids[puid]._limituse;
           uprodc[_uids[puid]._ucl]+=1;
           uprodu[ puid           ]+=1;
           cenerg-=_uids[puid]._renerg;
@@ -811,13 +948,14 @@ begin
    _unit_ctraining_p:=false;
    with pu^ do
    with uid^ do
-    if(uprod_r[pn]>0)and(bld)and(_isbarrack)and(_isbuilding)then
+    if(uprod_r[pn]>0)and(bld)and(_isbarrack)and(_ukbuilding)then
      if(puid=255)or(puid=uprod_u[pn])then
       with player^ do
       begin
          puid:=uprod_u[pn];
 
          uproda-=1;
+         uprodl-=_uids[puid]._limituse;
          uprodc[_uids[puid]._ucl]-=1;
          uprodu[ puid           ]-=1;
          cenerg+=_uids[puid]._renerg;
@@ -846,8 +984,8 @@ begin
    if(upid<255)then
     with pu^ do
     with uid^ do
-     if(pprod_r[pn]=0)and(bld)and(_issmith)and(_isbuilding)then
-      if(_upid_cndt(player,upid)=0)then
+     if(pprod_r[pn]=0)and(bld)and(_issmith)and(_ukbuilding)then
+      if(_upid_conditionals(player,upid)=0)then
        with player^ do
        with _upids[upid] do
        begin
@@ -880,7 +1018,7 @@ begin
    _unit_cupgrade_p:=false;
    with pu^ do
    with uid^ do
-    if(pprod_r[pn]>0)and(bld)and(_issmith)and(_isbuilding)then
+    if(pprod_r[pn]>0)and(bld)and(_issmith)and(_ukbuilding)then
      if(upid=255)or(upid=pprod_u[pn])then
       with player^ do
       begin
@@ -911,8 +1049,8 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [_isbuilding,_ucl]+=1;
-      ucl_cs[_isbuilding     ]+=1;
+      ucl_s [_ukbuilding,_ucl]+=1;
+      ucl_cs[_ukbuilding     ]+=1;
       uid_s [uidi            ]+=1;
       if(_isbuilder)then s_builders+=1;
       if(_isbarrack)then s_barracks+=1;
@@ -925,8 +1063,8 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [_isbuilding,_ucl]-=1;
-      ucl_cs[_isbuilding     ]-=1;
+      ucl_s [_ukbuilding,_ucl]-=1;
+      ucl_cs[_ukbuilding     ]-=1;
       uid_s [uidi            ]-=1;
       if(_isbuilder)then s_builders-=1;
       if(_isbarrack)then s_barracks-=1;
@@ -958,7 +1096,7 @@ begin
          _unit_ctraining(pu,255);
          _unit_cupgrade (pu,255);
 
-         ucl_eb[_isbuilding,_ucl]-=1;
+         ucl_eb[_ukbuilding,_ucl]-=1;
          uid_eb[uidi            ]-=1;
          menerg-=_generg;
          cenerg-=_generg;
@@ -966,7 +1104,7 @@ begin
          _unit_done_dec_cntrs(pu);
       end;
 
-      if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
+      if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
       if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
    end;
 end;
@@ -977,9 +1115,10 @@ begin
    with uid^ do
    with player^ do
    begin
-      army-=1;
-      ucl_e[_isbuilding,_ucl]-=1;
-      ucl_c[_isbuilding     ]-=1;
+      army     -=1;
+      armylimit-=_limituse;
+      ucl_e[_ukbuilding,_ucl]-=1;
+      ucl_c[_ukbuilding     ]-=1;
       uid_e[uidi            ]-=1;
    end;
 end;
@@ -1035,7 +1174,8 @@ begin
    begin
        _uid:=uprod_u[i];
 
-      if((army+uproda)>MaxPlayerUnits)
+      if((army     +uproda)>MaxPlayerUnits)
+      or((armylimit+uprodl)>MaxPlayerLimit)
       or(cenerg<0)
       or(uid_e[_uid]>=_uids[_uid]._max)
       or(uid_e[_uid]>=a_units[_uid])
@@ -1087,7 +1227,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      if((army+uproda)>=MaxPlayerUnits)
+      if(_uid_player_limit(player,auid))
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
@@ -1219,10 +1359,39 @@ uab_radar: begin
            end;
 uab_uac__unit_adv:
            if(upgr[upgr_uac_6bld]>0)then buff[ub_advanced]:=_ub_infinity;
+uab_CCFly:
+           if(buff[ub_advanced]>0)then
+           begin
+              if(uf<>flyCC_floor)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 PlaySND(snd_CCup ,pu,nil);
+                 {$ENDIF}
+                 uf   :=flyCC_floor;
+                 zfall:=-fly_height[uf];
+              end;
+              speed:=_speed;
+           end
+           else
+           begin
+              if(uf<>uf_ground)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 PlaySND(snd_inapc,pu,nil);
+                 {$ENDIF}
+                 zfall:=fly_height[uf];
+                 uf   :=uf_ground;
+              end;
+              speed:=0;
+
+              if(zfall<>0)then
+               if(_collisionr(x,y+zfall,_r,unum,true)>0)then buff[ub_advanced]:=_ub_infinity;
+           end;
       end;
 
       // DETECTION
       case uidi of
+UID_UMine,
 UID_HEye: buff[ub_detect]:=b2ib[upgr[upgr_hell_heye]>0];
       end;
 
@@ -1281,17 +1450,10 @@ UID_ZMajor:
               uf   :=uf_ground;
               speed:=_speed;
            end;
-UID_HCommandCenter,
-UID_UCommandCenter:
-           if(buff[ub_advanced]>0)then
-           begin
-              speed:=_speed;
-           end
-           else
-           begin
-              speed:=0;
-           end;
+UID_HSymbol: isbuildarea:=true;
       end;
+      if(_isbuilder)then isbuildarea:=true;
+
 
       // SRANGE
       if(_upgr_srange>0)and(_upgr_srange_step>0)then
@@ -1305,7 +1467,7 @@ UID_UCommandCenter:
             {$ENDIF}
          end;
       end;
-      case uid of
+      case uidi of
 UID_Major,
 UID_ZMajor,
 UID_ZCommando:
@@ -1328,12 +1490,14 @@ UID_ZCommando:
       if(ServerSide)then
       if(uclord=_uregen_c)then
       begin
-         if(_isbuilding)
+         if(_ukbuilding)
          then i:= upgr[upgr_race_build_regen[_urace]]
          else
-          if(_ismech)
+          if(_ukmech)
           then i:= upgr[upgr_race_mech_regen[_urace]]
-          else i:= upgr[upgr_race_bio_regen [_urace]];
+          else
+            if(_ukbio)
+            then i:= upgr[upgr_race_bio_regen [_urace]];
 
          if(i>0)then hits:=min2(hits+i,_mhits);
       end;

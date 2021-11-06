@@ -101,13 +101,13 @@ begin
           break;
        end
        else tr:=8;
-    8: if(tr in bblds)and(u_e[true,tr]=0)then   // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
+    8: if(tr in bblds)and(u_e[true,tr]=0)then   // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_boost))
        begin
           _cmp_chucl:=tr;
           break;
        end
        else
-         if((i mod 2)=0)                        // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_2tier))
+         if((i mod 2)=0)                        // and(u_e[true,6]>0)and(_bc_g(c_upgr,upgr_boost))
          then tr:=7
          else tr:=4;
     4: if(tr in bblds)and(u_e[true,tr]<twc)then

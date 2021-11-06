@@ -345,7 +345,7 @@ begin
                           if(G_Paused=0)then _rclinet_gframe(0,true);
 
                           if (_rpls_step>1)then _effectsCycle(false,false);
-                          dec(_rpls_step,1);
+                          _rpls_step-=1;
                        end;
                        _rpls_step:=1;
 
@@ -382,7 +382,7 @@ begin
        delete(s,length(s)-3,4);
        if(s<>'')then
        begin
-          inc(_rpls_ln,1);
+          _rpls_ln+=1;
           setlength(_rpls_l,_rpls_ln);
           _rpls_l[_rpls_ln-1]:=s;
        end;

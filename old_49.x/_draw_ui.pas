@@ -10,7 +10,7 @@ begin
         if(ab)
         then RectangleColor(_minimap,ax-r,ay-r,ax+r,ay+r, c_white)
         else CircleColor   (_minimap,ax  ,ay  ,r,c_white);
-        dec(at,1);
+        at-=1;
      end;
 end;
 
@@ -37,8 +37,8 @@ begin
       sy :=cl2uid[race,true,m_sbuild];
       u  :=@_ulst[sy];
 
-      dec(m_brushx,vid_vx);
-      dec(m_brushy,vid_vy);
+      m_brushx-=vid_vx;
+      m_brushy-=vid_vy;
 
       spr:=_unit_spr(u);
       SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,128);
@@ -53,15 +53,15 @@ begin
 
       if(m_sbuild in [4,7,10])then circleColor(_screen,m_brushx,m_brushy,towers_sr[upgr[upgr_towers]],c_gray);
 
-      inc(m_brushx,vid_vx);
-      inc(m_brushy,vid_vy);
+      m_brushx+=vid_vx;
+      m_brushy+=vid_vy;
 
       for i:=0 to _uts do
        if(ui_bldrs_x[i]<>0)then circleColor(_screen,ui_bldrs_x[i]-vid_vx,ui_bldrs_y[i]-vid_vy,ui_bldrs_r[i],c_white);
 
       if(g_mode=gm_ct)then
-       for i:=1 to MaxPlayers do
-        with g_ct_pl[i] do circleColor(_screen,px-vid_vx,py-vid_vy,base_r,c_blue);
+       for i:=1 to MaxCapturePoints do
+        with g_cpoints[i] do circleColor(_screen,px-vid_vx,py-vid_vy,base_r,c_blue);
 
       rectangleColor(_screen,build_b-vid_vx,build_b-vid_vy,map_b1-vid_vx,map_b1-vid_vy,c_white);
    end;
@@ -88,7 +88,7 @@ begin
              if(y0=-1)then y0:=y+4;
              if((n mod rown)=0)then
              begin
-                if(n>0)then inc(y,vid_oisw);
+                if(n>0)then y+=vid_oisw;
                 x:=vid_mw-vid_oips;
              end;
              with _players[HPlayer] do
@@ -101,14 +101,14 @@ begin
                 _draw_surf(_screen,x,y,spr_ui_oico[race,b,c]);
              end;
 
-             dec(x,vid_oisw);
-             inc(n,1);
+             x-=vid_oisw;
+             n+=1;
           end;
       end;
       if(y0=-1)then y0:=y+4;
       _draw_text(_screen,vid_mw,y0   ,b2s(i)      ,ta_right,255,c_white);
       _draw_text(_screen,vid_mw,y0+10,i2s(ordn[i]),ta_right,255,c_gray);
-      inc(y,vid_oihw);
+      y+=vid_oihw;
    end;
    _draw_text(_screen,vid_mw-4,2,str_orders,ta_right,255,c_white);
 end;
@@ -233,8 +233,9 @@ begin
                      else _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[5]].rld),'',0,0,0,0,c_aqua,0);
                6 : if(ubx[6]>0)then
                     case race of
-                    r_hell: if(upgr[upgr_6bld]   >0)then _drawBtnt(_uipanel,ux,uy,'','','','',b2s(upgr[upgr_6bld])   ,'',0,0,0,0,c_red ,0);
-                    r_uac : if(_units[ubx[6]].rld>0)then _drawBtnt(_uipanel,ux,uy,'','','','',r2s(_units[ubx[6]].rld),'',0,0,0,0,c_aqua,0);
+                    r_hell: if(upgr[upgr_6bld]   >0)
+                            or(_units[ubx[6]].rld>0)then _drawBtnt(_uipanel,ux,uy,'',b2s(upgr[upgr_6bld]),'','',r2s(_units[ubx[6]].rld),'',0,c_red,0,0,c_aqua,0);
+                    r_uac : if(_units[ubx[6]].rld>0)then _drawBtnt(_uipanel,ux,uy,'',''                  ,'','',r2s(_units[ubx[6]].rld),'',0,0    ,0,0,c_aqua,0);
                     end;
                8 : if(ubx[8]>0)then
                     case race of
@@ -276,7 +277,7 @@ begin
             for ui:=0 to MaxUpgrs do
             begin
                if(_bc_g(a_upgr,ui)=false)then continue;
-               if((G_addon=false)and(ui>=upgr_2tier))then break;
+               if((G_addon=false)and(ui>upgr_boost))then break;
 
                ux:=(ui mod 3);
                uy:=(ui div 3);
@@ -310,11 +311,11 @@ begin
                else _drawBtnt(_uipanel,ux,uy,_players[ui].name,'','','','','',plcolor[ui],0,0,0,0,0);
                _drawBtn(_uipanel,ux,uy,_dsurf,ui=HPlayer,_players[ui].army=0);
 
-               inc(ux,1);
+               ux+=1;
                if(ux>2)then
                begin
                   ux:=0;
-                  inc(uy,1);
+                  uy+=1;
                end;
             end;
          end
@@ -395,7 +396,7 @@ begin
                   if(i<=MaxUpgrs)then
                   begin
                      if(_bc_g(a_upgr,i)=false)then exit;
-                     if(g_addon=false)and(i>=upgr_2tier)then exit;
+                     if(g_addon=false)and(i>upgr_boost)then exit;
                   end;
                   _draw_text(_screen,ui_textx,vid_mh-30,str_up_hint[i+(race*_uts)],ta_left,255,c_white);
                end;
@@ -426,7 +427,7 @@ begin
      if(net_chat_shlm>0)then
      begin
         _draw_text(_screen,ui_textx,vid_mh-60,net_chat[HPlayer,0],ta_left,255,c_white);
-        dec(net_chat_shlm,1);
+        net_chat_shlm-=1;
      end;
 
    D_hints;

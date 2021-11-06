@@ -147,8 +147,8 @@ end;
 procedure g_menu;
 var p:byte;
 begin
-   dec(m_vx,mv_x);
-   dec(m_vy,mv_y);
+   m_vx-=mv_x;
+   m_vy-=mv_y;
 
    if(k_ml=2)or(k_mr=2) then   //right or left click
    begin
@@ -303,7 +303,7 @@ begin
                if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
                begin
-                  inc(race,1);
+                  race+=1;
                   race:=race mod 3;
                   mrace:=race;
                end;
@@ -314,7 +314,7 @@ begin
               with _players[p] do
                if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
-                if(team<MaxPlayers)then inc(team,1);
+                if(team<MaxPlayers)then team+=1;
            end;
 
       // CAMP SCIRMISH MULTIPLAY
@@ -326,13 +326,13 @@ begin
       75 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
       76 : if(net_nstat<>ns_clnt)and(not G_Started)then
            begin
-              inc(g_mode,1);
+              g_mode+=1;
               g_mode:=g_mode mod 6;
               Map_premap;
            end;
       77 : if(net_nstat<>ns_clnt)and(not G_Started)then
            begin
-              inc(g_startb,1);
+              g_startb+=1;
               if(g_startb>5)then g_startb:=0;
            end;
       78 : if(net_nstat<>ns_clnt)and(not G_Started)then begin g_shpos:=not g_shpos; _makeMMB; end;
@@ -407,7 +407,7 @@ begin
             then _scrollV(@PlayerTeam,1,1,MaxPlayers)
             else
               if(m_vx<ui_menu_csm_x3)
-              then begin inc(PlayerRace,1); PlayerRace:=PlayerRace mod 3;end
+              then begin PlayerRace+=1; PlayerRace:=PlayerRace mod 3;end
               else PlayerReady:=not PlayerReady;
       93 : if(m_vx<ui_menu_csm_xc)
            then begin if(G_Started=false)then PlayerObs:=not PlayerObs;end
@@ -463,12 +463,12 @@ begin
               with _players[p] do
                if(observer=false)then
                if(state=ps_comp)or(p=HPlayer)then
-                if(team>1)then dec(team,1);
+                if(team>1)then team-=1;
            end;
       77 : if(net_nstat<>ns_clnt)and(not G_Started)then
            begin
               if(g_startb>0)
-              then dec(g_startb,1)
+              then g_startb-=1
               else g_startb:=5;
            end;
 
@@ -510,8 +510,8 @@ begin
    end;
 
 
-   inc(m_vx,mv_x);
-   inc(m_vy,mv_y);
+   m_vx+=mv_x;
+   m_vy+=mv_y;
 
 
    if(net_nstat<>ns_clnt)then

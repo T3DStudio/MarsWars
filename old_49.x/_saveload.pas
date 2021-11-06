@@ -120,7 +120,7 @@ begin
        delete(s,length(s)-3,4);
        if(s<>'')then
        begin
-          inc(_svld_ln,1);
+          _svld_ln+=1;
           setlength(_svld_l,_svld_ln);
           _svld_l[_svld_ln-1]:=s;
        end;
@@ -215,7 +215,7 @@ begin
    BlockWrite(f,g_inv_wn   ,SizeOf(g_inv_wn ));
    BlockWrite(f,g_inv_t    ,SizeOf(g_inv_t  ));
    BlockWrite(f,g_inv_wt   ,SizeOf(g_inv_wt ));
-   BlockWrite(f,g_ct_pl    ,SizeOf(g_ct_pl  ));
+   BlockWrite(f,g_cpoints  ,SizeOf(g_cpoints));
    BlockWrite(f,g_royal_r  ,SizeOf(g_royal_r));
    BlockWrite(f,_uclord_c  ,SizeOf(_uclord_c));
    BlockWrite(f,_uregen_c  ,SizeOf(_uregen_c));
@@ -286,7 +286,7 @@ begin
          BlockRead(f,g_inv_wn   ,SizeOf(g_inv_wn ));
          BlockRead(f,g_inv_t    ,SizeOf(g_inv_t  ));
          BlockRead(f,g_inv_wt   ,SizeOf(g_inv_wt ));
-         BlockRead(f,g_ct_pl    ,SizeOf(g_ct_pl  ));
+         BlockRead(f,g_cpoints  ,SizeOf(g_cpoints));
          BlockRead(f,g_royal_r  ,SizeOf(g_royal_r));
          BlockRead(f,_uclord_c  ,SizeOf(_uclord_c));
          BlockRead(f,_uregen_c  ,SizeOf(_uregen_c));

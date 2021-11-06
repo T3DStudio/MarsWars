@@ -355,7 +355,7 @@ begin
    if(o_id>0)and(army>0)then
    begin
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_startb(o_x0,o_y0,o_x1,pl);
+uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
       else
          scnt :=0;
          scntm:=MaxPlayerUnits;

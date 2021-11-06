@@ -39,7 +39,7 @@ begin
    begin
       if(G_started)and(snd_mls>1)then
       begin
-         inc(snd_curm,1);
+         snd_curm+=1;
          if(snd_curm>=snd_mls)then snd_curm:=1;
       end else snd_curm:=0;
       PlayMSC(snd_ml[snd_curm]);
@@ -82,7 +82,7 @@ begin
        begin
           setlength(snd_ml,snd_mls+1);
           snd_ml[snd_mls]:=loadMSC(s);
-          Inc(snd_mls,1);
+          snd_mls+=1;
        end;
     until (FindNext(info)<>0);
    FindClose(info);

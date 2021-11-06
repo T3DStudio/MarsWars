@@ -77,7 +77,7 @@ begin
         if(_RectInScreen(x+ox,y+oy,spr^.hw,spr^.hh,0))then
         begin
            _sl_add_dec(x,y,dpth,shh,spr,255,ro,ox,oy);
-           if(pspr<>nil)then _sl_add_dec(x,y,-10000,-32000,pspr,255,ro,ox,oy);
+           if(pspr<>nil)then _sl_add_dec(x,y,-20000,-32000,pspr,255,ro,ox,oy);
         end;
      end;
 end;
@@ -103,7 +103,7 @@ begin
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4: begin
-                         dpth := -5;
+                         dpth := -10000;
                          mmc  := theme_liquid_color;
                          animn:= t;
                          pspr := @spr_liquidb[animn];
@@ -117,7 +117,7 @@ begin
                          _dds_anim(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
                       end;
         DID_other  :  begin
-                         shh  := 1;
+                         shh  := 0;
                          mmc  := c_gray;
                          _dds_anim(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
                       end;

@@ -101,11 +101,11 @@ begin
    _lcu:=0;
    while(_lcu<MaxUnits)do
    begin
-      inc(_lcu,1);
+      _lcu+=1;
       _units[_lcu].hits:=dead_hits;
    end;
 
-   FillChar(g_ct_pl  ,SizeOf(g_ct_pl),  0);
+   FillChar(g_cpoints  ,SizeOf(g_cpoints),  0);
 
    DefPlayers;
 
@@ -179,7 +179,7 @@ begin
    with _players[p] do
     if(state=PS_Comp)then
      begin
-        inc(ai_skill,1);
+        ai_skill+=1;
         if(ai_skill>8)then ai_skill:=1;
         name:=ai_name(ai_skill);
      end;
@@ -204,11 +204,11 @@ begin
              solid:=false;
           end;
        end;
-       inc(y,100);
+       y+=100;
        if(y>map_mw)then
        begin
           y:=100;
-          inc(x,100);
+          x+=100;
        end;
     end;
 end;
@@ -236,7 +236,7 @@ begin
 
          _unit_add(xs,ys,uid,pl,true);
 
-         inc(d,ds);
+         d+=ds;
       end;
    end;
 end;
@@ -554,23 +554,23 @@ uo_build   : _unit_startb(o_x0,o_y0,o_x1,pl);
 
                    if(psel=false)then
                    begin
-                      inc(u_s [isbuild,ucl],1);
-                      inc(u_cs[isbuild],1);
+                      u_s [isbuild,ucl]+=1;
+                      u_cs[isbuild    ]+=1;
                    end;
-                   inc(scnt,1);
+                   scnt+=1;
                 end
                 else
                 begin
                    if(psel=true)then
                    begin
-                      dec(u_s [isbuild,ucl],1);
-                      dec(u_cs[isbuild],1);
+                      u_s [isbuild,ucl]-=1;
+                      u_cs[isbuild    ]-=1;
                    end;
                    if(o_id=uo_setorder)and(order=o_x0)then order:=0;
                 end;
              end;
 
-            inc(u,cstep);
+            u+=cstep;
          end;
 
          if(o_id in [uo_select,uo_aselect])then
@@ -592,7 +592,7 @@ begin
         begin
            if (ttl<ClientTTL)then
            begin
-              Inc(ttl,1);
+              ttl+=1;
               if(ttl=ClientTTL)or(ttl=vid_fps)then vid_mredraw:=true;
            end
            else
@@ -608,7 +608,7 @@ begin
         begin
            _u_ord(p);
 
-           if(bld_r>0)then dec(bld_r,1);
+           if(bld_r>0)then bld_r-=1;
         end;
      end;
 
@@ -627,7 +627,7 @@ begin
          G_WTeam:=255;
          for p:=0 to MaxPlayers do
           with _players[p] do
-           if(state>ps_none)then inc(team_army[team],army);
+           if(state>ps_none)then team_army[team]+=army;
 
          {$IFDEF _FULLGAME}
          if(menu_s2=ms2_camp)
@@ -666,12 +666,12 @@ begin
    a:=0;
    for i:=1 to MaxPlayers do
     with _players[i] do
-    if(state=ps_play)and(army>0)then inc(a,u_c[false]);
+    if(state=ps_play)and(army>0)then a+=u_c[false];
 
-   dec(g_inv_t, g_inv_wn*vid_fps*2);
-   dec(g_inv_t,(a div 10)*vid_fps);
-   dec(g_inv_t, ((map_mw-MaxSMapW) div 100)*vid_fps);
-   dec(g_inv_t, g_startb*18*vid_fps);
+   g_inv_t-= g_inv_wn*vid_fps*2;
+   g_inv_t-=(a div 10)*vid_fps;
+   g_inv_t-=((map_mw-MaxSMapW) div 100)*vid_fps;
+   g_inv_t-= g_startb*18*vid_fps;
 
    if(g_inv_t<min_wave_time)then g_inv_t:=min_wave_time;
 
@@ -699,13 +699,13 @@ begin
          then G_WTeam:=1
          else
          begin
-            inc(g_inv_wn,1);
+            g_inv_wn+=1;
             g_inv_calcmm;
          end;
       end
       else
       begin
-         dec(g_inv_t,1);
+         g_inv_t-=1;
          if(g_inv_t=0)then
          begin
             {$IFDEF _FULLGAME}
@@ -838,7 +838,7 @@ begin
          end;
       end;
    end
-   else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1);
+   else if(g_inv_wt<max_wave_time)then g_inv_wt+=1;
 end;
 
 procedure _CPoints;
@@ -846,19 +846,19 @@ var i,t,e:integer;
 begin
    e:=0;
    t:=0;
-   for i:=1 to MaxPlayers do
-    with g_ct_pl[i] do
+   for i:=1 to MaxCapturePoints do
+    with g_cpoints[i] do
     begin
-       if(ct>0)then dec(ct,1);
+       if(ct>0)then ct-=1;
        if(t=0)or(t<>_players[pl].team)then
        begin
           t:=_players[pl].team;
           e:=1;
        end
-       else inc(e,1);
+       else e+=1;
     end;
 
-   if(e=MaxPlayers)and(G_WTeam=255)then
+   if(e=MaxCapturePoints)and(G_WTeam=255)then
    begin
       G_WTeam:=t;
       for i:=1 to MaxUnits do
@@ -874,7 +874,7 @@ end;
 procedure CodeGame;
 begin
    {$IFDEF _FULLGAME}
-   inc(vid_rtui,1);
+   vid_rtui+=1;
    vid_rtui:=vid_rtui mod vid_rtuis;
 
    if(vid_rtui=0)then _MusicCheck;
@@ -913,17 +913,17 @@ begin
          FillChar(ordn      ,SizeOf(ordn      ),0);
          FillChar(ordx      ,SizeOf(ordx      ),0);
          FillChar(ordy      ,SizeOf(ordy      ),0);
-         if(ui_umark_t>0)then begin dec(ui_umark_t,1);if(ui_umark_t=0)then ui_umark_u:=0;end;
+         if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
          {$ENDIF}
-         inc(_uclord_c,1); _uclord_c:=_uclord_c mod _uclord_p;
-         inc(_uregen_c,1); _uregen_c:=_uregen_c mod regen_per;
+         _uclord_c+=1; _uclord_c:=_uclord_c mod _uclord_p;
+         _uregen_c+=1; _uregen_c:=_uregen_c mod regen_per;
 
          if(_uclord_c=0)then
-          if(g_royal_r>0)then dec(g_royal_r,1);
+          if(g_royal_r>0)then g_royal_r-=1;
 
          if(onlySVCode)then
          begin
-            inc(G_Step,1);
+            G_Step+=1;
             if(g_mode=gm_ct )then _CPoints;
             if(g_mode=gm_inv)then g_inv_spawn;
          end;

@@ -192,7 +192,7 @@ begin
    0     : m_brush:=co_empty;
    1..255:
       with _players[HPlayer] do
-       if _uid_cndt(@_players[HPlayer],m_brush)>0
+       if _uid_conditionals(@_players[HPlayer],m_brush)>0
        then m_brush:=co_empty
        else
        begin
@@ -216,15 +216,16 @@ begin
              m_brushy:=mm3(vid_vy,m_brushy,vid_vy+vid_sh);
           end;
 
-          case _unit_grbcol(m_brushx,m_brushy,_uids[m_brush]._r,HPlayer,m_brush,true) of
+          case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
+          0 :  m_brushc:=c_lime;
           1 :  m_brushc:=c_red;
           2 :  m_brushc:=c_blue;
-          else m_brushc:=c_lime;
+          else m_brushc:=c_gray;
           end;
        end;
 co_paction,
-co_move ,co_patrol,
-co_amove,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
+co_move   ,co_patrol  ,
+co_amove  ,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
    else
    end;
 end;

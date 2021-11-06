@@ -6,7 +6,7 @@ procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:pSDL_
 begin
    if(vid_vsls<vid_mvs){and(G_Paused=0)}and(_menu=false)then
    begin
-      inc(vid_vsls,1);
+      vid_vsls+=1;
       with vid_vsl[vid_vsls] do
       begin
          x   := ax-vid_vx;
@@ -100,7 +100,7 @@ begin
 
        SDL_SetAlpha(s,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-       dec(vid_vsls,1);
+       vid_vsls-=1;
     end;
 
    if(ui_mc_a>0)then
@@ -109,7 +109,7 @@ begin
       sy:=sx shr 1;
       ellipseColor(_screen,ui_mc_x-vid_vx,ui_mc_y-vid_vy,sx,sy,ui_mc_c);
 
-      dec(ui_mc_a,1);
+      ui_mc_a-=1;
    end;
 end;
 
@@ -146,8 +146,8 @@ begin
        if(ix<0)then ix:=vid_mwa+ix;
        if(iy<0)then iy:=vid_mha+iy;
 
-       dec(ix,vid_ab);
-       dec(iy,vid_ab);
+       ix-=vid_ab;
+       iy-=vid_ab;
 
        _draw_surf(_screen,ix-spr^.hw,iy-spr^.hh,spr^.surf);
     end;
@@ -175,15 +175,15 @@ begin
             fog_grid[cx,cy]:=0;
          end
          else fog_grid[cx,cy]:=2;
-         inc(ssy,fog_cw);
+         ssy+=fog_cw;
       end;
-      inc(ssx,fog_cw);
+      ssx+=fog_cw;
    end;
 
 
    case g_mode of
-gm_ct:for cx:=1 to MaxPlayers do
-      with g_ct_pl[cx] do
+gm_ct:for cx:=1 to MaxCapturePoints do
+      with g_cpoints[cx] do
       begin
          circleColor(_screen,px-vid_vx,py-vid_vy,g_ct_pr,plcolor[pl]);
          //if(_testmode)then _draw_text(_screen,px-vid_vx,py-vid_vy,i2s(ct) , ta_left,255, plcolor[pl]);
@@ -210,18 +210,18 @@ gm_royl:
       begin
          if(integer(ui_msk+ui_msks)>255)
          then ui_msk:=255
-         else inc(ui_msk,ui_msks);
+         else ui_msk+=ui_msks;
       end
       else
       begin
          if(integer(ui_msk+ui_msks)<0)
          then ui_msk:=0
-         else inc(ui_msk,ui_msks);
+         else ui_msk+=ui_msks;
       end;
       if(ui_msk>0)then
       begin
          boxColor(_screen,vid_panel,0,vid_mw,vid_mh,rgba2c(255,255,255,ui_msk));
-         if(vid_rtui=0)then dec(ui_msks,1);
+         if(vid_rtui=0)then ui_msks-=1;
       end;
    end;
 end;

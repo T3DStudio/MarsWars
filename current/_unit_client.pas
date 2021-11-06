@@ -170,7 +170,7 @@ begin
             if(rpl=false)and(playeri=_pl)then
             begin
                if(sel)then _wudata_byte(order,rpl);
-               if(_isbuilding)then
+               if(_ukbuilding)then
                begin
                   if(bld)then
                   begin
@@ -297,8 +297,8 @@ begin
    with player^ do
    begin
       army+=1;
-      ucl_e[_isbuilding,_ucl]+=1;
-      ucl_c[_isbuilding     ]+=1;
+      ucl_e[_ukbuilding,_ucl]+=1;
+      ucl_c[_ukbuilding     ]+=1;
       uid_e[uidi            ]+=1;
 
       if(_IsUnitRange(inapc,nil))then _units[inapc].apcc+=_apcs;
@@ -312,7 +312,7 @@ begin
          begin
             _unit_bld_inc_cntrs(pu);
 
-            p:=@ucl_x[_isbuilding,_ucl];
+            p:=@ucl_x[_ukbuilding,_ucl];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
@@ -332,10 +332,10 @@ begin
               begin
                  _puid:=uprod_u[i];
 
-                 inc(uproda,1);
-                 inc(uprodc[_uids[_puid]._ucl],1);
-                 inc(uprodu[_puid],1);
-                 dec(cenerg,_uids[_puid]._renerg);
+                 uproda+=1;
+                 uprodc[_uids[_puid]._ucl]+=1;
+                 uprodu[      _puid      ]+=1;
+                 cenerg-=_uids[_puid]._renerg;
               end;
             if(_issmith)then
              for i:=0 to MaxUnitProds do
@@ -343,9 +343,9 @@ begin
               begin
                  _puid:=pprod_u[i] ;
 
-                 inc(pproda,1);
-                 inc(pprodu[_puid],1);
-                 dec(cenerg,_upids[_puid]._up_renerg);
+                 pproda+=1;
+                 pprodu[_puid]+=1;
+                 cenerg-=_upids[_puid]._up_renerg;
               end;
          end;
       end;
@@ -360,8 +360,8 @@ begin
    with player^ do
    begin
       army-=1;
-      ucl_e[_isbuilding,_ucl]-=1;
-      ucl_c[_isbuilding     ]-=1;
+      ucl_e[_ukbuilding,_ucl]-=1;
+      ucl_c[_ukbuilding     ]-=1;
       uid_e[uidi            ]-=1;
 
       if(_IsUnitRange(inapc,nil))then dec(_units[inapc].apcc,_apcs);
@@ -373,11 +373,11 @@ begin
          then inc(cenerg,_renerg)
          else
          begin
-            dec(cenerg,_generg);
-            dec(menerg,_generg);
-            dec(uid_eb[uidi],1);
-            dec(ucl_eb[_isbuilding,_ucl],1);
-            if(ucl_x[_isbuilding,_ucl]=unum)then ucl_x[_isbuilding,_ucl]:=0;
+            cenerg-=_generg;
+            menerg-=_generg;
+            uid_eb[uidi]-=1;
+            ucl_eb[_ukbuilding,_ucl]-=1;
+            if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
             if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
 
             _unit_done_dec_cntrs(pu);
@@ -388,10 +388,10 @@ begin
                begin
                   _puid:=uprod_u[i];
 
-                  dec(uproda,1);
-                  dec(uprodc[_uids[_puid]._ucl],1);
-                  dec(uprodu[_puid],1);
-                  inc(cenerg,_uids[_puid]._renerg);
+                  uproda-=1;
+                  uprodc[_uids[_puid]._ucl]-=1;
+                  uprodu[      _puid      ]-=1;
+                  cenerg+=_uids[_puid]._renerg;
                end;
              if(_issmith)then
               for i:=0 to MaxUnitProds do
@@ -399,9 +399,9 @@ begin
                begin
                   _puid:=pprod_u[i];
 
-                  dec(pproda,1);
-                  dec(pprodu[_puid],1);
-                  inc(cenerg,_upids[_puid]._up_renerg);
+                  pproda-=1;
+                  pprodu[_puid]-=1;
+                  cenerg+=_upids[_puid]._up_renerg;
                end;
          end;
       end;
@@ -523,7 +523,7 @@ begin
                uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
-                  if(uid^._isbuilding=false)then
+                  if(uid^._ukbuilding=false)then
                   begin
                      if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced ]>0)then
                       case uid^._urace of
@@ -814,7 +814,7 @@ begin
             if(rpl=false)and(playeri=_pl)then
             begin
                if(sel)then order:=_rudata_byte(rpl,0);
-               if(uid^._isbuilding)then
+               if(uid^._ukbuilding)then
                begin
                   if(bld)then
                   begin

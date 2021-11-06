@@ -4,14 +4,20 @@ begin
   if(vid_rtui=0)and(_menu=false)and(_draw)then
    with pu^ do
    with uid^ do
-    if(uid^._isbuilding)
+    if(uid^._ukbuilding)
     then filledCircleColor(r_minimap,mmx,mmy,mmr,_PlayerColor(player^.pnum))
     else pixelColor       (r_minimap,mmx,mmy,    _PlayerColor(player^.pnum));
 end;
 
-function _depth(y,f:integer):integer;
+function _depth(y:integer;f:byte):integer;
 begin
-   _depth:=map_flydepths[f]+y;
+   if(f=255)
+   then _depth:=y-map_flydepths[uf_soaring]
+   else
+   begin
+      if(f>uf_fly)then f:=uf_fly;
+      _depth:=map_flydepths[f]+y;
+   end;
 end;
 
 function _udpth(pu:PTUnit):integer;
@@ -19,22 +25,18 @@ begin
    _udpth:=0;
    with pu^ do
     case uidi of
-UID_UPortal   : _udpth:=-5;
+UID_UPortal   : _udpth:=-10001;
 UID_HTeleport : _udpth:=-4;
 UID_HSymbol,
-UID_HAltar    : _udpth:=-3;
+UID_HAltar    : _udpth:=_depth(vy,255);
 UID_UMine     : _udpth:=-2;
-UID_HCommandCenter,
-UID_UCommandCenter: if(uf>uf_ground)
-                    then _udpth:=_depth(uf_soaring,vy)
-                    else
-                      if(hits>0)
-                      then _udpth:=_depth(vy,uf)
-                      else _udpth:=vy;
     else
-      if(hits>0)
-      then _udpth:=_depth(vy,uf)
-      else _udpth:=vy;
+      if(uid^._ukbuilding)and(bld)
+      then _udpth:=_depth(vy,255)
+      else
+        if(hits>0)or(buff[ub_resur]>0)
+        then _udpth:=_depth(vy,uf)
+        else _udpth:=vy;
     end;
 end;
 
@@ -168,22 +170,22 @@ begin
       if(order<10)then
       begin
          _orders(x,y,order);
-         ui_orders_uids[order,_isbuilding]:=ui_orders_uids[order,_isbuilding]+[uidi];
+         ui_orders_uids[order,_ukbuilding]:=ui_orders_uids[order,_ukbuilding]+[uidi];
       end;
 
       if(speed>0)and(_attack>0)then
       begin
-         inc(ui_uibtn_f2,1);
+         ui_uibtn_f2+=1;
          _orders(x,y,10);
       end;
 
-      if(_isbuilding)then
+      if(_ukbuilding)then
       begin
          if(bld)then
          begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
-            if(_isbuilder)and(0<m_brush)and(m_brush<=255)and(speed=0)then
-             if(m_brush in uid^.ups_builder)then
+            if(isbuildarea)and(0<m_brush)and(m_brush<=255)and(speed<=0)then
+             //if(m_brush in ui_prod_builds)then
                if(_RectInScreen(x,y,srange,srange,0))then _addUIBuildRs(x,y,srange);
 
             for i:=0 to MaxUnitProds do
@@ -200,14 +202,14 @@ begin
 
          if(sel)then
          begin
-            if(speed>0)then inc(ui_uibtn_move,1);
-            if(_ability in [uab_spawnlost])or(apcc>0)then inc(ui_uibtn_action,1);
+            if(speed>0)then ui_uibtn_move+=1;
+            if(_ability in [uab_spawnlost])or(apcc>0)then ui_uibtn_action+=1;
          end;
       end
       else
       begin
-         inc(ui_uid_builds[uidi],1);
-         inc(ui_uid_buildn      ,1);
+         ui_uid_builds[uidi]+=1;
+         ui_uid_buildn      +=1;
       end;
 
    end;
@@ -292,7 +294,7 @@ begin
             rc :=_PlayerColor(playeri);
             ro :=0;
 
-            if(_isbuilding)then
+            if(_ukbuilding)then
              if(0<m_brush)and(m_brush<=255)
              then ro:=_r
              else
@@ -343,12 +345,12 @@ begin
             if(buff[ub_invis ]>0 )then inv:=128;
             if(buff[ub_invuln]>10)then mc :=c_awhite;
 
-            if(playeri=0)and(_isbuilding=false)then
+            if(playeri=0)and(not _ukbuilding)then
              if(g_mode in [gm_inv,gm_aslt])then mc:=c_ablack;
 
             dp:=_udpth(pu);
 
-            if(_isbuilding)then
+            if(_ukbuilding)then
              if(bld)then
              begin
                 if(a_rld<=0)and(noanim=false)then

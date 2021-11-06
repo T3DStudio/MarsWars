@@ -256,7 +256,7 @@ smt_commando :case animk of
         sms_mattack
                  : i:=32+dd;
         sms_dattack
-                 : i:=40;
+                 : i:=40+dd;
         sms_death: i:=48+anim;
               else exit;
               end;
@@ -305,7 +305,7 @@ end;
 
 function _unit2SMAnimK(pu:PTUnit;_wanim_:boolean):byte;  // unit's animation state
 begin
-   if(_wanim_)or(pu^.uid^._isbuilding)
+   if(_wanim_)or(pu^.uid^._ukbuilding)
    then _unit2SMAnimK:=sms_walk
    else _unit2SMAnimK:=sms_stand;
 
@@ -349,7 +349,7 @@ begin
          case ak of
 sms_walk:    if(animw>0)then
              begin
-                if(wanim)or(_isbuilding)then
+                if(wanim)or(_ukbuilding)then
                 begin
                    anim+=animw;
                    if(anim<0)then anim:=0;

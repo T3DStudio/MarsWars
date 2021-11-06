@@ -83,16 +83,17 @@ end;
 procedure _makeHints;
 var
 uid         :byte;
-ENRG,HK,PROD,
+ENRG,HK,PROD,LMT,
 TIME,REQ    :shortstring;
 begin
    for uid:=0 to 255 do
    with _uids[uid] do
    begin
-      REQ  :='';
-      PROD :='';
-      ENRG :='';
-      TIME :='';
+      REQ :='';
+      PROD:='';
+      ENRG:='';
+      TIME:='';
+      LMT :='';
       if(un_name='')then continue;
 
       if(_ucl>=21)then
@@ -103,6 +104,7 @@ begin
       begin
          if(_renerg>0)then ENRG:=i2s(_renerg);
          if(_btime >0)then TIME:=i2s(_btime );
+         LMT:=i2s(_limituse);
 
          PROD:=findprd(uid);
          if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
@@ -113,10 +115,11 @@ begin
          if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
          if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
          if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
+         if(LMT <>'')then un_hint:=un_hint+' <'+#15+LMT +#25+'>';
          un_hint:=un_hint+#11+un_descr+#11;
          if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
          if(PROD<>'')then
-          if(_isbuilding)
+          if(_ukbuilding)
           then un_hint:= un_hint+str_bprod+PROD
           else un_hint:= un_hint+str_uprod+PROD;
       end;

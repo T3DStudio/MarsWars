@@ -15,6 +15,7 @@ fr_2hfps               = fr_fps div 2;
 fr_3hfps               = fr_fps div 3;
 fr_4hfps               = fr_fps div 4;
 fr_6hfps               = fr_fps div 6;
+fr_7hfps               = fr_fps div 7;
 fr_8hfps               = fr_fps div 8;
 fr_2h3fps              = fr_2hfps*3;
 fr_2fps                = fr_fps*2;
@@ -52,6 +53,7 @@ r_uac                  = 2;
 
 MaxPlayers             = 6;
 MaxPlayerUnits         = 120;
+MaxPlayerLimit         = 120;
 MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
@@ -61,6 +63,17 @@ StepSMap               = 250;
 map_b0                 = 5;
 
 uidall                 = [0..255];
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  PATH FIND SYSTEM
+//
+
+pf_pathmap_c           = 255;
+pf_pathmap_w           = ceil(MaxSMapW div pf_pathmap_c);
+pf_pathmap_hw          = pf_pathmap_w div 2;
+
+pf_solid               : word = 65535;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -147,18 +160,19 @@ uo_addorder            = 10;
 //  UNIT & UPGRADES REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = %0000000000000001;
-ureq_ruid              : cardinal = %0000000000000010;
-ureq_rupid             : cardinal = %0000000000000100;
-ureq_energy            : cardinal = %0000000000001000;
-ureq_time              : cardinal = %0000000000010000;
-ureq_addon             : cardinal = %0000000000100000;
-ureq_max               : cardinal = %0000000001000000;
-ureq_builders          : cardinal = %0000000010000000;
-ureq_bld_r             : cardinal = %0000000100000000;
-ureq_barracks          : cardinal = %0000001000000000;
-ureq_smiths            : cardinal = %0000010000000000;
-ureq_product           : cardinal = %0000100000000000;
+ureq_unitlimit         : cardinal = 1;
+ureq_ruid              : cardinal = 1 shl 1;
+ureq_rupid             : cardinal = 1 shl 2;
+ureq_energy            : cardinal = 1 shl 3;
+ureq_time              : cardinal = 1 shl 4;
+ureq_addon             : cardinal = 1 shl 5;
+ureq_max               : cardinal = 1 shl 6;
+ureq_builders          : cardinal = 1 shl 7;
+ureq_bld_r             : cardinal = 1 shl 8;
+ureq_barracks          : cardinal = 1 shl 9;
+ureq_smiths            : cardinal = 1 shl 10;
+ureq_product           : cardinal = 1 shl 11;
+ureq_armylimit         : cardinal = 1 shl 12;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -225,32 +239,24 @@ wpr_suicide          : cardinal =  %0000000001000000;
 //  Target requirements flags
 //
 
-wtr_owner_p                                    : cardinal = %000000000000000000000001;  // own
-wtr_owner_a                                    : cardinal = %000000000000000000000010;  // ally
-wtr_owner_e                                    : cardinal = %000000000000000000000100;  // enemy
-wtr_hits_h                                     : cardinal = %000000000000000000001000;  // 0<hits<mhits
-wtr_hits_d                                     : cardinal = %000000000000000000010000;  // hits<=0
-wtr_hits_a                                     : cardinal = %000000000000000000100000;  // hits=mhits
-wtr_bio                                        : cardinal = %000000000000000001000000;  // non mech
-wtr_mech                                       : cardinal = %000000000000000010000000;  // mech and !building
-wtr_building                                   : cardinal = %000000000000000100000000;  // building
-wtr_bld                                        : cardinal = %000000000000001000000000;  // bld=true
-wtr_nbld                                       : cardinal = %000000000000010000000000;  // bld=false
-wtr_ground                                     : cardinal = %000000000000100000000000;
-wtr_soaring                                    : cardinal = %000000000001000000000000;
-wtr_fly                                        : cardinal = %000000000010000000000000;
-wtr_adv                                        : cardinal = %000000000100000000000000;
-wtr_nadv                                       : cardinal = %000000001000000000000000;
-
-wtrset_enemy_alive_ground                      : cardinal = %000000001101111111101100;
-wtrset_enemy_alive_fly                         : cardinal = %000000001111011111101100;
-wtrset_enemy_alive                             : cardinal = %000000001111111111101100;
-wtrset_enemy_alive_mech                        : cardinal = %000000001111111010101100;
-wtrset_enemy_alive_buildings                   : cardinal = %000000001111111100101100;
-wtrset_enemy_alive_nbuildings                  : cardinal = %000000001111111011101100;
-wtrset_enemy_alive_ground_buildings            : cardinal = %000000001100111100101100;
-wtrset_enemy_alive_bio                         : cardinal = %000000001111111001101100;
-wtrset_resurect                                : cardinal = %000000001111111111010011;
+wtr_owner_p                                    : cardinal = 1;        // own
+wtr_owner_a                                    : cardinal = 1 shl 1;  // ally
+wtr_owner_e                                    : cardinal = 1 shl 2;  // enemy
+wtr_hits_h                                     : cardinal = 1 shl 3;  // 0<hits<mhits
+wtr_hits_d                                     : cardinal = 1 shl 4;  // hits<=0
+wtr_hits_a                                     : cardinal = 1 shl 5;  // hits=mhits
+wtr_bio                                        : cardinal = 1 shl 6;  // non mech
+wtr_mech                                       : cardinal = 1 shl 7;  // mech and !building
+wtr_building                                   : cardinal = 1 shl 8;  // building
+wtr_bld                                        : cardinal = 1 shl 9;  // bld=true
+wtr_nbld                                       : cardinal = 1 shl 10; // bld=false
+wtr_ground                                     : cardinal = 1 shl 11;
+wtr_soaring                                    : cardinal = 1 shl 12;
+wtr_fly                                        : cardinal = 1 shl 13;
+wtr_adv                                        : cardinal = 1 shl 14;
+wtr_nadv                                       : cardinal = 1 shl 15;
+wtr_light                                      : cardinal = 1 shl 16;
+wtr_nlight                                     : cardinal = 1 shl 17;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -315,6 +321,7 @@ uab_uac_rstrike        = 7;
 uab_spawnlost          = 100;
 uab_morph2heye         = 101;
 uab_umine              = 102;
+uab_CCFly              = 103;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -400,18 +407,18 @@ upgr_hell_hktele       = 10; // HK teleportation
 upgr_hell_paina        = 11; // decay aura
 upgr_hell_mainr        = 12; // main range
 upgr_hell_pinkspd      = 13; // demon speed
-upgr_hell_misfst       = 14; // missiles speed
+//upgr_hell_misfst       = 14; // missiles speed
 upgr_hell_6bld         = 15; // Souls
 //upgr_hell_2tier        = 16; // Tier 2
 upgr_hell_revtele      = 17; // revers teleport
 upgr_hell_revmis       = 18; // revenant missile
 upgr_hell_totminv      = 19; // totem and eye invisible
 upgr_hell_bldrep       = 20; // build restoration
-upgr_hell_mainonr      = 21; // HK on doodabs
+//upgr_hell_mainonr      = 21; // HK on doodabs
 upgr_hell_b478tel      = 22; // teleport towers
-upgr_hell_hinvuln      = 23; // hell invuln powerup
+//upgr_hell_hinvuln      = 23; // hell invuln powerup
 //upgr_hell_bldenrg      = 24; // additional energy
-upgr_hell_9bld         = 25; // 9 class building reload time
+//upgr_hell_9bld         = 25; // 9 class building reload time
 
 
 upgr_uac_attack        = 31; // distance attack
@@ -424,7 +431,7 @@ upgr_uac_detect        = 37; // detectors
 upgr_uac_towers        = 38; // towers sr
 upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
-upgr_uac_ucomatt       = 41; // CC turret
+upgr_uac_ccturr        = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_mines         = 43; // mines for engineers
 //upgr_uac_minesen       = 44; // mine-sensor
@@ -434,11 +441,11 @@ upgr_uac_rstrike       = 47; // rstrike launch
 upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
 //upgr_uac_6bld2         = 50; // 6bld upgr
-upgr_uac_mainonr       = 51; // main on doodabs
+//upgr_uac_mainonr       = 51; // main on doodabs
 upgr_uac_turarm        = 52; // turrets armor
-upgr_uac_rturrets      = 53; // rocket turrets
+//upgr_uac_rturrets      = 53; // rocket turrets
 //upgr_uac_bldenrg       = 54; // additional energy
-upgr_uac_9bld          = 55; // 9 class building reload time
+//upgr_uac_9bld          = 55; // 9 class building reload time
 
 upgr_fast_build        = 250;
 upgr_fast_product      = 251;
@@ -598,7 +605,7 @@ coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 slowturn               = [UID_APC,UID_Tank];
 
 armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
-armor_massive          = [UID_Cyberdemon,UID_Mastermind,UID_Mancubus,UID_Arachnotron];
+armor_nosdmg           = [UID_Cyberdemon,UID_Mastermind,UID_Tank];  // splash damage immune
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -614,15 +621,11 @@ dead_hits              = -12*fr_fps;
 fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
 
-//upgr_1                 : array[1..r_cnt] of set of byte = ([upgr_6bld,upgr_b478tel,upgr_hinvuln],[upgr_blizz]);
-ai_d2alrm              : array[false..true] of integer = (150,15);
-builder_enrg           : array[0..4] of byte = (6,7,8,9,10);
 base_r                 = 350;
 base_rr                = base_r*2;
 base_3r                = base_r*3;
 base_ir                = base_r+(base_r div 2);
-base_rA                : array[0..2] of integer = (280,320,360);
-uaccc_fly              = 23;
+
 apc_exp_damage         = 70;
 regen_per              = fr_fps*2;
 _uclord_p              = fr_2hfps+1;
@@ -640,6 +643,8 @@ max_build_reload       = fr_fps*12;
 
 melee_r                = 8;
 
+flyCC_floor            = uf_soaring;
+
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
@@ -651,13 +656,9 @@ building_adv_reload    : array[false..true] of integer = (fr_fps*60,fr_fps*30);
 
 
 rocket_sr              = 45;
-map_ffly_fapc          : array[false..true] of byte = (3,6);
-map_gapc               : array[false..true] of byte = (8,5);
-towers_sr              : array[0..5] of integer = (250,265,280,295,310,325);
 blizz_r                = 150;
 
 g_ct_pr                = 150;
-g_ct_ct                : array[1..r_cnt] of integer = (fr_fps*10,fr_fps*5);
 bld_dec_mr             = 6;
 def_ai                 = 5;
 pain_time              = fr_2hfps;
@@ -669,7 +670,7 @@ advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 fly_z                  = 30;
 fly_height             : array[0..2] of integer = (1,fly_z*uf_soaring,fly_z*uf_fly);
 
-map_flydepths          : array[0..2] of integer = (0,MaxSMapW*2,MaxSMapW*3);
+map_flydepths          : array[0..2] of integer = (0,MaxSMapW,MaxSMapW*2);
 
 {$IFDEF _FULLGAME}
 
@@ -936,7 +937,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 262365;
+svld_size              = 262393;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

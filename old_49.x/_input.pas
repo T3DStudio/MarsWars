@@ -67,23 +67,23 @@ begin
       begin
          su:=0;
          cmsnd:=false;
-         for i:=0 to _uts do inc(su,u_s[false,i]);
+         for i:=0 to _uts do su+=u_s[false,i];
          if(su>0)then cmsnd:=true;
-         if(upgr[upgr_mainm]>0)then inc(su,u_s[true,0]);
-         inc(su,u_s[true,1]+u_s[true,5]+u_s[true,4]+u_s[true,7]);
+         if(upgr[upgr_mainm]>0)then su+=u_s[true,0];
+         su+=u_s[true,1]+u_s[true,5]+u_s[true,4]+u_s[true,7];
          if(race=r_uac )then
          begin
-            if(upgr[upgr_blizz]>0)then inc(su,u_s[true,8]);
-            inc(su,u_s[true,6]);
-            inc(su,u_s[true,0]);
+            if(upgr[upgr_blizz]>0)then su+=u_s[true,8];
+            su+=u_s[true,6];
+            su+=u_s[true,0];
          end;
          if(race=r_hell)then
          begin
-            if(upgr[upgr_6bld]>0)then inc(su,u_s[true,6]);
+            if(upgr[upgr_6bld]>0)then su+=u_s[true,6];
             if(upgr[upgr_b478tel]>0)then
             begin
-               inc(su,u_s[true,2]);
-               inc(su,u_s[true,8]);
+               su+=u_s[true,2];
+               su+=u_s[true,8];
             end;
          end;
          for i:=_uts downto 0 do if(u_s[false,i]>0)then break;
@@ -125,7 +125,7 @@ begin
    else
       case k of
       sdlk_tab: begin
-                   inc(ui_tab,1);
+                   ui_tab+=1;
                    ui_tab:=ui_tab mod 4;
                 end;
        1:begin end;
@@ -133,7 +133,7 @@ begin
         if(_testmode>0)and(net_nstat=0)then
          case k of
             sdlk_end       : if(k_ctrl>2)
-                             then begin if(g_mode=gm_inv)then inc(g_inv_wn,1); end
+                             then begin if(g_mode=gm_inv)then g_inv_wn+=1; end
                              else _fsttime:=not _fsttime;
             sdlk_home      : _warpten:=not _warpten;
             sdlk_pageup    : if(net_nstat<>ns_clnt) then with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
@@ -303,7 +303,7 @@ end;
 
 procedure _keyp(i:pbyte);
 begin
-   if (i^>1)and(i^<255) then inc(i^,1); //
+   if (i^>1)and(i^<255) then i^+=1; //
    if (i^=1) then i^:=0;
 end;
 
@@ -319,15 +319,15 @@ begin
    _keyp(@k_ml);
    _keyp(@k_mr);
    _keyp(@k_chrt);
-   if(k_dbl>0)then dec(k_dbl,1);
+   if(k_dbl>0)then k_dbl-=1;
 
    while (SDL_PollEvent( _event )>0) do
     CASE (_event^.type_) OF
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(_menu=false)and(G_Started)then
                               begin
-                                 dec(vid_vx,_event^.motion.x-m_vx);
-                                 dec(vid_vy,_event^.motion.y-m_vy);
+                                 vid_vx-=_event^.motion.x-m_vx;
+                                 vid_vy-=_event^.motion.y-m_vy;
                                  _view_bounds;
                               end;
                               m_vx:=_event^.motion.x;
@@ -423,8 +423,8 @@ begin
    begin
       for i:=0 to _uts do
       begin
-         inc(sc,u_s[false,i]);
-         inc(sc,u_s[true ,i]);
+         sc+=u_s[false,i];
+         sc+=u_s[true ,i];
       end;
       htm:=team;
    end;
@@ -519,7 +519,7 @@ begin
    m_bx :=m_vx div vid_BW;
    m_by :=m_vy div vid_BW;
 
-   if(m_ldblclk>0)then dec(m_ldblclk,1);
+   if(m_ldblclk>0)then m_ldblclk-=1;
 
    _chkbld;
 
@@ -741,10 +741,10 @@ end;
 
 procedure _move_v_m;
 begin
-   if(m_vx<vid_vmb_x0)then dec(vid_vx,vid_vmspd);
-   if(m_vy<vid_vmb_y0)then dec(vid_vy,vid_vmspd);
-   if(m_vx>vid_vmb_x1)then inc(vid_vx,vid_vmspd);
-   if(m_vy>vid_vmb_y1)then inc(vid_vy,vid_vmspd);
+   if(m_vx<vid_vmb_x0)then vid_vx-=vid_vmspd;
+   if(m_vy<vid_vmb_y0)then vid_vy-=vid_vmspd;
+   if(m_vx>vid_vmb_x1)then vid_vx+=vid_vmspd;
+   if(m_vy>vid_vmb_y1)then vid_vy+=vid_vmspd;
 end;
 
 procedure _view_move;
@@ -755,10 +755,10 @@ begin
 
    if(vid_vmm)then _move_v_m;
 
-   if (k_u>1) then dec(vid_vy,vid_vmspd);
-   if (k_l>1) then dec(vid_vx,vid_vmspd);
-   if (k_d>1) then inc(vid_vy,vid_vmspd);
-   if (k_r>1) then inc(vid_vx,vid_vmspd);
+   if (k_u>1) then vid_vy-=vid_vmspd;
+   if (k_l>1) then vid_vx-=vid_vmspd;
+   if (k_d>1) then vid_vy+=vid_vmspd;
+   if (k_r>1) then vid_vx+=vid_vmspd;
 
    if(vx<>vid_vx)or(vy<>vid_vy)then _view_bounds;
 end;

@@ -322,6 +322,7 @@ begin
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
+   setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_ZBFG:
 begin
@@ -447,6 +448,8 @@ begin
    setCommandSND(true ,snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,nil,snd_ssg    ,0,0);
+   setWeaponESND(2,nil,snd_shotgun,0,0);
 end;
 UID_Commando:
 begin
@@ -456,6 +459,7 @@ begin
    setCommandSND(false,snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,nil,snd_pistol,0,0);
 end;
 UID_Bomber:
 begin
@@ -476,6 +480,8 @@ begin
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
+   setWeaponESND(0    ,nil,snd_plasma,0,0);
+   setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_BFG:
 begin
@@ -508,6 +514,7 @@ begin
    setCommandSND(false,snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
+   setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_Tank:
 begin
@@ -611,9 +618,9 @@ end;
 
       end;
 
-      ui_panel_uids[_urace,byte(not _isbuilding),_ucl]:=u;
+      ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]:=u;
 
-      if(_isbuilding)then
+      if(_ukbuilding)then
       begin
          case _urace of
        r_hell: begin
@@ -644,7 +651,7 @@ end;
             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
          end;
          if(un_snd_ready[false]=nil)then un_snd_ready[false]:=snd_constr_complete[_urace];
-         if(un_snd_ready[true ]=nil)then un_snd_ready[true]:=un_snd_ready[false];
+         if(un_snd_ready[true ]=nil)then un_snd_ready[true ]:=un_snd_ready[false];
       end;
 
       for w:=0 to MaxUnitWeapons do
@@ -687,6 +694,9 @@ upgr_hell_heye    : begin _up_btn:=spr_b_up[r_hell,6 ]; end;
 upgr_hell_towers  : begin _up_btn:=spr_b_up[r_hell,7 ]; end;
 upgr_hell_teleport: begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_pinkspd : begin _up_btn:=spr_b_up[r_hell,12]; end;
+upgr_hell_hktele  : begin _up_btn:=spr_b_up[r_hell,9 ]; end;
+upgr_hell_paina   : begin _up_btn:=spr_b_up[r_hell,10]; end;
+upgr_hell_mainr   : begin _up_btn:=spr_b_up[r_hell,11]; end;
 upgr_hell_6bld    : begin _up_btn:=spr_b_up[r_hell,14]; end;
 upgr_hell_revmis  : begin _up_btn:=spr_b_up[r_hell,17]; end;
 upgr_hell_totminv : begin _up_btn:=spr_b_up[r_hell,18]; end;
@@ -701,9 +711,12 @@ upgr_uac_apcgun   : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
 upgr_uac_detect   : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers   : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r  : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
+upgr_uac_mainm    : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
+upgr_uac_ccturr   : begin _up_btn:=spr_b_up[r_uac ,10]; end;
+upgr_uac_mainr    : begin _up_btn:=spr_b_up[r_uac ,11]; end;
 upgr_uac_mines    : begin _up_btn:=spr_b_up[r_uac ,13]; end;
-upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 upgr_uac_6bld     : begin _up_btn:=spr_b_up[r_uac ,14]; end;
+upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 upgr_uac_mechspd  : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm  : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm   : begin _up_btn:=spr_b_up[r_uac ,21]; end;

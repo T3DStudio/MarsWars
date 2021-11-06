@@ -252,7 +252,7 @@ begin
 
       with _units[ui_UnitSelectedNU] do
       with uid^ do
-       if(_isbuilding)and(bld=false)
+       if(_ukbuilding)and(bld=false)
        then PlayCommandSound(snd_building[_urace])
        else
         if(ui_UnitSelectedn<annoystart)
@@ -374,6 +374,7 @@ begin
 
    snd_jetpoff              :=LoadSoundSet(race_dir[r_uac]+'jetpoff');
    snd_jetpon               :=LoadSoundSet(race_dir[r_uac]+'jetpon' );
+   snd_CCup                 :=LoadSoundSet(race_dir[r_uac]+'ccup'   );
 
    snd_uac_cc               :=LoadSoundSet(race_buildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=LoadSoundSet(race_buildings[r_uac ]+'barraks'        );

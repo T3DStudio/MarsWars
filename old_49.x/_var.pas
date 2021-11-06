@@ -19,7 +19,7 @@ g_inv_mn          : byte = 0;
 g_inv_wn          : byte = 0;
 g_inv_t           : integer = 0;
 g_inv_wt          : integer = 0;
-g_ct_pl           : array[1..MaxPlayers] of TCTPoint;
+g_cpoints         : array[1..MaxCapturePoints] of TCTPoint;
 
 g_royal_r         : integer = 0;
 

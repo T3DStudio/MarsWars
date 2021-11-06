@@ -67,6 +67,7 @@ begin
       SetBBit(@_bts2,3, buff[ub_born     ]>0);
       SetBBit(@_bts2,4, buff[ub_invuln   ]>0);
       SetBBit(@_bts2,5, buff[ub_teleeff  ]>0);
+      SetBBit(@_bts2,6, buff[ub_pboost   ]>0);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -173,7 +174,7 @@ begin
           y:=0;
           u:=n*2;
           if(u<=_uts)then y:=y or  upgr[u];
-          inc(u,1);
+          u+=1;
           if(u<=_uts)then y:=y or (upgr[u] shl 4);
           _wudata_byte(y,rpl);
        end;
@@ -208,7 +209,7 @@ gm_inv :begin
            _wudata_byte(g_inv_wn,rpl);
            _wudata_int (g_inv_t ,rpl);
         end;
-gm_ct  : for i:=1 to MaxPlayers do _wudata_byte(g_ct_pl[i].pl,rpl);
+gm_ct  : for i:=1 to MaxCapturePoints do _wudata_byte(g_cpoints[i].pl,rpl);
 gm_royl: _wudata_int(g_royal_r,rpl);
       end;
    end;
@@ -228,7 +229,7 @@ gm_royl: _wudata_int(g_royal_r,rpl);
    _wudata_int (_N_U^,rpl);
    for i:=1 to _PNU^ do
    begin
-      inc(_N_U^,1);
+      _N_U^+=1;
 
       if(_N_U^<1)then _N_U^:=1;
       if(_N_U^>MaxUnits)then _N_U^:=1;
@@ -251,42 +252,42 @@ begin
    with _units[u] do
    with _players[player] do
    begin
-      inc(uid_e[uid],1);
-      inc(u_e[isbuild,ucl],1);
-      inc(u_c[isbuild]);
-      inc(army,1);
+      uid_e[uid]+=1;
+      u_e[isbuild,ucl]+=1;
+      u_c[isbuild]+=1;
+      army+=1;
 
-      if(inapc>0)then inc(_units[inapc].apcc,apcs);
+      if(inapc>0)then _units[inapc].apcc+=apcs;
 
       if(hits>0)and(inapc=0)then
       begin
          if(sel)then
          begin
-            inc(u_s [isbuild,ucl],1);
-            inc(u_cs[isbuild],1);
+            u_s [isbuild,ucl]+=1;
+            u_cs[isbuild]+=1;
          end;
          if(isbuild)then
           if(bld=false)
-          then inc(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
+          then cenerg+=_ulst[cl2uid[race,true,ucl]].renerg
           else
           begin
-             inc(uid_b[uid],1);
-             inc(u_eb[isbuild,ucl],1);
+             uid_b[uid]+=1;
+             u_eb[isbuild,ucl]+=1;
              if(ubx[ucl]=0)then ubx[ucl]:=u;
              if(0<ubx[ucl])and(ubx[ucl]<=MaxUnits)then
               if(_units[ubx[ucl]].ucl<>ucl)then ubx[ucl]:=u;
              case ucl of
-              0 : inc(bldrs,1);
+              0 : bldrs+=1;
               1 : if(rld>0)then
                   begin
-                     if(_ulst[cl2uid[race,false,utrain]].max=1)then inc(wbhero,1);
-                     inc(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
-                     inc(wb,1);
+                     if(_ulst[cl2uid[race,false,utrain]].max=1)then wbhero+=1;
+                     cenerg+=_ulst[cl2uid[race,false,utrain]].renerg;
+                     wb+=1;
                   end;
               3 : if(rld>0)then
                   begin
-                     inc(cenerg,_pne_r[race,utrain]);
-                     inc(upgrinp[utrain],1);
+                     cenerg+=_pne_r[race,utrain];
+                     upgrinp[utrain]+=1;
                   end;
              end;
           end;
@@ -299,40 +300,40 @@ begin
    with _units[u] do
    with _players[player] do
    begin
-      dec(uid_e[uid],1);
-      dec(u_e[isbuild,ucl],1);
-      dec(u_c[isbuild]);
-      dec(army,1);
+      uid_e[uid]-=1;
+      u_e[isbuild,ucl]-=1;
+      u_c[isbuild]-=1;
+      army-=1;
 
-      if(inapc>0)then dec(_units[inapc].apcc,apcs);
+      if(inapc>0)then _units[inapc].apcc-=apcs;
 
       if(hits>0)and(inapc=0)then
       begin
          if(sel)then
          begin
-            dec(u_s [isbuild,ucl],1);
-            dec(u_cs[isbuild],1);
+            u_s [isbuild,ucl]-=1;
+            u_cs[isbuild]-=1;
          end;
          if(isbuild)then
           if(bld=false)
-          then dec(cenerg,_ulst[cl2uid[race,true,ucl]].renerg)
+          then cenerg-=_ulst[cl2uid[race,true,ucl]].renerg
           else
           begin
-             dec(uid_b[uid],1);
-             dec(u_eb[isbuild,ucl],1);
+             uid_b[uid]-=1;
+             u_eb[isbuild,ucl]-=1;
              if(ubx[ucl]=u)then ubx[ucl]:=0;
              case ucl of
-              0 : dec(bldrs,1);
+              0 : bldrs-=1;
               1 : if(rld>0)then
                   begin
-                     if(_ulst[cl2uid[race,false,utrain]].max=1)then dec(wbhero,1);
-                     dec(cenerg,_ulst[cl2uid[race,false,utrain]].renerg);
-                     dec(wb,1);
+                     if(_ulst[cl2uid[race,false,utrain]].max=1)then wbhero-=1;
+                     cenerg-=_ulst[cl2uid[race,false,utrain]].renerg;
+                     wb-=1;
                   end;
               3 : if(rld>0)then
                   begin
-                     dec(cenerg,_pne_r[race,utrain]);
-                     dec(upgrinp[utrain],1);
+                     cenerg-=_pne_r[race,utrain];
+                     upgrinp[utrain]-=1;
                   end;
              end;
           end;
@@ -644,6 +645,7 @@ begin
          buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,4)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_pboost   ]:=_buffst[GetBBit(@_bts2,6)];
       end
       else
       begin
@@ -764,7 +766,7 @@ begin
           y:=_rudata_byte(rpl,0);
           u:=o*2;
           if(u<=_uts)then upgr[u]:= y and %00001111;
-          inc(u,1);
+          u+=1;
           if(u<=_uts)then upgr[u]:= y shr 4;
        end;
 end;
@@ -797,7 +799,7 @@ gm_inv : begin
             if(g_inv_wn>_PNU)then PlaySND(snd_teleport,0);
             g_inv_t :=_rudata_int (rpl,0);
          end;
-gm_ct  : for i:=1 to MaxPlayers do g_ct_pl[i].pl:=_rudata_byte(rpl,0);
+gm_ct  : for i:=1 to MaxCapturePoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
 gm_royl: g_royal_r:=_rudata_int(rpl,0);
       end;
    end;
@@ -815,7 +817,7 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
    _N_U:=_rudata_int (rpl,0);
    for i:=1 to _PNU do
    begin
-      inc(_N_U,1);
+      _N_U+=1;
 
       if(_N_U<1       )then _N_U:=1;
       if(_N_U>MaxUnits)then _N_U:=1;
@@ -826,8 +828,8 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
     with _players[i] do
     begin
        menerg:=0;
-       inc(menerg,u_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]]);
-       inc(menerg,u_eb[true,2]*_ulst[cl2uid[race,true,2]].generg);
+       menerg+=u_eb[true,0]*builder_enrg[upgr[upgr_bldenrg]];
+       menerg+=u_eb[true,2]*_ulst[cl2uid[race,true,2]].generg;
     end;
 end;
 {$ENDIF}

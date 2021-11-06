@@ -109,11 +109,13 @@ PTSoundSet = ^TSoundSet;
 TMID = record
    ms_smodel       : PTMWSModel;
    ms_eid_fly_st   : integer;
-   ms_snd_death_ch,
    ms_eid_fly,
    ms_eid_decal    : byte;
-   ms_snd_death    : PTSoundSet;
-   ms_bullet_death : boolean;
+   ms_eid_death,
+   ms_eid_death_cnt,
+   ms_eid_death_r,
+   ms_snd_death_ch : array[false..true] of byte;
+   ms_snd_death    : array[false..true] of PTSoundSet;
 end;
 
 {$ENDIF}
@@ -161,8 +163,10 @@ TUID = record
    _zfall,
    _apcs,
    _apcm,
+   _base_armor,
    _zombie_hits,
-   _upgr_srange_step
+   _upgr_srange_step,
+   _limituse
                 : integer;
 
    _upgr_srange,
@@ -179,14 +183,18 @@ TUID = record
    _shcf        : single;
 
    _ability,
+   _ability_rupgr,
+   _ability_rupgrl,
+   _ability_ruid,
    _attack      : byte;
    _barrack_teleport,
    _slowturn,
-   _isbuilding,
+   _ukbuilding,
+   _ukbio,
+   _ukmech,
    _isbuilder,
    _issmith,
    _isbarrack,
-   _ismech,
    _issolid,
    _addon       : boolean;
    _advanced    : array[false..true] of boolean; //[addon]
@@ -265,6 +273,7 @@ TPlayer = record
 
    build_cd,
    army,
+   armylimit,
    cenerg,
    menerg  : integer;
 
@@ -289,6 +298,7 @@ o_x1,o_y1  :integer;
    ucl_cs  : array[false..true] of integer;         // count selected buildings/units
 
    uprodm,
+   uprodl,
    uproda  : integer;
    uprodc  : array[byte] of integer;
    uprodu  : array[byte] of integer;
@@ -354,14 +364,13 @@ TUnit = record
    a_rld,
    a_weap   : byte;
 
-   a_tx,
-   a_ty,
-   a_tar,
+   a_tx,a_ty,a_tar,
    mv_x,mv_y,
+
    uo_bx,uo_by,
    uo_tar,
-   uo_x,
-   uo_y     : integer;
+   uo_x,uo_y
+            : integer;
    uo_id    : byte;
 
    inapc,
@@ -374,6 +383,8 @@ TUnit = record
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
+   underobstacle,
+   isbuildarea,
    bld,
    solid,
    sel      : boolean;
@@ -411,6 +422,9 @@ TMissile = record
    mid,
    mfe,mfs  : byte;
    homing   : boolean;
+   {$IFDEF _FULLGAME}
+   ms_eid_bio_death: boolean;
+   {$ENDIF}
 end;
 
 TCTPoint = record

@@ -149,14 +149,14 @@ begin
    _gen:=map_seed2*5+167;
    map_seed2:=_gen;
    _gen:=abs(_gen mod x);
-   inc(map_seed2,17);
+   map_seed2+=17;
 end;
 
 function _genx(x,m:integer;newn:boolean):integer;
 begin
    _genx:=(x*5)+integer(map_seed+map_seed2);
    _genx:=abs(_genx mod m);
-   if(newn)then inc(map_seed2,67);
+   if(newn)then map_seed2+=67;
 end;
 
 procedure WriteError;
@@ -235,7 +235,7 @@ begin
              or((upgrade_rupgr[race,up]<=_uts)and(upgr[upgrade_rupgr[race,up]]=0))
              or(_bc_g(a_upgr,up)=false)
              or((menerg-cenerg)<_pne_r[race,up])
-             or((up>=upgr_2tier)and(G_addon=false));
+             or((up>upgr_boost)and(G_addon=false));
 
    with _players[player] do
    if(_upgrreq=false)then
@@ -262,8 +262,8 @@ begin
     with _players[p] do
      if(state=ps_play)then
      begin
-        inc(c,1);
-        if(ready)or(p=HPlayer)then inc(r,1);
+        c+=1;
+        if(ready)or(p=HPlayer)then r+=1;
      end;
    _plsReady:=(r=c)and(c>0);
 end;
@@ -473,7 +473,7 @@ end;
 
 procedure _scrollV(i:pinteger;s,min,max:integer);
 begin
-   inc(i^,s);
+   i^+=s;
    if(i^>max)then i^:=max;
    if(i^<min)then i^:=min;
 end;
@@ -484,7 +484,7 @@ var i:integer;
 begin
    i:=0;
    repeat
-      inc(i,1);
+      i+=1;
       s:=str_screenshot+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
@@ -563,7 +563,7 @@ begin
    for i:=1 to MaxTDecsS do
    with _TDecs[i-1] do
    begin
-      inc(rn,17);
+      rn+=17;
       ix:=_genx(ix+rn,vid_mwa,false);
       iy:=_genx(iy+sqr(ix*i),vid_mha,false);
       x :=ix;
@@ -633,7 +633,7 @@ begin
    while (y<=ystop) do
    begin
       hlineColor(spr_panel,0,vid_panel,y,c_white);
-      inc(y,vid_BW);
+      y+=vid_BW;
    end;
 end;
 
@@ -660,8 +660,8 @@ begin
     with _Players[i] do
      if (state=PS_Play) then
      begin
-        inc(c,1);
-        if (ttl=ClientTTL) then inc(r,1);
+        c+=1;
+        if (ttl=ClientTTL) then r+=1;
      end;
    _plsOut:=(r=c)and(c>0);
 end;

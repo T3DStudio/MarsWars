@@ -1,6 +1,6 @@
 
 
-procedure cfg_setval(vr,vl:string);
+procedure cfg_setval(vr,vl:shortstring);
 var vlb:word;
 begin
    vlb:=s2w(vl);
@@ -24,22 +24,25 @@ begin
    if (vr='npnui')then net_pnui    :=vlb;
 end;
 
-procedure cfg_parse_str(s:string);
-var vr,vl:string;
+procedure cfg_parse_str(s:shortstring);
+var vr,vl:shortstring;
     i:byte;
 begin
    vr:='';
    vl:='';
    i :=pos('=',s);
-   vr:=copy(s,1,i-1);
-   delete(s,1,i);
-   vl:=s;
+   if(i>0)then
+   begin
+      vr:=copy(s,1,i-1);
+      delete(s,1,i);
+      vl:=s;
+   end;
    cfg_setval(vr,vl);
 end;
 
 procedure cfg_read;
 var f:text;
-    s:string;
+    s:shortstring;
 begin
    if FileExists(cfgfn) then
    begin

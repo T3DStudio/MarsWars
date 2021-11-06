@@ -17,6 +17,9 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
 procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);  forward;
+function _canmove  (pu:PTUnit):boolean; forward;
+function _canattack(pu:PTUnit):boolean; forward;
+
 
 function _str_mx(x:byte):shortstring;
 begin
@@ -220,36 +223,46 @@ begin
    Close(f);
 end;
 
-function _uid_cndt(pl:PTPlayer;uid:byte):cardinal;
-procedure setr(ni:cardinal;b:boolean);
-begin if(b)then _uid_cndt:=_uid_cndt or ni;end;
+function _uid_player_limit(pl:PTPlayer;uid:byte):boolean;
 begin
-   _uid_cndt:=0;
+   with pl^ do
+    with _uids[uid] do
+     if(_ukbuilding)and(menerg<=0)
+     then _uid_player_limit:=false
+     else _uid_player_limit:=((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+_limituse)<=MaxPlayerLimit);
+end;
+
+function _uid_conditionals(pl:PTPlayer;uid:byte):cardinal;
+procedure setr(ni:cardinal;b:boolean);
+begin if(b)then _uid_conditionals:=_uid_conditionals or ni;end;
+begin
+   _uid_conditionals:=0;
    with pl^ do
    with _uids[uid] do
    begin
-      setr(ureq_unitlimit ,(army+uproda)>=MaxPlayerUnits  );
-      setr(ureq_ruid      ,(_ruid >0)and(uid_eb[_ruid ]=0));
-      setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]=0));
-      setr(ureq_energy    , cenerg<_renerg                );
-      setr(ureq_time      , _btime<=0                     );
-      setr(ureq_addon     ,(_addon)and(G_addon=false)     );
+      setr(ureq_unitlimit ,(army     +uproda          )>=MaxPlayerUnits);
+      setr(ureq_armylimit ,(armylimit+uprodl+_limituse)> MaxPlayerLimit);
+      setr(ureq_ruid      ,(_ruid >0)and(uid_eb[_ruid ]<=0));
+      setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr] =0));
+      setr(ureq_energy    , cenerg<_renerg                 );
+      setr(ureq_time      , _btime<=0                      );
+      setr(ureq_addon     ,(_addon)and(G_addon=false)      );
       setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
 
-      case _isbuilding of
-      true : begin
-             setr(ureq_builders ,n_builders<=0);
-             setr(ureq_bld_r    ,build_cd   >0);
-             end;
-      false: setr(ureq_barracks ,n_barracks<=0);
+      case _ukbuilding of
+true  : begin
+           setr(ureq_builders ,n_builders<=0);
+           setr(ureq_bld_r    ,build_cd  > 0);
+        end;
+false : setr(ureq_barracks    ,n_barracks<=0);
       end;
    end;
 end;
-function _upid_cndt(pl:PTPlayer;up:byte):cardinal;
+function _upid_conditionals(pl:PTPlayer;up:byte):cardinal;
 procedure setr(ni:cardinal;b:boolean);
-begin if(b)then _upid_cndt:=_upid_cndt or ni;end;
+begin if(b)then _upid_conditionals:=_upid_conditionals or ni;end;
 begin
-   _upid_cndt:=0;
+   _upid_conditionals:=0;
    with pl^ do
    with _upids[up] do
    begin
