@@ -14,12 +14,12 @@ g_started         : boolean  = false;
 g_paused          : byte     = 0;
 g_wteam           : byte     = 255;
 g_mode            : byte     = 0;
-g_startb          : byte     = 0;
-g_shpos           : boolean  = false;
-g_aislots         : byte     = 5;
+g_start_base      : byte     = 0;
+g_show_positions  : boolean  = false;
+g_ai_slots        : byte     = 5;
 g_step            : cardinal = 0;
-g_plstat          : byte     = 0;
-g_nunits          : integer  = 0;
+g_player_status   : byte     = 0;
+g_cl_units        : integer  = 0;
 
 g_inv_monsters    : byte = 0;
 g_inv_wave_n      : byte = 0;
@@ -67,15 +67,15 @@ ai_bx,
 ai_by,
 ai_bd             : integer;  }
 
-HPlayer           : byte = 1;
+HPlayer           : byte = 1; // 'this' player
 
 team_army         : array[0..MaxPlayers] of integer;
 
 vid_mredraw       : boolean  = true;
 
 map_seed          : cardinal = 1;
-map_rpos          : byte = 0;
 map_iseed         : word     = 0;
+map_rpos          : byte     = 0;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
@@ -89,12 +89,15 @@ map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
-pf_pathgrid_tmp   : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
+pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
+pf_pathgrid_tmpb  : byte;
+pfNodes           : array[1..pfMaxNodes] of TPFNode;
+pfNodes_c         : integer;
 
-net_chatls        : array[0..MaxPlayers] of byte; // local state
-net_chatss        : array[0..MaxPlayers] of byte; // server state
-net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
-net_nstat         : byte = 0;
+//net_chatls        : array[0..MaxPlayers] of byte; // local state
+//net_chatss        : array[0..MaxPlayers] of byte; // server state
+//net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
+net_nstate        : byte = 0;
 net_sv_port       : word = 10666;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
@@ -111,7 +114,11 @@ fps_ns            : cardinal;
 
 wtrset_enemy_alive,
 wtrset_enemy_alive_ground,
+wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
+wtrset_enemy_alive_fly_mech,
+wtrset_enemy_alive_notfly,
+wtrset_enemy_alive_notfly_mech,
 wtrset_enemy_alive_mech,
 wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_nbuildings,
@@ -135,15 +142,16 @@ r_bminimap,
 r_screen,
 r_dterrain,
 r_menu            : pSDL_SURFACE;
-_vflags           : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
+r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
-_RECT             : pSDL_RECT;
+r_RECT            : pSDL_RECT;
 
-_fscr             : boolean = false;
+cfg_fullscreen    : boolean = false;
 _igchat           : boolean = false;
-_draw             : boolean = true;
+r_draw            : boolean = true;
 
 _menu             : boolean = true;
+menu_item         : integer;
 menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_scir;
 menu_s3           : byte = ms3_game;
@@ -164,8 +172,8 @@ PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
-vid_sw            : integer = 800;
-vid_sh            : integer = 600;
+vid_cam_w            : integer = 800;
+vid_cam_h            : integer = 600;
 vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = 794;
@@ -174,8 +182,8 @@ vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_rtui          : byte = 0;
-vid_vx            : integer = 0;
-vid_vy            : integer = 0;
+vid_cam_x            : integer = 0;
+vid_cam_y            : integer = 0;
 vid_vmspd         : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
@@ -256,20 +264,20 @@ fog_vfh           : byte = 0;
 _fog              : boolean = true;
 _fcx              : array[0..MFogM,0..MFogM] of byte;
 fog_surf          : pSDL_Surface;
-vid_fsx           : integer = 0;
-vid_fsy           : integer = 0;
-vid_fex           : integer = 0;
-vid_fey           : integer = 0;
+vid_fog_sx           : integer = 0;
+vid_fog_sy           : integer = 0;
+vid_fog_ex           : integer = 0;
+vid_fog_ey           : integer = 0;
 
 _lng              : boolean = false;
 
-_m_sel,
-m_sxs,
-m_sys,
-m_mx,
-m_my,
-m_vx,
-m_vy              : integer;
+
+mouse_select_x0,
+mouse_select_y0,
+mouse_map_x,
+mouse_map_y,
+mouse_x,
+mouse_y           : integer;
 m_ldblclk,
 m_brushc          : cardinal;
 m_brushx,
@@ -599,7 +607,6 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 //  TEST
 //
 
-str_startat       : array[0..gms_g_startb] of shortstring;
 str_race          : array[0..r_cnt       ] of shortstring;
 str_gmode         : array[0..gm_cnt      ] of shortstring;
 str_addon         : array[false..true    ] of shortstring;

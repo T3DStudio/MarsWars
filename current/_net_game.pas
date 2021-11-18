@@ -104,9 +104,9 @@ begin
 
    net_writebool(g_addon  );
    net_writebyte(g_mode   );
-   net_writebyte(g_startb );
-   net_writebool(g_shpos  );
-   net_writebyte(g_aislots);
+   net_writebyte(g_start_base );
+   net_writebool(g_show_positions  );
+   net_writebyte(g_ai_slots);
 end;
 
 procedure net_GServer;
@@ -176,11 +176,7 @@ nmid_chat:  begin
 
 nmid_plout: begin
                net_chat_add(_players[pid].name+str_plout,pid,255);
-               if(G_Started=false)then
-               begin
-                  _players[pid].state:=ps_none;
-                  _playerSetState(pid);
-               end;
+               if(G_Started=false)then PlayerSetState(pid,ps_none);
                continue;
             end;
             end;
@@ -298,9 +294,9 @@ begin
    g_mode   := net_readbyte;
    rm:=rm or (c<>g_mode  );
 
-   g_startb := net_readbyte;
-   g_shpos  := net_readbool;
-   g_aislots:= net_readbyte;
+   g_start_base := net_readbyte;
+   g_show_positions  := net_readbool;
+   g_ai_slots:= net_readbyte;
 
    if(rm)then Map_premap;
    vid_mredraw:=true;
@@ -388,7 +384,7 @@ begin
                _menu:=false;
                ServerSide:=false;
                //if(g_mode=gm_coop)then _make_coop;
-               _moveHumView(map_psx[HPlayer] , map_psy[HPlayer]);
+               MoveCamToPoint(map_psx[HPlayer] , map_psy[HPlayer]);
             end
             else
             begin

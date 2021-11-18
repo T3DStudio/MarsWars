@@ -6,7 +6,7 @@ begin
 
    if SDL_Init(SDL_INIT_VIDEO)<>0 then begin WriteSDLError; exit; end;
 
-   NEW(_rect);
+   NEW(r_RECT);
 
    SDL_putenv('SDL_VIDEO_WINDOW_POS');
    SDL_putenv('SDL_VIDEO_CENTERED=1');

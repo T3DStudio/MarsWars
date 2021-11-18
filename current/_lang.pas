@@ -250,13 +250,7 @@ begin
    str_pcolors[3]        := #14+'teams'+#25;
    str_pcolors[4]        := #22+'own '+#14+'teams'+#25;
 
-   str_starta            := 'Starting base:';
-   str_startat[0]        := '1 '+#19+'builder'+#25;
-   str_startat[1]        := '2 '+#19+'builders'+#25;
-   str_startat[2]        := '3 '+#19+'builders'+#25;
-   str_startat[3]        := '4 '+#19+'builders'+#25;
-   str_startat[4]        := '5 '+#19+'builders'+#25;
-   str_startat[5]        := '6 '+#19+'builders'+#25;
+   str_starta            := 'Builders at game start:';
 
    str_sstarts           := 'Show player starts:';
 
@@ -693,13 +687,7 @@ begin
   str_pcolors[3]        := #14+'команды'+#25;
   str_pcolors[4]        := #22+'свои '+#14+'команды'+#25;
 
-  str_starta            := 'Ќачальна€ база:';
-  str_startat[0]        := '1 '+#19+'строитель'+#25;
-  str_startat[1]        := '2 '+#19+'строител€'+#25;
-  str_startat[2]        := '3 '+#19+'строител€'+#25;
-  str_startat[3]        := '4 '+#19+'строител€'+#25;
-  str_startat[4]        := '5 '+#19+'строителей'+#25;
-  str_startat[5]        := '6 '+#19+'строителей'+#25;
+  str_starta            := ' оличество строителей на старте:';
 
   str_sstarts           := 'ѕоказывать старты:';
 

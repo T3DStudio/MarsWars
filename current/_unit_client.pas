@@ -195,7 +195,7 @@ procedure _wpupgr(rpl:boolean);
 var i,n,bp,bv:byte;
 begin
    for i:=1 to MaxPlayers do
-    if((G_plstat and (1 shl i))>0)then
+    if((g_player_status and (1 shl i))>0)then
      with _players[i] do
      begin
         bp:=0;
@@ -259,11 +259,11 @@ gm_royl: _wudata_int(g_royal_r,rpl);
 
    CalcPLNU;
 
-   _wudata_byte(G_plstat,rpl);
-   if(G_plstat>0)then
+   _wudata_byte(g_player_status,rpl);
+   if(g_player_status>0)then
    begin
       _wudata_byte(_PNU,rpl);
-      _PNU:=min2(G_nunits,_PNU*4);
+      _PNU:=min2(g_cl_units,_PNU*4);
 
       if((gstp mod i)=0)then _wpupgr(rpl);
 
@@ -273,7 +273,7 @@ gm_royl: _wudata_int(g_royal_r,rpl);
          repeat
             inc(_N_U^,1);
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
-         until ( G_plstat and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
+         until ( g_player_status and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
          _wudata(@_units[_N_U^],rpl,_pl);
       end;
    end;
@@ -435,7 +435,7 @@ var pu,tu:PTUnit;
    vis:boolean;
 begin
    pu:=@_units[0];
-   with uu^ do vis:=_PointInScreen2(x,y,player);
+   with uu^ do vis:=PointInScreenF(x,y,player);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
@@ -600,8 +600,8 @@ begin
                {if(pu^.buff[ub_teleeff]=0)and(buff[ub_teleeff]>0)then
                 if(uidi=UID_HKeep)then
                 begin
-                   if(_PointInScreen2(x,y,player))
-                   or(_PointInScreen2(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
+                   if(PointInScreenF(x,y,player))
+                   or(PointInScreenF(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
                    _effect_add(pu^.x,pu^.y,0,EID_HKT_h);
                    _effect_add(x    ,y    ,0,EID_HKT_s);
                    buff[ub_clcast]:=vid_fps;
@@ -612,8 +612,8 @@ begin
                 begin
                    vx:=x;
                    vy:=y;
-                   if(_PointInScreen2(vx,vy,player))
-                   or(_PointInScreen2(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
+                   if(PointInScreenF(vx,vy,player))
+                   or(PointInScreenF(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
                    _effect_add(vx    ,vy    ,    vy+map_flydpth[uf]+1,EID_Teleport);
                    _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
                 end; }
@@ -845,9 +845,9 @@ procedure _rpdata(rpl:boolean);
 var i,n,bp,bv,lu,anoncer:byte;
 begin
    anoncer:=0;
-   if(G_plstat>0)then
+   if(g_player_status>0)then
    for i:=1 to MaxPlayers do
-    if((G_plstat and (1 shl i))>0)then
+    if((g_player_status and (1 shl i))>0)then
      with _players[i] do
      begin
         bp:=0;
@@ -878,9 +878,9 @@ end;
 procedure ClNUnits;
 var i:byte;
 begin
-   G_nunits:=0;
+   g_cl_units:=0;
    for i:=1 to MaxPlayers do
-    if((G_plstat and (1 shl i))>0)then inc(G_nunits,MaxPlayerUnits);
+    if((g_player_status and (1 shl i))>0)then inc(g_cl_units,MaxPlayerUnits);
 end;
 
 procedure _rclinet_gframe(_pl:byte;rpl:boolean);
@@ -915,8 +915,8 @@ gm_cptp  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
 gm_royl: g_royal_r:=_rudata_int(rpl,0);
     end;
 
-   G_plstat:=_rudata_byte(rpl,0);
-   if(G_plstat>0)then
+   g_player_status:=_rudata_byte(rpl,0);
+   if(g_player_status>0)then
    begin
       _PNU:=_rudata_byte(rpl,0)*4;
 
@@ -924,7 +924,7 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
 
       ClNUnits;
 
-      if(_PNU>G_nunits)then _PNU:=G_nunits;
+      if(_PNU>g_cl_units)then _PNU:=g_cl_units;
 
       if(_PNU<>_rpls_pnu)then
       begin
@@ -942,7 +942,7 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
          repeat
            inc(_N_U,1);
            if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
-         until ( G_plstat and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0 ;
+         until ( g_player_status and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0 ;
          _units[_N_U].unum:=_N_U;
          _rudata(@_units[_N_U],rpl,_pl);
       end;

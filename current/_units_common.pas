@@ -64,7 +64,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
+         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),un_eid_ready[buff[ub_advanced]>0]);
@@ -83,7 +83,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       if(fastdeath)then
       begin
@@ -108,7 +108,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
       PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
@@ -122,7 +122,7 @@ begin
       if(vischeck^=false)then exit
    end
    else
-     if(_PointInScreen2(tx,ty,@_players[HPlayer])=false)then exit;
+     if(PointInScreenF(tx,ty,@_players[HPlayer])=false)then exit;
 
    _effect_add(tx,ty,dy,UID_LostSoul);
    PlaySND(snd_pexp,nil,nil);
@@ -139,7 +139,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(_PointInScreen2(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       if(start)then
       begin
@@ -296,8 +296,8 @@ begin
       tx:=mm3(0,tx,map_mw);
       ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
-      if _PointInScreen2(vx,vy,@_players[HPlayer])
-      or _PointInScreen2(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil,nil);
+      if PointInScreenF(vx,vy,@_players[HPlayer])
+      or PointInScreenF(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
       _effect_add(tx,ty,_depth(ty+1,uf),EID_Teleport);
       {$ENDIF}
@@ -1153,7 +1153,7 @@ begin
             begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
-               if _PointInScreen2(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
+               if PointInScreenF(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
                _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.uf),EID_Teleport);
                {$ENDIF}
             end;

@@ -129,7 +129,7 @@ begin
 end;
 
 begin
-   if(_menu)or(g_paused>0)or(_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
+   if(_menu)or(g_paused>0)or(r_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
 
    for e:=1 to vid_mvs do
    with _effects[e] do
@@ -234,7 +234,7 @@ var i,o,r:byte;
 begin
    with _missiles[m] do
    with _mids[mid] do
-   if(_PointInScreen2(vx,vy,@_players[player]))then
+   if(PointInScreenF(vx,vy,@_players[player]))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -268,7 +268,7 @@ begin
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
+       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
    end;
 end;
 
@@ -318,7 +318,7 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
         else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
-         if(_RectInScreen(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
+         if(RectInCam(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
      end;
 end;
 

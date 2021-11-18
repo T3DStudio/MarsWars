@@ -4,25 +4,25 @@ procedure _draw_texture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
    begin
-      _rect^.x:=x;
-      _rect^.y:=y;
-      _rect^.w:=sur^.w;
-      _rect^.h:=sur^.h;
-      SDL_BLITSURFACE(surf,nil,tar,_rect);
+      r_RECT^.x:=x;
+      r_RECT^.y:=y;
+      r_RECT^.w:=sur^.w;
+      r_RECT^.h:=sur^.h;
+      SDL_BLITSURFACE(surf,nil,tar,r_RECT);
    end;
 end;
 
 procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
 begin
-   _rect^.x:=x;
-   _rect^.y:=y;
-   _rect^.w:=sur^.w;
-   _rect^.h:=sur^.h;
-   SDL_BLITSURFACE(sur,nil,tar,_rect);
+   r_RECT^.x:=x;
+   r_RECT^.y:=y;
+   r_RECT^.w:=sur^.w;
+   r_RECT^.h:=sur^.h;
+   SDL_BLITSURFACE(sur,nil,tar,r_RECT);
 end;
 
 
-procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:string;al,chrs:byte;tc:cardinal);
+procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:shortstring;al,chrs:byte;tc:cardinal);
 var ss,i,o:byte;
     ix:integer;
      c:char;
@@ -51,7 +51,7 @@ begin
          c:=s[i];
 
          case c of
-         #0..#6  : begin cl:=_PlayerColor(ord(c));if(i<ss)then continue;end; //tc:=cl;
+         #0..#6  : begin cl:=PlayerGetColor(ord(c));if(i<ss)then continue;end; //tc:=cl;
          #11..#13: ;
          #14     : begin cl:=c_purple       ;if(i<ss)then continue;end;
          #15     : begin cl:=c_red          ;if(i<ss)then continue;end;
@@ -137,7 +137,7 @@ begin
       x:=trunc(map_psx[i]*map_mmcx);
       y:=trunc(map_psy[i]*map_mmcx);
 
-      c:=_PlayerColor(i);
+      c:=PlayerGetColor(i);
 
       characterColor(r_minimap,x-3,y-3,start_char,c);
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
@@ -154,7 +154,7 @@ begin
    sdl_FillRect(r_minimap,nil,0);
    map_bminimap;
    _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_shpos)or(g_mode in [gm_inv,gm_2fort,gm_3fort])then map_dstarts;
+   if(g_show_positions)or(g_mode in [gm_inv,gm_2fort,gm_3fort])then map_dstarts;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
   // vid_mredraw:=true;

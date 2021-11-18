@@ -33,7 +33,7 @@ begin
    if(vr=cfg_key_sndv )then snd_svolume := vlw;
    if(vr=cfg_key_mscv )then snd_mvolume := vlw;
    if(vr=cfg_key_vspd )then vid_vmspd   := vlw;
-   if(vr=cfg_key_fscr )then _fscr       :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_fscr )then cfg_fullscreen       :=(vl=b2pm[true,2]);
    if(vr=cfg_key_vmm  )then vid_vmm     :=(vl=b2pm[true,2]);
    if(vr=cfg_key_saddr)then net_cl_svstr:= vl;
    if(vr=cfg_key_sport)then net_sv_pstr := vl;
@@ -41,9 +41,9 @@ begin
    if(vr=cfg_key_mai  )then m_a_inv     :=(vl=b2pm[true,2]);
    if(vr=cfg_key_vidvw)then vid_vw      := vlw;
    if(vr=cfg_key_vidvh)then vid_vh      := vlw;
-   if(vr=cfg_key_gsb  )then G_startb    := vlw;
-   if(vr=cfg_key_gsp  )then G_shpos     :=(vl=b2pm[true,2]);
-   if(vr=cfg_key_gai  )then G_aislots   := vlw;
+   if(vr=cfg_key_gsb  )then g_start_base    := vlw;
+   if(vr=cfg_key_gsp  )then g_show_positions     :=(vl=b2pm[true,2]);
+   if(vr=cfg_key_gai  )then g_ai_slots   := vlw;
    if(vr=cfg_key_rpnui)then _rpls_pnui  := vlw;
    if(vr=cfg_key_npnui)then net_pnui    := vlw;
    if(vr=cfg_key_ppos )then vid_ppos    := vlw;
@@ -91,8 +91,8 @@ begin
       vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
 
-      if(G_aislots>gms_g_maxai )then G_aislots:=gms_g_maxai;
-      if(G_startb >gms_g_startb)then G_startb :=gms_g_startb;
+      if(g_ai_slots>gms_g_maxai )then g_ai_slots:=gms_g_maxai;
+      if(g_start_base >gms_g_startb)then g_start_base :=gms_g_startb;
 
       if(_rpls_pnui  >_cl_pnun)then _rpls_pnui  :=_cl_pnun;
       if(net_pnui    >_cl_pnun)then net_pnui    :=_cl_pnun;
@@ -116,7 +116,7 @@ begin
    writeln(f,cfg_key_name ,'=',PlayerName     );
    writeln(f,cfg_key_sndv ,'=',snd_svolume    );
    writeln(f,cfg_key_mscv ,'=',snd_mvolume    );
-   writeln(f,cfg_key_fscr ,'=',b2pm[_fscr,2]  );
+   writeln(f,cfg_key_fscr ,'=',b2pm[cfg_fullscreen,2]  );
    writeln(f,cfg_key_vspd ,'=',vid_vmspd      );
    writeln(f,cfg_key_vmm  ,'=',b2pm[vid_vmm,2]);
    writeln(f,cfg_key_saddr,'=',net_cl_svstr   );
@@ -127,9 +127,9 @@ begin
    writeln(f,cfg_key_vidvh,'=',vid_vh         );
    writeln(f,cfg_key_rpnui,'=',_rpls_pnui     );
    writeln(f,cfg_key_npnui,'=',net_pnui       );
-   writeln(f,cfg_key_gsb  ,'=',G_startb       );
-   writeln(f,cfg_key_gsp  ,'=',b2pm[G_shpos,2]);
-   writeln(f,cfg_key_gai  ,'=',G_aislots      );
+   writeln(f,cfg_key_gsb  ,'=',g_start_base       );
+   writeln(f,cfg_key_gsp  ,'=',b2pm[g_show_positions,2]);
+   writeln(f,cfg_key_gai  ,'=',g_ai_slots      );
    writeln(f,cfg_key_ppos ,'=',vid_ppos       );
    writeln(f,cfg_key_uhbar,'=',vid_uhbars     );
    writeln(f,cfg_key_plcol,'=',vid_plcolors   );

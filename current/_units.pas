@@ -36,7 +36,7 @@ begin
        if(G_WTeam=255)then
         if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
          if(army=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-         and(state>ps_none)then net_chat_add(name+str_player_def,playeri,255);
+         and(state>ps_none)then PlayerAddLog(playeri,name+str_player_def,,255);
     end;
 end;
 
@@ -482,6 +482,8 @@ begin
           end
           else
           begin
+             //pf_unit(pu);
+
              with uid^ do
               if(not _ukbuilding)then
                with player^ do
@@ -695,6 +697,11 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then exit;
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
 
+      if(cf(@aw_reqf,@wpr_air   ))then
+       if(uf=uf_ground)or(tu^.uf=uf_ground)then exit;
+      if(cf(@aw_reqf,@wpr_ground))then
+       if(uf>uf_ground)or(tu^.uf>uf_ground)then exit;
+
       if(cf(@aw_reqf,@wpr_zombie))then
       begin
          if(tu^.bld=false)
@@ -739,23 +746,25 @@ wpt_heal     : if(tu^.hits<=0)
 
       // Distance requirements
 
-      if(aw_range=0)
+      if(ud<aw_min_range)then exit;
+
+      if(aw_max_range=0)
       then awr:=ud-srange
       else
-        if(aw_range>0)
-        then awr:=ud-aw_range
+        if(aw_max_range>0)
+        then awr:=ud-aw_max_range
         else
           if(_IsUnitRange(inapc,nil))
           then exit
-          else awr:=ud-(_r+tu^.uid^._r-aw_range);
+          else awr:=ud-(_r+tu^.uid^._r-aw_max_range);
 
       if(awr<0)or(ServerSide=false)
       then _target_weapon_check:=2      // can attack now
       else
         if(speed>0)and(uo_id<>ua_hold)and(_IsUnitRange(inapc,nil)=false)then
          if(ud<=srange)or(nosrangecheck)
-         then _target_weapon_check:=1  // need move closer
-         else exit;                    // target too far
+         then _target_weapon_check:=1   // need move closer
+         else exit;                     // target too far
    end;
 end;
 
@@ -1292,6 +1301,9 @@ begin
       0: exit;
       1: begin
             if(ServerSide)then
+            with uid^ do
+            with _a_weap[a_weap] do
+            if(not cf(@aw_reqf,@wpr_move))then
             begin
                mv_x:=tu^.x;
                mv_y:=tu^.y;
@@ -1300,6 +1312,9 @@ begin
          end;
       else
          if(ServerSide)then
+         with uid^ do
+         with _a_weap[a_weap] do
+         if(not cf(@aw_reqf,@wpr_move))then
          begin
             mv_x:=x;
             mv_y:=y;
@@ -1313,8 +1328,11 @@ begin
          if(a_rld=0)then
          begin
             a_rld:=aw_rld;
-            dir    :=p_dir(x,y,tu^.x,tu^.y);
-            if(ServerSide)then buff[ub_stopattack]:=max2(a_rld,_uclord_p);
+            if(not cf(@aw_reqf,@wpr_move))then
+            begin
+               dir:=p_dir(x,y,tu^.x,tu^.y);
+               if(ServerSide)then buff[ub_stopattack]:=max2(a_rld,_uclord_p);
+            end;
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,nil);
             a_aweap:=a_weap;
@@ -1329,7 +1347,7 @@ begin
 
          {$IFDEF _FULLGAME}
          if(aw_eid_target>0)then
-          if(_PointInScreen2(tu^.vx,tu^.vy,@_players[HPlayer])=false)then exit;
+          if(PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer])=false)then exit;
           begin
              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),aw_eid_target);
              if(aw_snd_target<>nil)then
@@ -1342,9 +1360,8 @@ begin
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,false,nil);
             {$ENDIF}
-            if(aw_dupgr>0)and(aw_dupgr_s>0)then
-             upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
-            dir    :=p_dir(x,y,tu^.x,tu^.y);
+            if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
+            if(not cf(@aw_reqf,@wpr_move))then dir:=p_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
                  then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)

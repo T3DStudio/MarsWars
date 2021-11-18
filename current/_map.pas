@@ -20,7 +20,7 @@ end;
 
 {$ENDIF}
 
-procedure _refresh_dmcells;
+procedure map_doodads_cells_refresh;
 var dx0,dy0,dx1,dy1,d,dy:integer;
 begin
    for dx0:=0 to dcn do
@@ -88,8 +88,8 @@ begin
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
-   map_mmvw    := trunc(vid_sw*map_mmcx)+1;
-   map_mmvh    := trunc(vid_sh*map_mmcx)+1;
+   map_mmvw    := trunc(vid_cam_w*map_mmcx)+1;
+   map_mmvh    := trunc(vid_cam_h*map_mmcx)+1;
    map_prmm    := round(g_ct_pr*map_mmcx);
    {$ENDIF}
 end;
@@ -397,7 +397,7 @@ const dpostime = 400;
 var i,ix,iy,lqs,rks,ddc,cnt:integer;
 begin
    {$IFDEF _FULLGAME}
-   map_tdmake;
+   map_tdmake;   //terrain decals
    {$ENDIF}
 
    map_ddn:=0;
@@ -453,7 +453,8 @@ begin
       end;
    end;
 
-   _refresh_dmcells;
+   map_doodads_cells_refresh;
+   pf_make_grid;
    {$IFDEF _FULLGAME}
    _map_dds;
    _makeMMB;

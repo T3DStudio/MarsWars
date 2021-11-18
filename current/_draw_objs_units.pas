@@ -1,18 +1,18 @@
 
 procedure _unit_minimap(pu:PTUnit);
 begin
-  if(vid_rtui=0)and(_menu=false)and(_draw)then
+  if(vid_rtui=0)and(_menu=false)and(r_draw)then
    with pu^ do
    with uid^ do
     if(uid^._ukbuilding)
-    then filledCircleColor(r_minimap,mmx,mmy,mmr,_PlayerColor(player^.pnum))
-    else pixelColor       (r_minimap,mmx,mmy,    _PlayerColor(player^.pnum));
+    then filledCircleColor(r_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
+    else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 end;
 
 function _depth(y:integer;f:byte):integer;
 begin
    if(f=255)
-   then _depth:=y-map_flydepths[uf_soaring]
+   then _depth:=y-MaxSMapW
    else
    begin
       if(f>uf_fly)then f:=uf_fly;
@@ -31,7 +31,7 @@ UID_HSymbol,
 UID_HAltar    : _udpth:=_depth(vy,255);
 UID_UMine     : _udpth:=-2;
     else
-      if(uid^._ukbuilding)and(bld)
+      if(uid^._ukbuilding)and(bld=false)
       then _udpth:=_depth(vy,255)
       else
         if(hits>0)or(buff[ub_resur]>0)
@@ -63,8 +63,8 @@ end;
 
 function _fog_cscr(x,y,r:integer):boolean;
 begin
-   _fog_cscr:=((vid_fsx-r)<=x)and(x<=(vid_fex+r))
-           and((vid_fsy-r)<=y)and(y<=(vid_fey+r));
+   _fog_cscr:=((vid_fog_sx-r)<=x)and(x<=(vid_fog_ex+r))
+           and((vid_fog_sy-r)<=y)and(y<=(vid_fog_ey+r));
 end;
 
 procedure _unit_sfog(pu:PTUnit);
@@ -100,13 +100,13 @@ begin
     else
       case _checkvision(pu) of
     1:begin
-         if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,_fr);
+         if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
          _unit_fogrev:=true;
       end;
     2:begin
-         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fsx,fy-vid_fsy,fsr);
+         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
          _unit_fogrev:=true;
-         if(_ability=uab_radar)and(rld>radar_btime)then _fog_sr((uo_x div fog_cw)-vid_fsx,(uo_y div fog_cw)-vid_fsy,fsr);
+         if(_ability=uab_radar)and(rld>radar_btime)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
       end;
       end;
 end;
@@ -186,7 +186,7 @@ begin
             ui_prod_builds := ui_prod_builds + uid^.ups_builder;
             if(isbuildarea)and(0<m_brush)and(m_brush<=255)and(speed<=0)then
              //if(m_brush in ui_prod_builds)then
-               if(_RectInScreen(x,y,srange,srange,0))then _addUIBuildRs(x,y,srange);
+               if(RectInCam(x,y,srange,srange,0))then UIAddBuilderArea(x,y,srange);
 
             for i:=0 to MaxUnitProds do
              if(i>0)and(buff[ub_advanced]<=0)
@@ -279,7 +279,7 @@ begin
          shadow+=sign(_unit_shadowz(pu)-shadow);
          sh    :=shadow;
 
-         if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,sh))then
+         if(RectInCam(vx,vy,spr^.hw,spr^.hh,sh))then
          begin
             dp :=0;
             inv:=255;
@@ -291,7 +291,7 @@ begin
             b2 :=0;
             b3 :=0;
             rct:=false;
-            rc :=_PlayerColor(playeri);
+            rc :=PlayerGetColor(playeri);
             ro :=0;
 
             if(_ukbuilding)then
@@ -381,7 +381,7 @@ begin
 
                  if(buff[ub_invis]>0)then invb:=invb shr 1;
 
-                 _sl_add_eff(vx,vy+un_eid_bcrater_y,-5,0,_EID2Spr(un_eid_bcrater),invb);
+                 _sl_add_eff(vx,vy+un_eid_bcrater_y,dp-MaxSMapW,0,_EID2Spr(un_eid_bcrater),invb);
               end
               else
                 if(buff[ub_invis]>0)then inv:=inv shr 1;
@@ -538,7 +538,7 @@ begin
        if(spr=pspr_dummy)then exit;
 
        if(_unit_fogrev(pu))then
-        if(_RectInScreen(vx,vy,spr^.hw,spr^.hh,0))then
+        if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
          _sl_add_dec(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0,0);
     end;
 end;

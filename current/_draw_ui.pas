@@ -19,7 +19,7 @@ gm_cptp:
        with g_cpoints[i] do
         if(ct>0)and((G_Step mod 20)>10)
         then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray     )
-        else circleColor(r_minimap,mpx,mpy,map_prmm,_PlayerColor(pl));
+        else circleColor(r_minimap,mpx,mpy,map_prmm,PlayerGetColor(pl));
 gm_royl:
       circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
    end;
@@ -43,8 +43,8 @@ begin
    case m_brush of
    1..255:
    begin
-      m_brushx-=vid_vx-lx;
-      m_brushy-=vid_vy-ly;
+      m_brushx-=vid_cam_x-lx;
+      m_brushy-=vid_cam_y-ly;
 
       with _uids[m_brush] do
       begin
@@ -56,19 +56,19 @@ begin
          circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
       end;
 
-      m_brushx+=vid_vx-lx;
-      m_brushy+=vid_vy-ly;
+      m_brushx+=vid_cam_x-lx;
+      m_brushy+=vid_cam_y-ly;
 
       {if(m_brush in [4,7,10])then
-       circleColor(tar,m_vx,m_vy,towers_sr[upgr[upgr_towers]],c_gray); }
+       circleColor(tar,mouse_x,mouse_y,towers_sr[upgr[upgr_towers]],c_gray); }
 
       // build areas
       while(ui_builders_n>0)do
       begin
          ui_builders_n-=1;
          circleColor(tar,
-         lx+ui_builders_x[ui_builders_n]-vid_vx,
-         ly+ui_builders_y[ui_builders_n]-vid_vy,
+         lx+ui_builders_x[ui_builders_n]-vid_cam_x,
+         ly+ui_builders_y[ui_builders_n]-vid_cam_y,
          ui_builders_r[ui_builders_n],c_white);
       end;
 
@@ -77,14 +77,14 @@ begin
        for i:=1 to MaxCPoints do
         with g_cpoints[i] do
          circleColor(tar,
-         lx+px-vid_vx,
-         ly+py-vid_vy,
+         lx+px-vid_cam_x,
+         ly+py-vid_cam_y,
          base_r,c_blue);
 
       // map build rect
       rectangleColor(tar,
-      lx+map_b0-vid_vx,ly+map_b0-vid_vy,
-      lx+map_b1-vid_vx,ly+map_b1-vid_vy,
+      lx+map_b0-vid_cam_x,ly+map_b0-vid_cam_y,
+      lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
       c_white);
    end;
    end;
@@ -237,9 +237,9 @@ begin
       end;
 
       d_TextBTN(tar,0,9,@str_menu,c_white);
-      if(net_nstat>ns_none)and(G_WTeam=255)then
+      if(net_nstate>ns_none)and(G_WTeam=255)then
        if(g_paused>0)
-       then d_TextBTN(tar,2,9,@str_pause,_PlayerColor(g_paused))
+       then d_TextBTN(tar,2,9,@str_pause,PlayerGetColor(g_paused))
        else d_TextBTN(tar,2,9,@str_pause,c_white          );
 
       if(vid_ppos<2)then
@@ -340,7 +340,7 @@ begin
          begin
             if(ui=0)
             then _drawBtnt(tar,ux,uy,str_all          ,'','','','',c_white         ,0,0,0,0,'')
-            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',_PlayerColor(ui),0,0,0,0,'');
+            else _drawBtnt(tar,ux,uy,_players[ui].name,'','','','',PlayerGetColor(ui),0,0,0,0,'');
             _drawBtn(tar,ux,uy,r_empty,ui=HPlayer,_players[ui].army=0);
 
             ux+=1;
@@ -386,14 +386,14 @@ begin
         if(uid_s[sx]>0)then
          with _uids[sx] do
          case _ability of
-uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,m_vx,m_vy,blizz_r,c_gray);
+uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizz_r,c_gray);
          end;
 
       if(ui_mc_a>0)then //click effect
       begin
          sx:=ui_mc_a;
          sy:=sx shr 1;
-         ellipseColor(tar,ui_mc_x-vid_vx,ui_mc_y-vid_vy,sx,sy,ui_mc_c);
+         ellipseColor(tar,ui_mc_x-vid_cam_x,ui_mc_y-vid_cam_y,sx,sy,ui_mc_c);
 
          ui_mc_a-=1;
       end;
@@ -421,16 +421,16 @@ begin
       hs:=nil;
       case m_by of
       3  : case (vid_ppos<2) of
-           true :if(m_vy>ui_tabsy)
-                 then hs:=@str_hint_t[(m_vx-vid_panelx) div vid_tBW ]
-                 else hs:=@str_hint_a[(m_vx-vid_panelx) div vid_2tBW];
-           false:if(m_vx>ui_tabsy)
-                 then hs:=@str_hint_t[(m_vy-vid_panely) div vid_tBW ]
+           true :if(mouse_y>ui_tabsy)
+                 then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW ]
+                 else hs:=@str_hint_a[(mouse_x-vid_panelx) div vid_2tBW];
+           false:if(mouse_x>ui_tabsy)
+                 then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW ]
                  else ;
            end;
       13 : begin
               if(m_bx=2)then
-               if(net_nstat=ns_none)or(G_WTeam<255)then exit;
+               if(net_nstate=ns_none)or(G_WTeam<255)then exit;
               hs:=@str_hint_m[m_bx];
            end;
       15 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[0];
@@ -484,13 +484,13 @@ begin
    // CHAT
    if(_igchat)or(_rpls_log)then
    begin
-      for i:=0 to MaxNetChat do _draw_text(tar,ui_textx,ui_chaty-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
+      //for i:=0 to MaxNetChat do _draw_text(tar,ui_textx,ui_chaty-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
       if(_rpls_log=false)then   _draw_text(tar,ui_textx,ui_hinty     ,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then
      begin
-        _draw_text(tar,ui_textx,ui_chaty,net_chat[HPlayer,0],ta_left,255,c_white);
+       // _draw_text(tar,ui_textx,ui_chaty,net_chat[HPlayer,0],ta_left,255,c_white);
         net_chat_shlm-=1;
      end
      else d_Hints(tar);
@@ -507,9 +507,9 @@ begin
            if(menu_s2<>ms2_camp)then
             if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
-            if(net_nstat=ns_clnt)and(net_cl_svttl=ClientTTL)
-            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,_PlayerColor(net_cl_svpl))
-            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,_PlayerColor(G_paused   ));
+            if(net_nstate=ns_clnt)and(net_cl_svttl=ClientTTL)
+            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
+            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
         end
         else
         begin
@@ -543,13 +543,13 @@ co_patrol  : c:=c_lime;
 co_amove,
 co_apatrol : c:=c_red;
 co_paction : c:=c_aqua;
-   else _draw_surf(tar,m_vx,m_vy,spr_cursor);
+   else _draw_surf(tar,mouse_x,mouse_y,spr_cursor);
    end;
    if(c<>0)then
    begin
-      circleColor(tar,m_vx   ,m_vy,10,        c);
-      hlineColor (tar,m_vx-12,m_vx+12,m_vy   ,c);
-      vlineColor (tar,m_vx   ,m_vy-12,m_vy+12,c);
+      circleColor(tar,mouse_x   ,mouse_y,10,        c);
+      hlineColor (tar,mouse_x-12,mouse_x+12,mouse_y   ,c);
+      vlineColor (tar,mouse_x   ,mouse_y-12,mouse_y+12,c);
    end;
 end;
 
@@ -557,7 +557,7 @@ procedure d_ui(tar:pSDL_Surface;lx,ly:integer);
 begin
    d_PanelUI(tar,lx,ly);
    d_UIText(tar);
-   if(m_sxs>-1)then rectangleColor(tar,lx+m_sxs-vid_vx, ly+m_sys-vid_vy, m_vx, m_vy, _PlayerColor(HPlayer));
+   if(mouse_select_x0>-1)then rectangleColor(tar,lx+mouse_select_x0-vid_cam_x, ly+mouse_select_y0-vid_cam_y, mouse_x, mouse_y, PlayerGetColor(HPlayer));
 end;
 
 

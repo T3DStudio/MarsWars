@@ -69,8 +69,11 @@ uidall                 = [0..255];
 //  PATH FIND SYSTEM
 //
 
-pf_pathmap_c           = 255;
-pf_pathmap_w           = ceil(MaxSMapW div pf_pathmap_c);
+pfMaxNodes             = 255;
+
+pf_pathmap_w           = 40;
+pf_pathmap_c           = (MaxSMapW div pf_pathmap_w)+1;
+
 pf_pathmap_hw          = pf_pathmap_w div 2;
 
 pf_solid               : word = 65535;
@@ -98,9 +101,22 @@ outlogfn               : shortstring = 'out.txt';
 //  Game settings borders
 //
 
-gms_g_startb           = 5;
+gms_g_startb           = 6;
 gms_g_maxai            = 8;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Player log
+//
+
+MaxPlayerLog           = 255;
+
+lmt_chat               = #1;
+//lmt_victory            = #2;
+//lmt_defeat             = #3;
+//lmt_supply             = #4;
+//lmt_energy             = #5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -114,7 +130,6 @@ _cl_pnua               : array[0.._cl_pnun] of byte = (15,35 ,55 ,75 ,95 ,115,13
 ClientTTL              = fr_fps*10;
 
 NetTickN               = 2;
-MaxNetChat             = 16;
 MaxNetBuffer           = 4096;
 
 ns_none                = 0;
@@ -226,13 +241,16 @@ atm_inapc              = 4;   // can attack only when inapc
 //
 
 wpr_any              : cardinal =  0;
-wpr_adv              : cardinal =  %0000000000000001;
-wpr_nadv             : cardinal =  %0000000000000010;
-wpr_zombie           : cardinal =  %0000000000000100;
-wpr_sspos            : cardinal =  %0000000000001000;
-wpr_cast             : cardinal =  %0000000000010000;
-wpr_tvis             : cardinal =  %0000000000100000;
-wpr_suicide          : cardinal =  %0000000001000000;
+wpr_adv              : cardinal =  1;
+wpr_nadv             : cardinal =  1 shl 1;
+wpr_zombie           : cardinal =  1 shl 2;
+wpr_sspos            : cardinal =  1 shl 3; // launch missile in unit position
+wpr_cast             : cardinal =  1 shl 4;
+wpr_tvis             : cardinal =  1 shl 5;
+wpr_suicide          : cardinal =  1 shl 6;
+wpr_ground           : cardinal =  1 shl 7;
+wpr_air              : cardinal =  1 shl 8;
+wpr_move             : cardinal =  1 shl 9;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -615,7 +633,7 @@ armor_nosdmg           = [UID_Cyberdemon,UID_Mastermind,UID_Tank];  // splash da
 
 
 NameLen                = 13;
-ChatLen                = 38;
+//ChatLen                = 38;
 
 dead_hits              = -12*fr_fps;
 fdead_hits             = dead_hits+fr_3fps;
@@ -660,7 +678,7 @@ blizz_r                = 150;
 
 g_ct_pr                = 150;
 bld_dec_mr             = 6;
-def_ai                 = 5;
+player_default_ai_level                 = 5;
 pain_time              = fr_2hfps;
 hinvuln_time           = (fr_fps*30);
 _mms                   = 126;
@@ -937,7 +955,7 @@ AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 262393;
+svld_size              = 279213;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

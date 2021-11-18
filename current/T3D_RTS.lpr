@@ -43,6 +43,7 @@ uses SysUtils, SDL, SDL_Net
         {$include _draw.pas}
         {$include _loadgfx.pas}
      {$ENDIF}
+{$include _path.pas}
 {$include _map.pas}
 {$Include _missiles.pas}
 {$include _units_common.pas}
@@ -71,7 +72,7 @@ begin
       {$IFDEF _FULLGAME}
       InputGame;
       CodeGame;
-      if(_draw)then DrawGame;
+      if(r_draw)then DrawGame;
       {$ELSE}
       while (SDL_PollEvent(_EVENT)>0) do
        CASE (_EVENT^.type_) OF

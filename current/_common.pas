@@ -1,3 +1,7 @@
+procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);  forward;
+function _canmove  (pu:PTUnit):boolean; forward;
+function _canattack(pu:PTUnit):boolean; forward;
+
 
 function b2s (i:byte    ):shortstring;begin str(i,b2s);end;
 function w2s (i:word    ):shortstring;begin str(i,w2s);end;
@@ -16,9 +20,7 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);  forward;
-function _canmove  (pu:PTUnit):boolean; forward;
-function _canattack(pu:PTUnit):boolean; forward;
+
 
 
 function _str_mx(x:byte):shortstring;
@@ -28,7 +30,7 @@ begin
    else _str_mx:='x'+b2s(x);
 end;
 
-procedure _player_allowed_units(p:byte;g:TSob;max:integer;new:boolean);  // allowed units
+procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);   // allowed units
 var i:byte;
 begin
    with _players[p] do
@@ -40,7 +42,7 @@ begin
          with _uids[i] do a_units[i]:=min2(_max,max);
    end;
 end;
-procedure _player_allowed_upgrds(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
+procedure PlayerSetAllowedUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -53,7 +55,7 @@ begin
    end;
 end;
 
-procedure _player_current_upgrds(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
+procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with _players[p] do
@@ -65,22 +67,75 @@ begin
          with _upids[i] do upgr[i]:=min3(a_upgrs[i],_up_max,lvl);
    end;
 end;
+{
+procedure _log_add(aroom:PTRoom;message:shortstring);
+begin
+   if(length(message)=0)then exit;
+
+   with aroom^ do
+   begin
+      log_n+=1;
+      log_i+=1;
+      if(log_i>MaxRoomLog)then log_i:=0;
+
+      log_l[log_i]:=message;
+
+      {$IFNDEF FULLGAME}
+      writeln('Room #',rnum+1,': ',message);
+      {$ELSE}
+
+      {PlaySoundGlobal(snd_score);
+         }
+
+      {$ENDIF}
+   end;
+end;
+
+}
+
+procedure PlayerAddLog(pn:byte;mtype:char;str:shortstring);
+begin
+   if(pn>MaxPlayers)then exit;
+
+   with _players[pn] do
+   if(state>ps_none)then
+   begin
+      log_n+=1;
+      log_i+=1;
+      if(log_i>MaxPlayerLog)then log_i:=0;
+
+      case mtype of
+      lmt_chat : log_l[log_i]:=mtype+str;
+      end;
+
+      if(pn=HPlayer)then ;//sound and effects
+   end;
+end;
+
+procedure AddLog(playern,to_players,mtype:byte;str:shortstring);
+var i:byte;
+begin
+   for i:=0 to MaxPlayers do
+    if((to_players and (1 shl i))>0)
+    or(i=playern)
+    or(i=0)then PlayerAddLog(i,mtype,str);
+end;
 
 procedure CalcPLNU;
 var p:byte;
 begin
-   G_plstat:=0;
-   G_nunits:=0;
+   g_player_status:=0;
+   g_cl_units:=0;
    for p:=0 to MaxPlayers do
     with _players[p] do
      if(army>0)and(state>ps_none)then
      begin
-        G_plstat:=G_plstat or (1 shl p);
-        G_nunits+=MaxPlayerUnits;
+        g_player_status:=g_player_status or (1 shl p);
+        g_cl_units+=MaxPlayerUnits;
      end;
 end;
 
-function cf(c,f:pcardinal):boolean;
+function cf(c,f:pcardinal):boolean;  // check flag
 begin cf:=(c^ and f^)>0;end;
 
 function sign(x:integer):integer;
@@ -90,20 +145,18 @@ begin
    if(x<0)then sign:=-1;
 end;
 
-function dist2(dx,dy,dx1,dy1:integer):integer;
+function dist2(dx0,dy0,dx1,dy1:integer):integer;
 begin
-   dx := abs(dx1-dx);
-   dy := abs(dy1-dy);
-   if (dx<dy)
-   then dist2:=(123*dy+51*dx) shr 7
-   else dist2:=(123*dx+51*dy) shr 7;
+   dx0:=abs(dx1-dx0);
+   dy0:=abs(dy1-dy0);
+   if(dx0<dy0)
+   then dist2:=(123*dy0+51*dx0) shr 7
+   else dist2:=(123*dx0+51*dy0) shr 7;
 end;
 
-function dist(dx,dy,dx1,dy1:integer):integer;
+function dist(dx0,dy0,dx1,dy1:integer):integer;
 begin
-   dx  :=abs(dx-dx1);
-   dy  :=abs(dy-dy1);
-   dist:=trunc(sqrt(sqr(dx)+sqr(dy)));
+   dist:=trunc(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
 end;
 
 function p_dir(x0,y0,x1,y1:integer):integer;
@@ -217,7 +270,9 @@ procedure WriteSDLError;
 var f:Text;
 begin
    Assign(f,outlogfn);
-   if FileExists(outlogfn) then Append(f) else Rewrite(f);
+   if FileExists(outlogfn)
+   then Append (f)
+   else Rewrite(f);
    writeln(f,sdl_GetError);
    SDL_ClearError;
    Close(f);
@@ -277,12 +332,11 @@ begin
    end;
 end;
 
-function _PlayersReady:boolean;
+function PlayersReadyStatus:boolean;
 var p,c,r:byte;
 begin
    c:=0;
    r:=0;
-
    for p:=1 to MaxPlayers do
     with _players[p] do
      if(state=ps_play)then
@@ -290,7 +344,7 @@ begin
         c+=1;
         if(ready)or(p=HPlayer)then r+=1;
      end;
-   _PlayersReady:=(r=c)and(c>0);
+   PlayersReadyStatus:=(r=c)and(c>0);
 end;
 
 function _Hi2Si(h,mh:integer;s:single):shortint;
@@ -299,9 +353,9 @@ begin
    if(h =0         )then _Hi2Si:=0    else
    if(h =dead_hits )then _Hi2Si:=-127 else
    if(h<=ndead_hits)then _Hi2Si:=-128 else
-   if(dead_hits<h)and(h<0)
-                    then _Hi2Si:=mm3(-126,h div _d2shi,-1)
-   else                  _Hi2Si:=mm3(1,trunc(h/s),_mms);
+   if (dead_hits<h)
+   and(h<0)         then _Hi2Si:=mm3(-126,h div _d2shi,-1  )
+   else                  _Hi2Si:=mm3(   1,trunc(h/s)  ,_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -321,38 +375,38 @@ begin
      gm_aslt,
      gm_2fort: case p of
                1..3: PickPlayerTeam:=1;
-               4..6: PickPlayerTeam:=2;
+               4..6: PickPlayerTeam:=4;
                end;
      gm_3fort: case p of
                1,2 : PickPlayerTeam:=1;
-               3,4 : PickPlayerTeam:=2;
-               5,6 : PickPlayerTeam:=3;
+               3,4 : PickPlayerTeam:=3;
+               5,6 : PickPlayerTeam:=5;
                end;
      gm_inv  : PickPlayerTeam:=1;
      else      PickPlayerTeam:=_players[p].team;
      end;
 end;
 
-function _PlyerStatus(p:integer):char;
+function PlayerGetStatus(p:integer):char;
 begin
    with _players[p] do
    begin
-      _PlyerStatus:=str_ps_c[state];
+      PlayerGetStatus:=str_ps_c[state];
       if(state=ps_play)then
       begin
          if(g_started=false)
-         then _PlyerStatus:=b2pm[ready,2]
-         else _PlyerStatus:=str_ps_c[ps_play];
-         if(ttl>=fr_fps)then _PlyerStatus:=str_ps_t;
+         then PlayerGetStatus:=b2pm[ready,2]
+         else PlayerGetStatus:=str_ps_c[ps_play];
+         if(ttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
          {$IFDEF _FULLGAME}
          if(net_cl_svpl=p)then
          begin
-            _PlyerStatus:=str_ps_sv;
-            if(net_cl_svttl>=fr_fps)then _PlyerStatus:=str_ps_t;
+            PlayerGetStatus:=str_ps_sv;
+            if(net_cl_svttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
          end;
          {$ENDIF}
       end;
-      if(p=HPlayer)then _PlyerStatus:=str_ps_h;
+      if(p=HPlayer)then PlayerGetStatus:=str_ps_h;
    end;
 end;
 
@@ -377,7 +431,7 @@ end;
 
 {$IFDEF _FULLGAME}
 
-procedure _bnext(pb:pbyte;fwrd:boolean;pset:PTSoB);
+procedure ScrollByte(pb:pbyte;fwrd:boolean;pset:PTSoB);
 begin
    if(pset^=[])then exit;
    repeat
@@ -387,103 +441,106 @@ begin
    until pb^ in pset^
 end;
 
-procedure WriteLog(mess:shortstring);
-var f:Text;
-begin
-   Assign(f,outlogfn);
-   if FileExists(outlogfn) then Append(f) else Rewrite(f);
-   writeln(f,mess);
-   Close(f);
-end;
-
-function _fog_pgrid(x,y:integer):boolean;
-var cx,cy:integer;
-begin
-   cx:=x div fog_cw;
-   cy:=y div fog_cw;
-   _fog_pgrid:=false;
-   if(0<=cx)and(cx<=fog_vfwm)
-  and(0<=cy)and(cy<=fog_vfhm)then _fog_pgrid:=(fog_pgrid[cx,cy]>0);
-end;
-
-function _RectInScreen(x,y,hw,hh,sh:integer):boolean;
-begin
-   _RectInScreen:=((vid_vx-hw           )<x)and(x<(vid_vx+vid_sw+hw))
-               and((vid_vy-hh-max2(0,sh))<y)and(y<(vid_vy+vid_sh+hh));
-end;
-function _PointInScreen(x,y:integer):boolean;
-begin
-   _PointInScreen:=(vid_vx<x)and(x<(vid_vx+vid_sw))
-                and(vid_vy<y)and(y<(vid_vy+vid_sh));
-end;
-
-function _PointInScreen2(x,y:integer;player:PTPlayer):boolean;
-begin
-   _PointInScreen2:=false;
-   x-=vid_vx;
-   y-=vid_vy;
-   if(0<x)and(x<vid_sw)and
-     (0<y)and(y<vid_sh)then
-   begin
-      if(player<>nil)then
-       if (player^.team=_players[HPlayer].team)
-       or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
-       begin
-          _PointInScreen2:=true;
-          exit;
-       end;
-
-      if(_fog=false)or(_fog_pgrid(x,y))then _PointInScreen2:=true;
-   end;
-end;
-
-procedure _scrollInt(i:pinteger;s,min,max:integer);
+procedure ScrollInt(i:pinteger;s,min,max:integer);
 begin
    i^+=s;
    if(i^>max)then i^:=max;
    if(i^<min)then i^:=min;
 end;
 
-function _PlayerColor(player:byte):cardinal;
+procedure WriteLog(mess:shortstring);
+var f:Text;
 begin
-   _PlayerColor:=0;
+   Assign(f,outlogfn);
+   if FileExists(outlogfn)
+   then Append (f)
+   else Rewrite(f);
+   writeln(f,mess);
+   Close(f);
+end;
+
+function fog_check(x,y:integer):boolean;
+var cx,cy:integer;
+begin
+   cx:=x div fog_cw;
+   cy:=y div fog_cw;
+   fog_check:=false;
+   if(0<=cx)and(cx<=fog_vfwm)
+  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=(fog_pgrid[cx,cy]>0);
+end;
+
+function RectInCam(x,y,w,h,s:integer):boolean;
+begin
+   RectInCam:=((vid_cam_x-w          )<x)and(x<(vid_cam_x+vid_cam_w+w))
+           and((vid_cam_y-h-max2(0,s))<y)and(y<(vid_cam_y+vid_cam_h+h));
+end;
+function PointInCam(x,y:integer):boolean;
+begin
+   PointInCam:=(vid_cam_x<x)and(x<(vid_cam_x+vid_cam_w))
+            and(vid_cam_y<y)and(y<(vid_cam_y+vid_cam_h));
+end;
+
+function PointInScreenF(x,y:integer;player:PTPlayer):boolean;
+begin
+   PointInScreenF:=false;
+   x-=vid_cam_x;
+   y-=vid_cam_y;
+   if(0<x)and(x<vid_cam_w)and
+     (0<y)and(y<vid_cam_h)then
+   begin
+      if(player<>nil)then
+       if (player^.team=_players[HPlayer].team)
+       or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
+       begin
+          PointInScreenF:=true;
+          exit;
+       end;
+
+      if(_fog=false)or(fog_check(x,y))then PointInScreenF:=true;
+   end;
+end;
+
+
+
+function PlayerGetColor(player:byte):cardinal;
+begin
+   PlayerGetColor:=c_white;
    if(player<=MaxPlayers)then
     case vid_plcolors of
    1,
    2: if(player=HPlayer)then
         if(vid_plcolors=1)
-        then _PlayerColor:=c_lime
-        else _PlayerColor:=c_white
+        then PlayerGetColor:=c_lime
+        else PlayerGetColor:=c_white
       else
         if(PickPlayerTeam(g_mode,HPlayer)=PickPlayerTeam(g_mode,player))
-        then _PlayerColor:=c_yellow
-        else _PlayerColor:=c_red;
-   3: _PlayerColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
+        then PlayerGetColor:=c_yellow
+        else PlayerGetColor:=c_red;
+   3: PlayerGetColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
    4: if(player=HPlayer)
-      then _PlayerColor:=c_white
-      else _PlayerColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
-    else
-      _PlayerColor:=PlayerColor[player];
+      then PlayerGetColor:=c_white
+      else PlayerGetColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
+    else PlayerGetColor:=PlayerColor[player];
     end;
 end;
 
 procedure _view_bounds;
 begin
-   vid_vx:=mm3(0,vid_vx,map_mw-vid_sw);
-   vid_vy:=mm3(0,vid_vy,map_mw-vid_sh);
+   vid_cam_x:=mm3(0,vid_cam_x,map_mw-vid_cam_w);
+   vid_cam_y:=mm3(0,vid_cam_y,map_mw-vid_cam_h);
 
-   vid_mmvx:=round(vid_vx*map_mmcx);
-   vid_mmvy:=round(vid_vy*map_mmcx);
-   vid_fsx :=vid_vx div fog_cw;
-   vid_fsy :=vid_vy div fog_cw;
-   vid_fex :=vid_fsx+fog_vfw;
-   vid_fey :=vid_fsy+fog_vfh;
+   vid_mmvx:=round(vid_cam_x*map_mmcx);
+   vid_mmvy:=round(vid_cam_y*map_mmcx);
+   vid_fog_sx :=vid_cam_x div fog_cw;
+   vid_fog_sy :=vid_cam_y div fog_cw;
+   vid_fog_ex :=vid_fog_sx+fog_vfw;
+   vid_fog_ey :=vid_fog_sy+fog_vfh;
 end;
 
-procedure _moveHumView(mx,my:integer);
+procedure MoveCamToPoint(mx,my:integer);
 begin
-   vid_vx:=mx-(vid_sw shr 1);
-   vid_vy:=my-(vid_sh shr 1);
+   vid_cam_x:=mx-(vid_cam_w shr 1);
+   vid_cam_y:=my-(vid_cam_h shr 1);
    _view_bounds;
 end;
 
@@ -499,7 +556,7 @@ begin
    end;
 end;
 
-procedure _addUIBuildRs(tx,ty,tr:integer);
+procedure UIAddBuilderArea(tx,ty,tr:integer);
 begin
    if(ui_builders_n>ui_builder_srs)then exit;
 
@@ -512,7 +569,7 @@ end;
 
 {$ELSE}
 
-function _plsOut:boolean;
+function PlayerAllOut:boolean;
 var i,c,r:byte;
 begin
    c:=0;

@@ -321,7 +321,7 @@ else if(a_rld          >0)and(a_aweap<=MaxUnitWeapons)then
        if(cf(@aw_reqf,@wpr_cast))
        then _unit2SMAnimK:=sms_cast
        else
-         if(aw_range>=0)then
+         if(aw_max_range>=0)then
          begin
             if(a_rld in aw_rld_a)//and(_IsUnitRange(a_tar,nil))
             then _unit2SMAnimK:=sms_dattack

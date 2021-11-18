@@ -75,8 +75,8 @@ begin
                                    else _svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;
 
             vr:=0;
-            BlockRead(f,vr,sizeof(g_startb ));vr:=0;
-            BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
+            BlockRead(f,vr,sizeof(g_start_base ));vr:=0;
+            BlockRead(f,vr,sizeof(g_show_positions  ));vr:=0;
             BlockRead(f,hp,sizeof(HPlayer  ));
 
             BlockRead(f,pls,SizeOf(TPList));
@@ -204,16 +204,16 @@ begin
    BlockWrite(f,theme_i        ,SizeOf(theme_i        ));
    BlockWrite(f,g_addon        ,SizeOf(g_addon        ));
    BlockWrite(f,g_mode         ,SizeOf(g_mode         ));
-   BlockWrite(f,g_startb       ,SizeOf(g_startb       ));
-   BlockWrite(f,g_shpos        ,SizeOf(g_shpos        ));
+   BlockWrite(f,g_start_base       ,SizeOf(g_start_base       ));
+   BlockWrite(f,g_show_positions        ,SizeOf(g_show_positions        ));
    BlockWrite(f,HPlayer        ,SizeOf(HPlayer        ));
    BlockWrite(f,_players       ,SizeOf(TPList         ));
    BlockWrite(f,_units         ,SizeOf(_units         ));
    BlockWrite(f,_missiles      ,SizeOf(_missiles      ));
    BlockWrite(f,_effects       ,SizeOf(_effects       ));
    BlockWrite(f,map_dds        ,SizeOf(map_dds        ));
-   BlockWrite(f,vid_vx         ,SizeOf(vid_vx         ));
-   BlockWrite(f,vid_vy         ,SizeOf(vid_vy         ));
+   BlockWrite(f,vid_cam_x         ,SizeOf(vid_cam_x         ));
+   BlockWrite(f,vid_cam_y         ,SizeOf(vid_cam_y         ));
    BlockWrite(f,PlayerColor    ,SizeOf(PlayerColor    ));
    BlockWrite(f,G_Step         ,SizeOf(G_Step         ));
    BlockWrite(f,vid_rtui       ,SizeOf(vid_rtui       ));
@@ -278,16 +278,16 @@ begin
          BlockRead(f,theme_i        ,SizeOf(theme_i        ));map_seed2theme;
          BlockRead(f,g_addon        ,SizeOf(g_addon        ));
          BlockRead(f,g_mode         ,SizeOf(g_mode         ));
-         BlockRead(f,g_startb       ,SizeOf(g_startb       ));
-         BlockRead(f,g_shpos        ,SizeOf(g_shpos        ));
+         BlockRead(f,g_start_base       ,SizeOf(g_start_base       ));
+         BlockRead(f,g_show_positions        ,SizeOf(g_show_positions        ));
          BlockRead(f,HPlayer        ,SizeOf(HPlayer        ));
          BlockRead(f,_players       ,SizeOf(TPList         ));
          BlockRead(f,_units         ,SizeOf(_units         ));
          BlockRead(f,_missiles      ,SizeOf(_missiles      ));
          BlockRead(f,_effects       ,SizeOf(_effects       ));
          BlockRead(f,map_dds        ,SizeOf(map_dds        ));
-         BlockRead(f,vid_vx         ,SizeOf(vid_vx         ));
-         BlockRead(f,vid_vy         ,SizeOf(vid_vy         ));
+         BlockRead(f,vid_cam_x         ,SizeOf(vid_cam_x         ));
+         BlockRead(f,vid_cam_y         ,SizeOf(vid_cam_y         ));
          BlockRead(f,PlayerColor    ,SizeOf(PlayerColor    ));
          BlockRead(f,G_Step         ,SizeOf(G_Step         ));
          BlockRead(f,vid_rtui       ,SizeOf(vid_rtui       ));
@@ -312,9 +312,10 @@ begin
 
          map_vars;
          map_tllbc;
-         _refresh_dmcells;
+         map_doodads_cells_refresh;
          _makeMMB;
          _map_dds;
+         pf_make_grid;
          //g_inv_calcmm;
          _view_bounds;
 

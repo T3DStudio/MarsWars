@@ -49,8 +49,8 @@ begin
          BlockRead(f,vr,sizeof(g_mode   ));
          if(vr in gamemodes)then begin _rpls_stat:=_rpls_stat+str_gmode[vr]+#13;    end
                             else begin _rpls_stat:=str_svld_errors[4];close(f);exit;end;
-         BlockRead(f,vr,sizeof(g_startb ));vr:=0;
-         BlockRead(f,vr,sizeof(g_shpos  ));vr:=0;
+         BlockRead(f,vr,sizeof(g_start_base ));vr:=0;
+         BlockRead(f,vr,sizeof(g_show_positions  ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
 
          //_rpls_stat:=_rpls_stat+str_players+':'+#13;
@@ -143,8 +143,8 @@ begin
 
                          BlockWrite(_rpls_file,g_addon    ,SizeOf(g_addon ));
                          BlockWrite(_rpls_file,g_mode     ,SizeOf(g_mode  ));
-                         BlockWrite(_rpls_file,g_startb   ,SizeOf(g_startb));
-                         BlockWrite(_rpls_file,g_shpos    ,SizeOf(g_shpos ));
+                         BlockWrite(_rpls_file,g_start_base   ,SizeOf(g_start_base));
+                         BlockWrite(_rpls_file,g_show_positions    ,SizeOf(g_show_positions ));
                          BlockWrite(_rpls_file,HPlayer    ,sizeof(HPlayer ));
 
                          for i:=1 to MaxPlayers do
@@ -163,8 +163,8 @@ begin
                    end;
      rpl_wunit   : if((vid_rtui mod 2)=0) then
                    begin
-                      _vx:=byte(vid_vx shr vxyc);
-                      _vy:=byte(vid_vy shr vxyc);
+                      _vx:=byte(vid_cam_x shr vxyc);
+                      _vy:=byte(vid_cam_y shr vxyc);
 
                       i:=0;
                       if(_rpls_nwrch    )then i:=i or %10000000;
@@ -262,14 +262,14 @@ begin
                             BlockRead(_rpls_file,map_sym  ,SizeOf(map_sym  ));
                             BlockRead(_rpls_file,g_addon  ,SizeOf(g_addon  ));
                             BlockRead(_rpls_file,g_mode   ,SizeOf(g_mode   ));
-                            BlockRead(_rpls_file,g_startb ,SizeOf(g_startb ));
-                            BlockRead(_rpls_file,g_shpos  ,SizeOf(g_shpos  ));
+                            BlockRead(_rpls_file,g_start_base ,SizeOf(g_start_base ));
+                            BlockRead(_rpls_file,g_show_positions  ,SizeOf(g_show_positions  ));
                             BlockRead(_rpls_file,HPlayer  ,sizeof(HPlayer  ));
                             {$I+}
 
                             if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
                             or(map_liq>7)or(map_obs>7)
-                            or not(g_mode in gamemodes)or(g_startb>gms_g_startb)or(HPlayer>MaxPlayers)then
+                            or not(g_mode in gamemodes)or(g_start_base>gms_g_startb)or(HPlayer>MaxPlayers)then
                             begin
                                rpl_abort;
                                g_started  :=false;
@@ -301,7 +301,7 @@ begin
                             _rpls_player:=HPlayer;
 
                             map_premap;
-                            _moveHumView(map_psx[Hplayer] , map_psy[Hplayer]);
+                            MoveCamToPoint(map_psx[Hplayer] , map_psy[Hplayer]);
 
                             _view_bounds;
                             ui_tab    :=2;
@@ -354,8 +354,8 @@ begin
 
                        if(_rpls_vidm)then
                        begin
-                          vid_vx:=(vid_vx+integer(_rpls_vidx shl vxyc)) div 2;
-                          vid_vy:=(vid_vy+integer(_rpls_vidy shl vxyc)) div 2;
+                          vid_cam_x:=(vid_cam_x+integer(_rpls_vidx shl vxyc)) div 2;
+                          vid_cam_y:=(vid_cam_y+integer(_rpls_vidy shl vxyc)) div 2;
                           _view_bounds;
                        end;
                    end;

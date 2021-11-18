@@ -394,8 +394,8 @@ begin
 
       ter_w:=ter_s^.w;
       ter_h:=ter_s^.h;
-      w:=vid_sw+(ter_w shl 1);
-      h:=vid_sh+(ter_h shl 1);
+      w:=vid_cam_w+(ter_w shl 1);
+      h:=vid_cam_h+(ter_h shl 1);
       vid_terrain:=_createSurf(w,h);
       x:=0;
       while (x<w) do
@@ -469,11 +469,11 @@ begin
          SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
       end;
 
-      _rect^.x:=ord(i)*font_w;
-      _rect^.y:=0;
-      _rect^.w:=font_w;
-      _rect^.h:=font_w;
-      SDL_BLITSURFACE(fspr,_rect,font_ca[c].surf,nil);
+      r_RECT^.x:=ord(i)*font_w;
+      r_RECT^.y:=0;
+      r_RECT^.w:=font_w;
+      r_RECT^.h:=font_w;
+      SDL_BLITSURFACE(fspr,r_RECT,font_ca[c].surf,nil);
    end;
    _FreeSF(fspr);
 end;
@@ -700,11 +700,11 @@ end;
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   _tdecaln:=(vid_sw*vid_sh) div 10000;
+   _tdecaln:=(vid_cam_w*vid_cam_h) div 10000;
    setlength(_tdecals,_tdecaln);
 
-   vid_mwa:= vid_sw+vid_ab*2;
-   vid_mha:= vid_sh+vid_ab*2;
+   vid_mwa:= vid_cam_w+vid_ab*2;
+   vid_mha:= vid_cam_h+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
    iy:=(map_iseed*5+ix)  mod vid_mha;
@@ -727,23 +727,23 @@ begin
 
    ui_textx     := vid_mapx+4;
    ui_texty     := vid_mapy+4;
-   ui_hinty     := vid_mapy+vid_sh-60;
+   ui_hinty     := vid_mapy+vid_cam_h-60;
    ui_chaty     := ui_hinty-10;
-   ui_oicox     := vid_mapx+vid_sw-4;
+   ui_oicox     := vid_mapx+vid_cam_w-4;
 
-   ui_uiuphx    := vid_mapx+(vid_sw div 2);
+   ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
 
-   ui_ingamecl  :=(vid_sw-font_w) div font_w;
+   ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
       mv_x      :=(vid_vw-spr_mback^.w) div 2;
       mv_y      :=(vid_vh-spr_mback^.h) div 2;
    end;
-   fog_vfw      :=(vid_sw div fog_cw)+2;
-   fog_vfh      :=(vid_sh div fog_cw)+2;
+   fog_vfw      :=(vid_cam_w div fog_cw)+2;
+   fog_vfh      :=(vid_cam_h div fog_cw)+2;
 
-   map_mmvw     := round(vid_sw*map_mmcx);
-   map_mmvh     := round(vid_sh*map_mmcx);
+   map_mmvw     := round(vid_cam_w*map_mmcx);
+   map_mmvh     := round(vid_cam_h*map_mmcx);
    _view_bounds;
 
    Map_tdmake;
@@ -776,8 +776,8 @@ begin
 
    if(vid_ppos<2)then // left-right
    begin
-      vid_sw:=vid_vw-vid_panelw;
-      vid_sh:=vid_vh;
+      vid_cam_w:=vid_vw-vid_panelw;
+      vid_cam_h:=vid_vh;
 
       if(vid_ppos=0)
       then vid_mapx:=vid_panelw
@@ -786,7 +786,7 @@ begin
 
       if(vid_ppos=0)
       then vid_panelx:=0
-      else vid_panelx:=vid_sw;
+      else vid_panelx:=vid_cam_w;
       vid_panely:=0;
 
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
@@ -809,8 +809,8 @@ begin
    end
    else
    begin
-      vid_sw:=vid_vw;
-      vid_sh:=vid_vh-vid_panelw;
+      vid_cam_w:=vid_vw;
+      vid_cam_h:=vid_vh-vid_panelw;
 
       vid_mapx:=0;
       if(vid_ppos=2)
@@ -820,10 +820,10 @@ begin
       vid_panelx:=0;
       if(vid_ppos=2)
       then vid_panely:=0
-      else vid_panely:=vid_sh-1;
+      else vid_panely:=vid_cam_h-1;
 
-      r_uipanel:=_createSurf(vid_sw,vid_panelw+1);
-      r_panel  :=_createSurf(vid_sw,vid_panelw+1);
+      r_uipanel:=_createSurf(vid_cam_w,vid_panelw+1);
+      r_panel  :=_createSurf(vid_cam_w,vid_panelw+1);
 
       y:=vid_BW*14;
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
@@ -865,7 +865,7 @@ begin
 
    _draw_surf(r_uipanel,0,0,r_panel);
 
-   r_dterrain:=_createSurf(vid_sw,vid_sh);
+   r_dterrain:=_createSurf(vid_cam_w,vid_cam_h);
 
    _vidvars;
 end;
@@ -874,9 +874,9 @@ procedure _MakeScreen;
 begin
    if (r_screen<>nil) then sdl_freesurface(r_screen);
 
-   if(_fscr)
-   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags + SDL_FULLSCREEN)
-   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, _vflags);
+   if(cfg_fullscreen)
+   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)
+   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags);
 
    if(r_screen=nil)then begin WriteSDLError; exit; end;
 

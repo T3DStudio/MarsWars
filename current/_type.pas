@@ -16,7 +16,6 @@ TColor = record
    r,g,b,a:byte;
    c      :cardinal;
 end;
-
 PTColor = ^TColor;
 
 TMWTexture = record
@@ -133,7 +132,8 @@ TUWeapon = record
   aw_x,
   aw_y,
   aw_dupgr_s,
-  aw_range,
+  aw_max_range,
+  aw_min_range,
   aw_count: integer;
   aw_rld   : byte;
   aw_rld_s : TSoB;
@@ -338,6 +338,11 @@ o_x1,o_y1  :integer;
    ttl     : integer;
    nip     : cardinal;
    nport   : word;
+
+   log_l   : array[0..MaxPlayerLog] of shortstring;
+   log_i,
+   log_n
+           : integer;
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
@@ -372,6 +377,18 @@ TUnit = record
    uo_x,uo_y
             : integer;
    uo_id    : byte;
+
+   pf_pos_x,
+   pf_pos_y,
+   pf_pos_cx,
+   pf_pos_cy,
+   pf_mv_x,
+   pf_mv_y,
+   pf_mv_cx,
+   pf_mv_cy,
+   pf_mv_nx,
+   pf_mv_ny
+            : integer;
 
    inapc,
    painc,
@@ -425,6 +442,13 @@ TMissile = record
    {$IFDEF _FULLGAME}
    ms_eid_bio_death: boolean;
    {$ENDIF}
+end;
+
+TPFNode = record
+    pos_x,
+    pos_y,
+    rootx,
+    rooty : integer;
 end;
 
 TCTPoint = record

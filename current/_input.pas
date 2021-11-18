@@ -11,13 +11,13 @@ end;
 
 procedure return_key;
 begin
-   if(_menu=false)and(not _igchat)and(net_nstat<>ns_none)
+   if(_menu=false)and(not _igchat)and(net_nstate<>ns_none)
    then _igchat:=true
    else
-    if(_m_sel=100)or(_igchat)then
+    if(menu_item=100)or(_igchat)then
     begin
        if(length(net_chat_str)>0)then
-        if(net_nstat=ns_clnt)
+        if(net_nstate=ns_clnt)
         then net_chatm
         else net_chat_add(net_chat_str,HPlayer,net_chat_tar);
        net_chat_str:='';
@@ -27,10 +27,10 @@ end;
 
 procedure TogglePause;
 begin
-   if(net_nstat=ns_clnt)
+   if(net_nstate=ns_clnt)
    then net_pause
    else
-     if(net_nstat=ns_srvr)then
+     if(net_nstate=ns_srvr)then
        if(G_paused=0)
        then G_paused:=HPlayer
        else G_paused:=0;
@@ -119,7 +119,7 @@ procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
 begin
    if(G_Paused=0)and(_rpls_rst<rpl_rhead)then
    begin
-      if(net_nstat=ns_clnt)then
+      if(net_nstate=ns_clnt)then
       begin
          net_clearbuffer;
          net_writebyte(nmid_order);
@@ -167,7 +167,7 @@ begin
       htm:=team;
    end;
    _whoInPoint:=0;
-   if(_PointInScreen(tx,ty))then
+   if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
      with _units[i] do
       if(hits>0)and(inapc=0)and(_ch(player))then
@@ -204,16 +204,16 @@ begin
 
           if(k_ctrl>1)then
           begin
-             m_brushx:=m_mx;
-             m_brushy:=m_my;
+             m_brushx:=mouse_map_x;
+             m_brushy:=mouse_map_y;
           end
           else
           begin
-             _building_newplace(m_mx,m_my,m_brush,HPlayer,@m_brushx,@m_brushy);
+             _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
              m_brushx:=mm3(map_b0,m_brushx,map_b1);
              m_brushy:=mm3(map_b0,m_brushy,map_b1);
-             m_brushx:=mm3(vid_vx,m_brushx,vid_vx+vid_sw);
-             m_brushy:=mm3(vid_vy,m_brushy,vid_vy+vid_sh);
+             m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
+             m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
           end;
 
           case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
@@ -274,13 +274,13 @@ begin
 
    case by of
    -1: case vid_ppos of   // tabs
-       0,1: begin m_vx-=vid_panelx; if(m_vy>ui_tabsy)then ui_tab:=mm3(0,m_vx div vid_tBW,3);m_vx+=vid_panelx;end;
-       2,3: begin m_vy-=vid_panely; if(m_vx>ui_tabsy)then ui_tab:=mm3(0,m_vy div vid_tBW,3);m_vy+=vid_panely;end;
+       0,1: begin mouse_x-=vid_panelx; if(mouse_y>ui_tabsy)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
+       2,3: begin mouse_y-=vid_panely; if(mouse_x>ui_tabsy)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
        end;
    9 : case bx of         // buttons
        0 : ToggleMenu;
        1 : ;
-       2 : if(net_nstat>ns_none)then TogglePause;
+       2 : if(net_nstate>ns_none)then TogglePause;
        end;
    else
      u:=(by*3)+(bx mod 3);
@@ -341,7 +341,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
 
    10: if(ui_orders_x[10]>0)then
         if(k_dbl>0)
-        then _moveHumView(ui_orders_x[10], ui_orders_y[10])
+        then MoveCamToPoint(ui_orders_x[10], ui_orders_y[10])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
          end;
@@ -388,9 +388,9 @@ begin
                    ui_tab+=1;
                    ui_tab:=ui_tab mod 4;
                 end;
-      1       : begin end;
+      1       : ;
       else
-        if(_testmode>0)and(net_nstat=0)then
+        if(_testmode>0)and(net_nstate=0)then
          case k of
             sdlk_end       : if(k_ctrl>2)
                              then begin if(g_mode=gm_inv)then g_inv_wave_n+=1; end
@@ -406,7 +406,7 @@ begin
             SDLK_F9        : begin HPlayer:=4;exit end;
             SDLK_F10       : begin HPlayer:=5;exit end;
             SDLK_F11       : begin HPlayer:=6;exit end;
-            sdlk_insert    : _draw:= not _draw;
+            sdlk_insert    : r_draw:= not r_draw;
          end;
 
         if(_rpls_rst<rpl_rhead)then
@@ -446,7 +446,7 @@ begin
                                   then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
                                   else
                                     if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
-                                    then _moveHumView(ui_orders_x[ko] , ui_orders_y[ko])
+                                    then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
                                     else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
                              end;
 
@@ -494,12 +494,12 @@ begin
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(_menu=false)and(G_Started)then
                               begin
-                                 vid_vx-=_event^.motion.x-m_vx;
-                                 vid_vy-=_event^.motion.y-m_vy;
+                                 vid_cam_x-=_event^.motion.x-mouse_x;
+                                 vid_cam_y-=_event^.motion.y-mouse_y;
                                  _view_bounds;
                               end;
-                              m_vx:=_event^.motion.x;
-                              m_vy:=_event^.motion.y;
+                              mouse_x:=_event^.motion.x;
+                              mouse_y:=_event^.motion.y;
                            end;
       SDL_MOUSEBUTTONUP  : case (_event^.button.button) of
                             SDL_BUTTON_LEFT   : k_ml:=1;
@@ -515,20 +515,20 @@ begin
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
-                                                      case _m_sel of
-                                                      98: _scrollInt(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
-                                                      36: _scrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1 );
-                                                      41: _scrollInt(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1 );
+                                                      case menu_item of
+                                                      98: ScrollInt(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
+                                                      36: ScrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1 );
+                                                      41: ScrollInt(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1 );
                                                       end;
                                                    end
                                                    else tmpmid-=1;
                             SDL_BUTTON_WHEELUP   : if(_menu)then
                                                    begin
                                                       vid_mredraw:=true;
-                                                      case _m_sel of
-                                                      98: _scrollInt(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
-                                                      36: _scrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1 );
-                                                      41: _scrollInt(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1 );
+                                                      case menu_item of
+                                                      98: ScrollInt(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
+                                                      36: ScrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1 );
+                                                      41: ScrollInt(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1 );
                                                       end;
                                                    end
                                                    else tmpmid+=1;
@@ -582,24 +582,24 @@ end;
 procedure ui_SicpleClick;
 var u:integer;
 begin
-   u:=_whoInPoint(m_mx,m_my,4);
+   u:=_whoInPoint(mouse_map_x,mouse_map_y,4);
    if(u>0)then ui_UnitSelectedNU:=u;
 end;
 
 procedure g_mouse;
 var u:integer;
 begin
-   m_mx :=m_vx+vid_vx-vid_mapx;
-   m_my :=m_vy+vid_vy-vid_mapy;
+   mouse_map_x :=mouse_x+vid_cam_x-vid_mapx;
+   mouse_map_y :=mouse_y+vid_cam_y-vid_mapy;
    if(vid_ppos<2)then
    begin
-      u:=m_vx-vid_panelx;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
-      u:=m_vy-vid_panely;m_by:=u div vid_BW;if(u<0)then m_by-=1;
+      u:=mouse_x-vid_panelx;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
+      u:=mouse_y-vid_panely;m_by:=u div vid_BW;if(u<0)then m_by-=1;
    end
    else
    begin
-      u:=m_vy-vid_panely;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
-      u:=m_vx-vid_panelx;m_by:=u div vid_BW;if(u<0)then m_by-=1;
+      u:=mouse_y-vid_panely;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
+      u:=mouse_x-vid_panelx;m_by:=u div vid_BW;if(u<0)then m_by-=1;
    end;
 
    if(m_ldblclk>0)then m_ldblclk-=1;
@@ -610,10 +610,10 @@ begin
     if(m_bx<0)or(3<=m_bx)then        // map
      case m_brush of
 co_empty  : begin
-               m_sxs:=m_mx;
-               m_sys:=m_my;
-               //_missile_add(vid_vx+400,vid_vy+250,m_mx,m_my,0,tmpmid,HPlayer,uf_ground,false);
-               //_effect_add(m_mx,m_my-50,10000,EID_HCC);
+               mouse_select_x0:=mouse_map_x;
+               mouse_select_y0:=mouse_map_y;
+               //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
+               //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);
                //PlaySoundSet(snd_engineer_attack);
             end;
 1..255    : if(m_brushc=c_lime)
@@ -623,7 +623,7 @@ co_paction,
 co_move,
 co_amove,
 co_patrol,
-co_apatrol: _command(m_mx,m_my);
+co_apatrol: _command(mouse_map_x,mouse_map_y);
      end
     else
       if(m_by<3)then      // minimap
@@ -632,7 +632,7 @@ co_apatrol: _command(m_mx,m_my);
       co_move,
       co_amove,
       co_patrol,
-      co_apatrol : _command(trunc((m_vx-vid_panelx)/map_mmcx),trunc((m_vy-vid_panely)/map_mmcx));
+      co_apatrol : _command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       else         if(_rpls_vidm=false)then m_mmap_move:=true;
       end
       else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
@@ -641,69 +641,69 @@ co_apatrol: _command(m_mx,m_my);
    begin
       m_mmap_move:=false;
 
-      if(m_sxs>-1)then //select
+      if(mouse_select_x0>-1)then //select
       begin
          if(m_ldblclk>0)then
             if(k_shift<2)
-            then _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_dblselect  ,HPlayer)
-            else _player_s_o(vid_vx,vid_vy, vid_vx+vid_sw,vid_vy+vid_sh,_whoInPoint(m_mx,m_my,3), uo_adblselect ,HPlayer)
+            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3), uo_dblselect  ,HPlayer)
+            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3), uo_adblselect ,HPlayer)
          else
          begin
             if(k_shift<2)
-            then _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_select ,HPlayer)
-            else _player_s_o(m_sxs,m_sys,m_mx,m_my,0,uo_aselect,HPlayer);
+            then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer)
+            else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer);
 
             if(G_Paused=0)and(_rpls_rst<rpl_runit)then
-             if(_CheckSimpleClick(m_sxs,m_sys,m_mx,m_my))then ui_SicpleClick;
+             if(_CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 
-         m_sxs:=-1;
+         mouse_select_x0:=-1;
          m_ldblclk:=fr_4hfps;
       end;
    end;
 
-   if(m_mmap_move)and(m_sxs=-1)then
+   if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
-      _moveHumView(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx));
+      MoveCamToPoint(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx));
       _view_bounds;
    end;
 
-   //if(k_mr=2)then _effect_add(m_mx,m_my-50,10000,EID_HMU);
+   //if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HMU);
 
    if(k_mr=2)then                 // RMB down
     if(m_brush<>co_empty)
     then m_brush:=co_empty
     else
      if(m_bx<0)or(3<=m_bx)        // map
-     then _command(m_mx,m_my)
+     then _command(mouse_map_x,mouse_map_y)
      else
        if(m_by<3)                 // minimap
-       then _command(trunc((m_vx-vid_panelx)/map_mmcx), trunc((m_vy-vid_panely)/map_mmcx))
+       then _command(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx))
        else _panel_click(ui_tab,m_bx,m_by,true,false);     // panel
 end;
 
 procedure _move_v_m;
 begin
-   if(m_vx<vid_vmb_x0)then vid_vx-=vid_vmspd;
-   if(m_vy<vid_vmb_y0)then vid_vy-=vid_vmspd;
-   if(m_vx>vid_vmb_x1)then vid_vx+=vid_vmspd;
-   if(m_vy>vid_vmb_y1)then vid_vy+=vid_vmspd;
+   if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_vmspd;
+   if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_vmspd;
+   if(mouse_x>vid_vmb_x1)then vid_cam_x+=vid_vmspd;
+   if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_vmspd;
 end;
 
 procedure _view_move;
 var vx,vy:integer;
 begin
-   vx:=vid_vx;
-   vy:=vid_vy;
+   vx:=vid_cam_x;
+   vy:=vid_cam_y;
 
    if(vid_vmm)then _move_v_m;
 
-   if(k_u>1)then vid_vy-=vid_vmspd;
-   if(k_l>1)then vid_vx-=vid_vmspd;
-   if(k_d>1)then vid_vy+=vid_vmspd;
-   if(k_r>1)then vid_vx+=vid_vmspd;
+   if(k_u>1)then vid_cam_y-=vid_vmspd;
+   if(k_l>1)then vid_cam_x-=vid_vmspd;
+   if(k_d>1)then vid_cam_y+=vid_vmspd;
+   if(k_r>1)then vid_cam_x+=vid_vmspd;
 
-   if(vx<>vid_vx)or(vy<>vid_vy)then _view_bounds;
+   if(vx<>vid_cam_x)or(vy<>vid_cam_y)then _view_bounds;
 end;
 
 procedure g_keyboard;

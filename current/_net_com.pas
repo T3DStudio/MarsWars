@@ -6,9 +6,26 @@ begin
    net_bufpos     :=0;
 end;
 
+procedure net_dispose;
+begin
+   if(net_buffer<>nil)then
+   begin
+      SDLNet_FreePacket(net_buffer);
+      net_buffer:=nil;
+   end;
+
+   if(net_socket<>nil)then
+   begin
+      SDLNet_UDP_Close(net_socket);
+      net_socket:=nil;
+   end;
+end;
+
 function net_UpSocket:boolean;
 begin
    net_UpSocket:=false;
+
+   net_dispose;
 
    net_period:=0;
 
@@ -19,10 +36,10 @@ begin
       exit;
    end;
 
-   if(net_nstat=ns_clnt)
+   if(net_nstate=ns_clnt)
    then net_socket:=SDLNet_UDP_Open(0)
    else
-     if(net_nstat=ns_srvr)
+     if(net_nstate=ns_srvr)
      then net_socket:=SDLNet_UDP_Open(net_sv_port);
 
    if (net_socket=nil) then
@@ -40,20 +57,7 @@ begin
    if(InitNET=false)then WriteSDLError;
 end;
 
-procedure net_dispose;
-begin
-   if(net_buffer<>nil)then
-   begin
-      SDLNet_FreePacket(net_buffer);
-      net_buffer:=nil;
-   end;
 
-   if(net_socket<>nil)then
-   begin
-      SDLNet_UDP_Close(net_socket);
-      net_socket:=nil;
-   end;
-end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -220,38 +224,26 @@ end;
 procedure net_writechat(p:byte);
 var i:byte;
 begin
-   for i:=0 to MaxNetChat do net_writestring(net_chat[p,i]);
+   //for i:=0 to MaxNetChat do net_writestring(net_chat[p,i]);
 end;
 
-procedure net_chat_add(msg:shortstring;pl,pls:byte);
+{procedure net_chat_add(msg:shortstring;player,to_players:byte);
 var i,t,stl,cpl:byte;
 begin
-   stl:=length(msg);
-   while(stl>0)do
-   begin
-      if(stl>ChatLen)
-      then cpl:=ChatLen
-      else cpl:=stl;
+   for i:=0 to MaxPlayers do
+    if((to_players and (1 shl i))>0)or(player=i)or(i=0)then
+    begin
+       for t:=MaxNetChat-1 downto 0 do net_chat[i,t+1]:=net_chat[i,t];
 
-      for i:=0 to MaxPlayers do
-       if((pls and (1 shl i))>0)or(pl=i)or(i=0)then
-       begin
-          for t:=MaxNetChat-1 downto 0 do net_chat[i,t+1]:=net_chat[i,t];
+       net_chatss[i]+=1;
 
-          net_chatss[i]+=1;
-
-          if(pl<=MaxPlayers)then
-          begin
-             if(i=0)
-             then net_chat[i,0]:=_players[pl].name+': '+copy(msg,0,cpl)
-             else net_chat[i,0]:=chr(pl)+copy(msg,0,cpl);
-          end
-          else net_chat[i,0]:=copy(msg,1,cpl);
-       end;
-
-      delete(msg,0,cpl);
-      stl-=cpl;
-   end;
+       if(player>MaxPlayers)
+       then net_chat[i,0]:=copy(msg,1,cpl)
+       else
+         if(i=0)
+         then net_chat[i,0]:=_players[player].name+': '+copy(msg,0,cpl)
+         else net_chat[i,0]:=chr(player)+copy(msg,0,cpl);
+    end;
 
    {$IFDEF _FULLGAME}
    vid_mredraw:=true;
@@ -259,7 +251,7 @@ begin
    PlaySNDM(snd_chat);
    _rpls_nwrch:=true;
    {$ENDIF}
-end;
+end; }
 
 {$IFDEF _FULLGAME}
 
@@ -328,20 +320,20 @@ end;
 
 procedure net_chat_clear;
 begin
-   FillChar(net_chat  ,sizeof(net_chat  ),#0);
-   FillChar(net_chatss,sizeof(net_chatss),0 );
-   FillChar(net_chatls,sizeof(net_chatls),0 );
+  // FillChar(net_chat  ,sizeof(net_chat  ),#0);
+  // FillChar(net_chatss,sizeof(net_chatss),0 );
+  // FillChar(net_chatls,sizeof(net_chatls),0 );
 end;
 
 procedure net_readchat;
 var i:byte;
 begin
-   for i:=0 to MaxNetChat do net_chat[HPlayer,i]:=net_readstring;
+   //for i:=0 to MaxNetChat do net_chat[HPlayer,i]:=net_readstring;
 end;
 
 procedure net_chatm;
 begin
-   if(net_nstat=ns_clnt)then
+   if(net_nstate=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_chat);
@@ -353,7 +345,7 @@ end;
 
 procedure net_pause;
 begin
-   if(net_nstat=ns_clnt)then
+   if(net_nstate=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_pause);
@@ -363,7 +355,7 @@ end;
 
 procedure net_plout;
 begin
-   if(net_nstat=ns_clnt)then
+   if(net_nstate=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_plout);
@@ -373,7 +365,7 @@ end;
 
 procedure net_swapp(p1:byte);
 begin
-   if(net_nstat=ns_clnt)then
+   if(net_nstate=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_swapp);
