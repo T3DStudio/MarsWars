@@ -14,11 +14,11 @@ begin
    begin
       sl:=length(s);
       {$I-}
-      BlockWrite(_rpls_file,sl,SizeOf(sl));
+      BlockWrite(rpls_file,sl,SizeOf(sl));
       for x:=1 to sl do
       begin
          c:=s[x];
-         BlockWrite(_rpls_file,c,SizeOf(c));
+         BlockWrite(rpls_file,c,SizeOf(c));
       end;
       {$I+}
    end;
@@ -27,37 +27,37 @@ end;
 procedure _wudata_chat(p:byte;rpl:boolean);
 var i:byte;
 begin
-   if(rpl=false)
-   then net_writechat(p)
-   else for i:=0 to MaxNetChat do _wudata_string(net_chat[p,i],rpl);
+   //if(rpl=false)
+   //then net_writechat(p)
+   //else for i:=0 to MaxNetChat do _wudata_string(net_chat[p,i],rpl);
 end;
 
 procedure _wudata_byte(bt:byte;rpl:boolean);
 begin
    if(rpl=false)
    then net_writebyte(bt)
-   else begin {$I-} BlockWrite(_rpls_file,bt,SizeOf(bt)); {$I+} end;
+   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
 procedure _wudata_sint(bt:shortint;rpl:boolean);
 begin
    if(rpl=false)
    then net_writesint(bt)
-   else begin {$I-} BlockWrite(_rpls_file,bt,SizeOf(bt)); {$I+} end;
+   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
 procedure _wudata_int(bt:integer;rpl:boolean);
 begin
    if(rpl=false)
    then net_writeint(bt)
-   else begin {$I-} BlockWrite(_rpls_file,bt,SizeOf(bt)); {$I+} end;
+   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
 procedure _wudata_card(bt:cardinal;rpl:boolean);
 begin
    if(rpl=false)
    then net_writecard(bt)
-   else begin {$I-} BlockWrite(_rpls_file,bt,SizeOf(bt)); {$I+} end;
+   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
 procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
@@ -248,8 +248,8 @@ gm_royl: _wudata_int(g_royal_r,rpl);
 
    if(rpl)then
    begin
-      _PNU:=_cl_pnua[_rpls_pnui];
-      _N_U:=@_rpls_u;
+      _PNU:=_cl_pnua[rpls_pnui];
+      _N_U:=@rpls_u;
    end
    else
    begin
@@ -620,7 +620,7 @@ begin
 
                if(speed>0)then
                begin
-                  vstp:=UnitStepNum;
+                  vstp:=UnitStepTicks;
 
                   dir :=p_dir(uo_bx,uo_by,x,y);
                end;
@@ -643,11 +643,11 @@ begin
       sl:=0;
       _rudata_string:='';
       {$I-}
-      BlockRead(_rpls_file,sl,SizeOf(sl));
+      BlockRead(rpls_file,sl,SizeOf(sl));
       for x:=1 to sl do
       begin
          c:=#0;
-         BlockRead(_rpls_file,c,SizeOf(c));
+         BlockRead(rpls_file,c,SizeOf(c));
          _rudata_string:=_rudata_string+c;
       end;
       {$I+}
@@ -657,37 +657,37 @@ end;
 procedure  _rudata_chat(p:byte;rpl:boolean);
 var i:byte;
 begin
-   if(rpl=false)
-   then net_readchat
-   else for i:=0 to MaxNetChat do net_chat[p,i]:=_rudata_string(rpl);
+   //if(rpl=false)
+   //then net_readchat
+   //else for i:=0 to MaxNetChat do net_chat[p,i]:=_rudata_string(rpl);
 end;
 
 function _rudata_byte(rpl:boolean;def:byte):byte;
 begin
    if(rpl=false)
    then _rudata_byte:=net_readbyte
-   else begin {$I-} BlockRead(_rpls_file,_rudata_byte,SizeOf(_rudata_byte));if(ioresult<>0)then _rudata_byte:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));if(ioresult<>0)then _rudata_byte:=def; {$I+} end;
 end;
 
 function _rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
    if(rpl=false)
    then _rudata_sint:=net_readsint
-   else begin {$I-} BlockRead(_rpls_file,_rudata_sint,SizeOf(_rudata_sint));if(ioresult<>0)then _rudata_sint:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));if(ioresult<>0)then _rudata_sint:=def; {$I+} end;
 end;
 
 function _rudata_int(rpl:boolean;def:integer):integer;
 begin
    if(rpl=false)
    then _rudata_int:=net_readint
-   else begin {$I-} BlockRead(_rpls_file,_rudata_int ,SizeOf(_rudata_int ));if(ioresult<>0)then _rudata_int :=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));if(ioresult<>0)then _rudata_int :=def; {$I+} end;
 end;
 
 function _rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
    if(rpl=false)
    then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(_rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card :=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card :=def; {$I+} end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -930,8 +930,8 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
       begin
          _rpls_pnu:=_PNU;
          if(_rpls_pnu<=0)then _rpls_pnu:=1;
-         UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
-         if(UnitStepNum=0)then UnitStepNum:=1;
+         UnitStepTicks:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
+         if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
       if((gstp mod i)=0)then _rpdata(rpl);

@@ -149,7 +149,7 @@ begin
       filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
 end;
 
-procedure _makeMMB;
+procedure map_RedrawMenuMinimap;
 begin
    sdl_FillRect(r_minimap,nil,0);
    map_bminimap;
@@ -157,7 +157,7 @@ begin
    if(g_show_positions)or(g_mode in [gm_inv,gm_2fort,gm_3fort])then map_dstarts;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
-  // vid_mredraw:=true;
+  // vid_menu_redraw:=true;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string);

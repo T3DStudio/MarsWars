@@ -35,7 +35,7 @@ g_royal_r         : integer = 0;
 
 ServerSide        : boolean = true; // only server side code
 
-UnitStepNum       : byte = 8;
+UnitStepTicks       : byte = 8;
 
 _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
@@ -71,7 +71,7 @@ HPlayer           : byte = 1; // 'this' player
 
 team_army         : array[0..MaxPlayers] of integer;
 
-vid_mredraw       : boolean  = true;
+vid_menu_redraw       : boolean  = true;
 
 map_seed          : cardinal = 1;
 map_iseed         : word     = 0;
@@ -94,19 +94,19 @@ pf_pathgrid_tmpb  : byte;
 pfNodes           : array[1..pfMaxNodes] of TPFNode;
 pfNodes_c         : integer;
 
-//net_chatls        : array[0..MaxPlayers] of byte; // local state
-//net_chatss        : array[0..MaxPlayers] of byte; // server state
-//net_chat          : array[0..MaxPlayers,0..MaxNetChat] of shortstring;
-net_nstate        : byte = 0;
-net_sv_port       : word = 10666;
+
+net_status        : byte = 0;
+net_port          : word = 10666;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
 net_period        : byte = 0;
+net_log_n         : word = 0;
 
-_rpls_file        : file;
-_rpls_u           : integer = 0;
-_rpls_pnui        : byte = 0;
+rpls_file         : file;
+rpls_u            : integer = 0;
+rpls_pnui         : byte = 0;
+rpls_log_n        : word = 0;
 
 fps_tt,
 fps_cs,
@@ -147,7 +147,7 @@ r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 r_RECT            : pSDL_RECT;
 
 cfg_fullscreen    : boolean = false;
-_igchat           : boolean = false;
+ingame_chat           : boolean = false;
 r_draw            : boolean = true;
 
 _menu             : boolean = true;
@@ -352,7 +352,7 @@ k_ml,
 k_mr,
 k_chart           : cardinal;
 k_char            : char;
-k_kstring         : shortstring = '';
+k_keyboard_string         : shortstring = '';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -4,9 +4,9 @@ begin
    if(G_Started)then
    begin
       _menu:=not _menu;
-      vid_mredraw:=_menu;
+      vid_menu_redraw:=_menu;
       menu_item:=0;
-      if(net_nstate=ns_none)and(G_Paused<200)then
+      if(net_status=ns_none)and(G_Paused<200)then
        if(_menu)
        then G_Paused:=1
        else G_Paused:=0;
@@ -17,10 +17,10 @@ function menu_sf(s:shortstring;charset:TSoc;ms:byte):shortstring;
 var i:byte;
     c:char;
 begin
-   if(length(k_kstring)>0)then
-   for i:=1 to length(k_kstring) do
+   if(length(k_keyboard_string)>0)then
+   for i:=1 to length(k_keyboard_string) do
    begin
-      c:=k_kstring[i];
+      c:=k_keyboard_string[i];
       if(c=#8)
       then delete(s,length(s),1)
       else
@@ -29,7 +29,7 @@ begin
        else
          if(c in charset)then s:=s+c;
    end;
-   k_kstring:='';
+   k_keyboard_string:='';
    menu_sf:=s;
 end;
 
@@ -40,7 +40,7 @@ begin
    if(544<mouse_y)and(mouse_y<571)then
    begin
       if(32 <mouse_x)and(mouse_x<107)then menu_item:=1;     // exit
-      if(net_nstate<>ns_clnt)then
+      if(net_status<>ns_clnt)then
        if(692<mouse_x)and(mouse_x<767)then menu_item:=2;    // start
    end;
 
@@ -58,8 +58,8 @@ begin
          menu_item:=3+((mouse_x-ui_menu_ssr_x0) div ui_menu_ssr_xs);
 
          case menu_item of
-         4: if not ((net_nstate=ns_none)and(_rpls_rst<rpl_rhead))then menu_item:=0;
-         5: if (net_nstate<>ns_none)then menu_item:=0;
+         4: if not ((net_status=ns_none)and(_rpls_rst<rpl_rhead))then menu_item:=0;
+         5: if (net_status<>ns_none)then menu_item:=0;
          end;
       end
       else
@@ -99,7 +99,7 @@ begin
 
    if(G_Started=false)then
    begin
-      if(net_nstate<>ns_clnt)then
+      if(net_status<>ns_clnt)then
       begin
          // MAP
          if(menu_s2<>ms2_camp)then
@@ -159,7 +159,7 @@ begin
       if(menu_item=11 )then _players[HPlayer].name:=PlayerName;
       c_m_sel;
       if not(menu_item in [16,17])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
-      vid_mredraw:=true;
+      vid_menu_redraw:=true;
       PlaySNDM(snd_click);
    end;
 
@@ -169,7 +169,7 @@ begin
       1  : if(G_Started)
            then ToggleMenu
            else _CYCLE:=false;
-      2  : _StartStopGame;    // start/break game
+      2  : GameMakeDestroy;    // start/break game
 
       /// SETTINGS SAVE REPLAYS
 
@@ -188,7 +188,7 @@ begin
              then vid_vmspd:=mouse_x-ui_menu_ssr_x2
              else vid_vmspd:=127;
       10 : vid_vmm:=not vid_vmm;
-      11 : if not ((net_nstate=ns_none)and(G_Started=false))then menu_item:=0;
+      11 : if not ((net_status=ns_none)and(G_Started=false))then menu_item:=0;
       12 : begin _lng:=not _lng;swLNG;end;
       13 : begin
               vid_ppos+=1;
@@ -296,8 +296,8 @@ begin
 
 
       // players
-      60 : if(net_nstate<>ns_clnt)then _swAI( ((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys) +1);
-      61 : if(net_nstate<>ns_clnt)then
+      60 : if(net_status<>ns_clnt)then PlayerSwitchAILevel( ((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys) +1);
+      61 : if(net_status<>ns_clnt)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               if(p<>HPlayer)then
@@ -306,7 +306,7 @@ begin
                 then PlayerSetState(p,PS_None)
                 else PlayerSetState(p,PS_Comp);
            end;
-      62 : if(net_nstate<>ns_clnt)then
+      62 : if(net_status<>ns_clnt)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -317,7 +317,7 @@ begin
                   mrace:=race;
                end;
            end;
-      63 : if(net_nstate<>ns_clnt)then
+      63 : if(net_status<>ns_clnt)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -331,12 +331,12 @@ begin
       72 : if not(G_Started and(menu_s2=ms2_camp))then begin menu_s2:=ms2_mult; if(m_chat)then menu_item:=100; end;
 
       // game options
-      75 : if(net_nstate<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
-      76 : if(net_nstate<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@gamemodes);Map_premap;end;
-      77 : if(net_nstate<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
-      78 : if(net_nstate<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions; end;
-      79 : if(net_nstate<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);
-      80 : if(net_nstate<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
+      75 : if(net_status<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
+      76 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@gamemodes);Map_premap;end;
+      77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
+      78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions; end;
+      79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);
+      80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
@@ -344,50 +344,50 @@ begin
             then _rpls_rst:=rpl_whead
             else _rpls_rst:=rpl_none;
       83 : if(_rpls_rst<>rpl_none)then menu_item:=0;
-      84 : ScrollInt(@_rpls_pnui,1,0,9);
+      84 : ScrollInt(@rpls_pnui,1,0,9);
 
       //// multiplayer
       // server
-      86 : if(net_nstate<>ns_clnt)and(not G_Started)and(mouse_x>ui_menu_csm_xc)then
+      86 : if(net_status<>ns_clnt)and(not G_Started)and(mouse_x>ui_menu_csm_xc)then
            begin
-              if(net_nstate=ns_srvr)then
+              if(net_status=ns_srvr)then
               begin
                  net_dispose;
-                 DefGameObjects;
+                 GameDefaultAll;
                  g_started:=false;
-                 net_nstate:=ns_none;
+                 net_status:=ns_none;
               end
               else
               begin
-                 net_nstate:=ns_srvr;
+                 net_status:=ns_srvr;
                  net_sv_sport;
                  if(net_UpSocket=false)then
                  begin
                     net_dispose;
-                    net_nstate:=ns_none;
+                    net_status:=ns_none;
                  end
-                 else DefPlayers;
+                 else PlayersSetDefault;
               end;
               menu_s1:=ms1_sett;
            end;
-      87 : if(net_nstate<>ns_none)then menu_item:=0; // port
+      87 : if(net_status<>ns_none)then menu_item:=0; // port
 
       // client
-      89 : if(net_nstate<>ns_srvr)and(mouse_x>ui_menu_csm_xc)then
-           if(net_nstate=ns_clnt)or(G_Started=false)then
+      89 : if(net_status<>ns_srvr)and(mouse_x>ui_menu_csm_xc)then
+           if(net_status=ns_clnt)or(G_Started=false)then
            begin
-              if(net_nstate=ns_clnt)then
+              if(net_status=ns_clnt)then
               begin
-                 net_plout;
+                 net_disconnect;
                  net_dispose;
-                 DefGameObjects;
+                 GameDefaultAll;
                  G_started  :=false;
                  PlayerReady:=false;
-                 net_nstate  :=ns_none;
+                 net_status  :=ns_none;
               end
               else
               begin
-                 net_nstate:=ns_clnt;
+                 net_status:=ns_clnt;
                  net_cl_saddr;
                  _rpls_pnu:=0;
                  if(net_UpSocket)
@@ -395,14 +395,14 @@ begin
                  else
                  begin
                     net_dispose;
-                    net_nstate:=ns_none;
+                    net_status:=ns_none;
                  end;
               end;
               menu_s1:=ms1_sett;
            end;
-      90 : if(net_nstate<>ns_none)then menu_item:=0; // addr
-      91 : if(net_nstate<>ns_srvr)then ScrollInt(@net_pnui,1,0,9);
-      92 : if(G_Started=false)and(net_nstate<>ns_srvr)then
+      90 : if(net_status<>ns_none)then menu_item:=0; // addr
+      91 : if(net_status<>ns_srvr)then ScrollInt(@net_pnui,1,0,9);
+      92 : if(G_Started=false)and(net_status<>ns_srvr)then
             if(mouse_x<ui_menu_csm_x2)
             then ScrollInt(@PlayerTeam,1,1,MaxPlayers)
             else
@@ -419,7 +419,7 @@ begin
                  else net_chat_tar:=net_chat_tar or  p;
               end;
            end;
-      96 : if(net_nstate<>ns_none)then
+      96 : if(net_status<>ns_none)then
            begin
               m_chat:=not m_chat;
               if(m_chat)then menu_item:=100;
@@ -449,11 +449,11 @@ begin
 
       60 : begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
-              if(net_nstate=ns_clnt)
+              if(net_status=ns_clnt)
               then net_swapp(p)
-              else _swapPlayers(p,HPlayer);
+              else PlayersSwap(p,HPlayer);
            end;
-      63 : if(net_nstate<>ns_clnt)and(not G_Started)then
+      63 : if(net_status<>ns_clnt)and(not G_Started)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -461,21 +461,21 @@ begin
                 if(team>1)then team-=1;
            end;
 
-      77 : if(net_nstate<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base ,-1,0,gms_g_startb);
-      79 : if(net_nstate<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,-1,0,gms_g_maxai );
-      80 : if(net_nstate<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
+      77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base ,-1,0,gms_g_startb);
+      79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,-1,0,gms_g_maxai );
+      80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
-      84 : ScrollInt(@_rpls_pnui,-1,0,9);
+      84 : ScrollInt(@rpls_pnui,-1,0,9);
 
-      91 : if(net_nstate<>ns_srvr)then ScrollInt(@net_pnui,-1,0,9);
-      92 : if(G_Started=false)and(net_nstate<>ns_srvr)then
+      91 : if(net_status<>ns_srvr)then ScrollInt(@net_pnui,-1,0,9);
+      92 : if(G_Started=false)and(net_status<>ns_srvr)then
             if(mouse_x<ui_menu_csm_x2)then ScrollInt(@PlayerTeam,-1,1,MaxPlayers);
 
       97 : ScrollInt(@cmp_skill,-1,0,CMPMaxSkills);
       end;
    end;
 
-   if(length(k_kstring)>0)then
+   if(length(k_keyboard_string)>0)then
    begin
       case menu_item of
       11 : PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
@@ -490,10 +490,10 @@ begin
               net_sv_sport;
            end;
       90 : net_cl_svstr:=menu_sf(net_cl_svstr,k_kbaddr,21);
-      100: net_chat_str:=menu_sf(net_chat_str,k_kbstr ,ChatLen);
+      100: net_chat_str:=menu_sf(net_chat_str,k_kbstr ,255);
       end;
 
-      vid_mredraw:=true;
+      vid_menu_redraw:=true;
    end;
 
 

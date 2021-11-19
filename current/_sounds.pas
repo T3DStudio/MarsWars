@@ -305,6 +305,12 @@ begin
     end;
 end;
 
+procedure SoundControl;
+begin
+   if(vid_rtui=0)then _MusicCheck;
+   if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
+   if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
+end;
 
 function InitSound:boolean;
 var r:byte;

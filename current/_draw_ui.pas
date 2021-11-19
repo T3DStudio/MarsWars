@@ -237,7 +237,7 @@ begin
       end;
 
       d_TextBTN(tar,0,9,@str_menu,c_white);
-      if(net_nstate>ns_none)and(G_WTeam=255)then
+      if(net_status>ns_none)and(G_WTeam=255)then
        if(g_paused>0)
        then d_TextBTN(tar,2,9,@str_pause,PlayerGetColor(g_paused))
        else d_TextBTN(tar,2,9,@str_pause,c_white          );
@@ -430,7 +430,7 @@ begin
            end;
       13 : begin
               if(m_bx=2)then
-               if(net_nstate=ns_none)or(G_WTeam<255)then exit;
+               if(net_status=ns_none)or(G_WTeam<255)then exit;
               hs:=@str_hint_m[m_bx];
            end;
       15 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[0];
@@ -482,7 +482,7 @@ procedure D_UIText(tar:pSDL_Surface);
 var i:byte;
 begin
    // CHAT
-   if(_igchat)or(_rpls_log)then
+   if(ingame_chat)or(_rpls_log)then
    begin
       //for i:=0 to MaxNetChat do _draw_text(tar,ui_textx,ui_chaty-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
       if(_rpls_log=false)then   _draw_text(tar,ui_textx,ui_hinty     ,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
@@ -507,7 +507,7 @@ begin
            if(menu_s2<>ms2_camp)then
             if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
-            if(net_nstate=ns_clnt)and(net_cl_svttl=ClientTTL)
+            if(net_status=ns_clnt)and(net_cl_svttl=ClientTTL)
             then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
             else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
         end

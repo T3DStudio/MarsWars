@@ -84,7 +84,7 @@ begin
    if not(InitNET)then exit;
 
    Map_randommap;
-   DefGameObjects;
+   GameDefaultAll;
 
    NEW(_event);
 

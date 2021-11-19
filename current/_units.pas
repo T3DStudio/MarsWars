@@ -35,8 +35,8 @@ begin
 
        if(G_WTeam=255)then
         if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
-         if(army=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-         and(state>ps_none)then PlayerAddLog(playeri,name+str_player_def,,255);
+         if(army<=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+         and(state>ps_none)then PlayersAddLog(playeri,log_to_all,lmt_game,name+str_player_def);
     end;
 end;
 
@@ -369,7 +369,7 @@ begin
             y+=trunc(ud*(tu^.y-y)/t);
          end;
 
-         vstp:=UnitStepNum;
+         vstp:=UnitStepTicks;
 
          _unit_correctXY(pu);
          {$IFDEF _FULLGAME}
@@ -416,7 +416,7 @@ begin
             y+=trunc(ud*(td^.y-y)/t);
          end;
 
-         vstp:=UnitStepNum;
+         vstp:=UnitStepTicks;
 
          _unit_correctXY(pu);
          {$IFDEF _FULLGAME}

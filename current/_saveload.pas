@@ -242,7 +242,7 @@ begin
    g_paused:=0;
    _svld_make_lst;
 
-   net_chat_add(str_gsaved,HPlayer,255);
+   PlayersAddLog(HPlayer,log_to_all,lmt_game,str_gsaved);
 end;
 
 
@@ -264,7 +264,7 @@ begin
       BlockRead(f,vr,SizeOf(ver));
       if(vr=ver)then
       begin
-         DefGameObjects;
+         GameDefaultAll;
 
          BlockRead(f,menu_s2        ,SizeOf(menu_s2        ));
          BlockRead(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
@@ -313,7 +313,7 @@ begin
          map_vars;
          map_tllbc;
          map_doodads_cells_refresh;
-         _makeMMB;
+         map_RedrawMenuMinimap;
          _map_dds;
          pf_make_grid;
          //g_inv_calcmm;

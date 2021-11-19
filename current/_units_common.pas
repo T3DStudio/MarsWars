@@ -344,7 +344,7 @@ begin
     end
     else
     begin
-       if(vstp<=0)then vstp:=UnitStepNum;
+       if(vstp<=0)then vstp:=UnitStepTicks;
        vx  +=(x-vx) div vstp;
        vy  +=(y-vy) div vstp;
        vstp-=1;
@@ -943,7 +943,7 @@ begin
    _unit_straining:=false;
 end;
 /// Stop unit prod
-function _unit_ctraining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
+function _unit_ctraining_p(pu:PTUnit;puid,pn:byte):boolean;
 begin
    _unit_ctraining_p:=false;
    with pu^ do
@@ -978,7 +978,7 @@ end;
 
 //////   Start upgrade production
 //
-function _unit_supgrade_p(pu:PTUnit;upid:byte;pn:integer):boolean;
+function _unit_supgrade_p(pu:PTUnit;upid,pn:byte):boolean;
 begin
    _unit_supgrade_p:=false;
    if(upid<255)then

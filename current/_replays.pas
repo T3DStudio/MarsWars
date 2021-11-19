@@ -90,7 +90,7 @@ procedure rpl_abort;
 begin
    if(_rpls_fileo)then
    begin
-      close(_rpls_file);
+      close(rpls_file);
       _rpls_fileo:=false;
    end;
    if(_rpls_rst>=rpl_rhead)then _rpls_rst  :=rpl_none;
@@ -119,8 +119,8 @@ begin
                       end;
 
                       {$I-}
-                      assign(_rpls_file,str_f_rpls+_rpls_lrname+str_e_rpls);
-                      rewrite(_rpls_file,1);
+                      assign(rpls_file,str_f_rpls+_rpls_lrname+str_e_rpls);
+                      rewrite(rpls_file,1);
                       {$I+}
 
                       if(ioresult<>0)
@@ -129,32 +129,32 @@ begin
                       begin
                          _rpls_rst  :=rpl_wunit;
                          _rpls_fileo:=true;
-                         _rpls_u    :=MaxPlayerUnits+1;
+                         rpls_u    :=MaxPlayerUnits+1;
                          _rpls_nwrch:=true;
                          _rpls_vidm :=false;
 
                          {$I-}
-                         BlockWrite(_rpls_file,ver        ,SizeOf(ver     ));
-                         BlockWrite(_rpls_file,map_seed   ,SizeOf(map_seed));
-                         BlockWrite(_rpls_file,map_mw     ,SizeOf(map_mw  ));
-                         BlockWrite(_rpls_file,map_liq    ,SizeOf(map_liq ));
-                         BlockWrite(_rpls_file,map_obs    ,SizeOf(map_obs ));
-                         BlockWrite(_rpls_file,map_sym    ,SizeOf(map_sym ));
+                         BlockWrite(rpls_file,ver        ,SizeOf(ver     ));
+                         BlockWrite(rpls_file,map_seed   ,SizeOf(map_seed));
+                         BlockWrite(rpls_file,map_mw     ,SizeOf(map_mw  ));
+                         BlockWrite(rpls_file,map_liq    ,SizeOf(map_liq ));
+                         BlockWrite(rpls_file,map_obs    ,SizeOf(map_obs ));
+                         BlockWrite(rpls_file,map_sym    ,SizeOf(map_sym ));
 
-                         BlockWrite(_rpls_file,g_addon    ,SizeOf(g_addon ));
-                         BlockWrite(_rpls_file,g_mode     ,SizeOf(g_mode  ));
-                         BlockWrite(_rpls_file,g_start_base   ,SizeOf(g_start_base));
-                         BlockWrite(_rpls_file,g_show_positions    ,SizeOf(g_show_positions ));
-                         BlockWrite(_rpls_file,HPlayer    ,sizeof(HPlayer ));
+                         BlockWrite(rpls_file,g_addon    ,SizeOf(g_addon ));
+                         BlockWrite(rpls_file,g_mode     ,SizeOf(g_mode  ));
+                         BlockWrite(rpls_file,g_start_base   ,SizeOf(g_start_base));
+                         BlockWrite(rpls_file,g_show_positions    ,SizeOf(g_show_positions ));
+                         BlockWrite(rpls_file,HPlayer    ,sizeof(HPlayer ));
 
                          for i:=1 to MaxPlayers do
                           with _Players[i] do
                           begin
-                             BlockWrite(_rpls_file,name ,sizeof(name ));
-                             BlockWrite(_rpls_file,state,sizeof(state));
-                             BlockWrite(_rpls_file,race ,sizeof(race ));
-                             BlockWrite(_rpls_file,mrace,sizeof(mrace));
-                             BlockWrite(_rpls_file,team ,sizeof(team ));
+                             BlockWrite(rpls_file,name ,sizeof(name ));
+                             BlockWrite(rpls_file,state,sizeof(state));
+                             BlockWrite(rpls_file,race ,sizeof(race ));
+                             BlockWrite(rpls_file,mrace,sizeof(mrace));
+                             BlockWrite(rpls_file,team ,sizeof(team ));
                           end;
                          {$I+}
 
@@ -175,7 +175,7 @@ begin
                       if((i and %11000000)>0)or(G_Paused=0)then
                       begin
                          {$I-}
-                         BlockWrite(_rpls_file,i,sizeof(i));
+                         BlockWrite(rpls_file,i,sizeof(i));
                          {$I+}
                          if(_rpls_nwrch)then
                          begin
@@ -187,8 +187,8 @@ begin
                             _rpls_vidx:=_vx;
                             _rpls_vidy:=_vy;
                             {$I-}
-                            BlockWrite(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
-                            BlockWrite(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
+                            BlockWrite(rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
+                            BlockWrite(rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
                             {$I+}
                          end;
 
@@ -217,8 +217,8 @@ begin
                       end;
 
                       {$I-}
-                      assign(_rpls_file,fn);
-                      reset(_rpls_file,1);
+                      assign(rpls_file,fn);
+                      reset(rpls_file,1);
                       {$I+}
 
                       if(ioresult<>0)then
@@ -229,7 +229,7 @@ begin
                       end
                       else
                       begin
-                         fs:=FileSize(_rpls_file);
+                         fs:=FileSize(rpls_file);
 
                          if(fs<rpl_hsize)then
                          begin
@@ -241,7 +241,7 @@ begin
 
                          i:=0;
                          {$I-}
-                         BlockRead(_rpls_file,i,SizeOf(Ver));
+                         BlockRead(rpls_file,i,SizeOf(Ver));
                          {$I+}
 
                          if(i<>ver)then
@@ -252,19 +252,19 @@ begin
                          end
                          else
                          begin
-                            DefGameObjects;
+                            GameDefaultAll;
 
                             {$I-}
-                            BlockRead(_rpls_file,map_seed ,SizeOf(map_seed ));
-                            BlockRead(_rpls_file,map_mw   ,SizeOf(map_mw   ));
-                            BlockRead(_rpls_file,map_liq  ,SizeOf(map_liq  ));
-                            BlockRead(_rpls_file,map_obs  ,SizeOf(map_obs  ));
-                            BlockRead(_rpls_file,map_sym  ,SizeOf(map_sym  ));
-                            BlockRead(_rpls_file,g_addon  ,SizeOf(g_addon  ));
-                            BlockRead(_rpls_file,g_mode   ,SizeOf(g_mode   ));
-                            BlockRead(_rpls_file,g_start_base ,SizeOf(g_start_base ));
-                            BlockRead(_rpls_file,g_show_positions  ,SizeOf(g_show_positions  ));
-                            BlockRead(_rpls_file,HPlayer  ,sizeof(HPlayer  ));
+                            BlockRead(rpls_file,map_seed ,SizeOf(map_seed ));
+                            BlockRead(rpls_file,map_mw   ,SizeOf(map_mw   ));
+                            BlockRead(rpls_file,map_liq  ,SizeOf(map_liq  ));
+                            BlockRead(rpls_file,map_obs  ,SizeOf(map_obs  ));
+                            BlockRead(rpls_file,map_sym  ,SizeOf(map_sym  ));
+                            BlockRead(rpls_file,g_addon  ,SizeOf(g_addon  ));
+                            BlockRead(rpls_file,g_mode   ,SizeOf(g_mode   ));
+                            BlockRead(rpls_file,g_start_base ,SizeOf(g_start_base ));
+                            BlockRead(rpls_file,g_show_positions  ,SizeOf(g_show_positions  ));
+                            BlockRead(rpls_file,HPlayer  ,sizeof(HPlayer  ));
                             {$I+}
 
                             if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
@@ -274,7 +274,7 @@ begin
                                rpl_abort;
                                g_started  :=false;
                                _rpls_stat:=str_svld_errors[4];
-                               DefGameObjects;
+                               GameDefaultAll;
                                exit;
                             end;
 
@@ -282,17 +282,17 @@ begin
                             for i:=1 to MaxPlayers do
                              with _Players[i] do
                              begin
-                                BlockRead(_rpls_file,name ,sizeof(name));
-                                BlockRead(_rpls_file,state,sizeof(state));
-                                BlockRead(_rpls_file,race ,sizeof(race));
-                                BlockRead(_rpls_file,mrace,sizeof(mrace));
-                                BlockRead(_rpls_file,team ,sizeof(team));
+                                BlockRead(rpls_file,name ,sizeof(name));
+                                BlockRead(rpls_file,state,sizeof(state));
+                                BlockRead(rpls_file,race ,sizeof(race));
+                                BlockRead(rpls_file,mrace,sizeof(mrace));
+                                BlockRead(rpls_file,team ,sizeof(team));
                              end;
                             {$I+}
 
                             if(_rpls_pnu=0)then _rpls_pnu:=NetTickN;
-                            UnitStepNum:=trunc(MaxUnits/_rpls_pnu)*NetTickN;
-                            if(UnitStepNum=0)then UnitStepNum:=1;
+                            UnitStepTicks:=trunc(MaxUnits/_rpls_pnu)*NetTickN;
+                            if(UnitStepTicks=0)then UnitStepTicks:=1;
 
                             _rpls_fileo :=true;
                             _rpls_rst   :=rpl_runit;
@@ -313,7 +313,7 @@ begin
                    end;
      rpl_runit   : if((vid_rtui mod 2)=0)then
                    begin
-                       if(eof(_rpls_file)or(ioresult<>0))then
+                       if(eof(rpls_file)or(ioresult<>0))then
                        begin
                           rpl_abort;
                           _rpls_rst:=rpl_end;
@@ -326,7 +326,7 @@ begin
                        while (_rpls_step>0) do
                        begin
                           {$I-}
-                          BlockRead(_rpls_file,i,SizeOf(i));
+                          BlockRead(rpls_file,i,SizeOf(i));
                           {$I+}
                           G_Paused:=i and %00111111;
 
@@ -334,14 +334,14 @@ begin
                           begin
                              _rudata_chat(_rpls_player,true);
                              net_chat_shlm:=chat_shlm_t;
-                             vid_mredraw  :=true;
+                             vid_menu_redraw  :=true;
                              PlaySNDM(snd_chat);
                           end;
                           if((i and %01000000)>0)then
                           begin
                              {$I-}
-                             BlockRead(_rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
-                             BlockRead(_rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
+                             BlockRead(rpls_file,_rpls_vidx,sizeof(_rpls_vidx));
+                             BlockRead(rpls_file,_rpls_vidy,sizeof(_rpls_vidy));
                              {$I+}
                           end;
 

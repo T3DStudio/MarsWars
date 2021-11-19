@@ -335,14 +335,14 @@ o_x1,o_y1  :integer;
 
    PNU     : byte;
    n_u,
-   ttl     : integer;
+   ttl     : word;
    nip     : cardinal;
    nport   : word;
 
    log_l   : array[0..MaxPlayerLog] of shortstring;
    log_i,
    log_n
-           : integer;
+           : word;
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;

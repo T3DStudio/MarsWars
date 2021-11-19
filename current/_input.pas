@@ -1,9 +1,9 @@
 
 procedure escape_key;
 begin
-   if(_igchat)then
+   if(ingame_chat)then
    begin
-      _igchat:=false;
+      ingame_chat:=false;
       net_chat_str:='';
    end
    else ToggleMenu;
@@ -11,26 +11,26 @@ end;
 
 procedure return_key;
 begin
-   if(_menu=false)and(not _igchat)and(net_nstate<>ns_none)
-   then _igchat:=true
+   if(_menu=false)and(not ingame_chat)and(net_status<>ns_none)
+   then ingame_chat:=true
    else
-    if(menu_item=100)or(_igchat)then
+    if(menu_item=100)or(ingame_chat)then
     begin
        if(length(net_chat_str)>0)then
-        if(net_nstate=ns_clnt)
-        then net_chatm
-        else net_chat_add(net_chat_str,HPlayer,net_chat_tar);
+        if(net_status=ns_clnt)
+        then net_send_chat
+        else PlayersAddLog(HPlayer,net_chat_tar,lmt_game,net_chat_str);
        net_chat_str:='';
-       _igchat:=false;
+       ingame_chat:=false;
     end;
 end;
 
 procedure TogglePause;
 begin
-   if(net_nstate=ns_clnt)
+   if(net_status=ns_clnt)
    then net_pause
    else
-     if(net_nstate=ns_srvr)then
+     if(net_status=ns_srvr)then
        if(G_paused=0)
        then G_paused:=HPlayer
        else G_paused:=0;
@@ -119,7 +119,7 @@ procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
 begin
    if(G_Paused=0)and(_rpls_rst<rpl_rhead)then
    begin
-      if(net_nstate=ns_clnt)then
+      if(net_status=ns_clnt)then
       begin
          net_clearbuffer;
          net_writebyte(nmid_order);
@@ -186,7 +186,7 @@ begin
        end;
 end;
 
-procedure _chkbld;
+procedure check_mouse_brush;
 begin
    case m_brush of
    0     : m_brush:=co_empty;
@@ -210,8 +210,8 @@ begin
           else
           begin
              _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
-             m_brushx:=mm3(map_b0,m_brushx,map_b1);
-             m_brushy:=mm3(map_b0,m_brushy,map_b1);
+             m_brushx:=mm3(map_b0   ,m_brushx,map_b1);
+             m_brushy:=mm3(map_b0   ,m_brushy,map_b1);
              m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
              m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
           end;
@@ -235,23 +235,23 @@ var t:integer;
 begin
    t:=0;
    case m_brush of
-co_move   : begin                     // move
-               t:=_whoInPoint(x,y,2);
-               _player_s_o(co_move ,t,x,y,0,uo_corder,HPlayer);
-            end;
-co_amove  : begin                     // attack
-               t:=_whoInPoint(x,y,1);
-               _player_s_o(co_amove,t,x,y,0,uo_corder,HPlayer);
-            end;
+co_move    : begin                     // move
+                t:=_whoInPoint(x,y,2);
+                _player_s_o(co_move ,t,x,y,0,uo_corder,HPlayer);
+             end;
+co_amove   : begin                     // attack
+                t:=_whoInPoint(x,y,1);
+                _player_s_o(co_amove,t,x,y,0,uo_corder,HPlayer);
+             end;
 co_paction,
 co_patrol,
-co_apatrol: _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
-co_empty  : begin                     // rclick
-               t:=_whoInPoint(x,y,0);
-               if(m_a_inv)
-               then _player_s_o(co_rcmove ,t,x,y,0,uo_corder,HPlayer)
-               else _player_s_o(co_rcamove,t,x,y,0,uo_corder,HPlayer);
-            end;
+co_apatrol : _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
+co_empty   : begin                     // rclick
+                t:=_whoInPoint(x,y,0);
+                if(m_a_inv)
+                then _player_s_o(co_rcmove ,t,x,y,0,uo_corder,HPlayer)
+                else _player_s_o(co_rcamove,t,x,y,0,uo_corder,HPlayer);
+             end;
    end;
 
    m_brush:=co_empty;
@@ -280,7 +280,7 @@ begin
    9 : case bx of         // buttons
        0 : ToggleMenu;
        1 : ;
-       2 : if(net_nstate>ns_none)then TogglePause;
+       2 : if(net_status>ns_none)then TogglePause;
        end;
    else
      u:=(by*3)+(bx mod 3);
@@ -299,7 +299,7 @@ false: begin
              _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
              m_brush:=co_empty;
           end
-          else _chkbld;
+          else check_mouse_brush;
        end;
 true : if(uid_x[ui_panel_uids[race,0,u]]>0)then
         if(_rclickmove(ui_panel_uids[race,0,u]))then
@@ -346,7 +346,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
          end;
 
-         _chkbld;
+         check_mouse_brush;
       end;
    end
    else
@@ -390,7 +390,7 @@ begin
                 end;
       1       : ;
       else
-        if(_testmode>0)and(net_nstate=0)then
+        if(_testmode>0)and(net_status=0)then
          case k of
             sdlk_end       : if(k_ctrl>2)
                              then begin if(g_mode=gm_inv)then g_inv_wave_n+=1; end
@@ -474,23 +474,23 @@ end;
 
 procedure WindowEvents;
 begin
-   _keyp(@k_u    );
+   _keyp(@k_u    ); // arrows
    _keyp(@k_d    );
    _keyp(@k_r    );
    _keyp(@k_l    );
    _keyp(@k_shift);
    _keyp(@k_ctrl );
    _keyp(@k_alt  );
-   _keyp(@k_ml   );
+   _keyp(@k_ml   ); // mouse btns
    _keyp(@k_mr   );
-   _keyp(@k_chart);
+   _keyp(@k_chart); // last key
    if(k_dbl>0)then k_dbl-=1;
 
    if(k_chart>k_chrtt)then
-    if(length(k_kstring)<255)then k_kstring:=k_kstring+k_char;
+    if(length(k_keyboard_string)<255)then k_keyboard_string:=k_keyboard_string+k_char;
 
    while (SDL_PollEvent( _event )>0) do
-    CASE (_event^.type_) OF
+    case (_event^.type_) of
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(_menu=false)and(G_Started)then
                               begin
@@ -507,14 +507,13 @@ begin
                             SDL_BUTTON_MIDDLE : m_vmove:=false;
                            else
                            end;
-      SDL_MOUSEBUTTONDOWN: begin
-                              case (_event^.button.button) of
+      SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
                             SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
                             SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
                             SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(_rpls_vidm=false)then m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
-                                                      vid_mredraw:=true;
+                                                      vid_menu_redraw:=true;
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
                                                       36: ScrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1 );
@@ -524,7 +523,7 @@ begin
                                                    else tmpmid-=1;
                             SDL_BUTTON_WHEELUP   : if(_menu)then
                                                    begin
-                                                      vid_mredraw:=true;
+                                                      vid_menu_redraw:=true;
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
                                                       36: ScrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1 );
@@ -532,8 +531,7 @@ begin
                                                       end;
                                                    end
                                                    else tmpmid+=1;
-                              else
-                              end;
+                           else
                            end;
       SDL_QUITEV         : _CYCLE:=false;
       SDL_KEYUP          : begin
@@ -555,7 +553,7 @@ begin
       SDL_KEYDOWN        : begin
                               k_chart  :=2;
                               k_char   :=Widechar(_event^.key.keysym.unicode);
-                              k_kstring:=k_kstring+k_char;
+                              k_keyboard_string:=k_keyboard_string+k_char;
 
                               case (_event^.key.keysym.sym) of
                                 sdlk_up     : if(k_u    =0)then k_u    :=2;
@@ -568,11 +566,11 @@ begin
                                 sdlk_lctrl  : if(k_ctrl =0)then k_ctrl :=2;
                                 sdlk_ralt   : if(k_alt  =0)then k_alt  :=2;
                                 sdlk_lalt   : if(k_alt  =0)then k_alt  :=2;
-                                SDLK_PRINT  : _screenshot;
+                                sdlk_print  : _screenshot;
                                 sdlk_escape : escape_key;
                                 sdlk_return : return_key;
                               else
-                                if(_menu=false)and(G_Started)and(_igchat=false)then _hotkeys(_event^.key.keysym.sym);
+                                if(_menu=false)and(G_Started)and(ingame_chat=false)then _hotkeys(_event^.key.keysym.sym);
                               end;
                            end;
     else
@@ -604,7 +602,7 @@ begin
 
    if(m_ldblclk>0)then m_ldblclk-=1;
 
-   _chkbld;
+   check_mouse_brush;
 
    if(k_ml=2)then                    // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
@@ -637,6 +635,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
       end
       else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
 
+
    if(k_ml=1)then  // LMB up
    begin
       m_mmap_move:=false;
@@ -654,7 +653,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
             else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer);
 
             if(G_Paused=0)and(_rpls_rst<rpl_runit)then
-             if(_CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
+             if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 
          mouse_select_x0:=-1;
@@ -709,7 +708,7 @@ end;
 procedure g_keyboard;
 begin
    if(m_vmove=false)and(_rpls_vidm=false)then _view_move;
-   if(_igchat)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen2);
+   if(ingame_chat)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen2);
 end;
 
 procedure InputGame;

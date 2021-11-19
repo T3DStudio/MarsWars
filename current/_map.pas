@@ -457,7 +457,7 @@ begin
    pf_make_grid;
    {$IFDEF _FULLGAME}
    _map_dds;
-   _makeMMB;
+   map_RedrawMenuMinimap;
    {$ENDIF}
 end;
 

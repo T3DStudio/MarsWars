@@ -1,7 +1,9 @@
 
-procedure _swapPlayers(p0,p1:integer);
+procedure PlayersSwap(p0,p1:byte);
 var tp:TPlayer;
 begin
+   if(p0>MaxPlayers)
+   or(p1>MaxPlayers)then exit;
    if(_players[p0].state=ps_play)or(p1=p0)then exit;
 
    tp:=_players[p0];
@@ -29,7 +31,7 @@ PS_Play: begin ready:=false;name :='';                ttl:=0;end;
    end;
 end;
 
-procedure DefPlayers;
+procedure PlayersSetDefault;
 var p:byte;
 begin
    FillChar(_players,SizeOf(TPList),0);
@@ -41,7 +43,15 @@ begin
        team     :=p;
        ready    :=false;
        pnum     :=p;
-       PlayerSEtState(p,ps_none);
+       PlayerSetState(p,ps_none);
+       PlayerClearLog(p);
+       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
+                                 UID_LostSoul      ..UID_ZBFG,
+                                 UID_UCommandCenter..UID_UMine,
+                                 UID_Engineer      ..UID_Flyer  ],
+                                255,true);
+
+       PlayerSetAllowedUpgrades(p,[0..255],255,true);
 
        {ai_pushtime := fr_fps*30;
        ai_pushmin  := 55;
@@ -51,29 +61,19 @@ begin
        ai_flags    := $FFFFFFFF;
        ai_pushtimei:= 0;
        ai_pushfrmi := 0; }
-
-       PlayerSetAllowedUnits(p,[UID_HKeep..UID_HMilitaryUnit,
-                                UID_LostSoul..UID_ZBFG,
-                                UID_UCommandCenter..UID_UMine,
-                                UID_Engineer..UID_Flyer],
-                                255,true);
-
-       PlayerSetAllowedUpgrades(p,[0..255],255,true);
-
-      // a_upgr  := [0..MaxUpgrs];
    end;
 
    with _players[0] do
    begin
       race     :=r_hell;
       state    :=ps_comp;
-      PlayerSetAllowedUnits(0,[],0,true);
+      PlayerSetAllowedUnits   (0,[],0,true);
       PlayerSetAllowedUpgrades(0,[],0,true);
    end;
 
    {$IFDEF _FULLGAME}
    HPlayer:=1;
-   with _players[1] do
+   with _players[HPlayer] do
    begin
       state:=ps_play;
       name :=PlayerName;
@@ -89,22 +89,22 @@ begin
 
    {$ELSE}
    HPlayer:=0;
-   with _players[0] do
+   with _players[HPlayer] do
    begin
       name :='SERVER';
    end;
    {$ENDIF}
 end;
 
-procedure DefGameObjects;
+procedure GameDefaultAll;
 var u:integer;
 begin
    randomize;
 
-   G_Step   :=0;
-   G_Paused :=0;
-   G_WTeam  :=255;
-   g_player_status :=255;
+   G_Step         :=0;
+   G_Paused       :=0;
+   G_WTeam        :=255;
+   g_player_status:=255;
 
    ServerSide :=true;
 
@@ -123,9 +123,9 @@ begin
    _LastCreatedUnit :=0;
    _LastCreatedUnitP:=@_units[_LastCreatedUnit];
 
-   DefPlayers;
+   PlayersSetDefault;
 
-   UnitStepNum:=8;
+   UnitStepTicks:= 8;
 
    g_inv_wave_n := 0;
    g_inv_time   := 0;
@@ -135,7 +135,7 @@ begin
    _uclord_c    := 0;
    _uregen_c    := 0;
 
-   vid_mredraw:=true;
+   vid_menu_redraw:=true;
 
    Map_premap;
 
@@ -158,8 +158,7 @@ begin
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
 
-   _igchat:=false;
-   net_chat_clear;
+   ingame_chat :=false;
    net_chat_str:='';
    net_cl_svttl:=0;
    net_cl_svpl :=0;
@@ -185,16 +184,7 @@ end;
 {$IFDEF _FULLGAME}
 {$include _replays.pas}
 
-procedure _swAI(p:byte);
-begin
-   with _players[p] do
-    if(state=PS_Comp)then
-     begin
-        ai_skill+=1;
-        if(ai_skill>gms_g_maxai)then ai_skill:=1;
-        name:=ai_name(ai_skill);
-     end;
-end;
+
 
 {$ENDIF}
 
@@ -227,7 +217,7 @@ begin
    end;
 end;
 
-procedure _StartSkirmish;
+procedure GameStartSkirmish;
 var p:byte;
 begin
    g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
@@ -235,26 +225,34 @@ begin
    for p:=0 to MaxPlayers do
    with _players[p] do
    begin
-      team:=PickPlayerTeam(g_mode,p);
+      team:=PlayerGetTeam(g_mode,p);
 
-      if(p=0)then continue;
-
-      if(state=ps_none)then
-       if(g_ai_slots>0)then
-       begin
-          ai_skill:=g_ai_slots;
-          race    :=r_random;
-          PlayerSetState(p,ps_comp);
-       end;
-
-      if(race=r_random)then race:=1+random(r_cnt);
-
-      if(state<>PS_None)then
+      if(p=0)then
       begin
-         _CreateStartBase(map_psx[p],map_psy[p],start_base[race],p,g_start_base);
+         // neutrall player settings depend from g_mode
 
-         if(state=ps_play)then ai_skill:=player_default_ai_level;
-        // _setAI(p);
+         race :=r_hell;
+         state:=ps_comp;
+      end
+      else
+      begin
+         if(state=ps_none)then
+          if(g_ai_slots>0)then
+          begin
+             ai_skill:=g_ai_slots;
+             race    :=r_random;
+             PlayerSetState(p,ps_comp);
+          end;
+
+         if(race=r_random)then race:=1+random(r_cnt);
+
+         if(state<>ps_none)then
+         begin
+            _CreateStartBase(map_psx[p],map_psy[p],start_base[race],p,g_start_base);
+
+            if(state=ps_play)then ai_skill:=player_default_ai_level;
+            // _setAI(p);  set AI settings
+         end;
       end;
    end;
 
@@ -265,13 +263,13 @@ end;
 
 
 {$IFDEF _FULLGAME}
-procedure _StartStopGame;
+procedure GameMakeDestroy;
 begin
    menu_item:=0;
    if(G_Started)then
    begin
       G_Started:=false;
-      DefGameObjects;
+      GameDefaultAll;
    end
    else
     if(PlayersReadyStatus)then
@@ -279,26 +277,26 @@ begin
        G_Started:=true;
        _menu    :=false;
        if(menu_s2<>ms2_camp)
-       then _StartSkirmish
+       then GameStartSkirmish
        else ;//_CMPMap;
        vid_rtui:=2;
-       _makeMMB;
+       map_RedrawMenuMinimap;
        d_Panel(r_uipanel);
     end;
 end;
 
-procedure MakeRandomSkirmish(st:boolean);
+procedure MakeRandomSkirmish(andstart:boolean);
 var p:byte;
 begin
    if(G_Started)then exit;
 
    Map_randommap;
 
-   G_mode       :=gm_scir;
+   g_mode       :=gm_scir;
    g_start_base :=random(gms_g_startb+1);
    g_addon      :=random(3)<>0;
 
-   _swapPlayers(1,HPlayer);
+   PlayersSwap(1,HPlayer);
 
    for p:=2 to MaxPlayers do
     with _players[p] do
@@ -317,21 +315,21 @@ begin
        else PlayerSetState(p,ps_comp);
     end;
 
-   _swapPlayers(random(6)+1,HPlayer);
+   PlayersSwap(random(6)+1,HPlayer);
 
    g_ai_slots:=random(5);
 
    Map_premap;
 
-   if(st)then _StartStopGame;
+   if(andstart)then GameMakeDestroy;
 end;
 {$ELSE}
 {$include _ded.pas}
 {$ENDIF}
 
-function _CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
+function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
 begin
-   _CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
+   CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
 function f2select(pu:PTUnit):boolean;
@@ -340,9 +338,9 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(speed   <=0)then exit;
-      if(_ukbuilding)then exit;
-      if(_attack  =0)then exit;
+      if(speed          <=0)then exit;
+      if(_ukbuilding       )then exit;
+      if(_attack  =atm_none)then exit;
       if(uo_id=ua_paction)
       or(uo_id=ua_hold   )
       or(uo_bx>0         )then exit;
@@ -353,24 +351,24 @@ end;
 procedure _u_ord(pl:byte);
 var
 _su,_eu,
-scnt,
-scntm : integer;
- psel : boolean;
-pu    : PTUnit;
+usel_n,
+usel_max : integer;
+psel     : boolean;
+pu       : PTUnit;
 begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
+uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1),pl);
       else
-         scnt :=0;
-         scntm:=MaxPlayerUnits;
+         usel_n  :=0;
+         usel_max:=MaxPlayerUnits;
          if(o_id in [uo_select,uo_aselect])then
          begin
             if(o_x0>o_x1)then begin _su:=o_x1;o_x1:=o_x0;o_x0:=_su;end;
             if(o_y0>o_y1)then begin _su:=o_y1;o_y1:=o_y0;o_y0:=_su;end;
-            if(_CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then scntm:=1;
+            if(CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then usel_max:=1;
          end;
 
          _su :=1;
@@ -394,13 +392,14 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
              if(hits>0)and(not _IsUnitRange(inapc,nil))and(pl=playeri)then
              begin
                 psel:=sel;
+
                 if (o_id=uo_select )
                 or((o_id=uo_aselect)and(not sel))then
                 begin
                    sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                      and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
-                   if(speed=0)and(scntm>1)and(o_id<>uo_aselect)then sel:=false;
-                   if(scnt>=scntm)then sel:=false;
+                   if(speed <=0)and(usel_max>1)and(o_id<>uo_aselect)then sel:=false;
+                   if(usel_n>=usel_max)then sel:=false;
                 end;
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
 
@@ -435,7 +434,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
                                      case _ability of
                                      uab_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
                                      uab_radar       : _unit_uradar  (pu,o_x1,o_y1);
-                                     uab_htowertele  : if(o_y0<>_su)and(o_y0<>0)and(_attack>atm_none)
+                                     uab_htowertele  : if(o_y0<>_su)and(not _IsUnitRange(o_y0,nil))and(_attack>atm_none)
                                                        then uo_tar:=o_y0
                                                        else _unit_htteleport(pu,o_x1,o_y1);
                                      uab_hell_unit_adv,
@@ -519,10 +518,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
                                      _unit_turn(pu);
                                   end;
                     co_action  :  _unit_action   (pu);
-                    co_supgrade:  _unit_supgrade (pu,o_y0);
-                    co_cupgrade:  _unit_cupgrade (pu,o_y0);
-                    co_suprod  :  _unit_straining(pu,o_y0);
-                    co_cuprod  :  _unit_ctraining(pu,o_y0);
+                    co_supgrade:  if(0<=o_y0)and(o_y0<=255)then _unit_supgrade (pu,o_y0);
+                    co_cupgrade:  if(0<=o_y0)and(o_y0<=255)then _unit_cupgrade (pu,o_y0);
+                    co_suprod  :  if(0<=o_y0)and(o_y0<=255)then _unit_straining(pu,o_y0);
+                    co_cuprod  :  if(0<=o_y0)and(o_y0<=255)then _unit_ctraining(pu,o_y0);
                     co_pcancle :  begin
                                   _unit_ctraining(pu,255);
                                   _unit_cupgrade (pu,255);
@@ -537,7 +536,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
                       ui_UnitSelectedNU:=unum;
                       {$ENDIF}
                    end;
-                   scnt+=1;
+                   usel_n+=1;
                 end
                 else
                 begin
@@ -556,14 +555,14 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,o_x1,pl);
    end;
 end;
 
-procedure Endgame;
+procedure GameEndConditions;
 var p:byte;
 begin
    if(not G_Started)
    or(G_Paused=0)
    or(not ServerSide)then exit;
 
-   if(net_nstate>ns_none)and(G_Step<fr_fps)then exit;
+   if(net_status>ns_none)and(G_Step<fr_fps)then exit;
 
    g_player_status:=0;
    for p:=0 to MaxPlayers do
@@ -603,25 +602,24 @@ begin
 end;
 
 procedure PlayersCycle;
-//const _pushtimes = _uclord_p;
 var p:byte;
 begin
    for p:=0 to MaxPlayers do
     with _players[p] do
      if(state>ps_none)then
      begin
-        if(state=PS_Play)and(p<>HPlayer)and(net_nstate=ns_srvr)then
+        if(state=PS_Play)and(p<>HPlayer)and(net_status=ns_srvr)then
         begin
            if(ttl<ClientTTL)then
            begin
               ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps)then vid_mredraw:=true;
+              if(ttl=ClientTTL)or(ttl=fr_fps)then vid_menu_redraw:=true;
            end
            else
              if(G_Started=false)then
              begin
                 PlayerSetState(p,PS_None);
-                vid_mredraw:=true;
+                vid_menu_redraw:=true;
              end;
         end;
 
@@ -633,7 +631,7 @@ begin
         end;
      end;
 
-   Endgame;
+   GameEndConditions;
 end;
     {
 procedure g_inv_calcmm;
@@ -841,11 +839,10 @@ begin
    vid_rtui+=1;
    vid_rtui:=vid_rtui mod vid_rtuis;
 
-   if(vid_rtui=0)then _MusicCheck;
-   if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
-   if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
+   SoundControl;
 
-   if(net_nstate=ns_clnt)then net_GClient;
+
+   if(net_status=ns_clnt)then net_GClient;
    _rpls_code;
 
    {$ELSE}
@@ -901,7 +898,7 @@ begin
       end;
    end;
 
-   if(net_nstate=ns_srvr)then net_GServer;
+   if(net_status=ns_srvr)then net_GServer;
 end;
 
 

@@ -20,15 +20,17 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-
-
-
 function _str_mx(x:byte):shortstring;
 begin
    if(x=0)
    then _str_mx:='-'
    else _str_mx:='x'+b2s(x);
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   COMMON Players funcs
+//
 
 procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);   // allowed units
 var i:byte;
@@ -67,31 +69,7 @@ begin
          with _upids[i] do upgr[i]:=min3(a_upgrs[i],_up_max,lvl);
    end;
 end;
-{
-procedure _log_add(aroom:PTRoom;message:shortstring);
-begin
-   if(length(message)=0)then exit;
 
-   with aroom^ do
-   begin
-      log_n+=1;
-      log_i+=1;
-      if(log_i>MaxRoomLog)then log_i:=0;
-
-      log_l[log_i]:=message;
-
-      {$IFNDEF FULLGAME}
-      writeln('Room #',rnum+1,': ',message);
-      {$ELSE}
-
-      {PlaySoundGlobal(snd_score);
-         }
-
-      {$ENDIF}
-   end;
-end;
-
-}
 
 procedure PlayerAddLog(pn:byte;mtype:char;str:shortstring);
 begin
@@ -112,7 +90,7 @@ begin
    end;
 end;
 
-procedure AddLog(playern,to_players,mtype:byte;str:shortstring);
+procedure PlayersAddLog(playern,to_players:byte;mtype:char;str:shortstring);
 var i:byte;
 begin
    for i:=0 to MaxPlayers do
@@ -120,6 +98,27 @@ begin
     or(i=playern)
     or(i=0)then PlayerAddLog(i,mtype,str);
 end;
+
+procedure PlayerClearLog(pn:byte);
+begin
+   if(pn>MaxPlayers)then exit;
+
+   with _players[pn] do
+   begin
+      FillChar(log_l,SizeOf(log_l),0);
+      log_n:=0;
+      log_i:=0;
+   end;
+end;
+
+procedure PlayersClearLog;
+var i:byte;
+begin
+   for i:=0 to MaxPlayers do PlayerClearLog(i);
+end;
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure CalcPLNU;
 var p:byte;
@@ -365,25 +364,36 @@ begin
    else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(22-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
 end;
 
+procedure PlayerSwitchAILevel(p:byte);
+begin
+   with _players[p] do
+    if(state=PS_Comp)then
+     begin
+        ai_skill+=1;
+        if(ai_skill>gms_g_maxai)then ai_skill:=1;
+        name:=ai_name(ai_skill);
+     end;
+end;
 
-function PickPlayerTeam(gm,p:byte):byte;
+
+function PlayerGetTeam(gm,p:byte):byte;
 begin
    if(p=0)
-   then PickPlayerTeam:=0
+   then PlayerGetTeam:=0
    else
      case gm of
      gm_aslt,
      gm_2fort: case p of
-               1..3: PickPlayerTeam:=1;
-               4..6: PickPlayerTeam:=4;
+               1..3: PlayerGetTeam:=1;
+               4..6: PlayerGetTeam:=4;
                end;
      gm_3fort: case p of
-               1,2 : PickPlayerTeam:=1;
-               3,4 : PickPlayerTeam:=3;
-               5,6 : PickPlayerTeam:=5;
+               1,2 : PlayerGetTeam:=1;
+               3,4 : PlayerGetTeam:=3;
+               5,6 : PlayerGetTeam:=5;
                end;
-     gm_inv  : PickPlayerTeam:=1;
-     else      PickPlayerTeam:=_players[p].team;
+     gm_inv  : PlayerGetTeam:=1;
+     else      PlayerGetTeam:=_players[p].team;
      end;
 end;
 
@@ -513,13 +523,13 @@ begin
         then PlayerGetColor:=c_lime
         else PlayerGetColor:=c_white
       else
-        if(PickPlayerTeam(g_mode,HPlayer)=PickPlayerTeam(g_mode,player))
+        if(PlayerGetTeam(g_mode,HPlayer)=PlayerGetTeam(g_mode,player))
         then PlayerGetColor:=c_yellow
         else PlayerGetColor:=c_red;
-   3: PlayerGetColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
+   3: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
    4: if(player=HPlayer)
       then PlayerGetColor:=c_white
-      else PlayerGetColor:=PlayerColor[PickPlayerTeam(g_mode,player)];
+      else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
     else PlayerGetColor:=PlayerColor[player];
     end;
 end;

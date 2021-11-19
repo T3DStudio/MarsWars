@@ -112,7 +112,10 @@ gms_g_maxai            = 8;
 
 MaxPlayerLog           = 255;
 
+log_to_all             = 255;
+
 lmt_chat               = #1;
+lmt_game               = #2;
 //lmt_victory            = #2;
 //lmt_defeat             = #3;
 //lmt_supply             = #4;
@@ -136,20 +139,20 @@ ns_none                = 0;
 ns_srvr                = 1;
 ns_clnt                = 2;
 
-nmid_startinf          = 3;
+nmid_lobby_info        = 3;
 nmid_connect           = 4;
-nmid_clinf             = 5;
-nmid_chat              = 6;
+nmid_client_info       = 5;
+nmid_log_chat              = 6;
 nmid_chatclupd         = 7;
-nmid_shap              = 8;
+nmid_snapshot              = 8;
 nmid_pause             = 9;
-nmid_sfull             = 10;
-nmid_sver              = 11;
-nmid_sgst              = 12;
-nmid_ncon              = 13;
+nmid_server_full       = 10;
+nmid_wrong_ver         = 11;
+nmid_game_started      = 12;
+nmid_notconnected      = 13;
 nmid_swapp             = 14;
 nmid_order             = 15;
-nmid_plout             = 16;
+nmid_player_leave      = 16;
 nmid_getinfo           = 66;
 
 

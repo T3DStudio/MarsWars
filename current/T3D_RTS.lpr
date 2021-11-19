@@ -95,7 +95,7 @@ begin
    end;
 
    {$IFDEF _FULLGAME}
-   net_plout;
+   net_disconnect;
    cfg_write;
    {$ENDIF}
 end.

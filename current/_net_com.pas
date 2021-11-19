@@ -36,11 +36,11 @@ begin
       exit;
    end;
 
-   if(net_nstate=ns_clnt)
+   if(net_status=ns_clnt)
    then net_socket:=SDLNet_UDP_Open(0)
    else
-     if(net_nstate=ns_srvr)
-     then net_socket:=SDLNet_UDP_Open(net_sv_port);
+     if(net_status=ns_srvr)
+     then net_socket:=SDLNet_UDP_Open(net_port);
 
    if (net_socket=nil) then
    begin
@@ -221,44 +221,12 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure net_writechat(p:byte);
-var i:byte;
-begin
-   //for i:=0 to MaxNetChat do net_writestring(net_chat[p,i]);
-end;
-
-{procedure net_chat_add(msg:shortstring;player,to_players:byte);
-var i,t,stl,cpl:byte;
-begin
-   for i:=0 to MaxPlayers do
-    if((to_players and (1 shl i))>0)or(player=i)or(i=0)then
-    begin
-       for t:=MaxNetChat-1 downto 0 do net_chat[i,t+1]:=net_chat[i,t];
-
-       net_chatss[i]+=1;
-
-       if(player>MaxPlayers)
-       then net_chat[i,0]:=copy(msg,1,cpl)
-       else
-         if(i=0)
-         then net_chat[i,0]:=_players[player].name+': '+copy(msg,0,cpl)
-         else net_chat[i,0]:=chr(player)+copy(msg,0,cpl);
-    end;
-
-   {$IFDEF _FULLGAME}
-   vid_mredraw:=true;
-   net_chat_shlm:=chat_shlm_t;
-   PlaySNDM(snd_chat);
-   _rpls_nwrch:=true;
-   {$ENDIF}
-end; }
-
 {$IFDEF _FULLGAME}
 
 procedure net_sv_sport;
 begin
-   net_sv_port:=s2w(net_sv_pstr);
-   net_sv_pstr:=w2s(net_sv_port);
+   net_port:=s2w(net_sv_pstr);
+   net_sv_pstr:=w2s(net_port);
 end;
 
 function ip2c(s:shortstring):cardinal;
@@ -280,9 +248,9 @@ end;
 
 function c2ip(c:cardinal):string;
 begin
-   c2ip:=b2s (c and $FF      )
-    +'.'+b2s((c and $FF00    ) shr 8 )
-    +'.'+b2s((c and $FF0000  ) shr 16)
+   c2ip:=b2s (c and $000000FF)
+    +'.'+b2s((c and $0000FF00) shr 8 )
+    +'.'+b2s((c and $00FF0000) shr 16)
     +'.'+b2s((c and $FF000000) shr 24);
 end;
 
@@ -318,25 +286,12 @@ begin
    net_cl_svstr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
 end;
 
-procedure net_chat_clear;
+procedure net_send_chat;
 begin
-  // FillChar(net_chat  ,sizeof(net_chat  ),#0);
-  // FillChar(net_chatss,sizeof(net_chatss),0 );
-  // FillChar(net_chatls,sizeof(net_chatls),0 );
-end;
-
-procedure net_readchat;
-var i:byte;
-begin
-   //for i:=0 to MaxNetChat do net_chat[HPlayer,i]:=net_readstring;
-end;
-
-procedure net_chatm;
-begin
-   if(net_nstate=ns_clnt)then
+   if(net_status=ns_clnt)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_chat);
+      net_writebyte(nmid_log_chat);
       net_writebyte(net_chat_tar);
       net_writestring(net_chat_str);
       net_send(net_cl_svip,net_cl_svport);
@@ -345,7 +300,7 @@ end;
 
 procedure net_pause;
 begin
-   if(net_nstate=ns_clnt)then
+   if(net_status=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_pause);
@@ -353,19 +308,19 @@ begin
    end;
 end;
 
-procedure net_plout;
+procedure net_disconnect;
 begin
-   if(net_nstate=ns_clnt)then
+   if(net_status=ns_clnt)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_plout);
+      net_writebyte(nmid_player_leave);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;
 
 procedure net_swapp(p1:byte);
 begin
-   if(net_nstate=ns_clnt)then
+   if(net_status=ns_clnt)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_swapp);
