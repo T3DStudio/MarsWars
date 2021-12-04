@@ -160,7 +160,7 @@ begin
       c_m_sel;
       if not(menu_item in [16,17])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
       vid_menu_redraw:=true;
-      PlaySNDM(snd_click);
+      SoundPlayUI(snd_click);
    end;
 
    if(k_ml=2)then              // left button pressed
@@ -240,20 +240,23 @@ begin
       18 : begin cfg_fullscreen:=not cfg_fullscreen; _MakeScreen;end;
 
       // sounds
-      26 : if(ui_menu_ssr_x2>=mouse_x)
-           then snd_svolume:=0
-           else
-             if(mouse_x<ui_menu_ssr_x3)
-             then snd_svolume:=mouse_x-ui_menu_ssr_x2
-             else snd_svolume:=127;
-      27 : begin
+      26 : begin
               if(ui_menu_ssr_x2>=mouse_x)
-              then snd_mvolume:=0
+              then snd_svolume1:=0
               else
                 if(mouse_x<ui_menu_ssr_x3)
-                then snd_mvolume:=mouse_x-ui_menu_ssr_x2
-                else snd_mvolume:=127;
-              MIX_VOLUMEMUSIC(snd_mvolume);
+                then snd_svolume1:=(mouse_x-ui_menu_ssr_x2)/ui_menu_ssr_barl
+                else snd_svolume1:=1;
+              SoundSourceUpdateGainAll;
+           end;
+      27 : begin
+              if(ui_menu_ssr_x2>=mouse_x)
+              then snd_mvolume1:=0
+              else
+                if(mouse_x<ui_menu_ssr_x3)
+                then snd_mvolume1:=(mouse_x-ui_menu_ssr_x2)/ui_menu_ssr_barl
+                else snd_mvolume1:=1;
+              SoundSourceUpdateGainAll;
            end;
 
       33 : menu_s3:=ms3_game;

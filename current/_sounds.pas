@@ -1,59 +1,103 @@
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   LOAD
+//
 
-function load_music(fn:string):pMIX_MUSIC;
+
+
+
+function oalError:boolean;begin oalError:=alGetError()<>AL_NO_ERROR;end;
+
+function Load_Chunk(fname:shortstring):TALuint;
+var str,stre : shortstring;
+SLformat: TALenum = 0;
+SLdata  : TALvoid = nil;
+SLsize  : TALsizei= 0;
+SLfreq  : TALsizei= 0;
+SLloop  : TALint  = 0;
+
+procedure load_wav(sfn:shortstring);
 begin
-   fn:=str_f_msc+fn+#0;
-   load_music:=MIX_LOADMUS(@fn[1]);
+   oalError();
+
+   alGenBuffers   (1,    @Load_Chunk);
+   if(oalError)then begin Load_Chunk:=0;exit;end;
+   alutLoadWAVFile(sfn   ,SLformat,SLdata,SLsize,SLfreq,SLloop);
+   if(oalError)then begin Load_Chunk:=0;exit;end;
+   alBufferData   (Load_Chunk,SLformat,SLdata,SLsize,SLfreq);
+   if(oalError)then begin Load_Chunk:=0;exit;end;
+   alutUnloadWAV  (       SLformat,SLdata,SLsize,SLfreq);
+   if(oalError)then Load_Chunk:=0;
 end;
 
-function MIXChunkGetFPSLength(s:pMIX_CHUNK):integer;
-var format:word;
-  freq,
-  channels:LongInt;
-  tmp:single;
+procedure load_ogg(sfn:shortstring);
+var
+SLformat: TALenum     = 0;
+SLdata  : TALvoid     = nil;
+SLsize  : TALsizei    = 0;
+SLfreq  : TALsizei    = 0;
+error   : shortstring = '';
 begin
-   freq    :=0;
-   format  :=0;
-   channels:=0;
-   Mix_QuerySpec(freq,format,channels);
+   oalError();
 
-   MIXChunkGetFPSLength:=0;
+   alGenBuffers(1,@Load_Chunk);
+   if(oalError)then begin Load_Chunk:=0;exit;end;
 
-   if(channels=0)
-   or(freq    =0)then exit;
-
-   tmp :=(format and $FF)/8;
-   if(tmp=0)then exit;
-   tmp:=s^.alen/tmp;
-
-   MIXChunkGetFPSLength:=trunc( ((tmp/channels)/freq)*fr_fps );
-end;
-
-function Load_Chunk(fn:shortstring):pMIX_Chunk;
-var n:shortstring;
-begin
-   n:=str_f_snd+fn+'.wav'+#0;
-   Load_Chunk:=mix_loadwav(@n[1]);
-end;
-
-function load_sound(fn:shortstring):PTMWSound;
-var t:pMIX_Chunk;
-begin
-   load_sound:=nil;
-   t := Load_Chunk(fn);
-   if(t<>nil)then
+   if(LoadOGGData(sfn,@SLformat,@SLdata,@SLsize,@SLfreq,@error))then
    begin
-      new(load_sound);
-      with load_sound^ do
-      begin
-         sound:=t;
-         ticks_length:=MIXChunkGetFPSLength(t);
-         last_channel:=-1;
-      end;
+      alBufferData(Load_Chunk,SLformat,SLdata,SLsize,SLfreq);
+      if(oalError)then Load_Chunk:=0;
+      FreeOGGData(@SLdata,@SLsize);
+   end
+   else
+   begin
+      WriteLog(sfn+' '+error);
+      alDeleteBuffers(1,@Load_Chunk);
+      Load_Chunk:=0;
    end;
 end;
 
-procedure AddToSoundSet(ss:PTSoundSet;tsnd:PTMWSound);
+begin
+   Load_Chunk:=0;
+   str:=str_f_snd+fname;
+
+   stre:=str+'.wav';
+   if FileExists(stre)then
+   begin
+      load_wav(stre);
+      if(Load_Chunk=0)then WriteLog(stre+' error!');
+      exit;
+   end;
+
+   stre:=str+'.ogg';
+   if FileExists(stre)then
+   begin
+      load_ogg(stre);
+      if(Load_Chunk=0)then WriteLog(stre+' error!');
+      exit;
+   end;
+end;
+
+
+function load_sound(fn:shortstring):PTMWSound;
+var t:TALuint;
+begin
+   load_sound:=nil;
+   t := Load_Chunk(fn);
+   if(t<>0)then
+   begin
+      new(load_sound);
+      load_sound^.sound:=t;
+   end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   SoundSets
+//
+
+procedure SoundSetAdd(ss:PTSoundSet;tsnd:PTMWSound);
 begin
    if(tsnd<>nil)then
    with ss^ do
@@ -64,20 +108,20 @@ begin
    end;
 end;
 
-function Load_SoundSet(fname:shortstring):PTSoundSet;
+function SoundSetLoad(fname:shortstring):PTSoundSet;
 var tsnd:PTMWSound;
        i:integer;
 begin
    i:=0;
-   new(Load_SoundSet);
-   with Load_SoundSet^ do
+   new(SoundSetLoad);
+   with SoundSetLoad^ do
    begin
       sndps:=0;
       sndn :=0;
       setlength(snds,sndn);
 
       tsnd:=load_sound(fname);
-      if(tsnd<>nil)then AddToSoundSet(Load_SoundSet,tsnd);
+      if(tsnd<>nil)then SoundSetAdd(SoundSetLoad,tsnd);
 
       while true do
       begin
@@ -90,90 +134,157 @@ begin
           end
           else break;
 
-         AddToSoundSet(Load_SoundSet,tsnd);
+         SoundSetAdd(SoundSetLoad,tsnd);
          i+=1;
       end;
-      if(sndn=0)then WriteLog(fname);
+      if(sndn<=0)then WriteLog(fname);
    end;
 end;
 
-procedure PlayMSC(m:pMIX_MUSIC);
+procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
+var i,n,
+m1,m2 : integer;
+  snd : PTMWSound;
 begin
-   MIX_PLAYMUSIC(m,0);
-   MIX_VOLUMEMUSIC(snd_mvolume);
+   with SoundSet^ do
+    if(sndn>1)then
+     for i:=0 to sndn+5 do
+     begin
+        m1:=random(sndn);
+        m2:=random(sndn);
+
+        snd:=snds[m1];
+        snds[m1]:=snds[m2];
+        snds[m2]:=snd;
+        sndps:=random(sndn);
+     end;
 end;
 
-procedure _MusicCheck;
+function SoundSetGetChunk(ss:PTSoundSet):PTMWSound;
 begin
-   if(snd_music_list_size>0)then
-    if(Mix_PlayingMusic>0)then
-    begin
-       if(G_started)and(snd_current_music=0)and(snd_music_list_size>1)then
-       begin
-          snd_current_music:=1+random(snd_music_list_size-1);
-          PlayMSC(snd_music_list[snd_current_music]);
-       end
-       else
-         if(G_started=false)and(snd_current_music>0)then
-         begin
-            snd_current_music:=0;
-            PlayMSC(snd_music_list[snd_current_music]);
-         end;
-    end
-    else
-    begin
-       if(G_started)and(snd_music_list_size>1)then
-       begin
-          snd_current_music+=1;
-          if(snd_current_music>=snd_music_list_size)then snd_current_music:=1;
-       end
-       else snd_current_music:=0;
-       PlayMSC(snd_music_list[snd_current_music]);
-    end;
-end;
-
-function SoundSet2Chunk(ss:PTSoundSet):PTMWSound;
-begin
-   SoundSet2Chunk:=nil;
+   SoundSetGetChunk:=nil;
    with ss^ do
     if(sndn>0)then
      if(sndn=1)
-     then SoundSet2Chunk:=snds[0]
+     then SoundSetGetChunk:=snds[0]
      else
      begin
         sndps+=1;
         if(sndps<0)or(sndps>=sndn)then sndps:=0;
-        SoundSet2Chunk:=snds[sndps];
+        SoundSetGetChunk:=snds[sndps];
      end;
 end;
 
-function PlaySound(Sound:PTMWSound):integer;
+////////////////////////////////////////////////////////////////////////////////
+//
+//   SOURCE SETs
+//
+
+procedure SoundSourceSetInit(sss:PTMWSoundSourceSet;sssn:integer;avolumevar:psingle);
 begin
-   PlaySound:=-1;
-   if(Sound<>nil)then
-   with Sound^ do
+   if(sssn>0)then
+   with sss^ do
    begin
-      MIX_VOLUMECHUNK(sound,snd_svolume);
-      PlaySound:=MIX_PLAYCHANNEL(-1,sound,0);
+      setlength(ssl,sssn);
+      ssn:=sssn;
+
+      while(sssn>0)do
+      begin
+         sssn-=1;
+         with ssl[sssn] do
+         begin
+            alGenSources(1,@source);
+            alSourcefv(source, AL_POSITION, @SLpos);
+            volumevar:=avolumevar;
+         end;
+      end;
    end;
 end;
 
-function PlaySoundSet(ss:PTSoundSet;channel:pinteger):PTMWSound;
+procedure SoundSourceUpdateGain(SoundSourceSet:PTMWSoundSourceSet);
 var i:integer;
 begin
-   PlaySoundSet:=SoundSet2Chunk(ss);
-
-   if(channel<>nil)then
-    if(channel^>-1)then MIX_HALTCHANNEL(channel^);
-
-   i:=PlaySound(PlaySoundSet);
-   if(channel<>nil)then channel^:=i;
+   with SoundSourceSet^ do
+    if(ssn>0)then
+     for i:=0 to ssn-1 do
+      with ssl[i] do
+       if(volumevar<>nil)then alSourcef(source,AL_GAIN,volumevar^);
+end;
+procedure SoundSourceUpdateGainAll;
+var s:integer;
+begin
+   for s:=0 to sss_count-1 do SoundSourceUpdateGain(@SoundSources[s]);
 end;
 
-function PlaySND(ss:PTSoundSet;pu:PTUnit;visdata:pboolean):boolean;
+function SourceIsPlaying(source:TALuint):boolean;
+var i:TALint;
 begin
-   PlaySND:=false;
+   alGetSourcei(source,AL_SOURCE_STATE,@i);
+   SourceisPlaying:=(i=AL_PLAYING);
+end;
+function SoundSourceSetIsPlaying(SoundSourceSet:PTMWSoundSourceSet):boolean;
+var i:integer;
+begin
+   SoundSourceSetIsPlaying:=false;
 
+   with SoundSourceSet^ do
+    if(ssn>0)then
+     for i:=0 to ssn-1 do
+      with ssl[i] do
+       if(SourceIsPlaying(source))then
+       begin
+          SoundSourceSetIsPlaying:=true;
+          break;
+       end;
+end;
+
+function SoundSourceSetGetSource(SoundSourceSet:PTMWSoundSourceSet):PTMWSoundSource;
+var i:integer;
+begin
+   SoundSourceSetGetSource:=nil;
+
+   with SoundSourceSet^ do
+    if(ssn>0)then
+     if(ssn=1)
+     then SoundSourceSetGetSource:=@ssl[0]
+     else
+      for i:=0 to ssn-1 do
+       with ssl[i] do
+        if(SourceIsPlaying(source)=false)then SoundSourceSetGetSource:=@ssl[i];
+end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   PLAY
+//
+
+
+procedure SoundPlay(SoundSet:PTSoundSet;sss:byte);
+var vsound :PTMWSound;
+    vsource:PTMWSoundSource;
+begin
+   if(sss>=sss_count)then exit;
+
+   vsound :=SoundSetGetChunk(SoundSet);
+   vsource:=SoundSourceSetGetSource(@SoundSources[sss]);
+
+   if(vsound<>nil)and(vsource<>nil)then
+   with vsound^  do
+   with vsource^ do
+   begin
+      alSourceStop(source);
+
+      if(volumevar<>nil)then
+      alSourcef   (source, AL_GAIN  , volumevar^);
+
+      alSourcei   (source, AL_BUFFER, sound  );
+      alSourcePlay(source);
+   end;
+end;
+
+procedure SoundPlayUnit(ss:PTSoundSet;pu:PTUnit;visdata:pboolean);
+begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
@@ -187,61 +298,45 @@ begin
       with pu^ do
        if(PointInScreenF(x,y,player)=false)then exit;
 
-   PlaySoundSet(ss,nil);
-   PlaySND:=true;
+   SoundPlay(ss,sss_world);
 end;
 
-procedure PlaySNDM(ss:PTSoundSet);
+procedure SoundPlayUI(ss:PTSoundSet);
 begin
    if(ss=nil)
    or(r_draw=false)then exit;
 
-   PlaySoundSet(ss,nil);
+   SoundPlay(ss,sss_ui);
 end;
 
-procedure PlayInGameAnoncer(ss:PTSoundSet);
-const min_snd_pause = fr_4hfps;
-var s:PTMWSound;
+procedure SoundPlayAnoncer(ss:PTSoundSet);
 begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
 
-   if(snd_anoncer_pause<=min_snd_pause)or(snd_anoncer_last<>ss)then
-   begin
-      s:=PlaySoundSet(ss,@snd_anoncer_channel);
-      if(s<>nil)then
-      begin
-         snd_anoncer_last :=ss;
-         snd_anoncer_pause:=max2(min_snd_pause,s^.ticks_length);
-      end;
-   end;
+   if(snd_last_anoncer=ss)then
+    if(SoundSourceSetIsPlaying(@SoundSources[sss_anoncer]))then exit;
+
+   SoundPlay(ss,sss_anoncer);
+
+   snd_last_anoncer:=ss;
 end;
 
-procedure PlayCommandSound(ss:PTSoundSet);
-const min_snd_pause = fr_2hfps;
-var s:PTMWSound;
+procedure SoundPlayUnitCommand(ss:PTSoundSet);
 begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
 
-   if(snd_unitcmd_pause<=min_snd_pause)or(snd_unitcmd_last<>ss)then
-   begin
-      s:=PlaySoundSet(ss,@snd_unitcmd_channel);
-      if(s<>nil)then
-      begin
-         snd_unitcmd_last :=ss;
-         snd_unitcmd_pause:=max2(min_snd_pause,s^.ticks_length);
-      end;
-   end;
+   SoundPlay(ss,sss_ucommand);
 end;
 
-procedure PlayUnitSelect;
+procedure SoundPlayUnitSelect;
 const annoystart = 6;
       annoystop  = 12;
 begin
-   if(ui_UnitSelectedNU>0)then
+   if(_IsUnitRange(ui_UnitSelectedNU,nil))then
    begin
       if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
@@ -251,124 +346,128 @@ begin
         else ui_UnitSelectedn:=0;
 
       with _units[ui_UnitSelectedNU] do
-      with uid^ do
-       if(_ukbuilding)and(bld=false)
-       then PlayCommandSound(snd_building[_urace])
-       else
-        if(ui_UnitSelectedn<annoystart)
-        then PlayCommandSound(un_snd_select[buff[ub_advanced]>0])
-        else PlayCommandSound(un_snd_annoy [buff[ub_advanced]>0]);
+       with uid^ do
+        if(_ukbuilding)and(bld=false)
+        then SoundPlay(snd_building[_urace],sss_ucommand)
+        else
+         if(ui_UnitSelectedn<annoystart)
+         then SoundPlay(un_snd_select[buff[ub_advanced]>0],sss_ucommand)
+         else SoundPlay(un_snd_annoy [buff[ub_advanced]>0],sss_ucommand);
 
       ui_UnitSelectedPU:=ui_UnitSelectedNU;
       ui_UnitSelectedNU:=0;
    end;
 end;
 
-procedure LoadMusicMask(mask:shortstring);
-var Info : TSearchRec;
-       s : shortstring;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   MUSIC
+//
+
+procedure SoundMusicControll;
+var current_music_ss: PTSoundSet;
 begin
-   if(FindFirst(str_f_msc+mask,faReadonly,info)=0)then
-   repeat
-      s:=info.Name;
-      if(s<>'')then
-      begin
-         setlength(snd_music_list,snd_music_list_size+1);
-         snd_music_list[snd_music_list_size]:=load_music(s);
-         snd_music_list_size+=1;
-      end;
-   until (FindNext(info)<>0);
-   FindClose(info);
+   if(G_Started)
+   then current_music_ss:=snd_music_game
+   else current_music_ss:=snd_music_menu;
+
+   if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)then
+   begin
+      snd_music_current:=current_music_ss;
+
+      SoundPlay(snd_music_current,sss_music);
+   end;
 end;
 
-procedure LoadAllMusic;
-begin
-   snd_music_list_size:=0;
-   setlength(snd_music_list,0);
-
-   LoadMusicMask('*.ogg');
-   LoadMusicMask('*.wav');
-end;
-
-procedure ShafleMusicList;
-var i,m1,m2:byte;
-    d:pMIX_MUSIC;
-begin
-   if(snd_music_list_size>3)then
-    for i:=1 to snd_music_list_size do
-    begin
-       m1:=random(snd_music_list_size-1)+1;
-       m2:=random(snd_music_list_size-1)+1;
-       d:=snd_music_list[m1];
-       snd_music_list[m1]:=snd_music_list[m2];
-       snd_music_list[m2]:=d;
-    end;
-end;
 
 procedure SoundControl;
 begin
-   if(vid_rtui=0)then _MusicCheck;
-   if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
-   if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
+   if(vid_rtui=0)then SoundMusicControll;
+   //if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
+   //if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
 end;
 
+
 function InitSound:boolean;
-var r:byte;
+var r:integer;
 begin
    InitSound:=false;
 
-   if(SDL_Init(SDL_INIT_AUDIO)<>0)then begin WriteSDLError; exit; end;
+   if(InitOpenAL=false)then exit;
 
-   if(MIX_OPENAUDIO(AUDIO_FREQUENCY,
-                    AUDIO_FORMAT,
-                    AUDIO_CHANNELS,
-                    AUDIO_CHUNKSIZE)<>0) then begin WriteSDLError; exit; end;
+   if(oalError)then exit;
 
-   LoadAllMusic;
-   ShafleMusicList;
+   MainDevice  := alcOpenDevice(nil);
+   MainContext := alcCreateContext(MainDevice,nil);
+   alcMakeContextCurrent(MainContext);
+
+   if(oalError)then exit;
+
+   FillChar(SLpos,SizeOf(SLpos),0);
+   FillChar(SLori,SizeOf(SLori),0);
+
+   alListenerfv(AL_POSITION   ,@SLPos);
+   alListenerfv(AL_ORIENTATION,@SLOri);
+
+   for r:=0 to sss_count-1 do
+    case r of
+    sss_music: SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_mvolume1);
+    else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
+    end;
+
+   snd_music_menu:=SoundSetLoad('music\mm');
+   snd_music_game:=SoundSetLoad('music\m');
+
+
+
+   //LoadAllMusic;
+
+   //SoundShafleSoundSet(snd_music_game);
+   //SoundShafleSoundSet(snd_music_menu);
 
    /////////////////////////////////////////////////////////////////////////////////
    //
    // COMMON
    //
 
-   snd_click                :=Load_SoundSet('click'           );
-   snd_chat                 :=Load_SoundSet('chat'            );
-   snd_building_explode     :=Load_SoundSet('building_explode');
-   snd_teleport             :=Load_SoundSet('teleport'        );
-   snd_exp                  :=Load_SoundSet('explode'         );
-   snd_mine_place           :=Load_SoundSet('mine_place'      );
-   snd_inapc                :=Load_SoundSet('inapc'           );
-   snd_meat                 :=Load_SoundSet('meat'            );
+   snd_click                :=SoundSetLoad('click'           );
+   snd_chat                 :=SoundSetLoad('chat'            );
+   snd_building_explode     :=SoundSetLoad('building_explode');
+   snd_teleport             :=SoundSetLoad('teleport'        );
+   snd_exp                  :=SoundSetLoad('explode'         );
+   snd_mine_place           :=SoundSetLoad('mine_place'      );
+   snd_inapc                :=SoundSetLoad('inapc'           );
+   snd_meat                 :=SoundSetLoad('meat'            );
 
-   snd_pexp                 :=Load_SoundSet(missiles_folder+'p_exp'           );
-   snd_launch               :=Load_SoundSet(missiles_folder+'launch'          );
-   snd_pistol               :=Load_SoundSet(missiles_folder+'pistol'          );
-   snd_shotgun              :=Load_SoundSet(missiles_folder+'shotgun'         );
-   snd_ssg                  :=Load_SoundSet(missiles_folder+'ssg'             );
-   snd_plasma               :=Load_SoundSet(missiles_folder+'plasma'          );
-   snd_bfg_shot             :=Load_SoundSet(missiles_folder+'bfg_shot'        );
-   snd_healing              :=Load_SoundSet(missiles_folder+'healing'         );
-   snd_electro              :=Load_SoundSet(missiles_folder+'electro'         );
-   snd_rico                 :=Load_SoundSet(missiles_folder+'rico'            );
-   snd_bfg_exp              :=Load_SoundSet(missiles_folder+'bfg_exp'         );
-   snd_flyer_s              :=Load_SoundSet(missiles_folder+'flyer_s'         );
-   snd_flyer_a              :=Load_SoundSet(missiles_folder+'flyer_a'         );
+   snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
+   snd_launch               :=SoundSetLoad(missiles_folder+'launch'          );
+   snd_pistol               :=SoundSetLoad(missiles_folder+'pistol'          );
+   snd_shotgun              :=SoundSetLoad(missiles_folder+'shotgun'         );
+   snd_ssg                  :=SoundSetLoad(missiles_folder+'ssg'             );
+   snd_plasma               :=SoundSetLoad(missiles_folder+'plasma'          );
+   snd_bfg_shot             :=SoundSetLoad(missiles_folder+'bfg_shot'        );
+   snd_healing              :=SoundSetLoad(missiles_folder+'healing'         );
+   snd_electro              :=SoundSetLoad(missiles_folder+'electro'         );
+   snd_rico                 :=SoundSetLoad(missiles_folder+'rico'            );
+   snd_bfg_exp              :=SoundSetLoad(missiles_folder+'bfg_exp'         );
+   snd_flyer_s              :=SoundSetLoad(missiles_folder+'flyer_s'         );
+   snd_flyer_a              :=SoundSetLoad(missiles_folder+'flyer_a'         );
 
    for r:=1 to r_cnt do
    begin
-   snd_under_attack[true ,r]:=Load_SoundSet(race_dir[r]+'base_under_attack'         );
-   snd_under_attack[false,r]:=Load_SoundSet(race_dir[r]+'unit_under_attack'         );
-   snd_build_place       [r]:=Load_SoundSet(race_dir[r]+'build_place'               );
-   snd_building          [r]:=Load_SoundSet(race_dir[r]+'building'                  );
-   snd_constr_complete   [r]:=Load_SoundSet(race_dir[r]+'construction_complete'     );
-   snd_cannot_build      [r]:=Load_SoundSet(race_dir[r]+'cannot_build_here'         );
-   snd_defeat            [r]:=Load_SoundSet(race_dir[r]+'defeat'                    );
-   snd_not_enough_energy [r]:=Load_SoundSet(race_dir[r]+'not_enough_energy'         );
-   snd_player_defeated   [r]:=Load_SoundSet(race_dir[r]+'player_defeated'           );
-   snd_upgrade_complete  [r]:=Load_SoundSet(race_dir[r]+'upgrade_complete'          );
-   snd_victory           [r]:=Load_SoundSet(race_dir[r]+'victory'                   );
-   snd_unit_adv          [r]:=Load_SoundSet(race_dir[r]+'unit_adv'                  );
+   snd_under_attack[true ,r]:=SoundSetLoad(race_dir[r]+'base_under_attack'         );
+   snd_under_attack[false,r]:=SoundSetLoad(race_dir[r]+'unit_under_attack'         );
+   snd_build_place       [r]:=SoundSetLoad(race_dir[r]+'build_place'               );
+   snd_building          [r]:=SoundSetLoad(race_dir[r]+'building'                  );
+   snd_constr_complete   [r]:=SoundSetLoad(race_dir[r]+'construction_complete'     );
+   snd_cannot_build      [r]:=SoundSetLoad(race_dir[r]+'cannot_build_here'         );
+   snd_defeat            [r]:=SoundSetLoad(race_dir[r]+'defeat'                    );
+   snd_not_enough_energy [r]:=SoundSetLoad(race_dir[r]+'not_enough_energy'         );
+   snd_player_defeated   [r]:=SoundSetLoad(race_dir[r]+'player_defeated'           );
+   snd_upgrade_complete  [r]:=SoundSetLoad(race_dir[r]+'upgrade_complete'          );
+   snd_victory           [r]:=SoundSetLoad(race_dir[r]+'victory'                   );
+   snd_unit_adv          [r]:=SoundSetLoad(race_dir[r]+'unit_adv'                  );
    end;
 
    /////////////////////////////////////////////////////////////////////////////////
@@ -376,101 +475,101 @@ begin
    // UAC
    //
 
-   snd_radar                :=Load_SoundSet(race_dir[r_uac]+'radar');
+   snd_radar                :=SoundSetLoad(race_dir[r_uac]+'radar');
 
-   snd_jetpoff              :=Load_SoundSet(race_dir[r_uac]+'jetpoff');
-   snd_jetpon               :=Load_SoundSet(race_dir[r_uac]+'jetpon' );
-   snd_CCup                 :=Load_SoundSet(race_dir[r_uac]+'ccup'   );
+   snd_jetpoff              :=SoundSetLoad(race_dir[r_uac]+'jetpoff');
+   snd_jetpon               :=SoundSetLoad(race_dir[r_uac]+'jetpon' );
+   snd_CCup                 :=SoundSetLoad(race_dir[r_uac]+'ccup'   );
 
-   snd_uac_cc               :=Load_SoundSet(race_buildings[r_uac ]+'command_center' );
-   snd_uac_barracks         :=Load_SoundSet(race_buildings[r_uac ]+'barraks'        );
-   snd_uac_generator        :=Load_SoundSet(race_buildings[r_uac ]+'generator'      );
-   snd_uac_smith            :=Load_SoundSet(race_buildings[r_uac ]+'weapon_factory' );
-   snd_uac_ctower           :=Load_SoundSet(race_buildings[r_uac ]+'chaingun_tower' );
-   snd_uac_radar            :=Load_SoundSet(race_buildings[r_uac ]+'radar_on'       );
-   snd_uac_rtower           :=Load_SoundSet(race_buildings[r_uac ]+'rocket_turret'  );
-   snd_uac_factory          :=Load_SoundSet(race_buildings[r_uac ]+'factory'        );
-   snd_uac_tech             :=Load_SoundSet(race_buildings[r_uac ]+'tech_center'    );
-   snd_uac_rls              :=Load_SoundSet(race_buildings[r_uac ]+'rocketstation'  );
-   snd_uac_nucl             :=Load_SoundSet(race_buildings[r_uac ]+'nuclear_plant'  );
+   snd_uac_cc               :=SoundSetLoad(race_buildings[r_uac ]+'command_center' );
+   snd_uac_barracks         :=SoundSetLoad(race_buildings[r_uac ]+'barraks'        );
+   snd_uac_generator        :=SoundSetLoad(race_buildings[r_uac ]+'generator'      );
+   snd_uac_smith            :=SoundSetLoad(race_buildings[r_uac ]+'weapon_factory' );
+   snd_uac_ctower           :=SoundSetLoad(race_buildings[r_uac ]+'chaingun_tower' );
+   snd_uac_radar            :=SoundSetLoad(race_buildings[r_uac ]+'radar_on'       );
+   snd_uac_rtower           :=SoundSetLoad(race_buildings[r_uac ]+'rocket_turret'  );
+   snd_uac_factory          :=SoundSetLoad(race_buildings[r_uac ]+'factory'        );
+   snd_uac_tech             :=SoundSetLoad(race_buildings[r_uac ]+'tech_center'    );
+   snd_uac_rls              :=SoundSetLoad(race_buildings[r_uac ]+'rocketstation'  );
+   snd_uac_nucl             :=SoundSetLoad(race_buildings[r_uac ]+'nuclear_plant'  );
 
-   snd_uac_suply            :=Load_SoundSet(race_buildings[r_uac ]+'supply-depot'   );
-   snd_uac_rescc            :=Load_SoundSet(race_buildings[r_uac ]+'resourse_senter');
+   snd_uac_suply            :=SoundSetLoad(race_buildings[r_uac ]+'supply-depot'   );
+   snd_uac_rescc            :=SoundSetLoad(race_buildings[r_uac ]+'resourse_senter');
 
-   snd_uac_hdeath           :=Load_SoundSet(race_units[r_uac ]+'death'              );
+   snd_uac_hdeath           :=SoundSetLoad(race_units[r_uac ]+'death'              );
 
-   snd_APC_ready            :=Load_SoundSet(race_units[r_uac ]+'APC\UAC_im_find2'   );
-   snd_APC_move             :=Load_SoundSet(race_units[r_uac ]+'APC\uac_u'          );
+   snd_APC_ready            :=SoundSetLoad(race_units[r_uac ]+'APC\UAC_im_find2'   );
+   snd_APC_move             :=SoundSetLoad(race_units[r_uac ]+'APC\uac_u'          );
 
-   snd_bfgmarine_ready      :=Load_SoundSet(race_units[r_uac ]+'bfgmarine\ready'    );
-   snd_bfgmarine_annoy      :=Load_SoundSet(race_units[r_uac ]+'bfgmarine\an'       );
-   snd_bfgmarine_attack     :=Load_SoundSet(race_units[r_uac ]+'bfgmarine\attack'   );
-   snd_bfgmarine_select     :=Load_SoundSet(race_units[r_uac ]+'bfgmarine\select'   );
-   snd_bfgmarine_move       :=Load_SoundSet(race_units[r_uac ]+'bfgmarine\go'       );
+   snd_bfgmarine_ready      :=SoundSetLoad(race_units[r_uac ]+'bfgmarine\ready'    );
+   snd_bfgmarine_annoy      :=SoundSetLoad(race_units[r_uac ]+'bfgmarine\an'       );
+   snd_bfgmarine_attack     :=SoundSetLoad(race_units[r_uac ]+'bfgmarine\attack'   );
+   snd_bfgmarine_select     :=SoundSetLoad(race_units[r_uac ]+'bfgmarine\select'   );
+   snd_bfgmarine_move       :=SoundSetLoad(race_units[r_uac ]+'bfgmarine\go'       );
 
-   snd_commando_ready       :=Load_SoundSet(race_units[r_uac ]+'commando\ready'     );
-   snd_commando_annoy       :=Load_SoundSet(race_units[r_uac ]+'commando\annoy'     );
-   snd_commando_attack      :=Load_SoundSet(race_units[r_uac ]+'commando\attack'    );
-   snd_commando_select      :=Load_SoundSet(race_units[r_uac ]+'commando\select'    );
-   snd_commando_move        :=Load_SoundSet(race_units[r_uac ]+'commando\move'      );
+   snd_commando_ready       :=SoundSetLoad(race_units[r_uac ]+'commando\ready'     );
+   snd_commando_annoy       :=SoundSetLoad(race_units[r_uac ]+'commando\annoy'     );
+   snd_commando_attack      :=SoundSetLoad(race_units[r_uac ]+'commando\attack'    );
+   snd_commando_select      :=SoundSetLoad(race_units[r_uac ]+'commando\select'    );
+   snd_commando_move        :=SoundSetLoad(race_units[r_uac ]+'commando\move'      );
 
-   snd_engineer_ready       :=Load_SoundSet(race_units[r_uac ]+'engineer\ready'     );
-   snd_engineer_annoy       :=Load_SoundSet(race_units[r_uac ]+'engineer\annoy'     );
-   snd_engineer_attack      :=Load_SoundSet(race_units[r_uac ]+'engineer\attack'    );
-   snd_engineer_select      :=Load_SoundSet(race_units[r_uac ]+'engineer\select'    );
-   snd_engineer_move        :=Load_SoundSet(race_units[r_uac ]+'engineer\move'      );
+   snd_engineer_ready       :=SoundSetLoad(race_units[r_uac ]+'engineer\ready'     );
+   snd_engineer_annoy       :=SoundSetLoad(race_units[r_uac ]+'engineer\annoy'     );
+   snd_engineer_attack      :=SoundSetLoad(race_units[r_uac ]+'engineer\attack'    );
+   snd_engineer_select      :=SoundSetLoad(race_units[r_uac ]+'engineer\select'    );
+   snd_engineer_move        :=SoundSetLoad(race_units[r_uac ]+'engineer\move'      );
 
-   snd_medic_ready          :=Load_SoundSet(race_units[r_uac ]+'medic\ready'        );
-   snd_medic_annoy          :=Load_SoundSet(race_units[r_uac ]+'medic\annoy'        );
-   snd_medic_select         :=Load_SoundSet(race_units[r_uac ]+'medic\select'       );
-   snd_medic_move           :=Load_SoundSet(race_units[r_uac ]+'medic\move'         );
+   snd_medic_ready          :=SoundSetLoad(race_units[r_uac ]+'medic\ready'        );
+   snd_medic_annoy          :=SoundSetLoad(race_units[r_uac ]+'medic\annoy'        );
+   snd_medic_select         :=SoundSetLoad(race_units[r_uac ]+'medic\select'       );
+   snd_medic_move           :=SoundSetLoad(race_units[r_uac ]+'medic\move'         );
 
-   snd_plasmamarine_ready   :=Load_SoundSet(race_units[r_uac ]+'plasmamarine\ready' );
-   snd_plasmamarine_annoy   :=Load_SoundSet(race_units[r_uac ]+'plasmamarine\annoy' );
-   snd_plasmamarine_attack  :=Load_SoundSet(race_units[r_uac ]+'plasmamarine\attack');
-   snd_plasmamarine_select  :=Load_SoundSet(race_units[r_uac ]+'plasmamarine\select');
-   snd_plasmamarine_move    :=Load_SoundSet(race_units[r_uac ]+'plasmamarine\move'  );
+   snd_plasmamarine_ready   :=SoundSetLoad(race_units[r_uac ]+'plasmamarine\ready' );
+   snd_plasmamarine_annoy   :=SoundSetLoad(race_units[r_uac ]+'plasmamarine\annoy' );
+   snd_plasmamarine_attack  :=SoundSetLoad(race_units[r_uac ]+'plasmamarine\attack');
+   snd_plasmamarine_select  :=SoundSetLoad(race_units[r_uac ]+'plasmamarine\select');
+   snd_plasmamarine_move    :=SoundSetLoad(race_units[r_uac ]+'plasmamarine\move'  );
 
-   snd_rocketmarine_ready   :=Load_SoundSet(race_units[r_uac ]+'rocketmarine\rocket_ready');
-   snd_rocketmarine_annoy   :=Load_SoundSet(race_units[r_uac ]+'rocketmarine\rocket_irr'  );
-   snd_rocketmarine_attack  :=Load_SoundSet(race_units[r_uac ]+'rocketmarine\rocket_atk'  );
-   snd_rocketmarine_select  :=Load_SoundSet(race_units[r_uac ]+'rocketmarine\rocket_sel'  );
-   snd_rocketmarine_move    :=Load_SoundSet(race_units[r_uac ]+'rocketmarine\rocket_conf' );
+   snd_rocketmarine_ready   :=SoundSetLoad(race_units[r_uac ]+'rocketmarine\rocket_ready');
+   snd_rocketmarine_annoy   :=SoundSetLoad(race_units[r_uac ]+'rocketmarine\rocket_irr'  );
+   snd_rocketmarine_attack  :=SoundSetLoad(race_units[r_uac ]+'rocketmarine\rocket_atk'  );
+   snd_rocketmarine_select  :=SoundSetLoad(race_units[r_uac ]+'rocketmarine\rocket_sel'  );
+   snd_rocketmarine_move    :=SoundSetLoad(race_units[r_uac ]+'rocketmarine\rocket_conf' );
 
-   snd_shotgunner_ready     :=Load_SoundSet(race_units[r_uac ]+'shotgunner\ready'   );
-   snd_shotgunner_annoy     :=Load_SoundSet(race_units[r_uac ]+'shotgunner\an'      );
-   snd_shotgunner_attack    :=Load_SoundSet(race_units[r_uac ]+'shotgunner\attack'  );
-   snd_shotgunner_select    :=Load_SoundSet(race_units[r_uac ]+'shotgunner\select'  );
-   snd_shotgunner_move      :=Load_SoundSet(race_units[r_uac ]+'shotgunner\go'      );
+   snd_shotgunner_ready     :=SoundSetLoad(race_units[r_uac ]+'shotgunner\ready'   );
+   snd_shotgunner_annoy     :=SoundSetLoad(race_units[r_uac ]+'shotgunner\an'      );
+   snd_shotgunner_attack    :=SoundSetLoad(race_units[r_uac ]+'shotgunner\attack'  );
+   snd_shotgunner_select    :=SoundSetLoad(race_units[r_uac ]+'shotgunner\select'  );
+   snd_shotgunner_move      :=SoundSetLoad(race_units[r_uac ]+'shotgunner\go'      );
 
-   snd_ssg_ready            :=Load_SoundSet(race_units[r_uac ]+'ssg\ready'          );
-   snd_ssg_annoy            :=Load_SoundSet(race_units[r_uac ]+'ssg\annoy'          );
-   snd_ssg_attack           :=Load_SoundSet(race_units[r_uac ]+'ssg\attack'         );
-   snd_ssg_select           :=Load_SoundSet(race_units[r_uac ]+'ssg\select'         );
-   snd_ssg_move             :=Load_SoundSet(race_units[r_uac ]+'ssg\move'           );
+   snd_ssg_ready            :=SoundSetLoad(race_units[r_uac ]+'ssg\ready'          );
+   snd_ssg_annoy            :=SoundSetLoad(race_units[r_uac ]+'ssg\annoy'          );
+   snd_ssg_attack           :=SoundSetLoad(race_units[r_uac ]+'ssg\attack'         );
+   snd_ssg_select           :=SoundSetLoad(race_units[r_uac ]+'ssg\select'         );
+   snd_ssg_move             :=SoundSetLoad(race_units[r_uac ]+'ssg\move'           );
 
-   snd_tank_ready           :=Load_SoundSet(race_units[r_uac ]+'tank\ready'         );
-   snd_tank_annoy           :=Load_SoundSet(race_units[r_uac ]+'tank\annoy'         );
-   snd_tank_attack          :=Load_SoundSet(race_units[r_uac ]+'tank\attack'        );
-   snd_tank_select          :=Load_SoundSet(race_units[r_uac ]+'tank\select'        );
-   snd_tank_move            :=Load_SoundSet(race_units[r_uac ]+'tank\move'          );
+   snd_tank_ready           :=SoundSetLoad(race_units[r_uac ]+'tank\ready'         );
+   snd_tank_annoy           :=SoundSetLoad(race_units[r_uac ]+'tank\annoy'         );
+   snd_tank_attack          :=SoundSetLoad(race_units[r_uac ]+'tank\attack'        );
+   snd_tank_select          :=SoundSetLoad(race_units[r_uac ]+'tank\select'        );
+   snd_tank_move            :=SoundSetLoad(race_units[r_uac ]+'tank\move'          );
 
-   snd_terminator_ready     :=Load_SoundSet(race_units[r_uac ]+'terminator\ready'   );
-   snd_terminator_annoy     :=Load_SoundSet(race_units[r_uac ]+'terminator\annoy'   );
-   snd_terminator_attack    :=Load_SoundSet(race_units[r_uac ]+'terminator\attack'  );
-   snd_terminator_select    :=Load_SoundSet(race_units[r_uac ]+'terminator\select'  );
-   snd_terminator_move      :=Load_SoundSet(race_units[r_uac ]+'terminator\move'    );
+   snd_terminator_ready     :=SoundSetLoad(race_units[r_uac ]+'terminator\ready'   );
+   snd_terminator_annoy     :=SoundSetLoad(race_units[r_uac ]+'terminator\annoy'   );
+   snd_terminator_attack    :=SoundSetLoad(race_units[r_uac ]+'terminator\attack'  );
+   snd_terminator_select    :=SoundSetLoad(race_units[r_uac ]+'terminator\select'  );
+   snd_terminator_move      :=SoundSetLoad(race_units[r_uac ]+'terminator\move'    );
 
-   snd_transport_ready      :=Load_SoundSet(race_units[r_uac ]+'transport\ready'    );
-   snd_transport_annoy      :=Load_SoundSet(race_units[r_uac ]+'transport\annoy'    );
-   snd_transport_select     :=Load_SoundSet(race_units[r_uac ]+'transport\select'   );
-   snd_transport_move       :=Load_SoundSet(race_units[r_uac ]+'transport\move'     );
+   snd_transport_ready      :=SoundSetLoad(race_units[r_uac ]+'transport\ready'    );
+   snd_transport_annoy      :=SoundSetLoad(race_units[r_uac ]+'transport\annoy'    );
+   snd_transport_select     :=SoundSetLoad(race_units[r_uac ]+'transport\select'   );
+   snd_transport_move       :=SoundSetLoad(race_units[r_uac ]+'transport\move'     );
 
-   snd_uacfighter_ready     :=Load_SoundSet(race_units[r_uac ]+'uacfighter\ready'   );
-   snd_uacfighter_annoy     :=Load_SoundSet(race_units[r_uac ]+'uacfighter\an'      );
-   snd_uacfighter_attack    :=Load_SoundSet(race_units[r_uac ]+'uacfighter\attack'  );
-   snd_uacfighter_select    :=Load_SoundSet(race_units[r_uac ]+'uacfighter\select'  );
-   snd_uacfighter_move      :=Load_SoundSet(race_units[r_uac ]+'uacfighter\go'      );
+   snd_uacfighter_ready     :=SoundSetLoad(race_units[r_uac ]+'uacfighter\ready'   );
+   snd_uacfighter_annoy     :=SoundSetLoad(race_units[r_uac ]+'uacfighter\an'      );
+   snd_uacfighter_attack    :=SoundSetLoad(race_units[r_uac ]+'uacfighter\attack'  );
+   snd_uacfighter_select    :=SoundSetLoad(race_units[r_uac ]+'uacfighter\select'  );
+   snd_uacfighter_move      :=SoundSetLoad(race_units[r_uac ]+'uacfighter\go'      );
 
 
    /////////////////////////////////////////////////////////////////////////////////
@@ -478,84 +577,84 @@ begin
    // HELL
    //
 
-   snd_hell_hk              :=Load_SoundSet(race_buildings[r_hell]+'hell_keep'     );
-   snd_hell_hgate           :=Load_SoundSet(race_buildings[r_hell]+'hell_gate'     );
-   snd_hell_hsymbol         :=Load_SoundSet(race_buildings[r_hell]+'hell_symbol'   );
-   snd_hell_hpool           :=Load_SoundSet(race_buildings[r_hell]+'hell_pool'     );
-   snd_hell_htower          :=Load_SoundSet(race_buildings[r_hell]+'hell_tower'    );
-   snd_hell_hteleport       :=Load_SoundSet(race_buildings[r_hell]+'hell_teleport' );
-   snd_hell_htotem          :=Load_SoundSet(race_buildings[r_hell]+'hell_totem'    );
-   snd_hell_hmon            :=Load_SoundSet(race_buildings[r_hell]+'hell_monastery');
-   snd_hell_hfort           :=Load_SoundSet(race_buildings[r_hell]+'hell_temple'   );
-   snd_hell_haltar          :=Load_SoundSet(race_buildings[r_hell]+'hell_altar'    );
-   snd_hell_hbuild          :=Load_SoundSet(race_buildings[r_hell]+'hell_building' );
-   snd_hell_eye             :=Load_SoundSet(race_buildings[r_hell]+'hell_eye'      );
+   snd_hell_hk              :=SoundSetLoad(race_buildings[r_hell]+'hell_keep'     );
+   snd_hell_hgate           :=SoundSetLoad(race_buildings[r_hell]+'hell_gate'     );
+   snd_hell_hsymbol         :=SoundSetLoad(race_buildings[r_hell]+'hell_symbol'   );
+   snd_hell_hpool           :=SoundSetLoad(race_buildings[r_hell]+'hell_pool'     );
+   snd_hell_htower          :=SoundSetLoad(race_buildings[r_hell]+'hell_tower'    );
+   snd_hell_hteleport       :=SoundSetLoad(race_buildings[r_hell]+'hell_teleport' );
+   snd_hell_htotem          :=SoundSetLoad(race_buildings[r_hell]+'hell_totem'    );
+   snd_hell_hmon            :=SoundSetLoad(race_buildings[r_hell]+'hell_monastery');
+   snd_hell_hfort           :=SoundSetLoad(race_buildings[r_hell]+'hell_temple'   );
+   snd_hell_haltar          :=SoundSetLoad(race_buildings[r_hell]+'hell_altar'    );
+   snd_hell_hbuild          :=SoundSetLoad(race_buildings[r_hell]+'hell_building' );
+   snd_hell_eye             :=SoundSetLoad(race_buildings[r_hell]+'hell_eye'      );
 
 
 
-   snd_hell_invuln          :=Load_SoundSet(race_units[r_hell]+'invuln');
-   snd_hell_pain            :=Load_SoundSet(race_units[r_hell]+'d_p');
-   snd_hell_melee           :=Load_SoundSet(race_units[r_hell]+'d_m');
-   snd_hell_attack          :=Load_SoundSet(race_units[r_hell]+'d_a');
-   snd_hell_move            :=Load_SoundSet(race_units[r_hell]+'d_' );
+   snd_hell_invuln          :=SoundSetLoad(race_units[r_hell]+'invuln');
+   snd_hell_pain            :=SoundSetLoad(race_units[r_hell]+'d_p');
+   snd_hell_melee           :=SoundSetLoad(race_units[r_hell]+'d_m');
+   snd_hell_attack          :=SoundSetLoad(race_units[r_hell]+'d_a');
+   snd_hell_move            :=SoundSetLoad(race_units[r_hell]+'d_' );
 
-   snd_zimba_death          :=Load_SoundSet(race_units[r_hell]+'zimbas\d_z_d' );
-   snd_zimba_ready          :=Load_SoundSet(race_units[r_hell]+'zimbas\d_z_s' );
-   snd_zimba_pain           :=Load_SoundSet(race_units[r_hell]+'zimbas\d_z_p' );
-   snd_zimba_move           :=Load_SoundSet(race_units[r_hell]+'zimbas\d_z_ac');
+   snd_zimba_death          :=SoundSetLoad(race_units[r_hell]+'zimbas\d_z_d' );
+   snd_zimba_ready          :=SoundSetLoad(race_units[r_hell]+'zimbas\d_z_s' );
+   snd_zimba_pain           :=SoundSetLoad(race_units[r_hell]+'zimbas\d_z_p' );
+   snd_zimba_move           :=SoundSetLoad(race_units[r_hell]+'zimbas\d_z_ac');
 
-   snd_revenant_death       :=Load_SoundSet(race_units[r_hell]+'revenant\d_rev_d' );
-   snd_revenant_ready       :=Load_SoundSet(race_units[r_hell]+'revenant\d_rev_c' );
-   snd_revenant_melee       :=Load_SoundSet(race_units[r_hell]+'revenant\d_rev_m' );
-   snd_revenant_attack      :=Load_SoundSet(race_units[r_hell]+'revenant\d_rev_a' );
-   snd_revenant_move        :=Load_SoundSet(race_units[r_hell]+'revenant\d_rev_ac');
+   snd_revenant_death       :=SoundSetLoad(race_units[r_hell]+'revenant\d_rev_d' );
+   snd_revenant_ready       :=SoundSetLoad(race_units[r_hell]+'revenant\d_rev_c' );
+   snd_revenant_melee       :=SoundSetLoad(race_units[r_hell]+'revenant\d_rev_m' );
+   snd_revenant_attack      :=SoundSetLoad(race_units[r_hell]+'revenant\d_rev_a' );
+   snd_revenant_move        :=SoundSetLoad(race_units[r_hell]+'revenant\d_rev_ac');
 
-   snd_pain_ready           :=Load_SoundSet(race_units[r_hell]+'pain\d_pain_c');
-   snd_pain_death           :=Load_SoundSet(race_units[r_hell]+'pain\d_pain_d');
-   snd_pain_pain            :=Load_SoundSet(race_units[r_hell]+'pain\d_pain_p');
+   snd_pain_ready           :=SoundSetLoad(race_units[r_hell]+'pain\d_pain_c');
+   snd_pain_death           :=SoundSetLoad(race_units[r_hell]+'pain\d_pain_d');
+   snd_pain_pain            :=SoundSetLoad(race_units[r_hell]+'pain\d_pain_p');
 
-   snd_mastermind_ready     :=Load_SoundSet(race_units[r_hell]+'mastermind\d_u6_c');
-   snd_mastermind_death     :=Load_SoundSet(race_units[r_hell]+'mastermind\d_u6_d');
-   snd_mastermind_foot      :=Load_SoundSet(race_units[r_hell]+'mastermind\d_u6_f');
+   snd_mastermind_ready     :=SoundSetLoad(race_units[r_hell]+'mastermind\d_u6_c');
+   snd_mastermind_death     :=SoundSetLoad(race_units[r_hell]+'mastermind\d_u6_d');
+   snd_mastermind_foot      :=SoundSetLoad(race_units[r_hell]+'mastermind\d_u6_f');
 
-   snd_mancubus_ready       :=Load_SoundSet(race_units[r_hell]+'mancubus\d_man_c');
-   snd_mancubus_death       :=Load_SoundSet(race_units[r_hell]+'mancubus\d_man_d');
-   snd_mancubus_pain        :=Load_SoundSet(race_units[r_hell]+'mancubus\d_man_p');
-   snd_mancubus_attack      :=Load_SoundSet(race_units[r_hell]+'mancubus\d_man_a');
+   snd_mancubus_ready       :=SoundSetLoad(race_units[r_hell]+'mancubus\d_man_c');
+   snd_mancubus_death       :=SoundSetLoad(race_units[r_hell]+'mancubus\d_man_d');
+   snd_mancubus_pain        :=SoundSetLoad(race_units[r_hell]+'mancubus\d_man_p');
+   snd_mancubus_attack      :=SoundSetLoad(race_units[r_hell]+'mancubus\d_man_a');
 
-   snd_lost_move            :=Load_SoundSet(race_units[r_hell]+'lost\d_u0'     );
+   snd_lost_move            :=SoundSetLoad(race_units[r_hell]+'lost\d_u0'     );
 
-   snd_knight_ready         :=Load_SoundSet(race_units[r_hell]+'knight\knightc');
-   snd_knight_death         :=Load_SoundSet(race_units[r_hell]+'knight\knightd');
-   snd_baron_ready          :=Load_SoundSet(race_units[r_hell]+'baron\d_u4_c'  );
-   snd_baron_death          :=Load_SoundSet(race_units[r_hell]+'baron\d_u4_d'  );
+   snd_knight_ready         :=SoundSetLoad(race_units[r_hell]+'knight\knightc');
+   snd_knight_death         :=SoundSetLoad(race_units[r_hell]+'knight\knightd');
+   snd_baron_ready          :=SoundSetLoad(race_units[r_hell]+'baron\d_u4_c'  );
+   snd_baron_death          :=SoundSetLoad(race_units[r_hell]+'baron\d_u4_d'  );
 
-   snd_imp_ready            :=Load_SoundSet(race_units[r_hell]+'imp\d_u1_s');
-   snd_imp_death            :=Load_SoundSet(race_units[r_hell]+'imp\d_u1_d');
-   snd_imp_move             :=Load_SoundSet(race_units[r_hell]+'imp\d_imp' );
+   snd_imp_ready            :=SoundSetLoad(race_units[r_hell]+'imp\d_u1_s');
+   snd_imp_death            :=SoundSetLoad(race_units[r_hell]+'imp\d_u1_d');
+   snd_imp_move             :=SoundSetLoad(race_units[r_hell]+'imp\d_imp' );
 
-   snd_demon_ready          :=Load_SoundSet(race_units[r_hell]+'demon\d_u2'   );
-   snd_demon_death          :=Load_SoundSet(race_units[r_hell]+'demon\d_u2_d' );
-   snd_demon_melee          :=Load_SoundSet(race_units[r_hell]+'demon\d_u2_a' );
+   snd_demon_ready          :=SoundSetLoad(race_units[r_hell]+'demon\d_u2'   );
+   snd_demon_death          :=SoundSetLoad(race_units[r_hell]+'demon\d_u2_d' );
+   snd_demon_melee          :=SoundSetLoad(race_units[r_hell]+'demon\d_u2_a' );
 
-   snd_cyber_ready          :=Load_SoundSet(race_units[r_hell]+'cyber\d_u5'   );
-   snd_cyber_death          :=Load_SoundSet(race_units[r_hell]+'cyber\d_u5_d' );
-   snd_cyber_foot           :=Load_SoundSet(race_units[r_hell]+'cyber\d_u5_f' );
+   snd_cyber_ready          :=SoundSetLoad(race_units[r_hell]+'cyber\d_u5'   );
+   snd_cyber_death          :=SoundSetLoad(race_units[r_hell]+'cyber\d_u5_d' );
+   snd_cyber_foot           :=SoundSetLoad(race_units[r_hell]+'cyber\d_u5_f' );
 
-   snd_caco_death           :=Load_SoundSet(race_units[r_hell]+'caco\d_u3_d'   );
-   snd_caco_ready           :=Load_SoundSet(race_units[r_hell]+'caco\d_u3'     );
+   snd_caco_death           :=SoundSetLoad(race_units[r_hell]+'caco\d_u3_d'   );
+   snd_caco_ready           :=SoundSetLoad(race_units[r_hell]+'caco\d_u3'     );
 
-   snd_archvile_death       :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_d' );
-   snd_archvile_attack      :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_at');
-   snd_archvile_fire        :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_f' );
-   snd_archvile_pain        :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_p' );
-   snd_archvile_ready       :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_c' );
-   snd_archvile_move        :=Load_SoundSet(race_units[r_hell]+'archvile\d_arch_a' );
+   snd_archvile_death       :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_d' );
+   snd_archvile_attack      :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_at');
+   snd_archvile_fire        :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_f' );
+   snd_archvile_pain        :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_p' );
+   snd_archvile_ready       :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_c' );
+   snd_archvile_move        :=SoundSetLoad(race_units[r_hell]+'archvile\d_arch_a' );
 
-   snd_arachno_death        :=Load_SoundSet(race_units[r_hell]+'arachnotron\d_ar_d');
-   snd_arachno_move         :=Load_SoundSet(race_units[r_hell]+'arachnotron\d_ar_act');
-   snd_arachno_foot         :=Load_SoundSet(race_units[r_hell]+'arachnotron\d_ar_f');
-   snd_arachno_ready        :=Load_SoundSet(race_units[r_hell]+'arachnotron\d_ar_c');
+   snd_arachno_death        :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_d');
+   snd_arachno_move         :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_act');
+   snd_arachno_foot         :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_f');
+   snd_arachno_ready        :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_c');
 
 
   {snd_inapc       :=load_sound('inapc.wav'    );

@@ -205,7 +205,7 @@ font_ca           : array[char] of TMWTexture;
 
 _eids             : array[byte] of TEID;
 _effects          : array[1..vid_mvs] of TEffect;
-_mids             : array[byte] of TMID;
+_mid_effs         : array[byte] of TMIDEffects;
 
 _tdecaln          : integer = 0;
 _tdecals          : array of TDecal;
@@ -222,9 +222,9 @@ net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
 net_cl_svpl       : byte = 0;
+net_cl_svstr      : shortstring = '127.0.0.1:10666';
 net_m_error       : shortstring = '';
 net_sv_pstr       : shortstring = '10666';
-net_cl_svstr      : shortstring = '127.0.0.1:10666';
 net_chat_shlm     : integer = 0;
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
@@ -709,17 +709,21 @@ str_menu_s3       : array[0..2] of shortstring;
 //  SOUND
 //
 
-snd_svolume        : byte = 64;
-snd_mvolume        : byte = 64;
-snd_music_list     : array of pMIX_MUSIC;
-snd_music_list_size: integer = 0;
-snd_current_music  : integer = 0;
-snd_anoncer_pause  : integer = 0;
-snd_anoncer_last   : PTSoundSet;
-snd_anoncer_channel: integer = -1;
-snd_unitcmd_channel: integer = -1;
-snd_unitcmd_pause  : integer = 0;
-snd_unitcmd_last   : PTSoundSet;
+SLpos              : array[0..2] of TALfloat;
+SLori              : array[0..5] of TALfloat;
+
+snd_svolume1       : single = 0.5;
+snd_mvolume1       : single = 0.5;
+
+MainDevice         : TALCdevice;
+MainContext        : TALCcontext;
+
+SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
+
+snd_music_game,
+snd_music_menu     : PTSoundSet;
+snd_music_current  : PTSoundSet = nil;
+snd_last_anoncer   : PTSoundSet = nil;
 
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;

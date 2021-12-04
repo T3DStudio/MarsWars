@@ -12,7 +12,7 @@ program T3D_RTS;
 
 uses SysUtils, SDL, SDL_Net
 {$IFDEF _FULLGAME}
-,crt, SDL_Image, SDL_Gfx, SDL_Mixer;
+,crt, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader;
 {$ELSE}
 ,crt;
 {$ENDIF}

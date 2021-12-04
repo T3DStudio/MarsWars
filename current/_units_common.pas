@@ -20,7 +20,7 @@ procedure _unit_PowerUpEff(pu:PTUnit;snd:PTSoundSet);
 begin
    with pu^ do
    begin
-      PlaySND(snd,pu,nil);
+      SoundPlayUnit(snd,pu,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),EID_HUpgr);
    end;
 end;
@@ -30,7 +30,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
+      SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
    end;
 end;
@@ -41,8 +41,8 @@ begin
    begin
       _effect_add(vx,vy-15,_depth(vy+10,uf),EID_Exp2);
       if(playeri=HPlayer)
-      then PlaySND(snd_exp,nil,nil)
-      else PlaySND(snd_exp,pu ,nil);
+      then SoundPlayUnit(snd_exp,nil,nil)
+      else SoundPlayUnit(snd_exp,pu ,nil);
    end;
 end;
 
@@ -54,8 +54,8 @@ begin
    begin
       if(playeri=HPlayer)then
        if(bld)
-       then PlayInGameAnoncer(un_snd_ready[buff[ub_advanced]>0])
-       else PlayInGameAnoncer(snd_build_place[_urace]);
+       then SoundPlayAnoncer(un_snd_ready[buff[ub_advanced]>0])
+       else SoundPlayAnoncer(snd_build_place[_urace]);
 
       if(bld=false)then exit;
 
@@ -66,7 +66,7 @@ begin
       else
          if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
-      PlaySND(un_eid_snd_ready[buff[ub_advanced]>0],nil,nil);
+      SoundPlayUnit(un_eid_snd_ready[buff[ub_advanced]>0],nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),un_eid_ready[buff[ub_advanced]>0]);
    end;
 end;
@@ -88,12 +88,12 @@ begin
       if(fastdeath)then
       begin
          _effect_add(vx,vy,_depth(vy+1,uf),un_eid_fdeath[buff[ub_advanced]>0]);
-         PlaySND(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
+         SoundPlayUnit(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
       end
       else
       begin
          _effect_add(vx,vy,vy+1,un_eid_death[buff[ub_advanced]>0]);
-         PlaySND(un_eid_snd_death[buff[ub_advanced]>0],nil,nil);
+         SoundPlayUnit(un_eid_snd_death[buff[ub_advanced]>0],nil,nil);
       end;
    end;
 end;
@@ -111,7 +111,7 @@ begin
         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
-      PlaySND(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
+      SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
    end;
 end;
 
@@ -125,7 +125,7 @@ begin
      if(PointInScreenF(tx,ty,@_players[HPlayer])=false)then exit;
 
    _effect_add(tx,ty,dy,UID_LostSoul);
-   PlaySND(snd_pexp,nil,nil);
+   SoundPlayUnit(snd_pexp,nil,nil);
 end;
 
 procedure _unit_attack_effects(pu:PTUnit;start:boolean;vischeck:pboolean);
@@ -144,12 +144,12 @@ begin
       if(start)then
       begin
          _effect_add(vx,vy,_depth(vy+1,uf),aw_eid_start);
-         PlaySND(aw_snd_start,nil,nil);
+         SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
          _effect_add(vx+aw_x,vy+aw_y,_depth(vy+1,uf),aw_eid_shot );
-         PlaySND(aw_snd_shot,nil,nil);
+         SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
 end;
@@ -297,7 +297,7 @@ begin
       ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
       if PointInScreenF(vx,vy,@_players[HPlayer])
-      or PointInScreenF(tx,ty,@_players[HPlayer]) then PlaySND(snd_teleport,nil,nil);
+      or PointInScreenF(tx,ty,@_players[HPlayer]) then SoundPlayUnit(snd_teleport,nil,nil);
       _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
       _effect_add(tx,ty,_depth(ty+1,uf),EID_Teleport);
       {$ENDIF}
@@ -372,7 +372,7 @@ begin
       buff[ub_cast]:=fr_fps;
 
       {$IFDEF _FULLGAME}
-      if(ServerSide)and(player^.team=_players[HPlayer].team)then PlaySND(snd_radar,nil,nil);
+      if(ServerSide)and(player^.team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
       {$ENDIF}
    end;
 end;
@@ -1153,7 +1153,7 @@ begin
             begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
-               if PointInScreenF(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then PlaySND(snd_teleport,nil,nil);
+               if PointInScreenF(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then SoundPlayUnit(snd_teleport,nil,nil);
                _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.uf),EID_Teleport);
                {$ENDIF}
             end;
@@ -1212,7 +1212,7 @@ begin
           upgr[_uid]+=1;
           _unit_cupgrade_p(pu,255,i);
           {$IFDEF _FULLGAME}
-          if(playeri=HPlayer)then PlayInGameAnoncer(snd_upgrade_complete[_urace]);
+          if(playeri=HPlayer)then SoundPlayAnoncer(snd_upgrade_complete[_urace]);
           {$ENDIF}
        end
        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
@@ -1365,7 +1365,7 @@ uab_CCFly:
               if(uf<>flyCC_floor)then
               begin
                  {$IFDEF _FULLGAME}
-                 PlaySND(snd_CCup ,pu,nil);
+                 SoundPlayUnit(snd_CCup ,pu,nil);
                  {$ENDIF}
                  uf   :=flyCC_floor;
                  zfall:=-fly_height[uf];
@@ -1377,7 +1377,7 @@ uab_CCFly:
               if(uf<>uf_ground)then
               begin
                  {$IFDEF _FULLGAME}
-                 PlaySND(snd_inapc,pu,nil);
+                 SoundPlayUnit(snd_inapc,pu,nil);
                  {$ENDIF}
                  zfall:=fly_height[uf];
                  uf   :=uf_ground;
@@ -1431,7 +1431,7 @@ UID_ZMajor:
               if(uf<>uf_fly)then
               begin
                  {$IFDEF _FULLGAME}
-                 PlaySND(snd_jetpon ,pu,nil);
+                 SoundPlayUnit(snd_jetpon ,pu,nil);
                  {$ENDIF}
                  zfall:=-fly_height[uf_fly];
               end;
@@ -1443,7 +1443,7 @@ UID_ZMajor:
               if(uf<>uf_ground)then
               begin
                  {$IFDEF _FULLGAME}
-                 PlaySND(snd_jetpoff,pu,nil);
+                 SoundPlayUnit(snd_jetpoff,pu,nil);
                  {$ENDIF}
                  zfall:= fly_height[uf_ground];
               end;

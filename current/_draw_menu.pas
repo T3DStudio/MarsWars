@@ -219,16 +219,16 @@ begin
                  if(menu_s3=ms3_sond)then
                  begin
                     y:=_yt(4);
-                    _draw_text(tar,i,y, str_soundvol, ta_left,255, mic(snd_svolume>0,false));
+                    _draw_text(tar,i,y, str_soundvol, ta_left,255, mic(snd_svolume1>0,false));
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
                     vlineColor(tar,ui_menu_ssr_x3,y-6,y+12,c_gray);
-                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+snd_svolume,y+6,c_lime);
+                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+trunc(snd_svolume1*ui_menu_ssr_barl),y+6,c_lime);
 
                     y:=_yt(5);
-                    _draw_text(tar,i,y, str_musicvol, ta_left,255, mic(snd_mvolume>0,false));
+                    _draw_text(tar,i,y, str_musicvol, ta_left,255, mic(snd_mvolume1>0,false));
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
                     vlineColor(tar,ui_menu_ssr_x3,y-6,y+12,c_gray);
-                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+snd_mvolume,y+6,c_lime);
+                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+trunc(snd_mvolume1*ui_menu_ssr_barl),y+6,c_lime);
                  end;
               end;
    ms1_svld : begin

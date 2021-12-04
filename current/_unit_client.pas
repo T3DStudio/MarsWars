@@ -426,7 +426,7 @@ begin
       vx:=x;
       vy:=y;
       _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
-      PlaySND(snd_teleport,nil,vis);
+      SoundPlayUnit(snd_teleport,nil,vis);
    end;
 end;
 
@@ -511,7 +511,7 @@ begin
                if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))then _ucCreateEffect(uu,@vis);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
-               if(pu^.inapc<>inapc)and(vis)then PlaySND(snd_inapc,nil,@vis);
+               if(pu^.inapc<>inapc)and(vis)then SoundPlayUnit(snd_inapc,nil,@vis);
 
                if(bld)then
                begin
@@ -519,7 +519,7 @@ begin
                    case uid^._ability of
                0:;
                uab_uac_rstrike : _unit_umstrike_create(uu);
-               uab_radar       : if(team=_players[HPlayer].team)then PlaySND(snd_radar,nil,@vis);
+               uab_radar       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,@vis);
                uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
@@ -872,7 +872,7 @@ begin
          end;
      end;
 
-   if(anoncer>0)then PlayInGameAnoncer(snd_upgrade_complete[anoncer]);
+   if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer]);
 end;
 
 procedure ClNUnits;
@@ -908,7 +908,7 @@ begin
 gm_inv : begin
             _PNU:=g_inv_wave_n;
             g_inv_wave_n:=_rudata_byte(rpl,0);
-            if(g_inv_wave_n>_PNU)then PlaySND(snd_teleport,nil,nil);
+            if(g_inv_wave_n>_PNU)then SoundPlayUnit(snd_teleport,nil,nil);
             g_inv_time :=_rudata_int (rpl,0);
          end;
 gm_cptp  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);

@@ -56,7 +56,6 @@
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="fpc"/>
         <AllowLabel Value="False"/>
         <CPPInline Value="False"/>
         <UseAnsiStrings Value="False"/>

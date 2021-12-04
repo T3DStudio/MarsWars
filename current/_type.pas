@@ -12,6 +12,11 @@ TSoc = set of char;
 
 string6 = string[6];
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GRAPHIC
+//
+
 TColor = record
    r,g,b,a:byte;
    c      :cardinal;
@@ -72,11 +77,6 @@ TVisSpr = record
 end;
 PTVisSpr = ^TVisSpr;
 
-TAlarm = record
-   ax,ay,at : integer;
-   ab       : boolean;
-end;
-
  TIntList = array of integer;
 PTIntList = ^TIntList;
 
@@ -90,11 +90,29 @@ end;
  TThemeAnimL = array of TThemeAnim;
 PTThemeAnimL = ^TThemeAnimL;
 
+TAlarm = record
+   ax,ay,at : integer;
+   ab       : boolean;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   SOUNDS
+//
+
+TMWSoundSource = record
+   source   :TALuint;
+   volumevar:psingle;
+end;
+PTMWSoundSource   = ^TMWSoundSource;
+TMWSoundSourceSet = record
+   ssl: array of TMWSoundSource;
+   ssn: integer;
+end;
+PTMWSoundSourceSet = ^TMWSoundSourceSet;
+
 TMWSound = record
-   sound  : pMIX_CHUNK;
-   last_channel,
-   ticks_length
-          : integer;
+   sound  : TALuint;
 end;
 PTMWSound = ^TMWSound;
 
@@ -105,7 +123,9 @@ TSoundSet = record
 end;
 PTSoundSet = ^TSoundSet;
 
-TMID = record
+////////////////////////////////////////////////////////////////////////////////
+
+TMIDEffects = record
    ms_smodel       : PTMWSModel;
    ms_eid_fly_st   : integer;
    ms_eid_fly,

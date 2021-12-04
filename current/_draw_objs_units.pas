@@ -227,7 +227,7 @@ begin
          animf-=1;
          if(animf<=0)then
          begin
-            PlaySND(un_eid_snd_foot[adv],nil,nil);
+            SoundPlayUnit(un_eid_snd_foot[adv],nil,nil);
             animf:=un_foot_anim[adv];
          end;
       end;

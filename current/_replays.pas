@@ -335,7 +335,7 @@ begin
                              _rudata_chat(_rpls_player,true);
                              net_chat_shlm:=chat_shlm_t;
                              vid_menu_redraw  :=true;
-                             PlaySNDM(snd_chat);
+                             //PlaySNDM(snd_chat);
                           end;
                           if((i and %01000000)>0)then
                           begin

@@ -3,10 +3,10 @@
 procedure initMissiles;
 var m:byte;
 begin
-   FillChar(_mids,SizeOf(_mids),0);
+   FillChar(_mid_effs,SizeOf(_mid_effs),0);
 
    for m:=0 to 255 do
-   with _mids[m] do
+   with _mid_effs[m] do
    begin
       ms_smodel   :=spr_pdmodel;
 
@@ -543,7 +543,7 @@ begin
       end
       {$IFDEF _FULLGAME}
       else
-        with _mids[mid] do
+        with _mid_effs[mid] do
          if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
           if((vst mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_depth(vy,mfs),ms_eid_fly);
       {$ENDIF};

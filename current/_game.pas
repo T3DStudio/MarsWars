@@ -879,7 +879,7 @@ begin
          FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
          if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
 
-         PlayUnitSelect;
+         SoundPlayUnitSelect;
          {$ENDIF}
 
          _uclord_c+=1; _uclord_c:=_uclord_c mod _uclord_p;

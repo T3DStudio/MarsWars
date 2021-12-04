@@ -233,7 +233,7 @@ procedure _missile_explode_effect(m:integer);
 var i,o,r:byte;
 begin
    with _missiles[m] do
-   with _mids[mid] do
+   with _mid_effs[mid] do
    if(PointInScreenF(vx,vy,@_players[player]))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
@@ -250,7 +250,7 @@ begin
       if(ms_snd_death_ch[ms_eid_bio_death]>0)then
        if(random(ms_snd_death_ch[ms_eid_bio_death])>0)then exit;
 
-      PlaySND(ms_snd_death[ms_eid_bio_death],nil,nil);
+      SoundPlayUnit(ms_snd_death[ms_eid_bio_death],nil,nil);
    end;
 end;
 
@@ -260,7 +260,7 @@ var  m:integer;
 begin
    for m:=1 to MaxMissiles do
    with _missiles[m] do
-   with _mids[mid] do
+   with _mid_effs[mid] do
    if(vst>0)then
    begin
       spr:=@spr_dummy;

@@ -3,15 +3,16 @@ function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit):boolean; forward;
 
 
-function b2s (i:byte    ):shortstring;begin str(i,b2s);end;
-function w2s (i:word    ):shortstring;begin str(i,w2s);end;
-function c2s (i:cardinal):shortstring;begin str(i,c2s);end;
-function i2s (i:integer ):shortstring;begin str(i,i2s);end;
-//function si2s(i:single  ):shortstring;begin str(i,si2s);end;
-function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b,t);end;
-function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w,t);end;
-function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i,t);end;
-function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c,t);end;
+function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
+function w2s (i:word    ):shortstring;begin str(i,w2s );end;
+function c2s (i:cardinal):shortstring;begin str(i,c2s );end;
+function i2s (i:integer ):shortstring;begin str(i,i2s );end;
+function si2s(i:single  ):shortstring;begin str(i,si2s);end;
+function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b ,t);end;
+function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w ,t);end;
+function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i ,t);end;
+function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c ,t);end;
+function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
 function max2(x1,x2   :integer):integer;begin if(x1>x2)then max2:=x1 else max2:=x2;end;
 function max3(x1,x2,x3:integer):integer;begin max3:=max2(max2(x1,x2),x3);end;
@@ -466,6 +467,7 @@ begin
    then Append (f)
    else Rewrite(f);
    writeln(f,mess);
+   writeln(mess);
    Close(f);
 end;
 

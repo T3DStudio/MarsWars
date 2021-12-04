@@ -891,8 +891,9 @@ ui_menu_ssr_xs         = 102;
 ui_menu_ssr_xhs        = ui_menu_ssr_xs div 2;
 ui_menu_ssr_xhhs       = ui_menu_ssr_xhs div 2;
 ui_menu_ssr_ys         = 18;
+ui_menu_ssr_barl       = 127;
 ui_menu_ssr_x3         = ui_menu_ssr_x1-10;
-ui_menu_ssr_x2         = ui_menu_ssr_x3-127;
+ui_menu_ssr_x2         = ui_menu_ssr_x3-ui_menu_ssr_barl;
 ui_menu_ssr_x4         = ui_menu_ssr_x0+ui_menu_ssr_xs;
 ui_menu_ssr_x5         = ui_menu_ssr_x0+ui_menu_ssr_xs*2;
 ui_menu_ssr_x6         = ui_menu_ssr_x5+ui_menu_ssr_xhs;
@@ -948,10 +949,16 @@ chat_shlm_t            = fr_fps*5;
 //  SOUND
 //
 
-AUDIO_FREQUENCY        : INTEGER = MIX_DEFAULT_FREQUENCY; //22050;
-AUDIO_FORMAT           : WORD    = AUDIO_S16;
-AUDIO_CHANNELS         : INTEGER = 1;
-AUDIO_CHUNKSIZE        : INTEGER = 1024;                  //4096;
+sss_count              = 6;
+
+sss_ui                 = 0;
+sss_world              = 1;
+sss_mmap               = 2;
+sss_anoncer            = 3;
+sss_ucommand           = 4;
+sss_music              = 5;
+
+sss_sssize             : array[0..sss_count-1] of integer = (1,12,1,3,1,1);
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -208,7 +208,7 @@ begin
          ab:=aab;
          at:=vid_uialrm_t;
          if((vid_mmvx-vid_uialrm_ti)>ax)or(ax>(vid_mmvx+map_mmvw+vid_uialrm_ti))or   // vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh
-           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then PlayInGameAnoncer(snd_under_attack[aab,_players[HPlayer].race]);
+           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then SoundPlayAnoncer(snd_under_attack[aab,_players[HPlayer].race]);
          break;
       end;
 end;

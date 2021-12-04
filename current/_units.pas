@@ -885,7 +885,7 @@ begin
                      if(apcc=0)then
                      begin
                         {$IFDEF _FULLGAME}
-                        PlaySND(snd_inapc,pu,nil);
+                        SoundPlayUnit(snd_inapc,pu,nil);
                         {$ENDIF}
                         uo_id:=ua_amove;
                      end;
@@ -914,7 +914,7 @@ begin
                        if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
                        _unit_desel(tu);
                        {$IFDEF _FULLGAME}
-                       PlaySND(snd_inapc,pu,nil);
+                       SoundPlayUnit(snd_inapc,pu,nil);
                        {$ENDIF}
                        continue;
                     end;
@@ -1019,7 +1019,7 @@ begin
       end;
 
       {$IFDEF _FULLGAME}
-      PlaySND(snd_unit_adv[_urace],pu,nil);
+      SoundPlayUnit(snd_unit_adv[_urace],pu,nil);
       {$ENDIF}
    end;
 end;
@@ -1108,7 +1108,7 @@ begin
            _unit_building_start_adv(pu);
            tu^.rld:=building_adv_reload[tu^.buff[ub_advanced]>0];
            {$IFDEF _FULLGAME}
-           PlayCommandSound(snd_building[_urace]);
+           SoundPlayUnitCommand(snd_building[_urace]);
            {$ENDIF}
         end;
 
@@ -1351,7 +1351,7 @@ begin
           begin
              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),aw_eid_target);
              if(aw_snd_target<>nil)then
-              if((G_Step mod fr_fps  )=0)then PlaySND(aw_snd_target,tu,nil);
+              if((G_Step mod fr_fps  )=0)then SoundPlayUnit(aw_snd_target,tu,nil);
           end;
          {$ENDIF}
 

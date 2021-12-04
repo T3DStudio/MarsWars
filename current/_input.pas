@@ -48,7 +48,7 @@ begin
 end;
 procedure _PlayCommand(ss:PTSoundSet);
 begin
-   PlayCommandSound(ss);
+   SoundPlayUnitCommand(ss);
    ui_UnitSelectedn:=0;
 end;
 procedure _ClickEffect(color:cardinal);
@@ -269,7 +269,8 @@ procedure _panel_click(tab,bx,by:integer;right,mid:boolean);
 var u:integer;
 begin
    //writeln(tab,': ',bx,', ',by);
-   PlaySNDM(snd_click);
+   SoundPlayUI(snd_click);
+
    by-=4;// 0,0 under minimap
 
    case by of
@@ -616,7 +617,7 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
-            else PlayInGameAnoncer(snd_cannot_build[_players[HPlayer].race]);
+            else SoundPlayAnoncer(snd_cannot_build[_players[HPlayer].race]);
 co_paction,
 co_move,
 co_amove,

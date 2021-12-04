@@ -270,7 +270,7 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
    end;
 
 
-   {if(pfNodes_c>0)then
+ {  if(pfNodes_c>0)then
     for ci:=1 to pfNodes_c do
      with pfNodes[ci] do
      begin
@@ -316,7 +316,7 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
          ssy+=pf_pathmap_w;
       end;
       ssx+=pf_pathmap_w;
-   end;  }
+   end; }
 
    {if(menu_s2=ms2_camp)then
    begin
