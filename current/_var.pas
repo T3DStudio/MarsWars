@@ -21,12 +21,12 @@ g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
 g_cl_units        : integer  = 0;
 
-g_inv_monsters    : byte = 0;
-g_inv_wave_n      : byte = 0;
-g_inv_time        : integer = 0;
-g_inv_wave_t      : integer = 0;
+g_inv_monsters    : byte     = 0;
+g_inv_wave_n      : byte     = 0;
+g_inv_time        : integer  = 0;
+g_inv_wave_t      : integer  = 0;
+g_royal_r         : integer  = 0;
 g_cpoints         : array[1..MaxCPoints] of TCTPoint;
-g_royal_r         : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -35,7 +35,7 @@ g_royal_r         : integer = 0;
 
 ServerSide        : boolean = true; // only server side code
 
-UnitStepTicks       : byte = 8;
+UnitStepTicks     : byte = 8;
 
 _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
@@ -51,27 +51,11 @@ _upids            : array[byte] of TUPID;
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
 
-{tar1p             : integer;
-ai_builders,
-ai_uprods,
-ai_pprods,
-ai_pt,
-ai_ptd,
-ai_uc_e,
-ai_uc_a,
-ai_apcd,
-ai_ux,
-ai_uy,
-ai_ud,
-ai_bx,
-ai_by,
-ai_bd             : integer;  }
-
 HPlayer           : byte = 1; // 'this' player
 
 team_army         : array[0..MaxPlayers] of integer;
 
-vid_menu_redraw       : boolean  = true;
+vid_menu_redraw   : boolean  = true;
 
 map_seed          : cardinal = 1;
 map_iseed         : word     = 0;
@@ -89,11 +73,10 @@ map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
-pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
-pf_pathgrid_tmpb  : byte;
-pfNodes           : array[1..pfMaxNodes] of TPFNode;
-pfNodes_c         : integer;
-
+//pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
+//pf_pathgrid_tmpb  : byte;
+//pfNodes           : array[1..pfMaxNodes] of TPFNode;
+//pfNodes_c         : integer;
 
 net_status        : byte = 0;
 net_port          : word = 10666;
@@ -117,8 +100,6 @@ wtrset_enemy_alive_ground,
 wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
 wtrset_enemy_alive_fly_mech,
-wtrset_enemy_alive_notfly,
-wtrset_enemy_alive_notfly_mech,
 wtrset_enemy_alive_mech,
 wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_nbuildings,
@@ -198,6 +179,18 @@ vid_mapy          : integer = 0;
 vid_vsl           : array[1..vid_mvs] of PTVisSpr;
 vid_vsls          : word = 0;
 
+vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
+vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
+vid_fog_vfw       : byte = 0;
+vid_fog_vfh       : byte = 0;
+vid_fog           : boolean = true;
+vid_fcx           : array[0..MFogM,0..MFogM] of byte;
+vid_fog_surf      : pSDL_Surface;
+vid_fog_sx        : integer = 0;
+vid_fog_sy        : integer = 0;
+vid_fog_ex        : integer = 0;
+vid_fog_ey        : integer = 0;
+
 ter_w,
 ter_h             : integer;
 
@@ -237,37 +230,26 @@ _svld_ln          : integer = 0;
 _svld_ls          : integer = 0;
 _svld_sm          : integer = 0;
 
-_rpls_fileo       : boolean = false;
-_rpls_pnu         : byte = 0;
-_rpls_lrname      : shortstring = 'LastReplay';
-_rpls_stat        : shortstring = '';
-_rpls_rst         : byte = rpl_none;
-_rpls_l           : array of shortstring;
-_rpls_ln          : integer = 0;
-_rpls_ls          : integer = 0;
-_rpls_sm          : integer = 0;
-_rpls_step        : integer = 1;
-_rpls_nwrch       : boolean = false;
-_rpls_vidx        : byte = 0;
-_rpls_vidy        : byte = 0;
-_rpls_vidm        : boolean = false;
-_rpls_log         : boolean = false;
-_rpls_player      : byte = 0;
+rpls_fstatus      : byte = 0;   // file status (none,write,read)
+rpls_pnu          : byte = 0;   // quality
+rpls_str_name     : shortstring = 'LastReplay';
+rpls_str_path     : shortstring = '';
+rpls_str_data     : shortstring = '';
+rpls_state        : byte = rpl_none;
+rpls_list         : array of shortstring;
+rpls_list_size    : integer = 0;
+rpls_list_sel     : integer = 0;
+rpls_list_scroll  : integer = 0;
+rpls_step         : integer = 1;
+rpls_vidx         : byte = 0;
+rpls_vidy         : byte = 0;
+rpls_player       : byte = 0;
+rpls_showlog      : boolean = false;
+rpls_plcam        : boolean = false;
+rpls_fog          : boolean = false;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
-
-fog_grid          : array[0..fog_vfwm,0..fog_vfhm] of byte;
-fog_pgrid         : array[0..fog_vfwm,0..fog_vfhm] of byte;
-fog_vfw           : byte = 0;
-fog_vfh           : byte = 0;
-_fog              : boolean = true;
-_fcx              : array[0..MFogM,0..MFogM] of byte;
-fog_surf          : pSDL_Surface;
-vid_fog_sx           : integer = 0;
-vid_fog_sy           : integer = 0;
-vid_fog_ex           : integer = 0;
-vid_fog_ey           : integer = 0;
 
 _lng              : boolean = false;
 
@@ -306,10 +288,10 @@ ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
-ui_builders_n     : integer = 0;
-ui_builders_x     : array[0..ui_builder_srs] of integer; //
-ui_builders_y     : array[0..ui_builder_srs] of integer; // builders areas
-ui_builders_r     : array[0..ui_builder_srs] of integer; //
+ui_builders_s     : integer = 0;
+ui_builders_x     : array of integer; //
+ui_builders_y     : array of integer; // builders areas
+ui_builders_r     : array of integer; //
 
 ui_first_upgr_time: integer = 0;
 ui_upgr           : array[byte] of integer;
@@ -330,6 +312,7 @@ ui_muc            : array[false..true] of cardinal; // unit max count color
 ui_limit          : array[false..true] of cardinal; // unit limit colors
 
 ui_uiuphx         : integer = 0;
+ui_uiuphy         : integer = 0;
 ui_ingamecl       : byte = 0;
 ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
@@ -338,7 +321,15 @@ ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
 ui_iy             : integer = 0;
 ui_energx         : integer = 0;
+ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
+ui_armyy          : integer = 0;
+
+ui_chat_sound     : boolean = false;
+
+ui_log_s          : array of shortstring;
+ui_log_t          : array of byte;
+ui_log_n          : integer = 0;
 
 k_dbl,
 k_l,
@@ -684,7 +675,8 @@ str_npnua,
 str_pnua          : array[0..9] of shortstring;
 str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
-str_hint_a        : array[0..1] of shortstring;
+str_hint_army     : shortstring;
+str_hint_energy   : shortstring;
 str_hint_m        : array[0..2] of shortstring;
 str_hint          : array[0..3,1..r_cnt,byte] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
@@ -723,8 +715,10 @@ SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
 snd_music_game,
 snd_music_menu     : PTSoundSet;
 snd_music_current  : PTSoundSet = nil;
-snd_last_anoncer   : PTSoundSet = nil;
-
+snd_anoncer_last   : PTSoundSet = nil;
+snd_anoncer_ticks  : integer = 0;
+snd_command_last   : PTSoundSet = nil;
+snd_command_ticks  : integer = 0;
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
 snd_build_place,

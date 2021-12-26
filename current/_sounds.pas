@@ -309,18 +309,19 @@ begin
    SoundPlay(ss,sss_ui);
 end;
 
-procedure SoundPlayAnoncer(ss:PTSoundSet);
+procedure SoundPlayAnoncer(ss:PTSoundSet;pause:boolean);
 begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
 
-   if(snd_last_anoncer=ss)then
-    if(SoundSourceSetIsPlaying(@SoundSources[sss_anoncer]))then exit;
+   if(pause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
+   // if(SoundSourceSetIsPlaying(@SoundSources[sss_anoncer])){and(snd_anoncer_ticks>0)}
 
    SoundPlay(ss,sss_anoncer);
 
-   snd_last_anoncer:=ss;
+   snd_anoncer_ticks:=fr_3h2fps;
+   snd_anoncer_last :=ss;
 end;
 
 procedure SoundPlayUnitCommand(ss:PTSoundSet);
@@ -329,7 +330,12 @@ begin
    or(_menu)
    or(r_draw=false)then exit;
 
+   if(snd_command_last=ss)and(snd_command_ticks>0)then exit;
+
    SoundPlay(ss,sss_ucommand);
+
+   snd_command_last:=ss;
+   snd_command_ticks:=fr_3h2fps;
 end;
 
 procedure SoundPlayUnitSelect;
@@ -348,11 +354,11 @@ begin
       with _units[ui_UnitSelectedNU] do
        with uid^ do
         if(_ukbuilding)and(bld=false)
-        then SoundPlay(snd_building[_urace],sss_ucommand)
+        then SoundPlayUnitCommand(snd_building[_urace])
         else
          if(ui_UnitSelectedn<annoystart)
-         then SoundPlay(un_snd_select[buff[ub_advanced]>0],sss_ucommand)
-         else SoundPlay(un_snd_annoy [buff[ub_advanced]>0],sss_ucommand);
+         then SoundPlayUnitCommand(un_snd_select[buff[ub_advanced]>0])
+         else SoundPlayUnitCommand(un_snd_annoy [buff[ub_advanced]>0]);
 
       ui_UnitSelectedPU:=ui_UnitSelectedNU;
       ui_UnitSelectedNU:=0;
@@ -384,8 +390,13 @@ end;
 procedure SoundControl;
 begin
    if(vid_rtui=0)then SoundMusicControll;
-   //if(snd_anoncer_pause>0)then snd_anoncer_pause-=1;
-   //if(snd_unitcmd_pause>0)then snd_unitcmd_pause-=1;
+   if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
+   if(snd_command_ticks>0)then snd_command_ticks-=1;
+   if(ui_chat_sound)then
+   begin
+      SoundPlayUI(snd_chat);
+      ui_chat_sound:=false;
+   end;
 end;
 
 
@@ -419,13 +430,8 @@ begin
    snd_music_menu:=SoundSetLoad('music\mm');
    snd_music_game:=SoundSetLoad('music\m');
 
-
-
-   //LoadAllMusic;
-
-   //SoundShafleSoundSet(snd_music_game);
-   //SoundShafleSoundSet(snd_music_menu);
-
+   SoundShafleSoundSet(@snd_music_menu);
+   SoundShafleSoundSet(@snd_music_game);
    /////////////////////////////////////////////////////////////////////////////////
    //
    // COMMON

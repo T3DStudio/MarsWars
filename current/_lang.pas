@@ -17,19 +17,19 @@ SDLK_RShift         : GetKeyName:='Shift';
    end
 end;
 
-procedure _mkHStrXY(tab,i,x,y:byte;STR:string);
+procedure _mkHStrXY(tab,i,x,y:byte;STR:shortstring);
 begin
    if(i=255)then i:=(y div 3)+x;
-   str_hint[tab,r_hell,i] := STR;
-   str_hint[tab,r_uac ,i] := str_hint[tab,r_hell,i ];
+   str_hint[tab,r_hell,i]:=STR;
+   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
 end;
 
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
    with _uids[uid] do
    begin
-      un_name :=NAME;
-      un_descr:=DESCR;
+      un_txt_name :=NAME;
+      un_txt_descr:=DESCR;
    end;
 end;
 
@@ -72,8 +72,8 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _addstr(@up,_uids[i].un_name);
-      if(uid in _uids[i].ups_builder)then _addstr(@bp,_uids[i].un_name);
+      if(uid in _uids[i].ups_units  )then _addstr(@up,_uids[i].un_txt_name);
+      if(uid in _uids[i].ups_builder)then _addstr(@bp,_uids[i].un_txt_name);
    end;
 
    if(up<>'')then _addstr(@findprd,up);
@@ -94,11 +94,11 @@ begin
       ENRG:='';
       TIME:='';
       LMT :='';
-      if(un_name='')then continue;
+      if(un_txt_name='')then continue;
 
       if(_ucl>=21)then
       begin
-         un_hint:= un_name+#11+un_descr+#11;
+         un_txt_hint:= un_txt_name+#11+un_txt_descr+#11;
       end
       else
       begin
@@ -107,21 +107,21 @@ begin
          LMT:=i2s(_limituse);
 
          PROD:=findprd(uid);
-         if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_name );
-         if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name);
+         if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_txt_name);
+         if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name   );
          HK:=_gHK(_ucl);
 
-         un_hint:= un_name;
-         if(HK  <>'')then un_hint:=un_hint+' ('+HK+')';
-         if(TIME<>'')then un_hint:=un_hint+' ['+#16+TIME+#25+']';
-         if(ENRG<>'')then un_hint:=un_hint+' {'+#19+ENRG+#25+'}';
-         if(LMT <>'')then un_hint:=un_hint+' <'+#15+LMT +#25+'>';
-         un_hint:=un_hint+#11+un_descr+#11;
-         if(REQ <>'')then un_hint:= un_hint+#17+str_req+#25+REQ+#11 else un_hint:= un_hint+#11;
-         if(PROD<>'')then
+         un_txt_hint:= un_txt_name;
+         if(length(HK  )>0)then un_txt_hint:=un_txt_hint+' ('+HK+')';
+         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#16+TIME+#25+']';
+         if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
+         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#15+LMT +#25+'>';
+         un_txt_hint:=un_txt_hint+#11+un_txt_descr+#11;
+         if(length(REQ )>0)then un_txt_hint:= un_txt_hint+#17+str_req+#25+REQ+#11 else un_txt_hint:= un_txt_hint+#11;
+         if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_hint:= un_hint+str_bprod+PROD
-          else un_hint:= un_hint+str_uprod+PROD;
+          then un_txt_hint:= un_txt_hint+str_bprod+PROD
+          else un_txt_hint:= un_txt_hint+str_uprod+PROD;
       end;
    end;
 
@@ -132,24 +132,24 @@ begin
       PROD :='';
       ENRG :='';
       TIME :='';
-      if(_up_name='')then continue;
+      if(length(_up_name)=0)then continue;
 
       if(_up_renerg>0)then ENRG :=i2s(_up_renerg);
       if(_up_time  >0)then TIME :=i2s(_up_time div fr_fps);
 
-      if(_up_ruid >0)then _addstr(@REQ,_uids [_up_ruid ].un_name );
-      if(_up_rupgr>0)then _addstr(@REQ,_upids[_up_rupgr]._up_name);
+      if(_up_ruid  >0)then _addstr(@REQ,_uids [_up_ruid ].un_txt_name );
+      if(_up_rupgr >0)then _addstr(@REQ,_upids[_up_rupgr]._up_name);
 
       HK:=_gHK(_up_btni);
 
       _up_hint:=_up_name;
-      if(HK  <>'')then _up_hint:=_up_hint+' ('+HK+')';
-      if(TIME<>'')then _up_hint:=_up_hint+' ['+#16+TIME+#25+']';
-      if(ENRG<>'')then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
+      if(length(HK  )>0)then _up_hint:=_up_hint+' ('+HK+')';
+      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#16+TIME+#25+']';
+      if(length(ENRG)>0)then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
       _up_hint:=_up_hint+' x'+#17+i2s(_up_max)+#25;
       if(_up_mfrg)then _up_hint:=_up_hint+#15+' *'+#25;
       _up_hint:=_up_hint+#11+_up_descr+#11;
-      if(REQ<>'')then _up_hint:=_up_hint+#17+str_req+#25+REQ;
+      if(length(REQ)>0)then _up_hint:=_up_hint+#17+str_req+#25+REQ;
    end;
 end;
 
@@ -316,8 +316,10 @@ begin
    str_hint_t[2]         := 'Researches';
    str_hint_t[3]         := 'Controls';
 
-   str_hint_a[0]         := 'Energy ('+#19+'free'+#25+' / max)';
-   str_hint_a[1]         := 'Army (units + buildings)';
+   str_hint_army         := 'Army: ';
+   str_hint_energy       := 'Energy: ';
+   //str_hint_a[0]         := 'Energy ('+#19+'free'+#25+' / max)';
+   //str_hint_a[1]         := 'Army (units + buildings)';
 
    str_hint_m[0]         := 'Menu (' +#18+'Esc'+#25+')';
    str_hint_m[2]         := 'Pause ('+#18+'Pause/Break'+#25+')';
@@ -695,7 +697,7 @@ begin
   str_gmode[gm_scir ]   := #18+'Схватка'+#25;
   str_gmode[gm_2fort]   := #16+'Две крепости'+#25;
   str_gmode[gm_3fort]   := #17+'Три крепости'+#25;
-  str_gmode[gm_cptp   ]   := #19+'Захват точек'+#25;
+  str_gmode[gm_cptp ]   := #19+'Захват точек'+#25;
   str_gmode[gm_inv  ]   := #20+'Вторжение'+#25;
   str_gmode[gm_aslt ]   := #14+'Штурм'+#25;
   str_gmode[gm_royl ]   := #15+'Королевская битва'+#25;
@@ -723,8 +725,10 @@ begin
   str_hint_m[0]         := 'Меню (' +#18+'Esc'+#25+')';
   str_hint_m[2]         := 'Пауза ('+#18+'Pause/Break'+#25+')';
 
-  str_hint_a[0]         := 'Энергия (свободная / максимальная)';
-  str_hint_a[1]         := 'Армия (юниты и здания)';
+  str_hint_army         := 'Армия: ';
+  str_hint_energy       := 'Энергия: ';
+//  str_hint_a[0]         := 'Энергия (свободная / максимальная)';
+//  str_hint_a[1]         := 'Армия (юниты и здания)';
 
   _mkHStrUid(UID_HKeep         ,'Адская Крепость' ,'Строит базу. Увеличивает энергию.'     );
   _mkHStrUid(UID_HGate         ,'Адские Врата'    ,'Призывает юнитов.'                     );

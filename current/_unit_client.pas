@@ -24,14 +24,6 @@ begin
    end;
 end;
 
-procedure _wudata_chat(p:byte;rpl:boolean);
-var i:byte;
-begin
-   //if(rpl=false)
-   //then net_writechat(p)
-   //else for i:=0 to MaxNetChat do _wudata_string(net_chat[p,i],rpl);
-end;
-
 procedure _wudata_byte(bt:byte;rpl:boolean);
 begin
    if(rpl=false)
@@ -60,6 +52,49 @@ begin
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
+function _wudata_chat(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
+var t,s:integer;
+      i:cardinal;
+begin
+   _wudata_chat:=false;
+   if(p<=MaxPlayers)then
+    with _players[p] do
+    begin
+       if(log_n<clog_n^)then
+        if(log_n=0)
+        then clog_n^:=0
+        else clog_n^:=log_n-1;
+
+       if(log_n>clog_n^)then
+       begin
+          s:=min3(log_n,log_n-clog_n^,MaxPlayerLog);
+          i:=log_i;
+          clog_n^:=log_n;
+
+          if(s>1)then
+           for t:=1 to s-1 do
+            if(i=0)
+            then i:=MaxPlayerLog
+            else i-=1;
+
+          _wudata_byte(byte(s),rpl);
+          for t:=1 to s do
+          begin
+             _wudata_byte  (log_lt[i],rpl);
+             _wudata_string(log_ls[i],rpl);
+
+             if(i=MaxPlayerLog)
+             then i:=0
+             else i+=1;
+          end;
+          if(rpl=false)then _wudata_card(clog_n^,rpl);
+          _wudata_chat:=true;
+          exit;
+       end;
+    end;
+   _wudata_byte(0,rpl);
+end;
+
 procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
 var i:byte;
 begin
@@ -84,7 +119,7 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_stun    ]>0);
+      SetBBit(@_bts2,0, buff[ub_stun     ]>0);
       SetBBit(@_bts2,1, buff[ub_gear     ]>0);
       SetBBit(@_bts2,2, buff[ub_resur    ]>0);
       SetBBit(@_bts2,3, buff[ub_born     ]>0);
@@ -343,8 +378,8 @@ begin
               begin
                  _puid:=pprod_u[i] ;
 
-                 pproda+=1;
-                 pprodu[_puid]+=1;
+                 upproda+=1;
+                 upprodu[_puid]+=1;
                  cenerg-=_upids[_puid]._up_renerg;
               end;
          end;
@@ -399,8 +434,8 @@ begin
                begin
                   _puid:=pprod_u[i];
 
-                  pproda-=1;
-                  pprodu[_puid]-=1;
+                  upproda-=1;
+                  upprodu[_puid]-=1;
                   cenerg+=_upids[_puid]._up_renerg;
                end;
          end;
@@ -425,7 +460,7 @@ begin
    begin
       vx:=x;
       vy:=y;
-      _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_Teleport);
       SoundPlayUnit(snd_teleport,nil,vis);
    end;
 end;
@@ -475,7 +510,7 @@ begin
                 _unit_death_effects(uu,true,@vis);
              end;
 
-             if(hits<=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,uf),@vis);
+             if(hits<=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,ukfly),@vis);
           end;
 
           if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
@@ -495,7 +530,7 @@ begin
                vx:=x;
                vy:=y;
 
-               if(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.uf),@vis);
+               if(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
             end;
 
             _unit_upgr(pu);
@@ -654,14 +689,6 @@ begin
    end;
 end;
 
-procedure  _rudata_chat(p:byte;rpl:boolean);
-var i:byte;
-begin
-   //if(rpl=false)
-   //then net_readchat
-   //else for i:=0 to MaxNetChat do net_chat[p,i]:=_rudata_string(rpl);
-end;
-
 function _rudata_byte(rpl:boolean;def:byte):byte;
 begin
    if(rpl=false)
@@ -687,7 +714,27 @@ function _rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
    if(rpl=false)
    then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card :=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card:=def; {$I+} end;
+end;
+
+procedure  _rudata_chat(p:byte;rpl:boolean);
+var t,s:byte;
+    str:shortstring;
+begin
+   s:=_rudata_byte(rpl,0);
+   if(s>0)then
+   begin
+      while(s>0)do
+      begin
+         t  :=_rudata_byte  (rpl,0);
+         str:=_rudata_string(rpl);
+         PlayersAddLog(p,0,t,str);
+         s-=1;
+      end;
+      if(rpl=false)and(p<=MaxPlayers)then
+       with _players[p] do
+        log_n:=_rudata_card(rpl,log_n);
+   end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -831,7 +878,7 @@ begin
          end;
       end
       else hits:=ndead_hits;
-      if(rpl)and(_rpls_step>2)then
+      if(rpl)and(rpls_step>2)then
       begin
          vx:=x;
          vy:=y;
@@ -872,7 +919,7 @@ begin
          end;
      end;
 
-   if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer]);
+   if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer],true);
 end;
 
 procedure ClNUnits;
@@ -926,11 +973,11 @@ gm_royl: g_royal_r:=_rudata_int(rpl,0);
 
       if(_PNU>g_cl_units)then _PNU:=g_cl_units;
 
-      if(_PNU<>_rpls_pnu)then
+      if(_PNU<>rpls_pnu)then
       begin
-         _rpls_pnu:=_PNU;
-         if(_rpls_pnu<=0)then _rpls_pnu:=1;
-         UnitStepTicks:=trunc(MaxUnits/_rpls_pnu)*NetTickN+1;
+         rpls_pnu:=_PNU;
+         if(rpls_pnu<=0)then rpls_pnu:=1;
+         UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN+1;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 

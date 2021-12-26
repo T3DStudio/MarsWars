@@ -273,17 +273,17 @@ begin
                  vlineColor(tar,ui_menu_ssr_x5,y,y+ui_menu_ssr_ys,c_gray);
 
                  y:=_yt(10);
-                 _draw_text(tar,ui_menu_ssr_x0+ui_menu_ssr_xhs, y, str_play  , ta_middle,255, mic((_rpls_ls<_rpls_ln)and(G_Started=false),false));
-                 _draw_text(tar,ui_menu_ssr_x5+ui_menu_ssr_xhs, y, str_delete, ta_middle,255, mic((_rpls_ls<_rpls_ln)and(G_Started=false),false));
+                 _draw_text(tar,ui_menu_ssr_x0+ui_menu_ssr_xhs, y, str_play  , ta_middle,255, mic((rpls_list_sel<rpls_list_size)and(G_Started=false),false));
+                 _draw_text(tar,ui_menu_ssr_x5+ui_menu_ssr_xhs, y, str_delete, ta_middle,255, mic((rpls_list_sel<rpls_list_size)and(G_Started=false),false));
 
                  for t:=0 to vid_rpls_m do
                  begin
-                    i:=t+_rpls_sm;
-                    if(i<_rpls_ln)then
+                    i:=t+rpls_list_scroll;
+                    if(i<rpls_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+_rpls_l[i],ta_left,255,mic(true,i=_rpls_ls));
-                       if(i=_rpls_ls)then
+                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+rpls_list[i],ta_left,255,mic(true,i=rpls_list_sel));
+                       if(i=rpls_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+ui_menu_ssr_ys-1,c_gray);
@@ -291,7 +291,7 @@ begin
                     end;
                  end;
 
-                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,_rpls_stat  ,ta_left,19,c_white);
+                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,rpls_str_data  ,ta_left,19,c_white);
               end;
    end;
 end;
@@ -371,16 +371,16 @@ begin
 
                  y:=_yt(10);
                  _draw_text(tar,ui_menu_csm_xt1, y, str_replay        , ta_left ,255, c_white);
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[_rpls_rst], ta_right,255, mic( _rpls_rst<rpl_rhead ,_rpls_rst>0));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state], ta_right,255, mic( rpls_state<rpl_rhead ,rpls_state>rpl_none));
                  t:=_yl(10);
                  vlineColor(tar,ui_menu_csm_x3  ,t,t+ui_menu_csm_ys, c_gray);
                  y:=_yt(11);
-                 _draw_text(tar,ui_menu_csm_xt0, y, _rpls_lrname, ta_left,255, mic( _rpls_rst=rpl_none ,menu_item=83));
+                 _draw_text(tar,ui_menu_csm_xt0, y, rpls_str_name, ta_left,255, mic( rpls_state=rpl_none ,menu_item=83));
                  y:=_yl(11);
                  vlineColor(tar,ui_menu_csm_xc,y,y+ui_menu_csm_ys,c_gray);
                  y:=_yt(12);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( _rpls_rst<rpl_rhead ,false));
-                if(_rpls_rst>rpl_none)and(g_cl_units>0)then
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpl_rhead ,false));
+                if(rpls_state>rpl_none)and(g_cl_units>0)then
                 _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
               end;
    ms2_mult : begin
@@ -393,9 +393,11 @@ begin
                     hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y,c_gray);
 
                     y:=_yt(10);
-                   // for t:=0 to MaxNetChat do _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,net_chat[HPlayer,t],ta_left,255,c_white);
+                    ReMakeLogForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height);
+                    if(ui_log_n>0)then
+                     for t:=0 to ui_log_n-1 do _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,c_white);
 
-                    _draw_text(tar, ui_menu_csm_xct, _yt(11), net_chat_str , ta_left,255, c_white);
+                    _draw_text(tar,ui_menu_csm_xct, _yt(11), net_chat_str , ta_chat,ui_menu_chat_width, c_white);
                  end
                  else
                  begin

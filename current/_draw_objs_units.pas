@@ -9,15 +9,9 @@ begin
     else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 end;
 
-function _depth(y:integer;f:byte):integer;
+function _depth(y:integer;f:boolean):integer;
 begin
-   if(f=255)
-   then _depth:=y-MaxSMapW
-   else
-   begin
-      if(f>uf_fly)then f:=uf_fly;
-      _depth:=map_flydepths[f]+y;
-   end;
+   _depth:=map_flydepths[f]+y;
 end;
 
 function _udpth(pu:PTUnit):integer;
@@ -28,28 +22,28 @@ begin
 UID_UPortal   : _udpth:=-10001;
 UID_HTeleport : _udpth:=-4;
 UID_HSymbol,
-UID_HAltar    : _udpth:=_depth(vy,255);
+//UID_HAltar    : _udpth:=_depth(vy,false);
 UID_UMine     : _udpth:=-2;
     else
       if(uid^._ukbuilding)and(bld=false)
-      then _udpth:=_depth(vy,255)
+      then _udpth:=-MaxSMapW+vy
       else
         if(hits>0)or(buff[ub_resur]>0)
-        then _udpth:=_depth(vy,uf)
+        then _udpth:=_depth(vy,ukfly)
         else _udpth:=vy;
     end;
 end;
 
 procedure _sf(tx,ty:integer);
 begin
-   if(0<=tx)and(0<=ty)and(tx<=fog_vfw)and(ty<=fog_vfh)then fog_grid[tx,ty]:=2;
+   if(0<=tx)and(0<=ty)and(tx<=vid_fog_vfw)and(ty<=vid_fog_vfh)then vid_fog_grid[tx,ty]:=2;
 end;
 
 procedure _fog_sr(x,y,r:integer);
 var iy,i:integer;
 begin
    for i:=0 to r do
-    for iy:=0 to _fcx[r,i] do
+    for iy:=0 to vid_fcx[r,i] do
     begin
        _sf(x-i,y-iy);
        _sf(x-i,y+iy);
@@ -80,7 +74,7 @@ function _checkvision(pu:PTUnit):byte;
 begin
    _checkvision:=0;
    with pu^ do
-    if(HPlayer=0)and(_rpls_rst>=rpl_rhead)
+    if(HPlayer=0)and(rpls_state>=rpl_rhead)
     then _checkvision:=2
     else
       if(_uvision(_players[HPlayer].team,pu,false))then
@@ -95,7 +89,7 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-    if(_fog=false)
+    if(rpls_fog=false)
     then _unit_fogrev:=true
     else
       case _checkvision(pu) of
@@ -364,7 +358,7 @@ begin
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._advanced[g_addon]],255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
+                      if(_isbarrack)and(uprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_gray,0,true,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],255,0,(uprod_r[t] div fr_fps)+1,0,0,'',0);
                       if(_issmith  )and(pprod_r[t]>0)then _sl_add(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,dp,0,c_red ,0,true,@_upids[pprod_u[t]]._up_btn                                      ,255,0,(pprod_r[t] div fr_fps)+1,0,0,'',0);
                    end;
                 end;

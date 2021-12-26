@@ -58,7 +58,7 @@ begin
          menu_item:=3+((mouse_x-ui_menu_ssr_x0) div ui_menu_ssr_xs);
 
          case menu_item of
-         4: if not ((net_status=ns_none)and(_rpls_rst<rpl_rhead))then menu_item:=0;
+         4: if not ((net_status=ns_none)and(rpls_state<rpl_rhead))then menu_item:=0;
          5: if (net_status<>ns_none)then menu_item:=0;
          end;
       end
@@ -275,19 +275,19 @@ begin
       40 : if(0<=_svld_ls)and(_svld_ls<_svld_ln)then _svld_delete;
 
       // replays
-      41 : if(_rpls_ln>0)and(_rpls_rst<rpl_rhead)then
+      41 : if(rpls_list_size>0)and(rpls_state<rpl_rhead)then
            begin
-              _rpls_ls :=_rpls_sm+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
+              rpls_list_sel :=rpls_list_scroll+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
               _rpls_sel;
            end;
-      42 : if(0<=_rpls_ls)and(_rpls_ls<_rpls_ln)and(G_Started=false)then
+      42 : if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then
            begin
               menu_s2:=ms2_scir;
-              _rpls_rst:=rpl_rhead;
+              rpls_state:=rpl_rhead;
               g_started:=true;
            end;
       43 : ;
-      44 : if(_rpls_ln>0)and(_rpls_ls<_rpls_ln)and(G_Started=false)then _rpls_delete;
+      44 : if(rpls_list_size>0)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then _rpls_delete;
 
       ///  MAP
       50 : ;
@@ -343,10 +343,10 @@ begin
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
-            if(_rpls_rst=rpl_none)
-            then _rpls_rst:=rpl_whead
-            else _rpls_rst:=rpl_none;
-      83 : if(_rpls_rst<>rpl_none)then menu_item:=0;
+            if(rpls_state=rpl_none)
+            then rpls_state:=rpl_whead
+            else rpls_state:=rpl_none;
+      83 : if(rpls_state<>rpl_none)then menu_item:=0;
       84 : ScrollInt(@rpls_pnui,1,0,9);
 
       //// multiplayer
@@ -392,7 +392,7 @@ begin
               begin
                  net_status:=ns_clnt;
                  net_cl_saddr;
-                 _rpls_pnu:=0;
+                 rpls_pnu:=0;
                  if(net_UpSocket)
                  then net_m_error:=str_connecting
                  else
@@ -487,7 +487,7 @@ begin
               map_seed:=s2c(menu_sf(c2s(map_seed),k_kbdig,10));
               map_premap;
            end;
-      83 : _rpls_lrname:=menu_sf(_rpls_lrname,k_kbstr,SvRpLen);
+      83 : rpls_str_name:=menu_sf(rpls_str_name,k_kbstr,SvRpLen);
       87 : begin
               net_sv_pstr:=menu_sf(net_sv_pstr,k_kbdig,5);
               net_sv_sport;

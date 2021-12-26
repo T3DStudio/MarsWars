@@ -4,7 +4,7 @@ var r,x:byte;
 begin
    for r:=0 to MFogM do
     for x:=0 to r do
-     _fcx[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
+     vid_fcx[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
 procedure _screenshot;
@@ -514,10 +514,10 @@ begin
 
    LoadFont;
 
-   fog_surf := _createSurf(fog_cr*2,fog_cr*2);
-   boxColor(fog_surf,0,0,fog_surf^.w,fog_surf^.h,c_purple);
-   filledcircleColor(fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(fog_surf,0,0));
+   vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
+   boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
+   filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
+   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
 
    spr_mback:= loadIMG('mback'   ,false,true);
 
@@ -730,8 +730,13 @@ begin
    ui_hinty     := vid_mapy+vid_cam_h-60;
    ui_chaty     := ui_hinty-10;
    ui_oicox     := vid_mapx+vid_cam_w-4;
-
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
+   ui_uiuphy    := ui_texty+font_6hw;
+
+   ui_energx    := ui_uiuphx-100;
+   ui_energy    := ui_texty;
+   ui_armyx     := ui_uiuphx+80;
+   ui_armyy     := ui_texty;
 
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
@@ -739,8 +744,8 @@ begin
       mv_x      :=(vid_vw-spr_mback^.w) div 2;
       mv_y      :=(vid_vh-spr_mback^.h) div 2;
    end;
-   fog_vfw      :=(vid_cam_w div fog_cw)+2;
-   fog_vfh      :=(vid_cam_h div fog_cw)+2;
+   vid_fog_vfw      :=(vid_cam_w div fog_cw)+2;
+   vid_fog_vfh      :=(vid_cam_h div fog_cw)+2;
 
    map_mmvw     := round(vid_cam_w*map_mmcx);
    map_mmvh     := round(vid_cam_h*map_mmcx);
@@ -751,8 +756,6 @@ end;
 
 procedure _ScreenSurfaces;
 const
-  ui_ex = 3;
-  ui_ax = ui_ex+vid_BW+vid_hBW;
   ystop = 14;
 var i,y:integer;
 
@@ -792,20 +795,11 @@ begin
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
       r_panel  :=_createSurf(vid_panelw+1,vid_vh);
 
-      vlineColor(r_panel,ui_h3bw       ,vid_panelw,vid_panelw+ui_h3bw,c_white);
-      vlineColor(r_panel,ui_hwp        ,vid_panelw,vid_panelw+ui_h3bw,c_white);
-      vlineColor(r_panel,ui_hwp+ui_h3bw,vid_panelw,vid_panelw+ui_h3bw,c_white);
-
       y:=vid_BW*14;
       vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
       vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
 
       ui_iy     := vid_panelw+3;
-      ui_energx := (ui_hwp+ui_h3bw) div 2;
-      ui_armyx  := (ui_hwp+ui_h3bw+vid_panelw) div 2;
-
-      characterColor(r_panel,ui_ex,ui_iy,'E',c_aqua  );
-      characterColor(r_panel,ui_ax,ui_iy,'A',c_orange);
    end
    else
    begin
@@ -829,20 +823,9 @@ begin
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
 
-      vlineColor(r_panel,y+vid_BW  ,0,vid_BW,c_white);
-      vlineColor(r_panel,y+vid_BW*2,0,vid_BW,c_white);
-      vlineColor(r_panel,y+vid_BW*3,0,vid_BW,c_white);
-      hlineColor(r_panel,y+vid_BW  ,y+vid_BW*3,vid_BW  ,c_white);
-
       ui_iy     := 3;
-      ui_energx := y+vid_BW+vid_hBW+2;
-      ui_armyx  := y+vid_BW*2+vid_hBW;
 
-      y+=vid_BW;
-      characterColor(r_panel,y       +2,ui_iy,'E',c_aqua  );
-      characterColor(r_panel,y+vid_BW+2,ui_iy,'A',c_orange);
-
-       ui_iy := 23;
+      ui_iy := 23;
    end;
 
    rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);

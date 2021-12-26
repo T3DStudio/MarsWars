@@ -138,7 +138,7 @@ begin
        x+=lx+xo;
        y+=ly+yo;
 
-       if(sh>-fly_z)then
+       if(sh>-fly_hz)then
        begin
           sx:=s^.hw;
           sy:=s^.h-(s^.h shr 3);
@@ -244,18 +244,18 @@ begin
    ssx:=lx-(vid_cam_x mod fog_cw);
    sty:=ly-(vid_cam_y mod fog_cw);
 
-   for cx:=0 to fog_vfw do
+   for cx:=0 to vid_fog_vfw do
    begin
       ssy:=sty;
-      for cy:=0 to fog_vfh do
+      for cy:=0 to vid_fog_vfh do
       begin
-         fog_pgrid[cx,cy]:=fog_grid[cx,cy];
-         if(_fog)then
+         vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
+         if(rpls_fog)then
          begin
-            if(fog_grid[cx,cy]=0)then _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, fog_surf);
-            fog_grid[cx,cy]:=0;
+            if(vid_fog_grid[cx,cy]=0)then _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, vid_fog_surf);
+            vid_fog_grid[cx,cy]:=0;
          end
-         else fog_grid[cx,cy]:=2;
+         else vid_fog_grid[cx,cy]:=2;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
@@ -393,8 +393,8 @@ begin
           // circleColor(r_screen,ix,iy,srange,c_white);
            if(sel)then
            begin
-              lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
-              lineColor(r_screen,ix,iy,vid_mapx+mv_x    -vid_cam_x+1,vid_mapy+mv_y    -vid_cam_y+1,c_lime);
+              //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
+              //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -vid_cam_x+1,vid_mapy+mv_y    -vid_cam_y+1,c_lime);
 
            end;
 
@@ -453,7 +453,7 @@ begin
    if(k_ctrl>2)then
    for u:=1 to MaxMissiles do
    with _missiles[u] do
-   if(vst>0)then
+   if(vstep>0)then
    begin
       ix:=vx-vid_cam_x+vid_mapx;
       iy:=vy-vid_cam_y+vid_mapy;

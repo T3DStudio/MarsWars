@@ -137,83 +137,85 @@ function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
    case pu^.uidi of
    UID_LostSoul: begin
-                    if(tu^.uid^._ukmech)then _d25 (@damage) else
-                    if(tu^.uf=uf_ground)then _d50 (@damage);
+                    if(tu^.uid^._ukmech   )then _d25(@damage) else
+                    if(tu^.ukfly=uf_ground)then _d50(@damage);
                  end;
    UID_Demon   : begin
-                    if(tu^.uid^._ukmech)then _d50 (@damage);
+                    if(tu^.uid^._ukmech)then _d50(@damage);
                  end;
    end;
 
    _unit_melee_damage:=damage;
 end;
 
-procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl,mfst,mfet:byte;adddmg:integer);
+procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet:boolean;adddmg:integer);
 var m:integer;
     tu:PTUnit;
 begin
    for m:=1 to MaxUnits do
    with _missiles[m] do
-   if(vst=0)then
+   if(vstep=0)then
    begin
-      x      := mxt;
+      x      := mxt;// end point
       y      := myt;
-      vx     := mvx;
+      vx     := mvx;// start point
       vy     := mvy;
       tar    := mtar;
       mid    := msid;
       player := mpl;
-      mfe    := mfet;
       mfs    := mfst;
+      mfe    := mfet;
       mtars  := 0;
       ntars  := 0;
       ystep  := 0;
       dir    := 270;
 
-      sr:=dist2(x,y,vx,vy);
+      splashr:=dist2(x,y,vx,vy);
 
       {$IFDEF _FULLGAME}
       ms_eid_bio_death:=false;
       {$ENDIF}
 
       case mid of
-MID_Imp        : begin dam:=8  ; vst:=sr div 8 ; sr :=0  ;       end;
-MID_Cacodemon  : begin dam:=24 ; vst:=sr div 8 ; sr :=0  ;       end;
-MID_Baron      : begin dam:=32 ; vst:=sr div 8 ; sr :=0  ;       end;
+MID_Imp        : begin damage:=20 ; vstep:=splashr div 8 ; splashr :=0  ;       end;
+MID_Cacodemon  : begin damage:=40 ; vstep:=splashr div 8 ; splashr :=0  ;       end;
+MID_Baron      : begin damage:=60 ; vstep:=splashr div 8 ; splashr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin dam:=8  ; vst:=sr div 11; sr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin dam:=24 ; vst:=sr div 8 ; sr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin dam:=8  ; vst:=sr div 15; sr :=0  ;       end;
-MID_ArchFire   : begin dam:=100; vst:=1;         sr :=15 ;       end;
+MID_Revenant   : begin damage:=20 ; vstep:=splashr div 11; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=40 ; vstep:=splashr div 8 ; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_YPlasma    : begin damage:=20 ; vstep:=splashr div 15; splashr :=0  ;       end;
+MID_ArchFire   : begin damage:=200; vstep:=1;              splashr :=15 ;       end;
 
 MID_MBullet,
 MID_TBullet,
-MID_Bullet     : begin dam:=4  ; vst:=1;         sr :=0  ;       end;
-MID_Bulletx2   : begin dam:=8  ; vst:=1;         sr :=0  ;       end;
-MID_BPlasma    : begin dam:=8  ; vst:=sr div 15; sr :=0  ;       end;
-MID_BFG        : begin dam:=100; vst:=sr div 8 ; sr :=125;       end;
-MID_Flyer      : begin dam:=8  ; vst:=sr div 60; sr :=0  ;       end;
-MID_HRocket    : begin dam:=100; vst:=sr div 15; sr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_Granade    : begin dam:=24 ; vst:=sr div 10; sr :=rocket_sr; ystep:=3;end;
-MID_Tank       : begin dam:=32 ; vst:=1;         sr :=rocket_sr; end;
-MID_StunMine   : begin dam:=4  ; vst:=1;         sr :=100;       end;
-MID_Mine       : begin dam:=150; vst:=1;         sr :=100;       end;
-MID_Blizzard   : begin dam:=200; vst:=fr_fps;    sr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
-MID_SShot      : begin dam:=8  ; vst:=1;         sr :=0;         end;
-MID_SSShot     : begin dam:=12 ; vst:=1;         sr :=0;         end;
+MID_Bullet     : begin damage:=10 ; vstep:=1;              splashr :=0  ;       end;
+MID_Bulletx2   : begin damage:=20 ; vstep:=1;              splashr :=0  ;       end;
+MID_BPlasma    : begin damage:=20 ; vstep:=splashr div 15; splashr :=0  ;       end;
+MID_BFG        : begin damage:=200; vstep:=splashr div 8 ; splashr :=125;       end;
+MID_Flyer      : begin damage:=20 ; vstep:=splashr div 60; splashr :=0  ;       end;
+MID_HRocket    : begin damage:=200; vstep:=splashr div 15; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_Granade    : begin damage:=50 ; vstep:=splashr div 10; splashr :=rocket_sr; ystep:=3;end;
+MID_Tank       : begin damage:=60 ; vstep:=1;              splashr :=rocket_sr; end;
+MID_StunMine   : begin damage:=1  ; vstep:=1;              splashr :=100;       end;
+MID_Mine       : begin damage:=300; vstep:=1;              splashr :=100;       end;
+MID_Blizzard   : begin damage:=500; vstep:=fr_fps;         splashr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
+MID_SShot      : begin damage:=20 ; vstep:=1;              splashr :=0;         end;
+MID_SSShot     : begin damage:=30 ; vstep:=1;              splashr :=0;         end;
       else
-         vst:=0;
+         vstep:=0;
          exit;
       end;
 
-      if(vst<=0)then vst:=1;
+      if(vstep<=0)then vstep:=1;
+
+      hvstep:=vstep div 2;
 
       if(mtars=0)then
-       if(tar<=0)or(sr>0)
+       if(tar<=0)or(splashr>0)
        then mtars:=MaxUnits
        else mtars:=1;
 
-      dam+=adddmg;
+      damage+=adddmg;
 
       if(mid=MID_Revenant)then
        if(_players[player].upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
@@ -231,43 +233,9 @@ MID_SSShot     : begin dam:=12 ; vst:=1;         sr :=0;         end;
    end;
 end;
 
-{ with _players[player] do
- begin
-    if(upgr[upgr_attack]>0)then
-     case mid of
-MID_SShot,
-MID_Imp,
-MID_BPlasma    : inc(dam,upgr[upgr_attack]*2);
-MID_SSShot,
-MID_YPlasma,
-MID_Revenant,
-MID_RevenantS,
-MID_Flyer,
-MID_HRocket,
-MID_BFG,
-MID_Mancubus,
-MID_Cacodemon,
-MID_Baron,
-MID_Mine       : inc(dam,upgr[upgr_attack]*3);
-MID_ArchFire,
-MID_Granade,
-MID_Tank       : inc(dam,upgr[upgr_attack]*5);
-MID_Blizzard   : ;
-     else inc(dam,upgr[upgr_attack]);
-     end;
-
-    if(race=r_hell)then
-    if(upgr[upgr_misfst]>0)then
-     case mid of
-MID_Imp,
-MID_Cacodemon,
-MID_Baron      : vst:=vst-(vst div 2);
-     end;
- end;}
-
-function _miduid(mid,uid:byte):boolean;
+function MissileUIDCheck(mid,uid:byte):boolean;
 begin
-   _miduid:=false;
+   MissileUIDCheck:=false;
 
    case mid of
 MID_Imp       : if(uid=UID_Imp        )then exit;
@@ -280,7 +248,7 @@ MID_RevenantS : if(uid=UID_Revenant   )then exit;
 MID_StunMine  : if(uid=UID_UMine      )then exit;
    end;
 
-   _miduid:=true;
+   MissileUIDCheck:=true;
 end;
 
 
@@ -292,22 +260,25 @@ d,damd: integer;
 begin
    with _missiles[m] do
     if(_IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)and(_miduid(mid,tu^.uidi))and(_IsUnitRange(tu^.inapc,nil)=false)then
-      if(abs(mfs-tu^.uf)<2)then
+     if(tu^.hits>0)and(MissileUIDCheck(mid,tu^.uidi))and(_IsUnitRange(tu^.inapc,nil)=false)then
+      if(mfs<>tu^.ukfly)then
       begin
          teams:=_players[player].team=tu^.player^.team;
-         damd :=dam;
+         damd :=damage;
 
-         if(teams)and(sr>0)then
-          case mid of
-          MID_BFG,
-          MID_StunMine,
-          MID_ArchFire: exit;
-          end;
+         if(teams)then
+          if(splashr<=0)
+          then exit
+          else
+            case mid of
+            MID_BFG,
+            MID_StunMine,
+            MID_ArchFire: exit;
+            end;
 
          d:=dist2(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
-         if(sr<=0)then d-=10;
-         if(d < 0)then d:=0;
+         if(splashr<=0)then d-=10;
+         if(d<0)then d:=0;
 
          if(ServerSide)then
          begin
@@ -421,7 +392,7 @@ begin
               MID_SShot       : p:=2;
               MID_SSShot      : p:=4;
               end;
-           end; }
+            end; }
          end;
 
          if(d<=0)and(ntars=0)then // direct and first target
@@ -441,7 +412,7 @@ begin
                    tu^.buff[ub_pain]:=fr_fps;
                 end;
                 {$IFDEF _FULLGAME}
-                if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
+                if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                 {$ENDIF}
              end;
 
@@ -451,10 +422,10 @@ begin
             if(ServerSide)then _unit_damage(tu,damd,p,player);
          end
          else
-           if(sr>0)and(d<sr)then // splash damage
+           if(splashr>0)and(d<splashr)then // splash damage
            begin
               {$IFDEF _FULLGAME}
-              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),EID_BFG);
+              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),EID_BFG);
               {$ENDIF}
 
               if(ServerSide)then
@@ -463,14 +434,13 @@ begin
                   tu^.buff[ub_stun]:=fr_fps;
                   tu^.buff[ub_pain]:=fr_fps;
                   {$IFDEF _FULLGAME}
-                  _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),MID_BPlasma);
+                  _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                   {$ENDIF}
                end;
 
               if(mid in [MID_HRocket,MID_Tank,MID_Granade])then
               begin
                  if(tu^.uidi in armor_nosdmg)then exit;
-                 if(tu^.uidi in armor_lite  )then damd:=damd div 2;
               end;
 
               mtars-=1;
@@ -478,7 +448,7 @@ begin
 
               if(ServerSide)then
               begin
-                 damd:=mm3(0,trunc(damd*(1-(d/sr))),dam);
+                 damd:=mm3(0,trunc(damd*(1-(d/splashr))),damd);
                  _unit_damage(tu,damd,p,player);
               end;
            end;
@@ -493,40 +463,41 @@ var m,u:integer;
 begin
    for m:=1 to MaxMissiles do
    with _missiles[m] do
-   if(vst>0)then
+   if(vstep>0)then
    begin
       if(homing)and(_IsUnitRange(tar,@tu))then
       begin
          x  :=tu^.x;
          y  :=tu^.y;
-         mfs:=tu^.uf;
+         //mfs:=tu^.ukfly;
       end;
 
       if(mid=MID_Blizzard)then
       begin
-         if(vst>mb_s1)
+         if(vstep>mb_s1)
          then vy-=fr_fps
          else
-           if(vst=mb_s1)then
+           if(vstep=mb_s1)then
            begin
               vx:=x;
               vy:=y-(fr_fps*mb_s0);
            end
            else
-             if(vst<=mb_s0)then vy+=fr_fps;
+             if(vstep<=mb_s0)then vy+=fr_fps;
       end
       else
       begin
-         vx+=(x-vx) div vst;
-         vy+=(y-vy) div vst;
+         vx+=(x-vx) div vstep;
+         vy+=(y-vy) div vstep;
       end;
-      vst-=1;
+      vstep-=1;
+      if(vstep<=hvstep)then mfs:=mfe;
 
-      if(ystep>0)then vy-=vst div ystep;
+      if(ystep>0)then vy-=vstep div ystep;
 
-      if(vst=0)then
+      if(vstep=0)then
       begin
-         if(dam>0)then
+         if(damage>0)and(splashr>=0)then
           if _IsUnitRange(tar,nil)and(mtars=1)
           then _missle_damage(m)
           else
@@ -545,7 +516,7 @@ begin
       else
         with _mid_effs[mid] do
          if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
-          if((vst mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_depth(vy,mfs),ms_eid_fly);
+          if((vstep mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_depth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;

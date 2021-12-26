@@ -21,7 +21,7 @@ begin
    with pu^ do
    begin
       SoundPlayUnit(snd,pu,nil);
-      _effect_add(vx,vy,_depth(vy+1,uf),EID_HUpgr);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_HUpgr);
    end;
 end;
 
@@ -31,7 +31,7 @@ begin
    with uid^ do
    begin
       SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
    end;
 end;
 
@@ -39,7 +39,7 @@ procedure _uac_rocketl_eff(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _effect_add(vx,vy-15,_depth(vy+10,uf),EID_Exp2);
+      _effect_add(vx,vy-15,_depth(vy+10,ukfly),EID_Exp2);
       if(playeri=HPlayer)
       then SoundPlayUnit(snd_exp,nil,nil)
       else SoundPlayUnit(snd_exp,pu ,nil);
@@ -54,8 +54,8 @@ begin
    begin
       if(playeri=HPlayer)then
        if(bld)
-       then SoundPlayAnoncer(un_snd_ready[buff[ub_advanced]>0])
-       else SoundPlayAnoncer(snd_build_place[_urace]);
+       then SoundPlayAnoncer(un_snd_ready[buff[ub_advanced]>0],true)
+       else SoundPlayAnoncer(snd_build_place[_urace],false);
 
       if(bld=false)then exit;
 
@@ -67,7 +67,7 @@ begin
          if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
       SoundPlayUnit(un_eid_snd_ready[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_ready[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_ready[buff[ub_advanced]>0]);
    end;
 end;
 
@@ -87,7 +87,7 @@ begin
 
       if(fastdeath)then
       begin
-         _effect_add(vx,vy,_depth(vy+1,uf),un_eid_fdeath[buff[ub_advanced]>0]);
+         _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_fdeath[buff[ub_advanced]>0]);
          SoundPlayUnit(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
       end
       else
@@ -110,7 +110,7 @@ begin
       else
         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
 
-      _effect_add(vx,vy,_depth(vy+1,uf),un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
       SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
    end;
 end;
@@ -143,12 +143,12 @@ begin
 
       if(start)then
       begin
-         _effect_add(vx,vy,_depth(vy+1,uf),aw_eid_start);
+         _effect_add(vx,vy,_depth(vy+1,ukfly),aw_eid_start);
          SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
-         _effect_add(vx+aw_x,vy+aw_y,_depth(vy+1,uf),aw_eid_shot );
+         _effect_add(vx+aw_x,vy+aw_y,_depth(vy+1,ukfly),aw_eid_shot );
          SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
@@ -298,8 +298,8 @@ begin
       {$IFDEF _FULLGAME}
       if PointInScreenF(vx,vy,@_players[HPlayer])
       or PointInScreenF(tx,ty,@_players[HPlayer]) then SoundPlayUnit(snd_teleport,nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,uf),EID_Teleport);
-      _effect_add(tx,ty,_depth(ty+1,uf),EID_Teleport);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_Teleport);
+      _effect_add(tx,ty,_depth(ty+1,ukfly),EID_Teleport);
       {$ENDIF}
       buff[ub_teleeff]:=fr_fps;
       x     :=tx;
@@ -381,7 +381,7 @@ procedure _unit_umstrike_create(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_soaring,uf_soaring,0);
+      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,0);
       {$IFDEF _FULLGAME}
       _uac_rocketl_eff(pu);
       {$ENDIF}
@@ -546,14 +546,14 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(uf=uf_ground)and(inapc<=0)then
+      if(hits>0)and(speed<=0)and(ukfly=uf_ground)and(inapc<=0)then
       begin
          o:=tr+_r;
          d:=dist(x,y,tx,ty);
          add(x,y,d-o,o);
 
-         if(buid>0)then   // ?????????????????????
-          if(isbuildarea)and(bld)and(playeri=pl)then
+         if(buid>0)then
+          if(isbuildarea)and(buid in ups_builder)and(bld)and(playeri=pl)then
           begin
              o:=d-srange;
              if(o<dr)then
@@ -593,7 +593,7 @@ begin
     if(u<>uskip)then
      with _units[u] do
       with uid^ do
-       if(hits>0)and(speed<=0)and(uf=uf_ground)and(_IsUnitRange(inapc,nil)=false)then
+       if(hits>0)and(speed<=0)and(ukfly=uf_ground)and(_IsUnitRange(inapc,nil)=false)then
         if(dist(x,y,tx,ty)<(tr+_r))then
         begin
            _collisionr:=2;
@@ -630,9 +630,16 @@ end;
 
 function _InBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
 var u:integer;
-inrange,ebuilder:boolean;
 begin
    _InBuildArea:=0;
+
+   if(pl<=MaxPlayers)then
+    with _players[pl] do
+     if(n_builders<=0)then
+     begin
+        _InBuildArea:=1;
+        exit;
+     end;
 
    if(tx<map_b0)or(map_b1<tx)
    or(ty<map_b0)or(map_b1<ty)then
@@ -643,34 +650,25 @@ begin
 
    tr+=_uids[buid]._r;
 
-   inrange :=false;
-   ebuilder:=false;
+   _InBuildArea:=2;
 
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(_IsUnitRange(inapc,nil)=false)and(bld)and(playeri=pl)then
-      begin
-         if(_isbuilder)and(ebuilder=false)then
-          if(buid in ups_builder)then ebuilder:=true;
-
-         if(isbuildarea)and(inrange=false)then
-         begin
-            if(_ukbuilding)then
-             if(speed>0)or(uf>uf_ground)then continue;
-            if(dist(x,y,tx,ty)<srange)then inrange:=true;
-         end;
-
-         if(ebuilder)and(inrange)then break;
-      end;
-
-   if(ebuilder=false)
-   then _InBuildArea:=1
-   else
-      if(inrange=false)then _InBuildArea:=2;
+      if(isbuildarea)and(hits>0)and(_IsUnitRange(inapc,nil)=false)and(bld)and(playeri=pl)then
+       if(buid in ups_builder)then
+       begin
+          if(_ukbuilding)then
+           if(speed>0)or(ukfly=uf_fly)then continue;
+          if(dist(x,y,tx,ty)<srange)then
+          begin
+             _InBuildArea:=0;
+             break;
+          end;
+       end;
 end;
 
-function _CheckBuildPlace(tx,ty,tr,uskip:integer;pl,buid:byte;obstacles:boolean):byte;
+function _CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte;obstacles:boolean):byte;
 var i:byte;
 begin
    _CheckBuildPlace:=0;
@@ -682,7 +680,7 @@ begin
    else m_brushc:=c_gray;
    }
 
-   i:=_InBuildArea(tx,ty,0,buid,pl);
+   i:=_InBuildArea(tx,ty,0,buid,playern);
    case i of
    0  : ;
    2  : begin _CheckBuildPlace:=2;exit;end;
@@ -746,8 +744,8 @@ begin
       begin
          n_smiths+=1;
          if(buff[ub_advanced]>0)
-         then pprodm+=2
-         else pprodm+=1;
+         then upprodm+=2
+         else upprodm+=1;
       end;
    end;
 end;
@@ -769,8 +767,8 @@ begin
       begin
          n_smiths-=1;
          if(buff[ub_advanced]>0)
-         then pprodm-=2
-         else pprodm-=1;
+         then upprodm-=2
+         else upprodm-=1;
       end;
    end;
 end;
@@ -989,8 +987,8 @@ begin
        with player^ do
        with _upids[upid] do
        begin
-          pproda+=1;
-          pprodu[upid]+=1;
+          upproda+=1;
+          upprodu[upid]+=1;
           cenerg-=_up_renerg;
           pprod_r[pn]:=_up_time;
           pprod_u[pn]:=upid;
@@ -1024,8 +1022,8 @@ begin
       begin
          upid:=pprod_u[pn];
 
-         pproda-=1;
-         pprodu[upid]-=1;
+         upproda-=1;
+         upprodu[upid]-=1;
          cenerg+=_upids[upid]._up_renerg;
          pprod_r[pn]:=0;
 
@@ -1132,7 +1130,7 @@ begin
    with uid^ do
    begin
       dir:=p_dir(x,y,uo_x,uo_y);
-      if(_uids[_uid]._uf>uf_ground)
+      if(_uids[_uid]._ukfly=uf_fly)
       then sr:=0
       else sr:=_r;//+_uids[_uid]._r;
 
@@ -1154,7 +1152,7 @@ begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
                if PointInScreenF(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then SoundPlayUnit(snd_teleport,nil,nil);
-               _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.uf),EID_Teleport);
+               _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
          end;
@@ -1212,7 +1210,7 @@ begin
           upgr[_uid]+=1;
           _unit_cupgrade_p(pu,255,i);
           {$IFDEF _FULLGAME}
-          if(playeri=HPlayer)then SoundPlayAnoncer(snd_upgrade_complete[_urace]);
+          if(playeri=HPlayer)then SoundPlayAnoncer(snd_upgrade_complete[_urace],true);
           {$ENDIF}
        end
        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
@@ -1227,7 +1225,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      if(_uid_player_limit(player,auid))
+      if(_uid_player_limit(player,auid)=false)
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
@@ -1256,7 +1254,7 @@ begin
       {$IFDEF _FULLGAME}
       else
         case auid of
-UID_LostSoul: _pain_lost_fail(tx,ty,_depth(ty+1,uf),nil);
+UID_LostSoul: _pain_lost_fail(tx,ty,_depth(ty+1,ukfly),nil);
         end;
       {$ENDIF};
    end;
@@ -1278,7 +1276,7 @@ end;
 function _itcanapc(uu,tu:PTUnit):boolean;
 begin
    _itcanapc:=false;
-   if(tu^.uf>uf_ground)then exit;
+   if(tu^.ukfly=uf_fly)then exit;
    if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
     if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;
@@ -1291,13 +1289,7 @@ begin
    begin
       for i:=0 to MaxUnitBuffs do
        if(0<buff[i])and(buff[i]<_ub_infinity)then
-       begin
-          buff[i]-=1;
-          {if(i=ub_stopattack)and(ServerSide)then
-           if(bld)and(speed>0)and(tar1=0)then
-            if(buff[i]=0)then
-             if(x<>uo_x)or(y<>uo_y)then dir:=p_dir(x,y,uo_x,uo_y);}
-       end;
+        buff[i]-=1;
 
       for i:=0 to MaxPlayers do
       begin
@@ -1362,25 +1354,25 @@ uab_uac__unit_adv:
 uab_CCFly:
            if(buff[ub_advanced]>0)then
            begin
-              if(uf<>flyCC_floor)then
+              if(ukfly<>uf_fly)then
               begin
                  {$IFDEF _FULLGAME}
                  SoundPlayUnit(snd_CCup ,pu,nil);
                  {$ENDIF}
-                 uf   :=flyCC_floor;
-                 zfall:=-fly_height[uf];
+                 ukfly:=uf_fly;
+                 zfall:=-fly_hz;
               end;
               speed:=_speed;
            end
            else
            begin
-              if(uf<>uf_ground)then
+              if(ukfly<>uf_ground)then
               begin
                  {$IFDEF _FULLGAME}
                  SoundPlayUnit(snd_inapc,pu,nil);
                  {$ENDIF}
-                 zfall:=fly_height[uf];
-                 uf   :=uf_ground;
+                 zfall:=fly_hz;
+                 ukfly:=uf_ground;
               end;
               speed:=0;
 
@@ -1428,29 +1420,28 @@ UID_Major,
 UID_ZMajor:
            if(buff[ub_advanced]>0)then
            begin
-              if(uf<>uf_fly)then
+              if(ukfly<>uf_fly)then
               begin
                  {$IFDEF _FULLGAME}
                  SoundPlayUnit(snd_jetpon ,pu,nil);
                  {$ENDIF}
                  zfall:=-fly_height[uf_fly];
               end;
-              uf   :=uf_fly;
-              speed:=_speed+4;
+              ukfly:=uf_fly;
+              speed:=_speed+_speed;
            end
            else
            begin
-              if(uf<>uf_ground)then
+              if(ukfly<>uf_ground)then
               begin
                  {$IFDEF _FULLGAME}
                  SoundPlayUnit(snd_jetpoff,pu,nil);
                  {$ENDIF}
                  zfall:= fly_height[uf_ground];
               end;
-              uf   :=uf_ground;
+              ukfly:=uf_ground;
               speed:=_speed;
            end;
-UID_HSymbol: isbuildarea:=true;
       end;
       if(_isbuilder)then isbuildarea:=true;
 

@@ -49,7 +49,7 @@ begin
                                  UID_LostSoul      ..UID_ZBFG,
                                  UID_UCommandCenter..UID_UMine,
                                  UID_Engineer      ..UID_Flyer  ],
-                                255,true);
+                                MaxUnits,true);
 
        PlayerSetAllowedUpgrades(p,[0..255],255,true);
 
@@ -104,13 +104,12 @@ begin
    G_Step         :=0;
    G_Paused       :=0;
    G_WTeam        :=255;
-   g_player_status:=255;
+   G_player_status:=255;
 
-   ServerSide :=true;
+   ServerSide     :=true;
 
-   FillChar(g_cpoints ,SizeOf(g_cpoints ),0);
+   FillChar(g_cpoints,SizeOf(g_cpoints),0);
    FillChar(_missiles,SizeOf(_missiles),0);
-
    FillChar(_units   ,SizeOf(_units   ),0);
 
    for u:=0 to MaxUnits do
@@ -153,7 +152,7 @@ begin
    ui_tab :=0;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
-   ui_builders_n:=0;
+   UIClearBuilderAreas;
 
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
@@ -167,24 +166,22 @@ begin
    ui_umark_u:=0;
    ui_umark_t:=0;
 
-   mouse_select_x0  :=-1;
+   mouse_select_x0:=-1;
    m_brush:=-32000;
 
-   _fog   :=true;
+   rpls_fog   :=true;
 
    _svld_str:='';
 
-   _rpls_pnu :=0;
-   _rpls_vidm:=false;
-   if(_rpls_rst>rpl_wunit)then _rpls_rst:=rpl_none;
+   rpls_pnu  :=0;
+   rpls_plcam:=false;
+   if(rpls_state>rpl_wunit)then rpls_state:=rpl_none;
    {$ELSE}
    {$ENDIF}
 end;
 
 {$IFDEF _FULLGAME}
 {$include _replays.pas}
-
-
 
 {$ENDIF}
 
@@ -514,7 +511,13 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                                      uo_tar:=0;
                                      if((_ability=0)and(apcc<=0))or(speed<=0)
                                      then uo_id:=ua_amove
-                                     else uo_id:=ua_paction;
+                                     else
+                                     begin
+                                       case _ability of
+                                       uab_CCFly: uo_y-=fly_hz;
+                                       end;
+                                       uo_id:=ua_paction;
+                                     end;
                                      _unit_turn(pu);
                                   end;
                     co_action  :  _unit_action   (pu);
@@ -622,6 +625,7 @@ begin
                 vid_menu_redraw:=true;
              end;
         end;
+        if(log_net_pause>0)then log_net_pause-=1;
 
         if(G_Started)and(G_Paused=0)and(ServerSide)then
         begin
@@ -840,7 +844,6 @@ begin
    vid_rtui:=vid_rtui mod vid_rtuis;
 
    SoundControl;
-
 
    if(net_status=ns_clnt)then net_GClient;
    _rpls_code;

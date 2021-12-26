@@ -28,9 +28,9 @@ begin
         ey:=mm3(0,(y+r) div pf_pathmap_w,pf_pathmap_c);
 
         for ix:=sx to ex do
-        for iy:=sy to ey do
-        if(dist(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,x,y)<=(r-bld_dec_mr))then
-        pf_pathgrid_areas[ix,iy]:=pf_solid;
+         for iy:=sy to ey do
+          if(dist(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,x,y)<=(r-bld_dec_mr))then
+           pf_pathgrid_areas[ix,iy]:=pf_solid;
      end;
 
    ex:=round(map_mw/pf_pathmap_w);
@@ -62,7 +62,7 @@ begin
    else pf_get_area:=pf_pathgrid_areas[cx,cy];
 end;
 
-
+{
 function pf_find(startx,starty,endx,endy:integer;nextx,nexty:pinteger):boolean;
 var i,pfdist,pfvx,pfvy,
 
@@ -73,7 +73,7 @@ begin
    pfCellDistance:=max2(abs(_sx-_ex),abs(_sy-_ey));
 end;
 
-function pfAddNode(cx,cy,rx,ry:integer):boolean;
+{function pfAddNode(cx,cy,rx,ry:integer):boolean;
 begin
    pfAddNode:=false;
    if(pfNodes_c>=pfMaxNodes)then exit;
@@ -91,7 +91,7 @@ begin
    end;
    pf_pathgrid_tmpg[cx,cy]:=pf_pathgrid_tmpb;
    pfAddNode:=true;
-end;
+end; }
 
 procedure pfCalcVector(_sx,_sy,_ex,_ey:integer;_vx,_vy:pinteger);
 //var dx,dy:integer;
@@ -179,7 +179,7 @@ end;
 
 
 
-procedure pf_unit(pu:PTUnit);
+{procedure pf_unit(pu:PTUnit);
 var _pos_cx,
     _pos_cy,
     _mv_cx,
@@ -246,8 +246,8 @@ begin
       mv_x:=pf_mv_nx;
       mv_y:=pf_mv_ny;
    end;
-end;
+end;  }
 
-
+   }
 
 

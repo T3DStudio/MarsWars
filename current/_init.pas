@@ -45,11 +45,11 @@ procedure StartParams;
 var t:integer;
 begin
    t:=ParamCount;
-   net_sv_port:=10666;
+   net_port:=10666;
    if(t>0)then
    begin
-      net_sv_port:=s2w(ParamStr(1));
-      if(net_sv_port=0)then net_sv_port:=10666;
+      net_port:=s2w(ParamStr(1));
+      if(net_port=0)then net_port:=10666;
    end;
 end;
 

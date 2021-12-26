@@ -1,5 +1,5 @@
 
-procedure escape_key;
+procedure input_key_escape;
 begin
    if(ingame_chat)then
    begin
@@ -9,9 +9,9 @@ begin
    else ToggleMenu;
 end;
 
-procedure return_key;
+procedure input_key_return;
 begin
-   if(_menu=false)and(not ingame_chat)and(net_status<>ns_none)
+   if(_menu=false)and(not ingame_chat)//and(net_status<>ns_none)
    then ingame_chat:=true
    else
     if(menu_item=100)or(ingame_chat)then
@@ -19,21 +19,21 @@ begin
        if(length(net_chat_str)>0)then
         if(net_status=ns_clnt)
         then net_send_chat
-        else PlayersAddLog(HPlayer,net_chat_tar,lmt_game,net_chat_str);
+        else PlayersAddLog(HPlayer,net_chat_tar,HPlayer,net_chat_str);//message type = player number (chat)
        net_chat_str:='';
        ingame_chat:=false;
     end;
 end;
 
-procedure TogglePause;
+procedure GameTogglePause;
 begin
    if(net_status=ns_clnt)
    then net_pause
    else
-     if(net_status=ns_srvr)then
-       if(G_paused=0)
-       then G_paused:=HPlayer
-       else G_paused:=0;
+    if(net_status=ns_srvr)then
+     if(G_paused=0)
+     then G_paused:=HPlayer
+     else G_paused:=0;
 end;
 
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
@@ -117,7 +117,7 @@ end;
 
 procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
 begin
-   if(G_Paused=0)and(_rpls_rst<rpl_rhead)then
+   if(G_Paused=0)and(rpls_state<rpl_rhead)then
    begin
       if(net_status=ns_clnt)then
       begin
@@ -196,7 +196,7 @@ begin
        then m_brush:=co_empty
        else
        begin
-          if not(m_brush in ui_prod_builds)then
+          if not(m_brush in ui_prod_builds)or(n_builders<=0)then
           begin
              m_brush:=co_empty;
              exit;
@@ -281,7 +281,7 @@ begin
    9 : case bx of         // buttons
        0 : ToggleMenu;
        1 : ;
-       2 : if(net_status>ns_none)then TogglePause;
+       2 : if(net_status>ns_none)then GameTogglePause;
        end;
    else
      u:=(by*3)+(bx mod 3);
@@ -290,7 +290,7 @@ begin
      with _players[HPlayer] do
       case tab of
 
-0: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // buildings
+0: if(G_Paused=0)and(rpls_state<rpl_runit)then  // buildings
    if(u<=ui_ubtns)then
    case right of
 false: begin
@@ -307,21 +307,21 @@ true : if(uid_x[ui_panel_uids[race,0,u]]>0)then
          with _units[uid_x[ui_panel_uids[race,0,u]]] do _command(x,y);
    end;
 
-1: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // units
+1: if(G_Paused=0)and(rpls_state<rpl_runit)then  // units
    if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_suprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
 true : _player_s_o(co_cuprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
    end;
 
-2: if(G_Paused=0)and(_rpls_rst<rpl_runit)then  // upgrades
+2: if(G_Paused=0)and(rpls_state<rpl_runit)then  // upgrades
    if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
 true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
    end;
 
-3: if(_rpls_rst<rpl_rhead)then
+3: if(rpls_state<rpl_rhead)then
    begin
       if(G_Paused=0)and(right=false)then
       begin
@@ -354,24 +354,24 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      if(u=13)then
      begin
         if(mid)
-        then _rpls_step:=fr_2hfps*fr_fps
+        then rpls_step:=fr_2hfps*fr_fps
         else
           if(right=false)
-          then _rpls_step:=fr_2hfps*2
-          else _rpls_step:=fr_2hfps*10;
+          then rpls_step:=fr_2hfps*2
+          else rpls_step:=fr_2hfps*10;
      end
      else
        if(right=false)then
         case u of
      12: _fsttime:=not _fsttime;
-     14: if(_rpls_rst<rpl_end)then
+     14: if(rpls_state<rpl_end)then
           if(G_Paused>0)
           then G_Paused:=0
           else G_Paused:=200;
-     15: _rpls_vidm:=not _rpls_vidm;
-     16: _rpls_log :=not _rpls_log;
-     17: _fog      :=not _fog;
- 20..26: HPlayer   :=u-20;
+     15: rpls_plcam :=not rpls_plcam;
+     16: rpls_showlog:=not rpls_showlog;
+     17: rpls_fog    :=not rpls_fog;
+ 20..26: HPlayer    :=u-20;
         end;
 
       end;
@@ -382,7 +382,7 @@ procedure _hotkeys(k:cardinal);
 var ko,k2:cardinal;
 begin
    if(k=sdlk_pause)
-   then TogglePause
+   then GameTogglePause
    else
       case k of
       sdlk_tab: begin
@@ -399,7 +399,7 @@ begin
             sdlk_home      : _warpten:=not _warpten;
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
             sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
-            sdlk_backspace : _fog:=not _fog;
+            sdlk_backspace : rpls_fog:=not rpls_fog;
             SDLK_F5        : begin HPlayer:=0;exit end;
             SDLK_F6        : begin HPlayer:=1;exit end;
             SDLK_F7        : begin HPlayer:=2;exit end;
@@ -410,7 +410,7 @@ begin
             sdlk_insert    : r_draw:= not r_draw;
          end;
 
-        if(_rpls_rst<rpl_rhead)then
+        if(rpls_state<rpl_rhead)then
         begin
            k2:=0;
            if(k_ctrl >1)then k2:=SDLK_LCtrl;
@@ -511,14 +511,14 @@ begin
       SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
                             SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
                             SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
-                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(_rpls_vidm=false)then m_vmove:=true;
+                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
                                                       36: ScrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1 );
-                                                      41: ScrollInt(@_rpls_sm,1,0,_rpls_ln-vid_rpls_m-1 );
+                                                      41: ScrollInt(@rpls_list_scroll,1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
                                                    else tmpmid-=1;
@@ -528,7 +528,7 @@ begin
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
                                                       36: ScrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1 );
-                                                      41: ScrollInt(@_rpls_sm,-1,0,_rpls_ln-vid_rpls_m-1 );
+                                                      41: ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
                                                    else tmpmid+=1;
@@ -568,8 +568,8 @@ begin
                                 sdlk_ralt   : if(k_alt  =0)then k_alt  :=2;
                                 sdlk_lalt   : if(k_alt  =0)then k_alt  :=2;
                                 sdlk_print  : _screenshot;
-                                sdlk_escape : escape_key;
-                                sdlk_return : return_key;
+                                sdlk_escape : input_key_escape;
+                                sdlk_return : input_key_return;
                               else
                                 if(_menu=false)and(G_Started)and(ingame_chat=false)then _hotkeys(_event^.key.keysym.sym);
                               end;
@@ -617,7 +617,7 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
-            else SoundPlayAnoncer(snd_cannot_build[_players[HPlayer].race]);
+            else SoundPlayAnoncer(snd_cannot_build[_players[HPlayer].race],true);
 co_paction,
 co_move,
 co_amove,
@@ -632,7 +632,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
       co_amove,
       co_patrol,
       co_apatrol : _command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
-      else         if(_rpls_vidm=false)then m_mmap_move:=true;
+      else         if(rpls_plcam=false)then m_mmap_move:=true;
       end
       else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
 
@@ -653,7 +653,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
             then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer)
             else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer);
 
-            if(G_Paused=0)and(_rpls_rst<rpl_runit)then
+            if(G_Paused=0)and(rpls_state<rpl_runit)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 
@@ -708,7 +708,7 @@ end;
 
 procedure g_keyboard;
 begin
-   if(m_vmove=false)and(_rpls_vidm=false)then _view_move;
+   if(m_vmove=false)and(rpls_plcam=false)then _view_move;
    if(ingame_chat)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen2);
 end;
 

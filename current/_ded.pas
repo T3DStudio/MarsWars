@@ -1,20 +1,20 @@
 
 procedure _dedInit;
 begin
-   net_nstat:=ns_srvr;
+   net_status:=ns_srvr;
    if(net_UpSocket=false)then
    begin
       net_dispose;
-      net_nstat:=ns_none;
+      net_status:=ns_none;
       _CYCLE:=false;
    end
    else
    begin
       HPlayer:=0;
-      DefPlayers;
+      PlayersSetDefault;
    end;
 
-   vid_mredraw:=true;
+   vid_menu_redraw:=true;
 end;
 
 
@@ -25,12 +25,11 @@ begin
     with _Players[p] do
      if(state=ps_none)then
      begin
-        if(g_mode in [gm_scir,gm_ct])then  team:=t;
+        if(g_mode in [gm_scir,gm_cptp])then  team:=t;
         race:=r;
         mrace:=race;
-        state:=ps_comp;
         ai_skill:=a;
-        _playerSetState(p);
+        PlayerSetState(p,ps_comp);
         break;
      end;
 end;
@@ -40,11 +39,7 @@ var p:byte;
 begin
    for p:=1 to MaxPlayers do
     with _Players[p] do
-    if(state=ps_comp)then
-    begin
-       state:=ps_none;
-       _playerSetState(p);
-    end;
+     if(state=ps_comp)then PlayerSetState(p,ps_none);
 end;
 
 procedure cmp_ffa;
@@ -56,8 +51,7 @@ begin
 end;
 
 procedure _parseCmd(msg:string;pl:byte);
-var
-    v      : shortstring;
+var v      : shortstring;
     l,p,a  : byte;
     args   : array of shortstring;
 function _a2r(s:shortstring):byte;
@@ -66,7 +60,6 @@ begin
    if(s='H')or(s='h')then _a2r:=r_hell;
    if(s='U')or(s='u')then _a2r:=r_uac;
 end;
-
 begin
    if(length(msg)=0)then exit;
    if(ord(msg[1])<=MaxPlayers)then delete(msg,1,1);
@@ -110,26 +103,26 @@ begin
    '-h',
    '-help':
    begin
-      net_chat_add('MarsWars dedicated server, '+str_ver  ,0,255);
-      net_chat_add('New map: -m [seed size lakes obs sym]',0,255);
-      net_chat_add('Add AI player: -p [R/H/U team skill]' ,0,255);
-      net_chat_add('Remove all AI players: -k or -noai'   ,0,255);
-      net_chat_add('Set 1..6 teams to AI players: -ffa'   ,0,255);
-      net_chat_add('Game moddes: -s - scirmish'           ,0,255);
-      net_chat_add('  -f2/3- 2/3 fortress, -i - invasion' ,0,255);
-      net_chat_add('  -c - capturing points, -a - assault',0,255);
-      net_chat_add('  -rb - royal battle'                 ,0,255);
-      net_chat_add('  -ud/-d2 - UDOOM/DOOM 2 mode'        ,0,255);
-      net_chat_add('Show/hide player starts: -ps'         ,0,255);
-      net_chat_add('Starting base options: -st 1-6'       ,0,255);
-      net_chat_add('Fill empty slots with AI: -fs 0-7'    ,0,255);
+      PlayersAddLog(0,log_to_all,lmt_game,'MarsWars dedicated server, '+str_ver  );
+      PlayersAddLog(0,log_to_all,lmt_game,'New map: -m [seed size lakes obs sym]');
+      PlayersAddLog(0,log_to_all,lmt_game,'Add AI player: -p [R/H/U team skill]' );
+      PlayersAddLog(0,log_to_all,lmt_game,'Remove all AI players: -k or -noai'   );
+      PlayersAddLog(0,log_to_all,lmt_game,'Set 1..6 teams to AI players: -ffa'   );
+      PlayersAddLog(0,log_to_all,lmt_game,'Game moddes: -s - scirmish'           );
+      PlayersAddLog(0,log_to_all,lmt_game,'  -f2/3- 2/3 fortress, -i - invasion' );
+      PlayersAddLog(0,log_to_all,lmt_game,'  -c - capturing points, -a - assault');
+      PlayersAddLog(0,log_to_all,lmt_game,'  -rb - royal battle'                 );
+      PlayersAddLog(0,log_to_all,lmt_game,'  -ud/-d2 - UDOOM/DOOM 2 mode'        );
+      PlayersAddLog(0,log_to_all,lmt_game,'Show/hide player starts: -ps'         );
+      PlayersAddLog(0,log_to_all,lmt_game,'Starting base options: -st 1-6'       );
+      PlayersAddLog(0,log_to_all,lmt_game,'Fill empty slots with AI: -fs 0-7'    );
       exit;
    end;
    '-m'  : if(a<6)
            then begin Map_randommap; Map_premap;end
            else
            begin
-              _SetRandomSeed(s2c(args[1]));
+              map_seed:=s2c(args[1]);
               map_mw  :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
               map_liq :=min2(7,s2b(args[3]));
               map_obs :=min2(7,s2b(args[4]));
@@ -148,30 +141,30 @@ begin
    '-f3' : begin g_mode:=gm_3fort; Map_premap; end;
    '-s'  : begin g_mode:=gm_scir;  Map_premap; cmp_ffa; end;
    '-i'  : begin g_mode:=gm_inv;   Map_premap; end;
-   '-c'  : begin g_mode:=gm_ct;    Map_premap; cmp_ffa; end;
+   '-c'  : begin g_mode:=gm_cptp;  Map_premap; cmp_ffa; end;
    '-a'  : begin g_mode:=gm_aslt;  Map_premap; end;
    '-rb' : begin g_mode:=gm_royl;  Map_premap; end;
-   '-ps' : g_shpos:=not g_shpos;
-   '-st' : if(a=2)then G_startb :=mm3(0,s2b(args[1])-1,gms_g_startb);
-   '-fs' : if(a=2)then G_aislots:=mm3(0,s2b(args[1]),7);
+   '-ps' : g_show_positions:=not g_show_positions;
+   '-st' : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
+   '-fs' : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
    else exit;
    end;
-   vid_mredraw:=true;
+   vid_menu_redraw:=true;
 end;
 
 procedure _dedCode;
 begin
    case G_Started of
-false: if(_PlayersReady)then
+false: if(PlayersReadyStatus)then
        begin
-          vid_mredraw:=true;
+          vid_menu_redraw:=true;
           G_Started:=true;
-          _StartSkirmish;
+          GameStartSkirmish;
        end;
-true : if(_plsOut)then
+true : if(PlayerAllOut)then
        begin
           G_Started:=false;
-          DefGameObjects;
+          PlayersSetDefault;
        end;
    end;
 end;
@@ -216,8 +209,8 @@ begin
    then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0, '',0)
    else with _players[p] do
         if(state<>ps_none)
-        then _screenLine(name      ,1   , _PlyerStatus(p)  ,15, str_race[mrace],25, b2s(PickPlayerTeam(g_mode,p)),35, '',0, '',0)
-        else _screenLine(name      ,1   , _PlyerStatus(p)  ,15, '-----'        ,25, '-'                          ,35, '',0, '',0);
+        then _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, b2s(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
+        else _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '-----'        ,25, '-'                         ,35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -232,24 +225,24 @@ end;
 
 procedure _dedScreen;
 begin
-   if(vid_mredraw)then
+   if(vid_menu_redraw)then
    begin
       clrscr;
       consoley:=0;
-      vid_mredraw:=false;
+      vid_menu_redraw:=false;
    end;
 
    if(consoley<=fr_fps)then
    begin
       case consoley of
-      0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_sv_port);
+      0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
       3 : writeln('         ',str_gaddon  ,' ',str_addon  [g_addon] );
       4 : writeln('         ',str_gmodet  ,' ',str_gmode  [g_mode ] );
-      6 : writeln('         ',str_sstarts ,' ',g_shpos              );
-      8 : writeln('         ',str_starta  ,' ',str_startat[g_startb]);
-      10: writeln('         ',str_aislots ,' ',G_aislots            );
+      6 : writeln('         ',str_sstarts ,' ',g_show_positions     );
+      8 : writeln('         ',str_starta  ,' ',str_startat[g_start_base]);
+      10: writeln('         ',str_aislots ,' ',g_ai_slots           );
       11: writeln;
       12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym       ,56);
       14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2pm[map_sym][2],56);

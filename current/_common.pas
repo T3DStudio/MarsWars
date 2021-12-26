@@ -71,33 +71,44 @@ begin
    end;
 end;
 
-
-procedure PlayerAddLog(pn:byte;mtype:char;str:shortstring);
+procedure PlayerAddLog(ptarget,psender:byte;mtype:byte;str:shortstring);
 begin
-   if(pn>MaxPlayers)then exit;
+   if(ptarget>MaxPlayers)then exit;
 
-   with _players[pn] do
+   with _players[ptarget] do
    if(state>ps_none)then
    begin
       log_n+=1;
       log_i+=1;
       if(log_i>MaxPlayerLog)then log_i:=0;
 
-      case mtype of
-      lmt_chat : log_l[log_i]:=mtype+str;
-      end;
+      log_ls[log_i]:=str;
+      log_lt[log_i]:=mtype;
 
-      if(pn=HPlayer)then ;//sound and effects
+      {$IFDEF _FULLGAME}
+      net_chat_shlm  :=chat_shlm_t;
+      vid_menu_redraw:=true;
+      if((ptarget=HPlayer)and(psender<>ptarget))
+      or((rpls_state>=rpl_rhead)and(HPlayer=0))then
+      begin
+         ui_chat_sound  :=true;
+      end;
+      {$ENDIF}
    end;
 end;
 
-procedure PlayersAddLog(playern,to_players:byte;mtype:char;str:shortstring);
+procedure PlayersAddLog(playern,to_players:byte;mtype:byte;str:shortstring);
 var i:byte;
 begin
    for i:=0 to MaxPlayers do
     if((to_players and (1 shl i))>0)
     or(i=playern)
-    or(i=0)then PlayerAddLog(i,mtype,str);
+    or(i=0)then PlayerAddLog(i,playern,mtype,str);
+end;
+procedure GameLogPlayerDefeat(pl:byte);
+begin
+   if(pl>MaxPlayers)then exit;
+   PlayersAddLog(pl,log_to_all,lmt_defeat,_players[pl].name);
 end;
 
 procedure PlayerClearLog(pn:byte);
@@ -106,7 +117,8 @@ begin
 
    with _players[pn] do
    begin
-      FillChar(log_l,SizeOf(log_l),0);
+      FillChar(log_ls,SizeOf(log_ls),0);
+      FillChar(log_lt,SizeOf(log_lt),0);
       log_n:=0;
       log_i:=0;
    end;
@@ -118,6 +130,64 @@ begin
    for i:=0 to MaxPlayers do PlayerClearLog(i);
 end;
 
+function PlayersReadyStatus:boolean;
+var p,c,r:byte;
+begin
+   c:=0;
+   r:=0;
+   for p:=1 to MaxPlayers do
+    with _players[p] do
+     if(state=ps_play)then
+     begin
+        c+=1;
+        if(ready)or(p=HPlayer)then r+=1;
+     end;
+   PlayersReadyStatus:=(r=c)and(c>0);
+end;
+
+function PlayerGetTeam(gm,p:byte):byte;
+begin
+   if(p=0)
+   then PlayerGetTeam:=0
+   else
+     case gm of
+     gm_aslt,
+     gm_2fort: case p of
+               1..3: PlayerGetTeam:=1;
+               4..6: PlayerGetTeam:=4;
+               end;
+     gm_3fort: case p of
+               1,2 : PlayerGetTeam:=1;
+               3,4 : PlayerGetTeam:=3;
+               5,6 : PlayerGetTeam:=5;
+               end;
+     gm_inv  : PlayerGetTeam:=1;
+     else      PlayerGetTeam:=_players[p].team;
+     end;
+end;
+
+function PlayerGetStatus(p:integer):char;
+begin
+   with _players[p] do
+   begin
+      PlayerGetStatus:=str_ps_c[state];
+      if(state=ps_play)then
+      begin
+         if(g_started=false)
+         then PlayerGetStatus:=b2pm[ready,2]
+         else PlayerGetStatus:=str_ps_c[ps_play];
+         if(ttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
+         {$IFDEF _FULLGAME}
+         if(net_cl_svpl=p)then
+         begin
+            PlayerGetStatus:=str_ps_sv;
+            if(net_cl_svttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
+         end;
+         {$ENDIF}
+      end;
+      if(p=HPlayer)then PlayerGetStatus:=str_ps_h;
+   end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -257,13 +327,20 @@ end;
 
 function _randomx(x,m:integer):integer;
 begin
-   map_iseed+=word(x);
-   _randomx:=_random(m);
+   if(m=0)
+   then _randomx:=0
+   else
+   begin
+      map_iseed+=word(x);
+      _randomx:=_random(m);
+   end;
 end;
 
 function _randomr(r:integer):integer;
 begin
-   _randomr:=_random(r)-_random(r);
+   if(r=0)
+   then _randomr:=0
+   else _randomr:=_random(r)-_random(r);
 end;
 
 procedure WriteSDLError;
@@ -326,25 +403,10 @@ begin
       setr(ureq_energy , cenerg<_up_renerg                     );
       setr(ureq_time   , _up_time<=0                           );
       setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
-      setr(ureq_max    ,(integer(upgr[up]+pprodu[up])>=min2(_up_max,a_upgrs[up])));
-      setr(ureq_product,(_up_mfrg=false)and(pprodu[up]>0)      );
+      setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));
+      setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)      );
       setr(ureq_smiths , n_smiths<=0                           );
    end;
-end;
-
-function PlayersReadyStatus:boolean;
-var p,c,r:byte;
-begin
-   c:=0;
-   r:=0;
-   for p:=1 to MaxPlayers do
-    with _players[p] do
-     if(state=ps_play)then
-     begin
-        c+=1;
-        if(ready)or(p=HPlayer)then r+=1;
-     end;
-   PlayersReadyStatus:=(r=c)and(c>0);
 end;
 
 function _Hi2Si(h,mh:integer;s:single):shortint;
@@ -376,51 +438,6 @@ begin
      end;
 end;
 
-
-function PlayerGetTeam(gm,p:byte):byte;
-begin
-   if(p=0)
-   then PlayerGetTeam:=0
-   else
-     case gm of
-     gm_aslt,
-     gm_2fort: case p of
-               1..3: PlayerGetTeam:=1;
-               4..6: PlayerGetTeam:=4;
-               end;
-     gm_3fort: case p of
-               1,2 : PlayerGetTeam:=1;
-               3,4 : PlayerGetTeam:=3;
-               5,6 : PlayerGetTeam:=5;
-               end;
-     gm_inv  : PlayerGetTeam:=1;
-     else      PlayerGetTeam:=_players[p].team;
-     end;
-end;
-
-function PlayerGetStatus(p:integer):char;
-begin
-   with _players[p] do
-   begin
-      PlayerGetStatus:=str_ps_c[state];
-      if(state=ps_play)then
-      begin
-         if(g_started=false)
-         then PlayerGetStatus:=b2pm[ready,2]
-         else PlayerGetStatus:=str_ps_c[ps_play];
-         if(ttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
-         {$IFDEF _FULLGAME}
-         if(net_cl_svpl=p)then
-         begin
-            PlayerGetStatus:=str_ps_sv;
-            if(net_cl_svttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
-         end;
-         {$ENDIF}
-      end;
-      if(p=HPlayer)then PlayerGetStatus:=str_ps_h;
-   end;
-end;
-
 function _UnitHaveRPoint(uid:byte):boolean;
 begin
    with _uids[uid] do
@@ -430,7 +447,7 @@ end;
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
 begin
    {$IFDEF _FULLGAME}
-   if(_rpls_rst>=rpl_rhead)and(HPlayer=0)
+   if(rpls_state>=rpl_rhead)and(HPlayer=0)
    then _uvision:=true
    else
    {$ENDIF}
@@ -478,7 +495,7 @@ begin
    cy:=y div fog_cw;
    fog_check:=false;
    if(0<=cx)and(cx<=fog_vfwm)
-  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=(fog_pgrid[cx,cy]>0);
+  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=(vid_fog_pgrid[cx,cy]>0);
 end;
 
 function RectInCam(x,y,w,h,s:integer):boolean;
@@ -502,13 +519,13 @@ begin
    begin
       if(player<>nil)then
        if (player^.team=_players[HPlayer].team)
-       or((_rpls_rst>=rpl_rhead)and(player^.pnum=0))then
+       or((rpls_state>=rpl_rhead)and(player^.pnum=0))then
        begin
           PointInScreenF:=true;
           exit;
        end;
 
-      if(_fog=false)or(fog_check(x,y))then PointInScreenF:=true;
+      if(rpls_fog=false)or(fog_check(x,y))then PointInScreenF:=true;
    end;
 end;
 
@@ -545,8 +562,8 @@ begin
    vid_mmvy:=round(vid_cam_y*map_mmcx);
    vid_fog_sx :=vid_cam_x div fog_cw;
    vid_fog_sy :=vid_cam_y div fog_cw;
-   vid_fog_ex :=vid_fog_sx+fog_vfw;
-   vid_fog_ey :=vid_fog_sy+fog_vfh;
+   vid_fog_ex :=vid_fog_sx+vid_fog_vfw;
+   vid_fog_ey :=vid_fog_sy+vid_fog_vfh;
 end;
 
 procedure MoveCamToPoint(mx,my:integer);
@@ -568,15 +585,90 @@ begin
    end;
 end;
 
+procedure UIClearBuilderAreas;
+begin
+   ui_builders_s:=0;
+   SetLength(ui_builders_x,ui_builders_s);
+   SetLength(ui_builders_y,ui_builders_s);
+   SetLength(ui_builders_r,ui_builders_s);
+end;
+
 procedure UIAddBuilderArea(tx,ty,tr:integer);
 begin
-   if(ui_builders_n>ui_builder_srs)then exit;
+   ui_builders_s+=1;
 
-   ui_builders_x[ui_builders_n]:=tx;
-   ui_builders_y[ui_builders_n]:=ty;
-   ui_builders_r[ui_builders_n]:=tr;
+   SetLength(ui_builders_x,ui_builders_s);
+   SetLength(ui_builders_y,ui_builders_s);
+   SetLength(ui_builders_r,ui_builders_s);
 
-   ui_builders_n+=1;
+   ui_builders_x[ui_builders_s-1]:=tx;
+   ui_builders_y[ui_builders_s-1]:=ty;
+   ui_builders_r[ui_builders_s-1]:=tr;
+end;
+
+
+procedure ReMakeLogForDraw(playern:byte;widthchars:integer;listheight:cardinal);
+var ts:shortstring;
+   n,i:cardinal;
+chunkp,
+chunkl,
+chunks:integer;
+ st,sl:byte;
+procedure _add(s:shortstring;t:byte);
+begin
+   ui_log_n+=1;
+   SetLength(ui_log_s,ui_log_n);
+   SetLength(ui_log_t,ui_log_n);
+   ui_log_s[ui_log_n-1]:=s;
+   ui_log_t[ui_log_n-1]:=t;
+end;
+begin
+   ui_log_n:=0;
+   SetLength(ui_log_s,ui_log_n);
+   SetLength(ui_log_t,ui_log_n);
+
+   if(widthchars>0)and(listheight>0)then
+   with _players[playern] do
+   begin
+      widthchars+=1;
+      i:=log_i;
+      if(listheight>log_n)
+      then n:=log_n
+      else n:=listheight;
+
+      while(n>0)do
+      begin
+         ts:=log_ls[i];
+         st:=log_lt[i];
+         sl:=length(ts);
+         if(i=0)
+         then i:=MaxPlayerLog
+         else i-=1;
+         n-=1;
+
+         if(sl>0)then
+          if(sl<=widthchars)
+          then _add(ts,st)
+          else
+          begin
+             chunks:=sl div widthchars;
+             while(chunks>=0)do
+             begin
+                chunkp:=chunks*widthchars+1;
+                if(chunkp>sl)then continue;
+                chunkl:=widthchars;
+                if((chunkl+chunkp)>sl)then
+                begin
+                   chunkl:=(sl mod widthchars);
+                   if(chunkl<=0)then chunkl:=1;
+                end;
+                _add(copy(ts,chunkp,chunkl),st);
+                chunks-=1;
+             end;
+          end;
+      end;
+   end;
+   while(ui_log_n<listheight)do _add('',0);
 end;
 
 {$ELSE}
@@ -593,7 +685,7 @@ begin
         c+=1;
         if(ttl=ClientTTL)then r+=1;
      end;
-   _plsOut:=(r=c)and(c>0);
+   PlayerAllOut:=(r=c)and(c>0);
 end;
 
 {$ENDIF}

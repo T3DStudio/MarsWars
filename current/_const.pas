@@ -17,7 +17,7 @@ fr_4hfps               = fr_fps div 4;
 fr_6hfps               = fr_fps div 6;
 fr_7hfps               = fr_fps div 7;
 fr_8hfps               = fr_fps div 8;
-fr_2h3fps              = fr_2hfps*3;
+fr_2h3fps              = fr_2hfps*3;   //1,5
 fr_2fps                = fr_fps*2;
 fr_3fps                = fr_fps*3;
 fr_4fps                = fr_fps*4;
@@ -112,14 +112,20 @@ gms_g_maxai            = 8;
 
 MaxPlayerLog           = 255;
 
-log_to_all             = 255;
+log_to_all             = %11111111;
 
-lmt_chat               = #1;
-lmt_game               = #2;
-//lmt_victory            = #2;
-//lmt_defeat             = #3;
-//lmt_supply             = #4;
-//lmt_energy             = #5;
+{
+lmt_chat0              = 0;
+lmt_chat1              = 1;
+lmt_chat2              = 2;
+lmt_chat3              = 3;
+lmt_chat4              = 4;
+lmt_chat5              = 5;
+lmt_chat6              = 6; }
+lmt_game               = 10;
+lmt_victory            = 11;
+lmt_defeat             = 12;
+lmt_chat               = 255;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -272,12 +278,11 @@ wtr_building                                   : cardinal = 1 shl 8;  // buildin
 wtr_bld                                        : cardinal = 1 shl 9;  // bld=true
 wtr_nbld                                       : cardinal = 1 shl 10; // bld=false
 wtr_ground                                     : cardinal = 1 shl 11;
-wtr_soaring                                    : cardinal = 1 shl 12;
-wtr_fly                                        : cardinal = 1 shl 13;
-wtr_adv                                        : cardinal = 1 shl 14;
-wtr_nadv                                       : cardinal = 1 shl 15;
-wtr_light                                      : cardinal = 1 shl 16;
-wtr_nlight                                     : cardinal = 1 shl 17;
+wtr_fly                                        : cardinal = 1 shl 12;
+wtr_adv                                        : cardinal = 1 shl 13;
+wtr_nadv                                       : cardinal = 1 shl 14;
+wtr_light                                      : cardinal = 1 shl 15;
+wtr_nlight                                     : cardinal = 1 shl 16;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -522,9 +527,8 @@ MaxUnitWeapons         = 15; //0-15
 MaxUnitProds           = 1;  //0-1
 MaxMissiles            = MaxUnits;
 
-uf_ground              = 0;
-uf_soaring             = 1;
-uf_fly                 = 2;
+uf_ground              = false;
+uf_fly                 = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -664,8 +668,6 @@ max_build_reload       = fr_fps*12;
 
 melee_r                = 8;
 
-flyCC_floor            = uf_soaring;
-
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
@@ -688,10 +690,11 @@ _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
-fly_z                  = 30;
-fly_height             : array[0..2] of integer = (1,fly_z*uf_soaring,fly_z*uf_fly);
+fly_z                  = 80;
+fly_hz                 = fly_z div 2;
+fly_height             : array[false..true] of integer = (1,fly_z);
 
-map_flydepths          : array[0..2] of integer = (0,MaxSMapW,MaxSMapW*2);
+map_flydepths          : array[false..true] of integer = (0,MaxSMapW);
 
 {$IFDEF _FULLGAME}
 
@@ -851,7 +854,6 @@ vid_panelw             = vid_BW*3;
 vid_tBW                = vid_panelw div 4;
 vid_thBW               = vid_tBW div 2;
 vid_2tBW               = vid_tBW*2;
-//vid_3tBW               = vid_panel div 4;
 vid_hBW                = vid_BW div 2;
 vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
@@ -867,7 +869,6 @@ ui_bottomsy            = vid_BW*4;
 ui_h3bw                = vid_BW-vid_tBW;
 ui_hwp                 = vid_panelw div 2;
 ui_tabsy               = vid_panelw+ui_h3bw;
-ui_builder_srs         = 127;
 ui_ubtns               = 23;
 
 ui_menu_map_zx0        = 76;
@@ -944,6 +945,10 @@ ui_menu_csm_xt2        = ui_menu_csm_x1-8;
 chat_type              : array[false..true] of char = ('|',' ');
 chat_shlm_t            = fr_fps*5;
 
+ui_menu_chat_height    = 13; // lines
+ui_menu_chat_width     = 37; // chars
+ui_game_chat_height    = 64; // lines
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SOUND
@@ -965,7 +970,11 @@ sss_sssize             : array[0..sss_count-1] of integer = (1,12,1,3,1,1);
 //  SAVE/LOAD/REPLAY
 //
 
-svld_size              = 279213;
+rpls_file_none         = 0;
+rpls_file_write        = 1;
+rpls_file_read         = 2;
+
+svld_size              = 723021;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
@@ -998,9 +1007,12 @@ fog_vfhm               = (vid_maxh div fog_cw)+2;
 ta_left                = 0;
 ta_middle              = 1;
 ta_right               = 2;
+ta_chat                = 3;
 
 font_w                 = 8;
 font_iw                = font_w-1;
+font_3hw               = font_w+(font_w div 2);
+font_6hw               = font_3hw*2;
 
 txt_line_h             = 5;
 txt_line_h2            = 25-font_w;
@@ -1111,7 +1123,7 @@ str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
 str_ready                : shortstring = 'Ready';
 
-str_startat              : array[0..gms_g_startb] of shortstring = ('1 builder','2 builders','3 builders','4 builders','5 builders','6 builders');
+str_startat              : array[0..gms_g_startb] of shortstring = ('1 builder','2 builders','3 builders','4 builders','5 builders','6 builders','7 builders');
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
 str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
 str_addon                : array[false..true    ] of shortstring = ('UDOOM','DOOM 2');

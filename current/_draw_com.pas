@@ -39,14 +39,18 @@ begin
 
          case al of
          ta_middle: ix:=x-((o*font_w)shr 1);
-         ta_right : ix:=x-(o*font_w);
+         ta_right : ix:=x- (o*font_w);
          end;
       end
       else ix:=x;
 
+      if(al=ta_chat)and(ss>chrs)
+      then i:=ss-chrs
+      else i:=1;
+
       o:=0;
       cl:=tc;
-      for i:=1 to ss do
+      for i:=i to ss do
       begin
          c:=s[i];
 
@@ -183,7 +187,7 @@ end;
 procedure ui_addalrm(aax,aay:integer;aab:boolean);
 var i,ni:byte;
 begin
-   if(_rpls_rst>=rpl_rhead)then exit;
+   if(rpls_state>=rpl_rhead)then exit;
 
    ni:=255;
    for i:=0 to ui_max_alarms do
@@ -208,7 +212,7 @@ begin
          ab:=aab;
          at:=vid_uialrm_t;
          if((vid_mmvx-vid_uialrm_ti)>ax)or(ax>(vid_mmvx+map_mmvw+vid_uialrm_ti))or   // vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh
-           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then SoundPlayAnoncer(snd_under_attack[aab,_players[HPlayer].race]);
+           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then SoundPlayAnoncer(snd_under_attack[aab,_players[HPlayer].race],true);
          break;
       end;
 end;

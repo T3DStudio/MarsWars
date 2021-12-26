@@ -242,7 +242,7 @@ begin
    _animw:=11;
    _animd:=13;
    setMWSModel  (@spr_arachnotron,nil);
-   setCommandSND(false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_arachno_move,snd_arachno_move);
+   setCommandSND(false,snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_hell_pain,snd_arachno_move);
    setEffectEID (false,0  ,0              ,0  ,0             );
    setEffectSND (false,nil,snd_arachno_death,nil,snd_hell_pain );
    setFOOT      (false,snd_arachno_foot,26);

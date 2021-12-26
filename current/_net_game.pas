@@ -33,7 +33,7 @@ begin
          net_GetPlayer:=i;
          ttl:=0;
          {$IFNDEF _FULLGAME}
-         if(ttl>=ClientTTL)then vid_mredraw:=true;
+         if(ttl>=ClientTTL)then vid_menu_redraw:=true;
          {$ENDIF}
          break;
       end;
@@ -71,6 +71,10 @@ begin
       if((i>0)<>ready)then vid_menu_redraw:=true;
 
       PNU  :=net_readbyte;
+
+      log_n_cl:=net_readcard;
+
+      if(log_n_cl=log_n)then log_net_pause:=0;
    end;
 end;
 
@@ -146,7 +150,7 @@ begin
             continue;
          end;
          pid:=net_GetPlayer(net_lastinip,net_lastinport,true);
-         if(pid=0) then
+         if(pid=0)then
          begin
             net_clearbuffer;
             if(g_started)
@@ -172,7 +176,9 @@ nmid_log_chat    : begin
                       i:=net_readbyte;
                       PlayersAddLog(pid,i,lmt_chat,net_readstring);    // chat
                       {$IFNDEF _FULLGAME}
-                      if(G_Started=false)then _parseCmd(net_chat[pid,0],pid);
+                      if(G_Started=false)then
+                       with(_players[pid])do
+                        if(log_lt[log_i]=lmt_chat)then _parseCmd(log_ls[log_i],pid);
                       {$ENDIF}
                       continue;
                    end;
@@ -195,8 +201,9 @@ nmid_order      : with _players[pid]do
                   end;
 nmid_client_info: with _players[pid] do
                   begin
-                     PNU :=net_readbyte;
-                     //net_chatls[pid]:=net_readbyte;
+                     PNU     :=net_readbyte;
+                     log_n_cl:=net_readcard;
+                     if(log_n_cl=log_n)then log_net_pause:=0;
                   end;
 nmid_pause      : begin
                      if(G_Paused=pid)
@@ -204,7 +211,7 @@ nmid_pause      : begin
                      else
                        if(G_Paused<>HPlayer)or(G_Paused=0)then G_Paused:=pid;
                     {$IFNDEF _FULLGAME}
-                    vid_mredraw:=true;
+                    vid_menu_redraw:=true;
                     {$ENDIF}
                   end;
                end
@@ -214,7 +221,7 @@ nmid_pause      : begin
                     i:=net_readbyte;
                     PlayersSwap(i,pid);
                     {$IFNDEF _FULLGAME}
-                    vid_mredraw:=true;
+                    vid_menu_redraw:=true;
                     {$ENDIF}
                  end;
             end;
@@ -244,14 +251,14 @@ nmid_pause      : begin
             net_send(nip,nport);
          end;
 
-         {if(net_period=i)and(net_chatls[i]<>net_chatss[i])then
+         if(log_net_pause<=0)and(log_n_cl<>log_n)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_chatclupd);
-            net_writebyte(net_chatss[i]);
-            net_writechat(i);
+            _wudata_chat(i,@log_n_cl,false);
             net_send(nip,nport);
-         end;}
+            log_net_pause:=fr_2hfps;
+         end;
       end;
 
    net_period+=1;
@@ -263,10 +270,10 @@ end;
 procedure net_ReadMapData;
 var redraw_menu,new_map:boolean;
 function _rmByte(pv:pbyte    ):boolean;var v:byte    ;begin v:=pv^;pv^:=net_readbyte;_rmByte:=(v<>pv^);end;
-function _rmWord(pv:pword    ):boolean;var v:word    ;begin v:=pv^;pv^:=net_readword;_rmWord:=(v<>pv^);redraw_menu:=redraw_menu or _rmWord;end;
-function _rmInt (pv:pinteger ):boolean;var v:integer ;begin v:=pv^;pv^:=net_readint ;_rmInt :=(v<>pv^);redraw_menu:=redraw_menu or _rmInt ;end;
-function _rmCard(pv:pcardinal):boolean;var v:cardinal;begin v:=pv^;pv^:=net_readcard;_rmCard:=(v<>pv^);redraw_menu:=redraw_menu or _rmCard;end;
-function _rmBool(pv:pboolean ):boolean;var v:boolean ;begin v:=pv^;pv^:=net_readbool;_rmBool:=(v<>pv^);redraw_menu:=redraw_menu or _rmBool;end;
+function _rmWord(pv:pword    ):boolean;var v:word    ;begin v:=pv^;pv^:=net_readword;_rmWord:=(v<>pv^);end;
+function _rmInt (pv:pinteger ):boolean;var v:integer ;begin v:=pv^;pv^:=net_readint ;_rmInt :=(v<>pv^);end;
+function _rmCard(pv:pcardinal):boolean;var v:cardinal;begin v:=pv^;pv^:=net_readcard;_rmCard:=(v<>pv^);end;
+function _rmBool(pv:pboolean ):boolean;var v:boolean ;begin v:=pv^;pv^:=net_readbool;_rmBool:=(v<>pv^);end;
 begin
    redraw_menu:=false;
    new_map    :=false;
@@ -317,15 +324,9 @@ nmid_notconnected: begin
                       GameDefaultAll;
                    end;
 nmid_chatclupd   : begin
-                     { i:=net_readbyte;
-                      if(net_chatls[HPlayer]<>i)then
-                      begin
-                         PlaySNDM(snd_chat);
-                         _rpls_nwrch:=true;
-                      end;
-                      net_chatls[HPlayer]:=i;
-                      net_readchat;
-                      net_chat_shlm:=chat_shlm_t; }
+                      _rudata_chat(HPlayer,false);
+                      net_chat_shlm:=chat_shlm_t;
+                      net_period:=0;
                    end;
 nmid_lobby_info  : begin
                       gst:=net_readbool;
@@ -394,14 +395,14 @@ nmid_lobby_info  : begin
          net_writebyte  (PlayerTeam );
          net_writebyte  (PlayerRace );
          net_writebool  (PlayerReady);
-         //net_writebyte  (net_chatls[HPlayer]);
          net_writebyte  (_cl_pnua[net_pnui]);
+         net_writecard  (net_log_n  );
       end
       else
       begin
          net_writebyte(nmid_client_info);
          net_writebyte(_cl_pnua[net_pnui]);
-         //net_writebyte(net_chatls[HPlayer]);
+         net_writecard(net_log_n);
       end;
       net_send(net_cl_svip,net_cl_svport);
    end;

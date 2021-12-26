@@ -193,7 +193,6 @@ TUID = record
    _upgr_armor,
    _zombie_uid,
    _urace,
-   _uf,
    _ucl,
    _ruid,
    _rupgr       : byte;
@@ -216,8 +215,9 @@ TUID = record
    _issmith,
    _isbarrack,
    _issolid,
+   _ukfly,
    _addon       : boolean;
-   _advanced    : array[false..true] of boolean; //[addon]
+   _bornadvanced: array[false..true] of boolean; //[addon]
    _fastdeath_hits
                 : array[false..true] of integer; //[adv]
 
@@ -226,15 +226,16 @@ TUID = record
    ups_upgrades,
    ups_apc      : TSoB;
    {$IFDEF _FULLGAME}
-   _animw,_animd,
+   _animw,
+   _animd,
    _fr          : integer;
    un_btn,
    un_sbtn      : array[false..true] of TMWTexture;
-   un_name,
-   un_descr,
-   un_hint      : shortstring;
-
    un_smodel    : array[false..true] of PTMWSModel;
+
+   un_txt_name,
+   un_txt_descr,
+   un_txt_hint  : shortstring;
 
    un_build_amode,
    un_eid_bcrater   :byte;
@@ -263,7 +264,7 @@ TUID = record
    {$ENDIF}
 end;
 PTUID = ^TUID;
-TUPID = record
+TUPID = record  // upgrade
    _up_ruid,
    _up_rupgr,
    _up_btni,
@@ -323,9 +324,9 @@ o_x1,o_y1  :integer;
    uprodc  : array[byte] of integer;
    uprodu  : array[byte] of integer;
 
-   pprodm,
-   pproda  : integer;
-   pprodu,
+   upprodm,
+   upproda : integer;
+   upprodu,
    upgr    : array[byte] of byte;
 
    a_upgrs,
@@ -359,10 +360,14 @@ o_x1,o_y1  :integer;
    nip     : cardinal;
    nport   : word;
 
-   log_l   : array[0..MaxPlayerLog] of shortstring;
+   log_net_pause
+           : integer;
+   log_ls  : array[0..MaxPlayerLog] of shortstring;
+   log_lt  : array[0..MaxPlayerLog] of byte;
    log_i,
-   log_n
-           : word;
+   log_n,
+   log_n_cl
+           : cardinal;
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
@@ -375,7 +380,6 @@ TUnit = record
    hits,
    unum     : integer;
 
-   uf,
    uclord,
    order,
    playeri,
@@ -388,8 +392,9 @@ TUnit = record
 
    a_rld,
    a_weap   : byte;
+   a_tx,a_ty,
+   a_tar,
 
-   a_tx,a_ty,a_tar,
    mv_x,mv_y,
 
    uo_bx,uo_by,
@@ -398,7 +403,7 @@ TUnit = record
             : integer;
    uo_id    : byte;
 
-   pf_pos_x,
+{   pf_pos_x,
    pf_pos_y,
    pf_pos_cx,
    pf_pos_cy,
@@ -408,7 +413,7 @@ TUnit = record
    pf_mv_cy,
    pf_mv_nx,
    pf_mv_ny
-            : integer;
+            : integer; }
 
    inapc,
    painc,
@@ -420,6 +425,7 @@ TUnit = record
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
+   ukfly,
    underobstacle,
    isbuildarea,
    bld,
@@ -447,17 +453,17 @@ PPTUnit = ^PTUnit;
 TMissile = record
    x,y,
    vx,vy,
-   dam,
-   vst,
+   damage,
+   vstep,hvstep,
    tar,
-   sr,
+   splashr,
    dir,
    ystep,
    mtars,
    ntars    : integer;
    player,
-   mid,
-   mfe,mfs  : byte;
+   mid      : byte;
+   mfe,mfs,
    homing   : boolean;
    {$IFDEF _FULLGAME}
    ms_eid_bio_death: boolean;

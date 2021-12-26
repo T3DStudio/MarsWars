@@ -243,7 +243,7 @@ begin
          r:=0;
          o:=1;
       end;
-      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_depth(vy,mfs),ms_eid_death[ms_eid_bio_death]);
+      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_depth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
       if(ms_eid_decal>0)then _effect_add(vx,vy,-6,ms_eid_decal);
 
@@ -261,14 +261,14 @@ begin
    for m:=1 to MaxMissiles do
    with _missiles[m] do
    with _mid_effs[mid] do
-   if(vst>0)then
+   if(vstep>0)then
    begin
       spr:=@spr_dummy;
 
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs),0,spr,255);
+       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs)+100,0,spr,255);
    end;
 end;
 

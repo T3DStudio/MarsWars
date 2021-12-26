@@ -48,7 +48,7 @@ begin
 
       with _uids[m_brush] do
       begin
-         spr:=_uid2spr(m_brush,_advanced[g_addon]);
+         spr:=_uid2spr(m_brush,_bornadvanced[g_addon]);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
          _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
@@ -63,14 +63,15 @@ begin
        circleColor(tar,mouse_x,mouse_y,towers_sr[upgr[upgr_towers]],c_gray); }
 
       // build areas
-      while(ui_builders_n>0)do
+      while(ui_builders_s>0)do
       begin
-         ui_builders_n-=1;
+         ui_builders_s-=1;
          circleColor(tar,
-         lx+ui_builders_x[ui_builders_n]-vid_cam_x,
-         ly+ui_builders_y[ui_builders_n]-vid_cam_y,
-         ui_builders_r[ui_builders_n],c_white);
+         lx+ui_builders_x[ui_builders_s]-vid_cam_x,
+         ly+ui_builders_y[ui_builders_s]-vid_cam_y,
+            ui_builders_r[ui_builders_s],c_white);
       end;
+      UIClearBuilderAreas;
 
       // points areas
       if(g_mode=gm_cptp)then
@@ -113,7 +114,7 @@ begin
             x:=ui_oicox-vid_oips;
          end;
          with _players[HPlayer] do
-          with _uids[c] do _draw_surf(tar,x,y,un_sbtn[_advanced[g_addon]].surf);
+          with _uids[c] do _draw_surf(tar,x,y,un_sbtn[_bornadvanced[g_addon]].surf);
 
          x-=vid_oisw;
          n+=1;
@@ -229,8 +230,8 @@ begin
          case ui of
          0: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[true ],ui_uid_buildn,ucl_c [true ], c_lime ,c_yellow,c_orange, ui=ui_tab);
          1: d_tabbtn(tar,spr_tabs[ui],ux,uy, ucl_cs[false],uproda       ,ucl_c [false], c_lime ,c_yellow,c_orange, ui=ui_tab);
-         2: begin if(pproda>0)then uid:=(ui_first_upgr_time div fr_fps)+1 else uid:=0;
-            d_tabbtn(tar,spr_tabs[ui],ux,uy, uid          ,pproda  ,0            , c_white,c_yellow,0       , ui=ui_tab);
+         2: begin if(upproda>0)then uid:=(ui_first_upgr_time div fr_fps)+1 else uid:=0;
+            d_tabbtn(tar,spr_tabs[ui],ux,uy, uid          ,upproda  ,0            , c_white,c_yellow,0       , ui=ui_tab);
             end;
          3: d_tabbtn(tar,spr_tabs[ui],ux,uy, 0            ,0       ,0            , 0      ,0       ,0       , ui=ui_tab);
          end;
@@ -242,7 +243,7 @@ begin
        then d_TextBTN(tar,2,9,@str_pause,PlayerGetColor(g_paused))
        else d_TextBTN(tar,2,9,@str_pause,c_white          );
 
-      if(vid_ppos<2)then
+      {if(vid_ppos<2)then
       begin
          _draw_text(tar,ui_energx  ,ui_iy,#19+i2s(cenerg),ta_right,255,c_aqua );
          _draw_text(tar,ui_energx+2,ui_iy,    i2s(menerg),ta_left ,255,c_white);
@@ -252,7 +253,7 @@ begin
          _draw_text(tar,ui_energx  ,ui_iy-6,#19+i2s(cenerg),ta_middle,255,c_aqua );
          _draw_text(tar,ui_energx+2,ui_iy+6,    i2s(menerg),ta_middle,255,c_white);
       end;
-      _draw_text(tar,ui_armyx   ,ui_iy,i2s(armylimit+uprodl),ta_middle,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_armyx   ,ui_iy,i2s(armylimit+uprodl),ta_middle,255,ui_limit[armylimit>=MaxPlayerLimit]);}
 
       case ui_tab of    // buildings
       0:
@@ -274,7 +275,7 @@ begin
 
             req:=_uid_conditionals(@_players[HPlayer],uid);
 
-            _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
+            _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
             _drawBtnt(tar,ux,uy,
             b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(ui_uid_reload[uid]),
             c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,r2s(build_cd));
@@ -298,7 +299,7 @@ begin
             ux:=(ui mod 3);
             uy:=(ui div 3);
 
-            _drawBtn (tar,ux,uy,un_btn[_advanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
+            _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
             b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
             c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,'');
@@ -316,7 +317,7 @@ begin
          ux:=(ui mod 3);
          uy:=(ui div 3);
 
-         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0) or (pproda>=pprodm)or(n_smiths<=0));
+         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0) or (upproda>=upprodm)or(n_smiths<=0));
 
          _drawBtnt(tar,ux,uy,
          b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
@@ -324,14 +325,14 @@ begin
       end;
 
       3:
-      if(_rpls_rst>=rpl_rhead)then
+      if(rpls_state>=rpl_rhead)then
       begin
-         _drawBtn(tar,0,4,spr_b_rfast,_fsttime  ,false);
-         _drawBtn(tar,1,4,spr_b_rskip,false     ,false);
-         _drawBtn(tar,2,4,spr_b_rstop,g_paused>0,false);
-         _drawBtn(tar,0,5,spr_b_rvis ,_rpls_vidm,false);
-         _drawBtn(tar,1,5,spr_b_rlog ,_rpls_log ,false);
-         _drawBtn(tar,2,5,spr_b_rfog ,_fog      ,false);
+         _drawBtn(tar,0,4,spr_b_rfast,_fsttime   ,false);
+         _drawBtn(tar,1,4,spr_b_rskip,false      ,false);
+         _drawBtn(tar,2,4,spr_b_rstop,g_paused>0 ,false);
+         _drawBtn(tar,0,5,spr_b_rvis ,rpls_plcam ,false);
+         _drawBtn(tar,1,5,spr_b_rlog ,rpls_showlog,false);
+         _drawBtn(tar,2,5,spr_b_rfog ,rpls_fog    ,false);
 
          ux:=2;
          uy:=6;
@@ -377,7 +378,7 @@ end;
 procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy:integer;
 begin
-   if(_rpls_rst<rpl_rhead)then
+   if(rpls_state<rpl_rhead)then
    begin
       D_BuildUI(tar,lx,ly);
 
@@ -416,25 +417,20 @@ var i,
    uid:byte;
     hs:pshortstring;
 begin
+   //str_hint_a
    if(0<=m_bx)and(m_bx<3)and(3<=m_by)and(m_by<=16)then
    begin
       hs:=nil;
       case m_by of
       3  : case (vid_ppos<2) of
-           true :if(mouse_y>ui_tabsy)
-                 then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW ]
-                 else hs:=@str_hint_a[(mouse_x-vid_panelx) div vid_2tBW];
-           false:if(mouse_x>ui_tabsy)
-                 then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW ]
-                 else ;
+           true :if(mouse_y>ui_tabsy)then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
+           false:if(mouse_x>ui_tabsy)then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
            end;
       13 : begin
               if(m_bx=2)then
                if(net_status=ns_none)or(G_WTeam<255)then exit;
               hs:=@str_hint_m[m_bx];
            end;
-      15 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[0];
-      16 : if(vid_ppos>=2)and(m_bx=0)then hs:=@str_hint_a[1];
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
 
@@ -443,7 +439,7 @@ begin
         begin
            if(ui_tab=3)then
            begin
-              if(_rpls_rst>=rpl_rhead)then
+              if(rpls_state>=rpl_rhead)then
               begin
                  if(i<12)then exit;
               end
@@ -462,7 +458,7 @@ begin
                          if(a_units[uid]<=0)then exit;
                          if((g_addon=false)and(_uids[uid]._addon))then exit;
                       end;
-                      hs:=@_uids[uid].un_hint;
+                      hs:=@_uids[uid].un_txt_hint;
                    end;
               2  : begin
                       if (a_upgrs[uid]<=0)then exit;
@@ -479,43 +475,54 @@ begin
 end;
 
 procedure D_UIText(tar:pSDL_Surface);
-var i:byte;
+var i:integer;
 begin
    // CHAT
-   if(ingame_chat)or(_rpls_log)then
+   if(ingame_chat)or(rpls_showlog)then
    begin
-      //for i:=0 to MaxNetChat do _draw_text(tar,ui_textx,ui_chaty-13*i,net_chat[HPlayer,i]                   ,ta_left,255        ,c_white);
-      if(_rpls_log=false)then   _draw_text(tar,ui_textx,ui_hinty     ,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
+      ReMakeLogForDraw(HPlayer,ui_ingamecl,ui_game_chat_height);
+      if(ui_log_n>0)then
+       for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_chaty-font_3hw*i,ui_log_s[i],ta_left,255,c_white);
+      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_hinty,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then
      begin
-       // _draw_text(tar,ui_textx,ui_chaty,net_chat[HPlayer,0],ta_left,255,c_white);
+        ReMakeLogForDraw(HPlayer,ui_ingamecl,1);
+        if(ui_log_n>0)then
+         for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_chaty-font_3hw*i,ui_log_s[i],ta_left,255,c_white);
         net_chat_shlm-=1;
      end
      else d_Hints(tar);
 
+   //resources
+   with _players[HPlayer] do
+   begin
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg)+' / '+#19+i2s(menerg),ta_left,255,c_white);
+      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)            ,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+   end;
+
    // VICTORY/DEFEAT PAUSE REPLAY END
-   if(_rpls_rst=rpl_end)
-   then _draw_text(tar,ui_uiuphx,ui_texty,str_repend,ta_middle,255,c_white)
+   if(rpls_state=rpl_end)
+   then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_repend,ta_middle,255,c_white)
    else
-    if(_rpls_rst<rpl_rhead)then
+    if(rpls_state<rpl_rhead)then
      with _players[HPlayer] do
      begin
         if(G_WTeam=255)then
         begin
            if(menu_s2<>ms2_camp)then
-            if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
+            if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
            if(G_paused>0)then
             if(net_status=ns_clnt)and(net_cl_svttl=ClientTTL)
-            then _draw_text(tar,ui_uiuphx,ui_texty+12,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
-            else _draw_text(tar,ui_uiuphx,ui_texty+12,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
+            then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
+            else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
         end
         else
         begin
            if(G_WTeam=team)
-           then _draw_text(tar,ui_uiuphx,ui_texty,str_win   ,ta_middle,255,c_lime)
-           else _draw_text(tar,ui_uiuphx,ui_texty,str_lose  ,ta_middle,255,c_red);
+           then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_win   ,ta_middle,255,c_lime)
+           else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
         end;
      end;
 
@@ -526,8 +533,8 @@ begin
    if(G_WTeam=255)then
     if(g_mode=gm_inv)then
     begin
-       D_Timer(tar,ui_textx,ui_texty+14,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
-       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+26,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+       D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
+       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
     end;
 
    d_OrderIcons(tar);

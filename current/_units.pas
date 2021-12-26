@@ -36,7 +36,7 @@ begin
        if(G_WTeam=255)then
         if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
          if(army<=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-         and(state>ps_none)then PlayersAddLog(playeri,log_to_all,lmt_game,name+str_player_def);
+         and(state>ps_none)then GameLogPlayerDefeat(playeri);
     end;
 end;
 
@@ -99,7 +99,7 @@ var i:integer;
 begin
    for i:=1 to MaxUnits do
     with _missiles[i] do
-     if(vst>0)and(tar=u)then tar:=0;
+     if(vstep>0)and(tar=u)then tar:=0;
 end;
 
 procedure _unit_kill(pu:PTUnit;instant,fastdeath:boolean);
@@ -153,7 +153,7 @@ begin
             if(apcc>0)then
              if(tu^.inapc=unum)then
              begin
-                if(uf>uf_ground)or(inapc>0)
+                if(ukfly<>uf_ground)or(inapc>0)
                 then _unit_kill(tu,true,false)
                 else
                 begin
@@ -328,7 +328,7 @@ uab_morph2heye    : if(upgr[upgr_hell_heye]>0)and(menerg>0)then
                        _unit_add(vx,vy,UID_HEye,playeri,true,true);
                        buff[ub_cast]:=fr_fps;
                        {$IFDEF _FULLGAME}
-                       _pain_lost_fail(vx,vy,_depth(vy+1,uf),nil);
+                       _pain_lost_fail(vx,vy,_depth(vy+1,ukfly),nil);
                        {$ENDIF}
                     end;
 uab_umine         : if(upgr[upgr_uac_mines]>0)and(buff[ub_clcast]<=0)then
@@ -452,7 +452,7 @@ end;
 procedure _unit_npush_dcell(pu:PTUnit);
 begin
    with pu^ do
-    if(speed>0)and(uf=uf_ground)and(solid)then _unit_npush(pu);
+    if(speed>0)and(ukfly=uf_ground)and(solid)then _unit_npush(pu);
 end;
 
 procedure _unit_move(pu:PTUnit);
@@ -698,9 +698,9 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
 
       if(cf(@aw_reqf,@wpr_air   ))then
-       if(uf=uf_ground)or(tu^.uf=uf_ground)then exit;
+       if(ukfly=uf_ground)or(tu^.ukfly=uf_ground)then exit;
       if(cf(@aw_reqf,@wpr_ground))then
-       if(uf>uf_ground)or(tu^.uf>uf_ground)then exit;
+       if(ukfly=uf_fly)or(tu^.ukfly=uf_fly)then exit;
 
       if(cf(@aw_reqf,@wpr_zombie))then
       begin
@@ -731,9 +731,8 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_tarf,@wtr_bld     )=false)and(tu^.bld                    )then exit;
       if(cf(@aw_tarf,@wtr_nbld    )=false)and(tu^.bld =false             )then exit;
 
-      if(cf(@aw_tarf,@wtr_ground  )=false)and(tu^.uf = uf_ground         )then exit;
-      if(cf(@aw_tarf,@wtr_soaring )=false)and(tu^.uf = uf_soaring        )then exit;
-      if(cf(@aw_tarf,@wtr_fly     )=false)and(tu^.uf = uf_fly            )then exit;
+      if(cf(@aw_tarf,@wtr_ground  )=false)and(tu^.ukfly = uf_ground      )then exit;
+      if(cf(@aw_tarf,@wtr_fly     )=false)and(tu^.ukfly = uf_fly         )then exit;
 
       if(cf(@aw_tarf,@wtr_adv     )=false)and(tu^.buff[ub_advanced]> 0   )then exit;
       if(cf(@aw_tarf,@wtr_nadv    )=false)and(tu^.buff[ub_advanced]<=0   )then exit;
@@ -848,7 +847,7 @@ begin
       underobstacle:=_UnderObstacle(x,y);
 
       cunload:=true;
-      if(uf>uf_ground)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)and(underobstacle)then cunload:=false;
+      if(ukfly=uf_fly)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)and(underobstacle)then cunload:=false;
 
       push    := solid and _canmove(pu);
       ftarget := _canattack(pu);
@@ -895,7 +894,7 @@ begin
 
                if(push)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)then
-                 if(tu^.solid)and((uf=uf_ground)=(tu^.uf=uf_ground))then _unit_push(pu,tu,ud);
+                 if(tu^.solid)and((ukfly=uf_ground)=(tu^.ukfly=uf_ground))then _unit_push(pu,tu,ud);
 
                ud-=_r+tu^.uid^._r;
 
@@ -1132,7 +1131,7 @@ begin
         begin
            if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then
            begin
-              if(uf=uf_ground)then
+              if(ukfly=uf_ground)then
                if(tu^.buff[ub_transpause]>0)
                then exit
                else
@@ -1227,7 +1226,7 @@ begin
    begin
       buff[ub_resur]:=fr_2fps;
       zfall:=-uid^._zfall;
-      uf   := uid^._uf;
+      ukfly:= uid^._ukfly;
    end;
 end;
 
@@ -1349,7 +1348,7 @@ begin
          if(aw_eid_target>0)then
           if(PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer])=false)then exit;
           begin
-             if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.uf),aw_eid_target);
+             if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((G_Step mod fr_fps  )=0)then SoundPlayUnit(aw_snd_target,tu,nil);
           end;
@@ -1364,18 +1363,18 @@ begin
             if(not cf(@aw_reqf,@wpr_move))then dir:=p_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
-                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
                  else
                    if(aw_count=0)
-                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
                    else
                      if(aw_count>0)
-                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd)
+                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
                      else
                        if(aw_count<0)then
                        begin
-                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
-                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,uf,tu^.uf,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd);
                        end;
 wpt_unit       : _ability_unit_spawn(pu,aw_oid);
             else
