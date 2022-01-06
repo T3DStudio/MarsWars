@@ -21,7 +21,6 @@ begin
 end;
 {$ENDIF}
 
-
 procedure _unit_apUID(pu:PTUnit);
 begin
    with pu^ do
@@ -113,7 +112,6 @@ begin
       _urace     := r_hell;
       _attack    := atm_none;
       _srange    := 250;
-      _attack    := atm_always;
       _fdeathhits(-32000);
 
       _ukbuilding:= false;
@@ -194,7 +192,6 @@ begin
    _ucl       := 10;
    _btime     := 60;
    _max       := 1;
-   _ruid      := UID_HPools;
    _ability   := uab_hell_unit_adv;
    _ukbuilding:= true;
 end;
@@ -208,7 +205,6 @@ begin
    _ucl       := 11;
    _btime     := 90;
    _max       := 1;
-   _ruid      := UID_HPools;
    _ability   := uab_building_adv;
    _ukbuilding:= true;
 end;
@@ -433,7 +429,7 @@ begin
    _painc     := 3;
    _btime     := 40;
    _apcs      := 2;
-   _ruid      := UID_HFortress;
+   _ruid      := UID_HMonastery;
    _ukfly     := uf_fly;
    _attack    := atm_always;
    _ukbio     := true;
@@ -452,7 +448,7 @@ begin
    _ucl       := 8;
    _painc     := 7;
    _btime     := 40;
-   _ruid      := UID_HFortress;
+   _ruid      := UID_HMonastery;
    _limituse  := 2;
    _attack    := atm_always;
    _ukbio     := true;
@@ -472,7 +468,7 @@ begin
    _ucl       := 9;
    _painc     := 4;
    _btime     := 60;
-   _ruid      := UID_HMonastery;
+   _ruid      := UID_HFortress;
    _limituse  := 3;
    _attack    := atm_always;
    _addon     := true;
@@ -491,7 +487,7 @@ begin
    _ucl       := 10;
    _painc     := 4;
    _btime     := 50;
-   _ruid      := UID_HMonastery;
+   _ruid      := UID_HFortress;
    _limituse  := 3;
    _attack    := atm_always;
    _addon     := true;
@@ -513,7 +509,7 @@ begin
    _painc     := 12;
    _btime     := 90;
    _apcs      := 2;
-   _ruid      := UID_HMonastery;
+   _ruid      := UID_HFortress;
    _limituse  := 2;
    _attack    := atm_always;
    _addon     := true;
@@ -697,15 +693,14 @@ begin
    if(i=UID_HMilitaryUnit)then
    begin
       _ucl       := 4;
-      ups_units  :=zimbas;
+      ups_units  := zimbas;
    end
    else
    begin
-      ups_units:=marines;
+      ups_units  := marines;
       _zombie_uid:= UID_HMilitaryUnit;
    end;
 end;
-
 UID_UFactory:
 begin
    _mhits     := 3000;
@@ -756,7 +751,6 @@ begin
    _ucl       := 10;
    _btime     := 60;
    _max       := 1;
-   _ruid      := UID_UWeaponFactory;
    _ability   := uab_uac__unit_adv;
    _ukbuilding:= true;
 end;
@@ -770,7 +764,6 @@ begin
    _ucl       := 11;
    _btime     := 90;
    _max       := 1;
-   _ruid      := UID_UTechCenter;
    _ability   := uab_building_adv;
    _ukbuilding:= true;
 end;
@@ -837,7 +830,6 @@ begin
    _btime     := 25;
    _ruid      := UID_UTechCenter;
    _attack    := atm_always;
-   //_rupgr     := upgr_rturrets;
    _ukbuilding:= true;
    _addon     := true;
    _upgr_armor:=upgr_uac_turarm;
@@ -992,7 +984,7 @@ begin
    _ukmech    := true;
    _slowturn  := true;
 
-   ups_apc    :=marines+[UID_APC,UID_Terminator,UID_Tank,UID_Flyer];
+   ups_apc    :=marines+[UID_APC,UID_Terminator,UID_Tank];
 end;
 UID_APC:
 begin
@@ -1021,7 +1013,6 @@ begin
    _ucl       := 9;
    _btime     := 60;
    _apcs      := 3;
-   _ruid      := UID_UTechCenter;
    _limituse  := 3;
    _attack    := atm_always;
    _ukmech    := true;
@@ -1037,7 +1028,6 @@ begin
    _ucl       := 10;
    _btime     := 60;
    _apcs      := 7;
-   _ruid      := UID_UTechCenter;
    _limituse  := 3;
    _attack    := atm_always;
    _ukmech    := true;
@@ -1055,7 +1045,6 @@ begin
    _btime     := 60;
    _apcs      := 7;
    _ukfly     := uf_fly;
-   _ruid      := UID_UTechCenter;
    _limituse  := 3;
    _attack    := atm_always;
    _ukmech    := true;

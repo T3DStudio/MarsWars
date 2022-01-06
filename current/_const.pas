@@ -69,8 +69,6 @@ uidall                 = [0..255];
 //  PATH FIND SYSTEM
 //
 
-pfMaxNodes             = 255;
-
 pf_pathmap_w           = 40;
 pf_pathmap_c           = (MaxSMapW div pf_pathmap_w)+1;
 
@@ -115,7 +113,7 @@ MaxPlayerLog           = 255;
 log_to_all             = %11111111;
 
 {
-lmt_chat0              = 0;
+lmt_chat0              = 0;  = player humber
 lmt_chat1              = 1;
 lmt_chat2              = 2;
 lmt_chat3              = 3;
@@ -123,8 +121,10 @@ lmt_chat4              = 4;
 lmt_chat5              = 5;
 lmt_chat6              = 6; }
 lmt_game               = 10;
-lmt_victory            = 11;
-lmt_defeat             = 12;
+lmt_endgame            = 11;
+lmt_defeated           = 12;
+lmt_unit               = 13;
+lmt_upgrade            = 14;
 lmt_chat               = 255;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -530,6 +530,8 @@ MaxMissiles            = MaxUnits;
 uf_ground              = false;
 uf_fly                 = true;
 
+MaxUnitOrders          = 10;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UIDs
@@ -827,6 +829,18 @@ EID_HAMU               = 216;
 EID_HMU                = 217;
 EID_HCC                = 218;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNITS INFO
+//
+
+uinfo_line             = 1;
+uinfo_rect             = 2;
+uinfo_box              = 3;
+uinfo_circle           = 4;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  VIDEO & UI
@@ -991,7 +1005,7 @@ SvRpLen                = 15;
 //  FOG
 //
 
-MFogM                  = 30;
+MFogM                  = 64;
 fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);

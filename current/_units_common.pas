@@ -57,7 +57,9 @@ begin
        then SoundPlayAnoncer(un_snd_ready[buff[ub_advanced]>0],true)
        else SoundPlayAnoncer(snd_build_place[_urace],false);
 
-      if(bld=false)then exit;
+      if(bld)
+      then GameLogUnitReady(playeri,uidi)
+      else exit;
 
       if(vischeck<>nil)then
       begin
@@ -160,33 +162,29 @@ function _canmove(pu:PTUnit):boolean;
 begin
    with pu^ do
    with uid^ do
-   begin
-      _canmove:=false;
+    if(ServerSide=false)and(speed>0)
+    then _canmove:=(x<>uo_bx)or(y<>uo_by)
+    else
+    begin
+       _canmove:=false;
 
-      if(ServerSide=false)and(speed>0)then
-      begin
-         _canmove:=(x<>uo_bx)or(y<>uo_by);
-         exit;
-      end;
+       if(speed<=0)or(buff[ub_stopattack]>0)or(bld=false)then exit;
 
-      if(speed<=0)or(buff[ub_stopattack]>0)or(bld=false)then exit;
+       if(_ukbuilding)then
+         if(buff[ub_clcast]>0)then exit;
 
+       if(_ukmech)then
+         if(buff[ub_gear  ]>0)
+         or(buff[ub_stun  ]>0)then exit;
 
-      if(_ukbuilding)then
-        if(buff[ub_clcast]>0)then exit;
+       if(_ukbio)then
+         if(buff[ub_pain  ]>0)
+         or(buff[ub_cast  ]>0)
+         or(buff[ub_stun  ]>0)
+         or(buff[ub_gear  ]>0)then exit;
 
-      if(_ukmech)then
-        if(buff[ub_gear  ]>0)
-        or(buff[ub_stun  ]>0)then exit;
-
-      if(_ukbio)then
-        if(buff[ub_pain  ]>0)
-        or(buff[ub_cast  ]>0)
-        or(buff[ub_stun  ]>0)
-        or(buff[ub_gear  ]>0)then exit;
-
-      _canmove:=true;
-   end;
+       _canmove:=true;
+    end;
 end;
 
 function _canattack(pu:PTUnit):boolean;
@@ -228,25 +226,6 @@ begin
       end;
    end;
    _canattack:=true;
-end;
-
-function _canability(pu:PTUnit):boolean;
-begin
-   _canability:=false;
-   with pu^     do
-   with uid^    do
-   if(_ability>0)then
-   with player^ do
-   begin
-      if(bld=false)or(hits<=0)then exit;
-
-      if(_ability_rupgr>0)then
-       if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;
-
-      if(_ability_ruid>0)then
-       if(uid_eb[_ability_ruid]<=0)then exit;
-   end;
-   _canability:=true;
 end;
 
 procedure _unit_asapc(pu,apc:PTUnit);
@@ -584,16 +563,16 @@ begin
 end;
 
 
-function _collisionr(tx,ty,tr,uskip:integer;obstacles:boolean):byte;
+function _collisionr(tx,ty,tr,skipunit:integer;flylevel,check_obstacles:boolean):byte;
 var u,dx,dy:integer;
 begin
    _collisionr:=0;
 
    for u:=1 to MaxUnits do
-    if(u<>uskip)then
+    if(u<>skipunit)then
      with _units[u] do
       with uid^ do
-       if(hits>0)and(speed<=0)and(ukfly=uf_ground)and(_IsUnitRange(inapc,nil)=false)then
+       if(hits>0)and(speed<=0)and(ukfly=flylevel)and(_IsUnitRange(inapc,nil)=false)then
         if(dist(x,y,tx,ty)<(tr+_r))then
         begin
            _collisionr:=2;
@@ -609,7 +588,7 @@ begin
          exit;
       end;
 
-   if(obstacles=false)then exit;
+   if(check_obstacles=false)or(flylevel)then exit;
 
    tr-=bld_dec_mr;
 
@@ -637,14 +616,14 @@ begin
     with _players[pl] do
      if(n_builders<=0)then
      begin
-        _InBuildArea:=1;
+        _InBuildArea:=1; // no builders
         exit;
      end;
 
    if(tx<map_b0)or(map_b1<tx)
    or(ty<map_b0)or(map_b1<ty)then
    begin
-      _InBuildArea:=2;
+      _InBuildArea:=2;  // out of bounds
       exit;
    end;
 
@@ -655,14 +634,12 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(isbuildarea)and(hits>0)and(_IsUnitRange(inapc,nil)=false)and(bld)and(playeri=pl)then
+      if(hits>0)and(bld)and(isbuildarea)and(_IsUnitRange(inapc,nil)=false)and(playeri=pl)then
        if(buid in ups_builder)then
        begin
-          if(_ukbuilding)then
-           if(speed>0)or(ukfly=uf_fly)then continue;
           if(dist(x,y,tx,ty)<srange)then
           begin
-             _InBuildArea:=0;
+             _InBuildArea:=0; // inside build area
              break;
           end;
        end;
@@ -680,14 +657,14 @@ begin
    else m_brushc:=c_gray;
    }
 
-   i:=_InBuildArea(tx,ty,0,buid,playern);
+   i:=_InBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
    0  : ;
    2  : begin _CheckBuildPlace:=2;exit;end;
    else begin _CheckBuildPlace:=3;exit;end;
    end;
 
-   i:=_collisionr(tx,ty,tr+_uids[buid]._r,uskip,obstacles);
+   i:=_collisionr(tx,ty,tr+_uids[buid]._r,uskip,_uids[buid]._ukfly,obstacles);
    if(i>0)then _CheckBuildPlace:=1;
 end;
 
@@ -1209,9 +1186,7 @@ begin
        begin
           upgr[_uid]+=1;
           _unit_cupgrade_p(pu,255,i);
-          {$IFDEF _FULLGAME}
-          if(playeri=HPlayer)then SoundPlayAnoncer(snd_upgrade_complete[_urace],true);
-          {$ENDIF}
+          GameLogAddUpgrade(playeri,_uid);
        end
        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
   end;
@@ -1377,7 +1352,7 @@ uab_CCFly:
               speed:=0;
 
               if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,true)>0)then buff[ub_advanced]:=_ub_infinity;
+               if(_collisionr(x,y+zfall,_r,unum,false,true)>0)then buff[ub_advanced]:=_ub_infinity;
            end;
       end;
 
@@ -1443,7 +1418,13 @@ UID_ZMajor:
               speed:=_speed;
            end;
       end;
+
+      // BUILD AREA
       if(_isbuilder)then isbuildarea:=true;
+      case uidi of
+UID_HCommandCenter,
+UID_UCommandCenter: isbuildarea:=not ukfly;
+      end;
 
 
       // SRANGE
@@ -1462,20 +1443,21 @@ UID_ZMajor:
 UID_Major,
 UID_ZMajor,
 UID_ZCommando:
-           begin
-              if(buff[ub_advanced]>0)
-              then i:=_srange+50
-              else i:=_srange;
+         begin
+            if(buff[ub_advanced]>0)
+            then i:=_srange+50
+            else i:=_srange;
 
-              if(srange<>i)then
-              begin
-                 srange:=i;
-                 {$IFDEF _FULLGAME}
-                 _unit_fog_r(pu);
-                 {$ENDIF}
-              end;
-           end;
+            if(srange<>i)then
+            begin
+               srange:=i;
+               {$IFDEF _FULLGAME}
+               _unit_fog_r(pu);
+               {$ENDIF}
+            end;
+         end;
       end;
+
 
       // REGENERATION
       if(ServerSide)then

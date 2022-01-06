@@ -308,7 +308,10 @@ begin
                  MID_TBullet,
                  MID_Bullet,
                  MID_Bulletx2    : _d150(@damd);
-                 end;
+                 end
+              else
+                 case mid of
+
 
               if(tu^.uidi in armor_massive)then
                  case mid of

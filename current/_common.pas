@@ -1,6 +1,8 @@
 procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);  forward;
+procedure _unit_upgr  (pu:PTUnit);  forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit):boolean; forward;
+procedure SoundLog(ptarget:byte);  forward;
 
 
 function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
@@ -71,14 +73,21 @@ begin
    end;
 end;
 
-procedure PlayerAddLog(ptarget,psender:byte;mtype:byte;str:shortstring);
+////////////////////////////////////////////////////////////////////////////////
+//
+//   LOG
+//
+
+procedure PlayerAddLog(ptarget:byte;mtype:byte;str:shortstring;local:boolean);
 begin
    if(ptarget>MaxPlayers)then exit;
 
    with _players[ptarget] do
    if(state>ps_none)then
    begin
+      if(local=false)then
       log_n+=1;
+
       log_i+=1;
       if(log_i>MaxPlayerLog)then log_i:=0;
 
@@ -88,28 +97,47 @@ begin
       {$IFDEF _FULLGAME}
       net_chat_shlm  :=chat_shlm_t;
       vid_menu_redraw:=true;
-      if((ptarget=HPlayer)and(psender<>ptarget))
-      or((rpls_state>=rpl_rhead)and(HPlayer=0))then
-      begin
-         ui_chat_sound  :=true;
-      end;
+      SoundLog(ptarget);
       {$ENDIF}
    end;
 end;
 
-procedure PlayersAddLog(playern,to_players:byte;mtype:byte;str:shortstring);
+procedure PlayersAddLog(playern,to_players:byte;mtype:byte;str:shortstring;local:boolean);
 var i:byte;
 begin
    for i:=0 to MaxPlayers do
     if((to_players and (1 shl i))>0)
     or(i=playern)
-    or(i=0)then PlayerAddLog(i,playern,mtype,str);
+    or(i=0)then PlayerAddLog(i,mtype,str,local);
 end;
-procedure GameLogPlayerDefeat(pl:byte);
+
+procedure GameLogEndGame(wteam:byte);
 begin
-   if(pl>MaxPlayers)then exit;
-   PlayersAddLog(pl,log_to_all,lmt_defeat,_players[pl].name);
+   if(ServerSide=false)then exit;
+   PlayersAddLog(0,log_to_all,lmt_endgame,chr(wteam),false);
 end;
+procedure GameLogPlayerDefeated(pl:byte);
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddLog(pl,log_to_all,lmt_defeated,_players[pl].name+str_player_def,false);
+end;
+procedure GameLogPlayerLeave(pl:byte);
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddLog(pl,log_to_all,lmt_chat,_players[pl].name+str_plout,false);
+end;
+procedure GameLogUnitReady(pl,uid:byte);
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddLog(pl,pl,lmt_unit,chr(uid),false);
+end;
+procedure GameLogAddUpgrade(pl,upid:byte);
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddLog(pl,pl,lmt_upgrade,chr(upid),false);
+end;
+
+
 
 procedure PlayerClearLog(pn:byte);
 begin
@@ -444,6 +472,42 @@ begin
    _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac__unit_adv]);
 end;
 
+function UnitF2Select(pu:PTUnit):boolean;
+begin
+   UnitF2Select:=false;
+   with pu^  do
+   if(hits>0)and(bld)and(_IsUnitRange(inapc,nil)=false)then
+   with uid^ do
+   begin
+      if(speed          <=0)then exit;
+      if(_ukbuilding       )then exit;
+      if(_attack  =atm_none)then exit;
+      if(uo_id=ua_paction)
+      or(uo_id=ua_hold   )
+      or(uo_bx>0         )then exit;
+   end;
+   UnitF2Select:=true;
+end;
+
+function _canability(pu:PTUnit):boolean;
+begin
+   _canability:=false;
+   with pu^     do
+   with uid^    do
+   if(_ability>0)then
+   with player^ do
+   begin
+      if(bld=false)or(hits<=0)then exit;
+
+      if(_ability_rupgr>0)then
+       if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;
+
+      if(_ability_ruid>0)then
+       if(uid_eb[_ability_ruid]<=0)then exit;
+   end;
+   _canability:=true;
+end;
+
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
 begin
    {$IFDEF _FULLGAME}
@@ -458,6 +522,13 @@ begin
 end;
 
 {$IFDEF _FULLGAME}
+
+function UIUnitDrawRange(pu:PTUnit):boolean;
+begin
+   with pu^  do
+    with uid^ do
+     UIUnitDrawRange:=(_attack>0)or(_ability in [uab_radar])or(isbuildarea);
+end;
 
 procedure ScrollByte(pb:pbyte;fwrd:boolean;pset:PTSoB);
 begin
@@ -498,10 +569,10 @@ begin
   and(0<=cy)and(cy<=fog_vfhm)then fog_check:=(vid_fog_pgrid[cx,cy]>0);
 end;
 
-function RectInCam(x,y,w,h,s:integer):boolean;
+function RectInCam(x,y,hw,hh,s:integer):boolean;
 begin
-   RectInCam:=((vid_cam_x-w          )<x)and(x<(vid_cam_x+vid_cam_w+w))
-           and((vid_cam_y-h-max2(0,s))<y)and(y<(vid_cam_y+vid_cam_h+h));
+   RectInCam:=((vid_cam_x-hw          )<x)and(x<(vid_cam_x+vid_cam_w+hw))
+           and((vid_cam_y-hh-max2(0,s))<y)and(y<(vid_cam_y+vid_cam_h+hh));
 end;
 function PointInCam(x,y:integer):boolean;
 begin
@@ -585,47 +656,42 @@ begin
    end;
 end;
 
-procedure UIClearBuilderAreas;
+function ParseLogMessage(mstr:pshortstring;mtype:byte;mcolor:pcardinal):shortstring;
 begin
-   ui_builders_s:=0;
-   SetLength(ui_builders_x,ui_builders_s);
-   SetLength(ui_builders_y,ui_builders_s);
-   SetLength(ui_builders_r,ui_builders_s);
+   ParseLogMessage:='';
+   mcolor^:=c_white;
+   case mtype of
+0..MaxPlayers  : begin
+                    mcolor^:=PlayerGetColor(mtype);
+                    ParseLogMessage:=_players[mtype].name+': '+mstr^;
+                 end;
+lmt_chat       : ParseLogMessage:=mstr^;
+lmt_endgame    : ;
+   end;
 end;
-
-procedure UIAddBuilderArea(tx,ty,tr:integer);
-begin
-   ui_builders_s+=1;
-
-   SetLength(ui_builders_x,ui_builders_s);
-   SetLength(ui_builders_y,ui_builders_s);
-   SetLength(ui_builders_r,ui_builders_s);
-
-   ui_builders_x[ui_builders_s-1]:=tx;
-   ui_builders_y[ui_builders_s-1]:=ty;
-   ui_builders_r[ui_builders_s-1]:=tr;
-end;
-
 
 procedure ReMakeLogForDraw(playern:byte;widthchars:integer;listheight:cardinal);
 var ts:shortstring;
-   n,i:cardinal;
+mc,n,i:cardinal;
 chunkp,
 chunkl,
 chunks:integer;
  st,sl:byte;
-procedure _add(s:shortstring;t:byte);
+procedure _add(s:shortstring;t:byte;c:cardinal);
 begin
    ui_log_n+=1;
    SetLength(ui_log_s,ui_log_n);
    SetLength(ui_log_t,ui_log_n);
+   SetLength(ui_log_c,ui_log_n);
    ui_log_s[ui_log_n-1]:=s;
    ui_log_t[ui_log_n-1]:=t;
+   ui_log_c[ui_log_n-1]:=c;
 end;
 begin
    ui_log_n:=0;
    SetLength(ui_log_s,ui_log_n);
    SetLength(ui_log_t,ui_log_n);
+   SetLength(ui_log_c,ui_log_n);
 
    if(widthchars>0)and(listheight>0)then
    with _players[playern] do
@@ -638,8 +704,9 @@ begin
 
       while(n>0)do
       begin
-         ts:=log_ls[i];
+         mc:=c_white;
          st:=log_lt[i];
+         ts:=ParseLogMessage(@log_ls[i],st,@mc);
          sl:=length(ts);
          if(i=0)
          then i:=MaxPlayerLog
@@ -648,7 +715,7 @@ begin
 
          if(sl>0)then
           if(sl<=widthchars)
-          then _add(ts,st)
+          then _add(ts,st,mc)
           else
           begin
              chunks:=sl div widthchars;
@@ -662,13 +729,13 @@ begin
                    chunkl:=(sl mod widthchars);
                    if(chunkl<=0)then chunkl:=1;
                 end;
-                _add(copy(ts,chunkp,chunkl),st);
+                _add(copy(ts,chunkp,chunkl),st,mc);
                 chunks-=1;
              end;
           end;
       end;
    end;
-   while(ui_log_n<listheight)do _add('',0);
+   while(ui_log_n<listheight)do _add('',0,c_white);
 end;
 
 {$ELSE}

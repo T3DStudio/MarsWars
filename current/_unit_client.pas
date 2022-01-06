@@ -530,7 +530,7 @@ begin
                vx:=x;
                vy:=y;
 
-               if(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
+               if(pu^.uid^._ability=uab_morph2heye)and(uidi=UID_HEye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
             end;
 
             _unit_upgr(pu);
@@ -543,7 +543,8 @@ begin
             begin
                if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
 
-               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))then _ucCreateEffect(uu,@vis);
+               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
+               or((pu^.bld       =false)and(bld            ))then _ucCreateEffect(uu,@vis);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
                if(pu^.inapc<>inapc)and(vis)then SoundPlayUnit(snd_inapc,nil,@vis);
@@ -560,21 +561,14 @@ begin
 
                   if(uid^._ukbuilding=false)then
                   begin
-                     if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced ]>0)then
+                     if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
                       case uid^._urace of
                 r_hell: _unit_hell_unit_adv(uu);
                 r_uac : _unit_uac_unit_adv (uu,nil);
                       end;
 
-                     if(pu^.buff[ub_invuln  ]=0)and(buff[ub_invuln  ]>0)then _unit_PowerUpEff(uu,snd_hell_invuln);
+                     if(pu^.buff[ub_invuln]=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln);
                   end;
-
-                  {if(uidi in [UID_Major,UID_ZMajor])then
-                   if(pu^.hits>0)then
-                   begin
-                      if(pu^.uf=uf_ground)and(uf>uf_ground)then PlaySND(snd_jetpon ,uu,@vis);
-                      if(pu^.uf>uf_ground)and(uf=uf_ground)then PlaySND(snd_jetpoff,uu,@vis);
-                   end;}
                end;
             end;
 
@@ -728,12 +722,13 @@ begin
       begin
          t  :=_rudata_byte  (rpl,0);
          str:=_rudata_string(rpl);
-         PlayersAddLog(p,0,t,str);
+         PlayerAddLog(p,t,str,false);
          s-=1;
       end;
-      if(rpl=false)and(p<=MaxPlayers)then
-       with _players[p] do
-        log_n:=_rudata_card(rpl,log_n);
+      if(rpl=false)then
+       if(p<=MaxPlayers)
+       then with _players[p] do log_n:=_rudata_card(rpl,log_n)
+       else _rudata_card(rpl,0);
    end;
 end;
 
@@ -889,9 +884,9 @@ end;
 
 
 procedure _rpdata(rpl:boolean);
-var i,n,bp,bv,lu,anoncer:byte;
+var i,n,bp,bv:byte;
 begin
-   anoncer:=0;
+   //anoncer:=0; ,lu
    if(g_player_status>0)then
    for i:=1 to MaxPlayers do
     if((g_player_status and (1 shl i))>0)then
@@ -905,21 +900,21 @@ begin
          case bp of
          0: begin
                bv:=_rudata_byte(rpl,0);
-               lu:=upgr[n];
+               //lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv and %00001111);
-               if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
+               //if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=1;
             end;
          1: begin
-               lu:=upgr[n];
+               //lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv shr 4);
-               if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
+               //if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=0;
             end;
          end;
      end;
 
-   if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer],true);
+   //if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer],true);
 end;
 
 procedure ClNUnits;

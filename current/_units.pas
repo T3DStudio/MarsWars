@@ -35,8 +35,8 @@ begin
 
        if(G_WTeam=255)then
         if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
-         if(army<=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-         and(state>ps_none)then GameLogPlayerDefeat(playeri);
+         if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+         then GameLogPlayerDefeated(playeri);
     end;
 end;
 
@@ -1041,6 +1041,8 @@ begin
    with uid^    do
    with player^ do
    begin
+      _unit_cupgrade (pu,255);
+      _unit_ctraining(pu,255);
       _unit_bld_dec_cntrs(pu);
       buff[ub_advanced]:=_ub_infinity;
       bld := false;
@@ -1099,7 +1101,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(not _ukbuilding)and(bld)and(_ability=0)then
+      if(_ukbuilding)and(bld)and(_ability=0)then
        if(_isbarrack)or(_issmith)then
        if(tu^.uid^._ukbuilding)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)then
         if(buff[ub_advanced]<=0)and(cenerg>=_renerg)then

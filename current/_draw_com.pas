@@ -118,7 +118,7 @@ begin
      if(t in sd)then
       if(mmr>0)
       then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor(r_bminimap,mmx,mmy,mmc);
+      else pixelColor       (r_bminimap,mmx,mmy,    mmc);
 end;
 
 procedure map_bminimap;

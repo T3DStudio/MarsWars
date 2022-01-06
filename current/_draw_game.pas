@@ -1,123 +1,99 @@
 
-procedure _sl_add(ax,ay,ad,ash:integer;arc,amsk:cardinal;arct:boolean;aspr:PTMWTexture;ainv:byte;abar:single;aclu:integer;acrl,acll:byte;acru:string6;aro:integer);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SpriteList
+//
+
+const TVisSprSize =  SizeOf(TVisSpr);
+
+var slatemp : PTVisSpr;
+
+function SpriteListAdd:PTVisSpr;
 begin
+   SpriteListAdd:=nil;
    if(vid_vsls<vid_mvs)and(_menu=false)then
    begin
       vid_vsls+=1;
+      SpriteListAdd:=vid_vsl[vid_vsls];
+      FillChar(SpriteListAdd^,TVisSprSize,0);
       with vid_vsl[vid_vsls]^ do
       begin
-         x   := ax-vid_cam_x;
-         y   := ay-vid_cam_y;
-         d   := ad;
-         sh  := ash;
-         s   := aspr;
-         rc  := arc;
-         msk := amsk;
-         inv := ainv;
-         bar := abar;
-         clu := aclu;
-         cru := acru;
-         crl := acrl;
-         cll := acll;
-         rct := arct;
-         ro  := aro;
-         xo  := 0;
-         yo  := 0;
-      end;
-   end;
-end;
-//_sl_add(x-spr^.hw, y-spr^.hh,dpth,shh,0,0,false,spr^.surf,255,0,0,0,0,'',ro);
-procedure _sl_add_dec(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,ayo:integer);
-begin
-   if(vid_vsls<vid_mvs)and(_menu=false)then
-   begin
-      vid_vsls+=1;
-      with vid_vsl[vid_vsls]^ do
-      begin
-         x   := ax-vid_cam_x;
-         y   := ay-vid_cam_y;
-         d   := ad;
-         sh  := ash;
-         s   := aspr;
-         rc  := 0;
-         msk := 0;
-         inv := ainv;
-         bar := 0;
-         clu := 0;
-         cru := '';
-         crl := 0;
-         cll := 0;
-         rct := false;
-         ro  := aro;
-         xo  := axo;
-         yo  := ayo;
-      end;
-   end;
-end;
-procedure _sl_add_dec2(ax,ay,ad,ash:integer;aspr:PTMWTexture;ainv:byte;aro,axo,ayo:integer;_cru:string6);
-begin
-   if(vid_vsls<vid_mvs)and(_menu=false)then
-   begin
-      vid_vsls+=1;
-      with vid_vsl[vid_vsls]^ do
-      begin
-         x   := ax-vid_cam_x;
-         y   := ay-vid_cam_y;
-         d   := ad;
-         sh  := ash;
-         s   := aspr;
-         rc  := 0;
-         msk := 0;
-         inv := ainv;
-         bar := 0;
-         clu := 0;
-         cru := _cru;
-         crl := 0;
-         cll := 0;
-         rct := false;
-         ro  := aro;
-         xo  := axo;
-         yo  := ayo;
-      end;
-   end;
-end;
-//_sl_add(x-spr^.hw, y-spr^.hh,d,0,0,msk,false,spr^.surf,alpha,0,0,0,0,'',0);
-procedure _sl_add_eff(ax,ay,ad:integer;amsk:cardinal;aspr:PTMWTexture;ainv:byte);
-begin
-   if(vid_vsls<vid_mvs)and(_menu=false)then
-   begin
-      vid_vsls+=1;
-      with vid_vsl[vid_vsls]^ do
-      begin
-         x   := ax-vid_cam_x;
-         y   := ay-vid_cam_y;
-         d   := ad;
-         sh  := -32000;
-         s   := aspr;
-         rc  := 0;
-         msk := amsk;
-         inv := ainv;
-         bar := 0;
-         clu := 0;
-         cru := '';
-         crl := 0;
-         cll := 0;
-         rct := false;
-         ro  := 0;
-         xo  := 0;
-         yo  := 0;
+         alpha:=255;
       end;
    end;
 end;
 
-procedure _sv_sort;
+procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+begin
+   slatemp:=SpriteListAdd;
+   if(slatemp<>nil)then
+    with slatemp^ do
+    begin
+       x      := ax-vid_cam_x;
+       y      := ay-vid_cam_y;
+       depth  := adepth;
+       shadowz:= ashadowz;
+       sprite := aspr;
+       aura   := aaura;
+       alpha  := aalpha;
+    end;
+end;
+procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axo,ayo:integer);
+begin
+   slatemp:=SpriteListAdd;
+   if(slatemp<>nil)then
+    with slatemp^ do
+    begin
+       x      := ax-vid_cam_x;
+       y      := ay-vid_cam_y;
+       depth  := adepth;
+       shadowz:= ashadowz;
+       sprite := aspr;
+       aalpha := aalpha;
+       xo     := axo;
+       yo     := ayo;
+    end;
+end;
+procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
+begin
+   slatemp:=SpriteListAdd;
+   if(slatemp<>nil)then
+    with slatemp^ do
+    begin
+       x      := ax-vid_cam_x;
+       y      := ay-vid_cam_y;
+       depth  :=  32000;
+       shadowz:= -32000;
+       sprite := aspr;
+       alpha  := 255;
+       yo     := -aspr^.hh;
+    end;
+end;
+procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+begin
+   slatemp:=SpriteListAdd;
+   if(slatemp<>nil)then
+    with slatemp^ do
+    begin
+       x      := ax-vid_cam_x;
+       y      := ay-vid_cam_y;
+       depth  := adepth;
+       shadowz:= -32000;
+       sprite := aspr;
+       aura   := aaura;
+       alpha  := aalpha;
+    end;
+end;
+
+procedure SpriteListSort;
 var i,u:word;
     dt :PTVisSpr;
 begin
    if(vid_vsls>1)then
     for i:=1 to vid_vsls do
      for u:=1 to (vid_vsls-1) do
-      if(vid_vsl[u]^.d<vid_vsl[u+1]^.d)then
+      if(vid_vsl[u]^.depth<vid_vsl[u+1]^.depth)then
       begin
         dt:=vid_vsl[u];
         vid_vsl[u]:=vid_vsl[u+1];
@@ -128,72 +104,265 @@ end;
 procedure D_SpriteList(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy:integer;
 begin
-   _sv_sort;
+   SpriteListSort;
    while(vid_vsls>0)do
     with vid_vsl[vid_vsls]^ do
     begin
-       x-=s^.hw;
-       y-=s^.hh;
+       vid_vsls-=1;
+
+       x-=sprite^.hw;
+       y-=sprite^.hh;
 
        x+=lx+xo;
        y+=ly+yo;
 
-       if(sh>-fly_hz)then
+       if(shadowz>-fly_hz)then
        begin
-          sx:=s^.hw;
-          sy:=s^.h-(s^.h shr 3);
-          filledellipseColor(tar,x+sx,y+sy+sh,sx,s^.hh shr 1,c_ablack);
+          sx:=sprite^.hw;
+          sy:=sprite^.h-(sprite^.h shr 3);
+          filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,c_ablack);
        end;
-       if(inv<255)then SDL_SetAlpha(s^.surf,SDL_SRCALPHA or SDL_RLEACCEL,inv);
+       if(alpha>0)then
+        if(alpha=255)
+        then _draw_surf(tar,x,y,sprite^.surf)
+        else
+        begin
+           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+           _draw_surf(tar,x,y,sprite^.surf);
+           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+        end;
 
-       if(inv>0)then _draw_surf(tar,x,y,s^.surf);
-
-       x-=xo;
-       y-=yo;
-
-       if(msk>0)or(ro>0)then
+       if(aura>0)then
        begin
-          sx:=s^.w shr 1;
-          sy:=s^.h shr 1;
-          if(msk>0)then filledellipseColor(tar,x+sx,y+sy,sx,sy,msk);
-          if(ro >0)then circleColor       (tar,x+sx,y+sy,ro,c_gray);
+          sx:=sprite^.w shr 1;
+          sy:=sprite^.h shr 1;
+          filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
        end;
-
-       sx:=s^.h;
-       if(bar>0)
-       then sy:=4
-       else sy:=1;
-       if(y<sy)then
-       begin
-          sx:=s^.h+y-sy;
-          y:=sy;
-       end;
-       sy:=y;
-
-       if(sy>-s^.h)then
-       begin
-          if(rc>0)and(y>-s^.h)then
-          begin
-             if(rct)then rectangleColor(tar,x-1,y-1,x+s^.w,y+sx, rc);
-             if(bar>0)then
-             begin
-                boxColor(tar,x-1,y-4,x+s^.w           ,y-1,c_black);
-                boxColor(tar,x-1,y-4,x+trunc(bar*s^.w),y-1,rc);
-             end;
-          end;
-          if(clu >0 )then _draw_text(tar,x     ,y          ,i2s(clu),ta_left ,255,c_white);
-          if(cru<>'')then _draw_text(tar,x+s^.w,y          ,cru     ,ta_right,3,c_white);
-          if(cll >0 )then _draw_text(tar,x     ,y+sx-font_w,b2s(cll),ta_left ,255,c_white);
-          if(crl >0 )then _draw_text(tar,x+s^.w,y+sx-font_w,b2s(crl),ta_right,255,c_white);
-       end;
-
-       y:=sy;
-
-       if(inv<255)then SDL_SetAlpha(s^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
-
-       vid_vsls-=1;
     end;
 end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UnitsInfo
+//
+
+const TVisPrimSize =  SizeOf(TVisPrim);
+
+procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind :=uinfo_rect;
+      x0   :=ax0;
+      y0   :=ay0;
+      x1   :=ax1;
+      y1   :=ay1;
+      color:=acolor;
+   end;
+end;
+procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind :=uinfo_box;
+      x0   :=ax0;
+      y0   :=ay0;
+      x1   :=ax1;
+      y1   :=ay1;
+      color:=acolor;
+   end;
+end;
+procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind :=uinfo_circle;
+      x0   :=ax0;
+      y0   :=ay0;
+      x1   :=ar;
+      color:=acolor;
+   end;
+end;
+
+procedure UnitsInfoAddSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,srt,srd,sld:string6);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind   :=uinfo_rect;
+      x0     :=ax0-aspr^.hw;
+      y0     :=ay0-aspr^.hh;
+      x1     :=x0+aspr^.w;
+      y1     :=y0+aspr^.h;
+      sprite :=aspr;
+      color  :=acolor;
+      text_lt:=slt;
+      text_rt:=srt;
+      text_rd:=srd;
+      text_ld:=sld;
+   end;
+end;
+
+procedure UnitsInfoProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
+var vx:integer;
+begin
+   if(per<0)then per:=0;
+   if(per>1)then per:=1;
+
+   if(per=0)
+   then UnitsInfoAddBox(ax0,ay0,ax1,ay1,c_black)
+   else
+     if(per=1)
+     then UnitsInfoAddBox(ax0,ay0,ax1,ay1,acolor)
+     else
+     begin
+        vx:=trunc((ax1-ax0)*per);
+
+        UnitsInfoAddBox(ax0   ,ay0,ax0+vx,ay1,acolor );
+        UnitsInfoAddBox(ax0+vx,ay0,ax1   ,ay1,c_black);
+     end;
+end;
+
+{ if(_ukbuilding)then
+  if(0<m_brush)and(m_brush<=255)
+  then ro:=_r
+  else
+  begin
+     if(sel)then
+      case uidi of
+     UID_UCTurret,
+     UID_UPTurret,
+     UID_URTurret,
+     UID_HTower,
+     UID_HTotem,
+     UID_UMine,
+     UID_HEye     : ro:=ar;
+     UID_HSymbol  : if(upgr[upgr_b478tel]>0)then ro:=sr;
+      else
+      if(isbuilder)and(speed=0)then ro:=sr;
+      end;
+  end;
+  if((sel)and(playeri=HPlayer))
+ or(k_alt>1)
+ or((ui_umark_u=unum)and(vid_rtui>vid_rtuish))then
+ begin
+    rct:=true;
+    if(buff[ub_advanced ]>0)then b1:=b1+adv_char;
+    if(buff[ub_detect   ]>0)then b1:=b1+hp_detect;
+    if(playeri=HPlayer)then
+    begin
+       if(order>0)then b0:=order;
+       if(apcm>0)then
+       begin
+          b2:=apcm;
+          b3:=apcc;
+       end;
+    end;
+ end;
+
+ if(rct)
+ then sb:=hits/_mhits
+ else
+   case vid_uhbars of
+ 0: if(hits<_mhits)then sb:=hits/_mhits;
+ 1: sb:=hits/_mhits;
+   end;   }
+
+procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
+var srect,hbar:boolean;
+    acolor:cardinal;
+begin
+   with pu^   do
+   with uid^  do
+   with uspr^ do
+   begin
+      acolor:=PlayerGetColor(playeri);
+
+      srect :=((sel)and(playeri=HPlayer))
+            or(k_alt>1)
+            or((ui_umark_u=unum)and(vid_rtui>vid_rtuish));
+
+      hbar  :=false;
+      if(srect)
+      then hbar:=true
+      else
+        case vid_uhbars of
+      0: if(hits<_mhits)then hbar:=true;
+      1: hbar:=true;
+        end;
+
+      if(srect)then UnitsInfoAddRect    (vx-hw,vy-hh  ,vx+hw,vy+hh,            acolor);
+      if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
+
+      if(speed<=0)and(solid)then
+       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitr[vid_rtui>vid_rtuish]);
+
+      //if(sel)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,c_gray);
+   end;
+end;
+
+procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
+var t:integer;
+begin
+   case g_mode of
+gm_cptp: for t:=1 to MaxCPoints do
+          with g_cpoints[t] do
+           circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,g_ct_pr,PlayerGetColor(pl));
+gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
+   end;
+
+
+   while(vid_prims>0)do
+    with vid_prim[vid_prims-1] do
+    begin
+       vid_prims-=1;
+
+       x0-=vid_cam_x;
+       y0-=vid_cam_y;
+       if(kind<>uinfo_circle)then
+       begin
+          x1-=vid_cam_x;
+          y1-=vid_cam_y;
+          if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
+          if(y0>y1)then begin t:=y0;y0:=y1;y1:=t;end;
+       end;
+
+       if(sprite<>nil)then
+        with sprite^ do _draw_surf(tar,x0,y0,surf);
+
+       if(color>0)then
+        case kind of
+uinfo_line   : lineColor     (tar,x0,y0,x1,y1,color);
+uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
+uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
+uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
+        else
+        end;
+
+       if(length(text_lt)>0)then _draw_text(tar,x0+1,y0+1       ,text_lt,ta_left ,255,c_white);
+       if(length(text_rt)>0)then _draw_text(tar,x1-1,y0+1       ,text_rt,ta_right,255,c_white);
+       if(length(text_rd)>0)then _draw_text(tar,x1-1,y1-1-font_w,text_rd,ta_right,255,c_white);
+       if(length(text_ld)>0)then _draw_text(tar,x0+1,y1-1-font_w,text_ld,ta_left ,255,c_white);
+    end;
+   setlength(vid_prim,vid_prims);
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Terrain
+//
 
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
 var i,t,
@@ -236,8 +405,16 @@ begin
      end;
 end;
 
-procedure d_foglayer(tar:pSDL_Surface;lx,ly:integer);
-var cx,cy,ssx,ssy,sty,ci:integer;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  FOG
+//
+
+
+procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
+var cx,cy,ssx,ssy,sty:integer;
+    ci:integer;
     pf:word;
     cl:cardinal;
 begin
@@ -259,14 +436,6 @@ begin
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
-   end;
-
-
-   case g_mode of
-gm_cptp: for cx:=1 to MaxCPoints do
-          with g_cpoints[cx] do
-           circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,g_ct_pr,PlayerGetColor(pl));
-gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
 
 

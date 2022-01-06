@@ -163,8 +163,8 @@ vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_rtui          : byte = 0;
-vid_cam_x            : integer = 0;
-vid_cam_y            : integer = 0;
+vid_cam_x         : integer = 0;
+vid_cam_y         : integer = 0;
 vid_vmspd         : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
@@ -178,6 +178,8 @@ vid_mapx          : integer = 0;
 vid_mapy          : integer = 0;
 vid_vsl           : array[1..vid_mvs] of PTVisSpr;
 vid_vsls          : word = 0;
+vid_prim          : array of TVisPrim;
+vid_prims         : word = 0;
 
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
@@ -280,23 +282,19 @@ ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 
 ui_orders_n,                                             //
 ui_orders_x,                                             //
-ui_orders_y       : array[0..10] of integer;             //
-ui_orders_uids    : array[0..9,false..true] of TSob;     //
+ui_orders_y       : array[0..MaxUnitOrders] of integer;             //
+ui_orders_uids    : array[0..MaxUnitOrders,false..true] of TSob;    //
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
-ui_builders_s     : integer = 0;
-ui_builders_x     : array of integer; //
-ui_builders_y     : array of integer; // builders areas
-ui_builders_r     : array of integer; //
-
 ui_first_upgr_time: integer = 0;
 ui_upgr           : array[byte] of integer;
 ui_units_inapc    : array[byte] of integer;
 ui_prod_units     : array[byte] of integer;
+ui_prod_upgrades  : array[byte] of integer;
 ui_units_ptime    : array[byte] of integer;
 ui_prod_builds    : TSoB;
 ui_uid_builds     : array[byte] of integer;
@@ -304,12 +302,12 @@ ui_uid_buildn     : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_uibtn_move     : integer = 0; // ui move buttons
 ui_uibtn_action   : integer = 0; // ui action button
-ui_uibtn_f2       : integer = 0; // ui select all button
 ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_muc            : array[false..true] of cardinal; // unit max count color
 ui_limit          : array[false..true] of cardinal; // unit limit colors
+ui_unitr          : array[false..true] of cardinal;
 
 ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
@@ -319,16 +317,14 @@ ui_texty          : integer = 0;  // timer/chat screen Y
 ui_hinty          : integer = 0;  // hints screen Y
 ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
-ui_iy             : integer = 0;
 ui_energx         : integer = 0;
 ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
 
-ui_chat_sound     : boolean = false;
-
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
+ui_log_c          : array of cardinal;
 ui_log_n          : integer = 0;
 
 k_dbl,

@@ -2,7 +2,7 @@
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
-     map_sprites(noanim);
+     map_DoodadsDraw(noanim);
     unit_sprites(noanim);
  effects_sprites(noanim,r_draw);
 missiles_sprites(noanim,r_draw);
@@ -10,12 +10,13 @@ end;
 
 procedure d_Game;
 begin
-   d_AddObjSprites(G_Paused>0);
+   D_AddObjSprites(G_Paused>0);
 
-   d_terrain   (r_screen,vid_mapx,vid_mapy);
-   d_SpriteList(r_screen,vid_mapx,vid_mapy);
-   d_foglayer  (r_screen,vid_mapx,vid_mapy);
-   d_ui        (r_screen,vid_mapx,vid_mapy);
+   D_terrain   (r_screen,vid_mapx,vid_mapy);
+   D_SpriteList(r_screen,vid_mapx,vid_mapy);
+   D_Fog       (r_screen,vid_mapx,vid_mapy);
+   D_UnitsInfo (r_screen,vid_mapx,vid_mapy);
+   D_ui        (r_screen,vid_mapx,vid_mapy);
 
    _draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
 

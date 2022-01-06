@@ -174,7 +174,7 @@ begin
             case mid of
 nmid_log_chat    : begin
                       i:=net_readbyte;
-                      PlayersAddLog(pid,i,lmt_chat,net_readstring);    // chat
+                      PlayersAddLog(pid,i,lmt_chat,net_readstring,false);    // chat
                       {$IFNDEF _FULLGAME}
                       if(G_Started=false)then
                        with(_players[pid])do
@@ -183,7 +183,8 @@ nmid_log_chat    : begin
                       continue;
                    end;
 nmid_player_leave: begin
-                      PlayersAddLog(pid,log_to_all,lmt_game,_players[pid].name+str_plout);
+
+                      GameLogPlayerLeave(pid);
                       if(G_Started=false)then PlayerSetState(pid,ps_none);
                       continue;
                    end;

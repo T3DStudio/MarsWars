@@ -57,6 +57,8 @@ begin
    ui_muc    [true ]:=c_gray;
    ui_limit  [false]:=c_white;
    ui_limit  [true ]:=c_red;
+   ui_unitr  [false]:=c_white;
+   ui_unitr  [true ]:=c_black;
 end;
 
 function _createSurf(tw,th:integer):pSDL_Surface;
@@ -220,10 +222,13 @@ begin
 
    if(animstyle=0)then
    begin
-      case animst of
+      {case animst of
       0:   e:=d div 22;
       else e:=d div 32;
-      end;
+      end;}
+      if(animst=0)
+      then e:=12
+      else e:=d div 32;
       rand:=0;
       dir :=0;
       i   :=r+e;
@@ -236,14 +241,15 @@ begin
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
          filledcircleColor(surf,x,y,p,c_purple);
-         dir +=8;
+         dir+=max2(1,(trunc(p*180/(pi*r)) div 3)*4 );
+         //dir +=8;  _cr:=_minr+random(_rstep);
          rand+=13;
       end;
    end;
 
    dir:=0;
    case animstyle of
-   0: i:=r div 10;
+   0: i:=r div 12;
    1: i:=-5;
    end;
 
@@ -255,7 +261,7 @@ begin
       y:=r+trunc(d*sin(dir*degtorad));
       filledcircleColor(surf,x,y,p,c_purple);
    end;
-   if(itb)then filledcircleColor(surf,r,r,r-(r div 6)-5,c_purple);
+   if(itb)then filledcircleColor(surf,r,r,r-(r div 6)-10,c_purple);
 end;
 
 procedure MakeLiquid;
@@ -491,6 +497,8 @@ begin
 
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
+   vid_prims:=0;
+   setlength(vid_prim,vid_prims);
 
    with spr_dummy do
    begin
@@ -735,7 +743,7 @@ begin
 
    ui_energx    := ui_uiuphx-100;
    ui_energy    := ui_texty;
-   ui_armyx     := ui_uiuphx+80;
+   ui_armyx     := ui_uiuphx+90;
    ui_armyy     := ui_texty;
 
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
@@ -798,8 +806,6 @@ begin
       y:=vid_BW*14;
       vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
       vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
-
-      ui_iy     := vid_panelw+3;
    end
    else
    begin
@@ -822,10 +828,6 @@ begin
       y:=vid_BW*14;
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
-
-      ui_iy     := 3;
-
-      ui_iy := 23;
    end;
 
    rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);

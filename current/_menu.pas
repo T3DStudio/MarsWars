@@ -13,7 +13,7 @@ begin
    end;
 end;
 
-function menu_sf(s:shortstring;charset:TSoc;ms:byte):shortstring;
+function StringApplyInput(s:shortstring;charset:TSoc;ms:byte):shortstring;
 var i:byte;
     c:char;
 begin
@@ -30,10 +30,10 @@ begin
          if(c in charset)then s:=s+c;
    end;
    k_keyboard_string:='';
-   menu_sf:=s;
+   StringApplyInput:=s;
 end;
 
-procedure c_m_sel;
+procedure MenuItem;
 begin
    menu_item:=0;
 
@@ -156,8 +156,8 @@ begin
    if(k_ml=2)or(k_mr=2) then   //right or left click
    begin
       if(menu_item=90)then net_cl_saddr;
-      if(menu_item=11 )then _players[HPlayer].name:=PlayerName;
-      c_m_sel;
+      if(menu_item=11)then _players[HPlayer].name:=PlayerName;
+      MenuItem;
       if not(menu_item in [16,17])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
       vid_menu_redraw:=true;
       SoundPlayUI(snd_click);
@@ -444,11 +444,11 @@ begin
    begin
       case menu_item of
       // MAP
-      50 : begin Map_randomseed;                                  Map_premap;end;
+      50 : begin Map_randomseed;                                 Map_premap;end;
       51 : begin ScrollInt(@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin ScrollInt(@map_liq,-1,0,7);                     Map_premap;end;
       53 : begin ScrollInt(@map_obs,-1,0,7);                     Map_premap;end;
-      56 : begin Map_randommap;                                   Map_premap;end;
+      56 : begin Map_randommap;                                  Map_premap;end;
 
       60 : begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
@@ -481,19 +481,19 @@ begin
    if(length(k_keyboard_string)>0)then
    begin
       case menu_item of
-      11 : PlayerName:=menu_sf(PlayerName,k_kbstr,NameLen);
-      37 : _svld_str :=menu_sf(_svld_str ,k_kbstr,SvRpLen);
+      11 : PlayerName:=StringApplyInput(PlayerName,k_kbstr,NameLen);
+      37 : _svld_str :=StringApplyInput(_svld_str ,k_kbstr,SvRpLen);
       50 : begin
-              map_seed:=s2c(menu_sf(c2s(map_seed),k_kbdig,10));
+              map_seed:=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
               map_premap;
            end;
-      83 : rpls_str_name:=menu_sf(rpls_str_name,k_kbstr,SvRpLen);
+      83 : rpls_str_name:=StringApplyInput(rpls_str_name,k_kbstr,SvRpLen);
       87 : begin
-              net_sv_pstr:=menu_sf(net_sv_pstr,k_kbdig,5);
+              net_sv_pstr:=StringApplyInput(net_sv_pstr,k_kbdig,5);
               net_sv_sport;
            end;
-      90 : net_cl_svstr:=menu_sf(net_cl_svstr,k_kbaddr,21);
-      100: net_chat_str:=menu_sf(net_chat_str,k_kbstr ,255);
+      90 : net_cl_svstr:=StringApplyInput(net_cl_svstr,k_kbaddr,21);
+      100: net_chat_str:=StringApplyInput(net_chat_str,k_kbstr ,255);
       end;
 
       vid_menu_redraw:=true;

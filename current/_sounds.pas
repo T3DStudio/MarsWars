@@ -365,6 +365,27 @@ begin
    end;
 end;
 
+procedure SoundLog(ptarget:byte);
+begin
+   with _players[ptarget] do
+   begin
+      //ps:=@log_ls[log_i];
+      case log_lt[log_i] of
+0..MaxPlayers : if((ptarget=HPlayer)and(log_lt[log_i]<>ptarget))
+                or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
+lmt_chat      : SoundPlayUI(snd_chat);
+lmt_game      : SoundPlayUI(snd_chat);
+lmt_endgame   : if(_players[HPlayer].team=team)
+                then SoundPlayAnoncer(snd_victory[race],false)
+                else SoundPlayAnoncer(snd_defeat [race],false);
+lmt_defeated  : if(HPlayer<>ptarget)
+                then SoundPlayAnoncer(snd_player_defeated[race],true);
+//lmt_unit      : if(length(ps^)>1)then
+//                 with _uids[ord(ps^[1])] do SoundPlayAnoncer(un_snd_ready[ps^[2]<>#0],true);
+lmt_upgrade   : SoundPlayAnoncer(snd_upgrade_complete[race],true);
+      end;
+   end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -386,17 +407,16 @@ begin
    end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   MAIN
+//
 
 procedure SoundControl;
 begin
    if(vid_rtui=0)then SoundMusicControll;
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
-   if(ui_chat_sound)then
-   begin
-      SoundPlayUI(snd_chat);
-      ui_chat_sound:=false;
-   end;
 end;
 
 

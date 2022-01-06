@@ -19,7 +19,7 @@ begin
        if(length(net_chat_str)>0)then
         if(net_status=ns_clnt)
         then net_send_chat
-        else PlayersAddLog(HPlayer,net_chat_tar,HPlayer,net_chat_str);//message type = player number (chat)
+        else PlayersAddLog(HPlayer,net_chat_tar,HPlayer,net_chat_str,false);//message type = player number (chat)
        net_chat_str:='';
        ingame_chat:=false;
     end;
@@ -62,21 +62,19 @@ begin
    gadv:=false;
 
    with _players[HPlayer] do
-   begin
-      for i:=1 to MaxUnits do
-      with _units[i] do
+    for i:=1 to MaxUnits do
+     with _units[i] do
       with uid^ do
-      if(hits>0)and(sel)and(playeri=HPlayer)then
-      if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(_units[i].uidi))then
-      begin
-         su+=1;
-         if(bld)then
-         begin
-            guid:=uidi;
-            gadv:=buff[ub_advanced]>0;
-         end;
-      end;
-   end;
+       if(hits>0)and(sel)and(playeri=HPlayer)then
+        if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(_units[i].uidi))then
+        begin
+           su+=1;
+           if(bld)then
+           begin
+              guid:=uidi;
+              gadv:=buff[ub_advanced]>0;
+           end;
+        end;
 
    if(su<=0)then exit;
 
@@ -142,7 +140,9 @@ begin
            o_id:=oid;
         end;
 
-      if(oid=uo_corder)then _ClientCommandEffect(ox0,oy0,ox1,oy1);
+      case oid of
+      uo_corder : _ClientCommandEffect(ox0,oy0,ox1,oy1);
+      end;
    end;
 end;
 
@@ -237,11 +237,11 @@ begin
    case m_brush of
 co_move    : begin                     // move
                 t:=_whoInPoint(x,y,2);
-                _player_s_o(co_move ,t,x,y,0,uo_corder,HPlayer);
+                _player_s_o(m_brush ,t,x,y,0,uo_corder,HPlayer);
              end;
 co_amove   : begin                     // attack
                 t:=_whoInPoint(x,y,1);
-                _player_s_o(co_amove,t,x,y,0,uo_corder,HPlayer);
+                _player_s_o(m_brush,t,x,y,0,uo_corder,HPlayer);
              end;
 co_paction,
 co_patrol,
@@ -267,6 +267,7 @@ end;
 
 procedure _panel_click(tab,bx,by:integer;right,mid:boolean);
 var u:integer;
+   tu:PTUnit;
 begin
    //writeln(tab,': ',bx,', ',by);
    SoundPlayUI(snd_click);
@@ -302,9 +303,9 @@ false: begin
           end
           else check_mouse_brush;
        end;
-true : if(uid_x[ui_panel_uids[race,0,u]]>0)then
-        if(_rclickmove(ui_panel_uids[race,0,u]))then
-         with _units[uid_x[ui_panel_uids[race,0,u]]] do _command(x,y);
+true : if(_IsUnitRange(uid_x[ui_panel_uids[race,0,u]],@tu))then
+        if(_rclickmove(tu^.uidi))then
+         with tu^ do _command(x,y);
    end;
 
 1: if(G_Paused=0)and(rpls_state<rpl_runit)then  // units
@@ -340,9 +341,9 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
 
    9 : m_brush:=co_paction;
 
-   10: if(ui_orders_x[10]>0)then
+   10: if(ui_orders_x[MaxUnitOrders]>0)then
         if(k_dbl>0)
-        then MoveCamToPoint(ui_orders_x[10], ui_orders_y[10])
+        then MoveCamToPoint(ui_orders_x[MaxUnitOrders], ui_orders_y[MaxUnitOrders])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
          end;
@@ -368,10 +369,10 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
           if(G_Paused>0)
           then G_Paused:=0
           else G_Paused:=200;
-     15: rpls_plcam :=not rpls_plcam;
+     15: rpls_plcam  :=not rpls_plcam;
      16: rpls_showlog:=not rpls_showlog;
      17: rpls_fog    :=not rpls_fog;
- 20..26: HPlayer    :=u-20;
+ 20..26: HPlayer     :=u-20;
         end;
 
       end;
@@ -440,15 +441,16 @@ begin
               case k of
            sdlk_0..sdlk_9 :  begin
                                 ko:=_event^.key.keysym.sym-sdlk_0;
-                                if (k_ctrl>1)
-                                then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
-                                else
-                                  if (k_alt>1)
-                                  then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
-                                  else
-                                    if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
-                                    then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
-                                    else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
+                                if(ko<MaxUnitOrders)then
+                                 if (k_ctrl>1)
+                                 then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
+                                 else
+                                   if (k_alt>1)
+                                   then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
+                                   else
+                                     if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
+                                     then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
+                                     else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
                              end;
 
               else
@@ -486,6 +488,8 @@ begin
    _keyp(@k_mr   );
    _keyp(@k_chart); // last key
    if(k_dbl>0)then k_dbl-=1;
+
+   k_keyboard_string:='';
 
    if(k_chart>k_chrtt)then
     if(length(k_keyboard_string)<255)then k_keyboard_string:=k_keyboard_string+k_char;
@@ -709,7 +713,7 @@ end;
 procedure g_keyboard;
 begin
    if(m_vmove=false)and(rpls_plcam=false)then _view_move;
-   if(ingame_chat)then net_chat_str:=menu_sf(net_chat_str,k_kbstr,ChatLen2);
+   if(ingame_chat)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2);
 end;
 
 procedure InputGame;

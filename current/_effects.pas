@@ -268,7 +268,7 @@ begin
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then _sl_add_eff(vx,vy,_depth(vy,mfs)+100,0,spr,255);
+       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,_depth(vy,mfs)+100,0,spr,255);
    end;
 end;
 
@@ -318,7 +318,7 @@ EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
         else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
-         if(RectInCam(x,y,spr^.hw,spr^.hh,0))then _sl_add_eff(x,y,d,smask,spr,alpha);
+         if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
      end;
 end;
 

@@ -313,6 +313,8 @@ begin
    setlength(theme_ant_liquids ,theme_spr_liquidn );
    setlength(theme_clr_liquids ,theme_spr_liquidn );
 
+   //              minimap color anim  anim     animstyle: 0=default; 1=1 frame + lava bliks; 2=static 1 frame
+   //          n   R    G    B   style time
    LiquidAnims(0,  16 , 16 , 150  , 0, 30);
    LiquidAnims(1,  10 , 150, 10   , 0, 30);
    LiquidAnims(2,  136, 68 , 32   , 0, 30);

@@ -456,7 +456,7 @@ begin
    map_doodads_cells_refresh;
    pf_make_grid;
    {$IFDEF _FULLGAME}
-   _map_dds;
+   map_DoodadsDrawData;
    map_RedrawMenuMinimap;
    {$ENDIF}
 end;

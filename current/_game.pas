@@ -152,7 +152,6 @@ begin
    ui_tab :=0;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
-   UIClearBuilderAreas;
 
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
@@ -329,21 +328,6 @@ begin
    CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
-function f2select(pu:PTUnit):boolean;
-begin
-   f2select:=false;
-   with pu^  do
-   with uid^ do
-   begin
-      if(speed          <=0)then exit;
-      if(_ukbuilding       )then exit;
-      if(_attack  =atm_none)then exit;
-      if(uo_id=ua_paction)
-      or(uo_id=ua_hold   )
-      or(uo_bx>0         )then exit;
-   end;
-   f2select:=true;
-end;
 
 procedure _u_ord(pl:byte);
 var
@@ -407,7 +391,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
 
                 if(o_id=uo_specsel)then
                  if(o_x0<1)or(255<o_x0)
-                 then begin if(f2select(pu)        )then sel:=true else if(o_y0=0)then sel:=false; end
+                 then begin if(UnitF2Select(pu)    )then sel:=true else if(o_y0=0)then sel:=false; end
                  else       if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
 
@@ -423,7 +407,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                 begin
                    case o_id of
                uo_setorder,
-               uo_addorder   : order:=o_x0;
+               uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitOrders)then order:=o_x0;
                uo_corder     : case o_x0 of  // o_x0 = id, o_y0 = tar, o_x1,o_y1 - x,y
                     co_destroy :  _unit_kill(pu,false,o_y0>0);
                     co_rcamove,
@@ -863,23 +847,22 @@ begin
       if(G_paused=0)then
       begin
          {$IFDEF _FULLGAME}
-         FillChar(ui_builders_x ,SizeOf(ui_builders_x ),0);
          FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
          ui_first_upgr_time:=0;
          ui_uid_buildn     :=0;
          ui_uibtn_action   :=0;
          ui_uibtn_move     :=0;
-         ui_uibtn_f2       :=0;
          ui_prod_builds    :=[];
-         FillChar(ui_prod_units ,SizeOf(ui_prod_units ),0);
-         FillChar(ui_orders_uids,SizeOf(ui_orders_uids),0);
-         FillChar(ui_upgrct     ,SizeOf(ui_upgrct     ),0);
-         FillChar(ui_upgr       ,SizeOf(ui_upgr       ),0);
-         FillChar(ui_units_inapc,SizeOf(ui_units_inapc),0);
-         FillChar(ui_uid_builds ,SizeOf(ui_uid_builds ),0);
-         FillChar(ui_orders_n   ,SizeOf(ui_orders_n   ),0);
-         FillChar(ui_orders_x   ,SizeOf(ui_orders_x   ),0);
-         FillChar(ui_orders_y   ,SizeOf(ui_orders_y   ),0);
+         FillChar(ui_prod_units   ,SizeOf(ui_prod_units   ),0);
+         FillChar(ui_prod_upgrades,SizeOf(ui_prod_upgrades),0);
+         FillChar(ui_orders_uids  ,SizeOf(ui_orders_uids  ),0);
+         FillChar(ui_upgrct       ,SizeOf(ui_upgrct       ),0);
+         FillChar(ui_upgr         ,SizeOf(ui_upgr         ),0);
+         FillChar(ui_units_inapc  ,SizeOf(ui_units_inapc  ),0);
+         FillChar(ui_uid_builds   ,SizeOf(ui_uid_builds   ),0);
+         FillChar(ui_orders_n     ,SizeOf(ui_orders_n     ),0);
+         FillChar(ui_orders_x     ,SizeOf(ui_orders_x     ),0);
+         FillChar(ui_orders_y     ,SizeOf(ui_orders_y     ),0);
          if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
 
          SoundPlayUnitSelect;

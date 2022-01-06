@@ -61,19 +61,26 @@ TEffect = record
             : integer;
 end;
 
+TVisPrim = record
+   kind     : byte;
+   sprite   : PTMWTexture;
+   cx,cy,
+   x0,y0,
+   x1,y1    : integer;
+   color    : cardinal;
+   text_lt,
+   text_rt,
+   text_rd,
+   text_ld  : string6;
+end;
+PTVisPrim = ^TVisPrim;
 TVisSpr = record
-   s        : PTMWTexture;
+   sprite   : PTMWTexture;
    x,y,xo,yo,
-   ro,
-   d,sh     : integer;
-   rc,msk   : cardinal;
-   inv      : byte;
-   bar      : single;
-   clu      : integer;
-   cll,
-   crl      : byte;
-   cru      : string6;
-   rct      : boolean;
+   depth,
+   shadowz  : integer;
+   aura     : cardinal;
+   alpha    : byte;
 end;
 PTVisSpr = ^TVisSpr;
 
@@ -490,11 +497,11 @@ TDoodad = record
 
    {$IFDEF _FULLGAME}
    animn,animt,
-   dpth,shh,ox,oy,
+   depth,shadowz,ox,oy,
    mmx,mmy,mmr :integer;
    mmc         :cardinal;
-   spr,
-   pspr        :PTMWTexture;
+   sprite,
+   back_sprite :PTMWTexture;
    {$ENDIF}
 end;
 PTDoodad = ^TDoodad;
