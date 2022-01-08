@@ -272,6 +272,15 @@ begin
    end;
 end;
 
+
+procedure teleport_effects(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
+begin
+   if PointInScreenF(vx,vy,@_players[HPlayer])
+   or PointInScreenF(tx,ty,@_players[HPlayer]) then SoundPlayUnit(snd,nil,nil);
+   _effect_add(vx,vy,_depth(vy+1,ukfly),eidstart);
+   _effect_add(tx,ty,_depth(ty+1,ukfly),eidend  );
+end;
+
 procedure effects_sprites(noanim,draw:boolean);
 var ei,
  alpha:integer;

@@ -493,8 +493,8 @@ begin
    // resources
    with _players[HPlayer] do
    begin
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg)+' / '+#19+i2s(menerg),ta_left,255,c_white);
-      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)            ,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg)+' / '+#19+i2s(menerg)    ,ta_left,255,c_white);
+      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)+' / '+#16+'120',ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

@@ -70,9 +70,8 @@ begin
          #25     : begin cl:=tc             ;if(i<ss)then continue;end;
          else
            case c of
-             hp_detect : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
-             hp_pshield: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_aqua);
-             adv_char  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white);
+            char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
+            char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white );
            else
              boxColor(sur,ix,y,ix+font_iw,y+font_iw,cl);
            end;

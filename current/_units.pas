@@ -273,38 +273,6 @@ gm_inv    : if(playeri=0)then dam:=dam div 2;
 end;
 
 
-{
-
-
-procedure _unit_bteleport(pu:PTUnit);
-begin
-   with pu^ do
-    with player^ do
-     if(bld)then
-      if(upgr[upgr_mainm]>0)and(buff[ub_clcast]=0)then
-       if(_unit_grbcol(uo_x,uo_y,r,255,0,upgr[upgr_mainonr]=0)=0)then
-       begin
-          dec(upgr[upgr_mainm],1);
-          {$IFDEF _FULLGAME}
-          if(_uvision(_players[HPlayer].team,pu,true))then
-           if(_nhp(x,y) or _nhp(uo_x,uo_y))then PlaySND(snd_cubes,nil);
-          _effect_add(x,y,0,EID_HKT_h);
-          {$ENDIF}
-          buff[ub_clcast ]:=vid_fps;
-          buff[ub_teleeff]:=vid_fps;
-          x :=uo_x;
-          y :=uo_y;
-          vx:=x;
-          vy:=y;
-          {$IFDEF _FULLGAME}
-          _effect_add(x,y,0,EID_HKT_s);
-          _unit_sfog(pu);
-          _unit_mmcoords(pu);
-          {$ENDIF}
-       end;
-end;
-}
-
 procedure _unit_action(pu:PTUnit);
 begin
    with pu^ do
@@ -337,7 +305,7 @@ uab_umine         : if(upgr[upgr_uac_mines]>0)and(buff[ub_clcast]<=0)then
                         _unit_add(vx,vy,UID_UMine,playeri,true,true);
                         buff[ub_clcast]:=fr_fps;
                      end;
-uab_CCFly         : if(zfall=0)then
+uab_advance       : if(zfall=0)then
                      if(buff[ub_advanced]>0)
                      then buff[ub_advanced]:=0
                      else buff[ub_advanced]:=_ub_infinity;
@@ -985,37 +953,36 @@ end;
 function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
 begin
    _move2uotar:=true;
-   {if(tu^.uidi=UID_HTeleport)then exit;
-   _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.sr);
-   dec(td,uu^.r+tu^.r);
-   if(td<=-melee_r)then _move2uotar:=false;
+   if(tu^.uid^._ability=uab_teleport)then exit;
+   _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.srange);
+   td-=uu^.uid^._r+tu^.uid^._r;
+   if(td<=-uu^.speed)then _move2uotar:=false;
    if(tu^.playeri=uu^.playeri)then
     if(_itcanapc(tu,uu))then
     begin
        _move2uotar:=true;
-       if(tu^.uf>uf_ground)and(tu^.uo_tar=0)then
+       if(tu^.ukfly)and(tu^.uo_tar=0)then
        begin
           tu^.uo_x:=uu^.x;
           tu^.uo_y:=uu^.y;
        end;
-    end;}
+    end;
 end;
 
 procedure _unit_uac_unit_adv(pu,tu:PTUnit);
 begin
+   // pu - target
+   // tu - caster
    with pu^  do
    with uid^ do
    begin
-      buff[ub_gear    ]:=gear_time[_ukmech];
+      buff[ub_gear]:=gear_time[_ukmech];
 
-      if(ServerSide)then
-      begin
-         buff[ub_advanced]:=_ub_infinity;
+      buff[ub_advanced]:=_ub_infinity;
 
-         if(tu^.player^.upgr[upgr_uac_6bld]>0)
-         then tu^.rld:=uac_adv_base_reload[_ukmech] div tu^.player^.upgr[upgr_uac_6bld]
-         else tu^.rld:=uac_adv_base_reload[_ukmech];
-      end;
+      if(tu^.buff[ub_advanced]>0)
+      then tu^.rld:=uac_adv_base_reload[_ukmech] div 2
+      else tu^.rld:=uac_adv_base_reload[_ukmech];
 
       {$IFDEF _FULLGAME}
       SoundPlayUnit(snd_unit_adv[_urace],pu,nil);
@@ -1030,7 +997,7 @@ begin
    begin
       buff[ub_advanced]:=_ub_infinity;
       {$IFDEF _FULLGAME}
-      _unit_PowerUpEff(pu,snd_unit_adv[_urace]);
+      _unit_PowerUpEff(pu,snd_unit_adv[_urace],nil);
       {$ENDIF}
    end;
 end;
@@ -1060,15 +1027,13 @@ begin
    with uid^ do
    if(tdm<=speed)and(tu^.rld<=0)and(not _ukbuilding)and(tu^.hits>0)then
    begin
-      if(tu^.buff[ub_advanced]>0)and(tu^.bld)and(buff[ub_advanced]<=0)then _unit_uac_unit_adv(pu,tu);
+      if(tu^.bld)and(buff[ub_advanced]<=0)and(_ability<>uab_advance)then _unit_uac_unit_adv(pu,tu); //(tu^.buff[ub_advanced]>0)and
       uo_x  :=tu^.uo_x;
       uo_y  :=tu^.uo_y;
       uo_tar:=tu^.uo_tar;
       _ability_uac__unit_adv:=true;
    end;
 end;
-
-
 
 function _ability_hell_unit_adv(pu,tu:PTUnit):boolean;
 begin
@@ -1078,7 +1043,7 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(not _ukbuilding)and(bld)then
+      if(not _ukbuilding)and(bld)and(_ability<>uab_advance)then
        with tu^.player^ do
         if(tu^.bld)and(tu^.hits>0)then
          if(buff[ub_advanced]<=0)and(upgr[upgr_hell_6bld]>0)then
@@ -1131,7 +1096,7 @@ begin
        if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
         if(td<=tu^.uid^._r)then
         begin
-           if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.uid^._srange)and(tu^.rld<=0) then
+           if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.srange)and(tu^.rld<=0) then
            begin
               if(ukfly=uf_ground)then
                if(tu^.buff[ub_transpause]>0)
@@ -1139,16 +1104,16 @@ begin
                else
                  if(_UnderObstacle(tu^.uo_x,tu^.uo_y))then exit;
 
-              _unit_teleport(pu,tu^.uo_x,tu^.uo_y);
+              _unit_teleport(pu,tu^.uo_x,tu^.uo_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
               _teleport_rld(tu,_mhits);
               _ability_teleport:=true;
            end;
         end
         else
-          if(tu^.buff[ub_advanced]>0)and(td>base_rr)then
+          if(tu^.buff[ub_advanced]>0)and(td>tu^.srange)then
            if(tu^.rld<=0)then
            begin
-              _unit_teleport(pu,tu^.x,tu^.y);
+              _unit_teleport(pu,tu^.x,tu^.y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
               _teleport_rld(tu,_mhits);
               _ability_teleport:=true;
            end
@@ -1164,9 +1129,8 @@ procedure _unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
      w: byte;
 td,tdm: integer;
-teams : boolean;
 begin
-   with pu^ do
+   with pu^  do
    with uid^ do
    begin
       if(uo_tar=unum)then uo_tar:=0;
@@ -1193,7 +1157,6 @@ begin
             case tu^.uid^._ability of
 uab_uac__unit_adv: if(_ability_uac__unit_adv(pu,tu,tdm))then exit;
 uab_hell_unit_adv: if(_ability_hell_unit_adv(pu,tu    ))then exit;
-//uab_building_adv : if(_ability_building_adv (pu,tu    ))then exit;
             end;
 
             case _ability of

@@ -683,43 +683,75 @@ end;
    begin
       _up_btn:=spr_dummy;
 
-      case u of
-upgr_hell_dattack : begin _up_btn:=spr_b_up[r_hell,0 ]; end;
-upgr_hell_uarmor  : begin _up_btn:=spr_b_up[r_hell,1 ]; end;
-upgr_hell_barmor  : begin _up_btn:=spr_b_up[r_hell,2 ]; end;
-upgr_hell_mattack : begin _up_btn:=spr_b_up[r_hell,3 ]; end;
-upgr_hell_regen   : begin _up_btn:=spr_b_up[r_hell,4 ]; end;
-upgr_hell_pains   : begin _up_btn:=spr_b_up[r_hell,5 ]; end;
-upgr_hell_heye    : begin _up_btn:=spr_b_up[r_hell,6 ]; end;
-upgr_hell_towers  : begin _up_btn:=spr_b_up[r_hell,7 ]; end;
-upgr_hell_teleport: begin _up_btn:=spr_b_up[r_hell,8 ]; end;
-upgr_hell_pinkspd : begin _up_btn:=spr_b_up[r_hell,12]; end;
-upgr_hell_hktele  : begin _up_btn:=spr_b_up[r_hell,9 ]; end;
-upgr_hell_paina   : begin _up_btn:=spr_b_up[r_hell,10]; end;
-upgr_hell_mainr   : begin _up_btn:=spr_b_up[r_hell,11]; end;
-upgr_hell_6bld    : begin _up_btn:=spr_b_up[r_hell,14]; end;
-upgr_hell_revmis  : begin _up_btn:=spr_b_up[r_hell,17]; end;
-upgr_hell_totminv : begin _up_btn:=spr_b_up[r_hell,18]; end;
-upgr_hell_b478tel : begin _up_btn:=spr_b_up[r_hell,21]; end;
+      {
+      upgr_hell_dattack      = 1;  // distance attacks damage
+      upgr_hell_uarmor       = 2;  // base unit armor
+      upgr_hell_barmor       = 3;  // base building armor
+      upgr_hell_mattack      = 4;  // melee attack damage
+      upgr_hell_regen        = 5;  // regeneration
+      upgr_hell_pains        = 6;  // pain state
+      upgr_hell_heye         = 7;  // hell Eye
+      upgr_hell_towers       = 8;  // towers range
+      upgr_hell_teleport     = 9;  // Teleport reload
+      upgr_hell_hktele       = 10; // HK teleportation
+      upgr_hell_paina        = 11; // decay aura
+      upgr_hell_mainr        = 12; // main range
+      upgr_hell_hktdoodads   = 13; // HK on doodabs
+      upgr_hell_pinkspd      = 14; // demon speed
+      upgr_hell_6bld         = 15; // Souls
 
-upgr_uac_attack   : begin _up_btn:=spr_b_up[r_uac ,0 ]; end;
-upgr_uac_uarmor   : begin _up_btn:=spr_b_up[r_uac ,1 ]; end;
-upgr_uac_barmor   : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
-upgr_uac_melee    : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
-upgr_uac_mspeed   : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
-upgr_uac_apcgun   : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_detect   : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
-upgr_uac_towers   : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
-upgr_uac_radar_r  : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
-upgr_uac_mainm    : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
-upgr_uac_ccturr   : begin _up_btn:=spr_b_up[r_uac ,10]; end;
-upgr_uac_mainr    : begin _up_btn:=spr_b_up[r_uac ,11]; end;
-upgr_uac_mines    : begin _up_btn:=spr_b_up[r_uac ,13]; end;
-upgr_uac_6bld     : begin _up_btn:=spr_b_up[r_uac ,14]; end;
-upgr_uac_rstrike  : begin _up_btn:=spr_b_up[r_uac ,16]; end;
-upgr_uac_mechspd  : begin _up_btn:=spr_b_up[r_uac ,17]; end;
-upgr_uac_mecharm  : begin _up_btn:=spr_b_up[r_uac ,18]; end;
-upgr_uac_turarm   : begin _up_btn:=spr_b_up[r_uac ,21]; end;
+      upgr_hell_revtele      = 17; // revers teleport
+      upgr_hell_revmis       = 18; // revenant missile
+      upgr_hell_totminv      = 19; // totem and eye invisible
+
+      upgr_hell_bldrep       = 20; // build restoration
+      upgr_hell_b478tel      = 22; // teleport towers
+      }
+      case u of
+upgr_hell_dattack   : begin _up_btn:=spr_b_up[r_hell,0 ]; end;
+upgr_hell_uarmor    : begin _up_btn:=spr_b_up[r_hell,1 ]; end;
+upgr_hell_barmor    : begin _up_btn:=spr_b_up[r_hell,2 ]; end;
+upgr_hell_mattack   : begin _up_btn:=spr_b_up[r_hell,3 ]; end;
+upgr_hell_regen     : begin _up_btn:=spr_b_up[r_hell,4 ]; end;
+upgr_hell_pains     : begin _up_btn:=spr_b_up[r_hell,5 ]; end;
+upgr_hell_heye      : begin _up_btn:=spr_b_up[r_hell,6 ]; end;
+upgr_hell_towers    : begin _up_btn:=spr_b_up[r_hell,7 ]; end;
+upgr_hell_teleport  : begin _up_btn:=spr_b_up[r_hell,8 ]; end;
+upgr_hell_hktele    : begin _up_btn:=spr_b_up[r_hell,9 ]; end;
+upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
+upgr_hell_mainr     : begin _up_btn:=spr_b_up[r_hell,11]; end;
+upgr_hell_hktdoodads: begin _up_btn:=spr_b_up[r_hell,20]; end;
+upgr_hell_pinkspd   : begin _up_btn:=spr_b_up[r_hell,12]; end;
+upgr_hell_6bld      : begin _up_btn:=spr_b_up[r_hell,14]; end;
+
+upgr_hell_revtele   : begin _up_btn:=spr_b_up[r_hell,16]; end;
+upgr_hell_revmis    : begin _up_btn:=spr_b_up[r_hell,17]; end;
+upgr_hell_totminv   : begin _up_btn:=spr_b_up[r_hell,18]; end;
+
+upgr_hell_bldrep    : begin _up_btn:=spr_b_up[r_hell,19]; end;
+upgr_hell_b478tel   : begin _up_btn:=spr_b_up[r_hell,21]; end;
+
+
+upgr_uac_attack    : begin _up_btn:=spr_b_up[r_uac ,0 ]; end;
+upgr_uac_uarmor    : begin _up_btn:=spr_b_up[r_uac ,1 ]; end;
+upgr_uac_barmor    : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
+upgr_uac_melee     : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
+upgr_uac_mspeed    : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
+upgr_uac_apcgun    : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
+upgr_uac_detect    : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
+upgr_uac_towers    : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
+upgr_uac_radar_r   : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
+upgr_uac_mainm     : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
+upgr_uac_ccturr    : begin _up_btn:=spr_b_up[r_uac ,10]; end;
+upgr_uac_mainr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
+upgr_uac_ccldoodads: begin _up_btn:=spr_b_up[r_uac ,20]; end;
+upgr_uac_mines     : begin _up_btn:=spr_b_up[r_uac ,13]; end;
+upgr_uac_6bld      : begin _up_btn:=spr_b_up[r_uac ,14]; end;
+upgr_uac_jetpack   : begin _up_btn:=spr_b_up[r_uac ,15]; end;
+upgr_uac_rstrike   : begin _up_btn:=spr_b_up[r_uac ,16]; end;
+upgr_uac_mechspd   : begin _up_btn:=spr_b_up[r_uac ,17]; end;
+upgr_uac_mecharm   : begin _up_btn:=spr_b_up[r_uac ,18]; end;
+upgr_uac_turarm    : begin _up_btn:=spr_b_up[r_uac ,21]; end;
 
       end;
 

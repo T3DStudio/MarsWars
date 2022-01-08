@@ -207,14 +207,7 @@ begin
              m_brushx:=mouse_map_x;
              m_brushy:=mouse_map_y;
           end
-          else
-          begin
-             _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
-             m_brushx:=mm3(map_b0   ,m_brushx,map_b1);
-             m_brushy:=mm3(map_b0   ,m_brushy,map_b1);
-             m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
-             m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
-          end;
+          else _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
 
           case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
           0 :  m_brushc:=c_lime;

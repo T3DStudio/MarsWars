@@ -344,10 +344,11 @@ uab_building_adv       = 4;
 uab_radar              = 5;
 uab_htowertele         = 6;
 uab_uac_rstrike        = 7;
+uab_hkeeptele          = 8;
 uab_spawnlost          = 100;
 uab_morph2heye         = 101;
 uab_umine              = 102;
-uab_CCFly              = 103;
+uab_Advance            = 103;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -420,10 +421,10 @@ DID_R                  : array[0..7] of integer = (0,250,185,125,64,105,60,17);
 //  UPGRADES
 //
 
-upgr_hell_dattack      = 1;  // distance attack
+upgr_hell_dattack      = 1;  // distance attacks damage
 upgr_hell_uarmor       = 2;  // base unit armor
 upgr_hell_barmor       = 3;  // base building armor
-upgr_hell_mattack      = 4;  // melee attack
+upgr_hell_mattack      = 4;  // melee attack damage
 upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
 upgr_hell_heye         = 7;  // hell Eye
@@ -432,16 +433,19 @@ upgr_hell_teleport     = 9;  // Teleport reload
 upgr_hell_hktele       = 10; // HK teleportation
 upgr_hell_paina        = 11; // decay aura
 upgr_hell_mainr        = 12; // main range
-upgr_hell_pinkspd      = 13; // demon speed
-//upgr_hell_misfst       = 14; // missiles speed
+upgr_hell_hktdoodads   = 13; // HK on doodabs
+upgr_hell_pinkspd      = 14; // demon speed
 upgr_hell_6bld         = 15; // Souls
-//upgr_hell_2tier        = 16; // Tier 2
+
 upgr_hell_revtele      = 17; // revers teleport
 upgr_hell_revmis       = 18; // revenant missile
 upgr_hell_totminv      = 19; // totem and eye invisible
 upgr_hell_bldrep       = 20; // build restoration
-//upgr_hell_mainonr      = 21; // HK on doodabs
+
 upgr_hell_b478tel      = 22; // teleport towers
+
+//upgr_hell_2tier        = 16; // Tier 2
+//upgr_hell_misfst       = 14; // missiles speed
 //upgr_hell_hinvuln      = 23; // hell invuln powerup
 //upgr_hell_bldenrg      = 24; // additional energy
 //upgr_hell_9bld         = 25; // 9 class building reload time
@@ -459,16 +463,19 @@ upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
 upgr_uac_ccturr        = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
-upgr_uac_mines         = 43; // mines for engineers
-//upgr_uac_minesen       = 44; // mine-sensor
+upgr_uac_ccldoodads    = 43; // main on doodabs
+upgr_uac_mines         = 44; // mines for engineers
 upgr_uac_6bld          = 45; // adv
-//upgr_uac_2tier         = 46; // Tier 2
+upgr_uac_jetpack       = 46; // jetpack for plasmagunner
+
 upgr_uac_rstrike       = 47; // rstrike launch
 upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
+upgr_uac_turarm        = 50; // turrets armor
+
 //upgr_uac_6bld2         = 50; // 6bld upgr
-//upgr_uac_mainonr       = 51; // main on doodabs
-upgr_uac_turarm        = 52; // turrets armor
+//upgr_uac_mainonr       = 51;
+//upgr_uac_2tier         = 46; // Tier 2
 //upgr_uac_rturrets      = 53; // rocket turrets
 //upgr_uac_bldenrg       = 54; // additional energy
 //upgr_uac_9bld          = 55; // 9 class building reload time
@@ -658,12 +665,12 @@ regen_per              = fr_fps*2;
 _uclord_p              = fr_2hfps+1;
 vistime                = _uclord_p+1;
 
-radar_reload           = fr_fps*40;
+radar_reload           = fr_fps*60;
 radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
-mstrike_reload         = fr_fps*10;
+mstrike_reload         = fr_fps*30;
 mstrike_reload_client  = mstrike_reload-(fr_fps*3);
 
 max_build_reload       = fr_fps*12;
@@ -673,8 +680,8 @@ melee_r                = 8;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-uac_adv_base_reload    : array[false..true] of integer = (fr_fps*2,fr_fps*6);
-gear_time              : array[false..true] of integer = (fr_fps  ,fr_fps*2);
+uac_adv_base_reload    : array[false..true] of integer = (fr_fps*5 ,fr_fps*10);
+gear_time              : array[false..true] of integer = (fr_fps   ,fr_fps*2 );
 
 building_adv_reload    : array[false..true] of integer = (fr_fps*60,fr_fps*30);
 
@@ -690,7 +697,6 @@ pain_time              = fr_2hfps;
 hinvuln_time           = (fr_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
-advprod_rld            : array[false..true] of integer = (fr_fps*120,fr_fps*60);
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
@@ -749,10 +755,8 @@ str_ps_sv              : char = '@';
 
 ChatLen2               = 255;
 dead_time              = -dead_hits;
-hp_detect              = #7;
-hp_pshield             = #8;
-adv_char               = #10;
-revenant_ra            : array[false..true] of integer = (45,20);
+char_detect            = #7;
+char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
 
@@ -988,7 +992,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 723021;
+svld_size              = 724701;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

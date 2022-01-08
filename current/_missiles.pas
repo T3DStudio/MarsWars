@@ -156,15 +156,15 @@ begin
    with _missiles[m] do
    if(vstep=0)then
    begin
-      x      := mxt;// end point
+      x      := mxt;  // end point
       y      := myt;
-      vx     := mvx;// start point
+      vx     := mvx;  // start point
       vy     := mvy;
       tar    := mtar;
       mid    := msid;
       player := mpl;
-      mfs    := mfst;
-      mfe    := mfet;
+      mfs    := mfst; // start floor
+      mfe    := mfet; // end floor
       mtars  := 0;
       ntars  := 0;
       ystep  := 0;
@@ -261,7 +261,7 @@ begin
    with _missiles[m] do
     if(_IsUnitRange(tar,@tu))then
      if(tu^.hits>0)and(MissileUIDCheck(mid,tu^.uidi))and(_IsUnitRange(tu^.inapc,nil)=false)then
-      if(mfs<>tu^.ukfly)then
+      if(mfs=tu^.ukfly)then
       begin
          teams:=_players[player].team=tu^.player^.team;
          damd :=damage;

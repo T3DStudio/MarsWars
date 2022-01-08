@@ -899,9 +899,10 @@ snd_arachno_ready,
 
 {
 snd_alarm,
-snd_cubes,
+
 snd_hshoot,
 }
+snd_cube,
 snd_pistol,
 snd_shotgun,
 snd_ssg,
@@ -919,9 +920,6 @@ snd_flyer_s,
 snd_flyer_a,
 snd_launch,
 snd_CCup,
-{,
-snd_ccup,
-, }
 snd_meat,
 snd_building_explode,
 snd_mine_place,

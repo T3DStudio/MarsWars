@@ -51,7 +51,7 @@ begin
                                  UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
-       PlayerSetAllowedUpgrades(p,[0..255],255,true);
+       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
 
        {ai_pushtime := fr_fps*30;
        ai_pushmin  := 55;
@@ -413,11 +413,12 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                     co_rcamove,
                     co_rcmove  :  begin     // right clik
                                      case _ability of
-                                     uab_uac_rstrike : _unit_umstrike(pu,o_x1,o_y1);
-                                     uab_radar       : _unit_uradar  (pu,o_x1,o_y1);
-                                     uab_htowertele  : if(o_y0<>_su)and(not _IsUnitRange(o_y0,nil))and(_attack>atm_none)
+                                     uab_uac_rstrike : if(_unit_umstrike(pu,o_x1,o_y1))then break;
+                                     uab_radar       : if(_unit_uradar  (pu,o_x1,o_y1))then break;
+                                     uab_htowertele  : if(o_y0<>_su)and(_IsUnitRange(o_y0,nil))and(_attack>atm_none)
                                                        then uo_tar:=o_y0
-                                                       else _unit_htteleport(pu,o_x1,o_y1);
+                                                       else if(_unit_htteleport(pu,o_x1,o_y1))then break;
+                                     uab_hkeeptele   : if(_unit_hkteleport(pu,o_x1,o_y1))then break;
                                      uab_hell_unit_adv,
                                      uab_building_adv: uo_tar:=o_y0;
                                      else
@@ -497,8 +498,12 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                                      then uo_id:=ua_amove
                                      else
                                      begin
-                                       case _ability of
-                                       uab_CCFly: uo_y-=fly_hz;
+                                       case uidi of
+                                       UID_HCommandCenter,
+                                       UID_UCommandCenter: begin
+                                                              _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) );
+                                                              uo_y-=fly_hz;
+                                                           end;
                                        end;
                                        uo_id:=ua_paction;
                                      end;

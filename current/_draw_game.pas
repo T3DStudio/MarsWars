@@ -164,6 +164,25 @@ begin
       color:=acolor;
    end;
 end;
+procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,srt,srd,sld:string6);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind :=uinfo_rect;
+      x0   :=ax0;
+      y0   :=ay0;
+      x1   :=ax1;
+      y1   :=ay1;
+      color:=acolor;
+      text_lt:=slt;
+      text_rt:=srt;
+      text_rd:=srd;
+      text_ld:=sld;
+   end;
+end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    vid_prims+=1;
@@ -281,8 +300,17 @@ end;
    end;   }
 
 procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
-var srect,hbar:boolean;
+var srect,
+      hbar:boolean;
     acolor:cardinal;
+   buffstr:string6;
+function i2s6(i:integer):string6;
+begin
+   if(i>0)
+   then i2s6:=i2s(i)
+   else i2s6:='';
+end;
+
 begin
    with pu^   do
    with uid^  do
@@ -303,7 +331,14 @@ begin
       1: hbar:=true;
         end;
 
-      if(srect)then UnitsInfoAddRect    (vx-hw,vy-hh  ,vx+hw,vy+hh,            acolor);
+      if(srect)then
+      begin
+         buffstr:='';
+         if(buff[ub_advanced]>0)then buffstr:=buffstr+char_advanced;
+         if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
+
+         UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,'',buffstr,i2s6(apcm),i2s6(apcc));
+      end;
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 
       if(speed<=0)and(solid)then
@@ -329,12 +364,12 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
     begin
        vid_prims-=1;
 
-       x0-=vid_cam_x;
-       y0-=vid_cam_y;
+       x0+=lx-vid_cam_x;
+       y0+=ly-vid_cam_y;
        if(kind<>uinfo_circle)then
        begin
-          x1-=vid_cam_x;
-          y1-=vid_cam_y;
+          x1+=lx-vid_cam_x;
+          y1+=ly-vid_cam_y;
           if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
           if(y0>y1)then begin t:=y0;y0:=y1;y1:=t;end;
        end;
@@ -414,9 +449,9 @@ end;
 
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
 var cx,cy,ssx,ssy,sty:integer;
-    ci:integer;
+    {ci:integer;
     pf:word;
-    cl:cardinal;
+    cl:cardinal; }
 begin
    ssx:=lx-(vid_cam_x mod fog_cw);
    sty:=ly-(vid_cam_y mod fog_cw);

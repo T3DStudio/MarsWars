@@ -144,7 +144,7 @@ begin
    end;
 
    case g_mode of
-   gm_2fort :
+gm_2fort :
       begin
          ix:=map_mw div 2;
          iy:=base_rr+(map_mw div 25);
@@ -167,7 +167,7 @@ begin
          map_psx[6]:=map_mw-map_psx[3];
          map_psy[6]:=map_mw-map_psy[3];
       end;
-   gm_3fort:
+gm_3fort:
       begin
          ix:=map_mw div 2;
          iy:=base_rr+(map_mw div 30);
@@ -194,16 +194,16 @@ begin
          map_psx[6]:=map_psx[5]+trunc(cos(i*degtorad)*iy);
          map_psy[6]:=map_psy[5]+trunc(sin(i*degtorad)*iy);
       end;
-   gm_inv:
+gm_inv:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
 
          MCircleStarts(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
-   gm_royl:
+gm_royl:
       MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-   gm_cptp:
+gm_cptp:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
@@ -230,7 +230,7 @@ begin
          map_psx[0]:=-5000;
          map_psy[0]:=-5000;
       end;
-   gm_aslt:
+gm_aslt:
       begin
          c  :=map_seed mod 360;
          bb0:=base_rr-100;

@@ -19,17 +19,21 @@ begin
    _udpth:=0;
    with pu^ do
     case uidi of
-UID_UPortal   : _udpth:=-10001;
-UID_HTeleport : _udpth:=-4;
+UID_UPortal,
+UID_HTeleport,
 UID_HSymbol,
-//UID_HAltar    : _udpth:=_depth(vy,false);
-UID_UMine     : _udpth:=-2;
+UID_HAltar,
+UID_UMine     : _udpth:=-MaxSMapW+vy;
     else
       if(uid^._ukbuilding)and(bld=false)
       then _udpth:=-MaxSMapW+vy
       else
-        if(hits>0)or(buff[ub_resur]>0)
-        then _udpth:=_depth(vy,ukfly)
+        if(hits>0)or(buff[ub_resur]>0)then
+        begin
+           if(zfall>0)
+           then _udpth:=_depth(vy,true)
+           else _udpth:=_depth(vy,ukfly);
+        end
         else _udpth:=vy;
     end;
 end;
@@ -185,7 +189,7 @@ begin
                ui_prod_builds := ui_prod_builds+ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,c_white);
+                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,c_gray);
             end;
 
             for i:=0 to MaxUnitProds do
@@ -198,7 +202,7 @@ begin
 
       if(bld)then
       begin
-         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<=fr_fps)then ui_uid_reload[uidi]:=rld;
+         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<=0)then ui_uid_reload[uidi]:=rld;
 
          if(sel)then
          begin
@@ -261,6 +265,9 @@ begin
       begin
          _unit_minimap(pu);
 
+         if(_ability=uab_hkeeptele)then
+          if(buff[ub_clcast]>0)then exit;
+
          wanim:=false;
          if(g_paused=0)then
           if(_canmove(pu))then
@@ -270,7 +277,10 @@ begin
 
          if(spr=pspr_dummy)then exit;
 
-         shadow+=sign(_unit_shadowz(pu)-shadow);
+         depth:=_unit_shadowz(pu)-shadow;
+         t:=sign(depth);
+         if(depth<-1)then t*=2;
+         shadow+=t;
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin

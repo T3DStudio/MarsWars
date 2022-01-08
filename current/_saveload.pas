@@ -22,7 +22,9 @@ begin
    if(FileExists(fn))then
    begin
       assign(f,fn);
-      {$I-}reset(f,1);{$I+}
+      {$I-}
+      reset(f,1);
+      {$I+}
       if(ioresult<>0)then
       begin
          _svld_stat:=str_svld_errors[2];
@@ -115,7 +117,7 @@ end;
 
 procedure _svld_make_lst;
 var Info : TSearchRec;
-       s : string;
+       s : shortstring;
 begin
    _svld_sm:=0;
    _svld_ln:=0;
@@ -189,52 +191,55 @@ procedure _svld_save;
 var f:file;
 begin
    assign(f,str_f_svld+_svld_str+str_e_svld);
-   {$I-}rewrite(f,1);{$I+} if (ioresult<>0) then exit;
+   {$I-}
+   rewrite(f,1);
+   {$I+}
+   if(ioresult<>0)then exit;
 
-   BlockWrite(f,ver            ,SizeOf(ver            ));
-   BlockWrite(f,menu_s2        ,SizeOf(menu_s2        ));
-   BlockWrite(f,_cmp_sel       ,SizeOf(_cmp_sel       ));
-   BlockWrite(f,cmp_skill      ,SizeOf(cmp_skill      ));
-   BlockWrite(f,map_seed       ,SizeOf(map_seed       ));
-   BlockWrite(f,map_iseed      ,SizeOf(map_iseed      ));
-   BlockWrite(f,map_mw         ,SizeOf(map_mw         ));
-   BlockWrite(f,map_liq        ,SizeOf(map_liq        ));
-   BlockWrite(f,map_obs        ,SizeOf(map_obs        ));
-   BlockWrite(f,map_sym        ,sizeof(map_sym        ));
-   BlockWrite(f,theme_i        ,SizeOf(theme_i        ));
-   BlockWrite(f,g_addon        ,SizeOf(g_addon        ));
-   BlockWrite(f,g_mode         ,SizeOf(g_mode         ));
-   BlockWrite(f,g_start_base       ,SizeOf(g_start_base       ));
-   BlockWrite(f,g_show_positions        ,SizeOf(g_show_positions        ));
-   BlockWrite(f,HPlayer        ,SizeOf(HPlayer        ));
-   BlockWrite(f,_players       ,SizeOf(TPList         ));
-   BlockWrite(f,_units         ,SizeOf(_units         ));
-   BlockWrite(f,_missiles      ,SizeOf(_missiles      ));
-   BlockWrite(f,_effects       ,SizeOf(_effects       ));
-   BlockWrite(f,map_dds        ,SizeOf(map_dds        ));
-   BlockWrite(f,vid_cam_x         ,SizeOf(vid_cam_x         ));
-   BlockWrite(f,vid_cam_y         ,SizeOf(vid_cam_y         ));
-   BlockWrite(f,PlayerColor    ,SizeOf(PlayerColor    ));
-   BlockWrite(f,G_Step         ,SizeOf(G_Step         ));
-   BlockWrite(f,vid_rtui       ,SizeOf(vid_rtui       ));
-   BlockWrite(f,m_brush        ,SizeOf(m_brush        ));
-   BlockWrite(f,g_inv_wave_n   ,SizeOf(g_inv_wave_n   ));
-   BlockWrite(f,g_inv_time     ,SizeOf(g_inv_time     ));
-   BlockWrite(f,g_inv_wave_t   ,SizeOf(g_inv_wave_t   ));
-   BlockWrite(f,g_cpoints      ,SizeOf(g_cpoints      ));
-   BlockWrite(f,g_royal_r      ,SizeOf(g_royal_r      ));
-   BlockWrite(f,_uclord_c      ,SizeOf(_uclord_c      ));
-   BlockWrite(f,_uregen_c      ,SizeOf(_uregen_c      ));
-   BlockWrite(f,G_WTeam        ,SizeOf(G_WTeam        ));
-   BlockWrite(f,team_army      ,SizeOf(team_army      ));
-   BlockWrite(f,ui_alarms      ,SizeOf(ui_alarms      ));
-   BlockWrite(f,map_psx        ,SizeOf(map_psx        ));
-   BlockWrite(f,map_psy        ,SizeOf(map_psy        ));
-   BlockWrite(f,map_rpos       ,SizeOf(map_rpos       ));
-   BlockWrite(f,theme_map_lqt  ,SizeOf(theme_map_lqt  ));
-   BlockWrite(f,theme_map_blqt ,SizeOf(theme_map_blqt ));
-   BlockWrite(f,theme_map_trt  ,SizeOf(theme_map_trt  ));
-   BlockWrite(f,theme_map_crt  ,SizeOf(theme_map_crt  ));
+   BlockWrite(f,ver             ,SizeOf(ver             ));
+   BlockWrite(f,menu_s2         ,SizeOf(menu_s2         ));
+   BlockWrite(f,_cmp_sel        ,SizeOf(_cmp_sel        ));
+   BlockWrite(f,cmp_skill       ,SizeOf(cmp_skill       ));
+   BlockWrite(f,map_seed        ,SizeOf(map_seed        ));
+   BlockWrite(f,map_iseed       ,SizeOf(map_iseed       ));
+   BlockWrite(f,map_mw          ,SizeOf(map_mw          ));
+   BlockWrite(f,map_liq         ,SizeOf(map_liq         ));
+   BlockWrite(f,map_obs         ,SizeOf(map_obs         ));
+   BlockWrite(f,map_sym         ,sizeof(map_sym         ));
+   BlockWrite(f,theme_i         ,SizeOf(theme_i         ));
+   BlockWrite(f,g_addon         ,SizeOf(g_addon         ));
+   BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
+   BlockWrite(f,g_start_base    ,SizeOf(g_start_base    ));
+   BlockWrite(f,g_show_positions,SizeOf(g_show_positions));
+   BlockWrite(f,HPlayer         ,SizeOf(HPlayer         ));
+   BlockWrite(f,_players        ,SizeOf(TPList          ));
+   BlockWrite(f,_units          ,SizeOf(_units          ));
+   BlockWrite(f,_missiles       ,SizeOf(_missiles       ));
+   BlockWrite(f,_effects        ,SizeOf(_effects        ));
+   BlockWrite(f,map_dds         ,SizeOf(map_dds         ));
+   BlockWrite(f,vid_cam_x       ,SizeOf(vid_cam_x       ));
+   BlockWrite(f,vid_cam_y       ,SizeOf(vid_cam_y       ));
+   BlockWrite(f,PlayerColor     ,SizeOf(PlayerColor     ));
+   BlockWrite(f,G_Step          ,SizeOf(G_Step          ));
+   BlockWrite(f,vid_rtui        ,SizeOf(vid_rtui        ));
+   BlockWrite(f,m_brush         ,SizeOf(m_brush         ));
+   BlockWrite(f,g_inv_wave_n    ,SizeOf(g_inv_wave_n    ));
+   BlockWrite(f,g_inv_time      ,SizeOf(g_inv_time      ));
+   BlockWrite(f,g_inv_wave_t    ,SizeOf(g_inv_wave_t    ));
+   BlockWrite(f,g_cpoints       ,SizeOf(g_cpoints       ));
+   BlockWrite(f,g_royal_r       ,SizeOf(g_royal_r       ));
+   BlockWrite(f,_uclord_c       ,SizeOf(_uclord_c       ));
+   BlockWrite(f,_uregen_c       ,SizeOf(_uregen_c       ));
+   BlockWrite(f,G_WTeam         ,SizeOf(G_WTeam         ));
+   BlockWrite(f,team_army       ,SizeOf(team_army       ));
+   BlockWrite(f,ui_alarms       ,SizeOf(ui_alarms       ));
+   BlockWrite(f,map_psx         ,SizeOf(map_psx         ));
+   BlockWrite(f,map_psy         ,SizeOf(map_psy         ));
+   BlockWrite(f,map_rpos        ,SizeOf(map_rpos        ));
+   BlockWrite(f,theme_map_lqt   ,SizeOf(theme_map_lqt   ));
+   BlockWrite(f,theme_map_blqt  ,SizeOf(theme_map_blqt  ));
+   BlockWrite(f,theme_map_trt   ,SizeOf(theme_map_trt   ));
+   BlockWrite(f,theme_map_crt   ,SizeOf(theme_map_crt   ));
 
    close(f);
 

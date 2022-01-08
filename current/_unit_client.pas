@@ -454,14 +454,20 @@ begin
    end;
 end;
 
-procedure _teleEff(pu:PTUnit;vis:pboolean);
+procedure _teleEff(uu,pu:PTUnit);
 begin
-   with pu^ do
+   with uu^  do
    begin
       vx:=x;
       vy:=y;
-      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_Teleport);
-      SoundPlayUnit(snd_teleport,nil,vis);
+      if(uid^._ability=uab_hkeeptele)then
+      begin
+         teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKT_h,EID_HKT_s,snd_cube);
+         buff[ub_clcast]:=fr_fps;
+         exit;
+      end;
+      // default teleport effects
+      teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
    end;
 end;
 
@@ -541,7 +547,7 @@ begin
 
             if(hits>0)then
             begin
-               if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
+               if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,pu);
 
                if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
                or((pu^.bld       =false)and(bld            ))then _ucCreateEffect(uu,@vis);
@@ -561,13 +567,17 @@ begin
 
                   if(uid^._ukbuilding=false)then
                   begin
-                     if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
-                      case uid^._urace of
-                r_hell: _unit_hell_unit_adv(uu);
-                r_uac : _unit_uac_unit_adv (uu,nil);
-                      end;
+                     if(uid^._ability<>uab_advance)then
+                      if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
+                       case uid^._urace of
+                r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
+                r_uac : begin
+                           buff[ub_gear]:=gear_time[uid^._ukmech];
+                           SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
+                        end;
+                       end;
 
-                     if(pu^.buff[ub_invuln]=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln);
+                     if(pu^.buff[ub_invuln]=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln,@vis);
                   end;
                end;
             end;
@@ -589,32 +599,6 @@ begin
             if(pu^.inapc=0)then
              if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
 
-            {
-            if(uidi in [UID_UCommandCenter,UID_HCommandCenter])then
-            begin
-               if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
-               begin
-                  speed:= 6;
-                  uf   := uf_fly;
-                  buff[ub_clcast]  := uaccc_fly;
-                  PlaySND(snd_ccup,uu);
-               end;
-               if(pu^.buff[ub_advanced]>0)and(buff[ub_advanced]=0)then
-               begin
-                  speed:= 0;
-                  uf   := uf_ground;
-                  buff[ub_clcast]  := uaccc_fly;
-                  vy:=y;
-                  PlaySND(snd_inapc,uu);
-               end;
-               if(buff[ub_advanced]>0)then
-               begin
-                  speed:=6;
-                  uf   := uf_fly;
-               end;
-            end;
-   }
-
             if(speed>0)then
             begin
                uo_bx:=pu^.x;
@@ -625,27 +609,6 @@ begin
             begin
                _unit_sfog(uu);
                _unit_mmcoords(uu);
-
-               {if(pu^.buff[ub_teleeff]=0)and(buff[ub_teleeff]>0)then
-                if(uidi=UID_HKeep)then
-                begin
-                   if(PointInScreenF(x,y,player))
-                   or(PointInScreenF(pu^.x,pu^.y,player))then PlaySND(snd_cubes,nil);
-                   _effect_add(pu^.x,pu^.y,0,EID_HKT_h);
-                   _effect_add(x    ,y    ,0,EID_HKT_s);
-                   buff[ub_clcast]:=vid_fps;
-                   vx:=x;
-                   vy:=y;
-                end
-                else
-                begin
-                   vx:=x;
-                   vy:=y;
-                   if(PointInScreenF(vx,vy,player))
-                   or(PointInScreenF(pu^.vx,pu^.vy,player))then PlaySND(snd_teleport,nil);
-                   _effect_add(vx    ,vy    ,    vy+map_flydpth[uf]+1,EID_Teleport);
-                   _effect_add(pu^.vx,pu^.vy,pu^.vy+map_flydpth[uf]+1,EID_Teleport);
-                end; }
 
                if(speed>0)then
                begin
@@ -886,7 +849,6 @@ end;
 procedure _rpdata(rpl:boolean);
 var i,n,bp,bv:byte;
 begin
-   //anoncer:=0; ,lu
    if(g_player_status>0)then
    for i:=1 to MaxPlayers do
     if((g_player_status and (1 shl i))>0)then
@@ -900,21 +862,15 @@ begin
          case bp of
          0: begin
                bv:=_rudata_byte(rpl,0);
-               //lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv and %00001111);
-               //if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=1;
             end;
          1: begin
-               //lu:=upgr[n];
                upgr[n]:=min2(_up_max,bv shr 4);
-               //if(upgr[n]>lu)and(i=HPlayer)then anoncer:=race;
                bp:=0;
             end;
          end;
      end;
-
-   //if(anoncer>0)then SoundPlayAnoncer(snd_upgrade_complete[anoncer],true);
 end;
 
 procedure ClNUnits;

@@ -8,18 +8,17 @@ begin
    end;
 end;
 
-{procedure _unit_snd_ready(uid:byte;adv:boolean);
-begin
-   with _uids[uid] do
-   begin
-      PlaySND(un_snd_ready[adv],nil,nil);
-   end;
-end; }
-
-procedure _unit_PowerUpEff(pu:PTUnit;snd:PTSoundSet);
+procedure _unit_PowerUpEff(pu:PTUnit;snd:PTSoundSet;vischeck:pboolean);
 begin
    with pu^ do
    begin
+      if(vischeck<>nil)then
+      begin
+         if(vischeck^=false)then exit
+      end
+      else
+         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+
       SoundPlayUnit(snd,pu,nil);
       _effect_add(vx,vy,_depth(vy+1,ukfly),EID_HUpgr);
    end;
@@ -268,17 +267,14 @@ begin
     with player^ do rld:=max2(fr_4hfps, ur-((ur div 3)*upgr[upgr_hell_teleport]) );
 end;
 
-procedure _unit_teleport(pu:PTUnit;tx,ty:integer);
+procedure _unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
 begin
    with pu^ do
    begin
       tx:=mm3(0,tx,map_mw);
       ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
-      if PointInScreenF(vx,vy,@_players[HPlayer])
-      or PointInScreenF(tx,ty,@_players[HPlayer]) then SoundPlayUnit(snd_teleport,nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_Teleport);
-      _effect_add(tx,ty,_depth(ty+1,ukfly),EID_Teleport);
+      teleport_effects(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
       buff[ub_teleeff]:=fr_fps;
       x     :=tx;
@@ -301,6 +297,7 @@ begin
    if(zfall<>0)then
    begin
       st:=sign(zfall);
+      if(zfall>1)then st*=2;
       if(x=uo_x)
      and(y=uo_y)then uo_y+=st;
       zfall-=st;
@@ -339,21 +336,23 @@ begin
       dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
-procedure _unit_uradar(pu:PTUnit;x0,y0:integer);
+function _unit_uradar(pu:PTUnit;x0,y0:integer):boolean;
 begin
+   _unit_uradar:=false;
    with pu^ do
-   if(bld)and(rld<=0)then
-   begin
-      _unit_clear_order(pu,true);
-      uo_x:=x0;
-      uo_y:=y0;
-      rld :=radar_reload;
-      buff[ub_cast]:=fr_fps;
+    if(bld)and(rld<=0)then
+    begin
+       _unit_clear_order(pu,true);
+       uo_x:=x0;
+       uo_y:=y0;
+       rld :=radar_reload;
+       buff[ub_cast]:=fr_fps;
+       _unit_uradar:=true;
 
-      {$IFDEF _FULLGAME}
-      if(ServerSide)and(player^.team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
-      {$ENDIF}
-   end;
+       {$IFDEF _FULLGAME}
+       if(ServerSide)and(player^.team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+       {$ENDIF}
+    end;
 end;
 
 procedure _unit_umstrike_create(pu:PTUnit);
@@ -367,38 +366,25 @@ begin
    end;
 end;
 
-procedure _unit_umstrike(pu:PTUnit;x0,y0:integer);
+function _unit_umstrike(pu:PTUnit;x0,y0:integer):boolean;
 var i:byte;
 begin
+   _unit_umstrike:=false;
    with pu^ do
-   if(bld)and(rld<=0)then
-   with player^ do
-   if(upgr[upgr_uac_rstrike]>0)then
-   begin
-      _unit_clear_order(pu,true);
-      uo_x:=x0;
-      uo_y:=y0;
-      for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_2fps);
-      rld:=mstrike_reload;
-      upgr[upgr_uac_rstrike]-=1;
-      _unit_umstrike_create(pu);
-      buff[ub_cast]:=fr_fps;
-   end;
-end;
-
-
-procedure _unit_htteleport(pu:PTUnit;x0,y0:integer);
-begin
-   with pu^ do
-   if(bld)and(buff[ub_clcast]<=0)then
-   with player^ do
-   if(upgr[upgr_hell_b478tel]>0)then
-   if(dist(x,y,x0,y0)<srange)then
-   begin
-      upgr[upgr_hell_b478tel]-=1;
-      buff[ub_clcast]:=fr_2hfps;
-      _unit_teleport(pu,x0,y0);
-   end;
+    if(bld)and(rld<=0)then
+     with player^ do
+      if(upgr[upgr_uac_rstrike]>0)then
+      begin
+         _unit_clear_order(pu,true);
+         uo_x:=x0;
+         uo_y:=y0;
+         for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_2fps);
+         rld:=mstrike_reload;
+         upgr[upgr_uac_rstrike]-=1;
+         _unit_umstrike_create(pu);
+         buff[ub_cast]:=fr_fps;
+         _unit_umstrike:=true;
+      end;
 end;
 
 
@@ -446,15 +432,16 @@ begin
    else _1c_push(tx,ty,x0,y0,r0);
 end;
 
-procedure _building_newplace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
+
+
+procedure _push_out(tx,ty,tr:integer;newx,newy:pinteger;_ukfly,check_doodads:boolean);
 const nrl = 1;
 var nrx,
     nry,
     nrd,
-    nrt: array[0..nrl] of integer;
-dx,dy,o,
-u,d,tr,
-sr,dr  : integer;
+    nrt : array[0..nrl] of integer;
+dx,dy,
+o,u,d   : integer;
 
 procedure add(ax,ay,ad,at:integer);
 var i,n:integer;
@@ -492,57 +479,46 @@ begin
       nry[u]:=-2000;
       nrt[u]:=0;
    end;
-   tr :=_uids[buid]._r;
 
-   dx:=tx div dcw;
-   dy:=ty div dcw;
-   tr-=bld_dec_mr;
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-    with map_dcell[dx,dy] do
-     if(n>0)then
-      for u:=0 to n-1 do
-       with l[u]^ do
-        if(r>0)and(t>0)then
-        begin
-           o:=tr+r;
-           d:=dist(x,y,tx,ty)-o;
-           add(x,y,d,o);
-        end;
-   tr+=bld_dec_mr;
+   if(_ukfly)then check_doodads:=false;
 
-   for u:=1 to MaxCPoints do
-    with g_cpoints[u] do
-    begin
-       o:=base_r;
-       d:=dist(px,py,tx,ty)-o;
-       add(px,py,d,o);
-    end;
+   if(check_doodads)then
+   begin
+      dx:=tx div dcw;
+      dy:=ty div dcw;
+      tr-=bld_dec_mr;
+      if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
+       with map_dcell[dx,dy] do
+        if(n>0)then
+         for u:=0 to n-1 do
+          with l[u]^ do
+           if(r>0)and(t>0)then
+           begin
+              o:=tr+r;
+              d:=dist(x,y,tx,ty)-o;
+              add(x,y,d,o);
+           end;
+      tr+=bld_dec_mr;
+   end;
 
-   dx:=-2000;
-   dy:=-2000;
-   sr:=32000;
-   dr:=32000;
+   if(_ukfly=false)and(g_mode=gm_cptp)then
+    for u:=1 to MaxCPoints do
+     with g_cpoints[u] do
+     begin
+        o:=base_r;
+        d:=dist(px,py,tx,ty)-o;
+        add(px,py,d,o);
+     end;
+
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=uf_ground)and(inapc<=0)then
-      begin
-         o:=tr+_r;
-         d:=dist(x,y,tx,ty);
-         add(x,y,d-o,o);
-
-         if(buid>0)then
-          if(isbuildarea)and(buid in ups_builder)and(bld)and(playeri=pl)then
-          begin
-             o:=d-srange;
-             if(o<dr)then
-             begin
-                dx:=x;
-                dy:=y;
-                dr:=o;
-                sr:=srange;
-             end;
-          end;
+      if(hits>0)and(speed<=0)and(ukfly=_ukfly)then
+       if(not _IsUnitRange(inapc,nil))then
+       begin
+          o:=tr+_r;
+          d:=dist(x,y,tx,ty);
+          add(x,y,d-o,o);
        end;
 
    if(nrd[1]<=-1)
@@ -551,15 +527,49 @@ begin
      if(nrd[0]<=-1)
      then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
 
+   newx^:=tx;
+   newy^:=ty;
+end;
+
+
+procedure _building_newplace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
+var
+dx,dy,o,
+u,sr,dr  : integer;
+begin
+   with _uids[buid] do
+   _push_out(tx,ty,_r,@tx,@ty,_ukfly,true);
+
+   dx:=-2000;
+   dy:=-2000;
+   sr:=32000;
+   dr:=32000;
+   for u:=1 to MaxUnits do
+    with _units[u] do
+     with uid^ do
+      if(hits>0)and(speed<=0)and(ukfly=_uids[buid]._ukfly)and(bld)and(playeri=pl)then
+       if(isbuildarea)and(buid in ups_builder)then
+        if(not _IsUnitRange(inapc,nil))then
+        begin
+           o:=dist(x,y,tx,ty)-srange;
+           if(o<dr)then
+           begin
+              dx:=x;
+              dy:=y;
+              dr:=o;
+              sr:=srange;
+           end;
+        end;
+
    if(dr<32000)then
    begin
-      d :=dist(dx,dy,tx,ty);
-      dr:=d-sr;
+      o :=dist(dx,dy,tx,ty);
+      dr:=o-sr;
       if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   newx^:=tx;
-   newy^:=ty;
+   newx^:=mm3(vid_cam_x,mm3(map_b0,tx,map_b1),vid_cam_x+vid_cam_w);
+   newy^:=mm3(vid_cam_y,mm3(map_b0,ty,map_b1),vid_cam_y+vid_cam_h);
 end;
 
 
@@ -668,6 +678,46 @@ begin
    if(i>0)then _CheckBuildPlace:=1;
 end;
 
+
+function _unit_hkteleport(pu:PTUnit;x0,y0:integer):boolean;
+begin
+   _unit_hkteleport:=false;
+   with pu^ do
+    if(hits>0)and(bld)and(buff[ub_clcast]<=0)then
+     with player^ do
+      if(upgr[upgr_hell_hktele]>0)then
+      begin
+         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0)  );
+         if(_collisionr(x0,y0,uid^._r,unum,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then exit;
+
+         upgr[upgr_hell_hktele]-=1;
+         buff[ub_clcast]:=fr_fps;
+
+         _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKT_h,EID_HKT_s,snd_cube{$ENDIF});
+         _unit_hkteleport:=true;
+      end;
+end;
+
+
+function _unit_htteleport(pu:PTUnit;x0,y0:integer):boolean;
+begin
+   _unit_htteleport:=false;
+   with pu^ do
+    if(hits>0)and(bld)and(buff[ub_clcast]<=0)then
+     with player^ do
+      if(upgr[upgr_hell_b478tel]>0)then
+      begin
+         if(srange<dist(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
+         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, true  );
+         if(dist(x,y,x0,y0)>srange)then exit;
+         if(_collisionr(x0,y0,uid^._r,unum,ukfly, true )>0)then exit;
+
+         upgr[upgr_hell_b478tel]-=1;
+         buff[ub_clcast]:=fr_2hfps;
+         _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
+         _unit_htteleport:=true;
+      end;
+end;
 
 
 procedure _unit_default(pu:PTUnit);
@@ -1324,36 +1374,8 @@ uab_radar: begin
                  {$ENDIF}
               end;
            end;
-uab_uac__unit_adv:
-           if(upgr[upgr_uac_6bld]>0)then buff[ub_advanced]:=_ub_infinity;
-uab_CCFly:
-           if(buff[ub_advanced]>0)then
-           begin
-              if(ukfly<>uf_fly)then
-              begin
-                 {$IFDEF _FULLGAME}
-                 SoundPlayUnit(snd_CCup ,pu,nil);
-                 {$ENDIF}
-                 ukfly:=uf_fly;
-                 zfall:=-fly_hz;
-              end;
-              speed:=_speed;
-           end
-           else
-           begin
-              if(ukfly<>uf_ground)then
-              begin
-                 {$IFDEF _FULLGAME}
-                 SoundPlayUnit(snd_inapc,pu,nil);
-                 {$ENDIF}
-                 zfall:=fly_hz;
-                 ukfly:=uf_ground;
-              end;
-              speed:=0;
-
-              if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,false,true)>0)then buff[ub_advanced]:=_ub_infinity;
-           end;
+uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele]>0];
+uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld    ]>0];
       end;
 
       // DETECTION
@@ -1391,6 +1413,35 @@ UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
                 animw :=_animw;
                 {$ENDIF}
              end;
+UID_HCommandCenter,
+UID_UCommandCenter:
+           if(buff[ub_advanced]>0)then
+           begin
+              if(ukfly<>uf_fly)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 SoundPlayUnit(snd_CCup ,pu,nil);
+                 {$ENDIF}
+                 ukfly:=uf_fly;
+                 zfall:=zfall-fly_hz;
+              end;
+              speed:=_speed;
+           end
+           else
+           begin
+              if(ukfly<>uf_ground)then
+              begin
+                 {$IFDEF _FULLGAME}
+                 SoundPlayUnit(snd_inapc,pu,nil);
+                 {$ENDIF}
+                 zfall:=fly_hz;
+                 ukfly:=uf_ground;
+              end;
+              speed:=0;
+
+              if(zfall<>0)then
+               if(_collisionr(x,y+zfall,_r,unum,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then buff[ub_advanced]:=_ub_infinity;
+           end;
 UID_Major,
 UID_ZMajor:
            if(buff[ub_advanced]>0)then
@@ -1412,7 +1463,7 @@ UID_ZMajor:
                  {$IFDEF _FULLGAME}
                  SoundPlayUnit(snd_jetpoff,pu,nil);
                  {$ENDIF}
-                 zfall:= fly_height[uf_ground];
+                 zfall:= fly_height[uf_fly];
               end;
               ukfly:=uf_ground;
               speed:=_speed;

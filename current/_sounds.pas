@@ -367,11 +367,12 @@ end;
 
 procedure SoundLog(ptarget:byte);
 begin
+   if(ptarget=HPlayer)then
    with _players[ptarget] do
    begin
       //ps:=@log_ls[log_i];
       case log_lt[log_i] of
-0..MaxPlayers : if((ptarget=HPlayer)and(log_lt[log_i]<>ptarget))
+0..MaxPlayers : if(log_lt[log_i]<>ptarget)
                 or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
 lmt_chat      : SoundPlayUI(snd_chat);
 lmt_game      : SoundPlayUI(snd_chat);
@@ -465,6 +466,7 @@ begin
    snd_mine_place           :=SoundSetLoad('mine_place'      );
    snd_inapc                :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
+   snd_cube                 :=SoundSetLoad('cube_s'          );
 
    snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
    snd_launch               :=SoundSetLoad(missiles_folder+'launch'          );
