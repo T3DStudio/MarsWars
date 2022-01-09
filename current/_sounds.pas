@@ -283,8 +283,9 @@ begin
    end;
 end;
 
-procedure SoundPlayUnit(ss:PTSoundSet;pu:PTUnit;visdata:pboolean);
+function SoundPlayUnit(ss:PTSoundSet;pu:PTUnit;visdata:pboolean):boolean;
 begin
+   SoundPlayUnit:=false;
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
@@ -299,6 +300,7 @@ begin
        if(PointInScreenF(x,y,player)=false)then exit;
 
    SoundPlay(ss,sss_world);
+   SoundPlayUnit:=true;
 end;
 
 procedure SoundPlayUI(ss:PTSoundSet);

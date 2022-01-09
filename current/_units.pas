@@ -217,15 +217,16 @@ begin
 
          if(dam>=arm_f[_ukbuilding])
          then arm+=(dam div arm_f[_ukbuilding])*arm_upgr_lvl;
+      end;
 
-         case uidi of
+      case uidi of
 UID_Baron : if(buff[ub_advanced]>0)then dam:=dam div 2;
-         else
-         end;
+UID_HEye  : begin arm:=0;dam:=hits;end;
+      else
+      end;
 
-         case g_mode of
+      case g_mode of
 gm_inv    : if(playeri=0)then dam:=dam div 2;
-         end;
       end;
 
       dam-=arm;
@@ -319,7 +320,7 @@ begin
    with uid^ do
    begin
       t:=ud;
-      if(tu^.speed<=0)and(pu^.player=tu^.player)
+      if((tu^.speed<=0)or(not tu^.bld))and(pu^.player=tu^.player)
       then ud-=tu^.uid^._r
       else ud-=tu^.uid^._r+_r;
 
@@ -643,6 +644,7 @@ begin
    begin
       // Weapon type requirements
 
+      if(ServerSide)then
       case aw_type of
 wpt_resurect : if(tu^.buff[ub_resur]>0)
                or(tu^.buff[ub_pain ]>0)
@@ -692,7 +694,7 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_tarf,@wtr_hits_d  )=false)and(tu^.hits<=0                )then exit;
       if(cf(@aw_tarf,@wtr_hits_a  )=false)and(tu^.hits =tu^.uid^._mhits  )then exit;
 
-      if(cf(@aw_tarf,@wtr_bio     )=false)and(tu^.uid^._ukbio            )then exit;
+      if(cf(@aw_tarf,@wtr_bio     )=false)and(not tu^.uid^._ukmech       )then exit;
       if(cf(@aw_tarf,@wtr_mech    )=false)and(tu^.uid^._ukmech           )then exit;
       if(cf(@aw_tarf,@wtr_building)=false)and(tu^.uid^._ukbuilding       )then exit;
 
@@ -705,13 +707,20 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_tarf,@wtr_adv     )=false)and(tu^.buff[ub_advanced]> 0   )then exit;
       if(cf(@aw_tarf,@wtr_nadv    )=false)and(tu^.buff[ub_advanced]<=0   )then exit;
 
+
       if(not tu^.uid^._ukbuilding )then
       begin
-      if(cf(@aw_tarf,@wtr_light   )=false)and    (tu^.uidi in armor_lite )then exit;
-      if(cf(@aw_tarf,@wtr_nlight  )=false)and not(tu^.uidi in armor_lite )then exit;
+      if(cf(@aw_tarf,@wtr_light   )=false)and    (tu^.uid^._uklight      )then exit;
+      if(cf(@aw_tarf,@wtr_nlight  )=false)and not(tu^.uid^._uklight      )then exit;
       end;
 
       // Distance requirements
+
+      if(ServerSide=false)then
+      begin
+         _target_weapon_check:=2;
+         exit;
+      end;
 
       if(ud<aw_min_range)then exit;
 
@@ -725,7 +734,7 @@ wpt_heal     : if(tu^.hits<=0)
           then exit
           else awr:=ud-(_r+tu^.uid^._r-aw_max_range);
 
-      if(awr<0)or(ServerSide=false)
+      if(awr<0)
       then _target_weapon_check:=2      // can attack now
       else
         if(speed>0)and(uo_id<>ua_hold)and(_IsUnitRange(inapc,nil)=false)then
@@ -778,6 +787,18 @@ begin
       t_weap^:=tw;
       a_tar  :=tu^.unum;
       a_tard^:=ud;
+   end;
+end;
+
+procedure _unit_aura_effects(pu,tu:PTUnit;ud:integer);
+begin
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      case uidi of
+UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)then _unit_damage(tu,upgr[upgr_hell_paina],upgr[upgr_hell_paina],playeri);
+      end;
    end;
 end;
 
@@ -836,9 +857,9 @@ begin
 
             if(tu^.hits>0)then
             begin
-               if(tu^.inapc>0)then // unload
+               if(tu^.inapc>0)then
                begin
-                  if(tu^.inapc=unum)and(uo_id=ua_unload)and(cunload)then
+                  if(tu^.inapc=unum)and(uo_id=ua_unload)and(cunload)then // unload
                   begin
                      if(apcc>0)then
                      begin
@@ -860,8 +881,10 @@ begin
                   continue;
                end;
 
+               _unit_aura_effects(pu,tu,ud);
+
                if(push)then
-                if(_r<=tu^.uid^._r)or(tu^.speed<=0)then
+                if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.bld)then
                  if(tu^.solid)and((ukfly=uf_ground)=(tu^.ukfly=uf_ground))then _unit_push(pu,tu,ud);
 
                ud-=_r+tu^.uid^._r;
@@ -997,6 +1020,7 @@ begin
    begin
       buff[ub_advanced]:=_ub_infinity;
       {$IFDEF _FULLGAME}
+      _unit_advanced_effects(pu);
       _unit_PowerUpEff(pu,snd_unit_adv[_urace],nil);
       {$ENDIF}
    end;
@@ -1231,6 +1255,8 @@ procedure _unit_attack(pu:PTUnit);
 var w,a  : byte;
      tu  : PTUnit;
 upgradd,c: integer;
+attackervis,
+targetvis: boolean;
 begin
    with pu^ do
    begin
@@ -1289,16 +1315,20 @@ begin
       with uid^ do
       with _a_weap[a_weap] do
       begin
+         targetvis  :=PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer]);
+         attackervis:=PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer]);
+
          if(a_rld=0)then
          begin
-            a_rld:=aw_rld;
+            a_rld   :=aw_rld;
+            a_tar_cl:=a_tar;
             if(not cf(@aw_reqf,@wpr_move))then
             begin
                dir:=p_dir(x,y,tu^.x,tu^.y);
                if(ServerSide)then buff[ub_stopattack]:=max2(a_rld,_uclord_p);
             end;
             {$IFDEF _FULLGAME}
-            _unit_attack_effects(pu,true,nil);
+            _unit_attack_effects(pu,true,@attackervis);
             a_aweap:=a_weap;
             {$ENDIF}
          end;
@@ -1310,19 +1340,25 @@ begin
          end;
 
          {$IFDEF _FULLGAME}
-         if(aw_eid_target>0)then
-          if(PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer])=false)then exit;
+         if(targetvis)then
+          if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
-              if((G_Step mod fr_fps  )=0)then SoundPlayUnit(aw_snd_target,tu,nil);
+              if((G_Step mod fr_fps)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;
          {$ENDIF}
 
          if(a_rld in aw_rld_s)then
          begin
             {$IFDEF _FULLGAME}
-            _unit_attack_effects(pu,false,nil);
+            _unit_attack_effects(pu,false,@attackervis);
+            if(targetvis)then
+             if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
+             begin
+                _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_depth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+                SoundPlayUnit(aw_snd_target,tu,@targetvis);
+             end;
             {$ENDIF}
             if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
             if(not cf(@aw_reqf,@wpr_move))then dir:=p_dir(x,y,tu^.x,tu^.y);
@@ -1346,7 +1382,7 @@ wpt_unit       : _ability_unit_spawn(pu,aw_oid);
                if(ServerSide)then
                 case aw_type of
 wpt_resurect : _resurrect(tu);
-wpt_heal     : if(tu^.hits>0)then tu^.hits:=min2(tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+wpt_heal     : if(tu^.hits>0)then tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
 wpt_directdmg: if(cf(@aw_reqf,@wpr_zombie))
                then _makezimba(pu,tu)
                else _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri);
@@ -1449,6 +1485,12 @@ begin
 
          if(uid_x[            uidi]<=0)then uid_x[            uidi]:=unum;
          if(ucl_x[_ukbuilding,_ucl]<=0)then ucl_x[_ukbuilding,_ucl]:=unum;
+
+         case uidi of
+UID_HEye: if(hits>1)
+          then hits-=1
+          else _unit_kill(pu,false,true);
+         end;
       end
       else
         if(cenerg<0)
@@ -1504,11 +1546,11 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         _unit_reveal(pu);
+         _unit_reveal (pu);
+         _unit_counters(pu);
 
          if(hits>0)then
          begin
-            _unit_counters(pu);
             _unit_upgr    (pu);
             _unit_order   (pu);
             _unit_move    (pu);
@@ -1520,11 +1562,7 @@ begin
              then _unit_mcycle   (pu)
              else _unit_mcycle_cl(pu);
          end
-         else
-         begin
-            _unit_counters(pu);
-            _unit_death(pu);
-         end;
+         else _unit_death(pu);
 
          _unit_movevis (pu);
       end;

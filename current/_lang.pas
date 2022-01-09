@@ -107,7 +107,8 @@ begin
          LMT:=i2s(_limituse);
 
          PROD:=findprd(uid);
-         if(_ruid >0)then _addstr(@REQ,_uids [_ruid ].un_txt_name);
+         if(_ruid1>0)then _addstr(@REQ,_uids [_ruid1].un_txt_name);
+         if(_ruid2>0)then _addstr(@REQ,_uids [_ruid2].un_txt_name);
          if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name   );
          HK:=_gHK(_ucl);
 

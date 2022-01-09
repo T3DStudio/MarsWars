@@ -258,7 +258,7 @@ begin
      if(_max=1)and(_UnitHaveRPoint(uid))then _rclickmove:=true;
 end;
 
-procedure _panel_click(tab,bx,by:integer;right,mid:boolean);
+procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
 var u:integer;
    tu:PTUnit;
 begin
@@ -335,7 +335,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
    9 : m_brush:=co_paction;
 
    10: if(ui_orders_x[MaxUnitOrders]>0)then
-        if(k_dbl>0)
+        if(dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitOrders], ui_orders_y[MaxUnitOrders])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
@@ -375,6 +375,9 @@ end;
 procedure _hotkeys(k:cardinal);
 var ko,k2:cardinal;
 begin
+   k_dbl:=(k_dblt>0)and(k=k_dblk);
+   k_dblt:=fr_4hfps;
+   k_dblk:=k;
    if(k=sdlk_pause)
    then GameTogglePause
    else
@@ -416,7 +419,7 @@ begin
                  if(_hotkey2[ko]<>k2)
                  or(_hotkey1[ko]= 0 )
                  or(_hotkey1[ko]<>k )then continue;
-                 _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false);
+                 _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false,false);
                  exit;
               end;
            end;
@@ -427,7 +430,7 @@ begin
                if(k=_hotkeyA[ko])then
                begin
                   if(_hotkeyA[ko]=0)then continue;
-                  _panel_click(3,ko mod 3,4+(ko div 3),false,false);
+                  _panel_click(3,ko mod 3,4+(ko div 3),false,false,k_dbl);
                   exit;
                end;
 
@@ -435,13 +438,13 @@ begin
            sdlk_0..sdlk_9 :  begin
                                 ko:=_event^.key.keysym.sym-sdlk_0;
                                 if(ko<MaxUnitOrders)then
-                                 if (k_ctrl>1)
+                                 if(k_ctrl>1)
                                  then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
                                  else
-                                   if (k_alt>1)
+                                   if(k_alt>1)
                                    then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
                                    else
-                                     if(k_dbl>0)and(ui_orders_x[ko]>0)and(ko>0)
+                                     if(k_dbl)and(ui_orders_x[ko]>0)and(ko>0)
                                      then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
                                      else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
                              end;
@@ -454,12 +457,10 @@ begin
           for ko:=0 to 14 do  // actions
            if(k=_hotkeyR[ko])and(_hotkeyR[ko]>0)then
            begin
-              _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1);
+              _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
               exit;
            end;
-
       end;
-   k_dbl:=fr_4hfps;
 end;
 
 procedure _keyp(i:pbyte);
@@ -480,7 +481,7 @@ begin
    _keyp(@k_ml   ); // mouse btns
    _keyp(@k_mr   );
    _keyp(@k_chart); // last key
-   if(k_dbl>0)then k_dbl-=1;
+   if(k_dblt>0)then k_dblt-=1;
 
    k_keyboard_string:='';
 
@@ -513,8 +514,8 @@ begin
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
-                                                      98: ScrollInt(@_cmp_sm ,1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@_svld_sm,1,0,_svld_ln-vid_svld_m-1 );
+                                                      98: ScrollInt(@_cmp_sm         ,1,0,MaxMissions-vid_camp_m);
+                                                      36: ScrollInt(@_svld_sm        ,1,0,_svld_ln-vid_svld_m-1 );
                                                       41: ScrollInt(@rpls_list_scroll,1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
@@ -523,8 +524,8 @@ begin
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
-                                                      98: ScrollInt(@_cmp_sm ,-1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@_svld_sm,-1,0,_svld_ln-vid_svld_m-1 );
+                                                      98: ScrollInt(@_cmp_sm         ,-1,0,MaxMissions-vid_camp_m);
+                                                      36: ScrollInt(@_svld_sm        ,-1,0,_svld_ln-vid_svld_m-1 );
                                                       41: ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
@@ -608,6 +609,12 @@ begin
 co_empty  : begin
                mouse_select_x0:=mouse_map_x;
                mouse_select_y0:=mouse_map_y;
+
+               u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+               if(u>0)and(k_ctrl>1)then
+                with _units[u] do
+                 if(hits>4)then hits:=hits div 2;
+
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);
                //PlaySoundSet(snd_engineer_attack);
@@ -631,7 +638,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
       co_apatrol : _command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       else         if(rpls_plcam=false)then m_mmap_move:=true;
       end
-      else _panel_click(ui_tab,m_bx,m_by,false,false);     // panel
+      else _panel_click(ui_tab,m_bx,m_by,false,false,false);     // panel
 
 
    if(k_ml=1)then  // LMB up
@@ -676,7 +683,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
      else
        if(m_by<3)                 // minimap
        then _command(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx))
-       else _panel_click(ui_tab,m_bx,m_by,true,false);     // panel
+       else _panel_click(ui_tab,m_bx,m_by,true,false,false);     // panel
 end;
 
 procedure _move_v_m;

@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////////
 procedure InitUIDDataCL;
 var u,i,r,w:byte;
+un_eid_snd_set:boolean;
 
 //local funcs
 procedure setMWSModel(mwsm,mwsma:PTMWSModel);
@@ -85,6 +86,7 @@ begin
       un_eid_snd_fdeath[b]:=fdeath;
       un_eid_snd_pain  [b]:=pain;
    end;
+   un_eid_snd_set:=true;
 end;
 
 procedure setFOOT(adv:boolean;footsnd:PTSoundSet;footanim:integer);
@@ -130,6 +132,7 @@ begin
    for u:=0 to 255 do
    with _uids[u] do
    begin
+      un_eid_snd_set:=false;
       setMWSModel(@spr_dmodel,nil);
       _animw:=10;
       _animd:=10;
@@ -223,7 +226,7 @@ begin
    setMWSModel  (@spr_revenant,nil);
    setCommandSND(false,snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
    setEffectEID (false,0  ,0                 ,0  ,0             );
-   setEffectSND (false,nil,snd_revenant_death,nil,snd_hell_pain);
+   setEffectSND (false,nil,snd_revenant_death,nil,snd_zimba_pain);
    setWeaponESND(0,nil,snd_revenant_attack,0,0);
    setWeaponESND(4,nil,snd_revenant_melee ,0,0);
 end;
@@ -256,7 +259,8 @@ begin
    setCommandSND(false,snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
    setEffectEID (false,0  ,0                   ,0  ,0                 );
    setEffectSND (false,nil,snd_archvile_death  ,nil,snd_archvile_pain );
-   setWeaponESND(0,nil,snd_meat       ,0,0);
+   setWeaponESND(0,nil,snd_meat,0,0);
+   setWeaponTEID(0,nil,0       ,[0..255]);
    setWeaponESND(1,snd_archvile_attack,nil,0,0);
    setWeaponTEID(1,snd_archvile_fire  ,EID_ArchFire,[0..65]);
 end;
@@ -363,6 +367,7 @@ begin
    setMWSModel(@spr_HTower,nil);
    setBuildingSND(snd_hell_htower);
    setWeaponESND(0,nil,snd_revenant_attack,0,MID_Imp);
+   setWeaponESND(1,nil,snd_hell_attack    ,0,MID_Imp);
    un_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -401,12 +406,13 @@ begin
 end;
 UID_HEye:
 begin
-   setMWSModel(@spr_HEye,nil);
+   setMWSModel(@spr_HEye,@spr_HAEye);
    setBuildingSND(snd_hell_eye);
    un_build_amode:=2;
-   un_eid_bcrater:=0;
+   un_eid_bcrater:=255;
    un_snd_ready[false]:=snd_hell_eye;
-   setEffectEID(false,0  ,UID_HEye,UID_HEye,0  );
+   setEffectEID(false,0  ,UID_HEye ,UID_HEye,0  );
+   setEffectEID(true ,0  ,EID_HAEye,EID_HAEye ,0  );
    setEffectSND(false,nil,snd_pexp,snd_pexp,nil);
 end;
 UID_HCommandCenter:
@@ -429,6 +435,9 @@ begin
    setCommandSND(false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,nil,snd_electro,0,0);
+   setWeaponESND(1,nil,snd_pistol ,0,0);
+   with _a_weap[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_Medic:
 begin
@@ -438,6 +447,9 @@ begin
    setCommandSND(false,snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,nil,snd_healing,0,0);
+   setWeaponESND(1,nil,snd_pistol,0,0);
+   with _a_weap[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_Sergant:
 begin
@@ -622,6 +634,7 @@ end;
 
       if(_ukbuilding)then
       begin
+         if(un_eid_bcrater=0)then
          case _urace of
        r_hell: begin
                   if(_r>42)
@@ -638,6 +651,7 @@ end;
                     else un_eid_bcrater:=EID_db_u1;
                end;
          end;
+         if(not un_eid_snd_set)then
          if(_r>42)then
          begin
             setEffectEID(false,0  ,EID_BBExp           ,EID_BBExp           ,0  );

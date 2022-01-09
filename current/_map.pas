@@ -396,10 +396,6 @@ procedure map_make;
 const dpostime = 400;
 var i,ix,iy,lqs,rks,ddc,cnt:integer;
 begin
-   {$IFDEF _FULLGAME}
-   map_tdmake;   //terrain decals
-   {$ENDIF}
-
    map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
    for ix:=0 to dcn do
@@ -458,6 +454,7 @@ begin
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
    map_RedrawMenuMinimap;
+   map_tdmake;
    {$ENDIF}
 end;
 

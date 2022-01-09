@@ -233,7 +233,6 @@ begin
                 vid_vh:=m_vry;
 
                 _MakeScreen;
-                _ScreenSurfaces;
                 theme_map_ptrt:=255;
                 MakeTerrain;
              end;

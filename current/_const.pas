@@ -51,13 +51,13 @@ r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
-MaxPlayers             = 6;
+MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 120;
 MaxPlayerLimit         = 120;
 MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
-MinSMapW               = 3000;
+MinSMapW               = 2500;
 StepSMap               = 250;
 
 map_b0                 = 5;
@@ -83,7 +83,7 @@ pf_solid               : word = 65535;
 
 str_ver                = 'v51';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
-str_cprt               : shortstring = '[ T3DStudio (c) 2016-2021 ]';
+str_cprt               : shortstring = '[ T3DStudio (c) 2016-2022 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
@@ -254,12 +254,11 @@ wpr_adv              : cardinal =  1;
 wpr_nadv             : cardinal =  1 shl 1;
 wpr_zombie           : cardinal =  1 shl 2;
 wpr_sspos            : cardinal =  1 shl 3; // launch missile in unit position
-wpr_cast             : cardinal =  1 shl 4;
-wpr_tvis             : cardinal =  1 shl 5;
-wpr_suicide          : cardinal =  1 shl 6;
-wpr_ground           : cardinal =  1 shl 7;
-wpr_air              : cardinal =  1 shl 8;
-wpr_move             : cardinal =  1 shl 9;
+wpr_tvis             : cardinal =  1 shl 4;
+wpr_suicide          : cardinal =  1 shl 5;
+wpr_ground           : cardinal =  1 shl 6;
+wpr_air              : cardinal =  1 shl 7;
+wpr_move             : cardinal =  1 shl 8;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -522,6 +521,7 @@ MID_Blizzard           = 120;
 MID_ArchFire           = 121;
 MID_Flyer              = 122;
 MID_Mine               = 123;
+MID_URocket            = 124;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -637,9 +637,6 @@ demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
 
 slowturn               = [UID_APC,UID_Tank];
-
-armor_lite             = marines+zimbas+[UID_LostSoul,UID_Imp,UID_Revenant];
-armor_nosdmg           = [UID_Cyberdemon,UID_Mastermind,UID_Tank];  // splash damage immune
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -832,7 +829,7 @@ EID_HUpgr              = 215;
 EID_HAMU               = 216;
 EID_HMU                = 217;
 EID_HCC                = 218;
-
+EID_HAEye              = 219;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

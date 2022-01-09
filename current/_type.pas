@@ -169,6 +169,7 @@ TUWeapon = record
   aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
+  aw_eid_target_onlyshot:boolean;
   aw_eid_target,
   aw_eid_shot,
   aw_eid_start: byte;
@@ -201,7 +202,8 @@ TUID = record
    _zombie_uid,
    _urace,
    _ucl,
-   _ruid,
+   _ruid1,
+   _ruid2,
    _rupgr       : byte;
 
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
@@ -216,13 +218,14 @@ TUID = record
    _barrack_teleport,
    _slowturn,
    _ukbuilding,
-   _ukbio,
    _ukmech,
+   _uklight,
    _isbuilder,
    _issmith,
    _isbarrack,
    _issolid,
    _ukfly,
+   _splashresist,
    _addon       : boolean;
    _bornadvanced: array[false..true] of boolean; //[addon]
    _fastdeath_hits
@@ -401,6 +404,7 @@ TUnit = record
    a_weap   : byte;
    a_tx,a_ty,
    a_tar,
+   a_tar_cl,
 
    mv_x,mv_y,
 

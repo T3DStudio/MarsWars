@@ -72,6 +72,15 @@ begin
    end;
 end;
 
+procedure _unit_advanced_effects(pu:PTUnit);
+begin
+   with pu^ do
+    if(hits>0)then
+     with uid^ do
+      if(playeri=HPlayer)then
+       if(un_snd_ready[false]<>un_snd_ready[true])then SoundPlayAnoncer(un_snd_ready[true],true);
+end;
+
 procedure _unit_death_effects(pu:PTUnit;fastdeath:boolean;vischeck:pboolean);
 begin
    with pu^ do
@@ -131,7 +140,7 @@ end;
 
 procedure _unit_attack_effects(pu:PTUnit;start:boolean;vischeck:pboolean);
 begin
-   with pu^ do
+   with pu^  do
    with uid^ do
    with _a_weap[a_weap] do
    begin
@@ -173,10 +182,11 @@ begin
          if(buff[ub_clcast]>0)then exit;
 
        if(_ukmech)then
+       begin
          if(buff[ub_gear  ]>0)
          or(buff[ub_stun  ]>0)then exit;
-
-       if(_ukbio)then
+       end
+       else
          if(buff[ub_pain  ]>0)
          or(buff[ub_cast  ]>0)
          or(buff[ub_stun  ]>0)
@@ -199,10 +209,11 @@ begin
         if(buff[ub_clcast]>0)then exit;
 
       if(_ukmech)then
+      begin
         if(buff[ub_gear  ]>0)
         or(buff[ub_stun  ]>0)then exit;
-
-      if(_ukbio)then
+      end
+      else
         if(buff[ub_pain  ]>0)
         or(buff[ub_cast  ]>0)
         or(buff[ub_stun  ]>0)
@@ -262,9 +273,10 @@ begin
 end;
 
 procedure _teleport_rld(tu:PTUnit;ur:integer);
+const hpart = 4;
 begin
    with tu^ do
-    with player^ do rld:=max2(fr_4hfps, ur-((ur div 3)*upgr[upgr_hell_teleport]) );
+    with player^ do rld:=max2( fr_fps , fr_3fps+(ur div hpart)*mm3(1,hpart-upgr[upgr_hell_teleport],hpart) );
 end;
 
 procedure _unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
@@ -513,13 +525,14 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=_ukfly)then
-       if(not _IsUnitRange(inapc,nil))then
-       begin
-          o:=tr+_r;
-          d:=dist(x,y,tx,ty);
-          add(x,y,d-o,o);
-       end;
+      if(hits>0)and(ukfly=_ukfly)then
+       if(speed<=0)or(not bld)then
+        if(not _IsUnitRange(inapc,nil))then
+        begin
+           o:=tr+_r;
+           d:=dist(x,y,tx,ty);
+           add(x,y,d-o,o);
+        end;
 
    if(nrd[1]<=-1)
    then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
@@ -582,12 +595,13 @@ begin
     if(u<>skipunit)then
      with _units[u] do
       with uid^ do
-       if(hits>0)and(speed<=0)and(ukfly=flylevel)and(_IsUnitRange(inapc,nil)=false)then
-        if(dist(x,y,tx,ty)<(tr+_r))then
-        begin
-           _collisionr:=2;
-           exit;
-        end;
+       if(hits>0)and(ukfly=flylevel)and(_IsUnitRange(inapc,nil)=false)then
+        if(speed<=0)or(not bld)then
+         if(dist(x,y,tx,ty)<(tr+_r))then
+         begin
+            _collisionr:=2;
+            exit;
+         end;
 
    if(g_mode=gm_cptp)then
     for u:=1 to MaxCPoints do
@@ -1178,8 +1192,8 @@ begin
             begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
-               if PointInScreenF(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,@_players[HPlayer])then SoundPlayUnit(snd_teleport,nil,nil);
-               _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
+               if(SoundPlayUnit(snd_teleport,nil,nil))
+               then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
          end;
@@ -1356,6 +1370,7 @@ end;
 
 procedure _unit_upgr(pu:PTUnit);
 var i:integer;
+   tu:PTUnit;
 begin
    with pu^ do
    with uid^ do
@@ -1380,8 +1395,8 @@ uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld    ]>0];
 
       // DETECTION
       case uidi of
-UID_UMine,
-UID_HEye: buff[ub_detect]:=b2ib[upgr[upgr_hell_heye]>0];
+UID_UMine : buff[ub_detect]:=b2ib[upgr[upgr_hell_heye]>0];
+UID_HEye  : buff[ub_detect]:=_ub_infinity;
       end;
 
       // INVIS
@@ -1395,24 +1410,18 @@ UID_UMine : buff[ub_invis]:=_ub_infinity;
 
       // OTHER HARDCODE
       case uidi of
+UID_LostSoul: begin
+                 tu:=nil;
+                 if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
+                 if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
+              end;
+UID_HEye : buff[ub_advanced]:=b2ib[upgr[upgr_hell_heye]>1];
 UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
            begin
-              if(speed=_speed)then
-              begin
-                 speed :=_speed+7;
-                 {$IFDEF _FULLGAME}
-                 animw :=_animw+3;
-                 {$ENDIF}
-              end;
+              if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+3;{$ENDIF}end;
            end
            else
-             if(speed<>_speed)then
-             begin
-                speed :=_speed;
-                {$IFDEF _FULLGAME}
-                animw :=_animw;
-                {$ENDIF}
-             end;
+             if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;
 UID_HCommandCenter,
 UID_UCommandCenter:
            if(buff[ub_advanced]>0)then
@@ -1517,11 +1526,9 @@ UID_ZCommando:
          if(_ukbuilding)
          then i:= upgr[upgr_race_build_regen[_urace]]
          else
-          if(_ukmech)
-          then i:= upgr[upgr_race_mech_regen[_urace]]
-          else
-            if(_ukbio)
-            then i:= upgr[upgr_race_bio_regen [_urace]];
+           if(_ukmech)
+           then i:= upgr[upgr_race_mech_regen[_urace]]
+           else i:= upgr[upgr_race_bio_regen [_urace]];
 
          if(i>0)then hits:=min2(hits+i,_mhits);
       end;

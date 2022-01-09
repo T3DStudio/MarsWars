@@ -51,7 +51,6 @@ end;
 procedure map_DoodadsDraw(noanim:boolean);
 var d,ro:integer;
 begin
-   clrscr;
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then

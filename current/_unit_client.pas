@@ -131,7 +131,7 @@ begin
       SetBBit(@_bts1,2, buff[ub_advanced ]>0);
       SetBBit(@_bts1,3, buff[ub_pain     ]>0);
       SetBBit(@_bts1,4, buff[ub_cast     ]>0);
-      SetBBit(@_bts1,5,(a_tar>0)and(a_rld>0));
+      SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
 
@@ -192,7 +192,7 @@ begin
 
          if(sh>0)then
          begin
-            if(a_tar>0)and(a_rld>0)then _wudata_int(a_tar,rpl);
+            if(a_tar_cl>0)and(a_rld>0)then _wudata_int(a_tar_cl,rpl);
 
             if(buff[ub_cast]>0)then
              if(_ability in client_cast_abils)then
@@ -493,9 +493,10 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           if(buff[ub_born]>0)then _ucCreateEffect(uu,@vis);
-
+           if(buff[ub_born   ]>0)then _ucCreateEffect(uu,@vis);
            if(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
+
+           if(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
         end;
 
         _ucInc(uu);
@@ -536,7 +537,7 @@ begin
                vx:=x;
                vy:=y;
 
-               if(pu^.uid^._ability=uab_morph2heye)and(uidi=UID_HEye)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
+               if(pu^.uid^._ability=uab_morph2heye)and(pu^.uidi=UID_LostSoul)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
             end;
 
             _unit_upgr(pu);
@@ -569,13 +570,16 @@ begin
                   begin
                      if(uid^._ability<>uab_advance)then
                       if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
-                       case uid^._urace of
-                r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
-                r_uac : begin
-                           buff[ub_gear]:=gear_time[uid^._ukmech];
-                           SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
-                        end;
-                       end;
+                      begin
+                         _unit_advanced_effects(pu);
+                         case uid^._urace of
+                    r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
+                    r_uac : begin
+                               buff[ub_gear]:=gear_time[uid^._ukmech];
+                               SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
+                            end;
+                         end;
+                      end;
 
                      if(pu^.buff[ub_invuln]=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln,@vis);
                   end;
@@ -805,6 +809,7 @@ begin
             if(a_tar=-1)then
             begin
                a_tar:=_rudata_int(rpl,0);
+               writeln(a_tar);
                if(_IsUnitRange(a_tar,nil)=false)then a_tar:=0;
             end;
 

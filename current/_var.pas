@@ -105,6 +105,8 @@ wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_nbuildings,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
+wtrset_allies_damaged_bio,
+wtrset_allies_damaged_mchbld,
 wtrset_resurect   : cardinal;
 
 {$IFDEF _FULLGAME}
@@ -327,7 +329,9 @@ ui_log_t          : array of byte;
 ui_log_c          : array of cardinal;
 ui_log_n          : integer = 0;
 
-k_dbl,
+k_dbl             : boolean = false;
+k_dblt,
+k_dblk,
 k_l,
 k_r,
 k_u,
@@ -501,6 +505,7 @@ spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
 spr_HEye,
+spr_HAEye,
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,
@@ -539,6 +544,7 @@ spr_u_p0,
 spr_u_p1,
 spr_u_p2,
 spr_u_p3,
+spr_u_p8,
 
 spr_db_h0,
 spr_db_h1,

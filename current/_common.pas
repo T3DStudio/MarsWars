@@ -402,7 +402,8 @@ begin
    begin
       setr(ureq_unitlimit ,(army     +uproda          )>=MaxPlayerUnits);
       setr(ureq_armylimit ,(armylimit+uprodl+_limituse)> MaxPlayerLimit);
-      setr(ureq_ruid      ,(_ruid >0)and(uid_eb[_ruid ]<=0));
+      setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<=0));
+      setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<=0));
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr] =0));
       setr(ureq_energy    , cenerg<_renerg                 );
       setr(ureq_time      , _btime<=0                      );

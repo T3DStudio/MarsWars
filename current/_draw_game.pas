@@ -301,16 +301,16 @@ end;
 
 procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
 var srect,
-      hbar:boolean;
-    acolor:cardinal;
-   buffstr:string6;
+      hbar :boolean;
+    acolor :cardinal;
+   buffstr,
+  orderstr :string6;
 function i2s6(i:integer):string6;
 begin
    if(i>0)
    then i2s6:=i2s(i)
    else i2s6:='';
 end;
-
 begin
    with pu^   do
    with uid^  do
@@ -337,14 +337,17 @@ begin
          if(buff[ub_advanced]>0)then buffstr:=buffstr+char_advanced;
          if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
 
-         UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,'',buffstr,i2s6(apcm),i2s6(apcc));
+         orderstr:='';
+         if(playeri=HPlayer)then orderstr:=i2s6(order);
+
+         UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,orderstr,buffstr,i2s6(apcm),i2s6(apcc));
       end;
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 
-      if(speed<=0)and(solid)then
+      if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitr[vid_rtui>vid_rtuish]);
 
-      //if(sel)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,c_gray);
+      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,c_gray);
    end;
 end;
 
@@ -603,7 +606,9 @@ begin
            end;
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(buff[ub_advanced]) , ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(a_tar) , ta_left,255, PlayerGetColor(playeri));
+
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));
 
         end;

@@ -32,9 +32,11 @@ begin
         MID_BFG           : _setEID(@spr_u_p2          ,sms_death);
         MID_Flyer         : _setEID(@spr_u_p3          ,sms_death);
 
+        EID_HAEye,
         MID_Imp           : _setEID(@spr_h_p0          ,sms_death);
         MID_Cacodemon     : _setEID(@spr_h_p1          ,sms_death);
         MID_Baron         : _setEID(@spr_h_p2          ,sms_death);
+        MID_URocket,
         MID_Revenant,
         MID_RevenantS     : _setEID(@spr_h_p4          ,sms_death);
         MID_YPlasma       : _setEID(@spr_h_p7          ,sms_death);
@@ -138,6 +140,7 @@ begin
       case ee of
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
+EID_HAEye,
 UID_HEye          : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
@@ -153,6 +156,7 @@ MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Imp           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Baron         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_URocket,
 MID_Revenant,
 MID_RevenantS     : _setEff(7 ,0 , 8 ,-1       ,false,0 );
 MID_YPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );

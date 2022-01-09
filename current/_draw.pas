@@ -36,7 +36,7 @@ begin
 
    //_drawMWSModel(@spr_HCC);
 
-   if(_testmode>0)then _draw_text(r_screen,vid_cam_w,0,
+   if(_testmode>0)then _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
    c2s(fps_tt)+' '+b2pm[_fsttime]+' '+i2s(mouse_map_x div pf_pathmap_w)+' '+i2s(mouse_map_y div pf_pathmap_w)+' '+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)]),
    ta_right,255, c_white);
 

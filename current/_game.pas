@@ -488,7 +488,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                               co_apatrol: uo_id:=ua_amove;
                                      end;
                                   end;
-                    co_paction :  begin
+                    co_paction :  if(uo_id<>ua_paction)or((ucl_cs[true]+ucl_cs[false])=1)then
+                                  begin
                                      uo_x  :=o_x1;
                                      uo_y  :=o_y1;
                                      uo_bx :=-1;
@@ -508,8 +509,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
                                        uo_id:=ua_paction;
                                      end;
                                      _unit_turn(pu);
+                                     break;
                                   end;
-                    co_action  :  _unit_action   (pu);
+                    co_action  :  _unit_action(pu);
                     co_supgrade:  if(0<=o_y0)and(o_y0<=255)then _unit_supgrade (pu,o_y0);
                     co_cupgrade:  if(0<=o_y0)and(o_y0<=255)then _unit_cupgrade (pu,o_y0);
                     co_suprod  :  if(0<=o_y0)and(o_y0<=255)then _unit_straining(pu,o_y0);

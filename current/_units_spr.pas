@@ -197,9 +197,9 @@ smt_arch     :case animk of
         sms_walk : i:=dd*6+aa3(0,anim,5);
         sms_dready
                  : i:=48+dd;
-        sms_mattack,
         sms_dattack
                  : i:=56+dd;
+        sms_mattack,
         sms_cast : i:=64+dd;
         sms_pain : i:=72+dd;
         sms_death: i:=80+anim;
@@ -318,12 +318,12 @@ else if(buff[ub_pain  ]>0)
 else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
 else if(a_rld          >0)and(a_aweap<=MaxUnitWeapons)then
       with _a_weap[a_aweap] do
-       if(cf(@aw_reqf,@wpr_cast))
-       then _unit2SMAnimK:=sms_cast
-       else
+       //if(cf(@aw_reqf,@wpr_cast))
+       //then _unit2SMAnimK:=sms_cast
+       //else
          if(aw_max_range>=0)then
          begin
-            if(a_rld in aw_rld_a)//and(_IsUnitRange(a_tar,nil))
+            if(a_rld in aw_rld_a)
             then _unit2SMAnimK:=sms_dattack
             else _unit2SMAnimK:=sms_dready;
          end

@@ -222,10 +222,6 @@ begin
 
    if(animstyle=0)then
    begin
-      {case animst of
-      0:   e:=d div 22;
-      else e:=d div 32;
-      end;}
       if(animst=0)
       then e:=12
       else e:=d div 32;
@@ -242,7 +238,6 @@ begin
          y:=r+trunc(i*sin(dir*degtorad));
          filledcircleColor(surf,x,y,p,c_purple);
          dir+=max2(1,(trunc(p*180/(pi*r)) div 3)*4 );
-         //dir +=8;  _cr:=_minr+random(_rstep);
          rand+=13;
       end;
    end;
@@ -620,6 +615,7 @@ begin
    _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
    _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAEye          ,race_buildings[r_hell]+'heyea_' ,smt_buiding,firstload);
 
    _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UMilitaryUnit  ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
@@ -655,6 +651,7 @@ begin
    _LoadMWSModel(@spr_u_p1           ,race_missiles[r_uac ]+'u_p1_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_effect ,firstload);
 
    _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
@@ -752,8 +749,8 @@ begin
       mv_x      :=(vid_vw-spr_mback^.w) div 2;
       mv_y      :=(vid_vh-spr_mback^.h) div 2;
    end;
-   vid_fog_vfw      :=(vid_cam_w div fog_cw)+2;
-   vid_fog_vfh      :=(vid_cam_h div fog_cw)+2;
+   vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
+   vid_fog_vfh  :=(vid_cam_h div fog_cw)+2;
 
    map_mmvw     := round(vid_cam_w*map_mmcx);
    map_mmvh     := round(vid_cam_h*map_mmcx);
