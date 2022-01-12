@@ -131,8 +131,8 @@ begin
    g_inv_wave_t := 0;
    g_royal_r    := 0;
 
-   _uclord_c    := 0;
-   _uregen_c    := 0;
+   _cycle_order    := 0;
+   _cycle_regen    := 0;
 
    vid_menu_redraw:=true;
 
@@ -875,12 +875,12 @@ begin
          SoundPlayUnitSelect;
          {$ENDIF}
 
-         _uclord_c+=1; _uclord_c:=_uclord_c mod _uclord_p;
-         _uregen_c+=1; _uregen_c:=_uregen_c mod regen_per;
+         _cycle_order+=1; _cycle_order:=_cycle_order mod order_period;
+         _cycle_regen+=1; _cycle_regen:=_cycle_regen mod regen_period;
 
          if(ServerSide)then
          begin
-            if(_uclord_c=0)then
+            if(_cycle_order=0)then
              if(g_royal_r>0)then g_royal_r-=1;
 
             G_Step+=1;

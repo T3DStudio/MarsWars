@@ -14,8 +14,8 @@ begin
          state        :=PS_Play;
          ttl          :=0;
          {$IFNDEF _FULLGAME}
-         PlayersAddLog(i,0,lmt_game,'MarsWars dedicated server, '+str_ver);
-         PlayersAddLog(i,0,lmt_game,'Type -h/-help command'              );
+         PlayersAddLog(i,0,lmt_game,'MarsWars dedicated server, '+str_ver,false);
+         PlayersAddLog(i,0,lmt_game,'Type -h/-help command'              ,false);
          {$ENDIF}
          break;
       end;

@@ -63,6 +63,8 @@ uses SysUtils, SDL, SDL_Net
 {$R *.res}
 
 begin
+   writeln(sizeof(unit_grid));
+
    InitGame;
 
    while (_CYCLE) do

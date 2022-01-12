@@ -66,7 +66,7 @@ begin
      with _units[i] do
       with uid^ do
        if(hits>0)and(sel)and(playeri=HPlayer)then
-        if(speed>0)or(_canattack(@_units[i]))or(_UnitHaveRPoint(_units[i].uidi))then
+        if(speed>0)or(_canattack(@_units[i],false))or(_UnitHaveRPoint(_units[i].uidi))then
         begin
            su+=1;
            if(bld)then

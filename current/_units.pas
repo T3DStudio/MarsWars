@@ -1,31 +1,5 @@
 
 
-function _UnderObstacle(ux,uy:integer):boolean;
-const dr = 64;
-var i,dx,dy,ud,dp:integer;
-begin
-   _UnderObstacle:=false;
-   dx:=ux div dcw;
-   dy:=uy div dcw;
-   dp:=0;
-
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-    with map_dcell[dx,dy] do
-     for i:=1 to n do
-      with l[i-1]^ do
-       if(r>0)and(t>0)then
-       begin
-          ud:=(dist2(x,y,ux,uy)-r);
-          if(ud<0)then dp+=1;
-          ud+=dr;
-          if(ud<0)or(dp>1)then
-          begin
-             _UnderObstacle:=true;
-             exit;
-          end;
-       end;
-end;
-
 procedure _unit_remove(pu:PTUnit);
 begin
    with pu^ do
@@ -49,7 +23,7 @@ begin
    with player^ do
     if(hits>dead_hits)then
     begin
-       if(uclord=_uclord_c)then
+       if(cycle_order=_cycle_order)then
        begin
           for uc:=1 to MaxUnits do
            if(uc<>unum)then
@@ -63,7 +37,7 @@ begin
        begin
           if(ServerSide)or(hits>fdead_hits)then hits-=1;
           {$IFDEF _FULLGAME}
-          if(uclord=_uclord_c)and(fsr>1)then fsr-=1;
+          if(cycle_order=_cycle_order)and(fsr>1)then fsr-=1;
           {$ENDIF}
 
           if(ServerSide)then
@@ -257,8 +231,8 @@ gm_inv    : if(playeri=0)then dam:=dam div 2;
               begin
                  pains:=painc;
 
-                 buff[ub_pain      ]:=pain_time;
-                 buff[ub_stopattack]:=buff[ub_pain];
+                 buff[ub_pain]:=order_period;
+                 buff[ub_stop]:=order_period;
 
                  with player^ do
                   if(_urace=r_hell)then
@@ -346,6 +320,7 @@ begin
          _unit_sfog(pu);
          {$ENDIF}
 
+         if(a_rld<=0)then
          dir:=_DIR360(dir-(dir_diff(dir,p_dir(vx,vy,x,y)) div 2 ));
 
          if(tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)and(uo_tar=0)then
@@ -644,7 +619,6 @@ begin
    begin
       // Weapon type requirements
 
-      if(ServerSide)then
       case aw_type of
 wpt_resurect : if(tu^.buff[ub_resur]>0)
                or(tu^.buff[ub_pain ]>0)
@@ -715,12 +689,6 @@ wpt_heal     : if(tu^.hits<=0)
       end;
 
       // Distance requirements
-
-      if(ServerSide=false)then
-      begin
-         _target_weapon_check:=2;
-         exit;
-      end;
 
       if(ud<aw_min_range)then exit;
 
@@ -839,7 +807,7 @@ begin
       if(ukfly=uf_fly)and(apcm>0)and(apcc>0)and(uo_id=ua_unload)and(underobstacle)then cunload:=false;
 
       push    := solid and _canmove(pu);
-      ftarget := _canattack(pu);
+      ftarget := _canattack(pu,false);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -939,7 +907,7 @@ begin
          a_tar  :=0;
          a_tard :=32000;
          t_weap :=255;
-         ftarget:=_canattack(pu);
+         ftarget:=_canattack(pu,false);
       end
       else ftarget:=false;
 
@@ -1008,6 +976,7 @@ begin
       else tu^.rld:=uac_adv_base_reload[_ukmech];
 
       {$IFDEF _FULLGAME}
+      _unit_advanced_effects(pu);
       SoundPlayUnit(snd_unit_adv[_urace],pu,nil);
       {$ENDIF}
    end;
@@ -1255,85 +1224,100 @@ procedure _unit_attack(pu:PTUnit);
 var w,a  : byte;
      tu  : PTUnit;
 upgradd,c: integer;
+{$IFDEF _FULLGAME}
 attackervis,
 targetvis: boolean;
+{$ENDIF}
 begin
    with pu^ do
    begin
-      if(_canattack(pu)=false)then exit;
       if(_IsUnitRange(a_tar,@tu)=false)then exit;
 
-      if(a_rld<=0)then
+      if(ServerSide)then
       begin
-         w:=_unit_target2weapon(pu,tu,-1,255,@a);
-
-         if(w>MaxUnitWeapons)or(a=0)then
+         if(a_rld<=0)then
          begin
-            if(ServerSide)then a_tar:=0;
-            exit;
+            w:=_unit_target2weapon(pu,tu,-1,255,@a);
+
+            if(w>MaxUnitWeapons)or(a=0)then
+            begin
+               if(ServerSide)then a_tar:=0;
+               exit;
+            end;
+
+            a_weap:=w;
+         end
+         else
+         begin
+            a:=_target_weapon_check(pu,tu,-1,a_weap,true,false);
+            if(a=0)then
+            begin
+               if(ServerSide)then a_tar:=0;
+               exit;
+            end;
          end;
 
-         a_weap:=w;
-      end
-      else
-      begin
-         a:=_target_weapon_check(pu,tu,-1,a_weap,true,false);
-         if(a=0)then
-         begin
-            if(ServerSide)then a_tar:=0;
-            exit;
-         end;
-      end;
+         upgradd:=0;
 
-      upgradd:=0;
-
-      case a of
-      0: exit;
-      1: begin
-            if(ServerSide)then
+         case a of
+         0: exit;
+         1: begin
+               with uid^ do
+               with _a_weap[a_weap] do
+               if(not cf(@aw_reqf,@wpr_move))then
+               begin
+                  mv_x:=tu^.x;
+                  mv_y:=tu^.y;
+               end;
+               exit;
+            end;
+         else
             with uid^ do
             with _a_weap[a_weap] do
             if(not cf(@aw_reqf,@wpr_move))then
             begin
-               mv_x:=tu^.x;
-               mv_y:=tu^.y;
+               mv_x:=x;
+               mv_y:=y;
             end;
-            exit;
          end;
+      end
       else
-         if(ServerSide)then
-         with uid^ do
-         with _a_weap[a_weap] do
-         if(not cf(@aw_reqf,@wpr_move))then
-         begin
-            mv_x:=x;
-            mv_y:=y;
-         end;
+      begin
+         if(a_weap>MaxUnitWeapons)then exit;
+      end;
+
+      if(_canattack(pu,true)=false)then
+      begin
+         mv_x:=x;
+         mv_y:=y;
+         exit;
       end;
 
       // attack code
       with uid^ do
       with _a_weap[a_weap] do
       begin
+         {$IFDEF _FULLGAME}
          targetvis  :=PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer]);
-         attackervis:=PointInScreenF(tu^.vx,tu^.vy,@_players[HPlayer]);
+         attackervis:=PointInScreenF(vx    ,vy    ,@_players[HPlayer]);
+         {$ENDIF}
 
          if(a_rld=0)then
          begin
-            a_rld   :=aw_rld;
-            a_tar_cl:=a_tar;
+            a_rld    :=aw_rld;
+            a_tar_cl :=a_tar;
+            a_weap_cl:=a_weap;
             if(not cf(@aw_reqf,@wpr_move))then
             begin
                dir:=p_dir(x,y,tu^.x,tu^.y);
-               if(ServerSide)then buff[ub_stopattack]:=max2(a_rld,_uclord_p);
+               if(ServerSide)then buff[ub_stop]:=max2(a_rld,order_period);
             end;
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,@attackervis);
-            a_aweap:=a_weap;
             {$ENDIF}
          end;
 
-         if(uclord=_uclord_c)then
+         if(cycle_order=_cycle_order)then
          begin
             if(cf(@aw_reqf,@wpr_tvis))then _AddToInt(@tu^.vsnt[player^.team],vistime);
             _AddToInt(@vsnt[tu^.player^.team],vistime);
@@ -1457,17 +1441,18 @@ uab_spawnlost:  begin
       else _unit_inapc_target(pu,apctu);
 
       if(uo_id=ua_amove)then _unit_attack(pu);
-      if(buff[ub_stopattack]>0)then
-       if(buff[ub_stopattack]=1)then
-       begin
-          buff[ub_stopattack]:=0;
-          _unit_turn(pu);
-       end
-       else
-       begin
-          mv_x:=x;
-          mv_y:=y;
-       end;
+
+      if(buff[ub_stop]>0)then
+      begin
+         if(buff[ub_stop]=1)and(_IsUnitRange(a_tar,nil)=false)then
+         begin
+            buff[ub_stop]:=0;
+            _unit_turn(pu);
+         end;
+
+         mv_x:=x;
+         mv_y:=y;
+      end;
    end;
 end;
 
@@ -1498,7 +1483,7 @@ UID_HEye: if(hits>1)
         else
           if(buff[ub_pain]<=0)then
           begin
-             if(_uclord_c=uclord)then
+             if(_cycle_order=cycle_order)then
              begin
                 hits+=_bstep;
                 hits+=_bstep*upgr[upgr_fast_build];
@@ -1526,7 +1511,7 @@ begin
    begin
       _AddToInt(@vsnt[team],vistime);
       _AddToInt(@vsni[team],vistime);
-      if(ServerSide)and(uclord=_uclord_c)then
+      if(ServerSide)and(cycle_order=_cycle_order)then
        if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
         for i:=0 to MaxPlayers do
         begin
@@ -1557,7 +1542,7 @@ begin
 
             if(ServerSide)then _unit_prod(pu);
 
-            if(uclord=_uclord_c)then
+            if(cycle_order=_cycle_order)then
              if(ServerSide)and(inapc=0)
              then _unit_mcycle   (pu)
              else _unit_mcycle_cl(pu);

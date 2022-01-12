@@ -228,8 +228,8 @@ begin
    BlockWrite(f,g_inv_wave_t    ,SizeOf(g_inv_wave_t    ));
    BlockWrite(f,g_cpoints       ,SizeOf(g_cpoints       ));
    BlockWrite(f,g_royal_r       ,SizeOf(g_royal_r       ));
-   BlockWrite(f,_uclord_c       ,SizeOf(_uclord_c       ));
-   BlockWrite(f,_uregen_c       ,SizeOf(_uregen_c       ));
+   BlockWrite(f,_cycle_order    ,SizeOf(_cycle_order    ));
+   BlockWrite(f,_cycle_regen    ,SizeOf(_cycle_regen    ));
    BlockWrite(f,G_WTeam         ,SizeOf(G_WTeam         ));
    BlockWrite(f,team_army       ,SizeOf(team_army       ));
    BlockWrite(f,ui_alarms       ,SizeOf(ui_alarms       ));
@@ -302,8 +302,8 @@ begin
          BlockRead(f,g_inv_wave_t    ,SizeOf(g_inv_wave_t    ));
          BlockRead(f,g_cpoints       ,SizeOf(g_cpoints       ));
          BlockRead(f,g_royal_r       ,SizeOf(g_royal_r       ));
-         BlockRead(f,_uclord_c       ,SizeOf(_uclord_c       ));
-         BlockRead(f,_uregen_c       ,SizeOf(_uregen_c       ));
+         BlockRead(f,_cycle_order    ,SizeOf(_cycle_order    ));
+         BlockRead(f,_cycle_regen    ,SizeOf(_cycle_regen    ));
          BlockRead(f,G_WTeam         ,SizeOf(G_WTeam         ));
          BlockRead(f,team_army       ,SizeOf(team_army       ));
          BlockRead(f,ui_alarms       ,SizeOf(ui_alarms       ));

@@ -1,9 +1,12 @@
 procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
 function _canmove  (pu:PTUnit):boolean; forward;
-function _canattack(pu:PTUnit):boolean; forward;
-procedure SoundLog(ptarget:byte);  forward;
+function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
+function _UnderObstacle(ux,uy:integer):boolean; forward;
 
+{$IFDEF _FULLGAME}
+procedure SoundLog(ptarget:byte);  forward;
+{$ENDIF}
 
 function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
 function w2s (i:word    ):shortstring;begin str(i,w2s );end;
@@ -499,6 +502,9 @@ begin
    with player^ do
    begin
       if(bld=false)or(hits<=0)then exit;
+
+      if(_ability_no_obstacles)then
+       if(_UnderObstacle(x,y))then exit;
 
       if(_ability_rupgr>0)then
        if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;

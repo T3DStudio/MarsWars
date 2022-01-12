@@ -316,19 +316,16 @@ else if(not bld          )then _unit2SMAnimK:=sms_build
 else if(buff[ub_pain  ]>0)
      or(buff[ub_stun  ]>0)then _unit2SMAnimK:=sms_pain
 else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
-else if(a_rld          >0)and(a_aweap<=MaxUnitWeapons)then
-      with _a_weap[a_aweap] do
-       //if(cf(@aw_reqf,@wpr_cast))
-       //then _unit2SMAnimK:=sms_cast
-       //else
-         if(aw_max_range>=0)then
-         begin
-            if(a_rld in aw_rld_a)
-            then _unit2SMAnimK:=sms_dattack
-            else _unit2SMAnimK:=sms_dready;
-         end
-         else
-            if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
+else if(a_rld          >0)and(a_weap_cl<=MaxUnitWeapons)then
+      with _a_weap[a_weap_cl] do
+       if(aw_max_range>=0)then
+       begin
+          if(a_rld in aw_rld_a)
+          then _unit2SMAnimK:=sms_dattack
+          else _unit2SMAnimK:=sms_dready;
+       end
+       else
+          if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
 end;
 
 function _unit2spr(u:PTUnit):PTMWTexture;

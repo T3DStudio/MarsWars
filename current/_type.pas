@@ -210,6 +210,8 @@ TUID = record
 
    _shcf        : single;
 
+   _ability_no_obstacles
+                : boolean;
    _ability,
    _ability_rupgr,
    _ability_rupgrl,
@@ -390,7 +392,7 @@ TUnit = record
    hits,
    unum     : integer;
 
-   uclord,
+   cycle_order,
    order,
    playeri,
    uidi     : byte;
@@ -401,6 +403,7 @@ TUnit = record
    pprod_u  : array[0..MaxUnitProds] of byte;
 
    a_rld,
+   a_weap_cl,
    a_weap   : byte;
    a_tx,a_ty,
    a_tar,
@@ -444,7 +447,6 @@ TUnit = record
    sel      : boolean;
 
    {$IFDEF _FULLGAME}
-   a_aweap  : byte;
    wanim    : boolean;
 
    animw,

@@ -166,6 +166,11 @@ end;
 
 {$ENDIF}
 
+function _UnderObstacle(ux,uy:integer):boolean;
+begin
+   _UnderObstacle:=pf_get_area(ux div pf_pathmap_w,uy div pf_pathmap_w)=pf_solid;
+end;
+
 function _canmove(pu:PTUnit):boolean;
 begin
    with pu^ do
@@ -176,7 +181,8 @@ begin
     begin
        _canmove:=false;
 
-       if(speed<=0)or(buff[ub_stopattack]>0)or(bld=false)then exit;
+       //or(buff[ub_stop]>0)
+       if(speed<=0)or(bld=false)then exit;
 
        if(_ukbuilding)then
          if(buff[ub_clcast]>0)then exit;
@@ -196,7 +202,7 @@ begin
     end;
 end;
 
-function _canattack(pu:PTUnit):boolean;
+function _canattack(pu:PTUnit;check_buffs:boolean):boolean;
 var tu:PTUnit;
 begin
    _canattack:=false;
@@ -205,19 +211,22 @@ begin
    begin
       if(bld=false)or(hits<=0)or(_attack=atm_none)then exit;
 
-      if(_ukbuilding)then
-        if(buff[ub_clcast]>0)then exit;
-
-      if(_ukmech)then
+      if(check_buffs)then
       begin
-        if(buff[ub_gear  ]>0)
-        or(buff[ub_stun  ]>0)then exit;
-      end
-      else
-        if(buff[ub_pain  ]>0)
-        or(buff[ub_cast  ]>0)
-        or(buff[ub_stun  ]>0)
-        or(buff[ub_gear  ]>0)then exit;
+         if(_ukbuilding)then
+          if(buff[ub_clcast]>0)then exit;
+
+         if(_ukmech)then
+         begin
+           if(buff[ub_gear  ]>0)
+           or(buff[ub_stun  ]>0)then exit;
+         end
+         else
+           if(buff[ub_pain  ]>0)
+           or(buff[ub_cast  ]>0)
+           or(buff[ub_stun  ]>0)
+           or(buff[ub_gear  ]>0)then exit;
+      end;
 
       case _attack of
    atm_bunker,
@@ -344,8 +353,9 @@ procedure _unit_turn(pu:PTUnit);
 begin
    with pu^ do
     if(uid^._slowturn=false)then
-     if(_canmove(pu))then
-      dir:=p_dir(x,y,uo_x,uo_y);
+     if(x<>uo_x)or(y<>uo_y)then
+      if(_canmove(pu))then
+       dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
 function _unit_uradar(pu:PTUnit;x0,y0:integer):boolean;
@@ -581,8 +591,14 @@ begin
       if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   newx^:=mm3(vid_cam_x,mm3(map_b0,tx,map_b1),vid_cam_x+vid_cam_w);
-   newy^:=mm3(vid_cam_y,mm3(map_b0,ty,map_b1),vid_cam_y+vid_cam_h);
+   tx:=mm3(map_b0,tx,map_b1);
+   ty:=mm3(map_b0,ty,map_b1);
+   {$IFDEF _FULLGAME}
+   tx:=mm3(vid_cam_x,tx,vid_cam_x+vid_cam_w);
+   ty:=mm3(vid_cam_y,ty,vid_cam_y+vid_cam_h);
+   {$ENDIF}
+   newx^:=tx;
+   newy^:=ty;
 end;
 
 
@@ -904,7 +920,7 @@ begin
       if(_LastCreatedUnit>0)then
        with _LastCreatedUnitP^ do
        begin
-          uclord  := _LastCreatedUnit mod _uclord_p;
+          cycle_order  := _LastCreatedUnit mod order_period;
           unum    := _LastCreatedUnit;
 
           x       := ux;
@@ -1371,6 +1387,18 @@ end;
 procedure _unit_upgr(pu:PTUnit);
 var i:integer;
    tu:PTUnit;
+procedure SetSRange(newsr:integer);
+begin
+   with pu^ do
+   if(srange<>newsr)then
+   begin
+      srange:=newsr;
+      {$IFDEF _FULLGAME}
+      _unit_fog_r(pu);
+      {$ENDIF}
+   end;
+end;
+
 begin
    with pu^ do
    with uid^ do
@@ -1379,23 +1407,14 @@ begin
    begin
       // ABILITIES
       case _ability of
-uab_radar: begin
-              i:=radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr_levels)];
-              if(srange<>i)then
-              begin
-                 srange:=i;
-                 {$IFDEF _FULLGAME}
-                 _unit_fog_r(pu);
-                 {$ENDIF}
-              end;
-           end;
+uab_radar        : SetSRange(radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr_levels)]);
 uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele]>0];
 uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld    ]>0];
       end;
 
       // DETECTION
       case uidi of
-UID_UMine : buff[ub_detect]:=b2ib[upgr[upgr_hell_heye]>0];
+UID_UMine : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
 UID_HEye  : buff[ub_detect]:=_ub_infinity;
       end;
 
@@ -1488,47 +1507,29 @@ UID_UCommandCenter: isbuildarea:=not ukfly;
 
 
       // SRANGE
-      if(_upgr_srange>0)and(_upgr_srange_step>0)then
-      begin
-         i:=_srange+(upgr[_upgr_srange]*_upgr_srange_step);
-         if(srange<>i)then
-         begin
-            srange:=i;
-            {$IFDEF _FULLGAME}
-            _unit_fog_r(pu);
-            {$ENDIF}
-         end;
-      end;
+      if(_upgr_srange>0)and(_upgr_srange_step>0)then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step));
       case uidi of
+UID_UMine    : if(upgr[upgr_uac_mines]>1)then SetSRange(upgr[upgr_uac_mines]*100);
+UID_BFG,
+UID_ZBFG,
 UID_Major,
 UID_ZMajor,
-UID_ZCommando:
-         begin
-            if(buff[ub_advanced]>0)
-            then i:=_srange+50
-            else i:=_srange;
-
-            if(srange<>i)then
-            begin
-               srange:=i;
-               {$IFDEF _FULLGAME}
-               _unit_fog_r(pu);
-               {$ENDIF}
-            end;
-         end;
+UID_ZCommando: if(buff[ub_advanced]>0)
+               then SetSRange(_srange+50)
+               else SetSRange(_srange   );
       end;
 
 
       // REGENERATION
       if(ServerSide)then
-      if(uclord=_uregen_c)then
+      if(cycle_order=_cycle_regen)then
       begin
          if(_ukbuilding)
-         then i:= upgr[upgr_race_build_regen[_urace]]
+         then i:=upgr[upgr_race_build_regen[_urace]]
          else
            if(_ukmech)
-           then i:= upgr[upgr_race_mech_regen[_urace]]
-           else i:= upgr[upgr_race_bio_regen [_urace]];
+           then i:=upgr[upgr_race_mech_regen[_urace]]
+           else i:=upgr[upgr_race_bio_regen [_urace]];
 
          if(i>0)then hits:=min2(hits+i,_mhits);
       end;

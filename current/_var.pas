@@ -41,8 +41,8 @@ _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
 _missiles         : array[1..MaxMissiles] of TMissile;
 
-_uclord_c         : integer = 0;
-_uregen_c         : integer = 0;
+_cycle_order      : integer = 0;
+_cycle_regen      : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
@@ -71,6 +71,8 @@ map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
+
+unit_grid         : array[0..ugridw,0..ugridw,false..true] of integer;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;

@@ -58,6 +58,16 @@ begin
     end;
 end;
 
+procedure _SetRLDA(aa:byte;rld:TSoB);
+begin
+   with _uids[u] do
+   for aa:=aa to MaxUnitWeapons do
+   with _a_weap[aa] do
+   begin
+      aw_rld_a:=rld;
+   end;
+end;
+
 procedure setBuildingSND(s:PTSoundSet);
 begin setCommandSND(false,nil,s,s,s,s);end;
 
@@ -337,6 +347,7 @@ begin
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (@spr_ZBFG,nil);
    setWeaponESND(0,snd_bfg_shot,nil,0,0);
+   setWeaponTEID(0,nil,0,[fr_fps-10..255]);
 end;
 
 
@@ -461,7 +472,7 @@ begin
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
-   setWeaponESND(2,nil,snd_shotgun,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
 end;
 UID_Commando:
 begin
@@ -503,6 +514,8 @@ begin
    setCommandSND(false,snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,snd_bfg_shot,nil,0,0);
+   setWeaponTEID(0,nil,0,[fr_fps-10..255]);
 end;
 UID_FAPC:
 begin
@@ -625,7 +638,10 @@ begin
    setMWSModel   (@spr_Mine,nil);
    setBuildingSND(snd_mine_place);
    un_snd_ready[false]:=snd_mine_place;
-   setWeaponESND (0,nil,snd_electro,0,0);
+   setWeaponESND(0,nil,snd_electro,0,0);
+   setEffectEID(false,0  ,EID_Exp,EID_Exp,0  );
+   setEffectSND(false,nil,snd_exp,snd_exp,nil);
+   un_eid_bcrater:=255;
 end;
 
       end;

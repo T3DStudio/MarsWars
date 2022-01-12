@@ -64,6 +64,9 @@ map_b0                 = 5;
 
 uidall                 = [0..255];
 
+ugrid_cellw            =  20;
+ugridw                 = (MaxSMapW div ugrid_cellw)+1;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  PATH FIND SYSTEM
@@ -373,7 +376,7 @@ ub_stun                = 2;
 ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
-ub_stopattack          = 6;
+ub_stop          = 6;
 ub_slooow              = 7;
 ub_clcast              = 8;
 ub_invis               = 9;
@@ -658,9 +661,9 @@ base_3r                = base_r*3;
 base_ir                = base_r+(base_r div 2);
 
 apc_exp_damage         = 70;
-regen_per              = fr_fps*2;
-_uclord_p              = fr_2hfps+1;
-vistime                = _uclord_p+1;
+regen_period           = fr_fps*2;
+order_period           = fr_2hfps+1;
+vistime                = order_period+1;
 
 radar_reload           = fr_fps*60;
 radar_btime            = radar_reload-(fr_fps*5);
@@ -690,7 +693,6 @@ blizz_r                = 150;
 g_ct_pr                = 150;
 bld_dec_mr             = 6;
 player_default_ai_level                 = 5;
-pain_time              = fr_2hfps;
 hinvuln_time           = (fr_fps*30);
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
@@ -989,7 +991,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 724701;
+svld_size              = 728065;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

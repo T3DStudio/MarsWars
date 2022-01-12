@@ -31,6 +31,13 @@ begin
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
+procedure _wudata_word(bt:word;rpl:boolean);
+begin
+   if(rpl=false)
+   then net_writeword(bt)
+   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+end;
+
 procedure _wudata_sint(bt:shortint;rpl:boolean);
 begin
    if(rpl=false)
@@ -162,6 +169,7 @@ end;
 
 procedure _wudata(pu:PTUnit;rpl:boolean;_pl:byte);
 var sh :shortint;
+    wt :word;
 begin
    with pu^ do
    with uid^ do
@@ -192,7 +200,13 @@ begin
 
          if(sh>0)then
          begin
-            if(a_tar_cl>0)and(a_rld>0)then _wudata_int(a_tar_cl,rpl);
+            if(a_tar_cl>0)and(a_rld>0)then
+            begin
+               wt:=0;
+               if(_IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
+               wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
+               _wudata_word(wt,rpl);
+            end;
 
             if(buff[ub_cast]>0)then
              if(_ability in client_cast_abils)then
@@ -657,6 +671,13 @@ begin
    else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));if(ioresult<>0)then _rudata_byte:=def; {$I+} end;
 end;
 
+function _rudata_word(rpl:boolean;def:byte):word;
+begin
+   if(rpl=false)
+   then _rudata_word:=net_readword
+   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));if(ioresult<>0)then _rudata_word:=def; {$I+} end;
+end;
+
 function _rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
    if(rpl=false)
@@ -708,6 +729,8 @@ var _bts1,
 begin
    with uu^ do
    begin
+      a_weap:=255;
+
       _bts1:=_rudata_byte(rpl,0);
 
       bld:=GetBBit(@_bts1,0);
@@ -723,7 +746,7 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_stun    ]:=_buffst[GetBBit(@_bts2,0)];
+         buff[ub_stun     ]:=_buffst[GetBBit(@_bts2,0)];
          buff[ub_gear     ]:=_buffst[GetBBit(@_bts2,1)];
          buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,2)];
          buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
@@ -732,7 +755,7 @@ begin
       end
       else
       begin
-         buff[ub_stun    ]:=0;
+         buff[ub_stun     ]:=0;
          buff[ub_gear     ]:=0;
          buff[ub_resur    ]:=0;
          buff[ub_born     ]:=0;
@@ -767,6 +790,7 @@ end;
 procedure _rudata(uu:PTUnit;rpl:boolean;_pl:byte);
 var sh:shortint;
     i :byte;
+    wt:word;
 begin
    _units[0]:=uu^;
    with uu^ do
@@ -808,9 +832,9 @@ begin
          begin
             if(a_tar=-1)then
             begin
-               a_tar:=_rudata_int(rpl,0);
-               writeln(a_tar);
-               if(_IsUnitRange(a_tar,nil)=false)then a_tar:=0;
+               wt:=_rudata_word(rpl,0);
+               a_tar :=integer(wt and %0000001111111111);
+               a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
             if(uid^._ability in client_cast_abils)then

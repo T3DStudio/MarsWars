@@ -103,19 +103,19 @@ begin
    '-h',
    '-help':
    begin
-      PlayersAddLog(0,log_to_all,lmt_game,'MarsWars dedicated server, '+str_ver  );
-      PlayersAddLog(0,log_to_all,lmt_game,'New map: -m [seed size lakes obs sym]');
-      PlayersAddLog(0,log_to_all,lmt_game,'Add AI player: -p [R/H/U team skill]' );
-      PlayersAddLog(0,log_to_all,lmt_game,'Remove all AI players: -k or -noai'   );
-      PlayersAddLog(0,log_to_all,lmt_game,'Set 1..6 teams to AI players: -ffa'   );
-      PlayersAddLog(0,log_to_all,lmt_game,'Game moddes: -s - scirmish'           );
-      PlayersAddLog(0,log_to_all,lmt_game,'  -f2/3- 2/3 fortress, -i - invasion' );
-      PlayersAddLog(0,log_to_all,lmt_game,'  -c - capturing points, -a - assault');
-      PlayersAddLog(0,log_to_all,lmt_game,'  -rb - royal battle'                 );
-      PlayersAddLog(0,log_to_all,lmt_game,'  -ud/-d2 - UDOOM/DOOM 2 mode'        );
-      PlayersAddLog(0,log_to_all,lmt_game,'Show/hide player starts: -ps'         );
-      PlayersAddLog(0,log_to_all,lmt_game,'Starting base options: -st 1-6'       );
-      PlayersAddLog(0,log_to_all,lmt_game,'Fill empty slots with AI: -fs 0-7'    );
+      PlayersAddLog(0,log_to_all,lmt_game,'MarsWars dedicated server, '+str_ver  ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'New map: -m [seed size lakes obs sym]',false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Add AI player: -p [R/H/U team skill]' ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Remove all AI players: -k or -noai'   ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Set 1..6 teams to AI players: -ffa'   ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Game moddes: -s - scirmish'           ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'  -f2/3- 2/3 fortress, -i - invasion' ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'  -c - capturing points, -a - assault',false);
+      PlayersAddLog(0,log_to_all,lmt_game,'  -rb - royal battle'                 ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'  -ud/-d2 - UDOOM/DOOM 2 mode'        ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Show/hide player starts: -ps'         ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Starting base options: -st 1-6'       ,false);
+      PlayersAddLog(0,log_to_all,lmt_game,'Fill empty slots with AI: -fs 0-7'    ,false);
       exit;
    end;
    '-m'  : if(a<6)

@@ -136,11 +136,9 @@ end;
 procedure _d1  (d:pinteger);begin d^:=0             end;
 procedure _d25 (d:pinteger);begin d^:=d^ div 4;     end;
 procedure _d50 (d:pinteger);begin d^:=d^ div 2;     end;
-procedure _d75 (d:pinteger);begin d^:=d^-(d^ div 4);end;
-procedure _d125(d:pinteger);begin d^:=d^+(d^ div 4);end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
-procedure _d225(d:pinteger);begin d^:=(d^ div 4)*9; end;
+procedure _d300(d:pinteger);begin d^:=d^*3;         end;
 
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
@@ -188,19 +186,19 @@ begin
 
       case mid of
 MID_Imp        : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       end;
-MID_Cacodemon  : begin damage:=40 ; vstep:=d div 10; splashr :=0  ;       end;
-MID_Baron      : begin damage:=60 ; vstep:=d div 10; splashr :=0  ;       end;
+MID_Cacodemon  : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       end;
+MID_Baron      : begin damage:=40 ; vstep:=d div 10; splashr :=0  ;       end;
 MID_RevenantS,
 MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=40 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=30 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_YPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=200; vstep:=1;        splashr :=15 ;       end;
 
 MID_MBullet,
 MID_TBullet,
 MID_Bullet     : begin damage:=8  ; vstep:=1;        splashr :=0  ;       end;
-MID_Bulletx2   : begin damage:=15 ; vstep:=1;        splashr :=0  ;       end;
+MID_Bulletx2   : begin damage:=16 ; vstep:=1;        splashr :=0  ;       end;
 MID_BPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_BFG        : begin damage:=200; vstep:=d div 10; splashr :=125;       end;
 MID_Flyer      : begin damage:=15 ; vstep:=d div 60; splashr :=0  ;       end;
@@ -301,7 +299,9 @@ begin
 
               /////////////////////////////////
 
-            if(tu^.uid^._uklight)then
+            if(tu^.uid^._ukbuilding=false)then
+            begin
+            if (tu^.uid^._uklight)then
                 case mid of
                 MID_Cacodemon   : _d200(@damd);
                 MID_Blizzard,
@@ -313,7 +313,7 @@ begin
                 MID_MBullet,
                 MID_TBullet,
                 MID_Bullet,
-                MID_Bulletx2    : _d150(@damd);
+                MID_Bulletx2    : _d200(@damd);
                 end;
 
             if (not tu^.uid^._uklight)
@@ -324,26 +324,28 @@ begin
                 MID_SSShot      : _d200(@damd);
                 end;
 
-            if(tu^.uid^._ukmech)then
+            if (tu^.uid^._ukmech)then
                 case mid of
-                MID_BPlasma,
-                MID_YPlasma     : _d200(@damd);
+                MID_BPlasma     : _d200(@damd);
+                MID_YPlasma     : _d300(@damd);
                 end;
 
-            if(tu^.uid^._ukbuilding)then
+            end
+            else
                 case mid of
                 MID_Blizzard,
-                MID_HRocket,
+                MID_Granade,
+                MID_HRocket     : _d200(@damd);
                 MID_Mancubus,
-                MID_Granade     : _d200(@damd);
+                MID_Tank        : _d300(@damd);
                 end;
 
             if(tu^.uid^._ukfly)then
                 case mid of
-                MID_URocket,
+                MID_URocket     : _d200(@damd);
                 MID_Revenant,
                 MID_RevenantS,
-                MID_Flyer       : _d200(@damd);
+                MID_Flyer       : _d300(@damd);
                 end;
 
             case mid of
