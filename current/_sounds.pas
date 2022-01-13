@@ -142,7 +142,7 @@ begin
 end;
 
 procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
-var i,n,
+var i,
 m1,m2 : integer;
   snd : PTMWSound;
 begin
@@ -322,7 +322,7 @@ begin
 
    SoundPlay(ss,sss_anoncer);
 
-   snd_anoncer_ticks:=fr_3h2fps;
+   snd_anoncer_ticks:=fr_fps;
    snd_anoncer_last :=ss;
 end;
 
@@ -367,24 +367,27 @@ begin
    end;
 end;
 
-procedure SoundLog(ptarget:byte);
+procedure SoundLogHPlayer;
+var ps:pshortstring;
 begin
-   if(ptarget=HPlayer)then
-   with _players[ptarget] do
+   with _players[HPlayer] do
    begin
-      //ps:=@log_ls[log_i];
+      ps:=@log_ls[log_i];
       case log_lt[log_i] of
-0..MaxPlayers : if(log_lt[log_i]<>ptarget)
+0..MaxPlayers : if(log_lt[log_i]<>HPlayer)
                 or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
-lmt_chat      : SoundPlayUI(snd_chat);
+lmt_chat,
 lmt_game      : SoundPlayUI(snd_chat);
-lmt_endgame   : if(_players[HPlayer].team=team)
-                then SoundPlayAnoncer(snd_victory[race],false)
-                else SoundPlayAnoncer(snd_defeat [race],false);
-lmt_defeated  : if(HPlayer<>ptarget)
-                then SoundPlayAnoncer(snd_player_defeated[race],true);
-//lmt_unit      : if(length(ps^)>1)then
-//                 with _uids[ord(ps^[1])] do SoundPlayAnoncer(un_snd_ready[ps^[2]<>#0],true);
+lmt_endgame   : if(length(ps^)>0)then
+                 if(ord(ps^[1])<=MaxPlayers)then
+                  if(ord(ps^[1])=team)
+                  then SoundPlayAnoncer(snd_victory[race],false)
+                  else SoundPlayAnoncer(snd_defeat [race],false);
+lmt_defeated  : if(length(ps^)>0)then
+                 if(ord(ps^[1])<=MaxPlayers)then
+                  if(ord(ps^[1])<>HPlayer)
+                  then SoundPlayAnoncer(snd_player_defeated[race],true);
+lmt_advanced  : SoundPlayAnoncer(snd_unit_promoted[race],true);
 lmt_upgrade   : SoundPlayAnoncer(snd_upgrade_complete[race],true);
       end;
    end;
@@ -498,6 +501,7 @@ begin
    snd_upgrade_complete  [r]:=SoundSetLoad(race_dir[r]+'upgrade_complete'          );
    snd_victory           [r]:=SoundSetLoad(race_dir[r]+'victory'                   );
    snd_unit_adv          [r]:=SoundSetLoad(race_dir[r]+'unit_adv'                  );
+   snd_unit_promoted     [r]:=SoundSetLoad(race_dir[r]+'unit_promoted'             );
    end;
 
    /////////////////////////////////////////////////////////////////////////////////

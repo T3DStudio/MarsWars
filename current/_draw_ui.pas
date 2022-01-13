@@ -472,23 +472,25 @@ end;
 procedure D_UIText(tar:pSDL_Surface);
 var i:integer;
 begin
-   // CHAT
+   // LOG and HINTs
+   if(net_chat_shlm>0)then net_chat_shlm-=1;
+
    if(ingame_chat)or(rpls_showlog)then
    begin
-      ReMakeLogForDraw(HPlayer,ui_ingamecl,ui_game_chat_height);
+      ReMakeLogForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
-       for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_chaty-font_3hw*i,ui_log_s[i],ta_left,255,c_white);
-      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_hinty,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
+       for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
+      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then
      begin
-        ReMakeLogForDraw(HPlayer,ui_ingamecl,1);
+        ReMakeLogForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
-         for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_chaty-font_3hw*i,ui_log_s[i],ta_left,255,c_white);
-        net_chat_shlm-=1;
-     end
-     else d_Hints(tar);
+         for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
+     end;
+   d_Hints(tar);
+
 
    // resources
    with _players[HPlayer] do

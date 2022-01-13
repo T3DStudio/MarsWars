@@ -185,14 +185,14 @@ begin
       {$ENDIF}
 
       case mid of
-MID_Imp        : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       end;
-MID_Cacodemon  : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       end;
-MID_Baron      : begin damage:=40 ; vstep:=d div 10; splashr :=0  ;       end;
+MID_Imp        : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
+MID_Cacodemon  : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
+MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=30 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
+MID_Revenant   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_URocket    : begin damage:=20 ; vstep:=d div 12; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=30 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_YPlasma    : begin damage:=15 ; vstep:=d div 16; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=200; vstep:=1;        splashr :=15 ;       end;
 
 MID_MBullet,

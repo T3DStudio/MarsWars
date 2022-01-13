@@ -233,6 +233,12 @@ begin
    str_uprod             := #18+'Produced by: '+#25;
    str_bprod             := #18+'Constructed by: '+#25;
 
+   str_advanced          := 'Advanced ';
+   str_unit_advanced     := 'Unit promoted';
+   str_upgrade_complete  := 'Upgrade complete';
+   str_building_complete := 'Construction complete';
+   str_unit_complete     := 'Unit ready';
+
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := #18+'left' +#25;
    str_panelposp[1]      := #16+'right'+#25;
@@ -289,7 +295,7 @@ begin
    str_gmode[gm_scir ]   := #18+'Skirmish'    +#25;
    str_gmode[gm_2fort]   := #16+'Two bases'   +#25;
    str_gmode[gm_3fort]   := #17+'Three bases' +#25;
-   str_gmode[gm_cptp   ]   := #19+'Capturing points'+#25;
+   str_gmode[gm_cptp ]   := #19+'Capturing points'+#25;
    str_gmode[gm_inv  ]   := #20+'Invasion'    +#25;
    str_gmode[gm_aslt ]   := #14+'Assault'     +#25;
    str_gmode[gm_royl ]   := #15+'Royal Battle'+#25;
@@ -671,6 +677,12 @@ begin
   str_all               := 'Все';
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
+
+  str_advanced          := 'Улучшенный ';
+  str_unit_advanced     := 'Юнит улучшен';
+  str_upgrade_complete  := 'Исследование завершено';
+  str_building_complete := 'Постройка завершена';
+  str_unit_complete     := 'Юнит готов';
 
   str_panelpos          := 'Положение игровой панели';
   str_panelposp[0]      := #18+'слева' +#25;

@@ -733,10 +733,12 @@ begin
    ui_textx     := vid_mapx+4;
    ui_texty     := vid_mapy+4;
    ui_hinty     := vid_mapy+vid_cam_h-60;
-   ui_chaty     := ui_hinty-10;
+   ui_chaty     := ui_hinty-14;
+   ui_logy      := ui_chaty-12;
    ui_oicox     := vid_mapx+vid_cam_w-4;
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
+   ui_game_log_height:=(ui_hinty-60) div 12;
 
    ui_energx    := ui_uiuphx-100;
    ui_energy    := ui_texty;

@@ -161,71 +161,68 @@ begin
    end;
 end;
 
-procedure _unit_damage(pu:PTUnit;dam,p:integer;pl:byte);
-const arm_f : array[false..true] of integer = (24,16);
-var arm,arm_upgr_lvl:integer;
+procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);
+const armor_f : array[false..true] of integer = (40,40);
+var armor:integer;
 begin
-   if(ServerSide=false)or(dam<0)then exit;
+   if(ServerSide=false)then exit;
 
    with pu^ do
    with uid^ do
    begin
       if(buff[ub_invuln]>0)or(hits<0)then exit;
 
-      arm_upgr_lvl:=0;
-      arm:=_base_armor;
+      armor:=_base_armor;
 
       with player^ do
       begin
          if(bld)then
          begin
-            arm_upgr_lvl+=upgr[_upgr_armor];
+            armor+=upgr[_upgr_armor];
             if(_ukbuilding)
-            then arm_upgr_lvl+=upgr[upgr_race_build_armor[_urace]]
+            then armor+=upgr[upgr_race_build_armor[_urace]]
             else
               if(_ukmech)
-              then arm_upgr_lvl+=upgr[upgr_race_mech_armor[_urace]]
-              else arm_upgr_lvl+=upgr[upgr_race_bio_armor [_urace]];
-            arm+=arm_upgr_lvl;
+              then armor+=upgr[upgr_race_mech_armor[_urace]]
+              else armor+=upgr[upgr_race_bio_armor [_urace]];
          end;
 
-         if(dam>=arm_f[_ukbuilding])
-         then arm+=(dam div arm_f[_ukbuilding])*arm_upgr_lvl;
+         armor+=(damage div armor_f[_ukbuilding])*armor;
       end;
 
       case uidi of
-UID_Baron : if(buff[ub_advanced]>0)then dam:=dam div 2;
-UID_HEye  : begin arm:=0;dam:=hits;end;
+UID_Baron : if(buff[ub_advanced]>0)then damage:=damage div 2;
+UID_HEye  : begin armor:=0;damage:=hits;end;
       else
       end;
 
       case g_mode of
-gm_inv    : if(playeri=0)then dam:=dam div 2;
+gm_inv    : if(playeri=0)then damage:=damage div 2;
       end;
 
-      dam-=arm;
+      damage-=armor;
 
-      if(dam<=0)then
-       if(_random(abs(dam)+1)=0)
-       then dam:=1
-       else dam:=0;
+      if(damage<=0)then
+       if(_random(abs(damage)+1)=0)
+       then damage:=1
+       else damage:=0;
 
-      if(hits<=dam)
-      then _unit_kill(pu,false,(hits-dam)<=_fastdeath_hits[buff[ub_advanced]>0])
+      if(hits<=damage)
+      then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits[buff[ub_advanced]>0])
       else
       begin
-         hits-=dam;
+         hits-=damage;
 
          if(_ukbuilding)or(_ukmech)
          then buff[ub_pain]:=fr_2fps
          else
-           if(_painc>0)and(painc>0)and(buff[ub_pain]=0)then
+           if(pain_f>0)and(_painc>0)and(painc>0)and(buff[ub_pain]=0)then
            begin
               if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
 
-              if(p>pains)
+              if(pain_f>pains)
               then pains:=0
-              else pains-=p;
+              else pains-=pain_f;
 
               if(pains=0)then
               begin

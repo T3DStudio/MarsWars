@@ -24,16 +24,6 @@ begin
    end;
 end;
 
-procedure _unit_painsnd(pu:PTUnit);
-begin
-   with pu^ do
-   with uid^ do
-   begin
-      SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
-   end;
-end;
-
 procedure _uac_rocketl_eff(pu:PTUnit);
 begin
    with pu^ do
@@ -57,7 +47,7 @@ begin
        else SoundPlayAnoncer(snd_build_place[_urace],false);
 
       if(bld)
-      then GameLogUnitReady(playeri,uidi)
+      then GameLogUnitReady(playeri,uidi,buff[ub_advanced]>0)
       else exit;
 
       if(vischeck<>nil)then
@@ -76,9 +66,12 @@ procedure _unit_advanced_effects(pu:PTUnit);
 begin
    with pu^ do
     if(hits>0)then
-     with uid^ do
-      if(playeri=HPlayer)then
-       if(un_snd_ready[false]<>un_snd_ready[true])then SoundPlayAnoncer(un_snd_ready[true],true);
+    begin
+       GameLogUnitPromoted(playeri,uidi);
+       with uid^ do
+        if(playeri=HPlayer)then
+         if(un_snd_ready[false]<>un_snd_ready[true])then SoundPlayAnoncer(un_snd_ready[true],true);
+    end;
 end;
 
 procedure _unit_death_effects(pu:PTUnit;fastdeath:boolean;vischeck:pboolean);

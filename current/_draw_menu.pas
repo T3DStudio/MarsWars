@@ -393,9 +393,9 @@ begin
                     hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y,c_gray);
 
                     y:=_yt(10);
-                    ReMakeLogForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height);
+                    ReMakeLogForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height,lmts_menu_chat);
                     if(ui_log_n>0)then
-                     for t:=0 to ui_log_n-1 do _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,c_white);
+                     for t:=0 to ui_log_n-1 do _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,ui_log_c[t]);
 
                     _draw_text(tar,ui_menu_csm_xct, _yt(11), net_chat_str , ta_chat,ui_menu_chat_width, c_white);
                  end

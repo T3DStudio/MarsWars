@@ -127,8 +127,13 @@ lmt_game               = 10;
 lmt_endgame            = 11;
 lmt_defeated           = 12;
 lmt_unit               = 13;
-lmt_upgrade            = 14;
+lmt_advanced           = 14;
+lmt_upgrade            = 15;
+lmt_player_leave       = 16;
 lmt_chat               = 255;
+
+lmts_menu_chat         = [0..MaxPlayers,lmt_game,lmt_endgame,lmt_defeated,lmt_player_leave,lmt_chat];
+lmts_last_messages     = [0..255];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -960,11 +965,11 @@ ui_menu_csm_xt1        = ui_menu_csm_x0+24;
 ui_menu_csm_xt2        = ui_menu_csm_x1-8;
 
 chat_type              : array[false..true] of char = ('|',' ');
-chat_shlm_t            = fr_fps*5;
+chat_shlm_t            = fr_fps*3;
+chat_shlm_max          = chat_shlm_t*5;
 
 ui_menu_chat_height    = 13; // lines
 ui_menu_chat_width     = 37; // chars
-ui_game_chat_height    = 64; // lines
 
 ////////////////////////////////////////////////////////////////////////////////
 //

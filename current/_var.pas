@@ -319,12 +319,14 @@ ui_ingamecl       : byte = 0;
 ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
 ui_hinty          : integer = 0;  // hints screen Y
+ui_logy           : integer = 0;  // LOG screen Y
 ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
 ui_energx         : integer = 0;
 ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
+ui_game_log_height:integer = 0;
 
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
@@ -605,6 +607,11 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 str_race          : array[0..r_cnt       ] of shortstring;
 str_gmode         : array[0..gm_cnt      ] of shortstring;
 str_addon         : array[false..true    ] of shortstring;
+str_unit_advanced,
+str_advanced,
+str_upgrade_complete,
+str_building_complete,
+str_unit_complete,
 str_m_liq,
 str_m_siz,
 str_m_obs,
@@ -734,7 +741,8 @@ snd_not_enough_energy,
 snd_player_defeated,
 snd_upgrade_complete,
 snd_victory,
-snd_unit_adv
+snd_unit_adv,
+snd_unit_promoted
                    : array[1..r_cnt] of PTSoundSet;
 
 snd_radar,
