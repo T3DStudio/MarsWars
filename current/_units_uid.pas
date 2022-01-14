@@ -9,10 +9,7 @@ begin
      else
        if(speed<=0)or(bld=false)
        then _unit_shadowz:=-fly_hz   // no shadow
-       else
-         {if(ukfly)
-         then _unit_shadowz:=fly_hz
-         else }_unit_shadowz:=0;
+       else _unit_shadowz:=0;
 end;
 
 procedure _unit_fog_r(pu:PTUnit);
@@ -60,7 +57,7 @@ procedure initUIDS;
 const aw_srange =  0;  // attack range = sight range
       aw_dmelee = -8;  // default melee range
       aw_hmelee = -64; // default heal/reapir melee range
-var i:byte;
+var i,a:byte;
 
 procedure _weapon(aa,wtype:byte;max_range,min_range,count:integer;reload,oid,ruid,rupid,rupidl,dupgr:byte;dupgrs:integer;tarf,reqf:cardinal;uids,reload_s:TSoB;ax,ay:integer);
 begin

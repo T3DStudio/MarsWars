@@ -42,9 +42,8 @@ begin
    with uid^ do
    begin
       if(playeri=HPlayer)then
-       if(bld)
-       then SoundPlayAnoncer(un_snd_ready[buff[ub_advanced]>0],true)
-       else SoundPlayAnoncer(snd_build_place[_urace],false);
+       if(not bld)
+       then SoundPlayAnoncer(snd_build_place[_urace],false);
 
       if(bld)
       then GameLogUnitReady(playeri,uidi,buff[ub_advanced]>0)
@@ -68,9 +67,6 @@ begin
     if(hits>0)then
     begin
        GameLogUnitPromoted(playeri,uidi);
-       with uid^ do
-        if(playeri=HPlayer)then
-         if(un_snd_ready[false]<>un_snd_ready[true])then SoundPlayAnoncer(un_snd_ready[true],true);
     end;
 end;
 
@@ -177,9 +173,6 @@ begin
        //or(buff[ub_stop]>0)
        if(speed<=0)or(bld=false)then exit;
 
-       if(_ukbuilding)then
-         if(buff[ub_clcast]>0)then exit;
-
        if(_ukmech)then
        begin
          if(buff[ub_gear  ]>0)
@@ -206,9 +199,6 @@ begin
 
       if(check_buffs)then
       begin
-         if(_ukbuilding)then
-          if(buff[ub_clcast]>0)then exit;
-
          if(_ukmech)then
          begin
            if(buff[ub_gear  ]>0)
@@ -240,18 +230,6 @@ begin
    _canattack:=true;
 end;
 
-procedure _unit_asapc(pu,apc:PTUnit);
-begin
-   pu^.x  :=apc^.x;
-   pu^.y  :=apc^.y;
-   {$IFDEF _FULLGAME}
-   pu^.fx :=apc^.fx;
-   pu^.fy :=apc^.fy;
-   pu^.mmx:=apc^.mmx;
-   pu^.mmy:=apc^.mmy;
-   {$ENDIF}
-end;
-
 procedure _unit_correctXY(pu:PTUnit);
 begin;
    with pu^ do
@@ -259,6 +237,19 @@ begin;
       x:=mm3(1,x,map_mw);
       y:=mm3(1,y,map_mw);
    end;
+end;
+
+procedure _unit_asapc(pu,apc:PTUnit);
+begin
+   pu^.x:=apc^.x;
+   pu^.y:=apc^.y;
+   {$IFDEF _FULLGAME}
+   pu^.fx :=apc^.fx;
+   pu^.fy :=apc^.fy;
+   pu^.mmx:=apc^.mmx;
+   pu^.mmy:=apc^.mmy;
+   {$ENDIF}
+
 end;
 
 procedure _unit_clear_order(pu:PTUnit;clearid:boolean);
@@ -913,11 +904,14 @@ begin
       if(_LastCreatedUnit>0)then
        with _LastCreatedUnitP^ do
        begin
-          cycle_order  := _LastCreatedUnit mod order_period;
+          cycle_order:= _LastCreatedUnit mod order_period;
           unum    := _LastCreatedUnit;
 
+          gridx   := -1;
+          gridy   := -1;
           x       := ux;
           y       := uy;
+          _unit_correctXY(_LastCreatedUnitP);
           uidi    := ui;
           playeri := pl;
           player  :=@_players[playeri];
@@ -1323,6 +1317,8 @@ end;
 
 function _itcanapc(uu,tu:PTUnit):boolean;
 begin
+   //uu - transport
+   //ru - target
    _itcanapc:=false;
    if(tu^.ukfly=uf_fly)then exit;
    if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
@@ -1473,9 +1469,9 @@ UID_ZMajor:
                  SoundPlayUnit(snd_jetpon ,pu,nil);
                  {$ENDIF}
                  zfall:=-fly_height[uf_fly];
+                 ukfly:=uf_fly;
+                 speed:=_speed+_speed;
               end;
-              ukfly:=uf_fly;
-              speed:=_speed+_speed;
            end
            else
            begin
@@ -1485,10 +1481,14 @@ UID_ZMajor:
                  SoundPlayUnit(snd_jetpoff,pu,nil);
                  {$ENDIF}
                  zfall:= fly_height[uf_fly];
+                 ukfly:=uf_ground;
+                 speed:=_speed;
               end;
-              ukfly:=uf_ground;
-              speed:=_speed;
            end;
+UID_FAPC  : if(buff[ub_advanced]>0)
+            then apcm:=_apcm+4
+            else apcm:=_apcm;
+           //
       end;
 
       // BUILD AREA

@@ -1,10 +1,10 @@
 
-procedure _InitFogR;
-var r,x:byte;
+procedure InitRX2Y;
+var r,x:integer;
 begin
    for r:=0 to MFogM do
     for x:=0 to r do
-     vid_fcx[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
+     _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
 procedure _screenshot;

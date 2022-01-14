@@ -452,7 +452,9 @@ end;
 
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
 var cx,cy,ssx,ssy,sty:integer;
-    {ci:integer;
+   { b:boolean;
+    cl:cardinal;
+    ci:integer;
     pf:word;
     cl:cardinal; }
 begin
@@ -523,7 +525,7 @@ begin
          ssy+=pf_pathmap_w;
       end;
       ssx+=pf_pathmap_w;
-   end; }
+   end;    }
 
    {if(menu_s2=ms2_camp)then
    begin
@@ -603,11 +605,17 @@ begin
               //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
               //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -vid_cam_x+1,vid_mapy+mv_y    -vid_cam_y+1,c_lime);
 
+              //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_x+vid_mapx;
+              //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_y+vid_mapy;
+
+               //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
            end;
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+20,i2s(a_tar), ta_left,255, PlayerGetColor(playeri));
+           //_draw_text(r_screen,ix,iy+30,i2s(_rx2y_r), ta_left,255, PlayerGetColor(playeri));
+
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));
 

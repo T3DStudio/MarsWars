@@ -47,6 +47,7 @@ _cycle_regen      : integer = 0;
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
 
+_RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -71,8 +72,6 @@ map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
-
-unit_grid         : array[0..ugridw,0..ugridw,false..true] of integer;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
@@ -190,7 +189,6 @@ vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
 vid_fog_vfw       : byte = 0;
 vid_fog_vfh       : byte = 0;
 vid_fog           : boolean = true;
-vid_fcx           : array[0..MFogM,0..MFogM] of byte;
 vid_fog_surf      : pSDL_Surface;
 vid_fog_sx        : integer = 0;
 vid_fog_sy        : integer = 0;

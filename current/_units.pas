@@ -187,7 +187,7 @@ begin
               else armor+=upgr[upgr_race_bio_armor [_urace]];
          end;
 
-         armor+=(damage div armor_f[_ukbuilding])*armor;
+         armor*=(damage div armor_f[_ukbuilding])+1;
       end;
 
       case uidi of
@@ -205,7 +205,7 @@ gm_inv    : if(playeri=0)then damage:=damage div 2;
       if(damage<=0)then
        if(_random(abs(damage)+1)=0)
        then damage:=1
-       else damage:=0;
+       else exit;
 
       if(hits<=damage)
       then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits[buff[ub_advanced]>0])
@@ -768,7 +768,8 @@ UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)t
 end;
 
 procedure _unit_mcycle(pu:PTUnit);
-var uc,a_tard,
+var uc,
+a_tard,
     ud: integer;
     tu: PTUnit;
 cunload,
@@ -798,6 +799,7 @@ begin
          exit;
       end;
 
+      uo_vision:=false;
       underobstacle:=_UnderObstacle(x,y);
 
       cunload:=true;
@@ -810,6 +812,7 @@ begin
       if(uc<>unum)then
       begin
          tu:=@_units[uc];
+
          if(tu^.hits>fdead_hits)then
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
@@ -822,29 +825,8 @@ begin
 
             if(tu^.hits>0)then
             begin
-               if(tu^.inapc>0)then
-               begin
-                  if(tu^.inapc=unum)and(uo_id=ua_unload)and(cunload)then // unload
-                  begin
-                     if(apcc>0)then
-                     begin
-                        apcc-=tu^.uid^._apcs;
-                        tu^.inapc:=0;
-                        tu^.x    :=x-_randomr(_r);
-                        tu^.y    :=y-_randomr(_r);
-                        tu^.uo_x :=tu^.x;
-                        tu^.uo_y :=tu^.y;
-                     end;
-                     if(apcc=0)then
-                     begin
-                        {$IFDEF _FULLGAME}
-                        SoundPlayUnit(snd_inapc,pu,nil);
-                        {$ENDIF}
-                        uo_id:=ua_amove;
-                     end;
-                  end;
-                  continue;
-               end;
+               if(tu^.inapc>0)then continue;
+
 
                _unit_aura_effects(pu,tu,ud);
 
@@ -852,27 +834,11 @@ begin
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.bld)then
                  if(tu^.solid)and((ukfly=uf_ground)=(tu^.ukfly=uf_ground))then _unit_push(pu,tu,ud);
 
-               ud-=_r+tu^.uid^._r;
+               //ud-=_r+tu^.uid^._r;
 
                if(player=tu^.player)then
                begin
 
-                  if(ud<melee_r)then
-                   if(uo_tar=uc)or(tu^.uo_tar=unum)then
-                    if(_itcanapc(pu,tu))then
-                    begin
-                       //if(state=ps_comp)and(order<>1)then tu^.order:=order;
-                       apcc+=tu^.uid^._apcs;
-                       tu^.inapc:=unum;
-                       tu^.a_tar:=0;
-                       if(    uo_tar=uc  )then     uo_tar:=0;
-                       if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
-                       _unit_desel(tu);
-                       {$IFDEF _FULLGAME}
-                       SoundPlayUnit(snd_inapc,pu,nil);
-                       {$ENDIF}
-                       continue;
-                    end;
 
                end;
             end;
@@ -1089,10 +1055,14 @@ begin
            if(dist2(x,y,tu^.uo_x,tu^.uo_y)>tu^.srange)and(tu^.rld<=0) then
            begin
               if(ukfly=uf_ground)then
-               if(tu^.buff[ub_transpause]>0)
+               if(tu^.buff[ub_clcast]>0)
                then exit
                else
-                 if(_UnderObstacle(tu^.uo_x,tu^.uo_y))then exit;
+                 if(_UnderObstacle(tu^.uo_x,tu^.uo_y))then
+                 begin
+                    tu^.buff[ub_clcast]:=fr_2hfps;
+                    exit;
+                 end;
 
               _unit_teleport(pu,tu^.uo_x,tu^.uo_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
               _teleport_rld(tu,_mhits);
@@ -1115,6 +1085,58 @@ begin
    end;
 end;
 
+function _unit_load(pu,tu:PTUnit):boolean;
+begin
+   //pu - transport
+   //tu - target
+   _unit_load:=false;
+   if(_itcanapc(pu,tu))then
+   with pu^ do
+   begin
+      apcc+=tu^.uid^._apcs;
+      tu^.inapc:=unum;
+      tu^.a_tar:=0;
+      if(uo_tar=tu^.unum)then     uo_tar:=0;
+      if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
+      _unit_desel(tu);
+      {$IFDEF _FULLGAME}
+      SoundPlayUnit(snd_inapc,pu,nil);
+      {$ENDIF}
+      _unit_load:=true;
+   end;
+end;
+function _unit_unload(pu,tu:PTUnit):boolean;
+begin
+   //pu - transport
+   //tu - target
+   _unit_unload:=false;
+   if(pu=nil)then
+    if(not _IsUnitRange(tu^.inapc,@pu))then exit;
+   with tu^ do
+    if(inapc=pu^.unum)then
+    begin
+       pu^.apcc-=uid^._apcs;
+       inapc:=0;
+       x    :=pu^.x-_randomr(pu^.uid^._r);
+       y    :=pu^.y-_randomr(pu^.uid^._r);
+       uo_x :=x;
+       uo_y :=y;
+       {$IFDEF _FULLGAME}
+       SoundPlayUnit(snd_inapc,pu,nil);
+       {$ENDIF}
+       _unit_unload:=true;
+    end;
+   with pu^ do
+    if(apcc=0)then
+    begin
+       {$IFDEF _FULLGAME}
+       SoundPlayUnit(snd_inapc,pu,nil);
+       {$ENDIF}
+       uo_id:=ua_amove;
+    end;
+end;
+
+// target units
 procedure _unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
      w: byte;
@@ -1142,8 +1164,12 @@ begin
 
          if(playeri=tu^.playeri)then
          begin
+            if(tdm<melee_r)then
+            begin
+               if(_unit_load(pu,tu))then exit;
+               if(_unit_load(tu,pu))then exit;
+            end;
 
-            // target units
             case tu^.uid^._ability of
 uab_uac__unit_adv: if(_ability_uac__unit_adv(pu,tu,tdm))then exit;
 uab_hell_unit_adv: if(_ability_hell_unit_adv(pu,tu    ))then exit;
@@ -1382,6 +1408,10 @@ var tu:PTUnit;
 begin
    with pu^ do
    begin
+      if(au^.uo_id=ua_unload)or(au^.apcc>au^.apcm)then
+       if(au^.ukfly=false)or(au^.underobstacle=false)then
+        if(_unit_unload(au,pu))then exit;
+
       if(au^.uo_id in [ua_move,ua_hold,ua_amove])then uo_id:=au^.uo_id;
       if(_IsUnitRange(au^.uo_tar,@tu))then
       begin
@@ -1453,6 +1483,127 @@ uab_spawnlost:  begin
    end;
 end;
 
+function _unit_player_order(pu:PTUnit;order_id,order_tar,order_x,order_y:integer):boolean;
+begin
+   _unit_player_order:=false;
+   with pu^     do
+   with uid^    do
+   with player^ do
+   case order_id of
+co_destroy :  _unit_kill(pu,false,order_tar>0);
+co_rcamove,
+co_rcmove  :  begin     // right clik
+                 case _ability of
+           uab_uac_rstrike : if(_unit_umstrike(pu,order_x,order_y))then exit;
+           uab_radar       : if(_unit_uradar  (pu,order_x,order_y))then exit;
+           uab_htowertele  : if(order_tar<>unum)and(_IsUnitRange(order_tar,nil))and(_attack>atm_none)
+                             then uo_tar:=order_tar
+                             else if(_unit_htteleport(pu,order_x,order_y))then exit;
+           uab_hkeeptele   : if(_unit_hkteleport(pu,order_x,order_y))then exit;
+           uab_hell_unit_adv,
+           uab_building_adv: uo_tar:=order_tar;
+                 else
+                    uo_tar:=0;
+                    uo_x  :=order_x;
+                    uo_y  :=order_y;
+                    uo_bx :=-1;
+
+                    if(order_tar<>unum)then uo_tar:=order_tar;
+                    if(order_id<>co_rcmove)or(speed<=0)
+                    then uo_id:=ua_amove
+                    else
+                    begin
+                       uo_id :=ua_move;
+                      // a_tar :=0;
+                    end;
+                 end;
+
+                 _unit_turn(pu);
+              end;
+co_stand,
+co_move,
+co_patrol,
+co_astand,
+co_amove,
+co_apatrol :  if(speed>0)then   // attack, move, patrol, stand, hold
+              begin
+                 case order_id of
+           co_stand,
+           co_astand:  begin
+                          uo_x  :=x;
+                          uo_y  :=y;
+                          uo_bx :=-1;
+                          uo_tar:=0;
+                          a_tar :=0;
+                       end;
+           co_move,
+           co_patrol,
+           co_amove,
+           co_apatrol: begin
+                          uo_x  :=order_x;
+                          uo_y  :=order_y;
+                          uo_bx :=-1;
+                          uo_tar:=0;
+                          _unit_turn(pu);
+                          case order_id of
+                      co_patrol,
+                      co_apatrol: begin   // patrol
+                                     uo_bx:=x;
+                                     uo_by:=y;
+                                  end;
+                          end;
+                       end;
+                 end;
+                 case order_id of
+           co_stand  : begin
+                          uo_id :=ua_hold;
+                          a_tar :=0;
+                       end;
+           co_move,
+           co_patrol : begin
+                          uo_id :=ua_move;
+                          a_tar :=0;
+                       end;
+           co_astand,
+           co_amove,
+           co_apatrol: uo_id:=ua_amove;
+                 end;
+              end;
+co_paction :  if(uo_id<>ua_paction)or((ucl_cs[true]+ucl_cs[false])=1)then
+              begin
+                 uo_x  :=order_x;
+                 uo_y  :=order_y;
+                 uo_bx :=-1;
+                 a_tar :=0;
+                 uo_tar:=0;
+                 if((_ability=0)and(apcc<=0))or(speed<=0)
+                 then uo_id:=ua_amove
+                 else
+                 begin
+                    case uidi of
+                    UID_HCommandCenter,
+                    UID_UCommandCenter: begin
+                                           _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) );
+                                           uo_y-=fly_hz;
+                                        end;
+                    end;
+                    uo_id:=ua_paction;
+                 end;
+                 _unit_turn(pu);
+                 exit;
+              end;
+co_action  :  _unit_action(pu);
+co_supgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_supgrade (pu,order_tar);
+co_cupgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_cupgrade (pu,order_tar);
+co_suprod  :  if(0<=order_tar)and(order_tar<=255)then _unit_straining(pu,order_tar);
+co_cuprod  :  if(0<=order_tar)and(order_tar<=255)then _unit_ctraining(pu,order_tar);
+co_pcancle :  begin
+                 _unit_ctraining(pu,255);
+                 _unit_cupgrade (pu,255);
+              end;
+   end;
+   _unit_player_order:=true;
+end;
 
 procedure _unit_prod(pu:PTUnit);
 begin

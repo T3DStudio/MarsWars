@@ -386,7 +386,8 @@ TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
    vx,vy,
-   x,y,zfall,
+   x,y,gridx,gridy,
+   zfall,
    srange,
    speed,dir,rld,vstp,
    hits,
@@ -439,6 +440,8 @@ TUnit = record
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
+
+   uo_vision,
    ukfly,
    underobstacle,
    isbuildarea,

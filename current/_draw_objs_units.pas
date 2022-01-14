@@ -48,7 +48,7 @@ begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
    for i:=0 to r do
-    for iy:=0 to vid_fcx[r,i] do
+    for iy:=0 to _RX2Y[r,i] do
     begin
        _sf(x-i,y-iy);
        _sf(x-i,y+iy);

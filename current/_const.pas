@@ -64,9 +64,6 @@ map_b0                 = 5;
 
 uidall                 = [0..255];
 
-ugrid_cellw            =  20;
-ugridw                 = (MaxSMapW div ugrid_cellw)+1;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  PATH FIND SYSTEM
@@ -381,14 +378,13 @@ ub_stun                = 2;
 ub_gear                = 3;
 ub_resur               = 4;
 ub_cast                = 5;
-ub_stop          = 6;
+ub_stop                = 6;
 ub_slooow              = 7;
 ub_clcast              = 8;
 ub_invis               = 9;
 ub_detect              = 10;
 ub_invuln              = 11;
 ub_born                = 13;
-ub_transpause          = 14;
 ub_teleeff             = 15;
 
 _ub_infinity           = 32000;
@@ -996,7 +992,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 728065;
+svld_size              = 731429;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
