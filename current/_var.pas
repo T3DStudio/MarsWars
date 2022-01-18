@@ -47,8 +47,6 @@ _cycle_regen      : integer = 0;
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
 
-_RX2Y             : array[0..MFogM,0..MFogM] of integer;
-
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
 
@@ -96,21 +94,31 @@ fps_tt,
 fps_cs,
 fps_ns            : cardinal;
 
+wtrset_enemy,
 wtrset_enemy_alive,
 wtrset_enemy_alive_ground,
 wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
 wtrset_enemy_alive_fly_mech,
 wtrset_enemy_alive_mech,
+wtrset_enemy_alive_mech_nstun,
 wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_nbuildings,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
-wtrset_allies_damaged_bio,
-wtrset_allies_damaged_mchbld,
+wtrset_enemy_alive_bio_nstun,
+wtrset_enemy_alive_nlight_bio,
+wtrset_enemy_alive_ground_nlight,
+wtrset_enemy_alive_ground_nlight_bio,
+wtrset_enemy_alive_ground_bio,
+wtrset_enemy_alive_ground_light_bio,
+wtrset_heal,
+wtrset_repair,
 wtrset_resurect   : cardinal;
 
 {$IFDEF _FULLGAME}
+
+_RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 tmpmid            : byte = MID_Imp;
 
@@ -490,11 +498,13 @@ spr_Terminator,
 spr_Tank,
 spr_Flyer,
 spr_Transport,
+spr_UACBot,
 
 spr_HKeep,
 spr_HGate,
 spr_HAGate,
 spr_HSymbol,
+spr_HASymbol,
 spr_HPools,
 spr_HAPools,
 spr_HTower,
@@ -515,6 +525,7 @@ spr_UFactory,
 spr_UAFactory,
 spr_UAMilitaryUnit,
 spr_UGenerator,
+spr_UAGenerator,
 spr_UWeaponFactory,
 spr_UAWeaponFactory,
 spr_UTurret,
@@ -557,9 +568,8 @@ spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel;
 
 spr_mp            : array[1..r_cnt] of TMWTexture;
-spr_gear,
-spr_toxin
-                  : TMWTexture;
+spr_ptur,
+spr_stun          : TMWTexture;
 
 
 spr_c_mars,
@@ -817,6 +827,11 @@ snd_tank_attack,
 snd_tank_select,
 snd_tank_move,
 
+snd_uacbot_annoy,
+snd_uacbot_attack,
+snd_uacbot_select,
+snd_uacbot_move,
+
 snd_terminator_ready,
 snd_terminator_annoy,
 snd_terminator_attack,
@@ -934,20 +949,22 @@ snd_flyer_s,
 snd_flyer_a,
 snd_launch,
 snd_CCup,
+snd_bomblaunch,
 snd_meat,
 snd_building_explode,
 snd_mine_place,
 snd_inapc,
 snd_teleport,
 snd_pexp,
-snd_exp
+snd_exp,
+snd_hpower
 {
 ,
 ,
 
 snd_hellbar,
 snd_hell,
-snd_hpower }       : PTSoundSet;
+ }       : PTSoundSet;
 
 
 {$ELSE}

@@ -149,6 +149,7 @@ begin
                          BlockWrite(rpls_file,g_show_positions,SizeOf(g_show_positions));
                          BlockWrite(rpls_file,rpls_player     ,sizeof(rpls_player     ));
 
+
                          for i:=1 to MaxPlayers do
                           with _Players[i] do
                           begin
@@ -172,8 +173,8 @@ begin
                         _vy:=byte(vid_cam_y shr vxyc);
 
                         i:=0;
-                        if(_players[rpls_player].log_n<>rpls_player)then i:=i or %10000000;
-                        if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)        then i:=i or %01000000;
+                        if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
+                        if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)       then i:=i or %01000000;
                         i:=i or (G_Paused and %00111111);
 
                         if((i and %11000000)>0)or(G_Paused=0)then

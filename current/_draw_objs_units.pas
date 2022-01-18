@@ -22,6 +22,7 @@ begin
 UID_UPortal,
 UID_HTeleport,
 UID_HSymbol,
+UID_HASymbol,
 UID_HAltar,
 UID_UMine     : _udpth:=-MaxSMapW+vy;
     else
@@ -164,6 +165,11 @@ begin
    ui_orders_n[i]+=1;
 end;
 
+procedure ui_counters_clear;
+begin
+
+end;
+
 procedure ui_counters(pu:PTUnit);
 var i:byte;
 begin
@@ -202,7 +208,7 @@ begin
 
       if(bld)then
       begin
-         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<=0)then ui_uid_reload[uidi]:=rld;
+         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<0)then ui_uid_reload[uidi]:=rld;
 
          if(sel)then
          begin
@@ -315,9 +321,13 @@ begin
                 begin
                    for t:=0 to MaxUnitProds do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','');
                    end;
+                end;
+
+                case uidi of
+UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,@spr_ptur,alpha);
                 end;
              end
              else
@@ -369,6 +379,25 @@ procedure unit_sprites(noanim:boolean);
 var u:integer;
 pu,tu:PTUnit;
 begin
+   FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
+   ui_first_upgr_time:=0;
+   ui_uid_buildn     :=0;
+   ui_uibtn_action   :=0;
+   ui_uibtn_move     :=0;
+   ui_prod_builds    :=[];
+   for u:=0 to 255 do ui_uid_reload[u]:=-1;
+   FillChar(ui_prod_units   ,SizeOf(ui_prod_units   ),0);
+   FillChar(ui_prod_upgrades,SizeOf(ui_prod_upgrades),0);
+   FillChar(ui_orders_uids  ,SizeOf(ui_orders_uids  ),0);
+   FillChar(ui_upgrct       ,SizeOf(ui_upgrct       ),0);
+   FillChar(ui_upgr         ,SizeOf(ui_upgr         ),0);
+   FillChar(ui_units_inapc  ,SizeOf(ui_units_inapc  ),0);
+   FillChar(ui_uid_builds   ,SizeOf(ui_uid_builds   ),0);
+   FillChar(ui_orders_n     ,SizeOf(ui_orders_n     ),0);
+   FillChar(ui_orders_x     ,SizeOf(ui_orders_x     ),0);
+   FillChar(ui_orders_y     ,SizeOf(ui_orders_y     ),0);
+   if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
+
    for u:=1 to MaxUnits do
    begin
       pu:=@_units[u];

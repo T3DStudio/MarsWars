@@ -50,7 +50,7 @@ begin
        depth  := adepth;
        shadowz:= ashadowz;
        sprite := aspr;
-       aalpha := aalpha;
+       alpha  := aalpha;
        xo     := axo;
        yo     := ayo;
     end;
@@ -213,7 +213,7 @@ begin
    end;
 end;
 
-procedure UnitsInfoAddSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,srt,srd,sld:string6);
+procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,srt,srd,sld:string6);
 begin
    vid_prims+=1;
    setlength(vid_prim,vid_prims);
@@ -231,6 +231,20 @@ begin
       text_rt:=srt;
       text_rd:=srd;
       text_ld:=sld;
+   end;
+end;
+
+procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind   :=uinfo_sprite;
+      x0     :=ax0-aspr^.hw;
+      y0     :=ay0-aspr^.hh;
+      sprite :=aspr;
    end;
 end;
 
@@ -254,50 +268,11 @@ begin
      end;
 end;
 
-{ if(_ukbuilding)then
-  if(0<m_brush)and(m_brush<=255)
-  then ro:=_r
-  else
-  begin
-     if(sel)then
-      case uidi of
-     UID_UCTurret,
-     UID_UPTurret,
-     UID_URTurret,
-     UID_HTower,
-     UID_HTotem,
-     UID_UMine,
-     UID_HEye     : ro:=ar;
-     UID_HSymbol  : if(upgr[upgr_b478tel]>0)then ro:=sr;
-      else
-      if(isbuilder)and(speed=0)then ro:=sr;
-      end;
-  end;
-  if((sel)and(playeri=HPlayer))
- or(k_alt>1)
- or((ui_umark_u=unum)and(vid_rtui>vid_rtuish))then
- begin
-    rct:=true;
-    if(buff[ub_advanced ]>0)then b1:=b1+adv_char;
-    if(buff[ub_detect   ]>0)then b1:=b1+hp_detect;
-    if(playeri=HPlayer)then
-    begin
-       if(order>0)then b0:=order;
-       if(apcm>0)then
-       begin
-          b2:=apcm;
-          b3:=apcc;
-       end;
-    end;
- end;
-
- if(rct)
- then sb:=hits/_mhits
- else
-   case vid_uhbars of
- 0: if(hits<_mhits)then sb:=hits/_mhits;
- 1: sb:=hits/_mhits;
-   end;   }
+procedure UnitsInfoAddStun(ax,ay:integer);
+begin
+   with spr_stun do ay-=hh;
+   UnitsInfoAddSprite(ax,ay,@spr_stun);
+end;
 
 procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
 var srect,
@@ -348,6 +323,8 @@ begin
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitr[vid_rtui>vid_rtuish]);
 
       if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,c_gray);
+
+      if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-hh-6);
    end;
 end;
 
@@ -369,7 +346,7 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
 
        x0+=lx-vid_cam_x;
        y0+=ly-vid_cam_y;
-       if(kind<>uinfo_circle)then
+       if(kind<>uinfo_circle)and(kind<>uinfo_sprite)then
        begin
           x1+=lx-vid_cam_x;
           y1+=ly-vid_cam_y;
@@ -379,6 +356,8 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
 
        if(sprite<>nil)then
         with sprite^ do _draw_surf(tar,x0,y0,surf);
+
+       if(kind=uinfo_sprite)then continue;
 
        if(color>0)then
         case kind of
@@ -595,7 +574,7 @@ begin
 
         //_draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, PlayerGetColor(playeri));
 
-        if(hits>0)then
+        //if(hits>0)then
         //if(k_shift>1)then
         begin
           // circleColor(r_screen,ix,iy,_r  ,c_gray);

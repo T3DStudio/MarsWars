@@ -211,8 +211,8 @@ begin
 end;
 
 procedure d_Panel(tar:pSDL_Surface);
-var ui,ux,uy,uid,rld:integer;
-                 req:cardinal;
+var ui,ux,uy,uid:integer;
+             req:cardinal;
 function r2s(r:integer):shortstring;
 begin if(r<=0)then r2s:='' else r2s:=i2s((r div fr_fps)+1) end;
 begin
@@ -273,6 +273,8 @@ begin
             _drawBtnt(tar,ux,uy,
             b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(ui_uid_reload[uid]),
             c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,r2s(build_cd));
+
+            ui_uid_reload[uid]:=-1;
          end;
       end;
 
@@ -296,7 +298,7 @@ begin
 
             _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
-            b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodc[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
+            b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodu[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
             c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,'');
          end;
       end;

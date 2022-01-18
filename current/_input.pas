@@ -70,10 +70,11 @@ begin
         begin
            su+=1;
            if(bld)then
-           begin
-              guid:=uidi;
-              gadv:=buff[ub_advanced]>0;
-           end;
+            if(guid=0)or(_mhits>_uids[guid]._mhits)then
+            begin
+               guid:=uidi;
+               gadv:=buff[ub_advanced]>0;
+            end;
         end;
 
    if(su<=0)then exit;

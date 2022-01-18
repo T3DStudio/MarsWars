@@ -335,6 +335,7 @@ begin
    _mkHStrUid(UID_HKeep         ,'Hell Keep'          ,'Builder. Generates energy.'   );
    _mkHStrUid(UID_HGate         ,'Hell Gate'          ,'Summons units.'               );
    _mkHStrUid(UID_HSymbol       ,'Hell Symbol'        ,'Increase energy level.'       );
+   _mkHStrUid(UID_HSymbol       ,'Hell Great Symbol'  ,'Increase energy level.'       );
    _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Researches and upgrades.'     );
    _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
    _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );

@@ -127,11 +127,10 @@ begin
       _bts2:=0;
 
       SetBBit(@_bts2,0, buff[ub_stun     ]>0);
-      SetBBit(@_bts2,1, buff[ub_gear     ]>0);
-      SetBBit(@_bts2,2, buff[ub_resur    ]>0);
-      SetBBit(@_bts2,3, buff[ub_born     ]>0);
-      SetBBit(@_bts2,4, buff[ub_invuln   ]>0);
-      SetBBit(@_bts2,5, buff[ub_teleeff  ]>0);
+      SetBBit(@_bts2,1, buff[ub_resur    ]>0);
+      SetBBit(@_bts2,2, buff[ub_summoned ]>0);
+      SetBBit(@_bts2,3, buff[ub_invuln   ]>0);
+      SetBBit(@_bts2,4, buff[ub_teleeff  ]>0);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -151,7 +150,7 @@ function _wrld(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
    then _wrld:=0
-   else _wrld:=min2((r^ div fr_fps)+1,255);
+   else _wrld:=mm3(1,(r^ div fr_fps)+1,255);
    _wudata_byte(_wrld,rpl);
 end;
 
@@ -306,7 +305,7 @@ gm_royl: _wudata_int(g_royal_r,rpl);
       _N_U:=@_players[_pl].n_u;
    end;
 
-   CalcPLNU;
+   CalcPLNU;;
 
    _wudata_byte(g_player_status,rpl);
    if(g_player_status>0)then
@@ -458,13 +457,13 @@ begin
 end;
 
 
-procedure _ucCreateEffect(uu:PTUnit;vis:pboolean);
+procedure _ucSummonedEffect(uu:PTUnit;vis:pboolean);
 begin
-   with uu^     do
+   with uu^ do
    begin
       vx:=x;
       vy:=y;
-      _unit_ready_effects(uu,vis);
+      _unit_summon_effects(uu,vis);
    end;
 end;
 
@@ -507,8 +506,10 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           if(buff[ub_born   ]>0)then _ucCreateEffect(uu,@vis);
-           if(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
+           if(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
+           if(buff[ub_teleeff ]>0)then _teleEff(uu,@vis);
+           with uid^ do
+           if(bld=false)then SoundPlayAnoncer(snd_build_place[_urace],false);
 
            if(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
         end;
@@ -564,8 +565,10 @@ begin
             begin
                if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,pu);
 
-               if((pu^.buff[ub_born]<=0)and(buff[ub_born]>0))
-               or((pu^.bld       =false)and(bld            ))then _ucCreateEffect(uu,@vis);
+               if((pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0))then _ucSummonedEffect(uu,@vis);
+
+               if(pu^.bld)and(bld=false)then
+                with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
                if(pu^.inapc<>inapc)and(vis)then SoundPlayUnit(snd_inapc,nil,@vis);
@@ -575,7 +578,7 @@ begin
                   if(pu^.buff[ub_cast]<=0)and(buff[ub_cast]>0)then
                    case uid^._ability of
                0:;
-               uab_uac_rstrike : _unit_umstrike_create(uu);
+               uab_uac_rstrike : _unit_umstrike_missile(uu);
                uab_radar       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,@vis);
                uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
@@ -585,13 +588,9 @@ begin
                      if(uid^._ability<>uab_advance)then
                       if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
                       begin
-                         _unit_advanced_effects(pu);
                          case uid^._urace of
                     r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
-                    r_uac : begin
-                               buff[ub_gear]:=gear_time[uid^._ukmech];
-                               SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
-                            end;
+                    r_uac : SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
                          end;
                       end;
 
@@ -747,18 +746,16 @@ begin
       if(_bts2>0)then
       begin
          buff[ub_stun     ]:=_buffst[GetBBit(@_bts2,0)];
-         buff[ub_gear     ]:=_buffst[GetBBit(@_bts2,1)];
-         buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,2)];
-         buff[ub_born     ]:=_buffst[GetBBit(@_bts2,3)];
-         buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,1)];
+         buff[ub_summoned ]:=_buffst[GetBBit(@_bts2,2)];
+         buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,3)];
+         buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,4)];
       end
       else
       begin
          buff[ub_stun     ]:=0;
-         buff[ub_gear     ]:=0;
          buff[ub_resur    ]:=0;
-         buff[ub_born     ]:=0;
+         buff[ub_summoned ]:=0;
          buff[ub_invuln   ]:=0;
          buff[ub_teleeff  ]:=0;
       end;
@@ -837,8 +834,8 @@ begin
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
-            if(uid^._ability in client_cast_abils)then
-             if(buff[ub_cast]>0)then
+            if(buff[ub_cast]>0)then
+             if(uid^._ability in client_cast_abils)then
              begin
                 _rrld(@rld,rpl);
                 uo_x:=_rudata_int(rpl,0);

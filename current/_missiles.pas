@@ -133,10 +133,9 @@ end;
 
 {$ENDIF}
 
-procedure _d1  (d:pinteger);begin d^:=0             end;
 procedure _d25 (d:pinteger);begin d^:=d^ div 4;     end;
 procedure _d50 (d:pinteger);begin d^:=d^ div 2;     end;
-procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
+//procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 procedure _d300(d:pinteger);begin d^:=d^*3;         end;
 
@@ -177,6 +176,7 @@ begin
       ntars  := 0;
       ystep  := 0;
       dir    := 270;
+      homing := false;
 
       d:=dist2(x,y,vx,vy);
 
@@ -191,22 +191,22 @@ MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantS,
 MID_Revenant   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_URocket    : begin damage:=20 ; vstep:=d div 12; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=30 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_YPlasma    : begin damage:=15 ; vstep:=d div 16; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=200; vstep:=1;        splashr :=15 ;       end;
 
 MID_MBullet,
 MID_TBullet,
 MID_Bullet     : begin damage:=8  ; vstep:=1;        splashr :=0  ;       end;
-MID_Bulletx2   : begin damage:=16 ; vstep:=1;        splashr :=0  ;       end;
+MID_Bulletx2   : begin damage:=15 ; vstep:=1;        splashr :=0  ;       end;
 MID_BPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_BFG        : begin damage:=200; vstep:=d div 10; splashr :=125;       end;
 MID_Flyer      : begin damage:=15 ; vstep:=d div 60; splashr :=0  ;       end;
 MID_HRocket    : begin damage:=200; vstep:=d div 15; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_Granade    : begin damage:=50 ; vstep:=d div 10; splashr :=rocket_sr; ystep:=3;end;
-MID_Tank       : begin damage:=75 ; vstep:=1;        splashr :=rocket_sr; end;
+MID_Granade    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; ystep:=3;end;
+MID_Tank       : begin damage:=40 ; vstep:=1;        splashr :=rocket_sr; end;
 MID_StunMine   : begin damage:=1  ; vstep:=1;        splashr :=100;       end;
-MID_Mine       : begin damage:=300; vstep:=1;        splashr :=100;       end;
+MID_Mine       : begin damage:=500; vstep:=1;        splashr :=100;       end;
 MID_Blizzard   : begin damage:=500; vstep:=fr_fps;   splashr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=20 ; vstep:=1;        splashr :=0;         end;
 MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
@@ -229,14 +229,15 @@ MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
       if(mid=MID_Revenant)then
        if(_players[player].upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
 
-      if(mid=MID_RevenantS)
-      then homing:=true
-      else
-        if(_IsUnitRange(tar,@tu))then
-        begin
-           x+=_randomr(tu^.uid^._missile_r);
-           y+=_randomr(tu^.uid^._missile_r);
-        end;
+      if(mid=MID_URocket)and(mfe)then homing:=true;
+
+      if(mid=MID_RevenantS)then homing:=true;
+
+      if(not homing)and(_IsUnitRange(tar,@tu))then
+      begin
+         x+=_randomr(tu^.uid^._missile_r);
+         y+=_randomr(tu^.uid^._missile_r);
+      end;
 
       break;
    end;
@@ -299,17 +300,20 @@ begin
 
               /////////////////////////////////
 
-            if(tu^.uid^._ukbuilding=false)then
+            if(not tu^.uid^._ukbuilding)then
             begin
-            if (tu^.uid^._uklight)then
+            if (    tu^.uid^._uklight)then  // light all
                 case mid of
                 MID_Cacodemon   : _d200(@damd);
                 MID_Blizzard,
                 MID_BFG,
                 MID_HRocket,
-                MID_Mancubus,
-                MID_Granade,
-                MID_Tank        : _d50(@damd);
+                MID_Tank        : _d50 (@damd);
+                end;
+
+            if (    tu^.uid^._uklight)
+            and(not tu^.uid^._ukmech )then  // light bio
+                case mid of
                 MID_MBullet,
                 MID_TBullet,
                 MID_Bullet,
@@ -317,30 +321,32 @@ begin
                 end;
 
             if (not tu^.uid^._uklight)
-            and(not tu^.uid^._ukmech )then
+            and(not tu^.uid^._ukmech )then  // not light, bio
                 case mid of
                 MID_Imp,
                 MID_SShot,
                 MID_SSShot      : _d200(@damd);
                 end;
 
-            if (tu^.uid^._ukmech)then
+            if (    tu^.uid^._ukmech)then   // mech
                 case mid of
+                MID_SShot,
+                MID_SSShot      : _d50 (@damd);
                 MID_BPlasma     : _d200(@damd);
                 MID_YPlasma     : _d300(@damd);
                 end;
 
             end
-            else
+            else                            // buildings
                 case mid of
-                MID_Blizzard,
                 MID_Granade,
+                MID_Blizzard,
                 MID_HRocket     : _d200(@damd);
                 MID_Mancubus,
                 MID_Tank        : _d300(@damd);
                 end;
 
-            if(tu^.uid^._ukfly)then
+            if(tu^.ukfly)then               // fly all
                 case mid of
                 MID_URocket     : _d200(@damd);
                 MID_Revenant,

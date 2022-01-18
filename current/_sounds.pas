@@ -431,6 +431,10 @@ begin
    if(vid_rtui=0)then SoundMusicControll;
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
+
+
+   if(G_Started)and(G_paused=0)and(not _menu)
+   then SoundPlayUnitSelect;
 end;
 
 
@@ -480,6 +484,7 @@ begin
    snd_inapc                :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
+   snd_hpower               :=SoundSetLoad('hpower'          );
 
    snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
    snd_launch               :=SoundSetLoad(missiles_folder+'launch'          );
@@ -519,9 +524,10 @@ begin
 
    snd_radar                :=SoundSetLoad(race_dir[r_uac]+'radar');
 
-   snd_jetpoff              :=SoundSetLoad(race_dir[r_uac]+'jetpoff');
-   snd_jetpon               :=SoundSetLoad(race_dir[r_uac]+'jetpon' );
-   snd_CCup                 :=SoundSetLoad(race_dir[r_uac]+'ccup'   );
+   snd_jetpoff              :=SoundSetLoad(race_dir[r_uac]+'jetpoff'   );
+   snd_jetpon               :=SoundSetLoad(race_dir[r_uac]+'jetpon'    );
+   snd_CCup                 :=SoundSetLoad(race_dir[r_uac]+'ccup'      );
+   snd_bomblaunch           :=SoundSetLoad(race_dir[r_uac]+'bomblaunch');
 
    snd_uac_cc               :=SoundSetLoad(race_buildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=SoundSetLoad(race_buildings[r_uac ]+'barraks'        );
@@ -595,6 +601,11 @@ begin
    snd_tank_attack          :=SoundSetLoad(race_units[r_uac ]+'tank\attack'        );
    snd_tank_select          :=SoundSetLoad(race_units[r_uac ]+'tank\select'        );
    snd_tank_move            :=SoundSetLoad(race_units[r_uac ]+'tank\move'          );
+
+   snd_uacbot_annoy         :=SoundSetLoad(race_units[r_uac ]+'uacbot\annoy'       );
+   snd_uacbot_attack        :=SoundSetLoad(race_units[r_uac ]+'uacbot\attack'      );
+   snd_uacbot_select        :=SoundSetLoad(race_units[r_uac ]+'uacbot\select'      );
+   snd_uacbot_move          :=SoundSetLoad(race_units[r_uac ]+'uacbot\move'        );
 
    snd_terminator_ready     :=SoundSetLoad(race_units[r_uac ]+'terminator\ready'   );
    snd_terminator_annoy     :=SoundSetLoad(race_units[r_uac ]+'terminator\annoy'   );

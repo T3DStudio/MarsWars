@@ -287,6 +287,8 @@ wtr_adv                                        : cardinal = 1 shl 13;
 wtr_nadv                                       : cardinal = 1 shl 14;
 wtr_light                                      : cardinal = 1 shl 15;
 wtr_nlight                                     : cardinal = 1 shl 16;
+wtr_stun                                       : cardinal = 1 shl 17;
+wtr_nostun                                     : cardinal = 1 shl 18;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -349,6 +351,9 @@ uab_radar              = 5;
 uab_htowertele         = 6;
 uab_uac_rstrike        = 7;
 uab_hkeeptele          = 8;
+uab_rebuild            = 9;
+uab_buildturret        = 10;
+uab_hinvuln            = 11;
 uab_spawnlost          = 100;
 uab_morph2heye         = 101;
 uab_umine              = 102;
@@ -375,20 +380,20 @@ MaxUnitBuffs           = 15;
 ub_advanced            = 0;
 ub_pain                = 1;
 ub_stun                = 2;
-ub_gear                = 3;
-ub_resur               = 4;
-ub_cast                = 5;
-ub_stop                = 6;
-ub_slooow              = 7;
-ub_clcast              = 8;
-ub_invis               = 9;
-ub_detect              = 10;
-ub_invuln              = 11;
-ub_born                = 13;
-ub_teleeff             = 15;
+ub_resur               = 3;
+ub_cast                = 4;
+ub_stop                = 5;
+ub_slooow              = 6;
+ub_clcast              = 7;
+ub_invis               = 8;
+ub_detect              = 9;
+ub_invuln              = 10;
+ub_summoned            = 11;
+ub_teleeff             = 12;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -438,20 +443,17 @@ upgr_hell_paina        = 11; // decay aura
 upgr_hell_mainr        = 12; // main range
 upgr_hell_hktdoodads   = 13; // HK on doodabs
 upgr_hell_pinkspd      = 14; // demon speed
-upgr_hell_6bld         = 15; // Souls
-
-upgr_hell_revtele      = 17; // revers teleport
+upgr_hell_revtele      = 15; // revers teleport
+upgr_hell_6bld         = 16; // Souls
+upgr_hell_9bld         = 17; // 9 class building reload time
 upgr_hell_revmis       = 18; // revenant missile
 upgr_hell_totminv      = 19; // totem and eye invisible
 upgr_hell_bldrep       = 20; // build restoration
-
-upgr_hell_b478tel      = 22; // teleport towers
+upgr_hell_b478tel      = 21; // teleport towers
+upgr_hell_invuln       = 22; // hell invuln powerup
 
 //upgr_hell_2tier        = 16; // Tier 2
 //upgr_hell_misfst       = 14; // missiles speed
-//upgr_hell_hinvuln      = 23; // hell invuln powerup
-//upgr_hell_bldenrg      = 24; // additional energy
-//upgr_hell_9bld         = 25; // 9 class building reload time
 
 
 upgr_uac_attack        = 31; // distance attack
@@ -468,20 +470,20 @@ upgr_uac_ccturr        = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_ccldoodads    = 43; // main on doodabs
 upgr_uac_mines         = 44; // mines for engineers
-upgr_uac_6bld          = 45; // adv
-upgr_uac_jetpack       = 46; // jetpack for plasmagunner
+upgr_uac_jetpack       = 45; // jetpack for plasmagunner
+upgr_uac_6bld          = 46; // adv
+upgr_uac_9bld          = 47; // 9 class building reload time
+upgr_uac_rstrike       = 48; // rstrike launch
+upgr_uac_mechspd       = 49; // mech speed
+upgr_uac_mecharm       = 50; // mech arm
+upgr_uac_turarm        = 51; // turrets armor
 
-upgr_uac_rstrike       = 47; // rstrike launch
-upgr_uac_mechspd       = 48; // mech speed
-upgr_uac_mecharm       = 49; // mech arm
-upgr_uac_turarm        = 50; // turrets armor
 
 //upgr_uac_6bld2         = 50; // 6bld upgr
 //upgr_uac_mainonr       = 51;
 //upgr_uac_2tier         = 46; // Tier 2
 //upgr_uac_rturrets      = 53; // rocket turrets
 //upgr_uac_bldenrg       = 54; // additional energy
-//upgr_uac_9bld          = 55; // 9 class building reload time
 
 upgr_fast_build        = 250;
 upgr_fast_product      = 251;
@@ -496,6 +498,7 @@ upgr_race_mech_regen   : array[1..r_cnt] of byte = (0                , 0        
 upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0               );
 upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
 upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
+upgr_race_9bld         : array[1..r_cnt] of byte = (upgr_hell_9bld   , upgr_uac_9bld   );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -553,16 +556,17 @@ MaxUnitOrders          = 10;
 UID_HKeep              = 1;
 UID_HGate              = 2;
 UID_HSymbol            = 3;
-UID_HPools             = 4;
-UID_HTower             = 5;
-UID_HTeleport          = 6;
-UID_HMonastery         = 7;
-UID_HTotem             = 8;
-UID_HAltar             = 9;
-UID_HFortress          = 10;
-UID_HEye               = 11;
-UID_HCommandCenter     = 12;
-UID_HMilitaryUnit      = 13;
+UID_HASymbol           = 4;
+UID_HPools             = 5;
+UID_HTower             = 6;
+UID_HTeleport          = 7;
+UID_HMonastery         = 8;
+UID_HTotem             = 9;
+UID_HAltar             = 10;
+UID_HFortress          = 11;
+UID_HEye               = 12;
+UID_HCommandCenter     = 13;
+UID_HMilitaryUnit      = 14;
 
 UID_LostSoul           = 15;
 UID_Imp                = 16;
@@ -590,15 +594,16 @@ UID_UCommandCenter     = 41;
 UID_UMilitaryUnit      = 42;
 UID_UFactory           = 43;
 UID_UGenerator         = 44;
-UID_UWeaponFactory     = 45;
-UID_URadar             = 46;
-UID_URMStation         = 47;
-UID_UTechCenter        = 48;
-UID_UCTurret           = 49;
-UID_UPTurret           = 50;
-UID_URTurret           = 51;
-UID_UNuclearPlant      = 52;
-UID_UMine              = 53;
+UID_UAGenerator        = 45;
+UID_UWeaponFactory     = 46;
+UID_URadar             = 47;
+UID_URMStation         = 48;
+UID_UTechCenter        = 49;
+UID_UCTurret           = 50;
+UID_UPTurret           = 51;
+UID_URTurret           = 52;
+UID_UNuclearPlant      = 53;
+UID_UMine              = 54;
 
 UID_Engineer           = 55;
 UID_Medic              = 56;
@@ -609,10 +614,11 @@ UID_Major              = 60;
 UID_BFG                = 61;
 UID_FAPC               = 62;
 UID_APC                = 64;
-UID_Terminator         = 65;
-UID_Tank               = 66;
-UID_Flyer              = 67;
-UID_UTransport         = 68;
+UID_UACBot             = 65;
+UID_Terminator         = 66;
+UID_Tank               = 67;
+UID_Flyer              = 68;
+UID_UTransport         = 69;
 
 UID_UBaseMil           = 70;
 UID_UBaseCom           = 71;
@@ -630,17 +636,12 @@ uids_uac               = [41..80];
 
 start_base             : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
 
-t2                     = [UID_URMStation,UID_URTurret,UID_HTotem,UID_HAltar,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain..UID_Archvile];
-
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
-gavno                  = marines+[UID_Imp]+zimbas-[UID_ZEngineer];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 
-coopspawn              = marines+demons+[UID_Terminator,UID_Tank,UID_Flyer];
-
-slowturn               = [UID_APC,UID_Tank];
+coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -672,7 +673,6 @@ radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
 mstrike_reload         = fr_fps*30;
-mstrike_reload_client  = mstrike_reload-(fr_fps*3);
 
 max_build_reload       = fr_fps*12;
 
@@ -686,7 +686,7 @@ gear_time              : array[false..true] of integer = (fr_fps   ,fr_fps*2 );
 
 building_adv_reload    : array[false..true] of integer = (fr_fps*60,fr_fps*30);
 
-
+invuln_time            = fr_fps*30;
 
 rocket_sr              = 45;
 blizz_r                = 150;
@@ -790,6 +790,7 @@ smt_commando           = 21; //UID_Commando
 smt_tank               = 22; //UID_Tank
 smt_terminat           = 23; //UID_Terminator
 smt_transport          = 24; //UID_Transport
+smt_flyer              = 25; //UID_FLyer
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -843,6 +844,7 @@ uinfo_line             = 1;
 uinfo_rect             = 2;
 uinfo_box              = 3;
 uinfo_circle           = 4;
+uinfo_sprite           = 5;
 
 
 ////////////////////////////////////////////////////////////////////////////////

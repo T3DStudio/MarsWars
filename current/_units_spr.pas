@@ -114,7 +114,13 @@ smt_fmajor   :case animk of
         sms_death: exit;
               else i:=dd;
               end;
-
+smt_flyer    :case animk of
+        sms_dattack,
+        sms_mattack,
+        sms_cast : i:=8+dd;
+        sms_death: exit;
+              else i:=dd;
+              end;
 smt_caco     :case animk of
         sms_dready,
         sms_stand,
@@ -282,8 +288,8 @@ smt_terminat :case animk of
         sms_stand,
         sms_pain,
         sms_walk : i:=dd*4+aa3(0,anim,3);
-        sms_cast : i:=32+dd;
         sms_mattack,
+        sms_cast : i:=32+dd;
         sms_dattack
                  : i:=40+dd;
               else exit;
@@ -305,27 +311,34 @@ end;
 
 function _unit2SMAnimK(pu:PTUnit;_wanim_:boolean):byte;  // unit's animation state
 begin
-   if(_wanim_)or(pu^.uid^._ukbuilding)
-   then _unit2SMAnimK:=sms_walk
-   else _unit2SMAnimK:=sms_stand;
-
    with pu^   do
    with uid^  do
-     if(hits          <=0)then _unit2SMAnimK:=sms_death
-else if(not bld          )then _unit2SMAnimK:=sms_build
-else if(buff[ub_pain  ]>0)
-     or(buff[ub_stun  ]>0)then _unit2SMAnimK:=sms_pain
-else if(buff[ub_cast  ]>0)then _unit2SMAnimK:=sms_cast
-else if(a_rld          >0)and(a_weap_cl<=MaxUnitWeapons)then
-      with _a_weap[a_weap_cl] do
-       if(aw_max_range>=0)then
-       begin
-          if(a_rld in aw_rld_a)
-          then _unit2SMAnimK:=sms_dattack
-          else _unit2SMAnimK:=sms_dready;
-       end
-       else
-          if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
+   begin
+      if(_wanim_)or(_ukbuilding)
+      then _unit2SMAnimK:=sms_walk
+      else _unit2SMAnimK:=sms_stand;
+
+      if(hits          <=0)then begin _unit2SMAnimK:=sms_death;exit;end;
+      if(not bld          )then begin _unit2SMAnimK:=sms_build;exit;end;
+
+      if(not _ukbuilding)then
+      begin
+      if(buff[ub_pain  ]>0)
+      or(buff[ub_stun  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
+      if(buff[ub_cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
+      end;
+
+      if(a_rld          >0)and(a_weap_cl<=MaxUnitWeapons)then
+       with _a_weap[a_weap_cl] do
+        if(aw_max_range>=0)then
+        begin
+           if(a_rld in aw_rld_a)
+           then _unit2SMAnimK:=sms_dattack
+           else _unit2SMAnimK:=sms_dready;
+        end
+        else
+           if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
+   end
 end;
 
 function _unit2spr(u:PTUnit):PTMWTexture;

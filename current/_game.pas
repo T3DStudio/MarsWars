@@ -48,8 +48,8 @@ begin
        PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
                                  UID_LostSoul      ..UID_ZBFG,
                                  UID_UCommandCenter..UID_UMine,
-                                 UID_Engineer      ..UID_Flyer  ],
-                                MaxUnits,true);
+                                 UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
+                                 MaxUnits,true);
 
        PlayerSetAllowedUpgrades(p,[0..255],255,true); //
 
@@ -181,7 +181,6 @@ end;
 
 {$IFDEF _FULLGAME}
 {$include _replays.pas}
-
 {$ENDIF}
 
 procedure _CreateStartBase(x,y:integer;uid,pl,c:byte);
@@ -741,28 +740,6 @@ begin
 
       if(G_paused=0)then
       begin
-         {$IFDEF _FULLGAME}
-         FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
-         ui_first_upgr_time:=0;
-         ui_uid_buildn     :=0;
-         ui_uibtn_action   :=0;
-         ui_uibtn_move     :=0;
-         ui_prod_builds    :=[];
-         FillChar(ui_prod_units   ,SizeOf(ui_prod_units   ),0);
-         FillChar(ui_prod_upgrades,SizeOf(ui_prod_upgrades),0);
-         FillChar(ui_orders_uids  ,SizeOf(ui_orders_uids  ),0);
-         FillChar(ui_upgrct       ,SizeOf(ui_upgrct       ),0);
-         FillChar(ui_upgr         ,SizeOf(ui_upgr         ),0);
-         FillChar(ui_units_inapc  ,SizeOf(ui_units_inapc  ),0);
-         FillChar(ui_uid_builds   ,SizeOf(ui_uid_builds   ),0);
-         FillChar(ui_orders_n     ,SizeOf(ui_orders_n     ),0);
-         FillChar(ui_orders_x     ,SizeOf(ui_orders_x     ),0);
-         FillChar(ui_orders_y     ,SizeOf(ui_orders_y     ),0);
-         if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
-
-         SoundPlayUnitSelect;
-         {$ENDIF}
-
          _cycle_order+=1; _cycle_order:=_cycle_order mod order_period;
          _cycle_regen+=1; _cycle_regen:=_cycle_regen mod regen_period;
 

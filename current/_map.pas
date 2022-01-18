@@ -123,15 +123,6 @@ begin
       map_psx[i]:=cx+trunc(r*cos(sdir*degtorad));
       map_psy[i]:=cy+trunc(r*sin(sdir*degtorad));
    end;
-   for cx:=1 to 32 do
-   begin
-      i:=_random(MaxPlayers)+1;
-      r:=_random(MaxPlayers)+1;
-      if(i=r)then continue;
-
-      cy:=map_psx[i];map_psx[i]:=map_psx[r];map_psx[r]:=cy;
-      cy:=map_psy[i];map_psy[i]:=map_psy[r];map_psy[r]:=cy;
-   end;
 end;
 
 procedure MSkirmishStarts;

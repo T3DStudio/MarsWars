@@ -596,13 +596,16 @@ begin
    _LoadMWSModel(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
    _LoadMWSModel(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'      ,smt_terminat ,firstload);
    _LoadMWSModel(@spr_Tank           ,race_units[r_uac ]+'u_u10_'     ,smt_tank     ,firstload);
-   _LoadMWSModel(@spr_Flyer          ,race_units[r_uac ]+'u_u11_'     ,smt_fmajor   ,firstload);
+   _LoadMWSModel(@spr_Flyer          ,race_units[r_uac ]+'u_u11_'     ,smt_flyer    ,firstload);
    _LoadMWSModel(@spr_Transport      ,race_units[r_uac ]+'transport'  ,smt_transport,firstload);
+   _LoadMWSModel(@spr_UACBot         ,race_units[r_uac ]+'uacd'       ,smt_flyer    ,firstload);
+
 
    _LoadMWSModel(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HASymbol       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding,firstload);
@@ -621,6 +624,7 @@ begin
    _LoadMWSModel(@spr_UMilitaryUnit  ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UAMilitaryUnit ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding,firstload);
    _LoadMWSModel(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret ,firstload);
@@ -651,7 +655,7 @@ begin
    _LoadMWSModel(@spr_u_p1           ,race_missiles[r_uac ]+'u_p1_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
-   _LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_missile,firstload);
 
    _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
@@ -664,6 +668,10 @@ begin
 
    _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
+   _lstr(@spr_ptur,race_dir[r_uac ]+'ptur',firstload,true);
+
+
+   _lstr(@spr_stun,effects_folder+'stun',firstload,true);
 
    for x:=0 to spr_upgrade_icons do
    for r:=1 to r_cnt do
@@ -740,9 +748,9 @@ begin
    ui_uiuphy    := ui_texty+font_6hw;
    ui_game_log_height:=(ui_hinty-60) div 12;
 
-   ui_energx    := ui_uiuphx-100;
+   ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;
-   ui_armyx     := ui_uiuphx+90;
+   ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
 
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;

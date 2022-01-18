@@ -61,7 +61,7 @@ begin
 
    StartParams;
    randomize;
-   InitRX2Y;
+
    ObjTbl;
 
    {$IFDEF _FULLGAME}
@@ -74,6 +74,7 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
+   InitRX2Y;
    initMissiles;
    swLNG;
    InitUIDDataCL;

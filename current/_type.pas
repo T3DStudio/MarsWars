@@ -7,6 +7,7 @@ pinteger = ^integer;
 TSob  = set of byte;
 PTSob = ^TSob;
 
+
 {$IFDEF _FULLGAME}
 TSoc = set of char;
 
@@ -68,6 +69,7 @@ TVisPrim = record
    x0,y0,
    x1,y1    : integer;
    color    : cardinal;
+   //spr_stun
    text_lt,
    text_rt,
    text_rd,
@@ -192,6 +194,7 @@ TUID = record
    _apcs,
    _apcm,
    _base_armor,
+   _baseregen,
    _zombie_hits,
    _upgr_srange_step,
    _limituse
@@ -255,13 +258,13 @@ TUID = record
 
    un_foot_anim : array[false..true] of integer;
 
-   un_eid_ready,
+   un_eid_summon,
    un_eid_death,
    un_eid_fdeath,
    un_eid_pain
                 : array[false..true] of byte;
    un_eid_snd_foot,
-   un_eid_snd_ready,
+   un_eid_snd_summon,
    un_eid_snd_death,
    un_eid_snd_fdeath,
    un_eid_snd_pain
@@ -484,13 +487,6 @@ TMissile = record
    {$IFDEF _FULLGAME}
    ms_eid_bio_death: boolean;
    {$ENDIF}
-end;
-
-TPFNode = record
-    pos_x,
-    pos_y,
-    rootx,
-    rooty : integer;
 end;
 
 TCTPoint = record
