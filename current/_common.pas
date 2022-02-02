@@ -4,6 +4,7 @@ function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _UnderObstacle(ux,uy:integer):boolean; forward;
 
+
 {$IFDEF _FULLGAME}
 procedure SoundLogHPlayer;  forward;
 {$ENDIF}
@@ -266,6 +267,11 @@ end;
 function dist(dx0,dy0,dx1,dy1:integer):integer;
 begin
    dist:=trunc(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
+end;
+
+function distr(dx0,dy0,dx1,dy1:integer):single;
+begin
+   distr:=sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1)));
 end;
 
 function p_dir(x0,y0,x1,y1:integer):integer;
@@ -614,7 +620,6 @@ begin
       if(rpls_fog=false)or(fog_check(x,y))then PointInScreenF:=true;
    end;
 end;
-
 
 
 function PlayerGetColor(player:byte):cardinal;

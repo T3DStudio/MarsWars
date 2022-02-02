@@ -81,6 +81,7 @@ TVisSpr = record
    x,y,xo,yo,
    depth,
    shadowz  : integer;
+   shadowc,
    aura     : cardinal;
    alpha    : byte;
 end;

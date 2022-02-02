@@ -270,10 +270,10 @@ begin
 
    case by of
    -1: case vid_ppos of   // tabs
-       0,1: begin mouse_x-=vid_panelx; if(mouse_y>ui_tabsy)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
-       2,3: begin mouse_y-=vid_panely; if(mouse_x>ui_tabsy)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
+       0,1: begin mouse_x-=vid_panelx; if(mouse_y>vid_panelw)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
+       2,3: begin mouse_y-=vid_panely; if(mouse_x>vid_panelw)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
        end;
-   9 : case bx of         // buttons
+    8: case bx of         // buttons
        0 : ToggleMenu;
        1 : ;
        2 : if(net_status>ns_none)then GameTogglePause;
@@ -281,7 +281,7 @@ begin
    else
      u:=(by*3)+(bx mod 3);
 
-     if(0<=by)and(by<9)and(bx>=0)then
+     if(0<=by)and(by<8)and(bx>=0)then
      with _players[HPlayer] do
       case tab of
 
@@ -321,25 +321,26 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
       if(G_Paused=0)and(right=false)then
       begin
          case u of
-   0 : m_brush:=co_move;
-   1 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
-   2 : m_brush:=co_patrol;
+   0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
+   1 : m_brush:=co_paction;
+   2 : m_a_inv:=not m_a_inv;
 
    3 : m_brush:=co_amove;
    4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
    5 : m_brush:=co_apatrol;
 
-   6 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
-   7 : m_a_inv:=not m_a_inv;
-   8 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
+   6 : m_brush:=co_move;
+   7 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
+   8 : m_brush:=co_patrol;
 
-   9 : m_brush:=co_paction;
-
+   9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
    10: if(ui_orders_x[MaxUnitOrders]>0)then
         if(dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitOrders], ui_orders_y[MaxUnitOrders])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
+
+
          end;
 
          check_mouse_brush;
@@ -408,12 +409,13 @@ begin
             sdlk_insert    : r_draw:= not r_draw;
          end;
 
+        k2:=0;
+        if(k_ctrl >1)then k2:=SDLK_LCtrl;
+        if(k_alt  >1)then k2:=SDLK_LAlt;
+        if(k_shift>1)then k2:=SDLK_LShift;
+
         if(rpls_state<rpl_rhead)then
         begin
-           k2:=0;
-           if(k_ctrl >1)then k2:=SDLK_LCtrl;
-           if(k_alt  >1)then k2:=SDLK_LAlt;
-           if(k_shift>1)then k2:=SDLK_LShift;
            case ui_tab of
         0,1,2:for ko:=0 to _mhkeys do
               begin
@@ -427,13 +429,14 @@ begin
 
            if(G_Paused=0)then
            begin
-              for ko:=0 to _mhkeys do  // actions
-               if(k=_hotkeyA[ko])then
-               begin
-                  if(_hotkeyA[ko]=0)then continue;
-                  _panel_click(3,ko mod 3,4+(ko div 3),false,false,k_dbl);
-                  exit;
-               end;
+              for ko:=0 to _mhkeys do  // actions   _hotkeyA2
+              begin
+                 if(_hotkeyA2[ko]<>k2)
+                 or(_hotkeyA [ko]= 0 )
+                 or(_hotkeyA [ko]<>k )then continue;
+                 _panel_click(3,ko mod 3,4+(ko div 3),false,false,k_dbl);
+                 exit;
+              end;
 
               case k of
            sdlk_0..sdlk_9 :  begin
@@ -455,12 +458,14 @@ begin
            end;
         end
         else
-          for ko:=0 to 14 do  // actions
-           if(k=_hotkeyR[ko])and(_hotkeyR[ko]>0)then
-           begin
-              _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
-              exit;
-           end;
+          for ko:=0 to _mhkeys do  // actions
+          begin
+             if(_hotkeyR2[ko]<>k2)
+             or(_hotkeyR [ko]= 0 )
+             or(_hotkeyR [ko]<>k )then continue;
+             _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
+             exit;
+          end;
       end;
 end;
 

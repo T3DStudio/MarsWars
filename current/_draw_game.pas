@@ -24,7 +24,7 @@ begin
    end;
 end;
 
-procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
@@ -34,6 +34,7 @@ begin
        y      := ay-vid_cam_y;
        depth  := adepth;
        shadowz:= ashadowz;
+       shadowc:= ashadowc;
        sprite := aspr;
        aura   := aaura;
        alpha  := aalpha;
@@ -49,6 +50,7 @@ begin
        y      := ay-vid_cam_y;
        depth  := adepth;
        shadowz:= ashadowz;
+       shadowc:= c_ablack;
        sprite := aspr;
        alpha  := aalpha;
        xo     := axo;
@@ -120,7 +122,7 @@ begin
        begin
           sx:=sprite^.hw;
           sy:=sprite^.h-(sprite^.h shr 3);
-          filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,c_ablack);
+          filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
        end;
        if(alpha>0)then
         if(alpha=255)
@@ -134,8 +136,10 @@ begin
 
        if(aura>0)then
        begin
-          sx:=sprite^.w shr 1;
-          sy:=sprite^.h shr 1;
+          x-=6;
+          y-=6;
+          sx:=sprite^.hw+6;
+          sy:=sprite^.hh+6;
           filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
        end;
     end;
@@ -320,9 +324,9 @@ begin
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 
       if(speed<=0)or(not bld)then
-       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitr[vid_rtui>vid_rtuish]);
+       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitrR[vid_rtui>vid_rtuish]);
 
-      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,c_gray);
+      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_unitrS[vid_rtui>vid_rtuish]);
 
       if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-hh-6);
    end;
@@ -592,7 +596,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(a_tar), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(a_weap), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+30,i2s(_rx2y_r), ta_left,255, PlayerGetColor(playeri));
 
 

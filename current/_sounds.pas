@@ -397,6 +397,7 @@ lmt_advanced  : begin
 lmt_upgrade   : SoundPlayAnoncer(snd_upgrade_complete[race],true);
 lmt_unit      : if(length(ps^)>1)then
                  with _uids[ord(ps^[1])] do SoundPlayUnitCommand(un_snd_ready[ps^[2]<>#0]);
+lmt_nenergy   : SoundPlayAnoncer(snd_not_enough_energy[race],true);
       end;
    end;
 end;
@@ -643,7 +644,7 @@ begin
    snd_hell_hbuild          :=SoundSetLoad(race_buildings[r_hell]+'hell_building' );
    snd_hell_eye             :=SoundSetLoad(race_buildings[r_hell]+'hell_eye'      );
 
-
+   snd_hell                 :=SoundSetLoad(race_dir[r_hell]+'hell' );
 
    snd_hell_invuln          :=SoundSetLoad(race_units[r_hell]+'invuln');
    snd_hell_pain            :=SoundSetLoad(race_units[r_hell]+'d_p');

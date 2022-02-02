@@ -480,7 +480,7 @@ procedure D_Menu;
 begin
    if(vid_menu_redraw)then
    begin
-      map_RedrawMenuMinimap;
+      //map_RedrawMenuMinimap;
       d_updmenu(r_menu);
       vid_menu_redraw:=false;
    end;

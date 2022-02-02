@@ -336,7 +336,7 @@ begin
       75 : if(net_status<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
       76 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@gamemodes);Map_premap;end;
       77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
-      78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions; end;
+      78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
       79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);
       80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 

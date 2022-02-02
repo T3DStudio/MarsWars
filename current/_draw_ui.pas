@@ -66,10 +66,10 @@ begin
             bld    :=true;
             hits   :=_mhits;
          end;
-         _unit_apUID(pdunit);
+         _unit_apUID(pdunit,false);
          _unit_upgr (pdunit);
          if(UIUnitDrawRange(pdunit))then
-          circleColor(tar,m_brushx,m_brushy,dunit.srange,c_gray);
+          circleColor(tar,m_brushx,m_brushy,dunit.srange,ui_unitrS[vid_rtui>vid_rtuish]);
       end;
 
       m_brushx+=vid_cam_x-lx;
@@ -155,7 +155,7 @@ end;
 procedure _drawBtnt(tar:pSDL_Surface;x,y:integer;
 lu1 ,lu2 ,ru ,rd ,ld :shortstring;
 clu1,clu2,cru,crd,cld:cardinal;ms:shortstring);
-var ux,uy,ui_dBW:integer;
+var ux,uy:integer;
 function cs(ps:pshortstring):boolean;begin cs:=(ps^<>'')and(ps^[1]<>'0'); end;
 begin
    if(vid_ppos<2)then
@@ -168,7 +168,6 @@ begin
       ux:=ui_bottomsy+y*vid_BW+1;
       uy:=x*vid_BW+1;
    end;
-   ui_dBW:=vid_BW-font_w-3;
 
    if(cs(@lu1))then _draw_text(tar,ux+2       ,uy+3       ,lu1,ta_left  ,5,clu1);
    if(cs(@lu2))then _draw_text(tar,ux+2       ,uy+5+font_w,lu2,ta_left  ,5,clu2);
@@ -202,12 +201,22 @@ i1,i2,i3:integer;
 c1,c2,c3:cardinal;
 sel:boolean);
 begin
-   _draw_surf(tar,bx,by,btn);
-   if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_tBW-3,c_lime);
-
-   if(i1>0)then _draw_text(tar,bx+3,by+2 ,i2s(i1),ta_left,255,c1);
-   if(i2>0)then _draw_text(tar,bx+3,by+11,i2s(i2),ta_left,255,c2);
-   if(i3>0)then _draw_text(tar,bx+3,by+22,i2s(i3),ta_left,255,c3);
+   if(vid_ppos<2)then
+   begin
+      _draw_surf(tar,bx,by+5,btn);
+      if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_BW-3,c_lime);
+      if(i1>0)then _draw_text(tar,bx+3,by+3       ,i2s(i1),ta_left,255,c1);
+      if(i2>0)then _draw_text(tar,bx+3,by+font_w+5,i2s(i2),ta_left,255,c2);
+      if(i3>0)then _draw_text(tar,bx+3,by+ui_dBW  ,i2s(i3),ta_left,255,c3);
+   end
+   else
+   begin
+      _draw_surf(tar,bx+5,by,btn);
+      if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_BW-3,by+vid_tBW-3,c_lime);
+      if(i1>0)then _draw_text(tar,bx+3,by+3 ,i2s(i1),ta_left,255,c1);
+      if(i2>0)then _draw_text(tar,bx+3,by+13,i2s(i2),ta_left,255,c2);
+      if(i3>0)then _draw_text(tar,bx+3,by+24,i2s(i3),ta_left,255,c3);
+   end;
 end;
 
 procedure d_Panel(tar:pSDL_Surface);
@@ -225,11 +234,11 @@ begin
          if(vid_ppos<2)then
          begin
             ux:=ui*vid_tBW+1;
-            uy:=ui_tabsy+1;
+            uy:=vid_panelw+1;
          end
          else
          begin
-            ux:=ui_tabsy+1;
+            ux:=vid_panelw+1;
             uy:=ui*vid_tBW+1;
          end;
 
@@ -243,14 +252,15 @@ begin
          end;
       end;
 
-      d_TextBTN(tar,0,9,@str_menu,c_white);
+      d_TextBTN(tar,0,8,@str_menu,c_white);
       if(net_status>ns_none)and(G_WTeam=255)then
        if(g_paused>0)
-       then d_TextBTN(tar,2,9,@str_pause,PlayerGetColor(g_paused))
-       else d_TextBTN(tar,2,9,@str_pause,c_white          );
+       then d_TextBTN(tar,2,8,@str_pause,PlayerGetColor(g_paused))
+       else d_TextBTN(tar,2,8,@str_pause,c_white                 );
 
-      case ui_tab of    // buildings
-      0:
+      case ui_tab of
+
+      0: // buildings
       for ui:=0 to ui_ubtns do
       begin
          uid:=ui_panel_uids[race ,ui_tab,ui];
@@ -278,8 +288,7 @@ begin
          end;
       end;
 
-
-      1:      // units
+      1: // units
       for ui:=0 to ui_ubtns do
       begin
          uid:=ui_panel_uids[race ,ui_tab,ui];
@@ -303,7 +312,7 @@ begin
          end;
       end;
 
-      2:
+      2: // upgrades
       for ui:=0 to ui_ubtns do
       begin
          uid:=ui_panel_uids[race ,ui_tab,ui];
@@ -321,7 +330,7 @@ begin
          c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
       end;
 
-      3:
+      3: // actions
       if(rpls_state>=rpl_rhead)then
       begin
          _drawBtn(tar,0,4,spr_b_rfast,_fsttime    ,false);
@@ -351,19 +360,19 @@ begin
       end
       else
       begin
-         _drawBtn(tar,0,0,spr_b_move   ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,1,0,spr_b_hold   ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,2,0,spr_b_patrol ,false  ,ui_uibtn_move<=0   );
+         _drawBtn(tar,0,0,spr_b_action ,false  ,ui_uibtn_action<=0 );
+         _drawBtn(tar,1,0,spr_b_paction,false  ,ui_uibtn_action<=0 );
+         _drawBtn(tar,2,0,spr_b_rclck  ,m_a_inv,false              );
 
          _drawBtn(tar,0,1,spr_b_attack ,false  ,ui_uibtn_move<=0   );
          _drawBtn(tar,1,1,spr_b_stop   ,false  ,ui_uibtn_move<=0   );
          _drawBtn(tar,2,1,spr_b_apatrol,false  ,ui_uibtn_move<=0   );
 
-         _drawBtn(tar,0,2,spr_b_action ,false  ,ui_uibtn_action<=0 );
-         _drawBtn(tar,1,2,spr_b_rclck  ,m_a_inv,false              );
-         _drawBtn(tar,2,2,spr_b_cancel ,false  ,false              );
+         _drawBtn(tar,0,2,spr_b_move   ,false  ,ui_uibtn_move<=0   );
+         _drawBtn(tar,1,2,spr_b_hold   ,false  ,ui_uibtn_move<=0   );
+         _drawBtn(tar,2,2,spr_b_patrol ,false  ,ui_uibtn_move<=0   );
 
-         _drawBtn(tar,0,3,spr_b_paction,false  ,ui_uibtn_action<=0 );
+         _drawBtn(tar,0,3,spr_b_cancel ,false  ,false              );
          _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_orders_n[MaxUnitOrders]  <=0);
          _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])<=0);
       end;
@@ -410,6 +419,7 @@ begin
 end;
 
 procedure d_Hints(tar:pSDL_Surface);
+const rpl_btns_border = 12;
 var i,
    uid:byte;
     hs:pshortstring;
@@ -420,10 +430,10 @@ begin
       hs:=nil;
       case m_by of
       3  : case (vid_ppos<2) of
-           true :if(mouse_y>ui_tabsy)then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
-           false:if(mouse_x>ui_tabsy)then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
+           true :if(mouse_y>vid_panelw)then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
+           false:if(mouse_x>vid_panelw)then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
            end;
-      13 : begin
+      12 : begin
               if(m_bx=2)then
                if(net_status=ns_none)or(G_WTeam<255)then exit;
               hs:=@str_hint_m[m_bx];
@@ -438,10 +448,10 @@ begin
            begin
               if(rpls_state>=rpl_rhead)then
               begin
-                 if(i<12)then exit;
+                 if(i<rpl_btns_border)then exit;
               end
               else
-                 if(i>11)then exit;
+                 if(i>=rpl_btns_border)then exit;
               hs:=@str_hint[ui_tab,race,i];
            end
            else

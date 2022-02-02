@@ -27,6 +27,8 @@ begin
 end;
 
 
+
+
 procedure _GfxColors;
 begin
    c_dred    :=rgba2c(190,  0,  0,255);
@@ -57,8 +59,12 @@ begin
    ui_muc    [true ]:=c_gray;
    ui_limit  [false]:=c_white;
    ui_limit  [true ]:=c_red;
-   ui_unitr  [false]:=c_white;
-   ui_unitr  [true ]:=c_black;
+
+   ui_unitrR [false]:=c_black;
+   ui_unitrR [true ]:=c_yellow;
+
+   ui_unitrS [false]:=c_black;
+   ui_unitrS [true ]:=c_gray;
 end;
 
 function _createSurf(tw,th:integer):pSDL_Surface;
@@ -840,11 +846,11 @@ begin
    rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
    pline(0,vid_panelw,vid_panelw,vid_panelw,c_white);
 
-   pline(0,vid_panelw+ui_h3bw,r_panel^.w,vid_panelw+ui_h3bw,c_white);
+   //pline(0,vid_panelw+ui_h3bw,r_panel^.w,vid_panelw+ui_h3bw,c_white);
    pline(0,vid_panelw+vid_BW ,r_panel^.w,vid_panelw+vid_BW ,c_white);
 
    for y:=0 to 3 do
-   pline(y*vid_tBW,vid_panelw+ui_h3bw,y*vid_tBW,vid_panelw+vid_BW,c_white);
+   pline(y*vid_tBW,vid_panelw,y*vid_tBW,vid_panelw+vid_BW,c_white);
 
    i:=4;
    y:=vid_BW*i;

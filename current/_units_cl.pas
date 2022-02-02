@@ -4,7 +4,8 @@
 
 ///////////////////////////////////////////////////////////////
 procedure InitUIDDataCL;
-var u,i,r,w:byte;
+var u,i,r,w,
+  DefaultRLDA_pa:byte;
 un_eid_snd_set:boolean;
 
 //local funcs
@@ -34,7 +35,7 @@ begin
    end;
 end;
 
-procedure _CalcDefaultRLDA(a,s:PTSoB);
+procedure _CalcDefaultRLDA(a,s:PTSoB;pa:byte);
 var i,x:byte;
 procedure setline(a0,a1:byte);
 begin
@@ -53,7 +54,7 @@ begin
    for i:=255 downto 0 do
     if(i in s^)or(i=0)then
     begin
-       if(x<255)then setline((i+x) div 2,x);
+       if(x<255)then setline(x-((x-i) div pa),x);
        x:=i;
     end;
 end;
@@ -135,6 +136,33 @@ begin
       if(rld_a<>[])then aw_rld_a:=rld_a;
    end;
 end;
+procedure setWeaponESND2(aaset:TSoB;snd_start,snd_shot:PTSoundSet;eid_start,eid_shot:byte);
+var aa:byte;
+begin
+   with _uids[u] do
+   for aa:=0 to MaxUnitWeapons do
+   if(aa in aaset)then
+   with _a_weap[aa] do
+   begin
+      aw_snd_start:=snd_start;
+      aw_snd_shot :=snd_shot;
+      aw_eid_start:=eid_start;
+      aw_eid_shot :=eid_shot;
+   end;
+end;
+procedure setWeaponTEID2(aaset:TSoB;snd_target:PTSoundSet;eid_target:byte;rld_a:TSoB);
+var aa:byte;
+begin
+   with _uids[u] do
+   for aa:=0 to MaxUnitWeapons do
+   if(aa in aaset)then
+   with _a_weap[aa] do
+   begin
+      aw_snd_target:=snd_target;
+      aw_eid_target:=eid_target;
+      if(rld_a<>[])then aw_rld_a:=rld_a;
+   end;
+end;
 
 begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
@@ -146,6 +174,8 @@ begin
       setMWSModel(@spr_dmodel,nil);
       _animw:=10;
       _animd:=10;
+
+      DefaultRLDA_pa:=3;
 
       case u of
 UID_LostSoul:
@@ -185,7 +215,7 @@ begin
    setEffectEID (false,0  ,0              ,0  ,0             );
    setEffectSND (false,nil,snd_caco_death ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(2,nil,snd_hell_melee ,0,0);
+   setWeaponESND(4,nil,snd_hell_melee ,0,0);
 end;
 UID_Baron:
 begin
@@ -435,12 +465,19 @@ UID_HCommandCenter:
 begin
    setMWSModel(@spr_HCC,nil);
    setBuildingSND(snd_hell_hbuild);
+   setEffectEID(false,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectSND(false,snd_hell,snd_building_explode,snd_building_explode,nil);
+   un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);
 end;
 UID_HMilitaryUnit:
 begin
    setMWSModel(@spr_HMUnit,@spr_HMUnita);
    setBuildingSND(snd_hell_hbuild);
+   setEffectEID(false,EID_HMU ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(true ,EID_HAMU,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectSND(false,snd_hell,snd_building_explode,snd_building_explode,nil);
+   un_eid_bcrater_y:=10;
 end;
 
 
@@ -554,7 +591,17 @@ begin
    setCommandSND(false,snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
-   setWeaponTEID(0    ,nil,0,[0..255]);
+
+   setWeaponTEID2([0..255],nil,0,[]);
+
+   setWeaponTEID2([2,6,10],nil,0,[0..255]);
+   setWeaponTEID2([0,4,8 ],nil,0,[0..255]);
+
+   setWeaponESND2([0,4,8,3,7,11],nil,snd_shotgun,0,0);
+   setWeaponESND2([1,5,9 ],nil,snd_ssg    ,0,0);
+   setWeaponESND2([2,6,10],nil,snd_pistol ,0,0);
+
+   DefaultRLDA_pa:=3;
 end;
 UID_Tank:
 begin
@@ -573,6 +620,7 @@ begin
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_flyer_s,0,0);
+   setWeaponESND(1    ,nil,snd_launch ,0,0);
    //
 end;
 UID_UTransport:
@@ -608,7 +656,7 @@ end;
 UID_UAGenerator:
 begin
    setMWSModel(@spr_UAGenerator,nil);
-   setBuildingSND(snd_uac_generator);
+   setBuildingSND(snd_uac_suply);
 end;
 UID_UWeaponFactory:
 begin
@@ -716,7 +764,7 @@ end;
 
       for w:=0 to MaxUnitWeapons do
        with _a_weap[w] do
-        if(aw_rld_a=[])then _CalcDefaultRLDA(@aw_rld_a,@aw_rld_s);
+        if(aw_rld_a=[])then _CalcDefaultRLDA(@aw_rld_a,@aw_rld_s,DefaultRLDA_pa);
 
       _fr:=(_r div fog_cw)+1;
       if(_fr<1)then _fr:=1;

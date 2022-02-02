@@ -66,8 +66,8 @@ begin
         EID_BBExp         : _setEID(@spr_eff_ebb       ,sms_death);
         EID_HKT_h,
         EID_HKT_s         : _setEID(@spr_HKeep         ,sms_walk );
-        EID_HMU           : _setEID(@spr_UCommandCenter,sms_walk );
-        EID_HCC           : _setEID(@spr_UMilitaryUnit ,sms_walk );
+        EID_HCC           : _setEID(@spr_UCommandCenter,sms_walk );
+        EID_HMU           : _setEID(@spr_UMilitaryUnit ,sms_walk );
         EID_HAMU          : _setEID(@spr_UAMilitaryUnit,sms_walk );
         EID_db_h0         : _setEID(@spr_db_h0         ,sms_death);
         EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);

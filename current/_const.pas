@@ -127,6 +127,9 @@ lmt_unit               = 13;
 lmt_advanced           = 14;
 lmt_upgrade            = 15;
 lmt_player_leave       = 16;
+lmt_nenergy            = 17;
+lmt_prodreq            = 18;
+lmt_ccommand           = 19;
 lmt_chat               = 255;
 
 lmts_menu_chat         = [0..MaxPlayers,lmt_game,lmt_endgame,lmt_defeated,lmt_player_leave,lmt_chat];
@@ -246,7 +249,7 @@ atm_none               = 0;   // cant attack
 atm_always             = 1;   // can attack
 atm_bunker             = 2;   // can attack, units inside can attack too
 atm_sturret            = 3;   // can attack when somebody inside
-atm_inapc              = 4;   // can attack only when inapc
+atm_inapc              = 4;   // can attack only when in apc
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,16 +257,23 @@ atm_inapc              = 4;   // can attack only when inapc
 //  Weapon: requirements to attacker and some flags
 //
 
-wpr_any              : cardinal =  0;
-wpr_adv              : cardinal =  1;
-wpr_nadv             : cardinal =  1 shl 1;
-wpr_zombie           : cardinal =  1 shl 2;
-wpr_sspos            : cardinal =  1 shl 3; // launch missile in unit position
-wpr_tvis             : cardinal =  1 shl 4;
-wpr_suicide          : cardinal =  1 shl 5;
-wpr_ground           : cardinal =  1 shl 6;
-wpr_air              : cardinal =  1 shl 7;
-wpr_move             : cardinal =  1 shl 8;
+wpr_any                : cardinal =  0;
+wpr_adv                : cardinal =  1;
+wpr_nadv               : cardinal =  1 shl 1;
+wpr_zombie             : cardinal =  1 shl 2;
+wpr_sspos              : cardinal =  1 shl 3; // launch missile in unit position
+wpr_tvis               : cardinal =  1 shl 4;
+wpr_suicide            : cardinal =  1 shl 5;
+wpr_ground             : cardinal =  1 shl 6;
+wpr_air                : cardinal =  1 shl 7;
+wpr_move               : cardinal =  1 shl 8;
+
+aw_fsr0                = 15000;
+
+aw_srange              =  0;            // attack range = sight range
+aw_fsr                 =  aw_fsr0+7500; // attack range = sight range + (x-aw_fsr)
+aw_dmelee              = -8;            // default melee range
+aw_hmelee              = -64;           // default heal/reapir melee range
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -634,14 +644,15 @@ UID_UPortal            = 78;
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
-start_base             : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
-
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
 arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 
 coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
+
+uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
+uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -736,17 +747,51 @@ _hotkey2 : array[0.._mhkeys] of cardinal = (0      , 0      , 0      ,
                                             SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
                                             SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
 
-_hotkeyA : array[0..11     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
-                                            SDLK_A , SDLK_S , SDLK_D ,
-                                            SDLK_Z , SDLK_M , SDLK_C ,
-                                            SDLK_X , SDLK_F2, SDLK_Delete );
+_hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W , SDLK_SPACE ,
+                                            SDLK_A    , SDLK_S , SDLK_D ,
+                                            SDLK_Z    , SDLK_X , SDLK_C ,
 
-_hotkeyR : array[0..14     ] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
+                                            SDLK_C    , SDLK_F2, SDLK_Delete,
+                                            0         , 0      , 0,
+                                            0         , 0      , 0,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0);
+_hotkeyA2: array[0.._mhkeys] of cardinal = (0 , 0 , SDLK_LCtrl ,
+                                            0 , 0 , 0 ,
+                                            0 , 0 , 0 ,
+
+                                            SDLK_LCtrl , 0, 0,
+                                            0 , 0, 0,
+                                            0 , 0, 0,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0);
+
+_hotkeyR : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_A , SDLK_S , SDLK_D ,
                                             SDLK_Z , SDLK_X , SDLK_C ,
-                                            SDLK_R , SDLK_T , SDLK_Y ,
-                                            SDLK_F , SDLK_G , SDLK_H      );
 
+                                            SDLK_R , SDLK_T , SDLK_Y ,
+                                            SDLK_F , SDLK_G , SDLK_H ,
+                                            0,0,0,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0);
+_hotkeyR2: array[0.._mhkeys] of cardinal = (0 , 0 , 0 ,
+                                            0 , 0 , 0 ,
+                                            0 , 0 , 0 ,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0);
 
 
 _buffst                : array[false..true] of smallint = (0,_ub_infinity);
@@ -846,6 +891,23 @@ uinfo_box              = 3;
 uinfo_circle           = 4;
 uinfo_sprite           = 5;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  TEXT
+//
+
+ta_left                = 0;
+ta_middle              = 1;
+ta_right               = 2;
+ta_chat                = 3;
+
+font_w                 = 8;
+font_iw                = font_w-1;
+font_3hw               = font_w+(font_w div 2);
+font_6hw               = font_3hw*2;
+
+txt_line_h             = 5;
+txt_line_h2            = 25-font_w;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -861,19 +923,17 @@ vid_maxw               = 1360;
 vid_maxh               = 768;
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
-vid_rtuir              = 6;
+vid_rtuir              = 5;
 vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
 vid_uialrm_t           = fr_fps div (vid_rtuir div 3);
 vid_uialrm_ti          = vid_uialrm_t div 3;
 
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
-vid_BW                 = 44;
+vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;
 vid_tBW                = vid_panelw div 4;
-vid_thBW               = vid_tBW div 2;
-vid_2tBW               = vid_tBW*2;
 vid_hBW                = vid_BW div 2;
 vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
@@ -886,9 +946,7 @@ vid_camp_m             = 11;
 ui_max_alarms          = 10;
 
 ui_bottomsy            = vid_BW*4;
-ui_h3bw                = vid_BW-vid_tBW;
 ui_hwp                 = vid_panelw div 2;
-ui_tabsy               = vid_panelw+ui_h3bw;
 ui_ubtns               = 23;
 
 ui_menu_map_zx0        = 76;
@@ -969,6 +1027,8 @@ chat_shlm_max          = chat_shlm_t*5;
 ui_menu_chat_height    = 13; // lines
 ui_menu_chat_width     = 37; // chars
 
+ui_dBW                 = vid_BW-font_w-3;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SOUND
@@ -1018,24 +1078,6 @@ fog_cr                 = round(fog_chw*1.45);
 fog_cxr                = fog_cr-fog_chw;
 fog_vfwm               = (vid_maxw div fog_cw)+2;
 fog_vfhm               = (vid_maxh div fog_cw)+2;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  TEXT
-//
-
-ta_left                = 0;
-ta_middle              = 1;
-ta_right               = 2;
-ta_chat                = 3;
-
-font_w                 = 8;
-font_iw                = font_w-1;
-font_3hw               = font_w+(font_w div 2);
-font_6hw               = font_3hw*2;
-
-txt_line_h             = 5;
-txt_line_h2            = 25-font_w;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

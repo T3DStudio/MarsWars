@@ -188,12 +188,12 @@ var  i:byte;
 r,d,ds:integer;
 begin
    if(c=0)
-   then _unit_add(x,y,uid,pl,true,false)
+   then _unit_add(x,y,uid,pl,true,false,false)
    else
    begin
       if(c>5)then
       begin
-         _unit_add(x,y,uid,pl,true,false);
+         _unit_add(x,y,uid,pl,true,false,false);
          c-=1;
       end;
       ds :=map_mw div 2;
@@ -205,7 +205,7 @@ begin
          _unit_add(
          x+trunc(r*cos(d*degtorad)),
          y-trunc(r*sin(d*degtorad)),
-         uid,pl,true,false);
+         uid,pl,true,false,false);
 
          d+=ds;
       end;
@@ -243,7 +243,7 @@ begin
 
          if(state<>ps_none)then
          begin
-            _CreateStartBase(map_psx[p],map_psy[p],start_base[race],p,g_start_base);
+            _CreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
 
             if(state=ps_play)then ai_skill:=player_default_ai_level;
             // _setAI(p);  set AI settings

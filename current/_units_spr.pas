@@ -324,7 +324,8 @@ begin
       if(not _ukbuilding)then
       begin
       if(buff[ub_pain  ]>0)
-      or(buff[ub_stun  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
+      or(buff[ub_stun  ]>0)then
+       if(not _ukmech)then begin _unit2SMAnimK:=sms_pain ;exit;end;
       if(buff[ub_cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 

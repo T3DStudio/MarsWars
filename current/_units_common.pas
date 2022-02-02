@@ -196,7 +196,7 @@ begin
    atm_bunker,
    atm_always  : if(_IsUnitRange(inapc,@tu))then
                  begin
-                    if(tu^.inapc>0)then exit;
+                    if(_IsUnitRange(tu^.inapc,nil))then exit;
                     case tu^.uid^._attack of
                     atm_always,
                     atm_none,
@@ -298,7 +298,7 @@ begin
    if(ServerSide)then _unit_zfall(pu);
    with pu^ do
    if(vx<>x)or(vy<>y)then
-    if(inapc>0)then
+    if(_IsUnitRange(inapc,nil))then
     begin
        vstp:=0;
        vx  :=x;
@@ -306,6 +306,7 @@ begin
     end
     else
     begin
+       if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
        if(vstp<=0)then vstp:=UnitStepTicks;
        vx  +=(x-vx) div vstp;
        vy  +=(y-vy) div vstp;
@@ -888,7 +889,7 @@ begin
    end;
 end;
 
-procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld,summoned:boolean);
+procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld,summoned,advanced:boolean);
 var m,i:integer;
 begin
    _LastCreatedUnit :=0;
@@ -941,7 +942,7 @@ begin
           FillChar(vsni,SizeOf(vsni),0);
 
           _unit_default  (_LastCreatedUnitP);
-          _unit_apUID    (_LastCreatedUnitP);
+          _unit_apUID    (_LastCreatedUnitP,advanced);
           _unit_inc_cntrs(_LastCreatedUnitP,ubld,summoned);
        end;
    end;
@@ -952,7 +953,7 @@ begin
    if(_uid_conditionals(@_players[bp],buid)=0)then
     with _players[bp] do
      if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)then
-      _unit_add(bx,by,buid,bp,false,false);
+      _unit_add(bx,by,buid,bp,false,false,false);
 end;
 
 
@@ -1193,7 +1194,7 @@ begin
          cd:=(dir+i*15)*degtorad;
 
          _unit_add(x+trunc(sr*cos(cd)),
-                   y-trunc(sr*sin(cd)),_uid,playeri,true,false);
+                   y-trunc(sr*sin(cd)),_uid,playeri,true,false,false);
          if(_LastCreatedUnit>0)then
          begin
             _LastCreatedUnitP^.uo_x  :=uo_x;
@@ -1282,7 +1283,7 @@ begin
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
-        then _unit_add(tx,ty,auid,playeri,true,true)
+        then _unit_add(tx,ty,auid,playeri,true,true,buff[ub_advanced]>0)
         else exit;
 
       if(_LastCreatedUnit>0)then
@@ -1302,7 +1303,6 @@ begin
              _LastCreatedUnitP^.uo_x  :=uo_x;
              _LastCreatedUnitP^.uo_y  :=uo_y;
           end;
-         _LastCreatedUnitP^.buff[ub_advanced]:=buff[ub_advanced];
       end
       {$IFDEF _FULLGAME}
       else
@@ -1370,16 +1370,14 @@ begin
       else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then
-      begin
-         if(buff[ub_invis]<=0)
-         then _AddToInt(@vsnt[tu^.player^.team],vistime)
-         else
-           if(tu^.buff[ub_detect]>0)and(tu^.bld)and(tu^.hits>0)then
-           begin
-              _AddToInt(@vsnt[tu^.player^.team],vistime);
-              _AddToInt(@vsni[tu^.player^.team],vistime);
-           end;
-      end;
+       if(buff[ub_invis]<=0)
+       then _AddToInt(@vsnt[tu^.player^.team],vistime)
+       else
+         if(tu^.buff[ub_detect]>0)and(tu^.bld)and(tu^.hits>0)then
+         begin
+            _AddToInt(@vsnt[tu^.player^.team],vistime);
+            _AddToInt(@vsni[tu^.player^.team],vistime);
+         end;
    end;
 end;
 

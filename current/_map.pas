@@ -94,7 +94,7 @@ begin
    {$ENDIF}
 end;
 
-function _spch(x,y,m:integer):boolean;
+function _spch(x,y,m:integer;check_symmetry:boolean):boolean;
 var p:byte;
 begin
    if(m<=0)then
@@ -104,8 +104,15 @@ begin
    end;
    _spch:=false;
 
+   if(check_symmetry)then
+    if(dist(x,y,map_mw-x,map_mw-y)<m)then
+    begin
+       _spch:=true;
+       exit;
+    end;
+
    for p:=0 to MaxPlayers do
-   if(dist2(x,y,map_psx[p],map_psy[p])<m)then
+   if(dist(x,y,map_psx[p],map_psy[p])<m)then
    begin
       _spch:=true;
       break;
@@ -126,7 +133,7 @@ begin
 end;
 
 procedure MSkirmishStarts;
-var ix,iy,i,u,c,bb0,bb1,dst:integer;
+var ix,iy,ixs,iys,i,u,c,bb0,bb1,dst:integer;
 begin
    for i:=0 to MaxPlayers do
    begin
@@ -239,31 +246,34 @@ gm_aslt:
          map_psy[0]:=map_hmw;
       end;
    else
-      if(map_sym)
-      then MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8))
-      else
+      ix :=abs(integer(map_seed)) mod map_mw;
+      iy :=0;
+      bb0:=base_r+(map_mw-MinSMapW) div 6;
+      bb1:=map_mw-(bb0*2);
+      dst:=(map_mw div 5)+base_r;
+
+      for i:=1 to MaxPlayers do
       begin
-         ix :=abs(integer(map_seed)) mod map_mw;
-         iy :=0;
-         bb0:=base_r+(map_mw-MinSMapW) div 6;
-         bb1:=map_mw-(bb0*2);
-         dst:=(map_mw div 5)+base_r;
-
-         for i:=1 to MaxPlayers do
+         if(map_sym)and(i>3)then break;
+         c:=0;
+         u:=dst;
+         while true do
          begin
-            c:=0;
-            u:=dst;
-            while true do
-            begin
-               ix:=bb0+_random(bb1);
-               iy:=bb0+_random(bb1);
-               c+=1;
-               if(c>500 )then u-=1;
-               if(c>1000)or(_spch(ix,iy,u)=false)then break;
-            end;
+            ix:=bb0+_random(bb1);
+            iy:=bb0+_random(bb1);
+            c+=1;
+            if(c>500 )then u-=1;
 
-            map_psx[i]:=ix;
-            map_psy[i]:=iy;
+            if(c>1000)
+            or(_spch(ix,iy,u,map_sym)=false)then break;
+         end;
+
+         map_psx[i]:=ix;
+         map_psy[i]:=iy;
+         if(map_sym)then
+         begin
+            map_psx[i+3]:=map_mw-map_psx[i];
+            map_psy[i+3]:=map_mw-map_psy[i];
          end;
       end;
    end;
@@ -315,25 +325,25 @@ begin
    end;
 end;
 
-function _checkPlace(di:byte;ix,iy:integer):boolean;
+function _checkPlace(di:byte;ix,iy,doodad_r:integer):boolean;
 begin
    _checkPlace:=false;
    if(_dnear(di,@ix,@iy))
-   or(_spch (ix,iy,base_ir))
+   or(_spch (ix,iy,doodad_r,false))
    then _checkPlace:=true
    else
-     if(map_sym)and(g_mode in [gm_aslt,gm_3fort])then
+     if(map_sym){and(g_mode in [gm_aslt,gm_3fort])}then
      begin
         ix:=map_mw-ix;
         iy:=map_mw-iy;
         if(_dnear(di,@ix,@iy))
-        or(_spch (ix,iy,base_ir))then _checkPlace:=true;
+        or(_spch (ix,iy,doodad_r,false))then _checkPlace:=true;
      end;
 end;
 
-function _trysetdd(di:byte;ix,iy:pinteger):boolean;
+function _trysetdd(di:byte;ix,iy:pinteger;doodad_r:integer):boolean;
 begin
-   if(_checkPlace(di,ix^,iy^))
+   if(_checkPlace(di,ix^,iy^,doodad_r+(DID_R[di] div 2)))
    then _trysetdd:=false
    else
    begin
@@ -343,7 +353,7 @@ begin
    end;
 end;
 
-function _PickDoodad(ix,iy,lqs,rks:pinteger):boolean;
+function _PickDoodad(ix,iy,lqs,rks:pinteger;doodad_r:integer):boolean;
 var di:byte;
 begin
    _PickDoodad:=false;
@@ -355,7 +365,7 @@ begin
     DID_LiquidR4  : if(lqs^<=0)
                     then continue
                     else
-                      if(_trysetdd(di,ix,iy))then
+                      if(_trysetdd(di,ix,iy,doodad_r))then
                       begin
                          _PickDoodad:=true;
                          lqs^-=1;
@@ -366,7 +376,7 @@ begin
     DID_BRock     : if(rks^<=0)
                     then continue
                     else
-                      if(_trysetdd(di,ix,iy))then
+                      if(_trysetdd(di,ix,iy,doodad_r))then
                       begin
                          _PickDoodad:=true;
                          rks^-=1;
@@ -374,7 +384,7 @@ begin
                       end
                       else continue;
     else
-      if(_trysetdd(di,ix,iy))then
+      if(_trysetdd(di,ix,iy,doodad_r))then
       begin
          _PickDoodad:=true;
          break;
@@ -385,7 +395,7 @@ end;
 
 procedure map_make;
 const dpostime = 400;
-var i,ix,iy,lqs,rks,ddc,cnt:integer;
+var i,ix,iy,lqs,rks,ddc,cnt,ir:integer;
 begin
    map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
@@ -422,6 +432,7 @@ begin
    end
    else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 
+   ir :=base_r+(map_mw div 100);
    ix :=map_seed;
    iy :=0;
 
@@ -433,7 +444,7 @@ begin
          ix:=_randomx(ix,map_mw);
          iy:=_randomx(iy,map_mw); //+ix*cnt
 
-         if(_PickDoodad(@ix,@iy,@lqs,@rks))then break;
+         if(_PickDoodad(@ix,@iy,@lqs,@rks,ir))then break;
 
          cnt+=1;
          if(cnt>=dpostime)then break;

@@ -165,11 +165,6 @@ begin
    ui_orders_n[i]+=1;
 end;
 
-procedure ui_counters_clear;
-begin
-
-end;
-
 procedure ui_counters(pu:PTUnit);
 var i:byte;
 begin
@@ -195,7 +190,7 @@ begin
                ui_prod_builds := ui_prod_builds+ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,c_gray);
+                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_unitrS[vid_rtui>vid_rtuish]);
             end;
 
             for i:=0 to MaxUnitProds do
@@ -213,7 +208,8 @@ begin
          if(sel)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            if(_canability(pu))or(apcc>0)then ui_uibtn_action+=1;
+            if((_ability>0)and(_canability(pu)))
+            or(apcc>0)then ui_uibtn_action+=1;
          end;
       end
       else
@@ -327,7 +323,7 @@ begin
                 end;
 
                 case uidi of
-UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,@spr_ptur,alpha);
+UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,0,@spr_ptur,alpha);
                 end;
              end
              else
@@ -347,7 +343,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
               else
                 if(buff[ub_invis]>0)then alpha:=alpha shr 1;
 
-            SpriteListAddUnit(vx,vy,depth,shadow,aura,spr,alpha);
+            SpriteListAddUnit(vx,vy,depth,shadow,ShadowColor(PlayerGetColor(playeri)),aura,spr,alpha);
          end;
       end;
    end;

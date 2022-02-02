@@ -189,10 +189,10 @@ MID_Imp        : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Cacodemon  : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantS,
-MID_Revenant   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=20 ; vstep:=d div 12; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
 MID_Mancubus   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin damage:=15 ; vstep:=d div 16; splashr :=0  ;       end;
+MID_YPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=200; vstep:=1;        splashr :=15 ;       end;
 
 MID_MBullet,
@@ -201,12 +201,12 @@ MID_Bullet     : begin damage:=8  ; vstep:=1;        splashr :=0  ;       end;
 MID_Bulletx2   : begin damage:=15 ; vstep:=1;        splashr :=0  ;       end;
 MID_BPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_BFG        : begin damage:=200; vstep:=d div 10; splashr :=125;       end;
-MID_Flyer      : begin damage:=15 ; vstep:=d div 60; splashr :=0  ;       end;
+MID_Flyer      : begin damage:=20 ; vstep:=d div 60; splashr :=0  ;       end;
 MID_HRocket    : begin damage:=200; vstep:=d div 15; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; ystep:=3;end;
-MID_Tank       : begin damage:=40 ; vstep:=1;        splashr :=rocket_sr; end;
+MID_Tank       : begin damage:=30 ; vstep:=1;        splashr :=rocket_sr; end;
 MID_StunMine   : begin damage:=1  ; vstep:=1;        splashr :=100;       end;
-MID_Mine       : begin damage:=500; vstep:=1;        splashr :=100;       end;
+MID_Mine       : begin damage:=400; vstep:=1;        splashr :=100;       end;
 MID_Blizzard   : begin damage:=500; vstep:=fr_fps;   splashr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=20 ; vstep:=1;        splashr :=0;         end;
 MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
@@ -300,7 +300,7 @@ begin
 
               /////////////////////////////////
 
-            if(not tu^.uid^._ukbuilding)then
+            if(not tu^.uid^._ukbuilding)then// not buildings
             begin
             if (    tu^.uid^._uklight)then  // light all
                 case mid of
@@ -330,27 +330,25 @@ begin
 
             if (    tu^.uid^._ukmech)then   // mech
                 case mid of
-                MID_SShot,
-                MID_SSShot      : _d50 (@damd);
-                MID_BPlasma     : _d200(@damd);
-                MID_YPlasma     : _d300(@damd);
+                MID_BPlasma,//     : _d200(@damd);
+                MID_YPlasma     : _d200(@damd);
                 end;
 
             end
             else                            // buildings
                 case mid of
+                MID_Blizzard    : _d200(@damd);
+                MID_Mine,
                 MID_Granade,
-                MID_Blizzard,
-                MID_HRocket     : _d200(@damd);
                 MID_Mancubus,
                 MID_Tank        : _d300(@damd);
                 end;
 
             if(tu^.ukfly)then               // fly all
                 case mid of
-                MID_URocket     : _d200(@damd);
                 MID_Revenant,
                 MID_RevenantS,
+                MID_URocket     : _d200(@damd);
                 MID_Flyer       : _d300(@damd);
                 end;
 

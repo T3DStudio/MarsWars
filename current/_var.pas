@@ -96,6 +96,7 @@ fps_ns            : cardinal;
 
 wtrset_enemy,
 wtrset_enemy_alive,
+wtrset_enemy_alive_light,
 wtrset_enemy_alive_ground,
 wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
@@ -106,6 +107,7 @@ wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_nbuildings,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
+wtrset_enemy_alive_bio_light,
 wtrset_enemy_alive_bio_nstun,
 wtrset_enemy_alive_nlight_bio,
 wtrset_enemy_alive_ground_nlight,
@@ -317,7 +319,8 @@ ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_muc            : array[false..true] of cardinal; // unit max count color
 ui_limit          : array[false..true] of cardinal; // unit limit colors
-ui_unitr          : array[false..true] of cardinal;
+ui_unitrR         : array[false..true] of cardinal;
+ui_unitrS         : array[false..true] of cardinal;
 
 ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
@@ -332,7 +335,7 @@ ui_energx         : integer = 0;
 ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
-ui_game_log_height:integer = 0;
+ui_game_log_height: integer = 0;
 
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
@@ -957,12 +960,13 @@ snd_inapc,
 snd_teleport,
 snd_pexp,
 snd_exp,
-snd_hpower
+snd_hpower,
+snd_hell
 {
 ,
 ,
 
-snd_hellbar,
+,
 snd_hell,
  }       : PTSoundSet;
 

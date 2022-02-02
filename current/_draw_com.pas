@@ -1,4 +1,10 @@
-
+function ShadowColor(c:cardinal):cardinal;
+begin
+   ShadowColor:=128 +
+   (((c and $FF000000) shr 26) shl 24) +
+   (((c and $00FF0000) shr 18) shl 16) +
+   (((c and $0000FF00) shr 10) shl 8 );
+end;
 
 procedure _draw_texture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
@@ -160,7 +166,7 @@ begin
    if(g_show_positions)or(g_mode in [gm_inv,gm_2fort,gm_3fort])then map_dstarts;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
-  // vid_menu_redraw:=true;
+   vid_menu_redraw:=vid_menu_redraw or _menu;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string);

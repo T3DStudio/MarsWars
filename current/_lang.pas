@@ -17,9 +17,63 @@ SDLK_RShift         : GetKeyName:='Shift';
    end
 end;
 
+function _gHK(ucl:byte):shortstring;
+begin
+   _gHK:='';
+   if(ucl<=_mhkeys)then
+    if(_hotkey1[ucl]>0)then
+    begin
+       if(_hotkey2[ucl]>0)then
+       _gHK:=     #18+GetKeyName(_hotkey2[ucl])+#25+'+';
+       _gHK:=_gHK+#18+GetKeyName(_hotkey1[ucl])+#25;
+    end;
+end;
+
+function _gHKA(ucl:byte):shortstring;
+begin
+   _gHKA:='';
+   if(ucl<=_mhkeys)then
+    if(_hotkeyA[ucl]>0)then
+    begin
+       if(_hotkeyA2[ucl]>0)then
+       _gHKA:=      #18+GetKeyName(_hotkeyA2[ucl])+#25+'+';
+       _gHKA:=_gHKA+#18+GetKeyName(_hotkeyA [ucl])+#25;
+    end;
+end;
+function _gHKR(ucl:byte):shortstring;
+begin
+   _gHKR:='';
+   if(ucl<=_mhkeys)then
+    if(_hotkeyR[ucl]>0)then
+    begin
+       if(_hotkeyR2[ucl]>0)then
+       _gHKR:=      #18+GetKeyName(_hotkeyR2[ucl])+#25+'+';
+       _gHKR:=_gHKR+#18+GetKeyName(_hotkeyR [ucl])+#25;
+    end;
+end;
+
 procedure _mkHStrXY(tab,i,x,y:byte;STR:shortstring);
 begin
    if(i=255)then i:=(y div 3)+x;
+   str_hint[tab,r_hell,i]:=STR;
+   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
+end;
+
+procedure _mkHStrXYHKA(tab,i,x,y:byte;STR:shortstring);
+var HK:shortstring;
+begin
+   if(i=255)then i:=(y div 3)+x;
+   HK:=_gHKA(i);
+   if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
+   str_hint[tab,r_hell,i]:=STR;
+   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
+end;
+procedure _mkHStrXYHKR(tab,i,x,y:byte;STR:shortstring);
+var HK:shortstring;
+begin
+   if(i=255)then i:=(y div 3)+x;
+   HK:=_gHKR(i);
+   if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
    str_hint[tab,r_hell,i]:=STR;
    str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
 end;
@@ -42,18 +96,7 @@ begin
    end;
 end;
 
-function _gHK(ucl:byte):shortstring;
-begin
-   _gHK:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkey1[ucl]>0)then
-    begin
-       if(_hotkey2[ucl]>0)then
-       _gHK:=     #18+GetKeyName(_hotkey2[ucl])+#25+'+';
 
-       _gHK:=_gHK+#18+GetKeyName(_hotkey1[ucl])+#25;
-    end;
-end;
 
 procedure _addstr(s:pshortstring;ad:shortstring);
 begin
@@ -114,9 +157,9 @@ begin
 
          un_txt_hint:= un_txt_name;
          if(length(HK  )>0)then un_txt_hint:=un_txt_hint+' ('+HK+')';
-         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#16+TIME+#25+']';
+         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#22+TIME+#25+']';
          if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
-         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#15+LMT +#25+'>';
+         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#16+LMT +#25+'>';
          un_txt_hint:=un_txt_hint+#11+un_txt_descr+#11;
          if(length(REQ )>0)then un_txt_hint:= un_txt_hint+#17+str_req+#25+REQ+#11 else un_txt_hint:= un_txt_hint+#11;
          if(length(PROD)>0)then
@@ -145,9 +188,9 @@ begin
 
       _up_hint:=_up_name;
       if(length(HK  )>0)then _up_hint:=_up_hint+' ('+HK+')';
-      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#16+TIME+#25+']';
+      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#22+TIME+#25+']';
       if(length(ENRG)>0)then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
-      _up_hint:=_up_hint+' x'+#17+i2s(_up_max)+#25;
+      _up_hint:=_up_hint+' x'+#16+i2s(_up_max)+#25;
       if(_up_mfrg)then _up_hint:=_up_hint+#15+' *'+#25;
       _up_hint:=_up_hint+#11+_up_descr+#11;
       if(length(REQ)>0)then _up_hint:=_up_hint+#17+str_req+#25+REQ;
@@ -325,8 +368,6 @@ begin
 
    str_hint_army         := 'Army: ';
    str_hint_energy       := 'Energy: ';
-   //str_hint_a[0]         := 'Energy ('+#19+'free'+#25+' / max)';
-   //str_hint_a[1]         := 'Army (units + buildings)';
 
    str_hint_m[0]         := 'Menu (' +#18+'Esc'+#25+')';
    str_hint_m[2]         := 'Pause ('+#18+'Pause/Break'+#25+')';
@@ -335,7 +376,7 @@ begin
    _mkHStrUid(UID_HKeep         ,'Hell Keep'          ,'Builder. Generates energy.'   );
    _mkHStrUid(UID_HGate         ,'Hell Gate'          ,'Summons units.'               );
    _mkHStrUid(UID_HSymbol       ,'Hell Symbol'        ,'Increase energy level.'       );
-   _mkHStrUid(UID_HSymbol       ,'Hell Great Symbol'  ,'Increase energy level.'       );
+   _mkHStrUid(UID_HASymbol      ,'Hell Great Symbol'  ,'Increase energy level.'       );
    _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Researches and upgrades.'     );
    _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
    _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );
@@ -456,36 +497,40 @@ begin
    _mkHStrUpid(upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
    _mkHStrUpid(upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'      ); }
 
-   t:='ignore enemies';
-   _mkHStrXY(3,0 ,0,0,'Move, '  +t+' ('    +#18+'Q'     +#25+')');
-   _mkHStrXY(3,1 ,0,0,'Stop, '  +t+' ('    +#18+'W'     +#25+')');
-   _mkHStrXY(3,2 ,0,0,'Patrol, '+t+' ('    +#18+'E'     +#25+')');
-   t:='attack enemies';
-   _mkHStrXY(3,3 ,0,0,'Move, '  +t+' ('    +#18+'A'     +#25+')');
-   _mkHStrXY(3,4 ,0,0,'Stop, '  +t+' ('    +#18+'S'     +#25+')');
-   _mkHStrXY(3,5 ,0,0,'Patrol, '+t+' ('    +#18+'D'     +#25+')');
-   _mkHStrXY(3,6 ,0,0,'Action ('           +#18+'Z'     +#25+')');
-   _mkHStrXY(3,7 ,0,0,str_maction+ ' ('    +#18+'M'     +#25+')');
-   _mkHStrXY(3,8 ,0,0,'Cancel production ('+#18+'C'     +#25+')');
-   _mkHStrXY(3,9 ,0,0,'Action at point ('  +#18+'X'     +#25+')');
-   _mkHStrXY(3,10,0,0,'Select all units (' +#18+'F2'    +#25+')');
-   _mkHStrXY(3,11,0,0,'Destroy ('          +#18+'Delete'+#25+')');
+   _mkHStrXYHKA(3,0 ,0,0,'Action'         );
+   _mkHStrXYHKA(3,1 ,0,0,'Action at point');
+   _mkHStrXYHKA(3,2 ,0,0,str_maction      );
 
-   _mkHStrXY(3,12,0,0,'Faster game speed ('           +#18+'Q'+#25+')');
+   t:='attack enemies';
+   _mkHStrXYHKA(3,3 ,0,0,'Move, '  +t);
+   _mkHStrXYHKA(3,4 ,0,0,'Stop, '  +t);
+   _mkHStrXYHKA(3,5 ,0,0,'Patrol, '+t);
+
+   t:='ignore enemies';
+   _mkHStrXYHKA(3,6 ,0,0,'Move, '  +t);
+   _mkHStrXYHKA(3,7 ,0,0,'Stop, '  +t);
+   _mkHStrXYHKA(3,8 ,0,0,'Patrol, '+t);
+
+   _mkHStrXYHKA(3,9 ,0,0,'Cancel production');
+   _mkHStrXYHKA(3,10,0,0,'Select all units' );
+   _mkHStrXYHKA(3,11,0,0,'Destroy'          );
+
+
+   _mkHStrXYHKR(3,12,0,0,'Faster game speed');
    _mkHStrXY(3,13,0,0,'Left click: skip 2 seconds ('                     +#18+'W'+#25+')'+#11+
                       'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
                       'Skip 1 minute ('               +#18+'Alt' +#25+'+'+#18+'W'+#25+')' );
-   _mkHStrXY(3,14,0,0,'Pause ('                       +#18+'E'+#25+')');
-   _mkHStrXY(3,15,0,0,'Player POV ('                  +#18+'A'+#25+')');
-   _mkHStrXY(3,16,0,0,'List of game messages ('       +#18+'S'+#25+')');
-   _mkHStrXY(3,17,0,0,'Fog of war ('                  +#18+'D'+#25+')');
-   _mkHStrXY(3,20,0,0,'All players ('                 +#18+'C'+#25+')');
-   _mkHStrXY(3,21,0,0,'Red player [#1] ('             +#18+'R'+#25+')');
-   _mkHStrXY(3,22,0,0,'Orange player [#2] ('          +#18+'T'+#25+')');
-   _mkHStrXY(3,23,0,0,'Yellow player [#3] ('          +#18+'Y'+#25+')');
-   _mkHStrXY(3,24,0,0,'Green player [#4] ('           +#18+'F'+#25+')');
-   _mkHStrXY(3,25,0,0,'Aqua player [#5] ('            +#18+'G'+#25+')');
-   _mkHStrXY(3,26,0,0,'Blue player [#6] ('            +#18+'H'+#25+')');
+   _mkHStrXYHKR(3,14,0,0,'Pause'                );
+   _mkHStrXYHKR(3,15,0,0,'Player POV'           );
+   _mkHStrXYHKR(3,16,0,0,'List of game messages');
+   _mkHStrXYHKR(3,17,0,0,'Fog of war'        );
+   _mkHStrXYHKR(3,20,0,0,'All players'       );
+   _mkHStrXYHKR(3,21,0,0,'Red player [#1]'   );
+   _mkHStrXYHKR(3,22,0,0,'Orange player [#2]');
+   _mkHStrXYHKR(3,23,0,0,'Yellow player [#3]');
+   _mkHStrXYHKR(3,24,0,0,'Green player [#4]' );
+   _mkHStrXYHKR(3,25,0,0,'Aqua player [#5]'  );
+   _mkHStrXYHKR(3,26,0,0,'Blue player [#6]'  );
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -741,8 +786,6 @@ begin
 
   str_hint_army         := 'Армия: ';
   str_hint_energy       := 'Энергия: ';
-//  str_hint_a[0]         := 'Энергия (свободная / максимальная)';
-//  str_hint_a[1]         := 'Армия (юниты и здания)';
 
   _mkHStrUid(UID_HKeep         ,'Адская Крепость' ,'Строит базу. Увеличивает энергию.'     );
   _mkHStrUid(UID_HGate         ,'Адские Врата'    ,'Призывает юнитов.'                     );
@@ -839,20 +882,25 @@ begin
   _mkHStrUpid(upgr_bldenrg ,'Встроенный генератор'       ,'Дополнительна энергия для Командного Центра.'             );
   _mkHStrUpid(upgr_9bld    ,'Улучшение АЭС'              ,'Уменьшение времени парезарядки АЭС.'                      );  }
 
-  t:='игнорировать врагов';
-  _mkHStrXY(3,0 ,0,0,'Двигаться, '    +t+' ('+#18+'Q'     +#25+')');
-  _mkHStrXY(3,1 ,0,0,'Стоять, '       +t+' ('+#18+'W'     +#25+')');
-  _mkHStrXY(3,2 ,0,0,'Патрулировать, '+t+' ('+#18+'E'     +#25+')');
+  _mkHStrXYHKA(3,0 ,0,0,'Действие'        );
+  _mkHStrXYHKA(3,1 ,0,0,'Действие в точке');
+  _mkHStrXYHKA(3,2 ,0,0,str_maction       );
+
   t:='атаковать врагов';
-  _mkHStrXY(3,3 ,0,0,'Двигаться, '    +t+' ('+#18+'A'     +#25+')');
-  _mkHStrXY(3,4 ,0,0,'Стоять, '       +t+' ('+#18+'S'     +#25+')');
-  _mkHStrXY(3,5 ,0,0,'Патрулировать, '+t+' ('+#18+'D'     +#25+')');
-  _mkHStrXY(3,6 ,0,0,'Действие ('            +#18+'Z'     +#25+')');
-  _mkHStrXY(3,7 ,0,0,str_maction+       ' (' +#18+'M'     +#25+')');
-  _mkHStrXY(3,8 ,0,0,'Отмена производства (' +#18+'C'     +#25+')');
-  _mkHStrXY(3,9 ,0,0,'Действие в точке ('    +#18+'X'     +#25+')');
-  _mkHStrXY(3,10,0,0,'Выбрать всех юнитов (' +#18+'F2'    +#25+')');
-  _mkHStrXY(3,11,0,0,'Уничтожить ('          +#18+'Delete'+#25+')');
+  _mkHStrXYHKA(3,3 ,0,0,'Двигаться, '    +t);
+  _mkHStrXYHKA(3,4 ,0,0,'Стоять, '       +t);
+  _mkHStrXYHKA(3,5 ,0,0,'Патрулировать, '+t);
+
+  t:='игнорировать врагов';
+  _mkHStrXYHKA(3,6 ,0,0,'Двигаться, '    +t);
+  _mkHStrXYHKA(3,7 ,0,0,'Стоять, '       +t);
+  _mkHStrXYHKA(3,8 ,0,0,'Патрулировать, '+t);
+
+  _mkHStrXYHKA(3,9 ,0,0,'Отмена производства');
+  _mkHStrXYHKA(3,10,0,0,'Выбрать всех боевых незанятых юнитов' );
+  _mkHStrXYHKA(3,11,0,0,'Уничтожить'         );
+
+
 
   _mkHStrXY(3,12,0,0,'Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')');
   _mkHStrXY(3,13,0,0,'Левый клик: пропустить 2 секунды ('                         +#18+'W'+#25+')'+#11+

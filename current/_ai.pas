@@ -1,3 +1,10 @@
+
+
+procedure ai_clear_vars;
+begin
+
+end;
+
 {
 const ucl_com = 0;
       ucl_gen = 1;
