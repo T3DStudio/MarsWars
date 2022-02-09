@@ -336,11 +336,22 @@ usel_max : integer;
 psel     : boolean;
 pu       : PTUnit;
 begin
+   _last_prod_type:= 0;
+   _last_prod_uid := 0;
+   _last_prod_cndt:= 0;
+
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
+      //prod_cndt:=0;
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1),pl);
+uo_build    : if(0<o_x1)and(o_x1<=255)then begin _last_prod_type:=glcp_unit;_last_prod_uid:=byte(o_x1);end;
+co_suprod   : if(0<o_y0)and(o_y0<=255)then begin _last_prod_type:=glcp_unit;_last_prod_uid:=byte(o_y0);end;
+co_supgrade : if(0<o_y0)and(o_y0<=255)then begin _last_prod_type:=glcp_upgr;_last_prod_uid:=byte(o_y0);end;
+      end;
+
+      case o_id of
+uo_build   : if(0<o_x1)and(o_x1<=255)then _last_prod_cndt:=_unit_start_build(o_x0,o_y0,byte(o_x1),pl);
       else
          usel_n  :=0;
          usel_max:=MaxPlayerUnits;
@@ -366,7 +377,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
 
          while(_su<>_eu)do
          begin
-            pu:=@_units[_su];
+            pu:=_punits[_su];
             with pu^ do
             with uid^ do
              if(hits>0)and(not _IsUnitRange(inapc,nil))and(pl=playeri)then
@@ -396,10 +407,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
 
                 if(o_id=uo_corder)then
                  case o_x0 of
-                 co_supgrade : if(s_smiths  =0)and(_unit_supgrade (pu,o_y0))then break;   // start upgr
-                 co_cupgrade : if(s_smiths  =0)and(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
-                 co_suprod   : if(s_barracks=0)and(_unit_straining(pu,o_y0))then break;   // start training
-                 co_cuprod   : if(s_barracks=0)and(_unit_ctraining(pu,o_y0))then break;   // cancle training
+                 co_supgrade : if(s_smiths  =0)then if(_unit_supgrade (pu,o_y0))then break;   // start  upgr
+                 co_cupgrade : if(s_smiths  =0)then if(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
+                 co_suprod   : if(s_barracks=0)then if(_unit_straining(pu,o_y0))then break;   // start  training
+                 co_cuprod   : if(s_barracks=0)then if(_unit_ctraining(pu,o_y0))then break;   // cancle training
                  end;
 
                 if(sel)then
@@ -434,6 +445,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _unit_start_build(o_x0,o_y0,byte(o_x1)
 
       o_id:=0;
    end;
+
+   //GameLogCantProduction(HPlayer,byte(o_x1),glcp_unit,uid,false);
 end;
 
 procedure GameEndConditions;

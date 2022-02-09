@@ -515,7 +515,7 @@ begin
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
-   setWeaponESND(1,nil,snd_shotgun,0,0);
+   setWeaponESND(3,nil,snd_shotgun,0,0);
 end;
 UID_Commando:
 begin

@@ -140,6 +140,8 @@ end;
 
 {$ENDIF}
 
+
+
 function _UnderObstacle(ux,uy:integer):boolean;
 begin
    _UnderObstacle:=pf_get_area(ux div pf_pathmap_w,uy div pf_pathmap_w)=pf_solid;
@@ -155,8 +157,7 @@ begin
     begin
        _canmove:=false;
 
-       //or(buff[ub_stop]>0)
-       if(speed<=0)or(bld=false)then exit;
+       if(speed<=0)or(bld=false)or(a_rld>0)then exit;
 
        if(_ukmech)then
        begin
@@ -220,19 +221,6 @@ begin;
    end;
 end;
 
-procedure _unit_asapc(pu,apc:PTUnit);
-begin
-   pu^.x:=apc^.x;
-   pu^.y:=apc^.y;
-   {$IFDEF _FULLGAME}
-   pu^.fx :=apc^.fx;
-   pu^.fy :=apc^.fy;
-   pu^.mmx:=apc^.mmx;
-   pu^.mmy:=apc^.mmy;
-   {$ENDIF}
-
-end;
-
 procedure _unit_clear_order(pu:PTUnit;clearid:boolean);
 begin
    with pu^ do
@@ -247,7 +235,7 @@ begin
 end;
 
 procedure _teleport_rld(tu:PTUnit;ur:integer);
-const hpart = 4;
+const hpart = 3;
 begin
    with tu^ do
     with player^ do rld:=max2( fr_fps , fr_3fps+(ur div hpart)*mm3(1,hpart-upgr[upgr_hell_teleport],hpart) );
@@ -312,16 +300,6 @@ begin
        vy  +=(y-vy) div vstp;
        vstp-=1;
     end;
-end;
-
-
-procedure _unit_turn(pu:PTUnit);
-begin
-   with pu^ do
-    if(uid^._slowturn=false)then
-     if(x<>uo_x)or(y<>uo_y)then
-      if(_canmove(pu))then
-       dir:=p_dir(x,y,uo_x,uo_y);
 end;
 
 function _unit_ability_uradar(pu:PTUnit;x0,y0:integer):boolean;
@@ -549,11 +527,15 @@ end;
 
 procedure _building_newplace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
 var
+aukfly  :boolean;
 dx,dy,o,
-u,sr,dr  : integer;
+u,sr,dr :integer;
 begin
    with _uids[buid] do
-   _push_out(tx,ty,_r,@tx,@ty,_ukfly,true);
+   begin
+      aukfly:=_ukfly;
+      _push_out(tx,ty,_r,@tx,@ty,aukfly,true);
+   end;
 
    dx:=-2000;
    dy:=-2000;
@@ -562,19 +544,18 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=_uids[buid]._ukfly)and(bld)and(playeri=pl)then
-       if(isbuildarea)and(buid in ups_builder)then
-        if(not _IsUnitRange(inapc,nil))then
-        begin
-           o:=dist(x,y,tx,ty)-srange;
-           if(o<dr)then
-           begin
-              dx:=x;
-              dy:=y;
-              dr:=o;
-              sr:=srange;
-           end;
-        end;
+      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(bld)and(playeri=pl)and(isbuildarea)then
+       if(buid in ups_builder)and(not _IsUnitRange(inapc,nil))then
+       begin
+          o:=dist(x,y,tx,ty)-srange;
+          if(o<dr)then
+          begin
+             dx:=x;
+             dy:=y;
+             dr:=o;
+             sr:=srange;
+          end;
+       end;
 
    if(dr<32000)then
    begin
@@ -585,10 +566,6 @@ begin
 
    tx:=mm3(map_b0,tx,map_b1);
    ty:=mm3(map_b0,ty,map_b1);
-   {$IFDEF _FULLGAME}
-   tx:=mm3(vid_cam_x,tx,vid_cam_x+vid_cam_w);
-   ty:=mm3(vid_cam_y,ty,vid_cam_y+vid_cam_h);
-   {$ENDIF}
    newx^:=tx;
    newy^:=ty;
 end;
@@ -666,15 +643,13 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(bld)and(isbuildarea)and(_IsUnitRange(inapc,nil)=false)and(playeri=pl)then
-       if(buid in ups_builder)then
-       begin
-          if(dist(x,y,tx,ty)<srange)then
-          begin
-             _InBuildArea:=0; // inside build area
-             break;
-          end;
-       end;
+      if(hits>0)and(bld)and(isbuildarea)and(playeri=pl)then
+       if(buid in ups_builder)and(_IsUnitRange(inapc,nil)=false)then
+        if(dist(x,y,tx,ty)<srange)then
+        begin
+           _InBuildArea:=0; // inside build area
+           break;
+        end;
 end;
 
 function _CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte;obstacles:boolean):byte;
@@ -875,7 +850,7 @@ begin
          hits  := 1;
          cenerg-=_renerg;
          {$IFDEF _FULLGAME}
-         SoundPlayAnoncer(snd_build_place[_urace],false);
+         if(playeri=HPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false);
          {$ENDIF}
       end;
 
@@ -948,12 +923,15 @@ begin
    end;
 end;
 
-procedure _unit_start_build(bx,by:integer;buid,bp:byte);
+function _unit_start_build(bx,by:integer;buid,bp:byte):cardinal;
 begin
-   if(_uid_conditionals(@_players[bp],buid)=0)then
+   _unit_start_build:=_uid_conditionals(@_players[bp],buid);
+   if(_unit_start_build=0)then
     with _players[bp] do
-     if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)then
-      _unit_add(bx,by,buid,bp,false,false,false);
+     if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)
+     then _unit_add(bx,by,buid,bp,false,false,false)
+     else _unit_start_build:=ureq_place;
+   _last_prod_cndt:=_unit_start_build;
 end;
 
 

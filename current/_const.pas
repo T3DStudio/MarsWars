@@ -120,20 +120,24 @@ lmt_chat3              = 3;
 lmt_chat4              = 4;
 lmt_chat5              = 5;
 lmt_chat6              = 6; }
-lmt_game               = 10;
-lmt_endgame            = 11;
-lmt_defeated           = 12;
-lmt_unit               = 13;
-lmt_advanced           = 14;
-lmt_upgrade            = 15;
-lmt_player_leave       = 16;
-lmt_nenergy            = 17;
-lmt_prodreq            = 18;
-lmt_ccommand           = 19;
-lmt_chat               = 255;
+lmt_game_message       = 10;
+lmt_game_end           = 11;
+lmt_player_defeated    = 12;
+lmt_player_leave       = 13;
+lmt_cant_build         = 14;
+lmt_unit_ready         = 15;
+lmt_unit_advanced      = 16;
+lmt_upgrade_complete   = 17;
+lmt_req_energy         = 18;
+lmt_req_common         = 19;
+lmt_req_ruids          = 20;
+lmt_player_chat        = 255;
 
-lmts_menu_chat         = [0..MaxPlayers,lmt_game,lmt_endgame,lmt_defeated,lmt_player_leave,lmt_chat];
+lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
 lmts_last_messages     = [0..255];
+
+glcp_unit              = 0;
+glcp_upgr              = 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -156,9 +160,9 @@ ns_clnt                = 2;
 nmid_lobby_info        = 3;
 nmid_connect           = 4;
 nmid_client_info       = 5;
-nmid_log_chat              = 6;
+nmid_log_chat          = 6;
 nmid_chatclupd         = 7;
-nmid_snapshot              = 8;
+nmid_snapshot          = 8;
 nmid_pause             = 9;
 nmid_server_full       = 10;
 nmid_wrong_ver         = 11;
@@ -192,19 +196,20 @@ uo_addorder            = 10;
 //  UNIT & UPGRADES REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = 1;
-ureq_ruid              : cardinal = 1 shl 1;
-ureq_rupid             : cardinal = 1 shl 2;
-ureq_energy            : cardinal = 1 shl 3;
-ureq_time              : cardinal = 1 shl 4;
-ureq_addon             : cardinal = 1 shl 5;
-ureq_max               : cardinal = 1 shl 6;
-ureq_builders          : cardinal = 1 shl 7;
-ureq_bld_r             : cardinal = 1 shl 8;
-ureq_barracks          : cardinal = 1 shl 9;
-ureq_smiths            : cardinal = 1 shl 10;
-ureq_product           : cardinal = 1 shl 11;
-ureq_armylimit         : cardinal = 1 shl 12;
+ureq_unitlimit         : cardinal = %0000000000000001;
+ureq_ruid              : cardinal = %0000000000000010;
+ureq_rupid             : cardinal = %0000000000000100;
+ureq_energy            : cardinal = %0000000000001000;
+ureq_time              : cardinal = %0000000000010000;
+ureq_addon             : cardinal = %0000000000100000;
+ureq_max               : cardinal = %0000000001000000;
+ureq_builders          : cardinal = %0000000010000000;
+ureq_bld_r             : cardinal = %0000000100000000;
+ureq_barracks          : cardinal = %0000001000000000;
+ureq_smiths            : cardinal = %0000010000000000;
+ureq_product           : cardinal = %0000100000000000;
+ureq_armylimit         : cardinal = %0001000000000000;
+ureq_place             : cardinal = %0010000000000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -258,15 +263,15 @@ atm_inapc              = 4;   // can attack only when in apc
 //
 
 wpr_any                : cardinal =  0;
-wpr_adv                : cardinal =  1;
-wpr_nadv               : cardinal =  1 shl 1;
-wpr_zombie             : cardinal =  1 shl 2;
-wpr_sspos              : cardinal =  1 shl 3; // launch missile in unit position
-wpr_tvis               : cardinal =  1 shl 4;
-wpr_suicide            : cardinal =  1 shl 5;
-wpr_ground             : cardinal =  1 shl 6;
-wpr_air                : cardinal =  1 shl 7;
-wpr_move               : cardinal =  1 shl 8;
+wpr_adv                : cardinal =  %0000000000000001;
+wpr_nadv               : cardinal =  %0000000000000010;
+wpr_zombie             : cardinal =  %0000000000000100;
+wpr_sspos              : cardinal =  %0000000000001000; // launch missile in unit position
+wpr_tvis               : cardinal =  %0000000000010000;
+wpr_suicide            : cardinal =  %0000000000100000;
+wpr_ground             : cardinal =  %0000000001000000;
+wpr_air                : cardinal =  %0000000010000000;
+wpr_move               : cardinal =  %0000000100000000;
 
 aw_fsr0                = 15000;
 
@@ -392,7 +397,7 @@ ub_pain                = 1;
 ub_stun                = 2;
 ub_resur               = 3;
 ub_cast                = 4;
-ub_stop                = 5;
+//ub_stop                = 5;
 ub_slooow              = 6;
 ub_clcast              = 7;
 ub_invis               = 8;
@@ -411,11 +416,11 @@ b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 //  OBSTACLES
 //
 
-MaxDoodads             = 500;
+MaxDoodads             = 600;
 
 //
 ddc_div                = 1000000;
-ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div; // 49
+ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div; // 36
 
 // doodads cell
 dcw                    = 200;
@@ -582,7 +587,7 @@ UID_LostSoul           = 15;
 UID_Imp                = 16;
 UID_Demon              = 17;
 UID_Cacodemon          = 18;
-UID_Baron              = 19;
+UID_Knight             = 19;
 UID_Cyberdemon         = 20;
 UID_Mastermind         = 21;
 UID_Pain               = 22;
@@ -646,7 +651,7 @@ uids_uac               = [41..80];
 
 marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
 zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
-arch_res               = [UID_Imp..UID_Baron,UID_Revenant..UID_Arachnotron]+zimbas;
+arch_res               = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 
 coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];

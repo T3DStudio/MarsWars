@@ -1,5 +1,8 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
+procedure ai_clear_vars;forward;
+procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
+procedure ai_code(pu:PTUnit);forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _UnderObstacle(ux,uy:integer):boolean; forward;
@@ -33,6 +36,9 @@ begin
    then _str_mx:='-'
    else _str_mx:='x'+b2s(x);
 end;
+
+function cf(c,f:pcardinal):boolean;  // check flag
+begin cf:=(c^ and f^)>0;end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -121,12 +127,12 @@ end;
 procedure GameLogEndGame(wteam:byte);
 begin
    if(ServerSide=false)then exit;
-   PlayersAddLog(0,log_to_all,lmt_endgame,chr(wteam),false);
+   PlayersAddLog(0,log_to_all,lmt_game_end,chr(wteam),false);
 end;
 procedure GameLogPlayerDefeated(pl:byte);
 begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddLog(pl,log_to_all,lmt_defeated,chr(pl),false);
+   PlayersAddLog(pl,log_to_all,lmt_player_defeated,chr(pl),false);
 end;
 procedure GameLogPlayerLeave(pl:byte);
 begin
@@ -136,20 +142,35 @@ end;
 procedure GameLogUnitReady(pl,uid:byte;advanced:boolean);
 begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddLog(pl,pl,lmt_unit,chr(uid)+chr(byte(advanced)),false);
+   PlayersAddLog(pl,0,lmt_unit_ready,chr(uid)+chr(byte(advanced)),false);
 end;
 procedure GameLogUnitPromoted(pl,uid:byte);
 begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddLog(pl,pl,lmt_advanced,chr(uid),false);
+   PlayersAddLog(pl,0,lmt_unit_advanced,chr(uid),false);
 end;
 procedure GameLogAddUpgrade(pl,upid:byte);
 begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddLog(pl,pl,lmt_upgrade,chr(upid),false);
+   PlayersAddLog(pl,0,lmt_upgrade_complete,chr(upid),false);
 end;
+procedure GameLogCantProduction(pl,uid:byte;utp:byte;condt:cardinal;local:boolean);
+var bt:byte;
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)or(condt=0)then exit;
 
+   if(cf(@condt,@ureq_place))
+   then bt:=lmt_cant_build
+   else
+     if(cf(@condt,@ureq_ruid))or(cf(@condt,@ureq_rupid))
+     then bt:=lmt_req_ruids
+     else
+      if(condt=ureq_energy)
+      then bt:=lmt_req_energy
+      else bt:=lmt_req_common;
 
+   PlayersAddLog(pl,0,bt,chr(utp)+chr(uid),local);
+end;
 
 procedure PlayerClearLog(pn:byte);
 begin
@@ -244,9 +265,6 @@ begin
         g_cl_units+=MaxPlayerUnits;
      end;
 end;
-
-function cf(c,f:pcardinal):boolean;  // check flag
-begin cf:=(c^ and f^)>0;end;
 
 function sign(x:integer):integer;
 begin
@@ -450,7 +468,7 @@ begin
       setr(ureq_time   , _up_time<=0                           );
       setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
       setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));
-      setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)      );
+      setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)     );
       setr(ureq_smiths , n_smiths<=0                           );
    end;
 end;
@@ -681,44 +699,61 @@ begin
    ParseLogMessage:='';
    mcolor^:=c_white;
    case mtype of
-0..MaxPlayers    : begin
-                      mcolor^:=PlayerGetColor(mtype);
-                      ParseLogMessage:=_players[mtype].name+': '+mstr^;
-                   end;
-lmt_chat,
-lmt_game         : ParseLogMessage:=mstr^;
-lmt_player_leave : if(length(mstr^)>1)then
-                    if(ord(mstr^[1])<=MaxPlayers)then ParseLogMessage:=_players[ord(mstr^[1])].name+str_plout;
-lmt_endgame      : if(length(mstr^)>1)then
-                    if(ord(mstr^[1])<=MaxPlayers)then
-                     if(ord(mstr^[1])=_players[HPlayer].team)
-                     then ParseLogMessage:=str_win
-                     else ParseLogMessage:=str_lose;
-lmt_defeated     : if(length(mstr^)>1)then
-                    if(ord(mstr^[1])<=MaxPlayers)then
-                     if(ord(mstr^[1])<>HPlayer)
-                     then ParseLogMessage:=_players[ord(mstr^[1])].name+str_player_def;
-lmt_upgrade      : begin
-                   ParseLogMessage:=str_upgrade_complete;
-                   if(length(mstr^)>0)then ParseLogMessage:=ParseLogMessage+' ('+_upids[ord(mstr^[1])]._up_name+')';
-                   end;
-lmt_unit         : if(length(mstr^)>1)then
-                    with _uids[ord(mstr^[1])] do
-                     if(mstr^[2]=#0)then
-                       if(_ukbuilding)
-                       then ParseLogMessage:=str_building_complete+' ('+_uids[ord(mstr^[1])].un_txt_name+')'
-                       else ParseLogMessage:=str_unit_complete    +' ('+_uids[ord(mstr^[1])].un_txt_name+')'
-                     else
-                       if(_ukbuilding)
-                       then ParseLogMessage:=str_building_complete+' ('+str_advanced+_uids[ord(mstr^[1])].un_txt_name+')'
-                       else ParseLogMessage:=str_unit_complete    +' ('+str_advanced+_uids[ord(mstr^[1])].un_txt_name+')';
-lmt_advanced     : if(length(mstr^)>0)then
-                    with _uids[ord(mstr^[1])] do
-                     ParseLogMessage:=str_unit_advanced+' ('+_uids[ord(mstr^[1])].un_txt_name+')';
+0..MaxPlayers        : begin
+                          mcolor^:=PlayerGetColor(mtype);
+                          ParseLogMessage:=_players[mtype].name+': '+mstr^;
+                       end;
+lmt_req_ruids,
+lmt_req_common,
+lmt_req_energy,
+lmt_cant_build       : begin
+                          case mtype of
+                          lmt_req_ruids : ParseLogMessage:=str_check_reqs;
+                          lmt_req_common: ParseLogMessage:=str_cant_prod;
+                          lmt_req_energy: ParseLogMessage:=str_need_energy;
+                          lmt_cant_build: ParseLogMessage:=str_cant_build;
+                          end;
+                          if(length(mstr^)=2)then
+                           if(mstr^[2]>#0)then
+                            case ord(mstr^[1]) of
+                            glcp_unit : ParseLogMessage:=ParseLogMessage+' ('+_uids [ord(mstr^[2])].un_txt_name+')';
+                            glcp_upgr : ParseLogMessage:=ParseLogMessage+' ('+_upids[ord(mstr^[2])]._up_name   +')';
+                            end;
+                       end;
+lmt_player_chat,
+lmt_game_message     : ParseLogMessage:=mstr^;
+lmt_player_leave     : if(length(mstr^)=1)then
+                        if(ord(mstr^[1])<=MaxPlayers)then ParseLogMessage:=_players[ord(mstr^[1])].name+str_plout;
+lmt_game_end         : if(length(mstr^)=1)then
+                        if(ord(mstr^[1])<=MaxPlayers)then
+                         if(ord(mstr^[1])=_players[HPlayer].team)
+                         then ParseLogMessage:=str_win
+                         else ParseLogMessage:=str_lose;
+lmt_player_defeated  : if(length(mstr^)=1)then
+                        if(ord(mstr^[1])<=MaxPlayers)then
+                         if(ord(mstr^[1])<>HPlayer)
+                         then ParseLogMessage:=_players[ord(mstr^[1])].name+str_player_def;
+lmt_upgrade_complete : begin
+                          ParseLogMessage:=str_upgrade_complete;
+                          if(length(mstr^)=1)then ParseLogMessage:=ParseLogMessage+' ('+_upids[ord(mstr^[1])]._up_name+')';
+                       end;
+lmt_unit_ready       : if(length(mstr^)=2)then
+                        with _uids[ord(mstr^[1])] do
+                         if(mstr^[2]=#0)then
+                          if(_ukbuilding)
+                          then ParseLogMessage:=str_building_complete+' ('+_uids[ord(mstr^[1])].un_txt_name+')'
+                          else ParseLogMessage:=str_unit_complete    +' ('+_uids[ord(mstr^[1])].un_txt_name+')'
+                         else
+                          if(_ukbuilding)
+                          then ParseLogMessage:=str_building_complete+' ('+str_advanced+_uids[ord(mstr^[1])].un_txt_name+')'
+                          else ParseLogMessage:=str_unit_complete    +' ('+str_advanced+_uids[ord(mstr^[1])].un_txt_name+')';
+lmt_unit_advanced    : if(length(mstr^)=1)then
+                        with _uids[ord(mstr^[1])] do
+                         ParseLogMessage:=str_unit_advanced+' ('+_uids[ord(mstr^[1])].un_txt_name+')';
    end;
 end;
 
-procedure ReMakeLogForDraw(playern:byte;widthchars:integer;listheight:cardinal;logtypes:TSoB);
+procedure ReMakeLogForDraw(playern:byte;widthchars,listheight:integer;logtypes:TSoB);
 var ts:shortstring;
 mc,n,i:cardinal;
 chunkp,
@@ -741,14 +776,14 @@ begin
    SetLength(ui_log_t,ui_log_n);
    SetLength(ui_log_c,ui_log_n);
 
+   if(listheight>MaxPlayerLog)then listheight:=MaxPlayerLog;
+
    if(widthchars>0)and(listheight>0)then
    with _players[playern] do
    begin
       widthchars+=1;
       i:=log_i;
-      if(listheight>log_n)
-      then n:=log_n
-      else n:=listheight;
+      n:=listheight;
 
       while(n>0)do
       begin
@@ -785,7 +820,7 @@ begin
           end;
       end;
    end;
-   while(ui_log_n<listheight)do _add('',0,c_white);
+   while(ui_log_n<listheight)do _add('',0,0);
 end;
 
 {$ELSE}

@@ -1,8 +1,223 @@
 
+const
+{
+
+
+UID_LostSoul           = 15;
+UID_Imp                = 16;
+UID_Demon              = 17;
+UID_Cacodemon          = 18;
+UID_Knight              = 19;
+UID_Cyberdemon         = 20;
+UID_Mastermind         = 21;
+UID_Pain               = 22;
+UID_Revenant           = 23;
+UID_Mancubus           = 24;
+UID_Arachnotron        = 25;
+UID_Archvile           = 26;
+UID_ZFormer            = 27;
+UID_ZEngineer          = 28;
+UID_ZSergant           = 29;
+UID_ZCommando          = 30;
+UID_ZBomber            = 31;
+UID_ZMajor             = 32;
+UID_ZBFG               = 33;
+
+// UAC
+
+
+UID_Engineer           = 55;
+UID_Medic              = 56;
+UID_Sergant            = 57;
+UID_Commando           = 58;
+UID_Bomber             = 59;
+UID_Major              = 60;
+UID_BFG                = 61;
+UID_FAPC               = 62;
+UID_APC                = 64;
+UID_UACBot             = 65;
+UID_Terminator         = 66;
+UID_Tank               = 67;
+UID_Flyer              = 68;
+UID_UTransport         = 69;
+
+UID_HKeep              = 1;
+UID_HGate              = 2;
+UID_HSymbol            = 3;
+UID_HASymbol           = 4;
+UID_HPools             = 5;
+UID_HTower             = 6;
+UID_HTeleport          = 7;
+UID_HMonastery         = 8;
+UID_HTotem             = 9;
+UID_HAltar             = 10;
+UID_HFortress          = 11;
+UID_HEye               = 12;
+UID_HCommandCenter     = 13;
+UID_HMilitaryUnit      = 14;
+
+UID_UCommandCenter     = 41;
+UID_UMilitaryUnit      = 42;
+UID_UFactory           = 43;
+UID_UGenerator         = 44;
+UID_UAGenerator        = 45;
+UID_UWeaponFactory     = 46;
+UID_URadar             = 47;
+UID_URMStation         = 48;
+UID_UTechCenter        = 49;
+UID_UCTurret           = 50;
+UID_UPTurret           = 51;
+UID_URTurret           = 52;
+UID_UNuclearPlant      = 53;
+UID_UMine              = 54;
+}
+
+aiucl_main       : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter);
+aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator    );
+aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UMilitaryUnit );
+aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HMilitaryUnit  ,UID_UFactory      );
+aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory);
+aiucl_tech       : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter   );
+aiucl_b9         : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant );
+
+var
+
+ai_enrg_cur,
+ai_enrg_nprod,
+ai_enrg_need,
+
+ai_main_cur,
+ai_main_need,
+
+ai_unit_prods_cur,
+ai_upgr_prods_cur,
+ai_unit_prods_need,
+ai_upgr_prods_need
+                   : integer;
 
 procedure ai_clear_vars;
 begin
+   ai_enrg_cur    :=0;
+   ai_enrg_need   :=0;
 
+   ai_main_cur    :=0;
+   ai_main_need   :=0;
+
+   ai_unit_prods_cur  :=0;
+   ai_upgr_prods_cur  :=0;
+   ai_unit_prods_need :=0;
+   ai_upgr_prods_need :=0;
+end;
+
+procedure ai_collect_data(pu,tu:PTUnit;ud:integer);
+begin
+   if(tu^.hits>0)then
+   begin
+      if(pu^.player=tu^.player)then
+      begin
+         ai_enrg_cur+=tu^.uid^._generg;
+
+         if(tu^.uid^._isbuilder)then ai_main_cur+=1;
+
+         if(tu^.uid^._isbarrack)then
+          if(tu^.buff[ub_advanced]>0)
+          then ai_unit_prods_cur+=2
+          else ai_unit_prods_cur+=1;
+
+         if(tu^.uid^._issmith)then
+          if(tu^.buff[ub_advanced]>0)
+          then ai_upgr_prods_cur+=2
+          else ai_upgr_prods_cur+=1;
+
+
+      end;
+   end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+procedure ai_buildings(pu:PTUnit);
+var bt:byte;
+     d:single;
+bx,by,l:integer;
+begin
+   bt:=0;
+
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      {if(cenerg>=350)and(ai_main_cur<ai_main_need)and(ai_main_cur<ai_unit_prods_cur)
+      then bt:=aiucl_main[race]
+      else
+        if(ai_enrg_cur<ai_enrg_need)and(ai_enrg_cur<500)
+        then bt:=aiucl_generator[race]
+        else
+           if(ai_unit_prods_cur=0)
+           then bt:=aiucl_barrack0[race]
+           else
+             if(ai_upgr_prods_cur<ai_upgr_prods_need)
+             then bt:=aiucl_smith[race]
+             else
+               if(ai_unit_prods_cur<ai_unit_prods_need)then bt:=aiucl_barrack0[race];}
+
+      if(ai_enrg_cur>350)then
+
+
+
+      if(bt=0)then exit;
+
+      d:=random(360)*degtorad;
+      l:=_uids[bt]._r+_r;
+      bx:=x+trunc(l*cos(d));
+      by:=y-trunc(l*sin(d));
+
+      _building_newplace(bx,by,bt,playeri,@bx,@by);
+
+      _unit_start_build(bx,by,bt,playeri);
+   end;
+end;
+
+
+procedure ai_code(pu:PTUnit);
+begin
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      ai_enrg_need:=(ai_unit_prods_cur*200)
+                   +(ai_upgr_prods_cur*200)
+                   +(n_builders*50)+220;
+
+      ai_main_need:=22;
+
+      ai_enrg_need:=min2(2200,ai_enrg_need);
+
+      ai_unit_prods_need:=ai_enrg_need div 225;
+      ai_upgr_prods_need:=ai_unit_prods_cur div 3;
+
+      ai_enrg_nprod:=ai_enrg_cur-(menerg-cenerg);
+
+
+
+      if(n_builders>0)then
+       if(isbuildarea)or(_isbarrack)or(_issmith)or(_generg>0)then ai_buildings(pu);
+
+      if(cenerg>1000)then
+       case uidi of
+UID_HSymbol,
+UID_HASymbol,
+UID_UGenerator,
+UID_UAGenerator: begin _unit_kill(pu,false,true,true); exit; end;
+       end;
+
+      case uidi of
+UID_HSymbol,
+UID_UGenerator : _unit_action(pu);
+      end;
+
+   end;
 end;
 
 {

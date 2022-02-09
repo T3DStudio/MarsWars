@@ -247,7 +247,7 @@ begin
    g_paused:=0;
    _svld_make_lst;
 
-   PlayersAddLog(HPlayer,log_to_all,lmt_game,str_gsaved,true);
+   PlayersAddLog(HPlayer,log_to_all,lmt_game_message,str_gsaved,true);
 end;
 
 

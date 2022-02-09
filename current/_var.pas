@@ -41,6 +41,8 @@ _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
 _missiles         : array[1..MaxMissiles] of TMissile;
 
+_punits           : array[0..MaxUnits   ] of PTUnit;
+
 _cycle_order      : integer = 0;
 _cycle_regen      : integer = 0;
 
@@ -84,6 +86,10 @@ net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
 net_period        : byte = 0;
 net_log_n         : word = 0;
+
+_last_prod_type   : byte = 0;
+_last_prod_uid    : byte = 0;
+_last_prod_cndt   : cardinal = 0;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
@@ -618,6 +624,10 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 str_race          : array[0..r_cnt       ] of shortstring;
 str_gmode         : array[0..gm_cnt      ] of shortstring;
 str_addon         : array[false..true    ] of shortstring;
+str_need_energy,
+str_cant_build,
+str_cant_prod,
+str_check_reqs,
 str_unit_advanced,
 str_advanced,
 str_upgrade_complete,
@@ -749,6 +759,7 @@ snd_cannot_build,
 snd_constr_complete,
 snd_defeat,
 snd_not_enough_energy,
+snd_cant_start_prod,
 snd_player_defeated,
 snd_upgrade_complete,
 snd_victory,

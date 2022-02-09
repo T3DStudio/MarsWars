@@ -226,10 +226,13 @@ begin
                      _wprod(pu,rpl);
                   end;
                   if(sel)and(_UnitHaveRPoint(pu^.uidi))then
-                  begin
-                     _wudata_int(uo_x ,rpl);
-                     _wudata_int(uo_y ,rpl);
-                  end;
+                   if(_IsUnitRange(uo_tar,nil))
+                   then _wudata_int(-uo_tar,rpl)
+                   else
+                   begin
+                      _wudata_int(uo_x,rpl);
+                      _wudata_int(uo_y,rpl);
+                   end;
                end;
             end;
 
@@ -496,7 +499,7 @@ begin
      begin
         _unit_default(uu);
 
-        if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
+        if(_IsUnitRange(inapc,@tu))then _unit_inapc_target(uu,tu);
 
         vx:=x;
         vy:=y;
@@ -613,8 +616,8 @@ begin
                  rld:=0;
               end;
 
-            if(pu^.inapc=0)then
-             if(_IsUnitRange(inapc,@tu))then _unit_asapc(uu,tu);
+            if(not _IsUnitRange(pu^.inapc,nil))then
+             if(_IsUnitRange(inapc,@tu))then _unit_inapc_target(uu,tu);
 
             if(speed>0)then
             begin
@@ -788,6 +791,7 @@ procedure _rudata(uu:PTUnit;rpl:boolean;_pl:byte);
 var sh:shortint;
     i :byte;
     wt:word;
+    tu:PTUnit;
 begin
    _units[0]:=uu^;
    with uu^ do
@@ -855,7 +859,17 @@ begin
                   if(sel)and(_UnitHaveRPoint(uu^.uidi))then
                   begin
                      uo_x:=_rudata_int(rpl,0);
-                     uo_y:=_rudata_int(rpl,0);
+                     if(_IsUnitRange(-uo_x,@tu))then
+                     begin
+                        uo_tar:=-uo_x;
+                        uo_x  :=tu^.vx;
+                        uo_y  :=tu^.vy;
+                     end
+                     else
+                     begin
+                        uo_tar:=0;
+                        uo_y  :=_rudata_int(rpl,0);
+                     end;
                   end;
                end;
             end;

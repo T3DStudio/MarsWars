@@ -491,7 +491,8 @@ begin
    begin
       ReMakeLogForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
-       for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
+       for i:=0 to ui_log_n-1 do
+        if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
       if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
    end
    else
@@ -499,7 +500,8 @@ begin
      begin
         ReMakeLogForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
-         for i:=0 to ui_log_n-1 do _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
+         for i:=0 to ui_log_n-1 do
+          if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
      end;
    d_Hints(tar);
 

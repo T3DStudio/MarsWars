@@ -55,6 +55,7 @@ end;
 
 procedure _dds_a(dx,dy:integer;dt:byte);
 begin
+   if(map_ddn<0)then map_ddn:=0;
    if(map_ddn>=MaxDoodads)then exit;
 
    case dt of
@@ -133,7 +134,7 @@ begin
 end;
 
 procedure MSkirmishStarts;
-var ix,iy,ixs,iys,i,u,c,bb0,bb1,dst:integer;
+var ix,iy,i,u,c,bb0,bb1,dst:integer;
 begin
    for i:=0 to MaxPlayers do
    begin
@@ -332,7 +333,7 @@ begin
    or(_spch (ix,iy,doodad_r,false))
    then _checkPlace:=true
    else
-     if(map_sym){and(g_mode in [gm_aslt,gm_3fort])}then
+     if(map_sym)then
      begin
         ix:=map_mw-ix;
         iy:=map_mw-iy;
@@ -408,27 +409,24 @@ begin
    end;
 
    ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
-   if(ddc>MaxDoodads)then ddc:=MaxDoodads;
 
-   if(map_sym)then ddc:=ddc div 3;
+   if(map_sym)
+   then ddc:=mm3(1,round(ddc/2),MaxDoodads)
+   else ddc:=mm3(1,      ddc   ,MaxDoodads);
 
    rks :=0;
    lqs :=0;
 
    if(map_obs>0)then
    begin
-      i  :=(ddc div 8);
+      i:=(ddc div 8);
       if(map_liq>0)then
       begin
          ix :=(i*map_obs);
          lqs:=max2(map_liq,(ix div 8)*map_liq);
          rks:=max2(map_obs,ix-lqs);
       end
-      else
-      begin
-         lqs:=0;
-         rks:=max2(map_obs,i*map_obs);
-      end;
+      else rks:=max2(map_obs,i*map_obs);
    end
    else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 

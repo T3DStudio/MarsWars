@@ -187,36 +187,47 @@ begin
        end;
 end;
 
-procedure check_mouse_brush;
+procedure check_mouse_brush(log:boolean);
+var cndt:cardinal;
 begin
    case m_brush of
    0     : m_brush:=co_empty;
-   1..255:
-      with _players[HPlayer] do
-       if _uid_conditionals(@_players[HPlayer],m_brush)>0
-       then m_brush:=co_empty
-       else
-       begin
-          if not(m_brush in ui_prod_builds)or(n_builders<=0)then
-          begin
-             m_brush:=co_empty;
-             exit;
-          end;
+   1..255: begin
+              cndt:=_uid_conditionals(@_players[HPlayer],m_brush);
+              if(cndt>0)then
+              begin
+                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,cndt,true);
+                 m_brush:=co_empty;
+              end
+              else
+               with _players[HPlayer] do
+               begin
+                  if not(m_brush in ui_prod_builds)or(n_builders<=0)then
+                  begin
+                     m_brush:=co_empty;
+                     exit;
+                  end;
 
-          if(k_ctrl>1)then
-          begin
-             m_brushx:=mouse_map_x;
-             m_brushy:=mouse_map_y;
-          end
-          else _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
+                  if(k_ctrl>1)then
+                  begin
+                     m_brushx:=mouse_map_x;
+                     m_brushy:=mouse_map_y;
+                  end
+                  else
+                  begin
+                     _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
+                     m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
+                     m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
+                  end;
 
-          case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
+                  case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
           0 :  m_brushc:=c_lime;
           1 :  m_brushc:=c_red;
           2 :  m_brushc:=c_blue;
           else m_brushc:=c_gray;
-          end;
-       end;
+                  end;
+               end;
+           end;
 co_paction,
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
@@ -295,7 +306,7 @@ false: begin
              _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
              m_brush:=co_empty;
           end
-          else check_mouse_brush;
+          else check_mouse_brush(true);
        end;
 true : if(_IsUnitRange(uid_x[ui_panel_uids[race,0,u]],@tu))then
         if(_rclickmove(tu^.uidi))then
@@ -339,11 +350,9 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
         then MoveCamToPoint(ui_orders_x[MaxUnitOrders], ui_orders_y[MaxUnitOrders])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
-
-
          end;
 
-         check_mouse_brush;
+         check_mouse_brush(false);
       end;
    end
    else
@@ -607,7 +616,7 @@ begin
 
    if(m_ldblclk>0)then m_ldblclk-=1;
 
-   check_mouse_brush;
+   check_mouse_brush(false);
 
    if(k_ml=2)then                    // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
@@ -627,7 +636,7 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
-            else SoundPlayAnoncer(snd_cannot_build[_players[HPlayer].race],true);
+            else GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,ureq_place,true);
 co_paction,
 co_move,
 co_amove,

@@ -93,10 +93,10 @@ begin
           else
             if(g_ai_slots)>0then
             begin
-               _draw_text(tar,ui_menu_pls_zxst, u,str_ps_c[ps_comp]             , ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxst, u,str_ps_c[ps_comp]              , ta_middle,255, c_gray);
                _draw_text(tar,ui_menu_pls_zxnt, u,str_ps_comp+' '+b2s(g_ai_slots), ta_left  ,255, c_gray);
-               _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random]            , ta_middle,255, c_gray);
-               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PlayerGetTeam(g_mode,p)) , ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxrt, u,str_race[r_random]             , ta_middle,255, c_gray);
+               _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PlayerGetTeam(g_mode,p))   , ta_middle,255, c_gray);
             end
             else _draw_text(tar,ui_menu_pls_zxst, u,PlayerGetStatus(p), ta_middle, 255, c);
           boxColor(tar,ui_menu_pls_zxc1,u,ui_menu_pls_zxc2,u+6,PlayerGetColor(p));
@@ -395,7 +395,8 @@ begin
                     y:=_yt(10);
                     ReMakeLogForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height,lmts_menu_chat);
                     if(ui_log_n>0)then
-                     for t:=0 to ui_log_n-1 do _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,ui_log_c[t]);
+                     for t:=0 to ui_log_n-1 do
+                      if(ui_log_c[t]>0)then _draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,ui_log_c[t]);
 
                     _draw_text(tar,ui_menu_csm_xct, _yt(11), net_chat_str , ta_chat,ui_menu_chat_width, c_white);
                  end

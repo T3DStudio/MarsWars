@@ -275,6 +275,10 @@ begin
    str_all               := 'All';
    str_uprod             := #18+'Produced by: '+#25;
    str_bprod             := #18+'Constructed by: '+#25;
+   str_cant_build        := 'Can`t build here!';
+   str_need_energy       := 'Need more energy!';
+   str_cant_prod         := 'Can`t production this!';
+   str_check_reqs        := 'Check requirements!';
 
    str_advanced          := 'Advanced ';
    str_unit_advanced     := 'Unit promoted';
@@ -723,6 +727,10 @@ begin
   str_all               := 'Все';
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
+  str_cant_build        := 'Нельзя строить здесь!';
+  str_need_energy       := 'Необходимо больше энергии!';
+  str_cant_prod         := 'Невоможно произвести это!';
+  str_check_reqs        := 'Проверьте требования!';
 
   str_advanced          := 'Улучшенный ';
   str_unit_advanced     := 'Юнит улучшен';

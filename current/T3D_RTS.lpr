@@ -48,6 +48,7 @@ uses SysUtils, SDL, SDL_Net
 {$Include _missiles.pas}
 {$include _units_common.pas}
 {$include _units.pas}
+{$include _ai.pas}
 {$include _unit_client.pas}
      {$IFDEF _FULLGAME}
         {$include _campaings.pas}
@@ -62,7 +63,34 @@ uses SysUtils, SDL, SDL_Net
 
 {$R *.res}
 
+//var __i,__u : cardinal;
+
 begin
+   ///
+  {
+   readln;
+   writeln('start');
+
+   delay(1000);
+
+   for __u:=1 to 10 do
+   begin
+      fps_cs:=SDL_GetTicks;
+
+      for __i:=0 to 100000000 do
+        if((__i and ureq_energy)>0)then continue;
+       //if(cf2(__i,ureq_energy))then continue;
+       //if(cf(@__i,@ureq_energy))then continue;
+
+      fps_cs:=SDL_GetTicks-fps_cs;
+
+      writeln(fps_cs);
+
+   end;
+
+   readln;
+   halt;  }
+
    InitGame;
 
    while (_CYCLE) do

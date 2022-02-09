@@ -415,6 +415,7 @@ TUnit = record
    a_tar_cl,
 
    mv_x,mv_y,
+   mp_x,mp_y,
 
    uo_bx,uo_by,
    uo_tar,

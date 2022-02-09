@@ -106,7 +106,6 @@ begin
       _apcs      := 1;
       _urace     := r_hell;
       _attack    := atm_none;
-      _srange    := 250;
       _fdeathhits(-32000);
 
       _ukbuilding:= false;
@@ -124,8 +123,8 @@ begin
 UID_HKeep:
 begin
    _mhits     := 5000;
-   _renerg    := 250;
-   _generg    := 100;
+   _renerg    := 300;
+   _generg    := 150;
    _r         := 66;
    _srange    := 280;
    _ucl       := 0;
@@ -145,7 +144,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 60;
-   _srange    := 150;
    _ucl       := 1;
    _btime     := 45;
    _barrack_teleport:=true;
@@ -161,7 +159,6 @@ begin
    _renerg    := 10;
    _generg    := 10;
    _r         := 22;
-   _srange    := 150;
    _ucl       := 2;
    _btime     := 10;
    _ukbuilding:= true;
@@ -181,7 +178,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 53;
-   _srange    := 150;
    _ucl       := 9;
    _btime     := 45;
    _ukbuilding:= true;
@@ -194,7 +190,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 65;
-   _srange    := 150;
    _ucl       := 10;
    _btime     := 60;
    _max       := 1;
@@ -208,7 +203,6 @@ begin
    _renerg    := 300;
    _generg    := 300;
    _r         := 86;
-   _srange    := 300;
    _ucl       := 11;
    _btime     := 60;
    _max       := 1;
@@ -223,7 +217,6 @@ begin
    _mhits     := 1000;
    _renerg    := 200;
    _r         := 28;
-   _srange    := 150;
    _ucl       := 12;
    _btime     := 30;
    _limituse  := 3;
@@ -236,7 +229,6 @@ begin
    _mhits     := 1000;
    _renerg    := 200;
    _r         := 50;
-   _srange    := 150;
    _ucl       := 13;
    _btime     := 30;
    _max       := 1;
@@ -663,8 +655,8 @@ UID_HCommandCenter,
 UID_UCommandCenter:
 begin
    _mhits     := 5000;
-   _renerg    := 250;
-   _generg    := 100;
+   _renerg    := 300;
+   _generg    := 150;
    _speed     := 6;
    _r         := 66;
    _srange    := 280;
@@ -707,7 +699,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 66;
-   _srange    := 200;
    _ucl       := 1;
    _btime     := 45;
    _ukbuilding:= true;
@@ -729,7 +720,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 66;
-   _srange    := 200;
    _ucl       := 4;
    _btime     := 45;
    _ukbuilding:= true;
@@ -745,7 +735,6 @@ begin
    _renerg    := 20;
    _generg    := 20;
    _r         := 42;
-   _srange    := 200;
    _ucl       := 2;
    _btime     := 20;
    _ukbuilding:= true;
@@ -764,7 +753,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 62;
-   _srange    := 200;
    _ucl       := 9;
    _btime     := 45;
    _ukbuilding:= true;
@@ -778,7 +766,6 @@ begin
    _mhits     := 3000;
    _renerg    := 200;
    _r         := 62;
-   _srange    := 200;
    _ucl       := 10;
    _btime     := 60;
    _limituse  := 2;
@@ -792,7 +779,6 @@ begin
    _renerg    := 300;
    _generg    := 300;
    _r         := 70;
-   _srange    := 200;
    _ucl       := 11;
    _btime     := 60;
    _max       := 1;
@@ -819,7 +805,6 @@ begin
    _mhits     := 750;
    _renerg    := 200;
    _r         := 40;
-   _srange    := 200;
    _ucl       := 13;
    _btime     := 30;
    _max       := 1;
@@ -842,6 +827,8 @@ begin
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
    _ability   := uab_rebuild;
+   _upgr_srange     :=upgr_uac_towers;
+   _upgr_srange_step:=25;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_4hfps,MID_Bulletx2,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground_light_bio,wpr_any,uidall,[],0,0);
    _weapon(1,wpt_missle,aw_srange,0,0 ,fr_4hfps,MID_Bulletx2,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground_bio      ,wpr_any,uidall,[],0,0);
    _weapon(2,wpt_missle,aw_srange,0,0 ,fr_4hfps,MID_Bulletx2,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground          ,wpr_any,uidall,[],0,0);
@@ -859,6 +846,8 @@ begin
    _upgr_armor:= upgr_uac_turarm;
    _ability   := uab_rebuild;
    _addon     := true;
+   _upgr_srange     :=upgr_uac_towers;
+   _upgr_srange_step:=25;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_4hfps,MID_BPlasma,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground_mech  ,wpr_any,uidall,[],0,-8);
    _weapon(1,wpt_missle,aw_srange,0,0 ,fr_4hfps,MID_BPlasma,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground       ,wpr_any,uidall,[],0,-8);
 end;
@@ -872,8 +861,10 @@ begin
    _btime     := 15;
    _attack    := atm_always;
    _ukbuilding:= true;
+   _upgr_srange     :=upgr_uac_towers;
+   _upgr_srange_step:=25;
    _upgr_armor:= upgr_uac_turarm;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps  ,MID_URocket,0,0,0,upgr_uac_attack,4,wtrset_enemy_alive_fly          ,wpr_any ,uidall,[],0,-8);
+   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps  ,MID_URocket,0,0,0,upgr_uac_attack,3,wtrset_enemy_alive_fly          ,wpr_any ,uidall,[],0,-8);
 end;
 
 UID_UMine:
@@ -967,9 +958,9 @@ begin
    _zombie_uid:= UID_ZCommando;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_7hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light,wpr_any ,uidall,[],0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_7hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_any ,uidall,[],0,0);
-   _weapon(2,wpt_missle,aw_srange,0,0,fr_7hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive          ,wpr_any ,uidall,[],0,0);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_8hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light,wpr_any ,uidall,[],0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0,fr_8hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_any ,uidall,[],0,0);
+   _weapon(2,wpt_missle,aw_srange,0,0,fr_8hfps,MID_Bullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive          ,wpr_any ,uidall,[],0,0);
 end;
 UID_Bomber:
 begin
@@ -1163,7 +1154,7 @@ begin
    _renerg    := 150;
    _r         := 36;
    _speed     := 10;
-   _srange    := 250;
+   _srange    := 200;
    _ucl       := 13;
    _btime     := 60;
    _apcm      := 30;
@@ -1215,6 +1206,7 @@ end;
          _zombie_hits:=_mhits div 2;
          _ukmech:=true;
          if(_base_armor<=0)then _base_armor:=10;
+         if(_srange    <=0)then _srange:=150;
       end
       else
       begin
@@ -1250,7 +1242,10 @@ end;
 
 
 procedure ObjTbl;
+var u:integer;
 begin
+   for u:=0 to MaxUnits do _punits[u]:=@_units[u];
+
    FillChar(_upids,SizeOf(_upids),0);
 
    //         race id                  time lvl  enr  rupgr         ruid                multi doom2
