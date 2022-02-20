@@ -624,7 +624,6 @@ begin
    _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
    _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAEye          ,race_buildings[r_hell]+'heyea_' ,smt_buiding,firstload);
 
    _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UMilitaryUnit  ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
@@ -770,7 +769,7 @@ begin
 
    map_mmvw     := round(vid_cam_w*map_mmcx);
    map_mmvh     := round(vid_cam_h*map_mmcx);
-   _view_bounds;
+   CamBounds;
 
    Map_tdmake;
 end;

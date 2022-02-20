@@ -2,7 +2,7 @@
 procedure d_Alarms;
 var i,r:byte;
 begin
-   for i:=0 to ui_max_alarms do
+   {for i:=0 to ui_max_alarms do
     with ui_alarms[i] do
      if(at>0)then
      begin
@@ -11,7 +11,7 @@ begin
         then RectangleColor(r_minimap,ax-r,ay-r,ax+r,ay+r, c_white)
         else CircleColor   (r_minimap,ax  ,ay  ,        r, c_white);
         at-=1;
-     end;
+     end;  }
 
    case g_mode of
 gm_cptp: for i:=1 to MaxCPoints do
@@ -253,9 +253,9 @@ begin
       end;
 
       d_TextBTN(tar,0,8,@str_menu,c_white);
-      if(net_status>ns_none)and(G_WTeam=255)then
-       if(g_paused>0)
-       then d_TextBTN(tar,2,8,@str_pause,PlayerGetColor(g_paused))
+      if(net_status>ns_none)then
+       if(0<g_status)and(g_status<=MaxPlayers)
+       then d_TextBTN(tar,2,8,@str_pause,PlayerGetColor(g_status))
        else d_TextBTN(tar,2,8,@str_pause,c_white                 );
 
       case ui_tab of
@@ -323,7 +323,7 @@ begin
          ux:=(ui mod 3);
          uy:=(ui div 3);
 
-         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0)or(upproda>=upprodm)or(n_smiths<=0));
+         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_upgr[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_prod_upgrades[uid]));
 
          _drawBtnt(tar,ux,uy,
          b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
@@ -335,7 +335,7 @@ begin
       begin
          _drawBtn(tar,0,4,spr_b_rfast,_fsttime    ,false);
          _drawBtn(tar,1,4,spr_b_rskip,false       ,false);
-         _drawBtn(tar,2,4,spr_b_rstop,g_paused>0  ,false);
+         _drawBtn(tar,2,4,spr_b_rstop,g_status>0  ,false);
          _drawBtn(tar,0,5,spr_b_rvis ,rpls_plcam  ,false);
          _drawBtn(tar,1,5,spr_b_rlog ,rpls_showlog,false);
          _drawBtn(tar,2,5,spr_b_rfog ,rpls_fog    ,false);
@@ -435,7 +435,7 @@ begin
            end;
       12 : begin
               if(m_bx=2)then
-               if(net_status=ns_none)or(G_WTeam<255)then exit;
+               if(net_status=ns_none)then exit;
               hs:=@str_hint_m[m_bx];
            end;
       else
@@ -483,6 +483,8 @@ end;
 
 procedure D_UIText(tar:pSDL_Surface);
 var i:integer;
+  str:shortstring;
+  col:cardinal;
 begin
    // LOG and HINTs
    if(net_chat_shlm>0)then net_chat_shlm-=1;
@@ -509,40 +511,22 @@ begin
    // resources
    with _players[HPlayer] do
    begin
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg)+' / '+#19+i2s(menerg)    ,ta_left,255,c_white);
-      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)+' / '+#16+'120',ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg          )+' / '+#19+i2s(menerg),ta_left,255,c_white);
+      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)+' / '+#16+'125'      ,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END
-   if(rpls_state=rpl_end)
-   then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_repend,ta_middle,255,c_white)
-   else
-    if(rpls_state<rpl_rhead)then
-     with _players[HPlayer] do
-      if(G_WTeam=255)then
-      begin
-         if(menu_s2<>ms2_camp)then
-          if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
-         if(G_paused>0)then
-          if(net_status=ns_clnt)and(net_cl_svttl=ClientTTL)
-          then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
-          else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
-      end
-      else
-        if(G_WTeam=team)
-        then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_win   ,ta_middle,255,c_lime)
-        else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
+   if(GameGetStatus(@str,@col))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
    // TIMER
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time);
 
    // INVASION
-   if(G_WTeam=255)then
-    if(g_mode=gm_inv)then
-    begin
-       D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
-       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
-    end;
+   if(g_mode=gm_inv)then
+   begin
+      D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
+      if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+   end;
 
    d_OrderIcons(tar);
 end;

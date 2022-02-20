@@ -1,9 +1,9 @@
 function ShadowColor(c:cardinal):cardinal;
 begin
    ShadowColor:=128 +
-   (((c and $FF000000) shr 26) shl 24) +
-   (((c and $00FF0000) shr 18) shl 16) +
-   (((c and $0000FF00) shr 10) shl 8 );
+   (((c and $FF000000) shr 25) shl 24) +
+   (((c and $00FF0000) shr 17) shl 16) +
+   (((c and $0000FF00) shr  9) shl 8 );
 end;
 
 procedure _draw_texture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
@@ -34,6 +34,7 @@ var ss,i,o:byte;
      c:char;
     cl:cardinal;
 begin
+   if(tc=0)then exit;
    ss:=length(s);
    if(ss>0)then
    begin
@@ -194,7 +195,7 @@ var i,ni:byte;
 begin
    if(rpls_state>=rpl_rhead)then exit;
 
-   ni:=255;
+   {ni:=255;
    for i:=0 to ui_max_alarms do
     with ui_alarms[i] do
      if(at>0)then
@@ -219,7 +220,7 @@ begin
          if((vid_mmvx-vid_uialrm_ti)>ax)or(ax>(vid_mmvx+map_mmvw+vid_uialrm_ti))or   // vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh
            ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then SoundPlayAnoncer(snd_under_attack[aab,_players[HPlayer].race],true);
          break;
-      end;
+      end; }
 end;
 
 

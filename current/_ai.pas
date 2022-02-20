@@ -72,65 +72,136 @@ UID_UNuclearPlant      = 53;
 UID_UMine              = 54;
 }
 
-aiucl_main       : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter);
+aiucl_main0      : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter);
+aiucl_main1      : array[1..r_cnt] of byte = (UID_HCommandCenter ,0);
 aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator    );
 aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UMilitaryUnit );
 aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HMilitaryUnit  ,UID_UFactory      );
 aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory);
-aiucl_tech       : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter   );
-aiucl_b9         : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant );
+aiucl_tech0      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter   );
+aiucl_tech1      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant );
+aiucl_spec0      : array[1..r_cnt] of byte = (UID_HTeleport      ,UID_URadar        );
+aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation    );
+
 
 var
 
 ai_enrg_cur,
-ai_enrg_nprod,
-ai_enrg_need,
 
 ai_main_cur,
 ai_main_need,
 
 ai_unit_prods_cur,
-ai_upgr_prods_cur,
+ai_unit_prods_cur_na,
+ai_unit_prods_num,
 ai_unit_prods_need,
-ai_upgr_prods_need
+ai_upgr_prods_cur,
+ai_upgr_prods_cur_na,
+ai_upgr_prods_num,
+ai_upgr_prods_need,
+
+ai_tech0_cur,
+ai_tech0_need,
+
+ai_tech1_cur,
+
+ai_spec0_cur,
+ai_spec0_need,
+
+ai_spec1_cur
+
                    : integer;
 
 procedure ai_clear_vars;
 begin
    ai_enrg_cur    :=0;
-   ai_enrg_need   :=0;
 
    ai_main_cur    :=0;
    ai_main_need   :=0;
 
-   ai_unit_prods_cur  :=0;
-   ai_upgr_prods_cur  :=0;
-   ai_unit_prods_need :=0;
-   ai_upgr_prods_need :=0;
+   ai_unit_prods_cur   :=0;
+   ai_unit_prods_cur_na:=0;
+   ai_unit_prods_num   :=0;
+   ai_unit_prods_need  :=0;
+
+   ai_upgr_prods_cur   :=0;
+   ai_upgr_prods_cur_na:=0;
+   ai_upgr_prods_num   :=0;
+   ai_upgr_prods_need  :=0;
+
+   ai_tech0_cur   :=0;
+   ai_tech0_need  :=0;
+
+   ai_tech1_cur   :=0;
+
+   ai_spec0_cur   :=0;
+   ai_spec0_need  :=0;
+
+   ai_spec1_cur   :=0;
 end;
 
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);
 begin
+   with pu^     do
+   with player^ do
    if(tu^.hits>0)then
    begin
       if(pu^.player=tu^.player)then
       begin
          ai_enrg_cur+=tu^.uid^._generg;
 
-         if(tu^.uid^._isbuilder)then ai_main_cur+=1;
-
          if(tu^.uid^._isbarrack)then
-          if(tu^.buff[ub_advanced]>0)
-          then ai_unit_prods_cur+=2
-          else ai_unit_prods_cur+=1;
+          if(tu^.uidi=aiucl_barrack0[race])or(tu^.uidi=aiucl_barrack1[race])then
+           if(tu^.buff[ub_advanced]>0)
+           then ai_unit_prods_cur+=MaxUnitProdsN
+           else
+           begin
+              ai_unit_prods_cur   +=1;
+              ai_unit_prods_cur_na+=1;
+           end;
 
          if(tu^.uid^._issmith)then
-          if(tu^.buff[ub_advanced]>0)
-          then ai_upgr_prods_cur+=2
-          else ai_upgr_prods_cur+=1;
-
-
+          if(tu^.uidi=aiucl_smith[race])then
+           if(tu^.buff[ub_advanced]>0)
+           then ai_upgr_prods_cur+=MaxUnitProdsN
+           else
+           begin
+              ai_upgr_prods_cur   +=1;
+              ai_upgr_prods_cur_na+=1;
+           end;
       end;
+   end;
+end;
+
+function ai_noprod(pu:PTUnit):boolean;
+var i:integer;
+begin
+   ai_noprod:=true;
+   with pu^  do
+   with uid^ do
+   begin
+      if(_isbarrack)then
+       for i:=0 to MaxUnitProdsI do
+       begin
+          if(i>0)then
+           if(buff[ub_advanced]<=0)then break;
+          if(uprod_r[i]>0)then
+          begin
+             ai_noprod:=false;
+             exit;
+          end;
+       end;
+      if(_issmith)then
+       for i:=0 to MaxUnitProdsI do
+       begin
+          if(i>0)then
+           if(buff[ub_advanced]<=0)then break;
+          if(pprod_r[i]>0)then
+          begin
+             ai_noprod:=false;
+             exit;
+          end;
+       end;
    end;
 end;
 
@@ -138,38 +209,59 @@ end;
 
 
 procedure ai_buildings(pu:PTUnit);
-var bt:byte;
-     d:single;
+var  bt:byte;
+      d:single;
 bx,by,l:integer;
+procedure SetBT(buid:byte);
+var _c:cardinal;
+begin
+  if(bt=0)then
+  begin
+     _c:=_uid_conditionals(pu^.player,buid);
+     if(_c=0)or(_c=ureq_energy)then bt:=buid;
+  end;
+end;
 begin
    bt:=0;
 
    with pu^     do
    with uid^    do
    with player^ do
+   if(build_cd<=0)then
    begin
-      {if(cenerg>=350)and(ai_main_cur<ai_main_need)and(ai_main_cur<ai_unit_prods_cur)
-      then bt:=aiucl_main[race]
-      else
-        if(ai_enrg_cur<ai_enrg_need)and(ai_enrg_cur<500)
-        then bt:=aiucl_generator[race]
-        else
-           if(ai_unit_prods_cur=0)
-           then bt:=aiucl_barrack0[race]
-           else
-             if(ai_upgr_prods_cur<ai_upgr_prods_need)
-             then bt:=aiucl_smith[race]
-             else
-               if(ai_unit_prods_cur<ai_unit_prods_need)then bt:=aiucl_barrack0[race];}
+      // fixed opening
+      if(ai_enrg_cur      <300 )then SetBT(aiucl_generator[race]);
+      if(ai_unit_prods_cur<1   )then SetBT(aiucl_barrack0 [race]);
+      if(ai_enrg_cur      <600 )then SetBT(aiucl_generator[race]);
+      if(ai_main_cur      <2   )then SetBT(aiucl_main0    [race]);
+      if(ai_enrg_cur      <800 )then SetBT(aiucl_generator[race]);
+      if(ai_upgr_prods_cur<1   )then SetBT(aiucl_smith    [race]);
+      if(ai_spec0_cur     <1   )then SetBT(aiucl_spec0    [race]);
+      if(ai_enrg_cur      <1000)then SetBT(aiucl_generator[race]);
+      if(ai_unit_prods_cur<3   )then SetBT(aiucl_barrack0 [race]);
+      if(ai_main_cur      <3   )then SetBT(aiucl_main0    [race]);
+      if(ai_enrg_cur      <1100)then SetBT(aiucl_generator[race]);
+      if(ai_tech0_cur     <1   )then SetBT(aiucl_tech0    [race]);
+      if(ai_enrg_cur      <1300)then SetBT(aiucl_generator[race]);
+      if(ai_tech1_cur     <1   )then SetBT(aiucl_tech1    [race]);
+      if(ai_spec1_cur     <1   )then SetBT(aiucl_spec1    [race]);
+      if(ai_enrg_cur      <1700)then SetBT(aiucl_generator[race]);
 
-      if(ai_enrg_cur>350)then
-
-
+      // general
+      if(ai_main_cur      <ai_main_need      )then SetBT(aiucl_main0   [race]);
+      if(ai_upgr_prods_cur<ai_upgr_prods_need)then
+       if(ai_tech1_cur=0)or((ai_tech1_cur>0)and(ai_upgr_prods_num<=3 ))
+                                              then SetBT(aiucl_smith   [race]);
+      if(ai_tech0_cur     <ai_tech0_need     )then SetBT(aiucl_tech0   [race]);
+      if(ai_spec0_cur     <ai_spec0_need     )then SetBT(aiucl_spec0   [race]);
+      if(ai_unit_prods_cur<ai_unit_prods_need)then
+       if(ai_tech1_cur=0)or((ai_tech1_cur>0)and(ai_unit_prods_num<=10))
+                                              then SetBT(aiucl_barrack0[race]);
 
       if(bt=0)then exit;
 
       d:=random(360)*degtorad;
-      l:=_uids[bt]._r+_r;
+      l:=random(srange);
       bx:=x+trunc(l*cos(d));
       by:=y-trunc(l*sin(d));
 
@@ -180,41 +272,65 @@ begin
 end;
 
 
+
+
 procedure ai_code(pu:PTUnit);
+var i:integer;
 begin
    with pu^     do
    with uid^    do
    with player^ do
    begin
-      ai_enrg_need:=(ai_unit_prods_cur*200)
-                   +(ai_upgr_prods_cur*200)
-                   +(n_builders*50)+220;
+      ai_main_cur      :=uid_e[aiucl_main0[race]];
+      ai_unit_prods_num:=uid_e[aiucl_barrack0[race]]
+                        +uid_e[aiucl_barrack1[race]];
 
-      ai_main_need:=22;
+      ai_unit_prods_need:=mm3(1,ai_unit_prods_cur+2    ,20);
+      ai_upgr_prods_need:=mm3(1,ai_unit_prods_cur div 3,6 );
 
-      ai_enrg_need:=min2(2200,ai_enrg_need);
+      if(ai_unit_prods_need<20)
+      then ai_main_need:=mm3(1,ai_unit_prods_need,20)
+      else ai_main_need:=mm3(1,ai_main_cur+1,25);
 
-      ai_unit_prods_need:=ai_enrg_need div 225;
-      ai_upgr_prods_need:=ai_unit_prods_cur div 3;
+      if(race=r_hell)
+      then ai_tech0_need:=1
+      else ai_tech0_need:=mm3(1,ai_unit_prods_cur div 4,4);
 
-      ai_enrg_nprod:=ai_enrg_cur-(menerg-cenerg);
+      ai_spec0_need:=mm3(1,ai_unit_prods_cur div 4,4);
 
 
-
-      if(n_builders>0)then
-       if(isbuildarea)or(_isbarrack)or(_issmith)or(_generg>0)then ai_buildings(pu);
-
-      if(cenerg>1000)then
        case uidi of
 UID_HSymbol,
 UID_HASymbol,
 UID_UGenerator,
-UID_UAGenerator: begin _unit_kill(pu,false,true,true); exit; end;
+UID_UAGenerator: if(cenerg>_generg)and(armylimit>80)and(menerg>2000)then begin _unit_kill(pu,false,true,true);exit;end;
+       else
+          if(_isbarrack)or(_issmith)then
+          if(ai_noprod(pu))then
+          begin
+             if(buff[ub_advanced]>0)
+             then i:=MaxUnitProdsN
+             else i:=1;
+
+             if(_isbarrack)then
+              if(ai_unit_prods_cur_na=0)or((buff[ub_advanced]<=0)and(ai_unit_prods_cur_na>0))then
+               if((ai_unit_prods_cur-i)>=ai_unit_prods_need)then begin _unit_kill(pu,false,true,true);exit;end;
+             if(_issmith )then
+              if(ai_upgr_prods_cur_na=0)or((buff[ub_advanced]<=0)and(ai_upgr_prods_cur_na>0))then
+               if((ai_upgr_prods_cur-i)>=ai_upgr_prods_need)then begin _unit_kill(pu,false,true,true);exit;end;
+          end;
        end;
 
+
+      if(n_builders>0)and(isbuildarea)then ai_buildings(pu);
+
+
+      if(ai_unit_prods_cur>=1)then
       case uidi of
 UID_HSymbol,
-UID_UGenerator : _unit_action(pu);
+UID_UGenerator : begin _unit_action(pu);exit;end;
+      else
+         if(_isbarrack)or(_issmith)then begin _unit_action(pu);exit;end;
       end;
 
    end;

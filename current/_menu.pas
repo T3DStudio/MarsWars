@@ -1,18 +1,3 @@
-
-procedure ToggleMenu;
-begin
-   if(G_Started)then
-   begin
-      _menu:=not _menu;
-      vid_menu_redraw:=_menu;
-      menu_item:=0;
-      if(net_status=ns_none)and(G_Paused<200)then
-       if(_menu)
-       then G_Paused:=1
-       else G_Paused:=0;
-   end;
-end;
-
 function StringApplyInput(s:shortstring;charset:TSoc;ms:byte):shortstring;
 var i:byte;
     c:char;

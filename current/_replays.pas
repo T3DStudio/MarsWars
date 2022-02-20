@@ -112,7 +112,7 @@ begin
    if(G_Started=false)or(rpls_state=rpl_none)or(menu_s2=ms2_camp)
    then rpl_abort
    else
-    if(G_Started)and(g_paused=0)then
+    if(G_Started)and(G_Status=gs_running)then
      case rpls_state of
      rpl_whead   : begin
                       rpl_abort;
@@ -175,9 +175,9 @@ begin
                         i:=0;
                         if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
                         if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)       then i:=i or %01000000;
-                        i:=i or (G_Paused and %00111111);
+                        i:=i or (G_Status and %00111111);
 
-                        if((i and %11000000)>0)or(G_Paused=0)then
+                        if((i and %11000000)>0)or(G_Status=0)then
                         begin
                            {$I-}
                            BlockWrite(rpls_file,i,sizeof(i));
@@ -310,7 +310,7 @@ begin
                             map_premap;
                             MoveCamToPoint(map_psx[Hplayer] , map_psy[Hplayer]);
 
-                            _view_bounds;
+                            CamBounds;
                             ui_tab    :=2;
                             G_Started :=true;
                             _menu     :=false;
@@ -327,7 +327,7 @@ begin
                          begin
                             rpl_abort;
                             rpls_state:=rpl_end;
-                            G_Paused  :=1;
+                            G_Status  :=gs_replayend;
                             _fsttime  :=false;
                             exit;
                          end;
@@ -338,7 +338,7 @@ begin
                             {$I-}
                             BlockRead(rpls_file,i,SizeOf(i));
                             {$I+}
-                            G_Paused:=i and %00111111;
+                            G_Status:=i and %00111111;
 
                             if((i and %10000000)>0)then _rudata_chat(rpls_player,true);
                             if((i and %01000000)>0)then
@@ -349,7 +349,7 @@ begin
                                {$I+}
                             end;
 
-                            if(G_Paused=0)then _rclinet_gframe(0,true);
+                            if(G_Status=gs_running)then _rclinet_gframe(0,true);
 
                             if(rpls_step>1)then effects_sprites(false,false);
                             rpls_step-=1;
@@ -360,11 +360,11 @@ begin
                          begin
                             vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)) div 2;
                             vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)) div 2;
-                            _view_bounds;
+                            CamBounds;
                          end;
                      end;
 
-     rpl_end     : begin G_Paused:=1; end;
+     rpl_end     : begin G_Status:=gs_replayend; end;
      end;
 end;
 

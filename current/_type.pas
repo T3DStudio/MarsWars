@@ -69,7 +69,6 @@ TVisPrim = record
    x0,y0,
    x1,y1    : integer;
    color    : cardinal;
-   //spr_stun
    text_lt,
    text_rt,
    text_rd,
@@ -101,8 +100,10 @@ end;
 PTThemeAnimL = ^TThemeAnimL;
 
 TAlarm = record
-   ax,ay,at : integer;
-   ab       : boolean;
+   al_x,
+   al_y,
+   al_t      : integer;
+   al_v      : byte;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -300,6 +301,15 @@ TUPID = record  // upgrade
 end;
 
 
+TLogMes = record
+   mtype,
+   uidt,
+   uid  :byte;
+   str  :shortstring;
+   x,y  :integer;
+end;
+PTLogMes = ^TLogMes;
+
 TPlayer = record
    name    : shortstring;
 
@@ -349,17 +359,11 @@ o_x1,o_y1  :integer;
    a_units : array[byte] of integer;
 
 
-   {ai_pushfrmi,
-   ai_pushtimei,
-   ai_pushtime
+   ai_max_limit,
+   ai_max_unit_prods,
+   ai_max_upgr_prods,
+   ai_max_bases
            : integer;
-   ai_pushuids
-           : TSoB;
-   ai_pushmin,
-   ai_towngrd,
-   ai_maxunits
-           : integer;
-   ai_flags: cardinal;  }
    ai_skill: byte;
 
 
@@ -376,10 +380,15 @@ o_x1,o_y1  :integer;
    nip     : cardinal;
    nport   : word;
 
-   log_net_pause
+   prod_error_cndt: cardinal;
+   prod_error_x,
+   prod_error_y,
+   prod_error_utp,
+   prod_error_uid : byte;
+
+   net_logsend_pause
            : integer;
-   log_ls  : array[0..MaxPlayerLog] of shortstring;
-   log_lt  : array[0..MaxPlayerLog] of byte;
+   log_l   : array[0..MaxPlayerLog] of TLogMes;
    log_i,
    log_n,
    log_n_cl
@@ -390,7 +399,7 @@ TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
    vx,vy,
-   x,y,gridx,gridy,
+   x,y,
    zfall,
    srange,
    speed,dir,rld,vstp,
@@ -403,9 +412,9 @@ TUnit = record
    uidi     : byte;
 
    uprod_r,
-   pprod_r  : array[0..MaxUnitProds] of integer;
+   pprod_r  : array[0..MaxUnitProdsI] of integer;
    uprod_u,
-   pprod_u  : array[0..MaxUnitProds] of byte;
+   pprod_u  : array[0..MaxUnitProdsI] of byte;
 
    a_rld,
    a_weap_cl,

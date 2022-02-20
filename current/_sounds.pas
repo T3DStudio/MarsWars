@@ -368,40 +368,33 @@ begin
 end;
 
 procedure SoundLogHPlayer;
-var ps:pshortstring;
 begin
    with _players[HPlayer] do
-   begin
-      ps:=@log_ls[log_i];
-      case log_lt[log_i] of
-0..MaxPlayers : if(log_lt[log_i]<>HPlayer)
-                or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
+    with log_l[log_i] do
+     case mtype of
+0..MaxPlayers         : if(mtype<>HPlayer)
+                        or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
-lmt_game_end          : if(length(ps^)=1)then
-                         if(ord(ps^[1])<=MaxPlayers)then
-                          if(ord(ps^[1])=team)
-                          then SoundPlayAnoncer(snd_victory[race],false)
-                          else SoundPlayAnoncer(snd_defeat [race],false);
-lmt_player_defeated   : if(length(ps^)=1)then
-                         if(ord(ps^[1])<=MaxPlayers)and(ord(ps^[1])<>HPlayer)
-                         then SoundPlayAnoncer(snd_player_defeated[race],true);
-lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build[_players[HPlayer].race],true);
+lmt_game_end          : if(uid<=MaxPlayers)then
+                         if(uid=team)
+                         then SoundPlayAnoncer(snd_victory[race],false)
+                         else SoundPlayAnoncer(snd_defeat [race],false);
+lmt_player_defeated   : if(uid<=MaxPlayers)and(uid<>HPlayer)
+                        then SoundPlayAnoncer(snd_player_defeated[race],true);
+lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build[race],true);
 lmt_unit_advanced     : begin
-                           if(length(ps^)=1)then
-                            with _uids[ord(ps^[1])] do
-                             if(un_snd_ready[false]<>un_snd_ready[true])then
-                             begin SoundPlayUnitCommand(un_snd_ready[true]);exit;end;
+                           with _uids[uid] do
+                            if(un_snd_ready[false]<>un_snd_ready[true])then
+                            begin SoundPlayUnitCommand(un_snd_ready[true]);exit;end;
                            SoundPlayAnoncer(snd_unit_promoted[race],true);
                         end;
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
-lmt_unit_ready        : if(length(ps^)=2)then
-                         with _uids[ord(ps^[1])] do SoundPlayUnitCommand(un_snd_ready[ps^[2]<>#0]);
+lmt_unit_ready        : with _uids[uid] do SoundPlayUnitCommand(un_snd_ready[uidt=glcp_unita]);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
 lmt_req_common        : SoundPlayAnoncer(snd_cant_start_prod  [race],true);
-      end;
-   end;
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -435,8 +428,7 @@ begin
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 
-
-   if(G_Started)and(G_paused=0)and(not _menu)
+   if(G_Started)and(G_status=0)and(not _menu)
    then SoundPlayUnitSelect;
 end;
 

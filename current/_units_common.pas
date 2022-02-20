@@ -157,16 +157,23 @@ begin
     begin
        _canmove:=false;
 
-       if(speed<=0)or(bld=false)or(a_rld>0)then exit;
+       if(speed<=0)or(bld=false)then exit;
+
+       if(a_rld>0)then
+        if(a_weap_cl>MaxUnitWeapons)
+        then exit
+        else
+         with _a_weap[a_weap_cl] do
+          if(not cf(@aw_reqf,@wpr_move))then exit;
 
        if(_ukmech)then
        begin
-         if(buff[ub_stun  ]>0)then exit;
+         if(buff[ub_stun]>0)then exit;
        end
        else
-         if(buff[ub_pain  ]>0)
-         or(buff[ub_cast  ]>0)
-         or(buff[ub_stun  ]>0)then exit;
+         if(buff[ub_pain]>0)
+         or(buff[ub_cast]>0)
+         or(buff[ub_stun]>0)then exit;
 
        _canmove:=true;
     end;
@@ -185,12 +192,12 @@ begin
       begin
          if(_ukmech)then
          begin
-           if(buff[ub_stun  ]>0)then exit;
+           if(buff[ub_stun]>0)then exit;
          end
          else
-           if(buff[ub_pain  ]>0)
-           or(buff[ub_cast  ]>0)
-           or(buff[ub_stun  ]>0)then exit;
+           if(buff[ub_pain]>0)
+           or(buff[ub_cast]>0)
+           or(buff[ub_stun]>0)then exit;
       end;
 
       case _attack of
@@ -578,7 +585,7 @@ begin
 
    for u:=1 to MaxUnits do
     if(u<>skipunit)then
-     with _units[u] do
+     with _punits[u]^ do
       with uid^ do
        if(hits>0)and(ukfly=flylevel)and(_IsUnitRange(inapc,nil)=false)then
         if(speed<=0)or(not bld)then
@@ -641,15 +648,16 @@ begin
    _InBuildArea:=2;
 
    for u:=1 to MaxUnits do
-    with _units[u] do
+    with _punits[u]^ do
      with uid^ do
       if(hits>0)and(bld)and(isbuildarea)and(playeri=pl)then
-       if(buid in ups_builder)and(_IsUnitRange(inapc,nil)=false)then
-        if(dist(x,y,tx,ty)<srange)then
-        begin
-           _InBuildArea:=0; // inside build area
-           break;
-        end;
+       if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
+        if(buid in ups_builder)and(_IsUnitRange(inapc,nil)=false)then
+         if(dist(x,y,tx,ty)<srange)then
+         begin
+            _InBuildArea:=0; // inside build area
+            break;
+         end;
 end;
 
 function _CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte;obstacles:boolean):byte;
@@ -893,8 +901,6 @@ begin
           cycle_order:= _LastCreatedUnit mod order_period;
           unum    := _LastCreatedUnit;
 
-          gridx   := -1;
-          gridy   := -1;
           x       := ux;
           y       := uy;
           _unit_correctXY(_LastCreatedUnitP);
@@ -931,7 +937,6 @@ begin
      if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)
      then _unit_add(bx,by,buid,bp,false,false,false)
      else _unit_start_build:=ureq_place;
-   _last_prod_cndt:=_unit_start_build;
 end;
 
 
@@ -940,30 +945,36 @@ end;
 function _unit_straining_p(pu:PTUnit;puid:byte;pn:integer):boolean;
 begin
    _unit_straining_p:=false;
-   if(puid<255)then
+   if(0<puid)and(puid<255)then
     with pu^ do
-    with uid^ do
-     if(uprod_r[pn]=0)and(bld)and(_isbarrack)and(_ukbuilding)then
-      if(puid in ups_units)and(_uid_conditionals(pu^.player,puid)=0)then
-       with player^ do
-       begin
-          uproda+=1;
-          uprodl+=_uids[puid]._limituse;
-          uprodc[_uids[puid]._ucl]+=1;
-          uprodu[ puid           ]+=1;
-          cenerg-=_uids[puid]._renerg;
-          uprod_u[pn]:=puid;
-          uprod_r[pn]:=_uids[puid]._tprod;
+     with uid^ do
+      if(bld)and(_isbarrack)and(_ukbuilding)then
+       if not (puid in ups_units)
+       then PlayerSetProdError(playeri,glcp_unit,puid,ureq_barracks,pu)
+       else
+         if(uprod_r[pn]>0)
+         then PlayerSetProdError(playeri,glcp_unit,puid,ureq_busy,pu)
+         else
+           if(not PlayerSetProdError(playeri,glcp_unit,puid,_uid_conditionals(pu^.player,puid),pu))then
+            with player^ do
+            begin
+               uproda+=1;
+               uprodl+=_uids[puid]._limituse;
+               uprodc[_uids[puid]._ucl]+=1;
+               uprodu[ puid           ]+=1;
+               cenerg-=_uids[puid]._renerg;
+               uprod_u[pn]:=puid;
+               uprod_r[pn]:=_uids[puid]._tprod;
 
-          _unit_straining_p:=true;
-       end;
+               _unit_straining_p:=true;
+            end;
 end;
 function _unit_straining(pu:PTUnit;puid:byte):boolean;
 var i:byte;
 begin
    _unit_straining:=true;
 
-   for i:=0 to MaxUnitProds do
+   for i:=0 to MaxUnitProdsI do
    begin
       if(i>0)then
        if(pu^.buff[ub_advanced]<=0)then break;
@@ -1000,7 +1011,7 @@ var i:byte;
 begin
    _unit_ctraining:=true;
 
-   for i:=MaxUnitProds downto 0 do
+   for i:=MaxUnitProdsI downto 0 do
     if(_unit_ctraining_p(pu,puid,i))and(puid<255)then exit;
 
    _unit_ctraining:=false;
@@ -1014,27 +1025,33 @@ begin
    _unit_supgrade_p:=false;
    if(upid<255)then
     with pu^ do
-    with uid^ do
-     if(pprod_r[pn]=0)and(bld)and(_issmith)and(_ukbuilding)then
-      if(_upid_conditionals(player,upid)=0)then
-       with player^ do
-       with _upids[upid] do
-       begin
-          upproda+=1;
-          upprodu[upid]+=1;
-          cenerg-=_up_renerg;
-          pprod_r[pn]:=_up_time;
-          pprod_u[pn]:=upid;
+     with uid^ do
+      if(bld)and(_issmith)and(_ukbuilding)then
+       if not(upid in ups_upgrades)
+       then PlayerSetProdError(playeri,glcp_upgr,upid,ureq_smiths,pu)
+       else
+         if(pprod_r[pn]>0)
+         then PlayerSetProdError(playeri,glcp_upgr,upid,ureq_busy,pu)
+         else
+           if(not PlayerSetProdError(playeri,glcp_upgr,upid,_upid_conditionals(player,upid),pu))then
+            with player^ do
+             with _upids[upid] do
+             begin
+                upproda+=1;
+                upprodu[upid]+=1;
+                cenerg-=_up_renerg;
+                pprod_r[pn]:=_up_time;
+                pprod_u[pn]:=upid;
 
-          _unit_supgrade_p:=true;
-       end;
+                _unit_supgrade_p:=true;
+             end;
 end;
 function _unit_supgrade(pu:PTUnit;upid:integer):boolean;
 var i:byte;
 begin
    _unit_supgrade:=true;
 
-   for i:=0 to MaxUnitProds do
+   for i:=0 to MaxUnitProdsI do
    begin
       if(i>0)then
        if(pu^.buff[ub_advanced]<=0)then break;
@@ -1068,7 +1085,7 @@ var i:byte;
 begin
    _unit_cupgrade:=true;
 
-   for i:=MaxUnitProds downto 0 do
+   for i:=MaxUnitProdsI downto 0 do
     if(_unit_cupgrade_p(pu,puid,i))and(puid<255)then exit;
 
    _unit_cupgrade:=false;
@@ -1188,7 +1205,7 @@ begin
                then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
-            GameLogUnitReady(playeri,_uid,_LastCreatedUnitP^.buff[ub_advanced]>0);
+            GameLogUnitReady(_LastCreatedUnitP);
          end;
       end;
    end;
@@ -1201,7 +1218,7 @@ begin
    with uid^ do
    if(_isbarrack)then
    with player^ do
-   for i:=0 to MaxUnitProds do
+   for i:=0 to MaxUnitProdsI do
    if(uprod_r[i]>0)then
    begin
        _uid:=uprod_u[i];
@@ -1230,7 +1247,7 @@ begin
   with uid^ do
   if(_issmith)then
   with player^ do
-  for i:=0 to MaxUnitProds do
+  for i:=0 to MaxUnitProdsI do
   if(pprod_r[i]>0)then
   begin
       _uid:=pprod_u[i];
@@ -1243,7 +1260,7 @@ begin
        begin
           upgr[_uid]+=1;
           _unit_cupgrade_p(pu,255,i);
-          GameLogAddUpgrade(playeri,_uid);
+          GameLogUpgradeComplete(playeri,_uid,x,y);
        end
        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
   end;
@@ -1330,10 +1347,11 @@ begin
          if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;
       end;
 
-      if(a_rld>0)then a_rld-=1;
-
       if(bld)then
-       if(rld>0)then rld-=1;
+      begin
+         if(  rld>0)then   rld-=1;
+         if(a_rld>0)then a_rld-=1;
+      end;
    end;
 end;
 
@@ -1367,7 +1385,7 @@ begin
     begin
        _unit_dec_Rcntrs(pu);
 
-       if(G_WTeam=255)then
+       //if(G_Status=gs_running)then
         if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
          if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
@@ -1506,21 +1524,23 @@ UID_HEye  : buff[ub_detect]:=_ub_infinity;
 
       // INVIS
       case uidi of
-UID_HEye,
 UID_HTotem: buff[ub_invis]:=b2ib[upgr[upgr_hell_totminv]>0];
 UID_Commando,
 UID_Demon : buff[ub_invis]:=buff[ub_advanced];
+UID_HEye,
 UID_UMine : buff[ub_invis]:=_ub_infinity;
       end;
 
       // OTHER HARDCODE
+      if(buff[ub_hvision]>0)then
+       if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
+
       case uidi of
 UID_LostSoul: begin
                  tu:=nil;
                  if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
                  if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
               end;
-UID_HEye : buff[ub_advanced]:=b2ib[upgr[upgr_hell_heye]>1];
 UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
            begin
               if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+3;{$ENDIF}end;
@@ -1538,8 +1558,9 @@ UID_UCommandCenter:
                  {$ENDIF}
                  ukfly:=uf_fly;
                  zfall:=zfall-fly_hz;
+                 _unit_clear_order(pu,false);
               end;
-              speed:=_speed;
+              speed:=6;
            end
            else
            begin
@@ -1550,6 +1571,7 @@ UID_UCommandCenter:
                  {$ENDIF}
                  zfall:=fly_hz;
                  ukfly:=uf_ground;
+                 _unit_clear_order(pu,false);
               end;
               speed:=0;
 
@@ -1585,7 +1607,8 @@ UID_ZMajor:
 UID_FAPC  : if(buff[ub_advanced]>0)
             then apcm:=_apcm+4
             else apcm:=_apcm;
-           //
+UID_UCTurret:
+          buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
       end;
 
       // BUILD AREA

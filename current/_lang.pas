@@ -396,7 +396,7 @@ begin
    _mkHStrUid(UID_Imp        ,'Imp'            ,'');
    _mkHStrUid(UID_Demon      ,'Demon'          ,'');
    _mkHStrUid(UID_Cacodemon  ,'Cacodemon'      ,'');
-   _mkHStrUid(UID_Baron      ,'Baron of Hell / Hell Knight','');
+   _mkHStrUid(UID_Knight      ,'Baron of Hell / Hell Knight','');
    _mkHStrUid(UID_Cyberdemon ,'Cyberdemon'     ,'');
    _mkHStrUid(UID_Mastermind ,'Mastermind'     ,'');
    _mkHStrUid(UID_Pain       ,'Pain Elemental' ,'');
@@ -448,12 +448,11 @@ begin
    _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
    _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,'Researches and upgrades.'        );
-   _mkHStrUid(UID_UCTurret         ,'UAC Chaingun Turret'        ,'Defensive structure.'            );
+   _mkHStrUid(UID_UCTurret         ,'UAC Anti-ground turret'     ,'Defensive structure.'            );
    _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map.'                    );
    _mkHStrUid(UID_UTechCenter      ,'UAC Tech Center'            ,'Upgrades units.'                 );
-   _mkHStrUid(UID_UPTurret         ,'UAC Plasma turret'          ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
-   _mkHStrUid(UID_URTurret         ,'UAC Rocket turret'          ,'Advanced defensive structure.'   );
+   _mkHStrUid(UID_URTurret         ,'UAC Anti-air turret'        ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
@@ -841,12 +840,11 @@ begin
   _mkHStrUid(UID_UFactory        ,'Фабрика'                ,'Производит технику.'              );
   _mkHStrUid(UID_UGenerator      ,'Генератор'              ,'Увеличивает энергию.'             );
   _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'       ,'Исследования и улучшения.'        );
-  _mkHStrUid(UID_UCTurret        ,'Пулеметная Турель'      ,'Защитное сооружение.'             );
+  _mkHStrUid(UID_UCTurret        ,'Анти-наземная Турель'   ,'Защитное сооружение.'             );
   _mkHStrUid(UID_URadar          ,'Радар'                  ,'Раскрывает карту.'                );
   _mkHStrUid(UID_UTechCenter     ,'Технический Центр'      ,'Улучшает юнитов.'                 );
-  _mkHStrUid(UID_UPTurret        ,'Плазменная Турель'      ,'Продвинутое защитное сооружение.' );
   _mkHStrUid(UID_URMStation        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
-  _mkHStrUid(UID_URTurret        ,'Ракетная Турель'        ,'Продвинутое защитное сооружение.');
+  _mkHStrUid(UID_URTurret        ,'Анти-воздушная Турель'  ,'Защитное сооружение.');
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_UMine           ,'Мина','');
 

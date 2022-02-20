@@ -87,8 +87,15 @@ begin
           _wudata_byte(byte(s),rpl);
           for t:=1 to s do
           begin
-             _wudata_byte  (log_lt[i],rpl);
-             _wudata_string(log_ls[i],rpl);
+             with log_l[i] do
+             begin
+                _wudata_byte  (mtype,rpl);
+                _wudata_byte  (uidt ,rpl);
+                _wudata_byte  (uid  ,rpl);
+                _wudata_string(str  ,rpl);
+                _wudata_byte  (byte(x shr 5),rpl);
+                _wudata_byte  (byte(y shr 5),rpl);
+             end;
 
              if(i=MaxPlayerLog)
              then i:=0
@@ -131,6 +138,7 @@ begin
       SetBBit(@_bts2,2, buff[ub_summoned ]>0);
       SetBBit(@_bts2,3, buff[ub_invuln   ]>0);
       SetBBit(@_bts2,4, buff[ub_teleeff  ]>0);
+      SetBBit(@_bts2,5, buff[ub_hvision  ]>0);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -159,7 +167,7 @@ var i: byte;
 begin
    with pu^ do
    with uid^ do
-   for i:=0 to MaxUnitProds do
+   for i:=0 to MaxUnitProdsI do
    begin
       if(_isbarrack)then if(_wrld(@uprod_r[i],rpl)>0)then _wudata_byte(uprod_u[i],rpl);
       if(_issmith  )then if(_wrld(@pprod_r[i],rpl)>0)then _wudata_byte(pprod_u[i],rpl);
@@ -378,7 +386,7 @@ begin
             _unit_done_inc_cntrs(pu);
 
             if(_isbarrack)then
-             for i:=0 to MaxUnitProds do
+             for i:=0 to MaxUnitProdsI do
               if(uprod_r[i]>0)then
               begin
                  _puid:=uprod_u[i];
@@ -389,7 +397,7 @@ begin
                  cenerg-=_uids[_puid]._renerg;
               end;
             if(_issmith)then
-             for i:=0 to MaxUnitProds do
+             for i:=0 to MaxUnitProdsI do
               if(pprod_r[i]>0)then
               begin
                  _puid:=pprod_u[i] ;
@@ -434,7 +442,7 @@ begin
             _unit_done_dec_cntrs(pu);
 
              if(_isbarrack)then
-              for i:=0 to MaxUnitProds do
+              for i:=0 to MaxUnitProdsI do
                if(uprod_r[i]>0)then
                begin
                   _puid:=uprod_u[i];
@@ -445,7 +453,7 @@ begin
                   cenerg+=_uids[_puid]._renerg;
                end;
              if(_issmith)then
-              for i:=0 to MaxUnitProds do
+              for i:=0 to MaxUnitProdsI do
                if(pprod_r[i]>0)then
                begin
                   _puid:=pprod_u[i];
@@ -534,18 +542,11 @@ begin
 
                 _unit_death_effects(uu,true,@vis);
              end;
-
-             if(hits<=ndead_hits)and(pu^.uid^._ability=uab_morph2heye)and(buff[ub_cast]>0)then _pain_lost_fail(vx,vy,_depth(vy+1,ukfly),@vis);
           end;
 
           if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           _ucDec(pu);
-
-          {x :=-32000;
-          y :=-32000;
-          vx:=x;
-          vy:=y; }
        end
        else
          if(pu^.hits>dead_hits)and(hits>dead_hits)then
@@ -554,8 +555,6 @@ begin
             begin
                vx:=x;
                vy:=y;
-
-               if(pu^.uid^._ability=uab_morph2heye)and(pu^.uidi=UID_LostSoul)and(buff[ub_cast]>0)then _pain_lost_fail(pu^.vx,pu^.vy,_depth(pu^.vy+1,pu^.ukfly),@vis);
             end;
 
             _unit_upgr(pu);
@@ -702,7 +701,10 @@ begin
 end;
 
 procedure  _rudata_chat(p:byte;rpl:boolean);
-var t,s:byte;
+var s,
+mtype,
+uidt,
+uid,x,y:byte;
     str:shortstring;
 begin
    s:=_rudata_byte(rpl,0);
@@ -710,9 +712,13 @@ begin
    begin
       while(s>0)do
       begin
-         t  :=_rudata_byte  (rpl,0);
-         str:=_rudata_string(rpl);
-         PlayerAddLog(p,t,str,false);
+         mtype:=_rudata_byte  (rpl,0);
+         uidt :=_rudata_byte  (rpl,0);
+         uid  :=_rudata_byte  (rpl,0);
+         str  :=_rudata_string(rpl  );
+         x    :=_rudata_byte  (rpl,0);
+         y    :=_rudata_byte  (rpl,0);
+         PlayerAddLog(p,mtype,uidt,uid,str,x shl 5,y shl 5,false);
          s-=1;
       end;
       if(rpl=false)then
@@ -753,6 +759,7 @@ begin
          buff[ub_summoned ]:=_buffst[GetBBit(@_bts2,2)];
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,4)];
+         buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,5)];
       end
       else
       begin
@@ -761,6 +768,7 @@ begin
          buff[ub_summoned ]:=0;
          buff[ub_invuln   ]:=0;
          buff[ub_teleeff  ]:=0;
+         buff[ub_hvision  ]:=0;
       end;
 
       if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
@@ -780,7 +788,7 @@ var i: byte;
 begin
    with uu^ do
    with uid^ do
-   for i:=0 to MaxUnitProds do
+   for i:=0 to MaxUnitProdsI do
    begin
       if(_isbarrack)then if(_rrld(@uprod_r[i],rpl)>0)then uprod_u[i]:=_rudata_byte(rpl,0);
       if(_issmith  )then if(_rrld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);

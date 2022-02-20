@@ -102,8 +102,7 @@ begin
    randomize;
 
    G_Step         :=0;
-   G_Paused       :=0;
-   G_WTeam        :=255;
+   G_Status       :=0;
    G_player_status:=255;
 
    ServerSide     :=true;
@@ -144,7 +143,7 @@ begin
 
    vid_cam_x:=-vid_panelw;
    vid_cam_y:=0;
-   _view_bounds;
+   CamBounds;
 
    vid_rtui:=0;
    vid_vsls:=0;
@@ -336,22 +335,11 @@ usel_max : integer;
 psel     : boolean;
 pu       : PTUnit;
 begin
-   _last_prod_type:= 0;
-   _last_prod_uid := 0;
-   _last_prod_cndt:= 0;
-
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
-      //prod_cndt:=0;
       case o_id of
-uo_build    : if(0<o_x1)and(o_x1<=255)then begin _last_prod_type:=glcp_unit;_last_prod_uid:=byte(o_x1);end;
-co_suprod   : if(0<o_y0)and(o_y0<=255)then begin _last_prod_type:=glcp_unit;_last_prod_uid:=byte(o_y0);end;
-co_supgrade : if(0<o_y0)and(o_y0<=255)then begin _last_prod_type:=glcp_upgr;_last_prod_uid:=byte(o_y0);end;
-      end;
-
-      case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then _last_prod_cndt:=_unit_start_build(o_x0,o_y0,byte(o_x1),pl);
+uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
       else
          usel_n  :=0;
          usel_max:=MaxPlayerUnits;
@@ -384,6 +372,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _last_prod_cndt:=_unit_start_build(o_x
              begin
                 psel:=sel;
 
+                // common select
                 if (o_id=uo_select )
                 or((o_id=uo_aselect)and(not sel))then
                 begin
@@ -393,17 +382,14 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _last_prod_cndt:=_unit_start_build(o_x
                    if(usel_n>=usel_max)then sel:=false;
                 end;
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
-
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
                  if(uidi=o_a0)then
                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
-
                 if(o_id=uo_specsel)then
                  if(o_x0<1)or(255<o_x0)
                  then begin if(UnitF2Select(pu)    )then sel:=true else if(o_y0=0)then sel:=false; end
                  else       if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
-
 
                 if(o_id=uo_corder)then
                  case o_x0 of
@@ -445,15 +431,13 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then _last_prod_cndt:=_unit_start_build(o_x
 
       o_id:=0;
    end;
-
-   //GameLogCantProduction(HPlayer,byte(o_x1),glcp_unit,uid,false);
 end;
 
 procedure GameEndConditions;
 var p:byte;
 begin
    if(not G_Started)
-   or(G_Paused=0)
+   or(G_Status=gs_running)
    or(not ServerSide)then exit;
 
    if(net_status>ns_none)and(G_Step<fr_fps)then exit;
@@ -463,7 +447,7 @@ begin
     with _players[p] do
      if(army>0)and(state>ps_none)then g_player_status:=g_player_status or (1 shl p);
 
-   if(G_WTeam=255)then
+  { if(G_WTeam=255)then
    begin
       FillChar(team_army,SizeOf(team_army),0);
       G_WTeam:=255;
@@ -492,7 +476,7 @@ begin
       {$IFDEF _FULLGAME}
       r_draw:=true;
       {$ENDIF}
-   end;
+   end; }
 end;
 
 procedure PlayersCycle;
@@ -516,13 +500,19 @@ begin
                 vid_menu_redraw:=true;
              end;
         end;
-        if(log_net_pause>0)then log_net_pause-=1;
+        if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-        if(G_Started)and(G_Paused=0)and(ServerSide)then
+        if(G_Started)and(G_Status=gs_running)and(ServerSide)then
         begin
+           if(build_cd>0)then build_cd-=1;
+
            _u_ord(p);
 
-           if(build_cd>0)then build_cd-=1;
+           if(prod_error_cndt>0)then
+           begin
+              GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
+              prod_error_cndt:=0;
+           end;
         end;
      end;
 
@@ -751,7 +741,7 @@ begin
       //if(k_ctrl=5)then PlaySoundSet(snd_zimba_death);//PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
       //if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
 
-      if(G_paused=0)then
+      if(G_Status=gs_running)then
       begin
          _cycle_order+=1; _cycle_order:=_cycle_order mod order_period;
          _cycle_regen+=1; _cycle_regen:=_cycle_regen mod regen_period;

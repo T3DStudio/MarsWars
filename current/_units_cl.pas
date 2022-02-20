@@ -217,7 +217,7 @@ begin
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(4,nil,snd_hell_melee ,0,0);
 end;
-UID_Baron:
+UID_Knight:
 begin
    _animw:=12;
    _animd:=10;
@@ -452,7 +452,7 @@ begin
 end;
 UID_HEye:
 begin
-   setMWSModel(@spr_HEye,@spr_HAEye);
+   setMWSModel(@spr_HEye,nil);
    setBuildingSND(snd_hell_eye);
    un_build_amode:=2;
    un_eid_bcrater:=255;
@@ -671,19 +671,12 @@ end;
 UID_UCTurret:
 begin
    _animw    := 6;
-   setMWSModel(@spr_UTurret,nil);
+   setMWSModel(@spr_UTurret,@spr_UPTurret);
    setBuildingSND(snd_uac_ctower);
    un_eid_bcrater_y:=1;
    setWeaponESND(0,nil,snd_shotgun,0,0);
-end;
-UID_UPTurret:
-begin
-   _animw    := 4;
-
-   setMWSModel(@spr_UPTurret,nil);
-   setBuildingSND(snd_uac_ctower);
-   un_eid_bcrater_y:=1;
-   setWeaponESND(0,nil,snd_plasma,0,0);
+   setWeaponESND(1,nil,snd_plasma ,0,0);
+   setWeaponESND(2,nil,snd_shotgun,0,0);
 end;
 UID_URTurret:
 begin
@@ -820,7 +813,7 @@ upgr_uac_uarmor     : begin _up_btn:=spr_b_up[r_uac ,1 ]; end;
 upgr_uac_barmor     : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
 upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
-upgr_uac_apcgun     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
+upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
 upgr_uac_detect     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
@@ -832,10 +825,10 @@ upgr_uac_mines      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
 upgr_uac_jetpack    : begin _up_btn:=spr_b_up[r_uac ,15]; end;
 upgr_uac_6bld       : begin _up_btn:=spr_b_up[r_uac ,14]; end;
 upgr_uac_9bld       : begin _up_btn:=spr_b_up[r_uac ,24]; end;
-upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm     : begin _up_btn:=spr_b_up[r_uac ,21]; end;
+upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 
       end;
 

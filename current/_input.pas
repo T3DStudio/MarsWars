@@ -19,7 +19,7 @@ begin
        if(length(net_chat_str)>0)then
         if(net_status=ns_clnt)
         then net_send_chat
-        else PlayersAddLog(HPlayer,net_chat_tar,HPlayer,net_chat_str,false);//message type = player number (chat)
+        else GameLogChat(HPlayer,net_chat_tar,net_chat_str,false);//message type = player number (chat)
        net_chat_str:='';
        ingame_chat:=false;
     end;
@@ -31,9 +31,9 @@ begin
    then net_pause
    else
     if(net_status=ns_srvr)then
-     if(G_paused=0)
-     then G_paused:=HPlayer
-     else G_paused:=0;
+     if(G_Status=0)
+     then G_Status:=HPlayer
+     else G_Status:=0;
 end;
 
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
@@ -66,15 +66,18 @@ begin
      with _units[i] do
       with uid^ do
        if(hits>0)and(sel)and(playeri=HPlayer)then
-        if(speed>0)or(_canattack(@_units[i],false))or(_UnitHaveRPoint(_units[i].uidi))then
+        if(speed>0)or(_canattack(@_units[i],false))or(_UnitHaveRPoint(_units[i].uidi))or(_ability in [uab_hell_vision,uab_radar])then
         begin
            su+=1;
            if(bld)then
-            if(guid=0)or(_mhits>_uids[guid]._mhits)then
-            begin
-               guid:=uidi;
-               gadv:=buff[ub_advanced]>0;
-            end;
+           begin
+              if(guid<>0)then
+               if(_mhits<=_uids[guid]._mhits)then
+                if(_ucl<_uids[guid]._ucl)then continue;
+
+              guid:=uidi;
+              gadv:=buff[ub_advanced]>0;
+           end;
         end;
 
    if(su<=0)then exit;
@@ -116,7 +119,7 @@ end;
 
 procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
 begin
-   if(G_Paused=0)and(rpls_state<rpl_rhead)then
+   if(G_Status=gs_running)and(rpls_state<rpl_rhead)then
    begin
       if(net_status=ns_clnt)then
       begin
@@ -196,7 +199,7 @@ begin
               cndt:=_uid_conditionals(@_players[HPlayer],m_brush);
               if(cndt>0)then
               begin
-                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,cndt,true);
+                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,cndt,mouse_map_x,mouse_map_y,true);
                  m_brush:=co_empty;
               end
               else
@@ -296,7 +299,7 @@ begin
      with _players[HPlayer] do
       case tab of
 
-0: if(G_Paused=0)and(rpls_state<rpl_runit)then  // buildings
+0: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // buildings
    if(u<=ui_ubtns)then
    case right of
 false: begin
@@ -313,14 +316,14 @@ true : if(_IsUnitRange(uid_x[ui_panel_uids[race,0,u]],@tu))then
          with tu^ do _command(x,y);
    end;
 
-1: if(G_Paused=0)and(rpls_state<rpl_runit)then  // units
+1: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // units
    if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_suprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
 true : _player_s_o(co_cuprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
    end;
 
-2: if(G_Paused=0)and(rpls_state<rpl_runit)then  // upgrades
+2: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // upgrades
    if(u<=ui_ubtns)then
    case right of
 false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
@@ -329,7 +332,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
 
 3: if(rpls_state<rpl_rhead)then
    begin
-      if(G_Paused=0)and(right=false)then
+      if(G_Status=gs_running)and(right=false)then
       begin
          case u of
    0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
@@ -370,9 +373,9 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
         case u of
      12: _fsttime:=not _fsttime;
      14: if(rpls_state<rpl_end)then
-          if(G_Paused>0)
-          then G_Paused:=0
-          else G_Paused:=200;
+          if(G_Status=gs_running)
+          then G_Status:=gs_running
+          else G_Status:=gs_replaypause;
      15: rpls_plcam  :=not rpls_plcam;
      16: rpls_showlog:=not rpls_showlog;
      17: rpls_fog    :=not rpls_fog;
@@ -436,7 +439,7 @@ begin
               end;
            end;
 
-           if(G_Paused=0)then
+           if(G_Status=gs_running)then
            begin
               for ko:=0 to _mhkeys do  // actions   _hotkeyA2
               begin
@@ -510,7 +513,7 @@ begin
                               begin
                                  vid_cam_x-=_event^.motion.x-mouse_x;
                                  vid_cam_y-=_event^.motion.y-mouse_y;
-                                 _view_bounds;
+                                 CamBounds;
                               end;
                               mouse_x:=_event^.motion.x;
                               mouse_y:=_event^.motion.y;
@@ -636,7 +639,7 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
-            else GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,ureq_place,true);
+            else GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,ureq_place,mouse_map_x,mouse_map_y,true);
 co_paction,
 co_move,
 co_amove,
@@ -672,7 +675,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
             then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer)
             else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer);
 
-            if(G_Paused=0)and(rpls_state<rpl_runit)then
+            if(G_Status=gs_running)and(rpls_state<rpl_runit)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 
@@ -684,7 +687,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
    if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
       MoveCamToPoint(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx));
-      _view_bounds;
+      CamBounds;
    end;
 
    //if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HMU);
@@ -722,7 +725,7 @@ begin
    if(k_d>1)then vid_cam_y+=vid_vmspd;
    if(k_r>1)then vid_cam_x+=vid_vmspd;
 
-   if(vx<>vid_cam_x)or(vy<>vid_cam_y)then _view_bounds;
+   if(vx<>vid_cam_x)or(vy<>vid_cam_y)then CamBounds;
 end;
 
 procedure g_keyboard;

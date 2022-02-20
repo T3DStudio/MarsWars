@@ -10,7 +10,7 @@ end;
 
 procedure d_Game;
 begin
-   D_AddObjSprites(G_Paused>0);
+   D_AddObjSprites(G_Status>gs_running);
 
    D_terrain   (r_screen,vid_mapx,vid_mapy);
    D_SpriteList(r_screen,vid_mapx,vid_mapy);

@@ -169,7 +169,7 @@ procedure ui_counters(pu:PTUnit);
 var i:byte;
 begin
    with pu^ do
-   if(playeri=HPlayer)and(G_Paused=0)then
+   if(playeri=HPlayer)and(G_Status=gs_running)then
    with uid^ do
    with player^ do
    begin
@@ -193,7 +193,7 @@ begin
                  if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_unitrS[vid_rtui>vid_rtuish]);
             end;
 
-            for i:=0 to MaxUnitProds do
+            for i:=0 to MaxUnitProdsI do
              if(i>0)and(buff[ub_advanced]<=0)
              then break
              else _unit_uiprodcnts(pu,i);
@@ -271,7 +271,7 @@ begin
           if(buff[ub_clcast]>0)then exit;
 
          wanim:=false;
-         if(g_paused=0)then
+         if(G_Status=gs_running)then
           if(_canmove(pu))then
            wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
 
@@ -307,7 +307,7 @@ begin
              if(bld)then
              begin
                 if(a_rld<=0)and(noanim=false)then
-                 if(uidi in [UID_UCTurret,UID_UPTurret,UID_URTurret])then
+                 if(uidi in [UID_UCTurret,UID_URTurret])then
                  begin
                     dir+=_animw;
                     dir:=dir mod 360;
@@ -315,7 +315,7 @@ begin
 
                 if(playeri=HPlayer)then
                 begin
-                   for t:=0 to MaxUnitProds do
+                   for t:=0 to MaxUnitProdsI do
                    begin
                       if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','');
                       if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','');
@@ -344,6 +344,14 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
                 if(buff[ub_invis]>0)then alpha:=alpha shr 1;
 
             SpriteListAddUnit(vx,vy,depth,shadow,ShadowColor(PlayerGetColor(playeri)),aura,spr,alpha);
+
+            if(buff[ub_hvision]>0)then
+            begin
+               if(_ukbuilding)
+               then t:=vy
+               else t:=vy-spr^.hh;
+               SpriteListAddUnit(vx,t,depth+1,0,0,0,_uid2spr(UID_HEye,false),255);
+            end;
          end;
       end;
    end;
@@ -400,7 +408,7 @@ begin
       with pu^ do
        if(_IsUnitRange(inapc,@tu))then
        begin
-          if(tu^.sel)and(G_paused=0)and(playeri=HPlayer)then ui_units_inapc[uidi]+=1;
+          if(tu^.sel)and(G_Status=gs_running)and(playeri=HPlayer)then ui_units_inapc[uidi]+=1;
        end
        else
          if(hits<=0)

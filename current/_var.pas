@@ -11,8 +11,7 @@ _EVENT            : pSDL_EVENT;
 
 g_addon           : boolean  = true;
 g_started         : boolean  = false;
-g_paused          : byte     = 0;
-g_wteam           : byte     = 255;
+g_status          : byte     = 0;
 g_mode            : byte     = 0;
 g_start_base      : byte     = 0;
 g_show_positions  : boolean  = false;
@@ -86,10 +85,6 @@ net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
 net_period        : byte = 0;
 net_log_n         : word = 0;
-
-_last_prod_type   : byte = 0;
-_last_prod_uid    : byte = 0;
-_last_prod_cndt   : cardinal = 0;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
@@ -526,7 +521,6 @@ spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
 spr_HEye,
-spr_HAEye,
 
 spr_UCommandCenter,
 spr_UMilitaryUnit,

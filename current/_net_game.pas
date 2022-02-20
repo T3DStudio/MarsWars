@@ -74,7 +74,7 @@ begin
 
       log_n_cl:=net_readcard;
 
-      if(log_n_cl=log_n)then log_net_pause:=0;
+      if(log_n_cl=log_n)then net_logsend_pause:=0;
    end;
 end;
 
@@ -174,7 +174,7 @@ begin
             case mid of
 nmid_log_chat    : begin
                       i:=net_readbyte;
-                      PlayersAddLog(pid,i,lmt_player_chat,net_readstring,false);    // chat
+                      GameLogChat(pid,i,net_readstring,false);    // chat
                       {$IFNDEF _FULLGAME}
                       if(G_Started=false)then
                        with(_players[pid])do
@@ -204,13 +204,13 @@ nmid_client_info: with _players[pid] do
                   begin
                      PNU     :=net_readbyte;
                      log_n_cl:=net_readcard;
-                     if(log_n_cl=log_n)then log_net_pause:=0;
+                     if(log_n_cl=log_n)then net_logsend_pause:=0;
                   end;
 nmid_pause      : begin
-                     if(G_Paused=pid)
-                     then G_Paused:=0
+                     if(G_Status=pid)
+                     then G_Status:=gs_running
                      else
-                       if(G_Paused<>HPlayer)or(G_Paused=0)then G_Paused:=pid;
+                       if(G_Status<>HPlayer)or(G_Status=gs_running)then G_Status:=pid;
                     {$IFNDEF _FULLGAME}
                     vid_menu_redraw:=true;
                     {$ENDIF}
@@ -245,20 +245,19 @@ nmid_pause      : begin
          begin
             net_clearbuffer;
             net_writebyte(nmid_snapshot);
-            net_writebyte(G_Paused);
-            if(G_Paused=0)
-            then _wclinet_gframe(i,false)
-            else net_writebyte(G_WTeam);
+            net_writebyte(G_Status);
+            if(G_Status=gs_running)
+            then _wclinet_gframe(i,false);
             net_send(nip,nport);
          end;
 
-         if(log_net_pause<=0)and(log_n_cl<>log_n)then
+         if(net_logsend_pause<=0)and(log_n_cl<>log_n)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_chatclupd);
             _wudata_chat(i,@log_n_cl,false);
             net_send(nip,nport);
-            log_net_pause:=fr_2hfps;
+            net_logsend_pause:=fr_2hfps;
          end;
       end;
 
@@ -376,11 +375,10 @@ nmid_lobby_info  : begin
       begin
          if(mid=nmid_snapshot)then
          begin
-            G_paused:=net_readbyte;
+            G_Status:=net_readbyte;
 
-            if(G_paused=0)
-            then _rclinet_gframe(HPlayer,false)
-            else G_WTeam:=net_readbyte;
+            if(G_Status=gs_running)
+            then _rclinet_gframe(HPlayer,false);
          end;
       end;
    end;
@@ -414,7 +412,7 @@ nmid_lobby_info  : begin
    begin
       net_cl_svttl+=1;
       if(net_cl_svttl=fr_fps   )then vid_menu_redraw:=true;
-      if(net_cl_svttl=ClientTTL)then G_Paused:=net_cl_svpl;
+      if(net_cl_svttl=ClientTTL)then G_Status:=gs_waitserver;
    end;
 end;
 
