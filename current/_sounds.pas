@@ -393,7 +393,8 @@ lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
 lmt_unit_ready        : with _uids[uid] do SoundPlayUnitCommand(un_snd_ready[uidt=glcp_unita]);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
-lmt_req_common        : SoundPlayAnoncer(snd_cant_start_prod  [race],true);
+lmt_req_common        : SoundPlayAnoncer(snd_cant_start_prod[race],true);
+lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
      end;
 end;
 
@@ -480,6 +481,7 @@ begin
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
    snd_hpower               :=SoundSetLoad('hpower'          );
+   snd_mapmark              :=SoundSetLoad('mapmark'         );
 
    snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
    snd_launch               :=SoundSetLoad(missiles_folder+'launch'          );

@@ -934,11 +934,6 @@ snd_arachno_move,
 snd_arachno_foot,
 snd_arachno_ready,
 
-{
-snd_alarm,
-
-snd_hshoot,
-}
 snd_cube,
 snd_pistol,
 snd_shotgun,
@@ -966,14 +961,9 @@ snd_teleport,
 snd_pexp,
 snd_exp,
 snd_hpower,
+snd_mapmark,
 snd_hell
-{
-,
-,
-
-,
-snd_hell,
- }       : PTSoundSet;
+       : PTSoundSet;
 
 
 {$ELSE}

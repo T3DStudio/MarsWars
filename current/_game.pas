@@ -51,6 +51,9 @@ begin
                                  UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
                                  MaxUnits,true);
 
+       PlayerSetAllowedUnits(p,[ UID_HFortress,UID_HAltar,
+                                 UID_UNuclearPlant,UID_URMStation ],1,false);
+
        PlayerSetAllowedUpgrades(p,[0..255],255,true); //
 
        {ai_pushtime := fr_fps*30;
@@ -389,7 +392,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                 if(o_id=uo_specsel)then
                  if(o_x0<1)or(255<o_x0)
                  then begin if(UnitF2Select(pu)    )then sel:=true else if(o_y0=0)then sel:=false; end
-                 else       if(_max=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
+                 else       if(a_units[uidi]=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
                 if(o_id=uo_corder)then
                  case o_x0 of

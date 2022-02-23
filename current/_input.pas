@@ -36,6 +36,14 @@ begin
      else G_Status:=0;
 end;
 
+procedure MapMarker(x,y:integer);
+begin
+   if(net_status=ns_clnt)
+   then net_SendMapMark(x,y)
+   else GameLogMapMark(HPlayer,x,y);
+   m_brush:=co_empty;
+end;
+
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
 var su,i:integer;
     guid:byte;
@@ -269,8 +277,8 @@ function _rclickmove(uid:byte):boolean;
 begin
    _rclickmove:=false;
    if(uid>0)then
-    with _uids[uid] do
-     if(_max=1)and(_UnitHaveRPoint(uid))then _rclickmove:=true;
+    with _players[HPlayer] do
+     if(a_units[uid]=1)and(_UnitHaveRPoint(uid))then _rclickmove:=true;
 end;
 
 procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
@@ -304,7 +312,7 @@ begin
    case right of
 false: begin
           m_brush:=ui_panel_uids[race,0,u];
-          if(_uids[m_brush]._max=1)and(uid_e[m_brush]>0)then
+          if(a_units[m_brush]=1)and(uid_e[m_brush]>0)then
           begin
              _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
              m_brush:=co_empty;
@@ -527,7 +535,8 @@ begin
       SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
                             SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
                             SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
-                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
+                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then
+                                                    if(k_ctrl>1)then m_brush:=co_mmark else m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_menu_redraw:=true;
@@ -645,6 +654,7 @@ co_move,
 co_amove,
 co_patrol,
 co_apatrol: _command(mouse_map_x,mouse_map_y);
+co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
      end
     else
       if(m_by<3)then      // minimap
@@ -654,6 +664,7 @@ co_apatrol: _command(mouse_map_x,mouse_map_y);
       co_amove,
       co_patrol,
       co_apatrol : _command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+      co_mmark   : MapMarker(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       else         if(rpls_plcam=false)then m_mmap_move:=true;
       end
       else _panel_click(ui_tab,m_bx,m_by,false,false,false);     // panel

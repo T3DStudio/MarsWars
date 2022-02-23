@@ -6,9 +6,11 @@ procedure ai_code(pu:PTUnit);forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _UnderObstacle(ux,uy:integer):boolean; forward;
-
+function _itcanapc(uu,tu:PTUnit):boolean;  forward;
 
 {$IFDEF _FULLGAME}
+function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;forward;
+function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogHPlayer;  forward;
 {$ENDIF}
 
@@ -54,7 +56,7 @@ begin
       if(g<>[])then
        for i:=0 to 255 do
         if(i in g)then
-         with _uids[i] do a_units[i]:=min2(_max,max);
+         with _uids[i] do a_units[i]:=max;
    end;
 end;
 procedure PlayerSetAllowedUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
@@ -149,7 +151,8 @@ begin
       begin
          net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
          vid_menu_redraw:=true;
-         SoundLogHPlayer;
+
+         if(LogMes2UIAlarm)then SoundLogHPlayer;
       end;
       {$ENDIF}
    end;
@@ -226,6 +229,12 @@ begin
       else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
+end;
+procedure GameLogMapMark(pl:byte;x,y:integer);
+begin
+   if(pl>MaxPlayers)or(ServerSide=false)then exit;
+
+   PlayersAddToLog(pl,0,lmt_map_mark,0,0,'',x,y,false);
 end;
 
 procedure PlayerClearLog(pn:byte);
@@ -498,7 +507,7 @@ begin
       setr(ureq_energy    , cenerg<_renerg                 );
       setr(ureq_time      , _btime<=0                      );
       setr(ureq_addon     ,(_addon)and(G_addon=false)      );
-      setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=min2(_max,a_units[uid]));
+      setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
 
       case _ukbuilding of
 true  : begin
@@ -564,6 +573,7 @@ begin
 end;
 
 function UnitF2Select(pu:PTUnit):boolean;
+var tu:PTUnit;
 begin
    UnitF2Select:=false;
    with pu^  do
@@ -576,9 +586,20 @@ begin
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
       if(_attack  =atm_none)then exit;
-      if(uo_id=ua_paction)
-      or(uo_id=ua_hold   )
-      or(uo_bx>0         )then exit;
+      if(uo_id=ua_paction  )
+      or(uo_id=ua_hold     )
+      or(uo_bx>0           )then exit;
+
+      if(_IsUnitRange(uo_tar,@tu))then
+      begin
+         if(tu^.uid^._ability=uab_teleport)then exit;
+
+         if(tu^.uid^._ability=uab_uac__unit_adv)then
+          if(_ability<>uab_advance)and(buff[ub_advanced]<=0)then exit;
+
+         if(_itcanapc(pu,tu))
+         or(_itcanapc(tu,pu))then exit;
+      end;
    end;
    UnitF2Select:=true;
 end;

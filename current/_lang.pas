@@ -157,9 +157,9 @@ begin
 
          un_txt_hint:= un_txt_name;
          if(length(HK  )>0)then un_txt_hint:=un_txt_hint+' ('+HK+')';
-         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#22+TIME+#25+']';
-         if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
          if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#16+LMT +#25+'>';
+         if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
+         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#22+TIME+#25+']';
          un_txt_hint:=un_txt_hint+#11+un_txt_descr+#11;
          if(length(REQ )>0)then un_txt_hint:= un_txt_hint+#17+str_req+#25+REQ+#11 else un_txt_hint:= un_txt_hint+#11;
          if(length(PROD)>0)then
@@ -188,8 +188,8 @@ begin
 
       _up_hint:=_up_name;
       if(length(HK  )>0)then _up_hint:=_up_hint+' ('+HK+')';
-      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#22+TIME+#25+']';
       if(length(ENRG)>0)then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
+      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#22+TIME+#25+']';
       _up_hint:=_up_hint+' x'+#16+i2s(_up_max)+#25;
       if(_up_mfrg)then _up_hint:=_up_hint+#15+' *'+#25;
       _up_hint:=_up_hint+#11+_up_descr+#11;

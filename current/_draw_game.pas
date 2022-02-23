@@ -278,18 +278,18 @@ begin
    UnitsInfoAddSprite(ax,ay,@spr_stun);
 end;
 
-procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
-var srect,
-      hbar :boolean;
-    acolor :cardinal;
-   buffstr,
-  orderstr :string6;
 function i2s6(i:integer):string6;
 begin
    if(i>0)
    then i2s6:=i2s(i)
    else i2s6:='';
 end;
+
+procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
+var srect,
+      hbar :boolean;
+    acolor :cardinal;
+   buffstr :string6;
 begin
    with pu^   do
    with uid^  do
@@ -316,10 +316,9 @@ begin
          if(buff[ub_advanced]>0)then buffstr:=buffstr+char_advanced;
          if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
 
-         orderstr:='';
-         if(playeri=HPlayer)then orderstr:=i2s6(order);
-
-         UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,orderstr,buffstr,i2s6(apcm),i2s6(apcc));
+         if(playeri=HPlayer)
+         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(order),buffstr,i2s6(apcm),i2s6(apcc))
+         else UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,lvlstr_w   ,buffstr,lvlstr_a  ,lvlstr_s  );
       end;
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 

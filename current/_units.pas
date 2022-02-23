@@ -761,7 +761,7 @@ begin
       if(aicode)then
       begin
          ai_clear_vars;
-         ai_collect_data(pu,pu,0);
+         ai_collect_data(pu,pu,0);   //uab_building_adv
       end;
 
       if(ftarget)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp);
@@ -1052,10 +1052,6 @@ begin
    if(_itcanapc(pu,tu))then
    with pu^ do
    begin
-      if(pu^.player<>tu^.player)then
-       if(player^.team<>tu^.player^.team)
-       then exit;
-
       apcc+=tu^.uid^._apcs;
       tu^.inapc:=unum;
       tu^.a_tar:=0;
@@ -1164,25 +1160,6 @@ uab_buildturret   : if(buff[ub_advanced]>0)then PlayerSetProdError(playeri,glcp_
              if(uid_x[uid_race_9bld[race]]>0)then _ability_building_adv(pu,@_units[uid_x[uid_race_9bld[race]]]);
          end;
 end;
-
-{function _move2uotar(uu,tu:PTUnit;td:integer):boolean;
-begin
-   _move2uotar:=true;
-   if(tu^.uid^._ability=uab_teleport)or(uu^.speed<=0)then exit;
-   _move2uotar:=(tu^.x<>tu^.uo_x)or(tu^.y<>tu^.uo_y)or(td>uu^.srange);
-   td-=uu^.uid^._r+tu^.uid^._r;
-   if(td<=-uu^.speed)then _move2uotar:=false;
-   if(tu^.playeri=uu^.playeri)then
-    if(_itcanapc(tu,uu))then
-    begin
-       _move2uotar:=true;
-       if(tu^.ukfly)and(tu^.uo_tar=0)then
-       begin
-          tu^.uo_x:=uu^.x;
-          tu^.uo_y:=uu^.y;
-       end;
-    end;
-end;}
 
 // target units
 procedure _unit_uo_tar(pu:PTUnit);
@@ -1695,7 +1672,18 @@ co_pcancle :  begin
    _unit_player_order:=true;
 end;
 
+
+
 procedure _unit_prod(pu:PTUnit);
+procedure _uXCheck(pui:pinteger);
+var tu:PTUnit;
+begin
+   if(not _IsUnitRange(pui^,@tu))
+   then pui^:=pu^.unum
+   else
+    if(tu^.rld>pu^.rld)
+    then pui^:=pu^.unum;
+end;
 begin
    with pu^     do
    with uid^    do
@@ -1706,8 +1694,8 @@ begin
          _unit_end_uprod(pu);
          _unit_end_pprod(pu);
 
-         if(uid_x[            uidi]<=0)then uid_x[            uidi]:=unum;
-         if(ucl_x[_ukbuilding,_ucl]<=0)then ucl_x[_ukbuilding,_ucl]:=unum;
+         _uXCheck(@uid_x[            uidi]);
+         _uXCheck(@ucl_x[_ukbuilding,_ucl]);
       end
       else
         if(cenerg<0)

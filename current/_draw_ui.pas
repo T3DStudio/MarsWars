@@ -2,16 +2,24 @@
 procedure d_Alarms;
 var i,r:byte;
 begin
-   {for i:=0 to ui_max_alarms do
+   for i:=0 to ui_max_alarms do
     with ui_alarms[i] do
-     if(at>0)then
+     if(al_t>0)then
      begin
-        r:=(at*2) mod vid_uialrm_ti;
-        if(ab)
-        then RectangleColor(r_minimap,ax-r,ay-r,ax+r,ay+r, c_white)
-        else CircleColor   (r_minimap,ax  ,ay  ,        r, c_white);
-        at-=1;
-     end;  }
+        r:=(al_t*2) mod vid_uialrm_t;
+
+        case al_v of
+aummat_attacked_b,
+aummat_created_b,
+aummat_upgrade   : RectangleColor(r_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
+aummat_advance,
+aummat_attacked_u,
+aummat_created_u,
+aummat_info      : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_c);
+        end;
+
+        al_t-=2;
+     end;
 
    case g_mode of
 gm_cptp: for i:=1 to MaxCPoints do
@@ -281,8 +289,8 @@ begin
 
             _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,m_brush=uid,(req>0) or not(uid in ui_prod_builds));
             _drawBtnt(tar,ux,uy,
-            b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])      ,r2s(ui_uid_reload[uid]),
-            c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_aqua  ,r2s(build_cd));
+            b2s(ui_uid_builds[uid]),'',b2s(uid_s[uid]),b2s   (uid_e[uid])              ,r2s(ui_uid_reload[uid]),
+            c_dyellow              ,0 ,c_lime         ,ui_muc[uid_e[uid]>=a_units[uid]],c_aqua  ,r2s(build_cd));
 
             ui_uid_reload[uid]:=-1;
          end;
@@ -307,8 +315,8 @@ begin
 
             _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
-            b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodu[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])      ,b2s(ui_units_inapc[uid]),
-            c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=_max],c_purple                ,'');
+            b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodu[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])              ,b2s(ui_units_inapc[uid]),
+            c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=a_units[uid]],c_purple                ,'');
          end;
       end;
 
@@ -382,7 +390,7 @@ begin
 end;
 
 procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
-var sx,sy:integer;
+var sx,sy,i,r:integer;
 begin
    if(rpls_state<rpl_rhead)then
    begin
@@ -404,6 +412,23 @@ uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_
 
          ui_mc_a-=1;
       end;
+
+      for i:=0 to ui_max_alarms do
+       with ui_alarms[i] do
+        if(al_t>0)then
+        begin
+           case al_v of
+aummat_info     : ;
+           else continue;
+           end;
+
+           sx:=al_x-vid_cam_x+lx;
+           sy:=al_y-vid_cam_y+ly;
+
+           r:=32-(g_step mod 32);
+
+           circleColor(tar,sx,sy,r,c_white);
+        end;
    end;
 end;
 
@@ -511,8 +536,8 @@ begin
    // resources
    with _players[HPlayer] do
    begin
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg          )+' / '+#19+i2s(menerg),ta_left,255,c_white);
-      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)+' / '+#16+'125'      ,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenerg          )+#22+' / '+#19+i2s(menerg),ta_left,255,c_white);
+      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+i2s(armylimit+uprodl)+#22+' / '+#16+'125'      ,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END
@@ -541,6 +566,7 @@ co_patrol  : c:=c_lime;
 co_amove,
 co_apatrol : c:=c_red;
 co_paction : c:=c_aqua;
+co_mmark   : c:=c_white;
    else _draw_surf(tar,mouse_x,mouse_y,spr_cursor);
    end;
    if(c<>0)then

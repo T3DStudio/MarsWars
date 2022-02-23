@@ -249,6 +249,50 @@ begin
       _EID2Spr:=@smodel^.sl[0];
 end;
 
+procedure _unit_level_string(pu:PTUnit);
+var i,
+al,wl,sl:integer;
+   atset:TSoB;
+begin
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      wl      :=0;
+      atset   :=[];
+      for i:=0 to MaxUnitWeapons do
+       with _a_weap[i] do
+        if(aw_rld>0)and(aw_dupgr>0)and not(aw_dupgr in atset)then
+        begin
+           wl+=upgr[aw_dupgr];
+           atset+=[aw_dupgr];
+        end;
+      lvlstr_w:=#15+i2s6(wl);
+
+      al:=upgr[_upgr_armor];
+      if(_ukbuilding)
+      then al+=upgr[upgr_race_build_armor[_urace]]
+      else
+        if(_ukmech)
+        then al+=upgr[upgr_race_mech_armor[_urace]]
+        else al+=upgr[upgr_race_bio_armor [_urace]];
+      lvlstr_a:=#18+i2s6(al);
+
+      sl:=0;
+      if(_ukbuilding)
+      then sl+=integer(upgr[upgr_race_build_regen[_urace]])
+      else
+        if(_ukmech)
+        then sl+=integer(upgr[upgr_race_mech_regen [_urace]]+upgr[upgr_race_mech_mspeed[_urace]])
+        else
+        begin
+           sl+=integer(upgr[upgr_race_mech_mspeed[_urace]]+upgr[upgr_race_bio_mspeed [_urace]]);
+           if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
+        end;
+      lvlstr_s:=#17+i2s6(sl);
+   end;
+end;
+
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
 var spr : PTMWTexture;
@@ -286,6 +330,9 @@ begin
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
+            if(cycle_order=_cycle_order)and(noanim=false)
+            then _unit_level_string(pu);
+
             depth:=_udpth(pu);
             alpha:=255;
             aura :=0;

@@ -113,6 +113,14 @@ begin
    net_writebyte(g_ai_slots      );
 end;
 
+procedure net_ReadMapMark(pid:byte);
+var x,y:integer;
+begin
+   x:=net_readint;
+   y:=net_readint;
+   GameLogMapMark(pid,x,y);
+end;
+
 procedure net_GServer;
 var mid,pid,i:byte;
 begin
@@ -200,6 +208,7 @@ nmid_order      : with _players[pid]do
                      o_a0:=net_readbyte;
                      o_id:=net_readbyte;
                   end;
+nmid_map_mark   : net_ReadMapMark(pid);
 nmid_client_info: with _players[pid] do
                   begin
                      PNU     :=net_readbyte;

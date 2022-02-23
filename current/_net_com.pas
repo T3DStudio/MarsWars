@@ -329,5 +329,17 @@ begin
    end;
 end;
 
+procedure net_SendMapMark(x,y:integer);
+begin
+   if(net_status=ns_clnt)then
+   begin
+      net_clearbuffer;
+      net_writebyte(nmid_map_mark);
+      net_writeint(x);
+      net_writeint(y);
+      net_send(net_cl_svip,net_cl_svport);
+   end;
+end;
+
 {$ENDIF}
 

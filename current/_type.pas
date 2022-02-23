@@ -102,8 +102,12 @@ PTThemeAnimL = ^TThemeAnimL;
 TAlarm = record
    al_x,
    al_y,
+   al_mx,
+   al_my,
+   al_r,
    al_t      : integer;
    al_v      : byte;
+   al_c      : cardinal;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +189,6 @@ TUID = record
    _speed,
    _r,_missile_r,
    _srange,
-   _max,
    _renerg,
    _generg,
    _btime,
@@ -472,6 +475,9 @@ TUnit = record
    anim,animf,
    shadow
             : integer;
+   lvlstr_w,
+   lvlstr_a,
+   lvlstr_s : string6;
    {$ENDIF}
 
    player   : PTPlayer;

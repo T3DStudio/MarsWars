@@ -143,6 +143,7 @@ lmt_upgrade_complete   = 17;
 lmt_req_energy         = 18;
 lmt_req_common         = 19;
 lmt_req_ruids          = 20;
+lmt_map_mark           = 21;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
@@ -184,6 +185,7 @@ nmid_notconnected      = 13;
 nmid_swapp             = 14;
 nmid_order             = 15;
 nmid_player_leave      = 16;
+nmid_map_mark          = 17;
 nmid_getinfo           = 66;
 
 
@@ -247,6 +249,7 @@ co_cupgrade            = -82;
 co_suprod              = -83;
 co_cuprod              = -84;
 co_pcancle             = -85;
+co_mmark               = -86;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -481,9 +484,6 @@ upgr_hell_bldrep       = 20; // build restoration
 upgr_hell_b478tel      = 21; // teleport towers
 upgr_hell_invuln       = 22; // hell invuln powerup
 
-//upgr_hell_2tier        = 16; // Tier 2
-//upgr_hell_misfst       = 14; // missiles speed
-
 
 upgr_uac_attack        = 31; // distance attack
 upgr_uac_uarmor        = 32; // base armor
@@ -506,13 +506,6 @@ upgr_uac_mechspd       = 48; // mech speed
 upgr_uac_mecharm       = 49; // mech arm
 upgr_uac_turarm        = 50; // turrets armor
 upgr_uac_rstrike       = 51; // rstrike launch
-
-
-//upgr_uac_6bld2         = 50; // 6bld upgr
-//upgr_uac_mainonr       = 51;
-//upgr_uac_2tier         = 46; // Tier 2
-//upgr_uac_rturrets      = 53; // rocket turrets
-//upgr_uac_bldenrg       = 54; // additional energy
 
 upgr_fast_build        = 250;
 upgr_fast_product      = 251;
@@ -948,8 +941,8 @@ vid_mvs                = 500; // max vis sprites;
 vid_rtuir              = 5;
 vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
-vid_uialrm_t           = fr_fps div (vid_rtuir div 3);
-vid_uialrm_ti          = vid_uialrm_t div 3;
+vid_uialrm_t           = fr_2fps div vid_rtuir;
+vid_uialrm_ti          = vid_uialrm_t div 4;
 
 vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
 vid_BW                 = 48;
@@ -965,7 +958,7 @@ vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
 
-ui_max_alarms          = 20;
+ui_max_alarms          = 12;
 
 ui_bottomsy            = vid_BW*4;
 ui_hwp                 = vid_panelw div 2;
@@ -1050,6 +1043,15 @@ ui_menu_chat_height    = 13; // lines
 ui_menu_chat_width     = 37; // chars
 
 ui_dBW                 = vid_BW-font_w-3;
+
+
+aummat_attacked_u      = 1;
+aummat_attacked_b      = 2;
+aummat_created_u       = 3;
+aummat_created_b       = 4;
+aummat_advance         = 5;
+aummat_upgrade         = 6;
+aummat_info            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

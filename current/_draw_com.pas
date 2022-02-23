@@ -190,25 +190,60 @@ begin
    _draw_text(tar,x,y,str,ta,255,c_white);
 end;
 
-procedure ui_addalrm(aax,aay:integer;aab:boolean);
-var i,ni:byte;
-begin
-   if(rpls_state>=rpl_rhead)then exit;
+{al_x,
+al_y,
+al_mx,
+al_my,  }
 
-   {ni:=255;
+function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;
+var i,mx,my:integer;
+begin
+   ui_addalrm:=false;
+
+   mx:=trunc(ax*map_mmcx);
+   my:=trunc(ay*map_mmcx);
+
+   if(not new)then
    for i:=0 to ui_max_alarms do
     with ui_alarms[i] do
-     if(at>0)then
-      if(dist2(aax,aay,ax,ay)<=vid_uialrm_mr)and(ab=aab)then
+     if(al_t>0)and(al_v=av)then
+      if(dist2(al_mx,al_my,mx,my)<=vid_uialrm_t)then
       begin
-         ax:=(ax+aax) div 2;
-         ay:=(ay+aay) div 2;
-         if(at<vid_uialrm_ti)then at:=vid_uialrm_t;
-         ni:=i;
-         break;
+         al_x :=(al_x +ax) div 2;
+         al_y :=(al_y +ay) div 2;
+         al_mx:=(al_mx+mx) div 2;
+         al_my:=(al_my+my) div 2;
+         al_t:=vid_uialrm_t;
+         ui_addalrm:=true;
+         exit;
       end;
 
-   if(ni=255)then
+   for i:=0 to ui_max_alarms do
+    with ui_alarms[i] do
+     if(al_t<=0)then
+     begin
+        al_x :=ax;
+        al_y :=ay;
+        al_mx:=mx;
+        al_my:=my;
+        al_v :=av;
+        al_t :=vid_uialrm_t;
+        case al_v of
+aummat_attacked_u,
+aummat_attacked_b: al_c:=c_red;
+aummat_created_u,
+aummat_created_b : al_c:=c_lime;
+aummat_advance,
+aummat_upgrade   : al_c:=c_yellow;
+aummat_info      : al_c:=c_white;
+        end;
+        if((vid_mmvx-vid_uialrm_ti)>mx)or(mx>(vid_mmvx+map_mmvw+vid_uialrm_ti))or
+          ((vid_mmvy-vid_uialrm_ti)>my)or(my>(vid_mmvy+map_mmvh+vid_uialrm_ti))then ui_addalrm:=true;
+        break;
+     end;
+
+ {
+ if(ni=255)then
     for i:=0 to ui_max_alarms do
      with ui_alarms[i] do
       if(at=0)then
@@ -222,6 +257,42 @@ begin
          break;
       end; }
 end;
+{
 
+lmt_chat0              = 0;  = player humber
+lmt_chat1              = 1;
+lmt_chat2              = 2;
+lmt_chat3              = 3;
+lmt_chat4              = 4;
+lmt_chat5              = 5;
+lmt_chat6              = 6;
+lmt_game_message       = 10;
+lmt_game_end           = 11;
+lmt_player_defeated    = 12;
+lmt_player_leave       = 13;
+lmt_cant_build         = 14;
+lmt_unit_ready         = 15;
+lmt_unit_advanced      = 16;
+lmt_upgrade_complete   = 17;
+lmt_req_energy         = 18;
+lmt_req_common         = 19;
+lmt_req_ruids          = 20;
+lmt_player_chat        = 255;
+}
+
+function LogMes2UIAlarm:boolean;
+begin
+   LogMes2UIAlarm:=true;
+   with _players[HPlayer] do
+   with log_l[log_i] do
+   case mtype of
+lmt_unit_advanced    : ui_addalrm(x,y,aummat_advance,true);
+lmt_unit_ready       : if(_uids[uid]._ukbuilding)
+                       then ui_addalrm(x,y,aummat_created_b,true)
+                       else ui_addalrm(x,y,aummat_created_u,true);
+lmt_upgrade_complete : ui_addalrm(x,y,aummat_upgrade,true);
+lmt_map_mark         : ui_addalrm(x,y,aummat_info   ,true);
+   end;
+end;
 
 

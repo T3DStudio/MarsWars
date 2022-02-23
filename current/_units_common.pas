@@ -1226,7 +1226,6 @@ begin
       if((army     +uproda)>MaxPlayerUnits)
       or((armylimit+uprodl)>MaxPlayerLimit)
       or(cenerg<0)
-      or(uid_e[_uid]>=_uids[_uid]._max)
       or(uid_e[_uid]>=a_units[_uid])
       then _unit_ctraining_p(pu,255,i)
       else
@@ -1327,6 +1326,11 @@ begin
    //ru - target
    _itcanapc:=false;
    if(tu^.ukfly=uf_fly)then exit;
+
+   if(uu^.player<>tu^.player)then
+    if(uu^.player^.team<>tu^.player^.team)
+    then exit;
+
    if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
     if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
 end;

@@ -99,7 +99,6 @@ begin
    with _uids[i] do
    begin
       _mhits     := 100;
-      _max       := 32000;
       _btime     := 1;
       _ukfly     := uf_ground;
       _ucl       := 255;
@@ -193,7 +192,6 @@ begin
    _r         := 65;
    _ucl       := 10;
    _btime     := 60;
-   _max       := 1;
    _ability   := uab_hell_unit_adv;
    _ukbuilding:= true;
 end;
@@ -205,7 +203,6 @@ begin
    _r         := 86;
    _ucl       := 11;
    _btime     := 60;
-   _max       := 1;
    _ability   := uab_building_adv;
    _addon     := true;
    _ukbuilding:= true;
@@ -230,7 +227,6 @@ begin
    _r         := 50;
    _ucl       := 13;
    _btime     := 30;
-   _max       := 1;
    _ruid1     := UID_HMonastery;
    _ruid2     := UID_HFortress;
    _ukbuilding:= true;
@@ -381,18 +377,18 @@ end;
 UID_Cyberdemon :
 begin
    _mhits     := 4000;
-   _renerg    := 300;
-   _max       := 1;
+   _renerg    := 400;
    _r         := 20;
    _speed     := 11;
    _srange    := 250;
    _ucl       := 5;
    _painc     := 15;
-   _btime     := 90;
+   _btime     := 120;
    _apcs      := 10;
    _ruid1     := UID_HPools;
    _ruid2     := UID_HMonastery;
    _attack    := atm_always;
+   _limituse  := 10;
    _splashresist:=true;
    _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive_buildings,wpr_any,uidall,[],0,0);
    _weapon(1,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive          ,wpr_any,uidall,[],0,0);
@@ -400,18 +396,18 @@ end;
 UID_Mastermind :
 begin
    _mhits     := 4000;
-   _renerg    := 300;
-   _max       := 1;
+   _renerg    := 400;
    _r         := 35;
    _speed     := 11;
    _srange    := 275;
    _ucl       := 6;
    _painc     := 15;
-   _btime     := 90;
+   _btime     := 120;
    _apcs      := 10;
    _ruid1     := UID_HPools;
    _ruid2     := UID_HMonastery;
    _attack    := atm_always;
+   _limituse  := 10;
    _splashresist:=true;
    _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_7hfps,MID_Bulletx2,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_bio_light,wpr_any,uidall,[],0,0);
    _weapon(1,wpt_missle   ,aw_srange,0,0 ,fr_7hfps,MID_Bulletx2,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_bio      ,wpr_any,uidall,[],0,0);
@@ -773,7 +769,6 @@ begin
    _r         := 70;
    _ucl       := 11;
    _btime     := 60;
-   _max       := 1;
    _ability   := uab_building_adv;
    _ukbuilding:= true;
    _addon     := true;
@@ -798,7 +793,6 @@ begin
    _r         := 40;
    _ucl       := 13;
    _btime     := 30;
-   _max       := 1;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UNuclearPlant;
    _ability   := uab_uac_rstrike;
@@ -873,12 +867,12 @@ begin
    _ability   := uab_umine;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_heal  ,aw_hmelee,0,6,fr_3h2fps,0          ,0,0,0,upgr_uac_melee ,3,wtrset_repair                ,wpr_any,uidall,[],0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_mech_nstun,wpr_adv,uidall,[],0,0);
-   _weapon(2,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_mech      ,wpr_adv,uidall,[],0,0);
-   _weapon(3,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light ,wpr_any,uidall,[],0,0);
-   _weapon(4,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio       ,wpr_any,uidall,[],0,0);
-   _weapon(5,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive           ,wpr_any,uidall,[],0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,8 ,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_repair                ,wpr_any,uidall,[],0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_mech_nstun,wpr_adv,uidall,[],0,0);
+   _weapon(2,wpt_missle,aw_srange,0,0 ,fr_fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_mech      ,wpr_adv,uidall,[],0,0);
+   _weapon(3,wpt_missle,aw_srange,0,0 ,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light ,wpr_any,uidall,[],0,0);
+   _weapon(4,wpt_missle,aw_srange,0,0 ,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio       ,wpr_any,uidall,[],0,0);
+   _weapon(5,wpt_missle,aw_srange,0,0 ,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive           ,wpr_any,uidall,[],0,0);
 end;
 UID_Medic:
 begin
@@ -893,12 +887,12 @@ begin
    _zombie_uid:= UID_ZFormer;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_heal  ,aw_hmelee,0,6,fr_3h2fps,0          ,0,0,0,upgr_uac_melee ,3,wtrset_heal                 ,wpr_any,uidall,[],0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_nstun,wpr_adv,uidall,[],0,0);
-   _weapon(2,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_adv,uidall,[],0,0);
-   _weapon(3,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light,wpr_any,uidall,[],0,0);
-   _weapon(4,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_any,uidall,[],0,0);
-   _weapon(5,wpt_missle,aw_srange,0,0,fr_3h2fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive          ,wpr_any,uidall,[],0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,8,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_heal                 ,wpr_any,uidall,[],0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0,fr_fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_nstun,wpr_adv,uidall,[],0,0);
+   _weapon(2,wpt_missle,aw_srange,0,0,fr_fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_adv,uidall,[],0,0);
+   _weapon(3,wpt_missle,aw_srange,0,0,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio_light,wpr_any,uidall,[],0,0);
+   _weapon(4,wpt_missle,aw_srange,0,0,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio      ,wpr_any,uidall,[],0,0);
+   _weapon(5,wpt_missle,aw_srange,0,0,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive          ,wpr_any,uidall,[],0,0);
 end;
 UID_Sergant:
 begin
