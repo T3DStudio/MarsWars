@@ -362,10 +362,14 @@ o_x1,o_y1  :integer;
    a_units : array[byte] of integer;
 
 
-   ai_max_limit,
-   ai_max_unit_prods,
-   ai_max_upgr_prods,
-   ai_max_bases
+   ai_max_ulimit,
+   ai_max_energy,
+   ai_max_mains,
+   ai_max_unitps,
+   ai_max_upgrps,
+   ai_max_techs,
+   ai_max_specs
+
            : integer;
    ai_skill: byte;
 

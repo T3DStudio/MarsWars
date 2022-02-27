@@ -189,6 +189,7 @@ UID_HMonastery:
 begin
    _mhits     := 3000;
    _renerg    := 300;
+   _generg    := 300;
    _r         := 65;
    _ucl       := 10;
    _btime     := 60;
@@ -215,7 +216,7 @@ begin
    _r         := 28;
    _ucl       := 12;
    _btime     := 30;
-   _limituse  := 3;
+   _limituse  := 30;
    _ability   := uab_teleport;
    _ukbuilding:= true;
    _issolid   := false;
@@ -346,6 +347,7 @@ begin
    _painc     := 6;
    _btime     := 20;
    _apcs      := 2;
+   _limituse  := 15;
    _ukfly     := uf_fly;
    _ruid1     := UID_HPools;
    _attack    := atm_always;
@@ -367,7 +369,7 @@ begin
    _painc     := 8;
    _btime     := 20;
    _apcs      := 3;
-   _limituse  := 2;
+   _limituse  := 20;
    _ruid1     := UID_HPools;
    _attack    := atm_always;
    _bornadvanced[false]:=true;
@@ -388,7 +390,7 @@ begin
    _ruid1     := UID_HPools;
    _ruid2     := UID_HMonastery;
    _attack    := atm_always;
-   _limituse  := 10;
+   _limituse  := 100;
    _splashresist:=true;
    _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive_buildings,wpr_any,uidall,[],0,0);
    _weapon(1,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive          ,wpr_any,uidall,[],0,0);
@@ -407,7 +409,7 @@ begin
    _ruid1     := UID_HPools;
    _ruid2     := UID_HMonastery;
    _attack    := atm_always;
-   _limituse  := 10;
+   _limituse  := 100;
    _splashresist:=true;
    _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_7hfps,MID_Bulletx2,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_bio_light,wpr_any,uidall,[],0,0);
    _weapon(1,wpt_missle   ,aw_srange,0,0 ,fr_7hfps,MID_Bulletx2,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_bio      ,wpr_any,uidall,[],0,0);
@@ -434,7 +436,7 @@ begin
 end;
 UID_Revenant   :
 begin
-   _mhits     := 200;
+   _mhits     := 300;
    _renerg    := 200;
    _r         := 13;
    _speed     := 12;
@@ -443,7 +445,7 @@ begin
    _painc     := 7;
    _btime     := 20;
    _ruid1     := UID_HMonastery;
-   _limituse  := 1;
+   _limituse  := 15;
    _attack    := atm_always;
    _uklight   := true;
    _addon     := true;
@@ -455,15 +457,15 @@ end;
 UID_Mancubus   :
 begin
    _mhits     := 600;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 20;
    _speed     := 6;
    _srange    := 250;
    _ucl       := 9;
    _painc     := 4;
-   _btime     := 60;
+   _btime     := 40;
    _ruid1     := UID_HFortress;
-   _limituse  := 3;
+   _limituse  := 30;
    _attack    := atm_always;
    _addon     := true;
    _weapon(0,wpt_missle   ,aw_fsr+50,0,-8,fr_mancubus_r,MID_Mancubus,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_buildings,wpr_any ,uidall-[UID_Mancubus],[110,70,30],0,0);
@@ -472,15 +474,15 @@ end;
 UID_Arachnotron:
 begin
    _mhits     := 600;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 20;
    _speed     := 8;
    _srange    := 250;
    _ucl       := 10;
    _painc     := 4;
-   _btime     := 60;
+   _btime     := 40;
    _ruid1     := UID_HFortress;
-   _limituse  := 3;
+   _limituse  := 30;
    _attack    := atm_always;
    _addon     := true;
    _weapon(0,wpt_missle   ,aw_fsr+100,0,0 ,fr_4hfps,MID_YPlasma,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_mech  ,wpr_adv ,uidall-[UID_Arachnotron],[],0,0);
@@ -500,7 +502,7 @@ begin
    _btime     := 90;
    _apcs      := 2;
    _ruid1     := UID_HAltar;
-   _limituse  := 3;
+   _limituse  := 30;
    _attack    := atm_always;
    _addon     := true;
    _weapon(0,wpt_resurect,aw_dmelee,0,0  ,fr_fps,0           ,0,0,0,0                ,0,wtrset_resurect              ,wpr_adv         ,arch_res,[  ],0,0);
@@ -624,7 +626,7 @@ end;
 UID_ZBFG:
 begin
    _mhits     := 200;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 12;
    _speed     := 10;
    _srange    := 250;
@@ -633,7 +635,7 @@ begin
    _btime     := 60;
    _attack    := atm_always;
    _uklight   := true;
-   _limituse  := 2;
+   _limituse  := 20;
    _fdeathhits(-30);
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_2fps,MID_BFG,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive,wpr_any ,uidall,[fr_fps],0,0);
 end;
@@ -663,6 +665,7 @@ begin
       _apcm            := 30;
       ups_builder      :=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HMilitaryUnit];
       ups_apc          :=demons;
+      _ruid1           := UID_HCommandCenter;
       _upgr_srange     :=upgr_hell_mainr;
       _upgr_srange_step:=40;
       _weapon(0,wpt_missle,aw_srange,_r,0,fr_2hfps,MID_Imp      ,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive_nlight_bio,wpr_any+wpr_move,uidall-[UID_Imp],[],3,-65);
@@ -697,6 +700,7 @@ begin
    begin
       _ucl       := 4;
       ups_units  := zimbas;
+      _ruid1     := UID_HCommandCenter;
    end
    else
    begin
@@ -757,7 +761,7 @@ begin
    _r         := 62;
    _ucl       := 10;
    _btime     := 60;
-   _limituse  := 2;
+   _limituse  := 10;
    _ability   := uab_uac__unit_adv;
    _ukbuilding:= true;
 end;
@@ -782,7 +786,7 @@ begin
    _srange    := 200;
    _ucl       := 12;
    _btime     := 30;
-   _limituse  := 4;
+   _limituse  := 30;
    _ability   := uab_radar;
    _ukbuilding:= true;
 end;
@@ -977,7 +981,7 @@ end;
 UID_BFG:
 begin
    _mhits     := 200;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 12;
    _speed     := 10;
    _srange    := 250;
@@ -986,7 +990,7 @@ begin
    _attack    := atm_always;
    _zombie_uid:= UID_ZBFG;
    _uklight   := true;
-   _limituse  := 2;
+   _limituse  := 20;
    _ruid1     := UID_UTechCenter;
    _fdeathhits(-30);
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_2fps,MID_BFG,0,0,0,upgr_uac_attack,5,wtrset_enemy_alive,wpr_any,uidall,[fr_fps],0,0);
@@ -1037,7 +1041,7 @@ begin
    _ucl       := 9;
    _btime     := 20;
    _apcs      := 2;
-   _limituse  := 3;
+   _limituse  := 30;
    _attack    := atm_always;
    _ukmech    := true;
    _uklight   := true;
@@ -1049,14 +1053,14 @@ end;
 UID_Terminator:
 begin
    _mhits     := 600;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 16;
    _speed     := 14;
    _srange    := 250;
    _ucl       := 10;
-   _btime     := 60;
+   _btime     := 40;
    _apcs      := 3;
-   _limituse  := 4;
+   _limituse  := 40;
    _attack    := atm_always;
    _ukmech    := true;
    _addon     := true;
@@ -1078,14 +1082,14 @@ end;
 UID_Tank:
 begin
    _mhits     := 800;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 20;
    _speed     := 10;
    _srange    := 250;
    _ucl       := 11;
-   _btime     := 60;
+   _btime     := 40;
    _apcs      := 7;
-   _limituse  := 4;
+   _limituse  := 40;
    _attack    := atm_always;
    _ukmech    := true;
    _addon     := true;
@@ -1099,15 +1103,15 @@ end;
 UID_Flyer:
 begin
    _mhits     := 600;
-   _renerg    := 200;
+   _renerg    := 400;
    _r         := 18;
    _speed     := 20;
    _srange    := 300;
    _ucl       := 12;
-   _btime     := 60;
+   _btime     := 40;
    _apcs      := 7;
    _ukfly     := uf_fly;
-   _limituse  := 4;
+   _limituse  := 40;
    _attack    := atm_always;
    _ukmech    := true;
    _addon     := true;
@@ -1118,7 +1122,7 @@ end;
 UID_UTransport:
 begin
    _mhits     := 1000;
-   _renerg    := 150;
+   _renerg    := 200;
    _r         := 36;
    _speed     := 10;
    _srange    := 200;
@@ -1177,13 +1181,13 @@ end;
       begin
          _zombie_hits:=_mhits div 2;
          _ukmech:=true;
-         if(_base_armor<=0)then _base_armor:=10;
+         if(_base_armor<=0)then _base_armor:=6;
          if(_srange    <=0)then _srange:=150;
       end
       else
       begin
          //_zombie_hits:=0;
-         if(_base_armor<=0)and(_ukmech)then _base_armor:=5;
+         if(_base_armor<=0)and(_ukmech)then _base_armor:=3;
       end;
 
       _shcf:=_mhits/_mms;
@@ -1192,7 +1196,7 @@ end;
       if(_bstep<=0)then _bstep:=1;
       _tprod:=_btime*fr_fps;
 
-      if(_limituse<=0)then _limituse:=1;
+      if(_limituse<10)then _limituse:=10;
    end;
 end;
 

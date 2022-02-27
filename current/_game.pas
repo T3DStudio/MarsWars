@@ -1,4 +1,33 @@
 
+procedure PlayerSetSkirmishTech(p:byte);
+begin
+   with _players[p] do
+   begin
+      PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
+                                UID_LostSoul      ..UID_ZBFG,
+                                UID_UCommandCenter..UID_UMine,
+                                UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
+                                MaxUnits,true);
+
+      PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
+                                UID_UNuclearPlant,UID_URMStation ],1,false);
+
+      PlayerSetAllowedUpgrades(p,[0..255],255,true); //
+
+
+
+      {ai_pushtime := fr_fps*30;
+      ai_pushmin  := 55;
+      ai_pushuids := [];
+      ai_towngrd  := 3;
+      ai_maxunits := 100;
+      ai_flags    := $FFFFFFFF;
+      ai_pushtimei:= 0;
+      ai_pushfrmi := 0; }
+   end;
+   PlayerSetAIParams(p);
+end;
+
 procedure PlayersSwap(p0,p1:byte);
 var tp:TPlayer;
 begin
@@ -45,25 +74,6 @@ begin
        pnum     :=p;
        PlayerSetState(p,ps_none);
        PlayerClearLog(p);
-       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
-                                 UID_LostSoul      ..UID_ZBFG,
-                                 UID_UCommandCenter..UID_UMine,
-                                 UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
-                                 MaxUnits,true);
-
-       PlayerSetAllowedUnits(p,[ UID_HFortress,UID_HAltar,
-                                 UID_UNuclearPlant,UID_URMStation ],1,false);
-
-       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
-
-       {ai_pushtime := fr_fps*30;
-       ai_pushmin  := 55;
-       ai_pushuids := [];
-       ai_towngrd  := 3;
-       ai_maxunits := 100;
-       ai_flags    := $FFFFFFFF;
-       ai_pushtimei:= 0;
-       ai_pushfrmi := 0; }
    end;
 
    with _players[0] do
@@ -185,7 +195,7 @@ end;
 {$include _replays.pas}
 {$ENDIF}
 
-procedure _CreateStartBase(x,y:integer;uid,pl,c:byte);
+procedure GameCreateStartBase(x,y:integer;uid,pl,c:byte);
 var  i:byte;
 r,d,ds:integer;
 begin
@@ -245,10 +255,10 @@ begin
 
          if(state<>ps_none)then
          begin
-            _CreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
+            if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;
 
-            if(state=ps_play)then ai_skill:=player_default_ai_level;
-            // _setAI(p);  set AI settings
+            PlayerSetSkirmishTech(p);
+            GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
          end;
       end;
    end;

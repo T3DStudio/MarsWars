@@ -65,7 +65,7 @@ r_uac                  = 2;
 
 MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
-MaxPlayerLimit         = MaxPlayerUnits;
+MaxPlayerLimit         = MaxPlayerUnits*10;
 MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
@@ -1147,6 +1147,8 @@ race_upgrades          : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'ua
 race_missiles          : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
 effects_folder         : shortstring = 'effs\';
 missiles_folder        : shortstring = 'missiles\';
+
+ui_limitstr            : shortstring = '1250';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

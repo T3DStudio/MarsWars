@@ -157,8 +157,8 @@ begin
 
          un_txt_hint:= un_txt_name;
          if(length(HK  )>0)then un_txt_hint:=un_txt_hint+' ('+HK+')';
-         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#16+LMT +#25+'>';
          if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
+         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#16+LMT +#25+'>';
          if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#22+TIME+#25+']';
          un_txt_hint:=un_txt_hint+#11+un_txt_descr+#11;
          if(length(REQ )>0)then un_txt_hint:= un_txt_hint+#17+str_req+#25+REQ+#11 else un_txt_hint:= un_txt_hint+#11;
