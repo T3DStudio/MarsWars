@@ -318,7 +318,7 @@ begin
 
           if(buff[ub_slooow]>0)then ss:=max2(2,ss div 2);
 
-          mdist:=dist2(x,y,mv_x,mv_y);
+          mdist:=dist(x,y,mv_x,mv_y);
           if(mdist<=speed)then
           begin
              x:=mv_x;
@@ -333,8 +333,8 @@ begin
               if(not _ukbuilding)then
                with player^ do
                 if(_ukmech)
-                then ss+=upgr[upgr_race_mech_mspeed[_urace]]
-                else ss+=upgr[upgr_race_bio_mspeed [_urace]];
+                then ss+=upgr[upgr_race_mech_mspeed[_urace]]*2
+                else ss+=upgr[upgr_race_bio_mspeed [_urace]]*2;
 
              if(mdist>70)
              then mdist:=8+_random(25)
@@ -354,152 +354,6 @@ begin
           {$ENDIF}
        end;
 end;
-
-
-
- {
-function _player_sight(player:byte;tu:PTUnit;vision:boolean):boolean;
-begin
-   _player_sight:=true;
-
-   with _players[player] do
-    if(vision)
-    then exit
-    else
-     if(tu^.buff[ub_invis]=0)then
-     begin
-        if(tu^.isbuild)and(tu^.speed=0)then
-         if(cf(@ai_flags,@aif_nofogblds))then exit;
-
-        if(tu^.isbuild=false)then
-         if(cf(@ai_flags,@aif_nofogunts))then exit;
-     end;
-
-   _player_sight:=false;
-end;
-
-procedure _unit_tardetect(pu,tu:PTUnit;ud:integer);
-var
- vision,
- teams:boolean;
-begin
-   with pu^ do
-   begin
-      with player^ do
-      begin
-         teams:=(team=tu^.player^.team);
-
-         if(tu^.hits>0)then
-         begin
-            vision:=_uvision(team,tu,false);
-
-            if(onlySVCode)and(state=ps_comp)and(vision)then _unit_aiUBC(pu,tu,ud,teams);
-
-            if(_player_sight(playeri,tu,vision))then
-             if(teams=false)then
-             begin
-                if(tu^.buff[ub_invuln]=0)then
-                 if(alrm_b=false)or(ud<base_rr)then
-                  if(ud<alrm_r)then
-                  begin
-                     alrm_x:=tu^.x;
-                     alrm_y:=tu^.y;
-                     alrm_r:=ud;
-                     alrm_b:=false;
-                  end;
-             end
-             else
-               if(state=ps_comp)then
-                if(tu^.isbuild)or(tu^.alrm_r<0)then
-                 if(isbuild=false)and(tu^.alrm_r<base_rr)then
-                  if not(tu^.uidi in [UID_UMine,UID_HEye])then
-                  begin
-                     ud:=dist2(x,y,tu^.alrm_x,tu^.alrm_y);
-                     if(ud<alrm_r)or((tu^.isbuild)and(alrm_b=false))then
-                      if(ud<base_3r)or(order<>2)then
-                      begin
-                         alrm_x:=tu^.alrm_x;
-                         alrm_y:=tu^.alrm_y;
-                         alrm_r:=ud;
-                         if(tu^.isbuild)then
-                          if(cf(@ai_flags,@aif_help))then alrm_b:=true;
-                      end;
-                  end;
-         end;
-      end;
-
-      if(onlySVCode)then
-      begin
-         with player^ do
-          if(bld)and(tu^.hits>0)then
-          begin
-             if(uidi=UID_HKeep)then
-              if(upgr[upgr_paina]>0)and(ud<sr)then
-               if(teams=false)then
-               begin
-                  if not(tu^.uidi in [UID_HEye,UID_UMine])then  _unit_damage(tu,upgr[upgr_paina] shl 1,upgr[upgr_paina],playeri);
-               end
-               else tu^.buff[ub_toxin]:=-vid_fps;
-          end;
-
-         if(uo_id=ua_amove)then
-         begin
-            if(rld_t>0)and(uidi=UID_Archvile)then exit;
-
-            if(_unit_target(pu,tu,ud,false)>0)then
-             if(_TarPrioDT(pu,tu,ud))then
-             begin
-                tar1 :=tu^.unum;
-                tar1d:=ud;
-             end;
-         end;
-      end;
-   end;
-end;
-
-
-
-procedure _unit_cp(pu:PTUnit);
-var i : byte;
-    ud:integer;
-begin
-   with pu^ do
-   with player^ do
-   begin
-      for i:=1 to MaxPlayers do
-       with g_ct_pl[i] do
-       begin
-          ud:=dist2(x,y,px,py);
-
-          if(ud<=g_ct_pr)and(_players[pl].team<>team)then
-           if(ct<g_ct_ct[race])
-           then inc(ct,vid_hfps)
-           else
-             if(ct>=g_ct_ct[race])then
-             begin
-                pl:=playeri;
-                ct:=0;
-             end;
-
-          if(_players[pl].team<>team)or(pl=0)or(ct>0)then
-          begin
-             if(ud<ai_ptd)then
-             begin
-                ai_ptd:=ud;
-                ai_pt :=i;
-             end;
-          end;
-       end;
-
-      if(ai_pt>0)then
-      begin
-         alrm_x:=g_ct_pl[ai_pt].px;
-         alrm_y:=g_ct_pl[ai_pt].py;
-      end;
-   end;
-end;
-
-}
 
 function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte;checkvis,nosrangecheck:boolean):byte;
 var awr:integer;
@@ -638,13 +492,13 @@ wpt_heal     : if(tu^.hits<=0)
          else
            if(canmove)
            then _target_weapon_check:=2  // need move farther
-           else ;                        // target too close
+           else ;                        // target too close & cant move
       end
       else
         if(canmove)then
          if(ud<=srange)or(nosrangecheck)
          then _target_weapon_check:=1   // need move closer
-         else ;                         // target too far
+         else ;                         // target too far & cant move
    end;
 end;
 
@@ -672,9 +526,65 @@ begin
    end;
 end;
 
+//aw_tarprior
 
-procedure _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit);
+function _unitWeaponPriority(tu:PTUnit;priorset:byte):integer;
+var i:integer;
+procedure add;
+begin
+   _unitWeaponPriority+=i;
+   i:=i shr 1;
+end;
+begin
+   i:=1024;
+   _unitWeaponPriority:=0;
+   with tu^  do
+   with uid^ do
+   case priorset of
+wtp_building    : if(    _ukbuilding  )then add;
+wtp_unit_light_bio   : begin
+                       if(not _ukbuilding  )then add;
+                       if(    _uklight     )then add;
+                       if(not _ukmech      )then add;
+                       end;
+wtp_unit_bio_light   : begin
+                       if(not _ukbuilding  )then add;
+                       if(not _ukmech      )then add;
+                       if(    _uklight     )then add;
+                       end;
+wtp_unit_bio_nlight  : begin
+                       if(not _ukbuilding  )then add;
+                       if(not _ukmech      )then add;
+                       if(not _uklight     )then add;
+                       end;
+wtp_unit_bio_nostun  : begin
+                       if(not _ukbuilding  )then add;
+                       if(not _ukmech      )then add;
+                       if (buff[ub_stun]<=0)
+                       and(buff[ub_pain]<=0)then add;
+                       end;
+wtp_unit_mech_nostun : begin
+                       if(not _ukbuilding  )then add;
+                       if(    _ukmech      )then add;
+                       if (buff[ub_stun]<=0)
+                       and(buff[ub_pain]<=0)then add;
+                       end;
+wtp_unit_mech        : begin
+                       if(not _ukbuilding  )then add;
+                       if(    _ukmech      )then add;
+                       end;
+wtp_bio              : if(not _ukmech      )then add;
+wtp_light            : if(    _uklight     )then add;
+wtp_unit_light       : begin
+                       if(not _ukbuilding  )then add;
+                       if(    _uklight     )then add;
+                       end;
+   end;
+end;
+
+procedure _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger);
 var tw:byte;
+n_prio:integer;
 begin
    with pu^ do
    with uid^ do
@@ -686,17 +596,30 @@ begin
       if(tw>t_weap^)
       then exit
       else
+       with _a_weap[tw] do
         if(tw<t_weap^)
-        then // high weapon priority
+        then n_prio:=_unitWeaponPriority(tu,aw_tarprior)
         else
-         with _a_weap[tw] do
-          if(aw_max_range>=0)or(aw_type=wpt_heal)then
-          begin
-             if(tu^.hits>a_tarp^^.hits)then exit;
-          end
-          else
-             if(ud>a_tard^)then exit;
+        begin
+           n_prio:=_unitWeaponPriority(tu,aw_tarprior);
+           if(n_prio>t_prio^)then ;
+           if(n_prio=t_prio^)then
+           case aw_tarprior of
+wtp_distance         : if(ud>a_tard^)then exit;
+wtp_rmhits           : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
+           else
+              if(tu^.hits>a_tarp^^.hits)then exit;  // default
+              {if(aw_max_range>=0)or(aw_type=wpt_heal)then
+              begin
+                 if(tu^.hits>a_tarp^^.hits)then exit;
+              end
+              else
+                 if(ud>a_tard^)then exit; }
+           end;
+           if(n_prio<t_prio^)then exit;
+        end;
 
+      t_prio^:=n_prio;
       t_weap^:=tw;
       a_tar  :=tu^.unum;
       a_tard^:=ud;
@@ -716,8 +639,51 @@ UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)t
    end;
 end;
 
+
+procedure _unit_capture_points(pu:PTUnit);
+var i :byte;
+   ud:integer;
+begin
+  with pu^ do
+  with player^ do
+  begin
+     for i:=1 to MaxCPoints do
+      with g_cpoints[i] do
+      begin
+         ud:=dist(x,y,px,py);
+
+         if(ud<=pr)and(_players[pl].team<>team)then
+          if(ct<gm_cptp_time)
+          then ct+=fr_fps
+          else
+            if(ct>=gm_cptp_time)then
+            begin
+               pl:=playeri;
+               ct:=0;
+            end;
+
+         {if(_players[pl].team<>team)or(pl=0)or(ct>0)then
+         begin
+            if(ud<ai_ptd)then
+            begin
+               ai_ptd:=ud;
+               ai_pt :=i;
+            end;
+         end; }
+      end;
+
+     {if(ai_pt>0)then
+     begin
+        alrm_x:=g_ct_pl[ai_pt].px;
+        alrm_y:=g_ct_pl[ai_pt].py;
+     end; }
+  end;
+end;
+
+
 procedure _unit_mcycle(pu:PTUnit);
 var uc,
+t_prio,
 a_tard,
     ud: integer;
     uds:single;
@@ -736,6 +702,7 @@ begin
       a_tard  := 32000;
       a_tarp  := nil;
       t_weap  := 255;
+      t_prio  := 0;
       underobstacle:=false;
 
       if(g_mode=gm_royl)then
@@ -764,7 +731,9 @@ begin
          ai_collect_data(pu,pu,0);   //uab_building_adv
       end;
 
-      if(ftarget)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp);
+      if(ftarget)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+
+      _unit_capture_points(pu);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -778,7 +747,7 @@ begin
 
             if(not _IsUnitRange(tu^.inapc,nil))then _unit_detect(pu,tu,ud);
 
-            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp);
+            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
             if(aicode)then ai_collect_data(pu,tu,ud);
 
@@ -807,6 +776,7 @@ end;
 
 procedure _unit_mcycle_cl(pu,au:PTUnit);
 var uc,a_tard,
+t_prio,
     ud : integer;
 a_tarp,
     tu : PTUnit;
@@ -824,6 +794,7 @@ begin
          a_tard :=32000;
          t_weap :=255;
          a_tarp :=nil;
+         t_prio :=0;
          ftarget:=_canattack(pu,false);
       end
       else ftarget:=false;
@@ -839,7 +810,7 @@ begin
 
       if(udetect=false)and(ftarget=false)then exit;  // in apc & client side
 
-      if(ftarget)and(ServerSide)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp);
+      if(ftarget)and(ServerSide)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -849,7 +820,7 @@ begin
          begin
             ud:=dist2(x,y,tu^.x,tu^.y);
             if(udetect)then _unit_detect(pu,tu,ud);
-            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp);
+            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
          end;
       end;
 

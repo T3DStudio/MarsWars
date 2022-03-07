@@ -156,6 +156,7 @@ end;
 
 TUWeapon = record
   aw_type,
+  aw_tarprior,
   aw_rupgr,
   aw_rupgr_l,
   aw_dupgr,
@@ -367,9 +368,10 @@ o_x1,o_y1  :integer;
    ai_max_mains,
    ai_max_unitps,
    ai_max_upgrps,
-   ai_max_techs,
-   ai_max_specs
-
+   ai_max_tech0,
+   ai_max_tech1,
+   ai_max_spec0,
+   ai_max_spec1
            : integer;
    ai_skill: byte;
 
@@ -511,8 +513,8 @@ TMissile = record
 end;
 
 TCTPoint = record
-   px,py,
-   mpx,mpy,
+   px,py,pr,
+   mpx,mpy,mpr,
    ct       : integer;
    pl       : byte;
 end;

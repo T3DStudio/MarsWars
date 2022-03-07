@@ -15,6 +15,19 @@ aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation
 
 var
 
+ai_grd_commander_tu,
+ai_fly_commander_tu,
+ai_base_tu,
+ai_alarm_invis_tu,
+ai_alarm_tu      : PTUnit;
+ai_alarm_x,
+ai_alarm_y,
+ai_alarm_d,
+ai_alarm_invis_x,
+ai_alarm_invis_y,
+ai_alarm_invis_d,
+ai_base_d,
+
 ai_enrg_cur,
 
 ai_basep_builders,
@@ -38,15 +51,76 @@ ai_spec0_cur,
 ai_spec0_need,
 
 ai_spec1_cur
+                 : integer;
 
-                   : integer;
 
-
-procedure PlayerSetAIParams(p:byte);
+procedure PlayerSetSkirmishAIParams(p:byte);
 begin
    with _players[p] do
    begin
       case ai_skill of
+      0 : begin
+             ai_max_energy:=600;
+             ai_max_mains :=1;
+             ai_max_unitps:=1;
+             ai_max_upgrps:=0;
+             ai_max_tech0 :=0;
+             ai_max_tech1 :=0;
+             ai_max_spec0 :=0;
+             ai_max_spec1 :=0;
+          end;
+      1 : begin
+             ai_max_energy:=1000;
+             ai_max_mains :=3;
+             ai_max_unitps:=2;
+             ai_max_upgrps:=1;
+             ai_max_tech0 :=0;
+             ai_max_tech1 :=0;
+             ai_max_spec0 :=0;
+             ai_max_spec1 :=0;
+          end;
+      2 : begin
+             ai_max_energy:=2000;
+             ai_max_mains :=8;
+             ai_max_unitps:=4;
+             ai_max_upgrps:=1;
+             ai_max_tech0 :=1;
+             ai_max_tech1 :=0;
+             ai_max_spec0 :=1;
+             ai_max_spec1 :=0;
+          end;
+      3 : begin
+             ai_max_energy:=32000;
+             ai_max_mains :=12;
+             ai_max_unitps:=8;
+             ai_max_upgrps:=2;
+             ai_max_tech0 :=2;
+             ai_max_tech1 :=1;
+             ai_max_spec0 :=2;
+             ai_max_spec1 :=0;
+          end;
+      4 : begin
+             ai_max_energy:=32000;
+             ai_max_mains :=18;
+             ai_max_unitps:=14;
+             ai_max_upgrps:=4;
+             ai_max_tech0 :=4;
+             ai_max_tech1 :=1;
+             ai_max_spec0 :=4;
+             ai_max_spec1 :=1;
+          end;
+      else
+             ai_max_energy:=32000;
+             ai_max_mains :=25;
+             ai_max_unitps:=20;
+             ai_max_upgrps:=4;
+             ai_max_tech0 :=4;
+             ai_max_tech1 :=1;
+             ai_max_spec0 :=4;
+             ai_max_spec1 :=1;
+      end;
+
+      {case ai_skill of
       0,1 : ai_max_mains:=1;
       2   : ai_max_mains:=3;
       3   : ai_max_mains:=9;
@@ -60,8 +134,10 @@ begin
       ai_max_energy:=ai_max_mains*250+300;
       ai_max_unitps:=1;
       ai_max_upgrps:=1;
-      ai_max_techs :=0;
-      ai_max_specs :=0;
+      ai_max_tech0 :=0;
+      ai_max_tech1 :=0;
+      ai_max_spec0 :=0;
+      ai_max_spec1 :=0;
 
       if(ai_skill<=1)then exit;
 
@@ -70,13 +146,37 @@ begin
 
       if(ai_skill<=2)then exit;
 
-      ai_max_techs :=max2(1,ai_max_unitps div 4);
-      ai_max_specs :=max2(1,ai_max_unitps div 4);
+      ai_max_tech0 :=max2(1,ai_max_unitps div 4);
+      ai_max_spec0 :=max2(1,ai_max_unitps div 4);
+
+      if(ai_skill<=3)then exit;
+
+      ai_max_tech1 :=1;
+      ai_max_spec1 :=1; }
    end;
 end;
 
 procedure ai_clear_vars;
 begin
+   // nearest enemy unit or last enemy position
+   ai_alarm_x       := -1;
+   ai_alarm_d       := 32000;
+   ai_alarm_tu      := nil;
+
+   // nearest invisible enemy
+   ai_alarm_invis_x := -1;
+   ai_alarm_invis_d := 32000;
+   ai_alarm_invis_tu:= nil;
+
+   // nearest building
+   ai_base_d        := 32000;
+   ai_base_tu       := nil;
+
+   // nearest commander
+   ai_grd_commander_tu:= nil;
+   ai_fly_commander_tu:= nil;
+
+
    ai_enrg_cur      :=0;
 
    ai_basep_builders:=0;
@@ -103,35 +203,110 @@ begin
    ai_spec1_cur     :=0;
 end;
 
+procedure ai_alarm_target(tu:PTUnit;x,y,ud:integer);
+begin
+   if(ud<ai_alarm_d)then
+   begin
+      if(tu<>nil)then
+      begin
+         ai_alarm_x :=tu^.x;
+         ai_alarm_y :=tu^.y;
+         ai_alarm_tu:=tu;
+      end
+      else
+      begin
+         ai_alarm_x :=x;
+         ai_alarm_y :=y;
+         ai_alarm_tu:=nil;
+      end;
+      ai_alarm_d:=ud;
+   end;
+end;
+
+procedure ai_alarm_invis_target(tu:PTUnit;x,y,ud:integer);
+begin
+   if(ud<ai_alarm_invis_d)then
+   begin
+      if(tu<>nil)then
+      begin
+         ai_alarm_invis_x :=tu^.x;
+         ai_alarm_invis_y :=tu^.y;
+         ai_alarm_invis_tu:=tu;
+      end
+      else
+      begin
+         ai_alarm_invis_x :=x;
+         ai_alarm_invis_y :=y;
+         ai_alarm_invis_tu:=nil;
+      end;
+      ai_alarm_invis_d:=ud;
+   end;
+end;
+
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);
+procedure _setCommanderVar(pv:PPTUnit);
+begin
+   if(pv^=nil)
+   then pv^:=tu
+   else
+     if(tu^.speed<pv^^.speed)
+     then pv^:=tu
+     else
+       if (tu^.speed=pv^^.speed)
+       and(tu^.unum <pv^^.unum)
+       then pv^:=tu;
+end;
+
 begin
    with pu^     do
    with player^ do
-   if(tu^.hits>0)then
    begin
-      if(pu^.player=tu^.player)then
+      if(tu^.hits>0)then
       begin
-         ai_enrg_cur+=tu^.uid^._generg;
+         if(team<>tu^.player^.team)then
+          if(_uvision(pu^.player^.team,tu,true))then
+          begin
+             ai_alarm_target(tu,0,0,ud);
+             if(tu^.buff[ub_invis]>0)and(tu^.vsni[pu^.player^.team]<=0)then ai_alarm_invis_target(tu,0,0,ud);
+          end;
 
-         if(tu^.uid^._isbarrack)then
-          if(tu^.uidi=aiucl_barrack0[race])or(tu^.uidi=aiucl_barrack1[race])then
-           if(tu^.buff[ub_advanced]>0)
-           then ai_unitp_cur+=MaxUnitProdsN
-           else
-           begin
-              ai_unitp_cur   +=1;
-              ai_unitp_cur_na+=1;
-           end;
+         if(pu^.player=tu^.player)then
+         begin
+            if(ud<ai_base_d)and(tu^.uid^._ukbuilding)and(tu^.speed<=0)then
+            begin
+               ai_base_tu:=tu;
+               ai_base_d :=ud;
+            end;
 
-         if(tu^.uid^._issmith)then
-          if(tu^.uidi=aiucl_smith[race])then
-           if(tu^.buff[ub_advanced]>0)
-           then ai_upgrp_cur+=MaxUnitProdsN
-           else
-           begin
-              ai_upgrp_cur   +=1;
-              ai_upgrp_cur_na+=1;
-           end;
+            if(ud<base_ir)then
+            begin
+               if(tu^.ukfly=false)
+               then _setCommanderVar(@ai_grd_commander_tu)
+               else _setCommanderVar(@ai_fly_commander_tu);
+            end;
+
+            ai_enrg_cur+=tu^.uid^._generg;
+
+            if(tu^.uid^._isbarrack)then
+             if(tu^.uidi=aiucl_barrack0[race])or(tu^.uidi=aiucl_barrack1[race])then
+              if(tu^.buff[ub_advanced]>0)
+              then ai_unitp_cur+=MaxUnitProdsN
+              else
+              begin
+                 ai_unitp_cur   +=1;
+                 ai_unitp_cur_na+=1;
+              end;
+
+            if(tu^.uid^._issmith)then
+             if(tu^.uidi=aiucl_smith[race])then
+              if(tu^.buff[ub_advanced]>0)
+              then ai_upgrp_cur+=MaxUnitProdsN
+              else
+              begin
+                 ai_upgrp_cur   +=1;
+                 ai_upgrp_cur_na+=1;
+              end;
+         end;
       end;
    end;
 end;
@@ -241,25 +416,25 @@ end;
 procedure BuildTech0(x:integer);  // Tech0  TechCenter, HellMonastery
 begin
     with pu^.player^ do
-     if(ai_tech0_cur<x)and(ai_tech0_cur<ai_max_techs)
+     if(ai_tech0_cur<x)and(ai_tech0_cur<ai_max_tech0)
      then SetBT2(aiucl_tech0[race],0);
 end;
 procedure BuildTech1(x:integer);  // Tech1
 begin
     with pu^.player^ do
-     if(ai_tech1_cur<x)and(ai_tech1_cur<ai_max_techs)
+     if(ai_tech1_cur<x)and(ai_tech1_cur<ai_max_tech1)
      then SetBT2(aiucl_tech1[race],0);
 end;
 procedure BuildSpec0(x:integer);  // Radar, Teleport
 begin
     with pu^.player^ do
-     if(ai_spec0_cur<x)and(ai_spec0_cur<ai_max_specs)
+     if(ai_spec0_cur<x)and(ai_spec0_cur<ai_max_spec0)
      then SetBT2(aiucl_spec0[race],0);
 end;
 procedure BuildSpec1(x:integer);  // RStation, Altar
 begin
     with pu^.player^ do
-     if(ai_spec1_cur<x)and(ai_spec1_cur<ai_max_specs)
+     if(ai_spec1_cur<x)and(ai_spec1_cur<ai_max_spec1)
      then SetBT2(aiucl_spec1[race],0);
 end;
 
@@ -310,7 +485,14 @@ begin
 end;
 
 
+procedure ai_UnitProduction(pu:PTUnit);
+begin
+   with pu^     do
+   with uid^    do
+   begin
 
+   end;
+end;
 
 procedure ai_code(pu:PTUnit);
 var i:integer;
@@ -330,6 +512,12 @@ begin
    with uid^    do
    with player^ do
    begin
+      if(playeri=HPlayer)and(sel)then
+      begin
+         if(ai_alarm_x      >-1)then UnitsInfoAddLine(x,y,ai_alarm_x,ai_alarm_y,c_red);
+         if(ai_alarm_invis_x>-1)then UnitsInfoAddLine(x,y,ai_alarm_invis_x+1,ai_alarm_invis_y+1,c_aqua);
+      end;
+
       ai_basep_builders:=uid_e[aiucl_main0   [race]]
                         +uid_e[aiucl_main1   [race]];
       ai_unitp_barracks:=uid_e[aiucl_barrack0[race]]
@@ -344,39 +532,35 @@ begin
       if(_N(@ai_basep_need,ai_max_mains ))then ai_basep_need:=mm3(1,ai_basep_builders+1           ,ai_max_mains );
       if(_N(@ai_unitp_need,ai_max_unitps))then ai_unitp_need:=mm3(1,trunc((ai_basep_builders/6)*5),ai_max_unitps);
       if(_N(@ai_upgrp_need,ai_max_upgrps))then ai_upgrp_need:=mm3(1,ai_unitp_cur div 3            ,ai_max_upgrps);
-      if(_N(@ai_tech0_need,ai_max_techs ))then ai_tech0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_techs );
-      if(_N(@ai_spec0_need,ai_max_specs ))then ai_spec0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_specs );
+      if(_N(@ai_tech0_need,ai_max_tech0 ))then ai_tech0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_tech0 );
+      if(_N(@ai_spec0_need,ai_max_spec0 ))then ai_spec0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_spec0 );
 
       if(sel)then
       if(k_ctrl>1)and(k_ctrl<fr_2hfps)then writeln('ai_unitp_need=',ai_unitp_need,' ai_max_unitps=',ai_max_unitps);
 
 
 
-       case uidi of
+      case uidi of
 UID_HSymbol,
 UID_HASymbol   : if(cenerg>_generg)and(menerg>2200)and(uid_eb[uidi]>1)then begin _unit_kill(pu,false,true,true);exit;end;
 UID_UGenerator,
 UID_UAGenerator: if(cenerg>_generg)and(menerg>2200)then begin _unit_kill(pu,false,true,true);exit;end;
-       else
-          if(_isbarrack)or(_issmith)then
-          if(ai_noprod(pu))then
-          begin
-             if(buff[ub_advanced]>0)
-             then i:=MaxUnitProdsN
-             else i:=1;
+      else
+         if(_isbarrack)or(_issmith)then
+         if(ai_noprod(pu))then
+         begin
+            if(buff[ub_advanced]>0)
+            then i:=MaxUnitProdsN
+            else i:=1;
 
-             if(_isbarrack)and(ai_unitp_cur>6)then
-              if(ai_unitp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_unitp_cur_na>0))then
-               if((ai_unitp_cur-i)>=ai_unitp_need)then begin _unit_kill(pu,false,true,true);exit;end;
-             if(_issmith  )and(ai_upgrp_cur>3)then
-              if(ai_upgrp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_upgrp_cur_na>0))then
-               if((ai_upgrp_cur-i)>=ai_upgrp_need)then begin _unit_kill(pu,false,true,true);exit;end;
-          end;
-       end;
-
-
-      if(n_builders>0)and(isbuildarea)then ai_buildings(pu);
-
+            if(_isbarrack)and(ai_unitp_cur>6)then
+             if(ai_unitp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_unitp_cur_na>0))then
+              if((ai_unitp_cur-i)>=ai_unitp_need)then begin _unit_kill(pu,false,true,true);exit;end;
+            if(_issmith  )and(ai_upgrp_cur>3)then
+             if(ai_upgrp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_upgrp_cur_na>0))then
+              if((ai_upgrp_cur-i)>=ai_upgrp_need)then begin _unit_kill(pu,false,true,true);exit;end;
+         end;
+      end;
 
       if(ai_unitp_cur>=1)then
       case uidi of
@@ -386,6 +570,9 @@ UID_UGenerator : if(ai_enrg_cur<ai_max_energy)then begin _unit_action(pu);exit;e
          if(_isbarrack)or(_issmith)then begin _unit_action(pu);exit;end;
       end;
 
+      if(n_builders>0)and(isbuildarea)then ai_buildings(pu);
+
+      if(_isbarrack)then ai_UnitProduction(pu);
    end;
 end;
 

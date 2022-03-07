@@ -195,7 +195,7 @@ begin
    setEffectEID (false,0  ,0            ,EID_Gavno,0             );
    setEffectSND (false,nil,snd_imp_death,snd_meat ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(4,nil,snd_hell_melee ,0,0);
+   setWeaponESND(2,nil,snd_hell_melee ,0,0);
 end;
 UID_Demon:
 begin
@@ -215,7 +215,7 @@ begin
    setEffectEID (false,0  ,0              ,0  ,0             );
    setEffectSND (false,nil,snd_caco_death ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(4,nil,snd_hell_melee ,0,0);
+   setWeaponESND(2,nil,snd_hell_melee ,0,0);
 end;
 UID_Knight:
 begin
@@ -228,7 +228,7 @@ begin
    setEffectSND (false,nil,snd_knight_death ,nil,snd_hell_pain );
    setEffectSND (true ,nil,snd_baron_death  ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(2,nil,snd_hell_melee ,0,0);
+   setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
 UID_Cyberdemon:
 begin
@@ -268,7 +268,7 @@ begin
    setEffectEID (false,0  ,0                 ,0  ,0             );
    setEffectSND (false,nil,snd_revenant_death,nil,snd_zimba_pain);
    setWeaponESND(0,nil,snd_revenant_attack,0,0);
-   setWeaponESND(4,nil,snd_revenant_melee ,0,0);
+   setWeaponESND(2,nil,snd_revenant_melee ,0,0);
 end;
 UID_Mancubus:
 begin
@@ -333,7 +333,7 @@ begin
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (@spr_ZSergant,@spr_ZSSergant);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
-   setWeaponESND(3,nil,snd_shotgun,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
 end;
 UID_ZCommando:
 begin
@@ -515,7 +515,7 @@ begin
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
-   setWeaponESND(3,nil,snd_shotgun,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
 end;
 UID_Commando:
 begin
@@ -592,14 +592,10 @@ begin
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
 
-   setWeaponTEID2([0..255],nil,0,[]);
-
-   setWeaponTEID2([2,6,10],nil,0,[0..255]);
-   setWeaponTEID2([0,4,8 ],nil,0,[0..255]);
-
-   setWeaponESND2([0,4,8,3,7,11],nil,snd_shotgun,0,0);
-   setWeaponESND2([1,5,9 ],nil,snd_ssg    ,0,0);
-   setWeaponESND2([2,6,10],nil,snd_pistol ,0,0);
+   setWeaponESND(0,nil,snd_shotgun,0,0);
+   setWeaponESND(1,nil,snd_ssg    ,0,0);
+   setWeaponESND(2,nil,snd_pistol ,0,0);
+   setWeaponESND(3,nil,snd_shotgun,0,0);
 
    DefaultRLDA_pa:=3;
 end;

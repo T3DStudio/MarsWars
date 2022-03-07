@@ -220,8 +220,7 @@ _tdecals          : array of TDecal;
 
 map_mmcx          : single;
 map_mmvw,
-map_mmvh,
-map_prmm          : integer;
+map_mmvh          : integer;
 
 cmp_skill         : byte = 3;
 cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;

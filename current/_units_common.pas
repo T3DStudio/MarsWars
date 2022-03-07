@@ -1366,7 +1366,7 @@ begin
    with uu^ do
    begin
       if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)
-      then td:=min2(ud,dist2(x,y,tu^.uo_x,tu^.uo_y))
+      then td:=min2(ud,dist(x,y,tu^.uo_x,tu^.uo_y))
       else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then

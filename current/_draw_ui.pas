@@ -25,8 +25,8 @@ aummat_info      : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_
 gm_cptp: for i:=1 to MaxCPoints do
           with g_cpoints[i] do
            if(ct>0)and((G_Step mod 20)>10)
-           then circleColor(r_minimap,mpx,mpy,map_prmm,c_gray            )
-           else circleColor(r_minimap,mpx,mpy,map_prmm,PlayerGetColor(pl));
+           then circleColor(r_minimap,mpx,mpy,mpr,c_gray            )
+           else circleColor(r_minimap,mpx,mpy,mpr,PlayerGetColor(pl));
 gm_royl: circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
    end;
 end;

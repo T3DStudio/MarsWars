@@ -153,6 +153,21 @@ end;
 
 const TVisPrimSize =  SizeOf(TVisPrim);
 
+procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+begin
+   vid_prims+=1;
+   setlength(vid_prim,vid_prims);
+   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   with vid_prim[vid_prims-1] do
+   begin
+      kind :=uinfo_line;
+      x0   :=ax0;
+      y0   :=ay0;
+      x1   :=ax1;
+      y1   :=ay1;
+      color:=acolor;
+   end;
+end;
 procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    vid_prims+=1;
@@ -337,7 +352,9 @@ begin
    case g_mode of
 gm_cptp: for t:=1 to MaxCPoints do
           with g_cpoints[t] do
-           circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,g_ct_pr,PlayerGetColor(pl));
+          if(ct>0)and((G_Step mod 20)>10)
+          then circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,c_gray            )
+          else circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,PlayerGetColor(pl));
 gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
 
@@ -349,12 +366,17 @@ gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_
 
        x0+=lx-vid_cam_x;
        y0+=ly-vid_cam_y;
-       if(kind<>uinfo_circle)and(kind<>uinfo_sprite)then
+       if(kind=uinfo_rect)
+       or(kind=uinfo_box)
+       or(kind=uinfo_line)then
        begin
           x1+=lx-vid_cam_x;
           y1+=ly-vid_cam_y;
+          if(kind<>uinfo_line)then
+          begin
           if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
           if(y0>y1)then begin t:=y0;y0:=y1;y1:=t;end;
+          end;
        end;
 
        if(sprite<>nil)then

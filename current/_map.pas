@@ -91,7 +91,6 @@ begin
    map_mmcx    := (vid_panelw-2)/map_mw;
    map_mmvw    := trunc(vid_cam_w*map_mmcx)+1;
    map_mmvh    := trunc(vid_cam_h*map_mmcx)+1;
-   map_prmm    := round(g_ct_pr*map_mmcx);
    {$ENDIF}
 end;
 
@@ -210,7 +209,7 @@ gm_cptp:
          MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 9));
 
          c :=map_seed mod 360;
-         u :=map_mw div 5;
+         u :=map_mw div 6;
          ix:=map_mw div 2;
          iy:=360-(360 div MaxCPoints);
 
@@ -219,11 +218,13 @@ gm_cptp:
          begin
             px:=trunc(ix+cos(c*degtorad)*u);
             py:=trunc(ix+sin(c*degtorad)*u);
+            pr:=64+_random(256);
             c+=iy;
 
             {$IFDEF _FULLGAME}
             mpx:=round(px*map_mmcx);
             mpy:=round(py*map_mmcx);
+            mpr:=round(pr*map_mmcx);
             {$ENDIF}
          end;
          map_psx[0]:=-5000;

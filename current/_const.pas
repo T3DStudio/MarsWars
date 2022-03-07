@@ -333,6 +333,26 @@ wpt_heal               = 2;
 wpt_unit               = 3;
 wpt_directdmg          = 4;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Weapon: priority type
+//
+
+wtp_default            = 0;
+wtp_hits               = 1;
+wtp_rmhits             = 2;
+wtp_distance           = 3;
+wtp_building           = 4;
+wtp_unit_light_bio     = 5;
+wtp_unit_bio_nostun    = 6;
+wtp_unit_bio_light     = 7;
+wtp_unit_bio_nlight    = 8;
+wtp_unit_mech_nostun   = 9;
+wtp_unit_mech          = 10;
+wtp_bio                = 11;
+wtp_light              = 12;
+wtp_unit_light         = 13;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -717,12 +737,12 @@ invuln_time            = fr_fps*30;
 rocket_sr              = 40;
 blizz_r                = 150;
 
-g_ct_pr                = 150;
 bld_dec_mr             = 6;
-player_default_ai_level                 = 5;
-hinvuln_time           = (fr_fps*30);
+player_default_ai_level= 5;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
+
+gm_cptp_time           = fr_fps*20;
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;

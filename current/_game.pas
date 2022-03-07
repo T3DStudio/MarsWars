@@ -25,7 +25,7 @@ begin
       ai_pushtimei:= 0;
       ai_pushfrmi := 0; }
    end;
-   PlayerSetAIParams(p);
+   PlayerSetSkirmishAIParams(p);
 end;
 
 procedure PlayersSwap(p0,p1:byte);
@@ -699,26 +699,26 @@ begin
       end;
    end
    else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1);
-end;
+end;  }
 
-procedure _CPoints;
+procedure GameModeCPoints;
 var i,t,e:integer;
 begin
    e:=0;
    t:=0;
    for i:=1 to MaxCPoints do
-    with g_cpt_pl[i] do
+    with g_cpoints[i] do
     begin
-       if(ct>0)then dec(ct,1);
+       if(ct>0)then ct-=1;
        if(t=0)or(t<>_players[pl].team)then
        begin
           t:=_players[pl].team;
           e:=1;
        end
-       else inc(e,1);
+       else e+=1;
     end;
 
-   if(e=MaxCPoints)and(G_WTeam=255)then
+   {if(e=MaxCPoints)and(G_WTeam=255)then
    begin
       G_WTeam:=t;
       for i:=1 to MaxUnits do
@@ -726,8 +726,8 @@ begin
         if(hits>0)and(inapc=0)then
          with player^ do
           if(team<>t)then _unit_kill(@_units[i],false,false);
-   end;
-end;  }
+   end; }
+end;
 
 {$include _net_game.pas}
 
@@ -765,7 +765,7 @@ begin
              if(g_royal_r>0)then g_royal_r-=1;
 
             G_Step+=1;
-            //if(g_mode=gm_cptp )then _CPoints;
+            if(g_mode=gm_cptp )then GameModeCPoints;
             //if(g_mode=gm_inv)then g_inv_spawn;
          end;
          _obj_cycle;

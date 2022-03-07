@@ -156,7 +156,7 @@ begin
    if(g_mode=gm_cptp)then
     for i:=1 to MaxCPoints do
      with g_cpoints[i] do
-      filledcircleColor(r_minimap,mpx,mpy,map_prmm,c_aqua);
+      filledcircleColor(r_minimap,mpx,mpy,mpr,c_aqua);
 end;
 
 procedure map_RedrawMenuMinimap;
@@ -190,15 +190,13 @@ begin
    _draw_text(tar,x,y,str,ta,255,c_white);
 end;
 
-{al_x,
-al_y,
-al_mx,
-al_my,  }
-
 function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;
 var i,mx,my:integer;
 begin
    ui_addalrm:=false;
+
+   if(ax>map_mw)
+   or(ay>map_mw)then exit;
 
    mx:=trunc(ax*map_mmcx);
    my:=trunc(ay*map_mmcx);
@@ -291,7 +289,7 @@ lmt_unit_ready       : if(_uids[uid]._ukbuilding)
                        then ui_addalrm(x,y,aummat_created_b,true)
                        else ui_addalrm(x,y,aummat_created_u,true);
 lmt_upgrade_complete : ui_addalrm(x,y,aummat_upgrade,true);
-lmt_map_mark         : ui_addalrm(x,y,aummat_info   ,true);
+lmt_map_mark         : LogMes2UIAlarm:=ui_addalrm(x,y,aummat_info   ,true);
    end;
 end;
 

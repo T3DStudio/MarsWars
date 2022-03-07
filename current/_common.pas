@@ -1,6 +1,7 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
 procedure ai_clear_vars;forward;
+procedure ai_alarm_target(tu:PTUnit;x,y,ud:integer);forward;
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_code(pu:PTUnit);forward;
 function _canmove  (pu:PTUnit):boolean; forward;
@@ -47,7 +48,7 @@ begin cf:=(c^ and f^)>0;end;
 //   COMMON Players funcs
 //
 
-procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);   // allowed units
+procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);    // allowed units
 var i:byte;
 begin
    with _players[p] do
@@ -71,7 +72,6 @@ begin
          with _upids[i] do a_upgrs[i]:=min2(_up_max,lvl);
    end;
 end;
-
 procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
