@@ -24,30 +24,31 @@ procedure map_doodads_cells_refresh;
 var dx0,dy0,dx1,dy1,d,dy:integer;
 begin
    for dx0:=0 to dcn do
-    for dy0:=0 to dcn do
-     with map_dcell[dx0,dy0] do
-     begin
-        n:=0;
-        setlength(l,n);
-     end;
+   for dy0:=0 to dcn do
+   with map_dcell[dx0,dy0] do
+   begin
+      n:=0;
+      setlength(l,n);
+   end;
 
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then
      begin
-        dx0:=mm3(0,(x-r-dcw) div dcw,dcn);
-        dy0:=mm3(0,(y-r-dcw) div dcw,dcn);
-        dx1:=mm3(0,(x+r+dcw) div dcw,dcn);
-        dy1:=mm3(0,(y+r+dcw) div dcw,dcn);
+        dx0:=(x-r-dcw) div dcw;
+        dy0:=(y-r-dcw) div dcw;
+        dx1:=(x+r+dcw) div dcw;
+        dy1:=(y+r+dcw) div dcw;
         while(dx0<=dx1)do
         begin
            for dy:=dy0 to dy1 do
-            with map_dcell[dx0,dy] do
-            begin
-               n+=1;
-               setlength(l,n);
-               l[n-1]:=@map_dds[d];
-            end;
+            if(0<=dx0)and(dx0<=dcn)and(0<=dy)and(dy<=dcn)then
+             with map_dcell[dx0,dy] do
+             begin
+                n+=1;
+                setlength(l,n);
+                l[n-1]:=@map_dds[d];
+             end;
            dx0+=1;
         end;
      end;

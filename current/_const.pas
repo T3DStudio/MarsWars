@@ -389,6 +389,8 @@ aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
 aif_stayathome         : cardinal = 1 shl 28; //   }
 
+aius_needscan          : byte = %00000001;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -408,7 +410,6 @@ uab_buildturret        = 10;
 uab_hinvuln            = 11;
 uab_spawnlost          = 100;
 uab_hell_vision        = 101;
-uab_umine              = 102;
 uab_advance            = 103;
 
 client_rld_abils = [
@@ -518,7 +519,7 @@ upgr_uac_mainm         = 40; // Main b move
 upgr_uac_ccturr        = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_ccldoodads    = 43; // main on doodabs
-upgr_uac_mines         = 44; // mines for engineers
+upgr_uac_airsp         = 44; // anti-air missiles splash
 upgr_uac_jetpack       = 45; // jetpack for plasmagunner
 upgr_uac_6bld          = 46; // adv
 upgr_uac_9bld          = 47; // 9 class building reload time
@@ -571,6 +572,7 @@ MID_ArchFire           = 121;
 MID_Flyer              = 122;
 MID_Mine               = 123;
 MID_URocket            = 124;
+MID_URocketS           = 125;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -579,7 +581,7 @@ MID_URocket            = 124;
 //
 
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
-MaxUnitWeapons         = 15; //0-15
+MaxUnitWeapons         = 7;  //0-7
 MaxUnitProdsI          = 1;  //0-1
 MaxUnitProdsN          = MaxUnitProdsI+1;  //2
 MaxMissiles            = MaxUnits;

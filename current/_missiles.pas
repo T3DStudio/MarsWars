@@ -35,6 +35,7 @@ MID_Tank,
 MID_StunMine     : ;
 MID_ArchFire : ;
 MID_Flyer    : ms_smodel:=@spr_u_p3;
+MID_URocketS,
 MID_URocket  : ms_smodel:=@spr_u_p8;
       end;
 
@@ -42,6 +43,7 @@ MID_URocket  : ms_smodel:=@spr_u_p8;
       case m of
 MID_Granade,
 MID_HRocket,
+MID_URocketS,
 MID_URocket,
 MID_RevenantS: begin
                ms_eid_fly   :=MID_Bullet;
@@ -69,6 +71,7 @@ MID_Mine,
 MID_Tank,
 MID_Granade,
 MID_HRocket,
+MID_URocket,
 MID_Revenant,
 MID_RevenantS: ms_snd_death[false]:=snd_exp;
 MID_Bullet,
@@ -93,7 +96,7 @@ MID_Flyer    : ms_snd_death[false]:=snd_flyer_a;
 
       // death sound and effect
       case m of
-MID_URocket  : begin
+MID_URocketS : begin
                   ms_snd_death    [true ]:=snd_exp;
                   ms_eid_death_cnt[true ]:=4;
                   ms_eid_death_r  [true ]:=20;
@@ -190,7 +193,8 @@ MID_Cacodemon  : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantS,
 MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_URocketS   : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=0;         dir:=p_dir(vx,vy,x,y);end;
 MID_Mancubus   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_YPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=100; vstep:=1;        splashr :=15 ;       end;
@@ -226,12 +230,13 @@ MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
 
       damage+=adddmg;
 
-      if(mid=MID_Revenant)then
-       if(_players[player].upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
+      with _players[player] do
+      case mid of
+MID_Revenant: if(upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
+MID_URocket : if(upgr[upgr_uac_airsp  ]>0)then mid:=MID_URocketS;
+      end;
 
-      if(mid=MID_URocket)and(mfe)then homing:=true;
-
-      if(mid=MID_RevenantS)then homing:=true;
+      homing:=homing or (mid in [MID_URocket,MID_URocketS,MID_RevenantS]);
 
       if(not homing)and(_IsUnitRange(tar,@tu))then
       begin
@@ -354,6 +359,7 @@ begin
                case mid of
                MID_Revenant,
                MID_RevenantS,
+               MID_URocketS,
                MID_URocket     : _d200(@rdamage);
                MID_Flyer       : _d300(@rdamage);
                end;

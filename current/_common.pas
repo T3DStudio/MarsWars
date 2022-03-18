@@ -1,12 +1,12 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
 procedure ai_clear_vars;forward;
-procedure ai_alarm_target(tu:PTUnit;x,y,ud:integer);forward;
+procedure ai_alarm_target(aid:byte;tu:PTUnit;x,y,ud:integer);forward;
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_code(pu:PTUnit);forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function _UnderObstacle(ux,uy:integer):boolean; forward;
+function IfUnderObstacle(ux,uy:integer):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
 
 {$IFDEF _FULLGAME}
@@ -615,7 +615,7 @@ begin
       if(bld=false)or(hits<=0)then exit;
 
       if(_ability_no_obstacles)then
-       if(_UnderObstacle(x,y))then exit;
+       if(IfUnderObstacle(x,y))then exit;
 
       if(_ability_rupgr>0)then
        if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;
@@ -698,9 +698,10 @@ begin
             and(vid_cam_y<y)and(y<(vid_cam_y+vid_cam_h));
 end;
 
-function PointInScreenF(x,y:integer;player:PTPlayer):boolean;
+function PointInScreenP(x,y:integer;player:PTPlayer):boolean;
 begin
-   PointInScreenF:=false;
+   // player = player of vision source
+   PointInScreenP:=false;
    x-=vid_cam_x;
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
@@ -710,11 +711,11 @@ begin
        if (player^.team=_players[HPlayer].team)
        or((rpls_state>=rpl_rhead)and(player^.pnum=0))then
        begin
-          PointInScreenF:=true;
+          PointInScreenP:=true;
           exit;
        end;
 
-      if(rpls_fog=false)or(fog_check(x,y))then PointInScreenF:=true;
+      if(rpls_fog=false)or(fog_check(x,y))then PointInScreenP:=true;
    end;
 end;
 

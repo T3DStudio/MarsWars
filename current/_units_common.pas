@@ -17,11 +17,16 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+         if(PointInScreenP(vx,vy,player)=false)then exit;
 
       SoundPlayUnit(snd,pu,nil);
       _effect_add(vx,vy,_depth(vy+1,ukfly),EID_HUpgr);
    end;
+end;
+
+procedure _unit_HvisionEff(pu:PTUnit;vischeck:pboolean);
+begin
+   _unit_PowerUpEff(pu,snd_hell_eye,vischeck);
 end;
 
 procedure _uac_rocketl_eff(pu:PTUnit);
@@ -46,7 +51,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+         if(PointInScreenP(vx,vy,player)=false)then exit;
 
      SoundPlayUnit(un_snd_ready[buff[ub_advanced]>0],nil,nil);
 
@@ -67,7 +72,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenP(vx,vy,player)=false)then exit;
 
       if(fastdeath)then
       begin
@@ -92,7 +97,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenP(vx,vy,player)=false)then exit;
 
       _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
       SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
@@ -106,7 +111,7 @@ begin
       if(vischeck^=false)then exit
    end
    else
-     if(PointInScreenF(tx,ty,@_players[HPlayer])=false)then exit;
+     if(PointInScreenP(tx,ty,nil)=false)then exit;
 
    _effect_add(tx,ty,dy,UID_LostSoul);
    SoundPlayUnit(snd_pexp,nil,nil);
@@ -123,7 +128,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenF(vx,vy,@_players[HPlayer])=false)then exit;
+        if(PointInScreenP(vx,vy,player)=false)then exit;
 
       if(start)then
       begin
@@ -140,11 +145,9 @@ end;
 
 {$ENDIF}
 
-
-
-function _UnderObstacle(ux,uy:integer):boolean;
+function IfUnderObstacle(ux,uy:integer):boolean;
 begin
-   _UnderObstacle:=pf_get_area(ux div pf_pathmap_w,uy div pf_pathmap_w)=pf_solid;
+   IfUnderObstacle:=pf_get_area(ux div pf_pathmap_w,uy div pf_pathmap_w)=pf_solid;
 end;
 
 function _canmove(pu:PTUnit):boolean;
@@ -157,7 +160,7 @@ begin
     begin
        _canmove:=false;
 
-       if(speed<=0)or(bld=false)then exit;
+       if(speed<=0)or(hits<=0)or(bld=false)then exit;
 
        if(a_rld>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -264,6 +267,7 @@ begin
       vy    :=y;
       _unit_correctXY(pu);
       _unit_clear_order(pu,false);
+      underobstacle:=IfUnderObstacle(x,y);
       {$IFDEF _FULLGAME}
       _unit_mmcoords(pu);
       _unit_sfog(pu);
@@ -483,9 +487,9 @@ begin
 
    if(check_doodads)then
    begin
+      tr-=bld_dec_mr;
       dx:=tx div dcw;
       dy:=ty div dcw;
-      tr-=bld_dec_mr;
       if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
        with map_dcell[dx,dy] do
         if(n>0)then
@@ -613,14 +617,15 @@ begin
 
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
     with map_dcell[dx,dy] do
-     for u:=0 to n-1 do
-      with l[u]^ do
-       if(r>0)and(t>0)then
-        if(dist(x,y,tx,ty)<(tr+r))then
-        begin
-           _collisionr:=4;
-           exit;
-        end;
+     if(n>0)then
+      for u:=0 to n-1 do
+       with l[u]^ do
+        if(r>0)and(t>0)then
+         if(dist(x,y,tx,ty)<(tr+r))then
+         begin
+            _collisionr:=4;
+            exit;
+         end;
 end;
 
 function _InBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
@@ -738,6 +743,7 @@ begin
       order    := 0;
       a_tar    := 0;
       a_weap   := 0;
+      a_rld    := 0;
       //a_tard   := 32000;
       {alrm_x   := 0;
       alrm_y   := 0;
@@ -948,7 +954,7 @@ begin
    if(0<puid)and(puid<255)then
     with pu^ do
      with uid^ do
-      if(bld)and(_isbarrack)and(_ukbuilding)then
+      if(hits>0)and(bld)and(_isbarrack)and(_ukbuilding)then
        if not (puid in ups_units)
        then PlayerSetProdError(playeri,glcp_unit,puid,ureq_barracks,pu)
        else
@@ -1026,7 +1032,7 @@ begin
    if(upid<255)then
     with pu^ do
      with uid^ do
-      if(bld)and(_issmith)and(_ukbuilding)then
+      if(hits>0)and(bld)and(_issmith)and(_ukbuilding)then
        if not(upid in ups_upgrades)
        then PlayerSetProdError(playeri,glcp_upgr,upid,ureq_smiths,pu)
        else
@@ -1201,7 +1207,7 @@ begin
             begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
-               if(SoundPlayUnit(snd_teleport,nil,nil))
+               if(SoundPlayUnit(snd_teleport,pu,nil))
                then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
@@ -1509,30 +1515,29 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-   if(bld)then
+   if(bld)and(hits>0)then
    begin
       // ABILITIES
       case _ability of
 uab_radar        : SetSRange(radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr_levels)]);
-uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele]>0];
-uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld    ]>0];
+uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele     ]>0];
+uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld         ]>0];
 uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
       end;
-      //
 
       // DETECTION
       case uidi of
-UID_UMine : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
-UID_HEye  : buff[ub_detect]:=_ub_infinity;
+UID_UMine        : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
+UID_HEye         : buff[ub_detect]:=_ub_infinity;
       end;
 
       // INVIS
       case uidi of
-UID_HTotem: buff[ub_invis]:=b2ib[upgr[upgr_hell_totminv]>0];
+UID_HTotem       : buff[ub_invis]:=b2ib[upgr[upgr_hell_totminv]>0];
 UID_Commando,
-UID_Demon : buff[ub_invis]:=buff[ub_advanced];
+UID_Demon        : buff[ub_invis]:=buff[ub_advanced];
 UID_HEye,
-UID_UMine : buff[ub_invis]:=_ub_infinity;
+UID_UMine        : buff[ub_invis]:=_ub_infinity;
       end;
 
       // OTHER HARDCODE
@@ -1545,12 +1550,12 @@ UID_LostSoul: begin
                  if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
                  if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
               end;
-UID_Demon: if(upgr[upgr_hell_pinkspd]>0)then
-           begin
-              if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+3;{$ENDIF}end;
-           end
-           else
-             if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;
+UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)then
+              begin
+                 if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+3;{$ENDIF}end;
+              end
+              else
+                if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;
 UID_HCommandCenter,
 UID_UCommandCenter:
            if(buff[ub_advanced]>0)then
@@ -1608,11 +1613,13 @@ UID_ZMajor:
                  speed:=_speed;
               end;
            end;
-UID_FAPC  : if(buff[ub_advanced]>0)
-            then apcm:=_apcm+4
-            else apcm:=_apcm;
-UID_UCTurret:
-          buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
+UID_FAPC    : if(buff[ub_advanced]>0)
+              then apcm:=_apcm+4
+              else apcm:=_apcm;
+UID_APC     : if(buff[ub_advanced]>0)
+              then apcm:=_apcm+2
+              else apcm:=_apcm;
+UID_UCTurret: buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
       end;
 
       // BUILD AREA
@@ -1622,11 +1629,8 @@ UID_HCommandCenter,
 UID_UCommandCenter: isbuildarea:=not ukfly;
       end;
 
-
       // SRANGE
-      if(_upgr_srange>0)and(_upgr_srange_step>0)then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step));
       case uidi of
-UID_UMine    : if(upgr[upgr_uac_mines]>1)then SetSRange(upgr[upgr_uac_mines]*100);
 UID_Cyberdemon,
 UID_Mastermind,
 UID_Engineer,
@@ -1637,30 +1641,8 @@ UID_Major,
 UID_ZMajor   : if(buff[ub_advanced]>0)
                then SetSRange(_srange+50)
                else SetSRange(_srange   );
-      end;
-
-
-      // REGENERATION
-      if(ServerSide)then
-      if(cycle_order=_cycle_regen)then
-      begin
-         i:=_baseregen;
-         if(i>=0)then
-          if(_ukbuilding)
-          then i+=upgr[upgr_race_build_regen[_urace]]
-          else
-            if(_ukmech)
-            then i+=upgr[upgr_race_mech_regen[_urace]]
-            else i+=upgr[upgr_race_bio_regen [_urace]];
-
-         hits+=i;
-         if(hits<=0)then
-         begin
-            hits:=1;
-            _unit_kill(pu,false,false,false);
-         end
-         else
-           if(hits>_mhits)then hits:=_mhits;
+      else
+        if(_upgr_srange>0)and(_upgr_srange_step>0)then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step));
       end;
    end;
 end;

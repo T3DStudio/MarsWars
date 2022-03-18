@@ -500,7 +500,7 @@ var pu,tu:PTUnit;
    vis:boolean;
 begin
    pu:=@_units[0];
-   with uu^ do vis:=PointInScreenF(x,y,player);
+   with uu^ do vis:=PointInScreenP(x,y,player);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
@@ -519,6 +519,7 @@ begin
            _unit_fog_r(uu);
            if(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
            if(buff[ub_teleeff ]>0)then _teleEff(uu,@vis);
+           if(buff[ub_hvision ]>0)then _unit_HvisionEff(uu,@vis);
            with uid^ do
            if(bld=false)then SoundPlayAnoncer(snd_build_place[_urace],false);
 
@@ -565,12 +566,13 @@ begin
 
             if(hits>0)then
             begin
-               if(pu^.buff[ub_teleeff]<=0)and(buff[ub_teleeff]>0)then _teleEff(uu,pu);
-
-               if((pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0))then _ucSummonedEffect(uu,@vis);
+               if(pu^.buff[ub_teleeff ]<=0)and(buff[ub_teleeff ]>0)then _teleEff(uu,pu);
+               if(pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
+               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_HvisionEff (uu,@vis);
 
                if(pu^.bld)and(bld=false)then
-                with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
+                if(playeri=HPlayer)then
+                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
                if(pu^.inapc<>inapc)and(vis)then SoundPlayUnit(snd_inapc,nil,@vis);
@@ -581,14 +583,14 @@ begin
                    case uid^._ability of
                0:;
                uab_uac_rstrike : _unit_umstrike_missile(uu);
-               uab_radar       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,@vis);
+               uab_radar       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then
                   begin
                      if(uid^._ability<>uab_advance)then
-                      if(pu^.buff[ub_advanced]=0)and(buff[ub_advanced]>0)then
+                      if(pu^.buff[ub_advanced]<=0)and(buff[ub_advanced]>0)then
                       begin
                          case uid^._urace of
                     r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
@@ -596,7 +598,7 @@ begin
                          end;
                       end;
 
-                     if(pu^.buff[ub_invuln]=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln,@vis);
+                     if(pu^.buff[ub_invuln]<=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln,@vis);
                   end;
                end;
             end;

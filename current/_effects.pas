@@ -36,6 +36,7 @@ begin
         MID_Imp           : _setEID(@spr_h_p0          ,sms_death);
         MID_Cacodemon     : _setEID(@spr_h_p1          ,sms_death);
         MID_Baron         : _setEID(@spr_h_p2          ,sms_death);
+        MID_URocketS,
         MID_URocket,
         MID_Revenant,
         MID_RevenantS     : _setEID(@spr_h_p4          ,sms_death);
@@ -137,6 +138,8 @@ begin
    if(anim_last_i_t=0)then
    begin
       case ee of
+//                       anin  frst  last,
+//                       step  frame
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
 EID_HAEye,
@@ -155,6 +158,7 @@ MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Imp           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Baron         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_URocketS,
 MID_URocket,
 MID_Revenant,
 MID_RevenantS     : _setEff(7 ,0 , 8 ,-1       ,false,0 );
@@ -236,7 +240,7 @@ var i,o,r:byte;
 begin
    with _missiles[m] do
    with _mid_effs[mid] do
-   if(PointInScreenF(vx,vy,@_players[player]))then
+   if(PointInScreenP(vx,vy,nil))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -277,8 +281,8 @@ end;
 
 procedure teleport_effects(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
-   if PointInScreenF(vx,vy,@_players[HPlayer])
-   or PointInScreenF(tx,ty,@_players[HPlayer]) then SoundPlayUnit(snd,nil,nil);
+   if PointInScreenP(vx,vy,nil)
+   or PointInScreenP(tx,ty,nil) then SoundPlayUnit(snd,nil,nil);
    _effect_add(vx,vy,_depth(vy+1,ukfly),eidstart);
    _effect_add(tx,ty,_depth(ty+1,ukfly),eidend  );
 end;

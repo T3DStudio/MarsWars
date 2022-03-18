@@ -122,7 +122,7 @@ begin
 //         HELL BUILDINGS   ////////////////////////////////////////////////////
 UID_HKeep:
 begin
-   _mhits     := 5000;
+   _mhits     := 4000;
    _renerg    := 300;
    _generg    := 150;
    _r         := 66;
@@ -141,7 +141,7 @@ end;
 
 UID_HGate:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 200;
    _r         := 60;
    _ucl       := 1;
@@ -176,7 +176,7 @@ end;
 
 UID_HPools:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 200;
    _r         := 53;
    _ucl       := 9;
@@ -188,7 +188,7 @@ end;
 
 UID_HMonastery:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 300;
    _generg    := 300;
    _r         := 65;
@@ -199,7 +199,7 @@ begin
 end;
 UID_HFortress:
 begin
-   _mhits     := 6000;
+   _mhits     := 5000;
    _renerg    := 300;
    _generg    := 300;
    _r         := 86;
@@ -212,7 +212,7 @@ end;
 
 UID_HTeleport:
 begin
-   _mhits     := 1000;
+   _mhits     := 500;
    _renerg    := 200;
    _r         := 28;
    _ucl       := 12;
@@ -224,7 +224,7 @@ begin
 end;
 UID_HAltar:
 begin
-   _mhits     := 1000;
+   _mhits     := 500;
    _renerg    := 200;
    _r         := 50;
    _ucl       := 13;
@@ -255,10 +255,10 @@ begin
 end;
 UID_HTotem:
 begin
-   _mhits     := 1000;
+   _mhits     := 500;
    _renerg    := 200;
    _r         := 21;
-   _srange    := 275;
+   _srange    := 250;
    _ucl       := 7;
    _btime     := 20;
    _ruid1     := UID_HAltar;
@@ -268,7 +268,7 @@ begin
    _addon     := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
-   _weapon(0,wpt_missle,aw_srange,0,0,140,MID_ArchFire,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive_nbuildings,wpr_any+wpr_tvis,uidall,[65],0,0,wtp_hits);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0,140,MID_ArchFire,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive_nbuildings,wpr_any+wpr_tvis,uidall,[65],0,0,wtp_hits);
 end;
 
 UID_HEye:
@@ -300,8 +300,8 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fdeathhits(1);
-   _weapon(0,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy          ,wpr_adv+wpr_zombie,uidall,[],0,0,wtp_distance);
-   _weapon(1,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive    ,wpr_any           ,uidall,[],0,0,wtp_bio     );
+   _weapon(0,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy      ,wpr_adv+wpr_zombie,uidall,[],0,0,wtp_distance);
+   _weapon(1,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive,wpr_any           ,uidall,[],0,0,wtp_bio     );
 end;
 UID_Imp        :
 begin
@@ -316,9 +316,9 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_missle    ,aw_srange,0,0 ,fr_3h2fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive           ,wpr_adv ,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
-   _weapon(1,wpt_missle    ,aw_srange,0,0 ,fr_fps   ,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive           ,wpr_nadv,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
-   _weapon(2,wpt_directdmg ,aw_dmelee,0,10,fr_fps   ,0      ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground    ,wpr_any,        [UID_Imp],[],0, 0,wtp_distance       );
+   _weapon(0,wpt_missle    ,aw_srange,0,0 ,fr_3h2fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive       ,wpr_adv ,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
+   _weapon(1,wpt_missle    ,aw_srange,0,0 ,fr_fps   ,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive       ,wpr_nadv,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
+   _weapon(2,wpt_directdmg ,aw_dmelee,0,10,fr_fps   ,0      ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground,wpr_any,        [UID_Imp],[],0, 0,wtp_distance       );
 end;
 UID_Demon      :
 begin
@@ -443,9 +443,9 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _addon     := true;
-   _weapon(0,wpt_missle   ,aw_fsr+100,0,0 ,fr_fps   ,MID_Revenant ,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_fly   ,wpr_adv ,uidall-[UID_Revenant],[],0,-7,wtp_hits);
-   _weapon(1,wpt_missle   ,aw_srange ,0,0 ,fr_fps   ,MID_Revenant ,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive       ,wpr_any ,uidall-[UID_Revenant],[],0,-7,wtp_hits);
-   _weapon(2,wpt_directdmg,aw_dmelee ,0,20,fr_3h2fps,0            ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground,wpr_any ,       [UID_Revenant],[],0, 0,wtp_distance);
+   _weapon(0,wpt_missle   ,aw_fsr+100,0,0 ,fr_fps   ,MID_Revenant ,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_fly   ,wpr_adv,uidall-[UID_Revenant],[],0,-7,wtp_hits);
+   _weapon(1,wpt_missle   ,aw_srange ,0,0 ,fr_fps   ,MID_Revenant ,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive       ,wpr_any,uidall-[UID_Revenant],[],0,-7,wtp_hits);
+   _weapon(2,wpt_directdmg,aw_dmelee ,0,20,fr_3h2fps,0            ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground,wpr_any,       [UID_Revenant],[],0, 0,wtp_distance);
 end;
 UID_Mancubus   :
 begin
@@ -461,7 +461,7 @@ begin
    _limituse  := 30;
    _attack    := atm_always;
    _addon     := true;
-   _weapon(0,wpt_missle   ,aw_fsr+50,0,-8,fr_mancubus_r,MID_Mancubus,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive,wpr_any ,uidall-[UID_Mancubus],[110,70,30],0,0,wtp_building);
+   _weapon(0,wpt_missle,aw_fsr+50,0,-8,fr_mancubus_r,MID_Mancubus,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive,wpr_any ,uidall-[UID_Mancubus],[110,70,30],0,0,wtp_building);
 end;
 UID_Arachnotron:
 begin
@@ -477,8 +477,8 @@ begin
    _limituse  := 30;
    _attack    := atm_always;
    _addon     := true;
-   _weapon(0,wpt_missle   ,aw_fsr+100,0,0 ,fr_4hfps,MID_YPlasma,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive       ,wpr_adv ,uidall-[UID_Arachnotron],[],0,0,wtp_unit_mech);
-   _weapon(1,wpt_missle   ,aw_srange ,0,0 ,fr_4hfps,MID_YPlasma,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive       ,wpr_nadv,uidall-[UID_Arachnotron],[],0,0,wtp_unit_mech);
+   _weapon(0,wpt_missle,aw_fsr+100,0,0 ,fr_4hfps,MID_YPlasma,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive,wpr_adv ,uidall-[UID_Arachnotron],[],0,0,wtp_unit_mech);
+   _weapon(1,wpt_missle,aw_srange ,0,0 ,fr_4hfps,MID_YPlasma,0,0,0,upgr_hell_dattack,1,wtrset_enemy_alive,wpr_nadv,uidall-[UID_Arachnotron],[],0,0,wtp_unit_mech);
 end;
 UID_Archvile:
 begin
@@ -576,7 +576,7 @@ begin
    _uklight   := true;
    _fdeathhits(-30);
    _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_2h3fps,MID_Granade,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground_buildings,wpr_adv ,uidall,[],0,-4,wtp_hits);
-   _weapon(1,wpt_missle,aw_srange,rocket_sr,0 ,fr_2h3fps,MID_URocket,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_fly             ,wpr_any ,uidall,[],0,-4,wtp_hits);
+   _weapon(1,wpt_missle,aw_srange,0        ,0 ,fr_2h3fps,MID_URocket,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_fly             ,wpr_any ,uidall,[],0,-4,wtp_hits);
    _weapon(2,wpt_missle,aw_srange,rocket_sr,0 ,fr_2h3fps,MID_Granade,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground          ,wpr_adv ,uidall,[],0,-4,wtp_hits);
    _weapon(3,wpt_missle,aw_srange,rocket_sr,0 ,fr_2h3fps,MID_URocket,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground          ,wpr_nadv,uidall,[],0,-4,wtp_hits);
 end;
@@ -621,7 +621,7 @@ end;
 UID_HCommandCenter,
 UID_UCommandCenter:
 begin
-   _mhits     := 5000;
+   _mhits     := 4000;
    _renerg    := 300;
    _generg    := 150;
    _speed     := 0;
@@ -662,7 +662,7 @@ end;
 UID_HMilitaryUnit,
 UID_UMilitaryUnit:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 200;
    _r         := 66;
    _ucl       := 1;
@@ -684,7 +684,7 @@ begin
 end;
 UID_UFactory:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 200;
    _r         := 66;
    _ucl       := 4;
@@ -717,7 +717,7 @@ end;
 
 UID_UWeaponFactory:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 200;
    _r         := 62;
    _ucl       := 9;
@@ -730,7 +730,7 @@ end;
 
 UID_UTechCenter :
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renerg    := 300;
    _r         := 62;
    _ucl       := 10;
@@ -841,7 +841,7 @@ begin
    _btime     := 10;
    _attack    := atm_always;
    _zombie_uid:= UID_ZEngineer;
-   _ability   := uab_umine;
+   _ability   := 0;
    _uklight   := true;
    _fdeathhits(-30);
    _weapon(0,wpt_heal  ,aw_hmelee,0,8 ,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_repair          ,wpr_any,uidall,[],0,0,wtp_hits            );
@@ -1209,7 +1209,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_ccturr     ,120,1   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_uac ,upgr_uac_mainr      ,60 ,2   ,50  ,0            ,0                  ,false,false);
    _setUPGR(r_uac ,upgr_uac_ccldoodads ,60 ,1   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_mines      ,30 ,2   ,50  ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,1   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_uac ,upgr_uac_jetpack    ,60 ,1   ,50  ,0            ,UID_UTechCenter    ,false,false);
    _setUPGR(r_uac ,upgr_uac_6bld       ,120,1   ,100 ,0            ,UID_UTechCenter    ,false,false);
    _setUPGR(r_uac ,upgr_uac_9bld       ,60 ,1   ,100 ,0            ,UID_UTechCenter    ,false,true );
@@ -1240,7 +1240,7 @@ begin
    wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+                      wtr_bld+wtr_nbld+wtr_ground+        wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;
    wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+                      wtr_bld+wtr_nbld+wtr_ground+        wtr_adv+wtr_nadv+wtr_light           +wtr_stun+wtr_nostun;
    wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+                      wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;
-   wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+         wtr_nostun;
+   wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;
    wtrset_resurect                       :=wtr_owner_p+wtr_owner_a                       +wtr_hits_d           +wtr_bio+wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;
 
 
