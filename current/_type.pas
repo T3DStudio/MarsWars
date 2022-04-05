@@ -330,8 +330,8 @@ TPlayer = record
 
    ready   : boolean;
 
-   o_id,
-   o_a0    : byte;
+   o_id    : byte;
+o_a0,
 o_x0,o_y0,
 o_x1,o_y1  :integer;
 
@@ -441,18 +441,6 @@ TUnit = record
             : integer;
    uo_id    : byte;
 
-{   pf_pos_x,
-   pf_pos_y,
-   pf_pos_cx,
-   pf_pos_cy,
-   pf_mv_x,
-   pf_mv_y,
-   pf_mv_cx,
-   pf_mv_cy,
-   pf_mv_nx,
-   pf_mv_ny
-            : integer; }
-
    inapc,
    painc,
    pains,
@@ -463,7 +451,6 @@ TUnit = record
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
-
    uo_vision,
    ukfly,
    underobstacle,
@@ -471,6 +458,13 @@ TUnit = record
    bld,
    solid,
    sel      : boolean;
+
+   ai_need_heye
+            : boolean;
+   ai_alarm_d,
+   ai_alarm_x,
+   ai_alarm_y
+            : integer;
 
    {$IFDEF _FULLGAME}
    wanim    : boolean;

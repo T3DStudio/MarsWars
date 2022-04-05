@@ -1,6 +1,6 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
-procedure ai_clear_vars;forward;
+procedure ai_clear_vars(pu:PTUnit);forward;
 procedure ai_alarm_target(aid:byte;tu:PTUnit;x,y,ud:integer);forward;
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_code(pu:PTUnit);forward;

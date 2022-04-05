@@ -102,33 +102,32 @@ gm_inv    : if(playeri=0)then damage:=damage div 2;
       else
       begin
          hits-=damage;
+         buff[ub_damaged]:=fr_fps;
 
-         if(_ukbuilding)or(_ukmech)
-         then buff[ub_pain]:=fr_2fps
-         else
-           if(pain_f>0)and(_painc>0)and(painc>0)and(buff[ub_pain]=0)then
-           begin
-              if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
+         if(not _ukbuilding)and(not _ukmech)then
+          if(pain_f>0)and(_painc>0)and(painc>0)and(buff[ub_pain]<=0)then
+          begin
+             if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
 
-              if(pain_f>pains)
-              then pains:=0
-              else pains-=pain_f;
+             if(pain_f>pains)
+             then pains:=0
+             else pains-=pain_f;
 
-              if(pains=0)then
-              begin
-                 pains:=painc;
+             if(pains=0)then
+             begin
+                pains:=painc;
 
-                 buff[ub_pain]:=max2(order_period,a_rld);
+                buff[ub_pain]:=max2(order_period,a_rld);
 
-                 with player^ do
-                  if(_urace=r_hell)then
-                   if(upgr[upgr_hell_pains]>0)then pains+=upgr[upgr_hell_pains]*3;
+                with player^ do
+                 if(_urace=r_hell)then
+                  if(upgr[upgr_hell_pains]>0)then pains+=upgr[upgr_hell_pains]*3;
 
-                 {$IFDEF _FULLGAME}
-                 _unit_pain_effects(pu,nil);
-                 {$ENDIF}
-              end;
-           end;
+                {$IFDEF _FULLGAME}
+                _unit_pain_effects(pu,nil);
+                {$ENDIF}
+             end;
+          end;
       end;
    end;
 end;
@@ -191,11 +190,11 @@ begin
       if(tusolid)
       then uds-=tu^.uid^._r
       else uds-=tu^.uid^._r+_r;
-      ud:=trunc(uds);
+      ud:=round(uds);
 
-      if(ud<0)then
+      if(uds<0)then
       begin
-         if((tu^.x=x)and(tu^.y=y))or(t<=0)then
+         if((tu^.x=x)and(tu^.y=y))then
          begin
             case _random(4) of
             0: x-=ud;
@@ -206,8 +205,8 @@ begin
          end
          else
          begin
-            x+=trunc(uds*(tu^.x-x)/t);
-            y+=trunc(uds*(tu^.y-y)/t);
+            x+=round(uds*(tu^.x-x)/t)+_randomr(2);
+            y+=round(uds*(tu^.y-y)/t)+_randomr(2);
          end;
 
          _unit_correctXY(pu);
@@ -243,14 +242,13 @@ begin
    with pu^ do
    with uid^ do
    begin
-      uds:=distr(x,y,td^.x,td^.y);
-      t  :=uds;
-      uds-=_r+td^.r;
-      ud :=trunc(uds);
+      t  :=distr(x,y,td^.x,td^.y);
+      uds:=t-(_r+td^.r);
+      ud :=round(uds);
 
-      if(ud<0)then
+      if(uds<0)then
       begin
-         if((td^.x=x)and(td^.y=y))or(t<=0)then
+         if((td^.x=x)and(td^.y=y))then
          begin
             case _random(4) of
             0: x-=ud;
@@ -647,38 +645,21 @@ var i :byte;
 begin
   with pu^ do
   with player^ do
-  begin
-     for i:=1 to MaxCPoints do
-      with g_cpoints[i] do
-      begin
-         ud:=dist(x,y,px,py);
+   for i:=1 to MaxCPoints do
+    with g_cpoints[i] do
+    begin
+       ud:=dist(x,y,px,py);
 
-         if(ud<=pr)and(_players[pl].team<>team)then
-          if(ct<gm_cptp_time)
-          then ct+=fr_fps
-          else
-            if(ct>=gm_cptp_time)then
-            begin
-               pl:=playeri;
-               ct:=0;
-            end;
-
-         {if(_players[pl].team<>team)or(pl=0)or(ct>0)then
-         begin
-            if(ud<ai_ptd)then
-            begin
-               ai_ptd:=ud;
-               ai_pt :=i;
-            end;
-         end; }
-      end;
-
-     {if(ai_pt>0)then
-     begin
-        alrm_x:=g_ct_pl[ai_pt].px;
-        alrm_y:=g_ct_pl[ai_pt].py;
-     end; }
-  end;
+       if(ud<=pr)and(_players[pl].team<>team)then
+        if(ct<gm_cptp_time)
+        then ct+=fr_fps
+        else
+          if(ct>=gm_cptp_time)then
+          begin
+             pl:=playeri;
+             ct:=0;
+          end;
+    end;
 end;
 
 
@@ -689,7 +670,10 @@ a_tard,
     ud: integer;
     uds:single;
 a_tarp,
+    puo,
     tu: PTUnit;
+tuinapc,
+swtarget,
 aicode,
 ftarget,
   push: boolean;
@@ -724,12 +708,20 @@ begin
 
       push    := solid and _canmove(pu) and (a_rld<=0) and bld;
       ftarget := _canattack(pu,false);
-      aicode  := (state=ps_comp) and bld;
+      aicode  := (state=ps_comp);
+      swtarget:= false;
+      puo:=nil;
+      if(_IsUnitRange(uo_tar,@puo))and(aicode=false)then
+       if(puo^.player=player)and(puo^.hits>0)and(puo^.rld>0)then
+        case _uids[puo^.uidi]._ability of
+uab_teleport,
+uab_uac__unit_adv : swtarget:=true;
+        end;
 
       if(aicode)then
       begin
-         ai_clear_vars;
-         ai_collect_data(pu,pu,0);   //uab_building_adv
+         ai_clear_vars(pu);
+         ai_collect_data(pu,pu,0);
       end;
 
       if(ftarget)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
@@ -744,9 +736,11 @@ begin
          if(tu^.hits>fdead_hits)then
          begin
             uds:=distr(x,y,tu^.x,tu^.y);
-            ud :=trunc(uds);
+            ud :=round(uds);
 
-            if(not _IsUnitRange(tu^.inapc,nil))then _unit_detect(pu,tu,ud);
+            tuinapc:=(0<tu^.inapc)and(tu^.inapc<=MaxUnits);
+
+            if(not tuinapc)then _unit_detect(pu,tu,ud);
 
             if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
@@ -754,13 +748,21 @@ begin
 
             if(tu^.hits>0)then
             begin
-               if(tu^.inapc>0)then continue;
+               if(tuinapc)then continue;
 
                _unit_aura_effects(pu,tu,ud);
 
                if(push)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.bld)then
                  if(tu^.solid)and(ukfly=tu^.ukfly)then _unit_push(pu,tu,uds);
+
+               if(swtarget)then
+                if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)then
+                 if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=puo^.uo_tar))
+                 or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))then
+                 begin
+                    uo_tar:=tu^.unum;
+                 end;
             end;
          end;
       end;
@@ -1671,6 +1673,7 @@ begin
 
       // REGENERATION
       if(cycle_order=_cycle_regen)then
+      if(buff[ub_damaged]<=0)then
       begin
          i:=_baseregen;
          if(i>=0)then
@@ -1681,37 +1684,33 @@ begin
             then i+=upgr[upgr_race_mech_regen[_urace]]
             else i+=upgr[upgr_race_bio_regen [_urace]];
 
-         hits+=i;
-         if(hits<=0)then
+         if(i>0)then
          begin
-            hits:=1;
-            _unit_kill(pu,false,false,false);
-         end
-         else
-           if(hits>_mhits)then hits:=_mhits;
+            hits+=i;
+            if(hits>_mhits)then hits:=_mhits;
+         end;
       end;
    end
    else
      if(cenerg<0)
      then _unit_kill(pu,false,false,true)
      else
-       //if(buff[ub_pain]<=0)then
-       begin
-          if(_cycle_order=cycle_order)then
-          begin
-             hits+=_bstep;
-             hits+=_bstep*upgr[upgr_fast_build];
-          end;
+     begin
+        if(_cycle_order=cycle_order)then
+        begin
+           hits+=_bstep;
+           hits+=_bstep*upgr[upgr_fast_build];
+        end;
 
-          if(hits>=_mhits){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-          begin
-             hits:=_mhits;
-             bld :=true;
-             _unit_bld_inc_cntrs(pu);
-             cenerg+=_renerg;
-             GameLogUnitReady(pu);
-          end;
-       end;
+        if(hits>=_mhits){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        begin
+           hits:=_mhits;
+           bld :=true;
+           _unit_bld_inc_cntrs(pu);
+           cenerg+=_renerg;
+           GameLogUnitReady(pu);
+        end;
+     end;
 end;
 
 procedure _unit_reveal(pu:PTUnit);

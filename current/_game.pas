@@ -346,8 +346,10 @@ _su,_eu,
 usel_n,
 usel_max : integer;
 psel     : boolean;
+oa,
 pu       : PTUnit;
 begin
+   oa:=nil;
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
@@ -396,12 +398,17 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                 end;
                 if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                 if(uidi=o_a0)then
-                  sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
-                    and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
+                begin
+                   if(oa=nil)then
+                    if(not _IsUnitRange(o_a0,@oa))then break;
+                   if(uidi=oa^.uidi)and((buff[ub_advanced]>0)=(oa^.buff[ub_advanced]>0))
+                   then sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
+                          and((o_y0-_r)<=vy)and(vy<=(o_y1+_r))
+                   else if(o_id<>uo_adblselect)then sel:=false;
+                end;
                 if(o_id=uo_specsel)then
                  if(o_x0<1)or(255<o_x0)
-                 then begin if(UnitF2Select(pu)    )then sel:=true else if(o_y0=0)then sel:=false; end
+                 then begin if(UnitF2Select(pu))then sel:=true else if(o_y0=0)then sel:=false; end
                  else       if(a_units[uidi]=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
 
                 if(o_id=uo_corder)then

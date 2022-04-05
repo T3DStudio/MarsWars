@@ -209,7 +209,8 @@ begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_ability>0)and(_canability(pu)))
-            or(apcc>0)then ui_uibtn_action+=1;
+            or(apcc>0)
+            or((buff[ub_advanced]<=0)and(_isbarrack or _issmith)and(uid_x[uid_race_9bld[race]]>0))then ui_uibtn_action+=1;
          end;
       end
       else

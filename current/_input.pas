@@ -125,7 +125,7 @@ begin
    end;
 end;
 
-procedure _player_s_o(ox0,oy0,ox1,oy1:integer;oa0,oid,pl:byte);
+procedure _player_s_o(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
 begin
    if(G_Status=gs_running)and(rpls_state<rpl_rhead)then
    begin
@@ -137,7 +137,7 @@ begin
          net_writeint (oy0);
          net_writeint (ox1);
          net_writeint (oy1);
-         net_writebyte(oa0);
+         net_writeint (oa0);
          net_writebyte(oid);
          net_send(net_cl_svip,net_cl_svport);
       end
@@ -634,13 +634,21 @@ begin
     if(m_bx<0)or(3<=m_bx)then        // map
      case m_brush of
 co_empty  : begin
-               mouse_select_x0:=mouse_map_x;
-               mouse_select_y0:=mouse_map_y;
-
-               u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+               if(k_ctrl>1)then
+               begin
+                  if(k_shift<2)
+                  then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect  ,HPlayer)
+                  else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect ,HPlayer)
+               end
+               else
+               begin
+                  mouse_select_x0:=mouse_map_x;
+                  mouse_select_y0:=mouse_map_y;
+               end;
+               {u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
                if(u>0)and(k_ctrl>1)then
                 with _units[u] do
-                 if(hits>4)then hits:=hits div 2;
+                 if(hits>4)then hits:=hits div 2;}
 
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);
@@ -678,8 +686,8 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       begin
          if(m_ldblclk>0)then
             if(k_shift<2)
-            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3), uo_dblselect  ,HPlayer)
-            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3), uo_adblselect ,HPlayer)
+            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect  ,HPlayer)
+            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect ,HPlayer)
          else
          begin
             if(k_shift<2)

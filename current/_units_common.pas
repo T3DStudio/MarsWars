@@ -1331,7 +1331,7 @@ begin
    //uu - transport
    //ru - target
    _itcanapc:=false;
-   if(tu^.ukfly=uf_fly)then exit;
+   if(tu^.ukfly=uf_fly)or(uu=tu)then exit;
 
    if(uu^.player<>tu^.player)then
     if(uu^.player^.team<>tu^.player^.team)
@@ -1415,6 +1415,7 @@ var i :integer;
     tu:PTunit;
 begin
    with pu^ do
+   if(hits>0)then
    with player^ do
    begin
       if(instant=false)then
@@ -1497,7 +1498,7 @@ end;
 
 
 procedure _unit_upgr(pu:PTUnit);
-var i:integer;
+var
    tu:PTUnit;
 procedure SetSRange(newsr:integer);
 begin
@@ -1552,7 +1553,7 @@ UID_LostSoul: begin
               end;
 UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)then
               begin
-                 if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+3;{$ENDIF}end;
+                 if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;
               end
               else
                 if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;

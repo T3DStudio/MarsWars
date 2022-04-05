@@ -205,7 +205,7 @@ nmid_order      : with _players[pid]do
                      o_y0:=net_readint;
                      o_x1:=net_readint;
                      o_y1:=net_readint;
-                     o_a0:=net_readbyte;
+                     o_a0:=net_readint;
                      o_id:=net_readbyte;
                   end;
 nmid_map_mark   : net_ReadMapMark(pid);

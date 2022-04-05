@@ -133,8 +133,8 @@ begin
       if(y0=-1)then y0:=y+4;
       if(ui_orders_n[i]>0)then
       begin
-      _draw_text(tar,ui_oicox,y0   ,b2s(i)             ,ta_right,255,c_white);
-      _draw_text(tar,ui_oicox,y0+10,i2s(ui_orders_n[i]),ta_right,255,c_gray );
+      _draw_text(tar,ui_oicox,y0   ,b2s(i)             ,ta_right,255,c_white );
+      _draw_text(tar,ui_oicox,y0+10,i2s(ui_orders_n[i]),ta_right,255,c_orange);
       end;
       y+=vid_oihw;
    end;

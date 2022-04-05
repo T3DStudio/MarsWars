@@ -389,7 +389,7 @@ aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
 aif_stayathome         : cardinal = 1 shl 28; //   }
 
-aius_needscan          : byte = %00000001;
+//aius_needscan          : byte = %00000001;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -443,6 +443,7 @@ ub_invuln              = 9;
 ub_summoned            = 10;
 ub_teleeff             = 11;
 ub_hvision             = 12;
+ub_damaged             = 13;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
@@ -1100,7 +1101,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 731429;
+svld_size              = 780301;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
