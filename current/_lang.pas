@@ -344,7 +344,7 @@ begin
    str_gmode[gm_3fort]   := #17+'Three bases' +#25;
    str_gmode[gm_cptp ]   := #19+'Capturing points'+#25;
    str_gmode[gm_inv  ]   := #20+'Invasion'    +#25;
-   str_gmode[gm_aslt ]   := #14+'Assault'     +#25;
+   str_gmode[gm_koh  ]   := #14+'King of the Hill'+#25;
    str_gmode[gm_royl ]   := #15+'Royal Battle'+#25;
 
    str_addon[false]      := #16+'UDOOM' +#25;
@@ -765,7 +765,7 @@ begin
   str_gmode[gm_3fort]   := #17+'Три крепости'+#25;
   str_gmode[gm_cptp ]   := #19+'Захват точек'+#25;
   str_gmode[gm_inv  ]   := #20+'Вторжение'+#25;
-  str_gmode[gm_aslt ]   := #14+'Штурм'+#25;
+  str_gmode[gm_koh  ]   := #14+'Царь горы'+#25;
   str_gmode[gm_royl ]   := #15+'Королевская битва'+#25;
 
   str_team              := 'Клан:';

@@ -123,14 +123,15 @@ begin
 UID_HKeep:
 begin
    _mhits     := 4000;
-   _renerg    := 300;
-   _generg    := 150;
+   _renerg    := 500;
+   _generg    := 300;
    _r         := 66;
    _srange    := 280;
    _ucl       := 0;
    _btime     := 60;
    _ukbuilding:= true;
    _isbuilder := true;
+   _limituse  := 20;
    ups_builder:= [UID_HKeep..UID_HFortress,UID_HCommandCenter]-[UID_HASymbol];
    _upgr_srange     :=upgr_hell_mainr;
    _upgr_srange_step:=40;
@@ -622,8 +623,8 @@ UID_HCommandCenter,
 UID_UCommandCenter:
 begin
    _mhits     := 4000;
-   _renerg    := 300;
-   _generg    := 150;
+   _renerg    := 500;
+   _generg    := 300;
    _speed     := 0;
    _r         := 66;
    _srange    := 280;
@@ -634,6 +635,7 @@ begin
    _ukbuilding:= true;
    _isbuilder := true;
    _slowturn  := false;
+   _limituse  := 20;
 
    if(i=UID_HCommandCenter)then
    begin

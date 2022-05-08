@@ -86,7 +86,7 @@ begin
              _draw_text(tar,ui_menu_pls_zxnt, u, name             , ta_left  , 255, c_white);
              if G_Started or (net_status=ns_clnt) or ((net_status<ns_clnt)and(state=ps_play)and(p<>HPlayer)) then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
-             if(g_mode in [gm_2fort,gm_3fort,gm_inv,gm_aslt])then c:=c_gray;
+             if(g_mode in [gm_2fort,gm_3fort,gm_inv])then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PlayerGetTeam(g_mode,p)), ta_middle, 255, c);
              if((g_player_status and (1 shl p))=0)and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_gray);
           end
@@ -360,7 +360,7 @@ begin
 
                  y:=_yt(6);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_sstarts       , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, b2pm[g_show_positions or (g_mode in [gm_2fort,gm_3fort,gm_inv,gm_aslt])]   , ta_right ,255 ,c_white);
+                 _draw_text(tar,ui_menu_csm_xt2, y, b2pm[g_show_positions or (g_mode in [gm_2fort,gm_3fort,gm_inv])]   , ta_right ,255 ,c_white);
 
                  y:=_yt(7);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_aislots       , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));

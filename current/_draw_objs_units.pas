@@ -348,7 +348,7 @@ begin
             then aura:=c_awhite
             else
               if(playeri=0)and(not _ukbuilding)then
-               if(g_mode in [gm_inv,gm_aslt])then aura:=c_ablack;
+               if(g_mode in [gm_inv])then aura:=c_ablack;
 
 
             if(_ukbuilding)then

@@ -302,7 +302,12 @@ gm_inv : begin
             _wudata_int (g_inv_time  ,rpl);
          end;
 gm_cptp  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].pl,rpl);
-gm_royl: _wudata_int(g_royal_r,rpl);
+gm_koh   : with g_cpoints[1] do
+           begin
+              _wudata_byte(pl,rpl);
+              _wudata_int (ct,rpl);
+           end;
+gm_royl  : _wudata_int(g_royal_r,rpl);
     end;
 
    if(rpl)then
@@ -960,6 +965,11 @@ gm_inv : begin
             g_inv_time :=_rudata_int (rpl,0);
          end;
 gm_cptp  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
+gm_koh   : with g_cpoints[1] do
+           begin
+              pl:=_rudata_byte(rpl,0);
+              ct:=_rudata_int (rpl,0);
+           end;
 gm_royl: g_royal_r:=_rudata_int(rpl,0);
     end;
 

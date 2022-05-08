@@ -40,7 +40,7 @@ gm_2fort               = 1;
 gm_3fort               = 2;
 gm_cptp                = 3;
 gm_inv                 = 4;
-gm_aslt                = 5;
+gm_koh                 = 5;
 gm_royl                = 6;
 
 gs_running             = 0;  //
@@ -55,7 +55,7 @@ gs_waitserver          = 11;
 gs_replaypause         = 12;
 
 
-gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_aslt,gm_royl];
+gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_koh,gm_royl];
 gm_cnt                 = 6;
 
 r_cnt                  = 2;  // race num

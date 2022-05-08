@@ -153,10 +153,12 @@ begin
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
    end;
 
-   if(g_mode=gm_cptp)then
-    for i:=1 to MaxCPoints do
-     with g_cpoints[i] do
-      filledcircleColor(r_minimap,mpx,mpy,mpr,c_aqua);
+   case g_mode of
+gm_cptp: for i:=1 to MaxCPoints do
+          with g_cpoints[i] do
+           filledcircleColor(r_minimap,mpx,mpy,mpr,c_aqua);
+gm_koh : with g_cpoints[1] do filledcircleColor(r_minimap,mpx,mpy,mpr,c_purple);
+    end;
 end;
 
 procedure map_RedrawMenuMinimap;

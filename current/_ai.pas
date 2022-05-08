@@ -86,7 +86,7 @@ begin
           end;
       1 : begin
              ai_max_energy:=1000;
-             ai_max_mains :=3;
+             ai_max_mains :=2;
              ai_max_unitps:=2;
              ai_max_upgrps:=1;
              ai_max_tech0 :=0;
@@ -96,7 +96,7 @@ begin
           end;
       2 : begin
              ai_max_energy:=2000;
-             ai_max_mains :=8;
+             ai_max_mains :=4;
              ai_max_unitps:=4;
              ai_max_upgrps:=1;
              ai_max_tech0 :=1;
@@ -106,7 +106,7 @@ begin
           end;
       3 : begin
              ai_max_energy:=32000;
-             ai_max_mains :=12;
+             ai_max_mains :=7;
              ai_max_unitps:=8;
              ai_max_upgrps:=2;
              ai_max_tech0 :=2;
@@ -116,7 +116,7 @@ begin
           end;
       4 : begin
              ai_max_energy:=32000;
-             ai_max_mains :=18;
+             ai_max_mains :=10;
              ai_max_unitps:=14;
              ai_max_upgrps:=4;
              ai_max_tech0 :=4;
@@ -126,7 +126,7 @@ begin
           end;
       else
              ai_max_energy:=32000;
-             ai_max_mains :=25;
+             ai_max_mains :=13;
              ai_max_unitps:=20;
              ai_max_upgrps:=4;
              ai_max_tech0 :=4;

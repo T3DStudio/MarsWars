@@ -1231,17 +1231,36 @@ begin
    end;
 end;
 
-procedure _makezimba(pu,tu:PTUnit);
+function _makezimba(pu,tu:PTUnit):boolean;
 var _h:single;
     _o:byte;
     _f:boolean;
     _d,
     _z,
     _a:integer;
+ _zuid:PTUID;
     {$IFDEF _FULLGAME}
     _s:integer;
     {$ENDIF}
 begin
+   _makezimba:=false;
+
+   if(tu^.uid^._zombie_uid=0)then exit;
+   _zuid:=@_uids[tu^.uid^._zombie_uid];
+
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if((armylimit-_limituse+_zuid^._limituse)>MaxPlayerLimit)then exit;
+
+      //if(_zuid^._ukbuilding)then
+      // if((cenerg-_generg+_zuid^._generg)<=0)
+      //if(_uids[].)
+      // _zuid
+      //check limit use and energy level for buildings
+   end;
+
    _h:=tu^.hits/tu^.uid^._mhits;
    _d:=tu^.dir;
    _o:=pu^.order;
@@ -1279,6 +1298,7 @@ begin
    end;
 
    _unit_kill(tu,true,true,false);
+   _makezimba:=true;
 end;
 
 procedure _unit_attack(pu:PTUnit);
@@ -1364,7 +1384,7 @@ begin
            attackinmove:=cf(@aw_reqf,@wpr_move);
       end;
 
-      if(_canattack(pu,true)=false)then
+      if(not _canattack(pu,true))then
       begin
          mv_x:=x;
          mv_y:=y;
@@ -1448,9 +1468,11 @@ wpt_unit       : _ability_unit_spawn(pu,aw_oid);
                 case aw_type of
 wpt_resurect : _resurrect(tu);
 wpt_heal     : if(tu^.hits>0)then tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
-wpt_directdmg: if(cf(@aw_reqf,@wpr_zombie))
-               then _makezimba(pu,tu)
-               else _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri);
+wpt_directdmg: if(not cf(@aw_reqf,@wpr_zombie))
+               then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri)
+               else
+                 if(not _makezimba(pu,tu))
+                 then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri);
                 end;
             end;
 

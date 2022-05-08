@@ -1396,7 +1396,7 @@ begin
        _unit_dec_Rcntrs(pu);
 
        //if(G_Status=gs_running)then
-        if(playeri>0)or not(g_mode in [gm_inv,gm_aslt])then
+        if(playeri>0)or not(g_mode in [gm_inv])then
          if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;

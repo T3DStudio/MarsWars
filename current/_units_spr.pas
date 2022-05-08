@@ -329,7 +329,7 @@ begin
       if(buff[ub_cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 
-      if(a_rld          >0)and(a_weap_cl<=MaxUnitWeapons)then
+      if(a_rld>0)and(a_weap_cl<=MaxUnitWeapons)and(0<a_tar)and(a_tar<=MaxUnits) then
        with _a_weap[a_weap_cl] do
         if(aw_max_range>=0)then
         begin

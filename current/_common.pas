@@ -276,7 +276,6 @@ begin
    then PlayerGetTeam:=0
    else
      case gm of
-     gm_aslt,
      gm_2fort: case p of
                1..3: PlayerGetTeam:=1;
                4..6: PlayerGetTeam:=4;

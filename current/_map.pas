@@ -200,6 +200,22 @@ gm_inv:
 
          MCircleStarts(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
+gm_koh:
+      begin
+         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         with g_cpoints[1] do
+         begin
+            px:=map_hmw;
+            py:=map_hmw;
+            pr:=base_r;
+
+            {$IFDEF _FULLGAME}
+            mpx:=round(px*map_mmcx);
+            mpy:=round(py*map_mmcx);
+            mpr:=round(pr*map_mmcx);
+            {$ENDIF}
+         end;
+      end;
 gm_royl:
       MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
 gm_cptp:
@@ -230,23 +246,6 @@ gm_cptp:
          end;
          map_psx[0]:=-5000;
          map_psy[0]:=-5000;
-      end;
-gm_aslt:
-      begin
-         c  :=map_seed mod 360;
-         bb0:=base_rr-100;
-         bb1:=map_hmw-(map_mw div 10);
-         for i:=1 to 3 do
-         begin
-            map_psx[i  ]:=map_hmw+trunc(cos(c*degtorad)*bb0);
-            map_psy[i  ]:=map_hmw+trunc(sin(c*degtorad)*bb0);
-            c+=60;
-            map_psx[i+3]:=map_hmw+trunc(cos(c*degtorad)*bb1);
-            map_psy[i+3]:=map_hmw+trunc(sin(c*degtorad)*bb1);
-            c+=60;
-         end;
-         map_psx[0]:=map_hmw;
-         map_psy[0]:=map_hmw;
       end;
    else
       ix :=abs(integer(map_seed)) mod map_mw;
