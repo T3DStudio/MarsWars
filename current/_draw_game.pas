@@ -356,7 +356,7 @@ gm_cptp: for t:=1 to MaxCPoints do
           then circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,c_gray            )
           else circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,PlayerGetColor(pl));
 gm_koh : with g_cpoints[1] do circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,PlayerGetColor(pl));
-gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,lx+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
+gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
 
 

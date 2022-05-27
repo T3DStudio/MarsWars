@@ -31,8 +31,8 @@
       <Unit3>
         <Filename Value="_var.pas"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="2"/>
-        <CursorPos Y="28"/>
+        <TopLine Value="78"/>
+        <CursorPos X="26" Y="102"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -108,8 +108,8 @@
       <Unit13>
         <Filename Value="_map.pas"/>
         <EditorIndex Value="23"/>
-        <TopLine Value="432"/>
-        <CursorPos X="7" Y="203"/>
+        <TopLine Value="64"/>
+        <CursorPos X="11" Y="89"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -257,9 +257,10 @@
       </Unit31>
       <Unit32>
         <Filename Value="_draw_game.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="15"/>
         <TopLine Value="335"/>
-        <CursorPos X="102" Y="358"/>
+        <CursorPos X="49" Y="359"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -274,8 +275,8 @@
       <Unit34>
         <Filename Value="_draw_objs_map.pas"/>
         <EditorIndex Value="17"/>
-        <TopLine Value="36"/>
-        <CursorPos X="60" Y="80"/>
+        <TopLine Value="37"/>
+        <CursorPos X="95" Y="46"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit34>
@@ -289,10 +290,9 @@
       </Unit35>
       <Unit36>
         <Filename Value="_units_uid.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="174"/>
-        <CursorPos X="65" Y="191"/>
+        <TopLine Value="848"/>
+        <CursorPos X="52" Y="874"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit36>
@@ -415,16 +415,16 @@
         <Caret Line="336" Column="42" TopLine="301"/>
       </Position27>
       <Position28>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1200" Column="25" TopLine="1496"/>
-      </Position28>
-      <Position29>
-        <Filename Value="_const.pas"/>
-        <Caret Line="43" Column="7" TopLine="571"/>
-      </Position29>
-      <Position30>
         <Filename Value="_units_common.pas"/>
         <Caret Line="147" Column="157" TopLine="135"/>
+      </Position28>
+      <Position29>
+        <Filename Value="_map.pas"/>
+        <Caret Line="203" Column="7" TopLine="451"/>
+      </Position29>
+      <Position30>
+        <Filename Value="_draw_game.pas"/>
+        <Caret Line="358" Column="102" TopLine="335"/>
       </Position30>
     </JumpHistory>
     <RunParams>

@@ -846,9 +846,9 @@ begin
    _ability   := 0;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_heal  ,aw_hmelee,0,8 ,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_repair          ,wpr_any,uidall,[],0,0,wtp_hits            );
-   _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_mech,wpr_adv,uidall,[],0,0,wtp_unit_mech_nostun);
-   _weapon(2,wpt_missle,aw_srange,0,0 ,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive     ,wpr_any,uidall,[],0,0,wtp_unit_bio_light  );
+   _weapon(0,wpt_heal  ,aw_hmelee,0,8 ,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_repair                 ,wpr_any,uidall,[],0,0,wtp_hits            );
+   _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fps,MID_MBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground_mech,wpr_adv,uidall,[],0,0,wtp_unit_mech_nostun);
+   _weapon(2,wpt_missle,aw_srange,0,0 ,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground     ,wpr_any,uidall,[],0,0,wtp_unit_bio_light  );
 end;
 UID_Medic:
 begin
@@ -863,9 +863,9 @@ begin
    _zombie_uid:= UID_ZFormer;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_heal  ,aw_hmelee,0,8,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_heal           ,wpr_any,uidall,[],0,0,wtp_hits           );
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_bio,wpr_adv,uidall,[],0,0,wtp_unit_bio_nostun);
-   _weapon(2,wpt_missle,aw_srange,0,0,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive    ,wpr_any,uidall,[],0,0,wtp_unit_bio_light );
+   _weapon(0,wpt_heal  ,aw_hmelee,0,8,fr_fps,0          ,0,0,0,upgr_uac_melee ,4,wtrset_heal                  ,wpr_any,uidall,[],0,0,wtp_hits           );
+   _weapon(1,wpt_missle,aw_srange,0,0,fr_fps,MID_TBullet,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground_bio,wpr_adv,uidall,[],0,0,wtp_unit_bio_nostun);
+   _weapon(2,wpt_missle,aw_srange,0,0,fr_fps,MID_Bullet ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground    ,wpr_any,uidall,[],0,0,wtp_unit_bio_light );
 end;
 UID_Sergant:
 begin
