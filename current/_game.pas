@@ -5,7 +5,7 @@ begin
    begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
                                 UID_LostSoul      ..UID_ZBFG,
-                                UID_UCommandCenter..UID_UMine,
+                                UID_UCommandCenter..UID_UNuclearPlant,
                                 UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
                                 MaxUnits,true);
 
@@ -747,7 +747,7 @@ begin
    SoundControl;
 
    if(net_status=ns_clnt)then net_GClient;
-   _rpls_code;
+   replay_code;
 
    {$ELSE}
    _dedCode;
@@ -763,17 +763,19 @@ begin
 
       if(G_Status=gs_running)then
       begin
-         _cycle_order+=1; _cycle_order:=_cycle_order mod order_period;
-         _cycle_regen+=1; _cycle_regen:=_cycle_regen mod regen_period;
+         _cycle_order+=1;_cycle_order:=_cycle_order mod order_period;
+         _cycle_regen+=1;_cycle_regen:=_cycle_regen mod regen_period;
 
          if(ServerSide)then
          begin
-            if(_cycle_order=0)then
-             if(g_royal_r>0)then g_royal_r-=1;
-
             G_Step+=1;
-            if(g_mode=gm_cptp )then GameModeCPoints;
-            //if(g_mode=gm_inv)then g_inv_spawn;
+
+            case g_mode of
+            gm_cptp : GameModeCPoints;
+            gm_inv  : ;
+            gm_royl : if(_cycle_order=0)then
+                       if(g_royal_r>0)then g_royal_r-=1;
+            end;
          end;
          _obj_cycle;
       end;

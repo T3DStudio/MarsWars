@@ -20,7 +20,7 @@ MID_Granade,
 MID_Mine,
 MID_HRocket  : ms_smodel:=@spr_h_p3;
 MID_Revenant : ms_smodel:=@spr_h_p4;
-MID_RevenantS: ms_smodel:=@spr_h_p4;
+MID_RevenantH: ms_smodel:=@spr_h_p4;
 MID_Mancubus : ms_smodel:=@spr_h_p5;
 MID_YPlasma  : ms_smodel:=@spr_h_p7;
 MID_BPlasma  : ms_smodel:=@spr_u_p0;
@@ -45,7 +45,7 @@ MID_Granade,
 MID_HRocket,
 MID_URocketS,
 MID_URocket,
-MID_RevenantS: begin
+MID_RevenantH: begin
                ms_eid_fly   :=MID_Bullet;
                ms_eid_fly_st:=5;
                end;
@@ -73,7 +73,7 @@ MID_Granade,
 MID_HRocket,
 MID_URocket,
 MID_Revenant,
-MID_RevenantS: ms_snd_death[false]:=snd_exp;
+MID_RevenantH: ms_snd_death[false]:=snd_exp;
 MID_Bullet,
 MID_Bulletx2,
 MID_TBullet,
@@ -188,10 +188,10 @@ begin
       {$ENDIF}
 
       case mid of
-MID_Imp        : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
+MID_Imp        : begin damage:=15 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Cacodemon  : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
-MID_RevenantS,
+MID_RevenantH,
 MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
 MID_URocketS   : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
 MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=0;         dir:=p_dir(vx,vy,x,y);end;
@@ -212,8 +212,8 @@ MID_Tank       : begin damage:=20 ; vstep:=1;        splashr :=rocket_sr; end;
 MID_StunMine   : begin damage:=1  ; vstep:=1;        splashr :=100;       end;
 MID_Mine       : begin damage:=300; vstep:=1;        splashr :=100;       end;
 MID_Blizzard   : begin damage:=500; vstep:=fr_fps;   splashr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
-MID_SShot      : begin damage:=20 ; vstep:=1;        splashr :=0;         end;
-MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
+MID_SShot      : begin damage:=15 ; vstep:=1;        splashr :=0;         end;
+MID_SSShot     : begin damage:=30 ; vstep:=1;        splashr :=0;         end;
       else
          vstep:=0;
          exit;
@@ -232,11 +232,11 @@ MID_SSShot     : begin damage:=40 ; vstep:=1;        splashr :=0;         end;
 
       with _players[player] do
       case mid of
-MID_Revenant: if(upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantS;
+MID_Revenant: if(upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantH;
 MID_URocket : if(upgr[upgr_uac_airsp  ]>0)then mid:=MID_URocketS;
       end;
 
-      homing:=homing or (mid in [MID_URocket,MID_URocketS,MID_RevenantS]);
+      homing:=homing or (mid in [MID_RevenantH]); //MID_URocket,MID_URocketS
 
       if(not homing)and(_IsUnitRange(tar,@tu))then
       begin
@@ -259,7 +259,7 @@ MID_Baron     : if(uid=UID_Knight     )then exit;
 MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
 MID_Revenant,
-MID_RevenantS : if(uid=UID_Revenant   )then exit;
+MID_RevenantH : if(uid=UID_Revenant   )then exit;
 MID_StunMine  : if(uid=UID_UMine      )then exit;
    end;
 
@@ -358,7 +358,7 @@ begin
            if(tu^.ukfly)then               // fly all
                case mid of
                MID_Revenant,
-               MID_RevenantS,
+               MID_RevenantH,
                MID_URocketS,
                MID_URocket     : _d200(@rdamage);
                MID_Flyer       : _d300(@rdamage);

@@ -664,7 +664,7 @@ begin
    setMWSModel(@spr_UVehicleFactory,nil);
    setBuildingSND(snd_uac_tech);
 end;
-UID_UCTurret:
+UID_UGTurret:
 begin
    _animw    := 6;
    setMWSModel(@spr_UTurret,@spr_UPTurret);
@@ -674,7 +674,7 @@ begin
    setWeaponESND(1,nil,snd_plasma ,0,0);
    setWeaponESND(2,nil,snd_shotgun,0,0);
 end;
-UID_URTurret:
+UID_UATurret:
 begin
    _animw    := 2;
 

@@ -11,9 +11,9 @@ aiucl_tech0      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCente
 aiucl_tech1      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant );
 aiucl_spec0      : array[1..r_cnt] of byte = (UID_HTeleport      ,UID_URadar        );
 aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation    );
-aiucl_twr_air    : array[1..r_cnt] of byte = (UID_HTower         ,UID_URTurret      );
-aiucl_twr_grnd1  : array[1..r_cnt] of byte = (UID_HTower         ,UID_UCTurret      );
-aiucl_twr_grnd2  : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UCTurret      );
+aiucl_twr_air    : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret      );
+aiucl_twr_grnd1  : array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret      );
+aiucl_twr_grnd2  : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret      );
 
 aia_n = 4;
 
@@ -388,7 +388,7 @@ begin
          begin
             if(pu^.uid=tu^.uid)and(not bld)then ai_inprogress_uid+=1;
 
-            ai_enrg_cur+=tu^.uid^._generg;
+            ai_enrg_cur+=tu^.uid^._genergy;
 
             if(tu^.uid^._isbarrack)then
              if(tu^.uidi=aiucl_barrack0[race])or(tu^.uidi=aiucl_barrack1[race])then
@@ -776,9 +776,9 @@ begin
       or((ai_inprogress_uid>0)and(not bld))then
       case uidi of
 UID_HSymbol,
-UID_HASymbol   : if(cenerg>_generg)and(menerg>2200)and(uid_eb[uidi]>ai_max_spec0)then _unit_kill(pu,false,true,true);
+UID_HASymbol   : if(cenergy>_genergy)and(menergy>2200)and(uid_eb[uidi]>ai_max_spec0)then _unit_kill(pu,false,true,true);
 UID_UGenerator,
-UID_UAGenerator: if(cenerg>_generg)and(menerg>2200)then _unit_kill(pu,false,true,true);
+UID_UAGenerator: if(cenergy>_genergy)and(menergy>2200)then _unit_kill(pu,false,true,true);
       else
          if(_isbarrack)or(_issmith)then
          if(ai_isnoprod(pu))then

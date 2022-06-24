@@ -145,7 +145,7 @@ begin
       end
       else
       begin
-         if(_renerg>0)then ENRG:=i2s(_renerg);
+         if(_renergy>0)then ENRG:=i2s(_renergy);
          if(_btime >0)then TIME:=i2s(_btime );
          LMT:=i2s(_limituse);
 
@@ -239,6 +239,7 @@ begin
    str_race[r_uac   ]    := #18+'UAC'+#25;
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
+   str_gsunknown         := 'Unknown status!';
    str_pause             := 'Pause';
    str_gsaved            := 'Game saved';
    str_repend            := 'Replay ended!';
@@ -448,11 +449,11 @@ begin
    _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
    _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,'Researches and upgrades.'        );
-   _mkHStrUid(UID_UCTurret         ,'UAC Anti-ground turret'     ,'Defensive structure.'            );
+   _mkHStrUid(UID_UGTurret         ,'UAC Anti-ground turret'     ,'Defensive structure.'            );
    _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map.'                    );
    _mkHStrUid(UID_UTechCenter      ,'UAC Tech Center'            ,'Upgrades units.'                 );
    _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
-   _mkHStrUid(UID_URTurret         ,'UAC Anti-air turret'        ,'Advanced defensive structure.'   );
+   _mkHStrUid(UID_UATurret         ,'UAC Anti-air turret'        ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
@@ -691,6 +692,7 @@ begin
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
   str_lose              := 'ПОРАЖЕНИЕ!';
+  str_gsunknown         := 'Неизвестный статус!';
   str_gsaved            := 'Игра сохранена';
   str_repend            := 'Конец записи!';
   str_save              := 'Сохранить';
@@ -840,11 +842,11 @@ begin
   _mkHStrUid(UID_UFactory        ,'Фабрика'                ,'Производит технику.'              );
   _mkHStrUid(UID_UGenerator      ,'Генератор'              ,'Увеличивает энергию.'             );
   _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'       ,'Исследования и улучшения.'        );
-  _mkHStrUid(UID_UCTurret        ,'Анти-наземная Турель'   ,'Защитное сооружение.'             );
+  _mkHStrUid(UID_UGTurret        ,'Анти-наземная Турель'   ,'Защитное сооружение.'             );
   _mkHStrUid(UID_URadar          ,'Радар'                  ,'Раскрывает карту.'                );
   _mkHStrUid(UID_UTechCenter     ,'Технический Центр'      ,'Улучшает юнитов.'                 );
   _mkHStrUid(UID_URMStation        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
-  _mkHStrUid(UID_URTurret        ,'Анти-воздушная Турель'  ,'Защитное сооружение.');
+  _mkHStrUid(UID_UATurret        ,'Анти-воздушная Турель'  ,'Защитное сооружение.');
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_UMine           ,'Мина','');
 

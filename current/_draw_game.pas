@@ -463,6 +463,8 @@ var cx,cy,ssx,ssy,sty:integer;
     pf:word;
     cl:cardinal; }
 begin
+   if(not vid_fog)then exit;
+
    ssx:=lx-(vid_cam_x mod fog_cw);
    sty:=ly-(vid_cam_y mod fog_cw);
 
@@ -582,7 +584,7 @@ begin
        _draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
 
        //_draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
-       _draw_text(r_screen,ix,110,b2s(cenerg  )+' '+b2s(menerg) , ta_middle,255, c);
+       _draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_middle,255, c);
 
 
        for iy:=0 to 8  do _draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);

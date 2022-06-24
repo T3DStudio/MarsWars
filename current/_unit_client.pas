@@ -361,6 +361,7 @@ begin
    with player^ do
    begin
       army+=1;
+      armylimit+=_limituse;
       ucl_e[_ukbuilding,_ucl]+=1;
       ucl_c[_ukbuilding     ]+=1;
       uid_e[uidi            ]+=1;
@@ -371,7 +372,7 @@ begin
       begin
          if(sel)then _unit_counters_inc_select(pu);
          if(bld=false)
-         then cenerg-=_renerg
+         then cenergy-=_renergy
          else
          begin
             _unit_bld_inc_cntrs(pu);
@@ -399,7 +400,7 @@ begin
                  uproda+=1;
                  uprodc[_uids[_puid]._ucl]+=1;
                  uprodu[      _puid      ]+=1;
-                 cenerg-=_uids[_puid]._renerg;
+                 cenergy-=_uids[_puid]._renergy;
               end;
             if(_issmith)then
              for i:=0 to MaxUnitProdsI do
@@ -409,7 +410,7 @@ begin
 
                  upproda+=1;
                  upprodu[_puid]+=1;
-                 cenerg-=_upids[_puid]._up_renerg;
+                 cenergy-=_upids[_puid]._up_renerg;
               end;
          end;
       end;
@@ -424,6 +425,7 @@ begin
    with player^ do
    begin
       army-=1;
+      armylimit-=_limituse;
       ucl_e[_ukbuilding,_ucl]-=1;
       ucl_c[_ukbuilding     ]-=1;
       uid_e[uidi            ]-=1;
@@ -434,11 +436,11 @@ begin
       begin
          if(sel)then _unit_counters_dec_select(pu);
          if(bld=false)
-         then inc(cenerg,_renerg)
+         then cenergy+=_renergy
          else
          begin
-            cenerg-=_generg;
-            menerg-=_generg;
+            cenergy-=_genergy;
+            menergy-=_genergy;
             uid_eb[uidi]-=1;
             ucl_eb[_ukbuilding,_ucl]-=1;
             if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
@@ -455,7 +457,7 @@ begin
                   uproda-=1;
                   uprodc[_uids[_puid]._ucl]-=1;
                   uprodu[      _puid      ]-=1;
-                  cenerg+=_uids[_puid]._renerg;
+                  cenergy+=_uids[_puid]._renergy;
                end;
              if(_issmith)then
               for i:=0 to MaxUnitProdsI do
@@ -465,7 +467,7 @@ begin
 
                   upproda-=1;
                   upprodu[_puid]-=1;
-                  cenerg+=_upids[_puid]._up_renerg;
+                  cenergy+=_upids[_puid]._up_renerg;
                end;
          end;
       end;

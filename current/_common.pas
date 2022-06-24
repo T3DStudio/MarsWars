@@ -485,7 +485,7 @@ function _uid_player_limit(pl:PTPlayer;uid:byte):boolean;
 begin
    with pl^ do
     with _uids[uid] do
-     if(_ukbuilding)and(menerg<=0)
+     if(_ukbuilding)and(menergy<=0)
      then _uid_player_limit:=false
      else _uid_player_limit:=((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+_limituse)<=MaxPlayerLimit);
 end;
@@ -503,7 +503,7 @@ begin
       setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<=0));
       setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<=0));
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr] =0));
-      setr(ureq_energy    , cenerg<_renerg                 );
+      setr(ureq_energy    , cenergy<_renergy                 );
       setr(ureq_time      , _btime<=0                      );
       setr(ureq_addon     ,(_addon)and(G_addon=false)      );
       setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
@@ -527,7 +527,7 @@ begin
    begin
       setr(ureq_ruid   ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  );
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
-      setr(ureq_energy , cenerg<_up_renerg                     );
+      setr(ureq_energy , cenergy<_up_renerg                     );
       setr(ureq_time   , _up_time<=0                           );
       setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
       setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));
@@ -742,18 +742,49 @@ begin
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal):boolean;
+var t:byte;
 begin
    GameGetStatus:=false;
    if(G_status>gs_running)then
    begin
       GameGetStatus:=true;
+      if(pstr<>nil)then pstr^:=str_gsunknown;
+      if(pcol<>nil)then pcol^:=c_gray;
+
       if(pstr<>nil)and(pcol<>nil)then
       case G_status of
-1..MaxPlayers: begin
-                  pstr^:=str_pause;
-                  pcol^:=PlayerGetColor(G_status);
-               end;
-
+1..MaxPlayers : begin
+                   pstr^:=str_pause;
+                   pcol^:=PlayerGetColor(G_status);
+                end;
+gs_replayend  : begin
+                   pstr^:=str_repend;
+                   pcol^:=c_white;
+                end;
+gs_waitserver : begin
+                   pstr^:=str_waitsv;
+                   pcol^:=PlayerGetColor(net_cl_svpl);
+                end;
+gs_replaypause: begin
+                   pstr^:=str_pause;
+                   pcol^:=c_white;
+                end;
+      else
+        if(G_status>=gs_win_team)then
+        begin
+           t:=G_status-gs_win_team;
+           if(t<=MaxPlayers)then
+            if(t=_players[HPlayer].team)then
+            begin
+               pstr^:=str_win;
+               pcol^:=c_lime;
+            end
+            else
+            begin
+               pstr^:=str_lose;
+               pcol^:=c_red;
+            end;
+        end;
 {
 if(rpls_state=rpl_end)
 then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_repend,ta_middle,255,c_white)

@@ -53,10 +53,10 @@ begin
       else
          if(PointInScreenP(vx,vy,player)=false)then exit;
 
-     SoundPlayUnit(un_snd_ready[buff[ub_advanced]>0],nil,nil);
+      SoundPlayUnit(un_eid_snd_summon[buff[ub_advanced]>0],nil,nil);
+      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
 
-     SoundPlayUnit(un_eid_snd_summon[buff[ub_advanced]>0],nil,nil);
-     _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
+      if(playeri=HPlayer)then SoundPlayUnit(un_snd_ready[buff[ub_advanced]>0],nil,nil);
    end;
 end;
 
@@ -821,8 +821,8 @@ begin
       if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
       ucl_eb[_ukbuilding,_ucl]-=1;
       uid_eb[uidi            ]-=1;
-      menerg-=_generg;
-      cenerg-=_generg;
+      menergy-=_genergy;
+      cenergy-=_genergy;
       _unit_done_dec_cntrs(pu);
    end;
 end;
@@ -837,8 +837,8 @@ begin
       if(ucl_x[_ukbuilding,_ucl]<=0)then ucl_x[_ukbuilding,_ucl]:=unum;
       ucl_eb[_ukbuilding,_ucl]+=1;
       uid_eb[uidi            ]+=1;
-      menerg+=_generg;
-      cenerg+=_generg;
+      menergy+=_genergy;
+      cenergy+=_genergy;
       _unit_done_inc_cntrs(pu);
    end;
 end;
@@ -862,7 +862,7 @@ begin
       else
       begin
          hits  := 1;
-         cenerg-=_renerg;
+         cenergy-=_renergy;
          {$IFDEF _FULLGAME}
          if(playeri=HPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false);
          {$ENDIF}
@@ -968,7 +968,7 @@ begin
                uprodl+=_uids[puid]._limituse;
                uprodc[_uids[puid]._ucl]+=1;
                uprodu[ puid           ]+=1;
-               cenerg-=_uids[puid]._renerg;
+               cenergy-=_uids[puid]._renergy;
                uprod_u[pn]:=puid;
                uprod_r[pn]:=_uids[puid]._tprod;
 
@@ -1006,7 +1006,7 @@ begin
          uprodl-=_uids[puid]._limituse;
          uprodc[_uids[puid]._ucl]-=1;
          uprodu[ puid           ]-=1;
-         cenerg+=_uids[puid]._renerg;
+         cenergy+=_uids[puid]._renergy;
          uprod_r[pn]:=0;
 
          _unit_ctraining_p:=true;
@@ -1045,7 +1045,7 @@ begin
              begin
                 upproda+=1;
                 upprodu[upid]+=1;
-                cenerg-=_up_renerg;
+                cenergy-=_up_renerg;
                 pprod_r[pn]:=_up_time;
                 pprod_u[pn]:=upid;
 
@@ -1080,7 +1080,7 @@ begin
 
          upproda-=1;
          upprodu[upid]-=1;
-         cenerg+=_upids[upid]._up_renerg;
+         cenergy+=_upids[upid]._up_renerg;
          pprod_r[pn]:=0;
 
          _unit_cupgrade_p:=true;
@@ -1144,7 +1144,7 @@ begin
       _unit_desel(pu);
 
       if(bld=false)
-      then cenerg+=_uids[uidi]._renerg
+      then cenergy+=_uids[uidi]._renergy
       else
       begin
          _unit_ctraining(pu,255);
@@ -1152,8 +1152,8 @@ begin
 
          ucl_eb[_ukbuilding,_ucl]-=1;
          uid_eb[uidi            ]-=1;
-         menerg-=_generg;
-         cenerg-=_generg;
+         menergy-=_genergy;
+         cenergy-=_genergy;
 
          _unit_done_dec_cntrs(pu);
       end;
@@ -1231,7 +1231,7 @@ begin
 
       if((army     +uproda)>MaxPlayerUnits)
       or((armylimit+uprodl)>MaxPlayerLimit)
-      or(cenerg<0)
+      or(cenergy<0)
       or(uid_e[_uid]>=a_units[_uid])
       then _unit_ctraining_p(pu,255,i)
       else
@@ -1256,7 +1256,7 @@ begin
   if(pprod_r[i]>0)then
   begin
       _uid:=pprod_u[i];
-     if(cenerg<0)
+     if(cenergy<0)
      or(upgr[_uid]>=_upids[_uid]._up_max)
      or(upgr[_uid]>=a_upgrs[_uid])
      then _unit_cupgrade_p(pu,255,i)
@@ -1369,6 +1369,8 @@ end;
 procedure _unit_detect(uu,tu:PTUnit;ud:integer);
 var td:integer;
 begin
+   // tu - unit-detector
+   // uu - unit-target
    with uu^ do
    begin
       if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)
@@ -1436,7 +1438,7 @@ begin
 
       with uid^ do
       begin
-         if(_ukbuilding)and(buildcd)then build_cd:=min2(build_cd+fr_3fps,max_build_reload);
+         if(_ukbuilding)and(buildcd)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 
@@ -1498,8 +1500,7 @@ end;
 
 
 procedure _unit_upgr(pu:PTUnit);
-var
-   tu:PTUnit;
+var tu:PTUnit;
 procedure SetSRange(newsr:integer);
 begin
    with pu^ do
@@ -1511,7 +1512,6 @@ begin
       {$ENDIF}
    end;
 end;
-
 begin
    with pu^ do
    with uid^ do
@@ -1528,9 +1528,12 @@ uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
 
       // DETECTION
       case uidi of
-UID_UMine        : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
+UID_UMine,
+UID_URadar       : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
 UID_HEye         : buff[ub_detect]:=_ub_infinity;
       end;
+      if(buff[ub_hvision]>0)then
+       if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
 
       // INVIS
       case uidi of
@@ -1541,10 +1544,7 @@ UID_HEye,
 UID_UMine        : buff[ub_invis]:=_ub_infinity;
       end;
 
-      // OTHER HARDCODE
-      if(buff[ub_hvision]>0)then
-       if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
-
+      // OTHER
       case uidi of
 UID_LostSoul: begin
                  tu:=nil;
@@ -1620,7 +1620,7 @@ UID_FAPC    : if(buff[ub_advanced]>0)
 UID_APC     : if(buff[ub_advanced]>0)
               then apcm:=_apcm+2
               else apcm:=_apcm;
-UID_UCTurret: buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
+UID_UGTurret: buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
       end;
 
       // BUILD AREA

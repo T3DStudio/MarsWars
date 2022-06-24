@@ -21,7 +21,8 @@ fr_2h3fps              = fr_2hfps*3;   //1,5
 fr_2fps                = fr_fps*2;
 fr_3fps                = fr_fps*3;
 fr_4fps                = fr_fps*4;
-fr_3h2fps              = fr_3hfps*2;
+fr_3h2fps              = fr_3hfps*2; //2/3
+fr_4h3fps              = fr_4hfps*3;
 fr_mpt                 = trunc(1000/fr_fps);
 fr_mancubus_r          = fr_2fps+fr_2hfps+10;
 
@@ -44,18 +45,19 @@ gm_koh                 = 5;
 gm_royl                = 6;
 
 gs_running             = 0;  //
-{gs_paused1             = 1;
-gs_paused2             = 2;
-gs_paused3             = 3;
-gs_paused4             = 4;
-gs_paused5             = 5;
-gs_paused6             = 6;}
+{gs_paused1            = 1; 1..MaxPlayers
+ gs_paused2            = 2;
+ gs_paused3            = 3;
+ gs_paused4            = 4;
+ gs_paused5            = 5;
+ gs_paused6            = 6;}
 gs_replayend           = 10;
 gs_waitserver          = 11;
 gs_replaypause         = 12;
+gs_win_team            = 100;
 
 
-gamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_koh,gm_royl];
+allgamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_koh,gm_royl];
 gm_cnt                 = 6;
 
 r_cnt                  = 2;  // race num
@@ -554,7 +556,7 @@ MID_Cacodemon          = 102;
 MID_Baron              = 103;
 MID_HRocket            = 104;
 MID_Revenant           = 105;
-MID_RevenantS          = 106;
+MID_RevenantH          = 106;
 MID_Mancubus           = 107;
 MID_YPlasma            = 108;
 MID_BPlasma            = 109;
@@ -610,9 +612,9 @@ UID_HMonastery         = 8;
 UID_HTotem             = 9;
 UID_HAltar             = 10;
 UID_HFortress          = 11;
-UID_HEye               = 12;
-UID_HCommandCenter     = 13;
-UID_HMilitaryUnit      = 14;
+UID_HCommandCenter     = 12;
+UID_HMilitaryUnit      = 13;
+UID_HEye               = 14;
 
 UID_LostSoul           = 15;
 UID_Imp                = 16;
@@ -645,9 +647,8 @@ UID_UWeaponFactory     = 46;
 UID_URadar             = 47;
 UID_URMStation         = 48;
 UID_UTechCenter        = 49;
-UID_UCTurret           = 50;
-//UID_UPTurret           = 51;
-UID_URTurret           = 51;
+UID_UGTurret           = 50;
+UID_UATurret           = 51;
 UID_UNuclearPlant      = 52;
 UID_UMine              = 53;
 
@@ -660,10 +661,10 @@ UID_Major              = 60;
 UID_BFG                = 61;
 UID_FAPC               = 62;
 UID_APC                = 64;
-UID_UACBot             = 65;
-UID_Terminator         = 66;
-UID_Tank               = 67;
-UID_Flyer              = 68;
+UID_Terminator         = 65;
+UID_Tank               = 66;
+UID_Flyer              = 67;
+UID_UACBot             = 68;
 UID_UTransport         = 69;
 
 UID_UBaseMil           = 70;
@@ -723,17 +724,18 @@ hell_vision_time       = fr_fps*5;
 
 mstrike_reload         = fr_fps*30;
 
-max_build_reload       = fr_fps*12;
+step_build_reload      = fr_fps*3;
+max_build_reload       = step_build_reload*5;
 
 melee_r                = 8;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-uac_adv_base_reload    : array[false..true] of integer = (fr_fps*5 ,fr_fps*10);
-gear_time              : array[false..true] of integer = (fr_fps   ,fr_fps*2 );
+uac_adv_base_reload    : array[false..true] of integer = (fr_fps*20,fr_fps*40);
+gear_time              : array[false..true] of integer = (fr_fps*3 ,fr_fps*6 );
 
-building_adv_reload    : array[false..true] of integer = (fr_fps*30,0);
+building_adv_reload    : array[false..true] of integer = (fr_fps*45,0);
 
 invuln_time            = fr_fps*30;
 

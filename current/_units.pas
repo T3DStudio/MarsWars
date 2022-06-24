@@ -142,13 +142,13 @@ begin
    begin
       puid:=@_uids[ouid];
       if(not obld)then
-       if((cenerg-uid^._generg)<puid^._renerg)or(menerg<=uid^._generg)then
+       if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
        begin
           _unit_morph:=ureq_energy;
           exit;
        end;
       if(not obld)or(puid^._ukbuilding)then
-        if(menerg<=0)then
+        if(menergy<=0)then
         begin
            _unit_morph:=ureq_energy;
            exit;
@@ -608,12 +608,6 @@ wtp_distance         : if(ud>a_tard^)then exit;
 wtp_rmhits           : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
            else
               if(tu^.hits>a_tarp^^.hits)then exit;  // default
-              {if(aw_max_range>=0)or(aw_type=wpt_heal)then
-              begin
-                 if(tu^.hits>a_tarp^^.hits)then exit;
-              end
-              else
-                 if(ud>a_tard^)then exit; }
            end;
            if(n_prio<t_prio^)then exit;
         end;
@@ -697,7 +691,7 @@ begin
           exit;
        end;
 
-      if(_ukbuilding)and(menerg<=0)then
+      if(_ukbuilding)and(menergy<=0)then
       begin
          _unit_kill(pu,false,false,true);
          exit;
@@ -928,7 +922,7 @@ begin
       if(_ukbuilding)and(bld)and(_ability=0)then
        if(_isbarrack)or(_issmith)then
        if(tu^.uid^._ukbuilding)and(player^.team=tu^.player^.team)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)and(hits>0)then
-        if(buff[ub_advanced]<=0)and(cenerg>=_renerg)then
+        if(buff[ub_advanced]<=0)and(cenergy>=_renergy)then
         begin
            _unit_building_start_adv(pu, tu^.buff[ub_advanced]>0 );
            tu^.rld:=building_adv_reload[tu^.buff[ub_advanced]>0];
@@ -1128,12 +1122,12 @@ uab_advance       : if(zfall=0)then
                        _unit_action:=true;
                     end;
 uab_rebuild       : case uidi of
-                    UID_UCTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_URTurret   ,_unit_morph(pu,UID_URTurret   ,false,-2,1),pu);
-                    UID_URTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UCTurret   ,_unit_morph(pu,UID_UCTurret   ,false,-2,1),pu);
+                    UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,1),pu);
+                    UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,1),pu);
                     UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,1),pu);
                     UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-2,1),pu);
                     end;
-uab_buildturret   : if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UCTurret,_unit_morph(pu,UID_UCTurret,false,-2,0),pu);
+uab_buildturret   : if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
          else
             if(buff[ub_advanced]<=0)then
              if(_isbarrack)or(_issmith)then
@@ -1253,12 +1247,8 @@ begin
    with player^ do
    begin
       if((armylimit-_limituse+_zuid^._limituse)>MaxPlayerLimit)then exit;
-
-      //if(_zuid^._ukbuilding)then
-      // if((cenerg-_generg+_zuid^._generg)<=0)
-      //if(_uids[].)
-      // _zuid
-      //check limit use and energy level for buildings
+      if(_zuid^._ukbuilding)then
+       if((menergy-_genergy+_zuid^._genergy)<=0)then exit;
    end;
 
    _h:=tu^.hits/tu^.uid^._mhits;
@@ -1289,12 +1279,12 @@ begin
       begin
          _unit_dec_Kcntrs(_LastCreatedUnitP);
          _resurrect(_LastCreatedUnitP);
-      end
+      end;{
       else
       begin
          buff[ub_summoned]:=fr_fps;
          //_unit_summon_effects(pu,nil);
-      end;
+      end;}
    end;
 
    _unit_kill(tu,true,true,false);
@@ -1714,7 +1704,7 @@ begin
       end;
    end
    else
-     if(cenerg<0)
+     if(cenergy<0)
      then _unit_kill(pu,false,false,true)
      else
      begin
@@ -1729,7 +1719,7 @@ begin
            hits:=_mhits;
            bld :=true;
            _unit_bld_inc_cntrs(pu);
-           cenerg+=_renerg;
+           cenergy+=_renergy;
            GameLogUnitReady(pu);
         end;
      end;

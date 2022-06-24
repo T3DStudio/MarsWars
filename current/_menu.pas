@@ -160,7 +160,7 @@ begin
 
       3  : menu_s1:=ms1_sett;
       4  : begin menu_s1:=ms1_svld; _svld_make_lst; end;
-      5  : begin menu_s1:=ms1_reps; if(G_Started=false)then _rpls_make_lst; end;
+      5  : begin menu_s1:=ms1_reps; if(G_Started=false)then replay_make_list; end;
 
       // game settings
       6  : ;
@@ -262,7 +262,7 @@ begin
       41 : if(rpls_list_size>0)and(rpls_state<rpl_rhead)then
            begin
               rpls_list_sel :=rpls_list_scroll+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
-              _rpls_sel;
+              replay_select;
            end;
       42 : if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then
            begin
@@ -271,7 +271,7 @@ begin
               g_started:=true;
            end;
       43 : ;
-      44 : if(rpls_list_size>0)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then _rpls_delete;
+      44 : if(rpls_list_size>0)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then replay_delete;
 
       ///  MAP
       50 : ;
@@ -319,7 +319,7 @@ begin
 
       // game options
       75 : if(net_status<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
-      76 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@gamemodes);Map_premap;end;
+      76 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@allgamemodes);Map_premap;end;
       77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
       78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
       79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);

@@ -190,8 +190,8 @@ TUID = record
    _speed,
    _r,_missile_r,
    _srange,
-   _renerg,
-   _generg,
+   _renergy,
+   _genergy,
    _btime,
    _bstep,
    _tprod,
@@ -325,8 +325,8 @@ TPlayer = record
    build_cd,
    army,
    armylimit,
-   cenerg,
-   menerg  : integer;
+   cenergy,
+   menergy : integer;
 
    ready   : boolean;
 

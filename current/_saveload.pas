@@ -73,7 +73,7 @@ begin
             if(vr>=theme_n)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));
-            if not(vr in gamemodes)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
+            if not(vr in allgamemodes)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
                                    else _svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;
 
             vr:=0;
