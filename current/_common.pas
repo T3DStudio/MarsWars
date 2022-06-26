@@ -347,7 +347,7 @@ end;
 
 function dist(dx0,dy0,dx1,dy1:integer):integer;
 begin
-   dist:=trunc(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
+   dist:=round(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
 end;
 
 function distr(dx0,dy0,dx1,dy1:integer):single;

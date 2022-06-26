@@ -223,19 +223,20 @@ gm_cptp:
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
 
-         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 9));
+         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
 
-         c :=map_seed mod 360;
-         u :=map_mw div 6;
-         ix:=map_mw div 2;
-         iy:=360-(360 div MaxCPoints);
+         bb0:=map_mw div 22;
+         c  :=map_seed mod 360;
+         u  :=map_mw div 6;
+         ix :=map_mw div 2;
+         iy :=360-(360 div MaxCPoints);
 
          for i:=1 to MaxCPoints do
          with g_cpoints[i] do
          begin
             px:=trunc(ix+cos(c*degtorad)*u);
             py:=trunc(ix+sin(c*degtorad)*u);
-            pr:=64+_random(256);
+            pr:=50+_random(bb0);
             c+=iy;
 
             {$IFDEF _FULLGAME}

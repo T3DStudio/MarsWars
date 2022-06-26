@@ -124,7 +124,7 @@ begin
 UID_HKeep:
 begin
    _mhits     := 4000;
-   _renergy   := 600;
+   _renergy   := 800;
    _genergy   := 300;
    _r         := 66;
    _srange    := 280;
@@ -132,7 +132,7 @@ begin
    _btime     := 90;
    _ukbuilding:= true;
    _isbuilder := true;
-   _limituse  := 20;
+   _limituse  := 10;
    ups_builder:= [UID_HKeep..UID_HFortress,UID_HCommandCenter]-[UID_HASymbol];
    _upgr_srange     :=upgr_hell_mainr;
    _upgr_srange_step:=40;
@@ -172,6 +172,7 @@ begin
       _genergy:=_genergy*2;
       _ucl    :=5;
       _ability:=uab_hell_vision;
+      _srange :=250;
    end
    else _ability:= uab_rebuild;
 end;
@@ -624,7 +625,7 @@ UID_HCommandCenter,
 UID_UCommandCenter:
 begin
    _mhits     := 4000;
-   _renergy   := 600;
+   _renergy   := 800;
    _genergy   := 300;
    _speed     := 0;
    _r         := 66;
@@ -636,7 +637,7 @@ begin
    _ukbuilding:= true;
    _isbuilder := true;
    _slowturn  := false;
-   _limituse  := 20;
+   _limituse  := 10;
 
    if(i=UID_HCommandCenter)then
    begin
@@ -1176,50 +1177,50 @@ begin
    FillChar(_upids,SizeOf(_upids),0);
 
    //         race id                  time lvl  enr  rupgr         ruid                multi doom2
-   _setUPGR(r_hell,upgr_hell_dattack   ,180,3   ,200 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_uarmor    ,180,3   ,200 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_barmor    ,180,3   ,200 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_mattack   ,60 ,3   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_regen     ,60 ,2   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_pains     ,30 ,3   ,50  ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_dattack   ,180,3   ,300 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_uarmor    ,180,3   ,300 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_barmor    ,180,3   ,300 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_mattack   ,60 ,3   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_regen     ,60 ,2   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_pains     ,30 ,3   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_heye      ,30 ,3   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_towers    ,60 ,3   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_teleport  ,60 ,2   ,50  ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_towers    ,60 ,3   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_teleport  ,60 ,2   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_hktele    ,180,1   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_paina     ,60 ,2   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_mainr     ,60 ,2   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_hktdoodads,60 ,1   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,1   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_revtele   ,60 ,1   ,100 ,0            ,UID_HMonastery     ,false,false);
-   _setUPGR(r_hell,upgr_hell_6bld      ,20 ,15  ,100 ,0            ,UID_HMonastery     ,true ,false);
-   _setUPGR(r_hell,upgr_hell_9bld      ,60 ,1   ,100 ,0            ,UID_HMonastery     ,false,true );
-   _setUPGR(r_hell,upgr_hell_revmis    ,30 ,1   ,100 ,0            ,UID_HMonastery     ,false,true );
-   _setUPGR(r_hell,upgr_hell_totminv   ,60 ,1   ,100 ,0            ,UID_HAltar         ,false,true );
-   _setUPGR(r_hell,upgr_hell_bldrep    ,60 ,3   ,100 ,0            ,UID_HAltar         ,false,true );
+   _setUPGR(r_hell,upgr_hell_paina     ,60 ,2   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_mainr     ,60 ,2   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_hktdoodads,60 ,1   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,1   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_revtele   ,60 ,1   ,200 ,0            ,UID_HMonastery     ,false,false);
+   _setUPGR(r_hell,upgr_hell_6bld      ,20 ,15  ,200 ,0            ,UID_HMonastery     ,true ,false);
+   _setUPGR(r_hell,upgr_hell_9bld      ,60 ,1   ,200 ,0            ,UID_HMonastery     ,false,true );
+   _setUPGR(r_hell,upgr_hell_revmis    ,30 ,1   ,200 ,0            ,UID_HMonastery     ,false,true );
+   _setUPGR(r_hell,upgr_hell_totminv   ,60 ,1   ,200 ,0            ,UID_HAltar         ,false,true );
+   _setUPGR(r_hell,upgr_hell_bldrep    ,60 ,3   ,200 ,0            ,UID_HAltar         ,false,true );
    _setUPGR(r_hell,upgr_hell_b478tel   ,30 ,15  ,50  ,0            ,UID_HAltar         ,true ,true );
-   _setUPGR(r_hell,upgr_hell_invuln    ,180,1   ,300 ,0            ,UID_HAltar         ,true ,true );
+   _setUPGR(r_hell,upgr_hell_invuln    ,180,1   ,400 ,0            ,UID_HAltar         ,true ,true );
 
-   _setUPGR(r_uac ,upgr_uac_attack     ,180,3   ,200 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_uarmor     ,120,4   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_barmor     ,180,3   ,200 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,2   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,1   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_plasmt     ,60 ,1   ,50  ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_attack     ,180,3   ,300 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_uarmor     ,120,4   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_barmor     ,180,3   ,300 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,2   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,1   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_plasmt     ,60 ,1   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_uac ,upgr_uac_detect     ,30 ,1   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_towers     ,60 ,3   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_radar_r    ,60 ,3   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_mainm      ,120,1   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_ccturr     ,120,1   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_mainr      ,60 ,2   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_ccldoodads ,60 ,1   ,50  ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,1   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_uac ,upgr_uac_jetpack    ,60 ,1   ,50  ,0            ,UID_UTechCenter    ,false,false);
-   _setUPGR(r_uac ,upgr_uac_6bld       ,120,1   ,100 ,0            ,UID_UTechCenter    ,false,false);
-   _setUPGR(r_uac ,upgr_uac_9bld       ,60 ,1   ,100 ,0            ,UID_UTechCenter    ,false,true );
-   _setUPGR(r_uac ,upgr_uac_mechspd    ,60 ,1   ,100 ,0            ,UID_UTechCenter    ,false,true );
-   _setUPGR(r_uac ,upgr_uac_mecharm    ,180,3   ,200 ,0            ,UID_UTechCenter    ,false,true );
+   _setUPGR(r_uac ,upgr_uac_towers     ,60 ,3   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_radar_r    ,60 ,3   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_mainm      ,120,1   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_ccturr     ,120,1   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_mainr      ,60 ,2   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_ccldoodads ,60 ,1   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,1   ,200 ,0            ,0                  ,false,false);
+   _setUPGR(r_uac ,upgr_uac_jetpack    ,60 ,1   ,200 ,0            ,UID_UTechCenter    ,false,false);
+   _setUPGR(r_uac ,upgr_uac_6bld       ,120,1   ,200 ,0            ,UID_UTechCenter    ,false,false);
+   _setUPGR(r_uac ,upgr_uac_9bld       ,60 ,1   ,200 ,0            ,UID_UTechCenter    ,false,true );
+   _setUPGR(r_uac ,upgr_uac_mechspd    ,60 ,1   ,200 ,0            ,UID_UTechCenter    ,false,true );
+   _setUPGR(r_uac ,upgr_uac_mecharm    ,180,3   ,300 ,0            ,UID_UTechCenter    ,false,true );
    _setUPGR(r_uac ,upgr_uac_turarm     ,60 ,2   ,200 ,0            ,UID_UTechCenter    ,false,true );
-   _setUPGR(r_uac ,upgr_uac_rstrike    ,120,3   ,200 ,0            ,UID_UTechCenter    ,true ,true );
+   _setUPGR(r_uac ,upgr_uac_rstrike    ,120,3   ,300 ,0            ,UID_UTechCenter    ,true ,true );
 
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_building wtr_bld wtr_nbld wtr_ground wtr_fly wtr_adv wtr_nadv wtr_light wtr_nlight wtr_stun wtr_nostun;
    wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;

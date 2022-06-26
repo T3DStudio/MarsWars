@@ -79,6 +79,9 @@ begin
             else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*2;
       end;
 
+     // if(pl=HPlayer)then
+     // writeln(uidi,' ',damage,' ',armor);
+
       case uidi of
 UID_Knight : if(buff[ub_advanced]>0)then damage:=damage div 2;
       else
@@ -661,17 +664,20 @@ procedure _unit_mcycle(pu:PTUnit);
 var uc,
 t_prio,
 a_tard,
-    ud: integer;
-    uds:single;
+uontar,
+uontard,
+    ud : integer;
+    uds: single;
 a_tarp,
     puo,
-    tu: PTUnit;
+    tu : PTUnit;
 tuinapc,
 swtarget,
 aicode,
+foutar,
 ftarget,
-  push: boolean;
-t_weap: byte;
+pushout: boolean;
+t_weap : byte;
 begin
    with pu^     do
    with uid^    do
@@ -682,6 +688,8 @@ begin
       a_tarp  := nil;
       t_weap  := 255;
       t_prio  := 0;
+      uontar  := 0;
+      uontard := 32000;
       underobstacle:=false;
 
       if(g_mode=gm_royl)then
@@ -700,9 +708,10 @@ begin
       uo_vision:=false;
       underobstacle:=IfUnderObstacle(x,y);
 
-      push    := solid and _canmove(pu) and (a_rld<=0) and bld;
+      pushout := solid and _canmove(pu) and (a_rld<=0) and bld;
       ftarget := _canattack(pu,false);
       aicode  := (state=ps_comp);
+      foutar  := ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_teleport);
       swtarget:= false;
       puo:=nil;
       if(_IsUnitRange(uo_tar,@puo))and(aicode=false)then
@@ -746,7 +755,7 @@ uab_uac__unit_adv : swtarget:=true;
 
                _unit_aura_effects(pu,tu,ud);
 
-               if(push)then
+               if(pushout)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.bld)then
                  if(tu^.solid)and(ukfly=tu^.ukfly)then _unit_push(pu,tu,uds);
 
@@ -757,11 +766,24 @@ uab_uac__unit_adv : swtarget:=true;
                  begin
                     uo_tar:=tu^.unum;
                  end;
+
+               if(foutar)then
+               begin
+                  ud:=dist(uo_x,uo_y,tu^.x,tu^.y);
+                  if(ud<srange)and(ud<uontard)then
+                   if(team=tu^.player^.team)then
+                   begin
+                      uontar :=uc;
+                      uontard:=ud;
+                   end;
+               end;
             end;
          end;
       end;
 
       _unit_npush_dcell(pu);
+
+      if(foutar)and(uontar>0)then uo_tar:=uontar;
 
       if(aicode)then ai_code(pu);
 
@@ -1172,7 +1194,7 @@ begin
          end;
 
          case _ability of
-uab_teleport     : if(tu^.player^.team<>player^.team   )then begin uo_tar:=0;uo_x:=x;uo_y:=y;exit; end;
+uab_teleport     : if(tu^.player^.team<>player^.team   )then begin uo_tar:=0;exit; end;
 uab_hell_unit_adv: if(_ability_hell_unit_adv(tu,pu    ))then exit;//team, race=race
 uab_building_adv : if(_ability_building_adv (tu,pu    ))then exit;//team
 uab_hell_vision  : if(_ability_hell_vision  (tu,pu    ))then exit;//team
@@ -1207,11 +1229,7 @@ uab_teleport     : if(_ability_teleport     (pu,tu,tdm))then exit;//team
 
          uo_x:=tu^.vx;
          uo_y:=tu^.vy;
-      end
-      else
-        case _ability of
-uab_teleport     : begin uo_x:=x;uo_y:=y;exit; end;
-        end;
+      end;
    end;
 end;
 

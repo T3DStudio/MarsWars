@@ -597,7 +597,14 @@ begin
    setWeaponESND(2,nil,snd_pistol ,0,0);
    setWeaponESND(3,nil,snd_shotgun,0,0);
 
-   DefaultRLDA_pa:=3;
+{
+_weapon(0,wpt_missle,aw_srange,0,0,fr_4hfps ,MID_Bulletx2,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground,wpr_adv ,uidall,[],0,0,wtp_unit_bio_light );
+_weapon(1,wpt_missle,aw_srange,0,0,fr_2h3fps,MID_SSShot  ,0,0,0,upgr_uac_attack,3,wtrset_enemy_alive_ground,wpr_adv ,uidall,[],0,0,wtp_unit_bio_nlight);
+_weapon(2,wpt_missle,aw_srange,0,0,fr_7hfps ,MID_Bullet  ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground,wpr_nadv,uidall,[],0,0,wtp_unit_bio_light );
+_weapon(3,wpt_missle,aw_srange,0,0,fr_fps   ,MID_SShot   ,0,0,0,upgr_uac_attack,3,wtrset_enemy_alive_ground,wpr_nadv,uidall,[],0,0,wtp_unit_bio_nlight);
+}
+
+   DefaultRLDA_pa:=2;
 end;
 UID_Tank:
 begin

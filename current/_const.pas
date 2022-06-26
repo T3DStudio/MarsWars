@@ -71,7 +71,7 @@ MaxPlayerLimit         = MaxPlayerUnits*10;
 MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
-MinSMapW               = 2500;
+MinSMapW               = 2000;
 StepSMap               = 250;
 
 map_b0                 = 5;
@@ -545,6 +545,7 @@ upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0        
 upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
 upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
 upgr_race_9bld         : array[1..r_cnt] of byte = (upgr_hell_9bld   , upgr_uac_9bld   );
+upgr_race_detect       : array[1..r_cnt] of byte = (upgr_hell_heye   , upgr_uac_detect );
 
 ////////////////////////////////////////////////////////////////////////////////
 //

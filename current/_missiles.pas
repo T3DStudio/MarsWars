@@ -151,7 +151,7 @@ begin
                     if(tu^.ukfly=uf_ground)then _d50(@damage);
                  end;
    UID_Demon   : begin
-                    if(tu^.uid^._ukmech)then _d50(@damage);
+                    if(tu^.uid^._ukbuilding)then _d50(@damage);
                  end;
    end;
 
@@ -268,22 +268,15 @@ end;
 
 
 procedure _missle_damage(m:integer);
-var tu,au: PTUnit;
+var tu: PTUnit;
 teams : boolean;
 ud,rdamage: integer;
      p: byte;
 begin
    with _missiles[m] do
     if(_IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)then
+     if(tu^.hits>0)and(not _IsUnitRange(tu^.inapc,nil))then
      begin
-        if(_IsUnitRange(tu^.inapc,@au))then
-        begin
-           tar:=au^.unum;
-           _missle_damage(m);
-           exit;
-        end;
-
         if(mfs<>tu^.ukfly)or(MissileUIDCheck(mid,tu^.uidi)=false)then exit;
 
         teams  :=_players[player].team=tu^.player^.team;
@@ -318,6 +311,7 @@ begin
            if (    tu^.uid^._uklight)then  // light all
                case mid of
                MID_Cacodemon   : _d200(@rdamage);
+               MID_HRocket,
                MID_Blizzard,
                MID_BFG         : _d50 (@rdamage);
                end;
@@ -348,6 +342,7 @@ begin
            end
            else                            // buildings
                case mid of
+               MID_HRocket,
                MID_Blizzard    : _d200(@rdamage);
                MID_Mine,
                MID_Granade,

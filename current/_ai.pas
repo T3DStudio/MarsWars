@@ -11,9 +11,13 @@ aiucl_tech0      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCente
 aiucl_tech1      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant );
 aiucl_spec0      : array[1..r_cnt] of byte = (UID_HTeleport      ,UID_URadar        );
 aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation    );
-aiucl_twr_air    : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret      );
-aiucl_twr_grnd1  : array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret      );
-aiucl_twr_grnd2  : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret      );
+aiucl_twr_air1   : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret      );
+aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret      );
+aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret      );
+aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret      );
+
+del_generators_energy = 2500;
+towers_limit_border   = 300;
 
 aia_n = 4;
 
@@ -64,121 +68,57 @@ ai_tech1_cur,
 ai_spec0_cur,
 ai_spec0_need,
 ai_spec1_cur,
+ai_towers_around,
+ai_towers_need,
+ai_towers_need_type,
+ai_towers_needx,
+ai_towers_needy,
+ai_battle_limit_around,
 
 ai_inprogress_uid
                  : integer;
 
-
 procedure PlayerSetSkirmishAIParams(p:byte);
+procedure SetBaseOpt(me,m,unp,upp,t0,t1,s0,s1,t:integer);
+begin
+   with _players[p] do
+   begin
+      ai_max_energy:=me;
+      ai_max_mains :=m;
+      ai_max_unitps:=unp;
+      ai_max_upgrps:=upp;
+      ai_max_tech0 :=t0;
+      ai_max_tech1 :=t1;
+      ai_max_spec0 :=s0;
+      ai_max_spec1 :=s1;
+      ai_max_towers:=t;
+   end;
+end;
 begin
    with _players[p] do
    begin
       case ai_skill of
-      0 : begin
-             ai_max_energy:=600;
-             ai_max_mains :=1;
-             ai_max_unitps:=1;
-             ai_max_upgrps:=0;
-             ai_max_tech0 :=0;
-             ai_max_tech1 :=0;
-             ai_max_spec0 :=0;
-             ai_max_spec1 :=0;
-          end;
-      1 : begin
-             ai_max_energy:=1000;
-             ai_max_mains :=2;
-             ai_max_unitps:=2;
-             ai_max_upgrps:=1;
-             ai_max_tech0 :=0;
-             ai_max_tech1 :=0;
-             ai_max_spec0 :=0;
-             ai_max_spec1 :=0;
-          end;
-      2 : begin
-             ai_max_energy:=2000;
-             ai_max_mains :=4;
-             ai_max_unitps:=4;
-             ai_max_upgrps:=1;
-             ai_max_tech0 :=1;
-             ai_max_tech1 :=0;
-             ai_max_spec0 :=1;
-             ai_max_spec1 :=0;
-          end;
-      3 : begin
-             ai_max_energy:=32000;
-             ai_max_mains :=7;
-             ai_max_unitps:=8;
-             ai_max_upgrps:=2;
-             ai_max_tech0 :=2;
-             ai_max_tech1 :=1;
-             ai_max_spec0 :=2;
-             ai_max_spec1 :=0;
-          end;
-      4 : begin
-             ai_max_energy:=32000;
-             ai_max_mains :=10;
-             ai_max_unitps:=14;
-             ai_max_upgrps:=4;
-             ai_max_tech0 :=4;
-             ai_max_tech1 :=1;
-             ai_max_spec0 :=4;
-             ai_max_spec1 :=1;
-          end;
-      else
-             ai_max_energy:=32000;
-             ai_max_mains :=13;
-             ai_max_unitps:=20;
-             ai_max_upgrps:=4;
-             ai_max_tech0 :=4;
-             ai_max_tech1 :=1;
-             ai_max_spec0 :=4;
-             ai_max_spec1 :=1;
+      0  : SetBaseOpt(600 ,1 ,1 ,0,0,0,0,0,0 );
+      1  : SetBaseOpt(1000,2 ,2 ,1,0,0,0,0,6 );
+      2  : SetBaseOpt(2000,4 ,4 ,1,1,0,1,0,10);
+      3  : SetBaseOpt(9999,7 ,8 ,2,2,1,3,1,14);
+      4  : SetBaseOpt(9999,11,14,4,4,1,4,1,14);
+      else SetBaseOpt(9999,14,20,6,5,1,4,1,14);
       end;
-
-      {case ai_skill of
-      0,1 : ai_max_mains:=1;
-      2   : ai_max_mains:=3;
-      3   : ai_max_mains:=9;
-      4   : ai_max_mains:=16;
-      else  ai_max_mains:=25;
-      end;
-      {
-      ai_max_ulimit,
-      }
-
-      ai_max_energy:=ai_max_mains*250+300;
-      ai_max_unitps:=1;
-      ai_max_upgrps:=1;
-      ai_max_tech0 :=0;
-      ai_max_tech1 :=0;
-      ai_max_spec0 :=0;
-      ai_max_spec1 :=0;
-
-      if(ai_skill<=1)then exit;
-
-      ai_max_unitps:=max2(3,trunc((ai_max_mains/6)*5));
-      ai_max_upgrps:=max2(1,ai_max_unitps div 3);
-
-      if(ai_skill<=2)then exit;
-
-      ai_max_tech0 :=max2(1,ai_max_unitps div 4);
-      ai_max_spec0 :=max2(1,ai_max_unitps div 4);
-
-      if(ai_skill<=3)then exit;
-
-      ai_max_tech1 :=1;
-      ai_max_spec1 :=1; }
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure ai_clear_vars(pu:PTUnit);
 var i:integer;
 begin
    with pu^ do
    begin
-      ai_alarm_d:=32000;
-      ai_alarm_x:=-1;
-      ai_alarm_y:=-1;
+      ai_alarm_d  :=32000;
+      ai_alarm_x  :=-1;
+      ai_alarm_y  :=-1;
+      ai_alarm_fly:=false;
       ai_need_heye:=false;
    end;
 
@@ -209,35 +149,44 @@ begin
    ai_uadv_u        := nil;
    ai_hadv_u        := nil;
 
-   // teleport
+   // nearest teleport
    ai_teleport_d    := 32000;
    ai_teleport_u    := nil;
 
    // builds data
    ai_enrg_cur      :=0;
 
-   ai_basep_builders:=0;
+   ai_basep_builders:=0;  // base production
    ai_basep_need    :=0;
 
-   ai_unitp_cur     :=0;
+   ai_unitp_cur     :=0;  // unit production
    ai_unitp_cur_na  :=0;
    ai_unitp_barracks:=0;
    ai_unitp_need    :=0;
 
-   ai_upgrp_cur     :=0;
+   ai_upgrp_cur     :=0;  // upgr production
    ai_upgrp_cur_na  :=0;
    ai_upgrp_smiths  :=0;
    ai_upgrp_need    :=0;
 
-   ai_tech0_cur     :=0;
+   ai_tech0_cur     :=0;  // tech 1 (unit adv)
    ai_tech0_need    :=0;
 
-   ai_tech1_cur     :=0;
+   ai_tech1_cur     :=0;  // tech  2 (build adv)
 
-   ai_spec0_cur     :=0;
+   ai_spec0_cur     :=0;  // radar/teleport
    ai_spec0_need    :=0;
 
-   ai_spec1_cur     :=0;
+   ai_spec1_cur     :=0;  // rocket station/altar
+
+   ai_towers_around :=0;
+   ai_towers_needx  :=-1;
+   ai_towers_needy  :=-1;
+   ai_towers_need   :=0;
+   ai_towers_need_type
+                    :=0;
+   ai_battle_limit_around
+                    :=0;
 
    ai_inprogress_uid:=0;
 end;
@@ -310,7 +259,7 @@ begin
    begin
       if(tu^.hits>0)then
       begin
-         if(tu^.inapc<1)or(MaxUnits<tu^.inapc)then
+         if(tu^.inapc<1)or(MaxUnits<tu^.inapc)then // not inapc
          begin
             if(team=tu^.player^.team)then
             begin
@@ -319,6 +268,12 @@ begin
                 begin
                    ai_abase_d:=ud;
                    ai_abase_u:=tu;
+                end;
+               if(ud<base_ir)then
+                if(tu^.uid^._attack>0)then
+                begin
+                   ai_battle_limit_around+=tu^.uid^._limituse;
+                   if(tu^.speed=0)and(tu^.uid^._ukbuilding)and(ud<srange)then ai_towers_around+=1;
                 end;
             end
             else
@@ -358,7 +313,6 @@ begin
                       ai_teleport_d:=ud;
                       ai_teleport_u:=tu;
                    end;
-
 
                   if(ud<ai_inapc_d)and(tu^.ai_alarm_d>base_r)then
                    if(_itcanapc(pu,tu))then
@@ -440,7 +394,8 @@ end;
 
 procedure ai_builder(pu:PTUnit);
 var  bt:byte;
-      d:single;
+   ddir,
+   rdir:single;
 bx,by,l:integer;
 procedure SetBT(buid:byte);
 var _c:cardinal;
@@ -465,7 +420,7 @@ begin
      end;
 end;
 
-procedure SetBT2(b0,b1:byte);
+procedure SetBTA(b0,b1:byte);
 begin
    if(bt=0)then
     if(b0=b1)or(b1=0)
@@ -483,73 +438,91 @@ procedure BuildMain(x:integer);   // Builders
 begin
    with pu^.player^ do
     if(ai_basep_builders<x)and(ai_basep_builders<ai_max_mains)
-    then SetBT2(aiucl_main0[race],aiucl_main1[race]);
+    then SetBTA(aiucl_main0[race],aiucl_main1[race]);
 end;
 procedure BuildEnergy(x:integer); // Energy
 begin
    with pu^.player^ do
     if(ai_enrg_cur<x)and(ai_enrg_cur<ai_max_energy)
-    then SetBT2(aiucl_generator[race],0);
+    then SetBTA(aiucl_generator[race],0);
 end;
 procedure BuildUProd(x:integer);  // Barracks
 begin
     with pu^.player^ do
      if(ai_unitp_cur<x)and(ai_unitp_cur<ai_max_unitps)then
       if(ai_tech1_cur<=0)or(ai_unitp_cur_na=0)or(ai_unitp_cur<6)then
-       SetBT2(aiucl_barrack0[race],aiucl_barrack1[race]);
+       SetBTA(aiucl_barrack0[race],aiucl_barrack1[race]);
 end;
 procedure BuildSmith(x:integer);  // Smiths
 begin
     with pu^.player^ do
      if(ai_upgrp_cur<x)and(ai_upgrp_cur<ai_max_upgrps)then
       if(ai_tech1_cur<=0)or(ai_upgrp_cur_na=0)or(ai_upgrp_cur<2)then
-       SetBT2(aiucl_smith[race],0);
+       SetBTA(aiucl_smith[race],0);
 end;
 procedure BuildTech0(x:integer);  // Tech0  TechCenter, HellMonastery
 begin
     with pu^.player^ do
      if(ai_tech0_cur<x)and(ai_tech0_cur<ai_max_tech0)
-     then SetBT2(aiucl_tech0[race],0);
+     then SetBTA(aiucl_tech0[race],0);
 end;
 procedure BuildTech1(x:integer);  // Tech1
 begin
     with pu^.player^ do
      if(ai_tech1_cur<x)and(ai_tech1_cur<ai_max_tech1)
-     then SetBT2(aiucl_tech1[race],0);
+     then SetBTA(aiucl_tech1[race],0);
 end;
 procedure BuildSpec0(x:integer);  // Radar, Teleport
 begin
     with pu^.player^ do
      if(ai_spec0_cur<x)and(ai_spec0_cur<ai_max_spec0)
-     then SetBT2(aiucl_spec0[race],0);
+     then SetBTA(aiucl_spec0[race],0);
 end;
 procedure BuildSpec1(x:integer);  // RStation, Altar
 begin
     with pu^.player^ do
      if(ai_spec1_cur<x)and(ai_spec1_cur<ai_max_spec1)
-     then SetBT2(aiucl_spec1[race],0);
+     then SetBTA(aiucl_spec1[race],0);
+end;
+procedure BuildTower(x,t:integer);  // Towers
+begin
+    with pu^.player^ do
+     if(ai_towers_around<x)and(ai_towers_around<ai_max_towers)then
+      if(t>0)
+      then SetBTA(aiucl_twr_air1[race],aiucl_twr_air2[race])
+      else
+       if(t<=0)
+       then SetBTA(aiucl_twr_ground1[race],aiucl_twr_ground2[race]);
 end;
 
 begin
-   bt:=0;
+   bt  :=0;
+   ddir:=0;
+   rdir:=0;
 
    with pu^     do
    with uid^    do
    with player^ do
    if(build_cd<=0)then
    begin
+      BuildTower (ai_towers_need,ai_towers_need_type);
+      if(bt>0)and(ai_towers_needx>-1)
+      then ddir:=(p_dir(x,y,ai_towers_needx,ai_towers_needy)+_randomr(90));
+
       // fixed opening
       if(race=r_hell)
       then SetBTX(UID_HSymbol,UID_HASymbol,ai_max_spec0);
       BuildEnergy(300 );
       BuildUProd (1   );
-      BuildEnergy(600 );
-      BuildUProd (2   );
-      BuildMain  (2   );
-      BuildEnergy(900 );
+      BuildEnergy(850 );
       BuildSmith (1   );
+if(race=r_uac)
+then  BuildSpec0 (1   );
+      BuildMain  (2   );
+      BuildUProd (2   );
+      BuildEnergy(1100);
       BuildSpec0 (1   );
-      BuildEnergy(1200);
+      BuildEnergy(1300);
       BuildUProd (3   );
       BuildMain  (4   );
       BuildTech0 (1   );
@@ -565,10 +538,12 @@ begin
 
       if(bt=0)then exit;
 
-      d:=random(360)*degtorad;
-      l:=random(srange-_r)+_r;
-      bx:=x+trunc(l*cos(d));
-      by:=y-trunc(l*sin(d));
+      if(ddir=0)
+      then ddir:=random(360);
+      rdir:=ddir*degtorad;
+      l   :=random(srange-_r)+_r;
+      bx  :=x+trunc(l*cos(rdir));
+      by  :=y-trunc(l*sin(rdir));
 
       _building_newplace(bx,by,bt,playeri,@bx,@by);
 
@@ -765,20 +740,29 @@ begin
       ai_spec0_cur     :=uid_e[aiucl_spec0   [race]];
       ai_spec1_cur     :=uid_e[aiucl_spec1   [race]];
 
-      if(_N(@ai_basep_need,ai_max_mains ))then ai_basep_need:=mm3(1,ai_basep_builders+1           ,ai_max_mains );
-      if(_N(@ai_unitp_need,ai_max_unitps))then ai_unitp_need:=mm3(1,trunc((ai_basep_builders/6)*5),ai_max_unitps);
-      if(_N(@ai_upgrp_need,ai_max_upgrps))then ai_upgrp_need:=mm3(1,ai_unitp_cur div 3            ,ai_max_upgrps);
-      if(_N(@ai_tech0_need,ai_max_tech0 ))then ai_tech0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_tech0 );
-      if(_N(@ai_spec0_need,ai_max_spec0 ))then ai_spec0_need:=mm3(0,ai_unitp_cur div 4            ,ai_max_spec0 );
-
+      if(_N(@ai_basep_need ,ai_max_mains ))then ai_basep_need :=ai_max_mains;//mm3(1,ai_basep_builders+1           ,ai_max_mains );
+      if(_N(@ai_unitp_need ,ai_max_unitps))then ai_unitp_need :=mm3(1,ai_basep_builders      ,ai_max_unitps);
+      if(_N(@ai_upgrp_need ,ai_max_upgrps))then ai_upgrp_need :=mm3(1,round(ai_unitp_cur/2.5),ai_max_upgrps);
+      if(_N(@ai_tech0_need ,ai_max_tech0 ))then ai_tech0_need :=mm3(0,ai_unitp_cur div 3     ,ai_max_tech0 );
+      if(_N(@ai_spec0_need ,ai_max_spec0 ))then ai_spec0_need :=mm3(0,ai_unitp_cur div 3     ,ai_max_spec0 );
+      if(_N(@ai_towers_need,ai_max_towers))then
+       if(ai_alarm[aia_common].aiad<base_rr) then
+       begin
+          ai_towers_need:=mm3(0,(towers_limit_border-ai_battle_limit_around) div 10,ai_max_towers);
+          ai_towers_needx:=ai_alarm[aia_common].aiax;
+          ai_towers_needy:=ai_alarm[aia_common].aiay;
+          ai_towers_need_type:=0;
+          if(ai_alarm[aia_ground].aiad<base_rr)then ai_towers_need_type:=-1;
+          if(ai_alarm[aia_fly   ].aiad<base_rr)then ai_towers_need_type:= 1;
+       end;
 
       if((ai_inprogress_uid=0)and(    bld))
       or((ai_inprogress_uid>0)and(not bld))then
       case uidi of
 UID_HSymbol,
-UID_HASymbol   : if(cenergy>_genergy)and(menergy>2200)and(uid_eb[uidi]>ai_max_spec0)then _unit_kill(pu,false,true,true);
+UID_HASymbol   : if(cenergy>_genergy)and(menergy>del_generators_energy)and(uid_eb[uidi]>ai_max_spec0)then _unit_kill(pu,false,true,true);
 UID_UGenerator,
-UID_UAGenerator: if(cenergy>_genergy)and(menergy>2200)then _unit_kill(pu,false,true,true);
+UID_UAGenerator: if(cenergy>_genergy)and(menergy>del_generators_energy)then _unit_kill(pu,false,true,true);
       else
          if(_isbarrack)or(_issmith)then
          if(ai_isnoprod(pu))then
@@ -800,7 +784,8 @@ UID_UAGenerator: if(cenergy>_genergy)and(menergy>2200)then _unit_kill(pu,false,t
 
       if(ai_unitp_cur>=1)then
       case uidi of
-UID_HSymbol    : if(ai_enrg_cur<ai_max_energy)or(uid_e[UID_HASymbol]<ai_max_spec0)then begin _unit_action(pu);exit;end;
+UID_HSymbol    : if(uid_e[UID_HASymbol]<ai_max_spec0)
+                 or(ai_enrg_cur<ai_max_energy)then begin _unit_action(pu);exit;end;
 UID_UGenerator : if(ai_enrg_cur<ai_max_energy)then begin _unit_action(pu);exit;end;
       else
          if(_isbarrack)or(_issmith)then

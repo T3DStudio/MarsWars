@@ -371,7 +371,8 @@ o_x1,o_y1  :integer;
    ai_max_tech0,
    ai_max_tech1,
    ai_max_spec0,
-   ai_max_spec1
+   ai_max_spec1,
+   ai_max_towers
            : integer;
    ai_skill: byte;
 
@@ -459,7 +460,8 @@ TUnit = record
    solid,
    sel      : boolean;
 
-   ai_need_heye
+   ai_need_heye,
+   ai_alarm_fly
             : boolean;
    ai_alarm_d,
    ai_alarm_x,

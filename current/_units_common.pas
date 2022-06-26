@@ -1528,8 +1528,9 @@ uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
 
       // DETECTION
       case uidi of
+UID_HASymbol,
 UID_UMine,
-UID_URadar       : buff[ub_detect]:=b2ib[upgr[upgr_uac_detect]>0];
+UID_URadar       : buff[ub_detect]:=b2ib[upgr[upgr_race_detect[_urace]]>0];
 UID_HEye         : buff[ub_detect]:=_ub_infinity;
       end;
       if(buff[ub_hvision]>0)then
