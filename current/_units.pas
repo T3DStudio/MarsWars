@@ -1726,7 +1726,7 @@ begin
      then _unit_kill(pu,false,false,true)
      else
      begin
-        if(_cycle_order=cycle_order)then
+        if(_cycle_order=cycle_order)and(buff[ub_damaged]<=0)then
         begin
            hits+=_bstep;
            hits+=_bstep*upgr[upgr_fast_build];

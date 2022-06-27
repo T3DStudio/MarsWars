@@ -460,9 +460,9 @@ TUnit = record
    solid,
    sel      : boolean;
 
-   ai_need_heye,
-   ai_alarm_fly
+   ai_need_detect
             : boolean;
+   ai_alarm_timer,
    ai_alarm_d,
    ai_alarm_x,
    ai_alarm_y

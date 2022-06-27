@@ -18,6 +18,7 @@ aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret  
 
 del_generators_energy = 2500;
 towers_limit_border   = 300;
+ai_tower_life_time    = fr_fps*60;
 
 aia_n = 4;
 
@@ -118,8 +119,7 @@ begin
       ai_alarm_d  :=32000;
       ai_alarm_x  :=-1;
       ai_alarm_y  :=-1;
-      ai_alarm_fly:=false;
-      ai_need_heye:=false;
+      ai_need_detect:=false;
    end;
 
    // nearest enemy unit or last enemy position
@@ -286,7 +286,7 @@ begin
                 if(tu^.buff[ub_invis]>0)and(tu^.vsni[pu^.player^.team]<=0)then
                 begin
                    ai_alarm_target(aia_invis,tu,0,0,ud);
-                   if(ud<srange)then ai_need_heye:=true;
+                   if(ud<srange)then ai_need_detect:=true;
                 end;
              end;
 
@@ -782,6 +782,14 @@ UID_UAGenerator: if(cenergy>_genergy)and(menergy>del_generators_energy)then _uni
 
       if(hits<=0)or(not bld)then exit;
 
+      with ai_alarm[aia_common] do
+       if(aiau<>nil)and(aiad<base_3r)and(a_rld<=0)then
+        case uidi of
+      UID_UGTurret: if(    aiau^.ukfly)and(ai_alarm[aia_ground].aiad>srange)then begin _unit_action(pu);exit;end;
+      UID_UATurret: if(not aiau^.ukfly)and(ai_alarm[aia_fly   ].aiad>srange)then begin _unit_action(pu);exit;end;
+        end;
+
+
       if(ai_unitp_cur>=1)then
       case uidi of
 UID_HSymbol    : if(uid_e[UID_HASymbol]<ai_max_spec0)
@@ -805,6 +813,19 @@ UID_UGenerator : if(ai_enrg_cur<ai_max_energy)then begin _unit_action(pu);exit;e
          end;
       end;
       if(_issmith  )then ai_UpgrProduction(pu);
+
+      case uidi of
+UID_HTower,
+UID_HTotem,
+UID_UGTurret,
+UID_UATurret    : with ai_alarm[aia_common] do
+                   if(aiad<base_ir)
+                   then ai_alarm_timer:=ai_tower_life_time
+                   else
+                     if(ai_alarm_timer<0)
+                     then _unit_kill(pu,false,true,true)
+                     else
+      end;
    end;
 end;
 
@@ -814,14 +835,22 @@ begin
    with pu^     do
    with uid^ do
    begin
+      if(ai_alarm_timer>0)then
+      begin
+         ai_alarm_timer-=order_period;
+         if(ai_alarm_timer=0)then ai_alarm_timer:=-1;
+      end
+      else
+       if(ai_alarm_timer<0)then ai_alarm_timer:=0;
+
       uo_id :=ua_amove;
       uo_tar:=0;
 
       with ai_alarm[aia_common] do
       begin
-         ai_alarm_d:=aiad;
-         ai_alarm_x:=aiax;
-         ai_alarm_y:=aiay;
+         ai_alarm_d  :=aiad;
+         ai_alarm_x  :=aiax;
+         ai_alarm_y  :=aiay;
       end;
 
       if(playeri=HPlayer)and(sel)then
