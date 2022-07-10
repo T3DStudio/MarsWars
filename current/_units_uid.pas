@@ -123,7 +123,7 @@ begin
 //         HELL BUILDINGS   ////////////////////////////////////////////////////
 UID_HKeep:
 begin
-   _mhits     := 4000;
+   _mhits     := 3500;
    _renergy   := 800;
    _genergy   := 300;
    _r         := 66;
@@ -158,8 +158,8 @@ UID_HSymbol,
 UID_HASymbol:
 begin
    _mhits     := 200;
-   _renergy   := 10;
    _genergy   := 10;
+   _renergy   := _genergy*2;
    _r         := 22;
    _ucl       := 2;
    _btime     := 15;
@@ -192,7 +192,7 @@ end;
 UID_HMonastery:
 begin
    _mhits     := 2500;
-   _renergy   := 400;
+   _renergy   := 600;
    _r         := 65;
    _ucl       := 10;
    _btime     := 60;
@@ -201,8 +201,8 @@ begin
 end;
 UID_HFortress:
 begin
-   _mhits     := 5000;
-   _renergy   := 400;
+   _mhits     := 4000;
+   _renergy   := 600;
    _genergy   := 300;
    _r         := 86;
    _ucl       := 11;
@@ -219,7 +219,7 @@ begin
    _r         := 28;
    _ucl       := 12;
    _btime     := 30;
-   _limituse  := 30;
+   _limituse  := 50;
    _ability   := uab_teleport;
    _ukbuilding:= true;
    _issolid   := false;
@@ -241,7 +241,7 @@ end;
 UID_HTower:
 begin
    _mhits     := 1000;
-   _renergy   := 100;
+   _renergy   := 200;
    _r         := 20;
    _srange    := 250;
    _ucl       := 6;
@@ -257,7 +257,7 @@ end;
 UID_HTotem:
 begin
    _mhits     := 500;
-   _renergy   := 200;
+   _renergy   := 300;
    _r         := 21;
    _srange    := 250;
    _ucl       := 7;
@@ -301,8 +301,8 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fdeathhits(1);
-   _weapon(0,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy      ,wpr_adv+wpr_zombie,uidall,[],0,0,wtp_distance);
-   _weapon(1,wpt_directdmg,aw_dmelee,0,20,fr_3h2fps,0,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive,wpr_any           ,uidall,[],0,0,wtp_bio     );
+   _weapon(0,wpt_directdmg,aw_dmelee,0,10,fr_3h2fps,0,0,0,0,upgr_hell_mattack,4,wtrset_enemy      ,wpr_adv+wpr_zombie,uidall,[],0,0,wtp_distance);
+   _weapon(1,wpt_directdmg,aw_dmelee,0,10,fr_3h2fps,0,0,0,0,upgr_hell_mattack,4,wtrset_enemy_alive,wpr_any           ,uidall,[],0,0,wtp_bio     );
 end;
 UID_Imp        :
 begin
@@ -317,9 +317,9 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fdeathhits(-30);
-   _weapon(0,wpt_missle    ,aw_srange,0,0 ,fr_4h3fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive       ,wpr_adv ,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
-   _weapon(1,wpt_missle    ,aw_srange,0,0 ,fr_4h3fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground,wpr_nadv,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
-   _weapon(2,wpt_directdmg ,aw_dmelee,0,20,fr_fps   ,0      ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground,wpr_any,        [UID_Imp],[],0, 0,wtp_distance       );
+   _weapon(0,wpt_missle    ,_srange+50,0,0 ,fr_4h3fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground,wpr_adv ,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
+   _weapon(1,wpt_missle    ,aw_srange ,0,0 ,fr_4h3fps,MID_Imp,0,0,0,upgr_hell_dattack,3,wtrset_enemy_alive_ground,wpr_nadv,uidall-[UID_Imp],[],0,-5,wtp_unit_bio_nlight);
+   _weapon(2,wpt_directdmg ,aw_dmelee ,0,20,fr_fps   ,0      ,0,0,0,upgr_hell_mattack,3,wtrset_enemy_alive_ground,wpr_any,        [UID_Imp],[],0, 0,wtp_distance       );
 end;
 UID_Demon      :
 begin
@@ -377,7 +377,7 @@ end;
 UID_Cyberdemon :
 begin
    _mhits     := 4000;
-   _renergy   := 400;
+   _renergy   := 600;
    _r         := 20;
    _speed     := 11;
    _srange    := 250;
@@ -391,12 +391,12 @@ begin
    _limituse  := 100;
    _base_armor:= 2;
    _splashresist:=true;
-   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive,wpr_any,uidall,[],0,0,wtp_building);
+   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps   ,MID_HRocket,0,0,0,upgr_hell_dattack,5,wtrset_enemy_alive,wpr_any,uidall,[],0,0,wtp_building_nlight);
 end;
 UID_Mastermind :
 begin
    _mhits     := 4000;
-   _renergy   := 400;
+   _renergy   := 600;
    _r         := 35;
    _speed     := 11;
    _srange    := 275;
@@ -486,7 +486,7 @@ end;
 UID_Archvile:
 begin
    _mhits     := 600;
-   _renergy   := 200;
+   _renergy   := 600;
    _r         := 14;
    _speed     := 15;
    _srange    := 250;
@@ -624,7 +624,7 @@ end;
 UID_HCommandCenter,
 UID_UCommandCenter:
 begin
-   _mhits     := 4000;
+   _mhits     := 3500;
    _renergy   := 800;
    _genergy   := 300;
    _speed     := 0;
@@ -703,8 +703,8 @@ UID_UGenerator,
 UID_UAGenerator:
 begin
    _mhits     := 400;
-   _renergy   := 20;
    _genergy   := 20;
+   _renergy   := _genergy*2;
    _r         := 42;
    _ucl       := 2;
    _btime     := 30;
@@ -735,7 +735,7 @@ end;
 UID_UTechCenter :
 begin
    _mhits     := 2500;
-   _renergy   := 400;
+   _renergy   := 600;
    _r         := 62;
    _ucl       := 10;
    _btime     := 60;
@@ -745,8 +745,8 @@ begin
 end;
 UID_UNuclearPlant:
 begin
-   _mhits     := 4000;
-   _renergy   := 400;
+   _mhits     := 3500;
+   _renergy   := 600;
    _genergy   := 300;
    _r         := 70;
    _ucl       := 11;
@@ -764,7 +764,7 @@ begin
    _srange    := 200;
    _ucl       := 12;
    _btime     := 30;
-   _limituse  := 30;
+   _limituse  := 40;
    _ability   := uab_radar;
    _ukbuilding:= true;
 end;
@@ -786,7 +786,7 @@ end;
 UID_UGTurret:
 begin
    _mhits     := 750;
-   _renergy   := 50;
+   _renergy   := 100;
    _r         := 15;
    _srange    := 250;
    _ucl       := 6;
@@ -804,7 +804,7 @@ end;
 UID_UATurret:
 begin
    _mhits     := 750;
-   _renergy   := 50;
+   _renergy   := 100;
    _r         := 15;
    _srange    := 250;
    _ucl       := 7;
@@ -820,7 +820,7 @@ end;
 
 UID_UMine:
 begin
-   _mhits     := 5;
+   _mhits     := 25;
    _renergy   := 10;
    _r         := 5;
    _srange    := 100;
@@ -838,7 +838,7 @@ end;
 UID_Engineer:
 begin
    _mhits     := 200;
-   _renergy   := 100;
+   _renergy   := 200;
    _r         := 12;
    _speed     := 13;
    _srange    := 200;
@@ -856,7 +856,7 @@ end;
 UID_Medic:
 begin
    _mhits     := 200;
-   _renergy   := 100;
+   _renergy   := 200;
    _r         := 12;
    _speed     := 13;
    _srange    := 200;
@@ -1064,7 +1064,7 @@ begin
    _ucl       := 9;
    _btime     := 30;
    _apcs      := 2;
-   _limituse  := 30;
+   _limituse  := 20;
    _attack    := atm_always;
    _ukmech    := true;
    _uklight   := true;

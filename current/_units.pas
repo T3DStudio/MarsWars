@@ -144,25 +144,31 @@ begin
    with player^ do
    begin
       puid:=@_uids[ouid];
-      if(not obld)then
-       if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
+
+      if(not obld)or(puid^._ukbuilding)then
+       if(menergy<=0)then
        begin
           _unit_morph:=ureq_energy;
           exit;
        end;
-      if(not obld)or(puid^._ukbuilding)then
-        if(menergy<=0)then
-        begin
-           _unit_morph:=ureq_energy;
-           exit;
-        end;
-
       if(not obld)then
-       if(_collisionr(x,y,puid^._r,unum,puid^._ukfly,true)>0)then
-       begin
-          _unit_morph:=ureq_place;
-          exit;
-       end;
+      begin
+         if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
+         begin
+            _unit_morph:=ureq_energy;
+            exit;
+         end;
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukfly,true)>0)then
+         begin
+            _unit_morph:=ureq_place;
+            exit;
+         end;
+      end;
+      if(a_units[ouid]<=0)then
+      begin
+         _unit_morph:=ureq_max;
+         exit;
+      end;
 
       case advanced_mode of
       0:   adv:=false;
@@ -532,10 +538,10 @@ end;
 
 function _unitWeaponPriority(tu:PTUnit;priorset:byte):integer;
 var i:integer;
-procedure add;
+procedure incPrio;
 begin
    _unitWeaponPriority+=i;
-   i:=i shr 1;
+   i:=i div 2;
 end;
 begin
    i:=1024;
@@ -543,43 +549,47 @@ begin
    with tu^  do
    with uid^ do
    case priorset of
-wtp_building    : if(    _ukbuilding  )then add;
+wtp_building         : if(    _ukbuilding  )then incPrio;
+wtp_building_nlight  : begin
+                       if(    _ukbuilding  )then incPrio;
+                       if(not _uklight     )then incPrio;
+                       end;
 wtp_unit_light_bio   : begin
-                       if(not _ukbuilding  )then add;
-                       if(    _uklight     )then add;
-                       if(not _ukmech      )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(    _uklight     )then incPrio;
+                       if(not _ukmech      )then incPrio;
                        end;
 wtp_unit_bio_light   : begin
-                       if(not _ukbuilding  )then add;
-                       if(not _ukmech      )then add;
-                       if(    _uklight     )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(not _ukmech      )then incPrio;
+                       if(    _uklight     )then incPrio;
                        end;
 wtp_unit_bio_nlight  : begin
-                       if(not _ukbuilding  )then add;
-                       if(not _ukmech      )then add;
-                       if(not _uklight     )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(not _ukmech      )then incPrio;
+                       if(not _uklight     )then incPrio;
                        end;
 wtp_unit_bio_nostun  : begin
-                       if(not _ukbuilding  )then add;
-                       if(not _ukmech      )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(not _ukmech      )then incPrio;
                        if (buff[ub_stun]<=0)
-                       and(buff[ub_pain]<=0)then add;
+                       and(buff[ub_pain]<=0)then incPrio;
                        end;
 wtp_unit_mech_nostun : begin
-                       if(not _ukbuilding  )then add;
-                       if(    _ukmech      )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(    _ukmech      )then incPrio;
                        if (buff[ub_stun]<=0)
-                       and(buff[ub_pain]<=0)then add;
+                       and(buff[ub_pain]<=0)then incPrio;
                        end;
 wtp_unit_mech        : begin
-                       if(not _ukbuilding  )then add;
-                       if(    _ukmech      )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(    _ukmech      )then incPrio;
                        end;
-wtp_bio              : if(not _ukmech      )then add;
-wtp_light            : if(    _uklight     )then add;
+wtp_bio              : if(not _ukmech      )then incPrio;
+wtp_light            : if(    _uklight     )then incPrio;
 wtp_unit_light       : begin
-                       if(not _ukbuilding  )then add;
-                       if(    _uklight     )then add;
+                       if(not _ukbuilding  )then incPrio;
+                       if(    _uklight     )then incPrio;
                        end;
    end;
 end;
@@ -856,13 +866,17 @@ begin
    with pu^  do
    with uid^ do
    begin
-      buff[ub_stun]:=gear_time[_ukmech];
+      if(tu^.buff[ub_advanced]>0)
+      then buff[ub_stun]:=_tprod div 4
+      else buff[ub_stun]:=_tprod div 2;
+      //gear_time[_ukmech];
 
       buff[ub_advanced]:=_ub_infinity;
 
-      if(tu^.buff[ub_advanced]>0)
+      {if(tu^.buff[ub_advanced]>0)
       then tu^.rld:=uac_adv_base_reload[_ukmech] div 2
-      else tu^.rld:=uac_adv_base_reload[_ukmech];
+      else tu^.rld:=uac_adv_base_reload[_ukmech];}
+      tu^.rld:=uac_adv_base_reload;
 
       GameLogUnitPromoted(pu);
       {$IFDEF _FULLGAME}
@@ -1287,7 +1301,7 @@ begin
       order:=_o;
       dir  :=_d;
       ukfly:=_f;
-      hits :=trunc(uid^._mhits*_h);
+      hits := trunc(uid^._mhits*_h);
       zfall:=_z;
       buff[ub_advanced]:=_a;
       {$IFDEF _FULLGAME}

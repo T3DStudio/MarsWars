@@ -460,12 +460,11 @@ TUnit = record
    solid,
    sel      : boolean;
 
-   ai_need_detect
-            : boolean;
-   ai_alarm_timer,
-   ai_alarm_d,
-   ai_alarm_x,
-   ai_alarm_y
+   aiu_need_detect,
+   aiu_alarm_timer,
+   aiu_alarm_d,
+   aiu_alarm_x,
+   aiu_alarm_y
             : integer;
 
    {$IFDEF _FULLGAME}

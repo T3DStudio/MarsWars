@@ -6,7 +6,7 @@ begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
                                 UID_LostSoul      ..UID_ZBFG,
                                 UID_UCommandCenter..UID_UNuclearPlant,
-                                UID_Engineer      ..UID_Flyer  ]-[UID_HASymbol,UID_UAGenerator],
+                                UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
       PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
@@ -255,7 +255,7 @@ begin
 
          if(state<>ps_none)then
          begin
-            if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;
+            if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots;//
 
             PlayerSetSkirmishTech(p);
             GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);

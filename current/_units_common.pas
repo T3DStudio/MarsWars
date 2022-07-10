@@ -729,7 +729,6 @@ begin
       end;
 end;
 
-
 procedure _unit_default(pu:PTUnit);
 begin
    with pu^ do
@@ -747,10 +746,12 @@ begin
       a_weap_cl:= 0;
       a_tar_cl := 0;
 
-      ai_alarm_timer:=0;
-      ai_alarm_d    :=32000;
-      ai_alarm_x    :=-1;
-      ai_alarm_y    :=0;
+      aiu_alarm_timer:=0;
+      aiu_alarm_d    :=32000;
+      aiu_alarm_x    :=-1;
+      aiu_alarm_y    :=0;
+      aiu_need_detect:=32000;
+
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);

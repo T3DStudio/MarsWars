@@ -354,6 +354,7 @@ wtp_unit_mech          = 10;
 wtp_bio                = 11;
 wtp_light              = 12;
 wtp_unit_light         = 13;
+wtp_building_nlight    = 14;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -733,8 +734,8 @@ melee_r                = 8;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-uac_adv_base_reload    : array[false..true] of integer = (fr_fps*20,fr_fps*40);
-gear_time              : array[false..true] of integer = (fr_fps*3 ,fr_fps*6 );
+//uac_adv_base_reload    : array[false..true] of integer = (fr_fps*5,fr_fps*10);
+uac_adv_base_reload    = fr_fps*5;
 
 building_adv_reload    : array[false..true] of integer = (fr_fps*45,0);
 
@@ -1104,7 +1105,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 780301;
+svld_size              = 783833;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
