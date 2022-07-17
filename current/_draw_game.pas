@@ -594,15 +594,16 @@ begin
    if(k_ctrl>2)then
    for u:=1 to MaxUnits do
     with _units[u] do
+    with player^ do
     with uid^ do
-     if(hits>dead_hits)then
+     if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
         ix:=x-vid_cam_x+vid_mapx;
         iy:=y-vid_cam_y+vid_mapy;
 
         //_draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, PlayerGetColor(playeri));
 
-        //if(hits>0)then
+        if(hits>0)then
         //if(k_shift>1)then
         begin
           // circleColor(r_screen,ix,iy,_r  ,c_gray);
@@ -616,7 +617,13 @@ begin
               //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_y+vid_mapy;
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
+
+
            end;
+
+           if(aiu_alarm_d<32000)then
+           lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
+
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));

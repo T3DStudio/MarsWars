@@ -147,7 +147,7 @@ end;
 
 function IfUnderObstacle(ux,uy:integer):boolean;
 begin
-   IfUnderObstacle:=pf_get_area(ux div pf_pathmap_w,uy div pf_pathmap_w)=pf_solid;
+   IfUnderObstacle:=pf_get_area(ux,uy)=pf_solid;
 end;
 
 function _canmove(pu:PTUnit):boolean;
@@ -751,6 +751,8 @@ begin
       aiu_alarm_x    :=-1;
       aiu_alarm_y    :=0;
       aiu_need_detect:=32000;
+      aiu_armyaround_ally :=0;
+      aiu_armyaround_enemy:=0;
 
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
@@ -1626,6 +1628,7 @@ UID_APC     : if(buff[ub_advanced]>0)
               else apcm:=_apcm;
 UID_UGTurret: buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
       end;
+      if(upgr[upgr_invuln]>0)then buff[ub_invuln]:=fr_fps;
 
       // BUILD AREA
       if(_isbuilder)then isbuildarea:=true;

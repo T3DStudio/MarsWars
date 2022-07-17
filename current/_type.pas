@@ -236,6 +236,7 @@ TUID = record
    _isbarrack,
    _issolid,
    _ukfly,
+   _ukfloater,
    _splashresist,
    _addon       : boolean;
    _bornadvanced: array[false..true] of boolean; //[addon]
@@ -304,6 +305,12 @@ TUPID = record  // upgrade
    {$ENDIF}
 end;
 
+TAIAlarm = record
+   aia_enemy_count,
+   aia_x,
+   aia_y    : integer;
+   aia_zone : word;
+end;
 
 TLogMes = record
    mtype,
@@ -372,9 +379,16 @@ o_x1,o_y1  :integer;
    ai_max_tech1,
    ai_max_spec0,
    ai_max_spec1,
-   ai_max_towers
+   ai_max_towers,
+   ai_scout_u_cur,
+   ai_scout_u_cur_w,
+   ai_scout_u_new,
+   ai_scout_u_new_w,
+   ai_detection_pause
            : integer;
    ai_skill: byte;
+   ai_alarms
+           : array[0..MaxPlayers] of TAIAlarm;
 
 
    s_builders,
@@ -460,6 +474,8 @@ TUnit = record
    solid,
    sel      : boolean;
 
+   aiu_armyaround_ally,
+   aiu_armyaround_enemy,
    aiu_need_detect,
    aiu_alarm_timer,
    aiu_alarm_d,

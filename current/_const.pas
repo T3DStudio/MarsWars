@@ -67,7 +67,8 @@ r_uac                  = 2;
 
 MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
-MaxPlayerLimit         = MaxPlayerUnits*10;
+MinUnitLimit           = 100;
+MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 MaxCPoints             = 3;
 
 MaxSMapW               = 7000;
@@ -355,6 +356,7 @@ wtp_bio                = 11;
 wtp_light              = 12;
 wtp_unit_light         = 13;
 wtp_building_nlight    = 14;
+wtp_scout              = 15;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -391,9 +393,6 @@ aif_hrsmntapcs         : cardinal = 1 shl 25; // transport harrasment
 aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
 aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
 aif_stayathome         : cardinal = 1 shl 28; //   }
-
-//aius_needscan          : byte = %00000001;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -447,6 +446,7 @@ ub_summoned            = 10;
 ub_teleeff             = 11;
 ub_hvision             = 12;
 ub_damaged             = 13;
+ub_heal                = 14;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
@@ -663,10 +663,10 @@ UID_Major              = 60;
 UID_BFG                = 61;
 UID_FAPC               = 62;
 UID_APC                = 64;
-UID_Terminator         = 65;
-UID_Tank               = 66;
-UID_Flyer              = 67;
-UID_UACBot             = 68;
+UID_UACBot             = 65;
+UID_Terminator         = 66;
+UID_Tank               = 67;
+UID_Flyer              = 68;
 UID_UTransport         = 69;
 
 UID_UBaseMil           = 70;
@@ -688,7 +688,7 @@ zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,
 arch_res               = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+zimbas;
 demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
 
-coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
+//coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 
 uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
 uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant);
@@ -708,9 +708,9 @@ fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
 
 base_r                 = 350;
+base_ir                = base_r+(base_r div 2);
 base_rr                = base_r*2;
 base_3r                = base_r*3;
-base_ir                = base_r+(base_r div 2);
 
 apc_exp_damage         = 70;
 regen_period           = fr_fps*2;
@@ -722,7 +722,7 @@ radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
-hell_vision_time       = fr_fps*5;
+hell_vision_time       = fr_fps*15;
 
 mstrike_reload         = fr_fps*30;
 
@@ -1105,7 +1105,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 783833;
+svld_size              = 787785;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;
@@ -1175,7 +1175,7 @@ race_missiles          : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'ua
 effects_folder         : shortstring = 'effs\';
 missiles_folder        : shortstring = 'missiles\';
 
-ui_limitstr            : shortstring = '1250';
+ui_limitstr            : shortstring = '125';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

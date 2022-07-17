@@ -1,4 +1,16 @@
 
+function l2s(limit:integer):shortstring;
+var fr:integer;
+begin
+   fr:=limit mod MinUnitLimit;
+   case fr of
+   0  : l2s:=i2s(limit div MinUnitLimit);
+   50 : l2s:=i2s(limit div MinUnitLimit)+'.5';
+   25 : l2s:=i2s(limit div MinUnitLimit)+'.25';
+   else l2s:=i2s(limit div MinUnitLimit)+'.'+i2s(fr);
+   end;
+end;
+
 function GetKeyName(k:cardinal):shortstring;
 begin
    case k of
@@ -147,7 +159,7 @@ begin
       begin
          if(_renergy>0)then ENRG:=i2s(_renergy);
          if(_btime >0)then TIME:=i2s(_btime );
-         LMT:=i2s(_limituse);
+         LMT:=l2s(_limituse);
 
          PROD:=findprd(uid);
          if(_ruid1>0)then _addstr(@REQ,_uids [_ruid1].un_txt_name);
@@ -397,7 +409,7 @@ begin
    _mkHStrUid(UID_Imp        ,'Imp'            ,'');
    _mkHStrUid(UID_Demon      ,'Demon'          ,'');
    _mkHStrUid(UID_Cacodemon  ,'Cacodemon'      ,'');
-   _mkHStrUid(UID_Knight      ,'Baron of Hell / Hell Knight','');
+   _mkHStrUid(UID_Knight     ,'Baron of Hell / Hell Knight','');
    _mkHStrUid(UID_Cyberdemon ,'Cyberdemon'     ,'');
    _mkHStrUid(UID_Mastermind ,'Mastermind'     ,'');
    _mkHStrUid(UID_Pain       ,'Pain Elemental' ,'');
@@ -467,6 +479,7 @@ begin
    _mkHStrUid(UID_FAPC       ,'Air APC'          ,'');
    _mkHStrUid(UID_UTransport ,'Air APC'          ,'');
    _mkHStrUid(UID_APC        ,'Ground APC'       ,'');
+   _mkHStrUid(UID_UACBot     ,'UAC Bot'          ,'');
    _mkHStrUid(UID_Terminator ,'UAC Terminator'   ,'');
    _mkHStrUid(UID_Tank       ,'UAC Tank'         ,'');
    _mkHStrUid(UID_Flyer      ,'UAC Fighter'      ,'');

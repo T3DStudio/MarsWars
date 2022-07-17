@@ -419,6 +419,9 @@ begin
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
             sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
             sdlk_backspace : rpls_fog:=not rpls_fog;
+            SDLK_F4        : with _players[Hplayer] do
+                              if(_IsUnitRange(ai_scout_u_cur,nil))then
+                               with _units[ai_scout_u_cur] do MoveCamToPoint(x,y);
             SDLK_F5        : begin HPlayer:=0;exit end;
             SDLK_F6        : begin HPlayer:=1;exit end;
             SDLK_F7        : begin HPlayer:=2;exit end;
@@ -536,7 +539,7 @@ begin
                             SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
                             SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
                             SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then
-                                                    if(k_ctrl>1)then m_brush:=co_mmark else m_vmove:=true;
+                                                    {if(k_ctrl>1)then m_brush:=co_mmark else }m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_menu_redraw:=true;

@@ -55,11 +55,16 @@ begin
    pf_check_borders:=(0<=cx)and(0<=cy)and(cx<=pf_pathmap_c)and(cy<=pf_pathmap_c);
 end;
 
-function pf_get_area(cx,cy:integer):word;
+function pf_get_area_cell(cx,cy:integer):word;
 begin
    if(pf_check_borders(cx,cy)=false)
-   then pf_get_area:=pf_solid
-   else pf_get_area:=pf_pathgrid_areas[cx,cy];
+   then pf_get_area_cell:=pf_solid
+   else pf_get_area_cell:=pf_pathgrid_areas[cx,cy];
+end;
+
+function pf_get_area(x,y:integer):word;
+begin
+    pf_get_area:=pf_get_area_cell(x div pf_pathmap_w,y div pf_pathmap_w);
 end;
 
 {

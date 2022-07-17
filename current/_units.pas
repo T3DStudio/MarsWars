@@ -292,7 +292,7 @@ begin
    end;
 end;
 
-procedure _unit_npush(pu:PTUnit);
+procedure _unit_npush(pu:PTUnit;ignore_liquid:boolean);
 var i,dx,dy:integer;
 begin
    dx:=pu^.x div dcw;
@@ -303,13 +303,18 @@ begin
      if(n>0)then
       for i:=0 to n-1 do
        with l[i]^ do
-        if(r>0)and(t>0)then _unit_dpush(pu,l[i]);
+        if(r>0)and(t>0)then
+        begin
+           if(ignore_liquid)then
+            if(t in dids_liquids)then continue;
+           _unit_dpush(pu,l[i]);
+        end;
 end;
 
 procedure _unit_npush_dcell(pu:PTUnit);
 begin
    with pu^ do
-    if(speed>0)and(ukfly=uf_ground)and(solid)and(bld)then _unit_npush(pu);
+    if(speed>0)and(ukfly=uf_ground)and(solid)and(bld)then _unit_npush(pu,uid^._ukfloater);
 end;
 
 procedure _unit_move(pu:PTUnit);
@@ -394,7 +399,8 @@ wpt_resurect : if(tu^.buff[ub_resur]>0)
                or(tu^.hits> 0         )then exit;
 wpt_heal     : if(tu^.hits<=0)
                or(tu^.hits>=tu^.uid^._mhits)
-               or(tu^.bld=false       )then exit;
+               or(tu^.bld=false       )
+               or(tu^.buff[ub_heal]>0 )then exit;
       end;
 
       // transport check
@@ -590,6 +596,12 @@ wtp_light            : if(    _uklight     )then incPrio;
 wtp_unit_light       : begin
                        if(not _ukbuilding  )then incPrio;
                        if(    _uklight     )then incPrio;
+                       end;
+wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
+                       begin
+                          if(speed>0)
+                         and(apcc=apcm)then incPrio;
+                          if(ukfly    )then incPrio;
                        end;
    end;
 end;
@@ -1005,7 +1017,7 @@ begin
    _ability_teleport:=false;
    with pu^  do
    with uid^ do
-      if(not _ukbuilding)and(tu^.hits>0)and(tu^.bld)then
+      if(not _ukbuilding)and(ukfly=false)and(tu^.hits>0)and(tu^.bld)then
        if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
         if(td<=melee_r)then
         begin
@@ -1489,13 +1501,16 @@ wpt_unit       : _ability_unit_spawn(pu,aw_oid);
                if(ServerSide)then
                 case aw_type of
 wpt_resurect : _resurrect(tu);
-wpt_heal     : if(tu^.hits>0)then tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+wpt_heal     : begin
+                  tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+                  tu^.buff[ub_heal]:=aw_rld;
+               end;
 wpt_directdmg: if(not cf(@aw_reqf,@wpr_zombie))
                then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri)
                else
                  if(not _makezimba(pu,tu))
                  then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri);
-                end;
+               end;
             end;
 
             if(ServerSide)then
@@ -1798,6 +1813,7 @@ begin
             begin
                _unit_move(pu);
                _unit_prod(pu);
+               if(player^.state=ps_comp)then ai_scout_pick(pu);
             end;
 
             au:=nil;

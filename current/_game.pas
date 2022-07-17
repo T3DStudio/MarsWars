@@ -524,6 +524,8 @@ begin
 
         if(G_Started)and(G_Status=gs_running)and(ServerSide)then
         begin
+           if(state=ps_comp)then ai_player_code(p);
+
            if(build_cd>0)then build_cd-=1;
 
            _u_ord(p);

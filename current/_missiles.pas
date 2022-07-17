@@ -298,10 +298,6 @@ begin
 
         if(ServerSide)then
         begin
-           if(teams)then
-            if(tu^.uid^._ukbuilding)
-            then rdamage:=rdamage div 4
-            else rdamage:=rdamage div 2;
            p:=1;
 
            /////////////////////////////////
@@ -319,8 +315,6 @@ begin
            if (    tu^.uid^._uklight)
            and(not tu^.uid^._ukmech )then  // light bio
                case mid of
-               MID_MBullet,
-               MID_TBullet,
                MID_Bullet,
                MID_Bulletx2    : _d200(@rdamage);
                end;
