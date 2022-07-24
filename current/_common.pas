@@ -7,8 +7,8 @@ procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function IfUnderObstacle(ux,uy:integer):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
+function pf_isobstacle_zone(zone:word):boolean;  forward;
 
 {$IFDEF _FULLGAME}
 function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;forward;
@@ -615,7 +615,7 @@ begin
       if(bld=false)or(hits<=0)then exit;
 
       if(_ability_no_obstacles)then
-       if(IfUnderObstacle(x,y))then exit;
+       if(pf_isobstacle_zone(pfzone))then exit;
 
       if(_ability_rupgr>0)then
        if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;

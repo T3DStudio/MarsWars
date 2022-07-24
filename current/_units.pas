@@ -340,8 +340,6 @@ begin
           end
           else
           begin
-             //pf_unit(pu);
-
              with uid^ do
               if(not _ukbuilding)then
                with player^ do
@@ -389,7 +387,7 @@ begin
    with player^ do
    with _a_weap[cw] do
    begin
-      if(aw_rld<=0)then exit;
+      if(aw_rld=0)then exit;
 
       // Weapon type requirements
       case aw_type of
@@ -418,7 +416,7 @@ wpt_heal     : if(tu^.hits<=0)
              if(aw_max_range< 0)then exit; // melee
            end
            else
-             if(aw_max_range>=0)then exit; // not melee
+             if(aw_max_range>=0)then exit; // ranged
       end
       else
         if(_IsUnitRange(tu^.inapc,nil))then exit;
@@ -693,11 +691,11 @@ uontard,
 a_tarp,
     puo,
     tu : PTUnit;
-tuinapc,
+tu_inapc,
 swtarget,
 aicode,
-foutar,
-ftarget,
+fteleport_tar,
+attack_target,
 pushout: boolean;
 t_weap : byte;
 begin
@@ -712,7 +710,6 @@ begin
       t_prio  := 0;
       uontar  := 0;
       uontard := 32000;
-      underobstacle:=false;
 
       if(g_mode=gm_royl)then
        if((dist(x,y,map_hmw,map_hmw)+_missile_r)>=g_royal_r)then
@@ -728,13 +725,12 @@ begin
       end;
 
       uo_vision:=false;
-      underobstacle:=IfUnderObstacle(x,y);
 
-      pushout := solid and _canmove(pu) and (a_rld<=0) and bld;
-      ftarget := _canattack(pu,false);
-      aicode  := (state=ps_comp);
-      foutar  := ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_teleport);
-      swtarget:= false;
+      pushout      := solid and _canmove(pu) and (a_rld<=0) and bld;
+      attack_target:= _canattack(pu,false);
+      aicode       := (state=ps_comp);
+      fteleport_tar:= ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_teleport);
+      swtarget     := false;
       puo:=nil;
       if(_IsUnitRange(uo_tar,@puo))and(aicode=false)then
        if(puo^.player=player)and(puo^.hits>0)and(puo^.rld>0)then
@@ -749,7 +745,7 @@ uab_uac__unit_adv : swtarget:=true;
          ai_collect_data(pu,pu,0);
       end;
 
-      if(ftarget)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       _unit_capture_points(pu);
 
@@ -763,17 +759,17 @@ uab_uac__unit_adv : swtarget:=true;
             uds:=distr(x,y,tu^.x,tu^.y);
             ud :=round(uds);
 
-            tuinapc:=(0<tu^.inapc)and(tu^.inapc<=MaxUnits);
+            tu_inapc:=(0<tu^.inapc)and(tu^.inapc<=MaxUnits);
 
-            if(not tuinapc)then _unit_detect(pu,tu,ud);
+            if(not tu_inapc)then _unit_detect(pu,tu,ud);
 
-            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
+            if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
             if(aicode)then ai_collect_data(pu,tu,ud);
 
             if(tu^.hits>0)then
             begin
-               if(tuinapc)then continue;
+               if(tu_inapc)then continue;
 
                _unit_aura_effects(pu,tu,ud);
 
@@ -784,12 +780,10 @@ uab_uac__unit_adv : swtarget:=true;
                if(swtarget)then
                 if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)then
                  if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=puo^.uo_tar))
-                 or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))then
-                 begin
-                    uo_tar:=tu^.unum;
-                 end;
+                 or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))
+                 then uo_tar:=tu^.unum;
 
-               if(foutar)then
+               if(fteleport_tar)then
                begin
                   ud:=dist(uo_x,uo_y,tu^.x,tu^.y);
                   if(ud<srange)and(ud<uontard)then
@@ -805,7 +799,7 @@ uab_uac__unit_adv : swtarget:=true;
 
       _unit_npush_dcell(pu);
 
-      if(foutar)and(uontar>0)then uo_tar:=uontar;
+      if(fteleport_tar)and(uontar>0)then uo_tar:=uontar;
 
       if(aicode)then ai_code(pu);
 
@@ -843,9 +837,8 @@ begin
       if(au<>nil)then
       begin
          if(_IsUnitRange(au^.inapc,nil))then exit;
-         vsnt         :=au^.vsnt;
-         underobstacle:=au^.underobstacle;
-         udetect      :=false;
+         vsnt   :=au^.vsnt;
+         udetect:=false;
       end
       else udetect:=true;
 
@@ -1031,7 +1024,7 @@ begin
               tu^.uo_y:=tt^.y;
 
               if(ukfly=uf_ground)then
-               if(IfUnderObstacle(tu^.uo_x,tu^.uo_y))then exit;
+               if(pf_isobstacle_zone(tu^.pfzone))then exit;
 
               tr:=_r+tt^.uid^._r;
 
@@ -1127,7 +1120,7 @@ begin
       if(ServerSide)then
       begin
          if(au^.uo_id=ua_unload)or(au^.apcc>au^.apcm)then
-          if(au^.ukfly=false)or(au^.underobstacle=false)then
+          if(not au^.ukfly)or(not pf_isobstacle_zone(au^.pfzone))then
            if(_unit_unload(au,pu))then exit;
 
          if(au^.uo_id in [ua_move,ua_hold,ua_amove])then uo_id:=au^.uo_id;

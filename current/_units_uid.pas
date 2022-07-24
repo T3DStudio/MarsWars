@@ -1015,7 +1015,7 @@ begin
 end;
 UID_Terminator:
 begin
-   _mhits     := 600;
+   _mhits     := 800;
    _renergy   := 300;
    _r         := 16;
    _speed     := 14;
@@ -1023,7 +1023,7 @@ begin
    _ucl       := 10;
    _btime     := 45;
    _apcs      := 3;
-   _limituse  := 300;
+   _limituse  := 400;
    _attack    := atm_always;
    _ukmech    := true;
    _addon     := true;
@@ -1186,7 +1186,7 @@ begin
    _setUPGR(r_hell,upgr_hell_pains     ,30 ,3   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_heye      ,30 ,3   ,50  ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_towers    ,60 ,3   ,100 ,0            ,0                  ,false,false);
-   _setUPGR(r_hell,upgr_hell_teleport  ,60 ,2   ,100 ,0            ,0                  ,false,false);
+   _setUPGR(r_hell,upgr_hell_teleport  ,120,2   ,200 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_hktele    ,180,1   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_paina     ,60 ,2   ,100 ,0            ,0                  ,false,false);
    _setUPGR(r_hell,upgr_hell_mainr     ,60 ,2   ,100 ,0            ,0                  ,false,false);

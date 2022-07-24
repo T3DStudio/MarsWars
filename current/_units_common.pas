@@ -145,11 +145,6 @@ end;
 
 {$ENDIF}
 
-function IfUnderObstacle(ux,uy:integer):boolean;
-begin
-   IfUnderObstacle:=pf_get_area(ux,uy)=pf_solid;
-end;
-
 function _canmove(pu:PTUnit):boolean;
 begin
    with pu^ do
@@ -228,6 +223,7 @@ begin;
    begin
       x:=mm3(1,x,map_mw);
       y:=mm3(1,y,map_mw);
+      pfzone:=pf_get_area(x,y);
    end;
 end;
 
@@ -267,7 +263,6 @@ begin
       vy    :=y;
       _unit_correctXY(pu);
       _unit_clear_order(pu,false);
-      underobstacle:=IfUnderObstacle(x,y);
       {$IFDEF _FULLGAME}
       _unit_mmcoords(pu);
       _unit_sfog(pu);

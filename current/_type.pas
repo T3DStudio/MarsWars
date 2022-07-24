@@ -429,6 +429,7 @@ TUnit = record
    speed,dir,rld,vstp,
    hits,
    unum     : integer;
+   pfzone   : word;
 
    cycle_order,
    order,
@@ -468,7 +469,6 @@ TUnit = record
 
    uo_vision,
    ukfly,
-   underobstacle,
    isbuildarea,
    bld,
    solid,
