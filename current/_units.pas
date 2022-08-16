@@ -88,7 +88,7 @@ UID_Knight : if(buff[ub_advanced]>0)then damage:=damage div 2;
       end;
 
       case g_mode of
-gm_inv    : if(playeri=0)then damage:=damage div 2;
+gm_invasion    : if(playeri=0)then damage:=damage div 2;
       end;
 
       if(_baseregen<0)then begin armor:=0;damage:=hits;end;
@@ -158,7 +158,7 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukfly,true)>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,true)>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
@@ -596,6 +596,7 @@ wtp_unit_light       : begin
                        if(    _uklight     )then incPrio;
                        end;
 wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
+                       if(not _IsUnitRange(inapc,nil))then
                        begin
                           if(speed>0)
                          and(apcc=apcm)then incPrio;
@@ -656,27 +657,17 @@ UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)t
 end;
 
 
-procedure _unit_capture_points(pu:PTUnit);
+procedure _unit_capture_point(pu:PTUnit);
 var i :byte;
-   ud:integer;
 begin
-  with pu^ do
-  with player^ do
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
-    begin
-       ud:=dist(x,y,px,py);
-
-       if(ud<=pr)and(_players[pl].team<>team)then
-        if(ct<gm_cptp_time)
-        then ct+=fr_fps
-        else
-          if(ct>=gm_cptp_time)then
-          begin
-             pl:=playeri;
-             ct:=0;
-          end;
-    end;
+  if(g_mode=gm_KotH)
+  or(g_mode=gm_ecapture)
+  or(g_mode=gm_capture)then
+   with pu^ do
+    for i:=1 to MaxCPoints do
+     with g_cpoints[i] do
+      if(cpcapturer>0)then
+       if(dist(x,y,cpx,cpy)<=cpcapturer)then cpunits[playeri]+=1;
 end;
 
 
@@ -711,7 +702,7 @@ begin
       uontar  := 0;
       uontard := 32000;
 
-      if(g_mode=gm_royl)then
+      if(g_mode=gm_royale)then
        if((dist(x,y,map_hmw,map_hmw)+_missile_r)>=g_royal_r)then
        begin
           _unit_kill(pu,false,false,true);
@@ -728,7 +719,7 @@ begin
 
       pushout      := solid and _canmove(pu) and (a_rld<=0) and bld;
       attack_target:= _canattack(pu,false);
-      aicode       := (state=ps_comp);
+      aicode       := (state=ps_comp);//and(sel);
       fteleport_tar:= ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_teleport);
       swtarget     := false;
       puo:=nil;
@@ -746,8 +737,6 @@ uab_uac__unit_adv : swtarget:=true;
       end;
 
       if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
-
-      _unit_capture_points(pu);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -989,8 +978,8 @@ begin
       if(bld)and(hits>0)and(pu^.bld)and(pu^.hits>0)and(team=pu^.player^.team)then
        if(pu^.buff[ub_hvision]<hell_vision_time)and(upgr[upgr_hell_heye]>0)then
        begin
-          pu^.buff[ub_hvision]:=hell_vision_time;
-          upgr[upgr_hell_heye]-=1;
+          pu^.buff[ub_hvision]:=hell_vision_time*upgr[upgr_hell_heye];
+          rld:=heyenest_reload;
           {$IFDEF _FULLGAME}
           _unit_HvisionEff(pu,nil);
           {$ENDIF}
@@ -1778,12 +1767,12 @@ begin
         for i:=0 to MaxPlayers do
         begin
            _AddToInt(@vsnt[i],fr_fps);
-           if(g_mode<>gm_inv)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
+           if(g_mode<>gm_invasion)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
         end;
    end;
 end;
 
-procedure _obj_cycle;
+procedure _obj_cycle();
 var u : integer;
     pu,
     au: PTUnit;
@@ -1817,7 +1806,8 @@ begin
          end
          else _unit_death(pu);
 
-         _unit_movevis (pu);
+         _unit_movevis(pu);
+         _unit_capture_point(pu);
       end;
    end;
 

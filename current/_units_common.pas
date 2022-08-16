@@ -499,14 +499,15 @@ begin
       tr+=bld_dec_mr;
    end;
 
-   if(_ukfly=false)and(g_mode=gm_cptp)then
+   if(_ukfly=false)then
     for u:=1 to MaxCPoints do
      with g_cpoints[u] do
-     begin
-        o:=base_r;
-        d:=dist(px,py,tx,ty)-o;
-        add(px,py,d,o);
-     end;
+      if(cpcapturer>0)and(cpnobuildr>0)then
+      begin
+         o:=cpnobuildr;
+         d:=dist(cpx,cpy,tx,ty)-o;
+         add(cpx,cpy,d,o);
+      end;
 
    for u:=1 to MaxUnits do
     with _units[u] do
@@ -577,7 +578,7 @@ begin
 end;
 
 
-function _collisionr(tx,ty,tr,skipunit:integer;flylevel,check_obstacles:boolean):byte;
+function _collisionr(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean):byte;
 var u,dx,dy:integer;
 begin
    _collisionr:=0;
@@ -594,16 +595,24 @@ begin
             exit;
          end;
 
-   if(g_mode=gm_cptp)then
-    for u:=1 to MaxCPoints do
-     with g_cpoints[u] do
-      if(dist(tx,ty,px,py)<base_r)then
-      begin
-         _collisionr:=3;
-         exit;
-      end;
+   if(flylevel)then exit;
 
-   if(check_obstacles=false)or(flylevel)then exit;
+   for u:=1 to MaxCPoints do
+    with g_cpoints[u] do
+     if(cpcapturer>0)then
+     begin
+        if(building)
+        then dx:=max2(cpsolidr,cpnobuildr)
+        else dx:=cpsolidr;
+        if(dx<=0)then continue;
+        if(dist(tx,ty,cpx,cpy)<dx)then
+        begin
+           _collisionr:=3;
+           exit;
+        end;
+     end;
+
+   if(check_obstacles=false)then exit;
 
    tr-=bld_dec_mr;
 
@@ -643,6 +652,15 @@ begin
       exit;
    end;
 
+   for u:=1 to MaxCPoints do
+    with g_cpoints[u] do
+     if(cpcapturer>0)and(cpnobuildr>0)then
+      if(dist(tx,ty,cpx,cpy)<cpnobuildr)then
+      begin
+         _InBuildArea:=2;
+         exit;
+      end;
+
    tr+=_uids[buid]._r;
 
    _InBuildArea:=2;
@@ -679,7 +697,8 @@ begin
    else begin _CheckBuildPlace:=3;exit;end;
    end;
 
-   i:=_collisionr(tx,ty,tr+_uids[buid]._r,uskip,_uids[buid]._ukfly,obstacles);
+   with _uids[buid] do
+    i:=_collisionr(tx,ty,tr+_r,uskip,_ukbuilding,_ukfly,obstacles);
    if(i>0)then _CheckBuildPlace:=1;
 end;
 
@@ -693,7 +712,7 @@ begin
       if(upgr[upgr_hell_hktele]>0)then
       begin
          _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0)  );
-         if(_collisionr(x0,y0,uid^._r,unum,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then exit;
+         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then exit;
 
          upgr[upgr_hell_hktele]-=1;
          buff[ub_clcast]:=fr_fps;
@@ -715,7 +734,7 @@ begin
          if(srange<dist(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, true  );
          if(dist(x,y,x0,y0)>srange)then exit;
-         if(_collisionr(x0,y0,uid^._r,unum,ukfly, true )>0)then exit;
+         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, true )>0)then exit;
 
          upgr[upgr_hell_b478tel]-=1;
          buff[ub_clcast]:=fr_2hfps;
@@ -741,6 +760,7 @@ begin
       a_weap_cl:= 0;
       a_tar_cl := 0;
 
+      aiu_attack_timer      :=0;
       aiu_alarm_timer:=0;
       aiu_alarm_d    :=32000;
       aiu_alarm_x    :=-1;
@@ -1398,7 +1418,7 @@ begin
        _unit_dec_Rcntrs(pu);
 
        //if(G_Status=gs_running)then
-        if(playeri>0)or not(g_mode in [gm_inv])then
+        if(playeri>0)or not(g_mode in [gm_invasion])then
          if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;
@@ -1524,6 +1544,7 @@ uab_radar        : SetSRange(radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr
 uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele     ]>0];
 uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld         ]>0];
 uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
+uab_hell_vision  : buff[ub_advanced]:=b2ib[(rld<=0)and(upgr[upgr_hell_heye]>0)];
       end;
 
       // DETECTION
@@ -1532,6 +1553,7 @@ UID_HASymbol,
 UID_UMine,
 UID_URadar       : buff[ub_detect]:=b2ib[upgr[upgr_race_detect[_urace]]>0];
 UID_HEye         : buff[ub_detect]:=_ub_infinity;
+UID_HEyeNest     : buff[ub_detect]:=buff[ub_advanced];
       end;
       if(buff[ub_hvision]>0)then
        if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
@@ -1587,7 +1609,7 @@ UID_UCommandCenter:
               speed:=0;
 
               if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then buff[ub_advanced]:=_ub_infinity;
+               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then buff[ub_advanced]:=_ub_infinity;
            end;
 UID_Major,
 UID_ZMajor:
@@ -1634,6 +1656,9 @@ UID_UCommandCenter: isbuildarea:=not ukfly;
 
       // SRANGE
       case uidi of
+UID_HEyeNest : if(buff[ub_advanced]>0)and(_upgr_srange>0)and(_upgr_srange_step>0)
+               then SetSRange(250+(upgr[_upgr_srange]*_upgr_srange_step))
+               else SetSRange(_srange);
 UID_Cyberdemon,
 UID_Mastermind,
 UID_Engineer,

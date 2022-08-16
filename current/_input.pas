@@ -413,7 +413,7 @@ begin
         if(_testmode>0)and(net_status=0)then
          case k of
             sdlk_end       : if(k_ctrl>2)
-                             then begin if(g_mode=gm_inv)then g_inv_wave_n+=1; end
+                             then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                              else _fsttime:=not _fsttime;
             sdlk_home      : _warpten:=not _warpten;
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;

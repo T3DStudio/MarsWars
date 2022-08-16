@@ -278,7 +278,7 @@ begin
       51 : begin ScrollInt(@map_mw,StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin ScrollInt(@map_liq,1,0,7); Map_premap;end;
       53 : begin ScrollInt(@map_obs,1,0,7); Map_premap;end;
-      54 : begin map_sym:=not map_sym; Map_premap;end;
+      54 : begin map_symmetry:=not map_symmetry; Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
 
 

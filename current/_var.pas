@@ -65,7 +65,7 @@ map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
 map_obs           : byte     = 1;
 map_liq           : byte     = 1;
-map_sym           : boolean  = true;
+map_symmetry           : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
@@ -516,6 +516,7 @@ spr_HMonastery,
 spr_HTotem,
 spr_HAltar,
 spr_HFortress,
+spr_HEyeNest,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,

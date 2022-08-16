@@ -36,13 +36,17 @@ ps_none                = 0;  // player state
 ps_play                = 1;
 ps_comp                = 2;
 
-gm_scir                = 0;  // game mode
-gm_2fort               = 1;
-gm_3fort               = 2;
-gm_cptp                = 3;
-gm_inv                 = 4;
-gm_koh                 = 5;
-gm_royl                = 6;
+gm_scirmish            = 0;  // game mode
+gm_3x3                 = 1;
+gm_2x2x2               = 2;
+gm_capture             = 3;
+gm_invasion            = 4;
+gm_KotH                = 5;
+gm_ecapture            = 6;
+gm_royale              = 7;
+
+allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_ecapture,gm_royale];
+gm_cnt                 = 7;
 
 gs_running             = 0;  //
 {gs_paused1            = 1; 1..MaxPlayers
@@ -56,10 +60,6 @@ gs_waitserver          = 11;
 gs_replaypause         = 12;
 gs_win_team            = 100;
 
-
-allgamemodes              : set of byte = [gm_scir,gm_2fort,gm_3fort,gm_cptp,gm_inv,gm_koh,gm_royl];
-gm_cnt                 = 6;
-
 r_cnt                  = 2;  // race num
 r_random               = 0;
 r_hell                 = 1;
@@ -69,7 +69,7 @@ MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = 3;
+MaxCPoints             = MaxPlayers*3;
 
 MaxSMapW               = 7000;
 MinSMapW               = 2000;
@@ -364,6 +364,8 @@ wtp_scout              = 15;
 //  AI FLAGS
 //
 
+ai_limit_border        = MaxPlayerLimit-(10*MinUnitLimit);
+
 {aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
 aif_pushair            : cardinal = 1 shl 2 ; // push air
@@ -609,34 +611,35 @@ UID_HSymbol            = 3;
 UID_HASymbol           = 4;
 UID_HPools             = 5;
 UID_HTower             = 6;
-UID_HTeleport          = 7;
-UID_HMonastery         = 8;
-UID_HTotem             = 9;
-UID_HAltar             = 10;
-UID_HFortress          = 11;
-UID_HCommandCenter     = 12;
-UID_HMilitaryUnit      = 13;
-UID_HEye               = 14;
+UID_HEyeNest           = 7;
+UID_HTeleport          = 8;
+UID_HMonastery         = 9;
+UID_HTotem             = 10;
+UID_HAltar             = 11;
+UID_HFortress          = 12;
+UID_HCommandCenter     = 13;
+UID_HMilitaryUnit      = 14;
+UID_HEye               = 15;
 
-UID_LostSoul           = 15;
-UID_Imp                = 16;
-UID_Demon              = 17;
-UID_Cacodemon          = 18;
-UID_Knight             = 19;
-UID_Cyberdemon         = 20;
-UID_Mastermind         = 21;
-UID_Pain               = 22;
-UID_Revenant           = 23;
-UID_Mancubus           = 24;
-UID_Arachnotron        = 25;
-UID_Archvile           = 26;
-UID_ZFormer            = 27;
-UID_ZEngineer          = 28;
-UID_ZSergant           = 29;
-UID_ZCommando          = 30;
-UID_ZBomber            = 31;
-UID_ZMajor             = 32;
-UID_ZBFG               = 33;
+UID_LostSoul           = 16;
+UID_Imp                = 17;
+UID_Demon              = 18;
+UID_Cacodemon          = 19;
+UID_Knight             = 20;
+UID_Cyberdemon         = 21;
+UID_Mastermind         = 22;
+UID_Pain               = 23;
+UID_Revenant           = 24;
+UID_Mancubus           = 25;
+UID_Arachnotron        = 26;
+UID_Archvile           = 27;
+UID_ZFormer            = 28;
+UID_ZEngineer          = 29;
+UID_ZSergant           = 30;
+UID_ZCommando          = 31;
+UID_ZBomber            = 32;
+UID_ZMajor             = 33;
+UID_ZBFG               = 34;
 
 // UAC
 
@@ -722,7 +725,8 @@ radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
-hell_vision_time       = fr_fps*15;
+hell_vision_time       = fr_fps*5;
+heyenest_reload        = fr_fps*60;
 
 mstrike_reload         = fr_fps*30;
 
@@ -1105,7 +1109,7 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-svld_size              = 787785;
+svld_size              = 791345;
 rpl_hsize              = 1575;
 
 rpl_none               = 0;

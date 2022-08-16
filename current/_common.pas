@@ -277,17 +277,17 @@ begin
    then PlayerGetTeam:=0
    else
      case gm of
-     gm_2fort: case p of
-               1..3: PlayerGetTeam:=1;
-               4..6: PlayerGetTeam:=4;
-               end;
-     gm_3fort: case p of
-               1,2 : PlayerGetTeam:=1;
-               3,4 : PlayerGetTeam:=3;
-               5,6 : PlayerGetTeam:=5;
-               end;
-     gm_inv  : PlayerGetTeam:=1;
-     else      PlayerGetTeam:=_players[p].team;
+gm_3x3     : case p of
+             1..3: PlayerGetTeam:=1;
+             4..6: PlayerGetTeam:=4;
+             end;
+gm_2x2x2   : case p of
+             1,2 : PlayerGetTeam:=1;
+             3,4 : PlayerGetTeam:=3;
+             5,6 : PlayerGetTeam:=5;
+             end;
+gm_invasion: PlayerGetTeam:=1;
+     else    PlayerGetTeam:=_players[p].team;
      end;
 end;
 

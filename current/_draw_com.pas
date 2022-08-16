@@ -142,10 +142,10 @@ var i  :byte;
 begin
    for i:=0 to MaxPlayers do
    begin
-      if(g_mode=gm_inv)and(i=0)then continue;
+      if(g_mode=gm_invasion)and(i=0)then continue;
 
-      x:=trunc(map_psx[i]*map_mmcx);
-      y:=trunc(map_psy[i]*map_mmcx);
+      x:=round(map_psx[i]*map_mmcx);
+      y:=round(map_psy[i]*map_mmcx);
 
       c:=PlayerGetColor(i);
 
@@ -154,10 +154,11 @@ begin
    end;
 
    case g_mode of
-gm_cptp: for i:=1 to MaxCPoints do
-          with g_cpoints[i] do
-           filledcircleColor(r_minimap,mpx,mpy,mpr,c_aqua);
-gm_koh : with g_cpoints[1] do filledcircleColor(r_minimap,mpx,mpy,mpr,c_purple);
+gm_ecapture,
+gm_KotH,
+gm_capture: for i:=1 to MaxCPoints do
+             with g_cpoints[i] do
+              if(cpcapturer>0)then filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_purple);
     end;
 end;
 
@@ -166,7 +167,7 @@ begin
    sdl_FillRect(r_minimap,nil,0);
    map_bminimap;
    _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_show_positions)or(g_mode in [gm_inv,gm_2fort,gm_3fort])then map_dstarts;
+   if(g_show_positions)or(g_mode in [gm_invasion,gm_3x3,gm_2x2x2])then map_dstarts;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
    vid_menu_redraw:=vid_menu_redraw or _menu;

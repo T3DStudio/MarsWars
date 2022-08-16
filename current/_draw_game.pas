@@ -347,16 +347,25 @@ begin
 end;
 
 procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
-var t:integer;
+var t,p:integer;
 begin
    case g_mode of
-gm_cptp: for t:=1 to MaxCPoints do
-          with g_cpoints[t] do
-          if(ct>0)and((G_Step mod 20)>10)
-          then circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,c_gray            )
-          else circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,PlayerGetColor(pl));
-gm_koh : with g_cpoints[1] do circleColor(tar,lx+px-vid_cam_x,ly+py-vid_cam_y,pr,PlayerGetColor(pl));
-gm_royl: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
+gm_ecapture,
+gm_KotH,
+gm_capture  : for t:=1 to MaxCPoints do
+               with g_cpoints[t] do
+                if(cpcapturer>0)then
+                begin
+                   _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,i2s(cptimer div fr_fps),ta_middle,255,PlayerGetColor(cptimerowner));
+                   for p:=0 to MaxPlayers do
+                    _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunits[p]),ta_middle,255,c_white);
+                   //
+
+                   if(cptimer>0)and((G_Step mod 20)>10)
+                   then circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cptimerowner))
+                   else circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cpowner     ));
+                end;
+gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
 
 
@@ -624,11 +633,10 @@ begin
            if(aiu_alarm_d<32000)then
            lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
 
-
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(a_weap), ta_left,255, PlayerGetColor(playeri));
-           //_draw_text(r_screen,ix,iy+30,i2s(_rx2y_r), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
 
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));

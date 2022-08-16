@@ -95,32 +95,59 @@ begin
    {$ENDIF}
 end;
 
-function _spch(x,y,m:integer;check_symmetry:boolean):boolean;
+function _PlayerStartHere(x,y,m:integer;check_symmetry:boolean):boolean;
 var p:byte;
 begin
    if(m<=0)then
    begin
-      _spch:=true;
+      _PlayerStartHere:=true;
       exit;
    end;
-   _spch:=false;
+   _PlayerStartHere:=false;
 
    if(check_symmetry)then
     if(dist(x,y,map_mw-x,map_mw-y)<m)then
     begin
-       _spch:=true;
+       _PlayerStartHere:=true;
        exit;
     end;
 
    for p:=0 to MaxPlayers do
-   if(dist(x,y,map_psx[p],map_psy[p])<m)then
-   begin
-      _spch:=true;
-      break;
-   end;
+    if(dist(x,y,map_psx[p],map_psy[p])<m)then
+    begin
+       _PlayerStartHere:=true;
+       break;
+    end;
 end;
 
-procedure MCircleStarts(cx,cy,sdir,r:integer);
+function _CPointHere(x,y,m:integer;check_symmetry:boolean):boolean;
+var p:byte;
+begin
+   if(m<=0)then
+   begin
+      _CPointHere:=true;
+      exit;
+   end;
+   _CPointHere:=false;
+
+   if(check_symmetry)then
+    if(dist(x,y,map_mw-x,map_mw-y)<(m*2))then
+    begin
+       _CPointHere:=true;
+       exit;
+    end;
+
+   for p:=1 to MaxCpoints do
+    with g_cpoints[p] do
+     if(cpcapturer>0)then
+      if(dist(x,y,cpx,cpy)<(m+max2(cpsolidr,cpcapturer)))then
+      begin
+         _CPointHere:=true;
+         break;
+      end;
+end;
+
+procedure map_Starts_Circle(cx,cy,sdir,r:integer);
 const dstep = 360 div MaxPlayers;
 var i:byte;
 begin
@@ -133,17 +160,102 @@ begin
    end;
 end;
 
-procedure MSkirmishStarts;
+procedure map_Starts_Default;
 var ix,iy,i,u,c,bb0,bb1,dst:integer;
+begin
+   bb0:=base_r+(map_mw-MinSMapW) div 7;
+   bb1:=map_mw-(bb0*2);
+   dst:=(map_mw div 5)+base_r;
+
+   for i:=1 to MaxPlayers do
+   begin
+      if(map_symmetry)and(i>3)then break;
+      c:=0;
+      u:=dst;
+      while true do
+      begin
+         ix:=bb0+_random(bb1);
+         iy:=bb0+_random(bb1);
+         c+=1;
+         if(c>500 )then u-=1;
+
+         if(c>1000)
+         or(_PlayerStartHere(ix,iy,u,map_symmetry)=false)then break;
+      end;
+
+      map_psx[i]:=ix;
+      map_psy[i]:=iy;
+      if(map_symmetry)then
+      begin
+         map_psx[i+3]:=map_mw-map_psx[i];
+         map_psy[i+3]:=map_mw-map_psy[i];
+      end;
+   end;
+end;
+
+procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer);
+var ix,iy,i,u,b,c:integer;
+    pn:byte;
+procedure _setcpoint(px,py:integer);
+begin
+   if(pn>=num)then exit;
+   pn+=1;
+   with g_cpoints[pn] do
+   begin
+      cpx:=px;
+      cpy:=py;
+      cpsolidr  :=sr;
+      cpnobuildr:=nr;
+      cpenergy  :=energy;
+      cpcapturer:=cr;
+      cpcapturetime:=time;
+      {$IFDEF _FULLGAME}
+      cpmx:=round(cpx*map_mmcx);
+      cpmy:=round(cpy*map_mmcx);
+      cpmr:=round(cpcapturer*map_mmcx);
+      {$ENDIF}
+   end;
+end;
+begin
+   u:=map_mw div 50;
+   b:=map_mw-(u*2);
+
+   pn:=0;
+   i:=0;
+   while(i<num)do
+   begin
+      i+=1;
+      c:=0;
+      while(c<1000)do
+      begin
+         ix:=u+_random(b);
+         iy:=u+_random(b);
+
+         if (not _PlayerStartHere(ix,iy,base_ir,map_symmetry))
+         and(not _CPointHere(ix,iy,base_ir,map_symmetry))then
+         begin
+            _setcpoint(ix,iy);
+            if(map_symmetry)
+            then _setcpoint(map_mw-ix,map_mw-iy);
+         end;
+         c+=1;
+      end;
+      if(pn>MaxCPoints)then break;
+   end;
+end;
+
+procedure map_Starts;
+var ix,iy,i,u,c:integer;
 begin
    for i:=0 to MaxPlayers do
    begin
       map_psx[i]:=-5000;
       map_psy[i]:=-5000;
    end;
+   FillChar(g_cpoints,SizeOf(g_cpoints),0);
 
    case g_mode of
-gm_2fort :
+gm_3x3 :
       begin
          ix:=map_mw div 2;
          iy:=base_rr+(map_mw div 25);
@@ -166,7 +278,7 @@ gm_2fort :
          map_psx[6]:=map_mw-map_psx[3];
          map_psy[6]:=map_mw-map_psy[3];
       end;
-gm_3fort:
+gm_2x2x2:
       begin
          ix:=map_mw div 2;
          iy:=base_rr+(map_mw div 30);
@@ -193,92 +305,47 @@ gm_3fort:
          map_psx[6]:=map_psx[5]+trunc(cos(i*degtorad)*iy);
          map_psy[6]:=map_psy[5]+trunc(sin(i*degtorad)*iy);
       end;
-gm_inv:
+gm_invasion:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
 
-         MCircleStarts(map_hmw,map_hmw,integer(map_seed),base_rr);
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
-gm_koh:
+gm_KotH:
       begin
-         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
          with g_cpoints[1] do
          begin
-            px:=map_hmw;
-            py:=map_hmw;
-            pr:=base_r;
+            cpx:=map_hmw;
+            cpy:=map_hmw;
+            cpcapturer:=base_r;
+            cpcapturetime:=fr_fps*60;
 
             {$IFDEF _FULLGAME}
-            mpx:=round(px*map_mmcx);
-            mpy:=round(py*map_mmcx);
-            mpr:=round(pr*map_mmcx);
+            cpmx:=round(cpx*map_mmcx);
+            cpmy:=round(cpy*map_mmcx);
+            cpmr:=round(cpcapturer*map_mmcx)+1;
             {$ENDIF}
          end;
+         //map_psx[0]:=-5000;
+         //map_psy[0]:=-5000;
       end;
-gm_royl:
-      MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-gm_cptp:
+gm_royale:
+      map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+gm_capture:
       begin
-         map_psx[0]:=map_hmw;
-         map_psy[0]:=map_hmw;
-
-         MCircleStarts(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-
-         bb0:=map_mw div 22;
-         c  :=map_seed mod 360;
-         u  :=map_mw div 6;
-         ix :=map_mw div 2;
-         iy :=360-(360 div MaxCPoints);
-
-         for i:=1 to MaxCPoints do
-         with g_cpoints[i] do
-         begin
-            px:=trunc(ix+cos(c*degtorad)*u);
-            py:=trunc(ix+sin(c*degtorad)*u);
-            pr:=50+_random(bb0);
-            c+=iy;
-
-            {$IFDEF _FULLGAME}
-            mpx:=round(px*map_mmcx);
-            mpy:=round(py*map_mmcx);
-            mpr:=round(pr*map_mmcx);
-            {$ENDIF}
-         end;
-         map_psx[0]:=-5000;
-         map_psy[0]:=-5000;
+         map_Starts_Default;
+         map_CPoints_Default(4,0,100,base_r,0,fr_fps*15);
       end;
-   else
-      ix :=abs(integer(map_seed)) mod map_mw;
-      iy :=0;
-      bb0:=base_r+(map_mw-MinSMapW) div 6;
-      bb1:=map_mw-(bb0*2);
-      dst:=(map_mw div 5)+base_r;
-
-      for i:=1 to MaxPlayers do
+gm_ecapture:
       begin
-         if(map_sym)and(i>3)then break;
-         c:=0;
-         u:=dst;
-         while true do
-         begin
-            ix:=bb0+_random(bb1);
-            iy:=bb0+_random(bb1);
-            c+=1;
-            if(c>500 )then u-=1;
-
-            if(c>1000)
-            or(_spch(ix,iy,u,map_sym)=false)then break;
-         end;
-
-         map_psx[i]:=ix;
-         map_psy[i]:=iy;
-         if(map_sym)then
-         begin
-            map_psx[i+3]:=map_mw-map_psx[i];
-            map_psy[i+3]:=map_mw-map_psy[i];
-         end;
+         map_Starts_Default;
+         map_CPoints_Default(MaxCPoints,50,100,100,300,fr_fps*20);
       end;
+   else map_Starts_Default;
    end;
 end;
 
@@ -304,7 +371,7 @@ begin
    _dnear:=false;
 
    with map_dds[0] do
-   if(map_sym)then
+   if(map_symmetry)then
    begin
       t:=td;
       r:=DID_R[td];
@@ -332,15 +399,15 @@ function _checkPlace(di:byte;ix,iy,doodad_r:integer):boolean;
 begin
    _checkPlace:=false;
    if(_dnear(di,@ix,@iy))
-   or(_spch (ix,iy,doodad_r,false))
+   or(_PlayerStartHere (ix,iy,doodad_r,false))
    then _checkPlace:=true
    else
-     if(map_sym)then
+     if(map_symmetry)then
      begin
         ix:=map_mw-ix;
         iy:=map_mw-iy;
         if(_dnear(di,@ix,@iy))
-        or(_spch (ix,iy,doodad_r,false))then _checkPlace:=true;
+        or(_PlayerStartHere (ix,iy,doodad_r,false))then _checkPlace:=true;
      end;
 end;
 
@@ -351,7 +418,7 @@ begin
    else
    begin
       _dds_a(ix^,iy^,di);
-      if(map_sym)then _dds_a(map_mw-ix^,map_mw-iy^,di);
+      if(map_symmetry)then _dds_a(map_mw-ix^,map_mw-iy^,di);
       _trysetdd:=true;
    end;
 end;
@@ -412,7 +479,7 @@ begin
 
    ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
 
-   if(map_sym)
+   if(map_symmetry)
    then ddc:=mm3(1,round(ddc/2),MaxDoodads)
    else ddc:=mm3(1,      ddc   ,MaxDoodads);
 
@@ -472,13 +539,13 @@ begin
    map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/StepSMap)*StepSMap;
    map_liq:=random(8);
    map_obs:=random(8);
-   map_sym:=random(2)>0;
+   map_symmetry:=random(2)>0;
 end;
 
 procedure Map_premap;
 begin
    map_vars;
-   mSkirmishStarts;
+   map_Starts;
    {$IFDEF _FULLGAME}
    map_seed2theme;
    map_tllbc;

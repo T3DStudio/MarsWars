@@ -12,9 +12,12 @@ begin
       PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
                                 UID_UNuclearPlant,UID_URMStation ],1,false);
 
+      if(g_mode=gm_ecapture)then
+      PlayerSetAllowedUnits(p,[ UID_HSymbol,UID_HASymbol,
+                                UID_UGenerator,UID_UAGenerator ],0,false);
+
+
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
-
-
 
       {ai_pushtime := fr_fps*30;
       ai_pushmin  := 55;
@@ -299,7 +302,7 @@ begin
 
    Map_randommap;
 
-   g_mode       :=gm_scir;
+   g_mode       :=gm_scirmish;
    g_start_base :=random(gms_g_startb+1);
    g_addon      :=random(3)<>0;
 
@@ -480,7 +483,7 @@ begin
       then //cmp_code
       else
       {$ENDIF}
-       if(g_mode<>gm_inv)then
+       if(g_mode<>gm_invasion)then
         for p:=0 to MaxPlayers do
          if(team_army[p]>0)then
           if(G_WTeam<255)then
@@ -570,14 +573,14 @@ begin
    3  : g_inv_mn:=90;
    else g_inv_mn:=MaxPlayerUnits;
    end;
-end;
+end;  }
 
-procedure g_inv_spawn;
+procedure GameModeInvasion;
 const max_wave_time = fr_fps*150;
 var i,tx,ty:integer;
   mon:byte;
 begin
-   if(G_WTeam=255)then
+   {if(G_WTeam=255)then
    if(_players[0].army=0)then
    begin
       if(g_inv_t=0)then
@@ -707,24 +710,68 @@ begin
          end;
       end;
    end
-   else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1);
-end;  }
+   else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1); }
+end;
+
+procedure CPoint_ChangeOwner(i,newowner:byte);
+begin
+   with g_cpoints[i] do
+   if(cpowner<>newowner)then
+   begin
+      if(cpowner>0)then
+       with _players[cpowner] do
+       begin
+          cenergy-=cpenergy;
+          menergy-=cpenergy;
+       end;
+      cpowner:=newowner;
+      if(cpowner>0)then
+       with _players[cpowner] do
+       begin
+          cenergy+=cpenergy;
+          menergy+=cpenergy;
+       end;
+   end;
+end;
 
 procedure GameModeCPoints;
-var i,t,e:integer;
+var i,p,iowner,iplayers:integer;
 begin
-   e:=0;
-   t:=0;
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
+    if(cpcapturer>0)then
     begin
-       if(ct>0)then ct-=1;
-       if(t=0)or(t<>_players[pl].team)then
-       begin
-          t:=_players[pl].team;
-          e:=1;
-       end
-       else e+=1;
+       iowner  :=cpowner;
+       iplayers:=0;
+       for p:=0 to MaxPlayers do
+        if(cpunits[p]>0)then
+        begin
+           iplayers+=1;
+           iowner  :=p;
+           cpunits[p]:=0;
+        end;
+
+       if(iplayers=0)
+       then cptimer:=0
+       else
+         if(iplayers=1)then
+          if(cpowner=iowner)
+          then cptimer:=0
+          else
+          begin
+             if(cptimerowner<>iowner)then
+             begin
+                cptimerowner:=iowner;
+                cptimer:=0;
+             end;
+             if(cptimer<cpcapturetime)
+             then cptimer+=1
+             else
+             begin
+                cptimer:=0;
+                CPoint_ChangeOwner(i,iowner);
+             end;
+          end;
     end;
 
    {if(e=MaxCPoints)and(G_WTeam=255)then
@@ -773,10 +820,12 @@ begin
             G_Step+=1;
 
             case g_mode of
-            gm_cptp : GameModeCPoints;
-            gm_inv  : ;
-            gm_royl : if(_cycle_order=0)then
-                       if(g_royal_r>0)then g_royal_r-=1;
+            gm_KotH,
+            gm_ecapture,
+            gm_capture   : GameModeCPoints;
+            gm_invasion  : GameModeInvasion;
+            gm_royale    : if(_cycle_order=0)then
+                            if(g_royal_r>0)then g_royal_r-=1;
             end;
          end;
          _obj_cycle;

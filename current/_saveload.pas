@@ -68,7 +68,7 @@ begin
             BlockRead(f,vr,sizeof(map_obs  ));
             if(vr>7)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
                     else _svld_stat:=_svld_stat+str_m_obs+_str_mx(vr)+#13+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_sym  ));   ////////
+            BlockRead(f,vr,sizeof(map_symmetry  ));   ////////
             BlockRead(f,vr,sizeof(theme_i  ));
             if(vr>=theme_n)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]+#13+' ';vr:=0;
@@ -205,7 +205,7 @@ begin
    BlockWrite(f,map_mw          ,SizeOf(map_mw          ));
    BlockWrite(f,map_liq         ,SizeOf(map_liq         ));
    BlockWrite(f,map_obs         ,SizeOf(map_obs         ));
-   BlockWrite(f,map_sym         ,sizeof(map_sym         ));
+   BlockWrite(f,map_symmetry         ,sizeof(map_symmetry         ));
    BlockWrite(f,theme_i         ,SizeOf(theme_i         ));
    BlockWrite(f,g_addon         ,SizeOf(g_addon         ));
    BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
@@ -280,7 +280,7 @@ begin
          BlockRead(f,map_mw          ,SizeOf(map_mw          ));
          BlockRead(f,map_liq         ,SizeOf(map_liq         ));
          BlockRead(f,map_obs         ,SizeOf(map_obs         ));
-         BlockRead(f,map_sym         ,sizeof(map_sym         ));
+         BlockRead(f,map_symmetry         ,sizeof(map_symmetry         ));
          BlockRead(f,theme_i         ,SizeOf(theme_i         ));map_seed2theme;
          BlockRead(f,g_addon         ,SizeOf(g_addon         ));
          BlockRead(f,g_mode          ,SizeOf(g_mode          ));

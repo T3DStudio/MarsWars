@@ -297,17 +297,18 @@ begin
 
    if((gstp mod i)=0)then
     case g_mode of
-gm_inv : begin
-            _wudata_byte(g_inv_wave_n,rpl);
-            _wudata_int (g_inv_time  ,rpl);
-         end;
-gm_cptp  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].pl,rpl);
-gm_koh   : with g_cpoints[1] do
-           begin
-              _wudata_byte(pl,rpl);
-              _wudata_int (ct,rpl);
-           end;
-gm_royl  : _wudata_int(g_royal_r,rpl);
+gm_invasion : begin
+                 _wudata_byte(g_inv_wave_n,rpl);
+                 _wudata_int (g_inv_time  ,rpl);
+              end;
+gm_ecapture,
+gm_capture  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].cpowner,rpl);
+gm_KotH     : with g_cpoints[1] do
+              begin
+                 _wudata_byte(cpowner,rpl);
+                 _wudata_int (cptimer,rpl);
+              end;
+gm_royale   : _wudata_int(g_royal_r,rpl);
     end;
 
    if(rpl)then
@@ -681,7 +682,7 @@ begin
    else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));if(ioresult<>0)then _rudata_byte:=def; {$I+} end;
 end;
 
-function _rudata_word(rpl:boolean;def:byte):word;
+function _rudata_word(rpl:boolean;def:word):word;
 begin
    if(rpl=false)
    then _rudata_word:=net_readword
@@ -960,19 +961,19 @@ begin
 
    if((gstp mod i)=0)then
     case g_mode of
-gm_inv : begin
-            _PNU:=g_inv_wave_n;
-            g_inv_wave_n:=_rudata_byte(rpl,0);
-            if(g_inv_wave_n>_PNU)then SoundPlayUnit(snd_teleport,nil,nil);
-            g_inv_time :=_rudata_int (rpl,0);
-         end;
-gm_cptp  : for i:=1 to MaxCPoints do g_cpoints[i].pl:=_rudata_byte(rpl,0);
-gm_koh   : with g_cpoints[1] do
-           begin
-              pl:=_rudata_byte(rpl,0);
-              ct:=_rudata_int (rpl,0);
-           end;
-gm_royl: g_royal_r:=_rudata_int(rpl,0);
+gm_invasion : begin
+                 _PNU:=g_inv_wave_n;
+                 g_inv_wave_n:=_rudata_byte(rpl,0);
+                 if(g_inv_wave_n>_PNU)then SoundPlayUnit(snd_teleport,nil,nil);
+                 g_inv_time :=_rudata_int (rpl,0);
+              end;
+gm_capture  : for i:=1 to MaxCPoints do g_cpoints[i].cpowner:=_rudata_byte(rpl,0);
+gm_KotH     : with g_cpoints[1] do
+              begin
+                 cpowner:=_rudata_byte(rpl,0);
+                 cptimer :=_rudata_int (rpl,0);
+              end;
+gm_royale   : g_royal_r:=_rudata_int(rpl,0);
     end;
 
    g_player_status:=_rudata_byte(rpl,0);

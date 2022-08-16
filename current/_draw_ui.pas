@@ -22,13 +22,14 @@ aummat_info      : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_
      end;
 
    case g_mode of
-gm_cptp: for i:=1 to MaxCPoints do
-          with g_cpoints[i] do
-           if(ct>0)and((G_Step mod 20)>10)
-           then circleColor(r_minimap,mpx,mpy,mpr,c_gray            )
-           else circleColor(r_minimap,mpx,mpy,mpr,PlayerGetColor(pl));
-gm_koh : with g_cpoints[1] do circleColor(r_minimap,mpx,mpy,mpr,PlayerGetColor(pl));
-gm_royl: circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
+gm_ecapture,
+gm_capture,
+gm_KotH     : for i:=1 to MaxCPoints do
+               with g_cpoints[i] do
+                if(cptimer>0)and((G_Step mod 20)>10)
+                 then circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cptimerowner))
+                 else circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cpowner     ));
+gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
    end;
 end;
 
@@ -85,13 +86,17 @@ begin
       m_brushy+=vid_cam_y-ly;
 
       // points areas
-      if(g_mode=gm_cptp)then
-       for i:=1 to MaxCPoints do
-        with g_cpoints[i] do
-         circleColor(tar,
-         lx+px-vid_cam_x,
-         ly+py-vid_cam_y,
-         base_r,c_blue);
+      case g_mode of
+gm_capture,
+gm_KotH,
+gm_ecapture : for i:=1 to MaxCPoints do
+               with g_cpoints[i] do
+                if(cpcapturer>0)and(cpnobuildr>0)then
+                 circleColor(tar,
+                 lx+cpx-vid_cam_x,
+                 ly+cpy-vid_cam_y,
+                 cpnobuildr,c_blue);
+      end;
 
       // map build rect
       rectangleColor(tar,
@@ -548,7 +553,7 @@ begin
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time);
 
    // INVASION
-   if(g_mode=gm_inv)then
+   if(g_mode=gm_invasion)then
    begin
       D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);

@@ -1,7 +1,4 @@
 
-
-
-
 function _sm2s(sm:PTMWSModel;animk:byte;dir,anim:integer;stat:pbyte):PTMWTexture;  // sprite model 2 sprite
 var dd,i:integer;
 function aa3(b0,a,b1:integer):integer;

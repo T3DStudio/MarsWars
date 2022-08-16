@@ -416,6 +416,11 @@ begin
    setWeaponESND(1,nil,snd_hell_attack    ,0,MID_Imp);
    un_eid_bcrater_y:=15;
 end;
+UID_HEyeNest:
+begin
+   setMWSModel(@spr_HEyeNest,nil);
+   setBuildingSND(snd_hell_hteleport);
+end;
 UID_HTeleport:
 begin
    _animw:=5;

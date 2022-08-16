@@ -379,7 +379,11 @@ o_x1,o_y1  :integer;
    ai_max_tech1,
    ai_max_spec0,
    ai_max_spec1,
+   ai_max_spec2,
    ai_max_towers,
+   ai_max_blimit,
+   ai_attack_limit,
+   ai_attack_pause,
    ai_scout_u_cur,
    ai_scout_u_cur_w,
    ai_scout_u_new,
@@ -477,6 +481,7 @@ TUnit = record
    aiu_armyaround_ally,
    aiu_armyaround_enemy,
    aiu_need_detect,
+   aiu_attack_timer,
    aiu_alarm_timer,
    aiu_alarm_d,
    aiu_alarm_x,
@@ -524,10 +529,14 @@ TMissile = record
 end;
 
 TCTPoint = record
-   px,py,pr,
-   mpx,mpy,mpr,
-   ct       : integer;
-   pl       : byte;
+   cpx ,cpy ,cpsolidr,cpcapturer,cpnobuildr,
+   cpmx,cpmy,cpmr,
+   cpenergy,
+   cpcapturetime,
+   cptimer  : integer;
+   cptimerowner,
+   cpowner  : byte;
+   cpunits  : array[0..MaxPlayers] of integer;
 end;
 
 TDoodad = record

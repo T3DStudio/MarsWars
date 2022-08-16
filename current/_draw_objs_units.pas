@@ -296,7 +296,7 @@ end;
 
 procedure _unit_aspr(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
-var spr : PTMWTexture;
+var spr,eff : PTMWTexture;
 depth,
 alphab,
 alpha,t : integer;
@@ -348,8 +348,7 @@ begin
             then aura:=c_awhite
             else
               if(playeri=0)and(not _ukbuilding)then
-               if(g_mode in [gm_inv])then aura:=c_ablack;
-
+               if(g_mode in [gm_invasion])then aura:=c_ablack;
 
             if(_ukbuilding)then
              if(bld)then
@@ -372,6 +371,11 @@ begin
 
                 case uidi of
 UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,0,@spr_ptur,alpha);
+UID_HEyeNest      : if(buff[ub_advanced    ]>0)then
+                    begin
+                       eff:=_sm2s(@spr_HEye,sms_stand,0,0,nil);
+                       SpriteListAddUnit(vx,vy-eff^.hh,depth,0,0,0,eff,alpha);
+                    end;
                 end;
              end
              else
