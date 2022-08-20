@@ -358,7 +358,7 @@ gm_capture  : for t:=1 to MaxCPoints do
                 begin
                    _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,i2s(cptimer div fr_fps),ta_middle,255,PlayerGetColor(cptimerowner));
                    for p:=0 to MaxPlayers do
-                    _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunits[p]),ta_middle,255,c_white);
+                    _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunitsp[p]),ta_middle,255,c_white);
                    //
 
                    if(cptimer>0)and((G_Step mod 20)>10)
@@ -627,11 +627,13 @@ begin
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
+              if(aiu_alarm_d<32000)then
+              lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
+
+              lineColor(r_screen,ix,iy,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
 
            end;
 
-           if(aiu_alarm_d<32000)then
-           lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));

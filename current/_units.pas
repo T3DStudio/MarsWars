@@ -598,6 +598,7 @@ wtp_unit_light       : begin
 wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
                        if(not _IsUnitRange(inapc,nil))then
                        begin
+                          if(apcm=0   )then incPrio;
                           if(speed>0)
                          and(apcc=apcm)then incPrio;
                           if(ukfly    )then incPrio;
@@ -631,7 +632,9 @@ begin
 wtp_distance         : if(ud>a_tard^)then exit;
 wtp_rmhits           : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
            else
-              if(tu^.hits>a_tarp^^.hits)then exit;  // default
+              if(aw_max_range<0)and(aw_type=wpt_directdmg)
+              then begin if(ud>a_tard^)then exit; end
+              else if(tu^.hits>a_tarp^^.hits)then exit;  // default
            end;
            if(n_prio<t_prio^)then exit;
         end;
@@ -667,7 +670,11 @@ begin
     for i:=1 to MaxCPoints do
      with g_cpoints[i] do
       if(cpcapturer>0)then
-       if(dist(x,y,cpx,cpy)<=cpcapturer)then cpunits[playeri]+=1;
+       if(dist(x,y,cpx,cpy)<=cpcapturer)then
+       begin
+          cpunitsp[playeri     ]+=uid^._limituse;
+          cpunitst[player^.team]+=uid^._limituse;
+       end;
 end;
 
 

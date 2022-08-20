@@ -873,6 +873,7 @@ begin
       armylimit+=_limituse;
       ucl_e[_ukbuilding,_ucl]+=1;
       ucl_c[_ukbuilding     ]+=1;
+      ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
 
       bld:=ubld;
@@ -1193,6 +1194,7 @@ begin
       armylimit-=_limituse;
       ucl_e[_ukbuilding,_ucl]-=1;
       ucl_c[_ukbuilding     ]-=1;
+      ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
    end;
 end;

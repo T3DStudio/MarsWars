@@ -306,6 +306,7 @@ TUPID = record  // upgrade
 end;
 
 TAIAlarm = record
+   aia_enemy_base :boolean;
    aia_enemy_count,
    aia_x,
    aia_y    : integer;
@@ -353,6 +354,7 @@ o_x1,o_y1  :integer;
    uid_x   : array[byte] of integer;
 
    ucl_c,                                           // count buildings/units
+   ucl_l,                                           // limit buildings/units
    ucl_cs  : array[false..true] of integer;         // count selected buildings/units
 
    uprodm,
@@ -536,7 +538,10 @@ TCTPoint = record
    cptimer  : integer;
    cptimerowner,
    cpowner  : byte;
-   cpunits  : array[0..MaxPlayers] of integer;
+   cpunitst_pstate,
+   cpunitst,
+   cpunitsp_pstate,
+   cpunitsp : array[0..MaxPlayers] of integer;
 end;
 
 TDoodad = record

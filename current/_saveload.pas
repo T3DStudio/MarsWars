@@ -187,6 +187,55 @@ theme_map_trt
 theme_map_crt
 }
 
+procedure _svld_make_save_size;
+begin
+   svld_size:=
+   SizeOf(ver             )+
+   SizeOf(menu_s2         )+
+   SizeOf(_cmp_sel        )+
+   SizeOf(cmp_skill       )+
+   SizeOf(map_seed        )+
+   SizeOf(map_iseed       )+
+   SizeOf(map_mw          )+
+   SizeOf(map_liq         )+
+   SizeOf(map_obs         )+
+   SizeOf(theme_i         )+
+   SizeOf(g_addon         )+
+   SizeOf(g_mode          )+
+   SizeOf(g_start_base    )+
+   SizeOf(g_show_positions)+
+   SizeOf(HPlayer         )+
+   SizeOf(TPList          )+
+   SizeOf(_units          )+
+   SizeOf(_missiles       )+
+   SizeOf(_effects        )+
+   SizeOf(map_dds         )+
+   SizeOf(vid_cam_x       )+
+   SizeOf(vid_cam_y       )+
+   SizeOf(PlayerColor     )+
+   SizeOf(G_Step          )+
+   SizeOf(vid_rtui        )+
+   SizeOf(m_brush         )+
+   SizeOf(g_inv_wave_n    )+
+   SizeOf(g_inv_time      )+
+   SizeOf(g_inv_wave_t    )+
+   SizeOf(g_cpoints       )+
+   SizeOf(g_royal_r       )+
+   SizeOf(g_status        )+
+   SizeOf(_cycle_order    )+
+   SizeOf(_cycle_regen    )+
+   SizeOf(team_army       )+
+   SizeOf(ui_alarms       )+
+   SizeOf(map_psx         )+
+   SizeOf(map_psy         )+
+   SizeOf(map_rpos        )+
+   SizeOf(theme_map_lqt   )+
+   SizeOf(theme_map_blqt  )+
+   SizeOf(theme_map_trt   )+
+   SizeOf(theme_map_crt   )+1;
+   writeln(svld_size);
+end;
+
 procedure _svld_save;
 var f:file;
 begin
@@ -205,7 +254,7 @@ begin
    BlockWrite(f,map_mw          ,SizeOf(map_mw          ));
    BlockWrite(f,map_liq         ,SizeOf(map_liq         ));
    BlockWrite(f,map_obs         ,SizeOf(map_obs         ));
-   BlockWrite(f,map_symmetry         ,sizeof(map_symmetry         ));
+   BlockWrite(f,map_symmetry    ,sizeof(map_symmetry    ));
    BlockWrite(f,theme_i         ,SizeOf(theme_i         ));
    BlockWrite(f,g_addon         ,SizeOf(g_addon         ));
    BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
@@ -280,7 +329,7 @@ begin
          BlockRead(f,map_mw          ,SizeOf(map_mw          ));
          BlockRead(f,map_liq         ,SizeOf(map_liq         ));
          BlockRead(f,map_obs         ,SizeOf(map_obs         ));
-         BlockRead(f,map_symmetry         ,sizeof(map_symmetry         ));
+         BlockRead(f,map_symmetry    ,sizeof(map_symmetry    ));
          BlockRead(f,theme_i         ,SizeOf(theme_i         ));map_seed2theme;
          BlockRead(f,g_addon         ,SizeOf(g_addon         ));
          BlockRead(f,g_mode          ,SizeOf(g_mode          ));

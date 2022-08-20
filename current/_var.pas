@@ -244,6 +244,8 @@ _svld_ln          : integer = 0;
 _svld_ls          : integer = 0;
 _svld_sm          : integer = 0;
 
+svld_size         : cardinal = 0;
+
 rpls_fstatus      : byte = 0;   // file status (none,write,read)
 rpls_pnu          : byte = 0;   // quality
 rpls_str_name     : shortstring = 'LastReplay';

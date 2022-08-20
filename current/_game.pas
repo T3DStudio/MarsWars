@@ -28,7 +28,6 @@ begin
       ai_pushtimei:= 0;
       ai_pushfrmi := 0; }
    end;
-   PlayerSetSkirmishAIParams(p);
 end;
 
 procedure PlayersSwap(p0,p1:byte);
@@ -239,8 +238,6 @@ begin
 
       if(p=0)then
       begin
-         // neutrall player settings depend from g_mode
-
          race :=r_hell;
          state:=ps_comp;
       end
@@ -256,15 +253,18 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state<>ps_none)then
-         begin
-            if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots;//
-
-            PlayerSetSkirmishTech(p);
-            GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
-         end;
+         if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots;//
       end;
    end;
+
+   for p:=1 to MaxPlayers do
+    with _players[p] do
+     if(state<>ps_none)then
+     begin
+        PlayerSetSkirmishTech(p);
+        PlayerSetSkirmishAIParams(p);
+        GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
+     end;
 
    {$IFDEF _FULLGAME}
    MoveCamToPoint(map_psx[HPlayer] , map_psy[HPlayer]);
@@ -741,15 +741,20 @@ begin
     with g_cpoints[i] do
     if(cpcapturer>0)then
     begin
+       cpunitsp_pstate:=cpunitsp;
+       cpunitst_pstate:=cpunitst;
        iowner  :=cpowner;
        iplayers:=0;
        for p:=0 to MaxPlayers do
-        if(cpunits[p]>0)then
-        begin
-           iplayers+=1;
-           iowner  :=p;
-           cpunits[p]:=0;
-        end;
+       begin
+          if(cpunitsp[p]>0)then
+          begin
+             iplayers+=1;
+             iowner  :=p;
+          end;
+          cpunitsp[p]:=0;
+          cpunitst[p]:=0;
+       end;
 
        if(iplayers=0)
        then cptimer:=0

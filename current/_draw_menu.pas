@@ -88,7 +88,7 @@ begin
              _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace]   , ta_middle, 255, c);
              if(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxtt, u,b2s(PlayerGetTeam(g_mode,p)), ta_middle, 255, c);
-             if((g_player_status and (1 shl p))=0)and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_gray);
+             if((g_player_status and (1 shl p))=0)and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_red);
           end
           else
             if(g_ai_slots)>0then

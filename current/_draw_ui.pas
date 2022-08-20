@@ -11,11 +11,11 @@ begin
         case al_v of
 aummat_attacked_b,
 aummat_created_b,
-aummat_upgrade   : RectangleColor(r_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
+aummat_upgrade    : RectangleColor(r_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
 aummat_advance,
 aummat_attacked_u,
 aummat_created_u,
-aummat_info      : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_c);
+aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_c);
         end;
 
         al_t-=2;
@@ -34,10 +34,18 @@ gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui
 end;
 
 procedure d_Minimap(tar:pSDL_Surface);
+var i:byte;
 begin
    rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh, c_white);
 
    d_Alarms;
+
+   with _players[HPlayer] do
+    for i:=0 to MaxPlayers do
+     with ai_alarms[i] do
+      if(aia_enemy_count>0)then
+       circleColor(r_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
+
 
    _draw_surf(tar      ,1,1,r_minimap );
    _draw_surf(r_minimap,0,0,r_bminimap);
@@ -513,7 +521,7 @@ begin
 end;
 
 procedure D_UIText(tar:pSDL_Surface);
-var i:integer;
+var i,pl:integer;
   str:shortstring;
   col:cardinal;
 begin
@@ -542,8 +550,10 @@ begin
    // resources
    with _players[HPlayer] do
    begin
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenergy          )+#22+' / '+#19+i2s(menergy),ta_left,255,c_white);
-      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+l2s(armylimit+uprodl)+#22+' / '+#16+ui_limitstr,ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      pl:=armylimit+uprodl;
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenergy)+#22+' / '+#19+i2s(menergy),ta_left,255,c_white);
+      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+l2s(pl     )+#22+' / '+#16+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
+      _draw_text(tar,ui_armyx ,ui_armyy+font_w,l2s(ucl_l[false])+'/'+l2s(ucl_l[true]),ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

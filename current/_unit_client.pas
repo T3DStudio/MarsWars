@@ -365,6 +365,7 @@ begin
       armylimit+=_limituse;
       ucl_e[_ukbuilding,_ucl]+=1;
       ucl_c[_ukbuilding     ]+=1;
+      ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
 
       if(_IsUnitRange(inapc,nil))then _units[inapc].apcc+=_apcs;
@@ -429,6 +430,7 @@ begin
       armylimit-=_limituse;
       ucl_e[_ukbuilding,_ucl]-=1;
       ucl_c[_ukbuilding     ]-=1;
+      ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
 
       if(_IsUnitRange(inapc,nil))then dec(_units[inapc].apcc,_apcs);
