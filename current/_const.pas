@@ -42,11 +42,10 @@ gm_2x2x2               = 2;
 gm_capture             = 3;
 gm_invasion            = 4;
 gm_KotH                = 5;
-gm_ecapture            = 6;
-gm_royale              = 7;
+gm_royale              = 6;
 
-allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_ecapture,gm_royale];
-gm_cnt                 = 7;
+allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
+gm_cnt                 = 6;
 
 gs_running             = 0;  //
 {gs_paused1            = 1; 1..MaxPlayers
@@ -116,7 +115,15 @@ outlogfn               : shortstring = 'out.txt';
 
 gms_g_startb           = 6;
 gms_g_maxai            = 8;
+gms_g_maxcps           = 5;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CPoints life
+//
+
+g_cgenerators_ltime    : array[0..gms_g_maxcps] of cardinal = (0,fr_fps*60*5,fr_fps*60*10,fr_fps*60*15,fr_fps*60*20,0);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -338,6 +345,16 @@ wpt_directdmg          = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  Weapon: move status
+//
+
+wmove_impassible       = 0;
+wmove_closer           = 1;
+wmove_farther          = 2;
+wmove_noneed           = 3;
+
+////////////////////////////////////////////////////////////////////////////////
+//
 //  Weapon: priority type
 //
 
@@ -357,6 +374,7 @@ wtp_light              = 12;
 wtp_unit_light         = 13;
 wtp_building_nlight    = 14;
 wtp_scout              = 15;
+wtp_notme_hits         = 16;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,6 +383,8 @@ wtp_scout              = 15;
 //
 
 ai_limit_border        = MaxPlayerLimit-(10*MinUnitLimit);
+
+aif_base_smart_opening : cardinal = 1;
 
 {aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
@@ -494,7 +514,7 @@ upgr_hell_barmor       = 3;  // base building armor
 upgr_hell_mattack      = 4;  // melee attack damage
 upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
-upgr_hell_heye         = 7;  // hell Eye
+upgr_hell_heye         = 7;  // hell Eye time
 upgr_hell_towers       = 8;  // towers range
 upgr_hell_teleport     = 9;  // Teleport reload
 upgr_hell_hktele       = 10; // HK teleportation
@@ -518,7 +538,7 @@ upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_plasmt        = 36; // turrent for apcs
-upgr_uac_detect        = 37; // detectors
+upgr_uac_srange        = 37; // infantry srange
 upgr_uac_towers        = 38; // towers sr
 upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
@@ -548,7 +568,6 @@ upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0        
 upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
 upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
 upgr_race_9bld         : array[1..r_cnt] of byte = (upgr_hell_9bld   , upgr_uac_9bld   );
-upgr_race_detect       : array[1..r_cnt] of byte = (upgr_hell_heye   , upgr_uac_detect );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -714,18 +733,19 @@ base_r                 = 350;
 base_ir                = base_r+(base_r div 2);
 base_rr                = base_r*2;
 base_3r                = base_r*3;
+base_4r                = base_r*4;
 
 apc_exp_damage         = 70;
 regen_period           = fr_fps*2;
 order_period           = fr_2hfps+1;
-vistime                = order_period+1;
+vistime                = order_period+2;
 
 radar_reload           = fr_fps*60;
 radar_btime            = radar_reload-(fr_fps*5);
 radar_upgr_levels      = 4;
 radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
-hell_vision_time       = fr_fps*5;
+hell_vision_time       = fr_fps*4;
 heyenest_reload        = fr_fps*60;
 
 mstrike_reload         = fr_fps*30;

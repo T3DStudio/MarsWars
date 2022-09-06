@@ -29,7 +29,7 @@ begin
 
         for ix:=sx to ex do
          for iy:=sy to ey do
-          if(dist(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,x,y)<=(r-bld_dec_mr))then
+          if(point_dist_int(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,x,y)<=(r-bld_dec_mr))then
            pf_pathgrid_areas[ix,iy]:=pf_solid;
      end;
 

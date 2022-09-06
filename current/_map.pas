@@ -106,14 +106,14 @@ begin
    _PlayerStartHere:=false;
 
    if(check_symmetry)then
-    if(dist(x,y,map_mw-x,map_mw-y)<m)then
+    if(point_dist_int(x,y,map_mw-x,map_mw-y)<m)then
     begin
        _PlayerStartHere:=true;
        exit;
     end;
 
    for p:=0 to MaxPlayers do
-    if(dist(x,y,map_psx[p],map_psy[p])<m)then
+    if(point_dist_int(x,y,map_psx[p],map_psy[p])<m)then
     begin
        _PlayerStartHere:=true;
        break;
@@ -131,7 +131,7 @@ begin
    _CPointHere:=false;
 
    if(check_symmetry)then
-    if(dist(x,y,map_mw-x,map_mw-y)<(m*2))then
+    if(point_dist_int(x,y,map_mw-x,map_mw-y)<(m*2))then
     begin
        _CPointHere:=true;
        exit;
@@ -140,7 +140,7 @@ begin
    for p:=1 to MaxCpoints do
     with g_cpoints[p] do
      if(cpcapturer>0)then
-      if(dist(x,y,cpx,cpy)<(m+max2(cpsolidr,cpcapturer)))then
+      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpcapturer)))then
       begin
          _CPointHere:=true;
          break;
@@ -193,22 +193,32 @@ begin
    end;
 end;
 
-procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer);
+procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
 var ix,iy,i,u,b,c:integer;
-    pn:byte;
-procedure _setcpoint(px,py:integer);
+function _setcpoint(px,py:integer):boolean;
+var pn:byte;
 begin
-   if(pn>=num)then exit;
-   pn+=1;
+   for pn:=1 to MaxCPoints do
+    if(g_cpoints[pn].cpcapturer<=0)then break;
+
+   if(pn>MaxCPoints)then
+   begin
+      _setcpoint:=true;
+      exit;
+   end
+   else _setcpoint:=false;
+
    with g_cpoints[pn] do
    begin
-      cpx:=px;
-      cpy:=py;
+      cpx       :=px;
+      cpy       :=py;
+      cpzone    :=pf_get_area(px,py);
       cpsolidr  :=sr;
       cpnobuildr:=nr;
       cpenergy  :=energy;
       cpcapturer:=cr;
       cpcapturetime:=time;
+      cplifetime   :=lifetime;
       {$IFDEF _FULLGAME}
       cpmx:=round(cpx*map_mmcx);
       cpmy:=round(cpy*map_mmcx);
@@ -217,14 +227,15 @@ begin
    end;
 end;
 begin
+   if(newpoints)then FillChar(g_cpoints,SizeOf(g_cpoints),0);
    u:=map_mw div 50;
    b:=map_mw-(u*2);
 
-   pn:=0;
+   writeln(num);
    i:=0;
    while(i<num)do
    begin
-      i+=1;
+      i+=1+byte(map_symmetry);
       c:=0;
       while(c<1000)do
       begin
@@ -234,13 +245,13 @@ begin
          if (not _PlayerStartHere(ix,iy,base_ir,map_symmetry))
          and(not _CPointHere(ix,iy,base_ir,map_symmetry))then
          begin
-            _setcpoint(ix,iy);
-            if(map_symmetry)
-            then _setcpoint(map_mw-ix,map_mw-iy);
+            if(_setcpoint(ix,iy))then exit;
+            if(map_symmetry)then
+             if(_setcpoint(map_mw-ix,map_mw-iy))then exit;
+            break;
          end;
          c+=1;
       end;
-      if(pn>MaxCPoints)then break;
    end;
 end;
 
@@ -338,15 +349,13 @@ gm_royale:
 gm_capture:
       begin
          map_Starts_Default;
-         map_CPoints_Default(4,0,100,base_r,0,fr_fps*15);
-      end;
-gm_ecapture:
-      begin
-         map_Starts_Default;
-         map_CPoints_Default(MaxCPoints,50,100,100,300,fr_fps*20);
+         map_CPoints_Default(4,0,100,base_r,0,fr_fps*15,0,true);
       end;
    else map_Starts_Default;
    end;
+
+   if(g_cgenerators>0)then
+    map_CPoints_Default(MaxCPoints,50,100,100,500,fr_fps*20,g_cgenerators_ltime[g_cgenerators],false);
 end;
 
 function _dec_min_r(t1,t2:byte):integer;
@@ -388,7 +397,7 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
-   if(dist2(x,y,ix^,iy^)<_dec_min_r(t,td))then
+   if(point_dist_rint(x,y,ix^,iy^)<_dec_min_r(t,td))then
    begin
       _dnear:=true;
       break;

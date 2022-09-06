@@ -71,8 +71,8 @@ procedure _unit_sfog(pu:PTUnit);
 begin
    with pu^ do
    begin
-      fx :=x div fog_cw;
-      fy :=y div fog_cw;
+      fx :=round(x/fog_cw);
+      fy :=round(y/fog_cw);
    end;
 end;
 
@@ -259,6 +259,10 @@ begin
    with uid^    do
    with player^ do
    begin
+      if(rld>0)
+      then lvlstr_r:=#19+i2s((rld div fr_fps)+1)
+      else lvlstr_r:='';
+
       wl      :=0;
       atset   :=[];
       for i:=0 to MaxUnitWeapons do
@@ -364,18 +368,13 @@ begin
                 begin
                    for t:=0 to MaxUnitProdsI do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','','');
                    end;
                 end;
 
                 case uidi of
 UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,0,@spr_ptur,alpha);
-UID_HEyeNest      : if(buff[ub_advanced    ]>0)then
-                    begin
-                       eff:=_sm2s(@spr_HEye,sms_stand,0,0,nil);
-                       SpriteListAddUnit(vx,vy-eff^.hh,depth,0,0,0,eff,alpha);
-                    end;
                 end;
              end
              else

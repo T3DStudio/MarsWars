@@ -296,20 +296,25 @@ begin
    else i:=fr_2hfps;
 
    if((gstp mod i)=0)then
-    case g_mode of
+   begin
+      case g_mode of
 gm_invasion : begin
                  _wudata_byte(g_inv_wave_n,rpl);
                  _wudata_int (g_inv_time  ,rpl);
               end;
-gm_ecapture,
-gm_capture  : for i:=1 to MaxCPoints do _wudata_byte(g_cpoints[i].cpowner,rpl);
-gm_KotH     : with g_cpoints[1] do
-              begin
-                 _wudata_byte(cpowner,rpl);
-                 _wudata_int (cptimer,rpl);
-              end;
 gm_royale   : _wudata_int(g_royal_r,rpl);
-    end;
+      end;
+      if(g_mode=gm_capture)
+      or(g_mode=gm_KotH)
+      or(g_cgenerators>0)then
+       for i:=1 to MaxCPoints do
+        with g_cpoints[i] do
+        begin
+           _wudata_byte(cpowner,rpl);
+           if(g_mode=gm_KotH)and(i=1)then _wudata_int(cptimer,rpl);
+           //+lifetime
+        end;
+   end;
 
    if(rpl)then
    begin
@@ -412,7 +417,7 @@ begin
 
                  upproda+=1;
                  upprodu[_puid]+=1;
-                 cenergy-=_upids[_puid]._up_renerg;
+                 cenergy-=pprod_e[i];//_upids[_puid]._up_renerg;
               end;
          end;
       end;
@@ -470,7 +475,8 @@ begin
 
                   upproda-=1;
                   upprodu[_puid]-=1;
-                  cenergy+=_upids[_puid]._up_renerg;
+                  pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                  cenergy+=pprod_e[i];
                end;
          end;
       end;
@@ -645,7 +651,7 @@ begin
                begin
                   vstp:=UnitStepTicks;
 
-                  dir :=p_dir(uo_bx,uo_by,x,y);
+                  dir :=point_dir(uo_bx,uo_by,x,y);
                end;
             end;
          end;
@@ -962,21 +968,27 @@ begin
    else i:=fr_2hfps;
 
    if((gstp mod i)=0)then
-    case g_mode of
+   begin
+      case g_mode of
 gm_invasion : begin
                  _PNU:=g_inv_wave_n;
                  g_inv_wave_n:=_rudata_byte(rpl,0);
                  if(g_inv_wave_n>_PNU)then SoundPlayUnit(snd_teleport,nil,nil);
                  g_inv_time :=_rudata_int (rpl,0);
               end;
-gm_capture  : for i:=1 to MaxCPoints do g_cpoints[i].cpowner:=_rudata_byte(rpl,0);
-gm_KotH     : with g_cpoints[1] do
-              begin
-                 cpowner:=_rudata_byte(rpl,0);
-                 cptimer :=_rudata_int (rpl,0);
-              end;
 gm_royale   : g_royal_r:=_rudata_int(rpl,0);
-    end;
+      end;
+      if(g_mode=gm_capture)
+      or(g_mode=gm_KotH)
+      or(g_cgenerators>0)then
+       for i:=1 to MaxCPoints do
+        with g_cpoints[i] do
+        begin
+           cpowner:=_rudata_byte(rpl,0);
+           if(g_mode=gm_KotH)and(i=1)then cptimer:=_rudata_int(rpl,0);
+           //lifetime
+        end;
+   end;
 
    g_player_status:=_rudata_byte(rpl,0);
    if(g_player_status>0)then

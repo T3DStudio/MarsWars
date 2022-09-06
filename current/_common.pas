@@ -1,10 +1,11 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
 procedure ai_clear_vars(pu:PTUnit);forward;
-procedure ai_alarm_target(aid:byte;tu:PTUnit;x,y,ud:integer);forward;
+procedure ai_set_nearest_alarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
+function ai_HighTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
@@ -174,7 +175,10 @@ begin
    then PlayersAddToLog(sender,targets,sender         ,0,0,message,0,0,local)
    else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message,0,0,local);
 end;
-
+procedure GameLogCommon(sender,targets:byte;message:shortstring;local:boolean);
+begin
+   PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0,local);
+end;
 procedure GameLogEndGame(wteam:byte);
 begin
    if(ServerSide=false)then exit;
@@ -337,30 +341,30 @@ begin
    if(x<0)then sign:=-1;
 end;
 
-function dist2(dx0,dy0,dx1,dy1:integer):integer;
+function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;
 begin
    dx0:=abs(dx1-dx0);
    dy0:=abs(dy1-dy0);
    if(dx0<dy0)
-   then dist2:=(123*dy0+51*dx0) shr 7
-   else dist2:=(123*dx0+51*dy0) shr 7;
+   then point_dist_rint:=(123*dy0+51*dx0) shr 7
+   else point_dist_rint:=(123*dx0+51*dy0) shr 7;
 end;
 
-function dist(dx0,dy0,dx1,dy1:integer):integer;
+function point_dist_int(dx0,dy0,dx1,dy1:integer):integer;
 begin
-   dist:=round(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
+   point_dist_int:=round(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
 end;
 
-function distr(dx0,dy0,dx1,dy1:integer):single;
+function point_dist_real(dx0,dy0,dx1,dy1:integer):single;
 begin
-   distr:=sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1)));
+   point_dist_real:=sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1)));
 end;
 
-function p_dir(x0,y0,x1,y1:integer):integer;
+function point_dir(x0,y0,x1,y1:integer):integer;
 var vx,vy,avx,avy:integer;
     res:single;
 begin
-   p_dir:=270;
+   point_dir:=270;
    vx:=x1-x0;
    vy:=y1-y0;
 
@@ -383,7 +387,7 @@ begin
 
    if(vx<0)and(res=0)then res:=180;
 
-   p_dir:=trunc(360-res);
+   point_dir:=trunc(360-res);
 end;
 
 function dir_diff(dir1,dir2:integer):integer;
@@ -518,6 +522,46 @@ false : setr(ureq_barracks    ,n_barracks<=0);
       end;
    end;
 end;
+
+function ipower(base,n:integer):integer;
+begin
+   ipower:=1;
+   if(n<0)or(base<=0)then exit;
+   case n of
+   0    : ipower:=1;
+   1    : ipower:=base;
+   else  ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
+   end;
+end;
+
+function _upid_energy(upgr,lvl:byte):integer;
+begin
+   _upid_energy:=0;
+   with _upids[upgr] do
+    if(0<lvl)and(lvl<=_up_max)then
+     if(_up_mfrg)or((_up_renerg_xpl<=0)and(_up_renerg_apl<=0))
+     then _upid_energy:=_up_renerg
+     else
+     begin
+        lvl-=1;
+        _upid_energy:=(_up_renerg*ipower(_up_renerg_xpl,lvl))+(_up_renerg_apl*lvl);
+     end;
+end;
+function _upid_time(upgr,lvl:byte):integer;
+begin
+   _upid_time:=0;
+   with _upids[upgr] do
+    if(0<lvl)and(lvl<=_up_max)then
+     if(_up_mfrg)or((_up_time_xpl<=0)and(_up_time_apl<=0))
+     then _upid_time:=_up_time
+     else
+     begin
+        lvl-=1;
+        _upid_time:=(_up_time*ipower(_up_time_xpl,lvl))+(_up_time_apl*lvl);
+     end;
+end;
+
+
 function _upid_conditionals(pl:PTPlayer;up:byte):cardinal;
 procedure setr(ni:cardinal;b:boolean);
 begin if(b)then _upid_conditionals:=_upid_conditionals or ni;end;
@@ -528,7 +572,7 @@ begin
    begin
       setr(ureq_ruid   ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  );
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
-      setr(ureq_energy , cenergy<_up_renerg                     );
+      setr(ureq_energy , cenergy<_upid_energy(up,upgr[up]+1)   );
       setr(ureq_time   , _up_time<=0                           );
       setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
       setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));

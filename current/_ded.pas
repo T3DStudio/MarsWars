@@ -25,7 +25,7 @@ begin
     with _Players[p] do
      if(state=ps_none)then
      begin
-        if(g_mode in [gm_scir,gm_cptp])then  team:=t;
+        if(g_mode in [gm_scirmish,gm_capture])then  team:=t;
         race:=r;
         mrace:=race;
         ai_skill:=a;
@@ -103,50 +103,51 @@ begin
    '-h',
    '-help':
    begin
-      PlayersAddLog(0,log_to_all,lmt_game,'MarsWars dedicated server, '+str_ver  ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'New map: -m [seed size lakes obs sym]',false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Add AI player: -p [R/H/U team skill]' ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Remove all AI players: -k or -noai'   ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Set 1..6 teams to AI players: -ffa'   ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Game moddes: -s - scirmish'           ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'  -f2/3- 2/3 fortress, -i - invasion' ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'  -c - capturing points, -a - assault',false);
-      PlayersAddLog(0,log_to_all,lmt_game,'  -rb - royal battle'                 ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'  -ud/-d2 - UDOOM/DOOM 2 mode'        ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Show/hide player starts: -ps'         ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Starting base options: -st 1-6'       ,false);
-      PlayersAddLog(0,log_to_all,lmt_game,'Fill empty slots with AI: -fs 0-7'    ,false);
+      GameLogCommon(0,log_to_all,'MarsWars dedicated server, '+str_ver  ,false);
+      GameLogCommon(0,log_to_all,'New map: -m [seed size lakes obs sym]',false);
+      GameLogCommon(0,log_to_all,'Add AI player: -p [R/H/U team skill]' ,false);
+      GameLogCommon(0,log_to_all,'Remove all AI players: -k or -noai'   ,false);
+      GameLogCommon(0,log_to_all,'Set 1..6 teams to AI players: -ffa'   ,false);
+      GameLogCommon(0,log_to_all,'Game moddes: -s - scirmish'           ,false);
+      GameLogCommon(0,log_to_all,'  -f2/3- 2/3 fortress, -i - invasion' ,false);
+      GameLogCommon(0,log_to_all,'  -c - capturing points, -a - assault',false);
+      GameLogCommon(0,log_to_all,'  -rb - royal battle'                 ,false);
+      GameLogCommon(0,log_to_all,'  -ud/-d2 - UDOOM/DOOM 2 mode'        ,false);
+      GameLogCommon(0,log_to_all,'Show/hide player starts: -ps'         ,false);
+      GameLogCommon(0,log_to_all,'Starting base options: -st 1-6'       ,false);
+      GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-7'    ,false);
       exit;
    end;
    '-m'  : if(a<6)
            then begin Map_randommap; Map_premap;end
            else
            begin
-              map_seed:=s2c(args[1]);
-              map_mw  :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
-              map_liq :=min2(7,s2b(args[3]));
-              map_obs :=min2(7,s2b(args[4]));
-              map_sym :=s2i(args[5])>0;
+              map_seed    :=s2c(args[1]);
+              map_mw      :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
+              map_liq     :=min2(7,s2b(args[3]));
+              map_obs     :=min2(7,s2b(args[4]));
+              map_symmetry:=s2i(args[5])>0;
               Map_premap;
            end;
    '-p'  : if(a<3)
            then with _players[pl] do NewAI(race,team,4)
            else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),7));
-   '-ffa': cmp_ffa;
-   '-noai',
-   '-k'  : RemoveAI;
-   '-d2' : g_addon:=true;
-   '-ud' : g_addon:=false;
-   '-f2' : begin g_mode:=gm_2fort; Map_premap; end;
-   '-f3' : begin g_mode:=gm_3fort; Map_premap; end;
-   '-s'  : begin g_mode:=gm_scir;  Map_premap; cmp_ffa; end;
-   '-i'  : begin g_mode:=gm_inv;   Map_premap; end;
-   '-c'  : begin g_mode:=gm_cptp;  Map_premap; cmp_ffa; end;
-   '-a'  : begin g_mode:=gm_aslt;  Map_premap; end;
-   '-rb' : begin g_mode:=gm_royl;  Map_premap; end;
-   '-ps' : g_show_positions:=not g_show_positions;
-   '-st' : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
-   '-fs' : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
+'-ffa'   : cmp_ffa;
+'-noai',
+'-k'     : RemoveAI;
+'-d2'    : g_addon:=true;
+'-ud'    : g_addon:=false;
+'-3x3'   : begin g_mode:=gm_3x3;      Map_premap; end;
+'-2x2x2' : begin g_mode:=gm_2x2x2;    Map_premap; end;
+'-scir'  : begin g_mode:=gm_scirmish; Map_premap; cmp_ffa; end;
+'-inv'   : begin g_mode:=gm_invasion; Map_premap; end;
+'-cpt'   : begin g_mode:=gm_capture;  Map_premap; cmp_ffa; end;
+'-koth'  : begin g_mode:=gm_koth;     Map_premap; end;
+'-rb'    : begin g_mode:=gm_royale;   Map_premap; end;
+'-cg'    : begin g_cgenerators:=not g_cgenerators; Map_premap;end;
+'-ps'    : g_show_positions:=not g_show_positions;
+'-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
+'-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
    else exit;
    end;
    vid_menu_redraw:=true;
@@ -218,9 +219,9 @@ begin
    if(g_started=false)
    then SVGameStatus:=str_gnstarted
    else
-     if(G_Paused=0)
+     if(G_Status=0)
      then SVGameStatus:=str_grun
-     else SVGameStatus:=str_gpaused+b2s(G_Paused);
+     else SVGameStatus:=str_gpaused+b2s(G_Status);
 end;
 
 procedure _dedScreen;
@@ -244,8 +245,8 @@ begin
       8 : writeln('         ',str_starta  ,' ',str_startat[g_start_base]);
       10: writeln('         ',str_aislots ,' ',g_ai_slots           );
       11: writeln;
-      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym       ,56);
-      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2pm[map_sym][2],56);
+      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym            ,56);
+      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2pm[map_symmetry][2],56);
       15: writeln;
       16: ps(0);
       18: ps(1);

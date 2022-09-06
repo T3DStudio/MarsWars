@@ -40,6 +40,16 @@ begin
    end;
 end;
 
+procedure _CPExplode(vx,vy:integer);
+begin
+   _effect_add(vx,vy,-5,EID_db_u0);
+   if(PointInScreenP(vx,vy,nil))then
+   begin
+      _effect_add(vx,vy,_depth(vy+1,false),EID_BBExp);
+      SoundPlayUnit(snd_exp,nil,nil);
+   end;
+end;
+
 procedure _unit_summon_effects(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
@@ -155,7 +165,7 @@ begin
     begin
        _canmove:=false;
 
-       if(speed<=0)or(hits<=0)or(bld=false)then exit;
+       if(speed<=0)or(hits<=0)or(bld=false)or(StayWaitForNextTarget>0)then exit;
 
        if(a_rld>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -407,7 +417,7 @@ vx,vy,
 begin
    r0+=1;
    r1+=1;
-   d:=dist(x0,y0,x1,y1);
+   d:=point_dist_int(x0,y0,x1,y1);
    if(abs(r0-r1)<=d)and(d<=(r0+r1))and(d>0)then
    begin
       a:=(sqr(r0)-sqr(r1)+sqr(d))/(2*d);
@@ -493,7 +503,7 @@ begin
            if(r>0)and(t>0)then
            begin
               o:=tr+r;
-              d:=dist(x,y,tx,ty)-o;
+              d:=point_dist_int(x,y,tx,ty)-o;
               add(x,y,d,o);
            end;
       tr+=bld_dec_mr;
@@ -505,7 +515,7 @@ begin
       if(cpcapturer>0)and(cpnobuildr>0)then
       begin
          o:=cpnobuildr;
-         d:=dist(cpx,cpy,tx,ty)-o;
+         d:=point_dist_int(cpx,cpy,tx,ty)-o;
          add(cpx,cpy,d,o);
       end;
 
@@ -517,7 +527,7 @@ begin
         if(not _IsUnitRange(inapc,nil))then
         begin
            o:=tr+_r;
-           d:=dist(x,y,tx,ty);
+           d:=point_dist_int(x,y,tx,ty);
            add(x,y,d-o,o);
         end;
 
@@ -554,7 +564,7 @@ begin
       if(hits>0)and(speed<=0)and(ukfly=aukfly)and(bld)and(playeri=pl)and(isbuildarea)then
        if(buid in ups_builder)and(not _IsUnitRange(inapc,nil))then
        begin
-          o:=dist(x,y,tx,ty)-srange;
+          o:=point_dist_int(x,y,tx,ty)-srange;
           if(o<dr)then
           begin
              dx:=x;
@@ -566,7 +576,7 @@ begin
 
    if(dr<32000)then
    begin
-      o :=dist(dx,dy,tx,ty);
+      o :=point_dist_int(dx,dy,tx,ty);
       dr:=o-sr;
       if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
@@ -589,7 +599,7 @@ begin
       with uid^ do
        if(hits>0)and(ukfly=flylevel)and(_IsUnitRange(inapc,nil)=false)then
         if(speed<=0)or(not bld)then
-         if(dist(x,y,tx,ty)<(tr+_r))then
+         if(point_dist_int(x,y,tx,ty)<(tr+_r))then
          begin
             _collisionr:=2;
             exit;
@@ -605,7 +615,7 @@ begin
         then dx:=max2(cpsolidr,cpnobuildr)
         else dx:=cpsolidr;
         if(dx<=0)then continue;
-        if(dist(tx,ty,cpx,cpy)<dx)then
+        if(point_dist_int(tx,ty,cpx,cpy)<dx)then
         begin
            _collisionr:=3;
            exit;
@@ -625,7 +635,7 @@ begin
       for u:=0 to n-1 do
        with l[u]^ do
         if(r>0)and(t>0)then
-         if(dist(x,y,tx,ty)<(tr+r))then
+         if(point_dist_int(x,y,tx,ty)<(tr+r))then
          begin
             _collisionr:=4;
             exit;
@@ -655,7 +665,7 @@ begin
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
      if(cpcapturer>0)and(cpnobuildr>0)then
-      if(dist(tx,ty,cpx,cpy)<cpnobuildr)then
+      if(point_dist_int(tx,ty,cpx,cpy)<cpnobuildr)then
       begin
          _InBuildArea:=2;
          exit;
@@ -671,7 +681,7 @@ begin
       if(hits>0)and(bld)and(isbuildarea)and(playeri=pl)then
        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
         if(buid in ups_builder)and(_IsUnitRange(inapc,nil)=false)then
-         if(dist(x,y,tx,ty)<srange)then
+         if(point_dist_int(x,y,tx,ty)<srange)then
          begin
             _InBuildArea:=0; // inside build area
             break;
@@ -731,9 +741,9 @@ begin
      with player^ do
       if(upgr[upgr_hell_b478tel]>0)then
       begin
-         if(srange<dist(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
+         if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, true  );
-         if(dist(x,y,x0,y0)>srange)then exit;
+         if(point_dist_int(x,y,x0,y0)>srange)then exit;
          if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, true )>0)then exit;
 
          upgr[upgr_hell_b478tel]-=1;
@@ -1066,8 +1076,9 @@ begin
              begin
                 upproda+=1;
                 upprodu[upid]+=1;
-                cenergy-=_up_renerg;
-                pprod_r[pn]:=_up_time;
+                pprod_e[pn]:=_upid_energy(upid,upgr[upid]+1);
+                cenergy-=pprod_e[pn];
+                pprod_r[pn]:=_upid_time(upid,upgr[upid]+1);
                 pprod_u[pn]:=upid;
 
                 _unit_supgrade_p:=true;
@@ -1101,7 +1112,7 @@ begin
 
          upproda-=1;
          upprodu[upid]-=1;
-         cenergy+=_upids[upid]._up_renerg;
+         cenergy+=pprod_e[pn]; //_upids[upid]._up_renerg;
          pprod_r[pn]:=0;
 
          _unit_cupgrade_p:=true;
@@ -1207,7 +1218,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      dir:=p_dir(x,y,uo_x,uo_y);
+      dir:=point_dir(x,y,uo_x,uo_y);
       if(_uids[_uid]._ukfly=uf_fly)
       then sr:=0
       else sr:=_r;//+_uids[_uid]._r;
@@ -1255,7 +1266,7 @@ begin
       or((armylimit+uprodl)>MaxPlayerLimit)
       or(cenergy<0)
       or(uid_e[_uid]>=a_units[_uid])
-      then _unit_ctraining_p(pu,255,i)
+      then //_unit_ctraining_p(pu,255,i)
       else
         if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
         begin
@@ -1281,7 +1292,7 @@ begin
      if(cenergy<0)
      or(upgr[_uid]>=_upids[_uid]._up_max)
      or(upgr[_uid]>=a_upgrs[_uid])
-     then _unit_cupgrade_p(pu,255,i)
+     then //_unit_cupgrade_p(pu,255,i)
      else
        if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
        begin
@@ -1396,7 +1407,7 @@ begin
    with uu^ do
    begin
       if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)
-      then td:=min2(ud,dist(x,y,tu^.uo_x,tu^.uo_y))
+      then td:=min2(ud,point_dist_int(x,y,tu^.uo_x,tu^.uo_y))
       else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then
@@ -1517,6 +1528,12 @@ begin
         if(fastdeath)
         then hits:=fdead_hits
         else hits:=0;
+   end
+   else
+   if(hits>dead_hits)then
+   begin
+      hits:=ndead_hits;
+      _unit_remove(pu);
    end;
 end;
 
@@ -1546,14 +1563,13 @@ uab_radar        : SetSRange(radar_range[mm3(0,upgr[upgr_uac_radar_r],radar_upgr
 uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_revtele     ]>0];
 uab_uac__unit_adv: buff[ub_advanced]:=b2ib[upgr[upgr_uac_6bld         ]>0];
 uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
-uab_hell_vision  : buff[ub_advanced]:=b2ib[(rld<=0)and(upgr[upgr_hell_heye]>0)];
+uab_hell_vision  : buff[ub_advanced]:=b2ib[rld<=0];
       end;
 
       // DETECTION
       case uidi of
-UID_HASymbol,
 UID_UMine,
-UID_URadar       : buff[ub_detect]:=b2ib[upgr[upgr_race_detect[_urace]]>0];
+UID_URadar,
 UID_HEye         : buff[ub_detect]:=_ub_infinity;
 UID_HEyeNest     : buff[ub_detect]:=buff[ub_advanced];
       end;
@@ -1611,7 +1627,11 @@ UID_UCommandCenter:
               speed:=0;
 
               if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then buff[ub_advanced]:=_ub_infinity;
+               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then
+               begin
+                  buff[ub_advanced]:=_ub_infinity;
+                  buff[ub_clcast  ]:=fr_2fps;
+               end;
            end;
 UID_Major,
 UID_ZMajor:
@@ -1672,9 +1692,12 @@ UID_ZMajor   : if(buff[ub_advanced]>0)
                then SetSRange(_srange+50)
                else SetSRange(_srange   );
       else
-        if(_upgr_srange>0)and(_upgr_srange_step>0)then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step));
+        if(_upgr_srange>0)and(_upgr_srange_step>0)
+        then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step))
+        else SetSRange(_srange);
       end;
-   end;
+   end
+   else SetSRange(_r+_r);
 end;
 
 

@@ -70,6 +70,7 @@ TVisPrim = record
    x1,y1    : integer;
    color    : cardinal;
    text_lt,
+   text_lt2,
    text_rt,
    text_rd,
    text_ld  : string6;
@@ -292,7 +293,11 @@ TUPID = record  // upgrade
    _up_btni,
    _up_race  : byte;
    _up_renerg,
+   _up_renerg_xpl, // energy * per level
+   _up_renerg_apl, // energy + per level
    _up_time,
+   _up_time_xpl,
+   _up_time_apl,
    _up_max   : integer;
    _up_addon,
    _up_mfrg  : boolean;
@@ -383,6 +388,7 @@ o_x1,o_y1  :integer;
    ai_max_spec1,
    ai_max_spec2,
    ai_max_towers,
+   ai_min_towers,
    ai_max_blimit,
    ai_attack_limit,
    ai_attack_pause,
@@ -392,6 +398,10 @@ o_x1,o_y1  :integer;
    ai_scout_u_new_w,
    ai_detection_pause
            : integer;
+   ai_max_upgrlvl
+           : byte;
+   ai_hptargets
+           : TSoB;
    ai_skill: byte;
    ai_alarms
            : array[0..MaxPlayers] of TAIAlarm;
@@ -443,7 +453,8 @@ TUnit = record
    uidi     : byte;
 
    uprod_r,
-   pprod_r  : array[0..MaxUnitProdsI] of integer;
+   pprod_r,
+   pprod_e  : array[0..MaxUnitProdsI] of integer;
    uprod_u,
    pprod_u  : array[0..MaxUnitProdsI] of byte;
 
@@ -473,6 +484,7 @@ TUnit = record
    vsni,
    vsnt     : array[0..MaxPlayers] of integer;
 
+   StayWaitForNextTarget:byte;
    uo_vision,
    ukfly,
    isbuildarea,
@@ -500,6 +512,7 @@ TUnit = record
    shadow
             : integer;
    lvlstr_w,
+   lvlstr_r,
    lvlstr_a,
    lvlstr_s : string6;
    {$ENDIF}
@@ -535,13 +548,15 @@ TCTPoint = record
    cpmx,cpmy,cpmr,
    cpenergy,
    cpcapturetime,
-   cptimer  : integer;
+   cptimer      : integer;
+   cplifetime   : cardinal;
    cptimerowner,
-   cpowner  : byte;
+   cpowner      : byte;
+   cpzone       : word;
    cpunitst_pstate,
    cpunitst,
    cpunitsp_pstate,
-   cpunitsp : array[0..MaxPlayers] of integer;
+   cpunitsp     : array[0..MaxPlayers] of integer;
 end;
 
 TDoodad = record

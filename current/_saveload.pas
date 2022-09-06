@@ -77,8 +77,10 @@ begin
                                    else _svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;
 
             vr:=0;
-            BlockRead(f,vr,sizeof(g_start_base ));vr:=0;
-            BlockRead(f,vr,sizeof(g_show_positions  ));vr:=0;
+            BlockRead(f,vr,sizeof(g_start_base    ));vr:=0;
+            BlockRead(f,vr,sizeof(g_show_positions));vr:=0;
+            BlockRead(f,vr,sizeof(g_cgenerators   ));vr:=0;
+
             BlockRead(f,hp,sizeof(HPlayer  ));
 
             BlockRead(f,pls,SizeOf(TPList));
@@ -204,6 +206,7 @@ begin
    SizeOf(g_mode          )+
    SizeOf(g_start_base    )+
    SizeOf(g_show_positions)+
+   SizeOf(g_cgenerators   )+
    SizeOf(HPlayer         )+
    SizeOf(TPList          )+
    SizeOf(_units          )+
@@ -233,7 +236,6 @@ begin
    SizeOf(theme_map_blqt  )+
    SizeOf(theme_map_trt   )+
    SizeOf(theme_map_crt   )+1;
-   writeln(svld_size);
 end;
 
 procedure _svld_save;
@@ -260,6 +262,7 @@ begin
    BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
    BlockWrite(f,g_start_base    ,SizeOf(g_start_base    ));
    BlockWrite(f,g_show_positions,SizeOf(g_show_positions));
+   BlockWrite(f,g_cgenerators   ,SizeOf(g_cgenerators   ));
    BlockWrite(f,HPlayer         ,SizeOf(HPlayer         ));
    BlockWrite(f,_players        ,SizeOf(TPList          ));
    BlockWrite(f,_units          ,SizeOf(_units          ));
@@ -335,6 +338,7 @@ begin
          BlockRead(f,g_mode          ,SizeOf(g_mode          ));
          BlockRead(f,g_start_base    ,SizeOf(g_start_base    ));
          BlockRead(f,g_show_positions,SizeOf(g_show_positions));
+         BlockRead(f,g_cgenerators   ,SizeOf(g_cgenerators   ));
          BlockRead(f,HPlayer         ,SizeOf(HPlayer         ));
          BlockRead(f,_players        ,SizeOf(TPList          ));
          BlockRead(f,_units          ,SizeOf(_units          ));
@@ -378,8 +382,6 @@ begin
 
          if(_menu)
          then ToggleMenu;
-
-         //for vr:=0 to MaxPlayers do _setAI(vr);
 
          for u:=1 to MaxUnits do
           with _units[u] do

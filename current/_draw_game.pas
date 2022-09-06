@@ -183,7 +183,7 @@ begin
       color:=acolor;
    end;
 end;
-procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,srt,srd,sld:string6);
+procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
    vid_prims+=1;
    setlength(vid_prim,vid_prims);
@@ -196,10 +196,11 @@ begin
       x1   :=ax1;
       y1   :=ay1;
       color:=acolor;
-      text_lt:=slt;
-      text_rt:=srt;
-      text_rd:=srd;
-      text_ld:=sld;
+      text_lt :=slt;
+      text_lt2:=slt2;
+      text_rt :=srt;
+      text_rd :=srd;
+      text_ld :=sld;
    end;
 end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
@@ -232,24 +233,25 @@ begin
    end;
 end;
 
-procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,srt,srd,sld:string6);
+procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
    vid_prims+=1;
    setlength(vid_prim,vid_prims);
    FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
    with vid_prim[vid_prims-1] do
    begin
-      kind   :=uinfo_rect;
-      x0     :=ax0-aspr^.hw;
-      y0     :=ay0-aspr^.hh;
-      x1     :=x0+aspr^.w;
-      y1     :=y0+aspr^.h;
-      sprite :=aspr;
-      color  :=acolor;
-      text_lt:=slt;
-      text_rt:=srt;
-      text_rd:=srd;
-      text_ld:=sld;
+      kind    :=uinfo_rect;
+      x0      :=ax0-aspr^.hw;
+      y0      :=ay0-aspr^.hh;
+      x1      :=x0+aspr^.w;
+      y1      :=y0+aspr^.h;
+      sprite  :=aspr;
+      color   :=acolor;
+      text_lt :=slt;
+      text_lt2:=slt2;
+      text_rt :=srt;
+      text_rd :=srd;
+      text_ld :=sld;
    end;
 end;
 
@@ -332,8 +334,8 @@ begin
          if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
 
          if(playeri=HPlayer)
-         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(order),buffstr,i2s6(apcm),i2s6(apcc))
-         else UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,lvlstr_w   ,buffstr,lvlstr_a  ,lvlstr_s  );
+         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(order),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
+         else UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,lvlstr_w   ,''      ,buffstr,lvlstr_a  ,lvlstr_s  );
       end;
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 
@@ -349,22 +351,21 @@ end;
 procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t,p:integer;
 begin
-   case g_mode of
-gm_ecapture,
-gm_KotH,
-gm_capture  : for t:=1 to MaxCPoints do
-               with g_cpoints[t] do
-                if(cpcapturer>0)then
-                begin
-                   _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,i2s(cptimer div fr_fps),ta_middle,255,PlayerGetColor(cptimerowner));
-                   for p:=0 to MaxPlayers do
-                    _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunitsp[p]),ta_middle,255,c_white);
-                   //
+   for t:=1 to MaxCPoints do
+    with g_cpoints[t] do
+     if(cpcapturer>0)then
+     begin
+        _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,i2s(cptimer div fr_fps),ta_middle,255,PlayerGetColor(cptimerowner));
+        for p:=0 to MaxPlayers do
+         _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunitsp[p]),ta_middle,255,c_white);
+                      //
 
-                   if(cptimer>0)and((G_Step mod 20)>10)
-                   then circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cptimerowner))
-                   else circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cpowner     ));
-                end;
+         if(cptimer>0)and((G_Step mod 20)>10)
+         then circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cptimerowner))
+         else circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cpowner     ));
+     end;
+
+   case g_mode of
 gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
    end;
 
@@ -403,10 +404,11 @@ uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
         else
         end;
 
-       if(length(text_lt)>0)then _draw_text(tar,x0+1,y0+1       ,text_lt,ta_left ,255,c_white);
-       if(length(text_rt)>0)then _draw_text(tar,x1-1,y0+1       ,text_rt,ta_right,255,c_white);
-       if(length(text_rd)>0)then _draw_text(tar,x1-1,y1-1-font_w,text_rd,ta_right,255,c_white);
-       if(length(text_ld)>0)then _draw_text(tar,x0+1,y1-1-font_w,text_ld,ta_left ,255,c_white);
+       if(length(text_lt )>0)then _draw_text(tar,x0+1,y0+1       ,text_lt ,ta_left ,255,c_white);
+       if(length(text_lt2)>0)then _draw_text(tar,x0+1,y0+font_w+4,text_lt2,ta_left ,255,c_aqua );
+       if(length(text_rt )>0)then _draw_text(tar,x1-1,y0+1       ,text_rt ,ta_right,255,c_white);
+       if(length(text_rd )>0)then _draw_text(tar,x1-1,y1-1-font_w,text_rd ,ta_right,255,c_white);
+       if(length(text_ld )>0)then _draw_text(tar,x0+1,y1-1-font_w,text_ld ,ta_left ,255,c_white);
     end;
    setlength(vid_prim,vid_prims);
 end;
@@ -639,6 +641,7 @@ begin
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+20,i2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+40,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
 
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));

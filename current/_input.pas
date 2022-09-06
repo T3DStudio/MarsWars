@@ -184,7 +184,7 @@ begin
      with _units[i] do
       if(hits>0)and(inapc=0)and(_ch(player))then
        if(_uvision(htm,@_units[i],false))then
-        if(dist2(vx,vy,tx,ty)<uid^._r)then
+        if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            case tt of
            1,2: begin

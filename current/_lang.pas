@@ -137,10 +137,11 @@ end;
 
 procedure _makeHints;
 var
-uid         :byte;
+uid,l       :byte;
 ENRG,HK,PROD,LMT,
 TIME,REQ    :shortstring;
 begin
+   // units
    for uid:=0 to 255 do
    with _uids[uid] do
    begin
@@ -181,6 +182,7 @@ begin
       end;
    end;
 
+   // upgrades
    for uid:=0 to 255 do
    with _upids[uid] do
    begin
@@ -190,8 +192,18 @@ begin
       TIME :='';
       if(length(_up_name)=0)then continue;
 
-      if(_up_renerg>0)then ENRG :=i2s(_up_renerg);
-      if(_up_time  >0)then TIME :=i2s(_up_time div fr_fps);
+      if(_up_renerg>0)then
+      begin
+         ENRG:=i2s(_upid_energy(uid,1));
+         if(_up_max>1)and(not _up_mfrg)then
+          for l:=2 to _up_max do ENRG+=#25+'/'+#19+i2s(_upid_energy(uid,l));
+      end;
+      if(_up_time  >0)then
+      begin
+         TIME :=i2s(_upid_time(uid,1) div fr_fps);
+         if(_up_max>1)and(not _up_mfrg)then
+          for l:=2 to _up_max do TIME+=#25+'/'+#22+i2s(_upid_time(uid,l) div fr_fps);
+      end;
 
       if(_up_ruid  >0)then _addstr(@REQ,_uids [_up_ruid ].un_txt_name );
       if(_up_rupgr >0)then _addstr(@REQ,_upids[_up_rupgr]._up_name);
@@ -357,12 +369,19 @@ begin
    str_gmode[gm_2x2x2   ]:= #17+'2x2x2'           +#25;
    str_gmode[gm_capture ]:= #19+'Capturing points'+#25;
    str_gmode[gm_invasion]:= #20+'Invasion'        +#25;
-   str_gmode[gm_KotH    ]:= #14+'King of the Hill'    +#25;
-   str_gmode[gm_ecapture]:= #23+'Capturing generators'+#25;
-   str_gmode[gm_royale  ]:= #15+'Royal Battle'        +#25;
+   str_gmode[gm_KotH    ]:= #14+'King of the Hill'+#25;
+   str_gmode[gm_royale  ]:= #15+'Royal Battle'    +#25;
 
    str_addon[false]      := #16+'UDOOM' +#25;
    str_addon[true ]      := #18+'DOOM 2'+#25;
+
+   str_cgenerators       := 'Neutral generators lifetime:';
+   str_cgeneratorsM[0]   := 'w/o n. generators';
+   str_cgeneratorsM[1]   := '5 min';
+   str_cgeneratorsM[2]   := '10 min';
+   str_cgeneratorsM[3]   := '15 min';
+   str_cgeneratorsM[4]   := '20 min';
+   str_cgeneratorsM[5]   := 'infinity';
 
    str_team              := 'Team:';
    str_srace             := 'Race:';
@@ -427,15 +446,15 @@ begin
    _mkHStrUid(UID_ZBFG       ,'Zombie BFG'     ,'');
 
 
-   _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease Hell Teleport cooldown time.'                           );
+   _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease cooldown time of Hell Teleport.'                           );
    _mkHStrUpid(upgr_hell_b478tel  ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
 
 
-  { _mkHStrUpid(upgr_attack  ,'Range attack upgrade'       ,'Increase ranged attacks damage.'                                           );
-   _mkHStrUpid(upgr_armor   ,'Unit armor upgrade'         ,'Increase units armor.'                                                     );
-   _mkHStrUpid(upgr_build   ,'Buildinds armor upgrade'    ,'Increase buildings armor.'                                                 );
-   _mkHStrUpid(upgr_melee   ,'Melee attack upgrade'       ,'Increase melee attacks damage.'                                            );
-   _mkHStrUpid(upgr_regen   ,'Regeneration'               ,'Damaged units will slowly regenerate their health.'                        );
+   _mkHStrUpid(upgr_hell_dattack  ,'Hell Firepower'             ,'Increase the damage of ranged attacks.'                              );
+   _mkHStrUpid(upgr_hell_uarmor   ,'Combat Flesh'               ,'Increase the armor of Hell`s units.'                                 );
+   _mkHStrUpid(upgr_hell_barmor   ,'Stone Walls'                ,'Increase the armor of Hell`s buildings.'                             );
+   _mkHStrUpid(upgr_hell_mattack  ,'Claws and Teeth'            ,'Increase the damage of melee attacks.'                               );
+  { _mkHStrUpid(upgr_regen   ,'Regeneration'               ,'Damaged units will slowly regenerate their health.'                        );
    _mkHStrUpid(upgr_pains   ,'Pain threshold'             ,'Decrease "pain state" chance.'                                             );
    _mkHStrUpid(upgr_vision  ,'Hell eye'                   ,'Lost Soul ability & Hell Eye sight radius.'                                );
    _mkHStrUpid(upgr_towers  ,'Tower range upgrade'        ,'Increase defensive structures range.'                                      );
@@ -734,6 +753,7 @@ begin
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты:';
+  str_cgenerators       := 'Захват генераторов:';
   str_chattars          := 'Адресаты';
   str_resol             := 'Разрешение';
   str_language          := 'Язык интерфейса';
@@ -782,7 +802,6 @@ begin
   str_gmode[gm_capture ]:= #19+'Захват точек'      +#25;
   str_gmode[gm_invasion]:= #20+'Вторжение'         +#25;
   str_gmode[gm_KotH    ]:= #14+'Царь горы'         +#25;
-  str_gmode[gm_ecapture]:= #23+'Захват генераторов'+#25;
   str_gmode[gm_royale  ]:= #15+'Королевская битва' +#25;
 
   str_team              := 'Клан:';

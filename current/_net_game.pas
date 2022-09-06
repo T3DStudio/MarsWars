@@ -14,8 +14,8 @@ begin
          state        :=PS_Play;
          ttl          :=0;
          {$IFNDEF _FULLGAME}
-         PlayersAddLog(i,0,lmt_game,'MarsWars dedicated server, '+str_ver,false);
-         PlayersAddLog(i,0,lmt_game,'Type -h/-help command'              ,false);
+         GameLogCommon(i,0,'MarsWars dedicated server, '+str_ver,false);
+         GameLogCommon(i,0,'Type -h/-help command'              ,false);
          {$ENDIF}
          break;
       end;
@@ -111,6 +111,7 @@ begin
    net_writebyte(g_start_base    );
    net_writebool(g_show_positions);
    net_writebyte(g_ai_slots      );
+   net_writebyte(g_cgenerators   );
 end;
 
 procedure net_ReadMapMark(pid:byte);
@@ -185,13 +186,13 @@ nmid_log_chat    : begin
                       GameLogChat(pid,i,net_readstring,false);    // chat
                       {$IFNDEF _FULLGAME}
                       if(G_Started=false)then
-                       with(_players[pid])do
-                        if(log_lt[log_i]=lmt_chat)then _parseCmd(log_ls[log_i],pid);
+                       with _players[pid] do
+                        with log_l[log_i] do
+                         if(mtype=lmt_player_chat)then _parseCmd(str,pid);
                       {$ENDIF}
                       continue;
                    end;
 nmid_player_leave: begin
-
                       GameLogPlayerLeave(pid);
                       if(G_Started=false)then PlayerSetState(pid,ps_none);
                       continue;

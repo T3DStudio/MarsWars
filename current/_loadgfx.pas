@@ -57,6 +57,8 @@ begin
 
    ui_muc    [false]:=c_dorange;
    ui_muc    [true ]:=c_gray;
+   ui_cenergy[false]:=c_white;
+   ui_cenergy[true ]:=c_red;
    ui_limit  [false]:=c_white;
    ui_limit  [true ]:=c_red;
 
@@ -621,6 +623,7 @@ begin
    _LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HEyeNest       ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAEyeNest      ,race_buildings[r_hell]+'h_b10a_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HCC            ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
@@ -674,7 +677,7 @@ begin
 
    _lstr(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
-   _lstr(@spr_ptur,race_dir[r_uac ]+'ptur',firstload,true);
+   _lstr(@spr_ptur      ,race_dir[r_uac ]+'ptur',firstload,true);
 
 
    _lstr(@spr_stun,effects_folder+'stun',firstload,true);
@@ -703,17 +706,23 @@ begin
    begin
       with un_btn[b] do
       begin
-         surf := LoadBtnFS(_uid2spr(u,b)^.surf,vid_BW );
-         w    := surf^.w;h    := w;
-         hw   := w div 2;hh   := hw;
+         surf:= LoadBtnFS(_uid2spr(u,b)^.surf,vid_BW );
+         w   := surf^.w;h := w;
+         hw  := w div 2;hh:= hw;
       end;
       with un_sbtn[b] do
       begin
-         surf := LoadBtnFS(_uid2spr(u,b)^.surf,vid_oiw);
-         w    := surf^.w;h    := w;
-         hw   := w div 2;hh   := hw;
+         surf:= LoadBtnFS(_uid2spr(u,b)^.surf,vid_oiw);
+         w   := surf^.w;h := w;
+         hw  := w div 2;hh:= hw;
       end;
    end;
+   {with _uids[UID_HEyeNest] do
+    with un_btn[false] do
+    begin
+       SDl_FreeSurface(surf);
+       surf:=un_btn[true].surf;
+    end; }
 end;
 
 procedure Map_tdmake;

@@ -323,7 +323,8 @@ begin
       77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
       78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
       79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);
-      80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
+      80 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_cgenerators,true,@allgamemodes);Map_premap;end;//gms_g_maxcps
+      81 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then

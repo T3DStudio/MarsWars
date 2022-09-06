@@ -103,9 +103,9 @@ begin
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4: begin
-                         depth := -10000;
-                         mmc   := theme_liquid_color;
-                         animn := t;
+                         depth  := -10000;
+                         mmc    := theme_liquid_color;
+                         animn  := t;
                          back_sprite := @spr_liquidb[animn];
                       end;
         DID_Srock  :  begin

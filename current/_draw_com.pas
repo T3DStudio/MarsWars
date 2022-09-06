@@ -153,13 +153,12 @@ begin
          circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
    end;
 
-   case g_mode of
-gm_ecapture,
-gm_KotH,
-gm_capture: for i:=1 to MaxCPoints do
-             with g_cpoints[i] do
-              if(cpcapturer>0)then filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_purple);
-    end;
+   for i:=1 to MaxCPoints do
+    with g_cpoints[i] do
+     if(cpcapturer>0)then
+       if(cpenergy>0)
+       then filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_green )
+       else filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_purple);
 end;
 
 procedure map_RedrawMenuMinimap;
@@ -208,7 +207,7 @@ begin
    for i:=0 to ui_max_alarms do
     with ui_alarms[i] do
      if(al_t>0)and(al_v=av)then
-      if(dist2(al_mx,al_my,mx,my)<=vid_uialrm_t)then
+      if(point_dist_rint(al_mx,al_my,mx,my)<=vid_uialrm_t)then
       begin
          al_x :=(al_x +ax) div 2;
          al_y :=(al_y +ay) div 2;

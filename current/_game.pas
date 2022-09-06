@@ -12,7 +12,7 @@ begin
       PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
                                 UID_UNuclearPlant,UID_URMStation ],1,false);
 
-      if(g_mode=gm_ecapture)then
+      if(g_cgenerators>0)then
       PlayerSetAllowedUnits(p,[ UID_HSymbol,UID_HASymbol,
                                 UID_UGenerator,UID_UAGenerator ],0,false);
 
@@ -211,7 +211,7 @@ begin
          c-=1;
       end;
       ds :=map_mw div 2;
-      d  :=p_dir(x,y,ds,ds);
+      d  :=point_dir(x,y,ds,ds);
       ds :=360 div (c+1);
       r  :=46+c*18;
       for i:=0 to c do
@@ -253,7 +253,7 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots;//
+         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;//g_ai_slots;//
       end;
    end;
 
@@ -339,7 +339,7 @@ end;
 
 function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
 begin
-   CheckSimpleClick:=dist2(o_x0,o_y0,o_x1,o_y1)<4;
+   CheckSimpleClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
 
@@ -741,6 +741,19 @@ begin
     with g_cpoints[i] do
     if(cpcapturer>0)then
     begin
+       if(cplifetime>0)and(cpowner>0)then
+       begin
+          cplifetime-=1;
+          if(cplifetime=0)then
+          begin
+             CPoint_ChangeOwner(i,0);
+             cpcapturer:=0;
+             {$IFDEF _FULLGAME}
+             _CPExplode(cpx,cpy);
+             {$ENDIF}
+          end;
+       end;
+
        cpunitsp_pstate:=cpunitsp;
        cpunitst_pstate:=cpunitst;
        iowner  :=cpowner;
@@ -824,10 +837,8 @@ begin
          begin
             G_Step+=1;
 
+            GameModeCPoints;
             case g_mode of
-            gm_KotH,
-            gm_ecapture,
-            gm_capture   : GameModeCPoints;
             gm_invasion  : GameModeInvasion;
             gm_royale    : if(_cycle_order=0)then
                             if(g_royal_r>0)then g_royal_r-=1;

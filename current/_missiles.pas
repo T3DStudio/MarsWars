@@ -147,8 +147,7 @@ function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
    case pu^.uidi of
    UID_LostSoul: begin
-                    if(tu^.uid^._ukmech   )then _d25(@damage) else
-                    if(tu^.ukfly=uf_ground)then _d50(@damage);
+                    if(tu^.uid^._ukmech   )then _d50(@damage);
                  end;
    UID_Demon   : begin
                     if(tu^.uid^._ukbuilding)then _d50(@damage);
@@ -181,7 +180,7 @@ begin
       dir    := 270;
       homing := false;
 
-      d:=dist2(x,y,vx,vy);
+      d:=point_dist_rint(x,y,vx,vy);
 
       {$IFDEF _FULLGAME}
       ms_eid_bio_death:=false;
@@ -192,26 +191,26 @@ MID_Imp        : begin damage:=15 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Cacodemon  : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Baron      : begin damage:=40 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantH,
-MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
-MID_URocketS   : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=0;         dir:=p_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=p_dir(vx,vy,x,y);end;
+MID_Revenant   : begin damage:=20 ; vstep:=d div 10; splashr :=0  ;       dir:=point_dir(vx,vy,x,y);end;
+MID_URocketS   : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; dir:=point_dir(vx,vy,x,y);end;
+MID_URocket    : begin damage:=20 ; vstep:=d div 10; splashr :=0;         dir:=point_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=20 ; vstep:=d div 12; splashr :=0  ;       dir:=point_dir(vx,vy,x,y);end;
 MID_YPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_ArchFire   : begin damage:=100; vstep:=1;        splashr :=15 ;       end;
 
 MID_MBullet,
 MID_TBullet,
-MID_Bullet     : begin damage:=8  ; vstep:=1;        splashr :=0  ;       end;
+MID_Bullet     : begin damage:=7  ; vstep:=1;        splashr :=0  ;       end;
 MID_Bulletx2   : begin damage:=15 ; vstep:=1;        splashr :=0  ;       end;
 MID_BPlasma    : begin damage:=15 ; vstep:=d div 15; splashr :=0  ;       end;
 MID_BFG        : begin damage:=200; vstep:=d div 10; splashr :=125;       end;
-MID_Flyer      : begin damage:=20 ; vstep:=d div 60; splashr :=0  ;       end;
-MID_HRocket    : begin damage:=100; vstep:=d div 15; splashr :=rocket_sr; dir:=p_dir(vx,vy,x,y);end;
+MID_Flyer      : begin damage:=15 ; vstep:=d div 60; splashr :=0  ;       end;
+MID_HRocket    : begin damage:=100; vstep:=d div 15; splashr :=rocket_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=20 ; vstep:=d div 10; splashr :=rocket_sr; ystep:=3;end;
 MID_Tank       : begin damage:=20 ; vstep:=1;        splashr :=rocket_sr; end;
 MID_StunMine   : begin damage:=1  ; vstep:=1;        splashr :=100;       end;
 MID_Mine       : begin damage:=300; vstep:=1;        splashr :=100;       end;
-MID_Blizzard   : begin damage:=500; vstep:=fr_fps;   splashr :=blizz_r;   dir:=p_dir(vx,vy,x,y);end;
+MID_Blizzard   : begin damage:=500; vstep:=fr_fps;   splashr :=blizz_r;   dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=15 ; vstep:=1;        splashr :=0;         end;
 MID_SSShot     : begin damage:=30 ; vstep:=1;        splashr :=0;         end;
       else
@@ -236,7 +235,7 @@ MID_Revenant: if(upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantH;
 MID_URocket : if(upgr[upgr_uac_airsp  ]>0)then mid:=MID_URocketS;
       end;
 
-      homing:=homing or (mid in [MID_RevenantH]); //MID_URocket,MID_URocketS
+      homing:=homing or (mid in [MID_RevenantH,MID_URocket,MID_URocketS,MID_Flyer]); //MID_URocket,MID_URocketS
 
       if(not homing)and(_IsUnitRange(tar,@tu))then
       begin
@@ -292,7 +291,7 @@ begin
            MID_ArchFire: exit;
            end;
 
-        ud:=dist2(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
+        ud:=point_dist_rint(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
         if(splashr<=0)then ud-=10;
         if(ud<0)then ud:=0;
 
@@ -347,9 +346,9 @@ begin
            if(tu^.ukfly)then               // fly all
                case mid of
                MID_Revenant,
-               MID_RevenantH,
+               MID_RevenantH   : _d200(@rdamage);
                MID_URocketS,
-               MID_URocket     : _d200(@rdamage);
+               MID_URocket,
                MID_Flyer       : _d300(@rdamage);
                end;
 

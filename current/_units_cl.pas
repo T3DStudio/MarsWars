@@ -272,7 +272,7 @@ begin
 end;
 UID_Mancubus:
 begin
-   _animw:=10;
+   _animw:=11;
    _animd:=13;
    setMWSModel  (@spr_mancubus,nil);
    setCommandSND(false,snd_mancubus_ready,snd_zimba_move,snd_mancubus_ready,snd_mancubus_pain,snd_zimba_move);
@@ -347,7 +347,7 @@ begin
 end;
 UID_ZBomber:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
@@ -418,7 +418,7 @@ begin
 end;
 UID_HEyeNest:
 begin
-   setMWSModel(@spr_HEyeNest,nil);
+   setMWSModel(@spr_HEyeNest,@spr_HAEyeNest);
    setBuildingSND(snd_hell_hteleport);
 end;
 UID_HTeleport:
@@ -508,7 +508,9 @@ begin
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_healing,0,0);
    setWeaponESND(1,nil,snd_pistol,0,0);
+   setWeaponESND(3,nil,snd_healing,0,0);
    with _a_weap[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
+   with _a_weap[3] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_Sergant:
 begin
@@ -602,12 +604,8 @@ begin
    setWeaponESND(2,nil,snd_pistol ,0,0);
    setWeaponESND(3,nil,snd_shotgun,0,0);
 
-{
-_weapon(0,wpt_missle,aw_srange,0,0,fr_4hfps ,MID_Bulletx2,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground,wpr_adv ,uidall,[],0,0,wtp_unit_bio_light );
-_weapon(1,wpt_missle,aw_srange,0,0,fr_2h3fps,MID_SSShot  ,0,0,0,upgr_uac_attack,3,wtrset_enemy_alive_ground,wpr_adv ,uidall,[],0,0,wtp_unit_bio_nlight);
-_weapon(2,wpt_missle,aw_srange,0,0,fr_7hfps ,MID_Bullet  ,0,0,0,upgr_uac_attack,1,wtrset_enemy_alive_ground,wpr_nadv,uidall,[],0,0,wtp_unit_bio_light );
-_weapon(3,wpt_missle,aw_srange,0,0,fr_fps   ,MID_SShot   ,0,0,0,upgr_uac_attack,3,wtrset_enemy_alive_ground,wpr_nadv,uidall,[],0,0,wtp_unit_bio_nlight);
-}
+   setWeaponTEID(0    ,nil,0,[0..255]);
+   setWeaponTEID(2    ,nil,0,[0..255]);
 
    DefaultRLDA_pa:=2;
 end;
@@ -822,7 +820,7 @@ upgr_uac_barmor     : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
 upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_detect     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
+upgr_uac_srange     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;

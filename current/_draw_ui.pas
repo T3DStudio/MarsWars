@@ -21,14 +21,14 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
         al_t-=2;
      end;
 
+   for i:=1 to MaxCPoints do
+    with g_cpoints[i] do
+     if(cpcapturer>0)then
+      if(cptimer>0)and((G_Step mod 20)>10)
+      then circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cptimerowner))
+      else circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cpowner     ));
+
    case g_mode of
-gm_ecapture,
-gm_capture,
-gm_KotH     : for i:=1 to MaxCPoints do
-               with g_cpoints[i] do
-                if(cptimer>0)and((G_Step mod 20)>10)
-                 then circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cptimerowner))
-                 else circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cpowner     ));
 gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_muc[(g_royal_r mod 2)=0]);
    end;
 end;
@@ -94,17 +94,13 @@ begin
       m_brushy+=vid_cam_y-ly;
 
       // points areas
-      case g_mode of
-gm_capture,
-gm_KotH,
-gm_ecapture : for i:=1 to MaxCPoints do
-               with g_cpoints[i] do
-                if(cpcapturer>0)and(cpnobuildr>0)then
-                 circleColor(tar,
-                 lx+cpx-vid_cam_x,
-                 ly+cpy-vid_cam_y,
-                 cpnobuildr,c_blue);
-      end;
+      for i:=1 to MaxCPoints do
+       with g_cpoints[i] do
+        if(cpcapturer>0)and(cpnobuildr>0)then
+         circleColor(tar,
+         lx+cpx-vid_cam_x,
+         ly+cpy-vid_cam_y,
+         cpnobuildr,c_blue);
 
       // map build rect
       rectangleColor(tar,
@@ -330,7 +326,7 @@ begin
             _drawBtn (tar,ux,uy,un_btn[_bornadvanced[g_addon]].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_prod_units[uid]));
             _drawBtnt(tar,ux,uy,
             b2s(((ui_units_ptime[uid]+fr_ifps) div fr_fps)),b2s(uprodu[uid]),b2s(uid_s[uid]),b2s(   uid_e[uid])              ,b2s(ui_units_inapc[uid]),
-            c_white                                        ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=a_units[uid]],c_purple                ,'');
+            ui_cenergy[cenergy<0]                          ,c_dyellow       ,c_lime         ,ui_muc[uid_e[uid]>=a_units[uid]],c_purple                ,'');
          end;
       end;
 
@@ -349,7 +345,7 @@ begin
 
          _drawBtnt(tar,ux,uy,
          b2s(((ui_upgr[uid]+fr_ifps) div fr_fps)),b2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                      ,'',
-         c_white                                 ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
+         ui_cenergy[cenergy<0]                   ,c_dyellow          ,0 ,ui_muc[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
       end;
 
       3: // actions
@@ -551,9 +547,9 @@ begin
    with _players[HPlayer] do
    begin
       pl:=armylimit+uprodl;
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenergy)+#22+' / '+#19+i2s(menergy),ta_left,255,c_white);
+      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenergy)+#22+' / '+#19+i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
       _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+l2s(pl     )+#22+' / '+#16+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
-      _draw_text(tar,ui_armyx ,ui_armyy+font_w,l2s(ucl_l[false])+'/'+l2s(ucl_l[true]),ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
+      //_draw_text(tar,ui_armyx ,ui_armyy+font_w,l2s(ucl_l[false])+'/'+l2s(ucl_l[true]),ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

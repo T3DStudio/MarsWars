@@ -15,6 +15,7 @@ g_status          : byte     = 0;
 g_mode            : byte     = 0;
 g_start_base      : byte     = 0;
 g_show_positions  : boolean  = false;
+g_cgenerators     : byte     = 0;
 g_ai_slots        : byte     = 5;
 g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
@@ -38,9 +39,9 @@ UnitStepTicks     : byte = 8;
 
 _players          : TPList;
 _units            : array[0..MaxUnits   ] of TUnit;
-_missiles         : array[1..MaxMissiles] of TMissile;
-
 _punits           : array[0..MaxUnits   ] of PTUnit;
+
+_missiles         : array[1..MaxMissiles] of TMissile;
 
 _cycle_order      : integer = 0;
 _cycle_regen      : integer = 0;
@@ -65,7 +66,7 @@ map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
 map_obs           : byte     = 1;
 map_liq           : byte     = 1;
-map_symmetry           : boolean  = true;
+map_symmetry      : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
@@ -142,7 +143,7 @@ r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 r_RECT            : pSDL_RECT;
 
 cfg_fullscreen    : boolean = false;
-ingame_chat           : boolean = false;
+ingame_chat       : boolean = false;
 r_draw            : boolean = true;
 
 _menu             : boolean = true;
@@ -167,8 +168,8 @@ PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
-vid_cam_w            : integer = 800;
-vid_cam_h            : integer = 600;
+vid_cam_w         : integer = 800;
+vid_cam_h         : integer = 600;
 vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = 794;
@@ -320,6 +321,7 @@ ui_upgrct         : array[byte] of byte;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_muc            : array[false..true] of cardinal; // unit max count color
+ui_cenergy        : array[false..true] of cardinal; // energy limit colors
 ui_limit          : array[false..true] of cardinal; // unit limit colors
 ui_unitrR         : array[false..true] of cardinal;
 ui_unitrS         : array[false..true] of cardinal;
@@ -519,6 +521,7 @@ spr_HTotem,
 spr_HAltar,
 spr_HFortress,
 spr_HEyeNest,
+spr_HAEyeNest,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
@@ -635,6 +638,7 @@ str_m_obs,
 str_m_sym,
 str_plname,
 str_aislots,
+str_cgenerators,
 str_team,
 str_srace,
 str_ready,
@@ -644,6 +648,7 @@ str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
+str_cgeneratorsM  : array[0..gms_g_maxcps] of shortstring;
 str_pcolors       : array[0..4] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
