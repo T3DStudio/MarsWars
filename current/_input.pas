@@ -356,9 +356,9 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
    8 : m_brush:=co_patrol;
 
    9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
-   10: if(ui_orders_x[MaxUnitOrders]>0)then
+   10: if(ui_orders_x[MaxUnitGroups]>0)then
         if(dbl)
-        then MoveCamToPoint(ui_orders_x[MaxUnitOrders], ui_orders_y[MaxUnitOrders])
+        then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
          end;
@@ -464,7 +464,7 @@ begin
               case k of
            sdlk_0..sdlk_9 :  begin
                                 ko:=_event^.key.keysym.sym-sdlk_0;
-                                if(ko<MaxUnitOrders)then
+                                if(ko<MaxUnitGroups)then
                                  if(k_ctrl>1)
                                  then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
                                  else

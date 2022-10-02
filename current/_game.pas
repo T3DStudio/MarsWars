@@ -6,7 +6,7 @@ begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
                                 UID_LostSoul      ..UID_ZBFG,
                                 UID_UCommandCenter..UID_UNuclearPlant,
-                                UID_Engineer      ..UID_Flyer  ],
+                                UID_Scout      ..UID_Flyer  ],
                                 MaxUnits,true);
 
       PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
@@ -253,7 +253,7 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;//g_ai_slots;//
+         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level
       end;
    end;
 
@@ -399,7 +399,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                    if(speed <=0)and(usel_max>1)and(o_id<>uo_aselect)then sel:=false;
                    if(usel_n>=usel_max)then sel:=false;
                 end;
-                if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(order=o_x0);
+                if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(group=o_x0);
                 if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
                 begin
                    if(oa=nil)then
@@ -426,7 +426,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                 begin
                    case o_id of
                uo_setorder,
-               uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitOrders)then order:=o_x0;
+               uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitGroups)then group:=o_x0;
                uo_corder     : if(not _unit_player_order(pu,o_x0,o_y0,o_x1,o_y1))then break;
                    end;
 
@@ -442,7 +442,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                 else
                 begin
                    if(psel=true)then _unit_counters_dec_select(pu);
-                   if(o_id=uo_setorder)and(order=o_x0)then order:=0;
+                   if(o_id=uo_setorder)and(group=o_x0)then group:=0;
                 end;
              end;
 

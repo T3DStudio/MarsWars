@@ -187,7 +187,7 @@ TUWeapon = record
 end;
 
 TUID = record
-   _mhits,
+   _mhits       : longint;
    _speed,
    _r,_missile_r,
    _srange,
@@ -213,8 +213,11 @@ TUID = record
    _urace,
    _ucl,
    _ruid1,
+   _ruid1n,
    _ruid2,
-   _rupgr       : byte;
+   _ruid2n,
+   _rupgr,
+   _rupgrn      : byte;
 
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
 
@@ -390,6 +393,7 @@ o_x1,o_y1  :integer;
    ai_max_towers,
    ai_min_towers,
    ai_max_blimit,
+   ai_max_specialist,
    ai_attack_limit,
    ai_attack_pause,
    ai_scout_u_cur,
@@ -403,6 +407,7 @@ o_x1,o_y1  :integer;
    ai_hptargets
            : TSoB;
    ai_skill: byte;
+   ai_flags: cardinal;
    ai_alarms
            : array[0..MaxPlayers] of TAIAlarm;
 
@@ -438,17 +443,17 @@ PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
 
 TUnit = record
+   hits     : longint;
    vx,vy,
    x,y,
    zfall,
    srange,
    speed,dir,rld,vstp,
-   hits,
    unum     : integer;
    pfzone   : word;
 
    cycle_order,
-   order,
+   group,
    playeri,
    uidi     : byte;
 

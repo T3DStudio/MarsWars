@@ -72,6 +72,7 @@ ai_teleporter_d,
 ai_armyaround_own,
 ai_teleports_near,
 
+ai_enrg_pot,
 ai_enrg_cur,
 ai_basep_builders,
 ai_basep_need,
@@ -155,8 +156,8 @@ begin
         if(_players[i].state>ps_none)then
          if(_players[i].team<>_players[p].team)then
           ai_set_alarm(@_players[p],map_psx[i],map_psy[i],1,base_r,true,pf_get_area(map_psx[i],map_psy[i]));
-     end
-     else ai_set_alarm(@_players[p],map_psx[i],map_psy[i],1,base_r,true,pf_get_area(map_psx[i],map_psy[i]));
+     end;
+     //else ai_set_alarm(@_players[p],map_psx[i],map_psy[i],1,base_r,true,pf_get_area(map_psx[i],map_psy[i]));
 end;
 
 procedure  PlayerSetSkirmishAIParams(p:byte);
@@ -190,13 +191,60 @@ begin
       //                    ders                          tlprt altr            towers towers limit  delay      army          lvl  targets
       0  : ; // nothing
       1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps*180,10            ,0  ,[]);
-      2  : SetBaseOpt(600  ,1   ,2     ,0    ,0    ,0    ,0    ,0      ,0       ,3    ,3     ,15    ,fr_fps*150,20            ,0  ,[]);
+      2  : SetBaseOpt(600  ,1   ,2     ,1    ,0    ,0    ,0    ,0      ,0       ,3    ,3     ,15    ,fr_fps*150,20            ,0  ,[]);
       3  : SetBaseOpt(1200 ,2   ,3     ,1    ,0    ,0    ,0    ,0      ,0       ,6    ,6     ,30    ,fr_fps*120,30            ,1  ,[]);
       4  : SetBaseOpt(2500 ,5   ,4     ,1    ,1    ,0    ,1    ,0      ,1       ,10   ,10    ,60    ,fr_fps*90 ,40            ,2  ,[]);
-      5  : SetBaseOpt(4500 ,8   ,8     ,2    ,2    ,1    ,3    ,1      ,4       ,10   ,14    ,90    ,fr_fps*60 ,50            ,3  ,[UID_Pain,UID_ArchVile]);
-      6  : SetBaseOpt(5000 ,12  ,14    ,6    ,5    ,1    ,4    ,1      ,4       ,2    ,14    ,120   ,1         ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_Engineer,UID_BFG,UID_ZBFG]);
-      else SetBaseOpt(6000 ,16  ,20    ,6    ,5    ,1    ,4    ,1      ,4       ,2    ,14    ,120   ,1         ,MaxPlayerUnits,5  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_Engineer,UID_BFG,UID_ZBFG]);
+      5  : SetBaseOpt(4500 ,8   ,8     ,2    ,2    ,1    ,3    ,1      ,4       ,10   ,14    ,90    ,fr_fps*60 ,50            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
+      6  : SetBaseOpt(5000 ,13  ,14    ,6    ,5    ,1    ,4    ,1      ,4       ,2    ,14    ,120   ,fr_fps*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_Scout,UID_BFG,UID_ZBFG]);
+      else SetBaseOpt(6000 ,17  ,20    ,6    ,5    ,1    ,4    ,1      ,4       ,2    ,14    ,120   ,1         ,MaxPlayerUnits,5  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_Scout,UID_BFG,UID_ZBFG]);
       end;
+      ai_max_specialist:=ai_skill-2;
+      case ai_skill of
+      0  :;
+      1,
+      2  : ai_flags:=aif_army_scout;
+      3  : ai_flags:=aif_army_scout
+                    +aif_base_smart_opening
+                    +aif_base_advance
+                    +aif_army_smart_order;
+      4  : ai_flags:=aif_army_scout
+                    +aif_base_smart_opening
+                    +aif_base_smart_order
+                    +aif_base_suicide
+                    +aif_army_smart_order
+                    +aif_army_advance
+                    +aif_army_teleport
+                    +aif_ability_detection
+                    +aif_ability_other;
+      else ai_flags:=aif_base_smart_opening
+                    +aif_base_smart_order
+                    +aif_base_suicide
+                    +aif_base_advance
+                    +aif_army_smart_order
+                    +aif_army_scout
+                    +aif_army_advance
+                    +aif_army_smart_micro
+                    +aif_army_teleport
+                    +aif_upgr_smart_opening
+                    +aif_ability_detection
+                    +aif_ability_other
+                    +aif_ability_mainsave; //all
+      end;
+   {
+   aif_base_smart_opening : cardinal = 1;
+   aif_base_smart_order   : cardinal = 1 shl 1;
+   aif_base_suicide       : cardinal = 1 shl 2;
+   aif_base_advance       : cardinal = 1 shl 3;
+   aif_army_smart_order   : cardinal = 1 shl 4;
+   aif_army_scout         : cardinal = 1 shl 5;
+   aif_army_advance       : cardinal = 1 shl 6;
+   aif_army_smart_micro   : cardinal = 1 shl 7;
+   aif_army_teleport      : cardinal = 1 shl 8;
+   aif_upgr_smart_opening : cardinal = 1 shl 9;
+   aif_ability_detection  : cardinal = 1 shl 10;
+   aif_ability_other      : cardinal = 1 shl 11;
+   aif_ability_mainsave   : cardinal = 1 shl 12;
+   }
    end;
    ai_make_scirmish_start_alarms(p);
 end;
@@ -337,6 +385,7 @@ begin
    ai_need_heye_u   := nil;
 
    // builds data
+   ai_enrg_pot      :=0;
    ai_enrg_cur      :=0;
 
    ai_basep_builders:=0;  // base production
@@ -362,6 +411,8 @@ begin
 
    ai_spec2_cur     :=0;  // heye nest
 
+   ai_towers_cur_active
+                    :=0;
    ai_towers_cur    :=0;
    ai_towers_near   :=0;
    ai_towers_near_air   :=0;
@@ -435,33 +486,45 @@ begin
                if(tu^.uid^._ukbuilding)and(tu^.aiu_alarm_d<base_ir)then _setNearestPU(@ai_abase_u,@ai_abase_d,ud);
                if(tu^.uid^._attack>0)then
                begin
-                  if(ud<srange)and(tu^.speed<=0)then //then
+                  if(tu^.speed<=0)then
                    if(tu^.uidi=aiucl_twr_air1[race])
                    or(tu^.uidi=aiucl_twr_air2[race])then
                    begin
-                      ai_towers_near_air+=1;
-                      ai_towers_near    +=1;
+                      if(ud<srange)then
+                      begin
+                         ai_towers_near_air+=1;
+                         ai_towers_near    +=1;
+                      end;
+                      ai_towers_cur+=1;
+                      if(tu^.bld)then ai_towers_cur_active+=1;
                    end
                    else
                      if(tu^.uidi=aiucl_twr_ground1[race])
                      or(tu^.uidi=aiucl_twr_ground2[race])then
                      begin
-                        ai_towers_near_ground+=1;
-                        ai_towers_near       +=1;
+                        if(ud<srange)then
+                        begin
+                           ai_towers_near_ground+=1;
+                           ai_towers_near       +=1;
+                        end;
+                        ai_towers_cur+=1;
+                        if(tu^.bld)then ai_towers_cur_active+=1;
                      end;
-
+                  if(tu^.bld)then
+                  begin
+                     if(tu^.aiu_need_detect<ai_need_heye_d)then
+                      if(tu^.buff[ub_detect]<=0)and(tu^.buff[ub_hvision]<=0)then
+                      begin
+                         ai_need_heye_u:=tu;
+                         ai_need_heye_d:=tu^.aiu_need_detect;
+                      end;
+                     if(tu^.aiu_alarm_d<=tu^.srange)and(_IsUnitRange(tu^.a_tar,nil))and(tu^.buff[ub_damaged]>0)then
+                      if(ai_invuln_tar_u=nil)
+                      then ai_invuln_tar_u:=tu
+                      else
+                        if(tu^.hits>ai_invuln_tar_u^.hits)then ai_invuln_tar_u:=tu;
+                  end;
                   if(ud<base_ir)and(not tu^.uid^._ukbuilding)then aiu_armyaround_ally+=tu^.uid^._limituse;
-                  if(tu^.aiu_need_detect<ai_need_heye_d)then
-                   if(tu^.buff[ub_detect]<=0)and(tu^.buff[ub_hvision]<=0)then
-                   begin
-                      ai_need_heye_u:=tu;
-                      ai_need_heye_d:=tu^.aiu_need_detect;
-                   end;
-                  if(tu^.aiu_alarm_d<=tu^.srange)and(_IsUnitRange(tu^.a_tar,nil))and(tu^.buff[ub_damaged]>0)then
-                   if(ai_invuln_tar_u=nil)
-                   then ai_invuln_tar_u:=tu
-                   else
-                     if(tu^.hits>ai_invuln_tar_u^.hits)then ai_invuln_tar_u:=tu;
                end;
                if(uid^._ability=uab_teleport)then
                 if(tu^.aiu_alarm_d<base_r)then
@@ -518,7 +581,7 @@ begin
                      if(ud<base_rr)and(pfzone=tu^.pfzone)then ai_teleports_near+=1;
                   end;
 
-                  if(ud<ai_inapc_d)and(tu^.aiu_alarm_d>base_ir)and(tu^.order<>aio_busy)then
+                  if(ud<ai_inapc_d)and(tu^.aiu_alarm_d>base_ir)and(tu^.group<>aio_busy)then
                    if(tu^.apcc=tu^.apcm)or(armylimit>=ai_limit_border)then
                     if(ukfly)or(pfzone=tu^.pfzone)then
                      if(_itcanapc(pu,tu))then _setNearestPU(@ai_inapc_u,@ai_inapc_d,ud);
@@ -541,10 +604,11 @@ begin
             if(uid=tu^.uid)and(not bld)then ai_inprogress_uid+=1;
 
             case tu^.uidi of
-            UID_HSymbol   : if(a_units[UID_HASymbol   ]>0)then ai_enrg_cur+=_uids[UID_HASymbol   ]._genergy else ai_enrg_cur+=tu^.uid^._genergy;
-            UID_UGenerator: if(a_units[UID_UAGenerator]>0)then ai_enrg_cur+=_uids[UID_UAGenerator]._genergy else ai_enrg_cur+=tu^.uid^._genergy;
-            else            ai_enrg_cur+=tu^.uid^._genergy;
+            UID_HSymbol   : if(a_units[UID_HASymbol   ]>0)and(cf(@ai_flags,@aif_base_advance))then ai_enrg_pot+=_uids[UID_HASymbol   ]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
+            UID_UGenerator: if(a_units[UID_UAGenerator]>0)and(cf(@ai_flags,@aif_base_advance))then ai_enrg_pot+=_uids[UID_UAGenerator]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
+            else            ai_enrg_pot+=tu^.uid^._genergy;
             end;
+            ai_enrg_cur+=tu^.uid^._genergy;
 
             if(tu^.bld)and(tu^.speed>0)and(tu^.uid^._attack>0)then ai_armyaround_own+=tu^.uid^._limituse;
 
@@ -646,13 +710,14 @@ var  bt : byte;
    ddir,
    rdir : single;
 bx,by,l : integer;
+nocheck_energy:boolean;
 procedure SetBT(buid:byte);
 var _c:cardinal;
 begin
   if(bt=0)then
   begin
      _c:=_uid_conditionals(pu^.player,buid);
-     if(_c=0)or(_c=ureq_energy)then bt:=buid;
+     if(_c=0)or((_c=ureq_energy)and(nocheck_energy))then bt:=buid;
   end;
 end;
 
@@ -677,7 +742,13 @@ begin
     else
     begin
        with pu^.player^ do
-        if(uid_e[b1]<(uid_e[b0] div 2))then SetBT(b1);
+        if(uid_e[b0]<=0)
+        then SetBT(b0)
+        else
+          if(uid_e[b1]<=0)
+          then SetBT(b1)
+          else
+            if(uid_e[b1]<(uid_e[b0] div 2))then SetBT(b1);
        SetBT(b0);
        if(bt=0)then SetBT(b1);
     end;
@@ -688,61 +759,70 @@ begin
    with pu^.player^ do
     if(ai_basep_builders<x)and(ai_basep_builders<ai_max_mains)
     then SetBTA(aiucl_main0[race],aiucl_main1[race]);
+   ddir:=-1;
 end;
 procedure BuildEnergy(x:integer); // Energy
 begin
    with pu^.player^ do
-    if(ai_enrg_cur<x)and(ai_enrg_cur<ai_max_energy)
+    if(ai_enrg_pot<x)and(ai_enrg_pot<ai_max_energy)
     then SetBTA(aiucl_generator[race],0);
+   ddir:=-1;
 end;
 procedure BuildUProd(x:integer);  // Barracks
 begin
-    with pu^.player^ do
-     if(ai_unitp_cur<x)and(ai_unitp_cur<ai_max_unitps)then
-      if(ai_tech1_cur<=0)or(ai_unitp_cur_na=0)or(ai_unitp_cur<6)then
-       SetBTA(aiucl_barrack0[race],aiucl_barrack1[race]);
+   with pu^.player^ do
+    if(ai_unitp_cur<x)and(ai_unitp_cur<ai_max_unitps)then
+     if(ai_tech1_cur<=0)or(ai_unitp_cur_na=0)or(ai_unitp_cur<6)then
+      SetBTA(aiucl_barrack0[race],aiucl_barrack1[race]);
+   ddir:=-1;
 end;
 procedure BuildSmith(x:integer);  // Smiths
 begin
-    with pu^.player^ do
-     if(ai_upgrp_cur<x)and(ai_upgrp_cur<ai_max_upgrps)then
-      if(ai_tech1_cur<=0)or(ai_upgrp_cur_na=0)or(ai_upgrp_cur<2)then
-       SetBTA(aiucl_smith[race],0);
+   with pu^.player^ do
+    if(ai_upgrp_cur<x)and(ai_upgrp_cur<ai_max_upgrps)then
+     if(ai_tech1_cur<=0)or(ai_upgrp_cur_na=0)or(ai_upgrp_cur<2)then
+      SetBTA(aiucl_smith[race],0);
+   ddir:=-1;
 end;
 procedure BuildTech0(x:integer);  // Tech0  TechCenter, HellMonastery
 begin
-    with pu^.player^ do
-     if(ai_tech0_cur<x)and(ai_tech0_cur<ai_max_tech0)
-     then SetBTA(aiucl_tech0[race],0);
+   with pu^.player^ do
+    if(ai_tech0_cur<x)and(ai_tech0_cur<ai_max_tech0)
+    then SetBTA(aiucl_tech0[race],0);
+   ddir:=-1;
 end;
 procedure BuildTech1(x:integer);  // Tech1
 begin
-    with pu^.player^ do
-     if(ai_tech1_cur<x)and(ai_tech1_cur<ai_max_tech1)
-     then SetBTA(aiucl_tech1[race],0);
+   with pu^.player^ do
+    if(ai_tech1_cur<x)and(ai_tech1_cur<ai_max_tech1)
+    then SetBTA(aiucl_tech1[race],0);
+   ddir:=-1;
 end;
 procedure BuildSpec0(x:integer);  // Radar,  Heye Nest
 begin
-    with pu^.player^ do
-     if(ai_spec0_cur<x)and(ai_spec0_cur<ai_max_spec0)
-     then SetBTA(aiucl_spec0[race],0);
+   with pu^.player^ do
+    if(ai_spec0_cur<x)and(ai_spec0_cur<ai_max_spec0)
+    then SetBTA(aiucl_spec0[race],0);
+   ddir:=-1;
 end;
 procedure BuildSpec1(x:integer);  // RStation, Altar
 begin
-    with pu^.player^ do
-     if(ai_spec1_cur<x)and(ai_spec1_cur<ai_max_spec1)
-     then SetBTA(aiucl_spec1[race],0);
+   with pu^.player^ do
+    if(ai_spec1_cur<x)and(ai_spec1_cur<ai_max_spec1)
+    then SetBTA(aiucl_spec1[race],0);
+   ddir:=-1;
 end;
 procedure BuildSpec2(x:integer);  // Teleport
 begin
-    with pu^.player^ do
-     if(ai_spec2_cur<x)and(ai_spec2_cur<ai_max_spec2)
-     then SetBTA(aiucl_spec2[race],0);
+   with pu^.player^ do
+    if(ai_spec2_cur<x)and(ai_spec2_cur<ai_max_spec2)
+    then SetBTA(aiucl_spec2[race],0);
+   ddir:=-1;
 end;
 procedure BuildTower(x,t:integer);  // Towers
 begin
     with pu^.player^ do
-     if(ai_towers_near<x)and(ai_towers_near<ai_max_towers)then
+     if(ai_towers_cur<x)and(ai_towers_cur<ai_max_towers)then
       if(t>0)
       then SetBTA(aiucl_twr_air1[race],aiucl_twr_air2[race])
       else
@@ -766,18 +846,19 @@ begin
    bt  :=0;
    ddir:=-1;
    rdir:=0;
+   nocheck_energy:=true;
 
    with pu^     do
    with uid^    do
    with player^ do
    if(build_cd<=0)then
    begin
-      if(false)then
+      // opening
+      if(cf(@ai_flags,@aif_base_smart_opening))then
       begin
          if(ai_towers_need>ai_min_towers)then
          BuildTower (ai_towers_need,ai_towers_need_type);
 
-         // fixed opening
          BuildEnergy(300 );
          BuildUProd (1   );
          BuildEnergy(800 );
@@ -800,17 +881,21 @@ begin
          BuildTech0 (1   );
          BuildTech1 (1   );
          BuildSpec1 (1   );
+      end;
 
-         //if(sel)then writeln(bt);
-
-         // common
-         BuildEnergy(generators_energy);
+      // common
+      if(cf(@ai_flags,@aif_base_smart_order))then
+      begin
+         nocheck_energy:=false;
+         BuildUProd(ai_unitp_need);
          BuildSmith(ai_upgrp_need);
          BuildTech0(ai_tech0_need);
          BuildSpec0(ai_spec0_need);
          BuildSpec1(ai_max_spec1 );
          BuildSpec2(ai_max_spec2 );
-         BuildUProd(ai_unitp_need);
+         BuildTower(ai_towers_need,ai_towers_need_type);
+         nocheck_energy:=true;
+         BuildEnergy(generators_energy);
          BuildMain (ai_basep_need);
       end
       else
@@ -826,7 +911,7 @@ begin
         8:BuildTower (ai_towers_need,ai_towers_need_type);
         end;
 
-      if(sel)then writeln(bt,' ',ai_unitp_need);
+     // if(sel)then writeln(bt,' ',ai_unitp_need);
 
       if(bt=0)then exit;
 
@@ -887,7 +972,7 @@ r_hell: case random(19) of
         end;
 r_uac : case random(13) of
 0 : ut:=UID_Medic;
-1 : ut:=UID_Engineer;
+1 : ut:=UID_Scout;
 2 : ut:=UID_Sergant;
 3 : ut:=UID_Commando;
 4 : ut:=UID_Bomber;
@@ -945,11 +1030,17 @@ r_uac : _su(UID_Commando,3);
 end;
 begin
    ai_UnitProduction:=false;
+   ut:=0;
+
    with pu^     do
    with player^ do
    if((ucl_l[false]+uprodl)<ai_max_blimit)then
    begin
-      case uclass of
+
+      if(not cf(@ai_flags,@aif_army_smart_order))
+      then pick_any
+      else
+        case uclass of
 uprod_smart: begin
                 if(not ai_UnitProduction(pu,uprod_base))then
                  if(aiu_alarm_d=nodist)
@@ -965,18 +1056,18 @@ uprod_smart: begin
 uprod_any  : pick_any;
 uprod_base : pick_base;
 uprod_air  : pick_air;
-      end;
+        end;
 
       up_n:=uid_e[ut]+uprodu[ut];
 
       case ut of
 UID_Mastermind,
-UID_Cyberdemon   : up_m:=ai_skill-2-(uid_e[UID_Mastermind]+uprodu[UID_Mastermind]
-                                    +uid_e[UID_Cyberdemon]+uprodu[UID_Cyberdemon]);
+UID_Cyberdemon   : up_m:=ai_max_specialist-(uid_e[UID_Mastermind]+uprodu[UID_Mastermind]
+                                           +uid_e[UID_Cyberdemon]+uprodu[UID_Cyberdemon]);
 UID_APC,
-UID_FAPC         : up_m:=ai_skill+2;
-UID_Pain         : up_m:=ai_skill+2;
-      else up_m:=10000;
+UID_FAPC,
+UID_Pain         : up_m:=ai_max_specialist;
+      else         up_m:=10000;
       end;
 
       if(up_n<up_m)then ai_UnitProduction:=_unit_straining(pu,ut);
@@ -1000,28 +1091,34 @@ end;
 begin
    with pu^     do
    with player^ do
+   if(ai_max_upgrlvl>0)then
    begin
       case race of
 r_hell: begin
+        if(cf(@ai_flags,@aif_upgr_smart_opening))then
+        begin
         MakeUpgr(upgr_hell_mainr ,1);
         MakeUpgr(upgr_hell_hktele,1);
         MakeUpgr(upgr_hell_mainr ,2);
         MakeUpgr(upgr_hell_heye  ,1);
         MakeUpgr(upgr_hell_9bld  ,1);
-        MakeUpgr(upgr_hell_heye  ,3);
         MakeUpgr(upgr_hell_6bld  ,1);
+        end;
 
-        _unit_supgrade(pu,random(30));
+        MakeUpgr(random(30),ai_max_upgrlvl);
         end;
 r_uac : begin
+        if(cf(@ai_flags,@aif_upgr_smart_opening))then
+        begin
         MakeUpgr(upgr_uac_mainr  ,1);
         MakeUpgr(upgr_uac_mainm  ,1);
         MakeUpgr(upgr_uac_mainr  ,2);
         MakeUpgr(upgr_uac_9bld   ,1);
         MakeUpgr(upgr_uac_6bld   ,1);
-        MakeUpgr(upgr_uac_srange ,1);
+        //MakeUpgr(upgr_uac_engineer,1);
+        end;
 
-        _unit_supgrade(pu,30+random(30));
+        MakeUpgr(30+random(30),ai_max_upgrlvl);
         end;
       end;
    end;
@@ -1067,6 +1164,7 @@ UID_UAGenerator: if(cenergy>_genergy)and(menergy>generators_energy)then exit;
          end;
       end;
 
+      //if(sel)then writeln(ai_towers_cur_active,' ',ai_min_towers);
       case uidi of
 UID_HTower,
 UID_HTotem,
@@ -1130,15 +1228,6 @@ begin
       ai_spec0_cur     :=uid_e[aiucl_spec0[race]];
       ai_spec1_cur     :=uid_e[aiucl_spec1[race]];
       ai_spec2_cur     :=uid_e[aiucl_spec2[race]];
-      ai_towers_cur    :=uid_e[aiucl_twr_air1   [race]]
-                        +uid_e[aiucl_twr_air2   [race]]
-                        +uid_e[aiucl_twr_ground1[race]]
-                        +uid_e[aiucl_twr_ground2[race]];
-      ai_towers_cur_active:=
-                         uid_eb[aiucl_twr_air1   [race]]
-                        +uid_eb[aiucl_twr_air2   [race]]
-                        +uid_eb[aiucl_twr_ground1[race]]
-                        +uid_eb[aiucl_twr_ground2[race]];
 
       if(_N(@ai_basep_need ,ai_max_mains ))then ai_basep_need :=ai_max_mains;//mm3(1,ai_basep_builders+1           ,ai_max_mains );
       if(_N(@ai_unitp_need ,ai_max_unitps))then ai_unitp_need :=mm3(1,ai_basep_builders+1    ,ai_max_unitps);
@@ -1148,9 +1237,7 @@ begin
       if(_N(@ai_towers_need,ai_max_towers))then
        if(ai_enemy_d<base_3r) then
        begin
-          //ai_enemy_d
           ai_towers_need :=mm3(0,(aiu_armyaround_enemy-aiu_armyaround_ally+MinUnitLimit) div MinUnitLimit,ai_max_towers);
-          if(sel)then writeln(aiu_armyaround_enemy,' ',aiu_armyaround_ally,' ',ai_towers_need);
           ai_towers_needx:=aiu_alarm_x;
           ai_towers_needy:=aiu_alarm_y;
           ai_towers_need_type:=0;
@@ -1159,13 +1246,17 @@ begin
        end
        else ai_towers_need:=ai_min_towers;
 
-      if(ai_buildings_need_suicide(pu))then
-      begin
-         _unit_kill(pu,false,true,true);
-         exit;
-      end;
+      //if(sel)and(isbuildarea)then writeln(ai_towers_need,' ',ai_max_towers);
 
-      if(ai_buildings_need_ability(pu))then _unit_action(pu);
+      if(cf(@ai_flags,@aif_base_suicide))then
+       if(ai_buildings_need_suicide(pu))then
+       begin
+          _unit_kill(pu,false,true,true);
+          exit;
+       end;
+
+      if(cf(@ai_flags,@aif_base_advance))then
+       if(ai_buildings_need_ability(pu))then _unit_action(pu);
 
       if(hits<=0)or(not bld)then exit;
 
@@ -1215,7 +1306,7 @@ procedure ai_flytransport(pu:PTUnit);
 begin
    if(ai_enemy_u<>nil)then
     with pu^  do
-     if(apcc=0)or (pf_isobstacle_zone(ai_enemy_u^.pfzone))
+     if((apcc=0)or(pf_isobstacle_zone(ai_enemy_u^.pfzone)))and(cf(@player^.ai_flags,@aif_army_smart_micro))
      then ai_outfrom(pu,ai_enemy_u^.x,ai_enemy_u^.y)
      else
        if(ai_enemy_d<200)then uo_id:=ua_unload;
@@ -1224,9 +1315,10 @@ procedure ai_apc(pu:PTUnit);
 begin
    if(ai_enemy_u<>nil)then
     with pu^  do
-     if(apcc=0)
-     or(ai_enemy_d<150)
-     then ai_outfrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
+     if(cf(@player^.ai_flags,@aif_army_smart_micro))then
+      if(apcc=0)
+      or(ai_enemy_d<150)
+      then ai_outfrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
 end;
 
 procedure ai_set_uo(pu:PTUnit;ox,oy,ow:integer;tarpu:PTUnit);
@@ -1276,7 +1368,7 @@ end;
 procedure ai_try_teleport(pu,target:PTUnit);
 var tt:integer;
 begin
-   if(ai_teleporter_u<>nil)then
+   if(ai_teleporter_u<>nil)and(cf(@pu^.player^.ai_flags,@aif_army_teleport))then
     if(ai_teleporter_d<base_rr)and(ai_teleporter_u^.pfzone=pu^.pfzone)then
     begin
        pu^.uo_x:=ai_teleporter_u^.x;
@@ -1298,12 +1390,12 @@ begin
       then _ability_teleport(pu,ai_teleporter_u,ai_teleporter_d);
 end;
 
-procedure ai_GoToUnit(pu,tu:PTUnit;ud,dforward:integer);
+{procedure ai_GoToUnit(pu,tu:PTUnit;ud,dforward:integer);
 begin
    if(ud>dforward)
    then ai_set_uo(pu,0,0,0          ,tu)
    else ai_set_uo(pu,0,0,-pu^.srange,tu);
-end;
+end; }
 
 procedure ai_unit_target(pu:PTUnit);
 var d,
@@ -1334,7 +1426,7 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(order=aio_busy)then order:=aio_home;
+      if(group=aio_busy)then group:=aio_home;
 
       if(aiu_alarm_d<base_ir)then
       begin
@@ -1348,13 +1440,13 @@ atm_bunker : ai_apc(pu);
       else
         if(unum=player^.ai_scout_u_cur)and(player^.ucl_l[false]>scout_minarmy)then
         begin
-           if(order<>aio_scout)then
+           if(group<>aio_scout)then
             if(aiu_attack_timer<0)
-            then order:=aio_scout
+            then group:=aio_scout
             else
               if(aiu_attack_timer=0)then aiu_attack_timer:=max2(1,player^.ai_attack_pause div 2);
 
-           if(order<>aio_scout)
+           if(group<>aio_scout)
            then ai_BaseIdle(pu)
            else
             if(aiu_alarm_d<nodist)
@@ -1363,14 +1455,14 @@ atm_bunker : ai_apc(pu);
         end
         else
         begin
-           if(order=aio_scout)then
+           if(group=aio_scout)then
            begin
-              order:=aio_home;
+              group:=aio_home;
               aiu_attack_timer:=0;
            end;
 
-           if((ai_abase_d<aiu_alarm_d)and(order=aio_attack))
-           or((ai_abase_d<nodist     )and(order=aio_home  ))then
+           if((ai_abase_d<aiu_alarm_d)and(group=aio_attack))
+           or((ai_abase_d<nodist     )and(group=aio_home  ))then
            begin
               if(ai_abase_d>base_r)
               then ai_set_uo(pu,0,0, 0     ,ai_abase_u)
@@ -1382,28 +1474,21 @@ atm_bunker : ai_apc(pu);
            end
            else
            begin
-              if(order=aio_home)then
+              if(group=aio_home)then
                 with player^ do
                   if(ai_armyaround_own>ai_attack_limit)
                   or((ucl_l[false]+uprodl)>=ai_max_blimit)
                   or((armylimit+uprodl)>=ai_limit_border)
                   or(ucl_c[true]<=0)then
                   begin
-                     order:=aio_attack;
+                     group:=aio_attack;
                      if(pu=commander_u)then aiu_attack_timer:=player^.ai_attack_pause;
                   end
                   else ai_BaseIdle(pu);
 
-              if(order=aio_attack)then
-                if(commander_u=nil)then
-                begin
-                   if(ai_base_d<nodist)then
-                     if(ai_base_d>base_r)
-                     then ai_set_uo(pu,0,0,0     ,ai_base_u)
-                     else ai_set_uo(pu,0,0,base_r,ai_base_u)
-                   else ai_default_idle(pu);
-                   ai_try_teleport(pu,nil);
-                end
+              if(group=aio_attack)then
+                if(commander_u=nil)
+                then ai_BaseIdle(pu)
                 else
                   if(pu<>commander_u)then
                   begin
@@ -1414,7 +1499,6 @@ atm_bunker : ai_apc(pu);
                      if(commander_d>srange)
                      then ai_set_uo(pu,0,0,0      ,commander_u)
                      else ai_set_uo(pu,0,0,-srange,commander_u);
-                     if(sel)then writeln('no commander');
                   end
                   else
                     if(aiu_attack_timer<>0)
@@ -1425,33 +1509,32 @@ atm_bunker : ai_apc(pu);
                          ai_set_uo(pu,aiu_alarm_x,aiu_alarm_y,0,nil);
                          if(not ukfly)then
                           if(pfzone<>ai_alarm_zone)or(ai_alarm_d>base_4r)or((ai_teleporter_d<ai_alarm_d)and(ai_teleporter_d<base_rr))
-                          then ai_try_teleport(pu,nil);
+                          then ai_try_teleport(pu,nil);    //??????????????????????????
                       end
                       else ai_default_idle(pu);
            end;
         end;
 
-      if(ai_uadv_u<>nil)and(ai_uadv_d<base_ir)and(ai_uadv_d<aiu_alarm_d)then
-      begin
-         if(not _ukbuilding)and(buff[ub_advanced]<=0)and(_ability<>uab_Advance)then
-         begin
-            if(order<>aio_attack)then order:=aio_busy;
-            ai_set_uo(pu,0,0,0,ai_uadv_u);
-            d:=ai_uadv_d-(_r+ai_uadv_u^.uid^._r-aw_dmelee);
-            if(d<=0)
-            then uo_tar:=ai_uadv_u^.unum;
-            exit;
-         end;
-      end;
+      if(cf(@player^.ai_flags,@aif_army_advance))then
+       if(ai_uadv_u<>nil)and(ai_uadv_d<base_ir)and(ai_uadv_d<aiu_alarm_d)then
+        if(not _ukbuilding)and(buff[ub_advanced]<=0)and(_ability<>uab_Advance)then
+        begin
+           if(group<>aio_attack)then group:=aio_busy;
+           ai_set_uo(pu,0,0,0,ai_uadv_u);
+           d:=ai_uadv_d-(_r+ai_uadv_u^.uid^._r-aw_dmelee);
+           if(d<=0)
+           then uo_tar:=ai_uadv_u^.unum;
+           exit;
+        end;
 
      // if(sel)then writeln(ai_inapc_d);
 
       if(ai_inapc_d<nodist)then
        if((ai_inapc_d<ai_abase_d)and(apcc>0))or(apcc<=0)then
-        if(ai_inapc_d<base_ir)or(ukfly and ((apcc<=0)or(order<>aio_attack)or(ai_inapc_d<base_ir)) )then
+        if(ai_inapc_d<base_ir)or(ukfly and ((apcc<=0)or(group<>aio_attack)or(ai_inapc_d<base_ir)) )then
          with pu^  do
          begin
-            order:=aio_busy;
+            group:=aio_busy;
             ai_set_uo(pu,0,0,0,ai_inapc_u);
             d:=ai_inapc_d-(_r+ai_inapc_u^.uid^._r-aw_dmelee);
             if(d<=0)
@@ -1505,23 +1588,17 @@ begin
       if(hits<=0)or(not bld)then exit;
 
       case _ability of
-uab_hell_unit_adv: if(ai_hadv_u<>nil)then uo_tar:=ai_hadv_u^.unum;
-uab_radar        : if(player^.ai_detection_pause=0)and(ai_enemy_inv_u<>nil)then
-                   begin
-                      _unit_ability_uradar(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y);
-                      player^.ai_detection_pause:=fr_fps;
-                   end;
-uab_htowertele   : if(aiu_alarm_d<nodist)and(a_rld<=0)and(ai_alarm_zone=pfzone)then _unit_ability_htteleport(pu,aiu_alarm_x,aiu_alarm_y);
-uab_hkeeptele    : if(aiu_alarm_d<nodist)and(ai_basep_builders<5)and(hits<2000)then _unit_ability_hkteleport(pu,random(map_mw),random(map_mw));
-uab_hell_vision  : if(player^.ai_detection_pause=0)then
-                    if(ai_need_heye_u<>nil)then
-                    begin
-                       _ability_hell_vision(ai_need_heye_u,pu);
-                       player^.ai_detection_pause:=fr_fps;
-                    end;
+uab_hell_unit_adv: if(cf(@player^.ai_flags,@aif_army_advance))then
+                    if(ai_hadv_u<>nil)then uo_tar:=ai_hadv_u^.unum;
 uab_teleport     : if(ai_teleporter_beacon_u<>nil)
                    then uo_tar:=ai_teleporter_beacon_u^.unum
                    else uo_tar:=0;
+      end;
+
+      // abilities
+      if(cf(@player^.ai_flags,@aif_ability_other))then
+       case _ability of
+uab_htowertele   : if(aiu_alarm_d<nodist)and(a_rld<=0)and(ai_alarm_zone=pfzone)then _unit_ability_htteleport(pu,aiu_alarm_x,aiu_alarm_y);
 uab_hinvuln      : if(ai_invuln_tar_u<>nil)then _unit_ability_hinvuln(pu,ai_invuln_tar_u^.unum);
 uab_uac_rstrike  : if(ai_strike_tar_u<>nil)then _unit_ability_umstrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
 uab_advance      : case uidi of
@@ -1533,34 +1610,62 @@ uab_advance      : case uidi of
                            end
                            else
                              if(not ukfly)then _unit_action(pu);
-      UID_HCommandCenter,
-      UID_UCommandCenter: if(ukfly)then
-                          begin
-                             ai_default_idle(pu);
-                             if(ai_enemy_d<=base_ir)
-                             then ai_outfrom(pu,ai_enemy_u^.x,ai_enemy_u^.y)
-                             else
-                               if(ai_base_d<nodist)then
-                               begin
-                                  if(ai_base_d<srange)
-                                  then _unit_action(pu)
-                                  else ai_set_uo(pu,0,0,srange,ai_base_u);
-                               end
-                               else
-                               begin
-                                  _unit_action(pu);
-                                  //aiu_alarm_timer:=fr_2fps;
-                               end;
-                          end
-                          else
-                            if(aiu_armyaround_enemy>aiu_armyaround_ally)and(buff[ub_damaged]>0)then
-                             if(hits<2000)or(aiu_armyaround_enemy>15)then _unit_action(pu);
+
                    end;
-      end;
-      case uidi of
+       end;
+
+      // MAIN save
+      if(cf(@player^.ai_flags,@aif_ability_mainsave))then
+       case _ability of
+uab_advance: case uidi of
+UID_HCommandCenter,
+UID_UCommandCenter: if(ukfly)then
+                    begin
+                       ai_default_idle(pu);
+                       if(ai_enemy_d<=base_ir)
+                       then ai_outfrom(pu,ai_enemy_u^.x,ai_enemy_u^.y)
+                       else
+                         if(ai_base_d<nodist)then
+                         begin
+                            if(ai_base_d<srange)
+                            then _unit_action(pu)
+                            else ai_set_uo(pu,0,0,srange,ai_base_u);
+                         end
+                         else
+                         begin
+                            _unit_action(pu);
+                         end;
+                    end
+                    else
+                      if(aiu_armyaround_enemy>aiu_armyaround_ally)and(buff[ub_damaged]>0)then
+                       if(hits<2000)or(aiu_armyaround_enemy>15)then _unit_action(pu);
+             end;
+uab_hkeeptele     : if(aiu_alarm_d<base_rr)and(ai_basep_builders<5)and(hits<2000)then _unit_ability_hkteleport(pu,random(map_mw),random(map_mw));
+       end;
+
+      // active detection
+      if(cf(@player^.ai_flags,@aif_ability_detection))then
+       case _ability of
+uab_radar        : if(player^.ai_detection_pause=0)and(ai_enemy_inv_u<>nil)then
+                   begin
+                      _unit_ability_uradar(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y);
+                      player^.ai_detection_pause:=fr_fps;
+                   end;
+uab_hell_vision  : if(player^.ai_detection_pause=0)then
+                    if(ai_need_heye_u<>nil)then
+                    begin
+                       _ability_hell_vision(ai_need_heye_u,pu);
+                       player^.ai_detection_pause:=fr_fps;
+                    end;
+       end;
+
+      // smart micro
+      if(cf(@player^.ai_flags,@aif_army_smart_micro))then
+       case uidi of
 UID_Pain,
 UID_ArchVile   : ai_outfromenemy(pu,base_r);
-      end;
+       end;
+
 
       if(speed<=0)or(_ukbuilding)then exit;
 

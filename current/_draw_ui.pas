@@ -118,8 +118,8 @@ var  x,y,y0:integer;
      b     :boolean;
 begin
    y  :=ui_texty+vid_oiw;
-   if(MaxUnitOrders>1)then
-   for i:=1 to MaxUnitOrders-1 do
+   if(MaxUnitGroups>1)then
+   for i:=1 to MaxUnitGroups-1 do
    begin
       n  :=0;
       y0 :=-1;
@@ -391,7 +391,7 @@ begin
          _drawBtn(tar,2,2,spr_b_patrol ,false  ,ui_uibtn_move<=0   );
 
          _drawBtn(tar,0,3,spr_b_cancel ,false  ,false              );
-         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_orders_n[MaxUnitOrders]  <=0);
+         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_orders_n[MaxUnitGroups]  <=0);
          _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])<=0);
       end;
 

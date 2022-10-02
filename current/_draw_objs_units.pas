@@ -151,7 +151,7 @@ end;
 
 procedure UIIncOrderCounter(x,y:integer;i:byte);
 begin
-   if(i>MaxUnitOrders)then exit;
+   if(i>MaxUnitGroups)then exit;
    if(ui_orders_x[i]=0)then
    begin
       ui_orders_x[i]:=x;
@@ -173,13 +173,13 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(order<MaxUnitOrders)then
+      if(group<MaxUnitGroups)then
       begin
-         UIIncOrderCounter(x,y,order);
-         ui_orders_uids[order,_ukbuilding]:=ui_orders_uids[order,_ukbuilding]+[uidi];
+         UIIncOrderCounter(x,y,group);
+         ui_orders_uids[group,_ukbuilding]:=ui_orders_uids[group,_ukbuilding]+[uidi];
       end;
 
-      if(UnitF2Select(pu))then UIIncOrderCounter(x,y,MaxUnitOrders); // all battle units
+      if(UnitF2Select(pu))then UIIncOrderCounter(x,y,MaxUnitGroups); // all battle units
 
       if(_ukbuilding)then
       begin

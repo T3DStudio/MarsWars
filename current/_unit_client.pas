@@ -225,7 +225,7 @@ begin
 
             if(rpl=false)and(playeri=_pl)then
             begin
-               if(sel)then _wudata_byte(order,rpl);
+               if(sel)then _wudata_byte(group,rpl);
                if(_ukbuilding)then
                begin
                   if(bld)then
@@ -874,7 +874,7 @@ begin
 
             if(rpl=false)and(playeri=_pl)then
             begin
-               if(sel)then order:=_rudata_byte(rpl,0);
+               if(sel)then group:=_rudata_byte(rpl,0);
                if(uid^._ukbuilding)then
                begin
                   if(bld)then

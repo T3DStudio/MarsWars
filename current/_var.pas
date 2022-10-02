@@ -297,8 +297,8 @@ ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 
 ui_orders_n,                                             //
 ui_orders_x,                                             //
-ui_orders_y       : array[0..MaxUnitOrders] of integer;             //
-ui_orders_uids    : array[0..MaxUnitOrders,false..true] of TSob;    //
+ui_orders_y       : array[0..MaxUnitGroups] of integer;             //
+ui_orders_uids    : array[0..MaxUnitGroups,false..true] of TSob;    //
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -807,6 +807,10 @@ snd_engineer_annoy,
 snd_engineer_attack,
 snd_engineer_select,
 snd_engineer_move,
+
+snd_scout_ready,
+snd_scout_select,
+snd_scout_move,
 
 snd_medic_ready,
 snd_medic_annoy,

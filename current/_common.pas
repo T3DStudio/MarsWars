@@ -505,9 +505,9 @@ begin
    begin
       setr(ureq_unitlimit ,(army     +uproda          )>=MaxPlayerUnits);
       setr(ureq_armylimit ,(armylimit+uprodl+_limituse)> MaxPlayerLimit);
-      setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<=0));
-      setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<=0));
-      setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr] =0));
+      setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<_ruid1n));
+      setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<_ruid2n));
+      setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrn));
       setr(ureq_energy    , cenergy<_renergy                 );
       setr(ureq_time      , _btime<=0                      );
       setr(ureq_addon     ,(_addon)and(G_addon=false)      );
@@ -530,7 +530,7 @@ begin
    case n of
    0    : ipower:=1;
    1    : ipower:=base;
-   else  ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
+   else   ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
    end;
 end;
 

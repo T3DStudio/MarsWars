@@ -486,12 +486,13 @@ begin
 end;
 
 
-UID_Engineer:
+UID_Scout:
 begin
-   _animw:=18;
+   _animw:=19;
    _animd:=8;
    setMWSModel(@spr_Engineer,nil);
-   setCommandSND(false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
+   setCommandSND(false,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
+   setCommandSND(true ,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_electro,0,0);
@@ -500,7 +501,7 @@ begin
 end;
 UID_Medic:
 begin
-   _animw:=18;
+   _animw:=14;
    _animd:=8;
    setMWSModel(@spr_Medic,nil);
    setCommandSND(false,snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
@@ -514,7 +515,7 @@ begin
 end;
 UID_Sergant:
 begin
-   _animw:=18;
+   _animw:=14;
    _animd:=8;
    setMWSModel(@spr_Sergant,@spr_SSergant);
    setCommandSND(false,snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
@@ -526,7 +527,7 @@ begin
 end;
 UID_Commando:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setMWSModel(@spr_Commando,nil);
    setCommandSND(false,snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
@@ -820,7 +821,7 @@ upgr_uac_barmor     : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
 upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_srange     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
+upgr_uac_engineer     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;

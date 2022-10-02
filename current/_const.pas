@@ -76,8 +76,6 @@ StepSMap               = 250;
 
 map_b0                 = 5;
 
-uidall                 = [0..255];
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  PATH FIND SYSTEM
@@ -385,6 +383,18 @@ wtp_notme_hits         = 16;
 ai_limit_border        = MaxPlayerLimit-(10*MinUnitLimit);
 
 aif_base_smart_opening : cardinal = 1;
+aif_base_smart_order   : cardinal = 1 shl 1;
+aif_base_suicide       : cardinal = 1 shl 2;
+aif_base_advance       : cardinal = 1 shl 3;
+aif_army_smart_order   : cardinal = 1 shl 4;
+aif_army_scout         : cardinal = 1 shl 5;
+aif_army_advance       : cardinal = 1 shl 6;
+aif_army_smart_micro   : cardinal = 1 shl 7;
+aif_army_teleport      : cardinal = 1 shl 8;
+aif_upgr_smart_opening : cardinal = 1 shl 9;
+aif_ability_detection  : cardinal = 1 shl 10;
+aif_ability_other      : cardinal = 1 shl 11;
+aif_ability_mainsave   : cardinal = 1 shl 12;
 
 {aif_dattack            : cardinal = 1       ; // default attack sequense
 aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
@@ -531,14 +541,13 @@ upgr_hell_bldrep       = 20; // build restoration
 upgr_hell_b478tel      = 21; // teleport towers
 upgr_hell_invuln       = 22; // hell invuln powerup
 
-
 upgr_uac_attack        = 31; // distance attack
 upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_plasmt        = 36; // turrent for apcs
-upgr_uac_srange        = 37; // infantry srange
+upgr_uac_engineer      = 37; // engineer course
 upgr_uac_towers        = 38; // towers sr
 upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
@@ -612,10 +621,19 @@ MaxUnitProdsI          = 1;  //0-1
 MaxUnitProdsN          = MaxUnitProdsI+1;  //2
 MaxMissiles            = MaxUnits;
 
+ul1                    = MinUnitLimit;
+ul1_25                 = MinUnitLimit+(MinUnitLimit div 4);
+ul1_5                  = MinUnitLimit+(MinUnitLimit div 2);
+ul2                    = MinUnitLimit*2;
+ul3                    = MinUnitLimit*3;
+ul4                    = MinUnitLimit*4;
+ul5                    = MinUnitLimit*5;
+ul10                   = MinUnitLimit*10;
+
 uf_ground              = false;
 uf_fly                 = true;
 
-MaxUnitOrders          = 10;
+MaxUnitGroups          = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -676,7 +694,7 @@ UID_UATurret           = 51;
 UID_UNuclearPlant      = 52;
 UID_UMine              = 53;
 
-UID_Engineer           = 55;
+UID_Scout              = 55;
 UID_Medic              = 56;
 UID_Sergant            = 57;
 UID_Commando           = 58;
@@ -705,12 +723,12 @@ UID_UPortal            = 78;
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
-marines                = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
-zimbas                 = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
-arch_res               = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+zimbas;
-demons                 = [UID_LostSoul..UID_Archvile]+zimbas;
-
-//coopspawn              = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
+uids_marines           = [UID_Scout    ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
+uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
+uids_arch_res          = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+uids_zimbas;
+uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
+uids_all               = [0..255];
+//uids_coopspawn         = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 
 uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep,UID_UCommandCenter);
 uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant);
@@ -725,7 +743,7 @@ uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclea
 NameLen                = 13;
 //ChatLen                = 38;
 
-dead_hits              = -12*fr_fps;
+dead_hits              = -17*fr_fps;
 fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
 
@@ -769,7 +787,7 @@ rocket_sr              = 40;
 blizz_r                = 150;
 
 bld_dec_mr             = 6;
-player_default_ai_level= 5;
+player_default_ai_level= 6;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 126)+1;   // 5
 

@@ -63,11 +63,14 @@ uses SysUtils, SDL, SDL_Net
 
 {$R *.res}
 
-//var __i,__u : cardinal;
+{var __i,__u : cardinal;
+function cf2(c:pcardinal;f:cardinal):boolean;  // check flag
+ begin cf2:=(c^ and f)>0;end;
+function cf3(c,f:cardinal):boolean;  // check flag
+ begin cf3:=(c and f)>0;end;  }
 
 begin
-   ///
-  {
+  { ///
    readln;
    writeln('start');
 
@@ -78,14 +81,14 @@ begin
       fps_cs:=SDL_GetTicks;
 
       for __i:=0 to 100000000 do
-        if((__i and ureq_energy)>0)then continue;
-       //if(cf2(__i,ureq_energy))then continue;
-       //if(cf(@__i,@ureq_energy))then continue;
+       // if((__i and ureq_energy)>0)then continue;
+       //if(cf2(@__i,ureq_energy))then continue;
+       //if(cf3(__i,ureq_energy))then continue; 380-390
+       if(cf(@__i,@ureq_energy))then continue; 360
 
       fps_cs:=SDL_GetTicks-fps_cs;
 
       writeln(fps_cs);
-
    end;
 
    readln;

@@ -72,11 +72,11 @@ begin
          armor:=_base_armor;
          with player^ do
           if(_ukbuilding)
-          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_build_armor[_urace]])*4
+          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_build_armor[_urace]])*20
           else
             if(_ukmech)
-            then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_mech_armor[_urace]])*3
-            else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*2;
+            then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_mech_armor[_urace]])*10
+            else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*10;
       end;
 
      // if(pl=HPlayer)then
@@ -533,7 +533,7 @@ begin
    for i:=0 to cw do
    begin
       a:=_target_weapon_check(pu,tu,ud,i,false,action<>nil);
-      if(a=0)then continue;
+      if(a=wmove_impassible)then continue;
       if(action<>nil)then action^:=a;
       _unit_target2weapon:=i;
       break;
@@ -607,6 +607,7 @@ wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
                        incPrio(ukfly    );
                        end;
    end;
+   incPrio(tu^.uidi<>UID_LostSoul);
 end;
 
 procedure _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger);
@@ -658,7 +659,7 @@ begin
    with player^ do
    begin
       case uidi of
-UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)then _unit_damage(tu,upgr[upgr_hell_paina],upgr[upgr_hell_paina],playeri);
+UID_HKeep: if(ud<srange)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)then _unit_damage(tu,upgr[upgr_hell_paina]*5,upgr[upgr_hell_paina],playeri);
       end;
    end;
 end;
@@ -1286,7 +1287,7 @@ begin
 
    _h:=tu^.hits/tu^.uid^._mhits;
    _d:=tu^.dir;
-   _o:=pu^.order;
+   _o:=pu^.group;
    _a:=tu^.buff[ub_advanced];
    _f:=tu^.ukfly;
    _z:=tu^.zfall;
@@ -1301,7 +1302,7 @@ begin
    if(_LastCreatedUnit>0)then
    with _LastCreatedUnitP^ do   // визуальные проблемы когда захватывается летающий СС
    begin
-      order:=_o;
+      group:=_o;
       dir  :=_d;
       ukfly:=_f;
       hits := trunc(uid^._mhits*_h);
@@ -1735,23 +1736,23 @@ begin
 
       // REGENERATION
       if(cycle_order=_cycle_regen)then
-      if(buff[ub_damaged]<=0)then
-      begin
-         i:=_baseregen;
-         if(i>=0)then
-          if(_ukbuilding)
-          then i+=upgr[upgr_race_build_regen[_urace]]
-          else
-            if(_ukmech)
-            then i+=upgr[upgr_race_mech_regen[_urace]]
-            else i+=upgr[upgr_race_bio_regen [_urace]];
+       if(buff[ub_damaged]<=0)then
+       begin
+          i:=_baseregen;
+          if(i>=0)then
+           if(_ukbuilding)
+           then i+=upgr[upgr_race_build_regen[_urace]]*5
+           else
+             if(_ukmech)
+             then i+=upgr[upgr_race_mech_regen[_urace]]*5
+             else i+=upgr[upgr_race_bio_regen [_urace]]*5;
 
-         if(i>0)then
-         begin
-            hits+=i;
-            if(hits>_mhits)then hits:=_mhits;
-         end;
-      end;
+          if(i>0)then
+          begin
+             hits+=i;
+             if(hits>_mhits)then hits:=_mhits;
+          end;
+       end;
    end
    else
      if(cenergy<0)
@@ -1816,7 +1817,8 @@ begin
             begin
                _unit_move(pu);
                _unit_prod(pu);
-               if(player^.state=ps_comp)then ai_scout_pick(pu);
+               if(player^.state=ps_comp)then
+                if(cf(@player^.ai_flags,@aif_army_scout))then ai_scout_pick(pu);
             end;
 
             au:=nil;

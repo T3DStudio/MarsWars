@@ -565,6 +565,10 @@ begin
    snd_engineer_select      :=SoundSetLoad(race_units[r_uac ]+'engineer\select'    );
    snd_engineer_move        :=SoundSetLoad(race_units[r_uac ]+'engineer\move'      );
 
+   snd_scout_ready          :=SoundSetLoad(race_units[r_uac ]+'scout\ready'        );
+   snd_scout_select         :=SoundSetLoad(race_units[r_uac ]+'scout\select'       );
+   snd_scout_move           :=SoundSetLoad(race_units[r_uac ]+'scout\go'           );
+
    snd_medic_ready          :=SoundSetLoad(race_units[r_uac ]+'medic\ready'        );
    snd_medic_annoy          :=SoundSetLoad(race_units[r_uac ]+'medic\annoy'        );
    snd_medic_select         :=SoundSetLoad(race_units[r_uac ]+'medic\select'       );

@@ -150,7 +150,7 @@ begin
       ENRG:='';
       TIME:='';
       LMT :='';
-      if(un_txt_name='')then continue;
+      //if(un_txt_name='')then continue;
 
       if(_ucl>=21)then
       begin
@@ -163,9 +163,9 @@ begin
          LMT:=l2s(_limituse);
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then _addstr(@REQ,_uids [_ruid1].un_txt_name);
-         if(_ruid2>0)then _addstr(@REQ,_uids [_ruid2].un_txt_name);
-         if(_rupgr>0)then _addstr(@REQ,_upids[_rupgr]._up_name   );
+         if(_ruid1>0)then if(_ruid1n<=1)then _addstr(@REQ,_uids [_ruid1].un_txt_name) else _addstr(@REQ,_uids[_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
+         if(_ruid2>0)then if(_ruid2n<=1)then _addstr(@REQ,_uids [_ruid2].un_txt_name) else _addstr(@REQ,_uids[_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
+         if(_rupgr>0)then if(_rupgrn<=1)then _addstr(@REQ,_upids[_rupgr]._up_name   ) else _addstr(@REQ,_upids[_rupgr]._up_name  +'(x'+b2s(_rupgrn)+')');
          HK:=_gHK(_ucl);
 
          un_txt_hint:= un_txt_name;
@@ -190,7 +190,7 @@ begin
       PROD :='';
       ENRG :='';
       TIME :='';
-      if(length(_up_name)=0)then continue;
+      //if(length(_up_name)=0)then continue;
 
       if(_up_renerg>0)then
       begin
@@ -489,7 +489,7 @@ begin
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
-   _mkHStrUid(UID_Engineer   ,'Engineer'         ,'');
+   _mkHStrUid(UID_Scout   ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic      ,'Medic'            ,'');
    _mkHStrUid(UID_Sergant    ,'Sergeant'         ,'');
    _mkHStrUid(UID_Commando   ,'Commando'         ,'');
@@ -884,7 +884,7 @@ begin
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_UMine           ,'Мина','');
 
-  _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');
+  _mkHStrUid(UID_Scout   ,'Инженер'            ,'');
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');
   _mkHStrUid(UID_Sergant    ,'Сержант'            ,'');
   _mkHStrUid(UID_Commando   ,'Коммандо'           ,'');

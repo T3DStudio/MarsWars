@@ -334,7 +334,7 @@ begin
          if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
 
          if(playeri=HPlayer)
-         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(order),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
+         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(group),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
          else UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,lvlstr_w   ,''      ,buffstr,lvlstr_a  ,lvlstr_s  );
       end;
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
@@ -641,7 +641,7 @@ begin
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+20,i2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+40,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+40,i2s(aiu_alarm_timer), ta_left,255, PlayerGetColor(playeri));
 
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));

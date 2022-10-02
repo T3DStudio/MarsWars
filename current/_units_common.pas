@@ -763,7 +763,7 @@ begin
       rld      := 0;
       pains    := 0;
       dir      := 270;
-      order    := 0;
+      group    := 0;
       a_tar    := 0;
       a_weap   := 0;
       a_rld    := 0;
@@ -1683,7 +1683,7 @@ UID_HEyeNest : if(buff[ub_advanced]>0)and(_upgr_srange>0)and(_upgr_srange_step>0
                else SetSRange(_srange);
 UID_Cyberdemon,
 UID_Mastermind,
-UID_Engineer,
+//UID_Scout,
 UID_Medic,
 UID_BFG,
 UID_ZBFG,
