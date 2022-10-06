@@ -602,11 +602,12 @@ begin
 
    setWeaponESND(0,nil,snd_shotgun,0,0);
    setWeaponESND(1,nil,snd_ssg    ,0,0);
-   setWeaponESND(2,nil,snd_pistol ,0,0);
-   setWeaponESND(3,nil,snd_shotgun,0,0);
+   setWeaponESND(2,nil,snd_shotgun,0,0);
+   setWeaponESND(3,nil,snd_pistol ,0,0);
 
    setWeaponTEID(0    ,nil,0,[0..255]);
-   setWeaponTEID(2    ,nil,0,[0..255]);
+   setWeaponTEID(1    ,nil,0,[]);
+   setWeaponTEID(3    ,nil,0,[0..255]);
 
    DefaultRLDA_pa:=2;
 end;

@@ -108,7 +108,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
          buff[ub_damaged]:=fr_fps;
 
          if(not _ukbuilding)and(not _ukmech)then
-          if(pain_f>0)and(_painc>0)and(painc>0)and(buff[ub_pain]<=0)then
+          if(pain_f>0)and(_painc>0)and(painc>0)and(buff[ub_pain]<=0) then //
           begin
              if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
 
@@ -120,7 +120,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
              begin
                 pains:=painc;
 
-                buff[ub_pain]:=max2(order_period,a_rld);
+                buff[ub_pain]:=max2(pain_time,a_rld);
 
                 with player^ do
                  if(_urace=r_hell)then
@@ -936,11 +936,10 @@ begin
    with pu^  do
    with uid^ do
     if(not _ukbuilding)and(bld)and(_ability<>uab_advance)then
-     with tu^.player^ do
       if(tu^.bld)and(tu^.hits>0)and(hits>0)and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)then
-       if(buff[ub_advanced]<=0)and(upgr[upgr_hell_6bld]>0)then
+       if(buff[ub_advanced]<=0)and(tu^.player^.upgr[upgr_hell_6bld]>0)then
        begin
-          upgr[upgr_hell_6bld]-=1;
+          tu^.player^.upgr[upgr_hell_6bld]-=1;
           _unit_hell_unit_adv(pu);
           _ability_hell_unit_adv:=true;
        end;
@@ -986,13 +985,12 @@ begin
        begin
           pu^.buff[ub_hvision]:=hell_vision_time+(hell_vision_time*upgr[upgr_hell_heye]);
           rld:=heyenest_reload;
+          _ability_hell_vision:=true;
           {$IFDEF _FULLGAME}
           _unit_HvisionEff(pu,nil);
           {$ENDIF}
        end;
-
       uo_tar:=0;
-      _ability_hell_vision:=true;
    end;
 end;
 
@@ -1501,10 +1499,10 @@ wpt_heal     : begin
                   tu^.buff[ub_heal]:=aw_rld;
                end;
 wpt_directdmg: if(not cf(@aw_reqf,@wpr_zombie))
-               then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri)
+               then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri)
                else
                  if(not _makezimba(pu,tu))
-                 then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),2,playeri);
+                 then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri);
                end;
             end;
 

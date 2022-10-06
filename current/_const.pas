@@ -59,7 +59,7 @@ gs_waitserver          = 11;
 gs_replaypause         = 12;
 gs_win_team            = 100;
 
-r_cnt                  = 2;  // race num
+r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
@@ -93,7 +93,7 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v51';
+str_ver                = 'v52';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2022 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');
@@ -629,6 +629,7 @@ ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
 ul10                   = MinUnitLimit*10;
+ul20                   = MinUnitLimit*20;
 
 uf_ground              = false;
 uf_fly                 = true;
@@ -752,6 +753,7 @@ base_ir                = base_r+(base_r div 2);
 base_rr                = base_r*2;
 base_3r                = base_r*3;
 base_4r                = base_r*4;
+base_6r                = base_r*6;
 
 apc_exp_damage         = 70;
 regen_period           = fr_fps*2;
@@ -783,6 +785,7 @@ building_adv_reload    : array[false..true] of integer = (fr_fps*45,0);
 
 invuln_time            = fr_fps*30;
 
+tank_sr                = 20;
 rocket_sr              = 40;
 blizz_r                = 150;
 
@@ -798,6 +801,9 @@ fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
 map_flydepths          : array[false..true] of integer = (0,MaxSMapW);
+
+pain_time              = fr_3h2fps;//order_period;
+stun_time              : array[false..true] of integer = (fr_fps,fr_2hfps);
 
 {$IFDEF _FULLGAME}
 
