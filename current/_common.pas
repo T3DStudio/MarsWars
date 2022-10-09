@@ -548,6 +548,7 @@ begin
      end;
 end;
 function _upid_time(upgr,lvl:byte):integer;
+const upgr_max_time = fr_fps*255;
 begin
    _upid_time:=0;
    with _upids[upgr] do
@@ -557,7 +558,7 @@ begin
      else
      begin
         lvl-=1;
-        _upid_time:=(_up_time*ipower(_up_time_xpl,lvl))+(_up_time_apl*lvl);
+        _upid_time:=min2(upgr_max_time,_up_time*ipower(_up_time_xpl,lvl)+(_up_time_apl*lvl));
      end;
 end;
 

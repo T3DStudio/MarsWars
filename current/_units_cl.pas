@@ -606,8 +606,8 @@ begin
    setWeaponESND(3,nil,snd_pistol ,0,0);
 
    setWeaponTEID(0    ,nil,0,[0..255]);
-   setWeaponTEID(1    ,nil,0,[]);
-   setWeaponTEID(3    ,nil,0,[0..255]);
+   with _a_weap[1] do aw_rld_a:=[];
+   with _a_weap[2] do aw_rld_a:=[];
 
    DefaultRLDA_pa:=2;
 end;

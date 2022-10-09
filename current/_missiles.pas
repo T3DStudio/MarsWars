@@ -189,7 +189,7 @@ begin
       case mid of
 MID_Imp        : begin damage:=100 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_Cacodemon  : begin damage:=100 ; vstep:=d div 12; splashr :=0  ;       end;
-MID_Baron      : begin damage:=100 ; vstep:=d div 12; splashr :=0  ;       end;
+MID_Baron      : begin damage:=200 ; vstep:=d div 12; splashr :=0  ;       end;
 MID_RevenantH,
 MID_Revenant   : begin damage:=100 ; vstep:=d div 10; splashr :=0  ;       dir:=point_dir(vx,vy,x,y);end;
 MID_URocketS   : begin damage:=100 ; vstep:=d div 10; splashr :=rocket_sr; dir:=point_dir(vx,vy,x,y);end;
@@ -204,8 +204,8 @@ MID_Bullet     : begin damage:=20  ; vstep:=1;        splashr :=0  ;       end;
 MID_Bulletx2   : begin damage:=30  ; vstep:=1;        splashr :=0  ;       end;
 MID_BPlasma    : begin damage:=35  ; vstep:=d div 15; splashr :=0  ;       end;
 MID_BFG        : begin damage:=500 ; vstep:=d div 10; splashr :=125;       end;
-MID_Flyer      : begin damage:=35  ; vstep:=d div 60; splashr :=0  ;       end;
-MID_HRocket    : begin damage:=500 ; vstep:=d div 15; splashr :=rocket_sr; dir:=point_dir(vx,vy,x,y);end;
+MID_Flyer      : begin damage:=150 ; vstep:=d div 60; splashr :=0  ;       end;
+MID_HRocket    : begin damage:=250 ; vstep:=d div 15; splashr :=rocket_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=100 ; vstep:=d div 10; splashr :=tank_sr;   ystep:=3;end;
 MID_Tank       : begin damage:=100 ; vstep:=1;        splashr :=tank_sr;   end;
 MID_StunMine   : begin damage:=1   ; vstep:=1;        splashr :=100;       end;
@@ -328,14 +328,15 @@ begin
 
            if (    tu^.uid^._ukmech)then   // mech
                case mid of
-               MID_BPlasma,
-               MID_YPlasma     : _d200(@rdamage);
+               MID_BPlasma     : _d200(@rdamage);
+               MID_YPlasma     : _d300(@rdamage);
                end;
 
            end
            else                            // buildings
                case mid of
-               //MID_HRocket,
+               MID_Baron       : _d50 (@rdamage);
+               MID_HRocket,
                MID_Blizzard,
                MID_Granade     : _d200(@rdamage);
                MID_Mine,
@@ -349,7 +350,6 @@ begin
                MID_RevenantH,
                MID_URocketS,
                MID_URocket     : _d200(@rdamage);
-               MID_Flyer       : _d300(@rdamage);
                end;
 
            case mid of

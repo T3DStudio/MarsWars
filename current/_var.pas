@@ -318,7 +318,7 @@ ui_uid_buildn     : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_uibtn_move     : integer = 0; // ui move buttons
 ui_uibtn_action   : integer = 0; // ui action button
-ui_upgrct         : array[byte] of byte;
+ui_upgrct         : array[byte] of integer;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_muc            : array[false..true] of cardinal; // unit max count color

@@ -14,6 +14,7 @@ fr_fps                 = 60;
 fr_2hfps               = fr_fps div 2;
 fr_3hfps               = fr_fps div 3;
 fr_4hfps               = fr_fps div 4;
+fr_5hfps               = fr_fps div 5;
 fr_6hfps               = fr_fps div 6;
 fr_7hfps               = fr_fps div 7;
 fr_8hfps               = fr_fps div 8;
