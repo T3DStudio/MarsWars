@@ -394,6 +394,14 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
    end;
 end;
 
+procedure nullupgr(playeri:byte);
+var i:byte;
+begin
+   with _players[playeri] do
+    for i:=1 to 255 do
+     upgr[i]:=0;
+end;
+
 procedure _hotkeys(k:cardinal);
 var ko,k2:cardinal;
 begin
@@ -419,6 +427,7 @@ begin
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
             sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
             sdlk_backspace : rpls_fog:=not rpls_fog;
+            SDLK_F3        : nullupgr(HPlayer);
             SDLK_F4        : with _players[Hplayer] do
                               if(_IsUnitRange(ai_scout_u_cur,nil))then
                                with _units[ai_scout_u_cur] do MoveCamToPoint(x,y);

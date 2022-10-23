@@ -427,6 +427,13 @@ begin
    if(bt^<val)then bt^:=val;
 end;
 
+function _RoyalBattleOut(x,y,d:integer):boolean;
+begin
+   if(g_mode=gm_royale)
+   then _RoyalBattleOut:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
+   else _RoyalBattleOut:=false;
+end;
+
 function _random(m:integer):integer;
 const a = 4;
       t : array[byte] of byte = (
@@ -584,13 +591,13 @@ end;
 
 function _Hi2Si(h,mh:integer;s:single):shortint;
 begin
-   if(h>=mh        )then _Hi2Si:=127  else
-   if(h =0         )then _Hi2Si:=0    else
-   if(h =dead_hits )then _Hi2Si:=-127 else
-   if(h<=ndead_hits)then _Hi2Si:=-128 else
-   if (dead_hits<h)
-   and(h<0)         then _Hi2Si:=mm3(-126,h div _d2shi,-1  )
-   else                  _Hi2Si:=mm3(   1,trunc(h/s)  ,_mms);
+   if(h>=mh                         )then _Hi2Si:=127  else
+   if(h =0                          )then _Hi2Si:=0    else
+   if(h =dead_hits                  )then _Hi2Si:=-127 else
+   if(h<=ndead_hits                 )then _Hi2Si:=-128 else
+   if(fdead_hits<h)and(h<0          )then _Hi2Si:=mm3(-125,h div _d2shi,-1  ) else
+   if( dead_hits<h)and(h<=fdead_hits)then _Hi2Si:=-126 else
+                                          _Hi2Si:=mm3(   1,trunc(h/s)  ,_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -895,7 +902,8 @@ begin
 127     : _Si2Hi:=mh;
 1..126  : _Si2Hi:=mm3(1,trunc(sh*s),mh-1);
 0       : _Si2Hi:=0;
--126..-1: _Si2Hi:=mm3(dead_hits+1,sh*_d2shi,-1);
+-125..-1: _Si2Hi:=mm3(dead_hits+1,sh*_d2shi,-1);
+-126    : _Si2Hi:=fdead_hits;
 -127    : _Si2Hi:=dead_hits;
 -128    : _Si2Hi:=ndead_hits;
    end;

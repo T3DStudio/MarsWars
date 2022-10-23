@@ -202,12 +202,12 @@ var  i:byte;
 r,d,ds:integer;
 begin
    if(c=0)
-   then _unit_add(x,y,uid,pl,true,false,false)
+   then _unit_add(x,y,0,uid,pl,true,false,false)
    else
    begin
       if(c>5)then
       begin
-         _unit_add(x,y,uid,pl,true,false,false);
+         _unit_add(x,y,0,uid,pl,true,false,false);
          c-=1;
       end;
       ds :=map_mw div 2;
@@ -219,7 +219,7 @@ begin
          _unit_add(
          x+trunc(r*cos(d*degtorad)),
          y-trunc(r*sin(d*degtorad)),
-         uid,pl,true,false,false);
+         0,uid,pl,true,false,false);
 
          d+=ds;
       end;
@@ -613,7 +613,7 @@ begin
                    0 : mon:=UID_ZFormer;
                    1 : mon:=UID_ZSergant;
                    2 : mon:=UID_ZCommando;
-                   3 : mon:=UID_ZBomber;
+                   3 : mon:=UID_ZAntiaircrafter;
                    4 : mon:=UID_ZMajor;
                    5 : mon:=UID_ZBFG;
                    end;
@@ -624,7 +624,7 @@ begin
                        0 : mon:=UID_ZFormer;
                        1 : mon:=UID_ZSergant;
                        2 : mon:=UID_ZCommando;
-                       3 : mon:=UID_ZBomber;
+                       3 : mon:=UID_ZAntiaircrafter;
                        4 : mon:=UID_ZMajor;
                        5 : mon:=UID_ZBFG;
                        end;
@@ -636,7 +636,7 @@ begin
                        0 : mon:=UID_ZFormer;
                        1 : mon:=UID_ZSergant;
                        2 : mon:=UID_ZCommando;
-                       3 : mon:=UID_ZBomber;
+                       3 : mon:=UID_ZAntiaircrafter;
                        4 : mon:=UID_ZMajor;
                        5 : mon:=UID_ZBFG;
                        end;
@@ -654,7 +654,7 @@ begin
                     0 : mon:=UID_ZFormer;
                     1 : mon:=UID_ZSergant;
                     2 : mon:=UID_ZCommando;
-                    3 : mon:=UID_ZBomber;
+                    3 : mon:=UID_ZAntiaircrafter;
                     4 : mon:=UID_ZMajor;
                     5 : mon:=UID_ZBFG;
                     6 : mon:=UID_Imp;
@@ -667,7 +667,7 @@ begin
                     13: mon:=UID_Mancubus;
                     14: mon:=UID_Archvile;
                     15: mon:=UID_ZCommando;
-                    16: mon:=UID_ZBomber;
+                    16: mon:=UID_ZAntiaircrafter;
                     17: mon:=UID_ZMajor;
                     18: mon:=UID_Pain;
                     else

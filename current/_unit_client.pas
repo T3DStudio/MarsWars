@@ -583,8 +583,9 @@ begin
             if(hits>0)then
             begin
                if(pu^.buff[ub_teleeff ]<=0)and(buff[ub_teleeff ]>0)then _teleEff(uu,pu);
-               if(pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
-               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_HvisionEff (uu,@vis);
+               if(pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0)then _ucSummonedEffect (uu,@vis);
+               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_HvisionEff  (uu,@vis);
+               if(pu^.buff[ub_pain    ]<=0)and(buff[ub_pain    ]>0)then _unit_pain_effects(uu,@vis);
 
                if(pu^.bld)and(bld=false)then
                 if(playeri=HPlayer)then

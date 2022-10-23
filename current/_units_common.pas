@@ -770,15 +770,14 @@ begin
       a_weap_cl:= 0;
       a_tar_cl := 0;
 
-      aiu_attack_timer      :=0;
-      aiu_alarm_timer:=0;
-      aiu_alarm_d    :=32000;
-      aiu_alarm_x    :=-1;
-      aiu_alarm_y    :=0;
-      aiu_need_detect:=32000;
+      aiu_attack_timer:=0;
+      aiu_alarm_timer :=0;
+      aiu_alarm_d     :=32000;
+      aiu_alarm_x     :=-1;
+      aiu_alarm_y     :=0;
+      aiu_need_detect :=32000;
       aiu_armyaround_ally :=0;
       aiu_armyaround_enemy:=0;
-
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
@@ -909,27 +908,41 @@ begin
    end;
 end;
 
-procedure _unit_add(ux,uy:integer;ui,pl:byte;ubld,summoned,advanced:boolean);
+procedure _unit_add(ux,uy,aunum:integer;ui,pl:byte;ubld,summoned,advanced:boolean);
 var m,i:integer;
+procedure _FindDeadUnit;
+begin
+   i:=MaxPlayerUnits*pl+1;
+   m:=i+MaxPlayerUnits;
+   while(i<m)do
+   begin
+      with _units[i] do
+       if(hits<=dead_hits)then
+       begin
+          _LastCreatedUnit :=i;
+          _LastCreatedUnitP:=@_units[i];
+          break;
+       end;
+      i+=1;
+   end;
+end;
 begin
    _LastCreatedUnit :=0;
    _LastCreatedUnitP:=@_units[_LastCreatedUnit];
    with _players[pl] do
    begin
       if(ui=0)then exit;
-      i:=MaxPlayerUnits*pl+1;
-      m:=i+MaxPlayerUnits;
-      while(i<m)do
-      begin
-         with _units[i] do
-          if(hits<=dead_hits)then
-          begin
-             _LastCreatedUnit :=i;
-             _LastCreatedUnitP:=@_units[i];
-             break;
-          end;
-         i+=1;
-      end;
+
+      if(not _IsUnitRange(aunum,nil))
+      then _FindDeadUnit
+      else
+        if(_units[aunum].hits>dead_hits)
+        then _FindDeadUnit
+        else
+        begin
+           _LastCreatedUnit :=aunum;
+           _LastCreatedUnitP:=@_units[_LastCreatedUnit];
+        end;
 
       FillChar(_LastCreatedUnitP^,SizeOf(TUnit),0);
       if(_LastCreatedUnit>0)then
@@ -972,7 +985,7 @@ begin
    if(_unit_start_build=0)then
     with _players[bp] do
      if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)
-     then _unit_add(bx,by,buid,bp,false,false,false)
+     then _unit_add(bx,by,-1,buid,bp,false,false,false)
      else _unit_start_build:=ureq_place;
 end;
 
@@ -1228,7 +1241,7 @@ begin
          cd:=(dir+i*15)*degtorad;
 
          _unit_add(x+trunc(sr*cos(cd)),
-                   y-trunc(sr*sin(cd)),_uid,playeri,true,false,false);
+                   y-trunc(sr*sin(cd)),-1,_uid,playeri,true,false,false);
          if(_LastCreatedUnit>0)then
          begin
             _LastCreatedUnitP^.uo_x  :=uo_x;
@@ -1316,7 +1329,7 @@ begin
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
-        then _unit_add(tx,ty,auid,playeri,true,true,buff[ub_advanced]>0)
+        then _unit_add(tx,ty,-1,auid,playeri,true,true,buff[ub_advanced]>0)
         else exit;
 
       if(_LastCreatedUnit>0)then
@@ -1588,10 +1601,12 @@ UID_UMine        : buff[ub_invis]:=_ub_infinity;
       // OTHER
       case uidi of
 UID_LostSoul: begin
+                 ukfloater:=true;
                  tu:=nil;
                  if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
                  if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
               end;
+UID_UACBot  : ukfloater:=upgr[upgr_uac_float]>0;
 UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)then
               begin
                  if(speed=_speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;
@@ -1685,10 +1700,7 @@ UID_Cyberdemon,
 UID_Mastermind,
 //UID_Scout,
 UID_Medic,
-UID_BFG,
-UID_ZBFG,
-UID_Major,
-UID_ZMajor   : if(buff[ub_advanced]>0)
+UID_BFG      : if(buff[ub_advanced]>0)
                then SetSRange(_srange+50)
                else SetSRange(_srange   );
       else

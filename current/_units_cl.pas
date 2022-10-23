@@ -307,7 +307,7 @@ end;
 
 UID_ZFormer:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (@spr_ZFormer,nil);
@@ -326,7 +326,7 @@ begin
 end;
 UID_ZSergant:
 begin
-   _animw:=18;
+   _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
@@ -345,19 +345,29 @@ begin
    setMWSModel  (@spr_ZCommando,nil);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
-UID_ZBomber:
+UID_ZSiege:
 begin
    _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
    setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
-   setMWSModel  (@spr_ZBomber,nil);
+   setMWSModel  (@spr_ZSiege,nil);
+   setWeaponESND(0,nil,snd_launch,0,0);
+end;
+UID_ZAntiaircrafter:
+begin
+   _animw:=15;
+   _animd:=8;
+   setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
+   setEffectEID (false,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (false,nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setMWSModel  (@spr_ZAntiaircrafter,nil);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_ZMajor:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setMWSModel(@spr_ZMajor,@spr_ZFMajor);
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
@@ -370,7 +380,7 @@ begin
 end;
 UID_ZBFG:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(false,snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (false,0  ,0              ,EID_Gavno,0             );
@@ -490,7 +500,7 @@ UID_Scout:
 begin
    _animw:=19;
    _animd:=8;
-   setMWSModel(@spr_Engineer,nil);
+   setMWSModel(@spr_Scout,@spr_Engineer);
    setCommandSND(false,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
    setCommandSND(true ,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
@@ -535,11 +545,21 @@ begin
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_pistol,0,0);
 end;
-UID_Bomber:
+UID_Siege:
 begin
    _animw:=14;
    _animd:=8;
-   setMWSModel(@spr_Bomber,nil);
+   setMWSModel(@spr_Siege,nil);
+   setCommandSND(false,snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
+   setEffectEID (false,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
+   setWeaponESND(0,nil,snd_launch,0,0);
+end;
+UID_Antiaircrafter:
+begin
+   _animw:=14;
+   _animd:=8;
+   setMWSModel(@spr_Antiaircrafter,nil);
    setCommandSND(false,snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
@@ -600,14 +620,13 @@ begin
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
 
-   setWeaponESND(0,nil,snd_shotgun,0,0);
-   setWeaponESND(1,nil,snd_ssg    ,0,0);
-   setWeaponESND(2,nil,snd_shotgun,0,0);
-   setWeaponESND(3,nil,snd_pistol ,0,0);
+   setWeaponESND(0,nil,snd_ssg    ,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
+   setWeaponESND(2,nil,snd_pistol ,0,0);
 
-   setWeaponTEID(0    ,nil,0,[0..255]);
-   with _a_weap[1] do aw_rld_a:=[];
-   with _a_weap[2] do aw_rld_a:=[];
+   setWeaponTEID(2    ,nil,0,[0..255]);
+   //with _a_weap[1] do aw_rld_a:=[];
+   //with _a_weap[2] do aw_rld_a:=[];
 
    DefaultRLDA_pa:=2;
 end;
@@ -628,8 +647,6 @@ begin
    setEffectEID (false,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (false,nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_flyer_s,0,0);
-   setWeaponESND(1    ,nil,snd_launch ,0,0);
-   //
 end;
 UID_UTransport:
 begin
@@ -822,7 +839,7 @@ upgr_uac_barmor     : begin _up_btn:=spr_b_up[r_uac ,2 ]; end;
 upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_engineer     : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
+upgr_uac_float      : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;

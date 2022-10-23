@@ -374,6 +374,8 @@ wtp_unit_light         = 13;
 wtp_building_nlight    = 14;
 wtp_scout              = 15;
 wtp_notme_hits         = 16;
+wtp_fly                = 17;
+wtp_nolost_hits        = 18;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -451,7 +453,8 @@ client_rld_abils = [
                    uab_teleport     ,
                    uab_uac__unit_adv,
                    uab_hell_unit_adv,
-                   uab_building_adv
+                   uab_building_adv,
+                   uab_hell_vision
                    ];
 client_cast_abils= [
                    uab_radar,
@@ -548,7 +551,7 @@ upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_plasmt        = 36; // turrent for apcs
-upgr_uac_engineer      = 37; // engineer course
+upgr_uac_float         = 37; // UACBot floating
 upgr_uac_towers        = 38; // towers sr
 upgr_uac_radar_r       = 39; // Radar
 upgr_uac_mainm         = 40; // Main b move
@@ -623,8 +626,8 @@ MaxUnitProdsN          = MaxUnitProdsI+1;  //2
 MaxMissiles            = MaxUnits;
 
 ul1                    = MinUnitLimit;
-ul1_25                 = MinUnitLimit+(MinUnitLimit div 4);
-ul1_5                  = MinUnitLimit+(MinUnitLimit div 2);
+ul1hh                  = MinUnitLimit+(MinUnitLimit div 4);
+ul1h                   = MinUnitLimit+(MinUnitLimit div 2);
 ul2                    = MinUnitLimit*2;
 ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
@@ -676,9 +679,10 @@ UID_ZFormer            = 28;
 UID_ZEngineer          = 29;
 UID_ZSergant           = 30;
 UID_ZCommando          = 31;
-UID_ZBomber            = 32;
-UID_ZMajor             = 33;
-UID_ZBFG               = 34;
+UID_ZAntiaircrafter    = 32;
+UID_ZSiege             = 33;
+UID_ZMajor             = 34;
+UID_ZBFG               = 35;
 
 // UAC
 
@@ -700,15 +704,16 @@ UID_Scout              = 55;
 UID_Medic              = 56;
 UID_Sergant            = 57;
 UID_Commando           = 58;
-UID_Bomber             = 59;
-UID_Major              = 60;
-UID_BFG                = 61;
-UID_FAPC               = 62;
-UID_APC                = 64;
-UID_UACBot             = 65;
-UID_Terminator         = 66;
-UID_Tank               = 67;
-UID_Flyer              = 68;
+UID_Antiaircrafter     = 59;
+UID_Siege              = 60;
+UID_Major              = 61;
+UID_BFG                = 62;
+UID_FAPC               = 63;
+UID_UACBot             = 64;
+UID_Terminator         = 65;
+UID_Tank               = 66;
+UID_Flyer              = 67;
+UID_APC                = 68;
 UID_UTransport         = 69;
 
 UID_UBaseMil           = 70;
@@ -725,8 +730,8 @@ UID_UPortal            = 78;
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
-uids_marines           = [UID_Scout    ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Bomber ,UID_Major ,UID_BFG ];
-uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZBomber,UID_ZMajor,UID_ZBFG];
+uids_marines           = [UID_Scout    ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Antiaircrafter ,UID_Siege , UID_Major ,UID_BFG ];
+uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiege, UID_ZMajor,UID_ZBFG];
 uids_arch_res          = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
@@ -748,6 +753,8 @@ NameLen                = 13;
 dead_hits              = -17*fr_fps;
 fdead_hits             = dead_hits+fr_3fps;
 ndead_hits             = dead_hits-1;
+
+fdead_hits_border      = -130;
 
 base_r                 = 350;
 base_ir                = base_r+(base_r div 2);
@@ -793,7 +800,7 @@ blizz_r                = 150;
 bld_dec_mr             = 6;
 player_default_ai_level= 6;
 _mms                   = 126;
-_d2shi                 = abs(dead_hits div 126)+1;   // 5
+_d2shi                 = abs(dead_hits div 125)+1;   // 5
 
 gm_cptp_time           = fr_fps*20;
 
@@ -803,8 +810,7 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 
 map_flydepths          : array[false..true] of integer = (0,MaxSMapW);
 
-pain_time              = fr_3h2fps;//order_period;
-stun_time              : array[false..true] of integer = (fr_fps,fr_2hfps);
+pain_time              = order_period;
 
 {$IFDEF _FULLGAME}
 

@@ -154,12 +154,12 @@ begin
 
       if(_ucl>=21)then
       begin
-         un_txt_hint:= un_txt_name+#11+un_txt_descr+#11;
+         un_txt_hint:=un_txt_name+#11+un_txt_descr+#11;
       end
       else
       begin
          if(_renergy>0)then ENRG:=i2s(_renergy);
-         if(_btime >0)then TIME:=i2s(_btime );
+         if(_btime  >0)then TIME:=i2s(_btime );
          LMT:=l2s(_limituse);
 
          PROD:=findprd(uid);
@@ -169,16 +169,16 @@ begin
          HK:=_gHK(_ucl);
 
          un_txt_hint:= un_txt_name;
-         if(length(HK  )>0)then un_txt_hint:=un_txt_hint+' ('+HK+')';
-         if(length(ENRG)>0)then un_txt_hint:=un_txt_hint+' {'+#19+ENRG+#25+'}';
-         if(length(LMT )>0)then un_txt_hint:=un_txt_hint+' <'+#16+LMT +#25+'>';
-         if(length(TIME)>0)then un_txt_hint:=un_txt_hint+' ['+#22+TIME+#25+']';
-         un_txt_hint:=un_txt_hint+#11+un_txt_descr+#11;
-         if(length(REQ )>0)then un_txt_hint:= un_txt_hint+#17+str_req+#25+REQ+#11 else un_txt_hint:= un_txt_hint+#11;
+         if(length(HK  )>0)then un_txt_hint+=' ('+HK+')';
+         if(length(ENRG)>0)then un_txt_hint+=' {'+#19+ENRG+#25+'}';
+         if(length(LMT )>0)then un_txt_hint+=' <'+#16+LMT +#25+'>';
+         if(length(TIME)>0)then un_txt_hint+=' ['+#22+TIME+#25+']';
+         un_txt_hint+=#11+un_txt_descr+#11;
+         if(length(REQ )>0)then un_txt_hint+=#17+str_req+#25+REQ+#11 else un_txt_hint+=#11;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_hint:= un_txt_hint+str_bprod+PROD
-          else un_txt_hint:= un_txt_hint+str_uprod+PROD;
+          then un_txt_hint+=str_bprod+PROD
+          else un_txt_hint+=str_uprod+PROD;
       end;
    end;
 
@@ -211,13 +211,13 @@ begin
       HK:=_gHK(_up_btni);
 
       _up_hint:=_up_name;
-      if(length(HK  )>0)then _up_hint:=_up_hint+' ('+HK+')';
-      if(length(ENRG)>0)then _up_hint:=_up_hint+' {'+#19+ENRG+#25+'}';
-      if(length(TIME)>0)then _up_hint:=_up_hint+' ['+#22+TIME+#25+']';
-      _up_hint:=_up_hint+' x'+#16+i2s(_up_max)+#25;
-      if(_up_mfrg)then _up_hint:=_up_hint+#15+' *'+#25;
-      _up_hint:=_up_hint+#11+_up_descr+#11;
-      if(length(REQ)>0)then _up_hint:=_up_hint+#17+str_req+#25+REQ;
+      if(length(HK  )>0)then _up_hint+=' ('+HK+')';
+      if(length(ENRG)>0)then _up_hint+=' {'+#19+ENRG+#25+'}';
+      if(length(TIME)>0)then _up_hint+=' ['+#22+TIME+#25+']';
+      _up_hint+=' x'+#16+i2s(_up_max)+#25;
+      if(_up_mfrg)then _up_hint+=#15+' *'+#25;
+      _up_hint+=#11+_up_descr+#11;
+      if(length(REQ)>0)then _up_hint+=#17+str_req+#25+REQ;
    end;
 end;
 
@@ -425,25 +425,26 @@ begin
    _mkHStrUid(UID_HMilitaryUnit ,'Hell Military Unit' ,'Corrupted UAC Military Unit. Creates zombies.' );
    _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'');
 
-   _mkHStrUid(UID_LostSoul   ,'Lost Soul'      ,'');
-   _mkHStrUid(UID_Imp        ,'Imp'            ,'');
-   _mkHStrUid(UID_Demon      ,'Demon'          ,'');
-   _mkHStrUid(UID_Cacodemon  ,'Cacodemon'      ,'');
-   _mkHStrUid(UID_Knight     ,'Baron of Hell / Hell Knight','');
-   _mkHStrUid(UID_Cyberdemon ,'Cyberdemon'     ,'');
-   _mkHStrUid(UID_Mastermind ,'Mastermind'     ,'');
-   _mkHStrUid(UID_Pain       ,'Pain Elemental' ,'');
-   _mkHStrUid(UID_Revenant   ,'Revenant'       ,'');
-   _mkHStrUid(UID_Mancubus   ,'Mancubus'       ,'');
-   _mkHStrUid(UID_Arachnotron,'Arachnotron'    ,'');
-   _mkHStrUid(UID_Archvile   ,'ArchVile'       ,'');
-   _mkHStrUid(UID_ZFormer    ,'Zombie Former'  ,'');
-   _mkHStrUid(UID_ZEngineer  ,'Zombie Engineer','');
-   _mkHStrUid(UID_ZSergant   ,'Zombie Sergeant','');
-   _mkHStrUid(UID_ZCommando  ,'Zombie Commando','');
-   _mkHStrUid(UID_ZBomber    ,'Zombie Bomber'  ,'');
-   _mkHStrUid(UID_ZMajor     ,'Zombie Major'   ,'');
-   _mkHStrUid(UID_ZBFG       ,'Zombie BFG'     ,'');
+   _mkHStrUid(UID_LostSoul       ,'Lost Soul'      ,'');
+   _mkHStrUid(UID_Imp            ,'Imp'            ,'');
+   _mkHStrUid(UID_Demon          ,'Demon'          ,'');
+   _mkHStrUid(UID_Cacodemon      ,'Cacodemon'      ,'');
+   _mkHStrUid(UID_Knight         ,'Baron of Hell / Hell Knight','');
+   _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'     ,'');
+   _mkHStrUid(UID_Mastermind     ,'Mastermind'     ,'');
+   _mkHStrUid(UID_Pain           ,'Pain Elemental' ,'');
+   _mkHStrUid(UID_Revenant       ,'Revenant'       ,'');
+   _mkHStrUid(UID_Mancubus       ,'Mancubus'       ,'');
+   _mkHStrUid(UID_Arachnotron    ,'Arachnotron'    ,'');
+   _mkHStrUid(UID_Archvile       ,'ArchVile'       ,'');
+   _mkHStrUid(UID_ZFormer        ,'Zombie Former'  ,'');
+   _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer','');
+   _mkHStrUid(UID_ZSergant       ,'Zombie Sergeant','');
+   _mkHStrUid(UID_ZCommando      ,'Zombie Commando','');
+   _mkHStrUid(UID_ZAntiaircrafter,'Antiaircrafter Zombie'  ,'');
+   _mkHStrUid(UID_ZSiege         ,'Siege Zombie'  ,'');
+   _mkHStrUid(UID_ZMajor         ,'Zombie Major'   ,'');
+   _mkHStrUid(UID_ZBFG           ,'Zombie BFG'     ,'');
 
 
    _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease cooldown time of Hell Teleport.'                           );
@@ -489,20 +490,21 @@ begin
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
-   _mkHStrUid(UID_Scout   ,'Engineer'         ,'');
-   _mkHStrUid(UID_Medic      ,'Medic'            ,'');
-   _mkHStrUid(UID_Sergant    ,'Sergeant'         ,'');
-   _mkHStrUid(UID_Commando   ,'Commando'         ,'');
-   _mkHStrUid(UID_Bomber     ,'Artillery soldier','');
-   _mkHStrUid(UID_Major      ,'Major'            ,'');
-   _mkHStrUid(UID_BFG        ,'BFG Marine'       ,'');
-   _mkHStrUid(UID_FAPC       ,'Air APC'          ,'');
-   _mkHStrUid(UID_UTransport ,'Air APC'          ,'');
-   _mkHStrUid(UID_APC        ,'Ground APC'       ,'');
-   _mkHStrUid(UID_UACBot     ,'UAC Bot'          ,'');
-   _mkHStrUid(UID_Terminator ,'UAC Terminator'   ,'');
-   _mkHStrUid(UID_Tank       ,'UAC Tank'         ,'');
-   _mkHStrUid(UID_Flyer      ,'UAC Fighter'      ,'');
+   _mkHStrUid(UID_Scout         ,'Scout / Engineer' ,'');
+   _mkHStrUid(UID_Medic         ,'Medic'            ,'');
+   _mkHStrUid(UID_Sergant       ,'Sergeant'         ,'');
+   _mkHStrUid(UID_Commando      ,'Commando'         ,'');
+   _mkHStrUid(UID_Antiaircrafter,'Antiaircrafter soldier','');
+   _mkHStrUid(UID_Siege         ,'Siege soldier','');
+   _mkHStrUid(UID_Major         ,'Major'            ,'');
+   _mkHStrUid(UID_BFG           ,'BFG Marine'       ,'');
+   _mkHStrUid(UID_FAPC          ,'Air APC'          ,'');
+   _mkHStrUid(UID_UTransport    ,'Air APC'          ,'');
+   _mkHStrUid(UID_APC           ,'Ground APC'       ,'');
+   _mkHStrUid(UID_UACBot        ,'UAC Bot'          ,'');
+   _mkHStrUid(UID_Terminator    ,'UAC Terminator'   ,'');
+   _mkHStrUid(UID_Tank          ,'UAC Tank'         ,'');
+   _mkHStrUid(UID_Flyer         ,'UAC Fighter'      ,'');
 
    _mkHStrUpid(upgr_uac_radar_r,'UAC Radar upgrade','Increase radar scouting radius.'     );
    _mkHStrUpid(upgr_uac_rstrike,'UAC Rocket strike','Missile for Rocket Launcher Station.');
@@ -888,7 +890,7 @@ begin
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');
   _mkHStrUid(UID_Sergant    ,'Сержант'            ,'');
   _mkHStrUid(UID_Commando   ,'Коммандо'           ,'');
-  _mkHStrUid(UID_Bomber     ,'Гранатометчик'      ,'');
+  _mkHStrUid(UID_Antiaircrafter     ,'Гранатометчик'      ,'');
   _mkHStrUid(UID_Major      ,'Майор'              ,'');
   _mkHStrUid(UID_BFG        ,'Солдат с BFG'       ,'');
   _mkHStrUid(UID_FAPC       ,'Воздушный транспорт','');

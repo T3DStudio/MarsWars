@@ -187,6 +187,7 @@ TUWeapon = record
 end;
 
 TUID = record
+   _hmhits,
    _mhits       : longint;
    _speed,
    _r,_missile_r,
@@ -197,6 +198,7 @@ TUID = record
    _bstep,
    _tprod,
    _painc,
+   _painc_upgr,
    _zfall,
    _apcs,
    _apcm,
@@ -219,6 +221,9 @@ TUID = record
    _rupgr,
    _rupgrn      : byte;
 
+   _shots2advanced
+                : byte;
+
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
 
    _shcf        : single;
@@ -240,7 +245,6 @@ TUID = record
    _isbarrack,
    _issolid,
    _ukfly,
-   _ukfloater,
    _splashresist,
    _addon       : boolean;
    _bornadvanced: array[false..true] of boolean; //[addon]
@@ -492,6 +496,7 @@ TUnit = record
    StayWaitForNextTarget:byte;
    uo_vision,
    ukfly,
+   ukfloater,
    isbuildarea,
    bld,
    solid,
@@ -540,9 +545,9 @@ TMissile = record
    mtars,
    ntars    : integer;
    player,
+   homing,
    mid      : byte;
-   mfe,mfs,
-   homing   : boolean;
+   mfe,mfs  : boolean;
    {$IFDEF _FULLGAME}
    ms_eid_bio_death: boolean;
    {$ENDIF}
