@@ -80,8 +80,8 @@ begin
          end;
 
          case uidi of
-UID_Knight    : if(buff[ub_advanced]>0)then damage:=damage div 2;
-UID_ZCommando : if(buff[ub_advanced]>0)then armor+=8;
+UID_Knight     : if(buff[ub_advanced]>0)then damage:=damage div 2;
+UID_ZCommando  : if(buff[ub_advanced]>0)then armor+=8;
          else
          end;
 
@@ -95,7 +95,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
       if(damage<=0)then
        if(_random(abs(damage)+1)=0)
        then damage:=1
-       else exit;
+       else damage:=0;
 
       if(hits<=damage)then
       begin
@@ -104,7 +104,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
       end
       else
       begin
-         buff[ub_damaged]:=fr_fps;
+         buff[ub_damaged]:=fr_2fps;
 
          if(ServerSide)
          then hits-=damage
@@ -553,9 +553,10 @@ begin
    i:=i div 2;
 end;
 begin
-   i:=1024;
+   i:=2048;
    _unitWeaponPriority:=0;
 
+   incPrio(tu^.buff[ub_invuln]<=0);
    incPrio(highprio);
 
    with tu^  do
@@ -642,10 +643,10 @@ begin
       else
        with _a_weap[tw] do
         if(tw<t_weap^)
-        then n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighTarget(player,tu))
+        then n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPrioTarget(player,tu))
         else
         begin
-           n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighTarget(player,tu));
+           n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPrioTarget(player,tu));
            if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
            case aw_tarprior of
@@ -1457,6 +1458,7 @@ wmove_noneed    : if(not attackinmove)then
 
          if(a_rld<=0)then
          begin
+            a_shots  +=1;
             a_rld    :=aw_rld;
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
@@ -1482,7 +1484,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not _IsUnitRange(tu^.inapc,nil))then
-              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((G_Step mod fr_fps)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;
@@ -1496,7 +1498,7 @@ wmove_noneed    : if(not attackinmove)then
              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
              begin
                 if(not _IsUnitRange(tu^.inapc,nil))then
-                _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_depth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+                _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_FlyDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
 
                 SoundPlayUnit(aw_snd_target,tu,@targetvis);
              end;
@@ -1756,16 +1758,16 @@ begin
 
       // REGENERATION
       if(cycle_order=_cycle_regen)then
-       if(buff[ub_damaged]<=0)then
+       if(buff[ub_damaged]<=0)and(hits<_mhits)then
        begin
-          i:=_baseregen;
-          if(i>=0)then
-           if(_ukbuilding)
-           then i+=upgr[upgr_race_build_regen[_urace]]*5
-           else
-             if(_ukmech)
-             then i+=upgr[upgr_race_mech_regen[_urace]]*5
-             else i+=upgr[upgr_race_bio_regen [_urace]]*5;
+          i:=upgr[_upgr_regen];
+          if(_ukbuilding)
+          then i+=upgr[upgr_race_build_regen[_urace]]
+          else
+            if(_ukmech)
+            then i+=upgr[upgr_race_mech_regen[_urace]]
+            else i+=upgr[upgr_race_bio_regen [_urace]];
+          i:=(i*10)+_baseregen;
 
           if(i>0)then
           begin
@@ -1775,9 +1777,7 @@ begin
        end;
    end
    else
-     if(cenergy<0)
-     then //_unit_kill(pu,false,false,true)
-     else
+     if(cenergy>=0)then
      begin
         if(_cycle_order=cycle_order)and(buff[ub_damaged]<=0)then
         begin

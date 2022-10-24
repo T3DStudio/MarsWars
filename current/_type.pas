@@ -211,6 +211,8 @@ TUID = record
 
    _upgr_srange,
    _upgr_armor,
+   _upgr_regen,
+   _upgr_bornadv,
    _zombie_uid,
    _urace,
    _ucl,
@@ -218,6 +220,8 @@ TUID = record
    _ruid1n,
    _ruid2,
    _ruid2n,
+   _ruid3,
+   _ruid3n,
    _rupgr,
    _rupgrn      : byte;
 
@@ -247,7 +251,7 @@ TUID = record
    _ukfly,
    _splashresist,
    _addon       : boolean;
-   _bornadvanced: array[false..true] of boolean; //[addon]
+   //_bornadvanced: array[false..true] of boolean; //[addon]
    _fastdeath_hits
                 : array[false..true] of integer; //[adv]
 
@@ -467,6 +471,7 @@ TUnit = record
    uprod_u,
    pprod_u  : array[0..MaxUnitProdsI] of byte;
 
+   a_shots  : cardinal;
    a_rld,
    a_weap_cl,
    a_weap   : byte;

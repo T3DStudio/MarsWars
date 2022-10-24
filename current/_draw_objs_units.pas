@@ -9,14 +9,14 @@ begin
      else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 end;
 
-function _depth(y:integer;f:boolean):integer;
+function _FlyDepth(y:integer;f:boolean):integer;
 begin
-   _depth:=map_flydepths[f]+y;
+   _FlyDepth:=map_flydepths[f]+y;
 end;
 
-function _udpth(pu:PTUnit):integer;
+function _unit_SpriteDepth(pu:PTUnit):integer;
 begin
-   _udpth:=0;
+   _unit_SpriteDepth:=0;
    with pu^ do
     case uidi of
 UID_UPortal,
@@ -24,21 +24,20 @@ UID_HTeleport,
 UID_HSymbol,
 UID_HASymbol,
 UID_HAltar,
-UID_UMine     : _udpth:=-MaxSMapW+vy;
+UID_UMine     : _unit_SpriteDepth:=-MaxSMapW+vy;
     else
       if(uid^._ukbuilding)and(bld=false)
-      then _udpth:=-MaxSMapW+vy
+      then _unit_SpriteDepth:=-MaxSMapW+vy
       else
         if(hits>0)or(buff[ub_resur]>0)then
         begin
            if(zfall>0)
-           then _udpth:=_depth(vy,true)
-           else _udpth:=_depth(vy,ukfly);
+           then _unit_SpriteDepth:=_FlyDepth(vy,true)
+           else _unit_SpriteDepth:=_FlyDepth(vy,ukfly);
         end
-        else _udpth:=vy;
+        else _unit_SpriteDepth:=vy;
     end;
 end;
-
 
 
 procedure _fog_sr(x,y,r:integer);
@@ -112,7 +111,7 @@ begin
 end;
 
 
-procedure _unit_uiprodcnts(pu:PTUnit;pn:integer);
+procedure ui_ProductionCounters(pu:PTUnit;pn:integer);
 var i,t:byte;
 begin
    with pu^     do
@@ -123,12 +122,13 @@ begin
       begin
          for t:=1 to 255 do
           if(s_barracks<=0)or(sel and(s_barracks>0))then
-           if(t in ups_units)then ui_prod_units[t]+=1+byte(buff[ub_advanced]>0);     //possible productions count of each unit type
+           if(t in ups_units)then ui_uprod_uid_max[t]+=1+byte(buff[ub_advanced]>0);     //possible productions count of each unit type
 
          if(uprod_r[pn]>0)then
          begin
             i:=uprod_u[pn];
-            if(ui_units_ptime[i]<=0)or(ui_units_ptime[i]>uprod_r[pn])then ui_units_ptime[i]:=uprod_r[pn];
+            if(ui_uprod_first      <=0)or(ui_uprod_first      >uprod_r[pn])then ui_uprod_first      :=uprod_r[pn];
+            if(ui_uprod_uid_time[i]<=0)or(ui_uprod_uid_time[i]>uprod_r[pn])then ui_uprod_uid_time[i]:=uprod_r[pn];
          end;
       end;
 
@@ -136,37 +136,39 @@ begin
       begin
          for t:=1 to 255 do
           if(s_smiths<=0)or(sel and(s_smiths>0))then
-           if(t in ups_upgrades)then ui_prod_upgrades[t]+=1+byte(buff[ub_advanced]>0);   //possible productions count of each upgrade type
+           if(t in ups_upgrades)then ui_pprod_max[t]+=1+byte(buff[ub_advanced]>0);   //possible productions count of each upgrade type
 
          if(pprod_r[pn]>0)then
          begin
             i:=pprod_u[pn];
-            //if(upgrade_mfrg[race,i])then inc(ui_upgrct[i],1);
-            if(ui_first_upgr_time<=0)or(pprod_r[pn]<ui_first_upgr_time)then ui_first_upgr_time:=pprod_r[pn];
-            if(ui_upgr[i]<=0)or(ui_upgr[i]>pprod_r[pn])then ui_upgr[i]:=pprod_r[pn];
+            if(ui_pprod_first  <=0)or(pprod_r[pn]  <ui_pprod_first)then ui_pprod_first:=pprod_r[pn];
+            if(ui_pprod_time[i]<=0)or(ui_pprod_time[i]>pprod_r[pn])then ui_pprod_time[i]  :=pprod_r[pn];
          end;
       end;
    end;
 end;
 
-procedure UIIncOrderCounter(x,y:integer;i:byte);
+procedure ui_IncOrderCounter(x,y:integer;i:byte);
 begin
    if(i>MaxUnitGroups)then exit;
-   if(ui_orders_x[i]=0)then
+   if(ui_orders_n[i]=0)then
    begin
       ui_orders_x[i]:=x;
       ui_orders_y[i]:=y;
    end
    else
-   begin
-      ui_orders_x[i]:=(ui_orders_x[i]+x) div 2;
-      ui_orders_y[i]:=(ui_orders_y[i]+y) div 2;
-   end;
+     if (abs(x-ui_orders_x[i])<vid_vw)
+     and(abs(y-ui_orders_y[i])<vid_vh)then
+     begin
+        ui_orders_x[i]:=(ui_orders_x[i]+x) div 2;
+        ui_orders_y[i]:=(ui_orders_y[i]+y) div 2;
+     end;
    ui_orders_n[i]+=1;
 end;
 
 procedure ui_counters(pu:PTUnit);
 var i:byte;
+    t:integer;
 begin
    with pu^ do
    if(playeri=HPlayer)and(G_Status=gs_running)then
@@ -175,11 +177,11 @@ begin
    begin
       if(group<MaxUnitGroups)then
       begin
-         UIIncOrderCounter(x,y,group);
+         ui_IncOrderCounter(x,y,group);
          ui_orders_uids[group,_ukbuilding]:=ui_orders_uids[group,_ukbuilding]+[uidi];
       end;
 
-      if(UnitF2Select(pu))then UIIncOrderCounter(x,y,MaxUnitGroups); // all battle units
+      if(UnitF2Select(pu))then ui_IncOrderCounter(x,y,MaxUnitGroups); // all battle units
 
       if(_ukbuilding)then
       begin
@@ -187,16 +189,16 @@ begin
          begin
             if(n_builders>0)and(isbuildarea)then
             begin
-               ui_prod_builds := ui_prod_builds+ups_builder;
+               ui_bprod_possible+=ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_unitrS[vid_rtui>vid_rtuish]);
+                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[vid_rtui>vid_rtuish]);
             end;
 
             for i:=0 to MaxUnitProdsI do
              if(i>0)and(buff[ub_advanced]<=0)
              then break
-             else _unit_uiprodcnts(pu,i);
+             else ui_ProductionCounters(pu,i);
          end;
          if(sel)and(_UnitHaveRPoint(pu^.uidi))then SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
       end;
@@ -204,6 +206,7 @@ begin
       if(bld)then
       begin
          if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<0)then ui_uid_reload[uidi]:=rld;
+         if(rld<ui_ucl_reload[_ucl])or(ui_ucl_reload[_ucl]<0)then ui_ucl_reload[_ucl]:=rld;
 
          if(sel)then
          begin
@@ -215,8 +218,17 @@ begin
       end
       else
       begin
-         ui_uid_builds[uidi]+=1;
-         ui_uid_buildn      +=1;
+         t:=min2(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
+         if(t>0)then
+         begin
+            if(ui_bprod_ucl_time[_ucl]<=0)
+            or(ui_bprod_ucl_time[_ucl]> t)then ui_bprod_ucl_time[_ucl]:=t;
+            if(ui_bprod_first<=0)
+            or(ui_bprod_first> t)then ui_bprod_first:=t;
+         end;
+         ui_bprod_uid_count[uidi]+=1;
+         ui_bprod_ucl_count[_ucl]+=1;
+         ui_bprod_all       +=1;
       end;
    end;
 end;
@@ -338,7 +350,7 @@ begin
             if(cycle_order=_cycle_order)and(noanim=false)
             then _unit_level_string(pu);
 
-            depth:=_udpth(pu);
+            depth:=_unit_SpriteDepth(pu);
             alpha:=255;
             aura :=0;
 
@@ -368,8 +380,8 @@ begin
                 begin
                    for t:=0 to MaxUnitProdsI do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[_uids[uprod_u[t]]._bornadvanced[g_addon]],i2s((uprod_r[t] div fr_fps)+1),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                          ,i2s((pprod_r[t] div fr_fps)+1),'','','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[upgr[_uids[uprod_u[t]]._upgr_bornadv]>0],i2s((uprod_r[t] div fr_fps)+1),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                         ,i2s((pprod_r[t] div fr_fps)+1),'','','','');
                    end;
                 end;
 
@@ -425,7 +437,7 @@ begin
 
        if(_unit_fogrev(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_udpth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0);
+         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0);
     end;
 end;
 
@@ -434,25 +446,33 @@ procedure unit_sprites(noanim:boolean);
 var u:integer;
 pu,tu:PTUnit;
 begin
-   FillChar(ui_units_ptime,SizeOf(ui_units_ptime),0);
-   ui_first_upgr_time:=0;
-   ui_uid_buildn     :=0;
+   for u:=0 to 255 do
+   begin
+      ui_uid_reload[u]:=-1;
+      ui_ucl_reload[u]:=-1;
+   end;
+   FillChar(ui_bprod_uid_count,SizeOf(ui_bprod_uid_count),0);
+   FillChar(ui_bprod_ucl_count,SizeOf(ui_bprod_ucl_count),0);
+   FillChar(ui_bprod_ucl_time ,SizeOf(ui_bprod_ucl_time ),0);
+   FillChar(ui_uprod_uid_time ,SizeOf(ui_uprod_uid_time ),0);
+   FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
+   FillChar(ui_pprod_max      ,SizeOf(ui_pprod_max      ),0);
+   FillChar(ui_orders_uids    ,SizeOf(ui_orders_uids    ),0);
+   FillChar(ui_upgrct         ,SizeOf(ui_upgrct         ),0);
+   FillChar(ui_pprod_time     ,SizeOf(ui_pprod_time     ),0);
+   FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
+   FillChar(ui_orders_n       ,SizeOf(ui_orders_n       ),0);
+   FillChar(ui_orders_x       ,SizeOf(ui_orders_x       ),0);
+   FillChar(ui_orders_y       ,SizeOf(ui_orders_y       ),0);
+   ui_uprod_first    :=0;
+   ui_pprod_first    :=0;
    ui_uibtn_action   :=0;
    ui_uibtn_move     :=0;
-   ui_prod_builds    :=[];
-   for u:=0 to 255 do ui_uid_reload[u]:=-1;
-   FillChar(ui_prod_units   ,SizeOf(ui_prod_units   ),0);
-   FillChar(ui_prod_upgrades,SizeOf(ui_prod_upgrades),0);
-   FillChar(ui_orders_uids  ,SizeOf(ui_orders_uids  ),0);
-   FillChar(ui_upgrct       ,SizeOf(ui_upgrct       ),0);
-   FillChar(ui_upgr         ,SizeOf(ui_upgr         ),0);
-   FillChar(ui_units_inapc  ,SizeOf(ui_units_inapc  ),0);
-   FillChar(ui_uid_builds   ,SizeOf(ui_uid_builds   ),0);
-   FillChar(ui_orders_n     ,SizeOf(ui_orders_n     ),0);
-   FillChar(ui_orders_x     ,SizeOf(ui_orders_x     ),0);
-   FillChar(ui_orders_y     ,SizeOf(ui_orders_y     ),0);
-   if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
+   ui_bprod_possible :=[];
+   ui_bprod_first    :=0;
+   ui_bprod_all      :=0;
 
+   if(ui_umark_t>0)then begin ui_umark_t-=1;if(ui_umark_t=0)then ui_umark_u:=0;end;
    for u:=1 to MaxUnits do
    begin
       pu:=@_units[u];

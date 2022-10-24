@@ -165,6 +165,7 @@ begin
          PROD:=findprd(uid);
          if(_ruid1>0)then if(_ruid1n<=1)then _addstr(@REQ,_uids [_ruid1].un_txt_name) else _addstr(@REQ,_uids[_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
          if(_ruid2>0)then if(_ruid2n<=1)then _addstr(@REQ,_uids [_ruid2].un_txt_name) else _addstr(@REQ,_uids[_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
+         if(_ruid3>0)then if(_ruid3n<=1)then _addstr(@REQ,_uids [_ruid3].un_txt_name) else _addstr(@REQ,_uids[_ruid3].un_txt_name+'(x'+b2s(_ruid3n)+')');
          if(_rupgr>0)then if(_rupgrn<=1)then _addstr(@REQ,_upids[_rupgr]._up_name   ) else _addstr(@REQ,_upids[_rupgr]._up_name  +'(x'+b2s(_rupgrn)+')');
          HK:=_gHK(_ucl);
 

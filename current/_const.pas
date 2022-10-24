@@ -545,6 +545,8 @@ upgr_hell_bldrep       = 20; // build restoration
 upgr_hell_b478tel      = 21; // teleport towers
 upgr_hell_invuln       = 22; // hell invuln powerup
 
+upgr_hell_baron        = 23; // knight starts as baron
+
 upgr_uac_attack        = 31; // distance attack
 upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor

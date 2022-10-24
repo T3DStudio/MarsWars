@@ -306,26 +306,31 @@ ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
-ui_first_upgr_time: integer = 0;
-ui_upgr           : array[byte] of integer;
-ui_units_inapc    : array[byte] of integer;
-ui_prod_units     : array[byte] of integer;
-ui_prod_upgrades  : array[byte] of integer;
-ui_units_ptime    : array[byte] of integer;
-ui_prod_builds    : TSoB;
-ui_uid_builds     : array[byte] of integer;
-ui_uid_buildn     : integer;
+ui_uprod_first    : integer;
+ui_units_inapc,
+ui_uprod_uid_max,
+ui_uprod_uid_time,
+ui_pprod_max,
+ui_pprod_time     : array[byte] of integer;
+ui_pprod_first    : integer;
+ui_bprod_possible : TSoB;
+ui_bprod_uid_count,
+ui_bprod_ucl_count,
+ui_bprod_ucl_time : array[byte] of integer;
+ui_bprod_first,
+ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
+ui_ucl_reload     : array[byte] of integer;
 ui_uibtn_move     : integer = 0; // ui move buttons
 ui_uibtn_action   : integer = 0; // ui action button
 ui_upgrct         : array[byte] of integer;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
-ui_muc            : array[false..true] of cardinal; // unit max count color
-ui_cenergy        : array[false..true] of cardinal; // energy limit colors
-ui_limit          : array[false..true] of cardinal; // unit limit colors
-ui_unitrR         : array[false..true] of cardinal;
-ui_unitrS         : array[false..true] of cardinal;
+ui_max_color,                                       // unit max count color
+ui_cenergy,                                         // energy limit colors
+ui_limit,                                           // unit limit colors
+ui_blink_color2,
+ui_blink_color1   : array[false..true] of cardinal;
 
 ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
@@ -469,6 +474,7 @@ pspr_dummy        : PTMWTexture;
 spr_dmodel,
 
 spr_LostSoul,
+spr_phantom,
 spr_Imp ,
 spr_Demon,
 spr_Cacodemon,
@@ -543,6 +549,7 @@ spr_UAWeaponFactory,
 spr_UTurret,
 spr_URadar,
 spr_UVehicleFactory,
+spr_UTechCenter,
 spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,

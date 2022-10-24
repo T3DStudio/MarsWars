@@ -20,7 +20,7 @@ begin
          if(PointInScreenP(vx,vy,player)=false)then exit;
 
       SoundPlayUnit(snd,pu,nil);
-      _effect_add(vx,vy,_depth(vy+1,ukfly),EID_HUpgr);
+      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),EID_HUpgr);
    end;
 end;
 
@@ -33,7 +33,7 @@ procedure _uac_rocketl_eff(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _effect_add(vx,vy-15,_depth(vy+10,ukfly),EID_Exp2);
+      _effect_add(vx,vy-15,_FlyDepth(vy+10,ukfly),EID_Exp2);
       if(playeri=HPlayer)
       then SoundPlayUnit(snd_bomblaunch,nil,nil)
       else SoundPlayUnit(snd_bomblaunch,pu ,nil);
@@ -45,7 +45,7 @@ begin
    _effect_add(vx,vy,-5,EID_db_u0);
    if(PointInScreenP(vx,vy,nil))then
    begin
-      _effect_add(vx,vy,_depth(vy+1,false),EID_BBExp);
+      _effect_add(vx,vy,_FlyDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
    end;
 end;
@@ -64,7 +64,7 @@ begin
          if(PointInScreenP(vx,vy,player)=false)then exit;
 
       SoundPlayUnit(un_eid_snd_summon[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
 
       if(playeri=HPlayer)then SoundPlayUnit(un_snd_ready[buff[ub_advanced]>0],nil,nil);
    end;
@@ -86,7 +86,7 @@ begin
 
       if(fastdeath)then
       begin
-         _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_fdeath[buff[ub_advanced]>0]);
+         _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_fdeath[buff[ub_advanced]>0]);
          SoundPlayUnit(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
       end
       else
@@ -109,7 +109,7 @@ begin
       else
         if(PointInScreenP(vx,vy,player)=false)then exit;
 
-      _effect_add(vx,vy,_depth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
       SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
    end;
 end;
@@ -142,12 +142,12 @@ begin
 
       if(start)then
       begin
-         _effect_add(vx,vy,_depth(vy+1,ukfly),aw_eid_start);
+         _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),aw_eid_start);
          SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
-         _effect_add(vx+aw_x,vy+aw_y,_depth(vy+1,ukfly),aw_eid_shot );
+         _effect_add(vx+aw_x,vy+aw_y,_FlyDepth(vy+1,ukfly),aw_eid_shot );
          SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
@@ -767,6 +767,7 @@ begin
       a_tar    := 0;
       a_weap   := 0;
       a_rld    := 0;
+      a_shots  := 0;
       a_weap_cl:= 0;
       a_tar_cl := 0;
 
@@ -1254,7 +1255,7 @@ begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
                if(SoundPlayUnit(snd_teleport,pu,nil))
-               then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_depth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
+               then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_FlyDepth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
             GameLogUnitReady(_LastCreatedUnitP);
@@ -1329,7 +1330,7 @@ begin
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
-        then _unit_add(tx,ty,-1,auid,playeri,true,true,buff[ub_advanced]>0)
+        then _unit_add(tx,ty,-1,auid,playeri,true,true,(buff[ub_advanced]>0)and((a_shots mod 10)=9))
         else exit;
 
       if(_LastCreatedUnit>0)then
@@ -1353,7 +1354,7 @@ begin
       {$IFDEF _FULLGAME}
       else
         case auid of
-UID_LostSoul: _pain_lost_fail(tx,ty,_depth(ty+1,ukfly),nil);
+UID_LostSoul: _pain_lost_fail(tx,ty,_FlyDepth(ty+1,ukfly),nil);
         end;
       {$ENDIF};
    end;
@@ -1468,7 +1469,7 @@ begin
    begin
       if(instant=false)then
       begin
-         with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits[buff[ub_advanced]>0]>=0)or(_ukmech)or(_ukbuilding);
+         with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits[buff[ub_advanced]>0]>=0)or(_ukbuilding);
          buff[ub_pain]:=fr_fps; // prevent fast resurrecting
 
          {$IFDEF _FULLGAME}
@@ -1626,7 +1627,7 @@ UID_UCommandCenter:
                  zfall:=zfall-fly_hz;
                  _unit_clear_order(pu,false);
               end;
-              speed:=6;
+              speed:=3;
            end
            else
            begin

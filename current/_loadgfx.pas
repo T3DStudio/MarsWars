@@ -26,9 +26,6 @@ begin
    rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
-
-
-
 procedure _GfxColors;
 begin
    c_dred    :=rgba2c(190,  0,  0,255);
@@ -55,18 +52,18 @@ begin
    c_ablack  :=rgba2c(0  ,0  ,0  ,128);
    c_lava    :=rgba2c(222,80 ,0  ,255);
 
-   ui_muc    [false]:=c_dorange;
-   ui_muc    [true ]:=c_gray;
+   ui_max_color    [false]:=c_dorange;
+   ui_max_color    [true ]:=c_gray;
    ui_cenergy[false]:=c_white;
    ui_cenergy[true ]:=c_red;
    ui_limit  [false]:=c_white;
    ui_limit  [true ]:=c_red;
 
-   ui_unitrR [false]:=c_black;
-   ui_unitrR [true ]:=c_yellow;
+   ui_blink_color2 [false]:=c_black;
+   ui_blink_color2 [true ]:=c_yellow;
 
-   ui_unitrS [false]:=c_black;
-   ui_unitrS [true ]:=c_gray;
+   ui_blink_color1 [false]:=c_black;
+   ui_blink_color1 [true ]:=c_gray;
 end;
 
 function _createSurf(tw,th:integer):pSDL_Surface;
@@ -568,6 +565,7 @@ begin
    spr_c_deimos   := LoadIMG('M_DEIMOS' ,false,true);
 
    _LoadMWSModel(@spr_lostsoul       ,race_units[r_hell]+'h_u0_'      ,smt_lost     ,firstload);
+   _LoadMWSModel(@spr_phantom        ,race_units[r_hell]+'h_u0a_'     ,smt_lost     ,firstload);
    _LoadMWSModel(@spr_imp            ,race_units[r_hell]+'h_u1_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_demon          ,race_units[r_hell]+'h_u2_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_cacodemon      ,race_units[r_hell]+'h_u3_'      ,smt_caco     ,firstload);
@@ -642,6 +640,7 @@ begin
    _LoadMWSModel(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret ,firstload);
    _LoadMWSModel(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding,firstload);
    _LoadMWSModel(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret ,firstload);
    _LoadMWSModel(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2,firstload);

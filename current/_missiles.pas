@@ -209,7 +209,7 @@ MID_TBullet,
 MID_Bullet     : begin damage:=20  ; vstep:=1;        splashr :=0  ;         end;
 MID_Bulletx2   : begin damage:=30  ; vstep:=1;        splashr :=0  ;         end;
 MID_BPlasma    : begin damage:=30  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_BFG        : begin damage:=400 ; vstep:=d div 12; splashr :=125;         end;
+MID_BFG        : begin damage:=600 ; vstep:=d div 12; splashr :=125;         end;
 MID_Flyer      : begin damage:=50  ; vstep:=d div 60; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=400 ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=80  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
@@ -218,7 +218,7 @@ MID_StunMine   : begin damage:=1   ; vstep:=1;        splashr :=100;         end
 MID_Mine       : begin damage:=1000; vstep:=1;        splashr :=100;         end;
 MID_Blizzard   : begin damage:=2000; vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=80  ; vstep:=1;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=120 ; vstep:=1;        splashr :=10 ;mtars:=2;end;
+MID_SSShot     : begin damage:=160 ; vstep:=1;        splashr :=10 ;mtars:=2;end;
       else
          vstep:=0;
          exit;
@@ -345,6 +345,7 @@ begin
 
         if (    tu^.uid^._ukmech)then   // mech
             case mid of
+
             MID_BPlasma     : _d200(@rdamage);
             MID_YPlasma     : _d300(@rdamage);
             end;
@@ -358,6 +359,11 @@ begin
             MID_Mine,
             MID_Mancubus,
             MID_Tank        : _d300(@rdamage);
+            end;
+
+        if (    tu^.uid^._ukmech)then   // mech all
+            case mid of
+            MID_SSShot      : _d50 (@rdamage);
             end;
 
         if(tu^.ukfly)
@@ -389,7 +395,7 @@ begin
                or((mid=MID_MBullet )and(    tu^.uid^._ukmech))
                or (mid=MID_StunMine)then tu^.buff[ub_stun]:=fr_2hfps;
                {$IFDEF _FULLGAME}
-               if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
+               if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                {$ENDIF}
             end;
 
@@ -402,7 +408,7 @@ begin
           if(splashr>0)and(ud<splashr)then // splash damage
           begin
              {$IFDEF _FULLGAME}
-             if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),EID_BFG);
+             if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),EID_BFG);
              {$ENDIF}
 
              if(ServerSide)then
@@ -410,7 +416,7 @@ begin
               begin
                  tu^.buff[ub_stun]:=fr_fps;
                  {$IFDEF _FULLGAME}
-                 _effect_add(tu^.vx,tu^.vy,_depth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
+                 _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                  {$ENDIF}
               end;
 
@@ -494,7 +500,7 @@ mh_homing   : if(_IsUnitRange(tar,@tu))then
       else
         with _mid_effs[mid] do
          if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
-          if((vstep mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_depth(vy,mfs),ms_eid_fly);
+          if((vstep mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_FlyDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;

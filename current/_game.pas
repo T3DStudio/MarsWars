@@ -19,6 +19,9 @@ begin
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
 
+      if(not g_addon)then upgr[upgr_hell_baron]:=1;
+
+
       {ai_pushtime := fr_fps*30;
       ai_pushmin  := 55;
       ai_pushuids := [];

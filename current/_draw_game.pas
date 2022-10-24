@@ -340,9 +340,9 @@ begin
       if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
 
       if(speed<=0)or(not bld)then
-       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_unitrR[vid_rtui>vid_rtuish]);
+       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_blink_color2[vid_rtui>vid_rtuish]);
 
-      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_unitrS[vid_rtui>vid_rtuish]);
+      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[vid_rtui>vid_rtuish]);
 
       if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-hh-6);
    end;
@@ -366,7 +366,7 @@ begin
      end;
 
    case g_mode of
-gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_muc[(g_royal_r mod 2)=0]);
+gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[(g_royal_r mod 2)=0]);
    end;
 
 
@@ -639,7 +639,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,c2s(a_shots), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+40,i2s(aiu_alarm_timer), ta_left,255, PlayerGetColor(playeri));
 

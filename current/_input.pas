@@ -213,7 +213,7 @@ begin
               else
                with _players[HPlayer] do
                begin
-                  if not(m_brush in ui_prod_builds)or(n_builders<=0)then
+                  if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
                   begin
                      m_brush:=co_empty;
                      exit;
@@ -657,10 +657,10 @@ co_empty  : begin
                   mouse_select_x0:=mouse_map_x;
                   mouse_select_y0:=mouse_map_y;
                end;
-               {u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+               u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
                if(u>0)and(k_ctrl>1)then
                 with _units[u] do
-                 if(hits>4)then hits:=hits div 2;}
+                 if(hits>4)then hits:=hits div 2;
 
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);

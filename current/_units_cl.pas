@@ -180,7 +180,7 @@ begin
       case u of
 UID_LostSoul:
 begin
-   setMWSModel  (@spr_lostsoul,nil);
+   setMWSModel  (@spr_lostsoul,@spr_phantom);
    setCommandSND(false,snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
    setEffectEID (false,0  ,0        ,u       ,0            );
    setEffectSND (false,nil,snd_pexp ,snd_pexp,snd_hell_pain);
@@ -690,7 +690,7 @@ begin
 end;
 UID_UTechCenter:
 begin
-   setMWSModel(@spr_UVehicleFactory,nil);
+   setMWSModel(@spr_UTechCenter,nil);
    setBuildingSND(snd_uac_tech);
 end;
 UID_UGTurret:
@@ -741,7 +741,7 @@ end;
 
       end;
 
-      if  (ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]=0)
+      if  (ui_panel_uids[_urace,byte(not _ukbuilding),_ucl] =0)
       then ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]:=u;
 
       if(_ukbuilding)then

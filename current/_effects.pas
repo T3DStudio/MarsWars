@@ -249,7 +249,7 @@ begin
          r:=0;
          o:=1;
       end;
-      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_depth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
+      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_FlyDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
       if(ms_eid_decal>0)then _effect_add(vx,vy,-6,ms_eid_decal);
 
@@ -274,7 +274,7 @@ begin
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
-       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,_depth(vy,mfs)+100,0,spr,255);
+       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,_FlyDepth(vy,mfs)+100,0,spr,255);
    end;
 end;
 
@@ -283,8 +283,8 @@ procedure teleport_effects(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byt
 begin
    if PointInScreenP(vx,vy,nil)
    or PointInScreenP(tx,ty,nil) then SoundPlayUnit(snd,nil,nil);
-   _effect_add(vx,vy,_depth(vy+1,ukfly),eidstart);
-   _effect_add(tx,ty,_depth(ty+1,ukfly),eidend  );
+   _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),eidstart);
+   _effect_add(tx,ty,_FlyDepth(ty+1,ukfly),eidend  );
 end;
 
 procedure effects_sprites(noanim,draw:boolean);

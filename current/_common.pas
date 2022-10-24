@@ -5,7 +5,7 @@ procedure ai_set_nearest_alarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
-function ai_HighTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
+function ai_HighPrioTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
@@ -514,6 +514,7 @@ begin
       setr(ureq_armylimit ,(armylimit+uprodl+_limituse)> MaxPlayerLimit);
       setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<_ruid1n));
       setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<_ruid2n));
+      setr(ureq_ruid      ,(_ruid3>0)and(uid_eb[_ruid3]<_ruid3n));
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrn));
       setr(ureq_energy    , cenergy<_renergy                 );
       setr(ureq_time      , _btime<=0                      );
