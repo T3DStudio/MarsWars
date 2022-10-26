@@ -347,30 +347,26 @@ begin
                  _draw_text(tar,ui_menu_csm_xt1, _yt(2), str_goptions, ta_left,255, c_white);
 
                  y:=_yt(3);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_gaddon        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_addon[g_addon], ta_right ,255, c_white);
-
-                 y:=_yt(4);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_gmodet        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, str_gmode[g_mode] , ta_right ,255, c_white);
 
-                 y:=_yt(5);
+                 y:=_yt(4);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_starta           , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, b2s(g_start_base+1)  , ta_right ,255,c_white);
 
-                 y:=_yt(6);
+                 y:=_yt(5);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_sstarts       , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, b2pm[g_show_positions or (g_mode in [gm_3x3,gm_2x2x2,gm_invasion])]   , ta_right ,255 ,c_white);
 
-                 y:=_yt(7);
+                 y:=_yt(6);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_aislots        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, ai_name(g_ai_slots), ta_right ,255 ,c_white);
 
-                 y:=_yt(8);
+                 y:=_yt(7);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_cgenerators    , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, str_cgeneratorsM[g_cgenerators], ta_right ,255 ,c_white);
 
-                 y:=_yt(9);
+                 y:=_yt(8);
                  _draw_text(tar,ui_menu_csm_xc, y, str_randoms        , ta_middle,255, mic((G_Started=false)and(net_status=0),false));
 
                  y:=_yt(10);

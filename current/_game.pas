@@ -19,7 +19,8 @@ begin
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
 
-      if(not g_addon)then upgr[upgr_hell_baron]:=1;
+      //if(not g_addon)then
+      //upgr[upgr_hell_baron]:=1;
 
 
       {ai_pushtime := fr_fps*30;
@@ -97,7 +98,7 @@ begin
       name :=PlayerName;
    end;
 
-   PlayerColor[0]:=c_white;
+   PlayerColor[0]:=c_ltgray;
    PlayerColor[1]:=c_red;
    PlayerColor[2]:=c_orange;
    PlayerColor[3]:=c_yellow;
@@ -256,7 +257,7 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level
+         if(state=ps_play)then ai_skill:=player_default_ai_level;// g_ai_slots;//
       end;
    end;
 
@@ -307,30 +308,30 @@ begin
 
    g_mode       :=gm_scirmish;
    g_start_base :=random(gms_g_startb+1);
-   g_addon      :=random(3)<>0;
+   g_cgenerators:=random(gms_g_maxgens+1);
 
    PlayersSwap(1,HPlayer);
 
    for p:=2 to MaxPlayers do
     with _players[p] do
     begin
-       race :=random(3);
+       race :=random(r_cnt+1);
        mrace:=race;
 
        if(p=4)
-       then team :=1+random(4)
-       else team :=2+random(3);
+       then team:=1+random(4)
+       else team:=2+random(3);
 
-       ai_skill:=random(4)+2;
+       ai_skill:=random(6)+2;
 
        if(random(2)=0)and(p>2)
        then PlayerSetState(p,ps_none)
        else PlayerSetState(p,ps_comp);
     end;
 
-   PlayersSwap(random(6)+1,HPlayer);
+   PlayersSwap(random(MaxPlayers)+1,HPlayer);
 
-   g_ai_slots:=random(5);
+   g_ai_slots:=random(player_default_ai_level+1);
 
    Map_premap;
 

@@ -134,31 +134,35 @@ begin
    _bmm_draw([DID_other,DID_srock,DID_brock]);
 end;
 
+procedure map_minimap_cpoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
+begin
+   circleColor   (tar,x  ,y  ,r  ,color);
+   characterColor(tar,x-3,y-3,sym,color);
+end;
+
 procedure map_dstarts;
-const start_char : char = '+';
 var i  :byte;
     x,y:integer;
     c  :cardinal;
 begin
    for i:=0 to MaxPlayers do
    begin
-      if(g_mode=gm_invasion)and(i=0)then continue;
+      if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
 
       x:=round(map_psx[i]*map_mmcx);
       y:=round(map_psy[i]*map_mmcx);
 
       c:=PlayerGetColor(i);
 
-      characterColor(r_minimap,x-3,y-3,start_char,c);
-         circleColor(r_minimap,x,y,trunc(base_r*map_mmcx),c);
+      map_minimap_cpoint(r_minimap,x,y,trunc(base_r*map_mmcx),char_start ,c);
    end;
 
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
      if(cpcapturer>0)then
-       if(cpenergy>0)
-       then filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_green )
-       else filledcircleColor(r_minimap,cpmx,cpmy,cpmr,c_purple);
+      if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
+      then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
+      else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
 end;
 
 procedure map_RedrawMenuMinimap;

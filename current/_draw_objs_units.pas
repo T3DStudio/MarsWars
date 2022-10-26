@@ -9,35 +9,7 @@ begin
      else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 end;
 
-function _FlyDepth(y:integer;f:boolean):integer;
-begin
-   _FlyDepth:=map_flydepths[f]+y;
-end;
 
-function _unit_SpriteDepth(pu:PTUnit):integer;
-begin
-   _unit_SpriteDepth:=0;
-   with pu^ do
-    case uidi of
-UID_UPortal,
-UID_HTeleport,
-UID_HSymbol,
-UID_HASymbol,
-UID_HAltar,
-UID_UMine     : _unit_SpriteDepth:=-MaxSMapW+vy;
-    else
-      if(uid^._ukbuilding)and(bld=false)
-      then _unit_SpriteDepth:=-MaxSMapW+vy
-      else
-        if(hits>0)or(buff[ub_resur]>0)then
-        begin
-           if(zfall>0)
-           then _unit_SpriteDepth:=_FlyDepth(vy,true)
-           else _unit_SpriteDepth:=_FlyDepth(vy,ukfly);
-        end
-        else _unit_SpriteDepth:=vy;
-    end;
-end;
 
 
 procedure _fog_sr(x,y,r:integer);
@@ -275,6 +247,7 @@ begin
       then lvlstr_r:=#19+i2s((rld div fr_fps)+1)
       else lvlstr_r:='';
 
+      // weapon/attack
       wl      :=0;
       atset   :=[];
       for i:=0 to MaxUnitWeapons do
@@ -286,6 +259,7 @@ begin
         end;
       lvlstr_w:=#15+i2s6(wl);
 
+      // armor
       al:=upgr[_upgr_armor];
       if(_ukbuilding)
       then al+=upgr[upgr_race_build_armor[_urace]]
@@ -295,7 +269,8 @@ begin
         else al+=upgr[upgr_race_bio_armor [_urace]];
       lvlstr_a:=#18+i2s6(al);
 
-      sl:=0;
+      // other
+      sl:=upgr[_upgr_regen];
       if(_ukbuilding)
       then sl+=integer(upgr[upgr_race_build_regen[_urace]])
       else
@@ -401,7 +376,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
 
                  if(buff[ub_invis]>0)then alphab:=alphab shr 1;
 
-                 SpriteListAddEffect(vx,vy+un_eid_bcrater_y,depth-MaxSMapW,0,_EID2Spr(un_eid_bcrater),alphab);
+                 SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_tcraters+y,0,_EID2Spr(un_eid_bcrater),alphab);
               end
               else
                 if(buff[ub_invis]>0)then alpha:=alpha shr 1;
@@ -437,7 +412,7 @@ begin
 
        if(_unit_fogrev(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits),255),0,0);
+         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),sd_ground,spr,mm3(0,abs(hits-fdead_hits),255),0,0);
     end;
 end;
 

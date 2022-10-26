@@ -65,7 +65,7 @@ begin
     begin
        x      := ax-vid_cam_x;
        y      := ay-vid_cam_y;
-       depth  :=  32000;
+       depth  :=  sd_marker;
        shadowz:= -32000;
        sprite := aspr;
        alpha  := 255;
@@ -153,11 +153,16 @@ end;
 
 const TVisPrimSize =  SizeOf(TVisPrim);
 
-procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfoNew;
 begin
    vid_prims+=1;
    setlength(vid_prim,vid_prims);
    FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+end;
+
+procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+begin
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind :=uinfo_line;
@@ -170,9 +175,7 @@ begin
 end;
 procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind :=uinfo_rect;
@@ -185,9 +188,7 @@ begin
 end;
 procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind :=uinfo_rect;
@@ -205,9 +206,7 @@ begin
 end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind :=uinfo_box;
@@ -220,9 +219,7 @@ begin
 end;
 procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind :=uinfo_circle;
@@ -232,12 +229,21 @@ begin
       color:=acolor;
    end;
 end;
-
+procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
+begin
+   UnitsInfoNew;
+   with vid_prim[vid_prims-1] do
+   begin
+      kind   :=uinfo_text;
+      x0     :=ax0;
+      y0     :=ay0;
+      text_lt:=text;
+      color  :=acolor;
+   end;
+end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind    :=uinfo_rect;
@@ -254,12 +260,9 @@ begin
       text_ld :=sld;
    end;
 end;
-
 procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   UnitsInfoNew;
    with vid_prim[vid_prims-1] do
    begin
       kind   :=uinfo_sprite;
@@ -349,22 +352,8 @@ begin
 end;
 
 procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
-var t,p:integer;
+var t:integer;
 begin
-   for t:=1 to MaxCPoints do
-    with g_cpoints[t] do
-     if(cpcapturer>0)then
-     begin
-        _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,i2s(cptimer div fr_fps),ta_middle,255,PlayerGetColor(cptimerowner));
-        for p:=0 to MaxPlayers do
-         _draw_text(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y+((p+1)*10),i2s(cpunitsp[p]),ta_middle,255,c_white);
-                      //
-
-         if(cptimer>0)and((G_Step mod 20)>10)
-         then circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cptimerowner))
-         else circleColor(tar,lx+cpx-vid_cam_x,ly+cpy-vid_cam_y,cpcapturer,PlayerGetColor(cpowner     ));
-     end;
-
    case g_mode of
 gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[(g_royal_r mod 2)=0]);
    end;
@@ -401,6 +390,10 @@ uinfo_line   : lineColor     (tar,x0,y0,x1,y1,color);
 uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
 uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
 uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
+uinfo_text   : begin
+               _draw_text(tar,x0,y0-font_hw,text_lt,ta_middle,255,color);
+               continue;
+               end;
         else
         end;
 
@@ -459,6 +452,41 @@ begin
      end;
 end;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CPoints
+//
+
+procedure cpoints_sprites(draw:boolean);
+var t:integer;
+begin
+   if(not draw)then exit;
+
+   for t:=1 to MaxCPoints do
+    with g_cpoints[t] do
+     if(cpcapturer>0)then
+     begin
+        if(not RectInCam(cpx,cpy,cpcapturer,cpcapturer,0))then continue;
+
+        if(t=1)and(g_mode=gm_koth)then
+        begin
+
+        end
+        else
+          if(cpenergy<=0)
+          then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(GetCPColor(t)),@spr_cp_out,255)
+          else
+          begin
+             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0                         ,@spr_cp_out,255);
+             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(GetCPColor(t)),@spr_cp_gen,255);
+          end;
+
+        if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime),c_white);
+        if(cptimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpcapturetime-cptimer),PlayerGetColor(cptimerowner));
+        //UnitsInfoAddText(cpx,cpy+20,w2s(cpzone),c_white);
+     end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -567,6 +595,32 @@ begin
    end;  }
 end;
 
+function _SpriteDepth(y:integer;f:boolean):integer;
+begin
+   _SpriteDepth:=map_flydepths[f]+y;
+end;
+
+function _unit_SpriteDepth(pu:PTUnit):integer;
+begin
+   _unit_SpriteDepth:=0;
+   with pu^ do
+    case uidi of
+UID_UPortal,
+UID_HTeleport,
+UID_HSymbol,
+UID_HASymbol,
+UID_HAltar,
+UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
+    else
+      if(uid^._ukbuilding)and(bld=false)
+      then _unit_SpriteDepth:=sd_brocks+vy
+      else
+        if(hits>0)or(buff[ub_resur]>0)
+        then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
+        else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
+    end;
+end;
+
 procedure _draw_dbg;
 var u,ix,iy:integer;
     c:cardinal;
@@ -639,7 +693,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,c2s(a_shots), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(_unit_SpriteDepth(@_units[u])), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+40,i2s(aiu_alarm_timer), ta_left,255, PlayerGetColor(playeri));
 

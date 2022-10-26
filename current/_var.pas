@@ -9,7 +9,6 @@ _EVENT            : pSDL_EVENT;
 //  GAME
 //
 
-g_addon           : boolean  = true;
 g_started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
@@ -391,6 +390,7 @@ c_blue,
 c_aqua,
 c_white,
 c_agray,
+c_ltgray,
 c_gray,
 c_dgray,
 c_ablack,
@@ -614,14 +614,12 @@ spr_b_hold,
 spr_b_selall,
 spr_b_cancel,
 spr_b_delete,
-spr_b_knight,
-spr_b_baron,
-spr_iob_knight,
-spr_iob_baron,
 spr_mback,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_tabs          : array[0..3] of pSDL_Surface;
+spr_cp_out,
+spr_cp_gen        : TMWTexture;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 
@@ -633,7 +631,6 @@ spr_tabs          : array[0..3] of pSDL_Surface;
 
 str_race          : array[0..r_cnt       ] of shortstring;
 str_gmode         : array[0..gm_cnt      ] of shortstring;
-str_addon         : array[false..true    ] of shortstring;
 str_need_energy,
 str_cant_build,
 str_cant_prod,
@@ -654,12 +651,11 @@ str_team,
 str_srace,
 str_ready,
 str_sstarts,
-str_gaddon,
 str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
-str_cgeneratorsM  : array[0..gms_g_maxcps] of shortstring;
+str_cgeneratorsM  : array[0..gms_g_maxgens] of shortstring;
 str_pcolors       : array[0..4] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;

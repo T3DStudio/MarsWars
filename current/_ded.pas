@@ -135,8 +135,6 @@ begin
 '-ffa'   : cmp_ffa;
 '-noai',
 '-k'     : RemoveAI;
-'-d2'    : g_addon:=true;
-'-ud'    : g_addon:=false;
 '-3x3'   : begin g_mode:=gm_3x3;      Map_premap; end;
 '-2x2x2' : begin g_mode:=gm_2x2x2;    Map_premap; end;
 '-scir'  : begin g_mode:=gm_scirmish; Map_premap; cmp_ffa; end;
@@ -239,7 +237,6 @@ begin
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
-      3 : writeln('         ',str_gaddon  ,' ',str_addon  [g_addon] );
       4 : writeln('         ',str_gmodet  ,' ',str_gmode  [g_mode ] );
       6 : writeln('         ',str_sstarts ,' ',g_show_positions     );
       8 : writeln('         ',str_starta  ,' ',str_startat[g_start_base]);

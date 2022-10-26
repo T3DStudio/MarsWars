@@ -1484,7 +1484,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not _IsUnitRange(tu^.inapc,nil))then
-              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+              if((G_Step mod fr_3hfps)=0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((G_Step mod fr_fps)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;
@@ -1498,7 +1498,7 @@ wmove_noneed    : if(not attackinmove)then
              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
              begin
                 if(not _IsUnitRange(tu^.inapc,nil))then
-                _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_FlyDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+                _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
 
                 SoundPlayUnit(aw_snd_target,tu,@targetvis);
              end;

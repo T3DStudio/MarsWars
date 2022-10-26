@@ -193,6 +193,14 @@ begin
    end;
 end;
 
+procedure map_CPoints_UpdatePFZone;
+var pn:integer;
+begin
+   for pn:=1 to MaxCPoints do
+    with g_cpoints[pn] do
+     if(cpcapturer>0)then cpzone:=pf_get_area(cpx,cpy);
+end;
+
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
 var ix,iy,i,u,b,c:integer;
 function _setcpoint(px,py:integer):boolean;
@@ -212,7 +220,6 @@ begin
    begin
       cpx       :=px;
       cpy       :=py;
-      cpzone    :=pf_get_area(px,py);
       cpsolidr  :=sr;
       cpnobuildr:=nr;
       cpenergy  :=energy;
@@ -231,7 +238,6 @@ begin
    u:=map_mw div 50;
    b:=map_mw-(u*2);
 
-   writeln(num);
    i:=0;
    while(i<num)do
    begin
@@ -332,7 +338,7 @@ gm_KotH:
          begin
             cpx:=map_hmw;
             cpy:=map_hmw;
-            cpcapturer:=base_r;
+            cpcapturer   :=base_r;
             cpcapturetime:=fr_fps*60;
 
             {$IFDEF _FULLGAME}
@@ -349,13 +355,13 @@ gm_royale:
 gm_capture:
       begin
          map_Starts_Default;
-         map_CPoints_Default(4,0,100,base_r,0,fr_fps*15,0,true);
+         map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
       end;
    else map_Starts_Default;
    end;
 
    if(g_cgenerators>0)then
-    map_CPoints_Default(MaxCPoints,50,100,100,500,fr_fps*20,g_cgenerators_ltime[g_cgenerators],false);
+    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r,500,gm_cptp_time,g_cgenerators_ltime[g_cgenerators],false);
 end;
 
 function _dec_min_r(t1,t2:byte):integer;
@@ -529,6 +535,7 @@ begin
 
    map_doodads_cells_refresh;
    pf_make_grid;
+   map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
    map_RedrawMenuMinimap;

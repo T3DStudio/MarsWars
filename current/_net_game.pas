@@ -106,7 +106,6 @@ begin
    net_writecard(map_seed );
    net_writebool(map_symmetry  );
 
-   net_writebool(g_addon  );
    net_writebyte(g_mode   );
    net_writebyte(g_start_base    );
    net_writebool(g_show_positions);
@@ -292,8 +291,7 @@ begin
    if(_rmByte(@map_liq         ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
    if(_rmByte(@map_obs         ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
    if(_rmCard(@map_seed        ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmBool(@map_symmetry         ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmBool(@g_addon         ))then begin redraw_menu:=redraw_menu or true;end;
+   if(_rmBool(@map_symmetry    ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
    if(_rmByte(@g_mode          ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
    if(_rmByte(@g_start_base    ))then begin redraw_menu:=redraw_menu or true;end;
    if(_rmBool(@g_show_positions))then begin redraw_menu:=redraw_menu or true;end;

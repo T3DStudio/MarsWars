@@ -318,13 +318,12 @@ begin
       72 : if not(G_Started and(menu_s2=ms2_camp))then begin menu_s2:=ms2_mult; if(m_chat)then menu_item:=100; end;
 
       // game options
-      75 : if(net_status<>ns_clnt)and(not G_Started)then begin g_addon:=not g_addon; end;
-      76 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_mode,true,@allgamemodes);Map_premap;end;
-      77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base,1,0,gms_g_startb);
-      78 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
-      79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,1,0,gms_g_maxai);
-      80 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_cgenerators,true,@allgamemodes);Map_premap;end;//gms_g_maxcps
-      81 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(false);
+      75 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);Map_premap;end;
+      76 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte   (@g_start_base,true,0,gms_g_startb);
+      77 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
+      78 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);
+      79 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_cgenerators,true,0,gms_g_maxgens);Map_premap;end;
+      80 : if(net_status<>ns_clnt)and(not G_Started)then       MakeRandomSkirmish(false);
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
@@ -449,8 +448,9 @@ begin
                 if(team>1)then team-=1;
            end;
 
-      77 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_start_base ,-1,0,gms_g_startb);
-      79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollInt(@g_ai_slots,-1,0,gms_g_maxai );
+      76 : if(net_status<>ns_clnt)and(not G_Started)then ScrollByte(@g_start_base ,false,0,gms_g_startb );
+      78 : if(net_status<>ns_clnt)and(not G_Started)then ScrollByte(@g_ai_slots   ,false,0,gms_g_maxai  );
+      79 : if(net_status<>ns_clnt)and(not G_Started)then ScrollByte(@g_cgenerators,false,0,gms_g_maxgens);
       80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
 
       84 : ScrollInt(@rpls_pnui,-1,0,9);

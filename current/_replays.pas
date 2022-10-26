@@ -50,7 +50,6 @@ begin
          if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_obs+_str_mx(vr)+#13+' '; end
                   else begin rpls_str_data:=str_svld_errors[4];close(f);exit;            end;
          BlockRead(f,vr,sizeof(map_symmetry  ));
-         BlockRead(f,vr,sizeof(g_addon  ));rpls_str_data:=rpls_str_data+str_addon[vr>0]+#13+' ';
          BlockRead(f,vr,sizeof(g_mode   ));
          if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+#13; end
                             else begin rpls_str_data:=str_svld_errors[4];close(f);exit;end;
@@ -144,7 +143,6 @@ begin
                          BlockWrite(rpls_file,map_obs    ,SizeOf(map_obs ));
                          BlockWrite(rpls_file,map_symmetry    ,SizeOf(map_symmetry ));
 
-                         BlockWrite(rpls_file,g_addon    ,SizeOf(g_addon ));
                          BlockWrite(rpls_file,g_mode     ,SizeOf(g_mode  ));
                          BlockWrite(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
                          BlockWrite(rpls_file,g_show_positions,SizeOf(g_show_positions));
@@ -264,8 +262,7 @@ begin
                             BlockRead(rpls_file,map_mw          ,SizeOf(map_mw          ));
                             BlockRead(rpls_file,map_liq         ,SizeOf(map_liq         ));
                             BlockRead(rpls_file,map_obs         ,SizeOf(map_obs         ));
-                            BlockRead(rpls_file,map_symmetry         ,SizeOf(map_symmetry         ));
-                            BlockRead(rpls_file,g_addon         ,SizeOf(g_addon         ));
+                            BlockRead(rpls_file,map_symmetry    ,SizeOf(map_symmetry    ));
                             BlockRead(rpls_file,g_mode          ,SizeOf(g_mode          ));
                             BlockRead(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
                             BlockRead(rpls_file,g_show_positions,SizeOf(g_show_positions));

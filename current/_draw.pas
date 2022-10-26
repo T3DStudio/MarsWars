@@ -2,10 +2,11 @@
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
-     map_DoodadsDraw(noanim);
+ doodads_sprites(noanim);
     unit_sprites(noanim);
  effects_sprites(noanim,r_draw);
 missiles_sprites(noanim,r_draw);
+ cpoints_sprites(r_draw);
 end;
 
 procedure d_Game;

@@ -288,7 +288,6 @@ begin
    str_server            := 'SERVER';
    str_client            := 'CLIENT';
    str_chat              := 'CHAT';
-   str_gaddon            := 'Game:';
    str_randoms           := 'Random skirmish';
    str_apply             := 'apply';
    str_plout             := ' left the game';
@@ -373,11 +372,8 @@ begin
    str_gmode[gm_KotH    ]:= #14+'King of the Hill'+#25;
    str_gmode[gm_royale  ]:= #15+'Royal Battle'    +#25;
 
-   str_addon[false]      := #16+'UDOOM' +#25;
-   str_addon[true ]      := #18+'DOOM 2'+#25;
-
    str_cgenerators       := 'Neutral generators lifetime:';
-   str_cgeneratorsM[0]   := 'w/o n. generators';
+   str_cgeneratorsM[0]   := 'none';
    str_cgeneratorsM[1]   := '5 min';
    str_cgeneratorsM[2]   := '10 min';
    str_cgeneratorsM[3]   := '15 min';
@@ -751,7 +747,6 @@ begin
   str_server            := 'СЕРВЕР';
   str_client            := 'КЛИЕНТ';
   str_chat              := 'ЧАТ';
-  str_gaddon            := 'Игра:';
   str_randoms           := 'Случайная схватка';
   str_apply             := 'применить';
   str_plout             := ' покинул игру';

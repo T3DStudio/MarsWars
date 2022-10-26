@@ -1,4 +1,30 @@
 
+function it2s(r:integer):integer;
+begin
+   if(r>0)
+   then it2s:=(r+fr_ifps) div fr_fps
+   else it2s:=0;
+end;
+function ct2s(r:cardinal):cardinal;
+begin
+   if(r>0)
+   then ct2s:=(r+fr_ifps) div fr_fps
+   else ct2s:=0;
+end;
+function ir2s(r:integer):shortstring;
+begin
+   if(r<=0)
+   then ir2s:=''
+   else ir2s:=i2s(it2s(r))
+end;
+function cr2s(r:cardinal):shortstring;
+begin
+   if(r<=0)
+   then cr2s:=''
+   else cr2s:=c2s(ct2s(r))
+end;
+
+
 procedure d_Alarms;
 var i,r:byte;
 begin
@@ -24,9 +50,9 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
      if(cpcapturer>0)then
-      if(cptimer>0)and((G_Step mod 20)>10)
-      then circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cptimerowner))
-      else circleColor(r_minimap,cpmx,cpmy,cpmr,PlayerGetColor(cpowner     ));
+      if(cpenergy>0)
+      then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
+      else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
 
    case g_mode of
 gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_max_color[(g_royal_r mod 2)=0]);
@@ -242,11 +268,7 @@ end;
 
 procedure d_Panel(tar:pSDL_Surface);
 var ucl,ux,uy,uid:integer;
-             req:cardinal;
-function t2s(r:integer):integer;
-begin if(r>0)then t2s:=(r+fr_ifps) div fr_fps else t2s:=0; end;
-function r2s(r:integer):shortstring;
-begin if(r<=0)then r2s:='' else r2s:=i2s(t2s(r)) end;
+              req:cardinal;
 begin
    with _players[HPlayer] do
    begin
@@ -267,8 +289,8 @@ begin
 
          case ucl of
          0: d_tabbtn(tar,spr_tabs[ucl],ux,uy, ui_bprod_first     ,ui_bprod_all,ucl_cs[true ],ucl_c[true ],c_white,c_yellow,c_lime,c_orange, ucl=ui_tab);
-         1: d_tabbtn(tar,spr_tabs[ucl],ux,uy, t2s(ui_uprod_first),uproda      ,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange, ucl=ui_tab);
-         2: d_tabbtn(tar,spr_tabs[ucl],ux,uy, t2s(ui_pprod_first),upproda     ,0            ,0           ,c_white,c_yellow,0     ,0       , ucl=ui_tab);
+         1: d_tabbtn(tar,spr_tabs[ucl],ux,uy, it2s(ui_uprod_first),uproda      ,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange, ucl=ui_tab);
+         2: d_tabbtn(tar,spr_tabs[ucl],ux,uy, it2s(ui_pprod_first),upproda     ,0            ,0           ,c_white,c_yellow,0     ,0       , ucl=ui_tab);
          3: d_tabbtn(tar,spr_tabs[ucl],ux,uy, 0                  ,0           ,0            ,0           ,0      ,0       ,0     ,0       , ucl=ui_tab);
          end;
       end;
@@ -291,7 +313,6 @@ begin
             if(uid_e[uid]<=0)then
             begin
                if(a_units[uid]<=0)then continue;
-               if((G_addon=false)and(_addon))then continue;
             end;
 
             ux:=(ucl mod 3);
@@ -303,8 +324,8 @@ begin
             _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
             _drawBtnt(tar,ux,uy,
 
-            i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s   (ucl_e[true,ucl])              ,r2s(ui_ucl_reload[ucl]),
-            ui_cenergy[cenergy<0]       ,c_dyellow                  ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                 ,r2s(build_cd));
+            i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s   (ucl_e[true,ucl])              ,ir2s(ui_ucl_reload[ucl]),
+            ui_cenergy[cenergy<0]       ,c_dyellow                  ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                 ,ir2s(build_cd));
 
             ui_uid_reload[uid]:=-1;
             ui_ucl_reload[ucl]:=-1;
@@ -322,7 +343,6 @@ begin
             if(uid_e[uid]<=0)then
             begin
                if(a_units[uid]<=0)then continue;
-               if((G_addon=false)and(_addon))then continue;
             end;
 
             ux:=(ucl mod 3);
@@ -330,7 +350,7 @@ begin
 
             _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_uprod_uid_max[uid]));
             _drawBtnt(tar,ux,uy,
-            r2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
+            ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
             ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
          end;
       end;
@@ -341,7 +361,6 @@ begin
          uid:=ui_panel_uids[race ,ui_tab,ucl];
 
          if (a_upgrs[uid]<=0)then continue;
-         if((G_addon=false)and(_upids[uid]._up_addon))then continue;
 
          ux:=(ucl mod 3);
          uy:=(ucl div 3);
@@ -349,7 +368,7 @@ begin
          _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_pprod_time[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]));
 
          _drawBtnt(tar,ux,uy,
-         r2s(ui_pprod_time[uid]),i2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                            ,'',
+         ir2s(ui_pprod_time[uid]),i2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                            ,'',
          ui_cenergy[cenergy<0]  ,c_dyellow          ,0 ,ui_max_color[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
       end;
 
@@ -503,13 +522,11 @@ begin
                       if(uid_e[uid]=0)then
                       begin
                          if (a_units[uid]<=0)then exit;
-                         if((g_addon=false)and(_uids[uid]._addon))then exit;
                       end;
                       hs:=@_uids[uid].un_txt_hint;
                    end;
               2  : begin
                       if (a_upgrs[uid]<=0)then exit;
-                      if((g_addon=false)and(_upids[uid]._up_addon))then exit;
                       hs:=@_upids[uid]._up_hint;
                    end;
               end;

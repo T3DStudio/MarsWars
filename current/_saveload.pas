@@ -71,7 +71,6 @@ begin
             BlockRead(f,vr,sizeof(map_symmetry  ));   ////////
             BlockRead(f,vr,sizeof(theme_i  ));
             if(vr>=theme_n)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end;  vr:=0;
-            BlockRead(f,vr,sizeof(g_addon  ));_svld_stat:=_svld_stat+str_addon[vr>0]+#13+' ';vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));
             if not(vr in allgamemodes)then begin _svld_stat:=str_svld_errors[4];close(f);exit; end
                                    else _svld_stat:=_svld_stat+str_gmode[vr  ]    +#13+#25;
@@ -152,7 +151,6 @@ map_lqt
 map_obs
 map_sym
 theme_i
-g_addon
 g_mode
 g_starta
 g_sstart
@@ -202,7 +200,6 @@ begin
    SizeOf(map_liq         )+
    SizeOf(map_obs         )+
    SizeOf(theme_i         )+
-   SizeOf(g_addon         )+
    SizeOf(g_mode          )+
    SizeOf(g_start_base    )+
    SizeOf(g_show_positions)+
@@ -258,7 +255,6 @@ begin
    BlockWrite(f,map_obs         ,SizeOf(map_obs         ));
    BlockWrite(f,map_symmetry    ,sizeof(map_symmetry    ));
    BlockWrite(f,theme_i         ,SizeOf(theme_i         ));
-   BlockWrite(f,g_addon         ,SizeOf(g_addon         ));
    BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
    BlockWrite(f,g_start_base    ,SizeOf(g_start_base    ));
    BlockWrite(f,g_show_positions,SizeOf(g_show_positions));
@@ -334,7 +330,6 @@ begin
          BlockRead(f,map_obs         ,SizeOf(map_obs         ));
          BlockRead(f,map_symmetry    ,sizeof(map_symmetry    ));
          BlockRead(f,theme_i         ,SizeOf(theme_i         ));map_seed2theme;
-         BlockRead(f,g_addon         ,SizeOf(g_addon         ));
          BlockRead(f,g_mode          ,SizeOf(g_mode          ));
          BlockRead(f,g_start_base    ,SizeOf(g_start_base    ));
          BlockRead(f,g_show_positions,SizeOf(g_show_positions));

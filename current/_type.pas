@@ -249,9 +249,7 @@ TUID = record
    _isbarrack,
    _issolid,
    _ukfly,
-   _splashresist,
-   _addon       : boolean;
-   //_bornadvanced: array[false..true] of boolean; //[addon]
+   _splashresist: boolean;
    _fastdeath_hits
                 : array[false..true] of integer; //[adv]
 
@@ -310,7 +308,6 @@ TUPID = record  // upgrade
    _up_time_xpl,
    _up_time_apl,
    _up_max   : integer;
-   _up_addon,
    _up_mfrg  : boolean;
 
    {$IFDEF _FULLGAME}

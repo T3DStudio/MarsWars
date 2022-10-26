@@ -20,7 +20,7 @@ begin
          if(PointInScreenP(vx,vy,player)=false)then exit;
 
       SoundPlayUnit(snd,pu,nil);
-      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),EID_HUpgr);
+      _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),EID_HUpgr);
    end;
 end;
 
@@ -33,7 +33,7 @@ procedure _uac_rocketl_eff(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _effect_add(vx,vy-15,_FlyDepth(vy+10,ukfly),EID_Exp2);
+      _effect_add(vx,vy-15,_SpriteDepth(vy+10,ukfly),EID_Exp2);
       if(playeri=HPlayer)
       then SoundPlayUnit(snd_bomblaunch,nil,nil)
       else SoundPlayUnit(snd_bomblaunch,pu ,nil);
@@ -42,10 +42,10 @@ end;
 
 procedure _CPExplode(vx,vy:integer);
 begin
-   _effect_add(vx,vy,-5,EID_db_u0);
+   _effect_add(vx,vy,sd_tcraters+vy,EID_db_u0);
    if(PointInScreenP(vx,vy,nil))then
    begin
-      _effect_add(vx,vy,_FlyDepth(vy+1,false),EID_BBExp);
+      _effect_add(vx,vy,_SpriteDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
    end;
 end;
@@ -64,7 +64,7 @@ begin
          if(PointInScreenP(vx,vy,player)=false)then exit;
 
       SoundPlayUnit(un_eid_snd_summon[buff[ub_advanced]>0],nil,nil);
-      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_summon[buff[ub_advanced]>0]);
 
       if(playeri=HPlayer)then SoundPlayUnit(un_snd_ready[buff[ub_advanced]>0],nil,nil);
    end;
@@ -75,7 +75,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      _effect_add(vx,vy+un_eid_bcrater_y,-5,un_eid_bcrater);
+      _effect_add(vx,vy+un_eid_bcrater_y,sd_tcraters+vy,un_eid_bcrater);
 
       if(vischeck<>nil)then
       begin
@@ -86,7 +86,7 @@ begin
 
       if(fastdeath)then
       begin
-         _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_fdeath[buff[ub_advanced]>0]);
+         _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_fdeath[buff[ub_advanced]>0]);
          SoundPlayUnit(un_eid_snd_fdeath[buff[ub_advanced]>0],nil,nil);
       end
       else
@@ -109,7 +109,7 @@ begin
       else
         if(PointInScreenP(vx,vy,player)=false)then exit;
 
-      _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
+      _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_pain[buff[ub_advanced]>0]);
       SoundPlayUnit(un_eid_snd_pain[buff[ub_advanced]>0],nil,nil);
    end;
 end;
@@ -142,12 +142,12 @@ begin
 
       if(start)then
       begin
-         _effect_add(vx,vy,_FlyDepth(vy+1,ukfly),aw_eid_start);
+         _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),aw_eid_start);
          SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
-         _effect_add(vx+aw_x,vy+aw_y,_FlyDepth(vy+1,ukfly),aw_eid_shot );
+         _effect_add(vx+aw_x,vy+aw_y,_SpriteDepth(vy+1,ukfly),aw_eid_shot );
          SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
@@ -1255,7 +1255,7 @@ begin
                _LastCreatedUnitP^.buff[ub_teleeff]:=fr_fps;
                {$IFDEF _FULLGAME}
                if(SoundPlayUnit(snd_teleport,pu,nil))
-               then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_FlyDepth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
+               then _effect_add(_LastCreatedUnitP^.vx,_LastCreatedUnitP^.vy,_SpriteDepth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
                {$ENDIF}
             end;
             GameLogUnitReady(_LastCreatedUnitP);
@@ -1354,7 +1354,7 @@ begin
       {$IFDEF _FULLGAME}
       else
         case auid of
-UID_LostSoul: _pain_lost_fail(tx,ty,_FlyDepth(ty+1,ukfly),nil);
+UID_LostSoul: _pain_lost_fail(tx,ty,_SpriteDepth(ty+1,ukfly),nil);
         end;
       {$ENDIF};
    end;

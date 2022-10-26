@@ -112,9 +112,9 @@ outlogfn               : shortstring = 'out.txt';
 //  Game settings borders
 //
 
-gms_g_startb           = 6;
-gms_g_maxai            = 8;
-gms_g_maxcps           = 5;
+gms_g_startb           = 6;  // 0-6  max start base options
+gms_g_maxai            = 8;  // 0-8  max skirmish AI skills
+gms_g_maxgens          = 5;  // 0-5  max neytrall generators options
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ gms_g_maxcps           = 5;
 //  CPoints life
 //
 
-g_cgenerators_ltime    : array[0..gms_g_maxcps] of cardinal = (0,fr_fps*60*5,fr_fps*60*10,fr_fps*60*15,fr_fps*60*20,0);
+g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,fr_fps*60*5,fr_fps*60*10,fr_fps*60*15,fr_fps*60*20,0);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -225,7 +225,6 @@ ureq_ruid              : cardinal = %0000000000000010;
 ureq_rupid             : cardinal = %0000000000000100;
 ureq_energy            : cardinal = %0000000000001000;
 ureq_time              : cardinal = %0000000000010000;
-ureq_addon             : cardinal = %0000000000100000;
 ureq_max               : cardinal = %0000000001000000;
 ureq_builders          : cardinal = %0000000010000000; // need builders
 ureq_bld_r             : cardinal = %0000000100000000;
@@ -800,17 +799,16 @@ rocket_sr              = 40;
 blizz_r                = 150;
 
 bld_dec_mr             = 6;
-player_default_ai_level= 6;
+player_default_ai_level= 7;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
 gm_cptp_time           = fr_fps*20;
+gm_cptp_r              = 100;
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
-
-map_flydepths          : array[false..true] of integer = (0,MaxSMapW);
 
 pain_time              = order_period;
 
@@ -897,12 +895,37 @@ _buffst                : array[false..true] of smallint = (0,_ub_infinity);
 
 str_ps_sv              : char = '@';
 
+char_start             : char = '+';
+char_gen               : char = '*';
+char_cp                : char = '=';
+
 ChatLen2               = 255;
 dead_time              = -dead_hits;
 char_detect            = #7;
 char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SPRITE DEPTH
+//
+
+// terrain
+sd_liquid_back         = -32500;
+sd_liquid              = -32000;
+// neytral generators
+sd_tcraters            = MaxSMapW+sd_liquid;
+// doodads
+sd_brocks              = MaxSMapW+sd_tcraters;
+sd_srocks              = MaxSMapW+sd_brocks;
+sd_ground              = MaxSMapW+sd_srocks;
+sd_fly                 = MaxSMapW+sd_ground;
+sd_marker              = MaxSMapW+sd_fly;
+
+map_flydepths          : array[false..true] of integer = (sd_ground,sd_fly);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -989,6 +1012,7 @@ uinfo_rect             = 2;
 uinfo_box              = 3;
 uinfo_circle           = 4;
 uinfo_sprite           = 5;
+uinfo_text             = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1001,6 +1025,7 @@ ta_right               = 2;
 ta_chat                = 3;
 
 font_w                 = 8;
+font_hw                = font_w div 2;
 font_iw                = font_w-1;
 font_3hw               = font_w+(font_w div 2);
 font_6hw               = font_3hw*2;

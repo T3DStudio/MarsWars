@@ -518,7 +518,6 @@ begin
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrn));
       setr(ureq_energy    , cenergy<_renergy                 );
       setr(ureq_time      , _btime<=0                      );
-      setr(ureq_addon     ,(_addon)and(G_addon=false)      );
       setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
 
       case _ukbuilding of
@@ -583,7 +582,6 @@ begin
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
       setr(ureq_energy , cenergy<_upid_energy(up,upgr[up]+1)   );
       setr(ureq_time   , _up_time<=0                           );
-      setr(ureq_addon  ,(_up_addon)and(G_addon=false)          );
       setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));
       setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)     );
       setr(ureq_smiths , n_smiths<=0                           );
@@ -701,7 +699,7 @@ begin
      UIUnitDrawRange:=(_attack>0)or(_ability in [uab_radar])or(isbuildarea);
 end;
 
-procedure ScrollByte(pb:pbyte;fwrd:boolean;pset:PTSoB);
+procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
 begin
    if(pset^=[])then exit;
    repeat
@@ -710,6 +708,25 @@ begin
      else pb^-=1
    until pb^ in pset^
 end;
+procedure ScrollByte(pb:pbyte;fwrd:boolean;min,max:byte);
+var i:byte;
+begin
+   if(fwrd)then
+   begin
+      if(pb^<255)then
+      begin
+         pb^+=1;
+         if(pb^>max)then pb^:=max;
+      end;
+   end
+   else
+      if(pb^>0  )then
+      begin
+         pb^-=1;
+         if(pb^<min)then pb^:=min;
+      end;
+end;
+
 
 procedure ScrollInt(i:pinteger;s,min,max:integer);
 begin
@@ -793,6 +810,17 @@ begin
       else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
     else PlayerGetColor:=PlayerColor[player];
     end;
+end;
+
+function GetCPColor(cp:byte):cardinal;
+begin
+   GetCPColor:=c_black;
+   if(cp<1)or(cp>MaxCPoints)then exit;
+   with g_cpoints[cp] do
+    if(cpcapturer>0)then
+     if(cptimer>0)and((G_Step mod 20)>10)
+     then GetCPColor:=PlayerGetColor(cptimerowner)
+     else GetCPColor:=PlayerGetColor(cpowner     );
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal):boolean;

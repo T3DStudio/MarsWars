@@ -16,6 +16,7 @@ cfg_key_vidvh   : shortstring = 'vid_height';
 cfg_key_gsb     : shortstring = 'g_start_base';
 cfg_key_gsp     : shortstring = 'g_show_positions';
 cfg_key_gai     : shortstring = 'g_default_ai';
+cfg_key_gcg     : shortstring = 'g_generators';
 cfg_key_rpnui   : shortstring = 'UPT_replay';
 cfg_key_npnui   : shortstring = 'UPT_network';
 cfg_key_ppos    : shortstring = 'vid_panel';
@@ -25,7 +26,6 @@ cfg_key_plcol   : shortstring = 'vid_player_colors';
 
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
 function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
-
 
 procedure cfg_setval(vr,vl:string);
 var vlw:word;
@@ -47,6 +47,7 @@ begin
    if(vr=cfg_key_gsb  )then g_start_base    := vlw;
    if(vr=cfg_key_gsp  )then g_show_positions:=(vl=b2pm[true,2]);
    if(vr=cfg_key_gai  )then g_ai_slots      := vlw;
+   if(vr=cfg_key_gcg  )then g_cgenerators   := vlw;
    if(vr=cfg_key_rpnui)then rpls_pnui       := vlw;
    if(vr=cfg_key_npnui)then net_pnui        := vlw;
    if(vr=cfg_key_ppos )then vid_ppos        := vlw;
@@ -94,8 +95,9 @@ begin
       vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
 
-      if(g_ai_slots>gms_g_maxai )then g_ai_slots:=gms_g_maxai;
-      if(g_start_base >gms_g_startb)then g_start_base :=gms_g_startb;
+      if(g_ai_slots   >gms_g_maxai  )then g_ai_slots   :=gms_g_maxai;
+      if(g_start_base >gms_g_startb )then g_start_base :=gms_g_startb;
+      if(g_cgenerators>gms_g_maxgens)then g_cgenerators:=gms_g_maxgens;
 
       if(rpls_pnui   >_cl_pnun)then rpls_pnui   :=_cl_pnun;
       if(net_pnui    >_cl_pnun)then net_pnui    :=_cl_pnun;
@@ -133,6 +135,7 @@ begin
    writeln(f,cfg_key_gsb  ,'=',g_start_base   );
    writeln(f,cfg_key_gsp  ,'=',b2pm[g_show_positions,2]);
    writeln(f,cfg_key_gai  ,'=',g_ai_slots     );
+   writeln(f,cfg_key_gcg  ,'=',g_cgenerators  );
    writeln(f,cfg_key_ppos ,'=',vid_ppos       );
    writeln(f,cfg_key_uhbar,'=',vid_uhbars     );
    writeln(f,cfg_key_plcol,'=',vid_plcolors   );

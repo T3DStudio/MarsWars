@@ -46,6 +46,7 @@ begin
    c_white   :=rgba2c(255,255,255,255);
    c_awhite  :=rgba2c(255,255,255,40 );
    c_gray    :=rgba2c(120,120,120,255);
+   c_ltgray  :=rgba2c(200,200,200,255);
    c_dgray   :=rgba2c(70 ,70 ,70 ,255);
    c_agray   :=rgba2c(80 ,80 ,80 ,128);
    c_black   :=rgba2c(0  ,0  ,0  ,255);
@@ -681,8 +682,9 @@ begin
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
    _lstr(@spr_ptur      ,race_dir[r_uac ]+'ptur',firstload,true);
 
-
-   _lstr(@spr_stun,effects_folder+'stun',firstload,true);
+   _lstr(@spr_stun      ,effects_folder+'stun',firstload,true);
+   _lstr(@spr_cp_out    ,'cp_out',firstload,true);
+   _lstr(@spr_cp_gen    ,'cp_gen',firstload,true);
 
    for x:=0 to spr_upgrade_icons do
    for r:=1 to r_cnt do

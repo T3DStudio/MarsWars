@@ -195,7 +195,7 @@ begin
       case mid of
 MID_Imp        : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Cacodemon  : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_Baron      : begin damage:=160 ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Baron      : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_RevenantH,
 MID_Revenant   : begin damage:=80  ; vstep:=d div 12; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
 MID_URocketS   : begin damage:=80  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
@@ -345,7 +345,7 @@ begin
 
         if (    tu^.uid^._ukmech)then   // mech
             case mid of
-
+            MID_Baron,
             MID_BPlasma     : _d200(@rdamage);
             MID_YPlasma     : _d300(@rdamage);
             end;
@@ -353,7 +353,6 @@ begin
         end
         else                            // buildings
             case mid of
-            MID_Baron       : _d50 (@rdamage);
             MID_Blizzard    : _d200(@rdamage);
             MID_Granade,
             MID_Mine,
@@ -395,7 +394,7 @@ begin
                or((mid=MID_MBullet )and(    tu^.uid^._ukmech))
                or (mid=MID_StunMine)then tu^.buff[ub_stun]:=fr_2hfps;
                {$IFDEF _FULLGAME}
-               if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
+               if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                {$ENDIF}
             end;
 
@@ -408,7 +407,7 @@ begin
           if(splashr>0)and(ud<splashr)then // splash damage
           begin
              {$IFDEF _FULLGAME}
-             if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),EID_BFG);
+             if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),EID_BFG);
              {$ENDIF}
 
              if(ServerSide)then
@@ -416,7 +415,7 @@ begin
               begin
                  tu^.buff[ub_stun]:=fr_fps;
                  {$IFDEF _FULLGAME}
-                 _effect_add(tu^.vx,tu^.vy,_FlyDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
+                 _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
                  {$ENDIF}
               end;
 
@@ -500,7 +499,7 @@ mh_homing   : if(_IsUnitRange(tar,@tu))then
       else
         with _mid_effs[mid] do
          if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
-          if((vstep mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_FlyDepth(vy,mfs),ms_eid_fly);
+          if((vstep mod ms_eid_fly_st)=0)then _effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;

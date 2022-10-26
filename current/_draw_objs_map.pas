@@ -40,22 +40,22 @@ begin
            ox     := anml^[animn].xo;
            oy     := anml^[animn].yo;
            sprite :=@sprl^[animn];
-           case anml^[animn].depth of
-           0    : depth :=y;
+           {case anml^[animn].depth of
+           0    : depth :=y;                     ?????????????????????
            else   depth :=anml^[animn].depth;
-           end;
+           end;}
         end;
      end;
 end;
 
-procedure map_DoodadsDraw(noanim:boolean);
+procedure doodads_sprites(noanim:boolean);
 var d,ro:integer;
 begin
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then
      begin
-        if(RectInCam(x,y,255,255,0)=false)then continue;
+        if(not RectInCam(x,y,255,255,0))then continue;
 
         ro:=0;
         if(1<=m_brush)and(m_brush<=255)then ro:=r-bld_dec_mr;
@@ -76,7 +76,7 @@ begin
         if(RectInCam(x+ox,y+oy,sprite^.hw,sprite^.hh,0))then
         begin
            SpriteListAddDoodad(x,y,depth,shadowz,sprite,255,ox,oy);
-           if(back_sprite<>nil)then SpriteListAddDoodad(x,y,-20000,-32000,back_sprite,255,ox,oy);
+           if(back_sprite<>nil)then SpriteListAddDoodad(x,y,sd_liquid_back,-32000,back_sprite,255,ox,oy);
            if(ro>0)then UnitsInfoAddCircle(x,y,ro,ui_blink_color2[vid_rtui>vid_rtuish]);
         end;
      end;
@@ -89,8 +89,8 @@ begin
     with map_dds[d] do
      if(t>0)then
      begin
-        depth  := y;
         shadowz:= -32000;
+        depth  :=0;
         animn  := -1;
         animt  := 0;
         ox     := 0;
@@ -103,20 +103,23 @@ begin
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4: begin
-                         depth  := -10000;
+                         depth  := sd_liquid;
                          mmc    := theme_liquid_color;
                          animn  := t;
                          back_sprite := @spr_liquidb[animn];
                       end;
         DID_Srock  :  begin
+                         depth  := sd_srocks+y;
                          mmc    := c_dgray;
                          DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
                       end;
         DID_Brock  :  begin
+                         depth  := sd_brocks+y;
                          mmc    := c_dgray;
                          DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
                       end;
         DID_other  :  begin
+                         depth  := sd_ground+y;
                          shadowz:= 0;
                          mmc    := c_gray;
                          DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
