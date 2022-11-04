@@ -305,6 +305,8 @@ ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
+ui_uprod_max,
+ui_uprod_cur,
 ui_uprod_first    : integer;
 ui_units_inapc,
 ui_uprod_uid_max,
@@ -323,6 +325,7 @@ ui_ucl_reload     : array[byte] of integer;
 ui_uibtn_move     : integer = 0; // ui move buttons
 ui_uibtn_action   : integer = 0; // ui action button
 ui_upgrct         : array[byte] of integer;
+ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_max_color,                                       // unit max count color
@@ -635,6 +638,16 @@ str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
+str_attr_advanced,
+str_attr_building,
+str_attr_unit,
+str_attr_mech,
+str_attr_bio,
+str_attr_light,
+str_attr_nlight,
+str_attr_fly,
+str_attr_ground,
+str_attr_floater,
 str_unit_advanced,
 str_advanced,
 str_upgrade_complete,
@@ -718,8 +731,9 @@ str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_army     : shortstring;
 str_hint_energy   : shortstring;
-str_hint_m        : array[0..2] of shortstring;
-str_hint          : array[0..3,1..r_cnt,byte] of shortstring;
+str_hint_m        : array[0..2 ] of shortstring;
+str_hint_a,
+str_hint_r        : array[byte ] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 str_svld_errors   : array[1..4] of shortstring;
 str_camp_t        : array[0..MaxMissions] of shortstring;

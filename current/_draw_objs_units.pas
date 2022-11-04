@@ -10,6 +10,31 @@ begin
 end;
 
 
+function _SpriteDepth(y:integer;f:boolean):integer;
+begin
+   _SpriteDepth:=map_flydepths[f]+y;
+end;
+
+function _unit_SpriteDepth(pu:PTUnit):integer;
+begin
+   _unit_SpriteDepth:=0;
+   with pu^ do
+    case uidi of
+UID_UPortal,
+UID_HTeleport,
+UID_HSymbol,
+UID_HASymbol,
+UID_HAltar,
+UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
+    else
+      if(uid^._ukbuilding)and(bld=false)
+      then _unit_SpriteDepth:=sd_brocks+vy
+      else
+        if(hits>0)or(buff[ub_resur]>0)
+        then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
+        else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
+    end;
+end;
 
 
 procedure _fog_sr(x,y,r:integer);
@@ -85,6 +110,7 @@ end;
 
 procedure ui_ProductionCounters(pu:PTUnit;pn:integer);
 var i,t:byte;
+    pcurrent:boolean;
 begin
    with pu^     do
    with uid^    do
@@ -92,12 +118,16 @@ begin
    begin
       if(_isbarrack)then
       begin
+         pcurrent:=(s_barracks<=0)or(sel);
+         if(pcurrent)then ui_uprod_max+=1;
+
          for t:=1 to 255 do
-          if(s_barracks<=0)or(sel and(s_barracks>0))then
-           if(t in ups_units)then ui_uprod_uid_max[t]+=1+byte(buff[ub_advanced]>0);     //possible productions count of each unit type
+          if(pcurrent)then
+           if(t in ups_units)then ui_uprod_uid_max[t]+=1;     //possible productions count of each unit type     +byte(buff[ub_advanced]>0)
 
          if(uprod_r[pn]>0)then
          begin
+            if(pcurrent)then ui_uprod_cur+=1;
             i:=uprod_u[pn];
             if(ui_uprod_first      <=0)or(ui_uprod_first      >uprod_r[pn])then ui_uprod_first      :=uprod_r[pn];
             if(ui_uprod_uid_time[i]<=0)or(ui_uprod_uid_time[i]>uprod_r[pn])then ui_uprod_uid_time[i]:=uprod_r[pn];
@@ -107,8 +137,11 @@ begin
       if(_issmith)then
       begin
          for t:=1 to 255 do
-          if(s_smiths<=0)or(sel and(s_smiths>0))then
-           if(t in ups_upgrades)then ui_pprod_max[t]+=1+byte(buff[ub_advanced]>0);   //possible productions count of each upgrade type
+          if(s_smiths<=0)or(sel)then   // and(s_smiths>0)
+           if(t in ups_upgrades)then
+           begin
+              ui_pprod_max[t]+=1;   //possible productions count of each upgrade type      +byte(buff[ub_advanced]>0)
+           end;
 
          if(pprod_r[pn]>0)then
          begin
@@ -285,7 +318,7 @@ begin
    end;
 end;
 
-procedure _unit_aspr(pu:PTUnit;noanim:boolean);
+procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
 var spr,eff : PTMWTexture;
 depth,
@@ -331,11 +364,11 @@ begin
 
             if(wanim)then _unit_foot_effects(pu);
 
-            UnitsInfoAddUnit(pu,spr);
+            UnitsInfoAddUnit(pu,un_smodel[buff[ub_advanced]>0]);
 
             if(buff[ub_invis ]>0 )then alpha:=128;
 
-            if(buff[ub_invuln]>10)
+            if(buff[ub_invuln]>fr_6hfps)
             then aura:=c_awhite
             else
               if(playeri=0)and(not _ukbuilding)then
@@ -376,7 +409,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
 
                  if(buff[ub_invis]>0)then alphab:=alphab shr 1;
 
-                 SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_tcraters+y,0,_EID2Spr(un_eid_bcrater),alphab);
+                 SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_liquid+un_eid_bcrater_y+y,0,_EID2Spr(un_eid_bcrater),alphab);
               end
               else
                 if(buff[ub_invis]>0)then alpha:=alpha shr 1;
@@ -395,8 +428,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
    end;
 end;
 
-
-procedure _unit_dspr(pu:PTUnit);
+procedure _unit_dead_sprite(pu:PTUnit);
 var spr:PTMWTexture;
 begin
    with pu^ do
@@ -412,10 +444,9 @@ begin
 
        if(_unit_fogrev(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),sd_ground,spr,mm3(0,abs(hits-fdead_hits),255),0,0);
+         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits) div 4,255),0,0);
     end;
 end;
-
 
 procedure unit_sprites(noanim:boolean);
 var u:integer;
@@ -439,6 +470,8 @@ begin
    FillChar(ui_orders_n       ,SizeOf(ui_orders_n       ),0);
    FillChar(ui_orders_x       ,SizeOf(ui_orders_x       ),0);
    FillChar(ui_orders_y       ,SizeOf(ui_orders_y       ),0);
+   ui_uprod_max      :=0;
+   ui_uprod_cur      :=0;
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
    ui_uibtn_action   :=0;
@@ -458,8 +491,8 @@ begin
        end
        else
          if(hits<=0)
-         then _unit_dspr(pu)
-         else _unit_aspr(pu,noanim);
+         then _unit_dead_sprite(pu)
+         else _unit_alive_sprite(pu,noanim);
    end;
 end;
 

@@ -63,7 +63,6 @@ procedure _ClickEffect(color:cardinal);
 begin
    _click_eff(ox1,oy1,fr_4hfps,color);
 end;
-
 begin
    su  :=0;
    guid:=0;
@@ -74,7 +73,10 @@ begin
      with _units[i] do
       with uid^ do
        if(hits>0)and(sel)and(playeri=HPlayer)then
-        if(speed>0)or(_canattack(@_units[i],false))or(_UnitHaveRPoint(_units[i].uidi))or(_ability in [uab_hell_vision,uab_radar])then
+        if(speed>0)
+        or(_canattack(@_units[i],false))
+        or(_UnitHaveRPoint(_units[i].uidi))
+        or(_ability in [uab_hell_vision,uab_radar])then
         begin
            su+=1;
            if(bld)then
@@ -251,23 +253,14 @@ var t:integer;
 begin
    t:=0;
    case m_brush of
-co_move    : begin                     // move
-                t:=_whoInPoint(x,y,2);
-                _player_s_o(m_brush ,t,x,y,0,uo_corder,HPlayer);
-             end;
-co_amove   : begin                     // attack
-                t:=_whoInPoint(x,y,1);
-                _player_s_o(m_brush,t,x,y,0,uo_corder,HPlayer);
-             end;
+co_move    : _player_s_o(m_brush,_whoInPoint(x,y,2),x,y,0,uo_corder,HPlayer);   // move
+co_amove   : _player_s_o(m_brush,_whoInPoint(x,y,1),x,y,0,uo_corder,HPlayer);   // attack
 co_paction,
 co_patrol,
 co_apatrol : _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
-co_empty   : begin                     // rclick
-                t:=_whoInPoint(x,y,0);
-                if(m_a_inv)
-                then _player_s_o(co_rcmove ,t,x,y,0,uo_corder,HPlayer)
-                else _player_s_o(co_rcamove,t,x,y,0,uo_corder,HPlayer);
-             end;
+co_empty   : if(m_a_inv)// rclick
+             then _player_s_o(co_rcmove ,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer)
+             else _player_s_o(co_rcamove,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer);
    end;
 
    m_brush:=co_empty;
@@ -285,7 +278,6 @@ procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
 var u:integer;
    tu:PTUnit;
 begin
-   //writeln(tab,': ',bx,', ',by);
    SoundPlayUI(snd_click);
 
    by-=4;// 0,0 under minimap
@@ -367,7 +359,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
       end;
    end
    else
-     if(u=13)then
+     if(u=1)then
      begin
         if(mid)
         then rpls_step:=fr_2hfps*fr_fps
@@ -379,15 +371,15 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      else
        if(right=false)then
         case u of
-     12: _fsttime:=not _fsttime;
-     14: if(rpls_state<rpl_end)then
+     0 : _fsttime:=not _fsttime;
+     2 : if(rpls_state<rpl_end)then
           if(G_Status=gs_running)
           then G_Status:=gs_running
           else G_Status:=gs_replaypause;
-     15: rpls_plcam  :=not rpls_plcam;
-     16: rpls_showlog:=not rpls_showlog;
-     17: rpls_fog    :=not rpls_fog;
- 20..26: HPlayer     :=u-20;
+     3 : rpls_plcam  :=not rpls_plcam;
+     4 : rpls_showlog:=not rpls_showlog;
+     5 : rpls_fog    :=not rpls_fog;
+ 8..14 : HPlayer     :=u-8;
         end;
 
       end;
@@ -642,6 +634,10 @@ begin
 
    check_mouse_brush(false);
 
+   if(m_brush=co_empty)
+   then ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0)
+   else ui_uhint:=0;
+
    if(k_ml=2)then                    // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
      case m_brush of
@@ -657,10 +653,10 @@ co_empty  : begin
                   mouse_select_x0:=mouse_map_x;
                   mouse_select_y0:=mouse_map_y;
                end;
-               u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-               if(u>0)and(k_ctrl>1)then
-                with _units[u] do
-                 if(hits>4)then hits:=hits div 2;
+
+               {if(ui_uhint>0)and(k_ctrl>1)then
+                with _units[ui_uhint] do
+                 if(hits>4)then hits:=hits div 2;  }
 
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);
@@ -673,7 +669,7 @@ co_paction,
 co_move,
 co_amove,
 co_patrol,
-co_apatrol: _command(mouse_map_x,mouse_map_y);
+co_apatrol: _command (mouse_map_x,mouse_map_y);
 co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
      end
     else
@@ -683,7 +679,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       co_move,
       co_amove,
       co_patrol,
-      co_apatrol : _command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+      co_apatrol : _command (trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       co_mmark   : MapMarker(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       else         if(rpls_plcam=false)then m_mmap_move:=true;
       end

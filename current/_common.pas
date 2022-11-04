@@ -427,11 +427,11 @@ begin
    if(bt^<val)then bt^:=val;
 end;
 
-function _RoyalBattleOut(x,y,d:integer):boolean;
+function _CheckRoyalBattleR(x,y,d:integer):boolean;
 begin
    if(g_mode=gm_royale)
-   then _RoyalBattleOut:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
-   else _RoyalBattleOut:=false;
+   then _CheckRoyalBattleR:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
+   else _CheckRoyalBattleR:=false;
 end;
 
 function _random(m:integer):integer;
@@ -516,8 +516,8 @@ begin
       setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<_ruid2n));
       setr(ureq_ruid      ,(_ruid3>0)and(uid_eb[_ruid3]<_ruid3n));
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrn));
-      setr(ureq_energy    , cenergy<_renergy                 );
-      setr(ureq_time      , _btime<=0                      );
+      setr(ureq_energy    , cenergy<_renergy                     );
+      setr(ureq_time      , _btime<=0                            );
       setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
 
       case _ukbuilding of
@@ -817,10 +817,10 @@ begin
    GetCPColor:=c_black;
    if(cp<1)or(cp>MaxCPoints)then exit;
    with g_cpoints[cp] do
-    if(cpcapturer>0)then
-     if(cptimer>0)and((G_Step mod 20)>10)
-     then GetCPColor:=PlayerGetColor(cptimerowner)
-     else GetCPColor:=PlayerGetColor(cpowner     );
+    if(cpCapturer>0)then
+     if(cpTimer>0)and((G_Step mod 20)>10)
+     then GetCPColor:=PlayerGetColor(cpTimerOwnerPlayer)
+     else GetCPColor:=PlayerGetColor(cpOwnerPlayer     );
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal):boolean;

@@ -6,7 +6,7 @@ begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
                                 UID_LostSoul      ..UID_ZBFG,
                                 UID_UCommandCenter..UID_UNuclearPlant,
-                                UID_Scout      ..UID_Flyer  ],
+                                UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
       PlayerSetAllowedUnits(p,[ UID_HMonastery,UID_HFortress,UID_HAltar,
@@ -420,10 +420,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
 
                 if(o_id=uo_corder)then
                  case o_x0 of
-                 co_supgrade : if(s_smiths  =0)then if(_unit_supgrade (pu,o_y0))then break;   // start  upgr
-                 co_cupgrade : if(s_smiths  =0)then if(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
-                 co_suprod   : if(s_barracks=0)then if(_unit_straining(pu,o_y0))then break;   // start  training
-                 co_cuprod   : if(s_barracks=0)then if(_unit_ctraining(pu,o_y0))then break;   // cancle training
+                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0))then break;   // start  upgr
+                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
+                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0))then break;   // start  training
+                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0))then break;   // cancle training
                  end;
 
                 if(sel)then
@@ -717,81 +717,95 @@ begin
    else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1); }
 end;
 
-procedure CPoint_ChangeOwner(i,newowner:byte);
+procedure CPoint_ChangeOwner(i,newOwnerTeam:byte);
+var p:byte;
 begin
    with g_cpoints[i] do
-   if(cpowner<>newowner)then
+   if(cpOwnerTeam<>newOwnerTeam)then
    begin
-      if(cpowner>0)then
-       with _players[cpowner] do
-       begin
-          cenergy-=cpenergy;
-          menergy-=cpenergy;
-       end;
-      cpowner:=newowner;
-      if(cpowner>0)then
-       with _players[cpowner] do
-       begin
-          cenergy+=cpenergy;
-          menergy+=cpenergy;
-       end;
+      if(cpOwnerTeam>0)then
+       for p:=0 to MaxPlayers do
+        with _players[p] do
+         if(team=cpOwnerTeam)then
+         begin
+            cenergy-=cpenergy;
+            menergy-=cpenergy;
+         end;
+      cpOwnerTeam:=newOwnerTeam;
+      if(cpOwnerTeam>0)then
+       for p:=0 to MaxPlayers do
+        with _players[p] do
+         if(team=cpOwnerTeam)then
+         begin
+            cenergy+=cpenergy;
+            menergy+=cpenergy;
+         end;
    end;
 end;
 
 procedure GameModeCPoints;
-var i,p,iowner,iplayers:integer;
+var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams:integer;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-    if(cpcapturer>0)then
+    if(cpCapturer>0)then
     begin
-       if(cplifetime>0)and(cpowner>0)then
+       if(cplifetime>0)and(cpOwnerTeam>0)then
        begin
           cplifetime-=1;
           if(cplifetime=0)then
           begin
              CPoint_ChangeOwner(i,0);
-             cpcapturer:=0;
+             cpCapturer:=0;
              {$IFDEF _FULLGAME}
              _CPExplode(cpx,cpy);
              {$ENDIF}
           end;
        end;
 
-       cpunitsp_pstate:=cpunitsp;
-       cpunitst_pstate:=cpunitst;
-       iowner  :=cpowner;
-       iplayers:=0;
+       cpunitsp_pstate:=cpUnitsPlayer;
+       cpunitst_pstate:=cpUnitsTeam;
+       iOwnerTeam  :=cpOwnerTeam;
+       iOwnerPlayer:=cpOwnerPlayer;
+       iArmy :=0;
+       iTeams:=0;
        for p:=0 to MaxPlayers do
        begin
-          if(cpunitsp[p]>0)then
+          if(cpUnitsTeam[p]>0)then
           begin
-             iplayers+=1;
-             iowner  :=p;
+             iTeams+=1;
+             iOwnerTeam:=p;
           end;
-          cpunitsp[p]:=0;
-          cpunitst[p]:=0;
+          if(cpUnitsPlayer[p]>iArmy)or(iArmy=0)then
+          begin
+             iArmy:=cpUnitsPlayer[p];
+             iOwnerPlayer:=p;
+          end;
+          cpUnitsPlayer[p]:=0;
+          cpUnitsTeam  [p]:=0;
        end;
 
-       if(iplayers=0)
-       then cptimer:=0
+       if(iTeams=0)
+       then cpTimer:=0
        else
-         if(iplayers=1)then
-          if(cpowner=iowner)
-          then cptimer:=0
+         if(iTeams=1)then
+          if(cpOwnerTeam=iOwnerTeam)
+          then cpTimer:=0
           else
           begin
-             if(cptimerowner<>iowner)then
+             cpTimerOwnerPlayer:=iOwnerPlayer;
+             if(cpTimerOwnerTeam<>iOwnerTeam)then
              begin
-                cptimerowner:=iowner;
-                cptimer:=0;
+                cpTimerOwnerTeam  :=iOwnerTeam;
+                cpTimer:=0;
              end;
-             if(cptimer<cpcapturetime)
-             then cptimer+=1
+             if(cpTimer<cpCaptureTime)
+             then cpTimer+=1
              else
              begin
-                cptimer:=0;
-                CPoint_ChangeOwner(i,iowner);
+                cpOwnerPlayer:=iOwnerPlayer;
+                cpTimer:=0;
+                CPoint_ChangeOwner(i,iOwnerTeam);
              end;
           end;
     end;

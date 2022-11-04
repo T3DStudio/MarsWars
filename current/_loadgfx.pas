@@ -172,6 +172,12 @@ end;
 
 procedure _LoadMWSModel(mwsm:PTMWSModel;name:shortstring;_mkind:byte;firstload:boolean);
 var t:TMWTexture;
+procedure _addSelRect(ip:pinteger;vl:integer);
+begin
+   if(ip^=0)
+   then ip^:=vl
+   else ip^:=(ip^+vl) div 2;
+end;
 begin
    with mwsm^ do
    begin
@@ -182,7 +188,9 @@ begin
           sn-=1;
        end;
 
-      sn:=0;
+      sel_hw:=0;
+      sel_hh:=0;
+      sn :=0;
       setlength(sl,sn);
 
       _lstr(@t,name,firstload,false);
@@ -191,6 +199,8 @@ begin
          sn+=1;
          setlength(sl,sn);
          sl[sn-1]:=t;
+         _addSelRect(@sel_hw,t.hw);
+         _addSelRect(@sel_hh,t.hh);
       end;
 
       while true do
@@ -201,6 +211,8 @@ begin
          sn+=1;
          setlength(sl,sn);
          sl[sn-1]:=t;
+         _addSelRect(@sel_hw,t.hw);
+         _addSelRect(@sel_hh,t.hh);
       end;
       sk   :=sn-1;
       mkind:=_mkind;
@@ -759,7 +771,7 @@ begin
 
    ui_textx     := vid_mapx+4;
    ui_texty     := vid_mapy+4;
-   ui_hinty     := vid_mapy+vid_cam_h-60;
+   ui_hinty     := vid_mapy+vid_cam_h-(font_w+2)*6;
    ui_chaty     := ui_hinty-14;
    ui_logy      := ui_chaty-12;
    ui_oicox     := vid_mapx+vid_cam_w-4;

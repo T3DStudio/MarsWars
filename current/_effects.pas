@@ -38,8 +38,7 @@ begin
         MID_Baron         : _setEID(@spr_h_p2          ,sms_death);
         MID_URocketS,
         MID_URocket,
-        MID_Revenant,
-        MID_RevenantH     : _setEID(@spr_h_p4          ,sms_death);
+        MID_Revenant      : _setEID(@spr_h_p4          ,sms_death);
         MID_YPlasma       : _setEID(@spr_h_p7          ,sms_death);
 
         EID_BFG           : _setEID(@spr_eff_bfg       ,sms_death);
@@ -160,8 +159,7 @@ MID_Cacodemon     : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Baron         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_URocketS,
 MID_URocket,
-MID_Revenant,
-MID_RevenantH     : _setEff(7 ,0 , 8 ,-1       ,false,0 );
+MID_Revenant      : _setEff(7 ,0 , 8 ,-1       ,false,0 );
 MID_YPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
 EID_BFG           : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
@@ -251,7 +249,7 @@ begin
       end;
       for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
-      if(ms_eid_decal>0)then _effect_add(vx,vy,-6,ms_eid_decal);
+      if(mfe=uf_ground)and(ms_eid_decal>0)then _effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
 
       if(ms_snd_death_ch[ms_eid_bio_death]>0)then
        if(random(ms_snd_death_ch[ms_eid_bio_death])>0)then exit;

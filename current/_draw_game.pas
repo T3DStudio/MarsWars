@@ -305,7 +305,7 @@ begin
    else i2s6:='';
 end;
 
-procedure UnitsInfoAddUnit(pu:PTUnit;uspr:PTMWTexture);
+procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
 var srect,
       hbar :boolean;
     acolor :cardinal;
@@ -313,13 +313,13 @@ var srect,
 begin
    with pu^   do
    with uid^  do
-   with uspr^ do
+   with usmodel^ do
    begin
       acolor:=PlayerGetColor(playeri);
 
       srect :=((sel)and(playeri=HPlayer))
             or(k_alt>1)
-            or((ui_umark_u=unum)and(vid_rtui>vid_rtuish));
+            or(((ui_uhint=unum)or(ui_umark_u=unum))and(vid_rtui>vid_rtuish));
 
       hbar  :=false;
       if(srect)
@@ -337,17 +337,17 @@ begin
          if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
 
          if(playeri=HPlayer)
-         then UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,i2s6(group),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
-         else UnitsInfoAddRectText(vx-hw,vy-hh,vx+hw,vy+hh,acolor,lvlstr_w   ,''      ,buffstr,lvlstr_a  ,lvlstr_s  );
+         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
+         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w   ,''      ,buffstr,lvlstr_a  ,lvlstr_s  );
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-hw,vy-hh-4,vx+hw,vy-hh,hits/_mhits,acolor);
+      if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
 
       if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_blink_color2[vid_rtui>vid_rtuish]);
 
       if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[vid_rtui>vid_rtuish]);
 
-      if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-hh-6);
+      if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-sel_hh-6);
    end;
 end;
 
@@ -459,15 +459,15 @@ end;
 //
 
 procedure cpoints_sprites(draw:boolean);
-var t:integer;
+var t,i:integer;
 begin
    if(not draw)then exit;
 
    for t:=1 to MaxCPoints do
     with g_cpoints[t] do
-     if(cpcapturer>0)then
+     if(cpCapturer>0)then
      begin
-        if(not RectInCam(cpx,cpy,cpcapturer,cpcapturer,0))then continue;
+        if(not RectInCam(cpx,cpy,cpCapturer,cpCapturer,0))then continue;
 
         if(t=1)and(g_mode=gm_koth)then
         begin
@@ -483,8 +483,11 @@ begin
           end;
 
         if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime),c_white);
-        if(cptimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpcapturetime-cptimer),PlayerGetColor(cptimerowner));
-        //UnitsInfoAddText(cpx,cpy+20,w2s(cpzone),c_white);
+        if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),PlayerGetColor(cpTimerOwnerPlayer));
+        {UnitsInfoAddText(cpx,cpy+20,w2s(cpTimerOwnerPlayer),c_white);
+
+        for i:=0 to MaxPlayers do
+          UnitsInfoAddText(cpx-50,cpy+i*10,i2s(cpunitsp_pstate[i]),c_white);  }
      end;
 end;
 
@@ -595,31 +598,6 @@ begin
    end;  }
 end;
 
-function _SpriteDepth(y:integer;f:boolean):integer;
-begin
-   _SpriteDepth:=map_flydepths[f]+y;
-end;
-
-function _unit_SpriteDepth(pu:PTUnit):integer;
-begin
-   _unit_SpriteDepth:=0;
-   with pu^ do
-    case uidi of
-UID_UPortal,
-UID_HTeleport,
-UID_HSymbol,
-UID_HASymbol,
-UID_HAltar,
-UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
-    else
-      if(uid^._ukbuilding)and(bld=false)
-      then _unit_SpriteDepth:=sd_brocks+vy
-      else
-        if(hits>0)or(buff[ub_resur]>0)
-        then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
-        else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
-    end;
-end;
 
 procedure _draw_dbg;
 var u,ix,iy:integer;
@@ -693,7 +671,6 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(_unit_SpriteDepth(@_units[u])), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+40,i2s(aiu_alarm_timer), ta_left,255, PlayerGetColor(playeri));
 

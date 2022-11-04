@@ -376,7 +376,7 @@ begin
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
-   setWeaponTEID(0    ,nil,0,[0..255]);
+   //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_ZBFG:
 begin
@@ -496,13 +496,13 @@ begin
 end;
 
 
-UID_Scout:
+UID_Engineer:
 begin
-   _animw:=19;
+   _animw:=14;
    _animd:=8;
-   setMWSModel(@spr_Scout,@spr_Engineer);
-   setCommandSND(false,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
-   setCommandSND(true ,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
+   setMWSModel(@spr_Engineer,nil);
+//   setCommandSND(true ,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
+   setCommandSND(false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_electro,0,0);
@@ -576,7 +576,7 @@ begin
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
-   setWeaponTEID(0    ,nil,0,[0..255]);
+   //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_BFG:
 begin
@@ -622,7 +622,7 @@ begin
 
    setWeaponESND(0,nil,snd_ssg    ,0,0);
    setWeaponESND(1,nil,snd_shotgun,0,0);
-   setWeaponESND(2,nil,snd_pistol ,0,0);
+   setWeaponESND(3,nil,snd_pistol ,0,0);
 
    setWeaponTEID(2    ,nil,0,[0..255]);
    //with _a_weap[1] do aw_rld_a:=[];

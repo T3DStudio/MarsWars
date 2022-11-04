@@ -310,8 +310,8 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
        for i:=1 to MaxCPoints do
         with g_cpoints[i] do
         begin
-           _wudata_byte(cpowner,rpl);
-           if(g_mode=gm_KotH)and(i=1)then _wudata_int(cptimer,rpl);
+           _wudata_byte(cpOwnerTeam,rpl);
+           if(g_mode=gm_KotH)and(i=1)then _wudata_int(cpTimer,rpl);
            //+lifetime
         end;
    end;
@@ -456,28 +456,28 @@ begin
 
             _unit_done_dec_cntrs(pu);
 
-             if(_isbarrack)then
-              for i:=0 to MaxUnitProdsI do
-               if(uprod_r[i]>0)then
-               begin
-                  _puid:=uprod_u[i];
+            if(_isbarrack)then
+             for i:=0 to MaxUnitProdsI do
+              if(uprod_r[i]>0)then
+              begin
+                 _puid:=uprod_u[i];
 
-                  uproda-=1;
-                  uprodc[_uids[_puid]._ucl]-=1;
-                  uprodu[      _puid      ]-=1;
-                  cenergy+=_uids[_puid]._renergy;
-               end;
-             if(_issmith)then
-              for i:=0 to MaxUnitProdsI do
-               if(pprod_r[i]>0)then
-               begin
-                  _puid:=pprod_u[i];
+                 uproda-=1;
+                 uprodc[_uids[_puid]._ucl]-=1;
+                 uprodu[      _puid      ]-=1;
+                 cenergy+=_uids[_puid]._renergy;
+              end;
+            if(_issmith)then
+             for i:=0 to MaxUnitProdsI do
+              if(pprod_r[i]>0)then
+              begin
+                 _puid:=pprod_u[i];
 
-                  upproda-=1;
-                  upprodu[_puid]-=1;
-                  pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
-                  cenergy+=pprod_e[i];
-               end;
+                 upproda-=1;
+                 upprodu[_puid]-=1;
+                 pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                 cenergy+=pprod_e[i];
+              end;
          end;
       end;
    end;
@@ -515,6 +515,8 @@ procedure _netSetUcl(uu:PTUnit);
 var pu,tu:PTUnit;
    vis:boolean;
 begin
+   // pu - previous state
+   // uu - current state
    pu:=@_units[0];
    with uu^ do vis:=PointInScreenP(x,y,player);
    with uu^ do
@@ -645,13 +647,11 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               _unit_sfog(uu);
-               _unit_mmcoords(uu);
+               _unit_SetXY(uu,x,y,mvxy_none);
 
                if(speed>0)then
                begin
                   vstp:=UnitStepTicks;
-
                   dir :=point_dir(uo_bx,uo_by,x,y);
                end;
             end;
@@ -985,8 +985,8 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
        for i:=1 to MaxCPoints do
         with g_cpoints[i] do
         begin
-           cpowner:=_rudata_byte(rpl,0);
-           if(g_mode=gm_KotH)and(i=1)then cptimer:=_rudata_int(rpl,0);
+           cpOwnerTeam:=_rudata_byte(rpl,0);
+           if(g_mode=gm_KotH)and(i=1)then cpTimer:=_rudata_int(rpl,0);
            //lifetime
         end;
    end;

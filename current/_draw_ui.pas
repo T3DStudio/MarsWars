@@ -25,7 +25,7 @@ begin
 end;
 
 
-procedure d_Alarms;
+procedure d_MinimapAlarms;
 var i,r:byte;
 begin
    for i:=0 to ui_max_alarms do
@@ -49,7 +49,7 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
 
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-     if(cpcapturer>0)then
+     if(cpCapturer>0)then
       if(cpenergy>0)
       then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
       else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
@@ -64,14 +64,13 @@ var i:byte;
 begin
    rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh, c_white);
 
-   d_Alarms;
+   d_MinimapAlarms;
 
    with _players[HPlayer] do
     for i:=0 to MaxPlayers do
      with ai_alarms[i] do
       if(aia_enemy_count>0)then
        circleColor(r_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
-
 
    _draw_surf(tar      ,1,1,r_minimap );
    _draw_surf(r_minimap,0,0,r_bminimap);
@@ -122,7 +121,7 @@ begin
       // points areas
       for i:=1 to MaxCPoints do
        with g_cpoints[i] do
-        if(cpcapturer>0)and(cpnobuildr>0)then
+        if(cpCapturer>0)and(cpnobuildr>0)then
          circleColor(tar,
          lx+cpx-vid_cam_x,
          ly+cpy-vid_cam_y,
@@ -348,7 +347,9 @@ begin
             ux:=(ucl mod 3);
             uy:=(ucl div 3);
 
-            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (uprodu[uid]>=ui_uprod_uid_max[uid]));
+            //(uprodu[uid]>=ui_uprod_uid_max[uid])
+
+            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
             _drawBtnt(tar,ux,uy,
             ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
             ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
@@ -375,15 +376,15 @@ begin
       3: // actions
       if(rpls_state>=rpl_rhead)then
       begin
-         _drawBtn(tar,0,4,spr_b_rfast,_fsttime    ,false);
-         _drawBtn(tar,1,4,spr_b_rskip,false       ,false);
-         _drawBtn(tar,2,4,spr_b_rstop,g_status>0  ,false);
-         _drawBtn(tar,0,5,spr_b_rvis ,rpls_plcam  ,false);
-         _drawBtn(tar,1,5,spr_b_rlog ,rpls_showlog,false);
-         _drawBtn(tar,2,5,spr_b_rfog ,rpls_fog    ,false);
+         _drawBtn(tar,0,0,spr_b_rfast,_fsttime    ,false);
+         _drawBtn(tar,1,0,spr_b_rskip,false       ,false);
+         _drawBtn(tar,2,0,spr_b_rstop,g_status>0  ,false);
+         _drawBtn(tar,0,1,spr_b_rvis ,rpls_plcam  ,false);
+         _drawBtn(tar,1,1,spr_b_rlog ,rpls_showlog,false);
+         _drawBtn(tar,2,1,spr_b_rfog ,rpls_fog    ,false);
 
          ux:=2;
-         uy:=6;
+         uy:=2;
 
          for ucl:=0 to MaxPlayers do
          begin
@@ -478,10 +479,10 @@ begin
 end;
 
 procedure d_Hints(tar:pSDL_Surface);
-const rpl_btns_border = 12;
 var i,
    uid:byte;
     hs:pshortstring;
+    tu:PTUnit;
 begin
    //str_hint_a
    if(0<=m_bx)and(m_bx<3)and(3<=m_by)and(m_by<=16)then
@@ -505,13 +506,9 @@ begin
         begin
            if(ui_tab=3)then
            begin
-              if(rpls_state>=rpl_rhead)then
-              begin
-                 if(i<rpl_btns_border)then exit;
-              end
-              else
-                 if(i>=rpl_btns_border)then exit;
-              hs:=@str_hint[ui_tab,race,i];
+              if(rpls_state>=rpl_rhead)
+              then hs:=@str_hint_r[i]
+              else hs:=@str_hint_a[i];
            end
            else
            begin
@@ -523,7 +520,7 @@ begin
                       begin
                          if (a_units[uid]<=0)then exit;
                       end;
-                      hs:=@_uids[uid].un_txt_hint;
+                      hs:=@_uids[uid].un_txt_uihint;
                    end;
               2  : begin
                       if (a_upgrs[uid]<=0)then exit;
@@ -535,7 +532,10 @@ begin
       end;
       if(hs=nil)then exit;
       _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,255,c_white);
-   end;
+   end
+   else
+    if(_IsUnitRange(ui_uhint,@tu))then
+     _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,255,c_white);
 end;
 
 procedure D_UIText(tar:pSDL_Surface);

@@ -20,7 +20,6 @@ MID_Granade,
 MID_Mine,
 MID_HRocket  : ms_smodel:=@spr_h_p3;
 MID_Revenant : ms_smodel:=@spr_h_p4;
-MID_RevenantH: ms_smodel:=@spr_h_p4;
 MID_Mancubus : ms_smodel:=@spr_h_p5;
 MID_YPlasma  : ms_smodel:=@spr_h_p7;
 MID_BPlasma  : ms_smodel:=@spr_u_p0;
@@ -45,7 +44,7 @@ MID_Granade,
 MID_HRocket,
 MID_URocketS,
 MID_URocket,
-MID_RevenantH: begin
+MID_Revenant : begin
                ms_eid_fly   :=MID_Bullet;
                ms_eid_fly_st:=5;
                end;
@@ -72,8 +71,7 @@ MID_Tank,
 MID_Granade,
 MID_HRocket,
 MID_URocket,
-MID_Revenant,
-MID_RevenantH: ms_snd_death[false]:=snd_exp;
+MID_Revenant : ms_snd_death[false]:=snd_exp;
 MID_Bullet,
 MID_Bulletx2,
 MID_TBullet,
@@ -196,29 +194,28 @@ begin
 MID_Imp        : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Cacodemon  : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Baron      : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_RevenantH,
 MID_Revenant   : begin damage:=80  ; vstep:=d div 12; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
 MID_URocketS   : begin damage:=80  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_URocket    : begin damage:=80  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
 MID_Mancubus   : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin damage:=30  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_YPlasma    : begin damage:=40  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_ArchFire   : begin damage:=400 ; vstep:=1;        splashr :=15 ;         end;
 
 MID_MBullet,
 MID_TBullet,
-MID_Bullet     : begin damage:=20  ; vstep:=1;        splashr :=0  ;         end;
-MID_Bulletx2   : begin damage:=30  ; vstep:=1;        splashr :=0  ;         end;
-MID_BPlasma    : begin damage:=30  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Bullet     : begin damage:=20  ; vstep:=5;        splashr :=0  ;         end;
+MID_Bulletx2   : begin damage:=30  ; vstep:=5;        splashr :=0  ;         end;
+MID_BPlasma    : begin damage:=40  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_BFG        : begin damage:=600 ; vstep:=d div 12; splashr :=125;         end;
-MID_Flyer      : begin damage:=50  ; vstep:=d div 60; splashr :=0  ;         end;
+MID_Flyer      : begin damage:=80  ; vstep:=d div 30; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=400 ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=80  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
-MID_Tank       : begin damage:=80  ; vstep:=1;        splashr :=tank_sr;     end;
+MID_Tank       : begin damage:=80  ; vstep:=5;        splashr :=tank_sr;     end;
 MID_StunMine   : begin damage:=1   ; vstep:=1;        splashr :=100;         end;
 MID_Mine       : begin damage:=1000; vstep:=1;        splashr :=100;         end;
 MID_Blizzard   : begin damage:=2000; vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
-MID_SShot      : begin damage:=80  ; vstep:=1;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=160 ; vstep:=1;        splashr :=10 ;mtars:=2;end;
+MID_SShot      : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
+MID_SSShot     : begin damage:=160 ; vstep:=5;        splashr :=10 ;mtars:=2;end;
       else
          vstep:=0;
          exit;
@@ -237,16 +234,14 @@ MID_SSShot     : begin damage:=160 ; vstep:=1;        splashr :=10 ;mtars:=2;end
 
       with _players[player] do
       case mid of
-MID_Revenant: if(upgr[upgr_hell_revmis]>0)then mid:=MID_RevenantH;
-MID_URocket : if(upgr[upgr_uac_airsp  ]>0)then mid:=MID_URocketS;
+MID_URocket : if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
       end;
 
       if(homing=mh_none)then
        case mid of
-MID_RevenantH,
+MID_Revenant,
 MID_URocket,
 MID_URocketS   : homing:=mh_homing;
-MID_Revenant,
 MID_Imp,
 MID_Cacodemon,
 MID_Baron,
@@ -255,7 +250,7 @@ MID_YPlasma    : homing:=mh_magnetic;
        end;
 
 
-      if(homing<mh_homing)and(_IsUnitRange(tar,@tu))then
+      if(_IsUnitRange(tar,@tu))then
       begin
          x+=_randomr(tu^.uid^._missile_r);
          y+=_randomr(tu^.uid^._missile_r);
@@ -275,8 +270,7 @@ MID_Cacodemon : if(uid=UID_Cacodemon  )then exit;
 MID_Baron     : if(uid=UID_Knight     )then exit;
 MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
-MID_Revenant,
-MID_RevenantH : if(uid=UID_Revenant   )then exit;
+MID_Revenant  : if(uid=UID_Revenant   )then exit;
 MID_Mine,
 MID_StunMine  : if(uid=UID_UMine      )then exit;
    end;
@@ -369,16 +363,15 @@ begin
         or(tu^.uidi=UID_LostSoul)then   // fly all
             case mid of
             MID_Revenant,
-            MID_RevenantH,
             MID_URocketS,
             MID_URocket     : _d200(@rdamage);
             MID_Flyer       : _d300(@rdamage);
             end;
 
         case mid of
-            MID_Bulletx2,
-            MID_SShot       : p:=2;
-            MID_SSShot      : p:=3;
+            //MID_Bulletx2,
+            //MID_SShot       : p:=2;
+            MID_SSShot      : p:=2;
         end;
 
         if(ud<=0)and(ntars=0)then // direct and first target
@@ -441,19 +434,22 @@ begin
    with _missiles[m] do
    if(vstep>0)then
    begin
-      case homing of
-mh_magnetic : if(_IsUnitRange(tar,@tu))then
-              begin
-                 x  +=sign(tu^.x-x);
-                 y  +=sign(tu^.y-y);
+      if(homing>mh_none)then
+       if(_IsUnitRange(tar,@tu))then
+        if(tu^.x<>tu^.vx)
+        or(tu^.y<>tu^.vy)
+        or(max2(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
+         case homing of
+mh_magnetic : begin
+                 x  +=sign(tu^.x-x)*3;
+                 y  +=sign(tu^.y-y)*3;
               end;
-mh_homing   : if(_IsUnitRange(tar,@tu))then
-              begin
+mh_homing   : begin
                  x  :=tu^.x;
                  y  :=tu^.y;
                  mfe:=tu^.ukfly;
               end;
-      end;
+         end;
 
       if(mid=MID_Blizzard)then
       begin
@@ -467,12 +463,14 @@ mh_homing   : if(_IsUnitRange(tar,@tu))then
            end
            else
              if(vstep<=mb_s0)then vy+=fr_fps;
+
       end
       else
       begin
          vx+=(x-vx) div vstep;
          vy+=(y-vy) div vstep;
       end;
+
       vstep-=1;
       if(vstep<=hvstep)then mfs:=mfe;
 

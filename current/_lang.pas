@@ -1,5 +1,5 @@
 
-function l2s(limit:integer):shortstring;
+function l2s(limit:integer):shortstring; // limit 2 string
 var fr:integer;
 begin
    fr:=limit mod MinUnitLimit;
@@ -29,7 +29,7 @@ SDLK_RShift         : GetKeyName:='Shift';
    end
 end;
 
-function _gHK(ucl:byte):shortstring;
+function _gHK(ucl:byte):shortstring;  // hotkey units&upgrades tab
 begin
    _gHK:='';
    if(ucl<=_mhkeys)then
@@ -41,7 +41,7 @@ begin
     end;
 end;
 
-function _gHKA(ucl:byte):shortstring;
+function _gHKA(ucl:byte):shortstring;  // hotkey actions tab
 begin
    _gHKA:='';
    if(ucl<=_mhkeys)then
@@ -52,7 +52,7 @@ begin
        _gHKA:=_gHKA+#18+GetKeyName(_hotkeyA [ucl])+#25;
     end;
 end;
-function _gHKR(ucl:byte):shortstring;
+function _gHKR(ucl:byte):shortstring;  // hotkey replays tab
 begin
    _gHKR:='';
    if(ucl<=_mhkeys)then
@@ -64,31 +64,33 @@ begin
     end;
 end;
 
-procedure _mkHStrXY(tab,i,x,y:byte;STR:shortstring);
+procedure _mkHStrXY(tab,i,x,y:byte;STR:shortstring); // units&upgrades
 begin
    if(i=255)then i:=(y div 3)+x;
-   str_hint[tab,r_hell,i]:=STR;
-   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
+   //str_hint[tab,r_hell,i]:=STR;
+   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
 end;
 
-procedure _mkHStrXYHKA(tab,i,x,y:byte;STR:shortstring);
+procedure _mkHStrXYHKA(tab,i,x,y:byte;STR:shortstring); // actions
 var HK:shortstring;
 begin
    if(i=255)then i:=(y div 3)+x;
    HK:=_gHKA(i);
    if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
-   str_hint[tab,r_hell,i]:=STR;
-   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
+   //str_hint[tab,r_hell,i]:=STR;
+   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
 end;
-procedure _mkHStrXYHKR(tab,i,x,y:byte;STR:shortstring);
+procedure _mkHStrXYHKR(tab,i,x,y:byte;STR:shortstring); // replays tab
 var HK:shortstring;
 begin
    if(i=255)then i:=(y div 3)+x;
    HK:=_gHKR(i);
    if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
-   str_hint[tab,r_hell,i]:=STR;
-   str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
+   //str_hint[tab,r_hell,i]:=STR;
+   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
 end;
+
+//str_hin_rpl
 
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
@@ -108,14 +110,19 @@ begin
    end;
 end;
 
-
-
-procedure _addstr(s:pshortstring;ad:shortstring);
+procedure _ADDSTRC(s:pshortstring;ad:shortstring);
 begin
-   if(s^='')
+   if(length(s^)=0)
    then s^:=ad
-   else s^:=s^+', '+ad;
+   else s^:=s^+',' +ad;
 end;
+procedure _ADDSTRS(s:pshortstring;ad:shortstring);
+begin
+   if(length(s^)=0)
+   then s^:=ad
+   else s^:=s^+'/' +ad;
+end;
+
 
 function findprd(uid:byte):shortstring;
 var i:byte;
@@ -127,18 +134,61 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _addstr(@up,_uids[i].un_txt_name);
-      if(uid in _uids[i].ups_builder)then _addstr(@bp,_uids[i].un_txt_name);
+      if(uid in _uids[i].ups_units  )then _ADDSTRC(@up,_uids[i].un_txt_name);
+      if(uid in _uids[i].ups_builder)then _ADDSTRC(@bp,_uids[i].un_txt_name);
    end;
 
-   if(up<>'')then _addstr(@findprd,up);
-   if(bp<>'')then _addstr(@findprd,bp);
+   if(length(up)>0)then _ADDSTRC(@findprd,up);
+   if(length(bp)>0)then _ADDSTRC(@findprd,bp);
+end;
+
+function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
+begin
+   if(pu=nil)then
+   begin
+      pu:=@_units[0];
+      with pu^ do
+      begin
+         uidi:=auid;
+         playeri:=0;
+         player :=@_players[playeri];
+      end;
+      _unit_apUID(pu,false);
+   end;
+   with pu^  do
+   with uid^ do
+   begin
+      if(_ukbuilding)
+      then _makeAttributeStr:=str_attr_building
+      else _makeAttributeStr:=str_attr_unit;
+      if(_ukmech)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_mech)
+      else _ADDSTRC(@_makeAttributeStr,str_attr_bio );
+      if(_uklight)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_light )
+      else _ADDSTRC(@_makeAttributeStr,str_attr_nlight);
+      if(ukfly)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_fly)
+      else
+        if(ukfloater)
+        then _ADDSTRC(@_makeAttributeStr,str_attr_floater)
+        else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
+      if(buff[ub_advanced]>0)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_advanced);
+      _makeAttributeStr:='['+_makeAttributeStr+']';
+   end;
+end;
+function _makeDynUnitHint(pu:PTUnit):shortstring;
+begin
+   with pu^  do
+    with uid^ do
+     _makeDynUnitHint:=un_txt_name+' ('+pu^.player^.name+')'+#11+_makeAttributeStr(pu,0)+#11+un_txt_descr;
 end;
 
 procedure _makeHints;
 var
 uid,l       :byte;
-ENRG,HK,PROD,LMT,
+ENRG,HK,PROD,LMT,INFO,
 TIME,REQ    :shortstring;
 begin
    // units
@@ -150,36 +200,36 @@ begin
       ENRG:='';
       TIME:='';
       LMT :='';
-      //if(un_txt_name='')then continue;
+      INFO:='';
 
       if(_ucl>=21)then
       begin
-         un_txt_hint:=un_txt_name+#11+un_txt_descr+#11;
+         un_txt_uihint:=un_txt_name+#11+un_txt_descr+#11;
       end
       else
       begin
-         if(_renergy>0)then ENRG:=i2s(_renergy);
-         if(_btime  >0)then TIME:=i2s(_btime );
-         LMT:=l2s(_limituse);
+         HK:=_gHK(_ucl);
+         if(_renergy>0)then ENRG:=#19+i2s(_renergy)+#25;
+         if(_btime  >0)then TIME:=#22+i2s(_btime  )+#25;
+         LMT:=#16+l2s(_limituse)+#25;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then if(_ruid1n<=1)then _addstr(@REQ,_uids [_ruid1].un_txt_name) else _addstr(@REQ,_uids[_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
-         if(_ruid2>0)then if(_ruid2n<=1)then _addstr(@REQ,_uids [_ruid2].un_txt_name) else _addstr(@REQ,_uids[_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
-         if(_ruid3>0)then if(_ruid3n<=1)then _addstr(@REQ,_uids [_ruid3].un_txt_name) else _addstr(@REQ,_uids[_ruid3].un_txt_name+'(x'+b2s(_ruid3n)+')');
-         if(_rupgr>0)then if(_rupgrn<=1)then _addstr(@REQ,_upids[_rupgr]._up_name   ) else _addstr(@REQ,_upids[_rupgr]._up_name  +'(x'+b2s(_rupgrn)+')');
-         HK:=_gHK(_ucl);
+         if(_ruid1>0)then if(_ruid1n<=1)then _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
+         if(_ruid2>0)then if(_ruid2n<=1)then _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
+         if(_ruid3>0)then if(_ruid3n<=1)then _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name+'(x'+b2s(_ruid3n)+')');
+         if(_rupgr>0)then if(_rupgrn<=1)then _ADDSTRC(@REQ,_upids[_rupgr]._up_name   ) else _ADDSTRC(@REQ,_upids[_rupgr]._up_name   +'(x'+b2s(_rupgrn)+')');
 
-         un_txt_hint:= un_txt_name;
-         if(length(HK  )>0)then un_txt_hint+=' ('+HK+')';
-         if(length(ENRG)>0)then un_txt_hint+=' {'+#19+ENRG+#25+'}';
-         if(length(LMT )>0)then un_txt_hint+=' <'+#16+LMT +#25+'>';
-         if(length(TIME)>0)then un_txt_hint+=' ['+#22+TIME+#25+']';
-         un_txt_hint+=#11+un_txt_descr+#11;
-         if(length(REQ )>0)then un_txt_hint+=#17+str_req+#25+REQ+#11 else un_txt_hint+=#11;
+         if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
+         if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
+         if(length(LMT )>0)then _ADDSTRC(@INFO,LMT );
+         if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
+
+         un_txt_uihint:=un_txt_name+' ('+INFO+')'+#11+_makeAttributeStr(nil,uid)+#11+un_txt_descr+#11;
+         if(length(REQ )>0)then un_txt_uihint+=#17+str_req+#25+REQ+#11 else un_txt_uihint+=#11;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_hint+=str_bprod+PROD
-          else un_txt_hint+=str_uprod+PROD;
+          then un_txt_uihint+=str_bprod+PROD
+          else un_txt_uihint+=str_uprod+PROD;
       end;
    end;
 
@@ -191,33 +241,34 @@ begin
       PROD :='';
       ENRG :='';
       TIME :='';
-      //if(length(_up_name)=0)then continue;
+      INFO :='';
 
+      HK:=_gHK(_up_btni);
       if(_up_renerg>0)then
       begin
-         ENRG:=i2s(_upid_energy(uid,1));
-         if(_up_max>1)and(not _up_mfrg)then
-          for l:=2 to _up_max do ENRG+=#25+'/'+#19+i2s(_upid_energy(uid,l));
+         if(_up_max>1)and(not _up_mfrg)
+         then for l:=1 to _up_max do _ADDSTRS(@ENRG,i2s(_upid_energy(uid,l)))
+         else ENRG:=i2s(_upid_energy(uid,1));
+         ENRG:=#19+ENRG+#25;
       end;
       if(_up_time  >0)then
       begin
-         TIME :=i2s(_upid_time(uid,1) div fr_fps);
-         if(_up_max>1)and(not _up_mfrg)then
-          for l:=2 to _up_max do TIME+=#25+'/'+#22+i2s(_upid_time(uid,l) div fr_fps);
+         if(_up_max>1)and(not _up_mfrg)
+         then for l:=1 to _up_max do _ADDSTRS(@TIME,i2s(_upid_time(uid,l) div fr_fps))
+         else TIME :=i2s(_upid_time(uid,1) div fr_fps);
+         TIME:=#22+TIME+#25;
       end;
 
-      if(_up_ruid  >0)then _addstr(@REQ,_uids [_up_ruid ].un_txt_name );
-      if(_up_rupgr >0)then _addstr(@REQ,_upids[_up_rupgr]._up_name);
+      if(_up_ruid  >0)then _ADDSTRC(@REQ,_uids [_up_ruid ].un_txt_name);
+      if(_up_rupgr >0)then _ADDSTRC(@REQ,_upids[_up_rupgr]._up_name   );
 
-      HK:=_gHK(_up_btni);
+      if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
+      if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
+      if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
+      _ADDSTRC(@INFO,#16+'x'+i2s(_up_max)+#25);
+      if(_up_mfrg)then _ADDSTRC(@INFO,#15+'*'+#25);
 
-      _up_hint:=_up_name;
-      if(length(HK  )>0)then _up_hint+=' ('+HK+')';
-      if(length(ENRG)>0)then _up_hint+=' {'+#19+ENRG+#25+'}';
-      if(length(TIME)>0)then _up_hint+=' ['+#22+TIME+#25+']';
-      _up_hint+=' x'+#16+i2s(_up_max)+#25;
-      if(_up_mfrg)then _up_hint+=#15+' *'+#25;
-      _up_hint+=#11+_up_descr+#11;
+      _up_hint:=_up_name+' ('+INFO+')'+#11+_up_descr+#11;
       if(length(REQ)>0)then _up_hint+=#17+str_req+#25+REQ;
    end;
 end;
@@ -310,6 +361,17 @@ begin
    str_upgrade_complete  := 'Upgrade complete';
    str_building_complete := 'Construction complete';
    str_unit_complete     := 'Unit ready';
+
+   str_attr_unit         := #21+'unit'      +#25;
+   str_attr_building     := #15+'building'  +#25;
+   str_attr_mech         := #20+'mechanical'+#25;
+   str_attr_bio          := #16+'biological'+#25;
+   str_attr_light        := #17+'light'     +#25;
+   str_attr_nlight       := #23+'heavy'     +#25;
+   str_attr_fly          := #22+'flying'    +#25;
+   str_attr_ground       := #18+'ground'    +#25;
+   str_attr_floater      := #19+'floater'   +#25;
+   str_attr_advanced     := #14+'advanced'  +#25;
 
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := #18+'left' +#25;
@@ -487,14 +549,14 @@ begin
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
-   _mkHStrUid(UID_Scout         ,'Scout / Engineer' ,'');
-   _mkHStrUid(UID_Medic         ,'Medic'            ,'');
    _mkHStrUid(UID_Sergant       ,'Sergeant'         ,'');
    _mkHStrUid(UID_Commando      ,'Commando'         ,'');
-   _mkHStrUid(UID_Antiaircrafter,'Antiaircrafter soldier','');
-   _mkHStrUid(UID_Siege         ,'Siege soldier','');
+   _mkHStrUid(UID_Antiaircrafter,'Antiaircrafter'   ,'');
+   _mkHStrUid(UID_Siege         ,'Siege Marine'     ,'');
    _mkHStrUid(UID_Major         ,'Major'            ,'');
    _mkHStrUid(UID_BFG           ,'BFG Marine'       ,'');
+   _mkHStrUid(UID_Engineer      ,'Engineer'         ,'');
+   _mkHStrUid(UID_Medic         ,'Medic'            ,'');
    _mkHStrUid(UID_FAPC          ,'Air APC'          ,'');
    _mkHStrUid(UID_UTransport    ,'Air APC'          ,'');
    _mkHStrUid(UID_APC           ,'Ground APC'       ,'');
@@ -533,40 +595,37 @@ begin
    _mkHStrUpid(upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
    _mkHStrUpid(upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'      ); }
 
-   _mkHStrXYHKA(3,0 ,0,0,'Action'         );
-   _mkHStrXYHKA(3,1 ,0,0,'Action at point');
-   _mkHStrXYHKA(3,2 ,0,0,str_maction      );
-
+   str_hint_a[0 ]:='Action';
+   str_hint_a[1 ]:='Action at point';
+   str_hint_a[2 ]:=str_maction;
    t:='attack enemies';
-   _mkHStrXYHKA(3,3 ,0,0,'Move, '  +t);
-   _mkHStrXYHKA(3,4 ,0,0,'Stop, '  +t);
-   _mkHStrXYHKA(3,5 ,0,0,'Patrol, '+t);
-
+   str_hint_a[3 ]:='Move, '  +t;
+   str_hint_a[4 ]:='Stop, '  +t;
+   str_hint_a[5 ]:='Patrol, '+t;
    t:='ignore enemies';
-   _mkHStrXYHKA(3,6 ,0,0,'Move, '  +t);
-   _mkHStrXYHKA(3,7 ,0,0,'Stop, '  +t);
-   _mkHStrXYHKA(3,8 ,0,0,'Patrol, '+t);
+   str_hint_a[6 ]:='Move, '  +t;
+   str_hint_a[7 ]:='Stop, '  +t;
+   str_hint_a[8 ]:='Patrol, '+t;
+   str_hint_a[9 ]:='Cancel production';
+   str_hint_a[10]:='Select all units' ;
+   str_hint_a[11]:='Destroy'          ;
 
-   _mkHStrXYHKA(3,9 ,0,0,'Cancel production');
-   _mkHStrXYHKA(3,10,0,0,'Select all units' );
-   _mkHStrXYHKA(3,11,0,0,'Destroy'          );
 
-
-   _mkHStrXYHKR(3,12,0,0,'Faster game speed');
-   _mkHStrXY(3,13,0,0,'Left click: skip 2 seconds ('                     +#18+'W'+#25+')'+#11+
-                      'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
-                      'Skip 1 minute ('               +#18+'Alt' +#25+'+'+#18+'W'+#25+')' );
-   _mkHStrXYHKR(3,14,0,0,'Pause'                );
-   _mkHStrXYHKR(3,15,0,0,'Player POV'           );
-   _mkHStrXYHKR(3,16,0,0,'List of game messages');
-   _mkHStrXYHKR(3,17,0,0,'Fog of war'        );
-   _mkHStrXYHKR(3,20,0,0,'All players'       );
-   _mkHStrXYHKR(3,21,0,0,'Red player [#1]'   );
-   _mkHStrXYHKR(3,22,0,0,'Orange player [#2]');
-   _mkHStrXYHKR(3,23,0,0,'Yellow player [#3]');
-   _mkHStrXYHKR(3,24,0,0,'Green player [#4]' );
-   _mkHStrXYHKR(3,25,0,0,'Aqua player [#5]'  );
-   _mkHStrXYHKR(3,26,0,0,'Blue player [#6]'  );
+   str_hint_r[0 ]:='Faster game speed';
+   str_hint_r[1 ]:='Left click: skip 2 seconds ('                     +#18+'W'+#25+')'+#11+
+                   'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
+                   'Skip 1 minute ('               +#18+'Alt' +#25+'+'+#18+'W'+#25+')';
+   str_hint_r[2 ]:='Pause';
+   str_hint_r[3 ]:='Player POV'           ;
+   str_hint_r[4 ]:='List of game messages';
+   str_hint_r[5 ]:='Fog of war'        ;
+   str_hint_r[8 ]:='All players'       ;
+   str_hint_r[9 ]:='Red player [#1]'   ;
+   str_hint_r[10]:='Orange player [#2]';
+   str_hint_r[11]:='Yellow player [#3]';
+   str_hint_r[12]:='Green player [#4]' ;
+   str_hint_r[13]:='Aqua player [#5]'  ;
+   str_hint_r[14]:='Blue player [#6]'  ;
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -882,7 +941,7 @@ begin
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_UMine           ,'Мина','');
 
-  _mkHStrUid(UID_Scout   ,'Инженер'            ,'');
+  _mkHStrUid(UID_Engineer   ,'Инженер'            ,'');
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');
   _mkHStrUid(UID_Sergant    ,'Сержант'            ,'');
   _mkHStrUid(UID_Commando   ,'Коммандо'           ,'');
@@ -922,41 +981,37 @@ begin
   _mkHStrUpid(upgr_bldenrg ,'Встроенный генератор'       ,'Дополнительна энергия для Командного Центра.'             );
   _mkHStrUpid(upgr_9bld    ,'Улучшение АЭС'              ,'Уменьшение времени парезарядки АЭС.'                      );  }
 
-  _mkHStrXYHKA(3,0 ,0,0,'Действие'        );
-  _mkHStrXYHKA(3,1 ,0,0,'Действие в точке');
-  _mkHStrXYHKA(3,2 ,0,0,str_maction       );
-
+  str_hint_a[0 ]:='Действие';
+  str_hint_a[1 ]:='Действие в точке';
+  str_hint_a[2 ]:=str_maction;
   t:='атаковать врагов';
-  _mkHStrXYHKA(3,3 ,0,0,'Двигаться, '    +t);
-  _mkHStrXYHKA(3,4 ,0,0,'Стоять, '       +t);
-  _mkHStrXYHKA(3,5 ,0,0,'Патрулировать, '+t);
-
+  str_hint_a[3 ]:='Двигаться, '    +t;
+  str_hint_a[4 ]:='Стоять, '       +t;
+  str_hint_a[5 ]:='Патрулировать, '+t;
   t:='игнорировать врагов';
-  _mkHStrXYHKA(3,6 ,0,0,'Двигаться, '    +t);
-  _mkHStrXYHKA(3,7 ,0,0,'Стоять, '       +t);
-  _mkHStrXYHKA(3,8 ,0,0,'Патрулировать, '+t);
-
-  _mkHStrXYHKA(3,9 ,0,0,'Отмена производства');
-  _mkHStrXYHKA(3,10,0,0,'Выбрать всех боевых незанятых юнитов' );
-  _mkHStrXYHKA(3,11,0,0,'Уничтожить'         );
-
+  str_hint_a[6 ]:='Двигаться, '    +t;
+  str_hint_a[7 ]:='Стоять, '       +t;
+  str_hint_a[8 ]:='Патрулировать, '+t;
+  str_hint_a[9 ]:='Отмена производства';
+  str_hint_a[10]:='Выбрать всех боевых незанятых юнитов';
+  str_hint_a[11]:='Уничтожить';
 
 
-  _mkHStrXY(3,12,0,0,'Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')');
-  _mkHStrXY(3,13,0,0,'Левый клик: пропустить 2 секунды ('                         +#18+'W'+#25+')'+#11+
-                     'Правый клик: пропустить 10 секунд ('     +#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
-                     'Пропустить 1 минуту ('                   +#18+'Alt' +#25+'+'+#18+'W'+#25+')' );
-  _mkHStrXY(3,14,0,0,'Пауза ('                   +#18+'E'+#25+')');
-  _mkHStrXY(3,15,0,0,'Камера игрока ('           +#18+'A'+#25+')');
-  _mkHStrXY(3,16,0,0,'Список игровых сообщений ('+#18+'S'+#25+')');
-  _mkHStrXY(3,17,0,0,'Туман войны ('             +#18+'D'+#25+')');
-  _mkHStrXY(3,20,0,0,'Все игроки ('              +#18+'C'+#25+')');
-  _mkHStrXY(3,21,0,0,'Красный игрок [#1] ('      +#18+'R'+#25+')');
-  _mkHStrXY(3,22,0,0,'Оранжевый игрок [#2] ('    +#18+'T'+#25+')');
-  _mkHStrXY(3,23,0,0,'Желтый игрок [#3] ('       +#18+'Y'+#25+')');
-  _mkHStrXY(3,24,0,0,'Зеленый игрок [#4] ('      +#18+'F'+#25+')');
-  _mkHStrXY(3,25,0,0,'Бирюзовый игрок [#5] ('    +#18+'G'+#25+')');
-  _mkHStrXY(3,26,0,0,'Синий игрок [#6] ('        +#18+'H'+#25+')');
+  str_hint_r[0 ]:='Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')';
+  str_hint_r[1 ]:='Левый клик: пропустить 2 секунды ('                         +#18+'W'+#25+')'+#11+
+                  'Правый клик: пропустить 10 секунд ('     +#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
+                  'Пропустить 1 минуту ('                   +#18+'Alt' +#25+'+'+#18+'W'+#25+')';
+  str_hint_r[2 ]:='Пауза ('                   +#18+'E'+#25+')';
+  str_hint_r[3 ]:='Камера игрока ('           +#18+'A'+#25+')';
+  str_hint_r[4 ]:='Список игровых сообщений ('+#18+'S'+#25+')';
+  str_hint_r[5 ]:='Туман войны ('             +#18+'D'+#25+')';
+  str_hint_r[8 ]:='Все игроки ('              +#18+'C'+#25+')';
+  str_hint_r[9 ]:='Красный игрок [#1] ('      +#18+'R'+#25+')';
+  str_hint_r[10]:='Оранжевый игрок [#2] ('    +#18+'T'+#25+')';
+  str_hint_r[11]:='Желтый игрок [#3] ('       +#18+'Y'+#25+')';
+  str_hint_r[12]:='Зеленый игрок [#4] ('      +#18+'F'+#25+')';
+  str_hint_r[13]:='Бирюзовый игрок [#5] ('    +#18+'G'+#25+')';
+  str_hint_r[14]:='Синий игрок [#6] ('        +#18+'H'+#25+')';
 
 
   {str_camp_t[0]         := 'Hell #1: Вторжение на Фобос';

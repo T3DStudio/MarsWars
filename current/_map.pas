@@ -139,8 +139,8 @@ begin
 
    for p:=1 to MaxCpoints do
     with g_cpoints[p] do
-     if(cpcapturer>0)then
-      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpcapturer)))then
+     if(cpCapturer>0)then
+      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpCapturer)))then
       begin
          _CPointHere:=true;
          break;
@@ -198,7 +198,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpcapturer>0)then cpzone:=pf_get_area(cpx,cpy);
+     if(cpCapturer>0)then cpzone:=pf_get_area(cpx,cpy);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -207,7 +207,7 @@ function _setcpoint(px,py:integer):boolean;
 var pn:byte;
 begin
    for pn:=1 to MaxCPoints do
-    if(g_cpoints[pn].cpcapturer<=0)then break;
+    if(g_cpoints[pn].cpCapturer<=0)then break;
 
    if(pn>MaxCPoints)then
    begin
@@ -223,13 +223,13 @@ begin
       cpsolidr  :=sr;
       cpnobuildr:=nr;
       cpenergy  :=energy;
-      cpcapturer:=cr;
-      cpcapturetime:=time;
+      cpCapturer:=cr;
+      cpCaptureTime:=time;
       cplifetime   :=lifetime;
       {$IFDEF _FULLGAME}
       cpmx:=round(cpx*map_mmcx);
       cpmy:=round(cpy*map_mmcx);
-      cpmr:=round(cpcapturer*map_mmcx);
+      cpmr:=round(cpCapturer*map_mmcx);
       {$ENDIF}
    end;
 end;
@@ -338,13 +338,13 @@ gm_KotH:
          begin
             cpx:=map_hmw;
             cpy:=map_hmw;
-            cpcapturer   :=base_r;
-            cpcapturetime:=fr_fps*60;
+            cpCapturer   :=base_r;
+            cpCaptureTime:=fr_fps*60;
 
             {$IFDEF _FULLGAME}
             cpmx:=round(cpx*map_mmcx);
             cpmy:=round(cpy*map_mmcx);
-            cpmr:=round(cpcapturer*map_mmcx)+1;
+            cpmr:=round(cpCapturer*map_mmcx)+1;
             {$ENDIF}
          end;
          //map_psx[0]:=-5000;

@@ -36,6 +36,8 @@ PTUSpriteList = ^TUSpriteList;
 
 TMWSModel = record
    sl       : TUSpriteList;
+   sel_hw,
+   sel_hh,
    sk,
    sn       : integer;
    mkind    : byte;
@@ -267,7 +269,7 @@ TUID = record
 
    un_txt_name,
    un_txt_descr,
-   un_txt_hint  : shortstring;
+   un_txt_uihint: shortstring;
 
    un_build_amode,
    un_eid_bcrater   :byte;
@@ -366,13 +368,13 @@ o_x1,o_y1  :integer;
    uid_s,
    uid_x   : array[byte] of integer;
 
-   ucl_c,                                           // count buildings/units
-   ucl_l,                                           // limit buildings/units
-   ucl_cs  : array[false..true] of integer;         // count selected buildings/units
+   ucl_c,                                        // count buildings/units
+   ucl_l,                                        // limit buildings/units
+   ucl_cs  : array[false..true] of integer;      // count selected buildings/units
 
-   uprodm,
-   uprodl,
-   uproda  : integer;
+   uprodm,                                       // current max unit productions
+   uprodl,                                       // current limit in production
+   uproda  : integer;                            // current productions
    uprodc  : array[byte] of integer;
    uprodu  : array[byte] of integer;
 
@@ -498,8 +500,8 @@ TUnit = record
    StayWaitForNextTarget:byte;
    uo_vision,
    ukfly,
-   ukfloater,
    isbuildarea,
+   ukfloater,
    bld,
    solid,
    sel      : boolean;
@@ -539,7 +541,7 @@ TMissile = record
    x,y,
    vx,vy,
    damage,
-   vstep,hvstep,
+   vstep,hvstep,vsteps,
    tar,
    splashr,
    dir,
@@ -556,19 +558,21 @@ TMissile = record
 end;
 
 TCTPoint = record
-   cpx ,cpy ,cpsolidr,cpcapturer,cpnobuildr,
+   cpx ,cpy ,cpsolidr,cpCapturer,cpnobuildr,
    cpmx,cpmy,cpmr,
    cpenergy,
-   cpcapturetime,
-   cptimer      : integer;
+   cpCaptureTime,
+   cpTimer      : integer;
    cplifetime   : cardinal;
-   cptimerowner,
-   cpowner      : byte;
+   cpTimerOwnerTeam,
+   cpTimerOwnerPlayer,
+   cpOwnerPlayer,
+   cpOwnerTeam     : byte;
    cpzone       : word;
    cpunitst_pstate,
-   cpunitst,
+   cpUnitsTeam,
    cpunitsp_pstate,
-   cpunitsp     : array[0..MaxPlayers] of integer;
+   cpUnitsPlayer     : array[0..MaxPlayers] of integer;
 end;
 
 TDoodad = record

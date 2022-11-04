@@ -22,8 +22,9 @@ fr_2h3fps              = fr_2hfps*3;   //1,5
 fr_2fps                = fr_fps*2;
 fr_3fps                = fr_fps*3;
 fr_4fps                = fr_fps*4;
+fr_5fps                = fr_fps*5;
 fr_3h2fps              = fr_3hfps*2; //2/3
-fr_4h3fps              = fr_4hfps*3;
+fr_4h3fps              = fr_4hfps*3; //3/4
 fr_mpt                 = trunc(1000/fr_fps);
 fr_mancubus_r          = fr_2fps+fr_2hfps+10;
 
@@ -538,11 +539,12 @@ upgr_hell_pinkspd      = 14; // demon speed
 upgr_hell_revtele      = 15; // revers teleport
 upgr_hell_6bld         = 16; // Souls
 upgr_hell_9bld         = 17; // 9 class building reload time
-upgr_hell_revmis       = 18; // revenant missile
-upgr_hell_totminv      = 19; // totem and eye invisible
-upgr_hell_bldrep       = 20; // build restoration
-upgr_hell_b478tel      = 21; // teleport towers
-upgr_hell_invuln       = 22; // hell invuln powerup
+upgr_hell_totminv      = 18; // totem and eye invisible
+upgr_hell_bldrep       = 19; // build restoration
+upgr_hell_b478tel      = 20; // teleport towers
+upgr_hell_invuln       = 21; // hell invuln powerup
+
+upgr_hell_revmis       = 22; // revenant missile ????
 
 upgr_hell_baron        = 23; // knight starts as baron
 
@@ -560,13 +562,14 @@ upgr_uac_ccturr        = 41; // CC turret
 upgr_uac_mainr         = 42; // main sr
 upgr_uac_ccldoodads    = 43; // main on doodabs
 upgr_uac_airsp         = 44; // anti-air missiles splash
-upgr_uac_jetpack       = 45; // jetpack for plasmagunner
-upgr_uac_6bld          = 46; // adv
-upgr_uac_9bld          = 47; // 9 class building reload time
-upgr_uac_mechspd       = 48; // mech speed
-upgr_uac_mecharm       = 49; // mech arm
-upgr_uac_turarm        = 50; // turrets armor
-upgr_uac_rstrike       = 51; // rstrike launch
+upgr_uac_6bld          = 45; // adv
+upgr_uac_9bld          = 46; // 9 class building reload time
+upgr_uac_mechspd       = 47; // mech speed
+upgr_uac_mecharm       = 48; // mech arm
+upgr_uac_turarm        = 49; // turrets armor
+upgr_uac_rstrike       = 50; // rstrike launch
+
+upgr_uac_jetpack       = 51; // jetpack for plasmagunner ?????
 
 upgr_fast_build        = 250;
 upgr_fast_product      = 251;
@@ -593,7 +596,6 @@ MID_Cacodemon          = 102;
 MID_Baron              = 103;
 MID_HRocket            = 104;
 MID_Revenant           = 105;
-MID_RevenantH          = 106;
 MID_Mancubus           = 107;
 MID_YPlasma            = 108;
 MID_BPlasma            = 109;
@@ -635,11 +637,16 @@ ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
 ul10                   = MinUnitLimit*10;
 ul20                   = MinUnitLimit*20;
+ul30                   = MinUnitLimit*30;
 
 uf_ground              = false;
 uf_fly                 = true;
 
 MaxUnitGroups          = 10;
+
+mvxy_none              = 0;
+mvxy_relative          = 1;
+mvxy_strict            = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -701,7 +708,7 @@ UID_UATurret           = 51;
 UID_UNuclearPlant      = 52;
 UID_UMine              = 53;
 
-UID_Scout              = 55;
+UID_Engineer           = 55;
 UID_Medic              = 56;
 UID_Sergant            = 57;
 UID_Commando           = 58;
@@ -731,7 +738,7 @@ UID_UPortal            = 78;
 uids_hell              = [1 ..40];
 uids_uac               = [41..80];
 
-uids_marines           = [UID_Scout    ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Antiaircrafter ,UID_Siege , UID_Major ,UID_BFG ];
+uids_marines           = [UID_Engineer    ,UID_Medic   ,UID_Sergant ,UID_Commando ,UID_Antiaircrafter ,UID_Siege , UID_Major ,UID_BFG ];
 uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiege, UID_ZMajor,UID_ZBFG];
 uids_arch_res          = [UID_Imp..UID_Knight,UID_Revenant..UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
@@ -751,8 +758,8 @@ uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclea
 NameLen                = 13;
 //ChatLen                = 38;
 
-dead_hits              = -17*fr_fps;
-fdead_hits             = dead_hits+fr_3fps;
+dead_hits              = -25*fr_fps;
+fdead_hits             = dead_hits+fr_5fps;
 ndead_hits             = dead_hits-1;
 
 fdead_hits_border      = -130;

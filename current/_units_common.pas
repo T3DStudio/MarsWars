@@ -42,7 +42,7 @@ end;
 
 procedure _CPExplode(vx,vy:integer);
 begin
-   _effect_add(vx,vy,sd_tcraters+vy,EID_db_u0);
+   _effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
    if(PointInScreenP(vx,vy,nil))then
    begin
       _effect_add(vx,vy,_SpriteDepth(vy+1,false),EID_BBExp);
@@ -75,7 +75,8 @@ begin
    with pu^ do
    with uid^ do
    begin
-      _effect_add(vx,vy+un_eid_bcrater_y,sd_tcraters+vy,un_eid_bcrater);
+      if(not ukfly)then
+      _effect_add(vx,vy+un_eid_bcrater_y,sd_liquid+vy,un_eid_bcrater);
 
       if(vischeck<>nil)then
       begin
@@ -227,13 +228,39 @@ begin
    _canattack:=true;
 end;
 
-procedure _unit_correctXY(pu:PTUnit);
-begin;
+procedure _unit_SetXY(pu:PTUnit;ax,ay:integer;movevxy:byte);
+var _px,_py:integer;
+begin
    with pu^ do
    begin
-      x:=mm3(1,x,map_mw);
-      y:=mm3(1,y,map_mw);
-      pfzone:=pf_get_area(x,y);
+      _px:=x;
+      _py:=y;
+      x:=mm3(1,ax,map_mw);
+      y:=mm3(1,ay,map_mw);
+      if(x<>_px)or(y<>_py)then
+      begin
+         pfzone:=pf_get_area(x,y);
+         {$IFDEF _FULLGAME}
+         _unit_mmcoords(pu);
+         _unit_sfog(pu);
+         {$ENDIF}
+         if(_px=uo_x)
+        and(_py=uo_y)then
+        begin
+           uo_x:=x;
+           uo_y:=y;
+        end;
+      end;
+      case movevxy of
+mvxy_relative: begin
+                  vx+=x-_px;
+                  vy+=y-_py;
+               end;
+mvxy_strict  : begin
+                  vx:=x;
+                  vy:=y;
+               end;
+      end;
    end;
 end;
 
@@ -267,16 +294,8 @@ begin
       teleport_effects(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
       buff[ub_teleeff]:=fr_fps;
-      x     :=tx;
-      y     :=ty;
-      vx    :=x;
-      vy    :=y;
-      _unit_correctXY(pu);
+      _unit_SetXY(pu,tx,ty,mvxy_strict);
       _unit_clear_order(pu,false);
-      {$IFDEF _FULLGAME}
-      _unit_mmcoords(pu);
-      _unit_sfog(pu);
-      {$ENDIF}
    end;
 end;
 
@@ -288,12 +307,8 @@ begin
    begin
       st:=sign(zfall);
       if(zfall>1)then st*=2;
-      if(x=uo_x)
-     and(y=uo_y)then uo_y+=st;
       zfall-=st;
-      y    +=st;
-      vy   +=st;
-      _unit_correctXY(pu);
+      _unit_SetXY(pu,x,y+st,mvxy_relative);
    end;
 end;
 
@@ -512,7 +527,7 @@ begin
    if(_ukfly=false)then
     for u:=1 to MaxCPoints do
      with g_cpoints[u] do
-      if(cpcapturer>0)and(cpnobuildr>0)then
+      if(cpCapturer>0)and(cpnobuildr>0)then
       begin
          o:=cpnobuildr;
          d:=point_dist_int(cpx,cpy,tx,ty)-o;
@@ -609,7 +624,7 @@ begin
 
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
-     if(cpcapturer>0)then
+     if(cpCapturer>0)then
      begin
         if(building)
         then dx:=max2(cpsolidr,cpnobuildr)
@@ -664,7 +679,7 @@ begin
 
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
-     if(cpcapturer>0)and(cpnobuildr>0)then
+     if(cpCapturer>0)and(cpnobuildr>0)then
       if(point_dist_int(tx,ty,cpx,cpy)<cpnobuildr)then
       begin
          _InBuildArea:=2;
@@ -952,14 +967,10 @@ begin
           cycle_order:= _LastCreatedUnit mod order_period;
           unum    := _LastCreatedUnit;
 
-          x       := ux;
-          y       := uy;
-          _unit_correctXY(_LastCreatedUnitP);
+          _unit_SetXY(_LastCreatedUnitP,ux,uy,mvxy_strict);
           uidi    := ui;
           playeri := pl;
           player  :=@_players[playeri];
-          vx      := x;
-          vy      := y;
           uo_x    := x;
           uo_y    := y;
           uo_bx   := -1;
@@ -1602,10 +1613,10 @@ UID_UMine        : buff[ub_invis]:=_ub_infinity;
       // OTHER
       case uidi of
 UID_LostSoul: begin
-                 ukfloater:=true;
                  tu:=nil;
                  if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
                  if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
+                 ukfloater:=not ukfly;
               end;
 UID_UACBot  : ukfloater:=upgr[upgr_uac_float]>0;
 UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)then
@@ -1699,7 +1710,7 @@ UID_HEyeNest : if(buff[ub_advanced]>0)and(_upgr_srange>0)and(_upgr_srange_step>0
                else SetSRange(_srange);
 UID_Cyberdemon,
 UID_Mastermind,
-//UID_Scout,
+UID_Flyer,
 UID_Medic,
 UID_BFG      : if(buff[ub_advanced]>0)
                then SetSRange(_srange+50)

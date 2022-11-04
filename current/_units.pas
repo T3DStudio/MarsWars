@@ -149,6 +149,12 @@ begin
    begin
       puid:=@_uids[ouid];
 
+      if(hits<=0)then
+      begin
+         _unit_morph:=ureq_product;
+         exit;
+      end;
+
       if(not obld)or(puid^._ukbuilding)then
        if(menergy<=0)then
        begin
@@ -162,7 +168,7 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,true)>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater)>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
@@ -210,23 +216,14 @@ begin
          if((tu^.x=x)and(tu^.y=y))then
          begin
             case _random(4) of
-            0: x-=ud;
-            1: x+=ud;
-            2: y-=ud;
-            3: y+=ud;
+            0: _unit_SetXY(pu,x-ud,y   ,mvxy_none);
+            1: _unit_SetXY(pu,x+ud,y   ,mvxy_none);
+            2: _unit_SetXY(pu,x   ,y-ud,mvxy_none);
+            3: _unit_SetXY(pu,x   ,y+ud,mvxy_none);
             end;
          end
-         else
-         begin
-            x+=round(uds*(tu^.x-x)/t)+_randomr(2);
-            y+=round(uds*(tu^.y-y)/t)+_randomr(2);
-         end;
-
-         _unit_correctXY(pu);
-         {$IFDEF _FULLGAME}
-         _unit_mmcoords(pu);
-         _unit_sfog(pu);
-         {$ENDIF}
+         else _unit_SetXY(pu,x+round(uds*(tu^.x-x)/t)+_randomr(2),
+                             y+round(uds*(tu^.y-y)/t)+_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -265,23 +262,14 @@ begin
          if((td^.x=x)and(td^.y=y))then
          begin
             case _random(4) of
-            0: x-=ud;
-            1: x+=ud;
-            2: y-=ud;
-            3: y+=ud;
+            0: _unit_SetXY(pu,x-ud,y   ,mvxy_none);
+            1: _unit_SetXY(pu,x+ud,y   ,mvxy_none);
+            2: _unit_SetXY(pu,x   ,y-ud,mvxy_none);
+            3: _unit_SetXY(pu,x   ,y+ud,mvxy_none);
             end;
          end
-         else
-         begin
-            x+=round(ud*(td^.x-x)/t)+_randomr(2);
-            y+=round(ud*(td^.y-y)/t)+_randomr(2);
-         end;
-
-         _unit_correctXY(pu);
-         {$IFDEF _FULLGAME}
-         _unit_mmcoords(pu);
-         _unit_sfog(pu);
-         {$ENDIF}
+         else _unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+_randomr(2),
+                             y+round(ud*(td^.y-y)/t)+_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -298,7 +286,7 @@ begin
    end;
 end;
 
-procedure _unit_npush(pu:PTUnit;ignore_liquid:boolean);
+procedure _unit_npush(pu:PTUnit);
 var i,dx,dy:integer;
 begin
    dx:=pu^.x div dcw;
@@ -309,18 +297,13 @@ begin
      if(n>0)then
       for i:=0 to n-1 do
        with l[i]^ do
-        if(r>0)and(t>0)then
-        begin
-           if(ignore_liquid)then
-            if(t in dids_liquids)then continue;
-           _unit_dpush(pu,l[i]);
-        end;
+        if(r>0)and(t>0)then _unit_dpush(pu,l[i]);
 end;
 
 procedure _unit_npush_dcell(pu:PTUnit);
 begin
    with pu^ do
-    if(speed>0)and(ukfly=uf_ground)and(solid)and(bld)then _unit_npush(pu,ukfloater);
+    if(speed>0)and(ukfly=uf_ground)and(solid)and(bld)and(not ukfloater)then _unit_npush(pu);
 end;
 
 procedure _unit_move(pu:PTUnit);
@@ -340,8 +323,7 @@ begin
           mdist:=point_dist_int(x,y,mv_x,mv_y);
           if(mdist<=speed)then
           begin
-             x:=mv_x;
-             y:=mv_y;
+             _unit_SetXY(pu,mv_x,mv_y,mvxy_none);
              dir:=point_dir(vx,vy,x,y);
           end
           else
@@ -360,21 +342,17 @@ begin
              dir:=dir_turn(dir,point_dir(x,y,mv_x,mv_y),mdist);
 
              ddir:=dir*degtorad;
-             x:=x+round(ss*cos(ddir));
-             y:=y-round(ss*sin(ddir));
+             _unit_SetXY(pu,x+round(ss*cos(ddir)),
+                            y-round(ss*sin(ddir)),mvxy_none);
           end;
           _unit_npush_dcell(pu);
-          _unit_correctXY(pu);
-          {$IFDEF _FULLGAME}
-          _unit_mmcoords(pu);
-          _unit_sfog(pu);
-          {$ENDIF}
        end;
 end;
 
 function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte;checkvis,nosrangecheck:boolean):byte;
 var awr:integer;
      au:PTUnit;
+pfcheck,
 canmove:boolean;
 begin
    _target_weapon_check:=wmove_impassible;
@@ -502,6 +480,9 @@ wpt_heal     : if(tu^.hits<=0)
           else awr:=ud-aw_max_range; // absolute
 
       canmove:=(speed>0)and(uo_id<>ua_hold)and(au=nil);
+      pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
+
+      // pfzone check for melee
 
       if(awr<0)then
       begin
@@ -513,10 +494,10 @@ wpt_heal     : if(tu^.hits<=0)
            else ;                                    // target too close & cant move
       end
       else
-        if(canmove)then
+        if(canmove)and(pfcheck)then
          if(ud<=srange)or(nosrangecheck)
-         then _target_weapon_check:=wmove_closer   // need move closer
-         else ;                                    // target too far & cant move
+         then _target_weapon_check:=wmove_closer     // need move closer
+         else ;                                      // target too far & cant move
    end;
 end;
 
@@ -689,11 +670,11 @@ begin
     if(hits>0)then
      for i:=1 to MaxCPoints do
       with g_cpoints[i] do
-       if(cpcapturer>0)then
-        if(point_dist_int(x,y,cpx,cpy)<=cpcapturer)then
+       if(cpCapturer>0)then
+        if(point_dist_int(x,y,cpx,cpy)<=cpCapturer)then
         begin
-           cpunitsp[playeri     ]+=uid^._limituse;
-           cpunitst[player^.team]+=uid^._limituse;
+           cpUnitsPlayer[playeri     ]+=uid^._limituse;
+           cpUnitsTeam  [player^.team]+=uid^._limituse;
         end;
 end;
 
@@ -731,7 +712,7 @@ begin
       then StayWaitForNextTarget-=1;
 
       if(g_mode=gm_royale)then
-       if(_RoyalBattleOut(x,y,_missile_r))then
+       if(_CheckRoyalBattleR(x,y,_missile_r))then
        begin
           _unit_kill(pu,false,false,true);
           exit;
@@ -895,17 +876,18 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(tu^.buff[ub_advanced]>0)
-      then buff[ub_stun]:=_tprod div 4
-      else buff[ub_stun]:=_tprod div 2;
-      //gear_time[_ukmech];
+      if(tu^.buff[ub_advanced]>0)then
+      begin
+         buff[ub_stun]:=_tprod div 4;
+         tu^.rld:=uac_adv_base_reload;
+      end
+      else
+      begin
+         buff[ub_stun]:=_tprod div 2;
+         tu^.rld:=uac_adv_base_reload*2;
+      end;
 
       buff[ub_advanced]:=_ub_infinity;
-
-      {if(tu^.buff[ub_advanced]>0)
-      then tu^.rld:=uac_adv_base_reload[_ukmech] div 2
-      else tu^.rld:=uac_adv_base_reload[_ukmech];}
-      tu^.rld:=uac_adv_base_reload;
 
       GameLogUnitPromoted(pu);
       {$IFDEF _FULLGAME}
@@ -942,7 +924,7 @@ begin
    with uid^ do
    if(tdm<=melee_r)and(tu^.rld<=0)and(not _ukbuilding)and(tu^.hits>0)then
    begin
-      if(tu^.bld)and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)and(buff[ub_advanced]<=0)and(_ability<>uab_advance)and(hits>0)then
+      if(_canability(tu))and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)and(buff[ub_advanced]<=0)and(_ability<>uab_advance)and(hits>0)then
       begin
          _unit_uac_unit_adv(pu,tu);
          _ability_uac__unit_adv:=true;
@@ -961,7 +943,7 @@ begin
    with pu^  do
    with uid^ do
     if(not _ukbuilding)and(bld)and(_ability<>uab_advance)then
-      if(tu^.bld)and(tu^.hits>0)and(hits>0)and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)then
+      if(_canability(tu))and(hits>0)and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)then
        if(buff[ub_advanced]<=0)and(tu^.player^.upgr[upgr_hell_6bld]>0)then
        begin
           tu^.player^.upgr[upgr_hell_6bld]-=1;
@@ -1619,6 +1601,23 @@ uab_spawnlost:  begin
 end;
 
 function _unit_player_order(pu:PTUnit;order_id,order_tar,order_x,order_y:integer):boolean;
+procedure _setUO(aid,atar,ax,ay,apx,apy:integer;atarz:boolean);
+begin
+   with pu^     do
+   begin
+      uo_id :=aid;
+      uo_tar:=atar;
+      if(atarz)
+      then a_tar:=0;
+      if(speed>0)then
+      begin
+         uo_x  :=ax;
+         uo_y  :=ay;
+         uo_bx :=apx;
+         uo_by :=apy;
+      end;
+   end;
+end;
 begin
    _unit_player_order:=false;
    with pu^     do
@@ -1650,65 +1649,22 @@ co_rcmove  :  begin     // right click
                     else uo_id:=ua_move;
                  end;
               end;
-co_stand,
-co_move,
-co_patrol,
-co_astand,
-co_amove,
-co_apatrol :  if(speed>0)then   // attack, move, patrol, stand, hold
+co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true );
+co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true );
+co_patrol  : _setUO(ua_move ,0        ,order_x,order_y, x, y,true );
+co_astand  : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false);
+co_amove   : if(_IsUnitRange(order_tar,nil))
+             then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false)
+             else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false);
+co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false);
+co_paction :  if(uo_id<>ua_paction)
+              or((ucl_cs[true]+ucl_cs[false])=1)then
               begin
-                 case order_id of
-           co_stand,
-           co_astand:  begin
-                          uo_x  :=x;
-                          uo_y  :=y;
-                          uo_bx :=-1;
-                          uo_tar:=0;
-                          a_tar :=0;
-                       end;
-           co_move,
-           co_patrol,
-           co_amove,
-           co_apatrol: begin
-                          uo_x  :=order_x;
-                          uo_y  :=order_y;
-                          uo_bx :=-1;
-                          uo_tar:=0;
-                          case order_id of
-                      co_patrol,
-                      co_apatrol: begin   // patrol
-                                     uo_bx:=x;
-                                     uo_by:=y;
-                                  end;
-                          end;
-                       end;
-                 end;
-                 case order_id of
-           co_stand  : begin
-                          uo_id :=ua_hold;
-                          a_tar :=0;
-                       end;
-           co_move,
-           co_patrol : begin
-                          uo_id :=ua_move;
-                          a_tar :=0;
-                       end;
-           co_astand,
-           co_amove,
-           co_apatrol: uo_id:=ua_amove;
-                 end;
-              end;
-co_paction :  if(uo_id<>ua_paction)or((ucl_cs[true]+ucl_cs[false])=1)then
-              begin
-                 uo_x  :=order_x;
-                 uo_y  :=order_y;
-                 uo_bx :=-1;
-                 a_tar :=0;
-                 uo_tar:=0;
                  if((_ability=0)and(apcc<=0))or(speed<=0)
-                 then uo_id:=ua_amove
+                 then _setUO(ua_amove,0,order_x,order_y,-1,-1,true )
                  else
                  begin
+                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
                     case uidi of
                     UID_HCommandCenter,
                     UID_UCommandCenter: begin
@@ -1716,7 +1672,6 @@ co_paction :  if(uo_id<>ua_paction)or((ucl_cs[true]+ucl_cs[false])=1)then
                                            uo_y-=fly_hz;
                                         end;
                     end;
-                    uo_id:=ua_paction;
                  end;
                  exit;
               end;
