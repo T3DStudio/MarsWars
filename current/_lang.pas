@@ -64,34 +64,6 @@ begin
     end;
 end;
 
-procedure _mkHStrXY(tab,i,x,y:byte;STR:shortstring); // units&upgrades
-begin
-   if(i=255)then i:=(y div 3)+x;
-   //str_hint[tab,r_hell,i]:=STR;
-   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
-end;
-
-procedure _mkHStrXYHKA(tab,i,x,y:byte;STR:shortstring); // actions
-var HK:shortstring;
-begin
-   if(i=255)then i:=(y div 3)+x;
-   HK:=_gHKA(i);
-   if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
-   //str_hint[tab,r_hell,i]:=STR;
-   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
-end;
-procedure _mkHStrXYHKR(tab,i,x,y:byte;STR:shortstring); // replays tab
-var HK:shortstring;
-begin
-   if(i=255)then i:=(y div 3)+x;
-   HK:=_gHKR(i);
-   if(length(HK)>0)then STR:=STR+' ('+#18+HK+#25+')';
-   //str_hint[tab,r_hell,i]:=STR;
-   //str_hint[tab,r_uac ,i]:=str_hint[tab,r_hell,i ];
-end;
-
-//str_hin_rpl
-
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
    with _uids[uid] do
@@ -173,8 +145,16 @@ begin
         if(ukfloater)
         then _ADDSTRC(@_makeAttributeStr,str_attr_floater)
         else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
+      if(buff[ub_detect]>0)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_detector);
       if(buff[ub_advanced]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_advanced);
+      if(buff[ub_invuln]>0)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
+      else
+        if(buff[ub_stun]>0)or(buff[ub_pain]>0)
+        then _ADDSTRC(@_makeAttributeStr,str_attr_stuned);
+
       _makeAttributeStr:='['+_makeAttributeStr+']';
    end;
 end;
@@ -361,6 +341,8 @@ begin
    str_upgrade_complete  := 'Upgrade complete';
    str_building_complete := 'Construction complete';
    str_unit_complete     := 'Unit ready';
+   str_unit_attacked     := 'Unit is under attack';
+   str_base_attacked     := 'Base is under attack';
 
    str_attr_unit         := #21+'unit'      +#25;
    str_attr_building     := #15+'building'  +#25;
@@ -371,7 +353,10 @@ begin
    str_attr_fly          := #22+'flying'    +#25;
    str_attr_ground       := #18+'ground'    +#25;
    str_attr_floater      := #19+'floater'   +#25;
-   str_attr_advanced     := #14+'advanced'  +#25;
+   str_attr_advanced     := #22+'advanced'  +#25;
+   str_attr_invuln       := #18+'invulnerable'+#25;
+   str_attr_stuned       := #17+'stuned'      +#25;
+   str_attr_detector     := #14+'detector'    +#25;
 
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := #18+'left' +#25;
@@ -476,13 +461,14 @@ begin
    _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Researches and upgrades.'     );
    _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
    _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );
-   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,'Upgrades units.'                    );
-   _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.'      );
-   _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" on units.'  );
-   _mkHStrUid(UID_HFortress     ,'Hell Fortress'      ,'Upgrades production buildings. Builder. Generates energy.');
-   _mkHStrUid(UID_HCommandCenter,'Hell Command Center','Corrupted UAC Command Center. Builder. Generates energy.' );
+   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,'Upgrades units.'              );
+   _mkHStrUid(UID_HEyeNest      ,'Hell Eye Nest'      ,'Casts "Hell Vision"  effect on units. Detector.' );
+   _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.');
+   _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" effect on units.'        );
+   _mkHStrUid(UID_HFortress     ,'Hell Fortress'      ,'Upgrades production buildings. Generates energy.');
+   _mkHStrUid(UID_HCommandCenter,'Hell Command Center','Corrupted UAC Command Center. Builder. Generates energy.');
    _mkHStrUid(UID_HMilitaryUnit ,'Hell Military Unit' ,'Corrupted UAC Military Unit. Creates zombies.' );
-   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'');
+   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Detection.');
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'      ,'');
    _mkHStrUid(UID_Imp            ,'Imp'            ,'');
@@ -501,7 +487,7 @@ begin
    _mkHStrUid(UID_ZSergant       ,'Zombie Sergeant','');
    _mkHStrUid(UID_ZCommando      ,'Zombie Commando','');
    _mkHStrUid(UID_ZAntiaircrafter,'Antiaircrafter Zombie'  ,'');
-   _mkHStrUid(UID_ZSiege         ,'Siege Zombie'  ,'');
+   _mkHStrUid(UID_ZSiege         ,'Siege Zombie'   ,'');
    _mkHStrUid(UID_ZMajor         ,'Zombie Major'   ,'');
    _mkHStrUid(UID_ZBFG           ,'Zombie BFG'     ,'');
 
@@ -540,12 +526,13 @@ begin
    _mkHStrUid(UID_UMilitaryUnit    ,'UAC Military unit'          ,'Produces units.'                 );
    _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
+   _mkHStrUid(UID_UAGenerator      ,'UAC Advanced Generator'     ,'Increase energy level.'          );
    _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,'Researches and upgrades.'        );
-   _mkHStrUid(UID_UGTurret         ,'UAC Anti-ground turret'     ,'Defensive structure.'            );
-   _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map.'                    );
+   _mkHStrUid(UID_UGTurret         ,'UAC Anti-ground turret'     ,'Anti-ground defensive structure.');
+   _mkHStrUid(UID_UATurret         ,'UAC Anti-air turret'        ,'Anti-air defensive structure.'   );
+   _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map. Detector.'          );
    _mkHStrUid(UID_UTechCenter      ,'UAC Tech Center'            ,'Upgrades units.'                 );
    _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" research.');
-   _mkHStrUid(UID_UATurret         ,'UAC Anti-air turret'        ,'Advanced defensive structure.'   );
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
@@ -829,6 +816,20 @@ begin
   str_upgrade_complete  := 'Исследование завершено';
   str_building_complete := 'Постройка завершена';
   str_unit_complete     := 'Юнит готов';
+
+  str_attr_unit         := #21+'юнит'          +#25;
+  str_attr_building     := #15+'здание'        +#25;
+  str_attr_mech         := #20+'механический'  +#25;
+  str_attr_bio          := #16+'биологический' +#25;
+  str_attr_light        := #17+'легкий'        +#25;
+  str_attr_nlight       := #23+'тяжелый'       +#25;
+  str_attr_fly          := #22+'летающий'      +#25;
+  str_attr_ground       := #18+'наземный'      +#25;
+  str_attr_floater      := #19+'парящий'       +#25;
+  str_attr_advanced     := #22+'улучшенный'    +#25;
+  str_attr_invuln       := #18+'неуязвимый'    +#25;
+  str_attr_stuned       := #17+'парализованный'+#25;
+  str_attr_detector     := #14+'детектор'      +#25;
 
   str_panelpos          := 'Положение игровой панели';
   str_panelposp[0]      := #18+'слева' +#25;

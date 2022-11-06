@@ -75,10 +75,11 @@ end;
 function _checkvision(pu:PTUnit):byte;
 begin
    _checkvision:=0;
-   with pu^ do
-    if(HPlayer=0)and(rpls_state>=rpl_rhead)
-    then _checkvision:=2
-    else
+   if((HPlayer=0)and(rpls_state>=rpl_rhead))
+   or(g_deadobservers and(_players[HPlayer].armylimit<=0))
+   then _checkvision:=2
+   else
+     with pu^ do
       if(_uvision(_players[HPlayer].team,pu,false))then
        if(player^.team=_players[HPlayer].team)
        then _checkvision:=2
@@ -320,7 +321,7 @@ end;
 
 procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
 const _btnas: array[false..true] of integer = (0,vid_hBW);
-var spr,eff : PTMWTexture;
+var spr : PTMWTexture;
 depth,
 alphab,
 alpha,t : integer;
@@ -388,8 +389,8 @@ begin
                 begin
                    for t:=0 to MaxUnitProdsI do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_gray,@_uids [uprod_u[t]]. un_btn[upgr[_uids[uprod_u[t]]._upgr_bornadv]>0],i2s((uprod_r[t] div fr_fps)+1),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_red ,@_upids[pprod_u[t]]._up_btn                                         ,i2s((pprod_r[t] div fr_fps)+1),'','','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_lime  ,@_uids [uprod_u[t]]. un_btn[upgr[_uids[uprod_u[t]]._upgr_bornadv]>0],i2s(it2s(uprod_r[t])),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_yellow,@_upids[pprod_u[t]]._up_btn                                         ,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 
@@ -415,14 +416,6 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
                 if(buff[ub_invis]>0)then alpha:=alpha shr 1;
 
             SpriteListAddUnit(vx,vy,depth,shadow,ShadowColor(PlayerGetColor(playeri)),aura,spr,alpha);
-
-            if(buff[ub_hvision]>0)then
-            begin
-               if(_ukbuilding)
-               then t:=vy
-               else t:=vy-spr^.hh;
-               SpriteListAddUnit(vx,t,depth+1,0,0,0,_uid2spr(UID_HEye,false),255);
-            end;
          end;
       end;
    end;

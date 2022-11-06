@@ -828,6 +828,7 @@ begin
    {$IFDEF _FULLGAME}
    vid_rtui+=1;
    vid_rtui:=vid_rtui mod vid_rtuis;
+   r_blink_color:=ui_blink_color2[vid_rtui>vid_rtuish];
 
    SoundControl;
 

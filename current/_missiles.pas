@@ -1,5 +1,11 @@
 {$IFDEF _FULLGAME}
 
+{
+1000 / 100 = 10 sec  10*100 = 1000 *3 = 3000
+3000 / 100 = 30 sec  30*100 = 3000 *1 = 3000
+
+}
+
 procedure initMissiles;
 var m:byte;
 begin
@@ -24,16 +30,17 @@ MID_Mancubus : ms_smodel:=@spr_h_p5;
 MID_YPlasma  : ms_smodel:=@spr_h_p7;
 MID_BPlasma  : ms_smodel:=@spr_u_p0;
 MID_Bullet,
-MID_Bulletx2,
+MID_Chaingun,
+MID_Chaingunx2,
 MID_TBullet,
 MID_MBullet,
 MID_SShot,
 MID_SSShot   : ms_smodel:=@spr_u_p1;
 MID_BFG      : ms_smodel:=@spr_u_p2;
-MID_Tank,
-MID_StunMine     : ;
+MID_StunMine : ;
 MID_ArchFire : ;
 MID_Flyer    : ms_smodel:=@spr_u_p3;
+MID_Tank,
 MID_URocketS,
 MID_URocket  : ms_smodel:=@spr_u_p8;
       end;
@@ -73,7 +80,8 @@ MID_HRocket,
 MID_URocket,
 MID_Revenant : ms_snd_death[false]:=snd_exp;
 MID_Bullet,
-MID_Bulletx2,
+MID_Chaingun,
+MID_Chaingunx2,
 MID_TBullet,
 MID_MBullet,
 MID_SShot,
@@ -103,7 +111,8 @@ MID_URocketS : begin
                   ms_eid_death_r  [false]:=20;
                end;
 MID_Bullet,
-MID_Bulletx2,
+MID_Chaingun,
+MID_Chaingunx2,
 MID_TBullet,
 MID_MBullet,
 MID_SShot,
@@ -161,7 +170,7 @@ begin
    _unit_melee_damage:=damage;
 end;
 
-procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet:boolean;adddmg:integer);
+procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer);
 var m,d:integer;
     tu:PTUnit;
 begin
@@ -183,6 +192,7 @@ begin
       ystep  := 0;
       dir    := 270;
       homing := mh_none;
+      fake   := mfake;
 
       d:=point_dist_rint(x,y,vx,vy);
 
@@ -198,16 +208,17 @@ MID_Revenant   : begin damage:=80  ; vstep:=d div 12; splashr :=0  ;         dir
 MID_URocketS   : begin damage:=80  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_URocket    : begin damage:=80  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
 MID_Mancubus   : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin damage:=40  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_YPlasma    : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_ArchFire   : begin damage:=400 ; vstep:=1;        splashr :=15 ;         end;
 
 MID_MBullet,
 MID_TBullet,
-MID_Bullet     : begin damage:=20  ; vstep:=5;        splashr :=0  ;         end;
-MID_Bulletx2   : begin damage:=30  ; vstep:=5;        splashr :=0  ;         end;
-MID_BPlasma    : begin damage:=40  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Bullet     : begin damage:=40  ; vstep:=5;        splashr :=0  ;         end;
+MID_Chaingun   : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
+MID_Chaingunx2 : begin damage:=120 ; vstep:=5;        splashr :=0  ;         end;
+MID_BPlasma    : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_BFG        : begin damage:=600 ; vstep:=d div 12; splashr :=125;         end;
-MID_Flyer      : begin damage:=80  ; vstep:=d div 30; splashr :=0  ;         end;
+MID_Flyer      : begin damage:=160 ; vstep:=d div 30; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=400 ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=80  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=80  ; vstep:=5;        splashr :=tank_sr;     end;
@@ -242,8 +253,14 @@ MID_URocket : if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
 MID_Revenant,
 MID_URocket,
 MID_URocketS   : homing:=mh_homing;
+MID_MBullet,
+MID_TBullet,
+MID_Bullet,
+MID_Chaingun,
+MID_Chaingunx2,
 MID_Imp,
 MID_Cacodemon,
+MID_Tank,
 MID_Baron,
 MID_BPlasma,
 MID_YPlasma    : homing:=mh_magnetic;
@@ -289,7 +306,8 @@ begin
     if(_IsUnitRange(tar,@tu))then
      if(tu^.hits>0)and(not _IsUnitRange(tu^.inapc,nil))then
      begin
-        if(mfs<>tu^.ukfly)or(MissileUIDCheck(mid,tu^.uidi)=false)then exit;
+        if(mid<>MID_Blizzard)then
+         if(mfs<>tu^.ukfly)or(MissileUIDCheck(mid,tu^.uidi)=false)then exit;
 
         teams  :=_players[player].team=tu^.player^.team;
         rdamage:=damage;
@@ -316,7 +334,7 @@ begin
         begin
         if (    tu^.uid^._uklight)then  // light all
             case mid of
-            MID_Bulletx2    : _d300(@rdamage);
+            MID_Chaingunx2,
             MID_Cacodemon   : _d200(@rdamage);
             MID_HRocket,
             MID_Blizzard,
@@ -326,7 +344,7 @@ begin
         if (    tu^.uid^._uklight)
         and(not tu^.uid^._ukmech )then  // light bio
             case mid of
-            MID_Bullet      : _d300(@rdamage);
+            MID_Chaingun    : _d200(@rdamage);
             end;
 
         if (not tu^.uid^._uklight)
@@ -347,6 +365,8 @@ begin
         end
         else                            // buildings
             case mid of
+            MID_Chaingun,
+            MID_Chaingunx2  : _d50 (@rdamage);
             MID_Blizzard    : _d200(@rdamage);
             MID_Granade,
             MID_Mine,
@@ -365,12 +385,13 @@ begin
             MID_Revenant,
             MID_URocketS,
             MID_URocket     : _d200(@rdamage);
-            MID_Flyer       : _d300(@rdamage);
             end;
 
         case mid of
-            //MID_Bulletx2,
-            //MID_SShot       : p:=2;
+            MID_BPlasma,
+            MID_YPlasma     : p:=4;
+            MID_Chaingun,
+            MID_Chaingunx2  : p:=5;
             MID_SSShot      : p:=2;
         end;
 
@@ -394,7 +415,8 @@ begin
            mtars-=1;
            ntars+=1;
 
-           _unit_damage(tu,rdamage,p,player);
+           if(not fake)
+           then _unit_damage(tu,rdamage,p,player);
         end
         else
           if(splashr>0)and(ud<splashr)then // splash damage
@@ -418,8 +440,11 @@ begin
              mtars-=1;
              ntars+=1;
 
-             rdamage:=mm3(0,trunc(rdamage*(1-(ud/splashr))),rdamage);
-             _unit_damage(tu,rdamage,p,player);
+             if(not fake)then
+             begin
+                rdamage:=mm3(0,trunc(rdamage*(1-(ud/splashr))),rdamage);
+                _unit_damage(tu,rdamage,p,player);
+             end;
           end;
      end;
 end;

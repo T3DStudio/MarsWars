@@ -58,6 +58,7 @@ ai_mrepair_u,
 ai_urepair_u,
 ai_base_u         : PTUnit;
 
+ai_LostWantZombieMe,
 ai_choosen,
 ai_cpoint_koth    : boolean;
 ai_cpoint_x,
@@ -121,6 +122,8 @@ freea:byte;
 begin
    freea  :=255;
    nobasea:=255;
+   ax:=mm3(1,ax,map_mw);
+   ay:=mm3(1,ay,map_mw);
    with pplayer^ do
     for a:=0 to MaxPlayers do
      with ai_alarms[a] do
@@ -244,21 +247,24 @@ begin
                     +aif_ability_other
                     +aif_ability_mainsave; //all
       end;
-   {
-   aif_base_smart_opening : cardinal = 1;
-   aif_base_smart_order   : cardinal = 1 shl 1;
-   aif_base_suicide       : cardinal = 1 shl 2;
-   aif_base_advance       : cardinal = 1 shl 3;
-   aif_army_smart_order   : cardinal = 1 shl 4;
-   aif_army_scout         : cardinal = 1 shl 5;
-   aif_army_advance       : cardinal = 1 shl 6;
-   aif_army_smart_micro   : cardinal = 1 shl 7;
-   aif_army_teleport      : cardinal = 1 shl 8;
-   aif_upgr_smart_opening : cardinal = 1 shl 9;
-   aif_ability_detection  : cardinal = 1 shl 10;
-   aif_ability_other      : cardinal = 1 shl 11;
-   aif_ability_mainsave   : cardinal = 1 shl 12;
-   }
+      case ai_skill of
+      8 : upgr[upgr_fog_vision  ]:=1;
+      9 : begin
+          upgr[upgr_fog_vision  ]:=1;
+          upgr[upgr_mult_product]:=1;
+          end;
+      10: begin
+          upgr[upgr_fog_vision  ]:=1;
+          upgr[upgr_mult_product]:=1;
+          upgr[upgr_fast_product]:=1;
+          end;
+      11: begin
+          upgr[upgr_fog_vision  ]:=1;
+          upgr[upgr_mult_product]:=1;
+          upgr[upgr_fast_product]:=1;
+          upgr[upgr_fast_build  ]:=1;
+          end;
+      end;
    end;
    ai_make_scirmish_start_alarms(p);
 end;
@@ -374,6 +380,8 @@ begin
               end;
           end;
     end;
+
+   ai_LostWantZombieMe:=false;
 
    // commander
    ai_grd_commander_u:=nil;
@@ -509,6 +517,7 @@ begin
 end;
 begin
    with pu^     do
+   with uid^    do
    with player^ do
    begin
       pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
@@ -574,7 +583,7 @@ begin
                 and(tu^.aiu_armyaround_enemy>ul1)then _setNearestPU(@ai_abase_u,@ai_abase_d,ud);
 
                // teleporter target
-               if(uid^._ability=uab_teleport)then
+               if(_ability=uab_teleport)then
                 if(tu^.aiu_alarm_d<base_r)then
                  if(not pf_isobstacle_zone(tu^.pfzone))then
                   if(ai_teleporter_beacon_u=nil)
@@ -604,8 +613,9 @@ begin
                 else
                 begin
                    _setNearestPU(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
-                   if(ud<base_rr)then ai_armyaround_enemy_grd+=tu^.uid^._limituse;
+                   if(ud<base_rr)and(tu^.uid^._attack>0)then ai_armyaround_enemy_grd+=tu^.uid^._limituse;
                 end;
+
                 // need detection
                 if(tu^.buff[ub_invis]>0)and(tu^.vsni[team]<=0)then
                 begin
@@ -621,20 +631,24 @@ begin
                  else
                    if(tu^.hits>ai_strike_tar_u^.hits)
                    then ai_strike_tar_u:=tu;
+
+                if(not ai_LostWantZombieMe)then
+                 if((ud-_r-tu^.uid^._r)<melee_r)then
+                  if(tu^.uidi=UID_LostSoul)and(tu^.buff[ub_advanced]>0)and(tu^.a_tar=unum)then ai_LostWantZombieMe:=true;
              end;
 
             if(player=tu^.player)then
             begin
                if(tu^.bld)then
                begin
-                  if(uid^._urace=tu^.uid^._urace)then
+                  if(_urace=tu^.uid^._urace)then
                   begin
                      // uac tech
                      if(tu^.uid^._ability=uab_uac__unit_adv)and(tu^.rld<=0)and(pfcheck)then
                       if(_canability(tu))then _setNearestPU(@ai_uadv_u,@ai_uadv_d,ud);
 
                      // hell tech target
-                     if(uid^._ability=uab_hell_unit_adv)then
+                     if(_ability=uab_hell_unit_adv)then
                       if(_canability(pu))then
                        if(_HellAdvPrio(tu,ai_hadv_u))then ai_hadv_u:=tu;
                   end;
@@ -650,7 +664,7 @@ begin
                   begin
                      // transport target
                      if(apcc<apcm)and(ud<ai_inapc_d)and(tu^.group<>aio_busy)then
-                      if(tu^.aiu_alarm_d>base_ir)or(uid^._attack=atm_bunker)then
+                      if(tu^.aiu_alarm_d>base_ir)or(_attack=atm_bunker)then
                        if(tu^.apcc=tu^.apcm)or(armylimit>=ai_limit_border)or(armylimit>=ai_attack_limit)then
                         if(pfcheck)then
                          if(_itcanapc(pu,tu))then _setNearestPU(@ai_inapc_u,@ai_inapc_d,ud);
@@ -1276,10 +1290,9 @@ UID_UAGenerator: if(armylimit>ai_gendestroy_armylimit)and(cenergy>_genergy)and(m
          end;
       end;
 
+      if(ai_LostWantZombieMe)and(_zombie_uid>0)and(bld)and(hits<=_zombie_hits)then exit;
+
       case uidi of
-UID_UMilitaryUnit,
-UID_UCommandCenter : if(ai_enemy_d<srange)and(hits<=_zombie_hits)then
-                      if(ai_enemy_u^.uidi=UID_LostSoul)and(ai_enemy_u^.buff[ub_advanced]>0)and(ai_enemy_u^.a_tar=unum)then exit;
 UID_HTower,
 UID_HTotem,
 UID_UGTurret,
@@ -1377,7 +1390,7 @@ begin
       if(hits<=0)or(not bld)then exit;
 
       // build
-      if((ucl_l[false]+uprodl)>0)or(uprodl<=0)then
+      if((ucl_l[false]+uprodl)>0)or(n_barracks<=0)then
        if(n_builders>0)and(isbuildarea)then ai_builder(pu);
 
       // production
@@ -1869,7 +1882,8 @@ begin
 
       if(ai_enemy_d>srange)
       then ai_set_alarm(player,x,y,0,srange,false,0)
-      else ai_set_alarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_armyaround_enemy,srange,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pfzone);
+      else ai_set_alarm(player,ai_enemy_u^.x+sign(ai_enemy_u^.x-x)*srange,
+                               ai_enemy_u^.y+sign(ai_enemy_u^.y-y)*srange,aiu_armyaround_enemy,srange,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pfzone);
 
       case _ability of
 uab_hell_unit_adv: if(cf(@player^.ai_flags,@aif_army_advance))then

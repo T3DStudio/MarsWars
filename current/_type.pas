@@ -160,6 +160,7 @@ end;
 TUWeapon = record
   aw_type,
   aw_tarprior,
+  aw_fakeshots,
   aw_rupgr,
   aw_rupgr_l,
   aw_dupgr,
@@ -498,7 +499,6 @@ TUnit = record
    vsnt     : array[0..MaxPlayers] of integer;
 
    StayWaitForNextTarget:byte;
-   uo_vision,
    ukfly,
    isbuildarea,
    ukfloater,
@@ -551,6 +551,7 @@ TMissile = record
    player,
    homing,
    mid      : byte;
+   fake,
    mfe,mfs  : boolean;
    {$IFDEF _FULLGAME}
    ms_eid_bio_death: boolean;

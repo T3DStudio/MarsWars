@@ -160,7 +160,7 @@ begin
    end;
 end;
 
-function _whoInPoint(tx,ty,tt:integer):integer;
+function _whoInPoint(tx,ty:integer;tt:byte):integer;
 var i,sc:integer;
     htm :byte;
 function _ch(up:PTPlayer):boolean;
@@ -173,6 +173,13 @@ begin
    end;
 end;
 begin
+   {
+   tt:
+      1 - enemy, unum
+      2 - own&ally, unum
+      3 - own, uid
+      4 - own, unum
+   }
    sc:=0;
    with _players[HPlayer]do
    begin
@@ -183,9 +190,9 @@ begin
    _whoInPoint:=0;
    if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
-     with _units[i] do
+     with _punits[i]^ do
       if(hits>0)and(inapc=0)and(_ch(player))then
-       if(_uvision(htm,@_units[i],false))then
+       if(_uvision(htm,_punits[i],false))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            case tt of
@@ -374,8 +381,8 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      0 : _fsttime:=not _fsttime;
      2 : if(rpls_state<rpl_end)then
           if(G_Status=gs_running)
-          then G_Status:=gs_running
-          else G_Status:=gs_replaypause;
+          then G_Status:=gs_replaypause
+          else G_Status:=gs_running;
      3 : rpls_plcam  :=not rpls_plcam;
      4 : rpls_showlog:=not rpls_showlog;
      5 : rpls_fog    :=not rpls_fog;
@@ -438,6 +445,12 @@ begin
         if(k_alt  >1)then k2:=SDLK_LAlt;
         if(k_shift>1)then k2:=SDLK_LShift;
 
+        if(k=sdlk_space)then
+        begin
+           MoveCamToLastEvent;
+           exit;
+        end;
+
         if(rpls_state<rpl_rhead)then
         begin
            case ui_tab of
@@ -476,13 +489,12 @@ begin
                                      then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
                                      else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
                              end;
-
               else
               end;
            end;
         end
         else
-          for ko:=0 to _mhkeys do  // actions
+          for ko:=0 to _mhkeys do  // replays
           begin
              if(_hotkeyR2[ko]<>k2)
              or(_hotkeyR [ko]= 0 )

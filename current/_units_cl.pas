@@ -376,7 +376,7 @@ begin
    setEffectEID (true ,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (true ,nil,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
-   //setWeaponTEID(0    ,nil,0,[0..255]);
+   setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_ZBFG:
 begin
@@ -501,8 +501,7 @@ begin
    _animw:=14;
    _animd:=8;
    setMWSModel(@spr_Engineer,nil);
-//   setCommandSND(true ,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
-   setCommandSND(false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
+   setCommandSND(false,snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_electro,0,0);
@@ -560,7 +559,7 @@ begin
    _animw:=14;
    _animd:=8;
    setMWSModel(@spr_Antiaircrafter,nil);
-   setCommandSND(false,snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
+   setCommandSND(false,snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
    setEffectEID (false,0  ,0             ,EID_Gavno,0  );
    setEffectSND (false,nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_launch,0,0);

@@ -16,6 +16,7 @@ g_start_base      : byte     = 0;
 g_show_positions  : boolean  = false;
 g_cgenerators     : byte     = 0;
 g_ai_slots        : byte     = 5;
+g_deadobservers   : boolean  = true;
 g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
 g_cl_units        : integer  = 0;
@@ -264,6 +265,7 @@ rpls_player       : byte = 0;
 rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_fog          : boolean = false;
+rpls_ticks        : byte = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
@@ -374,6 +376,8 @@ k_keyboard_string         : shortstring = '';
 //
 //  COLORS
 //
+
+r_blink_color     : cardinal;
 
 c_dred,
 c_awhite,
@@ -591,6 +595,8 @@ spr_pdmodel       : PTMWSModel;
 
 spr_mp            : array[1..r_cnt] of TMWTexture;
 spr_ptur,
+spr_invuln,
+spr_hvision,
 spr_stun          : TMWTexture;
 
 
@@ -638,6 +644,9 @@ str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
+str_attr_detector,
+str_attr_invuln,
+str_attr_stuned,
 str_attr_advanced,
 str_attr_building,
 str_attr_unit,
@@ -653,6 +662,8 @@ str_advanced,
 str_upgrade_complete,
 str_building_complete,
 str_unit_complete,
+str_unit_attacked,
+str_base_attacked,
 str_m_liq,
 str_m_siz,
 str_m_obs,

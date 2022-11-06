@@ -694,7 +694,10 @@ begin
    _lstr(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
    _lstr(@spr_ptur      ,race_dir[r_uac ]+'ptur',firstload,true);
 
-   _lstr(@spr_stun      ,effects_folder+'stun',firstload,true);
+   _lstr(@spr_stun      ,effects_folder+'stun'   ,firstload,true);
+   _lstr(@spr_invuln    ,effects_folder+'invuln' ,firstload,true);
+   _lstr(@spr_hvision   ,effects_folder+'hvision',firstload,true);
+
    _lstr(@spr_cp_out    ,'cp_out',firstload,true);
    _lstr(@spr_cp_gen    ,'cp_gen',firstload,true);
 

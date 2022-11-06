@@ -228,6 +228,18 @@ begin
    _canattack:=true;
 end;
 
+procedure _unit_update_xy(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      pfzone:=pf_get_area(x,y);
+      {$IFDEF _FULLGAME}
+      _unit_mmcoords(pu);
+      _unit_sfog(pu);
+      {$ENDIF}
+   end;
+end;
+
 procedure _unit_SetXY(pu:PTUnit;ax,ay:integer;movevxy:byte);
 var _px,_py:integer;
 begin
@@ -239,11 +251,7 @@ begin
       y:=mm3(1,ay,map_mw);
       if(x<>_px)or(y<>_py)then
       begin
-         pfzone:=pf_get_area(x,y);
-         {$IFDEF _FULLGAME}
-         _unit_mmcoords(pu);
-         _unit_sfog(pu);
-         {$ENDIF}
+         _unit_update_xy(pu);
          if(_px=uo_x)
         and(_py=uo_y)then
         begin
@@ -382,7 +390,7 @@ procedure _unit_umstrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,0);
+      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0);
       {$IFDEF _FULLGAME}
       _uac_rocketl_eff(pu);
       {$ENDIF}
@@ -1341,7 +1349,7 @@ begin
       then _LastCreatedUnit:=0
       else
         if(ServerSide)
-        then _unit_add(tx,ty,-1,auid,playeri,true,true,(buff[ub_advanced]>0)and((a_shots mod 10)=9))
+        then _unit_add(tx,ty,-1,auid,playeri,true,true,(buff[ub_advanced]>0)and((a_shots mod 6)=0))
         else exit;
 
       if(_LastCreatedUnit>0)then
@@ -1435,7 +1443,7 @@ begin
       then td:=min2(ud,point_dist_int(x,y,tu^.uo_x,tu^.uo_y))
       else td:=ud;
 
-      if(td<=(tu^.srange+uid^._r))then
+      if(td<=(tu^.srange+uid^._r))or(tu^.player^.upgr[upgr_fog_vision]>0)then
        if(buff[ub_invis]<=0)
        then _AddToInt(@vsnt[tu^.player^.team],vistime)
        else

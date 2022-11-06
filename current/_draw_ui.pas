@@ -32,7 +32,8 @@ begin
     with ui_alarms[i] do
      if(al_t>0)then
      begin
-        r:=(al_t*2) mod vid_uialrm_t;
+        //r:=(al_t*2) mod vid_uialrm_t;
+        r:=(g_step+cardinal(i+al_t)) mod vid_uialrm_t;
 
         case al_v of
 aummat_attacked_b,
@@ -112,7 +113,7 @@ begin
          _unit_apUID(pdunit,false);
          _unit_upgr (pdunit);
          if(UIUnitDrawRange(pdunit))then
-          circleColor(tar,m_brushx,m_brushy,dunit.srange,ui_blink_color1[vid_rtui>vid_rtuish]);
+          circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink_color);
       end;
 
       m_brushx+=vid_cam_x-lx;
@@ -534,8 +535,8 @@ begin
       _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,255,c_white);
    end
    else
-    if(_IsUnitRange(ui_uhint,@tu))then
-     _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,255,c_white);
+     if(_IsUnitRange(ui_uhint,@tu))then
+       _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,255,c_white);
 end;
 
 procedure D_UIText(tar:pSDL_Surface);

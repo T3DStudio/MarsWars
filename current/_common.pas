@@ -115,16 +115,6 @@ begin
    end;
 end;
 
-{
-TLogMes = record
-   mtype,
-   uidt,
-   uid  :byte;
-   str  :shortstring;
-   x,y  :integer;
-end;
-}
-
 procedure PlayerAddLog(ptarget,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer;local:boolean);
 begin
    if(ptarget>MaxPlayers)then exit;
@@ -259,6 +249,8 @@ var i:byte;
 begin
    for i:=0 to MaxPlayers do PlayerClearLog(i);
 end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 function PlayersReadyStatus:boolean;
 var p,c,r:byte;
@@ -603,18 +595,25 @@ function ai_name(ain:byte):shortstring;
 begin
    if(ain=0)
    then ai_name:=str_ps_none
-   else ai_name:=str_ps_comp+' '{$IFDEF _FULLGAME}+chr(22-ain){$ENDIF}+b2s(ain){$IFDEF _FULLGAME}+#25{$ENDIF};
+   else
+     {$IFDEF _FULLGAME}
+     if(ain<=8)
+     then ai_name:=str_ps_comp+' '+chr(22-ain)+b2s(ain)+#25
+     else ai_name:=str_ps_comp+' '+#14
+     {$ELSE}
+     ai_name:=str_ps_comp+' '+b2s(ain);
+     {$ENDIF}
 end;
 
 procedure PlayerSwitchAILevel(p:byte);
 begin
    with _players[p] do
     if(state=PS_Comp)then
-     begin
-        ai_skill+=1;
-        if(ai_skill>gms_g_maxai)then ai_skill:=1;
-        name:=ai_name(ai_skill);
-     end;
+    begin
+       ai_skill+=1;
+       if(ai_skill>gms_g_maxai)then ai_skill:=1;
+       name:=ai_name(ai_skill);
+    end;
 end;
 
 function _UnitHaveRPoint(uid:byte):boolean;
@@ -692,11 +691,15 @@ end;
 
 {$IFDEF _FULLGAME}
 
+
 function UIUnitDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
     with uid^ do
-     UIUnitDrawRange:=(_attack>0)or(_ability in [uab_radar])or(isbuildarea);
+     UIUnitDrawRange:=(_attack>0)
+                    or(_ability=uab_radar)
+                    or(isbuildarea)
+                    or((_ability=uab_hell_vision)and(rld<=0));
 end;
 
 procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
@@ -709,7 +712,6 @@ begin
    until pb^ in pset^
 end;
 procedure ScrollByte(pb:pbyte;fwrd:boolean;min,max:byte);
-var i:byte;
 begin
    if(fwrd)then
    begin
@@ -789,7 +791,6 @@ begin
    end;
 end;
 
-
 function PlayerGetColor(player:byte):cardinal;
 begin
    PlayerGetColor:=c_white;
@@ -867,26 +868,6 @@ gs_replaypause: begin
                pcol^:=c_red;
             end;
         end;
-{
-if(rpls_state=rpl_end)
-then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_repend,ta_middle,255,c_white)
-else
- if(rpls_state<rpl_rhead)then
-  with _players[HPlayer] do
-   if(G_WTeam=255)then
-   begin
-      if(menu_s2<>ms2_camp)then
-       if(_players[HPlayer].army=0)then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
-      if(G_paused>0)then
-       if(net_status=ns_clnt)and(net_cl_svttl=ClientTTL)
-       then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_waitsv,ta_middle,255,PlayerGetColor(net_cl_svpl))
-       else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_pause ,ta_middle,255,PlayerGetColor(G_paused   ));
-   end
-   else
-     if(G_WTeam=team)
-     then _draw_text(tar,ui_uiuphx,ui_uiuphy,str_win   ,ta_middle,255,c_lime)
-     else _draw_text(tar,ui_uiuphx,ui_uiuphy,str_lose  ,ta_middle,255,c_red);
-}
       end;
    end;
 end;
@@ -938,12 +919,49 @@ begin
    end;
 end;
 
-function ParseLogMessage(ptlog:PTLogMes;mtype:byte;mcolor:pcardinal):shortstring;
+procedure MoveCamToLastEvent;
+var log_pi:cardinal;
+begin
+   with _players[HPlayer] do
+   begin
+      log_pi:=log_i;
+      while true do
+      begin
+         with log_l[log_pi] do
+          if(x>0)or(y>0)then
+          begin
+             MoveCamToPoint(x,y);
+             break;
+          end;
+         if(log_pi>0)
+         then log_pi-=1
+         else log_pi:=MaxPlayerLog;
+         if(log_pi=log_i)then exit;
+      end;
+   end;
+end;
+
+procedure GameLogUnitAttacked(pu:PTunit);
+var atype:byte;
+begin
+   if(pu=nil)then exit;
+
+   with pu^ do
+    if(playeri=HPlayer)then
+    begin
+       if(uid^._ukbuilding)
+       then atype:=aummat_attacked_b
+       else atype:=aummat_attacked_u;
+       if(ui_addalrm(x,y,atype,false))then PlayersAddToLog(playeri,0,lmt_unit_attacked,0,uidi,'',x,y,true);
+    end;
+end;
+
+function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;
 begin
    ParseLogMessage:='';
    mcolor^:=c_white;
    with ptlog^ do
-   case mtype of
+    case mtype of
 0..MaxPlayers        : begin
                           mcolor^:=PlayerGetColor(mtype);
                           ParseLogMessage:=_players[mtype].name+': '+str;
@@ -973,8 +991,12 @@ lmt_game_end         : if(uid<=MaxPlayers)then
                         else ParseLogMessage:=str_lose;
 lmt_player_defeated  : if(uid<=MaxPlayers)then
                         if(uid<>HPlayer)then ParseLogMessage:=_players[uid].name+str_player_def;
-lmt_upgrade_complete : with _upids[uid] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
-lmt_unit_ready       : with _uids [uid] do
+lmt_upgrade_complete : begin
+                       with _upids[uid] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
+                       mcolor^:=c_yellow;
+                       end;
+lmt_unit_ready       : begin
+                       with _uids [uid] do
                         case uidt of
                          glcp_unit : if(_ukbuilding)
                                      then ParseLogMessage:=str_building_complete+' ('+un_txt_name+')'
@@ -983,8 +1005,20 @@ lmt_unit_ready       : with _uids [uid] do
                                      then ParseLogMessage:=str_building_complete+' ('+str_advanced+un_txt_name+')'
                                      else ParseLogMessage:=str_unit_complete    +' ('+str_advanced+un_txt_name+')';
                         end;
-lmt_unit_advanced    : with _uids[uid] do ParseLogMessage:=str_unit_advanced+' ('+un_txt_name+')';
-   end;
+                       mcolor^:=c_green;
+                       end;
+lmt_unit_advanced    : begin
+                       with _uids[uid] do ParseLogMessage:=str_unit_advanced+' ('+un_txt_name+')';
+                       mcolor^:=c_aqua;
+                       end;
+lmt_unit_attacked    : begin
+                       with _uids[uid] do
+                        if(_ukbuilding)
+                        then ParseLogMessage:=str_base_attacked+' ('+un_txt_name+')'
+                        else ParseLogMessage:=str_unit_attacked+' ('+un_txt_name+')';
+                       mcolor^:=c_red;
+                       end;
+    end;
 end;
 
 procedure ReMakeLogForDraw(playern:byte;widthchars,listheight:integer;logtypes:TSoB);
@@ -1024,7 +1058,7 @@ begin
          mc:=c_white;
          st:=log_l[i].mtype;
          if(st in logtypes)
-         then ts:=ParseLogMessage(@log_l[i],st,@mc)
+         then ts:=ParseLogMessage(@log_l[i],@mc)
          else ts:='';
          sl:=length(ts);
          if(i=0)

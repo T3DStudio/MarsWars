@@ -109,10 +109,11 @@ var  i :byte;
      fs:cardinal;
 _vx,_vy:byte;
 begin
+   rpls_ticks+=1;
    if(G_Started=false)or(rpls_state=rpl_none)or(menu_s2=ms2_camp)
    then replay_abort
    else
-    if(G_Started)and(G_Status=gs_running)then
+    if(G_Started)then
      case rpls_state of
      rpl_whead   : begin
                       replay_abort;
@@ -132,18 +133,17 @@ begin
                          rpls_u      :=MaxPlayerUnits+1;
                          rpls_player :=HPlayer;
                          rpls_log_n  :=_players[rpls_player].log_n;
-
                          rpls_plcam  :=false;
 
                          {$I-}
-                         BlockWrite(rpls_file,ver        ,SizeOf(ver     ));
-                         BlockWrite(rpls_file,map_seed   ,SizeOf(map_seed));
-                         BlockWrite(rpls_file,map_mw     ,SizeOf(map_mw  ));
-                         BlockWrite(rpls_file,map_liq    ,SizeOf(map_liq ));
-                         BlockWrite(rpls_file,map_obs    ,SizeOf(map_obs ));
-                         BlockWrite(rpls_file,map_symmetry    ,SizeOf(map_symmetry ));
+                         BlockWrite(rpls_file,ver             ,SizeOf(ver             ));
+                         BlockWrite(rpls_file,map_seed        ,SizeOf(map_seed        ));
+                         BlockWrite(rpls_file,map_mw          ,SizeOf(map_mw          ));
+                         BlockWrite(rpls_file,map_liq         ,SizeOf(map_liq         ));
+                         BlockWrite(rpls_file,map_obs         ,SizeOf(map_obs         ));
+                         BlockWrite(rpls_file,map_symmetry    ,SizeOf(map_symmetry    ));
 
-                         BlockWrite(rpls_file,g_mode     ,SizeOf(g_mode  ));
+                         BlockWrite(rpls_file,g_mode          ,SizeOf(g_mode          ));
                          BlockWrite(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
                          BlockWrite(rpls_file,g_show_positions,SizeOf(g_show_positions));
                          BlockWrite(rpls_file,g_cgenerators   ,SizeOf(g_cgenerators   ));
@@ -167,17 +167,18 @@ begin
      rpl_wunit   : if(rpls_fstatus<>rpls_file_write)
                    then replay_abort
                    else
-                     if((vid_rtui mod 2)=0)then
+                     if((rpls_ticks mod 2)=0)then
                      begin
                         _vx:=byte(vid_cam_x shr vxyc);
                         _vy:=byte(vid_cam_y shr vxyc);
 
                         i:=0;
                         if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
-                        if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)       then i:=i or %01000000;
+                        if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)then
+                         if(G_Status=gs_running)then i:=i or %01000000;
                         i:=i or (G_Status and %00111111);
 
-                        if((i and %11000000)>0)or(G_Status=0)then
+                        if((i and %11000000)>0)or(G_Status=gs_running)then
                         begin
                            {$I-}
                            BlockWrite(rpls_file,i,sizeof(i));
@@ -320,7 +321,7 @@ begin
      rpl_runit   : if(rpls_fstatus<>rpls_file_read)
                    then replay_abort
                    else
-                     if((vid_rtui mod 2)=0)then
+                     if((rpls_ticks mod 2)=0)and(G_Status=gs_running)then
                      begin
                          if(eof(rpls_file)or(ioresult<>0))then
                          begin

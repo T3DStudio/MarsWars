@@ -1,6 +1,5 @@
 
 
-
 procedure _unit_death(pu:PTUnit);
 var tu  : PTUnit;
     uc  : integer;
@@ -510,7 +509,7 @@ begin
    // tu - target
 
    if(_uvision(pu^.player^.team,tu,false)=false)then exit;
-   if(tu^.hits<=fdead_hits)then exit;
+   if(tu^.hits<=fdead_hits)or(tu^.buff[ub_invuln]>0)then exit;
    if(ud<0)then ud:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
    if(cw>MaxUnitWeapons)then cw:=MaxUnitWeapons;
    if(action<>nil)then action^:=0;
@@ -608,16 +607,19 @@ wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
    end;
 end;
 
-procedure _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger);
+function _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;
 var tw:byte;
 n_prio:integer;
 begin
+   _unit_target:=false;
    with pu^ do
    with uid^ do
    begin
       tw:=_unit_target2weapon(pu,tu,ud,t_weap^,nil);
 
       if(tw>MaxUnitWeapons)then exit;
+
+      _unit_target:=true;
 
       if(tw>t_weap^)
       then exit
@@ -724,8 +726,6 @@ begin
          exit;
       end;
 
-      uo_vision:=false;
-
       pushout      := solid and _canmove(pu) and (a_rld<=0) and bld;
       attack_target:= _canattack(pu,false);
       aicode       := (state=ps_comp);//and(sel);
@@ -802,7 +802,8 @@ uab_uac__unit_adv : swtarget:=true;
       if(aicode)then ai_code(pu);
 
       {$IFDEF _FULLGAME}
-      //if(playeri=HPlayer)and(alrm_r<srange)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
+      if(playeri=HPlayer)and(buff[ub_damaged]>0)
+      then GameLogUnitAttacked(pu);
       {$ENDIF}
    end;
 end;
@@ -864,7 +865,8 @@ begin
       end;
 
       {$IFDEF _FULLGAME}
-      //if(playeri=HPlayer)and(alrm_r<srange)and(alrm_b=false)then ui_addalrm(mmx,mmy,_isbuilding);
+      if(playeri=HPlayer)and(buff[ub_damaged]>0)and(au=nil)
+      then GameLogUnitAttacked(pu);
       {$ENDIF}
    end;
 end;
@@ -912,7 +914,7 @@ end;
 
 procedure _unit_building_start_adv(pu:PTUnit;upgr:boolean);
 begin
-   with pu^     do _unit_morph(pu,uidi,false,-6+(4*byte(upgr)),2);
+   with pu^ do _unit_morph(pu,uidi,false,-6+(4*byte(upgr)),2);
 end;
 
 function _ability_uac__unit_adv(pu,tu:PTUnit;tdm:integer):boolean;
@@ -987,8 +989,8 @@ begin
    with tu^     do
    with player^ do
    begin
-      if(bld)and(hits>0)and(pu^.bld)and(pu^.hits>0)and(team=pu^.player^.team)then
-       if(pu^.buff[ub_hvision]<hell_vision_time)then
+      if(bld)and(hits>0)and(rld<=0)and(pu^.bld)and(pu^.hits>0)and(team=pu^.player^.team)then
+       if(pu^.buff[ub_hvision]<fr_fps)then
        begin
           pu^.buff[ub_hvision]:=hell_vision_time+(hell_vision_time*upgr[upgr_hell_heye]);
           rld:=heyenest_reload;
@@ -1340,7 +1342,8 @@ upgradd,c : integer;
 attackinmove: boolean;
 {$IFDEF _FULLGAME}
 attackervis,
-targetvis: boolean;
+fakemissile,
+targetvis : boolean;
 {$ENDIF}
 begin
    _unit_attack:=false;
@@ -1474,6 +1477,9 @@ wmove_noneed    : if(not attackinmove)then
 
          if(a_rld in aw_rld_s)then
          begin
+            if(aw_fakeshots=0)
+            then fakemissile:=false
+            else fakemissile:=(a_shots mod aw_fakeshots)>0;
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,false,@attackervis);
             if(targetvis)then
@@ -1491,34 +1497,35 @@ wmove_noneed    : if(not attackinmove)then
              or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
-                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
+                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
                  else
                    if(aw_count=0)
-                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
+                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
                    else
                      if(aw_count>0)
-                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd)
+                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
                      else
                        if(aw_count<0)then
                        begin
-                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd);
-                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
+                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
                        end;
-wpt_unit       : _ability_unit_spawn(pu,aw_oid);
-wpt_directdmg  : if(not cf(@aw_reqf,@wpr_zombie))
-                 then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri)
-                 else
-                   if(not _makezimba(pu,tu))
-                   then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri);
+wpt_unit       : if(not fakemissile)then _ability_unit_spawn(pu,aw_oid);
+wpt_directdmg  : if(not fakemissile)then
+                  if(not cf(@aw_reqf,@wpr_zombie))
+                  then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri)
+                  else
+                    if(not _makezimba(pu,tu))
+                    then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri);
             else
-               if(ServerSide)then
-                case aw_type of
+               if(ServerSide)and(not fakemissile)then
+                 case aw_type of
 wpt_resurect : _resurrect(tu);
 wpt_heal     : begin
                   tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
                   tu^.buff[ub_heal]:=aw_rld;
                end;
-                end;
+                 end;
             end;
 
             if(ServerSide)then
@@ -1755,18 +1762,20 @@ procedure _unit_reveal(pu:PTUnit);
 var i:byte;
 begin
    with pu^ do
-   with player^ do
-   begin
-      _AddToInt(@vsnt[team],vistime);
-      _AddToInt(@vsni[team],vistime);
-      if(ServerSide)and(cycle_order=_cycle_order)then
-       if{$IFDEF _FULLGAME}(menu_s2<>ms2_camp)and{$ENDIF}(n_builders=0)then
-        for i:=0 to MaxPlayers do
-        begin
-           _AddToInt(@vsnt[i],fr_fps);
-           if(g_mode<>gm_invasion)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
-        end;
-   end;
+    if(cycle_order=_cycle_order)then
+     with player^ do
+     begin
+        _AddToInt(@vsnt[team],vistime);
+        _AddToInt(@vsni[team],vistime);
+        if(ServerSide)then
+{$IFDEF _FULLGAME}if(menu_s2<>ms2_camp)then{$ENDIF}
+         for i:=0 to MaxPlayers do
+          if((g_deadobservers)and(_players[i].armylimit<=0))or(n_builders=0)then
+          begin
+             _AddToInt(@vsnt[i],fr_fps);
+             if(g_mode<>gm_invasion)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
+          end;
+     end;
 end;
 
 procedure _obj_cycle();

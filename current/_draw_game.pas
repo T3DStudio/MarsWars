@@ -292,10 +292,10 @@ begin
      end;
 end;
 
-procedure UnitsInfoAddStun(ax,ay:integer);
+procedure UnitsInfoAddBuff(ax,ay:integer;pspr:PTMWTexture);
 begin
-   with spr_stun do ay-=hh;
-   UnitsInfoAddSprite(ax,ay,@spr_stun);
+   ay-=pspr^.hh;
+   UnitsInfoAddSprite(ax,ay,pspr);
 end;
 
 function i2s6(i:integer):string6;
@@ -306,10 +306,13 @@ begin
 end;
 
 procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
+const buff_sprite_w = 18;
 var srect,
       hbar :boolean;
     acolor :cardinal;
    buffstr :string6;
+   buffx,
+   buffy   :integer;
 begin
    with pu^   do
    with uid^  do
@@ -343,11 +346,27 @@ begin
       if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
 
       if(speed<=0)or(not bld)then
-       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,ui_blink_color2[vid_rtui>vid_rtuish]);
+       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink_color);
 
-      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[vid_rtui>vid_rtuish]);
+      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink_color);
 
-      if(buff[ub_stun]>0)then UnitsInfoAddStun(vx,vy-sel_hh-6);
+      buffx:=0;
+      if(buff[ub_hvision]>0)then buffx+=1;
+      if(buff[ub_invuln ]>0)then buffx+=1;
+      if(buff[ub_stun   ]>0)then buffx+=1;
+
+      if(buffx=0)then exit;
+
+      buffx-=1;
+      buffx:=vx-((buffx*buff_sprite_w) div 2);
+
+      if(_ukbuilding)
+      then buffy:=vy
+      else buffy:=vy-sel_hh;
+
+      if(buff[ub_hvision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
+      if(buff[ub_stun   ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
+      if(buff[ub_invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
    end;
 end;
 
@@ -459,7 +478,7 @@ end;
 //
 
 procedure cpoints_sprites(draw:boolean);
-var t,i:integer;
+var t:integer;
 begin
    if(not draw)then exit;
 

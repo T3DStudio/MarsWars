@@ -59,7 +59,7 @@ gs_running             = 0;  //
 gs_replayend           = 10;
 gs_waitserver          = 11;
 gs_replaypause         = 12;
-gs_win_team            = 100;
+gs_win_team            = 20;
 
 r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
@@ -72,11 +72,14 @@ MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 MaxCPoints             = MaxPlayers*3;
 
+
+
 MaxSMapW               = 7000;
 MinSMapW               = 2000;
 StepSMap               = 250;
 
 map_b0                 = 5;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -114,7 +117,7 @@ outlogfn               : shortstring = 'out.txt';
 //
 
 gms_g_startb           = 6;  // 0-6  max start base options
-gms_g_maxai            = 8;  // 0-8  max skirmish AI skills
+gms_g_maxai            = 11; // 0-11 max skirmish AI skills
 gms_g_maxgens          = 5;  // 0-5  max neytrall generators options
 
 
@@ -154,6 +157,7 @@ lmt_req_energy         = 18;
 lmt_req_common         = 19;
 lmt_req_ruids          = 20;
 lmt_map_mark           = 21;
+lmt_unit_attacked      = 22;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
@@ -162,6 +166,10 @@ lmts_last_messages     = [0..255];
 glcp_unit              = 0;
 glcp_unita             = 1;
 glcp_upgr              = 2;
+{
+uia_nonew              = 0;
+uia_trynew             = 1;
+uia_newstrict          = 2;  }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -571,6 +579,7 @@ upgr_uac_rstrike       = 50; // rstrike launch
 
 upgr_uac_jetpack       = 51; // jetpack for plasmagunner ?????
 
+upgr_fog_vision        = 249;
 upgr_fast_build        = 250;
 upgr_fast_product      = 251;
 upgr_mult_product      = 252;
@@ -600,7 +609,7 @@ MID_Mancubus           = 107;
 MID_YPlasma            = 108;
 MID_BPlasma            = 109;
 MID_Bullet             = 110;
-MID_Bulletx2           = 111;
+MID_Chaingunx2         = 111;
 MID_TBullet            = 112;
 MID_MBullet            = 113;
 MID_SShot              = 114;
@@ -615,6 +624,7 @@ MID_Flyer              = 122;
 MID_Mine               = 123;
 MID_URocket            = 124;
 MID_URocketS           = 125;
+MID_Chaingun           = 126;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1054,7 +1064,7 @@ vid_maxw               = 1360;
 vid_maxh               = 768;
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
-vid_rtuir              = 5;
+vid_rtuir              = 6;
 vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
 vid_uialrm_t           = fr_2fps div vid_rtuir;

@@ -197,69 +197,64 @@ begin
 end;
 
 function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;
-var i,mx,my:integer;
+var i,ni,mx,my:integer;
 begin
+   {
+   new  0 - not required new alarm point
+        1 -
+   return - true if alarm created
+   }
    ui_addalrm:=false;
 
-   if(ax>map_mw)
-   or(ay>map_mw)then exit;
+   ax:=mm3(1,ax,map_mw);
+   ay:=mm3(1,ay,map_mw);
 
    mx:=trunc(ax*map_mmcx);
    my:=trunc(ay*map_mmcx);
 
    if(not new)then
-   for i:=0 to ui_max_alarms do
-    with ui_alarms[i] do
-     if(al_t>0)and(al_v=av)then
-      if(point_dist_rint(al_mx,al_my,mx,my)<=vid_uialrm_t)then
-      begin
-         al_x :=(al_x +ax) div 2;
-         al_y :=(al_y +ay) div 2;
-         al_mx:=(al_mx+mx) div 2;
-         al_my:=(al_my+my) div 2;
-         al_t:=vid_uialrm_t;
-         ui_addalrm:=true;
-         exit;
-      end;
-
-   for i:=0 to ui_max_alarms do
-    with ui_alarms[i] do
-     if(al_t<=0)then
-     begin
-        al_x :=ax;
-        al_y :=ay;
-        al_mx:=mx;
-        al_my:=my;
-        al_v :=av;
-        al_t :=vid_uialrm_t;
-        case al_v of
-aummat_attacked_u,
-aummat_attacked_b: al_c:=c_red;
-aummat_created_u,
-aummat_created_b : al_c:=c_lime;
-aummat_advance,
-aummat_upgrade   : al_c:=c_yellow;
-aummat_info      : al_c:=c_white;
-        end;
-        if((vid_mmvx-vid_uialrm_ti)>mx)or(mx>(vid_mmvx+map_mmvw+vid_uialrm_ti))or
-          ((vid_mmvy-vid_uialrm_ti)>my)or(my>(vid_mmvy+map_mmvh+vid_uialrm_ti))then ui_addalrm:=true;
-        break;
-     end;
-
- {
- if(ni=255)then
     for i:=0 to ui_max_alarms do
      with ui_alarms[i] do
-      if(at=0)then
-      begin
-         ax:=aax;
-         ay:=aay;
-         ab:=aab;
-         at:=vid_uialrm_t;
-         if((vid_mmvx-vid_uialrm_ti)>ax)or(ax>(vid_mmvx+map_mmvw+vid_uialrm_ti))or   // vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh
-           ((vid_mmvy-vid_uialrm_ti)>ay)or(ay>(vid_mmvy+map_mmvh+vid_uialrm_ti))then SoundPlayAnoncer(snd_under_attack[aab,_players[HPlayer].race],true);
-         break;
-      end; }
+      if(al_t>0)and(al_v=av)then
+       if(point_dist_rint(al_mx,al_my,mx,my)<=vid_uialrm_t)then
+       begin
+          al_x :=(al_x +ax) div 2;
+          al_y :=(al_y +ay) div 2;
+          al_mx:=(al_mx+mx) div 2;
+          al_my:=(al_my+my) div 2;
+          al_t :=vid_uialrm_t;
+          //ui_addalrm:=(mx<(vid_mmvx-vid_uialrm_ti))or((vid_mmvx+map_mmvw+vid_uialrm_ti)<mx)
+          //          or(my<(vid_mmvy-vid_uialrm_ti))or((vid_mmvy+map_mmvh+vid_uialrm_ti)<my);
+          exit;
+       end;
+
+   ni:=0;
+   for i:=0 to ui_max_alarms do
+    if(ui_alarms[i].al_t<ui_alarms[ni].al_t)
+    then ni:=i;
+
+   with ui_alarms[ni] do
+    if(al_t<=0)or(not new)then
+    begin
+       al_x :=ax;
+       al_y :=ay;
+       al_mx:=mx;
+       al_my:=my;
+       al_v :=av;
+       al_t :=vid_uialrm_t;
+       case al_v of
+aummat_attacked_u,
+aummat_attacked_b : al_c:=c_red;
+aummat_created_u,
+aummat_created_b  : al_c:=c_lime;
+aummat_advance,
+aummat_upgrade    : al_c:=c_yellow;
+aummat_info       : al_c:=c_white;
+       end;
+       ui_addalrm:=true;
+       //(mx<(vid_mmvx-vid_uialrm_ti))or((vid_mmvx+map_mmvw+vid_uialrm_ti)<mx)
+      //           or(my<(vid_mmvy-vid_uialrm_ti))or((vid_mmvy+map_mmvh+vid_uialrm_ti)<my);
+    end;
 end;
 {
 
@@ -286,17 +281,20 @@ lmt_player_chat        = 255;
 
 function LogMes2UIAlarm:boolean;
 begin
+   // true  - need announcer sound
+   // false - no need announcer sound
    LogMes2UIAlarm:=true;
    with _players[HPlayer] do
-   with log_l[log_i] do
-   case mtype of
+    with log_l[log_i] do
+     case mtype of
 lmt_unit_advanced    : ui_addalrm(x,y,aummat_advance,true);
 lmt_unit_ready       : if(_uids[uid]._ukbuilding)
                        then ui_addalrm(x,y,aummat_created_b,true)
                        else ui_addalrm(x,y,aummat_created_u,true);
 lmt_upgrade_complete : ui_addalrm(x,y,aummat_upgrade,true);
-lmt_map_mark         : LogMes2UIAlarm:=ui_addalrm(x,y,aummat_info   ,true);
-   end;
+lmt_map_mark         : ui_addalrm(x,y,aummat_info   ,true);
+lmt_unit_attacked    : LogMes2UIAlarm:=not PointInCam(x,y);
+     end;
 end;
 
 

@@ -647,7 +647,7 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               _unit_SetXY(uu,x,y,mvxy_none);
+               _unit_update_xy(uu);
 
                if(speed>0)then
                begin
