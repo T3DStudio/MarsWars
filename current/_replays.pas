@@ -41,36 +41,36 @@ begin
          vr:=0;
          mw:=0;
          wr:=0;
-         BlockRead(f,wr,sizeof(map_seed ));rpls_str_data:=str_map+': '+c2s(wr)           +#13+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_data:=rpls_str_data+str_m_siz+i2s(mw)+#13+' ';mw:=0;
+         BlockRead(f,wr,sizeof(map_seed ));rpls_str_data:=str_map+': '+c2s(wr)           +tc_nl3+' ';wr:=0;
+         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_data:=rpls_str_data+str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
-         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_liq+_str_mx(vr)+#13+' '; end
+         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_liq+_str_mx(vr)+tc_nl3+' '; end
                   else begin rpls_str_data:=str_svld_errors[4];close(f);exit;            end;
          BlockRead(f,vr,sizeof(map_obs  ));
-         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_obs+_str_mx(vr)+#13+' '; end
+         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_obs+_str_mx(vr)+tc_nl3+' '; end
                   else begin rpls_str_data:=str_svld_errors[4];close(f);exit;            end;
          BlockRead(f,vr,sizeof(map_symmetry  ));
          BlockRead(f,vr,sizeof(g_mode   ));
-         if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+#13; end
+         if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+tc_nl3; end
                             else begin rpls_str_data:=str_svld_errors[4];close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base    ));vr:=0;
          BlockRead(f,vr,sizeof(g_show_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_cgenerators   ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
 
-         //rpls_str_data:=rpls_str_data+str_players+':'+#13;
+         //rpls_str_data:=rpls_str_data+str_players+':'+tc_nl3;
 
          for vr:=1 to MaxPlayers do
          begin
             BlockRead(f,fn ,sizeof(fn));
 
-            rpls_str_data:=rpls_str_data+chr(vr)+pl_n_ch[vr=hp]+#25+fn;
+            rpls_str_data:=rpls_str_data+chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
 
             t:=0;
             BlockRead(f,t,1);
             if(t=PS_none)then
             begin
-               rpls_str_data:=rpls_str_data+#13;
+               rpls_str_data:=rpls_str_data+tc_nl3;
                BlockRead(f,mw,3);
             end
             else
@@ -80,7 +80,7 @@ begin
                if(t<=r_cnt)
                then rpls_str_data:=rpls_str_data+','+str_race[t][2]
                else rpls_str_data:=rpls_str_data+',?';
-               BlockRead(f,t ,1); rpls_str_data:=rpls_str_data+','+b2s(t)+#13;
+               BlockRead(f,t ,1); rpls_str_data:=rpls_str_data+','+b2s(t)+tc_nl3;
             end;
          end;
       end

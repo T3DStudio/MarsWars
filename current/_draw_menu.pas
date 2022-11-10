@@ -35,7 +35,7 @@ begin
       _draw_text(tar,ui_menu_map_tx0,_yt(1), str_m_siz+i2s(map_mw)      , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_liq+_str_mx(map_liq) , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_obs+_str_mx(map_obs) , ta_left  ,255, mic(c,false));
-      _draw_text(tar,ui_menu_map_tx0,_yt(4), str_m_sym+b2pm   [map_symmetry] , ta_left  ,255, mic(c,false));
+      _draw_text(tar,ui_menu_map_tx0,_yt(4), str_m_sym+b2cc[map_symmetry],ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx1,_yt(5), theme_name[theme_i]        , ta_middle,255, c_white     );
 
       _draw_text(tar,ui_menu_map_tx1,_yt(6), str_mrandom                , ta_middle,255, mic(c,false));
@@ -178,7 +178,7 @@ begin
 
                     y:=_yt(6);
                     _draw_text(tar,i ,y, str_mousescrl, ta_left ,255, mic(true,false));
-                    _draw_text(tar,t ,y, b2pm[vid_vmm], ta_right,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[vid_vmm], ta_right,255, mic(true,false));
 
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_plname, ta_left,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));
@@ -213,7 +213,7 @@ begin
 
                     y:=_yt(5);
                     _draw_text(tar,i ,y, str_fullscreen, ta_left ,255, mic(true,false));
-                    _draw_text(tar,t ,y, b2pm[not cfg_fullscreen],ta_right,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[not cfg_fullscreen],ta_right,255, mic(true,false));
                  end;
 
                  if(menu_s3=ms3_sond)then
@@ -355,8 +355,8 @@ begin
                  _draw_text(tar,ui_menu_csm_xt2, y, b2s(g_start_base+1)  , ta_right ,255,c_white);
 
                  y:=_yt(5);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_sstarts       , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, b2pm[g_show_positions or (g_mode in [gm_3x3,gm_2x2x2,gm_invasion])]   , ta_right ,255 ,c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_sstarts          , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_show_positions or (g_mode in [gm_3x3,gm_2x2x2,gm_invasion])]  , ta_right ,255 ,c_white);
 
                  y:=_yt(6);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_aislots        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
@@ -434,7 +434,7 @@ begin
                     i:=t+ui_menu_csm_ys;
                     _draw_text(tar,ui_menu_csm_xt0 , y, str_team+b2s(PlayerTeam)        , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
                     _draw_text(tar,ui_menu_csm_x2+6, y, str_srace+str_race[PlayerRace]  , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
-                    _draw_text(tar,ui_menu_csm_x3+6, y, str_ready+b2pm[PlayerReady]     , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
+                    _draw_text(tar,ui_menu_csm_x3+6, y, str_ready+b2cc[PlayerReady]     , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
                     vlineColor(tar,ui_menu_csm_x2  , t,i, c_gray);
                     vlineColor(tar,ui_menu_csm_x3  , t,i, c_gray);
 

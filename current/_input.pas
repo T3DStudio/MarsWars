@@ -256,9 +256,7 @@ co_amove  ,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
 end;
 
 procedure _command(x,y:integer);
-var t:integer;
 begin
-   t:=0;
    case m_brush of
 co_move    : _player_s_o(m_brush,_whoInPoint(x,y,2),x,y,0,uo_corder,HPlayer);   // move
 co_amove   : _player_s_o(m_brush,_whoInPoint(x,y,1),x,y,0,uo_corder,HPlayer);   // attack
@@ -445,11 +443,7 @@ begin
         if(k_alt  >1)then k2:=SDLK_LAlt;
         if(k_shift>1)then k2:=SDLK_LShift;
 
-        if(k=sdlk_space)then
-        begin
-           MoveCamToLastEvent;
-           exit;
-        end;
+        if(k=sdlk_space)and(k2=0)then MoveCamToLastEvent;
 
         if(rpls_state<rpl_rhead)then
         begin
@@ -499,7 +493,7 @@ begin
              if(_hotkeyR2[ko]<>k2)
              or(_hotkeyR [ko]= 0 )
              or(_hotkeyR [ko]<>k )then continue;
-             _panel_click(3,ko mod 3,16+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
+             _panel_click(3,ko mod 3,4+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
              exit;
           end;
       end;

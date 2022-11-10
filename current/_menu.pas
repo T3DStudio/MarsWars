@@ -6,7 +6,7 @@ begin
    for i:=1 to length(k_keyboard_string) do
    begin
       c:=k_keyboard_string[i];
-      if(c=#8)
+      if(c=#8)   // backspace
       then delete(s,length(s),1)
       else
        if(length(s)>=ms)

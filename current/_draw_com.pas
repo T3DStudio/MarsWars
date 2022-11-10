@@ -42,7 +42,7 @@ begin
       begin
          o:=0;
          for i:=1 to ss do
-          if not(s[i] in [#0..#4,#14..#25])then o+=1;
+          if not(s[i] in [tc_player0..tc_player6,tc_purple..tc_default])then o+=1;
 
          case al of
          ta_middle: ix:=x-((o*font_w)shr 1);
@@ -62,19 +62,21 @@ begin
          c:=s[i];
 
          case c of
-         #0..#6  : begin cl:=PlayerGetColor(ord(c));if(i<ss)then continue;end; //tc:=cl;
-         #11..#13: ;
-         #14     : begin cl:=c_purple       ;if(i<ss)then continue;end;
-         #15     : begin cl:=c_red          ;if(i<ss)then continue;end;
-         #16     : begin cl:=c_orange       ;if(i<ss)then continue;end;
-         #17     : begin cl:=c_yellow       ;if(i<ss)then continue;end;
-         #18     : begin cl:=c_lime         ;if(i<ss)then continue;end;
-         #19     : begin cl:=c_aqua         ;if(i<ss)then continue;end;
-         #20     : begin cl:=c_blue         ;if(i<ss)then continue;end;
-         #21     : begin cl:=c_gray         ;if(i<ss)then continue;end;
-         #22     : begin cl:=c_white        ;if(i<ss)then continue;end;
-         #23     : begin cl:=c_green        ;if(i<ss)then continue;end;
-         #25     : begin cl:=tc             ;if(i<ss)then continue;end;
+         tc_player0..
+         tc_player6  : begin cl:=PlayerGetColor(ord(c));if(i<ss)then continue;end;
+         tc_nl1..
+         tc_nl3      : ;
+         tc_purple   : begin cl:=c_purple ;if(i<ss)then continue;end;
+         tc_red      : begin cl:=c_red    ;if(i<ss)then continue;end;
+         tc_orange   : begin cl:=c_orange ;if(i<ss)then continue;end;
+         tc_yellow   : begin cl:=c_yellow ;if(i<ss)then continue;end;
+         tc_lime     : begin cl:=c_lime   ;if(i<ss)then continue;end;
+         tc_aqua     : begin cl:=c_aqua   ;if(i<ss)then continue;end;
+         tc_blue     : begin cl:=c_blue   ;if(i<ss)then continue;end;
+         tc_gray     : begin cl:=c_gray   ;if(i<ss)then continue;end;
+         tc_white    : begin cl:=c_white  ;if(i<ss)then continue;end;
+         tc_green    : begin cl:=c_green  ;if(i<ss)then continue;end;
+         tc_default  : begin cl:=tc       ;if(i<ss)then continue;end;
          else
            case c of
             char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
@@ -90,17 +92,17 @@ begin
          end;
 
          if(al=ta_left)then
-          if(o>=chrs)or(c in [#11..#13])or(i=ss)then
+          if(o>=chrs)or(c in [tc_nl1..tc_nl3])or(i=ss)then
           begin
              if(i<ss)then o:=0;
 
              ix:=x;
              y +=font_w;
              case c of
-             #11 : y+=2;
-             #12 : y+=txt_line_h2;
-             #13 : y+=txt_line_h;
-             else  y+=txt_line_h;
+             tc_nl1 : y+=2;
+             tc_nl2 : y+=txt_line_h2;
+             tc_nl3 : y+=txt_line_h;
+             else     y+=txt_line_h;
              end;
           end;
       end;

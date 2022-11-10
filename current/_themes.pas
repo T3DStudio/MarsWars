@@ -315,23 +315,23 @@ begin
 
    //              minimap color anim  anim     animstyle: 0=default; 1=1 frame + lava bliks; 2=static 1 frame
    //          n   R    G    B   style time
-   LiquidAnims(0,  16 , 16 , 150  , 0, 30);
-   LiquidAnims(1,  10 , 150, 10   , 0, 30);
-   LiquidAnims(2,  136, 68 , 32   , 0, 30);
-   LiquidAnims(3,  136, 0  , 16   , 0, 30);
-   LiquidAnims(4,  220, 100, 15   , 0, 30);
-   LiquidAnims(5,  163, 82 , 82   , 1, 20);
-   LiquidAnims(6,  30 , 30 , 150  , 0, 15);
-   LiquidAnims(7,  64 , 128, 128  , 0, 15);
-   LiquidAnims(8,  210, 168, 0    , 0, 15);
-   LiquidAnims(9,  160, 120, 15   , 1, 15);
-   LiquidAnims(10, 140, 20 , 0    , 0, 15);
-   LiquidAnims(11, 255, 180, 15   , 1, 15);
-   LiquidAnims(12, 0  , 128, 64   , 0, 15);
-   LiquidAnims(13, 200, 82 , 0    , 0, 15);
-   LiquidAnims(14, 0  , 128, 192  , 0, 10);
-   LiquidAnims(15, 80 , 230, 80   , 0, 10);
-   LiquidAnims(16, 100, 100, 100  , 2, 10);
+   LiquidAnims(0,  16 , 16 , 150  , 0, 30);  // doom water
+   LiquidAnims(1,  10 , 150, 10   , 0, 30);  // doom slime
+   LiquidAnims(2,  136, 68 , 32   , 0, 30);  // doom brown
+   LiquidAnims(3,  136, 0  , 16   , 0, 30);  // doom blood
+   LiquidAnims(4,  220, 100, 15   , 0, 30);  // doom lava
+   LiquidAnims(5,  163, 82 , 82   , 1, 20);  // doom clifs
+   LiquidAnims(6,  30 , 30 , 150  , 0, 15);  // heretic water
+   LiquidAnims(7,  64 , 128, 128  , 0, 15);  // blood brown
+   LiquidAnims(8,  210, 168, 0    , 0, 15);  // blood magma
+   LiquidAnims(9,  160, 120, 15   , 1, 15);  // blood lava
+   LiquidAnims(10, 140, 20 , 0    , 0, 15);  // blood blood
+   LiquidAnims(11, 255, 180, 15   , 1, 15);  // heretic lava
+   LiquidAnims(12, 0  , 128, 64   , 0, 15);  // blood slime
+   LiquidAnims(13, 200, 82 , 0    , 0, 15);  // blood orange water
+   LiquidAnims(14, 0  , 128, 192  , 0, 10);  // duke3d water
+   LiquidAnims(15, 100, 180, 100  , 0, 10);  // duke3d slime
+   LiquidAnims(16, 100, 100, 100  , 2, 10);  // doom pl2 ice
 end;
 
 procedure SetThemeList(lst:PTIntList;lstn,smax:pinteger;str:shortstring);

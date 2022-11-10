@@ -349,8 +349,9 @@ begin
             uy:=(ucl div 3);
 
             //(uprodu[uid]>=ui_uprod_uid_max[uid])
+            req:=_uid_conditionals(@_players[HPlayer],uid);
 
-            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(_uid_conditionals(@_players[HPlayer],uid)>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
+            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
             _drawBtnt(tar,ux,uy,
             ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
             ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
@@ -370,8 +371,8 @@ begin
          _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_pprod_time[uid]>0, (_upid_conditionals(@_players[HPlayer],uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]));
 
          _drawBtnt(tar,ux,uy,
-         ir2s(ui_pprod_time[uid]),i2s(ui_upgrct[uid]),'',b2s(   upgr[uid])                            ,'',
-         ui_cenergy[cenergy<0]  ,c_dyellow          ,0 ,ui_max_color[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
+         ir2s(ui_pprod_time[uid]),i2s(upprodu[uid]),'',b2s(   upgr[uid])                            ,'',
+         ui_cenergy[cenergy<0]  ,c_dyellow         ,0 ,ui_max_color[upgr[uid]>=_upids[uid]._up_max] ,0 ,'');
       end;
 
       3: // actions
@@ -507,9 +508,10 @@ begin
         begin
            if(ui_tab=3)then
            begin
-              if(rpls_state>=rpl_rhead)
-              then hs:=@str_hint_r[i]
-              else hs:=@str_hint_a[i];
+              if(i<=_mhkeys)then
+               if(rpls_state>=rpl_rhead)
+               then hs:=@str_hint_r[i]
+               else hs:=@str_hint_a[i];
            end
            else
            begin
@@ -553,7 +555,7 @@ begin
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
-      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[vid_rtui>6],ta_left,ui_ingamecl,c_white);
+      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[r_blink_colorb],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then
@@ -565,13 +567,12 @@ begin
      end;
    d_Hints(tar);
 
-
    // resources
    with _players[HPlayer] do
    begin
       pl:=armylimit+uprodl;
-      _draw_text(tar,ui_energx,ui_energy,#19+str_hint_energy+#25+i2s(cenergy)+#22+' / '+#19+i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
-      _draw_text(tar,ui_armyx ,ui_armyy ,#16+str_hint_army  +#25+l2s(pl     )+#22+' / '+#16+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
+      _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy)+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
+      _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(pl     )+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
       //_draw_text(tar,ui_armyx ,ui_armyy+font_w,l2s(ucl_l[false])+'/'+l2s(ucl_l[true]),ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
 

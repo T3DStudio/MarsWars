@@ -308,6 +308,7 @@ end;
 procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
 var srect,
+choosen,
       hbar :boolean;
     acolor :cardinal;
    buffstr :string6;
@@ -320,9 +321,11 @@ begin
    begin
       acolor:=PlayerGetColor(playeri);
 
+      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(vid_rtui>vid_rtuish);
+
       srect :=((sel)and(playeri=HPlayer))
             or(k_alt>1)
-            or(((ui_uhint=unum)or(ui_umark_u=unum))and(vid_rtui>vid_rtuish));
+            or(choosen);
 
       hbar  :=false;
       if(srect)
@@ -348,7 +351,7 @@ begin
       if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink_color);
 
-      if(sel)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink_color);
+      if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink_color);
 
       buffx:=0;
       if(buff[ub_hvision]>0)then buffx+=1;

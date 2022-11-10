@@ -260,7 +260,7 @@ begin
    end;
 end;
 
-procedure missiles_sprites(noanim,draw:boolean);
+procedure missiles_sprites(draw:boolean);
 var  m:integer;
    spr:PTMWTexture;
 begin

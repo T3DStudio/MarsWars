@@ -77,7 +77,7 @@ begin
         begin
            SpriteListAddDoodad(x,y,depth,shadowz,sprite,255,ox,oy);
            if(back_sprite<>nil)then SpriteListAddDoodad(x,y,sd_liquid_back,-32000,back_sprite,255,ox,oy);
-           if(ro>0)then UnitsInfoAddCircle(x,y,ro,ui_blink_color2[vid_rtui>vid_rtuish]);
+           if(ro>0)then UnitsInfoAddCircle(x,y,ro,r_blink_color);
         end;
      end;
 end;

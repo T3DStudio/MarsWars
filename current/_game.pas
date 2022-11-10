@@ -828,7 +828,8 @@ begin
    {$IFDEF _FULLGAME}
    vid_rtui+=1;
    vid_rtui:=vid_rtui mod vid_rtuis;
-   r_blink_color:=ui_blink_color2[vid_rtui>vid_rtuish];
+   r_blink_colorb:=vid_rtui>vid_rtuish;
+   r_blink_color :=ui_blink_color2[r_blink_colorb];
 
    SoundControl;
 
@@ -842,29 +843,23 @@ begin
 
    PlayersCycle;
 
-   if(G_Started)then
+   if(G_Started)and(G_Status=gs_running)then
    begin
-      //if(k_ctrl=5)then PlaySoundSet(snd_zimba_death);//PlayInGameAnoncer(snd_under_attack[false,_players[HPlayer].race]);
-      //if(k_alt =5)then PlayInGameAnoncer(snd_under_attack[true ,_players[HPlayer].race]);
+      _cycle_order+=1;_cycle_order:=_cycle_order mod order_period;
+      _cycle_regen+=1;_cycle_regen:=_cycle_regen mod regen_period;
 
-      if(G_Status=gs_running)then
+      if(ServerSide)then
       begin
-         _cycle_order+=1;_cycle_order:=_cycle_order mod order_period;
-         _cycle_regen+=1;_cycle_regen:=_cycle_regen mod regen_period;
+         G_Step+=1;
 
-         if(ServerSide)then
-         begin
-            G_Step+=1;
-
-            GameModeCPoints;
-            case g_mode of
-            gm_invasion  : GameModeInvasion;
-            gm_royale    : if(_cycle_order=0)then
-                            if(g_royal_r>0)then g_royal_r-=1;
-            end;
+         GameModeCPoints;
+         case g_mode of
+         gm_invasion  : GameModeInvasion;
+         gm_royale    : if(_cycle_order=0)then
+                         if(g_royal_r>0)then g_royal_r-=1;
          end;
-         _obj_cycle;
       end;
+      _obj_cycle;
    end;
 
    if(net_status=ns_srvr)then net_GServer;

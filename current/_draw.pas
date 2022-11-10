@@ -5,7 +5,7 @@ begin
  doodads_sprites(noanim);
     unit_sprites(noanim);
  effects_sprites(noanim,r_draw);
-missiles_sprites(noanim,r_draw);
+missiles_sprites(r_draw);
  cpoints_sprites(r_draw);
 end;
 
@@ -46,7 +46,7 @@ begin
 
    if(_testmode>0)then _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fps_tt)+
-   ' '+b2pm[PointInScreenP(mouse_map_x,mouse_map_y,nil)]+
+   ' '+b2c[PointInScreenP(mouse_map_x,mouse_map_y,nil)]+
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+

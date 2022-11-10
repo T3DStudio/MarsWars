@@ -72,18 +72,18 @@ begin
    end;
 end;
 
-function _checkvision(pu:PTUnit):byte;
+function UnitVisionRange(pu:PTUnit):byte;
 begin
-   _checkvision:=0;
+   UnitVisionRange:=0;
    if((HPlayer=0)and(rpls_state>=rpl_rhead))
-   or(g_deadobservers and(_players[HPlayer].armylimit<=0))
-   then _checkvision:=2
+   or(PlayerObserver(@_players[HPlayer]))
+   then UnitVisionRange:=2
    else
      with pu^ do
       if(_uvision(_players[HPlayer].team,pu,false))then
        if(player^.team=_players[HPlayer].team)
-       then _checkvision:=2
-       else _checkvision:=1;
+       then UnitVisionRange:=2
+       else UnitVisionRange:=1;
 end;
 
 function _unit_fogrev(pu:PTUnit):boolean;
@@ -95,7 +95,7 @@ begin
     if(rpls_fog=false)
     then _unit_fogrev:=true
     else
-      case _checkvision(pu) of
+      case UnitVisionRange(pu) of
     1:begin
          if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
          _unit_fogrev:=true;
@@ -139,16 +139,13 @@ begin
       begin
          for t:=1 to 255 do
           if(s_smiths<=0)or(sel)then   // and(s_smiths>0)
-           if(t in ups_upgrades)then
-           begin
-              ui_pprod_max[t]+=1;   //possible productions count of each upgrade type      +byte(buff[ub_advanced]>0)
-           end;
+           if(t in ups_upgrades)then ui_pprod_max[t]+=1;   //possible productions count of each upgrade type      +byte(buff[ub_advanced]>0)
 
          if(pprod_r[pn]>0)then
          begin
             i:=pprod_u[pn];
-            if(ui_pprod_first  <=0)or(pprod_r[pn]  <ui_pprod_first)then ui_pprod_first:=pprod_r[pn];
-            if(ui_pprod_time[i]<=0)or(ui_pprod_time[i]>pprod_r[pn])then ui_pprod_time[i]  :=pprod_r[pn];
+            if(ui_pprod_first  <=0)or(pprod_r[pn]  <ui_pprod_first)then ui_pprod_first  :=pprod_r[pn];
+            if(ui_pprod_time[i]<=0)or(ui_pprod_time[i]>pprod_r[pn])then ui_pprod_time[i]:=pprod_r[pn];
          end;
       end;
    end;
@@ -198,7 +195,7 @@ begin
                ui_bprod_possible+=ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[vid_rtui>vid_rtuish]);
+                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[r_blink_colorb]);
             end;
 
             for i:=0 to MaxUnitProdsI do
@@ -278,7 +275,7 @@ begin
    with player^ do
    begin
       if(rld>0)
-      then lvlstr_r:=#19+i2s((rld div fr_fps)+1)
+      then lvlstr_r:=tc_aqua+i2s(it2s(rld))
       else lvlstr_r:='';
 
       // weapon/attack
@@ -291,7 +288,7 @@ begin
            wl+=upgr[aw_dupgr];
            atset+=[aw_dupgr];
         end;
-      lvlstr_w:=#15+i2s6(wl);
+      lvlstr_w:=tc_red+i2s6(wl);
 
       // armor
       al:=upgr[_upgr_armor];
@@ -301,10 +298,10 @@ begin
         if(_ukmech)
         then al+=upgr[upgr_race_mech_armor[_urace]]
         else al+=upgr[upgr_race_bio_armor [_urace]];
-      lvlstr_a:=#18+i2s6(al);
+      lvlstr_a:=tc_lime+i2s6(al);
 
       // other
-      sl:=upgr[_upgr_regen];
+      sl:=upgr[_upgr_regen]+upgr[_upgr_srange];
       if(_ukbuilding)
       then sl+=integer(upgr[upgr_race_build_regen[_urace]])
       else
@@ -315,7 +312,7 @@ begin
            sl+=integer(upgr[upgr_race_mech_mspeed[_urace]]+upgr[upgr_race_bio_mspeed [_urace]]);
            if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
         end;
-      lvlstr_s:=#17+i2s6(sl);
+      lvlstr_s:=tc_yellow+i2s6(sl);
    end;
 end;
 
@@ -457,7 +454,6 @@ begin
    FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
    FillChar(ui_pprod_max      ,SizeOf(ui_pprod_max      ),0);
    FillChar(ui_orders_uids    ,SizeOf(ui_orders_uids    ),0);
-   FillChar(ui_upgrct         ,SizeOf(ui_upgrct         ),0);
    FillChar(ui_pprod_time     ,SizeOf(ui_pprod_time     ),0);
    FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
    FillChar(ui_orders_n       ,SizeOf(ui_orders_n       ),0);

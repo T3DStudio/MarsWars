@@ -326,7 +326,6 @@ ui_uid_reload     : array[byte] of integer;
 ui_ucl_reload     : array[byte] of integer;
 ui_uibtn_move     : integer = 0; // ui move buttons
 ui_uibtn_action   : integer = 0; // ui action button
-ui_upgrct         : array[byte] of integer;
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -377,6 +376,7 @@ k_keyboard_string         : shortstring = '';
 //  COLORS
 //
 
+r_blink_colorb    : boolean;
 r_blink_color     : cardinal;
 
 c_dred,
@@ -744,7 +744,7 @@ str_hint_army     : shortstring;
 str_hint_energy   : shortstring;
 str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
-str_hint_r        : array[byte ] of shortstring;
+str_hint_r        : array[0.._mhkeys] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 str_svld_errors   : array[1..4] of shortstring;
 str_camp_t        : array[0..MaxMissions] of shortstring;

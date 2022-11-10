@@ -106,7 +106,7 @@ str_ps_t               : char = '?';
 str_ps_h               : char = '<';
 str_ps_comp            : shortstring = 'AI';
 str_ps_none            : shortstring = '--';
-b2pm                   : array[false..true] of string[3] = (#15+'-'+#25,#18+'+'+#25);
+b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
 
@@ -407,36 +407,6 @@ aif_ability_detection  : cardinal = 1 shl 10;
 aif_ability_other      : cardinal = 1 shl 11;
 aif_ability_mainsave   : cardinal = 1 shl 12;
 
-{aif_dattack            : cardinal = 1       ; // default attack sequense
-aif_pushuids           : cardinal = 1 shl 1 ; // push only ai_pushuids
-aif_pushair            : cardinal = 1 shl 2 ; // push air
-aif_pushgrnd           : cardinal = 1 shl 3 ; // push ground
-aif_help               : cardinal = 1 shl 4 ; // help allies
-aif_hrrsmnt            : cardinal = 1 shl 5 ; // attacks with small forces
-aif_usex5              : cardinal = 1 shl 6 ; // use teleport and radar
-aif_nofogblds          : cardinal = 1 shl 7 ; // AI see enemy buildings through fog
-aif_nofogunts          : cardinal = 1 shl 8 ; // AI see enemy units through fog
-aif_alrmtwrs           : cardinal = 1 shl 9 ; // Builders build towers when alarm near
-aif_CCescape           : cardinal = 1 shl 10; // CC and HK escape from alarm
-aif_CCattack           : cardinal = 1 shl 11; // CC and HK attack
-aif_buildseq1          : cardinal = 1 shl 12; // Base build order
-aif_buildseq2          : cardinal = 1 shl 13; // Adv build order
-aif_usex6              : cardinal = 1 shl 14; // Use advanced units
-aif_usex8              : cardinal = 1 shl 15; // Use hell altar and rocket l station
-aif_smarttpri          : cardinal = 1 shl 16; // Smart target priority
-aif_upgrseq1           : cardinal = 1 shl 17; // Base upgr order
-aif_upgrseq2           : cardinal = 1 shl 18; // Adv upgr order
-aif_twrtlprt           : cardinal = 1 shl 19; // Hell Towers teleportation
-aif_specblds           : cardinal = 1 shl 20; // Mines and Hell Eyes managment
-aif_usex9              : cardinal = 1 shl 21; // Use adnvanced buildings
-aif_destrblds          : cardinal = 1 shl 22; // Destroy buildngs
-aif_unitaacts          : cardinal = 1 shl 23; // Units micro and actions
-aif_useapcs            : cardinal = 1 shl 24; // Use transports
-aif_hrsmntapcs         : cardinal = 1 shl 25; // transport harrasment
-aif_smartbar           : cardinal = 1 shl 26; // Smart unit production
-aif_detecatcs          : cardinal = 1 shl 27; // Mines and Hell Eyes
-aif_stayathome         : cardinal = 1 shl 28; //   }
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT ABILITIES
@@ -453,16 +423,18 @@ uab_hkeeptele          = 8;
 uab_rebuild            = 9;
 uab_buildturret        = 10;
 uab_hinvuln            = 11;
-uab_spawnlost          = 100;
-uab_hell_vision        = 101;
-uab_advance            = 103;
+uab_hell_vard          = 12;
+uab_spawnlost          = 13;
+uab_hell_vision        = 14;
+uab_advance            = 15;
 
 client_rld_abils = [
                    uab_teleport     ,
                    uab_uac__unit_adv,
                    uab_hell_unit_adv,
-                   uab_building_adv,
-                   uab_hell_vision
+                   uab_building_adv ,
+                   uab_hell_vision  ,
+                   uab_hell_vard
                    ];
 client_cast_abils= [
                    uab_radar,
@@ -617,7 +589,6 @@ MID_SSShot             = 115;
 MID_BFG                = 116;
 MID_Granade            = 117;
 MID_Tank               = 118;
-MID_StunMine           = 119;
 MID_Blizzard           = 120;
 MID_ArchFire           = 121;
 MID_Flyer              = 122;
@@ -646,6 +617,7 @@ ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
 ul10                   = MinUnitLimit*10;
+ul12                   = MinUnitLimit*12;
 ul20                   = MinUnitLimit*20;
 ul30                   = MinUnitLimit*30;
 
@@ -788,10 +760,8 @@ vistime                = order_period+2;
 
 radar_reload           = fr_fps*60;
 radar_btime            = radar_reload-(fr_fps*5);
-radar_upgr_levels      = 4;
-radar_range            : array[0..radar_upgr_levels] of integer = (200,250,300,350,400);
 
-hell_vision_time       = fr_fps*4;
+hell_vision_time       = fr_fps*5;
 heyenest_reload        = fr_fps*60;
 
 mstrike_reload         = fr_fps*30;
@@ -1068,9 +1038,9 @@ vid_rtuir              = 6;
 vid_rtuis              = fr_fps div vid_rtuir;
 vid_rtuish             = vid_rtuis div 2;
 vid_uialrm_t           = fr_2fps div vid_rtuir;
-vid_uialrm_ti          = vid_uialrm_t div 4;
+//vid_uialrm_ti          = vid_uialrm_t div 4;
 
-vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
+//vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
 vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;
@@ -1225,7 +1195,7 @@ MFogM                  = 64;
 fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
-fog_cxr                = fog_cr-fog_chw;
+//fog_cxr                = fog_cr-fog_chw;
 fog_vfwm               = (vid_maxw div fog_cw)+2;
 fog_vfhm               = (vid_maxh div fog_cw)+2;
 
@@ -1276,6 +1246,30 @@ missiles_folder        : shortstring = 'missiles\';
 
 ui_limitstr            : shortstring = '125';
 
+tc_player0             = #0;
+{tc_player1             = #1;
+tc_player2             = #2;
+tc_player3             = #3;
+tc_player4             = #4;
+tc_player5             = #5;}
+tc_player6             = #6;
+tc_nl1                 = #11;
+tc_nl2                 = #12;
+tc_nl3                 = #13;
+tc_purple              = #14;
+tc_red                 = #15;
+tc_orange              = #16;
+tc_yellow              = #17;
+tc_lime                = #18;
+tc_aqua                = #19;
+tc_blue                = #20;
+tc_gray                = #21;
+tc_white               = #22;
+tc_green               = #23;
+tc_default             = #25;
+
+b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  INPUT
@@ -1298,14 +1292,14 @@ crater_ri              = 4;
 crater_r               : array[1..crater_ri] of integer = (33,60,88,110);
 
 theme_n                = 8;
-theme_name             : array[0..theme_n-1] of shortstring = (#18+'TECH BASE'  ,
-                                                               #20+'TECH BASE'  ,
-                                                                   'PLANET'     ,
-                                                                   'PLANET MOON',
-                                                               #21+'CAVES'      ,
-                                                               #19+'ICE CAVES'  ,
-                                                               #16+'HELL'       ,
-                                                               #17+'HELL CAVES' );
+theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'  ,
+                                                               tc_blue  +'TECH BASE'  ,
+                                                               tc_white +'PLANET'     ,
+                                                               tc_white +'PLANET MOON',
+                                                               tc_gray  +'CAVES'      ,
+                                                               tc_aqua  +'ICE CAVES'  ,
+                                                               tc_orange+'HELL'       ,
+                                                               tc_yellow+'HELL CAVES' );
 
 {$ELSE }
 
@@ -1325,12 +1319,14 @@ str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';
 str_aislots              : shortstring = 'Fill empty slots:   ';
 str_sstarts              : shortstring = 'Show player starts: ';
-str_gaddon               : shortstring = 'Game:               ';
 str_gmodet               : shortstring = 'Game mode:          ';
+str_cgenerators          : shortstring = 'Neutral generators: ';
 str_starta               : shortstring = 'Starting base:      ';
 str_plname               : shortstring = 'Player name';
 str_plout                : shortstring = ' left the game';
 str_player_def           : shortstring = ' was terminated!';
+
+str_cgeneratorsM         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
 
 str_plstat               : shortstring = 'State';
 str_team                 : shortstring = 'Team';

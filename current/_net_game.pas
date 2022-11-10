@@ -104,13 +104,14 @@ begin
    net_writebyte(map_liq  );
    net_writebyte(map_obs  );
    net_writecard(map_seed );
-   net_writebool(map_symmetry  );
+   net_writebool(map_symmetry);
 
    net_writebyte(g_mode   );
    net_writebyte(g_start_base    );
    net_writebool(g_show_positions);
    net_writebyte(g_ai_slots      );
    net_writebyte(g_cgenerators   );
+   net_writebool(g_deadobservers );
 end;
 
 procedure net_ReadMapMark(pid:byte);
@@ -287,15 +288,17 @@ begin
    redraw_menu:=false;
    new_map    :=false;
 
-   if(_rmInt (@map_mw          ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmByte(@map_liq         ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmByte(@map_obs         ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmCard(@map_seed        ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmBool(@map_symmetry    ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmByte(@g_mode          ))then begin redraw_menu:=redraw_menu or true;new_map:=new_map or true;end;
-   if(_rmByte(@g_start_base    ))then begin redraw_menu:=redraw_menu or true;end;
-   if(_rmBool(@g_show_positions))then begin redraw_menu:=redraw_menu or true;end;
-   if(_rmByte(@g_ai_slots      ))then begin redraw_menu:=redraw_menu or true;end;
+   if(_rmInt (@map_mw          ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_liq         ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_obs         ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmBool(@map_symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@g_mode          ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@g_start_base    ))then begin redraw_menu:=true;end;
+   if(_rmBool(@g_show_positions))then begin redraw_menu:=true;end;
+   if(_rmByte(@g_ai_slots      ))then begin redraw_menu:=true;end;
+   if(_rmBool(@g_cgenerators   ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@g_deadobservers ))then begin redraw_menu:=true;end;
 
    Map_premap;
 

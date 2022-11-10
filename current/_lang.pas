@@ -29,6 +29,8 @@ SDLK_RShift         : GetKeyName:='Shift';
    end
 end;
 
+
+
 function _gHK(ucl:byte):shortstring;  // hotkey units&upgrades tab
 begin
    _gHK:='';
@@ -36,8 +38,8 @@ begin
     if(_hotkey1[ucl]>0)then
     begin
        if(_hotkey2[ucl]>0)then
-       _gHK:=     #18+GetKeyName(_hotkey2[ucl])+#25+'+';
-       _gHK:=_gHK+#18+GetKeyName(_hotkey1[ucl])+#25;
+       _gHK:=     tc_lime+GetKeyName(_hotkey2[ucl])+tc_default+'+';
+       _gHK:=_gHK+tc_lime+GetKeyName(_hotkey1[ucl])+tc_default;
     end;
 end;
 
@@ -48,8 +50,8 @@ begin
     if(_hotkeyA[ucl]>0)then
     begin
        if(_hotkeyA2[ucl]>0)then
-       _gHKA:=      #18+GetKeyName(_hotkeyA2[ucl])+#25+'+';
-       _gHKA:=_gHKA+#18+GetKeyName(_hotkeyA [ucl])+#25;
+       _gHKA:=      tc_lime+GetKeyName(_hotkeyA2[ucl])+tc_default+'+';
+       _gHKA:=_gHKA+tc_lime+GetKeyName(_hotkeyA [ucl])+tc_default;
     end;
 end;
 function _gHKR(ucl:byte):shortstring;  // hotkey replays tab
@@ -59,9 +61,35 @@ begin
     if(_hotkeyR[ucl]>0)then
     begin
        if(_hotkeyR2[ucl]>0)then
-       _gHKR:=      #18+GetKeyName(_hotkeyR2[ucl])+#25+'+';
-       _gHKR:=_gHKR+#18+GetKeyName(_hotkeyR [ucl])+#25;
+       _gHKR:=      tc_lime+GetKeyName(_hotkeyR2[ucl])+tc_default+'+';
+       _gHKR:=_gHKR+tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
     end;
+end;
+
+procedure _mkHStrACT(ucl:byte;hint:shortstring);
+var hk:shortstring;
+begin
+   if(ucl<=_mhkeys)then
+   begin
+      hk:=_gHKA(ucl);
+      if(length(hk)>0)
+      then str_hint_a[ucl]:=hint+' ('+hk+')'
+      else str_hint_a[ucl]:=hint;
+   end;
+end;
+
+procedure _mkHStrREQ(ucl:byte;hint:shortstring;noHK:boolean);
+var hk:shortstring;
+begin
+   if(ucl<=_mhkeys)then
+   begin
+      if(noHK)
+      then hk:=''
+      else hk:=_gHKR(ucl);
+      if(length(hk)>0)
+      then str_hint_r[ucl]:=hint+' ('+hk+')'
+      else str_hint_r[ucl]:=hint;
+   end;
 end;
 
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
@@ -162,7 +190,7 @@ function _makeDynUnitHint(pu:PTUnit):shortstring;
 begin
    with pu^  do
     with uid^ do
-     _makeDynUnitHint:=un_txt_name+' ('+pu^.player^.name+')'+#11+_makeAttributeStr(pu,0)+#11+un_txt_descr;
+     _makeDynUnitHint:=un_txt_name+' ('+pu^.player^.name+')'+tc_nl1+_makeAttributeStr(pu,0)+tc_nl1+un_txt_descr;
 end;
 
 procedure _makeHints;
@@ -184,14 +212,14 @@ begin
 
       if(_ucl>=21)then
       begin
-         un_txt_uihint:=un_txt_name+#11+un_txt_descr+#11;
+         un_txt_uihint:=un_txt_name+tc_nl1+un_txt_descr+tc_nl1;
       end
       else
       begin
          HK:=_gHK(_ucl);
-         if(_renergy>0)then ENRG:=#19+i2s(_renergy)+#25;
-         if(_btime  >0)then TIME:=#22+i2s(_btime  )+#25;
-         LMT:=#16+l2s(_limituse)+#25;
+         if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
+         if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
+         LMT:=tc_orange+l2s(_limituse)+tc_default;
 
          PROD:=findprd(uid);
          if(_ruid1>0)then if(_ruid1n<=1)then _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
@@ -204,8 +232,8 @@ begin
          if(length(LMT )>0)then _ADDSTRC(@INFO,LMT );
          if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
 
-         un_txt_uihint:=un_txt_name+' ('+INFO+')'+#11+_makeAttributeStr(nil,uid)+#11+un_txt_descr+#11;
-         if(length(REQ )>0)then un_txt_uihint+=#17+str_req+#25+REQ+#11 else un_txt_uihint+=#11;
+         un_txt_uihint:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid)+tc_nl1+un_txt_descr+tc_nl1;
+         if(length(REQ )>0)then un_txt_uihint+=tc_yellow+str_req+tc_default+REQ+tc_nl1 else un_txt_uihint+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
           then un_txt_uihint+=str_bprod+PROD
@@ -229,14 +257,14 @@ begin
          if(_up_max>1)and(not _up_mfrg)
          then for l:=1 to _up_max do _ADDSTRS(@ENRG,i2s(_upid_energy(uid,l)))
          else ENRG:=i2s(_upid_energy(uid,1));
-         ENRG:=#19+ENRG+#25;
+         ENRG:=tc_aqua+ENRG+tc_default;
       end;
       if(_up_time  >0)then
       begin
          if(_up_max>1)and(not _up_mfrg)
          then for l:=1 to _up_max do _ADDSTRS(@TIME,i2s(_upid_time(uid,l) div fr_fps))
          else TIME :=i2s(_upid_time(uid,1) div fr_fps);
-         TIME:=#22+TIME+#25;
+         TIME:=tc_white+TIME+tc_default;
       end;
 
       if(_up_ruid  >0)then _ADDSTRC(@REQ,_uids [_up_ruid ].un_txt_name);
@@ -245,11 +273,11 @@ begin
       if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
       if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
       if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
-      _ADDSTRC(@INFO,#16+'x'+i2s(_up_max)+#25);
-      if(_up_mfrg)then _ADDSTRC(@INFO,#15+'*'+#25);
+      _ADDSTRC(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default);
+      if(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
 
-      _up_hint:=_up_name+' ('+INFO+')'+#11+_up_descr+#11;
-      if(length(REQ)>0)then _up_hint+=#17+str_req+#25+REQ;
+      _up_hint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr+tc_nl1;
+      if(length(REQ)>0)then _up_hint+=tc_yellow+str_req+tc_default+REQ;
    end;
 end;
 
@@ -288,11 +316,11 @@ begin
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
    str_maction           := 'Right click action';
-   str_maction2[true ]   := #18+'move'+#25;
-   str_maction2[false]   := #18+'move'+#25+'+'+#15+'attack'+#25;
-   str_race[r_random]    := #25+'RANDOM'+#25;
-   str_race[r_hell  ]    := #16+'HELL'+#25;
-   str_race[r_uac   ]    := #18+'UAC'+#25;
+   str_maction2[true ]   := tc_lime  +'move'  +tc_default;
+   str_maction2[false]   := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
+   str_race[r_random]    := tc_white +'RANDOM'+tc_default;
+   str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
+   str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
    str_gsunknown         := 'Unknown status!';
@@ -302,9 +330,9 @@ begin
    str_save              := 'Save';
    str_load              := 'Load';
    str_delete            := 'Delete';
-   str_svld_errors[1]    := 'File not'+#13+'exists!';
-   str_svld_errors[2]    := 'Can`t open'+#13+'file!';
-   str_svld_errors[3]    := 'Wrong file'+#13+'size!';
+   str_svld_errors[1]    := 'File not'+tc_nl3+'exists!';
+   str_svld_errors[2]    := 'Can`t open'+tc_nl3+'file!';
+   str_svld_errors[3]    := 'Wrong file'+tc_nl3+'size!';
    str_svld_errors[4]    := 'Wrong version!';
    str_time              := 'Time: ';
    str_menu              := 'Menu';
@@ -329,8 +357,8 @@ begin
    str_req               := 'Requirements: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
-   str_uprod             := #18+'Produced by: '+#25;
-   str_bprod             := #18+'Constructed by: '+#25;
+   str_uprod             := tc_lime+'Produced by: '   +tc_default;
+   str_bprod             := tc_lime+'Constructed by: '+tc_default;
    str_cant_build        := 'Can`t build here!';
    str_need_energy       := 'Need more energy!';
    str_cant_prod         := 'Can`t production this!';
@@ -344,80 +372,80 @@ begin
    str_unit_attacked     := 'Unit is under attack';
    str_base_attacked     := 'Base is under attack';
 
-   str_attr_unit         := #21+'unit'      +#25;
-   str_attr_building     := #15+'building'  +#25;
-   str_attr_mech         := #20+'mechanical'+#25;
-   str_attr_bio          := #16+'biological'+#25;
-   str_attr_light        := #17+'light'     +#25;
-   str_attr_nlight       := #23+'heavy'     +#25;
-   str_attr_fly          := #22+'flying'    +#25;
-   str_attr_ground       := #18+'ground'    +#25;
-   str_attr_floater      := #19+'floater'   +#25;
-   str_attr_advanced     := #22+'advanced'  +#25;
-   str_attr_invuln       := #18+'invulnerable'+#25;
-   str_attr_stuned       := #17+'stuned'      +#25;
-   str_attr_detector     := #14+'detector'    +#25;
+   str_attr_unit         := tc_gray  +'unit'        +tc_default;
+   str_attr_building     := tc_red   +'building'    +tc_default;
+   str_attr_mech         := tc_blue  +'mechanical'  +tc_default;
+   str_attr_bio          := tc_orange+'biological'  +tc_default;
+   str_attr_light        := tc_yellow+'light'       +tc_default;
+   str_attr_nlight       := tc_green +'heavy'       +tc_default;
+   str_attr_fly          := tc_white +'flying'      +tc_default;
+   str_attr_ground       := tc_lime  +'ground'      +tc_default;
+   str_attr_floater      := tc_aqua  +'floater'     +tc_default;
+   str_attr_advanced     := tc_white +'advanced'    +tc_default;
+   str_attr_invuln       := tc_lime  +'invulnerable'+tc_default;
+   str_attr_stuned       := tc_yellow+'stuned'      +tc_default;
+   str_attr_detector     := tc_purple+'detector'    +tc_default;
 
    str_panelpos          := 'Control panel position';
-   str_panelposp[0]      := #18+'left' +#25;
-   str_panelposp[1]      := #16+'right'+#25;
-   str_panelposp[2]      := #17+'up'   +#25;
-   str_panelposp[3]      := #19+'down' +#25;
+   str_panelposp[0]      := tc_lime  +'left' +tc_default;
+   str_panelposp[1]      := tc_orange+'right'+tc_default;
+   str_panelposp[2]      := tc_yellow+'up'   +tc_default;
+   str_panelposp[3]      := tc_aqua  +'down' +tc_default;
 
    str_uhbar             := 'Health bars';
-   str_uhbars[0]         := #18+'selected'+#25+'+'+#15+'damaged'+#25;
-   str_uhbars[1]         := #19+'always'+#25;
-   str_uhbars[2]         := #16+'only '+#18+'selected'+#25;
+   str_uhbars[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
+   str_uhbars[1]         := tc_aqua  +'always'  +tc_default;
+   str_uhbars[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
 
    str_pcolor            := 'Players colors';
-   str_pcolors[0]        := #22+'default'+#25;
-   str_pcolors[1]        := #18+'own '+#17+'ally '+#15+'enemy'+#25;
-   str_pcolors[2]        := #22+'own '+#17+'ally '+#15+'enemy'+#25;
-   str_pcolors[3]        := #14+'teams'+#25;
-   str_pcolors[4]        := #22+'own '+#14+'teams'+#25;
+   str_pcolors[0]        := tc_white +'default'+tc_default;
+   str_pcolors[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_pcolors[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_pcolors[3]        := tc_purple+'teams'  +tc_default;
+   str_pcolors[4]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
    str_starta            := 'Builders at game start:';
 
    str_sstarts           := 'Show player starts:';
 
-   str_pnua[0]           := #19+'x1 '+#25+'/'+#15+' x1';
-   str_pnua[1]           := #19+'x2 '+#25+'/'+#15+' x2';
-   str_pnua[2]           := #18+'x3 '+#25+'/'+#16+' x3';
-   str_pnua[3]           := #18+'x4 '+#25+'/'+#16+' x4';
-   str_pnua[4]           := #17+'x5 '+#25+'/'+#17+' x5';
-   str_pnua[5]           := #17+'x6 '+#25+'/'+#17+' x6';
-   str_pnua[6]           := #16+'x7 '+#25+'/'+#18+' x7';
-   str_pnua[7]           := #16+'x8 '+#25+'/'+#18+' x8';
-   str_pnua[8]           := #15+'x9 '+#25+'/'+#19+' x9';
-   str_pnua[9]           := #15+'x10'+#25+'/'+#19+' x10';
+   str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red+' x1';
+   str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red+' x2';
+   str_pnua[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
+   str_pnua[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
+   str_pnua[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
+   str_pnua[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
+   str_pnua[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime+' x7';
+   str_pnua[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime+' x8';
+   str_pnua[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua+' x9';
+   str_pnua[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua+' x10';
 
-   str_npnua[0]          := #15+'x1 ';
-   str_npnua[1]          := #15+'x2 ';
-   str_npnua[2]          := #16+'x3 ';
-   str_npnua[3]          := #16+'x4 ';
-   str_npnua[4]          := #17+'x5 ';
-   str_npnua[5]          := #17+'x6 ';
-   str_npnua[6]          := #18+'x7 ';
-   str_npnua[7]          := #18+'x8 ';
-   str_npnua[8]          := #19+'x9 ';
-   str_npnua[9]          := #19+'x10';
+   str_npnua[0]          := tc_red+'x1 ';
+   str_npnua[1]          := tc_red+'x2 ';
+   str_npnua[2]          := tc_orange+'x3 ';
+   str_npnua[3]          := tc_orange+'x4 ';
+   str_npnua[4]          := tc_yellow+'x5 ';
+   str_npnua[5]          := tc_yellow+'x6 ';
+   str_npnua[6]          := tc_lime+'x7 ';
+   str_npnua[7]          := tc_lime+'x8 ';
+   str_npnua[8]          := tc_aqua+'x9 ';
+   str_npnua[9]          := tc_aqua+'x10';
 
-   str_cmpd[0]           := #20+'I`m too young to die'+#25;
-   str_cmpd[1]           := #19+'Hey, not too rough'  +#25;
-   str_cmpd[2]           := #18+'Hurt me plenty'      +#25;
-   str_cmpd[3]           := #17+'Ultra-Violence'      +#25;
-   str_cmpd[4]           := #16+'Unholy massacre'     +#25;
-   str_cmpd[5]           := #15+'Nightmare'           +#25;
-   str_cmpd[6]           := #14+'HELL'                +#25;
+   str_cmpd[0]           := tc_blue  +'I`m too young to die'+tc_default;
+   str_cmpd[1]           := tc_aqua  +'Hey, not too rough'  +tc_default;
+   str_cmpd[2]           := tc_lime  +'Hurt me plenty'      +tc_default;
+   str_cmpd[3]           := tc_yellow+'Ultra-Violence'      +tc_default;
+   str_cmpd[4]           := tc_orange+'Unholy massacre'     +tc_default;
+   str_cmpd[5]           := tc_red   +'Nightmare'           +tc_default;
+   str_cmpd[6]           := tc_purple+'HELL'                +tc_default;
 
    str_gmodet            := 'Game mode:';
-   str_gmode[gm_scirmish]:= #18+'Skirmish'        +#25;
-   str_gmode[gm_3x3     ]:= #16+'3x3'             +#25;
-   str_gmode[gm_2x2x2   ]:= #17+'2x2x2'           +#25;
-   str_gmode[gm_capture ]:= #19+'Capturing points'+#25;
-   str_gmode[gm_invasion]:= #20+'Invasion'        +#25;
-   str_gmode[gm_KotH    ]:= #14+'King of the Hill'+#25;
-   str_gmode[gm_royale  ]:= #15+'Royal Battle'    +#25;
+   str_gmode[gm_scirmish]:= tc_lime  +'Skirmish'        +tc_default;
+   str_gmode[gm_3x3     ]:= tc_orange+'3x3'             +tc_default;
+   str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'           +tc_default;
+   str_gmode[gm_capture ]:= tc_aqua  +'Capturing points'+tc_default;
+   str_gmode[gm_invasion]:= tc_blue  +'Invasion'        +tc_default;
+   str_gmode[gm_KotH    ]:= tc_purple+'King of the Hill'+tc_default;
+   str_gmode[gm_royale  ]:= tc_red   +'Royal Battle'    +tc_default;
 
    str_cgenerators       := 'Neutral generators lifetime:';
    str_cgeneratorsM[0]   := 'none';
@@ -450,8 +478,8 @@ begin
    str_hint_army         := 'Army: ';
    str_hint_energy       := 'Energy: ';
 
-   str_hint_m[0]         := 'Menu (' +#18+'Esc'+#25+')';
-   str_hint_m[2]         := 'Pause ('+#18+'Pause/Break'+#25+')';
+   str_hint_m[0]         := 'Menu (' +tc_lime+'Esc'+tc_default+')';
+   str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
 
    _mkHStrUid(UID_HKeep         ,'Hell Keep'          ,'Builder. Generates energy.'   );
@@ -582,37 +610,37 @@ begin
    _mkHStrUpid(upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
    _mkHStrUpid(upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'      ); }
 
-   str_hint_a[0 ]:='Action';
-   str_hint_a[1 ]:='Action at point';
-   str_hint_a[2 ]:=str_maction;
+   _mkHStrACT(0 ,'Action ');
+   _mkHStrACT(1 ,'Action at point ');
+   _mkHStrACT(2 ,str_maction);
    t:='attack enemies';
-   str_hint_a[3 ]:='Move, '  +t;
-   str_hint_a[4 ]:='Stop, '  +t;
-   str_hint_a[5 ]:='Patrol, '+t;
+   _mkHStrACT(3 ,'Move, '  +t);
+   _mkHStrACT(4 ,'Stop, '  +t);
+   _mkHStrACT(5 ,'Patrol, '+t);
    t:='ignore enemies';
-   str_hint_a[6 ]:='Move, '  +t;
-   str_hint_a[7 ]:='Stop, '  +t;
-   str_hint_a[8 ]:='Patrol, '+t;
-   str_hint_a[9 ]:='Cancel production';
-   str_hint_a[10]:='Select all units' ;
-   str_hint_a[11]:='Destroy'          ;
+   _mkHStrACT(6 ,'Move, '  +t);
+   _mkHStrACT(7 ,'Stop, '  +t);
+   _mkHStrACT(8 ,'Patrol, '+t);
+   _mkHStrACT(9 ,'Cancel production');
+   _mkHStrACT(10,'Select all units' );
+   _mkHStrACT(11,'Destroy'          );
 
 
-   str_hint_r[0 ]:='Faster game speed';
-   str_hint_r[1 ]:='Left click: skip 2 seconds ('                     +#18+'W'+#25+')'+#11+
-                   'Right click: skip 10 seconds ('+#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
-                   'Skip 1 minute ('               +#18+'Alt' +#25+'+'+#18+'W'+#25+')';
-   str_hint_r[2 ]:='Pause';
-   str_hint_r[3 ]:='Player POV'           ;
-   str_hint_r[4 ]:='List of game messages';
-   str_hint_r[5 ]:='Fog of war'        ;
-   str_hint_r[8 ]:='All players'       ;
-   str_hint_r[9 ]:='Red player [#1]'   ;
-   str_hint_r[10]:='Orange player [#2]';
-   str_hint_r[11]:='Yellow player [#3]';
-   str_hint_r[12]:='Green player [#4]' ;
-   str_hint_r[13]:='Aqua player [#5]'  ;
-   str_hint_r[14]:='Blue player [#6]'  ;
+   _mkHStrREQ(0 ,'Faster game speed'    ,false);
+   _mkHStrREQ(1 ,'Left click: skip 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
+                 'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
+                 'Skip 1 minute ('               +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
+   _mkHStrREQ(2 ,'Pause'                ,false);
+   _mkHStrREQ(3 ,'Player POV'           ,false);
+   _mkHStrREQ(4 ,'List of game messages',false);
+   _mkHStrREQ(5 ,'Fog of war'           ,false);
+   _mkHStrREQ(8 ,'All players',false);
+   _mkHStrREQ(9 ,'Player #1'  ,false);
+   _mkHStrREQ(10,'Player #2'  ,false);
+   _mkHStrREQ(11,'Player #3'  ,false);
+   _mkHStrREQ(12,'Player #4'  ,false);
+   _mkHStrREQ(13,'Player #5'  ,false);
+   _mkHStrREQ(14,'Player #6'  ,false);
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -638,23 +666,23 @@ begin
    str_camp_t[20]        := '21. ';
    str_camp_t[21]        := '22. ';
 
-   str_camp_o[0]         := '-Destroy all human bases and armies'+#13+'-Protect the Portal';
+   str_camp_o[0]         := '-Destroy all human bases and armies'+tc_nl3+'-Protect the Portal';
    str_camp_o[1]         := '-Destroy Military Base';
-   str_camp_o[2]         := '-Destroy all human bases and armies'+#13+'-Protect the Portal';
+   str_camp_o[2]         := '-Destroy all human bases and armies'+tc_nl3+'-Protect the Portal';
    str_camp_o[3]         := '-Protect the altars for 20 minutes';
    str_camp_o[4]         := '-Destroy all human bases and armies';
    str_camp_o[5]         := '-Destroy all human bases and armies';
    str_camp_o[6]         := '-Destroy all human bases and armies';
-   str_camp_o[7]         := '-Destroy Cosmodrome'+#13+'-No one human`s transport should escape';
+   str_camp_o[7]         := '-Destroy Cosmodrome'+tc_nl3+'-No one human`s transport should escape';
 
-   str_camp_m[0]         := #18+'Date:'+#25+#12+'15.11.2145'+#12+#18+'Location:'+#25+#12+'PHOBOS'+#12+#18+'Area:'+#25+#12+'Anomaly Zone';
-   str_camp_m[1]         := #18+'Date:'+#25+#12+'16.11.2145'+#12+#18+'Location:'+#25+#12+'PHOBOS'+#12+#18+'Area:'+#25+#12+'Hall crater';
-   str_camp_m[2]         := #18+'Date:'+#25+#12+'15.11.2145'+#12+#18+'Location:'+#25+#12+'DEIMOS'+#12+#18+'Area:'+#25+#12+'Anomaly Zone';
-   str_camp_m[3]         := #18+'Date:'+#25+#12+'16.11.2145'+#12+#18+'Location:'+#25+#12+'DEIMOS'+#12+#18+'Area:'+#25+#12+'Swift crater';
-   str_camp_m[4]         := #18+'Date:'+#25+#12+'18.11.2145'+#12+#18+'Location:'+#25+#12+'MARS'  +#12+#18+'Area:'+#25+#12+'Hellas Area';
-   str_camp_m[5]         := #18+'Date:'+#25+#12+'19.11.2145'+#12+#18+'Location:'+#25+#12+'MARS'  +#12+#18+'Area:'+#25+#12+'Hellas Area';
-   str_camp_m[6]         := #18+'Date:'+#25+#12+'18.11.2145'+#12+#18+'Location:'+#25+#12+'EARTH' +#12+#18+'Area:'+#25+#12+'Unknown';
-   str_camp_m[7]         := #18+'Date:'+#25+#12+'19.11.2145'+#12+#18+'Location:'+#25+#12+'EARTH' +#12+#18+'Area:'+#25+#12+'Unknown';  }
+   str_camp_m[0]         := tc_lime+'Date:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'PHOBOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Anomaly Zone';
+   str_camp_m[1]         := tc_lime+'Date:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'PHOBOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hall crater';
+   str_camp_m[2]         := tc_lime+'Date:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'DEIMOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Anomaly Zone';
+   str_camp_m[3]         := tc_lime+'Date:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'DEIMOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Swift crater';
+   str_camp_m[4]         := tc_lime+'Date:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'MARS'  +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hellas Area';
+   str_camp_m[5]         := tc_lime+'Date:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'MARS'  +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hellas Area';
+   str_camp_m[6]         := tc_lime+'Date:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'EARTH' +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Unknown';
+   str_camp_m[7]         := tc_lime+'Date:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'EARTH' +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Unknown';  }
 
    {
    str_cmp_mn[1 ] := 'Hell #1: Invasion on Phobos';
@@ -667,7 +695,7 @@ begin
    str_cmp_mn[8 ] := 'Hell #8: Hell on Mars';
    str_cmp_mn[9 ] := 'Hell #9: Hell On Earth';
    str_cmp_mn[10] := 'Hell #10: Industrial Zone';
-   str_cmp_mn[11] := 'Hell #11: Cosmodrome';
+   str_cmp_mn[11] := 'Hell tc_nl1: Cosmodrome';
    str_cmp_mn[12] := 'UAC #1: Command Center';
    str_cmp_mn[13] := 'UAC #2: Super Generators';
    str_cmp_mn[14] := 'UAC #3: Phobos Anomaly';
@@ -678,53 +706,53 @@ begin
    str_cmp_mn[19] := 'UAC #8: Slough of Despair';
    str_cmp_mn[20] := 'UAC #9: Mt. Erebus';
    str_cmp_mn[21] := 'UAC #10: Dead Zone';
-   str_cmp_mn[22] := 'UAC #11: Battle For Mars';
+   str_cmp_mn[22] := 'UAC tc_nl1: Battle For Mars';
 
-   str_cmp_ob[1 ] := '-Destroy all human bases and armies'+#13+'-Protect portal';
+   str_cmp_ob[1 ] := '-Destroy all human bases and armies'+tc_nl3+'-Protect portal';
    str_cmp_ob[2 ] := '-Destroy Toxin Refinery';
    str_cmp_ob[3 ] := '-Destroy Military Base';
-   str_cmp_ob[4 ] := '-Destroy all human bases and armies'+#13+'-Cyberdemon must survive'+#13+'-Protect portal';
-   str_cmp_ob[5 ] := '-Destroy Nuclear Plant'+#13+'-Cyberdemon must survive';
-   str_cmp_ob[6 ] := '-Destroy Science Center'+#13+'-Cyberdemon must survive';
+   str_cmp_ob[4 ] := '-Destroy all human bases and armies'+tc_nl3+'-Cyberdemon must survive'+tc_nl3+'-Protect portal';
+   str_cmp_ob[5 ] := '-Destroy Nuclear Plant'+tc_nl3+'-Cyberdemon must survive';
+   str_cmp_ob[6 ] := '-Destroy Science Center'+tc_nl3+'-Cyberdemon must survive';
    str_cmp_ob[7 ] := '-Destroy all human bases and armies';
    str_cmp_ob[8 ] := '-Kill all humans!';
-   str_cmp_ob[9 ] := '-Protect Hell Fortess'+#13+'-Destroy all human towns and armies';
-   str_cmp_ob[10] := '-Destroy all industrial buildings'+#13+'-Destroy all command centers';
+   str_cmp_ob[9 ] := '-Protect Hell Fortess'+tc_nl3+'-Destroy all human towns and armies';
+   str_cmp_ob[10] := '-Destroy all industrial buildings'+tc_nl3+'-Destroy all command centers';
    str_cmp_ob[11] := '-Destroy all military bases';
-   str_cmp_ob[12] := '-Find, protect and reapir'+#13+'Command Center'+#13+'-At least one engineer must survive';
+   str_cmp_ob[12] := '-Find, protect and reapir'+tc_nl3+'Command Center'+tc_nl3+'-At least one engineer must survive';
    str_cmp_ob[13] := '-Find and repair 5 Super Generators';
-   str_cmp_ob[14] := '-Destroy all bases and armies of hell'+#13+'around portal until the arrival of'+#13+'enemy reinforcements(for 20 minutes)';
-   str_cmp_ob[15] := '-Destroy all bases and armies of hell'+#13+'-Protect portal';
-   str_cmp_ob[16] := '-Repair and protect Science Center'+#13+'-Destroy all bases and armies of hell';
+   str_cmp_ob[14] := '-Destroy all bases and armies of hell'+tc_nl3+'around portal until the arrival of'+tc_nl3+'enemy reinforcements(for 20 minutes)';
+   str_cmp_ob[15] := '-Destroy all bases and armies of hell'+tc_nl3+'-Protect portal';
+   str_cmp_ob[16] := '-Repair and protect Science Center'+tc_nl3+'-Destroy all bases and armies of hell';
    str_cmp_ob[17] := '-Destroy fortess of hell';
-   str_cmp_ob[18] := '-Destroy all altars of hell'+#13+'-Protect portal';
+   str_cmp_ob[18] := '-Destroy all altars of hell'+tc_nl3+'-Protect portal';
    str_cmp_ob[19] := '-Reach the opposite side of the area';
    str_cmp_ob[20] := '-Find and kill the Spiderdemon';
    str_cmp_ob[21] := '-Cleanse the Quarry';
    str_cmp_ob[22] := '-Destroy all bases and armies of hell';
 
-   str_cmp_map[1 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[2 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Hall crater';
-   str_cmp_map[3 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Drunlo crater';
-   str_cmp_map[4 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[5 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Swift crater';
-   str_cmp_map[6 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[7 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[8 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[9 ] := 'Date:'+#12+'25.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[10] := 'Date:'+#12+'26.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[11] := 'Date:'+#12+'27.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[12] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Todd crater';
-   str_cmp_map[13] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Roche crater';
-   str_cmp_map[14] := 'Date:'+#12+'17.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[15] := 'Date:'+#12+'17.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[16] := 'Date:'+#12+'18.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[17] := 'Date:'+#12+'18.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[18] := 'Date:'+#12+'20.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[19] := 'Date:'+#12+'21.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[20] := 'Date:'+#12+'22.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[21] := 'Date:'+#12+'21.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[22] := 'Date:'+#12+'22.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
+   str_cmp_map[1 ] := 'Date:'+tc_nl2+'15.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Anomaly Zone';
+   str_cmp_map[2 ] := 'Date:'+tc_nl2+'15.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Hall crater';
+   str_cmp_map[3 ] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Drunlo crater';
+   str_cmp_map[4 ] := 'Date:'+tc_nl2+'15.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Anomaly Zone';
+   str_cmp_map[5 ] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Swift crater';
+   str_cmp_map[6 ] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Voltaire Area';
+   str_cmp_map[7 ] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
+   str_cmp_map[8 ] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
+   str_cmp_map[9 ] := 'Date:'+tc_nl2+'25.11.2145'+tc_nl2+'Location:'+tc_nl2+'EARTH' +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[10] := 'Date:'+tc_nl2+'26.11.2145'+tc_nl2+'Location:'+tc_nl2+'EARTH' +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[11] := 'Date:'+tc_nl2+'27.11.2145'+tc_nl2+'Location:'+tc_nl2+'EARTH' +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[12] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Todd crater';
+   str_cmp_map[13] := 'Date:'+tc_nl2+'16.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Roche crater';
+   str_cmp_map[14] := 'Date:'+tc_nl2+'17.11.2145'+tc_nl2+'Location:'+tc_nl2+'PHOBOS'+tc_nl2+'Area:'+tc_nl2+'Anomaly Zone';
+   str_cmp_map[15] := 'Date:'+tc_nl2+'17.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Anomaly Zone';
+   str_cmp_map[16] := 'Date:'+tc_nl2+'18.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Voltaire Area';
+   str_cmp_map[17] := 'Date:'+tc_nl2+'18.11.2145'+tc_nl2+'Location:'+tc_nl2+'DEIMOS'+tc_nl2+'Area:'+tc_nl2+'Voltaire Area';
+   str_cmp_map[18] := 'Date:'+tc_nl2+'20.11.2145'+tc_nl2+'Location:'+tc_nl2+'HELL'  +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[19] := 'Date:'+tc_nl2+'21.11.2145'+tc_nl2+'Location:'+tc_nl2+'HELL'  +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[20] := 'Date:'+tc_nl2+'22.11.2145'+tc_nl2+'Location:'+tc_nl2+'HELL'  +tc_nl2+'Area:'+tc_nl2+'Unknown';
+   str_cmp_map[21] := 'Date:'+tc_nl2+'21.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
+   str_cmp_map[22] := 'Date:'+tc_nl2+'22.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
 
    }
 
@@ -764,9 +792,9 @@ begin
   str_fullscreen        := 'В окне:';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
-  str_maction2[true ]   := #18+'движение'+#25;
-  str_maction2[false]   := #18+'движ.'+#25+'+'+#15+'атака'+#25;
-  str_race[r_random]    := #22+'случ.'+#25;
+  str_maction2[true ]   := tc_lime+'движение'+tc_default;
+  str_maction2[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
+  str_race[r_random]    := tc_white+'случ.'  +tc_default;
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
   str_lose              := 'ПОРАЖЕНИЕ!';
@@ -776,10 +804,10 @@ begin
   str_save              := 'Сохранить';
   str_load              := 'Загрузить';
   str_delete            := 'Удалить';
-  str_svld_errors[1]    := 'Файл не'+#13+'существует!';
-  str_svld_errors[2]    := 'Невозможно'+#13+'открыть файл!';
-  str_svld_errors[3]    := 'Неправильный'+#13+'размер файла!';
-  str_svld_errors[4]    := 'Неправильная'+#13+'версия файла!';
+  str_svld_errors[1]    := 'Файл не'+tc_nl3+'существует!';
+  str_svld_errors[2]    := 'Невозможно'+tc_nl3+'открыть файл!';
+  str_svld_errors[3]    := 'Неправильный'+tc_nl3+'размер файла!';
+  str_svld_errors[4]    := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
   str_menu              := 'Меню';
   str_player_def        := ' уничтожен!';
@@ -817,50 +845,50 @@ begin
   str_building_complete := 'Постройка завершена';
   str_unit_complete     := 'Юнит готов';
 
-  str_attr_unit         := #21+'юнит'          +#25;
-  str_attr_building     := #15+'здание'        +#25;
-  str_attr_mech         := #20+'механический'  +#25;
-  str_attr_bio          := #16+'биологический' +#25;
-  str_attr_light        := #17+'легкий'        +#25;
-  str_attr_nlight       := #23+'тяжелый'       +#25;
-  str_attr_fly          := #22+'летающий'      +#25;
-  str_attr_ground       := #18+'наземный'      +#25;
-  str_attr_floater      := #19+'парящий'       +#25;
-  str_attr_advanced     := #22+'улучшенный'    +#25;
-  str_attr_invuln       := #18+'неуязвимый'    +#25;
-  str_attr_stuned       := #17+'парализованный'+#25;
-  str_attr_detector     := #14+'детектор'      +#25;
+  str_attr_unit         := tc_gray  +'юнит'          +tc_default;
+  str_attr_building     := tc_red   +'здание'        +tc_default;
+  str_attr_mech         := tc_blue  +'механический'  +tc_default;
+  str_attr_bio          := tc_orange+'биологический' +tc_default;
+  str_attr_light        := tc_yellow+'легкий'        +tc_default;
+  str_attr_nlight       := tc_green +'тяжелый'       +tc_default;
+  str_attr_fly          := tc_white +'летающий'      +tc_default;
+  str_attr_ground       := tc_lime  +'наземный'      +tc_default;
+  str_attr_floater      := tc_aqua  +'парящий'       +tc_default;
+  str_attr_advanced     := tc_white +'улучшенный'    +tc_default;
+  str_attr_invuln       := tc_lime  +'неуязвимый'    +tc_default;
+  str_attr_stuned       := tc_yellow+'парализованный'+tc_default;
+  str_attr_detector     := tc_purple+'детектор'      +tc_default;
 
   str_panelpos          := 'Положение игровой панели';
-  str_panelposp[0]      := #18+'слева' +#25;
-  str_panelposp[1]      := #16+'справа'+#25;
-  str_panelposp[2]      := #17+'вверху'+#25;
-  str_panelposp[3]      := #19+'внизу' +#25;
+  str_panelposp[0]      := tc_lime  +'слева' +tc_default;
+  str_panelposp[1]      := tc_orange+'справа'+tc_default;
+  str_panelposp[2]      := tc_yellow+'вверху'+tc_default;
+  str_panelposp[3]      := tc_aqua  +'внизу' +tc_default;
 
   str_uhbar             := 'Полоски здоровья';
-  str_uhbars[0]         := #18+'выбранные'+#25+'+'+#15+'поврежд.'+#25;
-  str_uhbars[1]         := #19+'всегда'+#25;
-  str_uhbars[2]         := #16+'только '+#18+'выбранные'+#25;
+  str_uhbars[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежд.'+tc_default;
+  str_uhbars[1]         := tc_aqua  +'всегда'   +tc_default;
+  str_uhbars[2]         := tc_orange+'только '  +tc_lime+'выбранные'+tc_default;
 
   str_pcolor            := 'Цвета игроков';
-  str_pcolors[0]        := #22+'по умолчанию'+#25;
-  str_pcolors[1]        := #18+'свои '+#17+'союзники '+#15+'враги'+#25;
-  str_pcolors[2]        := #22+'свои '+#17+'союзники '+#15+'враги'+#25;
-  str_pcolors[3]        := #14+'команды'+#25;
-  str_pcolors[4]        := #22+'свои '+#14+'команды'+#25;
+  str_pcolors[0]        := tc_white +'по умолчанию'+tc_default;
+  str_pcolors[1]        := tc_lime  +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
+  str_pcolors[2]        := tc_white +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
+  str_pcolors[3]        := tc_purple+'команды'+tc_default;
+  str_pcolors[4]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
 
   str_starta            := 'Количество строителей на старте:';
 
   str_sstarts           := 'Показывать старты:';
 
   str_gmodet            := 'Режим игры:';
-  str_gmode[gm_scirmish]:= #18+'Схватка'           +#25;
-  str_gmode[gm_3x3     ]:= #16+'3x3'               +#25;
-  str_gmode[gm_2x2x2   ]:= #17+'2x2x2'             +#25;
-  str_gmode[gm_capture ]:= #19+'Захват точек'      +#25;
-  str_gmode[gm_invasion]:= #20+'Вторжение'         +#25;
-  str_gmode[gm_KotH    ]:= #14+'Царь горы'         +#25;
-  str_gmode[gm_royale  ]:= #15+'Королевская битва' +#25;
+  str_gmode[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
+  str_gmode[gm_3x3     ]:= tc_orange+'3x3'               +tc_default;
+  str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
+  str_gmode[gm_capture ]:= tc_aqua  +'Захват точек'      +tc_default;
+  str_gmode[gm_invasion]:= tc_blue  +'Вторжение'         +tc_default;
+  str_gmode[gm_KotH    ]:= tc_purple+'Царь горы'         +tc_default;
+  str_gmode[gm_royale  ]:= tc_red   +'Королевская битва' +tc_default;
 
   str_team              := 'Клан:';
   str_srace             := 'Раса:';
@@ -882,8 +910,8 @@ begin
   str_hint_t[2]         := 'Исследования';
   str_hint_t[3]         := 'Запись';
 
-  str_hint_m[0]         := 'Меню (' +#18+'Esc'+#25+')';
-  str_hint_m[2]         := 'Пауза ('+#18+'Pause/Break'+#25+')';
+  str_hint_m[0]         := 'Меню (' +tc_lime+'Esc'        +tc_default+')';
+  str_hint_m[2]         := 'Пауза ('+tc_lime+'Pause/Break'+tc_default+')';
 
   str_hint_army         := 'Армия: ';
   str_hint_energy       := 'Энергия: ';
@@ -982,37 +1010,37 @@ begin
   _mkHStrUpid(upgr_bldenrg ,'Встроенный генератор'       ,'Дополнительна энергия для Командного Центра.'             );
   _mkHStrUpid(upgr_9bld    ,'Улучшение АЭС'              ,'Уменьшение времени парезарядки АЭС.'                      );  }
 
-  str_hint_a[0 ]:='Действие';
-  str_hint_a[1 ]:='Действие в точке';
-  str_hint_a[2 ]:=str_maction;
+  _mkHStrACT(0 ,'Действие');
+  _mkHStrACT(1 ,'Действие в точке');
+  _mkHStrACT(2 ,str_maction);
   t:='атаковать врагов';
-  str_hint_a[3 ]:='Двигаться, '    +t;
-  str_hint_a[4 ]:='Стоять, '       +t;
-  str_hint_a[5 ]:='Патрулировать, '+t;
+  _mkHStrACT(3 ,'Двигаться, '    +t);
+  _mkHStrACT(4 ,'Стоять, '       +t);
+  _mkHStrACT(5 ,'Патрулировать, '+t);
   t:='игнорировать врагов';
-  str_hint_a[6 ]:='Двигаться, '    +t;
-  str_hint_a[7 ]:='Стоять, '       +t;
-  str_hint_a[8 ]:='Патрулировать, '+t;
-  str_hint_a[9 ]:='Отмена производства';
-  str_hint_a[10]:='Выбрать всех боевых незанятых юнитов';
-  str_hint_a[11]:='Уничтожить';
+  _mkHStrACT(6 ,'Двигаться, '    +t);
+  _mkHStrACT(7 ,'Стоять, '       +t);
+  _mkHStrACT(8 ,'Патрулировать, '+t);
+  _mkHStrACT(9 ,'Отмена производства');
+  _mkHStrACT(10,'Выбрать всех боевых незанятых юнитов');
+  _mkHStrACT(11,'Уничтожить');
 
 
-  str_hint_r[0 ]:='Включить/выключить ускоренный просмотр ('+#18+'Q'+#25+')';
-  str_hint_r[1 ]:='Левый клик: пропустить 2 секунды ('                         +#18+'W'+#25+')'+#11+
-                  'Правый клик: пропустить 10 секунд ('     +#18+'Ctrl'+#25+'+'+#18+'W'+#25+')'+#11+
-                  'Пропустить 1 минуту ('                   +#18+'Alt' +#25+'+'+#18+'W'+#25+')';
-  str_hint_r[2 ]:='Пауза ('                   +#18+'E'+#25+')';
-  str_hint_r[3 ]:='Камера игрока ('           +#18+'A'+#25+')';
-  str_hint_r[4 ]:='Список игровых сообщений ('+#18+'S'+#25+')';
-  str_hint_r[5 ]:='Туман войны ('             +#18+'D'+#25+')';
-  str_hint_r[8 ]:='Все игроки ('              +#18+'C'+#25+')';
-  str_hint_r[9 ]:='Красный игрок [#1] ('      +#18+'R'+#25+')';
-  str_hint_r[10]:='Оранжевый игрок [#2] ('    +#18+'T'+#25+')';
-  str_hint_r[11]:='Желтый игрок [#3] ('       +#18+'Y'+#25+')';
-  str_hint_r[12]:='Зеленый игрок [#4] ('      +#18+'F'+#25+')';
-  str_hint_r[13]:='Бирюзовый игрок [#5] ('    +#18+'G'+#25+')';
-  str_hint_r[14]:='Синий игрок [#6] ('        +#18+'H'+#25+')';
+  _mkHStrREQ(0 ,'Включить/выключить ускоренный просмотр',false);
+  _mkHStrREQ(1 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'W'+tc_default+')'+tc_nl1+
+                'Правый клик: пропустить 10 секунд ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
+                'Пропустить 1 минуту ('              +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true  );
+  _mkHStrREQ(2 ,'Пауза'                   ,false);
+  _mkHStrREQ(3 ,'Камера игрока'           ,false);
+  _mkHStrREQ(4 ,'Список игровых сообщений',false);
+  _mkHStrREQ(5 ,'Туман войны'             ,false);
+  _mkHStrREQ(8 ,'Все игроки'              ,false);
+  _mkHStrREQ(9 ,'Игрок #1',false);
+  _mkHStrREQ(10,'Игрок #2',false);
+  _mkHStrREQ(11,'Игрок #3',false);
+  _mkHStrREQ(12,'Игрок #4',false);
+  _mkHStrREQ(13,'Игрок #5',false);
+  _mkHStrREQ(14,'Игрок #6',false);
 
 
   {str_camp_t[0]         := 'Hell #1: Вторжение на Фобос';
@@ -1024,23 +1052,23 @@ begin
   str_camp_t[6]         := 'Hell #5: Ад на Земле';
   str_camp_t[7]         := 'Hell #6: Космодром';
 
-  str_camp_o[0]         := '-Уничтожь все людские базы и армии'+#13+'-Защити портал';
+  str_camp_o[0]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
   str_camp_o[1]         := '-Уничтожь военную базу';
-  str_camp_o[2]         := '-Уничтожь все людские базы и армии'+#13+'-Защити портал';
+  str_camp_o[2]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
   str_camp_o[3]         := '-Защити алтари в течении 20 минут';
   str_camp_o[4]         := '-Уничтожь все людские базы и армии';
   str_camp_o[5]         := '-Уничтожь все людские базы и армии';
   str_camp_o[6]         := '-Уничтожь все людские базы и армии';
-  str_camp_o[7]         := '-Уничтожь космодром'+#13+'-Ни один людской транспорт не должен'+#13+'уйти';
+  str_camp_o[7]         := '-Уничтожь космодром'+tc_nl3+'-Ни один людской транспорт не должен'+tc_nl3+'уйти';
 
-  str_camp_m[0]         := #18+'Дата:'+#25+#12+'15.11.2145'+#12+#18+'Место:'+#25+#12+'ФОБОС' +#12+#18+'Район:'+#25+#12+'Аномалия';
-  str_camp_m[1]         := #18+'Дата:'+#25+#12+'16.11.2145'+#12+#18+'Место:'+#25+#12+'ФОБОС' +#12+#18+'Район:'+#25+#12+'Кратер Халл';
-  str_camp_m[2]         := #18+'Дата:'+#25+#12+'15.11.2145'+#12+#18+'Место:'+#25+#12+'ДЕЙМОС'+#12+#18+'Район:'+#25+#12+'Аномалия';
-  str_camp_m[3]         := #18+'Дата:'+#25+#12+'16.11.2145'+#12+#18+'Место:'+#25+#12+'ДЕЙМОС'+#12+#18+'Район:'+#25+#12+'Кратер Свифт';
-  str_camp_m[4]         := #18+'Дата:'+#25+#12+'18.11.2145'+#12+#18+'Место:'+#25+#12+'МАРС'  +#12+#18+'Район:'+#25+#12+'Равнина Хеллас';
-  str_camp_m[5]         := #18+'Дата:'+#25+#12+'19.11.2145'+#12+#18+'Место:'+#25+#12+'МАРС'  +#12+#18+'Район:'+#25+#12+'Равнина Хеллас';
-  str_camp_m[6]         := #18+'Дата:'+#25+#12+'18.11.2145'+#12+#18+'Место:'+#25+#12+'ЗЕМЛЯ' +#12+#18+'Район:'+#25+#12+'Неизвестно';
-  str_camp_m[7]         := #18+'Дата:'+#25+#12+'19.11.2145'+#12+#18+'Место:'+#25+#12+'ЗЕМЛЯ' +#12+#18+'Район:'+#25+#12+'Неизвестно';  }
+  str_camp_m[0]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
+  str_camp_m[1]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Халл';
+  str_camp_m[2]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
+  str_camp_m[3]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Свифт';
+  str_camp_m[4]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
+  str_camp_m[5]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
+  str_camp_m[6]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';
+  str_camp_m[7]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';  }
 
   _makeHints;
 end;

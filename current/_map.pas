@@ -269,7 +269,6 @@ begin
       map_psx[i]:=-5000;
       map_psy[i]:=-5000;
    end;
-   FillChar(g_cpoints,SizeOf(g_cpoints),0);
 
    case g_mode of
 gm_3x3 :
@@ -326,7 +325,6 @@ gm_invasion:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
-
          map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_rr);
       end;
 gm_KotH:
@@ -334,30 +332,32 @@ gm_KotH:
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
          map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-         with g_cpoints[1] do
-         begin
-            cpx:=map_hmw;
-            cpy:=map_hmw;
-            cpCapturer   :=base_r;
-            cpCaptureTime:=fr_fps*60;
-
-            {$IFDEF _FULLGAME}
-            cpmx:=round(cpx*map_mmcx);
-            cpmy:=round(cpy*map_mmcx);
-            cpmr:=round(cpCapturer*map_mmcx)+1;
-            {$ENDIF}
-         end;
-         //map_psx[0]:=-5000;
-         //map_psy[0]:=-5000;
       end;
-gm_royale:
-      map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-gm_capture:
-      begin
-         map_Starts_Default;
-         map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
-      end;
+gm_royale : map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+gm_capture: map_Starts_Default;
    else map_Starts_Default;
+   end;
+end;
+
+procedure map_CPoints;
+begin
+   FillChar(g_cpoints,SizeOf(g_cpoints),0);
+
+   case g_mode of
+gm_KotH   : with g_cpoints[1] do
+            begin
+               cpx:=map_hmw;
+               cpy:=map_hmw;
+               cpCapturer   :=base_r;
+               cpCaptureTime:=fr_fps*60;
+
+               {$IFDEF _FULLGAME}
+               cpmx:=round(cpx*map_mmcx);
+               cpmy:=round(cpy*map_mmcx);
+               cpmr:=round(cpCapturer*map_mmcx)+1;
+               {$ENDIF}
+            end;
+gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
    end;
 
    if(g_cgenerators>0)then
@@ -533,6 +533,7 @@ begin
       end;
    end;
 
+   map_CPoints;
    map_doodads_cells_refresh;
    pf_make_grid;
    map_CPoints_UpdatePFZone;

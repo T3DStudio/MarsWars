@@ -252,6 +252,14 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+function PlayerObserver(player:PTPlayer):boolean;
+begin
+   with player^ do
+   PlayerObserver:=(upgr[upgr_fog_vision]>0)
+                 or(g_deadobservers and(armylimit<=0))
+                 or((pnum>0)and(team=0));
+end;
+
 function PlayersReadyStatus:boolean;
 var p,c,r:byte;
 begin
@@ -295,7 +303,7 @@ begin
       if(state=ps_play)then
       begin
          if(g_started=false)
-         then PlayerGetStatus:=b2pm[ready,2]
+         then PlayerGetStatus:=b2c[ready]
          else PlayerGetStatus:=str_ps_c[ps_play];
          if(ttl>=fr_fps)then PlayerGetStatus:=str_ps_t;
          {$IFDEF _FULLGAME}
@@ -597,9 +605,18 @@ begin
    then ai_name:=str_ps_none
    else
      {$IFDEF _FULLGAME}
-     if(ain<=8)
-     then ai_name:=str_ps_comp+' '+chr(22-ain)+b2s(ain)+#25
-     else ai_name:=str_ps_comp+' '+#14
+     case ain of
+     0  : ai_name:=str_ps_comp+' '+tc_gray  +b2s(ain)+tc_default;
+     1  : ai_name:=str_ps_comp+' '+tc_blue  +b2s(ain)+tc_default;
+     2  : ai_name:=str_ps_comp+' '+tc_aqua  +b2s(ain)+tc_default;
+     3  : ai_name:=str_ps_comp+' '+tc_lime  +b2s(ain)+tc_default;
+     4  : ai_name:=str_ps_comp+' '+tc_green +b2s(ain)+tc_default;
+     5  : ai_name:=str_ps_comp+' '+tc_yellow+b2s(ain)+tc_default;
+     6  : ai_name:=str_ps_comp+' '+tc_orange+b2s(ain)+tc_default;
+     7  : ai_name:=str_ps_comp+' '+tc_red   +b2s(ain)+tc_default;
+     8  : ai_name:=str_ps_comp+' '+tc_purple+b2s(ain)+tc_default;
+     else ai_name:=str_ps_comp+' '+tc_white +b2s(ain)+tc_default;
+     end;
      {$ELSE}
      ai_name:=str_ps_comp+' '+b2s(ain);
      {$ENDIF}
@@ -697,9 +714,9 @@ begin
    with pu^  do
     with uid^ do
      UIUnitDrawRange:=(_attack>0)
-                    or(_ability=uab_radar)
                     or(isbuildarea)
-                    or((_ability=uab_hell_vision)and(rld<=0));
+                    or(_ability=uab_radar)
+                    or(_ability=uab_hell_vision);
 end;
 
 procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);

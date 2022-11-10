@@ -1,11 +1,5 @@
 {$IFDEF _FULLGAME}
 
-{
-1000 / 100 = 10 sec  10*100 = 1000 *3 = 3000
-3000 / 100 = 30 sec  30*100 = 3000 *1 = 3000
-
-}
-
 procedure initMissiles;
 var m:byte;
 begin
@@ -37,7 +31,6 @@ MID_MBullet,
 MID_SShot,
 MID_SSShot   : ms_smodel:=@spr_u_p1;
 MID_BFG      : ms_smodel:=@spr_u_p2;
-MID_StunMine : ;
 MID_ArchFire : ;
 MID_Flyer    : ms_smodel:=@spr_u_p3;
 MID_Tank,
@@ -70,7 +63,6 @@ MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
 MID_Baron    : ms_snd_death[false]:=snd_pexp;
-MID_StunMine : ms_snd_death[false]:=snd_electro;
 MID_ArchFire,
 MID_Blizzard,
 MID_Mine,
@@ -162,9 +154,6 @@ begin
    UID_LostSoul: begin
                     if(tu^.uid^._ukmech    )then _d50(@damage);
                  end;
-   {UID_Demon   : begin
-                    if(tu^.uid^._ukbuilding)then _d50(@damage);
-                 end; }
    end;
 
    _unit_melee_damage:=damage;
@@ -215,18 +204,17 @@ MID_MBullet,
 MID_TBullet,
 MID_Bullet     : begin damage:=40  ; vstep:=5;        splashr :=0  ;         end;
 MID_Chaingun   : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
-MID_Chaingunx2 : begin damage:=120 ; vstep:=5;        splashr :=0  ;         end;
+MID_Chaingunx2 : begin damage:=100 ; vstep:=5;        splashr :=0  ;         end;
 MID_BPlasma    : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_BFG        : begin damage:=600 ; vstep:=d div 12; splashr :=125;         end;
-MID_Flyer      : begin damage:=160 ; vstep:=d div 30; splashr :=0  ;         end;
+MID_BFG        : begin damage:=400 ; vstep:=d div 12; splashr :=100;         end;
+MID_Flyer      : begin damage:=80  ; vstep:=d div 30; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=400 ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=80  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=80  ; vstep:=5;        splashr :=tank_sr;     end;
-MID_StunMine   : begin damage:=1   ; vstep:=1;        splashr :=100;         end;
 MID_Mine       : begin damage:=1000; vstep:=1;        splashr :=100;         end;
 MID_Blizzard   : begin damage:=2000; vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=160 ; vstep:=5;        splashr :=10 ;mtars:=2;end;
+MID_SSShot     : begin damage:=140 ; vstep:=5;        splashr :=10 ;mtars:=2;end;
       else
          vstep:=0;
          exit;
@@ -269,8 +257,8 @@ MID_YPlasma    : homing:=mh_magnetic;
 
       if(_IsUnitRange(tar,@tu))then
       begin
-         x+=_randomr(tu^.uid^._missile_r);
-         y+=_randomr(tu^.uid^._missile_r);
+         x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
+         y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
       end;
 
       break;
@@ -288,8 +276,7 @@ MID_Baron     : if(uid=UID_Knight     )then exit;
 MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
 MID_Revenant  : if(uid=UID_Revenant   )then exit;
-MID_Mine,
-MID_StunMine  : if(uid=UID_UMine      )then exit;
+MID_Mine      : if(uid=UID_UMine      )then exit;
    end;
 
    MissileUIDCheck:=true;
@@ -300,7 +287,7 @@ procedure _missle_damage(m:integer);
 var tu: PTUnit;
 teams : boolean;
 ud,rdamage: integer;
-     p: byte;
+     painX: byte;
 begin
    with _missiles[m] do
     if(_IsUnitRange(tar,@tu))then
@@ -318,7 +305,6 @@ begin
          else
            case mid of
            MID_BFG,
-           MID_StunMine,
            MID_ArchFire: exit;
            end;
 
@@ -326,7 +312,7 @@ begin
         if(splashr<=0)or(mid=MID_Mine)then ud-=10;
         if(ud<0)then ud:=0;
 
-        p:=1;
+        painX:=1;
 
         /////////////////////////////////
 
@@ -334,8 +320,8 @@ begin
         begin
         if (    tu^.uid^._uklight)then  // light all
             case mid of
-            MID_Chaingunx2,
-            MID_Cacodemon   : _d200(@rdamage);
+            MID_Baron,
+            MID_Chaingunx2  : _d200(@rdamage);
             MID_HRocket,
             MID_Blizzard,
             MID_BFG         : _d50 (@rdamage);
@@ -348,7 +334,7 @@ begin
             end;
 
         if (not tu^.uid^._uklight)
-        and(not tu^.uid^._ukmech )then  // not light, bio
+        and(not tu^.uid^._ukmech )then  // heavy, bio
             case mid of
             MID_Imp,
             MID_SShot,
@@ -357,16 +343,15 @@ begin
 
         if (    tu^.uid^._ukmech)then   // mech
             case mid of
-            MID_Baron,
+            MID_Cacodemon,
             MID_BPlasma     : _d200(@rdamage);
             MID_YPlasma     : _d300(@rdamage);
             end;
-
         end
-        else                            // buildings
+        else ///////////////////////////// buildings
             case mid of
-            MID_Chaingun,
-            MID_Chaingunx2  : _d50 (@rdamage);
+            //MID_Chaingun,
+            //MID_Chaingunx2  : _d50 (@rdamage);
             MID_Blizzard    : _d200(@rdamage);
             MID_Granade,
             MID_Mine,
@@ -384,39 +369,37 @@ begin
             case mid of
             MID_Revenant,
             MID_URocketS,
-            MID_URocket     : _d200(@rdamage);
+            MID_URocket,
+            MID_Flyer       : _d200(@rdamage);
             end;
 
         case mid of
             MID_BPlasma,
-            MID_YPlasma     : p:=4;
+            MID_YPlasma,
             MID_Chaingun,
-            MID_Chaingunx2  : p:=5;
-            MID_SSShot      : p:=2;
+            MID_Chaingunx2,
+            MID_SSShot      : painX:=2;
         end;
 
         if(ud<=0)and(ntars=0)then // direct and first target
         begin
            {$IFDEF _FULLGAME}
-           ms_eid_bio_death:=not tu^.uid^._ukmech;
+           ms_eid_bio_death:=(not tu^.uid^._ukmech)or(tu^.uidi in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron]);
            {$ENDIF}
 
            if(ServerSide)then
             if(tu^.buff[ub_invuln]<=0)and(tu^.uid^._ukbuilding=false)then
             begin
-               if((mid=MID_TBullet )and(not tu^.uid^._ukmech ))
+               if((mid=MID_TBullet )and(not tu^.uid^._ukmech))
                or((mid=MID_MBullet )and(    tu^.uid^._ukmech))
-               or (mid=MID_StunMine)then tu^.buff[ub_stun]:=fr_2hfps;
-               {$IFDEF _FULLGAME}
-               if(mid=MID_StunMine)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
-               {$ENDIF}
+               then tu^.buff[ub_stun]:=fr_2hfps;
             end;
 
            mtars-=1;
            ntars+=1;
 
            if(not fake)
-           then _unit_damage(tu,rdamage,p,player);
+           then _unit_damage(tu,rdamage,painX,player);
         end
         else
           if(splashr>0)and(ud<splashr)then // splash damage
@@ -424,15 +407,6 @@ begin
              {$IFDEF _FULLGAME}
              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),EID_BFG);
              {$ENDIF}
-
-             if(ServerSide)then
-              if(mid=MID_StunMine)then
-              begin
-                 tu^.buff[ub_stun]:=fr_fps;
-                 {$IFDEF _FULLGAME}
-                 _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),MID_BPlasma);
-                 {$ENDIF}
-              end;
 
              if(mid<>MID_BFG)then
               if(tu^.uid^._splashresist)then exit;
@@ -443,7 +417,7 @@ begin
              if(not fake)then
              begin
                 rdamage:=mm3(0,trunc(rdamage*(1-(ud/splashr))),rdamage);
-                _unit_damage(tu,rdamage,p,player);
+                _unit_damage(tu,rdamage,painX,player);
              end;
           end;
      end;

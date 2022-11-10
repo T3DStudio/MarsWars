@@ -596,12 +596,12 @@ wtp_unit_light       : begin
                        incPrio(not _ukbuilding  );
                        incPrio(    _uklight     );
                        end;
-wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)then
+wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)and(apcm=0)then
                        if(not _IsUnitRange(inapc,nil))then
                        begin
-                       incPrio(apcm=0   );
-                       incPrio((speed>0)and(apcc=apcm));
-                       incPrio(ukfly    );
+                       incPrio(_limituse<ul3);
+                       incPrio(speed>0);
+                       incPrio(ukfly  );
                        _unitWeaponPriority+=speed;
                        end;
    end;
@@ -1168,7 +1168,7 @@ uab_rebuild       : case uidi of
                     UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,1),pu);
                     UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,1),pu);
                     UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,1),pu);
-                    UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-2,1),pu);
+                    UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,1),pu);
                     end;
 uab_buildturret   : if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
          else
@@ -1339,10 +1339,10 @@ function _unit_attack(pu:PTUnit):boolean;
 var w,a   : byte;
      tu   : PTUnit;
 upgradd,c : integer;
+fakemissile,
 attackinmove: boolean;
 {$IFDEF _FULLGAME}
 attackervis,
-fakemissile,
 targetvis : boolean;
 {$ENDIF}
 begin
@@ -1758,26 +1758,6 @@ begin
      end;
 end;
 
-procedure _unit_reveal(pu:PTUnit);
-var i:byte;
-begin
-   with pu^ do
-    if(cycle_order=_cycle_order)then
-     with player^ do
-     begin
-        _AddToInt(@vsnt[team],vistime);
-        _AddToInt(@vsni[team],vistime);
-        if(ServerSide)then
-{$IFDEF _FULLGAME}if(menu_s2<>ms2_camp)then{$ENDIF}
-         for i:=0 to MaxPlayers do
-          if((g_deadobservers)and(_players[i].armylimit<=0))or(n_builders=0)then
-          begin
-             _AddToInt(@vsnt[i],fr_fps);
-             if(g_mode<>gm_invasion)or(playeri>0)then _AddToInt(@vsni[i],fr_fps);
-          end;
-     end;
-end;
-
 procedure _obj_cycle();
 var u : integer;
     pu,
@@ -1789,8 +1769,13 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         _unit_reveal  (pu);
+         if(cycle_order=_cycle_order)
+         then _unit_reveal(pu);
+
          _unit_counters(pu);
+
+         if(uid^._ability=uab_hell_vard)and(bld)and(rld=1)
+         then _unit_kill(pu,false,true,false);
 
          if(hits>0)then
          begin
