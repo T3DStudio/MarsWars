@@ -348,7 +348,7 @@ begin
    with u^   do
    with uid^ do
    begin
-      smodel:=un_smodel[buff[ub_advanced]>0];
+      smodel:=un_smodel[level];
 
       if(smodel<>spr_pdmodel)then
       begin
@@ -384,12 +384,12 @@ sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
    end;
 end;
 
-function _uid2spr(_uid:byte;adv:boolean):PTMWTexture;
+function _uid2spr(_uid:byte;level:byte):PTMWTexture;
 begin
    with _uids[_uid] do
     case _urace of
-    r_hell: _uid2spr:=_sm2s(un_smodel[adv],sms_stand,315,0,nil);
-    r_uac : _uid2spr:=_sm2s(un_smodel[adv],sms_stand,225,0,nil);
+    r_hell: _uid2spr:=_sm2s(un_smodel[level],sms_stand,315,0,nil);
+    r_uac : _uid2spr:=_sm2s(un_smodel[level],sms_stand,225,0,nil);
     end;
 end;
 

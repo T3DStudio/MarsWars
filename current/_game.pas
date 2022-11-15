@@ -206,12 +206,12 @@ var  i:byte;
 r,d,ds:integer;
 begin
    if(c=0)
-   then _unit_add(x,y,0,uid,pl,true,false,false)
+   then _unit_add(x,y,0,uid,pl,true,false,0)
    else
    begin
       if(c>5)then
       begin
-         _unit_add(x,y,0,uid,pl,true,false,false);
+         _unit_add(x,y,0,uid,pl,true,false,0);
          c-=1;
       end;
       ds :=map_mw div 2;
@@ -223,7 +223,7 @@ begin
          _unit_add(
          x+trunc(r*cos(d*degtorad)),
          y-trunc(r*sin(d*degtorad)),
-         0,uid,pl,true,false,false);
+         0,uid,pl,true,false,0);
 
          d+=ds;
       end;
@@ -408,7 +408,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                 begin
                    if(oa=nil)then
                     if(not _IsUnitRange(o_a0,@oa))then break;
-                   if(uidi=oa^.uidi)and((buff[ub_advanced]>0)=(oa^.buff[ub_advanced]>0))
+                   if(uidi=oa^.uidi)
                    then sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
                           and((o_y0-_r)<=vy)and(vy<=(o_y1+_r))
                    else if(o_id<>uo_adblselect)then sel:=false;

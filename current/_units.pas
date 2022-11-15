@@ -71,17 +71,12 @@ begin
             armor:=_base_armor;
             with player^ do
              if(_ukbuilding)
-             then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_build_armor[_urace]])*10
+             then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_build_armor[_urace]])*BaseArmorBonus1h
              else
                if(_ukmech)
-               then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_mech_armor[_urace]])*8
-               else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*8;
-         end;
-
-         case uidi of
-UID_Knight     : if(buff[ub_advanced]>0)then damage:=damage div 2;
-UID_ZCommando  : if(buff[ub_advanced]>0)then armor+=8;
-         else
+               then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_mech_armor[_urace]])*BaseArmorBonus1
+               else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*BaseArmorBonus1;
+            if(level>0)then armor+=level*_level_armor;
          end;
 
          case g_mode of
@@ -99,7 +94,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
       if(hits<=damage)then
       begin
          if(ServerSide)
-         then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits[buff[ub_advanced]>0],true);
+         then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits,true);
       end
       else
       begin
@@ -113,8 +108,6 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
          if(not _ukbuilding)and(not _ukmech)then
           if(pain_f>0)and(_painc>0)and(painc>0)then // and(buff[ub_pain]<=0)
           begin
-             if(uidi=UID_Mancubus)and(buff[ub_advanced]>0)then exit;
-
              if(pain_f>pains)
              then pains:=0
              else pains-=pain_f;
@@ -138,9 +131,8 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
    end;
 end;
 
-function _unit_morph(pu:PTUnit;ouid:byte;obld:boolean;bhits:integer;advanced_mode:byte):cardinal;
+function _unit_morph(pu:PTUnit;ouid:byte;obld:boolean;bhits:integer;ulevel:byte):cardinal;
 var puid:PTUID;
-     adv:boolean;
 begin
    _unit_morph:=0;
    with pu^     do
@@ -179,14 +171,8 @@ begin
          exit;
       end;
 
-      case advanced_mode of
-      0:   adv:=false;
-      1:   adv:=buff[ub_advanced]>0;
-      else adv:=true;
-      end;
-
       _unit_kill(pu,true,true,false);
-      _unit_add(vx,vy,unum,ouid,playeri,obld,true,adv);
+      _unit_add(vx,vy,unum,ouid,playeri,obld,true,ulevel);
 
       if(bhits<0)then bhits:=puid^._mhits div abs(bhits);
 
@@ -413,9 +399,6 @@ wpt_heal     : if(tu^.hits<=0)
 
       if not(tu^.uidi in aw_uids)then exit;
 
-      if(cf(@aw_reqf,@wpr_adv ))and(buff[ub_advanced]<=0)then exit;
-      if(cf(@aw_reqf,@wpr_nadv))and(buff[ub_advanced]> 0)then exit;
-
       if(cf(@aw_reqf,@wpr_air   ))then
        if(ukfly=uf_ground)or(tu^.ukfly=uf_ground)then exit;
       if(cf(@aw_reqf,@wpr_ground))then
@@ -449,10 +432,6 @@ wpt_heal     : if(tu^.hits<=0)
 
       if(cf(@aw_tarf,@wtr_ground  )=false)and(tu^.ukfly = uf_ground      )then exit;
       if(cf(@aw_tarf,@wtr_fly     )=false)and(tu^.ukfly = uf_fly         )then exit;
-
-      if(cf(@aw_tarf,@wtr_adv     )=false)and(tu^.buff[ub_advanced]> 0   )then exit;
-      if(cf(@aw_tarf,@wtr_nadv    )=false)and(tu^.buff[ub_advanced]<=0   )then exit;
-
 
       if(not tu^.uid^._ukbuilding )then
       begin
@@ -660,7 +639,7 @@ begin
    with player^ do
    begin
       case uidi of
-UID_HKeep: if(ud<srange)and(not tu^.uid^._ukbuilding)and(not tu^.uid^._ukmech)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)then _unit_damage(tu,upgr[upgr_hell_paina]*8,upgr[upgr_hell_paina],playeri);
+UID_HKeep: if(ud<srange)and(not tu^.uid^._ukbuilding)and(not tu^.uid^._ukmech)and(team<>tu^.player^.team)and(upgr[upgr_hell_paina]>0)then _unit_damage(tu,upgr[upgr_hell_paina]*BaseDamageBonus1,upgr[upgr_hell_paina],playeri);
       end;
    end;
 end;
@@ -735,8 +714,7 @@ begin
       if(_IsUnitRange(uo_tar,@puo))and(aicode=false)then
        if(puo^.player=player)and(puo^.hits>0)and(puo^.rld>0)then
         case _uids[puo^.uidi]._ability of
-uab_teleport,
-uab_uac__unit_adv : swtarget:=true;
+uab_teleport      : swtarget:=true;
         end;
 
       if(aicode)then
@@ -871,87 +849,11 @@ begin
    end;
 end;
 
-procedure _unit_uac_unit_adv(pu,tu:PTUnit);
+procedure _unit_building_start_adv(pu:PTUnit;upgr:byte);
 begin
-   // pu - target
-   // tu - caster
-   with pu^  do
-   with uid^ do
-   begin
-      if(tu^.buff[ub_advanced]>0)then
-      begin
-         buff[ub_stun]:=_tprod div 4;
-         tu^.rld:=uac_adv_base_reload;
-      end
-      else
-      begin
-         buff[ub_stun]:=_tprod div 2;
-         tu^.rld:=uac_adv_base_reload*2;
-      end;
-
-      buff[ub_advanced]:=_ub_infinity;
-
-      GameLogUnitPromoted(pu);
-      {$IFDEF _FULLGAME}
-      SoundPlayUnit(snd_unit_adv[_urace],pu,nil);
-      {$ENDIF}
-   end;
-end;
-
-procedure _unit_hell_unit_adv(pu:PTUnit);
-begin
+   if(upgr>MaxUnitLevel)then upgr:=MaxUnitLevel;
    with pu^ do
-   with uid^ do
-   begin
-      buff[ub_advanced]:=_ub_infinity;
-
-      GameLogUnitPromoted(pu);
-      {$IFDEF _FULLGAME}
-      _unit_PowerUpEff(pu,snd_unit_adv[_urace],nil);
-      {$ENDIF}
-   end;
-end;
-
-procedure _unit_building_start_adv(pu:PTUnit;upgr:boolean);
-begin
-   with pu^ do _unit_morph(pu,uidi,false,-6+(4*byte(upgr)),2);
-end;
-
-function _ability_uac__unit_adv(pu,tu:PTUnit;tdm:integer):boolean;
-begin
-   // pu - target
-   // tu - caster
-   _ability_uac__unit_adv:=false;
-   with pu^  do
-   with uid^ do
-   if(tdm<=melee_r)and(tu^.rld<=0)and(not _ukbuilding)and(tu^.hits>0)then
-   begin
-      if(_canability(tu))and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)and(buff[ub_advanced]<=0)and(_ability<>uab_advance)and(hits>0)then
-      begin
-         _unit_uac_unit_adv(pu,tu);
-         _ability_uac__unit_adv:=true;
-      end;
-      uo_x  :=tu^.uo_x;
-      uo_y  :=tu^.uo_y;
-      uo_tar:=tu^.uo_tar;
-   end;
-end;
-
-function _ability_hell_unit_adv(pu,tu:PTUnit):boolean;
-begin
-   // pu - target
-   // tu - caster
-   _ability_hell_unit_adv:=false;
-   with pu^  do
-   with uid^ do
-    if(not _ukbuilding)and(bld)and(_ability<>uab_advance)then
-      if(_canability(tu))and(hits>0)and(_urace=tu^.uid^._urace)and(player^.team=tu^.player^.team)then
-       if(buff[ub_advanced]<=0)and(tu^.player^.upgr[upgr_hell_6bld]>0)then
-       begin
-          tu^.player^.upgr[upgr_hell_6bld]-=1;
-          _unit_hell_unit_adv(pu);
-          _ability_hell_unit_adv:=true;
-       end;
+    if(level=0)then _unit_morph(pu,uidi,false,-6+(4*upgr),level+1);
 end;
 
 function _ability_building_adv(pu,tu:PTUnit):boolean;
@@ -965,17 +867,17 @@ begin
    begin
       if(_ukbuilding)and(bld)and(_ability=0)then
        if(_isbarrack)or(_issmith)then
-       if(tu^.uid^._ukbuilding)and(player^.team=tu^.player^.team)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)and(hits>0)then
-        if(buff[ub_advanced]<=0)and(cenergy>=_renergy)then
-        begin
-           _unit_building_start_adv(pu, tu^.buff[ub_advanced]>0 );
-           tu^.rld:=building_adv_reload[tu^.buff[ub_advanced]>0];
-           {$IFDEF _FULLGAME}
-           if(playeri=HPlayer)then
-           SoundPlayUnitCommand(snd_building[_urace]);
-           {$ENDIF}
-           _ability_building_adv:=true;
-        end;
+        if(tu^.uid^._ukbuilding)and(player^.team=tu^.player^.team)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)and(hits>0)then
+         if(level=0)and(cenergy>=_renergy)then
+         begin
+            _unit_building_start_adv(pu,tu^.level);
+            tu^.rld:=building_adv_reload[level>0];
+            {$IFDEF _FULLGAME}
+            if(playeri=HPlayer)then
+            SoundPlayUnitCommand(snd_building[_urace]);
+            {$ENDIF}
+            _ability_building_adv:=true;
+         end;
 
       tu^.uo_tar:=0;
    end;
@@ -996,7 +898,7 @@ begin
           rld:=heyenest_reload;
           _ability_hell_vision:=true;
           {$IFDEF _FULLGAME}
-          _unit_HvisionEff(pu,nil);
+          _unit_LevelUp(pu,EID_Hvision,nil);
           {$ENDIF}
        end;
       uo_tar:=0;
@@ -1011,9 +913,9 @@ begin
    // tu - teleporter
    _ability_teleport:=false;
    with pu^  do
-   with uid^ do
-      if(not _ukbuilding)and(ukfly=false)and(tu^.hits>0)and(tu^.bld)then
-       if(player^.team=tu^.player^.team)and(buff[ub_teleeff]<=0)then
+    with uid^ do
+      if(not _ukbuilding)and(bld)and(ukfly=false)and(tu^.hits>0)and(tu^.bld)then
+       if(playeri=tu^.playeri)and(buff[ub_teleeff]<=0)then
         if(td<=tu^.uid^._r)then
         begin
            if(tu^.rld<=0)then
@@ -1034,16 +936,16 @@ begin
               then _unit_teleport(pu,tu^.uo_x+(tr*sign(x-tu^.uo_x)),tu^.uo_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF})
               else _unit_teleport(pu,tu^.uo_x                      ,tu^.uo_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
 
-              _teleport_rld(tu,_mhits);
+              _teleport_CalcReload(tu,_limituse);
               _ability_teleport:=true;
            end;
         end
         else
-          if(tu^.buff[ub_advanced]>0)and(td>base_r)then
+          if(tu^.player^.upgr[upgr_hell_rteleport]>0)and(td>base_r)then
            if(tu^.rld<=0)then
            begin
               _unit_teleport(pu,tu^.x,tu^.y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
-              _teleport_rld(tu,_mhits);
+              _teleport_CalcReload(tu,_limituse);
               uo_x  :=x;
               uo_y  :=y;
               uo_tar:=0;
@@ -1107,7 +1009,7 @@ procedure _unit_inapc_target(pu,au:PTUnit);
 var tu:PTUnit;
 begin
    // pu - unit inside
-   // au - apc
+   // au - transport
    with pu^ do
    begin
       x  :=au^.x;
@@ -1159,20 +1061,20 @@ uab_spawnlost     : if(buff[ub_cast]<=0)and(buff[ub_clcast]<=0)then
                     end;
 uab_advance       : if(zfall=0)and(buff[ub_clcast]<=0)then
                     begin
-                        if(buff[ub_advanced]>0)
-                        then buff[ub_advanced]:=0
-                        else buff[ub_advanced]:=_ub_infinity;
+                        if(level>0)
+                        then level:=0
+                        else level:=1;
                        _unit_action:=true;
                     end;
 uab_rebuild       : case uidi of
-                    UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,1),pu);
-                    UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,1),pu);
-                    UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,1),pu);
-                    UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,1),pu);
+                    UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,0),pu);
+                    UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,0),pu);
+                    UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,0),pu);
+                    UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,0),pu);
                     end;
-uab_buildturret   : if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
+uab_buildturret   : ;//if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
          else
-            if(buff[ub_advanced]<=0)then
+            if(level<=0)then
              if(_isbarrack)or(_issmith)then
               if(uid_x[uid_race_9bld[race]]>0)then _unit_action:=_ability_building_adv(pu,@_units[uid_x[uid_race_9bld[race]]]);
          end;
@@ -1183,17 +1085,12 @@ procedure _unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
      w: byte;
 td,tdm: integer;
-function StayAtTarget:boolean;
-begin
-   StayAtTarget:=true;
-   if(tdm<=melee_r)then exit;
-   StayAtTarget:=false;
-end;
 begin
    with pu^  do
    with uid^ do
-   begin
-      if(uo_tar=unum)then uo_tar:=0;
+   if(uo_tar=unum)
+   then uo_tar:=0
+   else
       if(_IsUnitRange(uo_tar,@tu))then
       begin
          if(_IsUnitRange(tu^.inapc,nil))
@@ -1206,7 +1103,7 @@ begin
          td :=point_dist_int(x,y,tu^.x,tu^.y);
          if(tu^.solid)
          then tdm:=td-(_r+tu^.uid^._r)
-         else tdm:=td- _r;
+         else tdm:=td- min2(_r,tu^.uid^._r);
 
          if(tdm<melee_r)then
          begin
@@ -1215,16 +1112,13 @@ begin
          end;
 
          case _ability of
-uab_teleport     : if(tu^.player^.team<>player^.team   )then begin uo_tar:=0;exit; end;
-uab_hell_unit_adv: if(_ability_hell_unit_adv(tu,pu    ))then begin _unit_clear_order(pu,false);exit;end;//team, race=race
-uab_building_adv : if(_ability_building_adv (tu,pu    ))then exit;//team
-uab_hell_vision  : if(_ability_hell_vision  (tu,pu    ))then exit;//team     _unit_clear_order(tu,false);
+uab_teleport     : if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
+uab_building_adv : if(_ability_building_adv (tu,pu  ))then exit;//team
+uab_hell_vision  : if(_ability_hell_vision  (tu,pu  ))then exit;//team     _unit_clear_order(tu,false);
          end;
 
          case tu^.uid^._ability of
-uab_uac__unit_adv: if(_ability_uac__unit_adv(pu,tu,tdm))then exit;//team, race=race
-uab_hell_unit_adv: if(_ability_hell_unit_adv(pu,tu    ))then begin _unit_clear_order(tu,false); exit;end;//team
-uab_teleport     : if(_ability_teleport     (pu,tu,td ))then exit;//team
+uab_teleport     : if(_ability_teleport    (pu,tu,td))then exit;//team
          end;
 
          w:=_unit_target2weapon(pu,tu,td,255,nil);
@@ -1234,7 +1128,7 @@ uab_teleport     : if(_ability_teleport     (pu,tu,td ))then exit;//team
             uo_id :=ua_amove;
          end;
 
-         if(StayAtTarget)then
+         if(tdm<=melee_r)then
          begin
             uo_x:=x;
             uo_y:=y;
@@ -1251,7 +1145,6 @@ uab_teleport     : if(_ability_teleport     (pu,tu,td ))then exit;//team
          uo_x:=tu^.vx;
          uo_y:=tu^.vy;
       end;
-   end;
 end;
 
 procedure _resurrect(tu:PTUnit);
@@ -1269,8 +1162,7 @@ var _h:single;
     _o:byte;
     _f:boolean;
     _d,
-    _z,
-    _a:integer;
+    _z:integer;
  _zuid:PTUID;
     {$IFDEF _FULLGAME}
     _s:integer;
@@ -1297,7 +1189,6 @@ begin
       _h:=tu^.hits/tu^.uid^._mhits;
       _d:=tu^.dir;
       _o:=pu^.group;
-      _a:=tu^.buff[ub_advanced];
       _f:=tu^.ukfly;
       _z:=tu^.zfall;
       {$IFDEF _FULLGAME}
@@ -1305,7 +1196,7 @@ begin
       {$ENDIF}
 
       _unit_kill(pu,true,true,false);
-      _unit_add(tu^.x,tu^.y,pu^.unum,tu^.uid^._zombie_uid,pu^.playeri,true,true,_a>0);
+      _unit_add(tu^.x,tu^.y,pu^.unum,tu^.uid^._zombie_uid,pu^.playeri,true,true,0);
       _unit_kill(tu,true,true,false);
 
       if(_LastCreatedUnit>0)then
@@ -1316,7 +1207,6 @@ begin
          ukfly:=_f;
          hits := trunc(uid^._mhits*_h);
          zfall:=_z;
-         buff[ub_advanced]:=_a;
          {$IFDEF _FULLGAME}
          shadow:=_s;
          {$ENDIF}
@@ -1333,6 +1223,26 @@ begin
       end;
    end;
    _makezimba:=true;
+end;
+
+procedure _unit_exp(pu:PTUnit;exp:cardinal);
+begin
+   with pu^ do
+   if(level<MaxUnitLevel)then
+   with uid^ do
+   begin
+      a_exp+=exp;
+      if(a_exp>=a_exp_next)then
+      begin
+         level+=1;
+         a_exp:=0;
+         a_exp_next:=level*ExpLevel1+ExpLevel1;
+         GameLogUnitPromoted(pu);
+         {$IFDEF _FULLGAME}
+         _unit_LevelUp(pu,0,nil);
+         {$ENDIF}
+      end;
+   end;
 end;
 
 function _unit_attack(pu:PTUnit):boolean;
@@ -1447,6 +1357,8 @@ wmove_noneed    : if(not attackinmove)then
             a_rld    :=aw_rld;
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
+            if(ServerSide)
+            then _unit_exp(pu,aw_rld);
             if(not attackinmove)then
             begin
                if(x<>tu^.x)
@@ -1492,6 +1404,7 @@ wmove_noneed    : if(not attackinmove)then
              end;
             {$ENDIF}
             if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
+            if(level>0)then upgradd+=level*_level_damage;
             if(not attackinmove)then
              if(x<>tu^.x)
              or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
@@ -1642,7 +1555,6 @@ co_rcmove  :  begin     // right click
                              then uo_tar:=order_tar
                              else if(_unit_ability_htteleport(pu,order_x,order_y))then exit;
            uab_hkeeptele   : if(_unit_ability_hkteleport(pu,order_x,order_y))then exit;
-           uab_hell_unit_adv,
            uab_building_adv: uo_tar:=order_tar;
                  else
                     uo_tar:=0;
@@ -1729,7 +1641,7 @@ begin
             if(_ukmech)
             then i+=upgr[upgr_race_mech_regen[_urace]]
             else i+=upgr[upgr_race_bio_regen [_urace]];
-          i:=(i*10)+_baseregen;
+          i:=(i*BaseArmorBonus1)+_baseregen;
 
           if(i>0)then
           begin

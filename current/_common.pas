@@ -188,10 +188,7 @@ procedure GameLogUnitReady(pu:PTunit);
 begin
    if(pu=nil)or(ServerSide=false)then exit;
 
-   with pu^ do
-    if(buff[ub_advanced]>0)
-    then PlayersAddToLog(playeri,0,lmt_unit_ready,glcp_unita,uidi,'',x,y,false)
-    else PlayersAddToLog(playeri,0,lmt_unit_ready,glcp_unit ,uidi,'',x,y,false);
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,glcp_unit ,uidi,'',x,y,false);
 end;
 procedure GameLogUnitPromoted(pu:PTunit);
 begin
@@ -493,6 +490,24 @@ begin
    Close(f);
 end;
 
+function _ReplaceUid(uid:byte;pl:PTPlayer):byte;
+begin
+   {
+   _replace_uid,
+   _replace_ruid,
+   _replace_rpuid,
+   }
+   _ReplaceUid:=uid;
+   with pl^ do
+    with _uids[uid] do
+     if(_replace_uid>0)and(_replace_uid<>uid)then
+     begin
+        if(_replace_ruid >0)and(uid_eb[_replace_ruid ]<=0)then exit;
+        if(_replace_rpuid>0)and(upgr  [_replace_rpuid] =0)then exit;
+        _ReplaceUid:=_replace_uid;
+     end;
+end;
+
 function _uid_player_limit(pl:PTPlayer;uid:byte):boolean;
 begin
    with pl^ do
@@ -636,7 +651,7 @@ end;
 function _UnitHaveRPoint(uid:byte):boolean;
 begin
    with _uids[uid] do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport,uab_uac__unit_adv]);
+   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_teleport]);
 end;
 
 function UnitF2Select(pu:PTUnit):boolean;
@@ -660,9 +675,6 @@ begin
       if(_IsUnitRange(uo_tar,@tu))then
       begin
          if(tu^.uid^._ability=uab_teleport)then exit;
-
-         if(tu^.uid^._ability=uab_uac__unit_adv)then
-          if(_ability<>uab_advance)and(buff[ub_advanced]<=0)then exit;
 
          if(_itcanapc(pu,tu))
          or(_itcanapc(tu,pu))then exit;
@@ -994,9 +1006,8 @@ lmt_cant_build       : begin
                           lmt_cant_build: ParseLogMessage:=str_cant_build;
                           end;
                           case uidt of
-                          glcp_unit,
-                          glcp_unita: with _uids [uid] do ParseLogMessage:=ParseLogMessage+' ('+un_txt_name+')';
-                          glcp_upgr : with _upids[uid] do ParseLogMessage:=ParseLogMessage+' ('+_up_name   +')';
+                          glcp_unit: with _uids [uid] do ParseLogMessage:=ParseLogMessage+' ('+un_txt_name+')';
+                          glcp_upgr: with _upids[uid] do ParseLogMessage:=ParseLogMessage+' ('+_up_name   +')';
                           end;
                        end;
 lmt_player_chat,
@@ -1018,9 +1029,6 @@ lmt_unit_ready       : begin
                          glcp_unit : if(_ukbuilding)
                                      then ParseLogMessage:=str_building_complete+' ('+un_txt_name+')'
                                      else ParseLogMessage:=str_unit_complete    +' ('+un_txt_name+')';
-                         glcp_unita: if(_ukbuilding)
-                                     then ParseLogMessage:=str_building_complete+' ('+str_advanced+un_txt_name+')'
-                                     else ParseLogMessage:=str_unit_complete    +' ('+str_advanced+un_txt_name+')';
                         end;
                        mcolor^:=c_green;
                        end;

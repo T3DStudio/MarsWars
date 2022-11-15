@@ -198,8 +198,8 @@ begin
                  if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[r_blink_colorb]);
             end;
 
-            for i:=0 to MaxUnitProdsI do
-             if(i>0)and(buff[ub_advanced]<=0)
+            for i:=0 to MaxUnitLevel do
+             if(i>level)
              then break
              else ui_ProductionCounters(pu,i);
          end;
@@ -216,7 +216,7 @@ begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_ability>0)and(_canability(pu)))
             or(apcc>0)
-            or((buff[ub_advanced]<=0)and(_isbarrack or _issmith)and(uid_x[uid_race_9bld[race]]>0))then ui_uibtn_action+=1;
+            or((level=0)and(_isbarrack or _issmith)and(uid_x[uid_race_9bld[race]]>0))then ui_uibtn_action+=1;
          end;
       end
       else
@@ -237,19 +237,18 @@ begin
 end;
 
 procedure _unit_foot_effects(pu:PTUnit);
-var adv:boolean;
+
 begin
    with pu^ do
    begin
-      adv:=buff[ub_advanced]>0;
       with uid^ do
-      if(un_foot_anim[adv]>0)then
+      if(un_foot_anim>0)then
       begin
          animf-=1;
          if(animf<=0)then
          begin
-            SoundPlayUnit(un_eid_snd_foot[adv],nil,nil);
-            animf:=un_foot_anim[adv];
+            SoundPlayUnit(un_eid_snd_foot,nil,nil);
+            animf:=un_foot_anim;
          end;
       end;
    end;
@@ -274,6 +273,21 @@ begin
    with uid^    do
    with player^ do
    begin
+      // buffs and level
+      lvlstr_b:='';
+      if(buff[ub_detect  ]>0)then lvlstr_b+=char_detect;
+
+      if(not _ukbuilding)then
+       case level of
+       0: lvlstr_b+=tc_gray  +'1';
+       1: lvlstr_b+=tc_yellow+'2';
+       2: lvlstr_b+=tc_orange+'3';
+       else lvlstr_b+=tc_red+b2s(level+1);
+       end
+      else
+        if(level>0)then lvlstr_b+=char_advanced;
+
+      // reload
       if(rld>0)
       then lvlstr_r:=tc_aqua+i2s(it2s(rld))
       else lvlstr_r:='';
@@ -317,7 +331,7 @@ begin
 end;
 
 procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
-const _btnas: array[false..true] of integer = (0,vid_hBW);
+const _btnas: array[0..MaxUnitLevel] of integer = (0,vid_hBW,vid_BW,vid_BW+vid_hBW);
 var spr : PTMWTexture;
 depth,
 alphab,
@@ -362,7 +376,7 @@ begin
 
             if(wanim)then _unit_foot_effects(pu);
 
-            UnitsInfoAddUnit(pu,un_smodel[buff[ub_advanced]>0]);
+            UnitsInfoAddUnit(pu,un_smodel[level]);
 
             if(buff[ub_invis ]>0 )then alpha:=128;
 
@@ -384,10 +398,10 @@ begin
 
                 if(playeri=HPlayer)then
                 begin
-                   for t:=0 to MaxUnitProdsI do
+                   for t:=0 to MaxUnitLevel do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_lime  ,@_uids [uprod_u[t]]. un_btn[upgr[_uids[uprod_u[t]]._upgr_bornadv]>0],i2s(it2s(uprod_r[t])),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[buff[ub_advanced]>0]+vid_BW*t,vy,c_yellow,@_upids[pprod_u[t]]._up_btn                                         ,i2s(it2s(pprod_r[t])),'','','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_lime  ,@_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_yellow,@_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 

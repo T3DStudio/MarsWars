@@ -311,7 +311,6 @@ var srect,
 choosen,
       hbar :boolean;
     acolor :cardinal;
-   buffstr :string6;
    buffx,
    buffy   :integer;
 begin
@@ -338,15 +337,13 @@ begin
 
       if(srect)then
       begin
-         buffstr:='';
-         if(buff[ub_advanced]>0)then buffstr:=buffstr+char_advanced;
-         if(buff[ub_detect  ]>0)then buffstr:=buffstr+char_detect;
-
          if(playeri=HPlayer)
-         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group),lvlstr_r,buffstr,i2s6(apcm),i2s6(apcc))
-         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w   ,''      ,buffstr,lvlstr_a  ,lvlstr_s  );
+         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group),'',lvlstr_b,i2s6(apcm),i2s6(apcc))
+         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w   ,'',lvlstr_b,lvlstr_a  ,lvlstr_s  );
       end;
       if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
+
+      if(rld>0)and(playeri=HPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink_color);
@@ -420,7 +417,7 @@ uinfo_text   : begin
         end;
 
        if(length(text_lt )>0)then _draw_text(tar,x0+1,y0+1       ,text_lt ,ta_left ,255,c_white);
-       if(length(text_lt2)>0)then _draw_text(tar,x0+1,y0+font_w+4,text_lt2,ta_left ,255,c_aqua );
+       if(length(text_lt2)>0)then _draw_text(tar,x0+1,y0+font_w+4,text_lt2,ta_left ,255,c_white);
        if(length(text_rt )>0)then _draw_text(tar,x1-1,y0+1       ,text_rt ,ta_right,255,c_white);
        if(length(text_rd )>0)then _draw_text(tar,x1-1,y1-1-font_w,text_rd ,ta_right,255,c_white);
        if(length(text_ld )>0)then _draw_text(tar,x0+1,y1-1-font_w,text_ld ,ta_left ,255,c_white);
@@ -693,8 +690,8 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,i2s(aiu_attack_timer), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+40,i2s(aiu_alarm_timer), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,i2s(_level_damage), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));

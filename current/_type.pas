@@ -209,13 +209,17 @@ TUID = record
    _baseregen,
    _zombie_hits,
    _upgr_srange_step,
-   _limituse
+   _limituse,
+   _level_damage,
+   _level_armor
                 : integer;
 
    _upgr_srange,
    _upgr_armor,
    _upgr_regen,
-   _upgr_bornadv,
+   _replace_uid,
+   _replace_ruid,
+   _replace_rpuid,
    _zombie_uid,
    _urace,
    _ucl,
@@ -254,7 +258,7 @@ TUID = record
    _ukfly,
    _splashresist: boolean;
    _fastdeath_hits
-                : array[false..true] of integer; //[adv]
+                : integer;
 
    ups_builder,
    ups_units,
@@ -265,37 +269,37 @@ TUID = record
    _animd,
    _fr          : integer;
    un_btn,
-   un_sbtn      : array[false..true] of TMWTexture;
-   un_smodel    : array[false..true] of PTMWSModel;
+   un_sbtn      : TMWTexture;
+   un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
 
    un_txt_name,
    un_txt_descr,
    un_txt_uihint: shortstring;
 
    un_build_amode,
-   un_eid_bcrater   :byte;
-   un_eid_bcrater_y :integer;
-
-   un_foot_anim : array[false..true] of integer;
+   un_eid_bcrater
+                : byte;
+   un_eid_bcrater_y,
+   un_foot_anim : integer;
 
    un_eid_summon,
    un_eid_death,
    un_eid_fdeath,
    un_eid_pain
-                : array[false..true] of byte;
+                : byte;
+
    un_eid_snd_foot,
    un_eid_snd_summon,
    un_eid_snd_death,
    un_eid_snd_fdeath,
-   un_eid_snd_pain
-                : array[false..true] of PTSoundSet;
+   un_eid_snd_pain,
 
    un_snd_ready, //command sounds
    un_snd_move,
    un_snd_attack,
    un_snd_annoy,
    un_snd_select
-                : array[false..true] of PTSoundSet;
+                : PTSoundSet;
    {$ENDIF}
 end;
 PTUID = ^TUID;
@@ -460,6 +464,7 @@ TUnit = record
    unum     : integer;
    pfzone   : word;
 
+   level,
    cycle_order,
    group,
    playeri,
@@ -467,10 +472,12 @@ TUnit = record
 
    uprod_r,
    pprod_r,
-   pprod_e  : array[0..MaxUnitProdsI] of integer;
+   pprod_e  : array[0..MaxUnitLevel] of integer;
    uprod_u,
-   pprod_u  : array[0..MaxUnitProdsI] of byte;
+   pprod_u  : array[0..MaxUnitLevel] of byte;
 
+   a_exp,
+   a_exp_next,
    a_shots  : cardinal;
    a_rld,
    a_weap_cl,
@@ -527,6 +534,7 @@ TUnit = record
             : integer;
    lvlstr_w,
    lvlstr_r,
+   lvlstr_b,
    lvlstr_a,
    lvlstr_s : string6;
    {$ENDIF}

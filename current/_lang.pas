@@ -153,7 +153,7 @@ begin
          playeri:=0;
          player :=@_players[playeri];
       end;
-      _unit_apUID(pu,false);
+      _unit_apUID(pu);
    end;
    with pu^  do
    with uid^ do
@@ -173,10 +173,10 @@ begin
         if(ukfloater)
         then _ADDSTRC(@_makeAttributeStr,str_attr_floater)
         else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
+      if(level>0)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_level+b2s(level+1));
       if(buff[ub_detect]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_detector);
-      if(buff[ub_advanced]>0)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_advanced);
       if(buff[ub_invuln]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
       else
@@ -210,7 +210,7 @@ begin
       LMT :='';
       INFO:='';
 
-      if(_ucl>=21)then
+      if(_ucl>=23)then
       begin
          un_txt_uihint:=un_txt_name+tc_nl1+un_txt_descr+tc_nl1;
       end
@@ -381,7 +381,7 @@ begin
    str_attr_fly          := tc_white +'flying'      +tc_default;
    str_attr_ground       := tc_lime  +'ground'      +tc_default;
    str_attr_floater      := tc_aqua  +'floater'     +tc_default;
-   str_attr_advanced     := tc_white +'advanced'    +tc_default;
+   str_attr_level        := tc_white +'level'       ;
    str_attr_invuln       := tc_lime  +'invulnerable'+tc_default;
    str_attr_stuned       := tc_yellow+'stuned'      +tc_default;
    str_attr_detector     := tc_purple+'detector'    +tc_default;
@@ -502,7 +502,8 @@ begin
    _mkHStrUid(UID_Imp            ,'Imp'            ,'');
    _mkHStrUid(UID_Demon          ,'Demon'          ,'');
    _mkHStrUid(UID_Cacodemon      ,'Cacodemon'      ,'');
-   _mkHStrUid(UID_Knight         ,'Baron of Hell / Hell Knight','');
+   _mkHStrUid(UID_Knight         ,'Hell Knight'    ,'');
+   _mkHStrUid(UID_Baron          ,'Baron of Hell'  ,'');
    _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'     ,'');
    _mkHStrUid(UID_Mastermind     ,'Mastermind'     ,'');
    _mkHStrUid(UID_Pain           ,'Pain Elemental' ,'');
@@ -512,11 +513,13 @@ begin
    _mkHStrUid(UID_Archvile       ,'ArchVile'       ,'');
    _mkHStrUid(UID_ZFormer        ,'Zombie Former'  ,'');
    _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer','');
-   _mkHStrUid(UID_ZSergant       ,'Zombie Sergeant','');
+   _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner','');
+   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner','');
    _mkHStrUid(UID_ZCommando      ,'Zombie Commando','');
    _mkHStrUid(UID_ZAntiaircrafter,'Antiaircrafter Zombie'  ,'');
    _mkHStrUid(UID_ZSiege         ,'Siege Zombie'   ,'');
-   _mkHStrUid(UID_ZMajor         ,'Zombie Major'   ,'');
+   _mkHStrUid(UID_ZMajor         ,'Zombie Plasmaguner'        ,'');
+   _mkHStrUid(UID_ZFMajor        ,'Zombie Jetpack Plasmaguner','');
    _mkHStrUid(UID_ZBFG           ,'Zombie BFG'     ,'');
 
 
@@ -564,11 +567,13 @@ begin
    _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_UMine            ,'UAC Mine','');
 
-   _mkHStrUid(UID_Sergant       ,'Sergeant'         ,'');
+   _mkHStrUid(UID_Sergant       ,'Shotguner'        ,'');
+   _mkHStrUid(UID_SSergant      ,'SuperShotguner'   ,'');
    _mkHStrUid(UID_Commando      ,'Commando'         ,'');
    _mkHStrUid(UID_Antiaircrafter,'Antiaircrafter'   ,'');
    _mkHStrUid(UID_Siege         ,'Siege Marine'     ,'');
-   _mkHStrUid(UID_Major         ,'Major'            ,'');
+   _mkHStrUid(UID_Major         ,'Plasmaguner'      ,'');
+   _mkHStrUid(UID_FMajor        ,'Jatpack Plasmaguner','');
    _mkHStrUid(UID_BFG           ,'BFG Marine'       ,'');
    _mkHStrUid(UID_Engineer      ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic         ,'Medic'            ,'');
@@ -580,6 +585,8 @@ begin
    _mkHStrUid(UID_Tank          ,'UAC Tank'         ,'');
    _mkHStrUid(UID_Flyer         ,'UAC Fighter'      ,'');
 
+
+   _mkHStrUpid(upgr_uac_jetpack,'Jatpacks',''     );
    _mkHStrUpid(upgr_uac_radar_r,'UAC Radar upgrade','Increase radar scouting radius.'     );
    _mkHStrUpid(upgr_uac_rstrike,'UAC Rocket strike','Missile for Rocket Launcher Station.');
 
@@ -854,7 +861,7 @@ begin
   str_attr_fly          := tc_white +'летающий'      +tc_default;
   str_attr_ground       := tc_lime  +'наземный'      +tc_default;
   str_attr_floater      := tc_aqua  +'пар€щий'       +tc_default;
-  str_attr_advanced     := tc_white +'улучшенный'    +tc_default;
+  str_attr_level        := tc_white +'уровень '      ;
   str_attr_invuln       := tc_lime  +'неу€звимый'    +tc_default;
   str_attr_stuned       := tc_yellow+'парализованный'+tc_default;
   str_attr_detector     := tc_purple+'детектор'      +tc_default;

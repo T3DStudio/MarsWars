@@ -92,7 +92,7 @@ begin
 
       with _uids[m_brush] do
       begin
-         spr:=_uid2spr(m_brush,upgr[_upgr_bornadv]>0);
+         spr:=_uid2spr(m_brush,0);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
          _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
@@ -110,7 +110,7 @@ begin
             bld    :=true;
             hits   :=_mhits;
          end;
-         _unit_apUID(pdunit,false);
+         _unit_apUID(pdunit);
          _unit_upgr (pdunit);
          if(UIUnitDrawRange(pdunit))then
           circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink_color);
@@ -161,7 +161,7 @@ begin
             x:=ui_oicox-vid_oips;
          end;
          with _players[HPlayer] do
-          with _uids[c] do _draw_surf(tar,x,y,un_sbtn[upgr[_upgr_bornadv]>0].surf);
+          with _uids[c] do _draw_surf(tar,x,y,un_sbtn.surf);
 
          x-=vid_oisw;
          n+=1;
@@ -305,7 +305,7 @@ begin
       0: // buildings
       for ucl:=0 to ui_ubtns do
       begin
-         uid:=ui_panel_uids[race ,ui_tab,ucl];
+         uid:=_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
          if(uid=0)then continue;
 
          with _uids[uid] do
@@ -321,7 +321,7 @@ begin
             req:=_uid_conditionals(@_players[HPlayer],uid);
 
             // _bornadvanced[g_addon]
-            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
+            _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
             _drawBtnt(tar,ux,uy,
 
             i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s   (ucl_e[true,ucl])              ,ir2s(ui_ucl_reload[ucl]),
@@ -335,7 +335,7 @@ begin
       1: // units
       for ucl:=0 to ui_ubtns do
       begin
-         uid:=ui_panel_uids[race ,ui_tab,ucl];
+         uid:=_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
          if(uid=0)then continue;
 
          with _uids[uid] do
@@ -351,7 +351,7 @@ begin
             //(uprodu[uid]>=ui_uprod_uid_max[uid])
             req:=_uid_conditionals(@_players[HPlayer],uid);
 
-            _drawBtn (tar,ux,uy,un_btn[upgr[_upgr_bornadv]>0].surf,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
+            _drawBtn (tar,ux,uy,un_btn.surf,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
             _drawBtnt(tar,ux,uy,
             ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
             ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
@@ -439,6 +439,7 @@ begin
          with _uids[sx] do
           case _ability of
 uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizz_r,c_gray);
+uab_radar      : ;//if();
           end;
 
       if(ui_mc_a>0)then //click effect
@@ -515,7 +516,7 @@ begin
            end
            else
            begin
-              uid:=ui_panel_uids[race,ui_tab,i];
+              uid:=_ReplaceUid(ui_panel_uids[race,ui_tab,i],@_players[HPlayer]);
               if(uid>0)then
               case ui_tab of
               0,1: begin

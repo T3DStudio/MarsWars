@@ -37,9 +37,12 @@ begin
    c_yellow  :=rgba2c(255,255,  0,255);
    c_dyellow :=rgba2c(220,220,  0,255);
    c_lime    :=rgba2c(0  ,255,  0,255);
+   c_alime   :=rgba2c(0  ,255,  0,42 );
+   c_aaqua   :=rgba2c(0  ,255,255,42 );
    c_aqua    :=rgba2c(0  ,255,255,255);
    c_purple  :=rgba2c(255,0  ,255,255);
    c_green   :=rgba2c(0  ,150,0  ,255);
+   c_agreen  :=rgba2c(0  ,150,0  ,42 );
    c_dblue   :=rgba2c(100,100,192,255);
    c_blue    :=rgba2c(50 ,50 ,255,255);
    c_ablue   :=rgba2c(50 ,50 ,255,24 );
@@ -684,6 +687,7 @@ begin
    _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_eff_gtel       ,effects_folder+'ef_gt_'         ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_tel        ,effects_folder+'ef_tel_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect ,firstload);
@@ -717,31 +721,23 @@ end;
 
 procedure _icons;
 var u:byte;
-    b:boolean;
 begin
-   for b:=false to true do
    for u:=0 to 255 do
    with _uids[u] do
    begin
-      with un_btn[b] do
+      with un_btn do
       begin
-         surf:= LoadBtnFS(_uid2spr(u,b)^.surf,vid_BW );
+         surf:= LoadBtnFS(_uid2spr(u,0)^.surf,vid_BW );
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
-      with un_sbtn[b] do
+      with un_sbtn do
       begin
-         surf:= LoadBtnFS(_uid2spr(u,b)^.surf,vid_oiw);
+         surf:= LoadBtnFS(_uid2spr(u,0)^.surf,vid_oiw);
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
    end;
-   {with _uids[UID_HEyeNest] do
-    with un_btn[false] do
-    begin
-       SDl_FreeSurface(surf);
-       surf:=un_btn[true].surf;
-    end; }
 end;
 
 procedure Map_tdmake;

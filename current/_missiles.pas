@@ -190,31 +190,31 @@ begin
       {$ENDIF}
 
       case mid of
-MID_Imp        : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_Cacodemon  : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_Baron      : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_Revenant   : begin damage:=80  ; vstep:=d div 12; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
-MID_URocketS   : begin damage:=80  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=80  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
-MID_YPlasma    : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_ArchFire   : begin damage:=400 ; vstep:=1;        splashr :=15 ;         end;
+MID_Imp        : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Cacodemon  : begin damage:=BaseDamage1h ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Baron      : begin damage:=BaseDamage2  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_Revenant   : begin damage:=BaseDamage1h ; vstep:=d div 12; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
+MID_URocketS   : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
+MID_URocket    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
+MID_Mancubus   : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
+MID_YPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_ArchFire   : begin damage:=BaseDamage4  ; vstep:=1;        splashr :=15 ;         end;
 
 MID_MBullet,
 MID_TBullet,
-MID_Bullet     : begin damage:=40  ; vstep:=5;        splashr :=0  ;         end;
-MID_Chaingun   : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
-MID_Chaingunx2 : begin damage:=100 ; vstep:=5;        splashr :=0  ;         end;
-MID_BPlasma    : begin damage:=80  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_BFG        : begin damage:=400 ; vstep:=d div 12; splashr :=100;         end;
-MID_Flyer      : begin damage:=80  ; vstep:=d div 30; splashr :=0  ;         end;
-MID_HRocket    : begin damage:=400 ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
-MID_Granade    : begin damage:=80  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
-MID_Tank       : begin damage:=80  ; vstep:=5;        splashr :=tank_sr;     end;
+MID_Bullet     : begin damage:=BaseDamageh  ; vstep:=5;        splashr :=0  ;         end;
+MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
+MID_Chaingunx2 : begin damage:=BaseDamage1hh; vstep:=5;        splashr :=0  ;         end;
+MID_BPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
+MID_BFG        : begin damage:=BaseDamage5  ; vstep:=d div 12; splashr :=100;         end;
+MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 30; splashr :=0  ;         end;
+MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
+MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
+MID_Tank       : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=tank_sr;     end;
 MID_Mine       : begin damage:=1000; vstep:=1;        splashr :=100;         end;
 MID_Blizzard   : begin damage:=2000; vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
-MID_SShot      : begin damage:=80  ; vstep:=5;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=140 ; vstep:=5;        splashr :=10 ;mtars:=2;end;
+MID_SShot      : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
+MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;mtars:=2;end;
       else
          vstep:=0;
          exit;
@@ -272,7 +272,8 @@ begin
    case mid of
 MID_Imp       : if(uid=UID_Imp        )then exit;
 MID_Cacodemon : if(uid=UID_Cacodemon  )then exit;
-MID_Baron     : if(uid=UID_Knight     )then exit;
+MID_Baron     : if(uid=UID_Knight     )
+                or(uid=UID_Baron      )then exit;
 MID_Mancubus  : if(uid=UID_Mancubus   )then exit;
 MID_YPlasma   : if(uid=UID_Arachnotron)then exit;
 MID_Revenant  : if(uid=UID_Revenant   )then exit;
@@ -316,7 +317,7 @@ begin
 
         /////////////////////////////////
 
-        if(not tu^.uid^._ukbuilding)then// not buildings
+        {if(not tu^.uid^._ukbuilding)then// not buildings
         begin
         if (    tu^.uid^._uklight)then  // light all
             case mid of
@@ -352,6 +353,7 @@ begin
             case mid of
             //MID_Chaingun,
             //MID_Chaingunx2  : _d50 (@rdamage);
+            MID_HRocket,
             MID_Blizzard    : _d200(@rdamage);
             MID_Granade,
             MID_Mine,
@@ -379,7 +381,7 @@ begin
             MID_Chaingun,
             MID_Chaingunx2,
             MID_SSShot      : painX:=2;
-        end;
+        end;   }
 
         if(ud<=0)and(ntars=0)then // direct and first target
         begin

@@ -318,12 +318,24 @@ begin
    or(r_draw=false)then exit;
 
    if(pause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
-   // if(SoundSourceSetIsPlaying(@SoundSources[sss_anoncer])){and(snd_anoncer_ticks>0)}
 
    SoundPlay(ss,sss_anoncer);
 
    snd_anoncer_ticks:=fr_fps;
    snd_anoncer_last :=ss;
+end;
+procedure SoundPlayMMapAlarm(ss:PTSoundSet;pause:boolean);
+begin
+   if(ss=nil)
+   or(_menu)
+   or(r_draw=false)then exit;
+
+   if(pause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
+
+   SoundPlay(ss,sss_mmap);
+
+   snd_mmap_ticks:=fr_fps;
+   snd_mmap_last :=ss;
 end;
 
 procedure SoundPlayUnitCommand(ss:PTSoundSet);
@@ -359,8 +371,8 @@ begin
         then SoundPlayUnitCommand(snd_building[_urace])
         else
          if(ui_UnitSelectedn<annoystart)
-         then SoundPlayUnitCommand(un_snd_select[buff[ub_advanced]>0])
-         else SoundPlayUnitCommand(un_snd_annoy [buff[ub_advanced]>0]);
+         then SoundPlayUnitCommand(un_snd_select)
+         else SoundPlayUnitCommand(un_snd_annoy );
 
       ui_UnitSelectedPU:=ui_UnitSelectedNU;
       ui_UnitSelectedNU:=0;
@@ -382,20 +394,17 @@ lmt_game_end          : if(uid<=MaxPlayers)then
                          else SoundPlayAnoncer(snd_defeat [race],false);
 lmt_player_defeated   : if(uid<=MaxPlayers)and(uid<>HPlayer)
                         then SoundPlayAnoncer(snd_player_defeated[race],true);
-lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build[race],true);
-lmt_unit_advanced     : begin
-                           with _uids[uid] do
-                            if(un_snd_ready[false]<>un_snd_ready[true])then
-                            begin SoundPlayUnitCommand(un_snd_ready[true]);exit;end;
-                           SoundPlayAnoncer(snd_unit_promoted[race],true);
-                        end;
+lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build [race],true);
+lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted[race],true);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
-lmt_unit_ready        : with _uids[uid] do SoundPlayUnitCommand(un_snd_ready[uidt=glcp_unita]);
+lmt_unit_ready        : with _uids[uid] do
+                        SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
 lmt_req_common        : SoundPlayAnoncer(snd_cant_start_prod[race],true);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
-lmt_unit_attacked     : with _uids[uid] do SoundPlayAnoncer(snd_under_attack[_ukbuilding,race],true);
+lmt_unit_attacked     : with _uids[uid] do
+                        SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;
 end;
 

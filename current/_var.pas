@@ -391,10 +391,13 @@ c_yellow,
 c_dyellow,
 c_lava,
 c_lime,
+c_alime,
 c_green,
+c_agreen,
 c_dblue,
 c_blue,
 c_aqua,
+c_aaqua,
 c_white,
 c_agray,
 c_ltgray,
@@ -568,6 +571,7 @@ spr_eff_bfg,
 spr_eff_eb,
 spr_eff_ebb,
 spr_eff_tel,
+spr_eff_gtel,
 spr_eff_exp,
 spr_eff_exp2,
 spr_eff_g,
@@ -647,7 +651,7 @@ str_check_reqs,
 str_attr_detector,
 str_attr_invuln,
 str_attr_stuned,
-str_attr_advanced,
+str_attr_level,
 str_attr_building,
 str_attr_unit,
 str_attr_mech,
@@ -785,6 +789,9 @@ snd_anoncer_last   : PTSoundSet = nil;
 snd_anoncer_ticks  : integer = 0;
 snd_command_last   : PTSoundSet = nil;
 snd_command_ticks  : integer = 0;
+snd_mmap_last      : PTSoundSet = nil;
+snd_mmap_ticks     : integer = 0;
+
 
 snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
 snd_build_place,

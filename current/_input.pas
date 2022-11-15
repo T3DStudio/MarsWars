@@ -47,7 +47,6 @@ end;
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
 var su,i:integer;
     guid:byte;
-    gadv:boolean;
 function _checkEnemy:boolean;
 begin
    _checkEnemy:=false;
@@ -66,7 +65,6 @@ end;
 begin
    su  :=0;
    guid:=0;
-   gadv:=false;
 
    with _players[HPlayer] do
     for i:=1 to MaxUnits do
@@ -86,7 +84,6 @@ begin
                 if(_ucl<_uids[guid]._ucl)then continue;
 
               guid:=uidi;
-              gadv:=buff[ub_advanced]>0;
            end;
         end;
 
@@ -99,12 +96,12 @@ begin
    co_move,
    co_astand,
    co_stand,
-   co_patrol : _PlayCommand(un_snd_move[gadv]);
+   co_patrol : _PlayCommand(un_snd_move);
    co_amove,
-   co_apatrol: _PlayCommand(un_snd_attack[gadv]);
+   co_apatrol: _PlayCommand(un_snd_attack);
    co_rcamove: if(_checkEnemy)
-               then _PlayCommand(un_snd_attack[gadv])
-               else _PlayCommand(un_snd_move  [gadv]);
+               then _PlayCommand(un_snd_attack)
+               else _PlayCommand(un_snd_move  );
    end;
 
    ox1+=vid_mapx;
@@ -114,6 +111,7 @@ begin
    begin
       ui_umark_u:=tar;
       ui_umark_t:=fr_2hfps;
+      exit;
    end;
 
    case cmd of

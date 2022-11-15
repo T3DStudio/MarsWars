@@ -42,8 +42,6 @@ ai_alarm_unit,
 ai_need_heye_u,
 ai_grd_commander_u,
 ai_fly_commander_u,
-ai_hadv_u,
-ai_uadv_u,
 ai_inapc_u,
 ai_abase_u,
 ai_invuln_tar_u,
@@ -70,7 +68,6 @@ ai_alarm_y,
 ai_grd_commander_d,
 ai_fly_commander_d,
 ai_need_heye_d,
-ai_uadv_d,
 ai_inapc_d,
 ai_abase_d,
 ai_base_d,
@@ -401,11 +398,6 @@ begin
    ai_inapc_d       := notset;
    ai_inapc_u       := nil;
 
-   // adv
-   ai_uadv_d        := notset;
-   ai_uadv_u        := nil;
-   ai_hadv_u        := nil;
-
    // nearest teleporter
    ai_teleporter_d  := notset;
    ai_teleporter_u  := nil;
@@ -493,27 +485,6 @@ begin
       pd^ :=d;
       ppu^:=tu;
    end;
-end;
-function _HellAdvPrio(new,cur:PTUnit):boolean;
-begin
-   _HellAdvPrio:=false;
-
-   if(new=nil)then exit;
-
-   with new^ do
-    if(uid^._ukbuilding)
-    or(buff[ub_advanced]>0)
-    or(uid^._ability=uab_Advance)then exit;
-
-   if(cur<>nil)then
-   begin
-      if(new^.uidi=UID_LostSoul)then
-       if(pu^.player^.uid_e[UID_Pain]>0)then exit;
-
-      if(cur^.hits>new^.hits)then exit;
-   end;
-
-   _HellAdvPrio:=true;
 end;
 begin
    with pu^     do
@@ -634,7 +605,7 @@ begin
 
                 if(not ai_LostWantZombieMe)then
                  if((ud-_r-tu^.uid^._r)<melee_r)then
-                  if(tu^.uidi=UID_LostSoul)and(tu^.buff[ub_advanced]>0)and(tu^.a_tar=unum)then ai_LostWantZombieMe:=true;
+                  if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then ai_LostWantZombieMe:=true;
              end;
 
             if(player=tu^.player)then
@@ -643,14 +614,14 @@ begin
                begin
                   if(_urace=tu^.uid^._urace)then
                   begin
-                     // uac tech
+                     {// uac tech
                      if(tu^.uid^._ability=uab_uac__unit_adv)and(tu^.rld<=0)and(pfcheck)then
                       if(_canability(tu))then _setNearestPU(@ai_uadv_u,@ai_uadv_d,ud);
 
                      // hell tech target
                      if(_ability=uab_hell_unit_adv)then
                       if(_canability(pu))then
-                       if(_HellAdvPrio(tu,ai_hadv_u))then ai_hadv_u:=tu;
+                       if(_HellAdvPrio(tu,ai_hadv_u))then ai_hadv_u:=tu;  }
                   end;
 
                   // teleports near
@@ -698,23 +669,19 @@ begin
             if(tu^.uid^._isbarrack)then
              if(tu^.uidi=aiucl_barrack0[race])
              or(tu^.uidi=aiucl_barrack1[race])then
-              if(tu^.buff[ub_advanced]>0)
-              then ai_unitp_cur+=MaxUnitProdsN
-              else
-              begin
-                 ai_unitp_cur   +=1;
-                 ai_unitp_cur_na+=1;
-              end;
+             begin
+                ai_unitp_cur+=level+1;
+                if(level=0)then
+                ai_unitp_cur_na+=1;
+             end;
 
             if(tu^.uid^._issmith)then
              if(tu^.uidi=aiucl_smith[race])then
-              if(tu^.buff[ub_advanced]>0)
-              then ai_upgrp_cur+=MaxUnitProdsN
-              else
-              begin
-                 ai_upgrp_cur   +=1;
-                 ai_upgrp_cur_na+=1;
-              end;
+             begin
+                ai_upgrp_cur   +=level+1;
+                if(level=0)then
+                ai_upgrp_cur_na+=1;
+             end;
          end;
       end;
    end;
@@ -778,10 +745,9 @@ begin
    ai_isnoprod:=true;
    with pu^  do
    with uid^ do
-   for i:=0 to MaxUnitProdsI do
+   for i:=0 to MaxUnitLevel do
    begin
-      if(i>0)then
-       if(buff[ub_advanced]<=0)then break;
+      if(i>level)then break;
       if((_isbarrack)and(uprod_r[i]>0))
       or((_issmith  )and(pprod_r[i]>0))then
       begin
@@ -1234,13 +1200,13 @@ begin
 r_hell: begin
         if(cf(@ai_flags,@aif_upgr_smart_opening))then
         begin
-        MakeUpgr(upgr_hell_mainr ,1);
-        MakeUpgr(upgr_hell_hktele,1);
-        MakeUpgr(upgr_hell_mainr ,2);
+        MakeUpgr(upgr_hell_buildr ,1);
+        MakeUpgr(upgr_hell_HKTeleport,1);
+        MakeUpgr(upgr_hell_buildr ,2);
         MakeUpgr(upgr_hell_heye  ,1);
         MakeUpgr(upgr_hell_pains ,1);
         MakeUpgr(upgr_hell_9bld  ,1);
-        MakeUpgr(upgr_hell_6bld  ,2);
+       // MakeUpgr(upgr_hell_6bld  ,2);
         end;
 
         MakeUpgr(random(30)   ,ai_max_upgrlvl);
@@ -1253,7 +1219,7 @@ r_uac : begin
         MakeUpgr(upgr_uac_mainr  ,2);
         MakeUpgr(upgr_uac_float  ,1);
         MakeUpgr(upgr_uac_9bld   ,1);
-        MakeUpgr(upgr_uac_6bld   ,1);
+       // MakeUpgr(upgr_uac_6bld   ,1);
         end;
 
         MakeUpgr(30+random(30),ai_max_upgrlvl);
@@ -1288,15 +1254,13 @@ UID_UAGenerator: if(armylimit>ai_gendestroy_armylimit)and(cenergy>_genergy)and(m
         if(_isbarrack)or(_issmith)then
          if(ai_isnoprod(pu))then
          begin
-            if(buff[ub_advanced]>0)
-            then i:=MaxUnitProdsN
-            else i:=1;
+            i:=level;
 
             if(_isbarrack)and(ai_unitp_cur>6)then
-             if(ai_unitp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_unitp_cur_na>0))then
+             if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
               if((ai_unitp_cur-i)>=ai_unitp_need)then exit;
             if(_issmith  )and(ai_upgrp_cur>3)then
-             if(ai_upgrp_cur_na<=0)or((buff[ub_advanced]<=0)and(ai_upgrp_cur_na>0))then
+             if(ai_upgrp_cur_na<=0)or((level=0)and(ai_upgrp_cur_na>0))then
               if((ai_upgrp_cur-i)>=ai_upgrp_need)then exit;
          end;
       end;
@@ -1338,7 +1302,7 @@ UID_HSymbol,
 UID_UGenerator : if(ai_enrg_cur<ai_max_energy)then exit;
        else
           if(_isbarrack)or(_issmith)then
-           if(buff[ub_advanced]<=0)and(ai_isnoprod(pu))then exit;
+           if(level=0)and(ai_isnoprod(pu))then exit;
        end;
    end;
    ai_buildings_need_ability:=false;
@@ -1557,7 +1521,7 @@ begin
          if(_IsUnitRange(ai_teleporter_u^.uo_tar,nil))then _ability_teleport(pu,ai_teleporter_u,ai_teleporter_d);
     end
     else
-      if(ai_teleporter_u^.buff[ub_advanced]>0)and(ai_teleporter_u^.rld<=0)
+      if(ai_teleporter_u^.player^.upgr[upgr_hell_rteleport]>0)and(ai_teleporter_u^.rld<=0)
       then _ability_teleport(pu,ai_teleporter_u,ai_teleporter_d);
 end;
 
@@ -1746,17 +1710,6 @@ UID_Medic    : if(ai_urepair_d<base_rr)and(ai_urepair_d<ai_cpoint_d)then
                end;
          end;
 
-      if(group<>aio_busy)then
-       if(ai_uadv_u<>nil)and(ai_uadv_d<base_rr)and(ai_uadv_d<aiu_alarm_d)and(not _ukbuilding)and(_ability<>uab_Advance)then
-        if(cf(@player^.ai_flags,@aif_army_advance))and(buff[ub_advanced]<=0)then
-        begin
-           if(group<>aio_attack)then group:=aio_busy;
-           ai_set_uo(pu,ai_uadv_d,0,0,0,ai_uadv_u);
-           d:=ai_uadv_d-(_r+ai_uadv_u^.uid^._r-aw_dmelee);
-           if(d<=0)
-           then uo_tar:=ai_uadv_u^.unum;
-        end;
-
       if(group<>aio_busy)and(ai_inapc_d<notset)then
        if((ai_inapc_d<ai_abase_d)and(apcc>0))or(apcc<=0)then
         if(ai_inapc_d<base_ir)or( ukfly and ((apcc<=0)or(group<>aio_attack)) )then
@@ -1914,8 +1867,8 @@ begin
                                ai_enemy_u^.y+sign(ai_enemy_u^.y-y)*100,aiu_armyaround_enemy,srange,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pfzone);
 
       case _ability of
-uab_hell_unit_adv: if(cf(@player^.ai_flags,@aif_army_advance))then
-                    if(ai_hadv_u<>nil)then uo_tar:=ai_hadv_u^.unum;
+//uab_hell_unit_adv: if(cf(@player^.ai_flags,@aif_army_advance))then
+//                    if(ai_hadv_u<>nil)then uo_tar:=ai_hadv_u^.unum;
 uab_teleport     : if(ai_teleporter_beacon_u<>nil)
                    then uo_tar:=ai_teleporter_beacon_u^.unum
                    else uo_tar:=0;

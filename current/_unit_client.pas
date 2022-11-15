@@ -139,12 +139,14 @@ begin
       SetBBit(@_bts2,3, buff[ub_invuln   ]>0);
       SetBBit(@_bts2,4, buff[ub_teleeff  ]>0);
       SetBBit(@_bts2,5, buff[ub_hvision  ]>0);
+      SetBBit(@_bts2,6, buff[ub_cast     ]>0);
+
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
-      SetBBit(@_bts1,2, buff[ub_advanced ]>0);
-      SetBBit(@_bts1,3, buff[ub_pain     ]>0);
-      SetBBit(@_bts1,4, buff[ub_cast     ]>0);
+      SetBBit(@_bts1,2, false);    //level
+      SetBBit(@_bts1,3, false);
+      SetBBit(@_bts1,4, buff[ub_pain     ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
@@ -167,8 +169,9 @@ var i: byte;
 begin
    with pu^ do
    with uid^ do
-   for i:=0 to MaxUnitProdsI do
+   for i:=0 to MaxUnitLevel do
    begin
+      if(i>level)then break;
       if(_isbarrack)then if(_wrld(@uprod_r[i],rpl)>0)then _wudata_byte(uprod_u[i],rpl);
       if(_issmith  )then if(_wrld(@pprod_r[i],rpl)>0)then _wudata_byte(pprod_u[i],rpl);
    end;
@@ -399,7 +402,7 @@ begin
             _unit_done_inc_cntrs(pu);
 
             if(_isbarrack)then
-             for i:=0 to MaxUnitProdsI do
+             for i:=0 to MaxUnitLevel do
               if(uprod_r[i]>0)then
               begin
                  _puid:=uprod_u[i];
@@ -410,7 +413,7 @@ begin
                  cenergy-=_uids[_puid]._renergy;
               end;
             if(_issmith)then
-             for i:=0 to MaxUnitProdsI do
+             for i:=0 to MaxUnitLevel do
               if(pprod_r[i]>0)then
               begin
                  _puid:=pprod_u[i] ;
@@ -457,7 +460,7 @@ begin
             _unit_done_dec_cntrs(pu);
 
             if(_isbarrack)then
-             for i:=0 to MaxUnitProdsI do
+             for i:=0 to MaxUnitLevel do
               if(uprod_r[i]>0)then
               begin
                  _puid:=uprod_u[i];
@@ -468,7 +471,7 @@ begin
                  cenergy+=_uids[_puid]._renergy;
               end;
             if(_issmith)then
-             for i:=0 to MaxUnitProdsI do
+             for i:=0 to MaxUnitLevel do
               if(pprod_r[i]>0)then
               begin
                  _puid:=pprod_u[i];
@@ -537,7 +540,7 @@ begin
            _unit_fog_r(uu);
            if(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
            if(buff[ub_teleeff ]>0)then _teleEff(uu,@vis);
-           if(buff[ub_hvision ]>0)then _unit_HvisionEff(uu,@vis);
+           if(buff[ub_hvision ]>0)then _unit_LevelUp(uu,EID_HVision,@vis);
            with uid^ do
            if(bld=false)then SoundPlayAnoncer(snd_build_place[_urace],false);
 
@@ -586,7 +589,7 @@ begin
             begin
                if(pu^.buff[ub_teleeff ]<=0)and(buff[ub_teleeff ]>0)then _teleEff(uu,pu);
                if(pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0)then _ucSummonedEffect (uu,@vis);
-               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_HvisionEff  (uu,@vis);
+               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_LevelUp     (uu,EID_HVision,@vis);
                if(pu^.buff[ub_pain    ]<=0)and(buff[ub_pain    ]>0)then _unit_pain_effects(uu,@vis);
 
                if(pu^.bld)and(bld=false)then
@@ -608,16 +611,9 @@ begin
 
                   if(uid^._ukbuilding=false)then
                   begin
-                     if(uid^._ability<>uab_advance)then
-                      if(pu^.buff[ub_advanced]<=0)and(buff[ub_advanced]>0)then
-                      begin
-                         case uid^._urace of
-                    r_hell: _unit_PowerUpEff(pu,snd_unit_adv[uid^._urace],@vis);
-                    r_uac : SoundPlayUnit(snd_unit_adv[uid^._urace],pu,@vis);
-                         end;
-                      end;
+                     if(pu^.level<level)then _unit_LevelUp(uu,0,@vis);
 
-                     if(pu^.buff[ub_invuln]<=0)and(buff[ub_invuln]>0)then _unit_PowerUpEff(uu,snd_hell_invuln,@vis);
+                     if(pu^.buff[ub_invuln]<=0)and(buff[ub_invuln]>0)then _unit_LevelUp(uu,EID_Invuln,@vis);
                   end;
                end;
             end;
@@ -762,9 +758,9 @@ begin
 
       bld:=GetBBit(@_bts1,0);
       if(GetBBit(@_bts1,1))then inapc:=1 else inapc:=0;
-      buff[ub_advanced ]:=_buffst[GetBBit(@_bts1,2)];
-      buff[ub_pain     ]:=_buffst[GetBBit(@_bts1,3)];
-      buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,4)];
+      //buff[ub_advanced ]:=_buffst[GetBBit(@_bts1,2)];
+      // level from 2-3 bits
+      buff[ub_pain     ]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       sel:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
@@ -779,6 +775,7 @@ begin
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,4)];
          buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,6)];
       end
       else
       begin
@@ -807,8 +804,9 @@ var i: byte;
 begin
    with uu^ do
    with uid^ do
-   for i:=0 to MaxUnitProdsI do
+   for i:=0 to MaxUnitLevel do
    begin
+      if(i>level)then break;
       if(_isbarrack)then if(_rrld(@uprod_r[i],rpl)>0)then uprod_u[i]:=_rudata_byte(rpl,0);
       if(_issmith  )then if(_rrld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);
    end;
@@ -832,7 +830,7 @@ begin
          uidi:=_rudata_byte(rpl,0);
          if(i<>uidi)then
          begin
-            _unit_apUID(uu,false);
+            _unit_apUID(uu);
             _unit_default(uu);
             FillChar(buff,SizeOf(buff),0);
          end;

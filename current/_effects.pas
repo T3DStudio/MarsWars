@@ -33,7 +33,6 @@ begin
         MID_BFG           : _setEID(@spr_u_p2          ,sms_death);
         MID_Flyer         : _setEID(@spr_u_p3          ,sms_death);
 
-        EID_HAEye,
         MID_Imp           : _setEID(@spr_h_p0          ,sms_death);
         MID_Cacodemon     : _setEID(@spr_h_p1          ,sms_death);
         MID_Baron         : _setEID(@spr_h_p2          ,sms_death);
@@ -55,9 +54,21 @@ begin
 
         EID_ArchFire      : _setEID(@spr_h_p6          ,sms_death);
 
-        EID_HUpgr         : begin
+        EID_HLevelUp      : begin
                             _setEID(@spr_eff_tel       ,sms_death);
                             smask :=c_ared;
+                            end;
+        EID_ULevelUp      : begin
+                            _setEID(@spr_eff_gtel      ,sms_death);
+                            smask :=c_aaqua;
+                            end;
+        EID_HVision       : begin
+                            _setEID(@spr_eff_gtel      ,sms_death);
+                            smask :=c_alime;
+                            end;
+        EID_Invuln        : begin
+                            _setEID(@spr_eff_gtel      ,sms_death);
+                            smask :=c_awhite;
                             end;
         EID_Teleport      : _setEID(@spr_eff_tel       ,sms_death);
         EID_Gavno         : _setEID(@spr_eff_g         ,sms_death);
@@ -142,7 +153,6 @@ begin
 //                       step  frame
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
-EID_HAEye,
 UID_HEye          : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
@@ -177,7 +187,10 @@ EID_Blood         : _setEff(6 ,0 ,-1 ,-1       ,true ,15);
 
 EID_ArchFire      : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
-EID_HUpgr,
+EID_HLevelUp,
+EID_ULevelUp,
+EID_HVision,
+EID_Invuln,
 EID_Teleport      : _setEff(10,0 ,-1 ,-1       ,true ,0 );
 EID_Gavno         : _setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
