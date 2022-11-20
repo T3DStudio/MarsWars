@@ -207,12 +207,12 @@ MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;   
 MID_Chaingunx2 : begin damage:=BaseDamage1hh; vstep:=5;        splashr :=0  ;         end;
 MID_BPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_BFG        : begin damage:=BaseDamage5  ; vstep:=d div 12; splashr :=100;         end;
-MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 30; splashr :=0  ;         end;
+MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 20; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=tank_sr;     end;
-MID_Mine       : begin damage:=1000; vstep:=1;        splashr :=100;         end;
-MID_Blizzard   : begin damage:=2000; vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
+MID_Mine       : begin damage:=1000;          vstep:=1;        splashr :=100;         end;
+MID_Blizzard   : begin damage:=2000;          vstep:=fr_fps;   splashr :=blizz_r;     dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
 MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;mtars:=2;end;
       else
@@ -246,6 +246,7 @@ MID_TBullet,
 MID_Bullet,
 MID_Chaingun,
 MID_Chaingunx2,
+MID_Flyer,
 MID_Imp,
 MID_Cacodemon,
 MID_Tank,
@@ -317,7 +318,7 @@ begin
 
         /////////////////////////////////
 
-        {if(not tu^.uid^._ukbuilding)then// not buildings
+        if(not tu^.uid^._ukbuilding)then// not buildings
         begin
         if (    tu^.uid^._uklight)then  // light all
             case mid of
@@ -371,8 +372,7 @@ begin
             case mid of
             MID_Revenant,
             MID_URocketS,
-            MID_URocket,
-            MID_Flyer       : _d200(@rdamage);
+            MID_URocket     : _d200(@rdamage);
             end;
 
         case mid of
@@ -381,7 +381,7 @@ begin
             MID_Chaingun,
             MID_Chaingunx2,
             MID_SSShot      : painX:=2;
-        end;   }
+        end;
 
         if(ud<=0)and(ntars=0)then // direct and first target
         begin
@@ -394,7 +394,7 @@ begin
             begin
                if((mid=MID_TBullet )and(not tu^.uid^._ukmech))
                or((mid=MID_MBullet )and(    tu^.uid^._ukmech))
-               then tu^.buff[ub_stun]:=fr_2hfps;
+               then tu^.buff[ub_pain]:=fr_2hfps;
             end;
 
            mtars-=1;

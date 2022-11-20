@@ -11,11 +11,11 @@ end;
 procedure map_seed2theme;
 begin
    SetTheme(
-      map_seed and $0000000F,
-   -((map_seed and $00000FF0) shr 4 ),
-   -((map_seed and $000FF000) shr 12),
-   -((map_seed and $0FF00000) shr 20),
-   -((map_seed and $F0000000) shr 28));
+      map_seed and $0000000F,            // theme number
+   -((map_seed and $00000FF0) shr 4 ),   // terrain
+   -((map_seed and $000FF000) shr 12),   // liquid
+   -((map_seed and $0FF00000) shr 20),   // liquid back
+   -((map_seed and $F0000000) shr 28));  // crater
 end;
 
 {$ENDIF}

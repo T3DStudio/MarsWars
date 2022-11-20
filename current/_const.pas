@@ -158,6 +158,7 @@ lmt_req_common         = 19;
 lmt_req_ruids          = 20;
 lmt_map_mark           = 21;
 lmt_unit_attacked      = 22;
+lmt_cant_order         = 23;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
@@ -242,6 +243,7 @@ ureq_product           : cardinal = %0000100000000000; // already in production
 ureq_armylimit         : cardinal = %0001000000000000;
 ureq_place             : cardinal = %0010000000000000; // cant build here
 ureq_busy              : cardinal = %0100000000000000; // production is busy
+ureq_unknown           : cardinal = %1000000000000000; //
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -381,6 +383,7 @@ wtp_scout              = 15;
 wtp_notme_hits         = 16;
 wtp_fly                = 17;
 wtp_nolost_hits        = 18;
+wtp_max_hits           = 19;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -422,6 +425,7 @@ uab_hell_vard          = 12;
 uab_spawnlost          = 13;
 uab_hell_vision        = 14;
 uab_advance            = 15;
+uab_prodlevelup        = 16;
 
 client_rld_abils = [
                    uab_teleport     ,
@@ -442,19 +446,18 @@ client_cast_abils= [
 MaxUnitBuffs           = 15;
 
 ub_pain                = 1;
-ub_stun                = 2;
-ub_resur               = 3;
-ub_cast                = 4;
-ub_slooow              = 5;
-ub_clcast              = 6;
-ub_invis               = 7;
-ub_detect              = 8;
-ub_invuln              = 9;
-ub_summoned            = 10;
-ub_teleeff             = 11;
-ub_hvision             = 12;
-ub_damaged             = 13;
-ub_heal                = 14;
+ub_resur               = 2;
+ub_cast                = 3;
+ub_slooow              = 4;
+ub_clcast              = 5;
+ub_invis               = 6;
+ub_detect              = 7;
+ub_invuln              = 8;
+ub_summoned            = 9;
+ub_teleeff             = 10;
+ub_hvision             = 11;
+ub_damaged             = 12;
+ub_heal                = 13;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
@@ -498,20 +501,20 @@ upgr_hell_dattack      = 1;  // distance attacks damage    // t1
 upgr_hell_uarmor       = 2;  // base unit armor
 upgr_hell_barmor       = 3;  // base building armor
 upgr_hell_mattack      = 4;  // melee attack damage
-upgr_hell_vision       = 5;  // demons vision
-upgr_hell_regen        = 6;  // regeneration
-upgr_hell_pains        = 7;  // pain state
-upgr_hell_heye         = 8;  // hell Eye time
-upgr_hell_towers       = 9;  // towers range
-upgr_hell_teleport     = 10; // Teleport reload
-upgr_hell_HKTeleport   = 11; // HK teleportation
-upgr_hell_paina        = 12; // decay aura
-upgr_hell_buildr       = 13; // main range
-upgr_hell_hktdoodads   = 14; // HK on doodabs
+upgr_hell_regen        = 5;  // regeneration
+upgr_hell_pains        = 6;  // pain state
+upgr_hell_towers       = 7;  // towers range
+upgr_hell_HKTeleport   = 8;  // HK teleportation
+upgr_hell_paina        = 9;  // decay aura
+upgr_hell_buildr       = 10; // main range
+upgr_hell_hktdoodads   = 11; // HK on doodabs
+upgr_hell_pinkspd      = 12; // demon move speed
 
-upgr_hell_spectre      = 15; // demon spectre              // t2
-upgr_hell_pinkspd      = 16; // demon move speed
-upgr_hell_rteleport    = 17; // revers teleport
+upgr_hell_spectre      = 13; // demon spectre              // t2
+upgr_hell_vision       = 14; // demons vision
+upgr_hell_teleport     = 15; // Teleport reload
+upgr_hell_rteleport    = 16; // revers teleport
+upgr_hell_heye         = 17; // hell Eye time
 upgr_hell_9bld         = 18; // 9 class building reload time
 upgr_hell_totminv      = 19; // totem and eye invisible
 upgr_hell_bldrep       = 20; // build restoration
@@ -523,26 +526,27 @@ upgr_uac_attack        = 31; // distance attack            // t1
 upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
-upgr_uac_vision        = 35; // infatry vision
-upgr_uac_mspeed        = 36; // infantry speed
-upgr_uac_plasmt        = 37; // plasma weapons fro anti-ground turret
-upgr_uac_float         = 38; // UACBot floating
-upgr_uac_towers        = 39; // towers sr
-upgr_uac_radar_r       = 40; // Radar
-upgr_uac_mainm         = 41; // Main b move
-upgr_uac_ccturr        = 42; // CC turret
-upgr_uac_mainr         = 43; // main sr
-upgr_uac_ccldoodads    = 44; // main on doodabs
+upgr_uac_mspeed        = 35; // infantry speed
+upgr_uac_jetpack       = 36; // jetpack for plasmagunner
+upgr_uac_towers        = 37; // towers sr
+upgr_uac_mainm         = 38; // CC fly
+upgr_uac_ccturr        = 39; // CC turret
+upgr_uac_buildr        = 40; // main sr
+upgr_uac_ccldoodads    = 41; // main on doodabs
+upgr_uac_float         = 42; // UACBot floating
 
-upgr_uac_commando      = 45; // commando invis   // t2
-upgr_uac_ssg           = 46; // ssg
-upgr_uac_airsp         = 47; // anti-air missiles splash
-upgr_uac_jetpack       = 48; // jetpack for plasmagunner
-upgr_uac_9bld          = 49; // 9 class building reload time
-upgr_uac_mechspd       = 50; // mech speed
-upgr_uac_mecharm       = 51; // mech arm
-upgr_uac_turarm        = 52; // turrets armor
-upgr_uac_rstrike       = 53; // rstrike launch
+upgr_uac_botturret     = 43; // bot turret                 // t2
+upgr_uac_vision        = 44; // infatry vision
+upgr_uac_commando      = 45; // commando invis
+upgr_uac_airsp         = 46; // anti-air missiles splash
+upgr_uac_mechspd       = 47; // mech speed
+upgr_uac_mecharm       = 48; // mech arm
+upgr_uac_lturret       = 49; // flyer laser turret
+upgr_uac_radar_r       = 50; // Radar
+upgr_uac_9bld          = 51; // 9 class building reload time
+upgr_uac_plasmt        = 52; // plasma weapons fro anti-ground turret
+upgr_uac_turarm        = 53; // turrets armor
+upgr_uac_rstrike       = 54; // rstrike launch
 
 
 upgr_fog_vision        = 249;
@@ -559,7 +563,6 @@ upgr_race_mech_regen   : array[1..r_cnt] of byte = (0                , 0        
 upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0               );
 upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
 upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
-upgr_race_9bld         : array[1..r_cnt] of byte = (upgr_hell_9bld   , upgr_uac_9bld   );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -633,16 +636,19 @@ BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
 BaseDamage5            = BaseDamage1*5;
 
-BaseDamageBonus1       = 8;
+BaseDamageBonus1       = 6;
 BaseDamageLevel1       = BaseDamageBonus1 div 2;
-BaseArmorBonus1        = 8;
+BaseArmorBonus1        = 6;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
 BaseArmorBonus1h       = BaseArmorBonus1+BaseArmorBonush;
 BaseArmorLevel1        = BaseArmorBonush;
 
+BaseHeal1              = BaseDamageh;
 BaseHealBonus1         = BaseDamageBonus1*2;
+BaseRepair1            = BaseDamageh;
+BaseRepairBonus1       = BaseDamageBonus1*3;
 
-ExpLevel1              = fr_fps*30;
+ExpLevel1              = fr_fps*45;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -779,7 +785,7 @@ order_period           = fr_2hfps+1;
 vistime                = order_period+2;
 
 radar_reload           = fr_fps*60;
-radar_btime            = radar_reload-(fr_fps*5);
+radar_vision_time      = radar_reload-(fr_fps*5);
 
 hell_vision_time       = fr_fps*5;
 heyenest_reload        = fr_fps*60;
@@ -793,9 +799,6 @@ melee_r                = 8;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
-
-//uac_adv_base_reload    : array[false..true] of integer = (fr_fps*5,fr_fps*10);
-uac_adv_base_reload    = fr_fps*5;
 
 building_adv_reload    : array[false..true] of integer = (fr_fps*45,0);
 

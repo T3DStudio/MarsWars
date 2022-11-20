@@ -656,10 +656,9 @@ begin
    setEffectEID (0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (nil,snd_exp ,snd_exp ,nil);
 
-   setWeaponESND(0,nil,snd_ssg    ,0,0);
-   setWeaponESND(1,nil,snd_shotgun,0,0);
+   setWeaponESND(0,nil,snd_shotgun,0,0);
 
-   setWeaponTEID(1,nil,0,[0..255]);
+   setWeaponTEID(0,nil,0,[0..255]);
 
    DefaultRLDA_pa:=2;
 end;
@@ -679,7 +678,8 @@ begin
    setCommandSND(snd_uacfighter_ready,snd_uacfighter_move,snd_uacfighter_attack,snd_uacfighter_annoy,snd_uacfighter_select);
    setEffectEID (0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (nil,snd_exp ,snd_exp ,nil);
-   setWeaponESND(0    ,nil,snd_flyer_s,0,0);
+   setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
+   setWeaponESND(1  ,nil,snd_flyer_s,0,0);
 end;
 UID_UTransport:
 begin
@@ -882,11 +882,10 @@ upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
 upgr_uac_ccturr     : begin _up_btn:=spr_b_up[r_uac ,10]; end;
-upgr_uac_mainr      : begin _up_btn:=spr_b_up[r_uac ,11]; end;
+upgr_uac_buildr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
 upgr_uac_ccldoodads : begin _up_btn:=spr_b_up[r_uac ,20]; end;
-
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
-upgr_uac_ssg        : begin _up_btn:=spr_b_up[r_uac ,23]; end;
+upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
 upgr_uac_jetpack    : begin _up_btn:=spr_b_up[r_uac ,15]; end;
 upgr_uac_9bld       : begin _up_btn:=spr_b_up[r_uac ,24]; end;
@@ -894,6 +893,7 @@ upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm     : begin _up_btn:=spr_b_up[r_uac ,21]; end;
 upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
+upgr_uac_lturret    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
 
       end;
 

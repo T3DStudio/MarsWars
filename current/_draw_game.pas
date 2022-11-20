@@ -309,6 +309,7 @@ procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
 var srect,
 choosen,
+pain,
       hbar :boolean;
     acolor :cardinal;
    buffx,
@@ -340,20 +341,23 @@ begin
          if(playeri=HPlayer)
          then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group),'',lvlstr_b,i2s6(apcm),i2s6(apcc))
          else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w   ,'',lvlstr_b,lvlstr_a  ,lvlstr_s  );
+         UnitsInfoAddText(vx,vy-sel_hh-font_w,lvlstr_l,c_white);
       end;
       if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
 
       if(rld>0)and(playeri=HPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
+
 
       if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink_color);
 
       if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink_color);
 
+      pain:=(buff[ub_pain]>0)and(_ukmech and not _ukbuilding);
       buffx:=0;
       if(buff[ub_hvision]>0)then buffx+=1;
       if(buff[ub_invuln ]>0)then buffx+=1;
-      if(buff[ub_stun   ]>0)then buffx+=1;
+      if(pain              )then buffx+=1;
 
       if(buffx=0)then exit;
 
@@ -362,11 +366,11 @@ begin
 
       if(_ukbuilding)
       then buffy:=vy
-      else buffy:=vy-sel_hh;
+      else buffy:=vy-sel_hh-font_w;
 
       if(buff[ub_hvision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
-      if(buff[ub_stun   ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
       if(buff[ub_invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
+      if(pain              )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
 

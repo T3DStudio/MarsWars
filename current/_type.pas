@@ -535,6 +535,7 @@ TUnit = record
    lvlstr_w,
    lvlstr_r,
    lvlstr_b,
+   lvlstr_l,
    lvlstr_a,
    lvlstr_s : string6;
    {$ENDIF}

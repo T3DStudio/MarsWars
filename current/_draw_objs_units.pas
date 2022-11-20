@@ -103,7 +103,7 @@ begin
     2:begin
          if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
          _unit_fogrev:=true;
-         if(_ability=uab_radar)and(rld>radar_btime)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
+         if(_ability=uab_radar)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
       end;
       end;
 end;
@@ -214,7 +214,7 @@ begin
          if(sel)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            if((_ability>0)and(_canability(pu)))
+            if(_canability(pu)=0)
             or(apcc>0)
             or((level=0)and(_isbarrack or _issmith)and(uid_x[uid_race_9bld[race]]>0))then ui_uibtn_action+=1;
          end;
@@ -277,12 +277,12 @@ begin
       lvlstr_b:='';
       if(buff[ub_detect  ]>0)then lvlstr_b+=char_detect;
 
+      lvlstr_l:='';
       if(not _ukbuilding)then
        case level of
-       0: lvlstr_b+=tc_gray  +'1';
-       1: lvlstr_b+=tc_yellow+'2';
-       2: lvlstr_b+=tc_orange+'3';
-       else lvlstr_b+=tc_red+b2s(level+1);
+       1: lvlstr_l:='*';
+       2: lvlstr_l:='* *';
+       3: lvlstr_l:='* * *';
        end
       else
         if(level>0)then lvlstr_b+=char_advanced;
@@ -406,6 +406,11 @@ begin
                 end;
 
                 case uidi of
+UID_UGTurret      : if(upgr[upgr_uac_turarm]>0)then
+                     if(level=0)
+                     then SpriteListAddUnit(vx  ,vy   ,depth,0,0,0,@spr_b4_a,alpha)
+                     else SpriteListAddUnit(vx  ,vy   ,depth,0,0,0,@spr_b7_a,alpha);
+UID_UATurret      : if(upgr[upgr_uac_turarm]>0)then SpriteListAddUnit(vx  ,vy   ,depth,0,0,0,@spr_b9_a,alpha);
 UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,0,@spr_ptur,alpha);
                 end;
              end

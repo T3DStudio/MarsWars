@@ -180,7 +180,7 @@ begin
       if(buff[ub_invuln]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
       else
-        if(buff[ub_stun]>0)or(buff[ub_pain]>0)
+        if(buff[ub_pain]>0)
         then _ADDSTRC(@_makeAttributeStr,str_attr_stuned);
 
       _makeAttributeStr:='['+_makeAttributeStr+']';
@@ -363,6 +363,7 @@ begin
    str_need_energy       := 'Need more energy!';
    str_cant_prod         := 'Can`t production this!';
    str_check_reqs        := 'Check requirements!';
+   str_cant_execute      := 'Can`t execute order!';
 
    str_advanced          := 'Advanced ';
    str_unit_advanced     := 'Unit promoted';
@@ -845,6 +846,7 @@ begin
   str_need_energy       := 'Необходимо больше энергии!';
   str_cant_prod         := 'Невоможно произвести это!';
   str_check_reqs        := 'Проверьте требования!';
+  str_cant_execute      := 'Невозвможно выполнить приказ!';
 
   str_advanced          := 'Улучшенный ';
   str_unit_advanced     := 'Юнит улучшен';

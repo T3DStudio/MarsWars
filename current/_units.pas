@@ -440,10 +440,8 @@ wpt_heal     : if(tu^.hits<=0)
       end
       else
       begin
-      if(cf(@aw_tarf,@wtr_stun    )=false)and((tu^.buff[ub_pain]> 0)
-                                            or(tu^.buff[ub_stun]> 0)     )then exit;
-      if(cf(@aw_tarf,@wtr_nostun  )=false)and((tu^.buff[ub_pain]<=0)
-                                           and(tu^.buff[ub_stun]<=0)     )then exit;
+      if(cf(@aw_tarf,@wtr_stun    )=false)and(tu^.buff[ub_pain]> 0       )then exit;
+      if(cf(@aw_tarf,@wtr_nostun  )=false)and(tu^.buff[ub_pain]<=0       )then exit;
       end;
 
       // Distance requirements
@@ -545,15 +543,13 @@ wtp_unit_bio_nlight  : begin
 wtp_unit_bio_nostun  : begin
                        incPrio(not _ukbuilding  );
                        incPrio(not _ukmech      );
-                       incPrio((buff[ub_stun]<=0)
-                           and(buff[ub_pain]<=0));
+                       incPrio(buff[ub_pain]<=0 );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_unit_mech_nostun : begin
                        incPrio(not _ukbuilding  );
                        incPrio(    _ukmech      );
-                       incPrio((buff[ub_stun]<=0)
-                           and(buff[ub_pain]<=0));
+                       incPrio(buff[ub_pain]<=0 );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_unit_mech        : begin
@@ -612,6 +608,7 @@ begin
            if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
            case aw_tarprior of
+wtp_max_hits         : if(tu^.hits       <a_tarp^^.hits       )then exit;
 wtp_distance         : if(ud>a_tard^)then exit;
 wtp_nolost_hits,
 wtp_hits             : if(tu^.hits       >a_tarp^^.hits       )then exit;
@@ -1038,6 +1035,7 @@ begin
 end;
 
 function _unit_action(pu:PTUnit):boolean;
+var tu:PTUnit;
 begin
    _unit_action:=false;
    with pu^ do
@@ -1049,9 +1047,9 @@ begin
          _unit_action:=true;
       end
       else
-       if(_canability(pu))then
-        with player^ do
-         case _ability of
+        if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canability(pu),pu))then
+          with player^ do
+            case _ability of
 uab_spawnlost     : if(buff[ub_cast]<=0)and(buff[ub_clcast]<=0)then
                     begin
                        buff[ub_cast  ]:=fr_2hfps;
@@ -1072,12 +1070,12 @@ uab_rebuild       : case uidi of
                     UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,0),pu);
                     UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,0),pu);
                     end;
-uab_buildturret   : ;//if(buff[ub_advanced]>0)then _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
-         else
-            if(level<=0)then
-             if(_isbarrack)or(_issmith)then
-              if(uid_x[uid_race_9bld[race]]>0)then _unit_action:=_ability_building_adv(pu,@_units[uid_x[uid_race_9bld[race]]]);
-         end;
+uab_buildturret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
+uab_prodlevelup   : if(_isbarrack)or(_issmith)then
+                     if(level<=0)and(_IsUnitRange(uid_x[_ability_ruid],@tu))then
+                      _unit_action:=_ability_building_adv(pu,tu);
+            else
+            end;
 end;
 
 // target units
@@ -1357,7 +1355,7 @@ wmove_noneed    : if(not attackinmove)then
             a_rld    :=aw_rld;
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
-            if(ServerSide)
+            if(ServerSide)and(not _ukbuilding)
             then _unit_exp(pu,aw_rld);
             if(not attackinmove)then
             begin
@@ -1404,7 +1402,7 @@ wmove_noneed    : if(not attackinmove)then
              end;
             {$ENDIF}
             if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
-            if(level>0)then upgradd+=level*_level_damage;
+            if(level>0)and(not _ukbuilding)then upgradd+=level*_level_damage;
             if(not attackinmove)then
              if(x<>tu^.x)
              or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);

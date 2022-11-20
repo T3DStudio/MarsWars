@@ -133,19 +133,18 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_stun     ]>0);
-      SetBBit(@_bts2,1, buff[ub_resur    ]>0);
-      SetBBit(@_bts2,2, buff[ub_summoned ]>0);
-      SetBBit(@_bts2,3, buff[ub_invuln   ]>0);
-      SetBBit(@_bts2,4, buff[ub_teleeff  ]>0);
-      SetBBit(@_bts2,5, buff[ub_hvision  ]>0);
-      SetBBit(@_bts2,6, buff[ub_cast     ]>0);
+      SetBBit(@_bts2,0, buff[ub_resur    ]>0);
+      SetBBit(@_bts2,1, buff[ub_summoned ]>0);
+      SetBBit(@_bts2,2, buff[ub_invuln   ]>0);
+      SetBBit(@_bts2,3, buff[ub_teleeff  ]>0);
+      SetBBit(@_bts2,4, buff[ub_hvision  ]>0);
+      SetBBit(@_bts2,5, buff[ub_cast     ]>0);
 
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
-      SetBBit(@_bts1,2, false);    //level
-      SetBBit(@_bts1,3, false);
+      SetBBit(@_bts1,2, (level and %01)   >0);
+      SetBBit(@_bts1,3, (level and %10)   >0);
       SetBBit(@_bts1,4, buff[ub_pain     ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                 );
@@ -753,13 +752,14 @@ begin
    with uu^ do
    begin
       a_weap:=255;
+      level:=0;
 
       _bts1:=_rudata_byte(rpl,0);
 
       bld:=GetBBit(@_bts1,0);
       if(GetBBit(@_bts1,1))then inapc:=1 else inapc:=0;
-      //buff[ub_advanced ]:=_buffst[GetBBit(@_bts1,2)];
-      // level from 2-3 bits
+      if(GetBBit(@_bts1,2))then level+=%01;
+      if(GetBBit(@_bts1,3))then level+=%10;
       buff[ub_pain     ]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       sel:=GetBBit(@_bts1,6);
@@ -769,17 +769,15 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_stun     ]:=_buffst[GetBBit(@_bts2,0)];
-         buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,1)];
-         buff[ub_summoned ]:=_buffst[GetBBit(@_bts2,2)];
-         buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,3)];
-         buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,5)];
-         buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,6)];
+         buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,0)];
+         buff[ub_summoned ]:=_buffst[GetBBit(@_bts2,1)];
+         buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,2)];
+         buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,3)];
+         buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,4)];
+         buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,5)];
       end
       else
       begin
-         buff[ub_stun     ]:=0;
          buff[ub_resur    ]:=0;
          buff[ub_summoned ]:=0;
          buff[ub_invuln   ]:=0;

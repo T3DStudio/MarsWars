@@ -189,14 +189,9 @@ begin
          with _a_weap[a_weap_cl] do
           if(not cf(@aw_reqf,@wpr_move))then exit;
 
-       if(_ukmech)then
-       begin
-         if(buff[ub_stun]>0)then exit;
-       end
-       else
+       if(not _ukbuilding)then
          if(buff[ub_pain]>0)
-         or(buff[ub_cast]>0)
-         or(buff[ub_stun]>0)then exit;
+         or(buff[ub_cast]>0)then exit;
 
        _canmove:=true;
     end;
@@ -213,14 +208,9 @@ begin
 
       if(check_buffs)then
       begin
-         if(_ukmech)then
-         begin
-           if(buff[ub_stun]>0)then exit;
-         end
-         else
+         if(not _ukbuilding)then
            if(buff[ub_pain]>0)
-           or(buff[ub_cast]>0)
-           or(buff[ub_stun]>0)then exit;
+           or(buff[ub_cast]>0)then exit;
       end;
 
       case _attack of
@@ -1488,7 +1478,7 @@ begin
       if(PlayerObserver(tu^.player)) //(tu^.player^.upgr[upgr_fog_vision]>0)
       then td:=0
       else
-        if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_btime)
+        if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_vision_time)
         then td:=min2(ud,point_dist_int(x,y,tu^.uo_x,tu^.uo_y))
         else td:=ud;
 

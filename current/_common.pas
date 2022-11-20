@@ -210,15 +210,19 @@ begin
 
    if(_players[pl].state=ps_comp)then exit;
 
-   if(cf(@condt,@ureq_place))
-   then bt:=lmt_cant_build
+   if(cf(@condt,@ureq_unknown))
+   then bt:=lmt_cant_order
    else
-     if(cf(@condt,@ureq_ruid))or(cf(@condt,@ureq_rupid))
-     then bt:=lmt_req_ruids
+     if(cf(@condt,@ureq_place))
+     then bt:=lmt_cant_build
      else
-      if(condt=ureq_energy)
-      then bt:=lmt_req_energy
-      else bt:=lmt_req_common;
+       if(cf(@condt,@ureq_ruid))
+       or(cf(@condt,@ureq_rupid))
+       then bt:=lmt_req_ruids
+       else
+         if(condt=ureq_energy)
+         then bt:=lmt_req_energy
+         else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -683,26 +687,27 @@ begin
    UnitF2Select:=true;
 end;
 
-function _canability(pu:PTUnit):boolean;
+function _canability(pu:PTUnit):cardinal;
 begin
-   _canability:=false;
+   _canability:=0;
    with pu^     do
    with uid^    do
-   if(_ability>0)then
-   with player^ do
-   begin
-      if(bld=false)or(hits<=0)then exit;
+    if(bld=false)
+    or(hits<=0)
+    or(_ability=0)
+    then _canability:=ureq_unknown
+    else
+      with player^ do
+      begin
+         if(_ability_no_obstacles)then
+          if(pf_isobstacle_zone(pfzone))then _canability+=ureq_place;
 
-      if(_ability_no_obstacles)then
-       if(pf_isobstacle_zone(pfzone))then exit;
+         if(_ability_ruid>0)then
+          if(uid_eb[_ability_ruid]<=0)then _canability+=ureq_ruid;
 
-      if(_ability_rupgr>0)then
-       if(upgr[_ability_rupgr]<_ability_rupgrl)then exit;
-
-      if(_ability_ruid>0)then
-       if(uid_eb[_ability_ruid]<=0)then exit;
-   end;
-   _canability:=true;
+         if(_ability_rupgr>0)and(_ability_rupgrl>0)then
+          if(upgr[_ability_rupgr]<_ability_rupgrl)then _canability+=ureq_rupid;
+      end;
 end;
 
 function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
@@ -1043,10 +1048,14 @@ lmt_unit_attacked    : begin
                         else ParseLogMessage:=str_unit_attacked+' ('+un_txt_name+')';
                        mcolor^:=c_red;
                        end;
+lmt_cant_order       : begin
+                          ParseLogMessage:=str_cant_execute;
+                          with _uids [uid] do ParseLogMessage:=ParseLogMessage+' ('+un_txt_name+')';
+                       end;
     end;
 end;
 
-procedure ReMakeLogForDraw(playern:byte;widthchars,listheight:integer;logtypes:TSoB);
+procedure MakeLogListForDraw(playern:byte;widthchars,listheight:integer;logtypes:TSoB);
 var ts:shortstring;
 mc,n,i:cardinal;
 chunkp,

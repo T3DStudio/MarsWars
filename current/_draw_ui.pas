@@ -505,7 +505,7 @@ begin
         i:=((m_by-4)*3)+(m_bx mod 3);
 
         with _players[HPlayer] do
-        if(i<ui_ubtns)then
+        if(i<=ui_ubtns)then
         begin
            if(ui_tab=3)then
            begin
@@ -521,13 +521,11 @@ begin
               case ui_tab of
               0,1: begin
                       if(uid_e[uid]=0)then
-                      begin
-                         if (a_units[uid]<=0)then exit;
-                      end;
+                       if(a_units[uid]<=0)then exit;
                       hs:=@_uids[uid].un_txt_uihint;
                    end;
               2  : begin
-                      if (a_upgrs[uid]<=0)then exit;
+                      if(a_upgrs[uid]<=0)then exit;
                       hs:=@_upids[uid]._up_hint;
                    end;
               end;
@@ -552,7 +550,7 @@ begin
 
    if(ingame_chat)or(rpls_showlog)then
    begin
-      ReMakeLogForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
+      MakeLogListForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -561,7 +559,7 @@ begin
    else
      if(net_chat_shlm>0)then
      begin
-        ReMakeLogForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
+        MakeLogListForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
          for i:=0 to ui_log_n-1 do
           if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);

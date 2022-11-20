@@ -598,6 +598,9 @@ spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel;
 
 spr_mp            : array[1..r_cnt] of TMWTexture;
+spr_b4_a,
+spr_b7_a,
+spr_b9_a,
 spr_ptur,
 spr_invuln,
 spr_hvision,
@@ -668,6 +671,7 @@ str_building_complete,
 str_unit_complete,
 str_unit_attacked,
 str_base_attacked,
+str_cant_execute,
 str_m_liq,
 str_m_siz,
 str_m_obs,
