@@ -290,12 +290,12 @@ begin
 
    gstp:=G_Step shr 1;
    if(rpl=false)then
-    if((gstp mod fr_4hfps)=0)then
+    if((gstp mod fr_4hfps)=0)then  // every 1/2 seconds
      with _players[_pl] do _wrld(@build_cd,rpl);
 
    if(rpl)
-   then i:=fr_fps
-   else i:=fr_2hfps;
+   then i:=fr_fps    //every 2 second
+   else i:=fr_2hfps; // every second
 
    if((gstp mod i)=0)then
    begin
@@ -617,16 +617,21 @@ begin
                end;
             end;
 
-            if(pu^.hits<=0)and(hits>0)then
+            if(pu^.hits<=0)and(hits>0)then  //resurrected
             begin
                _unit_fog_r(uu);
                vx:=x;
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then
+              if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then  // death
               begin
                  _unit_death_effects(uu,hits<=fdead_hits,@vis);
+
+                 with uid^ do
+                  if(_death_missile>0)
+                  then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+
                  if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;

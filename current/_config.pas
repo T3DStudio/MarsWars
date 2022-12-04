@@ -45,7 +45,7 @@ begin
    if(vr=cfg_key_vidvw)then vid_vw          := vlw;
    if(vr=cfg_key_vidvh)then vid_vh          := vlw;
    if(vr=cfg_key_gsb  )then g_start_base    := vlw;
-   if(vr=cfg_key_gsp  )then g_show_positions:=(vl=b2c[true]);
+   if(vr=cfg_key_gsp  )then g_fixed_positions:=(vl=b2c[true]);
    if(vr=cfg_key_gai  )then g_ai_slots      := vlw;
    if(vr=cfg_key_gcg  )then g_cgenerators   := vlw;
    if(vr=cfg_key_rpnui)then rpls_pnui       := vlw;
@@ -133,7 +133,7 @@ begin
    writeln(f,cfg_key_rpnui,'=',rpls_pnui      );
    writeln(f,cfg_key_npnui,'=',net_pnui       );
    writeln(f,cfg_key_gsb  ,'=',g_start_base   );
-   writeln(f,cfg_key_gsp  ,'=',b2c[g_show_positions]);
+   writeln(f,cfg_key_gsp  ,'=',b2c[g_fixed_positions]);
    writeln(f,cfg_key_gai  ,'=',g_ai_slots     );
    writeln(f,cfg_key_gcg  ,'=',g_cgenerators  );
    writeln(f,cfg_key_ppos ,'=',vid_ppos       );

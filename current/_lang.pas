@@ -407,7 +407,7 @@ begin
 
    str_starta            := 'Builders at game start:';
 
-   str_sstarts           := 'Show player starts:';
+   str_fstarts           := 'Fixed player starts:';
 
    str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red+' x1';
    str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red+' x2';
@@ -491,12 +491,12 @@ begin
    _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
    _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );
    _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,'Upgrades units.'              );
-   _mkHStrUid(UID_HEyeNest      ,'Hell Eye Nest'      ,'Casts "Hell Vision"  effect on units. Detector.' );
+   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Casts "Hell Vision"  effect on units. Detector.' );
    _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.');
    _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" effect on units.'        );
    _mkHStrUid(UID_HFortress     ,'Hell Fortress'      ,'Upgrades production buildings. Generates energy.');
    _mkHStrUid(UID_HCommandCenter,'Hell Command Center','Corrupted UAC Command Center. Builder. Generates energy.');
-   _mkHStrUid(UID_HMilitaryUnit ,'Hell Military Unit' ,'Corrupted UAC Military Unit. Creates zombies.' );
+   _mkHStrUid(UID_HBarracks     ,'Hell Barracks'      ,'Corrupted UAC Barracks. Creates zombies.' );
    _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Detection.');
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'      ,'');
@@ -555,7 +555,7 @@ begin
    _mkHStrUpid(upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown time.'                                );  }
 
    _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,'Builder. Generates energy.'      );
-   _mkHStrUid(UID_UMilitaryUnit    ,'UAC Military unit'          ,'Produces units.'                 );
+   _mkHStrUid(UID_UBarracks        ,'UAC Barracks'               ,'Produces infantry units.'        );
    _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
    _mkHStrUid(UID_UAGenerator      ,'UAC Advanced Generator'     ,'Increase energy level.'          );
@@ -888,7 +888,7 @@ begin
 
   str_starta            := 'Количество строителей на старте:';
 
-  str_sstarts           := 'Показывать старты:';
+  str_fstarts           := 'Фиксированные старты:';
 
   str_gmodet            := 'Режим игры:';
   str_gmode[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
@@ -936,7 +936,7 @@ begin
   _mkHStrUid(UID_HAltar        ,'Адский Алтарь'   ,'Временно делает юнитов неуязвимыми.'   );
   _mkHStrUid(UID_HFortress     ,'Адский Замок'    ,'Позволяет улучшать производственные здания. Производит энергию. Может строить.'   );
   _mkHStrUid(UID_HCommandCenter,'Проклятый Командный Центр','Строит базу. Увеличивает энергию.');
-  _mkHStrUid(UID_HMilitaryUnit ,'Проклятая Войсковая часть','Производит зомби.' );
+  _mkHStrUid(UID_HBarracks ,'Проклятая Войсковая часть','Производит зомби.' );
 
  { _mkHStrUpid(upgr_attack  ,'Улучшение дальней атаки'        ,''                                         );
   _mkHStrUpid(upgr_armor   ,'Улучшение защиты юнитов'        ,''                                         );
@@ -967,7 +967,7 @@ begin
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу. Увеличивает энергию.');
-  _mkHStrUid(UID_UMilitaryUnit   ,'Войсковая Часть'        ,'Производит тренирует пехоту.'     );
+  _mkHStrUid(UID_UBarracks   ,'Войсковая Часть'        ,'Производит тренирует пехоту.'     );
   _mkHStrUid(UID_UFactory        ,'Фабрика'                ,'Производит технику.'              );
   _mkHStrUid(UID_UGenerator      ,'Генератор'              ,'Увеличивает энергию.'             );
   _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'       ,'Исследования и улучшения.'        );

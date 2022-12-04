@@ -470,7 +470,7 @@ end;
 
 
 
-procedure _push_out(tx,ty,tr:integer;newx,newy:pinteger;_ukfly,check_doodads:boolean);
+procedure _push_out(tx,ty,tr:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
 const nrl = 1;
 var nrx,
     nry,
@@ -516,9 +516,9 @@ begin
       nrt[u]:=0;
    end;
 
-   if(_ukfly)then check_doodads:=false;
+   if(_ukfly)then check_obstacles:=false;
 
-   if(check_doodads)then
+   if(check_obstacles)then
    begin
       tr-=bld_dec_mr;
       dx:=tx div dcw;
@@ -579,7 +579,7 @@ begin
    with _uids[buid] do
    begin
       aukfly:=_ukfly;
-      _push_out(tx,ty,_r,@tx,@ty,aukfly,true);
+      _push_out(tx,ty,_r,@tx,@ty,aukfly,not _buildonobs);
    end;
 
    dx:=-2000;
@@ -1014,7 +1014,7 @@ begin
    _unit_start_build:=_uid_conditionals(@_players[bp],buid);
    if(_unit_start_build=0)then
     with _players[bp] do
-     if(_CheckBuildPlace(bx,by,0,0,bp,buid,true)=0)
+     if(_CheckBuildPlace(bx,by,0,0,bp,buid,not _uids[buid]._buildonobs)=0)
      then _unit_add(bx,by,-1,buid,bp,false,false,0)
      else _unit_start_build:=ureq_place;
 end;
@@ -1382,12 +1382,12 @@ begin
    with pu^ do
    with player^ do
    begin
-      if(_uid_player_limit(player,auid)=false)
+      if(not _uid_player_limit(player,auid))
       then _LastCreatedUnit:=0
       else
-        if(ServerSide)
-        then _unit_add(tx,ty,-1,auid,playeri,true,true,0)
-        else exit;
+        if(not ServerSide)
+        then exit
+        else _unit_add(tx,ty,-1,auid,playeri,true,true,0);
 
       if(_LastCreatedUnit>0)then
       begin
@@ -1410,6 +1410,7 @@ begin
       {$IFDEF _FULLGAME}
       else
         case auid of
+UID_Phantom,
 UID_LostSoul: _pain_lost_fail(tx,ty,_SpriteDepth(ty+1,ukfly),nil);
         end;
       {$ENDIF};
@@ -1543,7 +1544,7 @@ begin
 
       with uid^ do
       begin
-         if(_ukbuilding)and(buildcd)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+         if(_ukbuilding)and(buildcd)and(_ability<>uab_hell_vision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 
@@ -1594,9 +1595,15 @@ begin
          _unit_remove(pu);
       end
       else
-        if(fastdeath)
-        then hits:=fdead_hits
-        else hits:=0;
+      begin
+         if(fastdeath)
+         then hits:=fdead_hits
+         else hits:=0;
+
+         with uid^ do
+          if(_death_missile>0)
+          then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+      end;
    end
    else
    if(hits>dead_hits)then
@@ -1631,15 +1638,13 @@ begin
 //uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_rteleport     ]>0];
 //uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
 uab_hell_vision  : level:=byte(rld<=0);
-uab_hell_vard    : if(rld<=0)then rld:=fr_fps*(30+10*upgr[upgr_hell_heye]);
       end;
 
       // DETECTION
       case uidi of
 UID_UMine,
 UID_URadar,
-UID_HEye,
-UID_HEyeNest     : buff[ub_detect]:=_ub_infinity;
+UID_HEye         : buff[ub_detect]:=_ub_infinity;
       end;
       if(buff[ub_hvision]>0)then
        if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
@@ -1655,9 +1660,8 @@ UID_UMine        : buff[ub_invis]:=_ub_infinity;
 
       // OTHER
       case uidi of
-//UID_ZEngineer:if(buff[ub_advanced]>0)
-//              then begin if(speed= _speed)then begin speed:=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF} end;end
-//              else begin if(speed<>_speed)then begin speed:=_speed;  {$IFDEF _FULLGAME}animw :=_animw  ;{$ENDIF} end;end;
+UID_UGTurret: level:=byte(upgr[upgr_uac_plasmt]>0);
+UID_Phantom,
 UID_LostSoul: begin
                  tu:=nil;
                  if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
@@ -1668,15 +1672,6 @@ UID_UACBot  : ukfloater:=upgr[upgr_uac_float]>0;
 UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)
               then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
               else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
-{UID_FMajor,
-UID_ZFMajor : if(not ukfly)then
-              begin
-                 {$IFDEF _FULLGAME}
-                 SoundPlayUnit(snd_jetpon ,pu,nil);
-                 {$ENDIF}
-                 zfall:=-fly_height[uf_fly];
-                 ukfly:=uf_fly;
-              end; }
 UID_HCommandCenter,
 UID_UCommandCenter:
            if(level>0)then
@@ -1714,13 +1709,13 @@ UID_UCommandCenter:
            end;
 UID_FAPC    : apcm:=_apcm;
 UID_APC     : apcm:=_apcm;
-//UID_UGTurret: buff[ub_advanced]:=b2ib[upgr[upgr_uac_plasmt]>0];
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_invuln]:=fr_fps;
 
       // BUILD AREA
       if(_isbuilder)then isbuildarea:=true;
       case uidi of
+UID_HEye          : isbuildarea:=true;
 UID_HCommandCenter,
 UID_UCommandCenter: isbuildarea:=not ukfly;
       end;

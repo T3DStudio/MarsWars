@@ -639,8 +639,6 @@ begin
    _LoadMWSModel(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HEyeNest       ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAEyeNest      ,race_buildings[r_hell]+'h_b10a_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HCC            ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);

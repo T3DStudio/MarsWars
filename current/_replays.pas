@@ -54,7 +54,7 @@ begin
          if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+tc_nl3; end
                             else begin rpls_str_data:=str_svld_errors[4];close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base    ));vr:=0;
-         BlockRead(f,vr,sizeof(g_show_positions));vr:=0;
+         BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_cgenerators   ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
 
@@ -145,7 +145,7 @@ begin
 
                          BlockWrite(rpls_file,g_mode          ,SizeOf(g_mode          ));
                          BlockWrite(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
-                         BlockWrite(rpls_file,g_show_positions,SizeOf(g_show_positions));
+                         BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
                          BlockWrite(rpls_file,g_cgenerators   ,SizeOf(g_cgenerators   ));
                          BlockWrite(rpls_file,rpls_player     ,sizeof(rpls_player     ));
 
@@ -266,7 +266,7 @@ begin
                             BlockRead(rpls_file,map_symmetry    ,SizeOf(map_symmetry    ));
                             BlockRead(rpls_file,g_mode          ,SizeOf(g_mode          ));
                             BlockRead(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
-                            BlockRead(rpls_file,g_show_positions,SizeOf(g_show_positions));
+                            BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
                             BlockRead(rpls_file,g_cgenerators   ,SizeOf(g_cgenerators   ));
                             BlockRead(rpls_file,rpls_player     ,sizeof(rpls_player     ));
                             {$I+}

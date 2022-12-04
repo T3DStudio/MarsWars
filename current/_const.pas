@@ -26,8 +26,6 @@ fr_5fps                = fr_fps*5;
 fr_3h2fps              = fr_3hfps*2; //2/3
 fr_4h3fps              = fr_4hfps*3; //3/4
 fr_mpt                 = trunc(1000/fr_fps);
-fr_mancubus_r          = fr_2fps+fr_2hfps+10;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -45,6 +43,8 @@ gm_capture             = 3;
 gm_invasion            = 4;
 gm_KotH                = 5;
 gm_royale              = 6;
+
+gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gm_cnt                 = 6;
@@ -298,13 +298,11 @@ atm_inapc              = 4;   // can attack only when in apc
 //
 
 wpr_any                : cardinal =  0;
-wpr_zombie             : cardinal =  %0000000000000100;
-wpr_sspos              : cardinal =  %0000000000001000; // launch missile in unit position
+wpr_zombie             : cardinal =  %0000000000001000;
 wpr_tvis               : cardinal =  %0000000000010000;
-wpr_suicide            : cardinal =  %0000000000100000;
-wpr_ground             : cardinal =  %0000000001000000;
-wpr_air                : cardinal =  %0000000010000000;
-wpr_move               : cardinal =  %0000000100000000;
+wpr_ground             : cardinal =  %0000000000100000;
+wpr_air                : cardinal =  %0000000001000000;
+wpr_move               : cardinal =  %0000000010000000;
 
 aw_fsr0                = 15000;
 
@@ -348,6 +346,7 @@ wpt_resurect           = 1;
 wpt_heal               = 2;
 wpt_unit               = 3;
 wpt_directdmg          = 4;
+wpt_suicide            = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -421,7 +420,6 @@ uab_hkeeptele          = 8;
 uab_rebuild            = 9;
 uab_buildturret        = 10;
 uab_hinvuln            = 11;
-uab_hell_vard          = 12;
 uab_spawnlost          = 13;
 uab_hell_vision        = 14;
 uab_advance            = 15;
@@ -430,8 +428,7 @@ uab_prodlevelup        = 16;
 client_rld_abils = [
                    uab_teleport     ,
                    uab_building_adv ,
-                   uab_hell_vision  ,
-                   uab_hell_vard
+                   uab_hell_vision
                    ];
 client_cast_abils= [
                    uab_radar,
@@ -469,7 +466,7 @@ b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 //  OBSTACLES
 //
 
-MaxDoodads             = 600;
+MaxDoodads             = 700;
 
 //
 ddc_div                = 1000000;
@@ -512,14 +509,16 @@ upgr_hell_pinkspd      = 12; // demon move speed
 
 upgr_hell_spectre      = 13; // demon spectre              // t2
 upgr_hell_vision       = 14; // demons vision
-upgr_hell_teleport     = 15; // Teleport reload
-upgr_hell_rteleport    = 16; // revers teleport
-upgr_hell_heye         = 17; // hell Eye time
-upgr_hell_9bld         = 18; // 9 class building reload time
-upgr_hell_totminv      = 19; // totem and eye invisible
-upgr_hell_bldrep       = 20; // build restoration
-upgr_hell_b478tel      = 21; // teleport towers
-upgr_hell_invuln       = 22; // hell invuln powerup
+upgr_hell_phantoms     = 15; // demons vision
+upgr_hell_teleport     = 16; // Teleport reload
+upgr_hell_rteleport    = 17; // revers teleport
+upgr_hell_heye         = 18; // hell Eye time
+upgr_hell_9bld         = 19; // 9 class building reload time
+upgr_hell_totminv      = 20; // totem and eye invisible
+upgr_hell_bldrep       = 21; // build restoration
+upgr_hell_b478tel      = 22; // teleport towers
+upgr_hell_resurrect    = 23; // archvile ability
+upgr_hell_invuln       = 24; // hell invuln powerup
 
 
 upgr_uac_attack        = 31; // distance attack            // t1
@@ -578,9 +577,6 @@ MID_Mancubus           = 107;
 MID_YPlasma            = 108;
 MID_BPlasma            = 109;
 MID_Bullet             = 110;
-MID_Chaingunx2         = 111;
-MID_TBullet            = 112;
-MID_MBullet            = 113;
 MID_SShot              = 114;
 MID_SSShot             = 115;
 MID_BFG                = 116;
@@ -616,6 +612,8 @@ ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
 ul20                   = MinUnitLimit*20;
 ul30                   = MinUnitLimit*30;
+ul100                  = MinUnitLimit*100;
+ul110                  = MinUnitLimit*110;
 
 uf_ground              = false;
 uf_fly                 = true;
@@ -635,6 +633,8 @@ BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
 BaseDamage5            = BaseDamage1*5;
+BaseDamage10           = BaseDamage1*10;
+BaseDamage20           = BaseDamage1*20;
 
 BaseDamageBonus1       = 6;
 BaseDamageLevel1       = BaseDamageBonus1 div 2;
@@ -663,15 +663,14 @@ UID_HSymbol            = 3;
 UID_HASymbol           = 4;
 UID_HPools             = 5;
 UID_HTower             = 6;
-UID_HEyeNest           = 7;
-UID_HTeleport          = 8;
+UID_HTeleport          = 7;
+UID_HEye               = 8;
 UID_HMonastery         = 9;
 UID_HTotem             = 10;
 UID_HAltar             = 11;
 UID_HFortress          = 12;
 UID_HCommandCenter     = 13;
-UID_HMilitaryUnit      = 14;
-UID_HEye               = 15;
+UID_HBarracks          = 14;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -701,7 +700,7 @@ UID_ZBFG               = 43;
 // UAC
 
 UID_UCommandCenter     = 50;
-UID_UMilitaryUnit      = 51;
+UID_UBarracks          = 51;
 UID_UFactory           = 52;
 UID_UGenerator         = 53;
 UID_UAGenerator        = 54;
@@ -763,6 +762,13 @@ uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclea
 //
 
 
+fr_mancubus_rld        = fr_2fps+fr_2hfps;
+fr_mancubus_rld_s1     = fr_2fps-fr_6hfps;
+fr_mancubus_rld_s2     = fr_fps +fr_6hfps;
+fr_mancubus_rld_s3     = fr_2hfps;
+
+fr_archvile_s          = fr_fps +fr_6hfps;
+
 NameLen                = 13;
 //ChatLen                = 38;
 
@@ -785,10 +791,9 @@ order_period           = fr_2hfps+1;
 vistime                = order_period+2;
 
 radar_reload           = fr_fps*60;
-radar_vision_time      = radar_reload-(fr_fps*5);
+radar_vision_time      = radar_reload-(fr_fps*8);
 
-hell_vision_time       = fr_fps*5;
-heyenest_reload        = fr_fps*60;
+hell_vision_time       = fr_fps*8;
 
 mstrike_reload         = fr_fps*30;
 
@@ -796,6 +801,7 @@ step_build_reload      = fr_fps*3;
 max_build_reload       = step_build_reload*5;
 
 melee_r                = 8;
+mine_r                 = melee_r*3;
 
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
@@ -805,8 +811,9 @@ building_adv_reload    : array[false..true] of integer = (fr_fps*45,0);
 invuln_time            = fr_fps*30;
 
 tank_sr                = 20;
-rocket_sr              = 40;
-blizz_r                = 150;
+rocket_sr              = tank_sr*2;
+mine_sr                = rocket_sr*2;
+blizzard_sr            = rocket_sr*4;
 
 bld_dec_mr             = 6;
 player_default_ai_level= 7;

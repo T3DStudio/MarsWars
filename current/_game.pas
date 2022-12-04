@@ -3,7 +3,7 @@ procedure PlayerSetSkirmishTech(p:byte);
 begin
    with _players[p] do
    begin
-      PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HMilitaryUnit,
+      PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HBarracks,
                                 UID_LostSoul      ..UID_ZBFG,
                                 UID_UCommandCenter..UID_UNuclearPlant,
                                 UID_Engineer      ..UID_Flyer  ],
@@ -547,14 +547,14 @@ begin
 
    GameEndConditions;
 end;
-    {
-procedure g_inv_calcmm;
+
+procedure g_inv_CalcWave;
 const min_wave_time = fr_fps*15;
 var a,i:integer;
 begin
-   case g_inv_wn of
-   1  : g_inv_t:=fr_fps*90;
-   else g_inv_t:=g_inv_wt;
+   {case g_inv_wave_n of
+   1  : g_inv_time:=fr_fps*90;
+   else g_inv_time:=g_inv_wt;
    end;
 
    a:=0;
@@ -562,22 +562,22 @@ begin
     with _players[i] do
     if(state=ps_play)then inc(a,ucl_c[false]);
 
-   dec(g_inv_t, g_inv_wn*fr_fps*2);
-   dec(g_inv_t,(a div 15)*fr_fps);
-   dec(g_inv_t, ((map_mw-MaxSMapW) div 100)*fr_fps);
-   dec(g_inv_t, g_startb*5*fr_fps);
+   dec(g_inv_time, g_inv_wave_n*fr_fps*2);
+   dec(g_inv_time,(a div 15)*fr_fps);
+   dec(g_inv_time, ((map_mw-MaxSMapW) div 100)*fr_fps);
+   dec(g_inv_time, g_startb*5*fr_fps);
 
-   if(g_inv_t<min_wave_time)then g_inv_t:=min_wave_time;
+   if(g_inv_time<min_wave_time)then g_inv_time:=min_wave_time;
 
    g_inv_wt:=0;
 
-   case g_inv_wn of
+   case g_inv_wave_n of
    1  : g_inv_mn:=30;
    2  : g_inv_mn:=60;
    3  : g_inv_mn:=90;
    else g_inv_mn:=MaxPlayerUnits;
-   end;
-end;  }
+   end;                        }
+end;
 
 procedure GameModeInvasion;
 const max_wave_time = fr_fps*150;
@@ -587,20 +587,20 @@ begin
    {if(G_WTeam=255)then
    if(_players[0].army=0)then
    begin
-      if(g_inv_t=0)then
+      if(g_inv_time=0)then
       begin
          if(g_inv_wn=20)
          then G_WTeam:=1
          else
          begin
             inc(g_inv_wn,1);
-            g_inv_calcmm;
+            g_inv_CalcWave;
          end;
       end
       else
       begin
-         dec(g_inv_t,1);
-         if(g_inv_t=0)then
+         dec(g_inv_time,1);
+         if(g_inv_time=0)then
          begin
             {$IFDEF _FULLGAME}
             PlaySND(snd_teleport,nil);

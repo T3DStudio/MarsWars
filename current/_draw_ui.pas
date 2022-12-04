@@ -438,7 +438,7 @@ begin
         if(uid_s[sx]>0)then
          with _uids[sx] do
           case _ability of
-uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizz_r,c_gray);
+uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
 uab_radar      : ;//if();
           end;
 

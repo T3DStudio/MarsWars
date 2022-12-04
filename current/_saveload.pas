@@ -77,7 +77,7 @@ begin
 
             vr:=0;
             BlockRead(f,vr,sizeof(g_start_base    ));vr:=0;
-            BlockRead(f,vr,sizeof(g_show_positions));vr:=0;
+            BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
             BlockRead(f,vr,sizeof(g_cgenerators   ));vr:=0;
 
             BlockRead(f,hp,sizeof(HPlayer  ));
@@ -202,7 +202,7 @@ begin
    SizeOf(theme_i         )+
    SizeOf(g_mode          )+
    SizeOf(g_start_base    )+
-   SizeOf(g_show_positions)+
+   SizeOf(g_fixed_positions)+
    SizeOf(g_cgenerators   )+
    SizeOf(HPlayer         )+
    SizeOf(TPList          )+
@@ -257,7 +257,7 @@ begin
    BlockWrite(f,theme_i         ,SizeOf(theme_i         ));
    BlockWrite(f,g_mode          ,SizeOf(g_mode          ));
    BlockWrite(f,g_start_base    ,SizeOf(g_start_base    ));
-   BlockWrite(f,g_show_positions,SizeOf(g_show_positions));
+   BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
    BlockWrite(f,g_cgenerators   ,SizeOf(g_cgenerators   ));
    BlockWrite(f,HPlayer         ,SizeOf(HPlayer         ));
    BlockWrite(f,_players        ,SizeOf(TPList          ));
@@ -332,7 +332,7 @@ begin
          BlockRead(f,theme_i         ,SizeOf(theme_i         ));map_seed2theme;
          BlockRead(f,g_mode          ,SizeOf(g_mode          ));
          BlockRead(f,g_start_base    ,SizeOf(g_start_base    ));
-         BlockRead(f,g_show_positions,SizeOf(g_show_positions));
+         BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
          BlockRead(f,g_cgenerators   ,SizeOf(g_cgenerators   ));
          BlockRead(f,HPlayer         ,SizeOf(HPlayer         ));
          BlockRead(f,_players        ,SizeOf(TPList          ));

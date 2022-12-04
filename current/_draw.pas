@@ -50,7 +50,7 @@ begin
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+
-   ' '+i2s(_players[Hplayer].ai_scout_u_cur)+
+   ' '+c2s(_players[Hplayer].ai_flags)+
    ' '+i2s(n),
    ta_right,255, c_white);
 

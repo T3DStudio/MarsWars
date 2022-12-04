@@ -80,13 +80,18 @@ begin
    end;
 end;
 
-
-procedure map_vars;
+procedure map_RandomBase;
 begin
    map_iseed   := word(map_seed);
    map_rpos    := byte(map_seed);
+end;
+
+procedure map_vars;
+begin
+   map_RandomBase;
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
+   //if(g_mode in gm_fixed_positions)then g_fixed_positions:=true;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
@@ -191,6 +196,19 @@ begin
          map_psy[i+3]:=map_mw-map_psy[i];
       end;
    end;
+end;
+
+procedure map_ShuffleStarts;
+var x,y:byte;
+    i:integer;
+begin
+   for x:=1 to MaxPlayers do
+    for y:=1 to MaxPlayers do
+     if((byte(x*y+map_seed+g_mode) mod 3)=0)then
+     begin
+        i:=map_psx[x];map_psx[x]:=map_psx[y];map_psx[y]:=i;
+        i:=map_psy[x];map_psy[x]:=map_psy[y];map_psy[y]:=i;
+     end;
 end;
 
 procedure map_CPoints_UpdatePFZone;
@@ -332,10 +350,21 @@ gm_KotH:
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
          map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         if(not g_fixed_positions)then map_ShuffleStarts;
       end;
-gm_royale : map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-gm_capture: map_Starts_Default;
-   else map_Starts_Default;
+gm_royale :
+      begin
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         if(not g_fixed_positions)then map_ShuffleStarts;
+      end;
+gm_capture:
+      begin
+         map_Starts_Default;
+         if(not g_fixed_positions)then map_ShuffleStarts;
+      end;
+   else
+         map_Starts_Default;
+         if(not g_fixed_positions)then map_ShuffleStarts;
    end;
 end;
 
@@ -533,8 +562,10 @@ begin
       end;
    end;
 
-   map_CPoints;
    map_doodads_cells_refresh;
+
+   map_RandomBase;
+   map_CPoints;
    pf_make_grid;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}

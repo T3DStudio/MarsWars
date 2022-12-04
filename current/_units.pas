@@ -538,7 +538,7 @@ wtp_unit_bio_nlight  : begin
                        incPrio(not _ukbuilding  );
                        incPrio(not _ukmech      );
                        incPrio(not _uklight     );
-                       incPrio(uidi<>UID_LostSoul);
+                       incPrio((uidi<>UID_LostSoul));
                        end;
 wtp_unit_bio_nostun  : begin
                        incPrio(not _ukbuilding  );
@@ -862,7 +862,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(_ukbuilding)and(bld)and(_ability=0)then
+      if(_ukbuilding)and(bld)and(_ability=uab_prodlevelup)then
        if(_isbarrack)or(_issmith)then
         if(tu^.uid^._ukbuilding)and(player^.team=tu^.player^.team)and(tu^.rld<=0)and(tu^.bld)and(tu^.hits>0)and(hits>0)then
          if(level=0)and(cenergy>=_renergy)then
@@ -891,8 +891,9 @@ begin
       if(bld)and(hits>0)and(rld<=0)and(pu^.bld)and(pu^.hits>0)and(team=pu^.player^.team)then
        if(pu^.buff[ub_hvision]<fr_fps)then
        begin
-          pu^.buff[ub_hvision]:=hell_vision_time+(hell_vision_time*upgr[upgr_hell_heye]);
-          rld:=heyenest_reload;
+          pu^.buff[ub_hvision]:=hell_vision_time;
+          //rld:=heyenest_reload;
+          _unit_kill(tu,false,true,false);
           _ability_hell_vision:=true;
           {$IFDEF _FULLGAME}
           _unit_LevelUp(pu,EID_Hvision,nil);
@@ -1054,7 +1055,9 @@ uab_spawnlost     : if(buff[ub_cast]<=0)and(buff[ub_clcast]<=0)then
                     begin
                        buff[ub_cast  ]:=fr_2hfps;
                        buff[ub_clcast]:=fr_2fps;
-                       _ability_unit_spawn(pu,UID_LostSoul);
+                       if(upgr[upgr_hell_phantoms]>0)
+                       then _ability_unit_spawn(pu,UID_Phantom )
+                       else _ability_unit_spawn(pu,UID_LostSoul);
                        _unit_action:=true;
                     end;
 uab_advance       : if(zfall=0)and(buff[ub_clcast]<=0)then
@@ -1407,27 +1410,26 @@ wmove_noneed    : if(not attackinmove)then
              if(x<>tu^.x)
              or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
             case aw_type of
-wpt_missle     : if(cf(@aw_reqf,@wpr_sspos))
-                 then _missile_add(vx,vy,vx,vy,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
-                 else
-                   if(aw_count=0)
-                   then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
-                   else
-                     if(aw_count>0)
-                     then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
-                     else
-                       if(aw_count<0)then
-                       begin
-                          _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
-                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
-                       end;
+wpt_missle     : if(aw_oid>0)then
+                  if(aw_count=0)
+                  then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
+                  else
+                    if(aw_count>0)
+                    then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
+                    else
+                      if(aw_count<0)then
+                      begin
+                         _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
+                         _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
+                      end;
 wpt_unit       : if(not fakemissile)then _ability_unit_spawn(pu,aw_oid);
-wpt_directdmg  : if(not fakemissile)then
+wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
                   if(not cf(@aw_reqf,@wpr_zombie))
                   then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri)
                   else
                     if(not _makezimba(pu,tu))
                     then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri);
+wpt_suicide  : if(ServerSide)then _unit_kill(pu,false,true,true);
             else
                if(ServerSide)and(not fakemissile)then
                  case aw_type of
@@ -1437,10 +1439,8 @@ wpt_heal     : begin
                   tu^.buff[ub_heal]:=aw_rld;
                end;
                  end;
-            end;
 
-            if(ServerSide)then
-             if(cf(@aw_reqf,@wpr_suicide))then _unit_kill(pu,false,true,true);
+            end;
          end;
       end;
    end;
@@ -1668,7 +1668,7 @@ begin
      end;
 end;
 
-procedure _obj_cycle();
+procedure _obj_cycle;
 var u : integer;
     pu,
     au: PTUnit;
@@ -1683,9 +1683,6 @@ begin
          then _unit_reveal(pu);
 
          _unit_counters(pu);
-
-         if(uid^._ability=uab_hell_vard)and(bld)and(rld=1)
-         then _unit_kill(pu,false,true,false);
 
          if(hits>0)then
          begin

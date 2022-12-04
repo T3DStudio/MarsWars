@@ -13,7 +13,7 @@ g_started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
 g_start_base      : byte     = 0;
-g_show_positions  : boolean  = false;
+g_fixed_positions : boolean  = false;
 g_cgenerators     : byte     = 0;
 g_ai_slots        : byte     = 5;
 g_deadobservers   : boolean  = true;
@@ -540,8 +540,6 @@ spr_HMonastery,
 spr_HTotem,
 spr_HAltar,
 spr_HFortress,
-spr_HEyeNest,
-spr_HAEyeNest,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
@@ -682,7 +680,7 @@ str_cgenerators,
 str_team,
 str_srace,
 str_ready,
-str_sstarts,
+str_fstarts,
 str_gmodet,
 str_starta,
 str_plout,

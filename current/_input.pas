@@ -238,7 +238,7 @@ begin
                      m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
                   end;
 
-                  case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,true) of
+                  case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,not _uids[m_brush]._buildonobs) of
           0 :  m_brushc:=c_lime;
           1 :  m_brushc:=c_red;
           2 :  m_brushc:=c_blue;

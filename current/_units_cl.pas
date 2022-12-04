@@ -67,7 +67,6 @@ procedure setBuildingSND(s:PTSoundSet);
 begin setCommandSND(nil,s,s,s,s);end;
 
 procedure setEffectEID(ready,death,fdeath,pain:byte);
-var b:boolean;
 begin
    with _uids[u] do
    begin
@@ -78,7 +77,6 @@ begin
    end;
 end;
 procedure setEffectSND(ready,death,fdeath,pain:PTSoundSet);
-var b:boolean;
 begin
    with _uids[u] do
    begin
@@ -91,7 +89,6 @@ begin
 end;
 
 procedure setFOOT(footsnd:PTSoundSet;footanim:integer);
-var b:boolean;
 begin
    with _uids[u] do
    begin
@@ -174,7 +171,7 @@ begin
    setCommandSND(snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
    setEffectEID (0  ,0        ,u       ,0            );
    setEffectSND (nil,snd_pexp ,snd_pexp,snd_hell_pain);
-   setWeaponESND(0,nil,snd_lost_move,0,0);
+   setWeaponESND(0  ,nil,snd_lost_move,0,0);
 end;
 UID_Imp:
 begin
@@ -445,12 +442,6 @@ begin
    setWeaponESND(1,nil,snd_hell_attack    ,0,MID_Imp);
    un_eid_bcrater_y:=15;
 end;
-UID_HEyeNest:
-begin
-   setMWSModel(0,@spr_HEyeNest);
-   setMWSModel(1,@spr_HAEyeNest );
-   setBuildingSND(snd_hell_hteleport);
-end;
 UID_HTeleport:
 begin
    _animw:=5;
@@ -504,7 +495,7 @@ begin
    un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);
 end;
-UID_HMilitaryUnit:
+UID_HBarracks:
 begin
    setMWSModel(0,@spr_HMUnit );
    setMWSModel(1,@spr_HMUnita);
@@ -538,9 +529,9 @@ begin
    setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_healing,0,0);
    setWeaponESND(1,nil,snd_pistol,0,0);
-   setWeaponESND(3,nil,snd_healing,0,0);
+   setWeaponESND(2,nil,snd_healing,0,0);
    with _a_weap[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
-   with _a_weap[3] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
+   with _a_weap[2] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_Sergant:
 begin
@@ -696,7 +687,7 @@ begin
    setBuildingSND(snd_uac_cc);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
 end;
-UID_UMilitaryUnit:
+UID_UBarracks:
 begin
    setMWSModel(0,@spr_UMilitaryUnit);
    setMWSModel(1,@spr_UAMilitaryUnit);
@@ -863,11 +854,13 @@ upgr_hell_hktdoodads: begin _up_btn:=spr_b_up[r_hell,20]; end;
 
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
 upgr_hell_pinkspd   : begin _up_btn:=spr_b_up[r_hell,12]; end;
+upgr_hell_phantoms  : begin _up_btn:=spr_b_up[r_hell,17]; end;
 upgr_hell_rteleport : begin _up_btn:=spr_b_up[r_hell,16]; end;
 upgr_hell_9bld      : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_totminv   : begin _up_btn:=spr_b_up[r_hell,18]; end;
 upgr_hell_bldrep    : begin _up_btn:=spr_b_up[r_hell,19]; end;
 upgr_hell_b478tel   : begin _up_btn:=spr_b_up[r_hell,21]; end;
+upgr_hell_resurrect : begin _up_btn:=spr_b_up[r_hell,13]; end;
 upgr_hell_invuln    : begin _up_btn:=spr_b_up[r_hell,22]; end;
 
 upgr_uac_attack     : begin _up_btn:=spr_b_up[r_uac ,0 ]; end;

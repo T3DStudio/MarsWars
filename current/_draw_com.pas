@@ -172,7 +172,7 @@ begin
    sdl_FillRect(r_minimap,nil,0);
    map_bminimap;
    _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_show_positions)or(g_mode in [gm_invasion,gm_3x3,gm_2x2x2])then map_dstarts;
+   if(g_fixed_positions)then map_dstarts;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
    vid_menu_redraw:=vid_menu_redraw or _menu;

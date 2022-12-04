@@ -95,7 +95,7 @@ end;
 function PlayerSetProdError(player,utp,uid:byte;cndt:cardinal;pu:PTUnit):boolean;
 begin
    PlayerSetProdError:=false;
-   if(player<=MaxPlayers)then
+   if(player<=MaxPlayers)and(cndt>0)then
    with _players[player] do
    begin
       prod_error_cndt:=cndt;
@@ -111,7 +111,7 @@ begin
       prod_error_x   :=255;
       prod_error_y   :=255;
       end;
-      PlayerSetProdError:=cndt>0;
+      PlayerSetProdError:=true;
    end;
 end;
 

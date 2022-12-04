@@ -318,10 +318,10 @@ begin
       72 : if not(G_Started and(menu_s2=ms2_camp))then begin menu_s2:=ms2_mult; if(m_chat)then menu_item:=100; end;
 
       // game options
-      75 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);Map_premap;end;
+      75 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);         Map_premap;end;
       76 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte   (@g_start_base,true,0,gms_g_startb);
-      77 : if(net_status<>ns_clnt)and(not G_Started)then begin g_show_positions:=not g_show_positions;map_RedrawMenuMinimap;end;
-      78 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);Map_premap;end;
+      77 : if(net_status<>ns_clnt)and(not G_Started)then begin g_fixed_positions:=not g_fixed_positions;          Map_premap;end;
+      78 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);     Map_premap;end;
       79 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_cgenerators,true,0,gms_g_maxgens);Map_premap;end;
       80 : if(net_status<>ns_clnt)and(not G_Started)then       MakeRandomSkirmish(false);
 
