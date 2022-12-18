@@ -218,13 +218,13 @@ begin
     for i:=0 to ui_max_alarms do
      with ui_alarms[i] do
       if(al_t>0)and(al_v=av)then
-       if(point_dist_rint(al_mx,al_my,mx,my)<=vid_uialrm_t)then
+       if(point_dist_rint(al_mx,al_my,mx,my)<=ui_alarm_time)then
        begin
           al_x :=(al_x +ax) div 2;
           al_y :=(al_y +ay) div 2;
           al_mx:=(al_mx+mx) div 2;
           al_my:=(al_my+my) div 2;
-          al_t :=vid_uialrm_t;
+          al_t :=ui_alarm_time;
           //ui_addalrm:=(mx<(vid_mmvx-vid_uialrm_ti))or((vid_mmvx+map_mmvw+vid_uialrm_ti)<mx)
           //          or(my<(vid_mmvy-vid_uialrm_ti))or((vid_mmvy+map_mmvh+vid_uialrm_ti)<my);
           exit;
@@ -243,7 +243,7 @@ begin
        al_mx:=mx;
        al_my:=my;
        al_v :=av;
-       al_t :=vid_uialrm_t;
+       al_t :=ui_alarm_time;
        case al_v of
 aummat_attacked_u,
 aummat_attacked_b : al_c:=c_red;

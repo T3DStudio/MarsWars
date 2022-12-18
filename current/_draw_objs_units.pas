@@ -1,7 +1,7 @@
 
 procedure _unit_minimap(pu:PTUnit);
 begin
-   if(vid_rtui=0)and(_menu=false)and(r_draw)then
+   if(vid_blink_timer1=0)and(_menu=false)and(r_draw)then
     with pu^  do
     with uid^ do
      if(uid^._ukbuilding)
@@ -22,6 +22,7 @@ begin
     case uidi of
 UID_UPortal,
 UID_HTeleport,
+UID_HPentagram,
 UID_HSymbol,
 UID_HASymbol,
 UID_HAltar,
@@ -67,8 +68,8 @@ procedure _unit_sfog(pu:PTUnit);
 begin
    with pu^ do
    begin
-      fx :=round(x/fog_cw);
-      fy :=round(y/fog_cw);
+      fx :=x div fog_cw;
+      fy :=y div fog_cw;
    end;
 end;
 
@@ -195,7 +196,7 @@ begin
                ui_bprod_possible+=ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[r_blink_colorb]);
+                 if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[r_blink2_colorb]);
             end;
 
             for i:=0 to MaxUnitLevel do
@@ -280,8 +281,8 @@ begin
       lvlstr_l:='';
       if(not _ukbuilding)then
        case level of
-       1: lvlstr_l:='*';
-       2: lvlstr_l:='* *';
+       1: lvlstr_l:='>';
+       2: lvlstr_l:='||';
        3: lvlstr_l:='* * *';
        end
       else
@@ -307,25 +308,28 @@ begin
       // armor
       al:=upgr[_upgr_armor];
       if(_ukbuilding)
-      then al+=upgr[upgr_race_build_armor[_urace]]
+      then al+=upgr[upgr_race_armor_build[_urace]]
       else
         if(_ukmech)
-        then al+=upgr[upgr_race_mech_armor[_urace]]
-        else al+=upgr[upgr_race_bio_armor [_urace]];
+        then al+=upgr[upgr_race_armor_mech[_urace]]
+        else al+=upgr[upgr_race_armor_bio [_urace]];
       lvlstr_a:=tc_lime+i2s6(al);
 
       // other
       sl:=upgr[_upgr_regen]+upgr[_upgr_srange];
       if(_ukbuilding)
-      then sl+=integer(upgr[upgr_race_build_regen[_urace]])
+      then sl+=integer(upgr[upgr_race_regen_build[_urace]])
       else
-        if(_ukmech)
-        then sl+=integer(upgr[upgr_race_mech_regen [_urace]]+upgr[upgr_race_mech_mspeed[_urace]])
-        else
-        begin
-           sl+=integer(upgr[upgr_race_mech_mspeed[_urace]]+upgr[upgr_race_bio_mspeed [_urace]]);
-           if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
-        end;
+      begin
+         sl+=upgr[upgr_race_srange[_urace]];
+         if(_ukmech)
+         then sl+=integer(upgr[upgr_race_regen_mech [_urace]]+upgr[upgr_race_mspeed_mech[_urace]])
+         else
+         begin
+            sl+=integer(upgr[upgr_race_regen_bio[_urace]]+upgr[upgr_race_mspeed_bio [_urace]]);
+            if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
+         end;
+      end;
       lvlstr_s:=tc_yellow+i2s6(sl);
    end;
 end;

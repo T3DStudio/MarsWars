@@ -165,16 +165,16 @@ begin
       // game settings
       6  : ;
       7  : begin vid_uhbars+=1;vid_uhbars:=vid_uhbars mod 3; end;
-      8  : m_a_inv:=not m_a_inv;
+      8  : m_action:=not m_action;
       9  : if(ui_menu_ssr_x2>=mouse_x)
-           then vid_vmspd:=0
+           then vid_CamSpeed:=0
            else
              if(mouse_x<ui_menu_ssr_x3)
-             then vid_vmspd:=mouse_x-ui_menu_ssr_x2
-             else vid_vmspd:=127;
+             then vid_CamSpeed:=mouse_x-ui_menu_ssr_x2
+             else vid_CamSpeed:=127;
       10 : vid_vmm:=not vid_vmm;
       11 : if not ((net_status=ns_none)and(G_Started=false))then menu_item:=0;
-      12 : begin _lng:=not _lng;swLNG;end;
+      12 : begin ui_language:=not ui_language;swLNG;end;
       13 : begin
               vid_ppos+=1;
               vid_ppos:=vid_ppos mod 4;
@@ -221,7 +221,7 @@ begin
                 theme_map_ptrt:=255;
                 MakeTerrain;
              end;
-      18 : begin cfg_fullscreen:=not cfg_fullscreen; _MakeScreen;end;
+      18 : begin vid_fullscreen:=not vid_fullscreen; _MakeScreen;end;
 
       // sounds
       26 : begin

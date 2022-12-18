@@ -321,7 +321,7 @@ begin
    begin
       acolor:=PlayerGetColor(playeri);
 
-      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(vid_rtui>vid_rtuish);
+      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
 
       srect :=((sel)and(playeri=HPlayer))
             or(k_alt>1)
@@ -349,9 +349,13 @@ begin
 
 
       if(speed<=0)or(not bld)then
-       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink_color);
+       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
 
-      if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink_color);
+      if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
+
+      //ub_scaned
+      if(r_blink2_colorb)then
+       if(buff[ub_scaned ]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan);
 
       pain:=(buff[ub_pain]>0)and(_ukmech and not _ukbuilding);
       buffx:=0;

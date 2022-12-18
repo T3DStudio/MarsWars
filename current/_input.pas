@@ -238,7 +238,7 @@ begin
                      m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
                   end;
 
-                  case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush,not _uids[m_brush]._buildonobs) of
+                  case _CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush) of
           0 :  m_brushc:=c_lime;
           1 :  m_brushc:=c_red;
           2 :  m_brushc:=c_blue;
@@ -261,7 +261,7 @@ co_amove   : _player_s_o(m_brush,_whoInPoint(x,y,1),x,y,0,uo_corder,HPlayer);   
 co_paction,
 co_patrol,
 co_apatrol : _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
-co_empty   : if(m_a_inv)// rclick
+co_empty   : if(m_action)// rclick
              then _player_s_o(co_rcmove ,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer)
              else _player_s_o(co_rcamove,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer);
    end;
@@ -340,7 +340,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
          case u of
    0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
    1 : m_brush:=co_paction;
-   2 : m_a_inv:=not m_a_inv;
+   2 : m_action:=not m_action;
 
    3 : m_brush:=co_amove;
    4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
@@ -737,10 +737,10 @@ end;
 
 procedure _move_v_m;
 begin
-   if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_vmspd;
-   if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_vmspd;
-   if(mouse_x>vid_vmb_x1)then vid_cam_x+=vid_vmspd;
-   if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_vmspd;
+   if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_CamSpeed;
+   if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_CamSpeed;
+   if(mouse_x>vid_vmb_x1)then vid_cam_x+=vid_CamSpeed;
+   if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_CamSpeed;
 end;
 
 procedure _view_move;
@@ -751,10 +751,10 @@ begin
 
    if(vid_vmm)then _move_v_m;
 
-   if(k_u>1)then vid_cam_y-=vid_vmspd;
-   if(k_l>1)then vid_cam_x-=vid_vmspd;
-   if(k_d>1)then vid_cam_y+=vid_vmspd;
-   if(k_r>1)then vid_cam_x+=vid_vmspd;
+   if(k_u>1)then vid_cam_y-=vid_CamSpeed;
+   if(k_l>1)then vid_cam_x-=vid_CamSpeed;
+   if(k_d>1)then vid_cam_y+=vid_CamSpeed;
+   if(k_r>1)then vid_cam_x+=vid_CamSpeed;
 
    if(vx<>vid_cam_x)or(vy<>vid_cam_y)then CamBounds;
 end;

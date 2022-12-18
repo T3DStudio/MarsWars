@@ -238,7 +238,7 @@ begin
 end;
 UID_Mastermind:
 begin
-   _animw:=11;
+   _animw:=13;
    _animd:=16;
    setMWSModel  (0,@spr_mastermind);
    setCommandSND(snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
@@ -278,7 +278,7 @@ begin
 end;
 UID_Arachnotron:
 begin
-   _animw:=11;
+   _animw:=13;
    _animd:=13;
    setMWSModel  (0,@spr_arachnotron);
    setCommandSND(snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_hell_pain,snd_arachno_move);
@@ -449,6 +449,11 @@ begin
    setMWSModel(0,@spr_HTeleport);
    setBuildingSND(snd_hell_hteleport);
 end;
+UID_HPentagram:
+begin
+   setMWSModel(0,@spr_HPentagram);
+   setBuildingSND(snd_hell_hbuild);
+end;
 UID_HMonastery:
 begin
    setMWSModel(0,@spr_HMonastery);
@@ -482,7 +487,6 @@ begin
    setBuildingSND(snd_hell_eye);
    un_build_amode:=2;
    un_eid_bcrater:=255;
-   un_snd_ready:=snd_hell_eye;
    setEffectEID(0  ,UID_HEye ,UID_HEye,0  );
    setEffectSND(nil,snd_pexp,snd_pexp,nil);
 end;
@@ -850,7 +854,7 @@ upgr_hell_teleport  : begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_HKTeleport: begin _up_btn:=spr_b_up[r_hell,9 ]; end;
 upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
 upgr_hell_buildr    : begin _up_btn:=spr_b_up[r_hell,11]; end;
-upgr_hell_hktdoodads: begin _up_btn:=spr_b_up[r_hell,20]; end;
+upgr_hell_extbuild: begin _up_btn:=spr_b_up[r_hell,20]; end;
 
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
 upgr_hell_pinkspd   : begin _up_btn:=spr_b_up[r_hell,12]; end;
@@ -876,7 +880,7 @@ upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
 upgr_uac_ccturr     : begin _up_btn:=spr_b_up[r_uac ,10]; end;
 upgr_uac_buildr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
-upgr_uac_ccldoodads : begin _up_btn:=spr_b_up[r_uac ,20]; end;
+upgr_uac_extbuild : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;

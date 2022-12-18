@@ -257,7 +257,6 @@ TUID = record
    _isbarrack,
    _issolid,
    _ukfly,
-   _buildonobs,
    _splashresist: boolean;
    _fastdeath_hits
                 : integer;
@@ -401,6 +400,7 @@ o_x1,o_y1  :integer;
    ai_max_upgrps,
    ai_max_tech0,
    ai_max_tech1,
+   ai_max_tech2,
    ai_max_detect,
    ai_max_spec1,
    ai_max_spec2,
@@ -498,7 +498,6 @@ TUnit = record
    uo_id    : byte;
 
    inapc,
-   painc,
    pains,
    apcm,
    apcc     : integer;

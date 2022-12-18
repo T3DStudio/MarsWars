@@ -579,7 +579,8 @@ begin
    with _uids[buid] do
    begin
       aukfly:=_ukfly;
-      _push_out(tx,ty,_r,@tx,@ty,aukfly,not _buildonobs);
+      with _players[pl] do
+       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack));
    end;
 
    dx:=-2000;
@@ -716,8 +717,9 @@ begin
          end;
 end;
 
-function _CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte;obstacles:boolean):byte;
+function _CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte):byte;
 var i:byte;
+obstacles:boolean;
 begin
    _CheckBuildPlace:=0;
 
@@ -727,6 +729,11 @@ begin
    2 :  m_brushc:=c_blue;
    else m_brushc:=c_gray;
    }
+   obstacles:=true;
+   if(playern<=MaxPlayers)then
+    with _uids[buid] do
+     with _players[playern] do
+      obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
 
    i:=_InBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
@@ -742,6 +749,7 @@ end;
 
 
 function _unit_ability_hkteleport(pu:PTUnit;x0,y0:integer):boolean;
+var obstacles:boolean;
 begin
    _unit_ability_hkteleport:=false;
    with pu^ do
@@ -749,8 +757,9 @@ begin
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0)  );
-         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then exit;
+         obstacles:=upgr[upgr_race_extbuilding[race]]=0;
+         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, obstacles );
+         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, obstacles)>0)then exit;
 
          upgr[upgr_hell_HKTeleport]-=1;
          buff[ub_clcast]:=fr_fps;
@@ -1014,7 +1023,7 @@ begin
    _unit_start_build:=_uid_conditionals(@_players[bp],buid);
    if(_unit_start_build=0)then
     with _players[bp] do
-     if(_CheckBuildPlace(bx,by,0,0,bp,buid,not _uids[buid]._buildonobs)=0)
+     if(_CheckBuildPlace(bx,by,0,0,bp,buid)=0)
      then _unit_add(bx,by,-1,buid,bp,false,false,0)
      else _unit_start_build:=ureq_place;
 end;
@@ -1471,26 +1480,39 @@ end;
 
 procedure _unit_detect(uu,tu:PTUnit;ud:integer);
 var td:integer;
+scan_buff:byte;
 begin
    // tu - unit-detector
    // uu - unit-target
+   scan_buff:=255;
    with uu^ do
    begin
-      if(PlayerObserver(tu^.player)) //(tu^.player^.upgr[upgr_fog_vision]>0)
+      if(PlayerObserver(tu^.player))
       then td:=0
       else
-        if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_vision_time)
-        then td:=min2(ud,point_dist_int(x,y,tu^.uo_x,tu^.uo_y))
+        if(tu^.uid^._ability=uab_radar)and(tu^.rld>radar_vision_time)then
+        begin
+           td:=point_dist_int(x,y,tu^.uo_x,tu^.uo_y);
+           if(td<ud)
+           then scan_buff:=ub_scaned
+           else td:=ud;
+        end
         else td:=ud;
 
       if(td<=(tu^.srange+uid^._r))then
-       if(buff[ub_invis]<=0)
-       then _AddToInt(@vsnt[tu^.player^.team],vistime)
+       if(buff[ub_invis]<=0)then
+       begin
+          _AddToInt(@vsnt[tu^.player^.team],vistime);
+          if(scan_buff<=MaxUnitBuffs)and(player^.team<>tu^.player^.team)
+          then _AddToInt(@buff[scan_buff],vistime);
+       end
        else
          if(tu^.buff[ub_detect]>0)and(tu^.bld)and(tu^.hits>0)then
          begin
             _AddToInt(@vsnt[tu^.player^.team],vistime);
             _AddToInt(@vsni[tu^.player^.team],vistime);
+            if(scan_buff<=MaxUnitBuffs)and(player^.team<>tu^.player^.team)
+            then _AddToInt(@buff[scan_buff],vistime);
          end;
    end;
 end;
@@ -1585,7 +1607,8 @@ begin
                    else _unit_kill(tu,true,false,true);
                 end;
              end;
-         end;
+         end
+         else tu^.inapc:=0;
       end;
       _check_missiles(unum);
 
@@ -1616,6 +1639,7 @@ end;
 
 procedure _unit_upgr(pu:PTUnit);
 var tu:PTUnit;
+    t :integer;
 procedure SetSRange(newsr:integer);
 begin
    with pu^ do
@@ -1635,43 +1659,43 @@ begin
    begin
       // ABILITIES
       case _ability of
-//uab_teleport     : buff[ub_advanced]:=b2ib[upgr[upgr_hell_rteleport     ]>0];
-//uab_building_adv : buff[ub_advanced]:=b2ib[upgr[upgr_race_9bld[_urace]]>0];
-uab_hell_vision  : level:=byte(rld<=0);
+uab_teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
+uab_building_adv  : level:=byte(upgr[upgr_race_9building[_urace]]>0);
+uab_hell_vision   : level:=byte(rld<=0);
       end;
 
       // DETECTION
       case uidi of
 UID_UMine,
 UID_URadar,
-UID_HEye         : buff[ub_detect]:=_ub_infinity;
+UID_HEye          : buff[ub_detect]:=_ub_infinity;
       end;
       if(buff[ub_hvision]>0)then
        if(buff[ub_detect]<buff[ub_hvision])then buff[ub_detect]:=buff[ub_hvision];
 
       // INVIS
       case uidi of
-UID_HEye,
-UID_HTotem       : buff[ub_invis]:=b2ib[upgr[upgr_hell_totminv]>0];
-UID_Commando     : buff[ub_invis]:=b2ib[upgr[upgr_uac_commando]>0];
-UID_Demon        : buff[ub_invis]:=b2ib[upgr[upgr_hell_spectre]>0];
-UID_UMine        : buff[ub_invis]:=_ub_infinity;
+UID_HEye          : buff[ub_invis]:=_ub_infinity;
+UID_HTotem        : buff[ub_invis]:=b2ib[upgr[upgr_hell_totminv]>0];
+UID_Commando      : buff[ub_invis]:=b2ib[upgr[upgr_uac_commando]>0];
+UID_Demon         : buff[ub_invis]:=b2ib[upgr[upgr_hell_spectre]>0];
+UID_UMine         : buff[ub_invis]:=_ub_infinity;
       end;
 
       // OTHER
       case uidi of
-UID_UGTurret: level:=byte(upgr[upgr_uac_plasmt]>0);
+UID_UGTurret      : level:=byte(upgr[upgr_uac_plasmt]>0);
 UID_Phantom,
-UID_LostSoul: begin
-                 tu:=nil;
-                 if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
-                 if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
-                 ukfloater:=not ukfly;
-              end;
-UID_UACBot  : ukfloater:=upgr[upgr_uac_float]>0;
-UID_Demon   : if(upgr[upgr_hell_pinkspd]>0)
-              then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
-              else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
+UID_LostSoul      : begin
+                       tu:=nil;
+                       if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_clcast]:=fr_2hfps;
+                       if(buff[ub_clcast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
+                       ukfloater:=not ukfly;
+                    end;
+UID_UACBot        : ukfloater:=upgr[upgr_uac_float]>0;
+UID_Demon         : if(upgr[upgr_hell_pinkspd]>0)
+                    then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
+                    else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
 UID_HCommandCenter,
 UID_UCommandCenter:
            if(level>0)then
@@ -1701,14 +1725,14 @@ UID_UCommandCenter:
               speed:=0;
 
               if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) )>0)then
+               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[race]]=0 )>0)then
                begin
                   level:=1;
                   buff[ub_clcast  ]:=fr_2fps;
                end;
            end;
-UID_FAPC    : apcm:=_apcm;
-UID_APC     : apcm:=_apcm;
+UID_FAPC          : apcm:=_apcm;
+UID_APC           : apcm:=_apcm;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_invuln]:=fr_fps;
 
@@ -1721,11 +1745,21 @@ UID_UCommandCenter: isbuildarea:=not ukfly;
       end;
 
       // SRANGE
+      t:=_srange;
       if(_upgr_srange>0)and(_upgr_srange_step>0)
-      then SetSRange(_srange+(upgr[_upgr_srange]*_upgr_srange_step))
-      else SetSRange(_srange);
+      then t+=upgr[_upgr_srange]*_upgr_srange_step;
+      if(not _ukbuilding)
+      then t+=upgr[upgr_race_srange[race]]*upgr_race_srange_bonus[race];
+      SetSRange(t);
    end
-   else SetSRange(_r+_r);
+   else
+   begin
+      SetSRange(_r+_r);
+      if(hits>0)then
+        case uidi of
+UID_HEye          :  buff[ub_invis]:=_ub_infinity;
+        end;
+   end;
 end;
 
 

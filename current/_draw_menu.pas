@@ -168,13 +168,13 @@ begin
 
                     y:=_yt(4);
                     _draw_text(tar,i,y, str_maction          , ta_left ,255,c_white);
-                    _draw_text(tar,t,y, str_maction2[m_a_inv], ta_right,255,c_white);
+                    _draw_text(tar,t,y, str_maction2[m_action], ta_right,255,c_white);
 
                     y:=_yt(5);
                     _draw_text(tar,i,y, str_scrollspd, ta_left,255,c_white);
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
                     vlineColor(tar,ui_menu_ssr_x3,y-6,y+12,c_gray);
-                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+vid_vmspd,y+6,c_lime);
+                    boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+vid_CamSpeed,y+6,c_lime);
 
                     y:=_yt(6);
                     _draw_text(tar,i ,y, str_mousescrl, ta_left ,255, mic(true,false));
@@ -187,7 +187,7 @@ begin
 
                     y:=_yt(8);
                     _draw_text(tar,i ,y, str_language , ta_left ,255, c_white);
-                    _draw_text(tar,t ,y, str_lng[_lng], ta_right,255, c_white);
+                    _draw_text(tar,t ,y, str_lng[ui_language], ta_right,255, c_white);
 
                     y:=_yt(9);
                     _draw_text(tar,i ,y, str_panelpos           , ta_left ,255, c_white);
@@ -213,7 +213,7 @@ begin
 
                     y:=_yt(5);
                     _draw_text(tar,i ,y, str_fullscreen, ta_left ,255, mic(true,false));
-                    _draw_text(tar,t ,y, b2cc[not cfg_fullscreen],ta_right,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[not vid_fullscreen],ta_right,255, mic(true,false));
                  end;
 
                  if(menu_s3=ms3_sond)then

@@ -23,13 +23,13 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         rpls_str_data:=str_svld_errors[2];
+         rpls_str_data:=str_svld_errors_open;
          exit;
       end;
       if(FileSize(f)<rpl_hsize)then
       begin
          close(f);
-         rpls_str_data:=str_svld_errors[3];
+         rpls_str_data:=str_svld_errors_wdata;
          exit;
       end;
       vr:=0;
@@ -45,17 +45,17 @@ begin
          BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_data:=rpls_str_data+str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
          if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_liq+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_data:=str_svld_errors[4];close(f);exit;            end;
+                  else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;            end;
          BlockRead(f,vr,sizeof(map_obs  ));
          if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_obs+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_data:=str_svld_errors[4];close(f);exit;            end;
+                  else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;            end;
          BlockRead(f,vr,sizeof(map_symmetry  ));
          BlockRead(f,vr,sizeof(g_mode   ));
          if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+tc_nl3; end
-                            else begin rpls_str_data:=str_svld_errors[4];close(f);exit;end;
-         BlockRead(f,vr,sizeof(g_start_base    ));vr:=0;
+                            else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;end;
+         BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-         BlockRead(f,vr,sizeof(g_cgenerators   ));vr:=0;
+         BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
 
          //rpls_str_data:=rpls_str_data+str_players+':'+tc_nl3;
@@ -84,12 +84,12 @@ begin
             end;
          end;
       end
-      else rpls_str_data:=str_svld_errors[4];
-      if(IOResult<>0)then rpls_str_data:=str_svld_errors[4];
+      else rpls_str_data:=str_svld_errors_wver;
+      if(IOResult<>0)then rpls_str_data:=str_svld_errors_wver;
       {$I+}
       close(f);
    end
-   else rpls_str_data:=str_svld_errors[1];
+   else rpls_str_data:=str_svld_errors_file;
 end;
 
 procedure replay_abort;
@@ -136,19 +136,18 @@ begin
                          rpls_plcam  :=false;
 
                          {$I-}
-                         BlockWrite(rpls_file,ver             ,SizeOf(ver             ));
-                         BlockWrite(rpls_file,map_seed        ,SizeOf(map_seed        ));
-                         BlockWrite(rpls_file,map_mw          ,SizeOf(map_mw          ));
-                         BlockWrite(rpls_file,map_liq         ,SizeOf(map_liq         ));
-                         BlockWrite(rpls_file,map_obs         ,SizeOf(map_obs         ));
-                         BlockWrite(rpls_file,map_symmetry    ,SizeOf(map_symmetry    ));
+                         BlockWrite(rpls_file,ver              ,SizeOf(ver              ));
+                         BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
+                         BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
+                         BlockWrite(rpls_file,map_liq          ,SizeOf(map_liq          ));
+                         BlockWrite(rpls_file,map_obs          ,SizeOf(map_obs          ));
+                         BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
 
-                         BlockWrite(rpls_file,g_mode          ,SizeOf(g_mode          ));
-                         BlockWrite(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
+                         BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
+                         BlockWrite(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
                          BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-                         BlockWrite(rpls_file,g_cgenerators   ,SizeOf(g_cgenerators   ));
-                         BlockWrite(rpls_file,rpls_player     ,sizeof(rpls_player     ));
-
+                         BlockWrite(rpls_file,g_cgenerators    ,SizeOf(g_cgenerators    ));
+                         BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
 
                          for i:=1 to MaxPlayers do
                           with _Players[i] do
@@ -216,7 +215,7 @@ begin
                       begin
                          rpls_state   :=rpl_none;
                          g_started    :=false;
-                         rpls_str_data:=str_svld_errors[1];
+                         rpls_str_data:=str_svld_errors_file;
                          exit;
                       end;
 
@@ -229,7 +228,7 @@ begin
                       begin
                          replay_abort;
                          g_started :=false;
-                         rpls_str_data :=str_svld_errors[2];
+                         rpls_str_data :=str_svld_errors_open;
                       end
                       else
                       begin
@@ -239,7 +238,7 @@ begin
                          begin
                             replay_abort;
                             g_started :=false;
-                            rpls_str_data :=str_svld_errors[3];
+                            rpls_str_data :=str_svld_errors_wdata;
                             exit;
                          end;
 
@@ -252,23 +251,23 @@ begin
                          begin
                             replay_abort;
                             g_started  :=false;
-                            rpls_str_data:=str_svld_errors[4];
+                            rpls_str_data:=str_svld_errors_wver;
                          end
                          else
                          begin
                             GameDefaultAll;
 
                             {$I-}
-                            BlockRead(rpls_file,map_seed        ,SizeOf(map_seed        ));
-                            BlockRead(rpls_file,map_mw          ,SizeOf(map_mw          ));
-                            BlockRead(rpls_file,map_liq         ,SizeOf(map_liq         ));
-                            BlockRead(rpls_file,map_obs         ,SizeOf(map_obs         ));
-                            BlockRead(rpls_file,map_symmetry    ,SizeOf(map_symmetry    ));
-                            BlockRead(rpls_file,g_mode          ,SizeOf(g_mode          ));
-                            BlockRead(rpls_file,g_start_base    ,SizeOf(g_start_base    ));
+                            BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
+                            BlockRead(rpls_file,map_mw           ,SizeOf(map_mw           ));
+                            BlockRead(rpls_file,map_liq          ,SizeOf(map_liq          ));
+                            BlockRead(rpls_file,map_obs          ,SizeOf(map_obs          ));
+                            BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
+                            BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
+                            BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
                             BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-                            BlockRead(rpls_file,g_cgenerators   ,SizeOf(g_cgenerators   ));
-                            BlockRead(rpls_file,rpls_player     ,sizeof(rpls_player     ));
+                            BlockRead(rpls_file,g_cgenerators    ,SizeOf(g_cgenerators    ));
+                            BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
                             {$I+}
 
                             if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
@@ -279,7 +278,7 @@ begin
                             begin
                                replay_abort;
                                g_started:=false;
-                               rpls_str_data:=str_svld_errors[4];
+                               rpls_str_data:=str_svld_errors_wver;
                                GameDefaultAll;
                                exit;
                             end;

@@ -43,7 +43,7 @@ MID_URocketS,
 MID_URocket,
 MID_Revenant : begin
                ms_eid_fly   :=MID_Bullet;
-               ms_eid_fly_st:=5;
+               ms_eid_fly_st:=4;
                end;
 MID_Blizzard : begin
                ms_eid_fly   :=MID_Granade;
@@ -180,6 +180,18 @@ begin
       {$IFDEF _FULLGAME}
       ms_eid_bio_death:=false;
       {$ENDIF}
+      tu:=nil;
+      _IsUnitRange(tar,@tu);
+      if(mid=MID_Tower)then
+       if(tu=nil)
+       then break
+       else
+         if(tu^.ukfly)
+         then mid:=MID_Revenant
+         else
+           if(tu^.uid^._ukmech)or(tu^.uid^._uklight)or(tu^.uidi=UID_Imp)
+           then mid:=MID_Cacodemon
+           else mid:=MID_Imp;
 
       case mid of
 MID_Imp        : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
@@ -195,7 +207,7 @@ MID_ArchFire   : begin damage:=BaseDamage4  ; vstep:=1;        splashr :=15 ;   
 MID_Bullet     : begin damage:=BaseDamageh  ; vstep:=5;        splashr :=0  ;         end;
 MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
 MID_BPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_BFG        : begin damage:=BaseDamage5  ; vstep:=d div 12; splashr :=100;         end;
+MID_BFG        : begin damage:=BaseDamage4  ; vstep:=d div 12; splashr :=100;         end;
 MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 20; splashr :=0  ;         end;
 MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
@@ -242,7 +254,7 @@ MID_YPlasma    : homing:=mh_magnetic;
        end;
 
 
-      if(_IsUnitRange(tar,@tu))then
+      if(tu<>nil)then
       begin
          x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
          y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
@@ -270,6 +282,12 @@ MID_Mine      : if(uid=UID_UMine      )then exit;
    MissileUIDCheck:=true;
 end;
 
+{ R   S
+  11  380
+  12  452
+  22  1520
+  35  3846
+}
 
 procedure _missle_damage(m:integer);
 var tu: PTUnit;
@@ -311,8 +329,7 @@ begin
             MID_Baron       : _d150(@rdamage);
             MID_HRocket,
             MID_Blizzard,
-            MID_Mine,
-            MID_BFG         : _d50 (@rdamage);
+            MID_Mine        : _d50 (@rdamage);
             end;
 
         if (    tu^.uid^._uklight)
@@ -331,9 +348,9 @@ begin
 
         if (    tu^.uid^._ukmech)then   // mech
             case mid of
-            MID_Cacodemon,
-            MID_BPlasma,
-            MID_YPlasma     : _d150(@rdamage);
+            MID_YPlasma,
+            MID_Cacodemon   : _d150(@rdamage);
+            MID_BPlasma     : _d150(@rdamage);
             end;
         end
         else ///////////////////////////// buildings
@@ -355,7 +372,7 @@ begin
         or(tu^.uidi=UID_Phantom )
         or(tu^.uidi=UID_LostSoul)then   // fly all
             case mid of
-            MID_Revenant,
+            MID_Revenant    : _d150(@rdamage);
             MID_URocketS,
             MID_URocket     : _d150(@rdamage);
             end;
@@ -380,7 +397,7 @@ begin
            then _unit_damage(tu,rdamage,painX,player);
         end
         else
-          if(splashr>0)and(ud<splashr)then // splash damage
+          if(splashr>0)and(ud<splashr)and(not tu^.uid^._splashresist)then // splash damage
           begin
              {$IFDEF _FULLGAME}
              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),EID_BFG);

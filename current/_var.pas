@@ -92,9 +92,13 @@ rpls_u            : integer = 0;
 rpls_pnui         : byte = 0;
 rpls_log_n        : word = 0;
 
-fps_tt,
-fps_cs,
-fps_ns            : cardinal;
+fr_FPSSecond,
+fr_FPSSecondD,
+fr_FPSSecondN,
+fr_FPSSecondC,
+fr_FrameCount,
+fr_LastTicks,
+fr_BaseTicks     : cardinal;
 
 wtrset_enemy,
 wtrset_enemy_alive,
@@ -104,6 +108,7 @@ wtrset_enemy_alive_ground_light,
 wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
 wtrset_enemy_alive_fly_mech,
+wtrset_enemy_alive_fly_buildings,
 wtrset_enemy_alive_mech,
 wtrset_enemy_alive_mech_nstun,
 wtrset_enemy_alive_buildings,
@@ -143,7 +148,7 @@ r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
 r_RECT            : pSDL_RECT;
 
-cfg_fullscreen    : boolean = false;
+vid_fullscreen    : boolean = false;
 ingame_chat       : boolean = false;
 r_draw            : boolean = true;
 
@@ -178,10 +183,9 @@ vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
-vid_rtui          : byte = 0;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
-vid_vmspd         : integer = 25;
+vid_CamSpeed         : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
 vid_uhbars        : byte = 0;
@@ -196,6 +200,8 @@ vid_vsl           : array[1..vid_mvs] of PTVisSpr;
 vid_vsls          : word = 0;
 vid_prim          : array of TVisPrim;
 vid_prims         : word = 0;
+vid_blink_timer1  : integer = 0;
+vid_blink_timer2  : integer = 0;
 
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
@@ -270,7 +276,7 @@ rpls_ticks        : byte = 0;
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
 
-_lng              : boolean = false;
+ui_language              : boolean = false;
 
 
 mouse_select_x0,
@@ -287,7 +293,7 @@ m_brush           : integer;
 m_bx,
 m_by              : integer;
 m_vmove           : boolean = false;
-m_a_inv           : boolean = false;
+m_action           : boolean = false;
 m_mmap_move       : boolean = false;
 
 ui_UnitSelectedNU : integer = 0;
@@ -376,8 +382,12 @@ k_keyboard_string         : shortstring = '';
 //  COLORS
 //
 
-r_blink_colorb    : boolean;
-r_blink_color     : cardinal;
+r_blink1_colorb,
+r_blink2_colorb   : boolean;
+r_blink1_color_BG,
+r_blink1_color_BY,
+r_blink2_color_BG,
+r_blink2_color_BY: cardinal;
 
 c_dred,
 c_awhite,
@@ -540,6 +550,7 @@ spr_HMonastery,
 spr_HTotem,
 spr_HAltar,
 spr_HFortress,
+spr_HPentagram,
 spr_HCC,
 spr_HMUnit,
 spr_HMUnita,
@@ -600,6 +611,7 @@ spr_b4_a,
 spr_b7_a,
 spr_b9_a,
 spr_ptur,
+spr_scan,
 spr_invuln,
 spr_hvision,
 spr_stun          : TMWTexture;
@@ -739,6 +751,10 @@ str_scrollspd,
 str_mousescrl,
 str_fullscreen,
 str_mrandom,
+str_svld_errors_file,
+str_svld_errors_open,
+str_svld_errors_wdata,
+str_svld_errors_wver,
 str_MObjectives,
 str_MMap,
 str_MPlayers      : shortstring;
@@ -752,7 +768,7 @@ str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
 str_hint_r        : array[0.._mhkeys] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
-str_svld_errors   : array[1..4] of shortstring;
+
 str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;
 str_camp_m        : array[0..MaxMissions] of shortstring;

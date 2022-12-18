@@ -45,7 +45,7 @@ begin
       if(aia_enemy_count>0)then n+=1;
 
    if(_testmode>0)then _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
-       c2s(fps_tt)+
+       c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')'+
    ' '+b2c[PointInScreenP(mouse_map_x,mouse_map_y,nil)]+
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+

@@ -1,11 +1,11 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte);  forward;
 procedure _unit_upgr  (pu:PTUnit);  forward;
-procedure ai_clear_vars(pu:PTUnit);forward;
-procedure ai_set_nearest_alarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
-procedure ai_collect_data(pu,tu:PTUnit;ud:integer);forward;
+procedure ai_InitVars(pu:PTUnit);forward;
+procedure ai_UnitSetAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+procedure ai_CollectData(pu,tu:PTUnit;ud:integer);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
-function ai_HighPrioTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
+function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canattack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
@@ -16,6 +16,51 @@ function ui_addalrm(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogHPlayer;  forward;
 {$ENDIF}
+
+procedure fr_init;
+begin
+   fr_LastTicks :=0;
+   fr_BaseTicks :=0;
+   fr_FrameCount:=0;
+   fr_FPSSecond :=0;
+   fr_FPSSecondN:=0;
+   fr_FPSSecondC:=0;
+end;
+
+procedure fr_delay;
+var
+fr_TargetTicks,
+fr_CurrentTicks: cardinal;
+begin
+   fr_FrameCount+=1;
+
+   fr_CurrentTicks:=SDL_GetTicks;
+
+   fr_FPSSecondD  :=fr_CurrentTicks-fr_LastTicks;
+   fr_FPSSecond   +=fr_FPSSecondD;
+   fr_FPSSecondN  +=1;
+   if(fr_FPSSecond>=1000)then
+   begin
+      fr_FPSSecondC:=fr_FPSSecondN;
+      fr_FPSSecondN:=0;
+      fr_FPSSecond :=fr_FPSSecond mod 1000;
+   end;
+
+   fr_LastTicks   :=fr_CurrentTicks;
+
+   if(_fsttime)
+   then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
+   else fr_TargetTicks :=fr_BaseTicks + trunc(fr_FrameCount*fr_RateTicks);
+
+   if(fr_CurrentTicks<=fr_TargetTicks)
+   then sdl_Delay(fr_TargetTicks-fr_CurrentTicks)
+   else
+   begin
+      fr_FrameCount:=0;
+      fr_BaseTicks :=fr_CurrentTicks;
+   end;
+end;
+
 
 function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
 function w2s (i:word    ):shortstring;begin str(i,w2s );end;
@@ -325,7 +370,7 @@ procedure CalcPLNU;
 var p:byte;
 begin
    g_player_status:=0;
-   g_cl_units:=0;
+   g_cl_units     :=0;
    for p:=0 to MaxPlayers do
     with _players[p] do
      if(army>0)and(state>ps_none)then

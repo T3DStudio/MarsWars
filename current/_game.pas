@@ -9,7 +9,7 @@ begin
                                 UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_HMonastery ,UID_HFortress    ,UID_HAltar,
+      PlayerSetAllowedUnits(p,[ UID_HMonastery ,UID_HFortress    ,UID_HAltar, UID_HPentagram,
                                 UID_UTechCenter,UID_UNuclearPlant,UID_URMStation ],1,false);
 
       if(g_cgenerators>0)then
@@ -64,6 +64,14 @@ PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;end;
 PS_Play: begin ready:=false;name :='';                ttl:=0;end;
       end;
    end;
+end;
+
+procedure PlayerKill(pl:byte);
+var u:integer;
+begin
+   for u:=1 to MaxUnits do
+    with _punits[u]^ do
+     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false);
 end;
 
 procedure PlayersSetDefault;
@@ -164,7 +172,8 @@ begin
    vid_cam_y:=0;
    CamBounds;
 
-   vid_rtui:=0;
+   vid_blink_timer1:=0;
+   vid_blink_timer2:=0;
    vid_vsls:=0;
 
    ui_tab :=0;
@@ -266,7 +275,7 @@ begin
      if(state<>ps_none)then
      begin
         PlayerSetSkirmishTech(p);
-        PlayerSetSkirmishAIParams(p);
+        ai_PlayerSetSkirmishSettings(p);
         GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
      end;
 
@@ -293,7 +302,7 @@ begin
        if(menu_s2<>ms2_camp)
        then GameStartSkirmish
        else ;//_CMPMap;
-       vid_rtui:=2;
+       vid_blink_timer1:=2;
        map_RedrawMenuMinimap;
        d_Panel(r_uipanel);
     end;
@@ -826,10 +835,16 @@ end;
 procedure CodeGame;
 begin
    {$IFDEF _FULLGAME}
-   vid_rtui+=1;
-   vid_rtui:=vid_rtui mod vid_rtuis;
-   r_blink_colorb:=vid_rtui>vid_rtuish;
-   r_blink_color :=ui_blink_color2[r_blink_colorb];
+   vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
+   vid_blink_timer2+=1;vid_blink_timer2:=vid_blink_timer2 mod vid_blink_period2;
+
+   r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
+   r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
+
+   r_blink1_color_BG:=ui_blink_color1[r_blink1_colorb];
+   r_blink1_color_BY:=ui_blink_color2[r_blink1_colorb];
+   r_blink2_color_BG:=ui_blink_color1[r_blink2_colorb];
+   r_blink2_color_BY:=ui_blink_color2[r_blink2_colorb];
 
    SoundControl;
 

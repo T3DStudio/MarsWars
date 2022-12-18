@@ -21,7 +21,7 @@ begin
       end;
 end;
 
-function net_GetPlayer(aip:cardinal;ap:word;cnew:boolean):byte;
+function net_GetPlayer(aip:cardinal;ap:word;MakeNew:boolean):byte;
 var i:byte;
 begin
    net_GetPlayer:=0;
@@ -38,19 +38,19 @@ begin
          break;
       end;
 
-   if(net_GetPlayer=0)and(G_Started=false)and(cnew)then net_GetPlayer:=net_NewPlayer(aip,ap);
+   if(net_GetPlayer=0)and(G_Started=false)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
 end;
 
 procedure net_ReadPlayerData(pid:byte);
-var i:byte;
-    s:shortstring;
+var   i:byte;
+oldname:shortstring;
 begin
    with _Players[pid] do
    begin
-      s:=name;
-      name :=net_readstring;
+      oldname:=name;
+      name   :=net_readstring;
       if(length(name)>NameLen)then setlength(name,NameLen);
-      if(s<>name)then vid_menu_redraw:=true;
+      if(oldname<>name)then vid_menu_redraw:=true;
 
       if(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])
       then i:=net_readbyte
@@ -106,12 +106,19 @@ begin
    net_writecard(map_seed );
    net_writebool(map_symmetry);
 
-   net_writebyte(g_mode   );
+   net_writebyte(g_mode          );
    net_writebyte(g_start_base    );
    net_writebool(g_fixed_positions);
    net_writebyte(g_ai_slots      );
    net_writebyte(g_cgenerators   );
    net_writebool(g_deadobservers );
+
+   if(G_Started)and(not g_fixed_positions)then
+    for i:=1 to MaxPlayers do
+    begin
+       net_writeint(map_psx[i]);
+       net_writeint(map_psy[i]);
+    end;
 end;
 
 procedure net_ReadMapMark(pid:byte);
@@ -144,7 +151,7 @@ begin
            if(state>ps_none)
            then net_writestring(name)
            else net_writestring(''  );
-         net_send(net_lastinip,net_lastinport);
+         net_send(net_LastinIP,net_LastinPort);
          continue;
       end;}
 
@@ -155,17 +162,17 @@ begin
          begin
             net_clearbuffer;
             net_writebyte(nmid_wrong_ver);
-            net_send(net_lastinip,net_lastinport);
+            net_send(net_LastinIP,net_LastinPort);
             continue;
          end;
-         pid:=net_GetPlayer(net_lastinip,net_lastinport,true);
+         pid:=net_GetPlayer(net_LastinIP,net_LastinPort,true);
          if(pid=0)then
          begin
             net_clearbuffer;
             if(g_started)
             then net_writebyte(nmid_game_started)
             else net_writebyte(nmid_server_full );
-            net_send(net_lastinip,net_lastinport);
+            net_send(net_LastinIP,net_LastinPort);
             continue;
          end;
 
@@ -173,11 +180,11 @@ begin
 
          net_clearbuffer;
          net_WriteGameData(pid);
-         net_send(net_lastinip,net_lastinport);
+         net_send(net_LastinIP,net_LastinPort);
       end
       else   // other net mess
       begin
-         pid:=net_GetPlayer(net_lastinip,net_lastinport,false);
+         pid:=net_GetPlayer(net_LastinIP,net_LastinPort,false);
          if(pid>0)then
          begin
             case mid of
@@ -194,7 +201,9 @@ nmid_log_chat    : begin
                    end;
 nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
-                      if(G_Started=false)then PlayerSetState(pid,ps_none);
+                      if(G_Started=false)
+                      then PlayerSetState(pid,ps_none)
+                      else PlayerKill(pid);
                       continue;
                    end;
             else
@@ -241,7 +250,7 @@ nmid_pause      : begin
          begin
             net_clearbuffer;
             net_writebyte(nmid_notconnected);
-            net_send(net_lastinip,net_lastinport);
+            net_send(net_LastinIP,net_LastinPort);
          end;
       end;
    end;
@@ -277,8 +286,11 @@ end;
 
 {$IFDEF _FULLGAME}
 
-procedure net_ReadMapData;
-var redraw_menu,new_map:boolean;
+procedure net_ReadMapData(StartGame:boolean);
+var
+redraw_menu,
+new_map     : boolean;
+i           : byte;
 function _rmByte(pv:pbyte    ):boolean;var v:byte    ;begin v:=pv^;pv^:=net_readbyte;_rmByte:=(v<>pv^);end;
 function _rmWord(pv:pword    ):boolean;var v:word    ;begin v:=pv^;pv^:=net_readword;_rmWord:=(v<>pv^);end;
 function _rmInt (pv:pinteger ):boolean;var v:integer ;begin v:=pv^;pv^:=net_readint ;_rmInt :=(v<>pv^);end;
@@ -294,14 +306,21 @@ begin
    if(_rmCard(@map_seed         ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmBool(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_mode           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;end;
+   if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;end;
+   if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_cgenerators    ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_deadobservers  ))then begin redraw_menu:=true;end;
+   if(_rmByte(@g_deadobservers  ))then begin redraw_menu:=true;              end;
 
    if(new_map    )then Map_premap;
    if(redraw_menu)then vid_menu_redraw:=true;
+
+   if(StartGame)and(not g_fixed_positions)then
+    for i:=1 to MaxPlayers do
+    begin
+       map_psx[i]:=net_readint;
+       map_psy[i]:=net_readint;
+    end;
 end;
 
 procedure net_GClient;
@@ -310,7 +329,7 @@ var mid,i:byte;
 begin
    net_clearbuffer;
    while(net_Receive>0)do
-   if(net_lastinip=net_cl_svip)and(net_lastinport=net_cl_svport)then
+   if(net_LastinIP=net_cl_svip)and(net_LastinPort=net_cl_svport)then
    begin
       net_cl_svttl:=0;
       mid:=net_readbyte;
@@ -358,7 +377,7 @@ nmid_lobby_info  : begin
                       HPlayer    :=net_readbyte;
                       net_cl_svpl:=net_readbyte;
 
-                      net_ReadMapData;
+                      net_ReadMapData(gst);
                       net_m_error:='';
 
                       if(gst<>G_Started)then
@@ -368,8 +387,7 @@ nmid_lobby_info  : begin
                          begin
                             _menu:=false;
                             ServerSide:=false;
-                            //if(g_mode=gm_coop)then _make_coop;
-                            MoveCamToPoint(map_psx[HPlayer] , map_psy[HPlayer]);
+                            MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
                          end
                          else
                          begin

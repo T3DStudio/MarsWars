@@ -33,7 +33,7 @@ begin
      if(al_t>0)then
      begin
         //r:=(al_t*2) mod vid_uialrm_t;
-        r:=(g_step+cardinal(i+al_t)) mod vid_uialrm_t;
+        r:=(g_step+cardinal(i+al_t)) mod ui_alarm_time;
 
         case al_v of
 aummat_attacked_b,
@@ -112,8 +112,8 @@ begin
          end;
          _unit_apUID(pdunit);
          _unit_upgr (pdunit);
-         if(UIUnitDrawRange(pdunit))then
-          circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink_color);
+         if(UIUnitDrawRange(pdunit))
+         then circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink2_color_BG);
       end;
 
       m_brushx+=vid_cam_x-lx;
@@ -407,7 +407,7 @@ begin
       begin
          _drawBtn(tar,0,0,spr_b_action ,false  ,ui_uibtn_action<=0 );
          _drawBtn(tar,1,0,spr_b_paction,false  ,ui_uibtn_action<=0 );
-         _drawBtn(tar,2,0,spr_b_rclck  ,m_a_inv,false              );
+         _drawBtn(tar,2,0,spr_b_rclck  ,m_action,false              );
 
          _drawBtn(tar,0,1,spr_b_attack ,false  ,ui_uibtn_move<=0   );
          _drawBtn(tar,1,1,spr_b_stop   ,false  ,ui_uibtn_move<=0   );
@@ -474,7 +474,7 @@ procedure d_PanelUI(tar:pSDL_Surface;lx,ly:integer);
 begin
    d_MapMouse(tar,lx,ly);
 
-   if(vid_rtui=2)then
+   if(vid_blink_timer1=2)then
    begin
       d_MiniMap(r_panel  );
       d_Panel  (r_uipanel);
@@ -554,7 +554,7 @@ begin
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
-      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[r_blink_colorb],ta_left,ui_ingamecl,c_white);
+      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[r_blink1_colorb],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then

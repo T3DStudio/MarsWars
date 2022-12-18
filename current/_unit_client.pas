@@ -139,7 +139,7 @@ begin
       SetBBit(@_bts2,3, buff[ub_teleeff  ]>0);
       SetBBit(@_bts2,4, buff[ub_hvision  ]>0);
       SetBBit(@_bts2,5, buff[ub_cast     ]>0);
-
+      SetBBit(@_bts2,6, buff[ub_scaned   ]>0);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, inapc>0             );
@@ -329,7 +329,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       _N_U:=@_players[_pl].n_u;
    end;
 
-   CalcPLNU;;
+   CalcPLNU;
 
    _wudata_byte(g_player_status,rpl);
    if(g_player_status>0)then
@@ -343,7 +343,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       for i:=1 to _PNU do
       begin
          repeat
-            inc(_N_U^,1);
+            _N_U^+=1;
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
          until ( g_player_status and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
          _wudata(@_units[_N_U^],rpl,_pl);
@@ -779,7 +779,8 @@ begin
          buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,2)];
          buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,3)];
          buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_cast     ]:=_buffst[GetBBit(@_bts1,5)];
+         buff[ub_cast     ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_scaned   ]:=_buffst[GetBBit(@_bts2,6)];
       end
       else
       begin
@@ -788,6 +789,7 @@ begin
          buff[ub_invuln   ]:=0;
          buff[ub_teleeff  ]:=0;
          buff[ub_hvision  ]:=0;
+         buff[ub_scaned   ]:=0;
       end;
 
       if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
@@ -946,7 +948,7 @@ var i:byte;
 begin
    g_cl_units:=0;
    for i:=1 to MaxPlayers do
-    if((g_player_status and (1 shl i))>0)then inc(g_cl_units,MaxPlayerUnits);
+    if((g_player_status and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
 end;
 
 procedure _rclinet_gframe(_pl:byte;rpl:boolean);
@@ -1017,7 +1019,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
       for i:=1 to _PNU do
       begin
          repeat
-           inc(_N_U,1);
+           _N_U+=1;
            if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
          until ( g_player_status and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0 ;
          _units[_N_U].unum:=_N_U;

@@ -57,8 +57,6 @@ begin
    if(InitNET=false)then WriteSDLError;
 end;
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure net_send(ip:cardinal; port:word);
@@ -152,45 +150,14 @@ end;
 
 // WRITE       /////////////////////////////////////////////////////////////////
 
-procedure net_writebyte(b:byte);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
-
-procedure net_writesint(b:shortint);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
-
-procedure net_writechar(b:char);
-begin
-   net_writebyte(ord(b));
-end;
-
-procedure net_writebool(b:boolean);
-begin
-   net_writebyte(byte(b));
-end;
-
-procedure net_writeint(b:integer);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
-
-procedure net_writeword(b:word);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
-
-procedure net_writecard(b:cardinal);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
-
-procedure net_writesingle(b:single);
-begin
-   net_buff(true,SizeOf(b),@b);
-end;
+procedure net_writebyte  (b:byte    );begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writesint  (b:shortint);begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writechar  (b:char    );begin net_writebyte(ord (b));end;
+procedure net_writebool  (b:boolean );begin net_writebyte(byte(b));end;
+procedure net_writeint   (b:integer );begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writeword  (b:word    );begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writecard  (b:cardinal);begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writesingle(b:single  );begin net_buff(true,SizeOf(b),@b);end;
 
 procedure net_writestring(s:shortstring);
 var sl,x:byte;
@@ -209,15 +176,8 @@ end;
 
 ////////////////
 
-function net_LastinIP:cardinal;
-begin
-   net_LastinIP:=net_buffer^.address.host;
-end;
-
-function net_LastinPort:word;
-begin
-   net_LastinPort:=net_buffer^.address.port;
-end;
+function net_LastinIP  :cardinal;begin net_LastinIP  :=net_buffer^.address.host;end;
+function net_LastinPort:word    ;begin net_LastinPort:=net_buffer^.address.port;end;
 
 ////////////////////////////////////////////////////////////////////////////////
 

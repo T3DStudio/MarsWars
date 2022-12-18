@@ -42,7 +42,7 @@ begin
               uo_y :=y;
               dir  :=270;
               hits :=_mhits;
-              buff[ub_resur]:=0;
+              buff[ub_resur   ]:=0;
               buff[ub_summoned]:=fr_fps;
               {$IFDEF _FULLGAME}
               _unit_fog_r(pu);
@@ -62,26 +62,21 @@ begin
    begin
       armor:=0;
 
-      if(_baseregen<0)
-      then damage:=hits
-      else
+      if(bld)then
       begin
-         if(bld)then
-         begin
-            armor:=_base_armor;
-            with player^ do
-             if(_ukbuilding)
-             then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_build_armor[_urace]])*BaseArmorBonus1h
-             else
-               if(_ukmech)
-               then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_mech_armor[_urace]])*BaseArmorBonus1
-               else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_bio_armor [_urace]])*BaseArmorBonus1;
-            if(level>0)then armor+=level*_level_armor;
-         end;
+         armor:=_base_armor;
+         with player^ do
+          if(_ukbuilding)
+          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*BaseArmorBonus1h
+          else
+            if(_ukmech)
+            then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_mech[_urace]])*BaseArmorBonus1
+            else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_bio [_urace]])*BaseArmorBonus1;
+         if(level>0)then armor+=level*_level_armor;
+      end;
 
-         case g_mode of
+      case g_mode of
 gm_invasion    : if(playeri=0)then damage:=damage div 2;
-         end;
       end;
 
       damage-=armor;
@@ -106,7 +101,7 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
            if(buff[ub_pain]<=0)then exit;
 
          if(not _ukbuilding)and(not _ukmech)then
-          if(pain_f>0)and(_painc>0)and(painc>0)then // and(buff[ub_pain]<=0)
+          if(pain_f>0)and(_painc>0)then // and(buff[ub_pain]<=0)
           begin
              if(pain_f>pains)
              then pains:=0
@@ -114,13 +109,14 @@ gm_invasion    : if(playeri=0)then damage:=damage div 2;
 
              if(pains=0)then
              begin
-                pains:=painc;
+                pains:=_painc;
 
                 buff[ub_pain]:=max2(pain_time,a_rld);
 
                 with player^ do
                  if(_urace=r_hell)then
                   if(upgr[upgr_hell_pains]>0)then pains+=_painc_upgr*upgr[upgr_hell_pains];
+                if(level>0)then pains+=level*2;
 
                 {$IFDEF _FULLGAME}
                 _unit_pain_effects(pu,nil);
@@ -138,13 +134,13 @@ begin
    with pu^     do
    with player^ do
    begin
-      puid:=@_uids[ouid];
-
       if(hits<=0)then
       begin
          _unit_morph:=ureq_product;
          exit;
       end;
+
+      puid:=@_uids[ouid];
 
       if(not obld)or(puid^._ukbuilding)then
        if(menergy<=0)then
@@ -184,14 +180,14 @@ end;
 procedure _unit_push(pu,tu:PTUnit;uds:single);
 var t:single;
    ud:integer;
-softcollision:boolean;
+shortcollision:boolean;
 begin
    with pu^ do
    with uid^ do
    begin
       t :=uds;
-      softcollision:=((tu^.speed<=0)or(not tu^.bld))and(pu^.player=tu^.player);
-      if(softcollision)
+      shortcollision:=((tu^.speed<=0)or(not tu^.bld))and(pu^.player=tu^.player);
+      if(shortcollision)
       then uds-=tu^.uid^._r
       else uds-=tu^.uid^._r+_r;
       ud:=round(uds);
@@ -214,7 +210,7 @@ begin
 
          if(a_rld<=0)then
           if(vx<>x)or(vy<>y)then
-           if(softcollision)
+           if(shortcollision)
            then dir:=_DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))
            else dir:=_DIR360(dir-( min2(90,max2(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
 
@@ -317,8 +313,8 @@ begin
               if(not _ukbuilding)then
                with player^ do
                 if(_ukmech)
-                then ss+=upgr[upgr_race_mech_mspeed[_urace]]*2
-                else ss+=upgr[upgr_race_bio_mspeed [_urace]]*2;
+                then ss+=upgr[upgr_race_mspeed_mech[_urace]]*2
+                else ss+=upgr[upgr_race_mspeed_bio [_urace]]*2;
 
              if(mdist>70)
              then mdist:=8+_random(25)
@@ -601,10 +597,10 @@ begin
       else
        with _a_weap[tw] do
         if(tw<t_weap^)
-        then n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPrioTarget(player,tu))
+        then n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu))
         else
         begin
-           n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPrioTarget(player,tu));
+           n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
            if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
            case aw_tarprior of
@@ -645,15 +641,14 @@ procedure _unit_capture_point(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
-    if(hits>0)then
-     for i:=1 to MaxCPoints do
-      with g_cpoints[i] do
-       if(cpCapturer>0)then
-        if(point_dist_int(x,y,cpx,cpy)<=cpCapturer)then
-        begin
-           cpUnitsPlayer[playeri     ]+=uid^._limituse;
-           cpUnitsTeam  [player^.team]+=uid^._limituse;
-        end;
+    for i:=1 to MaxCPoints do
+     with g_cpoints[i] do
+      if(cpCapturer>0)then
+       if(point_dist_int(x,y,cpx,cpy)<=cpCapturer)then
+       begin
+          cpUnitsPlayer[playeri     ]+=uid^._limituse;
+          cpUnitsTeam  [player^.team]+=uid^._limituse;
+       end;
 end;
 
 procedure _unit_mcycle(pu:PTUnit);
@@ -716,8 +711,8 @@ uab_teleport      : swtarget:=true;
 
       if(aicode)then
       begin
-         ai_clear_vars(pu);
-         ai_collect_data(pu,pu,0);
+         ai_InitVars(pu);
+         ai_CollectData(pu,pu,0);
       end;
 
       if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
@@ -738,7 +733,7 @@ uab_teleport      : swtarget:=true;
 
             if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
-            if(aicode)then ai_collect_data(pu,tu,ud);
+            if(aicode)then ai_CollectData(pu,tu,ud);
 
             if(tu^.hits>0)then
             begin
@@ -1407,8 +1402,8 @@ wmove_noneed    : if(not attackinmove)then
             if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
             if(level>0)and(not _ukbuilding)then upgradd+=level*_level_damage;
             if(not attackinmove)then
-             if(x<>tu^.x)
-             or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
+              if(x<>tu^.x)
+              or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
             case aw_type of
 wpt_missle     : if(aw_oid>0)then
                   if(aw_count=0)
@@ -1507,14 +1502,14 @@ uab_spawnlost:  begin
       else StayWaitForNextTarget:=0;
 
       if(apctu=nil)then
-       if(_canmove(pu))then
-        if(mp_x<>mv_x)or(mp_y<>mv_y)then
-        begin
-           if(not uid^._slowturn)then
-            if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
-           mp_x:=mv_x;
-           mp_y:=mv_y;
-        end;
+        if(_canmove(pu))then
+          if(mp_x<>mv_x)or(mp_y<>mv_y)then
+          begin
+             if(not uid^._slowturn)and(player^.state<>ps_comp)then
+               if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
+             mp_x:=mv_x;
+             mp_y:=mv_y;
+          end;
    end;
 end;
 
@@ -1585,7 +1580,7 @@ co_paction :  if(uo_id<>ua_paction)
                     case uidi of
                     UID_HCommandCenter,
                     UID_UCommandCenter: begin
-                                           _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_ccldoodads]<=0)and(upgr[upgr_hell_hktdoodads]<=0) );
+                                           _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
                                            uo_y-=fly_hz;
                                         end;
                     end;
@@ -1634,11 +1629,11 @@ begin
        begin
           i:=upgr[_upgr_regen];
           if(_ukbuilding)
-          then i+=upgr[upgr_race_build_regen[_urace]]
+          then i+=upgr[upgr_race_regen_build[_urace]]
           else
             if(_ukmech)
-            then i+=upgr[upgr_race_mech_regen[_urace]]
-            else i+=upgr[upgr_race_bio_regen [_urace]];
+            then i+=upgr[upgr_race_regen_mech[_urace]]
+            else i+=upgr[upgr_race_regen_bio [_urace]];
           i:=(i*BaseArmorBonus1)+_baseregen;
 
           if(i>0)then
@@ -1705,11 +1700,12 @@ begin
              if(ServerSide)and(not _IsUnitRange(inapc,@au))
              then _unit_mcycle   (pu)
              else _unit_mcycle_cl(pu,au);
+
+            _unit_capture_point(pu);
          end
          else _unit_death(pu);
 
          _unit_movevis(pu);
-         _unit_capture_point(pu);
       end;
    end;
 

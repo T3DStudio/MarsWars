@@ -11,6 +11,8 @@ degtorad               = pi/180;
 //
 
 fr_fps                 = 60;
+fr_RateTicks           = 1000/fr_fps;
+
 fr_2hfps               = fr_fps div 2;
 fr_3hfps               = fr_fps div 3;
 fr_4hfps               = fr_fps div 4;
@@ -25,7 +27,6 @@ fr_4fps                = fr_fps*4;
 fr_5fps                = fr_fps*5;
 fr_3h2fps              = fr_3hfps*2; //2/3
 fr_4h3fps              = fr_4hfps*3; //3/4
-fr_mpt                 = trunc(1000/fr_fps);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -455,6 +456,7 @@ ub_teleeff             = 10;
 ub_hvision             = 11;
 ub_damaged             = 12;
 ub_heal                = 13;
+ub_scaned              = 14;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
@@ -504,7 +506,7 @@ upgr_hell_towers       = 7;  // towers range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
 upgr_hell_paina        = 9;  // decay aura
 upgr_hell_buildr       = 10; // main range
-upgr_hell_hktdoodads   = 11; // HK on doodabs
+upgr_hell_extbuild     = 11; // HK on doodabs
 upgr_hell_pinkspd      = 12; // demon move speed
 
 upgr_hell_spectre      = 13; // demon spectre              // t2
@@ -531,7 +533,7 @@ upgr_uac_towers        = 37; // towers sr
 upgr_uac_mainm         = 38; // CC fly
 upgr_uac_ccturr        = 39; // CC turret
 upgr_uac_buildr        = 40; // main sr
-upgr_uac_ccldoodads    = 41; // main on doodabs
+upgr_uac_extbuild      = 41; // main on doodabs
 upgr_uac_float         = 42; // UACBot floating
 
 upgr_uac_botturret     = 43; // bot turret                 // t2
@@ -553,15 +555,19 @@ upgr_fast_build        = 250;
 upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
-                                                 // HELL               UAC
-upgr_race_bio_armor    : array[1..r_cnt] of byte = (upgr_hell_uarmor , upgr_uac_uarmor );
-upgr_race_mech_armor   : array[1..r_cnt] of byte = (0                , upgr_uac_mecharm);
-upgr_race_build_armor  : array[1..r_cnt] of byte = (upgr_hell_barmor , upgr_uac_barmor );
-upgr_race_bio_regen    : array[1..r_cnt] of byte = (upgr_hell_regen  , 0               );
-upgr_race_mech_regen   : array[1..r_cnt] of byte = (0                , 0               );
-upgr_race_build_regen  : array[1..r_cnt] of byte = (upgr_hell_bldrep , 0               );
-upgr_race_bio_mspeed   : array[1..r_cnt] of byte = (0                , upgr_uac_mspeed );
-upgr_race_mech_mspeed  : array[1..r_cnt] of byte = (0                , upgr_uac_mechspd);
+                                                 // HELL                UAC
+upgr_race_armor_bio    : array[1..r_cnt] of byte = (upgr_hell_uarmor  , upgr_uac_uarmor  );
+upgr_race_armor_mech   : array[1..r_cnt] of byte = (0                 , upgr_uac_mecharm );
+upgr_race_armor_build  : array[1..r_cnt] of byte = (upgr_hell_barmor  , upgr_uac_barmor  );
+upgr_race_regen_bio    : array[1..r_cnt] of byte = (upgr_hell_regen   , 0                );
+upgr_race_regen_mech   : array[1..r_cnt] of byte = (0                 , 0                );
+upgr_race_regen_build  : array[1..r_cnt] of byte = (upgr_hell_bldrep  , 0                );
+upgr_race_mspeed_bio   : array[1..r_cnt] of byte = (0                 , upgr_uac_mspeed  );
+upgr_race_mspeed_mech  : array[1..r_cnt] of byte = (0                 , upgr_uac_mechspd );
+upgr_race_9building    : array[1..r_cnt] of byte = (upgr_hell_9bld    , upgr_uac_9bld    );
+upgr_race_extbuilding  : array[1..r_cnt] of byte = (upgr_hell_extbuild, upgr_uac_extbuild);
+upgr_race_srange       : array[1..r_cnt] of byte = (upgr_hell_vision  , upgr_uac_vision  );
+upgr_race_srange_bonus : array[1..r_cnt] of integer = (25  , 25  );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -589,6 +595,7 @@ MID_Mine               = 123;
 MID_URocket            = 124;
 MID_URocketS           = 125;
 MID_Chaingun           = 126;
+MID_Tower              = 127;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -666,11 +673,12 @@ UID_HTower             = 6;
 UID_HTeleport          = 7;
 UID_HEye               = 8;
 UID_HMonastery         = 9;
-UID_HTotem             = 10;
-UID_HAltar             = 11;
-UID_HFortress          = 12;
-UID_HCommandCenter     = 13;
-UID_HBarracks          = 14;
+UID_HPentagram         = 10;
+UID_HTotem             = 11;
+UID_HAltar             = 12;
+UID_HFortress          = 13;
+UID_HCommandCenter     = 14;
+UID_HBarracks          = 15;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -1066,13 +1074,13 @@ vid_maxw               = 1360;
 vid_maxh               = 768;
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
-vid_rtuir              = 6;
-vid_rtuis              = fr_fps div vid_rtuir;
-vid_rtuish             = vid_rtuis div 2;
-vid_uialrm_t           = fr_2fps div vid_rtuir;
-//vid_uialrm_ti          = vid_uialrm_t div 4;
+vid_blink_persecond    = 6;
+vid_blink_period1      = fr_fps  div vid_blink_persecond;
+vid_blink_periodh      = vid_blink_period1 div 2;
+vid_blink_period2      = vid_blink_period1*2;
 
-//vid_uialrm_mr          = vid_uialrm_t-(vid_uialrm_t div 3);
+ui_alarm_time          = vid_blink_period2;
+
 vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;

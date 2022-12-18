@@ -330,10 +330,10 @@ begin
    str_save              := 'Save';
    str_load              := 'Load';
    str_delete            := 'Delete';
-   str_svld_errors[1]    := 'File not'+tc_nl3+'exists!';
-   str_svld_errors[2]    := 'Can`t open'+tc_nl3+'file!';
-   str_svld_errors[3]    := 'Wrong file'+tc_nl3+'size!';
-   str_svld_errors[4]    := 'Wrong version!';
+   str_svld_errors_file  := 'File not'+tc_nl3+'exists!';
+   str_svld_errors_open  := 'Can`t open'+tc_nl3+'file!';
+   str_svld_errors_wdata := 'Wrong file'+tc_nl3+'size!';
+   str_svld_errors_wver  := 'Wrong version!';
    str_time              := 'Time: ';
    str_menu              := 'Menu';
    str_player_def        := ' was terminated!';
@@ -490,7 +490,8 @@ begin
    _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Researches and upgrades.'     );
    _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
    _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );
-   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,'Upgrades units.'              );
+   _mkHStrUid(UID_HPentagram    ,'Hell Pentagram'     ,''              );
+   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,''              );
    _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Casts "Hell Vision"  effect on units. Detector.' );
    _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.');
    _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" effect on units.'        );
@@ -812,10 +813,10 @@ begin
   str_save              := 'Сохранить';
   str_load              := 'Загрузить';
   str_delete            := 'Удалить';
-  str_svld_errors[1]    := 'Файл не'+tc_nl3+'существует!';
-  str_svld_errors[2]    := 'Невозможно'+tc_nl3+'открыть файл!';
-  str_svld_errors[3]    := 'Неправильный'+tc_nl3+'размер файла!';
-  str_svld_errors[4]    := 'Неправильная'+tc_nl3+'версия файла!';
+  str_svld_errors_file  := 'Файл не'+tc_nl3+'существует!';
+  str_svld_errors_open  := 'Невозможно'+tc_nl3+'открыть файл!';
+  str_svld_errors_wdata := 'Неправильный'+tc_nl3+'размер файла!';
+  str_svld_errors_wver  := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
   str_menu              := 'Меню';
   str_player_def        := ' уничтожен!';
@@ -1085,7 +1086,7 @@ end;
 
 procedure swLNG;
 begin
-  if(_lng)
+  if(ui_language)
   then lng_rus
   else lng_eng;
 end;

@@ -59,14 +59,14 @@ procedure InitGame;
 begin
    _CYCLE:=false;
 
+   fr_init;
+
    StartParams;
    randomize;
 
    ObjTbl;
 
    {$IFDEF _FULLGAME}
-   fps_cs:=0;
-   fps_ns:=0;
 
    lng_eng;
    cfg_read;

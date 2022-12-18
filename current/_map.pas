@@ -1,6 +1,6 @@
 {$IFDEF _FULLGAME}
 
-procedure map_tllbc;
+procedure map_MakeThemeSprites;
 begin
    MakeTerrain;
    MakeCrater;
@@ -20,7 +20,7 @@ end;
 
 {$ENDIF}
 
-procedure map_doodads_cells_refresh;
+procedure map_RefreshDoodadsCells;
 var dx0,dy0,dx1,dy1,d,dy:integer;
 begin
    for dx0:=0 to dcn do
@@ -202,9 +202,10 @@ procedure map_ShuffleStarts;
 var x,y:byte;
     i:integer;
 begin
+   //(byte(x*y+map_seed+g_mode) mod 3)
    for x:=1 to MaxPlayers do
     for y:=1 to MaxPlayers do
-     if((byte(x*y+map_seed+g_mode) mod 3)=0)then
+     if(random(2)=0)then
      begin
         i:=map_psx[x];map_psx[x]:=map_psx[y];map_psx[y]:=i;
         i:=map_psy[x];map_psy[x]:=map_psy[y];map_psy[y]:=i;
@@ -562,7 +563,7 @@ begin
       end;
    end;
 
-   map_doodads_cells_refresh;
+   map_RefreshDoodadsCells;
 
    map_RandomBase;
    map_CPoints;
@@ -596,7 +597,7 @@ begin
    map_Starts;
    {$IFDEF _FULLGAME}
    map_seed2theme;
-   map_tllbc;
+   map_MakeThemeSprites;
    {$ENDIF}
    map_Make;
 end;

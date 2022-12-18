@@ -35,13 +35,13 @@ begin
    if(vr=cfg_key_name )then PlayerName      := vl;
    if(vr=cfg_key_sndv )then snd_svolume1    := b2si1(vlw);
    if(vr=cfg_key_mscv )then snd_mvolume1    := b2si1(vlw);
-   if(vr=cfg_key_vspd )then vid_vmspd       := vlw;
-   if(vr=cfg_key_fscr )then cfg_fullscreen  :=(vl=b2c[true]);
+   if(vr=cfg_key_vspd )then vid_CamSpeed    := vlw;
+   if(vr=cfg_key_fscr )then vid_fullscreen  :=(vl=b2c[true]);
    if(vr=cfg_key_vmm  )then vid_vmm         :=(vl=b2c[true]);
    if(vr=cfg_key_saddr)then net_cl_svstr    := vl;
    if(vr=cfg_key_sport)then net_sv_pstr     := vl;
-   if(vr=cfg_key_lng  )then _lng            :=(vl=b2c[true]);
-   if(vr=cfg_key_mai  )then m_a_inv         :=(vl=b2c[true]);
+   if(vr=cfg_key_lng  )then ui_language     :=(vl=b2c[true]);
+   if(vr=cfg_key_mai  )then m_action        :=(vl=b2c[true]);
    if(vr=cfg_key_vidvw)then vid_vw          := vlw;
    if(vr=cfg_key_vidvh)then vid_vh          := vlw;
    if(vr=cfg_key_gsb  )then g_start_base    := vlw;
@@ -88,7 +88,7 @@ begin
 
       if(snd_svolume1<0  )then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
       if(snd_mvolume1<0  )then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
-      if(vid_vmspd   >127)then vid_vmspd   :=127;
+      if(vid_CamSpeed   >127)then vid_CamSpeed   :=127;
 
       if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
 
@@ -118,27 +118,27 @@ begin
    assign(f,cfgfn);
 {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
 
-   writeln(f,cfg_key_name ,'=',PlayerName     );
+   writeln(f,cfg_key_name ,'=',PlayerName         );
    writeln(f,cfg_key_sndv ,'=',si12b(snd_svolume1));
    writeln(f,cfg_key_mscv ,'=',si12b(snd_mvolume1));
-   writeln(f,cfg_key_fscr ,'=',b2c[cfg_fullscreen]);
-   writeln(f,cfg_key_vspd ,'=',vid_vmspd      );
-   writeln(f,cfg_key_vmm  ,'=',b2c[vid_vmm]   );
-   writeln(f,cfg_key_saddr,'=',net_cl_svstr   );
-   writeln(f,cfg_key_sport,'=',net_sv_pstr    );
-   writeln(f,cfg_key_lng  ,'=',b2c[_lng]      );
-   writeln(f,cfg_key_mai  ,'=',b2c[m_a_inv]   );
-   writeln(f,cfg_key_vidvw,'=',vid_vw         );
-   writeln(f,cfg_key_vidvh,'=',vid_vh         );
-   writeln(f,cfg_key_rpnui,'=',rpls_pnui      );
-   writeln(f,cfg_key_npnui,'=',net_pnui       );
-   writeln(f,cfg_key_gsb  ,'=',g_start_base   );
+   writeln(f,cfg_key_fscr ,'=',b2c[vid_fullscreen]);
+   writeln(f,cfg_key_vspd ,'=',vid_CamSpeed       );
+   writeln(f,cfg_key_vmm  ,'=',b2c[vid_vmm]    );
+   writeln(f,cfg_key_saddr,'=',net_cl_svstr    );
+   writeln(f,cfg_key_sport,'=',net_sv_pstr     );
+   writeln(f,cfg_key_lng  ,'=',b2c[ui_language]);
+   writeln(f,cfg_key_mai  ,'=',b2c[m_action]   );
+   writeln(f,cfg_key_vidvw,'=',vid_vw          );
+   writeln(f,cfg_key_vidvh,'=',vid_vh          );
+   writeln(f,cfg_key_rpnui,'=',rpls_pnui       );
+   writeln(f,cfg_key_npnui,'=',net_pnui        );
+   writeln(f,cfg_key_gsb  ,'=',g_start_base    );
    writeln(f,cfg_key_gsp  ,'=',b2c[g_fixed_positions]);
-   writeln(f,cfg_key_gai  ,'=',g_ai_slots     );
-   writeln(f,cfg_key_gcg  ,'=',g_cgenerators  );
-   writeln(f,cfg_key_ppos ,'=',vid_ppos       );
-   writeln(f,cfg_key_uhbar,'=',vid_uhbars     );
-   writeln(f,cfg_key_plcol,'=',vid_plcolors   );
+   writeln(f,cfg_key_gai  ,'=',g_ai_slots      );
+   writeln(f,cfg_key_gcg  ,'=',g_cgenerators   );
+   writeln(f,cfg_key_ppos ,'=',vid_ppos        );
+   writeln(f,cfg_key_uhbar,'=',vid_uhbars      );
+   writeln(f,cfg_key_plcol,'=',vid_plcolors    );
 
    close(f);
 end;

@@ -639,6 +639,7 @@ begin
    _LoadMWSModel(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HCC            ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
    _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
@@ -703,6 +704,9 @@ begin
    _lstr(@spr_stun      ,effects_folder+'stun'   ,firstload,true);
    _lstr(@spr_invuln    ,effects_folder+'invuln' ,firstload,true);
    _lstr(@spr_hvision   ,effects_folder+'hvision',firstload,true);
+   _lstr(@spr_scan      ,effects_folder+'scan'   ,firstload,true);
+
+
 
    _lstr(@spr_cp_out    ,'cp_out',firstload,true);
    _lstr(@spr_cp_gen    ,'cp_gen',firstload,true);
@@ -898,7 +902,7 @@ procedure _MakeScreen;
 begin
    if (r_screen<>nil) then sdl_freesurface(r_screen);
 
-   if(cfg_fullscreen)
+   if(vid_fullscreen)
    then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)
    else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags);
 

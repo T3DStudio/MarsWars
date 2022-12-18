@@ -435,7 +435,7 @@ end;
 
 procedure SoundControl;
 begin
-   if(vid_rtui=0)then SoundMusicControll;
+   if(vid_blink_timer1=0)then SoundMusicControll;
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 
