@@ -71,7 +71,8 @@ begin
    lng_eng;
    cfg_read;
 
-   _svld_make_save_size;
+   saveload_CalcSaveSize;
+   replay_CalcHeaderSize;
 
    if not(InitVideo)then exit;
    if not(InitSound)then exit;

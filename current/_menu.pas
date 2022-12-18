@@ -159,8 +159,8 @@ begin
       /// SETTINGS SAVE REPLAYS
 
       3  : menu_s1:=ms1_sett;
-      4  : begin menu_s1:=ms1_svld; _svld_make_lst; end;
-      5  : begin menu_s1:=ms1_reps; if(G_Started=false)then replay_make_list; end;
+      4  : begin menu_s1:=ms1_svld; saveload_MakeFolderList; end;
+      5  : begin menu_s1:=ms1_reps; if(G_Started=false)then replay_MakeFolderList; end;
 
       // game settings
       6  : ;
@@ -248,21 +248,21 @@ begin
       35 : menu_s3:=ms3_sond;
 
       // save load
-      36 : if(_svld_ln>0)then
+      36 : if(svld_list_size>0)then
            begin
-               _svld_ls:=_svld_sm+((mouse_y-ui_menu_ssr_y0-ui_menu_ssr_ys)div ui_menu_ssr_ys);
-              _svld_sel;
+               svld_list_sel:=svld_list_scroll+((mouse_y-ui_menu_ssr_y0-ui_menu_ssr_ys)div ui_menu_ssr_ys);
+              saveload_Select;
            end;
       37 : if(G_Started=false)then menu_item:=0;
-      38 : if(G_Started)and(_svld_str<>'')then _svld_save;
-      39 : if(0<=_svld_ls)and(_svld_ls<_svld_ln)then _svld_load;
-      40 : if(0<=_svld_ls)and(_svld_ls<_svld_ln)then _svld_delete;
+      38 : if(G_Started)and(svld_str_fname<>'')then saveload_Save;
+      39 : if(0<=svld_list_sel)and(svld_list_sel<svld_list_size)then saveload_Load;
+      40 : if(0<=svld_list_sel)and(svld_list_sel<svld_list_size)then saveload_Delete;
 
       // replays
       41 : if(rpls_list_size>0)and(rpls_state<rpl_rhead)then
            begin
               rpls_list_sel :=rpls_list_scroll+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
-              replay_select;
+              replay_Select;
            end;
       42 : if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then
            begin
@@ -271,7 +271,7 @@ begin
               g_started:=true;
            end;
       43 : ;
-      44 : if(rpls_list_size>0)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then replay_delete;
+      44 : if(rpls_list_size>0)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then replay_Delete;
 
       ///  MAP
       50 : ;
@@ -467,7 +467,7 @@ begin
    begin
       case menu_item of
       11 : PlayerName:=StringApplyInput(PlayerName,k_kbstr,NameLen);
-      37 : _svld_str :=StringApplyInput(_svld_str ,k_kbstr,SvRpLen);
+      37 : svld_str_fname :=StringApplyInput(svld_str_fname ,k_kbstr,SvRpLen);
       50 : begin
               map_seed:=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
               map_premap;

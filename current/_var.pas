@@ -245,20 +245,19 @@ net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
 net_pnui          : byte = 4;
 
-_svld_stat        : shortstring = '';
-_svld_str         : shortstring = '';
-_svld_l           : array of shortstring;
-_svld_ln          : integer = 0;
-_svld_ls          : integer = 0;
-_svld_sm          : integer = 0;
-
-svld_size         : cardinal = 0;
+svld_str_info     : shortstring = '';
+svld_str_fname    : shortstring = '';
+svld_list         : array of shortstring;
+svld_list_size    : integer = 0;
+svld_list_sel     : integer = 0;
+svld_list_scroll  : integer = 0;
+svld_file_size    : cardinal = 0;
 
 rpls_fstatus      : byte = 0;   // file status (none,write,read)
 rpls_pnu          : byte = 0;   // quality
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
-rpls_str_data     : shortstring = '';
+rpls_str_info     : shortstring = '';
 rpls_state        : byte = rpl_none;
 rpls_list         : array of shortstring;
 rpls_list_size    : integer = 0;
@@ -272,6 +271,7 @@ rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_fog          : boolean = false;
 rpls_ticks        : byte = 0;
+rpls_file_size    : cardinal = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;

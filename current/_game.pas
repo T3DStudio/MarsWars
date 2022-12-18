@@ -197,7 +197,7 @@ begin
 
    rpls_fog   :=true;
 
-   _svld_str:='';
+   svld_str_fname:='';
 
    rpls_pnu  :=0;
    rpls_plcam:=false;
@@ -849,7 +849,7 @@ begin
    SoundControl;
 
    if(net_status=ns_clnt)then net_GClient;
-   replay_code;
+   replay_Code;
 
    {$ELSE}
    _dedCode;

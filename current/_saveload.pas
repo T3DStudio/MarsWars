@@ -1,6 +1,6 @@
 
 
-procedure _svld_pre;
+procedure saveload_MenuSelectedInfo;
 var f :file;
    hp :byte;
    vr :integer=0;
@@ -15,10 +15,10 @@ begin
    hp:=0;
    FillChar(pls,Sizeof(pls),0);
 
-   _svld_stat:='';
+   svld_str_info:='';
 
-   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
-   if(_svld_l[_svld_ls]<>'')then
+   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
+   if(length(svld_list[svld_list_sel])>0)then
    if(FileExists(fn))then
    begin
       assign(f,fn);
@@ -27,13 +27,13 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         _svld_stat:=str_svld_errors_open;
+         svld_str_info:=str_svld_errors_open;
          close(f);
          exit;
       end;
-      if(FileSize(f)<>svld_size)then
+      if(FileSize(f)<>svld_file_size)then
       begin
-         _svld_stat:=str_svld_errors_wdata;
+         svld_str_info:=str_svld_errors_wdata;
          close(f);
          exit;
       end;
@@ -46,34 +46,34 @@ begin
             BlockRead(f,vr,sizeof(_cmp_sel));
             if(0<=vr)and(vr<=MaxMissions)then
             begin
-               _svld_stat:=str_camp_t[vr];
+               svld_str_info:=str_camp_t[vr];
                BlockRead(f,vr,sizeof(cmp_skill));
                if(0<=vr)and(vr<=CMPMaxSkills)
-               then _svld_stat:=_svld_stat+tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
-               else _svld_stat:=str_svld_errors_wver;
+               then svld_str_info:=svld_str_info+tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
+               else svld_str_info:=str_svld_errors_wver;
             end
-            else _svld_stat:=str_svld_errors_wver;
+            else svld_str_info:=str_svld_errors_wver;
          end
          else
          begin
             BlockRead(f,vr,sizeof(_cmp_sel ));vr:=0;
             BlockRead(f,vr,sizeof(cmp_skill));vr:=0;
 
-            BlockRead(f,ms,sizeof(map_seed ));_svld_stat:=str_map+': '+c2s(ms)+tc_nl3+' ';
+            BlockRead(f,ms,sizeof(map_seed ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(map_iseed));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw   ));_svld_stat:=_svld_stat+str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,mw,sizeof(map_mw   ));svld_str_info:=svld_str_info+str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_liq  ));
-            if(vr>7)then begin _svld_stat:=str_svld_errors_wver;close(f);exit; end
-                    else _svld_stat:=_svld_stat+str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
+            if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                    else svld_str_info:=svld_str_info+str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_obs  ));
-            if(vr>7)then begin _svld_stat:=str_svld_errors_wver;close(f);exit; end
-                    else _svld_stat:=_svld_stat+str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
+            if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                    else svld_str_info:=svld_str_info+str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_symmetry  ));   ////////
             BlockRead(f,vr,sizeof(theme_i  ));
-            if(vr>=theme_n)then begin _svld_stat:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
+            if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));
-            if not(vr in allgamemodes)then begin _svld_stat:=str_svld_errors_wver;close(f);exit; end
-                                   else _svld_stat:=_svld_stat+str_gmode[vr  ]    +tc_nl3+tc_default;
+            if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                                   else svld_str_info:=svld_str_info+str_gmode[vr  ]    +tc_nl3+tc_default;
 
             vr:=0;
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
@@ -87,56 +87,56 @@ begin
             for vr:=1 to MaxPlayers do
             begin
                if(vr=hp)
-               then _svld_stat:=_svld_stat+chr(vr)+'*'+tc_default+pls[vr].name
-               else _svld_stat:=_svld_stat+chr(vr)+'#'+tc_default+pls[vr].name;
+               then svld_str_info:=svld_str_info+chr(vr)+'*'+tc_default+pls[vr].name
+               else svld_str_info:=svld_str_info+chr(vr)+'#'+tc_default+pls[vr].name;
 
                if(pls[vr].state<>PS_None)
-               then _svld_stat:=_svld_stat+','+str_race[pls[vr].mrace][2]+','+b2s(pls[vr].team)+tc_nl3
-               else _svld_stat:=_svld_stat+tc_nl3;
+               then svld_str_info:=svld_str_info+','+str_race[pls[vr].mrace][2]+','+b2s(pls[vr].team)+tc_nl3
+               else svld_str_info:=svld_str_info+tc_nl3;
             end;
          end;
       end
-      else _svld_stat:=str_svld_errors_wver;
+      else svld_str_info:=str_svld_errors_wver;
       close(f);
    end
-   else _svld_stat:=str_svld_errors_file;
+   else svld_str_info:=str_svld_errors_file;
 end;
 
-procedure _svld_sel;
+procedure saveload_Select;
 begin
-   if(0<=_svld_ls)and(_svld_ls<_svld_ln)then
+   if(0<=svld_list_sel)and(svld_list_sel<svld_list_size)then
    begin
-      _svld_str:=_svld_l[_svld_ls];
-      _svld_pre;
+      svld_str_fname:=svld_list[svld_list_sel];
+      saveload_MenuSelectedInfo;
    end
    else
    begin
-      _svld_str :='';
-      _svld_stat:='';
+      svld_str_fname:='';
+      svld_str_info :='';
    end;
 end;
 
-procedure _svld_make_lst;
+procedure saveload_MakeFolderList;
 var Info : TSearchRec;
        s : shortstring;
 begin
-   _svld_sm:=0;
-   _svld_ln:=0;
-   setlength(_svld_l,0);
+   svld_list_scroll:=0;
+   svld_list_size  :=0;
+   setlength(svld_list,0);
    if(FindFirst(str_f_svld+'*'+str_e_svld,faReadonly,info)=0)then
     repeat
        s:=info.Name;
        delete(s,length(s)-(length(str_e_svld)-1),length(str_e_svld));
-       if(s<>'')then
+       if(length(s)>0)then
        begin
-          _svld_ln+=1;
-          setlength(_svld_l,_svld_ln);
-          _svld_l[_svld_ln-1]:=s;
+          svld_list_size+=1;
+          setlength(svld_list,svld_list_size);
+          svld_list[svld_list_size-1]:=s;
        end;
     until (FindNext(info)<>0);
    FindClose(info);
 
-   _svld_sel;
+   saveload_Select;
 end;
 
 {
@@ -187,9 +187,9 @@ theme_map_trt
 theme_map_crt
 }
 
-procedure _svld_make_save_size;
+procedure saveload_CalcSaveSize;
 begin
-   svld_size:=
+   svld_file_size:=
    SizeOf(ver             )+
    SizeOf(menu_s2         )+
    SizeOf(_cmp_sel        )+
@@ -236,10 +236,10 @@ begin
    SizeOf(theme_map_crt   )+1;
 end;
 
-procedure _svld_save;
+procedure saveload_Save;
 var f:file;
 begin
-   assign(f,str_f_svld+_svld_str+str_e_svld);
+   assign(f,str_f_svld+svld_str_fname+str_e_svld);
    {$I-}
    rewrite(f,1);
    {$I+}
@@ -296,27 +296,27 @@ begin
    if(_menu)
    then ToggleMenu;
 
-   _svld_make_lst;
+   saveload_MakeFolderList;
 
    GameLogChat(HPlayer,log_to_all,str_gsaved,true);
 end;
 
 
-procedure _svld_load;
+procedure saveload_Load;
 var f:file;
    fn:shortstring;
    vr:byte=0;
    u:integer;
 begin
-   if(_svld_ls<0)or(_svld_ls>=_svld_ln)then exit;
+   if(svld_list_sel<0)or(svld_list_sel>=svld_list_size)then exit;
 
-   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
-  if(_svld_l[_svld_ls]<>'')then
+   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
+  if(length(svld_list[svld_list_sel])>0)then
    if(FileExists(fn))then
    begin
       assign(f,fn);
       {$I-}reset(f,1);{$I+} if (ioresult<>0) then exit;
-      if(FileSize(f)<>svld_size)then begin close(f); exit; end;
+      if(FileSize(f)<>svld_file_size)then begin close(f); exit; end;
       BlockRead(f,vr,SizeOf(ver));
       if(vr=ver)then
       begin
@@ -392,16 +392,16 @@ begin
    end;
 end;
 
-procedure _svld_delete;
+procedure saveload_Delete;
 var fn:string;
 begin
-   if(_svld_ls<0)or(_svld_ls>=_svld_ln)then exit;
+   if(svld_list_sel<0)or(svld_list_sel>=svld_list_size)then exit;
 
-   fn:=str_f_svld+_svld_l[_svld_ls]+str_e_svld;
+   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
-      _svld_make_lst;
+      saveload_MakeFolderList;
    end;
 end;
 

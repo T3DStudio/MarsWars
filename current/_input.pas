@@ -550,7 +550,7 @@ begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm         ,1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@_svld_sm        ,1,0,_svld_ln-vid_svld_m-1 );
+                                                      36: ScrollInt(@svld_list_scroll        ,1,0,svld_list_size-vid_svld_m-1 );
                                                       41: ScrollInt(@rpls_list_scroll,1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
@@ -560,7 +560,7 @@ begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
                                                       98: ScrollInt(@_cmp_sm         ,-1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@_svld_sm        ,-1,0,_svld_ln-vid_svld_m-1 );
+                                                      36: ScrollInt(@svld_list_scroll        ,-1,0,svld_list_size-vid_svld_m-1 );
                                                       41: ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end

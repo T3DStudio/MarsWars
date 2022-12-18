@@ -1,6 +1,6 @@
 
 
-procedure replay_pre;
+procedure replay_MenuSelectedInfo;
 const pl_n_ch : array[false..true] of char = ('#','*');
 var   f:file;
 vr,t,hp:byte;
@@ -8,13 +8,13 @@ vr,t,hp:byte;
      mw:integer;
      wr:cardinal;
 begin
-   rpls_str_data:='';
+   rpls_str_info:='';
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
 
    fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
 
-   if(rpls_list[rpls_list_sel]<>'')then
+   if(length(rpls_list[rpls_list_sel])>0)then
    if(FileExists(fn))then
    begin
       {$I-}
@@ -23,13 +23,13 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         rpls_str_data:=str_svld_errors_open;
+         rpls_str_info:=str_svld_errors_open;
          exit;
       end;
-      if(FileSize(f)<rpl_hsize)then
+      if(FileSize(f)<rpls_file_size)then
       begin
          close(f);
-         rpls_str_data:=str_svld_errors_wdata;
+         rpls_str_info:=str_svld_errors_wdata;
          exit;
       end;
       vr:=0;
@@ -41,36 +41,36 @@ begin
          vr:=0;
          mw:=0;
          wr:=0;
-         BlockRead(f,wr,sizeof(map_seed ));rpls_str_data:=str_map+': '+c2s(wr)           +tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_data:=rpls_str_data+str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
+         BlockRead(f,wr,sizeof(map_seed ));rpls_str_info:=str_map+': '+c2s(wr)           +tc_nl3+' ';wr:=0;
+         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_info:=rpls_str_info+str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
-         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_liq+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;            end;
+         if(vr<=7)then begin rpls_str_info:=rpls_str_info+str_m_liq+_str_mx(vr)+tc_nl3+' '; end
+                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;             end;
          BlockRead(f,vr,sizeof(map_obs  ));
-         if(vr<=7)then begin rpls_str_data:=rpls_str_data+str_m_obs+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;            end;
+         if(vr<=7)then begin rpls_str_info:=rpls_str_info+str_m_obs+_str_mx(vr)+tc_nl3+' '; end
+                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;             end;
          BlockRead(f,vr,sizeof(map_symmetry  ));
          BlockRead(f,vr,sizeof(g_mode   ));
-         if(vr in allgamemodes)then begin rpls_str_data:=rpls_str_data+str_gmode[vr]+tc_nl3; end
-                            else begin rpls_str_data:=str_svld_errors_wver;close(f);exit;end;
+         if(vr in allgamemodes)then begin rpls_str_info:=rpls_str_info+str_gmode[vr]+tc_nl3;end
+                               else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer  ));
 
-         //rpls_str_data:=rpls_str_data+str_players+':'+tc_nl3;
+         //rpls_str_info:=rpls_str_info+str_players+':'+tc_nl3;
 
          for vr:=1 to MaxPlayers do
          begin
             BlockRead(f,fn ,sizeof(fn));
 
-            rpls_str_data:=rpls_str_data+chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
+            rpls_str_info:=rpls_str_info+chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
 
             t:=0;
             BlockRead(f,t,1);
             if(t=PS_none)then
             begin
-               rpls_str_data:=rpls_str_data+tc_nl3;
+               rpls_str_info:=rpls_str_info+tc_nl3;
                BlockRead(f,mw,3);
             end
             else
@@ -78,21 +78,43 @@ begin
                BlockRead(f,t ,1);
                BlockRead(f,t ,1);
                if(t<=r_cnt)
-               then rpls_str_data:=rpls_str_data+','+str_race[t][2]
-               else rpls_str_data:=rpls_str_data+',?';
-               BlockRead(f,t ,1); rpls_str_data:=rpls_str_data+','+b2s(t)+tc_nl3;
+               then rpls_str_info:=rpls_str_info+','+str_race[t][2]
+               else rpls_str_info:=rpls_str_info+',?';
+               BlockRead(f,t ,1); rpls_str_info:=rpls_str_info+','+b2s(t)+tc_nl3;
             end;
          end;
       end
-      else rpls_str_data:=str_svld_errors_wver;
-      if(IOResult<>0)then rpls_str_data:=str_svld_errors_wver;
+      else rpls_str_info:=str_svld_errors_wver;
+      if(IOResult<>0)then rpls_str_info:=str_svld_errors_wver;
       {$I+}
       close(f);
    end
-   else rpls_str_data:=str_svld_errors_file;
+   else rpls_str_info:=str_svld_errors_file;
 end;
 
-procedure replay_abort;
+procedure replay_CalcHeaderSize;
+begin
+   rpls_file_size:=SizeOf(ver              )
+                  +SizeOf(map_seed         )
+                  +SizeOf(map_mw           )
+                  +SizeOf(map_liq          )
+                  +SizeOf(map_obs          )
+                  +SizeOf(map_symmetry     )
+
+                  +SizeOf(g_mode           )
+                  +SizeOf(g_start_base     )
+                  +SizeOf(g_fixed_positions)
+                  +SizeOf(g_cgenerators    )
+                  +sizeof(rpls_player      );
+   with _players[0] do
+   rpls_file_size+=(sizeof(name )
+                   +sizeof(state)
+                   +sizeof(race )
+                   +sizeof(mrace)
+                   +sizeof(team ))*MaxPlayers;
+end;
+
+procedure replay_Abort;
 begin
    if(rpls_fstatus>rpls_file_none)then
    begin
@@ -102,8 +124,7 @@ begin
    if(rpls_state>=rpl_rhead)then rpls_state:=rpl_none;
 end;
 
-
-procedure replay_code;
+procedure replay_Code;
 const vxyc = 5;
 var  i :byte;
      fs:cardinal;
@@ -111,12 +132,12 @@ _vx,_vy:byte;
 begin
    rpls_ticks+=1;
    if(G_Started=false)or(rpls_state=rpl_none)or(menu_s2=ms2_camp)
-   then replay_abort
+   then replay_Abort
    else
     if(G_Started)then
      case rpls_state of
      rpl_whead   : begin
-                      replay_abort;
+                      replay_Abort;
 
                       rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
                       {$I-}
@@ -125,7 +146,7 @@ begin
                       {$I+}
 
                       if(ioresult<>0)
-                      then replay_abort
+                      then replay_Abort
                       else
                       begin
                          rpls_state  :=rpl_wunit;
@@ -160,11 +181,11 @@ begin
                           end;
                          {$I+}
 
-                         if(ioresult<>0)then replay_abort;
+                         if(ioresult<>0)then replay_Abort;
                       end;
                    end;
      rpl_wunit   : if(rpls_fstatus<>rpls_file_write)
-                   then replay_abort
+                   then replay_Abort
                    else
                      if((rpls_ticks mod 2)=0)then
                      begin
@@ -196,16 +217,16 @@ begin
                            if((i and %00111111)=0)then _wclinet_gframe(rpls_player,true);
                         end;
 
-                        if(IOResult<>0)then replay_abort;
+                        if(IOResult<>0)then replay_Abort;
                      end;
      rpl_rhead   : begin
-                      replay_abort;
+                      replay_Abort;
 
                       if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
                       begin
                          rpls_state   :=rpl_none;
                          g_started    :=false;
-                         rpls_str_data:='';
+                         rpls_str_info:='';
                          exit;
                       end;
 
@@ -215,7 +236,7 @@ begin
                       begin
                          rpls_state   :=rpl_none;
                          g_started    :=false;
-                         rpls_str_data:=str_svld_errors_file;
+                         rpls_str_info:=str_svld_errors_file;
                          exit;
                       end;
 
@@ -226,19 +247,19 @@ begin
 
                       if(ioresult<>0)then
                       begin
-                         replay_abort;
+                         replay_Abort;
                          g_started :=false;
-                         rpls_str_data :=str_svld_errors_open;
+                         rpls_str_info :=str_svld_errors_open;
                       end
                       else
                       begin
                          fs:=FileSize(rpls_file);
 
-                         if(fs<rpl_hsize)then
+                         if(fs<rpls_file_size)then
                          begin
-                            replay_abort;
+                            replay_Abort;
                             g_started :=false;
-                            rpls_str_data :=str_svld_errors_wdata;
+                            rpls_str_info :=str_svld_errors_wdata;
                             exit;
                          end;
 
@@ -249,9 +270,9 @@ begin
 
                          if(i<>ver)then
                          begin
-                            replay_abort;
+                            replay_Abort;
                             g_started  :=false;
-                            rpls_str_data:=str_svld_errors_wver;
+                            rpls_str_info:=str_svld_errors_wver;
                          end
                          else
                          begin
@@ -276,9 +297,9 @@ begin
                             or(g_start_base>gms_g_startb)
                             or(rpls_player>MaxPlayers)then
                             begin
-                               replay_abort;
+                               replay_Abort;
                                g_started:=false;
-                               rpls_str_data:=str_svld_errors_wver;
+                               rpls_str_info:=str_svld_errors_wver;
                                GameDefaultAll;
                                exit;
                             end;
@@ -318,13 +339,13 @@ begin
                       end;
                    end;
      rpl_runit   : if(rpls_fstatus<>rpls_file_read)
-                   then replay_abort
+                   then replay_Abort
                    else
                      if((rpls_ticks mod 2)=0)and(G_Status=gs_running)then
                      begin
                          if(eof(rpls_file)or(ioresult<>0))then
                          begin
-                            replay_abort;
+                            replay_Abort;
                             rpls_state:=rpl_end;
                             G_Status  :=gs_replayend;
                             _fsttime  :=false;
@@ -366,15 +387,15 @@ begin
      end;
 end;
 
-procedure replay_select;
+procedure replay_Select;
 begin
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)
-   then replay_pre
+   then replay_MenuSelectedInfo
    else
-     if(g_started=false)then rpls_str_data:='';
+     if(g_started=false)then rpls_str_info:='';
 end;
 
-procedure replay_make_list;
+procedure replay_MakeFolderList;
 var Info : TSearchRec;
        s : shortstring;
 begin
@@ -385,7 +406,7 @@ begin
     repeat
        s:=info.Name;
        delete(s,length(s)-(length(str_e_rpls)-1),length(str_e_rpls));
-       if(s<>'')then
+       if(length(s)>0)then
        begin
           rpls_list_size+=1;
           setlength(rpls_list,rpls_list_size);
@@ -394,10 +415,10 @@ begin
     until (FindNext(info)<>0);
    FindClose(info);
 
-   replay_select;
+   replay_Select;
 end;
 
-procedure replay_delete;
+procedure replay_Delete;
 var fn:shortstring;
 begin
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
@@ -406,7 +427,7 @@ begin
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
-      replay_make_list;
+      replay_MakeFolderList;
    end;
 end;
 

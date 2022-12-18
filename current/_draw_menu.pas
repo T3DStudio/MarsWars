@@ -240,21 +240,21 @@ begin
                  vlineColor(tar,ui_menu_ssr_x4,y,y+ui_menu_ssr_ys,c_gray);
                  vlineColor(tar,ui_menu_ssr_x5,y,y+ui_menu_ssr_ys,c_gray);
 
-                 _draw_text(tar,_set_x0,_yt(9),_svld_str,ta_left,255,mic(true,menu_item=37) );
+                 _draw_text(tar,_set_x0,_yt(9),svld_str_fname,ta_left,255,mic(true,menu_item=37) );
 
                  y:=_yt(10);
-                 _draw_text(tar,ui_menu_ssr_x0+ui_menu_ssr_xhs, y, str_save  , ta_middle,255, mic(G_Started and (_svld_str<>''),false));
-                 _draw_text(tar,ui_menu_ssr_x4+ui_menu_ssr_xhs, y, str_load  , ta_middle,255, mic((_svld_ls<_svld_ln) ,false));
-                 _draw_text(tar,ui_menu_ssr_x5+ui_menu_ssr_xhs, y, str_delete, ta_middle,255, mic((_svld_ls<_svld_ln) ,false));
+                 _draw_text(tar,ui_menu_ssr_x0+ui_menu_ssr_xhs, y, str_save  , ta_middle,255, mic(G_Started and (svld_str_fname<>''),false));
+                 _draw_text(tar,ui_menu_ssr_x4+ui_menu_ssr_xhs, y, str_load  , ta_middle,255, mic((svld_list_sel<svld_list_size) ,false));
+                 _draw_text(tar,ui_menu_ssr_x5+ui_menu_ssr_xhs, y, str_delete, ta_middle,255, mic((svld_list_sel<svld_list_size) ,false));
 
                  for t:=0 to vid_svld_m do
                  begin
-                    i:=t+_svld_sm;
-                    if(i<_svld_ln)then
+                    i:=t+svld_list_scroll;
+                    if(i<svld_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+_svld_l[i],ta_left,255,mic(true,i=_svld_ls));
-                       if(i=_svld_ls)then
+                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+svld_list[i],ta_left,255,mic(true,i=svld_list_sel));
+                       if(i=svld_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+ui_menu_ssr_ys-1,c_gray);
@@ -262,7 +262,7 @@ begin
                     end;
                  end;
 
-                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,_svld_stat  ,ta_left,19,c_white);
+                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,svld_str_info  ,ta_left,19,c_white);
               end;
    ms1_reps : begin
                  vlineColor(tar,ui_menu_ssl_x0,_yl(1)+1,_yl(10),c_gray);
@@ -291,7 +291,7 @@ begin
                     end;
                  end;
 
-                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,rpls_str_data  ,ta_left,19,c_white);
+                 _draw_text(tar,ui_menu_ssl_x0+6, _yl(1)+6,rpls_str_info  ,ta_left,19,c_white);
               end;
    end;
 end;

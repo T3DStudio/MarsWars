@@ -1214,9 +1214,6 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-//svld_size              = 791345;
-rpl_hsize              = 1575;
-
 rpl_none               = 0;
 rpl_whead              = 1;
 rpl_wunit              = 2;
