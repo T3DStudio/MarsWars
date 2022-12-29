@@ -379,7 +379,7 @@ gm_KotH   : with g_cpoints[1] do
                cpx:=map_hmw;
                cpy:=map_hmw;
                cpCapturer   :=base_r;
-               cpCaptureTime:=fr_fps*60;
+               cpCaptureTime:=fr_fps1*60;
 
                {$IFDEF _FULLGAME}
                cpmx:=round(cpx*map_mmcx);

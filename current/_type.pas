@@ -157,6 +157,14 @@ end;
 
 {$ENDIF}
 
+TCommand = record
+   c_type  : byte;
+   {$IFDEF _FULLGAME}
+   c_hint  : shortstring;
+   c_btn   : pSDL_Surface;
+   {$ENDIF}
+end;
+
 TUWeapon = record
   aw_type,
   aw_tarprior,
@@ -211,7 +219,9 @@ TUID = record
    _upgr_srange_step,
    _limituse,
    _level_damage,
-   _level_armor
+   _level_armor,
+   a_BonusAntiFly_range,
+   a_BonusAntiGround_range
                 : integer;
 
    _upgr_srange,
@@ -255,6 +265,7 @@ TUID = record
    _isbuilder,
    _issmith,
    _isbarrack,
+   _ispadvancer,
    _issolid,
    _ukfly,
    _splashresist: boolean;
@@ -287,7 +298,7 @@ TUID = record
    un_eid_death,
    un_eid_fdeath,
    un_eid_pain
-                : byte;
+                : array[0..MaxUnitLevel] of byte;
 
    un_eid_snd_foot,
    un_eid_snd_summon,
@@ -431,7 +442,9 @@ o_x1,o_y1  :integer;
    s_smiths,
    n_builders,
    n_barracks,
-   n_smiths: integer;
+   n_smiths,
+   n_padvancers
+           : integer;
 
    PNU     : byte;
    n_u,
@@ -455,6 +468,8 @@ o_x1,o_y1  :integer;
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
+
+TUnitVisionData = array[0..MaxPlayers] of integer;
 
 TUnit = record
    hits     : longint;
@@ -497,14 +512,15 @@ TUnit = record
             : integer;
    uo_id    : byte;
 
-   inapc,
+   transport,
    pains,
    apcm,
    apcc     : integer;
 
    buff     : array[0..MaxUnitBuffs] of integer;
+
    vsni,
-   vsnt     : array[0..MaxPlayers] of integer;
+   vsnt     : TUnitVisionData;
 
    StayWaitForNextTarget:byte;
    ukfly,

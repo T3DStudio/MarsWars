@@ -320,8 +320,8 @@ begin
 
       if(not _ukbuilding)then
       begin
-      if(buff[ub_pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
-      if(buff[ub_cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
+      if(buff[ub_Pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
+      if(buff[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 
       if(a_rld>0)and(a_weap_cl<=MaxUnitWeapons)then //and(0<a_tar)and(a_tar<=MaxUnits)

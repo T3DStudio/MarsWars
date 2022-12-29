@@ -45,7 +45,7 @@ begin
 end;
 
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
-var su,i:integer;
+var su,i,selected:integer;
     guid:byte;
 function _checkEnemy:boolean;
 begin
@@ -60,34 +60,62 @@ begin
 end;
 procedure _ClickEffect(color:cardinal);
 begin
-   _click_eff(ox1,oy1,fr_4hfps,color);
+   _click_eff(ox1,oy1,fr_fps1_4,color);
 end;
+function CheckSU(pu:PTUnit):boolean;
+begin
+   CheckSU:=true;
+   with pu^ do
+   with uid^ do
+   begin
+      if(bld)then
+       if(speed>0)
+       or(_canattack(pu,false))
+       or((_ability in [uab_hell_vision,uab_UACScan,uab_rebuild])and(rld<=0))then exit;
+      if(_UnitHaveRPoint(uidi))then exit;
+   end;
+   CheckSU:=false;
+end;
+
 begin
    su  :=0;
    guid:=0;
+   selected:=0;
 
    with _players[HPlayer] do
-    for i:=1 to MaxUnits do
-     with _units[i] do
-      with uid^ do
-       if(hits>0)and(sel)and(playeri=HPlayer)then
-        if(speed>0)
-        or(_canattack(@_units[i],false))
-        or(_UnitHaveRPoint(_units[i].uidi))
-        or(_ability in [uab_hell_vision,uab_radar])then
-        begin
-           su+=1;
-           if(bld)then
-           begin
-              if(guid<>0)then
-               if(_mhits<=_uids[guid]._mhits)then
-                if(_ucl<_uids[guid]._ucl)then continue;
+   begin
+      for i:=1 to MaxUnits do
+       with _units[i] do
+        with uid^ do
+         if(hits>0)and(sel)and(playeri=HPlayer)then
+         begin
+            selected+=1;
+            if(CheckSU(_punits[i]))then
+            begin
+               su+=1;
+               if(bld)then
+               begin
+                  if(guid<>0)then
+                   if(_mhits<=_uids[guid]._mhits)then
+                    if(_ucl<_uids[guid]._ucl)then continue;
 
-              guid:=uidi;
-           end;
-        end;
-
-   if(su<=0)then exit;
+                  guid:=uidi;
+               end;
+            end;
+         end;
+      if(su<=0)then
+      begin
+         case cmd of
+         co_supgrade,
+         co_cupgrade,
+         co_suprod,
+         co_cuprod,
+         co_pcancle:;
+         else if(selected>0)then _PlayCommand(snd_cant_order[race]);
+         end;
+         exit;
+      end;
+   end;
 
    with _uids[guid] do
    case cmd of
@@ -110,7 +138,7 @@ begin
    if(_IsUnitRange(tar,nil))then
    begin
       ui_umark_u:=tar;
-      ui_umark_t:=fr_2hfps;
+      ui_umark_t:=fr_fpsh;
       exit;
    end;
 
@@ -189,7 +217,7 @@ begin
    if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
      with _punits[i]^ do
-      if(hits>0)and(inapc=0)and(_ch(player))then
+      if(hits>0)and(transport=0)and(_ch(player))then
        if(_uvision(htm,_punits[i],false))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
@@ -283,19 +311,24 @@ var u:integer;
 begin
    SoundPlayUI(snd_click);
 
-   by-=4;// 0,0 under minimap
-
    case by of
-   -1: case vid_ppos of   // tabs
+   3 : case vid_ppos of   // tabs
        0,1: begin mouse_x-=vid_panelx; if(mouse_y>vid_panelw)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
        2,3: begin mouse_y-=vid_panely; if(mouse_x>vid_panelw)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
        end;
-    8: case bx of         // buttons
-       0 : ToggleMenu;
-       1 : ;
-       2 : if(net_status>ns_none)then GameTogglePause;
-       end;
    else
+     if(by=ui_menu_btnsy)then
+     begin
+        case bx of         // buttons
+        0 : ToggleMenu;
+        1 : ;
+        2 : if(net_status>ns_none)then GameTogglePause;
+        end;
+        exit;
+     end;
+
+     by-=4;// 0,0 under minimap
+
      u:=(by*3)+(bx mod 3);
 
      if(0<=by)and(by<8)and(bx>=0)then
@@ -365,11 +398,11 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      if(u=1)then
      begin
         if(mid)
-        then rpls_step:=fr_2hfps*fr_fps
+        then rpls_step:=fr_fpsh*fr_fps1
         else
           if(right=false)
-          then rpls_step:=fr_2hfps*2
-          else rpls_step:=fr_2hfps*10;
+          then rpls_step:=fr_fpsh*2
+          else rpls_step:=fr_fpsh*10;
      end
      else
        if(right=false)then
@@ -401,7 +434,7 @@ procedure _hotkeys(k:cardinal);
 var ko,k2:cardinal;
 begin
    k_dbl:=(k_dblt>0)and(k=k_dblk);
-   k_dblt:=fr_4hfps;
+   k_dblt:=fr_fps1_4;
    k_dblk:=k;
    if(k=sdlk_pause)
    then GameTogglePause
@@ -711,7 +744,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
          end;
 
          mouse_select_x0:=-1;
-         m_ldblclk:=fr_4hfps;
+         m_ldblclk:=fr_fps1_4;
       end;
    end;
 
@@ -721,9 +754,9 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       CamBounds;
    end;
 
-   //if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HMU);
+ //  if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
 
-   if(k_mr=2)then                 // RMB down
+   if(k_mr=2)then                 // RMB down                                        //
     if(m_brush<>co_empty)
     then m_brush:=co_empty
     else
@@ -749,7 +782,7 @@ begin
    vx:=vid_cam_x;
    vy:=vid_cam_y;
 
-   if(vid_vmm)then _move_v_m;
+   if(vid_CamMScroll)then _move_v_m;
 
    if(k_u>1)then vid_cam_y-=vid_CamSpeed;
    if(k_l>1)then vid_cam_x-=vid_CamSpeed;

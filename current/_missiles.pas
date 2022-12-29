@@ -146,6 +146,7 @@ begin
    UID_LostSoul: begin
                     if(tu^.uid^._ukmech    )then _d50(@damage);
                  end;
+   UID_Demon   : if(tu^.uid^._uklight)then _d150(@damage);
    end;
 
    _unit_melee_damage:=damage;
@@ -182,16 +183,6 @@ begin
       {$ENDIF}
       tu:=nil;
       _IsUnitRange(tar,@tu);
-      if(mid=MID_Tower)then
-       if(tu=nil)
-       then break
-       else
-         if(tu^.ukfly)
-         then mid:=MID_Revenant
-         else
-           if(tu^.uid^._ukmech)or(tu^.uid^._uklight)or(tu^.uidi=UID_Imp)
-           then mid:=MID_Cacodemon
-           else mid:=MID_Imp;
 
       case mid of
 MID_Imp        : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
@@ -213,9 +204,9 @@ MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=tank_sr;     end;
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
-MID_Blizzard   : begin damage:=BaseDamage20 ; vstep:=fr_fps;   splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
+MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;   splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;mtars:=2;end;
+MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;         end;
       else
          vstep:=0;
          exit;
@@ -233,9 +224,14 @@ MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;mta
       damage+=adddmg;
 
       with _players[player] do
-      case mid of
-MID_URocket : if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
-      end;
+       case mid of
+MID_URocketS,
+MID_URocket : begin
+                 if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
+                 if(tu<>nil)then
+                  if(not tu^.ukfly)then mid:=MID_URocket;
+              end;
+       end;
 
       if(homing=mh_none)then
        case mid of
@@ -297,7 +293,7 @@ ud,rdamage: integer;
 begin
    with _missiles[m] do
     if(_IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)and(not _IsUnitRange(tu^.inapc,nil))then
+     if(tu^.hits>0)and(not _IsUnitRange(tu^.transport,nil))then
      begin
         if(mid<>MID_Blizzard)then
          if(mfs<>tu^.ukfly)or(MissileUIDCheck(mid,tu^.uidi)=false)then exit;
@@ -352,6 +348,9 @@ begin
             MID_Cacodemon   : _d150(@rdamage);
             MID_BPlasma     : _d150(@rdamage);
             end;
+
+        if(mid=MID_BFG)then rdamage:=trunc(rdamage*tu^.uid^._limituse/MinUnitLimit);
+
         end
         else ///////////////////////////// buildings
             case mid of
@@ -394,7 +393,7 @@ begin
            ntars+=1;
 
            if(not fake)
-           then _unit_damage(tu,rdamage,painX,player);
+           then _unit_damage(tu,rdamage,painX,player,false);
         end
         else
           if(splashr>0)and(ud<splashr)and(not tu^.uid^._splashresist)then // splash damage
@@ -403,24 +402,21 @@ begin
              if(mid=MID_BFG)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),EID_BFG);
              {$ENDIF}
 
-             //if(mid<>MID_BFG)then
-             // if(tu^.uid^._splashresist)then exit;
-
              mtars-=1;
              ntars+=1;
 
              if(not fake)then
              begin
                 rdamage:=mm3(0,trunc(rdamage*(1-(ud/splashr))),rdamage);
-                _unit_damage(tu,rdamage,painX,player);
+                _unit_damage(tu,rdamage,painX,player,false);
              end;
           end;
      end;
 end;
 
 procedure _missileCycle;
-const  mb_s0 = fr_fps div 5;
-       mb_s1 = fr_fps-mb_s0;
+const  mb_s0 = fr_fps1 div 5;
+       mb_s1 = fr_fps1-mb_s0;
 var m,u:integer;
      tu:PTUnit;
 begin
@@ -437,6 +433,7 @@ begin
 mh_magnetic : begin
                  x  +=sign(tu^.x-x)*3;
                  y  +=sign(tu^.y-y)*3;
+                 mfe:=tu^.ukfly;
               end;
 mh_homing   : begin
                  x  :=tu^.x;
@@ -448,15 +445,15 @@ mh_homing   : begin
       if(mid=MID_Blizzard)then
       begin
          if(vstep>mb_s1)
-         then vy-=fr_fps
+         then vy-=fr_fps1
          else
            if(vstep=mb_s1)then
            begin
               vx:=x;
-              vy:=y-(fr_fps*mb_s0);
+              vy:=y-(fr_fps1*mb_s0);
            end
            else
-             if(vstep<=mb_s0)then vy+=fr_fps;
+             if(vstep<=mb_s0)then vy+=fr_fps1;
 
       end
       else

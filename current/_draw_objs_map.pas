@@ -1,15 +1,15 @@
 
 
 function DoodadAnimationTime(base:integer):integer;
-const fr_h3fps = fr_fps div 3;
-      fr_4fps  = fr_fps*4;
+const fr_h3fps = fr_fps1 div 3;
+      fr_4fps  = fr_fps1*4;
 begin
    case base of
    -1 : DoodadAnimationTime:=random(fr_h3fps)+fr_h3fps;
-   -2 : DoodadAnimationTime:=random(fr_2fps )+1;
-   -3 : DoodadAnimationTime:=random(fr_fps  )+1;
-   -4 : DoodadAnimationTime:=random(fr_2fps )+1;
-   -5 : DoodadAnimationTime:=random(fr_3fps )+1;
+   -2 : DoodadAnimationTime:=random(fr_fps2 )+1;
+   -3 : DoodadAnimationTime:=random(fr_fps1  )+1;
+   -4 : DoodadAnimationTime:=random(fr_fps2 )+1;
+   -5 : DoodadAnimationTime:=random(fr_fps3 )+1;
    -6 : DoodadAnimationTime:=random(fr_4fps )+1;
    else if(base>0)
         then DoodadAnimationTime:=base

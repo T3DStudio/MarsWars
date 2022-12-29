@@ -353,14 +353,17 @@ begin
 
       if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
 
-      //ub_scaned
-      if(r_blink2_colorb)then
-       if(buff[ub_scaned ]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan);
+      //ub_Scaned
+      case r_blink3 of
+      0: if(buff[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
+      1: if(buff[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
+      2:;
+      end;
 
-      pain:=(buff[ub_pain]>0)and(_ukmech and not _ukbuilding);
+      pain:=(buff[ub_Pain]>0)and(_ukmech and not _ukbuilding);
       buffx:=0;
-      if(buff[ub_hvision]>0)then buffx+=1;
-      if(buff[ub_invuln ]>0)then buffx+=1;
+      if(buff[ub_HVision]>0)then buffx+=1;
+      if(buff[ub_Invuln ]>0)then buffx+=1;
       if(pain              )then buffx+=1;
 
       if(buffx=0)then exit;
@@ -372,8 +375,8 @@ begin
       then buffy:=vy
       else buffy:=vy-sel_hh-font_w;
 
-      if(buff[ub_hvision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
-      if(buff[ub_invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
+      if(buff[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
+      if(buff[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
       if(pain              )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
@@ -706,7 +709,7 @@ begin
 
         end;
 
-        {if(hits>0)and(inapc=0)then
+        {if(hits>0)and(transport=0)then
         if(playeri=HPlayer)then
         begin
            if(isbuild)then
@@ -725,7 +728,7 @@ begin
 
         _draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, PlayerGetColor(playeri));}
 
-        if(inapc>0)then continue;
+        if(transport>0)then continue;
 
         if(hits>0){and(uidi=UID_URMStation)}then
         begin

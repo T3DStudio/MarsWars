@@ -190,50 +190,50 @@ theme_map_crt
 procedure saveload_CalcSaveSize;
 begin
    svld_file_size:=
-   SizeOf(ver             )+
-   SizeOf(menu_s2         )+
-   SizeOf(_cmp_sel        )+
-   SizeOf(cmp_skill       )+
-   SizeOf(map_seed        )+
-   SizeOf(map_iseed       )+
-   SizeOf(map_mw          )+
-   SizeOf(map_liq         )+
-   SizeOf(map_obs         )+
-   SizeOf(theme_i         )+
-   SizeOf(g_mode          )+
-   SizeOf(g_start_base    )+
+   SizeOf(ver              )+
+   SizeOf(menu_s2          )+
+   SizeOf(_cmp_sel         )+
+   SizeOf(cmp_skill        )+
+   SizeOf(map_seed         )+
+   SizeOf(map_iseed        )+
+   SizeOf(map_mw           )+
+   SizeOf(map_liq          )+
+   SizeOf(map_obs          )+
+   SizeOf(theme_i          )+
+   SizeOf(g_mode           )+
+   SizeOf(g_start_base     )+
    SizeOf(g_fixed_positions)+
-   SizeOf(g_cgenerators   )+
-   SizeOf(HPlayer         )+
-   SizeOf(TPList          )+
-   SizeOf(_units          )+
-   SizeOf(_missiles       )+
-   SizeOf(_effects        )+
-   SizeOf(map_dds         )+
-   SizeOf(vid_cam_x       )+
-   SizeOf(vid_cam_y       )+
-   SizeOf(PlayerColor     )+
-   SizeOf(G_Step          )+
-   SizeOf(vid_blink_timer1)+
-   SizeOf(vid_blink_timer2)+
-   SizeOf(m_brush         )+
-   SizeOf(g_inv_wave_n    )+
-   SizeOf(g_inv_time      )+
-   SizeOf(g_inv_wave_t    )+
-   SizeOf(g_cpoints       )+
-   SizeOf(g_royal_r       )+
-   SizeOf(g_status        )+
-   SizeOf(_cycle_order    )+
-   SizeOf(_cycle_regen    )+
-   SizeOf(team_army       )+
-   SizeOf(ui_alarms       )+
-   SizeOf(map_psx         )+
-   SizeOf(map_psy         )+
-   SizeOf(map_rpos        )+
-   SizeOf(theme_map_lqt   )+
-   SizeOf(theme_map_blqt  )+
-   SizeOf(theme_map_trt   )+
-   SizeOf(theme_map_crt   )+1;
+   SizeOf(g_cgenerators    )+
+   SizeOf(HPlayer          )+
+   SizeOf(TPList           )+
+   SizeOf(_units           )+
+   SizeOf(_missiles        )+
+   SizeOf(_effects         )+
+   SizeOf(map_dds          )+
+   SizeOf(vid_cam_x        )+
+   SizeOf(vid_cam_y        )+
+   SizeOf(PlayerColor      )+
+   SizeOf(G_Step           )+
+   SizeOf(vid_blink_timer1 )+
+   SizeOf(vid_blink_timer2 )+
+   SizeOf(m_brush          )+
+   SizeOf(g_inv_wave_n     )+
+   SizeOf(g_inv_wave_t_next)+
+   SizeOf(g_inv_wave_t_curr)+
+   SizeOf(g_cpoints        )+
+   SizeOf(g_royal_r        )+
+   SizeOf(g_status         )+
+   SizeOf(_cycle_order     )+
+   SizeOf(_cycle_regen     )+
+   SizeOf(team_army        )+
+   SizeOf(ui_alarms        )+
+   SizeOf(map_psx          )+
+   SizeOf(map_psy          )+
+   SizeOf(map_rpos         )+
+   SizeOf(theme_map_lqt    )+
+   SizeOf(theme_map_blqt   )+
+   SizeOf(theme_map_trt    )+
+   SizeOf(theme_map_crt    )+1;
 end;
 
 procedure saveload_Save;
@@ -274,8 +274,8 @@ begin
    BlockWrite(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
    BlockWrite(f,m_brush          ,SizeOf(m_brush          ));
    BlockWrite(f,g_inv_wave_n     ,SizeOf(g_inv_wave_n     ));
-   BlockWrite(f,g_inv_time       ,SizeOf(g_inv_time       ));
-   BlockWrite(f,g_inv_wave_t     ,SizeOf(g_inv_wave_t     ));
+   BlockWrite(f,g_inv_wave_t_next,SizeOf(g_inv_wave_t_next));
+   BlockWrite(f,g_inv_wave_t_curr,SizeOf(g_inv_wave_t_curr));
    BlockWrite(f,g_cpoints        ,SizeOf(g_cpoints        ));
    BlockWrite(f,g_royal_r        ,SizeOf(g_royal_r        ));
    BlockWrite(f,g_status         ,SizeOf(g_status         ));
@@ -350,8 +350,8 @@ begin
          BlockRead(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
          BlockRead(f,m_brush          ,SizeOf(m_brush          ));
          BlockRead(f,g_inv_wave_n     ,SizeOf(g_inv_wave_n     ));
-         BlockRead(f,g_inv_time       ,SizeOf(g_inv_time       ));
-         BlockRead(f,g_inv_wave_t     ,SizeOf(g_inv_wave_t     ));
+         BlockRead(f,g_inv_wave_t_next,SizeOf(g_inv_wave_t_next));
+         BlockRead(f,g_inv_wave_t_curr,SizeOf(g_inv_wave_t_curr));
          BlockRead(f,g_cpoints        ,SizeOf(g_cpoints        ));
          BlockRead(f,g_royal_r        ,SizeOf(g_royal_r        ));
          BlockRead(f,g_status         ,SizeOf(g_status         ));
@@ -373,7 +373,7 @@ begin
          map_RedrawMenuMinimap;
          map_DoodadsDrawData;
          pf_make_grid;
-         //g_inv_calcmm;
+         g_inv_CalcWave;
          CamBounds;
 
          G_Started:=true;

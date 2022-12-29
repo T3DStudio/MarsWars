@@ -23,7 +23,7 @@ begin
       //upgr[upgr_hell_baron]:=1;
 
 
-      {ai_pushtime := fr_fps*30;
+      {ai_pushtime := fr_fps1*30;
       ai_pushmin  := 55;
       ai_pushuids := [];
       ai_towngrd  := 3;
@@ -53,7 +53,7 @@ begin
      if(HPlayer=p0)then HPlayer:=p1;
 end;
 
-procedure PlayerSetState(p:integer;st:byte);
+procedure PlayerSetState(p,st:byte);
 begin
    with _players[p] do
    begin
@@ -71,7 +71,7 @@ var u:integer;
 begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
-     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false);
+     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false,true);
 end;
 
 procedure PlayersSetDefault;
@@ -150,17 +150,17 @@ begin
 
    PlayersSetDefault;
 
-   UnitStepTicks:= 8;
+   UnitStepTicks    := 8;
 
-   g_inv_wave_n := 0;
-   g_inv_time   := 0;
-   g_inv_wave_t := 0;
-   g_royal_r    := 0;
+   g_inv_wave_n     := 0;
+   g_inv_wave_t_next:= 0;
+   g_inv_wave_t_curr:= 0;
+   g_royal_r        := 0;
 
-   _cycle_order    := 0;
-   _cycle_regen    := 0;
+   _cycle_order     := 0;
+   _cycle_regen     := 0;
 
-   vid_menu_redraw:=true;
+   vid_menu_redraw  := true;
 
    Map_premap;
 
@@ -251,8 +251,11 @@ begin
 
       if(p=0)then
       begin
-         race :=r_hell;
-         state:=ps_comp;
+         race    :=r_hell;
+         ai_skill:=gms_g_maxai;
+         PlayerSetState(p,ps_comp);
+         PlayerSetCurrentUpgrades(p,[1..255],15,true,true);
+         ai_PlayerSetSkirmishSettings(p);
       end
       else
       begin
@@ -356,7 +359,7 @@ begin
 end;
 
 
-procedure _u_ord(pl:byte);
+procedure PlayerExecuteOrder(pl:byte);
 var
 _su,_eu,
 usel_n,
@@ -399,7 +402,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
             pu:=_punits[_su];
             with pu^ do
             with uid^ do
-             if(hits>0)and(not _IsUnitRange(inapc,nil))and(pl=playeri)then
+             if(hits>0)and(not _IsUnitRange(transport,nil))and(pl=playeri)then
              begin
                 psel:=sel;
 
@@ -429,10 +432,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
 
                 if(o_id=uo_corder)then
                  case o_x0 of
-                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0))then break;   // start  upgr
-                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0))then break;   // cancle upgr
-                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0))then break;   // start  training
-                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0))then break;   // cancle training
+                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0))then begin PlayerClearProdError(player);break;end;// start  upgr
+                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0))then break;                                       // cancle upgr
+                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0))then begin PlayerClearProdError(player);break;end;// start  training
+                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0))then break;                                       // cancle training
                  end;
 
                 if(sel)then
@@ -476,7 +479,7 @@ begin
    or(G_Status=gs_running)
    or(not ServerSide)then exit;
 
-   if(net_status>ns_none)and(G_Step<fr_fps)then exit;
+   if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
    g_player_status:=0;
    for p:=0 to MaxPlayers do
@@ -527,7 +530,7 @@ begin
            if(ttl<ClientTTL)then
            begin
               ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps)then vid_menu_redraw:=true;
+              if(ttl=ClientTTL)or(ttl=fr_fps1)then vid_menu_redraw:=true;
            end
            else
              if(G_Started=false)then
@@ -544,7 +547,7 @@ begin
 
            if(build_cd>0)then build_cd-=1;
 
-           _u_ord(p);
+           PlayerExecuteOrder(p);
 
            if(prod_error_cndt>0)then
            begin
@@ -553,30 +556,30 @@ begin
            end;
         end;
      end;
-
-   GameEndConditions;
 end;
 
 procedure g_inv_CalcWave;
-const min_wave_time = fr_fps*15;
+const min_wave_time = fr_fps1*15;
 var a,i:integer;
 begin
-   {case g_inv_wave_n of
-   1  : g_inv_time:=fr_fps*90;
-   else g_inv_time:=g_inv_wt;
+   case g_inv_wave_n of
+   1  : g_inv_wave_t_next:=fr_fps1*90;
+   else g_inv_wave_t_next:=fr_fps1*90; //g_inv_wave_t_curr;
    end;
 
-   a:=0;
+   g_inv_limit:=ul5+(g_inv_wave_n-1)*ul8;
+
+  { a:=0;
    for i:=1 to MaxPlayers do
     with _players[i] do
     if(state=ps_play)then inc(a,ucl_c[false]);
 
-   dec(g_inv_time, g_inv_wave_n*fr_fps*2);
-   dec(g_inv_time,(a div 15)*fr_fps);
-   dec(g_inv_time, ((map_mw-MaxSMapW) div 100)*fr_fps);
-   dec(g_inv_time, g_startb*5*fr_fps);
+   dec(g_inv_wave_t_next, g_inv_wave_n*fr_fps1*2);
+   dec(g_inv_wave_t_next,(a div 15)*fr_fps1);
+   dec(g_inv_wave_t_next, ((map_mw-MaxSMapW) div 100)*fr_fps1);
+   dec(g_inv_wave_t_next, g_startb*5*fr_fps1);
 
-   if(g_inv_time<min_wave_time)then g_inv_time:=min_wave_time;
+   if(g_inv_wave_t_next<min_wave_time)then g_inv_wave_t_next:=min_wave_time;
 
    g_inv_wt:=0;
 
@@ -588,15 +591,134 @@ begin
    end;                        }
 end;
 
-procedure GameModeInvasion;
-const max_wave_time = fr_fps*150;
-var i,tx,ty:integer;
-  mon:byte;
+procedure GameModeInvasionSpawnMonsters(limit:integer;MaxMonsterLimit:integer);
+var tx,ty:integer;
+function SpawnMonster(uid:byte):boolean;
 begin
-   {if(G_WTeam=255)then
+   SpawnMonster:=false;
+   if(limit<_uids[uid]._limituse)then exit;
+   if(random(2)=0)then
+   begin
+      if(random(2)=0)
+      then tx:=map_mw
+      else tx:=0;
+      ty:=random(map_mw);
+   end
+   else
+   begin
+      if(random(2)=0)
+      then ty:=map_mw
+      else ty:=0;
+      tx:=random(map_mw);
+   end;
+   SpawnMonster:=_unit_add(tx,ty,0,uid,0,true,true,0);
+   if(SpawnMonster)then limit-=_uids[uid]._limituse;
+end;
+function SpawnL(ul:integer):boolean;
+begin
+   SpawnL:=false;
+   if(MaxMonsterLimit>=ul)then
+    case ul of
+ul10 : case random(2) of
+       0 :SpawnL:=SpawnMonster(UID_Cyberdemon);
+       1 :SpawnL:=SpawnMonster(UID_Mastermind);
+       end;
+ul4  : case random(4) of
+       0 :SpawnL:=SpawnMonster(UID_Archvile);
+       1 :SpawnL:=SpawnMonster(UID_Terminator);
+       2 :SpawnL:=SpawnMonster(UID_Tank);
+       3 :SpawnL:=SpawnMonster(UID_Flyer);
+       end;
+ul3  : case random(3) of
+       0 :SpawnL:=SpawnMonster(UID_Baron);
+       1 :SpawnL:=SpawnMonster(UID_Mancubus);
+       2 :SpawnL:=SpawnMonster(UID_Arachnotron);
+       end;
+ul2  : case random(9) of
+       0 :SpawnL:=SpawnMonster(UID_Demon);
+       1 :SpawnL:=SpawnMonster(UID_Cacodemon);
+       2 :SpawnL:=SpawnMonster(UID_Knight);
+       3 :SpawnL:=SpawnMonster(UID_Revenant);
+       4 :SpawnL:=SpawnMonster(UID_BFG);
+       5 :SpawnL:=SpawnMonster(UID_ZBFG);
+       6 :SpawnL:=SpawnMonster(UID_SSergant);
+       7 :SpawnL:=SpawnMonster(UID_ZSSergant);
+       8 :SpawnL:=SpawnMonster(UID_UACBot);
+       end;
+ul1  : case random(15) of
+       0 :SpawnL:=SpawnMonster(UID_Imp);
+       1 :SpawnL:=SpawnMonster(UID_Sergant);
+       2 :SpawnL:=SpawnMonster(UID_Commando);
+       3 :SpawnL:=SpawnMonster(UID_Antiaircrafter);
+       4 :SpawnL:=SpawnMonster(UID_Siege);
+       5 :SpawnL:=SpawnMonster(UID_Major);
+       6 :SpawnL:=SpawnMonster(UID_FMajor);
+       7 :SpawnL:=SpawnMonster(UID_ZSergant);
+       8 :SpawnL:=SpawnMonster(UID_ZCommando);
+       9 :SpawnL:=SpawnMonster(UID_ZAntiaircrafter);
+       10:SpawnL:=SpawnMonster(UID_ZSiege);
+       11:SpawnL:=SpawnMonster(UID_ZMajor);
+       12:SpawnL:=SpawnMonster(UID_ZFMajor);
+       13:SpawnL:=SpawnMonster(UID_ZEngineer);
+       14:SpawnL:=SpawnMonster(UID_Pain);
+       end;
+    end;
+end;
+function SpawnLR:boolean;
+begin
+   case random(5) of
+   0 : SpawnLR:=SpawnL(ul1 );
+   1 : SpawnLR:=SpawnL(ul2 );
+   2 : SpawnLR:=SpawnL(ul3 );
+   3 : SpawnLR:=SpawnL(ul4 );
+   4 : SpawnLR:=SpawnL(ul10);
+   end;
+end;
+begin
+   writeln((limit/ul1):3:3);
+   while(limit>0)and(_players[0].army<MaxPlayerUnits)do
+    if(not SpawnLR)then
+     if(not SpawnL(ul10))then
+      if(not SpawnL(ul4 ))then
+       if(not SpawnL(ul3 ))then
+        if(not SpawnL(ul2 ))then
+         if(not SpawnL(ul1 ))then break;
+end;
+
+procedure GameModeInvasion;
+const max_wave_time = fr_fps1*150;
+begin
+   if(_players[0].armylimit=0)then
+   begin
+      if(g_inv_wave_t_next=0)then
+      begin
+         if(g_inv_wave_n>=InvMaxWaves)
+         then GameSetStatusWinnerTeam(1)
+         else
+         begin
+            g_inv_wave_n+=1;
+            g_inv_CalcWave;
+         end;
+      end
+      else
+      begin
+         g_inv_wave_t_next-=1;
+         if(g_inv_wave_t_next=0)then
+         begin
+            {$IFDEF _FULLGAME}
+            SoundPlayMMapAlarm(snd_teleport,false);
+            {$ENDIF}
+            GameModeInvasionSpawnMonsters(g_inv_limit,ul10);
+         end;
+      end;
+   end
+   else if(g_inv_wave_t_curr<max_wave_time)then g_inv_wave_t_curr+=1;
+
+
+   {
    if(_players[0].army=0)then
    begin
-      if(g_inv_time=0)then
+      if(g_inv_wave_t_next=0)then
       begin
          if(g_inv_wn=20)
          then G_WTeam:=1
@@ -608,8 +730,8 @@ begin
       end
       else
       begin
-         dec(g_inv_time,1);
-         if(g_inv_time=0)then
+         dec(g_inv_wave_t_next,1);
+         if(g_inv_wave_t_next=0)then
          begin
             {$IFDEF _FULLGAME}
             PlaySND(snd_teleport,nil);
@@ -712,8 +834,8 @@ begin
                   if(g_inv_wn>8)then
                    if((i mod 11)=0)then
                    begin
-                      buff[ub_invis ]:=_bufinf;
-                      buff[ub_detect]:=_bufinf;
+                      buff[ub_Invis ]:=_bufinf;
+                      buff[ub_Detect]:=_bufinf;
                    end;
                   buff[ub_advanced ]:=_bufinf;
                   //painc:=5*painc;
@@ -838,6 +960,12 @@ begin
    vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
    vid_blink_timer2+=1;vid_blink_timer2:=vid_blink_timer2 mod vid_blink_period2;
 
+   if(vid_blink_timer1=0)then
+   begin
+      r_blink3+=1;
+      r_blink3:=r_blink3 mod 3;
+   end;
+
    r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
    r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
 
@@ -845,6 +973,7 @@ begin
    r_blink1_color_BY:=ui_blink_color2[r_blink1_colorb];
    r_blink2_color_BG:=ui_blink_color1[r_blink2_colorb];
    r_blink2_color_BY:=ui_blink_color2[r_blink2_colorb];
+
 
    SoundControl;
 
@@ -873,6 +1002,7 @@ begin
          gm_royale    : if(_cycle_order=0)then
                          if(g_royal_r>0)then g_royal_r-=1;
          end;
+         GameEndConditions;
       end;
       _obj_cycle;
    end;

@@ -163,7 +163,7 @@ begin
       5  : begin menu_s1:=ms1_reps; if(G_Started=false)then replay_MakeFolderList; end;
 
       // game settings
-      6  : ;
+      6  : vid_ColoredShadow:=not vid_ColoredShadow;
       7  : begin vid_uhbars+=1;vid_uhbars:=vid_uhbars mod 3; end;
       8  : m_action:=not m_action;
       9  : if(ui_menu_ssr_x2>=mouse_x)
@@ -172,7 +172,7 @@ begin
              if(mouse_x<ui_menu_ssr_x3)
              then vid_CamSpeed:=mouse_x-ui_menu_ssr_x2
              else vid_CamSpeed:=127;
-      10 : vid_vmm:=not vid_vmm;
+      10 : vid_CamMScroll:=not vid_CamMScroll;
       11 : if not ((net_status=ns_none)and(G_Started=false))then menu_item:=0;
       12 : begin ui_language:=not ui_language;swLNG;end;
       13 : begin

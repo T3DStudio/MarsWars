@@ -276,12 +276,12 @@ nmid_pause      : begin
             net_writebyte(nmid_chatclupd);
             _wudata_chat(i,@log_n_cl,false);
             net_send(nip,nport);
-            net_logsend_pause:=fr_2hfps;
+            net_logsend_pause:=fr_fpsh;
          end;
       end;
 
    net_period+=1;
-   net_period:=net_period mod fr_2hfps;
+   net_period:=net_period mod fr_fpsh;
 end;
 
 {$IFDEF _FULLGAME}
@@ -435,11 +435,11 @@ nmid_lobby_info  : begin
    end;
 
    net_period+=1;
-   net_period:=net_period mod fr_2hfps;
+   net_period:=net_period mod fr_fpsh;
    if(net_cl_svttl<ClientTTL)then
    begin
       net_cl_svttl+=1;
-      if(net_cl_svttl=fr_fps   )then vid_menu_redraw:=true;
+      if(net_cl_svttl=fr_fps1   )then vid_menu_redraw:=true;
       if(net_cl_svttl=ClientTTL)then G_Status:=gs_waitserver;
    end;
 end;

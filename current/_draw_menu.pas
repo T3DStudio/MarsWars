@@ -36,9 +36,9 @@ begin
       _draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_liq+_str_mx(map_liq) , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_obs+_str_mx(map_obs) , ta_left  ,255, mic(c,false));
       _draw_text(tar,ui_menu_map_tx0,_yt(4), str_m_sym+b2cc[map_symmetry],ta_left  ,255, mic(c,false));
-      _draw_text(tar,ui_menu_map_tx1,_yt(5), theme_name[theme_i]        , ta_middle,255, c_white     );
 
       _draw_text(tar,ui_menu_map_tx1,_yt(6), str_mrandom                , ta_middle,255, mic(c,false));
+      _draw_text(tar,ui_menu_map_tx1,_yt(7), theme_name[theme_i]        , ta_middle,255, c_white     );
    end
    else
    begin
@@ -162,6 +162,10 @@ begin
                  t:=ui_menu_ssr_x3;
                  if(menu_s3=ms3_game)then
                  begin
+                    y:=_yt(2);
+                    _draw_text(tar,i,y, str_ColoredShadow      , ta_left ,255,c_white);
+                    _draw_text(tar,t,y, b2cc[vid_ColoredShadow], ta_right,255,c_white);
+
                     y:=_yt(3);
                     _draw_text(tar,i,y, str_uhbar             , ta_left ,255,c_white);
                     _draw_text(tar,t,y, str_uhbars[vid_uhbars], ta_right,255,c_white);
@@ -178,7 +182,7 @@ begin
 
                     y:=_yt(6);
                     _draw_text(tar,i ,y, str_mousescrl, ta_left ,255, mic(true,false));
-                    _draw_text(tar,t ,y, b2cc[vid_vmm], ta_right,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[vid_CamMScroll], ta_right,255, mic(true,false));
 
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_plname, ta_left,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));

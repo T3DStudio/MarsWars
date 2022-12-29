@@ -4,9 +4,18 @@ begin
    if(vid_blink_timer1=0)and(_menu=false)and(r_draw)then
     with pu^  do
     with uid^ do
-     if(uid^._ukbuilding)
-     then filledCircleColor(r_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
-     else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
+    begin
+       if(uid^._ukbuilding)
+       then filledCircleColor(r_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
+       else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
+
+       with player^ do
+        if(team=_players[HPlayer].team)then
+         if(_ability=uab_UACScan)and(rld>radar_vision_time)and(r_minimap_scan_blink)then
+          filledCircleColor(r_minimap,trunc(uo_x*map_mmcx),
+                                      trunc(uo_y*map_mmcx),
+                                      trunc(srange*map_mmcx),ShadowColor(PlayerGetColor(pnum)));
+    end;
 end;
 
 
@@ -29,9 +38,9 @@ UID_HAltar,
 UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
     else
       if(uid^._ukbuilding)and(bld=false)
-      then _unit_SpriteDepth:=sd_brocks+vy
+      then _unit_SpriteDepth:=sd_build+vy
       else
-        if(hits>0)or(buff[ub_resur]>0)
+        if(hits>0)or(buff[ub_Resurect]>0)
         then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
         else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
     end;
@@ -104,7 +113,7 @@ begin
     2:begin
          if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
          _unit_fogrev:=true;
-         if(_ability=uab_radar)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
+         if(_ability=uab_UACScan)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
       end;
       end;
 end;
@@ -232,7 +241,7 @@ begin
          end;
          ui_bprod_uid_count[uidi]+=1;
          ui_bprod_ucl_count[_ucl]+=1;
-         ui_bprod_all       +=1;
+         ui_bprod_all            +=1;
       end;
    end;
 end;
@@ -276,7 +285,7 @@ begin
    begin
       // buffs and level
       lvlstr_b:='';
-      if(buff[ub_detect  ]>0)then lvlstr_b+=char_detect;
+      if(buff[ub_Detect  ]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
       if(not _ukbuilding)then
@@ -340,7 +349,8 @@ var spr : PTMWTexture;
 depth,
 alphab,
 alpha,t : integer;
-aura    : cardinal;
+ColorShadow,
+ColorAura    : cardinal;
 begin
    with pu^     do
    with uid^    do
@@ -352,8 +362,8 @@ begin
       begin
          _unit_minimap(pu);
 
-         if(_ability=uab_hkeeptele)then
-          if(buff[ub_clcast]>0)then exit;
+         if(_ability=uab_HKeepBlink)then
+          if(buff[ub_CCast]>0)then exit;
 
          wanim:=false;
          if(G_Status=gs_running)then
@@ -376,19 +386,19 @@ begin
 
             depth:=_unit_SpriteDepth(pu);
             alpha:=255;
-            aura :=0;
+            ColorAura :=0;
 
             if(wanim)then _unit_foot_effects(pu);
 
             UnitsInfoAddUnit(pu,un_smodel[level]);
 
-            if(buff[ub_invis ]>0 )then alpha:=128;
+            if(buff[ub_Invis ]>0 )then alpha:=128;
 
-            if(buff[ub_invuln]>fr_6hfps)
-            then aura:=c_awhite
+            if(buff[ub_Invuln]>fr_fps1_6)
+            then ColorAura:=c_awhite
             else
               if(playeri=0)and(not _ukbuilding)then
-               if(g_mode in [gm_invasion])then aura:=c_ablack;
+               if(g_mode in [gm_invasion])then ColorAura:=c_ablack;
 
             if(_ukbuilding)then
              if(bld)then
@@ -428,14 +438,18 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
                  end
                  else alphab:=255;
 
-                 if(buff[ub_invis]>0)then alphab:=alphab shr 1;
+                 if(buff[ub_Invis]>0)then alphab:=alphab shr 1;
 
                  SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_liquid+un_eid_bcrater_y+y,0,_EID2Spr(un_eid_bcrater),alphab);
               end
               else
-                if(buff[ub_invis]>0)then alpha:=alpha shr 1;
+                if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
 
-            SpriteListAddUnit(vx,vy,depth,shadow,ShadowColor(PlayerGetColor(playeri)),aura,spr,alpha);
+            if(vid_ColoredShadow)
+            then ColorShadow:=ShadowColor(PlayerGetColor(playeri))
+            else ColorShadow:=c_ablack;
+
+            SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha)
          end;
       end;
    end;
@@ -497,7 +511,7 @@ begin
    begin
       pu:=@_units[u];
       with pu^ do
-       if(_IsUnitRange(inapc,@tu))then
+       if(_IsUnitRange(transport,@tu))then
        begin
           if(tu^.sel)and(G_Status=gs_running)and(playeri=HPlayer)then ui_units_inapc[uidi]+=1;
        end

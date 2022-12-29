@@ -293,7 +293,7 @@ begin
       ts                :=r_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
-      theme_liquid_animm:=fr_2hfps;
+      theme_liquid_animm:=fr_fpsh;
    end
    else
    begin
@@ -705,6 +705,7 @@ begin
    _lstr(@spr_invuln    ,effects_folder+'invuln' ,firstload,true);
    _lstr(@spr_hvision   ,effects_folder+'hvision',firstload,true);
    _lstr(@spr_scan      ,effects_folder+'scan'   ,firstload,true);
+   _lstr(@spr_decay     ,effects_folder+'decay'  ,firstload,true);
 
 
 
@@ -789,6 +790,7 @@ begin
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
 
+   ui_menu_btnsy:= (vid_vh div vid_BW)-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
@@ -807,7 +809,7 @@ end;
 
 procedure _ScreenSurfaces;
 const
-  ystop = 14;
+  ystop = 16;
 var i,y:integer;
 
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
@@ -846,7 +848,7 @@ begin
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
       r_panel  :=_createSurf(vid_panelw+1,vid_vh);
 
-      y:=vid_BW*14;
+      y:=vid_BW*ystop;
       vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
       vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
    end
@@ -868,7 +870,7 @@ begin
       r_uipanel:=_createSurf(vid_cam_w,vid_panelw+1);
       r_panel  :=_createSurf(vid_cam_w,vid_panelw+1);
 
-      y:=vid_BW*14;
+      y:=vid_BW*ystop;
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
    end;

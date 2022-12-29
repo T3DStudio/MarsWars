@@ -66,14 +66,16 @@ end;
 procedure setBuildingSND(s:PTSoundSet);
 begin setCommandSND(nil,s,s,s,s);end;
 
-procedure setEffectEID(ready,death,fdeath,pain:byte);
+procedure setEffectEID(aa:byte;ready,death,fdeath,pain:byte);
 begin
    with _uids[u] do
+   for aa:=aa to MaxUnitLevel do
+   with _a_weap[aa] do
    begin
-      un_eid_summon:=ready;
-      un_eid_death :=death;
-      un_eid_fdeath:=fdeath;
-      un_eid_pain  :=pain;
+      un_eid_summon[aa]:=ready;
+      un_eid_death [aa]:=death;
+      un_eid_fdeath[aa]:=fdeath;
+      un_eid_pain  [aa]:=pain;
    end;
 end;
 procedure setEffectSND(ready,death,fdeath,pain:PTSoundSet);
@@ -169,8 +171,8 @@ begin
    then setMWSModel(0,@spr_phantom )
    else setMWSModel(0,@spr_lostsoul);
    setCommandSND(snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0        ,u       ,0            );
-   setEffectSND (nil,snd_pexp ,snd_pexp,snd_hell_pain);
+   setEffectEID (0,0  ,0        ,u       ,0            );
+   setEffectSND (    nil,snd_pexp ,snd_pexp,snd_hell_pain);
    setWeaponESND(0  ,nil,snd_lost_move,0,0);
 end;
 UID_Imp:
@@ -179,8 +181,8 @@ begin
    _animd:=8;
    setMWSModel  (0,@spr_imp);
    setCommandSND(snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain,snd_imp_move);
-   setEffectEID (0  ,0            ,EID_Gavno,0             );
-   setEffectSND (nil,snd_imp_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0            ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_imp_death,snd_meat ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(2,nil,snd_hell_melee ,0,0);
 end;
@@ -190,8 +192,8 @@ begin
    _animd:=9;
    setMWSModel  (0,@spr_demon);
    setCommandSND(snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0              ,0  ,0             );
-   setEffectSND (nil,snd_demon_death,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0              ,0  ,0             );
+   setEffectSND (  nil,snd_demon_death,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_demon_melee,0,0);
 end;
 UID_Cacodemon:
@@ -199,8 +201,8 @@ begin
    _animd:=10;
    setMWSModel  (0,@spr_cacodemon);
    setCommandSND(snd_caco_ready,snd_hell_move,snd_caco_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0              ,0  ,0             );
-   setEffectSND (nil,snd_caco_death ,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0              ,0  ,0             );
+   setEffectSND (  nil,snd_caco_death ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(2,nil,snd_hell_melee ,0,0);
 end;
@@ -210,8 +212,8 @@ begin
    _animd:=10;
    setMWSModel(0,@spr_knight);
    setCommandSND(snd_knight_ready,snd_hell_move,snd_knight_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0                ,0  ,0             );
-   setEffectSND (nil,snd_knight_death ,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0                ,0  ,0             );
+   setEffectSND (  nil,snd_knight_death ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
@@ -221,8 +223,8 @@ begin
    _animd:=10;
    setMWSModel  (0,@spr_baron);
    setCommandSND(snd_baron_ready ,snd_hell_move,snd_baron_ready ,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0                ,0  ,0             );
-   setEffectSND (nil,snd_baron_death  ,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0                ,0  ,0             );
+   setEffectSND (  nil,snd_baron_death  ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
@@ -231,8 +233,8 @@ begin
    _animw:=11;
    setMWSModel  (0,@spr_cyberdemon);
    setCommandSND(snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0              ,0  ,0             );
-   setEffectSND (nil,snd_cyber_death,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0              ,0  ,0             );
+   setEffectSND (  nil,snd_cyber_death,nil,snd_hell_pain );
    setFOOT      (snd_cyber_foot,30);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
@@ -242,8 +244,8 @@ begin
    _animd:=16;
    setMWSModel  (0,@spr_mastermind);
    setCommandSND(snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0  ,0                   ,0  ,0             );
-   setEffectSND (nil,snd_mastermind_death,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0                   ,0  ,0             );
+   setEffectSND (  nil,snd_mastermind_death,nil,snd_hell_pain );
    setFOOT      (snd_mastermind_foot,22);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
@@ -252,8 +254,8 @@ begin
    _animw:=7;
    setMWSModel  (0,@spr_pain);
    setCommandSND(snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
-   setEffectEID (0  ,0             ,u             ,0             );
-   setEffectSND (nil,snd_pain_death,snd_pain_death,snd_pain_pain );
+   setEffectEID (0,0  ,0   ,UID_Pain      ,0             );
+   setEffectSND (  nil,snd_pain_death,snd_pain_death,snd_pain_pain );
 end;
 UID_Revenant:
 begin
@@ -261,8 +263,8 @@ begin
    _animd:=9;
    setMWSModel  (0,@spr_revenant);
    setCommandSND(snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
-   setEffectEID (0  ,0                 ,0  ,0             );
-   setEffectSND (nil,snd_revenant_death,nil,snd_zimba_pain);
+   setEffectEID (0,0  ,0                 ,0  ,0             );
+   setEffectSND (  nil,snd_revenant_death,nil,snd_zimba_pain);
    setWeaponESND(0,nil,snd_revenant_attack,0,0);
    setWeaponESND(2,nil,snd_revenant_melee ,0,0);
 end;
@@ -272,8 +274,8 @@ begin
    _animd:=13;
    setMWSModel  (0,@spr_mancubus);
    setCommandSND(snd_mancubus_ready,snd_zimba_move,snd_mancubus_ready,snd_mancubus_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,0  ,0             );
-   setEffectSND (nil,snd_mancubus_death ,nil,snd_mancubus_pain );
+   setEffectEID (0,0  ,0              ,0  ,0             );
+   setEffectSND (  nil,snd_mancubus_death ,nil,snd_mancubus_pain );
    setWeaponESND(0,snd_mancubus_attack,snd_hell_attack,0,0);
 end;
 UID_Arachnotron:
@@ -282,8 +284,8 @@ begin
    _animd:=13;
    setMWSModel  (0,@spr_arachnotron);
    setCommandSND(snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_hell_pain,snd_arachno_move);
-   setEffectEID (0  ,0              ,0  ,0             );
-   setEffectSND (nil,snd_arachno_death,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0              ,0  ,0             );
+   setEffectSND (  nil,snd_arachno_death,nil,snd_hell_pain );
    setFOOT      (snd_arachno_foot,26);
    setWeaponESND(0,nil,snd_plasma,0,0);
 end;
@@ -293,8 +295,8 @@ begin
    _animd:=12;
    setMWSModel  (0,@spr_archvile);
    setCommandSND(snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
-   setEffectEID (0  ,0                   ,0  ,0                 );
-   setEffectSND (nil,snd_archvile_death  ,nil,snd_archvile_pain );
+   setEffectEID (0,0  ,0                   ,0  ,0                 );
+   setEffectSND (  nil,snd_archvile_death  ,nil,snd_archvile_pain );
    setWeaponESND(0,nil,snd_meat,0,0);
    setWeaponTEID(0,nil,0       ,[0..255]);
    setWeaponESND(1,snd_archvile_attack,nil,0,0);
@@ -307,8 +309,8 @@ begin
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (0,@spr_ZFormer);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_pistol,0,0);
 end;
 UID_ZEngineer:
@@ -317,91 +319,91 @@ begin
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (0,@spr_ZEngineer);
-   setEffectEID (0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND (nil,snd_exp,snd_exp,nil);
+   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectSND (  nil,snd_exp,snd_exp,nil);
 end;
 UID_ZSergant:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZSergant);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
 UID_ZSSergant:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZSSergant);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
 end;
 UID_ZCommando:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZCommando);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
 UID_ZSiege:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZSiege);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_ZAntiaircrafter:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZAntiaircrafter);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_ZMajor:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setMWSModel  (0,@spr_ZMajor);
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_ZFMajor:
 begin
-   _animw:=15;
+   _animw:=14;
    _animd:=8;
    setMWSModel  (0,@spr_ZFMajor);
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND (snd_jetpon,snd_exp,snd_exp,nil);
+   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectSND (  snd_jetpon,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_ZBFG:
 begin
-   _animw:=15;
+   _animw:=12;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0  ,0              ,EID_Gavno,0             );
-   setEffectSND (nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
    setMWSModel  (0,@spr_ZBFG);
    setWeaponESND(0,snd_bfg_shot,nil,0,0);
-   setWeaponTEID(0,nil,0,[fr_fps-10..255]);
+   setWeaponTEID(0,nil,0,[fr_fps1-10..255]);
 end;
 
 
@@ -438,8 +440,7 @@ begin
 
    setMWSModel(0,@spr_HTower);
    setBuildingSND(snd_hell_htower);
-   setWeaponESND(0,nil,snd_revenant_attack,0,MID_Imp);
-   setWeaponESND(1,nil,snd_hell_attack    ,0,MID_Imp);
+   setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Imp);
    un_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -487,15 +488,15 @@ begin
    setBuildingSND(snd_hell_eye);
    un_build_amode:=2;
    un_eid_bcrater:=255;
-   setEffectEID(0  ,UID_HEye ,UID_HEye,0  );
-   setEffectSND(nil,snd_pexp,snd_pexp,nil);
+   setEffectEID(0,0  ,UID_HEye ,UID_HEye,0  );
+   setEffectSND(  nil,snd_pexp,snd_pexp,nil);
 end;
 UID_HCommandCenter:
 begin
    setMWSModel(0,@spr_HCC);
    setBuildingSND(snd_hell_hbuild);
-   setEffectEID(EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
-   setEffectSND(snd_hell,snd_building_explode,snd_building_explode,nil);
+   setEffectEID(0,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);
 end;
@@ -504,8 +505,8 @@ begin
    setMWSModel(0,@spr_HMUnit );
    setMWSModel(1,@spr_HMUnita);
    setBuildingSND(snd_hell_hbuild);
-   //setEffectEID(false,EID_HMU ,EID_BBExp           ,EID_BBExp           ,0  );
-   //setEffectEID(true ,EID_HAMU,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(0,EID_HMU ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(1,EID_HAMU,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
 end;
@@ -517,8 +518,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Engineer);
    setCommandSND(snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_electro,0,0);
    setWeaponESND(1,nil,snd_pistol ,0,0);
    with _a_weap[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onlyshot:=true;end;
@@ -529,8 +530,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Medic);
    setCommandSND(snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_healing,0,0);
    setWeaponESND(1,nil,snd_pistol,0,0);
    setWeaponESND(2,nil,snd_healing,0,0);
@@ -543,8 +544,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Sergant);
    setCommandSND(snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_shotgun ,0,0);
 end;
 UID_SSergant:
@@ -553,8 +554,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_SSergant);
    setCommandSND(snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_ssg    ,0,0);
 end;
 UID_Commando:
@@ -563,8 +564,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Commando);
    setCommandSND(snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_pistol,0,0);
 end;
 UID_Siege:
@@ -573,8 +574,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Siege);
    setCommandSND(snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_Antiaircrafter:
@@ -583,8 +584,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Antiaircrafter);
    setCommandSND(snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_Major:
@@ -593,8 +594,8 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_Major);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
@@ -604,43 +605,44 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_FMajor);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
-   setEffectEID (0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND (snd_jetpon,snd_exp,snd_exp,nil);
+   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectSND (  snd_jetpon,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
 UID_BFG:
 begin
-   _animw:=14;
+   _animw:=12;
    _animd:=8;
    setMWSModel(0,@spr_BFG);
    setCommandSND(snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
-   setEffectEID (0  ,0             ,EID_Gavno,0  );
-   setEffectSND (nil,snd_uac_hdeath,snd_meat ,nil);
+   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
+   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,snd_bfg_shot,nil,0,0);
-   setWeaponTEID(0,nil,0,[fr_fps-10..255]);
+   setWeaponTEID(0,nil,0,[fr_fps1-10..255]);
 end;
 UID_FAPC:
 begin
    setMWSModel(0,@spr_FAPC);
+   setMWSModel(1,@spr_Transport);
    setCommandSND(snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
-   setEffectEID (0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
 UID_APC:
 begin
    _animw:=17;
    setMWSModel(0,@spr_APC);
    setCommandSND(snd_APC_ready,snd_APC_move,snd_APC_move,snd_APC_move,snd_APC_move);
-   setEffectEID (0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
 UID_UACBot:
 begin
    setMWSModel(0,@spr_UACBot);
    setCommandSND(snd_uacbot_move,snd_uacbot_move,snd_uacbot_attack,snd_uacbot_annoy,snd_uacbot_select);
-   setEffectEID (0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
 end;
 UID_Terminator:
@@ -648,8 +650,8 @@ begin
    _animw:=18;
    setMWSModel(0,@spr_Terminator);
    setCommandSND(snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
-   setEffectEID (0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 
    setWeaponESND(0,nil,snd_shotgun,0,0);
 
@@ -662,17 +664,17 @@ begin
    _animw:=17;
    setMWSModel(0,@spr_Tank);
    setCommandSND(snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
-   setEffectEID (0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_exp,0,0);
-   setWeaponTEID(0    ,nil,0,[fr_fps..255]);
+   setWeaponTEID(0    ,nil,0,[fr_fps1..255]);
 end;
 UID_Flyer:
 begin
    setMWSModel(0,@spr_Flyer);
    setCommandSND(snd_uacfighter_ready,snd_uacfighter_move,snd_uacfighter_attack,snd_uacfighter_annoy,snd_uacfighter_select);
-   setEffectEID (0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
    setWeaponESND(1  ,nil,snd_flyer_s,0,0);
 end;
@@ -680,8 +682,8 @@ UID_UTransport:
 begin
    setMWSModel(0,@spr_Transport);
    setCommandSND(snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
-   setEffectEID (0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
+   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
 
 
@@ -766,8 +768,8 @@ begin
    setBuildingSND(snd_mine_place);
    un_snd_ready:=snd_mine_place;
    setWeaponESND(0,nil,snd_electro,0,0);
-   setEffectEID(0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND(nil,snd_exp,snd_exp,nil);
+   setEffectEID(0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectSND(  nil,snd_exp,snd_exp,nil);
    un_eid_bcrater:=255;
 end;
 
@@ -798,14 +800,14 @@ end;
          if(not un_eid_snd_set)then
          if(_r>42)then
          begin
-            setEffectEID(0  ,EID_BBExp           ,EID_BBExp           ,0  );
-            setEffectSND(nil,snd_building_explode,snd_building_explode,nil);
+            setEffectEID(0,0  ,EID_BBExp           ,EID_BBExp           ,0  );
+            setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=10;
          end
          else
          begin
-            setEffectEID(0  ,EID_BExp            ,EID_BExp            ,0  );
-            setEffectSND(nil,snd_building_explode,snd_building_explode,nil);
+            setEffectEID(0,0  ,EID_BExp            ,EID_BExp            ,0  );
+            setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
          end;
          if(un_snd_ready=nil)then un_snd_ready:=snd_constr_complete[_urace];
@@ -841,7 +843,7 @@ end;
       _up_btn:=spr_dummy;
 
       case u of
-upgr_hell_dattack   : begin _up_btn:=spr_b_up[r_hell,0 ]; end;
+upgr_hell_t1attack  : begin _up_btn:=spr_b_up[r_hell,0 ]; end;
 upgr_hell_uarmor    : begin _up_btn:=spr_b_up[r_hell,1 ]; end;
 upgr_hell_barmor    : begin _up_btn:=spr_b_up[r_hell,2 ]; end;
 upgr_hell_mattack   : begin _up_btn:=spr_b_up[r_hell,3 ]; end;
@@ -854,13 +856,13 @@ upgr_hell_teleport  : begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_HKTeleport: begin _up_btn:=spr_b_up[r_hell,9 ]; end;
 upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
 upgr_hell_buildr    : begin _up_btn:=spr_b_up[r_hell,11]; end;
-upgr_hell_extbuild: begin _up_btn:=spr_b_up[r_hell,20]; end;
+upgr_hell_extbuild  : begin _up_btn:=spr_b_up[r_hell,20]; end;
 
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
 upgr_hell_pinkspd   : begin _up_btn:=spr_b_up[r_hell,12]; end;
 upgr_hell_phantoms  : begin _up_btn:=spr_b_up[r_hell,17]; end;
+upgr_hell_t2attack  : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_rteleport : begin _up_btn:=spr_b_up[r_hell,16]; end;
-upgr_hell_9bld      : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_totminv   : begin _up_btn:=spr_b_up[r_hell,18]; end;
 upgr_hell_bldrep    : begin _up_btn:=spr_b_up[r_hell,19]; end;
 upgr_hell_b478tel   : begin _up_btn:=spr_b_up[r_hell,21]; end;
@@ -877,15 +879,15 @@ upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
 upgr_uac_float      : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
-upgr_uac_mainm      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
+upgr_uac_CCFly      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
 upgr_uac_ccturr     : begin _up_btn:=spr_b_up[r_uac ,10]; end;
 upgr_uac_buildr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
-upgr_uac_extbuild : begin _up_btn:=spr_b_up[r_uac ,20]; end;
+upgr_uac_extbuild   : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
 upgr_uac_jetpack    : begin _up_btn:=spr_b_up[r_uac ,15]; end;
-upgr_uac_9bld       : begin _up_btn:=spr_b_up[r_uac ,24]; end;
+upgr_uac_transport  : begin _up_btn:=spr_b_up[r_uac ,24]; end;
 upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm     : begin _up_btn:=spr_b_up[r_uac ,21]; end;

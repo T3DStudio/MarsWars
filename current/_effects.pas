@@ -19,6 +19,7 @@ begin
       smodel:=spr_pdmodel;
       case x of
         UID_Pain          : _setEID(@spr_pain          ,sms_death);
+        UID_Phantom       : _setEID(@spr_Phantom       ,sms_death);
         UID_LostSoul      : _setEID(@spr_lostsoul      ,sms_death);
         UID_HEye          : _setEID(@spr_h_p2          ,sms_death);
 
@@ -149,6 +150,7 @@ begin
 //                       anin  frst  last,
 //                       step  frame
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
+UID_Phantom,
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
 UID_HEye          : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
@@ -197,7 +199,7 @@ EID_HKT_h,
 EID_HKT_s,
 EID_HMU,
 EID_HCC,
-EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps   ,false,0 );
+EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
 
 UID_UGTurret,
 UID_UATurret,

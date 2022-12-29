@@ -2,13 +2,13 @@
 function it2s(r:integer):integer;
 begin
    if(r>0)
-   then it2s:=(r+fr_ifps) div fr_fps
+   then it2s:=(r+fr_ifps) div fr_fps1
    else it2s:=0;
 end;
 function ct2s(r:cardinal):cardinal;
 begin
    if(r>0)
-   then ct2s:=(r+fr_ifps) div fr_fps
+   then ct2s:=(r+fr_ifps) div fr_fps1
    else ct2s:=0;
 end;
 function ir2s(r:integer):shortstring;
@@ -67,6 +67,7 @@ begin
 
    d_MinimapAlarms;
 
+   // debug
    with _players[HPlayer] do
     for i:=0 to MaxPlayers do
      with ai_alarms[i] do
@@ -75,6 +76,8 @@ begin
 
    _draw_surf(tar      ,1,1,r_minimap );
    _draw_surf(r_minimap,0,0,r_bminimap);
+
+   r_minimap_scan_blink:=not r_minimap_scan_blink;
 end;
 
 procedure d_BuildUI(tar:pSDL_Surface;lx,ly:integer);
@@ -295,11 +298,11 @@ begin
          end;
       end;
 
-      d_TextBTN(tar,0,8,@str_menu,c_white);
+      d_TextBTN(tar,0,ui_menu_btnsy-4,@str_menu,c_white);
       if(net_status>ns_none)then
        if(0<g_status)and(g_status<=MaxPlayers)
-       then d_TextBTN(tar,2,8,@str_pause,PlayerGetColor(g_status))
-       else d_TextBTN(tar,2,8,@str_pause,c_white                 );
+       then d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,PlayerGetColor(g_status))
+       else d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,c_white                 );
 
       case ui_tab of
       0: // buildings
@@ -438,8 +441,8 @@ begin
         if(uid_s[sx]>0)then
          with _uids[sx] do
           case _ability of
-uab_uac_rstrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_radar      : ;//if();
+uab_UACStrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
+uab_UACScan      : ;//if();
           end;
 
       if(ui_mc_a>0)then //click effect
@@ -491,15 +494,17 @@ begin
    if(0<=m_bx)and(m_bx<3)and(3<=m_by)and(m_by<=16)then
    begin
       hs:=nil;
+      if(m_by=ui_menu_btnsy)then
+      begin
+         if(m_bx=2)then
+          if(net_status=ns_none)then exit;
+         hs:=@str_hint_m[m_bx];
+      end
+      else
       case m_by of
       3  : case (vid_ppos<2) of
            true :if(mouse_y>vid_panelw)then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
            false:if(mouse_x>vid_panelw)then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
-           end;
-      12 : begin
-              if(m_bx=2)then
-               if(net_status=ns_none)then exit;
-              hs:=@str_hint_m[m_bx];
            end;
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
@@ -584,7 +589,7 @@ begin
    // INVASION
    if(g_mode=gm_invasion)then
    begin
-      D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_time,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
+      D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_wave_t_next,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
       if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
    end;
 

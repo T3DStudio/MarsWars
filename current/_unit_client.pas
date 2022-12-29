@@ -133,19 +133,19 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_resur    ]>0);
-      SetBBit(@_bts2,1, buff[ub_summoned ]>0);
-      SetBBit(@_bts2,2, buff[ub_invuln   ]>0);
-      SetBBit(@_bts2,3, buff[ub_teleeff  ]>0);
-      SetBBit(@_bts2,4, buff[ub_hvision  ]>0);
-      SetBBit(@_bts2,5, buff[ub_cast     ]>0);
-      SetBBit(@_bts2,6, buff[ub_scaned   ]>0);
+      SetBBit(@_bts2,0, buff[ub_Resurect ]>0);
+      SetBBit(@_bts2,1, buff[ub_Summoned ]>0);
+      SetBBit(@_bts2,2, buff[ub_Invuln   ]>0);
+      SetBBit(@_bts2,3, buff[ub_Teleport ]>0);
+      SetBBit(@_bts2,4, buff[ub_HVision  ]>0);
+      SetBBit(@_bts2,5, buff[ub_Cast     ]>0);
+      SetBBit(@_bts2,6, buff[ub_Scaned   ]>0);
 
       SetBBit(@_bts1,0, bld                 );
-      SetBBit(@_bts1,1, inapc>0             );
+      SetBBit(@_bts1,1, transport>0         );
       SetBBit(@_bts1,2, (level and %01)   >0);
       SetBBit(@_bts1,3, (level and %10)   >0);
-      SetBBit(@_bts1,4, buff[ub_pain     ]>0);
+      SetBBit(@_bts1,4, buff[ub_Pain     ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                 );
       SetBBit(@_bts1,7, _bts2>0             );
@@ -159,7 +159,7 @@ function _wrld(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
    then _wrld:=0
-   else _wrld:=mm3(1,(r^ div fr_fps)+1,255);
+   else _wrld:=mm3(1,(r^ div fr_fps1)+1,255);
    _wudata_byte(_wrld,rpl);
 end;
 
@@ -193,8 +193,8 @@ begin
          _wudata_byte (uidi,rpl);
          _wudata_bstat(pu,rpl,_pl);
 
-         if(inapc>0)
-         then _wudata_int(inapc,rpl)
+         if(transport>0)
+         then _wudata_int(transport,rpl)
          else
            if(sh>0)then
            begin
@@ -217,7 +217,7 @@ begin
                _wudata_word(wt,rpl);
             end;
 
-            if(buff[ub_cast]>0)then
+            if(buff[ub_Cast]>0)then
              if(_ability in client_cast_abils)then
              begin
                 _wrld(@rld,rpl);
@@ -290,19 +290,19 @@ begin
 
    gstp:=G_Step shr 1;
    if(rpl=false)then
-    if((gstp mod fr_4hfps)=0)then  // every 1/2 seconds
+    if((gstp mod fr_fps1_4)=0)then  // every 1/2 seconds
      with _players[_pl] do _wrld(@build_cd,rpl);
 
    if(rpl)
-   then i:=fr_fps    //every 2 second
-   else i:=fr_2hfps; // every second
+   then i:=fr_fps1    //every 2 second
+   else i:=fr_fpsh; // every second
 
    if((gstp mod i)=0)then
    begin
       case g_mode of
 gm_invasion : begin
                  _wudata_byte(g_inv_wave_n,rpl);
-                 _wudata_int (g_inv_time  ,rpl);
+                 _wudata_int (g_inv_wave_t_next  ,rpl);
               end;
 gm_royale   : _wudata_int(g_royal_r,rpl);
       end;
@@ -375,9 +375,9 @@ begin
       ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
 
-      if(_IsUnitRange(inapc,nil))then _units[inapc].apcc+=_apcs;
+      if(_IsUnitRange(transport,nil))then _units[transport].apcc+=_apcs;
 
-      if(hits>0)and(inapc<=0)then
+      if(hits>0)and(transport<=0)then
       begin
          if(sel)then _unit_counters_inc_select(pu);
          if(bld=false)
@@ -440,9 +440,9 @@ begin
       ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
 
-      if(_IsUnitRange(inapc,nil))then dec(_units[inapc].apcc,_apcs);
+      if(_IsUnitRange(transport,nil))then dec(_units[transport].apcc,_apcs);
 
-      if(hits>0)and(inapc=0)then
+      if(hits>0)and(transport=0)then
       begin
          if(sel)then _unit_counters_dec_select(pu);
          if(bld=false)
@@ -502,10 +502,10 @@ begin
    begin
       vx:=x;
       vy:=y;
-      if(uid^._ability=uab_hkeeptele)then
+      if(uid^._ability=uab_HKeepBlink)then
       begin
          teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKT_h,EID_HKT_s,snd_cube);
-         buff[ub_clcast]:=fr_fps;
+         buff[ub_CCast]:=fr_fps1;
          exit;
       end;
       // default teleport effects
@@ -527,7 +527,7 @@ begin
      begin
         _unit_default(uu);
 
-        if(_IsUnitRange(inapc,@tu))then _unit_inapc_target(uu,tu);
+        if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
 
         vx:=x;
         vy:=y;
@@ -537,9 +537,9 @@ begin
         if(hits>0)then
         begin
            _unit_fog_r(uu);
-           if(buff[ub_summoned]>0)then _ucSummonedEffect(uu,@vis);
-           if(buff[ub_teleeff ]>0)then _teleEff(uu,@vis);
-           if(buff[ub_hvision ]>0)then _unit_LevelUp(uu,EID_HVision,@vis);
+           if(buff[ub_Summoned]>0)then _ucSummonedEffect(uu,@vis);
+           if(buff[ub_Teleport ]>0)then _teleEff(uu,@vis);
+           if(buff[ub_HVision ]>0)then _unit_LevelUp(uu,EID_HVision,@vis);
            with uid^ do
            if(bld=false)then SoundPlayAnoncer(snd_build_place[_urace],false);
 
@@ -557,9 +557,9 @@ begin
           vy:=y;
           if(pu^.hits>0)and(vis)then
           begin
-             if(hits>ndead_hits)and(inapc=0)then
+             if(hits>ndead_hits)and(transport=0)then
              begin
-                if(buff[ub_teleeff]>0)then _teleEff(uu,@vis);
+                if(buff[ub_Teleport]>0)then _teleEff(uu,@vis);
 
                 _unit_death_effects(uu,true,@vis);
              end;
@@ -586,25 +586,25 @@ begin
 
             if(hits>0)then
             begin
-               if(pu^.buff[ub_teleeff ]<=0)and(buff[ub_teleeff ]>0)then _teleEff(uu,pu);
-               if(pu^.buff[ub_summoned]<=0)and(buff[ub_summoned]>0)then _ucSummonedEffect (uu,@vis);
-               if(pu^.buff[ub_hvision ]<=0)and(buff[ub_hvision ]>0)then _unit_LevelUp     (uu,EID_HVision,@vis);
-               if(pu^.buff[ub_pain    ]<=0)and(buff[ub_pain    ]>0)then _unit_pain_effects(uu,@vis);
+               if(pu^.buff[ub_Teleport ]<=0)and(buff[ub_Teleport ]>0)then _teleEff(uu,pu);
+               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _ucSummonedEffect (uu,@vis);
+               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then _unit_LevelUp     (uu,EID_HVision,@vis);
+               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,@vis);
 
                if(pu^.bld)and(bld=false)then
                 if(playeri=HPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
 
                if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
-               if(pu^.inapc<>inapc)and(vis)then SoundPlayUnit(snd_inapc,nil,@vis);
+               if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(bld)then
                begin
-                  if(pu^.buff[ub_cast]<=0)and(buff[ub_cast]>0)then
+                  if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
                    case uid^._ability of
                0:;
-               uab_uac_rstrike : _unit_umstrike_missile(uu);
-               uab_radar       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+               uab_UACStrike : _unit_umstrike_missile(uu);
+               uab_UACScan       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
@@ -612,7 +612,7 @@ begin
                   begin
                      if(pu^.level<level)then _unit_LevelUp(uu,0,@vis);
 
-                     if(pu^.buff[ub_invuln]<=0)and(buff[ub_invuln]>0)then _unit_LevelUp(uu,EID_Invuln,@vis);
+                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then _unit_LevelUp(uu,EID_Invuln,@vis);
                   end;
                end;
             end;
@@ -624,7 +624,7 @@ begin
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buff[ub_resur]=0)then  // death
+              if(pu^.hits>0)and(hits<=0)and(buff[ub_Resurect]=0)then  // death
               begin
                  _unit_death_effects(uu,hits<=fdead_hits,@vis);
 
@@ -636,8 +636,8 @@ begin
                  rld:=0;
               end;
 
-            if(not _IsUnitRange(pu^.inapc,nil))then
-             if(_IsUnitRange(inapc,@tu))then _unit_inapc_target(uu,tu);
+            if(not _IsUnitRange(pu^.transport,nil))then
+             if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
 
             if(speed>0)then
             begin
@@ -762,10 +762,10 @@ begin
       _bts1:=_rudata_byte(rpl,0);
 
       bld:=GetBBit(@_bts1,0);
-      if(GetBBit(@_bts1,1))then inapc:=1 else inapc:=0;
+      if(GetBBit(@_bts1,1))then transport:=1 else transport:=0;
       if(GetBBit(@_bts1,2))then level+=%01;
       if(GetBBit(@_bts1,3))then level+=%10;
-      buff[ub_pain     ]:=_buffst[GetBBit(@_bts1,4)];
+      buff[ub_Pain     ]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       sel:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
@@ -774,22 +774,22 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_resur    ]:=_buffst[GetBBit(@_bts2,0)];
-         buff[ub_summoned ]:=_buffst[GetBBit(@_bts2,1)];
-         buff[ub_invuln   ]:=_buffst[GetBBit(@_bts2,2)];
-         buff[ub_teleeff  ]:=_buffst[GetBBit(@_bts2,3)];
-         buff[ub_hvision  ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_cast     ]:=_buffst[GetBBit(@_bts2,5)];
-         buff[ub_scaned   ]:=_buffst[GetBBit(@_bts2,6)];
+         buff[ub_Resurect ]:=_buffst[GetBBit(@_bts2,0)];
+         buff[ub_Summoned ]:=_buffst[GetBBit(@_bts2,1)];
+         buff[ub_Invuln   ]:=_buffst[GetBBit(@_bts2,2)];
+         buff[ub_Teleport  ]:=_buffst[GetBBit(@_bts2,3)];
+         buff[ub_HVision  ]:=_buffst[GetBBit(@_bts2,4)];
+         buff[ub_Cast     ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_Scaned   ]:=_buffst[GetBBit(@_bts2,6)];
       end
       else
       begin
-         buff[ub_resur    ]:=0;
-         buff[ub_summoned ]:=0;
-         buff[ub_invuln   ]:=0;
-         buff[ub_teleeff  ]:=0;
-         buff[ub_hvision  ]:=0;
-         buff[ub_scaned   ]:=0;
+         buff[ub_Resurect ]:=0;
+         buff[ub_Summoned ]:=0;
+         buff[ub_Invuln   ]:=0;
+         buff[ub_Teleport  ]:=0;
+         buff[ub_HVision  ]:=0;
+         buff[ub_Scaned   ]:=0;
       end;
 
       if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
@@ -801,7 +801,7 @@ begin
    _rrld  :=_rudata_byte(rpl,0);
    if(_rrld=0)
    then r^:=0
-   else r^:=_rrld*fr_fps-1;
+   else r^:=_rrld*fr_fps1-1;
 end;
 
 procedure _rprod(uu:PTUnit;rpl:boolean);
@@ -842,10 +842,10 @@ begin
          hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
          _rudata_bstat(uu,rpl);
 
-         if(inapc>0)then
+         if(transport>0)then
          begin
-            inapc:=_rudata_int(rpl,0);
-            if(_IsUnitRange(inapc,nil)=false)then inapc:=0;
+            transport:=_rudata_int(rpl,0);
+            if(_IsUnitRange(transport,nil)=false)then transport:=0;
          end
          else
            if(sh>0)then
@@ -868,7 +868,7 @@ begin
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
-            if(buff[ub_cast]>0)then
+            if(buff[ub_Cast]>0)then
              if(uid^._ability in client_cast_abils)then
              begin
                 _rrld(@rld,rpl);
@@ -961,15 +961,15 @@ begin
 
    gstp:=G_Step shr 1;
    if(rpl=false)then
-    if((gstp mod fr_4hfps)=0)then
+    if((gstp mod fr_fps1_4)=0)then
      with _players[_pl] do
      begin
          _rrld(@build_cd,rpl);
      end;
 
    if(rpl)
-   then i:=fr_fps
-   else i:=fr_2hfps;
+   then i:=fr_fps1
+   else i:=fr_fpsh;
 
    if((gstp mod i)=0)then
    begin
@@ -978,7 +978,7 @@ gm_invasion : begin
                  _PNU:=g_inv_wave_n;
                  g_inv_wave_n:=_rudata_byte(rpl,0);
                  if(g_inv_wave_n>_PNU)then SoundPlayUnit(snd_teleport,nil,nil);
-                 g_inv_time :=_rudata_int (rpl,0);
+                 g_inv_wave_t_next :=_rudata_int (rpl,0);
               end;
 gm_royale   : g_royal_r:=_rudata_int(rpl,0);
       end;

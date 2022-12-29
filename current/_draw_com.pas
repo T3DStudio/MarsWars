@@ -6,7 +6,7 @@ begin
    (((c and $0000FF00) shr  9) shl 8 );
 end;
 
-procedure _draw_texture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
+procedure _draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
    begin
@@ -85,7 +85,7 @@ begin
              boxColor(sur,ix,y,ix+font_iw,y+font_iw,cl);
            end;
 
-           _draw_texture(sur,ix,y,@font_ca[c]);
+           _draw_mwtexture(sur,ix,y,@font_ca[c]);
 
            o  += 1;
            ix += font_w;
@@ -182,7 +182,7 @@ procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:string)
 var m,s,h:cardinal;
     hs,ms,ss:string;
 begin
-   s:=time div fr_fps;
+   s:=time div fr_fps1;
    m:=s div 60;
    s:=s mod 60;
    h:=m div 60;

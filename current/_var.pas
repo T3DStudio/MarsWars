@@ -21,10 +21,10 @@ g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
 g_cl_units        : integer  = 0;
 
-g_inv_monsters    : byte     = 0;
+g_inv_limit       : integer  = 0;
 g_inv_wave_n      : byte     = 0;
-g_inv_time        : integer  = 0;
-g_inv_wave_t      : integer  = 0;
+g_inv_wave_t_next : integer  = 0;
+g_inv_wave_t_curr : integer  = 0;
 g_royal_r         : integer  = 0;
 g_cpoints         : array[1..MaxCPoints] of TCTPoint;
 
@@ -48,6 +48,7 @@ _cycle_regen      : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
+_commands         : array[byte] of TCommand;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -146,6 +147,9 @@ r_dterrain,
 r_menu            : pSDL_SURFACE;
 r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
+r_minimap_scan_blink
+                  : boolean = false;
+
 r_RECT            : pSDL_RECT;
 
 vid_fullscreen    : boolean = false;
@@ -185,12 +189,13 @@ vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
-vid_CamSpeed         : integer = 25;
+vid_CamSpeed      : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
 vid_uhbars        : byte = 0;
 vid_plcolors      : byte = 0;
-vid_vmm           : boolean = false;
+vid_CamMScroll    : boolean = false;
+vid_ColoredShadow : boolean = true;
 vid_ppos          : byte = 0;
 vid_panelx        : integer = 0;
 vid_panely        : integer = 0;
@@ -355,6 +360,7 @@ ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
 ui_game_log_height: integer = 0;
+ui_menu_btnsy     : integer = 0;
 
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
@@ -387,7 +393,8 @@ r_blink2_colorb   : boolean;
 r_blink1_color_BG,
 r_blink1_color_BY,
 r_blink2_color_BG,
-r_blink2_color_BY: cardinal;
+r_blink2_color_BY : cardinal;
+r_blink3          : byte;
 
 c_dred,
 c_awhite,
@@ -612,6 +619,7 @@ spr_b7_a,
 spr_b9_a,
 spr_ptur,
 spr_scan,
+spr_decay,
 spr_invuln,
 spr_hvision,
 spr_stun          : TMWTexture;
@@ -702,6 +710,7 @@ str_pcolors       : array[0..4] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
 str_panelpos,
+str_ColoredShadow,
 str_uhbar,
 str_pcolor,
 str_all,
@@ -818,7 +827,7 @@ snd_cannot_build,
 snd_constr_complete,
 snd_defeat,
 snd_not_enough_energy,
-snd_cant_start_prod,
+snd_cant_order,
 snd_player_defeated,
 snd_upgrade_complete,
 snd_victory,
@@ -1025,7 +1034,7 @@ snd_bomblaunch,
 snd_meat,
 snd_building_explode,
 snd_mine_place,
-snd_inapc,
+snd_transport,
 snd_teleport,
 snd_pexp,
 snd_exp,

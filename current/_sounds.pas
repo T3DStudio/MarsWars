@@ -321,7 +321,7 @@ begin
 
    SoundPlay(ss,sss_anoncer);
 
-   snd_anoncer_ticks:=fr_fps;
+   snd_anoncer_ticks:=fr_fps1;
    snd_anoncer_last :=ss;
 end;
 procedure SoundPlayMMapAlarm(ss:PTSoundSet;pause:boolean);
@@ -334,7 +334,7 @@ begin
 
    SoundPlay(ss,sss_mmap);
 
-   snd_mmap_ticks:=fr_fps;
+   snd_mmap_ticks:=fr_fps1;
    snd_mmap_last :=ss;
 end;
 
@@ -349,7 +349,7 @@ begin
    SoundPlay(ss,sss_ucommand);
 
    snd_command_last:=ss;
-   snd_command_ticks:=fr_3h2fps;
+   snd_command_ticks:=fr_2h3fps;
 end;
 
 procedure SoundPlayUnitSelect;
@@ -401,7 +401,7 @@ lmt_unit_ready        : with _uids[uid] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
-lmt_req_common        : SoundPlayAnoncer(snd_cant_start_prod[race],true);
+lmt_req_common        : SoundPlayAnoncer(snd_cant_order[race],true);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
 lmt_unit_attacked     : with _uids[uid] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
@@ -487,7 +487,7 @@ begin
    snd_teleport             :=SoundSetLoad('teleport'        );
    snd_exp                  :=SoundSetLoad('explode'         );
    snd_mine_place           :=SoundSetLoad('mine_place'      );
-   snd_inapc                :=SoundSetLoad('inapc'           );
+   snd_transport                :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
    snd_hpower               :=SoundSetLoad('hpower'          );
@@ -522,7 +522,7 @@ begin
    snd_victory           [r]:=SoundSetLoad(race_dir[r]+'victory'                   );
    snd_unit_adv          [r]:=SoundSetLoad(race_dir[r]+'unit_adv'                  );
    snd_unit_promoted     [r]:=SoundSetLoad(race_dir[r]+'unit_promoted'             );
-   snd_cant_start_prod   [r]:=SoundSetLoad(race_dir[r]+'dselec3'                   );
+   snd_cant_order        [r]:=SoundSetLoad(race_dir[r]+'cant_order'                );
    end;
 
    /////////////////////////////////////////////////////////////////////////////////
@@ -722,7 +722,7 @@ begin
    snd_arachno_ready        :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_c');
 
 
-  {snd_inapc       :=load_sound('inapc.wav'    );
+  {snd_transport       :=load_sound('inapc.wav'    );
    snd_ccup        :=load_sound('ccup.wav'     );
 
    snd_meat        :=load_sound('gv.wav'       );

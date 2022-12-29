@@ -7,6 +7,7 @@ begin
    0  : l2s:=i2s(limit div MinUnitLimit);
    50 : l2s:=i2s(limit div MinUnitLimit)+'.5';
    25 : l2s:=i2s(limit div MinUnitLimit)+'.25';
+   75 : l2s:=i2s(limit div MinUnitLimit)+'.75';
    else l2s:=i2s(limit div MinUnitLimit)+'.'+i2s(fr);
    end;
 end;
@@ -175,12 +176,12 @@ begin
         else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
       if(level>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_level+b2s(level+1));
-      if(buff[ub_detect]>0)
+      if(buff[ub_Detect]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_detector);
-      if(buff[ub_invuln]>0)
+      if(buff[ub_Invuln]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
       else
-        if(buff[ub_pain]>0)
+        if(buff[ub_Pain]>0)
         then _ADDSTRC(@_makeAttributeStr,str_attr_stuned);
 
       _makeAttributeStr:='['+_makeAttributeStr+']';
@@ -262,8 +263,8 @@ begin
       if(_up_time  >0)then
       begin
          if(_up_max>1)and(not _up_mfrg)
-         then for l:=1 to _up_max do _ADDSTRS(@TIME,i2s(_upid_time(uid,l) div fr_fps))
-         else TIME :=i2s(_upid_time(uid,1) div fr_fps);
+         then for l:=1 to _up_max do _ADDSTRS(@TIME,i2s(_upid_time(uid,l) div fr_fps1))
+         else TIME :=i2s(_upid_time(uid,1) div fr_fps1);
          TIME:=tc_white+TIME+tc_default;
       end;
 
@@ -310,7 +311,7 @@ begin
    str_musicvol          := 'Music volume';
    str_soundvol          := 'Sound volume';
    str_scrollspd         := 'Scroll speed';
-   str_mousescrl         := 'Mouse scroll:';
+   str_mousescrl         := 'Mouse scroll';
    str_fullscreen        := 'Windowed:';
    str_plname            := 'Player name';
    str_lng[true]         := 'RUS';
@@ -359,12 +360,13 @@ begin
    str_all               := 'All';
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
+   str_ColoredShadow     := 'Colored shadows';
+
    str_cant_build        := 'Can`t build here!';
    str_need_energy       := 'Need more energy!';
    str_cant_prod         := 'Can`t production this!';
    str_check_reqs        := 'Check requirements!';
    str_cant_execute      := 'Can`t execute order!';
-
    str_advanced          := 'Advanced ';
    str_unit_advanced     := 'Unit promoted';
    str_upgrade_complete  := 'Upgrade complete';
@@ -529,7 +531,7 @@ begin
    _mkHStrUpid(upgr_hell_b478tel  ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
 
 
-   _mkHStrUpid(upgr_hell_dattack  ,'Hell Firepower'             ,'Increase the damage of ranged attacks.'                              );
+   _mkHStrUpid(upgr_hell_t1attack  ,'Hell Firepower'             ,'Increase the damage of ranged attacks.'                              );
    _mkHStrUpid(upgr_hell_uarmor   ,'Combat Flesh'               ,'Increase the armor of Hell`s units.'                                 );
    _mkHStrUpid(upgr_hell_barmor   ,'Stone Walls'                ,'Increase the armor of Hell`s buildings.'                             );
    _mkHStrUpid(upgr_hell_mattack  ,'Claws and Teeth'            ,'Increase the damage of melee attacks.'                               );
@@ -797,7 +799,7 @@ begin
   str_musicvol          := 'Громкость музыки';
   str_soundvol          := 'Громкость звуков';
   str_scrollspd         := 'Скорость пр.';
-  str_mousescrl         := 'Прокр. мышью:';
+  str_mousescrl         := 'Прокр. мышью';
   str_fullscreen        := 'В окне:';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
@@ -843,17 +845,20 @@ begin
   str_all               := 'Все';
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
+  str_ColoredShadow     := 'Цветные тени юнитов';
+
   str_cant_build        := 'Нельзя строить здесь!';
   str_need_energy       := 'Необходимо больше энергии!';
   str_cant_prod         := 'Невоможно произвести это!';
   str_check_reqs        := 'Проверьте требования!';
   str_cant_execute      := 'Невозвможно выполнить приказ!';
-
   str_advanced          := 'Улучшенный ';
   str_unit_advanced     := 'Юнит улучшен';
   str_upgrade_complete  := 'Исследование завершено';
   str_building_complete := 'Постройка завершена';
   str_unit_complete     := 'Юнит готов';
+  str_unit_attacked     := 'Юнит атакован';
+  str_base_attacked     := 'База атакована';
 
   str_attr_unit         := tc_gray  +'юнит'          +tc_default;
   str_attr_building     := tc_red   +'здание'        +tc_default;
@@ -937,7 +942,7 @@ begin
   _mkHStrUid(UID_HAltar        ,'Адский Алтарь'   ,'Временно делает юнитов неуязвимыми.'   );
   _mkHStrUid(UID_HFortress     ,'Адский Замок'    ,'Позволяет улучшать производственные здания. Производит энергию. Может строить.'   );
   _mkHStrUid(UID_HCommandCenter,'Проклятый Командный Центр','Строит базу. Увеличивает энергию.');
-  _mkHStrUid(UID_HBarracks ,'Проклятая Войсковая часть','Производит зомби.' );
+  _mkHStrUid(UID_HBarracks     ,'Проклятые Казармы','Производит зомби.' );
 
  { _mkHStrUpid(upgr_attack  ,'Улучшение дальней атаки'        ,''                                         );
   _mkHStrUpid(upgr_armor   ,'Улучшение защиты юнитов'        ,''                                         );
@@ -968,14 +973,14 @@ begin
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'        ,'Строит базу. Увеличивает энергию.');
-  _mkHStrUid(UID_UBarracks   ,'Войсковая Часть'        ,'Производит тренирует пехоту.'     );
+  _mkHStrUid(UID_UBarracks       ,'Казармы'                ,'Тренирует пехоту.'                );
   _mkHStrUid(UID_UFactory        ,'Фабрика'                ,'Производит технику.'              );
   _mkHStrUid(UID_UGenerator      ,'Генератор'              ,'Увеличивает энергию.'             );
   _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'       ,'Исследования и улучшения.'        );
   _mkHStrUid(UID_UGTurret        ,'Анти-наземная Турель'   ,'Защитное сооружение.'             );
   _mkHStrUid(UID_URadar          ,'Радар'                  ,'Раскрывает карту.'                );
   _mkHStrUid(UID_UTechCenter     ,'Технический Центр'      ,'Улучшает юнитов.'                 );
-  _mkHStrUid(UID_URMStation        ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
+  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа','Производит ракетный удар. Для залпа требуется исследование "Ракетный удар".');
   _mkHStrUid(UID_UATurret        ,'Анти-воздушная Турель'  ,'Защитное сооружение.');
   _mkHStrUid(UID_UNuclearPlant   ,'АЭС'                    ,'Позволяет улучшать производственные здания. Производит энергию.');
   _mkHStrUid(UID_UMine           ,'Мина','');
@@ -984,7 +989,7 @@ begin
   _mkHStrUid(UID_Medic      ,'Медик'              ,'');
   _mkHStrUid(UID_Sergant    ,'Сержант'            ,'');
   _mkHStrUid(UID_Commando   ,'Коммандо'           ,'');
-  _mkHStrUid(UID_Antiaircrafter     ,'Гранатометчик'      ,'');
+  _mkHStrUid(UID_Antiaircrafter,'Гранатометчик'      ,'');
   _mkHStrUid(UID_Major      ,'Майор'              ,'');
   _mkHStrUid(UID_BFG        ,'Солдат с BFG'       ,'');
   _mkHStrUid(UID_FAPC       ,'Воздушный транспорт','');
