@@ -164,7 +164,7 @@ begin
       _genergy:= _renergy;
       _renergy:= 0;
    end
-   else _ability:=uab_rebuild;
+   else _ability:=uab_Rebuild;
 end;
 
 UID_HPools:
@@ -215,11 +215,11 @@ end;
 UID_HTeleport:
 begin
    _mhits     := 2500;
-   _renergy   := 200;
+   _renergy   := 400;
    _r         := 28;
    _ucl       := 13;
    _btime     := ptime2;
-   _limituse  := ul5;
+   _limituse  := ul4;
    _ability   := uab_Teleport;
    _ukbuilding:= true;
    _issolid   := false;
@@ -280,7 +280,7 @@ begin
    _srange    := 300;
    _ucl       := 12;
    _btime     := ptime1;
-   _ability   := uab_hell_vision;
+   _ability   := uab_HellVision;
    _ukbuilding:= true;
    _issolid   := false;
    _upgr_srange     :=upgr_hell_heye;
@@ -437,7 +437,7 @@ begin
    _ruid1     := UID_HMonastery;
    _ukfly     := uf_fly;
    _attack    := atm_always;
-   _ability   := uab_spawnlost;
+   _ability   := uab_SpawnLost;
    _weapon(0,wpt_unit,aw_srange,0,0 ,fr_fps1h,UID_Phantom ,0,upgr_hell_phantoms,1,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
    _weapon(1,wpt_unit,aw_srange,0,0 ,fr_fps1h,UID_LostSoul,0,0                 ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
 
@@ -804,7 +804,7 @@ begin
       _genergy:=_renergy;
       _renergy:= 0;
    end
-   else _ability:= uab_rebuild;
+   else _ability:= uab_Rebuild;
 end;
 
 UID_UWeaponFactory:
@@ -881,7 +881,7 @@ begin
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
-   _ability   := uab_rebuild;
+   _ability   := uab_Rebuild;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps1_4,MID_Chaingun,0,0              ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground_light_bio,wpr_any,uids_all,[],0,-10,wtp_hits          ,2);
@@ -899,7 +899,7 @@ begin
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
-   _ability   := uab_rebuild;
+   _ability   := uab_Rebuild;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_URocket,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any ,uids_all      ,[],0,-10,wtp_nolost_hits,0);
@@ -1274,7 +1274,7 @@ end;
 
       if(_isbarrack)or(_issmith)then
       begin
-         _ability     :=uab_prodlevelup;
+         _ability     :=uab_ProdLevelUp;
          _ability_ruid:=uid_race_9bld[_urace];
       end;
 

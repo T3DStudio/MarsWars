@@ -555,7 +555,7 @@ begin
                          ai_need_heye_d:=tu^.aiu_need_detect;
                       end;
                      // invuln target
-                     if(tu^.aiu_alarm_d<=tu^.srange)and(_IsUnitRange(tu^.a_tar,nil))and(tu^.buff[ub_Damaged]>0)then
+                     if(tu^.aiu_alarm_d<=tu^.srange)and(not tu^.uid^._ukbuilding)and(_IsUnitRange(tu^.a_tar,nil))and(tu^.buff[ub_Damaged]>0)then
                       if(ai_invuln_tar_u=nil)
                       then ai_invuln_tar_u:=tu
                       else
@@ -698,7 +698,7 @@ begin
             end;
             if(ud<=srange)then
              if(tu^.buff[ub_Detect]>0)
-             or(tu^.uid^._ability=uab_hell_vision)
+             or(tu^.uid^._ability=uab_HellVision)
              or(tu^.uid^._ability=uab_UACScan    )then ai_detect_near+=1;
 
             if(tu^.uid^._isbarrack)then
@@ -1944,20 +1944,20 @@ begin
          if(g_mode=gm_royale)
          then w:=g_royal_r div 2
          else w:=map_hmw;
-         if(_unit_ability_hkteleport(pu,map_hmw+_random(w),map_hmw+_random(w)))then exit;
+         if(_unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w)))then exit;
       end;
 
       case g_mode of
 gm_koth  : if(ai_choosen)and(base_r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
            begin
               w:=base_r;
-              _unit_ability_hkteleport(pu,map_hmw+_random(w),map_hmw+_random(w));
+              _unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w));
            end;
 gm_royale: if(ai_choosen)
            or(_CheckRoyalBattleR(x,y,base_rr))then
            begin
               w:=min2(g_royal_r div 4,base_rr);
-              _unit_ability_hkteleport(pu,map_hmw+_random(w),map_hmw+_random(w));
+              _unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w));
            end;
       end;
    end;
@@ -2097,8 +2097,8 @@ uab_UACScan          : if(ai_detection_pause=0)then
                           if(ai_choosen)and(ai_alarm_d=NOTSET)then
                            if(_unit_ability_uradar(pu,random(map_mw),random(map_mw)))then player^.ai_detection_pause:=fr_fps1;
                        end;
-uab_hell_vision      : if(ai_detection_pause=0)and(ai_need_heye_u<>nil)then
-                        if(_ability_hell_vision(ai_need_heye_u,pu))then ai_detection_pause:=fr_fps1;
+uab_HellVision      : if(ai_detection_pause=0)and(ai_need_heye_u<>nil)then
+                        if(_unit_ability_HellVision(pu,ai_need_heye_u^.unum))then ai_detection_pause:=fr_fps1;
         end;
 
       if(speed<=0)or(_ukbuilding)then exit;

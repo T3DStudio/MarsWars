@@ -71,8 +71,10 @@ begin
       if(bld)then
        if(speed>0)
        or(_canattack(pu,false))
-       or((_ability in [uab_hell_vision,uab_UACScan,uab_rebuild])and(rld<=0))then exit;
+       or(_canability(pu)=0)then exit;
+
       if(_UnitHaveRPoint(uidi))then exit;
+      //  {or((_ability in [uab_HellVision,uab_UACScan,uab_Rebuild])and(rld<=0))}
    end;
    CheckSU:=false;
 end;
@@ -205,6 +207,7 @@ begin
       2 - own&ally, unum
       3 - own, uid
       4 - own, unum
+      5 - any
    }
    sc:=0;
    with _players[HPlayer]do
@@ -274,24 +277,24 @@ begin
                   end;
                end;
            end;
-co_paction,
+co_paction            : if(ui_uibtn_action=0)then m_brush:=co_empty;
 co_move   ,co_patrol  ,
-co_amove  ,co_apatrol : if(ui_uibtn_move=0)then m_brush:=co_empty;
+co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else
    end;
 end;
 
-procedure _command(x,y:integer);
+procedure _command(x,y,target:integer);
 begin
    case m_brush of
-co_move    : _player_s_o(m_brush,_whoInPoint(x,y,2),x,y,0,uo_corder,HPlayer);   // move
-co_amove   : _player_s_o(m_brush,_whoInPoint(x,y,1),x,y,0,uo_corder,HPlayer);   // attack
-co_paction,
+co_move    : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);   // move
+co_amove   : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);   // attack
+co_paction : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);
 co_patrol,
 co_apatrol : _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
 co_empty   : if(m_action)// rclick
-             then _player_s_o(co_rcmove ,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer)
-             else _player_s_o(co_rcamove,_whoInPoint(x,y,0),x,y,0,uo_corder,HPlayer);
+             then _player_s_o(co_rcmove ,target,x,y,0,uo_corder,HPlayer)
+             else _player_s_o(co_rcamove,target,x,y,0,uo_corder,HPlayer);
    end;
 
    m_brush:=co_empty;
@@ -349,7 +352,7 @@ false: begin
        end;
 true : if(_IsUnitRange(uid_x[ui_panel_uids[race,0,u]],@tu))then
         if(_rclickmove(tu^.uidi))then
-         with tu^ do _command(x,y);
+         with tu^ do _command(x,y,0);
    end;
 
 1: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // units
@@ -671,9 +674,13 @@ begin
 
    check_mouse_brush(false);
 
-   if(m_brush=co_empty)
-   then ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0)
+   case m_brush of
+co_empty   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
+co_amove   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);
+co_paction : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
    else ui_uhint:=0;
+   end;
 
    if(k_ml=2)then                    // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
@@ -706,7 +713,7 @@ co_paction,
 co_move,
 co_amove,
 co_patrol,
-co_apatrol: _command (mouse_map_x,mouse_map_y);
+co_apatrol: _command (mouse_map_x,mouse_map_y,ui_uhint);
 co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
      end
     else
@@ -716,7 +723,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       co_move,
       co_amove,
       co_patrol,
-      co_apatrol : _command (trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+      co_apatrol : _command (trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx),ui_uhint);
       co_mmark   : MapMarker(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
       else         if(rpls_plcam=false)then m_mmap_move:=true;
       end
@@ -761,10 +768,10 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
     then m_brush:=co_empty
     else
      if(m_bx<0)or(3<=m_bx)        // map
-     then _command(mouse_map_x,mouse_map_y)
+     then _command(mouse_map_x,mouse_map_y,ui_uhint)
      else
        if(m_by<3)                 // minimap
-       then _command(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx))
+       then _command(trunc((mouse_x-vid_panelx)/map_mmcx), trunc((mouse_y-vid_panely)/map_mmcx),ui_uhint)
        else _panel_click(ui_tab,m_bx,m_by,true,false,false);     // panel
 end;
 

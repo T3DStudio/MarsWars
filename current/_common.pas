@@ -784,7 +784,7 @@ begin
      UIUnitDrawRange:=(_attack>0)
                     or(isbuildarea)
                     or(_ability=uab_UACScan)
-                    or(_ability=uab_hell_vision);
+                    or(_ability=uab_HellVision);
 end;
 
 procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);

@@ -425,21 +425,20 @@ aif_ability_mainsave   : cardinal = 1 shl 12;
 //
 
 uab_Teleport           = 1;
-uab_UACScan            = 5;
-uab_HTowerBlink        = 6;
-uab_UACStrike          = 7;
-uab_HKeepBlink         = 8;
-uab_rebuild            = 9;
-uab_Rebuild2Turret     = 10;
-uab_HInvulnerability   = 11;
-uab_spawnlost          = 13;
-uab_hell_vision        = 14;
-uab_CCFly              = 15;
-uab_prodlevelup        = 16;
+uab_UACScan            = 2;
+uab_HTowerBlink        = 3;
+uab_UACStrike          = 4;
+uab_HKeepBlink         = 5;
+uab_Rebuild            = 6;
+uab_Rebuild2Turret     = 7;
+uab_HInvulnerability   = 8;
+uab_SpawnLost          = 9;
+uab_HellVision         = 10;
+uab_CCFly              = 11;
+uab_ProdLevelUp        = 12;
 
 client_rld_abils = [
-                   uab_Teleport   ,
-                   uab_hell_vision
+                   uab_Teleport
                    ];
 client_cast_abils= [
                    uab_UACScan  ,
@@ -854,6 +853,7 @@ _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
 gm_cptp_time           = fr_fps1*20;
 gm_cptp_r              = 100;
+gm_cptp_energy         = 600;
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;

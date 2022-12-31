@@ -276,6 +276,32 @@ mvxy_strict  : begin
    end;
 end;
 
+procedure _unit_reveal(pu:PTUnit;reset:boolean);
+var t:byte;
+begin
+   with pu^ do
+    with player^ do
+    begin
+       if(reset)then
+       begin
+          FillChar(vsnt,SizeOf(vsnt),0);
+          FillChar(vsni,SizeOf(vsni),0);
+       end;
+       _AddToInt(@vsnt[team],vistime);
+       _AddToInt(@vsni[team],vistime);
+{$IFDEF _FULLGAME}
+       if(menu_s2<>ms2_camp)then
+{$ENDIF}
+        if(ServerSide)and(n_builders=0)then
+         for t:=0 to MaxPlayers do
+         begin
+            _AddToInt(@vsnt[t],fr_fps1);
+            if(g_mode<>gm_invasion)
+            or(playeri>0)then _AddToInt(@vsni[t],fr_fps1);
+         end;
+    end;
+end;
+
 procedure _unit_clear_order(pu:PTUnit;clearid:boolean);
 begin
    with pu^ do
@@ -375,7 +401,7 @@ begin
    begin
       with tu^ do
        with uid^ do
-        if(hits<=0)or(not bld)or(_ukbuilding)then exit;
+        if(hits<=0){or(not bld)}then exit;
 
       with pu^ do
        with player^ do
@@ -748,10 +774,10 @@ begin
 end;
 
 
-function _unit_ability_hkteleport(pu:PTUnit;x0,y0:integer):boolean;
+function _unit_ability_HKeepBlink(pu:PTUnit;x0,y0:integer):boolean;
 var obstacles:boolean;
 begin
-   _unit_ability_hkteleport:=false;
+   _unit_ability_HKeepBlink:=false;
    with pu^ do
     if(hits>0)and(bld)and(buff[ub_CCast]<=0)then
      with player^ do
@@ -765,7 +791,8 @@ begin
          buff[ub_CCast]:=fr_fps1;
 
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKT_h,EID_HKT_s,snd_cube{$ENDIF});
-         _unit_ability_hkteleport:=true;
+         _unit_ability_HKeepBlink:=true;
+         _unit_reveal(pu,true);
       end;
 end;
 
@@ -789,6 +816,7 @@ begin
          buff[ub_CCast]:=fr_fpsh;
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
          _unit_ability_HTowerBlink:=true;
+         _unit_reveal(pu,true);
       end;
 end;
 
@@ -928,27 +956,6 @@ begin
    end;
 end;
 
-procedure _unit_reveal(pu:PTUnit);
-var t:byte;
-begin
-   with pu^ do
-    with player^ do
-    begin
-       _AddToInt(@vsnt[team],vistime);
-       _AddToInt(@vsni[team],vistime);
-{$IFDEF _FULLGAME}
-       if(menu_s2<>ms2_camp)then
-{$ENDIF}
-        if(ServerSide)and(n_builders=0)then
-         for t:=0 to MaxPlayers do
-         begin
-            _AddToInt(@vsnt[t],fr_fps1);
-            if(g_mode<>gm_invasion)
-            or(playeri>0)then _AddToInt(@vsni[t],fr_fps1);
-         end;
-    end;
-end;
-
 function _unit_add(ux,uy,aunum:integer;ui,pl:byte;ubld,summoned:boolean;ulevel:byte):boolean;
 var m,i:integer;
 procedure _FindNotExistedUnit;
@@ -1021,7 +1028,7 @@ begin
             _unit_apUID    (_LastCreatedUnitP);
             _unit_inc_cntrs(_LastCreatedUnitP,ubld,summoned);
 
-            _unit_reveal(_LastCreatedUnitP);
+            _unit_reveal(_LastCreatedUnitP,false);
          end;
       end;
    end;
@@ -1576,7 +1583,7 @@ begin
 
       with uid^ do
       begin
-         if(_ukbuilding)and(buildcd)and(_ability<>uab_hell_vision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+         if(_ukbuilding)and(buildcd)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 
@@ -1670,7 +1677,7 @@ begin
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
-uab_hell_vision   : level:=byte(rld<=0);
+uab_HellVision   : level:=byte(rld<=0);
 uab_CCFly         :
            if(level>0)then
            begin

@@ -147,10 +147,18 @@ r_dterrain,
 r_menu            : pSDL_SURFACE;
 r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
+r_RECT            : pSDL_RECT;
+
+r_blink1_colorb,
+r_blink2_colorb   : boolean;
+r_blink1_color_BG,
+r_blink1_color_BY,
+r_blink2_color_BG,
+r_blink2_color_BY : cardinal;
+r_blink3          : byte;
+
 r_minimap_scan_blink
                   : boolean = false;
-
-r_RECT            : pSDL_RECT;
 
 vid_fullscreen    : boolean = false;
 ingame_chat       : boolean = false;
@@ -387,14 +395,6 @@ k_keyboard_string         : shortstring = '';
 //
 //  COLORS
 //
-
-r_blink1_colorb,
-r_blink2_colorb   : boolean;
-r_blink1_color_BG,
-r_blink1_color_BY,
-r_blink2_color_BG,
-r_blink2_color_BY : cardinal;
-r_blink3          : byte;
 
 c_dred,
 c_awhite,

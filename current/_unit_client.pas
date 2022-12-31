@@ -605,7 +605,7 @@ begin
                0:;
                uab_UACStrike : _unit_umstrike_missile(uu);
                uab_UACScan       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
-               uab_spawnlost   : _ability_unit_spawn(pu,UID_LostSoul);
+               uab_SpawnLost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then

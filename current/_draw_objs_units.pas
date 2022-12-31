@@ -343,6 +343,18 @@ begin
    end;
 end;
 
+function r_AlphaGlows(amplitudo:byte;shift:cardinal):byte;
+var amplitudoH,t:cardinal;
+begin
+   r_AlphaGlows:=0;
+   if(amplitudo=0)then exit;
+   amplitudoH:=amplitudo div 2;
+   t:=(g_step+shift) mod amplitudo;
+   if(t>amplitudoH)
+   then r_AlphaGlows:=amplitudo-t
+   else r_AlphaGlows:=t;
+end;
+
 procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
 const _btnas: array[0..MaxUnitLevel] of integer = (0,vid_hBW,vid_BW,vid_BW+vid_hBW);
 var spr : PTMWTexture;
@@ -433,7 +445,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
               begin
                  if(un_build_amode>1)then
                  begin
-                    alpha :=trunc(255*hits/_mhits);
+                    alpha:=r_AlphaGlows(255,cardinal(unum));
                     alphab:=255-alpha;
                  end
                  else alphab:=255;

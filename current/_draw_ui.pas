@@ -436,14 +436,15 @@ begin
    begin
       D_BuildUI(tar,lx,ly);
 
-      with _players[HPlayer] do
-       for sx:=0 to 255 do
-        if(uid_s[sx]>0)then
-         with _uids[sx] do
-          case _ability of
+      if(m_brush=co_paction)then
+       with _players[HPlayer] do
+        for sx:=0 to 255 do
+         if(uid_s[sx]>0)and(uid_x[sx]>0)then
+          with _uids[sx] do
+           case _ability of
 uab_UACStrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_UACScan      : ;//if();
-          end;
+uab_UACScan  : circleColor(tar,mouse_x,mouse_y,_units[uid_x[sx]].srange,c_gray);
+           end;
 
       if(ui_mc_a>0)then //click effect
       begin

@@ -456,9 +456,10 @@ wpt_heal     : if(tu^.hits<=0)
           if(aw_max_range>=aw_fsr0)  // relative srange
           then awr:=ud-(srange+(aw_max_range-aw_fsr))
           else awr:=ud-aw_max_range; // absolute
-      if(tu^.ukfly)
-      then awr-=a_BonusAntiFly_range
-      else awr-=a_BonusAntiGround_range;
+      if(aw_max_range>=0)then
+       if(tu^.ukfly)
+       then awr-=a_BonusAntiFly_range
+       else awr-=a_BonusAntiGround_range;
 
       canmove:=(speed>0)and(uo_id<>ua_hold)and(au=nil);
       pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
@@ -866,33 +867,33 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
-    if(_ukbuilding)and(hits>0)and(bld)and(_ability=uab_prodlevelup)and(level=0)then
+    if(_ukbuilding)and(hits>0)and(bld)and(_ability=uab_ProdLevelUp)and(level=0)then
      if(_isbarrack)or(_issmith)then
       if(n_padvancers<=0)
       then _ability_prodlevelup:=ureq_ruid
       else _ability_prodlevelup:=_unit_morph(pu,uidi,false,-6,level+1);
 end;
 
-function _ability_hell_vision(pu,tu:PTUnit):boolean;
+function _unit_ability_HellVision(pu:PTUnit;target:integer):boolean;
+var tu:PTUnit;
 begin
-   // pu - target
-   // tu - caster
-   _ability_hell_vision:=false;
-   with tu^     do
+   _unit_ability_HellVision:=false;
+   // pu - caster
+   // tu - target
+   if(not _IsUnitRange(target,@tu))then exit;
+   with pu^     do
    with player^ do
    begin
-      if(bld)and(hits>0)and(rld<=0)and(pu^.bld)and(pu^.hits>0)and(team=pu^.player^.team)then
-       if(pu^.buff[ub_HVision]<fr_fps1)then
+      if(bld)and(hits>0)and(rld<=0)and(tu^.bld)and(tu^.hits>0)and(team=tu^.player^.team)then
+       if(tu^.buff[ub_HVision]<fr_fps1)and(tu^.buff[ub_Detect]<=0)then
        begin
-          pu^.buff[ub_HVision]:=hell_vision_time;
-          //rld:=heyenest_reload;
-          _unit_kill(tu,false,true,false,false);
-          _ability_hell_vision:=true;
+          tu^.buff[ub_HVision]:=hell_vision_time;
+          _unit_kill(pu,false,true,false,false);
+          _unit_ability_HellVision:=true;
           {$IFDEF _FULLGAME}
-          _unit_LevelUp(pu,EID_Hvision,nil);
+          _unit_LevelUp(tu,EID_Hvision,nil);
           {$ENDIF}
        end;
-      uo_tar:=0;
    end;
 end;
 
@@ -1043,7 +1044,7 @@ begin
         if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canability(pu),pu))then
           with player^ do
             case _ability of
-uab_spawnlost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
+uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
                     begin
                        buff[ub_Cast  ]:=fr_fpsh;
                        buff[ub_CCast]:=fr_fps2;
@@ -1059,14 +1060,14 @@ uab_CCFly       : if(zfall=0)and(buff[ub_CCast]<=0)then
                         else level:=1;
                        _unit_action:=true;
                     end;
-uab_rebuild       : case uidi of
+uab_Rebuild       : case uidi of
                     UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,0),pu);
                     UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,0),pu);
                     UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,0),pu);
                     UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,0),pu);
                     end;
 uab_Rebuild2Turret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
-uab_prodlevelup   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,uidi        ,_ability_prodlevelup(pu)               ,pu);
+uab_ProdLevelUp   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,uidi        ,_ability_prodlevelup(pu)               ,pu);
             else
             end;
 end;
@@ -1104,7 +1105,6 @@ begin
 
          case _ability of
 uab_Teleport     : if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
-uab_hell_vision  : if(_ability_hell_vision  (tu,pu  ))then exit;//team     _unit_clear_order(tu,false);
          end;
 
          case tu^.uid^._ability of
@@ -1462,15 +1462,15 @@ begin
          mv_y:=uo_y;
 
          if(uo_id=ua_paction)then
-          case uid^._ability of
-uab_spawnlost:  begin
+           case uid^._ability of
+uab_SpawnLost:  begin
                    mv_x:=x;
                    mv_y:=y;
                    uo_id:=ua_amove;
                    _unit_action(pu);
                    uo_id:=ua_paction;
                 end
-          else
+           else
              if(speed<=0)
              then uo_id:=ua_amove
              else
@@ -1479,7 +1479,7 @@ uab_spawnlost:  begin
                   uo_id:=ua_amove;
                   _unit_action(pu);
                end;
-          end
+           end
          else
            if(x=uo_x)and(y=uo_y)then
             if(uo_bx>=0)then
@@ -1528,7 +1528,7 @@ begin
    end;
 end;
 begin
-   _unit_player_order:=false;
+   _unit_player_order:=true;
    with pu^     do
    with uid^    do
    with player^ do
@@ -1536,25 +1536,15 @@ begin
 co_destroy :  _unit_kill(pu,false,order_tar>0,true,false);
 co_rcamove,
 co_rcmove  :  begin     // right click
-                 case _ability of
-           uab_UACStrike        : if(_unit_ability_UACStrike(pu,order_x,order_y))then exit;
-           uab_UACScan          : if(_unit_ability_uradar  (pu,order_x,order_y))then exit;
-           uab_HInvulnerability : if(_unit_ability_HInvuln (pu,order_tar      ))then exit;
-           uab_HTowerBlink      : if(order_tar<>unum)and(_IsUnitRange(order_tar,nil))and(_attack>atm_none)
-                                  then uo_tar:=order_tar
-                                  else if(_unit_ability_HTowerBlink(pu,order_x,order_y))then exit;
-           uab_HKeepBlink       : if(_unit_ability_hkteleport(pu,order_x,order_y))then exit;
-                 else
-                    uo_tar:=0;
-                    uo_x  :=order_x;
-                    uo_y  :=order_y;
-                    uo_bx :=-1;
+                 uo_tar:=0;
+                 uo_x  :=order_x;
+                 uo_y  :=order_y;
+                 uo_bx :=-1;
 
-                    if(order_tar<>unum)then uo_tar:=order_tar;
-                    if(order_id<>co_rcmove)or(speed<=0)
-                    then uo_id:=ua_amove
-                    else uo_id:=ua_move;
-                 end;
+                 if(order_tar<>unum)then uo_tar:=order_tar;
+                 if(order_id<>co_rcmove)or(speed<=0)
+                 then uo_id:=ua_amove
+                 else uo_id:=ua_move;
               end;
 co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true );
 co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true );
@@ -1566,21 +1556,31 @@ co_amove   : if(_IsUnitRange(order_tar,nil))
 co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false);
 co_paction :  if(uo_id<>ua_paction)
               or((ucl_cs[true]+ucl_cs[false])=1)then
-              begin
-                 if((_ability=0)and(apcc<=0))or(speed<=0)
-                 then _setUO(ua_amove,0,order_x,order_y,-1,-1,true )
-                 else
-                 begin
-                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
-                    case uidi of
-                    UID_HCommandCenter,
-                    UID_UCommandCenter: begin
-                                           _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
-                                           uo_y-=fly_hz;
-                                        end;
-                    end;
-                 end;
-                 exit;
+              case _ability of
+0                    : if(apcm>0)then
+                         if(apcc<=0)
+                         then
+                         else
+                         begin
+                            _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                            exit;
+                         end;
+uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y))then exit;
+uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y))then exit;
+uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar      ))then exit;
+uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y))then exit;
+uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y))then exit;
+uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar      ))then exit;
+uab_CCFly            : if(speed>0)then
+                       begin
+                          _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                          _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
+                          uo_y-=fly_hz;
+                          exit;
+                       end;
+              else
+                _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                exit;
               end;
 co_action  :  _unit_action(pu);
 co_supgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_supgrade (pu,order_tar);
@@ -1592,7 +1592,7 @@ co_pcancle :  begin
                  _unit_cupgrade (pu,255);
               end;
    end;
-   _unit_player_order:=true;
+   _unit_player_order:=false;
 end;
 
 procedure _unit_prod(pu:PTUnit);
@@ -1670,7 +1670,7 @@ begin
       if(hits>dead_hits)then
       begin
          if(cycle_order=_cycle_order)
-         then _unit_reveal(pu);
+         then _unit_reveal(pu,false);
 
          _unit_counters(pu);
 
