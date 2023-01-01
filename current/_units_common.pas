@@ -1,5 +1,5 @@
 {$IFDEF _FULLGAME}
-procedure _unit_mmcoords(pu:PTUnit);
+procedure _unit_MiniMapXY(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -8,7 +8,7 @@ begin
    end;
 end;
 
-procedure _unit_LevelUp(pu:PTUnit;etype:byte;vischeck:pboolean);
+procedure _LevelUpEffect(pu:PTUnit;etype:byte;vischeck:pboolean);
 begin
    with pu^ do
    begin
@@ -197,10 +197,10 @@ begin
     end;
 end;
 
-function _canattack(pu:PTUnit;check_buffs:boolean):boolean;
+function _canAttack(pu:PTUnit;check_buffs:boolean):boolean;
 var tu:PTUnit;
 begin
-   _canattack:=false;
+   _canAttack:=false;
    with pu^  do
    with uid^ do
    begin
@@ -229,7 +229,7 @@ begin
       else exit;
       end;
    end;
-   _canattack:=true;
+   _canAttack:=true;
 end;
 
 procedure _unit_update_xy(pu:PTUnit);
@@ -238,8 +238,8 @@ begin
    begin
       pfzone:=pf_get_area(x,y);
       {$IFDEF _FULLGAME}
-      _unit_mmcoords(pu);
-      _unit_sfog(pu);
+      _unit_MiniMapXY(pu);
+      _unit_ForXY(pu);
       {$ENDIF}
    end;
 end;
@@ -411,7 +411,7 @@ begin
            upgr[upgr_hell_invuln]-=1;
            _unit_ability_HInvuln:=true;
            {$IFDEF _FULLGAME}
-           _unit_LevelUp(tu,EID_Invuln,nil);
+           _LevelUpEffect(tu,EID_Invuln,nil);
            {$ENDIF}
         end;
    end;
@@ -780,17 +780,21 @@ begin
    _unit_ability_HKeepBlink:=false;
    with pu^ do
     if(hits>0)and(bld)and(buff[ub_CCast]<=0)then
+     with uid^ do
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(uid^._isbuilder);
-         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, obstacles );
-         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, obstacles)>0)then exit;
+         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
+         _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles );
+         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
 
          upgr[upgr_hell_HKTeleport]-=1;
          buff[ub_CCast]:=fr_fps1;
 
-         _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKT_h,EID_HKT_s,snd_cube{$ENDIF});
+         case uidi of
+         UID_HKeep : _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});
+         UID_HAKeep: _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
+         end;
          _unit_ability_HKeepBlink:=true;
          _unit_reveal(pu,true);
       end;
@@ -803,14 +807,15 @@ begin
    _unit_ability_HTowerBlink:=false;
    with pu^ do
     if(hits>0)and(bld)and(buff[ub_CCast]<=0)then
+     with uid^ do
      with player^ do
       if(upgr[upgr_hell_b478tel]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(uid^._isbuilder);
+         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
-         _push_out(x0,y0,uid^._r,@x0,@y0,ukfly, obstacles  );
+         _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles  );
          if(point_dist_int(x,y,x0,y0)>srange)then exit;
-         if(_collisionr(x0,y0,uid^._r,unum,uid^._ukbuilding,ukfly, obstacles )>0)then exit;
+         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles )>0)then exit;
 
          upgr[upgr_hell_b478tel]-=1;
          buff[ub_CCast]:=fr_fpsh;
@@ -824,7 +829,7 @@ procedure _unit_default(pu:PTUnit);
 begin
    with pu^ do
    begin
-      transport    := 0;
+      transport:= 0;
       uo_id    := ua_amove;
       uo_tar   := 0;
       rld      := 0;
@@ -857,8 +862,8 @@ begin
       {$IFDEF _FULLGAME}
       wanim    := false;
       anim     := 0;
-      _unit_mmcoords(pu);
-      _unit_sfog    (pu);
+      _unit_MiniMapXY(pu);
+      _unit_ForXY    (pu);
       {$ENDIF}
    end;
 end;
@@ -1107,8 +1112,7 @@ begin
       for i:=0 to count do announcer:=_barrack_out(pu,_uid,sstep,dir+i*15) or announcer;
 
       if(announcer)
-      then GameLogUnitReady   (_LastCreatedUnitP);
-      //GameLogUnitPromoted(_LastCreatedUnitP)
+      then GameLogUnitReady(_LastCreatedUnitP);
    end;
 end;
 
@@ -1146,14 +1150,11 @@ var i:byte;
 begin
    _unit_straining:=true;
 
-   puid:=_ReplaceUid(puid,pu^.player);
-
    for i:=0 to MaxUnitLevel do
    begin
       if(i>pu^.level)then break;
       if(_unit_straining_p(pu,puid,i))then exit;
    end;
-
 
    _unit_straining:=false;
 end;
@@ -1183,9 +1184,6 @@ function _unit_ctraining(pu:PTUnit;puid:byte):boolean;
 var i:byte;
 begin
    _unit_ctraining:=true;
-
-   if(puid<255)
-   then puid:=_ReplaceUid(puid,pu^.player);
 
    for i:=MaxUnitLevel downto 0 do
     if(_unit_ctraining_p(pu,puid,i))and(puid<255)then exit;
@@ -1664,7 +1662,7 @@ begin
    begin
       srange:=newsr;
       {$IFDEF _FULLGAME}
-      _unit_fog_r(pu);
+      _unit_CalcForR(pu);
       {$ENDIF}
    end;
 end;
@@ -1677,7 +1675,7 @@ begin
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
-uab_HellVision   : level:=byte(rld<=0);
+uab_HellVision    : level:=byte(rld<=0);
 uab_CCFly         :
            if(level>0)then
            begin
@@ -1755,10 +1753,8 @@ UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apc
       // BUILD AREA
       case uidi of
 UID_HEye          : isbuildarea:=true;
-UID_HCommandCenter,
-UID_UCommandCenter: isbuildarea:=not ukfly;
       else
-      if(_isbuilder)then isbuildarea:=true;
+      if(_isbuilder)then isbuildarea:=not ukfly;
       end;
 
       // SRANGE

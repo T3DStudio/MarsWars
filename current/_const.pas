@@ -172,7 +172,7 @@ lmt_req_ruids          = 20;
 lmt_map_mark           = 21;
 lmt_unit_attacked      = 22;
 lmt_cant_order         = 23;
-lmt_player_chat        = 255;
+lmt_player_chat        = 127;
 
 lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
 lmts_last_messages     = [0..255];
@@ -242,21 +242,22 @@ uo_addorder            = 10;
 //  UNIT & UPGRADES REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = %0000000000000001;
-ureq_ruid              : cardinal = %0000000000000010;
-ureq_rupid             : cardinal = %0000000000000100;
-ureq_energy            : cardinal = %0000000000001000;
-ureq_time              : cardinal = %0000000000010000;
-ureq_max               : cardinal = %0000000001000000;
-ureq_builders          : cardinal = %0000000010000000; // need builders
-ureq_bld_r             : cardinal = %0000000100000000;
-ureq_barracks          : cardinal = %0000001000000000; // need barracks
-ureq_smiths            : cardinal = %0000010000000000; // need smith
-ureq_product           : cardinal = %0000100000000000; // already in production
-ureq_armylimit         : cardinal = %0001000000000000;
-ureq_place             : cardinal = %0010000000000000; // cant build here
-ureq_busy              : cardinal = %0100000000000000; // production is busy
-ureq_unknown           : cardinal = %1000000000000000; //
+ureq_unitlimit         : cardinal = %000000000000000000001;
+ureq_ruid              : cardinal = %000000000000000000010;
+ureq_rupid             : cardinal = %000000000000000000100;
+ureq_energy            : cardinal = %000000000000000001000;
+ureq_time              : cardinal = %000000000000000010000;
+ureq_max               : cardinal = %000000000000001000000;
+ureq_builders          : cardinal = %000000000000010000000; // need builders
+ureq_bld_r             : cardinal = %000000000000100000000;
+ureq_barracks          : cardinal = %000000000001000000000; // need barracks
+ureq_smiths            : cardinal = %000000000010000000000; // need smith
+ureq_product           : cardinal = %000000000100000000000; // already in production
+ureq_armylimit         : cardinal = %000000001000000000000;
+ureq_place             : cardinal = %000000010000000000000; // cant build here
+ureq_busy              : cardinal = %000000100000000000000; // production is busy
+ureq_unknown           : cardinal = %000001000000000000000; //
+ureq_alreadyAdv        : cardinal = %000010000000000000000; //
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -281,6 +282,7 @@ co_suprod              = -83;
 co_cuprod              = -84;
 co_pcancle             = -85;
 co_mmark               = -86;
+co_rebuild             = -87;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -429,13 +431,11 @@ uab_UACScan            = 2;
 uab_HTowerBlink        = 3;
 uab_UACStrike          = 4;
 uab_HKeepBlink         = 5;
-uab_Rebuild            = 6;
-uab_Rebuild2Turret     = 7;
+uab_RebuildInPoint     = 6;
 uab_HInvulnerability   = 8;
 uab_SpawnLost          = 9;
 uab_HellVision         = 10;
 uab_CCFly              = 11;
-uab_ProdLevelUp        = 12;
 
 client_rld_abils = [
                    uab_Teleport
@@ -690,20 +690,22 @@ ExpLevel1              = fr_fps1*45;
 // HELL
 
 UID_HKeep              = 1;
-UID_HGate              = 2;
-UID_HSymbol            = 3;
-UID_HASymbol           = 4;
-UID_HPools             = 5;
-UID_HTower             = 6;
-UID_HTeleport          = 7;
-UID_HEye               = 8;
-UID_HMonastery         = 9;
-UID_HPentagram         = 10;
-UID_HTotem             = 11;
-UID_HAltar             = 12;
-UID_HFortress          = 13;
-UID_HCommandCenter     = 14;
-UID_HBarracks          = 15;
+UID_HAKeep             = 2;
+UID_HGate              = 3;
+UID_HSymbol            = 4;
+UID_HASymbol           = 5;
+UID_HPools             = 6;
+UID_HTower             = 7;
+UID_HTeleport          = 8;
+UID_HEye               = 9;
+UID_HMonastery         = 10;
+UID_HPentagram         = 11;
+UID_HTotem             = 12;
+UID_HAltar             = 13;
+UID_HFortress          = 14;
+UID_HCommandCenter     = 15;
+UID_HACommandCenter    = 16;
+UID_HBarracks          = 17;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -733,18 +735,19 @@ UID_ZBFG               = 43;
 // UAC
 
 UID_UCommandCenter     = 50;
-UID_UBarracks          = 51;
-UID_UFactory           = 52;
-UID_UGenerator         = 53;
-UID_UAGenerator        = 54;
-UID_UWeaponFactory     = 55;
-UID_URadar             = 56;
-UID_URMStation         = 57;
-UID_UTechCenter        = 58;
-UID_UGTurret           = 59;
-UID_UATurret           = 60;
-UID_UNuclearPlant      = 61;
-UID_UMine              = 62;
+UID_UACommandCenter    = 51;
+UID_UBarracks          = 52;
+UID_UFactory           = 53;
+UID_UGenerator         = 54;
+UID_UAGenerator        = 55;
+UID_UWeaponFactory     = 56;
+UID_URadar             = 57;
+UID_URMStation         = 58;
+UID_UTechCenter        = 59;
+UID_UGTurret           = 60;
+UID_UATurret           = 61;
+UID_UNuclearPlant      = 62;
+UID_UMine              = 63;
 
 UID_UBaseMil           = 65;
 UID_UBaseCom           = 66;
@@ -786,7 +789,7 @@ uids_all               = [0..255];
 //uids_coopspawn         = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 
 uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter);
-uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant );
+//uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant );
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -893,24 +896,24 @@ _hotkey2 : array[0.._mhkeys] of cardinal = (0      , 0      , 0      ,
                                             SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
                                             SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
 
-_hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W , SDLK_SPACE ,
-                                            SDLK_A    , SDLK_S , SDLK_D ,
-                                            SDLK_Z    , SDLK_X , SDLK_C ,
+_hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
+                                            SDLK_A    , SDLK_S    , SDLK_D ,
+                                            SDLK_Z    , SDLK_X    , SDLK_C ,
 
-                                            SDLK_C    , SDLK_F2, SDLK_Delete,
-                                            0         , 0      , 0,
-                                            0         , 0      , 0,
+                                            SDLK_C    , SDLK_F2   , SDLK_Delete,
+                                            0         , SDLK_SPACE, 0,
+                                            0         , 0         , 0,
 
                                             0,0,0,
                                             0,0,0,
                                             0,0,0);
-_hotkeyA2: array[0.._mhkeys] of cardinal = (0 , 0 , SDLK_LCtrl ,
-                                            0 , 0 , 0 ,
-                                            0 , 0 , 0 ,
+_hotkeyA2: array[0.._mhkeys] of cardinal = (0          , 0         , 0 ,
+                                            0          , 0         , 0 ,
+                                            0          , 0         , 0 ,
 
-                                            SDLK_LCtrl , 0, 0,
-                                            0 , 0, 0,
-                                            0 , 0, 0,
+                                            SDLK_LCtrl , 0         , 0,
+                                            0          , SDLK_LCtrl, 0,
+                                            0          , 0         , 0,
 
                                             0,0,0,
                                             0,0,0,
@@ -922,17 +925,6 @@ _hotkeyR : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
 
                                             SDLK_R , SDLK_T , SDLK_Y ,
                                             SDLK_F , SDLK_G , SDLK_H ,
-                                            0,0,0,
-
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0);
-_hotkeyR2: array[0.._mhkeys] of cardinal = (0 , 0 , 0 ,
-                                            0 , 0 , 0 ,
-                                            0 , 0 , 0 ,
-
-                                            0,0,0,
-                                            0,0,0,
                                             0,0,0,
 
                                             0,0,0,
@@ -1038,21 +1030,23 @@ EID_Teleport           = 203;
 EID_Exp                = 204;
 EID_Exp2               = 205;
 EID_Gavno              = 206;
-EID_HKT_h              = 207;
-EID_HKT_s              = 208;
-EID_db_h0              = 209;
-EID_db_h1              = 210;
-EID_db_u0              = 211;
-EID_db_u1              = 212;
-EID_Blood              = 213;
-EID_ArchFire           = 214;
-EID_ULevelUp           = 215;
-EID_HLevelUp           = 216;
-EID_HVision            = 217;
-EID_Invuln             = 218;
-EID_HAMU               = 219;
-EID_HMU                = 220;
-EID_HCC                = 221;
+EID_HKeep_H            = 207;
+EID_HKeep_S            = 208;
+EID_HAKeep_H           = 209;
+EID_HAKeep_S           = 210;
+EID_db_h0              = 211;
+EID_db_h1              = 212;
+EID_db_u0              = 213;
+EID_db_u1              = 214;
+EID_Blood              = 215;
+EID_ArchFire           = 216;
+EID_ULevelUp           = 217;
+EID_HLevelUp           = 218;
+EID_HVision            = 219;
+EID_Invuln             = 220;
+EID_HAMU               = 221;
+EID_HMU                = 222;
+EID_HCC                = 223;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

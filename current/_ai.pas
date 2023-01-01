@@ -2,7 +2,9 @@
 const
 
 aiucl_main0      : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter );
+aiucl_main0A     : array[1..r_cnt] of byte = (UID_HAKeep         ,UID_UACommandCenter);
 aiucl_main1      : array[1..r_cnt] of byte = (UID_HCommandCenter ,0                  );
+aiucl_main1A     : array[1..r_cnt] of byte = (UID_HACommandCenter,0                  );
 aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator     );
 aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UBarracks      );
 aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HBarracks      ,UID_UFactory       );
@@ -27,7 +29,7 @@ ai_MinScoutDelay          = fr_fps1*ptime1;
 ai_BaseIDLERange          = 100;
 ai_MinBaseSaveCountBorder = 6;
 ai_MinChoosenCount        = 6;
-ai_cp_go_r                = base_3r;
+ai_cp_go_r                = base_rr;
 
 aio_home   = 0;
 aio_scout  = 1;
@@ -60,14 +62,19 @@ ai_urepair_u,
 ai_base_u         : PTUnit;
 
 ai_LostWantZombieMe,
-ai_advanced_HGen,
+{ai_advanced_HGen,
+ai_advanced_HKeep,
+ai_advanced_HCC,
 ai_advanced_UGen,
+ai_advanced_UCC,}
+ai_advanced_bld,
 ai_teleport_use,
 ai_choosen,
 ai_cpoint_koth    : boolean;
 ai_cpoint_x,
 ai_cpoint_y,
 ai_cpoint_d,
+ai_cpoint_r,
 ai_alarm_d,
 ai_alarm_x,
 ai_alarm_y,
@@ -318,9 +325,24 @@ begin
 
       with player^ do
       begin
-         ai_advanced_HGen:=(a_units[UID_HASymbol   ]>0)and(cf(@ai_flags,@aif_base_advance));
-         ai_advanced_UGen:=(a_units[UID_UAGenerator]>0)and(cf(@ai_flags,@aif_base_advance));
-         ai_teleport_use :=cf(@ai_flags,@aif_army_teleport);
+         {if(not cf(@ai_flags,@aif_base_advance) )then
+         begin
+            ai_advanced_HGen  :=false;
+            ai_advanced_HKeep :=false;
+            ai_advanced_HCC   :=false;
+            ai_advanced_UGen  :=false;
+            ai_advanced_UCC   :=false;
+         end
+         else
+         begin
+            ai_advanced_HGen  :=(a_units[UID_HASymbol       ]>0);
+            ai_advanced_HKeep :=(a_units[UID_HAKeep         ]>0);
+            ai_advanced_HCC   :=(a_units[UID_HACommandCenter]>0);
+            ai_advanced_UGen  :=(a_units[UID_UAGenerator    ]>0);
+            ai_advanced_UCC   :=(a_units[UID_UACommandCenter]>0);
+         end; }
+         ai_advanced_bld   :=cf(@ai_flags,@aif_base_advance );
+         ai_teleport_use   :=cf(@ai_flags,@aif_army_teleport);
       end;
    end;
    ai_armyaround_own      :=0;
@@ -357,9 +379,15 @@ begin
    ai_cpoint_y       :=0;
    ai_cpoint_d       :=NOTSET;
    ai_cpoint_zone    :=0;
+   ai_cpoint_r       :=0;
+
+   //
+   ai_enrg_pot      :=0;
+   ai_enrg_cur      :=0;
 
    // get default alarm point
    with pu^ do
+   with uid^ do
     with player^ do
     begin
        for i:=0 to MaxPlayers do
@@ -374,29 +402,43 @@ begin
        for i:=1 to MaxCPoints do
         with g_cpoints[i] do
          if(cpCapturer>0)then
-          if(cpOwnerTeam<>team)
-          or((cpTimer>0)and(cpTimerOwnerTeam<>team))then
-          begin
-             d:=point_dist_int(cpx,cpy,x,y);
+         begin
+            if(cpOwnerTeam=team)and(cpenergy>0)then
+            begin
+               ai_enrg_pot+=cpenergy;
+               ai_enrg_cur+=cpenergy;
+            end;
 
-             ds:=d;
-             if(i=1)and(g_mode=gm_koth)then ds:=max2(d div 3,ai_cp_go_r);
-             if(cpOwnerTeam=0)and(cpTimer<=0)then ds:=d div 2;
+            if(cpOwnerTeam<>team)
+            or((cpTimer>0)and(cpTimerOwnerTeam<>team))then
+            begin
+               d:=point_dist_int(cpx,cpy,x,y);
 
-             if(pfzone=cpzone)
-             or(ukfly)
-             or(ukfloater)
-             or(d<gm_cptp_r)then
-              if(ds<ai_cpoint_d)then
-              begin
-                 ai_cpoint_x   :=cpx;
-                 ai_cpoint_y   :=cpy;
-                 ai_cpoint_d   :=ds;
-                 ai_cpoint_zone:=cpzone;
+               ds:=d;
+               if(_ukbuilding)
+               then ds:=d
+               else
+               begin
+                  if(i=1)and(g_mode=gm_koth)then ds:=(d div 2)-cpTimer;//max2(d div 3,ai_cp_go_r);
+                  if(cpOwnerTeam=0)and(cpTimer<=0)then ds:=d div 2;
+               end;
 
-                 ai_cpoint_koth:=(i=1)and(g_mode=gm_koth);
-              end;
-          end;
+               if(pfzone=cpzone)
+               or(ukfly)
+               or(ukfloater)
+               or(d<gm_cptp_r)then
+                if(ds<ai_cpoint_d)then
+                begin
+                   ai_cpoint_x   :=cpx;
+                   ai_cpoint_y   :=cpy;
+                   ai_cpoint_r   :=cpCapturer;
+                   ai_cpoint_d   :=ds;
+                   ai_cpoint_zone:=cpzone;
+
+                   ai_cpoint_koth:=(i=1)and(g_mode=gm_koth);
+                end;
+            end;
+         end;
     end;
 
    ai_LostWantZombieMe:=false;
@@ -439,9 +481,6 @@ begin
    ai_need_heye_u   := nil;
 
    // builds data
-   ai_enrg_pot      :=0;
-   ai_enrg_cur      :=0;
-
    ai_basep_builders:=0;  // base production
    ai_basep_need    :=0;
 
@@ -678,11 +717,15 @@ begin
          begin
             if(uid=tu^.uid)and(not bld)then ai_inprogress_uid+=1;
 
-            case tu^.uidi of
+            {case tu^.uidi of
             UID_HSymbol   : if(ai_advanced_HGen)then ai_enrg_pot+=_uids[UID_HASymbol   ]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
             UID_UGenerator: if(ai_advanced_UGen)then ai_enrg_pot+=_uids[UID_UAGenerator]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
             else            ai_enrg_pot+=tu^.uid^._genergy;
-            end;
+            end;}
+            if(tu^.uid^._rebuild_uid>0)and(ai_advanced_bld)
+            then ai_enrg_pot+=_uids[tu^.uid^._rebuild_uid]._genergy
+            else ai_enrg_pot+=tu^.uid^._genergy;
+
             ai_enrg_cur+=tu^.uid^._genergy;
 
             if(tu^.bld)then
@@ -851,9 +894,14 @@ end;
 procedure BuildEnergy(a:integer); // Energy
 begin
    a+=base_energy;
-   with pu^.player^ do
-    if(ai_enrg_pot<a)and(ai_enrg_pot<ai_max_energy)and(ai_enrg_pot<ai_GeneratorsEnergy)then
-     if(SetBTA(aiucl_generator[race],0))then ddir:=-1;
+   if(g_cgenerators>0)then
+   begin
+      if(ai_enrg_pot<a)then BuildMain(ai_basep_need);   //ai_basep_builders
+   end
+   else
+     with pu^.player^ do
+      if(ai_enrg_pot<a)and(ai_enrg_pot<ai_max_energy)and(ai_enrg_pot<ai_GeneratorsEnergy)then
+       if(SetBTA(aiucl_generator[race],0))then ddir:=-1;
 end;
 procedure BuildUProd(a:integer);  // Barracks
 begin
@@ -965,17 +1013,18 @@ begin
          if(ai_towers_need>0)then //ai_min_towers
          BuildTower(ai_towers_need,ai_towers_need_type);
 
-if(random(2)=0)then
-         BuildUProd (1   );
+if(random(2)=0)
+or(g_cgenerators>0)then BuildUProd (1   );
          BuildEnergy(600 );
-if(random(3)=0)then
-         BuildUProd (1   );
+if(random(3)=0    )then BuildUProd (1   );
+if(g_cgenerators>0)then BuildMain  (3   );
          BuildEnergy(1000);
          BuildSmith (1   );
          BuildEnergy(1500);
          BuildUProd (4   );
          BuildDetect(2   );
          BuildSpec2 (1   );
+if(g_cgenerators>0)then BuildMain  (5   );
          BuildMain  (2   );
          BuildEnergy(1900);
          BuildUProd (5   );
@@ -1008,7 +1057,6 @@ if(random(3)=0)then
           BuildMain  (ai_basep_need);
           nocheck_energy:=true;
           BuildEnergy(ai_GeneratorsEnergy);
-          //if(sel)then writeln(bt,' ',(ai_detect_need/MinUnitLimit):3:3);
        end
        else
          case random(9) of
@@ -1315,10 +1363,13 @@ begin
       if((ai_inprogress_uid=0)and(    bld))
       or((ai_inprogress_uid>0)and(not bld))then
       case uidi of
+{UID_HKeep,
+UID_HCommandCenter,
+UID_UCommandCenter: ;  }
 UID_HSymbol,
 UID_HASymbol,
 UID_UGenerator,
-UID_UAGenerator: if(armylimit>ai_GeneratorsDestoryLimit)and(cenergy>_genergy)and(menergy>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
+UID_UAGenerator   : if(armylimit>ai_GeneratorsDestoryLimit)and(cenergy>_genergy)and(menergy>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
       else
         if(_isbarrack)or(_issmith)then
          if(ai_isnoprod(pu))then
@@ -1351,9 +1402,9 @@ UID_UATurret       : if(ai_towers_cur_active>ai_min_towers)and(ai_cpoint_d>gm_cp
    ai_buildings_need_suicide:=false;
 end;
 
-function ai_buildings_need_ability(pu:PTUnit):boolean;
+function ai_buildings_need_rebuild(pu:PTUnit):boolean;
 begin
-   ai_buildings_need_ability:=true;
+   ai_buildings_need_rebuild:=true;
    with pu^     do
    with uid^    do
    with player^ do
@@ -1364,15 +1415,20 @@ UID_UGTurret   : if(    ai_enemy_u^.ukfly)and(srange<ai_enemy_grd_d)and(ai_enemy
 UID_UATurret   : if(not ai_enemy_u^.ukfly)and(srange<ai_enemy_air_d)and(ai_enemy_air_d<base_3r)then exit;
        end; ???????????????????????????????????????? }
 
-       case uidi of
+
+      //if(ai_alarm_d>base_rr)then
+      case uidi of
+UID_HKeep,
+UID_HCommandCenter,
+UID_UCommandCenter: if(n_builders>1)then exit;
 UID_HSymbol,
 UID_UGenerator    : if(ai_enrg_cur<ai_max_energy)then exit;
-       else
-          if(_isbarrack)or(_issmith)then
-           if(level=0)and(ai_isnoprod(pu))then exit;
-       end;
+      else
+         if(_isbarrack)or(_issmith)then
+          if(level=0)and(ai_isnoprod(pu))then exit;
+      end;
    end;
-   ai_buildings_need_ability:=false;
+   ai_buildings_need_rebuild:=false;
 end;
 
 procedure ai_buildings(pu:PTUnit);
@@ -1391,7 +1447,9 @@ begin
    with player^ do
    begin
       ai_basep_builders:=uid_e[aiucl_main0 [race]]
-                        +uid_e[aiucl_main1 [race]];
+                        +uid_e[aiucl_main0A[race]]*2
+                        +uid_e[aiucl_main1 [race]]
+                        +uid_e[aiucl_main1A[race]]*2;
       ai_tech0_cur     :=uid_e[aiucl_tech0 [race]];
       ai_tech1_cur     :=uid_e[aiucl_tech1 [race]];
       ai_tech2_cur     :=uid_e[aiucl_tech2 [race]];
@@ -1418,7 +1476,7 @@ begin
               if(ai_armyaround_enemy_fly>0)and(ai_armyaround_enemy_grd<=0)
               then ai_towers_need_type:= 1;
          end;
-         if(ai_cpoint_d<base_r)and(ai_cpoint_koth)then
+         if(ai_cpoint_d<base_rr)and(ai_cpoint_koth)then
          begin
             ai_towers_need     :=ai_max_towers;
             ai_towers_needx    :=ai_cpoint_x;
@@ -1434,10 +1492,9 @@ begin
           exit;
        end;
 
-      if(cf(@ai_flags,@aif_base_advance))then
-       if(ai_buildings_need_ability(pu))then
-        _unit_action(pu);
-
+      if(ai_advanced_bld)then
+       if(ai_buildings_need_rebuild(pu))then
+        _unit_rebuild(pu);
 
       if(hits<=0)or(not bld)then exit;
 
@@ -1680,8 +1737,7 @@ begin
         then uo_id:=ua_unload;
 
         group:=aio_busy;
-        uo_x :=ai_cpoint_x;
-        uo_y :=ai_cpoint_y;
+        ai_RunTo(pu,0,ai_cpoint_x,ai_cpoint_y,ai_cpoint_r div 2,nil);
 
         THINK_CPoint:=true;
      end;
@@ -1693,17 +1749,18 @@ begin
    with pu^  do
    with uid^ do
    with player^ do
-   if((ai_abase_d<aiu_alarm_d)and(group=aio_attack))
-   or((ai_abase_d<NOTSET     )and(group=aio_home  ))then
-   begin
-      ai_RunTo(pu,ai_abase_d,0,0,-base_r,ai_abase_u);
+    if(ai_abase_d<ai_cpoint_d)then
+     if((ai_abase_d<aiu_alarm_d)and(group=aio_attack))
+     or((ai_abase_d<NOTSET     )and(group=aio_home  ))then
+     begin
+        ai_RunTo(pu,ai_abase_d,0,0,-base_r,ai_abase_u);
 
-      if(not ukfly)and(not ukfloater)then
-        if(ai_abase_d>base_4r)or(pfzone<>ai_abase_u^.pfzone)
-        then ai_TryTeleport(pu,ai_abase_u);
+        if(not ukfly)and(not ukfloater)then
+          if(ai_abase_d>base_4r)or(pfzone<>ai_abase_u^.pfzone)
+          then ai_TryTeleport(pu,ai_abase_u);
 
-      THINK_BaseAlarm:=true;
-   end;
+        THINK_BaseAlarm:=true;
+     end;
    //if(pu^.sel)then writeln('THINK_BaseAlarm ',THINK_BaseAlarm);
 end;
 function THINK_Scout:boolean;
@@ -2071,13 +2128,17 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
 
       // abilities
       if(cf(@player^.ai_flags,@aif_ability_other))then
-       case _ability of
+      begin
+         case _ability of
 uab_HTowerBlink      : if(ai_uab_htowertele(pu ))then _unit_ability_HTowerBlink(pu,aiu_alarm_x,aiu_alarm_y);
 uab_HInvulnerability : if(ai_invuln_tar_u<>nil  )then _unit_ability_HInvuln    (pu,ai_invuln_tar_u^.unum);
 uab_UACStrike        : if(ai_strike_tar_u<>nil  )then _unit_ability_UACStrike  (pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
-uab_Rebuild2Turret   : if(ai_uab_buildturret(pu))then
-                        if(_unit_action(pu))then exit;
-       end;
+         end;
+         case uidi of
+UID_UACBot           : if(ai_uab_buildturret(pu))then
+                         if(_unit_rebuild(pu))then exit;
+         end;
+      end;
 
       // MAIN save
       if(cf(@player^.ai_flags,@aif_ability_mainsave))then

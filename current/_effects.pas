@@ -74,11 +74,13 @@ begin
         EID_BExp          : _setEID(@spr_eff_eb        ,sms_death);
         MID_Blizzard,
         EID_BBExp         : _setEID(@spr_eff_ebb       ,sms_death);
-        EID_HKT_h,
-        EID_HKT_s         : _setEID(@spr_HKeep         ,sms_walk );
+        EID_HKeep_H,
+        EID_HKeep_S       : _setEID(@spr_HKeep         ,sms_walk );
+        EID_HAKeep_H,
+        EID_HAKeep_s      : _setEID(@spr_HAKeep        ,sms_walk );
         EID_HCC           : _setEID(@spr_UCommandCenter,sms_walk );
-        EID_HMU           : _setEID(@spr_UMilitaryUnit ,sms_walk );
-        EID_HAMU          : _setEID(@spr_UAMilitaryUnit,sms_walk );
+        EID_HMU           : _setEID(@spr_UBarracks ,sms_walk );
+        EID_HAMU          : _setEID(@spr_UABarracks,sms_walk );
         EID_db_h0         : _setEID(@spr_db_h0         ,sms_death);
         EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);
         EID_db_u0         : _setEID(@spr_db_u0         ,sms_death);
@@ -195,8 +197,10 @@ EID_BExp          : _setEff(5 ,0 ,-1 ,-1       ,true ,0 );
 MID_Blizzard,
 EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
-EID_HKT_h,
-EID_HKT_s,
+EID_HKeep_H,
+EID_HKeep_S,
+EID_HAKeep_H,
+EID_HAKeep_S,
 EID_HMU,
 EID_HCC,
 EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
@@ -316,8 +320,10 @@ begin
 EID_HMU,
 EID_HCC,
 EID_HAMU,
-EID_HKT_h   : alpha:=anim_last_i_t*4;
-EID_HKT_s   : alpha:=255-(anim_last_i_t*4);
+EID_HKeep_H,
+EID_HAKeep_H  : alpha:=anim_last_i_t*4;
+EID_HKeep_S,
+EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
          else alpha:=min2(255,anim_last_i_t);
          end;
 

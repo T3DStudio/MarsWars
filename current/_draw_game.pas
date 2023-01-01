@@ -490,6 +490,7 @@ end;
 
 procedure cpoints_sprites(draw:boolean);
 var t:integer;
+color:cardinal;
 begin
    if(not draw)then exit;
 
@@ -499,25 +500,23 @@ begin
      begin
         if(not RectInCam(cpx,cpy,cpCapturer,cpCapturer,0))then continue;
 
-        if(t=1)and(g_mode=gm_koth)then
-        begin
+        color:=GetCPColor(t);
 
-        end
+        if(t=1)and(g_mode=gm_koth)
+        then UnitsInfoAddCircle(cpx,cpy,cpCapturer,color)
         else
           if(cpenergy<=0)
-          then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(GetCPColor(t)),@spr_cp_out,255)
+          then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_out,255)
           else
           begin
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0                         ,@spr_cp_out,255);
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(GetCPColor(t)),@spr_cp_gen,255);
+             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0                 ,@spr_cp_out,255);
+             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
           end;
 
-        if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime),c_white);
-        if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),PlayerGetColor(cpTimerOwnerPlayer));
-        {UnitsInfoAddText(cpx,cpy+20,w2s(cpTimerOwnerPlayer),c_white);
+        if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
 
-        for i:=0 to MaxPlayers do
-          UnitsInfoAddText(cpx-50,cpy+i*10,i2s(cpunitsp_pstate[i]),c_white);  }
+        if(PointInScreenP(cpx,cpy,nil))then
+         if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
      end;
 end;
 

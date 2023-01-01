@@ -412,6 +412,11 @@ begin
    setMWSModel(0,@spr_HKeep);
    setBuildingSND(snd_hell_hk);
 end;
+UID_HAKeep:
+begin
+   setMWSModel(0,@spr_HAKeep);
+   setBuildingSND(snd_hell_hk);
+end;
 UID_HGate:
 begin
    setMWSModel(0,@spr_HGate );
@@ -493,7 +498,16 @@ begin
 end;
 UID_HCommandCenter:
 begin
-   setMWSModel(0,@spr_HCC);
+   setMWSModel(0,@spr_HCommandCenter);
+   setBuildingSND(snd_hell_hbuild);
+   setEffectEID(0,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
+   un_eid_bcrater_y:=10;
+   setWeaponESND(0    ,nil,snd_hell_attack,0,0);
+end;
+UID_HACommandCenter:
+begin
+   setMWSModel(0,@spr_HACommandCenter);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
@@ -502,8 +516,8 @@ begin
 end;
 UID_HBarracks:
 begin
-   setMWSModel(0,@spr_HMUnit );
-   setMWSModel(1,@spr_HMUnita);
+   setMWSModel(0,@spr_HBarracks );
+   setMWSModel(1,@spr_HABarracks);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,EID_HMU ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectEID(1,EID_HAMU,EID_BBExp           ,EID_BBExp           ,0  );
@@ -693,10 +707,16 @@ begin
    setBuildingSND(snd_uac_cc);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
 end;
+UID_UACommandCenter:
+begin
+   setMWSModel(0,@spr_UACommandCenter);
+   setBuildingSND(snd_uac_cc);
+   setWeaponESND(0    ,nil,snd_plasma,0,0);
+end;
 UID_UBarracks:
 begin
-   setMWSModel(0,@spr_UMilitaryUnit);
-   setMWSModel(1,@spr_UAMilitaryUnit);
+   setMWSModel(0,@spr_UBarracks);
+   setMWSModel(1,@spr_UABarracks);
    setBuildingSND(snd_uac_barracks);
 end;
 UID_UFactory:

@@ -89,12 +89,15 @@ begin
           begin
              with log_l[i] do
              begin
-                _wudata_byte  (mtype,rpl);
-                _wudata_byte  (uidt ,rpl);
+                _wudata_byte  (((mtype and %01111111) shl 1)or(uidt and %00000001),rpl);
                 _wudata_byte  (uid  ,rpl);
                 _wudata_string(str  ,rpl);
-                _wudata_byte  (byte(x shr 5),rpl);
-                _wudata_byte  (byte(y shr 5),rpl);
+                if(xi>0)then
+                begin
+                   _wudata_byte(byte(xi shr 5),rpl);
+                   _wudata_byte(byte(yi shr 5),rpl);
+                end
+                else _wudata_byte(255,rpl);
              end;
 
              if(i=MaxPlayerLog)
@@ -140,6 +143,7 @@ begin
       SetBBit(@_bts2,4, buff[ub_HVision  ]>0);
       SetBBit(@_bts2,5, buff[ub_Cast     ]>0);
       SetBBit(@_bts2,6, buff[ub_Scaned   ]>0);
+      SetBBit(@_bts2,7, buff[ub_Decay    ]>0);
 
       SetBBit(@_bts1,0, bld                 );
       SetBBit(@_bts1,1, transport>0         );
@@ -486,7 +490,7 @@ begin
 end;
 
 
-procedure _ucSummonedEffect(uu:PTUnit;vis:pboolean);
+procedure _SummonEffect(uu:PTUnit;vis:pboolean);
 begin
    with uu^ do
    begin
@@ -496,7 +500,7 @@ begin
    end;
 end;
 
-procedure _teleEff(uu,pu:PTUnit);
+procedure _TeleportEffect(uu,pu:PTUnit);
 begin
    with uu^  do
    begin
@@ -504,7 +508,7 @@ begin
       vy:=y;
       if(uid^._ability=uab_HKeepBlink)then
       begin
-         teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKT_h,EID_HKT_s,snd_cube);
+         teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H,EID_HKeep_S,snd_cube);
          buff[ub_CCast]:=fr_fps1;
          exit;
       end;
@@ -526,6 +530,7 @@ begin
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
         _unit_default(uu);
+        _unit_reveal(uu,true);
 
         if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
 
@@ -536,14 +541,17 @@ begin
 
         if(hits>0)then
         begin
-           _unit_fog_r(uu);
-           if(buff[ub_Summoned]>0)then _ucSummonedEffect(uu,@vis);
-           if(buff[ub_Teleport ]>0)then _teleEff(uu,@vis);
-           if(buff[ub_HVision ]>0)then _unit_LevelUp(uu,EID_HVision,@vis);
-           with uid^ do
-           if(bld=false)then SoundPlayAnoncer(snd_build_place[_urace],false);
+           _unit_CalcForR(uu);
+           if(buff[ub_Summoned]>0)then _SummonEffect  (uu,@vis);
+           if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
+           if(buff[ub_HVision ]>0)then _LevelUpEffect (uu,EID_HVision,@vis);
 
-           if(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
+           if(playeri=HPlayer)then
+           begin
+              if(bld=false)then
+                with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
+              if(sel)then ui_UnitSelectedNU:=unum;
+           end;
         end;
 
         _ucInc(uu);
@@ -559,7 +567,7 @@ begin
           begin
              if(hits>ndead_hits)and(transport=0)then
              begin
-                if(buff[ub_Teleport]>0)then _teleEff(uu,@vis);
+                if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
 
                 _unit_death_effects(uu,true,@vis);
              end;
@@ -586,9 +594,9 @@ begin
 
             if(hits>0)then
             begin
-               if(pu^.buff[ub_Teleport ]<=0)and(buff[ub_Teleport ]>0)then _teleEff(uu,pu);
-               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _ucSummonedEffect (uu,@vis);
-               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then _unit_LevelUp     (uu,EID_HVision,@vis);
+               if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then _TeleportEffect   (uu,pu  );
+               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _SummonEffect     (uu,@vis);
+               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then _LevelUpEffect    (uu,EID_HVision,@vis);
                if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,@vis);
 
                if(pu^.bld)and(bld=false)then
@@ -603,23 +611,23 @@ begin
                   if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
                    case uid^._ability of
                0:;
-               uab_UACStrike : _unit_umstrike_missile(uu);
-               uab_UACScan       : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+               uab_UACStrike   : _unit_umstrike_missile(uu);
+               uab_UACScan     : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_SpawnLost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then
                   begin
-                     if(pu^.level<level)then _unit_LevelUp(uu,0,@vis);
+                     if(pu^.level<level)then _LevelUpEffect(uu,0,@vis);
 
-                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then _unit_LevelUp(uu,EID_Invuln,@vis);
+                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then _LevelUpEffect(uu,EID_Invuln,@vis);
                   end;
                end;
             end;
 
             if(pu^.hits<=0)and(hits>0)then  //resurrected
             begin
-               _unit_fog_r(uu);
+               _unit_CalcForR(uu);
                vx:=x;
                vy:=y;
             end
@@ -731,13 +739,18 @@ begin
    begin
       while(s>0)do
       begin
-         mtype:=_rudata_byte  (rpl,0);
-         uidt :=_rudata_byte  (rpl,0);
+         x    :=_rudata_byte  (rpl,0);
+         mtype:=(x and %11111110) shr 1;
+         uidt := x and %00000001;
          uid  :=_rudata_byte  (rpl,0);
          str  :=_rudata_string(rpl  );
          x    :=_rudata_byte  (rpl,0);
+         if(x<255)then
          y    :=_rudata_byte  (rpl,0);
-         PlayerAddLog(p,mtype,uidt,uid,str,x shl 5,y shl 5,false);
+
+         if(x=255)
+         then PlayerAddLog(p,mtype,uidt,uid,str,-1,-1,false)
+         else PlayerAddLog(p,mtype,uidt,uid,str,x shl 5,y shl 5,false);
          s-=1;
       end;
       if(rpl=false)then
@@ -765,7 +778,7 @@ begin
       if(GetBBit(@_bts1,1))then transport:=1 else transport:=0;
       if(GetBBit(@_bts1,2))then level+=%01;
       if(GetBBit(@_bts1,3))then level+=%10;
-      buff[ub_Pain     ]:=_buffst[GetBBit(@_bts1,4)];
+      buff[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       sel:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
@@ -774,25 +787,27 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_Resurect ]:=_buffst[GetBBit(@_bts2,0)];
-         buff[ub_Summoned ]:=_buffst[GetBBit(@_bts2,1)];
-         buff[ub_Invuln   ]:=_buffst[GetBBit(@_bts2,2)];
-         buff[ub_Teleport  ]:=_buffst[GetBBit(@_bts2,3)];
-         buff[ub_HVision  ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_Cast     ]:=_buffst[GetBBit(@_bts2,5)];
-         buff[ub_Scaned   ]:=_buffst[GetBBit(@_bts2,6)];
+         buff[ub_Resurect]:=_buffst[GetBBit(@_bts2,0)];
+         buff[ub_Summoned]:=_buffst[GetBBit(@_bts2,1)];
+         buff[ub_Invuln  ]:=_buffst[GetBBit(@_bts2,2)];
+         buff[ub_Teleport]:=_buffst[GetBBit(@_bts2,3)];
+         buff[ub_HVision ]:=_buffst[GetBBit(@_bts2,4)];
+         buff[ub_Cast    ]:=_buffst[GetBBit(@_bts2,5)];
+         buff[ub_Scaned  ]:=_buffst[GetBBit(@_bts2,6)];
+         buff[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7 )];
       end
       else
       begin
-         buff[ub_Resurect ]:=0;
-         buff[ub_Summoned ]:=0;
-         buff[ub_Invuln   ]:=0;
-         buff[ub_Teleport  ]:=0;
-         buff[ub_HVision  ]:=0;
-         buff[ub_Scaned   ]:=0;
+         buff[ub_Resurect]:=0;
+         buff[ub_Summoned]:=0;
+         buff[ub_Invuln  ]:=0;
+         buff[ub_Teleport]:=0;
+         buff[ub_HVision ]:=0;
+         buff[ub_Scaned  ]:=0;
+         buff[ub_Decay   ]:=0;
       end;
 
-      if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
+      //if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
    end;
 end;
 

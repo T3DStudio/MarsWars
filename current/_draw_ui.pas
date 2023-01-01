@@ -308,7 +308,7 @@ begin
       0: // buildings
       for ucl:=0 to ui_ubtns do
       begin
-         uid:=_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
+         uid:=ui_panel_uids[race ,ui_tab,ucl];//_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
          if(uid=0)then continue;
 
          with _uids[uid] do
@@ -338,7 +338,7 @@ begin
       1: // units
       for ucl:=0 to ui_ubtns do
       begin
-         uid:=_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
+         uid:=ui_panel_uids[race ,ui_tab,ucl];//_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],@_players[HPlayer]);
          if(uid=0)then continue;
 
          with _uids[uid] do
@@ -408,21 +408,23 @@ begin
       end
       else
       begin
-         _drawBtn(tar,0,0,spr_b_action ,false  ,ui_uibtn_action<=0 );
-         _drawBtn(tar,1,0,spr_b_paction,false  ,ui_uibtn_action<=0 );
-         _drawBtn(tar,2,0,spr_b_rclck  ,m_action,false              );
+         _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_action <=0);
+         _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_action <=0);
+         _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild<=0);
 
-         _drawBtn(tar,0,1,spr_b_attack ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,1,1,spr_b_stop   ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,2,1,spr_b_apatrol,false  ,ui_uibtn_move<=0   );
+         _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
+         _drawBtn(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );
+         _drawBtn(tar,2,1,spr_b_apatrol,false   ,ui_uibtn_move<=0   );
 
-         _drawBtn(tar,0,2,spr_b_move   ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,1,2,spr_b_hold   ,false  ,ui_uibtn_move<=0   );
-         _drawBtn(tar,2,2,spr_b_patrol ,false  ,ui_uibtn_move<=0   );
+         _drawBtn(tar,0,2,spr_b_move   ,false   ,ui_uibtn_move<=0   );
+         _drawBtn(tar,1,2,spr_b_hold   ,false   ,ui_uibtn_move<=0   );
+         _drawBtn(tar,2,2,spr_b_patrol ,false   ,ui_uibtn_move<=0   );
 
-         _drawBtn(tar,0,3,spr_b_cancel ,false  ,false              );
-         _drawBtn(tar,1,3,spr_b_selall ,false  ,ui_orders_n[MaxUnitGroups]  <=0);
-         _drawBtn(tar,2,3,spr_b_delete ,false  ,(ucl_cs[false]+ucl_cs[true])<=0);
+         _drawBtn(tar,0,3,spr_b_cancel ,false   ,false              );
+         _drawBtn(tar,1,3,spr_b_selall ,false   ,ui_orders_n[MaxUnitGroups]  <=0);
+         _drawBtn(tar,2,3,spr_b_delete ,false   ,(ucl_cs[false]+ucl_cs[true])<=0);
+
+         _drawBtn(tar,1,4,spr_b_rclck  ,m_action,false             );
       end;
 
       end;
@@ -522,7 +524,7 @@ begin
            end
            else
            begin
-              uid:=_ReplaceUid(ui_panel_uids[race,ui_tab,i],@_players[HPlayer]);
+              uid:=ui_panel_uids[race,ui_tab,i];
               if(uid>0)then
               case ui_tab of
               0,1: begin
@@ -585,13 +587,21 @@ begin
    if(GameGetStatus(@str,@col))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
    // TIMER
-   D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time);
+   D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time,c_white);
 
    // INVASION
-   if(g_mode=gm_invasion)then
-   begin
-      D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_wave_t_next,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time);
-      if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+   case g_mode of
+gm_invasion: begin
+                D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_wave_t_next,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time,c_white);
+                if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+             end;
+gm_koth    : with g_cpoints[1] do
+              if(cpTimer<=0)
+              then _draw_text(tar,ui_textx,ui_texty+font_3hw,str_kothtime+'---',ta_left,255,c_white)
+              else
+                if(r_blink2_colorb)
+                then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
+                else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
    d_OrderIcons(tar);

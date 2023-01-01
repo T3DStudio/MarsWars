@@ -60,11 +60,7 @@ begin
    _gHKR:='';
    if(ucl<=_mhkeys)then
     if(_hotkeyR[ucl]>0)then
-    begin
-       if(_hotkeyR2[ucl]>0)then
-       _gHKR:=      tc_lime+GetKeyName(_hotkeyR2[ucl])+tc_default+'+';
-       _gHKR:=_gHKR+tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
-    end;
+     _gHKR:=tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
 end;
 
 procedure _mkHStrACT(ucl:byte;hint:shortstring);
@@ -226,7 +222,7 @@ begin
          if(_ruid1>0)then if(_ruid1n<=1)then _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
          if(_ruid2>0)then if(_ruid2n<=1)then _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
          if(_ruid3>0)then if(_ruid3n<=1)then _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name+'(x'+b2s(_ruid3n)+')');
-         if(_rupgr>0)then if(_rupgrn<=1)then _ADDSTRC(@REQ,_upids[_rupgr]._up_name   ) else _ADDSTRC(@REQ,_upids[_rupgr]._up_name   +'(x'+b2s(_rupgrn)+')');
+         if(_rupgr>0)then if(_rupgrl<=1)then _ADDSTRC(@REQ,_upids[_rupgr]._up_name   ) else _ADDSTRC(@REQ,_upids[_rupgr]._up_name   +'(x'+b2s(_rupgrl)+')');
 
          if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
          if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
@@ -361,6 +357,7 @@ begin
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
    str_ColoredShadow     := 'Colored shadows';
+   str_kothtime          := 'Center capture time: ';
 
    str_cant_build        := 'Can`t build here!';
    str_need_energy       := 'Need more energy!';
@@ -485,22 +482,24 @@ begin
    str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
 
-   _mkHStrUid(UID_HKeep         ,'Hell Keep'          ,'Builder. Generates energy.'   );
-   _mkHStrUid(UID_HGate         ,'Hell Gate'          ,'Summons units.'               );
-   _mkHStrUid(UID_HSymbol       ,'Hell Symbol'        ,'Increase energy level.'       );
-   _mkHStrUid(UID_HASymbol      ,'Hell Great Symbol'  ,'Increase energy level.'       );
-   _mkHStrUid(UID_HPools        ,'Hell Pools'         ,'Researches and upgrades.'     );
-   _mkHStrUid(UID_HTower        ,'Hell Tower'         ,'Defensive structure.'         );
-   _mkHStrUid(UID_HTeleport     ,'Hell Teleport'      ,'Teleports units.'             );
-   _mkHStrUid(UID_HPentagram    ,'Hell Pentagram'     ,''              );
-   _mkHStrUid(UID_HMonastery    ,'Hell Monastery'     ,''              );
-   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Casts "Hell Vision"  effect on units. Detector.' );
-   _mkHStrUid(UID_HTotem        ,'Hell Totem'         ,'Advanced defensive structure.');
-   _mkHStrUid(UID_HAltar        ,'Hell Altar'         ,'Casts "Invulnerability" effect on units.'        );
-   _mkHStrUid(UID_HFortress     ,'Hell Fortress'      ,'Upgrades production buildings. Generates energy.');
-   _mkHStrUid(UID_HCommandCenter,'Hell Command Center','Corrupted UAC Command Center. Builder. Generates energy.');
-   _mkHStrUid(UID_HBarracks     ,'Hell Barracks'      ,'Corrupted UAC Barracks. Creates zombies.' );
-   _mkHStrUid(UID_HEye          ,'Hell Eye'           ,'Detection.');
+   _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'Builder. Generates energy.'   );
+   _mkHStrUid(UID_HAKeep         ,'Hell Great Keep'             ,'Builder. Generates energy.'   );
+   _mkHStrUid(UID_HGate          ,'Hell Gate'                   ,'Summons units.'               );
+   _mkHStrUid(UID_HSymbol        ,'Hell Symbol'                 ,'Increase energy level.'       );
+   _mkHStrUid(UID_HASymbol       ,'Hell Great Symbol'           ,'Increase energy level.'       );
+   _mkHStrUid(UID_HPools         ,'Hell Pools'                  ,'Researches and upgrades.'     );
+   _mkHStrUid(UID_HTower         ,'Hell Tower'                  ,'Defensive structure.'         );
+   _mkHStrUid(UID_HTeleport      ,'Hell Teleport'               ,'Teleports units.'             );
+   _mkHStrUid(UID_HPentagram     ,'Hell Pentagram'              ,''                             );
+   _mkHStrUid(UID_HMonastery     ,'Hell Monastery'              ,''                             );
+   _mkHStrUid(UID_HEye           ,'Hell Eye'                    ,'Casts "Hell Vision"  effect on units. Detector.' );
+   _mkHStrUid(UID_HTotem         ,'Hell Totem'                  ,'Advanced defensive structure.');
+   _mkHStrUid(UID_HAltar         ,'Hell Altar'                  ,'Casts "Invulnerability" effect on units.'        );
+   _mkHStrUid(UID_HFortress      ,'Hell Fortress'               ,'Upgrades production buildings. Generates energy.');
+   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted UAC Command Center. Builder. Generates energy.');
+   _mkHStrUid(UID_HACommandCenter,'Hell Advanced Command Center','Corrupted UAC Advanced Command Center. Builder. Generates energy.');
+   _mkHStrUid(UID_HBarracks      ,'Hell Barracks'               ,'Corrupted UAC Barracks. Creates zombies.' );
+   _mkHStrUid(UID_HEye           ,'Hell Eye'                    ,'Detection.'                  );
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'      ,'');
    _mkHStrUid(UID_Imp            ,'Imp'            ,'');
@@ -527,11 +526,11 @@ begin
    _mkHStrUid(UID_ZBFG           ,'Zombie BFG'     ,'');
 
 
-   _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease cooldown time of Hell Teleport.'                           );
+   _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease cooldown time of Hell Teleport.'                        );
    _mkHStrUpid(upgr_hell_b478tel  ,'Tower teleportation'            ,'Hell Towers and Hell Totems can teleporting to short distance.'  );
 
 
-   _mkHStrUpid(upgr_hell_t1attack  ,'Hell Firepower'             ,'Increase the damage of ranged attacks.'                              );
+   _mkHStrUpid(upgr_hell_t1attack ,'Hell Firepower'             ,'Increase the damage of ranged attacks.'                              );
    _mkHStrUpid(upgr_hell_uarmor   ,'Combat Flesh'               ,'Increase the armor of Hell`s units.'                                 );
    _mkHStrUpid(upgr_hell_barmor   ,'Stone Walls'                ,'Increase the armor of Hell`s buildings.'                             );
    _mkHStrUpid(upgr_hell_mattack  ,'Claws and Teeth'            ,'Increase the damage of melee attacks.'                               );
@@ -558,6 +557,7 @@ begin
    _mkHStrUpid(upgr_9bld    ,'Hell Fortress upgrade'          ,'Decrease Fortress cooldown time.'                                );  }
 
    _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,'Builder. Generates energy.'      );
+   _mkHStrUid(UID_UACommandCenter  ,'UAC Advanced Command Center','Builder. Generates energy.'      );
    _mkHStrUid(UID_UBarracks        ,'UAC Barracks'               ,'Produces infantry units.'        );
    _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,'Produces mech units.'            );
    _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,'Increase energy level.'          );
@@ -621,9 +621,9 @@ begin
    _mkHStrUpid(upgr_bldenrg ,'Built-in generator'     ,'Additional energy for UAC Command Center.'        );
    _mkHStrUpid(upgr_9bld    ,'UAC Nuclear Plant upgrade','Decrease UAC Nuclear Plant cooldown time.'      ); }
 
-   _mkHStrACT(0 ,'Action ');
-   _mkHStrACT(1 ,'Action at point ');
-   _mkHStrACT(2 ,str_maction);
+   _mkHStrACT(0 ,'Action');
+   _mkHStrACT(1 ,'Action at point');
+   _mkHStrACT(2 ,'Rebuild/Advance');
    t:='attack enemies';
    _mkHStrACT(3 ,'Move, '  +t);
    _mkHStrACT(4 ,'Stop, '  +t);
@@ -635,7 +635,7 @@ begin
    _mkHStrACT(9 ,'Cancel production');
    _mkHStrACT(10,'Select all units' );
    _mkHStrACT(11,'Destroy'          );
-
+   _mkHStrACT(13,str_maction);
 
    _mkHStrREQ(0 ,'Faster game speed'    ,false);
    _mkHStrREQ(1 ,'Left click: skip 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
@@ -846,6 +846,7 @@ begin
   str_uprod             := 'Создается в: ';
   str_bprod             := 'Строит: ';
   str_ColoredShadow     := 'Цветные тени юнитов';
+  str_kothtime          := 'Время захвата центра: ';
 
   str_cant_build        := 'Нельзя строить здесь!';
   str_need_energy       := 'Необходимо больше энергии!';
@@ -1027,7 +1028,7 @@ begin
 
   _mkHStrACT(0 ,'Действие');
   _mkHStrACT(1 ,'Действие в точке');
-  _mkHStrACT(2 ,str_maction);
+  _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
   _mkHStrACT(3 ,'Двигаться, '    +t);
   _mkHStrACT(4 ,'Стоять, '       +t);
@@ -1039,7 +1040,7 @@ begin
   _mkHStrACT(9 ,'Отмена производства');
   _mkHStrACT(10,'Выбрать всех боевых незанятых юнитов');
   _mkHStrACT(11,'Уничтожить');
-
+  _mkHStrACT(13,str_maction);
 
   _mkHStrREQ(0 ,'Включить/выключить ускоренный просмотр',false);
   _mkHStrREQ(1 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'W'+tc_default+')'+tc_nl1+

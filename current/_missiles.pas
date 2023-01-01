@@ -184,6 +184,16 @@ begin
       tu:=nil;
       _IsUnitRange(tar,@tu);
 
+      with _players[player] do
+       case mid of
+MID_URocketS,
+MID_URocket : begin
+                 if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
+                 if(tu<>nil)then
+                  if(not tu^.ukfly)then mid:=MID_URocket;
+              end;
+       end;
+
       case mid of
 MID_Imp        : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Cacodemon  : begin damage:=BaseDamage1h ; vstep:=d div 15; splashr :=0  ;         end;
@@ -216,22 +226,12 @@ MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;   
 
       hvstep:=vstep div 2;
 
+      damage+=adddmg;
+
       if(mtars=0)then
        if(tar<=0)or(splashr>0)
        then mtars:=MaxUnits
        else mtars:=1;
-
-      damage+=adddmg;
-
-      with _players[player] do
-       case mid of
-MID_URocketS,
-MID_URocket : begin
-                 if(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
-                 if(tu<>nil)then
-                  if(not tu^.ukfly)then mid:=MID_URocket;
-              end;
-       end;
 
       if(homing=mh_none)then
        case mid of

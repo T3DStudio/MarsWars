@@ -401,7 +401,8 @@ lmt_unit_ready        : with _uids[uid] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
-lmt_req_common        : SoundPlayAnoncer(snd_cant_order[race],true);
+lmt_req_common,
+lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
 lmt_unit_attacked     : with _uids[uid] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);

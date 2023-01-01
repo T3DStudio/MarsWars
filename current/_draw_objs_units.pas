@@ -73,7 +73,7 @@ begin
            and((vid_fog_sy-r)<=y)and(y<=(vid_fog_ey+r));
 end;
 
-procedure _unit_sfog(pu:PTUnit);
+procedure _unit_ForXY(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -224,9 +224,9 @@ begin
          if(sel)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            if(_canability(pu)=0)
-            or(apcc>0)
-            or((level=0)and(_isbarrack or _issmith)and(uid_x[uid_race_9bld[race]]>0))then ui_uibtn_action+=1;
+            if(_canAbility(pu)=0)
+            or(apcc>0)           then ui_uibtn_action +=1;
+            if(_canRebuild(pu)=0)then ui_uibtn_rebuild+=1;
          end;
       end
       else
@@ -386,7 +386,7 @@ begin
 
          if(spr=pspr_dummy)then exit;
 
-         depth:=_unit_shadowz(pu)-shadow;
+         depth:=_unit_CalcShadowZ(pu)-shadow;
          t:=sign(depth);
          if(depth<-1)then t*=2;
          shadow+=t;
@@ -513,6 +513,7 @@ begin
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
    ui_uibtn_action   :=0;
+   ui_uibtn_rebuild  :=0;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];
    ui_bprod_first    :=0;

@@ -555,6 +555,7 @@ begin
    spr_b_paction  := LoadBtn('b_paction',vid_bw);
    spr_b_delete   := LoadBtn('b_destroy',vid_bw);
    spr_b_attack   := LoadBtn('b_attack' ,vid_bw);
+   spr_b_rebuild  := LoadBtn('b_rebuild',vid_bw);
    spr_b_move     := LoadBtn('b_move'   ,vid_bw);
    spr_b_patrol   := LoadBtn('b_patrol' ,vid_bw);
    spr_b_apatrol  := LoadBtn('b_apatrol',vid_bw);
@@ -627,6 +628,7 @@ begin
 
 
    _LoadMWSModel(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
@@ -640,14 +642,16 @@ begin
    _LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HCC            ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HMUnit         ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HMUnita        ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HBarracks      ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HABarracks     ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
    _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
 
    _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UMilitaryUnit  ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAMilitaryUnit ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UBarracks      ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UABarracks     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding,firstload);
    _LoadMWSModel(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
@@ -706,8 +710,6 @@ begin
    _lstr(@spr_hvision   ,effects_folder+'hvision',firstload,true);
    _lstr(@spr_scan      ,effects_folder+'scan'   ,firstload,true);
    _lstr(@spr_decay     ,effects_folder+'decay'  ,firstload,true);
-
-
 
    _lstr(@spr_cp_out    ,'cp_out',firstload,true);
    _lstr(@spr_cp_gen    ,'cp_gen',firstload,true);

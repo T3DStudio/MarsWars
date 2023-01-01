@@ -36,7 +36,7 @@ begin
    then d_Menu
    else d_Game;
 
-   //_drawMWSModel(@spr_HCC);
+   //_drawMWSModel(@spr_HCommandCenter);
 
    n:=0;
    with _players[HPlayer] do

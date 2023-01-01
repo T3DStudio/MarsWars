@@ -1,18 +1,18 @@
 
 {$IFDEF _FULLGAME}
-function _unit_shadowz(pu:PTUnit):integer;
+function _unit_CalcShadowZ(pu:PTUnit):integer;
 begin
    with pu^  do
     with uid^ do
      if(_ukbuilding=false)
-     then _unit_shadowz:=fly_height[ukfly]
+     then _unit_CalcShadowZ:=fly_height[ukfly]
      else
        if(speed<=0)or(bld=false)
-       then _unit_shadowz:=-fly_hz   // no shadow
-       else _unit_shadowz:=0;
+       then _unit_CalcShadowZ:=-fly_hz   // no shadow
+       else _unit_CalcShadowZ:=0;
 end;
 
-procedure _unit_fog_r(pu:PTUnit);
+procedure _unit_CalcForR(pu:PTUnit);
 begin
    with pu^ do fsr:=mm3(0,srange div fog_cw,MFogM);
 end;
@@ -42,9 +42,9 @@ begin
          {$IFDEF _FULLGAME}
          mmr   := trunc(_r*map_mmcx)+1;
          animw := _animw;
-         shadow:= _unit_shadowz(pu);
+         shadow:= _unit_CalcShadowZ(pu);
 
-         _unit_fog_r(pu);
+         _unit_CalcForR(pu);
          {$ENDIF}
          hits:=_mhits;
       end;
@@ -115,23 +115,31 @@ begin
 
       case i of
 //         HELL BUILDINGS   ////////////////////////////////////////////////////
-UID_HKeep:
+UID_HKeep,
+UID_HAKeep:
 begin
    _mhits     := 15000;
    _renergy   := 900;
-   _genergy   := 300;
    _r         := 66;
    _srange    := 280;
    _ucl       := 0;
    _btime     := ptime3;
    _ukbuilding:= true;
    _isbuilder := true;
-   ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HASymbol];
+   ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HASymbol,UID_HAKeep];
    _upgr_srange     :=upgr_hell_buildr;
    _upgr_srange_step:=40;
    _ability         :=uab_HKeepBlink;
    _ability_rupgr   :=upgr_hell_HKTeleport;
    _ability_rupgrl  :=1;
+   if(i=UID_HAKeep)
+   then _genergy := 600
+   else
+   begin
+      _genergy    := 300;
+      _rebuild_uid:= UID_HAKeep;
+      _rebuild_hpstart:=6;
+   end;
 end;
 
 UID_HGate:
@@ -145,6 +153,10 @@ begin
    _ukbuilding:= true;
    _isbarrack := true;
    ups_units  := [UID_Imp..UID_Archvile];
+   _rebuild_uid  := i;
+   _rebuild_level:= 1;
+   _rebuild_ruid := UID_HFortress;
+   _rebuild_hpstart:=4;
 end;
 
 UID_HSymbol,
@@ -164,7 +176,11 @@ begin
       _genergy:= _renergy;
       _renergy:= 0;
    end
-   else _ability:=uab_Rebuild;
+   else
+   begin
+      _rebuild_uid:=UID_HASymbol;
+      _rebuild_hpstart:=4;
+   end;
 end;
 
 UID_HPools:
@@ -177,6 +193,10 @@ begin
    _ukbuilding:= true;
    _issmith   := true;
    ups_upgrades := [];
+   _rebuild_uid  := i;
+   _rebuild_level:= 1;
+   _rebuild_ruid := UID_HFortress;
+   _rebuild_hpstart:=4;
 end;
 
 UID_HPentagram:
@@ -236,7 +256,8 @@ begin
    _ruid2     := UID_HMonastery;
    _ruid3     := UID_HFortress;
    _ukbuilding:= true;
-   _ability   := uab_HInvulnerability;
+   _ability      := uab_HInvulnerability;
+   _ability_rupgr:= upgr_hell_invuln;
 end;
 
 UID_HTower:
@@ -684,7 +705,8 @@ begin
    _uklight   := true;
    _ukfly     := true;
    _ruid1     := UID_HBarracks;
-   _ruid1n    := 3;
+   _ruid1n    := 2;
+   _ruid2     := UID_HACommandCenter;
    _fdeathhits(fdead_hits_border);
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps1_4,MID_BPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any ,uids_all,[],0,0,wtp_unit_mech,4);
 end;
@@ -702,7 +724,7 @@ begin
    _uklight   := false;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 4;
-   _ruid2     := UID_HCommandCenter;
+   _ruid2     := UID_HACommandCenter;
    _ruid2n    := 2;
    _limituse  := ul2;
    _fdeathhits(fdead_hits_border);
@@ -711,16 +733,17 @@ end;
 
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
 UID_HCommandCenter,
-UID_UCommandCenter:
+UID_HACommandCenter,
+UID_UCommandCenter,
+UID_UACommandCenter:
 begin
    _mhits     := 15000;
    _renergy   := 900;
-   _genergy   := 300;
    _speed     := 0;
    _r         := 66;
    _srange    := 280;
    _ucl       := 0;
-   _btime     := ptime4;
+   _btime     := ptime3;
    _attack    := atm_always;
    _ability   := uab_CCFly;
    _ukbuilding:= true;
@@ -728,25 +751,44 @@ begin
    _slowturn  := false;
    _upgr_srange_step:= 40;
 
-   if(i=UID_HCommandCenter)then
+   if(i=UID_HCommandCenter )
+   or(i=UID_HACommandCenter)then
    begin
       _ucl             := 3;
       _apcm            := 30;
-      ups_builder      :=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HEye,UID_HBarracks];
+      ups_builder      :=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HEye,UID_HBarracks]-[UID_HACommandCenter];
       ups_apc          :=uids_demons;
       _ruid1           := UID_HCommandCenter;
       _upgr_srange     :=upgr_hell_buildr;
       _weapon(0,wpt_missle,_srange,_r,0,fr_fps1  ,MID_Imp      ,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_unit_bio_nlight,0);
       _weapon(1,wpt_missle,_srange,_r,0,fr_fps1_4,MID_Cacodemon,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,         [UID_Imp],[],3,-65,wtp_nolost_hits    ,0);
+
+      if(i=UID_HACommandCenter)
+      then _genergy := 600
+      else
+      begin
+         _genergy    := 300;
+         _rebuild_uid:= UID_HACommandCenter;
+         _rebuild_hpstart:=6;
+      end;
    end
    else
    begin
       _ability_rupgr   := upgr_uac_CCFly;
       _ability_rupgrl  := 1;
       _zombie_uid      := UID_HCommandCenter;
-      ups_builder      :=[UID_UCommandCenter..UID_UNuclearPlant]-[UID_UAGenerator];
+      ups_builder      :=[UID_UCommandCenter..UID_UNuclearPlant]-[UID_UAGenerator,UID_UACommandCenter];
       _upgr_srange     := upgr_uac_buildr;
       _weapon(0,wpt_missle,_srange,_r,0 ,fr_fpsh,MID_BPlasma,0,upgr_uac_ccturr,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,wtp_unit_mech,2);
+
+      if(i=UID_UACommandCenter)
+      then _genergy := 600
+      else
+      begin
+         _genergy    := 300;
+         _rebuild_uid:= UID_UACommandCenter;
+         _rebuild_hpstart:=6;
+      end;
    end;
 end;
 
@@ -760,17 +802,22 @@ begin
    _btime     := ptime2;
    _ukbuilding:= true;
    _isbarrack := true;
+   _rebuild_uid  := i;
+   _rebuild_level:= 1;
+   _rebuild_hpstart:=4;
 
    if(i=UID_HBarracks)then
    begin
-      _ucl       := 4;
-      ups_units  := uids_zimbas+[UID_LostSoul];
-      _ruid1     := UID_HCommandCenter;
+      _ucl         := 4;
+      ups_units    := uids_zimbas+[UID_LostSoul];
+      _ruid1       := UID_HCommandCenter;
+      //_rebuild_ruid:= UID_HFortress;
    end
    else
    begin
-      ups_units  := uids_marines;
-      _zombie_uid:= UID_HBarracks;
+      ups_units    := uids_marines;
+      _zombie_uid  := UID_HBarracks;
+      _rebuild_ruid:= UID_UNuclearPlant;
    end;
 end;
 UID_UFactory:
@@ -783,6 +830,10 @@ begin
    _ukbuilding:= true;
    _isbarrack := true;
    _ruid1     := UID_UWeaponFactory;
+   _rebuild_uid  := i;
+   _rebuild_level:= 1;
+   _rebuild_ruid := UID_UNuclearPlant;
+   _rebuild_hpstart:=4;
 
    ups_units:=[UID_APC,UID_FAPC,UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 end;
@@ -804,7 +855,11 @@ begin
       _genergy:=_renergy;
       _renergy:= 0;
    end
-   else _ability:= uab_Rebuild;
+   else
+   begin
+      _rebuild_uid:=UID_UAGenerator;
+      _rebuild_hpstart:=4;
+   end;
 end;
 
 UID_UWeaponFactory:
@@ -818,6 +873,11 @@ begin
    _issmith   := true;
 
    ups_upgrades := [];
+
+   _rebuild_uid  := i;
+   _rebuild_level:= 1;
+   _rebuild_ruid := UID_UNuclearPlant;
+   _rebuild_hpstart:=4;
 end;
 
 UID_UTechCenter :
@@ -867,6 +927,7 @@ begin
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UNuclearPlant;
    _ability   := uab_UACStrike;
+   _ability_rupgr:= upgr_uac_rstrike;
    _ukbuilding:= true;
 end;
 
@@ -881,9 +942,10 @@ begin
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
-   _ability   := uab_Rebuild;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;
+   _rebuild_uid    := UID_UATurret;
+   _rebuild_hpstart:= 2;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps1_4,MID_Chaingun,0,0              ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground_light_bio,wpr_any,uids_all,[],0,-10,wtp_hits          ,2);
    _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fps1_4,MID_BPlasma ,0,upgr_uac_plasmt,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground_mech     ,wpr_any,uids_all,[],0,-10,wtp_hits          ,2);
    _weapon(2,wpt_missle,aw_srange,0,0 ,fr_fps1_4,MID_Chaingun,0,0              ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground          ,wpr_any,uids_all,[],0,-10,wtp_unit_bio_light,2);
@@ -899,7 +961,8 @@ begin
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
-   _ability   := uab_Rebuild;
+   _rebuild_uid    := UID_UGTurret;
+   _rebuild_hpstart:= 2;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_URocket,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any ,uids_all      ,[],0,-10,wtp_nolost_hits,0);
@@ -1106,8 +1169,10 @@ begin
    _attack    := atm_always;
    _ukmech    := true;
    _uklight   := true;
-   _ability   := uab_Rebuild2Turret;
-   _ability_rupgr:=upgr_uac_botturret;
+   _ability   := uab_RebuildInPoint;
+   _rebuild_uid    :=UID_UGTurret;
+   _rebuild_rupgr  :=upgr_uac_botturret;
+   _rebuild_hpstart:=3;
    _fdeathhits(1);
    _weapon(0,wpt_missle,aw_fsr+25,0,0 ,fr_fps1_4,MID_BPlasma,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_unit_mech,2);
 end;
@@ -1259,8 +1324,9 @@ end;
       if(_ruid1>0)and(_ruid1n=0)then _ruid1n:=1;
       if(_ruid2>0)and(_ruid2n=0)then _ruid2n:=1;
       if(_ruid3>0)and(_ruid3n=0)then _ruid3n:=1;
-      if(_rupgr>0)and(_rupgrn=0)then _rupgrn:=1;
+      if(_rupgr>0)and(_rupgrl=0)then _rupgrl:=1;
       if(_ability_rupgr>0)and(_ability_rupgrl=0)then _ability_rupgrl:=1;
+      if(_rebuild_rupgr>0)and(_rebuild_rupgrl=0)then _rebuild_rupgrl:=1;
 
       _painc_upgr:=(_painc div 2)+(_painc mod 2);
 
@@ -1271,12 +1337,6 @@ end;
        for u:=1 to 255 do
         with _upids[u] do
          if(_up_time>0)and(_urace=_up_race)then ups_upgrades+=[u];
-
-      if(_isbarrack)or(_issmith)then
-      begin
-         _ability     :=uab_ProdLevelUp;
-         _ability_ruid:=uid_race_9bld[_urace];
-      end;
 
       if(_ukbuilding)then
       begin

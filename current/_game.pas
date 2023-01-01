@@ -472,50 +472,29 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
    end;
 end;
 
-procedure GameEndConditions;
-var p:byte;
+procedure GameDefaultEndConditions;
+var p,wteam_last,wteams_n: byte;
+teams_army: array[0..MaxPlayers] of integer;
 begin
-   if(not G_Started)
-   or(G_Status=gs_running)
-   or(not ServerSide)then exit;
-
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
-   g_player_status:=0;
+   FillChar(teams_army,SizeOf(teams_army),0);
+
+   wteam_last:=255;
+   wteams_n  :=0;
+
    for p:=0 to MaxPlayers do
     with _players[p] do
-     if(army>0)and(state>ps_none)then g_player_status:=g_player_status or (1 shl p);
+     teams_army[team]+=army;
 
-  { if(G_WTeam=255)then
-   begin
-      FillChar(team_army,SizeOf(team_army),0);
-      G_WTeam:=255;
-      for p:=0 to MaxPlayers do
-       with _players[p] do
-        if(state>ps_none)then team_army[team]+=army;
+   for p:=0 to MaxPlayers do
+    if(teams_army[p]>0)then
+    begin
+       wteam_last:=p;
+       wteams_n  +=1;
+    end;
 
-      {$IFDEF _FULLGAME}
-      if(menu_s2=ms2_camp)
-      then //cmp_code
-      else
-      {$ENDIF}
-       if(g_mode<>gm_invasion)then
-        for p:=0 to MaxPlayers do
-         if(team_army[p]>0)then
-          if(G_WTeam<255)then
-          begin
-             G_WTeam:=255;
-             break;
-          end
-          else G_WTeam:=p;
-   end
-   else
-   begin
-      G_Paused:=1;
-      {$IFDEF _FULLGAME}
-      r_draw:=true;
-      {$ENDIF}
-   end; }
+   if(wteams_n=1)then GameSetStatusWinnerTeam(wteam_last);
 end;
 
 procedure PlayersCycle;
@@ -550,10 +529,8 @@ begin
            PlayerExecuteOrder(p);
 
            if(prod_error_cndt>0)then
-           begin
-              GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
-              prod_error_cndt:=0;
-           end;
+             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
+           prod_error_cndt  :=0;
         end;
      end;
 end;
@@ -713,139 +690,6 @@ begin
       end;
    end
    else if(g_inv_wave_t_curr<max_wave_time)then g_inv_wave_t_curr+=1;
-
-
-   {
-   if(_players[0].army=0)then
-   begin
-      if(g_inv_wave_t_next=0)then
-      begin
-         if(g_inv_wn=20)
-         then G_WTeam:=1
-         else
-         begin
-            inc(g_inv_wn,1);
-            g_inv_CalcWave;
-         end;
-      end
-      else
-      begin
-         dec(g_inv_wave_t_next,1);
-         if(g_inv_wave_t_next=0)then
-         begin
-            {$IFDEF _FULLGAME}
-            PlaySND(snd_teleport,nil);
-            {$ENDIF}
-            for i:=1 to g_inv_mn do
-            begin
-               case g_inv_wn of
-               1 : mon:=UID_ZFormer;
-               2 : case i mod 2 of
-                   0 : mon:=UID_ZFormer;
-                   1 : mon:=UID_ZSergant;
-                   end;
-               3 : case i mod 7 of
-                   0 : mon:=UID_ZFormer;
-                   1 : mon:=UID_ZSergant;
-                   2 : mon:=UID_ZCommando;
-                   3 : mon:=UID_ZAntiaircrafter;
-                   4 : mon:=UID_ZMajor;
-                   5 : mon:=UID_ZBFG;
-                   end;
-               4 : case i of
-                   1..10: mon:=UID_Baron
-                   else
-                       case i mod 7 of
-                       0 : mon:=UID_ZFormer;
-                       1 : mon:=UID_ZSergant;
-                       2 : mon:=UID_ZCommando;
-                       3 : mon:=UID_ZAntiaircrafter;
-                       4 : mon:=UID_ZMajor;
-                       5 : mon:=UID_ZBFG;
-                       end;
-                   end;
-               5 : case i of
-                   1   : mon:=UID_Cyberdemon;
-                   else
-                       case i mod 7 of
-                       0 : mon:=UID_ZFormer;
-                       1 : mon:=UID_ZSergant;
-                       2 : mon:=UID_ZCommando;
-                       3 : mon:=UID_ZAntiaircrafter;
-                       4 : mon:=UID_ZMajor;
-                       5 : mon:=UID_ZBFG;
-                       end;
-                   end;
-               6 : mon:=UID_Demon;
-               7 : mon:=UID_CacoDemon;
-               else
-                  if(i<(g_inv_wn*2))then
-                    case i mod 2 of
-                    0: mon:=UID_Cyberdemon;
-                    1: mon:=UID_Mastermind;
-                    end
-                  else
-                    case i mod g_inv_wn of
-                    0 : mon:=UID_ZFormer;
-                    1 : mon:=UID_ZSergant;
-                    2 : mon:=UID_ZCommando;
-                    3 : mon:=UID_ZAntiaircrafter;
-                    4 : mon:=UID_ZMajor;
-                    5 : mon:=UID_ZBFG;
-                    6 : mon:=UID_Imp;
-                    7 : mon:=UID_Revenant;
-                    8 : mon:=UID_Demon;
-                    9 : mon:=UID_Commando;
-                    10: mon:=UID_Terminator;
-                    11: mon:=UID_Flyer;
-                    12: mon:=UID_Arachnotron;
-                    13: mon:=UID_Mancubus;
-                    14: mon:=UID_Archvile;
-                    15: mon:=UID_ZCommando;
-                    16: mon:=UID_ZAntiaircrafter;
-                    17: mon:=UID_ZMajor;
-                    18: mon:=UID_Pain;
-                    else
-                        mon:=UID_Baron;
-                    end;
-               end;
-
-               if(random(2)=0)then
-               begin
-                  if(random(2)=0)
-                  then tx:=map_mw
-                  else tx:=0;
-                  ty:=random(map_mw);
-               end
-               else
-               begin
-                  if(random(2)=0)
-                  then ty:=map_mw
-                  else ty:=0;
-                  tx:=random(map_mw);
-               end;
-
-               _unit_add(tx,ty,mon,0,true);
-               with _lcup^ do
-               begin
-                  {$IFDEF _FULLGAME}
-                  _effect_add(vx,vy,vy+map_flydpth[uf]+1,EID_Teleport);
-                  {$ENDIF}
-                  if(g_inv_wn>8)then
-                   if((i mod 11)=0)then
-                   begin
-                      buff[ub_Invis ]:=_bufinf;
-                      buff[ub_Detect]:=_bufinf;
-                   end;
-                  buff[ub_advanced ]:=_bufinf;
-                  //painc:=5*painc;
-                  order:=2;
-               end;
-            end;
-         end;
-      end;
-   end
-   else if(g_inv_wt<max_wave_time)then inc(g_inv_wt,1); }
 end;
 
 procedure CPoint_ChangeOwner(i,newOwnerTeam:byte);
@@ -875,7 +719,10 @@ begin
 end;
 
 procedure GameModeCPoints;
-var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams:integer;
+var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams,
+wteam,
+wteam_n   ,
+cp_captured_n :integer;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
@@ -896,8 +743,8 @@ begin
 
        cpunitsp_pstate:=cpUnitsPlayer;
        cpunitst_pstate:=cpUnitsTeam;
-       iOwnerTeam  :=cpOwnerTeam;
-       iOwnerPlayer:=cpOwnerPlayer;
+       iOwnerTeam     :=cpOwnerTeam;
+       iOwnerPlayer   :=cpOwnerPlayer;
        iArmy :=0;
        iTeams:=0;
        for p:=0 to MaxPlayers do
@@ -941,15 +788,26 @@ begin
           end;
     end;
 
-   {if(e=MaxCPoints)and(G_WTeam=255)then
-   begin
-      G_WTeam:=t;
-      for i:=1 to MaxUnits do
-       with _units[i] do
-        if(hits>0)and(inapc=0)then
-         with player^ do
-          if(team<>t)then _unit_kill(@_units[i],false,false);
-   end; }
+   wteam        :=0;
+   wteam_n      :=0;
+   cp_captured_n:=0;
+
+   for i:=1 to MaxCPoints do
+    with g_cpoints[i] do
+     if(cpCapturer>0)and(cpenergy<=0)then
+     begin
+        cp_captured_n+=1;
+        if(cpOwnerTeam>0)then
+        begin
+           if(wteam=0)
+           or(wteam<>cpOwnerTeam)
+           then wteam_n:=0;
+           wteam  :=cpOwnerTeam;
+           wteam_n+=1;
+        end;
+     end;
+
+   if(cp_captured_n>0)and(wteam_n=cp_captured_n)then GameSetStatusWinnerTeam(wteam);
 end;
 
 {$include _net_game.pas}
@@ -998,10 +856,15 @@ begin
          GameModeCPoints;
          case g_mode of
          gm_invasion  : GameModeInvasion;
-         gm_royale    : if(_cycle_order=0)then
-                         if(g_royal_r>0)then g_royal_r-=1;
+         gm_royale    : begin
+                           if(_cycle_order=0)then
+                            if(g_royal_r>0)then g_royal_r-=1;
+                           GameDefaultEndConditions;
+                        end;
+         gm_capture,
+         gm_KotH      : ;
+         else           //GameDefaultEndConditions;
          end;
-         GameEndConditions;
       end;
       _obj_cycle;
    end;

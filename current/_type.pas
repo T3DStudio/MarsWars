@@ -227,9 +227,12 @@ TUID = record
    _upgr_srange,
    _upgr_armor,
    _upgr_regen,
-   _replace_uid,
-   _replace_ruid,
-   _replace_rpuid,
+   _rebuild_uid,
+   _rebuild_level,
+   _rebuild_hpstart,
+   _rebuild_ruid,
+   _rebuild_rupgr,
+   _rebuild_rupgrl,
    _zombie_uid,
    _death_missile,
    _urace,
@@ -241,7 +244,7 @@ TUID = record
    _ruid3,
    _ruid3n,
    _rupgr,
-   _rupgrn      : byte;
+   _rupgrl      : byte;
 
    _shots2advanced
                 : byte;
@@ -350,7 +353,7 @@ TLogMes = record
    uidt,
    uid  :byte;
    str  :shortstring;
-   x,y  :integer;
+   xi,yi:integer;
 end;
 PTLogMes = ^TLogMes;
 
@@ -453,10 +456,10 @@ o_x1,o_y1  :integer;
    nport   : word;
 
    prod_error_cndt: cardinal;
-   prod_error_x,
-   prod_error_y,
    prod_error_utp,
    prod_error_uid : byte;
+   prod_error_x,
+   prod_error_y   : integer;
 
    net_logsend_pause
            : integer;

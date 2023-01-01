@@ -42,10 +42,10 @@ begin
               uo_y :=y;
               dir  :=270;
               hits :=_mhits;
-              buff[ub_Resurect   ]:=0;
+              buff[ub_Resurect]:=0;
               buff[ub_Summoned]:=fr_fps1;
               {$IFDEF _FULLGAME}
-              _unit_fog_r(pu);
+              _unit_CalcForR(pu);
               _unit_summon_effects(pu,nil);
               {$ENDIF}
            end;
@@ -127,6 +127,7 @@ function _unit_morph(pu:PTUnit;ouid:byte;obld:boolean;bhits:integer;ulevel:byte)
 var puid: PTUID;
     avsni,
     avsnt: TUnitVisionData;
+   select: boolean;
 begin
    _unit_morph:=0;
    with pu^     do
@@ -138,9 +139,10 @@ begin
          exit;
       end;
 
-      puid :=@_uids[ouid];
-      avsni:=vsni;
-      avsnt:=vsnt;
+      puid  :=@_uids[ouid];
+      avsni :=vsni;
+      avsnt :=vsnt;
+      select:=sel;
 
       if(not obld)or(puid^._ukbuilding)then
        if(menergy<=0)then
@@ -150,12 +152,22 @@ begin
        end;
       if(not obld)then
       begin
+         if(ukfly)then
+         begin
+            _unit_morph:=ureq_unknown;
+            exit;
+         end;
+         if(uid^._isbuilder)and(n_builders<=1)then
+         begin
+            _unit_morph:=ureq_unknown;
+            exit;
+         end;
          if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
          begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[race]]=0)or(uid^._isbuilder)) )>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[race]]=0)or(uid^._isbarrack)) )>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
@@ -180,6 +192,11 @@ begin
        vsnt:=avsnt;
        if(bhits>0)then
         if(not bld)then hits:=mm3(1,bhits,puid^._mhits);
+       if(select)then
+       begin
+          sel:=true;
+          _unit_counters_inc_select(_LastCreatedUnitP);
+       end;
     end;
 end;
 
@@ -717,7 +734,7 @@ begin
       end;
 
       pushout      := solid and _canmove(pu) and (a_rld<=0) and bld;
-      attack_target:= _canattack(pu,false);
+      attack_target:= _canAttack(pu,false);
       aicode       := (state=ps_comp);//and(sel);
       fteleport_tar:= ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_Teleport);
       swtarget     := false;
@@ -819,7 +836,7 @@ begin
          t_weap :=255;
          a_tarp :=nil;
          t_prio :=0;
-         ftarget:=_canattack(pu,false);
+         ftarget:=_canAttack(pu,false);
       end
       else ftarget:=false;
 
@@ -860,20 +877,6 @@ begin
    end;
 end;
 
-function _ability_prodlevelup(pu:PTUnit):cardinal;
-begin
-   // pu - target
-   _ability_prodlevelup:=0;
-   with pu^     do
-   with uid^    do
-   with player^ do
-    if(_ukbuilding)and(hits>0)and(bld)and(_ability=uab_ProdLevelUp)and(level=0)then
-     if(_isbarrack)or(_issmith)then
-      if(n_padvancers<=0)
-      then _ability_prodlevelup:=ureq_ruid
-      else _ability_prodlevelup:=_unit_morph(pu,uidi,false,-6,level+1);
-end;
-
 function _unit_ability_HellVision(pu:PTUnit;target:integer):boolean;
 var tu:PTUnit;
 begin
@@ -891,7 +894,7 @@ begin
           _unit_kill(pu,false,true,false,false);
           _unit_ability_HellVision:=true;
           {$IFDEF _FULLGAME}
-          _unit_LevelUp(tu,EID_Hvision,nil);
+          _LevelUpEffect(tu,EID_Hvision,nil);
           {$ENDIF}
        end;
    end;
@@ -1029,6 +1032,15 @@ begin
    end;
 end;
 
+function _unit_rebuild(pu:PTUnit):boolean;
+begin
+   _unit_rebuild:=false;
+   with pu^ do
+    with uid^ do
+     if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canRebuild(pu),pu))then
+      _unit_rebuild:=not PlayerSetProdError(playeri,glcp_unit,uidi,_unit_morph(pu,_rebuild_uid,false,-_rebuild_hpstart,_rebuild_level),pu);
+end;
+
 function _unit_action(pu:PTUnit):boolean;
 begin
    _unit_action:=false;
@@ -1041,7 +1053,7 @@ begin
          _unit_action:=true;
       end
       else
-        if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canability(pu),pu))then
+        if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canAbility(pu),pu))then
           with player^ do
             case _ability of
 uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
@@ -1053,21 +1065,14 @@ uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
                        else _ability_unit_spawn(pu,UID_LostSoul);
                        _unit_action:=true;
                     end;
-uab_CCFly       : if(zfall=0)and(buff[ub_CCast]<=0)then
+uab_CCFly         : if(zfall=0)and(buff[ub_CCast]<=0)then
                     begin
                         if(level>0)
                         then level:=0
                         else level:=1;
                        _unit_action:=true;
                     end;
-uab_Rebuild       : case uidi of
-                    UID_UGTurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UATurret   ,_unit_morph(pu,UID_UATurret   ,false,-2,0),pu);
-                    UID_UATurret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret   ,_unit_morph(pu,UID_UGTurret   ,false,-2,0),pu);
-                    UID_HSymbol    : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_HASymbol   ,_unit_morph(pu,UID_HASymbol   ,false,-4,0),pu);
-                    UID_UGenerator : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UAGenerator,_unit_morph(pu,UID_UAGenerator,false,-4,0),pu);
-                    end;
-uab_Rebuild2Turret   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,UID_UGTurret,_unit_morph(pu,UID_UGTurret,false,-2,0),pu);
-uab_ProdLevelUp   : _unit_action:=not PlayerSetProdError(playeri,glcp_unit,uidi        ,_ability_prodlevelup(pu)               ,pu);
+uab_RebuildInPoint: _unit_action:=_unit_rebuild(pu);
             else
             end;
 end;
@@ -1231,7 +1236,7 @@ begin
          a_exp_next:=level*ExpLevel1+ExpLevel1;
          GameLogUnitPromoted(pu);
          {$IFDEF _FULLGAME}
-         _unit_LevelUp(pu,0,nil);
+         _LevelUpEffect(pu,0,nil);
          {$ENDIF}
       end;
    end;
@@ -1327,7 +1332,7 @@ wmove_noneed    : if(not attackinmove)then
            attackinmove:=cf(@aw_reqf,@wpr_move);
       end;
 
-      if(not _canattack(pu,true))then
+      if(not _canAttack(pu,true))then
       begin
          mv_x:=x;
          mv_y:=y;
@@ -1582,7 +1587,8 @@ uab_CCFly            : if(speed>0)then
                 _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
                 exit;
               end;
-co_action  :  _unit_action(pu);
+co_rebuild :  if(_unit_rebuild(pu))then exit;
+co_action  :  if(_unit_action (pu))then exit;
 co_supgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_supgrade (pu,order_tar);
 co_cupgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_cupgrade (pu,order_tar);
 co_suprod  :  if(0<=order_tar)and(order_tar<=255)then _unit_straining(pu,order_tar);

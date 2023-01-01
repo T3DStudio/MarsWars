@@ -45,8 +45,13 @@ begin
 end;
 
 procedure _ClientCommandEffect(cmd,tar,ox1,oy1:integer);
-var su,i,selected:integer;
-    guid:byte;
+var
+i,
+SelectedAll,
+SelectedActions,
+SelectedRebuild,
+SelectedBOrders: integer;
+LeaderUID      : byte;
 function _checkEnemy:boolean;
 begin
    _checkEnemy:=false;
@@ -62,27 +67,27 @@ procedure _ClickEffect(color:cardinal);
 begin
    _click_eff(ox1,oy1,fr_fps1_4,color);
 end;
-function CheckSU(pu:PTUnit):boolean;
+function CheckBOrders(pu:PTUnit):boolean;
 begin
-   CheckSU:=true;
+   CheckBOrders:=true;
    with pu^ do
    with uid^ do
    begin
       if(bld)then
        if(speed>0)
-       or(_canattack(pu,false))
-       or(_canability(pu)=0)then exit;
-
+       or(_canAttack(pu,false))
+       or(_canAbility(pu)=0)then exit;
       if(_UnitHaveRPoint(uidi))then exit;
-      //  {or((_ability in [uab_HellVision,uab_UACScan,uab_Rebuild])and(rld<=0))}
    end;
-   CheckSU:=false;
+   CheckBOrders:=false;
 end;
 
 begin
-   su  :=0;
-   guid:=0;
-   selected:=0;
+   LeaderUID      :=0;
+   SelectedAll    :=0;
+   SelectedBOrders:=0;
+   SelectedActions:=0;
+   SelectedRebuild:=0;
 
    with _players[HPlayer] do
    begin
@@ -91,35 +96,46 @@ begin
         with uid^ do
          if(hits>0)and(sel)and(playeri=HPlayer)then
          begin
-            selected+=1;
-            if(CheckSU(_punits[i]))then
+            SelectedAll+=1;
+            if(CheckBOrders(_punits[i]))then
             begin
-               su+=1;
+               SelectedBOrders+=1;
                if(bld)then
                begin
-                  if(guid<>0)then
-                   if(_mhits<=_uids[guid]._mhits)then
-                    if(_ucl<_uids[guid]._ucl)then continue;
+                  if(LeaderUID<>0)then
+                   if(_mhits<=_uids[LeaderUID]._mhits)then
+                    if(_ucl<_uids[LeaderUID]._ucl)then continue;
 
-                  guid:=uidi;
+                  LeaderUID:=uidi;
                end;
             end;
+            if(_ability    >0{_canAbility(_punits[i])=0})then SelectedActions+=1;
+            if(_rebuild_uid>0{_canRebuild(_punits[i])=0})then SelectedRebuild+=1;
          end;
-      if(su<=0)then
-      begin
-         case cmd of
-         co_supgrade,
-         co_cupgrade,
-         co_suprod,
-         co_cuprod,
-         co_pcancle:;
-         else if(selected>0)then _PlayCommand(snd_cant_order[race]);
-         end;
-         exit;
+
+      case cmd of
+      co_supgrade,
+      co_cupgrade,
+      co_suprod,
+      co_cuprod,
+      co_pcancle  : ;
+      co_rcamove,
+      co_rcmove,
+      co_stand,
+      co_move,
+      co_patrol,
+      co_astand,
+      co_amove,
+      co_apatrol  : if(SelectedBOrders<=0)then exit;
+      co_paction  : if(SelectedActions<=0)then exit;
+      //co_action,
+      //co_paction : if(SelectedActions<=0)then begin _PlayCommand(snd_cant_order[race]);exit;end;
+      co_rebuild : if(SelectedRebuild<=0)then exit; //_PlayCommand(snd_cant_order[race]);
+      else          if(SelectedAll    <=0)then exit;
       end;
    end;
 
-   with _uids[guid] do
+   with _uids[LeaderUID] do
    case cmd of
    co_paction,
    co_rcmove,
@@ -376,7 +392,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
          case u of
    0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
    1 : m_brush:=co_paction;
-   2 : m_action:=not m_action;
+   2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
 
    3 : m_brush:=co_amove;
    4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
@@ -392,6 +408,8 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
+
+   13: m_action:=not m_action;
          end;
 
          check_mouse_brush(false);
@@ -524,9 +542,8 @@ begin
         else
           for ko:=0 to _mhkeys do  // replays
           begin
-             if(_hotkeyR2[ko]<>k2)
-             or(_hotkeyR [ko]= 0 )
-             or(_hotkeyR [ko]<>k )then continue;
+             if(_hotkeyR[ko]= 0 )
+             or(_hotkeyR[ko]<>k )then continue;
              _panel_click(3,ko mod 3,4+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
              exit;
           end;
