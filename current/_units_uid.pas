@@ -262,7 +262,7 @@ end;
 
 UID_HTower:
 begin
-   _mhits     := 5000;
+   _mhits     := 4000;
    _renergy   := 100;
    _r         := 20;
    _srange    := 250;
@@ -776,7 +776,9 @@ begin
    begin
       _ability_rupgr   := upgr_uac_CCFly;
       _ability_rupgrl  := 1;
-      _zombie_uid      := UID_HCommandCenter;
+      if(i=UID_UCommandCenter)
+      then _zombie_uid := UID_HCommandCenter
+      else _zombie_uid := UID_HACommandCenter;
       ups_builder      :=[UID_UCommandCenter..UID_UNuclearPlant]-[UID_UAGenerator,UID_UACommandCenter];
       _upgr_srange     := upgr_uac_buildr;
       _weapon(0,wpt_missle,_srange,_r,0 ,fr_fpsh,MID_BPlasma,0,upgr_uac_ccturr,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,wtp_unit_mech,2);
@@ -1348,8 +1350,8 @@ end;
 
       if(_limituse>=MinUnitLimit)then
       begin
-      _level_damage:=round(BaseDamageLevel1*_limituse/MinUnitLimit);
-      _level_armor :=round(BaseArmorLevel1 *_limituse/MinUnitLimit);
+      _level_damage:=BaseDamageLevel1+round(BaseDamageLevel1*(_limituse-MinUnitLimit)/MinUnitLimit/2);
+      _level_armor :=BaseArmorLevel1 +round(BaseArmorLevel1 *(_limituse-MinUnitLimit)/MinUnitLimit/2);
       end;
 
       if(_base_armor<0)then  _base_armor:=0;

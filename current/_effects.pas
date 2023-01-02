@@ -45,48 +45,49 @@ begin
         MID_Granade,
         MID_Tank,
         MID_Mancubus,
-        EID_Exp           : _setEID(@spr_eff_exp       ,sms_death);
-        EID_Exp2          : _setEID(@spr_eff_exp2      ,sms_death);
+        EID_Exp           : _setEID(@spr_eff_exp        ,sms_death);
+        EID_Exp2          : _setEID(@spr_eff_exp2       ,sms_death);
 
-        EID_Blood         : _setEID(@spr_blood         ,sms_death);
+        EID_Blood         : _setEID(@spr_blood          ,sms_death);
 
-        EID_ArchFire      : _setEID(@spr_h_p6          ,sms_death);
+        EID_ArchFire      : _setEID(@spr_h_p6           ,sms_death);
 
         EID_HLevelUp      : begin
-                            _setEID(@spr_eff_tel       ,sms_death);
+                            _setEID(@spr_eff_tel        ,sms_death);
                             smask :=c_ared;
                             end;
         EID_ULevelUp      : begin
-                            _setEID(@spr_eff_gtel      ,sms_death);
+                            _setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_aaqua;
                             end;
         EID_HVision       : begin
-                            _setEID(@spr_eff_gtel      ,sms_death);
+                            _setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_alime;
                             end;
         EID_Invuln        : begin
-                            _setEID(@spr_eff_gtel      ,sms_death);
+                            _setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_awhite;
                             end;
-        EID_Teleport      : _setEID(@spr_eff_tel       ,sms_death);
-        EID_Gavno         : _setEID(@spr_eff_g         ,sms_death);
+        EID_Teleport      : _setEID(@spr_eff_tel        ,sms_death);
+        EID_Gavno         : _setEID(@spr_eff_g          ,sms_death);
         MID_Mine,
-        EID_BExp          : _setEID(@spr_eff_eb        ,sms_death);
+        EID_BExp          : _setEID(@spr_eff_eb         ,sms_death);
         MID_Blizzard,
-        EID_BBExp         : _setEID(@spr_eff_ebb       ,sms_death);
+        EID_BBExp         : _setEID(@spr_eff_ebb        ,sms_death);
         EID_HKeep_H,
-        EID_HKeep_S       : _setEID(@spr_HKeep         ,sms_walk );
+        EID_HKeep_S       : _setEID(@spr_HKeep          ,sms_walk );
         EID_HAKeep_H,
-        EID_HAKeep_s      : _setEID(@spr_HAKeep        ,sms_walk );
-        EID_HCC           : _setEID(@spr_UCommandCenter,sms_walk );
+        EID_HAKeep_s      : _setEID(@spr_HAKeep         ,sms_walk );
+        EID_HCC           : _setEID(@spr_UCommandCenter ,sms_walk );
+        EID_HACC          : _setEID(@spr_UACommandCenter,sms_walk );
         EID_HMU           : _setEID(@spr_UBarracks ,sms_walk );
         EID_HAMU          : _setEID(@spr_UABarracks,sms_walk );
-        EID_db_h0         : _setEID(@spr_db_h0         ,sms_death);
-        EID_db_h1         : _setEID(@spr_db_h1         ,sms_death);
-        EID_db_u0         : _setEID(@spr_db_u0         ,sms_death);
-        EID_db_u1         : _setEID(@spr_db_u1         ,sms_death);
-        UID_UGTurret      : _setEID(@spr_UTurret       ,sms_build);
-        UID_UATurret      : _setEID(@spr_URTurret      ,sms_build);
+        EID_db_h0         : _setEID(@spr_db_h0          ,sms_death);
+        EID_db_h1         : _setEID(@spr_db_h1          ,sms_death);
+        EID_db_u0         : _setEID(@spr_db_u0          ,sms_death);
+        EID_db_u1         : _setEID(@spr_db_u1          ,sms_death);
+        UID_UGTurret      : _setEID(@spr_UTurret        ,sms_build);
+        UID_UATurret      : _setEID(@spr_URTurret       ,sms_build);
       end;
    end;
 end;
@@ -202,6 +203,7 @@ EID_HKeep_S,
 EID_HAKeep_H,
 EID_HAKeep_S,
 EID_HMU,
+EID_HACC,
 EID_HCC,
 EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
 
@@ -319,6 +321,7 @@ begin
          case eid of
 EID_HMU,
 EID_HCC,
+EID_HACC,
 EID_HAMU,
 EID_HKeep_H,
 EID_HAKeep_H  : alpha:=anim_last_i_t*4;

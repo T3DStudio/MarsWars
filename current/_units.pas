@@ -659,17 +659,16 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
-   begin
-      case uidi of
-UID_HKeep: if(ud<srange)
-          and(not tu^.uid^._ukbuilding)
-          and(team<>tu^.player^.team)
-          and(upgr[upgr_hell_paina]>0)then
-          begin
-             _unit_damage(tu,upgr[upgr_hell_paina]*BaseDamageBonush,upgr[upgr_hell_paina],playeri,true);
-             tu^.buff[ub_Decay]:=fr_fps1;
-          end;
-      end;
+   case uidi of
+UID_HAKeep,
+UID_HKeep     : if(ud<srange)
+               and(not tu^.uid^._ukbuilding)
+               and(team<>tu^.player^.team)
+               and(upgr[upgr_hell_paina]>0)then
+               begin
+                  _unit_damage(tu,upgr[upgr_hell_paina]*BaseDamageBonush,upgr[upgr_hell_paina],playeri,true);
+                  tu^.buff[ub_Decay]:=fr_fps1;
+               end;
    end;
 end;
 

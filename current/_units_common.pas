@@ -1675,7 +1675,6 @@ begin
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
-uab_HellVision    : level:=byte(rld<=0);
 uab_CCFly         :
            if(level>0)then
            begin

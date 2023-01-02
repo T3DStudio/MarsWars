@@ -29,7 +29,6 @@ ai_MinScoutDelay          = fr_fps1*ptime1;
 ai_BaseIDLERange          = 100;
 ai_MinBaseSaveCountBorder = 6;
 ai_MinChoosenCount        = 6;
-ai_cp_go_r                = base_rr;
 
 aio_home   = 0;
 aio_scout  = 1;
@@ -62,11 +61,6 @@ ai_urepair_u,
 ai_base_u         : PTUnit;
 
 ai_LostWantZombieMe,
-{ai_advanced_HGen,
-ai_advanced_HKeep,
-ai_advanced_HCC,
-ai_advanced_UGen,
-ai_advanced_UCC,}
 ai_advanced_bld,
 ai_teleport_use,
 ai_choosen,
@@ -94,7 +88,7 @@ ai_teleporter_d,
 ai_armyaround_own,
 ai_armyaround_enemy_fly,
 ai_armyaround_enemy_grd,
-ai_teleports_near,
+ai_teleports_limit,
 
 ai_enrg_pot,
 ai_enrg_cur,
@@ -222,12 +216,12 @@ begin
       //                    ders                                heye                  towers towers limit  delay      army          lvl  targets
       0  : ; // nothing                                         limit
       1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*180,10            ,0  ,[]);
-      2  : SetBaseOpt(1000 ,1   ,2     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,15    ,fr_fps1*150,20            ,0  ,[]);
-      3  : SetBaseOpt(2000 ,3   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,30    ,fr_fps1*120,30            ,1  ,[]);
-      4  : SetBaseOpt(3500 ,7   ,6     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,40            ,2  ,[]);
-      5  : SetBaseOpt(4250 ,11  ,10    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,90    ,fr_fps1*60 ,50            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
-      6  : SetBaseOpt(5000 ,16  ,14    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
-      else SetBaseOpt(6000 ,20  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1         ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
+      2  : SetBaseOpt(1200 ,1   ,2     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,15    ,fr_fps1*150,20            ,0  ,[]);
+      3  : SetBaseOpt(2400 ,3   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,30    ,fr_fps1*120,30            ,1  ,[]);
+      4  : SetBaseOpt(3600 ,7   ,6     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,40            ,2  ,[]);
+      5  : SetBaseOpt(4200 ,11  ,10    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,90    ,fr_fps1*60 ,50            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
+      6  : SetBaseOpt(4900 ,16  ,14    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
+      else SetBaseOpt(6000 ,20  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
       end;
       ai_max_specialist:=ai_skill;
       case ai_skill of
@@ -325,24 +319,8 @@ begin
 
       with player^ do
       begin
-         {if(not cf(@ai_flags,@aif_base_advance) )then
-         begin
-            ai_advanced_HGen  :=false;
-            ai_advanced_HKeep :=false;
-            ai_advanced_HCC   :=false;
-            ai_advanced_UGen  :=false;
-            ai_advanced_UCC   :=false;
-         end
-         else
-         begin
-            ai_advanced_HGen  :=(a_units[UID_HASymbol       ]>0);
-            ai_advanced_HKeep :=(a_units[UID_HAKeep         ]>0);
-            ai_advanced_HCC   :=(a_units[UID_HACommandCenter]>0);
-            ai_advanced_UGen  :=(a_units[UID_UAGenerator    ]>0);
-            ai_advanced_UCC   :=(a_units[UID_UACommandCenter]>0);
-         end; }
-         ai_advanced_bld   :=cf(@ai_flags,@aif_base_advance );
-         ai_teleport_use   :=cf(@ai_flags,@aif_army_teleport);
+         ai_advanced_bld  :=cf(@ai_flags,@aif_base_advance );
+         ai_teleport_use  :=cf(@ai_flags,@aif_army_teleport);
       end;
    end;
    ai_armyaround_own      :=0;
@@ -464,7 +442,7 @@ begin
    // nearest teleporter
    ai_teleporter_d  := NOTSET;
    ai_teleporter_u  := nil;
-   ai_teleports_near:= 0;
+   ai_teleports_limit:= 0;
 
    // teleporter beacon
    ai_teleporter_beacon_u
@@ -684,7 +662,7 @@ begin
                   if(tu^.uid^._ability=uab_Teleport)then
                   begin
                      _setNearestTarget(@ai_teleporter_u,@ai_teleporter_d,ud+(tu^.rld*20));
-                     if(ud<base_rr)and(pfcheck)then ai_teleports_near+=1;
+                     if(ud<base_3r)and(pfcheck)then ai_teleports_limit+=tu^.uid^._limituse;
                   end;
 
                   if(tu^.unum<>ai_scout_u_cur)then
@@ -717,11 +695,6 @@ begin
          begin
             if(uid=tu^.uid)and(not bld)then ai_inprogress_uid+=1;
 
-            {case tu^.uidi of
-            UID_HSymbol   : if(ai_advanced_HGen)then ai_enrg_pot+=_uids[UID_HASymbol   ]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
-            UID_UGenerator: if(ai_advanced_UGen)then ai_enrg_pot+=_uids[UID_UAGenerator]._genergy else ai_enrg_pot+=tu^.uid^._genergy;
-            else            ai_enrg_pot+=tu^.uid^._genergy;
-            end;}
             if(tu^.uid^._rebuild_uid>0)and(ai_advanced_bld)
             then ai_enrg_pot+=_uids[tu^.uid^._rebuild_uid]._genergy
             else ai_enrg_pot+=tu^.uid^._genergy;
@@ -1023,8 +996,8 @@ if(g_cgenerators>0)then BuildMain  (3   );
          BuildEnergy(1500);
          BuildUProd (4   );
          BuildDetect(2   );
-         BuildSpec2 (1   );
 if(g_cgenerators>0)then BuildMain  (5   );
+         BuildSpec2 (1   );
          BuildMain  (2   );
          BuildEnergy(1900);
          BuildUProd (5   );
@@ -1458,9 +1431,9 @@ begin
       ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
 
       if(_N(@ai_basep_need ,ai_max_mains ))then ai_basep_need :=ai_basep_builders+1;//ai_unitp_cur+1;
-      if(_N(@ai_unitp_need ,ai_max_unitps))then ai_unitp_need :=mm3(1,round(ai_basep_builders*0.7),ai_max_unitps);
-      if(_N(@ai_upgrp_need ,ai_max_upgrps))then ai_upgrp_need :=mm3(1,round(ai_unitp_cur/2.5)     ,ai_max_upgrps);
-      if(_N(@ai_detect_need,ai_max_detect))then ai_detect_need:=mm3(0,(ai_basep_builders+ai_unitp_cur)*ul1,ai_max_detect);
+      if(_N(@ai_upgrp_need ,ai_max_upgrps))then ai_upgrp_need :=mm3(1,round(ai_basep_builders/3.5)              ,ai_max_upgrps);
+      if(_N(@ai_unitp_need ,ai_max_unitps))then ai_unitp_need :=mm3(1,round(ai_basep_builders*1.5)-ai_upgrp_need,ai_max_unitps);
+      if(_N(@ai_detect_need,ai_max_detect))then ai_detect_need:=mm3(0,(ai_basep_builders+ai_unitp_cur)*ul1      ,ai_max_detect);
       if(_N(@ai_towers_need,ai_max_towers))then
       begin
          ai_towers_need:=0;
@@ -1640,17 +1613,23 @@ begin
      else ai_DefaultIdle(pu);
 end;
 
+function ai_DistanceDiv(d1,d2:integer):integer;
+begin
+   if(d2<=0)then d2:=1;
+   ai_DistanceDiv:=d1 div d2;
+end;
+
 procedure ai_TryTeleport(pu,target:PTUnit);
 var tt:integer;
 begin
    if(ai_teleport_use)and(ai_teleporter_u<>nil)then
-    if(ai_teleporter_d<base_rr)and(ai_teleporter_u^.pfzone=pu^.pfzone)then
+    if(ai_teleporter_d<base_3r)and(ai_teleporter_u^.pfzone=pu^.pfzone)then
     begin
        pu^.uo_x:=ai_teleporter_u^.x;
        pu^.uo_y:=ai_teleporter_u^.y;
        if(ai_teleporter_d<ai_teleporter_u^.uid^._r)then
         if(target<>nil)then
-        begin                                                     //??????????????????? неработает, юниты не идут в телепорт хотя есть куда
+        begin
            if(target^.player^.team<>pu^.player^.team)then exit;
            tt:=ai_teleporter_u^.uo_tar;
            ai_teleporter_u^.uo_tar:=target^.unum;
@@ -1854,7 +1833,7 @@ begin
                 ai_RunTo(pu,aiu_alarm_d,aiu_alarm_x,aiu_alarm_y,0,nil);
                 if(not ukfly)then
                   if(pfzone<>ai_alarm_zone)
-                  or((ai_alarm_d>base_6r)and(ai_armyaround_own<=ul30))
+                  or( (ai_DistanceDiv(ai_alarm_d,ai_teleporter_d)>2)and(ai_alarm_d>base_3r)and(ai_armyaround_own<=ai_teleports_limit))
                   then ai_TryTeleport(pu,nil);
              end
              else ai_DefaultIdle(pu);
@@ -2093,13 +2072,15 @@ begin
 
       //if(sel)then writeln('2 ',aiu_alarm_d);
 
-      {if(playeri=HPlayer)and(sel)then
+      if(playeri=HPlayer)and(sel)then
       begin
          //if(aiu_alarm_x      >-1)then UnitsInfoAddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
          //if(ai_alarm_invis_x>-1)then UnitsInfoAddLine(x,y,ai_alarm_invis_x+1,ai_alarm_invis_y+1,c_aqua);
 
          //if(ai_uadv_u<>nil)then UnitsInfoAddLine(x,y,ai_uadv_u^.x,ai_uadv_u^.y,c_red);
-      end; }
+
+         if(ai_teleporter_d<NOTSET)and(ai_teleporter_u<>nil)then UnitsInfoAddLine(x,y,ai_teleporter_u^.x,ai_teleporter_u^.y,c_lime);
+      end;
 
      { if(sel)then
       begin

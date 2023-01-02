@@ -66,13 +66,13 @@ end;
 procedure setBuildingSND(s:PTSoundSet);
 begin setCommandSND(nil,s,s,s,s);end;
 
-procedure setEffectEID(aa:byte;ready,death,fdeath,pain:byte);
+procedure setEffectEID(aa:byte;summon,death,fdeath,pain:byte);
 begin
    with _uids[u] do
    for aa:=aa to MaxUnitLevel do
    with _a_weap[aa] do
    begin
-      un_eid_summon[aa]:=ready;
+      un_eid_summon[aa]:=summon;
       un_eid_death [aa]:=death;
       un_eid_fdeath[aa]:=fdeath;
       un_eid_pain  [aa]:=pain;
@@ -509,7 +509,7 @@ UID_HACommandCenter:
 begin
    setMWSModel(0,@spr_HACommandCenter);
    setBuildingSND(snd_hell_hbuild);
-   setEffectEID(0,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(0,EID_HACC,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);

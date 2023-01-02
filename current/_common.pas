@@ -382,7 +382,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure CalcPLNU;
+procedure PlayersStatus;
 var p:byte;
 begin
    g_player_status:=0;
@@ -392,7 +392,7 @@ begin
      if(army>0)and(state>ps_none)then
      begin
         g_player_status:=g_player_status or (1 shl p);
-        g_cl_units+=MaxPlayerUnits;
+        g_cl_units     +=MaxPlayerUnits;
      end;
 end;
 
@@ -1100,7 +1100,7 @@ lmt_game_end         : if(uid<=MaxPlayers)then
                         then ParseLogMessage:=str_win
                         else ParseLogMessage:=str_lose;
 lmt_player_defeated  : if(uid<=MaxPlayers)then
-                        if(uid<>HPlayer)then ParseLogMessage:=_players[uid].name+str_player_def;
+                        {if(uid<>HPlayer)then }ParseLogMessage:=_players[uid].name+str_player_def;
 lmt_upgrade_complete : begin
                        with _upids[uid] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
                        mcolor^:=c_yellow;

@@ -476,6 +476,8 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
+   exit;
+
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
    FillChar(teams_army,SizeOf(teams_army),0);
@@ -821,7 +823,7 @@ begin
    if(vid_blink_timer1=0)then
    begin
       r_blink3+=1;
-      r_blink3:=r_blink3 mod 3;
+      r_blink3:=r_blink3 mod 4;
    end;
 
    r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
@@ -853,6 +855,8 @@ begin
       begin
          G_Step+=1;
 
+         PlayersStatus;
+
          GameModeCPoints;
          case g_mode of
          gm_invasion  : GameModeInvasion;
@@ -863,7 +867,7 @@ begin
                         end;
          gm_capture,
          gm_KotH      : ;
-         else           //GameDefaultEndConditions;
+         else           GameDefaultEndConditions;
          end;
       end;
       _obj_cycle;

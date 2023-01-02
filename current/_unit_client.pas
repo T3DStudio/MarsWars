@@ -333,7 +333,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       _N_U:=@_players[_pl].n_u;
    end;
 
-   CalcPLNU;
+   PlayersStatus;
 
    _wudata_byte(g_player_status,rpl);
    if(g_player_status>0)then

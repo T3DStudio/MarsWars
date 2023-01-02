@@ -392,7 +392,7 @@ lmt_game_end          : if(uid<=MaxPlayers)then
                          if(uid=team)
                          then SoundPlayAnoncer(snd_victory[race],false)
                          else SoundPlayAnoncer(snd_defeat [race],false);
-lmt_player_defeated   : if(uid<=MaxPlayers)and(uid<>HPlayer)
+lmt_player_defeated   : if(uid<=MaxPlayers)
                         then SoundPlayAnoncer(snd_player_defeated[race],true);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build [race],true);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted[race],true);

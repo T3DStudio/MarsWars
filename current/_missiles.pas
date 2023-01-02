@@ -143,9 +143,7 @@ function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
    case pu^.uidi of
    UID_Phantom,
-   UID_LostSoul: begin
-                    if(tu^.uid^._ukmech    )then _d50(@damage);
-                 end;
+   UID_LostSoul: if(tu^.uid^._ukmech )then _d50(@damage);
    UID_Demon   : if(tu^.uid^._uklight)then _d150(@damage);
    end;
 
