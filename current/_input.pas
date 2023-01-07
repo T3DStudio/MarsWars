@@ -717,7 +717,7 @@ co_empty  : begin
 
                {if(ui_uhint>0)and(k_ctrl>1)then
                 with _units[ui_uhint] do
-                 if(hits>4)then hits:=hits div 2;  }
+                 if(hits>4)then hits:=hits div 2;}
 
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);

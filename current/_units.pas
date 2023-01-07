@@ -152,7 +152,7 @@ begin
        end;
       if(not obld)then
       begin
-         if(ukfly)then
+         if(ukfly)or(apcc>0)then
          begin
             _unit_morph:=ureq_unknown;
             exit;
@@ -421,7 +421,10 @@ wpt_heal     : if(tu^.hits<=0)
       if(cf(@aw_reqf,@wpr_air   ))then
        if(ukfly=uf_ground)or(tu^.ukfly=uf_ground)then exit;
       if(cf(@aw_reqf,@wpr_ground))then
-       if(ukfly=uf_fly)or(tu^.ukfly=uf_fly)then exit;
+       if(ukfly=uf_fly   )or(tu^.ukfly=uf_fly   )then exit;
+      if(cf(@aw_reqf,@wpr_reload))then
+       if(rld>0)then exit;
+
 
       if(cf(@aw_reqf,@wpr_zombie))then
       begin
@@ -1251,6 +1254,24 @@ attackinmove: boolean;
 attackervis,
 targetvis : boolean;
 {$ENDIF}
+procedure _visEffs;
+begin
+   with pu^ do
+   with uid^ do
+   with _a_weap[a_weap] do
+   begin
+      if(cf(@aw_reqf,@wpr_avis))then
+      begin
+         _AddToInt(@tu^.vsnt[player^.team],vistime);
+         {$IFDEF _FULLGAME}
+         if not(a_rld in aw_rld_a)then
+          if(_AddToInt(@tu^.buff[ub_ArchFire ],fr_fps1))then SoundPlayUnit(snd_archvile_fire,tu,@targetvis);
+         {$ENDIF}
+      end;
+      _AddToInt(@vsnt[tu^.player^.team],vistime);
+   end;
+end;
+
 begin
    _unit_attack:=false;
    with pu^ do
@@ -1292,7 +1313,7 @@ begin
          case a of
 wmove_impassible: exit;
 wmove_closer    : begin
-                     if(not attackinmove){or(uo_bx<=0)}then
+                     if(not attackinmove)then
                      begin
                         mv_x:=tu^.x;
                         mv_y:=tu^.y;
@@ -1353,6 +1374,7 @@ wmove_noneed    : if(not attackinmove)then
             a_rld    :=aw_rld;
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
+
             if(ServerSide)and(not _ukbuilding)
             then _unit_exp(pu,aw_rld);
             if(not attackinmove)then
@@ -1364,13 +1386,10 @@ wmove_noneed    : if(not attackinmove)then
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,@attackervis);
             {$ENDIF}
+            _visEffs;
          end;
 
-         if(cycle_order=_cycle_order)then
-         begin
-            if(cf(@aw_reqf,@wpr_tvis))then _AddToInt(@tu^.vsnt[player^.team],vistime);
-            _AddToInt(@vsnt[tu^.player^.team],vistime);
-         end;
+         if(cycle_order=_cycle_order)then _visEffs;
 
          {$IFDEF _FULLGAME}
          if(targetvis)then
@@ -1428,7 +1447,10 @@ wpt_suicide  : if(ServerSide)then _unit_kill(pu,false,true,true,false);
             else
                if(ServerSide)and(not fakemissile)then
                  case aw_type of
-wpt_resurect : _resurrect(tu);
+wpt_resurect : begin
+                  _resurrect(tu);
+                  if(cf(@aw_reqf,@wpr_reload))then rld:=ptimehh*fr_fps1;
+               end;
 wpt_heal     : begin
                   tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
                   tu^.buff[ub_Heal]:=aw_rld;

@@ -95,7 +95,7 @@ begin
 
       with _uids[m_brush] do
       begin
-         spr:=_uid2spr(m_brush,0);
+         spr:=_uid2spr(m_brush,270,0);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
          _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
          SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);

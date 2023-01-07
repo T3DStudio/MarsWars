@@ -61,17 +61,16 @@ begin
          if(i<>team)then vid_menu_redraw:=true;
       end;
 
-      i:=race;
+      i    :=race;
       race :=net_readbyte;
       mrace:=race;
       if(i<>mrace)then vid_menu_redraw:=true;
 
-      i:=byte(ready);
+      i    :=byte(ready);
       ready:=net_readbool;
       if((i>0)<>ready)then vid_menu_redraw:=true;
 
-      PNU  :=net_readbyte;
-
+      PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
 
       if(log_n_cl=log_n)then net_logsend_pause:=0;
@@ -94,16 +93,16 @@ begin
        net_writebool  (ready);
        net_writeword  (ttl  );
        if(G_Started)then
-       net_writebyte  (race);
+       net_writebyte  (race );
     end;
 
-   net_writebyte(pid      );
-   net_writebyte(HPlayer  );
+   net_writebyte(pid         );
+   net_writebyte(HPlayer     );
 
-   net_writeint (map_mw   );
-   net_writebyte(map_liq  );
-   net_writebyte(map_obs  );
-   net_writecard(map_seed );
+   net_writeint (map_mw      );
+   net_writebyte(map_liq     );
+   net_writebyte(map_obs     );
+   net_writecard(map_seed    );
    net_writebool(map_symmetry);
 
    net_writebyte(g_mode          );
@@ -209,31 +208,31 @@ nmid_player_leave: begin
             else
                if(G_Started)then
                case mid of
-nmid_order      : with _players[pid]do
-                  begin
-                     o_x0:=net_readint;
-                     o_y0:=net_readint;
-                     o_x1:=net_readint;
-                     o_y1:=net_readint;
-                     o_a0:=net_readint;
-                     o_id:=net_readbyte;
-                  end;
-nmid_map_mark   : net_ReadMapMark(pid);
-nmid_client_info: with _players[pid] do
-                  begin
-                     PNU     :=net_readbyte;
-                     log_n_cl:=net_readcard;
-                     if(log_n_cl=log_n)then net_logsend_pause:=0;
-                  end;
-nmid_pause      : begin
-                     if(G_Status=pid)
-                     then G_Status:=gs_running
-                     else
-                       if(G_Status<>HPlayer)or(G_Status=gs_running)then G_Status:=pid;
-                    {$IFNDEF _FULLGAME}
-                    vid_menu_redraw:=true;
-                    {$ENDIF}
-                  end;
+nmid_order       : with _players[pid]do
+                   begin
+                      o_x0:=net_readint;
+                      o_y0:=net_readint;
+                      o_x1:=net_readint;
+                      o_y1:=net_readint;
+                      o_a0:=net_readint;
+                      o_id:=net_readbyte;
+                   end;
+nmid_map_mark    : net_ReadMapMark(pid);
+nmid_client_info : with _players[pid] do
+                   begin
+                      PNU     :=net_readbyte;
+                      log_n_cl:=net_readcard;
+                      if(log_n_cl=log_n)then net_logsend_pause:=0;
+                   end;
+nmid_pause       : begin
+                      if(G_Status=pid)
+                      then G_Status:=gs_running
+                      else
+                        if(G_Status<>HPlayer)or(G_Status=gs_running)then G_Status:=pid;
+                     {$IFNDEF _FULLGAME}
+                     vid_menu_redraw:=true;
+                     {$ENDIF}
+                   end;
                end
                else
                  if(mid=nmid_swapp)then

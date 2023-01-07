@@ -632,7 +632,7 @@ begin
                 and(tu^.uid^._attack>0)then aiu_armyaround_enemy+=tu^.uid^._limituse;
 
                 // need detection
-                if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)then
+                if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.buff[ub_Scaned]<=0)then
                 begin
                    _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
                    if(ud<srange)and(tu^.uid^._attack>0)then aiu_need_detect:=ud-srange-hits;
@@ -1100,8 +1100,8 @@ begin
    with pu^ do
     with player^ do
      if(unum=uid_x[uidi])then
-      if(CheckReq(UID_FAPC)and(uid_e[UID_FAPC]<ai_max_specialist))then
-       tryTransport:=ai_UnitProduction(pu,UID_FAPC,ai_max_specialist);
+      if(CheckReq(UID_UTransport)and(uid_e[UID_UTransport]<ai_max_specialist))then
+       tryTransport:=ai_UnitProduction(pu,UID_UTransport,ai_max_specialist);
 end;
 
 begin
@@ -1128,7 +1128,7 @@ uprod_smart: begin
                 end
                 else
                    case race of
-                   r_uac : if(uid_e[UID_FAPC]<=0)then
+                   r_uac : if(uid_e[UID_UTransport]<=0)then
                            begin
                               if(ai_UnitProduction(pu,uprod_air,MaxUnits))then exit;
                            end
@@ -1200,7 +1200,7 @@ uprod_any  : case pu^.player^.race of
                           8 : ut:=UID_FMajor;
                           9 : ut:=UID_BFG;
                           10: ut:=UID_APC;
-                          11: ut:=UID_FAPC;
+                          11: ut:=UID_UTransport;
                           12: ut:=UID_UACBot;
                           13: ut:=UID_Terminator;
                           14: ut:=UID_Tank;
@@ -1218,7 +1218,7 @@ uprod_air  : case pu^.player^.race of
              r_uac : case random(3) of
                           0 : ut:=UID_FMajor;
                           1 : ut:=UID_Flyer;
-                          2 : ut:=UID_FAPC;
+                          2 : ut:=UID_UTransport;
                      end;
              end;
 uprod_antiair
@@ -1251,7 +1251,7 @@ UID_Mastermind,
 UID_Cyberdemon   : up_m:=ai_max_specialist-(uid_e[UID_Mastermind]+uprodu[UID_Mastermind]
                                            +uid_e[UID_Cyberdemon]+uprodu[UID_Cyberdemon]);
 UID_APC,
-UID_FAPC,
+UID_UTransport,
 UID_Pain,
 UID_Medic,
 UID_Engineer     : up_m:=ai_max_specialist;
@@ -1336,9 +1336,6 @@ begin
       if((ai_inprogress_uid=0)and(    bld))
       or((ai_inprogress_uid>0)and(not bld))then
       case uidi of
-{UID_HKeep,
-UID_HCommandCenter,
-UID_UCommandCenter: ;  }
 UID_HSymbol,
 UID_HASymbol,
 UID_UGenerator,
@@ -2072,7 +2069,7 @@ begin
 
       //if(sel)then writeln('2 ',aiu_alarm_d);
 
-      if(playeri=HPlayer)and(sel)then
+     { if(playeri=HPlayer)and(sel)then
       begin
          //if(aiu_alarm_x      >-1)then UnitsInfoAddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
          //if(ai_alarm_invis_x>-1)then UnitsInfoAddLine(x,y,ai_alarm_invis_x+1,ai_alarm_invis_y+1,c_aqua);
@@ -2080,7 +2077,7 @@ begin
          //if(ai_uadv_u<>nil)then UnitsInfoAddLine(x,y,ai_uadv_u^.x,ai_uadv_u^.y,c_red);
 
          if(ai_teleporter_d<NOTSET)and(ai_teleporter_u<>nil)then UnitsInfoAddLine(x,y,ai_teleporter_u^.x,ai_teleporter_u^.y,c_lime);
-      end;
+      end; }
 
      { if(sel)then
       begin
@@ -2135,7 +2132,11 @@ uab_HKeepBlink  : ai_SaveMain_HK(pu);
 uab_UACScan          : if(ai_detection_pause=0)then
                        begin
                           if(ai_enemy_inv_u<>nil)then
-                           if(_unit_ability_uradar(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then player^.ai_detection_pause:=fr_fps1;
+                           if(_unit_ability_uradar(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
+                           begin
+                              player^.ai_detection_pause     :=fr_fps1;
+                              ai_enemy_inv_u^.buff[ub_Scaned]:=fr_fps1;
+                           end;
                           if(ai_choosen)and(ai_alarm_d=NOTSET)then
                            if(_unit_ability_uradar(pu,random(map_mw),random(map_mw)))then player^.ai_detection_pause:=fr_fps1;
                        end;

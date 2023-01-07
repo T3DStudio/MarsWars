@@ -65,8 +65,8 @@ begin
    if(ord(msg[1])<=MaxPlayers)then delete(msg,1,1);
 
    setlength(args,0);
-   a :=0;
-   l :=length(msg);
+   a:=0;
+   l:=length(msg);
    while(l>0)do
    begin
       v:='';
@@ -84,7 +84,7 @@ begin
          l:=0;
       end;
 
-      while (true) do
+      while(true)do
       begin
          p:=pos(' ',v);
          if(p=0)
@@ -92,7 +92,7 @@ begin
          else delete(v,p,1);
       end;
 
-      a-=1;
+      a+=1;
       setlength(args,a);
       args[a-1]:=v;
    end;
@@ -113,7 +113,7 @@ begin
       GameLogCommon(0,log_to_all,'  -c - capturing points, -a - assault',false);
       GameLogCommon(0,log_to_all,'  -rb - royal battle'                 ,false);
       GameLogCommon(0,log_to_all,'  -ud/-d2 - UDOOM/DOOM 2 mode'        ,false);
-      GameLogCommon(0,log_to_all,'Show/hide player starts: -ps'         ,false);
+      GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
       GameLogCommon(0,log_to_all,'Starting base options: -st 1-6'       ,false);
       GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-7'    ,false);
       exit;
@@ -142,8 +142,8 @@ begin
 '-cpt'   : begin g_mode:=gm_capture;  Map_premap; cmp_ffa; end;
 '-koth'  : begin g_mode:=gm_koth;     Map_premap; end;
 '-rb'    : begin g_mode:=gm_royale;   Map_premap; end;
-'-cg'    : begin g_cgenerators:=not g_cgenerators; Map_premap;end;
-'-ps'    : g_show_positions:=not g_show_positions;
+'-cg'    : begin g_cgenerators     :=not g_cgenerators;    Map_premap;end;
+'-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
 '-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
 '-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
    else exit;
@@ -231,14 +231,14 @@ begin
       vid_menu_redraw:=false;
    end;
 
-   if(consoley<=fr_fps)then
+   if(consoley<=fr_fps1)then
    begin
       case consoley of
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
       4 : writeln('         ',str_gmodet     ,' ',str_gmode  [g_mode ] );
-      6 : writeln('         ',str_sstarts    ,' ',g_show_positions     );
+      6 : writeln('         ',str_fstarts    ,' ',g_fixed_positions    );
       8 : writeln('         ',str_starta     ,' ',str_startat[g_start_base]);
       9 : writeln('         ',str_aislots    ,' ',g_ai_slots           );
       10: writeln('         ',str_cgenerators,' ',str_cgeneratorsM[g_cgenerators]);

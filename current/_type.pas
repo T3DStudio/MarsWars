@@ -165,6 +165,9 @@ TCommand = record
    {$ENDIF}
 end;
 
+TWUDataTime = array[1..MaxUnits] of cardinal;
+PTWUDataTime = ^TWUDataTime;
+
 TUWeapon = record
   aw_type,
   aw_tarprior,
@@ -182,7 +185,7 @@ TUWeapon = record
   aw_dupgr_s,
   aw_max_range,
   aw_min_range,
-  aw_count: integer;
+  aw_count : integer;
   aw_rld   : byte;
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
@@ -297,6 +300,8 @@ TUID = record
    un_eid_bcrater_y,
    un_foot_anim : integer;
 
+   un_eid_summon_spr
+                : array[0..MaxUnitLevel] of PTMWTexture;
    un_eid_summon,
    un_eid_death,
    un_eid_fdeath,
@@ -322,21 +327,21 @@ TUPID = record  // upgrade
    _up_ruid,
    _up_rupgr,
    _up_btni,
-   _up_race  : byte;
+   _up_race     : byte;
    _up_renerg,
    _up_renerg_xpl, // energy * per level
    _up_renerg_apl, // energy + per level
    _up_time,
    _up_time_xpl,
    _up_time_apl,
-   _up_max   : integer;
-   _up_mfrg  : boolean;
+   _up_max      : integer;
+   _up_mfrg     : boolean;
 
    {$IFDEF _FULLGAME}
-   _up_btn   : TMWTexture;
+   _up_btn      : TMWTexture;
    _up_name,
    _up_descr,
-   _up_hint  : shortstring;
+   _up_hint     : shortstring;
    {$ENDIF}
 end;
 
@@ -344,16 +349,16 @@ TAIAlarm = record
    aia_enemy_base :boolean;
    aia_enemy_count,
    aia_x,
-   aia_y    : integer;
-   aia_zone : word;
+   aia_y        : integer;
+   aia_zone     : word;
 end;
 
 TLogMes = record
    mtype,
    uidt,
-   uid  :byte;
-   str  :shortstring;
-   xi,yi:integer;
+   uid          : byte;
+   str          : shortstring;
+   xi,yi        : integer;
 end;
 PTLogMes = ^TLogMes;
 

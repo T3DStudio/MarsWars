@@ -13,6 +13,7 @@ function pf_isobstacle_zone(zone:word):boolean;  forward;
 
 {$IFDEF _FULLGAME}
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
+function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogHPlayer;  forward;
 {$ENDIF}
@@ -48,9 +49,12 @@ begin
 
    fr_LastTicks   :=fr_CurrentTicks;
 
+   {$IFDEF _FULLGAME}
    if(_fsttime)
    then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
-   else fr_TargetTicks :=fr_BaseTicks + trunc(fr_FrameCount*fr_RateTicks);
+   else
+   {$ENDIF}
+   fr_TargetTicks :=fr_BaseTicks + trunc(fr_FrameCount*fr_RateTicks);
 
    if(fr_CurrentTicks<=fr_TargetTicks)
    then sdl_Delay(fr_TargetTicks-fr_CurrentTicks)
@@ -318,7 +322,7 @@ function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
    PlayerObserver:=(upgr[upgr_fog_vision]>0)
-                 or(g_deadobservers and(armylimit<=0)and(rpls_state<rpl_rhead))
+                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
                  or((pnum>0)and(team=0));
 end;
 
@@ -484,9 +488,14 @@ begin
    end;
 end;
 
-procedure _AddToInt(bt:pinteger;val:integer);
+function _AddToInt(bt:pinteger;val:integer):boolean;
 begin
-   if(bt^<val)then bt^:=val;
+   _AddToInt:=false;
+   if(bt^<val)then
+   begin
+      bt^:=val;
+      _AddToInt:=true;
+   end;
 end;
 
 function _CheckRoyalBattleR(x,y,d:integer):boolean;
@@ -792,6 +801,13 @@ begin
      else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
 
+procedure GameSetStatusWinnerTeam(team:byte);
+begin
+   if(team<=MaxPlayers)then
+   G_status:=gs_win_team0+team;
+   GameLogEndGame(team);
+end;
+
 {$IFDEF _FULLGAME}
 
 
@@ -925,13 +941,6 @@ begin
      if(cpTimer>0)and(r_blink3=0)
      then GetCPColor:=PlayerGetColor(cpTimerOwnerPlayer)
      else GetCPColor:=PlayerGetColor(cpOwnerPlayer     );
-end;
-
-procedure GameSetStatusWinnerTeam(team:byte);
-begin
-   if(team<=MaxPlayers)then
-   G_status:=gs_win_team0+team;
-   GameLogEndGame(team);
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal):boolean;

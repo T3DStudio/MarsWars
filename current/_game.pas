@@ -476,8 +476,6 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
-   exit;
-
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
    FillChar(teams_army,SizeOf(teams_army),0);
@@ -654,7 +652,6 @@ begin
    end;
 end;
 begin
-   writeln((limit/ul1):3:3);
    while(limit>0)and(_players[0].army<MaxPlayerUnits)do
     if(not SpawnLR)then
      if(not SpawnL(ul10))then
@@ -692,124 +689,6 @@ begin
       end;
    end
    else if(g_inv_wave_t_curr<max_wave_time)then g_inv_wave_t_curr+=1;
-end;
-
-procedure CPoint_ChangeOwner(i,newOwnerTeam:byte);
-var p:byte;
-begin
-   with g_cpoints[i] do
-   if(cpOwnerTeam<>newOwnerTeam)then
-   begin
-      if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
-        with _players[p] do
-         if(team=cpOwnerTeam)then
-         begin
-            cenergy-=cpenergy;
-            menergy-=cpenergy;
-         end;
-      cpOwnerTeam:=newOwnerTeam;
-      if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
-        with _players[p] do
-         if(team=cpOwnerTeam)then
-         begin
-            cenergy+=cpenergy;
-            menergy+=cpenergy;
-         end;
-   end;
-end;
-
-procedure GameModeCPoints;
-var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams,
-wteam,
-wteam_n   ,
-cp_captured_n :integer;
-begin
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
-    if(cpCapturer>0)then
-    begin
-       if(cplifetime>0)and(cpOwnerTeam>0)then
-       begin
-          cplifetime-=1;
-          if(cplifetime=0)then
-          begin
-             CPoint_ChangeOwner(i,0);
-             cpCapturer:=0;
-             {$IFDEF _FULLGAME}
-             _CPExplode(cpx,cpy);
-             {$ENDIF}
-          end;
-       end;
-
-       cpunitsp_pstate:=cpUnitsPlayer;
-       cpunitst_pstate:=cpUnitsTeam;
-       iOwnerTeam     :=cpOwnerTeam;
-       iOwnerPlayer   :=cpOwnerPlayer;
-       iArmy :=0;
-       iTeams:=0;
-       for p:=0 to MaxPlayers do
-       begin
-          if(cpUnitsTeam[p]>0)then
-          begin
-             iTeams+=1;
-             iOwnerTeam:=p;
-          end;
-          if(cpUnitsPlayer[p]>iArmy)or(iArmy=0)then
-          begin
-             iArmy:=cpUnitsPlayer[p];
-             iOwnerPlayer:=p;
-          end;
-          cpUnitsPlayer[p]:=0;
-          cpUnitsTeam  [p]:=0;
-       end;
-
-       if(iTeams=0)
-       then cpTimer:=0
-       else
-         if(iTeams=1)then
-          if(cpOwnerTeam=iOwnerTeam)
-          then cpTimer:=0
-          else
-          begin
-             cpTimerOwnerPlayer:=iOwnerPlayer;
-             if(cpTimerOwnerTeam<>iOwnerTeam)then
-             begin
-                cpTimerOwnerTeam  :=iOwnerTeam;
-                cpTimer:=0;
-             end;
-             if(cpTimer<cpCaptureTime)
-             then cpTimer+=1
-             else
-             begin
-                cpOwnerPlayer:=iOwnerPlayer;
-                cpTimer:=0;
-                CPoint_ChangeOwner(i,iOwnerTeam);
-             end;
-          end;
-    end;
-
-   wteam        :=0;
-   wteam_n      :=0;
-   cp_captured_n:=0;
-
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
-     if(cpCapturer>0)and(cpenergy<=0)then
-     begin
-        cp_captured_n+=1;
-        if(cpOwnerTeam>0)then
-        begin
-           if(wteam=0)
-           or(wteam<>cpOwnerTeam)
-           then wteam_n:=0;
-           wteam  :=cpOwnerTeam;
-           wteam_n+=1;
-        end;
-     end;
-
-   if(cp_captured_n>0)and(wteam_n=cp_captured_n)then GameSetStatusWinnerTeam(wteam);
 end;
 
 {$include _net_game.pas}

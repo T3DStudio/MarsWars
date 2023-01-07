@@ -1743,7 +1743,7 @@ UID_UACBot        : ukfloater:=upgr[upgr_uac_float]>0;
 UID_Demon         : if(upgr[upgr_hell_pinkspd]>0)
                     then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
                     else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
-UID_FAPC          : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+4*level;end;
+UID_UTransport          : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+4*level;end;
 UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;

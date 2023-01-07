@@ -412,6 +412,14 @@ begin
               if(playeri=0)and(not _ukbuilding)then
                if(g_mode in [gm_invasion])then ColorAura:=c_ablack;
 
+            if(un_eid_summon_spr[level]<>nil)then
+             if(buff[ub_Summoned]>0)then
+              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3(0,buff[ub_Summoned]*4,255));
+
+            if(buff[ub_ArchFire]>0)then
+             with spr_h_p6 do
+              if(sn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
+
             if(_ukbuilding)then
              if(bld)then
              begin
@@ -462,7 +470,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
             then ColorShadow:=ShadowColor(PlayerGetColor(playeri))
             else ColorShadow:=c_ablack;
 
-            SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha)
+            SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha);
          end;
       end;
    end;

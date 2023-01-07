@@ -271,7 +271,7 @@ begin
       if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
       if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
       _ADDSTRC(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default);
-      if(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
+      if(_up_max>1)and(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
 
       _up_hint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr+tc_nl1;
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_req+tc_default+REQ;
@@ -581,8 +581,7 @@ begin
    _mkHStrUid(UID_BFG           ,'BFG Marine'       ,'');
    _mkHStrUid(UID_Engineer      ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic         ,'Medic'            ,'');
-   _mkHStrUid(UID_FAPC          ,'Air APC'          ,'');
-   _mkHStrUid(UID_UTransport    ,'Air APC'          ,'');
+   _mkHStrUid(UID_UTransport          ,'Air APC'          ,'');
    _mkHStrUid(UID_APC           ,'Ground APC'       ,'');
    _mkHStrUid(UID_UACBot        ,'UAC Bot'          ,'');
    _mkHStrUid(UID_Terminator    ,'UAC Terminator'   ,'');
@@ -993,8 +992,7 @@ begin
   _mkHStrUid(UID_Antiaircrafter,'Гранатометчик'      ,'');
   _mkHStrUid(UID_Major      ,'Майор'              ,'');
   _mkHStrUid(UID_BFG        ,'Солдат с BFG'       ,'');
-  _mkHStrUid(UID_FAPC       ,'Воздушный транспорт','');
-  _mkHStrUid(UID_UTransport ,'Воздушный транспорт','');
+  _mkHStrUid(UID_UTransport       ,'Воздушный транспорт','');
   _mkHStrUid(UID_APC        ,'БТР'                ,'');
   _mkHStrUid(UID_Terminator ,'Терминатор'         ,'');
   _mkHStrUid(UID_Tank       ,'Танк'               ,'');

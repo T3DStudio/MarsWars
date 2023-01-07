@@ -382,13 +382,9 @@ sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
    end;
 end;
 
-function _uid2spr(_uid:byte;level:byte):PTMWTexture;
+function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;
 begin
-   with _uids[_uid] do
-    case _urace of
-    r_hell: _uid2spr:=_sm2s(un_smodel[level],sms_stand,315,0,nil);
-    r_uac : _uid2spr:=_sm2s(un_smodel[level],sms_stand,225,0,nil);
-    end;
+   with _uids[_uid] do _uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
 end;
 
 

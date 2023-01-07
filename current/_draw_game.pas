@@ -347,7 +347,6 @@ begin
 
       if(rld>0)and(playeri=HPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
-
       if(speed<=0)or(not bld)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
 

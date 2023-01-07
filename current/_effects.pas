@@ -78,10 +78,6 @@ begin
         EID_HKeep_S       : _setEID(@spr_HKeep          ,sms_walk );
         EID_HAKeep_H,
         EID_HAKeep_s      : _setEID(@spr_HAKeep         ,sms_walk );
-        EID_HCC           : _setEID(@spr_UCommandCenter ,sms_walk );
-        EID_HACC          : _setEID(@spr_UACommandCenter,sms_walk );
-        EID_HMU           : _setEID(@spr_UBarracks ,sms_walk );
-        EID_HAMU          : _setEID(@spr_UABarracks,sms_walk );
         EID_db_h0         : _setEID(@spr_db_h0          ,sms_death);
         EID_db_h1         : _setEID(@spr_db_h1          ,sms_death);
         EID_db_u0         : _setEID(@spr_db_u0          ,sms_death);
@@ -100,7 +96,7 @@ begin
    ui_mc_c:=cc;
 end;
 
-procedure _effect_add(ex,ey,ed:integer; ee:byte);
+procedure _effect_add(ex,ey,ed:integer;ee:byte);
 var e:integer;
 
 procedure _setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
@@ -201,11 +197,7 @@ EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 EID_HKeep_H,
 EID_HKeep_S,
 EID_HAKeep_H,
-EID_HAKeep_S,
-EID_HMU,
-EID_HACC,
-EID_HCC,
-EID_HAMU          : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
+EID_HAKeep_S      : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
 
 UID_UGTurret,
 UID_UATurret,
@@ -319,10 +311,6 @@ begin
 
         if(anim_last_i_t>=0)then
          case eid of
-EID_HMU,
-EID_HCC,
-EID_HACC,
-EID_HAMU,
 EID_HKeep_H,
 EID_HAKeep_H  : alpha:=anim_last_i_t*4;
 EID_HKeep_S,

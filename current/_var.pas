@@ -87,11 +87,13 @@ net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
 net_period        : byte = 0;
 net_log_n         : word = 0;
+net_wudata_t      : TWUDataTime;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
 rpls_pnui         : byte = 0;
 rpls_log_n        : word = 0;
+rpls_wudata_t     : TWUDataTime;
 
 fr_FPSSecond,
 fr_FPSSecondD,
@@ -266,8 +268,8 @@ svld_list_sel     : integer = 0;
 svld_list_scroll  : integer = 0;
 svld_file_size    : cardinal = 0;
 
-rpls_fstatus      : byte = 0;   // file status (none,write,read)
-rpls_pnu          : byte = 0;   // quality
+rpls_fstatus      : byte = 0;    // file status (none,write,read)
+rpls_pnu          : integer = 0; // quality
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info     : shortstring = '';

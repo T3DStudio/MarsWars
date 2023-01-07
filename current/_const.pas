@@ -130,7 +130,7 @@ pf_solid               : word = 65535;
 
 str_ver                = 'v52';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
-str_cprt               : shortstring = '[ T3DStudio (c) 2016-2022 ]';
+str_cprt               : shortstring = '[ T3DStudio (c) 2016-2023 ]';
 str_ps_c               : array[0..2] of char = ('-','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
@@ -314,10 +314,11 @@ atm_inapc              = 4;   // can attack only when in apc
 
 wpr_any                : cardinal =  0;
 wpr_zombie             : cardinal =  %0000000000001000;
-wpr_tvis               : cardinal =  %0000000000010000;
+wpr_avis               : cardinal =  %0000000000010000;
 wpr_ground             : cardinal =  %0000000000100000;
 wpr_air                : cardinal =  %0000000001000000;
 wpr_move               : cardinal =  %0000000010000000;
+wpr_reload             : cardinal =  %0000000100000000;
 
 aw_fsr0                = 15000;
 
@@ -423,50 +424,27 @@ aif_ability_mainsave   : cardinal = 1 shl 12;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  UNIT ABILITIES
-//
-
-uab_Teleport           = 1;
-uab_UACScan            = 2;
-uab_HTowerBlink        = 3;
-uab_UACStrike          = 4;
-uab_HKeepBlink         = 5;
-uab_RebuildInPoint     = 6;
-uab_HInvulnerability   = 8;
-uab_SpawnLost          = 9;
-uab_HellVision         = 10;
-uab_CCFly              = 11;
-
-client_rld_abils = [
-                   uab_Teleport
-                   ];
-client_cast_abils= [
-                   uab_UACScan  ,
-                   uab_UACStrike
-                   ];
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  UNIT BUFFs
 //
 
 MaxUnitBuffs           = 15;
 
-ub_Pain                = 1;
-ub_Resurect            = 2;
-ub_Cast                = 3;
-ub_Slow                = 4;
-ub_CCast               = 5;
-ub_Invis               = 6;
-ub_Detect              = 7;
-ub_Invuln              = 8;
-ub_Summoned            = 9;
-ub_Teleport            = 10;
-ub_HVision             = 11;
-ub_Damaged             = 12;
-ub_Heal                = 13;
-ub_Scaned              = 14;
-ub_Decay               = 15;
+ub_Pain                = 0;
+ub_Resurect            = 1;
+ub_Cast                = 2;
+ub_Slow                = 3;
+ub_CCast               = 4;
+ub_Invis               = 5;
+ub_Detect              = 6;
+ub_Invuln              = 7;
+ub_Summoned            = 8;
+ub_Teleport            = 9;
+ub_HVision             = 10;
+ub_Damaged             = 11;
+ub_Heal                = 12;
+ub_Scaned              = 13;
+ub_Decay               = 14;
+ub_ArchFire            = 15;
 
 _ub_infinity           = 32000;
 b2ib                   : array[false..true] of integer = (0,_ub_infinity);
@@ -498,7 +476,7 @@ DID_Other              = 7;
 
 dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
-DID_R                  : array[0..7] of integer = (0,250,185,125,64,105,60,17);
+DID_R                  : array[0..7] of integer = (0,255,185,125,64,105,60,17);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -519,7 +497,7 @@ upgr_hell_buildr       = 10; // main range
 upgr_hell_extbuild     = 11; // HK on doodabs
 upgr_hell_pinkspd      = 12; // demon move speed
 
-upgr_hell_spectre      = 13; // demon spectre              // t2
+upgr_hell_spectre      = 13; // demon spectre                 // t2
 upgr_hell_vision       = 14; // demons vision
 upgr_hell_phantoms     = 15; // demons vision
 upgr_hell_t2attack     = 16; // t2 distance attacks damage
@@ -533,7 +511,7 @@ upgr_hell_resurrect    = 23; // archvile ability
 upgr_hell_invuln       = 24; // hell invuln powerup
 
 
-upgr_uac_attack        = 31; // distance attack            // t1
+upgr_uac_attack        = 31; // distance attack               // t1
 upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
@@ -546,7 +524,7 @@ upgr_uac_buildr        = 40; // main sr
 upgr_uac_extbuild      = 41; // main on doodabs
 upgr_uac_float         = 42; // UACBot floating
 
-upgr_uac_botturret     = 43; // bot turret                 // t2
+upgr_uac_botturret     = 43; // bot turret                    // t2
 upgr_uac_vision        = 44; // infatry vision
 upgr_uac_commando      = 45; // commando invis
 upgr_uac_airsp         = 46; // anti-air missiles splash
@@ -565,18 +543,18 @@ upgr_fast_build        = 250;
 upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
-                                                 // HELL                UAC
-upgr_race_armor_bio    : array[1..r_cnt] of byte = (upgr_hell_uarmor  , upgr_uac_uarmor  );
-upgr_race_armor_mech   : array[1..r_cnt] of byte = (0                 , upgr_uac_mecharm );
-upgr_race_armor_build  : array[1..r_cnt] of byte = (upgr_hell_barmor  , upgr_uac_barmor  );
-upgr_race_regen_bio    : array[1..r_cnt] of byte = (upgr_hell_regen   , 0                );
-upgr_race_regen_mech   : array[1..r_cnt] of byte = (0                 , 0                );
-upgr_race_regen_build  : array[1..r_cnt] of byte = (upgr_hell_bldrep  , 0                );
-upgr_race_mspeed_bio   : array[1..r_cnt] of byte = (0                 , upgr_uac_mspeed  );
-upgr_race_mspeed_mech  : array[1..r_cnt] of byte = (0                 , upgr_uac_mechspd );
-upgr_race_extbuilding  : array[1..r_cnt] of byte = (upgr_hell_extbuild, upgr_uac_extbuild);
-upgr_race_srange       : array[1..r_cnt] of byte = (upgr_hell_vision  , upgr_uac_vision  );
-upgr_race_srange_bonus : array[1..r_cnt] of integer = (25  , 25  );
+                                                    // HELL                UAC
+upgr_race_armor_bio    : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
+upgr_race_armor_mech   : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
+upgr_race_armor_build  : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
+upgr_race_regen_bio    : array[1..r_cnt] of byte    = (upgr_hell_regen   , 0                );
+upgr_race_regen_mech   : array[1..r_cnt] of byte    = (0                 , 0                );
+upgr_race_regen_build  : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 0                );
+upgr_race_mspeed_bio   : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
+upgr_race_mspeed_mech  : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
+upgr_race_extbuilding  : array[1..r_cnt] of byte    = (upgr_hell_extbuild, upgr_uac_extbuild);
+upgr_race_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
+upgr_race_srange_bonus : array[1..r_cnt] of integer = (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -656,15 +634,12 @@ mvxy_strict            = 2;
 
 BaseDamage1            = 70;
 BaseDamageh            = BaseDamage1 div 2;
-BaseDamagehh           = BaseDamage1 div 4;
-BaseDamage1hh          = BaseDamage1+BaseDamagehh;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
-BaseDamage5            = BaseDamage1*5;
+BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
-BaseDamage20           = BaseDamage1*20;
 
 BaseDamageBonus1       = 6;
 BaseDamageBonush       = BaseDamageBonus1 div 2;
@@ -769,13 +744,12 @@ UID_Siege              = 86;
 UID_Major              = 87;
 UID_FMajor             = 88;
 UID_BFG                = 89;
-UID_FAPC               = 90;
+UID_UTransport         = 90;
 UID_UACBot             = 91;
 UID_Terminator         = 92;
 UID_Tank               = 93;
 UID_Flyer              = 94;
 UID_APC                = 95;
-UID_UTransport         = 96;
 
 
 uids_hell              = [1 ..49];
@@ -786,11 +760,35 @@ uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
-//uids_coopspawn         = marines+demons+[UID_UACBot,UID_Terminator,UID_Tank,UID_Flyer];
 
 uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter);
-//uid_race_9bld          : array[1..r_cnt] of integer = (UID_HFortress,UID_UNuclearPlant );
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT ABILITIES
+//
+
+uab_Teleport           = 1;
+uab_UACScan            = 2;
+uab_HTowerBlink        = 3;
+uab_UACStrike          = 4;
+uab_HKeepBlink         = 5;
+uab_RebuildInPoint     = 6;
+uab_HInvulnerability   = 8;
+uab_SpawnLost          = 9;
+uab_HellVision         = 10;
+uab_CCFly              = 11;
+
+client_rld_abils = [
+                   uab_Teleport
+                   ];
+client_rld_uids  = [
+                   UID_ArchVile
+                   ];
+client_cast_abils= [
+                   uab_UACScan  ,
+                   uab_UACStrike
+                   ];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -800,16 +798,15 @@ uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UComman
 
 fr_mancubus_rld        = fr_fps2+fr_fpsh;
 fr_mancubus_rld_s1     = fr_fps2-fr_fps1_6;
-fr_mancubus_rld_s2     = fr_fps1 +fr_fps1_6;
+fr_mancubus_rld_s2     = fr_fps1+fr_fps1_6;
 fr_mancubus_rld_s3     = fr_fpsh;
 
-fr_archvile_s          = fr_fps1 +fr_fps1_6;
+fr_archvile_s          = fr_fps1+fr_fps1_6;
 
 NameLen                = 13;
-//ChatLen                = 38;
 
-dead_hits              = -25*fr_fps1;
-fdead_hits             = dead_hits+fr_fps5;
+dead_hits              = -ptime1*fr_fps1;
+fdead_hits             = dead_hits+fr_fps3;
 ndead_hits             = dead_hits-1;
 
 fdead_hits_border      = -130;
@@ -862,7 +859,7 @@ fly_z                  = 80;
 fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
-pain_time              = order_period;
+pain_time              = fr_2h3fps;
 
 {$IFDEF _FULLGAME}
 
@@ -1044,10 +1041,6 @@ EID_ULevelUp           = 217;
 EID_HLevelUp           = 218;
 EID_HVision            = 219;
 EID_Invuln             = 220;
-EID_HAMU               = 221;
-EID_HMU                = 222;
-EID_HCC                = 223;
-EID_HACC               = 224;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1374,26 +1367,24 @@ str_m_siz                : shortstring = 'Size';
 str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';
 str_aislots              : shortstring = 'Fill empty slots:   ';
-str_sstarts              : shortstring = 'Show player starts: ';
+str_fstarts              : shortstring = 'Fixed player starts: ';
 str_gmodet               : shortstring = 'Game mode:          ';
 str_cgenerators          : shortstring = 'Neutral generators: ';
 str_starta               : shortstring = 'Starting base:      ';
 str_plname               : shortstring = 'Player name';
-str_plout                : shortstring = ' left the game';
-str_player_def           : shortstring = ' was terminated!';
+//str_plout                : shortstring = ' left the game';
+//str_player_def           : shortstring = ' was terminated!';
 
 str_cgeneratorsM         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
 
 str_plstat               : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
-str_ready                : shortstring = 'Ready';
+//str_ready                : shortstring = 'Ready';
 
 str_startat              : array[0..gms_g_startb] of shortstring = ('1 builder','2 builders','3 builders','4 builders','5 builders','6 builders','7 builders');
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
 str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
-str_addon                : array[false..true    ] of shortstring = ('UDOOM','DOOM 2');
-
 
 {$ENDIF}
 

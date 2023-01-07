@@ -78,6 +78,15 @@ begin
       un_eid_pain  [aa]:=pain;
    end;
 end;
+procedure setEffectEID2(aa:byte;summonspr:PTMWTexture);
+begin
+   with _uids[u] do
+   for aa:=aa to MaxUnitLevel do
+   with _a_weap[aa] do
+   begin
+      un_eid_summon_spr[aa]:=summonspr;
+   end;
+end;
 procedure setEffectSND(ready,death,fdeath,pain:PTSoundSet);
 begin
    with _uids[u] do
@@ -300,7 +309,7 @@ begin
    setWeaponESND(0,nil,snd_meat,0,0);
    setWeaponTEID(0,nil,0       ,[0..255]);
    setWeaponESND(1,snd_archvile_attack,nil,0,0);
-   setWeaponTEID(1,snd_archvile_fire  ,EID_ArchFire,[0..65]);
+   setWeaponTEID(1,nil  ,0,[0..65]); //snd_archvile_fire EID_ArchFire
 end;
 
 UID_ZFormer:
@@ -324,7 +333,7 @@ begin
 end;
 UID_ZSergant:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -354,7 +363,7 @@ begin
 end;
 UID_ZSiege:
 begin
-   _animw:=14;
+   _animw:=13;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -364,7 +373,7 @@ begin
 end;
 UID_ZAntiaircrafter:
 begin
-   _animw:=14;
+   _animw:=13;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -396,7 +405,7 @@ begin
 end;
 UID_ZBFG:
 begin
-   _animw:=12;
+   _animw:=11;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -473,7 +482,7 @@ begin
    un_build_amode:=2;
    un_eid_bcrater_y:=12;
    setWeaponESND(0,snd_archvile_attack,nil,0,0);
-   setWeaponTEID(0,snd_archvile_fire  ,EID_ArchFire,[0..65]);
+   setWeaponTEID(0,nil,0,[0..65]); // snd_archvile_fire                EID_ArchFire
 end;
 UID_HAltar:
 begin
@@ -500,7 +509,7 @@ UID_HCommandCenter:
 begin
    setMWSModel(0,@spr_HCommandCenter);
    setBuildingSND(snd_hell_hbuild);
-   setEffectEID(0,EID_HCC ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);
@@ -509,7 +518,7 @@ UID_HACommandCenter:
 begin
    setMWSModel(0,@spr_HACommandCenter);
    setBuildingSND(snd_hell_hbuild);
-   setEffectEID(0,EID_HACC,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
    setWeaponESND(0    ,nil,snd_hell_attack,0,0);
@@ -519,8 +528,8 @@ begin
    setMWSModel(0,@spr_HBarracks );
    setMWSModel(1,@spr_HABarracks);
    setBuildingSND(snd_hell_hbuild);
-   setEffectEID(0,EID_HMU ,EID_BBExp           ,EID_BBExp           ,0  );
-   setEffectEID(1,EID_HAMU,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(0,0     ,EID_BBExp           ,EID_BBExp           ,0  );
+   setEffectEID(1,0     ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(snd_hell,snd_building_explode,snd_building_explode,nil);
    un_eid_bcrater_y:=10;
 end;
@@ -554,7 +563,7 @@ begin
 end;
 UID_Sergant:
 begin
-   _animw:=14;
+   _animw:=16;
    _animd:=8;
    setMWSModel(0,@spr_Sergant);
    setCommandSND(snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
@@ -635,7 +644,7 @@ begin
    setWeaponESND(0,snd_bfg_shot,nil,0,0);
    setWeaponTEID(0,nil,0,[fr_fps1-10..255]);
 end;
-UID_FAPC:
+UID_UTransport:
 begin
    setMWSModel(0,@spr_FAPC);
    setMWSModel(1,@spr_Transport);
@@ -691,13 +700,6 @@ begin
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
    setWeaponESND(1  ,nil,snd_flyer_s,0,0);
-end;
-UID_UTransport:
-begin
-   setMWSModel(0,@spr_Transport);
-   setCommandSND(snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
-   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
 
 
@@ -818,18 +820,18 @@ end;
                end;
          end;
          if(not un_eid_snd_set)then
-         if(_r>42)then
-         begin
-            setEffectEID(0,0  ,EID_BBExp           ,EID_BBExp           ,0  );
-            setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
-            if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=10;
-         end
-         else
-         begin
-            setEffectEID(0,0  ,EID_BExp            ,EID_BExp            ,0  );
-            setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
-            if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
-         end;
+          if(_r>42)then
+          begin
+             setEffectEID(0,0  ,EID_BBExp           ,EID_BBExp           ,0  );
+             setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
+             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=10;
+          end
+          else
+          begin
+             setEffectEID(0,0  ,EID_BExp            ,EID_BExp            ,0  );
+             setEffectSND(  nil,snd_building_explode,snd_building_explode,nil);
+             if(un_eid_bcrater_y=0)then un_eid_bcrater_y:=5;
+          end;
          if(un_snd_ready=nil)then un_snd_ready:=snd_constr_complete[_urace];
       end;
 
@@ -841,6 +843,10 @@ end;
       if(_fr<1)then _fr:=1;
    end;
 
+   u:=UID_HCommandCenter;  setEffectEID2(0,_uid2spr(UID_UCommandCenter  ,0,0));
+   u:=UID_HACommandCenter; setEffectEID2(0,_uid2spr(UID_UACommandCenter ,0,0));
+   u:=UID_HBarracks;       setEffectEID2(0,_uid2spr(UID_UBarracks       ,0,0));
+                           setEffectEID2(1,_uid2spr(UID_UBarracks       ,0,1));
 
    // ui panel
    for r:=1 to r_cnt do
@@ -877,7 +883,6 @@ upgr_hell_HKTeleport: begin _up_btn:=spr_b_up[r_hell,9 ]; end;
 upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
 upgr_hell_buildr    : begin _up_btn:=spr_b_up[r_hell,11]; end;
 upgr_hell_extbuild  : begin _up_btn:=spr_b_up[r_hell,20]; end;
-
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
 upgr_hell_pinkspd   : begin _up_btn:=spr_b_up[r_hell,12]; end;
 upgr_hell_phantoms  : begin _up_btn:=spr_b_up[r_hell,17]; end;

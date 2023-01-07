@@ -143,8 +143,9 @@ function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
 begin
    case pu^.uidi of
    UID_Phantom,
-   UID_LostSoul: if(tu^.uid^._ukmech )then _d50(@damage);
-   UID_Demon   : if(tu^.uid^._uklight)then _d150(@damage);
+   UID_LostSoul: if(    tu^.uid^._ukmech )then _d50 (@damage);
+   UID_Demon   : if(    tu^.uid^._uklight)
+                and(not tu^.uid^._ukmech )then _d150(@damage);
    end;
 
    _unit_melee_damage:=damage;
@@ -201,7 +202,7 @@ MID_URocketS   : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=rocket_
 MID_URocket    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
 MID_Mancubus   : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
 MID_YPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_ArchFire   : begin damage:=BaseDamage4  ; vstep:=1;        splashr :=15 ;         end;
+MID_ArchFire   : begin damage:=BaseDamage8  ; vstep:=1;        splashr :=15 ;         end;
 
 MID_Bullet     : begin damage:=BaseDamageh  ; vstep:=5;        splashr :=0  ;         end;
 MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
@@ -212,7 +213,7 @@ MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=tank_sr;     end;
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
-MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;   splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
+MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;  splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=5;        splashr :=0  ;         end;
 MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=5;        splashr :=0  ;         end;
       else

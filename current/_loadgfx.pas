@@ -736,13 +736,19 @@ begin
    begin
       with un_btn do
       begin
-         surf:= LoadBtnFS(_uid2spr(u,0)^.surf,vid_BW );
+         case _urace of
+         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_BW );
+         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_BW );
+         end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
       with un_sbtn do
       begin
-         surf:= LoadBtnFS(_uid2spr(u,0)^.surf,vid_oiw);
+         case _urace of
+         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_oiw );
+         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_oiw );
+         end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;

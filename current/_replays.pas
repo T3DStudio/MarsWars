@@ -56,7 +56,7 @@ begin
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
-         BlockRead(f,hp,SizeOf(HPlayer  ));
+         BlockRead(f,hp,SizeOf(HPlayer          ));
 
          //rpls_str_info:=rpls_str_info+str_players+':'+tc_nl3;
 
@@ -155,6 +155,7 @@ begin
                          rpls_player :=HPlayer;
                          rpls_log_n  :=_players[rpls_player].log_n;
                          rpls_plcam  :=false;
+                         rpls_ticks  :=0;
 
                          {$I-}
                          BlockWrite(rpls_file,ver              ,SizeOf(ver              ));
@@ -323,6 +324,7 @@ begin
                             rpls_fstatus:=rpls_file_read;
                             rpls_state  :=rpl_runit;
                             rpls_pnu    :=0;
+                            rpls_ticks  :=0;
                             HPlayer     :=rpls_player;
 
                             rpls_plcam  :=false;
@@ -369,7 +371,7 @@ begin
                                {$I+}
                             end;
 
-                            if(G_Status=gs_running)then _rclinet_gframe(0,true);
+                            if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true);
 
                             if(rpls_step>1)then effects_sprites(false,false);
                             rpls_step-=1;
