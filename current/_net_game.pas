@@ -273,14 +273,14 @@ nmid_pause       : begin
          begin
             net_clearbuffer;
             net_writebyte(nmid_chatclupd);
-            _wudata_chat(i,@log_n_cl,false);
+            _wudata_log(i,@log_n_cl,false);
             net_send(nip,nport);
-            net_logsend_pause:=fr_fpsh;
+            net_logsend_pause:=fr_fpsd2;
          end;
       end;
 
    net_period+=1;
-   net_period:=net_period mod fr_fpsh;
+   net_period:=net_period mod fr_fpsd2;
 end;
 
 {$IFDEF _FULLGAME}
@@ -352,7 +352,7 @@ nmid_notconnected: begin
                       GameDefaultAll;
                    end;
 nmid_chatclupd   : begin
-                      _rudata_chat(HPlayer,false);
+                      _rudata_log(HPlayer,false);
                       net_chat_shlm:=chat_shlm_t;
                       net_period:=0;
                    end;
@@ -434,7 +434,7 @@ nmid_lobby_info  : begin
    end;
 
    net_period+=1;
-   net_period:=net_period mod fr_fpsh;
+   net_period:=net_period mod fr_fpsd2;
    if(net_cl_svttl<ClientTTL)then
    begin
       net_cl_svttl+=1;

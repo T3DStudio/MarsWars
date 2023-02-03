@@ -39,7 +39,6 @@ NOTSET     = 32000;
 
 var
 
-ai_cpoint_zone,
 ai_alarm_zone    : word;
 ai_alarm_unit,
 
@@ -59,16 +58,16 @@ ai_enemy_inv_u,
 ai_mrepair_u,
 ai_urepair_u,
 ai_base_u         : PTUnit;
+ai_generator_cp,
+ai_cpoint_cp      : PTCTPoint;
 
 ai_LostWantZombieMe,
 ai_advanced_bld,
 ai_teleport_use,
 ai_choosen,
 ai_cpoint_koth    : boolean;
-ai_cpoint_x,
-ai_cpoint_y,
+ai_generator_d,
 ai_cpoint_d,
-ai_cpoint_r,
 ai_alarm_d,
 ai_alarm_x,
 ai_alarm_y,
@@ -220,8 +219,8 @@ begin
       3  : SetBaseOpt(2400 ,3   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,30    ,fr_fps1*120,30            ,1  ,[]);
       4  : SetBaseOpt(3600 ,7   ,6     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,40            ,2  ,[]);
       5  : SetBaseOpt(4200 ,11  ,10    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,90    ,fr_fps1*60 ,50            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
-      6  : SetBaseOpt(4900 ,16  ,14    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
-      else SetBaseOpt(6000 ,20  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFG,UID_ZBFG]);
+      6  : SetBaseOpt(4900 ,16  ,14    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(6000 ,20  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill;
       case ai_skill of
@@ -307,6 +306,7 @@ end;
 
 procedure ai_InitVars(pu:PTUnit);
 var i,d,ds:integer;
+      koth:boolean;
 begin
    with pu^ do
    begin
@@ -353,15 +353,15 @@ begin
    ai_urepair_d      := NOTSET;
 
    // cpoints
-   ai_cpoint_x       :=0;
-   ai_cpoint_y       :=0;
-   ai_cpoint_d       :=NOTSET;
-   ai_cpoint_zone    :=0;
-   ai_cpoint_r       :=0;
+   ai_cpoint_cp      := nil;
+   ai_cpoint_d       := NOTSET;
+
+   ai_generator_cp   := nil;
+   ai_generator_d    := NOTSET;
 
    //
-   ai_enrg_pot      :=0;
-   ai_enrg_cur      :=0;
+   ai_enrg_pot       :=0;
+   ai_enrg_cur       :=0;
 
    // get default alarm point
    with pu^ do
@@ -387,34 +387,63 @@ begin
                ai_enrg_cur+=cpenergy;
             end;
 
-            if(cpOwnerTeam<>team)
-            or((cpTimer>0)and(cpTimerOwnerTeam<>team))then
-            begin
-               d:=point_dist_int(cpx,cpy,x,y);
+            d:=point_dist_int(cpx,cpy,x,y);
 
-               ds:=d;
-               if(_ukbuilding)
-               then ds:=d
-               else
+            if(d>cpCapturer)then
+             if (not ukfly)
+             and(not ukfloater)
+             and(pfzone<>cpzone)then continue;
+
+            ds:=d;
+
+            koth:=(i=1)and(g_mode=gm_koth);
+
+            if (cpunitst_pstate[team]<ul4)
+            or((cpunitst_pstate[team]<ul8)and(d<cpCapturer))
+            or(koth)then
+            begin
+               if(apcm>0)then
                begin
-                  if(i=1)and(g_mode=gm_koth)then ds:=(d div 2)-cpTimer;//max2(d div 3,ai_cp_go_r);
-                  if(cpOwnerTeam=0)and(cpTimer<=0)then ds:=d div 2;
+                  if(apcc<=0)then
+                   if(cpunitst_pstate[team]>_limituse)
+                   or(cpOwnerTeam>0)
+                   or(cpOwnerPlayer>0)then continue;
                end;
 
-               if(pfzone=cpzone)
-               or(ukfly)
-               or(ukfloater)
-               or(d<gm_cptp_r)then
-                if(ds<ai_cpoint_d)then
-                begin
-                   ai_cpoint_x   :=cpx;
-                   ai_cpoint_y   :=cpy;
-                   ai_cpoint_r   :=cpCapturer;
-                   ai_cpoint_d   :=ds;
-                   ai_cpoint_zone:=cpzone;
+               if(cpenergy>0)then
+               begin
+                  ds:=d div 4;
+                  if(cpOwnerTeam=0)
+                  or(cpOwnerPlayer=0)then ds:=d div 4;
 
-                   ai_cpoint_koth:=(i=1)and(g_mode=gm_koth);
-                end;
+                  if(cycle_order<4)
+                  or(ds<base_rr)
+                  or(menergy<1000)
+                  or((ukfly or ukfloater)and(uid_e[uidi]>1)and(unum=uid_x[uidi]))then
+                  begin
+                     if(ds<ai_generator_d)then
+                     begin
+                        ai_generator_d :=ds;
+                        ai_generator_cp:=@g_cpoints[i];
+                     end;
+                  end;
+               end
+               else
+               begin
+                  if(not _ukbuilding)then
+                   if(koth)then ds:=(d div 2)-cpTimer;//max2(d div 3,ai_cp_go_r);
+
+                  if(d<ai_cpoint_d)then
+                    if(cycle_order<4)
+                    or(ds<base_ir)
+                    or((ukfly or ukfloater)and(uid_e[uidi]>1)and(unum=uid_x[uidi]))
+                    or(koth)then
+                    begin
+                       ai_cpoint_d   :=d;
+                       ai_cpoint_cp  :=@g_cpoints[i];
+                       ai_cpoint_koth:=(i=1)and(g_mode=gm_koth);
+                    end;
+               end;
             end;
          end;
     end;
@@ -1181,10 +1210,10 @@ uprod_any  : case pu^.player^.race of
                           16: ut:=UID_ZSSergant;
                           17: ut:=UID_ZCommando;
                           18: ut:=UID_ZAntiaircrafter;
-                          19: ut:=UID_ZSiege;
-                          20: ut:=UID_ZMajor;
-                          21: ut:=UID_ZFMajor;
-                          22: ut:=UID_ZBFG;
+                          19: ut:=UID_ZSiegeMarine;
+                          20: ut:=UID_ZPlasmagunner;
+                          21: ut:=UID_ZFPlasmagunner;
+                          22: ut:=UID_ZBFGMarine;
                      end;
              r_uac : begin
                      if(tryTransport)then exit;
@@ -1195,10 +1224,10 @@ uprod_any  : case pu^.player^.race of
                           3 : ut:=UID_SSergant;
                           4 : ut:=UID_Commando;
                           5 : ut:=UID_Antiaircrafter;
-                          6 : ut:=UID_Siege;
-                          7 : ut:=UID_Major;
-                          8 : ut:=UID_FMajor;
-                          9 : ut:=UID_BFG;
+                          6 : ut:=UID_SiegeMarine;
+                          7 : ut:=UID_Plasmagunner;
+                          8 : ut:=UID_FPlasmagunner;
+                          9 : ut:=UID_BFGMarine;
                           10: ut:=UID_APC;
                           11: ut:=UID_UTransport;
                           12: ut:=UID_UACBot;
@@ -1213,10 +1242,10 @@ uprod_air  : case pu^.player^.race of
                           0 : ut:=UID_LostSoul;
                           1 : ut:=UID_Cacodemon;
                           2 : ut:=UID_Pain;
-                          3 : ut:=UID_ZFMajor;
+                          3 : ut:=UID_ZFPlasmagunner;
                      end;
              r_uac : case random(3) of
-                          0 : ut:=UID_FMajor;
+                          0 : ut:=UID_FPlasmagunner;
                           1 : ut:=UID_Flyer;
                           2 : ut:=UID_UTransport;
                      end;
@@ -1227,13 +1256,13 @@ uprod_antiair
                           0 : ut:=UID_LostSoul;
                           1 : ut:=UID_Cacodemon;
                           2 : ut:=UID_Pain;
-                          3 : ut:=UID_ZFMajor;
+                          3 : ut:=UID_ZFPlasmagunner;
                           4 : ut:=UID_Revenant;
                           5 : ut:=UID_Imp;
                           6 : ut:=UID_ZAntiaircrafter;
                      end;
              r_uac : case random(3) of
-                          0 : ut:=UID_FMajor;
+                          0 : ut:=UID_FPlasmagunner;
                           1 : ut:=UID_Flyer;
                           2 : ut:=UID_Antiaircrafter;
                           3 : ut:=UID_Commando;
@@ -1390,7 +1419,7 @@ UID_UATurret   : if(not ai_enemy_u^.ukfly)and(srange<ai_enemy_air_d)and(ai_enemy
       case uidi of
 UID_HKeep,
 UID_HCommandCenter,
-UID_UCommandCenter: if(n_builders>1)then exit;
+UID_UCommandCenter: if(n_builders>1)and(ai_enrg_cur>1200)then exit;
 UID_HSymbol,
 UID_UGenerator    : if(ai_enrg_cur<ai_max_energy)then exit;
       else
@@ -1449,8 +1478,8 @@ begin
          if(ai_cpoint_d<base_rr)and(ai_cpoint_koth)then
          begin
             ai_towers_need     :=ai_max_towers;
-            ai_towers_needx    :=ai_cpoint_x;
-            ai_towers_needy    :=ai_cpoint_y;
+            ai_towers_needx    :=ai_cpoint_cp^.cpx;
+            ai_towers_needy    :=ai_cpoint_cp^.cpy;
             ai_towers_need_type:=0;
          end;
       end;
@@ -1476,7 +1505,7 @@ begin
       if(_isbarrack)then
       begin
          if(cenergy<0)
-         then _unit_ctraining(pu,255)
+         then _unit_ctraining(pu,255,false)
          else ai_UnitProduction(pu,uprod_smart,MaxUnits);
 
          if(aiu_alarm_d<NOTSET)and(speed<=0)then
@@ -1487,7 +1516,7 @@ begin
       end;
       if(_issmith  )then
        if(cenergy<0)and(uproda<=0)
-       then _unit_cupgrade(pu,255)
+       then _unit_cupgrade(pu,255,false)
        else ai_UpgrProduction(pu);
    end;
 end;
@@ -1694,29 +1723,44 @@ UID_ArchVile   : ai_RunFromEnemy(pu,base_r);
    end;
    //if(pu^.sel)then writeln('THINK_NearestAlarm ',THINK_NearestAlarm);
 end;
+function THINK_Generator:boolean;
+begin
+   THINK_Generator:=false;
+   with pu^ do
+    with player^ do
+     if(ai_generator_d<NOTSET)then
+      with ai_generator_cp^ do
+      begin
+         {if(apcm>0)and(unum<>uid_x[uidi])then
+          if(apcc<=0)or(pf_isobstacle_zone(cpzone))
+          then exit; }
+
+         if(apcc>0)and(ai_generator_d<base_r)
+         then uo_id:=ua_unload;
+
+         ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
+
+         group:=aio_busy;
+
+         THINK_Generator:=true;
+      end;
+end;
 function THINK_CPoint:boolean;
 begin
    THINK_CPoint:=false;
    with pu^ do
-   with player^ do
-   if(ai_cpoint_d<NOTSET)then
-     if(cycle_order<5)
-     or(ai_cpoint_d<base_r)
-     or(player^.menergy<1000)
-     or((ukfly or ukfloater)and(uid_e[uidi]>0)and(unum=uid_x[uidi]))then
-     begin
-        if(apcm>0)and(unum<>uid_x[uidi])then
-         if(apcc<=0)or(pf_isobstacle_zone(ai_cpoint_zone))
-         then exit;
+    with player^ do
+     if(ai_cpoint_d<NOTSET)then
+      with ai_cpoint_cp^ do
+      begin
+         if(apcc>0)and(ai_cpoint_d<base_r)
+         then uo_id:=ua_unload;
 
-        if(apcc>0)and(ai_cpoint_d<base_r)
-        then uo_id:=ua_unload;
+         group:=aio_busy;
+         ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
 
-        group:=aio_busy;
-        ai_RunTo(pu,0,ai_cpoint_x,ai_cpoint_y,ai_cpoint_r div 2,nil);
-
-        THINK_CPoint:=true;
-     end;
+         THINK_CPoint:=true;
+      end;
    //if(pu^.sel)then writeln('THINK_CPoint ',THINK_CPoint);
 end;
 function THINK_BaseAlarm:boolean;
@@ -1905,21 +1949,22 @@ begin
       if(group=aio_busy)then group:=aio_home;
 
       if(not THINK_RoyalBattleBorders)then
-       if(not THINK_Repair           )then
-        if(not THINK_NearestAlarm    )then
-         if(not THINK_Transport      )then
-          if(not THINK_BaseAlarm     )then
-           if(not THINK_Scout        )then
-           begin
-              if(group=aio_scout)then
-              begin
-                 group:=aio_home;
-                 aiu_attack_timer:=0;
-              end;
+       if(not THINK_Generator        )then
+        if(not THINK_Repair          )then
+         if(not THINK_NearestAlarm   )then
+          if(not THINK_Transport     )then
+           if(not THINK_BaseAlarm    )then
+            if(not THINK_Scout       )then
+            begin
+               if(group=aio_scout)then
+               begin
+                  group:=aio_home;
+                  aiu_attack_timer:=0;
+               end;
 
-              if(not THINK_CPoint)
-              then THINK_Attack;
-           end;
+               if(not THINK_CPoint)
+               then THINK_Attack;
+            end;
    end;
 end;
 
@@ -1943,7 +1988,7 @@ begin
            else
              if(ai_choosen)and(ai_cpoint_koth)then
              begin
-                ai_RunTo(pu,ai_cpoint_d,ai_cpoint_x,ai_cpoint_y,base_r,nil);
+                ai_RunTo(pu,ai_cpoint_d,ai_cpoint_cp^.cpx,ai_cpoint_cp^.cpy,base_r,nil);
                 if(ai_cpoint_d<base_r)
                 then _unit_action(pu);
              end
@@ -1963,6 +2008,7 @@ begin
         or((ai_choosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_r))
         then _unit_action(pu)
         else
+         if(not ai_cpoint_koth)or(ai_cpoint_d>base_r)then
           if(aiu_armyaround_enemy>aiu_armyaround_ally)and(buff[ub_Damaged]>0)then
            if(hits<uid^._hmhits)or(aiu_armyaround_enemy>ul15)then _unit_action(pu);
    end;
@@ -1972,13 +2018,14 @@ var w:integer;
 begin
    with pu^ do
    begin
-      if(aiu_alarm_d<base_rr)and(ai_basep_builders<=ai_MinBaseSaveCountBorder)and(hits<uid^._hmhits)then
-      begin
-         if(g_mode=gm_royale)
-         then w:=g_royal_r div 2
-         else w:=map_hmw;
-         if(_unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w)))then exit;
-      end;
+      if(not ai_cpoint_koth)or(ai_cpoint_d>base_r)then
+       if(aiu_alarm_d<base_rr)and(ai_basep_builders<=ai_MinBaseSaveCountBorder)and(hits<uid^._hmhits)then
+       begin
+          if(g_mode=gm_royale)
+          then w:=g_royal_r div 2
+          else w:=map_hmw;
+          if(_unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w)))then exit;
+       end;
 
       case g_mode of
 gm_koth  : if(ai_choosen)and(base_r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
@@ -2020,8 +2067,8 @@ begin
       if(a_rld>0)then exit;
 
       if (ai_cpoint_d<NOTSET)
-      and(ai_cpoint_x=ai_alarm_x)
-      and(ai_cpoint_y=ai_alarm_y)
+      and(ai_cpoint_cp^.cpx=ai_alarm_x)
+      and(ai_cpoint_cp^.cpy=ai_alarm_y)
       then br:=gm_cptp_r
       else br:=srange;
 

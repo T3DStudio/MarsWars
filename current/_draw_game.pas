@@ -324,7 +324,7 @@ begin
       choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
 
       srect :=((sel)and(playeri=HPlayer))
-            or(k_alt>1)
+            or(ks_alt>0)
             or(choosen);
 
       hbar  :=false;
@@ -642,7 +642,7 @@ begin
       _draw_text(r_screen,vid_panelw,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
    end;       }
 
-   if(k_shift>2) then
+   if(ks_shift>0) then
    for u:=0 to MaxPlayers do
     with _players[u] do
     begin
@@ -662,7 +662,7 @@ begin
        for iy:=0 to 11 do _draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
     end;
 
-   if(k_ctrl>2)then
+   if(ks_ctrl>0)then
    for u:=1 to MaxUnits do
     with _units[u] do
     with player^ do
@@ -753,7 +753,7 @@ begin
         //if(sel)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
 
-   if(k_ctrl>2)then
+   if(ks_ctrl>0)then
    for u:=1 to MaxMissiles do
    with _missiles[u] do
    if(vstep>0)then

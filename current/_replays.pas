@@ -204,7 +204,7 @@ begin
                            {$I-}
                            BlockWrite(rpls_file,i,sizeof(i));
                            {$I+}
-                           if((i and %10000000)>0)then _wudata_chat(rpls_player,@rpls_log_n,true);
+                           if((i and %10000000)>0)then _wudata_log(rpls_player,@rpls_log_n,true);
                            if((i and %01000000)>0)then
                            begin
                               rpls_vidx:=_vx;
@@ -362,7 +362,7 @@ begin
                             {$I+}
                             G_Status:=i and %00111111;
 
-                            if((i and %10000000)>0)then _rudata_chat(rpls_player,true);
+                            if((i and %10000000)>0)then _rudata_log(rpls_player,true);
                             if((i and %01000000)>0)then
                             begin
                                {$I-}

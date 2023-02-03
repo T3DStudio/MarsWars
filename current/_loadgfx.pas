@@ -293,7 +293,7 @@ begin
       ts                :=r_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
-      theme_liquid_animm:=fr_fpsh;
+      theme_liquid_animm:=fr_fpsd2;
    end
    else
    begin
@@ -686,6 +686,9 @@ begin
    _LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_missile,firstload);
+
+   spr_u_p1s:=spr_u_p1;
+   with spr_u_p1s do mkind:=smt_effect2;
 
    _LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);

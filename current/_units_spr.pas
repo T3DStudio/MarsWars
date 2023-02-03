@@ -30,6 +30,9 @@ begin
 smt_effect  : if(animk=sms_death)
               then i:=anim
               else i:=0;
+smt_effect2 : if(animk=sms_death)
+              then i:=anim
+              else i:=sk;
 
 smt_missile : if(animk=sms_death)
               then i:=8+anim
@@ -85,7 +88,7 @@ smt_imp     : case animk of
 smt_zengineer:case animk of
         sms_stand,
         sms_walk : i:=4*dd+aa3(0,anim,3);
-        sms_death: exit;
+        sms_death: i:=32+anim;
               else i:=4*dd;
               end;
 
@@ -328,9 +331,12 @@ begin
        with _a_weap[a_weap_cl] do
         if(aw_max_range>=0)then
         begin
-           if(a_rld in aw_rld_a)
-           then _unit2SMAnimK:=sms_dattack
-           else _unit2SMAnimK:=sms_dready;
+           if not(a_rld in aw_rld_a)
+           then _unit2SMAnimK:=sms_dready
+           else
+             if(aw_AnimStay>0)
+             then _unit2SMAnimK:=aw_AnimStay
+             else _unit2SMAnimK:=sms_dattack;
         end
         else
            if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
@@ -359,7 +365,6 @@ sms_walk:    if(animw>0)then
                 begin
                    anim+=animw;
                    if(anim<0)then anim:=0;
-                   //if(anim>=1100)then anim:=anim mod 1100;
                 end;
                 _unit2spr:=_sm2s(smodel,ak,dir,anim div 100,nil)
              end

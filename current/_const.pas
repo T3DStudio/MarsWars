@@ -13,20 +13,20 @@ degtorad               = pi/180;
 fr_fps1                = 60;
 fr_RateTicks           = 1000/fr_fps1;
 
-fr_fpsh                = fr_fps1 div 2;
-fr_fps1_3              = fr_fps1 div 3;
-fr_fps1_4              = fr_fps1 div 4;
-fr_fps1_5              = fr_fps1 div 5;
-fr_fps1_6              = fr_fps1 div 6;
-fr_fps1_7              = fr_fps1 div 7;
-fr_fps1_8              = fr_fps1 div 8;
-fr_fps1h               = fr_fpsh*3;   //1,5
+fr_fpsd2               = fr_fps1 div 2;
+fr_fpsd3               = fr_fps1 div 3;
+fr_fpsd4               = fr_fps1 div 4;
+fr_fpsd5               = fr_fps1 div 5;
+fr_fpsd6               = fr_fps1 div 6;
+fr_fpsd7               = fr_fps1 div 7;
+fr_fpsd8               = fr_fps1 div 8;
+fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
 fr_fps4                = fr_fps1*4;
 fr_fps5                = fr_fps1*5;
-fr_2h3fps              = fr_fps1_3*2; //2/3
-fr_3h4fps              = fr_fps1_4*3; //3/4
+fr_fps2d3              = fr_fpsd3*2; //2/3
+fr_fps3d4              = fr_fpsd4*3; //3/4
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -172,13 +172,21 @@ lmt_req_ruids          = 20;
 lmt_map_mark           = 21;
 lmt_unit_attacked      = 22;
 lmt_cant_order         = 23;
-lmt_player_chat        = 127;
+lmt_player_chat        = 255;
 
-lmts_menu_chat         = [0..MaxPlayers,lmt_game_message,lmt_game_end,lmt_player_defeated,lmt_player_leave,lmt_player_chat];
+lmts_menu_chat         = [
+                          0..MaxPlayers,
+                          lmt_game_message,
+                          lmt_game_end,
+                          lmt_player_defeated,
+                          lmt_player_leave,
+                          lmt_player_chat
+                         ];
 lmts_last_messages     = [0..255];
 
-glcp_unit              = 0;
-glcp_upgr              = 1;
+lmt_argt_unit          = 0;
+lmt_argt_upgr          = 1;
+
 {
 uia_nonew              = 0;
 uia_trynew             = 1;
@@ -582,6 +590,7 @@ MID_Mine               = 123;
 MID_URocket            = 124;
 MID_URocketS           = 125;
 MID_Chaingun           = 126;
+MID_Chaingun2          = 127;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -621,7 +630,7 @@ ptime1hh               = ptime1+ptimehh;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
-
+ptime5                 = ptime1*5;
 
 uf_ground              = false;
 uf_fly                 = true;
@@ -632,7 +641,7 @@ mvxy_none              = 0;
 mvxy_relative          = 1;
 mvxy_strict            = 2;
 
-BaseDamage1            = 70;
+BaseDamage1            = 62;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
@@ -696,16 +705,17 @@ UID_Revenant           = 30;
 UID_Mancubus           = 31;
 UID_Arachnotron        = 32;
 UID_Archvile           = 33;
+
 UID_ZFormer            = 34;
 UID_ZEngineer          = 35;
 UID_ZSergant           = 36;
 UID_ZSSergant          = 37;
 UID_ZCommando          = 38;
 UID_ZAntiaircrafter    = 39;
-UID_ZSiege             = 40;
-UID_ZMajor             = 41;
-UID_ZFMajor            = 42;
-UID_ZBFG               = 43;
+UID_ZSiegeMarine       = 40;
+UID_ZPlasmagunner      = 41;
+UID_ZFPlasmagunner     = 42;
+UID_ZBFGMarine         = 43;
 
 // UAC
 
@@ -740,10 +750,10 @@ UID_Sergant            = 82;
 UID_SSergant           = 83;
 UID_Commando           = 84;
 UID_Antiaircrafter     = 85;
-UID_Siege              = 86;
-UID_Major              = 87;
-UID_FMajor             = 88;
-UID_BFG                = 89;
+UID_SiegeMarine        = 86;
+UID_Plasmagunner       = 87;
+UID_FPlasmagunner      = 88;
+UID_BFGMarine          = 89;
 UID_UTransport         = 90;
 UID_UACBot             = 91;
 UID_Terminator         = 92;
@@ -755,8 +765,8 @@ UID_APC                = 95;
 uids_hell              = [1 ..49];
 uids_uac               = [50..99];
 
-uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_Siege , UID_Major, UID_FMajor ,UID_BFG ];
-uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiege, UID_ZMajor,UID_ZFMajor,UID_ZBFG];
+uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_Plasmagunner, UID_FPlasmagunner ,UID_BFGMarine ];
+uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZPlasmagunner,UID_ZFPlasmagunner,UID_ZBFGMarine];
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
@@ -796,12 +806,12 @@ client_cast_abils= [
 //
 
 
-fr_mancubus_rld        = fr_fps2+fr_fpsh;
-fr_mancubus_rld_s1     = fr_fps2-fr_fps1_6;
-fr_mancubus_rld_s2     = fr_fps1+fr_fps1_6;
-fr_mancubus_rld_s3     = fr_fpsh;
+fr_mancubus_rld        = fr_fps2+fr_fpsd2;
+fr_mancubus_rld_s1     = fr_fps2-fr_fpsd6;
+fr_mancubus_rld_s2     = fr_fps1+fr_fpsd6;
+fr_mancubus_rld_s3     = fr_fpsd2;
 
-fr_archvile_s          = fr_fps1+fr_fps1_6;
+fr_archvile_s          = fr_fps1+fr_fpsd6;
 
 NameLen                = 13;
 
@@ -820,7 +830,7 @@ base_6r                = base_r*6;
 
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1*2;
-order_period           = fr_fpsh+1;
+order_period           = fr_fpsd2+1;
 vistime                = order_period+2;
 
 radar_reload           = fr_fps1*60;
@@ -851,7 +861,8 @@ player_default_ai_level= 7;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
-gm_cptp_time           = fr_fps1*20;
+gm_cptp_gtime          = fr_fps1*ptimehh;
+gm_cptp_time           = fr_fps1*ptimeh;
 gm_cptp_r              = 100;
 gm_cptp_energy         = 600;
 
@@ -859,7 +870,7 @@ fly_z                  = 80;
 fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
-pain_time              = fr_2h3fps;
+pain_time              = fr_fps2d3;
 
 {$IFDEF _FULLGAME}
 
@@ -937,7 +948,7 @@ char_start             : char = '+';
 char_gen               : char = '*';
 char_cp                : char = '=';
 
-ChatLen2               = 255;
+ChatLen2               = 200;
 dead_time              = -dead_hits;
 char_detect            = #7;
 char_advanced          = #10;
@@ -997,6 +1008,7 @@ smt_tank               = 22; //UID_Tank
 smt_terminat           = 23; //UID_Terminator
 smt_transport          = 24; //UID_Transport
 smt_flyer              = 25; //UID_FLyer
+smt_effect2            = 26; // simple missile or effect
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1072,6 +1084,15 @@ font_6hw               = font_3hw*2;
 
 txt_line_h             = 5;
 txt_line_h2            = 25-font_w;
+
+chat_all               = 255;
+chat_allies            = 254;
+{chat_1                 = 1;
+chat_2                 = 2;
+chat_3                 = 3;
+chat_4                 = 4;
+chat_5                 = 5;
+chat_6                 = 6;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

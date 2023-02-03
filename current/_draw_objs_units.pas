@@ -406,7 +406,7 @@ begin
 
             if(buff[ub_Invis ]>0 )then alpha:=128;
 
-            if(buff[ub_Invuln]>fr_fps1_6)
+            if(buff[ub_Invuln]>fr_fpsd6)
             then ColorAura:=c_awhite
             else
               if(playeri=0)and(not _ukbuilding)then

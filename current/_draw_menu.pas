@@ -442,7 +442,7 @@ begin
                     vlineColor(tar,ui_menu_csm_x2  , t,i, c_gray);
                     vlineColor(tar,ui_menu_csm_x3  , t,i, c_gray);
 
-                    y:=_yt(10);
+                    {y:=_yt(10);
                     _draw_text(tar,ui_menu_csm_xt0, y, str_chattars, ta_left,255, c_white);
 
                     y:=_yl(11);
@@ -459,7 +459,7 @@ begin
                        else c:=c_gray;
 
                        _draw_text(tar,i-ui_menu_csm_ys, y+6, '#'+b2s(t), ta_middle,255, c);
-                    end;
+                    end; }
                  end;
               end;
    end;

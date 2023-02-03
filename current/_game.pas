@@ -4,7 +4,7 @@ begin
    with _players[p] do
    begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HBarracks,
-                                UID_LostSoul      ..UID_ZBFG,
+                                UID_LostSoul      ..UID_ZBFGMarine,
                                 UID_UCommandCenter..UID_UNuclearPlant,
                                 UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
@@ -87,6 +87,7 @@ begin
        ready    :=false;
        pnum     :=p;
        PlayerSetState(p,ps_none);
+       PlayerSetSkirmishTech(p);
        PlayerClearLog(p);
    end;
 
@@ -183,7 +184,7 @@ begin
    FillChar(_effects ,SizeOf(_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
 
-   ingame_chat :=false;
+   ingame_chat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
    net_cl_svpl :=0;
@@ -373,7 +374,7 @@ begin
    if(o_id>0)and(army>0)then
    begin
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
+uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
       else
          usel_n  :=0;
          usel_max:=MaxPlayerUnits;
@@ -426,16 +427,21 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,glcp_unit,byte(o
                    else if(o_id<>uo_adblselect)then sel:=false;
                 end;
                 if(o_id=uo_specsel)then
-                 if(o_x0<1)or(255<o_x0)
-                 then begin if(UnitF2Select(pu))then sel:=true else if(o_y0=0)then sel:=false; end
-                 else       if(a_units[uidi]=1)and(uidi=o_x0)then sel:=true else if(o_y0=0)then sel:=false;
+                  if(UnitF2Select(pu))
+                  then sel:=true
+                  else
+                    if(o_y0=0)then sel:=false;
 
                 if(o_id=uo_corder)then
                  case o_x0 of
-                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0))then begin PlayerClearProdError(player);break;end;// start  upgr
-                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0))then break;                                       // cancle upgr
-                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0))then begin PlayerClearProdError(player);break;end;// start  training
-                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0))then break;                                       // cancle training
+                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  upgr
+                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0,false))then break;                                       // cancle upgr
+                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  training
+                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0,false))then break;                                       // cancle training
+                 co_pcancle  : begin
+                               if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,255 ,false))then break;
+                               if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,255 ,false))then break;
+                               end;
                  end;
 
                 if(sel)then
@@ -476,6 +482,8 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
+   exit;
+
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
    FillChar(teams_army,SizeOf(teams_army),0);
@@ -529,7 +537,7 @@ begin
            PlayerExecuteOrder(p);
 
            if(prod_error_cndt>0)then
-             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
+            GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
            prod_error_cndt  :=0;
         end;
      end;
@@ -616,8 +624,8 @@ ul2  : case random(9) of
        1 :SpawnL:=SpawnMonster(UID_Cacodemon);
        2 :SpawnL:=SpawnMonster(UID_Knight);
        3 :SpawnL:=SpawnMonster(UID_Revenant);
-       4 :SpawnL:=SpawnMonster(UID_BFG);
-       5 :SpawnL:=SpawnMonster(UID_ZBFG);
+       4 :SpawnL:=SpawnMonster(UID_BFGMarine);
+       5 :SpawnL:=SpawnMonster(UID_ZBFGMarine);
        6 :SpawnL:=SpawnMonster(UID_SSergant);
        7 :SpawnL:=SpawnMonster(UID_ZSSergant);
        8 :SpawnL:=SpawnMonster(UID_UACBot);
@@ -627,15 +635,15 @@ ul1  : case random(15) of
        1 :SpawnL:=SpawnMonster(UID_Sergant);
        2 :SpawnL:=SpawnMonster(UID_Commando);
        3 :SpawnL:=SpawnMonster(UID_Antiaircrafter);
-       4 :SpawnL:=SpawnMonster(UID_Siege);
-       5 :SpawnL:=SpawnMonster(UID_Major);
-       6 :SpawnL:=SpawnMonster(UID_FMajor);
+       4 :SpawnL:=SpawnMonster(UID_SiegeMarine);
+       5 :SpawnL:=SpawnMonster(UID_Plasmagunner);
+       6 :SpawnL:=SpawnMonster(UID_FPlasmagunner);
        7 :SpawnL:=SpawnMonster(UID_ZSergant);
        8 :SpawnL:=SpawnMonster(UID_ZCommando);
        9 :SpawnL:=SpawnMonster(UID_ZAntiaircrafter);
-       10:SpawnL:=SpawnMonster(UID_ZSiege);
-       11:SpawnL:=SpawnMonster(UID_ZMajor);
-       12:SpawnL:=SpawnMonster(UID_ZFMajor);
+       10:SpawnL:=SpawnMonster(UID_ZSiegeMarine);
+       11:SpawnL:=SpawnMonster(UID_ZPlasmagunner);
+       12:SpawnL:=SpawnMonster(UID_ZFPlasmagunner);
        13:SpawnL:=SpawnMonster(UID_ZEngineer);
        14:SpawnL:=SpawnMonster(UID_Pain);
        end;

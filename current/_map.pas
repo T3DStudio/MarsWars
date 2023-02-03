@@ -391,7 +391,7 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
    end;
 
    if(g_cgenerators>0)then
-    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r,gm_cptp_energy,gm_cptp_time,g_cgenerators_ltime[g_cgenerators],false);
+    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r,gm_cptp_energy,gm_cptp_gtime,g_cgenerators_ltime[g_cgenerators],false);
 end;
 
 function _dec_min_r(t1,t2:byte):integer;

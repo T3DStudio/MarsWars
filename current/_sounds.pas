@@ -349,7 +349,7 @@ begin
    SoundPlay(ss,sss_ucommand);
 
    snd_command_last:=ss;
-   snd_command_ticks:=fr_2h3fps;
+   snd_command_ticks:=fr_fps2d3;
 end;
 
 procedure SoundPlayUnitSelect;
@@ -388,23 +388,23 @@ begin
                         or((rpls_state>=rpl_rhead)and(HPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
-lmt_game_end          : if(uid<=MaxPlayers)then
-                         if(uid=team)
+lmt_game_end          : if(argx<=MaxPlayers)then
+                         if(argx=team)
                          then SoundPlayAnoncer(snd_victory[race],false)
                          else SoundPlayAnoncer(snd_defeat [race],false);
-lmt_player_defeated   : if(uid<=MaxPlayers)
+lmt_player_defeated   : if(argx<=MaxPlayers)
                         then SoundPlayAnoncer(snd_player_defeated[race],true);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build [race],true);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted[race],true);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
-lmt_unit_ready        : with _uids[uid] do
+lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_req_ruids,
 lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
-lmt_unit_attacked     : with _uids[uid] do
+lmt_unit_attacked     : with _uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;
 end;

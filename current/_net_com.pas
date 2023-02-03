@@ -246,14 +246,14 @@ begin
    net_cl_svstr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
 end;
 
-procedure net_send_chat;
+procedure net_send_chat(targets:byte;msg:shortstring);
 begin
-   if(net_status=ns_clnt)then
+   if(net_status=ns_clnt)and(targets>0)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_log_chat);
-      net_writebyte(net_chat_tar);
-      net_writestring(net_chat_str);
+      net_writebyte(targets);
+      net_writestring(msg);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;

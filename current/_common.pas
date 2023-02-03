@@ -171,7 +171,7 @@ begin
    player^.prod_error_cndt:=0;
 end;
 
-procedure PlayerAddLog(ptarget,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer;local:boolean);
+procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer;local:boolean);
 begin
    if(ptarget>MaxPlayers)then exit;
 
@@ -187,8 +187,8 @@ begin
       with log_l[log_i] do
       begin
          mtype:=amtype;
-         uidt :=auidt;
-         uid  :=auid;
+         argt :=aargt;
+         argx :=aargx;
          str  :=astr;
          xi   :=ax;
          yi   :=ay;
@@ -217,9 +217,10 @@ end;
 
 procedure GameLogChat(sender,targets:byte;message:shortstring;local:boolean);
 begin
-   if(sender<=MaxPlayers)
-   then PlayersAddToLog(sender,targets,sender         ,0,0,message,0,0,local)
-   else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message,0,0,local);
+   if(targets>0)then
+    if(sender<=MaxPlayers)
+    then PlayersAddToLog(sender,targets,sender         ,0,0,message,0,0,local)
+    else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message,0,0,local);
 end;
 procedure GameLogCommon(sender,targets:byte;message:shortstring;local:boolean);
 begin
@@ -244,7 +245,7 @@ procedure GameLogUnitReady(pu:PTunit);
 begin
    if(pu=nil)or(ServerSide=false)then exit;
 
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,glcp_unit ,uidi,'',x,y,false);
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y,false);
 end;
 procedure GameLogUnitPromoted(pu:PTunit);
 begin
@@ -427,8 +428,8 @@ begin
 end;
 
 function point_dir(x0,y0,x1,y1:integer):integer;
-var vx,vy,avx,avy:integer;
-    res:single;
+var vx,vy:integer;
+    res  :single;
 begin
    point_dir:=270;
    vx:=x1-x0;
@@ -436,10 +437,7 @@ begin
 
    if(vx=0)and(vy=0)then exit;
 
-   avx:=abs(vx);
-   avy:=abs(vy);
-
-   if(avx>avy)
+   if(abs(vx)>abs(vy))
    then res:=   trunc((vy/vx)*45)
    else res:=90-trunc((vx/vy)*45);
 
@@ -1060,6 +1058,29 @@ begin
    end;
 end;
 
+procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
+var i:byte;
+begin
+   i:=(1 shl nb);
+   if(nozero)
+   then pb^:=pb^ or i
+   else
+     if((pb^ and i)>0)then pb^:=pb^ xor i;
+end;
+
+function PlayerAllies(playeri:byte;AddSelf:boolean):byte;
+var i:byte;
+begin
+   PlayerAllies:=0;
+   for i:=1 to MaxPlayers do
+    with _players[i] do
+     if(state>ps_none)and(team=_players[playeri].team)then
+     begin
+        if(not AddSelf)and(i=playeri)then continue;
+        SetBBit(@PlayerAllies,i,true);
+     end;
+end;
+
 procedure GameLogUnitAttacked(pu:PTunit);
 var atype:byte;
 begin
@@ -1071,7 +1092,7 @@ begin
        if(uid^._ukbuilding)
        then atype:=aummat_attacked_b
        else atype:=aummat_attacked_u;
-       if(ui_AddMarker(x,y,atype,false))then PlayersAddToLog(playeri,0,lmt_unit_attacked,0,uidi,'',x,y,true);
+       if(ui_AddMarker(x,y,atype,false))then PlayersAddToLog(playeri,PlayerAllies(playeri,true),lmt_unit_attacked,0,uidi,'',x,y,true);
     end;
 end;
 
@@ -1083,6 +1104,7 @@ begin
     case mtype of
 0..MaxPlayers        : if(length(str)>0)then
                        begin
+                          //mtype = sender
                           mcolor^:=PlayerGetColor(mtype);
                           ParseLogMessage:=_players[mtype].name+': '+str;
                        end;
@@ -1096,39 +1118,38 @@ lmt_cant_build       : begin
                           lmt_req_energy: ParseLogMessage:=str_need_energy;
                           lmt_cant_build: ParseLogMessage:=str_cant_build;
                           end;
-                          case uidt of
-                          glcp_unit: with _uids [uid] do ParseLogMessage:=ParseLogMessage+' ('+un_txt_name+')';
-                          glcp_upgr: with _upids[uid] do ParseLogMessage:=ParseLogMessage+' ('+_up_name   +')';
+                          case argt of
+                          lmt_argt_unit: with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
+                          lmt_argt_upgr: with _upids[argx] do ParseLogMessage+=' ('+_up_name   +')';
                           end;
                        end;
 lmt_player_chat,
 lmt_game_message     : ParseLogMessage:=str;
-lmt_player_leave     : if(uid<=MaxPlayers)then ParseLogMessage:=_players[uid].name+str_plout;
-lmt_game_end         : if(uid<=MaxPlayers)then
-                        if(uid=_players[HPlayer].team)
+lmt_player_leave     : if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
+lmt_game_end         : if(argx<=MaxPlayers)then
+                        if(argx=_players[HPlayer].team)
                         then ParseLogMessage:=str_win
                         else ParseLogMessage:=str_lose;
-lmt_player_defeated  : if(uid<=MaxPlayers)then
-                        {if(uid<>HPlayer)then }ParseLogMessage:=_players[uid].name+str_player_def;
+lmt_player_defeated  : if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_player_def;
 lmt_upgrade_complete : begin
-                       with _upids[uid] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
+                       with _upids[argx] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
                        mcolor^:=c_yellow;
                        end;
 lmt_unit_ready       : begin
-                       with _uids [uid] do
-                        case uidt of
-                         glcp_unit : if(_ukbuilding)
+                       with _uids[argx] do
+                        case argt of
+                         lmt_argt_unit : if(_ukbuilding)
                                      then ParseLogMessage:=str_building_complete+' ('+un_txt_name+')'
                                      else ParseLogMessage:=str_unit_complete    +' ('+un_txt_name+')';
                         end;
                        mcolor^:=c_green;
                        end;
 lmt_unit_advanced    : begin
-                       with _uids[uid] do ParseLogMessage:=str_unit_advanced+' ('+un_txt_name+')';
+                       with _uids[argx] do ParseLogMessage:=str_unit_advanced+' ('+un_txt_name+')';
                        mcolor^:=c_aqua;
                        end;
 lmt_unit_attacked    : begin
-                       with _uids[uid] do
+                       with _uids[argx] do
                         if(_ukbuilding)
                         then ParseLogMessage:=str_base_attacked+' ('+un_txt_name+')'
                         else ParseLogMessage:=str_unit_attacked+' ('+un_txt_name+')';
@@ -1136,7 +1157,7 @@ lmt_unit_attacked    : begin
                        end;
 lmt_cant_order       : begin
                           ParseLogMessage:=str_cant_execute;
-                          with _uids [uid] do ParseLogMessage:=ParseLogMessage+' ('+un_txt_name+')';
+                          with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                        end;
     end;
 end;

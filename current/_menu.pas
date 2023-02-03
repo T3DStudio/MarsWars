@@ -132,13 +132,14 @@ begin
 end;
 
 
+
 procedure g_menu;
 var p:byte;
 begin
    mouse_x-=mv_x;
    mouse_y-=mv_y;
 
-   if(k_ml=2)or(k_mr=2) then   //right or left click
+   if(ks_mleft=1)or(ks_mright=1) then   //right or left click
    begin
       if(menu_item=90)then net_cl_saddr;
       if(menu_item=11)then _players[HPlayer].name:=PlayerName;
@@ -148,12 +149,12 @@ begin
       SoundPlayUI(snd_click);
    end;
 
-   if(k_ml=2)then              // left button pressed
+   if(ks_mleft=1)then              // left button pressed
    begin
       case menu_item of
       1  : if(G_Started)
-           then ToggleMenu
-           else _CYCLE:=false;
+                 then ToggleMenu
+                 else _CYCLE:=false;
       2  : GameMakeDestroy;    // start/break game
 
       /// SETTINGS SAVE REPLAYS
@@ -396,16 +397,6 @@ begin
               if(mouse_x<ui_menu_csm_x3)
               then begin PlayerRace+=1; PlayerRace:=PlayerRace mod 3;end
               else PlayerReady:=not PlayerReady;
-      95 : begin
-              p:=((mouse_x-ui_menu_csm_x0) div ui_menu_csm_2ys)+1;
-              if(p<>HPlayer)and(p<=MaxPlayers)then
-              begin
-                 p:=1 shl p;
-                 if((net_chat_tar and p)>0)
-                 then net_chat_tar:=net_chat_tar xor p
-                 else net_chat_tar:=net_chat_tar or  p;
-              end;
-           end;
       96 : if(net_status<>ns_none)then
            begin
               m_chat:=not m_chat;
@@ -424,7 +415,7 @@ begin
 
    end;
 
-   if(k_mr=2)then    // right button pressed
+   if(ks_mright=1)then    // right button pressed
    begin
       case menu_item of
       // MAP

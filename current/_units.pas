@@ -67,7 +67,7 @@ begin
          armor:=_base_armor;
          with player^ do
           if(_ukbuilding)
-          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*BaseArmorBonus1h
+          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*BaseArmorBonus2
           else
             if(_ukmech)
             then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_mech[_urace]])*BaseArmorBonus1
@@ -191,7 +191,7 @@ begin
        vsni:=avsni;
        vsnt:=avsnt;
        if(bhits>0)then
-        if(not bld)then hits:=mm3(1,bhits,puid^._mhits);
+        if(not bld)then hits:=mm3(1,bhits,puid^._mhits-1);
        if(select)then
        begin
           sel:=true;
@@ -478,8 +478,8 @@ wpt_heal     : if(tu^.hits<=0)
           else awr:=ud-aw_max_range; // absolute
       if(aw_max_range>=0)then
        if(tu^.ukfly)
-       then awr-=a_BonusAntiFly_range
-       else awr-=a_BonusAntiGround_range;
+       then awr-=_a_BonusAntiFlyRange
+       else awr-=_a_BonusAntiGroundRange;
 
       canmove:=(speed>0)and(uo_id<>ua_hold)and(au=nil);
       pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
@@ -807,6 +807,8 @@ uab_Teleport      : swtarget:=true;
 
       if(fteleport_tar)and(uontar>0)then uo_tar:=uontar;
 
+      if(attack_target)and(a_tard<32000)then StayWaitForNextTarget:=0;
+
       if(aicode)then ai_code(pu);
 
       {$IFDEF _FULLGAME}
@@ -986,7 +988,7 @@ begin
    with tu^ do
     if(transport=pu^.unum)and(pu^.buff[ub_CCast]<=0)then
     begin
-       pu^.buff[ub_CCast]:=fr_fps1_4;
+       pu^.buff[ub_CCast]:=fr_fpsd4;
        pu^.apcc-=uid^._apcs;
        transport:=0;
        x    :=pu^.x-_randomr(pu^.uid^._r);
@@ -1035,12 +1037,20 @@ begin
 end;
 
 function _unit_rebuild(pu:PTUnit):boolean;
+function _getMHits(uid:byte):integer;
+begin
+   with _uids[uid] do
+    if(_isbarrack)
+    or(_issmith  )
+    then _getMHits:=_hhmhits
+    else _getMHits:=_hmhits;
+end;
 begin
    _unit_rebuild:=false;
    with pu^ do
     with uid^ do
-     if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canRebuild(pu),pu))then
-      _unit_rebuild:=not PlayerSetProdError(playeri,glcp_unit,uidi,_unit_morph(pu,_rebuild_uid,false,-_rebuild_hpstart,_rebuild_level),pu);
+     if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canRebuild(pu),pu))then
+      _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,trunc(_getMHits(_rebuild_uid)*(hits/_mhits)),_rebuild_level),pu);
 end;
 
 function _unit_action(pu:PTUnit):boolean;
@@ -1055,12 +1065,12 @@ begin
          _unit_action:=true;
       end
       else
-        if(not PlayerSetProdError(playeri,glcp_unit,uidi,_canAbility(pu),pu))then
+        if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canAbility(pu),pu))then
           with player^ do
             case _ability of
 uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
                     begin
-                       buff[ub_Cast  ]:=fr_fpsh;
+                       buff[ub_Cast  ]:=fr_fpsd2;
                        buff[ub_CCast]:=fr_fps2;
                        if(upgr[upgr_hell_phantoms]>0)
                        then _ability_unit_spawn(pu,UID_Phantom )
@@ -1271,7 +1281,6 @@ begin
       _AddToInt(@vsnt[tu^.player^.team],vistime);
    end;
 end;
-
 begin
    _unit_attack:=false;
    with pu^ do
@@ -1286,7 +1295,11 @@ begin
 
             if(w>MaxUnitWeapons)or(a=0)then
             begin
-               if(ServerSide)then a_tar:=0;
+               if(ServerSide)then
+               begin
+                  a_tar:=0;
+                  StayWaitForNextTarget:=1;
+               end;
                exit;
             end;
 
@@ -1295,9 +1308,14 @@ begin
          else
          begin
             a:=_target_weapon_check(pu,tu,-1,a_weap,true,false);
+
             if(a=0)then
             begin
-               if(ServerSide)then a_tar:=0;
+               if(ServerSide)then
+               begin
+                  a_tar:=0;
+                  StayWaitForNextTarget:=1;
+               end;
                exit;
             end;
          end;
@@ -1311,7 +1329,6 @@ begin
            attackinmove:=cf(@aw_reqf,@wpr_move);
 
          case a of
-wmove_impassible: exit;
 wmove_closer    : begin
                      if(not attackinmove)then
                      begin
@@ -1339,7 +1356,10 @@ wmove_noneed    : if(not attackinmove)then
                      mv_x:=x;
                      mv_y:=y;
                   end;
-         else exit;
+         else
+            // wmove_impassible
+           StayWaitForNextTarget:=1;
+           exit;
          end;
       end
       else
@@ -1381,7 +1401,7 @@ wmove_noneed    : if(not attackinmove)then
             begin
                if(x<>tu^.x)
                or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
-               StayWaitForNextTarget:=(a_rld div order_period)+2;
+               if(ServerSide)then StayWaitForNextTarget:=(a_rld div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
             _unit_attack_effects(pu,true,@attackervis);
@@ -1396,7 +1416,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not _IsUnitRange(tu^.transport,nil))then
-              if((G_Step mod fr_fps1_3)=0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+              if((G_Step mod fr_fpsd3)=0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((G_Step mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;
@@ -1559,7 +1579,7 @@ begin
    with uid^    do
    with player^ do
    case order_id of
-co_destroy :  _unit_kill(pu,false,order_tar>0,true,false);
+co_destroy :  _unit_kill(pu,false,false,true,false);
 co_rcamove,
 co_rcmove  :  begin     // right click
                  uo_tar:=0;
@@ -1576,17 +1596,16 @@ co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true );
 co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true );
 co_patrol  : _setUO(ua_move ,0        ,order_x,order_y, x, y,true );
 co_astand  : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false);
-co_amove   : if(_IsUnitRange(order_tar,nil))
-             then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false)
-             else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false);
+co_amove   :
+        if(_IsUnitRange(order_tar,nil))
+        then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false)
+        else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false);
 co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false);
 co_paction :  if(uo_id<>ua_paction)
               or((ucl_cs[true]+ucl_cs[false])=1)then
               case _ability of
 0                    : if(apcm>0)then
-                         if(apcc<=0)
-                         then
-                         else
+                         if(apcc>0)then
                          begin
                             _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
                             exit;
@@ -1610,14 +1629,6 @@ uab_CCFly            : if(speed>0)then
               end;
 co_rebuild :  if(_unit_rebuild(pu))then exit;
 co_action  :  if(_unit_action (pu))then exit;
-co_supgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_supgrade (pu,order_tar);
-co_cupgrade:  if(0<=order_tar)and(order_tar<=255)then _unit_cupgrade (pu,order_tar);
-co_suprod  :  if(0<=order_tar)and(order_tar<=255)then _unit_straining(pu,order_tar);
-co_cuprod  :  if(0<=order_tar)and(order_tar<=255)then _unit_ctraining(pu,order_tar);
-co_pcancle :  begin
-                 _unit_ctraining(pu,255);
-                 _unit_cupgrade (pu,255);
-              end;
    end;
    _unit_player_order:=false;
 end;

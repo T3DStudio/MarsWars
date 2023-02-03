@@ -197,11 +197,13 @@ TUWeapon = record
   aw_eid_target,
   aw_eid_shot,
   aw_eid_start: byte;
+  aw_AnimStay : byte;
   {$ENDIF}
 end;
 
 TUID = record
    _hmhits,
+   _hhmhits,
    _mhits       : longint;
    _speed,
    _r,_missile_r,
@@ -222,9 +224,7 @@ TUID = record
    _upgr_srange_step,
    _limituse,
    _level_damage,
-   _level_armor,
-   a_BonusAntiFly_range,
-   a_BonusAntiGround_range
+   _level_armor
                 : integer;
 
    _upgr_srange,
@@ -232,7 +232,6 @@ TUID = record
    _upgr_regen,
    _rebuild_uid,
    _rebuild_level,
-   _rebuild_hpstart,
    _rebuild_ruid,
    _rebuild_rupgr,
    _rebuild_rupgrl,
@@ -252,6 +251,9 @@ TUID = record
    _shots2advanced
                 : byte;
 
+   _a_BonusAntiFlyRange,
+   _a_BonusAntiGroundRange
+                : integer;
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
 
    _shcf        : single;
@@ -346,7 +348,8 @@ TUPID = record  // upgrade
 end;
 
 TAIAlarm = record
-   aia_enemy_base :boolean;
+   aia_enemy_base
+                : boolean;
    aia_enemy_count,
    aia_x,
    aia_y        : integer;
@@ -355,8 +358,8 @@ end;
 
 TLogMes = record
    mtype,
-   uidt,
-   uid          : byte;
+   argt,
+   argx         : byte;
    str          : shortstring;
    xi,yi        : integer;
 end;
@@ -609,6 +612,7 @@ TCTPoint = record
    cpunitsp_pstate,
    cpUnitsPlayer     : array[0..MaxPlayers] of integer;
 end;
+PTCTPoint = ^TCTPoint;
 
 TDoodad = record
    x,y,r :integer;

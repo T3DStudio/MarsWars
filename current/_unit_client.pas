@@ -59,11 +59,12 @@ begin
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-function _wudata_chat(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
+function _wudata_log(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
 var t,s:integer;
       i:cardinal;
+      b:byte;
 begin
-   _wudata_chat:=false;
+   _wudata_log:=false;
    if(p<=MaxPlayers)then
     with _players[p] do
     begin
@@ -89,15 +90,20 @@ begin
           begin
              with log_l[i] do
              begin
-                _wudata_byte  (((mtype and %01111111) shl 1)or(uidt and %00000001),rpl);
-                _wudata_byte  (uid  ,rpl);
-                _wudata_string(str  ,rpl);
-                if(xi>0)then
+                _wudata_byte  (mtype,rpl);
+                b:=argt and %00000001;
+                if(argx       >0)then b:=b or %00000010;
+                if(length(str)>0)then b:=b or %00000100;
+                if(xi         >0)then b:=b or %00001000;
+                _wudata_byte  (b,rpl);
+
+                if(argx       >0)then _wudata_byte  (argx ,rpl);
+                if(length(str)>0)then _wudata_string(str  ,rpl);
+                if(xi         >0)then
                 begin
                    _wudata_byte(byte(xi shr 5),rpl);
                    _wudata_byte(byte(yi shr 5),rpl);
-                end
-                else _wudata_byte(255,rpl);
+                end;
              end;
 
              if(i=MaxPlayerLog)
@@ -105,26 +111,14 @@ begin
              else i+=1;
           end;
           if(rpl=false)then _wudata_card(clog_n^,rpl);
-          _wudata_chat:=true;
+          _wudata_log:=true;
           exit;
        end;
     end;
    _wudata_byte(0,rpl);
 end;
 
-procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
-var i:byte;
-begin
-   i:=(1 shl nb);
-   if(nozero)
-   then pb^:=pb^ or i
-   else
-     if((pb^ and i)>0)then pb^:=pb^ xor i;
-end;
-
-
 ////////////////////////////////////////////////////////////////////////////////
-
 
 procedure _wudata_bstat(pu:PTUnit;rpl:boolean);
 var _bts1,
@@ -368,7 +362,7 @@ begin
 
    if(rpl)
    then wstepb:=(wstep mod fr_fps1)=0  // every 2 second
-   else wstepb:=(wstep mod fr_fpsh)=0; // every second
+   else wstepb:=(wstep mod fr_fpsd2)=0; // every second
 
    if(rpl=false)and(wstepb)then        // every 1/2 seconds
     with _players[POVPlayer] do _wudata_rld(@build_cd,rpl);
@@ -490,7 +484,8 @@ begin
 
                  upproda+=1;
                  upprodu[_puid]+=1;
-                 cenergy-=pprod_e[i];//_upids[_puid]._up_renerg;
+                 pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                 cenergy-=pprod_e[i];
               end;
          end;
       end;
@@ -794,11 +789,12 @@ begin
    else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card:=def; {$I+} end;
 end;
 
-procedure  _rudata_chat(p:byte;rpl:boolean);
-var s,
+procedure  _rudata_log(p:byte;rpl:boolean);
+var s,b,
 mtype,
-uidt,
-uid,x,y:byte;
+argt,
+argx,
+x,y    :byte;
     str:shortstring;
 begin
    s:=_rudata_byte(rpl,0);
@@ -806,18 +802,28 @@ begin
    begin
       while(s>0)do
       begin
-         x    :=_rudata_byte  (rpl,0);
-         mtype:=(x and %11111110) shr 1;
-         uidt := x and %00000001;
-         uid  :=_rudata_byte  (rpl,0);
-         str  :=_rudata_string(rpl  );
-         x    :=_rudata_byte  (rpl,0);
-         if(x<255)then
-         y    :=_rudata_byte  (rpl,0);
+         mtype:=_rudata_byte  (rpl,0);
+         b    :=_rudata_byte  (rpl,0);
+
+         argt:=0;
+         argx:=0;
+         str :='';
+         x:=255;
+         y:=255;
+
+         argt :=b and %00000001;
+         if((b and %00000010)>0)then argx:=_rudata_byte(rpl,0);
+         if((b and %00000100)>0)then str :=_rudata_string(rpl);
+         if((b and %00001000)>0)then
+         begin
+            x:=_rudata_byte  (rpl,0);
+            y:=_rudata_byte  (rpl,0);
+         end;
 
          if(x=255)
-         then PlayerAddLog(p,mtype,uidt,uid,str,-1,-1,false)
-         else PlayerAddLog(p,mtype,uidt,uid,str,x shl 5,y shl 5,false);
+         then PlayerAddLog(p,mtype,argt,argx,str,-1,-1,false)
+         else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5,false);
+
          s-=1;
       end;
       if(rpl=false)then
@@ -866,8 +872,8 @@ begin
       end
       else
       begin
-         //buff[ub_Resurect]:=0;
-         buff[ub_Summoned]:=0;
+         buff[ub_Resurect]:=0;
+         //buff[ub_Summoned]:=0;
          buff[ub_Invuln  ]:=0;
          buff[ub_Teleport]:=0;
          buff[ub_HVision ]:=0;
@@ -899,27 +905,6 @@ begin
       if(_issmith  )then if(_rudata_rld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);
    end;
 end;
-
-{
-if(not wb)then exit;
-
-if(bld)then
- if(_ability in client_rld_abils)
- or(uidi     in client_rld_uids )then _wudata_rld(@rld,rpl);
-
-if(_ukbuilding)then
-begin
-   if(bld)then _wudata_prod(pu,rpl);
-   if(sel)and(_UnitHaveRPoint(pu^.uidi))then
-    if(_IsUnitRange(uo_tar,nil))
-    then _wudata_int(-uo_tar,rpl)
-    else
-    begin
-       _wudata_int(uo_x,rpl);
-       _wudata_int(uo_y,rpl);
-    end;
-end;
-}
 
 procedure _rudata_OwnerUData(uu:PTUnit;rpl:boolean);
 var b : byte;
@@ -1111,7 +1096,7 @@ begin
 
    if(rpl)
    then wstepb:=(wstep mod fr_fps1)=0
-   else wstepb:=(wstep mod fr_fpsh)=0;
+   else wstepb:=(wstep mod fr_fpsd2)=0;
 
    if(rpl=false)and(wstepb)then
     with _players[POVPlayer] do

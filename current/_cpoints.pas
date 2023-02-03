@@ -72,6 +72,13 @@ begin
           cpUnitsTeam  [p]:=0;
        end;
 
+       if(iTeams=0)and(cpenergy>0)then
+       begin
+          iTeams:=1;
+          iOwnerTeam  :=0;
+          iOwnerPlayer:=0;
+       end;
+
        if(iTeams=0)
        then cpTimer:=0
        else
@@ -96,6 +103,7 @@ begin
           end;
     end;
 
+   // VICTORY CONDITIONS
    wteam        :=0;
    wteam_n      :=0;
    cp_captured_n:=0;

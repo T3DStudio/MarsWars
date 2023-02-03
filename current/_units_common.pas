@@ -818,7 +818,7 @@ begin
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles )>0)then exit;
 
          upgr[upgr_hell_b478tel]-=1;
-         buff[ub_CCast]:=fr_fpsh;
+         buff[ub_CCast]:=fr_fpsd2;
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
          _unit_ability_HTowerBlink:=true;
          _unit_reveal(pu,true);
@@ -1126,12 +1126,12 @@ begin
      with uid^ do
       if(hits>0)and(bld)and(_isbarrack)and(_ukbuilding)then
        if not (puid in ups_units)
-       then PlayerSetProdError(playeri,glcp_unit,puid,ureq_barracks,pu)
+       then PlayerSetProdError(playeri,lmt_argt_unit,puid,ureq_barracks,pu)
        else
          if(uprod_r[pn]>0)
-         then PlayerSetProdError(playeri,glcp_unit,puid,ureq_busy,pu)
+         then PlayerSetProdError(playeri,lmt_argt_unit,puid,ureq_busy,pu)
          else
-           if(not PlayerSetProdError(playeri,glcp_unit,puid,_uid_conditionals(pu^.player,puid),pu))then
+           if(not PlayerSetProdError(playeri,lmt_argt_unit,puid,_uid_conditionals(pu^.player,puid),pu))then
             with player^ do
             begin
                uproda+=1;
@@ -1180,15 +1180,17 @@ begin
          _unit_ctraining_p:=true;
       end;
 end;
-function _unit_ctraining(pu:PTUnit;puid:byte):boolean;
+function _unit_ctraining(pu:PTUnit;puid:byte;all:boolean):boolean;
 var i:byte;
 begin
-   _unit_ctraining:=true;
+   _unit_ctraining:=false;
 
    for i:=MaxUnitLevel downto 0 do
-    if(_unit_ctraining_p(pu,puid,i))and(puid<255)then exit;
-
-   _unit_ctraining:=false;
+    if(_unit_ctraining_p(pu,puid,i))then
+    begin
+       _unit_ctraining:=true;
+      if(not all)then break;
+    end;
 end;
 
 
@@ -1202,12 +1204,12 @@ begin
      with uid^ do
       if(hits>0)and(bld)and(_issmith)and(_ukbuilding)then
        if not(upid in ups_upgrades)
-       then PlayerSetProdError(playeri,glcp_upgr,upid,ureq_smiths,pu)
+       then PlayerSetProdError(playeri,lmt_argt_upgr,upid,ureq_smiths,pu)
        else
          if(pprod_r[pn]>0)
-         then PlayerSetProdError(playeri,glcp_upgr,upid,ureq_busy,pu)
+         then PlayerSetProdError(playeri,lmt_argt_upgr,upid,ureq_busy,pu)
          else
-           if(not PlayerSetProdError(playeri,glcp_upgr,upid,_upid_conditionals(player,upid),pu))then
+           if(not PlayerSetProdError(playeri,lmt_argt_upgr,upid,_upid_conditionals(player,upid),pu))then
             with player^ do
              with _upids[upid] do
              begin
@@ -1253,15 +1255,17 @@ begin
          _unit_cupgrade_p:=true;
        end;
 end;
-function _unit_cupgrade(pu:PTUnit;puid:byte):boolean;
+function _unit_cupgrade(pu:PTUnit;puid:byte;all:boolean):boolean;
 var i:byte;
 begin
-   _unit_cupgrade:=true;
+   _unit_cupgrade:=false;
 
    for i:=MaxUnitLevel downto 0 do
-    if(_unit_cupgrade_p(pu,puid,i))and(puid<255)then exit;
-
-   _unit_cupgrade:=false;
+    if(_unit_cupgrade_p(pu,puid,i))then
+    begin
+       _unit_cupgrade:=true;
+       if(not all)then break;
+    end;
 end;
 
 procedure _unit_counters_inc_select(pu:PTUnit);
@@ -1314,8 +1318,8 @@ begin
       then cenergy+=_uids[uidi]._renergy
       else
       begin
-         _unit_ctraining(pu,255);
-         _unit_cupgrade (pu,255);
+         _unit_ctraining(pu,255,true);
+         _unit_cupgrade (pu,255,true);
 
          ucl_eb[_ukbuilding,_ucl]-=1;
          uid_eb[uidi            ]-=1;
@@ -1735,7 +1739,7 @@ UID_UGTurret      : level:=byte(upgr[upgr_uac_plasmt]>0);
 UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
-                       if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_CCast]:=fr_fpsh;
+                       if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_CCast]:=fr_fpsd2;
                        if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;

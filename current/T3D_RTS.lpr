@@ -1,7 +1,19 @@
 program T3D_RTS;
 
+{
+- не записывается информации о времени жизни нейтральных генераторов
+}
+
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
+
+{$IFDEF _FULLGAME}   // FULL GAME
+  {$APPTYPE CONSOLE}
+  //{$APPTYPE GUI}
+{$ELSE}              // DED SERVER
+  {$APPTYPE CONSOLE}
+{$ENDIF}
+                                  
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}

@@ -162,8 +162,8 @@ r_blink3          : byte;
 r_minimap_scan_blink
                   : boolean = false;
 
+ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
-ingame_chat       : boolean = false;
 r_draw            : boolean = true;
 
 _menu             : boolean = true;
@@ -379,18 +379,18 @@ ui_log_c          : array of cardinal;
 ui_log_n          : integer = 0;
 
 k_dbl             : boolean = false;
+k_dblk            : cardinal;
 k_dblt,
-k_dblk,
-k_l,
-k_r,
-k_u,
-k_d,
-k_shift,
-k_ctrl,
-k_alt,
-k_ml,
-k_mr,
-k_chart           : cardinal;
+ks_left,
+ks_right,
+ks_up,
+ks_down,
+ks_shift,
+ks_ctrl,
+ks_alt,
+ks_mleft,
+ks_mright,
+k_chart           : integer;
 k_char            : char;
 k_keyboard_string         : shortstring = '';
 
@@ -607,6 +607,7 @@ spr_h_p6,
 spr_h_p7,
 spr_u_p0,
 spr_u_p1,
+spr_u_p1s,
 spr_u_p2,
 spr_u_p3,
 spr_u_p8,
@@ -729,8 +730,9 @@ str_language,
 str_resol,
 str_apply,
 str_randoms,
-str_chattars,
 str_chat,
+str_chat_all,
+str_chat_allies,
 str_server,
 str_client,
 str_goptions,

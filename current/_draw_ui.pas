@@ -552,17 +552,25 @@ procedure D_UIText(tar:pSDL_Surface);
 var i,pl:integer;
   str:shortstring;
   col:cardinal;
+function ChatString:shortstring;
+begin
+   case ingame_chat of
+chat_all     : ChatString:=str_chat_all;
+chat_allies  : ChatString:=str_chat_allies;
+1..MaxPlayers: ChatString:=_players[ingame_chat].name+':';
+   end;
+end;
 begin
    // LOG and HINTs
    if(net_chat_shlm>0)then net_chat_shlm-=1;
 
-   if(ingame_chat)or(rpls_showlog)then
+   if(ingame_chat>0)or(rpls_showlog)then
    begin
       MakeLogListForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
-      if(rpls_showlog=false)then _draw_text(tar,ui_textx,ui_chaty,':'+net_chat_str+chat_type[r_blink1_colorb],ta_left,ui_ingamecl,c_white);
+      if(ingame_chat>0)then _draw_text(tar,ui_textx,ui_chaty,ChatString+net_chat_str+chat_type[r_blink1_colorb],ta_left,ui_ingamecl,c_white);
    end
    else
      if(net_chat_shlm>0)then

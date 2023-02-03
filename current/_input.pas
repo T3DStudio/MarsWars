@@ -1,27 +1,65 @@
 
 procedure input_key_escape;
 begin
-   if(ingame_chat)then
+   if(ingame_chat>0)then
    begin
-      ingame_chat:=false;
+      ingame_chat :=0;
       net_chat_str:='';
    end
    else ToggleMenu;
 end;
 
-procedure input_key_return;
+function MakeChatTargets(a,player:byte):byte;
+var p:byte;
 begin
-   if(_menu=false)and(not ingame_chat)//and(net_status<>ns_none)
-   then ingame_chat:=true
+   MakeChatTargets:=0;
+   case a of
+chat_all      : MakeChatTargets:=255;
+chat_allies   : for p:=1 to MaxPlayers do
+                 with _players[p] do
+                  if(state>ps_none)and(team=_players[player].team)then
+                   SetBBit(@MakeChatTargets,p,true);
+1..MaxPlayers : if(_players[a].state=ps_play)then SetBBit(@MakeChatTargets,a,true);
+   end;
+end;
+
+procedure input_key_return;
+var HPlayerAllies: byte;
+begin
+   if(_menu=false)and(ingame_chat=0)then
+   begin
+      HPlayerAllies:=PlayerAllies(HPlayer,false);
+      if(HPlayerAllies>0)
+      then ingame_chat:=chat_allies
+      else ingame_chat:=chat_all;
+
+      if(ks_ctrl>0)then
+      begin
+         if(HPlayerAllies>0)
+         then ingame_chat:=chat_allies;
+      end
+      else
+         if(ks_shift>0)
+         then ingame_chat:=chat_all;
+      net_chat_tar:=MakeChatTargets(ingame_chat,HPlayer);
+   end
    else
-    if(menu_item=100)or(ingame_chat)then
+    if(menu_item=100)or(ingame_chat>0)then
     begin
-       if(length(net_chat_str)>0)then
-        if(net_status=ns_clnt)
-        then net_send_chat
-        else GameLogChat(HPlayer,net_chat_tar,net_chat_str,false);//message type = player number (chat)
+       if(_menu)then
+       begin
+          ingame_chat :=chat_all;
+          net_chat_tar:=255;
+       end;
+
+       if(length(net_chat_str)>0)and(net_chat_tar>0)then
+       begin
+          if(net_status=ns_clnt)
+          then net_send_chat(        net_chat_tar,net_chat_str)
+          else GameLogChat  (HPlayer,net_chat_tar,net_chat_str,false);
+       end;
        net_chat_str:='';
-       ingame_chat:=false;
+       ingame_chat :=0;
     end;
 end;
 
@@ -30,10 +68,10 @@ begin
    if(net_status=ns_clnt)
    then net_pause
    else
-    if(net_status=ns_srvr)then
-     if(G_Status=0)
-     then G_Status:=HPlayer
-     else G_Status:=0;
+     if(net_status=ns_srvr)then
+       if(G_Status=gs_running)
+       then G_Status:=HPlayer
+       else G_Status:=gs_running;
 end;
 
 procedure MapMarker(x,y:integer);
@@ -65,7 +103,7 @@ begin
 end;
 procedure _ClickEffect(color:cardinal);
 begin
-   _click_eff(ox1,oy1,fr_fps1_4,color);
+   _click_eff(ox1,oy1,fr_fpsd4,color);
 end;
 function CheckBOrders(pu:PTUnit):boolean;
 begin
@@ -130,7 +168,7 @@ begin
       co_paction  : if(SelectedActions<=0)then exit;
       //co_action,
       //co_paction : if(SelectedActions<=0)then begin _PlayCommand(snd_cant_order[race]);exit;end;
-      co_rebuild : if(SelectedRebuild<=0)then exit; //_PlayCommand(snd_cant_order[race]);
+      co_rebuild  : if(SelectedRebuild<=0)then exit; //_PlayCommand(snd_cant_order[race]);
       else          if(SelectedAll    <=0)then exit;
       end;
    end;
@@ -142,12 +180,12 @@ begin
    co_move,
    co_astand,
    co_stand,
-   co_patrol : _PlayCommand(un_snd_move);
+   co_patrol  : _PlayCommand(un_snd_move);
    co_amove,
-   co_apatrol: _PlayCommand(un_snd_attack);
-   co_rcamove: if(_checkEnemy)
-               then _PlayCommand(un_snd_attack)
-               else _PlayCommand(un_snd_move  );
+   co_apatrol : _PlayCommand(un_snd_attack);
+   co_rcamove : if(_checkEnemy)
+                then _PlayCommand(un_snd_attack)
+                else _PlayCommand(un_snd_move  );
    end;
 
    ox1+=vid_mapx;
@@ -156,7 +194,7 @@ begin
    if(_IsUnitRange(tar,nil))then
    begin
       ui_umark_u:=tar;
-      ui_umark_t:=fr_fpsh;
+      ui_umark_t:=fr_fpsd2;
       exit;
    end;
 
@@ -261,7 +299,7 @@ begin
               cndt:=_uid_conditionals(@_players[HPlayer],m_brush);
               if(cndt>0)then
               begin
-                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,cndt,mouse_map_x,mouse_map_y,true);
+                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,cndt,mouse_map_x,mouse_map_y,true);
                  m_brush:=co_empty;
               end
               else
@@ -273,7 +311,7 @@ begin
                      exit;
                   end;
 
-                  if(k_ctrl>1)then
+                  if(ks_ctrl>0)then
                   begin
                      m_brushx:=mouse_map_x;
                      m_brushy:=mouse_map_y;
@@ -303,30 +341,22 @@ end;
 procedure _command(x,y,target:integer);
 begin
    case m_brush of
-co_move    : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);   // move
-co_amove   : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);   // attack
-co_paction : _player_s_o(m_brush,target,x,y,0,uo_corder,HPlayer);
+co_move    : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // move
+co_amove   : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // attack
+co_paction : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);
 co_patrol,
-co_apatrol : _player_s_o(m_brush,0,x,y,0,uo_corder,HPlayer);
-co_empty   : if(m_action)// rclick
-             then _player_s_o(co_rcmove ,target,x,y,0,uo_corder,HPlayer)
-             else _player_s_o(co_rcamove,target,x,y,0,uo_corder,HPlayer);
+co_apatrol : _player_s_o(m_brush   ,0     ,x,y,0,uo_corder,HPlayer);
+co_empty   :
+        if(m_action)// rclick
+        then _player_s_o(co_rcmove ,target,x,y,0,uo_corder,HPlayer)
+        else _player_s_o(co_rcamove,target,x,y,0,uo_corder,HPlayer);
    end;
 
    m_brush:=co_empty;
 end;
 
-function _rclickmove(uid:byte):boolean;
-begin
-   _rclickmove:=false;
-   if(uid>0)then
-    with _players[HPlayer] do
-     if(a_units[uid]=1)and(_UnitHaveRPoint(uid))then _rclickmove:=true;
-end;
-
 procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
 var u:integer;
-   tu:PTUnit;
 begin
    SoundPlayUI(snd_click);
 
@@ -355,35 +385,27 @@ begin
       case tab of
 
 0: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // buildings
-   if(u<=ui_ubtns)then
-   case right of
-false: begin
-          m_brush:=ui_panel_uids[race,0,u];
-          if(a_units[m_brush]=1)and(uid_e[m_brush]>0)then
-          begin
-             _player_s_o(m_brush,k_shift,0,0,0,uo_specsel ,HPlayer);
-             m_brush:=co_empty;
-          end
-          else check_mouse_brush(true);
-       end;
-true : if(_IsUnitRange(uid_x[ui_panel_uids[race,0,u]],@tu))then
-        if(_rclickmove(tu^.uidi))then
-         with tu^ do _command(x,y,0);
-   end;
+    if(u<=ui_ubtns)then
+     case right of
+   false: begin
+          m_brush:=ui_panel_uids[race,tab,u];
+          check_mouse_brush(true);
+          end;
+     end;
 
 1: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // units
-   if(u<=ui_ubtns)then
-   case right of
-false: _player_s_o(co_suprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cuprod  ,ui_panel_uids[race,1,u],0,0,0, uo_corder  ,HPlayer);
-   end;
+    if(u<=ui_ubtns)then
+     case right of
+   false: _player_s_o(co_suprod  ,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+   true : _player_s_o(co_cuprod  ,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+     end;
 
 2: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // upgrades
-   if(u<=ui_ubtns)then
-   case right of
-false: _player_s_o(co_supgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
-true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlayer);
-   end;
+    if(u<=ui_ubtns)then
+     case right of
+   false: _player_s_o(co_supgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+   true : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+     end;
 
 3: if(rpls_state<rpl_rhead)then
    begin
@@ -407,7 +429,7 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
         if(dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
-   11: _player_s_o(co_destroy,0,0,0,0, uo_corder  ,HPlayer);
+   11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
 
    13: m_action:=not m_action;
          end;
@@ -419,11 +441,11 @@ true : _player_s_o(co_cupgrade,ui_panel_uids[race,2,u],0,0,0, uo_corder  ,HPlaye
      if(u=1)then
      begin
         if(mid)
-        then rpls_step:=fr_fpsh*fr_fps1
+        then rpls_step:=fr_fpsd2*fr_fps1
         else
           if(right=false)
-          then rpls_step:=fr_fpsh*2
-          else rpls_step:=fr_fpsh*10;
+          then rpls_step:=fr_fpsd2*2
+          else rpls_step:=fr_fpsd2*10;
      end
      else
        if(right=false)then
@@ -455,8 +477,9 @@ procedure _hotkeys(k:cardinal);
 var ko,k2:cardinal;
 begin
    k_dbl:=(k_dblt>0)and(k=k_dblk);
-   k_dblt:=fr_fps1_4;
+   k_dblt:=fr_fpsd4;
    k_dblk:=k;
+
    if(k=sdlk_pause)
    then GameTogglePause
    else
@@ -469,7 +492,7 @@ begin
       else
         if(_testmode>0)and(net_status=0)then
          case k of
-            sdlk_end       : if(k_ctrl>2)
+            sdlk_end       : if(ks_ctrl>0)
                              then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                              else _fsttime:=not _fsttime;
             sdlk_home      : _warpten:=not _warpten;
@@ -491,11 +514,15 @@ begin
          end;
 
         k2:=0;
-        if(k_ctrl >1)then k2:=SDLK_LCtrl;
-        if(k_alt  >1)then k2:=SDLK_LAlt;
-        if(k_shift>1)then k2:=SDLK_LShift;
+        if(ks_ctrl >0)then k2:=SDLK_LCtrl;
+        if(ks_alt  >0)then k2:=SDLK_LAlt;
+        if(ks_shift>0)then k2:=SDLK_LShift;
 
-        if(k=sdlk_space)and(k2=0)then MoveCamToLastEvent;
+        if(k=sdlk_space)and(k2=0)then
+        begin
+           MoveCamToLastEvent;
+           exit;
+        end;
 
         if(rpls_state<rpl_rhead)then
         begin
@@ -525,15 +552,15 @@ begin
            sdlk_0..sdlk_9 :  begin
                                 ko:=_event^.key.keysym.sym-sdlk_0;
                                 if(ko<MaxUnitGroups)then
-                                 if(k_ctrl>1)
+                                 if(ks_ctrl>0)
                                  then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
                                  else
-                                   if(k_alt>1)
+                                   if(ks_alt>0)
                                    then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
                                    else
                                      if(k_dbl)and(ui_orders_x[ko]>0)and(ko>0)
                                      then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
-                                     else _player_s_o(ko,k_shift,0,0,0,uo_selorder,HPlayer);
+                                     else _player_s_o(ko,ks_shift,0,0,0,uo_selorder,HPlayer);
                              end;
               else
               end;
@@ -544,38 +571,41 @@ begin
           begin
              if(_hotkeyR[ko]= 0 )
              or(_hotkeyR[ko]<>k )then continue;
-             _panel_click(3,ko mod 3,4+(ko div 3),k_ctrl>1,k_alt>1,k_dbl);
+             _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
              exit;
           end;
       end;
 end;
 
-procedure _keyp(i:pbyte);
+procedure _keyp(i:pinteger);
 begin
-   if(i^>1)and(i^<255)then i^+=1;
-   if(i^=1)then i^:=0;
+   if(i^<0)
+   then i^:=0
+   else
+     if(0<i^)and(i^<32000)then i^+=1;
 end;
 
 procedure WindowEvents;
 begin
-   _keyp(@k_u    ); // arrows
-   _keyp(@k_d    );
-   _keyp(@k_r    );
-   _keyp(@k_l    );
-   _keyp(@k_shift);
-   _keyp(@k_ctrl );
-   _keyp(@k_alt  );
-   _keyp(@k_ml   ); // mouse btns
-   _keyp(@k_mr   );
-   _keyp(@k_chart); // last key
+   _keyp(@ks_up       ); // arrows
+   _keyp(@ks_down     );
+   _keyp(@ks_right    );
+   _keyp(@ks_left     );
+   _keyp(@ks_shift    );
+   _keyp(@ks_ctrl     );
+   _keyp(@ks_alt      );
+   _keyp(@ks_mleft    ); // mouse btns
+   _keyp(@ks_mright   );
+   _keyp(@k_chart     ); // last key
+
    if(k_dblt>0)then k_dblt-=1;
 
    k_keyboard_string:='';
 
    if(k_chart>k_chrtt)then
-    if(length(k_keyboard_string)<255)then k_keyboard_string:=k_keyboard_string+k_char;
+    if(length(k_keyboard_string)<255)then k_keyboard_string+=k_char;
 
-   while (SDL_PollEvent( _event )>0) do
+   while (SDL_PollEvent(_event)>0) do
     case (_event^.type_) of
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(_menu=false)and(G_Started)then
@@ -588,23 +618,23 @@ begin
                               mouse_y:=_event^.motion.y;
                            end;
       SDL_MOUSEBUTTONUP  : case (_event^.button.button) of
-                            SDL_BUTTON_LEFT   : k_ml:=1;
-                            SDL_BUTTON_RIGHT  : k_mr:=1;
-                            SDL_BUTTON_MIDDLE : m_vmove:=false;
+                            SDL_BUTTON_LEFT   : ks_mleft :=-1;
+                            SDL_BUTTON_RIGHT  : ks_mright:=-1;
+                            SDL_BUTTON_MIDDLE : m_vmove  :=false;
                            else
                            end;
       SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
-                            SDL_BUTTON_LEFT      : if(k_ml=0)then k_ml:=2;
-                            SDL_BUTTON_RIGHT     : if(k_mr=0)then k_mr:=2;
+                            SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft :=1;
+                            SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright:=1;
                             SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then
                                                     {if(k_ctrl>1)then m_brush:=co_mmark else }m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
-                                                      98: ScrollInt(@_cmp_sm         ,1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@svld_list_scroll        ,1,0,svld_list_size-vid_svld_m-1 );
-                                                      41: ScrollInt(@rpls_list_scroll,1,0,rpls_list_size-vid_rpls_m-1 );
+                                                      98: ScrollInt(@_cmp_sm         , 1,0,MaxMissions-vid_camp_m      );
+                                                      36: ScrollInt(@svld_list_scroll, 1,0,svld_list_size-vid_svld_m-1 );
+                                                      41: ScrollInt(@rpls_list_scroll, 1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
                                                    else tmpmid-=1;
@@ -612,8 +642,8 @@ begin
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
-                                                      98: ScrollInt(@_cmp_sm         ,-1,0,MaxMissions-vid_camp_m);
-                                                      36: ScrollInt(@svld_list_scroll        ,-1,0,svld_list_size-vid_svld_m-1 );
+                                                      98: ScrollInt(@_cmp_sm         ,-1,0,MaxMissions-vid_camp_m      );
+                                                      36: ScrollInt(@svld_list_scroll,-1,0,svld_list_size-vid_svld_m-1 );
                                                       41: ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-vid_rpls_m-1 );
                                                       end;
                                                    end
@@ -622,42 +652,42 @@ begin
                            end;
       SDL_QUITEV         : _CYCLE:=false;
       SDL_KEYUP          : begin
-                              k_chart:=1;
+                              k_chart:=-1;
                               case (_event^.key.keysym.sym) of
-                                sdlk_up     : k_u    :=1;
-                                sdlk_down   : k_d    :=1;
-                                sdlk_left   : k_l    :=1;
-                                sdlk_right  : k_r    :=1;
-                                sdlk_rshift : k_shift:=1;
-                                sdlk_lshift : k_shift:=1;
-                                sdlk_lctrl  : k_ctrl :=1;
-                                sdlk_rctrl  : k_ctrl :=1;
-                                sdlk_lalt   : k_alt  :=1;
-                                sdlk_ralt   : k_alt  :=1;
+                                sdlk_up     : ks_up   :=-1;
+                                sdlk_down   : ks_down :=-1;
+                                sdlk_left   : ks_left :=-1;
+                                sdlk_right  : ks_right:=-1;
+                                sdlk_rshift : ks_shift:=-1;
+                                sdlk_lshift : ks_shift:=-1;
+                                sdlk_lctrl  : ks_ctrl :=-1;
+                                sdlk_rctrl  : ks_ctrl :=-1;
+                                sdlk_lalt   : ks_alt  :=-1;
+                                sdlk_ralt   : ks_alt  :=-1;
                               else
                               end;
                            end;
       SDL_KEYDOWN        : begin
                               k_chart  :=2;
                               k_char   :=Widechar(_event^.key.keysym.unicode);
-                              k_keyboard_string:=k_keyboard_string+k_char;
+                              k_keyboard_string+=k_char;
 
                               case (_event^.key.keysym.sym) of
-                                sdlk_up     : if(k_u    =0)then k_u    :=2;
-                                sdlk_down   : if(k_d    =0)then k_d    :=2;
-                                sdlk_left   : if(k_l    =0)then k_l    :=2;
-                                sdlk_right  : if(k_r    =0)then k_r    :=2;
-                                sdlk_rshift : if(k_shift=0)then k_shift:=2;
-                                sdlk_lshift : if(k_shift=0)then k_shift:=2;
-                                sdlk_rctrl  : if(k_ctrl =0)then k_ctrl :=2;
-                                sdlk_lctrl  : if(k_ctrl =0)then k_ctrl :=2;
-                                sdlk_ralt   : if(k_alt  =0)then k_alt  :=2;
-                                sdlk_lalt   : if(k_alt  =0)then k_alt  :=2;
+                                sdlk_up     : if(ks_up   =0)then ks_up   :=1;
+                                sdlk_down   : if(ks_down =0)then ks_down :=1;
+                                sdlk_left   : if(ks_left =0)then ks_left :=1;
+                                sdlk_right  : if(ks_right=0)then ks_right:=1;
+                                sdlk_rshift : if(ks_shift=0)then ks_shift:=1;
+                                sdlk_lshift : if(ks_shift=0)then ks_shift:=1;
+                                sdlk_rctrl  : if(ks_ctrl =0)then ks_ctrl :=1;
+                                sdlk_lctrl  : if(ks_ctrl =0)then ks_ctrl :=1;
+                                sdlk_ralt   : if(ks_alt  =0)then ks_alt  :=1;
+                                sdlk_lalt   : if(ks_alt  =0)then ks_alt  :=1;
                                 sdlk_print  : _screenshot;
                                 sdlk_escape : input_key_escape;
                                 sdlk_return : input_key_return;
                               else
-                                if(_menu=false)and(G_Started)and(ingame_chat=false)then _hotkeys(_event^.key.keysym.sym);
+                                if(_menu=false)and(G_Started)and(ingame_chat=0)then _hotkeys(_event^.key.keysym.sym);
                               end;
                            end;
     else
@@ -696,18 +726,18 @@ co_empty   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
 co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
 co_amove   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);
 co_paction : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
-   else ui_uhint:=0;
+   else      ui_uhint:=0;
    end;
 
-   if(k_ml=2)then                    // LMB down
+   if(ks_mleft=1)then                // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
      case m_brush of
 co_empty  : begin
-               if(k_ctrl>1)then
+               if(ks_ctrl>0)then
                begin
-                  if(k_shift<2)
-                  then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect  ,HPlayer)
-                  else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect ,HPlayer)
+                  if(ks_shift>0)
+                  then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
+                  else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
                end
                else
                begin
@@ -715,9 +745,7 @@ co_empty  : begin
                   mouse_select_y0:=mouse_map_y;
                end;
 
-               {if(ui_uhint>0)and(k_ctrl>1)then
-                with _units[ui_uhint] do
-                 if(hits>4)then hits:=hits div 2;}
+               //if(ui_uhint>0)and(k_ctrl>1)then _unit_damage(@_units[ui_uhint],100,0,HPlayer,true);
 
                //_missile_add(vid_cam_x+400,vid_cam_y+250,mouse_map_x,mouse_map_y,0,tmpmid,HPlayer,uf_ground,false);
                //_effect_add(mouse_map_x,mouse_map_y-50,10000,EID_HCC);
@@ -725,7 +753,7 @@ co_empty  : begin
             end;
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
-            else GameLogCantProduction(HPlayer,byte(m_brush),glcp_unit,ureq_place,mouse_map_x,mouse_map_y,true);
+            else GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
 co_paction,
 co_move,
 co_amove,
@@ -747,28 +775,28 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       else _panel_click(ui_tab,m_bx,m_by,false,false,false);     // panel
 
 
-   if(k_ml=1)then  // LMB up
+   if(ks_mleft=-1)then  // LMB up
    begin
       m_mmap_move:=false;
 
       if(mouse_select_x0>-1)then //select
       begin
          if(m_ldblclk>0)then
-            if(k_shift<2)
-            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect  ,HPlayer)
-            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect ,HPlayer)
+            if(ks_shift>0)
+            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
+            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
          else
          begin
-            if(k_shift<2)
-            then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer)
-            else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer);
+            if(ks_shift>0)
+            then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer)
+            else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
 
             if(G_Status=gs_running)and(rpls_state<rpl_runit)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 
          mouse_select_x0:=-1;
-         m_ldblclk:=fr_fps1_4;
+         m_ldblclk:=fr_fpsd4;
       end;
    end;
 
@@ -780,7 +808,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
 
  //  if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
 
-   if(k_mr=2)then                 // RMB down                                        //
+   if(ks_mright=1)then                 // RMB down                                        //
     if(m_brush<>co_empty)
     then m_brush:=co_empty
     else
@@ -808,10 +836,10 @@ begin
 
    if(vid_CamMScroll)then _move_v_m;
 
-   if(k_u>1)then vid_cam_y-=vid_CamSpeed;
-   if(k_l>1)then vid_cam_x-=vid_CamSpeed;
-   if(k_d>1)then vid_cam_y+=vid_CamSpeed;
-   if(k_r>1)then vid_cam_x+=vid_CamSpeed;
+   if(ks_up   >0)then vid_cam_y-=vid_CamSpeed;
+   if(ks_left >0)then vid_cam_x-=vid_CamSpeed;
+   if(ks_down >0)then vid_cam_y+=vid_CamSpeed;
+   if(ks_right>0)then vid_cam_x+=vid_CamSpeed;
 
    if(vx<>vid_cam_x)or(vy<>vid_cam_y)then CamBounds;
 end;
@@ -819,7 +847,7 @@ end;
 procedure g_keyboard;
 begin
    if(m_vmove=false)and(rpls_plcam=false)then _view_move;
-   if(ingame_chat)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2);
+   if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2);
 end;
 
 procedure InputGame;

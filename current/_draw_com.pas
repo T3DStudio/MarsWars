@@ -289,7 +289,7 @@ begin
     with log_l[log_i] do
      case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance,true);
-lmt_unit_ready       : if(_uids[uid]._ukbuilding)
+lmt_unit_ready       : if(_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b,true)
                        else ui_AddMarker(xi,yi,aummat_created_u,true);
 lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade,true);

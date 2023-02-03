@@ -344,11 +344,12 @@ begin
    str_server            := 'SERVER';
    str_client            := 'CLIENT';
    str_chat              := 'CHAT';
+   str_chat_all          := 'ALL:';
+   str_chat_allies       := 'ALLIES:';
    str_randoms           := 'Random skirmish';
    str_apply             := 'apply';
    str_plout             := ' left the game';
    str_aislots           := 'Fill empty slots:';
-   str_chattars          := 'Messaging to';
    str_resol             := 'Resolution';
    str_language          := 'UI language';
    str_req               := 'Requirements: ';
@@ -502,6 +503,7 @@ begin
    _mkHStrUid(UID_HEye           ,'Hell Eye'                    ,'Detection.'                  );
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'      ,'');
+   _mkHStrUid(UID_Phantom        ,'Phantom'        ,'');
    _mkHStrUid(UID_Imp            ,'Imp'            ,'');
    _mkHStrUid(UID_Demon          ,'Demon'          ,'');
    _mkHStrUid(UID_Cacodemon      ,'Cacodemon'      ,'');
@@ -514,16 +516,16 @@ begin
    _mkHStrUid(UID_Mancubus       ,'Mancubus'       ,'');
    _mkHStrUid(UID_Arachnotron    ,'Arachnotron'    ,'');
    _mkHStrUid(UID_Archvile       ,'ArchVile'       ,'');
-   _mkHStrUid(UID_ZFormer        ,'Zombie Former'  ,'');
+   _mkHStrUid(UID_ZFormer        ,'Former Zombie'  ,'');
    _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer','');
    _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner','');
    _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner','');
    _mkHStrUid(UID_ZCommando      ,'Zombie Commando','');
-   _mkHStrUid(UID_ZAntiaircrafter,'Antiaircrafter Zombie'  ,'');
-   _mkHStrUid(UID_ZSiege         ,'Siege Zombie'   ,'');
-   _mkHStrUid(UID_ZMajor         ,'Zombie Plasmaguner'        ,'');
-   _mkHStrUid(UID_ZFMajor        ,'Zombie Jetpack Plasmaguner','');
-   _mkHStrUid(UID_ZBFG           ,'Zombie BFG'     ,'');
+   _mkHStrUid(UID_ZAntiaircrafter,'Zombie Antiaircrafter'  ,'');
+   _mkHStrUid(UID_ZSiegeMarine         ,'Siege Zombie'   ,'');
+   _mkHStrUid(UID_ZPlasmagunner         ,'Zombie Plasmaguner'        ,'');
+   _mkHStrUid(UID_ZFPlasmagunner        ,'Zombie Jetpack Plasmaguner','');
+   _mkHStrUid(UID_ZBFGMarine           ,'Zombie BFG'     ,'');
 
 
    _mkHStrUpid(upgr_hell_teleport ,'Teleport upgrade'               ,'Decrease cooldown time of Hell Teleport.'                        );
@@ -575,10 +577,10 @@ begin
    _mkHStrUid(UID_SSergant      ,'SuperShotguner'   ,'');
    _mkHStrUid(UID_Commando      ,'Commando'         ,'');
    _mkHStrUid(UID_Antiaircrafter,'Antiaircrafter'   ,'');
-   _mkHStrUid(UID_Siege         ,'Siege Marine'     ,'');
-   _mkHStrUid(UID_Major         ,'Plasmaguner'      ,'');
-   _mkHStrUid(UID_FMajor        ,'Jatpack Plasmaguner','');
-   _mkHStrUid(UID_BFG           ,'BFG Marine'       ,'');
+   _mkHStrUid(UID_SiegeMarine         ,'Siege Marine'     ,'');
+   _mkHStrUid(UID_Plasmagunner         ,'Plasmaguner'      ,'');
+   _mkHStrUid(UID_FPlasmagunner        ,'Jatpack Plasmaguner','');
+   _mkHStrUid(UID_BFGMarine           ,'BFG Marine'       ,'');
    _mkHStrUid(UID_Engineer      ,'Engineer'         ,'');
    _mkHStrUid(UID_Medic         ,'Medic'            ,'');
    _mkHStrUid(UID_UTransport          ,'Air APC'          ,'');
@@ -831,12 +833,13 @@ begin
   str_server            := 'СЕРВЕР';
   str_client            := 'КЛИЕНТ';
   str_chat              := 'ЧАТ';
+  str_chat_all          := 'ВСЕ:';
+  str_chat_allies       := 'СОЮЗНИКИ:';
   str_randoms           := 'Случайная схватка';
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты:';
   str_cgenerators       := 'Захват генераторов:';
-  str_chattars          := 'Адресаты';
   str_resol             := 'Разрешение';
   str_language          := 'Язык интерфейса';
   str_req               := 'Требования: ';
@@ -990,8 +993,8 @@ begin
   _mkHStrUid(UID_Sergant    ,'Сержант'            ,'');
   _mkHStrUid(UID_Commando   ,'Коммандо'           ,'');
   _mkHStrUid(UID_Antiaircrafter,'Гранатометчик'      ,'');
-  _mkHStrUid(UID_Major      ,'Майор'              ,'');
-  _mkHStrUid(UID_BFG        ,'Солдат с BFG'       ,'');
+  _mkHStrUid(UID_Plasmagunner      ,'Майор'              ,'');
+  _mkHStrUid(UID_BFGMarine        ,'Солдат с BFG'       ,'');
   _mkHStrUid(UID_UTransport       ,'Воздушный транспорт','');
   _mkHStrUid(UID_APC        ,'БТР'                ,'');
   _mkHStrUid(UID_Terminator ,'Терминатор'         ,'');

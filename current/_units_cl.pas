@@ -361,7 +361,7 @@ begin
    setMWSModel  (0,@spr_ZCommando);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
-UID_ZSiege:
+UID_ZSiegeMarine:
 begin
    _animw:=13;
    _animd:=8;
@@ -381,7 +381,7 @@ begin
    setMWSModel  (0,@spr_ZAntiaircrafter);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
-UID_ZMajor:
+UID_ZPlasmagunner:
 begin
    _animw:=14;
    _animd:=8;
@@ -392,7 +392,7 @@ begin
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
 end;
-UID_ZFMajor:
+UID_ZFPlasmagunner:
 begin
    _animw:=14;
    _animd:=8;
@@ -403,7 +403,7 @@ begin
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
 end;
-UID_ZBFG:
+UID_ZBFGMarine:
 begin
    _animw:=11;
    _animd:=8;
@@ -591,7 +591,7 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_pistol,0,0);
 end;
-UID_Siege:
+UID_SiegeMarine:
 begin
    _animw:=14;
    _animd:=8;
@@ -611,7 +611,7 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
-UID_Major:
+UID_Plasmagunner:
 begin
    _animw:=14;
    _animd:=8;
@@ -622,7 +622,7 @@ begin
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
-UID_FMajor:
+UID_FPlasmagunner:
 begin
    _animw:=14;
    _animd:=8;
@@ -633,7 +633,7 @@ begin
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
-UID_BFG:
+UID_BFGMarine:
 begin
    _animw:=12;
    _animd:=8;
@@ -679,6 +679,7 @@ begin
    setWeaponESND(0,nil,snd_shotgun,0,0);
 
    setWeaponTEID(0,nil,0,[0..255]);
+   with _a_weap[1] do aw_AnimStay:=sms_mattack;
 
    DefaultRLDA_pa:=2;
 end;
