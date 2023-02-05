@@ -601,7 +601,7 @@ begin
    case g_mode of
 gm_invasion: begin
                 D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_wave_t_next,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time,c_white);
-                if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+b2s(_players[0].army),ta_left,255,c_white);
+                if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+l2s(_players[0].armylimit),ta_left,255,c_white);
              end;
 gm_koth    : with g_cpoints[1] do
               if(cpTimer<=0)

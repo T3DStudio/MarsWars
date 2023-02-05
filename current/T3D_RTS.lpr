@@ -62,6 +62,7 @@ uses SysUtils, SDL, SDL_Net
 {$include _units.pas}
 {$include _ai.pas}
 {$include _cpoints.pas}
+{$include _invasion.pas}
 {$include _unit_client.pas}
      {$IFDEF _FULLGAME}
         {$include _campaings.pas}

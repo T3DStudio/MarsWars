@@ -21,7 +21,7 @@ g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
 g_cl_units        : integer  = 0;
 
-g_inv_limit       : integer  = 0;
+g_inv_limit       : longint  = 0;
 g_inv_wave_n      : byte     = 0;
 g_inv_wave_t_next : integer  = 0;
 g_inv_wave_t_curr : integer  = 0;

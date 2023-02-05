@@ -1751,7 +1751,12 @@ UID_UTransport          : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLeve
 UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
-      if(playeri=0)and(g_mode=gm_invasion)then ukfloater:=true;
+      if(playeri=0)and(g_mode=gm_invasion)then
+      begin
+         ukfloater:=true;
+         if(cycle_order<4)then buff[ub_HVision]:=_ub_infinity;
+      end;
+
 
       // BUILD AREA
       case uidi of

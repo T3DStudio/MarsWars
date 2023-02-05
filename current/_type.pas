@@ -350,7 +350,8 @@ end;
 TAIAlarm = record
    aia_enemy_base
                 : boolean;
-   aia_enemy_count,
+   aia_enemy_count
+                : longint;
    aia_x,
    aia_y        : integer;
    aia_zone     : word;
@@ -375,9 +376,10 @@ TPlayer = record
 
    build_cd,
    army,
-   armylimit,
    cenergy,
    menergy : integer;
+   armylimit
+           : longint;
 
    ready   : boolean;
 
@@ -397,11 +399,11 @@ o_x1,o_y1  :integer;
    uid_x   : array[byte] of integer;
 
    ucl_c,                                        // count buildings/units
-   ucl_l,                                        // limit buildings/units
    ucl_cs  : array[false..true] of integer;      // count selected buildings/units
+   ucl_l   : array[false..true] of longint;      // limit buildings/units
 
+   uprodl  : longint;                            // current limit in production
    uprodm,                                       // current max unit productions
-   uprodl,                                       // current limit in production
    uproda  : integer;                            // current productions
    uprodc  : array[byte] of integer;
    uprodu  : array[byte] of integer;
@@ -542,7 +544,8 @@ TUnit = record
    sel      : boolean;
 
    aiu_armyaround_ally,
-   aiu_armyaround_enemy,
+   aiu_armyaround_enemy
+            : longint;
    aiu_need_detect,
    aiu_attack_timer,
    aiu_alarm_timer,

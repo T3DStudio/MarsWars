@@ -1,5 +1,5 @@
 
-function l2s(limit:integer):shortstring; // limit 2 string
+function l2s(limit:longint):shortstring; // limit 2 string
 var fr:integer;
 begin
    fr:=limit mod MinUnitLimit;
@@ -335,7 +335,7 @@ begin
    str_menu              := 'Menu';
    str_player_def        := ' was terminated!';
    str_inv_time          := 'Wave #';
-   str_inv_ml            := 'Monsters: ';
+   str_inv_ml            := 'Monsters limit: ';
    str_play              := 'Play';
    str_replay            := 'RECORD';
    str_cmpdif            := 'Difficulty: ';
@@ -824,7 +824,7 @@ begin
   str_menu              := 'Меню';
   str_player_def        := ' уничтожен!';
   str_inv_time          := 'Волна #';
-  str_inv_ml            := 'Монстры: ';
+  str_inv_ml            := 'Армия монстров: ';
   str_play              := 'Проиграть';
   str_replay            := 'ЗАПИСЬ';
   str_cmpdif            := 'Сложность: ';
