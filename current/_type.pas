@@ -168,6 +168,10 @@ end;
 TWUDataTime = array[1..MaxUnits] of cardinal;
 PTWUDataTime = ^TWUDataTime;
 
+TWCPDataTime = array[1..MaxCPoints] of byte;
+PTWCPDataTime = ^TWCPDataTime;
+
+
 TUWeapon = record
   aw_type,
   aw_tarprior,
@@ -608,7 +612,7 @@ TCTPoint = record
    cpTimerOwnerTeam,
    cpTimerOwnerPlayer,
    cpOwnerPlayer,
-   cpOwnerTeam     : byte;
+   cpOwnerTeam  : byte;
    cpzone       : word;
    cpunitst_pstate,
    cpUnitsTeam,

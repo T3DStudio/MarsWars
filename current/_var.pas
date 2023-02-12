@@ -88,12 +88,14 @@ net_bufpos        : integer = 0;
 net_period        : byte = 0;
 net_log_n         : word = 0;
 net_wudata_t      : TWUDataTime;
+net_cpoints_t     : TWCPDataTime;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
 rpls_pnui         : byte = 0;
 rpls_log_n        : word = 0;
 rpls_wudata_t     : TWUDataTime;
+rpls_cpoints_t    : TWCPDataTime;
 
 fr_FPSSecond,
 fr_FPSSecondD,

@@ -321,23 +321,37 @@ begin
 end;   }
 
 procedure _wclinet_cpoint(cpi:byte;rpl:boolean);
-var b:byte;
+var    b: byte;
+wdcptime: pbyte;
 begin
    b:=0;
+   if(rpl)
+   then wdcptime:=@rpls_cpoints_t[cpi]
+   else wdcptime:= @net_cpoints_t[cpi];
+
+   wdcptime^:=(wdcptime^+1) mod 2;
+
    with g_cpoints[cpi] do
     if(cpCaptureR<=0)
     then _wudata_byte(0,rpl)
     else
     begin
-       b:=%10000000 or (cpOwnerPlayer and %00000111);
-       if(cpTimer<=0)
-       then _wudata_byte(b,rpl)
-       else
-       begin
-          b:=b or %01000000;
-          b:=b or ((cpTimerOwnerPlayer and %00000111) shl 3);
-          _wudata_byte(b,rpl);
-          _wudata_rld(@cpTimer,rpl);
+       b:=b or (cpOwnerPlayer      shl 2) and %00011100;
+       b:=b or (cpTimerOwnerPlayer shl 5) and %11100000;
+
+       case wdcptime^ of
+0       : begin
+             _wudata_byte(b or %00000010,rpl);
+             if(cpOwnerPlayer<>cpTimerOwnerPlayer)
+             then _wudata_rld(@cpTimer,rpl);
+          end;
+1       : if(cpLifeTime<=0)
+          then _wudata_byte(b or %00000001,rpl)
+          else
+          begin
+             _wudata_byte(b or %00000011,rpl);
+             _wudata_byte((cpLifeTime div fr_fps1) shr 2,rpl);
+          end;
        end;
     end;
 end;
@@ -351,6 +365,7 @@ end;}
 procedure _wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
 wstep : cardinal;
+wstepb0,
 wstepb: boolean;
  _N_U : pinteger;
 i,
@@ -360,28 +375,29 @@ begin
 
    wstep:=G_Step shr 1;
 
+   wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
-   then wstepb:=(wstep mod fr_fps1)=0  // every 2 second
-   else wstepb:=(wstep mod fr_fpsd2)=0; // every second
+   then wstepb:=(wstep mod fr_fps1 )=0  // every 2 second
+   else wstepb:=wstepb0; // every second
 
    if(rpl=false)and(wstepb)then        // every 1/2 seconds
     with _players[POVPlayer] do _wudata_rld(@build_cd,rpl);
 
+   if(wstepb0)then
+     if(g_mode=gm_capture)
+     or(g_mode=gm_KotH)
+     or(g_cgenerators>0)then
+      for i:=1 to MaxCPoints do
+       _wclinet_cpoint(i,rpl);
+
    if(wstepb)then
-   begin
-      case g_mode of
+     case g_mode of
 gm_invasion : begin
               _wudata_byte(g_inv_wave_n     ,rpl);
               _wudata_int (g_inv_wave_t_next,rpl);
               end;
 gm_royale   : _wudata_int(g_royal_r,rpl);
-      end;
-      if(g_mode=gm_capture)
-      or(g_mode=gm_KotH)
-      or(g_cgenerators>0)then
-       for i:=1 to MaxCPoints do
-        _wclinet_cpoint(i,rpl);
-   end;
+     end;
 
    if(rpl)then
    begin
@@ -402,7 +418,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       _wudata_byte(_PNU,rpl);
       _PNU:=min2(g_cl_units,_PNU*4);
 
-      if(wstepb)then _wpdata_upgr(rpl);
+      if(wstepb0)then _wpdata_upgr(rpl);
 
       _wudata_int(_N_U^,rpl);
       for i:=1 to _PNU do
@@ -543,7 +559,7 @@ begin
 
                  upproda-=1;
                  upprodu[_puid]-=1;
-                 pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                 //pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
                  cenergy+=pprod_e[i];
               end;
          end;
@@ -1053,12 +1069,13 @@ begin
 end;
 
 procedure _rclinet_cpoint(cpi:byte;rpl:boolean);
-var b:byte;
+var b,t,p:byte;
 begin
    with g_cpoints[cpi] do
    begin
       b:=_rudata_byte(rpl,0);
-      if((b and %10000000)=0)then
+      t:=b and %00000011;
+      if(t=0)then
       begin
          if(cpCaptureR>0)then
          begin
@@ -1069,15 +1086,21 @@ begin
       else
       begin
          if(cpCaptureR<0)then cpCaptureR:=-cpCaptureR;
-         CPoint_ChangeOwner(cpi,b and %00000111);
-         if((b and %01000000)>0)then
-         begin
-            cpTimerOwnerPlayer:=(b and %00111000) shr 3;
-            if(cpTimerOwnerPlayer<=MaxPlayers)
-            then cpTimerOwnerTeam:=_players[cpTimerOwnerPlayer].team;
-            _rudata_rld(@cpTimer,rpl);
-         end
-         else cpTimer:=0;
+         p:=(b and %00011100) shr 2;
+         CPoint_ChangeOwner(cpi,p);
+         cpTimerOwnerPlayer:=(b and %11100000) shr 5;
+         if(cpTimerOwnerPlayer<=MaxPlayers)
+         then cpTimerOwnerTeam:=_players[cpTimerOwnerPlayer].team;
+
+         case t of
+%00000001 : ;
+%00000010 : begin
+               if(cpOwnerPlayer<>cpTimerOwnerPlayer)
+               then _rudata_rld(@cpTimer,rpl)
+               else cpTimer:=0;
+            end;
+%00000011 : cpLifeTime:=(_rudata_byte(rpl,0)*fr_fps1) shl 2;
+         end;
       end;
    end;
 end;
@@ -1085,6 +1108,7 @@ end;
 procedure _rclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
 wstep : cardinal;
+wstepb0,
 wstepb: boolean;
 i,
 _PNU,
@@ -1094,17 +1118,24 @@ begin
 
    wstep:=G_Step shr 1;
 
+   wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
    then wstepb:=(wstep mod fr_fps1)=0
-   else wstepb:=(wstep mod fr_fpsd2)=0;
+   else wstepb:=wstepb0;
 
    if(rpl=false)and(wstepb)then
     with _players[POVPlayer] do
      _rudata_rld(@build_cd,rpl);
 
+   if(wstepb0)then
+     if(g_mode=gm_capture)
+     or(g_mode=gm_KotH)
+     or(g_cgenerators>0)then
+      for i:=1 to MaxCPoints do
+       _rclinet_cpoint(i,rpl);
+
    if(wstepb)then
-   begin
-      case g_mode of
+     case g_mode of
 gm_invasion : begin
                  i:=g_inv_wave_n;
                  g_inv_wave_n:=_rudata_byte(rpl,0);
@@ -1112,13 +1143,7 @@ gm_invasion : begin
                  g_inv_wave_t_next :=_rudata_int (rpl,0);
               end;
 gm_royale   : g_royal_r:=_rudata_int(rpl,0);
-      end;
-      if(g_mode=gm_capture)
-      or(g_mode=gm_KotH)
-      or(g_cgenerators>0)then
-       for i:=1 to MaxCPoints do
-        _rclinet_cpoint(i,rpl);
-   end;
+     end;
 
    g_player_status:=_rudata_byte(rpl,0);
    if(g_player_status>0)then
@@ -1139,7 +1164,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
-      if(wstepb)then _rpdata_upgr(rpl);
+      if(wstepb0)then _rpdata_upgr(rpl);
 
       _N_U:=_rudata_int(rpl,0);
       for i:=1 to _PNU do
