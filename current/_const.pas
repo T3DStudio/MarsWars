@@ -5,6 +5,8 @@ ver                    : byte = 230;
 
 degtorad               = pi/180;
 
+NOTSET                 = 32000;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  FRAME RATE
@@ -27,6 +29,9 @@ fr_fps4                = fr_fps1*4;
 fr_fps5                = fr_fps1*5;
 fr_fps2d3              = fr_fpsd3*2; //2/3
 fr_fps3d4              = fr_fpsd4*3; //3/4
+fr_fps60               = fr_fps1*60;
+
+APMPeriod              = fr_fps5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -172,6 +177,8 @@ lmt_req_ruids          = 20;
 lmt_map_mark           = 21;
 lmt_unit_attacked      = 22;
 lmt_cant_order         = 23;
+lmt_allies_attacked    = 24;
+lmt_unit_limit         = 25;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -755,7 +762,7 @@ UID_Plasmagunner       = 87;
 UID_FPlasmagunner      = 88;
 UID_BFGMarine          = 89;
 UID_UTransport         = 90;
-UID_UACBot             = 91;
+UID_UACDron             = 91;
 UID_Terminator         = 92;
 UID_Tank               = 93;
 UID_Flyer              = 94;
@@ -909,7 +916,7 @@ _hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
                                             SDLK_Z    , SDLK_X    , SDLK_C ,
 
                                             SDLK_C    , SDLK_F2   , SDLK_Delete,
-                                            0         , SDLK_SPACE, 0,
+                                            SDLK_F5   , SDLK_SPACE, 0,
                                             0         , 0         , 0,
 
                                             0,0,0,

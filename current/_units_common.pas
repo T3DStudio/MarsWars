@@ -405,7 +405,7 @@ begin
 
       with pu^ do
        with player^ do
-        if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)then
+        if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
         begin
            tu^.buff[ub_Invuln]:=invuln_time;
            upgr[upgr_hell_invuln]-=1;
@@ -536,7 +536,7 @@ end;
 begin
    for u:=0 to nrl do
    begin
-      nrd[u]:= 32000;
+      nrd[u]:= NOTSET;
       nrx[u]:=-2000;
       nry[u]:=-2000;
       nrt[u]:=0;
@@ -606,13 +606,13 @@ begin
    begin
       aukfly:=_ukfly;
       with _players[pl] do
-       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack));
+       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack));
    end;
 
    dx:=-2000;
    dy:=-2000;
-   sr:=32000;
-   dr:=32000;
+   sr:=NOTSET;
+   dr:=NOTSET;
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
@@ -629,7 +629,7 @@ begin
           end;
        end;
 
-   if(dr<32000)then
+   if(dr<NOTSET)then
    begin
       o :=point_dist_int(dx,dy,tx,ty);
       dr:=o-sr;
@@ -759,7 +759,7 @@ begin
    if(playern<=MaxPlayers)then
     with _uids[buid] do
      with _players[playern] do
-      obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
+      obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
 
    i:=_InBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
@@ -784,7 +784,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
+         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles );
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
 
@@ -811,7 +811,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_b478tel]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[race]]=0)or(_isbarrack);
+         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles  );
          if(point_dist_int(x,y,x0,y0)>srange)then exit;
@@ -847,15 +847,16 @@ begin
 
       aiu_attack_timer:=0;
       aiu_alarm_timer :=0;
-      aiu_alarm_d     :=32000;
+      aiu_alarm_d     :=NOTSET;
       aiu_alarm_x     :=-1;
       aiu_alarm_y     :=0;
-      aiu_need_detect :=32000;
+      aiu_need_detect :=NOTSET;
       aiu_armyaround_ally :=0;
       aiu_armyaround_enemy:=0;
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
+      FillChar(pprod_e,SizeOf(pprod_e),0);
       FillChar(uprod_u,SizeOf(uprod_u),0);
       FillChar(pprod_u,SizeOf(pprod_u),0);
 
@@ -1707,7 +1708,7 @@ uab_CCFly         :
               speed:=0;
 
               if(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[race]]=0 )>0)then
+               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[_urace]]=0 )>0)then
                begin
                   level:=1;
                   buff[ub_CCast  ]:=fr_fps2;
@@ -1726,7 +1727,7 @@ UID_HEye          : buff[ub_Detect]:=_ub_infinity;
 
       // INVIS
       case uidi of
-UID_HEye          : buff[ub_Invis]:=_ub_infinity;
+UID_HEye          : buff[ub_Invis]:=b2ib[hits>_hhmhits];
 UID_HTotem        : buff[ub_Invis]:=b2ib[upgr[upgr_hell_totminv]>0];
 UID_Commando      : buff[ub_Invis]:=b2ib[upgr[upgr_uac_commando]>0];
 UID_Demon         : buff[ub_Invis]:=b2ib[upgr[upgr_hell_spectre]>0];
@@ -1743,11 +1744,11 @@ UID_LostSoul      : begin
                        if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UACBot        : ukfloater:=upgr[upgr_uac_float]>0;
+UID_UACDron       : ukfloater:=upgr[upgr_uac_float]>0;
 UID_Demon         : if(upgr[upgr_hell_pinkspd]>0)
                     then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
                     else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
-UID_UTransport          : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+4*level;end;
+UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+4*level;end;
 UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
@@ -1770,7 +1771,7 @@ UID_HEye          : isbuildarea:=true;
       if(_upgr_srange>0)and(_upgr_srange_step>0)
       then t+=upgr[_upgr_srange]*_upgr_srange_step;
       if(not _ukbuilding)
-      then t+=upgr[upgr_race_srange[race]]*upgr_race_srange_bonus[race];
+      then t+=upgr[upgr_race_srange[_urace]]*upgr_race_srange_bonus[_urace];
       SetSRange(t);
    end
    else
@@ -1778,7 +1779,7 @@ UID_HEye          : isbuildarea:=true;
       SetSRange(_r+_r);
       if(hits>0)then
         case uidi of
-UID_HEye          :  buff[ub_Invis]:=_ub_infinity;
+UID_HEye          :  buff[ub_Invis]:=b2ib[hits>_hhmhits];
         end;
    end;
 end;

@@ -10,6 +10,7 @@ function _canmove  (pu:PTUnit):boolean; forward;
 function _canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
 function pf_isobstacle_zone(zone:word):boolean;  forward;
+function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 {$IFDEF _FULLGAME}
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
@@ -94,6 +95,21 @@ end;
 function cf(c,f:pcardinal):boolean;  // check flag
 begin cf:=(c^ and f^)>0;end;
 
+function GetBBit(pb:pbyte;nb:byte):boolean;
+begin
+   GetBBit:=(pb^ and (1 shl nb))>0;
+end;
+
+procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
+var i:byte;
+begin
+   i:=(1 shl nb);
+   if(nozero)
+   then pb^:=pb^ or i
+   else
+     if((pb^ and i)>0)then pb^:=pb^ xor i;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   COMMON Players funcs
@@ -139,10 +155,37 @@ begin
    end;
 end;
 
+procedure PlayerAPMUpdate(player:byte);
+begin
+   with _playerAPM[player] do
+   begin
+      if(APMTime>0)
+      then APMTime-=1
+      else
+      begin
+         APMCurrent:=APMNew;
+         APMNew:=0;
+      end;
+   end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   LOG
 //
+
+function PlayerAllies(playeri:byte;AddSelf:boolean):byte;
+var i:byte;
+begin
+   PlayerAllies:=0;
+   for i:=1 to MaxPlayers do
+    with _players[i] do
+     if(state>ps_none)and(team=_players[playeri].team)then
+     begin
+        if(not AddSelf)and(i=playeri)then continue;
+        SetBBit(@PlayerAllies,i,true);
+     end;
+end;
 
 function PlayerSetProdError(player,utp,uid:byte;cndt:cardinal;pu:PTUnit):boolean;
 begin
@@ -171,13 +214,49 @@ begin
    player^.prod_error_cndt:=0;
 end;
 
+function PlayerLogCheckNearEvent(playeri:byte;mtypes:TSoB;tickDiff:cardinal;x,y:integer):boolean;
+var ln,li:cardinal;
+begin
+   PlayerLogCheckNearEvent:=true;
+   with _players[playeri] do
+   begin
+      ln:=0;
+      li:=log_i;
+
+      while(ln<=MaxPlayerLog)do
+      begin
+         ln+=1;
+         if(li>0)
+         then li-=1
+         else li:=MaxPlayerLog;
+
+         with log_l[li] do
+           if(tick>G_Step)or not(mtype in mtypes)
+           then continue
+           else
+             if((G_Step-tick)<tickDiff)then
+               if(x<0)or(y<0)
+               then exit
+               else
+                 if(point_dist_rint(xi,yi,x,y)<base_ir)then exit;
+      end;
+   end;
+   PlayerLogCheckNearEvent:=false;
+end;
+
 procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer;local:boolean);
+const attacked_timeDiff = fr_fps1*4;
 begin
    if(ptarget>MaxPlayers)then exit;
 
    with _players[ptarget] do
    if(state>ps_none)then
    begin
+      case amtype of
+lmt_unit_attacked,
+lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],attacked_timeDiff,ax,ay))then exit;
+      end;
+
       if(local=false)then
       log_n+=1;
 
@@ -192,6 +271,7 @@ begin
          str  :=astr;
          xi   :=ax;
          yi   :=ay;
+         tick :=g_Step;
       end;
 
       {$IFDEF _FULLGAME}
@@ -206,12 +286,12 @@ begin
    end;
 end;
 
-procedure PlayersAddToLog(playern,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer;local:boolean);
+procedure PlayersAddToLog(from_player,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer;local:boolean);
 var i:byte;
 begin
    for i:=0 to MaxPlayers do
     if((to_players and (1 shl i))>0)
-    or(i=playern)
+    or(i=from_player)
     or(i=0)then PlayerAddLog(i,amtype,auidt,auid,astr,ax,ay,local);
 end;
 
@@ -274,14 +354,18 @@ begin
      or(cf(@condt,@ureq_rupid))
      then bt:=lmt_req_ruids
      else
-       if(condt=ureq_energy)
-       then bt:=lmt_req_energy
+       if(condt=ureq_armylimit)
+       or(condt=ureq_unitlimit)
+       then bt:=lmt_unit_limit
        else
-         if(cf(@condt,@ureq_unknown))
-         or(cf(@condt,@ureq_busy))
-         or(cf(@condt,@ureq_alreadyAdv))
-         then bt:=lmt_cant_order
-         else bt:=lmt_req_common;
+         if(condt=ureq_energy)
+         then bt:=lmt_req_energy
+         else
+           if(cf(@condt,@ureq_unknown))
+           or(cf(@condt,@ureq_busy))
+           or(cf(@condt,@ureq_alreadyAdv))
+           then bt:=lmt_cant_order
+           else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -290,6 +374,16 @@ begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
 
    PlayersAddToLog(pl,0,lmt_map_mark,0,0,'',x,y,false);
+end;
+procedure GameLogUnitAttacked(pu:PTunit);
+begin
+   if(pu=nil)or(ServerSide=false)then exit;
+
+   with pu^ do
+   begin
+      PlayersAddToLog(playeri,0                          ,lmt_unit_attacked  ,0,uidi,'',x,y,false);
+      PlayersAddToLog(playeri,PlayerAllies(playeri,false),lmt_allies_attacked,0,uidi,'',x,y,false);
+   end;
 end;
 
 procedure PlayerClearLog(pn:byte);
@@ -808,7 +902,6 @@ end;
 
 {$IFDEF _FULLGAME}
 
-
 function UIUnitDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
@@ -1058,44 +1151,6 @@ begin
    end;
 end;
 
-procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);
-var i:byte;
-begin
-   i:=(1 shl nb);
-   if(nozero)
-   then pb^:=pb^ or i
-   else
-     if((pb^ and i)>0)then pb^:=pb^ xor i;
-end;
-
-function PlayerAllies(playeri:byte;AddSelf:boolean):byte;
-var i:byte;
-begin
-   PlayerAllies:=0;
-   for i:=1 to MaxPlayers do
-    with _players[i] do
-     if(state>ps_none)and(team=_players[playeri].team)then
-     begin
-        if(not AddSelf)and(i=playeri)then continue;
-        SetBBit(@PlayerAllies,i,true);
-     end;
-end;
-
-procedure GameLogUnitAttacked(pu:PTunit);
-var atype:byte;
-begin
-   if(pu=nil)then exit;
-
-   with pu^ do
-    if(playeri=HPlayer)then
-    begin
-       if(uid^._ukbuilding)
-       then atype:=aummat_attacked_b
-       else atype:=aummat_attacked_u;
-       if(ui_AddMarker(x,y,atype,false))then PlayersAddToLog(playeri,PlayerAllies(playeri,true),lmt_unit_attacked,0,uidi,'',x,y,true);
-    end;
-end;
-
 function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;
 begin
    ParseLogMessage:='';
@@ -1148,6 +1203,11 @@ lmt_unit_advanced    : begin
                        with _uids[argx] do ParseLogMessage:=str_unit_advanced+' ('+un_txt_name+')';
                        mcolor^:=c_aqua;
                        end;
+lmt_allies_attacked  : begin
+                       with _uids[argx] do
+                        ParseLogMessage:=str_allies_attacked+' ('+un_txt_name+')';
+                       mcolor^:=c_orange;
+                       end;
 lmt_unit_attacked    : begin
                        with _uids[argx] do
                         if(_ukbuilding)
@@ -1159,6 +1219,7 @@ lmt_cant_order       : begin
                           ParseLogMessage:=str_cant_execute;
                           with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                        end;
+lmt_unit_limit       : ParseLogMessage:=str_maxlimit_reached;
     end;
 end;
 

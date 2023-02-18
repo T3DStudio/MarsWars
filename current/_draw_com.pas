@@ -202,8 +202,8 @@ function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;
 var i,ni,mx,my:integer;
 begin
    {
-   new  0 - not required new alarm point
-        1 -
+   new  false - not required new alarm point
+        true  - required
    return - true if alarm created
    }
    ui_AddMarker:=false;
@@ -225,8 +225,6 @@ begin
           al_mx:=(al_mx+mx) div 2;
           al_my:=(al_my+my) div 2;
           al_t :=ui_alarm_time;
-          //ui_AddMarker:=(mx<(vid_mmvx-vid_uialrm_ti))or((vid_mmvx+map_mmvw+vid_uialrm_ti)<mx)
-          //          or(my<(vid_mmvy-vid_uialrm_ti))or((vid_mmvy+map_mmvh+vid_uialrm_ti)<my);
           exit;
        end;
 
@@ -257,29 +255,6 @@ aummat_info       : al_c:=c_white;
     end;
 end;
 
-{
-
-lmt_chat0              = 0;  = player humber
-lmt_chat1              = 1;
-lmt_chat2              = 2;
-lmt_chat3              = 3;
-lmt_chat4              = 4;
-lmt_chat5              = 5;
-lmt_chat6              = 6;
-lmt_game_message       = 10;
-lmt_game_end           = 11;
-lmt_player_defeated    = 12;
-lmt_player_leave       = 13;
-lmt_cant_build         = 14;
-lmt_unit_ready         = 15;
-lmt_unit_advanced      = 16;
-lmt_upgrade_complete   = 17;
-lmt_req_energy         = 18;
-lmt_req_common         = 19;
-lmt_req_ruids          = 20;
-lmt_player_chat        = 255;
-}
-
 function LogMes2UIAlarm:boolean;
 begin
    // true  - need announcer sound
@@ -288,13 +263,19 @@ begin
    with _players[HPlayer] do
     with log_l[log_i] do
      case mtype of
-lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance,true);
+lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
 lmt_unit_ready       : if(_uids[argx]._ukbuilding)
-                       then ui_AddMarker(xi,yi,aummat_created_b,true)
-                       else ui_AddMarker(xi,yi,aummat_created_u,true);
-lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade,true);
-lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info   ,true);
-lmt_unit_attacked    : LogMes2UIAlarm:=not PointInCam(xi,yi);
+                       then ui_AddMarker(xi,yi,aummat_created_b ,true)
+                       else ui_AddMarker(xi,yi,aummat_created_u ,true);
+lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
+lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
+lmt_allies_attacked,
+lmt_unit_attacked    : begin
+                       if(_uids[argx]._ukbuilding)
+                       then ui_AddMarker(xi,yi,aummat_attacked_b,false)
+                       else ui_AddMarker(xi,yi,aummat_attacked_u,false);
+                       LogMes2UIAlarm:=not PointInCam(xi,yi);
+                       end;
      end;
 end;
 

@@ -424,7 +424,8 @@ begin
          _drawBtn(tar,1,3,spr_b_selall ,false   ,ui_orders_n[MaxUnitGroups]  <=0);
          _drawBtn(tar,2,3,spr_b_delete ,false   ,(ucl_cs[false]+ucl_cs[true])<=0);
 
-         _drawBtn(tar,1,4,spr_b_rclck  ,m_action,false             );
+         _drawBtn(tar,0,4,spr_b_mmark  ,false   ,false              );
+         _drawBtn(tar,1,4,spr_b_rclck  ,m_action,false              );
       end;
 
       end;
@@ -469,7 +470,7 @@ aummat_info     : ;
            sx:=al_x-vid_cam_x+lx;
            sy:=al_y-vid_cam_y+ly;
 
-           r:=32-(g_step mod 32);
+           r:=(32-(g_step mod 32))*4;
 
            circleColor(tar,sx,sy,r,c_white);
         end;

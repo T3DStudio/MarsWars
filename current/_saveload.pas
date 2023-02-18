@@ -225,7 +225,6 @@ begin
    SizeOf(g_status         )+
    SizeOf(_cycle_order     )+
    SizeOf(_cycle_regen     )+
-   SizeOf(team_army        )+
    SizeOf(ui_alarms        )+
    SizeOf(map_psx          )+
    SizeOf(map_psy          )+
@@ -281,7 +280,6 @@ begin
    BlockWrite(f,g_status         ,SizeOf(g_status         ));
    BlockWrite(f,_cycle_order     ,SizeOf(_cycle_order     ));
    BlockWrite(f,_cycle_regen     ,SizeOf(_cycle_regen     ));
-   BlockWrite(f,team_army        ,SizeOf(team_army        ));
    BlockWrite(f,ui_alarms        ,SizeOf(ui_alarms        ));
    BlockWrite(f,map_psx          ,SizeOf(map_psx          ));
    BlockWrite(f,map_psy          ,SizeOf(map_psy          ));
@@ -357,7 +355,6 @@ begin
          BlockRead(f,g_status         ,SizeOf(g_status         ));
          BlockRead(f,_cycle_order     ,SizeOf(_cycle_order     ));
          BlockRead(f,_cycle_regen     ,SizeOf(_cycle_regen     ));
-         BlockRead(f,team_army        ,SizeOf(team_army        ));
          BlockRead(f,ui_alarms        ,SizeOf(ui_alarms        ));
          BlockRead(f,map_psx          ,SizeOf(map_psx          ));
          BlockRead(f,map_psy          ,SizeOf(map_psy          ));

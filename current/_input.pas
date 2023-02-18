@@ -245,6 +245,7 @@ end;
 function _whoInPoint(tx,ty:integer;tt:byte):integer;
 var i,sc:integer;
     htm :byte;
+PHPlayer:PTPlayer;
 function _ch(up:PTPlayer):boolean;
 begin
    _ch:=true;
@@ -264,7 +265,8 @@ begin
       5 - any
    }
    sc:=0;
-   with _players[HPlayer]do
+   PHPlayer:=@_players[HPlayer];
+   with PHPlayer^ do
    begin
       sc+=ucl_cs[false];
       sc+=ucl_cs[true ];
@@ -275,7 +277,7 @@ begin
     for i:=1 to MaxUnits do
      with _punits[i]^ do
       if(hits>0)and(transport=0)and(_ch(player))then
-       if(_uvision(htm,_punits[i],false))then
+       if(_uvision(htm,_punits[i],false))or(PlayerObserver(PHPlayer))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            case tt of
@@ -413,16 +415,16 @@ begin
       begin
          case u of
    0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
-   1 : m_brush:=co_paction;
+   1 : m_brush :=co_paction;
    2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
 
-   3 : m_brush:=co_amove;
+   3 : m_brush :=co_amove;
    4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
-   5 : m_brush:=co_apatrol;
+   5 : m_brush :=co_apatrol;
 
-   6 : m_brush:=co_move;
+   6 : m_brush :=co_move;
    7 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
-   8 : m_brush:=co_patrol;
+   8 : m_brush :=co_patrol;
 
    9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
    10: if(ui_orders_x[MaxUnitGroups]>0)then
@@ -430,7 +432,7 @@ begin
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
         else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
    11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
-
+   12: m_brush :=co_mmark;
    13: m_action:=not m_action;
          end;
 
@@ -626,8 +628,7 @@ begin
       SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright:=1;
-                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then
-                                                    {if(k_ctrl>1)then m_brush:=co_mmark else }m_vmove:=true;
+                            SDL_BUTTON_MIDDLE    : if(_menu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
                             SDL_BUTTON_WHEELDOWN : if(_menu)then
                                                    begin
                                                       vid_menu_redraw:=true;

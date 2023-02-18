@@ -400,10 +400,12 @@ lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
 lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
+lmt_unit_limit,
 lmt_req_ruids,
 lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
+lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false);
 lmt_unit_attacked     : with _uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;

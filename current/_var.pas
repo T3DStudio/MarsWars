@@ -48,14 +48,15 @@ _cycle_regen      : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
-_commands         : array[byte] of TCommand;
+//_commands         : array[byte] of TCommand;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
 
 HPlayer           : byte = 1; // 'this' player
 
-team_army         : array[0..MaxPlayers] of integer;
+_playerAPM        : array[00..MaxPlayers] of TAPMCounter;
+
 
 vid_menu_redraw   : boolean  = true;
 
@@ -639,6 +640,7 @@ spr_c_hell,
 spr_c_earth,
 spr_c_phobos,
 spr_c_deimos ,
+spr_b_mmark,
 spr_b_rfast,
 spr_b_rskip,
 spr_b_rfog,
@@ -679,6 +681,11 @@ str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
+str_Builder,
+str_Barrack,
+str_Smith,
+str_IncEnergyLevel,
+str_CanRebuildTo,
 str_attr_detector,
 str_attr_invuln,
 str_attr_stuned,
@@ -699,7 +706,9 @@ str_building_complete,
 str_unit_complete,
 str_unit_attacked,
 str_base_attacked,
+str_allies_attacked,
 str_cant_execute,
+str_maxlimit_reached,
 str_m_liq,
 str_m_siz,
 str_m_obs,

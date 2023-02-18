@@ -660,7 +660,7 @@ begin
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
-UID_UACBot:
+UID_UACDron:
 begin
    setMWSModel(0,@spr_UACBot);
    setCommandSND(snd_uacbot_move,snd_uacbot_move,snd_uacbot_attack,snd_uacbot_annoy,snd_uacbot_select);

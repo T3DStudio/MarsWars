@@ -18,11 +18,11 @@ string6 = string[6];
 //   GRAPHIC
 //
 
-TColor = record
+{TColor = record
    r,g,b,a:byte;
    c      :cardinal;
 end;
-PTColor = ^TColor;
+PTColor = ^TColor;    }
 
 TMWTexture = record
    surf:pSDL_Surface;
@@ -77,7 +77,8 @@ TVisPrim = record
    text_rd,
    text_ld  : string6;
 end;
-PTVisPrim = ^TVisPrim;
+//PTVisPrim = ^TVisPrim;
+
 TVisSpr = record
    sprite   : PTMWTexture;
    x,y,xo,yo,
@@ -157,20 +158,16 @@ end;
 
 {$ENDIF}
 
-TCommand = record
+{TCommand = record
    c_type  : byte;
    {$IFDEF _FULLGAME}
    c_hint  : shortstring;
    c_btn   : pSDL_Surface;
    {$ENDIF}
-end;
+end;   }
 
-TWUDataTime = array[1..MaxUnits] of cardinal;
-PTWUDataTime = ^TWUDataTime;
-
+TWUDataTime  = array[1..MaxUnits] of cardinal;
 TWCPDataTime = array[1..MaxCPoints] of byte;
-PTWCPDataTime = ^TWCPDataTime;
-
 
 TUWeapon = record
   aw_type,
@@ -351,6 +348,13 @@ TUPID = record  // upgrade
    {$ENDIF}
 end;
 
+TAPMCounter = record
+   APMTime,
+   APMCurrent,
+   APMNew       : cardinal;
+   APMStr       : shortstring;
+end;
+
 TAIAlarm = record
    aia_enemy_base
                 : boolean;
@@ -367,6 +371,7 @@ TLogMes = record
    argx         : byte;
    str          : shortstring;
    xi,yi        : integer;
+   tick         : cardinal;
 end;
 PTLogMes = ^TLogMes;
 

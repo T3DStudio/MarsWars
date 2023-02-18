@@ -66,7 +66,7 @@ ul2  : case random(9) of
        5 :SpawnL:=SpawnMonster(UID_ZBFGMarine);
        6 :SpawnL:=SpawnMonster(UID_SSergant);
        7 :SpawnL:=SpawnMonster(UID_ZSSergant);
-       8 :SpawnL:=SpawnMonster(UID_UACBot);
+       8 :SpawnL:=SpawnMonster(UID_UACDron);
        end;
 ul1  : case random(15) of
        0 :SpawnL:=SpawnMonster(UID_Imp);

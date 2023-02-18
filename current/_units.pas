@@ -167,7 +167,7 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[race]]=0)or(uid^._isbarrack)) )>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[puid^._urace]]=0)or(uid^._isbarrack)) )>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
@@ -545,57 +545,57 @@ begin
    with tu^  do
    with uid^ do
    case priorset of
-wtp_building         : incPrio(    _ukbuilding  );
+wtp_building         : incPrio(    _ukbuilding   );
 wtp_building_nlight  : begin
-                       incPrio(    _ukbuilding  );
-                       incPrio(not _uklight     );
+                       incPrio(    _ukbuilding   );
+                       incPrio(not _uklight      );
                        end;
 wtp_unit_light_bio   : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(    _uklight     );
-                       incPrio(not _ukmech      );
+                       incPrio(not _ukbuilding   );
+                       incPrio(    _uklight      );
+                       incPrio(not _ukmech       );
                        end;
 wtp_unit_bio_light   : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(not _ukmech      );
-                       incPrio(    _uklight     );
+                       incPrio(not _ukbuilding   );
+                       incPrio(not _ukmech       );
+                       incPrio(    _uklight      );
                        end;
 wtp_unit_bio_nlight  : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(not _ukmech      );
-                       incPrio(not _uklight     );
+                       incPrio(not _ukbuilding   );
+                       incPrio(not _ukmech       );
+                       incPrio(not _uklight      );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_unit_bio_nostun  : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(not _ukmech      );
-                       incPrio(buff[ub_Pain]<=0 );
+                       incPrio(not _ukbuilding   );
+                       incPrio(not _ukmech       );
+                       incPrio(buff[ub_Pain]<=0  );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_unit_mech_nostun : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(    _ukmech      );
-                       incPrio(buff[ub_Pain]<=0 );
+                       incPrio(not _ukbuilding   );
+                       incPrio(    _ukmech       );
+                       incPrio(buff[ub_Pain]<=0  );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_unit_mech        : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(    _ukmech      );
+                       incPrio(not _ukbuilding   );
+                       incPrio(    _ukmech       );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_bio              : begin
-                       incPrio(not _ukmech      );
+                       incPrio(not _ukmech       );
                        incPrio(uidi<>UID_LostSoul);
                        end;
-wtp_light            : incPrio(    _uklight     );
+wtp_light            : incPrio(    _uklight      );
 wtp_fly              : begin
-                       incPrio(     ukfly       );
+                       incPrio(     ukfly        );
                        incPrio(uidi<>UID_LostSoul);
                        end;
 wtp_nolost_hits      : incPrio(uidi<>UID_LostSoul);
 wtp_unit_light       : begin
-                       incPrio(not _ukbuilding  );
-                       incPrio(    _uklight     );
+                       incPrio(not _ukbuilding   );
+                       incPrio(    _uklight      );
                        end;
 wtp_scout            : if(bld)and(hits>0)and(not _ukbuilding)and(apcm=0)then
                        if(not _IsUnitRange(transport,nil))then
@@ -713,12 +713,12 @@ begin
    with player^ do
    begin
       a_tar   := 0;
-      a_tard  := 32000;
+      a_tard  := NOTSET;
       a_tarp  := nil;
       t_weap  := 255;
       t_prio  := 0;
       uontar  := 0;
-      uontard := 32000;
+      uontard := NOTSET;
       if(StayWaitForNextTarget>0)
       then StayWaitForNextTarget-=1;
 
@@ -807,13 +807,12 @@ uab_Teleport      : swtarget:=true;
 
       if(fteleport_tar)and(uontar>0)then uo_tar:=uontar;
 
-      if(attack_target)and(a_tard<32000)then StayWaitForNextTarget:=0;
+      if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
 
       if(aicode)then ai_code(pu);
 
       {$IFDEF _FULLGAME}
-      if(playeri=HPlayer)and(buff[ub_Damaged]>0)
-      then GameLogUnitAttacked(pu);
+      if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
       {$ENDIF}
    end;
 end;
@@ -836,7 +835,7 @@ begin
       if(ServerSide)then
       begin
          a_tar  :=0;
-         a_tard :=32000;
+         a_tard :=NOTSET;
          t_weap :=255;
          a_tarp :=nil;
          t_prio :=0;
@@ -873,11 +872,6 @@ begin
             if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
          end;
       end;
-
-      {$IFDEF _FULLGAME}
-      if(playeri=HPlayer)and(buff[ub_Damaged]>0)and(au=nil)
-      then GameLogUnitAttacked(pu);
-      {$ENDIF}
    end;
 end;
 
@@ -1603,13 +1597,14 @@ co_amove   :
 co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false);
 co_paction :  if(uo_id<>ua_paction)
               or((ucl_cs[true]+ucl_cs[false])=1)then
-              case _ability of
-0                    : if(apcm>0)then
-                         if(apcc>0)then
-                         begin
-                            _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
-                            exit;
-                         end;
+                if(apcm>0)and(apcc>0)then
+                begin
+                   _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                   exit;
+                end
+                else
+                  case _ability of
+0                    : ;
 uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y))then exit;
 uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y))then exit;
 uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar      ))then exit;
@@ -1623,10 +1618,10 @@ uab_CCFly            : if(speed>0)then
                           uo_y-=fly_hz;
                           exit;
                        end;
-              else
-                _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
-                exit;
-              end;
+                  else
+                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                    exit;
+                  end;
 co_rebuild :  if(_unit_rebuild(pu))then exit;
 co_action  :  if(_unit_action (pu))then exit;
    end;

@@ -230,7 +230,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(_uvision(_players[POVPlayer].team,pu,true))or(rpl)
+      if(_uvision(_players[POVPlayer].team,pu,true))or(rpl)or(PlayerObserver(@_players[POVPlayer]))
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
@@ -435,11 +435,6 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 {$IFDEF _FULLGAME}
-
-function GetBBit(pb:pbyte;nb:byte):boolean;
-begin
-   GetBBit:=(pb^ and (1 shl nb))>0;
-end;
 
 procedure _ucInc(pu:PTUnit);
 var i,_puid:byte;

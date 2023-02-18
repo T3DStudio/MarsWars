@@ -570,6 +570,7 @@ begin
    spr_b_rstop    := LoadBtn('b_rstop'  ,vid_bw);
    spr_b_rvis     := LoadBtn('b_rvis'   ,vid_bw);
    spr_b_rclck    := LoadBtn('b_rclick' ,vid_bw);
+   spr_b_mmark    := LoadBtn('b_mmark'  ,vid_bw);
 
    for x:=0 to 3 do spr_tabs[x]:=LoadBtn('tabs'+b2s(x),vid_tbw);
 

@@ -35,8 +35,6 @@ aio_scout  = 1;
 aio_busy   = 2;
 aio_attack = 3;
 
-NOTSET     = 32000;
-
 var
 
 ai_alarm_zone    : word;
@@ -1238,7 +1236,7 @@ uprod_any  : case pu^.player^.race of
                           9 : ut:=UID_BFGMarine;
                           10: ut:=UID_APC;
                           11: ut:=UID_UTransport;
-                          12: ut:=UID_UACBot;
+                          12: ut:=UID_UACDron;
                           13: ut:=UID_Terminator;
                           14: ut:=UID_Tank;
                           15: ut:=UID_Flyer;
@@ -2170,7 +2168,7 @@ uab_HInvulnerability : if(ai_invuln_tar_u<>nil  )then _unit_ability_HInvuln    (
 uab_UACStrike        : if(ai_strike_tar_u<>nil  )then _unit_ability_UACStrike  (pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
          end;
          case uidi of
-UID_UACBot           : if(ai_uab_buildturret(pu))then
+UID_UACDron           : if(ai_uab_buildturret(pu))then
                          if(_unit_rebuild(pu))then exit;
          end;
       end;

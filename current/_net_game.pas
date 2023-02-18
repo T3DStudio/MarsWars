@@ -105,12 +105,12 @@ begin
    net_writecard(map_seed    );
    net_writebool(map_symmetry);
 
-   net_writebyte(g_mode          );
-   net_writebyte(g_start_base    );
+   net_writebyte(g_mode           );
+   net_writebyte(g_start_base     );
    net_writebool(g_fixed_positions);
-   net_writebyte(g_ai_slots      );
-   net_writebyte(g_cgenerators   );
-   net_writebool(g_deadobservers );
+   net_writebyte(g_ai_slots       );
+   net_writebyte(g_cgenerators    );
+   net_writebool(g_deadobservers  );
 
    if(G_Started)and(not g_fixed_positions)then
     for i:=1 to MaxPlayers do

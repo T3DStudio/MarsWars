@@ -322,32 +322,29 @@ begin
 
         /////////////////////////////////
 
-        if(not tu^.uid^._ukbuilding)then// not buildings
+        if(not  tu^.uid^._ukbuilding)then// units
         begin
-        if (    tu^.uid^._uklight)then  // light all
+        if (    tu^.uid^._uklight)then  // units        light
             case mid of
             MID_Chaingun2,
             MID_Baron       : _d150(@rdamage);
-            MID_HRocket,
-            MID_Blizzard,
-            MID_Mine        : _d50 (@rdamage);
             end;
 
         if (    tu^.uid^._uklight)
-        and(not tu^.uid^._ukmech )then  // light bio
+        and(not tu^.uid^._ukmech )then  // units  bio   light
             case mid of
             MID_Chaingun    : _d150(@rdamage);
             end;
 
         if (not tu^.uid^._uklight)
-        and(not tu^.uid^._ukmech )then  // heavy, bio
+        and(not tu^.uid^._ukmech )then  // units  bio   heavy
             case mid of
             MID_Imp,
             MID_SShot,
             MID_SSShot      : _d150(@rdamage);
             end;
 
-        if (    tu^.uid^._ukmech)then   // mech
+        if (    tu^.uid^._ukmech)then   // units  mech
             case mid of
             MID_YPlasma,
             MID_Cacodemon   : _d150(@rdamage);
@@ -367,14 +364,21 @@ begin
             MID_Tank        : _d300(@rdamage);
             end;
 
-        if (    tu^.uid^._ukmech)then   // mech all
+        if (    tu^.uid^._uklight)then  // light
+            case mid of
+            MID_HRocket,
+            MID_Blizzard,
+            MID_Mine        : _d50 (@rdamage);
+            end;
+
+        if (    tu^.uid^._ukmech)then   // mech
             case mid of
             MID_SSShot      : _d50 (@rdamage);
             end;
 
-        if(tu^.ukfly)
+        if(     tu^.ukfly       )
         or(tu^.uidi=UID_Phantom )
-        or(tu^.uidi=UID_LostSoul)then   // fly all
+        or(tu^.uidi=UID_LostSoul)then   // fly
             case mid of
             MID_Revenant    : _d150(@rdamage);
             MID_URocketS,
@@ -385,7 +389,8 @@ begin
             MID_BPlasma,
             MID_YPlasma,
             MID_Chaingun,
-            MID_SSShot      : painX:=2;
+            MID_Chaingun2   : painX:=2;
+            MID_SSShot      : painX:=3;
         end;
 
         if(ud<=0)and(ntars=0)then // direct and first target
