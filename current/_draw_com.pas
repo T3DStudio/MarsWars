@@ -28,84 +28,89 @@ begin
 end;
 
 
-procedure _draw_text(sur:pSDL_Surface;x,y:integer;s:shortstring;al,chrs:byte;tc:cardinal);
-var ss,i,o:byte;
-    ix:integer;
-     c:char;
-    cl:cardinal;
+procedure _draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
+var strLen,
+    i,
+    chars :byte;
+    ix    :integer;
+    charc :char;
+ color    :cardinal;
 begin
-   if(tc=0)then exit;
-   ss:=length(s);
-   if(ss>0)then
+   if(BaseColor=0)then exit;
+   strLen:=length(str);
+   if(strLen=0)then exit;
+
+   if(alignment=ta_middle)
+   or(alignment=ta_right )then
    begin
-      if(al in [ta_middle,ta_right])then
-      begin
-         o:=0;
-         for i:=1 to ss do
-          if not(s[i] in [tc_player0..tc_player6,tc_purple..tc_default])then o+=1;
+      chars:=0;
+      for i:=1 to strLen do
+       if not(str[i] in [tc_player0..tc_player6,tc_purple..tc_default])then chars+=1;
 
-         case al of
-         ta_middle: ix:=x-((o*font_w)shr 1);
-         ta_right : ix:=x- (o*font_w);
-         end;
-      end
-      else ix:=x;
-
-      if(al=ta_chat)and(ss>chrs)
-      then i:=ss-chrs
-      else i:=1;
-
-      o:=0;
-      cl:=tc;
-      for i:=i to ss do
-      begin
-         c:=s[i];
-
-         case c of
-         tc_player0..
-         tc_player6  : begin cl:=PlayerGetColor(ord(c));if(i<ss)then continue;end;
-         tc_nl1..
-         tc_nl3      : ;
-         tc_purple   : begin cl:=c_purple ;if(i<ss)then continue;end;
-         tc_red      : begin cl:=c_red    ;if(i<ss)then continue;end;
-         tc_orange   : begin cl:=c_orange ;if(i<ss)then continue;end;
-         tc_yellow   : begin cl:=c_yellow ;if(i<ss)then continue;end;
-         tc_lime     : begin cl:=c_lime   ;if(i<ss)then continue;end;
-         tc_aqua     : begin cl:=c_aqua   ;if(i<ss)then continue;end;
-         tc_blue     : begin cl:=c_blue   ;if(i<ss)then continue;end;
-         tc_gray     : begin cl:=c_gray   ;if(i<ss)then continue;end;
-         tc_white    : begin cl:=c_white  ;if(i<ss)then continue;end;
-         tc_green    : begin cl:=c_green  ;if(i<ss)then continue;end;
-         tc_default  : begin cl:=tc       ;if(i<ss)then continue;end;
-         else
-           case c of
-            char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
-            char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white );
-           else
-             boxColor(sur,ix,y,ix+font_iw,y+font_iw,cl);
-           end;
-
-           _draw_mwtexture(sur,ix,y,@font_ca[c]);
-
-           o  += 1;
-           ix += font_w;
-         end;
-
-         if(al=ta_left)then
-          if(o>=chrs)or(c in [tc_nl1..tc_nl3])or(i=ss)then
-          begin
-             if(i<ss)then o:=0;
-
-             ix:=x;
-             y +=font_w;
-             case c of
-             tc_nl1 : y+=2;
-             tc_nl2 : y+=txt_line_h2;
-             tc_nl3 : y+=txt_line_h;
-             else     y+=txt_line_h;
-             end;
-          end;
+      case alignment of
+      ta_middle: ix:=x-((chars*font_w) shr 1);
+      ta_right : ix:=x- (chars*font_w);
       end;
+   end
+   else ix:=x;
+
+   if(alignment=ta_chat)and(strLen>MaxLineChars)
+   then i:=strLen-MaxLineChars
+   else i:=1;
+
+   chars:=0;
+   color:=BaseColor;
+   for i:=i to strLen do
+   begin
+      charc:=str[i];
+
+      case charc of
+      tc_player0..
+      tc_player6  : begin color:=PlayerGetColor(ord(charc));if(i<strLen)then continue;end;
+      tc_nl1..
+      tc_nl3      : ;
+      tc_purple   : begin color:=c_purple ;if(i<strLen)then continue;end;
+      tc_red      : begin color:=c_red    ;if(i<strLen)then continue;end;
+      tc_orange   : begin color:=c_orange ;if(i<strLen)then continue;end;
+      tc_yellow   : begin color:=c_yellow ;if(i<strLen)then continue;end;
+      tc_lime     : begin color:=c_lime   ;if(i<strLen)then continue;end;
+      tc_aqua     : begin color:=c_aqua   ;if(i<strLen)then continue;end;
+      tc_blue     : begin color:=c_blue   ;if(i<strLen)then continue;end;
+      tc_gray     : begin color:=c_gray   ;if(i<strLen)then continue;end;
+      tc_white    : begin color:=c_white  ;if(i<strLen)then continue;end;
+      tc_green    : begin color:=c_green  ;if(i<strLen)then continue;end;
+      tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
+      else
+         case charc of
+         char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
+         char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white );
+         else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color      );
+         end;
+
+         _draw_mwtexture(sur,ix,y,@font_ca[charc]);
+
+         chars+= 1;
+         ix   += font_w;
+      end;
+
+      if(alignment=ta_left)then
+       if(chars>=MaxLineChars)
+       or(charc  =tc_nl1)
+       or(charc  =tc_nl2)
+       or(charc  =tc_nl3)
+       or(i     =strLen)then
+       begin
+          if(i<strLen)then chars:=0;
+
+          ix:=x;
+          y +=font_w;
+          case charc of
+          tc_nl1 : y+=2;
+          tc_nl2 : y+=txt_line_h2;
+          tc_nl3 : y+=txt_line_h;
+          else     y+=txt_line_h;
+          end;
+       end;
    end;
 end;
 
@@ -129,7 +134,7 @@ begin
       else pixelColor       (r_bminimap,mmx,mmy,    mmc);
 end;
 
-procedure map_bminimap;
+procedure map_MinimapBackground;
 begin
    sdl_FillRect(r_bminimap,nil,0);
    _bmm_draw(dids_liquids);
@@ -142,7 +147,7 @@ begin
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
-procedure map_dstarts;
+procedure map_MinimapPlayerStarts;
 var i  :byte;
     x,y:integer;
     c  :cardinal;
@@ -158,7 +163,11 @@ begin
 
       map_minimap_cpoint(r_minimap,x,y,trunc(base_r*map_mmcx),char_start ,c);
    end;
+end;
 
+procedure map_MinimapCPoints;
+var i  :byte;
+begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
      if(cpCapturer>0)then
@@ -170,9 +179,10 @@ end;
 procedure map_RedrawMenuMinimap;
 begin
    sdl_FillRect(r_minimap,nil,0);
-   map_bminimap;
+   map_MinimapBackground;
    _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_fixed_positions)then map_dstarts;
+   if(g_fixed_positions)then map_MinimapPlayerStarts;
+   map_MinimapCPoints;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
    vid_menu_redraw:=vid_menu_redraw or _menu;

@@ -604,7 +604,6 @@ begin
    _LoadMWSModel(@spr_ZCommando      ,race_units[r_hell]+'h_z2_'      ,smt_zcommando,firstload);
    _LoadMWSModel(@spr_ZAntiaircrafter,race_units[r_hell]+'h_zr_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_ZSiege         ,race_units[r_hell]+'h_z3_'      ,smt_imp      ,firstload);
-   _LoadMWSModel(@spr_ZMajor         ,race_units[r_hell]+'h_z4_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_ZFMajor        ,race_units[r_hell]+'h_z4j_'     ,smt_fmajor   ,firstload);
    _LoadMWSModel(@spr_ZBFG           ,race_units[r_hell]+'h_z5_'      ,smt_imp      ,firstload);
 
@@ -617,7 +616,6 @@ begin
    _LoadMWSModel(@spr_Antiaircrafter ,race_units[r_uac ]+'u_u4r_'     ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_Siege          ,race_units[r_uac ]+'u_u4_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   ,firstload);
-   _LoadMWSModel(@spr_Major          ,race_units[r_uac ]+'u_u5_'      ,smt_zcommando,firstload);
    _LoadMWSModel(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_fapc     ,firstload);
    _LoadMWSModel(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
@@ -789,7 +787,7 @@ begin
 
    ui_textx     := vid_mapx+4;
    ui_texty     := vid_mapy+4;
-   ui_hinty     := vid_mapy+vid_cam_h-(font_w+2)*6;
+   ui_hinty     := vid_mapy+vid_cam_h-(font_w+3)*6;
    ui_chaty     := ui_hinty-14;
    ui_logy      := ui_chaty-12;
    ui_oicox     := vid_mapx+vid_cam_w-4;
@@ -801,6 +799,8 @@ begin
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
+   ui_apmx      := ui_uiuphx+190;
+   ui_apmy      := ui_texty;
 
    ui_menu_btnsy:= (vid_vh div vid_BW)-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;

@@ -1,15 +1,18 @@
 procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);  forward;
-procedure _unit_upgr  (pu:PTUnit);  forward;
+procedure _unit_upgr  (pu:PTUnit);forward;
+procedure aiu_InitVars(pu:PTUnit);forward;
 procedure ai_InitVars(pu:PTUnit);forward;
-procedure ai_UnitSetAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
-procedure ai_CollectData(pu,tu:PTUnit;ud:integer);forward;
+procedure ai_SetAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
+procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
+procedure aiu_code(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function _canmove  (pu:PTUnit):boolean; forward;
 function _canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
-function pf_isobstacle_zone(zone:word):boolean;  forward;
+function pf_IfObstacleZone(zone:word):boolean;  forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 {$IFDEF _FULLGAME}
@@ -71,6 +74,7 @@ function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
 function w2s (i:word    ):shortstring;begin str(i,w2s );end;
 function c2s (i:cardinal):shortstring;begin str(i,c2s );end;
 function i2s (i:integer ):shortstring;begin str(i,i2s );end;
+function li2s(i:longint ):shortstring;begin str(i,li2s);end;
 function si2s(i:single  ):shortstring;begin str(i,si2s);end;
 function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b ,t);end;
 function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w ,t);end;
@@ -155,6 +159,11 @@ begin
    end;
 end;
 
+procedure PlayerAPMInc(player:byte);
+begin
+   _playerAPM[player].APMNew+=1;
+end;
+
 procedure PlayerAPMUpdate(player:byte);
 begin
    with _playerAPM[player] do
@@ -163,8 +172,9 @@ begin
       then APMTime-=1
       else
       begin
-         APMCurrent:=APMNew;
-         APMNew:=0;
+         APMTime   :=APMPeriod;
+         APMCurrent:=round((fr_fps60/APMTime)*APMNew);
+         APMNew    :=0;
       end;
    end;
 end;
@@ -238,14 +248,20 @@ begin
                if(x<0)or(y<0)
                then exit
                else
-                 if(point_dist_rint(xi,yi,x,y)<base_ir)then exit;
+                 if (xi=x)
+                 and(yi=y)
+                 then exit
+                 else
+                   if(point_dist_rint(xi,yi,x,y)<base_ir)then exit;
       end;
    end;
    PlayerLogCheckNearEvent:=false;
 end;
 
 procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer;local:boolean);
-const attacked_timeDiff = fr_fps1*4;
+const
+timeDiff5 = fr_fps1*5;
+timeDiff3 = fr_fps1*3;
 begin
    if(ptarget>MaxPlayers)then exit;
 
@@ -254,7 +270,15 @@ begin
    begin
       case amtype of
 lmt_unit_attacked,
-lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],attacked_timeDiff,ax,ay))then exit;
+lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],timeDiff5,ax,ay))then exit;
+      else
+         with log_l[log_i] do
+           if(tick<=G_Step)then
+             if (mtype=amtype)
+             and(argt=aargt)
+             and(xi=ax)
+             and(yi=ay)then
+              if((G_Step-tick)<timeDiff3)then exit;
       end;
 
       if(local=false)then
@@ -358,14 +382,27 @@ begin
        or(condt=ureq_unitlimit)
        then bt:=lmt_unit_limit
        else
-         if(condt=ureq_energy)
-         then bt:=lmt_req_energy
+         if(cf(@condt,@ureq_smiths  ))
+         or(cf(@condt,@ureq_barracks))
+         then bt:=lmt_NeedMoreProd
          else
-           if(cf(@condt,@ureq_unknown))
-           or(cf(@condt,@ureq_busy))
-           or(cf(@condt,@ureq_alreadyAdv))
-           then bt:=lmt_cant_order
-           else bt:=lmt_req_common;
+
+
+         if(cf(@condt,@ureq_busy      ))
+         then bt:=lmt_production_busy
+         else
+           if(cf(@condt,@ureq_needbuilders))
+           then bt:=lmt_unit_needbuilder
+           else
+             if(condt=ureq_energy)
+             then bt:=lmt_req_energy
+             else
+               if(cf(@condt,@ureq_alreadyAdv))
+               then bt:=lmt_already_adv
+               else
+                 if(cf(@condt,@ureq_unknown   ))
+                 then bt:=lmt_cant_order
+                 else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -417,8 +454,7 @@ function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
    PlayerObserver:=(upgr[upgr_fog_vision]>0)
-                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
-                 or((pnum>0)and(team=0));
+                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF});
 end;
 
 function PlayersReadyStatus:boolean;
@@ -438,10 +474,13 @@ end;
 
 function PlayerGetTeam(gm,p:byte):byte;
 begin
-   if(p=0)
-   then PlayerGetTeam:=0
-   else
-     case gm of
+   PlayerGetTeam:=0;
+   if(p<=MaxPlayers)then
+    with _players[p] do
+     if(p=0)
+     then PlayerGetTeam:=0
+     else
+       case gm of
 gm_3x3     : case p of
              1..3: PlayerGetTeam:=1;
              4..6: PlayerGetTeam:=4;
@@ -452,8 +491,8 @@ gm_2x2x2   : case p of
              5,6 : PlayerGetTeam:=5;
              end;
 gm_invasion: PlayerGetTeam:=1;
-     else    PlayerGetTeam:=_players[p].team;
-     end;
+       else    PlayerGetTeam:=_players[p].team;
+       end;
 end;
 
 function PlayerGetStatus(p:integer):char;
@@ -481,18 +520,25 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure PlayersStatus;
+procedure PlayersStatus(pstatus:pbyte;punits:pinteger);
 var p:byte;
 begin
-   g_player_status:=0;
-   g_cl_units     :=0;
+   if(pstatus  <>nil)then pstatus^  :=0;
+   if(punits   <>nil)then punits^   :=0;
    for p:=0 to MaxPlayers do
     with _players[p] do
-     if(army>0)and(state>ps_none)then
-     begin
-        g_player_status:=g_player_status or (1 shl p);
-        g_cl_units     +=MaxPlayerUnits;
-     end;
+    begin
+       observer:=false;
+       if(state>ps_none)then
+       begin
+          observer:=PlayerObserver(@_players[p]);
+          if(army>0)then
+          begin
+             SetBBit(pstatus,p,true);
+             punits^+=MaxPlayerUnits;
+          end;
+       end;
+    end;
 end;
 
 function sign(x:integer):integer;
@@ -870,7 +916,7 @@ begin
       with player^ do
       begin
          if(_ability_no_obstacles)then
-          if(pf_isobstacle_zone(pfzone))then _canAbility+=ureq_place;
+          if(pf_IfObstacleZone(pfzone))then _canAbility+=ureq_place;
 
          if(_ability_ruid>0)then
           if(uid_eb[_ability_ruid]<=0)then _canAbility+=ureq_ruid;
@@ -1219,7 +1265,12 @@ lmt_cant_order       : begin
                           ParseLogMessage:=str_cant_execute;
                           with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                        end;
+lmt_NeedMoreProd     : ParseLogMessage:=str_NeedMoreProd;
+lmt_already_adv      : ParseLogMessage:=str_cant_advanced;
+lmt_production_busy  : ParseLogMessage:=str_production_busy;
+lmt_unit_needbuilder : ParseLogMessage:=str_need_more_builders;
 lmt_unit_limit       : ParseLogMessage:=str_maxlimit_reached;
+    else               ParseLogMessage:='UNKNOWN MESSAGE TYPE'; mcolor^:=c_purple;
     end;
 end;
 
@@ -1253,7 +1304,6 @@ begin
    begin
       widthchars+=1;
       i:=log_i;
-      if(listheight>log_n)then listheight:=log_n;
       n:=listheight;
 
       while(n>0)do

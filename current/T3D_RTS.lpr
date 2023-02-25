@@ -1,5 +1,10 @@
 program T3D_RTS;
 
+{
+- пересмотреть чат-команды ded сервера
+- время строительства hell eye отобрадается неверно
+}
+
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 

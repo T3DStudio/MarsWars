@@ -97,9 +97,9 @@ begin
                 if(xi         >0)then b:=b or %00001000;
                 _wudata_byte  (b,rpl);
 
-                if(argx       >0)then _wudata_byte  (argx ,rpl);
-                if(length(str)>0)then _wudata_string(str  ,rpl);
-                if(xi         >0)then
+                if((b and %00000010)>0)then _wudata_byte  (argx ,rpl);
+                if((b and %00000100)>0)then _wudata_string(str  ,rpl);
+                if((b and %00001000)>0)then
                 begin
                    _wudata_byte(byte(xi shr 5),rpl);
                    _wudata_byte(byte(yi shr 5),rpl);
@@ -130,23 +130,23 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_Resurect ]>0);
-      SetBBit(@_bts2,1, buff[ub_Summoned ]>0);
-      SetBBit(@_bts2,2, buff[ub_Invuln   ]>0);
-      SetBBit(@_bts2,3, buff[ub_Teleport ]>0);
-      SetBBit(@_bts2,4, buff[ub_HVision  ]>0);
-      SetBBit(@_bts2,5, buff[ub_Cast     ]>0);
-      SetBBit(@_bts2,6, buff[ub_Scaned   ]>0);
-      SetBBit(@_bts2,7, buff[ub_Decay    ]>0);
+      SetBBit(@_bts2,0, buff[ub_Resurect    ]>0);
+      SetBBit(@_bts2,1, buff[ub_Summoned    ]>0);
+      SetBBit(@_bts2,2, buff[ub_Invuln      ]>0);
+      SetBBit(@_bts2,3, buff[ub_Teleport    ]>0);
+      SetBBit(@_bts2,4, buff[ub_HVision     ]>0);
+      SetBBit(@_bts2,5, buff[ub_Cast        ]>0);
+      SetBBit(@_bts2,6, buff[ub_Scaned      ]>0);
+      SetBBit(@_bts2,7, buff[ub_Decay       ]>0);
 
-      SetBBit(@_bts1,0, bld                 );
-      SetBBit(@_bts1,1, transport>0         );
-      SetBBit(@_bts1,2, (level and %01)   >0);
-      SetBBit(@_bts1,3, (level and %10)   >0);
-      SetBBit(@_bts1,4, buff[ub_Pain     ]>0);
+      SetBBit(@_bts1,0, bld                    );
+      SetBBit(@_bts1,1, transport>0            );
+      SetBBit(@_bts1,2, (level and %01)      >0);
+      SetBBit(@_bts1,3, (level and %10)      >0);
+      SetBBit(@_bts1,4, buff[ub_Pain        ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
-      SetBBit(@_bts1,6, sel                 );
-      SetBBit(@_bts1,7, _bts2>0             );
+      SetBBit(@_bts1,6, sel                    );
+      SetBBit(@_bts1,7, _bts2>0                );
 
       _wudata_byte(_bts1,rpl);
       if(_bts2>0)then _wudata_byte(_bts2,rpl);
@@ -223,14 +223,14 @@ begin
    end;
 end;
 
-procedure _wudata_main(pu:PTUnit;rpl:boolean;POVPlayer:byte);
+procedure _wudata_main(pu:PTUnit;rpl:boolean;POVPlayer:byte;POVPlayerObserver:boolean);
 var sh :shortint;
     wt :word;
 begin
    with pu^ do
    with uid^ do
    begin
-      if(_uvision(_players[POVPlayer].team,pu,true))or(rpl)or(PlayerObserver(@_players[POVPlayer]))
+      if(_uvision(_players[POVPlayer].team,pu,true))or(rpl)or(POVPlayerObserver)
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
@@ -266,25 +266,24 @@ begin
 
             if(buff[ub_Cast]>0)then
              if(_ability in client_cast_abils)then
-             begin
-                _wudata_rld(@rld,rpl);
-                _wudata_byte(byte(uo_x shr 5),rpl);
-                _wudata_byte(byte(uo_y shr 5),rpl);
-             end;
+              if(_wudata_rld(@rld,rpl)>0)then
+              begin
+                 _wudata_byte(byte(uo_x shr 5),rpl);
+                 _wudata_byte(byte(uo_y shr 5),rpl);
+              end;
 
-            if(playeri=POVPlayer)then _wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(POVPlayerObserver)then _wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
 end;
 
-
 procedure _wpdata_upgr(rpl:boolean);
-var i,n,bp,bv:byte;
+var p,n,bp,bv:byte;
 begin
-   for i:=1 to MaxPlayers do
-    if((g_player_status and (1 shl i))>0)then
-     with _players[i] do
+   for p:=1 to MaxPlayers do
+    if(GetBBit(@g_player_status,p))then
+     with _players[p] do
      begin
         bp:=0;
 
@@ -364,12 +363,13 @@ end;}
 
 procedure _wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
-wstep : cardinal;
+wstep  : cardinal;
+POVPlayerObserver,
 wstepb0,
-wstepb: boolean;
- _N_U : pinteger;
+wstepb1: boolean;
+ _N_U  : pinteger;
 i,
- _PNU : integer;
+ _PNU  : integer;
 begin
    _wudata_card(G_Step,rpl);
 
@@ -377,10 +377,10 @@ begin
 
    wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
-   then wstepb:=(wstep mod fr_fps1 )=0  // every 2 second
-   else wstepb:=wstepb0; // every second
+   then wstepb1:=(wstep mod fr_fps1 )=0  // every 2 second
+   else wstepb1:=wstepb0;                // every second
 
-   if(rpl=false)and(wstepb)then        // every 1/2 seconds
+   if(rpl=false)and(wstepb1)then
     with _players[POVPlayer] do _wudata_rld(@build_cd,rpl);
 
    if(wstepb0)then
@@ -390,7 +390,7 @@ begin
       for i:=1 to MaxCPoints do
        _wclinet_cpoint(i,rpl);
 
-   if(wstepb)then
+   if(wstepb1)then
      case g_mode of
 gm_invasion : begin
               _wudata_byte(g_inv_wave_n     ,rpl);
@@ -410,7 +410,10 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       _N_U:=@_players[POVPlayer].n_u;
    end;
 
-   PlayersStatus;
+   PlayersStatus(@g_player_status,@g_cl_units);
+
+   POVPlayerObserver:=_players[POVPlayer].observer;
+   if(g_player_status>0)and(POVPlayerObserver)then SetBBit(@g_player_status,7,true);
 
    _wudata_byte(g_player_status,rpl);
    if(g_player_status>0)then
@@ -427,7 +430,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
             _N_U^+=1;
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
          until ( g_player_status and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
-         _wudata_main(@_units[_N_U^],rpl,POVPlayer);
+         _wudata_main(@_units[_N_U^],rpl,POVPlayer,POVPlayerObserver);
       end;
    end;
 end;
@@ -668,9 +671,9 @@ begin
             if(hits>0)then
             begin
                if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then _TeleportEffect   (uu,pu  );
-               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _SummonEffect     (uu,@vis);
+               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _SummonEffect     (uu,            @vis);
                if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then _LevelUpEffect    (uu,EID_HVision,@vis);
-               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,@vis);
+               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,            @vis);
 
                if(pu^.bld)and(bld=false)then
                 if(playeri=HPlayer)then
@@ -813,34 +816,31 @@ begin
    begin
       while(s>0)do
       begin
-         mtype:=_rudata_byte  (rpl,0);
-         b    :=_rudata_byte  (rpl,0);
+         mtype:=_rudata_byte(rpl,0);
+         b    :=_rudata_byte(rpl,0);
 
          argt:=0;
          argx:=0;
          str :='';
-         x:=255;
-         y:=255;
+         x   :=255;
+         y   :=255;
 
-         argt :=b and %00000001;
+         argt:=b and %00000001;
          if((b and %00000010)>0)then argx:=_rudata_byte(rpl,0);
          if((b and %00000100)>0)then str :=_rudata_string(rpl);
          if((b and %00001000)>0)then
          begin
-            x:=_rudata_byte  (rpl,0);
-            y:=_rudata_byte  (rpl,0);
+            x:=_rudata_byte(rpl,0);
+            y:=_rudata_byte(rpl,0);
          end;
 
          if(x=255)
-         then PlayerAddLog(p,mtype,argt,argx,str,-1,-1,false)
+         then PlayerAddLog(p,mtype,argt,argx,str,-1     ,-1     ,false)
          else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5,false);
 
          s-=1;
       end;
-      if(rpl=false)then
-       if(p<=MaxPlayers)
-       then with _players[p] do log_n:=_rudata_card(rpl,log_n)
-       else _rudata_card(rpl,0);
+      if(rpl=false)then net_log_n:=_rudata_card(rpl,net_log_n);
    end;
 end;
 
@@ -888,6 +888,7 @@ begin
          buff[ub_Invuln  ]:=0;
          buff[ub_Teleport]:=0;
          buff[ub_HVision ]:=0;
+         buff[ub_Cast    ]:=0;
          buff[ub_Scaned  ]:=0;
          buff[ub_Decay   ]:=0;
       end;
@@ -956,7 +957,7 @@ begin
    end;
 end;
 
-procedure _rudata_main(uu:PTUnit;rpl:boolean;_pl:byte);
+procedure _rudata_main(uu:PTUnit;rpl:boolean;POVPlayer:byte;POVPlayerObserver:boolean);
 var sh: shortint;
     i : byte;
     wt: word;
@@ -966,7 +967,7 @@ begin
    begin
       playeri:=(unum-1) div MaxPlayerUnits;
       player :=@_players[playeri];
-      sh:=_rudata_sint(rpl,-128);
+      sh     :=_rudata_sint(rpl,-128);
       if(sh>-127)then
       begin
          i   :=uidi;
@@ -1008,13 +1009,13 @@ begin
 
             if(buff[ub_Cast]>0)then
              if(uid^._ability in client_cast_abils)then
-             begin
-                _rudata_rld(@rld,rpl);
-                uo_x:=integer(_rudata_byte(rpl,0) shl 5);
-                uo_y:=integer(_rudata_byte(rpl,0) shl 5);
-             end;
+              if(_rudata_rld(@rld,rpl)>0)then
+              begin
+                 uo_x:=integer(_rudata_byte(rpl,0) shl 5);
+                 uo_y:=integer(_rudata_byte(rpl,0) shl 5);
+              end;
 
-            if(playeri=_pl)then _rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(POVPlayerObserver)then _rudata_OwnerUData(uu,rpl);
          end;
       end
       else hits:=ndead_hits;
@@ -1029,12 +1030,11 @@ end;
 
 
 procedure _rpdata_upgr(rpl:boolean);
-var i,n,bp,bv:byte;
+var p,n,bp,bv:byte;
 begin
-   if(g_player_status>0)then
-   for i:=1 to MaxPlayers do
-    if((g_player_status and (1 shl i))>0)then
-     with _players[i] do
+   for p:=1 to MaxPlayers do
+    if(GetBBit(@g_player_status,p))then
+     with _players[p] do
      begin
         bp:=0;
 
@@ -1102,9 +1102,10 @@ end;
 
 procedure _rclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
-wstep : cardinal;
+wstep  : cardinal;
+POVPlayerObserver,
 wstepb0,
-wstepb: boolean;
+wstepb1: boolean;
 i,
 _PNU,
 _N_U  : integer;
@@ -1115,10 +1116,10 @@ begin
 
    wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
-   then wstepb:=(wstep mod fr_fps1)=0
-   else wstepb:=wstepb0;
+   then wstepb1:=(wstep mod fr_fps1)=0
+   else wstepb1:=wstepb0;
 
-   if(rpl=false)and(wstepb)then
+   if(rpl=false)and(wstepb1)then
     with _players[POVPlayer] do
      _rudata_rld(@build_cd,rpl);
 
@@ -1129,7 +1130,7 @@ begin
       for i:=1 to MaxCPoints do
        _rclinet_cpoint(i,rpl);
 
-   if(wstepb)then
+   if(wstepb1)then
      case g_mode of
 gm_invasion : begin
                  i:=g_inv_wave_n;
@@ -1143,6 +1144,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
    g_player_status:=_rudata_byte(rpl,0);
    if(g_player_status>0)then
    begin
+      POVPlayerObserver:=GetBBit(@g_player_status,7);
       _PNU:=_rudata_byte(rpl,0)*4;
 
       if(_PNU<=0)then exit;
@@ -1169,7 +1171,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
            if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
          until ( g_player_status and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0 ;
          _units[_N_U].unum:=_N_U;
-         _rudata_main(@_units[_N_U],rpl,POVPlayer);
+         _rudata_main(@_units[_N_U],rpl,POVPlayer,POVPlayerObserver);
       end;
    end;
 end;

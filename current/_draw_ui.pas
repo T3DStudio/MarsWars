@@ -68,11 +68,12 @@ begin
    d_MinimapAlarms;
 
    // debug
-   with _players[HPlayer] do
-    for i:=0 to MaxPlayers do
-     with ai_alarms[i] do
-      if(aia_enemy_count>0)then
-       circleColor(r_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
+   if(_testmode>0)then
+    with _players[HPlayer] do
+     for i:=0 to MaxPlayers do
+      with ai_alarms[i] do
+       if(aia_enemy_limit>0)then
+        circleColor(r_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
 
    _draw_surf(tar      ,1,1,r_minimap );
    _draw_surf(r_minimap,0,0,r_bminimap);
@@ -163,8 +164,7 @@ begin
             if(n>0)then y+=vid_oisw;
             x:=ui_oicox-vid_oips;
          end;
-         with _players[HPlayer] do
-          with _uids[c] do _draw_surf(tar,x,y,un_sbtn.surf);
+         with _uids[c] do _draw_surf(tar,x,y,un_sbtn.surf);
 
          x-=vid_oisw;
          n+=1;
@@ -542,11 +542,11 @@ begin
         end;
       end;
       if(hs=nil)then exit;
-      _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,255,c_white);
+      _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,ui_ingamecl,c_white);
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
-       _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,255,c_white);
+       _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,ui_ingamecl,c_white);
 end;
 
 procedure D_UIText(tar:pSDL_Surface);
@@ -589,8 +589,9 @@ begin
       pl:=armylimit+uprodl;
       _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy)+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
       _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(pl     )+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
-      //_draw_text(tar,ui_armyx ,ui_armyy+font_w,l2s(ucl_l[false])+'/'+l2s(ucl_l[true]),ta_left,255,ui_limit[armylimit>=MaxPlayerLimit]);
    end;
+
+   _draw_text(tar,ui_apmx ,ui_apmy ,'APM: '+c2s(_playerAPM[Hplayer].APMCurrent),ta_left,255,c_white);
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);

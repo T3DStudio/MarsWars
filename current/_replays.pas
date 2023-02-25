@@ -126,9 +126,9 @@ end;
 
 procedure replay_Code;
 const vxyc = 5;
-var  i :byte;
-     fs:cardinal;
-_vx,_vy:byte;
+var  i,gs:byte;
+     fs  :cardinal;
+_vx,_vy  :byte;
 begin
    rpls_ticks+=1;
    if(G_Started=false)or(rpls_state=rpl_none)or(menu_s2=ms2_camp)
@@ -193,13 +193,13 @@ begin
                         _vx:=byte(vid_cam_x shr vxyc);
                         _vy:=byte(vid_cam_y shr vxyc);
 
-                        i:=0;
+                        gs:=G_Status and %00111111;
+                        i :=gs;
                         if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
                         if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)then
-                         if(G_Status=gs_running)then i:=i or %01000000;
-                        i:=i or (G_Status and %00111111);
+                         if(gs=gs_running)then i:=i or %01000000;
 
-                        if((i and %11000000)>0)or(G_Status=gs_running)then
+                        if((i and %11000000)>0)or(gs=gs_running)then
                         begin
                            {$I-}
                            BlockWrite(rpls_file,i,sizeof(i));
@@ -215,7 +215,7 @@ begin
                               {$I+}
                            end;
 
-                           if((i and %00111111)=0)then _wclinet_gframe(rpls_player,true);
+                           if(gs=gs_running)then _wclinet_gframe(rpls_player,true);
                         end;
 
                         if(IOResult<>0)then replay_Abort;

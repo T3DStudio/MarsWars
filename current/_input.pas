@@ -277,7 +277,7 @@ begin
     for i:=1 to MaxUnits do
      with _punits[i]^ do
       if(hits>0)and(transport=0)and(_ch(player))then
-       if(_uvision(htm,_punits[i],false))or(PlayerObserver(PHPlayer))then
+       if(_uvision(htm,_punits[i],false))or(PHPlayer^.observer)then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            case tt of
@@ -361,6 +361,7 @@ procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
 var u:integer;
 begin
    SoundPlayUI(snd_click);
+   PlayerAPMInc(HPlayer);
 
    case by of
    3 : case vid_ppos of   // tabs

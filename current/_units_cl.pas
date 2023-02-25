@@ -381,17 +381,6 @@ begin
    setMWSModel  (0,@spr_ZAntiaircrafter);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
-UID_ZPlasmagunner:
-begin
-   _animw:=14;
-   _animd:=8;
-   setMWSModel  (0,@spr_ZMajor);
-   setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
-   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
-   setWeaponESND(0    ,nil,snd_plasma,0,0);
-   setWeaponTEID(0    ,nil,0,[0..255]);
-end;
 UID_ZFPlasmagunner:
 begin
    _animw:=14;
@@ -537,7 +526,7 @@ end;
 
 UID_Engineer:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setMWSModel(0,@spr_Engineer);
    setCommandSND(snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
@@ -549,7 +538,7 @@ begin
 end;
 UID_Medic:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setMWSModel(0,@spr_Medic);
    setCommandSND(snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
@@ -563,7 +552,7 @@ begin
 end;
 UID_Sergant:
 begin
-   _animw:=16;
+   _animw:=17;
    _animd:=8;
    setMWSModel(0,@spr_Sergant);
    setCommandSND(snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
@@ -573,7 +562,7 @@ begin
 end;
 UID_SSergant:
 begin
-   _animw:=14;
+   _animw:=17;
    _animd:=8;
    setMWSModel(0,@spr_SSergant);
    setCommandSND(snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
@@ -583,7 +572,7 @@ begin
 end;
 UID_Commando:
 begin
-   _animw:=14;
+   _animw:=16;
    _animd:=8;
    setMWSModel(0,@spr_Commando);
    setCommandSND(snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
@@ -593,7 +582,7 @@ begin
 end;
 UID_SiegeMarine:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setMWSModel(0,@spr_Siege);
    setCommandSND(snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
@@ -603,7 +592,7 @@ begin
 end;
 UID_Antiaircrafter:
 begin
-   _animw:=14;
+   _animw:=16;
    _animd:=8;
    setMWSModel(0,@spr_Antiaircrafter);
    setCommandSND(snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
@@ -611,20 +600,8 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
-UID_Plasmagunner:
-begin
-   _animw:=14;
-   _animd:=8;
-   setMWSModel(0,@spr_Major);
-   setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
-   setEffectEID (0,0  ,0             ,EID_Gavno,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
-   setWeaponESND(0    ,nil,snd_plasma,0,0);
-   //setWeaponTEID(0    ,nil,0,[0..255]);
-end;
 UID_FPlasmagunner:
 begin
-   _animw:=14;
    _animd:=8;
    setMWSModel(0,@spr_FMajor);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
@@ -635,7 +612,7 @@ begin
 end;
 UID_BFGMarine:
 begin
-   _animw:=12;
+   _animw:=14;
    _animd:=8;
    setMWSModel(0,@spr_BFG);
    setCommandSND(snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
@@ -670,7 +647,7 @@ begin
 end;
 UID_Terminator:
 begin
-   _animw:=18;
+   _animw:=13;
    setMWSModel(0,@spr_Terminator);
    setCommandSND(snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
@@ -685,7 +662,7 @@ begin
 end;
 UID_Tank:
 begin
-   _animw:=17;
+   _animw:=14;
    setMWSModel(0,@spr_Tank);
    setCommandSND(snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
@@ -857,7 +834,7 @@ end;
       with _upids[u] do
       if(_up_race=r)then
       begin
-         ui_panel_uids[r,2,i]:=u;
+         ui_panel_uids[r,2,_up_btni]:=u;
          i+=1;
          if(i>ui_ubtns)then break;
       end;
@@ -902,7 +879,7 @@ upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_vision     : begin _up_btn:=spr_b_up[r_uac ,12]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_float      : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
+upgr_uac_soaring    : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_CCFly      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
@@ -912,7 +889,7 @@ upgr_uac_extbuild   : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
-upgr_uac_jetpack    : begin _up_btn:=spr_b_up[r_uac ,15]; end;
+upgr_uac_painn      : begin _up_btn:=spr_b_up[r_uac ,15]; end;
 upgr_uac_transport  : begin _up_btn:=spr_b_up[r_uac ,24]; end;
 upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;

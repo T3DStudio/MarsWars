@@ -42,7 +42,7 @@ begin
    with _players[HPlayer] do
     for i:=0 to MaxPlayers do
      with ai_alarms[i] do
-      if(aia_enemy_count>0)then n+=1;
+      if(aia_enemy_limit>0)then n+=1;
 
    if(_testmode>0)then _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')'+
@@ -50,7 +50,6 @@ begin
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+
-   ' '+c2s(_players[Hplayer].ai_flags)+
    ' '+i2s(n),
    ta_right,255, c_white);
 

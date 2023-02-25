@@ -68,23 +68,21 @@ ul2  : case random(9) of
        7 :SpawnL:=SpawnMonster(UID_ZSSergant);
        8 :SpawnL:=SpawnMonster(UID_UACDron);
        end;
-ul1  : case random(15) of
+ul1  : case random(13) of
        0 :SpawnL:=SpawnMonster(UID_Imp);
        1 :SpawnL:=SpawnMonster(UID_Sergant);
        2 :if(MaxMonsterLimit>ul2)then
           SpawnL:=SpawnMonster(UID_Commando);
        3 :SpawnL:=SpawnMonster(UID_Antiaircrafter);
        4 :SpawnL:=SpawnMonster(UID_SiegeMarine);
-       5 :SpawnL:=SpawnMonster(UID_Plasmagunner);
-       6 :SpawnL:=SpawnMonster(UID_FPlasmagunner);
-       7 :SpawnL:=SpawnMonster(UID_ZSergant);
-       8 :SpawnL:=SpawnMonster(UID_ZCommando);
-       9 :SpawnL:=SpawnMonster(UID_ZAntiaircrafter);
-       10:SpawnL:=SpawnMonster(UID_ZSiegeMarine);
-       11:SpawnL:=SpawnMonster(UID_ZPlasmagunner);
-       12:SpawnL:=SpawnMonster(UID_ZFPlasmagunner);
-       13:SpawnL:=SpawnMonster(UID_ZEngineer);
-       14:if(MaxMonsterLimit>ul5)then
+       5 :SpawnL:=SpawnMonster(UID_FPlasmagunner);
+       6 :SpawnL:=SpawnMonster(UID_ZSergant);
+       7 :SpawnL:=SpawnMonster(UID_ZCommando);
+       8 :SpawnL:=SpawnMonster(UID_ZAntiaircrafter);
+       9 :SpawnL:=SpawnMonster(UID_ZSiegeMarine);
+       10:SpawnL:=SpawnMonster(UID_ZFPlasmagunner);
+       11:SpawnL:=SpawnMonster(UID_ZEngineer);
+       12:if(MaxMonsterLimit>ul5)then
           SpawnL:=SpawnMonster(UID_Pain);
        end;
     end;

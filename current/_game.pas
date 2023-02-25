@@ -280,6 +280,7 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
+        // if player do not start as observer
         GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
      end;
 
@@ -290,7 +291,7 @@ end;
 
 
 {$IFDEF _FULLGAME}
-procedure GameMakeDestroy;
+procedure GameMakeReset;
 begin
    menu_item:=0;
    if(G_Started)then
@@ -348,7 +349,7 @@ begin
 
    Map_premap;
 
-   if(andstart)then GameMakeDestroy;
+   if(andstart)then GameMakeReset;
 end;
 {$ELSE}
 {$include _ded.pas}
@@ -373,6 +374,9 @@ begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
+      if(pl<>HPlayer)then
+      PlayerAPMInc(pl);
+
       case o_id of
 uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
       else
@@ -482,7 +486,7 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
-   exit;
+   //exit;
 
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
@@ -535,6 +539,7 @@ begin
            if(build_cd>0)then build_cd-=1;
 
            PlayerExecuteOrder(p);
+           PlayerAPMUpdate(p);
 
            if(prod_error_cndt>0)then
             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
@@ -586,7 +591,7 @@ begin
       begin
          G_Step+=1;
 
-         PlayersStatus;
+         PlayersStatus(@g_player_status,@g_cl_units);
 
          GameModeCPoints;
          case g_mode of

@@ -52,13 +52,11 @@ begin
       if(length(name)>NameLen)then setlength(name,NameLen);
       if(oldname<>name)then vid_menu_redraw:=true;
 
-      if(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])
-      then i:=net_readbyte
-      else
+      i:=net_readbyte;
+      if not(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])then
       begin
-         i:=team;
-         team:=net_readbyte;
          if(i<>team)then vid_menu_redraw:=true;
+         team:=i;
       end;
 
       i    :=race;
@@ -194,7 +192,7 @@ nmid_log_chat    : begin
                       if(G_Started=false)then
                        with _players[pid] do
                         with log_l[log_i] do
-                         if(mtype=lmt_player_chat)then _parseCmd(str,pid);
+                         if(mtype<=MaxPlayers)or(mtype=lmt_player_chat)then _parseCmd(str,pid);
                       {$ENDIF}
                       continue;
                    end;

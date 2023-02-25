@@ -147,8 +147,7 @@ begin
    case pu^.uidi of
    UID_Phantom,
    UID_LostSoul: if(    tu^.uid^._ukmech )then _d50 (@damage);
-   UID_Demon   : if(    tu^.uid^._uklight)
-                and(not tu^.uid^._ukmech )then _d150(@damage);
+   UID_Demon   : if(not tu^.uid^._uklight)then _d150(@damage);
    end;
 
    _unit_melee_damage:=damage;
@@ -356,7 +355,7 @@ begin
         end
         else ///////////////////////////// buildings
             case mid of
-            MID_Blizzard    : _d200(@rdamage);
+            MID_Blizzard,
             MID_HRocket,
             MID_Granade,
             MID_Mine,
@@ -380,18 +379,25 @@ begin
         or(tu^.uidi=UID_Phantom )
         or(tu^.uidi=UID_LostSoul)then   // fly
             case mid of
-            MID_Revenant    : _d150(@rdamage);
+            MID_Revenant,
             MID_URocketS,
             MID_URocket     : _d150(@rdamage);
             end;
 
         case mid of
+            MID_Chaingun2,
             MID_BPlasma,
-            MID_YPlasma,
-            MID_Chaingun,
-            MID_Chaingun2   : painX:=2;
+            MID_Chaingun    : painX:=2;
             MID_SSShot      : painX:=3;
         end;
+        if(player<=MaxPlayers)then
+         with _players[player] do
+          case mid of
+          MID_Chaingun2,
+          MID_Chaingun,
+          MID_SSShot,
+          MID_SShot    : painX+=upgr[upgr_uac_painn];
+          end;
 
         if(ud<=0)and(ntars=0)then // direct and first target
         begin

@@ -203,6 +203,7 @@ TUWeapon = record
 end;
 
 TUID = record
+   _square,
    _hmhits,
    _hhmhits,
    _mhits       : longint;
@@ -294,7 +295,8 @@ TUID = record
    un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
 
    un_txt_name,
-   un_txt_descr,
+   un_txt_udescr,
+   un_txt_fdescr,
    un_txt_uihint: shortstring;
 
    un_build_amode,
@@ -358,7 +360,7 @@ end;
 TAIAlarm = record
    aia_enemy_base
                 : boolean;
-   aia_enemy_count
+   aia_enemy_limit
                 : longint;
    aia_x,
    aia_y        : integer;
@@ -390,6 +392,7 @@ TPlayer = record
    armylimit
            : longint;
 
+   observer,
    ready   : boolean;
 
    o_id    : byte;
@@ -427,19 +430,19 @@ o_x1,o_y1  :integer;
 
 
    ai_max_ulimit,
-   ai_max_energy,
-   ai_max_mains,
-   ai_max_unitps,
-   ai_max_upgrps,
-   ai_max_tech0,
-   ai_max_tech1,
-   ai_max_tech2,
-   ai_max_detect,
-   ai_max_spec1,
-   ai_max_spec2,
-   ai_max_towers,
-   ai_min_towers,
-   ai_max_blimit,
+   ai_maxcount_energy,
+   ai_maxcount_mains,
+   ai_maxcount_unitps,
+   ai_maxcount_upgrps,
+   ai_maxcount_tech0,
+   ai_maxcount_tech1,
+   ai_maxcount_tech2,
+   ai_maxlimit_detect,
+   ai_maxcount_spec1,
+   ai_maxcount_spec2,
+   ai_maxcount_towers,
+   ai_mincount_towers,
+   ai_maxlimit_blimit,
    ai_max_specialist,
    ai_attack_limit,
    ai_attack_pause,
@@ -449,7 +452,7 @@ o_x1,o_y1  :integer;
    ai_scout_u_new_w,
    ai_detection_pause
            : integer;
-   ai_max_upgrlvl
+   ai_maxcount_upgrlvl
            : byte;
    ai_hptargets
            : TSoB;
@@ -552,10 +555,11 @@ TUnit = record
    solid,
    sel      : boolean;
 
-   aiu_armyaround_ally,
-   aiu_armyaround_enemy
+   aiu_FiledSquareNear,
+   aiu_limitaround_ally,
+   aiu_limitaround_enemy,
+   aiu_need_detect
             : longint;
-   aiu_need_detect,
    aiu_attack_timer,
    aiu_alarm_timer,
    aiu_alarm_d,

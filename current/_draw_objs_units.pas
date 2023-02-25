@@ -86,7 +86,7 @@ function UnitVisionRange(pu:PTUnit):byte;
 begin
    UnitVisionRange:=0;
    if((HPlayer=0)and(rpls_state>=rpl_rhead))
-   or(PlayerObserver(@_players[HPlayer]))
+   or(_players[HPlayer].observer)
    then UnitVisionRange:=2
    else
      with pu^ do
@@ -161,7 +161,7 @@ begin
    end;
 end;
 
-procedure ui_IncOrderCounter(x,y:integer;i:byte);
+procedure ui_IncOrderCounter(x,y:integer;i,uidi:byte);
 begin
    if(i>MaxUnitGroups)then exit;
    if(ui_orders_n[i]=0)then
@@ -177,6 +177,20 @@ begin
         ui_orders_y[i]:=(ui_orders_y[i]+y) div 2;
      end;
    ui_orders_n[i]+=1;
+   with _uids[uidi] do
+   ui_orders_uids[i,_ukbuilding]:=ui_orders_uids[i,_ukbuilding]+[uidi];
+end;
+
+procedure ui_UnitGroups(pu:PTUnit;UIPlayer:byte);
+begin
+   with pu^ do
+   if(playeri=UIPlayer)and(G_Status=gs_running)then
+   with uid^ do
+   begin
+   if(group<MaxUnitGroups)then ui_IncOrderCounter(x,y,group,uidi);
+
+   if(UnitF2Select(pu))then ui_IncOrderCounter(x,y,MaxUnitGroups,uidi); // all battle units
+   end;
 end;
 
 procedure ui_counters(pu:PTUnit);
@@ -188,14 +202,6 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(group<MaxUnitGroups)then
-      begin
-         ui_IncOrderCounter(x,y,group);
-         ui_orders_uids[group,_ukbuilding]:=ui_orders_uids[group,_ukbuilding]+[uidi];
-      end;
-
-      if(UnitF2Select(pu))then ui_IncOrderCounter(x,y,MaxUnitGroups); // all battle units
-
       if(_ukbuilding)then
       begin
          if(bld)then
@@ -368,6 +374,7 @@ begin
    with uid^    do
    with player^ do
    begin
+      ui_UnitGroups(pu,HPlayer);
       ui_counters(pu);
 
       if(_unit_fogrev(pu))then
@@ -430,7 +437,7 @@ begin
                     dir:=dir mod 360;
                  end;
 
-                if(playeri=HPlayer)then
+                if(playeri=HPlayer)or(_players[HPlayer].observer)then
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin

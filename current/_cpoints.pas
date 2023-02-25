@@ -75,8 +75,8 @@ begin
        if(iTeams=0)and(cpenergy>0)then
        begin
           iTeams:=1;
-          iOwnerTeam  :=0;
           iOwnerPlayer:=0;
+          iOwnerTeam  :=_players[iOwnerPlayer].team;
        end;
 
        if(iTeams=0)

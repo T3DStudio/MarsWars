@@ -373,6 +373,8 @@ ui_energx         : integer = 0;
 ui_energy         : integer = 0;
 ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
+ui_apmx           : integer = 0;
+ui_apmy           : integer = 0;
 ui_game_log_height: integer = 0;
 ui_menu_btnsy     : integer = 0;
 
@@ -528,7 +530,6 @@ spr_ZCommando,
 spr_ZAntiaircrafter,
 spr_ZSiege,
 spr_ZFMajor,
-spr_ZMajor,
 spr_ZBFG,
 
 spr_Engineer,
@@ -540,7 +541,6 @@ spr_Commando,
 spr_Antiaircrafter,
 spr_Siege,
 spr_FMajor,
-spr_Major,
 spr_BFG,
 spr_FAPC,
 spr_APC,
@@ -709,6 +709,10 @@ str_base_attacked,
 str_allies_attacked,
 str_cant_execute,
 str_maxlimit_reached,
+str_need_more_builders,
+str_production_busy,
+str_cant_advanced,
+str_NeedMoreProd,
 str_m_liq,
 str_m_siz,
 str_m_obs,
@@ -716,6 +720,7 @@ str_m_sym,
 str_plname,
 str_aislots,
 str_cgenerators,
+str_deadobservers,
 str_team,
 str_srace,
 str_ready,
@@ -752,6 +757,7 @@ str_gsunknown,
 str_cmpdif,
 str_repend,
 str_replay,
+str_replay_name,
 str_play,
 str_inv_ml,
 str_inv_time,

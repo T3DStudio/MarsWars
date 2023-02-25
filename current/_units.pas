@@ -159,7 +159,7 @@ begin
          end;
          if(uid^._isbuilder)and(n_builders<=1)then
          begin
-            _unit_morph:=ureq_unknown;
+            _unit_morph:=ureq_needbuilders;
             exit;
          end;
          if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
@@ -699,8 +699,8 @@ uontard,
     uds: single;
 a_tarp,
     puo,
+tu_transport,
     tu : PTUnit;
-tu_inapc,
 swtarget,
 aicode,
 fteleport_tar,
@@ -719,6 +719,7 @@ begin
       t_prio  := 0;
       uontar  := 0;
       uontard := NOTSET;
+      tu_transport:=nil;
       if(StayWaitForNextTarget>0)
       then StayWaitForNextTarget-=1;
 
@@ -747,11 +748,13 @@ begin
 uab_Teleport      : swtarget:=true;
         end;
 
+      aiu_InitVars(pu);
       if(aicode)then
       begin
          ai_InitVars(pu);
-         ai_CollectData(pu,pu,0);
+         ai_CollectData(pu,pu,0,nil);
       end;
+      aiu_CollectData(pu,pu,0,nil);
 
       if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
@@ -765,18 +768,18 @@ uab_Teleport      : swtarget:=true;
             uds:=point_dist_real(x,y,tu^.x,tu^.y);
             ud :=round(uds);
 
-            tu_inapc:=(0<tu^.transport)and(tu^.transport<=MaxUnits);
+            tu_transport:=nil;
+            _IsUnitRange(tu^.transport,@tu_transport);
 
-            if(not tu_inapc)then _unit_detect(pu,tu,ud);
+            if(tu_transport=nil)then _unit_detect(pu,tu,ud);
 
             if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
-            if(aicode)then ai_CollectData(pu,tu,ud);
+            aiu_CollectData(pu,tu,ud,tu_transport);
+            if(aicode)then ai_CollectData(pu,tu,ud,tu_transport);
 
-            if(tu^.hits>0)then
+            if(tu^.hits>0)and(tu_transport=nil)then
             begin
-               if(tu_inapc)then continue;
-
                _unit_aura_effects(pu,tu,ud);
 
                if(pushout)then
@@ -809,6 +812,7 @@ uab_Teleport      : swtarget:=true;
 
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
 
+      aiu_code(pu);
       if(aicode)then ai_code(pu);
 
       {$IFDEF _FULLGAME}
@@ -918,7 +922,7 @@ begin
               if(tt^.hits<=0)then exit;
 
               if(ukfly=uf_ground)then
-               if(pf_isobstacle_zone(tt^.pfzone))then exit;
+               if(pf_IfObstacleZone(tt^.pfzone))then exit;
 
               tu^.uo_x:=tt^.x;
               tu^.uo_y:=tt^.y;
@@ -1017,7 +1021,7 @@ begin
       if(ServerSide)then
       begin
          if(au^.uo_id=ua_unload)or(au^.apcc>au^.apcm)then
-          if(not au^.ukfly)or(not pf_isobstacle_zone(au^.pfzone))then
+          if(not au^.ukfly)or(not pf_IfObstacleZone(au^.pfzone))then
            if(_unit_unload(au,pu))then exit;
 
          if(au^.uo_id in [ua_move,ua_hold,ua_amove])then uo_id:=au^.uo_id;
@@ -1064,7 +1068,7 @@ begin
             case _ability of
 uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
                     begin
-                       buff[ub_Cast  ]:=fr_fpsd2;
+                       buff[ub_Cast ]:=fr_fpsd2;
                        buff[ub_CCast]:=fr_fps2;
                        if(upgr[upgr_hell_phantoms]>0)
                        then _ability_unit_spawn(pu,UID_Phantom )
@@ -1389,8 +1393,10 @@ wmove_noneed    : if(not attackinmove)then
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
 
-            if(ServerSide)and(not _ukbuilding)
-            then _unit_exp(pu,aw_rld);
+            if(ServerSide)and(not _ukbuilding)then
+             if(aw_max_range<0)and(aw_type=wpt_directdmg)
+             then _unit_exp(pu,aw_rld*2)
+             else _unit_exp(pu,aw_rld  );
             if(not attackinmove)then
             begin
                if(x<>tu^.x)
@@ -1509,7 +1515,12 @@ uab_SpawnLost:  begin
                    uo_id:=ua_amove;
                    _unit_action(pu);
                    uo_id:=ua_paction;
-                end
+                end;
+uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
+                begin
+                   uo_id:=ua_amove;
+                   _unit_action(pu);
+                end;
            else
              if(speed<=0)
              then uo_id:=ua_amove
@@ -1550,7 +1561,7 @@ uab_SpawnLost:  begin
 end;
 
 function _unit_player_order(pu:PTUnit;order_id,order_tar,order_x,order_y:integer):boolean;
-procedure _setUO(aid,atar,ax,ay,apx,apy:integer;atarz:boolean);
+procedure _setUO(aid,atar,ax,ay,apx,apy:integer;atarz,nospeedcheck:boolean);
 begin
    with pu^     do
    begin
@@ -1558,7 +1569,7 @@ begin
       uo_tar:=atar;
       if(atarz)
       then a_tar:=0;
-      if(speed>0)then
+      if(speed>0)or(nospeedcheck)then
       begin
          uo_x  :=ax;
          uo_y  :=ay;
@@ -1586,20 +1597,20 @@ co_rcmove  :  begin     // right click
                  then uo_id:=ua_amove
                  else uo_id:=ua_move;
               end;
-co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true );
-co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true );
-co_patrol  : _setUO(ua_move ,0        ,order_x,order_y, x, y,true );
-co_astand  : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false);
+co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true ,false);
+co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true ,false);
+co_patrol  : _setUO(ua_move ,0        ,order_x,order_y, x, y,true ,false);
+co_astand  : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false,false);
 co_amove   :
         if(_IsUnitRange(order_tar,nil))
-        then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false)
-        else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false);
-co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false);
+        then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
+        else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
+co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
 co_paction :  if(uo_id<>ua_paction)
               or((ucl_cs[true]+ucl_cs[false])=1)then
                 if(apcm>0)and(apcc>0)then
                 begin
-                   _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                   _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
                    exit;
                 end
                 else
@@ -1613,13 +1624,24 @@ uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y))then exi
 uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar      ))then exit;
 uab_CCFly            : if(speed>0)then
                        begin
-                          _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
-                          _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
-                          uo_y-=fly_hz;
-                          exit;
-                       end;
+                          if(_canAbility(pu)=0)then
+                          begin
+                             _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
+                             _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
+                             uo_y-=fly_hz;
+                             exit;
+                          end;
+                       end
+                       else
+                         if(_unit_action(pu))then
+                         begin
+                            _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,true);
+                            _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
+                            uo_y-=fly_hz;
+                            exit;
+                         end;
                   else
-                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true );
+                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
                     exit;
                   end;
 co_rebuild :  if(_unit_rebuild(pu))then exit;

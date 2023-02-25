@@ -67,9 +67,9 @@ begin
     pf_get_area:=pf_get_area_cell(x div pf_pathmap_w,y div pf_pathmap_w);
 end;
 
-function pf_isobstacle_zone(zone:word):boolean;
+function pf_IfObstacleZone(zone:word):boolean;
 begin
-   pf_isobstacle_zone:=(zone=pf_solid);
+   pf_IfObstacleZone:=(zone=pf_solid);
 end;
 
 {

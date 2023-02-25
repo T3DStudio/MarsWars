@@ -18,17 +18,17 @@ begin
 end;
 
 
-procedure NewAI(r,t,a:byte);
+procedure NewAI(arace,ateam,aiskill:byte);
 var p:byte;
 begin
    for p:=1 to MaxPlayers do
     with _Players[p] do
      if(state=ps_none)then
      begin
-        if(g_mode in [gm_scirmish,gm_capture])then  team:=t;
-        race:=r;
+        if(g_mode in [gm_scirmish,gm_capture])then  team:=ateam;
+        race:=arace;
         mrace:=race;
-        ai_skill:=a;
+        ai_skill:=aiskill;
         PlayerSetState(p,ps_comp);
         break;
      end;
@@ -42,7 +42,7 @@ begin
      if(state=ps_comp)then PlayerSetState(p,ps_none);
 end;
 
-procedure cmp_ffa;
+procedure SetFFATeams;
 var i: byte;
 begin
    for i:=1 to MaxPlayers do
@@ -60,6 +60,17 @@ begin
    if(s='H')or(s='h')then _a2r:=r_hell;
    if(s='U')or(s='u')then _a2r:=r_uac;
 end;
+function _str2b(s:shortstring):boolean;
+begin
+   _str2b:=false;
+   case s of
+'Y',
+'y',
+'+'   : _str2b:=true;
+   else _str2b:=s2i(s)>0;
+   end;
+end;
+
 begin
    if(length(msg)=0)then exit;
    if(ord(msg[1])<=MaxPlayers)then delete(msg,1,1);
@@ -108,42 +119,43 @@ begin
       GameLogCommon(0,log_to_all,'Add AI player: -p [R/H/U team skill]' ,false);
       GameLogCommon(0,log_to_all,'Remove all AI players: -k or -noai'   ,false);
       GameLogCommon(0,log_to_all,'Set 1..6 teams to AI players: -ffa'   ,false);
-      GameLogCommon(0,log_to_all,'Game moddes: -s - scirmish'           ,false);
-      GameLogCommon(0,log_to_all,'  -f2/3- 2/3 fortress, -i - invasion' ,false);
-      GameLogCommon(0,log_to_all,'  -c - capturing points, -a - assault',false);
-      GameLogCommon(0,log_to_all,'  -rb - royal battle'                 ,false);
-      GameLogCommon(0,log_to_all,'  -ud/-d2 - UDOOM/DOOM 2 mode'        ,false);
+      GameLogCommon(0,log_to_all,'Game moddes: -scir - scirmish, -3x3,' ,false);
+      GameLogCommon(0,log_to_all,'  -2x2x2, -inv - invasion, -cpt -'    ,false);
+      GameLogCommon(0,log_to_all,'  capturing points, -koth - king of'  ,false);
+      GameLogCommon(0,log_to_all,'  the hill, -rb - royal battle'       ,false);
       GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
       GameLogCommon(0,log_to_all,'Starting base options: -st 1-6'       ,false);
       GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-7'    ,false);
       exit;
    end;
-   '-m'  : if(a<6)
-           then begin Map_randommap; Map_premap;end
+'-m'     : if(a<6)
+           then GameLogCommon(0,log_to_all,'command syntax error, see -h',false)
            else
            begin
               map_seed    :=s2c(args[1]);
               map_mw      :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
               map_liq     :=min2(7,s2b(args[3]));
               map_obs     :=min2(7,s2b(args[4]));
-              map_symmetry:=s2i(args[5])>0;
+              map_symmetry:=_str2b(args[5]);
               Map_premap;
            end;
-   '-p'  : if(a<3)
-           then with _players[pl] do NewAI(race,team,4)
-           else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),7));
-'-ffa'   : cmp_ffa;
+'-p'     : if(a<3)
+           then with _players[pl] do NewAI(race,team,player_default_ai_level)
+           else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),gms_g_maxai));
+'-ffa'   : SetFFATeams;
 '-noai',
 '-k'     : RemoveAI;
 '-3x3'   : begin g_mode:=gm_3x3;      Map_premap; end;
 '-2x2x2' : begin g_mode:=gm_2x2x2;    Map_premap; end;
-'-scir'  : begin g_mode:=gm_scirmish; Map_premap; cmp_ffa; end;
+'-scir'  : begin g_mode:=gm_scirmish; Map_premap; SetFFATeams; end;
 '-inv'   : begin g_mode:=gm_invasion; Map_premap; end;
-'-cpt'   : begin g_mode:=gm_capture;  Map_premap; cmp_ffa; end;
+'-cpt'   : begin g_mode:=gm_capture;  Map_premap; SetFFATeams; end;
 '-koth'  : begin g_mode:=gm_koth;     Map_premap; end;
 '-rb'    : begin g_mode:=gm_royale;   Map_premap; end;
+
 '-cg'    : begin g_cgenerators     :=not g_cgenerators;    Map_premap;end;
 '-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
+'-lo'    : begin g_deadobservers   :=not g_deadobservers; end;
 '-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
 '-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
    else exit;

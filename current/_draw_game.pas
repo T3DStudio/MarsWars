@@ -488,7 +488,7 @@ end;
 //
 
 procedure cpoints_sprites(draw:boolean);
-var t:integer;
+var t,i:integer;
 color:cardinal;
 begin
    if(not draw)then exit;
@@ -516,6 +516,9 @@ begin
 
         if(PointInScreenP(cpx,cpy,nil))then
          if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+
+       // for i:=0 to MaxPlayers do
+       //  UnitsInfoAddText(cpx,cpy+(i+2)*10,i2s(cpunitsp_pstate[i])+' '+i2s(cpunitst_pstate[i]),c_white);
      end;
 end;
 
@@ -689,18 +692,20 @@ begin
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
+              lineColor(r_screen,ix,iy,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
+
               if(aiu_alarm_d<32000)then
               lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
 
-              lineColor(r_screen,ix,iy,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
+
 
            end;
 
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,i2s(_level_damage), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,li2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
+//           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 
            //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));

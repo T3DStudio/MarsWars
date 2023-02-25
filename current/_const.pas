@@ -179,6 +179,10 @@ lmt_unit_attacked      = 22;
 lmt_cant_order         = 23;
 lmt_allies_attacked    = 24;
 lmt_unit_limit         = 25;
+lmt_unit_needbuilder   = 26;
+lmt_production_busy    = 27;
+lmt_already_adv        = 28;
+lmt_NeedMoreProd       = 29;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -257,22 +261,23 @@ uo_addorder            = 10;
 //  UNIT & UPGRADES REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = %000000000000000000001;
-ureq_ruid              : cardinal = %000000000000000000010;
-ureq_rupid             : cardinal = %000000000000000000100;
-ureq_energy            : cardinal = %000000000000000001000;
-ureq_time              : cardinal = %000000000000000010000;
-ureq_max               : cardinal = %000000000000001000000;
-ureq_builders          : cardinal = %000000000000010000000; // need builders
-ureq_bld_r             : cardinal = %000000000000100000000;
-ureq_barracks          : cardinal = %000000000001000000000; // need barracks
-ureq_smiths            : cardinal = %000000000010000000000; // need smith
-ureq_product           : cardinal = %000000000100000000000; // already in production
-ureq_armylimit         : cardinal = %000000001000000000000;
-ureq_place             : cardinal = %000000010000000000000; // cant build here
-ureq_busy              : cardinal = %000000100000000000000; // production is busy
-ureq_unknown           : cardinal = %000001000000000000000; //
-ureq_alreadyAdv        : cardinal = %000010000000000000000; //
+ureq_unitlimit         : cardinal = 1;    // 1
+ureq_ruid              : cardinal = 2;    // 2
+ureq_rupid             : cardinal = 4;    // 4
+ureq_energy            : cardinal = 8;    // 8
+ureq_time              : cardinal = 16;   // 16
+ureq_max               : cardinal = 32;   // 32
+ureq_builders          : cardinal = 64;   // need builders  64
+ureq_bld_r             : cardinal = 128;  //                 128
+ureq_barracks          : cardinal = 256;  // need barracks     512
+ureq_smiths            : cardinal = 512;  // need smith          1024
+ureq_product           : cardinal = 1024; // already in production
+ureq_armylimit         : cardinal = 2048;
+ureq_place             : cardinal = 4096; // cant build here
+ureq_busy              : cardinal = 8192; // production is busy
+ureq_unknown           : cardinal = 16384;//
+ureq_alreadyAdv        : cardinal = 32768;//
+ureq_needbuilders      : cardinal = 65536;// need more builders
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -505,11 +510,11 @@ upgr_hell_barmor       = 3;  // base building armor
 upgr_hell_mattack      = 4;  // melee attack damage
 upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
-upgr_hell_towers       = 7;  // towers range
+upgr_hell_buildr       = 7;  // main range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
 upgr_hell_paina        = 9;  // decay aura
-upgr_hell_buildr       = 10; // main range
-upgr_hell_extbuild     = 11; // HK on doodabs
+upgr_hell_extbuild     = 10; // HK on doodabs
+upgr_hell_towers       = 11; // towers range
 upgr_hell_pinkspd      = 12; // demon move speed
 
 upgr_hell_spectre      = 13; // demon spectre                 // t2
@@ -531,13 +536,13 @@ upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
-upgr_uac_jetpack       = 36; // jetpack for plasmagunner
-upgr_uac_towers        = 37; // towers sr
+upgr_uac_painn         = 36; // expansive bullets
+upgr_uac_buildr        = 37; // main sr
 upgr_uac_CCFly         = 38; // CC fly
 upgr_uac_ccturr        = 39; // CC turret
-upgr_uac_buildr        = 40; // main sr
-upgr_uac_extbuild      = 41; // main on doodabs
-upgr_uac_float         = 42; // UACBot floating
+upgr_uac_extbuild      = 40; // main on doodabs
+upgr_uac_towers        = 41; // towers sr
+upgr_uac_soaring       = 42; // UACBot floating
 
 upgr_uac_botturret     = 43; // bot turret                    // t2
 upgr_uac_vision        = 44; // infatry vision
@@ -618,6 +623,7 @@ ul2                    = MinUnitLimit*2;
 ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
+ul6                    = MinUnitLimit*6;
 ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
@@ -720,9 +726,8 @@ UID_ZSSergant          = 37;
 UID_ZCommando          = 38;
 UID_ZAntiaircrafter    = 39;
 UID_ZSiegeMarine       = 40;
-UID_ZPlasmagunner      = 41;
-UID_ZFPlasmagunner     = 42;
-UID_ZBFGMarine         = 43;
+UID_ZFPlasmagunner     = 41;
+UID_ZBFGMarine         = 42;
 
 // UAC
 
@@ -758,25 +763,28 @@ UID_SSergant           = 83;
 UID_Commando           = 84;
 UID_Antiaircrafter     = 85;
 UID_SiegeMarine        = 86;
-UID_Plasmagunner       = 87;
-UID_FPlasmagunner      = 88;
-UID_BFGMarine          = 89;
-UID_UTransport         = 90;
-UID_UACDron             = 91;
-UID_Terminator         = 92;
-UID_Tank               = 93;
-UID_Flyer              = 94;
-UID_APC                = 95;
+UID_FPlasmagunner      = 87;
+UID_BFGMarine          = 88;
+UID_UTransport         = 89;
+UID_UACDron            = 90;
+UID_Terminator         = 91;
+UID_Tank               = 92;
+UID_Flyer              = 93;
+UID_APC                = 94;
 
 
 uids_hell              = [1 ..49];
 uids_uac               = [50..99];
 
-uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_Plasmagunner, UID_FPlasmagunner ,UID_BFGMarine ];
-uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZPlasmagunner,UID_ZFPlasmagunner,UID_ZBFGMarine];
+uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
+uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
+
+//T1                     = uids_marines+uids_zimbas+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
+T2                     = [UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_ZBFGMarine,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron];
+T3                     = [UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
 uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter);
 
@@ -877,7 +885,7 @@ fly_z                  = 80;
 fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
-pain_time              = fr_fps2d3;
+pain_time              = fr_fps1;
 
 {$IFDEF _FULLGAME}
 
@@ -1211,10 +1219,12 @@ ui_menu_csm_x3         = ui_menu_csm_x2+ui_menu_csm_xs;
 ui_menu_csm_xt0        = ui_menu_csm_x0+8;
 ui_menu_csm_xt1        = ui_menu_csm_x0+24;
 ui_menu_csm_xt2        = ui_menu_csm_x1-8;
+ui_menu_csm_xt3        = ui_menu_csm_xc+8;
+
 
 chat_type              : array[false..true] of char = ('|',' ');
 chat_shlm_t            = fr_fps1*3;
-chat_shlm_max          = chat_shlm_t*5;
+chat_shlm_max          = chat_shlm_t*6;
 
 ui_menu_chat_height    = 13; // lines
 ui_menu_chat_width     = 37; // chars
@@ -1395,7 +1405,7 @@ str_m_siz                : shortstring = 'Size';
 str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';
 str_aislots              : shortstring = 'Fill empty slots:   ';
-str_fstarts              : shortstring = 'Fixed player starts: ';
+str_fstarts              : shortstring = 'Fixed player starts:';
 str_gmodet               : shortstring = 'Game mode:          ';
 str_cgenerators          : shortstring = 'Neutral generators: ';
 str_starta               : shortstring = 'Starting base:      ';

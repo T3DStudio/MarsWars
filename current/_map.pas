@@ -202,7 +202,6 @@ procedure map_ShuffleStarts;
 var x,y:byte;
     i:integer;
 begin
-   //(byte(x*y+map_seed+g_mode) mod 3)
    for x:=1 to MaxPlayers do
     for y:=1 to MaxPlayers do
      if(random(2)=0)then
@@ -391,7 +390,7 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
    end;
 
    if(g_cgenerators>0)then
-    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r,gm_cptp_energy,gm_cptp_gtime,g_cgenerators_ltime[g_cgenerators],false);
+    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,gm_cptp_energy,gm_cptp_gtime,g_cgenerators_ltime[g_cgenerators],false);
 end;
 
 function _dec_min_r(t1,t2:byte):integer;

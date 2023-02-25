@@ -851,8 +851,8 @@ begin
       aiu_alarm_x     :=-1;
       aiu_alarm_y     :=0;
       aiu_need_detect :=NOTSET;
-      aiu_armyaround_ally :=0;
-      aiu_armyaround_enemy:=0;
+      aiu_limitaround_ally :=0;
+      aiu_limitaround_enemy:=0;
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
@@ -1507,7 +1507,7 @@ begin
    scan_buff:=255;
    with uu^ do
    begin
-      if(PlayerObserver(tu^.player))
+      if(tu^.player^.observer)
       then td:=0
       else
         if(tu^.uid^._ability=uab_UACScan)and(tu^.rld>radar_vision_time)then
@@ -1677,6 +1677,7 @@ begin
    with player^ do
    if(bld)and(hits>0)then
    begin
+      speed:=_speed;
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
@@ -1690,7 +1691,8 @@ uab_CCFly         :
                  {$ENDIF}
                  ukfly:=uf_fly;
                  zfall:=zfall-fly_hz;
-                 _unit_clear_order(pu,false);
+                 if(uo_id<>ua_paction)
+                 then _unit_clear_order(pu,false);
               end;
               speed:=3;
            end
@@ -1711,7 +1713,7 @@ uab_CCFly         :
                if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[_urace]]=0 )>0)then
                begin
                   level:=1;
-                  buff[ub_CCast  ]:=fr_fps2;
+                  buff[ub_CCast]:=fr_fps2;
                end;
            end;
       end;
@@ -1744,7 +1746,7 @@ UID_LostSoul      : begin
                        if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UACDron       : ukfloater:=upgr[upgr_uac_float]>0;
+UID_UACDron       : ukfloater:=upgr[upgr_uac_soaring]>0;
 UID_Demon         : if(upgr[upgr_hell_pinkspd]>0)
                     then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
                     else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
