@@ -218,7 +218,7 @@ MID_Tank       : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=tank_sr
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
 MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;  splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;         end;
+MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;         end;       //-1162   620
       else
          vstep:=0;
          exit;
@@ -314,7 +314,11 @@ begin
            end;
 
         ud:=point_dist_rint(vx,vy,tu^.x,tu^.y)-tu^.uid^._r;
-        if(splashr<=0)or(mid=MID_Mine)then ud-=10;
+        if(mid=MID_Mine)
+        then ud-=25
+        else
+          if(splashr<=0)then ud-=12;
+
         if(ud<0)then ud:=0;
 
         painX:=1;

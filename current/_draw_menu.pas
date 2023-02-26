@@ -116,7 +116,7 @@ begin
 end;
 
 procedure D_M1(tar:pSDL_Surface);
-const _set_x0 = ui_menu_ssr_x0+8;
+const _set_x0 = ui_menu_ssr_x0+font_w;
 var t,i,y:integer;
 function _yl(s:integer):integer;begin _yl:=ui_menu_ssr_y0+s*ui_menu_ssr_ys; end;
 function _yt(s:integer):integer;begin _yt:=_yl(s)+6; end;
@@ -166,7 +166,11 @@ begin
                  begin
                     y:=_yt(2);
                     _draw_text(tar,i,y, str_ColoredShadow      , ta_left ,255,c_white);
-                    _draw_text(tar,t,y, b2cc[vid_ColoredShadow], ta_right,255,c_white);
+                    _draw_text(tar,ui_menu_ssr_x7t,y, b2cc[vid_ColoredShadow], ta_right,255,c_white);
+                    vlineColor(tar,ui_menu_ssr_x2,y-5,y+12,c_gray);
+
+                    _draw_text(tar,ui_menu_ssr_x7r,y, str_APM      , ta_left ,255,c_white);
+                    _draw_text(tar,t,y, b2cc[vid_APM], ta_right,255,c_white);
 
                     y:=_yt(3);
                     _draw_text(tar,i,y, str_uhbar             , ta_left ,255,c_white);
@@ -220,6 +224,10 @@ begin
                     y:=_yt(5);
                     _draw_text(tar,i ,y, str_fullscreen, ta_left ,255, mic(true,false));
                     _draw_text(tar,t ,y, b2cc[not vid_fullscreen],ta_right,255, mic(true,false));
+
+                    y:=_yt(7);
+                    _draw_text(tar,i ,y, str_fps, ta_left ,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[vid_fps],ta_right,255, mic(true,false));
                  end;
 
                  if(menu_s3=ms3_sond)then

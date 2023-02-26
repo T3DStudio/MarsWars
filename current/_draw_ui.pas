@@ -147,7 +147,9 @@ var  x,y,y0:integer;
      c,i,n :byte;
      b     :boolean;
 begin
-   y  :=ui_texty+vid_oiw;
+   y:=ui_texty+vid_oihw;
+   _draw_text(tar,ui_oicox-4,y+2,str_orders,ta_right,255,c_white);
+   y+=vid_oiw;
    if(MaxUnitGroups>1)then
    for i:=1 to MaxUnitGroups-1 do
    begin
@@ -177,7 +179,6 @@ begin
       end;
       y+=vid_oihw;
    end;
-   _draw_text(tar,ui_oicox-4,ui_texty+2,str_orders,ta_right,255,c_white);
 end;
 
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
@@ -596,8 +597,6 @@ begin
       _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(pl     )+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[pl>=MaxPlayerLimit]);
    end;
 
-   _draw_text(tar,ui_apmx ,ui_apmy ,'APM: '+c2s(_playerAPM[Hplayer].APMCurrent),ta_left,255,c_white);
-
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
@@ -618,6 +617,9 @@ gm_koth    : with g_cpoints[1] do
                 then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
                 else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
+
+   if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[Hplayer].APM_Str                  ,ta_left,255,c_white);
+   if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')',ta_left,255,c_white);
 
    d_OrderIcons(tar);
 end;

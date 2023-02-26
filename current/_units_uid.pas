@@ -582,7 +582,7 @@ begin
    _ruid1     := UID_HBarracks;
    _ruid1n    := 4;
    _fastdeath_hits:=1;
-   _weapon(0,wpt_suicide,-_speed,0,0,fr_fps1,0,0,0,0,0,0,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _weapon(0,wpt_suicide,aw_dmelee,0,0,fr_fps1,0,0,0,0,0,0,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_distance,0);
 end;
 UID_ZSergant :
 begin
@@ -1362,9 +1362,9 @@ begin
    _setUPGR(r_hell,upgr_hell_rteleport ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress      ,false);
    _setUPGR(r_hell,upgr_hell_heye      ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_HFortress      ,false);
    _setUPGR(r_hell,upgr_hell_totminv   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress      ,false);
-   _setUPGR(r_hell,upgr_hell_bldrep    ,60 ,0,0 ,4   ,600 ,0,300 ,0            ,UID_HFortress      ,false);
-   _setUPGR(r_hell,upgr_hell_b478tel   ,15 ,0,0 ,15  ,200 ,0,0   ,0            ,UID_HFortress      ,true );
-   _setUPGR(r_hell,upgr_hell_resurrect ,60 ,0,0 ,1   ,900 ,0,0   ,0            ,UID_HAltar         ,false);
+   _setUPGR(r_hell,upgr_hell_bldrep    ,60 ,0,0 ,5   ,600 ,0,300 ,0            ,UID_HFortress      ,false);
+   _setUPGR(r_hell,upgr_hell_b478tel   ,15 ,0,0 ,15  ,100 ,0,0   ,0            ,UID_HFortress      ,true );
+   _setUPGR(r_hell,upgr_hell_resurrect ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAltar         ,false);
    _setUPGR(r_hell,upgr_hell_invuln    ,150,0,0 ,1   ,1200,0,0   ,0            ,UID_HAltar         ,true );
 
 

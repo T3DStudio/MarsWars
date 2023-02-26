@@ -401,6 +401,8 @@ begin
    str_ColoredShadow     := 'Colored shadows';
    str_kothtime          := 'Center capture time: ';
    str_deadobservers     := 'Observer mode after lose:';
+   str_FPS               := 'Show FPS';
+   str_APM               := 'Show APM';
 
    str_Builder           := 'Builder';
    str_Barrack           := 'Unit production';
@@ -427,6 +429,7 @@ begin
    str_cant_advanced     := 'Impassible to rebuild/advance';
    str_NeedMoreProd      := 'Nowhere to produce that';
    str_MaximumReached    := 'Maximum reached';
+   str_mapMark           := ' put a mark on the map';
 
    str_attr_unit         := tc_gray  +'unit'        +tc_default;
    str_attr_building     := tc_red   +'building'    +tc_default;
@@ -896,6 +899,9 @@ begin
   str_ColoredShadow     := 'Цветные тени';
   str_kothtime          := 'Время захвата центра: ';
   str_deadobservers     := 'Наблюдатель после поражения:';
+  str_FPS               := 'Показать FPS';
+  str_APM               := 'Показать APM';
+
 
   str_Builder           := 'Строитель';
   str_Barrack           := 'Производит юнитов';
@@ -922,6 +928,7 @@ begin
   str_cant_advanced     := 'Невозможно перестроить/улучшить';
   str_NeedMoreProd      := 'Негде производить это';
   str_MaximumReached    := 'Достигнут максимум';
+  str_mapMark           := ' поставил отметку на карте';
 
   str_attr_unit         := tc_gray  +'юнит'          +tc_default;
   str_attr_building     := tc_red   +'здание'        +tc_default;

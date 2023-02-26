@@ -164,7 +164,9 @@ begin
       5  : begin menu_s1:=ms1_reps; if(G_Started=false)then replay_MakeFolderList; end;
 
       // game settings
-      6  : vid_ColoredShadow:=not vid_ColoredShadow;
+      6  : if(mouse_x<ui_menu_ssr_x7)
+           then vid_ColoredShadow:=not vid_ColoredShadow
+           else vid_APM:=not vid_APM;
       7  : begin vid_uhbars+=1;vid_uhbars:=vid_uhbars mod 3; end;
       8  : m_action:=not m_action;
       9  : if(ui_menu_ssr_x2>=mouse_x)
@@ -223,6 +225,7 @@ begin
                 MakeTerrain;
              end;
       18 : begin vid_fullscreen:=not vid_fullscreen; _MakeScreen;end;
+      20 : vid_FPS:=not vid_FPS;
 
       // sounds
       26 : begin

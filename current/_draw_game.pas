@@ -680,7 +680,7 @@ begin
         if(hits>0)then
         //if(k_shift>1)then
         begin
-          // circleColor(r_screen,ix,iy,_r  ,c_gray);
+           circleColor(r_screen,ix,iy,_r  ,c_gray);
           // circleColor(r_screen,ix,iy,srange,c_white);
            if(sel)then
            begin

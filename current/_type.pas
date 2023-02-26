@@ -353,10 +353,10 @@ TUPID = record  // upgrade
 end;
 
 TAPMCounter = record
-   APMTime,
-   APMCurrent,
-   APMNew       : cardinal;
-   APMStr       : shortstring;
+   APM_Time,
+   APM_Current,
+   APM_New       : cardinal;
+   APM_Str       : shortstring;
 end;
 
 TAIAlarm = record

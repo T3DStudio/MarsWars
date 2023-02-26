@@ -99,6 +99,8 @@ begin
       PlayerSetAllowedUpgrades(0,[],0,true);
    end;
 
+   FillChar(_playerAPM,SizeOf(_playerAPM),0);
+
    {$IFDEF _FULLGAME}
    HPlayer:=1;
    with _players[HPlayer] do

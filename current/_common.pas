@@ -161,20 +161,21 @@ end;
 
 procedure PlayerAPMInc(player:byte);
 begin
-   _playerAPM[player].APMNew+=1;
+   _playerAPM[player].APM_New+=1;
 end;
 
 procedure PlayerAPMUpdate(player:byte);
 begin
    with _playerAPM[player] do
    begin
-      if(APMTime>0)
-      then APMTime-=1
+      if(APM_Time>0)
+      then APM_Time-=1
       else
       begin
-         APMTime   :=APMPeriod;
-         APMCurrent:=round((fr_fps60/APMTime)*APMNew);
-         APMNew    :=0;
+         APM_Time   :=APM_UPDPeriod;
+         APM_Current:=(APM_Current+round((APM_1Period/APM_Time)*APM_New)) div 2;
+         APM_Str    :=c2s(APM_Current);
+         APM_New    :=0;
       end;
    end;
 end;
@@ -276,8 +277,8 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
            if(tick<=G_Step)then
              if (mtype=amtype)
              and(argt=aargt)
-             and(xi=ax)
-             and(yi=ay)then
+             and(argx=aargx)
+             then
               if((G_Step-tick)<timeDiff3)then exit;
       end;
 
@@ -367,7 +368,7 @@ end;
 procedure GameLogCantProduction(pl,uid,utp:byte;condt:cardinal;x,y:integer;local:boolean);
 var bt:byte;
 begin
-   if(pl>MaxPlayers)or(ServerSide=false)or(condt=0)then exit;
+   if(pl>MaxPlayers)or(condt=0)then exit;
 
    if(_players[pl].state=ps_comp)then exit;
 
@@ -412,7 +413,9 @@ procedure GameLogMapMark(pl:byte;x,y:integer);
 begin
    if(pl>MaxPlayers)or(ServerSide=false)then exit;
 
-   PlayersAddToLog(pl,0,lmt_map_mark,0,0,'',x,y,false);
+   PlayersAddToLog(pl,
+   PlayerAllies(pl,true)
+   ,lmt_map_mark,0,pl,'',x,y,false);
 end;
 procedure GameLogUnitAttacked(pu:PTunit);
 begin
@@ -1264,8 +1267,8 @@ lmt_unit_attacked    : begin
                        mcolor^:=c_red;
                        end;
 lmt_cant_order       : begin
-                          ParseLogMessage:=str_cant_execute;
-                          with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
+                       ParseLogMessage:=str_cant_execute;
+                       with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                        end;
 lmt_MaximumReached   : ParseLogMessage:=str_MaximumReached;
 lmt_NeedMoreProd     : ParseLogMessage:=str_NeedMoreProd;
@@ -1273,6 +1276,11 @@ lmt_already_adv      : ParseLogMessage:=str_cant_advanced;
 lmt_production_busy  : ParseLogMessage:=str_production_busy;
 lmt_unit_needbuilder : ParseLogMessage:=str_need_more_builders;
 lmt_unit_limit       : ParseLogMessage:=str_maxlimit_reached;
+lmt_map_mark         : begin
+                       mcolor^:=c_gray;
+                       if(argx<=MaxPlayers)then
+                         with _players[argx] do ParseLogMessage:=name+str_mapMark;
+                       end;
     else               ParseLogMessage:='UNKNOWN MESSAGE TYPE'; mcolor^:=c_purple;
     end;
 end;

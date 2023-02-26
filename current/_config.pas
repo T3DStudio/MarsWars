@@ -23,6 +23,8 @@ cfg_key_npnui   : shortstring = 'UPT_network';
 cfg_key_ppos    : shortstring = 'vid_panel';
 cfg_key_uhbar   : shortstring = 'vid_health_bars';
 cfg_key_plcol   : shortstring = 'vid_player_colors';
+cfg_key_APM     : shortstring = 'vid_APM';
+cfg_key_FPS     : shortstring = 'vid_FPS';
 
 
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
@@ -55,6 +57,8 @@ begin
    if(vr=cfg_key_ppos )then vid_ppos         := vlw;
    if(vr=cfg_key_uhbar)then vid_uhbars       := vlw;
    if(vr=cfg_key_plcol)then vid_plcolors     := vlw;
+   if(vr=cfg_key_APM  )then vid_APM          :=(vl=b2c[true]);
+   if(vr=cfg_key_FPS  )then vid_FPS          :=(vl=b2c[true]);
 end;
 
 procedure cfg_parse_str(s:shortstring);
@@ -127,21 +131,23 @@ begin
    writeln(f,cfg_key_vspd ,'=',vid_CamSpeed          );
    writeln(f,cfg_key_vmm  ,'=',b2c[vid_CamMScroll]   );
    writeln(f,cfg_key_shdws,'=',b2c[vid_ColoredShadow]);
-   writeln(f,cfg_key_saddr,'=',net_cl_svstr    );
-   writeln(f,cfg_key_sport,'=',net_sv_pstr     );
-   writeln(f,cfg_key_lng  ,'=',b2c[ui_language]);
-   writeln(f,cfg_key_mai  ,'=',b2c[m_action]   );
-   writeln(f,cfg_key_vidvw,'=',vid_vw          );
-   writeln(f,cfg_key_vidvh,'=',vid_vh          );
-   writeln(f,cfg_key_rpnui,'=',rpls_pnui       );
-   writeln(f,cfg_key_npnui,'=',net_pnui        );
-   writeln(f,cfg_key_gsb  ,'=',g_start_base    );
+   writeln(f,cfg_key_saddr,'=',net_cl_svstr          );
+   writeln(f,cfg_key_sport,'=',net_sv_pstr           );
+   writeln(f,cfg_key_lng  ,'=',b2c[ui_language]      );
+   writeln(f,cfg_key_mai  ,'=',b2c[m_action]         );
+   writeln(f,cfg_key_vidvw,'=',vid_vw                );
+   writeln(f,cfg_key_vidvh,'=',vid_vh                );
+   writeln(f,cfg_key_rpnui,'=',rpls_pnui             );
+   writeln(f,cfg_key_npnui,'=',net_pnui              );
+   writeln(f,cfg_key_gsb  ,'=',g_start_base          );
    writeln(f,cfg_key_gsp  ,'=',b2c[g_fixed_positions]);
-   writeln(f,cfg_key_gai  ,'=',g_ai_slots      );
-   writeln(f,cfg_key_gcg  ,'=',g_cgenerators   );
-   writeln(f,cfg_key_ppos ,'=',vid_ppos        );
-   writeln(f,cfg_key_uhbar,'=',vid_uhbars      );
-   writeln(f,cfg_key_plcol,'=',vid_plcolors    );
+   writeln(f,cfg_key_gai  ,'=',g_ai_slots            );
+   writeln(f,cfg_key_gcg  ,'=',g_cgenerators         );
+   writeln(f,cfg_key_ppos ,'=',vid_ppos              );
+   writeln(f,cfg_key_uhbar,'=',vid_uhbars            );
+   writeln(f,cfg_key_plcol,'=',vid_plcolors          );
+   writeln(f,cfg_key_APM  ,'=',b2c[vid_APM]          );
+   writeln(f,cfg_key_FPS  ,'=',b2c[vid_FPS]          );
 
    close(f);
 end;

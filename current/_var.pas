@@ -207,6 +207,8 @@ vid_mmvx,
 vid_mmvy          : integer;
 vid_uhbars        : byte = 0;
 vid_plcolors      : byte = 0;
+vid_APM           : boolean = false;
+vid_FPS           : boolean = false;
 vid_CamMScroll    : boolean = false;
 vid_ColoredShadow : boolean = true;
 vid_ppos          : byte = 0;
@@ -376,6 +378,8 @@ ui_armyx          : integer = 0;
 ui_armyy          : integer = 0;
 ui_apmx           : integer = 0;
 ui_apmy           : integer = 0;
+ui_fpsx           : integer = 0;
+ui_fpsy           : integer = 0;
 ui_game_log_height: integer = 0;
 ui_menu_btnsy     : integer = 0;
 
@@ -710,6 +714,7 @@ str_base_attacked,
 str_allies_attacked,
 str_cant_execute,
 str_maxlimit_reached,
+str_mapMark,
 str_need_more_builders,
 str_production_busy,
 str_cant_advanced,
@@ -788,6 +793,8 @@ str_maction,
 str_scrollspd,
 str_mousescrl,
 str_fullscreen,
+str_FPS,
+str_APM,
 str_mrandom,
 str_svld_errors_file,
 str_svld_errors_open,

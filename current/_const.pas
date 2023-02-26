@@ -18,20 +18,16 @@ fr_RateTicks           = 1000/fr_fps1;
 fr_fpsd2               = fr_fps1 div 2;
 fr_fpsd3               = fr_fps1 div 3;
 fr_fpsd4               = fr_fps1 div 4;
-fr_fpsd5               = fr_fps1 div 5;
 fr_fpsd6               = fr_fps1 div 6;
-fr_fpsd7               = fr_fps1 div 7;
 fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
-fr_fps4                = fr_fps1*4;
-fr_fps5                = fr_fps1*5;
 fr_fps2d3              = fr_fpsd3*2; //2/3
-fr_fps3d4              = fr_fpsd4*3; //3/4
 fr_fps60               = fr_fps1*60;
 
-APMPeriod              = fr_fps5;
+APM_UPDPeriod          = fr_fps1*5;
+APM_1Period            = fr_fps60;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1178,6 +1174,9 @@ ui_menu_ssr_x2         = ui_menu_ssr_x3-ui_menu_ssr_barl;
 ui_menu_ssr_x4         = ui_menu_ssr_x0+ui_menu_ssr_xs;
 ui_menu_ssr_x5         = ui_menu_ssr_x0+ui_menu_ssr_xs*2;
 ui_menu_ssr_x6         = ui_menu_ssr_x5+ui_menu_ssr_xhs;
+ui_menu_ssr_x7         = ui_menu_ssr_x3-ui_menu_ssr_barl;
+ui_menu_ssr_x7t        = ui_menu_ssr_x7-font_w;
+ui_menu_ssr_x7r        = ui_menu_ssr_x7+font_w;
 ui_menu_ssr_xt0        = ui_menu_ssr_x6-ui_menu_ssr_xhhs;
 ui_menu_ssr_xt1        = ui_menu_ssr_x6+ui_menu_ssr_xhhs;
 ui_menu_ssl_x0         = (ui_menu_ssr_x0+ui_menu_ssr_x1) div 2;
