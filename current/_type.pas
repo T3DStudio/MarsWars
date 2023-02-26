@@ -297,7 +297,9 @@ TUID = record
    un_txt_name,
    un_txt_udescr,
    un_txt_fdescr,
-   un_txt_uihint: shortstring;
+   un_txt_uihint1,
+   un_txt_uihint2
+                : shortstring;
 
    un_build_amode,
    un_eid_bcrater
@@ -346,7 +348,7 @@ TUPID = record  // upgrade
    _up_btn      : TMWTexture;
    _up_name,
    _up_descr,
-   _up_hint     : shortstring;
+   _up_hint2    : shortstring;
    {$ENDIF}
 end;
 

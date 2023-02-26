@@ -378,31 +378,33 @@ begin
      or(cf(@condt,@ureq_rupid))
      then bt:=lmt_req_ruids
      else
-       if(condt=ureq_armylimit)
-       or(condt=ureq_unitlimit)
-       then bt:=lmt_unit_limit
+       if(cf(@condt,@ureq_max ))
+       then bt:=lmt_MaximumReached
        else
-         if(cf(@condt,@ureq_smiths  ))
-         or(cf(@condt,@ureq_barracks))
-         then bt:=lmt_NeedMoreProd
+         if(cf(@condt,@ureq_armylimit ))
+         or(cf(@condt,@ureq_unitlimit ))
+         then bt:=lmt_unit_limit
          else
-
-
-         if(cf(@condt,@ureq_busy      ))
-         then bt:=lmt_production_busy
-         else
-           if(cf(@condt,@ureq_needbuilders))
-           then bt:=lmt_unit_needbuilder
+           if(cf(@condt,@ureq_smiths  ))
+           or(cf(@condt,@ureq_barracks))
+           then bt:=lmt_NeedMoreProd
            else
-             if(condt=ureq_energy)
-             then bt:=lmt_req_energy
+             if(cf(@condt,@ureq_busy))
+             then bt:=lmt_production_busy
              else
-               if(cf(@condt,@ureq_alreadyAdv))
-               then bt:=lmt_already_adv
+               if(cf(@condt,@ureq_needbuilders))
+               or(cf(@condt,@ureq_builders))
+               then bt:=lmt_unit_needbuilder
                else
-                 if(cf(@condt,@ureq_unknown   ))
-                 then bt:=lmt_cant_order
-                 else bt:=lmt_req_common;
+                 if(condt=ureq_energy)
+                 then bt:=lmt_req_energy
+                 else
+                   if(cf(@condt,@ureq_alreadyAdv))
+                   then bt:=lmt_already_adv
+                   else
+                     if(cf(@condt,@ureq_unknown   ))
+                     then bt:=lmt_cant_order
+                     else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -1265,6 +1267,7 @@ lmt_cant_order       : begin
                           ParseLogMessage:=str_cant_execute;
                           with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                        end;
+lmt_MaximumReached   : ParseLogMessage:=str_MaximumReached;
 lmt_NeedMoreProd     : ParseLogMessage:=str_NeedMoreProd;
 lmt_already_adv      : ParseLogMessage:=str_cant_advanced;
 lmt_production_busy  : ParseLogMessage:=str_production_busy;

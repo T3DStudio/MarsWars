@@ -350,7 +350,7 @@ begin
                     hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,t,c_gray);
                  end;
 
-                 _draw_text(tar,ui_menu_csm_xt1, _yt(2), str_goptions, ta_left,255, c_white);
+                 _draw_text(tar,ui_menu_csm_xt1, _yt(1), str_goptions, ta_left,255, c_white);
 
                  y:=_yt(2);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_gmodet        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));

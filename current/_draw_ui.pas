@@ -490,25 +490,28 @@ end;
 
 procedure d_Hints(tar:pSDL_Surface);
 var i,
-   uid:byte;
-    hs:pshortstring;
-    tu:PTUnit;
+   uid :byte;
+     s1:shortstring;
+    hs1,
+    hs2:pshortstring;
+    tu :PTUnit;
 begin
    //str_hint_a
    if(0<=m_bx)and(m_bx<3)and(3<=m_by)and(m_by<=16)then
    begin
-      hs:=nil;
+      hs1:=nil;
+      hs2:=nil;
       if(m_by=ui_menu_btnsy)then
       begin
          if(m_bx=2)then
           if(net_status=ns_none)then exit;
-         hs:=@str_hint_m[m_bx];
+         hs1:=@str_hint_m[m_bx];
       end
       else
       case m_by of
       3  : case (vid_ppos<2) of
-           true :if(mouse_y>vid_panelw)then hs:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
-           false:if(mouse_x>vid_panelw)then hs:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
+           true :if(mouse_y>vid_panelw)then hs1:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
+           false:if(mouse_x>vid_panelw)then hs1:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
            end;
       else
         i:=((m_by-4)*3)+(m_bx mod 3);
@@ -520,8 +523,8 @@ begin
            begin
               if(i<=_mhkeys)then
                if(rpls_state>=rpl_rhead)
-               then hs:=@str_hint_r[i]
-               else hs:=@str_hint_a[i];
+               then hs1:=@str_hint_r[i]
+               else hs1:=@str_hint_a[i];
            end
            else
            begin
@@ -529,24 +532,26 @@ begin
               if(uid>0)then
               case ui_tab of
               0,1: begin
-                      if(uid_e[uid]=0)then
-                       if(a_units[uid]<=0)then exit;
-                      hs:=@_uids[uid].un_txt_uihint;
+                      if(uid_e[uid]=0)and(a_units[uid]<=0)then exit;
+                      hs1:=@_uids[uid].un_txt_uihint1;
+                      hs2:=@_uids[uid].un_txt_uihint2;
                    end;
               2  : begin
                       if(a_upgrs[uid]<=0)then exit;
-                      hs:=@_upids[uid]._up_hint;
+                      s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
+                      hs1:=@s1;
+                      hs2:=@_upids[uid]._up_hint2;
                    end;
               end;
            end;
         end;
       end;
-      if(hs=nil)then exit;
-      _draw_text(tar,ui_textx,ui_hinty,hs^,ta_left,ui_ingamecl,c_white);
+      if(hs1<>nil)then _draw_text(tar,ui_textx,ui_hinty1,hs1^,ta_left,ui_ingamecl,c_white);
+      if(hs2<>nil)then _draw_text(tar,ui_textx,ui_hinty2,hs2^,ta_left,ui_ingamecl,c_white);
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
-       _draw_text(tar,ui_textx,ui_hinty,_makeDynUnitHint(tu),ta_left,ui_ingamecl,c_white);
+      _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint1,ta_left,ui_ingamecl,c_white);
 end;
 
 procedure D_UIText(tar:pSDL_Surface);

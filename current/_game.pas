@@ -374,7 +374,7 @@ begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
-      if(pl<>HPlayer)then
+      if(pl<>HPlayer)then   // ded serverside counter
       PlayerAPMInc(pl);
 
       case o_id of
@@ -391,15 +391,17 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
 
          _su :=1;
          _eu:=MaxUnits+1;
-         if(o_id=uo_corder)then   // reverse unit loop
+         if(o_id=uo_corder)then
           case o_x0 of
           co_destroy,
           co_cupgrade,
           co_cuprod,
-          co_pcancle  : begin
+          co_pcancle  : begin   // reverse unit loop
                            _su :=MaxUnits;
                            _eu:=0;
                         end;
+          co_supgrade : if(n_smiths  <=0)then begin PlayerSetProdError(pl,lmt_argt_upgr,o_y0,ureq_smiths  ,nil);o_id:=0;end;
+          co_suprod   : if(n_barracks<=0)then begin PlayerSetProdError(pl,lmt_argt_unit,o_y0,ureq_barracks,nil);o_id:=0;end;
           end;
 
          while(_su<>_eu)do

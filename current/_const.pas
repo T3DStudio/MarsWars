@@ -183,6 +183,7 @@ lmt_unit_needbuilder   = 26;
 lmt_production_busy    = 27;
 lmt_already_adv        = 28;
 lmt_NeedMoreProd       = 29;
+lmt_MaximumReached     = 30;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -278,6 +279,7 @@ ureq_busy              : cardinal = 8192; // production is busy
 ureq_unknown           : cardinal = 16384;//
 ureq_alreadyAdv        : cardinal = 32768;//
 ureq_needbuilders      : cardinal = 65536;// need more builders
+ureq_common            : cardinal =131072;// common
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1353,6 +1355,7 @@ tc_blue                = #20;
 tc_gray                = #21;
 tc_white               = #22;
 tc_green               = #23;
+tc_dgray               = #24;
 tc_default             = #25;
 
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);

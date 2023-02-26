@@ -309,6 +309,7 @@ begin
                begin
                   if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
                   begin
+                     GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
                      m_brush:=co_empty;
                      exit;
                   end;
@@ -361,7 +362,6 @@ procedure _panel_click(tab,bx,by:integer;right,mid,dbl:boolean);
 var u:integer;
 begin
    SoundPlayUI(snd_click);
-   PlayerAPMInc(HPlayer);
 
    case by of
    3 : case vid_ppos of   // tabs
@@ -482,6 +482,8 @@ begin
    k_dbl:=(k_dblt>0)and(k=k_dblk);
    k_dblt:=fr_fpsd4;
    k_dblk:=k;
+
+   PlayerAPMInc(HPlayer);
 
    if(k=sdlk_pause)
    then GameTogglePause
@@ -860,6 +862,14 @@ begin
    then g_menu
    else
    begin
+      if(ks_mleft =1)
+      or(ks_mright=1)
+      or(ks_up    =1)
+      or(ks_down  =1)
+      or(ks_left  =1)
+      or(ks_right =1)
+      then PlayerAPMInc(HPlayer);
+
       g_keyboard;
       g_mouse;
    end;

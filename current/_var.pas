@@ -365,7 +365,8 @@ ui_uiuphy         : integer = 0;
 ui_ingamecl       : byte = 0;
 ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
-ui_hinty          : integer = 0;  // hints screen Y
+ui_hinty1         : integer = 0;  // hints screen Y
+ui_hinty2         : integer = 0;  // hints screen Y
 ui_logy           : integer = 0;  // LOG screen Y
 ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
@@ -713,6 +714,7 @@ str_need_more_builders,
 str_production_busy,
 str_cant_advanced,
 str_NeedMoreProd,
+str_MaximumReached,
 str_m_liq,
 str_m_siz,
 str_m_obs,

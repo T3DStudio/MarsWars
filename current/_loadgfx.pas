@@ -787,13 +787,14 @@ begin
 
    ui_textx     := vid_mapx+4;
    ui_texty     := vid_mapy+4;
-   ui_hinty     := vid_mapy+vid_cam_h-(font_w+3)*6;
-   ui_chaty     := ui_hinty-14;
+   ui_hinty1    := vid_mapy+vid_cam_h-(font_w+3)*6;
+   ui_hinty2    := vid_mapy+vid_cam_h-(font_w+3)*2;
+   ui_chaty     := ui_hinty1-14;
    ui_logy      := ui_chaty-12;
    ui_oicox     := vid_mapx+vid_cam_w-4;
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
-   ui_game_log_height:=(ui_hinty-60) div 12;
+   ui_game_log_height:=(ui_hinty1-60) div 12;
 
    ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;

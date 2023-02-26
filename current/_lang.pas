@@ -197,12 +197,6 @@ begin
       _makeAttributeStr:='['+_makeAttributeStr+']';
    end;
 end;
-function _makeDynUnitHint(pu:PTUnit):shortstring;
-begin
-   with pu^  do
-    with uid^ do
-     _makeDynUnitHint:=un_txt_name+' ('+pu^.player^.name+')'+tc_nl1+_makeAttributeStr(pu,0)+tc_nl1+un_txt_fdescr;
-end;
 
 function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
 begin
@@ -222,9 +216,45 @@ begin
     end;
 end;
 
+function _makeUpgrBaseHint(upid,curlvl:byte):shortstring;
+var HK,
+    ENRG,
+    TIME,
+    INFO:shortstring;
+   l:byte;
+begin
+  with _upids[upid] do
+  begin
+     HK  :=_gHK(_up_btni);
+     ENRG:='';
+     TIME:='';
+     INFO:='';
+
+     if(curlvl>_up_max)then curlvl:=_up_max;
+
+     HK:=_gHK(_up_btni);
+     if(_up_renerg>0)then
+       if(_up_max>1)and(not _up_mfrg)
+       then ENRG:=tc_aqua+i2s(_upid_energy(upid,curlvl))+tc_default
+       else ENRG:=tc_aqua+i2s(_upid_energy(upid,1     ))+tc_default;
+     if(_up_time  >0)then
+       if(_up_max>1)and(not _up_mfrg)
+       then TIME:=tc_white+i2s(_upid_time(upid,curlvl) div fr_fps1)+tc_default
+       else TIME:=tc_white+i2s(_upid_time(upid,1     ) div fr_fps1)+tc_default;
+
+     if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
+     if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
+     if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
+     _ADDSTRC(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default);
+     if(_up_max>1)and(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
+
+     _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr;
+  end;
+end;
+
 procedure _makeHints;
 var
-uid,l       :byte;
+uid         :byte;
 ENRG,HK,PROD,LMT,INFO,
 TIME,REQ    :shortstring;
 begin
@@ -241,7 +271,8 @@ begin
 
       if(_ucl>=23)then
       begin
-         un_txt_uihint:=un_txt_name+tc_nl1+un_txt_fdescr+tc_nl1;
+         un_txt_uihint1:=un_txt_name+tc_nl1+un_txt_fdescr+tc_nl1;
+         un_txt_uihint2:='';
       end
       else
       begin
@@ -263,12 +294,13 @@ begin
 
          un_txt_fdescr:=_MakeDefaultDescription(uid,un_txt_udescr);
 
-         un_txt_uihint:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid)+tc_nl1+un_txt_fdescr;
-         if(length(REQ )>0)then un_txt_uihint+=tc_nl1+tc_yellow+str_req+tc_default+REQ else un_txt_uihint+=tc_nl1;
+         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid)+tc_nl1+un_txt_fdescr;
+         un_txt_uihint2:='';
+         if(length(REQ )>0)then un_txt_uihint2+=tc_yellow+str_req+tc_default+REQ+tc_nl1 else un_txt_uihint2+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_uihint+=tc_nl1+str_bprod+PROD
-          else un_txt_uihint+=tc_nl1+str_uprod+PROD;
+          then un_txt_uihint2+=str_bprod+PROD
+          else un_txt_uihint2+=str_uprod+PROD;
       end;
    end;
 
@@ -277,38 +309,12 @@ begin
    with _upids[uid] do
    begin
       REQ  :='';
-      PROD :='';
-      ENRG :='';
-      TIME :='';
-      INFO :='';
-
-      HK:=_gHK(_up_btni);
-      if(_up_renerg>0)then
-      begin
-         if(_up_max>1)and(not _up_mfrg)
-         then for l:=1 to _up_max do _ADDSTRS(@ENRG,i2s(_upid_energy(uid,l)))
-         else ENRG:=i2s(_upid_energy(uid,1));
-         ENRG:=tc_aqua+ENRG+tc_default;
-      end;
-      if(_up_time  >0)then
-      begin
-         if(_up_max>1)and(not _up_mfrg)
-         then for l:=1 to _up_max do _ADDSTRS(@TIME,i2s(_upid_time(uid,l) div fr_fps1))
-         else TIME :=i2s(_upid_time(uid,1) div fr_fps1);
-         TIME:=tc_white+TIME+tc_default;
-      end;
 
       if(_up_ruid  >0)then _ADDSTRC(@REQ,_uids [_up_ruid ].un_txt_name);
       if(_up_rupgr >0)then _ADDSTRC(@REQ,_upids[_up_rupgr]._up_name   );
 
-      if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
-      if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
-      if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
-      _ADDSTRC(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default);
-      if(_up_max>1)and(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
-
-      _up_hint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr+tc_nl1;
-      if(length(REQ)>0)then _up_hint+=tc_yellow+str_req+tc_default+REQ;
+      _up_hint2:='';
+      if(length(REQ)>0)then _up_hint2+=tc_yellow+str_req+tc_default+REQ;
    end;
 end;
 
@@ -420,6 +426,7 @@ begin
    str_production_busy   := 'All production is busy';
    str_cant_advanced     := 'Impassible to rebuild/advance';
    str_NeedMoreProd      := 'Nowhere to produce that';
+   str_MaximumReached    := 'Maximum reached';
 
    str_attr_unit         := tc_gray  +'unit'        +tc_default;
    str_attr_building     := tc_red   +'building'    +tc_default;
@@ -914,6 +921,7 @@ begin
   str_production_busy   := 'Все производства заняты';
   str_cant_advanced     := 'Невозможно перестроить/улучшить';
   str_NeedMoreProd      := 'Негде производить это';
+  str_MaximumReached    := 'Достигнут максимум';
 
   str_attr_unit         := tc_gray  +'юнит'          +tc_default;
   str_attr_building     := tc_red   +'здание'        +tc_default;

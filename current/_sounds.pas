@@ -402,6 +402,7 @@ lmt_unit_ready        : with _uids[argx] do
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
 lmt_already_adv,
 lmt_NeedMoreProd,
+lmt_MaximumReached,
 lmt_unit_limit,
 lmt_production_busy,
 lmt_req_ruids,
