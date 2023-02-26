@@ -853,8 +853,8 @@ hell_vision_time       = fr_fps1*8;
 
 mstrike_reload         = fr_fps1*60;
 
-step_build_reload      = fr_fps1*3;
-max_build_reload       = step_build_reload*5;
+step_build_reload      = fr_fps1*4;
+max_build_reload       = step_build_reload*4;
 
 melee_r                = 8;
 mine_r                 = melee_r*3;

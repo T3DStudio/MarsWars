@@ -800,13 +800,13 @@ begin
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := vid_vh-(font_w*5);
+   ui_fpsx      := vid_mapx+vid_cam_w-(font_w*12);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+font_w+txt_line_h;
 
 
-   ui_menu_btnsy:= (vid_vh div vid_BW)-1;
+   ui_menu_btnsy:= max2(12,(vid_vh div vid_BW)-1);
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
