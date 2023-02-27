@@ -835,6 +835,7 @@ ndead_hits             = dead_hits-1;
 fdead_hits_border      = -130;
 
 base_r                 = 350;
+base_rh                = base_r div 2;
 base_ir                = base_r+(base_r div 2);
 base_rr                = base_r*2;
 base_3r                = base_r*3;
@@ -942,10 +943,21 @@ _hotkeyA2: array[0.._mhkeys] of cardinal = (0          , 0         , 0 ,
 
 _hotkeyR : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_A , SDLK_S , SDLK_D ,
-                                            SDLK_Z , SDLK_X , SDLK_C ,
+                                            SDLK_Z , SDLK_X , SDLK_0 ,
 
-                                            SDLK_R , SDLK_T , SDLK_Y ,
-                                            SDLK_F , SDLK_G , SDLK_H ,
+                                            SDLK_1 , SDLK_2 , SDLK_3 ,
+                                            SDLK_4 , SDLK_5 , SDLK_6 ,
+                                            0,0,0,
+
+                                            0,0,0,
+                                            0,0,0,
+                                            0,0,0);
+_hotkeyO : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_0 ,
+                                            SDLK_1 , SDLK_2 , SDLK_3 ,
+                                            SDLK_4 , SDLK_5 , SDLK_6 ,
+
+                                            0,0,0,
+                                            0,0,0,
                                             0,0,0,
 
                                             0,0,0,

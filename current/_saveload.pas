@@ -46,10 +46,10 @@ begin
             BlockRead(f,vr,sizeof(_cmp_sel));
             if(0<=vr)and(vr<=MaxMissions)then
             begin
-               svld_str_info:=str_camp_t[vr];
+               svld_str_info:='';//str_camp_t[vr];
                BlockRead(f,vr,sizeof(cmp_skill));
                if(0<=vr)and(vr<=CMPMaxSkills)
-               then svld_str_info:=svld_str_info+tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
+               then svld_str_info+=tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
                else svld_str_info:=str_svld_errors_wver;
             end
             else svld_str_info:=str_svld_errors_wver;
@@ -61,19 +61,19 @@ begin
 
             BlockRead(f,ms,sizeof(map_seed ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(map_iseed));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw   ));svld_str_info:=svld_str_info+str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,mw,sizeof(map_mw   ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_liq  ));
             if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                    else svld_str_info:=svld_str_info+str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
+                    else       svld_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_obs  ));
             if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                    else svld_str_info:=svld_str_info+str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_symmetry  ));   ////////
-            BlockRead(f,vr,sizeof(theme_i  ));
+                    else       svld_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_symmetry));   ////////
+            BlockRead(f,vr,sizeof(theme_i     ));
             if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));
             if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                   else svld_str_info:=svld_str_info+str_gmode[vr  ]    +tc_nl3+tc_default;
+                                      else       svld_str_info+=str_gmode[vr  ]+tc_nl3+tc_default;
 
             vr:=0;
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
@@ -87,12 +87,15 @@ begin
             for vr:=1 to MaxPlayers do
             begin
                if(vr=hp)
-               then svld_str_info:=svld_str_info+chr(vr)+'*'+tc_default+pls[vr].name
-               else svld_str_info:=svld_str_info+chr(vr)+'#'+tc_default+pls[vr].name;
+               then svld_str_info+=chr(vr)+'*'+tc_default+pls[vr].name
+               else svld_str_info+=chr(vr)+'#'+tc_default+pls[vr].name;
 
-               if(pls[vr].state<>PS_None)
-               then svld_str_info:=svld_str_info+','+str_race[pls[vr].mrace][2]+','+b2s(pls[vr].team)+tc_nl3
-               else svld_str_info:=svld_str_info+tc_nl3;
+               if(pls[vr].state=PS_None)
+               then svld_str_info+=tc_nl3
+               else
+                 if(pls[vr].team=0)
+                 then svld_str_info+=','+str_observer[1]+','+t2c(pls[vr].team)+tc_nl3
+                 else svld_str_info+=','+str_race[pls[vr].mrace][2]+','+t2c(pls[vr].team)+tc_nl3;
             end;
          end;
       end

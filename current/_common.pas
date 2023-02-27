@@ -82,6 +82,8 @@ function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i ,t);end;
 function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c ,t);end;
 function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
+function t2c(l:byte):char;begin if(l=0)then t2c:='-' else t2c:=b2s(l)[1]; end;
+
 function max2(x1,x2   :integer):integer;begin if(x1>x2)then max2:=x1 else max2:=x2;end;
 function max3(x1,x2,x3:integer):integer;begin max3:=max2(max2(x1,x2),x3);end;
 function min2(x1,x2   :integer):integer;begin if(x1<x2)then min2:=x1 else min2:=x2;end;
@@ -459,7 +461,8 @@ function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
    PlayerObserver:=(upgr[upgr_fog_vision]>0)
-                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF});
+                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
+                 or(team=0);
 end;
 
 function PlayersReadyStatus:boolean;
@@ -482,10 +485,11 @@ begin
    PlayerGetTeam:=0;
    if(p<=MaxPlayers)then
     with _players[p] do
-     if(p=0)
-     then PlayerGetTeam:=0
-     else
-       case gm of
+     if(team>0)then
+      if(p=0)
+      then PlayerGetTeam:=0
+      else
+        case gm of
 gm_3x3     : case p of
              1..3: PlayerGetTeam:=1;
              4..6: PlayerGetTeam:=4;
@@ -493,11 +497,11 @@ gm_3x3     : case p of
 gm_2x2x2   : case p of
              1,2 : PlayerGetTeam:=1;
              3,4 : PlayerGetTeam:=3;
-             5,6 : PlayerGetTeam:=5;
+             5,6 : PlayerGetTeam:=4;
              end;
-gm_invasion: PlayerGetTeam:=1;
-       else    PlayerGetTeam:=_players[p].team;
-       end;
+gm_invasion:       PlayerGetTeam:=1;
+        else       PlayerGetTeam:=_players[p].team;
+        end;
 end;
 
 function PlayerGetStatus(p:integer):char;
@@ -953,6 +957,22 @@ end;
 
 {$IFDEF _FULLGAME}
 
+procedure UpdateLastSelectedUnit(u:integer);
+var tu:PTUnit;
+begin
+   if(_IsUnitRange(u,@tu))then
+   begin
+      if(ui_UnitSelectedNU=0)
+      then
+      else
+        if(tu^.uid^._ucl>_units[ui_UnitSelectedNU].uid^._ucl)
+        then
+        else exit;
+      ui_UnitSelectedNU:=u;
+   end;
+end;
+
+
 function UIUnitDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
@@ -1058,16 +1078,16 @@ begin
    if(player<=MaxPlayers)then
     case vid_plcolors of
    1,
-   2: if(player=HPlayer)then
+   2: if(player=UIPlayer)then
         if(vid_plcolors=1)
         then PlayerGetColor:=c_lime
         else PlayerGetColor:=c_white
       else
-        if(PlayerGetTeam(g_mode,HPlayer)=PlayerGetTeam(g_mode,player))
+        if(PlayerGetTeam(g_mode,UIPlayer)=PlayerGetTeam(g_mode,player))
         then PlayerGetColor:=c_yellow
         else PlayerGetColor:=c_red;
    3: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
-   4: if(player=HPlayer)
+   4: if(player=UIPlayer)
       then PlayerGetColor:=c_white
       else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
     else PlayerGetColor:=PlayerColor[player];

@@ -626,7 +626,7 @@ begin
            begin
               if(bld=false)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
-              if(sel)then ui_UnitSelectedNU:=unum;
+              if(sel)then UpdateLastSelectedUnit(unum);
            end;
         end;
 
@@ -679,7 +679,7 @@ begin
                 if(playeri=HPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
 
-               if(pu^.sel=false)and(sel)and(playeri=HPlayer)then ui_UnitSelectedNU:=unum;
+               if(pu^.sel=false)and(sel)and(playeri=HPlayer)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(bld)then

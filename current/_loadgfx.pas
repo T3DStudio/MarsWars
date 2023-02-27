@@ -794,6 +794,7 @@ begin
    ui_oicox     := vid_mapx+vid_cam_w-4;
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
+   ui_uiplayery := ui_uiuphy+font_3hw;
    ui_game_log_height:=(ui_hinty1-60) div 12;
 
    ui_energx    := ui_uiuphx-150;

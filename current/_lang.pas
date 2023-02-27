@@ -43,7 +43,6 @@ begin
        _gHK:=_gHK+tc_lime+GetKeyName(_hotkey1[ucl])+tc_default;
     end;
 end;
-
 function _gHKA(ucl:byte):shortstring;  // hotkey actions tab
 begin
    _gHKA:='';
@@ -62,6 +61,14 @@ begin
     if(_hotkeyR[ucl]>0)then
      _gHKR:=tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
 end;
+function _gHKO(ucl:byte):shortstring;  // hotkey observer tab
+begin
+   _gHKO:='';
+   if(ucl<=_mhkeys)then
+    if(_hotkeyR[ucl]>0)then
+     _gHKO:=tc_lime+GetKeyName(_hotkeyO [ucl])+tc_default;
+end;
+
 
 procedure _mkHStrACT(ucl:byte;hint:shortstring);
 var hk:shortstring;
@@ -75,7 +82,7 @@ begin
    end;
 end;
 
-procedure _mkHStrREQ(ucl:byte;hint:shortstring;noHK:boolean);
+procedure _mkHStrRPL(ucl:byte;hint:shortstring;noHK:boolean);
 var hk:shortstring;
 begin
    if(ucl<=_mhkeys)then
@@ -88,7 +95,19 @@ begin
       else str_hint_r[ucl]:=hint;
    end;
 end;
-
+procedure _mkHStrOBS(ucl:byte;hint:shortstring;noHK:boolean);
+var hk:shortstring;
+begin
+   if(ucl<=_mhkeys)then
+   begin
+      if(noHK)
+      then hk:=''
+      else hk:=_gHKO(ucl);
+      if(length(hk)>0)
+      then str_hint_o[ucl]:=hint+' ('+hk+')'
+      else str_hint_o[ucl]:=hint;
+   end;
+end;
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
    with _uids[uid] do
@@ -119,13 +138,6 @@ begin
    then s^:=ad
    else s^:=s^+'. ' +ad;
 end;
-procedure _ADDSTRS(s:pshortstring;ad:shortstring);
-begin
-   if(length(s^)=0)
-   then s^:=ad
-   else s^:=s^+'/' +ad;
-end;
-
 
 function findprd(uid:byte):shortstring;
 var i:byte;
@@ -358,6 +370,7 @@ begin
    str_race[r_random]    := tc_white +'RANDOM'+tc_default;
    str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
    str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
+   str_observer          := 'OBSERV.';
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
    str_gsunknown         := 'Unknown status!';
@@ -687,21 +700,31 @@ begin
    _mkHStrACT(12,'Alarm mark'       );
    _mkHStrACT(13,str_maction);
 
-   _mkHStrREQ(0 ,'Faster game speed'    ,false);
-   _mkHStrREQ(1 ,'Left click: skip 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
+   _mkHStrRPL(0 ,'Faster game speed'    ,false);
+   _mkHStrRPL(1 ,'Left click: skip 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
                  'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
                  'Skip 1 minute ('               +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
-   _mkHStrREQ(2 ,'Pause'                ,false);
-   _mkHStrREQ(3 ,'Player POV'           ,false);
-   _mkHStrREQ(4 ,'List of game messages',false);
-   _mkHStrREQ(5 ,'Fog of war'           ,false);
-   _mkHStrREQ(8 ,'All players',false);
-   _mkHStrREQ(9 ,'Player #1'  ,false);
-   _mkHStrREQ(10,'Player #2'  ,false);
-   _mkHStrREQ(11,'Player #3'  ,false);
-   _mkHStrREQ(12,'Player #4'  ,false);
-   _mkHStrREQ(13,'Player #5'  ,false);
-   _mkHStrREQ(14,'Player #6'  ,false);
+   _mkHStrRPL(2 ,'Pause'                ,false);
+   _mkHStrRPL(3 ,'Player POV'           ,false);
+   _mkHStrRPL(4 ,'List of game messages',false);
+   _mkHStrRPL(5 ,'Fog of war'           ,false);
+   _mkHStrRPL(8 ,'All players',false);
+   _mkHStrRPL(9 ,'Player #1'  ,false);
+   _mkHStrRPL(10,'Player #2'  ,false);
+   _mkHStrRPL(11,'Player #3'  ,false);
+   _mkHStrRPL(12,'Player #4'  ,false);
+   _mkHStrRPL(13,'Player #5'  ,false);
+   _mkHStrRPL(14,'Player #6'  ,false);
+
+   _mkHStrOBS(0 ,'Fog of war' ,false);
+   _mkHStrOBS(2 ,'All players',false);
+   _mkHStrOBS(3 ,'Player #1'  ,false);
+   _mkHStrOBS(4 ,'Player #2'  ,false);
+   _mkHStrOBS(5 ,'Player #3'  ,false);
+   _mkHStrOBS(6 ,'Player #4'  ,false);
+   _mkHStrOBS(7 ,'Player #5'  ,false);
+   _mkHStrOBS(8 ,'Player #6'  ,false);
+   //str_hint_o
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -855,7 +878,8 @@ begin
   str_maction           := 'Действие на правый клик';
   str_maction2[true ]   := tc_lime+'движение'+tc_default;
   str_maction2[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
-  str_race[r_random]    := tc_white+'случ.'  +tc_default;
+  str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
+  str_observer          := 'ЗРИТЕЛЬ';
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
   str_lose              := 'ПОРАЖЕНИЕ!';
@@ -894,8 +918,8 @@ begin
   str_req               := 'Требования: ';
   str_orders            := 'Отряды: ';
   str_all               := 'Все';
-  str_uprod             := 'Создается в: ';
-  str_bprod             := 'Строит: ';
+  str_uprod             := tc_lime+'Создается в: '+tc_default;
+  str_bprod             := tc_lime+'Строит: '     +tc_default;
   str_ColoredShadow     := 'Цветные тени';
   str_kothtime          := 'Время захвата центра: ';
   str_deadobservers     := 'Наблюдатель после поражения:';
@@ -1074,21 +1098,21 @@ begin
   _mkHStrACT(12,'Поставить метку'     );
   _mkHStrACT(13,str_maction           );
 
-  _mkHStrREQ(0 ,'Включить/выключить ускоренный просмотр',false);
-  _mkHStrREQ(1 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'W'+tc_default+')'+tc_nl1+
+  _mkHStrRPL(0 ,'Включить/выключить ускоренный просмотр',false);
+  _mkHStrRPL(1 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'W'+tc_default+')'+tc_nl1+
                 'Правый клик: пропустить 10 секунд ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
                 'Пропустить 1 минуту ('              +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true  );
-  _mkHStrREQ(2 ,'Пауза'                   ,false);
-  _mkHStrREQ(3 ,'Камера игрока'           ,false);
-  _mkHStrREQ(4 ,'Список игровых сообщений',false);
-  _mkHStrREQ(5 ,'Туман войны'             ,false);
-  _mkHStrREQ(8 ,'Все игроки'              ,false);
-  _mkHStrREQ(9 ,'Игрок #1',false);
-  _mkHStrREQ(10,'Игрок #2',false);
-  _mkHStrREQ(11,'Игрок #3',false);
-  _mkHStrREQ(12,'Игрок #4',false);
-  _mkHStrREQ(13,'Игрок #5',false);
-  _mkHStrREQ(14,'Игрок #6',false);
+  _mkHStrRPL(2 ,'Пауза'                   ,false);
+  _mkHStrRPL(3 ,'Камера игрока'           ,false);
+  _mkHStrRPL(4 ,'Список игровых сообщений',false);
+  _mkHStrRPL(5 ,'Туман войны'             ,false);
+  _mkHStrRPL(8 ,'Все игроки'              ,false);
+  _mkHStrRPL(9 ,'Игрок #1',false);
+  _mkHStrRPL(10,'Игрок #2',false);
+  _mkHStrRPL(11,'Игрок #3',false);
+  _mkHStrRPL(12,'Игрок #4',false);
+  _mkHStrRPL(13,'Игрок #5',false);
+  _mkHStrRPL(14,'Игрок #6',false);
 
 
   {str_camp_t[0]         := 'Hell #1: Вторжение на Фобос';

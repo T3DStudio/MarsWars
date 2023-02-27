@@ -1,4 +1,17 @@
 
+function d_UpdateUIPlayer(u:integer):boolean;
+var tu:PTUnit;
+begin
+   d_UpdateUIPlayer:=false;
+   if(not _players[HPlayer].observer)or(rpls_state>=rpl_rhead)
+   then UIPlayer:=HPlayer
+   else
+     if(_IsUnitRange(u,@tu))then
+     begin
+        UIPlayer:=tu^.playeri;
+        d_UpdateUIPlayer:=true;
+     end;
+end;
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
@@ -11,13 +24,15 @@ end;
 
 procedure d_Game;
 begin
+   d_UpdateUIPlayer(0);
+
    D_AddObjSprites(G_Status>gs_running);
 
    D_terrain   (r_screen,vid_mapx,vid_mapy);
    D_SpriteList(r_screen,vid_mapx,vid_mapy);
    D_Fog       (r_screen,vid_mapx,vid_mapy);
    D_UnitsInfo (r_screen,vid_mapx,vid_mapy);
-   D_ui        (r_screen,vid_mapx,vid_mapy);
+   D_ui        (r_screen,vid_mapx,vid_mapy,UIPlayer);
 
    _draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
 

@@ -189,6 +189,8 @@ PlayerRace        : byte = 0;
 
 PlayerColor       : array[0..MaxPlayers] of cardinal;
 
+UIPlayer          : byte = 1;
+
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
 vid_cam_w         : integer = 800;
@@ -364,6 +366,7 @@ ui_blink_color1   : array[false..true] of cardinal;
 
 ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
+ui_uiplayery      : integer = 0;
 ui_ingamecl       : byte = 0;
 ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
@@ -778,6 +781,7 @@ str_load,
 str_delete,
 str_gsaved,
 str_pause,
+str_observer,
 str_win,
 str_lose,
 str_sver,
@@ -811,12 +815,13 @@ str_hint_army     : shortstring;
 str_hint_energy   : shortstring;
 str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
-str_hint_r        : array[0.._mhkeys] of shortstring;
+str_hint_r,
+str_hint_o        : array[0.._mhkeys] of shortstring;
 str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
 
-str_camp_t        : array[0..MaxMissions] of shortstring;
+{str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;
-str_camp_m        : array[0..MaxMissions] of shortstring;
+str_camp_m        : array[0..MaxMissions] of shortstring; }
 
 str_connect,
 str_svup,

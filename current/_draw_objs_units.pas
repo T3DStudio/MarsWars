@@ -82,21 +82,21 @@ begin
    end;
 end;
 
-function UnitVisionRange(pu:PTUnit):byte;
+function UnitVisionRange(pu:PTUnit;VisPlayer:byte):byte;
 begin
    UnitVisionRange:=0;
    if((HPlayer=0)and(rpls_state>=rpl_rhead))
-   or(_players[HPlayer].observer)
+   or(_players[VisPlayer].observer)
    then UnitVisionRange:=2
    else
      with pu^ do
-      if(_uvision(_players[HPlayer].team,pu,false))then
-       if(player^.team=_players[HPlayer].team)
+      if(_uvision(_players[VisPlayer].team,pu,false))then
+       if(player^.team=_players[VisPlayer].team)
        then UnitVisionRange:=2
        else UnitVisionRange:=1;
 end;
 
-function _unit_fogrev(pu:PTUnit):boolean;
+function _unit_fogrev(pu:PTUnit;VisPlayer:byte):boolean;
 begin
    _unit_fogrev:=false;
    with pu^     do
@@ -105,7 +105,7 @@ begin
     if(rpls_fog=false)
     then _unit_fogrev:=true
     else
-      case UnitVisionRange(pu) of
+      case UnitVisionRange(pu,VisPlayer) of
     1:begin
          if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
          _unit_fogrev:=true;
@@ -181,27 +181,18 @@ begin
    ui_orders_uids[i,_ukbuilding]:=ui_orders_uids[i,_ukbuilding]+[uidi];
 end;
 
-procedure ui_UnitGroups(pu:PTUnit;UIPlayer:byte);
-begin
-   with pu^ do
-   if(playeri=UIPlayer)and(G_Status=gs_running)then
-   with uid^ do
-   begin
-   if(group<MaxUnitGroups)then ui_IncOrderCounter(x,y,group,uidi);
-
-   if(UnitF2Select(pu))then ui_IncOrderCounter(x,y,MaxUnitGroups,uidi); // all battle units
-   end;
-end;
-
-procedure ui_counters(pu:PTUnit);
+procedure ui_counters(pu:PTUnit;VisPlayer:byte);
 var i:byte;
     t:integer;
 begin
    with pu^ do
-   if(playeri=HPlayer)and(G_Status=gs_running)then
+   if(playeri=VisPlayer)and(G_Status=gs_running)then
    with uid^ do
    with player^ do
    begin
+      if(group<MaxUnitGroups)then ui_IncOrderCounter(x,y,group,uidi);
+      if(UnitF2Select(pu))then ui_IncOrderCounter(x,y,MaxUnitGroups,uidi); // all battle units
+
       if(_ukbuilding)then
       begin
          if(bld)then
@@ -374,10 +365,9 @@ begin
    with uid^    do
    with player^ do
    begin
-      ui_UnitGroups(pu,HPlayer);
-      ui_counters(pu);
+      ui_counters(pu,UIPlayer);
 
-      if(_unit_fogrev(pu))then
+      if(_unit_fogrev(pu,UIPlayer))then
       begin
          _unit_minimap(pu);
 
@@ -497,7 +487,7 @@ begin
 
        if(spr=pspr_dummy)then exit;
 
-       if(_unit_fogrev(pu))then
+       if(_unit_fogrev(pu,UIPlayer))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
          SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits) div 4,255),0,0);
     end;

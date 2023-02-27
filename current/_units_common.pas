@@ -606,7 +606,7 @@ begin
    begin
       aukfly:=_ukfly;
       with _players[pl] do
-       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack));
+       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
    end;
 
    dx:=-2000;
@@ -759,7 +759,7 @@ begin
    if(playern<=MaxPlayers)then
     with _uids[buid] do
      with _players[playern] do
-      obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
+      obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
 
    i:=_InBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
@@ -784,7 +784,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
+         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles );
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
 
@@ -811,7 +811,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_b478tel]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack);
+         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles  );
          if(point_dist_int(x,y,x0,y0)>srange)then exit;

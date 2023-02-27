@@ -295,6 +295,9 @@ end;
 procedure check_mouse_brush(log:boolean);
 var cndt:cardinal;
 begin
+   if(UIPlayer<>HPlayer)
+   then m_brush:=co_empty
+   else
    case m_brush of
    0     : m_brush:=co_empty;
    1..255: begin
@@ -410,11 +413,20 @@ begin
    true : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
      end;
 
-3: if(rpls_state<rpl_rhead)then
+3: if(_players[HPlayer].observer)then
    begin
-      if(G_Status=gs_running)and(right=false)then
-      begin
-         case u of
+      if(right=false)then
+       case u of
+     0    :  rpls_fog:=not rpls_fog;
+     2..8 :  UIPlayer:=u-2;
+       end;
+   end
+   else
+     if(rpls_state<rpl_rhead)then
+     begin
+        if(G_Status=gs_running)and(right=false)then
+        begin
+           case u of
    0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
    1 : m_brush :=co_paction;
    2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
@@ -435,24 +447,24 @@ begin
    11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
    12: m_brush :=co_mmark;
    13: m_action:=not m_action;
-         end;
+           end;
 
-         check_mouse_brush(false);
-      end;
-   end
-   else
-     if(u=1)then
-     begin
-        if(mid)
-        then rpls_step:=fr_fpsd2*fr_fps1
-        else
-          if(right=false)
-          then rpls_step:=fr_fpsd2*2
-          else rpls_step:=fr_fpsd2*10;
+           check_mouse_brush(false);
+        end;
      end
      else
-       if(right=false)then
-        case u of
+       if(u=1)then
+       begin
+          if(mid)
+          then rpls_step:=fr_fpsd2*fr_fps1
+          else
+            if(right=false)
+            then rpls_step:=fr_fpsd2*2
+            else rpls_step:=fr_fpsd2*10;
+       end
+       else
+         if(right=false)then
+          case u of
      0 : _fsttime:=not _fsttime;
      2 : if(rpls_state<rpl_end)then
           if(G_Status=gs_running)
@@ -462,7 +474,7 @@ begin
      4 : rpls_showlog:=not rpls_showlog;
      5 : rpls_fog    :=not rpls_fog;
  8..14 : HPlayer     :=u-8;
-        end;
+          end;
 
       end;
    end;
@@ -529,9 +541,20 @@ begin
            exit;
         end;
 
-        if(rpls_state<rpl_rhead)then
+        if(_players[HPlayer].observer)then
         begin
-           case ui_tab of
+           for ko:=0 to _mhkeys do  // replays
+           begin
+              if(_hotkeyO[ko]= 0 )
+              or(_hotkeyO[ko]<>k )then continue;
+              _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
+              exit;
+           end;
+        end
+        else
+          if(rpls_state<rpl_rhead)then
+          begin
+             case ui_tab of
         0,1,2:for ko:=0 to _mhkeys do
               begin
                  if(_hotkey2[ko]<>k2)
@@ -540,7 +563,7 @@ begin
                  _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false,false);
                  exit;
               end;
-           end;
+             end;
 
            if(G_Status=gs_running)then
            begin
@@ -570,15 +593,15 @@ begin
               else
               end;
            end;
-        end
-        else
-          for ko:=0 to _mhkeys do  // replays
-          begin
-             if(_hotkeyR[ko]= 0 )
-             or(_hotkeyR[ko]<>k )then continue;
-             _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
-             exit;
-          end;
+          end
+          else
+            for ko:=0 to _mhkeys do  // replays
+            begin
+               if(_hotkeyR[ko]= 0 )
+               or(_hotkeyR[ko]<>k )then continue;
+               _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
+               exit;
+            end;
       end;
 end;
 
@@ -702,7 +725,7 @@ procedure ui_SicpleClick;
 var u:integer;
 begin
    u:=_whoInPoint(mouse_map_x,mouse_map_y,4);
-   if(u>0)then ui_UnitSelectedNU:=u;
+   if(u>0)then UpdateLastSelectedUnit(u);
 end;
 
 procedure g_mouse;
@@ -726,7 +749,11 @@ begin
    check_mouse_brush(false);
 
    case m_brush of
-co_empty   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+co_empty   : begin
+             ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+             if(_players[HPlayer].observer)and(ks_mleft=1)then
+              if(d_UpdateUIPlayer(ui_uhint))then exit;
+             end;
 co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
 co_amove   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);
 co_paction : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);

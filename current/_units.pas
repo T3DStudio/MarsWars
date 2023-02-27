@@ -167,7 +167,7 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[puid^._urace]]=0)or(uid^._isbarrack)) )>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[puid^._urace]]=0)or(uid^._isbarrack)or(uid^._ability=uab_Teleport)) )>0)then
          begin
             _unit_morph:=ureq_place;
             exit;

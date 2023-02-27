@@ -295,18 +295,23 @@ begin
                with _players[p] do
                 if (state<>ps_none)
                 then PlayerSetState(p,PS_None)
-                else PlayerSetState(p,PS_Comp);
+                else
+                begin
+                   PlayerSetState(p,PS_Comp);
+                   if(team=0)then team:=p;
+                end;
            end;
       62 : if(net_status<>ns_clnt)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
-               if(state=ps_comp)or(p=HPlayer)then
-               begin
-                  race+=1;
-                  race:=race mod 3;
-                  mrace:=race;
-               end;
+               if(team>0)then
+                if(state=ps_comp)or(p=HPlayer)then
+                begin
+                   race+=1;
+                   race:=race mod 3;
+                   mrace:=race;
+                end;
            end;
       63 : if(net_status<>ns_clnt)then
            begin
@@ -396,10 +401,10 @@ begin
       91 : if(net_status<>ns_srvr)then ScrollByte(@net_pnui,true,0,9);
       92 : if(G_Started=false)and(net_status<>ns_srvr)then
             if(mouse_x<ui_menu_csm_x2)
-            then ScrollByte(@PlayerTeam,true,1,MaxPlayers)
+            then ScrollByte(@PlayerTeam,true,0,MaxPlayers)
             else
               if(mouse_x<ui_menu_csm_x3)
-              then begin PlayerRace+=1; PlayerRace:=PlayerRace mod 3;end
+              then begin if(PlayerTeam>0)then PlayerRace+=1; PlayerRace:=PlayerRace mod 3;end
               else PlayerReady:=not PlayerReady;
       96 : if(net_status<>ns_none)then
            begin
@@ -440,7 +445,7 @@ begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
                if(state=ps_comp)or(p=HPlayer)then
-                if(team>1)then team-=1;
+                if(team>byte(state=ps_comp))then team-=1;
            end;
 
       75 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte(@g_start_base ,false,0,gms_g_startb );
@@ -453,7 +458,7 @@ begin
 
       91 : if(net_status<>ns_srvr)then ScrollByte(@net_pnui,false,0,9);
       92 : if(G_Started=false)and(net_status<>ns_srvr)then
-            if(mouse_x<ui_menu_csm_x2)then ScrollByte(@PlayerTeam,false,1,MaxPlayers);
+            if(mouse_x<ui_menu_csm_x2)then ScrollByte(@PlayerTeam,false,0,MaxPlayers);
 
       97 : ScrollByte(@cmp_skill,false,0,CMPMaxSkills);
       end;

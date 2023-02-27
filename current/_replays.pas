@@ -3,7 +3,7 @@
 procedure replay_MenuSelectedInfo;
 const pl_n_ch : array[false..true] of char = ('#','*');
 var   f:file;
-vr,t,hp:byte;
+vr,t,hp,tm:byte;
      fn:shortstring;
      mw:integer;
      wr:cardinal;
@@ -42,16 +42,16 @@ begin
          mw:=0;
          wr:=0;
          BlockRead(f,wr,sizeof(map_seed ));rpls_str_info:=str_map+': '+c2s(wr)           +tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_info:=rpls_str_info+str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
+         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_info+=str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_liq  ));
-         if(vr<=7)then begin rpls_str_info:=rpls_str_info+str_m_liq+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;             end;
+         if(vr<=7)then begin rpls_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';  end
+                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(map_obs  ));
-         if(vr<=7)then begin rpls_str_info:=rpls_str_info+str_m_obs+_str_mx(vr)+tc_nl3+' '; end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;             end;
+         if(vr<=7)then begin rpls_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';  end
+                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(map_symmetry  ));
          BlockRead(f,vr,sizeof(g_mode   ));
-         if(vr in allgamemodes)then begin rpls_str_info:=rpls_str_info+str_gmode[vr]+tc_nl3;end
+         if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
                                else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
@@ -64,23 +64,29 @@ begin
          begin
             BlockRead(f,fn ,sizeof(fn));
 
-            rpls_str_info:=rpls_str_info+chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
+            rpls_str_info+=chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
 
             t:=0;
+            tm:=0;
             BlockRead(f,t,1);
             if(t=PS_none)then
             begin
-               rpls_str_info:=rpls_str_info+tc_nl3;
+               rpls_str_info+=tc_nl3;
                BlockRead(f,mw,3);
             end
             else
             begin
                BlockRead(f,t ,1);
+               BlockRead(f,tm,1);
                BlockRead(f,t ,1);
-               if(t<=r_cnt)
-               then rpls_str_info:=rpls_str_info+','+str_race[t][2]
-               else rpls_str_info:=rpls_str_info+',?';
-               BlockRead(f,t ,1); rpls_str_info:=rpls_str_info+','+b2s(t)+tc_nl3;
+
+               if(t=0)
+               then rpls_str_info+=','+str_observer[1]
+               else
+                 if(tm<=r_cnt)
+                 then rpls_str_info+=','+str_race[t][2]
+                 else rpls_str_info+=',?';
+               rpls_str_info+=','+t2c(t)+tc_nl3;
             end;
          end;
       end

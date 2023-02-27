@@ -53,16 +53,16 @@ begin
      if(HPlayer=p0)then HPlayer:=p1;
 end;
 
-procedure PlayerSetState(p,st:byte);
+procedure PlayerSetState(p,newstate:byte);
 begin
    with _players[p] do
    begin
-      state:=st;
-      case state of
-PS_None: begin ready:=false;name :=str_ps_none;       ttl:=0;end;
-PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;end;
+      case newstate of
+PS_None: begin ready:=false;name :=str_ps_none;       ttl:=0;if(p>0)and(state=ps_comp)then team:=p;end;
+PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;if(p>0)and(team=0)then team:=p;end;
 PS_Play: begin ready:=false;name :='';                ttl:=0;end;
       end;
+      state:=newstate;
    end;
 end;
 
@@ -282,8 +282,8 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        // if player do not start as observer
-        GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
+        if(team>0)then
+         GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
      end;
 
    {$IFDEF _FULLGAME}
@@ -310,8 +310,9 @@ begin
        then GameStartSkirmish
        else ;//_CMPMap;
        vid_blink_timer1:=2;
+       UIPlayer:=HPlayer;
        map_RedrawMenuMinimap;
-       d_Panel(r_uipanel);
+       d_Panel(r_uipanel,UIPlayer);
     end;
 end;
 
@@ -464,7 +465,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                    begin
                       _unit_counters_inc_select(pu);
                       {$IFDEF _FULLGAME}
-                      ui_UnitSelectedNU:=unum;
+                      UpdateLastSelectedUnit(unum);
                       {$ENDIF}
                    end;
                    usel_n+=1;

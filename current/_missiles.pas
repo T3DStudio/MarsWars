@@ -218,7 +218,7 @@ MID_Tank       : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=tank_sr
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
 MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;  splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=0  ;         end;
-MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;         end;       //-1162   620
+MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;         end;
       else
          vstep:=0;
          exit;
@@ -240,16 +240,8 @@ MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;   
 MID_Revenant,
 MID_URocket,
 MID_URocketS   : homing:=mh_homing;
-MID_Bullet,
-MID_Chaingun,
-MID_Chaingun2,
-MID_Flyer,
-MID_Imp,
-MID_Cacodemon,
-MID_Tank,
-MID_Baron,
-MID_BPlasma,
-MID_YPlasma    : homing:=mh_magnetic;
+MID_BFG        : ;
+       else      homing:=mh_magnetic;
        end;
 
 
@@ -281,12 +273,6 @@ MID_Mine      : if(uid=UID_UMine      )then exit;
    MissileUIDCheck:=true;
 end;
 
-{ R   S
-  11  380
-  12  452
-  22  1520
-  35  3846
-}
 
 procedure _missle_damage(m:integer);
 var tu: PTUnit;

@@ -1110,8 +1110,8 @@ begin
       if(cf(@ai_flags,@aif_base_smart_opening))then
       begin
          case race of
-         r_hell: base_energy:=600*upgr[_upgr_srange];
-         r_uac : base_energy:=600*upgr[_upgr_srange];
+         r_hell: base_energy:=200+600*upgr[_upgr_srange];
+         r_uac : base_energy:=    600*upgr[_upgr_srange];
          end;
 
          if(ai_towers_need>0)then //ai_mincount_towers
@@ -1128,11 +1128,13 @@ if(g_cgenerators>0)then BuildMain  (3   );
          BuildUProd (1   );
          BuildSmith (1   );
          BuildEnergy(1700);
+         BuildUProd (2   );
+         BuildEnergy(1900);
          BuildUProd (4   );
          BuildDetect(2   );
-if(g_cgenerators>0)then BuildMain  (5   );
-         BuildSpec2 (1   );
-         BuildMain  (2   );
+if(g_cgenerators>0)
+then     BuildMain  (5   )
+else     BuildMain  (2   );
          BuildEnergy(2100);
          BuildUProd (5   );
          BuildDetect(4   );
@@ -2115,16 +2117,20 @@ begin
                else
                begin
                   ai_BaseIdle(pu,srange);
-                  if(ai_base_d<base_r)or(ai_base_d=NOTSET)then
-                   if(aiu_FiledSquareNear<=ai_FiledSquareBorder)then
-                    _unit_action(pu);
+                  with player^ do
+                  with uid^ do
+                    if(ai_base_d<base_rh)or(ai_base_d=NOTSET)then
+                      if (aiu_FiledSquareNear<=ai_FiledSquareBorder)then
+                        if(not pf_IfObstacleZone(pfzone))
+                        or(upgr[upgr_race_extbuilding[_urace]]>0)then
+                          _unit_action(pu);
                end;
       end
       else
         if(_CheckRoyalBattleR(x,y,base_r))
         or((ai_choosen)and(g_mode=gm_royale))
         or((ai_choosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_r))
-        or((aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<=2))
+        or((aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<2))
         then _unit_action(pu)
         else
          if(not ai_cpoint_koth)or(ai_cpoint_d>base_r)then
@@ -2164,7 +2170,7 @@ gm_royale: if(ai_choosen)
            end;
       end;
 
-      if(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<=2)then
+      if(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<2)then
       begin
          if(aiu_alarm_d<base_4r)
          then w:=point_dir(aiu_alarm_x,aiu_alarm_y,x,y)
