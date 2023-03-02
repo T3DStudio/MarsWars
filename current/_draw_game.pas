@@ -696,15 +696,14 @@ begin
 
               if(aiu_alarm_d<32000)then
               lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
-
-
-
            end;
-
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,li2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,li2s(level), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,li2s(_level_damage), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
+
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 

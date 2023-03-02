@@ -430,12 +430,15 @@ begin
    with _missiles[m] do
    if(vstep>0)then
    begin
-      if(homing>mh_none)then
-       if(_IsUnitRange(tar,@tu))then
-        if(tu^.x<>tu^.vx)
-        or(tu^.y<>tu^.vy)
-        or(max2(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
-         case homing of
+      if(_IsUnitRange(tar,@tu))then
+       if(homing>mh_none)then
+        if(tu^.buff[ub_teleport]>0)
+        then homing:=mh_none
+        else
+          if(tu^.x<>tu^.vx)
+          or(tu^.y<>tu^.vy)
+          or(max2(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
+            case homing of
 mh_magnetic : begin
                  x  +=sign(tu^.x-x)*3;
                  y  +=sign(tu^.y-y)*3;
@@ -446,7 +449,7 @@ mh_homing   : begin
                  y  :=tu^.y;
                  mfe:=tu^.ukfly;
               end;
-         end;
+            end;
 
       if(mid=MID_Blizzard)then
       begin

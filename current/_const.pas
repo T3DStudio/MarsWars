@@ -132,7 +132,7 @@ pf_solid               : word = 65535;
 str_ver                = 'v52';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2023 ]';
-str_ps_c               : array[0..2] of char = ('-','P','C');
+str_ps_c               : array[0..2] of char = (' ','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
 str_ps_comp            : shortstring = 'AI';
@@ -666,7 +666,6 @@ BaseDamageBonush       = BaseDamageBonus1 div 2;
 BaseDamageLevel1       = BaseDamageBonush;
 BaseArmorBonus1        = 6;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
-BaseArmorBonus1h       = BaseArmorBonus1+BaseArmorBonush;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonush;
 
@@ -1418,11 +1417,12 @@ str_m_liq                : shortstring = 'Lakes';
 str_m_siz                : shortstring = 'Size';
 str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';
-str_aislots              : shortstring = 'Fill empty slots:   ';
-str_fstarts              : shortstring = 'Fixed player starts:';
-str_gmodet               : shortstring = 'Game mode:          ';
-str_cgenerators          : shortstring = 'Neutral generators: ';
-str_starta               : shortstring = 'Starting base:      ';
+str_aislots              : shortstring = 'Fill empty slots:         ';
+str_fstarts              : shortstring = 'Fixed player starts:      ';
+str_gmodet               : shortstring = 'Game mode:                ';
+str_cgenerators          : shortstring = 'Neutral generators:       ';
+str_deadobservers        : shortstring = 'Observer mode after lose: ';
+str_starta               : shortstring = 'Builders at game start:   ';
 str_plname               : shortstring = 'Player name';
 //str_plout                : shortstring = ' left the game';
 //str_player_def           : shortstring = ' was terminated!';
@@ -1434,9 +1434,9 @@ str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
 //str_ready                : shortstring = 'Ready';
 
-str_startat              : array[0..gms_g_startb] of shortstring = ('1 builder','2 builders','3 builders','4 builders','5 builders','6 builders','7 builders');
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
 str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
+str_observer             : shortstring = 'OBSERVER';
 
 {$ENDIF}
 

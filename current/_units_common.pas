@@ -876,7 +876,6 @@ begin
    with player^ do
    begin
       if(_isbuilder  )then n_builders  +=1;
-      if(_ispadvancer)then n_padvancers+=1;
       if(_isbarrack  )then
       begin
          n_barracks+=1;
@@ -896,7 +895,6 @@ begin
    with player^ do
    begin
       if(_isbuilder  )then n_builders  -=1;
-      if(_ispadvancer)then n_padvancers-=1;
       if(_isbarrack  )then
       begin
          n_barracks-=1;

@@ -14,7 +14,7 @@ begin
       PlayersSetDefault;
    end;
 
-   vid_menu_redraw:=true;
+   screen_redraw:=true;
 end;
 
 
@@ -42,7 +42,7 @@ begin
      if(state=ps_comp)then PlayerSetState(p,ps_none);
 end;
 
-procedure SetFFATeams;
+procedure SetCompFFATeams;
 var i: byte;
 begin
    for i:=1 to MaxPlayers do
@@ -111,23 +111,25 @@ begin
    if(a=0)then exit;
 
    case args[0] of
-   '-h',
-   '-help':
-   begin
-      GameLogCommon(0,log_to_all,'MarsWars dedicated server, '+str_ver  ,false);
-      GameLogCommon(0,log_to_all,'New map: -m [seed size lakes obs sym]',false);
-      GameLogCommon(0,log_to_all,'Add AI player: -p [R/H/U team skill]' ,false);
-      GameLogCommon(0,log_to_all,'Remove all AI players: -k or -noai'   ,false);
-      GameLogCommon(0,log_to_all,'Set 1..6 teams to AI players: -ffa'   ,false);
-      GameLogCommon(0,log_to_all,'Game moddes: -scir - scirmish, -3x3,' ,false);
-      GameLogCommon(0,log_to_all,'  -2x2x2, -inv - invasion, -cpt -'    ,false);
-      GameLogCommon(0,log_to_all,'  capturing points, -koth - king of'  ,false);
-      GameLogCommon(0,log_to_all,'  the hill, -rb - royal battle'       ,false);
-      GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
-      GameLogCommon(0,log_to_all,'Starting base options: -st 1-6'       ,false);
-      GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-7'    ,false);
-      exit;
-   end;
+'-h',
+'-help'  : begin
+              GameLogCommon(0,log_to_all,'MarsWars dedicated server, '+str_ver  ,false);
+              GameLogCommon(0,log_to_all,'New map: -m [seed size lakes obs sym]',false);
+              GameLogCommon(0,log_to_all,'Add AI player: -p [R/H/U team skill]' ,false);
+              GameLogCommon(0,log_to_all,'Remove all AI players: -noai'         ,false);
+              GameLogCommon(0,log_to_all,'Set 1..6 teams to AI players: -ffa'   ,false);
+              GameLogCommon(0,log_to_all,'Game moddes: -scir - scirmish, -3x3,' ,false);
+              GameLogCommon(0,log_to_all,'  -2x2x2, -inv - invasion, -cpt -'    ,false);
+              GameLogCommon(0,log_to_all,'  capturing points, -koth - king of'  ,false);
+              GameLogCommon(0,log_to_all,'  the hill, -rb - royal battle'       ,false);
+              GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
+              GameLogCommon(0,log_to_all,'Starting base options: -st 1-7'       ,false);
+              GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-11'   ,false);
+              GameLogCommon(0,log_to_all,'Neytral generators: -ng 0-5'          ,false);
+              GameLogCommon(0,log_to_all,'Observer mode after lose: -lo'        ,false);
+
+           exit;
+           end;
 '-m'     : if(a<6)
            then GameLogCommon(0,log_to_all,'command syntax error, see -h',false)
            else
@@ -142,25 +144,25 @@ begin
 '-p'     : if(a<3)
            then with _players[pl] do NewAI(race,team,player_default_ai_level)
            else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),gms_g_maxai));
-'-ffa'   : SetFFATeams;
-'-noai',
-'-k'     : RemoveAI;
+'-ffa'   : SetCompFFATeams;
+'-noai'  : RemoveAI;
 '-3x3'   : begin g_mode:=gm_3x3;      Map_premap; end;
 '-2x2x2' : begin g_mode:=gm_2x2x2;    Map_premap; end;
-'-scir'  : begin g_mode:=gm_scirmish; Map_premap; SetFFATeams; end;
+'-scir'  : begin g_mode:=gm_scirmish; Map_premap; SetCompFFATeams; end;
 '-inv'   : begin g_mode:=gm_invasion; Map_premap; end;
-'-cpt'   : begin g_mode:=gm_capture;  Map_premap; SetFFATeams; end;
-'-koth'  : begin g_mode:=gm_koth;     Map_premap; end;
-'-rb'    : begin g_mode:=gm_royale;   Map_premap; end;
+'-cpt'   : begin g_mode:=gm_capture;  Map_premap; SetCompFFATeams; end;
+'-koth'  : begin g_mode:=gm_koth;     Map_premap; SetCompFFATeams; end;
+'-rb'    : begin g_mode:=gm_royale;   Map_premap; SetCompFFATeams; end;
 
-'-cg'    : begin g_cgenerators     :=not g_cgenerators;    Map_premap;end;
+
 '-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
 '-lo'    : begin g_deadobservers   :=not g_deadobservers; end;
+'-ng'    : if(a=2)then begin g_cgenerators:=mm3(0,s2b(args[1]),gms_g_maxgens);Map_premap;end;
 '-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
 '-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
    else exit;
    end;
-   vid_menu_redraw:=true;
+   screen_redraw:=true;
 end;
 
 procedure _dedCode;
@@ -168,7 +170,7 @@ begin
    case G_Started of
 false: if(PlayersReadyStatus)then
        begin
-          vid_menu_redraw:=true;
+          screen_redraw:=true;
           G_Started:=true;
           GameStartSkirmish;
        end;
@@ -217,11 +219,14 @@ end;
 procedure ps(p:byte);
 begin
    if(p=0)
-   then _screenLine(str_plname,1   , str_plstat,15, str_srace      ,25, str_team          ,35, '',0, '',0)
+   then        _screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team                    ,35, '',0, '',0)   // captions
    else with _players[p] do
-        if(state<>ps_none)
-        then _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, b2s(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
-        else _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '-----'        ,25, '-'                         ,35, '',0, '',0);
+        if(state=ps_none)
+        then   _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''                          ,35, '',0, '',0)
+        else
+          if(team=0)
+          then _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
+          else _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -236,11 +241,11 @@ end;
 
 procedure _dedScreen;
 begin
-   if(vid_menu_redraw)then
+   if(screen_redraw)then
    begin
       clrscr;
       consoley:=0;
-      vid_menu_redraw:=false;
+      screen_redraw:=false;
    end;
 
    if(consoley<=fr_fps1)then
@@ -249,13 +254,14 @@ begin
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
-      4 : writeln('         ',str_gmodet     ,' ',str_gmode  [g_mode ] );
-      6 : writeln('         ',str_fstarts    ,' ',g_fixed_positions    );
-      8 : writeln('         ',str_starta     ,' ',str_startat[g_start_base]);
-      9 : writeln('         ',str_aislots    ,' ',g_ai_slots           );
-      10: writeln('         ',str_cgenerators,' ',str_cgeneratorsM[g_cgenerators]);
-      11: writeln;
-      12: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
+      3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]           );
+      4 : writeln('         ',str_starta       ,b2s(g_start_base+1)            );
+      6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]         );
+      8 : writeln('         ',str_aislots      ,g_ai_slots                     );
+      10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_cgenerators]);
+      11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]          );
+      12: writeln;
+      13: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
       14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);
       15: writeln;
       16: ps(0);

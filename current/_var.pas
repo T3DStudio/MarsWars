@@ -15,7 +15,7 @@ g_mode            : byte     = 0;
 g_start_base      : byte     = 0;
 g_fixed_positions : boolean  = false;
 g_cgenerators     : byte     = 0;
-g_ai_slots        : byte     = 5;
+g_ai_slots        : byte     = player_default_ai_level;
 g_deadobservers   : boolean  = true;
 g_step            : cardinal = 0;
 g_player_status   : byte     = 0;
@@ -57,8 +57,6 @@ HPlayer           : byte = 1; // 'this' player
 
 _playerAPM        : array[00..MaxPlayers] of TAPMCounter;
 
-
-vid_menu_redraw   : boolean  = true;
 
 map_seed          : cardinal = 1;
 map_iseed         : word     = 0;
@@ -168,6 +166,8 @@ r_minimap_scan_blink
 ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
+
+vid_menu_redraw   : boolean  = true;
 
 _menu             : boolean = true;
 menu_item         : integer;
@@ -1087,7 +1087,8 @@ snd_hell
 
 {$ELSE}
 
-consoley : integer = 0;
+screen_redraw   : boolean = true;
+consoley        : integer = 0;
 
 {$ENDIF}
 

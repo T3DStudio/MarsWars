@@ -1145,6 +1145,8 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
    if(g_player_status>0)then
    begin
       POVPlayerObserver:=GetBBit(@g_player_status,7);
+      _players[POVPlayer].observer:=POVPlayerObserver;
+
       _PNU:=_rudata_byte(rpl,0)*4;
 
       if(_PNU<=0)then exit;

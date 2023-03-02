@@ -272,6 +272,12 @@ begin
    if(state>ps_none)then
    begin
       case amtype of
+0..MaxPlayers,
+lmt_player_chat,
+lmt_player_defeated,
+lmt_player_leave,
+lmt_game_end,
+lmt_game_message     :;
 lmt_unit_attacked,
 lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],timeDiff5,ax,ay))then exit;
       else
@@ -504,7 +510,7 @@ gm_invasion:       PlayerGetTeam:=1;
         end;
 end;
 
-function PlayerGetStatus(p:integer):char;
+function PlayerGetStatus(p:byte):char;
 begin
    with _players[p] do
    begin

@@ -163,13 +163,13 @@ begin
    _cycle_order     := 0;
    _cycle_regen     := 0;
 
-   vid_menu_redraw  := true;
-
    Map_premap;
 
    {$IFDEF _FULLGAME}
    _fsttime:=false;
    _warpten:=false;
+
+   vid_menu_redraw  := true;
 
    vid_cam_x:=-vid_panelw;
    vid_cam_y:=0;
@@ -206,6 +206,7 @@ begin
    rpls_plcam:=false;
    if(rpls_state>rpl_wunit)then rpls_state:=rpl_none;
    {$ELSE}
+   screen_redraw:=true;
    {$ENDIF}
 end;
 
@@ -526,13 +527,13 @@ begin
            if(ttl<ClientTTL)then
            begin
               ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps1)then vid_menu_redraw:=true;
+              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
            end
            else
              if(G_Started=false)then
              begin
                 PlayerSetState(p,PS_None);
-                vid_menu_redraw:=true;
+                {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;

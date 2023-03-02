@@ -86,6 +86,7 @@ function UnitVisionRange(pu:PTUnit;VisPlayer:byte):byte;
 begin
    UnitVisionRange:=0;
    if((HPlayer=0)and(rpls_state>=rpl_rhead))
+   or(_players[HPlayer  ].observer)
    or(_players[VisPlayer].observer)
    then UnitVisionRange:=2
    else

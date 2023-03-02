@@ -221,7 +221,6 @@ begin
    _ucl       := 11;
    _btime     := ptime3;
    _ukbuilding:= true;
-   _ispadvancer:=true;
 end;
 
 UID_HTeleport:
@@ -229,6 +228,7 @@ begin
    _mhits     := 3000;
    _renergy   := 400;
    _r         := 28;
+   _srange    := 100;
    _ucl       := 13;
    _btime     := ptime2;
    _limituse  := ul4;
@@ -878,7 +878,6 @@ begin
    _ucl       := 11;
    _btime     := ptime3;
    _ukbuilding:= true;
-   _ispadvancer:=true;
 end;
 
 UID_URadar:

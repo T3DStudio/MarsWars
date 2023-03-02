@@ -31,10 +31,10 @@ begin
       if(state=PS_Play)and(nip=aip)and(nport=ap)then
       begin
          net_GetPlayer:=i;
-         ttl:=0;
          {$IFNDEF _FULLGAME}
-         if(ttl>=ClientTTL)then vid_menu_redraw:=true;
+         if(ttl>=fr_fps1)then screen_redraw:=true;
          {$ENDIF}
+         ttl:=0;
          break;
       end;
 
@@ -50,23 +50,23 @@ begin
       oldname:=name;
       name   :=net_readstring;
       if(length(name)>NameLen)then setlength(name,NameLen);
-      if(oldname<>name)then vid_menu_redraw:=true;
+      if(oldname<>name)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       i:=net_readbyte;
       if not(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])then
       begin
-         if(i<>team)then vid_menu_redraw:=true;
+         if(i<>team)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
          team:=i;
       end;
 
       i    :=race;
       race :=net_readbyte;
       mrace:=race;
-      if(i<>mrace)then vid_menu_redraw:=true;
+      if(i<>mrace)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       i    :=byte(ready);
       ready:=net_readbool;
-      if((i>0)<>ready)then vid_menu_redraw:=true;
+      if((i>0)<>ready)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
@@ -127,7 +127,11 @@ begin
 end;
 
 procedure net_GServer;
-var mid,pid,i:byte;
+var mid,
+    pid,
+    i  :byte;
+net_period_step
+       :boolean;
 begin
    net_clearbuffer;
 
@@ -201,6 +205,9 @@ nmid_player_leave: begin
                       if(G_Started=false)
                       then PlayerSetState(pid,ps_none)
                       else PlayerKill(pid);
+                      {$IFNDEF _FULLGAME}
+                      screen_redraw:=true;
+                      {$ENDIF}
                       continue;
                    end;
             else
@@ -228,7 +235,7 @@ nmid_pause       : begin
                       else
                         if(G_Status<>HPlayer)or(G_Status=gs_running)then G_Status:=pid;
                      {$IFNDEF _FULLGAME}
-                     vid_menu_redraw:=true;
+                     screen_redraw:=true;
                      {$ENDIF}
                    end;
                end
@@ -238,7 +245,7 @@ nmid_pause       : begin
                     i:=net_readbyte;
                     PlayersSwap(i,pid);
                     {$IFNDEF _FULLGAME}
-                    vid_menu_redraw:=true;
+                    screen_redraw:=true;
                     {$ENDIF}
                  end;
             end;
@@ -252,12 +259,14 @@ nmid_pause       : begin
       end;
    end;
 
+   net_period_step:=(net_period mod NetTickN)=0;
+
    for i:=1 to MaxPlayers do
     if(i<>HPlayer)then
      with _players[i] do
       if(state=PS_Play)and(ttl<ClientTTL)then
       begin
-         if(G_Started)and((net_period mod NetTickN)=0)then
+         if(G_Started)and(net_period_step)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_snapshot);

@@ -1,16 +1,11 @@
 program T3D_RTS;
 
-{
-- пересмотреть чат-команды ded сервера
-- время строительства hell eye отобрадается неверно
-}
-
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
-  //{$APPTYPE GUI}
+  {$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}

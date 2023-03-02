@@ -275,7 +275,6 @@ TUID = record
    _isbuilder,
    _issmith,
    _isbarrack,
-   _ispadvancer,
    _issolid,
    _ukfly,
    _splashresist: boolean;
@@ -469,8 +468,7 @@ o_x1,o_y1  :integer;
    s_smiths,
    n_builders,
    n_barracks,
-   n_smiths,
-   n_padvancers
+   n_smiths
            : integer;
 
    PNU     : byte;

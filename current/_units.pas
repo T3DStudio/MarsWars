@@ -72,6 +72,7 @@ begin
             if(_ukmech)
             then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_mech[_urace]])*BaseArmorBonus1
             else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_bio [_urace]])*BaseArmorBonus1;
+
          if(level>0)then armor+=level*_level_armor;
 
          damage-=armor;
@@ -794,7 +795,7 @@ uab_Teleport      : swtarget:=true;
 
                if(fteleport_tar)then
                begin
-                  ud:=point_dist_int(uo_x,uo_y,tu^.x,tu^.y);
+                  ud:=point_dist_int(uo_x,uo_y,tu^.x,tu^.y)-tu^.uid^._r;
                   if(ud<srange)and(ud<uontard)then
                    if(team=tu^.player^.team)then
                    begin
