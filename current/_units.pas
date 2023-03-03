@@ -366,7 +366,7 @@ begin
    //tu - target
 
    if(checkvis)then
-    if(_uvision(pu^.player^.team,tu,false)=false)then exit;
+    if(CheckUnitTeamVision(pu^.player^.team,tu,false)=false)then exit;
    if(cw>MaxUnitWeapons)then exit;
    if(tu^.hits<=fdead_hits)then exit;
    if(ud<0)then ud:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
@@ -512,7 +512,7 @@ begin
    // pu - attacker
    // tu - target
 
-   if(_uvision(pu^.player^.team,tu,false)=false)then exit;
+   if(CheckUnitTeamVision(pu^.player^.team,tu,false)=false)then exit;
    if(tu^.hits<=fdead_hits)or(tu^.buff[ub_Invuln]>0)then exit;
    if(ud<0)then ud:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
    if(cw>MaxUnitWeapons)then cw:=MaxUnitWeapons;
@@ -1102,7 +1102,7 @@ begin
       if(_IsUnitRange(uo_tar,@tu))then
       begin
          if(_IsUnitRange(tu^.transport,nil))
-         or(_uvision(player^.team,tu,false)=false)then
+         or(CheckUnitTeamVision(player^.team,tu,false)=false)then
          begin
             uo_tar:=0;
             exit;
@@ -1383,8 +1383,8 @@ wmove_noneed    : if(not attackinmove)then
       with _a_weap[a_weap] do
       begin
          {$IFDEF _FULLGAME}
-         targetvis  :=PointInScreenP(tu^.vx,tu^.vy,tu^.player);
-         attackervis:=PointInScreenP(    vx,    vy,    player);
+         targetvis  :=PointInScreenP(tu^.vx,tu^.vy);
+         attackervis:=PointInScreenP(    vx,    vy);
          {$ENDIF}
 
          if(a_rld<=0)then

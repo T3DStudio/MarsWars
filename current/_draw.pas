@@ -63,7 +63,7 @@ begin
 
    _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')'+
-   ' '+b2c[PointInScreenP(mouse_map_x,mouse_map_y,nil)]+
+   ' '+b2c[PointInScreenP(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+

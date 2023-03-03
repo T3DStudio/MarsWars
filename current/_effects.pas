@@ -249,7 +249,7 @@ var i,o,r:byte;
 begin
    with _missiles[m] do
    with _mid_effs[mid] do
-   if(PointInScreenP(vx,vy,nil))then
+   if(PointInScreenP(vx,vy))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -290,8 +290,8 @@ end;
 
 procedure teleport_effects(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
-   if PointInScreenP(vx,vy,nil)
-   or PointInScreenP(tx,ty,nil) then SoundPlayUnit(snd,nil,nil);
+   if PointInScreenP(vx,vy)
+   or PointInScreenP(tx,ty) then SoundPlayUnit(snd,nil,nil);
    _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),eidstart);
    _effect_add(tx,ty,_SpriteDepth(ty+1,ukfly),eidend  );
 end;

@@ -514,7 +514,7 @@ begin
 
         if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
 
-        if(PointInScreenP(cpx,cpy,nil))then
+        if(PointInScreenP(cpx,cpy))then
          if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
 
        // for i:=0 to MaxPlayers do

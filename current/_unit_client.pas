@@ -230,7 +230,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(_uvision(_players[POVPlayer].team,pu,true))or(rpl)or(POVPlayerObserver)
+      if(CheckUnitTeamVision(_players[POVPlayer].team,pu,true))or(rpl)or(POVPlayerObserver)
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
@@ -600,7 +600,7 @@ begin
    // pu - previous state
    // uu - current state
    pu:=@_units[0];
-   with uu^ do vis:=PointInScreenP(x,y,player);
+   with uu^ do vis:=PointInScreenP(x,y);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit

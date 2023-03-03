@@ -573,7 +573,7 @@ begin
                 then aiu_limitaround_ally+=tu^.uid^._limituse;
            end
            else
-             if(_uvision(team,tu,true))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,true))then  // enemy in vision
              begin
                 ai_SetAlarm(tu,0,0,ud,0);
 
@@ -702,7 +702,7 @@ begin
                  else _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
             end
             else
-             if(_uvision(team,tu,true))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,true))then  // enemy in vision
              begin
                 // enemy
                 _setNearestTarget(@ai_enemy_u,@ai_enemy_d,ud);

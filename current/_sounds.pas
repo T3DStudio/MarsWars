@@ -297,7 +297,7 @@ begin
    else
      if(pu<>nil)then
       with pu^ do
-       if(PointInScreenP(x,y,player)=false)then exit;
+       if(PointInScreenP(x,y)=false)then exit;
 
    SoundPlay(ss,sss_world);
    SoundPlayUnit:=true;

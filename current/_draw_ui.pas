@@ -400,26 +400,26 @@ begin
       end;
 
       3: // actions
-      if(_players[HPlayer].observer)then
+      if(rpls_state>=rpl_rhead)then
       begin
-         _drawBtn(tar,0,0,spr_b_rfog ,rpls_fog    ,false);
+         _drawBtn(tar,0,0,spr_b_rfast,_fsttime    ,false);
+         _drawBtn(tar,1,0,spr_b_rskip,false       ,false);
+         _drawBtn(tar,2,0,spr_b_rstop,g_status>0  ,false);
+         _drawBtn(tar,0,1,spr_b_rvis ,rpls_plcam  ,false);
+         _drawBtn(tar,1,1,spr_b_rlog ,rpls_showlog,false);
+         _drawBtn(tar,2,1,spr_b_rfog ,rpls_fog    ,false);
 
          ux:=2;
-         uy:=0;
+         uy:=2;
          PlayersButtoms;
       end
       else
-        if(rpls_state>=rpl_rhead)then
+        if(_players[HPlayer].observer)then
         begin
-           _drawBtn(tar,0,0,spr_b_rfast,_fsttime    ,false);
-           _drawBtn(tar,1,0,spr_b_rskip,false       ,false);
-           _drawBtn(tar,2,0,spr_b_rstop,g_status>0  ,false);
-           _drawBtn(tar,0,1,spr_b_rvis ,rpls_plcam  ,false);
-           _drawBtn(tar,1,1,spr_b_rlog ,rpls_showlog,false);
-           _drawBtn(tar,2,1,spr_b_rfog ,rpls_fog    ,false);
+           _drawBtn(tar,0,0,spr_b_rfog ,rpls_fog    ,false);
 
            ux:=2;
-           uy:=2;
+           uy:=0;
            PlayersButtoms;
         end
         else
@@ -538,11 +538,11 @@ begin
            if(ui_tab=3)then
            begin
               if(i<=_mhkeys)then
-                if(_players[HPlayer].observer)
-                then hs1:=@str_hint_o[i]
+                if(rpls_state>=rpl_rhead)
+                then hs1:=@str_hint_r[i]
                 else
-                  if(rpls_state>=rpl_rhead)
-                  then hs1:=@str_hint_r[i]
+                  if(_players[HPlayer].observer)
+                  then hs1:=@str_hint_o[i]
                   else hs1:=@str_hint_a[i];
            end
            else
@@ -570,7 +570,10 @@ begin
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
-      _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint1,ta_left,ui_ingamecl,c_white);
+     begin
+        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint1 ,ta_left,ui_ingamecl,c_white);
+        _draw_text(tar,ui_textx,ui_hinty2,'('+tu^.player^.name+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
+     end;
 end;
 
 procedure D_UIText(tar:pSDL_Surface;VisPlayer:byte);

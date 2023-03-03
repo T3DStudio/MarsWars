@@ -314,6 +314,8 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
          vid_menu_redraw:=true;
 
          if(LogMes2UIAlarm)then SoundLogHPlayer;
+
+         if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=HPlayer)then ui_tab:=3;
       end;
       {$ENDIF}
    end;
@@ -344,15 +346,15 @@ begin
    if(ServerSide=false)then exit;
    PlayersAddToLog(0,log_to_all,lmt_game_end,0,wteam,'',0,0,false);
 end;
-procedure GameLogPlayerDefeated(pl:byte);
+procedure GameLogPlayerDefeated(player:byte);
 begin
-   if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddToLog(pl,log_to_all,lmt_player_defeated,0,pl,'',0,0,false);
+   if(player>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0,false);
 end;
-procedure GameLogPlayerLeave(pl:byte);
+procedure GameLogPlayerLeave(player:byte);
 begin
-   if(pl>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddToLog(pl,log_to_all,lmt_player_leave,0,pl,'',0,0,false);
+   if(player>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,player,'',0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
@@ -941,17 +943,12 @@ begin
       end;
 end;
 
-function _uvision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
+function CheckUnitTeamVision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
 begin
-   {$IFDEF _FULLGAME}
-   if(rpls_state>=rpl_rhead)and(HPlayer=0)
-   then _uvision:=true
-   else
-   {$ENDIF}
-    with tu^ do
-     if(buff[ub_Invis]<=0)or(hits<=0)or(noinvis)
-     then _uvision:=(vsnt[uteam]>0)
-     else _uvision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
+   with tu^ do
+    if(buff[ub_Invis]<=0)or(hits<=0)or(noinvis)
+    then CheckUnitTeamVision:=(vsnt[uteam]>0)
+    else CheckUnitTeamVision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
 
 procedure GameSetStatusWinnerTeam(team:byte);
@@ -1057,7 +1054,21 @@ begin
             and(vid_cam_y<y)and(y<(vid_cam_y+vid_cam_h));
 end;
 
-function PointInScreenP(x,y:integer;player:PTPlayer):boolean;
+function CheckUnitUIVision(tu:PTUnit):boolean;
+begin
+   CheckUnitUIVision:=true;
+   if(not rpls_fog)then exit;
+
+   if(UIPlayer=0)then
+     if(rpls_state>=rpl_rhead)or(_players[HPlayer].observer)then exit;
+
+   if(tu<>nil)then
+     if(tu^.player^.team=_players[UIPlayer].team)then exit;
+
+   CheckUnitUIVision:=false;
+end;
+
+function PointInScreenP(x,y:integer):boolean;
 begin
    // player = player of vision source
    PointInScreenP:=false;
@@ -1066,13 +1077,11 @@ begin
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
    begin
-      if(player<>nil)then
-       if (player^.team=_players[HPlayer].team)
-       or((rpls_state>=rpl_rhead)and(player^.pnum=0))then
-       begin
-          PointInScreenP:=true;
-          exit;
-       end;
+      if(CheckUnitUIVision(nil))then
+      begin
+         PointInScreenP:=true;
+         exit;
+      end;
 
       if(rpls_fog=false)or(fog_check(x,y))then PointInScreenP:=true;
    end;

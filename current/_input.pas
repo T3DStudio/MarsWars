@@ -242,16 +242,24 @@ begin
    end;
 end;
 
+{
+{$IFDEF _FULLGAME}
+if((HPlayer=0)and(rpls_state>=rpl_rhead))
+or((UIPlayer=0)and(_players[HPlayer].observer))
+then CheckUnitTeamVision:=true
+else
+{$ENDIF}
+}
+
 function _whoInPoint(tx,ty:integer;tt:byte):integer;
 var i,sc:integer;
-    htm :byte;
-PHPlayer:PTPlayer;
+  tteam :byte;
 function _ch(up:PTPlayer):boolean;
 begin
    _ch:=true;
    case tt of
-   1  : _ch:=up^.team<>htm;
-   2  : _ch:=up^.team= htm;
+   1  : _ch:=up^.team<>tteam;
+   2  : _ch:=up^.team= tteam;
    3,4: _ch:=up^.pnum= HPlayer;
    end;
 end;
@@ -265,24 +273,23 @@ begin
       5 - any
    }
    sc:=0;
-   PHPlayer:=@_players[HPlayer];
-   with PHPlayer^ do
+   with _players[UIPlayer] do
    begin
       sc+=ucl_cs[false];
       sc+=ucl_cs[true ];
-      htm:=team;
+      tteam:=team;
    end;
    _whoInPoint:=0;
    if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
      with _punits[i]^ do
       if(hits>0)and(transport=0)and(_ch(player))then
-       if(_uvision(htm,_punits[i],false))or(PHPlayer^.observer)then
+       if(CheckUnitTeamVision(tteam,_punits[i],false))or(CheckUnitUIVision(_punits[i]))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            case tt of
            1,2: begin
-                   if(playeri=HPlayer)and(sc=1)and(sel=true)then continue;
+                   if(playeri=UIPlayer)and(sc=1)and(sel=true)then continue;
                    _whoInPoint:=i;
                 end;
            3  : _whoInPoint:=uidi;
@@ -413,69 +420,68 @@ begin
    true : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
      end;
 
-3: if(_players[HPlayer].observer)then
+3: if(rpls_state>=rpl_rhead)then
    begin
-      if(right=false)then
-       case u of
-     0    :  rpls_fog:=not rpls_fog;
-     2..8 :  UIPlayer:=u-2;
-       end;
+      if(u=1)then
+      begin
+         if(mid)
+         then rpls_step:=fr_fpsd2*fr_fps1
+         else
+           if(right=false)
+           then rpls_step:=fr_fpsd2*2
+           else rpls_step:=fr_fpsd2*10;
+      end
+      else
+        if(right=false)then
+         case u of
+    0 : _fsttime:=not _fsttime;
+    2 : if(rpls_state<rpl_end)then
+         if(G_Status=gs_running)
+         then G_Status:=gs_replaypause
+         else G_Status:=gs_running;
+    3 : rpls_plcam  :=not rpls_plcam;
+    4 : rpls_showlog:=not rpls_showlog;
+    5 : rpls_fog    :=not rpls_fog;
+8..14 : HPlayer     :=u-8;
+         end;
    end
    else
-     if(rpls_state<rpl_rhead)then
+     if(_players[HPlayer].observer)then
      begin
-        if(G_Status=gs_running)and(right=false)then
-        begin
-           case u of
-   0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
-   1 : m_brush :=co_paction;
-   2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
-
-   3 : m_brush :=co_amove;
-   4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
-   5 : m_brush :=co_apatrol;
-
-   6 : m_brush :=co_move;
-   7 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
-   8 : m_brush :=co_patrol;
-
-   9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
-   10: if(ui_orders_x[MaxUnitGroups]>0)then
-        if(dbl)
-        then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
-        else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
-   11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
-   12: m_brush :=co_mmark;
-   13: m_action:=not m_action;
-           end;
-
-           check_mouse_brush(false);
-        end;
+        if(right=false)then
+          case u of
+          0    :  rpls_fog:=not rpls_fog;
+          2..8 :  UIPlayer:=u-2;
+          end;
      end
      else
-       if(u=1)then
+       if(G_Status=gs_running)and(right=false)then
        begin
-          if(mid)
-          then rpls_step:=fr_fpsd2*fr_fps1
-          else
-            if(right=false)
-            then rpls_step:=fr_fpsd2*2
-            else rpls_step:=fr_fpsd2*10;
-       end
-       else
-         if(right=false)then
           case u of
-     0 : _fsttime:=not _fsttime;
-     2 : if(rpls_state<rpl_end)then
-          if(G_Status=gs_running)
-          then G_Status:=gs_replaypause
-          else G_Status:=gs_running;
-     3 : rpls_plcam  :=not rpls_plcam;
-     4 : rpls_showlog:=not rpls_showlog;
-     5 : rpls_fog    :=not rpls_fog;
- 8..14 : HPlayer     :=u-8;
+  0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
+  1 : m_brush :=co_paction;
+  2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
+
+  3 : m_brush :=co_amove;
+  4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
+  5 : m_brush :=co_apatrol;
+
+  6 : m_brush :=co_move;
+  7 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
+  8 : m_brush :=co_patrol;
+
+  9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
+  10: if(ui_orders_x[MaxUnitGroups]>0)then
+       if(dbl)
+       then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
+       else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
+  11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
+  12: m_brush :=co_mmark;
+  13: m_action:=not m_action;
           end;
 
+          check_mouse_brush(false);
+       end;
       end;
    end;
 end;
@@ -541,67 +547,69 @@ begin
            exit;
         end;
 
-        if(_players[HPlayer].observer)then
+        if(rpls_state>=rpl_rhead)then
         begin
            for ko:=0 to _mhkeys do  // replays
            begin
-              if(_hotkeyO[ko]= 0 )
-              or(_hotkeyO[ko]<>k )then continue;
+              if(_hotkeyR[ko]= 0 )
+              or(_hotkeyR[ko]<>k )then continue;
               _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
               exit;
            end;
         end
         else
-          if(rpls_state<rpl_rhead)then
+          if(_players[HPlayer].observer)then
           begin
-             case ui_tab of
-        0,1,2:for ko:=0 to _mhkeys do
-              begin
-                 if(_hotkey2[ko]<>k2)
-                 or(_hotkey1[ko]= 0 )
-                 or(_hotkey1[ko]<>k )then continue;
-                 _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false,false);
-                 exit;
-              end;
+             for ko:=0 to _mhkeys do  // observer
+             begin
+                if(_hotkeyO[ko]= 0 )
+                or(_hotkeyO[ko]<>k )then continue;
+                _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
+                exit;
              end;
-
-           if(G_Status=gs_running)then
-           begin
-              for ko:=0 to _mhkeys do  // actions   _hotkeyA2
-              begin
-                 if(_hotkeyA2[ko]<>k2)
-                 or(_hotkeyA [ko]= 0 )
-                 or(_hotkeyA [ko]<>k )then continue;
-                 _panel_click(3,ko mod 3,4+(ko div 3),false,false,k_dbl);
-                 exit;
-              end;
-
-              case k of
-           sdlk_0..sdlk_9 :  begin
-                                ko:=_event^.key.keysym.sym-sdlk_0;
-                                if(ko<MaxUnitGroups)then
-                                 if(ks_ctrl>0)
-                                 then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
-                                 else
-                                   if(ks_alt>0)
-                                   then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
-                                   else
-                                     if(k_dbl)and(ui_orders_x[ko]>0)and(ko>0)
-                                     then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
-                                     else _player_s_o(ko,ks_shift,0,0,0,uo_selorder,HPlayer);
-                             end;
-              else
-              end;
-           end;
           end
           else
-            for ko:=0 to _mhkeys do  // replays
-            begin
-               if(_hotkeyR[ko]= 0 )
-               or(_hotkeyR[ko]<>k )then continue;
-               _panel_click(3,ko mod 3,4+(ko div 3),ks_ctrl>0,ks_alt>0,k_dbl);
-               exit;
-            end;
+          begin
+             case ui_tab of
+          0,1,2:for ko:=0 to _mhkeys do
+                begin
+                   if(_hotkey2[ko]<>k2)
+                   or(_hotkey1[ko]= 0 )
+                   or(_hotkey1[ko]<>k )then continue;
+                   _panel_click(ui_tab,ko mod 3,4+(ko div 3),false,false,false);
+                   exit;
+                end;
+             end;
+
+             if(G_Status=gs_running)then
+             begin
+                for ko:=0 to _mhkeys do  // actions   _hotkeyA2
+                begin
+                   if(_hotkeyA2[ko]<>k2)
+                   or(_hotkeyA [ko]= 0 )
+                   or(_hotkeyA [ko]<>k )then continue;
+                   _panel_click(3,ko mod 3,4+(ko div 3),false,false,k_dbl);
+                   exit;
+                end;
+
+                case k of
+             sdlk_0..sdlk_9 :  begin
+                                  ko:=_event^.key.keysym.sym-sdlk_0;
+                                  if(ko<MaxUnitGroups)then
+                                   if(ks_ctrl>0)
+                                   then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
+                                   else
+                                     if(ks_alt>0)
+                                     then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
+                                     else
+                                       if(k_dbl)and(ui_orders_x[ko]>0)and(ko>0)
+                                       then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
+                                       else _player_s_o(ko,ks_shift,0,0,0,uo_selorder,HPlayer);
+                               end;
+                else
+                end;
+             end;
+          end;
       end;
 end;
 
@@ -751,8 +759,9 @@ begin
    case m_brush of
 co_empty   : begin
              ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-             if(_players[HPlayer].observer)and(ks_mleft=1)then
-              if(d_UpdateUIPlayer(ui_uhint))then exit;
+             if(ui_uhint>0)then
+              if(_players[HPlayer].observer)and(ks_mleft=1)then
+               if(d_UpdateUIPlayer(ui_uhint))then exit;
              end;
 co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
 co_amove   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);

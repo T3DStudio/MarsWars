@@ -310,10 +310,8 @@ begin
        if(menu_s2<>ms2_camp)
        then GameStartSkirmish
        else ;//_CMPMap;
-       vid_blink_timer1:=2;
+       vid_blink_timer1:=1;
        UIPlayer:=HPlayer;
-       map_RedrawMenuMinimap;
-       d_Panel(r_uipanel,UIPlayer);
     end;
 end;
 
