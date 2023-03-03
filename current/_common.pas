@@ -878,9 +878,14 @@ begin
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
       if(_attack  =atm_none)then exit;
-      if(uo_id=ua_paction  )
-      or(uo_id=ua_hold     )
-      or(uo_bx>0           )then exit;
+      if(not ServerSide    )then
+      begin
+         if(uo_id=ua_hold)then exit;
+      end
+      else
+        if(uo_id=ua_paction  )
+        or(uo_id=ua_hold     )
+        or(uo_bx>0           )then exit;
 
       if(_IsUnitRange(uo_tar,@tu))then
       begin

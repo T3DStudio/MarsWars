@@ -1292,10 +1292,9 @@ SvRpLen                = 15;
 //
 
 MFogM                  = 64;
-fog_cw                 = 32;
+fog_cw                 = 25;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
-//fog_cxr                = fog_cr-fog_chw;
 fog_vfwm               = (vid_maxw div fog_cw)+2;
 fog_vfhm               = (vid_maxh div fog_cw)+2;
 

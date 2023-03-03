@@ -177,7 +177,7 @@ begin
      end;
    ui_orders_n[i]+=1;
    with _uids[uidi] do
-   ui_orders_uids[i,_ukbuilding]:=ui_orders_uids[i,_ukbuilding]+[uidi];
+   ui_orders_uids[i,_ukbuilding]+=[uidi];
 end;
 
 procedure ui_counters(pu:PTUnit);

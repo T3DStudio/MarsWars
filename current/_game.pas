@@ -285,6 +285,7 @@ begin
         ai_PlayerSetSkirmishSettings(p);
         if(team>0)then
          GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
+
      end;
 
    {$IFDEF _FULLGAME}

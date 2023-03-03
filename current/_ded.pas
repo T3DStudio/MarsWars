@@ -177,7 +177,7 @@ false: if(PlayersReadyStatus)then
 true : if(PlayerAllOut)then
        begin
           G_Started:=false;
-          PlayersSetDefault;
+          GameDefaultAll;
        end;
    end;
 end;

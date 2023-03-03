@@ -191,10 +191,12 @@ begin
       if(wudtick^>G_Step)
       then wb:=true
       else
-        if((G_Step-wudtick^)>=fr_fps1)
+        if((G_Step-wudtick^)>=fr_fpsd2)
         then wb:=true;
 
       b:=group and %00001111;
+      if(UnitF2Select(pu))
+      then b:=b or %01000000;
 
       if(wb)then b:=b or %10000000;
 
@@ -930,6 +932,10 @@ begin
       group:=b and %00001111;
 
       if((b and %10000000)=0)then exit;
+
+      if((b and %01000000)=0)
+      then uo_id:=ua_hold
+      else uo_id:=ua_amove;
 
       if(bld)then
        if(_ability in client_rld_abils)
