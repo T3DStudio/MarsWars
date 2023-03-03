@@ -1334,6 +1334,7 @@ chunks:integer;
  st,sl:byte;
 procedure _add(s:shortstring;t:byte;c:cardinal);
 begin
+   if(ui_log_n>=listheight)then exit;
    ui_log_n+=1;
    SetLength(ui_log_s,ui_log_n);
    SetLength(ui_log_t,ui_log_n);

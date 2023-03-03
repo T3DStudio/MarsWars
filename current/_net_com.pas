@@ -170,7 +170,9 @@ begin
    while (net_bufpos<=MaxNetBuffer)and(x<=sl) do
    begin
       net_writechar(s[x]);
-      x+=1;
+      if(x=255)
+      then break
+      else x+=1;
    end;
 end;
 

@@ -1238,7 +1238,7 @@ chat_type              : array[false..true] of char = ('|',' ');
 chat_shlm_t            = fr_fps1*3;
 chat_shlm_max          = chat_shlm_t*6;
 
-ui_menu_chat_height    = 13; // lines
+ui_menu_chat_height    = 17; // lines
 ui_menu_chat_width     = 37; // chars
 
 ui_dBW                 = vid_BW-font_w-3;
