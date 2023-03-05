@@ -308,7 +308,7 @@ begin
      end;
 end;
 
-{function b2bs(b:byte):shortstring;
+function b2bs(b:byte):shortstring;
 begin
    b2bs:='00000000';
    if((b and %10000000)>0)then b2bs[1]:='1';
@@ -319,7 +319,7 @@ begin
    if((b and %00000100)>0)then b2bs[6]:='1';
    if((b and %00000010)>0)then b2bs[7]:='1';
    if((b and %00000001)>0)then b2bs[8]:='1';
-end;   }
+end;
 
 procedure _wclinet_cpoint(cpi:byte;rpl:boolean);
 var    b: byte;
@@ -412,7 +412,8 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
       _N_U:=@_players[POVPlayer].n_u;
    end;
 
-   PlayersStatus(@g_player_status,@g_cl_units);
+   if(not rpl)
+   then PlayersStatus(@g_player_status,@g_cl_units);
 
    POVPlayerObserver:=_players[POVPlayer].observer;
    if(g_player_status>0)and(POVPlayerObserver)then SetBBit(@g_player_status,7,true);
@@ -444,6 +445,7 @@ end;
 procedure _ucInc(pu:PTUnit);
 var i,_puid:byte;
     p:pinteger;
+ptransport:PTUnit;
 begin
    with pu^ do
    with uid^ do
@@ -456,9 +458,10 @@ begin
       ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
 
-      if(_IsUnitRange(transport,nil))then _units[transport].apcc+=_apcs;
+      ptransport:=nil;
+      if(_IsUnitRange(transport,@ptransport))then ptransport^.apcc+=_apcs;
 
-      if(hits>0)and(transport<=0)then
+      if(hits>0)and(ptransport=nil)then
       begin
          if(sel)then _unit_counters_inc_select(pu);
          if(bld=false)
@@ -478,8 +481,6 @@ begin
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
                   if(_units[p^].uidi<>uidi)then p^:=unum;
-
-            _unit_done_inc_cntrs(pu);
 
             if(_isbarrack)then
              for i:=0 to MaxUnitLevel do
@@ -510,6 +511,7 @@ end;
 
 procedure _ucDec(pu:PTUnit);
 var i,_puid:byte;
+ptransport:PTUnit;
 begin
    with pu^ do
    with uid^ do
@@ -522,9 +524,10 @@ begin
       ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
 
-      if(_IsUnitRange(transport,nil))then dec(_units[transport].apcc,_apcs);
+      ptransport:=nil;
+      if(_IsUnitRange(transport,@ptransport))then ptransport^.apcc-=_apcs;
 
-      if(hits>0)and(transport=0)then
+      if(hits>0)and(ptransport=nil)then
       begin
          if(sel)then _unit_counters_dec_select(pu);
          if(bld=false)
@@ -607,7 +610,7 @@ begin
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
-        _unit_default(uu);
+        _unit_default(uu,true);
         _unit_reveal(uu,true);
 
         if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
@@ -849,7 +852,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 
-procedure _rudata_bstat(uu:PTUnit;rpl:boolean);
+procedure _rudata_bstat(uu:PTUnit;POVPlayer:byte;rpl:boolean);
 var _bts1,
     _bts2:byte;
 begin
@@ -881,7 +884,7 @@ begin
          buff[ub_HVision ]:=_buffst[GetBBit(@_bts2,4)];
          buff[ub_Cast    ]:=_buffst[GetBBit(@_bts2,5)];
          buff[ub_Scaned  ]:=_buffst[GetBBit(@_bts2,6)];
-         buff[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7 )];
+         buff[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7)];
       end
       else
       begin
@@ -895,7 +898,9 @@ begin
          buff[ub_Decay   ]:=0;
       end;
 
-      //if(rpl=false)then _AddToInt(@vsnt[_players[HPlayer].team],vistime);
+      with _players[POVPlayer] do
+       if(team>0)then
+        if(rpl=false)then _AddToInt(@vsnt[team],vistime);
    end;
 end;
 
@@ -981,11 +986,11 @@ begin
          if(i<>uidi)then
          begin
             _unit_apUID(uu);
-            _unit_default(uu);
+            _unit_default(uu,false);
             FillChar(buff,SizeOf(buff),0);
          end;
          hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
-         _rudata_bstat(uu,rpl);
+         _rudata_bstat(uu,POVPlayer,rpl);
 
          if(transport>0)then
          begin
@@ -1080,6 +1085,7 @@ begin
       begin
          if(cpCaptureR>0)then
          begin
+            CPoint_ChangeOwner(cpi,0);
             cpCaptureR:=-cpCaptureR;
             _CPExplode(cpx,cpy);
          end;

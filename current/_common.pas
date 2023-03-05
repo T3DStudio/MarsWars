@@ -380,7 +380,12 @@ var bt:byte;
 begin
    if(pl>MaxPlayers)or(condt=0)then exit;
 
-   if(_players[pl].state=ps_comp)then exit;
+   with _players[pl] do
+   begin
+      if(state=ps_comp)then exit;
+
+      if(a_units[uid]<=0)then exit;
+   end;
 
    if(cf(@condt,@ureq_place))
    then bt:=lmt_cant_build
@@ -540,8 +545,8 @@ end;
 procedure PlayersStatus(pstatus:pbyte;punits:pinteger);
 var p:byte;
 begin
-   if(pstatus  <>nil)then pstatus^  :=0;
-   if(punits   <>nil)then punits^   :=0;
+   pstatus^:=0;
+   punits^ :=0;
    for p:=0 to MaxPlayers do
     with _players[p] do
     begin

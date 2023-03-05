@@ -1590,14 +1590,6 @@ begin
             ai_towers_need_type:=0;
          end
          else
-         {if(ai_generator_d<srange)then
-         begin
-            ai_towers_need     :=3;
-            ai_towers_needx    :=ai_generator_cp^.cpx;
-            ai_towers_needy    :=ai_generator_cp^.cpy;
-            ai_towers_need_type:=0;
-         end
-         else}
          if(ai_cpoint_d<srange)then
          begin
             ai_towers_need     :=3;

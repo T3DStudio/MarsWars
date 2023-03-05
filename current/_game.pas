@@ -241,6 +241,9 @@ begin
          d+=ds;
       end;
    end;
+   _unit_add(x,y,0,UID_UTransport,pl,true,false,0);
+   for i:=0 to 6 do _unit_add(x,y,0,UID_Sergant   ,pl,true,false,0);
+   // добавить транспорт и мариков и проверить в мультиплеере
 end;
 
 procedure GameStartSkirmish;
@@ -544,13 +547,14 @@ begin
            if(build_cd>0)then build_cd-=1;
 
            PlayerExecuteOrder(p);
-           PlayerAPMUpdate(p);
 
            if(prod_error_cndt>0)then
             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
            prod_error_cndt  :=0;
         end;
      end;
+
+   for p:=0 to MaxPlayers do PlayerAPMUpdate(p);
 end;
 
 {$include _net_game.pas}

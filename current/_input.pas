@@ -242,15 +242,6 @@ begin
    end;
 end;
 
-{
-{$IFDEF _FULLGAME}
-if((HPlayer=0)and(rpls_state>=rpl_rhead))
-or((UIPlayer=0)and(_players[HPlayer].observer))
-then CheckUnitTeamVision:=true
-else
-{$ENDIF}
-}
-
 function _whoInPoint(tx,ty:integer;tt:byte):integer;
 var i,sc:integer;
   tteam :byte;

@@ -825,19 +825,23 @@ begin
       end;
 end;
 
-procedure _unit_default(pu:PTUnit);
+procedure _unit_default(pu:PTUnit;Client:boolean);
 begin
    with pu^ do
    begin
-      transport:= 0;
+      if(not Client)then
+      begin
+         transport:= 0;
+         a_tar    := 0;
+         a_weap   := 0;
+      end;
+
       uo_id    := ua_amove;
       uo_tar   := 0;
       rld      := 0;
       pains    := 0;
       dir      := 270;
       group    := 0;
-      a_tar    := 0;
-      a_weap   := 0;
       a_rld    := 0;
       a_shots  := 0;
       a_weap_cl:= 0;
@@ -1028,7 +1032,7 @@ begin
             then ulevel:=MaxUnitLevel;
             level:=ulevel;
 
-            _unit_default  (_LastCreatedUnitP);
+            _unit_default  (_LastCreatedUnitP,false);
             _unit_apUID    (_LastCreatedUnitP);
             _unit_inc_cntrs(_LastCreatedUnitP,ubld,summoned);
 

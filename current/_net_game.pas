@@ -315,8 +315,8 @@ begin
    if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;              end;
-   if(_rmBool(@g_cgenerators    ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_deadobservers  ))then begin redraw_menu:=true;              end;
+   if(_rmByte(@g_cgenerators    ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmBool(@g_deadobservers  ))then begin redraw_menu:=true;              end;
 
    if(new_map    )then Map_premap;
    if(redraw_menu)then vid_menu_redraw:=true;
@@ -378,6 +378,7 @@ nmid_lobby_info  : begin
                           if(gst)
                           then race:= net_readbyte
                           else race:= mrace;
+                          PlayerSetSkirmishTech(i);
                        end;
 
                       HPlayer    :=net_readbyte;

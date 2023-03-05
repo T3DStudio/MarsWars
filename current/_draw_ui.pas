@@ -325,6 +325,8 @@ begin
        then d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,PlayerGetColor(g_status))
        else d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,c_white                 );
 
+      if(1<ks_ctrl)and(ks_ctrl<10)then writeln(upproda,' ',upprodm);
+
       case ui_tab of
       0: // buildings
       for ucl:=0 to ui_ubtns do
@@ -382,6 +384,7 @@ begin
          end;
       end;
 
+
       2: // upgrades
       for ucl:=0 to ui_ubtns do
       begin
@@ -392,7 +395,8 @@ begin
          ux:=(ucl mod 3);
          uy:=(ucl div 3);
 
-         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_pprod_time[uid]>0, (_upid_conditionals(PVisPlayer,uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]));
+         _drawBtn(tar,ux,uy,_upids[uid]._up_btn.surf,ui_pprod_time[uid]>0,
+         (_upid_conditionals(PVisPlayer,uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]) );
 
          _drawBtnt(tar,ux,uy,
          ir2s(ui_pprod_time[uid]),i2s(upprodu[uid]),'',b2s(   upgr[uid])                            ,'',
@@ -644,7 +648,7 @@ gm_koth    : with g_cpoints[1] do
                 else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
-   if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                       ,ta_left,255,c_white);
+   if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                ,ta_left,255,c_white);
    if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')',ta_left,255,c_white);
 
    d_OrderIcons(tar);

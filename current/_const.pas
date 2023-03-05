@@ -844,7 +844,7 @@ base_6r                = base_r*6;
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1*2;
 order_period           = fr_fpsd2+1;
-vistime                = order_period+2;
+vistime                = fr_fps1;
 
 radar_reload           = fr_fps1*60;
 radar_vision_time      = radar_reload-(fr_fps1*8);
