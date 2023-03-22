@@ -18,6 +18,7 @@ fr_RateTicks           = 1000/fr_fps1;
 fr_fpsd2               = fr_fps1 div 2;
 fr_fpsd3               = fr_fps1 div 3;
 fr_fpsd4               = fr_fps1 div 4;
+fr_fpsd5               = fr_fps1 div 5;
 fr_fpsd6               = fr_fps1 div 6;
 fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
@@ -60,6 +61,7 @@ gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gm_cnt                 = 6;
 
+g_step_koth_pause      = fr_fps60*4;
 
 gs_running             = 0;  //
 {gs_paused1            = 1; 1..MaxPlayers
@@ -494,7 +496,11 @@ DID_Other              = 7;
 
 dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
-DID_R                  : array[0..7] of integer = (0,255,185,125,64,105,60,17);
+MaxDIDs                = 7;
+
+DID_R                  : array[0..MaxDIDs] of integer = (0,255,185,125,64,105,60,17);
+
+//pi*_r*_r
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -658,6 +664,7 @@ BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
+BaseDamage5            = BaseDamage1*5;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
@@ -669,9 +676,9 @@ BaseArmorBonush        = BaseArmorBonus1 div 2;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonush;
 
-BaseHeal1              = BaseDamageh;
+BaseHeal1              = (BaseDamage1 div 4)*3;
 BaseHealBonus1         = BaseDamageBonus1*2;
-BaseRepair1            = BaseDamageh;
+BaseRepair1            = (BaseDamage1 div 4)*3;
 BaseRepairBonus1       = BaseDamageBonus1*3;
 
 ExpLevel1              = fr_fps1*45;
@@ -783,7 +790,8 @@ uids_all               = [0..255];
 T2                     = [UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_ZBFGMarine,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron];
 T3                     = [UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
-uid_race_start_base    : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter);
+uid_race_start_fbase   : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter );
+uid_race_start_abase   : array[1..r_cnt] of integer = (UID_HAKeep   ,UID_UACommandCenter);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -833,13 +841,13 @@ ndead_hits             = dead_hits-1;
 
 fdead_hits_border      = -130;
 
-base_r                 = 350;
-base_rh                = base_r div 2;
-base_ir                = base_r+(base_r div 2);
-base_rr                = base_r*2;
-base_3r                = base_r*3;
-base_4r                = base_r*4;
-base_6r                = base_r*6;
+base_1r                = 350;
+base_hr                = base_1r div 2;
+base_1rh               = base_1r+(base_1r div 2);
+base_2r                = base_1r*2;
+base_3r                = base_1r*3;
+base_4r                = base_1r*4;
+base_6r                = base_1r*6;
 
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1*2;
@@ -862,7 +870,8 @@ mine_r                 = melee_r*3;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-invuln_time            = fr_fps1*30;
+invuln_time            = fr_fps1*60;
+invuln_time_limit      = fr_fps1*4;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;
@@ -979,6 +988,7 @@ char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
 
+vid_maxplcolors        = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

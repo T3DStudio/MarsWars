@@ -4,7 +4,7 @@ function InitVideo:boolean;
 begin
    InitVideo:=false;
 
-   if SDL_Init(SDL_INIT_VIDEO)<>0 then begin WriteSDLError; exit; end;
+   if(SDL_Init(SDL_INIT_VIDEO)<>0)then begin WriteSDLError; exit; end;
 
    NEW(r_RECT);
 
@@ -19,7 +19,7 @@ begin
    _MakeScreen;
    _LoadingScreen;
    _LoadGraphics(true);
-   _cmp_initmap;
+   _cmp_Init;
 
    InitVideo:=true;
 end;
@@ -64,7 +64,7 @@ begin
    StartParams;
    randomize;
 
-   ObjTbl;
+   GameObjectsInit;
 
    {$IFDEF _FULLGAME}
 
@@ -78,10 +78,10 @@ begin
    if not(InitSound)then exit;
 
    InitRX2Y;
-   initMissiles;
-   swLNG;
+   InitMissiles;
+   SwitchLanguage;
    InitUIDDataCL;
-   _icons;
+   MakeUnitIcons;
 
    {$ENDIF}
 

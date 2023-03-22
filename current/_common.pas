@@ -255,7 +255,7 @@ begin
                  and(yi=y)
                  then exit
                  else
-                   if(point_dist_rint(xi,yi,x,y)<base_ir)then exit;
+                   if(point_dist_rint(xi,yi,x,y)<base_1rh)then exit;
       end;
    end;
    PlayerLogCheckNearEvent:=false;
@@ -1103,16 +1103,23 @@ begin
    if(player<=MaxPlayers)then
     case vid_plcolors of
    1,
-   2: if(player=UIPlayer)then
-        if(vid_plcolors=1)
-        then PlayerGetColor:=c_lime
-        else PlayerGetColor:=c_white
+   2,
+   3: if(player=UIPlayer)then
+         case vid_plcolors of
+         1: PlayerGetColor:=c_lime;
+         2,
+         3: PlayerGetColor:=c_white;
+         end
       else
-        if(PlayerGetTeam(g_mode,UIPlayer)=PlayerGetTeam(g_mode,player))
-        then PlayerGetColor:=c_yellow
+        if(PlayerGetTeam(g_mode,UIPlayer)=PlayerGetTeam(g_mode,player))then
+          case vid_plcolors of
+          1,
+          2: PlayerGetColor:=c_yellow;
+          3: PlayerGetColor:=c_aqua;
+          end
         else PlayerGetColor:=c_red;
-   3: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
-   4: if(player=UIPlayer)
+   4: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
+   5: if(player=UIPlayer)
       then PlayerGetColor:=c_white
       else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
     else PlayerGetColor:=PlayerColor[player];
@@ -1130,7 +1137,7 @@ begin
      else GetCPColor:=PlayerGetColor(cpOwnerPlayer     );
 end;
 
-function GameGetStatus(pstr:pshortstring;pcol:pcardinal):boolean;
+function GameGetStatus(pstr:pshortstring;pcol:pcardinal;VisPlayer:byte):boolean;
 var t:byte;
 begin
    GameGetStatus:=false;
@@ -1159,11 +1166,12 @@ gs_replaypause: begin
                    pcol^:=c_white;
                 end;
       else
+       if(VisPlayer>0)then
         if(G_status>=gs_win_team0)then
         begin
            t:=G_status-gs_win_team0;
            if(t<=MaxPlayers)then
-            if(t=_players[HPlayer].team)then
+            if(t=_players[VisPlayer].team)then
             begin
                pstr^:=str_win;
                pcol^:=c_lime;

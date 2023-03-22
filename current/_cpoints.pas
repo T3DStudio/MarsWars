@@ -72,7 +72,8 @@ begin
           cpUnitsTeam  [p]:=0;
        end;
 
-       if(iTeams=0)and(cpenergy>0)then
+       if((iTeams=0)and(cpenergy>0))
+       or((i=1)and(g_mode=gm_koth)and(g_step<g_step_koth_pause))then
        begin
           iTeams:=1;
           iOwnerPlayer:=0;

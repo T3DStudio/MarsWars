@@ -109,9 +109,9 @@ begin
       if(net_pnui    >_cl_pnun)then net_pnui    :=_cl_pnun;
       if(vid_ppos    >3       )then vid_ppos    :=0;
       if(vid_uhbars  >2       )then vid_uhbars  :=0;
-      if(vid_plcolors>4       )then vid_plcolors:=0;
+      if(vid_plcolors>vid_maxplcolors)then vid_plcolors:=0;
    end;
-   swLNG;
+   SwitchLanguage;
    m_vrx:=vid_vw;
    m_vry:=vid_vh;
    net_cl_saddr;

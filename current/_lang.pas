@@ -210,7 +210,14 @@ begin
    end;
 end;
 
+function _req2s(basename:shortstring;reqn:byte):shortstring;
+begin
+   _req2s:=basename;
+   if(reqn>1)then _req2s+='(x'+b2s(reqn)+')';
+end;
+
 function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
+var REQ:shortstring;
 begin
    _MakeDefaultDescription:=basedesc;
     with _uids[uid] do
@@ -218,11 +225,18 @@ begin
        if(_isbuilder    )then _ADDSTRD(@_MakeDefaultDescription,str_Builder);
        if(_isbarrack    )then _ADDSTRD(@_MakeDefaultDescription,str_Barrack);
        if(_issmith      )then _ADDSTRD(@_MakeDefaultDescription,str_Smith  );
-       if(_genergy    >0)then _ADDSTRD(@_MakeDefaultDescription,str_IncEnergyLevel+' (+'+i2s(_genergy)+')');
+       if(_genergy    >0)then _ADDSTRD(@_MakeDefaultDescription,str_IncEnergyLevel+' ('+tc_aqua+'+'+i2s(_genergy)+tc_default+')');
        if(_rebuild_uid>0)then
-        if(_rebuild_level=0)
-        then _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+_uids[_rebuild_uid].un_txt_name)
-        else _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+_uids[_rebuild_uid].un_txt_name+'('+str_attr_level+b2s(_rebuild_level+1)+')');
+       begin
+          if(_rebuild_level=0)
+          then _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+'"'+_uids[_rebuild_uid].un_txt_name+'"')
+          else _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+'"'+_uids[_rebuild_uid].un_txt_name+'['+str_attr_level+b2s(_rebuild_level+1)+']"');
+
+          REQ:='';
+          if(_rebuild_ruid >0)then _ADDSTRC(@REQ,'"'+_req2s(_uids [_rebuild_ruid ].un_txt_name,1              )+'"' );
+          if(_rebuild_rupgr>0)then _ADDSTRC(@REQ,'"'+_req2s(_upids[_rebuild_rupgr]._up_name   ,_rebuild_rupgrl)+'"' );
+          if(length(REQ)>0)then _MakeDefaultDescription+='{'+tc_yellow+str_req+tc_default+REQ+'}';
+       end;
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
@@ -233,7 +247,6 @@ var HK,
     ENRG,
     TIME,
     INFO:shortstring;
-   l:byte;
 begin
   with _upids[upid] do
   begin
@@ -285,6 +298,7 @@ begin
       begin
          un_txt_uihint1:=un_txt_name+tc_nl1+un_txt_fdescr+tc_nl1;
          un_txt_uihint2:='';
+         un_txt_uihint3:='';
       end
       else
       begin
@@ -294,10 +308,10 @@ begin
          LMT:=tc_orange+l2s(_limituse)+tc_default;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then if(_ruid1n<=1)then _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid1].un_txt_name+'(x'+b2s(_ruid1n)+')');
-         if(_ruid2>0)then if(_ruid2n<=1)then _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid2].un_txt_name+'(x'+b2s(_ruid2n)+')');
-         if(_ruid3>0)then if(_ruid3n<=1)then _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name) else _ADDSTRC(@REQ,_uids [_ruid3].un_txt_name+'(x'+b2s(_ruid3n)+')');
-         if(_rupgr>0)then if(_rupgrl<=1)then _ADDSTRC(@REQ,_upids[_rupgr]._up_name   ) else _ADDSTRC(@REQ,_upids[_rupgr]._up_name   +'(x'+b2s(_rupgrl)+')');
+         if(_ruid1>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n));
+         if(_ruid2>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n));
+         if(_ruid3>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n));
+         if(_rupgr>0)then _ADDSTRC(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl));
 
          if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
          if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
@@ -307,7 +321,9 @@ begin
          un_txt_fdescr:=_MakeDefaultDescription(uid,un_txt_udescr);
 
          un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid)+tc_nl1+un_txt_fdescr;
+         un_txt_uihint3:=un_txt_name+tc_nl1+_makeAttributeStr(nil,uid);
          un_txt_uihint2:='';
+
          if(length(REQ )>0)then un_txt_uihint2+=tc_yellow+str_req+tc_default+REQ+tc_nl1 else un_txt_uihint2+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
@@ -397,7 +413,7 @@ begin
    str_goptions          := 'GAME OPTIONS';
    str_server            := 'SERVER';
    str_client            := 'CLIENT';
-   str_chat              := 'CHAT';
+   str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
    str_randoms           := 'Random skirmish';
@@ -413,6 +429,7 @@ begin
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
    str_ColoredShadow     := 'Colored shadows';
    str_kothtime          := 'Center capture time: ';
+   str_kothwinner        := ' is King of the Hill!';
    str_deadobservers     := 'Observer mode after lose:';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
@@ -473,8 +490,9 @@ begin
    str_pcolors[0]        := tc_white +'default'+tc_default;
    str_pcolors[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
    str_pcolors[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_pcolors[3]        := tc_purple+'teams'  +tc_default;
-   str_pcolors[4]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
+   str_pcolors[3]        := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_pcolors[4]        := tc_purple+'teams'  +tc_default;
+   str_pcolors[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
    str_starta            := 'Builders at game start:';
 
@@ -551,6 +569,7 @@ begin
    str_hint_energy       := 'Energy: ';
 
    str_hint_m[0]         := 'Menu (' +tc_lime+'Esc'+tc_default+')';
+   str_hint_m[1]         := '';
    str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
 
@@ -572,29 +591,29 @@ begin
    _mkHStrUid(UID_HBarracks      ,'Hell Barracks'               ,'Corrupted UAC Barracks'         );
    _mkHStrUid(UID_HEye           ,'Hell Eye'                    ,'Passive scouting and detection' );
 
-   _mkHStrUid(UID_LostSoul       ,'Lost Soul'                 ,'');
-   _mkHStrUid(UID_Phantom        ,'Phantom'                   ,'');
-   _mkHStrUid(UID_Imp            ,'Imp'                       ,'');
-   _mkHStrUid(UID_Demon          ,'Pinky Demon'               ,'');
-   _mkHStrUid(UID_Cacodemon      ,'Cacodemon'                 ,'');
-   _mkHStrUid(UID_Knight         ,'Hell Knight'               ,'');
-   _mkHStrUid(UID_Baron          ,'Baron of Hell'             ,'');
-   _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'                ,'');
-   _mkHStrUid(UID_Mastermind     ,'Mastermind'                ,'');
-   _mkHStrUid(UID_Pain           ,'Pain Elemental'            ,'');
-   _mkHStrUid(UID_Revenant       ,'Revenant'                  ,'');
-   _mkHStrUid(UID_Mancubus       ,'Mancubus'                  ,'');
-   _mkHStrUid(UID_Arachnotron    ,'Arachnotron'               ,'');
-   _mkHStrUid(UID_Archvile       ,'ArchVile'                  ,'');
-   _mkHStrUid(UID_ZFormer        ,'Former Zombie'             ,'');
-   _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer'           ,'');
-   _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner'          ,'');
-   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner'     ,'');
-   _mkHStrUid(UID_ZCommando      ,'Zombie Commando'           ,'');
-   _mkHStrUid(UID_ZAntiaircrafter,'Zombie Antiaircrafter'     ,'');
-   _mkHStrUid(UID_ZSiegeMarine   ,'Zombie Siege Marine'       ,'');
-   _mkHStrUid(UID_ZFPlasmagunner ,'Zombie Plasmaguner'        ,'');
-   _mkHStrUid(UID_ZBFGMarine     ,'Zombie BFG Marine'         ,'');
+   _mkHStrUid(UID_LostSoul       ,'Lost Soul'                   ,'');
+   _mkHStrUid(UID_Phantom        ,'Phantom'                     ,'');
+   _mkHStrUid(UID_Imp            ,'Imp'                         ,'');
+   _mkHStrUid(UID_Demon          ,'Pinky Demon'                 ,'');
+   _mkHStrUid(UID_Cacodemon      ,'Cacodemon'                   ,'');
+   _mkHStrUid(UID_Knight         ,'Hell Knight'                 ,'');
+   _mkHStrUid(UID_Baron          ,'Baron of Hell'               ,'');
+   _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'                  ,'');
+   _mkHStrUid(UID_Mastermind     ,'Mastermind'                  ,'');
+   _mkHStrUid(UID_Pain           ,'Pain Elemental'              ,'');
+   _mkHStrUid(UID_Revenant       ,'Revenant'                    ,'');
+   _mkHStrUid(UID_Mancubus       ,'Mancubus'                    ,'');
+   _mkHStrUid(UID_Arachnotron    ,'Arachnotron'                 ,'');
+   _mkHStrUid(UID_Archvile       ,'ArchVile'                    ,'');
+   _mkHStrUid(UID_ZFormer        ,'Former Zombie'               ,'');
+   _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer'             ,'');
+   _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner'            ,'');
+   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner'       ,'');
+   _mkHStrUid(UID_ZCommando      ,'Zombie Commando'             ,'');
+   _mkHStrUid(UID_ZAntiaircrafter,'Zombie Antiaircrafter'       ,'');
+   _mkHStrUid(UID_ZSiegeMarine   ,'Zombie Siege Marine'         ,'');
+   _mkHStrUid(UID_ZFPlasmagunner ,'Zombie Plasmaguner'          ,'');
+   _mkHStrUid(UID_ZBFGMarine     ,'Zombie BFG Marine'           ,'');
 
 
    _mkHStrUpid(upgr_hell_t1attack  ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures.');
@@ -906,7 +925,7 @@ begin
   str_goptions          := 'ПАРАМЕТРЫ ИГРЫ';
   str_server            := 'СЕРВЕР';
   str_client            := 'КЛИЕНТ';
-  str_chat              := 'ЧАТ';
+  str_menu_chat         := 'ЧАТ(ВСЕ ИГРОКИ)';
   str_chat_all          := 'ВСЕ:';
   str_chat_allies       := 'СОЮЗНИКИ:';
   str_randoms           := 'Случайная схватка';
@@ -922,6 +941,7 @@ begin
   str_bprod             := tc_lime+'Строит: '     +tc_default;
   str_ColoredShadow     := 'Цветные тени';
   str_kothtime          := 'Время захвата центра: ';
+  str_kothwinner        := ' - Царь Горы!';
   str_deadobservers     := 'Наблюдатель после поражения:';
   str_FPS               := 'Показать FPS';
   str_APM               := 'Показать APM';
@@ -1034,18 +1054,22 @@ begin
   str_hint_energy       := 'Энергия: ';
 
   _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,''             );
+  _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,''             );
   _mkHStrUid(UID_HGate           ,'Адские Врата'               ,''             );
   _mkHStrUid(UID_HSymbol         ,'Адский Символ'              ,''             );
+  _mkHStrUid(UID_HASymbol        ,'Великий Адский Символ'      ,''             );
   _mkHStrUid(UID_HPools          ,'Адские Омуты'               ,''             );
   _mkHStrUid(UID_HTower          ,'Адская Башня'               ,'Защитное сооружение. Может атаковать наземных и воздушных юнитов'  );
   _mkHStrUid(UID_HTeleport       ,'Адский Телепорт'            ,'Телепортирует юнитов'                                              );
   _mkHStrUid(UID_HMonastery      ,'Адский Монастырь'           ,'Открывает доступ к T2 технологиям для юнитов'                      );
   _mkHStrUid(UID_HTotem          ,'Адский Тотем'               ,'Продвинутое защитное сооружение.  Может атаковать наземных и воздушных юнитов. Не может атаковать здания'      );
   _mkHStrUid(UID_HAltar          ,'Адский Алтарь'              ,'Может накладывать "неуязвимость" на юнитов'     );
+  _mkHStrUid(UID_HPentagram      ,'Адская Пентаграмма'         ,'Открывает доступ к мощным T2 юнитам');
   _mkHStrUid(UID_HFortress       ,'Адский Замок'               ,'Открывает доступ к T2 технологиям для зданий'   );
   _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,'');
   _mkHStrUid(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
   _mkHStrUid(UID_HBarracks       ,'Проклятые Казармы'          ,'');
+  _mkHStrUid(UID_HEye            ,'Адский Глаз'                ,'Пассивная разведка и детекция');
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'            ,'');
@@ -1146,7 +1170,7 @@ begin
 end;
 
 
-procedure swLNG;
+procedure SwitchLanguage;
 begin
   if(ui_language)
   then lng_rus

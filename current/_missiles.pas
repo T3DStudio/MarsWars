@@ -1,6 +1,6 @@
 {$IFDEF _FULLGAME}
 
-procedure initMissiles;
+procedure InitMissiles;
 var m:byte;
 begin
    FillChar(_mid_effs,SizeOf(_mid_effs),0);
@@ -212,7 +212,7 @@ MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=0  ;   
 MID_BPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_BFG        : begin damage:=BaseDamage4  ; vstep:=d div 12; splashr :=100;         end;
 MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 20; splashr :=0  ;         end;
-MID_HRocket    : begin damage:=BaseDamage4  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
+MID_HRocket    : begin damage:=BaseDamage5  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=tank_sr;     end;
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
@@ -375,9 +375,9 @@ begin
             end;
 
         case mid of
-            MID_Chaingun2,
             MID_BPlasma,
-            MID_Chaingun    : painX:=2;
+            MID_Chaingun,
+            MID_Chaingun2   : painX:=2;
             MID_SSShot      : painX:=3;
         end;
         if(player<=MaxPlayers)then
@@ -386,10 +386,10 @@ begin
           MID_Chaingun2,
           MID_Chaingun,
           MID_SSShot,
-          MID_SShot    : painX+=upgr[upgr_uac_painn];
+          MID_SShot         : painX+=upgr[upgr_uac_painn];
           end;
 
-        if(ud<=0)and(ntars=0)then // direct and first target
+        if(ud<=0)and(ntars=0)then // first direct target
         begin
            {$IFDEF _FULLGAME}
            ms_eid_bio_death:=(not tu^.uid^._ukmech)or(tu^.uidi in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron]);

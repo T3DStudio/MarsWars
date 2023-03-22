@@ -575,8 +575,8 @@ begin
    else
      if(_IsUnitRange(ui_uhint,@tu))then
      begin
-        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint1 ,ta_left,ui_ingamecl,c_white);
-        _draw_text(tar,ui_textx,ui_hinty2,'('+tu^.player^.name+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
+        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint3 ,ta_left,ui_ingamecl,c_white);
+        _draw_text(tar,ui_textx,ui_hinty2,tc_white+'('+tc_default+tu^.player^.name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
      end;
 end;
 
@@ -623,7 +623,7 @@ begin
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END
-   if(GameGetStatus(@str,@col))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
+   if(GameGetStatus(@str,@col,VisPlayer))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
    if(VisPlayer<>HPlayer)then
     if(VisPlayer>0)
@@ -640,16 +640,19 @@ gm_invasion: begin
                 if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+l2s(_players[0].armylimit),ta_left,255,c_white);
              end;
 gm_koth    : with g_cpoints[1] do
-              if(cpTimer<=0)
-              then _draw_text(tar,ui_textx,ui_texty+font_3hw,str_kothtime+'---',ta_left,255,c_white)
+              if(cpOwnerPlayer>0)
+              then _draw_text(tar,ui_textx,ui_texty+font_3hw,_players[cpOwnerPlayer].name+str_kothwinner,ta_left,255,PlayerGetColor(cpOwnerPlayer))
               else
-                if(r_blink2_colorb)
-                then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
-                else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
+                if(cpTimer<=0)
+                then _draw_text(tar,ui_textx,ui_texty+font_3hw,str_kothtime+'---',ta_left,255,c_white)
+                else
+                  if(r_blink2_colorb)
+                  then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
+                  else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
    if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                ,ta_left,255,c_white);
-   if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')',ta_left,255,c_white);
+   if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_left,255,c_white);
 
    d_OrderIcons(tar);
 end;

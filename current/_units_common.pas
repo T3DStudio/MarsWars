@@ -401,13 +401,13 @@ begin
    begin
       with tu^ do
        with uid^ do
-        if(hits<=0){or(not bld)}then exit;
+        if(hits<=0)then exit;
 
       with pu^ do
        with player^ do
         if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
         begin
-           tu^.buff[ub_Invuln]:=invuln_time;
+           tu^.buff[ub_Invuln]:=invuln_time-round((tu^.uid^._limituse-MinUnitLimit)/MinUnitLimit*invuln_time_limit);
            upgr[upgr_hell_invuln]-=1;
            _unit_ability_HInvuln:=true;
            {$IFDEF _FULLGAME}
@@ -786,6 +786,8 @@ begin
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles );
+         x0:=mm3(1,x0,map_mw);
+         y0:=mm3(1,y0,map_mw);
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
 
          upgr[upgr_hell_HKTeleport]-=1;
@@ -814,6 +816,8 @@ begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles  );
+         x0:=mm3(1,x0,map_mw);
+         y0:=mm3(1,y0,map_mw);
          if(point_dist_int(x,y,x0,y0)>srange)then exit;
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles )>0)then exit;
 

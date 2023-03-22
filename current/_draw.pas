@@ -62,7 +62,7 @@ begin
       if(aia_enemy_limit>0)then n+=1;
 
    _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
-       c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondD)+')'+
+       c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[PointInScreenP(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+

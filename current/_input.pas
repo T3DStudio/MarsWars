@@ -68,7 +68,7 @@ begin
    if(net_status=ns_clnt)
    then net_pause
    else
-     if(net_status=ns_srvr)then
+     if(net_status=ns_srvr)or(_testmode>0)then
        if(G_Status=gs_running)
        then G_Status:=HPlayer
        else G_Status:=gs_running;

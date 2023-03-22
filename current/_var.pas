@@ -73,6 +73,8 @@ map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
+DID_Square        : array[0..MaxDIDs] of longint;
+
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
 //pf_pathgrid_tmpb  : byte;
@@ -98,6 +100,7 @@ rpls_cpoints_t    : TWCPDataTime;
 
 fr_FPSSecond,
 fr_FPSSecondD,
+fr_FPSSecondU,
 fr_FPSSecondN,
 fr_FPSSecondC,
 fr_FrameCount,
@@ -740,7 +743,7 @@ str_starta,
 str_plout,
 str_player_def    : shortstring;
 str_cgeneratorsM  : array[0..gms_g_maxgens] of shortstring;
-str_pcolors       : array[0..4] of shortstring;
+str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
 str_panelpos,
@@ -756,7 +759,7 @@ str_language,
 str_resol,
 str_apply,
 str_randoms,
-str_chat,
+str_menu_chat,
 str_chat_all,
 str_chat_allies,
 str_server,
@@ -774,6 +777,7 @@ str_inv_time,
 str_menu,
 str_time,
 str_kothtime,
+str_kothwinner,
 str_players,
 str_map,
 str_save,

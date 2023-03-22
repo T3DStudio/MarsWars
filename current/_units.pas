@@ -903,12 +903,52 @@ begin
    end;
 end;
 
+function _unit_ability_RevTeleport(pu:PTUnit;tar,tard:integer):boolean;
+var tu:PTUnit;
+begin
+   // pu - teleporter
+   _unit_ability_RevTeleport:=false;
+   if(not _IsUnitRange(tar,@tu))then exit;
+
+   with tu^ do
+    with uid^ do
+     if(_ukbuilding)
+     or(not bld)
+     or(ukfly)
+     or(hits<=0)
+     or(buff[ub_Teleport]>0)
+     or(pu^.playeri<>playeri)
+     or(not pu^.bld)
+     or(pu^.hits<=0)
+     then exit;
+
+    with pu^  do
+     with uid^ do
+      with player^ do
+       if(upgr[upgr_hell_rteleport]>0)then
+       begin
+          if(tard=NOTSET)
+          or(tard<0     )then tard:=point_dist_int(x,y,tu^.x,tu^.y);
+          if(tard>base_1r)then
+            if(rld<=0)then
+            begin
+               _unit_teleport(tu,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
+               _teleport_CalcReload(pu,tu^.uid^._limituse);
+               tu^.uo_x  :=tu^.x;
+               tu^.uo_y  :=tu^.y;
+               tu^.uo_tar:=0;
+               _unit_ability_RevTeleport:=true;
+            end;
+       end;
+end;
+
 function _ability_teleport(pu,tu:PTUnit;td:integer):boolean;
 var tt:PTUnit;
     tr:integer;
 begin
    // pu - target
    // tu - teleporter
+   // td = dist2(pu,tu)-pu.r-tu.r
    _ability_teleport:=false;
    with pu^  do
     with uid^ do
@@ -939,7 +979,7 @@ begin
            end;
         end
         else
-          if(tu^.player^.upgr[upgr_hell_rteleport]>0)and(td>base_r)then
+          if(tu^.player^.upgr[upgr_hell_rteleport]>0)and(td>base_1r)then
            if(tu^.rld<=0)then
            begin
               _unit_teleport(pu,tu^.x,tu^.y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
@@ -1617,12 +1657,13 @@ co_paction :  if(uo_id<>ua_paction)
                 else
                   case _ability of
 0                    : ;
-uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y))then exit;
-uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y))then exit;
-uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar      ))then exit;
-uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y))then exit;
-uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y))then exit;
-uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar      ))then exit;
+uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y ))then exit;
+uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y ))then exit;
+uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar       ))then exit;
+uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y ))then exit;
+uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y ))then exit;
+uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar       ))then exit;
+uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
 uab_CCFly            : if(speed>0)then
                        begin
                           if(_canAbility(pu)=0)then
@@ -1752,7 +1793,9 @@ begin
              then _unit_mcycle   (pu)
              else _unit_mcycle_cl(pu,au);
 
-            _unit_capture_point(pu);
+            if(ServerSide)then
+             if(not _isUnitRange(transport,nil))then
+              _unit_capture_point(pu);
          end
          else _unit_death(pu);
 

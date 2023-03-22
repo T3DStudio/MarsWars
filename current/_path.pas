@@ -20,7 +20,7 @@ begin
    // solid cells
    for d:=1 to MaxDoodads do
     with map_dds[d] do
-     if(t>0)and(r>=pf_pathmap_hw)then
+     if(t>0)and(r>=pf_pathmap_w)then
      begin
         sx:=mm3(0,(x-r) div pf_pathmap_w,pf_pathmap_c);
         sy:=mm3(0,(y-r) div pf_pathmap_w,pf_pathmap_c);

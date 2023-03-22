@@ -177,7 +177,7 @@ begin
              else vid_CamSpeed:=127;
       10 : vid_CamMScroll:=not vid_CamMScroll;
       11 : if not ((net_status=ns_none)and(G_Started=false))then menu_item:=0;
-      12 : begin ui_language:=not ui_language;swLNG;end;
+      12 : begin ui_language:=not ui_language;SwitchLanguage;end;
       13 : begin
               vid_ppos+=1;
               vid_ppos:=vid_ppos mod 4;
@@ -187,7 +187,7 @@ begin
            end;
       14 : begin
               vid_plcolors+=1;
-              vid_plcolors:=vid_plcolors mod 5;
+              vid_plcolors:=vid_plcolors mod vid_maxplcolors;
            end;
 
       // video

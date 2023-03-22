@@ -36,7 +36,7 @@ begin
    rld:=rld_r;
 end;  }
 
-procedure _cmp_initmap;
+procedure _cmp_Init;
 var x:byte;
 begin
    for x:=0 to MaxMissions do cmp_mmap[x]:=spr_c_phobos;

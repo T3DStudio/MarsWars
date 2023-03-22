@@ -13,8 +13,8 @@ begin
                                 UID_UTechCenter,UID_UNuclearPlant,UID_URMStation ],1,false);
 
       if(g_cgenerators>0)then
-      PlayerSetAllowedUnits(p,[ UID_HSymbol,UID_HASymbol,
-                                UID_UGenerator,UID_UAGenerator ],0,false);
+      PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HAKeep          ,UID_HCommandCenter, UID_HACommandCenter,
+                                UID_UGenerator,UID_UAGenerator,UID_UCommandCenter,UID_UACommandCenter ],0,false);
 
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
@@ -214,17 +214,29 @@ end;
 {$include _replays.pas}
 {$ENDIF}
 
-procedure GameCreateStartBase(x,y:integer;uid,pl,c:byte);
-var  i:byte;
+procedure GameCreateStartBase(x,y:integer;uidF,uidA,pl,c:byte;AdvancedBase:boolean);
+var  i,n,uid:byte;
 r,d,ds:integer;
+procedure _Spawn(tx,ty:integer);
 begin
+   if(n=0)and(AdvancedBase)and(c=0)
+   then uid:=uidA
+   else uid:=uidF;
+   _unit_add(tx,ty,0,uid,pl,true,false,0);
+   n+=1;
+end;
+
+begin
+   if(c>6)then c:=6;
+   n:=0;
+
    if(c=0)
-   then _unit_add(x,y,0,uid,pl,true,false,0)
+   then _Spawn(x,y)
    else
    begin
       if(c>5)then
       begin
-         _unit_add(x,y,0,uid,pl,true,false,0);
+         _Spawn(x,y);
          c-=1;
       end;
       ds :=map_mw div 2;
@@ -233,17 +245,14 @@ begin
       r  :=46+c*18;
       for i:=0 to c do
       begin
-         _unit_add(
+         _Spawn(
          x+trunc(r*cos(d*degtorad)),
-         y-trunc(r*sin(d*degtorad)),
-         0,uid,pl,true,false,0);
+         y-trunc(r*sin(d*degtorad))
+         );
 
          d+=ds;
       end;
    end;
-   _unit_add(x,y,0,UID_UTransport,pl,true,false,0);
-   for i:=0 to 6 do _unit_add(x,y,0,UID_Sergant   ,pl,true,false,0);
-   // добавить транспорт и мариков и проверить в мультиплеере
 end;
 
 procedure GameStartSkirmish;
@@ -276,7 +285,7 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_play)then ai_skill:=player_default_ai_level;// g_ai_slots;//
+         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;// ;//
       end;
    end;
 
@@ -286,9 +295,7 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)then
-         GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_base[race],p,g_start_base);
-
+        if(team>0)then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_cgenerators>0);
      end;
 
    {$IFDEF _FULLGAME}

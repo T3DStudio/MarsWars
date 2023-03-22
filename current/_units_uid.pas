@@ -84,6 +84,8 @@ begin
    end;
 end;
 begin
+   FillChar(_uids   ,SizeOf(_uids   ),0);
+
    for i:=0 to 255 do
    with _uids[i] do
    begin
@@ -117,7 +119,7 @@ begin
    _r         := 66;
    _srange    := 280;
    _ucl       := 0;
-   _btime     := ptime3;
+   _btime     := ptime2;
    _ukbuilding:= true;
    _isbuilder := true;
    ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HASymbol,UID_HAKeep];
@@ -130,7 +132,7 @@ begin
    begin
       _genergy := 600;
       _renergy := 600;
-      _btime   := _btime*2;
+      _btime   := _btime*3;
    end
    else
    begin
@@ -235,7 +237,7 @@ begin
    _ability   := uab_Teleport;
    _ukbuilding:= true;
    _issolid   := false;
-   _ruid1     := UID_HFortress;
+   _ruid1     := UID_HAKeep;
 end;
 UID_HAltar:
 begin
@@ -257,7 +259,7 @@ begin
    _mhits     := 5000;
    _renergy   := 100;
    _r         := 20;
-   _srange    := 250;
+   _srange    := 275;
    _ucl       := 6;
    _btime     := ptime1;
    _attack    := atm_always;
@@ -273,9 +275,9 @@ end;
 UID_HTotem:
 begin
    _mhits     := 3000;
-   _renergy   := 300;
+   _renergy   := 200;
    _r         := 21;
-   _srange    := 250;
+   _srange    := 275;
    _ucl       := 7;
    _btime     := ptime1h;
    _ruid1     := UID_HFortress;
@@ -315,7 +317,7 @@ begin
    _speed     := 10;
    _srange    := 225;
    _ucl       := 0;
-   _painc     := 3;
+   _painc     := 4;
    _btime     := ptime1;
    _attack    := atm_always;
    _uklight   := true;
@@ -346,7 +348,7 @@ begin
    _speed     := 10;
    _srange    := 225;
    _ucl       := 2;
-   _painc     := 7;
+   _painc     := 8;
    _btime     := ptime1hh;
    _apcs      := 2;
    _limituse  := ul1h;
@@ -397,17 +399,16 @@ end;
 {
 ul10 = 10000hp + 700dps
        15000hp + 350dps
-       16000hp + 280dps
 }
 UID_Mastermind :
 begin
-   _mhits     := 16000;
+   _mhits     := 15000;
    _renergy   := 1200;
    _r         := 35;
    _speed     := 12;
    _srange    := 225;
    _ucl       := 5;
-   _painc     := 10;
+   _painc     := 8;
    _btime     := ptime4;
    _apcs      := 12;
    _ruid1     := UID_HPentagram;
@@ -416,11 +417,15 @@ begin
    _splashresist:=true;
    _ukmech    := true;
    _upgr_regen:=upgr_race_regen_bio[r_hell];
-   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd8,MID_Chaingun2,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_unit_bio_light,2);
+   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd5,MID_Chaingun2,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_unit_bio_light,0);
 end;
+{
+12000  18000  19000
+x12    x6     x5
+}
 UID_Cyberdemon :
 begin
-   _mhits     := 18000;
+   _mhits     := 19000;
    _renergy   := 1400;
    _r         := 20;
    _speed     := 12;
@@ -443,7 +448,7 @@ begin
    _renergy   := 300;
    _r         := 14;
    _speed     := 7;
-   _srange    := 250;
+   _srange    := 225;
    _ucl       := 7;
    _painc     := 3;
    _btime     := ptime2;
@@ -452,8 +457,8 @@ begin
    _ukfly     := uf_fly;
    _attack    := atm_always;
    _ability   := uab_SpawnLost;
-   _weapon(0,wpt_unit,aw_srange,0,0 ,fr_fps1d2,UID_Phantom ,0,upgr_hell_phantoms,1,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
-   _weapon(1,wpt_unit,aw_srange,0,0 ,fr_fps1d2,UID_LostSoul,0,0                 ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _weapon(0,wpt_unit,aw_fsr+75,0,0 ,fr_fps1d2,UID_Phantom ,0,upgr_hell_phantoms,1,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _weapon(1,wpt_unit,aw_fsr+75,0,0 ,fr_fps1d2,UID_LostSoul,0,0                 ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
 
    _fastdeath_hits:=1;
 end;
@@ -494,7 +499,8 @@ begin
    _ruid1     := UID_HMonastery;
    _limituse  := ul3;
    _attack    := atm_always;
-   _weapon(0,wpt_missle,aw_fsr+50,0,-8,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground       ,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0);
+   _a_BonusAntiGroundRange:=50;
+   _weapon(0,wpt_missle,aw_fsr,0,-8,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0);
 end;
 UID_Arachnotron:
 begin
@@ -512,7 +518,8 @@ begin
    _attack    := atm_always;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
-   _weapon(0,wpt_missle,aw_fsr+50,0,0 ,fr_fpsd3,MID_YPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Arachnotron],[],0,0,wtp_unit_mech,0);
+   _a_BonusAntiGroundRange:=50;
+   _weapon(0,wpt_missle,aw_fsr,0,0 ,fr_fpsd3,MID_YPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Arachnotron],[],0,0,wtp_unit_mech,0);
 end;
 UID_Archvile:
 begin
@@ -746,7 +753,7 @@ begin
       begin
          _genergy := 600;
          _renergy := 600;
-         _btime   := _btime*2;
+         _btime   := (_btime*3) div 2;
       end
       else
       begin
@@ -770,7 +777,7 @@ begin
       begin
          _genergy := 600;
          _renergy := 600;
-         _btime   := _btime*2;
+         _btime   := (_btime*3) div 2;
       end
       else
       begin
@@ -915,9 +922,9 @@ begin
    _mhits     := 5000;
    _renergy   := 100;
    _r         := 15;
-   _srange    := 250;
+   _srange    := 275;
    _ucl       := 6;
-   _btime     := ptime2h3;
+   _btime     := ptime1;
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
@@ -934,9 +941,9 @@ begin
    _mhits     := 5000;
    _renergy   := 100;
    _r         := 15;
-   _srange    := 250;
+   _srange    := 275;
    _ucl       := 7;
-   _btime     := ptime2h3;
+   _btime     := ptime1;
    _attack    := atm_always;
    _ukbuilding:= true;
    _uklight   := true;
@@ -1153,7 +1160,7 @@ begin
    _attack    := atm_none;
    _ukmech    := true;
    _slowturn  := true;
-   _ruid1     := UID_UTechCenter;
+   _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;
    ups_apc    :=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
 end;
@@ -1276,7 +1283,8 @@ end;
       if(_ability_rupgr>0)and(_ability_rupgrl=0)then _ability_rupgrl:=1;
       if(_rebuild_rupgr>0)and(_rebuild_rupgrl=0)then _rebuild_rupgrl:=1;
 
-      _painc_upgr:=(_painc div 2)+(_painc mod 2);
+      if(_painc_upgr=0)
+      then _painc_upgr:=(_painc div 2)+(_painc mod 2);
 
       _missile_r:=trunc(_r/1.4);
       _hmhits :=_mhits div 2;
@@ -1311,7 +1319,7 @@ end;
 end;
 
 
-procedure ObjTbl;
+procedure GameObjectsInit;
 var u:integer;
 procedure _setUPGR(rc,upcl,stime,stimeX,stimeA,max,enrg,enrgX,enrgA:integer;rupgr,ruid:byte;mfrg:boolean);
 begin
@@ -1350,7 +1358,7 @@ begin
    _setUPGR(r_hell,upgr_hell_HKTeleport,180,0,0 ,1   ,300 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_hell,upgr_hell_paina     ,60 ,0,0 ,2   ,300 ,0,0   ,0            ,UID_HAKeep         ,false);
    _setUPGR(r_hell,upgr_hell_extbuild  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep         ,false);
-   _setUPGR(r_hell,upgr_hell_towers    ,60 ,0,15,3   ,600 ,0,300 ,0            ,UID_HAKeep         ,false);
+   _setUPGR(r_hell,upgr_hell_towers    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_HAKeep         ,false);
    _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep         ,false);
 
    _setUPGR(r_hell,upgr_hell_spectre   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery     ,false);
@@ -1378,7 +1386,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_CCFly      ,120,0,0 ,1   ,600 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_ccturr     ,120,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter,false);
    _setUPGR(r_uac ,upgr_uac_extbuild   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter,false);
-   _setUPGR(r_uac ,upgr_uac_towers     ,60 ,0,15,3   ,600 ,0,300 ,0            ,UID_UACommandCenter,false);
+   _setUPGR(r_uac ,upgr_uac_towers     ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UACommandCenter,false);
    _setUPGR(r_uac ,upgr_uac_soaring    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter,false);
 
    _setUPGR(r_uac ,upgr_uac_botturret  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
@@ -1421,7 +1429,7 @@ begin
    wtrset_resurect                       :=wtr_owner_p+wtr_owner_a                       +wtr_hits_d           +wtr_bio+wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;
 
 
-   FillChar(_uids   ,SizeOf(_uids   ),0);
-
    initUIDS;
+
+   for u:=0 to MaxDIDs do DID_Square[u]:=round(pi*sqr(DID_R[u]));
 end;

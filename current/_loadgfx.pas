@@ -730,7 +730,7 @@ begin
 end;
 
 
-procedure _icons;
+procedure MakeUnitIcons;
 var u:byte;
 begin
    for u:=0 to 255 do

@@ -297,7 +297,8 @@ TUID = record
    un_txt_udescr,
    un_txt_fdescr,
    un_txt_uihint1,
-   un_txt_uihint2
+   un_txt_uihint2,
+   un_txt_uihint3
                 : shortstring;
 
    un_build_amode,

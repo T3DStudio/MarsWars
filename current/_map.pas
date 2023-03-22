@@ -168,9 +168,9 @@ end;
 procedure map_Starts_Default;
 var ix,iy,i,u,c,bb0,bb1,dst:integer;
 begin
-   bb0:=base_r+(map_mw-MinSMapW) div 7;
+   bb0:=base_1r+(map_mw-MinSMapW) div 7;
    bb1:=map_mw-(bb0*2);
-   dst:=(map_mw div 5)+base_r;
+   dst:=(map_mw div 5)+base_1r;
 
    for i:=1 to MaxPlayers do
    begin
@@ -266,8 +266,8 @@ begin
          ix:=u+_random(b);
          iy:=u+_random(b);
 
-         if (not _PlayerStartHere(ix,iy,base_ir,map_symmetry))
-         and(not _CPointHere(ix,iy,base_ir,map_symmetry))then
+         if (not _PlayerStartHere(ix,iy,base_1rh,map_symmetry))
+         and(not _CPointHere(ix,iy,base_1rh,map_symmetry))then
          begin
             if(_setcpoint(ix,iy))then exit;
             if(map_symmetry)then
@@ -292,7 +292,7 @@ begin
 gm_3x3 :
       begin
          ix:=map_mw div 2;
-         iy:=base_rr+(map_mw div 25);
+         iy:=base_2r+(map_mw div 25);
          u :=ix-(map_mw div 7);
          i :=map_seed mod 360;
 
@@ -315,7 +315,7 @@ gm_3x3 :
 gm_2x2x2:
       begin
          ix:=map_mw div 2;
-         iy:=base_rr+(map_mw div 30);
+         iy:=base_2r+(map_mw div 30);
          u :=ix-(ix div 3);
          c :=map_seed mod 360;
 
@@ -343,7 +343,7 @@ gm_invasion:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
-         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_rr);
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_2r);
       end;
 gm_KotH:
       begin
@@ -354,7 +354,7 @@ gm_KotH:
       end;
 gm_royale :
       begin
-         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 5));
          if(not g_fixed_positions)then map_ShuffleStarts;
       end;
 gm_capture:
@@ -377,7 +377,7 @@ gm_KotH   : with g_cpoints[1] do
             begin
                cpx:=map_hmw;
                cpy:=map_hmw;
-               cpCapturer   :=base_r;
+               cpCapturer   :=base_1r;
                cpCaptureTime:=fr_fps1*60;
 
                {$IFDEF _FULLGAME}
@@ -386,7 +386,7 @@ gm_KotH   : with g_cpoints[1] do
                cpmr:=round(cpCapturer*map_mmcx)+1;
                {$ENDIF}
             end;
-gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_r,0,gm_cptp_time,0,true);
+gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
    end;
 
    if(g_cgenerators>0)then
@@ -543,7 +543,7 @@ begin
    end
    else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 
-   ir :=base_r+(map_mw div 100);
+   ir :=base_1r+(map_mw div 100);
    ix :=map_seed;
    iy :=0;
 

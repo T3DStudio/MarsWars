@@ -405,7 +405,7 @@ begin
                  _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
               end;
    ms2_mult : begin
-                 _draw_text(tar,ui_menu_csm_xc, _yt(12), str_chat, ta_middle,255, mic((net_status<>ns_none),m_chat));
+                 _draw_text(tar,ui_menu_csm_xc, _yt(12), str_menu_chat, ta_middle,255, mic((net_status<>ns_none),m_chat));
 
                  if(m_chat)then
                  begin

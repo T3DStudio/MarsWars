@@ -162,7 +162,7 @@ begin
 
       c:=PlayerGetColor(i);
 
-      map_minimap_cpoint(r_minimap,x,y,trunc(base_r*map_mmcx),char_start ,c);
+      map_minimap_cpoint(r_minimap,x,y,trunc(base_1r*map_mmcx),char_start ,c);
    end;
 end;
 

@@ -70,6 +70,8 @@ begin
 
    while (_CYCLE) do
    begin
+      fr_FPSSecondD:=SDL_GetTicks;
+
       {$IFDEF _FULLGAME}
       InputGame;
       CodeGame;
@@ -82,6 +84,7 @@ begin
       CodeGame;
       {$ENDIF}
 
+      fr_FPSSecondU:=SDL_GetTicks-fr_FPSSecondD;
       fr_delay;
    end;
 
