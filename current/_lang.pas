@@ -196,9 +196,11 @@ begin
         if(ukfloater)
         then _ADDSTRC(@_makeAttributeStr,str_attr_floater)
         else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
+      if(apcm>0)
+      then _ADDSTRC(@_makeAttributeStr,str_attr_transport);
       if(level>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_level+b2s(level+1));
-      if(buff[ub_Detect]>0)
+      if(buff[ub_Detect]>0)or(_detector)
       then _ADDSTRC(@_makeAttributeStr,str_attr_detector);
       if(buff[ub_Invuln]>0)
       then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
@@ -210,6 +212,8 @@ begin
    end;
 end;
 
+//function
+
 function _req2s(basename:shortstring;reqn:byte):shortstring;
 begin
    _req2s:=basename;
@@ -217,26 +221,48 @@ begin
 end;
 
 function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
-var REQ:shortstring;
+var w:byte;
+function AddReq(ruid,rupid,rupidl:byte):shortstring;
+begin
+  AddReq:='';
+  if(ruid >0)then _ADDSTRC(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' );
+  if(rupid>0)then _ADDSTRC(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' );
+  if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
+end;
+function RebuildStr(uid,uidl:byte):shortstring;
+begin
+  if(uidl=0)
+  then RebuildStr:='"'+_uids[uid].un_txt_name+'"'
+  else RebuildStr:='"'+_uids[uid].un_txt_name+'['+str_attr_level+b2s(uidl+1)+']"';
+end;
 begin
    _MakeDefaultDescription:=basedesc;
     with _uids[uid] do
     begin
-       if(_isbuilder    )then _ADDSTRD(@_MakeDefaultDescription,str_Builder);
-       if(_isbarrack    )then _ADDSTRD(@_MakeDefaultDescription,str_Barrack);
-       if(_issmith      )then _ADDSTRD(@_MakeDefaultDescription,str_Smith  );
-       if(_genergy    >0)then _ADDSTRD(@_MakeDefaultDescription,str_IncEnergyLevel+' ('+tc_aqua+'+'+i2s(_genergy)+tc_default+')');
-       if(_rebuild_uid>0)then
+       if(_isbuilder    )then _ADDSTRD(@_MakeDefaultDescription,str_builder);
+       if(_isbarrack    )then _ADDSTRD(@_MakeDefaultDescription,str_barrack);
+       if(_issmith      )then _ADDSTRD(@_MakeDefaultDescription,str_smith  );
+       if(_genergy    >0)then _ADDSTRD(@_MakeDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')');
+       if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
        begin
-          if(_rebuild_level=0)
-          then _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+'"'+_uids[_rebuild_uid].un_txt_name+'"')
-          else _ADDSTRD(@_MakeDefaultDescription,str_CanRebuildTo+'"'+_uids[_rebuild_uid].un_txt_name+'['+str_attr_level+b2s(_rebuild_level+1)+']"');
-
-          REQ:='';
-          if(_rebuild_ruid >0)then _ADDSTRC(@REQ,'"'+_req2s(_uids [_rebuild_ruid ].un_txt_name,1              )+'"' );
-          if(_rebuild_rupgr>0)then _ADDSTRC(@REQ,'"'+_req2s(_upids[_rebuild_rupgr]._up_name   ,_rebuild_rupgrl)+'"' );
-          if(length(REQ)>0)then _MakeDefaultDescription+='{'+tc_yellow+str_req+tc_default+REQ+'}';
+          _ADDSTRD(@_MakeDefaultDescription,
+          str_CanRebuildTo+
+          RebuildStr(_rebuild_uid,_rebuild_level)+
+          AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl) );
        end;
+       if(_ability>0)then
+        if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
+        then _ADDSTRD(@_MakeDefaultDescription,str_ability+str_transformation+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl))
+        else
+          if(length(str_ability_name[_ability])>0)
+          then _ADDSTRD(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl));
+
+       {if(_attack>0)then
+        for a:=0 to MaxUnitWeapons do
+         with _a_weap[a] do
+          case aw_type of
+
+          end;  }
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
@@ -298,7 +324,7 @@ begin
       begin
          un_txt_uihint1:=un_txt_name+tc_nl1+un_txt_fdescr+tc_nl1;
          un_txt_uihint2:='';
-         un_txt_uihint3:='';
+         un_txt_uihintS:='';
       end
       else
       begin
@@ -320,15 +346,17 @@ begin
 
          un_txt_fdescr:=_MakeDefaultDescription(uid,un_txt_udescr);
 
-         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid)+tc_nl1+un_txt_fdescr;
-         un_txt_uihint3:=un_txt_name+tc_nl1+_makeAttributeStr(nil,uid);
-         un_txt_uihint2:='';
+         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
+         un_txt_uihintS:=un_txt_name+tc_nl1+_makeAttributeStr(nil,uid);
+         un_txt_uihint2:=un_txt_fdescr;
+         un_txt_uihint3:='';
 
-         if(length(REQ )>0)then un_txt_uihint2+=tc_yellow+str_req+tc_default+REQ+tc_nl1 else un_txt_uihint2+=tc_nl1;
+         if(length(REQ )>0)then un_txt_uihint3+=tc_yellow+str_req+tc_default+REQ+tc_nl1
+                           else un_txt_uihint3+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_uihint2+=str_bprod+PROD
-          else un_txt_uihint2+=str_uprod+PROD;
+          then un_txt_uihint3+=str_bprod+PROD
+          else un_txt_uihint3+=str_uprod+PROD;
       end;
    end;
 
@@ -341,8 +369,8 @@ begin
       if(_up_ruid  >0)then _ADDSTRC(@REQ,_uids [_up_ruid ].un_txt_name);
       if(_up_rupgr >0)then _ADDSTRC(@REQ,_upids[_up_rupgr]._up_name   );
 
-      _up_hint2:='';
-      if(length(REQ)>0)then _up_hint2+=tc_yellow+str_req+tc_default+REQ;
+      _up_hint:='';
+      if(length(REQ)>0)then _up_hint+=tc_yellow+str_req+tc_default+REQ;
    end;
 end;
 
@@ -428,15 +456,17 @@ begin
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
    str_ColoredShadow     := 'Colored shadows';
-   str_kothtime          := 'Center capture time: ';
+   str_kothtime          := 'Center capture time left: ';
    str_kothwinner        := ' is King of the Hill!';
-   str_deadobservers     := 'Observer mode after lose:';
+   str_DeadObservers     := 'Observer mode after lose:';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
+   str_ability           := 'Ability: ';
+   str_transformation    := 'transformation to ';
 
-   str_Builder           := 'Builder';
-   str_Barrack           := 'Unit production';
-   str_Smith             := 'Researches and upgrades facility';
+   str_builder           := 'Builder';
+   str_barrack           := 'Unit production';
+   str_smith             := 'Researches and upgrades facility';
    str_IncEnergyLevel    := 'Increase energy level';
    str_CanRebuildTo      := 'Can be rebuilded to ';
 
@@ -474,6 +504,8 @@ begin
    str_attr_invuln       := tc_lime  +'invulnerable'+tc_default;
    str_attr_stuned       := tc_yellow+'stuned'      +tc_default;
    str_attr_detector     := tc_purple+'detector'    +tc_default;
+   str_attr_transport    := tc_gray  +'transport'   +tc_default;
+
 
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := tc_lime  +'left' +tc_default;
@@ -573,23 +605,34 @@ begin
    str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
 
+   str_ability_name[uab_Teleport        ]:='Teleportation';
+   str_ability_name[uab_UACScan         ]:='Scan';
+   str_ability_name[uab_HTowerBlink     ]:='Blink';
+   str_ability_name[uab_UACStrike       ]:='Missile Strike';
+   str_ability_name[uab_HKeepBlink      ]:='Blink';
+   str_ability_name[uab_RebuildInPoint  ]:='';
+   str_ability_name[uab_HInvulnerability]:='Invulnerability';
+   str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
+   str_ability_name[uab_HellVision      ]:='Hell Vision';
+   str_ability_name[uab_CCFly           ]:='Flight Engines';
+
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
-   _mkHStrUid(UID_HGate          ,'Hell Gate'                   ,'');
-   _mkHStrUid(UID_HSymbol        ,'Hell Symbol'                 ,'');
-   _mkHStrUid(UID_HASymbol       ,'Great Hell Symbol'           ,'');
-   _mkHStrUid(UID_HPools         ,'Hell Pools'                  ,'');
-   _mkHStrUid(UID_HTeleport      ,'Hell Teleport'               ,'Teleport units');
-   _mkHStrUid(UID_HPentagram     ,'Hell Pentagram'              ,'');
-   _mkHStrUid(UID_HMonastery     ,'Hell Monastery'              ,'');
-   _mkHStrUid(UID_HFortress      ,'Hell Fortress'               ,'');
-   _mkHStrUid(UID_HTower         ,'Hell Tower'                  ,'Defensive structure'            );
-   _mkHStrUid(UID_HTotem         ,'Hell Totem'                  ,'Advanced defensive structure'   );
-   _mkHStrUid(UID_HAltar         ,'Hell Altar'                  ,'Casts "Invulnerability" powerup');
-   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted UAC Command Center'   );
+   _mkHStrUid(UID_HGate          ,'Demon`s Gate'                ,'');
+   _mkHStrUid(UID_HSymbol        ,'Unholy Symbol'               ,'');
+   _mkHStrUid(UID_HASymbol       ,'Great Unholy Symbol'         ,'');
+   _mkHStrUid(UID_HPools         ,'Infernal Pools'              ,'');
+   _mkHStrUid(UID_HTeleport      ,'Teleport'                    ,'');
+   _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
+   _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
+   _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
+   _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Defensive structure'                  );
+   _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'         );
+   _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'');
+   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted UAC Command Center'         );
    _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted UAC Advanced Command Center');
-   _mkHStrUid(UID_HBarracks      ,'Hell Barracks'               ,'Corrupted UAC Barracks'         );
-   _mkHStrUid(UID_HEye           ,'Hell Eye'                    ,'Passive scouting and detection' );
+   _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted UAC Barracks'               );
+   _mkHStrUid(UID_HEye           ,'Evil Eye'                    ,'Passive scouting and detection'       );
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'                   ,'');
    _mkHStrUid(UID_Phantom        ,'Phantom'                     ,'');
@@ -604,7 +647,7 @@ begin
    _mkHStrUid(UID_Revenant       ,'Revenant'                    ,'');
    _mkHStrUid(UID_Mancubus       ,'Mancubus'                    ,'');
    _mkHStrUid(UID_Arachnotron    ,'Arachnotron'                 ,'');
-   _mkHStrUid(UID_Archvile       ,'ArchVile'                    ,'');
+   _mkHStrUid(UID_Archvile       ,'Arch-Vile'                   ,'');
    _mkHStrUid(UID_ZFormer        ,'Former Zombie'               ,'');
    _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer'             ,'');
    _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner'            ,'');
@@ -622,25 +665,25 @@ begin
    _mkHStrUpid(upgr_hell_mattack   ,'Claws and Teeth'               ,'Increase the damage of melee attacks.'                                   );
    _mkHStrUpid(upgr_hell_regen     ,'Flesh Regeneration'            ,'Health regeneration for all Hell`s units.'                               );
    _mkHStrUpid(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before pain stun happen.'                  );
-   _mkHStrUpid(upgr_hell_towers    ,'Tower Range Upgrade'           ,'Increase defensive structures range.'                                    );
-   _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Teleportation Charge','Charge for Hell Keep`s teleportation ability.'                           );
+   _mkHStrUpid(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase defensive structures range.'                                    );
+   _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Blick Charge'        ,'Charge for Hell Keep`s ability.'                                         );
    _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura`s damage ignore unit`s armor.');
    _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s sight range.'                                       );
-   _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except those that can produce units, can be placed on doodads.');
+   _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except those that can produce units and Teleport, can be placed on doodads.');
    _mkHStrUpid(upgr_hell_pinkspd   ,'Pinky`s Rage'                  ,'Increase the movement speed of Pinky.'                                   );
 
    _mkHStrUpid(upgr_hell_spectre   ,'Spectres'                      ,'Pinky become invisible.'                                     );
    _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell`s units.'               );
    _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Lost Soul become Phantom.'                                   );
-   _mkHStrUpid(upgr_hell_t2attack  ,'Hell Weapons'                  ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
+   _mkHStrUpid(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
    _mkHStrUpid(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Decrease cooldown time of Hell Teleport.'                        );
    _mkHStrUpid(upgr_hell_rteleport ,'Reverse Teleporting'           ,'Units can teleport back to Hell Teleport.'                       );
-   _mkHStrUpid(upgr_hell_heye      ,'Hell Eye Upgrade'              ,'Increase the sight range of Hell Eye.'                           );
-   _mkHStrUpid(upgr_hell_totminv   ,'Hell Totem Invisibility'       ,'Hell Totem become invisible.'                                    );
+   _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye.'                           );
+   _mkHStrUpid(upgr_hell_totminv   ,'Tower of Horror Invisibility'  ,'Tower of Horror become invisible.'                               );
    _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell`s buildings.'                   );
-   _mkHStrUpid(upgr_hell_b478tel   ,'Tower Teleportation Charge'    ,'Charges for Hell Tower`s and Hell Totem`s short-distance teleport ability.');
+   _mkHStrUpid(upgr_hell_b478tel   ,'Tower Teleportation Charge'    ,'Charges for Guard Tower`s and Tower`s of Horror ability.');
    _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability.');
-   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Hell Altar`s ability.'      );
+   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Altar`s of Pain ability.'      );
 
 
    _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,''      );
@@ -652,10 +695,10 @@ begin
    _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,''      );
    _mkHStrUid(UID_UGTurret         ,'UAC Anti-ground Turret'     ,'Anti-ground defensive structure');
    _mkHStrUid(UID_UATurret         ,'UAC Anti-air Turret'        ,'Anti-air defensive structure'   );
-   _mkHStrUid(UID_UTechCenter      ,'UAC Science Center'         ,''      );
-   _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,''      );
-   _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map. Detector'          );
-   _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','Provide a missile strike. Missile strike requires "Missile strike" charge');
+   _mkHStrUid(UID_UTechCenter      ,'UAC Science Center'         ,'');
+   _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'');
+   _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map');
+   _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','');
    _mkHStrUid(UID_UMine            ,'UAC Mine'                   ,''      );
 
    _mkHStrUid(UID_Sergant          ,'Shotguner'                  ,'');
@@ -682,11 +725,11 @@ begin
    _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units.'            );
    _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Attacks by Shotguner, SuperShotguner, Commando, UAC Terminator and anti-ground turrets make demons have pain state more often.'                               );
    _mkHStrUpid(upgr_uac_towers     ,'Tower Range Upgrade'              ,'Increase defensive structures range.'                           );
-   _mkHStrUpid(upgr_uac_CCFly      ,'UAC Command Center Engines'       ,'UAC Command Center gains ability to fly.'                       );
+   _mkHStrUpid(upgr_uac_CCFly      ,'UAC Command Center Flight Engines','UAC Command Center gains ability to fly.'                       );
    _mkHStrUpid(upgr_uac_ccturr     ,'UAC Command Center Turret'        ,'Plasma turret for UAC Command Center.'                          );
    _mkHStrUpid(upgr_uac_buildr     ,'UAC Command Center Range Upgrade' ,'Increase UAC Command Center sight range.'                       );
    _mkHStrUpid(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads.');
-   _mkHStrUpid(upgr_uac_soaring    ,'Engines for Soaring'              ,'UAC Drone can move over obstacles.');
+   _mkHStrUpid(upgr_uac_soaring    ,'Engines for Soaring'              ,'UAC Drone can move over obstacles.'          );
 
    _mkHStrUpid(upgr_uac_botturret  ,'UAC Drone Transformation Protocol','UAC Drone can rebuild to Anti-ground turret.');
    _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units.'  );
@@ -940,16 +983,17 @@ begin
   str_uprod             := tc_lime+'Создается в: '+tc_default;
   str_bprod             := tc_lime+'Строит: '     +tc_default;
   str_ColoredShadow     := 'Цветные тени';
-  str_kothtime          := 'Время захвата центра: ';
+  str_kothtime          := 'Время до захвата центра: ';
   str_kothwinner        := ' - Царь Горы!';
-  str_deadobservers     := 'Наблюдатель после поражения:';
+  str_DeadObservers     := 'Наблюдатель после поражения:';
   str_FPS               := 'Показать FPS';
   str_APM               := 'Показать APM';
+  str_ability           := 'Способность: ';
+  str_transformation    := 'превращение в ';
 
-
-  str_Builder           := 'Строитель';
-  str_Barrack           := 'Производит юнитов';
-  str_Smith             := 'Исследует улучшения и апгрейды';
+  str_builder           := 'Строитель';
+  str_barrack           := 'Производит юнитов';
+  str_smith             := 'Исследует улучшения и апгрейды';
   str_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_CanRebuildTo      := 'Можно перестроить в ';
 
@@ -987,6 +1031,7 @@ begin
   str_attr_invuln       := tc_lime  +'неуязвимый'    +tc_default;
   str_attr_stuned       := tc_yellow+'оглушен'       +tc_default;
   str_attr_detector     := tc_purple+'детектор'      +tc_default;
+  str_attr_transport    := tc_gray  +'транспорт'     +tc_default;
 
   str_panelpos          := 'Положение игровой панели';
   str_panelposp[0]      := tc_lime  +'слева' +tc_default;
@@ -1053,23 +1098,35 @@ begin
   str_hint_army         := 'Армия: ';
   str_hint_energy       := 'Энергия: ';
 
-  _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,''             );
-  _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,''             );
-  _mkHStrUid(UID_HGate           ,'Адские Врата'               ,''             );
-  _mkHStrUid(UID_HSymbol         ,'Адский Символ'              ,''             );
-  _mkHStrUid(UID_HASymbol        ,'Великий Адский Символ'      ,''             );
-  _mkHStrUid(UID_HPools          ,'Адские Омуты'               ,''             );
-  _mkHStrUid(UID_HTower          ,'Адская Башня'               ,'Защитное сооружение. Может атаковать наземных и воздушных юнитов'  );
-  _mkHStrUid(UID_HTeleport       ,'Адский Телепорт'            ,'Телепортирует юнитов'                                              );
-  _mkHStrUid(UID_HMonastery      ,'Адский Монастырь'           ,'Открывает доступ к T2 технологиям для юнитов'                      );
-  _mkHStrUid(UID_HTotem          ,'Адский Тотем'               ,'Продвинутое защитное сооружение.  Может атаковать наземных и воздушных юнитов. Не может атаковать здания'      );
-  _mkHStrUid(UID_HAltar          ,'Адский Алтарь'              ,'Может накладывать "неуязвимость" на юнитов'     );
-  _mkHStrUid(UID_HPentagram      ,'Адская Пентаграмма'         ,'Открывает доступ к мощным T2 юнитам');
-  _mkHStrUid(UID_HFortress       ,'Адский Замок'               ,'Открывает доступ к T2 технологиям для зданий'   );
-  _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,'');
+  str_ability_name[uab_Teleport        ]:='Телепортация';
+  str_ability_name[uab_UACScan         ]:='Сканирование';
+  str_ability_name[uab_HTowerBlink     ]:='Скачок';
+  str_ability_name[uab_UACStrike       ]:='Ракетный удар';
+  str_ability_name[uab_HKeepBlink      ]:='Перемещение';
+  str_ability_name[uab_RebuildInPoint  ]:='';
+  str_ability_name[uab_HInvulnerability]:='Неуязвимость';
+  str_ability_name[uab_SpawnLost       ]:='Выпустить Lost Soul';
+  str_ability_name[uab_HellVision      ]:='Адское зрение';
+  str_ability_name[uab_CCFly           ]:='Двигатели для полета';
+
+
+  _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');
+  _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
+  _mkHStrUid(UID_HGate           ,'Врата Демонов'              ,'');
+  _mkHStrUid(UID_HSymbol         ,'Нечестивый Символ'          ,'');
+  _mkHStrUid(UID_HASymbol        ,'Великий Нечестивый Символ'  ,'');
+  _mkHStrUid(UID_HPools          ,'Инфернальные Омуты'         ,'');
+  _mkHStrUid(UID_HTeleport       ,'Телепорт'                   ,'');
+  _mkHStrUid(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
+  _mkHStrUid(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
+  _mkHStrUid(UID_HFortress       ,'Замок Проклятых'            ,'');
+  _mkHStrUid(UID_HTower          ,'Сторожевая Башня'           ,'Защитное сооружение'                  );
+  _mkHStrUid(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
+  _mkHStrUid(UID_HAltar          ,'Алтарь Боли'                ,'');
+  _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''         );
   _mkHStrUid(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
-  _mkHStrUid(UID_HBarracks       ,'Проклятые Казармы'          ,'');
-  _mkHStrUid(UID_HEye            ,'Адский Глаз'                ,'Пассивная разведка и детекция');
+  _mkHStrUid(UID_HBarracks       ,'Казармы Зомби'              ,''          );
+  _mkHStrUid(UID_HEye            ,'Око Зла'                    ,''       );
 
 
   _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'            ,'');

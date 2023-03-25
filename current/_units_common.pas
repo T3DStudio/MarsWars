@@ -1725,13 +1725,9 @@ uab_CCFly         :
       end;
 
       // DETECTION
-      case uidi of
-UID_UMine,
-UID_URadar,
-UID_HEye          : buff[ub_Detect]:=_ub_infinity;
-      end;
       if(buff[ub_HVision]>0)then
        if(buff[ub_Detect]<buff[ub_HVision])then buff[ub_Detect]:=buff[ub_HVision];
+      if(_detector)then buff[ub_Detect]:=_ub_infinity;
 
       // INVIS
       case uidi of

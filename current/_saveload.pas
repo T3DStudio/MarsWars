@@ -367,26 +367,25 @@ begin
          BlockRead(f,theme_map_trt    ,SizeOf(theme_map_trt    ));
          BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
 
-         map_vars;
-         map_MakeThemeSprites;
-         map_RefreshDoodadsCells;
-         map_RedrawMenuMinimap;
-         map_DoodadsDrawData;
-         pf_make_grid;
-         g_inv_CalcWave;
-         CamBounds;
-
-         G_Started:=true;
-
-         if(_menu)
-         then ToggleMenu;
-
          for u:=1 to MaxUnits do
           with _units[u] do
           begin
              player:=@_players[playeri];
              uid   :=@_uids[uidi];
           end;
+
+         map_vars;
+         map_MakeThemeSprites;
+         map_RefreshDoodadsCells;
+         map_RedrawMenuMinimap;
+         map_DoodadsDrawData;
+         pf_make_grid;
+         CamBounds;
+
+         G_Started:=true;
+
+         if(_menu)
+         then ToggleMenu;
       end;
       close(f);
    end;

@@ -785,29 +785,30 @@ begin
    vid_vmb_x1   := vid_vw-vid_vmb_x0;
    vid_vmb_y1   := vid_vh-vid_vmb_y0;
 
-   ui_textx     := vid_mapx+4;
-   ui_texty     := vid_mapy+4;
-   ui_hinty1    := vid_mapy+vid_cam_h-(font_w+3)*6;
-   ui_hinty2    := vid_mapy+vid_cam_h-(font_w+3)*2;
-   ui_chaty     := ui_hinty1-14;
-   ui_logy      := ui_chaty-12;
-   ui_oicox     := vid_mapx+vid_cam_w-4;
+   ui_textx     := vid_mapx+font_hw;
+   ui_texty     := vid_mapy+font_hw;
+   ui_hinty1    := vid_mapy+vid_cam_h-txt_line_h1*7;
+   ui_hinty2    := vid_mapy+vid_cam_h-txt_line_h1*5;
+   ui_hinty3    := vid_mapy+vid_cam_h-txt_line_h1*2;
+   ui_chaty     := ui_hinty1-font_3hw;
+   ui_logy      := ui_chaty-font_3hw;
+   ui_oicox     := vid_mapx+vid_cam_w-font_hw;
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
    ui_uiplayery := ui_uiuphy+font_3hw;
-   ui_game_log_height:=(ui_hinty1-60) div 12;
+   ui_game_log_height:=(ui_hinty1-font_5w) div font_3hw;
 
    ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := vid_mapx+vid_cam_w-(font_w*12);
+   ui_fpsx      := vid_mapx+vid_cam_w-(font_w*font_3hw);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
-   ui_apmy      := ui_fpsy+font_w+txt_line_h;
+   ui_apmy      := ui_fpsy+txt_line_h3;
 
 
-   ui_menu_btnsy:= max2(12,(vid_vh div vid_BW)-1);
+   ui_menu_btnsy:= max2(font_3hw,(vid_vh div vid_BW)-1);
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin

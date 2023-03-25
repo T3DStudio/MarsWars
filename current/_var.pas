@@ -48,7 +48,6 @@ _cycle_regen      : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
-//_commands         : array[byte] of TCommand;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
@@ -107,6 +106,7 @@ fr_FrameCount,
 fr_LastTicks,
 fr_BaseTicks     : cardinal;
 
+wtrset_all,
 wtrset_enemy,
 wtrset_enemy_alive,
 wtrset_enemy_alive_light,
@@ -132,6 +132,9 @@ wtrset_enemy_alive_ground_light_bio,
 wtrset_heal,
 wtrset_repair,
 wtrset_resurect   : cardinal;
+
+u_royal_cd,
+u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
 
@@ -375,6 +378,7 @@ ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
 ui_hinty1         : integer = 0;  // hints screen Y
 ui_hinty2         : integer = 0;  // hints screen Y
+ui_hinty3         : integer = 0;  // hints screen Y
 ui_logy           : integer = 0;  // LOG screen Y
 ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
@@ -686,15 +690,18 @@ spr_cp_gen        : TMWTexture;
 //  TEST
 //
 
+str_ability_name  : array[byte]  of shortstring;
 str_race          : array[0..r_cnt       ] of shortstring;
 str_gmode         : array[0..gm_cnt      ] of shortstring;
 str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
-str_Builder,
-str_Barrack,
-str_Smith,
+str_transformation,
+str_ability,
+str_builder,
+str_barrack,
+str_smith,
 str_IncEnergyLevel,
 str_CanRebuildTo,
 str_attr_detector,
@@ -711,6 +718,7 @@ str_attr_fly,
 str_attr_ground,
 str_attr_floater,
 str_unit_advanced,
+str_attr_transport,
 str_advanced,
 str_upgrade_complete,
 str_building_complete,
@@ -733,7 +741,7 @@ str_m_sym,
 str_plname,
 str_aislots,
 str_cgenerators,
-str_deadobservers,
+str_DeadObservers,
 str_team,
 str_srace,
 str_ready,

@@ -1,20 +1,4 @@
 
-procedure g_inv_CalcWave;
-begin
-   case g_inv_wave_n of
-   1,
-   10,
-   19 : g_inv_wave_t_next:=fr_fps1*120;
-   else g_inv_wave_t_next:=fr_fps1*30+round(g_inv_wave_t_curr/2*(MinSMapW/map_mw)); //g_inv_wave_t_curr;
-   end;
-
-   case g_inv_wave_n of
-   1  : g_inv_limit:=ul5;
-   2  : g_inv_limit:=ul15;
-   else g_inv_limit:=(g_inv_wave_n-1)*ul30;
-   end;
-end;
-
 procedure GameModeInvasionSpawnMonsters(limit,MaxMonsterLimit:longint);
 var tx,ty:integer;
 function SpawnMonster(uid:byte):boolean;
@@ -114,14 +98,19 @@ const max_wave_time = fr_fps1*150;
 begin
    if(_players[0].armylimit<=0)then
    begin
-      if(g_inv_wave_t_next=0)then
+      if(g_inv_wave_t_next<=0)then
       begin
          if(g_inv_wave_n>=InvMaxWaves)
          then GameSetStatusWinnerTeam(1)
          else
          begin
             g_inv_wave_n+=1;
-            g_inv_CalcWave;
+            case g_inv_wave_n of
+            1,
+            10,
+            19 : g_inv_wave_t_next:=fr_fps1*120;
+            else g_inv_wave_t_next:=fr_fps1*30+round(g_inv_wave_t_curr/2*(MinSMapW/map_mw)); //g_inv_wave_t_curr;
+            end;
          end;
       end
       else
@@ -132,6 +121,12 @@ begin
             {$IFDEF _FULLGAME}
             SoundPlayMMapAlarm(snd_teleport,false);
             {$ENDIF}
+            case g_inv_wave_n of
+            0  : g_inv_limit:=0;
+            1  : g_inv_limit:=ul5;
+            2  : g_inv_limit:=ul15;
+            else g_inv_limit:=(g_inv_wave_n-1)*ul32;
+            end;
             GameModeInvasionSpawnMonsters(g_inv_limit,ul1*g_inv_wave_n);
          end;
       end;

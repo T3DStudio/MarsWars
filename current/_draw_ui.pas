@@ -513,7 +513,8 @@ var i,
    uid :byte;
      s1:shortstring;
     hs1,
-    hs2:pshortstring;
+    hs2,
+    hs3:pshortstring;
     tu :PTUnit;
 begin
    //str_hint_a
@@ -521,6 +522,7 @@ begin
    begin
       hs1:=nil;
       hs2:=nil;
+      hs3:=nil;
       if(m_by=ui_menu_btnsy)then
       begin
          if(m_bx=2)then
@@ -558,12 +560,13 @@ begin
                       if(uid_e[uid]=0)and(a_units[uid]<=0)then exit;
                       hs1:=@_uids[uid].un_txt_uihint1;
                       hs2:=@_uids[uid].un_txt_uihint2;
+                      hs3:=@_uids[uid].un_txt_uihint3;
                    end;
               2  : begin
                       if(a_upgrs[uid]<=0)then exit;
                       s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
                       hs1:=@s1;
-                      hs2:=@_upids[uid]._up_hint2;
+                      hs3:=@_upids[uid]._up_hint;
                    end;
               end;
            end;
@@ -571,12 +574,13 @@ begin
       end;
       if(hs1<>nil)then _draw_text(tar,ui_textx,ui_hinty1,hs1^,ta_left,ui_ingamecl,c_white);
       if(hs2<>nil)then _draw_text(tar,ui_textx,ui_hinty2,hs2^,ta_left,ui_ingamecl,c_white);
+      if(hs3<>nil)then _draw_text(tar,ui_textx,ui_hinty3,hs3^,ta_left,ui_ingamecl,c_white);
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
      begin
-        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihint3 ,ta_left,ui_ingamecl,c_white);
-        _draw_text(tar,ui_textx,ui_hinty2,tc_white+'('+tc_default+tu^.player^.name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
+        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihintS ,ta_left,ui_ingamecl,c_white);
+        _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+tu^.player^.name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
      end;
 end;
 

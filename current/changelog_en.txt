@@ -1,0 +1,83 @@
+52:
+
+Other:
+- the game engine has been updated to make it easier to add new content(units, upgrades, etc);
+- sdl_mixer replaced by OpenAL;
+- multiplayer/replays system was improved: now possible to update all units every game tick;
+- map generator can make symmetrical maps now;
+- visual themes for maps;
+- max map size increased to 8000;
+- option 'Game: UDOOM/DOOM2' removed; now game about DOOM2 only;
+- new game option: 'Neutral generators' - map contain neutral generators that can be cuptured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators can have optional lifetime;
+- new game mode 'King of the Hill' where players must capture and hold central area for 1 minute to win;
+- improvements for computer opponents code:
+-- bot trying to keep their attacking units together;
+-- bot remembers the places where he saw the enemy to check them later;
+-- increased number of AI difficulty levels to 11(1-7 - default, 8-11 - 'cheaters');
+- fixed framerate control code, now the game loop is exactly 60 fps;
+- added 'observer' player role;
+- shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
+
+Interface:
+
+
+
+49.1:
+- Fixed bugs: 
+-- Hell Gate teleportation;
+-- Hell Eye icon on panel; 
+- UAC CC now have turret sprite when "Command Center turret" upgrade researched;
+- Added builder helper: "building ghost" will push out from static objects;
+- Changed build reload: destruction one of you builds adds 3 seconds of build cooldown; maximum build cooldown – 12 seconds;
+- Changed "Starting base" options;
+- Game mode "Assault" replaced by "Royal Battle"; 
+- Double F2 now move camera on you army;
+- Game balance:
+-- UAC CC now can attack air units; Hits reduced to 2500;
+-- Mastermind's sight/attack range increase to 275/325(not adv./adv.);
+-- Increased damage from UAC missiles strike;
+-- Hits of UAC Generator/Hell Symbol reduced by 1/3, build time reduced by 2(Symbol) and 4(Generator) seconds;
+-- UAC Command Center/Hell Keep now give 8 energy points and request 10 for build;
+-- Hell: maximum invulnerability spheres now 1; 
+-- Reduced researching time of Ancient Evil, High technologies and Advanced armory upgrades; energy cost increased to 12;
+-- Reduced maximum upgrade level of Tower range upgrade and Pain threshold;
+-- Hell Keep building time reduced to 60 seconds;
+-- Changed advanced UAC Flyer - now it have 350 attack ranges against air and doesn't have "attack while moving" ability;
+-- ArchVile's attack range increased to 450;
+- Small fixes and optimizations;
+
+49:
+- Changes in main menu;
+- More window resolution options;
+- 4 tabs in game control panel (buildings, units, upgrades and units/replays controls);
+- New unit control system - now it more like Blizzard games;
+- New map generator;
+- Maximum map size increased to 7000;
+- Players number increased to 6;
+- New game mode: Three bases (2x2x2);
+- Setting 'Fill empty slots' (with AI players);
+- New chat in multiplayer - now you can pick players-recipients;
+- More sprites for map doodads, different sizes of lakes/craters;
+- Dedicated server (like in 39.5 version);
+- New system of chat-commands for dedicated server management;
+- Some upgrades can be produced in many buildings at time;
+- AI improvements (and also skills count increased to 7);
+- Now replays store information about selected units and screen moving; 
+- Units icons for orders (on 1..9 hotkeys);
+- UAC Fly transport and Hell Teleport can't unload/teleport units on doodads/lakes;
+- Changed Invasion game mode - no more Duke Nukem 3D monsters and time to next wave depend from how long you was kill previous wave;  
+- Many changes in units ballance;
+- New zombie type - zombie-camicadze (creates from UAC Engineers);
+
+Update:
+Fixed:
++ server address bug in menu;
++ UAC Medic can't attack enemy UAC Medics;
++ broken building reload timers on icons in multiplayer;
++ tower teleportation (Hell) not work for non-AI players;
++ bugs in AI;
+New:
++ advanced UAC Major can fly up/ground by order;
++ production cancelling for units/upgrades in reverse order;
++ hotkey and button for switch right click action in game;
++ lower priority for buildings when units attack(except siege units);

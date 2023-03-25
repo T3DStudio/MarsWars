@@ -658,11 +658,11 @@ begin
    end;
 end;
 
-function _CheckRoyalBattleR(x,y,d:integer):boolean;
+function _CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
    if(g_mode=gm_royale)
-   then _CheckRoyalBattleR:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
-   else _CheckRoyalBattleR:=false;
+   then _CheckRoyalBattlePoint:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
+   else _CheckRoyalBattlePoint:=false;
 end;
 
 function _random(m:integer):integer;

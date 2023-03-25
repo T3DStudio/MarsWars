@@ -94,7 +94,7 @@ MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 MaxCPoints             = MaxPlayers*3;
 
-MaxSMapW               = 7000;
+MaxSMapW               = 8000;
 MinSMapW               = 2000;
 StepSMap               = 250;
 
@@ -333,7 +333,7 @@ atm_inapc              = 4;   // can attack only when in apc
 //
 
 wpr_any                : cardinal =  0;
-wpr_zombie             : cardinal =  %0000000000001000;
+//wpr_zombie             : cardinal =  %0000000000001000;
 wpr_avis               : cardinal =  %0000000000010000;
 wpr_ground             : cardinal =  %0000000000100000;
 wpr_air                : cardinal =  %0000000001000000;
@@ -377,12 +377,13 @@ wtr_nostun             : cardinal = %001000000000000000000;
 //  Weapon: type
 //
 
-wpt_missle             = 0;
-wpt_resurect           = 1;
-wpt_heal               = 2;
-wpt_unit               = 3;
-wpt_directdmg          = 4;
-wpt_suicide            = 5;
+wpt_missle             = 1;
+wpt_resurect           = 2;
+wpt_heal               = 3;
+wpt_unit               = 4;
+wpt_directdmg          = 5;
+wpt_directdmgZ         = 6;
+wpt_suicide            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -476,7 +477,7 @@ b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 //  OBSTACLES
 //
 
-MaxDoodads             = 700;
+MaxDoodads             = 800;
 
 //
 ddc_div                = 1000000;
@@ -516,8 +517,8 @@ upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
 upgr_hell_buildr       = 7;  // main range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
-upgr_hell_paina        = 9;  // decay aura
-upgr_hell_extbuild     = 10; // HK on doodabs
+upgr_hell_extbuild     = 9;  // buildings on doodabs
+upgr_hell_paina        = 10; // decay aura
 upgr_hell_towers       = 11; // towers range
 upgr_hell_pinkspd      = 12; // demon move speed
 
@@ -543,8 +544,8 @@ upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_painn         = 36; // expansive bullets
 upgr_uac_buildr        = 37; // main sr
 upgr_uac_CCFly         = 38; // CC fly
-upgr_uac_ccturr        = 39; // CC turret
-upgr_uac_extbuild      = 40; // main on doodabs
+upgr_uac_extbuild      = 39; // buildings on doodabs
+upgr_uac_ccturr        = 40; // CC turret
 upgr_uac_towers        = 41; // towers sr
 upgr_uac_soaring       = 42; // UACBot floating
 
@@ -633,15 +634,15 @@ ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
 ul20                   = MinUnitLimit*20;
-ul30                   = MinUnitLimit*30;
+ul32                   = MinUnitLimit*32;
 ul100                  = MinUnitLimit*100;
 ul110                  = MinUnitLimit*110;
 
 // production time
 ptime1                 = 28;
-ptimeh                 = ptime1 div 2;
-ptimehh                = ptimeh div 2;
-ptime2h3               = (ptime1 div 3)*2; //2/3
+ptimeh                 = ptime1  div 2;
+ptimehh                = ptimeh  div 2;
+ptimehhh               = ptimehh div 2;
 ptime1h                = ptime1+ptimeh;
 ptime1hh               = ptime1+ptimehh;
 ptime2                 = ptime1*2;
@@ -804,10 +805,10 @@ uab_HTowerBlink        = 3;
 uab_UACStrike          = 4;
 uab_HKeepBlink         = 5;
 uab_RebuildInPoint     = 6;
-uab_HInvulnerability   = 8;
-uab_SpawnLost          = 9;
-uab_HellVision         = 10;
-uab_CCFly              = 11;
+uab_HInvulnerability   = 7;
+uab_SpawnLost          = 8;
+uab_HellVision         = 9;
+uab_CCFly              = 10;
 
 client_rld_abils = [
                    uab_Teleport
@@ -999,14 +1000,14 @@ vid_maxplcolors        = 6;
 sd_liquid_back         = -32500;
 sd_liquid              = -32000;
 // neytral generators
-sd_tcraters            = MaxSMapW+sd_liquid;    // -25000
+sd_tcraters            = MaxSMapW+sd_liquid;    // -24000
 // doodads
-sd_brocks              = MaxSMapW+sd_tcraters;  // -18000
-sd_srocks              = MaxSMapW+sd_brocks;    // -11000
-sd_build               = MaxSMapW+sd_srocks;    // -4000
-sd_ground              = MaxSMapW+sd_build;     //  3000
-sd_fly                 = MaxSMapW+sd_ground;    //  10000
-sd_marker              = MaxSMapW+sd_fly;       //  17000
+sd_brocks              = MaxSMapW+sd_tcraters;  // -16000
+sd_srocks              = MaxSMapW+sd_brocks;    // -8000
+sd_build               = MaxSMapW+sd_srocks;    //  0
+sd_ground              = MaxSMapW+sd_build;     //  8000
+sd_fly                 = MaxSMapW+sd_ground;    //  16000
+sd_marker              = MaxSMapW+sd_fly;       //  24000
 
 map_flydepths          : array[false..true] of integer = (sd_ground,sd_fly);
 
@@ -1112,12 +1113,14 @@ ta_chat                = 3;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
+font_5w                = font_w*5;
 font_iw                = font_w-1;
 font_3hw               = font_w+(font_w div 2);
 font_6hw               = font_3hw*2;
 
-txt_line_h             = 5;
+txt_line_h1            = font_w+2;
 txt_line_h2            = 25-font_w;
+txt_line_h3            = font_w+5;
 
 chat_all               = 255;
 chat_allies            = 254;

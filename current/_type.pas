@@ -158,14 +158,6 @@ end;
 
 {$ENDIF}
 
-{TCommand = record
-   c_type  : byte;
-   {$IFDEF _FULLGAME}
-   c_hint  : shortstring;
-   c_btn   : pSDL_Surface;
-   {$ENDIF}
-end;   }
-
 TWUDataTime  = array[1..MaxUnits] of cardinal;
 TWCPDataTime = array[1..MaxCPoints] of byte;
 
@@ -272,6 +264,7 @@ TUID = record
    _ukbuilding,
    _ukmech,
    _uklight,
+   _detector,
    _isbuilder,
    _issmith,
    _isbarrack,
@@ -298,7 +291,8 @@ TUID = record
    un_txt_fdescr,
    un_txt_uihint1,
    un_txt_uihint2,
-   un_txt_uihint3
+   un_txt_uihint3,
+   un_txt_uihintS
                 : shortstring;
 
    un_build_amode,
@@ -348,7 +342,7 @@ TUPID = record  // upgrade
    _up_btn      : TMWTexture;
    _up_name,
    _up_descr,
-   _up_hint2    : shortstring;
+   _up_hint     : shortstring;
    {$ENDIF}
 end;
 

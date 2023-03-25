@@ -383,7 +383,7 @@ begin
                  _draw_text(tar,ui_menu_csm_xt2, y, str_cgeneratorsM[g_cgenerators], ta_right ,255 ,c_white);
 
                  y:=_yt(7);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_deadobservers    , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_DeadObservers    , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_deadobservers], ta_right ,255 ,c_white);
 
                  y:=_yt(8);

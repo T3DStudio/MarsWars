@@ -41,7 +41,7 @@ begin
               uo_x :=x;
               uo_y :=y;
               dir  :=270;
-              hits :=_mhits;
+              hits :=_hmhits;
               buff[ub_Resurect]:=0;
               buff[ub_Summoned]:=fr_fps1;
               {$IFDEF _FULLGAME}
@@ -427,12 +427,12 @@ wpt_heal     : if(tu^.hits<=0)
        if(rld>0)then exit;
 
 
-      if(cf(@aw_reqf,@wpr_zombie))then
+      if(aw_type=wpt_directdmgZ)then
       begin
          if(tu^.bld=false)
          or(tu^.uid^._zombie_uid =0)
          or(tu^.uid^._zombie_hits<tu^.hits)
-         or(tu^.hits<=fdead_hits)then exit;
+         or(tu^.hits<=fdead_hits          )then exit;
       end;
 
       // requirements to target
@@ -724,12 +724,18 @@ begin
       if(StayWaitForNextTarget>0)
       then StayWaitForNextTarget-=1;
 
+      u_royal_cd:=NOTSET;
+      u_royal_d :=NOTSET;
       if(g_mode=gm_royale)then
-       if(_CheckRoyalBattleR(x,y,_missile_r))then
-       begin
-          _unit_kill(pu,false,false,true,true);
-          exit;
-       end;
+      begin
+         u_royal_cd:=point_dist_int(x,y,map_hmw,map_hmw);
+         u_royal_d :=g_royal_r-u_royal_cd;
+         if(u_royal_d<_missile_r)then
+         begin
+            _unit_kill(pu,false,false,true,true);
+            exit;
+         end;
+      end;
 
       if(_ukbuilding)and(menergy<=0)then
       begin
@@ -1193,7 +1199,7 @@ uab_Teleport     : if(_ability_teleport    (pu,tu,td))then exit;//team
       end;
 end;
 
-procedure _resurrect(tu:PTUnit);
+procedure _StartResurrection(tu:PTUnit);
 begin
    with tu^ do
    begin
@@ -1203,7 +1209,7 @@ begin
    end;
 end;
 
-function _makezimba(pu,tu:PTUnit):boolean;
+function _TryZombification(pu,tu:PTUnit):boolean;
 var _h:single;
     _l,
     _o:byte;
@@ -1215,7 +1221,7 @@ var _h:single;
     _s:integer;
     {$ENDIF}
 begin
-   _makezimba:=false;
+   _TryZombification:=false;
 
    //pu - lost
    //tu - marine
@@ -1261,16 +1267,11 @@ begin
          if(hits<=0)then
          begin
             _unit_dec_Kcntrs(_LastCreatedUnitP);
-            _resurrect(_LastCreatedUnitP);
-         end;{
-         else
-         begin
-            buff[ub_Summoned]:=fr_fps1;
-            //_unit_summon_effects(pu,nil);
-         end;}
+            _StartResurrection(_LastCreatedUnitP);
+         end;
       end;
    end;
-   _makezimba:=true;
+   _TryZombification:=true;
 end;
 
 procedure _unit_exp(pu:PTUnit;exp:cardinal);
@@ -1498,26 +1499,23 @@ wpt_missle     : if(aw_oid>0)then
                          _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
                       end;
 wpt_unit       : if(not fakemissile)then _ability_unit_spawn(pu,aw_oid);
-wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
-                  if(not cf(@aw_reqf,@wpr_zombie))
-                  then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false)
-                  else
-                    if(not _makezimba(pu,tu))
-                    then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false);
-wpt_suicide  : if(ServerSide)then _unit_kill(pu,false,true,true,false);
+wpt_directdmg  : if(not fakemissile)and(aw_count>0)then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false);
+wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
+                  if(not _TryZombification(pu,tu))
+                  then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false);
+wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false);
             else
-               if(ServerSide)and(not fakemissile)then
-                 case aw_type of
-wpt_resurect : begin
-                  _resurrect(tu);
-                  if(cf(@aw_reqf,@wpr_reload))then rld:=ptimehh*fr_fps1;
-               end;
-wpt_heal     : begin
-                  tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
-                  tu^.buff[ub_Heal]:=aw_rld;
-               end;
+              if(ServerSide)and(not fakemissile)then
+              case aw_type of
+wpt_resurect   : begin
+                    _StartResurrection(tu);
+                    if(cf(@aw_reqf,@wpr_reload))then rld:=ptimehhh*fr_fps1;
                  end;
-
+wpt_heal       : begin
+                    tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+                    tu^.buff[ub_Heal]:=aw_rld;
+                 end;
+              end;
             end;
          end;
       end;
