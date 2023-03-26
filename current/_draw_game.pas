@@ -692,7 +692,7 @@ begin
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(r_screen,ix,iy,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
+              lineColor(r_screen,ix+1,iy+1,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
 
               if(aiu_alarm_d<32000)then
               lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );

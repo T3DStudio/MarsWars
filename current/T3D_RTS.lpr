@@ -65,6 +65,17 @@ uses SysUtils, SDL, SDL_Net
 
 {$R *.res}
 
+{procedure _test;
+var i:byte;
+begin
+   for i:=0 to 255 do
+   with _uids[i] do
+   if(_r>0)then
+   begin
+      writeln(_r,' ',(_r/12):4:4,' ',un_txt_name);
+   end;
+end; }
+
 begin
    InitGame;
 

@@ -340,7 +340,7 @@ begin
             MID_BPlasma     : _d150(@rdamage);
             end;
 
-        if(mid=MID_BFG)then rdamage:=trunc(rdamage*tu^.uid^._limituse/MinUnitLimit);
+        if(mid=MID_BFG)then rdamage:=trunc(rdamage*tu^.uid^._limituse/MinUnitLimit );
 
         end
         else ///////////////////////////// buildings

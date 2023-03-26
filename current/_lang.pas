@@ -252,17 +252,19 @@ begin
        end;
        if(_ability>0)then
         if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-        then _ADDSTRD(@_MakeDefaultDescription,str_ability+str_transformation+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl))
+        then _ADDSTRD(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl))
         else
           if(length(str_ability_name[_ability])>0)
           then _ADDSTRD(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl));
 
-       {if(_attack>0)then
-        for a:=0 to MaxUnitWeapons do
-         with _a_weap[a] do
-          case aw_type of
-
-          end;  }
+       if(_attack=atm_always)then
+       begin
+          for w:=0 to MaxUnitWeapons do
+           with _a_weap[w] do
+            case aw_type of
+            wpt_missle:;
+            end;
+       end;
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
@@ -626,13 +628,13 @@ begin
    _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
    _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
    _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
-   _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Defensive structure'                  );
-   _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'         );
+   _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Defensive structure'              );
+   _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
    _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'');
-   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted UAC Command Center'         );
-   _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted UAC Advanced Command Center');
-   _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted UAC Barracks'               );
-   _mkHStrUid(UID_HEye           ,'Evil Eye'                    ,'Passive scouting and detection'       );
+   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
+   _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
+   _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
+   _mkHStrUid(UID_HEye           ,'Evil Eye'                    ,'Passive scouting and detection'   );
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'                   ,'');
    _mkHStrUid(UID_Phantom        ,'Phantom'                     ,'');
@@ -667,55 +669,55 @@ begin
    _mkHStrUpid(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before pain stun happen.'                  );
    _mkHStrUpid(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase defensive structures range.'                                    );
    _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Blick Charge'        ,'Charge for Hell Keep`s ability.'                                         );
-   _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura`s damage ignore unit`s armor.');
+   _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignore unit`s armor.');
    _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s sight range.'                                       );
    _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except those that can produce units and Teleport, can be placed on doodads.');
    _mkHStrUpid(upgr_hell_pinkspd   ,'Pinky`s Rage'                  ,'Increase the movement speed of Pinky.'                                   );
 
-   _mkHStrUpid(upgr_hell_spectre   ,'Spectres'                      ,'Pinky become invisible.'                                     );
-   _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell`s units.'               );
-   _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Lost Soul become Phantom.'                                   );
+   _mkHStrUpid(upgr_hell_spectre   ,'Spectres'                      ,'Pinky become invisible.'                                         );
+   _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell`s units.'                   );
+   _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul.'            );
    _mkHStrUpid(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
-   _mkHStrUpid(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Decrease cooldown time of Hell Teleport.'                        );
-   _mkHStrUpid(upgr_hell_rteleport ,'Reverse Teleporting'           ,'Units can teleport back to Hell Teleport.'                       );
+   _mkHStrUpid(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Decrease cooldown time of Teleport.'                             );
+   _mkHStrUpid(upgr_hell_rteleport ,'Reverse Teleportation'         ,'Units can teleport back to Teleport.'                            );
    _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye.'                           );
-   _mkHStrUpid(upgr_hell_totminv   ,'Tower of Horror Invisibility'  ,'Tower of Horror become invisible.'                               );
+   _mkHStrUpid(upgr_hell_totminv   ,'Tower of Horror Invisibility'  ,'Totem of Horror become invisible.'                               );
    _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell`s buildings.'                   );
-   _mkHStrUpid(upgr_hell_b478tel   ,'Tower Teleportation Charge'    ,'Charges for Guard Tower`s and Tower`s of Horror ability.');
-   _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability.');
-   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Altar`s of Pain ability.'      );
+   _mkHStrUpid(upgr_hell_b478tel   ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror.');
+   _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability.'                    );
+   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Altar of Pain ability.'      );
 
 
-   _mkHStrUid(UID_UCommandCenter   ,'UAC Command Center'         ,''      );
-   _mkHStrUid(UID_UACommandCenter  ,'UAC Advanced Command Center',''      );
-   _mkHStrUid(UID_UBarracks        ,'UAC Barracks'               ,''      );
-   _mkHStrUid(UID_UFactory         ,'UAC Factory'                ,''      );
-   _mkHStrUid(UID_UGenerator       ,'UAC Generator'              ,''      );
-   _mkHStrUid(UID_UAGenerator      ,'UAC Advanced Generator'     ,''      );
-   _mkHStrUid(UID_UWeaponFactory   ,'UAC Weapon Factory'         ,''      );
-   _mkHStrUid(UID_UGTurret         ,'UAC Anti-ground Turret'     ,'Anti-ground defensive structure');
-   _mkHStrUid(UID_UATurret         ,'UAC Anti-air Turret'        ,'Anti-air defensive structure'   );
-   _mkHStrUid(UID_UTechCenter      ,'UAC Science Center'         ,'');
-   _mkHStrUid(UID_UNuclearPlant    ,'UAC Nuclear Plant'          ,'');
-   _mkHStrUid(UID_URadar           ,'UAC Radar'                  ,'Reveals map');
-   _mkHStrUid(UID_URMStation       ,'UAC Rocket Launcher Station','');
-   _mkHStrUid(UID_UMine            ,'UAC Mine'                   ,''      );
+   _mkHStrUid(UID_UCommandCenter   ,'Command Center'                ,''      );
+   _mkHStrUid(UID_UACommandCenter  ,'Advanced Command Center'       ,''      );
+   _mkHStrUid(UID_UBarracks        ,'Barracks'                      ,''      );
+   _mkHStrUid(UID_UFactory         ,'Vehicle Factory'               ,''      );
+   _mkHStrUid(UID_UGenerator       ,'Generator'                     ,''      );
+   _mkHStrUid(UID_UAGenerator      ,'Advanced Generator'            ,''      );
+   _mkHStrUid(UID_UWeaponFactory   ,'Weapon Factory'                ,''      );
+   _mkHStrUid(UID_UGTurret         ,'Anti-ground Turret'            ,'Anti-ground defensive structure');
+   _mkHStrUid(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
+   _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
+   _mkHStrUid(UID_UNuclearPlant    ,'Nuclear Plant'                 ,'');
+   _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map');
+   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'');
+   _mkHStrUid(UID_UMine            ,'Mine'                          ,'');
 
-   _mkHStrUid(UID_Sergant          ,'Shotguner'                  ,'');
-   _mkHStrUid(UID_SSergant         ,'SuperShotguner'             ,'');
-   _mkHStrUid(UID_Commando         ,'Commando'                   ,'');
-   _mkHStrUid(UID_Antiaircrafter   ,'Antiaircrafter'             ,'');
-   _mkHStrUid(UID_SiegeMarine      ,'Siege Marine'               ,'');
-   _mkHStrUid(UID_FPlasmagunner    ,'Plasmaguner'                ,'');
-   _mkHStrUid(UID_BFGMarine        ,'BFG Marine'                 ,'');
-   _mkHStrUid(UID_Engineer         ,'Engineer'                   ,'');
-   _mkHStrUid(UID_Medic            ,'Medic'                      ,'');
-   _mkHStrUid(UID_UTransport       ,'UAC Dropship'               ,'');
-   _mkHStrUid(UID_UACDron          ,'UAC Drone'                  ,'');
-   _mkHStrUid(UID_Terminator       ,'UAC Terminator'             ,'');
-   _mkHStrUid(UID_Tank             ,'UAC Tank'                   ,'');
-   _mkHStrUid(UID_Flyer            ,'UAC Fighter'                ,'');
-   _mkHStrUid(UID_APC              ,'Ground APC'                 ,'');
+   _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
+   _mkHStrUid(UID_SSergant         ,'SuperShotguner'                ,'');
+   _mkHStrUid(UID_Commando         ,'Commando'                      ,'');
+   _mkHStrUid(UID_Antiaircrafter   ,'Antiaircrafter'                ,'');
+   _mkHStrUid(UID_SiegeMarine      ,'Siege Marine'                  ,'');
+   _mkHStrUid(UID_FPlasmagunner    ,'Plasmaguner'                   ,'');
+   _mkHStrUid(UID_BFGMarine        ,'BFG Marine'                    ,'');
+   _mkHStrUid(UID_Engineer         ,'Engineer'                      ,'');
+   _mkHStrUid(UID_Medic            ,'Medic'                         ,'');
+   _mkHStrUid(UID_UTransport       ,'Dropship'                      ,'');
+   _mkHStrUid(UID_UACDron          ,'Drone'                         ,'');
+   _mkHStrUid(UID_Terminator       ,'Terminator'                    ,'');
+   _mkHStrUid(UID_Tank             ,'Tank'                          ,'');
+   _mkHStrUid(UID_Flyer            ,'Fighter'                       ,'');
+   _mkHStrUid(UID_APC              ,'Ground APC'                    ,'');
 
 
    _mkHStrUpid(upgr_uac_attack     ,'Ranged Attack Upgrade'            ,'Increase the damage of ranged attacks for all UAC units and defensive structures.');
@@ -723,26 +725,26 @@ begin
    _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings.'                       );
    _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase the efficiency of repair/healing of Engineers/Medics.' );
    _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units.'            );
-   _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Attacks by Shotguner, SuperShotguner, Commando, UAC Terminator and anti-ground turrets make demons have pain state more often.'                               );
+   _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Attacks by Shotguner, SuperShotguner, Commando, Terminator and anti-ground turrets make demons have pain state more often.'                               );
    _mkHStrUpid(upgr_uac_towers     ,'Tower Range Upgrade'              ,'Increase defensive structures range.'                           );
-   _mkHStrUpid(upgr_uac_CCFly      ,'UAC Command Center Flight Engines','UAC Command Center gains ability to fly.'                       );
-   _mkHStrUpid(upgr_uac_ccturr     ,'UAC Command Center Turret'        ,'Plasma turret for UAC Command Center.'                          );
-   _mkHStrUpid(upgr_uac_buildr     ,'UAC Command Center Range Upgrade' ,'Increase UAC Command Center sight range.'                       );
+   _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly.'                           );
+   _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center.'                              );
+   _mkHStrUpid(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center sight range.'                           );
    _mkHStrUpid(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads.');
-   _mkHStrUpid(upgr_uac_soaring    ,'Engines for Soaring'              ,'UAC Drone can move over obstacles.'          );
+   _mkHStrUpid(upgr_uac_soaring    ,'Engines for Soaring'              ,'Drone can move over obstacles.'              );
 
-   _mkHStrUpid(upgr_uac_botturret  ,'UAC Drone Transformation Protocol','UAC Drone can rebuild to Anti-ground turret.');
+   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret.'    );
    _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units.'  );
    _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando become invisible.'                  );
    _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles deal additional damage around target.'  );
    _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units.'      );
    _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units.'               );
-   _mkHStrUpid(upgr_uac_lturret    ,'UAC Fighter Laser Gun'            ,'UAC Fighter anti-ground weapon.'                          );
-   _mkHStrUpid(upgr_uac_transport  ,'UAC Dropship Upgrade'             ,'Increase the capacity of UAC Dropship'                    );
-   _mkHStrUpid(upgr_uac_radar_r    ,'UAC Radar Upgrade'                ,'Increase radar scouting radius.'             );
-   _mkHStrUpid(upgr_uac_plasmt     ,'UAC Anti-ground Plasmagun'        ,'Plasmagun for UAC Anti-ground turret.'       );
-   _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for UAC Turrets.'           );
-   _mkHStrUpid(upgr_uac_rstrike    ,'UAC Rocket Strike Charge'         ,'Missile for Rocket Launcher Station ability.');
+   _mkHStrUpid(upgr_uac_lturret    ,'Fighter Laser Gun'                ,'Fighter anti-ground weapon.'                              );
+   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                    );
+   _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scouting radius.'             );
+   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Plasmagun for Anti-ground turret.'           );
+   _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets.'               );
+   _mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability.' );
 
 
    _mkHStrACT(0 ,'Action');

@@ -823,8 +823,9 @@ uab_Teleport      : swtarget:=true;
       if(aicode)then ai_code(pu);
 
       {$IFDEF _FULLGAME}
-      if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
+
       {$ENDIF}
+      if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
    end;
 end;
 

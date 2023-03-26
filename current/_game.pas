@@ -13,8 +13,8 @@ begin
                                 UID_UTechCenter,UID_UNuclearPlant,UID_URMStation ],1,false);
 
       if(g_cgenerators>0)then
-      PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HAKeep          ,UID_HCommandCenter, UID_HACommandCenter,
-                                UID_UGenerator,UID_UAGenerator,UID_UCommandCenter,UID_UACommandCenter ],0,false);
+      PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HCommandCenter,
+                                UID_UGenerator,UID_UAGenerator,UID_UCommandCenter],0,false);
 
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
@@ -285,7 +285,7 @@ begin
 
          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_play)then ai_skill:=g_ai_slots;//player_default_ai_level;// ;//
+         if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots
       end;
    end;
 

@@ -9,7 +9,7 @@ aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator
 aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UBarracks      );
 aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HBarracks      ,UID_UFactory       );
 aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory );
-aiucl_tech0      : array[1..r_cnt] of byte = (UID_HPentagram     ,UID_UTechCenter    );
+aiucl_tech0      : array[1..r_cnt] of byte = (UID_HPentagram     ,UID_UNuclearPlant  );
 aiucl_tech1      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter    );
 aiucl_tech2      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UNuclearPlant  );
 aiucl_detect     : array[1..r_cnt] of byte = (UID_HEye           ,UID_URadar         );
@@ -38,9 +38,6 @@ aio_attack = 3;
 
 var
 
-ai_ReadyForAttack: boolean;
-ai_extbuilding   : boolean;
-
 ai_alarm_zone    : word;
 ai_alarm_unit,
 
@@ -66,6 +63,8 @@ ai_base_u         : PTUnit;
 ai_generator_cp,
 ai_cpoint_cp      : PTCTPoint;
 
+ai_ReadyForAttack,
+ai_extbuilding,
 ai_PhantomWantZombieMe,
 ai_advanced_bld,
 ai_teleport_use,
@@ -127,6 +126,8 @@ ai_inprogress_uid
                         : integer;
 
 ai_nearest_builder_square,
+ai_armylimit_alive_u,
+ai_armylimit_alive_b,
 ai_limitaround_own,
 ai_limitaround_enemy_fly,
 ai_limitaround_enemy_grd,
@@ -385,12 +386,6 @@ begin
         ai_advanced_bld   :=cf(@ai_flags,@aif_base_advance );
         ai_teleport_use   :=cf(@ai_flags,@aif_army_teleport);
         ai_choosen        :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
-
-        ai_ReadyForAttack :=(ai_limitaround_own>ai_attack_limit)
-                          or(armylimit>=ai_attack_limit)
-                          or(armylimit>=ai_limit_border)
-                          or(ucl_l[false]>=ai_maxlimit_blimit)
-                          or(ucl_c[true ]<=0);
      end;
 
    ai_limitaround_own      :=0;
@@ -398,6 +393,9 @@ begin
    ai_limitaround_enemy_grd:=0;
    ai_limitaround_air      :=0;
    ai_limitaround_ground   :=0;
+
+   ai_armylimit_alive_u    :=0;
+   ai_armylimit_alive_b    :=0;
 
    // enemy
    ai_enemy_u        := nil;
@@ -870,6 +868,11 @@ begin
                   ai_limitaround_own  +=tu^.uid^._limituse;
                end;
             end;
+            // armylimit
+            if(tu^.uid^._ukbuilding)
+            then ai_armylimit_alive_b+=tu^.uid^._limituse
+            else ai_armylimit_alive_u+=tu^.uid^._limituse;
+
             // detection near
             if(ud<=srange)then
              if(tu^.buff[ub_Detect]>0)
@@ -1215,7 +1218,7 @@ else     BuildMain  (2   );
 
       case race of
       r_hell: ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*500+(ai_builders_count*600) ,ai_GeneratorsEnergy);
-      r_uac : ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*400+(ai_builders_count*600) ,ai_GeneratorsEnergy);
+      r_uac : ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*450+(ai_builders_count*600) ,ai_GeneratorsEnergy);
       end;
 
       if(cf(@ai_flags,@aif_base_smart_order))then
@@ -1293,7 +1296,7 @@ uprod_antiair= -5;
 
 
 function ai_UnitProduction(pu:PTUnit;uclass,count:integer):boolean;
-var ut  :byte;
+var ut,i:byte;
     up_m,
     up_n:integer;
 smart   : boolean;
@@ -1328,7 +1331,7 @@ begin
 
    with pu^     do
    with player^ do
-   if((ucl_l[false]+uprodl)<ai_maxlimit_blimit)then
+   if((ai_armylimit_alive_u+uprodl)<ai_maxlimit_blimit)then
    begin
       smart:=cf(@ai_flags,@aif_army_smart_order);
       if(not smart)and(uclass<0)then uclass:=uprod_any;
@@ -1358,23 +1361,25 @@ uprod_smart: begin
 
 uprod_base : begin
                 ai_UnitProduction:=true;
+                for i:=1 to 3 do
                 case pu^.player^.race of
              r_hell: begin
-                        if(ai_UnitProduction(pu,UID_Imp           ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_Cacodemon     ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_Knight        ,2))then exit;
-                        if(ai_UnitProduction(pu,UID_Baron         ,2))then exit;
-                        if(ai_UnitProduction(pu,UID_ZSergant      ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_ZCommando     ,3))then exit;
+                        if(ai_UnitProduction(pu,UID_Imp           ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Cacodemon     ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Knight        ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Baron         ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_ZSergant      ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_ZCommando     ,i))then exit;
                      end;
              r_uac : begin
-                        if(ai_UnitProduction(pu,UID_Antiaircrafter,3))then exit;
                         if(tryTransport)then exit;
-                        if(ai_UnitProduction(pu,UID_Sergant       ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_FPlasmagunner ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_Commando      ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_Medic         ,3))then exit;
-                        if(ai_UnitProduction(pu,UID_Engineer      ,3))then exit;
+                        if(ai_UnitProduction(pu,UID_Antiaircrafter,i))then exit;
+                        if(ai_UnitProduction(pu,UID_FPlasmagunner ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Sergant       ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Commando      ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Medic         ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_SSergant      ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Engineer      ,i))then exit;
                      end;
                 end;
                 ai_UnitProduction:=false;
@@ -1650,17 +1655,18 @@ begin
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;//ai_unitp_cur+1;
 
       prods:=400;
-      if(race=r_uac)then prods-=100;
+      if(race=r_uac)and(ai_builders_count>1)then prods-=100;
       if((ai_maxcount_tech0> 0)and((ai_tech0_cur=0)or(ai_tech1_cur=0)or(ai_tech2_cur=0)))
       or((ai_maxcount_mains>=8)and(ai_builders_count<8))
       then prods+=150;
       //if(sel)then  writeln(prods);
       prods:=(menergy div prods);
+      if(g_cgenerators>0)then prods+=2;
 
       if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
       if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
 
-      if(_N(@ai_detect_need  ,ai_maxlimit_detect))then ai_detect_need  :=mm3(0,ucl_l[false] div 8 ,ai_maxlimit_detect);
+      if(_N(@ai_detect_need  ,ai_maxlimit_detect))then ai_detect_need  :=mm3(0,ai_armylimit_alive_u div 8,ai_maxlimit_detect);
       if(_N(@ai_towers_need  ,ai_maxcount_towers))then
       begin
          ai_towers_need:=0;
@@ -1774,7 +1780,7 @@ begin
       uo_x:=mm3(1,uo_x,map_mw);
       uo_y:=mm3(1,uo_y,map_mw);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
-      or(not ukfly and (pfzone<>pf_get_area(uo_x,uo_y)))
+      or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
       or(_CheckRoyalBattlePoint(uo_x,uo_y,base_1r))
       then ai_RunTo(pu,-1,random(map_mw),random(map_mw),0,nil);
    end;
@@ -2071,7 +2077,7 @@ begin
    with pu^  do
    with uid^ do
    with player^ do
-   if(unum=ai_scout_u_cur)and(ucl_l[false]>ai_MinArmyForScout)and(g_mode<>gm_invasion)then
+   if(unum=ai_scout_u_cur)and(ai_armylimit_alive_u>ai_MinArmyForScout)and(g_mode<>gm_invasion)then
    begin
       if(group<>aio_scout)then
         if(aiu_attack_timer<0)
@@ -2089,11 +2095,20 @@ begin
       THINK_Scout:=true;
    end
    else
-     if(group=aio_scout)then
-     begin
-        group:=aio_home;
-        aiu_attack_timer:=0;
-     end;
+   begin
+      if(group=aio_scout)then
+      begin
+         group:=aio_home;
+         aiu_attack_timer:=0;
+      end;
+      if(ai_alarm_d=NOTSET)and(ai_ReadyForAttack)then
+       if(uidi=UID_LostSoul)
+       or(uidi=UID_Phantom )then
+       begin
+          ai_DefaultIdle(pu);
+          THINK_Scout:=true;
+       end;
+   end;
    //if(pu^.sel)then writeln('THINK_Scout ',THINK_Scout);
 end;
 function THINK_DefaultAttack:boolean;
@@ -2224,18 +2239,14 @@ begin
              if(not THINK_Transport     )then
               if(not THINK_BaseAlarm    )then
                if(not THINK_Scout       )then
-               begin
-
-
-                  if(ai_ZombieTarget_d<base_2r)and(uidi=UID_Phantom)then
-                  begin
-                     group:=aio_busy;
-                     ai_RunTo(pu,ai_ZombieTarget_d,0,0,0,ai_ZombieTarget_u);
-                  end
-                  else
-                    if(not THINK_CPoint)
-                    then THINK_DefaultAttack;
-               end;
+                if(ai_ZombieTarget_d<base_2r)and(uidi=UID_Phantom)then
+                begin
+                   group:=aio_busy;
+                   ai_RunTo(pu,ai_ZombieTarget_d,0,0,0,ai_ZombieTarget_u);
+                end
+                else
+                  if(not THINK_CPoint)
+                  then THINK_DefaultAttack;
       end;
       //if(sel)then writeln(ai_cpoint_d);
    end;
@@ -2438,6 +2449,13 @@ begin
       uo_id :=ua_amove;
       uo_tar:=0;
 
+      with player^ do
+        ai_ReadyForAttack :=(ai_limitaround_own>ai_attack_limit)
+                          or(armylimit>=ai_attack_limit)
+                          or(armylimit>=ai_limit_border)
+                          or(ai_armylimit_alive_u>=ai_maxlimit_blimit)
+                          or(ai_armylimit_alive_b<=0);
+
       if(_ukbuilding)then ai_buildings(pu);
 
       if(hits<=0)then exit;
@@ -2493,7 +2511,8 @@ uab_UACScan          : begin
                                player^.ai_detection_pause     :=fr_fps1;
                                ai_enemy_inv_u^.buff[ub_Scaned]:=fr_fps1;
                             end;
-                          if(ai_choosen)and(ai_alarm_d=NOTSET)then
+                          if(ai_alarm_d=NOTSET)then
+                           if(ai_choosen)or(ai_ReadyForAttack)then
                             if(_unit_ability_uradar(pu,random(map_mw),random(map_mw)))then player^.ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then

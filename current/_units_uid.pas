@@ -449,7 +449,7 @@ UID_Pain      :
 begin
    _mhits     := 1500;
    _renergy   := 300;
-   _r         := 14;
+   _r         := 15;
    _speed     := 7;
    _srange    := 225;
    _ucl       := 7;

@@ -325,7 +325,7 @@ begin
        then d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,PlayerGetColor(g_status))
        else d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,c_white                 );
 
-      if(1<ks_ctrl)and(ks_ctrl<10)then writeln(upproda,' ',upprodm);
+      //if(1<ks_ctrl)and(ks_ctrl<10)then writeln(upproda,' ',upprodm);
 
       case ui_tab of
       0: // buildings
