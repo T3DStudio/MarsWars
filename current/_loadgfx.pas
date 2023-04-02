@@ -674,7 +674,7 @@ begin
 
    _LoadMWSModel(@spr_h_p0           ,race_missiles[r_hell]+'h_p0_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_h_p1           ,race_missiles[r_hell]+'h_p1_'   ,smt_effect ,firstload);
-   _LoadMWSModel(@spr_h_p2           ,race_missiles[r_hell]+'h_p2_'   ,smt_effect ,firstload);
+   _LoadMWSModel(@spr_h_p2           ,race_missiles[r_hell]+'h_p2_'   ,smt_missile,firstload);
    _LoadMWSModel(@spr_h_p3           ,race_missiles[r_hell]+'h_p3_'   ,smt_missile,firstload);
    _LoadMWSModel(@spr_h_p4           ,race_missiles[r_hell]+'h_p4_'   ,smt_missile,firstload);
    _LoadMWSModel(@spr_h_p5           ,race_missiles[r_hell]+'h_p5_'   ,smt_missile,firstload);
@@ -713,8 +713,10 @@ begin
    _lstr(@spr_scan      ,effects_folder+'scan'   ,firstload,true);
    _lstr(@spr_decay     ,effects_folder+'decay'  ,firstload,true);
 
-   _lstr(@spr_cp_out    ,'cp_out',firstload,true);
-   _lstr(@spr_cp_gen    ,'cp_gen',firstload,true);
+
+   _lstr(@spr_cp_koth   ,'cp_koth',firstload,true);
+   _lstr(@spr_cp_out    ,'cp_out' ,firstload,true);
+   _lstr(@spr_cp_gen    ,'cp_gen' ,firstload,true);
 
    for x:=0 to spr_upgrade_icons do
    for r:=1 to r_cnt do

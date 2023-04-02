@@ -165,7 +165,7 @@ MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
 MID_Imp           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
-MID_Baron         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Baron,//         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_URocketS,
 MID_URocket,
 MID_Revenant      : _setEff(7 ,0 , 8 ,-1       ,false,0 );

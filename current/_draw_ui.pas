@@ -111,7 +111,7 @@ begin
             uidi   :=m_brush;
             playeri:=HPlayer;
             player :=@_players[playeri];
-            bld    :=true;
+            iscomplete    :=true;
             hits   :=_mhits;
          end;
          _unit_apUID(pdunit);
@@ -281,8 +281,11 @@ begin
    begin
       if(p=0)
       then _drawBtnt(tar,ux,uy,str_all         ,'','','','',c_white          ,0,0,0,0,'')
-      else _drawBtnt(tar,ux,uy,_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
-      _drawBtn(tar,ux,uy,r_empty,p=VisPlayer,_players[p].army=0);
+      else
+        if(p=HPlayer)
+        then _drawBtnt(tar,ux,uy,'*'+_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'')
+        else _drawBtnt(tar,ux,uy,    _players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
+      _drawBtn(tar,ux,uy,r_empty,p=VisPlayer,   GetBBit(@g_player_status,p));
 
       ux+=1;
       if(ux>2)then
@@ -325,8 +328,6 @@ begin
        then d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,PlayerGetColor(g_status))
        else d_TextBTN(tar,2,ui_menu_btnsy-4,@str_pause,c_white                 );
 
-      //if(1<ks_ctrl)and(ks_ctrl<10)then writeln(upproda,' ',upprodm);
-
       case ui_tab of
       0: // buildings
       for ucl:=0 to ui_ubtns do
@@ -336,10 +337,8 @@ begin
 
          with _uids[uid] do
          begin
-            if(uid_e[uid]<=0)then
-            begin
-               if(a_units[uid]<=0)then continue;
-            end;
+            if(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then
+              if(a_units[uid]<=0)then continue;
 
             ux:=(ucl mod 3);
             uy:=(ucl div 3);
@@ -366,10 +365,8 @@ begin
 
          with _uids[uid] do
          begin
-            if(uid_e[uid]<=0)then
-            begin
-               if(a_units[uid]<=0)then continue;
-            end;
+            if(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then
+              if(a_units[uid]<=0)then continue;
 
             ux:=(ucl mod 3);
             uy:=(ucl div 3);
@@ -501,6 +498,8 @@ procedure d_PanelUI(tar:pSDL_Surface;lx,ly:integer);
 begin
    d_MapMouse(tar,lx,ly);
 
+  // if(ks_ctrl=2)then writeln(ui_bprod_ucl_time[1]);
+
    if(vid_blink_timer1=2)then
    begin
       d_MiniMap(r_panel  );
@@ -557,7 +556,8 @@ begin
               if(uid>0)then
               case ui_tab of
               0,1: begin
-                      if(uid_e[uid]=0)and(a_units[uid]<=0)then exit;
+                      with _uids[uid] do
+                        if(uid_e[uid]=0)and(ucl_e[_ukbuilding,_ucl]<=0)and(a_units[uid]<=0)then exit;
                       hs1:=@_uids[uid].un_txt_uihint1;
                       hs2:=@_uids[uid].un_txt_uihint2;
                       hs3:=@_uids[uid].un_txt_uihint3;
@@ -609,9 +609,9 @@ begin
       if(ingame_chat>0)then _draw_text(tar,ui_textx,ui_chaty,ChatString+net_chat_str+chat_type[r_blink1_colorb],ta_left,ui_ingamecl,c_white);
    end
    else
-     if(net_chat_shlm>0)then
+     if(net_chat_shlm>0)then // last messages
      begin
-        MakeLogListForDraw(VisPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
+        MakeLogListForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
          for i:=0 to ui_log_n-1 do
           if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -629,10 +629,10 @@ begin
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col,VisPlayer))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
-   if(VisPlayer<>HPlayer)then
-    if(VisPlayer>0)
-    then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,c_white)
-    else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white);
+   if(VisPlayer<>HPlayer)or(rpls_state>=rpl_rhead)then
+     if(VisPlayer>0)
+     then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,c_white)
+     else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white);
 
    // TIMER
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time,c_white);

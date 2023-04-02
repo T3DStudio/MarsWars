@@ -725,7 +725,7 @@ begin
    _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings.'                       );
    _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase the efficiency of repair/healing of Engineers/Medics.' );
    _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units.'            );
-   _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Attacks by Shotguner, SuperShotguner, Commando, Terminator and anti-ground turrets make demons have pain state more often.'                               );
+   _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ?????????.' );
    _mkHStrUpid(upgr_uac_towers     ,'Tower Range Upgrade'              ,'Increase defensive structures range.'                           );
    _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly.'                           );
    _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center.'                              );
@@ -788,7 +788,6 @@ begin
    _mkHStrOBS(6 ,'Player #4'  ,false);
    _mkHStrOBS(7 ,'Player #5'  ,false);
    _mkHStrOBS(8 ,'Player #6'  ,false);
-   //str_hint_o
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -901,7 +900,6 @@ begin
    str_cmp_map[20] := 'Date:'+tc_nl2+'22.11.2145'+tc_nl2+'Location:'+tc_nl2+'HELL'  +tc_nl2+'Area:'+tc_nl2+'Unknown';
    str_cmp_map[21] := 'Date:'+tc_nl2+'21.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
    str_cmp_map[22] := 'Date:'+tc_nl2+'22.11.2145'+tc_nl2+'Location:'+tc_nl2+'MARS'  +tc_nl2+'Area:'+tc_nl2+'Hellas Area';
-
    }
 
    _makeHints;

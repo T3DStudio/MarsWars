@@ -1,16 +1,27 @@
 
 function d_UpdateUIPlayer(u:integer):boolean;
 var tu:PTUnit;
+function TryUpd(pplayer:pbyte):boolean;
+begin
+   TryUpd:=false;
+   if(_IsUnitRange(u,@tu))then
+   begin
+      pplayer^:=tu^.playeri;
+      TryUpd  :=true;
+   end;
+end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not _players[HPlayer].observer)or(rpls_state>=rpl_rhead)
-   then UIPlayer:=HPlayer
+   if(rpls_state>=rpl_rhead)then
+   begin
+      //d_UpdateUIPlayer:=TryUpd(@HPlayer);
+      //UIPlayer:=HPlayer;
+      d_UpdateUIPlayer:=TryUpd(@UIPlayer);
+   end
    else
-     if(_IsUnitRange(u,@tu))then
-     begin
-        UIPlayer:=tu^.playeri;
-        d_UpdateUIPlayer:=true;
-     end;
+     if(not _players[HPlayer].observer)
+     then UIPlayer:=HPlayer
+     else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
 
 procedure d_AddObjSprites(noanim:boolean);
@@ -38,7 +49,7 @@ begin
 
    d_uimouse(r_screen);
 
-   if(_testmode>1)and(net_status=0)then _draw_dbg;
+   if(_testmode>1){and(net_status=0)}then _draw_dbg;
 end;
 
 

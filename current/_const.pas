@@ -24,6 +24,7 @@ fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
+fr_fps6                = fr_fps1*6;
 fr_fps2d3              = fr_fpsd3*2; //2/3
 fr_fps60               = fr_fps1*60;
 
@@ -315,6 +316,8 @@ ua_amove               = 3;
 ua_unload              = 4;
 ua_paction             = 5;
 
+ua_patrol              = 6; // only for client data transfer
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Conditionals for attack
@@ -406,10 +409,8 @@ wtp_rmhits             = 2;
 wtp_distance           = 3;
 wtp_building           = 4;
 wtp_unit_light_bio     = 5;
-wtp_unit_bio_nostun    = 6;
 wtp_unit_bio_light     = 7;
 wtp_unit_bio_nlight    = 8;
-wtp_unit_mech_nostun   = 9;
 wtp_unit_mech          = 10;
 wtp_bio                = 11;
 wtp_light              = 12;
@@ -427,9 +428,8 @@ wtp_max_hits           = 19;
 //  AI FLAGS
 //
 
-ai_limit_border        = MaxPlayerLimit-(10*MinUnitLimit);
+ai_limit_border        = MaxPlayerLimit-(7*MinUnitLimit);
 
-aif_base_smart_opening : cardinal = 1;
 aif_base_smart_order   : cardinal = 1 shl 1;
 aif_base_suicide       : cardinal = 1 shl 2;
 aif_base_advance       : cardinal = 1 shl 3;
@@ -661,6 +661,7 @@ mvxy_strict            = 2;
 
 BaseDamage1            = 62;
 BaseDamageh            = BaseDamage1 div 2;
+BaseDamageh4           = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
@@ -671,6 +672,7 @@ BaseDamage10           = BaseDamage1*10;
 
 BaseDamageBonus1       = 6;
 BaseDamageBonush       = BaseDamageBonus1 div 2;
+BaseDamageBonush3      = BaseDamageBonus1*3;
 BaseDamageLevel1       = BaseDamageBonush;
 BaseArmorBonus1        = 6;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
@@ -678,9 +680,9 @@ BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonush;
 
 BaseHeal1              = (BaseDamage1 div 4)*3;
-BaseHealBonus1         = BaseDamageBonus1*2;
+BaseHealBonus1         = BaseDamageBonus1*3;
 BaseRepair1            = (BaseDamage1 div 4)*3;
-BaseRepairBonus1       = BaseDamageBonus1*3;
+BaseRepairBonus1       = BaseDamageBonus1*4;
 
 ExpLevel1              = fr_fps1*45;
 
@@ -818,7 +820,8 @@ client_rld_uids  = [
                    ];
 client_cast_abils= [
                    uab_UACScan  ,
-                   uab_UACStrike
+                   uab_UACStrike,
+                   uab_HInvulnerability
                    ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -860,7 +863,8 @@ radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-mstrike_reload         = fr_fps1*60;
+mstrike_reload         = fr_fps1*ptime2;
+haltar_reload          = fr_fps1*ptime2;
 
 step_build_reload      = fr_fps1*4;
 max_build_reload       = step_build_reload*4;

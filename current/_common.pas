@@ -473,8 +473,7 @@ end;
 function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(upgr[upgr_fog_vision]>0)
-                 or(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
+   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
                  or(team=0);
 end;
 
@@ -866,7 +865,7 @@ end;
 function _UnitHaveRPoint(uid:byte):boolean;
 begin
    with _uids[uid] do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability in [uab_Teleport]);
+   _UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
 end;
 
 function UnitF2Select(pu:PTUnit):boolean;
@@ -877,20 +876,15 @@ begin
    with uid^ do
    begin
       if(hits<=0)
-      or(not bld)
+      or(not iscomplete)
       or(_IsUnitRange(transport,nil))then exit;
 
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
       if(_attack  =atm_none)then exit;
-      if(not ServerSide    )then
-      begin
-         if(uo_id=ua_hold)then exit;
-      end
-      else
-        if(uo_id=ua_paction  )
-        or(uo_id=ua_hold     )
-        or(uo_bx>0           )then exit;
+      if(uo_id=ua_paction  )
+      or(uo_id=ua_hold     )
+      or(uo_bx>0           )then exit;
 
       if(_IsUnitRange(uo_tar,@tu))then
       begin
@@ -908,7 +902,7 @@ begin
    _canRebuild:=0;
    with pu^     do
    with uid^    do
-    if(bld=false)
+    if(iscomplete=false)
     or(hits<=0)
     or(_rebuild_uid=0)
     or((_rebuild_level>0)and(level>=_rebuild_level))
@@ -935,7 +929,7 @@ begin
    _canAbility:=0;
    with pu^     do
    with uid^    do
-    if(bld=false)
+    if(iscomplete=false)
     or(hits<=0)
     or(_ability=0)
     then _canAbility:=ureq_unknown
@@ -1166,22 +1160,25 @@ gs_replaypause: begin
                    pcol^:=c_white;
                 end;
       else
-       if(VisPlayer>0)then
-        if(G_status>=gs_win_team0)then
-        begin
-           t:=G_status-gs_win_team0;
-           if(t<=MaxPlayers)then
-            if(t=_players[VisPlayer].team)then
-            begin
-               pstr^:=str_win;
-               pcol^:=c_lime;
-            end
-            else
-            begin
-               pstr^:=str_lose;
-               pcol^:=c_red;
-            end;
-        end;
+         if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then
+           if(VisPlayer=0)then
+           begin
+              if(pstr<>nil)then pstr^:='';
+           end
+           else
+           begin
+              t:=G_status-gs_win_team0;
+              if(t=_players[VisPlayer].team)then
+              begin
+                 pstr^:=str_win;
+                 pcol^:=c_lime;
+              end
+              else
+              begin
+                 pstr^:=str_lose;
+                 pcol^:=c_red;
+              end;
+           end;
       end;
    end;
 end;
@@ -1277,10 +1274,11 @@ lmt_cant_build       : begin
                           lmt_req_energy: ParseLogMessage:=str_need_energy;
                           lmt_cant_build: ParseLogMessage:=str_cant_build;
                           end;
-                          case argt of
+                          if(argx>0)then
+                            case argt of
                           lmt_argt_unit: with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                           lmt_argt_upgr: with _upids[argx] do ParseLogMessage+=' ('+_up_name   +')';
-                          end;
+                            end;
                        end;
 lmt_player_chat,
 lmt_game_message     : ParseLogMessage:=str;

@@ -140,6 +140,7 @@ procedure _d50 (d:pinteger);begin d^:=d^ div 2;     end;
 procedure _d150(d:pinteger);begin d^:=d^+(d^ div 2);end;
 procedure _d200(d:pinteger);begin d^:=d^*2;         end;
 procedure _d300(d:pinteger);begin d^:=d^*3;         end;
+procedure _d500(d:pinteger);begin d^:=d^*5;         end;
 
 
 function _unit_melee_damage(pu,tu:PTUnit;damage:integer):integer;
@@ -199,12 +200,12 @@ MID_URocket : begin
 MID_Imp        : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Cacodemon  : begin damage:=BaseDamage1h ; vstep:=d div 15; splashr :=0  ;         end;
 MID_Baron      : begin damage:=BaseDamage2  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_Revenant   : begin damage:=BaseDamage1h ; vstep:=d div 12; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
-MID_URocketS   : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
-MID_URocket    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=0;           dir:=point_dir(vx,vy,x,y);end;
-MID_Mancubus   : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         dir:=point_dir(vx,vy,x,y);end;
+MID_Revenant   : begin damage:=BaseDamage1h ; vstep:=d div 12; splashr :=0  ;         end;
+MID_URocketS   : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=rocket_sr;   end;
+MID_URocket    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=0;           end;
+MID_Mancubus   : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_YPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
-MID_ArchFire   : begin damage:=BaseDamage8  ; vstep:=1;        splashr :=15 ;         end;
+MID_ArchFire   : begin damage:=BaseDamage8  ; vstep:=1;        splashr :=16 ;         end;
 
 MID_Bullet     : begin damage:=BaseDamageh  ; vstep:=3;        splashr :=0  ;         end;
 MID_Chaingun2,
@@ -212,11 +213,11 @@ MID_Chaingun   : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=0  ;   
 MID_BPlasma    : begin damage:=BaseDamage1  ; vstep:=d div 15; splashr :=0  ;         end;
 MID_BFG        : begin damage:=BaseDamage4  ; vstep:=d div 12; splashr :=100;         end;
 MID_Flyer      : begin damage:=BaseDamage1  ; vstep:=d div 20; splashr :=0  ;         end;
-MID_HRocket    : begin damage:=BaseDamage5  ; vstep:=d div 15; splashr :=rocket_sr;   dir:=point_dir(vx,vy,x,y);end;
+MID_HRocket    : begin damage:=BaseDamage5  ; vstep:=d div 15; splashr :=rocket_sr;   end;
 MID_Granade    : begin damage:=BaseDamage1  ; vstep:=d div 12; splashr :=tank_sr;     ystep:=3;end;
 MID_Tank       : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=tank_sr;     end;
 MID_Mine       : begin damage:=BaseDamage10 ; vstep:=1;        splashr :=mine_sr;     end;
-MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;  splashr :=blizzard_sr; dir:=point_dir(vx,vy,x,y);end;
+MID_Blizzard   : begin damage:=BaseDamage10 ; vstep:=fr_fps1;  splashr :=blizzard_sr; end;
 MID_SShot      : begin damage:=BaseDamage1  ; vstep:=3;        splashr :=0  ;         end;
 MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;         end;
       else
@@ -224,11 +225,20 @@ MID_SSShot     : begin damage:=BaseDamage3  ; vstep:=3;        splashr :=0  ;   
          exit;
       end;
 
+      dir:=point_dir(vx,vy,x,y);
+
       if(vstep<=0)then vstep:=1;
 
       hvstep:=vstep div 2;
 
       damage+=adddmg;
+      if(player<=MaxPlayers)and(tu<>nil)then
+       if(not tu^.uid^._ukmech)then
+        with _players[player] do
+         case mid of
+         MID_SSShot        : damage+=upgr[upgr_uac_painn]*BaseDamageBonush3;
+         MID_SShot         : damage+=upgr[upgr_uac_painn]*BaseDamageBonus1;
+         end;
 
       if(mtars=0)then
        if(tar<=0)or(splashr>0)
@@ -307,8 +317,6 @@ begin
 
         if(ud<0)then ud:=0;
 
-        painX:=1;
-
         /////////////////////////////////
 
         if(not  tu^.uid^._ukbuilding)then// units
@@ -345,7 +353,7 @@ begin
         end
         else ///////////////////////////// buildings
             case mid of
-            MID_Blizzard,
+            MID_Blizzard    : _d500(@rdamage);
             MID_HRocket,
             MID_Granade,
             MID_Mine,
@@ -379,15 +387,8 @@ begin
             MID_Chaingun,
             MID_Chaingun2   : painX:=2;
             MID_SSShot      : painX:=3;
+        else                  painX:=1;
         end;
-        if(player<=MaxPlayers)then
-         with _players[player] do
-          case mid of
-          MID_Chaingun2,
-          MID_Chaingun,
-          MID_SSShot,
-          MID_SShot         : painX+=upgr[upgr_uac_painn];
-          end;
 
         if(ud<=0)and(ntars=0)then // first direct target
         begin
@@ -463,7 +464,6 @@ mh_homing   : begin
            end
            else
              if(vstep<=mb_s0)then vy+=fr_fps1;
-
       end
       else
       begin

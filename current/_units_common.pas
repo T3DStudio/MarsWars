@@ -67,7 +67,7 @@ end;
 procedure _unit_summon_effects(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
-   if(hits>0)and(bld)then
+   if(hits>0)and(iscomplete)then
    with uid^ do
    begin
       if(vischeck<>nil)then
@@ -175,12 +175,12 @@ begin
    with pu^ do
    with uid^ do
     if(ServerSide=false)and(speed>0)
-    then _canmove:=(x<>uo_bx)or(y<>uo_by)
+    then _canmove:=(x<>mv_x)or(y<>mv_y)
     else
     begin
        _canmove:=false;
 
-       if(speed<=0)or(hits<=0)or(bld=false)or(StayWaitForNextTarget>0)then exit;
+       if(speed<=0)or(hits<=0)or(iscomplete=false)or(StayWaitForNextTarget>0)then exit;
 
        if(a_rld>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -204,7 +204,7 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(bld=false)or(hits<=0)or(_attack=atm_none)then exit;
+      if(iscomplete=false)or(hits<=0)or(_attack=atm_none)then exit;
 
       if(check_buffs)then
       begin
@@ -239,7 +239,7 @@ begin
       pfzone:=pf_get_area(x,y);
       {$IFDEF _FULLGAME}
       _unit_MiniMapXY(pu);
-      _unit_ForXY(pu);
+      _unit_FogXY(pu);
       {$ENDIF}
    end;
 end;
@@ -376,7 +376,7 @@ function _unit_ability_uradar(pu:PTUnit;x0,y0:integer):boolean;
 begin
    _unit_ability_uradar:=false;
    with pu^ do
-    if(bld)and(rld<=0)then
+    if(iscomplete)and(rld<=0)then
     begin
        _unit_clear_order(pu,true);
        uo_x:=x0;
@@ -404,16 +404,18 @@ begin
         if(hits<=0)then exit;
 
       with pu^ do
-       with player^ do
-        if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
-        begin
-           tu^.buff[ub_Invuln]:=invuln_time-round((tu^.uid^._limituse-MinUnitLimit)/MinUnitLimit*invuln_time_limit);
-           upgr[upgr_hell_invuln]-=1;
-           _unit_ability_HInvuln:=true;
-           {$IFDEF _FULLGAME}
-           _LevelUpEffect(tu,EID_Invuln,nil);
-           {$ENDIF}
-        end;
+       if(iscomplete)and(rld<=0)then
+        with player^ do
+         if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
+         begin
+            rld:=haltar_reload;
+            tu^.buff[ub_Invuln]:=invuln_time-round((tu^.uid^._limituse-MinUnitLimit)/MinUnitLimit*invuln_time_limit);
+            upgr[upgr_hell_invuln]-=1;
+            _unit_ability_HInvuln:=true;
+            {$IFDEF _FULLGAME}
+            _LevelUpEffect(tu,EID_Invuln,nil);
+            {$ENDIF}
+         end;
    end;
 end;
 
@@ -433,7 +435,7 @@ var i:byte;
 begin
    _unit_ability_UACStrike:=false;
    with pu^ do
-    if(bld)and(rld<=0)then
+    if(iscomplete)and(rld<=0)then
      with player^ do
       if(upgr[upgr_uac_rstrike]>0)then
       begin
@@ -460,8 +462,8 @@ begin
    if(a=0)then exit;
    vx :=vx/a;
    vy :=vy/a;
-   tx^:=x0-round(r0*vx);
-   ty^:=y0-round(r0*vy);
+   tx^:=x0-trunc(r0*vx);
+   ty^:=y0-trunc(r0*vy);
 end;
 
 procedure _2c_push(tx,ty:pinteger;x0,y0,r0,x1,y1,r1:integer);
@@ -480,21 +482,19 @@ begin
       vx:=(x1-x0)/d;
       vy:=(y1-y0)/d;
 
-      if( round(-vy*(x0-tx^)+vx*(y0-ty^)) <= 0 )then
+      if( trunc(-vy*(x0-tx^)+vx*(y0-ty^)) <= 0 )then
       begin
-         tx^:=round( x0+a*vx-(h*vy) );
-         ty^:=round( y0+a*vy+(h*vx) );
+         tx^:=trunc( x0+a*vx-(h*vy) );
+         ty^:=trunc( y0+a*vy+(h*vx) );
       end
       else
       begin
-         tx^:=round( x0+a*vx+(h*vy) );
-         ty^:=round( y0+a*vy-(h*vx) );
+         tx^:=trunc( x0+a*vx+(h*vy) );
+         ty^:=trunc( y0+a*vy-(h*vx) );
       end;
    end
    else _1c_push(tx,ty,x0,y0,r0);
 end;
-
-
 
 procedure _push_out(tx,ty,tr:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
 const nrl = 1;
@@ -577,7 +577,7 @@ begin
     with _units[u] do
      with uid^ do
       if(hits>0)and(ukfly=_ukfly)then
-       if(speed<=0)or(not bld)then
+       if(speed<=0)or(not iscomplete)then
         if(not _IsUnitRange(transport,nil))then
         begin
            o:=tr+_r;
@@ -616,7 +616,7 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(bld)and(playeri=pl)and(isbuildarea)then
+      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(isbuildarea)then
        if(buid in ups_builder)and(not _IsUnitRange(transport,nil))then
        begin
           o:=point_dist_int(x,y,tx,ty)-srange;
@@ -653,7 +653,7 @@ begin
      with _punits[u]^ do
       with uid^ do
        if(hits>0)and(ukfly=flylevel)and(_IsUnitRange(transport,nil)=false)then
-        if(speed<=0)or(not bld)then
+        if(speed<=0)or(not iscomplete)then
          if(point_dist_int(x,y,tx,ty)<(tr+_r))then
          begin
             _collisionr:=2;
@@ -733,7 +733,7 @@ begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
      with uid^ do
-      if(hits>0)and(bld)and(isbuildarea)and(playeri=pl)then
+      if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=pl)then
        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
         if(buid in ups_builder)and(_IsUnitRange(transport,nil)=false)then
          if(point_dist_int(x,y,tx,ty)<srange)then
@@ -779,7 +779,7 @@ var obstacles:boolean;
 begin
    _unit_ability_HKeepBlink:=false;
    with pu^ do
-    if(hits>0)and(bld)and(buff[ub_CCast]<=0)then
+    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)then
      with uid^ do
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
@@ -808,7 +808,7 @@ var obstacles:boolean;
 begin
    _unit_ability_HTowerBlink:=false;
    with pu^ do
-    if(hits>0)and(bld)and(buff[ub_CCast]<=0)then
+    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)then
      with uid^ do
      with player^ do
       if(upgr[upgr_hell_b478tel]>0)then
@@ -872,7 +872,7 @@ begin
       wanim    := false;
       anim     := 0;
       _unit_MiniMapXY(pu);
-      _unit_ForXY    (pu);
+      _unit_FogXY    (pu);
       {$ENDIF}
    end;
 end;
@@ -945,9 +945,9 @@ begin
       ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
 
-      bld:=ubld;
+      iscomplete:=ubld;
 
-      if(bld)
+      if(iscomplete)
       then _unit_bld_inc_cntrs(pu)
       else
       begin
@@ -958,7 +958,7 @@ begin
          {$ENDIF}
       end;
 
-      if(summoned)and(bld)then
+      if(summoned)and(iscomplete)then
       begin
          buff[ub_Summoned]:=fr_fps1;
          {$IFDEF _FULLGAME}
@@ -1131,7 +1131,7 @@ begin
    if(0<puid)and(puid<255)then
     with pu^ do
      with uid^ do
-      if(hits>0)and(bld)and(_isbarrack)and(_ukbuilding)then
+      if(hits>0)and(iscomplete)and(_isbarrack)and(_ukbuilding)then
        if not (puid in ups_units)
        then PlayerSetProdError(playeri,lmt_argt_unit,puid,ureq_barracks,pu)
        else
@@ -1171,7 +1171,7 @@ begin
    _unit_ctraining_p:=false;
    with pu^ do
    with uid^ do
-    if(uprod_r[pn]>0)and(bld)and(_isbarrack)and(_ukbuilding)then
+    if(uprod_r[pn]>0)and(iscomplete)and(_isbarrack)and(_ukbuilding)then
      if(puid=255)or(puid=uprod_u[pn])then
       with player^ do
       begin
@@ -1209,7 +1209,7 @@ begin
    if(upid<255)then
     with pu^ do
      with uid^ do
-      if(hits>0)and(bld)and(_issmith)and(_ukbuilding)then
+      if(hits>0)and(iscomplete)and(_issmith)and(_ukbuilding)then
        if not(upid in ups_upgrades)
        then PlayerSetProdError(playeri,lmt_argt_upgr,upid,ureq_smiths,pu)
        else
@@ -1248,7 +1248,7 @@ begin
    _unit_cupgrade_p:=false;
    with pu^ do
    with uid^ do
-    if(pprod_r[pn]>0)and(bld)and(_issmith)and(_ukbuilding)then
+    if(pprod_r[pn]>0)and(iscomplete)and(_issmith)and(_ukbuilding)then
      if(upid=255)or(upid=pprod_u[pn])then
       with player^ do
       begin
@@ -1321,7 +1321,7 @@ begin
    begin
       _unit_desel(pu);
 
-      if(bld=false)
+      if(iscomplete=false)
       then cenergy+=_uids[uidi]._renergy
       else
       begin
@@ -1495,7 +1495,7 @@ begin
          if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;
       end;
 
-      if(bld)then
+      if(iscomplete)then
       begin
          if(  rld>0)then   rld-=1;
          if(a_rld>0)then a_rld-=1;
@@ -1513,7 +1513,7 @@ begin
    scan_buff:=255;
    with uu^ do
    begin
-      if(tu^.player^.observer)
+      if(tu^.player^.observer)or(tu^.player^.upgr[upgr_fog_vision]>0)
       then td:=0
       else
         if(tu^.uid^._ability=uab_UACScan)and(tu^.rld>radar_vision_time)then
@@ -1533,7 +1533,7 @@ begin
           then _AddToInt(@buff[scan_buff],vistime);
        end
        else
-         if(tu^.buff[ub_Detect]>0)and(tu^.bld)and(tu^.hits>0)then
+         if(tu^.buff[ub_Detect]>0)and(tu^.iscomplete)and(tu^.hits>0)then
          begin
             _AddToInt(@vsnt[tu^.player^.team],vistime);
             _AddToInt(@vsni[tu^.player^.team],vistime);
@@ -1579,6 +1579,7 @@ begin
          with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits>=0)or(_ukbuilding);
          buff[ub_Pain]:=fr_fps1; // prevent fast resurrecting
 
+         GameLogUnitAttacked(pu);
          {$IFDEF _FULLGAME}
          _unit_death_effects(pu,fastdeath,nil);
          {$ENDIF}
@@ -1650,8 +1651,13 @@ begin
          else hits:=0;
 
          with uid^ do
-          if(_death_missile>0)
-          then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+         begin
+            if(_death_missile>0)
+            then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+            if(_death_uid>0)and(_death_uidn>0)then
+             for i:=1 to _death_uidn do
+              _unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
+         end;
       end;
    end
    else
@@ -1681,7 +1687,7 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-   if(bld)and(hits>0)then
+   if(iscomplete)and(hits>0)then
    begin
       speed:=_speed;
       // ABILITIES
@@ -1725,9 +1731,9 @@ uab_CCFly         :
       end;
 
       // DETECTION
-      if(buff[ub_HVision]>0)then
-       if(buff[ub_Detect]<buff[ub_HVision])then buff[ub_Detect]:=buff[ub_HVision];
-      if(_detector)then buff[ub_Detect]:=_ub_infinity;
+      if(_detector)or(buff[ub_HVision]>0)
+      then buff[ub_Detect]:=_ub_infinity
+      else buff[ub_Detect]:=0;
 
       // INVIS
       case uidi of

@@ -4,9 +4,6 @@
 //   LOAD
 //
 
-
-
-
 function oalError:boolean;begin oalError:=alGetError()<>AL_NO_ERROR;end;
 
 function Load_Chunk(fname:shortstring):TALuint;
@@ -367,7 +364,7 @@ begin
 
       with _units[ui_UnitSelectedNU] do
        with uid^ do
-        if(_ukbuilding)and(bld=false)
+        if(_ukbuilding)and(iscomplete=false)
         then SoundPlayUnitCommand(snd_building[_urace])
         else
          if(ui_UnitSelectedn<annoystart)
@@ -389,10 +386,10 @@ begin
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=MaxPlayers)then
-                         if(argx=team)
-                         then SoundPlayAnoncer(snd_victory[race],false)
-                         else SoundPlayAnoncer(snd_defeat [race],false);
-lmt_player_defeated   : if(argx<=MaxPlayers)
+                          if(argx=team)
+                          then SoundPlayAnoncer(snd_victory[race],false)
+                          else SoundPlayAnoncer(snd_defeat [race],false);
+lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build [race],true);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted[race],true);
@@ -494,7 +491,7 @@ begin
    snd_teleport             :=SoundSetLoad('teleport'        );
    snd_exp                  :=SoundSetLoad('explode'         );
    snd_mine_place           :=SoundSetLoad('mine_place'      );
-   snd_transport                :=SoundSetLoad('inapc'           );
+   snd_transport            :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
    snd_hpower               :=SoundSetLoad('hpower'          );
@@ -727,94 +724,6 @@ begin
    snd_arachno_move         :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_act');
    snd_arachno_foot         :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_f');
    snd_arachno_ready        :=SoundSetLoad(race_units[r_hell]+'arachnotron\d_ar_c');
-
-
-  {snd_transport       :=load_sound('inapc.wav'    );
-   snd_ccup        :=load_sound('ccup.wav'     );
-
-   snd_meat        :=load_sound('gv.wav'       );
-   snd_d0          :=load_sound('d_u0.wav'     );
-   snd_ar_act      :=load_sound('d_ar_act.wav' );
-   snd_ar_d        :=load_sound('d_ar_d.wav'   );
-   snd_ar_c        :=load_sound('d_ar_c.wav'   );
-   snd_ar_f        :=load_sound('d_ar_f.wav'   );
-   snd_arch_a      :=load_sound('d_arch_a.wav' );
-   snd_arch_at     :=load_sound('d_arch_at.wav');
-   snd_arch_d      :=load_sound('d_arch_d.wav' );
-   snd_arch_p      :=load_sound('d_arch_p.wav' );
-   snd_arch_c      :=load_sound('d_arch_c.wav' );
-   snd_arch_f      :=load_sound('d_arch_f.wav' );
-   snd_demonc      :=load_sound('d_u2.wav'     );
-   snd_demona      :=load_sound('d_u2_a.wav'   );
-   snd_demond      :=load_sound('d_u2_d.wav'   );
-   snd_hmelee      :=load_sound('d_melee.wav'  );
-   snd_demon1      :=load_sound('d_0.wav'      );
-   snd_imp         :=load_sound('d_imp.wav'    );
-   snd_impd1       :=load_sound('d_u1_d1.wav'  );
-   snd_impd2       :=load_sound('d_u1_d2.wav'  );
-   snd_impc1       :=load_sound('d_u1_s1.wav'  );
-   snd_impc2       :=load_sound('d_u1_s2.wav'  );
-   snd_dpain       :=load_sound('d_p.wav'      );
-   snd_cacoc       :=load_sound('d_u3.wav'     );
-   snd_cacod       :=load_sound('d_u3_d.wav'   );
-   snd_baronc      :=load_sound('d_u4.wav'     );
-   snd_barond      :=load_sound('d_u4_d.wav'   );
-   snd_knight      :=load_sound('knight.wav'   );
-   snd_knightd     :=load_sound('knightd.wav'  );
-   snd_cyberc      :=load_sound('d_u5.wav'     );
-   snd_cyberd      :=load_sound('d_u5_d.wav'   );
-   snd_cyberf      :=load_sound('d_u5_f.wav'   );
-   snd_mindc       :=load_sound('d_u6.wav'     );
-   snd_mindd       :=load_sound('d_u6_d.wav'   );
-   snd_mindf       :=load_sound('d_u6_f.wav'   );
-   snd_pain_c      :=load_sound('d_pain_c.wav' );
-   snd_pain_p      :=load_sound('d_pain_p.wav' );
-   snd_pain_d      :=load_sound('d_pain_d.wav' );
-   snd_uac_u0      :=load_sound('uac_u0.wav');
-   snd_uac_u1      :=load_sound('uac_u1.wav');
-   snd_uac_u2      :=load_sound('uac_u2.wav');
-   snd_z_s1        :=load_sound('d_z_s1.wav');
-   snd_z_s2        :=load_sound('d_z_s2.wav');
-   snd_z_s3        :=load_sound('d_z_s3.wav');
-   snd_z_d1        :=load_sound('d_z_d1.wav');
-   snd_z_d2        :=load_sound('d_z_d2.wav');
-   snd_z_d3        :=load_sound('d_z_d3.wav');
-   snd_z_p         :=load_sound('d_z_p.wav');
-   snd_ud1         :=load_sound('h_d1.wav');
-   snd_ud2         :=load_sound('h_d2.wav');
-   snd_zomb        :=load_sound('d_z_ac.wav');
-   snd_man_a       :=load_sound('d_man_a.wav');
-   snd_man_d       :=load_sound('d_man_d.wav');
-   snd_man_p       :=load_sound('d_man_p.wav');
-   snd_man_c       :=load_sound('d_man_c.wav');
-   snd_hshoot      :=load_sound('d_a.wav');
-   snd_rev_c       :=load_sound('d_rev_c.wav');
-   snd_rev_m       :=load_sound('d_rev_m.wav');
-   snd_rev_d       :=load_sound('d_rev_d.wav');
-   snd_rev_a       :=load_sound('d_rev_a.wav');
-   snd_rev_ac      :=load_sound('d_rev_ac.wav');
-   snd_cubes       :=load_sound('cube_s.wav');
-   snd_launch      :=load_sound('launch.wav');
-   snd_pistol      :=load_sound('h_u0_a.WAV');
-   snd_shotgun     :=load_sound('h_u1_a.wav');
-   snd_rico        :=load_sound('rico1.wav');
-   snd_ssg         :=load_sound('ssg.wav');
-   snd_bfgs        :=load_sound('h_u5_a.wav');
-   snd_bfgepx      :=load_sound('bfg_exp.wav');
-   snd_plasmas     :=load_sound('h_u4_a.wav');
-   snd_cast2       :=load_sound('rep.wav');
-   snd_cast        :=load_sound('h_u0_r.wav');
-   snd_uupgr       :=load_sound('uup.wav');
-   snd_hupgr       :=load_sound('hup.wav');
-   snd_alarm       :=load_sound('alarm.wav');
-   snd_hellbar     :=load_sound('hellbarracks.wav');
-   snd_hell        :=load_sound('hell.wav'     );
-   snd_hpower      :=load_sound('hpower.wav');
-   snd_fly_a1      :=load_sound('flyer_a1.wav');
-   snd_fly_a       :=load_sound('flyer_a.wav');
-   snd_jetpoff     :=load_sound('jetpoff.wav');
-   snd_jetpon      :=load_sound('jetpon.wav');
-   snd_oof         :=load_sound('oof.wav');    }
 
    InitSound:=true;
 end;

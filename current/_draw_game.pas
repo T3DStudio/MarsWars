@@ -347,7 +347,7 @@ begin
 
       if(rld>0)and(playeri=HPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
-      if(speed<=0)or(not bld)then
+      if(speed<=0)or(not iscomplete)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
 
       if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
@@ -488,8 +488,11 @@ end;
 //
 
 procedure cpoints_sprites(draw:boolean);
+const marks     = 15;
+      mark_step = round(360/marks);
 var t,i:integer;
-color:cardinal;
+   ddir:single;
+  color:cardinal;
 begin
    if(not draw)then exit;
 
@@ -501,8 +504,17 @@ begin
 
         color:=GetCPColor(t);
 
-        if(t=1)and(g_mode=gm_koth)
-        then UnitsInfoAddCircle(cpx,cpy,cpCapturer,color)
+        if(t=1)and(g_mode=gm_koth)then
+        begin
+           for i:=1 to marks do
+           begin
+              ddir:=(i*mark_step)*degtorad;
+              SpriteListAddEffect(
+              cpx+round(cpCapturer*cos(ddir)),
+              cpy+round(cpCapturer*sin(ddir)),
+              sd_ground+cpy,ShadowColor(color),@spr_cp_koth,255);
+           end;
+        end
         else
           if(cpenergy<=0)
           then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_out,255)
@@ -701,13 +713,13 @@ begin
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+20,li2s(uo_id), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,li2s(aiu_FiledSquareNear), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,li2s(uo_bx), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 
-           //_draw_text(r_screen,ix,iy+20,b2pm[bld], ta_left,255, PlayerGetColor(playeri));
+           //_draw_text(r_screen,ix,iy+20,b2pm[iscomplete], ta_left,255, PlayerGetColor(playeri));
 
         end;
 

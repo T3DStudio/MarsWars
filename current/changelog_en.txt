@@ -16,11 +16,29 @@ Other:
 -- increased number of AI difficulty levels to 11(1-7 - default, 8-11 - 'cheaters');
 - fixed framerate control code, now the game loop is exactly 60 fps;
 - added 'observer' player role;
+- POV-player of replays/observer mode can be changed by clicking on units;
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
 
 Interface:
-
-
+- screen messages about game events("Construction complete", "Need more energy", etc.);
+- units and game announcer phrases from DoomWars;
+- double F2-hotkey now move camera to player's army;
+-- "smart F2": F2 hotkey select all battle units, except those who:
+--- patroling;
+--- holding position;
+--- execing "action in point" order;
+--- going to Teleport;
+--- going to transport;
+--- going to pickup onboard some unit;
+- new UI options:
+-- control pannel position(up,down,left,right);
+-- units health bars draw option;
+-- players color schema;
+-- colored shadows for units;
+- army/energy information now draw in star/war-craft style;
+- healthbars and selection rects abow units now draw in separate layer;
+- hint about unit under cursor;
+- upgrades info in selection rect ?????
 
 49.1:
 - Fixed bugs: 

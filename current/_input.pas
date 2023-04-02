@@ -68,7 +68,7 @@ begin
    if(net_status=ns_clnt)
    then net_pause
    else
-     if(net_status=ns_srvr)or(_testmode>0)then
+     if(net_status=ns_srvr){or(_testmode>0)}then
        if(G_Status=gs_running)
        then G_Status:=HPlayer
        else G_Status:=gs_running;
@@ -111,7 +111,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(bld)then
+      if(iscomplete)then
        if(speed>0)
        or(_canAttack(pu,false))
        or(_canAbility(pu)=0)then exit;
@@ -138,7 +138,7 @@ begin
             if(CheckBOrders(_punits[i]))then
             begin
                SelectedBOrders+=1;
-               if(bld)then
+               if(iscomplete)then
                begin
                   if(LeaderUID<>0)then
                    if(_mhits<=_uids[LeaderUID]._mhits)then
@@ -433,7 +433,7 @@ begin
     3 : rpls_plcam  :=not rpls_plcam;
     4 : rpls_showlog:=not rpls_showlog;
     5 : rpls_fog    :=not rpls_fog;
-8..14 : HPlayer     :=u-8;
+8..14 : UIPlayer    :=u-8;
          end;
    end
    else
@@ -750,8 +750,8 @@ begin
    case m_brush of
 co_empty   : begin
              ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-             if(ui_uhint>0)then
-              if(_players[HPlayer].observer)and(ks_mleft=1)then
+             if(ui_uhint>0)and(ks_mleft=1)then
+              //if(_players[HPlayer].observer)then
                if(d_UpdateUIPlayer(ui_uhint))then exit;
              end;
 co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);

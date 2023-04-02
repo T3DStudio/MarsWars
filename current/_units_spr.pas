@@ -319,7 +319,7 @@ begin
       else _unit2SMAnimK:=sms_stand;
 
       if(hits          <=0)then begin _unit2SMAnimK:=sms_death;exit;end;
-      if(not bld          )then begin _unit2SMAnimK:=sms_build;exit;end;
+      if(not iscomplete   )then begin _unit2SMAnimK:=sms_build;exit;end;
 
       if(not _ukbuilding)then
       begin

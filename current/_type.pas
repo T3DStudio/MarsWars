@@ -231,6 +231,8 @@ TUID = record
    _rebuild_rupgrl,
    _zombie_uid,
    _death_missile,
+   _death_uid,
+   _death_uidn,
    _urace,
    _ucl,
    _ruid1,
@@ -485,6 +487,9 @@ o_x1,o_y1  :integer;
    log_n,
    log_n_cl
            : cardinal;
+
+   log_EnergyCheck
+           : integer;
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..MaxPlayers] of TPLayer;
@@ -546,7 +551,7 @@ TUnit = record
    ukfly,
    isbuildarea,
    ukfloater,
-   bld,
+   iscomplete,
    solid,
    sel      : boolean;
 

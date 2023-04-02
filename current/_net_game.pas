@@ -230,10 +230,10 @@ nmid_client_info : with _players[pid] do
                       if(log_n_cl=log_n)then net_logsend_pause:=0;
                    end;
 nmid_pause       : begin
-                      if(G_Status=pid)
+                      if(gs_running<>G_Status)and(G_Status<=MaxPlayers)
                       then G_Status:=gs_running
                       else
-                        if(G_Status<>HPlayer)or(G_Status=gs_running)then G_Status:=pid;
+                        if(G_Status=gs_running)then G_Status:=pid;
                      {$IFNDEF _FULLGAME}
                      screen_redraw:=true;
                      {$ENDIF}

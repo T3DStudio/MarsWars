@@ -37,7 +37,7 @@ UID_HASymbol,
 UID_HAltar,
 UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
     else
-      if(uid^._ukbuilding)and(bld=false)
+      if(uid^._ukbuilding)and(iscomplete=false)
       then _unit_SpriteDepth:=sd_build+vy
       else
         if(hits>0)or(buff[ub_Resurect]>0)
@@ -73,7 +73,7 @@ begin
            and((vid_fog_sy-r)<=y)and(y<=(vid_fog_ey+r));
 end;
 
-procedure _unit_ForXY(pu:PTUnit);
+procedure _unit_FogXY(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -131,24 +131,24 @@ begin
          pcurrent:=(s_barracks<=0)or(sel);
          if(pcurrent)then ui_uprod_max+=1;
 
-         for t:=1 to 255 do
-          if(pcurrent)then
-           if(t in ups_units)then ui_uprod_uid_max[t]+=1;     //possible productions count of each unit type     +byte(buff[ub_advanced]>0)
-
          if(uprod_r[pn]>0)then
          begin
             if(pcurrent)then ui_uprod_cur+=1;
             i:=uprod_u[pn];
             if(ui_uprod_first      <=0)or(ui_uprod_first      >uprod_r[pn])then ui_uprod_first      :=uprod_r[pn];
             if(ui_uprod_uid_time[i]<=0)or(ui_uprod_uid_time[i]>uprod_r[pn])then ui_uprod_uid_time[i]:=uprod_r[pn];
-         end;
+         end
+         else
+           for t:=1 to 255 do
+            if(pcurrent)then
+             if(t in ups_units)then ui_uprod_uid_max[t]+=1;     //possible productions count of each unit type
       end;
 
       if(_issmith)then
       begin
          for t:=1 to 255 do
           if(s_smiths<=0)or(sel)then   // and(s_smiths>0)
-           if(t in ups_upgrades)then ui_pprod_max[t]+=1;   //possible productions count of each upgrade type      +byte(buff[ub_advanced]>0)
+           if(t in ups_upgrades)then ui_pprod_max[t]+=1;   //possible productions count of each upgrade type
 
          if(pprod_r[pn]>0)then
          begin
@@ -185,7 +185,7 @@ var i:byte;
     t:integer;
 begin
    with pu^ do
-   if(playeri=UIPlayer)and(G_Status=gs_running)then
+   if(playeri=UIPlayer){and(G_Status=gs_running)}then
    with uid^ do
    with player^ do
    begin
@@ -194,7 +194,7 @@ begin
 
       if(_ukbuilding)then
       begin
-         if(bld)then
+         if(iscomplete)then
          begin
             if(n_builders>0)and(isbuildarea)then
             begin
@@ -212,7 +212,7 @@ begin
          if(sel)and(_UnitHaveRPoint(pu^.uidi))then SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
       end;
 
-      if(bld)then
+      if(iscomplete)then
       begin
          if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<0)then ui_uid_reload[uidi]:=rld;
          if(rld<ui_ucl_reload[_ucl])or(ui_ucl_reload[_ucl]<0)then ui_ucl_reload[_ucl]:=rld;
@@ -389,7 +389,7 @@ begin
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
-            if(cycle_order=_cycle_order)and(noanim=false)
+            if(cycle_order=_cycle_order)
             then _unit_level_string(pu);
 
             depth:=_unit_SpriteDepth(pu);
@@ -417,7 +417,7 @@ begin
               if(sn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
 
             if(_ukbuilding)then
-             if(bld)then
+             if(iscomplete)then
              begin
                 if(a_rld<=0)and(noanim=false)then
                  if(uidi in [UID_UGTurret,UID_UATurret])then

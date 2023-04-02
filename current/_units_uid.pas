@@ -7,7 +7,7 @@ begin
      if(_ukbuilding=false)
      then _unit_CalcShadowZ:=fly_height[ukfly]
      else
-       if(speed<=0)or(bld=false)
+       if(speed<=0)or(iscomplete=false)
        then _unit_CalcShadowZ:=-fly_hz   // no shadow
        else _unit_CalcShadowZ:=0;
 end;
@@ -448,7 +448,7 @@ end;
 UID_Pain      :
 begin
    _mhits     := 1500;
-   _renergy   := 300;
+   _renergy   := 400;
    _r         := 15;
    _speed     := 7;
    _srange    := 225;
@@ -457,11 +457,14 @@ begin
    _btime     := ptime2;
    _apcs      := 2;
    _ruid1     := UID_HMonastery;
+   _limituse  := ul2;
    _ukfly     := uf_fly;
    _attack    := atm_always;
    _ability   := uab_SpawnLost;
-   _weapon(0,wpt_unit,aw_fsr+75,0,0 ,fr_fps1d2,UID_Phantom ,0,upgr_hell_phantoms,1,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
-   _weapon(1,wpt_unit,aw_fsr+75,0,0 ,fr_fps1d2,UID_LostSoul,0,0                 ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _death_uid := UID_LostSoul;
+   _death_uidn:= 3;
+   _weapon(0,wpt_unit,aw_fsr+50,0,0 ,fr_fpsd2,UID_Phantom ,0,upgr_hell_phantoms,1,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _weapon(1,wpt_unit,aw_fsr+50,0,0 ,fr_fpsd2,UID_LostSoul,0,0                 ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_distance,0);
 
    _fastdeath_hits:=1;
 end;
@@ -562,9 +565,9 @@ begin
    _ucl       :=13;
    _renergy   :=200;
    _btime     :=ptime1;
-   _weapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamageh,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0);
+   _weapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0);
    end;
-   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_bio     ,0);
+   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_bio     ,0);
 end;
 UID_ZFormer:
 begin
@@ -754,7 +757,7 @@ begin
       ups_apc          :=uids_demons;
 
       _upgr_srange     :=upgr_hell_buildr;
-      _weapon(0,wpt_missle,_srange,_r,0,fr_fps1  ,MID_Imp     ,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_unit_bio_nlight,0);
+      _weapon(0,wpt_missle,_srange,_r,0,fr_fps1 ,MID_Imp      ,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_unit_bio_nlight,0);
       _weapon(1,wpt_missle,_srange,_r,0,fr_fpsd4,MID_Cacodemon,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,         [UID_Imp],[],3,-65,wtp_nolost_hits    ,0);
 
       if(i=UID_HACommandCenter)then
@@ -989,7 +992,7 @@ begin
    _mhits     := 1000;
    _renergy   := 200;
    _r         := 12;
-   _speed     := 13;
+   _speed     := 14;
    _srange    := 225;
    _ucl       := 0;
    _btime     := ptime1;
@@ -1004,7 +1007,7 @@ begin
    _mhits     := 1000;
    _renergy   := 250;
    _r         := 12;
-   _speed     := 13;
+   _speed     := 14;
    _srange    := 225;
    _ucl       := 1;
    _btime     := ptime1hh;
@@ -1020,7 +1023,7 @@ begin
    _mhits     := 1000;
    _renergy   := 200;
    _r         := 12;
-   _speed     := 11;
+   _speed     := 12;
    _srange    := 225;
    _ucl       := 2;
    _btime     := ptime1;
@@ -1036,7 +1039,7 @@ begin
    _mhits     := 1000;
    _renergy   := 200;
    _r         := 12;
-   _speed     := 11;
+   _speed     := 12;
    _srange    := 225;
    _ucl       := 3;
    _btime     := ptime1;
@@ -1052,8 +1055,8 @@ UID_SiegeMarine:
 begin
    _mhits     := 1000;
    _renergy   := 200;
-   _r         := 12;
-   _speed     := 9;
+   _r         := 13;
+   _speed     := 10;
    _srange    := 225;
    _ucl       := 4;
    _btime     := ptime1;
@@ -1085,8 +1088,8 @@ UID_BFGMarine:
 begin
    _mhits     := 1000;
    _renergy   := 600;
-   _r         := 12;
-   _speed     := 9;
+   _r         := 13;
+   _speed     := 10;
    _srange    := 225;
    _ucl       := 6;
    _apcs      := 2;
@@ -1104,7 +1107,7 @@ begin
    _mhits     := 1000;
    _renergy   := 200;
    _r         := 12;
-   _speed     := 11;
+   _speed     := 12;
    _srange    := 200;
    _ucl       := 7;
    _btime     := ptime1;
@@ -1112,17 +1115,17 @@ begin
    _zombie_uid:= UID_ZEngineer;
    _ability   := 0;
    _uklight   := true;
-   _ruid1     := UID_UFactory;
+   _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fps1,0          ,0,0,0,upgr_uac_melee ,BaseRepairBonus1,wtrset_repair                 ,wpr_any,uids_all,[],0,0,wtp_hits            ,0);
-   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fps1,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive            ,wpr_any,uids_all,[],0,-4,wtp_unit_bio_light  ,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fps1,0          ,0,0,0,upgr_uac_melee ,BaseRepairBonus1,wtrset_repair                 ,wpr_any,uids_all,[],0,0 ,wtp_hits          ,0);
+   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fps1,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive            ,wpr_any,uids_all,[],0,-4,wtp_unit_bio_light,0);
 end;
 UID_Medic:
 begin
    _mhits     := 1000;
    _renergy   := 200;
    _r         := 12;
-   _speed     := 11;
+   _speed     := 12;
    _srange    := 200;
    _ucl       := 8;
    _btime     := ptime1;
@@ -1132,7 +1135,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
    _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fps1,0          ,0,0,0,upgr_uac_melee ,BaseHealBonus1  ,wtrset_heal                  ,wpr_any,uids_all-[UID_Medic],[],0,0,wtp_notme_hits     ,0);
-   _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fps1,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground    ,wpr_any,uids_all            ,[],0,-4,wtp_unit_bio_light ,0);
+   _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fps1,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground    ,wpr_any,uids_all            ,[],0,-4,wtp_unit_bio_light,0);
    _weapon(2,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fps1,0          ,0,0,0,upgr_uac_melee ,BaseHealBonus1  ,wtrset_heal                  ,wpr_any,[UID_Medic]         ,[],0,0,wtp_notme_hits     ,0);
 end;
 UID_UACDron:
@@ -1176,22 +1179,22 @@ begin
 end;
 UID_Terminator:
 begin
-   _mhits     := 4000;
-   _renergy   := 600;
+   _mhits     := 2000;
+   _renergy   := 500;
    _r         := 16;
    _speed     := 8;
    _srange    := 225;
    _ucl       := 11;
-   _btime     := ptime2;
-   _apcs      := 6;
-   _limituse  := ul4;
+   _btime     := ptime1h;
+   _apcs      := 4;
+   _limituse  := ul3;
    _attack    := atm_always;
    _ukmech    := true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _uklight   := false;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SShot   ,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground_nlight_bio,wpr_any,uids_all,[],0,0,wtp_unit_bio_nlight,0);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_Chaingun,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground           ,wpr_any,uids_all,[],0,0,wtp_unit_light     ,0);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fpsd4,MID_Chaingun,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground_light_bio,wpr_any,uids_all,[],0,0,wtp_unit_bio_light ,0);
+   _weapon(1,wpt_missle,aw_fsr+50,0,0,fr_fpsd4,MID_SShot   ,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground          ,wpr_any,uids_all,[],0,0,wtp_unit_bio_nlight,0);
 end;
 UID_Tank:
 begin
@@ -1213,16 +1216,16 @@ begin
 end;
 UID_Flyer:
 begin
-   _mhits     := 4000;
-   _renergy   := 600;
+   _mhits     := 2000;
+   _renergy   := 500;
    _r         := 18;
    _speed     := 16;
    _srange    := 225;
    _ucl       := 13;
-   _btime     := ptime2;
-   _apcs      := 8;
+   _btime     := ptime1h;
+   _apcs      := 6;
    _ukfly     := uf_fly;
-   _limituse  := ul4;
+   _limituse  := ul3;
    _attack    := atm_always;
    _ukmech    := true;
    _ruid1     := UID_UTechCenter;
@@ -1367,7 +1370,7 @@ begin
    _setUPGR(r_hell,upgr_hell_buildr    ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_hell,upgr_hell_HKTeleport,180,0,0 ,1   ,300 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_hell,upgr_hell_extbuild  ,75 ,0,0 ,1   ,600 ,0,0   ,0            ,0                  ,false);
-   _setUPGR(r_hell,upgr_hell_paina     ,60 ,0,0 ,2   ,300 ,0,0   ,0            ,UID_HAKeep         ,false);
+   _setUPGR(r_hell,upgr_hell_paina     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep         ,false);
    _setUPGR(r_hell,upgr_hell_towers    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_HAKeep         ,false);
    _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep         ,false);
 
@@ -1380,16 +1383,16 @@ begin
    _setUPGR(r_hell,upgr_hell_heye      ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_HFortress      ,false);
    _setUPGR(r_hell,upgr_hell_totminv   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress      ,false);
    _setUPGR(r_hell,upgr_hell_bldrep    ,60 ,0,0 ,5   ,600 ,0,300 ,0            ,UID_HFortress      ,false);
-   _setUPGR(r_hell,upgr_hell_b478tel   ,15 ,0,0 ,15  ,100 ,0,0   ,0            ,UID_HFortress      ,true );
+   _setUPGR(r_hell,upgr_hell_b478tel   ,30 ,0,0 ,15  ,100 ,0,0   ,0            ,UID_HFortress      ,true );
    _setUPGR(r_hell,upgr_hell_resurrect ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAltar         ,false);
-   _setUPGR(r_hell,upgr_hell_invuln    ,150,0,0 ,1   ,1200,0,0   ,0            ,UID_HAltar         ,true );
+   _setUPGR(r_hell,upgr_hell_invuln    ,150,0,0 ,2   ,1200,0,0   ,0            ,UID_HAltar         ,true );
 
 
    u:=0;
    _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                  ,false);
-   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,40,3   ,600 ,0,600 ,0            ,0                  ,false);
+   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,45,2   ,600 ,0,300 ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_painn      ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                  ,false);
    _setUPGR(r_uac ,upgr_uac_buildr     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                  ,false);
@@ -1403,14 +1406,14 @@ begin
    _setUPGR(r_uac ,upgr_uac_vision     ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_commando   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
-   _setUPGR(r_uac ,upgr_uac_mechspd    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
+   _setUPGR(r_uac ,upgr_uac_mechspd    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_mecharm    ,60 ,0,45,5   ,600 ,0,600 ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_lturret    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_transport  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter    ,false);
    _setUPGR(r_uac ,upgr_uac_radar_r    ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_UNuclearPlant  ,false);
    _setUPGR(r_uac ,upgr_uac_plasmt     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UNuclearPlant  ,false);
    _setUPGR(r_uac ,upgr_uac_turarm     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UNuclearPlant  ,false);
-   _setUPGR(r_uac ,upgr_uac_rstrike    ,150,0,0 ,1   ,1200,0,0   ,0            ,UID_URMStation     ,true );
+   _setUPGR(r_uac ,upgr_uac_rstrike    ,150,0,0 ,2   ,1200,0,0   ,0            ,UID_URMStation     ,true );
 
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_building wtr_bld wtr_nbld wtr_ground wtr_fly wtr_adv wtr_nadv wtr_light wtr_nlight wtr_stun wtr_nostun;
    wtrset_all                            :=wtr_owner_p+wtr_owner_a+wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_building+wtr_bld+wtr_nbld+wtr_ground+wtr_fly+wtr_adv+wtr_nadv+wtr_light+wtr_nlight+wtr_stun+wtr_nostun;

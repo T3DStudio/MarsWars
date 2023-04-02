@@ -1,5 +1,9 @@
 program T3D_RTS;
 
+{
+- когда игрок теряет всех строителей - на клиентской стороне не раскрываются его невидимые юниты
+}
+
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
@@ -79,7 +83,7 @@ end; }
 begin
    InitGame;
 
-   while (_CYCLE) do
+   while(_CYCLE)do
    begin
       fr_FPSSecondD:=SDL_GetTicks;
 
@@ -88,10 +92,10 @@ begin
       CodeGame;
       if(r_draw)then DrawGame;
       {$ELSE}
-      while (SDL_PollEvent(_EVENT)>0) do
-       case (_EVENT^.type_) of
-       SDL_QUITEV  : break;
-       end;
+      while(SDL_PollEvent(_EVENT)>0)do
+        case (_EVENT^.type_) of
+        SDL_QUITEV  : break;
+        end;
       CodeGame;
       {$ENDIF}
 

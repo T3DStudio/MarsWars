@@ -647,7 +647,7 @@ begin
 end;
 UID_Terminator:
 begin
-   _animw:=13;
+   _animw:=14;
    setMWSModel(0,@spr_Terminator);
    setCommandSND(snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
@@ -656,13 +656,13 @@ begin
    setWeaponESND(0,nil,snd_shotgun,0,0);
 
    setWeaponTEID(0,nil,0,[0..255]);
-   with _a_weap[1] do aw_AnimStay:=sms_mattack;
+   with _a_weap[0] do aw_AnimStay:=sms_mattack;
 
    DefaultRLDA_pa:=2;
 end;
 UID_Tank:
 begin
-   _animw:=14;
+   _animw:=15;
    setMWSModel(0,@spr_Tank);
    setCommandSND(snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );

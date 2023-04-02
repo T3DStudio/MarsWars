@@ -679,6 +679,7 @@ spr_mback,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_tabs          : array[0..3] of pSDL_Surface;
+spr_cp_koth,
 spr_cp_out,
 spr_cp_gen        : TMWTexture;
 
