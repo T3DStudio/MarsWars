@@ -144,9 +144,28 @@ PTSoundSet = ^TSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TMIDEffects = record
+{$ENDIF}
+
+TDamageMod = array[0..MaxDamageModFactors] of record
+  dm_factor : integer;  // 100 = x1
+  dm_flags  : cardinal;
+end;
+
+TMID = record
+   mid_base_damage,
+   mid_base_splashr,
+   mid_size,
+   mid_speed       : integer;
+   mid_noflycheck,
+   mid_teamdamage  : boolean;
+   mid_ystep,
+   mid_homing      : byte;
+   mid_nodamage    : TSoB;
+
+   {$IFDEF _FULLGAME}
    ms_smodel       : PTMWSModel;
    ms_eid_fly_st   : integer;
+   ms_eid_target_eff,
    ms_eid_fly,
    ms_eid_decal    : byte;
    ms_eid_death,
@@ -154,9 +173,28 @@ TMIDEffects = record
    ms_eid_death_r,
    ms_snd_death_ch : array[false..true] of byte;
    ms_snd_death    : array[false..true] of PTSoundSet;
+   {$ENDIF}
 end;
 
-{$ENDIF}
+TMissile = record
+   x,y,
+   vx,vy,
+   damage,
+   vstep,hvstep,
+   tar,
+   dir,
+   mtars,
+   ntars    : integer;
+   player,
+   homing,
+   dmod,
+   mid      : byte;
+   fake,
+   mfe,mfs  : boolean;
+   {$IFDEF _FULLGAME}
+   ms_eid_bio_death: boolean;
+   {$ENDIF}
+end;
 
 TWUDataTime  = array[1..MaxUnits] of cardinal;
 TWCPDataTime = array[1..MaxCPoints] of byte;
@@ -179,6 +217,7 @@ TUWeapon = record
   aw_max_range,
   aw_min_range,
   aw_count : integer;
+  aw_dmod,
   aw_rld   : byte;
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
@@ -231,6 +270,7 @@ TUID = record
    _rebuild_rupgrl,
    _zombie_uid,
    _death_missile,
+   _death_missile_dmod,
    _death_uid,
    _death_uidn,
    _urace,
@@ -576,12 +616,13 @@ TUnit = record
    anim,animf,
    shadow
             : integer;
-   lvlstr_w,
-   lvlstr_r,
-   lvlstr_b,
-   lvlstr_l,
-   lvlstr_a,
-   lvlstr_s : string6;
+   lvlstr_w,  // weapon upgrades
+   lvlstr_r,  // reload
+   lvlstr_b,  // buffs
+   lvlstr_l,  // level
+   lvlstr_a,  // armor
+   lvlstr_s   // other upgrs
+            : string6;
    {$ENDIF}
 
    player   : PTPlayer;
@@ -589,27 +630,6 @@ TUnit = record
 end;
 PTUnit = ^TUnit;
 PPTUnit = ^PTUnit;
-
-TMissile = record
-   x,y,
-   vx,vy,
-   damage,
-   vstep,hvstep,vsteps,
-   tar,
-   splashr,
-   dir,
-   ystep,
-   mtars,
-   ntars    : integer;
-   player,
-   homing,
-   mid      : byte;
-   fake,
-   mfe,mfs  : boolean;
-   {$IFDEF _FULLGAME}
-   ms_eid_bio_death: boolean;
-   {$ENDIF}
-end;
 
 TCTPoint = record
    cpx ,cpy ,cpsolidr,cpCapturer,cpnobuildr,

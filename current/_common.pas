@@ -98,9 +98,6 @@ begin
    else _str_mx:='x'+b2s(x);
 end;
 
-function cf(c,f:pcardinal):boolean;  // check flag
-begin cf:=(c^ and f^)>0;end;
-
 function GetBBit(pb:pbyte;nb:byte):boolean;
 begin
    GetBBit:=(pb^ and (1 shl nb))>0;
@@ -308,14 +305,14 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
       end;
 
       {$IFDEF _FULLGAME}
-      if(ptarget=HPlayer)then
+      if(ptarget=UIPlayer)then
       begin
          net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
          vid_menu_redraw:=true;
 
          if(LogMes2UIAlarm)then SoundLogHPlayer;
 
-         if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=HPlayer)then ui_tab:=3;
+         if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
       end;
       {$ENDIF}
    end;
@@ -387,38 +384,38 @@ begin
       if(a_units[uid]<=0)then exit;
    end;
 
-   if(cf(@condt,@ureq_place))
+   if((condt and ureq_place)>0)
    then bt:=lmt_cant_build
    else
-     if(cf(@condt,@ureq_ruid ))
-     or(cf(@condt,@ureq_rupid))
+     if((condt and ureq_ruid )>0)
+     or((condt and ureq_rupid)>0)
      then bt:=lmt_req_ruids
      else
-       if(cf(@condt,@ureq_max ))
+       if((condt and ureq_max )>0)
        then bt:=lmt_MaximumReached
        else
-         if(cf(@condt,@ureq_armylimit ))
-         or(cf(@condt,@ureq_unitlimit ))
+         if((condt and ureq_armylimit )>0)
+         or((condt and ureq_unitlimit )>0)
          then bt:=lmt_unit_limit
          else
-           if(cf(@condt,@ureq_smiths  ))
-           or(cf(@condt,@ureq_barracks))
+           if((condt and ureq_smiths  )>0)
+           or((condt and ureq_barracks)>0)
            then bt:=lmt_NeedMoreProd
            else
-             if(cf(@condt,@ureq_busy))
+             if((condt and ureq_busy)>0)
              then bt:=lmt_production_busy
              else
-               if(cf(@condt,@ureq_needbuilders))
-               or(cf(@condt,@ureq_builders))
+               if((condt and ureq_needbuilders)>0)
+               or((condt and ureq_builders    )>0)
                then bt:=lmt_unit_needbuilder
                else
                  if(condt=ureq_energy)
                  then bt:=lmt_req_energy
                  else
-                   if(cf(@condt,@ureq_alreadyAdv))
+                   if((condt and ureq_alreadyAdv)>0)
                    then bt:=lmt_already_adv
                    else
-                     if(cf(@condt,@ureq_unknown   ))
+                     if((condt and ureq_unknown   )>0)
                      then bt:=lmt_cant_order
                      else bt:=lmt_req_common;
 
@@ -888,7 +885,7 @@ begin
 
       if(_IsUnitRange(uo_tar,@tu))then
       begin
-         if(tu^.uid^._ability=uab_Teleport)then exit;
+         if(tu^.uid^._ability=uab_Teleport)and(not ukfly)then exit;
 
          if(_itcanapc(pu,tu))
          or(_itcanapc(tu,pu))then exit;
@@ -916,12 +913,6 @@ begin
          if(_rebuild_rupgr>0)and(_rebuild_rupgrl>0)then
           if(upgr[_rebuild_rupgr]<_rebuild_rupgrl)then _canRebuild+=ureq_rupid;
       end;
-{
-_rebuild_uid,
-_rebuild_level,
-_rebuild_ruid,
-_rebuild_rpuid,
-}
 end;
 
 function _canAbility(pu:PTUnit):cardinal;
@@ -960,6 +951,25 @@ begin
    if(team<=MaxPlayers)then
    G_status:=gs_win_team0+team;
    GameLogEndGame(team);
+end;
+
+function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;
+begin
+   CheckUnitBaseFlags:=false;
+
+   if((flags and wtr_unit    )=0)and(not tu^.uid^._ukbuilding   )then exit;
+   if((flags and wtr_building)=0)and(    tu^.uid^._ukbuilding   )then exit;
+
+   if((flags and wtr_bio     )=0)and(not tu^.uid^._ukmech       )then exit;
+   if((flags and wtr_mech    )=0)and(    tu^.uid^._ukmech       )then exit;
+
+   if((flags and wtr_light   )=0)and    (tu^.uid^._uklight      )then exit;
+   if((flags and wtr_heavy   )=0)and not(tu^.uid^._uklight      )then exit;
+
+   if((flags and wtr_ground  )=0)and(tu^.ukfly = uf_ground      )then exit;
+   if((flags and wtr_fly     )=0)and(tu^.ukfly = uf_fly         )then exit;
+
+   CheckUnitBaseFlags:=true;
 end;
 
 {$IFDEF _FULLGAME}
@@ -1233,7 +1243,7 @@ end;
 procedure MoveCamToLastEvent;
 var log_pi:cardinal;
 begin
-   with _players[HPlayer] do
+   with _players[UIPlayer] do
    begin
       log_pi:=log_i;
       while true do
@@ -1284,7 +1294,7 @@ lmt_player_chat,
 lmt_game_message     : ParseLogMessage:=str;
 lmt_player_leave     : if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
 lmt_game_end         : if(argx<=MaxPlayers)then
-                        if(argx=_players[HPlayer].team)
+                        if(argx=_players[UIPlayer].team)
                         then ParseLogMessage:=str_win
                         else ParseLogMessage:=str_lose;
 lmt_player_defeated  : if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_player_def;

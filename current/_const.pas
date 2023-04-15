@@ -355,25 +355,24 @@ aw_hmelee              = -64;           // default heal/reapir melee range
 //  Target requirements flags
 //
 
-wtr_owner_p            : cardinal = %000000000000000000001;  // own
-wtr_owner_a            : cardinal = %000000000000000000010;  // ally
-wtr_owner_e            : cardinal = %000000000000000000100;  // enemy
-wtr_hits_h             : cardinal = %000000000000000001000;  // 0<hits<mhits
-wtr_hits_d             : cardinal = %000000000000000010000;  // hits<=0
-wtr_hits_a             : cardinal = %000000000000000100000;  // hits=mhits
-wtr_bio                : cardinal = %000000000000001000000;  // non mech
-wtr_mech               : cardinal = %000000000000010000000;  // mech and !building
-wtr_building           : cardinal = %000000000000100000000;  // building
-wtr_bld                : cardinal = %000000000001000000000;  // bld=true
-wtr_nbld               : cardinal = %000000000010000000000;  // bld=false
-wtr_ground             : cardinal = %000000000100000000000;
-wtr_fly                : cardinal = %000000001000000000000;
-wtr_adv                : cardinal = %000000010000000000000;
-wtr_nadv               : cardinal = %000000100000000000000;
-wtr_light              : cardinal = %000001000000000000000;
-wtr_nlight             : cardinal = %000010000000000000000;
-wtr_stun               : cardinal = %000100000000000000000;
-wtr_nostun             : cardinal = %001000000000000000000;
+wtr_owner_p            : cardinal = 1;         // own
+wtr_owner_a            : cardinal = 1 shl 1 ;  // ally
+wtr_owner_e            : cardinal = 1 shl 2 ;  // enemy
+wtr_hits_h             : cardinal = 1 shl 3 ;  // 0<hits<mhits
+wtr_hits_d             : cardinal = 1 shl 4 ;  // fdead_hits<hits<=0
+wtr_hits_a             : cardinal = 1 shl 5 ;  // hits=mhits
+wtr_bio                : cardinal = 1 shl 6 ;  // non mech
+wtr_mech               : cardinal = 1 shl 7 ;  // mech
+wtr_unit               : cardinal = 1 shl 8 ;  // unit
+wtr_building           : cardinal = 1 shl 9 ;  // building
+wtr_complete           : cardinal = 1 shl 10;  // complete=true
+wtr_ncomplete          : cardinal = 1 shl 11;  // complete=false
+wtr_ground             : cardinal = 1 shl 12;
+wtr_fly                : cardinal = 1 shl 13;
+wtr_light              : cardinal = 1 shl 14;
+wtr_heavy              : cardinal = 1 shl 15;
+wtr_stun               : cardinal = 1 shl 16;
+wtr_nostun             : cardinal = 1 shl 17;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -541,7 +540,7 @@ upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
 upgr_uac_melee         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
-upgr_uac_painn         = 36; // expansive bullets
+upgr_uac_ssgup         = 36; // expansive bullets
 upgr_uac_buildr        = 37; // main sr
 upgr_uac_CCFly         = 38; // CC fly
 upgr_uac_extbuild      = 39; // buildings on doodabs
@@ -591,24 +590,28 @@ MID_Cacodemon          = 102;
 MID_Baron              = 103;
 MID_HRocket            = 104;
 MID_Revenant           = 105;
-MID_Mancubus           = 107;
-MID_YPlasma            = 108;
-MID_BPlasma            = 109;
-MID_Bullet             = 110;
-MID_SShot              = 114;
-MID_SSShot             = 115;
-MID_BFG                = 116;
-MID_Granade            = 117;
-MID_Tank               = 118;
-MID_Blizzard           = 120;
-MID_ArchFire           = 121;
-MID_Flyer              = 122;
-MID_Mine               = 123;
-MID_URocket            = 124;
-MID_URocketS           = 125;
-MID_Chaingun           = 126;
-MID_Chaingun2          = 127;
+MID_Mancubus           = 106;
+MID_YPlasma            = 107;
+MID_BPlasma            = 108;
+MID_Bullet             = 109;
+MID_SShot              = 110;
+MID_SSShot             = 111;
+MID_BFG                = 112;
+MID_Granade            = 113;
+MID_Tank               = 114;
+MID_Blizzard           = 115;
+MID_ArchFire           = 116;
+MID_Flyer              = 117;
+MID_Mine               = 118;
+MID_URocket            = 119;
+MID_URocketS           = 120;
+MID_Chaingun           = 121;
+MID_Chaingun2          = 122;
 
+
+mh_none                = 0;
+mh_magnetic            = 1;
+mh_homing              = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -619,6 +622,22 @@ MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
 MaxUnitWeapons         = 7;  //0-7
 MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
+
+// damage modificator
+
+MaxDamageModFactors    = 1;
+
+dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
+dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
+dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
+dm_AntiUnitMech        = 4 ; // 1.5*[unit mech]
+dm_AntiUnitLight       = 5 ; // 1.5*[unit light]
+dm_AntiFly             = 6 ; // 1.5*[fly]
+dm_AntiHeavy           = 7 ; // 1.5*[heavy]
+dm_Cyber               = 8 ; //   3*[buildings]      0.5*[light]
+dm_Siege               = 9 ; //   3*[buildings]
+dm_Blizzard            = 10; //   5*[buildings]      0.5*[light]
+dm_Lost                = 11; //                      0.5*[mech ]
 
 // LIMIT
 ul1                    = MinUnitLimit;
@@ -672,7 +691,7 @@ BaseDamage10           = BaseDamage1*10;
 
 BaseDamageBonus1       = 6;
 BaseDamageBonush       = BaseDamageBonus1 div 2;
-BaseDamageBonush3      = BaseDamageBonus1*3;
+BaseDamageBonus3       = BaseDamageBonus1*2;
 BaseDamageLevel1       = BaseDamageBonush;
 BaseArmorBonus1        = 6;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
@@ -1385,6 +1404,10 @@ tc_dgray               = #24;
 tc_default             = #25;
 
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
+
+sep_comma              = ',';
+sep_sdot               = '. ';
+sep_wdash              = tc_white+'-';
 
 ////////////////////////////////////////////////////////////////////////////////
 //

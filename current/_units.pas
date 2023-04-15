@@ -419,11 +419,11 @@ wpt_heal     : if(tu^.hits<=0)
 
       if not(tu^.uidi in aw_uids)then exit;
 
-      if(cf(@aw_reqf,@wpr_air   ))then
+      if((aw_reqf and wpr_air   )>0)then
        if(ukfly=uf_ground)or(tu^.ukfly=uf_ground)then exit;
-      if(cf(@aw_reqf,@wpr_ground))then
+      if((aw_reqf and wpr_ground)>0)then
        if(ukfly=uf_fly   )or(tu^.ukfly=uf_fly   )then exit;
-      if(cf(@aw_reqf,@wpr_reload))then
+      if((aw_reqf and wpr_reload)>0)then
        if(rld>0)then exit;
 
 
@@ -437,35 +437,25 @@ wpt_heal     : if(tu^.hits<=0)
 
       // requirements to target
 
-      if(cf(@aw_tarf,@wtr_owner_p )=false)and(tu^.playeri      =playeri  )then exit;
-      if(cf(@aw_tarf,@wtr_owner_a )=false)and(tu^.player^.team =team     )then exit;
-      if(cf(@aw_tarf,@wtr_owner_e )=false)and(tu^.player^.team<>team     )then exit;
+      if((aw_tarf and wtr_owner_p  )=0)and(tu^.playeri      =playeri  )then exit;
+      if((aw_tarf and wtr_owner_a  )=0)and(tu^.player^.team =team     )then exit;
+      if((aw_tarf and wtr_owner_e  )=0)and(tu^.player^.team<>team     )then exit;
 
-      if(cf(@aw_tarf,@wtr_hits_h  )=false)and((0<tu^.hits)
-                                          and(tu^.hits< tu^.uid^._mhits ))then exit;
-      if(cf(@aw_tarf,@wtr_hits_d  )=false)and(tu^.hits<=0                )then exit;
-      if(cf(@aw_tarf,@wtr_hits_a  )=false)and(tu^.hits =tu^.uid^._mhits  )then exit;
+      if((aw_tarf and wtr_hits_h   )=0)and((0<tu^.hits)
+                                       and(tu^.hits< tu^.uid^._mhits ))then exit;
+      if((aw_tarf and wtr_hits_d   )=0)and(tu^.hits<=0                )then exit;
+      if((aw_tarf and wtr_hits_a   )=0)and(tu^.hits =tu^.uid^._mhits  )then exit;
 
-      if(cf(@aw_tarf,@wtr_bio     )=false)and(not tu^.uid^._ukmech       )then exit;
-      if(cf(@aw_tarf,@wtr_mech    )=false)and(tu^.uid^._ukmech           )then exit;
-      if(cf(@aw_tarf,@wtr_building)=false)and(tu^.uid^._ukbuilding       )then exit;
+      if((aw_tarf and wtr_complete )=0)and(tu^.iscomplete             )then exit;
+      if((aw_tarf and wtr_ncomplete)=0)and(tu^.iscomplete =false      )then exit;
 
-      if(cf(@aw_tarf,@wtr_bld     )=false)and(tu^.iscomplete                    )then exit;
-      if(cf(@aw_tarf,@wtr_nbld    )=false)and(tu^.iscomplete =false             )then exit;
-
-      if(cf(@aw_tarf,@wtr_ground  )=false)and(tu^.ukfly = uf_ground      )then exit;
-      if(cf(@aw_tarf,@wtr_fly     )=false)and(tu^.ukfly = uf_fly         )then exit;
-
-      if(not tu^.uid^._ukbuilding )then
+      if(not tu^.uid^._ukbuilding  )then
       begin
-      if(cf(@aw_tarf,@wtr_light   )=false)and    (tu^.uid^._uklight      )then exit;
-      if(cf(@aw_tarf,@wtr_nlight  )=false)and not(tu^.uid^._uklight      )then exit;
-      end
-      else
-      begin
-      if(cf(@aw_tarf,@wtr_stun    )=false)and(tu^.buff[ub_Pain]> 0       )then exit;
-      if(cf(@aw_tarf,@wtr_nostun  )=false)and(tu^.buff[ub_Pain]<=0       )then exit;
+      if((aw_tarf and wtr_stun     )=0)and(tu^.buff[ub_Pain]> 0       )then exit;
+      if((aw_tarf and wtr_nostun   )=0)and(tu^.buff[ub_Pain]<=0       )then exit;
       end;
+
+      if(not CheckUnitBaseFlags(tu,aw_tarf))then exit;
 
       // Distance requirements
       if(aw_max_range=0) // = srange
@@ -1283,6 +1273,8 @@ end;
 function _unit_attack(pu:PTUnit):boolean;
 var w,a   : byte;
      tu   : PTUnit;
+damage,
+painX,
 upgradd,c : integer;
 fakemissile,
 attackinmove: boolean;
@@ -1297,7 +1289,7 @@ begin
    with uid^ do
    with _a_weap[a_weap] do
    begin
-      if(cf(@aw_reqf,@wpr_avis))then
+      if((aw_reqf and wpr_avis)>0)then
       begin
          _AddToInt(@tu^.vsnt[player^.team],vistime);
          {$IFDEF _FULLGAME}
@@ -1358,7 +1350,7 @@ begin
 
          with uid^ do
           with _a_weap[a_weap] do
-           attackinmove:=cf(@aw_reqf,@wpr_move);
+           attackinmove:=(aw_reqf and wpr_move)>0;
 
          case a of
 wmove_closer    : begin
@@ -1403,7 +1395,7 @@ wmove_noneed    : if(not attackinmove)then
 
          with uid^ do
           with _a_weap[a_weap] do
-           attackinmove:=cf(@aw_reqf,@wpr_move);
+           attackinmove:=(aw_reqf and wpr_move)>0;
       end;
 
       if(not _canAttack(pu,true))then
@@ -1482,28 +1474,37 @@ wmove_noneed    : if(not attackinmove)then
             case aw_type of
 wpt_missle     : if(aw_oid>0)then
                   if(aw_count=0)
-                  then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
+                  then _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd,aw_dmod)
                   else
                     if(aw_count>0)
-                    then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd)
+                    then for c:=1 to aw_count do _missile_add(tu^.x,tu^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd,aw_dmod)
                     else
                       if(aw_count<0)then
                       begin
-                         _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
-                         _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd);
+                         _missile_add(tu^.x,tu^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd,aw_dmod);
+                         _missile_add(tu^.x,tu^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,tu^.ukfly,fakemissile,upgradd,aw_dmod);
                       end;
 wpt_unit       : if(not fakemissile)then _ability_unit_spawn(pu,aw_oid);
-wpt_directdmg  : if(not fakemissile)and(aw_count>0)then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false);
+wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
+                 begin
+                    damage:=ApplyDamageMod(tu,aw_dmod,aw_count+upgradd);
+                    painX :=1;
+                    _unit_damage(tu,damage,painX,playeri,false);
+                 end;
 wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
-                  if(not _TryZombification(pu,tu))
-                  then _unit_damage(tu,_unit_melee_damage(pu,tu,aw_count+upgradd),1,playeri,false);
+                  if(not _TryZombification(pu,tu))then
+                  begin
+                     damage:=ApplyDamageMod(tu,aw_dmod,aw_count+upgradd);
+                     painX :=1;
+                     _unit_damage(tu,damage,1,playeri,false);
+                  end;
 wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false);
             else
               if(ServerSide)and(not fakemissile)then
               case aw_type of
 wpt_resurect   : begin
                     _StartResurrection(tu);
-                    if(cf(@aw_reqf,@wpr_reload))then rld:=ptimehhh*fr_fps1;
+                    if((aw_reqf and wpr_reload)>0)then rld:=ptimehhh*fr_fps1;
                  end;
 wpt_heal       : begin
                     tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
@@ -1785,7 +1786,7 @@ begin
                _unit_prod(pu);
 
                if(player^.state=ps_comp)then
-                if(cf(@player^.ai_flags,@aif_army_scout))then ai_scout_pick(pu);
+                if((player^.ai_flags and aif_army_scout)>0)then ai_scout_pick(pu);
             end;
 
             au:=nil;

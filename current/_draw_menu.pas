@@ -461,25 +461,6 @@ begin
                     _draw_text(tar,ui_menu_csm_x3+6, y, str_ready+b2cc[PlayerReady]     , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
                     vlineColor(tar,ui_menu_csm_x2  , t,i, c_gray);
                     vlineColor(tar,ui_menu_csm_x3  , t,i, c_gray);
-
-                    {y:=_yt(10);
-                    _draw_text(tar,ui_menu_csm_xt0, y, str_chattars, ta_left,255, c_white);
-
-                    y:=_yl(11);
-
-                    for t:=0 to MaxPlayers do
-                    begin
-                       i:=ui_menu_csm_x0+t*ui_menu_csm_2ys;
-
-                       vlineColor(tar,i,y,y+ui_menu_csm_ys,c_gray);
-                       if(t=HPlayer)or(t=0)then continue;
-
-                       if(net_chat_tar and (1 shl t))>0
-                       then c:=PlayerGetColor(t)
-                       else c:=c_gray;
-
-                       _draw_text(tar,i-ui_menu_csm_ys, y+6, '#'+b2s(t), ta_middle,255, c);
-                    end; }
                  end;
               end;
    end;

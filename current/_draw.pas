@@ -12,16 +12,9 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(rpls_state>=rpl_rhead)then
-   begin
-      //d_UpdateUIPlayer:=TryUpd(@HPlayer);
-      //UIPlayer:=HPlayer;
-      d_UpdateUIPlayer:=TryUpd(@UIPlayer);
-   end
-   else
-     if(not _players[HPlayer].observer)
-     then UIPlayer:=HPlayer
-     else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
+   if(not _players[HPlayer].observer)or(rpls_state<rpl_rhead)
+   then UIPlayer:=HPlayer
+   else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
 
 procedure d_AddObjSprites(noanim:boolean);
@@ -67,7 +60,7 @@ begin
    if(_testmode>0)then
    begin
    n:=0;
-   with _players[HPlayer] do
+   with _players[UIPlayer] do
     for i:=0 to MaxPlayers do
      with ai_alarms[i] do
       if(aia_enemy_limit>0)then n+=1;

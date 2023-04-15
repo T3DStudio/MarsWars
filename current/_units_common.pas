@@ -25,7 +25,7 @@ EID_HVision : begin
               _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),EID_HVision);
               end;
 EID_Invuln  : begin
-              SoundPlayUnit(snd_hpower,pu,nil);
+              SoundPlayUnit(snd_hell_invuln,pu,nil);
               _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),EID_Invuln);
               end;
       else
@@ -48,9 +48,7 @@ begin
    with pu^ do
    begin
       _effect_add(vx,vy-15,_SpriteDepth(vy+10,ukfly),EID_Exp2);
-      if(playeri=HPlayer)
-      then SoundPlayUnit(snd_bomblaunch,nil,nil)
-      else SoundPlayUnit(snd_bomblaunch,pu ,nil);
+      SoundPlayUnit(snd_bomblaunch,nil,nil)
    end;
 end;
 
@@ -80,7 +78,7 @@ begin
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_summon[level]);
 
-      if(playeri=HPlayer)then SoundPlayUnit(un_snd_ready,nil,nil);
+      if(playeri=UIPlayer)then SoundPlayUnit(un_snd_ready,nil,nil);
    end;
 end;
 
@@ -187,7 +185,7 @@ begin
         then exit
         else
          with _a_weap[a_weap_cl] do
-          if(not cf(@aw_reqf,@wpr_move))then exit;
+          if((aw_reqf and wpr_move)=0)then exit;
 
        if(not _ukbuilding)then
          if(buff[ub_Pain]>0)
@@ -386,7 +384,7 @@ begin
        _unit_ability_uradar:=true;
 
        {$IFDEF _FULLGAME}
-       if(ServerSide)and(player^.team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+       if(ServerSide)and(player^.team=_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
        {$ENDIF}
     end;
 end;
@@ -423,7 +421,7 @@ procedure _unit_umstrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0);
+      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_Blizzard);
       {$IFDEF _FULLGAME}
       _uac_rocketl_eff(pu);
       {$ENDIF}
@@ -954,7 +952,7 @@ begin
          hits  := 1;
          cenergy-=_renergy;
          {$IFDEF _FULLGAME}
-         if(playeri=HPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false);
+         if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false);
          {$ENDIF}
       end;
 
@@ -1653,7 +1651,7 @@ begin
          with uid^ do
          begin
             if(_death_missile>0)
-            then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+            then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
             if(_death_uid>0)and(_death_uidn>0)then
              for i:=1 to _death_uidn do
               _unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
@@ -1751,7 +1749,8 @@ UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
                        if(_IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_CCast]:=fr_fpsd2;
-                       if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
+                       if(buff[ub_pain]<=0)then
+                         if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
 UID_UACDron       : ukfloater:=upgr[upgr_uac_soaring]>0;

@@ -506,14 +506,12 @@ begin
 
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
-   FillChar(teams_army,SizeOf(teams_army),0);
-
    wteam_last:=255;
    wteams_n  :=0;
 
    for p:=0 to MaxPlayers do
     with _players[p] do
-     teams_army[team]+=army;
+     teams_army[team]:=army;
 
    for p:=0 to MaxPlayers do
     if(teams_army[p]>0)then

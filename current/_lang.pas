@@ -1,14 +1,14 @@
 
-function l2s(limit:longint):shortstring; // limit 2 string
+function l2s(limit,base:longint):shortstring; // limit 2 string
 var fr:integer;
 begin
-   fr:=limit mod MinUnitLimit;
+   fr:=limit mod base;
    case fr of
-   0  : l2s:=i2s(limit div MinUnitLimit);
-   50 : l2s:=i2s(limit div MinUnitLimit)+'.5';
-   25 : l2s:=i2s(limit div MinUnitLimit)+'.25';
-   75 : l2s:=i2s(limit div MinUnitLimit)+'.75';
-   else l2s:=i2s(limit div MinUnitLimit)+'.'+i2s(fr);
+   0  : l2s:=i2s(limit div base);
+   50 : l2s:=i2s(limit div base)+'.5';
+   25 : l2s:=i2s(limit div base)+'.25';
+   75 : l2s:=i2s(limit div base)+'.75';
+   else l2s:=i2s(limit div base)+'.'+i2s(fr);
    end;
 end;
 
@@ -126,17 +126,12 @@ begin
    end;
 end;
 
-procedure _ADDSTRC(s:pshortstring;ad:shortstring);
+procedure _ADDSTR(s:pshortstring;ad,sep:shortstring);
 begin
-   if(length(s^)=0)
-   then s^:=ad
-   else s^:=s^+',' +ad;
-end;
-procedure _ADDSTRD(s:pshortstring;ad:shortstring);
-begin
-   if(length(s^)=0)
-   then s^:=ad
-   else s^:=s^+'. ' +ad;
+   if(length(ad)>0)then
+     if(length(s^)=0)
+     then s^:=ad
+     else s^:=s^+sep+ad;
 end;
 
 function findprd(uid:byte):shortstring;
@@ -149,13 +144,73 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _ADDSTRC(@up,_uids[i].un_txt_name);
-      if(uid in _uids[i].ups_builder)then _ADDSTRC(@bp,_uids[i].un_txt_name);
+      if(uid in _uids[i].ups_units  )then _ADDSTR(@up,_uids[i].un_txt_name,sep_comma);
+      if(uid in _uids[i].ups_builder)then _ADDSTR(@bp,_uids[i].un_txt_name,sep_comma);
    end;
 
-   if(length(up)>0)then _ADDSTRC(@findprd,up);
-   if(length(bp)>0)then _ADDSTRC(@findprd,bp);
+   if(length(up)>0)then _ADDSTR(@findprd,up,sep_comma);
+   if(length(bp)>0)then _ADDSTR(@findprd,bp,sep_comma);
 end;
+
+
+{function _AttackHint(uid:byte):shortstring;
+var mdtargets,
+    ldtargets:shortstring;
+begin
+   _AttackHint:='';
+   mdtargets  :='';
+   ldtargets  :='';
+   case uid of
+UID_Sergant,
+UID_SSergant,
+UID_Imp            : begin
+                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_bio     ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_heavy   ,sep_comma);
+                     end;
+UID_Demon          : _ADDSTR(@mdtargets,str_attr_heavy   ,sep_comma);
+UID_UCommandCenter,
+UID_FPlasmagunner,
+UID_UACDron,
+UID_Arachnotron,
+UID_Cacodemon      : begin
+                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_mech    ,sep_comma);
+                     end;
+UID_Commando,
+UID_ZCommando,
+UID_ZFormer,
+UID_Engineer,
+UID_Medic          : begin
+                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_bio     ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_light   ,sep_comma);
+                     end;
+
+UID_Mastermind,
+UID_Baron,
+UID_Knight         : begin
+                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
+                     _ADDSTR(@mdtargets,str_attr_light   ,sep_comma);
+                     end;
+
+UID_URMStation,
+UID_Cyberdemon,
+UID_Mancubus,
+UID_SiegeMarine,
+UID_Tank,
+UID_ZEngineer,
+UID_ZSiegeMarine   : _ADDSTR(@mdtargets,str_attr_building,sep_comma);
+   end;
+   case uid of
+UID_Phantom,
+UID_LostSoul       : _ADDSTR(@ldtargets,str_attr_mech    ,sep_comma);
+UID_URMStation,
+UID_ZEngineer,
+UID_Cyberdemon     : _ADDSTR(@ldtargets,str_attr_light   ,sep_comma);
+UID_SSergant       : _ADDSTR(@mdtargets,str_attr_mech    ,sep_comma);
+   end;
+end;    }
 
 function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
@@ -175,44 +230,83 @@ begin
    with uid^ do
    begin
       if(uidi in T2)
-      then _ADDSTRC(@_makeAttributeStr,'T2')
+      then _ADDSTR(@_makeAttributeStr,'T2',sep_comma)
       else
       if(uidi in T3)
-      then _ADDSTRC(@_makeAttributeStr,'T3')
-      else _ADDSTRC(@_makeAttributeStr,'T1');
+      then _ADDSTR(@_makeAttributeStr,'T3',sep_comma)
+      else _ADDSTR(@_makeAttributeStr,'T1',sep_comma);
 
       if(_ukbuilding)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_building)
-      else _ADDSTRC(@_makeAttributeStr,str_attr_unit    );
+      then _ADDSTR(@_makeAttributeStr,str_attr_building,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_unit    ,sep_comma);
       if(_ukmech)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_mech    )
-      else _ADDSTRC(@_makeAttributeStr,str_attr_bio     );
+      then _ADDSTR(@_makeAttributeStr,str_attr_mech    ,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_bio     ,sep_comma);
       if(_uklight)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_light   )
-      else _ADDSTRC(@_makeAttributeStr,str_attr_nlight  );
+      then _ADDSTR(@_makeAttributeStr,str_attr_light   ,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_heavy  ,sep_comma);
       if(ukfly)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_fly     )
+      then _ADDSTR(@_makeAttributeStr,str_attr_fly     ,sep_comma)
       else
         if(ukfloater)
-        then _ADDSTRC(@_makeAttributeStr,str_attr_floater)
-        else _ADDSTRC(@_makeAttributeStr,str_attr_ground );
+        then _ADDSTR(@_makeAttributeStr,str_attr_floater,sep_comma)
+        else _ADDSTR(@_makeAttributeStr,str_attr_ground ,sep_comma);
       if(apcm>0)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_transport);
+      then _ADDSTR(@_makeAttributeStr,str_attr_transport,sep_comma);
       if(level>0)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_level+b2s(level+1));
+      then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
       if(buff[ub_Detect]>0)or(_detector)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_detector);
+      then _ADDSTR(@_makeAttributeStr,str_attr_detector,sep_comma);
       if(buff[ub_Invuln]>0)
-      then _ADDSTRC(@_makeAttributeStr,str_attr_invuln)
+      then _ADDSTR(@_makeAttributeStr,str_attr_invuln,sep_comma)
       else
         if(buff[ub_Pain]>0)
-        then _ADDSTRC(@_makeAttributeStr,str_attr_stuned);
+        then _ADDSTR(@_makeAttributeStr,str_attr_stuned,sep_comma);
 
       _makeAttributeStr:='['+_makeAttributeStr+']';
    end;
 end;
 
-//function
+function BaseFlags2Str(flags:cardinal):shortstring;
+function CheckFlags(f1,f2:cardinal;s1,s2:pshortstring;addifboth:boolean):boolean;
+begin
+   CheckFlags:=((flags and f1)>0)and((flags and f2)>0);
+   if(addifboth)
+   or( ((flags and f1)>0)<>((flags and f2)>0) )then
+   begin
+      if((flags and f1)>0)then _ADDSTR(@BaseFlags2Str,s1^,sep_comma);
+      if((flags and f2)>0)then _ADDSTR(@BaseFlags2Str,s2^,sep_comma);
+   end;
+end;
+begin
+   BaseFlags2Str:='';
+
+   CheckFlags(wtr_unit  ,wtr_building,@str_attr_unit  ,@str_attr_building,false);
+   CheckFlags(wtr_bio   ,wtr_mech    ,@str_attr_bio   ,@str_attr_mech    ,false);
+   CheckFlags(wtr_light ,wtr_heavy   ,@str_attr_light ,@str_attr_heavy   ,false);
+   CheckFlags(wtr_ground,wtr_fly     ,@str_attr_ground,@str_attr_fly     ,false);
+
+   if(length(BaseFlags2Str)=0)then
+   CheckFlags(wtr_ground,wtr_fly     ,@str_attr_ground,@str_attr_fly     ,true );
+
+   if(length(BaseFlags2Str)>0)then BaseFlags2Str:='['+BaseFlags2Str+']';
+end;
+
+
+function DamageStr(dmods:TSoB):shortstring;
+var w,i:byte;
+begin
+   DamageStr:='';
+   for w:=1 to 255 do
+    if(w in dmods)then
+     for i:=0 to MaxDamageModFactors do
+      with _dmods[w][i] do
+       if(dm_factor<>100)and(dm_flags>0)then
+       begin
+          _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
+       end;
+   if(length(DamageStr)>0)then DamageStr:=str_damage+DamageStr;
+end;
 
 function _req2s(basename:shortstring;reqn:byte):shortstring;
 begin
@@ -221,12 +315,24 @@ begin
 end;
 
 function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
+{type
+TW = record
+   atflags:cardinal;
+   dmods  :byte;
+end;}
 var w:byte;
+atflags : cardinal;
+dmods   : TSoB;
+{   TW:array[0..MaxUnitWeapons] of TW;
+procedure AddWeapon();
+begin
+
+end;}
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then _ADDSTRC(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' );
-  if(rupid>0)then _ADDSTRC(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' );
+  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 function RebuildStr(uid,uidl:byte):shortstring;
@@ -239,31 +345,46 @@ begin
    _MakeDefaultDescription:=basedesc;
     with _uids[uid] do
     begin
-       if(_isbuilder    )then _ADDSTRD(@_MakeDefaultDescription,str_builder);
-       if(_isbarrack    )then _ADDSTRD(@_MakeDefaultDescription,str_barrack);
-       if(_issmith      )then _ADDSTRD(@_MakeDefaultDescription,str_smith  );
-       if(_genergy    >0)then _ADDSTRD(@_MakeDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')');
+       if(_isbuilder    )then _ADDSTR(@_MakeDefaultDescription,str_builder,sep_sdot);
+       if(_isbarrack    )then _ADDSTR(@_MakeDefaultDescription,str_barrack,sep_sdot);
+       if(_issmith      )then _ADDSTR(@_MakeDefaultDescription,str_smith  ,sep_sdot);
+       if(_genergy    >0)then _ADDSTR(@_MakeDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
        if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
        begin
-          _ADDSTRD(@_MakeDefaultDescription,
+          _ADDSTR(@_MakeDefaultDescription,
           str_CanRebuildTo+
           RebuildStr(_rebuild_uid,_rebuild_level)+
-          AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl) );
+          AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot );
        end;
        if(_ability>0)then
         if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-        then _ADDSTRD(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl))
+        then _ADDSTR(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
         else
           if(length(str_ability_name[_ability])>0)
-          then _ADDSTRD(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl));
+          then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
 
        if(_attack=atm_always)then
        begin
+          atflags:=0;
+          dmods  :=[];
           for w:=0 to MaxUnitWeapons do
            with _a_weap[w] do
             case aw_type of
-            wpt_missle:;
+            wpt_missle,
+            wpt_directdmg,
+            wpt_directdmgz : //AddWeapon(aw_tarf,aw_dmod,);
+                             begin
+                                atflags:=atflags or aw_tarf;
+                                if(aw_dmod>0)then dmods+=[aw_dmod];
+                             end;
             end;
+          if(atflags>0)then
+           if((atflags and wtr_fly   )>0)
+           or((atflags and wtr_ground)>0)then
+           begin
+              _ADDSTR(@_MakeDefaultDescription,str_canattack+BaseFlags2Str(atflags),sep_sdot);
+              _ADDSTR(@_MakeDefaultDescription,DamageStr(dmods),sep_sdot);
+           end;
        end;
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
@@ -295,11 +416,11 @@ begin
        then TIME:=tc_white+i2s(_upid_time(upid,curlvl) div fr_fps1)+tc_default
        else TIME:=tc_white+i2s(_upid_time(upid,1     ) div fr_fps1)+tc_default;
 
-     if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
-     if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
-     if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
-     _ADDSTRC(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default);
-     if(_up_max>1)and(_up_mfrg)then _ADDSTRC(@INFO,tc_red+'*'+tc_default);
+     if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
+     if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
+     if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
+     _ADDSTR(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
+     if(_up_max>1)and(_up_mfrg)then _ADDSTR(@INFO,tc_red+'*'+tc_default,sep_comma);
 
      _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr;
   end;
@@ -333,23 +454,23 @@ begin
          HK:=_gHK(_ucl);
          if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
          if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
-         LMT:=tc_orange+l2s(_limituse)+tc_default;
+         LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n));
-         if(_ruid2>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n));
-         if(_ruid3>0)then _ADDSTRC(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n));
-         if(_rupgr>0)then _ADDSTRC(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl));
+         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
+         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
+         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
+         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
 
-         if(length(HK  )>0)then _ADDSTRC(@INFO,HK  );
-         if(length(ENRG)>0)then _ADDSTRC(@INFO,ENRG);
-         if(length(LMT )>0)then _ADDSTRC(@INFO,LMT );
-         if(length(TIME)>0)then _ADDSTRC(@INFO,TIME);
+         if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
+         if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
+         if(length(LMT )>0)then _ADDSTR(@INFO,LMT ,sep_comma);
+         if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
 
          un_txt_fdescr:=_MakeDefaultDescription(uid,un_txt_udescr);
 
          un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
-         un_txt_uihintS:=un_txt_name+tc_nl1+_makeAttributeStr(nil,uid);
+         un_txt_uihintS:=un_txt_name+tc_nl1;
          un_txt_uihint2:=un_txt_fdescr;
          un_txt_uihint3:='';
 
@@ -368,8 +489,8 @@ begin
    begin
       REQ  :='';
 
-      if(_up_ruid  >0)then _ADDSTRC(@REQ,_uids [_up_ruid ].un_txt_name);
-      if(_up_rupgr >0)then _ADDSTRC(@REQ,_upids[_up_rupgr]._up_name   );
+      if(_up_ruid  >0)then _ADDSTR(@REQ,_uids [_up_ruid ].un_txt_name,sep_comma);
+      if(_up_rupgr >0)then _ADDSTR(@REQ,_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_req+tc_default+REQ;
@@ -465,12 +586,15 @@ begin
    str_APM               := 'Show APM';
    str_ability           := 'Ability: ';
    str_transformation    := 'transformation to ';
+   str_upgradeslvl       := 'Upgrades: ';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
    str_smith             := 'Researches and upgrades facility';
    str_IncEnergyLevel    := 'Increase energy level';
    str_CanRebuildTo      := 'Can be rebuilded to ';
+   str_canattack         := 'Can attack ';
+   str_damage            := 'Damage: ';
 
    str_cant_build        := 'Can`t build here';
    str_need_energy       := 'Need more energy';
@@ -498,7 +622,7 @@ begin
    str_attr_mech         := tc_blue  +'mechanical'  +tc_default;
    str_attr_bio          := tc_orange+'biological'  +tc_default;
    str_attr_light        := tc_yellow+'light'       +tc_default;
-   str_attr_nlight       := tc_green +'heavy'       +tc_default;
+   str_attr_heavy        := tc_green +'heavy'       +tc_default;
    str_attr_fly          := tc_white +'flying'      +tc_default;
    str_attr_ground       := tc_lime  +'ground'      +tc_default;
    str_attr_floater      := tc_aqua  +'floater'     +tc_default;
@@ -507,7 +631,6 @@ begin
    str_attr_stuned       := tc_yellow+'stuned'      +tc_default;
    str_attr_detector     := tc_purple+'detector'    +tc_default;
    str_attr_transport    := tc_gray  +'transport'   +tc_default;
-
 
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := tc_lime  +'left' +tc_default;
@@ -725,7 +848,7 @@ begin
    _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings.'                       );
    _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase the efficiency of repair/healing of Engineers/Medics.' );
    _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units.'            );
-   _mkHStrUpid(upgr_uac_painn      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ?????????.' );
+   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ['+str_attr_bio+'].' );
    _mkHStrUpid(upgr_uac_towers     ,'Tower Range Upgrade'              ,'Increase defensive structures range.'                           );
    _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly.'                           );
    _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center.'                              );
@@ -990,12 +1113,15 @@ begin
   str_APM               := 'Показать APM';
   str_ability           := 'Способность: ';
   str_transformation    := 'превращение в ';
+  str_upgradeslvl       := 'Улучшения: ';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
   str_smith             := 'Исследует улучшения и апгрейды';
   str_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_CanRebuildTo      := 'Можно перестроить в ';
+  str_canattack         := 'Может атаковать ';
+  str_damage            := 'Урон: ';
 
   str_cant_build        := 'Нельзя строить здесь';
   str_need_energy       := 'Необходимо больше энергии';
@@ -1023,7 +1149,7 @@ begin
   str_attr_mech         := tc_blue  +'механический'  +tc_default;
   str_attr_bio          := tc_orange+'биологический' +tc_default;
   str_attr_light        := tc_yellow+'легкий'        +tc_default;
-  str_attr_nlight       := tc_green +'тяжелый'       +tc_default;
+  str_attr_heavy        := tc_green +'тяжелый'       +tc_default;
   str_attr_fly          := tc_white +'летающий'      +tc_default;
   str_attr_ground       := tc_lime  +'наземный'      +tc_default;
   str_attr_floater      := tc_aqua  +'парящий'       +tc_default;

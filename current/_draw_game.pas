@@ -298,11 +298,14 @@ begin
    UnitsInfoAddSprite(ax,ay,pspr);
 end;
 
-function i2s6(i:integer):string6;
+function i2s6(i:integer;null:boolean):string6;
 begin
    if(i>0)
    then i2s6:=i2s(i)
-   else i2s6:='';
+   else
+     if(null)
+     then i2s6:='0'
+     else i2s6:='';
 end;
 
 procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
@@ -323,7 +326,7 @@ begin
 
       choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
 
-      srect :=((sel)and(playeri=HPlayer))
+      srect :=((sel)and(playeri=UIPlayer))
             or(ks_alt>0)
             or(choosen);
 
@@ -338,14 +341,14 @@ begin
 
       if(srect)then
       begin
-         if(playeri=HPlayer)
-         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group),'',lvlstr_b,i2s6(apcm),i2s6(apcc))
-         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w   ,'',lvlstr_b,lvlstr_a  ,lvlstr_s  );
+         if(playeri=UIPlayer)
+         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(apcm,false),i2s6(apcc,false))
+         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
          UnitsInfoAddText(vx,vy-sel_hh-font_w,lvlstr_l,c_white);
       end;
       if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
 
-      if(rld>0)and(playeri=HPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
+      if(rld>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
        if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);

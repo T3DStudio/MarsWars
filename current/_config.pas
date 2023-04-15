@@ -111,7 +111,6 @@ begin
       if(vid_uhbars  >2       )then vid_uhbars  :=0;
       if(vid_plcolors>vid_maxplcolors)then vid_plcolors:=0;
    end;
-   SwitchLanguage;
    m_vrx:=vid_vw;
    m_vry:=vid_vh;
    net_cl_saddr;

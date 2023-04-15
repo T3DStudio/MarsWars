@@ -677,7 +677,7 @@ begin
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
-   setWeaponESND(1  ,nil,snd_flyer_s,0,0);
+   setWeaponESND(2  ,nil,snd_flyer_s,0,0);
 end;
 
 
@@ -889,7 +889,7 @@ upgr_uac_extbuild   : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
-upgr_uac_painn      : begin _up_btn:=spr_b_up[r_uac ,15]; end;
+upgr_uac_ssgup      : begin _up_btn:=spr_b_up[r_uac ,15]; end;
 upgr_uac_transport  : begin _up_btn:=spr_b_up[r_uac ,24]; end;
 upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;

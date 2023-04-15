@@ -631,7 +631,7 @@ begin
            if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
            if(buff[ub_HVision ]>0)then _LevelUpEffect (uu,EID_HVision,@vis);
 
-           if(playeri=HPlayer)then
+           if(playeri=UIPlayer)then
            begin
               if(iscomplete=false)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
@@ -660,7 +660,7 @@ begin
              end;
           end;
 
-          if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+          if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           _ucDec(pu);
        end
@@ -690,10 +690,10 @@ begin
                if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,            @vis);
 
                if(pu^.iscomplete)and(iscomplete=false)then
-                if(playeri=HPlayer)then
+                if(playeri=UIPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
 
-               if(pu^.sel=false)and(sel)and(playeri=HPlayer)then UpdateLastSelectedUnit(unum);
+               if(pu^.sel=false)and(sel)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -702,7 +702,7 @@ begin
                    case uid^._ability of
                0:;
                uab_UACStrike   : _unit_umstrike_missile(uu);
-               uab_UACScan     : if(team=_players[HPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+               uab_UACScan     : if(team=_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_SpawnLost   : _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
@@ -730,9 +730,9 @@ begin
 
                  with uid^ do
                   if(_death_missile>0)
-                  then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0);
+                  then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
 
-                 if(playeri=HPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+                 if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 

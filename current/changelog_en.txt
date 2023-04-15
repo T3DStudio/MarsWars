@@ -40,6 +40,8 @@ Interface:
 - hint about unit under cursor;
 - upgrades info in selection rect ?????
 
+
+
 49.1:
 - Fixed bugs: 
 -- Hell Gate teleportation;

@@ -110,14 +110,6 @@ begin
           tc_nl2 : y+=txt_line_h2;
           else     y+=txt_line_h3;
           end;
-
-          {y +=font_w;
-          case charc of
-          tc_nl1 : y+=2;
-          tc_nl2 : y+=txt_line_h2;
-          tc_nl3 : y+=txt_line_h3;
-          else     y+=txt_line_h3;
-          end; }
        end;
    end;
 end;

@@ -386,8 +386,8 @@ begin
     with uid^ do
      with player^ do
      begin
-        ai_advanced_bld   :=cf(@ai_flags,@aif_base_advance );
-        ai_teleport_use   :=cf(@ai_flags,@aif_army_teleport);
+        ai_advanced_bld   :=(ai_flags and aif_base_advance )>0;
+        ai_teleport_use   :=(ai_flags and aif_army_teleport)>0;
         ai_choosen        :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
      end;
 
@@ -1201,13 +1201,9 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      {case race of
-      r_hell: ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*500+(ai_builders_count*600) ,ai_GeneratorsEnergy);
-      r_uac : ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*450+(ai_builders_count*600) ,ai_GeneratorsEnergy);
-      end;}
       ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*500+(ai_builders_count*600) ,ai_GeneratorsEnergy);
 
-      if(cf(@ai_flags,@aif_base_smart_order))then
+      if((ai_flags and aif_base_smart_order)>0)then
       begin
          skip_energy_check:=false;
          BuildTower (ai_towers_need,ai_towers_need_type);
@@ -1318,7 +1314,7 @@ begin
    with player^ do
    if((ai_armylimit_alive_u+uprodl)<ai_maxlimit_blimit)then
    begin
-      smart:=cf(@ai_flags,@aif_army_smart_order);
+      smart:=(ai_flags and aif_army_smart_order)>0;
       if(not smart)and(uclass<0)then uclass:=uprod_any;
 
       case uclass of
@@ -1494,7 +1490,7 @@ begin
      if(ai_maxcount_upgrlvl>0)then
       case race of
 r_hell: begin
-        if(cf(@ai_flags,@aif_upgr_smart_opening))then
+        if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
         MakeUpgr(upgr_hell_buildr    ,2);
         MakeUpgr(upgr_hell_HKTeleport,1);
@@ -1509,7 +1505,7 @@ r_hell: begin
         MakeUpgr(random(30)   ,ai_maxcount_upgrlvl);
         end;
 r_uac : begin
-        if(cf(@ai_flags,@aif_upgr_smart_opening))then
+        if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
         MakeUpgr(upgr_uac_buildr     ,2);
         MakeUpgr(upgr_uac_CCFly      ,1);
@@ -1690,7 +1686,7 @@ begin
          end;
       end;
 
-      if(cf(@ai_flags,@aif_base_suicide))then
+      if((ai_flags and aif_base_suicide)>0)then
        if(ai_buildings_need_suicide(pu))then
        begin
           _unit_kill(pu,false,true,true,false);
@@ -2483,7 +2479,7 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
                        then uo_tar:=ai_teleporter_beacon_u^.unum
                        else uo_tar:=0;
       end;
-      if(cf(@player^.ai_flags,@aif_ability_other))then
+      if((player^.ai_flags and aif_ability_other)>0)then
       begin
          case _ability of
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
@@ -2499,7 +2495,7 @@ UID_UACDron           : if(ai_uab_buildturret(pu))then
       end;
 
       // MAIN move
-      if(cf(@player^.ai_flags,@aif_ability_mainsave))then
+      if((player^.ai_flags and aif_ability_mainsave)>0)then
        case _ability of
 uab_CCFly       : ai_SaveMain_CC(pu);
 uab_HKeepBlink  : ai_SaveMain_HK(pu);
@@ -2508,7 +2504,7 @@ uab_HKeepBlink  : ai_SaveMain_HK(pu);
       // active detection
       with player^ do
        if(ai_detection_pause=0)then
-        if(cf(@ai_flags,@aif_ability_detection))then
+        if((ai_flags and aif_ability_detection)>0)then
          case _ability of
 uab_UACScan          : begin
                           if(ai_enemy_inv_u<>nil)then
@@ -2527,7 +2523,7 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
 
       if(speed<=0)or(_ukbuilding)then exit;
 
-      ai_THINK(pu,cf(@player^.ai_flags,@aif_army_smart_micro));
+      ai_THINK(pu,(player^.ai_flags and aif_army_smart_micro)>0);
    end;
 end;
 

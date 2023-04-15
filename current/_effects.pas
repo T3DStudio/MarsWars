@@ -248,7 +248,7 @@ procedure _missile_explode_effect(m:integer);
 var i,o,r:byte;
 begin
    with _missiles[m] do
-   with _mid_effs[mid] do
+   with _mids[mid] do
    if(PointInScreenP(vx,vy))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
@@ -275,7 +275,7 @@ var  m:integer;
 begin
    for m:=1 to MaxMissiles do
    with _missiles[m] do
-   with _mid_effs[mid] do
+   with _mids[mid] do
    if(vstep>0)then
    begin
       spr:=@spr_dummy;

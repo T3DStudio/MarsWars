@@ -89,7 +89,7 @@ pdunit:PTUnit;
 begin
    with _players[HPlayer]do
    case m_brush of
-   1..255:
+1..255:
    begin
       m_brushx-=vid_cam_x-lx;
       m_brushy-=vid_cam_y-ly;
@@ -138,6 +138,14 @@ begin
       lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
       c_white);
    end;
+co_paction:
+   for i:=0 to 255 do
+    if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],nil))then
+     with _uids[i] do
+      case _ability of
+uab_UACStrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
+uab_UACScan  : circleColor(tar,mouse_x,mouse_y,_units[uid_x[i]].srange,c_gray);
+      end;
    end;
 end;
 
@@ -280,12 +288,8 @@ begin
    for p:=0 to MaxPlayers do
    begin
       if(p=0)
-      then _drawBtnt(tar,ux,uy,str_all         ,'','','','',c_white          ,0,0,0,0,'')
-      else
-        if(p=HPlayer)
-        then _drawBtnt(tar,ux,uy,'*'+_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'')
-        else _drawBtnt(tar,ux,uy,    _players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
-      _drawBtn(tar,ux,uy,r_empty,p=VisPlayer,   GetBBit(@g_player_status,p));
+      then _drawBtnt(tar,ux,uy,str_all                            ,'','','','',c_white          ,0,0,0,0,'')
+      else _drawBtnt(tar,ux,uy,PlayerGetStatus(p)+_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
 
       ux+=1;
       if(ux>2)then
@@ -456,16 +460,6 @@ begin
    begin
       D_BuildUI(tar,lx,ly);
 
-      if(m_brush=co_paction)then
-       with _players[HPlayer] do
-        for sx:=0 to 255 do
-         if(uid_s[sx]>0)and(uid_x[sx]>0)then
-          with _uids[sx] do
-           case _ability of
-uab_UACStrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_UACScan  : circleColor(tar,mouse_x,mouse_y,_units[uid_x[sx]].srange,c_gray);
-           end;
-
       if(ui_mc_a>0)then //click effect
       begin
          sx:=ui_mc_a;
@@ -578,9 +572,20 @@ begin
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
-     begin
-        _draw_text(tar,ui_textx,ui_hinty1,tu^.uid^.un_txt_uihintS ,ta_left,ui_ingamecl,c_white);
-        _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+tu^.player^.name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(tu^.player^.pnum));
+       with tu^ do
+       with uid^ do
+       with player^ do
+       begin
+          _draw_text(tar,ui_textx,ui_hinty1,un_txt_uihintS+_makeAttributeStr(tu,0),ta_left,ui_ingamecl,c_white);
+
+          s1:='';
+          _ADDSTR(@s1,lvlstr_w,sep_wdash);
+          _ADDSTR(@s1,lvlstr_a,sep_wdash);
+          _ADDSTR(@s1,lvlstr_s,sep_wdash);
+          if(length(s1)>0)then
+          _draw_text(tar,ui_textx,ui_hinty2,str_upgradeslvl+s1,ta_left,ui_ingamecl,c_white);
+
+          _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(pnum));
      end;
 end;
 
@@ -602,7 +607,7 @@ begin
 
    if(ingame_chat>0)or(rpls_showlog)then
    begin
-      MakeLogListForDraw(HPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
+      MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -611,7 +616,7 @@ begin
    else
      if(net_chat_shlm>0)then // last messages
      begin
-        MakeLogListForDraw(HPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
+        MakeLogListForDraw(UIPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
          for i:=0 to ui_log_n-1 do
           if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -622,8 +627,8 @@ begin
    with _players[VisPlayer] do
    begin
       limit:=armylimit+uprodl;
-      _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy)+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
-      _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(limit  )+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[limit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy           )+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
+      _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[limit>=MaxPlayerLimit]);
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END
@@ -631,8 +636,8 @@ begin
 
    if(VisPlayer<>HPlayer)or(rpls_state>=rpl_rhead)then
      if(VisPlayer>0)
-     then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,c_white)
-     else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white);
+     then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,PlayerGetColor(VisPlayer))
+     else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white                  );
 
    // TIMER
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_left,str_time,c_white);
@@ -641,7 +646,7 @@ begin
    case g_mode of
 gm_invasion: begin
                 D_Timer(tar,ui_textx,ui_texty+font_3hw,g_inv_wave_t_next,ta_left,str_inv_time+b2s(g_inv_wave_n)+', '+str_time,c_white);
-                if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+l2s(_players[0].armylimit),ta_left,255,c_white);
+                if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+l2s(_players[0].armylimit,MinUnitLimit),ta_left,255,c_white);
              end;
 gm_koth    : with g_cpoints[1] do
               if(cpOwnerPlayer>0)

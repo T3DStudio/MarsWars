@@ -78,9 +78,9 @@ begin
    if not(InitSound)then exit;
 
    InitRX2Y;
-   InitMissiles;
    SwitchLanguage;
    InitUIDDataCL;
+   InitMIDDataCL;
    MakeUnitIcons;
 
    {$ENDIF}

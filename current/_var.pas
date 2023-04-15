@@ -48,13 +48,15 @@ _cycle_regen      : integer = 0;
 
 _uids             : array[byte] of TUID;
 _upids            : array[byte] of TUPID;
+_mids             : array[byte] of TMID;
+_dmods            : array[byte] of TDamageMod;
 
 _LastCreatedUnit  : integer = 0;
 _LastCreatedUnitP : PTUnit;
 
 HPlayer           : byte = 1; // 'this' player
 
-_playerAPM        : array[00..MaxPlayers] of TAPMCounter;
+_playerAPM        : array[0..MaxPlayers] of TAPMCounter;
 
 
 map_seed          : cardinal = 1;
@@ -249,7 +251,9 @@ font_ca           : array[char] of TMWTexture;
 
 _eids             : array[byte] of TEID;
 _effects          : array[1..vid_mvs] of TEffect;
-_mid_effs         : array[byte] of TMIDEffects;
+
+ms_eid_bio_death_uids
+                  : TSoB;
 
 _tdecaln          : integer = 0;
 _tdecals          : array of TDecal;
@@ -691,14 +695,17 @@ spr_cp_gen        : TMWTexture;
 //  TEST
 //
 
-str_ability_name  : array[byte]  of shortstring;
-str_race          : array[0..r_cnt       ] of shortstring;
-str_gmode         : array[0..gm_cnt      ] of shortstring;
+str_ability_name  : array[byte     ] of shortstring;
+str_race          : array[0..r_cnt ] of shortstring;
+str_gmode         : array[0..gm_cnt] of shortstring;
 str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
 str_transformation,
+str_upgradeslvl,
+str_canattack,
+str_damage,
 str_ability,
 str_builder,
 str_barrack,
@@ -714,7 +721,7 @@ str_attr_unit,
 str_attr_mech,
 str_attr_bio,
 str_attr_light,
-str_attr_nlight,
+str_attr_heavy,
 str_attr_fly,
 str_attr_ground,
 str_attr_floater,

@@ -10,7 +10,7 @@ begin
        else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 
        with player^ do
-        if(team=_players[HPlayer].team)then
+        if(team=_players[UIPlayer].team)then
          if(_ability=uab_UACScan)and(rld>radar_vision_time)and(r_minimap_scan_blink)then
           filledCircleColor(r_minimap,trunc(uo_x*map_mmcx),
                                       trunc(uo_y*map_mmcx),
@@ -308,7 +308,8 @@ begin
            wl+=upgr[aw_dupgr];
            atset+=[aw_dupgr];
         end;
-      lvlstr_w:=tc_red+i2s6(wl);
+      lvlstr_w:=i2s6(wl,(_attack>atm_none)and(_attack<>atm_bunker));
+      if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w;
 
       // armor
       al:=upgr[_upgr_armor];
@@ -318,7 +319,7 @@ begin
         if(_ukmech)
         then al+=upgr[upgr_race_armor_mech[_urace]]
         else al+=upgr[upgr_race_armor_bio [_urace]];
-      lvlstr_a:=tc_lime+i2s6(al);
+      lvlstr_a:=tc_lime+i2s6(al,true);
 
       // other
       sl:=upgr[_upgr_regen]+upgr[_upgr_srange];
@@ -335,7 +336,7 @@ begin
             if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
          end;
       end;
-      lvlstr_s:=tc_yellow+i2s6(sl);
+      lvlstr_s:=tc_yellow+i2s6(sl,true);
    end;
 end;
 
@@ -426,7 +427,7 @@ begin
                     dir:=dir mod 360;
                  end;
 
-                if(playeri=HPlayer)or(_players[HPlayer].observer)then
+                if(playeri=UIPlayer)then //or(_players[HPlayer].observer)or(rpls and uiplayer=0)
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
@@ -531,7 +532,7 @@ begin
       with pu^ do
        if(_IsUnitRange(transport,@tu))then
        begin
-          if(tu^.sel)and(G_Status=gs_running)and(playeri=HPlayer)then ui_units_inapc[uidi]+=1;
+          if(tu^.sel)and(G_Status=gs_running)and(playeri=UIPlayer)then ui_units_inapc[uidi]+=1;
        end
        else
          if(hits<=0)

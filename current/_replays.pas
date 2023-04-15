@@ -332,7 +332,7 @@ begin
                             rpls_pnu    :=0;
                             rpls_ticks  :=0;
                             HPlayer     :=rpls_player;
-                            _players[0].observer:=true;
+                            //_players[0].observer:=true;
 
                             rpls_plcam  :=false;
 
