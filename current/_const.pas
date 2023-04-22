@@ -769,7 +769,7 @@ UID_URMStation         = 58;
 UID_UTechCenter        = 59;
 UID_UGTurret           = 60;
 UID_UATurret           = 61;
-UID_UNuclearPlant      = 62;
+UID_UComputerStation   = 62;
 UID_UMine              = 63;
 
 UID_UBaseMil           = 65;
@@ -1406,7 +1406,9 @@ tc_default             = #25;
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 
 sep_comma              = ',';
+sep_scomma             = ', ';
 sep_sdot               = '. ';
+sep_sdots              = '; ';
 sep_wdash              = tc_white+'-';
 
 ////////////////////////////////////////////////////////////////////////////////

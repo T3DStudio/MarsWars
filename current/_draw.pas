@@ -71,7 +71,7 @@ begin
    ' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
-   ' '+i2s(n),
+   ' '+i2s(_players[UIPlayer].a_units[UID_LostSoul]),
    ta_right,255, c_white);
 
    _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-20,

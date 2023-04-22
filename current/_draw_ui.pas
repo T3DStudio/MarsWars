@@ -288,8 +288,8 @@ begin
    for p:=0 to MaxPlayers do
    begin
       if(p=0)
-      then _drawBtnt(tar,ux,uy,str_all                            ,'','','','',c_white          ,0,0,0,0,'')
-      else _drawBtnt(tar,ux,uy,PlayerGetStatus(p)+_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
+      then _drawBtnt(tar,ux,uy,str_all         ,'','','','',c_white          ,0,0,0,0,'')
+      else _drawBtnt(tar,ux,uy,_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
 
       ux+=1;
       if(ux>2)then

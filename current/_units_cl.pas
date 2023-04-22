@@ -733,9 +733,8 @@ begin
    setMWSModel(1,@spr_UPTurret);
    setBuildingSND(snd_uac_ctower);
    un_eid_bcrater_y:=1;
-   setWeaponESND(0,nil,snd_shotgun,0,0);
-   setWeaponESND(1,nil,snd_plasma ,0,0);
-   setWeaponESND(2,nil,snd_shotgun,0,0);
+   setWeaponESND(0,nil,snd_plasma ,0,0);
+   setWeaponESND(1,nil,snd_shotgun,0,0);
 end;
 UID_UATurret:
 begin
@@ -757,7 +756,7 @@ begin
    setBuildingSND(snd_uac_rls);
 end;
 
-UID_UNuclearPlant:
+UID_UComputerStation:
 begin
    setMWSModel(0,@spr_UNuclearPlant);
    setBuildingSND(snd_uac_nucl);

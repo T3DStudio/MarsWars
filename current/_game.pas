@@ -5,12 +5,14 @@ begin
    begin
       PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HBarracks,
                                 UID_LostSoul      ..UID_ZBFGMarine,
-                                UID_UCommandCenter..UID_UNuclearPlant,
+                                UID_UCommandCenter..UID_UComputerStation,
                                 UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_HMonastery ,UID_HFortress    ,UID_HAltar, UID_HPentagram,
-                                UID_UTechCenter,UID_UNuclearPlant,UID_URMStation ],1,false);
+      PlayerSetAllowedUnits(p,[ UID_HPentagram, UID_HMonastery ,UID_HFortress       ,UID_HAltar,
+                                                UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
+
+      PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
 
       if(g_cgenerators>0)then
       PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HCommandCenter,

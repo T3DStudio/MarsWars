@@ -726,7 +726,7 @@ begin
     with _uids[uid] do
      if(_ukbuilding)and(menergy<=0)
      then _uid_player_limit:=false
-     else _uid_player_limit:=((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+_limituse)<=MaxPlayerLimit);
+     else _uid_player_limit:=((uid_e[uid]+uprodu[uid])<a_units[uid])and((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+_limituse)<=MaxPlayerLimit);
 end;
 
 function _uid_conditionals(pl:PTPlayer;uid:byte):cardinal;
