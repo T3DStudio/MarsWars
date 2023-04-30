@@ -121,14 +121,14 @@ wtrset_enemy_alive_fly_buildings,
 wtrset_enemy_alive_mech,
 wtrset_enemy_alive_mech_nstun,
 wtrset_enemy_alive_buildings,
-wtrset_enemy_alive_nbuildings,
+wtrset_enemy_alive_units,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
 wtrset_enemy_alive_bio_light,
 wtrset_enemy_alive_bio_nstun,
-wtrset_enemy_alive_nlight_bio,
-wtrset_enemy_alive_ground_nlight,
-wtrset_enemy_alive_ground_nlight_bio,
+wtrset_enemy_alive_heavy_bio,
+wtrset_enemy_alive_ground_heavy,
+wtrset_enemy_alive_ground_heavy_bio,
 wtrset_enemy_alive_ground_bio,
 wtrset_enemy_alive_ground_light_bio,
 wtrset_heal,
@@ -146,7 +146,7 @@ tmpmid            : byte = MID_Imp;
 
 _warpten          : boolean = false;
 _testmode         : byte = 0;
-_fsttime          : boolean = false;
+uncappedFPS          : boolean = false;
 
 r_panel,
 r_uipanel,
@@ -303,7 +303,9 @@ rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_fog          : boolean = false;
 rpls_ticks        : byte = 0;
+rpls_file_head_size: cardinal = 0;
 rpls_file_size    : cardinal = 0;
+rpls_rbytes        : cardinal = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
@@ -380,9 +382,10 @@ ui_uiplayery      : integer = 0;
 ui_ingamecl       : byte = 0;
 ui_textx          : integer = 0;  // timer/chat screen X
 ui_texty          : integer = 0;  // timer/chat screen Y
-ui_hinty1         : integer = 0;  // hints screen Y
-ui_hinty2         : integer = 0;  // hints screen Y
-ui_hinty3         : integer = 0;  // hints screen Y
+ui_hinty1         : integer = 0;  // hints screen Y 1
+ui_hinty2         : integer = 0;  // hints screen Y 2
+ui_hinty3         : integer = 0;  // hints screen Y 3
+ui_hinty4         : integer = 0;  // hints screen Y 4
 ui_logy           : integer = 0;  // LOG screen Y
 ui_chaty          : integer = 0;  // chat screen Y
 ui_oicox          : integer = 0;  // order icons screen X
@@ -698,6 +701,7 @@ spr_cp_gen        : TMWTexture;
 str_ability_name  : array[byte     ] of shortstring;
 str_race          : array[0..r_cnt ] of shortstring;
 str_gmode         : array[0..gm_cnt] of shortstring;
+str_ability_unload,
 str_need_energy,
 str_cant_build,
 str_cant_prod,
@@ -705,13 +709,23 @@ str_check_reqs,
 str_transformation,
 str_upgradeslvl,
 str_UnitArming,
-str_damage,
+str_weapon_melee,
+str_weapon_ranged,
+str_weapon_zombie,
+str_weapon_ressurect,
+str_weapon_heal,
+str_weapon_spawn,
+str_weapon_suicide,
+str_weapon_targets,
+str_weapon_damage,
 str_ability,
 str_builder,
 str_barrack,
 str_smith,
 str_IncEnergyLevel,
 str_CanRebuildTo,
+str_attr_alive,
+str_attr_dead,
 str_attr_detector,
 str_attr_invuln,
 str_attr_stuned,

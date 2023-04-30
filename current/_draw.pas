@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not _players[HPlayer].observer)or(rpls_state<rpl_rhead)
+   if(not _players[HPlayer].observer)and(rpls_state<rpl_rhead)
    then UIPlayer:=HPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;

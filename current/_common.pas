@@ -54,7 +54,7 @@ begin
    fr_LastTicks   :=fr_CurrentTicks;
 
    {$IFDEF _FULLGAME}
-   if(_fsttime)
+   if(uncappedFPS)
    then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
    else
    {$ENDIF}
@@ -879,7 +879,7 @@ begin
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
       if(_attack  =atm_none)then exit;
-      if(uo_id=ua_paction  )
+      if(uo_id=ua_psability)
       or(uo_id=ua_hold     )
       or(uo_bx>0           )then exit;
 

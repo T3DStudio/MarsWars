@@ -138,7 +138,7 @@ begin
       lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
       c_white);
    end;
-co_paction:
+co_psability:
    for i:=0 to 255 do
     if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],nil))then
      with _uids[i] do
@@ -407,7 +407,7 @@ begin
       3: // actions
       if(rpls_state>=rpl_rhead)then
       begin
-         _drawBtn(tar,0,0,spr_b_rfast,_fsttime    ,false);
+         _drawBtn(tar,0,0,spr_b_rfast,uncappedFPS ,false);
          _drawBtn(tar,1,0,spr_b_rskip,false       ,false);
          _drawBtn(tar,2,0,spr_b_rstop,g_status>0  ,false);
          _drawBtn(tar,0,1,spr_b_rvis ,rpls_plcam  ,false);
@@ -507,7 +507,8 @@ var i,
      s1:shortstring;
     hs1,
     hs2,
-    hs3:pshortstring;
+    hs3,
+    hs4:pshortstring;
     tu :PTUnit;
 begin
    //str_hint_a
@@ -516,6 +517,7 @@ begin
       hs1:=nil;
       hs2:=nil;
       hs3:=nil;
+      hs4:=nil;
       if(m_by=ui_menu_btnsy)then
       begin
          if(m_bx=2)then
@@ -555,12 +557,13 @@ begin
                       hs1:=@_uids[uid].un_txt_uihint1;
                       hs2:=@_uids[uid].un_txt_uihint2;
                       hs3:=@_uids[uid].un_txt_uihint3;
+                      hs4:=@_uids[uid].un_txt_uihint4;
                    end;
               2  : begin
                       if(a_upgrs[uid]<=0)then exit;
                       s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
                       hs1:=@s1;
-                      hs3:=@_upids[uid]._up_hint;
+                      hs4:=@_upids[uid]._up_hint;
                    end;
               end;
            end;
@@ -569,6 +572,7 @@ begin
       if(hs1<>nil)then _draw_text(tar,ui_textx,ui_hinty1,hs1^,ta_left,ui_ingamecl,c_white);
       if(hs2<>nil)then _draw_text(tar,ui_textx,ui_hinty2,hs2^,ta_left,ui_ingamecl,c_white);
       if(hs3<>nil)then _draw_text(tar,ui_textx,ui_hinty3,hs3^,ta_left,ui_ingamecl,c_white);
+      if(hs4<>nil)then _draw_text(tar,ui_textx,ui_hinty4,hs4^,ta_left,ui_ingamecl,c_white);
    end
    else
      if(_IsUnitRange(ui_uhint,@tu))then
@@ -589,6 +593,24 @@ begin
      end;
 end;
 
+procedure D_ReplayProgress(tar:pSDL_Surface);
+var x,y,
+    w:integer;
+    cx :single;
+begin
+   x:=vid_mapx;
+   y:=vid_mapy+vid_cam_h-font_w;
+
+   if(rpls_file_size=0)or(rpls_state=rpl_end)
+   then cx:=1
+   else cx:=rpls_rbytes/rpls_file_size;
+
+   w:=round(vid_cam_w*cx);
+
+   boxColor(tar,x,y,x+w,y+font_w,c_yellow);
+   _draw_text(tar,x,y,i2s(round(cx*100))+'%',ta_left,255,c_white);
+end;
+
 procedure D_UIText(tar:pSDL_Surface;VisPlayer:byte);
 var i,limit:integer;
   str:shortstring;
@@ -602,9 +624,13 @@ chat_allies  : ChatString:=str_chat_allies;
    end;
 end;
 begin
+   // replay progress bar
+   //vid_mapy+vid_cam_h
+   if(rpls_state>=rpl_rhead)then
+     D_ReplayProgress(tar);
+
    // LOG and HINTs
    if(net_chat_shlm>0)then net_chat_shlm-=1;
-
    if(ingame_chat>0)or(rpls_showlog)then
    begin
       MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
@@ -672,11 +698,11 @@ begin
    c:=0;
    case m_brush of
 co_move,
-co_patrol  : c:=c_lime;
+co_patrol   : c:=c_lime;
 co_amove,
-co_apatrol : c:=c_red;
-co_paction : c:=c_aqua;
-co_mmark   : c:=c_white;
+co_apatrol  : c:=c_red;
+co_psability: c:=c_aqua;
+co_mmark    : c:=c_white;
    else _draw_surf(tar,mouse_x,mouse_y,spr_cursor);
    end;
    if(c<>0)then

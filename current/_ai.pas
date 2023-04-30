@@ -1965,7 +1965,7 @@ begin
 UID_Pain       : begin
                  ai_RunFromEnemy(pu,base_1r);
                  if (base_1r<aiu_alarm_d)
-                 and(aiu_alarm_d<base_1rh)then _unit_action(pu);
+                 and(aiu_alarm_d<base_1rh)then _unit_sability(pu);
                  end;
 UID_ArchVile   : ai_RunFromEnemy(pu,base_1r);
 UID_SiegeMarine,
@@ -2267,14 +2267,14 @@ begin
            begin
               ai_RunTo(pu,u_royal_cd,map_hmw,map_hmw,base_1r,nil);
               if(u_royal_cd<min2(g_royal_r div 7,base_2r))
-              then _unit_action(pu);
+              then _unit_sability(pu);
            end
            else
              if(ai_choosen)and(ai_cpoint_koth)then
              begin
                 ai_RunTo(pu,ai_cpoint_d,ai_cpoint_cp^.cpx,ai_cpoint_cp^.cpy,base_1r,nil);
                 if(ai_cpoint_d<ai_cpoint_r)
-                then _unit_action(pu);
+                then _unit_sability(pu);
              end
              else
                if(ai_enemy_d<=base_3r)
@@ -2294,7 +2294,7 @@ begin
                         or(g_mode=gm_royale)then
                           if(not pf_IfObstacleZone(pfzone))
                           or(ai_extbuilding)
-                          then _unit_action(pu);
+                          then _unit_sability(pu);
                end;
       end
       else
@@ -2302,11 +2302,11 @@ begin
         or((ai_choosen)and(g_mode=gm_royale))
         or((ai_choosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_1r))
         or((aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<3))
-        then _unit_action(pu)
+        then _unit_sability(pu)
         else
          if(not ai_cpoint_koth)or(ai_cpoint_d>base_1r)then
           if(aiu_limitaround_enemy>aiu_limitaround_ally)and(buff[ub_Damaged]>0)then
-           if(hits<uid^._hmhits)or(aiu_limitaround_enemy>ul15)then _unit_action(pu);
+           if(hits<uid^._hmhits)or(aiu_limitaround_enemy>ul15)then _unit_sability(pu);
    end;
 end;
 procedure ai_SaveMain_HK(pu:PTUnit);
@@ -2486,7 +2486,7 @@ uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
 uab_HInvulnerability : if(ai_invuln_tar_u<>nil  )then _unit_ability_HInvuln    (pu,ai_invuln_tar_u^.unum);
 uab_UACStrike        : if(ai_strike_tar_u<>nil  )then _unit_ability_UACStrike  (pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
 uab_SpawnLost        : if(ai_ZombieTarget_d<base_1r)and(player^.upgr[upgr_hell_phantoms]>0)then
-                        if(u_royal_d>srange)or(g_royal_r<srange)then _unit_action(pu);
+                        if(u_royal_d>srange)or(g_royal_r<srange)then _unit_sability(pu);
          end;
          case uidi of
 UID_UACDron           : if(ai_uab_buildturret(pu))then

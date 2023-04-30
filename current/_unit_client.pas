@@ -15,12 +15,14 @@ begin
       sl:=length(s);
       {$I-}
       BlockWrite(rpls_file,sl,SizeOf(sl));
+      {$I+}
       for x:=1 to sl do
       begin
          c:=s[x];
+         {$I-}
          BlockWrite(rpls_file,c,SizeOf(c));
+         {$I+}
       end;
-      {$I+}
    end;
 end;
 
@@ -774,13 +776,16 @@ begin
       _rudata_string:='';
       {$I-}
       BlockRead(rpls_file,sl,SizeOf(sl));
+      {$I+}
+      rpls_rbytes+=SizeOf(sl)+sl;
       for x:=1 to sl do
       begin
          c:=#0;
+         {$I-}
          BlockRead(rpls_file,c,SizeOf(c));
+         {$I+}
          _rudata_string:=_rudata_string+c;
       end;
-      {$I+}
    end;
 end;
 
@@ -788,35 +793,35 @@ function _rudata_byte(rpl:boolean;def:byte):byte;
 begin
    if(rpl=false)
    then _rudata_byte:=net_readbyte
-   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));if(ioresult<>0)then _rudata_byte:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));{$I+}rpls_rbytes+=SizeOf(_rudata_byte);if(ioresult<>0)then _rudata_byte:=def;  end;
 end;
 
 function _rudata_word(rpl:boolean;def:word):word;
 begin
    if(rpl=false)
    then _rudata_word:=net_readword
-   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));if(ioresult<>0)then _rudata_word:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));{$I+}rpls_rbytes+=SizeOf(_rudata_word);if(ioresult<>0)then _rudata_word:=def;  end;
 end;
 
 function _rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
    if(rpl=false)
    then _rudata_sint:=net_readsint
-   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));if(ioresult<>0)then _rudata_sint:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));{$I+}rpls_rbytes+=SizeOf(_rudata_sint);if(ioresult<>0)then _rudata_sint:=def; end;
 end;
 
 function _rudata_int(rpl:boolean;def:integer):integer;
 begin
    if(rpl=false)
    then _rudata_int:=net_readint
-   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));if(ioresult<>0)then _rudata_int :=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));{$I+}rpls_rbytes+=SizeOf(_rudata_int );if(ioresult<>0)then _rudata_int :=def;  end;
 end;
 
 function _rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
    if(rpl=false)
    then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));if(ioresult<>0)then _rudata_card:=def; {$I+} end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));{$I+}rpls_rbytes+=SizeOf(_rudata_card);if(ioresult<>0)then _rudata_card:=def; end;
 end;
 
 procedure  _rudata_log(p:byte;rpl:boolean);

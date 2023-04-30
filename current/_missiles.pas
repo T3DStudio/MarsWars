@@ -163,7 +163,6 @@ procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfak
 var m,d:integer;
     tu:PTUnit;
 begin
-   with _mids[msid] do
     for m:=1 to MaxUnits do
     with _missiles[m] do
     if(vstep<=0)then
@@ -180,7 +179,6 @@ begin
        fake   := mfake;
        dmod   := mdmod;
 
-       homing := mid_homing;
        ntars  := 0;
        dir    := point_dir(vx,vy,x,y);
        d      := point_dist_rint(x,y,vx,vy);
@@ -188,35 +186,44 @@ begin
        tu:=nil;
        _IsUnitRange(tar,@tu);
 
-       damage:=mid_base_damage+adddmg;
+       damage:=adddmg;
        if(player<=MaxPlayers)and(tu<>nil)then
-        if(not tu^.uid^._ukmech)then
-         with _players[player] do
-          case mid of
-          MID_SSShot : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus3;
-          MID_SShot  : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus1;
+        with _players[player] do
+        begin
+           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
+           if(not tu^.uid^._ukmech)then
+            case mid of
+           MID_SSShot : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus3;
+           MID_SShot  : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus1;
+            end;
+        end;
+
+       with _mids[mid] do
+       begin
+          damage+=mid_base_damage;
+          homing:=mid_homing;
+
+          if(mid_speed>0)
+          then vstep:=d div mid_speed
+          else vstep:=-mid_speed;
+          if(vstep<=0)then vstep:=1;
+
+          hvstep:=vstep div 2;
+
+          if(tu<>nil)then
+          begin
+             x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
+             y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
           end;
 
-       if(mid_speed>0)
-       then vstep:=d div mid_speed
-       else vstep:=-mid_speed;
-       if(vstep<=0)then vstep:=1;
+          if(tar<=0)or(mid_base_splashr>0)
+          then mtars:=MaxUnits
+          else mtars:=1;
 
-       hvstep:=vstep div 2;
-
-       if(tu<>nil)then
-       begin
-          x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
-          y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
+          {$IFDEF _FULLGAME}
+          ms_eid_bio_death:=false;
+          {$ENDIF}
        end;
-
-       if(tar<=0)or(mid_base_splashr>0)
-       then mtars:=MaxUnits
-       else mtars:=1;
-
-       {$IFDEF _FULLGAME}
-       ms_eid_bio_death:=false;
-       {$ENDIF}
 
        break;
     end;
@@ -249,6 +256,10 @@ begin
 
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
+        {case mid of
+        MID_SSShot : painX+=5;
+        MID_SShot  : painX+=3;
+        end;}
 
         if(ud<=0)and(ntars=0)then // first direct target
         begin

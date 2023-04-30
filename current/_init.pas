@@ -68,7 +68,6 @@ begin
 
    {$IFDEF _FULLGAME}
 
-   lng_eng;
    cfg_read;
 
    saveload_CalcSaveSize;
@@ -78,6 +77,7 @@ begin
    if not(InitSound)then exit;
 
    InitRX2Y;
+   lng_eng;
    SwitchLanguage;
    InitUIDDataCL;
    InitMIDDataCL;

@@ -165,9 +165,9 @@ begin
       co_astand,
       co_amove,
       co_apatrol  : if(SelectedBOrders<=0)then exit;
-      co_paction  : if(SelectedActions<=0)then exit;
-      //co_action,
-      //co_paction : if(SelectedActions<=0)then begin _PlayCommand(snd_cant_order[race]);exit;end;
+      co_psability: if(SelectedActions<=0)then exit;
+      //co_sability,
+      //co_psability : if(SelectedActions<=0)then begin _PlayCommand(snd_cant_order[race]);exit;end;
       co_rebuild  : if(SelectedRebuild<=0)then exit; //_PlayCommand(snd_cant_order[race]);
       else          if(SelectedAll    <=0)then exit;
       end;
@@ -175,7 +175,7 @@ begin
 
    with _uids[LeaderUID] do
    case cmd of
-   co_paction,
+   co_psability,
    co_rcmove,
    co_move,
    co_astand,
@@ -199,13 +199,13 @@ begin
    end;
 
    case cmd of
-   co_paction : _ClickEffect(c_aqua  );
-   co_rcamove : _ClickEffect(c_yellow);
+   co_psability: _ClickEffect(c_aqua  );
+   co_rcamove  : _ClickEffect(c_yellow);
    co_rcmove,
    co_move,
-   co_patrol  : _ClickEffect(c_lime  );
+   co_patrol   : _ClickEffect(c_lime  );
    co_amove,
-   co_apatrol : _ClickEffect(c_red   );
+   co_apatrol  : _ClickEffect(c_red   );
    end;
 end;
 
@@ -257,6 +257,7 @@ end;
 begin
    {
    tt:
+      0 - any
       1 - enemy, unum
       2 - own&ally, unum
       3 - own, uid
@@ -335,7 +336,7 @@ begin
                   end;
                end;
            end;
-co_paction            : if(ui_uibtn_action=0)then m_brush:=co_empty;
+co_psability          : if(ui_uibtn_action=0)then m_brush:=co_empty;
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else
@@ -345,15 +346,15 @@ end;
 procedure _command(x,y,target:integer);
 begin
    case m_brush of
-co_move    : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // move
-co_amove   : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // attack
-co_paction : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);
+co_move     : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // move
+co_amove    : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // attack
+co_psability: _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);
 co_patrol,
-co_apatrol : _player_s_o(m_brush   ,0     ,x,y,0,uo_corder,HPlayer);
-co_empty   :
-        if(m_action)// rclick
-        then _player_s_o(co_rcmove ,target,x,y,0,uo_corder,HPlayer)
-        else _player_s_o(co_rcamove,target,x,y,0,uo_corder,HPlayer);
+co_apatrol  : _player_s_o(m_brush   ,0     ,x,y,0,uo_corder,HPlayer);
+co_empty    :
+         if(m_action)// rclick
+         then _player_s_o(co_rcmove ,target,x,y,0,uo_corder,HPlayer)
+         else _player_s_o(co_rcamove,target,x,y,0,uo_corder,HPlayer);
    end;
 
    m_brush:=co_empty;
@@ -425,7 +426,7 @@ begin
       else
         if(right=false)then
          case u of
-    0 : _fsttime:=not _fsttime;
+    0 : uncappedFPS:=not uncappedFPS;
     2 : if(rpls_state<rpl_end)then
          if(G_Status=gs_running)
          then G_Status:=gs_replaypause
@@ -449,8 +450,8 @@ begin
        if(G_Status=gs_running)and(right=false)then
        begin
           case u of
-  0 : _player_s_o(co_action ,0,0,0,0, uo_corder  ,HPlayer);
-  1 : m_brush :=co_paction;
+  0 : _player_s_o(co_sability ,0,0,0,0, uo_corder  ,HPlayer);
+  1 : m_brush :=co_psability;
   2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
 
   3 : m_brush :=co_amove;
@@ -508,7 +509,7 @@ begin
          case k of
             sdlk_end       : if(ks_ctrl>0)
                              then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
-                             else _fsttime:=not _fsttime;
+                             else uncappedFPS:=not uncappedFPS;
             sdlk_home      : _warpten:=not _warpten;
             sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play)then state:=PS_Comp else state:=PS_Play;
             sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
@@ -747,18 +748,15 @@ begin
 
    check_mouse_brush(false);
 
-   case m_brush of
-co_empty   : begin
-             ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-             if(ui_uhint>0)and(ks_mleft=1)then
-              //if(_players[HPlayer].observer)then
-               if(d_UpdateUIPlayer(ui_uhint))then exit;
-             end;
-co_move    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
-co_amove   : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);
-co_paction : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
-   else      ui_uhint:=0;
-   end;
+   ui_uhint:=0;
+   if(mouse_select_x0=-1)or(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then
+     case m_brush of
+co_empty    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+co_move     : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,2);
+co_amove    : ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,1);
+co_psability: ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
+     else
+     end;
 
    if(ks_mleft=1)then                // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
@@ -772,6 +770,8 @@ co_empty  : begin
                end
                else
                begin
+                  if(ui_uhint>0)and(ks_mleft=1)then
+                   if(d_UpdateUIPlayer(ui_uhint))then exit;
                   mouse_select_x0:=mouse_map_x;
                   mouse_select_y0:=mouse_map_y;
                end;
@@ -785,7 +785,7 @@ co_empty  : begin
 1..255    : if(m_brushc=c_lime)
             then _player_s_o(m_brushx,m_brushy,m_brush,0,0, uo_build  ,HPlayer)
             else GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
-co_paction,
+co_psability,
 co_move,
 co_amove,
 co_patrol,
@@ -795,7 +795,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
     else
       if(m_by<3)then      // minimap
       case m_brush of
-      co_paction,
+      co_psability,
       co_move,
       co_amove,
       co_patrol,

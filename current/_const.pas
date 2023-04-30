@@ -295,8 +295,8 @@ co_patrol              = -92;
 co_astand              = -93;
 co_amove               = -94;
 co_apatrol             = -95;
-co_paction             = -79;
-co_action              = -80;
+co_psability           = -79;
+co_sability            = -80;
 co_supgrade            = -81;
 co_cupgrade            = -82;
 co_suprod              = -83;
@@ -314,7 +314,7 @@ ua_move                = 1;
 ua_hold                = 2;
 ua_amove               = 3;
 ua_unload              = 4;
-ua_paction             = 5;
+ua_psability           = 5;
 
 ua_patrol              = 6; // only for client data transfer
 
@@ -402,19 +402,19 @@ wmove_noneed           = 3;
 //  Weapon: priority type
 //
 
-wtp_default            = 0;
+wtp_Default            = 0;
 wtp_hits               = 1;
-wtp_rmhits             = 2;
+wtp_Rmhits             = 2;
 wtp_distance           = 3;
 wtp_building           = 4;
-wtp_unit_light_bio     = 5;
-wtp_unit_bio_light     = 7;
-wtp_unit_bio_nlight    = 8;
-wtp_unit_mech          = 10;
+wtp_UnitLightBio       = 5;
+wtp_UnitBioLight       = 7;
+wtp_UnitBioHeavy       = 8;
+wtp_UnitMech           = 10;
 wtp_bio                = 11;
 wtp_light              = 12;
-wtp_unit_light         = 13;
-wtp_building_nlight    = 14;
+wtp_UnitLight          = 13;
+wtp_BuildingHeavy      = 14;
 wtp_scout              = 15;
 wtp_notme_hits         = 16;
 wtp_fly                = 17;
@@ -530,7 +530,7 @@ upgr_hell_rteleport    = 18; // revers teleport
 upgr_hell_heye         = 19; // hell Eye time
 upgr_hell_totminv      = 20; // totem and eye invisible
 upgr_hell_bldrep       = 21; // build restoration
-upgr_hell_b478tel      = 22; // teleport towers
+upgr_hell_tblink       = 22; // teleport towers
 upgr_hell_resurrect    = 23; // archvile ability
 upgr_hell_invuln       = 24; // hell invuln powerup
 
@@ -808,8 +808,8 @@ uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,U
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-//T1                     = uids_marines+uids_zimbas+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
-T2                     = [UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_ZBFGMarine,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron];
+//T1                     = uids_marines+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
+T2                     = [UID_HTower,UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 T3                     = [UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
 uid_race_start_fbase   : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter );

@@ -65,7 +65,7 @@ function _gHKO(ucl:byte):shortstring;  // hotkey observer tab
 begin
    _gHKO:='';
    if(ucl<=_mhkeys)then
-    if(_hotkeyR[ucl]>0)then
+    if(_hotkeyO[ucl]>0)then
      _gHKO:=tc_lime+GetKeyName(_hotkeyO [ucl])+tc_default;
 end;
 
@@ -123,6 +123,8 @@ begin
    begin
       _up_name :=NAME;
       _up_descr:=DESCR;
+      if(length(_up_descr)>0)then
+       if(_up_descr[length(_up_descr)]<>'.')then _up_descr+='.';
    end;
 end;
 
@@ -153,65 +155,6 @@ begin
 end;
 
 
-{function _AttackHint(uid:byte):shortstring;
-var mdtargets,
-    ldtargets:shortstring;
-begin
-   _AttackHint:='';
-   mdtargets  :='';
-   ldtargets  :='';
-   case uid of
-UID_Sergant,
-UID_SSergant,
-UID_Imp            : begin
-                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_bio     ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_heavy   ,sep_comma);
-                     end;
-UID_Demon          : _ADDSTR(@mdtargets,str_attr_heavy   ,sep_comma);
-UID_UCommandCenter,
-UID_FPlasmagunner,
-UID_UACDron,
-UID_Arachnotron,
-UID_Cacodemon      : begin
-                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_mech    ,sep_comma);
-                     end;
-UID_Commando,
-UID_ZCommando,
-UID_ZFormer,
-UID_Engineer,
-UID_Medic          : begin
-                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_bio     ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_light   ,sep_comma);
-                     end;
-
-UID_Mastermind,
-UID_Baron,
-UID_Knight         : begin
-                     _ADDSTR(@mdtargets,str_attr_unit    ,sep_comma);
-                     _ADDSTR(@mdtargets,str_attr_light   ,sep_comma);
-                     end;
-
-UID_URMStation,
-UID_Cyberdemon,
-UID_Mancubus,
-UID_SiegeMarine,
-UID_Tank,
-UID_ZEngineer,
-UID_ZSiegeMarine   : _ADDSTR(@mdtargets,str_attr_building,sep_comma);
-   end;
-   case uid of
-UID_Phantom,
-UID_LostSoul       : _ADDSTR(@ldtargets,str_attr_mech    ,sep_comma);
-UID_URMStation,
-UID_ZEngineer,
-UID_Cyberdemon     : _ADDSTR(@ldtargets,str_attr_light   ,sep_comma);
-UID_SSergant       : _ADDSTR(@mdtargets,str_attr_mech    ,sep_comma);
-   end;
-end;    }
-
 function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
@@ -222,8 +165,9 @@ begin
          uidi:=auid;
          playeri:=0;
          player :=@_players[playeri];
+         _unit_apUID(pu);
+         hits:=-32000;
       end;
-      _unit_apUID(pu);
    end;
    _makeAttributeStr:='';
    with pu^  do
@@ -235,6 +179,11 @@ begin
       if(uidi in T3)
       then _ADDSTR(@_makeAttributeStr,'T3',sep_comma)
       else _ADDSTR(@_makeAttributeStr,'T1',sep_comma);
+
+      if(hits>fdead_hits)then
+       if(hits>0)
+       then _ADDSTR(@_makeAttributeStr,str_attr_alive  ,sep_comma)
+       else _ADDSTR(@_makeAttributeStr,str_attr_dead   ,sep_comma);
 
       if(_ukbuilding)
       then _ADDSTR(@_makeAttributeStr,str_attr_building,sep_comma)
@@ -263,7 +212,7 @@ begin
         if(buff[ub_Pain]>0)
         then _ADDSTR(@_makeAttributeStr,str_attr_stuned,sep_comma);
 
-      _makeAttributeStr:='['+_makeAttributeStr+']';
+      _makeAttributeStr:='['+_makeAttributeStr+tc_default+']';
    end;
 end;
 
@@ -281,6 +230,8 @@ end;
 begin
    BaseFlags2Str:='';
 
+   CheckFlags(wtr_hits_d,wtr_hits_a+
+                         wtr_hits_h  ,@str_attr_dead  ,@str_attr_alive   ,false);
    CheckFlags(wtr_unit  ,wtr_building,@str_attr_unit  ,@str_attr_building,false);
    CheckFlags(wtr_bio   ,wtr_mech    ,@str_attr_bio   ,@str_attr_mech    ,false);
    CheckFlags(wtr_light ,wtr_heavy   ,@str_attr_light ,@str_attr_heavy   ,false);
@@ -289,7 +240,7 @@ begin
    if(length(BaseFlags2Str)=0)then
    CheckFlags(wtr_ground,wtr_fly     ,@str_attr_ground,@str_attr_fly     ,true );
 
-   if(length(BaseFlags2Str)>0)then BaseFlags2Str:='['+BaseFlags2Str+']';
+   if(length(BaseFlags2Str)>0)then BaseFlags2Str:='['+BaseFlags2Str+tc_default+']';
 end;
 
 
@@ -300,9 +251,7 @@ begin
    for i:=0 to MaxDamageModFactors do
     with _dmods[dmod][i] do
      if(dm_factor<>100)and(dm_flags>0)then
-     begin
-        _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
-     end;
+      _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
 
 function _req2s(basename:shortstring;reqn:byte):shortstring;
@@ -311,14 +260,6 @@ begin
    if(reqn>1)then _req2s+='(x'+b2s(reqn)+')';
 end;
 
-
-
-function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
-var w:byte;
-dmod_str,
-weapon_str,
-weapons_str:shortstring;
-hintweapons:array[0..MaxUnitWeapons] of TUWeapon;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
@@ -326,6 +267,8 @@ begin
   if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
+
+function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
 function RebuildStr(uid,uidl:byte):shortstring;
 begin
   if(uidl=0)
@@ -348,78 +291,75 @@ begin
           AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot );
        end;
        if(_ability>0)then
-        if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-        then _ADDSTR(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
-        else
-          if(length(str_ability_name[_ability])>0)
-          then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
-
-       weapons_str:='';
-
-       if(length(weapons_str)>0)then
-       _ADDSTR(@_MakeDefaultDescription,str_UnitArming+weapons_str,sep_sdot);
+       begin
+          if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
+          then _ADDSTR(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
+          else
+            if(length(str_ability_name[_ability])>0)
+            then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
+       end
+       else
+         if(_apcm>0)then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_unload+'"',sep_sdot);
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
 end;
-{weapons_str:='';
-if(_attack=atm_always)then
- for w:=0 to MaxUnitWeapons do
-  with _a_weap[w] do
+
+function _MakeWeaponsDescription(uid:byte):shortstring;
+var w:byte;
+dmod_str,
+weapon_str,
+weapons_str:shortstring;
+begin
+  _MakeWeaponsDescription:='';
+  with _uids[uid] do
   begin
-     weapon_str:='';
-     case aw_type of
-     0             : continue;
-     wpt_missle,
-     wpt_directdmg,
-     wpt_directdmgZ: begin
-                        ;
-                        if(aw_max_range<0)
-                        then _ADDSTR(@weapon_str,'melee attack' ,sep_scomma)
-                        else _ADDSTR(@weapon_str,'ranged attack',sep_scomma);
-                        if(aw_type=wpt_directdmgZ)then
-                        _ADDSTR(@weapon_str,'+zombification',sep_scomma);
-                     end;
-     wpt_resurect  : _ADDSTR(@weapon_str,'resurrection',sep_scomma);
-     wpt_heal      : _ADDSTR(@weapon_str,'heal/repair' ,sep_scomma);
-     wpt_unit      : _ADDSTR(@weapon_str,'spawn'       ,sep_scomma);
-     wpt_suicide   : _ADDSTR(@weapon_str,'suicide'     ,sep_scomma);
-     end;
+     weapons_str:='';
+     if(_attack=atm_always)then
+      for w:=0 to MaxUnitWeapons do
+       with _a_weap[w] do
+       begin
+          weapon_str:='';
+          case aw_type of
+          0             : continue;
+          wpt_missle,
+          wpt_directdmg,
+          wpt_directdmgZ: begin
+                             ;
+                             if(aw_max_range<0)
+                             then _ADDSTR(@weapon_str,str_weapon_melee ,sep_scomma)
+                             else _ADDSTR(@weapon_str,str_weapon_ranged,sep_scomma);
+                             if(aw_type=wpt_directdmgZ)then
+                             _ADDSTR(@weapon_str,str_weapon_zombie,sep_scomma);
+                          end;
+          wpt_resurect  : _ADDSTR(@weapon_str,str_weapon_ressurect,sep_scomma);
+          wpt_heal      : _ADDSTR(@weapon_str,str_weapon_heal,sep_scomma);
+          wpt_unit      : begin
+                          _ADDSTR(@weapon_str,str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
+                          end;
+          wpt_suicide   : _ADDSTR(@weapon_str,str_weapon_suicide,sep_scomma);
+          end;
 
-     _ADDSTR(@weapon_str,'targets: '+BaseFlags2Str(aw_tarf),sep_scomma);
-     if(aw_dmod>0)then
-       case aw_type of
-     wpt_missle,
-     wpt_directdmg,
-     wpt_directdmgZ: begin
-                        dmod_str:=DamageStr(aw_dmod);
-                        if(length(dmod_str)>0)then
-                          _ADDSTR(@weapon_str,'damage factor: '+dmod_str,sep_scomma);
-                     end;
+          _ADDSTR(@weapon_str,str_weapon_targets+BaseFlags2Str(aw_tarf),sep_scomma);
+          if(aw_dmod>0)then
+            case aw_type of
+          wpt_missle,
+          wpt_directdmg,
+          wpt_directdmgZ: begin
+                             dmod_str:=DamageStr(aw_dmod);
+                             if(length(dmod_str)>0)then
+                               _ADDSTR(@weapon_str,str_weapon_damage+dmod_str,sep_scomma);
+                          end;
+            end;
+
+          _ADDSTR(@weapon_str,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
+
+          if(length(weapon_str)>0)then _ADDSTR(@weapons_str,weapon_str,sep_sdots);
        end;
-
-     if(length(weapon_str)>0)then _ADDSTR(@weapons_str,weapon_str,sep_sdots);
-  end; }
-{atflags:=0;
-dmods  :=[];
-for w:=0 to MaxUnitWeapons do
- with _a_weap[w] do
-  case aw_type of
-  wpt_missle,
-  wpt_directdmg,
-  wpt_directdmgz : begin
-                      atflags:=atflags or aw_tarf;
-                      if(aw_dmod>0)then dmods+=[aw_dmod];
-                   end;
+     if(length(weapons_str)>0)then  _ADDSTR(@_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
   end;
-if(atflags>0)then
- if((atflags and wtr_fly   )>0)
- or((atflags and wtr_ground)>0)then
- begin
-    _ADDSTR(@_MakeDefaultDescription,str_canattack+BaseFlags2Str(atflags),sep_sdot);
-    _ADDSTR(@_MakeDefaultDescription,DamageStr(dmods),sep_sdot);
- end;}
-
+  if(length(_MakeWeaponsDescription)>0)then _MakeWeaponsDescription+='.';
+end;
 
 function _makeUpgrBaseHint(upid,curlvl:byte):shortstring;
 var HK,
@@ -452,7 +392,7 @@ begin
      _ADDSTR(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
      if(_up_max>1)and(_up_mfrg)then _ADDSTR(@INFO,tc_red+'*'+tc_default,sep_comma);
 
-     _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+_up_descr;
+     _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+tc_nl1+_up_descr;
   end;
 end;
 
@@ -497,19 +437,20 @@ begin
          if(length(LMT )>0)then _ADDSTR(@INFO,LMT ,sep_comma);
          if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
 
-         un_txt_fdescr:=_MakeDefaultDescription(uid,un_txt_udescr);
+         un_txt_fdescr :=_MakeDefaultDescription(uid,un_txt_udescr);
 
          un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
          un_txt_uihintS:=un_txt_name+tc_nl1;
          un_txt_uihint2:=un_txt_fdescr;
-         un_txt_uihint3:='';
+         un_txt_uihint3:=_MakeWeaponsDescription(uid);
+         un_txt_uihint4:='';
 
-         if(length(REQ )>0)then un_txt_uihint3+=tc_yellow+str_requirements+tc_default+REQ+tc_nl1
-                           else un_txt_uihint3+=tc_nl1;
+         if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_requirements+tc_default+REQ+tc_nl1
+                           else un_txt_uihint4+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_uihint3+=str_bprod+PROD
-          else un_txt_uihint3+=str_uprod+PROD;
+          then un_txt_uihint4+=str_bprod+PROD
+          else un_txt_uihint4+=str_uprod+PROD;
       end;
    end;
 
@@ -615,7 +556,7 @@ begin
    str_DeadObservers     := 'Observer mode after lose:';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
-   str_ability           := 'Ability: ';
+   str_ability           := 'Special ability: ';
    str_transformation    := 'transformation to ';
    str_upgradeslvl       := 'Upgrades: ';
 
@@ -624,8 +565,17 @@ begin
    str_smith             := 'Researches and upgrades facility';
    str_IncEnergyLevel    := 'Increase energy level';
    str_CanRebuildTo      := 'Can be rebuilded to ';
-   str_damage            := 'Damage: ';
-   str_UnitArming        := 'Arming/Spells: ';
+   str_UnitArming        := 'Arming/Abilities: ';
+
+   str_weapon_melee      := 'melee attack';
+   str_weapon_ranged     := 'ranged attack';
+   str_weapon_zombie     := '+zombification';
+   str_weapon_ressurect  := 'resurrection';
+   str_weapon_heal       := 'heal/repair';
+   str_weapon_spawn      := 'spawn';
+   str_weapon_suicide    := 'suicide';
+   str_weapon_targets    := 'targets: ';
+   str_weapon_damage     := 'damage: ';
 
    str_cant_build        := 'Can`t build here';
    str_need_energy       := 'Need more energy';
@@ -648,20 +598,22 @@ begin
    str_MaximumReached    := 'Maximum reached';
    str_mapMark           := ' put a mark on the map';
 
-   str_attr_unit         := tc_gray  +'unit'        +tc_default;
-   str_attr_building     := tc_red   +'building'    +tc_default;
-   str_attr_mech         := tc_blue  +'mechanical'  +tc_default;
-   str_attr_bio          := tc_orange+'biological'  +tc_default;
-   str_attr_light        := tc_yellow+'light'       +tc_default;
-   str_attr_heavy        := tc_green +'heavy'       +tc_default;
-   str_attr_fly          := tc_white +'flying'      +tc_default;
-   str_attr_ground       := tc_lime  +'ground'      +tc_default;
-   str_attr_floater      := tc_aqua  +'floater'     +tc_default;
-   str_attr_level        := tc_white +'level'       +tc_default;
-   str_attr_invuln       := tc_lime  +'invulnerable'+tc_default;
-   str_attr_stuned       := tc_yellow+'stuned'      +tc_default;
-   str_attr_detector     := tc_purple+'detector'    +tc_default;
-   str_attr_transport    := tc_gray  +'transport'   +tc_default;
+   str_attr_alive        := tc_lime  +'alive'       ;
+   str_attr_dead         := tc_dgray +'dead'        ;
+   str_attr_unit         := tc_gray  +'unit'        ;
+   str_attr_building     := tc_red   +'building'    ;
+   str_attr_mech         := tc_blue  +'mechanical'  ;
+   str_attr_bio          := tc_orange+'biological'  ;
+   str_attr_light        := tc_yellow+'light'       ;
+   str_attr_heavy        := tc_green +'heavy'       ;
+   str_attr_fly          := tc_white +'flying'      ;
+   str_attr_ground       := tc_lime  +'ground'      ;
+   str_attr_floater      := tc_aqua  +'floater'     ;
+   str_attr_level        := tc_white +'level'       ;
+   str_attr_invuln       := tc_lime  +'invulnerable';
+   str_attr_stuned       := tc_yellow+'stuned'      ;
+   str_attr_detector     := tc_purple+'detector'    ;
+   str_attr_transport    := tc_gray  +'transport'   ;
 
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := tc_lime  +'left' +tc_default;
@@ -771,6 +723,7 @@ begin
    str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
    str_ability_name[uab_HellVision      ]:='Hell Vision';
    str_ability_name[uab_CCFly           ]:='Flight Engines';
+   str_ability_unload                    :='Unload';
 
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -837,7 +790,7 @@ begin
    _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
    _mkHStrUpid(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror become invisible'                               );
    _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell`s buildings'                   );
-   _mkHStrUpid(upgr_hell_b478tel   ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
+   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
    _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
    _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Altar of Pain ability'      );
 
@@ -874,35 +827,35 @@ begin
    _mkHStrUid(UID_APC              ,'Ground APC'                    ,'');
 
 
-   _mkHStrUpid(upgr_uac_attack     ,'Ranged Attack Upgrade'            ,'Increase the damage of ranged attacks for all UAC units and defensive structures.');
-   _mkHStrUpid(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units.'                     );
-   _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings.'                       );
-   _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase the efficiency of repair/healing of Engineers/Medics.' );
-   _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units.'            );
-   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ['+str_attr_bio+'].' );
-   _mkHStrUpid(upgr_uac_towers     ,'Tower Range Upgrade'              ,'Increase defensive structures range.'                           );
-   _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly.'                           );
-   _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center.'                              );
-   _mkHStrUpid(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center sight range.'                           );
-   _mkHStrUpid(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads.');
-   _mkHStrUpid(upgr_uac_soaring    ,'Engines for Soaring'              ,'Drone can move over obstacles.'              );
+   _mkHStrUpid(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
+   _mkHStrUpid(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
+   _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
+   _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase the efficiency of repair/healing of Engineers/Medics' );
+   _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
+   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ['+str_attr_bio+']' );
+   _mkHStrUpid(upgr_uac_towers     ,'Spotlights'                       ,'Increase defensive structures range'                           );
+   _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
+   _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
+   _mkHStrUpid(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center sight range'                           );
+   _mkHStrUpid(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads');
+   _mkHStrUpid(upgr_uac_soaring    ,'Antigravity Platform'             ,'Drone can move over obstacles'              );
 
-   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret.'    );
-   _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units.'  );
-   _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando become invisible.'                  );
-   _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles deal additional damage around target.'  );
-   _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units.'      );
-   _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units.'               );
-   _mkHStrUpid(upgr_uac_lturret    ,'Fighter Laser Gun'                ,'Fighter anti-ground weapon.'                              );
+   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
+   _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
+   _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando become invisible'                  );
+   _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles deal additional damage around target'  );
+   _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
+   _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
+   _mkHStrUpid(upgr_uac_lturret    ,'Fighter Laser Gun'                ,'Fighter anti-ground weapon'                              );
    _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                    );
-   _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scouting radius.'             );
-   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Plasmagun for Anti-ground turret.'           );
-   _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets.'               );
-   _mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability.' );
+   _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scouting radius'             );
+   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'           );
+   _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
+   _mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability' );
 
 
-   _mkHStrACT(0 ,'Action');
-   _mkHStrACT(1 ,'Action at point');
+   _mkHStrACT(0 ,'Specail ability');
+   _mkHStrACT(1 ,'Specail ability at point');
    _mkHStrACT(2 ,'Rebuild/Advance');
    t:='attack enemies';
    _mkHStrACT(3 ,'Move, '  +t);
@@ -1081,7 +1034,7 @@ begin
   str_m_liq             := 'Озера: ';
   str_m_siz             := 'Размер: ';
   str_m_obs             := 'Преграды: ';
-  str_m_sym             := 'Симметр.: ';
+  str_m_sym             := 'Симметрия: ';
   str_map               := 'Карта';
   str_players           := 'Игроки';
   str_mrandom           := 'Случайная карта';
@@ -1136,14 +1089,14 @@ begin
   str_orders            := 'Отряды: ';
   str_all               := 'Все';
   str_uprod             := tc_lime+'Создается в: '+tc_default;
-  str_bprod             := tc_lime+'Строит: '     +tc_default;
+  str_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
   str_ColoredShadow     := 'Цветные тени';
   str_kothtime          := 'Время до захвата центра: ';
   str_kothwinner        := ' - Царь Горы!';
   str_DeadObservers     := 'Наблюдатель после поражения:';
   str_FPS               := 'Показать FPS';
   str_APM               := 'Показать APM';
-  str_ability           := 'Способность: ';
+  str_ability           := 'Специальная способность: ';
   str_transformation    := 'превращение в ';
   str_upgradeslvl       := 'Улучшения: ';
 
@@ -1152,8 +1105,17 @@ begin
   str_smith             := 'Исследует улучшения и апгрейды';
   str_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_CanRebuildTo      := 'Можно перестроить в ';
-  str_damage            := 'Урон: ';
-  str_UnitArming        := 'Вооружение/заклинания: ';
+  str_UnitArming        := 'Вооружение/способности: ';
+
+  str_weapon_melee      := 'ближний бой';
+  str_weapon_ranged     := 'дальний бой';
+  str_weapon_zombie     := '+зомбификация';
+  str_weapon_ressurect  := 'воскрешение';
+  str_weapon_heal       := 'лечение/ремонт';
+  str_weapon_spawn      := 'порождение';
+  str_weapon_suicide    := 'самоубийство';
+  str_weapon_targets    := 'цели: ';
+  str_weapon_damage     := 'урон: ';
 
   str_cant_build        := 'Нельзя строить здесь';
   str_need_energy       := 'Необходимо больше энергии';
@@ -1176,20 +1138,22 @@ begin
   str_MaximumReached    := 'Достигнут максимум';
   str_mapMark           := ' поставил отметку на карте';
 
-  str_attr_unit         := tc_gray  +'юнит'          +tc_default;
-  str_attr_building     := tc_red   +'здание'        +tc_default;
-  str_attr_mech         := tc_blue  +'механический'  +tc_default;
-  str_attr_bio          := tc_orange+'биологический' +tc_default;
-  str_attr_light        := tc_yellow+'легкий'        +tc_default;
-  str_attr_heavy        := tc_green +'тяжелый'       +tc_default;
-  str_attr_fly          := tc_white +'летающий'      +tc_default;
-  str_attr_ground       := tc_lime  +'наземный'      +tc_default;
-  str_attr_floater      := tc_aqua  +'парящий'       +tc_default;
-  str_attr_level        := tc_white +'уровень '      +tc_default;
-  str_attr_invuln       := tc_lime  +'неуязвимый'    +tc_default;
-  str_attr_stuned       := tc_yellow+'оглушен'       +tc_default;
-  str_attr_detector     := tc_purple+'детектор'      +tc_default;
-  str_attr_transport    := tc_gray  +'транспорт'     +tc_default;
+  str_attr_alive        := tc_lime  +'живой'         ;
+  str_attr_dead         := tc_dgray +'мертвый'       ;
+  str_attr_unit         := tc_gray  +'юнит'          ;
+  str_attr_building     := tc_red   +'здание'        ;
+  str_attr_mech         := tc_blue  +'механический'  ;
+  str_attr_bio          := tc_orange+'биологический' ;
+  str_attr_light        := tc_yellow+'легкий'        ;
+  str_attr_heavy        := tc_green +'тяжелый'       ;
+  str_attr_fly          := tc_white +'летающий'      ;
+  str_attr_ground       := tc_lime  +'наземный'      ;
+  str_attr_floater      := tc_aqua  +'парящий'       ;
+  str_attr_level        := tc_white +'уровень '      ;
+  str_attr_invuln       := tc_lime  +'неуязвимый'    ;
+  str_attr_stuned       := tc_yellow+'оглушен'       ;
+  str_attr_detector     := tc_purple+'детектор'      ;
+  str_attr_transport    := tc_gray  +'транспорт'     ;
 
   str_panelpos          := 'Положение игровой панели';
   str_panelposp[0]      := tc_lime  +'слева' +tc_default;
@@ -1266,7 +1230,7 @@ begin
   str_ability_name[uab_SpawnLost       ]:='Выпустить Lost Soul';
   str_ability_name[uab_HellVision      ]:='Адское зрение';
   str_ability_name[uab_CCFly           ]:='Двигатели для полета';
-
+  str_ability_unload                    :='Выгрузить';
 
   _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');
   _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
@@ -1305,7 +1269,7 @@ begin
   _mkHStrUpid(upgr_hell_towers    ,'Демонические Призраки'         ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
   _mkHStrUpid(upgr_hell_HKTeleport,'Телепортация Адской Крепости'  ,'Заряд для способности Адской Крепости'                                );
   _mkHStrUpid(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
-  _mkHStrUpid(upgr_hell_buildr    ,'Увеличение Области обзора Адской Крепости',''                                       );
+  _mkHStrUpid(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
   _mkHStrUpid(upgr_hell_extbuild  ,'Адаптивный Фундамент'          ,'Все здания, кроме телепорта и производящих юнитов можно строить на декорациях');
   _mkHStrUpid(upgr_hell_pinkspd   ,'Ярость Pinky Demon'            ,'Увеличение скорости перемещения Pinky Demon'                                  );
 
@@ -1318,7 +1282,7 @@ begin
   _mkHStrUpid(upgr_hell_heye      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
   _mkHStrUpid(upgr_hell_totminv   ,'Невидимость Тотема Ужаса'      ,''                               );
   _mkHStrUpid(upgr_hell_bldrep    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
-  _mkHStrUpid(upgr_hell_b478tel   ,'Короткая Телепортация'         ,'Заряды для способности Адской Башни и Тотема Ужаса');
+  _mkHStrUpid(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Адской Башни и Тотема Ужаса');
   _mkHStrUpid(upgr_hell_resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
   _mkHStrUpid(upgr_hell_invuln    ,'Сферы Неуязвимости'            ,'Заряды для способности Алтаря Боли'      );
 
@@ -1355,9 +1319,35 @@ begin
   _mkHStrUid(UID_APC             ,'БТР'                    ,'');
 
 
+  _mkHStrUpid(upgr_uac_attack     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
+  _mkHStrUpid(upgr_uac_uarmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
+  _mkHStrUpid(upgr_uac_barmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
+  _mkHStrUpid(upgr_uac_melee      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
+  _mkHStrUpid(upgr_uac_mspeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
+  _mkHStrUpid(upgr_uac_ssgup      ,'Разрывные Пули'                    ,'Сержант, Старший Сержант и Терминатор наносят больше урона по ['+str_attr_bio+'].' );
+  _mkHStrUpid(upgr_uac_towers     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
+  _mkHStrUpid(upgr_uac_CCFly      ,'Летные Двигатели Командного Центра','Командный Центр может летать'                                  );
+  _mkHStrUpid(upgr_uac_ccturr     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
+  _mkHStrUpid(upgr_uac_buildr     ,'Увеличение Области Обзора Командного Центра',''                           );
+  _mkHStrUpid(upgr_uac_extbuild   ,'Адаптивный Фундамент'              ,'Все здания, кроме производящих юнитов можно строить на декорациях');
+  _mkHStrUpid(upgr_uac_soaring    ,'Антигравитационная Платформа'      ,'Дрон может перемещаться по декорациям'              );
 
-  _mkHStrACT(0 ,'Действие'            );
-  _mkHStrACT(1 ,'Действие в точке'    );
+  _mkHStrUpid(upgr_uac_botturret  ,'Протокол Трансформации Дрона'      ,'Дрон может превратиться в Анти-наземную Турель'    );
+  _mkHStrUpid(upgr_uac_vision     ,'Улучшенные Визоры'                 ,'Увеличение области обзора и атаки всех юнитов'  );
+  _mkHStrUpid(upgr_uac_commando   ,'Стелс-Технологии'                  ,'Коммандо становиться невидимым'                 );
+  _mkHStrUpid(upgr_uac_airsp      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
+  _mkHStrUpid(upgr_uac_mechspd    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
+  _mkHStrUpid(upgr_uac_mecharm    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
+  _mkHStrUpid(upgr_uac_lturret    ,'Лазерные Орудия'                   ,'Анти-наземное оружие для Истребителя'                    );
+  _mkHStrUpid(upgr_uac_transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
+  _mkHStrUpid(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
+  _mkHStrUpid(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
+  _mkHStrUpid(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
+  _mkHStrUpid(upgr_uac_rstrike    ,'Ракетный Залп'                     ,'Заряды для способности Станции Ракетного Залпа' );
+
+
+  _mkHStrACT(0 ,'Специальная способность'        );
+  _mkHStrACT(1 ,'Специальная способность в точке');
   _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
   _mkHStrACT(3 ,'Двигаться, '       +t);
@@ -1388,6 +1378,15 @@ begin
   _mkHStrRPL(12,'Игрок #4',false);
   _mkHStrRPL(13,'Игрок #5',false);
   _mkHStrRPL(14,'Игрок #6',false);
+
+  _mkHStrOBS(0 ,'Туман войны',false);
+  _mkHStrOBS(2 ,'Все игроки' ,false);
+  _mkHStrOBS(3 ,'Игрок #1'   ,false);
+  _mkHStrOBS(4 ,'Игрок #2'   ,false);
+  _mkHStrOBS(5 ,'Игрок #3'   ,false);
+  _mkHStrOBS(6 ,'Игрок #4'   ,false);
+  _mkHStrOBS(7 ,'Игрок #5'   ,false);
+  _mkHStrOBS(8 ,'Игрок #6'   ,false);
 
 
   {str_camp_t[0]         := 'Hell #1: Вторжение на Фобос';

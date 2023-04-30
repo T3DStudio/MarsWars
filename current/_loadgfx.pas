@@ -789,9 +789,10 @@ begin
 
    ui_textx     := vid_mapx+font_hw;
    ui_texty     := vid_mapy+font_hw;
-   ui_hinty1    := vid_mapy+vid_cam_h-txt_line_h1*7;
-   ui_hinty2    := vid_mapy+vid_cam_h-txt_line_h1*5;
-   ui_hinty3    := vid_mapy+vid_cam_h-txt_line_h1*2;
+   ui_hinty1    := vid_mapy+vid_cam_h-txt_line_h1*10;
+   ui_hinty2    := vid_mapy+vid_cam_h-txt_line_h1*8;
+   ui_hinty3    := vid_mapy+vid_cam_h-txt_line_h1*5;
+   ui_hinty4    := vid_mapy+vid_cam_h-txt_line_h1*2;
    ui_chaty     := ui_hinty1-font_3hw;
    ui_logy      := ui_chaty-font_3hw;
    ui_oicox     := vid_mapx+vid_cam_w-font_hw;

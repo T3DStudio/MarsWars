@@ -527,7 +527,7 @@ begin
    i:=i div 2;
 end;
 begin
-   i:=2048;
+   i:=4096;
    _unitWeaponPriority:=0;
 
    incPrio(tu^.buff[ub_Invuln]<=0);
@@ -537,44 +537,49 @@ begin
    with uid^ do
    case priorset of
 wtp_building         : incPrio(    _ukbuilding   );
-wtp_building_nlight  : begin
+wtp_BuildingHeavy    : begin
                        incPrio(    _ukbuilding   );
                        incPrio(not _uklight      );
+                       incPrio(not iscomplete    );
                        end;
-wtp_unit_light_bio   : begin
+wtp_UnitLightBio     : begin
                        incPrio(not _ukbuilding   );
                        incPrio(    _uklight      );
                        incPrio(not _ukmech       );
+                       incPrio(not iscomplete    );
                        end;
-wtp_unit_bio_light   : begin
+wtp_UnitBioLight     : begin
                        incPrio(not _ukbuilding   );
                        incPrio(not _ukmech       );
                        incPrio(    _uklight      );
+                       incPrio(not iscomplete    );
                        end;
-wtp_unit_bio_nlight  : begin
+wtp_UnitBioHeavy     : begin
                        incPrio(not _ukbuilding   );
                        incPrio(not _ukmech       );
                        incPrio(not _uklight      );
-                       incPrio(uidi<>UID_LostSoul);
+                       incPrio(not iscomplete    );
                        end;
-wtp_unit_mech        : begin
+wtp_UnitMech         : begin
                        incPrio(not _ukbuilding   );
                        incPrio(    _ukmech       );
-                       incPrio(uidi<>UID_LostSoul);
+                       incPrio(not iscomplete    );
                        end;
 wtp_bio              : begin
                        incPrio(not _ukmech       );
-                       incPrio(uidi<>UID_LostSoul);
+                       incPrio(not iscomplete    );
                        end;
 wtp_light            : incPrio(    _uklight      );
 wtp_fly              : begin
                        incPrio(     ukfly        );
                        incPrio(uidi<>UID_LostSoul);
+                       incPrio(not iscomplete    );
                        end;
 wtp_nolost_hits      : incPrio(uidi<>UID_LostSoul);
-wtp_unit_light       : begin
+wtp_UnitLight       : begin
                        incPrio(not _ukbuilding   );
                        incPrio(    _uklight      );
+                       incPrio(not iscomplete    );
                        end;
 wtp_scout            : if(iscomplete)and(hits>0)and(not _ukbuilding)and(apcm=0)then
                        if(not _IsUnitRange(transport,nil))then
@@ -610,14 +615,18 @@ begin
         else
         begin
            n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
+
+           if(aw_tarprior=wtp_notme_hits)then
+            if(tu<>pu)then n_prio+=1;
+
            //if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
            case aw_tarprior of
-wtp_max_hits         : if(tu^.hits       <a_tarp^^.hits       )then exit;
-wtp_distance         : if(ud             >a_tard^             )then exit;
+wtp_max_hits          : if(tu^.hits       <a_tarp^^.hits       )then exit;
+wtp_distance          : if(ud             >a_tard^             )then exit;
 wtp_nolost_hits,
-wtp_hits             : if(tu^.hits       >a_tarp^^.hits       )then exit;
-wtp_rmhits           : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
+wtp_hits              : if(tu^.hits       >a_tarp^^.hits       )then exit;
+wtp_Rmhits            : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
            else
               if(aw_max_range<0)and(aw_type=wpt_directdmg)
               then begin if(ud           >a_tard^             )then exit; end
@@ -1074,16 +1083,16 @@ begin
       _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,trunc(_getMHits(_rebuild_uid)*(hits/_mhits)),_rebuild_level),pu);
 end;
 
-function _unit_action(pu:PTUnit):boolean;
+function _unit_sability(pu:PTUnit):boolean;
 begin
-   _unit_action:=false;
+   _unit_sability:=false;
    with pu^ do
     if(_IsUnitRange(transport,nil)=false)then
      with uid^ do
       if(apcc>0)then
       begin
          uo_id:=ua_unload;
-         _unit_action:=true;
+         _unit_sability:=true;
       end
       else
         if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canAbility(pu),pu))then
@@ -1096,16 +1105,16 @@ uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
                        if(upgr[upgr_hell_phantoms]>0)
                        then _ability_unit_spawn(pu,UID_Phantom )
                        else _ability_unit_spawn(pu,UID_LostSoul);
-                       _unit_action:=true;
+                       _unit_sability:=true;
                     end;
 uab_CCFly         : if(zfall=0)and(buff[ub_CCast]<=0)then
                     begin
                         if(level>0)
                         then level:=0
                         else level:=1;
-                       _unit_action:=true;
+                       _unit_sability:=true;
                     end;
-uab_RebuildInPoint: _unit_action:=_unit_rebuild(pu);
+uab_RebuildInPoint: _unit_sability:=_unit_rebuild(pu);
             else
             end;
 end;
@@ -1199,8 +1208,8 @@ var _h:single;
 begin
    _TryZombification:=false;
 
-   //pu - lost
-   //tu - marine
+   //pu - zombificator
+   //tu - target
 
    if(tu^.uid^._zombie_uid=0)then exit;
    _zuid:=@_uids[tu^.uid^._zombie_uid];
@@ -1212,6 +1221,11 @@ begin
       if((armylimit-_limituse+_zuid^._limituse)>MaxPlayerLimit)then exit;
       if((menergy-_genergy+_zuid^._genergy)<=0)then exit;
    end;
+
+   if(tu^.iscomplete=false)
+   or(tu^.uid^._zombie_uid =0)
+   or(tu^.uid^._zombie_hits<tu^.hits)
+   or(tu^.hits<=fdead_hits          )then exit;
 
    if(ServerSide)then
    begin
@@ -1230,7 +1244,7 @@ begin
       _unit_kill(tu,true,true,false,false);
 
       if(_LastCreatedUnit>0)then
-      with _LastCreatedUnitP^ do   // визуальные проблемы когда захватывается летающий СС
+      with _LastCreatedUnitP^ do
       begin
          group:=_o;
          dir  :=_d;
@@ -1550,19 +1564,19 @@ begin
          mv_x:=uo_x;
          mv_y:=uo_y;
 
-         if(uo_id=ua_paction)then
+         if(uo_id=ua_psability)then
            case uid^._ability of
 uab_SpawnLost:  begin
                    mv_x:=x;
                    mv_y:=y;
                    uo_id:=ua_amove;
-                   _unit_action(pu);
-                   uo_id:=ua_paction;
+                   _unit_sability(pu);
+                   uo_id:=ua_psability;
                 end;
 uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
                 begin
                    uo_id:=ua_amove;
-                   _unit_action(pu);
+                   _unit_sability(pu);
                 end;
            else
              if(speed<=0)
@@ -1571,7 +1585,7 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
                if(x=uo_x)and(y=uo_y)then
                begin
                   uo_id:=ua_amove;
-                  _unit_action(pu);
+                  _unit_sability(pu);
                end;
            end
          else
@@ -1627,9 +1641,9 @@ begin
    with uid^    do
    with player^ do
    case order_id of
-co_destroy :  _unit_kill(pu,false,false,true,false);
+co_destroy  : _unit_kill(pu,false,false,true,false);
 co_rcamove,
-co_rcmove  :  begin     // right click
+co_rcmove   : begin     // right click
                  uo_tar:=0;
                  uo_x  :=order_x;
                  uo_y  :=order_y;
@@ -1640,20 +1654,20 @@ co_rcmove  :  begin     // right click
                  then uo_id:=ua_amove
                  else uo_id:=ua_move;
               end;
-co_stand   : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true ,false);
-co_move    : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true ,false);
-co_patrol  : _setUO(ua_move ,0        ,order_x,order_y, x, y,true ,false);
-co_astand  : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false,false);
-co_amove   :
+co_stand    : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true ,false);
+co_move     : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true ,false);
+co_patrol   : _setUO(ua_move ,0        ,order_x,order_y, x, y,true ,false);
+co_astand   : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false,false);
+co_amove    :
         if(_IsUnitRange(order_tar,nil))
         then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
         else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
-co_apatrol : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
-co_paction :  if(uo_id<>ua_paction)
+co_apatrol  : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
+co_psability: if(uo_id<>ua_psability)
               or((ucl_cs[true]+ucl_cs[false])=1)then
                 if(apcm>0)and(apcc>0)then
                 begin
-                   _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
+                   _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                    exit;
                 end
                 else
@@ -1670,26 +1684,26 @@ uab_CCFly            : if(speed>0)then
                        begin
                           if(_canAbility(pu)=0)then
                           begin
-                             _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
+                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                              _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
                              uo_y-=fly_hz;
                              exit;
                           end;
                        end
                        else
-                         if(_unit_action(pu))then
+                         if(_unit_sability(pu))then
                          begin
-                            _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,true);
+                            _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
                             _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
                             uo_y-=fly_hz;
                             exit;
                          end;
                   else
-                    _setUO(ua_paction,0,order_x,order_y,-1,-1,true ,false);
+                    _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                     exit;
                   end;
-co_rebuild :  if(_unit_rebuild(pu))then exit;
-co_action  :  if(_unit_action (pu))then exit;
+co_rebuild :  if(_unit_rebuild (pu))then exit;
+co_sability:  if(_unit_sability(pu))then exit;
    end;
    _unit_player_order:=false;
 end;

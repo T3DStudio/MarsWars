@@ -205,8 +205,8 @@ TUWeapon = record
   aw_fakeshots,
   aw_rupgr,
   aw_rupgr_l,
-  aw_dupgr,
   aw_ruid,
+  aw_dupgr,
   aw_oid   : byte;
   aw_uids  : TSob;
   aw_tarf,
@@ -334,6 +334,7 @@ TUID = record
    un_txt_uihint1,
    un_txt_uihint2,
    un_txt_uihint3,
+   un_txt_uihint4,
    un_txt_uihintS
                 : shortstring;
 

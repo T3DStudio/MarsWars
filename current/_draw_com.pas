@@ -77,15 +77,17 @@ begin
       tc_aqua     : begin color:=c_aqua   ;if(i<strLen)then continue;end;
       tc_blue     : begin color:=c_blue   ;if(i<strLen)then continue;end;
       tc_gray     : begin color:=c_gray   ;if(i<strLen)then continue;end;
-      tc_dgray    : begin color:=c_dgray   ;if(i<strLen)then continue;end;
+      tc_dgray    : begin color:=c_dgray  ;if(i<strLen)then continue;end;
       tc_white    : begin color:=c_white  ;if(i<strLen)then continue;end;
       tc_green    : begin color:=c_green  ;if(i<strLen)then continue;end;
       tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
       else
          case charc of
-         char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple);
-         char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white );
-         else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color      );
+         char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple );
+         char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white  );
+         ',',';','[',']','{','}'
+                      : boxColor(sur,ix,y,ix+font_iw,y+font_iw,BaseColor);
+         else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
          end;
 
          _draw_mwtexture(sur,ix,y,@font_ca[charc]);

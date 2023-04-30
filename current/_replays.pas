@@ -26,7 +26,7 @@ begin
          rpls_str_info:=str_svld_errors_open;
          exit;
       end;
-      if(FileSize(f)<rpls_file_size)then
+      if(FileSize(f)<rpls_file_head_size)then
       begin
          close(f);
          rpls_str_info:=str_svld_errors_wdata;
@@ -100,7 +100,8 @@ end;
 
 procedure replay_CalcHeaderSize;
 begin
-   rpls_file_size:=SizeOf(ver              )
+   rpls_file_head_size
+                 :=SizeOf(ver              )
                   +SizeOf(map_seed         )
                   +SizeOf(map_mw           )
                   +SizeOf(map_liq          )
@@ -113,7 +114,8 @@ begin
                   +SizeOf(g_cgenerators    )
                   +sizeof(rpls_player      );
    with _players[0] do
-   rpls_file_size+=(sizeof(name )
+   rpls_file_head_size
+                 +=(sizeof(name )
                    +sizeof(state)
                    +sizeof(race )
                    +sizeof(mrace)
@@ -126,6 +128,7 @@ begin
    begin
       close(rpls_file);
       rpls_fstatus:=rpls_file_none;
+      rpls_rbytes:=0;
    end;
    if(rpls_state>=rpl_rhead)then rpls_state:=rpl_none;
 end;
@@ -133,7 +136,6 @@ end;
 procedure replay_Code;
 const vxyc = 5;
 var  i,gs:byte;
-     fs  :cardinal;
 _vx,_vy  :byte;
 begin
    rpls_ticks+=1;
@@ -146,8 +148,9 @@ begin
                       replay_Abort;
 
                       rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
-                      {$I-}
+
                       assign (rpls_file,rpls_str_path);
+                      {$I-}
                       rewrite(rpls_file,1);
                       {$I+}
 
@@ -176,17 +179,19 @@ begin
                          BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
                          BlockWrite(rpls_file,g_cgenerators    ,SizeOf(g_cgenerators    ));
                          BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
+                         {$I+}
 
                          for i:=1 to MaxPlayers do
                           with _Players[i] do
                           begin
+                             {$I-}
                              BlockWrite(rpls_file,name ,sizeof(name ));
                              BlockWrite(rpls_file,state,sizeof(state));
                              BlockWrite(rpls_file,race ,sizeof(race ));
                              BlockWrite(rpls_file,mrace,sizeof(mrace));
                              BlockWrite(rpls_file,team ,sizeof(team ));
+                             {$I+}
                           end;
-                         {$I+}
 
                          if(ioresult<>0)then replay_Abort;
                       end;
@@ -247,8 +252,9 @@ begin
                          exit;
                       end;
 
-                      {$I-}
+
                       assign(rpls_file,rpls_str_path);
+                      {$I-}
                       reset (rpls_file,1);
                       {$I+}
 
@@ -260,9 +266,9 @@ begin
                       end
                       else
                       begin
-                         fs:=FileSize(rpls_file);
+                         rpls_file_size:=FileSize(rpls_file);
 
-                         if(fs<rpls_file_size)then
+                         if(rpls_file_size<rpls_file_head_size)then
                          begin
                             replay_Abort;
                             g_started :=false;
@@ -311,17 +317,21 @@ begin
                                exit;
                             end;
 
-                            {$I-}
+
                             for i:=1 to MaxPlayers do
                              with _Players[i] do
                              begin
+                                {$I-}
                                 BlockRead(rpls_file,name ,sizeof(name ));
                                 BlockRead(rpls_file,state,sizeof(state));
                                 BlockRead(rpls_file,race ,sizeof(race ));
                                 BlockRead(rpls_file,mrace,sizeof(mrace));
                                 BlockRead(rpls_file,team ,sizeof(team ));
+                                {$I+}
                              end;
-                            {$I+}
+
+                            rpls_rbytes+=rpls_file_head_size;
+
 
                             if(rpls_pnu=0)then rpls_pnu:=NetTickN;
                             UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
@@ -355,9 +365,9 @@ begin
                          if(eof(rpls_file)or(ioresult<>0))then
                          begin
                             replay_Abort;
-                            rpls_state:=rpl_end;
-                            G_Status  :=gs_replayend;
-                            _fsttime  :=false;
+                            rpls_state :=rpl_end;
+                            G_Status   :=gs_replayend;
+                            uncappedFPS:=false;
                             exit;
                          end;
 
@@ -367,6 +377,7 @@ begin
                             {$I-}
                             BlockRead(rpls_file,i,SizeOf(i));
                             {$I+}
+                            rpls_rbytes+=SizeOf(i);
                             G_Status:=i and %00111111;
 
                             if((i and %10000000)>0)then _rudata_log(rpls_player,true);
@@ -376,6 +387,8 @@ begin
                                BlockRead(rpls_file,rpls_vidx,sizeof(rpls_vidx));
                                BlockRead(rpls_file,rpls_vidy,sizeof(rpls_vidy));
                                {$I+}
+                               rpls_rbytes+=sizeof(rpls_vidx);
+                               rpls_rbytes+=sizeof(rpls_vidy);
                             end;
 
                             if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true);

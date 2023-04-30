@@ -406,8 +406,13 @@ begin
         with player^ do
          if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
          begin
-            rld:=haltar_reload;
             tu^.buff[ub_Invuln]:=invuln_time-round((tu^.uid^._limituse-MinUnitLimit)/MinUnitLimit*invuln_time_limit);
+            if(tu^.buff[ub_Invuln]<=0)then
+            begin
+               tu^.buff[ub_Invuln]:=0;
+               exit;
+            end;
+            rld:=haltar_reload;
             upgr[upgr_hell_invuln]-=1;
             _unit_ability_HInvuln:=true;
             {$IFDEF _FULLGAME}
@@ -809,7 +814,7 @@ begin
     if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)then
      with uid^ do
      with player^ do
-      if(upgr[upgr_hell_b478tel]>0)then
+      if(upgr[upgr_hell_tblink]>0)then
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
@@ -819,7 +824,7 @@ begin
          if(point_dist_int(x,y,x0,y0)>srange)then exit;
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles )>0)then exit;
 
-         upgr[upgr_hell_b478tel]-=1;
+         upgr[upgr_hell_tblink]-=1;
          buff[ub_CCast]:=fr_fpsd2;
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
          _unit_ability_HTowerBlink:=true;
@@ -1701,7 +1706,7 @@ uab_CCFly         :
                  {$ENDIF}
                  ukfly:=uf_fly;
                  zfall:=zfall-fly_hz;
-                 if(uo_id<>ua_paction)
+                 if(uo_id<>ua_psability)
                  then _unit_clear_order(pu,false);
               end;
               speed:=3;

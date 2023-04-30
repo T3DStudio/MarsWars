@@ -193,7 +193,7 @@ begin
    setEffectEID (0,0  ,0            ,EID_Gavno,0             );
    setEffectSND (  nil,snd_imp_death,snd_meat ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(2,nil,snd_hell_melee ,0,0);
+   setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
 UID_Demon:
 begin
@@ -213,7 +213,7 @@ begin
    setEffectEID (0,0  ,0              ,0  ,0             );
    setEffectSND (  nil,snd_caco_death ,nil,snd_hell_pain );
    setWeaponESND(0,nil,snd_hell_attack,0,0);
-   setWeaponESND(2,nil,snd_hell_melee ,0,0);
+   setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
 UID_Knight:
 begin
@@ -275,7 +275,7 @@ begin
    setEffectEID (0,0  ,0                 ,0  ,0             );
    setEffectSND (  nil,snd_revenant_death,nil,snd_zimba_pain);
    setWeaponESND(0,nil,snd_revenant_attack,0,0);
-   setWeaponESND(2,nil,snd_revenant_melee ,0,0);
+   setWeaponESND(1,nil,snd_revenant_melee ,0,0);
 end;
 UID_Mancubus:
 begin
@@ -546,9 +546,7 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_meat ,nil);
    setWeaponESND(0,nil,snd_healing,0,0);
    setWeaponESND(1,nil,snd_pistol,0,0);
-   setWeaponESND(2,nil,snd_healing,0,0);
    with _a_weap[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
-   with _a_weap[2] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_Sergant:
 begin
@@ -677,7 +675,7 @@ begin
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
-   setWeaponESND(2  ,nil,snd_flyer_s,0,0);
+   setWeaponESND(1  ,nil,snd_flyer_s,0,0);
 end;
 
 
@@ -867,7 +865,7 @@ upgr_hell_t2attack  : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_rteleport : begin _up_btn:=spr_b_up[r_hell,16]; end;
 upgr_hell_totminv   : begin _up_btn:=spr_b_up[r_hell,18]; end;
 upgr_hell_bldrep    : begin _up_btn:=spr_b_up[r_hell,19]; end;
-upgr_hell_b478tel   : begin _up_btn:=spr_b_up[r_hell,21]; end;
+upgr_hell_tblink    : begin _up_btn:=spr_b_up[r_hell,21]; end;
 upgr_hell_resurrect : begin _up_btn:=spr_b_up[r_hell,13]; end;
 upgr_hell_invuln    : begin _up_btn:=spr_b_up[r_hell,22]; end;
 

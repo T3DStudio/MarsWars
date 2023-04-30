@@ -169,7 +169,7 @@ begin
    Map_premap;
 
    {$IFDEF _FULLGAME}
-   _fsttime:=false;
+   uncappedFPS:=false;
    _warpten:=false;
 
    vid_menu_redraw  := true;
@@ -510,10 +510,10 @@ begin
 
    wteam_last:=255;
    wteams_n  :=0;
-
+   FillChar(teams_army,SizeOf(teams_army),0);
    for p:=0 to MaxPlayers do
     with _players[p] do
-     teams_army[team]:=army;
+     teams_army[team]+=army;
 
    for p:=0 to MaxPlayers do
     if(teams_army[p]>0)then
