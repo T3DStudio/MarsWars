@@ -1995,22 +1995,22 @@ begin
      and(ai_generator_d<ai_cpoint_d)then
        if(ai_builders_count>0)
        or(ai_unitp_cur>0)then
-         with ai_generator_cp^ do
-         begin
-            if(menergy>7000)and(ai_generator_d>srange)then exit;
+        with ai_generator_cp^ do
+        begin
+           if(menergy>7000)and(ai_generator_d>srange)then exit;
 
-            if(apcc>0)and(_attack<>atm_bunker)and(ai_generator_d<=ai_generator_r)
-            then uo_id:=ua_unload;
+           if(apcc>0)and(_attack<>atm_bunker)and(ai_generator_d<=ai_generator_r)
+           then uo_id:=ua_unload;
 
-            if((apcm<=0)and((cpOwnerPlayer=0)or(ai_generator_d<base_2r)or(cycle_order=0)) )
-            or((apcm<=0)and(ukfly or ukfloater)and(uid_e[uidi]>1)and(unum=uid_x[uidi]))
-            or(menergy<900)
-            or((apcc>0)and(ai_generator_d<base_2r))then
-            begin
-               ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
-               THINK_Generator:=true;
-            end;
-         end;
+           if((apcm<=0)and((cpOwnerPlayer=0)or(ai_generator_d<base_2r)or(cycle_order=0)) )
+           or((apcm<=0)and(ukfly or ukfloater)and(uid_e[uidi]>1)and(unum=uid_x[uidi]))
+           or(menergy<900)
+           or((apcc>0)and(ai_generator_d<base_2r))then
+           begin
+              ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
+              THINK_Generator:=true;
+           end;
+        end;
   // if(pu^.sel)then writeln('THINK_Generator ',THINK_Generator);
 end;
 function THINK_CPoint:boolean;
@@ -2230,9 +2230,11 @@ begin
       else
       begin
          if(apcm<=0)then
-          if(ai_cpoint_d<ai_cpoint_r)
-          or(ai_generator_d<ai_generator_r)
-          then group:=aio_busy;
+           if(ai_builders_count>0)
+           or(ai_unitp_cur>0)then
+             if(ai_cpoint_d<ai_cpoint_r)
+             or(ai_generator_d<ai_generator_r)
+             then group:=aio_busy;
 
          if(not THINK_RoyalBattleBorders)then
           if(not THINK_Generator        )then

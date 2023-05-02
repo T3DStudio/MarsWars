@@ -290,6 +290,7 @@ begin
       if(p=0)
       then _drawBtnt(tar,ux,uy,str_all         ,'','','','',c_white          ,0,0,0,0,'')
       else _drawBtnt(tar,ux,uy,_players[p].name,'','','','',PlayerGetColor(p),0,0,0,0,'');
+      _drawBtn(tar,ux,uy,r_empty,p=VisPlayer,_players[p].army=0);
 
       ux+=1;
       if(ux>2)then
@@ -491,8 +492,6 @@ end;
 procedure d_PanelUI(tar:pSDL_Surface;lx,ly:integer);
 begin
    d_MapMouse(tar,lx,ly);
-
-  // if(ks_ctrl=2)then writeln(ui_bprod_ucl_time[1]);
 
    if(vid_blink_timer1=2)then
    begin

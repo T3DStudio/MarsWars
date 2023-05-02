@@ -606,7 +606,6 @@ MID_Mine               = 118;
 MID_URocket            = 119;
 MID_URocketS           = 120;
 MID_Chaingun           = 121;
-MID_Chaingun2          = 122;
 
 
 mh_none                = 0;
@@ -809,7 +808,7 @@ uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
 //T1                     = uids_marines+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
-T2                     = [UID_HTower,UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
+T2                     = [UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 T3                     = [UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
 uid_race_start_fbase   : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter );

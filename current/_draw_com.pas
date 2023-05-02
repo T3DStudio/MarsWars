@@ -272,7 +272,7 @@ begin
    // true  - need announcer sound
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
-   with _players[HPlayer] do
+   with _players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);

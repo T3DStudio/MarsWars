@@ -19,7 +19,7 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
-procedure SoundLogHPlayer;  forward;
+procedure SoundLogUIPlayer;  forward;
 {$ENDIF}
 
 procedure fr_init;
@@ -202,6 +202,7 @@ begin
    PlayerSetProdError:=false;
    if(player<=MaxPlayers)then
    with _players[player] do
+   if(cndt>0)then
    begin
       prod_error_cndt:=cndt;
       prod_error_utp :=utp;
@@ -287,7 +288,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
               if((G_Step-tick)<timeDiff3)then exit;
       end;
 
-      if(local=false)then
+      if(not local)then
       log_n+=1;
 
       log_i+=1;
@@ -310,7 +311,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
          net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
          vid_menu_redraw:=true;
 
-         if(LogMes2UIAlarm)then SoundLogHPlayer;
+         if(LogMes2UIAlarm)then SoundLogUIPlayer;
 
          if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
       end;
@@ -381,7 +382,7 @@ begin
    begin
       if(state=ps_comp)then exit;
 
-      if(a_units[uid]<=0)then exit;
+      if(a_units[uid]<=0)and(uid_e[uid]<=0)then exit;
    end;
 
    if((condt and ureq_place)>0)
@@ -409,7 +410,7 @@ begin
                or((condt and ureq_builders    )>0)
                then bt:=lmt_unit_needbuilder
                else
-                 if(condt=ureq_energy)
+                 if((condt and ureq_energy)>0)
                  then bt:=lmt_req_energy
                  else
                    if((condt and ureq_alreadyAdv)>0)

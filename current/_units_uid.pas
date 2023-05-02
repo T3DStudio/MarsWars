@@ -256,11 +256,11 @@ end;
 
 UID_HTower:
 begin
-   _mhits     := 6000;
+   _mhits     := 5000;
    _renergy   := 100;
    _r         := 20;
    _srange    := 275;
-   _ucl       := 7;
+   _ucl       := 6;
    _btime     := ptime1;
    _attack    := atm_always;
    _ability   := uab_HTowerBlink;
@@ -270,7 +270,7 @@ begin
    _uklight   := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd2,MID_Mancubus,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Mancubus],[],0,-26,wtp_building,0,dm_siege);
+   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Imp],[],0,-26,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
 end;
 UID_HTotem:
 begin
@@ -278,7 +278,7 @@ begin
    _renergy   := 200;
    _r         := 21;
    _srange    := 275;
-   _ucl       := 8;
+   _ucl       := 7;
    _btime     := ptime1h;
    _ruid1     := UID_HFortress;
    _attack    := atm_always;
@@ -399,12 +399,12 @@ begin
    _weapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1   ,0        ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,wtp_distance ,0,0);
 end;
 {
-ul10 = 10000hp + 700dps
-       15000hp + 350dps
+ul10 = 10000hp + 620dps
+       14000hp + 310dps
 }
 UID_Mastermind :
 begin
-   _mhits     := 15000;
+   _mhits     := 14000;
    _renergy   := 1200;
    _r         := 35;
    _speed     := 12;
@@ -419,7 +419,7 @@ begin
    _splashresist:=true;
    _ukmech    := true;
    _upgr_regen:=upgr_race_regen_bio[r_hell];
-   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd5,MID_Chaingun2,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_UnitBioLight,0,dm_AntiUnitLight);
+   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd6,MID_Chaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_UnitLight,0,dm_AntiUnitLight);
 end;
 {
 12000  18000  19000
@@ -442,7 +442,7 @@ begin
    _splashresist:=true;
    _ukmech    := true;
    _upgr_regen:=upgr_race_regen_bio[r_hell];
-   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps1   ,MID_HRocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_BuildingHeavy,0,dm_Cyber);
+   _weapon(0,wpt_missle   ,aw_fsr+25,0,0 ,fr_fps1   ,MID_HRocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_BuildingHeavy,0,dm_Cyber);
 end;
 UID_Pain      :
 begin
@@ -724,7 +724,7 @@ begin
    _ruid2n    := 2;
    _limituse  := ul2;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fps2,MID_BFG,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_max_hits,0,0);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_BFG,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_max_hits,0,0);
 end;
 
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
@@ -1342,7 +1342,6 @@ case m of
 MID_ArchFire,
 MID_Mine           : mid_speed       :=32000;
 MID_Tank,
-MID_Chaingun2,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot,
@@ -1372,7 +1371,6 @@ MID_URocket,
 MID_Mancubus,
 MID_YPlasma,
 MID_BPlasma,
-MID_Chaingun2,
 MID_Chaingun,
 MID_Flyer,
 MID_Granade,
@@ -1382,7 +1380,7 @@ MID_Cacodemon,
 MID_Revenant       : mid_base_damage :=BaseDamage1h;
 MID_Baron          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;
-MID_BFG            : mid_base_damage :=BaseDamage4;
+MID_BFG            : mid_base_damage :=BaseDamage5;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_ArchFire       : mid_base_damage :=BaseDamage8;
 MID_Mine,
@@ -1398,6 +1396,7 @@ MID_HRocket        : mid_base_splashr:=rocket_sr;
 MID_ArchFire,
 MID_Tank,
 MID_Granade        : mid_base_splashr:=tank_sr;
+MID_BFG            : mid_base_splashr:=blizzard_sr;
 end;
 
 // homing

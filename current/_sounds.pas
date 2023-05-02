@@ -376,9 +376,9 @@ begin
    end;
 end;
 
-procedure SoundLogHPlayer;
+procedure SoundLogUIPlayer;
 begin
-   with _players[HPlayer] do
+   with _players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
 0..MaxPlayers         : if(mtype<>HPlayer)

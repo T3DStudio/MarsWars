@@ -471,7 +471,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                    case o_id of
                uo_setorder,
                uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitGroups)then group:=o_x0;
-               uo_corder     : if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1))then break;
+               uo_corder     : if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1))then begin PlayerClearProdError(player);break;end;
                    end;
 
                    if(psel=false)then

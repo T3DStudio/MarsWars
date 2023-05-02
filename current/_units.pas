@@ -179,10 +179,9 @@ begin
          _unit_morph:=ureq_max;
          exit;
       end;
-      // save vision data
 
       _unit_kill(pu,true,true,false,false);
-      _unit_add(vx,vy,unum,ouid,playeri,obld,true,ulevel);
+      _unit_add(x,y,unum,ouid,playeri,obld,true,ulevel);
    end;
 
    if(bhits<0)then bhits:=puid^._mhits div abs(bhits);
@@ -386,7 +385,7 @@ wpt_resurect : if(tu^.buff[ub_Resurect]>0)
                or(tu^.hits> 0         )then exit;
 wpt_heal     : if(tu^.hits<=0)
                or(tu^.hits>=tu^.uid^._mhits)
-               or(tu^.iscomplete=false       )
+               or(tu^.iscomplete=false     )
                or(tu^.buff[ub_Heal]>0 )then exit;
       end;
 
@@ -1659,9 +1658,9 @@ co_move     : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true ,false);
 co_patrol   : _setUO(ua_move ,0        ,order_x,order_y, x, y,true ,false);
 co_astand   : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false,false);
 co_amove    :
-        if(_IsUnitRange(order_tar,nil))
-        then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
-        else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
+         if(_IsUnitRange(order_tar,nil))
+         then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
+         else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
 co_apatrol  : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
 co_psability: if(uo_id<>ua_psability)
               or((ucl_cs[true]+ucl_cs[false])=1)then

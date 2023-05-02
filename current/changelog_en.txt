@@ -6,9 +6,9 @@ Other:
 - multiplayer/replays system was improved: now possible to update all units every game tick;
 - map generator can make symmetrical maps now;
 - visual themes for maps;
-- max map size increased to 8000;
+- maximum map size increased to 8000;
 - option 'Game: UDOOM/DOOM2' removed; now game about DOOM2 only;
-- new game option: 'Neutral generators' - map contain neutral generators that can be cuptured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators can have optional lifetime;
+- new game option: 'Neutral generators' - map contain neutral generators that can be cuptured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators have optional lifetime;
 - new game mode 'King of the Hill' where players must capture and hold central area for 1 minute to win;
 - improvements for computer opponents code:
 -- bot trying to keep their attacking units together;
@@ -20,13 +20,13 @@ Other:
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
 
 Interface:
-- screen messages about game events("Construction complete", "Need more energy", etc.);
-- units and game announcer phrases from DoomWars;
+- ui messages about game events("Construction complete", "Need more energy", etc.);
+- units phrases and game announcer phrases from DoomWars;
 - double F2-hotkey now move camera to player's army;
 -- "smart F2": F2 hotkey select all battle units, except those who:
 --- patroling;
 --- holding position;
---- execing "action in point" order;
+--- execing "special ability at point" order;
 --- going to Teleport;
 --- going to transport;
 --- going to pickup onboard some unit;
@@ -38,8 +38,18 @@ Interface:
 - army/energy information now draw in star/war-craft style;
 - healthbars and selection rects abow units now draw in separate layer;
 - hint about unit under cursor;
-- upgrades info in selection rect ?????
+- upgrades level info in selection rect;
 
+Control:
+- "action" order renamed to "special ability";
+- added new order type "special ability at point" for units with "special ability"; behaviour: unit will come to target point and do "special ability" order;
+-- exceptional behavior for Pain Elemental: this unit will start spawn Lost Souls/Phantoms to target point;
+- changed buttoms positions and hotkeys for unit`s basic orders on "Controls" tab;
+- "space" hotkey now moving camera to last event location;
+- only basic orders(move, attack, destruction) are transfering to all units in selected group; other order transfer to first-who-can-execute-it unit from group;
+- unit's abilities(like Radar`s scan) now casts by "special ability at point" order;
+- no automatic production cancel when energy goes under 0 anymore;
+- now players can set attention markers;
 
 
 49.1:

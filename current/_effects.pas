@@ -27,7 +27,6 @@ begin
         MID_SShot,
         MID_SSShot,
         MID_Bullet,
-        MID_Chaingun2,
         MID_Chaingun      : _setEID(@spr_u_p1          ,sms_death);
         MID_BFG           : _setEID(@spr_u_p2          ,sms_death);
         MID_Flyer         : _setEID(@spr_u_p3          ,sms_death);
@@ -158,7 +157,6 @@ MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
 MID_SSShot,
 MID_Bullet,
-MID_Chaingun2,
 MID_Chaingun      : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_BFG           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );

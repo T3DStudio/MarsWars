@@ -564,7 +564,7 @@ begin
    str_barrack           := 'Unit production';
    str_smith             := 'Researches and upgrades facility';
    str_IncEnergyLevel    := 'Increase energy level';
-   str_CanRebuildTo      := 'Can be rebuilded to ';
+   str_CanRebuildTo      := 'Can be rebuilt into ';
    str_UnitArming        := 'Arming/Abilities: ';
 
    str_weapon_melee      := 'melee attack';
@@ -1105,7 +1105,7 @@ begin
   str_smith             := 'Исследует улучшения и апгрейды';
   str_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_CanRebuildTo      := 'Можно перестроить в ';
-  str_UnitArming        := 'Вооружение/способности: ';
+  str_UnitArming        := 'Вооружение/Способности: ';
 
   str_weapon_melee      := 'ближний бой';
   str_weapon_ranged     := 'дальний бой';

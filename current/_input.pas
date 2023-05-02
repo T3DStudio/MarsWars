@@ -401,15 +401,15 @@ begin
 1: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // units
     if(u<=ui_ubtns)then
      case right of
-   false: _player_s_o(co_suprod  ,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
-   true : _player_s_o(co_cuprod  ,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+   false: _player_s_o(co_suprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
+   true : _player_s_o(co_cuprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
      end;
 
 2: if(G_Status=gs_running)and(rpls_state<rpl_runit)then  // upgrades
     if(u<=ui_ubtns)then
      case right of
-   false: _player_s_o(co_supgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
-   true : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0, uo_corder  ,HPlayer);
+   false: _player_s_o(co_supgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
+   true : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
      end;
 
 3: if(rpls_state>=rpl_rhead)then
@@ -450,22 +450,22 @@ begin
        if(G_Status=gs_running)and(right=false)then
        begin
           case u of
-  0 : _player_s_o(co_sability ,0,0,0,0, uo_corder  ,HPlayer);
+  0 : _player_s_o(co_sability,0,0,0,0, uo_corder  ,HPlayer);
   1 : m_brush :=co_psability;
-  2 : _player_s_o(co_rebuild,0,0,0,0, uo_corder  ,HPlayer);
+  2 : _player_s_o(co_rebuild ,0,0,0,0, uo_corder  ,HPlayer);
 
   3 : m_brush :=co_amove;
-  4 : _player_s_o(co_astand ,0,0,0,0, uo_corder  ,HPlayer);
+  4 : _player_s_o(co_astand  ,0,0,0,0, uo_corder  ,HPlayer);
   5 : m_brush :=co_apatrol;
 
   6 : m_brush :=co_move;
-  7 : _player_s_o(co_stand  ,0,0,0,0, uo_corder  ,HPlayer);
+  7 : _player_s_o(co_stand   ,0,0,0,0, uo_corder  ,HPlayer);
   8 : m_brush :=co_patrol;
 
-  9 : _player_s_o(co_pcancle,0,0,0,0, uo_corder  ,HPlayer);
+  9 : _player_s_o(co_pcancle ,0,0,0,0, uo_corder  ,HPlayer);
   10: if(ui_orders_x[MaxUnitGroups]>0)then
        if(dbl)
-       then MoveCamToPoint(ui_orders_x[MaxUnitGroups], ui_orders_y[MaxUnitGroups])
+       then MoveCamToPoint(ui_orders_x[MaxUnitGroups],ui_orders_y[MaxUnitGroups])
        else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
   11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
   12: m_brush :=co_mmark;
