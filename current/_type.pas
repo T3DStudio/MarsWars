@@ -319,7 +319,7 @@ TUID = record
    ups_builder,
    ups_units,
    ups_upgrades,
-   ups_apc      : TSoB;
+   ups_transport      : TSoB;
    {$IFDEF _FULLGAME}
    _animw,
    _animd,

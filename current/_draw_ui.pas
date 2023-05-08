@@ -87,13 +87,13 @@ var spr:PTMWTexture;
  dunit:TUnit;
 pdunit:PTUnit;
 begin
+   m_brushx-=vid_cam_x-lx;
+   m_brushy-=vid_cam_y-ly;
+
    with _players[HPlayer]do
    case m_brush of
 1..255:
    begin
-      m_brushx-=vid_cam_x-lx;
-      m_brushy-=vid_cam_y-ly;
-
       with _uids[m_brush] do
       begin
          spr:=_uid2spr(m_brush,270,0);
@@ -120,9 +120,6 @@ begin
          then circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink2_color_BG);
       end;
 
-      m_brushx+=vid_cam_x-lx;
-      m_brushy+=vid_cam_y-ly;
-
       // points areas
       for i:=1 to MaxCPoints do
        with g_cpoints[i] do
@@ -143,10 +140,29 @@ co_psability:
     if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],nil))then
      with _uids[i] do
       case _ability of
-uab_UACStrike: if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_UACScan  : circleColor(tar,mouse_x,mouse_y,_units[uid_x[i]].srange,c_gray);
-      end;
+uab_UACStrike     : if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
+uab_UACScan       : circleColor(tar,mouse_x,mouse_y,_units[uid_x[i]].srange,c_gray);
+uab_RebuildInPoint: begin
+                    spr:=_uid2spr(_rebuild_uid,270,0);
+                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
+                    _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
+                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+
+                    circleColor(tar,m_brushx,m_brushy,_uids[_rebuild_uid]._r,c_gray);
+                    end;
+uab_CCFly         : begin
+                    spr:=_uid2spr(i,270,0);
+                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
+                    _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
+                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+
+                    circleColor(tar,m_brushx,m_brushy,_r,c_gray);
+                    end;
+        end;
    end;
+
+   m_brushx+=vid_cam_x-lx;
+   m_brushy+=vid_cam_y-ly;
 end;
 
 procedure d_OrderIcons(tar:pSDL_Surface);
@@ -430,8 +446,8 @@ begin
         end
         else
         begin
-           _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_action <=0);
-           _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_action <=0);
+           _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_actionu=nil);
+           _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_actionu=nil);
            _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild<=0);
 
            _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );

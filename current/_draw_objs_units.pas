@@ -221,7 +221,7 @@ begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_canAbility(pu)=0)and(uo_id<>ua_psability))
-            or(apcc>0)           then ui_uibtn_action +=1;
+            or(apcc>0)           then ui_uibtn_actionu:=uid;
             if(_canRebuild(pu)=0)then ui_uibtn_rebuild+=1;
          end;
       end
@@ -427,7 +427,7 @@ begin
                     dir:=dir mod 360;
                  end;
 
-                if(playeri=UIPlayer)then //or(_players[HPlayer].observer)or(rpls and uiplayer=0)
+                if(playeri=UIPlayer)then
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
@@ -518,7 +518,7 @@ begin
    ui_uprod_cur      :=0;
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
-   ui_uibtn_action   :=0;
+   ui_uibtn_actionu  :=nil;
    ui_uibtn_rebuild  :=0;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];

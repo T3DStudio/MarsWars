@@ -350,8 +350,10 @@ begin
 
       if(rld>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
-      if(speed<=0)or(not iscomplete)then
-       if(0<m_brush)and(m_brush<=255)then UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+      if(0<m_brush)and(m_brush<=255)then
+       if(speed<=0)or(not iscomplete)then
+        UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+
 
       if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
 
@@ -715,8 +717,8 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)    , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits) , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,li2s(_level_damage), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(x), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,i2s(y), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

@@ -936,6 +936,8 @@ begin
 
          if(_ability_rupgr>0)and(_ability_rupgrl>0)then
           if(upgr[_ability_rupgr]<_ability_rupgrl)then _canAbility+=ureq_rupid;
+
+         if(_ability=uab_RebuildInPoint)and(_canAbility=0)then _canAbility+=_canRebuild(pu);
       end;
 end;
 

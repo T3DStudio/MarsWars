@@ -178,7 +178,10 @@ begin
     begin
        _canmove:=false;
 
-       if(speed<=0)or(hits<=0)or(iscomplete=false)or(StayWaitForNextTarget>0)then exit;
+       if(speed<=0)
+       or(hits<=0)
+       or(iscomplete=false)
+       or(StayWaitForNextTarget>0)then exit;
 
        if(a_rld>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -1016,7 +1019,7 @@ begin
          with _LastCreatedUnitP^ do
          begin
             cycle_order:= _LastCreatedUnit mod order_period;
-            unum    := _LastCreatedUnit;
+            unum       := _LastCreatedUnit;
 
             _unit_SetXY(_LastCreatedUnitP,ux,uy,mvxy_strict);
             uidi    := ui;
@@ -1480,7 +1483,7 @@ begin
     then exit;
 
    if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
-    if(tu^.uidi in uu^.uid^.ups_apc)then _itcanapc:=true;
+    if(tu^.uidi in uu^.uid^.ups_transport)then _itcanapc:=true;
 end;
 
 

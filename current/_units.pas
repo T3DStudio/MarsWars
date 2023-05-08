@@ -136,7 +136,7 @@ begin
    begin
       if(hits<=0)then
       begin
-         _unit_morph:=ureq_product;
+         _unit_morph:=ureq_unknown;
          exit;
       end;
 
@@ -145,6 +145,11 @@ begin
       avsnt :=vsnt;
       select:=sel;
 
+      if(a_units[ouid]<=0)then
+      begin
+         _unit_morph:=ureq_max;
+         exit;
+      end;
       if(not obld)or(puid^._ukbuilding)then
        if(menergy<=0)then
        begin
@@ -168,18 +173,15 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,not ukfloater and((upgr[upgr_race_extbuilding[puid^._urace]]=0)or(uid^._isbarrack)or(uid^._ability=uab_Teleport)) )>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,(upgr[upgr_race_extbuilding[puid^._urace]]=0)or(puid^._isbarrack)or(puid^._ability=uab_Teleport) )>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
          end;
       end;
-      if(a_units[ouid]<=0)then
-      begin
-         _unit_morph:=ureq_max;
-         exit;
-      end;
 
+      vx:=x;
+      vy:=y;
       _unit_kill(pu,true,true,false,false);
       _unit_add(x,y,unum,ouid,playeri,obld,true,ulevel);
    end;
@@ -729,10 +731,10 @@ begin
          exit;
       end;
 
-      pushout      := solid and _canmove(pu) and (a_rld<=0) and iscomplete;
+      pushout      := solid and _canmove(pu) and (a_rld<=0);
       attack_target:= _canAttack(pu,false);
       aicode       := (state=ps_comp);//and(sel);
-      fteleport_tar:= ((uo_tar<1)or(MaxUnits<uo_tar)) and (_ability=uab_Teleport);
+      fteleport_tar:= (not _IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       puo:=nil;
       if(_IsUnitRange(uo_tar,@puo))and(aicode=false)then
@@ -1071,6 +1073,7 @@ begin
    with _uids[uid] do
     if(_isbarrack)
     or(_issmith  )
+    or((_attack>0)and(not _isbuilder))
     then _getMHits:=_hhmhits
     else _getMHits:=_hmhits;
 end;
@@ -1684,7 +1687,7 @@ uab_CCFly            : if(speed>0)then
                           if(_canAbility(pu)=0)then
                           begin
                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
+                             _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                              uo_y-=fly_hz;
                              exit;
                           end;
@@ -1693,10 +1696,19 @@ uab_CCFly            : if(speed>0)then
                          if(_unit_sability(pu))then
                          begin
                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
-                            _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, (upgr[upgr_uac_extbuild]<=0)and(upgr[upgr_hell_extbuild]<=0) );
+                            _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                             uo_y-=fly_hz;
                             exit;
                          end;
+uab_RebuildInPoint   : begin
+                          if(speed>0)then
+                          begin
+                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,@uo_x,@uo_y,false, not ukfloater or (upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                          end
+                          else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                          exit;
+                       end;
                   else
                     _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                     exit;

@@ -180,12 +180,12 @@ begin
    co_move,
    co_astand,
    co_stand,
-   co_patrol  : _PlayCommand(un_snd_move);
+   co_patrol   : _PlayCommand(un_snd_move);
    co_amove,
-   co_apatrol : _PlayCommand(un_snd_attack);
-   co_rcamove : if(_checkEnemy)
-                then _PlayCommand(un_snd_attack)
-                else _PlayCommand(un_snd_move  );
+   co_apatrol  : _PlayCommand(un_snd_attack);
+   co_rcamove  : if(_checkEnemy)
+                 then _PlayCommand(un_snd_attack)
+                 else _PlayCommand(un_snd_move  );
    end;
 
    ox1+=vid_mapx;
@@ -292,8 +292,12 @@ begin
 end;
 
 procedure check_mouse_brush(log:boolean);
-var cndt:cardinal;
+var cndt,i:cardinal;
+      puid:PTUID;
 begin
+   m_brushx:=mouse_map_x;
+   m_brushy:=mouse_map_y;
+
    if(UIPlayer<>HPlayer)
    then m_brush:=co_empty
    else
@@ -316,12 +320,7 @@ begin
                      exit;
                   end;
 
-                  if(ks_ctrl>0)then
-                  begin
-                     m_brushx:=mouse_map_x;
-                     m_brushy:=mouse_map_y;
-                  end
-                  else
+                  if(ks_ctrl<=0)then
                   begin
                      _building_newplace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
                      m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
@@ -336,7 +335,7 @@ begin
                   end;
                end;
            end;
-co_psability          : if(ui_uibtn_action=0)then m_brush:=co_empty;
+co_psability          : if(ui_uibtn_actionu=nil)then m_brush:=co_empty;
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else

@@ -261,7 +261,7 @@ begin
    _r         := 20;
    _srange    := 275;
    _ucl       := 6;
-   _btime     := ptime1;
+   _btime     := ptime1hh;
    _attack    := atm_always;
    _ability   := uab_HTowerBlink;
    _ability_rupgr :=upgr_hell_tblink;
@@ -753,7 +753,7 @@ begin
       _ucl             := 3;
       _apcm            := 30;
       ups_builder      :=[UID_HCommandCenter,UID_HSymbol,UID_HTower,UID_HEye,UID_HBarracks]-[UID_HACommandCenter];
-      ups_apc          :=uids_demons;
+      ups_transport          :=uids_demons;
 
       _upgr_srange     :=upgr_hell_buildr;
       _weapon(0,wpt_missle,_srange,_r,0,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
@@ -932,7 +932,7 @@ begin
    _r         := 15;
    _srange    := 275;
    _ucl       := 6;
-   _btime     := ptime1;
+   _btime     := ptime1hh;
    _attack    := atm_always;
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
@@ -950,7 +950,7 @@ begin
    _r         := 15;
    _srange    := 275;
    _ucl       := 7;
-   _btime     := ptime1;
+   _btime     := ptime1hh;
    _attack    := atm_always;
    _ukbuilding:= true;
    _uklight   := true;
@@ -1136,7 +1136,7 @@ UID_UACDron:
 begin
    _mhits     := 2000;
    _renergy   := 300;
-   _r         := 13;
+   _r         := 15;
    _speed     := 12;
    _srange    := 225;
    _ucl       := 9;
@@ -1169,7 +1169,7 @@ begin
    _slowturn  := true;
    _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;
-   ups_apc    :=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
+   ups_transport:=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
 end;
 UID_Terminator:
 begin
@@ -1184,6 +1184,7 @@ begin
    _limituse  := ul3;
    _attack    := atm_always;
    _ukmech    := true;
+   _splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _uklight   := false;
@@ -1222,10 +1223,11 @@ begin
    _limituse  := ul3;
    _attack    := atm_always;
    _ukmech    := true;
+   _splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
-   _weapon(0,wpt_missle,aw_srange,0,-8,fr_fpsd2,MID_URocket,0,0               ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly);
-   _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fps1 ,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_hits       ,0,0);
+   _weapon(0,wpt_missle,aw_fsr+25,0,-8,fr_fpsd2,MID_URocket,0,0               ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly  );
+   _weapon(1,wpt_missle,aw_fsr+25,0,0 ,fr_fpsd3,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_light      ,0,dm_AntiLight);
 end;
 
 UID_APC:
@@ -1244,7 +1246,7 @@ begin
    _slowturn  := true;
    _splashresist:=true;
    _fastdeath_hits:=1;
-   ups_apc    :=uids_marines;
+   ups_transport    :=uids_marines;
 end;
 
 UID_UBaseMil:
@@ -1294,8 +1296,9 @@ end;
       then _painc_upgr:=(_painc div 2)+(_painc mod 2);
 
       _missile_r:=trunc(_r/1.4);
-      _hmhits :=_mhits div 2;
-      _hhmhits:=_hmhits div 2;
+      if(_mhits<1)then _mhits:=1;
+      _hmhits := _mhits div 2; if(_hmhits <1)then _hmhits :=1;
+      _hhmhits:=_hmhits div 2; if(_hhmhits<1)then _hhmhits:=1;
 
       if(_issmith)and(ups_upgrades=[])then
        for u:=1 to 255 do
@@ -1341,12 +1344,12 @@ begin
 case m of
 MID_ArchFire,
 MID_Mine           : mid_speed       :=32000;
-MID_Tank,
+MID_Tank           : mid_speed       :=100;
 MID_Chaingun,
 MID_SShot,
 MID_SSShot,
 MID_Bullet         : mid_speed       :=60;
-MID_Flyer          : mid_speed       :=20;
+MID_Flyer          : mid_speed       :=30;
 MID_Imp,
 MID_Cacodemon,
 MID_Baron,
@@ -1459,26 +1462,13 @@ begin
    SetDMOD(dm_AntiUnitLight   ,0,150,wtr_unit             +wtr_light           );
    SetDMOD(dm_AntiFly         ,0,150,                                wtr_fly   );
    SetDMOD(dm_AntiHeavy       ,0,150,                      wtr_heavy           );
+   SetDMOD(dm_AntiLight       ,0,150,                      wtr_light           );
    SetDMOD(dm_Cyber           ,0,300,wtr_building                              );
    SetDMOD(dm_Cyber           ,1, 50,                      wtr_light           );
    SetDMOD(dm_Siege           ,0,300,wtr_building                              );
    SetDMOD(dm_Blizzard        ,0,500,wtr_building                              );
    SetDMOD(dm_Blizzard        ,1, 50,                      wtr_light           );
    SetDMOD(dm_Lost            ,0, 50,             wtr_mech                     );
-
-{
-//dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
-//dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
-//dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
-//dm_AntiUnitMech        = 4 ; // 1.5*[unit mech]
-//dm_AntiUnitLight       = 5 ; // 1.5*[unit light]
-//dm_AntiFly             = 6 ; // 1.5*[fly]
-//dm_AntiHeavy           = 7 ; // 1.5*[heavy]
-//dm_Cyber               = 8 ; //   3*[buildings]      0.5*[light]
-//dm_Siege               = 9 ; //   3*[buildings]
-//dm_Blizzard            = 10; //   5*[buildings]      0.5*[light]
-//dm_Lost                = 11; //                      0.5*[mech ]
-}
 end;
 
 procedure GameObjectsInit;

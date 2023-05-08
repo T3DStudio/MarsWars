@@ -633,10 +633,11 @@ dm_AntiUnitMech        = 4 ; // 1.5*[unit mech]
 dm_AntiUnitLight       = 5 ; // 1.5*[unit light]
 dm_AntiFly             = 6 ; // 1.5*[fly]
 dm_AntiHeavy           = 7 ; // 1.5*[heavy]
-dm_Cyber               = 8 ; //   3*[buildings]      0.5*[light]
-dm_Siege               = 9 ; //   3*[buildings]
-dm_Blizzard            = 10; //   5*[buildings]      0.5*[light]
-dm_Lost                = 11; //                      0.5*[mech ]
+dm_AntiLight           = 8 ; // 1.5*[light]
+dm_Cyber               = 9 ; //   3*[buildings]      0.5*[light]
+dm_Siege               = 10; //   3*[buildings]
+dm_Blizzard            = 11; //   5*[buildings]      0.5*[light]
+dm_Lost                = 12; //                      0.5*[mech ]
 
 // LIMIT
 ul1                    = MinUnitLimit;

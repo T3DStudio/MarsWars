@@ -364,9 +364,9 @@ ui_bprod_first,
 ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_ucl_reload     : array[byte] of integer;
-ui_uibtn_move     : integer = 0; // ui move buttons
-ui_uibtn_action   : integer = 0; // ui action button
-ui_uibtn_rebuild  : integer = 0; // ui rebuild button
+ui_uibtn_move     : integer = 0;   // ui move buttons
+ui_uibtn_actionu  : PTUID   = nil; // ui action uid
+ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -708,6 +708,8 @@ str_cant_prod,
 str_check_reqs,
 str_transformation,
 str_upgradeslvl,
+str_demons,
+str_except,
 str_UnitArming,
 str_weapon_melee,
 str_weapon_ranged,

@@ -305,6 +305,64 @@ begin
     end;
 end;
 
+function WeaponTargets(tflags:cardinal;tset:TSoB):shortstring;
+var u:byte;
+  inset:TSoB;
+  innum:byte;
+  exset:TSoB;
+  exnum:byte;
+  instr,
+  exstr:shortstring;
+begin
+  WeaponTargets:='';
+  instr:='';
+  exstr:='';
+   if(tset<>uids_all     )then
+    if(tset=uids_arch_res)
+    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','+_uids[UID_Mastermind].un_txt_name+','+_uids[UID_ArchVile].un_txt_name+']'
+    else
+    begin
+      inset:=[];
+      innum:=0;
+      exset:=[];
+      exnum:=0;
+
+      for u:=1 to 255 do
+       if(u in tset)then
+       begin
+          inset+=[u];
+          innum+=1;
+       end
+       else
+       begin
+          exset+=[u];
+          exnum+=1;
+       end;
+
+      if(innum<3)then
+      begin
+         for u:=1 to 255 do
+          if(u in inset)then
+           _ADDSTR(@instr,_uids[u].un_txt_name,sep_comma);
+         if(length(instr)>0)then instr:='['+instr+']';
+      end;
+      if(exnum<3)then
+      begin
+         for u:=1 to 255 do
+          if(u in exset)then
+           _ADDSTR(@exstr,_uids[u].un_txt_name,sep_comma);
+         if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
+      end;
+   end;
+
+   if(length(instr)>0)
+   then WeaponTargets:=instr
+   else
+     if(length(exstr)>0)
+     then WeaponTargets:=BaseFlags2Str(tflags)+' '+exstr
+     else WeaponTargets:=BaseFlags2Str(tflags);
+end;
+
 function _MakeWeaponsDescription(uid:byte):shortstring;
 var w:byte;
 dmod_str,
@@ -340,7 +398,7 @@ begin
           wpt_suicide   : _ADDSTR(@weapon_str,str_weapon_suicide,sep_scomma);
           end;
 
-          _ADDSTR(@weapon_str,str_weapon_targets+BaseFlags2Str(aw_tarf),sep_scomma);
+          _ADDSTR(@weapon_str,str_weapon_targets+WeaponTargets(aw_tarf,aw_uids),sep_scomma);
           if(aw_dmod>0)then
             case aw_type of
           wpt_missle,
@@ -559,6 +617,8 @@ begin
    str_ability           := 'Special ability: ';
    str_transformation    := 'transformation to ';
    str_upgradeslvl       := 'Upgrades: ';
+   str_demons            := 'demons&zombies';
+   str_except            := 'except';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1099,6 +1159,8 @@ begin
   str_ability           := 'Специальная способность: ';
   str_transformation    := 'превращение в ';
   str_upgradeslvl       := 'Улучшения: ';
+  str_demons            := 'демоны и зомби';
+  str_except            := 'кроме';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';

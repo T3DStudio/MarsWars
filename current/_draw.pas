@@ -42,7 +42,7 @@ begin
 
    d_uimouse(r_screen);
 
-   if(_testmode>1){and(net_status=0)}then _draw_dbg;
+   if(_testmode>1)and(net_status=0)then _draw_dbg;
 end;
 
 
