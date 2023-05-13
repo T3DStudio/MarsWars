@@ -4,6 +4,7 @@ Other:
 - the game engine has been updated to make it easier to add new content(units, upgrades, etc);
 - sdl_mixer replaced by OpenAL;
 - multiplayer/replays system was improved: now possible to update all units every game tick;
+- added "skip backward" function to replays player;
 - map generator can make symmetrical maps now;
 - visual themes for maps;
 - maximum map size increased to 8000;

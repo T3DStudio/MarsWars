@@ -9,8 +9,8 @@ procedure ai_scout_pick(pu:PTUnit);forward;
 procedure aiu_code(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
-function _canmove  (pu:PTUnit):boolean; forward;
-function _canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
+function unit_canmove  (pu:PTUnit):boolean; forward;
+function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
 function pf_IfObstacleZone(zone:word):boolean;  forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
@@ -20,6 +20,8 @@ function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer;  forward;
+procedure replay_SavePlayPosition;forward;
+function replay_GetProgress:single;forward;
 {$ENDIF}
 
 procedure fr_init;
@@ -471,7 +473,7 @@ end;
 function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpl_rhead){$ENDIF})
+   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_rhead){$ENDIF})
                  or(team=0);
 end;
 
@@ -1077,7 +1079,7 @@ begin
    if(not rpls_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpl_rhead)or(_players[HPlayer].observer)then exit;
+     if(rpls_state>=rpls_state_rhead)or(_players[HPlayer].observer)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=_players[UIPlayer].team)then exit;
@@ -1159,6 +1161,10 @@ begin
 1..MaxPlayers : begin
                    pstr^:=str_pause;
                    pcol^:=PlayerGetColor(G_status);
+                end;
+gs_replayerror: begin
+                   pstr^:=str_reperror;
+                   pcol^:=c_white;
                 end;
 gs_replayend  : begin
                    pstr^:=str_repend;

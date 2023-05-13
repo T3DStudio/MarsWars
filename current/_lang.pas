@@ -301,6 +301,8 @@ begin
        else
          if(_apcm>0)then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_unload+'"',sep_sdot);
 
+       if(_splashresist)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
+
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
 end;
@@ -319,7 +321,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','+_uids[UID_Mastermind].un_txt_name+','+_uids[UID_ArchVile].un_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','
+                                                                                +_uids[UID_Mastermind].un_txt_name+','
+                                                                                +_uids[UID_ArchVile  ].un_txt_name+']'
     else
     begin
       inset:=[];
@@ -573,6 +577,7 @@ begin
    str_pause             := 'Pause';
    str_gsaved            := 'Game saved';
    str_repend            := 'Replay ended!';
+   str_reperror          := 'Read file error!';
    str_save              := 'Save';
    str_load              := 'Load';
    str_delete            := 'Delete';
@@ -619,6 +624,7 @@ begin
    str_upgradeslvl       := 'Upgrades: ';
    str_demons            := 'demons&zombies';
    str_except            := 'except';
+   str_splashresist      := 'Immune to splash damage';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -932,13 +938,16 @@ begin
    _mkHStrACT(13,str_maction);
 
    _mkHStrRPL(0 ,'Faster game speed'    ,false);
-   _mkHStrRPL(1 ,'Left click: skip 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
-                 'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
-                 'Skip 1 minute ('               +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
-   _mkHStrRPL(2 ,'Pause'                ,false);
-   _mkHStrRPL(3 ,'Player POV'           ,false);
-   _mkHStrRPL(4 ,'List of game messages',false);
-   _mkHStrRPL(5 ,'Fog of war'           ,false);
+   _mkHStrRPL(1 ,'Left click: back 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
+                 'Right click: back 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
+                 'Middle click: back 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
+   _mkHStrRPL(2 ,'Left click: skip 2 seconds ('                                +tc_lime+'E'+tc_default+')'+tc_nl1+
+                 'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'E'+tc_default+')'+tc_nl1+
+                 'Middle click: skip 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'E'+tc_default+')',true);
+   _mkHStrRPL(3 ,'Pause'                ,false);
+   _mkHStrRPL(4 ,'Player POV'           ,false);
+   _mkHStrRPL(5 ,'List of game messages',false);
+   _mkHStrRPL(6 ,'Fog of war'           ,false);
    _mkHStrRPL(8 ,'All players',false);
    _mkHStrRPL(9 ,'Player #1'  ,false);
    _mkHStrRPL(10,'Player #2'  ,false);
@@ -1115,11 +1124,12 @@ begin
   str_gsunknown         := 'Неизвестный статус!';
   str_gsaved            := 'Игра сохранена';
   str_repend            := 'Конец записи!';
+  str_reperror          := 'Ошибка при чтении файла!';
   str_save              := 'Сохранить';
   str_load              := 'Загрузить';
   str_delete            := 'Удалить';
   str_svld_errors_file  := 'Файл не'+tc_nl3+'существует!';
-  str_svld_errors_open  := 'Невозможно'+tc_nl3+'открыть файл!';
+  str_svld_errors_open  := 'Неполучилось'+tc_nl3+'открыть файл!';
   str_svld_errors_wdata := 'Неправильный'+tc_nl3+'размер файла!';
   str_svld_errors_wver  := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
@@ -1161,6 +1171,7 @@ begin
   str_upgradeslvl       := 'Улучшения: ';
   str_demons            := 'демоны и зомби';
   str_except            := 'кроме';
+  str_splashresist      := 'Невосприимчив к взрывной волне';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
@@ -1426,13 +1437,16 @@ begin
   _mkHStrACT(13,str_maction           );
 
   _mkHStrRPL(0 ,'Включить/выключить ускоренный просмотр',false);
-  _mkHStrRPL(1 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'W'+tc_default+')'+tc_nl1+
-                'Правый клик: пропустить 10 секунд ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
-                'Пропустить 1 минуту ('              +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true  );
-  _mkHStrRPL(2 ,'Пауза'                   ,false);
-  _mkHStrRPL(3 ,'Камера игрока'           ,false);
-  _mkHStrRPL(4 ,'Список игровых сообщений',false);
-  _mkHStrRPL(5 ,'Туман войны'             ,false);
+  _mkHStrRPL(1 ,'Левый клик: назад на 2 секунды ('                                 +tc_lime+'W'+tc_default+')'+tc_nl1+
+                'Правый клик: назад на 10 секунд ('  +tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
+                'Средний клик: назад на 1 минуту ('  +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true  );
+  _mkHStrRPL(2 ,'Левый клик: пропустить 2 секунды ('                               +tc_lime+'E'+tc_default+')'+tc_nl1+
+                'Правый клик: пропустить 10 секунд ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'E'+tc_default+')'+tc_nl1+
+                'Средний клик: пропустить 1 минуту ('+tc_lime+'Alt' +tc_default+'+'+tc_lime+'E'+tc_default+')',true  );
+  _mkHStrRPL(3 ,'Пауза'                   ,false);
+  _mkHStrRPL(4 ,'Камера игрока'           ,false);
+  _mkHStrRPL(5 ,'Список игровых сообщений',false);
+  _mkHStrRPL(6 ,'Туман войны'             ,false);
   _mkHStrRPL(8 ,'Все игроки'              ,false);
   _mkHStrRPL(9 ,'Игрок #1',false);
   _mkHStrRPL(10,'Игрок #2',false);

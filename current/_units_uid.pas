@@ -419,7 +419,7 @@ begin
    _splashresist:=true;
    _ukmech    := true;
    _upgr_regen:=upgr_race_regen_bio[r_hell];
-   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd6,MID_Chaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_UnitLight,0,dm_AntiUnitLight);
+   _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd6,MID_Chaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_UnitLight,0,dm_AntiLight);
 end;
 {
 12000  18000  19000
@@ -505,7 +505,7 @@ begin
    _limituse  := ul3;
    _attack    := atm_always;
    _a_BonusAntiGroundRange:=50;
-   _weapon(0,wpt_missle,aw_fsr,0,-8,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0,dm_Siege);
+   _weapon(0,wpt_missle,aw_fsr,0,-9,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0,dm_Siege);
 end;
 UID_Arachnotron:
 begin
@@ -958,7 +958,7 @@ begin
    _rebuild_uid     := UID_UGTurret;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-11,wtp_nolost_hits,0,dm_AntiFly);
+   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,wtp_nolost_hits,0,dm_AntiFly);
 end;
 
 UID_UMine:
@@ -1227,7 +1227,7 @@ begin
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _weapon(0,wpt_missle,aw_fsr+25,0,-8,fr_fpsd2,MID_URocket,0,0               ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly  );
-   _weapon(1,wpt_missle,aw_fsr+25,0,0 ,fr_fpsd3,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_light      ,0,dm_AntiLight);
+   _weapon(1,wpt_missle,aw_fsr+25,0,0 ,fr_fpsd3,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_light      ,0,0);
 end;
 
 UID_APC:
@@ -1454,21 +1454,22 @@ end;
 begin
    FillChar(_dmods,SizeOf(_dmods),0);
 
-   SetDMOD(dm_AntiUnitBioHeavy,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
-   SetDMOD(dm_SSGShot         ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
-   SetDMOD(dm_SSGShot         ,1, 50,             wtr_mech                     );
-   SetDMOD(dm_AntiUnitBioLight,0,150,wtr_unit    +wtr_bio +wtr_light           );
-   SetDMOD(dm_AntiUnitMech    ,0,150,wtr_unit    +wtr_mech                     );
-   SetDMOD(dm_AntiUnitLight   ,0,150,wtr_unit             +wtr_light           );
-   SetDMOD(dm_AntiFly         ,0,150,                                wtr_fly   );
-   SetDMOD(dm_AntiHeavy       ,0,150,                      wtr_heavy           );
-   SetDMOD(dm_AntiLight       ,0,150,                      wtr_light           );
-   SetDMOD(dm_Cyber           ,0,300,wtr_building                              );
-   SetDMOD(dm_Cyber           ,1, 50,                      wtr_light           );
-   SetDMOD(dm_Siege           ,0,300,wtr_building                              );
-   SetDMOD(dm_Blizzard        ,0,500,wtr_building                              );
-   SetDMOD(dm_Blizzard        ,1, 50,                      wtr_light           );
-   SetDMOD(dm_Lost            ,0, 50,             wtr_mech                     );
+   SetDMOD(dm_AntiUnitBioHeavy ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
+   SetDMOD(dm_SSGShot          ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
+   SetDMOD(dm_SSGShot          ,1, 50,             wtr_mech                     );
+   SetDMOD(dm_AntiUnitBioLight ,0,150,wtr_unit    +wtr_bio +wtr_light           );
+   SetDMOD(dm_AntiUnitMech     ,0,150,wtr_unit    +wtr_mech                     );
+   SetDMOD(dm_AntiUnitLight    ,0,150,wtr_unit             +wtr_light           );
+   SetDMOD(dm_AntiFly          ,0,150,                                wtr_fly   );
+   SetDMOD(dm_AntiHeavy        ,0,150,                      wtr_heavy           );
+   SetDMOD(dm_AntiLight        ,0,150,                      wtr_light           );
+   SetDMOD(dm_AntiBuildingLight,0,150,wtr_building+         wtr_light           );
+   SetDMOD(dm_Cyber            ,0,300,wtr_building                              );
+   SetDMOD(dm_Cyber            ,1, 50,wtr_unit+             wtr_light           );
+   SetDMOD(dm_Siege            ,0,300,wtr_building                              );
+   SetDMOD(dm_Blizzard         ,0,500,wtr_building                              );
+   SetDMOD(dm_Blizzard         ,1, 50,wtr_unit+             wtr_light           );
+   SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
 end;
 
 procedure GameObjectsInit;

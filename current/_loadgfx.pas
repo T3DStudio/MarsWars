@@ -565,6 +565,7 @@ begin
    spr_b_cancel   := LoadBtn('b_cancle' ,vid_bw);
    spr_b_rfast    := LoadBtn('b_rfast'  ,vid_bw);
    spr_b_rskip    := LoadBtn('b_rskip'  ,vid_bw);
+   spr_b_rback    := LoadBtn('b_rback'  ,vid_bw);
    spr_b_rfog     := LoadBtn('b_fog'    ,vid_bw);
    spr_b_rlog     := LoadBtn('b_log'    ,vid_bw);
    spr_b_rstop    := LoadBtn('b_rstop'  ,vid_bw);

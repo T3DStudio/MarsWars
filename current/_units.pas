@@ -46,7 +46,7 @@ begin
               buff[ub_Summoned]:=fr_fps1;
               {$IFDEF _FULLGAME}
               _unit_CalcForR(pu);
-              _unit_summon_effects(pu,nil);
+              effect_UnitSummon(pu,nil);
               {$ENDIF}
            end;
         end;
@@ -116,7 +116,7 @@ begin
                 if(level>0)then pains+=level*2;
 
                 {$IFDEF _FULLGAME}
-                _unit_pain_effects(pu,nil);
+                effect_UnitPain(pu,nil);
                 {$ENDIF}
              end;
           end;
@@ -320,7 +320,7 @@ begin
     if(x=vx)and(y=vy)then
      if(x<>mv_x)or(y<>mv_y)then
       if(not _IsUnitRange(transport,nil))then
-       if(_canmove(pu))then
+       if(unit_canmove(pu))then
        begin
           ss:=speed;
 
@@ -731,8 +731,8 @@ begin
          exit;
       end;
 
-      pushout      := solid and _canmove(pu) and (a_rld<=0);
-      attack_target:= _canAttack(pu,false);
+      pushout      := solid and unit_canmove(pu) and (a_rld<=0);
+      attack_target:= unit_canAttack(pu,false);
       aicode       := (state=ps_comp);//and(sel);
       fteleport_tar:= (not _IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
@@ -836,7 +836,7 @@ begin
          t_weap :=255;
          a_tarp :=nil;
          t_prio :=0;
-         ftarget:=_canAttack(pu,false);
+         ftarget:=unit_canAttack(pu,false);
       end
       else ftarget:=false;
 
@@ -889,7 +889,7 @@ begin
           _unit_kill(pu,false,true,false,false);
           _unit_ability_HellVision:=true;
           {$IFDEF _FULLGAME}
-          _LevelUpEffect(tu,EID_Hvision,nil);
+          effect_LevelUp(tu,EID_Hvision,nil);
           {$ENDIF}
        end;
    end;
@@ -1280,7 +1280,7 @@ begin
          a_exp_next:=level*ExpLevel1+ExpLevel1;
          GameLogUnitPromoted(pu);
          {$IFDEF _FULLGAME}
-         _LevelUpEffect(pu,0,nil);
+         effect_LevelUp(pu,0,nil);
          {$ENDIF}
       end;
    end;
@@ -1414,7 +1414,7 @@ wmove_noneed    : if(not attackinmove)then
            attackinmove:=(aw_reqf and wpr_move)>0;
       end;
 
-      if(not _canAttack(pu,true))then
+      if(not unit_canAttack(pu,true))then
       begin
          mv_x:=x;
          mv_y:=y;
@@ -1448,7 +1448,7 @@ wmove_noneed    : if(not attackinmove)then
                if(ServerSide)then StayWaitForNextTarget:=(a_rld div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
-            _unit_attack_effects(pu,true,@attackervis);
+            effect_UnitAttack(pu,true,@attackervis);
             {$ENDIF}
             _visEffs;
          end;
@@ -1472,7 +1472,7 @@ wmove_noneed    : if(not attackinmove)then
             then fakemissile:=false
             else fakemissile:=(a_shots mod aw_fakeshots)>0;
             {$IFDEF _FULLGAME}
-            _unit_attack_effects(pu,false,@attackervis);
+            effect_UnitAttack(pu,false,@attackervis);
             if(targetvis)then
              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
              begin
@@ -1608,7 +1608,7 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
       else StayWaitForNextTarget:=0;
 
       if(apctu=nil)then
-        if(_canmove(pu))then
+        if(unit_canmove(pu))then
           if(mp_x<>mv_x)or(mp_y<>mv_y)then
           begin
              if(not uid^._slowturn)and(player^.state<>ps_comp)then

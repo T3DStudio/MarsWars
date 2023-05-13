@@ -376,7 +376,7 @@ begin
 
          wanim:=false;
          if(G_Status=gs_running)then
-          if(_canmove(pu))then
+          if(unit_canmove(pu))then
            wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
 
          spr:=_unit2spr(pu);

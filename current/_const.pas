@@ -72,8 +72,9 @@ gs_running             = 0;  //
  gs_paused5            = 5;
  gs_paused6            = 6;}
 gs_replayend           = 10;
-gs_waitserver          = 11;
-gs_replaypause         = 12;
+gs_replayerror         = 11;
+gs_waitserver          = 12;
+gs_replaypause         = 13;
 gs_win_team0           = 20; // 0
 gs_win_team1           = 21;
 gs_win_team2           = 22;
@@ -634,10 +635,11 @@ dm_AntiUnitLight       = 5 ; // 1.5*[unit light]
 dm_AntiFly             = 6 ; // 1.5*[fly]
 dm_AntiHeavy           = 7 ; // 1.5*[heavy]
 dm_AntiLight           = 8 ; // 1.5*[light]
-dm_Cyber               = 9 ; //   3*[buildings]      0.5*[light]
-dm_Siege               = 10; //   3*[buildings]
-dm_Blizzard            = 11; //   5*[buildings]      0.5*[light]
-dm_Lost                = 12; //                      0.5*[mech ]
+dm_AntiBuildingLight   = 9 ; // 1.5*[buildings light]
+dm_Cyber               = 10; //   3*[buildings]      0.5*[light]
+dm_Siege               = 11; //   3*[buildings]
+dm_Blizzard            = 12; //   5*[buildings]      0.5*[light]
+dm_Lost                = 13; //                      0.5*[mech ]
 
 // LIMIT
 ul1                    = MinUnitLimit;
@@ -1313,12 +1315,11 @@ rpls_file_none         = 0;
 rpls_file_write        = 1;
 rpls_file_read         = 2;
 
-rpl_none               = 0;
-rpl_whead              = 1;
-rpl_wunit              = 2;
-rpl_rhead              = 3;
-rpl_runit              = 4;
-rpl_end                = 5;
+rpls_state_none        = 0;
+rpls_state_whead       = 1;
+rpls_state_wunit       = 2;
+rpls_state_rhead       = 3;
+rpls_state_runit       = 4;
 
 SvRpLen                = 15;
 

@@ -290,11 +290,13 @@ rpls_pnu          : integer = 0; // quality
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info     : shortstring = '';
-rpls_state        : byte = rpl_none;
+rpls_state        : byte = rpls_state_none;
 rpls_list         : array of shortstring;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
+rpls_ReadPosN     : int64 = 0;
+rpls_ReadPosL     : array of TReplayPos;
 rpls_step         : integer = 1;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
@@ -303,9 +305,9 @@ rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_fog          : boolean = false;
 rpls_ticks        : byte = 0;
-rpls_file_head_size: cardinal = 0;
+rpls_file_head_size
+                  : cardinal = 0;
 rpls_file_size    : cardinal = 0;
-rpls_rbytes        : cardinal = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
@@ -417,6 +419,7 @@ ks_ctrl,
 ks_alt,
 ks_mleft,
 ks_mright,
+ks_mmiddle,
 k_chart           : integer;
 k_char            : char;
 k_keyboard_string         : shortstring = '';
@@ -665,6 +668,7 @@ spr_c_deimos ,
 spr_b_mmark,
 spr_b_rfast,
 spr_b_rskip,
+spr_b_rback,
 spr_b_rfog,
 spr_b_rclck,
 spr_b_rlog,
@@ -720,6 +724,7 @@ str_weapon_spawn,
 str_weapon_suicide,
 str_weapon_targets,
 str_weapon_damage,
+str_splashresist,
 str_ability,
 str_builder,
 str_barrack,
@@ -802,6 +807,7 @@ str_waitsv,
 str_gsunknown,
 str_cmpdif,
 str_repend,
+str_reperror,
 str_replay,
 str_replay_name,
 str_play,
@@ -841,6 +847,7 @@ str_svld_errors_file,
 str_svld_errors_open,
 str_svld_errors_wdata,
 str_svld_errors_wver,
+str_rpls_errors_open,
 str_MObjectives,
 str_MMap,
 str_MPlayers      : shortstring;
@@ -854,7 +861,7 @@ str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
 str_hint_r,
 str_hint_o        : array[0.._mhkeys] of shortstring;
-str_rpl           : array[0..5] of shortstring = ('OFF','REC','REC','PLAY','PLAY','END');
+str_rpl           : array[0..4] of shortstring = ('OFF','RECORD','RECORD','PLAY','PLAY');
 
 {str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;

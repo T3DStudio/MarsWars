@@ -45,7 +45,7 @@ begin
              CPoint_ChangeOwner(i,0);
              cpCapturer:=-cpCapturer;
              {$IFDEF _FULLGAME}
-             _CPExplode(cpx,cpy);
+             effect_CPExplode(cpx,cpy);
              {$ENDIF}
           end;
        end;

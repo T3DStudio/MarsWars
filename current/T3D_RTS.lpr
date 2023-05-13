@@ -2,6 +2,7 @@ program T3D_RTS;
 
 {
 - когда игрок теряет всех строителей - на клиентской стороне не раскрываются его невидимые юниты
+- надо придумать куда выводить ошибку в случае неудачной попытки начать записывать реплей
 }
 
 {$DEFINE _FULLGAME}
@@ -9,7 +10,7 @@ program T3D_RTS;
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
-  //{$APPTYPE GUI}
+  {$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}

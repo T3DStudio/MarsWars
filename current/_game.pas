@@ -207,7 +207,7 @@ begin
 
    rpls_pnu  :=0;
    rpls_plcam:=false;
-   if(rpls_state>rpl_wunit)then rpls_state:=rpl_none;
+   if(rpls_state>rpls_state_wunit)then rpls_state:=rpls_state_none;
    {$ELSE}
    screen_redraw:=true;
    {$ENDIF}
@@ -548,29 +548,32 @@ begin
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-        if(G_Started)and(G_Status=gs_running)and(ServerSide)then
+        if(G_Started)and(G_Status=gs_running)then
         begin
            if(build_cd>0)then build_cd-=1;
 
-           PlayerExecuteOrder(p);
+           if(ServerSide)then
+           begin
+              PlayerExecuteOrder(p);
 
-           if(state=ps_comp)
-           then ai_player_code(p)
-           else
-             if(log_EnergyCheck>0)
-             then log_EnergyCheck-=1
-             else
-               if(cenergy>=0)
-               then log_EnergyCheck:=1
-               else
-               begin
-                  log_EnergyCheck:=fr_fps6;
-                  PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1,false);
-               end;
+              if(state=ps_comp)
+              then ai_player_code(p)
+              else
+                if(log_EnergyCheck>0)
+                then log_EnergyCheck-=1
+                else
+                  if(cenergy>=0)
+                  then log_EnergyCheck:=1
+                  else
+                  begin
+                     log_EnergyCheck:=fr_fps6;
+                     PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1,false);
+                  end;
 
-           if(prod_error_cndt>0)then
-             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
-           prod_error_cndt  :=0;
+              if(prod_error_cndt>0)then
+                GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
+              prod_error_cndt  :=0;
+           end;
         end;
      end;
 

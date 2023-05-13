@@ -422,14 +422,15 @@ begin
       end;
 
       3: // actions
-      if(rpls_state>=rpl_rhead)then
+      if(rpls_state>=rpls_state_rhead)then
       begin
          _drawBtn(tar,0,0,spr_b_rfast,uncappedFPS ,false);
-         _drawBtn(tar,1,0,spr_b_rskip,false       ,false);
-         _drawBtn(tar,2,0,spr_b_rstop,g_status>0  ,false);
-         _drawBtn(tar,0,1,spr_b_rvis ,rpls_plcam  ,false);
-         _drawBtn(tar,1,1,spr_b_rlog ,rpls_showlog,false);
-         _drawBtn(tar,2,1,spr_b_rfog ,rpls_fog    ,false);
+         _drawBtn(tar,1,0,spr_b_rback,false       ,false);
+         _drawBtn(tar,2,0,spr_b_rskip,false       ,false);
+         _drawBtn(tar,0,1,spr_b_rstop,g_status>0  ,false);
+         _drawBtn(tar,1,1,spr_b_rvis ,rpls_plcam  ,false);
+         _drawBtn(tar,2,1,spr_b_rlog ,rpls_showlog,false);
+         _drawBtn(tar,0,2,spr_b_rfog ,rpls_fog    ,false);
 
          ux:=2;
          uy:=2;
@@ -473,7 +474,7 @@ end;
 procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy,i,r:integer;
 begin
-   if(rpls_state<rpl_rhead)then
+   if(rpls_state<rpls_state_rhead)then
    begin
       D_BuildUI(tar,lx,ly);
 
@@ -554,7 +555,7 @@ begin
            if(ui_tab=3)then
            begin
               if(i<=_mhkeys)then
-                if(rpls_state>=rpl_rhead)
+                if(rpls_state>=rpls_state_rhead)
                 then hs1:=@str_hint_r[i]
                 else
                   if(_players[HPlayer].observer)
@@ -616,9 +617,7 @@ begin
    x:=vid_mapx;
    y:=vid_mapy+vid_cam_h-font_w;
 
-   if(rpls_file_size=0)or(rpls_state=rpl_end)
-   then cx:=1
-   else cx:=rpls_rbytes/rpls_file_size;
+   cx:=replay_GetProgress;
 
    w:=round(vid_cam_w*cx);
 
@@ -640,8 +639,7 @@ chat_allies  : ChatString:=str_chat_allies;
 end;
 begin
    // replay progress bar
-   //vid_mapy+vid_cam_h
-   if(rpls_state>=rpl_rhead)then
+   if(rpls_state=rpls_state_runit)then
      D_ReplayProgress(tar);
 
    // LOG and HINTs
@@ -675,7 +673,7 @@ begin
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col,VisPlayer))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
-   if(VisPlayer<>HPlayer)or(rpls_state>=rpl_rhead)then
+   if(VisPlayer<>HPlayer)or(rpls_state>=rpls_state_rhead)then
      if(VisPlayer>0)
      then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,PlayerGetColor(VisPlayer))
      else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white                  );

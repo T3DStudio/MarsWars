@@ -8,7 +8,7 @@ begin
    end;
 end;
 
-procedure _LevelUpEffect(pu:PTUnit;etype:byte;vischeck:pboolean);
+procedure effect_LevelUp(pu:PTUnit;etype:byte;vischeck:pboolean);
 begin
    with pu^ do
    begin
@@ -43,7 +43,7 @@ r_uac  : begin
    end;
 end;
 
-procedure _uac_rocketl_eff(pu:PTUnit);
+procedure effect_RStationShot(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -52,7 +52,7 @@ begin
    end;
 end;
 
-procedure _CPExplode(vx,vy:integer);
+procedure effect_CPExplode(vx,vy:integer);
 begin
    _effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
    if(PointInScreenP(vx,vy))then
@@ -62,7 +62,7 @@ begin
    end;
 end;
 
-procedure _unit_summon_effects(pu:PTUnit;vischeck:pboolean);
+procedure effect_UnitSummon(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
    if(hits>0)and(iscomplete)then
@@ -82,7 +82,7 @@ begin
    end;
 end;
 
-procedure _unit_death_effects(pu:PTUnit;fastdeath:boolean;vischeck:pboolean);
+procedure effect_UnitDeath(pu:PTUnit;fastdeath:boolean;vischeck:pboolean);
 begin
    with pu^ do
    with uid^ do
@@ -110,7 +110,7 @@ begin
    end;
 end;
 
-procedure _unit_pain_effects(pu:PTUnit;vischeck:pboolean);
+procedure effect_UnitPain(pu:PTUnit;vischeck:pboolean);
 begin
    with pu^ do
    with uid^ do
@@ -127,7 +127,7 @@ begin
    end;
 end;
 
-procedure _pain_lost_fail(tx,ty,dy:integer;vischeck:pboolean);
+procedure effect_PainSpawnFail(tx,ty,dy:integer;vischeck:pboolean);
 begin
    if(vischeck<>nil)then
    begin
@@ -140,7 +140,7 @@ begin
    SoundPlayUnit(snd_pexp,nil,nil);
 end;
 
-procedure _unit_attack_effects(pu:PTUnit;start:boolean;vischeck:pboolean);
+procedure effect_UnitAttack(pu:PTUnit;start:boolean;vischeck:pboolean);
 begin
    with pu^  do
    with uid^ do
@@ -168,15 +168,15 @@ end;
 
 {$ENDIF}
 
-function _canmove(pu:PTUnit):boolean;
+function unit_canmove(pu:PTUnit):boolean;
 begin
    with pu^ do
    with uid^ do
     if(ServerSide=false)and(speed>0)
-    then _canmove:=(x<>mv_x)or(y<>mv_y)
+    then unit_canmove:=(x<>mv_x)or(y<>mv_y)
     else
     begin
-       _canmove:=false;
+       unit_canmove:=false;
 
        if(speed<=0)
        or(hits<=0)
@@ -194,14 +194,14 @@ begin
          if(buff[ub_Pain]>0)
          or(buff[ub_Cast]>0)then exit;
 
-       _canmove:=true;
+       unit_canmove:=true;
     end;
 end;
 
-function _canAttack(pu:PTUnit;check_buffs:boolean):boolean;
+function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean;
 var tu:PTUnit;
 begin
-   _canAttack:=false;
+   unit_canAttack:=false;
    with pu^  do
    with uid^ do
    begin
@@ -230,7 +230,7 @@ begin
       else exit;
       end;
    end;
-   _canAttack:=true;
+   unit_canAttack:=true;
 end;
 
 procedure _unit_update_xy(pu:PTUnit);
@@ -419,7 +419,7 @@ begin
             upgr[upgr_hell_invuln]-=1;
             _unit_ability_HInvuln:=true;
             {$IFDEF _FULLGAME}
-            _LevelUpEffect(tu,EID_Invuln,nil);
+            effect_LevelUp(tu,EID_Invuln,nil);
             {$ENDIF}
          end;
    end;
@@ -431,7 +431,7 @@ begin
    begin
       _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_Blizzard);
       {$IFDEF _FULLGAME}
-      _uac_rocketl_eff(pu);
+      effect_RStationShot(pu);
       {$ENDIF}
    end;
 end;
@@ -968,7 +968,7 @@ begin
       begin
          buff[ub_Summoned]:=fr_fps1;
          {$IFDEF _FULLGAME}
-         _unit_summon_effects(_LastCreatedUnitP,nil);
+         effect_UnitSummon(_LastCreatedUnitP,nil);
          {$ENDIF}
       end;
    end;
@@ -1452,7 +1452,7 @@ begin
       else
         case auid of
 UID_Phantom,
-UID_LostSoul: _pain_lost_fail(tx,ty,_SpriteDepth(ty+1,ukfly),nil);
+UID_LostSoul: effect_PainSpawnFail(tx,ty,_SpriteDepth(ty+1,ukfly),nil);
         end;
       {$ENDIF};
    end;
@@ -1587,7 +1587,7 @@ begin
 
          GameLogUnitAttacked(pu);
          {$IFDEF _FULLGAME}
-         _unit_death_effects(pu,fastdeath,nil);
+         effect_UnitDeath(pu,fastdeath,nil);
          {$ENDIF}
       end;
 

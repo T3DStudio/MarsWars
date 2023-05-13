@@ -87,15 +87,14 @@ begin
             for vr:=1 to MaxPlayers do
             begin
                if(vr=hp)
-               then svld_str_info+=chr(vr)+'*'+tc_default+pls[vr].name
-               else svld_str_info+=chr(vr)+'#'+tc_default+pls[vr].name;
+               then svld_str_info+=chr(vr)+'*'+tc_default
+               else svld_str_info+=chr(vr)+'#'+tc_default;
 
-               if(pls[vr].state=PS_None)
-               then svld_str_info+=tc_nl3
-               else
+               if(pls[vr].state>PS_None)then
                  if(pls[vr].team=0)
-                 then svld_str_info+=','+str_observer[1]+','+t2c(pls[vr].team)+tc_nl3
-                 else svld_str_info+=','+str_race[pls[vr].mrace][2]+','+t2c(pls[vr].team)+tc_nl3;
+                 then svld_str_info+=str_observer[1]           +','+t2c(pls[vr].team)+','
+                 else svld_str_info+=str_race[pls[vr].mrace][2]+','+t2c(pls[vr].team)+',';
+               svld_str_info+=pls[vr].name+tc_nl3
             end;
          end;
       end

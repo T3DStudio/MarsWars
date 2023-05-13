@@ -144,6 +144,11 @@ PTSoundSet = ^TSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+TReplayPos = record
+   rp_fpos : int64;
+   rp_gtick: cardinal;
+end;
+
 {$ENDIF}
 
 TDamageMod = array[0..MaxDamageModFactors] of record

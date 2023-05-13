@@ -413,7 +413,7 @@ nmid_lobby_info  : begin
             G_Status:=net_readbyte;
 
             if(G_Status=gs_running)
-            then _rclinet_gframe(HPlayer,false);
+            then _rclinet_gframe(HPlayer,false,false);
          end;
       end;
    end;

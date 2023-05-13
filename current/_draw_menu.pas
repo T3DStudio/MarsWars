@@ -360,6 +360,7 @@ begin
                     hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,t,c_gray);
                  end;
 
+                 // game options
                  _draw_text(tar,ui_menu_csm_xt1, _yt(1), str_goptions, ta_left,255, c_white);
 
                  y:=_yt(2);
@@ -389,19 +390,20 @@ begin
                  y:=_yt(8);
                  _draw_text(tar,ui_menu_csm_xc , y, str_randoms        , ta_middle,255, mic((G_Started=false)and(net_status=0),false));
 
+                 // replays
                  y:=_yt(10);
                  _draw_text(tar,ui_menu_csm_xt1, y, str_replay         , ta_left ,255, c_white);
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state], ta_right,255, mic( rpls_state<rpl_rhead ,rpls_state>rpl_none));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state], ta_right,255, mic( rpls_state<rpls_state_rhead ,rpls_state>rpls_state_none));
                  t:=_yl(10);
                  vlineColor(tar,ui_menu_csm_x3 ,t,t+ui_menu_csm_ys, c_gray);
                  y:=_yt(11);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_replay_name, ta_left,255, mic( rpls_state=rpl_none ,false));
-                 _draw_text(tar,ui_menu_csm_xt3, y, rpls_str_name  , ta_left,255, mic( rpls_state=rpl_none ,menu_item=83));
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_replay_name, ta_left,255, mic( rpls_state=rpls_state_none ,false));
+                 _draw_text(tar,ui_menu_csm_xt3, y, rpls_str_name  , ta_left,255, mic( rpls_state=rpls_state_none ,menu_item=83));
                  y:=_yl(11);
                  vlineColor(tar,ui_menu_csm_xc ,y,y+ui_menu_csm_ys,c_gray);
                  y:=_yt(12);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpl_rhead ,false));
-                 if(rpls_state>rpl_none)and(g_cl_units>0)then
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpls_state_rhead ,false));
+                 if(rpls_state>rpls_state_none)and(g_cl_units>0)then
                  _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
               end;
    ms2_mult : begin

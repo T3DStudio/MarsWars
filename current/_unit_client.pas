@@ -584,7 +584,7 @@ begin
    begin
       vx:=x;
       vy:=y;
-      _unit_summon_effects(uu,vis);
+      effect_UnitSummon(uu,vis);
    end;
 end;
 
@@ -631,7 +631,7 @@ begin
            _unit_CalcForR(uu);
            if(buff[ub_Summoned]>0)then _SummonEffect  (uu,@vis);
            if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
-           if(buff[ub_HVision ]>0)then _LevelUpEffect (uu,EID_HVision,@vis);
+           if(buff[ub_HVision ]>0)then effect_LevelUp (uu,EID_HVision,@vis);
 
            if(playeri=UIPlayer)then
            begin
@@ -658,7 +658,7 @@ begin
 
                 with uid^ do
                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
-                _unit_death_effects(uu,true,@vis);
+                effect_UnitDeath(uu,true,@vis);
              end;
           end;
 
@@ -688,8 +688,8 @@ begin
                true : if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then _TeleportEffect(uu,pu  );
                end;
                if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _SummonEffect     (uu,            @vis);
-               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then _LevelUpEffect    (uu,EID_HVision,@vis);
-               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then _unit_pain_effects(uu,            @vis);
+               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then effect_LevelUp    (uu,EID_HVision,@vis);
+               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then effect_UnitPain(uu,            @vis);
 
                if(pu^.iscomplete)and(iscomplete=false)then
                 if(playeri=UIPlayer)then
@@ -710,9 +710,9 @@ begin
 
                   if(uid^._ukbuilding=false)then
                   begin
-                     if(pu^.level<level)then _LevelUpEffect(uu,0,@vis);
+                     if(pu^.level<level)then effect_LevelUp(uu,0,@vis);
 
-                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then _LevelUpEffect(uu,EID_Invuln,@vis);
+                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then effect_LevelUp(uu,EID_Invuln,@vis);
                   end;
                end;
             end;
@@ -728,7 +728,7 @@ begin
               begin
                  with uid^ do
                    if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
-                 _unit_death_effects(uu,hits<=fdead_hits,@vis);
+                 effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
                   if(_death_missile>0)
@@ -777,7 +777,6 @@ begin
       {$I-}
       BlockRead(rpls_file,sl,SizeOf(sl));
       {$I+}
-      rpls_rbytes+=SizeOf(sl)+sl;
       for x:=1 to sl do
       begin
          c:=#0;
@@ -793,35 +792,35 @@ function _rudata_byte(rpl:boolean;def:byte):byte;
 begin
    if(rpl=false)
    then _rudata_byte:=net_readbyte
-   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));{$I+}rpls_rbytes+=SizeOf(_rudata_byte);if(ioresult<>0)then _rudata_byte:=def;  end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));{$I+}if(ioresult<>0)then _rudata_byte:=def;  end;
 end;
 
 function _rudata_word(rpl:boolean;def:word):word;
 begin
    if(rpl=false)
    then _rudata_word:=net_readword
-   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));{$I+}rpls_rbytes+=SizeOf(_rudata_word);if(ioresult<>0)then _rudata_word:=def;  end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));{$I+}if(ioresult<>0)then _rudata_word:=def;  end;
 end;
 
 function _rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
    if(rpl=false)
    then _rudata_sint:=net_readsint
-   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));{$I+}rpls_rbytes+=SizeOf(_rudata_sint);if(ioresult<>0)then _rudata_sint:=def; end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));{$I+}if(ioresult<>0)then _rudata_sint:=def;  end;
 end;
 
 function _rudata_int(rpl:boolean;def:integer):integer;
 begin
    if(rpl=false)
    then _rudata_int:=net_readint
-   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));{$I+}rpls_rbytes+=SizeOf(_rudata_int );if(ioresult<>0)then _rudata_int :=def;  end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));{$I+}if(ioresult<>0)then _rudata_int :=def;  end;
 end;
 
 function _rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
    if(rpl=false)
    then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));{$I+}rpls_rbytes+=SizeOf(_rudata_card);if(ioresult<>0)then _rudata_card:=def; end;
+   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));{$I+}if(ioresult<>0)then _rudata_card:=def;  end;
 end;
 
 procedure  _rudata_log(p:byte;rpl:boolean);
@@ -988,7 +987,7 @@ begin
    end;
 end;
 
-procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;POVPlayerObserver:boolean);
+procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;POVPlayerObserver,SkipRead:boolean);
 var sh: shortint;
     i : byte;
     wt: word;
@@ -1060,7 +1059,7 @@ begin
         -127: hits:=dead_hits;
         -128: hits:=ndead_hits;
         end;
-      if(rpl)and(rpls_step>2)then
+      if(SkipRead)then
       begin
          vx:=x;
          vy:=y;
@@ -1104,7 +1103,7 @@ begin
     if((g_player_status and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
 end;
 
-procedure _rclinet_cpoint(cpi:byte;rpl:boolean);
+procedure _rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
 var b,t,p:byte;
 begin
    with g_cpoints[cpi] do
@@ -1117,7 +1116,8 @@ begin
          begin
             CPoint_ChangeOwner(cpi,0);
             cpCaptureR:=-cpCaptureR;
-            _CPExplode(cpx,cpy);
+            if(not no_effect)
+            then effect_CPExplode(cpx,cpy);
          end;
       end
       else
@@ -1142,7 +1142,7 @@ begin
    end;
 end;
 
-procedure _rclinet_gframe(POVPlayer:byte;rpl:boolean);
+procedure _rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
 var
 wstep  : cardinal;
 POVPlayerObserver,
@@ -1170,7 +1170,7 @@ begin
      or(g_mode=gm_KotH)
      or(g_cgenerators>0)then
       for i:=1 to MaxCPoints do
-       _rclinet_cpoint(i,rpl);
+       _rclinet_cpoint(i,rpl,fast_skip);
 
    if(wstepb1)then
      case g_mode of
@@ -1217,9 +1217,9 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
            _units[_N_U].unum:=_N_U;
            if( g_player_status and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0
            then break
-           else _rudata_main(@_units[_N_U],rpl,true,POVPlayer,POVPlayerObserver);
+           else _rudata_main(@_units[_N_U],rpl,true,POVPlayer,POVPlayerObserver,fast_skip);
          end;
-         _rudata_main(@_units[_N_U],rpl,false,POVPlayer,POVPlayerObserver);
+         _rudata_main(@_units[_N_U],rpl,false,POVPlayer,POVPlayerObserver,fast_skip);
       end;
    end;
 end;

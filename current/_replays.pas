@@ -58,20 +58,18 @@ begin
          BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer          ));
 
-         //rpls_str_info:=rpls_str_info+str_players+':'+tc_nl3;
-
          for vr:=1 to MaxPlayers do
          begin
             BlockRead(f,fn ,sizeof(fn));
 
-            rpls_str_info+=chr(vr)+pl_n_ch[vr=hp]+tc_default+fn;
+            rpls_str_info+=chr(vr)+pl_n_ch[vr=hp]+tc_default;
 
             t:=0;
             tm:=0;
             BlockRead(f,t,1);
             if(t=PS_none)then
             begin
-               rpls_str_info+=tc_nl3;
+               rpls_str_info+=fn+tc_nl3;
                BlockRead(f,mw,3);
             end
             else
@@ -81,12 +79,12 @@ begin
                BlockRead(f,t ,1);
 
                if(t=0)
-               then rpls_str_info+=','+str_observer[1]
+               then rpls_str_info+=str_observer[1]
                else
                  if(tm<=r_cnt)
-                 then rpls_str_info+=','+str_race[t][2]
-                 else rpls_str_info+=',?';
-               rpls_str_info+=','+t2c(t)+tc_nl3;
+                 then rpls_str_info+=str_race[tm][2]
+                 else rpls_str_info+='?';
+               rpls_str_info+=','+t2c(t)+','+fn+tc_nl3;
             end;
          end;
       end
@@ -122,29 +120,95 @@ begin
                    +sizeof(team ))*MaxPlayers;
 end;
 
+function replay_GetProgress:single;
+begin
+   replay_GetProgress:=0;
+
+   if(rpls_fstatus=rpls_file_read)and(rpls_file_size>0)then
+     if(rpls_state=rpls_state_rhead)
+     or(rpls_state=rpls_state_runit)then
+     begin
+        replay_GetProgress:=FilePos(rpls_file)/rpls_file_size;
+        if(replay_GetProgress>1)then replay_GetProgress:=1;
+        if(replay_GetProgress<0)then replay_GetProgress:=0;
+     end;
+end;
+
+procedure replay_SavePlayPosition;
+begin
+   if(rpls_fstatus<>rpls_file_read)
+   or(rpls_state  <>rpls_state_runit)then exit;
+
+   if(rpls_ReadPosN>0)then
+    with rpls_ReadPosL[rpls_ReadPosN-1] do
+    begin
+       if( g_Step<=rp_gtick)then exit;
+       if((g_Step -rp_gtick)<fr_fps2)then exit;
+    end;
+
+   rpls_ReadPosN+=1;
+   setlength(rpls_ReadPosL,rpls_ReadPosN);
+   with rpls_ReadPosL[rpls_ReadPosN-1] do
+   begin
+      rp_gtick:=g_Step;
+      rp_fpos :=FilePos(rpls_file);
+   end;
+end;
+procedure replay_SetPlayPosition(timetick:int64);
+var ni,i :cardinal;
+    vi,vt:int64;
+begin
+   if(rpls_ReadPosN=0)
+   or(rpls_fstatus<>rpls_file_read)
+   or(rpls_state  <>rpls_state_runit)then exit;
+
+   ni:=0;
+   vi:=0;
+   for i:=0 to rpls_ReadPosN-1 do
+    with rpls_ReadPosL[i] do
+     if(rp_gtick<=timetick)then
+     begin
+        vt:=abs(rp_gtick-timetick);
+        if(vt<vi)or(ni=0)then
+        begin
+           ni:=i;
+           vi:=vt;
+        end;
+     end;
+
+   with rpls_ReadPosL[ni] do
+   begin
+      g_Step:=rp_gtick;
+      Seek(rpls_file,rp_fpos);
+   end;
+   rpls_step:=2;
+end;
+
 procedure replay_Abort;
 begin
    if(rpls_fstatus>rpls_file_none)then
    begin
       close(rpls_file);
       rpls_fstatus:=rpls_file_none;
-      rpls_rbytes:=0;
    end;
-   if(rpls_state>=rpl_rhead)then rpls_state:=rpl_none;
+   if(rpls_state>=rpls_state_rhead)then rpls_state:=rpls_state_none;
+   rpls_ReadPosN:=0;
+   setlength(rpls_ReadPosl,rpls_ReadPosN);
 end;
 
 procedure replay_Code;
 const vxyc = 5;
-var  i,gs:byte;
-_vx,_vy  :byte;
+var  i,gs,
+      _vx,
+      _vy  : byte;
 begin
    rpls_ticks+=1;
-   if(G_Started=false)or(rpls_state=rpl_none)or(menu_s2=ms2_camp)
+   if(G_Started=false)or(rpls_state=rpls_state_none)or(menu_s2=ms2_camp)
    then replay_Abort
    else
-    if(G_Started)then
-     case rpls_state of
-     rpl_whead   : begin
+     if(G_Started)then
+       case rpls_state of
+rpls_state_whead : begin
                       replay_Abort;
 
                       rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
@@ -154,11 +218,14 @@ begin
                       rewrite(rpls_file,1);
                       {$I+}
 
-                      if(ioresult<>0)
-                      then replay_Abort
+                      if(ioresult<>0)then
+                      begin
+                         replay_Abort;
+                         rpls_state:=rpls_state_none;
+                      end
                       else
                       begin
-                         rpls_state  :=rpl_wunit;
+                         rpls_state  :=rpls_state_wunit;
                          rpls_fstatus:=rpls_file_write;
                          rpls_u      :=MaxPlayerUnits+1;
                          rpls_player :=HPlayer;
@@ -193,10 +260,14 @@ begin
                              {$I+}
                           end;
 
-                         if(ioresult<>0)then replay_Abort;
+                         if(ioresult<>0)then
+                         begin
+                            replay_Abort;
+                            rpls_state:=rpls_state_none;
+                         end;
                       end;
                    end;
-     rpl_wunit   : if(rpls_fstatus<>rpls_file_write)
+rpls_state_wunit : if(rpls_fstatus<>rpls_file_write)
                    then replay_Abort
                    else
                      if((rpls_ticks mod 2)=0)then
@@ -229,14 +300,18 @@ begin
                            if(gs=gs_running)then _wclinet_gframe(rpls_player,true);
                         end;
 
-                        if(IOResult<>0)then replay_Abort;
+                        if(ioresult<>0)then
+                        begin
+                           replay_Abort;
+                           rpls_state:=rpls_state_none;
+                        end;
                      end;
-     rpl_rhead   : begin
+rpls_state_rhead : begin
                       replay_Abort;
 
                       if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
                       begin
-                         rpls_state   :=rpl_none;
+                         rpls_state   :=rpls_state_none;
                          g_started    :=false;
                          rpls_str_info:='';
                          exit;
@@ -246,7 +321,7 @@ begin
 
                       if(not FileExists(rpls_str_path))then
                       begin
-                         rpls_state   :=rpl_none;
+                         rpls_state   :=rpls_state_none;
                          g_started    :=false;
                          rpls_str_info:=str_svld_errors_file;
                          exit;
@@ -317,7 +392,6 @@ begin
                                exit;
                             end;
 
-
                             for i:=1 to MaxPlayers do
                              with _Players[i] do
                              begin
@@ -330,19 +404,16 @@ begin
                                 {$I+}
                              end;
 
-                            rpls_rbytes+=rpls_file_head_size;
-
-
                             if(rpls_pnu=0)then rpls_pnu:=NetTickN;
                             UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
                             if(UnitStepTicks=0)then UnitStepTicks:=1;
 
                             rpls_fstatus:=rpls_file_read;
-                            rpls_state  :=rpl_runit;
+                            rpls_state  :=rpls_state_runit;
                             rpls_pnu    :=0;
                             rpls_ticks  :=0;
                             HPlayer     :=rpls_player;
-                            //_players[0].observer:=true;
+                            UIPlayer    :=HPlayer;
 
                             rpls_plcam  :=false;
 
@@ -357,27 +428,41 @@ begin
                          end;
                       end;
                    end;
-     rpl_runit   : if(rpls_fstatus<>rpls_file_read)
+rpls_state_runit : if(rpls_fstatus<>rpls_file_read)
                    then replay_Abort
                    else
-                     if((rpls_ticks mod 2)=0)and(G_Status=gs_running)then
+                     if((rpls_ticks mod 2)=0)then
                      begin
-                         if(eof(rpls_file)or(ioresult<>0))then
+                         if(ioresult<>0)then
                          begin
                             replay_Abort;
-                            rpls_state :=rpl_end;
-                            G_Status   :=gs_replayend;
+                            //rpls_state :=rpls_state_end;
+                            G_Status   :=gs_replayerror;
                             uncappedFPS:=false;
                             exit;
                          end;
 
-                         if(rpls_step<=0)then rpls_step:=1;
+                         if(eof(rpls_file))then
+                         begin
+                            //replay_Abort;
+                            //
+                            //rpls_state :=rpls_state_end;
+                            G_Status   :=gs_replayend;
+                            uncappedFPS:=false;
+                            rpls_step  :=0;
+                            exit;
+                         end;
+
+                         //gs_replaypause
+                         gs:=G_Status;
+                         if(rpls_step<=0)and(G_Status=gs_running)then rpls_step:=1;
                          while(rpls_step>0)do
                          begin
+                            replay_SavePlayPosition;
+
                             {$I-}
                             BlockRead(rpls_file,i,SizeOf(i));
                             {$I+}
-                            rpls_rbytes+=SizeOf(i);
                             G_Status:=i and %00111111;
 
                             if((i and %10000000)>0)then _rudata_log(rpls_player,true);
@@ -387,16 +472,13 @@ begin
                                BlockRead(rpls_file,rpls_vidx,sizeof(rpls_vidx));
                                BlockRead(rpls_file,rpls_vidy,sizeof(rpls_vidy));
                                {$I+}
-                               rpls_rbytes+=sizeof(rpls_vidx);
-                               rpls_rbytes+=sizeof(rpls_vidy);
                             end;
 
-                            if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true);
+                            if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true,rpls_step>1);
 
                             if(rpls_step>1)then effects_sprites(false,false);
                             rpls_step-=1;
                          end;
-                         rpls_step:=1;
 
                          if(rpls_plcam)then
                          begin
@@ -404,9 +486,10 @@ begin
                             vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)) div 2;
                             CamBounds;
                          end;
+
+                         if(gs=gs_replaypause)then G_Status:=gs;
                      end;
-     rpl_end     : begin G_Status:=gs_replayend; end;
-     end;
+       end;
 end;
 
 procedure replay_Select;
