@@ -1123,7 +1123,6 @@ snd_transport,
 snd_teleport,
 snd_pexp,
 snd_exp,
-snd_hpower,
 snd_mapmark,
 snd_hell
        : PTSoundSet;

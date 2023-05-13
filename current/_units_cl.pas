@@ -87,11 +87,11 @@ begin
       un_eid_summon_spr[aa]:=summonspr;
    end;
 end;
-procedure setEffectSND(ready,death,fdeath,pain:PTSoundSet);
+procedure setEffectSND(summon,death,fdeath,pain:PTSoundSet);
 begin
    with _uids[u] do
    begin
-      un_eid_snd_summon:=ready;
+      un_eid_snd_summon:=summon;
       un_eid_snd_death :=death;
       un_eid_snd_fdeath:=fdeath;
       un_eid_snd_pain  :=pain;
@@ -603,7 +603,7 @@ begin
    _animd:=8;
    setMWSModel(0,@spr_FMajor);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
-   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectEID (0,0         ,EID_Exp,EID_Exp,0  );
    setEffectSND (  snd_jetpon,snd_exp,snd_exp,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);

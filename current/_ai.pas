@@ -2488,7 +2488,7 @@ uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
 uab_HInvulnerability : if(ai_invuln_tar_u<>nil  )then _unit_ability_HInvuln    (pu,ai_invuln_tar_u^.unum);
 uab_UACStrike        : if(ai_strike_tar_u<>nil  )then _unit_ability_UACStrike  (pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
 uab_SpawnLost        : if(ai_ZombieTarget_d<base_1r)and(player^.upgr[upgr_hell_phantoms]>0)then
-                        if(u_royal_d>srange)or(g_royal_r<srange)then _unit_sability(pu);
+                         if(u_royal_d>srange)or(g_royal_r<srange)then _unit_sability(pu);
          end;
          case uidi of
 UID_UACDron           : if(ai_uab_buildturret(pu))then

@@ -494,7 +494,6 @@ begin
    snd_transport            :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
-   snd_hpower               :=SoundSetLoad('hpower'          );
    snd_mapmark              :=SoundSetLoad('mapmark'         );
 
    snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
