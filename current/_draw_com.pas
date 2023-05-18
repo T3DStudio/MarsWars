@@ -158,6 +158,9 @@ begin
    begin
       if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
 
+      //if(g_ai_slots=0)then
+      // if(_players[i].state=ps_none)then continue;
+
       x:=round(map_psx[i]*map_mmcx);
       y:=round(map_psy[i]*map_mmcx);
 

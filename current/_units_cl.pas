@@ -645,7 +645,7 @@ begin
 end;
 UID_Terminator:
 begin
-   _animw:=14;
+   _animw:=15;
    setMWSModel(0,@spr_Terminator);
    setCommandSND(snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );

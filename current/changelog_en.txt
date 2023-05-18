@@ -9,7 +9,7 @@ Other:
 - visual themes for maps;
 - maximum map size increased to 8000;
 - option 'Game: UDOOM/DOOM2' removed; now game about DOOM2 only;
-- new game option: 'Neutral generators' - map contain neutral generators that can be cuptured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators have optional lifetime;
+- new game option: 'Neutral generators' - map contain neutral generators that can be captured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators have optional lifetime;
 - new game mode 'King of the Hill' where players must capture and hold central area for 1 minute to win;
 - improvements for computer opponents code:
 -- bot trying to keep their attacking units together;
@@ -17,7 +17,6 @@ Other:
 -- increased number of AI difficulty levels to 11(1-7 - default, 8-11 - 'cheaters');
 - fixed framerate control code, now the game loop is exactly 60 fps;
 - added 'observer' player role;
-- POV-player of replays/observer mode can be changed by clicking on units;
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
 
 Interface:

@@ -150,6 +150,8 @@ uab_RebuildInPoint: begin
 
                     circleColor(tar,m_brushx,m_brushy,_uids[_rebuild_uid]._r,c_gray);
                     end;
+uab_HTowerBlink,
+uab_HKeepBlink,
 uab_CCFly         : begin
                     spr:=_uid2spr(i,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
@@ -626,7 +628,8 @@ begin
 end;
 
 procedure D_UIText(tar:pSDL_Surface;VisPlayer:byte);
-var i,limit:integer;
+var i,
+limit:integer;
   str:shortstring;
   col:cardinal;
 function ChatString:shortstring;
@@ -667,7 +670,13 @@ begin
    begin
       limit:=armylimit+uprodl;
       _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy           )+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
-      _draw_text(tar,ui_armyx ,ui_armyy ,tc_orange+str_hint_army  +tc_default+l2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr ,ta_left,255,ui_limit[limit>=MaxPlayerLimit]);
+      _draw_text(tar,ui_armyx ,ui_armyy,tc_orange+str_hint_army  +tc_default+l2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr,ta_left,255,ui_limit[limit>=MaxPlayerLimit]);
+
+      if(ui_armyx<mouse_x)and(mouse_x<=(ui_armyx+128))and(ui_armyy<=mouse_y)and(mouse_y<=(ui_armyy+font_w))then
+      begin
+      _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1  ,str_attr_building+tc_default+': '+l2s(ucl_l[true ]       ,MinUnitLimit),ta_left,255,c_white);
+      _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1*2,str_attr_unit    +tc_default+': '+l2s(ucl_l[false]+uprodl,MinUnitLimit),ta_left,255,c_white);
+      end;
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

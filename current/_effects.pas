@@ -286,7 +286,7 @@ begin
 end;
 
 
-procedure teleport_effects(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
+procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
    if PointInScreenP(vx,vy)
    or PointInScreenP(tx,ty) then SoundPlayUnit(snd,nil,nil);

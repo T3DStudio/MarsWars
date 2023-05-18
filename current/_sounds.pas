@@ -250,12 +250,21 @@ begin
         if(SourceIsPlaying(source)=false)then SoundSourceSetGetSource:=@ssl[i];
 end;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   PLAY
 //
 
+procedure StopSoundSource(sss:byte);
+var i:integer;
+begin
+   if(sss>=sss_count)then exit;
+
+   with SoundSources[sss] do
+    if(ssn>0)then
+     for i:=0 to ssn-1 do
+      with ssl[i] do alSourceStop(source);
+end;
 
 procedure SoundPlay(SoundSet:PTSoundSet;sss:byte);
 var vsound :PTMWSound;
@@ -308,26 +317,28 @@ begin
    SoundPlay(ss,sss_ui);
 end;
 
-procedure SoundPlayAnoncer(ss:PTSoundSet;pause:boolean);
+procedure SoundPlayAnoncer(ss:PTSoundSet;checkpause,stopother:boolean);
 begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
 
-   if(pause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
+   if(checkpause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
 
+   if(stopother)
+   then StopSoundSource(sss_anoncer);
    SoundPlay(ss,sss_anoncer);
 
    snd_anoncer_ticks:=fr_fps1;
    snd_anoncer_last :=ss;
 end;
-procedure SoundPlayMMapAlarm(ss:PTSoundSet;pause:boolean);
+procedure SoundPlayMMapAlarm(ss:PTSoundSet;checkpause:boolean);
 begin
    if(ss=nil)
    or(_menu)
    or(r_draw=false)then exit;
 
-   if(pause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
+   if(checkpause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
 
    SoundPlay(ss,sss_mmap);
 
@@ -387,16 +398,16 @@ lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=MaxPlayers)then
                           if(argx=team)
-                          then SoundPlayAnoncer(snd_victory[race],false)
-                          else SoundPlayAnoncer(snd_defeat [race],false);
+                          then SoundPlayAnoncer(snd_victory[race],false,true)
+                          else SoundPlayAnoncer(snd_defeat [race],false,true);
 lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
-                        then SoundPlayAnoncer(snd_player_defeated[race],true);
-lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build [race],true);
-lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted[race],true);
-lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true);
+                        then SoundPlayAnoncer(snd_player_defeated[race],true,false);
+lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
+lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
+lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
 lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
-lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true);
+lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_already_adv,
 lmt_NeedMoreProd,
 lmt_MaximumReached,
@@ -404,9 +415,9 @@ lmt_unit_limit,
 lmt_production_busy,
 lmt_req_ruids,
 lmt_req_common,
-lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true);
-lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false);
-lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false);
+lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
+lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false,false);
+lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with _uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;

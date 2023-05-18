@@ -361,7 +361,9 @@ begin
 
    PlayersSwap(random(MaxPlayers)+1,HPlayer);
 
-   g_ai_slots:=random(player_default_ai_level+1);
+   if(random(3)=0)
+   then g_ai_slots:=0
+   else g_ai_slots:=random(player_default_ai_level+1);
 
    Map_premap;
 

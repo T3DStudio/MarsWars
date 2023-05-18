@@ -1520,7 +1520,7 @@ wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false);
               case aw_type of
 wpt_resurect   : begin
                     _StartResurrection(tu);
-                    if((aw_reqf and wpr_reload)>0)then rld:=ptimehhh*fr_fps1;
+                    if((aw_reqf and wpr_reload)>0)then rld:=max2(0,aw_count*fr_fps1);
                  end;
 wpt_heal       : begin
                     tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);

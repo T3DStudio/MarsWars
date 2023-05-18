@@ -41,16 +41,17 @@ begin
          vr:=0;
          mw:=0;
          wr:=0;
-         BlockRead(f,wr,sizeof(map_seed ));rpls_str_info:=str_map+': '+c2s(wr)           +tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw   ));rpls_str_info+=str_m_siz+i2s(mw)+tc_nl3+' ';mw:=0;
-         BlockRead(f,vr,sizeof(map_liq  ));
+         BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
+         BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
+         BlockRead(f,vr,sizeof(map_liq     ));
          if(vr<=7)then begin rpls_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';  end
                   else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(map_obs  ));
+         BlockRead(f,vr,sizeof(map_obs     ));
          if(vr<=7)then begin rpls_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';  end
                   else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(map_symmetry  ));
-         BlockRead(f,vr,sizeof(g_mode   ));
+         BlockRead(f,vr,sizeof(map_symmetry));rpls_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
+
+         BlockRead(f,vr,sizeof(g_mode      ));
          if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
                                else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;

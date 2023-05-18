@@ -127,7 +127,7 @@ begin
    end;
 end;
 
-procedure effect_PainSpawnFail(tx,ty,dy:integer;vischeck:pboolean);
+procedure effect_InPoint(tx,ty,dy:integer;vischeck:pboolean;effect:byte;sound:PTSoundSet);
 begin
    if(vischeck<>nil)then
    begin
@@ -136,8 +136,8 @@ begin
    else
      if(PointInScreenP(tx,ty)=false)then exit;
 
-   _effect_add(tx,ty,dy,UID_LostSoul);
-   SoundPlayUnit(snd_pexp,nil,nil);
+   _effect_add(tx,ty,dy,effect);
+   SoundPlayUnit(sound,nil,nil);
 end;
 
 procedure effect_UnitAttack(pu:PTUnit;start:boolean;vischeck:pboolean);
@@ -331,7 +331,7 @@ begin
       tx:=mm3(0,tx,map_mw);
       ty:=mm3(0,ty,map_mw);
       {$IFDEF _FULLGAME}
-      teleport_effects(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
+      effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
       buff[ub_Teleport]:=fr_fps1;
       _unit_SetXY(pu,tx,ty,mvxy_strict);
@@ -960,7 +960,7 @@ begin
          hits  := 1;
          cenergy-=_renergy;
          {$IFDEF _FULLGAME}
-         if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false);
+         if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false,false);
          {$ENDIF}
       end;
 
@@ -1392,30 +1392,28 @@ end;
 procedure _unit_end_pprod(pu:PTUnit);
 var i,_uid:byte;
 begin
-  with pu^ do
-  with uid^ do
-  if(_issmith)then
-  with player^ do
-  for i:=0 to MaxUnitLevel do
-  if(pprod_r[i]>0)then
-  begin
-      _uid:=pprod_u[i];
-     if(cenergy<0)
-     or(upgr[_uid]>=_upids[_uid]._up_max)
-     or(upgr[_uid]>=a_upgrs[_uid])
-     then //_unit_cupgrade_p(pu,255,i)
-     else
-       if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
-       begin
-          upgr[_uid]+=1;
-          _unit_cupgrade_p(pu,255,i);
-          GameLogUpgradeComplete(playeri,_uid,x,y);
-       end
-       else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
-  end;
+   with pu^ do
+   with uid^ do
+   if(_issmith)then
+   with player^ do
+   for i:=0 to MaxUnitLevel do
+   if(pprod_r[i]>0)then
+   begin
+       _uid:=pprod_u[i];
+      if(cenergy<0)
+      or(upgr[_uid]>=_upids[_uid]._up_max)
+      or(upgr[_uid]>=a_upgrs[_uid])
+      then
+      else
+        if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        begin
+           upgr[_uid]+=1;
+           _unit_cupgrade_p(pu,255,i);
+           GameLogUpgradeComplete(playeri,_uid,x,y);
+        end
+        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+   end;
 end;
-
-
 
 procedure _unit_ability_spawn(pu:PTUnit;tx,ty:integer;auid:byte);
 var tu:PTUnit;
@@ -1427,32 +1425,36 @@ begin
       then _LastCreatedUnit:=0
       else
         if(not ServerSide)
-        then exit
+        then _LastCreatedUnit:=1
         else _unit_add(tx,ty,-1,auid,playeri,true,true,0);
 
       if(_LastCreatedUnit>0)then
       begin
-         _LastCreatedUnitP^.dir   :=dir;
-         _LastCreatedUnitP^.a_tar :=a_tar;
-         _LastCreatedUnitP^.uo_id :=uo_id;
-         _LastCreatedUnitP^.uo_tar:=uo_tar;
-         if(_IsUnitRange(a_tar,@tu))then
+         if(ServerSide)then
          begin
-            _LastCreatedUnitP^.uo_x  :=tu^.x;
-            _LastCreatedUnitP^.uo_y  :=tu^.y;
+            _LastCreatedUnitP^.dir   :=dir;
+            _LastCreatedUnitP^.a_tar :=a_tar;
+            _LastCreatedUnitP^.uo_id :=uo_id;
+            _LastCreatedUnitP^.uo_tar:=uo_tar;
+            if(_IsUnitRange(a_tar,@tu))then
+            begin
+               _LastCreatedUnitP^.uo_x :=tu^.x;
+               _LastCreatedUnitP^.uo_y :=tu^.y;
+            end
+            else
+             if(uo_x<>x)or(uo_y<>y)then
+             begin
+                _LastCreatedUnitP^.uo_x:=uo_x;
+                _LastCreatedUnitP^.uo_y:=uo_y;
+             end;
          end
-         else
-          if(uo_x<>x)or(uo_y<>y)then
-          begin
-             _LastCreatedUnitP^.uo_x  :=uo_x;
-             _LastCreatedUnitP^.uo_y  :=uo_y;
-          end;
+         else _LastCreatedUnit:=0;
       end
       {$IFDEF _FULLGAME}
       else
         case auid of
-UID_Phantom,
-UID_LostSoul: effect_PainSpawnFail(tx,ty,_SpriteDepth(ty+1,ukfly),nil);
+UID_Phantom : effect_InPoint(tx,ty,_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
+UID_LostSoul: effect_InPoint(tx,ty,_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
         end;
       {$ENDIF};
    end;

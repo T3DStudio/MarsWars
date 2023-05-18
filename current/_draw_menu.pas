@@ -168,30 +168,30 @@ begin
                  if(menu_s3=ms3_game)then
                  begin
                     y:=_yt(2);
-                    _draw_text(tar,i,y, str_ColoredShadow      , ta_left ,255,c_white);
-                    _draw_text(tar,ui_menu_ssr_x7t,y, b2cc[vid_ColoredShadow], ta_right,255,c_white);
-                    vlineColor(tar,ui_menu_ssr_x2,y-5,y+12,c_gray);
+                    _draw_text(tar,i              ,y  , str_ColoredShadow      , ta_left ,255,c_white);
+                    _draw_text(tar,ui_menu_ssr_x7t,y  , b2cc[vid_ColoredShadow], ta_right,255,c_white);
+                    vlineColor(tar,ui_menu_ssr_x2 ,y-5, y+12,c_gray);
 
-                    _draw_text(tar,ui_menu_ssr_x7r,y, str_APM      , ta_left ,255,c_white);
-                    _draw_text(tar,t,y, b2cc[vid_APM], ta_right,255,c_white);
+                    _draw_text(tar,ui_menu_ssr_x7r,y  , str_APM                , ta_left ,255,c_white);
+                    _draw_text(tar,t              ,y  , b2cc[vid_APM]          , ta_right,255,c_white);
 
                     y:=_yt(3);
-                    _draw_text(tar,i,y, str_uhbar             , ta_left ,255,c_white);
-                    _draw_text(tar,t,y, str_uhbars[vid_uhbars], ta_right,255,c_white);
+                    _draw_text(tar,i              ,y  , str_uhbar              , ta_left ,255,c_white);
+                    _draw_text(tar,t              ,y  , str_uhbars[vid_uhbars] , ta_right,255,c_white);
 
                     y:=_yt(4);
-                    _draw_text(tar,i,y, str_maction          , ta_left ,255,c_white);
-                    _draw_text(tar,t,y, str_maction2[m_action], ta_right,255,c_white);
+                    _draw_text(tar,i              ,y  , str_maction            , ta_left ,255,c_white);
+                    _draw_text(tar,t              ,y  , str_maction2[m_action] , ta_right,255,c_white);
 
                     y:=_yt(5);
-                    _draw_text(tar,i,y, str_scrollspd, ta_left,255,c_white);
+                    _draw_text(tar,i              ,y  , str_scrollspd          , ta_left ,255,c_white);
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
                     vlineColor(tar,ui_menu_ssr_x3,y-6,y+12,c_gray);
                     boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+vid_CamSpeed,y+6,c_lime);
 
                     y:=_yt(6);
-                    _draw_text(tar,i ,y, str_mousescrl, ta_left ,255, mic(true,false));
-                    _draw_text(tar,t ,y, b2cc[vid_CamMScroll], ta_right,255, mic(true,false));
+                    _draw_text(tar,i              ,y  , str_mousescrl          , ta_left ,255, mic(true,false));
+                    _draw_text(tar,t              ,y  , b2cc[vid_CamMScroll]   , ta_right,255, mic(true,false));
 
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_plname, ta_left,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));
@@ -199,12 +199,12 @@ begin
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
 
                     y:=_yt(8);
-                    _draw_text(tar,i ,y, str_language , ta_left ,255, c_white);
-                    _draw_text(tar,t ,y, str_lng[ui_language], ta_right,255, c_white);
+                    _draw_text(tar,i ,y, str_language             , ta_left ,255, c_white);
+                    _draw_text(tar,t ,y, str_lng[ui_language]     , ta_right,255, c_white);
 
                     y:=_yt(9);
-                    _draw_text(tar,i ,y, str_panelpos           , ta_left ,255, c_white);
-                    _draw_text(tar,t ,y, str_panelposp[vid_ppos], ta_right,255, c_white);
+                    _draw_text(tar,i ,y, str_panelpos             , ta_left ,255, c_white);
+                    _draw_text(tar,t ,y, str_panelposp[vid_ppos]  , ta_right,255, c_white);
 
                     y:=_yt(10);
                     _draw_text(tar,i ,y, str_pcolor               , ta_left ,255, c_white);
@@ -364,36 +364,37 @@ begin
                  _draw_text(tar,ui_menu_csm_xt1, _yt(1), str_goptions, ta_left,255, c_white);
 
                  y:=_yt(2);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_gmodet        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_gmode[g_mode] , ta_right ,255, c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_gmodet             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_gmode[g_mode]      , ta_right ,255, c_white);
 
                  y:=_yt(3);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_starta           , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, b2s(g_start_base+1)  , ta_right ,255,c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_starta             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, b2s(g_start_base+1)    , ta_right ,255,c_white);
 
                  y:=_yt(4);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_fstarts            , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_fixed_positions], ta_right ,255 ,c_white);
 
                  y:=_yt(5);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_aislots        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, ai_name(g_ai_slots), ta_right ,255 ,c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_aislots            , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, ai_name(g_ai_slots)    , ta_right ,255 ,c_white);
 
                  y:=_yt(6);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_cgenerators    , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_cgeneratorsM[g_cgenerators], ta_right ,255 ,c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_cgenerators        , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_cgeneratorsM[g_cgenerators],
+                                                                             ta_right ,255 ,c_white);
 
                  y:=_yt(7);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_DeadObservers    , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_deadobservers], ta_right ,255 ,c_white);
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_DeadObservers      , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_clnt),false));
+                 _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_deadobservers]  , ta_right ,255 ,c_white);
 
                  y:=_yt(8);
-                 _draw_text(tar,ui_menu_csm_xc , y, str_randoms        , ta_middle,255, mic((G_Started=false)and(net_status=0),false));
+                 _draw_text(tar,ui_menu_csm_xc , y, str_randoms            , ta_middle,255, mic((G_Started=false)and(net_status=0       ),false));
 
                  // replays
                  y:=_yt(10);
-                 _draw_text(tar,ui_menu_csm_xt1, y, str_replay         , ta_left ,255, c_white);
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state], ta_right,255, mic( rpls_state<rpls_state_rhead ,rpls_state>rpls_state_none));
+                 _draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_left  ,255, c_white);
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state]    , ta_right ,255, mic( rpls_state<rpls_state_rhead ,rpls_state>rpls_state_none));
                  t:=_yl(10);
                  vlineColor(tar,ui_menu_csm_x3 ,t,t+ui_menu_csm_ys, c_gray);
                  y:=_yt(11);
@@ -435,32 +436,32 @@ begin
 
                     y:=_yt(2);
                     _draw_text(tar,ui_menu_csm_xt1, y, str_server, ta_left,255, c_white);
-                    _draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_srvr], ta_right,255, mic((net_status<>ns_clnt)and(G_Started=false),false));
+                    _draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_srvr]         , ta_right ,255, mic((net_status<>ns_clnt)and(G_Started=false),false));
                     vlineColor(tar,ui_menu_csm_xc , _yl(2),_yl(2)+ui_menu_csm_ys, c_gray);
                     y:=_yt(3);
-                    _draw_text(tar,ui_menu_csm_xt0, y,str_udpport         , ta_left  ,255 ,mic((net_status=ns_none),menu_item=87));
-                    _draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr         , ta_right ,255 ,mic((net_status=ns_none),menu_item=87));
+                    _draw_text(tar,ui_menu_csm_xt0, y,str_udpport                          , ta_left  ,255 ,mic((net_status=ns_none),menu_item=87));
+                    _draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr                          , ta_right ,255 ,mic((net_status=ns_none),menu_item=87));
 
 
                     y:=_yt(5);
                     _draw_text(tar,ui_menu_csm_xt1, y, str_client , ta_left,255, c_white);
-                    _draw_text(tar,ui_menu_csm_xt2, y, str_connect[net_status=ns_clnt]  , ta_right ,255, mic((net_status<>ns_srvr)and((net_status=ns_clnt)or(G_Started=false)),false));
+                    _draw_text(tar,ui_menu_csm_xt2, y, str_connect[net_status=ns_clnt]     , ta_right ,255, mic((net_status<>ns_srvr)and((net_status=ns_clnt)or(G_Started=false)),false));
                     vlineColor(tar,ui_menu_csm_xc , _yl(5),_yl(5)+ui_menu_csm_ys, c_gray);
 
                     y:=_yt(6);
-                    _draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr                    , ta_left  ,255, mic((net_status=ns_none),menu_item=90));
-                    _draw_text(tar,ui_menu_csm_xt2, y, net_m_error, ta_right,255,c_red);
+                    _draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr                        , ta_left  ,255, mic((net_status=ns_none),menu_item=90));
+                    _draw_text(tar,ui_menu_csm_xt2, y, net_m_error                         , ta_right ,255, c_red);
                     y:=_yt(7);
-                    _draw_text(tar,ui_menu_csm_xt0, y, str_npnu+str_npnua[net_pnui]    , ta_left  ,255, mic((net_status<>ns_srvr),false));
+                    _draw_text(tar,ui_menu_csm_xt0, y, str_npnu+str_npnua[net_pnui]        , ta_left  ,255, mic((net_status<>ns_srvr),false));
                     y:=_yt(8);
                     t:=_yl(8);
                     i:=t+ui_menu_csm_ys;
-                    _draw_text(tar,ui_menu_csm_xt0 , y, str_team+t2c(PlayerTeam)        , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
+                    _draw_text(tar,ui_menu_csm_xt0 , y, str_team+t2c(PlayerTeam)           , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
 
                     if(PlayerTeam=0)
                     then _draw_text(tar,ui_menu_csm_x2+5, y, str_srace+str_observer        , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false)and(PlayerTeam>0),false))
                     else _draw_text(tar,ui_menu_csm_x2+6, y, str_srace+str_race[PlayerRace], ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false)and(PlayerTeam>0),false));
-                    _draw_text(tar,ui_menu_csm_x3+6, y, str_ready+b2cc[PlayerReady]     , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
+                    _draw_text(tar,ui_menu_csm_x3+6, y, str_ready+b2cc[PlayerReady]        , ta_left  ,255, mic((net_status<>ns_srvr)and(G_Started=false),false));
                     vlineColor(tar,ui_menu_csm_x2  , t,i, c_gray);
                     vlineColor(tar,ui_menu_csm_x3  , t,i, c_gray);
                  end;

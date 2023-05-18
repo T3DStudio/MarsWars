@@ -851,7 +851,7 @@ client_cast_abils= [
 //
 
 
-fr_mancubus_rld        = fr_fps2+fr_fpsd2;
+fr_mancubus_rld        = fr_fps2+fr_fpsd2;  //2.5
 fr_mancubus_rld_s1     = fr_fps2-fr_fpsd6;
 fr_mancubus_rld_s2     = fr_fps1+fr_fpsd6;
 fr_mancubus_rld_s3     = fr_fpsd2;

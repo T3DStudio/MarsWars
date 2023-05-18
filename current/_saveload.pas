@@ -56,19 +56,19 @@ begin
          end
          else
          begin
-            BlockRead(f,vr,sizeof(_cmp_sel ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_skill));vr:=0;
+            BlockRead(f,vr,sizeof(_cmp_sel    ));vr:=0;
+            BlockRead(f,vr,sizeof(cmp_skill   ));vr:=0;
 
-            BlockRead(f,ms,sizeof(map_seed ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
-            BlockRead(f,vr,sizeof(map_iseed));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw   ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_liq  ));
+            BlockRead(f,ms,sizeof(map_seed    ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
+            BlockRead(f,vr,sizeof(map_iseed   ));vr:=0;
+            BlockRead(f,mw,sizeof(map_mw      ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_liq     ));
             if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                     else       svld_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_obs  ));
+            BlockRead(f,vr,sizeof(map_obs     ));
             if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                     else       svld_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_symmetry));   ////////
+            BlockRead(f,vr,sizeof(map_symmetry));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
             BlockRead(f,vr,sizeof(theme_i     ));
             if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_mode   ));

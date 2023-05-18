@@ -578,7 +578,7 @@ begin
 end;
 
 
-procedure _SummonEffect(uu:PTUnit;vis:pboolean);
+procedure cleffect_UnitSummon(uu:PTUnit;vis:pboolean);
 begin
    with uu^ do
    begin
@@ -588,7 +588,7 @@ begin
    end;
 end;
 
-procedure _TeleportEffect(uu,pu:PTUnit);
+procedure cleffect_teleport(uu,pu:PTUnit);
 begin
    with uu^  do
    begin
@@ -596,11 +596,11 @@ begin
       vy:=y;
       if(uid^._ability=uab_HKeepBlink)then
       begin
-         teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H,EID_HKeep_S,snd_cube);
+         effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H,EID_HKeep_S,snd_cube);
          buff[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
-      else teleport_effects(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
+      else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
    end;
 end;
 
@@ -629,14 +629,14 @@ begin
         if(hits>0)then
         begin
            _unit_CalcForR(uu);
-           if(buff[ub_Summoned]>0)then _SummonEffect  (uu,@vis);
-           if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
-           if(buff[ub_HVision ]>0)then effect_LevelUp (uu,EID_HVision,@vis);
+           if(buff[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
+           if(buff[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
+           if(buff[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
 
            if(playeri=UIPlayer)then
            begin
               if(iscomplete=false)then
-                with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
+                with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
               if(sel)then UpdateLastSelectedUnit(unum);
            end;
         end;
@@ -654,7 +654,7 @@ begin
           begin
              if(hits>ndead_hits)and(transport=0)then
              begin
-                if(buff[ub_Teleport]>0)then _TeleportEffect(uu,@vis);
+                if(buff[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
@@ -684,16 +684,16 @@ begin
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(buff[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then _TeleportEffect(uu,pu  );
-               true : if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then _TeleportEffect(uu,pu  );
+               false: if(buff[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(uu,pu);
+               true : if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then cleffect_teleport(uu,pu);
                end;
-               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then _SummonEffect     (uu,            @vis);
-               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then effect_LevelUp    (uu,EID_HVision,@vis);
-               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then effect_UnitPain(uu,            @vis);
+               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
+               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
+               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
 
-               if(pu^.iscomplete)and(iscomplete=false)then
+               if(pu^.iscomplete)and(not iscomplete)then
                 if(playeri=UIPlayer)then
-                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false);
+                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
                if(pu^.sel=false)and(sel)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
@@ -705,7 +705,9 @@ begin
                0:;
                uab_UACStrike   : _unit_umstrike_missile(uu);
                uab_UACScan     : if(team=_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
-               uab_SpawnLost   : _ability_unit_spawn(pu,UID_LostSoul);
+               uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
+                                 then _ability_unit_spawn(pu,UID_Phantom )
+                                 else _ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then
@@ -991,8 +993,16 @@ procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;POVPlayerObserv
 var sh: shortint;
     i : byte;
     wt: word;
+    ou: PTUnit;
 begin
-   _units[0]:=uu^;
+   if(SkipRead)then
+   begin
+      ou:=uu;
+      _units[0].unum:=uu^.unum;
+      uu:=@_units[0];
+   end
+   else _units[0]:=uu^;
+
    with uu^ do
    begin
       playeri:=(unum-1) div MaxPlayerUnits;
@@ -1059,13 +1069,16 @@ begin
         -127: hits:=dead_hits;
         -128: hits:=ndead_hits;
         end;
-      if(SkipRead)then
-      begin
-         vx:=x;
-         vy:=y;
-      end;
    end;
-   _netSetUcl(uu);
+   if(SkipRead)then
+   begin
+      ou^.x :=uu^.x;
+      ou^.y :=uu^.y;
+      ou^.vx:=uu^.x;
+      ou^.vy:=uu^.y;
+      _unit_update_xy(ou);
+   end
+   else _netSetUcl(uu);
 end;
 
 

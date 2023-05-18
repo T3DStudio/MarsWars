@@ -20,9 +20,10 @@ aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret  
 aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret       );
 aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret       );
 
-ai_GeneratorsEnergy       = 3500;
-ai_GeneratorsDestroyEnergy= 4250;
-ai_GeneratorsDestoryLimit = MinUnitLimit*80;
+ai_GeneratorsLimit        = ul1*60;
+ai_GeneratorsEnergy       = 4500;
+ai_GeneratorsDestroyEnergy= 4750;
+ai_GeneratorsDestoryLimit = ul1*80;
 ai_TowerLifeTime          = fr_fps1*60;
 ai_MinArmyForScout        = 0;
 ai_MinScoutDelay          = fr_fps1*ptime1;
@@ -99,6 +100,7 @@ ai_ZombieTarget_d,
 
 ai_enrg_pot,
 ai_enrg_cur,
+ai_gen_limit,
 ai_builders_count,
 ai_builders_need,
 ai_unitp_cur,
@@ -442,6 +444,8 @@ begin
    // energy
    ai_enrg_pot       :=0;
    ai_enrg_cur       :=0;
+
+   ai_gen_limit      :=0;
 
    // nearest builder
    ai_nearest_builder_u     :=nil;
@@ -909,6 +913,9 @@ begin
              or(tu^.uid^._ability=uab_HellVision)
              or(tu^.uid^._ability=uab_UACScan   )then ai_detect_near+=1;
 
+            // generators limit
+            if(tu^.uidi=aiucl_generator[race])then ai_gen_limit+=tu^.uid^._limituse;
+
             // unit productions
             if(tu^.uid^._isbarrack)then
              if(tu^.uidi=aiucl_barrack0[race])
@@ -1096,7 +1103,7 @@ begin
    a+=base_energy;
    if(g_cgenerators=0)then
     with pu^.player^ do
-     if(ai_enrg_pot<a)and(ai_enrg_pot<ai_maxcount_energy)and(ai_enrg_pot<ai_GeneratorsEnergy)then
+     if(ai_enrg_pot<a)and(ai_enrg_pot<ai_maxcount_energy)and(ai_enrg_pot<ai_GeneratorsEnergy)and(ai_gen_limit<ai_GeneratorsLimit)then  //
       if(SetBTA(aiucl_generator[race],0,4))then ddir:=-1;
 end;
 procedure BuildUProd(a:integer);  // Barracks
@@ -1492,9 +1499,11 @@ begin
 r_hell: begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
+        if(g_cgenerators=0)then
         MakeUpgr(upgr_hell_buildr    ,2);
         MakeUpgr(upgr_hell_HKTeleport,1);
         MakeUpgr(upgr_hell_extbuild  ,1);
+        MakeUpgr(upgr_hell_buildr    ,2);
         MakeUpgr(upgr_hell_spectre   ,1);
         MakeUpgr(upgr_hell_pinkspd   ,1);
         MakeUpgr(upgr_hell_pains     ,3);
@@ -1507,9 +1516,11 @@ r_hell: begin
 r_uac : begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
+        if(g_cgenerators=0)then
         MakeUpgr(upgr_uac_buildr     ,2);
         MakeUpgr(upgr_uac_CCFly      ,1);
         MakeUpgr(upgr_uac_extbuild   ,1);
+        MakeUpgr(upgr_uac_buildr     ,2);
         MakeUpgr(upgr_uac_commando   ,1);
         MakeUpgr(upgr_uac_soaring    ,1);
         MakeUpgr(upgr_uac_botturret  ,1);
@@ -1595,7 +1606,7 @@ UID_UATurret   : if(ai_towers_near_grd=0)then exit; // if(ai_towers_near_grd<ai_
       case uidi of
 UID_HKeep,
 UID_HCommandCenter,
-UID_UCommandCenter: if(n_builders>1)and(ai_enemy_d>base_2r)and(ai_enrg_cur>1200)then exit;
+UID_UCommandCenter: if(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>1200)then exit;
 UID_HSymbol,
 UID_UGenerator    : if(ai_enrg_cur<ai_maxcount_energy)then exit;
       else
