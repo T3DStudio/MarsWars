@@ -182,20 +182,20 @@ begin
 
       if(hits>fdead_hits)then
        if(hits>0)
-       then _ADDSTR(@_makeAttributeStr,str_attr_alive  ,sep_comma)
-       else _ADDSTR(@_makeAttributeStr,str_attr_dead   ,sep_comma);
+       then _ADDSTR(@_makeAttributeStr,str_attr_alive    ,sep_comma)
+       else _ADDSTR(@_makeAttributeStr,str_attr_dead     ,sep_comma);
 
       if(_ukbuilding)
-      then _ADDSTR(@_makeAttributeStr,str_attr_building,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_unit    ,sep_comma);
+      then _ADDSTR(@_makeAttributeStr,str_attr_building  ,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_unit      ,sep_comma);
       if(_ukmech)
-      then _ADDSTR(@_makeAttributeStr,str_attr_mech    ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_bio     ,sep_comma);
+      then _ADDSTR(@_makeAttributeStr,str_attr_mech      ,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_bio       ,sep_comma);
       if(_uklight)
-      then _ADDSTR(@_makeAttributeStr,str_attr_light   ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_heavy  ,sep_comma);
+      then _ADDSTR(@_makeAttributeStr,str_attr_light     ,sep_comma)
+      else _ADDSTR(@_makeAttributeStr,str_attr_heavy     ,sep_comma);
       if(ukfly)
-      then _ADDSTR(@_makeAttributeStr,str_attr_fly     ,sep_comma)
+      then _ADDSTR(@_makeAttributeStr,str_attr_fly       ,sep_comma)
       else
         if(ukfloater)
         then _ADDSTR(@_makeAttributeStr,str_attr_floater,sep_comma)
@@ -248,10 +248,13 @@ function DamageStr(dmod:byte):shortstring;
 var i:byte;
 begin
    DamageStr:='';
-   for i:=0 to MaxDamageModFactors do
-    with _dmods[dmod][i] do
-     if(dm_factor<>100)and(dm_flags>0)then
-      _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
+   if(dmod=dm_BFG)
+   then DamageStr:='x '+str_TargetLimit
+   else
+    for i:=0 to MaxDamageModFactors do
+     with _dmods[dmod][i] do
+      if(dm_factor<>100)and(dm_flags>0)then
+       _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
 
 function _req2s(basename:shortstring;reqn:byte):shortstring;
@@ -625,6 +628,7 @@ begin
    str_demons            := 'demons&zombies';
    str_except            := 'except';
    str_splashresist      := 'Immune to splash damage';
+   str_TargetLimit       := 'target limit';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1172,6 +1176,7 @@ begin
   str_demons            := 'демоны и зомби';
   str_except            := 'кроме';
   str_splashresist      := 'Невосприимчив к взрывной волне';
+  str_TargetLimit       := 'лимит цели';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';

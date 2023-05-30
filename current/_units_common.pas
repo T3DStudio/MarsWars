@@ -290,16 +290,13 @@ begin
        end;
        _AddToInt(@vsnt[team],vistime);
        _AddToInt(@vsni[team],vistime);
-{$IFDEF _FULLGAME}
-       if(menu_s2<>ms2_camp)then
-{$ENDIF}
-        if(ServerSide)and(n_builders=0)then
-         for t:=0 to MaxPlayers do
-         begin
-            _AddToInt(@vsnt[t],fr_fps1);
-            if(g_mode<>gm_invasion)
-            or(playeri>0)then _AddToInt(@vsni[t],fr_fps1);
-         end;
+
+       if(revealed)then
+        for t:=0 to MaxPlayers do
+        begin
+           _AddToInt(@vsnt[t],fr_fps1);
+           _AddToInt(@vsni[t],fr_fps1);
+        end;
     end;
 end;
 
@@ -1574,7 +1571,7 @@ begin
      if(vstep>0)and(tar=u)then tar:=0;
 end;
 
-procedure _unit_kill(pu:PTUnit;instant,fastdeath,buildcd,recurse:boolean);
+procedure _unit_kill(pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);
 var i :integer;
     tu:PTunit;
 begin
@@ -1587,7 +1584,7 @@ begin
          with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits>=0)or(_ukbuilding);
          buff[ub_Pain]:=fr_fps1; // prevent fast resurrecting
 
-         GameLogUnitAttacked(pu);
+         if(not suicide)then GameLogUnitAttacked(pu);
          {$IFDEF _FULLGAME}
          effect_UnitDeath(pu,fastdeath,nil);
          {$ENDIF}
@@ -1627,8 +1624,8 @@ begin
             if(apcc>0)then
              if(tu^.transport=unum)then
              begin
-                if(ukfly<>uf_ground)or(transport>0)or(recurse)
-                then _unit_kill(tu,true,false,true,recurse)
+                if(ukfly<>uf_ground)or(transport>0)or(KillAllInside)
+                then _unit_kill(tu,true,false,true,KillAllInside,suicide)
                 else
                 begin
                    tu^.transport:=0;
@@ -1639,7 +1636,7 @@ begin
                    tu^.uo_y:=tu^.y;
                    if(tu^.hits>apc_exp_damage)
                    then tu^.hits-=apc_exp_damage
-                   else _unit_kill(tu,true,false,true,false);
+                   else _unit_kill(tu,true,false,true,false,suicide);
                 end;
              end;
          end
@@ -1729,7 +1726,7 @@ uab_CCFly         :
               end;
               speed:=0;
 
-              if(zfall<>0)then
+              if(ServerSide)and(zfall<>0)then
                if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[_urace]]=0 )>0)then
                begin
                   level:=1;

@@ -73,7 +73,7 @@ var u:integer;
 begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
-     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false,true);
+     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false,true,true);
 end;
 
 procedure PlayersSetDefault;
@@ -136,7 +136,7 @@ begin
 
    G_Step         :=0;
    G_Status       :=0;
-   G_player_status:=255;
+   g_player_astatus:=255;
 
    ServerSide     :=true;
 
@@ -207,7 +207,8 @@ begin
 
    rpls_pnu  :=0;
    rpls_plcam:=false;
-   if(rpls_state>rpls_state_wunit)then rpls_state:=rpls_state_none;
+   //if(rpls_state>=rpls_state_read)then
+   rpls_state:=rpls_state_none;
    {$ELSE}
    screen_redraw:=true;
    {$ENDIF}
@@ -556,6 +557,11 @@ begin
 
            if(ServerSide)then
            begin
+              revealed:=false;
+              if(n_builders=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}then
+                if(g_mode<>gm_invasion)
+                or(p>0)then revealed:=true;
+
               PlayerExecuteOrder(p);
 
               if(state=ps_comp)
@@ -625,7 +631,7 @@ begin
       begin
          G_Step+=1;
 
-         PlayersStatus(@g_player_status,@g_cl_units);
+         UpdatePlayersStatus;
 
          GameModeCPoints;
          case g_mode of

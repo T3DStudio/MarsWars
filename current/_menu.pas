@@ -43,7 +43,7 @@ begin
          menu_item:=3+((mouse_x-ui_menu_ssr_x0) div ui_menu_ssr_xs);
 
          case menu_item of
-         4: if not ((net_status=ns_none)and(rpls_state<rpls_state_rhead))then menu_item:=0;
+         4: if not ((net_status=ns_none)and(rpls_state<rpls_state_read))then menu_item:=0;
          5: if (net_status<>ns_none)then menu_item:=0;
          end;
       end
@@ -263,7 +263,7 @@ begin
       40 : if(0<=svld_list_sel)and(svld_list_sel<svld_list_size)then saveload_Delete;
 
       // replays
-      41 : if(rpls_list_size>0)and(rpls_state<rpls_state_rhead)then
+      41 : if(rpls_list_size>0)and(rpls_state<rpls_state_read)then
            begin
               rpls_list_sel :=rpls_list_scroll+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
               replay_Select;
@@ -271,7 +271,7 @@ begin
       42 : if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then
            begin
               menu_s2:=ms2_scir;
-              rpls_state:=rpls_state_rhead;
+              rpls_state:=rpls_state_read;
               g_started:=true;
            end;
       43 : ;
@@ -338,7 +338,7 @@ begin
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
             if(rpls_state=rpls_state_none)
-            then rpls_state:=rpls_state_whead
+            then rpls_state:=rpls_state_write
             else rpls_state:=rpls_state_none;
       83 : if(rpls_state<>rpls_state_none)then menu_item:=0;
       84 : ScrollByte(@rpls_pnui,true,0,9);
@@ -380,7 +380,7 @@ begin
                  GameDefaultAll;
                  G_started  :=false;
                  PlayerReady:=false;
-                 net_status  :=ns_none;
+                 net_status :=ns_none;
               end
               else
               begin

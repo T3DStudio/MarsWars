@@ -18,7 +18,8 @@ g_cgenerators     : byte     = 0;
 g_ai_slots        : byte     = player_default_ai_level;
 g_deadobservers   : boolean  = true;
 g_step            : cardinal = 0;
-g_player_status   : byte     = 0;
+g_player_astatus  : byte     = 0;
+g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
 
 g_inv_limit       : longint  = 0;
@@ -202,7 +203,9 @@ UIPlayer          : byte = 1;
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
 vid_cam_w         : integer = 800;
+vid_cam_hw        : integer = 400;
 vid_cam_h         : integer = 600;
+vid_cam_hh        : integer = 300;
 vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = 794;
@@ -312,8 +315,6 @@ rpls_file_size    : cardinal = 0;
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;
 
-ui_language              : boolean = false;
-
 
 mouse_select_x0,
 mouse_select_y0,
@@ -329,8 +330,10 @@ m_brush           : integer;
 m_bx,
 m_by              : integer;
 m_vmove           : boolean = false;
-m_action           : boolean = false;
+m_action          : boolean = false;
 m_mmap_move       : boolean = false;
+
+ui_language       : boolean = false;
 
 ui_UnitSelectedNU : integer = 0;
 ui_UnitSelectedpU : integer = 0;
@@ -340,6 +343,7 @@ ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 
 ui_orders_n,                                             //
+ui_orders_d,                                             //
 ui_orders_x,                                             //
 ui_orders_y       : array[0..MaxUnitGroups] of integer;             //
 ui_orders_uids    : array[0..MaxUnitGroups,false..true] of TSob;    //
@@ -731,6 +735,7 @@ str_barrack,
 str_smith,
 str_IncEnergyLevel,
 str_CanRebuildTo,
+str_TargetLimit,
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
@@ -861,7 +866,7 @@ str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
 str_hint_r,
 str_hint_o        : array[0.._mhkeys] of shortstring;
-str_rpl           : array[0..4] of shortstring = ('OFF','RECORD','RECORD','PLAY','PLAY');
+str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 {str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;

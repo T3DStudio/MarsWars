@@ -60,6 +60,7 @@ begin
    if(buff[ub_Invuln]<=0)and(hits>0)then
    with uid^ do
    begin
+
       armor:=0;
 
       if(iscomplete)and(not IgnoreArmor)then
@@ -86,7 +87,7 @@ begin
       if(hits<=damage)then
       begin
          if(ServerSide)
-         then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits,true,false);
+         then _unit_kill(pu,false,(hits-damage)<=_fastdeath_hits,true,false,false);
       end
       else
       begin
@@ -182,7 +183,7 @@ begin
 
       vx:=x;
       vy:=y;
-      _unit_kill(pu,true,true,false,false);
+      _unit_kill(pu,true,true,false,false,true);
       _unit_add(x,y,unum,ouid,playeri,obld,true,ulevel);
    end;
 
@@ -566,12 +567,17 @@ wtp_UnitMech         : begin
                        incPrio(    _ukmech       );
                        incPrio(not iscomplete    );
                        end;
-wtp_bio              : begin
+wtp_UnitBio          : begin
+                       incPrio(not _ukbuilding   );
                        incPrio(not _ukmech       );
                        incPrio(not iscomplete    );
                        end;
-wtp_light            : incPrio(    _uklight      );
-wtp_fly              : begin
+wtp_Bio              : begin
+                       incPrio(not _ukmech       );
+                       incPrio(not iscomplete    );
+                       end;
+wtp_Light            : incPrio(    _uklight      );
+wtp_Fly              : begin
                        incPrio(     ukfly        );
                        incPrio(uidi<>UID_LostSoul);
                        incPrio(not iscomplete    );
@@ -582,7 +588,8 @@ wtp_UnitLight       : begin
                        incPrio(    _uklight      );
                        incPrio(not iscomplete    );
                        end;
-wtp_scout            : if(iscomplete)and(hits>0)and(not _ukbuilding)and(apcm=0)then
+wtp_limit            : incPrio(not _ukbuilding   );
+wtp_Scout            : if(iscomplete)and(hits>0)and(not _ukbuilding)and(apcm=0)then
                        if(not _IsUnitRange(transport,nil))then
                        begin
                        incPrio(_limituse<ul3);
@@ -617,8 +624,10 @@ begin
         begin
            n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
 
-           if(aw_tarprior=wtp_notme_hits)then
-            if(tu<>pu)then n_prio+=1;
+           case aw_tarprior of
+           wtp_notme_hits: if(tu<>pu)then n_prio+=1;
+           wtp_limit     : n_prio+=tu^.uid^._limituse;
+           end;
 
            //if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
@@ -720,14 +729,14 @@ begin
          u_royal_d :=g_royal_r-u_royal_cd;
          if(u_royal_d<_missile_r)then
          begin
-            _unit_kill(pu,false,false,true,true);
+            _unit_kill(pu,false,false,true,true,false);
             exit;
          end;
       end;
 
       if(_ukbuilding)and(menergy<=0)then
       begin
-         _unit_kill(pu,false,false,true,false);
+         _unit_kill(pu,false,false,true,false,true);
          exit;
       end;
 
@@ -886,7 +895,7 @@ begin
        if(tu^.buff[ub_HVision]<fr_fps1)and(tu^.buff[ub_Detect]<=0)then
        begin
           tu^.buff[ub_HVision]:=hell_vision_time;
-          _unit_kill(pu,false,true,false,false);
+          _unit_kill(pu,false,true,false,false,true);
           _unit_ability_HellVision:=true;
           {$IFDEF _FULLGAME}
           effect_LevelUp(tu,EID_Hvision,nil);
@@ -1241,9 +1250,9 @@ begin
       _s:=tu^.shadow;
       {$ENDIF}
 
-      _unit_kill(pu,true,true,false,false);
+      _unit_kill(pu,true,true,false,false,true);
       _unit_add(tu^.x,tu^.y,pu^.unum,tu^.uid^._zombie_uid,pu^.playeri,true,true,_l);
-      _unit_kill(tu,true,true,false,false);
+      _unit_kill(tu,true,true,false,false,true);
 
       if(_LastCreatedUnit>0)then
       with _LastCreatedUnitP^ do
@@ -1514,7 +1523,7 @@ wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
                      painX :=1;
                      _unit_damage(tu,damage,1,playeri,false);
                   end;
-wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false);
+wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false,true);
             else
               if(ServerSide)and(not fakemissile)then
               case aw_type of
@@ -1643,7 +1652,7 @@ begin
    with uid^    do
    with player^ do
    case order_id of
-co_destroy  : _unit_kill(pu,false,false,true,false);
+co_destroy  : _unit_kill(pu,false,false,true,false,true);
 co_rcamove,
 co_rcmove   : begin     // right click
                  uo_tar:=0;

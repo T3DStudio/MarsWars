@@ -897,6 +897,9 @@ begin
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
    end;
 
+   vid_cam_hw:=vid_cam_w div 2;
+   vid_cam_hh:=vid_cam_h div 2;
+
    rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
    pline(0,vid_panelw,vid_panelw,vid_panelw,c_white);
 

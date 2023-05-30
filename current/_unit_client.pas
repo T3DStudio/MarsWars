@@ -230,14 +230,14 @@ begin
    end;
 end;
 
-procedure _wudata_main(pu:PTUnit;rpl:boolean;POVPlayer:byte;POVPlayerObserver:boolean);
+procedure _wudata_main(pu:PTUnit;rpl:boolean;POVPlayer:byte);
 var sh :shortint;
     wt :word;
 begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(_players[POVPlayer].team,pu,true))or(rpl)or(POVPlayerObserver)
+      if(CheckUnitTeamVision(_players[POVPlayer].team,pu,true))or(rpl)or(_players[POVPlayer].observer)
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
@@ -279,7 +279,7 @@ begin
                  _wudata_byte(byte(uo_y shr 5),rpl);
               end;
 
-            if(playeri=POVPlayer)or(POVPlayerObserver)then _wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(_players[POVPlayer].observer)then _wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
@@ -289,7 +289,7 @@ procedure _wpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
    for p:=1 to MaxPlayers do
-    if(GetBBit(@g_player_status,p))then
+    if(GetBBit(@g_player_astatus,p))then
      with _players[p] do
      begin
         bp:=0;
@@ -313,7 +313,7 @@ begin
      end;
 end;
 
-function b2bs(b:byte):shortstring;
+{function b2bs(b:byte):shortstring;
 begin
    b2bs:='00000000';
    if((b and %10000000)>0)then b2bs[1]:='1';
@@ -324,7 +324,7 @@ begin
    if((b and %00000100)>0)then b2bs[6]:='1';
    if((b and %00000010)>0)then b2bs[7]:='1';
    if((b and %00000001)>0)then b2bs[8]:='1';
-end;
+end; }
 
 procedure _wclinet_cpoint(cpi:byte;rpl:boolean);
 var    b: byte;
@@ -371,7 +371,6 @@ end;}
 procedure _wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
 wstep  : cardinal;
-POVPlayerObserver,
 wstepb0,
 wstepb1: boolean;
  _N_U  : pinteger;
@@ -418,18 +417,21 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
    end;
 
    if(not rpl)
-   then PlayersStatus(@g_player_status,@g_cl_units);
+   then UpdatePlayersStatus;
 
-   POVPlayerObserver:=_players[POVPlayer].observer;
-   if(g_player_status>0)and(POVPlayerObserver)then SetBBit(@g_player_status,7,true);
+   if(g_player_astatus>0)and(_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
 
-   _wudata_byte(g_player_status,rpl);
-   if(g_player_status>0)then
+   _wudata_byte(g_player_astatus,rpl);
+   if(g_player_astatus>0)then
    begin
       _wudata_byte(_PNU,rpl);
       _PNU:=min2(g_cl_units,_PNU*4);
 
-      if(wstepb0)then _wpdata_upgr(rpl);
+      if(wstepb0)then
+      begin
+         _wpdata_upgr(rpl);
+         _wudata_byte(g_player_rstatus,rpl);
+      end;
 
       _wudata_int(_N_U^,rpl);
       for i:=1 to _PNU do
@@ -437,8 +439,8 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
          repeat
             _N_U^+=1;
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
-         until ( g_player_status and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
-         _wudata_main(@_units[_N_U^],rpl,POVPlayer,POVPlayerObserver);
+         until ( g_player_astatus and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
+         _wudata_main(@_units[_N_U^],rpl,POVPlayer);
       end;
    end;
 end;
@@ -915,9 +917,10 @@ begin
          buff[ub_Decay   ]:=0;
       end;
 
-      with _players[POVPlayer] do
-       if(team>0)then
-        if(rpl=false)then _AddToInt(@vsnt[team],vistime);
+      if(not rpl)and(not _players[POVPlayer].observer)then
+       with _players[POVPlayer] do
+        if(team>0)then
+          _AddToInt(@vsnt[team],vistime);
    end;
 end;
 
@@ -989,7 +992,7 @@ begin
    end;
 end;
 
-procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;POVPlayerObserver,SkipRead:boolean);
+procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;SkipRead:boolean);
 var sh: shortint;
     i : byte;
     wt: word;
@@ -1061,7 +1064,7 @@ begin
                  uo_y:=integer(_rudata_byte(rpl,0) shl 5);
               end;
 
-            if(playeri=POVPlayer)or(POVPlayerObserver)then _rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(_players[POVPlayer].observer)then _rudata_OwnerUData(uu,rpl);
          end;
       end
       else
@@ -1086,7 +1089,7 @@ procedure _rpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
    for p:=1 to MaxPlayers do
-    if(GetBBit(@g_player_status,p))then
+    if(GetBBit(@g_player_astatus,p))then
      with _players[p] do
      begin
         bp:=0;
@@ -1113,7 +1116,7 @@ var i:byte;
 begin
    g_cl_units:=0;
    for i:=1 to MaxPlayers do
-    if((g_player_status and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
+    if((g_player_astatus and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
 end;
 
 procedure _rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
@@ -1158,7 +1161,6 @@ end;
 procedure _rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
 var
 wstep  : cardinal;
-POVPlayerObserver,
 wstepb0,
 wstepb1: boolean;
 i,
@@ -1196,11 +1198,10 @@ gm_invasion : begin
 gm_royale   : g_royal_r:=_rudata_int(rpl,0);
      end;
 
-   g_player_status:=_rudata_byte(rpl,0);
-   if(g_player_status>0)then
+   g_player_astatus:=_rudata_byte(rpl,0);
+   if(g_player_astatus>0)then
    begin
-      POVPlayerObserver:=GetBBit(@g_player_status,7);
-      _players[POVPlayer].observer:=POVPlayerObserver;
+      _players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
 
       _PNU:=_rudata_byte(rpl,0)*4;
 
@@ -1218,7 +1219,14 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
-      if(wstepb0)then _rpdata_upgr(rpl);
+      if(wstepb0)then
+      begin
+         _rpdata_upgr(rpl);
+         g_player_rstatus:=_rudata_byte(rpl,0);
+         for i:=0 to MaxPlayers do
+          with _players[i] do
+           revealed:=GetBBit(@g_player_rstatus,i);
+      end;
 
       _N_U:=_rudata_int(rpl,0);
       for i:=1 to _PNU do
@@ -1228,11 +1236,11 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
            _N_U+=1;
            if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
            _units[_N_U].unum:=_N_U;
-           if( g_player_status and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0
+           if( g_player_astatus and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0
            then break
-           else _rudata_main(@_units[_N_U],rpl,true,POVPlayer,POVPlayerObserver,fast_skip);
+           else _rudata_main(@_units[_N_U],rpl,true,POVPlayer,fast_skip);
          end;
-         _rudata_main(@_units[_N_U],rpl,false,POVPlayer,POVPlayerObserver,fast_skip);
+         _rudata_main(@_units[_N_U],rpl,false,POVPlayer,fast_skip);
       end;
    end;
 end;

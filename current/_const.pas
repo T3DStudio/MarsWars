@@ -1,11 +1,11 @@
 
 const
 
-ver                    : byte = 230;
+ver                    : byte = 231;
 
 degtorad               = pi/180;
 
-NOTSET                 = 32000;
+NOTSET                 = smallint.MaxValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -38,7 +38,7 @@ APM_1Period            = fr_fps60;
 
 gms_g_startb           = 6;  // 0-6  max start base options
 gms_g_maxai            = 11; // 0-11 max skirmish AI skills
-gms_g_maxgens          = 5;  // 0-5  max neytrall generators options
+gms_g_maxgens          = 5;  // 0-5  max neutrall generators options
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -412,15 +412,17 @@ wtp_UnitLightBio       = 5;
 wtp_UnitBioLight       = 7;
 wtp_UnitBioHeavy       = 8;
 wtp_UnitMech           = 10;
-wtp_bio                = 11;
-wtp_light              = 12;
-wtp_UnitLight          = 13;
-wtp_BuildingHeavy      = 14;
-wtp_scout              = 15;
-wtp_notme_hits         = 16;
-wtp_fly                = 17;
-wtp_nolost_hits        = 18;
-wtp_max_hits           = 19;
+wtp_UnitBio            = 11;
+wtp_Bio                = 12;
+wtp_Light              = 13;
+wtp_UnitLight          = 14;
+wtp_BuildingHeavy      = 15;
+wtp_Scout              = 16;
+wtp_notme_hits         = 17;
+wtp_Fly                = 18;
+wtp_nolost_hits        = 19;
+wtp_max_hits           = 20;
+wtp_limit              = 21;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -630,16 +632,18 @@ MaxDamageModFactors    = 1;
 dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
 dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
 dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
-dm_AntiUnitMech        = 4 ; // 1.5*[unit mech]
-dm_AntiUnitLight       = 5 ; // 1.5*[unit light]
-dm_AntiFly             = 6 ; // 1.5*[fly]
-dm_AntiHeavy           = 7 ; // 1.5*[heavy]
-dm_AntiLight           = 8 ; // 1.5*[light]
-dm_AntiBuildingLight   = 9 ; // 1.5*[buildings light]
-dm_Cyber               = 10; //   3*[buildings]      0.5*[light]
-dm_Siege               = 11; //   3*[buildings]
-dm_Blizzard            = 12; //   5*[buildings]      0.5*[light]
-dm_Lost                = 13; //                      0.5*[mech ]
+dm_AntiUnitBio         = 4 ; // 1.5*[unit bio]       0.5*[buildings]
+dm_AntiUnitMech        = 5 ; // 1.5*[unit mech]
+dm_AntiUnitLight       = 6 ; // 1.5*[unit light]
+dm_AntiFly             = 7 ; // 1.5*[fly]
+dm_AntiHeavy           = 8 ; // 1.5*[heavy]
+dm_AntiLight           = 9 ; // 1.5*[light]
+dm_AntiBuildingLight   = 10; // 1.5*[buildings light]
+dm_Cyber               = 11; //   3*[buildings]      0.5*[light]
+dm_Siege               = 12; //   3*[buildings]
+dm_Blizzard            = 13; //   5*[buildings]      0.5*[light]
+dm_Lost                = 14; //                      0.5*[mech ]
+dm_BFG                 = 15; // limituse*
 
 // LIMIT
 ul1                    = MinUnitLimit;
@@ -691,11 +695,11 @@ BaseDamage5            = BaseDamage1*5;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
-BaseDamageBonus1       = 6;
+BaseDamageBonus1       = 8;
 BaseDamageBonush       = BaseDamageBonus1 div 2;
 BaseDamageBonus3       = BaseDamageBonus1*2;
 BaseDamageLevel1       = BaseDamageBonush;
-BaseArmorBonus1        = 6;
+BaseArmorBonus1        = 8;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonush;
@@ -811,8 +815,8 @@ uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
 //T1                     = uids_marines+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
-T2                     = [UID_BFGMarine,UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
-T3                     = [UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
+T2                     = [UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas-[UID_ZBFGMarine];
+T3                     = [UID_BFGMarine,UID_ZBFGMarine,UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
 uid_race_start_fbase   : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter );
 uid_race_start_abase   : array[1..r_cnt] of integer = (UID_HAKeep   ,UID_UACommandCenter);
@@ -872,6 +876,7 @@ base_1rh               = base_1r+(base_1r div 2);
 base_2r                = base_1r*2;
 base_3r                = base_1r*3;
 base_4r                = base_1r*4;
+base_5r                = base_1r*5;
 base_6r                = base_1r*6;
 
 apc_exp_damage         = BaseDamage4;
@@ -1316,10 +1321,8 @@ rpls_file_write        = 1;
 rpls_file_read         = 2;
 
 rpls_state_none        = 0;
-rpls_state_whead       = 1;
-rpls_state_wunit       = 2;
-rpls_state_rhead       = 3;
-rpls_state_runit       = 4;
+rpls_state_write       = 1;
+rpls_state_read        = 2;
 
 SvRpLen                = 15;
 

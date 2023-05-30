@@ -151,7 +151,7 @@ begin
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_Phantom,
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
-UID_HEye          : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
+UID_HEye          : _setEff(6 ,0 ,8  ,-1       ,true ,0 );
 
 MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,

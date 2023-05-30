@@ -136,11 +136,17 @@ var i:byte;
 begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
-    for i:=0 to MaxDamageModFactors do
-     with _dmods[dmod][i] do
-      if(dm_flags>0)then
-       if(CheckUnitBaseFlags(tu,dm_flags))then
-        case dm_factor of
+    if(dmod=dm_BFG)then
+    begin
+       if(not tu^.uid^._ukbuilding)
+       then ApplyDamageMod:=round(base_damage*tu^.uid^._limituse/ul1);
+    end
+    else
+     for i:=0 to MaxDamageModFactors do
+      with _dmods[dmod][i] do
+       if(dm_flags>0)then
+        if(CheckUnitBaseFlags(tu,dm_flags))then
+         case dm_factor of
        0   : ApplyDamageMod:=0;
        25  : ApplyDamageMod:=               (ApplyDamageMod div 4);
        50  : ApplyDamageMod:=               (ApplyDamageMod div 2);
@@ -152,8 +158,8 @@ begin
        200 : ApplyDamageMod:=ApplyDamageMod* 2;
        300 : ApplyDamageMod:=ApplyDamageMod* 3;
        500 : ApplyDamageMod:=ApplyDamageMod* 5;
-        else ApplyDamageMod:=round(ApplyDamageMod*100/dm_factor);
-        end;
+         else ApplyDamageMod:=round(ApplyDamageMod*100/dm_factor);
+         end;
 end;
 
 procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
@@ -253,12 +259,8 @@ begin
 
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
-        {case mid of
-        MID_SSShot : painX+=5;
-        MID_SShot  : painX+=3;
-        end;}
 
-        if(ud<=0)and(ntars=0)then // first direct target
+        if(ud<=0)then // direct target
         begin
            {$IFDEF _FULLGAME}
            ms_eid_bio_death:=tu^.uidi in ms_eid_bio_death_uids;

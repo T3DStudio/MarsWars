@@ -491,7 +491,7 @@ begin
    setBuildingSND(snd_hell_eye);
    un_build_amode:=2;
    un_eid_bcrater:=255;
-   setEffectEID(0,0  ,UID_HEye ,UID_HEye,0  );
+   setEffectEID(0,0  ,UID_HEye,UID_HEye,0  );
    setEffectSND(  nil,snd_pexp,snd_pexp,nil);
 end;
 UID_HCommandCenter:

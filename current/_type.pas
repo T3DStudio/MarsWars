@@ -437,12 +437,13 @@ TPlayer = record
            : longint;
 
    observer,
+   revealed,
    ready   : boolean;
 
    o_id    : byte;
 o_a0,
 o_x0,o_y0,
-o_x1,o_y1  :integer;
+o_x1,o_y1  : integer;
 
    ucl_e,                                        // existed class
    ucl_eb,                                       // existed class bld=true and hits>0
@@ -638,7 +639,9 @@ PTUnit = ^TUnit;
 PPTUnit = ^PTUnit;
 
 TCTPoint = record
-   cpx ,cpy ,cpsolidr,cpCapturer,cpnobuildr,
+   cpx ,cpy ,
+   cpsolidr,cpCapturer,cpnobuildr,
+   cp_tocenterr,
    cpmx,cpmy,cpmr,
    cpenergy,
    cpCaptureTime,

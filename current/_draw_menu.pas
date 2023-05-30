@@ -93,7 +93,7 @@ begin
              else _draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace], ta_middle, 255, c);
              if(g_mode in gm_fixed_positions)then c:=c_gray;
              _draw_text(tar,ui_menu_pls_zxtt, u,t2c(PlayerGetTeam(g_mode,p)), ta_middle, 255, c);
-             if(not GetBBit(@g_player_status,p))and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_red);
+             if(not GetBBit(@g_player_astatus,p))and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_red);
           end
           else
             if(g_ai_slots)>0then
@@ -394,7 +394,7 @@ begin
                  // replays
                  y:=_yt(10);
                  _draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_left  ,255, c_white);
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_rpl[rpls_state]    , ta_right ,255, mic( rpls_state<rpls_state_rhead ,rpls_state>rpls_state_none));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_state], ta_right ,255, mic( rpls_state<rpls_state_read ,rpls_state>rpls_state_none));
                  t:=_yl(10);
                  vlineColor(tar,ui_menu_csm_x3 ,t,t+ui_menu_csm_ys, c_gray);
                  y:=_yt(11);
@@ -403,7 +403,7 @@ begin
                  y:=_yl(11);
                  vlineColor(tar,ui_menu_csm_xc ,y,y+ui_menu_csm_ys,c_gray);
                  y:=_yt(12);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpls_state_rhead ,false));
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpls_state_read ,false));
                  if(rpls_state>rpls_state_none)and(g_cl_units>0)then
                  _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
               end;

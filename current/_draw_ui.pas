@@ -424,7 +424,7 @@ begin
       end;
 
       3: // actions
-      if(rpls_state>=rpls_state_rhead)then
+      if(rpls_state>=rpls_state_read)then
       begin
          _drawBtn(tar,0,0,spr_b_rfast,uncappedFPS ,false);
          _drawBtn(tar,1,0,spr_b_rback,false       ,false);
@@ -476,7 +476,7 @@ end;
 procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy,i,r:integer;
 begin
-   if(rpls_state<rpls_state_rhead)then
+   if(rpls_state<rpls_state_read)then
    begin
       D_BuildUI(tar,lx,ly);
 
@@ -557,7 +557,7 @@ begin
            if(ui_tab=3)then
            begin
               if(i<=_mhkeys)then
-                if(rpls_state>=rpls_state_rhead)
+                if(rpls_state>=rpls_state_read)
                 then hs1:=@str_hint_r[i]
                 else
                   if(_players[HPlayer].observer)
@@ -642,7 +642,7 @@ chat_allies  : ChatString:=str_chat_allies;
 end;
 begin
    // replay progress bar
-   if(rpls_state=rpls_state_runit)then
+   if(rpls_state=rpls_state_read)then
      D_ReplayProgress(tar);
 
    // LOG and HINTs
@@ -682,7 +682,7 @@ begin
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col,VisPlayer))then _draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_middle,255,col);
 
-   if(VisPlayer<>HPlayer)or(rpls_state>=rpls_state_rhead)then
+   if(VisPlayer<>HPlayer)or(rpls_state>=rpls_state_read)then
      if(VisPlayer>0)
      then _draw_text(tar,ui_uiuphx,ui_uiplayery,_players[VisPlayer].name,ta_middle,255,PlayerGetColor(VisPlayer))
      else _draw_text(tar,ui_uiuphx,ui_uiplayery,str_all                 ,ta_middle,255,c_white                  );

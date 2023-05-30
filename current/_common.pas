@@ -473,7 +473,7 @@ end;
 function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_rhead){$ENDIF})
+   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_read){$ENDIF})
                  or(team=0);
 end;
 
@@ -541,22 +541,24 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure PlayersStatus(pstatus:pbyte;punits:pinteger);
+procedure UpdatePlayersStatus;
 var p:byte;
 begin
-   pstatus^:=0;
-   punits^ :=0;
+   g_player_astatus:=0;
+   g_player_rstatus:=0;
+   g_cl_units      :=0;
    for p:=0 to MaxPlayers do
     with _players[p] do
     begin
        observer:=false;
        if(state>ps_none)then
        begin
+          SetBBit(@g_player_rstatus,p,revealed);
           observer:=PlayerObserver(@_players[p]);
           if(army>0)then
           begin
-             SetBBit(pstatus,p,true);
-             punits^+=MaxPlayerUnits;
+             SetBBit(@g_player_astatus,p,true);
+             g_cl_units+=MaxPlayerUnits;
           end;
        end;
     end;
@@ -943,10 +945,10 @@ begin
       end;
 end;
 
-function CheckUnitTeamVision(uteam:byte;tu:PTUnit;noinvis:boolean):boolean;
+function CheckUnitTeamVision(uteam:byte;tu:PTUnit;SkipInvisCheck:boolean):boolean;
 begin
    with tu^ do
-    if(buff[ub_Invis]<=0)or(hits<=0)or(noinvis)
+    if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
     then CheckUnitTeamVision:=(vsnt[uteam]>0)
     else CheckUnitTeamVision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
 end;
@@ -1079,7 +1081,7 @@ begin
    if(not rpls_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_state_rhead)or(_players[HPlayer].observer)then exit;
+     if(rpls_state>=rpls_state_read)or(_players[HPlayer].observer)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=_players[UIPlayer].team)then exit;

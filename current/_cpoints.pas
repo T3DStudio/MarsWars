@@ -37,6 +37,16 @@ begin
     with g_cpoints[i] do
     if(cpCapturer>0)then
     begin
+       if(g_mode=gm_royale)and(g_royal_r<cp_tocenterr)then
+       begin
+          CPoint_ChangeOwner(i,0);
+          cpCapturer:=-cpCapturer;
+          {$IFDEF _FULLGAME}
+          effect_CPExplode(cpx,cpy);
+          {$ENDIF}
+          exit;
+       end;
+
        if(cplifetime>0)and(cpOwnerTeam>0)then
        begin
           cplifetime-=1;

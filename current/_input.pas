@@ -224,7 +224,7 @@ end;
 
 procedure _player_s_o(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
 begin
-   if(G_Status=gs_running)and(rpls_state<rpls_state_rhead)then
+   if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
    begin
       if(net_status=ns_clnt)then
       begin
@@ -404,7 +404,7 @@ begin
      if(u<=ui_ubtns)then
        with _players[HPlayer] do
          case tab of
-0:  if(G_Status=gs_running)and(rpls_state<rpls_state_rhead)then  // buildings
+0:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // buildings
       case click_type of
 pct_left   : begin
              m_brush:=ui_panel_uids[race,tab,u];
@@ -412,21 +412,21 @@ pct_left   : begin
              end;
       end;
 
-1:  if(G_Status=gs_running)and(rpls_state<rpls_state_rhead)then  // units
+1:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // units
       case click_type of
 pct_left   : _player_s_o(co_suprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
 pct_right  : _player_s_o(co_cuprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
       end;
 
-2:  if(G_Status=gs_running)and(rpls_state<rpls_state_rhead)then  // upgrades
+2:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // upgrades
       case click_type of
 pct_left   : _player_s_o(co_supgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
 pct_right  : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
       end;
 
-3:  if(rpls_state>=rpls_state_rhead)then
+3:  if(rpls_state>=rpls_state_read)then
     begin
-       if(rpls_state=rpls_state_runit)then
+       if(rpls_fstatus=rpls_file_read)then
        case u of
      1 : case click_type of
 pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1);
@@ -567,7 +567,7 @@ sdlk_tab: begin
          exit;
       end;
 
-      if(rpls_state>=rpls_state_rhead)then
+      if(rpls_state>=rpls_state_read)then
       begin
          for ko:=0 to _mhkeys do  // replays
          begin
@@ -832,7 +832,6 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       end
       else _panel_click(ui_tab,m_bx,m_by,pct_left,k_dbl);     // panel
 
-
    if(ks_mleft=-1)then  // LMB up
    begin
       m_mmap_move:=false;
@@ -849,7 +848,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
             then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer)
             else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
 
-            if(G_Status=gs_running)and(rpls_state<rpls_state_rhead)then
+            if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 

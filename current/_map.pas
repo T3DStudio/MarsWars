@@ -238,6 +238,7 @@ begin
    begin
       cpx       :=px;
       cpy       :=py;
+      cp_tocenterr:=point_dist_int(cpx,cpy,map_hmw,map_hmw);
       cpsolidr  :=sr;
       cpnobuildr:=nr;
       cpenergy  :=energy;

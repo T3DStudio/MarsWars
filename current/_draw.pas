@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not _players[HPlayer].observer)and(rpls_state<rpls_state_rhead)
+   if(not _players[HPlayer].observer)and(rpls_state<rpls_state_read)
    then UIPlayer:=HPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -78,6 +78,13 @@ begin
        i2s(mouse_map_x)+
    ' '+i2s(mouse_map_y),
    ta_right,255, c_white);
+
+   _draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
+       i2s(rpls_state)+
+   ' '+i2s(rpls_fstatus),
+   ta_right,255, c_white);
+
+
    end;
 
    sdl_flip(r_screen);

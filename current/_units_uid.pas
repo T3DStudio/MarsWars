@@ -415,7 +415,8 @@ begin
    _limituse  := ul10;
    _splashresist:=true;
    _ukmech    := true;
-   _upgr_regen:=upgr_race_regen_bio[r_hell];
+   _upgr_regen:= upgr_race_regen_bio[r_hell];
+   _upgr_armor:= upgr_race_armor_bio[r_hell];
    _weapon(0,wpt_missle   ,aw_fsr+50,0,0 ,fr_fpsd6,MID_Chaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Light,0,dm_AntiLight);
 end;
 {
@@ -438,7 +439,8 @@ begin
    _limituse  := ul12;
    _splashresist:=true;
    _ukmech    := true;
-   _upgr_regen:=upgr_race_regen_bio[r_hell];
+   _upgr_regen:= upgr_race_regen_bio[r_hell];
+   _upgr_armor:= upgr_race_armor_bio[r_hell];
    _weapon(0,wpt_missle   ,aw_fsr+25,0,0 ,fr_fps1   ,MID_HRocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Building,0,dm_Cyber);
 end;
 UID_Pain      :
@@ -480,7 +482,7 @@ begin
    _attack    := atm_always;
    _uklight   := false;
    _a_BonusAntiFlyRange:=75;
-   _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1,MID_Revenant ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Revenant],[],0,-7,wtp_fly     ,0,dm_AntiFly);
+   _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1,MID_Revenant ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Revenant],[],0,-7,wtp_Fly     ,0,dm_AntiFly);
    _weapon(1,wpt_directdmg,aw_dmelee ,0,BaseDamage1,fr_fps1,0            ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Revenant],[],0, 0,wtp_distance,0,0);
 end;
 {
@@ -520,6 +522,7 @@ begin
    _attack    := atm_always;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
+   _upgr_armor:= upgr_race_armor_bio[r_hell];
    _a_BonusAntiGroundRange:=50;
    _weapon(0,wpt_missle,aw_fsr,0,0 ,fr_fpsd3,MID_YPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Arachnotron],[],0,0,wtp_UnitMech,0,dm_AntiUnitMech);
 end;
@@ -563,7 +566,7 @@ begin
    _btime     :=ptime1;
    _weapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0,dm_Lost);
    end;
-   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_bio     ,0,dm_Lost);
+   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Bio     ,0,dm_Lost);
 end;
 UID_ZFormer:
 begin
@@ -667,7 +670,7 @@ begin
    _ruid1n    := 3;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiFlyRange:=25;
-   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_fly,0,dm_AntiFly);
+   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_Fly,0,dm_AntiFly);
 end;
 UID_ZSiegeMarine:
 begin
@@ -721,10 +724,10 @@ begin
    _ruid1     := UID_HBarracks;
    _ruid1n    := 4;
    _ruid2     := UID_HACommandCenter;
-   _ruid2n    := 2;
+   _ruid2n    := 3;
    _limituse  := ul2;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_BFG,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_max_hits,0,0);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_BFG,0,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_limit,0,dm_BFG);
 end;
 
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
@@ -1044,7 +1047,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiFlyRange:=25;
-   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_fly ,0,dm_AntiFly);
+   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Fly ,0,dm_AntiFly);
 end;
 UID_SiegeMarine:
 begin
@@ -1094,8 +1097,9 @@ begin
    _uklight   := false;
    _limituse  := ul2;
    _ruid1     := UID_UTechCenter;
+   _ruid2     := UID_UComputerStation;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_missle,aw_fsr+50,0,0 ,fr_fps2,MID_BFG,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_max_hits,0,0);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0 ,fr_fps2,MID_BFG,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_limit,0,dm_BFG);
 end;
 UID_Engineer:
 begin
@@ -1188,8 +1192,7 @@ begin
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _uklight   := false;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_Chaingun,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground_light_bio,wpr_any,uids_all,[],0,0,wtp_UnitBioLight,0,dm_AntiUnitBioLight);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SShot   ,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground          ,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SShot,0,0,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio,0,dm_AntiUnitBio);
 end;
 UID_Tank:
 begin
@@ -1227,7 +1230,7 @@ begin
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _weapon(0,wpt_missle,aw_fsr,0,-8,fr_fpsd2,MID_URocket,0,0               ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly  );
-   _weapon(1,wpt_missle,aw_fsr,0,0 ,fr_fpsd3,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_light      ,0,0);
+   _weapon(1,wpt_missle,aw_fsr,0,0 ,fr_fpsd2,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_Light      ,0,0);
 end;
 
 UID_APC:
@@ -1318,7 +1321,7 @@ end;
       _level_armor :=BaseArmorLevel1 +round(BaseArmorLevel1 *(_limituse-ul1)/ul1/2);
       end;
 
-      if(_base_armor<0)then  _base_armor:=0;
+      if(_base_armor<0)then _base_armor:=0;
 
       _shcf:=_mhits/_mms;
 
@@ -1383,7 +1386,7 @@ MID_Cacodemon,
 MID_Revenant       : mid_base_damage :=BaseDamage1h;
 MID_Baron          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;
-MID_BFG            : mid_base_damage :=BaseDamage5;
+MID_BFG            : mid_base_damage :=BaseDamage4;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_ArchFire       : mid_base_damage :=BaseDamage8;
 MID_Mine,
@@ -1458,6 +1461,8 @@ begin
    SetDMOD(dm_SSGShot          ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
    SetDMOD(dm_SSGShot          ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitBioLight ,0,150,wtr_unit    +wtr_bio +wtr_light           );
+   SetDMOD(dm_AntiUnitBio      ,0,150,wtr_unit    +wtr_bio                      );
+   SetDMOD(dm_AntiUnitBio      ,1, 50,wtr_building                              );
    SetDMOD(dm_AntiUnitMech     ,0,150,wtr_unit    +wtr_mech                     );
    SetDMOD(dm_AntiUnitLight    ,0,150,wtr_unit             +wtr_light           );
    SetDMOD(dm_AntiFly          ,0,150,                                wtr_fly   );

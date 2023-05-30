@@ -161,20 +161,32 @@ begin
 end;
 
 procedure ui_IncOrderCounter(x,y:integer;i,uidi:byte);
+var d:integer;
 begin
    if(i>MaxUnitGroups)then exit;
    if(ui_orders_n[i]=0)then
    begin
       ui_orders_x[i]:=x;
       ui_orders_y[i]:=y;
+      ui_orders_d[i]:=point_dist_int(x,y,vid_cam_x+vid_cam_hw,vid_cam_y+vid_cam_hh);
    end
    else
-     if (abs(x-ui_orders_x[i])<vid_vw)
-     and(abs(y-ui_orders_y[i])<vid_vh)then
-     begin
-        ui_orders_x[i]:=(ui_orders_x[i]+x) div 2;
-        ui_orders_y[i]:=(ui_orders_y[i]+y) div 2;
-     end;
+   begin
+      d:=point_dist_int(x,y,vid_cam_x+vid_cam_hw,vid_cam_y+vid_cam_hh);
+      if(abs(d-ui_orders_d[i])<vid_cam_hh)then
+      begin
+         ui_orders_x[i]:=(x+ui_orders_x[i]) div 2;
+         ui_orders_y[i]:=(y+ui_orders_y[i]) div 2;
+         ui_orders_d[i]:=(d+ui_orders_d[i]) div 2;
+      end
+      else
+        if(d<ui_orders_d[i])then
+        begin
+           ui_orders_x[i]:=x;
+           ui_orders_y[i]:=y;
+           ui_orders_d[i]:=d;
+        end;
+   end;
    ui_orders_n[i]+=1;
    with _uids[uidi] do
    ui_orders_uids[i,_ukbuilding]+=[uidi];
@@ -185,7 +197,7 @@ var i:byte;
     t:integer;
 begin
    with pu^ do
-   if(playeri=UIPlayer){and(G_Status=gs_running)}then
+   if(playeri=UIPlayer)then
    with uid^ do
    with player^ do
    begin
@@ -390,7 +402,7 @@ begin
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
-            if(cycle_order=_cycle_order)
+            if((unum mod vid_blink_period2)=vid_blink_timer2)
             then _unit_level_string(pu);
 
             depth:=_unit_SpriteDepth(pu);
@@ -512,6 +524,7 @@ begin
    FillChar(ui_pprod_time     ,SizeOf(ui_pprod_time     ),0);
    FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
    FillChar(ui_orders_n       ,SizeOf(ui_orders_n       ),0);
+   FillChar(ui_orders_d       ,SizeOf(ui_orders_d       ),0);
    FillChar(ui_orders_x       ,SizeOf(ui_orders_x       ),0);
    FillChar(ui_orders_y       ,SizeOf(ui_orders_y       ),0);
    ui_uprod_max      :=0;

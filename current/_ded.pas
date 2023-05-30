@@ -160,6 +160,13 @@ begin
 '-ng'    : if(a=2)then begin g_cgenerators:=mm3(0,s2b(args[1]),gms_g_maxgens);Map_premap;end;
 '-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
 '-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
+'-r'     : begin
+              g_start_base :=random(gms_g_startb+1);
+              g_cgenerators:=random(gms_g_maxgens+1);
+              if(random(3)=0)
+              then g_ai_slots:=0
+              else g_ai_slots:=random(player_default_ai_level+1);
+           end;
    else exit;
    end;
    screen_redraw:=true;
