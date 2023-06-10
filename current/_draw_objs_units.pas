@@ -135,26 +135,26 @@ begin
          begin
             if(pcurrent)then ui_uprod_cur+=1;
             i:=uprod_u[pn];
-            if(ui_uprod_first      <=0)or(ui_uprod_first      >uprod_r[pn])then ui_uprod_first      :=uprod_r[pn];
-            if(ui_uprod_uid_time[i]<=0)or(ui_uprod_uid_time[i]>uprod_r[pn])then ui_uprod_uid_time[i]:=uprod_r[pn];
+            if(ui_uprod_first      <=0)or(uprod_r[pn]<ui_uprod_first      )then ui_uprod_first      :=uprod_r[pn];
+            if(ui_uprod_uid_time[i]<=0)or(uprod_r[pn]<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[pn];
          end
          else
            for t:=1 to 255 do
             if(pcurrent)then
-             if(t in ups_units)then ui_uprod_uid_max[t]+=1;     //possible productions count of each unit type
+             if(t in ups_units)then ui_uprod_uid_max[t]+=1; // possible productions count of each unit type
       end;
 
       if(_issmith)then
       begin
          for t:=1 to 255 do
-          if(s_smiths<=0)or(sel)then   // and(s_smiths>0)
-           if(t in ups_upgrades)then ui_pprod_max[t]+=1;   //possible productions count of each upgrade type
+          if(s_smiths<=0)or(sel)then
+           if(t in ups_upgrades)then ui_pprod_max[t]+=1;    // possible productions count of each upgrade type
 
          if(pprod_r[pn]>0)then
          begin
             i:=pprod_u[pn];
-            if(ui_pprod_first  <=0)or(pprod_r[pn]  <ui_pprod_first)then ui_pprod_first  :=pprod_r[pn];
-            if(ui_pprod_time[i]<=0)or(ui_pprod_time[i]>pprod_r[pn])then ui_pprod_time[i]:=pprod_r[pn];
+            if(ui_pprod_first  <=0)or(pprod_r[pn]<  ui_pprod_first)then ui_pprod_first  :=pprod_r[pn];
+            if(ui_pprod_time[i]<=0)or(pprod_r[pn]<ui_pprod_time[i])then ui_pprod_time[i]:=pprod_r[pn];
          end;
       end;
    end;
@@ -173,23 +173,16 @@ begin
    else
    begin
       d:=point_dist_int(x,y,vid_cam_x+vid_cam_hw,vid_cam_y+vid_cam_hh);
-      if(abs(d-ui_orders_d[i])<vid_cam_hh)then
+      if(d<ui_orders_d[i])then
       begin
-         ui_orders_x[i]:=(x+ui_orders_x[i]) div 2;
-         ui_orders_y[i]:=(y+ui_orders_y[i]) div 2;
-         ui_orders_d[i]:=(d+ui_orders_d[i]) div 2;
-      end
-      else
-        if(d<ui_orders_d[i])then
-        begin
-           ui_orders_x[i]:=x;
-           ui_orders_y[i]:=y;
-           ui_orders_d[i]:=d;
-        end;
+         ui_orders_x[i]:=x;
+         ui_orders_y[i]:=y;
+         ui_orders_d[i]:=d;
+      end;
    end;
    ui_orders_n[i]+=1;
    with _uids[uidi] do
-   ui_orders_uids[i,_ukbuilding]+=[uidi];
+     ui_orders_uids[i,_ukbuilding]+=[uidi];
 end;
 
 procedure ui_counters(pu:PTUnit);
@@ -286,6 +279,14 @@ procedure _unit_level_string(pu:PTUnit);
 var i,
 al,wl,sl:integer;
    atset:TSoB;
+procedure WeaponUpgrInc(upgr:byte);
+begin
+   if not(upgr in atset)then
+   begin
+      wl+=pu^.player^.upgr[upgr];
+      atset+=[upgr];
+   end;
+end;
 begin
    with pu^     do
    with uid^    do
@@ -311,14 +312,18 @@ begin
       else lvlstr_r:='';
 
       // weapon/attack
+      sl      :=0;
       wl      :=0;
       atset   :=[];
       for i:=0 to MaxUnitWeapons do
        with _a_weap[i] do
-        if(aw_rld>0)and(aw_dupgr>0)and not(aw_dupgr in atset)then
+        if(aw_rld>0)then
         begin
-           wl+=upgr[aw_dupgr];
-           atset+=[aw_dupgr];
+           if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
+           if(aw_type=wpt_missle)then
+            if(aw_oid=MID_SShot )
+            or(aw_oid=MID_SSShot)then WeaponUpgrInc(upgr_uac_ssgup);
+           if(aw_rupgr>0)and(aw_rupgr_l>=upgr[aw_rupgr])then sl+=1;
         end;
       lvlstr_w:=i2s6(wl,(_attack>atm_none)and(_attack<>atm_bunker));
       if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w;
@@ -334,7 +339,7 @@ begin
       lvlstr_a:=tc_lime+i2s6(al,true);
 
       // other
-      sl:=upgr[_upgr_regen]+upgr[_upgr_srange];
+      sl+=upgr[_upgr_regen]+upgr[_upgr_srange];
       if(_ukbuilding)
       then sl+=integer(upgr[upgr_race_regen_build[_urace]])
       else

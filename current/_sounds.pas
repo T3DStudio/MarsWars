@@ -137,6 +137,31 @@ begin
       if(sndn<=0)then WriteLog(fname);
    end;
 end;
+function MusicSetLoad(dir:shortstring):PTSoundSet;
+var tsnd: PTMWSound;
+    Info: TSearchRec;
+    s   : shortstring;
+begin
+   new(MusicSetLoad);
+   with MusicSetLoad^ do
+   begin
+      sndps:=0;
+      sndn :=0;
+      setlength(snds,sndn);
+
+      if(FindFirst(str_f_snd+dir+'*.ogg',faReadonly,info)=0)then
+       repeat
+         s:=info.Name;
+         if(length(s)>4)then
+         begin
+            delete(s,length(s)-3,4);
+            tsnd:=load_sound(dir+s);
+            if(tsnd<>nil)then SoundSetAdd(MusicSetLoad,tsnd);
+         end;
+       until(FindNext(info)<>0);
+      FindClose(info);
+   end;
+end;
 
 procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
 var i,
@@ -157,7 +182,7 @@ begin
      end;
 end;
 
-function SoundSetGetChunk(ss:PTSoundSet):PTMWSound;
+function SoundSetGetChunk(ss:PTSoundSet;NewChunk:boolean):PTMWSound;
 begin
    SoundSetGetChunk:=nil;
    with ss^ do
@@ -166,7 +191,7 @@ begin
      then SoundSetGetChunk:=snds[0]
      else
      begin
-        sndps+=1;
+        if(NewChunk)then sndps+=1;
         if(sndps<0)or(sndps>=sndn)then sndps:=0;
         SoundSetGetChunk:=snds[sndps];
      end;
@@ -266,13 +291,13 @@ begin
       with ssl[i] do alSourceStop(source);
 end;
 
-procedure SoundPlay(SoundSet:PTSoundSet;sss:byte);
+procedure SoundPlay(SoundSet:PTSoundSet;sss:byte;NewChunk:boolean);
 var vsound :PTMWSound;
     vsource:PTMWSoundSource;
 begin
    if(sss>=sss_count)then exit;
 
-   vsound :=SoundSetGetChunk(SoundSet);
+   vsound :=SoundSetGetChunk(SoundSet,NewChunk);
    vsource:=SoundSourceSetGetSource(@SoundSources[sss]);
 
    if(vsound<>nil)and(vsource<>nil)then
@@ -305,7 +330,7 @@ begin
       with pu^ do
        if(PointInScreenP(x,y)=false)then exit;
 
-   SoundPlay(ss,sss_world);
+   SoundPlay(ss,sss_world,true);
    SoundPlayUnit:=true;
 end;
 
@@ -314,7 +339,7 @@ begin
    if(ss=nil)
    or(r_draw=false)then exit;
 
-   SoundPlay(ss,sss_ui);
+   SoundPlay(ss,sss_ui,true);
 end;
 
 procedure SoundPlayAnoncer(ss:PTSoundSet;checkpause,stopother:boolean);
@@ -327,7 +352,7 @@ begin
 
    if(stopother)
    then StopSoundSource(sss_anoncer);
-   SoundPlay(ss,sss_anoncer);
+   SoundPlay(ss,sss_anoncer,true);
 
    snd_anoncer_ticks:=fr_fps1;
    snd_anoncer_last :=ss;
@@ -340,7 +365,7 @@ begin
 
    if(checkpause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
 
-   SoundPlay(ss,sss_mmap);
+   SoundPlay(ss,sss_mmap,true);
 
    snd_mmap_ticks:=fr_fps1;
    snd_mmap_last :=ss;
@@ -354,7 +379,7 @@ begin
 
    if(snd_command_last=ss)and(snd_command_ticks>0)then exit;
 
-   SoundPlay(ss,sss_ucommand);
+   SoundPlay(ss,sss_ucommand,true);
 
    snd_command_last:=ss;
    snd_command_ticks:=fr_fps2d3;
@@ -437,9 +462,15 @@ begin
 
    if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)then
    begin
+      if(snd_music_current=current_music_ss)then
+      begin
+
+      end;
+
+      // add repeat
       snd_music_current:=current_music_ss;
 
-      SoundPlay(snd_music_current,sss_music);
+      SoundPlay(snd_music_current,sss_music,true);
    end;
 end;
 
@@ -486,8 +517,8 @@ begin
     else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
     end;
 
-   snd_music_menu:=SoundSetLoad('music\mm');
-   snd_music_game:=SoundSetLoad('music\m');
+   snd_music_menu:=MusicSetLoad('music\menu\');
+   snd_music_game:=MusicSetLoad('music\game\');
 
    SoundShafleSoundSet(@snd_music_menu);
    SoundShafleSoundSet(@snd_music_game);

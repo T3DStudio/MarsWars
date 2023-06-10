@@ -1394,7 +1394,7 @@ uprod_base : begin
                 exit;
              end;
 uprod_any  : case pu^.player^.race of
-             r_hell: case random(22) of
+             r_hell: case random(23) of
                           0 : ut:=UID_LostSoul;
                           1 : ut:=UID_Imp;
                           2 : if(upgr[upgr_hell_spectre]>0)and(smart)then ut:=UID_Demon else ut:=UID_Imp;
@@ -1417,6 +1417,7 @@ uprod_any  : case pu^.player^.race of
                           19: ut:=UID_ZSiegeMarine;
                           20: ut:=UID_ZFPlasmagunner;
                           21: ut:=UID_ZBFGMarine;
+                          22: ut:=UID_Phantom;
                      end;
              r_uac : begin
                      if(tryTransport)then exit;
@@ -1440,11 +1441,12 @@ uprod_any  : case pu^.player^.race of
                      end;
              end;
 uprod_air  : case pu^.player^.race of
-             r_hell: case random(4) of
+             r_hell: case random(5) of
                           0 : ut:=UID_LostSoul;
                           1 : ut:=UID_Cacodemon;
                           2 : ut:=UID_Pain;
                           3 : ut:=UID_ZFPlasmagunner;
+                          4 : ut:=UID_Phantom;
                      end;
              r_uac : case random(3) of
                           0 : ut:=UID_FPlasmagunner;
@@ -1454,7 +1456,7 @@ uprod_air  : case pu^.player^.race of
              end;
 uprod_antiair
            : case pu^.player^.race of
-             r_hell: case random(7) of
+             r_hell: case random(8) of
                           0 : ut:=UID_LostSoul;
                           1 : ut:=UID_Cacodemon;
                           2 : ut:=UID_Pain;
@@ -1462,6 +1464,7 @@ uprod_antiair
                           4 : ut:=UID_Revenant;
                           5 : ut:=UID_Imp;
                           6 : ut:=UID_ZAntiaircrafter;
+                          7 : ut:=UID_Phantom;
                      end;
              r_uac : case random(3) of
                           0 : ut:=UID_FPlasmagunner;

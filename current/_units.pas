@@ -667,7 +667,7 @@ UID_HKeep     : if(ud<srange)
                and(team<>tu^.player^.team)then
                  if(tu^.buff[ub_Decay]<=fr_fpsd2)and(upgr[upgr_hell_paina]>0)then
                  begin
-                    _unit_damage(tu,BaseDamageBonus1,1,playeri,true);
+                    _unit_damage(tu,DecayAuraDamage,1,playeri,true);
                     tu^.buff[ub_Decay]:=fr_fps1;
                  end;
    end;
@@ -1184,7 +1184,7 @@ uab_Teleport     : if(_ability_teleport    (pu,tu,td))then exit;//team
          end;
 
          if(player=tu^.player)and(tu^.ukfly)then
-          if(_itcanapc(tu,pu))and(not _IsUnitRange(tu^.uo_tar,nil))then
+          if(_itcanapc(tu,pu))and(not _IsUnitRange(tu^.uo_tar,nil))and(tu^.uo_x=tu^.x)and(tu^.uo_y=tu^.y)then
           begin
              tu^.uo_x:=x;
              tu^.uo_y:=y;
@@ -1723,7 +1723,8 @@ uab_RebuildInPoint   : begin
                     exit;
                   end;
 co_rebuild :  if(_unit_rebuild (pu))then exit;
-co_sability:  if(_unit_sability(pu))then exit;
+co_sability:  if(_unit_sability(pu))then
+               if(uo_id<>ua_unload)then exit;
    end;
    _unit_player_order:=false;
 end;

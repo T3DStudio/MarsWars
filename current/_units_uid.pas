@@ -365,7 +365,7 @@ begin
    _renergy   := 300;
    _r         := 14;
    _speed     := 10;
-   _srange    := 225;
+   _srange    := 250;
    _ucl       := 3;
    _painc     := 8;
    _btime     := ptime1h;
@@ -383,7 +383,7 @@ begin
    _renergy   := 500;
    _r         := 14;
    _speed     := 10;
-   _srange    := 225;
+   _srange    := 250;
    _ucl       := 4;
    _painc     := 8;
    _btime     := ptime1h;
@@ -455,7 +455,7 @@ begin
    _btime     := ptime2;
    _apcs      := 2;
    _ruid1     := UID_HMonastery;
-   _limituse  := ul2;
+   _limituse  := ul1;
    _ukfly     := uf_fly;
    _attack    := atm_always;
    _ability   := uab_SpawnLost;
@@ -761,15 +761,15 @@ begin
       _upgr_srange     :=upgr_hell_buildr;
       _weapon(0,wpt_missle,_srange,_r,0,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
 
+      _btime   := ptime2;
+
       if(i=UID_HACommandCenter)then
       begin
          _genergy := 600;
          _renergy := 600;
-         _btime   := (_btime*3) div 2;
       end
       else
       begin
-         _ruid1      := UID_HCommandCenter;
          _genergy    := 300;
          _rebuild_uid:= UID_HACommandCenter;
       end;
@@ -1317,8 +1317,8 @@ end;
 
       if(_limituse>=MinUnitLimit)then
       begin
-      _level_damage:=BaseDamageLevel1+round(BaseDamageLevel1*(_limituse-ul1)/ul1/2);
-      _level_armor :=BaseArmorLevel1 +round(BaseArmorLevel1 *(_limituse-ul1)/ul1/2);
+      _level_damage:=round(BaseDamageLevel1*_limituse/ul1);
+      _level_armor :=round(BaseArmorLevel1 *_limituse/ul1);
       end;
 
       if(_base_armor<0)then _base_armor:=0;

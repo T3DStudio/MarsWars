@@ -698,18 +698,20 @@ BaseDamage10           = BaseDamage1*10;
 BaseDamageBonus1       = 8;
 BaseDamageBonush       = BaseDamageBonus1 div 2;
 BaseDamageBonus3       = BaseDamageBonus1*2;
-BaseDamageLevel1       = BaseDamageBonush;
+BaseDamageLevel1       = BaseDamageBonus1/4;
 BaseArmorBonus1        = 8;
 BaseArmorBonush        = BaseArmorBonus1 div 2;
 BaseArmorBonus2        = BaseArmorBonus1*2;
-BaseArmorLevel1        = BaseArmorBonush;
+BaseArmorLevel1        = BaseArmorBonus1/4;
 
 BaseHeal1              = (BaseDamage1 div 4)*3;
 BaseHealBonus1         = BaseDamageBonus1*3;
 BaseRepair1            = (BaseDamage1 div 4)*3;
 BaseRepairBonus1       = BaseDamageBonus1*4;
 
-ExpLevel1              = fr_fps1*45;
+DecayAuraDamage        = BaseDamage1 div 10;
+
+ExpLevel1              = fr_fps1*30;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

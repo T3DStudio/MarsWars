@@ -50,6 +50,7 @@ begin
 
         EID_Blood         : _setEID(@spr_blood          ,sms_death);
 
+        MID_ArchFire,
         EID_ArchFire      : _setEID(@spr_h_p6           ,sms_death);
 
         EID_HLevelUp      : begin
@@ -180,6 +181,7 @@ EID_Exp2          : _setEff(7 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_Blood         : _setEff(6 ,0 ,-1 ,-1       ,true ,15);
 
+MID_ArchFire,
 EID_ArchFire      : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HLevelUp,

@@ -141,7 +141,7 @@ begin
       SetBBit(@_bts2,6, buff[ub_Scaned      ]>0);
       SetBBit(@_bts2,7, buff[ub_Decay       ]>0);
 
-      SetBBit(@_bts1,0, iscomplete                    );
+      SetBBit(@_bts1,0, iscomplete             );
       SetBBit(@_bts1,1, transport>0            );
       SetBBit(@_bts1,2, (level and %01)      >0);
       SetBBit(@_bts1,3, (level and %10)      >0);

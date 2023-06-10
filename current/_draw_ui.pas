@@ -677,6 +677,9 @@ begin
       _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1  ,str_attr_building+tc_default+': '+l2s(ucl_l[true ]       ,MinUnitLimit),ta_left,255,c_white);
       _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1*2,str_attr_unit    +tc_default+': '+l2s(ucl_l[false]+uprodl,MinUnitLimit),ta_left,255,c_white);
       end;
+      {if(ks_ctrl>0)then G_Status:=gs_running
+      else
+       if( (limit)>MaxPlayerLimit)then G_Status:=VisPlayer;}
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

@@ -899,6 +899,8 @@ MainContext        : TALCcontext;
 
 SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
 
+snd_music_n,
+snd_music_c        : integer;
 snd_music_game,
 snd_music_menu     : PTSoundSet;
 snd_music_current  : PTSoundSet = nil;

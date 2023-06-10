@@ -299,6 +299,16 @@ begin
         end;
     end;
 end;
+procedure _unit_UpVision(pu:PTUnit);
+var t:byte;
+begin
+   with pu^ do
+    for t:=0 to MaxPlayers do
+    begin
+       if(vsnt[t]>0)then _AddToInt(@vsnt[t],fr_fps1);
+       if(vsni[t]>0)then _AddToInt(@vsni[t],fr_fps1);
+    end;
+end;
 
 procedure _unit_clear_order(pu:PTUnit;clearid:boolean);
 begin
@@ -801,7 +811,7 @@ begin
          UID_HAKeep: _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
          end;
          _unit_ability_HKeepBlink:=true;
-         _unit_reveal(pu,true);
+         _unit_UpVision(pu);
       end;
 end;
 
@@ -828,7 +838,7 @@ begin
          buff[ub_CCast]:=fr_fpsd2;
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
          _unit_ability_HTowerBlink:=true;
-         _unit_reveal(pu,true);
+         _unit_UpVision(pu);
       end;
 end;
 
@@ -1661,7 +1671,8 @@ begin
             then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
             if(_death_uid>0)and(_death_uidn>0)then
              for i:=1 to _death_uidn do
-              _unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
+              if(_uid_player_limit(player,_death_uid))then
+               _unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
          end;
       end;
    end
