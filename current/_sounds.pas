@@ -455,22 +455,27 @@ end;
 
 procedure SoundMusicControll;
 var current_music_ss: PTSoundSet;
+    repeat_track    : boolean;
 begin
    if(G_Started)
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
+   repeat_track:=false;
 
    if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)then
    begin
-      if(snd_music_current=current_music_ss)then
+      {if(snd_music_current=current_music_ss)then
       begin
-
-      end;
+         snd_music_n+=1;
+         repeat_track:=(snd_music_n<snd_music_c);
+         if(repeat_track)then snd_music_n:=0;
+      end
+      else snd_music_n:=0; }
 
       // add repeat
       snd_music_current:=current_music_ss;
 
-      SoundPlay(snd_music_current,sss_music,true);
+      SoundPlay(snd_music_current,sss_music,repeat_track);
    end;
 end;
 

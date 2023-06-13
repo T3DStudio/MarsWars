@@ -368,15 +368,14 @@ begin
 
             req:=_uid_conditionals(PVisPlayer,uid);
 
-            // _bornadvanced[g_addon]
             _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
             _drawBtnt(tar,ux,uy,
 
-            i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_ucl_reload[ucl]),
-            ui_cenergy[cenergy<0]       ,c_dyellow                   ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                 ,ir2s(build_cd));
+            i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),
+            ui_cenergy[cenergy<0]       ,c_dyellow                   ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                   ,ir2s(build_cd));
 
-            ui_uid_reload[uid]:=-1;
-            ui_ucl_reload[ucl]:=-1;
+            ui_uid_reload [uid]:=-1;
+            ui_bucl_reload[ucl]:=-1;
          end;
       end;
 
@@ -672,14 +671,11 @@ begin
       _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy           )+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);
       _draw_text(tar,ui_armyx ,ui_armyy,tc_orange+str_hint_army  +tc_default+l2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr,ta_left,255,ui_limit[limit>=MaxPlayerLimit]);
 
-      if(ui_armyx<mouse_x)and(mouse_x<=(ui_armyx+128))and(ui_armyy<=mouse_y)and(mouse_y<=(ui_armyy+font_w))then
+      if(ui_armyx<mouse_x)and(mouse_x<=(ui_armyx+140))and(ui_armyy<=mouse_y)and(mouse_y<=(ui_armyy+font_w))then
       begin
       _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1  ,str_attr_building+tc_default+': '+l2s(ucl_l[true ]       ,MinUnitLimit),ta_left,255,c_white);
       _draw_text(tar,ui_armyx,ui_armyy+txt_line_h1*2,str_attr_unit    +tc_default+': '+l2s(ucl_l[false]+uprodl,MinUnitLimit),ta_left,255,c_white);
       end;
-      {if(ks_ctrl>0)then G_Status:=gs_running
-      else
-       if( (limit)>MaxPlayerLimit)then G_Status:=VisPlayer;}
    end;
 
    // VICTORY/DEFEAT/PAUSE/REPLAY END

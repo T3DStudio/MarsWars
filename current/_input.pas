@@ -481,7 +481,14 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
   7 : _player_s_o(co_stand   ,0,0,0,0, uo_corder  ,HPlayer);
   8 : m_brush :=co_patrol;
 
-  9 : _player_s_o(co_pcancle ,0,0,0,0, uo_corder  ,HPlayer);
+  9 : if(s_barracks>0)
+      or(s_smiths  >0)
+      then _player_s_o(co_pcancle ,0,0,0,0, uo_corder  ,HPlayer)
+      else
+        case ui_tab of
+        1 : _player_s_o(co_cuprod  ,255,0,0,0,uo_corder,HPlayer);
+        2 : _player_s_o(co_cupgrade,255,0,0,0,uo_corder,HPlayer);
+        end;
   10: if(ui_orders_x[MaxUnitGroups]>0)then
         if(click_dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups],ui_orders_y[MaxUnitGroups])

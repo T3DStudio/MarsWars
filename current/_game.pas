@@ -463,9 +463,10 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                  co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0,false))then break;                                       // cancle upgr
                  co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  training
                  co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0,false))then break;                                       // cancle training
-                 co_pcancle  : begin
-                               if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,255 ,false))then break;
-                               if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,255 ,false))then break;
+                 co_pcancle  : if(sel)then
+                               begin
+                               if(_unit_ctraining(pu,255 ,false))then break;
+                               if(_unit_cupgrade (pu,255 ,false))then break;
                                end;
                  end;
 

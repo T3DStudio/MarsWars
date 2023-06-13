@@ -1322,6 +1322,7 @@ begin
           if(_AddToInt(@tu^.buff[ub_ArchFire ],fr_fps1))then SoundPlayUnit(snd_archvile_fire,tu,@targetvis);
          {$ENDIF}
       end;
+      _AddToInt(@vsnt[tu^.player^.team],a_rld+1);
       _AddToInt(@vsnt[tu^.player^.team],vistime);
       for i:=0 to MaxPlayers do
       begin

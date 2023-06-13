@@ -262,7 +262,7 @@ aummat_attacked_u,
 aummat_attacked_b : al_c:=c_red;
 aummat_created_u,
 aummat_created_b  : al_c:=c_lime;
-aummat_advance,
+aummat_advance    : al_c:=c_aqua;
 aummat_upgrade    : al_c:=c_yellow;
 aummat_info       : al_c:=c_white;
        end;

@@ -31,12 +31,12 @@ uses SysUtils, SDL, SDL_Net
         {$include _sounds.pas}
      {$ENDIF}
 {$include _net_com.pas}
-{$include _units_uid.pas}
+{$include _objects_main_data.pas}
      {$IFDEF _FULLGAME}
-        {$include _units_cl.pas}
+        {$include _objects_client_data.pas}
         {$include _lang.pas}
         {$include _config.pas}
-        {$include _units_spr.pas}
+        {$include _sprite_model.pas}
         {$include _draw_com.pas}
         {$include _draw_menu.pas}
         {$include _draw_ui.pas}

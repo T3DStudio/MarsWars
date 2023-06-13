@@ -189,7 +189,7 @@ TMissile = record
    tar,
    dir,
    mtars,
-   ntars    : integer;
+   dtars    : integer;
    player,
    homing,
    dmod,

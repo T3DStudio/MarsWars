@@ -369,7 +369,7 @@ ui_bprod_ucl_time : array[byte] of integer;
 ui_bprod_first,
 ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
-ui_ucl_reload     : array[byte] of integer;
+ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_actionu  : PTUID   = nil; // ui action uid
 ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
@@ -900,7 +900,7 @@ MainContext        : TALCcontext;
 SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
 
 snd_music_n,
-snd_music_c        : integer;
+snd_music_c        : byte;
 snd_music_game,
 snd_music_menu     : PTSoundSet;
 snd_music_current  : PTSoundSet = nil;

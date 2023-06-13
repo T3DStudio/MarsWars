@@ -182,7 +182,7 @@ begin
        fake   := mfake;
        dmod   := mdmod;
 
-       ntars  := 0;
+       dtars  := 0;
        dir    := point_dir(vx,vy,x,y);
        d      := point_dist_rint(x,y,vx,vy);
 
@@ -260,14 +260,14 @@ begin
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
 
-        if(ud<=0)then // direct target
+        if(ud<=0)and(dtars=0)then // direct target
         begin
            {$IFDEF _FULLGAME}
            ms_eid_bio_death:=tu^.uidi in ms_eid_bio_death_uids;
            {$ENDIF}
 
            mtars-=1;
-           ntars+=1;
+           dtars+=1;
 
            if(not fake)
            then _unit_damage(tu,rdamage,painX,player,false);
@@ -280,7 +280,6 @@ begin
              {$ENDIF}
 
              mtars-=1;
-             ntars+=1;
 
              if(not fake)then
              begin

@@ -696,7 +696,7 @@ begin
    str_uhbars[1]         := tc_aqua  +'always'  +tc_default;
    str_uhbars[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
 
-   str_pcolor            := 'Players colors';
+   str_pcolor            := 'Players color';
    str_pcolors[0]        := tc_white +'default'+tc_default;
    str_pcolors[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
    str_pcolors[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
@@ -936,7 +936,7 @@ begin
    _mkHStrACT(7 ,'Stop, '  +t);
    _mkHStrACT(8 ,'Patrol, '+t);
    _mkHStrACT(9 ,'Cancel production');
-   _mkHStrACT(10,'Select all units' );
+   _mkHStrACT(10,'Select all battle units' );
    _mkHStrACT(11,'Destroy'          );
    _mkHStrACT(12,'Alarm mark'       );
    _mkHStrACT(13,str_maction);

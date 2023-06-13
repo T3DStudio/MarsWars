@@ -219,8 +219,9 @@ begin
 
       if(iscomplete)then
       begin
-         if(rld<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<0)then ui_uid_reload[uidi]:=rld;
-         if(rld<ui_ucl_reload[_ucl])or(ui_ucl_reload[_ucl]<0)then ui_ucl_reload[_ucl]:=rld;
+         if(rld<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=rld;
+         if(_ukbuilding)then
+           if(rld<ui_bucl_reload[_ucl])or(ui_bucl_reload[_ucl]<0)then ui_bucl_reload[_ucl]:=rld;
 
          if(sel)then
          begin
@@ -516,8 +517,8 @@ pu,tu:PTUnit;
 begin
    for u:=0 to 255 do
    begin
-      ui_uid_reload[u]:=-1;
-      ui_ucl_reload[u]:=-1;
+      ui_uid_reload [u]:=-1;
+      ui_bucl_reload[u]:=-1;
    end;
    FillChar(ui_bprod_uid_count,SizeOf(ui_bprod_uid_count),0);
    FillChar(ui_bprod_ucl_count,SizeOf(ui_bprod_ucl_count),0);

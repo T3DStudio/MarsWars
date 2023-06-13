@@ -305,8 +305,8 @@ begin
    with pu^ do
     for t:=0 to MaxPlayers do
     begin
-       if(vsnt[t]>0)then _AddToInt(@vsnt[t],fr_fps1);
-       if(vsni[t]>0)then _AddToInt(@vsni[t],fr_fps1);
+       if(vsnt[t]>0)then _AddToInt(@vsnt[t],vistime);
+       if(vsni[t]>0)then _AddToInt(@vsni[t],vistime);
     end;
 end;
 
@@ -343,6 +343,7 @@ begin
       buff[ub_Teleport]:=fr_fps1;
       _unit_SetXY(pu,tx,ty,mvxy_strict);
       _unit_clear_order(pu,false);
+      _unit_UpVision(pu);
    end;
 end;
 

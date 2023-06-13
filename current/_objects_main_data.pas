@@ -1170,6 +1170,7 @@ begin
    _ukfly     := uf_fly;
    _attack    := atm_none;
    _ukmech    := true;
+   _splashresist:=true;
    _slowturn  := true;
    _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;

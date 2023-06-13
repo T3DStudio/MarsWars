@@ -7,7 +7,7 @@ Other:
 - added "skip backward" function to replay player;
 - map generator can make symmetrical maps now;
 - visual themes for maps;
-- maximum map size increased to 8000;
+- maximum map sizes extended to 2000-8000;
 - option 'Game: UDOOM/DOOM2' removed; now game based on DOOM2 only;
 - new game option: 'Neutral generators' - map contain neutral generators that can be captured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators have optional lifetime;
 - new game mode 'King of the Hill' where players must capture and hold central area for 1 minute to win;
@@ -31,9 +31,9 @@ Interface:
 --- going to transport;
 --- going to pickup onboard some unit;
 - new UI options:
--- control pannel position(up,down,left,right);
+-- control panel position(up,down,left,right);
 -- units health bars draw option;
--- players color schema;
+-- players color scheme;
 -- colored shadows for units;
 - army/energy information now draw in star/war-craft style;
 - healthbars and selection rects abow units now draw in separate layer;
