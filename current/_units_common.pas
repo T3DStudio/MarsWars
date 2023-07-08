@@ -1609,7 +1609,8 @@ begin
 
       with uid^ do
       begin
-         if(_ukbuilding)and(buildcd)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+         if(_ukbuilding)and(buildcd)then
+           if(_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 

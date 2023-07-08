@@ -1,7 +1,7 @@
 
 var
 
-_CYCLE            : boolean = false;
+GameCycle         : boolean = false;
 _EVENT            : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,9 +12,9 @@ _EVENT            : pSDL_EVENT;
 g_started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
-g_start_base      : byte     = 0;
+g_start_base      : byte     = 2;
 g_fixed_positions : boolean  = false;
-g_cgenerators     : byte     = 0;
+g_generators      : byte     = 2;
 g_ai_slots        : byte     = player_default_ai_level;
 g_deadobservers   : boolean  = true;
 g_step            : cardinal = 0;
@@ -147,7 +147,7 @@ tmpmid            : byte = MID_Imp;
 
 _warpten          : boolean = false;
 _testmode         : byte = 0;
-uncappedFPS          : boolean = false;
+uncappedFPS       : boolean = false;
 
 r_panel,
 r_uipanel,
@@ -729,6 +729,8 @@ str_weapon_suicide,
 str_weapon_targets,
 str_weapon_damage,
 str_splashresist,
+str_hits,
+str_srange,
 str_ability,
 str_builder,
 str_barrack,
@@ -774,7 +776,7 @@ str_m_obs,
 str_m_sym,
 str_plname,
 str_aislots,
-str_cgenerators,
+str_generators,
 str_DeadObservers,
 str_team,
 str_srace,
@@ -784,7 +786,7 @@ str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
-str_cgeneratorsM  : array[0..gms_g_maxgens] of shortstring;
+str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
 str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;

@@ -22,6 +22,17 @@ function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer;  forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
+function Float2Str(s:single):shortstring;
+var l:byte;
+begin
+   Float2Str:=FormatFloat('#0.##',s);
+   l:=length(Float2Str);
+   while(l>0)do
+   begin
+      if(Float2Str[l]=',')then Float2Str[l]:='.';
+      l-=1;
+   end;
+end;
 {$ENDIF}
 
 procedure fr_init;

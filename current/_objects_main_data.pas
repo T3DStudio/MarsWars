@@ -51,7 +51,7 @@ begin
    end;
 end;
 
-procedure initUIDS;
+procedure InitUIDS;
 var i,u:byte;
 
 procedure _weapon(aa,wtype:byte;max_range,min_range,count:integer;reload,oid,ruid,rupid,rupidl,dupgr:byte;dupgrs:integer;tarf,reqf:cardinal;uids,reload_s:TSoB;ax,ay:integer;atarprior:byte;afakeshots:byte;admod:byte);
@@ -335,7 +335,7 @@ begin
    _ucl       := 1;
    _apcs      := 2;
    _painc     := 8;
-   _btime     := ptime1hh;
+   _btime     := ptime1;
    _limituse  := ul1h;
    _attack    := atm_always;
    _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpsd2,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiHeavy);
@@ -354,6 +354,7 @@ begin
    _limituse  := ul1h;
    _ukfly     := uf_fly;
    _ruid1     := UID_HPools;
+   _ruid2     := UID_HAKeep;
    _attack    := atm_always;
    _zfall     := fly_height[uf_fly];
    _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1   ,MID_Cacodemon,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive      ,wpr_any,uids_all-[UID_Cacodemon],[],0,0,wtp_UnitMech,0,dm_AntiUnitMech);
@@ -455,6 +456,7 @@ begin
    _btime     := ptime2;
    _apcs      := 2;
    _ruid1     := UID_HMonastery;
+   _ruid2     := UID_HAKeep;
    _limituse  := ul1;
    _ukfly     := uf_fly;
    _attack    := atm_always;
@@ -1030,7 +1032,7 @@ begin
    _uklight   := true;
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd6,MID_Chaingun,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitBioLight,4,dm_AntiUnitBioLight);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd6,MID_Chaingun,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitBioLight,6,dm_AntiUnitBioLight);
 end;
 UID_Antiaircrafter:
 begin
@@ -1079,6 +1081,7 @@ begin
    _uklight   := true;
    _ukfly     := true;
    _ruid1     := UID_UWeaponFactory;
+   _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=1;
    _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_BPlasma,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,4,dm_AntiUnitMech);
 end;
@@ -1228,7 +1231,8 @@ begin
    _attack    := atm_always;
    _ukmech    := true;
    _splashresist:=true;
-   _ruid1     := UID_UTechCenter;
+   _ruid1     := UID_UACommandCenter;
+   _ruid2     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _weapon(0,wpt_missle,aw_fsr,0,-8,fr_fpsd2,MID_URocket,0,0               ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly  );
    _weapon(1,wpt_missle,aw_fsr,0,0 ,fr_fpsd2,MID_Flyer  ,0,upgr_uac_lturret,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_Light      ,0,0);
@@ -1340,7 +1344,7 @@ begin
    for m:=0 to 255 do
    with _mids[m] do
    begin
-      mid_size      := 12;
+      mid_size      := 0;
       mid_homing    := mh_magnetic;
       mid_teamdamage:= true;
 
@@ -1398,8 +1402,8 @@ end;
 case m of
 MID_Blizzard       : mid_base_splashr:=blizzard_sr;
 MID_Mine           : mid_base_splashr:=mine_sr;
-MID_URocketS,
 MID_HRocket        : mid_base_splashr:=rocket_sr;
+MID_URocketS,
 MID_ArchFire,
 MID_Tank,
 MID_Granade        : mid_base_splashr:=tank_sr;
@@ -1418,7 +1422,8 @@ end;
 case m of
 MID_Imp            : mid_nodamage    :=[UID_Imp        ];
 MID_Cacodemon      : mid_nodamage    :=[UID_Cacodemon  ];
-MID_Baron          : mid_nodamage    :=[UID_Knight,UID_Baron];
+MID_Baron          : mid_nodamage    :=[UID_Knight,
+                                        UID_Baron      ];
 MID_Revenant       : mid_nodamage    :=[UID_Revenant   ];
 MID_Mancubus       : mid_nodamage    :=[UID_Mancubus   ];
 MID_YPlasma        : mid_nodamage    :=[UID_Arachnotron];
@@ -1430,7 +1435,10 @@ case m of
 MID_Granade        : mid_ystep       :=3;
 MID_Mine           : mid_size        :=25;
 MID_URocketS,
-MID_BFG            : mid_teamdamage  :=false;
+MID_BFG            : begin
+                     mid_teamdamage  :=false;
+                     mid_noflycheck  :=true;
+                     end;
 MID_Blizzard       : mid_noflycheck  :=true;
 end;
    end;
@@ -1478,8 +1486,8 @@ begin
    SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
 end;
 
-procedure GameObjectsInit;
-var u:integer;
+procedure InitUpgrades;
+var u:byte;
 procedure _setUPGR(rc,upcl,stime,stimeX,stimeA,max,enrg,enrgX,enrgA:integer;rupgr,ruid:byte;mfrg:boolean);
 begin
    with _upids[upcl] do
@@ -1500,8 +1508,6 @@ begin
    end;
 end;
 begin
-   for u:=0 to MaxUnits do _punits[u]:=@_units[u];
-
    FillChar(_upids,SizeOf(_upids),0);
 
    //                                  base X +
@@ -1520,7 +1526,7 @@ begin
    _setUPGR(r_hell,upgr_hell_towers    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_HAKeep          ,false);
    _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
 
-   _setUPGR(r_hell,upgr_hell_spectre   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      ,false);
+   _setUPGR(r_hell,upgr_hell_spectre   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
    _setUPGR(r_hell,upgr_hell_vision    ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_HMonastery      ,false);
    _setUPGR(r_hell,upgr_hell_phantoms  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      ,false);
    _setUPGR(r_hell,upgr_hell_t2attack  ,60 ,0,45,5   ,600 ,0,600 ,0            ,UID_HMonastery      ,false);
@@ -1548,7 +1554,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_towers     ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UACommandCenter ,false);
    _setUPGR(r_uac ,upgr_uac_soaring    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter ,false);
 
-   _setUPGR(r_uac ,upgr_uac_botturret  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
+   _setUPGR(r_uac ,upgr_uac_botturret  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter ,false);
    _setUPGR(r_uac ,upgr_uac_vision     ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_commando   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
@@ -1560,7 +1566,14 @@ begin
    _setUPGR(r_uac ,upgr_uac_plasmt     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation,false);
    _setUPGR(r_uac ,upgr_uac_turarm     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation,false);
    _setUPGR(r_uac ,upgr_uac_rstrike    ,150,0,0 ,2   ,1200,0,0   ,0            ,UID_URMStation      ,true );
+end;
 
+procedure GameObjectsInit;
+var u:integer;
+begin
+   for u:=0 to MaxUnits do _punits[u]:=@_units[u];
+
+   // weapon target requirements set
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy wtr_stun wtr_nostun;
    wtrset_all                            :=wtr_owner_p+wtr_owner_a+wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
    wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
@@ -1588,11 +1601,10 @@ begin
    wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
    wtrset_resurect                       :=wtr_owner_p+wtr_owner_a                       +wtr_hits_d           +wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
 
-
-   initUIDS;
-
-   for u:=0 to MaxDIDs do DID_Square[u]:=round(pi*sqr(DID_R[u]));
-
+   InitUpgrades;
+   InitUIDS;
    InitMIDs;
    InitDMODs;
+
+   for u:=0 to MaxDIDs do DID_Square[u]:=round(pi*sqr(DID_R[u]));
 end;

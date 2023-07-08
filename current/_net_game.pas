@@ -107,7 +107,7 @@ begin
    net_writebyte(g_start_base     );
    net_writebool(g_fixed_positions);
    net_writebyte(g_ai_slots       );
-   net_writebyte(g_cgenerators    );
+   net_writebyte(g_generators    );
    net_writebool(g_deadobservers  );
 
    if(G_Started)and(not g_fixed_positions)then
@@ -126,7 +126,7 @@ begin
    GameLogMapMark(pid,x,y);
 end;
 
-procedure net_GServer;
+procedure net_Server;
 var mid,
     pid,
     i  :byte;
@@ -196,7 +196,7 @@ nmid_log_chat    : begin
                       if(G_Started=false)then
                        with _players[pid] do
                         with log_l[log_i] do
-                         if(mtype<=MaxPlayers)or(mtype=lmt_player_chat)then _parseCmd(str,pid);
+                         if(mtype<=MaxPlayers)or(mtype=lmt_player_chat)then Dedicated_parseCmd(str,pid);
                       {$ENDIF}
                       continue;
                    end;
@@ -315,7 +315,7 @@ begin
    if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;              end;
-   if(_rmByte(@g_cgenerators    ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@g_generators    ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmBool(@g_deadobservers  ))then begin redraw_menu:=true;              end;
 
    if(new_map    )then Map_premap;
@@ -329,7 +329,7 @@ begin
     end;
 end;
 
-procedure net_GClient;
+procedure net_Client;
 var mid,i:byte;
     gst:boolean;
 begin

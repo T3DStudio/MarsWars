@@ -392,7 +392,7 @@ begin
    if(wstepb0)then
      if(g_mode=gm_capture)
      or(g_mode=gm_KotH)
-     or(g_cgenerators>0)then
+     or(g_generators>0)then
       for i:=1 to MaxCPoints do
        _wclinet_cpoint(i,rpl);
 
@@ -1183,7 +1183,7 @@ begin
    if(wstepb0)then
      if(g_mode=gm_capture)
      or(g_mode=gm_KotH)
-     or(g_cgenerators>0)then
+     or(g_generators>0)then
       for i:=1 to MaxCPoints do
        _rclinet_cpoint(i,rpl,fast_skip);
 

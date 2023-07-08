@@ -56,7 +56,7 @@ begin
                                else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-         BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
+         BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer          ));
 
          for vr:=1 to MaxPlayers do
@@ -110,7 +110,7 @@ begin
                   +SizeOf(g_mode           )
                   +SizeOf(g_start_base     )
                   +SizeOf(g_fixed_positions)
-                  +SizeOf(g_cgenerators    )
+                  +SizeOf(g_generators    )
                   +sizeof(rpls_player      );
    with _players[0] do
    rpls_file_head_size
@@ -246,7 +246,7 @@ begin
       BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
       BlockWrite(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
       BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-      BlockWrite(rpls_file,g_cgenerators    ,SizeOf(g_cgenerators    ));
+      BlockWrite(rpls_file,g_generators    ,SizeOf(g_generators    ));
       BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
       {$I+}
 
@@ -380,7 +380,7 @@ begin
          BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
          BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(rpls_file,g_cgenerators    ,SizeOf(g_cgenerators    ));
+         BlockRead(rpls_file,g_generators    ,SizeOf(g_generators    ));
          BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
          {$I+}
 

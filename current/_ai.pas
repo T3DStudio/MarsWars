@@ -132,6 +132,8 @@ ai_inprogress_uid,
 ai_radars
                         : integer;
 
+ai_generator_l,
+ai_cpoint_l,
 ai_nearest_builder_square,
 ai_armylimit_alive_u,
 ai_armylimit_alive_b,
@@ -390,7 +392,7 @@ begin
 end;
 
 procedure ai_InitVars(pu:PTUnit);
-var i,d,ds:integer;
+var i,d   :integer;
 koth_point:boolean;
 begin
    with pu^ do
@@ -445,10 +447,12 @@ begin
    ai_cpoint_d       := NOTSET;
    ai_cpoint_r       := 0;
    ai_cpoint_n       := 0;
+   ai_cpoint_l       := -1;
 
    ai_generator_cp   := nil;
    ai_generator_d    := NOTSET;
    ai_generator_r    := 0;
+   ai_generator_l    := -1;
 
    // energy
    ai_enrg_pot       :=0;
@@ -494,7 +498,17 @@ begin
                else ai_cpoint_n+=1;
             end;
 
-            if(g_royal_r<(cp_tocenterr+base_1r))then continue;
+            if(g_mode=gm_royale)then
+              if(g_royal_r<(cp_ToCenterD+base_1r))then continue;
+
+            if(cpx<=0)
+            or(cpy<=0)
+            or(cpx>=map_mw)
+            or(cpy>=map_mw)then continue;
+
+            if(apcm>0)and(_attack<>atm_bunker)then
+              if(pf_IfObstacleZone(cpzone))
+              or(cpOwnerTeam=team)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
 
@@ -504,10 +518,6 @@ begin
                    or(ai_ExtBuildingUpgr and _ukbuilding)
                    or(_isbarrack) )then continue;
 
-            if(apcm>0)and(_attack<>atm_bunker)then
-              if(pf_IfObstacleZone(cpzone))
-              or(cpOwnerTeam=team)then continue;
-
             koth_point:=(i=1)and(g_mode=gm_koth)and(g_step>=g_step_koth_pause);
 
             if(not koth_point)then
@@ -516,27 +526,38 @@ begin
 
             if(cpenergy>0)and(not koth_point)then
             begin
-               ds:=d;
                if(menergy<2000)
-               then ds:=d div 4;
+               then d:=d div 4;
                if(cpOwnerTeam=0)
-               or(cpOwnerPlayer=0)then ds:=d div 4;
+               or(cpOwnerPlayer=0)then d:=d div 4;
 
-               if(ds<ai_generator_d)then
-               begin
-                  ai_generator_d :=ds;
-                  ai_generator_r :=cpCapturer;
-                  ai_generator_cp:=@g_cpoints[i];
-               end;
+               if(ai_generator_l=-1)
+               then
+               else
+                 if(cpunitst_pstate[team]<ai_generator_l)and(d>cpCapturer)
+                 then
+                 else
+                   if(cpunitst_pstate[team]>ai_generator_l)and(d>cpCapturer)
+                   then continue
+                   else
+                     if(d>ai_generator_d)then continue;
+
+               ai_generator_l :=cpunitst_pstate[team];
+               ai_generator_d :=d;
+               ai_generator_r :=cpCapturer;
+               ai_generator_cp:=@g_cpoints[i];
             end
             else
               if(d<ai_cpoint_d)then
               begin
+                 ai_cpoint_l   :=cpunitst_pstate[team];
                  ai_cpoint_d   :=d;
                  ai_cpoint_r   :=cpCapturer;
                  ai_cpoint_cp  :=@g_cpoints[i];
                  ai_cpoint_koth:=koth_point;
               end;
+
+            if(d<cpCapturer)then break;
          end;
    end;
 
@@ -792,7 +813,7 @@ begin
                  else _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
             end
             else
-             if(CheckUnitTeamVision(team,tu,true))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,false))then  // enemy in vision
              begin
                 if(tu^.buff[ub_invuln]<=0)then
                 begin
@@ -812,10 +833,6 @@ begin
                    end;
                    if(tu^.uid^._ukbuilding)and(not tu^.ukfly)and(pfcheck)then _setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
 
-                   // invisible enemy unit
-                   if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.a_rld>0)and(tu^.buff[ub_Scaned]<=0)then
-                     _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
-
                    // uac strike target
                    if(tu^.speed<8)then
                     if(ai_strike_tar_u=nil)
@@ -832,7 +849,14 @@ begin
                 if(not ai_PhantomWantZombieMe)and(_zombie_uid>0)then
                  if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
                   if((ud-_r-tu^.uid^._r)<=melee_r)then ai_PhantomWantZombieMe:=true;
-             end;
+             end
+             else
+               if(CheckUnitTeamVision(team,tu,true))then
+               begin
+                  // invisible enemy unit
+                  if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.a_rld>0)and(tu^.buff[ub_Scaned]<=0)then
+                    _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
+               end;
 
             if(playeri=tu^.playeri)then
             begin
@@ -1117,7 +1141,7 @@ end;
 procedure BuildEnergy(a:integer); // Energy
 begin
    a+=base_energy;
-   if(g_cgenerators=0)then
+   if(g_generators=0)then
     with pu^.player^ do
      if(ai_enrg_pot<a)and(ai_enrg_pot<ai_maxcount_energy)and(ai_enrg_pot<ai_GeneratorsEnergy)and(ai_gen_limit<ai_GeneratorsLimit)then  //
       if(SetBTA(aiucl_generator[race],0,4))then ddir:=-1;
@@ -1522,8 +1546,9 @@ begin
 r_hell: begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
-        if(g_cgenerators=0)then
+        if(g_generators=0)then
         MakeUpgr(upgr_hell_buildr    ,2);
+
         MakeUpgr(upgr_hell_HKTeleport,1);
         MakeUpgr(upgr_hell_extbuild  ,1);
         MakeUpgr(upgr_hell_buildr    ,2);
@@ -1539,8 +1564,9 @@ r_hell: begin
 r_uac : begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
-        if(g_cgenerators=0)then
+        if(g_generators=0)then
         MakeUpgr(upgr_uac_buildr     ,2);
+
         MakeUpgr(upgr_uac_CCFly      ,1);
         MakeUpgr(upgr_uac_extbuild   ,1);
         MakeUpgr(upgr_uac_buildr     ,2);
@@ -1631,7 +1657,7 @@ UID_HCommandCenter,
 UID_UCommandCenter: if(race=r_uac)
                     or(g_mode<>gm_royale)
                     or((race=r_hell)and(u_royal_d>base_5r))then
-                      if(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>1200)then exit;
+                      if(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
 UID_HSymbol,
 UID_UGenerator    : if(ai_enrg_cur<ai_maxcount_energy)then exit;
       else
@@ -1681,7 +1707,7 @@ begin
       or((ai_maxcount_mains>=8)and(ai_builders_count<8))
       then prods+=150;
       prods:=(menergy div prods);
-      if(g_cgenerators>0)then prods+=2;
+      if(g_generators>0)then prods+=2;
 
       if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
       if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
@@ -2501,6 +2527,13 @@ begin
 
       uo_id :=ua_amove;
       uo_tar:=0;
+
+      if(sel)then
+      begin
+         //writeln(ai_generator_d);
+//      ai_generator_d :=ds;
+//      ai_generator_r :=cpCapturer;
+      end;
 
       with player^ do
         ai_ReadyForAttack :=(ai_limitaround_own>ai_attack_limit)

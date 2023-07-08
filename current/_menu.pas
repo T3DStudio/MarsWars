@@ -25,7 +25,7 @@ begin
    if(544<mouse_y)and(mouse_y<571)then
    begin
       if(32 <mouse_x)and(mouse_x<107)then menu_item:=1;     // exit
-      if(net_status<>ns_clnt)then
+      if(net_status<>ns_client)then
        if(692<mouse_x)and(mouse_x<767)then menu_item:=2;    // start
    end;
 
@@ -84,7 +84,7 @@ begin
 
    if(G_Started=false)then
    begin
-      if(net_status<>ns_clnt)then
+      if(net_status<>ns_client)then
       begin
          // MAP
          if(menu_s2<>ms2_camp)then
@@ -154,7 +154,7 @@ begin
       case menu_item of
       1  : if(G_Started)
                  then ToggleMenu
-                 else _CYCLE:=false;
+                 else GameCycle:=false;
       2  : GameMakeReset;    // start/break game
 
       /// SETTINGS SAVE REPLAYS
@@ -287,8 +287,8 @@ begin
 
 
       // PLAYERS table
-      60 : if(net_status<>ns_clnt)then PlayerSwitchAILevel( ((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys) +1);
-      61 : if(net_status<>ns_clnt)then
+      60 : if(net_status<>ns_client)then PlayerSwitchAILevel( ((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys) +1);
+      61 : if(net_status<>ns_client)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               if(p<>HPlayer)then
@@ -301,7 +301,7 @@ begin
                    if(team=0)then team:=p;
                 end;
            end;
-      62 : if(net_status<>ns_clnt)then
+      62 : if(net_status<>ns_client)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -313,7 +313,7 @@ begin
                    mrace:=race;
                 end;
            end;
-      63 : if(net_status<>ns_clnt)then
+      63 : if(net_status<>ns_client)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -327,13 +327,13 @@ begin
       72 : if not(G_Started and(menu_s2=ms2_camp))then begin menu_s2:=ms2_mult; if(m_chat)then menu_item:=100; end;
 
       // game options
-      74 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);         Map_premap;end;
-      75 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte   (@g_start_base,true,0,gms_g_startb);
-      76 : if(net_status<>ns_clnt)and(not G_Started)then begin g_fixed_positions:=not g_fixed_positions;          Map_premap;end;
-      77 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);     Map_premap;end;
-      78 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte   (@g_cgenerators,true,0,gms_g_maxgens);Map_premap;end;
-      79 : if(net_status<>ns_clnt)and(not G_Started)then g_deadobservers:=not g_deadobservers;
-      80 : if(net_status<>ns_clnt)and(not G_Started)then       MakeRandomSkirmish(false);
+      74 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);         Map_premap;end;
+      75 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte   (@g_start_base,true,0,gms_g_startb);
+      76 : if(net_status<>ns_client)and(not G_Started)then begin g_fixed_positions:=not g_fixed_positions;          Map_premap;end;
+      77 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);     Map_premap;end;
+      78 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte   (@g_generators,true,0,gms_g_maxgens);Map_premap;end;
+      79 : if(net_status<>ns_client)and(not G_Started)then g_deadobservers:=not g_deadobservers;
+      80 : if(net_status<>ns_client)and(not G_Started)then       MakeRandomSkirmish(false);
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
@@ -345,9 +345,9 @@ begin
 
       //// multiplayer
       // server
-      86 : if(net_status<>ns_clnt)and(not G_Started)and(mouse_x>ui_menu_csm_xc)then
+      86 : if(net_status<>ns_client)and(not G_Started)and(mouse_x>ui_menu_csm_xc)then
            begin
-              if(net_status=ns_srvr)then
+              if(net_status=ns_server)then
               begin
                  net_dispose;
                  GameDefaultAll;
@@ -356,7 +356,7 @@ begin
               end
               else
               begin
-                 net_status:=ns_srvr;
+                 net_status:=ns_server;
                  net_sv_sport;
                  if(net_UpSocket=false)then
                  begin
@@ -370,10 +370,10 @@ begin
       87 : if(net_status<>ns_none)then menu_item:=0; // port
 
       // client
-      89 : if(net_status<>ns_srvr)and(mouse_x>ui_menu_csm_xc)then
-           if(net_status=ns_clnt)or(G_Started=false)then
+      89 : if(net_status<>ns_server)and(mouse_x>ui_menu_csm_xc)then
+           if(net_status=ns_client)or(G_Started=false)then
            begin
-              if(net_status=ns_clnt)then
+              if(net_status=ns_client)then
               begin
                  net_disconnect;
                  net_dispose;
@@ -384,7 +384,7 @@ begin
               end
               else
               begin
-                 net_status:=ns_clnt;
+                 net_status:=ns_client;
                  net_cl_saddr;
                  rpls_pnu:=0;
                  if(net_UpSocket)
@@ -398,8 +398,8 @@ begin
               menu_s1:=ms1_sett;
            end;
       90 : if(net_status<>ns_none)then menu_item:=0; // addr
-      91 : if(net_status<>ns_srvr)then ScrollByte(@net_pnui,true,0,9);
-      92 : if(G_Started=false)and(net_status<>ns_srvr)then
+      91 : if(net_status<>ns_server)then ScrollByte(@net_pnui,true,0,9);
+      92 : if(G_Started=false)and(net_status<>ns_server)then
             if(mouse_x<ui_menu_csm_x2)
             then ScrollByte(@PlayerTeam,true,0,MaxPlayers)
             else
@@ -432,15 +432,14 @@ begin
       51 : begin ScrollInt (@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
       52 : begin ScrollByte(@map_liq,false,0,7);                  Map_premap;end;
       53 : begin ScrollByte(@map_obs,false,0,7);                  Map_premap;end;
-      56 : begin Map_randommap;                                   Map_premap;end;
 
       60 : begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
-              if(net_status=ns_clnt)
+              if(net_status=ns_client)
               then net_swapp(p)
               else PlayersSwap(p,HPlayer);
            end;
-      63 : if(net_status<>ns_clnt)and(not G_Started)then
+      63 : if(net_status<>ns_client)and(not G_Started)then
            begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;
               with _players[p] do
@@ -448,16 +447,16 @@ begin
                 if(team>byte(state=ps_comp))then team-=1;
            end;
 
-      75 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte(@g_start_base ,false,0,gms_g_startb );
-      77 : if(net_status<>ns_clnt)and(not G_Started)then       ScrollByte(@g_ai_slots   ,false,0,gms_g_maxai  );
-      78 : if(net_status<>ns_clnt)and(not G_Started)then begin ScrollByte(@g_cgenerators,false,0,gms_g_maxgens); Map_premap;end;
+      75 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte(@g_start_base ,false,0,gms_g_startb );
+      77 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte(@g_ai_slots   ,false,0,gms_g_maxai  );
+      78 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte(@g_generators,false,0,gms_g_maxgens); Map_premap;end;
 
-      80 : if(net_status<>ns_clnt)and(not G_Started)then MakeRandomSkirmish(true);
+      80 : if(net_status<>ns_client)and(not G_Started)then MakeRandomSkirmish(true);
 
       84 : ScrollByte(@rpls_pnui,false,0,9);
 
-      91 : if(net_status<>ns_srvr)then ScrollByte(@net_pnui,false,0,9);
-      92 : if(G_Started=false)and(net_status<>ns_srvr)then
+      91 : if(net_status<>ns_server)then ScrollByte(@net_pnui,false,0,9);
+      92 : if(G_Started=false)and(net_status<>ns_server)then
             if(mouse_x<ui_menu_csm_x2)then ScrollByte(@PlayerTeam,false,0,MaxPlayers);
 
       97 : ScrollByte(@cmp_skill,false,0,CMPMaxSkills);

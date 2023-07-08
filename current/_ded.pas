@@ -1,12 +1,12 @@
 
-procedure _dedInit;
+procedure Dedicated_Init;
 begin
-   net_status:=ns_srvr;
+   net_status:=ns_server;
    if(net_UpSocket=false)then
    begin
       net_dispose;
       net_status:=ns_none;
-      _CYCLE:=false;
+      GameCycle :=false;
    end
    else
    begin
@@ -18,7 +18,7 @@ begin
 end;
 
 
-procedure NewAI(arace,ateam,aiskill:byte);
+procedure Dedicated_NewAI(arace,ateam,aiskill:byte);
 var p:byte;
 begin
    for p:=1 to MaxPlayers do
@@ -34,7 +34,7 @@ begin
      end;
 end;
 
-procedure RemoveAI;
+procedure Dedicated_RemoveAI;
 var p:byte;
 begin
    for p:=1 to MaxPlayers do
@@ -42,7 +42,7 @@ begin
      if(state=ps_comp)then PlayerSetState(p,ps_none);
 end;
 
-procedure SetCompFFATeams;
+procedure Dedicated_SetCompFFATeams;
 var i: byte;
 begin
    for i:=1 to MaxPlayers do
@@ -50,7 +50,7 @@ begin
      if(state=ps_comp)then team:=i;
 end;
 
-procedure _parseCmd(msg:string;pl:byte);
+procedure Dedicated_parseCmd(msg:string;pl:byte);
 var v      : shortstring;
     l,p,a  : byte;
     args   : array of shortstring;
@@ -142,27 +142,27 @@ begin
               Map_premap;
            end;
 '-p'     : if(a<3)
-           then with _players[pl] do NewAI(race,team,player_default_ai_level)
-           else NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),gms_g_maxai));
-'-ffa'   : SetCompFFATeams;
-'-noai'  : RemoveAI;
+           then with _players[pl] do Dedicated_NewAI(race,team,player_default_ai_level)
+           else Dedicated_NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),gms_g_maxai));
+'-ffa'   : Dedicated_SetCompFFATeams;
+'-noai'  : Dedicated_RemoveAI;
 '-3x3'   : begin g_mode:=gm_3x3;      Map_premap; end;
 '-2x2x2' : begin g_mode:=gm_2x2x2;    Map_premap; end;
-'-scir'  : begin g_mode:=gm_scirmish; Map_premap; SetCompFFATeams; end;
+'-scir'  : begin g_mode:=gm_scirmish; Map_premap; Dedicated_SetCompFFATeams; end;
 '-inv'   : begin g_mode:=gm_invasion; Map_premap; end;
-'-cpt'   : begin g_mode:=gm_capture;  Map_premap; SetCompFFATeams; end;
-'-koth'  : begin g_mode:=gm_koth;     Map_premap; SetCompFFATeams; end;
-'-rb'    : begin g_mode:=gm_royale;   Map_premap; SetCompFFATeams; end;
+'-cpt'   : begin g_mode:=gm_capture;  Map_premap; Dedicated_SetCompFFATeams; end;
+'-koth'  : begin g_mode:=gm_koth;     Map_premap; Dedicated_SetCompFFATeams; end;
+'-rb'    : begin g_mode:=gm_royale;   Map_premap; Dedicated_SetCompFFATeams; end;
 
 
 '-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
 '-lo'    : begin g_deadobservers   :=not g_deadobservers; end;
-'-ng'    : if(a=2)then begin g_cgenerators:=mm3(0,s2b(args[1]),gms_g_maxgens);Map_premap;end;
+'-ng'    : if(a=2)then begin g_generators:=mm3(0,s2b(args[1]),gms_g_maxgens);Map_premap;end;
 '-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
 '-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
 '-r'     : begin
               g_start_base :=random(gms_g_startb+1);
-              g_cgenerators:=random(gms_g_maxgens+1);
+              g_generators :=random(gms_g_maxgens+1);
               if(random(3)=0)
               then g_ai_slots:=0
               else g_ai_slots:=random(player_default_ai_level+1);
@@ -172,7 +172,7 @@ begin
    screen_redraw:=true;
 end;
 
-procedure _dedCode;
+procedure Dedicated_Code;
 begin
    case G_Started of
 false: if(PlayersReadyStatus)then
@@ -189,7 +189,7 @@ true : if(PlayerAllOut)then
    end;
 end;
 
-procedure _screenLine(s1:shortstring;x1:byte;
+procedure Dedicated_screenLine(s1:shortstring;x1:byte;
                       s2:shortstring;x2:byte;
                       s3:shortstring;x3:byte;
                       s4:shortstring;x4:byte;
@@ -226,14 +226,14 @@ end;
 procedure ps(p:byte);
 begin
    if(p=0)
-   then        _screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team                    ,35, '',0, '',0)   // captions
+   then        Dedicated_screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team                    ,35, '',0, '',0)   // captions
    else with _players[p] do
         if(state=ps_none)
-        then   _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''                          ,35, '',0, '',0)
+        then   Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''                          ,35, '',0, '',0)
         else
           if(team=0)
-          then _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
-          else _screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0);
+          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
+          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -246,7 +246,7 @@ begin
      else SVGameStatus:=str_gpaused+b2s(G_Status);
 end;
 
-procedure _dedScreen;
+procedure Dedicated_Screen;
 begin
    if(screen_redraw)then
    begin
@@ -261,15 +261,15 @@ begin
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
-      3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]           );
-      4 : writeln('         ',str_starta       ,b2s(g_start_base+1)            );
-      6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]         );
-      8 : writeln('         ',str_aislots      ,g_ai_slots                     );
-      10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_cgenerators]);
-      11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]          );
+      3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]          );
+      4 : writeln('         ',str_starta       ,b2s(g_start_base+1)           );
+      6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]        );
+      8 : writeln('         ',str_aislots      ,g_ai_slots                    );
+      10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_generators]);
+      11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]         );
       12: writeln;
-      13: _screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
-      14: _screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);
+      13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
+      14: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);
       15: writeln;
       16: ps(0);
       18: ps(1);

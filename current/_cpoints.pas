@@ -29,35 +29,30 @@ end;
 
 procedure GameModeCPoints;
 var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams,
-wteam,
-wteam_n   ,
+wteam  ,
+wteam_n,
 cp_captured_n :integer;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
     if(cpCapturer>0)then
     begin
-       if(g_mode=gm_royale)and(g_royal_r<cp_tocenterr)then
+       p:=0;
+       if(g_mode=gm_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
+       if(cplifetime>0)and(cpOwnerTeam>0)then
+       begin
+          cplifetime-=1;
+          if(cplifetime=0)then p:=1;
+       end;
+
+       if(p>0)then
        begin
           CPoint_ChangeOwner(i,0);
           cpCapturer:=-cpCapturer;
           {$IFDEF _FULLGAME}
           effect_CPExplode(cpx,cpy);
           {$ENDIF}
-          exit;
-       end;
-
-       if(cplifetime>0)and(cpOwnerTeam>0)then
-       begin
-          cplifetime-=1;
-          if(cplifetime=0)then
-          begin
-             CPoint_ChangeOwner(i,0);
-             cpCapturer:=-cpCapturer;
-             {$IFDEF _FULLGAME}
-             effect_CPExplode(cpx,cpy);
-             {$ENDIF}
-          end;
+          continue;
        end;
 
        cpunitsp_pstate:=cpUnitsPlayer;

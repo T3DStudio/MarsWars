@@ -79,10 +79,10 @@ begin
          damage-=armor;
       end;
 
-      if(damage<=0)then
-       if(_random(abs(damage)+1)=0)
+      if(damage<=0)then damage:=1;
+      { if(_random(abs(damage)+1)=0)
        then damage:=1
-       else damage:=0;
+       else damage:=0; }
 
       if(hits<=damage)then
       begin
@@ -1793,10 +1793,10 @@ begin
      end;
 end;
 
-procedure _obj_cycle;
+procedure GameObjectsCode;
 var u : integer;
     pu,
-    au: PTUnit;
+    transportu: PTUnit;
 begin
    for u:=1 to MaxUnits do
    begin
@@ -1825,15 +1825,15 @@ begin
                 if((player^.ai_flags and aif_army_scout)>0)then ai_scout_pick(pu);
             end;
 
-            au:=nil;
+            transportu:=nil;
             if(cycle_order=_cycle_order)and(hits>0)then
-             if(ServerSide)and(not _IsUnitRange(transport,@au))
-             then _unit_mcycle   (pu)
-             else _unit_mcycle_cl(pu,au);
+              if(ServerSide)and(not _IsUnitRange(transport,@transportu))
+              then _unit_mcycle   (pu)
+              else _unit_mcycle_cl(pu,transportu);
 
             if(ServerSide)then
-             if(not _isUnitRange(transport,nil))then
-              _unit_capture_point(pu);
+              if(not _isUnitRange(transport,nil))then
+                _unit_capture_point(pu);
          end
          else _unit_death(pu);
 

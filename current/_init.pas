@@ -57,7 +57,7 @@ end;
 
 procedure InitGame;
 begin
-   _CYCLE:=false;
+   GameCycle:=false;
 
    fr_init;
 
@@ -92,9 +92,9 @@ begin
 
    NEW(_event);
 
-   _CYCLE:=true;
+   GameCycle:=true;
 
    {$IFNDEF _FULLGAME}
-   _dedInit;
+   Dedicated_Init;
    {$ENDIF}
 end;

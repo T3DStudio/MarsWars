@@ -14,7 +14,7 @@ begin
 
       PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
 
-      if(g_cgenerators>0)then
+      if(g_generators>0)then
       PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HCommandCenter,
                                 UID_UGenerator,UID_UAGenerator,UID_UCommandCenter],0,false);
 
@@ -299,7 +299,7 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_cgenerators>0);
+        if(team>0)then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
      end;
 
    {$IFDEF _FULLGAME}
@@ -339,7 +339,7 @@ begin
 
    g_mode       :=gm_scirmish;
    g_start_base :=random(gms_g_startb+1);
-   g_cgenerators:=random(gms_g_maxgens+1);
+   g_generators:=random(gms_g_maxgens+1);
 
    PlayersSwap(1,HPlayer);
 
@@ -536,7 +536,7 @@ begin
     with _players[p] do
      if(state>ps_none)then
      begin
-        if(state=PS_Play)and(p<>HPlayer)and(net_status=ns_srvr)then
+        if(state=PS_Play)and(p<>HPlayer)and(net_status=ns_server)then
         begin
            if(ttl<ClientTTL)then
            begin
@@ -613,12 +613,12 @@ begin
 
    SoundControl;
 
-   if(net_status=ns_clnt)then net_GClient;
+   if(net_status=ns_client)then net_Client;
    replay_Code;
 
    {$ELSE}
-   _dedCode;
-   _dedScreen;
+   Dedicated_Code;
+   Dedicated_Screen;
    {$ENDIF}
 
    PlayersCycle;
@@ -639,7 +639,7 @@ begin
          gm_invasion  : GameModeInvasion;
          gm_royale    : begin
                            if(_cycle_order=0)then
-                            if(g_royal_r>0)then g_royal_r-=1;
+                             if(g_royal_r>0)then g_royal_r-=1;
                            GameDefaultEndConditions;
                         end;
          gm_capture,
@@ -647,10 +647,10 @@ begin
          else           GameDefaultEndConditions;
          end;
       end;
-      _obj_cycle;
+      GameObjectsCode;
    end;
 
-   if(net_status=ns_srvr)then net_GServer;
+   if(net_status=ns_server)then net_Server;
 end;
 
 

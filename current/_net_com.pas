@@ -36,10 +36,10 @@ begin
       exit;
    end;
 
-   if(net_status=ns_clnt)
+   if(net_status=ns_client)
    then net_socket:=SDLNet_UDP_Open(0)
    else
-     if(net_status=ns_srvr)
+     if(net_status=ns_server)
      then net_socket:=SDLNet_UDP_Open(net_port);
 
    if (net_socket=nil) then
@@ -250,7 +250,7 @@ end;
 
 procedure net_send_chat(targets:byte;msg:shortstring);
 begin
-   if(net_status=ns_clnt)and(targets>0)then
+   if(net_status=ns_client)and(targets>0)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_log_chat);
@@ -262,7 +262,7 @@ end;
 
 procedure net_pause;
 begin
-   if(net_status=ns_clnt)then
+   if(net_status=ns_client)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_pause);
@@ -272,7 +272,7 @@ end;
 
 procedure net_disconnect;
 begin
-   if(net_status=ns_clnt)then
+   if(net_status=ns_client)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_player_leave);
@@ -282,7 +282,7 @@ end;
 
 procedure net_swapp(p1:byte);
 begin
-   if(net_status=ns_clnt)then
+   if(net_status=ns_client)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_swapp);
@@ -293,7 +293,7 @@ end;
 
 procedure net_SendMapMark(x,y:integer);
 begin
-   if(net_status=ns_clnt)then
+   if(net_status=ns_client)then
    begin
       net_clearbuffer;
       net_writebyte(nmid_map_mark);

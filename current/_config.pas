@@ -55,7 +55,7 @@ cfg_key_vidvh : vid_vh           := vli;
 cfg_key_gsb   : g_start_base     := vlw;
 cfg_key_gsp   : g_fixed_positions:=(vl=b2c[true]);
 cfg_key_gai   : g_ai_slots       := vlw;
-cfg_key_gcg   : g_cgenerators    := vlw;
+cfg_key_gcg   : g_generators    := vlw;
 cfg_key_rpnui : rpls_pnui        := vlw;
 cfg_key_npnui : net_pnui         := vlw;
 cfg_key_ppos  : vid_ppos         := vlw;
@@ -110,7 +110,7 @@ begin
 
       if(g_ai_slots   >gms_g_maxai  )then g_ai_slots   :=gms_g_maxai;
       if(g_start_base >gms_g_startb )then g_start_base :=gms_g_startb;
-      if(g_cgenerators>gms_g_maxgens)then g_cgenerators:=gms_g_maxgens;
+      if(g_generators >gms_g_maxgens)then g_generators:=gms_g_maxgens;
 
       if(rpls_pnui   >_cl_pnun       )then rpls_pnui   :=_cl_pnun;
       if(net_pnui    >_cl_pnun       )then net_pnui    :=_cl_pnun;
@@ -148,7 +148,7 @@ begin
    writeln(f,cfg_key_gsb   ,'=',g_start_base          );
    writeln(f,cfg_key_gsp   ,'=',b2c[g_fixed_positions]);
    writeln(f,cfg_key_gai   ,'=',g_ai_slots            );
-   writeln(f,cfg_key_gcg   ,'=',g_cgenerators         );
+   writeln(f,cfg_key_gcg   ,'=',g_generators         );
    writeln(f,cfg_key_ppos  ,'=',vid_ppos              );
    writeln(f,cfg_key_uhbar ,'=',vid_uhbars            );
    writeln(f,cfg_key_plcol ,'=',vid_plcolors          );

@@ -641,7 +641,7 @@ PPTUnit = ^PTUnit;
 TCTPoint = record
    cpx ,cpy ,
    cpsolidr,cpCapturer,cpnobuildr,
-   cp_tocenterr,
+   cp_ToCenterD,
    cpmx,cpmy,cpmr,
    cpenergy,
    cpCaptureTime,
@@ -655,7 +655,7 @@ TCTPoint = record
    cpunitst_pstate,
    cpUnitsTeam,
    cpunitsp_pstate,
-   cpUnitsPlayer     : array[0..MaxPlayers] of integer;
+   cpUnitsPlayer     : array[0..MaxPlayers] of longint;
 end;
 PTCTPoint = ^TCTPoint;
 

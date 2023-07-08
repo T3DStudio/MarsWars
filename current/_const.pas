@@ -94,7 +94,7 @@ MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayers*3;
+MaxCPoints             = MaxPlayers*2;
 
 MaxSMapW               = 8000;
 MinSMapW               = 2000;
@@ -108,6 +108,7 @@ map_b0                 = 5;
 //
 
 g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+g_cgenerators_energy   = 900;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -219,8 +220,8 @@ NetTickN               = 2;
 MaxNetBuffer           = 4096;
 
 ns_none                = 0;
-ns_srvr                = 1;
-ns_clnt                = 2;
+ns_server              = 1;
+ns_client              = 2;
 
 nmid_lobby_info        = 3;
 nmid_connect           = 4;
@@ -262,24 +263,24 @@ uo_addorder            = 10;
 //  UNIT & UPGRADES REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = 1;    // 1
-ureq_ruid              : cardinal = 2;    // 2
-ureq_rupid             : cardinal = 4;    // 4
-ureq_energy            : cardinal = 8;    // 8
-ureq_time              : cardinal = 16;   // 16
-ureq_max               : cardinal = 32;   // 32
-ureq_builders          : cardinal = 64;   // need builders  64
-ureq_bld_r             : cardinal = 128;  //                 128
-ureq_barracks          : cardinal = 256;  // need barracks     512
-ureq_smiths            : cardinal = 512;  // need smith          1024
-ureq_product           : cardinal = 1024; // already in production
-ureq_armylimit         : cardinal = 2048;
-ureq_place             : cardinal = 4096; // cant build here
-ureq_busy              : cardinal = 8192; // production is busy
-ureq_unknown           : cardinal = 16384;//
-ureq_alreadyAdv        : cardinal = 32768;//
-ureq_needbuilders      : cardinal = 65536;// need more builders
-ureq_common            : cardinal =131072;// common
+ureq_unitlimit         : cardinal = 1;
+ureq_ruid              : cardinal = 1 shl 1;
+ureq_rupid             : cardinal = 1 shl 2;
+ureq_energy            : cardinal = 1 shl 3;
+ureq_time              : cardinal = 1 shl 4;
+ureq_max               : cardinal = 1 shl 5;
+ureq_builders          : cardinal = 1 shl 6;  // need builders
+ureq_bld_r             : cardinal = 1 shl 7;  //
+ureq_barracks          : cardinal = 1 shl 8;  // need barracks
+ureq_smiths            : cardinal = 1 shl 9;  // need smith
+ureq_product           : cardinal = 1 shl 10; // already in production
+ureq_armylimit         : cardinal = 1 shl 11;
+ureq_place             : cardinal = 1 shl 12; // cant build here
+ureq_busy              : cardinal = 1 shl 13; // production is busy
+ureq_unknown           : cardinal = 1 shl 14; //
+ureq_alreadyAdv        : cardinal = 1 shl 15; //
+ureq_needbuilders      : cardinal = 1 shl 16; // need more builders
+ureq_common            : cardinal = 1 shl 17; // common
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -337,12 +338,11 @@ atm_inapc              = 4;   // can attack only when in apc
 //
 
 wpr_any                : cardinal =  0;
-//wpr_zombie             : cardinal =  %0000000000001000;
-wpr_avis               : cardinal =  %0000000000010000;
-wpr_ground             : cardinal =  %0000000000100000;
-wpr_air                : cardinal =  %0000000001000000;
-wpr_move               : cardinal =  %0000000010000000;
-wpr_reload             : cardinal =  %0000000100000000;
+wpr_avis               : cardinal =  1;
+wpr_ground             : cardinal =  1 shl 1;
+wpr_air                : cardinal =  1 shl 2;
+wpr_move               : cardinal =  1 shl 3;
+wpr_reload             : cardinal =  1 shl 4;
 
 aw_fsr0                = 15000;
 
@@ -469,8 +469,8 @@ ub_Scaned              = 13;
 ub_Decay               = 14;
 ub_ArchFire            = 15;
 
-_ub_infinity           = 32000;
-b2ib                   : array[false..true] of integer = (0,_ub_infinity);
+_ub_infinity           = NOTSET;
+b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 
 
 
@@ -501,7 +501,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
 MaxDIDs                = 7;
 
-DID_R                  : array[0..MaxDIDs] of integer = (0,255,185,125,64,105,60,17);
+DID_R                  : array[0..MaxDIDs] of smallint = (0,255,185,125,64,105,60,17);
 
 //pi*_r*_r
 
@@ -581,7 +581,7 @@ upgr_race_mspeed_bio   : array[1..r_cnt] of byte    = (0                 , upgr_
 upgr_race_mspeed_mech  : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
 upgr_race_extbuilding  : array[1..r_cnt] of byte    = (upgr_hell_extbuild, upgr_uac_extbuild);
 upgr_race_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
-upgr_race_srange_bonus : array[1..r_cnt] of integer = (25                , 25               );
+upgr_race_srange_bonus : array[1..r_cnt] of smallint= (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -696,11 +696,9 @@ BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
 BaseDamageBonus1       = 8;
-BaseDamageBonush       = BaseDamageBonus1 div 2;
 BaseDamageBonus3       = BaseDamageBonus1*2;
 BaseDamageLevel1       = BaseDamageBonus1/4;
 BaseArmorBonus1        = 8;
-BaseArmorBonush        = BaseArmorBonus1 div 2;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonus1/4;
 
@@ -820,8 +818,8 @@ uids_all               = [0..255];
 T2                     = [UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas-[UID_ZBFGMarine];
 T3                     = [UID_BFGMarine,UID_ZBFGMarine,UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
 
-uid_race_start_fbase   : array[1..r_cnt] of integer = (UID_HKeep    ,UID_UCommandCenter );
-uid_race_start_abase   : array[1..r_cnt] of integer = (UID_HAKeep   ,UID_UACommandCenter);
+uid_race_start_fbase   : array[1..r_cnt] of smallint = (UID_HKeep    ,UID_UCommandCenter );
+uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep   ,UID_UACommandCenter);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -839,17 +837,17 @@ uab_SpawnLost          = 8;
 uab_HellVision         = 9;
 uab_CCFly              = 10;
 
-client_rld_abils = [
-                   uab_Teleport
-                   ];
-client_rld_uids  = [
-                   UID_ArchVile
-                   ];
-client_cast_abils= [
-                   uab_UACScan  ,
-                   uab_UACStrike,
-                   uab_HInvulnerability
-                   ];
+client_rld_abils       = [
+                         uab_Teleport
+                         ];
+client_rld_uids        = [
+                          UID_ArchVile
+                         ];
+client_cast_abils      = [
+                         uab_UACScan  ,
+                         uab_UACStrike,
+                         uab_HInvulnerability
+                         ];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -884,7 +882,7 @@ base_6r                = base_1r*6;
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1*2;
 order_period           = fr_fpsd2+1;
-vistime                = fr_fps1;
+vistime                = fr_fps1d2;
 
 radar_reload           = fr_fps1*60;
 radar_vision_time      = radar_reload-(fr_fps1*8);
@@ -919,11 +917,10 @@ _d2shi                 = abs(dead_hits div 125)+1;   // 5
 gm_cptp_gtime          = fr_fps1*ptimehh;
 gm_cptp_time           = fr_fps1*ptimeh;
 gm_cptp_r              = 100;
-gm_cptp_energy         = 600;
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
-fly_height             : array[false..true] of integer = (1,fly_z);
+fly_height             : array[false..true] of smallint = (1,fly_z);
 
 pain_time              = fr_fps1;
 
@@ -984,7 +981,7 @@ _hotkeyA2: array[0.._mhkeys] of cardinal = (0          , 0         , 0 ,
 
 _hotkeyR : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
                                             SDLK_A , SDLK_S , SDLK_D ,
-                                            SDLK_Z , SDLK_X , SDLK_0 ,
+                                            SDLK_Z , 0      , SDLK_0 ,
 
                                             SDLK_1 , SDLK_2 , SDLK_3 ,
                                             SDLK_4 , SDLK_5 , SDLK_6 ,
@@ -1041,7 +1038,7 @@ sd_ground              = MaxSMapW+sd_build;     //  8000
 sd_fly                 = MaxSMapW+sd_ground;    //  16000
 sd_marker              = MaxSMapW+sd_fly;       //  24000
 
-map_flydepths          : array[false..true] of integer = (sd_ground,sd_fly);
+map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1311,7 +1308,8 @@ sss_anoncer            = 3;
 sss_ucommand           = 4;
 sss_music              = 5;
 
-sss_sssize             : array[0..sss_count-1] of integer = (1,12,1,3,1,1);
+// sound sources set size
+sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1436,7 +1434,7 @@ LiquidAnim             = 4;
 LiquidRs               = 4;
 
 crater_ri              = 4;
-crater_r               : array[1..crater_ri] of integer = (33,60,88,110);
+crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
 
 theme_n                = 8;
 theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'  ,

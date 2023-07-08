@@ -3,53 +3,56 @@
 Other:
 - the game engine has been updated to make it easier to add new content(units, upgrades, etc);
 - sdl_mixer replaced by OpenAL;
-- multiplayer/replays system was improved: now possible to update all units every game tick;
+- improved multiplayer/replay system: now possible to update all units every game tick;
 - added "skip backward" function to replay player;
-- map generator can make symmetrical maps now;
+- map generator can now create symmetric maps;
 - visual themes for maps;
-- maximum map sizes extended to 2000-8000;
+- extended maximum map sizes to 2000-8000;
 - option 'Game: UDOOM/DOOM2' removed; now game based on DOOM2 only;
-- new game option: 'Neutral generators' - map contain neutral generators that can be captured; captured generator give energy to owner's team; players can't build own generators and builders while this option is enabled; neutral generators have optional lifetime;
-- new game mode 'King of the Hill' where players must capture and hold central area for 1 minute to win;
+- new game option: 'Neutral Generators' - maps contain neutral generators that can be captured; captured generators give energy to the owner's team; players can't build their own generators and builders while this option is enabled; neutral generators have an optional lifetime;
+- new game mode 'King of the Hill' where players must capture and hold the central area for 1 minute to win;
 - improvements for computer opponents code:
--- bot trying to keep their attacking units together;
--- bot remembers the places where he saw the enemy to check them later;
--- increased number of AI difficulty levels to 11(1-7 - default, 8-11 - 'cheaters');
+-- bot tries to keep its attacking units together;
+-- bot remembers the places where it saw the enemy to check them later;
+-- increased the number of AI difficulty levels to 11(1-7 - default, 8-11 - 'cheaters');
 - fixed framerate control code, now the game loop is exactly 60 fps;
 - added 'observer' player role;
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
 
 Interface:
 - ui messages about game events("Construction complete", "Need more energy", etc.);
-- units phrases and game announcer phrases from DoomWars game;
-- double F2-hotkey now move camera to player's army;
--- "smart F2": F2 hotkey select all battle units, except those who:
+- units phrases and game announcer phrases from the DoomWars game;
+- double F2-hotkey now moves camera to player's army;
+-- "smart F2": F2 hotkey selects all combat units, except those that:
 --- patroling;
 --- holding position;
---- execing "special ability at point" order;
+--- performing  "special ability at point" order;
 --- going to Teleport;
 --- going to transport;
---- going to pickup onboard some unit;
+--- go to pickup on board a unit;
 - new UI options:
 -- control panel position(up,down,left,right);
 -- units health bars draw option;
--- players color scheme;
+-- player color scheme;
 -- colored shadows for units;
-- army/energy information now draw in star/war-craft style;
-- healthbars and selection rects abow units now draw in separate layer;
+- army/energy information now drawn in star/warcraft style;
+- healthbars and selection rects abowe units now drawn in separate layer;
 - hint about unit under cursor;
 - upgrades level info in selection rect;
 
 Control:
 - "action" order renamed to "special ability";
-- added new order type "special ability at point" for units with "special ability"; behaviour: unit will come to target point and do "special ability" order;
--- exceptional behavior for Pain Elemental: this unit will start spawn Lost Souls/Phantoms to target point;
-- changed buttoms positions and hotkeys for unit`s basic orders on "Controls" tab;
+- added new order type "special ability at point" for units with "special ability"; behavior: unit will come to target point and perform "special ability" order;
+-- exceptional behavior for Pain Elemental: this unit will start spawning Lost Souls/Phantoms to target point;
+- changed buttom positions and hotkeys for unit`s basic orders on the "Controls" tab;
 - "space" hotkey now moves camera to last event location;
-- only basic orders(move, attack, destruction) are transfering to all units in selected group; other order transfer to first-who-can-execute-it unit in group;
+- only basic orders (move, attack, destroy) are transferred to all units in the selected group; other orders are transferred to the first unit in the group that can execute them;
 - unit's abilities(like Radar`s scan) now casts by "special ability at point" order;
-- no automatic production cancel when energy goes under 0 anymore;
-- now players can set attention markers;
+- no automatic production cancellation when energy drops below 0;
+- players can now set attention markers;
+
+Units and balance:
+
 
 
 49.1:

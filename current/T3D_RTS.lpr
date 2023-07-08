@@ -82,8 +82,9 @@ end; }
 
 begin
    InitGame;
+   WriteUnitDescriptions;
 
-   while(_CYCLE)do
+   while(GameCycle)do
    begin
       fr_FPSSecondD:=SDL_GetTicks;
 

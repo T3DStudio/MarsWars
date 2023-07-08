@@ -78,7 +78,7 @@ begin
             vr:=0;
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
             BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-            BlockRead(f,vr,sizeof(g_cgenerators    ));vr:=0;
+            BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
 
             BlockRead(f,hp,sizeof(HPlayer  ));
 
@@ -205,7 +205,7 @@ begin
    SizeOf(g_mode           )+
    SizeOf(g_start_base     )+
    SizeOf(g_fixed_positions)+
-   SizeOf(g_cgenerators    )+
+   SizeOf(g_generators    )+
    SizeOf(HPlayer          )+
    SizeOf(TPList           )+
    SizeOf(_units           )+
@@ -260,7 +260,7 @@ begin
    BlockWrite(f,g_mode           ,SizeOf(g_mode           ));
    BlockWrite(f,g_start_base     ,SizeOf(g_start_base     ));
    BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
-   BlockWrite(f,g_cgenerators    ,SizeOf(g_cgenerators    ));
+   BlockWrite(f,g_generators    ,SizeOf(g_generators    ));
    BlockWrite(f,HPlayer          ,SizeOf(HPlayer          ));
    BlockWrite(f,_players         ,SizeOf(TPList           ));
    BlockWrite(f,_units           ,SizeOf(_units           ));
@@ -335,7 +335,7 @@ begin
          BlockRead(f,g_mode           ,SizeOf(g_mode           ));
          BlockRead(f,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(f,g_cgenerators    ,SizeOf(g_cgenerators    ));
+         BlockRead(f,g_generators    ,SizeOf(g_generators    ));
          BlockRead(f,HPlayer          ,SizeOf(HPlayer          ));
          BlockRead(f,_players         ,SizeOf(TPList           ));
          BlockRead(f,_units           ,SizeOf(_units           ));

@@ -67,7 +67,7 @@ begin
 
        if(length(net_chat_str)>0)and(net_chat_tar>0)then
        begin
-          if(net_status=ns_clnt)
+          if(net_status=ns_client)
           then net_send_chat(        net_chat_tar,net_chat_str)
           else GameLogChat  (HPlayer,net_chat_tar,net_chat_str,false);
        end;
@@ -78,10 +78,10 @@ end;
 
 procedure GameTogglePause;
 begin
-   if(net_status=ns_clnt)
+   if(net_status=ns_client)
    then net_pause
    else
-     if(net_status=ns_srvr){or(_testmode>0)}then
+     if(net_status=ns_server){or(_testmode>0)}then
        if(G_Status=gs_running)
        then G_Status:=HPlayer
        else G_Status:=gs_running;
@@ -89,7 +89,7 @@ end;
 
 procedure MapMarker(x,y:integer);
 begin
-   if(net_status=ns_clnt)
+   if(net_status=ns_client)
    then net_SendMapMark(x,y)
    else GameLogMapMark(HPlayer,x,y);
    m_brush:=co_empty;
@@ -226,7 +226,7 @@ procedure _player_s_o(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
 begin
    if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
    begin
-      if(net_status=ns_clnt)then
+      if(net_status=ns_client)then
       begin
          net_clearbuffer;
          net_writebyte(nmid_order);
@@ -719,7 +719,7 @@ begin
                                                    else tmpmid+=1;
                            else
                            end;
-      SDL_QUITEV         : _CYCLE:=false;
+      SDL_QUITEV         : GameCycle:=false;
       SDL_KEYUP          : begin
                               k_chart:=-1;
                               case (_event^.key.keysym.sym) of
