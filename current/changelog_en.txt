@@ -52,6 +52,7 @@ Control:
 - players can now set attention markers;
 
 Units and balance:
+- COMMON:
 
 
 
