@@ -9,7 +9,7 @@ Other:
 - visual themes for maps;
 - extended maximum map sizes to 2000-8000;
 - option 'Game: UDOOM/DOOM2' removed; now game based on DOOM2 only;
-- new game option: 'Neutral Generators' - maps contain neutral generators that can be captured; captured generators give energy to the owner's team; players can't build their own generators and builders while this option is enabled; neutral generators have an optional lifetime;
+- new game option: 'Generators' - maps contain neutral generators that can be captured; captured generators give energy to the owner's team; players can't build their own generators and builders while this option is enabled; neutral generators have an optional lifetime;
 - new game mode 'King of the Hill' where players must capture and hold the central area for 1 minute to win;
 - improvements for computer opponents code:
 -- bot tries to keep its attacking units together;
@@ -20,16 +20,15 @@ Other:
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
 
 Interface:
-- ui messages about game events("Construction complete", "Need more energy", etc.);
+- ui messages log about game events ("Construction complete", "Need more energy", etc.);
 - units phrases and game announcer phrases from the DoomWars game;
-- double F2-hotkey now moves camera to player's army;
+- double F2-hotkey now moves camera to nearest combat unit;
 -- "smart F2": F2 hotkey selects all combat units, except those that:
 --- patroling;
 --- holding position;
 --- performing  "special ability at point" order;
 --- going to Teleport;
---- going to transport;
---- go to pickup on board a unit;
+--- going to transport or going to pickup on board a unit;
 - new UI options:
 -- control panel position(up,down,left,right);
 -- units health bars draw option;
@@ -49,10 +48,93 @@ Control:
 - only basic orders (move, attack, destroy) are transferred to all units in the selected group; other orders are transferred to the first unit in the group that can execute them;
 - unit's abilities(like Radar`s scan) now casts by "special ability at point" order;
 - no automatic production cancellation when energy drops below 0;
-- players can now set attention markers;
+- players can now set attention markers is multiplayer game;
 
 Units and balance:
 - COMMON:
+-- units leave the barracks in the direction where the rally point was placed;
+-- the maximum limit of units per player is increased to 125;
+-- some units and buildings can now consume more than 1 limit;
+-- production buildings can now be advanced; an advanced version can create/research two units/upgrades at the same time; a special technology building is required for advancement;
+- main buildings and generators can also be advanced - an advanced version of a building gives x2 energy, but other characteristics do not change; advancing these buildings does not require any technology;
+-- rebuilding/advacement time is increased if the original building/unit has been damaged; the rebuilding/advancing process CANNOT be undone;
+-- detection of invisible units no longer requires any  upgrade;
+-- the "soaring" unit type has been removed from the game - now units are strictly either ground or air;
+--- some ground units, under certain conditions, can move above the map doodads and have the attribute "floating";
+-- change unit categories -- each unit necessarily has one of the following 4 pairs of attributes: unit/building, biological/mechanical, light/heavy, ground/air;
+-- the system of "advancing" units has been completely redesigned - some abilities have been moved to upgrades (for example, invisibility for demon and commando), or separated into different units (Shotgunner and Super Shotgunner, Hell Knight and Baron of Hell - now different units);
+-- implemented veteran system: initially all units are level 1, in battle they can advance up to 4; each level gives a small bonus to attack, defense and reduces the frequency of pain state (if a unit has one);
+--- units "advancing" twice as fast in close combat;
+-- hits, energy cost, damage of units multiplied by 10/100 times for more "fine-tuning"; on average, units are now more expensive and take longer to kill each other;
+-- "Pain State" time increased to 1 second;
+-- totally new unit balance system;
+
+
+-- most units in the game have only one damage modifier;
+-- buildings now have no armor initially, but a defense upgrade gives twice as much as an attack bonus upgrade to units; thus, buildings can be destroyed by anyone in the early game, and the value of siege units increases later in the game;
+
+-- basic attack/defense upgrades now have 5 levels;
+-- upgrades may now have a time and/or energy cost that progresses with each level;
+-- each side added an upgrade to increase sight and firing range for all combat units;
+-- the projectile mechanics have been modified to minimize the chance of missing the target:
+--- projectile velocity has been increased;
+--- projectiles are now "magnetized" to their target;
+--- revenants now have homing projectilles initially;
+-- all buildings in the game, except builders, detectors and static defense have greatly reduced sight radius;
+-- unit life time as a corpse has been increased to 28 seconds;
+
+
+- UAC
+
+-- BUILDINGS:
+--- Command Center - reduced flight speed; can be upgraded to Advanced Command Center, which gives x2 energy, all other things being equal; Advanced Command Center is needed to create air units and research some upgrades;
+--- Barrack - formerly Military Unit - now a classic barrack, producing only infantry (biological) units;
+--- Factory - a new production building for all vehicles;
+--- Weapon Factory - unchanged, as before - the only upgrade production building; also opens up access to some T1 units;
+---- all 3 production buildings can be advanced once; advanced version has different sprites and can produce 2 units/upgrades at a time; energy advance costs the same as building a new building, but is 1/4 faster in time and requires a Computer Station;
+--- Generator - now takes 2 limits; can be rebuilt into an advanced version, giving x2 energy, other things being equal;
+--- Static defense: two turrets with narrow specialization - against ground and air units; anti-ground initially shoots as Commando (effective against light+biological), but after special upgrade gets Plasmagan as second weapon against mechanical units; turrets can be rebuilt into each other for the same energy cost and in quarter less time;
+--- Science Center - now just a "tech" building - gives access to T2 units and upgrades for them; building sprites changed;
+--- Computer Station - new, another "tech" building; gives access to T2 buildings and upgrades for them; allows you to advance production buildings;
+---- both technological buildings can be only 1 instance;
+--- Radar - now takes 2 units limit; ability time is now fixed at 8 seconds, and special upgrade only increases vision and scanning radiuses; you can now build as many radars as you want; ability recharge time increased to 1 minute; a flashing sprite now appears above units that are being radar-scanned;
+--- Rocket Launcher Station - number of missile strikes reduced to 2; requires both technological buildings for itself; during volley reveals itself in a fog of war for all players for a couple of seconds and a minute to reload;
+
+-- UNITS:
+These are just the major changes, for more information on each unit - see the PDF document or in-game hints;
+--- mines removed from the game;
+--- APC removed from the game;
+--- multiple medics/engineers can no longer heal/repair a single target;
+---- but can now heal/repair while the target is taking damage;
+--- Medics and Engineers no longer have a paralyzing attack;
+--- new infantry type added - antiaircrafter, specialized ground antiaircraft;
+--- half of infantry now has the attribute heavy;
+--- Plasmagainer is now initially flying and it will not be possible to lower it to the ground; now it attacks both flying and ground targets;
+--- added a new mechanical anti-mech - UAC Dron - attacks similarly to the plasmagainer, but only on the ground; has two unique, researched abilities: one gives the ability to move around the map doodads, the second allows it to rebuild itself into an anti-ground turret;
+--- BFG-Marine now has a unique damage modifier: the damage is multiplied by the unit's occupation limit;
+
+- HELL
+-- BUILDINGS:
+--- Building names have been changed (the word Hell is now repeated much less frequently): Hell Gate -> Demon`s Gate; Hell pools -> Infernal Pools; Hell Monastery -> Monastery of Despair; Hell Altar -> Altar of Pain; Hell Eye -> Evil Eye;
+--- Hell Keep - as well as a similar building in UAC, can be upgraded to an advanced version(Great Hell Keep);
+---- Pain Aura now burns weaker, but the damage ignores units' armor;
+--- Demon`s Gate and Infernal Pools - changes similar to Barrack/Weapon Factory;
+--- Pentagram of Death - unlike UAC, Hell has 3 tech buildings; this building allows you to build Cyberdemons and Masterminds;
+--- Monastery of Despair and Castle of Damned - are technological buildings, similar in function to those of UAC;
+--- as well as UAC - technological buildings can be only 1 instance;
+--- Teleport - the maximum count unlimited now, but now takes 4 units limit. The teleportation destination now requires a beacon unit (any own or allied unit), but there must be no obstacles under the "beacon" (if the beacon is a flying unit over a lake/rock, no teleportation is possible); only OWN ground units can use the teleport; recharge time after teleportation is calculated as X*Unit limit seconds, X originally=6, but it can be reduced with a special upgrade: 1 level of upgrade = -1 second. Earlier, to reverse teleportation it was necessary to select a unit, move the screen to the teleport and do Mouse Right Click on it - now there is an alternative, more convenient way: you can select the teleport and execute a "Special ability at point" order on the desired unit;
+--- Altar of Pain - now requires all 3 technological buildings; you can accumulate 2 spheres of invulnerability, but after casting there is a cooldown of 1 minute;
+---- invulnerability time now depends on unit's limit, formula is simple: 64sec - (limit*4sec);
+--- Evil Eye is now built as a normal building; is originally a detector; at health greater than 1/4 has permanent invisibility, including during construction (visible only the first 7 seconds after construction began); it can be created not only around Hell Keep, but also around other Evil Eye, thus stretching exploration of the map; has a special upgrade, which increases the radius of view; has the ability: can give any his or allied unit to be a detector for 8 seconds, itself, in this case, dies;
+
+-- UNITS
+--- Lost Soul can no longer be built as a separate unit in Demon`s Gate (but can be built in a cursed UAC barracks); is now originally an air unit, but when attacking ground enemies it temporarily becomes a ground unit; no longer has the ability to turn into Evil Eye;
+--- new unit: Phantom (Lost Soul from the alpha version of DOOM, Pain Elemental begins to produce it after a special upgrade; also Phantom can be built in the cursed barracks UAC) can curse barracks and CC UAC, as well as raise to take over the corpses of infantry raising them as zombies; a cursed CC is also a builder (with a limited set of buildings and a cursed barracks instead of Demon`s Gate) and is originally able to fly and attack; aside from the ability to zombify corpses of infantry and curse buildings, as well as the greater cost in time and energy, Phantom is no different from Lost Soul, so it makes no sense to upgrade to it in Hell vs Hell;
+--- Cyberdemon, Mastermind and Arachnotron are now mechs;
+--- Cyberdemon and Mastermind are no longer limited (but now they take up a lot of limit);
+--- Arachnotron is now an anti-mech;
+--- Revenant is now anti-air;
+--- Arch-Vile: unit resurrection ability investigated by separate upgrade and has a 3 second cooldown; can now resurrect allied monsters; resurrected monster has 1/2 health; has the game's largest single damage - 8 "standard DPS" every 2 seconds;
 
 
 
