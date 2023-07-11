@@ -82,7 +82,7 @@ end; }
 
 begin
    InitGame;
-   WriteUnitDescriptions;
+   //WriteUnitDescriptions;
 
    while(GameCycle)do
    begin

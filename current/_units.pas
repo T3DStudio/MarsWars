@@ -382,14 +382,14 @@ begin
 
       // Weapon type requirements
       case aw_type of
-wpt_resurect : if(tu^.buff[ub_Resurect]>0)
-               or(tu^.buff[ub_Pain ]>0)
-               or(tu^.hits<=fdead_hits)
-               or(tu^.hits> 0         )then exit;
+wpt_resurect : if(tu^.buff[ub_Resurect]>0  )
+               or(tu^.buff[ub_Pain ]>0     )
+               or(tu^.hits<=fdead_hits     )
+               or(tu^.hits> 0              )then exit;
 wpt_heal     : if(tu^.hits<=0)
                or(tu^.hits>=tu^.uid^._mhits)
                or(tu^.iscomplete=false     )
-               or(tu^.buff[ub_Heal]>0 )then exit;
+               or(tu^.buff[ub_Heal]>0      )then exit;
       end;
 
       // transport check
@@ -427,7 +427,6 @@ wpt_heal     : if(tu^.hits<=0)
        if(ukfly=uf_fly   )or(tu^.ukfly=uf_fly   )then exit;
       if((aw_reqf and wpr_reload)>0)then
        if(rld>0)then exit;
-
 
       if(aw_type=wpt_directdmgZ)then
       begin
@@ -490,7 +489,7 @@ wpt_heal     : if(tu^.hits<=0)
       end
       else
         if(canmove)and(pfcheck)then
-         if(ud<=srange)or(nosrangecheck)
+         if(ud<=(srange+TargetCheckSRangeBonus))or(nosrangecheck)
          then _target_weapon_check:=wmove_closer     // need move closer
          else ;                                      // target too far & cant move
    end;
@@ -1044,32 +1043,35 @@ begin
     if(apcc=0)then uo_id:=ua_amove;
 end;
 
-procedure _unit_inapc_target(pu,au:PTUnit);
+procedure _unit_InTransportCode(pu,ptransport:PTUnit);
 var tu:PTUnit;
 begin
    // pu - unit inside
-   // au - transport
+   // ptransport - transport
    with pu^ do
    begin
-      x  :=au^.x;
-      y  :=au^.y;
+      x  :=ptransport^.x;
+      y  :=ptransport^.y;
       {$IFDEF _FULLGAME}
-      fx :=au^.fx;
-      fy :=au^.fy;
-      mmx:=au^.mmx;
-      mmy:=au^.mmy;
+      fx :=ptransport^.fx;
+      fy :=ptransport^.fy;
+      mmx:=ptransport^.mmx;
+      mmy:=ptransport^.mmy;
       {$ENDIF}
 
       if(ServerSide)then
       begin
-         if(au^.uo_id=ua_unload)or(au^.apcc>au^.apcm)then
-          if(not au^.ukfly)or(not pf_IfObstacleZone(au^.pfzone))then
-           if(_unit_unload(au,pu))then exit;
+         if(ptransport^.uo_id=ua_unload)or(ptransport^.apcc>ptransport^.apcm)then
+          if(not ptransport^.ukfly)or(not pf_IfObstacleZone(ptransport^.pfzone))then
+           if(_unit_unload(ptransport,pu))then exit;
 
-         if(au^.uo_id in [ua_move,ua_hold,ua_amove])then uo_id:=au^.uo_id;
-         if(_IsUnitRange(au^.uo_tar,@tu))then
+         if(ptransport^.uo_id=ua_move )
+         or(ptransport^.uo_id=ua_hold )
+         or(ptransport^.uo_id=ua_amove)then uo_id:=ptransport^.uo_id;
+
+         if(_IsUnitRange(ptransport^.uo_tar,@tu))then
          begin
-            a_tar:=au^.uo_tar;
+            a_tar:=ptransport^.uo_tar;
             if(_unit_target2weapon(pu,tu,-1,255,nil)<=MaxUnitWeapons)then uo_id:=ua_amove;
          end;
       end;
@@ -1133,6 +1135,7 @@ end;
 // target units
 procedure _unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
+     a,
      w: byte;
 td,tdm: integer;
 begin
@@ -1169,7 +1172,7 @@ uab_Teleport     : if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit;
 uab_Teleport     : if(_ability_teleport    (pu,tu,td))then exit;//team
          end;
 
-         w:=_unit_target2weapon(pu,tu,td,255,nil);
+         w:=_unit_target2weapon(pu,tu,td,255,@a);
          if(w<=MaxUnitWeapons)then
          begin
             a_tar :=uo_tar;
@@ -1550,7 +1553,7 @@ begin
     if(hits<=0)then exit;
 
    apctu:=nil;
-   if(_IsUnitRange(pu^.transport,@apctu))then _unit_inapc_target(pu,apctu);
+   if(_IsUnitRange(pu^.transport,@apctu))then _unit_InTransportCode(pu,apctu);
 
    with pu^ do
    if(ServerSide=false)then

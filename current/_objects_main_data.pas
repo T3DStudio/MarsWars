@@ -1144,7 +1144,7 @@ begin
    _mhits     := 2000;
    _renergy   := 300;
    _r         := 15;
-   _speed     := 12;
+   _speed     := 14;
    _srange    := 225;
    _ucl       := 9;
    _btime     := ptime1h;

@@ -398,6 +398,8 @@ wmove_closer           = 1;
 wmove_farther          = 2;
 wmove_noneed           = 3;
 
+TargetCheckSRangeBonus = 50;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Weapon: priority type
@@ -621,7 +623,7 @@ mh_homing              = 2;
 //
 
 MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
-MaxUnitWeapons         = 7;  //0-7
+MaxUnitWeapons         = 3;  //0-3
 MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
 

@@ -1,0 +1,1229 @@
+Hell Keep (R,900,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000. Builder. Increase energy level(+300). Can be rebuilt into "Great Hell Keep". Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 56
+Requierd energy: 900
+---------------------------
+Great Hell Keep (R,600,1,168)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000. Builder. Increase energy level(+600). Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}.
+
+
+
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 168
+Requierd energy: 600
+---------------------------
+Demon`s Gate (T,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 10000. Unit production. Can be rebuilt into "Demon`s Gate[level2]"{Req.: "Castle of Damned"}.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 10000
+Limit used: 1
+Size: 60
+Base vision range: 120
+Build time: 56
+Requierd energy: 300
+---------------------------
+Unholy Symbol (Y,50,1,28)
+[T1,building,mechanical,light,ground]
+Hits: 750. Increase energy level(+25). Can be rebuilt into "Great Unholy Symbol".
+
+
+Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
+Max hits: 750
+Limit used: 1
+Size: 22
+Base vision range: 44
+Build time: 28
+Requierd energy: 50
+---------------------------
+Great Unholy Symbol (Y,1,56)
+[T1,building,mechanical,light,ground]
+Hits: 750. Increase energy level(+50).
+
+
+
+Max hits: 750
+Limit used: 1
+Size: 22
+Base vision range: 44
+Build time: 56
+Requierd energy: 0
+---------------------------
+Infernal Pools (H,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 10000. Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level2]"{Req.: "Castle of Damned"}.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 10000
+Limit used: 1
+Size: 53
+Base vision range: 106
+Build time: 56
+Requierd energy: 300
+---------------------------
+Guard Tower (V,200,1,35)
+[T1,building,mechanical,light,ground]
+Defensive structure. Hits: 5000. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Arming/Abilities: -ranged attack, targets: [alive] except [Imp], impact 62*3: x1.5 [unit,biological,heavy].
+
+Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
+Max hits: 5000
+Limit used: 1
+Size: 20
+Base vision range: 275
+Build time: 35
+Requierd energy: 200
+---------------------------
+Teleport (K,400,4,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 3000. Special ability: "Teleportation".
+
+Requirements: Great Hell Keep
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 3000
+Limit used: 4
+Size: 28
+Base vision range: 100
+Build time: 56
+Requierd energy: 400
+---------------------------
+Evil Eye (J,50,1,28)
+[T1,building,mechanical,light,ground,detector]
+Passive scouting and detection. Hits: 62. Special ability: "Hell Vision".
+
+
+Constructed by: Hell Keep,Great Hell Keep,Evil Eye,Hell Command Center,Advanced Hell Command Center
+Max hits: 62
+Limit used: 1
+Size: 10
+Base vision range: 300
+Build time: 28
+Requierd energy: 50
+---------------------------
+Monastery of Despair (I,1200,1,112)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 15000
+Limit used: 1
+Size: 65
+Base vision range: 130
+Build time: 112
+Requierd energy: 1200
+---------------------------
+Pentagram of Death (U,1200,1,112)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 15000
+Limit used: 1
+Size: 65
+Base vision range: 130
+Build time: 112
+Requierd energy: 1200
+---------------------------
+Totem of Horror (B,300,1,42)
+[T3,building,mechanical,light,ground]
+Advanced defensive structure. Hits: 3000. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Arming/Abilities: -ranged attack, targets: [alive,unit], impact 496*0.5.
+Requirements: Castle of Damned
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 3000
+Limit used: 1
+Size: 21
+Base vision range: 275
+Build time: 42
+Requierd energy: 300
+---------------------------
+Altar of Pain (L,200,1,56)
+[T3,building,mechanical,heavy,ground]
+Hits: 3000. Special ability: "Invulnerability"{Req.: "Invulnerability Sphere"}.
+
+Requirements: Pentagram of Death,Monastery of Despair,Castle of Damned
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 3000
+Limit used: 1
+Size: 50
+Base vision range: 100
+Build time: 56
+Requierd energy: 200
+---------------------------
+Castle of Damned (O,1200,1,112)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000.
+
+
+Constructed by: Hell Keep,Great Hell Keep
+Max hits: 15000
+Limit used: 1
+Size: 86
+Base vision range: 172
+Build time: 112
+Requierd energy: 1200
+---------------------------
+Hell Command Center (F,900,1,56)
+[T1,building,mechanical,heavy,ground,transport]
+Corrupted Command Center. Hits: 15000. Builder. Increase energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Special ability: "Flight Engines".
+Arming/Abilities: -ranged attack, targets: [alive] except [Imp], impact 62*1: x1.5 [unit,biological,heavy].
+
+Constructed by: Hell Command Center,Advanced Hell Command Center
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 56
+Requierd energy: 900
+---------------------------
+Advanced Hell Command Center (F,600,1,56)
+[T1,building,mechanical,heavy,ground,transport]
+Corrupted Advanced Command Center. Hits: 15000. Builder. Increase energy level(+600). Special ability: "Flight Engines".
+Arming/Abilities: -ranged attack, targets: [alive] except [Imp], impact 62*1: x1.5 [unit,biological,heavy].
+
+
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 56
+Requierd energy: 600
+---------------------------
+Zombie Barracks (G,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Corrupted Barracks. Hits: 10000. Unit production. Can be rebuilt into "Zombie Barracks[level2]"{Req.: "Advanced Hell Command Center"}.
+
+
+Constructed by: Hell Command Center,Advanced Hell Command Center
+Max hits: 10000
+Limit used: 1
+Size: 60
+Base vision range: 120
+Build time: 56
+Requierd energy: 300
+---------------------------
+Lost Soul (J,100,1,14)
+[T1,unit,biological,light,flying]
+Hits: 1000.
+Arming/Abilities: -melee attack, targets: [alive], impact 15*1: x0.5 [mechanical].
+
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 10
+Base speed: 24
+Base vision range: 225
+Build time: 14
+Requierd energy: 100
+PainState base threshold: 1
+---------------------------
+Phantom (K,200,1,28)
+[T1,unit,biological,light,flying]
+Hits: 1000.
+Arming/Abilities: -melee attack, +zombification, targets: [ground,flying], impact 15*1: x0.5 [mechanical]; -melee attack, targets: [alive], impact 15*1: x0.5 [mechanical].
+
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 10
+Base speed: 24
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 1
+---------------------------
+Imp (R,200,1,28)
+[T1,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive] except [Imp], impact 62*1: x1.5 [unit,biological,heavy]; -melee attack, targets: [Imp], impact 62*1.
+
+Produced by: Demon`s Gate
+Max hits: 1000
+Limit used: 1
+Size: 11
+Base speed: 10
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 4
+Places in transport: 1
+---------------------------
+Pinky Demon (T,250,1.5,28)
+[T1,unit,biological,heavy,ground]
+Hits: 1500.
+Arming/Abilities: -melee attack, targets: [alive,ground], impact 62*2: x1.5 [heavy].
+
+Produced by: Demon`s Gate
+Max hits: 1500
+Limit used: 1.5
+Size: 14
+Base speed: 14
+Base vision range: 200
+Build time: 28
+Requierd energy: 250
+PainState base threshold: 8
+Places in transport: 2
+---------------------------
+Cacodemon (Y,250,1.5,35)
+[T1,unit,biological,heavy,flying]
+Hits: 1500.
+Arming/Abilities: -ranged attack, targets: [alive] except [Cacodemon], impact 93*1: x1.5 [unit,mechanical]; -melee attack, targets: [Cacodemon], impact 62*1.
+Requirements: Infernal Pools,Great Hell Keep
+Produced by: Demon`s Gate
+Max hits: 1500
+Limit used: 1.5
+Size: 14
+Base speed: 10
+Base vision range: 225
+Build time: 35
+Requierd energy: 250
+PainState base threshold: 8
+---------------------------
+Hell Knight (F,300,2,42)
+[T1,unit,biological,light,ground]
+Hits: 2000.
+Arming/Abilities: -ranged attack, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 124*1: x1.5 [unit,light]; -melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1.
+Requirements: Infernal Pools
+Produced by: Demon`s Gate
+Max hits: 2000
+Limit used: 2
+Size: 14
+Base speed: 10
+Base vision range: 250
+Build time: 42
+Requierd energy: 300
+PainState base threshold: 8
+Places in transport: 3
+---------------------------
+Baron of Hell (G,500,3,42)
+[T1,unit,biological,heavy,ground]
+Hits: 4000.
+Arming/Abilities: -ranged attack, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 124*1: x1.5 [unit,light]; -melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1.
+Requirements: Infernal Pools
+Produced by: Demon`s Gate
+Max hits: 4000
+Limit used: 3
+Size: 14
+Base speed: 10
+Base vision range: 250
+Build time: 42
+Requierd energy: 500
+PainState base threshold: 8
+Places in transport: 3
+---------------------------
+Cyberdemon (V,1400,12,140)
+[T2,unit,mechanical,heavy,ground]
+Hits: 19000. Immune to splash damage.
+Arming/Abilities: -ranged attack, targets: [alive], impact 310*1: x3 [building],x0.5 [unit,light].
+Requirements: Pentagram of Death
+Produced by: Demon`s Gate
+Max hits: 19000
+Limit used: 12
+Size: 20
+Base speed: 12
+Base vision range: 225
+Build time: 140
+Requierd energy: 1400
+PainState base threshold: 10
+Places in transport: 12
+---------------------------
+Mastermind (H,1200,10,112)
+[T2,unit,mechanical,heavy,ground]
+Hits: 14000. Immune to splash damage.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*6: x1.5 [light].
+Requirements: Pentagram of Death
+Produced by: Demon`s Gate
+Max hits: 14000
+Limit used: 10
+Size: 35
+Base speed: 12
+Base vision range: 225
+Build time: 112
+Requierd energy: 1200
+PainState base threshold: 8
+Places in transport: 12
+---------------------------
+Pain Elemental (B,400,1,56)
+[T2,unit,biological,heavy,flying]
+Hits: 1500. Special ability: "Spawn LostSoul".
+Arming/Abilities: -spawn "Phantom", targets: [alive], impact *0.5, {Req.: "Phantoms"}; -spawn "Lost Soul", targets: [alive], impact *0.5.
+Requirements: Monastery of Despair,Great Hell Keep
+Produced by: Demon`s Gate
+Max hits: 1500
+Limit used: 1
+Size: 15
+Base speed: 7
+Base vision range: 225
+Build time: 56
+Requierd energy: 400
+PainState base threshold: 3
+---------------------------
+Revenant (N,250,1.5,35)
+[T2,unit,biological,heavy,ground]
+Hits: 1500.
+Arming/Abilities: -ranged attack, targets: [alive] except [Revenant], impact 93*1: x1.5 [flying]; -melee attack, targets: [Revenant], impact 62*1.
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Max hits: 1500
+Limit used: 1.5
+Size: 13
+Base speed: 12
+Base vision range: 225
+Build time: 35
+Requierd energy: 250
+PainState base threshold: 5
+Places in transport: 2
+---------------------------
+Mancubus (U,500,3,42)
+[T2,unit,biological,heavy,ground]
+Hits: 3600.
+Arming/Abilities: -ranged attack, targets: [alive] except [Mancubus], impact 62x2*1.2: x3 [building].
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Max hits: 3600
+Limit used: 3
+Size: 20
+Base speed: 7
+Base vision range: 225
+Build time: 42
+Requierd energy: 500
+PainState base threshold: 7
+Places in transport: 4
+---------------------------
+Arachnotron (I,500,3,42)
+[T2,unit,mechanical,heavy,ground]
+Hits: 3000.
+Arming/Abilities: -ranged attack, targets: [alive] except [Arachnotron], impact 62*3: x1.5 [unit,mechanical].
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Max hits: 3000
+Limit used: 3
+Size: 20
+Base speed: 10
+Base vision range: 225
+Build time: 42
+Requierd energy: 500
+PainState base threshold: 7
+Places in transport: 4
+---------------------------
+Arch-Vile (O,600,4,56)
+[T3,unit,biological,heavy,ground]
+Hits: 4000.
+Arming/Abilities: -resurrection, targets: [dead,demons&zombies] except [Cyberdemon,Mastermind,Arch-Vile], impact *2, {Req.: "Resurrection"}; -ranged attack, targets: [alive,unit], impact 496*0.5.
+Requirements: Altar of Pain
+Produced by: Demon`s Gate
+Max hits: 4000
+Limit used: 4
+Size: 14
+Base speed: 14
+Base vision range: 275
+Build time: 56
+Requierd energy: 600
+PainState base threshold: 7
+Places in transport: 4
+---------------------------
+Former Zombie (L,100,1,14)
+[T2,unit,biological,light,ground]
+Hits: 500.
+Arming/Abilities: -ranged attack, targets: [alive], impact 31*1: x1.5 [unit,biological,light].
+
+Produced by: Zombie Barracks
+Max hits: 500
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 225
+Build time: 14
+Requierd energy: 100
+PainState base threshold: 1
+Places in transport: 1
+---------------------------
+Zombie Engineer (Ctrl+R,600,1,42)
+[T2,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -suicide, targets: [alive,ground], impact .
+Requirements: Zombie Barracks(x4)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 14
+Base vision range: 200
+Build time: 42
+Requierd energy: 600
+PainState base threshold: 2
+Places in transport: 2
+---------------------------
+Zombie Shotguner (Ctrl+T,200,1,28)
+[T2,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*1: x1.5 [unit,biological,heavy].
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 2
+Places in transport: 1
+---------------------------
+Zombie SuperShotguner (Ctrl+Y,250,1,35)
+[T2,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 186*0.67: x1.5 [unit,biological,heavy],x0.5 [mechanical].
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 10
+Base vision range: 225
+Build time: 35
+Requierd energy: 250
+PainState base threshold: 3
+Places in transport: 1
+---------------------------
+Zombie Commando (Ctrl+F,200,1,28)
+[T2,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,biological,light].
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 10
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 4
+Places in transport: 1
+---------------------------
+Zombie Antiaircrafter (Ctrl+G,200,1,28)
+[T2,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [flying].
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 8
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 4
+Places in transport: 1
+---------------------------
+Zombie Siege Marine (Ctrl+H,200,1,28)
+[T2,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*1: x3 [building].
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 8
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 5
+Places in transport: 1
+---------------------------
+Zombie Plasmaguner (Ctrl+V,200,1,28)
+[T2,unit,biological,light,flying]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,mechanical].
+Requirements: Zombie Barracks(x2),Advanced Hell Command Center
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 14
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+PainState base threshold: 5
+---------------------------
+Zombie BFG Marine (Ctrl+B,600,2,56)
+[T3,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 248*0.5: x target limit.
+Requirements: Zombie Barracks(x4),Advanced Hell Command Center(x3)
+Produced by: Zombie Barracks
+Max hits: 1000
+Limit used: 2
+Size: 12
+Base speed: 6
+Base vision range: 225
+Build time: 56
+Requierd energy: 600
+PainState base threshold: 5
+Places in transport: 2
+---------------------------
+Command Center (R,900,1,84)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000. Builder. Increase energy level(+300). Can be rebuilt into "Advanced Command Center". Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,mechanical], {Req.: "Command Center Turret"}.
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 84
+Requierd energy: 900
+---------------------------
+Advanced Command Center (R,600,1,126)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000. Builder. Increase energy level(+600). Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,mechanical], {Req.: "Command Center Turret"}.
+
+
+Max hits: 15000
+Limit used: 1
+Size: 66
+Base vision range: 280
+Build time: 126
+Requierd energy: 600
+---------------------------
+Barracks (T,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 10000. Unit production. Can be rebuilt into "Barracks[level2]"{Req.: "Computer Station"}.
+
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 10000
+Limit used: 1
+Size: 60
+Base vision range: 120
+Build time: 56
+Requierd energy: 300
+---------------------------
+Vehicle Factory (G,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 10000. Unit production. Can be rebuilt into "Vehicle Factory[level2]"{Req.: "Computer Station"}.
+
+Requirements: Weapon Factory
+Constructed by: Command Center,Advanced Command Center
+Max hits: 10000
+Limit used: 1
+Size: 60
+Base vision range: 120
+Build time: 56
+Requierd energy: 300
+---------------------------
+Generator (Y,100,2,28)
+[T1,building,mechanical,heavy,ground]
+Hits: 1500. Increase energy level(+50). Can be rebuilt into "Advanced Generator".
+
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 1500
+Limit used: 2
+Size: 44
+Base vision range: 88
+Build time: 28
+Requierd energy: 100
+---------------------------
+Advanced Generator (Y,2,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 1500. Increase energy level(+100).
+
+
+
+Max hits: 1500
+Limit used: 2
+Size: 44
+Base vision range: 88
+Build time: 56
+Requierd energy: 0
+---------------------------
+Weapon Factory (H,300,1,56)
+[T1,building,mechanical,heavy,ground]
+Hits: 10000. Researches and upgrades facility. Can be rebuilt into "Weapon Factory[level2]"{Req.: "Computer Station"}.
+
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 10000
+Limit used: 1
+Size: 62
+Base vision range: 124
+Build time: 56
+Requierd energy: 300
+---------------------------
+Radar (J,200,2,56)
+[T1,building,mechanical,heavy,ground,detector]
+Reveals map. Hits: 3000. Special ability: "Scan".
+
+Requirements: Weapon Factory
+Constructed by: Command Center,Advanced Command Center
+Max hits: 3000
+Limit used: 2
+Size: 35
+Base vision range: 300
+Build time: 56
+Requierd energy: 200
+---------------------------
+Rocket Launcher Station (L,200,2,56)
+[T3,building,mechanical,heavy,ground]
+Hits: 3000. Special ability: "Missile Strike"{Req.: "Rocket Strike Charge"}.
+
+Requirements: Science Facility,Computer Station
+Constructed by: Command Center,Advanced Command Center
+Max hits: 3000
+Limit used: 2
+Size: 40
+Base vision range: 80
+Build time: 56
+Requierd energy: 200
+---------------------------
+Science Facility (I,1200,1,112)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000.
+
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 15000
+Limit used: 1
+Size: 86
+Base vision range: 172
+Build time: 112
+Requierd energy: 1200
+---------------------------
+Anti-ground Turret (V,200,1,35)
+[T1,building,mechanical,light,ground]
+Anti-ground defensive structure. Hits: 5000. Can be rebuilt into "Anti-air Turret".
+Arming/Abilities: -ranged attack, targets: [alive,unit,mechanical,ground], impact 62*3: x1.5 [unit,mechanical], {Req.: "Anti-ground Plasmagun"}; -ranged attack, targets: [alive,ground], impact 62*3: x1.5 [unit,biological,light].
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 5000
+Limit used: 1
+Size: 15
+Base vision range: 275
+Build time: 35
+Requierd energy: 200
+---------------------------
+Anti-air Turret (B,200,1,35)
+[T1,building,mechanical,light,ground]
+Anti-air defensive structure. Hits: 5000. Can be rebuilt into "Anti-ground Turret".
+Arming/Abilities: -ranged attack, targets: [alive,flying], impact 62*3: x1.5 [flying].
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 5000
+Limit used: 1
+Size: 15
+Base vision range: 275
+Build time: 35
+Requierd energy: 200
+---------------------------
+Computer Station (O,1200,1,112)
+[T1,building,mechanical,heavy,ground]
+Hits: 15000.
+
+
+Constructed by: Command Center,Advanced Command Center
+Max hits: 15000
+Limit used: 1
+Size: 70
+Base vision range: 140
+Build time: 112
+Requierd energy: 1200
+---------------------------
+Mine (Ctrl+V,10,1,2)
+[T1,building,mechanical,light,ground,detector]
+Hits: 100.
+Arming/Abilities: -suicide, targets: [alive,ground], impact .
+
+
+Max hits: 100
+Limit used: 1
+Size: 5
+Base vision range: 100
+Build time: 2
+Requierd energy: 10
+---------------------------
+Engineer (B,200,1,28)
+[T1,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -heal/repair, targets: [alive,mechanical], impact 45*1; -ranged attack, targets: [alive], impact 31*1.
+Requirements: Weapon Factory
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 200
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+Medic (N,200,1,28)
+[T1,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -heal/repair, targets: [alive,unit,biological], impact 45*1; -ranged attack, targets: [alive,ground], impact 31*1.
+Requirements: Weapon Factory
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 200
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+Shotguner (R,200,1,28)
+[T1,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*1: x1.5 [unit,biological,heavy].
+
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 14
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+SuperShotguner (T,250,1.5,35)
+[T1,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 186*0.67: x1.5 [unit,biological,heavy],x0.5 [mechanical].
+
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1.5
+Size: 12
+Base speed: 14
+Base vision range: 225
+Build time: 35
+Requierd energy: 250
+Places in transport: 1
+---------------------------
+Commando (Y,200,1,28)
+[T1,unit,biological,light,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,biological,light].
+Requirements: Weapon Factory
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+Antiaircrafter (F,200,1,28)
+[T1,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [flying].
+Requirements: Weapon Factory
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 12
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+Siege Marine (G,200,1,28)
+[T1,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*1: x3 [building].
+Requirements: Weapon Factory
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 13
+Base speed: 10
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+Places in transport: 1
+---------------------------
+Plasmaguner (H,200,1,28)
+[T1,unit,biological,light,flying]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 62*1: x1.5 [unit,mechanical].
+Requirements: Weapon Factory,Advanced Command Center
+Produced by: Barracks
+Max hits: 1000
+Limit used: 1
+Size: 12
+Base speed: 14
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+---------------------------
+BFG Marine (V,600,2,56)
+[T3,unit,biological,heavy,ground]
+Hits: 1000.
+Arming/Abilities: -ranged attack, targets: [alive], impact 248*0.5: x target limit.
+Requirements: Science Facility,Computer Station
+Produced by: Barracks
+Max hits: 1000
+Limit used: 2
+Size: 13
+Base speed: 10
+Base vision range: 225
+Build time: 56
+Requierd energy: 600
+Places in transport: 2
+---------------------------
+Dropship (I,200,1,28)
+[T1,unit,mechanical,heavy,flying,transport]
+Hits: 2000. Special ability: "Unload". Immune to splash damage.
+
+Requirements: Advanced Command Center
+Produced by: Vehicle Factory
+Max hits: 2000
+Limit used: 1
+Size: 33
+Base speed: 18
+Base vision range: 225
+Build time: 28
+Requierd energy: 200
+---------------------------
+Drone (U,300,2,42)
+[T1,unit,mechanical,light,ground]
+Hits: 2000. Special ability: transformation to "Anti-ground Turret"{Req.: "Drone Transformation Protocol"}.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*2: x1.5 [unit,mechanical].
+
+Produced by: Vehicle Factory
+Max hits: 2000
+Limit used: 2
+Size: 15
+Base speed: 14
+Base vision range: 225
+Build time: 42
+Requierd energy: 300
+Places in transport: 3
+---------------------------
+Terminator (O,500,3,42)
+[T2,unit,mechanical,heavy,ground]
+Hits: 2000. Immune to splash damage.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62*4: x1.5 [unit,biological],x0.5 [building].
+Requirements: Science Facility
+Produced by: Vehicle Factory
+Max hits: 2000
+Limit used: 3
+Size: 16
+Base speed: 12
+Base vision range: 275
+Build time: 42
+Requierd energy: 500
+Places in transport: 4
+---------------------------
+Tank (J,600,4,56)
+[T2,unit,mechanical,heavy,ground]
+Hits: 6000. Immune to splash damage.
+Arming/Abilities: -ranged attack, targets: [alive,ground], impact 62x2*1: x3 [building].
+Requirements: Science Facility
+Produced by: Vehicle Factory
+Max hits: 6000
+Limit used: 4
+Size: 20
+Base speed: 8
+Base vision range: 225
+Build time: 56
+Requierd energy: 600
+Places in transport: 6
+---------------------------
+Fighter (K,500,3,42)
+[T2,unit,mechanical,heavy,flying]
+Hits: 2000. Immune to splash damage.
+Arming/Abilities: -ranged attack, targets: [alive,flying], impact 62x2*2: x1.5 [flying]; -ranged attack, targets: [alive,ground], impact 62*2, {Req.: "Fighter Laser Gun"}.
+Requirements: Advanced Command Center,Science Facility
+Produced by: Vehicle Factory
+Max hits: 2000
+Limit used: 3
+Size: 18
+Base speed: 16
+Base vision range: 225
+Build time: 42
+Requierd energy: 500
+---------------------------
+Ground APC (L,200,1,56)
+[T1,unit,mechanical,heavy,ground,transport]
+Hits: 3000. Special ability: "Unload". Immune to splash damage.
+
+
+Produced by: Vehicle Factory
+Max hits: 3000
+Limit used: 1
+Size: 25
+Base speed: 15
+Base vision range: 225
+Build time: 56
+Requierd energy: 200
+Places in transport: 10
+---------------------------
+
+Hell Firepower (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the damage of ranged attacks for T1 units and defensive structures.
+
+
+Combat Flesh (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the armor of all Hell units.
+
+
+Stone Walls (Y,600/900/1200/1500/1800,60/100/140/180/220,x5)
+
+Increase the armor of all Hell buildings.
+
+
+Claws and Teeth (F,600/900/1200/1500/1800,60/100/140/180/220,x5)
+
+Increase the damage of melee attacks.
+
+
+Flesh Regeneration (G,300/600,60/90,x2)
+
+Health regeneration for all Hell units.
+
+
+Pain Threshold (H,600/600,60/60,x2)
+
+Hell units can take more hits before being stunned by pain.
+
+
+Hell Keep Range Upgrade (V,600/600,60/75,x2)
+
+Increase Hell Keep`s range of vision.
+
+
+Hell Keep Blink Charge (B,300,180,x1)
+
+Charge for Hell Keep`s ability.
+
+
+Adaptive Foundation (N,600,75,x1)
+
+All buildings, except Teleport and those that can produce units, can be placed on doodads.
+
+
+Decay Aura (U,600,60,x1)
+
+Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor.
+Requirements: Great Hell Keep
+
+Demonic Spirits (I,600/900,60/75,x2)
+
+Increase the range of defensive structures.
+Requirements: Great Hell Keep
+
+Pinky`s Rage (O,600,60,x1)
+
+Increase the movement speed of Pinky Demons.
+Requirements: Great Hell Keep
+
+Specters (J,600,60,x1)
+
+Pinky Demon becomes invisible.
+Requirements: Great Hell Keep
+
+Hell Sight (K,600/900,60/90,x2)
+
+Increase the sight range of all Hell units.
+Requirements: Monastery of Despair
+
+Phantoms (L,600,60,x1)
+
+Pain Elemental spawns Phantoms instead of Lost Soul.
+Requirements: Monastery of Despair
+
+Demon`s Weapons (Ctrl+R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the damage of ranged attacks for T2 units and defensive structures.
+Requirements: Monastery of Despair
+
+Teleport Upgrade (Ctrl+T,400/600,60/90,x2)
+
+Reduced cooldown on Teleport ability.
+Requirements: Castle of Damned
+
+Reverse Teleportation (Ctrl+Y,600,60,x1)
+
+Units can teleport back to Teleport.
+Requirements: Castle of Damned
+
+Evil Eye Upgrade (Ctrl+F,300/600/900,60/60/60,x3)
+
+Increase the sight range of Evil Eye.
+Requirements: Castle of Damned
+
+Totem of Horror Invisibility (Ctrl+G,600,60,x1)
+
+Totem of Horror becomes invisible.
+Requirements: Castle of Damned
+
+Building Restoration (Ctrl+H,600/900/1200/1500/1800,60/60/60/60/60,x5)
+
+Health regeneration for all Hell buildings.
+Requirements: Castle of Damned
+
+Tower Teleportation Charge (Ctrl+V,200,30,x15,*)
+
+Charges for ability of Guard Tower and Totem of Horror.
+Requirements: Castle of Damned
+
+Resurrection (Ctrl+B,600,60,x1)
+
+ArchVile`s ability.
+Requirements: Altar of Pain
+
+Invulnerability Sphere (Ctrl+N,1200,150,x2,*)
+
+Charge for Altar of Pain ability.
+Requirements: Altar of Pain
+
+Weapons Upgrade (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the damage of ranged attacks for all UAC units and defensive structures.
+
+
+Infantry Combat Armor Upgrade (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the armor of all Barrack`s units.
+
+
+Concrete Walls (Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the armor of all UAC buildings.
+
+
+Advanced Tools (F,600/900,60/105,x2)
+
+Increase repair/healing efficiency of Engineers/Medics.
+
+
+Lightweight Armor (G,600,60,x1)
+
+Increase the movement speed of all Barrack`s units.
+
+
+Expansive bullets (H,600,60,x1)
+
+Shotguner, SuperShotguner and Terminator deal more damage to [biological].
+
+
+Command Center Range Upgrade (V,600/600,60/75,x2)
+
+Increase Command Center`s range of vision.
+
+
+Command Center Flight Engines (B,600,120,x1)
+
+Command Center gains ability to fly.
+
+
+Adaptive Foundation (N,600,75,x1)
+
+All buildings, except those that can produce units, can be placed on doodads.
+
+
+Command Center Turret (U,600,120,x1)
+
+Plasma turret for Command Center.
+Requirements: Advanced Command Center
+
+Spotlights (I,600/900,60/75,x2)
+
+Increase the range of defensive structures.
+Requirements: Advanced Command Center
+
+Antigravity Platform (O,600,60,x1)
+
+Drone can move over obstacles.
+Requirements: Advanced Command Center
+
+Drone Transformation Protocol (J,600,60,x1)
+
+Drone can rebuild to Anti-ground turret.
+Requirements: Advanced Command Center
+
+Light Amplification Visors (K,600/900,60/90,x2)
+
+Increase the sight range of all UAC units.
+Requirements: Science Facility
+
+Stealth Technology (L,600,60,x1)
+
+Commando becomes invisible.
+Requirements: Science Facility
+
+Fragmentation Missiles (Ctrl+R,600,60,x1)
+
+Anti-air missiles do extra damage around the target.
+Requirements: Science Facility
+
+Advanced Engines (Ctrl+T,600/900,60/75,x2)
+
+Increase the movement speed of all Factory`s units.
+Requirements: Science Facility
+
+Mech Combat Armor Upgrade (Ctrl+Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+
+Increase the armor of all Factory`s units.
+Requirements: Science Facility
+
+Fighter Laser Gun (Ctrl+F,600,60,x1)
+
+Fighter anti-ground weapon.
+Requirements: Science Facility
+
+Dropship Upgrade (Ctrl+G,600,60,x1)
+
+Increase the capacity of Dropship.
+Requirements: Science Facility
+
+Radar Upgrade (Ctrl+H,300/600/900,60/60/60,x3)
+
+Increase radar scanning radius.
+Requirements: Computer Station
+
+Anti-ground Plasmagun (Ctrl+V,600,60,x1)
+
+Anti-[mechanical] weapon for Anti-ground turret.
+Requirements: Computer Station
+
+Additional Armoring (Ctrl+B,600,60,x1)
+
+Additional armor for Turrets.
+Requirements: Computer Station
+
+Rocket Strike Charge (Ctrl+N,1200,150,x2,*)
+
+Charge for Rocket Launcher Station ability.
+Requirements: Rocket Launcher Station
+

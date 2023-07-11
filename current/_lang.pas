@@ -1603,17 +1603,24 @@ begin
         writeln(f,nstr(un_txt_uihint2));
         writeln(f,nstr(un_txt_uihint3));
         writeln(f,nstr(un_txt_uihint4));
+        writeln(f,'Max hits: ',_mhits);
+        writeln(f,'Limit used: ', l2s(_limituse,ul1));
         writeln(f,'Size: ',_r);
+        if(_speed>0)then
         writeln(f,'Base speed: ' , _speed);
         writeln(f,'Base vision range: ', _srange);
         writeln(f,'Build time: ' , _btime);
-        writeln(f,'Limit used: '  , l2s(_limituse,ul1));
+        writeln(f,'Requierd energy: ' , _renergy);
+        if(_painc>0)then
+        writeln(f,'PainState base threshold: ' , _painc);
+        if(not _ukfly)and(not _ukbuilding)then
         writeln(f,'Places in transport: ',_apcs );
+
         {
         Max count	Unlimited
         base damage  splash damage
         }
-        writeln(f);
+        writeln(f,'---------------------------');
      end;
 
 

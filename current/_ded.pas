@@ -154,12 +154,11 @@ begin
 '-koth'  : begin g_mode:=gm_koth;     Map_premap; Dedicated_SetCompFFATeams; end;
 '-rb'    : begin g_mode:=gm_royale;   Map_premap; Dedicated_SetCompFFATeams; end;
 
-
 '-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
 '-lo'    : begin g_deadobservers   :=not g_deadobservers; end;
-'-ng'    : if(a=2)then begin g_generators:=mm3(0,s2b(args[1]),gms_g_maxgens);Map_premap;end;
-'-st'    : if(a=2)then g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb);
-'-fs'    : if(a=2)then g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai );
+'-ng'    : if(a=2)then begin g_generators:=mm3(0,s2b(args[1])  ,gms_g_maxgens);Map_premap;end;
+'-st'    : if(a=2)then       g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb );
+'-fs'    : if(a=2)then       g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai  );
 '-r'     : begin
               g_start_base :=random(gms_g_startb+1);
               g_generators :=random(gms_g_maxgens+1);
@@ -190,11 +189,11 @@ true : if(PlayerAllOut)then
 end;
 
 procedure Dedicated_screenLine(s1:shortstring;x1:byte;
-                      s2:shortstring;x2:byte;
-                      s3:shortstring;x3:byte;
-                      s4:shortstring;x4:byte;
-                      s5:shortstring;x5:byte;
-                      s6:shortstring;x6:byte);
+                               s2:shortstring;x2:byte;
+                               s3:shortstring;x3:byte;
+                               s4:shortstring;x4:byte;
+                               s5:shortstring;x5:byte;
+                               s6:shortstring;x6:byte);
 var s: shortstring;
 
 procedure ss(sp:pshortstring;x:byte);

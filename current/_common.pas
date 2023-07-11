@@ -1061,7 +1061,9 @@ begin
    then Append (f)
    else Rewrite(f);
    writeln(f,mess);
+   {$IFDEF CONSOLE}
    writeln(mess);
+   {$ENDIF}
    Close(f);
 end;
 

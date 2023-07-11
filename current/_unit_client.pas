@@ -621,7 +621,7 @@ begin
         _unit_default(uu,true);
         _unit_reveal(uu,true);
 
-        if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
+        if(_IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
 
         vx:=x;
         vy:=y;
@@ -743,7 +743,7 @@ begin
               end;
 
             if(not _IsUnitRange(pu^.transport,nil))then
-             if(_IsUnitRange(transport,@tu))then _unit_inapc_target(uu,tu);
+             if(_IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
 
             if(speed>0)then
             begin
