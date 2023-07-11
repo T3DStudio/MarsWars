@@ -322,6 +322,20 @@ begin
       uo_bx :=-1;
    end;
 end;
+procedure _unit_clear_tar(tar:integer);
+var u:integer;
+begin
+   for u:=1 to MaxUnits do
+     with _punits[u]^ do
+       if(uo_tar=tar)then uo_tar:=0;
+end;
+procedure _missiles_clear_tar(u:integer);
+var i:integer;
+begin
+   for i:=1 to MaxUnits do
+    with _missiles[i] do
+     if(vstep>0)and(tar=u)then tar:=0;
+end;
 
 procedure _teleport_CalcReload(tu:PTUnit;limit:integer);
 const seconds_per_limit = 6;
@@ -343,6 +357,8 @@ begin
       buff[ub_Teleport]:=fr_fps1;
       _unit_SetXY(pu,tx,ty,mvxy_strict);
       _unit_clear_order(pu,false);
+      _unit_clear_tar(unum);
+      _missiles_clear_tar(unum);
       _unit_UpVision(pu);
    end;
 end;
@@ -1574,14 +1590,6 @@ begin
     end;
 end;
 
-procedure _check_missiles(u:integer);
-var i:integer;
-begin
-   for i:=1 to MaxUnits do
-    with _missiles[i] do
-     if(vstep>0)and(tar=u)then tar:=0;
-end;
-
 procedure _unit_kill(pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);
 var i :integer;
     tu:PTunit;
@@ -1654,7 +1662,7 @@ begin
          end
          else tu^.transport:=0;
       end;
-      _check_missiles(unum);
+      _missiles_clear_tar(unum);
 
       if(instant)then
       begin

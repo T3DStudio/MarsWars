@@ -598,7 +598,11 @@ begin
       vy:=y;
       if(uid^._ability=uab_HKeepBlink)then
       begin
-         effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H,EID_HKeep_S,snd_cube);
+         case uidi of
+UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_cube    );
+UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_cube    );
+         else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport);
+         end;
          buff[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
