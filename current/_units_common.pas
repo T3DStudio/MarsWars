@@ -225,8 +225,8 @@ begin
                     atm_sturret: exit;
                     end;
                  end;
-   atm_sturret : if(apcc <=0)then exit;
-   atm_inapc   : if(transport<=0)then exit;
+   atm_sturret : if(transportC<=0)then exit;
+   atm_inapc   : if(transport <=0)then exit;
       else exit;
       end;
    end;
@@ -234,10 +234,16 @@ begin
 end;
 
 procedure _unit_update_xy(pu:PTUnit);
+var newzone:word;
 begin
    with pu^ do
    begin
-      pfzone:=pf_get_area(x,y);
+      newzone:=pf_get_area(x,y);
+      if(ukfly)or(ukfloater)
+      then pfzone:=newzone
+      else
+        if(not pf_IfObstacleZone(newzone))then pfzone:=newzone;
+
       {$IFDEF _FULLGAME}
       _unit_MiniMapXY(pu);
       _unit_FogXY(pu);
@@ -596,9 +602,9 @@ begin
    if(_ukfly=false)then
     for u:=1 to MaxCPoints do
      with g_cpoints[u] do
-      if(cpCapturer>0)and(cpnobuildr>0)then
+      if(cpCaptureR>0)and(cpNoBuildR>0)then
       begin
-         o:=cpnobuildr;
+         o:=cpNoBuildR;
          d:=point_dist_int(cpx,cpy,tx,ty)-o;
          add(cpx,cpy,d,o);
       end;
@@ -694,10 +700,10 @@ begin
 
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
-     if(cpCapturer>0)then
+     if(cpCaptureR>0)then
      begin
         if(building)
-        then dx:=max2(cpsolidr,cpnobuildr)
+        then dx:=max2(cpsolidr,cpNoBuildR)
         else dx:=cpsolidr;
         if(dx<=0)then continue;
         if(point_dist_int(tx,ty,cpx,cpy)<dx)then
@@ -749,8 +755,8 @@ begin
 
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
-     if(cpCapturer>0)and(cpnobuildr>0)then
-      if(point_dist_int(tx,ty,cpx,cpy)<cpnobuildr)then
+     if(cpCaptureR>0)and(cpNoBuildR>0)then
+      if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
       begin
          _InBuildArea:=2;
          exit;
@@ -828,7 +834,6 @@ begin
          UID_HAKeep: _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
          end;
          _unit_ability_HKeepBlink:=true;
-         _unit_UpVision(pu);
       end;
 end;
 
@@ -855,7 +860,6 @@ begin
          buff[ub_CCast]:=fr_fpsd2;
          _unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
          _unit_ability_HTowerBlink:=true;
-         _unit_UpVision(pu);
       end;
 end;
 
@@ -883,7 +887,6 @@ begin
       a_exp    := 0;
       a_exp_next:=ExpLevel1;
 
-      aiu_attack_timer:=0;
       aiu_alarm_timer :=0;
       aiu_alarm_d     :=NOTSET;
       aiu_alarm_x     :=-1;
@@ -891,6 +894,7 @@ begin
       aiu_need_detect :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
+      aiu_FiledSquareNear  :=0;
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
@@ -1056,7 +1060,7 @@ begin
             mv_x    := x;
             mv_y    := y;
             sel     := false;
-            apcc    := 0;
+            transportC:= 0;
 
             FillChar(buff,sizeof(buff),0);
             FillChar(vsnt,SizeOf(vsnt),0);
@@ -1508,7 +1512,7 @@ begin
     if(uu^.player^.team<>tu^.player^.team)
     then exit;
 
-   if((uu^.apcm-uu^.apcc)>=tu^.uid^._apcs)then
+   if((uu^.transportM-uu^.transportC)>=tu^.uid^._transportS)then
     if(tu^.uidi in uu^.uid^.ups_transport)then _itcanapc:=true;
 end;
 
@@ -1584,7 +1588,7 @@ begin
        _unit_dec_Rcntrs(pu);
 
        //if(G_Status=gs_running)then
-        if(playeri>0)or not(g_mode in [gm_invasion])then
+        if(playeri>0)or(g_mode<>gm_invasion)then
          if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;
@@ -1641,7 +1645,7 @@ begin
          if(tu^.hits>0)then
          begin
             if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
-            if(apcc>0)then
+            if(transportC>0)then
              if(tu^.transport=unum)then
              begin
                 if(ukfly<>uf_ground)or(transport>0)or(KillAllInside)
@@ -1649,7 +1653,7 @@ begin
                 else
                 begin
                    tu^.transport:=0;
-                   apcc-=tu^.uid^._apcs;
+                   transportC-=tu^.uid^._transportS;
                    tu^.x+=_randomr(uid^._r);
                    tu^.y+=_randomr(uid^._r);
                    tu^.uo_x:=tu^.x;
@@ -1781,18 +1785,22 @@ UID_LostSoul      : begin
                          if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UACDron       : ukfloater:=upgr[upgr_uac_soaring]>0;
-UID_Demon         : if(upgr[upgr_hell_pinkspd]>0)
-                    then begin if(speed= _speed)then begin speed :=_speed+7;{$IFDEF _FULLGAME}animw :=_animw+4;{$ENDIF}end;end
-                    else begin if(speed<>_speed)then begin speed :=_speed;  {$IFDEF _FULLGAME}animw :=_animw;  {$ENDIF}end;end;
-UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+4*level;end;
-UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);apcm:=_apcm+2*level;end;
+UID_UACDron       : ukfloater:=upgr[upgr_uac_soaring ]>0;
+UID_Demon         : begin
+                    ukfloater:=upgr[upgr_hell_pinkspd]>0;
+                    if(pf_IfObstacleZone(pfzone))and(ukfloater)
+                    then begin if(speed= _speed)then speed:=_speed div 2;{$IFDEF _FULLGAME}if(animw =_animw)then animw:=_animw div 2;{$ENDIF}end
+                    else begin if(speed<>_speed)then speed:=_speed;      {$IFDEF _FULLGAME}if(animw<>_animw)then animw:=_animw;      {$ENDIF}end;
+                    end;
+UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
+UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
       if(playeri=0)and(g_mode=gm_invasion)then
       begin
          ukfloater:=true;
          if(cycle_order<4)then buff[ub_HVision]:=_ub_infinity;
+         if(cycle_order<2)and(g_inv_wave_n>3)then buff[ub_Invis]:=_ub_infinity;
       end;
 
 
@@ -1808,7 +1816,7 @@ UID_HEye          : isbuildarea:=true;
       if(_upgr_srange>0)and(_upgr_srange_step>0)
       then t+=upgr[_upgr_srange]*_upgr_srange_step;
       if(not _ukbuilding)
-      then t+=upgr[upgr_race_srange[_urace]]*upgr_race_srange_bonus[_urace];
+      then t+=upgr[upgr_race_unit_srange[_urace]]*upgr_race_srange_unit_bonus[_urace];
       SetSRange(t);
    end
    else

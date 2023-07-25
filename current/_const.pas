@@ -572,18 +572,19 @@ upgr_fast_build        = 250;
 upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
-                                                    // HELL                UAC
-upgr_race_armor_bio    : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
-upgr_race_armor_mech   : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
-upgr_race_armor_build  : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
-upgr_race_regen_bio    : array[1..r_cnt] of byte    = (upgr_hell_regen   , 0                );
-upgr_race_regen_mech   : array[1..r_cnt] of byte    = (0                 , 0                );
-upgr_race_regen_build  : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 0                );
-upgr_race_mspeed_bio   : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
-upgr_race_mspeed_mech  : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
-upgr_race_extbuilding  : array[1..r_cnt] of byte    = (upgr_hell_extbuild, upgr_uac_extbuild);
-upgr_race_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
-upgr_race_srange_bonus : array[1..r_cnt] of smallint= (25                , 25               );
+
+// BASIC RACE UPGRADES                                 HELL                UAC
+upgr_race_armor_bio         : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
+upgr_race_armor_mech        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
+upgr_race_armor_build       : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
+upgr_race_regen_bio         : array[1..r_cnt] of byte    = (upgr_hell_regen   , 0                );
+upgr_race_regen_mech        : array[1..r_cnt] of byte    = (0                 , 0                );
+upgr_race_regen_build       : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 0                );
+upgr_race_mspeed_bio        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
+upgr_race_mspeed_mech       : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
+upgr_race_extbuilding       : array[1..r_cnt] of byte    = (upgr_hell_extbuild, upgr_uac_extbuild);
+upgr_race_unit_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
+upgr_race_srange_unit_bonus : array[1..r_cnt] of smallint= (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -698,7 +699,7 @@ BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
 BaseDamageBonus1       = 8;
-BaseDamageBonus3       = BaseDamageBonus1*2;
+BaseDamageBonus3       = BaseDamageBonus1*3;
 BaseDamageLevel1       = BaseDamageBonus1/4;
 BaseArmorBonus1        = 8;
 BaseArmorBonus2        = BaseArmorBonus1*2;

@@ -252,10 +252,10 @@ TUID = record
    _bstep,
    _tprod,
    _painc,
-   _painc_upgr,
+   _painc_upgr_step,
    _zfall,
-   _apcs,
-   _apcm,
+   _transportS,
+   _transportM,
    _base_armor,
    _baseregen,
    _zombie_hits,
@@ -490,7 +490,7 @@ o_x1,o_y1  : integer;
    ai_maxlimit_blimit,
    ai_max_specialist,
    ai_attack_limit,
-   ai_attack_pause,
+   ai_attack_delay,
    ai_scout_u_cur,
    ai_scout_u_cur_w,
    ai_scout_u_new,
@@ -505,6 +505,11 @@ o_x1,o_y1  : integer;
    ai_flags: cardinal;
    ai_alarms
            : array[0..MaxPlayers] of TAIAlarm;
+   ai_attack_timer,
+   ai_scout_timer
+           : integer;
+   ai_ReadyForAttack
+           : boolean;
 
 
    s_builders,
@@ -586,8 +591,9 @@ TUnit = record
 
    transport,
    pains,
-   apcm,
-   apcc     : integer;
+   transportM,
+   transportC
+            : integer;
 
    buff     : array[0..MaxUnitBuffs] of integer;
 
@@ -607,7 +613,6 @@ TUnit = record
    aiu_limitaround_enemy,
    aiu_need_detect
             : longint;
-   aiu_attack_timer,
    aiu_alarm_timer,
    aiu_alarm_d,
    aiu_alarm_x,
@@ -640,7 +645,7 @@ PPTUnit = ^PTUnit;
 
 TCTPoint = record
    cpx ,cpy ,
-   cpsolidr,cpCapturer,cpnobuildr,
+   cpsolidr,cpCaptureR,cpNoBuildR,
    cp_ToCenterD,
    cpmx,cpmy,cpmr,
    cpenergy,

@@ -466,7 +466,7 @@ begin
       uid_e[uidi            ]+=1;
 
       ptransport:=nil;
-      if(_IsUnitRange(transport,@ptransport))then ptransport^.apcc+=_apcs;
+      if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin
@@ -533,7 +533,7 @@ begin
       uid_e[uidi            ]-=1;
 
       ptransport:=nil;
-      if(_IsUnitRange(transport,@ptransport))then ptransport^.apcc-=_apcs;
+      if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin

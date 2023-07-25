@@ -113,7 +113,7 @@ begin
 
                 with player^ do
                  if(_urace=r_hell)then
-                  if(upgr[upgr_hell_pains]>0)then pains+=_painc_upgr*upgr[upgr_hell_pains];
+                  if(upgr[upgr_hell_pains]>0)then pains+=_painc_upgr_step*upgr[upgr_hell_pains];
                 if(level>0)then pains+=level*2;
 
                 {$IFDEF _FULLGAME}
@@ -159,7 +159,7 @@ begin
        end;
       if(not obld)then
       begin
-         if(ukfly)or(apcc>0)then
+         if(ukfly)or(transportC>0)then
          begin
             _unit_morph:=ureq_unknown;
             exit;
@@ -588,12 +588,10 @@ wtp_UnitLight       : begin
                        incPrio(not iscomplete    );
                        end;
 wtp_limit            : incPrio(not _ukbuilding   );
-wtp_Scout            : if(iscomplete)and(hits>0)and(not _ukbuilding)and(apcm=0)then
-                       if(not _IsUnitRange(transport,nil))then
-                       begin
+wtp_Scout            : begin
                        incPrio(_limituse<ul3);
-                       incPrio(speed>0);
                        incPrio(ukfly or ukfloater);
+                       incPrio(transportM<=0);
                        _unitWeaponPriority+=speed;
                        end;
    end;
@@ -631,15 +629,33 @@ begin
            //if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
            case aw_tarprior of
-wtp_max_hits          : if(tu^.hits       <a_tarp^^.hits       )then exit;
+wtp_max_hits          : if(tu^.hits       <a_tarp^^.hits       )
+                        then exit
+                        else
+                          if(tu^.hits     =a_tarp^^.hits       )then
+                            if(ud         >a_tard^             )then exit;
 wtp_distance          : if(ud             >a_tard^             )then exit;
 wtp_nolost_hits,
-wtp_hits              : if(tu^.hits       >a_tarp^^.hits       )then exit;
-wtp_Rmhits            : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)then exit;
+wtp_hits              : if(tu^.hits       >a_tarp^^.hits       )
+                        then exit
+                        else
+                          if(tu^.hits     =a_tarp^^.hits       )then
+                            if(ud         >a_tard^             )then exit;
+
+wtp_Rmhits            : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)
+                        then exit
+                        else
+                          if(tu^.uid^._mhits=a_tarp^^.uid^._mhits)then
+                            if(ud           >a_tard^             )then exit;
            else
               if(aw_max_range<0)and(aw_type=wpt_directdmg)
-              then begin if(ud           >a_tard^             )then exit; end
-              else       if(tu^.hits     >a_tarp^^.hits       )then exit;  // default
+              then begin if(ud  >a_tard^             )then exit; end
+              else
+                if(tu^.hits     >a_tarp^^.hits       )
+                then exit
+                else
+                  if(tu^.hits   =a_tarp^^.hits       )then
+                    if(ud       >a_tard^             )then exit;
            end;
            if(n_prio<t_prio^)then exit;
         end;
@@ -678,8 +694,8 @@ begin
    with pu^ do
     for i:=1 to MaxCPoints do
      with g_cpoints[i] do
-      if(cpCapturer>0)then
-       if(point_dist_int(x,y,cpx,cpy)<=cpCapturer)then
+      if(cpCaptureR>0)then
+       if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then
        begin
           cpUnitsPlayer[playeri     ]+=uid^._limituse;
           cpUnitsTeam  [player^.team]+=uid^._limituse;
@@ -816,7 +832,7 @@ uab_Teleport      : swtarget:=true;
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
 
       aiu_code(pu);
-      if(aicode)then ai_code(pu);
+      if(aicode){and(playeri=HPlayer)}then ai_code(pu);
 
       if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
    end;
@@ -949,6 +965,7 @@ begin
    // pu - target
    // tu - teleporter
    // td = dist2(pu,tu)-pu.r-tu.r
+   if(td=NOTSET)then td:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y)-pu^.uid^._r-tu^.uid^._r;
    _ability_teleport:=false;
    with pu^  do
     with uid^ do
@@ -1005,7 +1022,7 @@ begin
    if(_itcanapc(pu,tu))then
    with pu^ do
    begin
-      apcc+=tu^.uid^._apcs;
+      transportC+=tu^.uid^._transportS;
       tu^.transport:=unum;
       tu^.a_tar:=0;
       if(uo_tar=tu^.unum)then     uo_tar:=0;
@@ -1028,7 +1045,7 @@ begin
     if(transport=pu^.unum)and(pu^.buff[ub_CCast]<=0)then
     begin
        pu^.buff[ub_CCast]:=fr_fpsd4;
-       pu^.apcc-=uid^._apcs;
+       pu^.transportC-=uid^._transportS;
        transport:=0;
        x    :=pu^.x-_randomr(pu^.uid^._r);
        y    :=pu^.y-_randomr(pu^.uid^._r);
@@ -1040,7 +1057,7 @@ begin
        _unit_unload:=true;
     end;
    with pu^ do
-    if(apcc=0)then uo_id:=ua_amove;
+    if(transportC=0)then uo_id:=ua_amove;
 end;
 
 procedure _unit_InTransportCode(pu,ptransport:PTUnit);
@@ -1061,7 +1078,7 @@ begin
 
       if(ServerSide)then
       begin
-         if(ptransport^.uo_id=ua_unload)or(ptransport^.apcc>ptransport^.apcm)then
+         if(ptransport^.uo_id=ua_unload)or(ptransport^.transportC>ptransport^.transportM)then
           if(not ptransport^.ukfly)or(not pf_IfObstacleZone(ptransport^.pfzone))then
            if(_unit_unload(ptransport,pu))then exit;
 
@@ -1102,7 +1119,7 @@ begin
    with pu^ do
     if(_IsUnitRange(transport,nil)=false)then
      with uid^ do
-      if(apcc>0)then
+      if(transportC>0)then
       begin
          uo_id:=ua_unload;
          _unit_sability:=true;
@@ -1451,9 +1468,10 @@ wmove_noneed    : if(not attackinmove)then
             a_weap_cl:=a_weap;
 
             if(ServerSide)and(not _ukbuilding)then
-             if(aw_max_range<0)and(aw_type=wpt_directdmg)
-             then _unit_exp(pu,aw_rld*2)
-             else _unit_exp(pu,aw_rld  );
+              if((aw_max_range<0)and(aw_type=wpt_directdmg))
+              or((playeri=0)and(g_mode=gm_invasion))
+              then _unit_exp(pu,aw_rld*2)
+              else _unit_exp(pu,aw_rld  );
             if(not attackinmove)then
             begin
                if(x<>tu^.x)
@@ -1680,7 +1698,7 @@ co_amove    :
 co_apatrol  : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
 co_psability: if(uo_id<>ua_psability)
               or((ucl_cs[true]+ucl_cs[false])=1)then
-                if(apcm>0)and(apcc>0)then
+                if(transportM>0)and(transportC>0)then
                 begin
                    _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                    exit;
@@ -1824,8 +1842,7 @@ begin
                _unit_move(pu);
                _unit_prod(pu);
 
-               if(player^.state=ps_comp)then
-                if((player^.ai_flags and aif_army_scout)>0)then ai_scout_pick(pu);
+               if(player^.state=ps_comp)then ai_scout_pick(pu);
             end;
 
             transportu:=nil;

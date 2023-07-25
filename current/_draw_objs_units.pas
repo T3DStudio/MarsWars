@@ -227,7 +227,7 @@ begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_canAbility(pu)=0)and(uo_id<>ua_psability))
-            or(apcc>0)           then ui_uibtn_actionu:=uid;
+            or(transportC>0)     then ui_uibtn_actionu:=uid;
             if(_canRebuild(pu)=0)then ui_uibtn_rebuild+=1;
          end;
       end
@@ -345,7 +345,7 @@ begin
       then sl+=integer(upgr[upgr_race_regen_build[_urace]])
       else
       begin
-         sl+=upgr[upgr_race_srange[_urace]];
+         sl+=upgr[upgr_race_unit_srange[_urace]];
          if(_ukmech)
          then sl+=integer(upgr[upgr_race_regen_mech [_urace]]+upgr[upgr_race_mspeed_mech[_urace]])
          else

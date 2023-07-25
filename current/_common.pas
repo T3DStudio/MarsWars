@@ -2,7 +2,7 @@ procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boole
 procedure _unit_upgr  (pu:PTUnit);forward;
 procedure aiu_InitVars(pu:PTUnit);forward;
 procedure ai_InitVars(pu:PTUnit);forward;
-procedure ai_SetAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+procedure ai_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
@@ -1155,7 +1155,7 @@ begin
    GetCPColor:=c_black;
    if(cp<1)or(cp>MaxCPoints)then exit;
    with g_cpoints[cp] do
-    if(cpCapturer>0)then
+    if(cpCaptureR>0)then
      if(cpTimer>0)and(r_blink3=0)
      then GetCPColor:=PlayerGetColor(cpTimerOwnerPlayer)
      else GetCPColor:=PlayerGetColor(cpOwnerPlayer     );

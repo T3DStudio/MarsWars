@@ -342,7 +342,7 @@ begin
       if(srect)then
       begin
          if(playeri=UIPlayer)
-         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(apcm,false),i2s6(apcc,false))
+         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
          else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
          UnitsInfoAddText(vx,vy-sel_hh-font_w,lvlstr_l,c_white);
       end;
@@ -503,9 +503,9 @@ begin
 
    for t:=1 to MaxCPoints do
     with g_cpoints[t] do
-     if(cpCapturer>0)then
+     if(cpCaptureR>0)then
      begin
-        if(not RectInCam(cpx,cpy,cpCapturer,cpCapturer,0))then continue;
+        if(not RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then continue;
 
         color:=GetCPColor(t);
 
@@ -515,8 +515,8 @@ begin
            begin
               ddir:=(i*mark_step)*degtorad;
               SpriteListAddEffect(
-              cpx+round(cpCapturer*cos(ddir)),
-              cpy+round(cpCapturer*sin(ddir)),
+              cpx+round(cpCaptureR*cos(ddir)),
+              cpy+round(cpCaptureR*sin(ddir)),
               sd_ground+cpy,ShadowColor(color),@spr_cp_koth,255);
            end;
         end
@@ -717,8 +717,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(uo_tar), ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,i2s(a_tar ), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,li2s(aiu_FiledSquareNear )+' '+i2s(_speed), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

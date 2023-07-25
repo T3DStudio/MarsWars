@@ -109,7 +109,7 @@ begin
             1,
             10,
             19 : g_inv_wave_t_next:=fr_fps1*120;
-            else g_inv_wave_t_next:=fr_fps1*30+round(g_inv_wave_t_curr/2*(MinSMapW/map_mw)); //g_inv_wave_t_curr;
+            else g_inv_wave_t_next:=fr_fps1*30+round(g_inv_wave_t_curr/2*(MinSMapW/map_mw))-integer(8*g_start_base); //g_inv_wave_t_curr;
             end;
          end;
       end
@@ -125,9 +125,9 @@ begin
             0  : g_inv_limit:=0;
             1  : g_inv_limit:=ul5;
             2  : g_inv_limit:=ul15;
-            else g_inv_limit:=(g_inv_wave_n-1)*ul32;
+            else g_inv_limit:=(g_inv_wave_n*g_inv_wave_n)*ul2+ul32;
             end;
-            GameModeInvasionSpawnMonsters(g_inv_limit,ul1*g_inv_wave_n);
+            GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));
          end;
       end;
    end

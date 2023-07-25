@@ -1,4 +1,32 @@
 
+function RemoveSpecChars(str:shortstring):shortstring;
+var i:byte;
+begin
+   RemoveSpecChars:=str;
+   i:=1;
+   while(i<=length(RemoveSpecChars)) do
+   begin
+      // 10 13
+      if(RemoveSpecChars[i]=tc_nl1)
+      then RemoveSpecChars[i]:=#10
+      else
+        if(RemoveSpecChars[i] in [#14..#25])then
+        begin
+           delete(RemoveSpecChars,i,1);
+           i-=1;
+        end;
+      i+=1;
+      if(i=255)then break;
+   end;
+end;
+
+function _i2s(i:integer):shortstring;
+begin
+  if(i<0)
+  then _i2s:=    i2s(i)
+  else _i2s:='+'+i2s(i);
+end;
+
 function l2s(limit,base:longint):shortstring; // limit 2 string
 var fr:integer;
 begin
@@ -200,7 +228,7 @@ begin
         if(ukfloater)
         then _ADDSTR(@_makeAttributeStr,str_attr_floater,sep_comma)
         else _ADDSTR(@_makeAttributeStr,str_attr_ground ,sep_comma);
-      if(apcm>0)
+      if(transportM>0)
       then _ADDSTR(@_makeAttributeStr,str_attr_transport,sep_comma);
       if(level>0)
       then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
@@ -271,7 +299,7 @@ begin
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 
-function _MakeDefaultDescription(uid:byte;basedesc:shortstring):shortstring;
+function _MakeDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
 function RebuildStr(uid,uidl:byte):shortstring;
 begin
   if(uidl=0)
@@ -282,6 +310,7 @@ begin
    _MakeDefaultDescription:=basedesc;
     with _uids[uid] do
     begin
+       if(not for_doc)then
        _ADDSTR(@_MakeDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
        //_ADDSTR(@_MakeDefaultDescription,str_srange+i2s(_srange),sep_sdot);
 
@@ -305,7 +334,7 @@ begin
             then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
        end
        else
-         if(_apcm>0)then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_unload+'"',sep_sdot);
+         if(_transportM>0)then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_unload+'"',sep_sdot);
 
        if(_splashresist)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
 
@@ -386,7 +415,12 @@ begin
      BaseDmg:=0;
      ocount :=0;
      case aw_type of
-     wpt_suicide   : exit;
+     wpt_suicide   : if(_death_missile>0)then
+                     begin
+                        BaseDmg:=_mids[_death_missile].mid_base_damage;
+                        ocount:=1;
+                     end
+                     else exit;       //wpt_suicide
      wpt_missle    : begin
                      BaseDmg:=_mids[aw_oid].mid_base_damage;
                      if(aw_count>=0)
@@ -397,9 +431,13 @@ begin
      wpt_directdmgZ,
      wpt_heal      : BaseDmg:=aw_count;
      end;
-     n:=0;
-     for i:=0 to aw_rld do
-       if(i in aw_rld_s)then n+=1;
+     if(aw_type<>wpt_suicide)then
+     begin
+        n:=0;
+        for i:=0 to aw_rld do
+          if(i in aw_rld_s)then n+=1;
+     end
+     else n:=1;
 
      if(BaseDmg>0)then
      begin
@@ -411,17 +449,109 @@ begin
         then _MakeWeaponDPS+='x'+i2s(ocount);
      end;
 
-     if(aw_fakeshots>0)
-     then sps:=(fr_fps1*n/aw_rld)/aw_fakeshots
-     else sps:=(fr_fps1*n/aw_rld);
+     if(aw_type=wpt_suicide)
+     then sps:=1
+     else
+       if(aw_fakeshots>0)
+       then sps:=(fr_fps1*n/aw_rld)/aw_fakeshots
+       else sps:=(fr_fps1*n/aw_rld);
      _ADDSTR(@_MakeWeaponDPS,'*'+Float2Str(sps),'');
   end;
 end;
 
-function _MakeWeaponsDescription(uid:byte):shortstring;
+function _MakeWeaponString(uid,wid:byte;docSTR:boolean):shortstring;
+const tab : array[false..true] of shortstring = ('-','- ');
+var
+dmod_str:shortstring;
+begin
+  with _uids[uid] do
+   with _a_weap[wid] do
+   begin
+      _MakeWeaponString:='';
+      case aw_type of
+      0             : exit;
+      wpt_missle,
+      wpt_directdmg,
+      wpt_directdmgZ: if(aw_max_range<0)
+                      then _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_melee    ,sep_scomma)
+                      else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
+      wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
+      wpt_heal      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
+      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_suicide   :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
+      end;
+
+      if(docSTR)then
+      begin
+         if(aw_min_range>0)then
+         _ADDSTR(@_MakeWeaponString,'min. range: '+i2s(aw_min_range),sep_scomma);
+
+         if(aw_max_range=0)then
+         begin
+            _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
+            if(_a_BonusAntiFlyRange   <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '   +_i2s(_a_BonusAntiFlyRange),sep_scomma);
+            if(_a_BonusAntiGroundRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '+_i2s(_a_BonusAntiFlyRange),sep_scomma);
+         end
+         else
+           if(aw_max_range<0) // melee
+           then //_ADDSTR(@_MakeWeaponString,'max range: melee',sep_scomma)
+           else
+             if(aw_max_range>=aw_fsr0)then  // relative srange
+             begin
+                if(aw_max_range<>aw_fsr)
+                then _ADDSTR(@_MakeWeaponString,'max. range: vision range'+_i2s(aw_max_range-aw_fsr),sep_scomma)
+                else _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
+             end
+             else
+             begin
+                _ADDSTR(@_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
+                if(_a_BonusAntiFlyRange   <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '   +_i2s(_a_BonusAntiFlyRange),sep_scomma);
+                if(_a_BonusAntiGroundRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '+_i2s(_a_BonusAntiFlyRange),sep_scomma);
+             end;
+      end;
+
+      if(aw_type=wpt_directdmgZ)then
+      _ADDSTR(@_MakeWeaponString,str_weapon_zombie,sep_scomma);
+
+      _ADDSTR(@_MakeWeaponString,str_weapon_targets+WeaponTargets(aw_tarf,aw_uids),sep_scomma);
+
+      _ADDSTR(@_MakeWeaponString,str_weapon_damage+' '+_MakeWeaponDPS(uid,wid),sep_scomma);
+      if(docSTR)then
+      begin
+         if(aw_type=wpt_missle)then
+          with _mids[aw_oid] do
+           if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+
+         if(aw_type=wpt_suicide)and(_death_missile>0)then
+          with _mids[_death_missile] do
+           if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+
+         if(aw_dupgr>0)then
+           _ADDSTR(@_MakeWeaponString,'upgrade: '+_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
+      end;
+
+      dmod_str:='';
+
+      case aw_type of
+      wpt_suicide   : if(_death_missile>0)then dmod_str:=DamageStr(_death_missile_dmod);
+      wpt_missle,
+      wpt_directdmg,
+      wpt_directdmgZ: if(aw_dmod>0)then dmod_str:=DamageStr(aw_dmod);
+      end;
+
+      if(length(dmod_str)>0)then
+        if(docSTR)
+        then _ADDSTR(@_MakeWeaponString,dmod_str,', factor: ')
+        else _ADDSTR(@_MakeWeaponString,dmod_str,': '      );
+
+      _ADDSTR(@_MakeWeaponString,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
+
+      if(docSTR)then _MakeWeaponString:=RemoveSpecChars(_MakeWeaponString);
+   end;
+end;
+
+function _MakeWeaponsDescription(uid:byte;docSTR:boolean):shortstring;
 var w:byte;
-dmod_str,
-weapon_str,
 weapons_str:shortstring;
 begin
   _MakeWeaponsDescription:='';
@@ -431,44 +561,12 @@ begin
      if(_attack=atm_always)then
       for w:=0 to MaxUnitWeapons do
        with _a_weap[w] do
-       begin
-          weapon_str:='';
-          case aw_type of
-          0             : continue;
-          wpt_missle,
-          wpt_directdmg,
-          wpt_directdmgZ: if(aw_max_range<0)
-                          then _ADDSTR(@weapon_str,'-'+str_weapon_melee    ,sep_scomma)
-                          else _ADDSTR(@weapon_str,'-'+str_weapon_ranged   ,sep_scomma);
-          wpt_resurect  :      _ADDSTR(@weapon_str,'-'+str_weapon_ressurect,sep_scomma);
-          wpt_heal      :      _ADDSTR(@weapon_str,'-'+str_weapon_heal     ,sep_scomma);
-          wpt_unit      :      _ADDSTR(@weapon_str,'-'+str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
-          wpt_suicide   :      _ADDSTR(@weapon_str,'-'+str_weapon_suicide  ,sep_scomma);
-          end;
+        _ADDSTR(@weapons_str,_MakeWeaponString(uid,w,docSTR),sep_sdots);
 
-          if(aw_type=wpt_directdmgZ)then
-          _ADDSTR(@weapon_str,str_weapon_zombie,sep_scomma);
-
-          _ADDSTR(@weapon_str,str_weapon_targets+WeaponTargets(aw_tarf,aw_uids),sep_scomma);
-
-          _ADDSTR(@weapon_str,str_weapon_damage+' '+_MakeWeaponDPS(uid,w),sep_scomma);
-
-          if(aw_dmod>0)then
-            case aw_type of
-          wpt_missle,
-          wpt_directdmg,
-          wpt_directdmgZ: begin
-                             dmod_str:=DamageStr(aw_dmod);
-                             if(length(dmod_str)>0)then
-                               _ADDSTR(@weapon_str,dmod_str,': ');
-                          end;
-            end;
-
-          _ADDSTR(@weapon_str,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
-
-          if(length(weapon_str)>0)then _ADDSTR(@weapons_str,weapon_str,sep_sdots);
-       end;
-     if(length(weapons_str)>0)then  _ADDSTR(@_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
+     if(length(weapons_str)>0)then
+      if(docSTR)
+      then _ADDSTR(@_MakeWeaponsDescription,weapons_str,sep_sdot)
+      else _ADDSTR(@_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
   end;
   if(length(_MakeWeaponsDescription)>0)then _MakeWeaponsDescription+='.';
 end;
@@ -562,12 +660,12 @@ begin
          if(length(LMT )>0)then _ADDSTR(@INFO,LMT ,sep_comma);
          if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
 
-         un_txt_fdescr :=_MakeDefaultDescription(uid,un_txt_udescr);
+         un_txt_fdescr :=_MakeDefaultDescription(uid,un_txt_udescr,false);
 
          un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
          un_txt_uihintS:=un_txt_name+tc_nl1;
          un_txt_uihint2:=un_txt_fdescr;
-         un_txt_uihint3:=_MakeWeaponsDescription(uid);
+         un_txt_uihint3:=_MakeWeaponsDescription(uid,false);
          un_txt_uihint4:='';
 
          if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_requirements+tc_default+REQ+tc_nl1
@@ -883,7 +981,7 @@ begin
    _mkHStrUid(UID_Knight         ,'Hell Knight'                 ,'');
    _mkHStrUid(UID_Baron          ,'Baron of Hell'               ,'');
    _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'                  ,'');
-   _mkHStrUid(UID_Mastermind     ,'Mastermind'                  ,'');
+   _mkHStrUid(UID_Mastermind     ,'Spider Mastermind'           ,'');
    _mkHStrUid(UID_Pain           ,'Pain Elemental'              ,'');
    _mkHStrUid(UID_Revenant       ,'Revenant'                    ,'');
    _mkHStrUid(UID_Mancubus       ,'Mancubus'                    ,'');
@@ -911,7 +1009,7 @@ begin
    _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
    _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
    _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except Teleport and those that can produce units, can be placed on doodads');
-   _mkHStrUpid(upgr_hell_pinkspd   ,'Pinky`s Rage'                  ,'Increase the movement speed of Pinky Demons'                            );
+   _mkHStrUpid(upgr_hell_pinkspd   ,'Ghost Monsters'                ,'Pinky Demons can move over obstacles'                           );
 
    _mkHStrUpid(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
    _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
@@ -1413,7 +1511,7 @@ begin
   _mkHStrUpid(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
   _mkHStrUpid(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
   _mkHStrUpid(upgr_hell_extbuild  ,'Адаптивный Фундамент'          ,'Все здания, кроме телепорта и производящих юнитов можно строить на декорациях');
-  _mkHStrUpid(upgr_hell_pinkspd   ,'Ярость Pinky Demon'            ,'Увеличение скорости перемещения Pinky Demon'                                  );
+  _mkHStrUpid(upgr_hell_pinkspd   ,'Призрачные Монстры'            ,'Pinky Demon может бегать по декорациям'                                       );
 
   _mkHStrUpid(upgr_hell_spectre   ,'Призраки'                      ,'Pinky Demon становиться невидимым'                                         );
   _mkHStrUpid(upgr_hell_vision    ,'Адское Зрение'                 ,'Увеличение области обзора и атаки всех адских юнитов'                      );
@@ -1570,25 +1668,12 @@ const fname = '_strings.txt';
 var f:text;
     u,
     w:byte;
-function nstr(str:shortstring):shortstring;
-var i:byte;
+tmp:shortstring;
+procedure upgrLine(upid:byte;info:shortstring);
 begin
-   nstr:=str;
-   i:=1;
-   while(i<=length(nstr)) do
-   begin
-      // 10 13
-      if(nstr[i]=tc_nl1)
-      then nstr[i]:=#10
-      else
-        if(nstr[i] in [#14..#25])then
-        begin
-           delete(nstr,i,1);
-           i-=1;
-        end;
-      i+=1;
-      if(i=255)then break;
-   end;
+   if(upid>0)then
+    with _upids[upid] do
+      writeln(f,'- ',_up_name,' - ',info,';');
 end;
 
 begin
@@ -1599,30 +1684,95 @@ begin
     with _uids[u] do
      if(length(un_txt_uihint1)>0)and(_r>0)then
      begin
-        writeln(f,nstr(un_txt_uihint1));
-        writeln(f,nstr(un_txt_uihint2));
-        writeln(f,nstr(un_txt_uihint3));
-        writeln(f,nstr(un_txt_uihint4));
+        writeln(f,un_txt_name);
+        writeln(f);
+
+        writeln(f,'Hotkey: ',RemoveSpecChars(_gHK(_ucl)));
+        writeln(f,'Categories/Attributes: ',RemoveSpecChars(_makeAttributeStr(nil,u)));
         writeln(f,'Max hits: ',_mhits);
         writeln(f,'Limit used: ', l2s(_limituse,ul1));
         writeln(f,'Size: ',_r);
         if(_speed>0)then
-        writeln(f,'Base speed: ' , _speed);
+        writeln(f,'Base movement speed: ' , _speed);
         writeln(f,'Base vision range: ', _srange);
         writeln(f,'Build time: ' , _btime);
-        writeln(f,'Requierd energy: ' , _renergy);
+        writeln(f,'Energy required: ' , _renergy);
         if(_painc>0)then
         writeln(f,'PainState base threshold: ' , _painc);
         if(not _ukfly)and(not _ukbuilding)then
-        writeln(f,'Places in transport: ',_apcs );
+        writeln(f,'Places in transport: ',_transportS );
+        if(_transportM>0)then
+        writeln(f,'Base transport capacity: ',_transportM );
 
+        if(_zombie_uid>0)then
+        begin
+        writeln(f,'Zombie: ',_uids[_zombie_uid].un_txt_name );
+        writeln(f,'Zombification hits: ',_zombie_hits);
+        end;
+
+        writeln(f,RemoveSpecChars(un_txt_uihint4));
+
+        if(_attack=atm_always)then
+        begin
+           writeln(f,str_UnitArming);
+           for w:=0 to MaxUnitWeapons do
+            with _a_weap[w] do
+            begin
+               tmp:=_MakeWeaponString(u,w,true);
+               if(length(tmp)>0)then writeln(f,tmp,';');
+            end;
+        end;
+
+
+        writeln(f,'Upgrades:');
+        upgrLine(_upgr_srange,'vision range '+_i2s(_upgr_srange_step));
+        if(not _ukbuilding)then
+        upgrLine(upgr_race_unit_srange[_urace],'vision range '+_i2s(upgr_race_srange_unit_bonus[_urace]));
+
+        if(_ukbuilding)
+        then upgrLine(_upgr_armor,'armor '+_i2s(BaseArmorBonus2))
+        else upgrLine(_upgr_armor,'armor '+_i2s(BaseArmorBonus1));
+
+        if(_ukbuilding)
+        then upgrLine(upgr_race_armor_build[_urace],'armor '+_i2s(BaseArmorBonus2))
+        else
+          if(_ukmech)
+          then upgrLine(upgr_race_armor_mech[_urace],'armor '+_i2s(BaseArmorBonus1))
+          else upgrLine(upgr_race_armor_bio [_urace],'armor '+_i2s(BaseArmorBonus1));
+
+        upgrLine(_upgr_regen,'hits regeneration '+_i2s(BaseArmorBonus1));
+        if(_ukbuilding)
+        then upgrLine(upgr_race_regen_build[_urace],'hits regeneration '+_i2s(BaseArmorBonus1))
+        else
+          if(_ukmech)
+          then upgrLine(upgr_race_regen_mech[_urace],'hits regeneration '+_i2s(BaseArmorBonus1))
+          else upgrLine(upgr_race_regen_bio [_urace],'hits regeneration '+_i2s(BaseArmorBonus1));
+
+        if(_ukbuilding)
+        then
+        else
+          if(_ukmech)
+          then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+_i2s(2))
+          else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+_i2s(2));
+
+        if(not _ukbuilding)and(not _ukmech)and(_painc>0)and(_urace=r_hell)then
+        upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
+
+        if(_ukbuilding)and(not _isbarrack)and(_ability<>uab_Teleport)then
+        upgrLine(upgr_race_extbuilding[_urace],'allow to build this building on doodads');
+
+
+        writeln(f);
+
+        writeln(f,RemoveSpecChars(_MakeDefaultDescription(u,un_txt_udescr,true)));
+
+        writeln(f);
         {
         Max count	Unlimited
-        base damage  splash damage
         }
         writeln(f,'---------------------------');
+        writeln(f);
      end;
-
 
    writeln(f);
 
@@ -1630,10 +1780,11 @@ begin
     with _upids[u] do
      if(length(_up_name)>0)then
      begin
-        writeln(f,nstr(_makeUpgrBaseHint(u,255)));
-        writeln(f,nstr(_up_hint));
+        writeln(f,RemoveSpecChars(_makeUpgrBaseHint(u,255)));
+        writeln(f,RemoveSpecChars(_up_hint));
         writeln(f);
      end;
+   writeln(f);
 {
 s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;

@@ -144,8 +144,8 @@ begin
 
    for p:=1 to MaxCpoints do
     with g_cpoints[p] do
-     if(cpCapturer>0)then
-      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpCapturer)))then
+     if(cpCaptureR>0)then
+      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpCaptureR)))then
       begin
          _CPointHere:=true;
          break;
@@ -216,7 +216,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCapturer>0)then cpzone:=pf_get_area(cpx,cpy);
+     if(cpCaptureR>0)then cpzone:=pf_get_area(cpx,cpy);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -225,7 +225,7 @@ function _setcpoint(px,py:integer):boolean;
 var pn:byte;
 begin
    for pn:=1 to MaxCPoints do
-    if(g_cpoints[pn].cpCapturer<=0)then break;
+    if(g_cpoints[pn].cpCaptureR<=0)then break;
 
    if(pn>MaxCPoints)then
    begin
@@ -240,15 +240,15 @@ begin
       cpy          :=py;
       cp_ToCenterD :=point_dist_int(cpx,cpy,map_hmw,map_hmw);
       cpsolidr     :=sr;
-      cpnobuildr   :=nr;
+      cpNoBuildR   :=nr;
       cpenergy     :=energy;
-      cpCapturer   :=cr;
+      cpCaptureR   :=cr;
       cpCaptureTime:=time;
       cplifetime   :=lifetime;
       {$IFDEF _FULLGAME}
       cpmx:=round(cpx*map_mmcx);
       cpmy:=round(cpy*map_mmcx);
-      cpmr:=round(cpCapturer*map_mmcx);
+      cpmr:=round(cpCaptureR*map_mmcx);
       {$ENDIF}
    end;
 end;
@@ -378,13 +378,13 @@ gm_KotH   : with g_cpoints[1] do
             begin
                cpx:=map_hmw;
                cpy:=map_hmw;
-               cpCapturer   :=base_1r;
+               cpCaptureR   :=base_1r;
                cpCaptureTime:=fr_fps1*60;
 
                {$IFDEF _FULLGAME}
                cpmx:=round(cpx*map_mmcx);
                cpmy:=round(cpy*map_mmcx);
-               cpmr:=round(cpCapturer*map_mmcx)+1;
+               cpmr:=round(cpCaptureR*map_mmcx)+1;
                {$ENDIF}
             end;
 gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
@@ -567,7 +567,7 @@ begin
 
    map_RandomBase;
    map_CPoints;
-   pf_make_grid;
+   pf_MakeZoneGrid;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;

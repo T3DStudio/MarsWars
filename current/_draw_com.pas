@@ -175,7 +175,7 @@ var i  :byte;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-     if(cpCapturer>0)then
+     if(cpCaptureR>0)then
       if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
       then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
       else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );

@@ -35,7 +35,7 @@ cp_captured_n :integer;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-    if(cpCapturer>0)then
+    if(cpCaptureR>0)then
     begin
        p:=0;
        if(g_mode=gm_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
@@ -48,7 +48,7 @@ begin
        if(p>0)then
        begin
           CPoint_ChangeOwner(i,0);
-          cpCapturer:=-cpCapturer;
+          cpCaptureR:=-cpCaptureR;
           {$IFDEF _FULLGAME}
           effect_CPExplode(cpx,cpy);
           {$ENDIF}
@@ -116,7 +116,7 @@ begin
 
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-     if(cpCapturer>0)and(cpenergy<=0)then
+     if(cpCaptureR>0)and(cpenergy<=0)then
      begin
         cp_captured_n+=1;
         if(cpOwnerTeam>0)then

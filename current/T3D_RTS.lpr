@@ -1,9 +1,5 @@
 program T3D_RTS;
 
-{
-- надо придумать куда выводить ошибку в случае неудачной попытки начать записывать реплей
-}
-
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
@@ -52,7 +48,8 @@ uses SysUtils, SDL, SDL_Net
 {$Include _missiles.pas}
 {$include _units_common.pas}
 {$include _units.pas}
-{$include _ai.pas}
+{$include _ai_base.pas}
+{$include _ai_main.pas}
 {$include _cpoints.pas}
 {$include _invasion.pas}
 {$include _unit_client.pas}

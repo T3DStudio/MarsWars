@@ -194,7 +194,7 @@ begin
 end;
 UID_Demon:
 begin
-   _animw:=15;
+   _animw:=19;
    _animd:=9;
    setMWSModel  (0,@spr_demon);
    setCommandSND(snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);

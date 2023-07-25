@@ -378,7 +378,7 @@ begin
          map_RefreshDoodadsCells;
          map_RedrawMenuMinimap;
          map_DoodadsDrawData;
-         pf_make_grid;
+         pf_MakeZoneGrid;
          CamBounds;
 
          G_Started:=true;

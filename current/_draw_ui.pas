@@ -50,7 +50,7 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
 
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
-     if(cpCapturer>0)then
+     if(cpCaptureR>0)then
       if(cpenergy>0)
       then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
       else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
@@ -123,11 +123,11 @@ begin
       // points areas
       for i:=1 to MaxCPoints do
        with g_cpoints[i] do
-        if(cpCapturer>0)and(cpnobuildr>0)then
+        if(cpCaptureR>0)and(cpNoBuildR>0)then
          circleColor(tar,
          lx+cpx-vid_cam_x,
          ly+cpy-vid_cam_y,
-         cpnobuildr,c_blue);
+         cpNoBuildR,c_blue);
 
       // map build rect
       rectangleColor(tar,
@@ -167,7 +167,7 @@ uab_CCFly         : begin
    m_brushy+=vid_cam_y-ly;
 end;
 
-procedure d_OrderIcons(tar:pSDL_Surface);
+procedure d_GroupsIcons(tar:pSDL_Surface);
 const rown = 6;
 var  x,y,y0:integer;
      c,i,n :byte;
@@ -710,7 +710,7 @@ gm_koth    : with g_cpoints[1] do
    if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                ,ta_left,255,c_white);
    if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_left,255,c_white);
 
-   d_OrderIcons(tar);
+   d_GroupsIcons(tar);
 end;
 
 procedure d_UIMouse(tar:pSDL_Surface);   //cursor/brash
