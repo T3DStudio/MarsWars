@@ -1720,7 +1720,7 @@ uab_CCFly            : if(speed>0)then
                           if(_canAbility(pu)=0)then
                           begin
                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                             _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                              uo_y-=fly_hz;
                              exit;
                           end;
@@ -1729,7 +1729,7 @@ uab_CCFly            : if(speed>0)then
                          if(_unit_sability(pu))then
                          begin
                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
-                            _push_out(uo_x,uo_y,_r,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                            _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                             uo_y-=fly_hz;
                             exit;
                          end;
@@ -1737,7 +1737,7 @@ uab_RebuildInPoint   : begin
                           if(speed>0)then
                           begin
                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,@uo_x,@uo_y,false, not ukfloater or (upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, not ukfloater or (upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
                           end
                           else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                           exit;

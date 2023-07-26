@@ -532,7 +532,7 @@ begin
    else _1c_push(tx,ty,x0,y0,r0);
 end;
 
-procedure _push_out(tx,ty,tr:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
+procedure _push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
 const nrl = 1;
 var nrx,
     nry,
@@ -612,7 +612,7 @@ begin
    for u:=1 to MaxUnits do
     with _units[u] do
      with uid^ do
-      if(hits>0)and(ukfly=_ukfly)then
+      if(hits>0)and(ukfly=_ukfly)and(unum<>ignore_unum)then
        if(speed<=0)or(not iscomplete)then
         if(not _IsUnitRange(transport,nil))then
         begin
@@ -642,7 +642,7 @@ begin
    begin
       aukfly:=_ukfly;
       with _players[pl] do
-       _push_out(tx,ty,_r,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+       _push_out(tx,ty,_r,0,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
    end;
 
    dx:=-2000;
@@ -821,7 +821,7 @@ begin
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
-         _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles );
+         _push_out(x0,y0,_r,unum,@x0,@y0,ukfly, obstacles );
          x0:=mm3(1,x0,map_mw);
          y0:=mm3(1,y0,map_mw);
          if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
@@ -850,7 +850,7 @@ begin
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
-         _push_out(x0,y0,_r,@x0,@y0,ukfly, obstacles  );
+         _push_out(x0,y0,_r,unum,@x0,@y0,ukfly, obstacles  );
          x0:=mm3(1,x0,map_mw);
          y0:=mm3(1,y0,map_mw);
          if(point_dist_int(x,y,x0,y0)>srange)then exit;

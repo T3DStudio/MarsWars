@@ -350,9 +350,11 @@ begin
 
       if(rld>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
-      if(0<m_brush)and(m_brush<=255)then
-       if(speed<=0)or(not iscomplete)then
-        UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+      if(speed<=0)or(not iscomplete)then
+        case m_brush of
+1..255,
+co_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+        end;
 
 
       if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
