@@ -956,14 +956,6 @@ begin
       end;
 end;
 
-function CheckUnitTeamVision(uteam:byte;tu:PTUnit;SkipInvisCheck:boolean):boolean;
-begin
-   with tu^ do
-    if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
-    then CheckUnitTeamVision:=(vsnt[uteam]>0)
-    else CheckUnitTeamVision:=(vsnt[uteam]>0)and(vsni[uteam]>0);
-end;
-
 procedure GameSetStatusWinnerTeam(team:byte);
 begin
    if(team<=MaxPlayers)then
@@ -988,6 +980,14 @@ begin
    if((flags and wtr_fly     )=0)and(tu^.ukfly = uf_fly         )then exit;
 
    CheckUnitBaseFlags:=true;
+end;
+
+function CheckUnitTeamVision(POVTeam:byte;tu:PTUnit;SkipInvisCheck:boolean):boolean;
+begin
+   with tu^ do
+     if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
+     then CheckUnitTeamVision:=(vsnt[POVTeam]>0)
+     else CheckUnitTeamVision:=(vsnt[POVTeam]>0)and(vsni[POVTeam]>0);
 end;
 
 {$IFDEF _FULLGAME}
@@ -1091,6 +1091,7 @@ end;
 function CheckUnitUIVision(tu:PTUnit):boolean;
 begin
    CheckUnitUIVision:=true;
+
    if(not rpls_fog)then exit;
 
    if(UIPlayer=0)then
@@ -1102,23 +1103,25 @@ begin
    CheckUnitUIVision:=false;
 end;
 
-function PointInScreenP(x,y:integer):boolean;
+function CheckUnitUIVisionScreen(tu:PTUnit):boolean;
 begin
-   // player = player of vision source
-   PointInScreenP:=false;
+   CheckUnitUIVisionScreen:=false;
+   with tu^ do
+    with uid^ do
+     if(RectInCam(vx,vy,_r,_r,0))then
+      CheckUnitUIVisionScreen:=(vsnt[_players[UIPlayer].team]>0);
+end;
+
+function MapPointInScreenP(x,y:integer):boolean;
+begin
+   MapPointInScreenP:=false;
    x-=vid_cam_x;
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
-   begin
-      if(CheckUnitUIVision(nil))then
-      begin
-         PointInScreenP:=true;
-         exit;
-      end;
-
-      if(rpls_fog=false)or(fog_check(x,y))then PointInScreenP:=true;
-   end;
+      if(not rpls_fog)
+      then MapPointInScreenP:=true
+      else MapPointInScreenP:=fog_check(x,y);
 end;
 
 function PlayerGetColor(player:byte):cardinal;

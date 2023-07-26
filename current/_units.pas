@@ -1339,16 +1339,18 @@ begin
          _AddToInt(@tu^.vsnt[player^.team],vistime);
          {$IFDEF _FULLGAME}
          if not(a_rld in aw_rld_a)then
-          if(_AddToInt(@tu^.buff[ub_ArchFire ],fr_fps1))then SoundPlayUnit(snd_archvile_fire,tu,@targetvis);
+           if(_AddToInt(@tu^.buff[ub_ArchFire ],fr_fps1))then SoundPlayUnit(snd_archvile_fire,tu,@targetvis);
          {$ENDIF}
       end;
       _AddToInt(@vsnt[tu^.player^.team],a_rld+1);
       _AddToInt(@vsnt[tu^.player^.team],vistime);
       for i:=0 to MaxPlayers do
-      begin
-         if(tu^.vsnt[i]>0)then vsnt[i]    :=max2(vsnt[i],tu^.vsnt[i]);
-         if(vsnt[i]    >0)then tu^.vsnt[i]:=max2(vsnt[i],    vsnt[i]);
-      end;
+        if(tu^.vsnt[i]>0)
+        or(    vsnt[i]>0)then
+        begin
+                vsnt[i]:=max2(vsnt[i],tu^.vsnt[i]);
+            tu^.vsnt[i]:=vsnt[i];
+        end;
    end;
 end;
 begin
@@ -1456,8 +1458,8 @@ wmove_noneed    : if(not attackinmove)then
       with _a_weap[a_weap] do
       begin
          {$IFDEF _FULLGAME}
-         targetvis  :=PointInScreenP(tu^.vx,tu^.vy);
-         attackervis:=PointInScreenP(    vx,    vy);
+         targetvis  :=CheckUnitUIVisionScreen(tu);
+         attackervis:=CheckUnitUIVisionScreen(pu);
          {$ENDIF}
 
          if(a_rld<=0)then

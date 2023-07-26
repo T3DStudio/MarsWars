@@ -246,6 +246,10 @@ begin
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
                     vlineColor(tar,ui_menu_ssr_x3,y-6,y+12,c_gray);
                     boxColor  (tar,ui_menu_ssr_x2,y,ui_menu_ssr_x2+trunc(snd_mvolume1*ui_menu_ssr_barl),y+6,c_lime);
+
+                    y:=_yt(7);
+                    _draw_text(tar,i,y, str_NextTrack, ta_left,255, c_white);
+
                  end;
               end;
    ms1_svld : begin

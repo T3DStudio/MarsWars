@@ -81,7 +81,7 @@ begin
    if(net_status=ns_client)
    then net_pause
    else
-     if(net_status=ns_server){or(_testmode>0)}then
+     if(net_status=ns_server){or(TestMode>0)}then
        if(G_Status=gs_running)
        then G_Status:=HPlayer
        else G_Status:=gs_running;
@@ -560,8 +560,8 @@ sdlk_tab: begin
           end;
 1       : ; // ?????
    else
-      if(_testmode>0)and(net_status=0)then
-       if(test_hotkeys(k))then exit;
+      if(TestMode>0)and(net_status=0)then
+        if(test_hotkeys(k))then exit;
 
       k2:=0;
       if(ks_ctrl >0)then k2:=SDLK_LCtrl;

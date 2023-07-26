@@ -246,6 +246,7 @@ begin
                 else snd_mvolume1:=1;
               SoundSourceUpdateGainAll;
            end;
+      29  : SoundMusicControll(true);
 
       33 : menu_s3:=ms3_game;
       34 : menu_s3:=ms3_vido;

@@ -39,7 +39,12 @@ begin
    oalError();
 
    alGenBuffers(1,@Load_Chunk);
-   if(oalError)then begin Load_Chunk:=0;exit;end;
+   if(oalError)then
+   begin
+      Load_Chunk:=0;
+      WriteLog(sfn+' alGenBuffers() error');
+      exit;
+   end;
 
    if(LoadOGGData(sfn,@SLformat,@SLdata,@SLsize,@SLfreq,@error))then
    begin
@@ -169,17 +174,20 @@ m1,m2 : integer;
   snd : PTMWSound;
 begin
    with SoundSet^ do
-    if(sndn>1)then
-     for i:=0 to sndn+5 do
-     begin
-        m1:=random(sndn);
-        m2:=random(sndn);
+   begin
+      sndps:=0;
+      if(sndn>1)then
+       for i:=0 to sndn+5 do
+       begin
+          m1:=random(sndn);
+          m2:=random(sndn);
 
-        snd:=snds[m1];
-        snds[m1]:=snds[m2];
-        snds[m2]:=snd;
-        sndps:=random(sndn);
-     end;
+          snd:=snds[m1];
+          snds[m1]:=snds[m2];
+          snds[m2]:=snd;
+          sndps:=random(sndn);
+       end;
+   end;
 end;
 
 function SoundSetGetChunk(ss:PTSoundSet;NewChunk:boolean):PTMWSound;
@@ -327,8 +335,7 @@ begin
    end
    else
      if(pu<>nil)then
-      with pu^ do
-       if(PointInScreenP(x,y)=false)then exit;
+       if(not CheckUnitUIVisionScreen(pu))then exit;
 
    SoundPlay(ss,sss_world,true);
    SoundPlayUnit:=true;
@@ -453,29 +460,19 @@ end;
 //   MUSIC
 //
 
-procedure SoundMusicControll;
+procedure SoundMusicControll(ForceNextTreck:boolean);
 var current_music_ss: PTSoundSet;
-    repeat_track    : boolean;
 begin
    if(G_Started)
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
-   repeat_track:=false;
 
-   if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)then
+   if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)or(ForceNextTreck)then
    begin
-      {if(snd_music_current=current_music_ss)then
-      begin
-         snd_music_n+=1;
-         repeat_track:=(snd_music_n<snd_music_c);
-         if(repeat_track)then snd_music_n:=0;
-      end
-      else snd_music_n:=0; }
-
-      // add repeat
+      if(snd_music_current<>current_music_ss)and(not ForceNextTreck)then SoundShafleSoundSet(current_music_ss);
       snd_music_current:=current_music_ss;
 
-      SoundPlay(snd_music_current,sss_music,repeat_track);
+      SoundPlay(snd_music_current,sss_music,ForceNextTreck);
    end;
 end;
 
@@ -486,7 +483,7 @@ end;
 
 procedure SoundControl;
 begin
-   if(vid_blink_timer1=0)then SoundMusicControll;
+   if(vid_blink_timer1=0)then SoundMusicControll(false);
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 

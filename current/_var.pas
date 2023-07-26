@@ -146,7 +146,7 @@ _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 tmpmid            : byte = MID_Imp;
 
 _warpten          : boolean = false;
-_testmode         : byte = 0;
+TestMode          : byte = 0;
 uncappedFPS       : boolean = false;
 
 r_panel,
@@ -330,7 +330,7 @@ m_brush           : integer;
 m_bx,
 m_by              : integer;
 m_vmove           : boolean = false;
-m_action          : boolean = false;
+m_action          : boolean = true;
 m_mmap_move       : boolean = false;
 
 ui_language       : boolean = false;
@@ -738,6 +738,7 @@ str_smith,
 str_IncEnergyLevel,
 str_CanRebuildTo,
 str_TargetLimit,
+str_NextTrack,
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,

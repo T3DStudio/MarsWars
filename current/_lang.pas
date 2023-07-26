@@ -787,6 +787,7 @@ begin
    str_except            := 'except';
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
+   str_NextTrack         := 'Play next track';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1337,6 +1338,7 @@ begin
   str_except            := 'кроме';
   str_splashresist      := 'Невосприимчив к взрывной волне';
   str_TargetLimit       := 'лимит цели';
+  str_NextTrack         := 'Следующий трек';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';

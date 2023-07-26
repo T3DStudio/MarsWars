@@ -116,10 +116,10 @@ begin
    end;
 end;
 
-procedure _LoadingScreen;
+procedure _LoadingScreen(color:cardinal);
 begin
    SDL_FillRect(r_screen,nil,0);
-   stringColor(r_screen,(vid_vw div 2)-40, vid_vh div 2,@str_loading[1],c_yellow);
+   stringColor(r_screen,(vid_vw div 2)-40, vid_vh div 2,@str_loading[1],color);
    SDL_FLIP(r_screen);
 end;
 

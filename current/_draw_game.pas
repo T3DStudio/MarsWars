@@ -529,10 +529,11 @@ begin
              SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
           end;
 
-        if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
-
-        if(PointInScreenP(cpx,cpy))then
-         if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+        if(MapPointInScreenP(cpx,cpy))then
+        begin
+           if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
+           if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+        end;
 
        // for i:=0 to MaxPlayers do
        //  UnitsInfoAddText(cpx,cpy+(i+2)*10,i2s(cpunitsp_pstate[i])+' '+i2s(cpunitst_pstate[i]),c_white);

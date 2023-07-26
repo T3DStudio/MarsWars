@@ -68,7 +68,7 @@ begin
    d_MinimapAlarms;
 
    // debug
-   if(_testmode>0)then
+   if(TestMode>1)then
     with _players[UIPlayer] do
      for i:=0 to MaxPlayers do
       with ai_alarms[i] do

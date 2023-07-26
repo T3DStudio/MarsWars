@@ -17,7 +17,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(PointInScreenP(vx,vy)=false)then exit;
+         if(not CheckUnitUIVisionScreen(pu))then exit;
 
       case etype of
 EID_HVision : begin
@@ -55,7 +55,7 @@ end;
 procedure effect_CPExplode(vx,vy:integer);
 begin
    _effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
-   if(PointInScreenP(vx,vy))then
+   if(MapPointInScreenP(vx,vy))then
    begin
       _effect_add(vx,vy,_SpriteDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
@@ -73,7 +73,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-         if(PointInScreenP(vx,vy)=false)then exit;
+         if(not CheckUnitUIVisionScreen(pu))then exit;
 
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_summon[level]);
@@ -95,7 +95,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenP(vx,vy)=false)then exit;
+        if(not CheckUnitUIVisionScreen(pu))then exit;
 
       if(fastdeath)then
       begin
@@ -120,7 +120,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenP(vx,vy)=false)then exit;
+        if(not CheckUnitUIVisionScreen(pu))then exit;
 
       _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_pain[level]);
       SoundPlayUnit(un_eid_snd_pain,nil,nil);
@@ -134,7 +134,7 @@ begin
       if(vischeck^=false)then exit
    end
    else
-     if(PointInScreenP(tx,ty)=false)then exit;
+     if(MapPointInScreenP(tx,ty)=false)then exit;
 
    _effect_add(tx,ty,dy,effect);
    SoundPlayUnit(sound,nil,nil);
@@ -151,7 +151,7 @@ begin
          if(vischeck^=false)then exit
       end
       else
-        if(PointInScreenP(vx,vy)=false)then exit;
+        if(not CheckUnitUIVisionScreen(pu))then exit;
 
       if(start)then
       begin

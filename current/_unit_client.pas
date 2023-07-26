@@ -617,7 +617,7 @@ begin
    // pu - previous state
    // uu - current state
    pu:=@_units[0];
-   with uu^ do vis:=PointInScreenP(x,y);
+   vis:=CheckUnitUIVisionScreen(uu);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
