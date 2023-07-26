@@ -478,6 +478,8 @@ begin
    _draw_surf(tar,0,0,spr_mback);
    _draw_text(tar,spr_mback^.w,spr_mback^.h-font_w,str_ver,ta_right,255,c_white);
 
+   if(TestMode>0)then _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_5w,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
+
    _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
    _draw_text(tar, 70,554, str_exit [G_Started], ta_middle,255, c_white);
@@ -499,6 +501,9 @@ begin
    end;
 
    _draw_surf(r_screen,mv_x,mv_y,r_menu    );
+
+   if(vid_FPS)then _draw_text(r_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_right,255,c_white);
+
    _draw_surf(r_screen,mouse_x,mouse_y,spr_cursor);
 end;
 

@@ -381,8 +381,10 @@ nmid_lobby_info  : begin
                           PlayerSetSkirmishTech(i);
                        end;
 
-                      HPlayer    :=net_readbyte;
-                      net_cl_svpl:=net_readbyte;
+                      i:=HPlayer;
+                      HPlayer    :=net_readbyte;if(HPlayer    <>i)then vid_menu_redraw:=true;
+                      i:=net_cl_svpl;
+                      net_cl_svpl:=net_readbyte;if(net_cl_svpl<>i)then vid_menu_redraw:=true;
 
                       net_ReadMapData(gst);
                       net_m_error:='';

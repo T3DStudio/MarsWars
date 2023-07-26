@@ -868,7 +868,11 @@ begin
 
          s-=1;
       end;
-      if(rpl=false)then net_log_n:=_rudata_card(rpl,net_log_n);
+      if(rpl=false)then
+      begin
+         net_log_n:=_rudata_card(rpl,net_log_n);
+         vid_menu_redraw:=true;
+      end;
    end;
 end;
 

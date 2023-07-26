@@ -523,9 +523,9 @@ sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play      )then state:=PS
 sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : rpls_fog:=not rpls_fog;
 SDLK_F3        : nullupgr(HPlayer);
-SDLK_F4        : with _players[Hplayer] do
+{SDLK_F4        : with _players[Hplayer] do
                   if(_IsUnitRange(ai_scout_u_cur,nil))then
-                   with _units[ai_scout_u_cur] do MoveCamToPoint(x,y);
+                   with _units[ai_scout_u_cur] do MoveCamToPoint(x,y); }
 SDLK_F5        : HPlayer:=0;
 SDLK_F6        : HPlayer:=1;
 SDLK_F7        : HPlayer:=2;

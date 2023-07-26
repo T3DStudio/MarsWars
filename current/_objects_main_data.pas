@@ -765,12 +765,11 @@ begin
       _upgr_srange     :=upgr_hell_buildr;
       _weapon(0,wpt_missle,_srange,_r,0,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
 
-      _btime   := ptime2;
-
       if(i=UID_HACommandCenter)then
       begin
          _genergy := 600;
          _renergy := 600;
+         _btime   := (_btime*3) div 2;
       end
       else
       begin

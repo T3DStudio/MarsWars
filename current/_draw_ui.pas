@@ -707,6 +707,8 @@ gm_koth    : with g_cpoints[1] do
                   else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
+   if(TestMode>0)then _draw_text(tar,vid_cam_hw,vid_cam_hh,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
+
    if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                ,ta_left,255,c_white);
    if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_left,255,c_white);
 

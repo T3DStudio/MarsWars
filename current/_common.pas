@@ -1168,6 +1168,7 @@ function GameGetStatus(pstr:pshortstring;pcol:pcardinal;VisPlayer:byte):boolean;
 var t:byte;
 begin
    GameGetStatus:=false;
+
    if(G_status>gs_running)then
    begin
       GameGetStatus:=true;

@@ -1440,10 +1440,10 @@ begin
   str_srace             := 'Раса:';
   str_ready             := 'Готов: ';
   str_udpport           := 'UDP порт:';
-  str_svup[false]       := 'Вкл. сервер';
-  str_svup[true ]       := 'Выкл. сервер';
+  str_svup[false]       := 'Включить сервер';
+  str_svup[true ]       := 'Выключить сервер';
   str_connect[false]    := 'Подключится';
-  str_connect[true ]    := 'Откл.';
+  str_connect[true ]    := 'Отключится';
   str_pnu               := 'Размер/качество: ';
   str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
