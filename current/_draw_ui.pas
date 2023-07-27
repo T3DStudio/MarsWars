@@ -221,7 +221,11 @@ begin
       uy:=x*vid_BW+1;
    end;
    _draw_surf(tar,ux,uy,surf);
-   if(sel)then rectangleColor(tar,ux+1,uy+1,ux+vid_BW-3,uy+vid_BW-3,c_lime)
+   if(sel)then
+   begin
+      rectangleColor(tar,ux+1,uy+1,ux+vid_BW-3,uy+vid_BW-3,c_lime);
+      rectangleColor(tar,ux+2,uy+2,ux+vid_BW-4,uy+vid_BW-4,c_lime);
+   end
    else
      if(dsbl)then boxColor(tar,ux,uy,ux+vid_BW-2,uy+vid_BW-2,c_ablack);
 end;
@@ -243,13 +247,13 @@ begin
       uy:=x*vid_BW+1;
    end;
 
-   if(cs(@lu1))then _draw_text(tar,ux+2       ,uy+3       ,lu1,ta_left  ,5,clu1);
-   if(cs(@lu2))then _draw_text(tar,ux+2       ,uy+5+font_w,lu2,ta_left  ,5,clu2);
-   if(cs(@ru ))then _draw_text(tar,ux+vid_BW-3,uy+3       ,ru ,ta_right ,5,cru );
-   if(cs(@rd ))then _draw_text(tar,ux+vid_BW-3,uy+ui_dBW  ,rd ,ta_right ,5,crd );
-   if(cs(@ld ))then _draw_text(tar,ux+2       ,uy+ui_dBW  ,ld ,ta_left  ,5,cld );
+   if(cs(@lu1))then _draw_text(tar,ux+3       ,uy+4       ,lu1,ta_left  ,5,clu1);
+   if(cs(@lu2))then _draw_text(tar,ux+3       ,uy+6+font_w,lu2,ta_left  ,5,clu2);
+   if(cs(@ru ))then _draw_text(tar,ux+vid_BW-4,uy+4       ,ru ,ta_right ,5,cru );
+   if(cs(@rd ))then _draw_text(tar,ux+vid_BW-4,uy+ui_dBW-1,rd ,ta_right ,5,crd );
+   if(cs(@ld ))then _draw_text(tar,ux+3       ,uy+ui_dBW-1,ld ,ta_left  ,5,cld );
 
-   if(cs(@ms ))then _draw_text(tar,ux+vid_hBW,uy+vid_hBW  ,ms ,ta_middle  ,5,c_red );
+   if(cs(@ms ))then _draw_text(tar,ux+vid_hBW,uy+vid_hBW  ,ms ,ta_middle,5,c_red );
 end;
 
 procedure d_TextBTN(tar:pSDL_Surface;bx,by:integer;txt:pshortstring;c:cardinal);
@@ -278,21 +282,29 @@ begin
    if(vid_ppos<2)then
    begin
       _draw_surf(tar,bx,by+5,btn);
-      if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_BW-3,c_lime);
-by+=3;if(i1>0)then _draw_text(tar,bx+3,by,i2s(i1),ta_left,255,c1);by+=font_w+3;
-      if(i2>0)then _draw_text(tar,bx+3,by,i2s(i2),ta_left,255,c2);by+=font_w+3;
-      if(i3>0)then _draw_text(tar,bx+3,by,i2s(i3),ta_left,255,c3);by+=font_w+3;
-      if(i4>0)then _draw_text(tar,bx+3,by,i2s(i4),ta_left,255,c4);
+      if(sel)then
+      begin
+         rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_BW-3,c_lime);
+         rectangleColor(tar,bx+2,by+2,bx+vid_tBW-4,by+vid_BW-4,c_lime);
+      end;
+by+=3;if(i1>0)then _draw_text(tar,bx+4,by,i2s(i1),ta_left,255,c1);by+=font_w+3;
+      if(i2>0)then _draw_text(tar,bx+4,by,i2s(i2),ta_left,255,c2);by+=font_w+3;
+      if(i3>0)then _draw_text(tar,bx+4,by,i2s(i3),ta_left,255,c3);by+=font_w+3;
+      if(i4>0)then _draw_text(tar,bx+4,by,i2s(i4),ta_left,255,c4);
    end
    else
    begin
       _draw_surf(tar,bx+5,by,btn);
-      if(sel)then rectangleColor(tar,bx+1,by+1,bx+vid_BW-3,by+vid_tBW-3,c_lime);
+      if(sel)then
+      begin
+         rectangleColor(tar,bx+1,by+1,bx+vid_BW-3,by+vid_tBW-3,c_lime);
+         rectangleColor(tar,bx+2,by+2,bx+vid_BW-4,by+vid_tBW-4,c_lime);
+      end;
 by+=3;if(i1>0)then _draw_text(tar,bx+3,by         ,i2s(i1),ta_left,255,c1);
       if(i2>0)then _draw_text(tar,bx+3,by+font_w+3,i2s(i2),ta_left,255,c2);
 
-      if(i3>0)then _draw_text(tar,bx+vid_BW-3,by         ,i2s(i3),ta_right,255,c3);
-      if(i4>0)then _draw_text(tar,bx+vid_BW-3,by+font_w+3,i2s(i4),ta_right,255,c4);
+      if(i3>0)then _draw_text(tar,bx+vid_BW-4,by         ,i2s(i3),ta_right,255,c3);
+      if(i4>0)then _draw_text(tar,bx+vid_BW-4,by+font_w+3,i2s(i4),ta_right,255,c4);
    end;
 end;
 

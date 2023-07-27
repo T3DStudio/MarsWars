@@ -647,6 +647,8 @@ begin
            end;
         end;
 
+        _missiles_clear_tar(unum);
+
         _ucInc(uu);
      end
      else
@@ -670,6 +672,8 @@ begin
 
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
+          _missiles_clear_tar(unum);
+
           _ucDec(pu);
        end
        else
@@ -679,6 +683,7 @@ begin
             begin
                vx:=x;
                vy:=y;
+               _missiles_clear_tar(unum);
             end;
 
             _unit_upgr(pu);
@@ -763,7 +768,8 @@ begin
                begin
                   vstp:=UnitStepTicks;
                   dir :=point_dir(mp_x,mp_y,x,y);
-               end;
+               end
+               else _missiles_clear_tar(unum);
             end;
          end;
 end;

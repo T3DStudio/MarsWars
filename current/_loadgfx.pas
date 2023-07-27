@@ -864,7 +864,7 @@ begin
 
       if(vid_ppos=0)
       then vid_panelx:=0
-      else vid_panelx:=vid_cam_w;
+      else vid_panelx:=vid_cam_w-1;
       vid_panely:=0;
 
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
