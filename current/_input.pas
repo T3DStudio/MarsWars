@@ -81,7 +81,7 @@ begin
    if(net_status=ns_client)
    then net_pause
    else
-     if(net_status=ns_server)then
+     if(net_status=ns_server) then
        if(G_Status=gs_running)then
        begin
           G_Status:=HPlayer;
@@ -326,7 +326,7 @@ begin
               cndt:=_uid_conditionals(@_players[HPlayer],m_brush);
               if(cndt>0)then
               begin
-                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,cndt,mouse_map_x,mouse_map_y,true);
+                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
                  m_brush:=co_empty;
               end
               else

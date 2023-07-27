@@ -244,7 +244,7 @@ begin
 gs_running    : ;
 1..MaxPlayers : SVGameStatus:=str_gpaused+b2s(G_Status)
    else
-     if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then SVGameStatus:=str_gwinner+b2s(G_Status);
+     if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then SVGameStatus:=str_gwinner+b2s(G_Status-gs_win_team0);
    end;
 end;
 

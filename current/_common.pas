@@ -222,8 +222,8 @@ begin
       prod_error_uid :=uid;
       if(pu<>nil)then
       begin
-         prod_error_x:=byte(pu^.x shr 5);
-         prod_error_y:=byte(pu^.y shr 5);
+         prod_error_x:=mm3(1,pu^.x,map_mw);
+         prod_error_y:=mm3(1,pu^.y,map_mw);
       end
       else
       begin
