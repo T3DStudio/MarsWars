@@ -1397,7 +1397,7 @@ MID_BFG            : mid_base_damage :=BaseDamage4;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_ArchFire       : mid_base_damage :=BaseDamage8;
 MID_Mine,
-MID_Blizzard       : mid_base_damage :=BaseDamage10;     // 620*5=   11900 3100
+MID_Blizzard       : mid_base_damage :=BaseDamage10;
 end;
 
 // splash R

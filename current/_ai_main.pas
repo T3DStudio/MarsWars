@@ -1143,8 +1143,9 @@ begin
            if((ai_abase_d>base_4r)and((cycle_order mod 5)=0) )or(ai_abase_u^.pfzone<>pfzone)then
             if(ai_TryTeleportF(pu,ai_abase_u))then exit;
 
-         if(tar_d=NOTSET)and(player^.ai_ReadyForAttack)and(g_mode<>gm_invasion)then
-           if(ai_TryTeleportF(pu,nil))then exit;
+         if(tar_d=NOTSET)and(g_mode<>gm_invasion)then
+           if(group=aio_attack)or(g_mode=gm_koth)then
+             if(ai_TryTeleportF(pu,nil))then exit;
       end;
    end;
 end;
@@ -1213,7 +1214,7 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do
-          if((cycle_order mod 6)=0)
+          if((cycle_order mod 5)=0)
           then SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,false,false,1)
           else SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,ai_generator_d>base_3r,ai_generator_d>base_3r,0);
 

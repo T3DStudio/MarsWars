@@ -342,7 +342,7 @@ begin
             then rpls_state:=rpls_state_write
             else rpls_state:=rpls_state_none;
       83 : if(rpls_state<>rpls_state_none)then menu_item:=0;
-      84 : ScrollByte(@rpls_pnui,true,0,9);
+      84 : ScrollByte(@rpls_pnui,true,0,_cl_pnun_rpls);
 
       //// multiplayer
       // server
@@ -399,7 +399,7 @@ begin
               menu_s1:=ms1_sett;
            end;
       90 : if(net_status<>ns_none)then menu_item:=0; // addr
-      91 : if(net_status<>ns_server)then ScrollByte(@net_pnui,true,0,9);
+      91 : if(net_status<>ns_server)then ScrollByte(@net_pnui,true,0,_cl_pnun);
       92 : if(G_Started=false)and(net_status<>ns_server)then
             if(mouse_x<ui_menu_csm_x2)
             then ScrollByte(@PlayerTeam,true,0,MaxPlayers)

@@ -739,6 +739,8 @@ str_IncEnergyLevel,
 str_CanRebuildTo,
 str_TargetLimit,
 str_NextTrack,
+str_PlayerPaused,
+str_PlayerResumed,
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
@@ -824,6 +826,7 @@ str_inv_time,
 str_menu,
 str_time,
 str_kothtime,
+str_kothtime_act,
 str_kothwinner,
 str_players,
 str_map,
@@ -860,7 +863,7 @@ str_MObjectives,
 str_MMap,
 str_MPlayers      : shortstring;
 str_npnua,
-str_pnua          : array[0..9] of shortstring;
+str_pnua          : array[0.._cl_pnun] of shortstring;
 str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_army     : shortstring;

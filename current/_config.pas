@@ -110,10 +110,11 @@ begin
 
       if(g_ai_slots   >gms_g_maxai  )then g_ai_slots   :=gms_g_maxai;
       if(g_start_base >gms_g_startb )then g_start_base :=gms_g_startb;
-      if(g_generators >gms_g_maxgens)then g_generators:=gms_g_maxgens;
+      if(g_generators >gms_g_maxgens)then g_generators :=gms_g_maxgens;
 
-      if(rpls_pnui   >_cl_pnun       )then rpls_pnui   :=_cl_pnun;
+      if(rpls_pnui   >_cl_pnun_rpls  )then rpls_pnui   :=_cl_pnun_rpls;
       if(net_pnui    >_cl_pnun       )then net_pnui    :=_cl_pnun;
+
       if(vid_ppos    >3              )then vid_ppos    :=0;
       if(vid_uhbars  >2              )then vid_uhbars  :=0;
       if(vid_plcolors>vid_maxplcolors)then vid_plcolors:=0;

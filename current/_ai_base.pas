@@ -1037,6 +1037,11 @@ procedure ai_scout_pick(pu:PTUnit);
 var w:integer;
    tu:PTUnit;
 begin
+   if(g_mode=gm_koth    )
+   or(g_mode=gm_capture )
+   or(g_mode=gm_invasion)
+   or(g_mode=gm_royale  )then exit;
+
    with pu^ do
    begin
       if(hits<=0)
@@ -1045,7 +1050,6 @@ begin
       or(not iscomplete)
       or(transportM>0)then exit;
 
-      if(playeri=0)and(g_mode=gm_invasion)then exit;
       if((player^.ai_flags and aif_army_scout)=0)then exit;
 
       if(_IsUnitRange(transport,nil))then exit;

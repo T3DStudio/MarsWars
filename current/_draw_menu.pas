@@ -457,6 +457,9 @@ begin
                     _draw_text(tar,ui_menu_csm_xt2, y, net_m_error                         , ta_right ,255, c_red);
                     y:=_yt(7);
                     _draw_text(tar,ui_menu_csm_xt0, y, str_npnu+str_npnua[net_pnui]        , ta_left  ,255, mic((net_status<>ns_server),false));
+                    if(g_cl_units>0)then
+                    _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units),
+                                                                                             ta_right ,255, c_white);
                     y:=_yt(8);
                     t:=_yl(8);
                     i:=t+ui_menu_csm_ys;

@@ -276,6 +276,9 @@ procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:in
 const
 timeDiff5 = fr_fps1*5;
 timeDiff3 = fr_fps1*3;
+{$IFDEF _FULLGAME}
+var ThisPlayer:byte;
+{$ENDIF}
 begin
    if(ptarget>MaxPlayers)then exit;
 
@@ -319,7 +322,10 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
       end;
 
       {$IFDEF _FULLGAME}
-      if(ptarget=UIPlayer)then
+      if(net_status=ns_client)
+      then ThisPlayer:=HPlayer
+      else ThisPlayer:=UIPlayer;
+      if(ptarget=ThisPlayer)then
       begin
          net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
          vid_menu_redraw:=true;
@@ -365,7 +371,7 @@ end;
 procedure GameLogPlayerLeave(player:byte);
 begin
    if(player>MaxPlayers)or(ServerSide=false)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,player,'',0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,_players[player].name+str_plout,0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
@@ -1328,8 +1334,8 @@ lmt_cant_build       : begin
                             end;
                        end;
 lmt_player_chat,
-lmt_game_message     : ParseLogMessage:=str;
-lmt_player_leave     : if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
+lmt_game_message     ,
+lmt_player_leave     : ParseLogMessage:=str;//if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
 lmt_game_end         : if(argx<=MaxPlayers)then
                         if(argx=_players[UIPlayer].team)
                         then ParseLogMessage:=str_win

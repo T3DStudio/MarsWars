@@ -610,6 +610,14 @@ UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_
    end;
 end;
 
+procedure _unit_clear_a_tar(tar:integer);
+var u:integer;
+begin
+   for u:=1 to MaxUnits do
+     with _punits[u]^ do
+       if(a_tar=tar)then a_tar:=0;
+end;
+
 procedure _netSetUcl(uu:PTUnit);
 var pu,tu:PTUnit;
    vis:boolean;
@@ -648,6 +656,7 @@ begin
         end;
 
         _missiles_clear_tar(unum);
+        _unit_clear_a_tar(unum);
 
         _ucInc(uu);
      end
@@ -673,6 +682,7 @@ begin
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           _missiles_clear_tar(unum);
+          _unit_clear_a_tar(unum);
 
           _ucDec(pu);
        end
@@ -684,6 +694,7 @@ begin
                vx:=x;
                vy:=y;
                _missiles_clear_tar(unum);
+               _unit_clear_a_tar(unum);
             end;
 
             _unit_upgr(pu);
@@ -769,7 +780,11 @@ begin
                   vstp:=UnitStepTicks;
                   dir :=point_dir(mp_x,mp_y,x,y);
                end
-               else _missiles_clear_tar(unum);
+               else
+               begin
+                  _missiles_clear_tar(unum);
+                  _unit_clear_a_tar(unum);
+               end;
             end;
          end;
 end;
@@ -1204,17 +1219,20 @@ begin
    if(wstepb1)then
      case g_mode of
 gm_invasion : begin
-                 i:=g_inv_wave_n;
-                 g_inv_wave_n:=_rudata_byte(rpl,0);
-                 if(g_inv_wave_n>i)then SoundPlayUnit(snd_teleport,nil,nil);
-                 g_inv_wave_t_next :=_rudata_int (rpl,0);
+              g_inv_wave_n     :=_rudata_byte(rpl,0);
+              g_inv_wave_t_next:=_rudata_int (rpl,0);
               end;
 gm_royale   : g_royal_r:=_rudata_int(rpl,0);
      end;
 
+   if(g_mode=gm_invasion)then i:=byte(GetBBit(@g_player_astatus,0));
+
    g_player_astatus:=_rudata_byte(rpl,0);
    if(g_player_astatus>0)then
    begin
+      if(g_mode=gm_invasion)then
+        if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
+
       _players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
 
       _PNU:=_rudata_byte(rpl,0)*4;

@@ -660,7 +660,9 @@ begin
    if(net_chat_shlm>0)then net_chat_shlm-=1;
    if(ingame_chat>0)or(rpls_showlog)then
    begin
-      MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
+      if(net_status=ns_client)
+      then MakeLogListForDraw(HPlayer ,ui_ingamecl,ui_game_log_height,lmts_menu_chat)
+      else MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -669,7 +671,9 @@ begin
    else
      if(net_chat_shlm>0)then // last messages
      begin
-        MakeLogListForDraw(UIPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
+        if(net_status=ns_client)
+        then MakeLogListForDraw(HPlayer ,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages)
+        else MakeLogListForDraw(UIPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
         if(ui_log_n>0)then
          for i:=0 to ui_log_n-1 do
           if(ui_log_c[i]>0)then _draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);
@@ -708,15 +712,18 @@ gm_invasion: begin
                 if(_players[0].army>0)then _draw_text(tar,ui_textx,ui_texty+font_6hw,str_inv_ml+' '+l2s(_players[0].armylimit,MinUnitLimit),ta_left,255,c_white);
              end;
 gm_koth    : with g_cpoints[1] do
-              if(cpOwnerPlayer>0)
-              then _draw_text(tar,ui_textx,ui_texty+font_3hw,_players[cpOwnerPlayer].name+str_kothwinner,ta_left,255,PlayerGetColor(cpOwnerPlayer))
+              if(g_step<g_step_koth_pause)
+              then D_Timer(tar,ui_textx,ui_texty+font_3hw,g_step_koth_pause-g_step,ta_left,str_kothtime_act,c_gray)
               else
-                if(cpTimer<=0)
-                then _draw_text(tar,ui_textx,ui_texty+font_3hw,str_kothtime+'---',ta_left,255,c_white)
+                if(cpOwnerPlayer>0)
+                then _draw_text(tar,ui_textx,ui_texty+font_3hw,_players[cpOwnerPlayer].name+str_kothwinner,ta_left,255,PlayerGetColor(cpOwnerPlayer))
                 else
-                  if(r_blink2_colorb)
-                  then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
-                  else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
+                  if(cpTimer<=0)
+                  then _draw_text(tar,ui_textx,ui_texty+font_3hw,str_kothtime+'---',ta_left,255,c_white)
+                  else
+                    if(r_blink2_colorb)
+                    then D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,c_white)
+                    else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
    if(TestMode>0)then _draw_text(tar,vid_cam_hw,vid_cam_hh,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);

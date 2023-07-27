@@ -776,6 +776,7 @@ begin
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
    str_ColoredShadow     := 'Colored shadows';
    str_kothtime          := 'Center capture time left: ';
+   str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
    str_DeadObservers     := 'Observer mode after lose:';
    str_FPS               := 'Show FPS';
@@ -788,6 +789,8 @@ begin
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
    str_NextTrack         := 'Play next track';
+   str_PlayerPaused      := 'player paused the game';
+   str_PlayerResumed     := 'Player has resumed the game';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1327,6 +1330,7 @@ begin
   str_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
   str_ColoredShadow     := 'Цветные тени';
   str_kothtime          := 'Время до захвата центра: ';
+  str_kothtime_act      := 'Время до активации центральной зоны: ';
   str_kothwinner        := ' - Царь Горы!';
   str_DeadObservers     := 'Наблюдатель после поражения:';
   str_FPS               := 'Показать FPS';
@@ -1339,6 +1343,8 @@ begin
   str_splashresist      := 'Невосприимчив к взрывной волне';
   str_TargetLimit       := 'лимит цели';
   str_NextTrack         := 'Следующий трек';
+  str_PlayerPaused      := 'игрок приостановил игру';
+  str_PlayerResumed     := 'игрок возобновил игру';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';

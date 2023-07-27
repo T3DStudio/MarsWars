@@ -39,7 +39,7 @@ end;
 procedure input_key_return;
 var HPlayerAllies: byte;
 begin
-   if(_menu=false)and(ingame_chat=0)then
+   if(_menu=false)and(ingame_chat=0)and(net_status>ns_none)then
    begin
       HPlayerAllies:=PlayerAllies(HPlayer,false);
       if(HPlayerAllies>0)
@@ -81,10 +81,17 @@ begin
    if(net_status=ns_client)
    then net_pause
    else
-     if(net_status=ns_server){or(TestMode>0)}then
-       if(G_Status=gs_running)
-       then G_Status:=HPlayer
-       else G_Status:=gs_running;
+     if(net_status=ns_server)then
+       if(G_Status=gs_running)then
+       begin
+          G_Status:=HPlayer;
+          GameLogChat(HPlayer,255,str_PlayerPaused,false);
+       end
+       else
+       begin
+          G_Status:=gs_running;
+          GameLogChat(HPlayer,255,str_PlayerResumed,false);
+       end;
 end;
 
 procedure MapMarker(x,y:integer);

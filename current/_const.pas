@@ -211,10 +211,12 @@ uia_newstrict          = 2;  }
 //
 
 _cl_pnun               = 9;
+_cl_pnun_rpls          = _cl_pnun div 2;
                                                     // 60 140 220 300 380 460 540 620 700 800
 _cl_pnua               : array[0.._cl_pnun] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
 ClientTTL              = fr_fps1*10;
+ServerTTL              = fr_fps1;
 
 NetTickN               = 2;
 MaxNetBuffer           = 4096;
@@ -1457,6 +1459,7 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
 str_gnstarted            : shortstring = 'Not started';
 str_grun                 : shortstring = 'Run';
 str_gpaused              : shortstring = 'Paused by player #';
+str_gwinner              : shortstring = 'Won by a team #';
 str_udpport              : shortstring = ' UPD port: ';
 str_gstatus              : shortstring = 'Game status:   ';
 str_gsettings            : shortstring = 'Game settings:';
@@ -1474,6 +1477,8 @@ str_cgenerators          : shortstring = 'Neutral generators:       ';
 str_deadobservers        : shortstring = 'Observer mode after lose: ';
 str_starta               : shortstring = 'Builders at game start:   ';
 str_plname               : shortstring = 'Player name';
+str_PlayerPaused         : shortstring = 'player paused the game';
+str_PlayerResumed        : shortstring = 'Player has resumed the game';
 //str_plout                : shortstring = ' left the game';
 //str_player_def           : shortstring = ' was terminated!';
 

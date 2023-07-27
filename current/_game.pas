@@ -304,7 +304,7 @@ begin
 
    {$IFDEF _FULLGAME}
    MoveCamToPoint(map_psx[HPlayer] , map_psy[HPlayer]);
-   if(g_deadobservers)and(_players[HPlayer].team=0)then ui_tab:=3;
+   if(_players[HPlayer].team=0)then ui_tab:=3;
    {$ENDIF}
 end;
 

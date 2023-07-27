@@ -237,12 +237,15 @@ end;
 
 function SVGameStatus:shortstring;
 begin
-   if(g_started=false)
-   then SVGameStatus:=str_gnstarted
+   if(g_started)
+   then SVGameStatus:=str_grun
+   else SVGameStatus:=str_gnstarted;
+   case G_status of
+gs_running    : ;
+1..MaxPlayers : SVGameStatus:=str_gpaused+b2s(G_Status)
    else
-     if(G_Status=0)
-     then SVGameStatus:=str_grun
-     else SVGameStatus:=str_gpaused+b2s(G_Status);
+     if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then SVGameStatus:=str_gwinner+b2s(G_Status);
+   end;
 end;
 
 procedure Dedicated_Screen;
