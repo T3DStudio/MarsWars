@@ -17,9 +17,8 @@ begin
 
    _GfxColors;
    _MakeScreen;
-   _LoadingScreen(c_yellow);
+   _LoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
-   _LoadingScreen(c_aqua);
    _cmp_Init;
 
    InitVideo:=true;
@@ -35,7 +34,7 @@ begin
       s:=ParamStr(i);
 
       if(s='test' )then TestMode:=1;
-      if(s='testD')then TestMode:=2;
+      //if(s='testD')then TestMode:=2;
    end;
 end;
 

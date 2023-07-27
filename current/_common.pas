@@ -1109,7 +1109,16 @@ begin
    with tu^ do
     with uid^ do
      if(RectInCam(vx,vy,_r,_r,0))then
-      CheckUnitUIVisionScreen:=(vsnt[_players[UIPlayer].team]>0);
+     begin
+        if(UIPlayer=0)then
+          if(rpls_state>=rpls_state_read)or(_players[HPlayer].observer)then
+          begin
+             CheckUnitUIVisionScreen:=true;
+             exit;
+          end;
+
+        CheckUnitUIVisionScreen:=(vsnt[_players[UIPlayer].team]>0)or(not rpls_fog);
+     end;
 end;
 
 function MapPointInScreenP(x,y:integer):boolean;
@@ -1443,6 +1452,13 @@ begin
       end;
    end;
    while(ui_log_n<listheight)do _add('',0,0);
+end;
+
+procedure _LoadingScreen(load_str:pshortstring;color:cardinal);
+begin
+   SDL_FillRect(r_screen,nil,0);
+   stringColor(r_screen,(vid_vw div 2)-(length(load_str^)*font_w div 2), vid_vh div 2,@(load_str^[1]),color);
+   SDL_FLIP(r_screen);
 end;
 
 {$ELSE}

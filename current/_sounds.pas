@@ -519,6 +519,8 @@ begin
     else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
     end;
 
+   _LoadingScreen(@str_loading_msc,c_aqua);
+
    snd_music_menu:=MusicSetLoad('music\menu\');
    snd_music_game:=MusicSetLoad('music\game\');
 
@@ -528,6 +530,8 @@ begin
    //
    // COMMON
    //
+
+   _LoadingScreen(@str_loading_sfx,c_green);
 
    snd_click                :=SoundSetLoad('click'           );
    snd_chat                 :=SoundSetLoad('chat'            );

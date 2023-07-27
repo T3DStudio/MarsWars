@@ -465,7 +465,6 @@ uprod_antiair
                           0 : ut:=UID_FPlasmagunner;
                           1 : ut:=UID_Flyer;
                           2 : ut:=UID_Antiaircrafter;
-                          3 : ut:=UID_Commando;
                      end;
              end;
 1..255     : ut:=uclass;
@@ -498,6 +497,7 @@ end;
 //
 
 procedure ai_UpgrProduction(pu:PTUnit);
+var i:byte;
 procedure MakeUpgr(upid,lvl:byte);
 var uip:integer;
 begin
@@ -524,10 +524,23 @@ r_hell: begin
         MakeUpgr(upgr_hell_extbuild  ,1);
         MakeUpgr(upgr_hell_buildr    ,2);
         MakeUpgr(upgr_hell_spectre   ,1);
-        MakeUpgr(upgr_hell_pinkspd   ,1);
-        MakeUpgr(upgr_hell_pains     ,3);
-        MakeUpgr(upgr_hell_heye      ,1);
-        MakeUpgr(upgr_hell_vision    ,1);
+        MakeUpgr(upgr_hell_ghostm    ,1);
+
+        if(ai_maxcount_upgrlvl>0)then
+        for i:=1 to ai_maxcount_upgrlvl do
+        begin
+        MakeUpgr(upgr_hell_pains     ,i);
+        MakeUpgr(upgr_hell_heye      ,i);
+        MakeUpgr(upgr_hell_regen     ,i);
+        MakeUpgr(upgr_hell_vision    ,i);
+        MakeUpgr(upgr_hell_t1attack  ,i);
+        MakeUpgr(upgr_hell_t2attack  ,i);
+        MakeUpgr(upgr_hell_mattack   ,i);
+        MakeUpgr(upgr_hell_uarmor    ,i);
+        MakeUpgr(upgr_hell_barmor    ,i);
+        MakeUpgr(upgr_hell_regen     ,i);
+        MakeUpgr(upgr_hell_vision    ,i);
+        end;
         end;
 
         MakeUpgr(upgr_hell_t1attack+random(24),ai_maxcount_upgrlvl);
@@ -545,7 +558,18 @@ r_uac : begin
         MakeUpgr(upgr_uac_soaring    ,1);
         MakeUpgr(upgr_uac_botturret  ,1);
         MakeUpgr(upgr_uac_lturret    ,1);
-        MakeUpgr(upgr_uac_vision     ,1);
+        if(ai_maxcount_upgrlvl>0)then
+        for i:=1 to ai_maxcount_upgrlvl do
+        begin
+        MakeUpgr(upgr_uac_vision     ,i);
+        MakeUpgr(upgr_uac_attack     ,i);
+        MakeUpgr(upgr_uac_uarmor     ,i);
+        MakeUpgr(upgr_uac_mecharm    ,i);
+        MakeUpgr(upgr_uac_barmor     ,i);
+        MakeUpgr(upgr_uac_melee      ,i);
+        MakeUpgr(upgr_uac_mechspd    ,i);
+        MakeUpgr(upgr_uac_vision     ,i);
+        end;
         end;
 
         MakeUpgr(upgr_uac_attack+random(24),ai_maxcount_upgrlvl);

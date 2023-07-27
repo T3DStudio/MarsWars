@@ -1785,9 +1785,14 @@ UID_LostSoul      : begin
                          if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UACDron       : ukfloater:=upgr[upgr_uac_soaring ]>0;
+UID_UACDron       : begin
+                    ukfloater:=upgr[upgr_uac_soaring ]>0;
+                    if(pf_IfObstacleZone(pfzone))and(ukfloater)
+                    then begin if(speed= _speed)then speed:=_speed div 2;end
+                    else begin if(speed<>_speed)then speed:=_speed;      end;
+                    end;
 UID_Demon         : begin
-                    ukfloater:=upgr[upgr_hell_pinkspd]>0;
+                    ukfloater:=upgr[upgr_hell_ghostm]>0;
                     if(pf_IfObstacleZone(pfzone))and(ukfloater)
                     then begin if(speed= _speed)then speed:=_speed div 2;{$IFDEF _FULLGAME}if(animw =_animw)then animw:=_animw div 2;{$ENDIF}end
                     else begin if(speed<>_speed)then speed:=_speed;      {$IFDEF _FULLGAME}if(animw<>_animw)then animw:=_animw;      {$ENDIF}end;

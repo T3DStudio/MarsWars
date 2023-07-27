@@ -524,7 +524,7 @@ upgr_hell_HKTeleport   = 8;  // HK teleportation
 upgr_hell_extbuild     = 9;  // buildings on doodabs
 upgr_hell_paina        = 10; // decay aura
 upgr_hell_towers       = 11; // towers range
-upgr_hell_pinkspd      = 12; // demon move speed
+upgr_hell_ghostm       = 12; // ghost monsters
 
 upgr_hell_spectre      = 13; // demon spectre                 // t2
 upgr_hell_vision       = 14; // demons vision
@@ -1368,7 +1368,9 @@ CMPMaxSkills           = 6;
 
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MVSCR_';
-str_loading            : shortstring = 'LOADING...'+#0;
+str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
+str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
+str_loading_msc        : shortstring = 'LOADING MUSIC...'+#0;
 str_f_grp              : shortstring = 'graphic\';
 str_f_map              : shortstring = 'map\';
 str_f_snd              : shortstring = 'sound\';

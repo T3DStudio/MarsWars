@@ -1526,7 +1526,7 @@ begin
    _setUPGR(r_hell,upgr_hell_extbuild  ,75 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_paina     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
    _setUPGR(r_hell,upgr_hell_towers    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_HAKeep          ,false);
-   _setUPGR(r_hell,upgr_hell_pinkspd   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
+   _setUPGR(r_hell,upgr_hell_ghostm    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
 
    _setUPGR(r_hell,upgr_hell_spectre   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
    _setUPGR(r_hell,upgr_hell_vision    ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_HMonastery      ,false);
