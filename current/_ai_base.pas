@@ -125,10 +125,12 @@ ai_towers_need,
 ai_towers_need_type,
 ai_towers_needx,
 ai_towers_needy,
+ai_towers_needl,
 ai_transport_cur,
 ai_transport_need,
 ai_inprogress_uid,
-ai_radars
+ai_radars,
+ai_nearest_builder_d
                         : integer;
 
 ai_nearest_builder_square,
@@ -461,11 +463,13 @@ begin
    // nearest builder
    ai_nearest_builder_u     :=nil;
    ai_nearest_builder_square:=longint.MaxValue;
+   ai_nearest_builder_d     := NOTSET;
    with pu^ do
     if(isbuildarea)and(iscomplete)then
     begin
        ai_nearest_builder_u     :=pu;
        ai_nearest_builder_square:=0;
+       ai_nearest_builder_d     :=0;
     end;
 
    with pu^ do
@@ -623,6 +627,7 @@ begin
    ai_towers_near_grd :=0;
    ai_towers_needx    :=-1;
    ai_towers_needy    :=-1;
+   ai_towers_needl    :=-1;
    ai_towers_need     :=0;
    ai_towers_need_type:=0;
 
@@ -883,6 +888,7 @@ begin
                       begin
                          ai_nearest_builder_square:=tu^.aiu_FiledSquareNear;
                          ai_nearest_builder_u     :=pu;
+                         ai_nearest_builder_d     :=ud;
                       end;
                end;
 

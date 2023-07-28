@@ -67,7 +67,7 @@ begin
    fr_LastTicks   :=fr_CurrentTicks;
 
    {$IFDEF _FULLGAME}
-   if(uncappedFPS)
+   if(uncappedFPS)and(not MainMenu)
    then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
    else
    {$ENDIF}
@@ -1240,11 +1240,11 @@ procedure ToggleMenu;
 begin
    if(G_Started)then
    begin
-      _menu:=not _menu;
-      vid_menu_redraw:=_menu;
+      MainMenu:=not MainMenu;
+      vid_menu_redraw:=MainMenu;
       menu_item:=0;
       if(net_status=ns_none)and(g_Status<=MaxPlayers)then
-       if(_menu)
+       if(MainMenu)
        then g_Status:=HPlayer
        else g_Status:=gs_running;
    end;

@@ -51,7 +51,7 @@ var i,n:integer;
 begin
    sdl_FillRect(r_screen,nil,0);
 
-   if(_menu)
+   if(MainMenu)
    then d_Menu
    else d_Game;
 

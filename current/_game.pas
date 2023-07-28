@@ -322,7 +322,7 @@ begin
     if(PlayersReadyStatus)then
     begin
        G_Started:=true;
-       _menu    :=false;
+       MainMenu    :=false;
        if(menu_s2<>ms2_camp)
        then GameStartSkirmish
        else ;//_CMPMap;

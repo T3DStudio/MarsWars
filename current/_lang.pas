@@ -790,7 +790,7 @@ begin
    str_TargetLimit       := 'target limit';
    str_NextTrack         := 'Play next track';
    str_PlayerPaused      := 'player paused the game';
-   str_PlayerResumed     := 'Player has resumed the game';
+   str_PlayerResumed     := 'player has resumed the game';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1713,6 +1713,7 @@ begin
         writeln(f,'Base transport capacity: ',_transportM );
 
         if(_zombie_uid>0)then
+        if(_zombie_hits>0)or(_fastdeath_hits<0)then
         begin
         writeln(f,'Zombie: ',_uids[_zombie_uid].un_txt_name );
         writeln(f,'Zombification hits: ',_zombie_hits);

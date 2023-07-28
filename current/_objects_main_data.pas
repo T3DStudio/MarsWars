@@ -696,21 +696,22 @@ end;
 UID_ZFPlasmagunner:
 begin
    _mhits     := 1000;
-   _renergy   := 200;
+   _renergy   := 250;
    _r         := 12;
    _speed     := 14;
    _srange    := 225;
    _ucl       := 21;
    _painc     := 5;
-   _btime     := ptime1;
+   _btime     := ptime1hh;
    _attack    := atm_always;
-   _uklight   := true;
+   _limituse  := ul1h;
+   _uklight   := false;
    _ukfly     := true;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 2;
    _ruid2     := UID_HACommandCenter;
-   _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd4,MID_BPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,4,dm_AntiUnitMech);
+   _fastdeath_hits:=1;
+   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd4,MID_BPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,2,dm_AntiUnitMech);
 end;
 UID_ZBFGMarine:
 begin
@@ -1074,19 +1075,20 @@ end;
 UID_FPlasmagunner:
 begin
    _mhits     := 1000;
-   _renergy   := 200;
+   _renergy   := 250;
    _r         := 12;
    _speed     := 14;
    _srange    := 225;
    _ucl       := 5;
-   _btime     := ptime1;
+   _btime     := ptime1hh;
    _attack    := atm_always;
    _zombie_uid:= UID_ZFPlasmagunner;
-   _uklight   := true;
+   _uklight   := false;
+   _limituse  := ul1h;
    _ukfly     := true;
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=1;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_BPlasma,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,4,dm_AntiUnitMech);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_BPlasma,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,2,dm_AntiUnitMech);
 end;
 UID_BFGMarine:
 begin

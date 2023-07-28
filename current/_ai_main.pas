@@ -199,6 +199,7 @@ begin
        if(ai_towers_needx>-1)
        then ddir:=point_dir(x,y,ai_towers_needx,ai_towers_needy)+_randomr(45)
        else ddir:=-1;
+       l:=ai_towers_needl;
     end;
 end;
 begin
@@ -622,7 +623,7 @@ UID_HTower,
 UID_HTotem,
 UID_UGTurret,
 UID_UATurret       : if(ai_towers_cur_active>ai_mincount_towers)and(not ai_checkCPNear(50))then
-                      if(aiu_alarm_d<base_1rh)or(aiu_alarm_timer=0)
+                      if(aiu_alarm_d<base_1rh)or(aiu_alarm_timer=0)or(ai_nearest_builder_d<base_1rh)
                       then aiu_alarm_timer:=ai_TowerLifeTime
                       else
                         if(aiu_alarm_timer<0)
@@ -694,7 +695,7 @@ begin
       ai_spec1_cur     :=uid_e[aiucl_spec1 [race]];
       ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
 
-      //if(sel)then writeln(ai_transport_cur,' ',ai_transport_need);
+
 
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;
 
@@ -716,13 +717,22 @@ begin
 
       if(_N(@ai_towers_need  ,ai_maxcount_towers))then
       begin
-         ai_towers_need:=0;
+         if(g_generators>0)then
+         begin
+            ai_towers_need :=min2(ucl_c[false],ai_maxcount_towers);
+            ai_towers_needx:=random(map_mw);
+            ai_towers_needy:=random(map_mw);
+            ai_towers_needl:=srange;
+         end
+         else ai_towers_need:=0;
+
          if(ai_enemy_d<base_4r)then
          begin
             ai_towers_need     :=mm3(ai_mincount_towers,(aiu_limitaround_enemy-aiu_limitaround_ally+MinUnitLimit) div MinUnitLimit,ai_maxcount_towers);
             ai_towers_needx    :=ai_enemy_u^.x;
             ai_towers_needy    :=ai_enemy_u^.y;
             ai_towers_need_type:=0;
+            ai_towers_needl    :=-1;
             if(ai_limitaround_enemy_fly<=0)and(ai_limitaround_enemy_grd>0)
             then ai_towers_need_type:=-1
             else
@@ -736,6 +746,7 @@ begin
             ai_towers_needx    :=ai_cpoint_cp^.cpx;
             ai_towers_needy    :=ai_cpoint_cp^.cpy;
             ai_towers_need_type:=0;
+            ai_towers_needl    :=-1;
          end
          else
          if(ai_cpoint_d<srange)then
@@ -744,12 +755,14 @@ begin
             ai_towers_needx    :=ai_cpoint_cp^.cpx;
             ai_towers_needy    :=ai_cpoint_cp^.cpy;
             ai_towers_need_type:=0;
+            ai_towers_needl    :=-1;
          end
          else
          if(ai_choosen)and(g_mode=gm_royale)and(u_royal_cd<base_2r)then
          begin
             ai_towers_need:=ai_maxcount_towers;
             ai_towers_need_type:=0;
+            ai_towers_needl    :=-1;
          end;
       end;
 
@@ -881,7 +894,7 @@ begin
      begin
         pu^.uo_x:=x;
         pu^.uo_y:=y;
-        td:=point_dist_int(pu^.x,pu^.y,x,y)-pu^.uid^._r-uid^._r;
+        td:=point_dist_int(pu^.x,pu^.y,x,y);
         ai_TryTeleportF:=true;
         if(td<uid^._r)then
           if(target<>nil)then
@@ -1544,7 +1557,7 @@ uab_UACScan          : begin
                             end;
                           if(ai_alarm_d=NOTSET)and(g_mode<>gm_invasion)then
                            if(ai_choosen)or(ai_ReadyForAttack)then
-                            if(_unit_ability_uradar(pu,random(map_mw),random(map_mw)))then ai_detection_pause:=fr_fps1;
+                            if(_unit_ability_uradar(pu,_random(map_mw),_random(map_mw)))then ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then
                          if(_unit_ability_HellVision(pu,ai_need_heye_u^.unum))then ai_detection_pause:=fr_fps1;

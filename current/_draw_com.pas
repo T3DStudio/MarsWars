@@ -181,7 +181,7 @@ begin
    map_MinimapCPoints;
    _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
-   vid_menu_redraw:=vid_menu_redraw or _menu;
+   vid_menu_redraw:=vid_menu_redraw or MainMenu;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);

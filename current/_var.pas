@@ -178,7 +178,7 @@ r_draw            : boolean = true;
 
 vid_menu_redraw   : boolean  = true;
 
-_menu             : boolean = true;
+MainMenu             : boolean = true;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_scir;

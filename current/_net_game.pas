@@ -395,7 +395,7 @@ nmid_game_started: begin
                    end;
 nmid_notconnected: begin
                       G_Started:=false;
-                      _menu:=true;
+                      MainMenu:=true;
                       PlayerReady:=false;
                       GameDefaultAll;
                    end;
@@ -430,14 +430,14 @@ nmid_lobby_info  : begin
                          G_Started:=gst;
                          if(G_Started)then
                          begin
-                            _menu:=false;
+                            MainMenu:=false;
                             ServerSide:=false;
                             MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
                             if(_players[HPlayer].team=0)then ui_tab:=3;
                          end
                          else
                          begin
-                            _menu:=true;
+                            MainMenu:=true;
                             PlayerReady:=false;
                             GameDefaultAll;
                          end;

@@ -293,7 +293,7 @@ begin
 
    close(f);
 
-   if(_menu)
+   if(MainMenu)
    then ToggleMenu;
 
    saveload_MakeFolderList;
@@ -383,7 +383,7 @@ begin
 
          G_Started:=true;
 
-         if(_menu)
+         if(MainMenu)
          then ToggleMenu;
       end;
       close(f);

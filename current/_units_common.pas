@@ -793,9 +793,15 @@ begin
    }
    obstacles:=true;
    if(playern<=MaxPlayers)then
-    with _uids[buid] do
-     with _players[playern] do
-      obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+   begin
+      with _uids[buid] do
+       with _players[playern] do
+        obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+
+      if(obstacles)and(_players[playern].state=ps_comp)then
+        if(pf_IfObstacleZone(pf_get_area(tx,ty)))then begin _CheckBuildPlace:=2;exit;end;
+   end;
+
 
    i:=_InBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of

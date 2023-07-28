@@ -1,7 +1,7 @@
 
 procedure _unit_minimap(pu:PTUnit);
 begin
-   if(vid_blink_timer1=0)and(_menu=false)and(r_draw)then
+   if(vid_blink_timer1=0)and(MainMenu=false)and(r_draw)then
     with pu^  do
     with uid^ do
     begin

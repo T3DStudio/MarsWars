@@ -436,7 +436,7 @@ begin
          CamBounds;
          ui_tab    :=3;
          G_Started :=true;
-         _menu     :=false;
+         MainMenu     :=false;
          ServerSide:=false;
       end;
    end;

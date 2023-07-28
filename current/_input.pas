@@ -39,7 +39,7 @@ end;
 procedure input_key_return;
 var HPlayerAllies: byte;
 begin
-   if(_menu=false)and(ingame_chat=0)and(net_status>ns_none)then
+   if(MainMenu=false)and(ingame_chat=0)and(net_status>ns_none)then
    begin
       HPlayerAllies:=PlayerAllies(HPlayer,false);
       if(HPlayerAllies>0)
@@ -59,7 +59,7 @@ begin
    else
     if(menu_item=100)or(ingame_chat>0)then
     begin
-       if(_menu)then
+       if(MainMenu)then
        begin
           ingame_chat :=chat_all;
           net_chat_tar:=255;
@@ -679,7 +679,7 @@ begin
    while (SDL_PollEvent(_event)>0) do
     case (_event^.type_) of
       SDL_MOUSEMOTION    : begin
-                              if(m_vmove)and(_menu=false)and(G_Started)then
+                              if(m_vmove)and(MainMenu=false)and(G_Started)then
                               begin
                                  vid_cam_x-=_event^.motion.x-mouse_x;
                                  vid_cam_y-=_event^.motion.y-mouse_y;
@@ -701,10 +701,10 @@ begin
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
-                                                   if(_menu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
+                                                   if(MainMenu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
                                                    if(ks_mmiddle=0)then ks_mmiddle:=1;
                                                    end;
-                            SDL_BUTTON_WHEELDOWN : if(_menu)then
+                            SDL_BUTTON_WHEELDOWN : if(MainMenu)then
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
@@ -714,7 +714,7 @@ begin
                                                       end;
                                                    end
                                                    else tmpmid-=1;
-                            SDL_BUTTON_WHEELUP   : if(_menu)then
+                            SDL_BUTTON_WHEELUP   : if(MainMenu)then
                                                    begin
                                                       vid_menu_redraw:=true;
                                                       case menu_item of
@@ -763,7 +763,7 @@ begin
                                 sdlk_escape : input_key_escape;
                                 sdlk_return : input_key_return;
                               else
-                                if(_menu=false)and(G_Started)and(ingame_chat=0)then _hotkeys(_event^.key.keysym.sym);
+                                if(MainMenu=false)and(G_Started)and(ingame_chat=0)then _hotkeys(_event^.key.keysym.sym);
                               end;
                            end;
     else
@@ -933,7 +933,7 @@ procedure InputGame;
 begin
    WindowEvents;
 
-   if(_menu)
+   if(MainMenu)
    then g_menu
    else
    begin

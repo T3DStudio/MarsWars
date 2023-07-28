@@ -307,7 +307,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 280
-Build time: 56
+Build time: 84
 Energy required: 900
 Base transport capacity: 30
 
@@ -332,7 +332,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 280
-Build time: 56
+Build time: 126
 Energy required: 600
 Base transport capacity: 30
 
@@ -940,19 +940,19 @@ Upgrades:
 Zombie Plasmaguner
 
 Hotkey: Ctrl+V
-Categories/Attributes: [T2,unit,biological,light,flying]
+Categories/Attributes: [T2,unit,biological,heavy,flying]
 Max hits: 1000
-Limit used: 1
+Limit used: 1.5
 Size: 12
 Base movement speed: 14
 Base vision range: 225
-Build time: 28
-Energy required: 200
+Build time: 35
+Energy required: 250
 PainState base threshold: 5
 Requirements: Zombie Barracks(x2),Advanced Hell Command Center
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive], impact 62*1, upgrade: Demon`s Weapons(+8), factor: x1.5 [unit,mechanical];
+- ranged attack, max. range: vision range, targets: [alive], impact 62*2, upgrade: Demon`s Weapons(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +8;
@@ -1486,20 +1486,18 @@ Upgrades:
 Plasmaguner
 
 Hotkey: H
-Categories/Attributes: [T1,unit,biological,light,flying]
+Categories/Attributes: [T1,unit,biological,heavy,flying]
 Max hits: 1000
-Limit used: 1
+Limit used: 1.5
 Size: 12
 Base movement speed: 14
 Base vision range: 225
-Build time: 28
-Energy required: 200
-Zombie: Zombie Plasmaguner
-Zombification hits: 0
+Build time: 35
+Energy required: 250
 Requirements: Weapon Factory
 Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical];
+- ranged attack, max. range: vision range, targets: [alive], impact 62*2, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +8;

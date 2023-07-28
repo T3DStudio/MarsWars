@@ -18,6 +18,7 @@ Other:
 - fixed framerate control code, now the game loop is exactly 60 fps;
 - added 'observer' player role;
 - shift+enter/ctrl+enter hotkeys for all/allies chat(starcraft style);
+- new music;
 
 Interface:
 - ui messages log about game events ("Construction complete", "Need more energy", etc.);
@@ -58,7 +59,7 @@ Units and balance:
 -- production buildings can now be advanced; an advanced version can create/research two units/upgrades at the same time; a special technology building is required for advancement;
 - main buildings and generators can also be advanced - an advanced version of a building gives x2 energy, but other characteristics do not change; advancing these buildings does not require any technology;
 -- rebuilding/advacement time is increased if the original building/unit has been damaged; the rebuilding/advancing process CANNOT be undone;
--- detection of invisible units no longer requires any  upgrade;
+-- detection of invisible units no longer requires any upgrade;
 -- the "soaring" unit type has been removed from the game - now units are strictly either ground or air;
 --- some ground units, under certain conditions, can move above the map doodads and have the attribute "floating";
 -- change unit categories -- each unit necessarily has one of the following 4 pairs of attributes: unit/building, biological/mechanical, light/heavy, ground/air;
@@ -87,13 +88,13 @@ Units and balance:
 - UAC
 
 -- BUILDINGS:
---- Command Center - reduced flight speed; can be upgraded to Advanced Command Center, which gives x2 energy, all other things being equal; Advanced Command Center is needed to create air units and research some upgrades;
+--- Command Center - reduced flight speed; can be upgraded to Advanced Command Center, which gives x2 energy, all other things being equal; Advanced Command Center is needed to research some upgrades;
 --- Barrack - formerly Military Unit - now a classic barrack, producing only infantry (biological) units;
---- Factory - a new production building for all vehicles;
+--- Factory - a new production building for vehicles;
 --- Weapon Factory - unchanged, as before - the only upgrade production building; also opens up access to some T1 units;
 ---- all 3 production buildings can be advanced once; advanced version has different sprites and can produce 2 units/upgrades at a time; energy advance costs the same as building a new building, but is 1/4 faster in time and requires a Computer Station;
 --- Generator - now takes 2 limits; can be rebuilt into an advanced version, giving x2 energy, other things being equal;
---- Static defense: two turrets with narrow specialization - against ground and air units; anti-ground initially shoots as Commando (effective against light+biological), but after special upgrade gets Plasmagan as second weapon against mechanical units; turrets can be rebuilt into each other for the same energy cost and in quarter less time;
+--- Static defense: two turrets with narrow specialization - against ground and air units; anti-ground initially shoots as Commando (effective against light+biological), but after special upgrade gets Plasmagun as second weapon against mechanical units; turrets can be rebuilt into each other for the same energy cost and in quarter less time;
 --- Science Center - now just a "tech" building - gives access to T2 units and upgrades for them; building sprites changed;
 --- Computer Station - new, another "tech" building; gives access to T2 buildings and upgrades for them; allows you to advance production buildings;
 ---- both technological buildings can be only 1 instance;
@@ -104,14 +105,14 @@ Units and balance:
 These are just the major changes, for more information on each unit - see the PDF document or in-game hints;
 --- mines removed from the game;
 --- APC removed from the game;
---- multiple medics/engineers can no longer heal/repair a single target;
+--- multiple medics/engineers can no longer heal/repair the same target;
 ---- but can now heal/repair while the target is taking damage;
 --- Medics and Engineers no longer have a paralyzing attack;
 --- new infantry type added - antiaircrafter, specialized ground antiaircraft;
---- half of infantry now has the attribute heavy;
+--- half of infantry now has the attribute [heavy];
 --- Plasmagainer is now initially flying and it will not be possible to lower it to the ground; now it attacks both flying and ground targets;
 --- added a new mechanical anti-mech - UAC Dron - attacks similarly to the plasmagainer, but only on the ground; has two unique, researched abilities: one gives the ability to move around the map doodads, the second allows it to rebuild itself into an anti-ground turret;
---- BFG-Marine now has a unique damage modifier: the damage is multiplied by the unit's occupation limit;
+--- BFG-Marine now has a unique damage modifier: the damage is multiplied by the used limit of the unit;
 
 - HELL
 -- BUILDINGS:
@@ -128,15 +129,18 @@ These are just the major changes, for more information on each unit - see the PD
 --- Evil Eye is now built as a normal building; is originally a detector; at health greater than 1/4 has permanent invisibility, including during construction (visible only the first 7 seconds after construction began); it can be created not only around Hell Keep, but also around other Evil Eye, thus stretching exploration of the map; has a special upgrade, which increases the radius of view; has the ability: can give any his or allied unit to be a detector for 8 seconds, itself, in this case, dies;
 
 -- UNITS
---- Lost Soul can no longer be built as a separate unit in Demon`s Gate (but can be built in a cursed UAC barracks); is now originally an air unit, but when attacking ground enemies it temporarily becomes a ground unit; no longer has the ability to turn into Evil Eye;
---- new unit: Phantom (Lost Soul from the alpha version of DOOM, Pain Elemental begins to produce it after a special upgrade; also Phantom can be built in the cursed barracks UAC) can curse barracks and CC UAC, as well as raise to take over the corpses of infantry raising them as zombies; a cursed CC is also a builder (with a limited set of buildings and a cursed barracks instead of Demon`s Gate) and is originally able to fly and attack; aside from the ability to zombify corpses of infantry and curse buildings, as well as the greater cost in time and energy, Phantom is no different from Lost Soul, so it makes no sense to upgrade to it in Hell vs Hell;
+--- Lost Soul can no longer be built as a separate unit in Demon`s Gate (but can be built in a cursed UAC barracks); is now originally an air unit, but when attacking ground enemies it temporarily becomes a ground unit; no longer has the ability to turn into Evil Eye; there is a limit on the maximum number per player - 20;
+--- new unit: Phantom (Lost Soul from the alpha version of DOOM, Pain Elemental begins to produce it after a special upgrade; also Phantom can be built in the zombie barracks) can curse barracks and CC UAC, as well as raise to take over the corpses of infantry raising them as zombies; a cursed CC is also a builder (with a limited set of buildings and a cursed barracks instead of Demon`s Gate) and is originally able to fly and attack; aside from the ability to zombify corpses of infantry and curse buildings, as well as the greater cost in time and energy, Phantom is no different from Lost Soul, so it makes no sense to upgrade to it in Hell vs Hell; there is a limit on the maximum number per player - 20;
+--- Demon - increased movement and attack speed; added a unique upgrade that allows the demon to run across the map decorations; movement speed on decorations is halved;
 --- Cyberdemon, Mastermind and Arachnotron are now mechs;
 --- Cyberdemon and Mastermind are no longer limited (but now they take up a lot of limit);
 --- Arachnotron is now an anti-mech;
 --- Revenant is now anti-air;
 --- Arch-Vile: unit resurrection ability investigated by separate upgrade and has a 3 second cooldown; can now resurrect allied monsters; resurrected monster has 1/2 health; has the game's largest single damage - 8 "standard DPS" every 2 seconds;
 
-
+Known bugs:
+- while watching a replay (and less often - in multiplayer game) sometimes you can see projectiles flying across the map from shooting visible units - a visual defect of the architecture of the client part of the game;
+- in multiplayer game, if you set "units update rate" to the maximum value, some units can stop updating (units will just stand still and do not change their state); cured by reducing the value of this setting; most likely, the game generates very large packets that can not pass through the network, in future versions I will try to study this problem;
 
 49.1:
 - Fixed bugs: 

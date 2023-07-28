@@ -12,7 +12,7 @@ var slatemp : PTVisSpr;
 function SpriteListAdd:PTVisSpr;
 begin
    SpriteListAdd:=nil;
-   if(vid_vsls<vid_mvs)and(_menu=false)then
+   if(vid_vsls<vid_mvs)and(MainMenu=false)then
    begin
       vid_vsls+=1;
       SpriteListAdd:=vid_vsl[vid_vsls];

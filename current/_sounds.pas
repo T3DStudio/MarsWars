@@ -326,7 +326,7 @@ function SoundPlayUnit(ss:PTSoundSet;pu:PTUnit;visdata:pboolean):boolean;
 begin
    SoundPlayUnit:=false;
    if(ss=nil)
-   or(_menu)
+   or(MainMenu)
    or(r_draw=false)then exit;
 
    if(visdata<>nil)then
@@ -352,7 +352,7 @@ end;
 procedure SoundPlayAnoncer(ss:PTSoundSet;checkpause,stopother:boolean);
 begin
    if(ss=nil)
-   or(_menu)
+   or(MainMenu)
    or(r_draw=false)then exit;
 
    if(checkpause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
@@ -367,7 +367,7 @@ end;
 procedure SoundPlayMMapAlarm(ss:PTSoundSet;checkpause:boolean);
 begin
    if(ss=nil)
-   or(_menu)
+   or(MainMenu)
    or(r_draw=false)then exit;
 
    if(checkpause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
@@ -381,7 +381,7 @@ end;
 procedure SoundPlayUnitCommand(ss:PTSoundSet);
 begin
    if(ss=nil)
-   or(_menu)
+   or(MainMenu)
    or(r_draw=false)then exit;
 
    if(snd_command_last=ss)and(snd_command_ticks>0)then exit;
@@ -487,7 +487,7 @@ begin
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 
-   if(G_Started)and(G_status=0)and(not _menu)
+   if(G_Started)and(G_status=0)and(not MainMenu)
    then SoundPlayUnitSelect;
 end;
 

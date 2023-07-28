@@ -964,8 +964,8 @@ var tt:PTUnit;
 begin
    // pu - target
    // tu - teleporter
-   // td = dist2(pu,tu)-pu.r-tu.r
-   if(td=NOTSET)then td:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y)-pu^.uid^._r-tu^.uid^._r;
+   // td = dist2(pu,tu)
+   if(td=NOTSET)then td:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
    _ability_teleport:=false;
    with pu^  do
     with uid^ do
@@ -1186,7 +1186,7 @@ uab_Teleport     : if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit;
          end;
 
          case tu^.uid^._ability of
-uab_Teleport     : if(_ability_teleport    (pu,tu,td))then exit;//team
+uab_Teleport     : if(_ability_teleport(pu,tu,td))then exit;//team
          end;
 
          w:=_unit_target2weapon(pu,tu,td,255,@a);
