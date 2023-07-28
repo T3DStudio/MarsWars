@@ -1037,6 +1037,7 @@ begin
 
    with uu^ do
    begin
+      cycle_order:=unum mod order_period;
       playeri:=(unum-1) div MaxPlayerUnits;
       player :=@_players[playeri];
       if(not DEAD)

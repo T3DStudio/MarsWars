@@ -422,10 +422,7 @@ begin
             if(buff[ub_Invis ]>0 )then alpha:=128;
 
             if(buff[ub_Invuln]>fr_fpsd6)
-            then ColorAura:=c_awhite
-            else
-              if(playeri=0)and(not _ukbuilding)then
-               if(g_mode in [gm_invasion])then ColorAura:=c_ablack;
+            then ColorAura:=c_awhite;
 
             if(un_eid_summon_spr[level]<>nil)then
              if(buff[ub_Summoned]>0)then

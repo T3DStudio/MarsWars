@@ -533,6 +533,10 @@ SDLK_F3        : nullupgr(HPlayer);
 {SDLK_F4        : with _players[Hplayer] do
                   if(_IsUnitRange(ai_scout_u_cur,nil))then
                    with _units[ai_scout_u_cur] do MoveCamToPoint(x,y); }
+SDLK_F4        : if(g_mode=gm_invasion)then
+                   if(ks_ctrl>0)
+                   then PlayerKill(0,true)
+                   else GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));
 SDLK_F5        : HPlayer:=0;
 SDLK_F6        : HPlayer:=1;
 SDLK_F7        : HPlayer:=2;

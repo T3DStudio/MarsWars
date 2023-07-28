@@ -68,12 +68,12 @@ PS_Play: begin ready:=false;name :='';                ttl:=0;end;
    end;
 end;
 
-procedure PlayerKill(pl:byte);
+procedure PlayerKill(pl:byte;instant:boolean);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
-     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],false,true,false,true,true);
+     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],instant,true,false,true,true);
 end;
 
 procedure PlayersSetDefault;
@@ -509,8 +509,6 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
-   //exit;
-
    if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
 
    wteam_last:=255;
@@ -528,6 +526,14 @@ begin
     end;
 
    if(wteams_n=1)then GameSetStatusWinnerTeam(wteam_last);
+end;
+
+procedure DefaultDefeatConditions;
+var i:byte;
+begin
+   for i:=1 to MaxPlayers do
+     if(_players[i].army>0)then exit;
+   GameSetStatusWinnerTeam(0);
 end;
 
 procedure PlayersCycle;
@@ -637,14 +643,17 @@ begin
 
          GameModeCPoints;
          case g_mode of
-         gm_invasion  : GameModeInvasion;
+         gm_invasion  : begin
+                        GameModeInvasion;
+                        DefaultDefeatConditions;
+                        end;
          gm_royale    : begin
                            if(_cycle_order=0)then
                              if(g_royal_r>0)then g_royal_r-=1;
                            GameDefaultEndConditions;
                         end;
          gm_capture,
-         gm_KotH      : ;
+         gm_KotH      : DefaultDefeatConditions;
          else           GameDefaultEndConditions;
          end;
       end;

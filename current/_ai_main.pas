@@ -526,6 +526,7 @@ r_hell: begin
         MakeUpgr(upgr_hell_buildr    ,2);
         MakeUpgr(upgr_hell_spectre   ,1);
         MakeUpgr(upgr_hell_ghostm    ,1);
+        MakeUpgr(upgr_hell_paina     ,1);
 
         if(ai_maxcount_upgrlvl>0)then
         for i:=1 to ai_maxcount_upgrlvl do
@@ -557,8 +558,10 @@ r_uac : begin
         MakeUpgr(upgr_uac_buildr     ,2);
         MakeUpgr(upgr_uac_commando   ,1);
         MakeUpgr(upgr_uac_soaring    ,1);
+        MakeUpgr(upgr_uac_ccturr     ,1);
         MakeUpgr(upgr_uac_botturret  ,1);
         MakeUpgr(upgr_uac_lturret    ,1);
+
         if(ai_maxcount_upgrlvl>0)then
         for i:=1 to ai_maxcount_upgrlvl do
         begin

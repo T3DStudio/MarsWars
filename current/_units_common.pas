@@ -1555,7 +1555,8 @@ begin
    scan_buff:=255;
    with uu^ do
    begin
-      if(tu^.player^.observer)or(tu^.player^.upgr[upgr_fog_vision]>0)
+      if(tu^.player^.observer)
+      or((tu^.player^.upgr[upgr_fog_vision]>0)and(tu^.buff[ub_detect]<=0))
       then td:=0
       else
         if(tu^.uid^._ability=uab_UACScan)and(tu^.rld>radar_vision_time)then
@@ -1810,8 +1811,13 @@ UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);tra
       if(playeri=0)and(g_mode=gm_invasion)then
       begin
          ukfloater:=true;
-         if(cycle_order<4)then buff[ub_HVision]:=_ub_infinity;
-         if(cycle_order<2)and(g_inv_wave_n>3)then buff[ub_Invis]:=_ub_infinity;
+         if(cycle_order<4 )
+         or(cycle_order=11)
+         or(cycle_order=21)then buff[ub_HVision]:=_ub_infinity else buff[ub_HVision]:=0;
+         if(g_inv_wave_n>3)then
+           if(cycle_order<2 )
+           or(cycle_order=10)
+           or(cycle_order=20)then buff[ub_Invis]:=_ub_infinity else buff[ub_Invis]:=0;
       end;
 
 

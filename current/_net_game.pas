@@ -202,7 +202,7 @@ nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
                       if(G_Started=false)
                       then PlayerSetState(pid,ps_none)
-                      else PlayerKill(pid);
+                      else PlayerKill(pid,false);
                       {$IFNDEF _FULLGAME}
                       screen_redraw:=true;
                       {$ENDIF}
