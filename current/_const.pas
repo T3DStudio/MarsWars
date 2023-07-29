@@ -1478,7 +1478,7 @@ str_deadobservers        : shortstring = 'Observer mode after lose: ';
 str_starta               : shortstring = 'Builders at game start:   ';
 str_plname               : shortstring = 'Player name';
 str_PlayerPaused         : shortstring = 'player paused the game';
-str_PlayerResumed        : shortstring = 'Player has resumed the game';
+str_PlayerResumed        : shortstring = 'player has resumed the game';
 str_plout                : shortstring = ' left the game';
 //str_player_def           : shortstring = ' was terminated!';
 

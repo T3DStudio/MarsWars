@@ -1117,7 +1117,7 @@ begin
      if(RectInCam(vx,vy,_r,_r,0))then
      begin
         if(UIPlayer=0)then
-          if(rpls_state>=rpls_state_read)or(_players[HPlayer].observer)then
+          if(rpls_state=rpls_state_read)or(_players[HPlayer].observer)then
           begin
              CheckUnitUIVisionScreen:=true;
              exit;

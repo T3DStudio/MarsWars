@@ -625,18 +625,22 @@ begin
    // pu - previous state
    // uu - current state
    pu:=@_units[0];
-   vis:=CheckUnitUIVisionScreen(uu);
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
         _unit_default(uu,true);
-        _unit_reveal(uu,true);
-
-        if(_IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
-
+        _unit_reveal (uu,true);
         vx:=x;
         vy:=y;
+        vis:=CheckUnitUIVisionScreen(uu);
+
+        if(_IsUnitRange(transport,@tu))then
+        begin
+           _unit_InTransportCode(uu,tu);
+           vx:=x;
+           vy:=y;
+        end;
 
         _unit_upgr(uu);
 
@@ -667,6 +671,8 @@ begin
 
           vx:=x;
           vy:=y;
+          vis:=CheckUnitUIVisionScreen(uu);
+
           if(pu^.hits>0)and(vis)then
           begin
              if(hits>ndead_hits)and(transport=0)then
@@ -696,6 +702,7 @@ begin
                _missiles_clear_tar(unum);
                _unit_clear_a_tar(unum);
             end;
+            vis:=CheckUnitUIVisionScreen(uu);
 
             _unit_upgr(pu);
             _ucDec(pu);

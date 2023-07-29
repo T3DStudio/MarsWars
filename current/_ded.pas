@@ -160,11 +160,34 @@ begin
 '-st'    : if(a=2)then       g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb );
 '-fs'    : if(a=2)then       g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai  );
 '-r'     : begin
-              g_start_base :=random(gms_g_startb+1);
-              g_generators :=random(gms_g_maxgens+1);
+              Map_randommap;
+
+              g_mode      :=gm_scirmish;
+              g_start_base:=random(gms_g_startb+1);
+              g_generators:=random(gms_g_maxgens+1);
               if(random(3)=0)
               then g_ai_slots:=0
               else g_ai_slots:=random(player_default_ai_level+1);
+
+              for l:=1 to MaxPlayers do
+               with _players[l] do
+                if(state<>ps_play)then
+                begin
+                   race :=random(r_cnt+1);
+                   mrace:=race;
+
+                   if(l=4)
+                   then team:=1+random(4)
+                   else team:=2+random(3);
+
+                   ai_skill:=random(6)+2;
+
+                   if(random(2)=0)
+                   then PlayerSetState(l,ps_none)
+                   else PlayerSetState(l,ps_comp);
+                end;
+
+              Map_premap;
            end;
    else exit;
    end;

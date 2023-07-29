@@ -338,8 +338,8 @@ begin
 
    Map_randommap;
 
-   g_mode       :=gm_scirmish;
-   g_start_base :=random(gms_g_startb+1);
+   g_mode      :=gm_scirmish;
+   g_start_base:=random(gms_g_startb+1);
    g_generators:=random(gms_g_maxgens+1);
 
    PlayersSwap(1,HPlayer);
