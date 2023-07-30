@@ -659,7 +659,7 @@ begin
            end;
         end;
 
-        _missiles_clear_tar(unum);
+        _missiles_clear_tar(unum,true);
         _unit_clear_a_tar(unum);
 
         _ucInc(uu);
@@ -687,7 +687,7 @@ begin
 
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
-          _missiles_clear_tar(unum);
+          _missiles_clear_tar(unum,true);
           _unit_clear_a_tar(unum);
 
           _ucDec(pu);
@@ -699,7 +699,7 @@ begin
             begin
                vx:=x;
                vy:=y;
-               _missiles_clear_tar(unum);
+               _missiles_clear_tar(unum,true);
                _unit_clear_a_tar(unum);
             end;
             vis:=CheckUnitUIVisionScreen(uu);
@@ -789,7 +789,7 @@ begin
                end
                else
                begin
-                  _missiles_clear_tar(unum);
+                  _missiles_clear_tar(unum,true);
                   _unit_clear_a_tar(unum);
                end;
             end;

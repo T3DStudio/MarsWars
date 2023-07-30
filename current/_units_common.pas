@@ -336,12 +336,21 @@ begin
      with _punits[u]^ do
        if(uo_tar=tar)then uo_tar:=0;
 end;
-procedure _missiles_clear_tar(u:integer);
+procedure _missiles_clear_tar(u:integer;ResetTarget:boolean);
 var i:integer;
 begin
    for i:=1 to MaxUnits do
     with _missiles[i] do
-     if(vstep>0)and(tar=u)then tar:=0;
+     if(vstep>0)and(tar=u)then
+     begin
+        tar:=0;
+        if(ResetTarget)then
+        begin
+           x:=vx;
+           y:=vy;
+           vstep:=1;
+        end;
+     end;
 end;
 
 procedure _teleport_CalcReload(tu:PTUnit;limit:integer);
@@ -365,7 +374,7 @@ begin
       _unit_SetXY(pu,tx,ty,mvxy_strict);
       _unit_clear_order(pu,false);
       _unit_clear_tar(unum);
-      _missiles_clear_tar(unum);
+      _missiles_clear_tar(unum,false);
       _unit_UpVision(pu);
    end;
 end;
@@ -1674,7 +1683,7 @@ begin
          end
          else tu^.transport:=0;
       end;
-      _missiles_clear_tar(unum);
+      _missiles_clear_tar(unum,false);
 
       if(instant)then
       begin

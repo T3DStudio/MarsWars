@@ -605,18 +605,19 @@ UID_HASymbol,
 UID_UGenerator,
 UID_UAGenerator   : if(cenergy>_genergy)and(armylimit>ai_GeneratorsDestoryLimit)and(menergy>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
       else
-        if(_isbarrack)or(_issmith)then
-         if(ai_isnoprod(pu))then
-         begin
-            i:=level+1;
+        if(uid_e[uidi]>1)then
+         if(_isbarrack)or(_issmith)then
+          if(ai_isnoprod(pu))then
+          begin
+             i:=level+1;
 
-            if(_isbarrack)and(ai_unitp_cur>2)then
-             if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
-              if((ai_unitp_cur-i-4)>=ai_unitp_need)then exit;
-            if(_issmith  )and(ai_upgrp_cur>1)then
-             if(ai_upgrp_cur_na<=0)or((level=0)and(ai_upgrp_cur_na>0))then
-              if((ai_upgrp_cur-i-2)>=ai_upgrp_need)then exit;
-         end;
+             if(_isbarrack)and(ai_unitp_cur>2)then
+              if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
+               if((ai_unitp_cur-i-4)>=ai_unitp_need)then exit;
+             if(_issmith  )and(ai_upgrp_cur>1)then
+              if(ai_upgrp_cur_na<=0)or((level=0)and(ai_upgrp_cur_na>0))then
+               if((ai_upgrp_cur-i-2)>=ai_upgrp_need)then exit;
+          end;
       end;
 
       if(ai_PhantomWantZombieMe)and(iscomplete)and(hits<=(_zombie_hits+BaseDamage4))then exit;
