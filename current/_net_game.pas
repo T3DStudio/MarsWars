@@ -47,7 +47,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      if(length(name)>NameLen)then setlength(name,NameLen);
+      name   :=ValidateStr(name,NameLen,@k_kbstr);
       if(oldname<>name)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       i:=net_readbyte;
@@ -96,10 +96,9 @@ begin
    net_writebyte(HPlayer     );
 
    net_writeint (map_mw      );
-   net_writebyte(map_liq     );
-   net_writebyte(map_obs     );
+   net_writebyte(map_type    );
    net_writecard(map_seed    );
-   net_writebool(map_symmetry);
+   net_writebyte(map_symmetry);
 
    net_writebyte(g_mode           );
    net_writebyte(g_start_base     );
@@ -141,9 +140,8 @@ begin
       begin
          net_clearbuffer;
          net_writebyte(nmid_getinfo);
-         net_writebyte(ver);
+         net_writebyte(version  );
          net_writebool(g_started);
-         net_writebool(g_addon  );
          net_writebyte(g_mode   );
          for i:=1 to MaxPlayers do
           with _players[i] do
@@ -157,7 +155,7 @@ begin
       if(mid=nmid_connect)then
       begin
          i:=net_readbyte;
-         if(i<>ver)then
+         if(i<>version)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_wrong_ver);
@@ -293,6 +291,23 @@ nmid_pause       : begin
 
    net_period+=1;
    net_period:=net_period mod fr_fpsd2;
+
+   if(net_localAdv)and(not G_Started)then
+     if(net_localAdv_timer<=0)then
+     begin
+        net_localAdv_timer:=net_localAdv_time;
+        net_clearbuffer;
+        net_writebyte(nmid_localadv);
+        net_writebyte(version);
+        net_writebyte(g_mode);
+        for i:=1 to MaxPlayers do
+          with _players[i] do
+            if(state=ps_none)
+            then net_writestring('')
+            else net_writestring(name);
+        net_send(net_localAdv_ip,net_svlsearch_portS);
+     end
+     else net_localAdv_timer-=1;
 end;
 
 {$IFDEF _FULLGAME}
@@ -312,10 +327,9 @@ begin
    new_map    :=false;
 
    if(_rmInt (@map_mw           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@map_liq          ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@map_obs          ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_type         ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmCard(@map_seed         ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmBool(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_mode           ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
@@ -342,7 +356,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      if(length(name)>NameLen)then setlength(name,NameLen);
+      name   :=ValidateStr(name,NameLen,@k_kbstr);
       if(oldname<>name)then vid_menu_redraw:=true;
 
       i      :=team;
@@ -463,7 +477,7 @@ nmid_lobby_info  : begin
       if (G_Started=false) then
       begin
          net_writebyte  (nmid_connect);
-         net_writebyte  (ver);
+         net_writebyte  (version);
          net_writestring(PlayerName );
          net_writebyte  (PlayerTeam );
          net_writebyte  (PlayerRace );
@@ -489,6 +503,71 @@ nmid_lobby_info  : begin
       begin
          vid_menu_redraw:=true;
          G_Status:=gs_waitserver;
+      end;
+   end;
+end;
+
+procedure net_DiscoweringUpdate(aip:cardinal;aport:word;ainfo:shortstring);
+var i,e:word;
+begin
+   e:=0;
+   if(net_svsearch_listn>0)then
+    for i:=1 to net_svsearch_listn do
+     with net_svsearch_list[i-1] do
+      if(aip=ip)and(aport=port)then
+      begin
+         e:=i;
+         break;
+      end;
+
+   if(e=0)then
+    if(net_svsearch_listn<net_svsearch_listn.MaxValue)then
+    begin
+       net_svsearch_listn+=1;
+       setlength(net_svsearch_list,net_svsearch_listn);
+       with net_svsearch_list[net_svsearch_listn-1] do
+       begin
+          ip  :=aip;
+          port:=aport;
+       end;
+       e:=net_svsearch_listn;
+       vid_menu_redraw:=true;
+    end;
+
+    if(e>0)then
+     with net_svsearch_list[e-1] do
+     begin
+        if(info<>ainfo)then vid_menu_redraw:=true;
+        info:=ainfo;
+     end;
+end;
+
+procedure net_Discowering;
+var mid,v,i:byte;
+          s:shortstring;
+begin
+   net_clearbuffer;
+   while(net_Receive>0)do
+   begin
+      mid:=net_readbyte;
+
+      case mid of
+nmid_localadv : begin
+                   v:=net_readbyte;
+                   if(v=version)then
+                   begin
+                      v:=net_readbyte;
+                      if(v in allgamemodes)then
+                      begin
+                         s:='';
+                         for i:=0 to MaxPlayers do _ADDSTR(@s,net_readstring,sep_comma);
+                         s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_gmode[v]+'  '+s;
+                         net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
+                         continue;
+                      end;
+                   end;
+                   net_DiscoweringUpdate(net_LastinIP,net_LastinPort,c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_sver);
+                end;
       end;
    end;
 end;

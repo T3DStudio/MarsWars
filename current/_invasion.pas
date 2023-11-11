@@ -19,7 +19,7 @@ begin
       else ty:=0;
       tx:=random(map_mw);
    end;
-   SpawnMonster:=_unit_add(tx,ty,0,uid,0,true,true,0);
+   SpawnMonster:=unit_add(tx,ty,0,uid,0,true,true,0);
    if(SpawnMonster)then limit-=_uids[uid]._limituse;
 end;
 function SpawnL(ul:longint):boolean;
@@ -103,7 +103,6 @@ procedure GameModeInvasion;
 const
 max_wave_time_s = 150;
 max_wave_time_t = fr_fps1*max_wave_time_s;
-var i:byte;
 begin
    if(_players[0].armylimit<=0)then
    begin

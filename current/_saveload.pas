@@ -37,8 +37,8 @@ begin
          close(f);
          exit;
       end;
-      BlockRead(f,vr,SizeOf(ver));
-      if(vr=ver)then
+      BlockRead(f,vr,SizeOf(version));
+      if(vr=version)then
       begin
          BlockRead(f,vr,sizeof(menu_s2));
          if(vr=ms2_camp)then
@@ -62,12 +62,9 @@ begin
             BlockRead(f,ms,sizeof(map_seed    ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(map_iseed   ));vr:=0;
             BlockRead(f,mw,sizeof(map_mw      ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_liq     ));
-            if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                    else       svld_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_obs     ));
-            if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                    else       svld_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_type    ));
+            if(vr>gms_m_types)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                              else       svld_str_info+=str_m_tpe+_str_mx(vr)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_symmetry));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
             BlockRead(f,vr,sizeof(theme_i     ));
             if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
@@ -78,7 +75,7 @@ begin
             vr:=0;
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
             BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-            BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
+            BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
 
             BlockRead(f,hp,sizeof(HPlayer  ));
 
@@ -192,20 +189,19 @@ theme_map_crt
 procedure saveload_CalcSaveSize;
 begin
    svld_file_size:=
-   SizeOf(ver              )+
+   SizeOf(version          )+
    SizeOf(menu_s2          )+
    SizeOf(_cmp_sel         )+
    SizeOf(cmp_skill        )+
    SizeOf(map_seed         )+
    SizeOf(map_iseed        )+
    SizeOf(map_mw           )+
-   SizeOf(map_liq          )+
-   SizeOf(map_obs          )+
+   SizeOf(map_type         )+
    SizeOf(theme_i          )+
    SizeOf(g_mode           )+
    SizeOf(g_start_base     )+
    SizeOf(g_fixed_positions)+
-   SizeOf(g_generators    )+
+   SizeOf(g_generators     )+
    SizeOf(HPlayer          )+
    SizeOf(TPList           )+
    SizeOf(_units           )+
@@ -246,21 +242,20 @@ begin
    {$I+}
    if(ioresult<>0)then exit;
 
-   BlockWrite(f,ver              ,SizeOf(ver              ));
+   BlockWrite(f,version          ,SizeOf(version          ));
    BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
    BlockWrite(f,_cmp_sel         ,SizeOf(_cmp_sel         ));
    BlockWrite(f,cmp_skill        ,SizeOf(cmp_skill        ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
    BlockWrite(f,map_iseed        ,SizeOf(map_iseed        ));
    BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
-   BlockWrite(f,map_liq          ,SizeOf(map_liq          ));
-   BlockWrite(f,map_obs          ,SizeOf(map_obs          ));
+   BlockWrite(f,map_type         ,SizeOf(map_type         ));
    BlockWrite(f,map_symmetry     ,sizeof(map_symmetry     ));
    BlockWrite(f,theme_i          ,SizeOf(theme_i          ));
    BlockWrite(f,g_mode           ,SizeOf(g_mode           ));
    BlockWrite(f,g_start_base     ,SizeOf(g_start_base     ));
    BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
-   BlockWrite(f,g_generators    ,SizeOf(g_generators    ));
+   BlockWrite(f,g_generators     ,SizeOf(g_generators     ));
    BlockWrite(f,HPlayer          ,SizeOf(HPlayer          ));
    BlockWrite(f,_players         ,SizeOf(TPList           ));
    BlockWrite(f,_units           ,SizeOf(_units           ));
@@ -317,8 +312,8 @@ begin
       assign(f,fn);
       {$I-}reset(f,1);{$I+} if (ioresult<>0) then exit;
       if(FileSize(f)<>svld_file_size)then begin close(f); exit; end;
-      BlockRead(f,vr,SizeOf(ver));
-      if(vr=ver)then
+      BlockRead(f,vr,SizeOf(version));
+      if(vr=version)then
       begin
          GameDefaultAll;
 
@@ -328,14 +323,13 @@ begin
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
          BlockRead(f,map_iseed        ,SizeOf(map_iseed        ));
          BlockRead(f,map_mw           ,SizeOf(map_mw           ));
-         BlockRead(f,map_liq          ,SizeOf(map_liq          ));
-         BlockRead(f,map_obs          ,SizeOf(map_obs          ));
+         BlockRead(f,map_type         ,SizeOf(map_type         ));
          BlockRead(f,map_symmetry     ,sizeof(map_symmetry     ));
          BlockRead(f,theme_i          ,SizeOf(theme_i          ));map_seed2theme;
          BlockRead(f,g_mode           ,SizeOf(g_mode           ));
          BlockRead(f,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(f,g_generators    ,SizeOf(g_generators    ));
+         BlockRead(f,g_generators     ,SizeOf(g_generators     ));
          BlockRead(f,HPlayer          ,SizeOf(HPlayer          ));
          BlockRead(f,_players         ,SizeOf(TPList           ));
          BlockRead(f,_units           ,SizeOf(_units           ));
@@ -373,10 +367,11 @@ begin
              uid   :=@_uids[uidi];
           end;
 
-         map_vars;
+         PlayersValidateName;
+         map_Vars;
          map_MakeThemeSprites;
          map_RefreshDoodadsCells;
-         map_RedrawMenuMinimap;
+         //map_RedrawMenuMinimap;
          map_DoodadsDrawData;
          pf_MakeZoneGrid;
          CamBounds;

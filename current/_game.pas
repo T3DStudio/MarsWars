@@ -3,20 +3,24 @@ procedure PlayerSetSkirmishTech(p:byte);
 begin
    with _players[p] do
    begin
-      PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HBarracks,
-                                UID_LostSoul      ..UID_ZBFGMarine,
-                                UID_UCommandCenter..UID_UComputerStation,
-                                UID_Engineer      ..UID_Flyer  ],
-                                MaxUnits,true);
+      PlayerSetAllowedUnitsMax(p,[UID_HKeep         ..UID_HBarracks,
+                                  UID_LostSoul      ..UID_ZBFGMarine,
+                                  UID_UCommandCenter..UID_UComputerStation,
+                                  UID_Engineer      ..UID_Flyer  ],
+                                  MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_HPentagram, UID_HMonastery ,UID_HFortress       ,UID_HAltar,
-                                                UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
+      PlayerSetAllowedUnitsMax(p,[ UID_HMonastery ,UID_HFortress       ,UID_HAltar,
+                                   UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
 
-      PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
+      PlayerSetAllowedUnitsMax(p,[ UID_LostSoul, UID_Phantom ],20,false);
 
-      if(g_generators>0)then
-      PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HCommandCenter,
-                                UID_UGenerator,UID_UAGenerator,UID_UCommandCenter],0,false);
+
+      case g_generators of
+      0:;
+      1    :PlayerSetAllowedUnitsMax(p,[ UID_HKeep     ,UID_HCommandCenter,UID_UCommandCenter],0,false);
+      else  PlayerSetAllowedUnitsMax(p,[ UID_HSymbol   ,UID_HASymbol      ,UID_HKeep          ,UID_HCommandCenter,
+                                         UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter],0,false);
+      end;
 
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
@@ -73,7 +77,7 @@ var u:integer;
 begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
-     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],instant,true,false,true,true);
+     if(hits>0)and(playeri=pl)then unit_kill(_punits[u],instant,true,false,true,true);
 end;
 
 procedure PlayersSetDefault;
@@ -98,7 +102,7 @@ begin
    begin
       race     :=r_hell;
       state    :=ps_comp;
-      PlayerSetAllowedUnits   (0,[],0,true);
+      PlayerSetAllowedUnitsMax   (0,[],0,true);
       PlayerSetAllowedUpgrades(0,[],0,true);
    end;
 
@@ -199,7 +203,7 @@ begin
    ui_umark_t:=0;
 
    mouse_select_x0:=-1;
-   m_brush:=-32000;
+   m_brush:=mb_empty;
 
    rpls_fog   :=true;
 
@@ -226,7 +230,7 @@ begin
    if(n=0)and(AdvancedBase)and(c=0)
    then uid:=uidA
    else uid:=uidF;
-   _unit_add(tx,ty,0,uid    ,pl,true,false,0);
+   unit_add(tx,ty,0,uid    ,pl,true,false,0);
    n+=1;
 end;
 
@@ -246,7 +250,7 @@ begin
       ds :=map_mw div 2;
       d  :=point_dir(x,y,ds,ds);
       ds :=360 div (c+1);
-      r  :=50+c*18;
+      r  :=70+c*28; //18
       for i:=0 to c do
       begin
          _Spawn(
@@ -263,6 +267,9 @@ procedure GameStartSkirmish;
 var p:byte;
 begin
    g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
+
+   if(not g_fixed_positions)then
+     if not(g_mode in gm_fixed_positions)then map_ShufflePlayerStarts;
 
    for p:=0 to MaxPlayers do
    with _players[p] do
@@ -299,7 +306,10 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
+        if(team>0)and(0<=map_psx[p])and(map_psx[p]<=map_mw)
+        then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
+
+        unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
      end;
 
    {$IFDEF _FULLGAME}
@@ -322,11 +332,11 @@ begin
     if(PlayersReadyStatus)then
     begin
        G_Started:=true;
-       MainMenu    :=false;
+       MainMenu :=false;
        if(menu_s2<>ms2_camp)
        then GameStartSkirmish
        else ;//_CMPMap;
-       vid_blink_timer1:=1;
+       vid_panel_timer:=0;
        UIPlayer:=HPlayer;
     end;
 end;
@@ -383,14 +393,18 @@ end;
 
 procedure PlayerExecuteOrder(pl:byte);
 var
-_su,_eu,
-usel_n,
-usel_max : integer;
-psel     : boolean;
-oa,
-pu       : PTUnit;
+su,eu,d: integer;
+SelectBuildings,
+ClearErrors,
+pselected: boolean;
+pu,
+sability_u  : PTUnit;
+sability_d  : integer;
+function RectInRect(x0,y0,x1,y1,vx,vy,r:integer):boolean;
 begin
-   oa:=nil;
+   RectInRect:=((x0-r)<=vx)and(vx<=(x1+r))and((y0-r)<=vy)and(vy<=(y1+r));
+end;
+begin
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
@@ -398,107 +412,156 @@ begin
       PlayerAPMInc(pl);
 
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
+po_build               : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),pl),nil);
       else
-         usel_n  :=0;
-         usel_max:=MaxPlayerUnits;
-         if(o_id in [uo_select,uo_aselect])then
-         begin
-            if(o_x0>o_x1)then begin _su:=o_x1;o_x1:=o_x0;o_x0:=_su;end;
-            if(o_y0>o_y1)then begin _su:=o_y1;o_y1:=o_y0;o_y0:=_su;end;
-            if(CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then usel_max:=1;
-         end;
+        SelectBuildings:=true;
+        ClearErrors:=false;
 
-         _su :=1;
-         _eu:=MaxUnits+1;
-         if(o_id=uo_corder)then
-          case o_x0 of
-          co_destroy,
-          co_cupgrade,
-          co_cuprod,
-          co_pcancle  : begin   // reverse unit loop
-                           _su :=MaxUnits;
-                           _eu:=0;
-                        end;
-          co_supgrade : if(n_smiths  <=0)then begin PlayerSetProdError(pl,lmt_argt_upgr,o_y0,ureq_smiths  ,nil);o_id:=0;end;
-          co_suprod   : if(n_barracks<=0)then begin PlayerSetProdError(pl,lmt_argt_unit,o_y0,ureq_barracks,nil);o_id:=0;end;
+        if(o_id=po_select_rect_set)
+        or(o_id=po_select_rect_add)then
+        begin
+           if(o_x0>o_x1)then begin su:=o_x1;o_x1:=o_x0;o_x0:=su;end;
+           if(o_y0>o_y1)then begin su:=o_y1;o_y1:=o_y0;o_y0:=su;end;
+
+           for su:=1 to MaxUnits do
+            with _punits[su]^ do
+             if(hits>0)and(pl=playeri)and(not IsUnitRange(transport,nil))then
+              with uid^ do
+               if(RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r))and(not _ukbuilding)then
+               begin
+                  SelectBuildings:=false;
+                  break;
+               end;
+        end;
+
+        if(o_id=po_unit_order_set)then
+          if(IsUnitRange(o_x1,@pu))then
+          begin
+             o_x0:=pu^.x;
+             o_y0:=pu^.y;
           end;
 
-         while(_su<>_eu)do
-         begin
-            pu:=_punits[_su];
-            with pu^ do
-            with uid^ do
-             if(hits>0)and(not _IsUnitRange(transport,nil))and(pl=playeri)then
-             begin
-                psel:=sel;
+        case o_id of
+po_prod_unit_stop,
+po_prod_upgr_stop,
+po_prod_stop      : begin
+                       su:=MaxUnits;
+                       eu:=1;
+                    end;
+        else
+           su:=1;
+           eu:=MaxUnits;
+        end;
 
-                // common select
-                if (o_id=uo_select )
-                or((o_id=uo_aselect)and(not sel))then
-                begin
-                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
-                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
-                   if(speed <=0)and(usel_max>1)and(o_id<>uo_aselect)then sel:=false;
-                   if(usel_n>=usel_max)then sel:=false;
-                end;
-                if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(group=o_x0);
-                if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                begin
-                   if(oa=nil)then
-                    if(not _IsUnitRange(o_a0,@oa))then break;
-                   if(uidi=oa^.uidi)
-                   then sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
-                          and((o_y0-_r)<=vy)and(vy<=(o_y1+_r))
-                   else if(o_id<>uo_adblselect)then sel:=false;
-                end;
-                if(o_id=uo_specsel)then
-                  if(UnitF2Select(pu))
-                  then sel:=true
-                  else
-                    if(o_y0=0)then sel:=false;
+     //   selected_n:=ucl_cs[true]+ucl_cs[false];
+        sability_d:=sability_d.MaxValue;
+        sability_u:=nil;
 
-                if(o_id=uo_corder)then
-                 case o_x0 of
-                 co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  upgr
-                 co_cupgrade : if(s_smiths  <=0)or(sel)then if(_unit_cupgrade (pu,o_y0,false))then break;                                       // cancle upgr
-                 co_suprod   : if(s_barracks<=0)or(sel)then if(_unit_straining(pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  training
-                 co_cuprod   : if(s_barracks<=0)or(sel)then if(_unit_ctraining(pu,o_y0,false))then break;                                       // cancle training
-                 co_pcancle  : if(sel)then
-                               begin
-                               if(_unit_ctraining(pu,255 ,false))then break;
-                               if(_unit_cupgrade (pu,255 ,false))then break;
-                               end;
-                 end;
+        while(su<>eu)do
+        begin
+           pu:=_punits[su];
+           with pu^ do
+           with uid^ do
+           if(hits>0)and(not IsUnitRange(transport,nil))and(pl=playeri)then
+           begin
+              pselected:=isselected;
 
-                if(sel)then
-                begin
+              case o_id of
+// select
+po_select_rect_set,
+po_select_rect_add   : if(o_id=po_select_rect_set)
+                       or((not isselected)and(o_id=po_select_rect_add))
+                       then isselected:=RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r)and(SelectBuildings or not _ukbuilding);
+po_select_uid_set,
+po_select_uid_add    : if(o_id=po_select_uid_set)
+                       or((not isselected)and(o_id=po_select_uid_add))then
+                         if(0<o_a0)and(o_a0<255)
+                         then isselected:=RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r)and(o_a0=uidi);
+po_select_group_set,
+po_select_group_add  : if(o_id=po_select_group_set)
+                       or((not isselected)and(o_id=po_select_group_add))then isselected:=(group=o_a0);
+po_select_special_set: isselected:=UnitF2Select(pu);
+
+// groups
+po_unit_group_set    : if(isselected)then
+                       begin
+                          if(0<=o_a0)and(o_a0<MaxUnitGroups)then group:=o_a0;
+                       end
+                       else if(group=o_a0)then group:=0;
+po_unit_group_add    : if(isselected)then
+                         if(0<=o_a0)and(o_a0<MaxUnitGroups)then group:=o_a0;
+
+// unit orders
+po_unit_order_set    : if(isselected)then
+                         case o_a0 of
+                       uo_move      : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_move  );
+                       uo_attack    : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_attack);
+                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0,x ,y ,ua_move  );
+                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0,x ,y ,ua_attack);
+                       //uo_stay      : default
+                       uo_hold      : unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_hold  );
+                       uo_destroy   : begin unit_kill(pu,false,false,true,false,true);pselected:=isselected;end;
+                       uo_sability  : if(ua_id<>ua_psability)then
+                                        if(unit_sability (pu,false))then ClearErrors:=true;
+                       uo_psability : if(ua_id<>ua_psability)then
+                                        if(unit_psability(pu,o_x0,o_y0,o_x1,true))then
+                                        begin
+                                           ClearErrors:=true;
+                                           d:=point_dist_int(o_x0,o_y0,x,y);
+                                           if(d<sability_d)then
+                                           begin
+                                              sability_d:=d;
+                                              sability_u:=pu;
+                                           end;
+                                        end;
+                       uo_rebuild   : if(_unit_rebuild(pu,false))then ClearErrors:=true;
+                         else         unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack);
+                         end;
+po_prod_stop         : if(isselected)then
+                       begin
+                       if(unit_ProdUnitStop(pu,255,false))then break;
+                       if(unit_ProdUpgrStop(pu,255,false))then break;
+                       end;
+              end;
+
+              if(0<o_a0)and(o_a0<=255)then
+              begin
+                 if(s_barracks<=0)or(isselected)then
                    case o_id of
-               uo_setorder,
-               uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitGroups)then group:=o_x0;
-               uo_corder     : if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1))then begin PlayerClearProdError(player);break;end;
+po_prod_unit_start   : if(unit_ProdUnitStart(pu,o_a0      ))then begin PlayerClearProdError(player);break;end;// start  training
+po_prod_unit_stop    : if(unit_ProdUnitStop (pu,o_a0,false))then break;
                    end;
-
-                   if(psel=false)then
-                   begin
-                      _unit_counters_inc_select(pu);
-                      {$IFDEF _FULLGAME}
-                      UpdateLastSelectedUnit(unum);
-                      {$ENDIF}
+                 if(s_smiths  <=0)or(isselected)then
+                   case o_id of
+po_prod_upgr_start   : if(unit_ProdUpgrStart(pu,o_a0      ))then begin PlayerClearProdError(player);break;end;// start  upgr
+po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
                    end;
-                   usel_n+=1;
-                end
-                else
-                begin
-                   if(psel=true)then _unit_counters_dec_select(pu);
-                   if(o_id=uo_setorder)and(group=o_x0)then group:=0;
-                end;
-             end;
+              end;
 
-            if(_su>_eu)
-            then _su-=1
-            else _su+=1;
-         end;
+              if(isselected)then
+              begin
+                 if(pselected=false)then
+                 begin
+                    unit_PC_select_inc(pu);
+                    {$IFDEF _FULLGAME}
+                    UpdateLastSelectedUnit(unum);
+                    {$ENDIF}
+                 end;
+              end
+              else
+                if(pselected=true)then unit_PC_select_dec(pu);
+           end;
+
+           if(su>eu)
+           then su-=1
+           else su+=1;
+        end;
+
+        if(o_id=po_unit_order_set)then
+          case o_a0 of
+uo_psability : if(sability_u<>nil)then unit_psability(sability_u,o_x0,o_y0,o_x1,false);
+          end;
+        if(ClearErrors)then PlayerClearProdError(@_players[pl]);
       end;
 
       o_id:=0;
@@ -509,7 +572,7 @@ procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
 teams_army: array[0..MaxPlayers] of integer;
 begin
-   if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
+   if(net_status>ns_single)and(G_Step<fr_fps1)then exit;
 
    wteam_last:=255;
    wteams_n  :=0;
@@ -610,6 +673,8 @@ begin
       r_blink3:=r_blink3 mod 4;
    end;
 
+   vid_panel_timer+=1;vid_panel_timer:=vid_panel_timer mod vid_panel_period;
+
    r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
    r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
 
@@ -620,7 +685,10 @@ begin
 
    SoundControl;
 
-   if(net_status=ns_client)then net_Client;
+   if(net_status=ns_client)then
+    if(net_svsearch)
+    then net_Discowering
+    else net_Client;
    replay_Code;
 
    {$ELSE}

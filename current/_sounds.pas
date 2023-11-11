@@ -396,7 +396,7 @@ procedure SoundPlayUnitSelect;
 const annoystart = 6;
       annoystop  = 12;
 begin
-   if(_IsUnitRange(ui_UnitSelectedNU,nil))then
+   if(IsUnitRange(ui_UnitSelectedNU,nil))then
    begin
       if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
@@ -443,6 +443,8 @@ lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false)
 lmt_already_adv,
 lmt_NeedMoreProd,
 lmt_MaximumReached,
+lmt_unit_needbuilder,
+lmt_UsepsabilityOrder,
 lmt_unit_limit,
 lmt_production_busy,
 lmt_req_ruids,

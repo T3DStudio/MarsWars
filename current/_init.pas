@@ -19,7 +19,6 @@ begin
    _MakeScreen;
    _LoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
-   _cmp_Init;
 
    InitVideo:=true;
 end;
@@ -34,7 +33,9 @@ begin
       s:=ParamStr(i);
 
       if(s='test' )then TestMode:=1;
-      //if(s='testD')then TestMode:=2;
+      {$IFDEF DTEST}
+      if(s='testD')then TestMode:=2;
+      {$ENDIF}
    end;
 end;
 
@@ -80,7 +81,7 @@ begin
    lng_eng;
    SwitchLanguage;
    InitUIDDataCL;
-   InitMIDDataCL;
+   missile_InitCLData;
    MakeUnitIcons;
 
    {$ENDIF}
@@ -96,5 +97,7 @@ begin
 
    {$IFNDEF _FULLGAME}
    Dedicated_Init;
+   {$ELSE}
+   campaings_InitData;
    {$ENDIF}
 end;

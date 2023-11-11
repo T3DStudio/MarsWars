@@ -25,8 +25,6 @@ cfg_key_uhbar   = 'vid_health_bars';
 cfg_key_plcol   = 'vid_player_colors';
 cfg_key_APM     = 'vid_APM';
 cfg_key_FPS     = 'vid_FPS';
-cfg_key_rmusic  = 'repeat_music';
-
 
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
 function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
@@ -55,7 +53,7 @@ cfg_key_vidvh : vid_vh           := vli;
 cfg_key_gsb   : g_start_base     := vlw;
 cfg_key_gsp   : g_fixed_positions:=(vl=b2c[true]);
 cfg_key_gai   : g_ai_slots       := vlw;
-cfg_key_gcg   : g_generators    := vlw;
+cfg_key_gcg   : g_generators     := vlw;
 cfg_key_rpnui : rpls_pnui        := vlw;
 cfg_key_npnui : net_pnui         := vlw;
 cfg_key_ppos  : vid_ppos         := vlw;
@@ -63,7 +61,6 @@ cfg_key_uhbar : vid_uhbars       := vlw;
 cfg_key_plcol : vid_plcolors     := vlw;
 cfg_key_APM   : vid_APM          :=(vl=b2c[true]);
 cfg_key_FPS   : vid_FPS          :=(vl=b2c[true]);
-cfg_key_rmusic: snd_music_c      := vlw;
    end;
 
 end;
@@ -91,7 +88,8 @@ begin
    if FileExists(cfgfn) then
    begin
       assign(f,cfgfn);
-      {$I-}reset(f);{$I+} if (ioresult<>0) then exit;
+      {$I-}reset(f);{$I+}
+      if(ioresult<>0)then exit;
       while not eof(f) do
       begin
          readln(f,s);
@@ -99,18 +97,18 @@ begin
       end;
       close(f);
 
-      if(snd_svolume1<0  )then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
-      if(snd_mvolume1<0  )then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
+      if(snd_svolume1<0)then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
+      if(snd_mvolume1<0)then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
       vid_CamSpeed:=mm3(1,vid_CamSpeed,127);
 
-      if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
+      PlayerName:=ValidateStr(PlayerName,NameLen,@k_kbstr);
 
       vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
 
-      if(g_ai_slots   >gms_g_maxai  )then g_ai_slots   :=gms_g_maxai;
-      if(g_start_base >gms_g_startb )then g_start_base :=gms_g_startb;
-      if(g_generators >gms_g_maxgens)then g_generators :=gms_g_maxgens;
+      if(g_ai_slots  >gms_g_maxai    )then g_ai_slots  :=gms_g_maxai;
+      if(g_start_base>gms_g_startb   )then g_start_base:=gms_g_startb;
+      if(g_generators>gms_g_maxgens  )then g_generators:=gms_g_maxgens;
 
       if(rpls_pnui   >_cl_pnun_rpls  )then rpls_pnui   :=_cl_pnun_rpls;
       if(net_pnui    >_cl_pnun       )then net_pnui    :=_cl_pnun;
@@ -149,14 +147,12 @@ begin
    writeln(f,cfg_key_gsb   ,'=',g_start_base          );
    writeln(f,cfg_key_gsp   ,'=',b2c[g_fixed_positions]);
    writeln(f,cfg_key_gai   ,'=',g_ai_slots            );
-   writeln(f,cfg_key_gcg   ,'=',g_generators         );
+   writeln(f,cfg_key_gcg   ,'=',g_generators          );
    writeln(f,cfg_key_ppos  ,'=',vid_ppos              );
    writeln(f,cfg_key_uhbar ,'=',vid_uhbars            );
    writeln(f,cfg_key_plcol ,'=',vid_plcolors          );
    writeln(f,cfg_key_APM   ,'=',b2c[vid_APM]          );
    writeln(f,cfg_key_FPS   ,'=',b2c[vid_FPS]          );
-   writeln(f,cfg_key_rmusic,'=',b2c[vid_FPS]          );
-
 
    close(f);
 end;

@@ -1,7 +1,7 @@
 
 const
 
-ver                    : byte = 231;
+version                : byte = 232;
 
 degtorad               = pi/180;
 
@@ -38,7 +38,7 @@ APM_1Period            = fr_fps60;
 
 gms_g_startb           = 6;  // 0-6  max start base options
 gms_g_maxai            = 11; // 0-11 max skirmish AI skills
-gms_g_maxgens          = 5;  // 0-5  max neutrall generators options
+gms_g_maxgens          = 6;  // 0-6  max neutrall generators options
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -57,7 +57,7 @@ gm_invasion            = 4;
 gm_KotH                = 5;
 gm_royale              = 6;
 
-gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
+gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gm_cnt                 = 6;
@@ -107,7 +107,7 @@ map_b0                 = 5;
 //  CPoints life
 //
 
-g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
 g_cgenerators_energy   = 900;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +134,7 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v52';
+str_ver                = 'v53';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2023 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
@@ -185,6 +185,7 @@ lmt_production_busy    = 27;
 lmt_already_adv        = 28;
 lmt_NeedMoreProd       = 29;
 lmt_MaximumReached     = 30;
+lmt_UsepsabilityOrder  = 31;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -221,7 +222,12 @@ ServerTTL              = fr_fps1;
 NetTickN               = 2;
 MaxNetBuffer           = 4096;
 
-ns_none                = 0;
+net_svlsearch_port     = 63666; // local servers advertisement port
+net_svlsearch_portS    = swap(net_svlsearch_port);
+net_localAdv_ip        : cardinal = $FFFFFFFF; // 255.255.255.255
+net_localAdv_time      = fr_fps1*2;
+
+ns_single                = 0;
 ns_server              = 1;
 ns_client              = 2;
 
@@ -241,24 +247,7 @@ nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
 nmid_getinfo           = 66;
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  PLAYER ORDERS
-//
-
-uo_build               = 1;
-uo_dblselect           = 2;
-uo_adblselect          = 3;
-uo_select              = 4;
-uo_aselect             = 5;
-uo_selorder            = 6;
-uo_setorder            = 7;
-uo_corder              = 8;
-uo_specsel             = 9;
-uo_addorder            = 10;
-
+nmid_localadv          = 67;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -283,44 +272,70 @@ ureq_unknown           : cardinal = 1 shl 14; //
 ureq_alreadyAdv        : cardinal = 1 shl 15; //
 ureq_needbuilders      : cardinal = 1 shl 16; // need more builders
 ureq_common            : cardinal = 1 shl 17; // common
+ureq_usepsaorder       : cardinal = 1 shl 18; // need use s ability in point
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  UNIT OTDERS
+//  UNIT/PLAYER OTDERS
 //
 
-co_empty               = -32000;
-co_destroy             = -111;
-co_rcamove             = -101;
-co_rcmove              = -100;
-co_stand               = -90;
-co_move                = -91;
-co_patrol              = -92;
-co_astand              = -93;
-co_amove               = -94;
-co_apatrol             = -95;
-co_psability           = -79;
-co_sability            = -80;
-co_supgrade            = -81;
-co_cupgrade            = -82;
-co_suprod              = -83;
-co_cuprod              = -84;
-co_pcancle             = -85;
-co_mmark               = -86;
-co_rebuild             = -87;
+mb_empty               = smallint.MinValue;
+mb_move                = -1;
+mb_attack              = -2;
+mb_patrol              = -3;
+mb_apatrol             = -4;
+mb_psability           = -5;
+mb_mark                = -6;
+
+po_build               = 1;
+po_select_rect_set     = 2; // select rect
+po_select_rect_add     = 3; // select rect shift
+po_select_uid_set      = 4; // select uid
+po_select_uid_add      = 5; // select uid shift
+po_select_group_set    = 6; // select group
+po_select_group_add    = 7; // select group shift
+po_select_special_set  = 8; // select f2
+po_unit_order_set      = 9;
+po_unit_group_set      = 10;
+po_unit_group_add      = 11;
+po_prod_unit_start     = 12;
+po_prod_unit_stop      = 13;
+po_prod_upgr_start     = 14;
+po_prod_upgr_stop      = 15;
+po_prod_stop           = 16;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT ACTIONS
 //
 
-ua_move                = 1;
+
+uo_nothing             = 0;
+uo_move                = 1;
+uo_attack              = 2;
+uo_patrol              = 3;
+uo_apatrol             = 4;
+uo_stay                = 5;
+uo_hold                = 6;
+uo_sability            = 7;
+uo_psability           = 8;
+uo_rebuild             = 9;
+uo_destroy             = 10;
+uo_unload              = 11;
+
+ua_attack              = 0;
+ua_hold                = 1;
+ua_move                = 2;
+ua_unload              = 3;
+ua_psability           = 4;
+
+{ua_move                = 1;
 ua_hold                = 2;
 ua_amove               = 3;
 ua_unload              = 4;
 ua_psability           = 5;
 
-ua_patrol              = 6; // only for client data transfer
+ua_patrol              = 6; // only for client data transfer    }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -480,7 +495,7 @@ b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  OBSTACLES
+//  MAP
 //
 
 MaxDoodads             = 800;
@@ -507,8 +522,13 @@ MaxDIDs                = 7;
 
 DID_R                  : array[0..MaxDIDs] of smallint = (0,255,185,125,64,105,60,17);
 
-//pi*_r*_r
+mapt_steppe            = 0;
+mapt_nature            = 1;
+mapt_lake              = 2;
+mapt_shore             = 3;
+mapt_sea               = 4;
 
+gms_m_types            = 4;  // 0-4  max map types
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -614,6 +634,7 @@ MID_Mine               = 118;
 MID_URocket            = 119;
 MID_URocketS           = 120;
 MID_Chaingun           = 121;
+MID_MChaingun          = 122;
 
 
 mh_none                = 0;
@@ -679,6 +700,7 @@ ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
 ptime5                 = ptime1*5;
+ptime6                 = ptime1*6;
 
 uf_ground              = false;
 uf_fly                 = true;
@@ -697,6 +719,7 @@ BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
 BaseDamage5            = BaseDamage1*5;
+BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
@@ -707,10 +730,10 @@ BaseArmorBonus1        = 8;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonus1/4;
 
-BaseHeal1              = (BaseDamage1 div 4)*3;
-BaseHealBonus1         = BaseDamageBonus1*3;
-BaseRepair1            = (BaseDamage1 div 4)*3;
-BaseRepairBonus1       = BaseDamageBonus1*4;
+BaseHeal1              = (BaseDamage1 div 8)*3;
+BaseHealBonus1         = BaseDamageBonus1*2;
+BaseRepair1            = (BaseDamage1 div 8)*3;
+BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamage1 div 10;
 
@@ -733,13 +756,13 @@ UID_HTower             = 7;
 UID_HTeleport          = 8;
 UID_HEye               = 9;
 UID_HMonastery         = 10;
-UID_HPentagram         = 11;
-UID_HTotem             = 12;
-UID_HAltar             = 13;
-UID_HFortress          = 14;
-UID_HCommandCenter     = 15;
-UID_HACommandCenter    = 16;
-UID_HBarracks          = 17;
+UID_HTotem             = 11;
+UID_HAltar             = 12;
+UID_HFortress          = 13;
+UID_HCommandCenter     = 14;
+UID_HACommandCenter    = 15;
+UID_HBarracks          = 16;
+UID_HPentagram         = 17;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -748,13 +771,13 @@ UID_Demon              = 23;
 UID_Cacodemon          = 24;
 UID_Knight             = 25;
 UID_Baron              = 26;
-UID_Cyberdemon         = 27;
-UID_Mastermind         = 28;
-UID_Pain               = 29;
-UID_Revenant           = 30;
-UID_Mancubus           = 31;
-UID_Arachnotron        = 32;
-UID_Archvile           = 33;
+UID_Pain               = 27;
+UID_Revenant           = 28;
+UID_Mancubus           = 29;
+UID_Arachnotron        = 30;
+UID_Archvile           = 31;
+UID_Mastermind         = 32;
+UID_Cyberdemon         = 33;
 
 UID_ZFormer            = 34;
 UID_ZEngineer          = 35;
@@ -819,9 +842,9 @@ uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,U
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-//T1                     = uids_marines+[UID_UTransport,UID_UACDron,UID_UGTurret,UID_UATurret,UID_LostSoul,UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron]-[UID_BFGMarine,UID_ZBFGMarine];
-T2                     = [UID_Terminator,UID_Tank,UID_Flyer,UID_Cyberdemon,UID_Mastermind,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas-[UID_ZBFGMarine];
-T3                     = [UID_BFGMarine,UID_ZBFGMarine,UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar];
+//T1                     = all by default
+T2                     = [UID_UTechCenter,UID_UComputerStation,UID_HMonastery,UID_HFortress,UID_Terminator,UID_Tank,UID_Flyer,UID_Pain,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas-[UID_ZBFGMarine];
+T3                     = [UID_BFGMarine,UID_ZBFGMarine,UID_Archvile,UID_HTotem,UID_URMStation,UID_HAltar,UID_Cyberdemon,UID_Mastermind];
 
 uid_race_start_fbase   : array[1..r_cnt] of smallint = (UID_HKeep    ,UID_UCommandCenter );
 uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep   ,UID_UACommandCenter);
@@ -906,8 +929,8 @@ mine_r                 = melee_r*3;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-invuln_time            = fr_fps1*60;
-invuln_time_limit      = fr_fps1*4;
+invuln_time            = fr_fps1*30;
+teleport_SecPerLimit   = 6;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;
@@ -966,7 +989,7 @@ _hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
                                             SDLK_Z    , SDLK_X    , SDLK_C ,
 
                                             SDLK_C    , SDLK_F2   , SDLK_Delete,
-                                            SDLK_F5   , SDLK_SPACE, 0,
+                                            SDLK_F5   , SDLK_Z    , 0,
                                             0         , 0         , 0,
 
                                             0,0,0,
@@ -1184,11 +1207,14 @@ vid_blink_period1      = fr_fps1  div vid_blink_persecond;
 vid_blink_periodh      = vid_blink_period1 div 2;
 vid_blink_period2      = vid_blink_period1*2;
 
+vid_panel_period       = fr_fps1 div 6;
+
 ui_alarm_time          = vid_blink_period2;
 
 vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;
+vid_panelwi            = vid_panelw-1;
 vid_tBW                = vid_panelw div 4;
 vid_hBW                = vid_BW div 2;
 vid_oiw                = 18;
@@ -1198,6 +1224,7 @@ vid_oips               = 2*vid_oiw+vid_oisw;
 vid_svld_m             = 7;
 vid_rpls_m             = 8;
 vid_camp_m             = 11;
+vid_srch_m             = 2;
 
 ui_max_alarms          = 12;
 
@@ -1215,7 +1242,7 @@ ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw d
 ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panelw;
 ui_menu_map_rx1        = ui_menu_map_zx1-12;
 ui_menu_map_y1         = ui_menu_map_y0+(ui_menu_map_ys*7);
-ui_menu_map_tx0        = ui_menu_map_rx0+6;
+ui_menu_map_tx0        = ui_menu_map_rx0+4;
 ui_menu_map_tx1        = ui_menu_map_rx0+((ui_menu_map_rx1-ui_menu_map_rx0) div 2);
 
 ui_menu_ssr_x0         = 76;
@@ -1244,6 +1271,9 @@ ui_menu_pls_y0         = 110;
 ui_menu_pls_x1         = 723;
 ui_menu_pls_y1         = 253;
 ui_menu_pls_ys         = 18;
+ui_menu_pls_ys3        = (txt_line_h3*3)+3;
+ui_menu_pls_y2         = ui_menu_pls_y0+6;
+ui_menu_pls_ye         = ui_menu_pls_y1-ui_menu_pls_ys+1;
 ui_menu_pls_zh         = (MaxPlayers*ui_menu_pls_ys);
 ui_menu_pls_xc         = (ui_menu_pls_x0+ui_menu_pls_x1) div 2;
 ui_menu_pls_zy0        = ((ui_menu_pls_y0+ui_menu_pls_y1) div 2)-(ui_menu_pls_zh div 2);
@@ -1275,10 +1305,10 @@ ui_menu_csm_xct        = ui_menu_csm_x0+2;
 ui_menu_csm_xc         = (ui_menu_csm_x0+ui_menu_csm_x1) div 2;
 ui_menu_csm_x2         = ui_menu_csm_x0+ui_menu_csm_xs;
 ui_menu_csm_x3         = ui_menu_csm_x2+ui_menu_csm_xs;
-ui_menu_csm_xt0        = ui_menu_csm_x0+8;
-ui_menu_csm_xt1        = ui_menu_csm_x0+24;
-ui_menu_csm_xt2        = ui_menu_csm_x1-8;
-ui_menu_csm_xt3        = ui_menu_csm_xc+8;
+ui_menu_csm_xt0        = ui_menu_csm_x0+6;
+ui_menu_csm_xt1        = ui_menu_csm_x0+18;
+ui_menu_csm_xt2        = ui_menu_csm_x1-6;
+ui_menu_csm_xt3        = ui_menu_csm_xc+6;
 
 
 chat_type              : array[false..true] of char = ('|',' ');
@@ -1342,6 +1372,9 @@ fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_vfwm               = (vid_maxw div fog_cw)+2;
 fog_vfhm               = (vid_maxh div fog_cw)+2;
+
+{fog_mm_Min             = 1;
+fog_mm_Max             = vid_panelwi; }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1428,7 +1461,7 @@ sep_wdash              = tc_white+'-';
 //
 
 k_chrtt                = fr_fps1 div 3;
-k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
+k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}',' ','_',',','.','(',')','-','+','`','&','@','#','%','?','$'];
 k_kbdig                : set of Char = ['0'..'9'];
 k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
@@ -1482,17 +1515,15 @@ str_PlayerResumed        : shortstring = 'player has resumed the game';
 str_plout                : shortstring = ' left the game';
 //str_player_def           : shortstring = ' was terminated!';
 
-str_cgeneratorsM         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
+str_cgeneratorsO         : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
 
 str_plstat               : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
-//str_ready                : shortstring = 'Ready';
 
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
-str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
+str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
 str_observer             : shortstring = 'OBSERVER';
-
 {$ENDIF}
 
 

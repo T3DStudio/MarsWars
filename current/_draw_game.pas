@@ -326,7 +326,7 @@ begin
 
       choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
 
-      srect :=((sel)and(playeri=UIPlayer))
+      srect :=((isselected)and(playeri=UIPlayer))
             or(ks_alt>0)
             or(choosen);
 
@@ -348,12 +348,12 @@ begin
       end;
       if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
+      if(reload>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
         case m_brush of
 1..255,
-co_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+mb_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
         end;
 
 
@@ -391,7 +391,7 @@ procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case g_mode of
-gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[(g_royal_r mod 2)=0]);
+gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
    end;
 
 
@@ -558,8 +558,8 @@ var cx,cy,ssx,ssy,sty:integer;
 begin
    if(not vid_fog)then exit;
 
-   ssx:=lx-(vid_cam_x mod fog_cw);
-   sty:=ly-(vid_cam_y mod fog_cw);
+   ssx:=lx-(vid_cam_x mod fog_cw)+fog_chw-integer(fog_cr);
+   sty:=ly-(vid_cam_y mod fog_cw)+fog_chw-integer(fog_cr);
 
    for cx:=0 to vid_fog_vfw do
    begin
@@ -569,7 +569,7 @@ begin
          vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
          if(rpls_fog)then
          begin
-            if(vid_fog_grid[cx,cy]=0)then _draw_surf(tar,ssx-fog_chw, ssy-fog_chw, vid_fog_surf);
+            if(vid_fog_grid[cx,cy]=0)then _draw_surf(tar,ssx, ssy,vid_fog_surf);
             vid_fog_grid[cx,cy]:=0;
          end
          else vid_fog_grid[cx,cy]:=2;
@@ -577,6 +577,19 @@ begin
       end;
       ssx+=fog_cw;
    end;
+
+  { ssx:=-(vid_cam_x mod fog_cw);
+   while(ssx<=vid_cam_w)do
+   begin
+      lineColor(tar,ssx,ly,ssx,ly+vid_cam_h,c_gray);
+      ssx+=fog_cw;
+   end;
+   ssy:=-(vid_cam_y mod fog_cw);
+   while(ssy<=vid_cam_h)do
+   begin
+      lineColor(tar,lx,ssy,lx+vid_cam_w,ssy,c_gray);
+      ssy+=fog_cw;
+   end;    }
 
 
  {  if(pfNodes_c>0)then
@@ -702,7 +715,7 @@ begin
         begin
            circleColor(r_screen,ix,iy,_r  ,c_gray);
           // circleColor(r_screen,ix,iy,srange,c_white);
-           if(sel)then
+           if(isselected)then
            begin
               //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
               //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -vid_cam_x+1,vid_mapy+mv_y    -vid_cam_y+1,c_lime);
@@ -712,15 +725,16 @@ begin
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(r_screen,ix+1,iy+1,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
+              lineColor(r_screen,ix+1,iy+1,ua_x+vid_mapx-vid_cam_x,ua_y-vid_cam_y,c_white);
 
               if(aiu_alarm_d<32000)then
               lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
            end;
 
-           _draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,li2s(aiu_FiledSquareNear )+' '+i2s(_speed), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy   ,i2s(u)           , ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+10,i2s(hits)        , ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,b2s(ua_id)       , ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,li2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
@@ -760,7 +774,7 @@ begin
         end;
 
          //_draw_text(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
-         //if(sel)then            i2s(vsnt[_players[player].team])+#13+i2s(vsni[_players[player].team])
+         //if(isselected)then            i2s(vsnt[_players[player].team])+#13+i2s(vsni[_players[player].team])
          //if(alrm_r<=0)then
          //
 
@@ -773,7 +787,7 @@ begin
 
         _draw_text(r_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_left,255, plcolor[player]);// }
 
-        //if(sel)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
+        //if(isselected)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
 
    if(ks_ctrl>0)then

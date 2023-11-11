@@ -1,17 +1,17 @@
-procedure _unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);  forward;
-procedure _unit_upgr  (pu:PTUnit);forward;
+procedure unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);  forward;
+procedure unit_Bonuses  (pu:PTUnit);forward;
 procedure aiu_InitVars(pu:PTUnit);forward;
 procedure ai_InitVars(pu:PTUnit);forward;
 procedure ai_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
-procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
-procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
+procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
+procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
 procedure aiu_code(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
-function unit_canmove  (pu:PTUnit):boolean; forward;
+function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function _itcanapc(uu,tu:PTUnit):boolean;  forward;
+function unit_CheckTransport(uu,tu:PTUnit):boolean;  forward;
 function pf_IfObstacleZone(zone:word):boolean;  forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
@@ -110,6 +110,17 @@ begin
    then _str_mx:='-'
    else _str_mx:='x'+b2s(x);
 end;
+function ValidateStr(BaseStr:shortstring;MaxSize:byte;Chars:PTSoc):shortstring;
+var i:byte;
+begin
+   ValidateStr:='';
+   if(length(BaseStr)>0)then
+     for i:=1 to length(BaseStr) do
+     begin
+        if(BaseStr[i] in Chars^)then ValidateStr+=BaseStr[i];
+        if(length(ValidateStr)>=MaxSize)then break;
+     end;
+end;
 
 function GetBBit(pb:pbyte;nb:byte):boolean;
 begin
@@ -131,7 +142,14 @@ end;
 //   COMMON Players funcs
 //
 
-procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);    // allowed units
+procedure PlayersValidateName;
+var p:byte;
+begin
+   for p:=0 to MaxPlayers do
+    with _players[p] do name:=ValidateStr(name,NameLen,@k_kbstr);
+end;
+
+procedure PlayerSetAllowedUnitsMax(p:byte;g:TSob;max:integer;new:boolean);    // allowed units
 var i:byte;
 begin
    with _players[p] do
@@ -435,9 +453,12 @@ begin
                    if((condt and ureq_alreadyAdv)>0)
                    then bt:=lmt_already_adv
                    else
-                     if((condt and ureq_unknown   )>0)
-                     then bt:=lmt_cant_order
-                     else bt:=lmt_req_common;
+                     if((condt and ureq_usepsaorder)>0)
+                     then bt:=lmt_UsepsabilityOrder
+                     else
+                       if((condt and ureq_unknown)>0)
+                       then bt:=lmt_cant_order
+                       else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -526,7 +547,7 @@ gm_3x3     : case p of
 gm_2x2x2   : case p of
              1,2 : PlayerGetTeam:=1;
              3,4 : PlayerGetTeam:=3;
-             5,6 : PlayerGetTeam:=4;
+             5,6 : PlayerGetTeam:=5;
              end;
 gm_invasion:       PlayerGetTeam:=1;
         else       PlayerGetTeam:=_players[p].team;
@@ -589,17 +610,31 @@ begin
 end;
 
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;
+var t:longint;
 begin
    dx0:=abs(dx1-dx0);
    dy0:=abs(dy1-dy0);
    if(dx0<dy0)
-   then point_dist_rint:=(123*dy0+51*dx0) shr 7
-   else point_dist_rint:=(123*dx0+51*dy0) shr 7;
+   then t:=(123*dy0+51*dx0) shr 7
+   else t:=(123*dx0+51*dy0) shr 7;
+   if(t>smallint.MaxValue)or(t<0)
+   then point_dist_rint:=integer.MaxValue
+   else point_dist_rint:=t;
 end;
 
 function point_dist_int(dx0,dy0,dx1,dy1:integer):integer;
+var t:int64;
 begin
-   point_dist_int:=round(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
+   t:=sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1));
+   if(t<0)
+   then point_dist_int:=integer.MaxValue
+   else
+   begin
+      t:=round(sqrt(t));
+      if(t<smallint.MaxValue)
+      then point_dist_int:=t
+      else point_dist_int:=smallint.MaxValue;
+   end;
 end;
 
 function point_dist_real(dx0,dy0,dx1,dy1:integer):single;
@@ -656,23 +691,23 @@ begin
    dir_turn:=_DIR360(dir_turn);
 end;
 
-function _IsUnitRange(u:integer;ppu:PPTUnit):boolean;
+function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
-   _IsUnitRange:=false;
+   IsUnitRange:=false;
    if(0<u)and(u<=MaxUnits)then
    begin
-      _IsUnitRange:=true;
+      IsUnitRange:=true;
       if(ppu<>nil)then ppu^:=@_units[u];
    end;
 end;
 
-function _AddToInt(bt:pinteger;val:integer):boolean;
+function AddToInt(bt:pinteger;val:integer):boolean;
 begin
-   _AddToInt:=false;
+   AddToInt:=false;
    if(bt^<val)then
    begin
       bt^:=val;
-      _AddToInt:=true;
+      AddToInt:=true;
    end;
 end;
 
@@ -826,7 +861,9 @@ begin
    with pl^ do
    with _upids[up] do
    begin
-      setr(ureq_ruid   ,(_up_ruid >0)and(uid_eb[_up_ruid ]=0)  );
+      setr(ureq_ruid   ,(_up_ruid1>0)and(uid_eb[_up_ruid1]=0)  );
+      setr(ureq_ruid   ,(_up_ruid2>0)and(uid_eb[_up_ruid2]=0)  );
+      setr(ureq_ruid   ,(_up_ruid3>0)and(uid_eb[_up_ruid3]=0)  );
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
       setr(ureq_energy , cenergy<_upid_energy(up,upgr[up]+1)   );
       setr(ureq_time   , _up_time<=0                           );
@@ -881,10 +918,10 @@ begin
     end;
 end;
 
-function _UnitHaveRPoint(uid:byte):boolean;
+function UnitHaveRPoint(uid:byte):boolean;
 begin
    with _uids[uid] do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
+   UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
 end;
 
 function UnitF2Select(pu:PTUnit):boolean;
@@ -896,69 +933,69 @@ begin
    begin
       if(hits<=0)
       or(not iscomplete)
-      or(_IsUnitRange(transport,nil))then exit;
+      or(IsUnitRange(transport,nil))then exit;
 
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
       if(_attack  =atm_none)then exit;
-      if(uo_id=ua_psability)
-      or(uo_id=ua_hold     )
-      or(uo_bx>0           )then exit;
+      if(ua_id=ua_psability)
+      or(ua_id=ua_hold     )
+      or(ua_bx>0           )then exit;
 
-      if(_IsUnitRange(uo_tar,@tu))then
+      if(IsUnitRange(ua_tar,@tu))then
       begin
          if(tu^.uid^._ability=uab_Teleport)and(not ukfly)then exit;
 
-         if(_itcanapc(pu,tu))
-         or(_itcanapc(tu,pu))then exit;
+         if(unit_CheckTransport(pu,tu))
+         or(unit_CheckTransport(tu,pu))then exit;
       end;
    end;
    UnitF2Select:=true;
 end;
 
-function _canRebuild(pu:PTUnit):cardinal;
+function unit_canRebuild(pu:PTUnit):cardinal;
 begin
-   _canRebuild:=0;
+   unit_canRebuild:=0;
    with pu^     do
    with uid^    do
     if(iscomplete=false)
     or(hits<=0)
     or(_rebuild_uid=0)
     or((_rebuild_level>0)and(level>=_rebuild_level))
-    then _canRebuild:=ureq_alreadyAdv
+    then unit_canRebuild:=ureq_alreadyAdv
     else
       with player^ do
       begin
          if(_rebuild_ruid>0)then
-          if(uid_eb[_rebuild_ruid]<=0)then _canRebuild+=ureq_ruid;
+          if(uid_eb[_rebuild_ruid]<=0)then unit_canRebuild+=ureq_ruid;
 
          if(_rebuild_rupgr>0)and(_rebuild_rupgrl>0)then
-          if(upgr[_rebuild_rupgr]<_rebuild_rupgrl)then _canRebuild+=ureq_rupid;
+          if(upgr[_rebuild_rupgr]<_rebuild_rupgrl)then unit_canRebuild+=ureq_rupid;
       end;
 end;
 
-function _canAbility(pu:PTUnit):cardinal;
+function unit_canAbility(pu:PTUnit):cardinal;
 begin
-   _canAbility:=0;
+   unit_canAbility:=0;
    with pu^     do
    with uid^    do
     if(iscomplete=false)
     or(hits<=0)
     or(_ability=0)
-    then _canAbility:=ureq_unknown
+    then unit_canAbility:=ureq_unknown
     else
       with player^ do
       begin
          if(_ability_no_obstacles)then
-          if(pf_IfObstacleZone(pfzone))then _canAbility+=ureq_place;
+          if(pf_IfObstacleZone(pfzone))then unit_canAbility+=ureq_place;
 
          if(_ability_ruid>0)then
-          if(uid_eb[_ability_ruid]<=0)then _canAbility+=ureq_ruid;
+          if(uid_eb[_ability_ruid]<=0)then unit_canAbility+=ureq_ruid;
 
          if(_ability_rupgr>0)and(_ability_rupgrl>0)then
-          if(upgr[_ability_rupgr]<_ability_rupgrl)then _canAbility+=ureq_rupid;
+          if(upgr[_ability_rupgr]<_ability_rupgrl)then unit_canAbility+=ureq_rupid;
 
-         if(_ability=uab_RebuildInPoint)and(_canAbility=0)then _canAbility+=_canRebuild(pu);
+         if(_ability=uab_RebuildInPoint)and(unit_canAbility=0)then unit_canAbility+=unit_canRebuild(pu);
       end;
 end;
 
@@ -1001,7 +1038,7 @@ end;
 procedure UpdateLastSelectedUnit(u:integer);
 var tu:PTUnit;
 begin
-   if(_IsUnitRange(u,@tu))then
+   if(IsUnitRange(u,@tu))then
    begin
       if(ui_UnitSelectedNU=0)
       then
@@ -1040,23 +1077,23 @@ begin
       if(pb^<255)then
       begin
          pb^+=1;
-         if(pb^>max)then pb^:=max;
-      end;
+         if(pb^>max)then pb^:=min;
+      end
+      else pb^:=min;
    end
    else
       if(pb^>0  )then
       begin
          pb^-=1;
-         if(pb^<min)then pb^:=min;
-      end;
+         if(pb^<min)then pb^:=max;
+      end
+      else pb^:=max;
 end;
-
-
 procedure ScrollInt(i:pinteger;s,min,max:integer);
 begin
    i^+=s;
-   if(i^>max)then i^:=max;
-   if(i^<min)then i^:=min;
+   if(i^>max)then i^:=min;
+   if(i^<min)then i^:=max;
 end;
 
 procedure WriteLog(mess:shortstring);
@@ -1243,7 +1280,7 @@ begin
       MainMenu:=not MainMenu;
       vid_menu_redraw:=MainMenu;
       menu_item:=0;
-      if(net_status=ns_none)and(g_Status<=MaxPlayers)then
+      if(net_status=ns_single)and(g_Status<=MaxPlayers)then
        if(MainMenu)
        then g_Status:=HPlayer
        else g_Status:=gs_running;
@@ -1380,6 +1417,7 @@ lmt_already_adv      : ParseLogMessage:=str_cant_advanced;
 lmt_production_busy  : ParseLogMessage:=str_production_busy;
 lmt_unit_needbuilder : ParseLogMessage:=str_need_more_builders;
 lmt_unit_limit       : ParseLogMessage:=str_maxlimit_reached;
+lmt_UsepsabilityOrder: ParseLogMessage:=str_NeedpsabilityOrder;
 lmt_map_mark         : begin
                        mcolor^:=c_gray;
                        if(argx<=MaxPlayers)then

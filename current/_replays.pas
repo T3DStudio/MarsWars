@@ -34,8 +34,8 @@ begin
       end;
       vr:=0;
       {$I-}
-      BlockRead(f,vr,SizeOf(Ver));
-      if(vr=Ver)then
+      BlockRead(f,vr,SizeOf(version));
+      if(vr=version)then
       begin
          hp:=0;
          vr:=0;
@@ -43,12 +43,9 @@ begin
          wr:=0;
          BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
          BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
-         BlockRead(f,vr,sizeof(map_liq     ));
-         if(vr<=7)then begin rpls_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';  end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(map_obs     ));
-         if(vr<=7)then begin rpls_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';  end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
+         BlockRead(f,vr,sizeof(map_type    ));
+         if(vr<=gms_m_types)then begin rpls_str_info+=str_m_tpe+_str_mx(vr)+tc_nl3+' ';  end
+                            else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(map_symmetry));rpls_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
 
          BlockRead(f,vr,sizeof(g_mode      ));
@@ -56,7 +53,7 @@ begin
                                else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-         BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
+         BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer          ));
 
          for vr:=1 to MaxPlayers do
@@ -100,17 +97,16 @@ end;
 procedure replay_CalcHeaderSize;
 begin
    rpls_file_head_size
-                 :=SizeOf(ver              )
+                 :=SizeOf(version          )
                   +SizeOf(map_seed         )
                   +SizeOf(map_mw           )
-                  +SizeOf(map_liq          )
-                  +SizeOf(map_obs          )
+                  +SizeOf(map_type         )
                   +SizeOf(map_symmetry     )
 
                   +SizeOf(g_mode           )
                   +SizeOf(g_start_base     )
                   +SizeOf(g_fixed_positions)
-                  +SizeOf(g_generators    )
+                  +SizeOf(g_generators     )
                   +sizeof(rpls_player      );
    with _players[0] do
    rpls_file_head_size
@@ -180,7 +176,7 @@ begin
       g_Step:=rp_gtick;
       Seek(rpls_file,rp_fpos);
    end;
-   rpls_step:=2;
+   rpls_ForwardStep:=2;
    for i:=1 to MaxUnits do
     with _units[i] do
     begin
@@ -236,17 +232,16 @@ begin
       rpls_ticks  :=0;
 
       {$I-}
-      BlockWrite(rpls_file,ver              ,SizeOf(ver              ));
+      BlockWrite(rpls_file,version          ,SizeOf(version          ));
       BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
       BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
-      BlockWrite(rpls_file,map_liq          ,SizeOf(map_liq          ));
-      BlockWrite(rpls_file,map_obs          ,SizeOf(map_obs          ));
+      BlockWrite(rpls_file,map_type         ,SizeOf(map_type         ));
       BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
 
       BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
       BlockWrite(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
       BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-      BlockWrite(rpls_file,g_generators    ,SizeOf(g_generators    ));
+      BlockWrite(rpls_file,g_generators     ,SizeOf(g_generators    ));
       BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
       {$I+}
 
@@ -358,10 +353,10 @@ begin
 
       i:=0;
       {$I-}
-      BlockRead(rpls_file,i,SizeOf(Ver));
+      BlockRead(rpls_file,i,SizeOf(version));
       {$I+}
 
-      if(i<>ver)then
+      if(i<>version)then
       begin
          replay_Abort;
          g_started    :=false;
@@ -374,18 +369,17 @@ begin
          {$I-}
          BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
          BlockRead(rpls_file,map_mw           ,SizeOf(map_mw           ));
-         BlockRead(rpls_file,map_liq          ,SizeOf(map_liq          ));
-         BlockRead(rpls_file,map_obs          ,SizeOf(map_obs          ));
+         BlockRead(rpls_file,map_type         ,SizeOf(map_type         ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
          BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
          BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(rpls_file,g_generators    ,SizeOf(g_generators    ));
+         BlockRead(rpls_file,g_generators     ,SizeOf(g_generators     ));
          BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
          {$I+}
 
          if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
-         or(map_liq>7)or(map_obs>7)
+         or(map_type>gms_m_types)
          or not(g_mode in allgamemodes)
          or(g_start_base>gms_g_startb)
          or(rpls_player>MaxPlayers)then
@@ -416,6 +410,8 @@ begin
             GameDefaultAll;
             exit;
          end;
+
+         PlayersValidateName;
 
          if(rpls_pnu=0)then rpls_pnu:=NetTickN;
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
@@ -457,14 +453,14 @@ begin
    begin
       G_Status   :=gs_replayend;
       uncappedFPS:=false;
-      rpls_step  :=0;
+      rpls_ForwardStep  :=0;
       exit;
    end;
 
    //gs_replaypause
    gs:=G_Status;
-   if(rpls_step<=0)and(G_Status=gs_running)then rpls_step:=1;
-   while(rpls_step>0)do
+   if(rpls_ForwardStep<=0)and(G_Status=gs_running)then rpls_ForwardStep:=1;
+   while(rpls_ForwardStep>0)do
    begin
       replay_SavePlayPosition;
 
@@ -482,10 +478,10 @@ begin
          {$I+}
       end;
 
-      if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true,rpls_step>1);
+      if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true,rpls_ForwardStep>1);
 
-      if(rpls_step>1)then effects_sprites(false,false);
-      rpls_step-=1;
+      if(rpls_ForwardStep>1)then effects_sprites(false,false);
+      rpls_ForwardStep-=1;
    end;
 
    if(rpls_plcam)then

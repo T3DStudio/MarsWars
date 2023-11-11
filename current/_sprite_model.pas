@@ -327,11 +327,11 @@ begin
       if(buff[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 
-      if(a_rld>0)and(a_weap_cl<=MaxUnitWeapons)then //and(0<a_tar)and(a_tar<=MaxUnits)
+      if(a_reload>0)and(a_weap_cl<=MaxUnitWeapons)then //and(0<a_tar)and(a_tar<=MaxUnits)
        with _a_weap[a_weap_cl] do
         if(aw_max_range>=0)then
         begin
-           if not(a_rld in aw_rld_a)
+           if not(a_reload in aw_rld_a)
            then _unit2SMAnimK:=sms_dready
            else
              if(aw_AnimStay>0)
@@ -339,7 +339,7 @@ begin
              else _unit2SMAnimK:=sms_dattack;
         end
         else
-           if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
+           if(a_reload in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
    end
 end;
 
@@ -371,7 +371,7 @@ sms_walk:    if(animw>0)then
              else _unit2spr:=_sm2s(smodel,ak,dir,0,nil);
 sms_dattack,
 sms_mattack: if(a_weap<=MaxUnitWeapons)
-             then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a),nil)
+             then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_reload in _a_weap[a_weap].aw_rld_a),nil)
              else _unit2spr:=_sm2s(smodel,ak,dir,0                                      ,nil);
 sms_death:   begin
                 anim:=abs(hits);

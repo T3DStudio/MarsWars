@@ -7,7 +7,7 @@ begin
      _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
-procedure _screenshot;
+procedure MakeScreenshot;
 var i:integer;
     s:shortstring;
 begin
@@ -508,8 +508,12 @@ begin
    r_empty   :=_createSurf(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_minimap :=_createSurf(vid_panelw-1,vid_panelw-1);
-   r_bminimap:=_createSurf(vid_panelw-1,vid_panelw-1);
+   r_minimap :=_createSurf(vid_panelwi,vid_panelwi);
+   r_bminimap:=_createSurf(vid_panelwi,vid_panelwi);
+
+   {r_sminimap:=_createSurf(vid_panelwi,vid_panelwi);
+   boxColor(r_sminimap,0,0,vid_panelwi,vid_panelwi,c_white);
+   SDL_SetColorKey(r_sminimap,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_sminimap,0,0));}
 
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
@@ -543,13 +547,21 @@ begin
    filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
    SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
 
+  { for x:=fog_mm_Min to fog_mm_Max do
+   begin
+      r:=x*2;
+      vid_fog_mm[x]:=_createSurf(r,r);
+      boxColor(vid_fog_mm[x],0,0,r-1,r-1,c_black);
+      filledcircleColor(vid_fog_mm[x],x,x,x,c_white);
+      SDL_SetColorKey(vid_fog_mm[x],SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_mm[x],0,0));
+   end;     }
+
    spr_mback:= loadIMG('mback'   ,false,true);
 
    r_menu:=_createSurf(max2(vid_minw,spr_mback^.w), max2(vid_minh,spr_mback^.h));
 
    mv_x:=(vid_vw-r_menu^.w) div 2;
    mv_y:=(vid_vh-r_menu^.h) div 2;
-
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
    spr_b_paction  := LoadBtn('b_paction',vid_bw);
@@ -728,7 +740,7 @@ begin
       hw  := w div 2;hh   := hw;
    end;
 
-   initEffects;
+   effect_InitCLData;
    InitThemes;
 end;
 
@@ -811,8 +823,7 @@ begin
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+txt_line_h3;
 
-
-   ui_menu_btnsy:= max2(font_3hw,(vid_vh div vid_BW)-1);
+   ui_menu_btnsy:=(vid_vh div vid_BW)-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
