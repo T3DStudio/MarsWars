@@ -486,14 +486,16 @@ begin
          if(aw_min_range>0)then
          _ADDSTR(@_MakeWeaponString,'min. range: '+i2s(aw_min_range),sep_scomma);
 
-         if(aw_max_range=0)then
+         if(aw_max_range=aw_srange)then
          begin
             _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
-            if(_a_BonusAntiFlyRange   <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '   +_i2s(_a_BonusAntiFlyRange),sep_scomma);
-            if(_a_BonusAntiGroundRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '+_i2s(_a_BonusAntiFlyRange),sep_scomma);
+            if(_a_BonusAntiFlyRange     <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '     +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
+            if(_a_BonusAntiGroundRange  <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '  +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
+            if(_a_BonusAntiUnitRange    <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-unit range: '    +_i2s(_a_BonusAntiUnitRange    ),sep_scomma);
+            if(_a_BonusAntiBuildingRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-building range: '+_i2s(_a_BonusAntiBuildingRange),sep_scomma);
          end
          else
-           if(aw_max_range<0) // melee
+           if(aw_max_range<aw_srange) // melee
            then //_ADDSTR(@_MakeWeaponString,'max range: melee',sep_scomma)
            else
              if(aw_max_range>=aw_fsr0)then  // relative srange

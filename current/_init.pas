@@ -34,7 +34,7 @@ begin
       s:=ParamStr(i);
 
       if(s='test' )then TestMode:=1;
-      //if(s='testD')then TestMode:=2;
+      if(s='testD')then TestMode:=2;
    end;
 end;
 

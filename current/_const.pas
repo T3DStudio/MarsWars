@@ -427,6 +427,7 @@ wtp_Fly                = 18;
 wtp_nolost_hits        = 19;
 wtp_max_hits           = 20;
 wtp_limit              = 21;
+wtp_limitaround        = 22;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -697,6 +698,7 @@ BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
 BaseDamage5            = BaseDamage1*5;
+BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
