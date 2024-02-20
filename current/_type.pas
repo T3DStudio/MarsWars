@@ -306,7 +306,9 @@ TUID = record
                 : byte;
 
    _a_BonusAntiFlyRange,
-   _a_BonusAntiGroundRange
+   _a_BonusAntiGroundRange,
+   _a_BonusAntiBuildingRange,
+   _a_BonusAntiUnitRange
                 : integer;
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
 

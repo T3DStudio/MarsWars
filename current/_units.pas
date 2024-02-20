@@ -457,19 +457,24 @@ wpt_heal     : if(tu^.hits<=0)
       if(not CheckUnitBaseFlags(tu,aw_tarf))then exit;
 
       // Distance requirements
-      if(aw_max_range=0) // = srange
+      if(aw_max_range=aw_srange) // = srange
       then awr:=ud-srange
       else
-        if(aw_max_range<0) // melee
+        if(aw_max_range<aw_srange) // melee
         then awr:=ud-(_r+tu^.uid^._r-aw_max_range)  // need transport check
         else
           if(aw_max_range>=aw_fsr0)  // relative srange
           then awr:=ud-(srange+(aw_max_range-aw_fsr))
           else awr:=ud-aw_max_range; // absolute
-      if(aw_max_range>=0)then
-       if(tu^.ukfly)
-       then awr-=_a_BonusAntiFlyRange
-       else awr-=_a_BonusAntiGroundRange;
+      if(aw_max_range>=aw_srange)then
+      begin
+         if(tu^.ukfly)
+         then awr-=_a_BonusAntiFlyRange
+         else awr-=_a_BonusAntiGroundRange;
+         if(tu^.uid^._ukbuilding)
+         then awr-=_a_BonusAntiBuildingRange
+         else awr-=_a_BonusAntiUnitRange;
+      end;
 
       canmove:=(speed>0)and(ua_id<>ua_hold)and(transportu=nil);
       pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
@@ -586,6 +591,7 @@ wtp_UnitLight       : begin
                        incPrio(not iscomplete    );
                        end;
 wtp_limit            : incPrio(not _ukbuilding   );
+wtp_limitaround      : _unitWeaponPriority+=tu^.aiu_limitaround_ally div ul1;
 wtp_Scout            : begin
                        incPrio(_limituse<ul3);
                        incPrio(ukfly or ukfloater);

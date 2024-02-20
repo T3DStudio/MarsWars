@@ -649,6 +649,7 @@ begin
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 
    setWeaponESND(0,nil,snd_shotgun,0,0);
+   setWeaponESND(1,nil,snd_revenant_attack,0,0);
 
    setWeaponTEID(0,nil,0,[0..255]);
    with _a_weap[0] do aw_AnimStay:=sms_mattack;
@@ -670,9 +671,8 @@ begin
    setMWSModel(0,@spr_Flyer);
    setCommandSND(snd_uacfighter_ready,snd_uacfighter_move,snd_uacfighter_attack,snd_uacfighter_annoy,snd_uacfighter_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
-   setWeaponESND(0  ,nil,snd_revenant_attack,0,0);
-   setWeaponESND(1  ,nil,snd_flyer_s,0,0);
+   setEffectSND (nil,snd_exp ,snd_exp ,nil);
+   setWeaponESND(0  ,nil,snd_flyer_s,0,0);
 end;
 
 
