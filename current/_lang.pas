@@ -138,7 +138,7 @@ begin
 end;
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       un_txt_name  :=NAME;
       un_txt_udescr:=DESCR;
@@ -147,7 +147,7 @@ end;
 
 procedure _mkHStrUpid(upid:byte;NAME,DESCR:shortstring);
 begin
-   with _upids[upid] do
+   with g_upids[upid] do
    begin
       _up_name :=NAME;
       _up_descr:=DESCR;
@@ -174,8 +174,8 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _ADDSTR(@up,_uids[i].un_txt_name,sep_comma);
-      if(uid in _uids[i].ups_builder)then _ADDSTR(@bp,_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_units  )then _ADDSTR(@up,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_builder)then _ADDSTR(@bp,g_uids[i].un_txt_name,sep_comma);
    end;
 
    if(length(up)>0)then _ADDSTR(@findprd,up,sep_comma);
@@ -187,13 +187,13 @@ function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
    begin
-      pu:=@_units[0];
+      pu:=@g_units[0];
       with pu^ do
       begin
          uidi:=auid;
          playeri:=0;
-         player :=@_players[playeri];
-         _unit_apUID(pu);
+         player :=@g_players[playeri];
+         unit_apllyUID(pu);
          hits:=-32000;
       end;
    end;
@@ -280,7 +280,7 @@ begin
    then DamageStr:='x '+str_TargetLimit
    else
     for i:=0 to MaxDamageModFactors do
-     with _dmods[dmod][i] do
+     with g_dmods[dmod][i] do
       if(dm_factor<>100)and(dm_flags>0)then
        _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
@@ -294,8 +294,8 @@ end;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 
@@ -303,12 +303,12 @@ function _MakeDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):
 function RebuildStr(uid,uidl:byte):shortstring;
 begin
   if(uidl=0)
-  then RebuildStr:='"'+_uids[uid].un_txt_name+'"'
-  else RebuildStr:='"'+_uids[uid].un_txt_name+'['+str_attr_level+b2s(uidl+1)+']"';
+  then RebuildStr:='"'+g_uids[uid].un_txt_name+'"'
+  else RebuildStr:='"'+g_uids[uid].un_txt_name+'['+str_attr_level+b2s(uidl+1)+']"';
 end;
 begin
    _MakeDefaultDescription:=basedesc;
-    with _uids[uid] do
+    with g_uids[uid] do
     begin
        if(not for_doc)then
        _ADDSTR(@_MakeDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
@@ -356,9 +356,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','
-                                                                                +_uids[UID_Mastermind].un_txt_name+','
-                                                                                +_uids[UID_ArchVile  ].un_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
+                                                                                +g_uids[UID_Mastermind].un_txt_name+','
+                                                                                +g_uids[UID_ArchVile  ].un_txt_name+']'
     else
     begin
       inset:=[];
@@ -382,14 +382,14 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           _ADDSTR(@instr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@instr,g_uids[u].un_txt_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           _ADDSTR(@exstr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@exstr,g_uids[u].un_txt_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
       end;
    end;
@@ -409,7 +409,7 @@ var BaseDmg,
     sps    : single;
 begin
   _MakeWeaponDPS:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   with _a_weap[wid] do
   begin
      BaseDmg:=0;
@@ -417,12 +417,12 @@ begin
      case aw_type of
      wpt_suicide   : if(_death_missile>0)then
                      begin
-                        BaseDmg:=_mids[_death_missile].mid_base_damage;
+                        BaseDmg:=g_mids[_death_missile].mid_base_damage;
                         ocount:=1;
                      end
                      else exit;       //wpt_suicide
      wpt_missle    : begin
-                     BaseDmg:=_mids[aw_oid].mid_base_damage;
+                     BaseDmg:=g_mids[aw_oid].mid_base_damage;
                      if(aw_count>=0)
                      then ocount:=aw_count
                      else ocount:=2;
@@ -434,7 +434,7 @@ begin
      if(aw_type<>wpt_suicide)then
      begin
         n:=0;
-        for i:=0 to aw_rld do
+        for i:=0 to aw_reload do
           if(i in aw_rld_s)then n+=1;
      end
      else n:=1;
@@ -453,8 +453,8 @@ begin
      then sps:=1
      else
        if(aw_fakeshots>0)
-       then sps:=(fr_fps1*n/aw_rld)/aw_fakeshots
-       else sps:=(fr_fps1*n/aw_rld);
+       then sps:=(fr_fps1*n/aw_reload)/aw_fakeshots
+       else sps:=(fr_fps1*n/aw_reload);
      _ADDSTR(@_MakeWeaponDPS,'*'+Float2Str(sps),'');
   end;
 end;
@@ -464,7 +464,7 @@ const tab : array[false..true] of shortstring = ('-','- ');
 var
 dmod_str:shortstring;
 begin
-  with _uids[uid] do
+  with g_uids[uid] do
    with _a_weap[wid] do
    begin
       _MakeWeaponString:='';
@@ -477,7 +477,7 @@ begin
                       else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
       wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
       wpt_heal      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
       wpt_suicide   :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
       end;
 
@@ -521,15 +521,15 @@ begin
       if(docSTR)then
       begin
          if(aw_type=wpt_missle)then
-          with _mids[aw_oid] do
+          with g_mids[aw_oid] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_type=wpt_suicide)and(_death_missile>0)then
-          with _mids[_death_missile] do
+          with g_mids[_death_missile] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_dupgr>0)then
-           _ADDSTR(@_MakeWeaponString,'upgrade: '+_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
+           _ADDSTR(@_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
       end;
 
       dmod_str:='';
@@ -557,7 +557,7 @@ var w:byte;
 weapons_str:shortstring;
 begin
   _MakeWeaponsDescription:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   begin
      weapons_str:='';
      if(_attack=atm_always)then
@@ -580,7 +580,7 @@ var HK,
     INFO:shortstring;
     i   :byte;
 begin
-  with _upids[upid] do
+  with g_upids[upid] do
   begin
      HK  :=_gHK(_up_btni);
      ENRG:='';
@@ -629,7 +629,7 @@ TIME,REQ    :shortstring;
 begin
    // units
    for uid:=0 to 255 do
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       REQ :='';
       PROD:='';
@@ -652,10 +652,10 @@ begin
          LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
-         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
-         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
-         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
+         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
+         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
+         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
+         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
 
          if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
          if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
@@ -681,12 +681,14 @@ begin
 
    // upgrades
    for uid:=0 to 255 do
-   with _upids[uid] do
+   with g_upids[uid] do
    begin
       REQ  :='';
 
-      if(_up_ruid  >0)then _ADDSTR(@REQ,_uids [_up_ruid ].un_txt_name,sep_comma);
-      if(_up_rupgr >0)then _ADDSTR(@REQ,_upids[_up_rupgr]._up_name   ,sep_comma);
+      if(_up_ruid1 >0)then _ADDSTR(@REQ,g_uids [_up_ruid1].un_txt_name,sep_comma);
+      if(_up_ruid2 >0)then _ADDSTR(@REQ,g_uids [_up_ruid2].un_txt_name,sep_comma);
+      if(_up_ruid3 >0)then _ADDSTR(@REQ,g_uids [_up_ruid3].un_txt_name,sep_comma);
+      if(_up_rupgr >0)then _ADDSTR(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_requirements+tc_default+REQ;
@@ -695,15 +697,17 @@ end;
 
 procedure lng_eng;
 var t: shortstring;
+    p: byte;
 begin
    str_MMap              := 'MAP';
    str_MPlayers          := 'PLAYERS';
    str_MObjectives       := 'OBJECTIVES';
+   str_MServers          := 'SERVERS';
    str_menu_s1[ms1_sett] := 'SETTINGS';
    str_menu_s1[ms1_svld] := 'SAVE/LOAD';
    str_menu_s1[ms1_reps] := 'REPLAYS';
    str_menu_s2[ms2_camp] := 'CAMPAIGNS';
-   str_menu_s2[ms2_scir] := 'SKIRMISH';
+   str_menu_s2[ms2_game] := 'GAME';
    str_menu_s2[ms2_mult] := 'MULTIPLAYER';
    str_menu_s3[ms3_game] := 'GAME';
    str_menu_s3[ms3_vido] := 'VIDEO';
@@ -712,10 +716,17 @@ begin
    str_reset[true ]      := 'RESET';
    str_exit[false]       := 'EXIT';
    str_exit[true]        := 'BACK';
-   str_m_liq             := 'Lakes: ';
+   str_m_tpe             := 'Type: ';
+   str_mapt[mapt_steppe] := tc_gray  +'Steppe';
+   str_mapt[mapt_nature] := tc_green +'Mountains';
+   str_mapt[mapt_lake  ] := tc_yellow+'Lake';
+   str_mapt[mapt_shore ] := tc_orange+'Sea shore';
+   str_mapt[mapt_sea   ] := tc_red   +'Sea';
    str_m_siz             := 'Size: ';
-   str_m_obs             := 'Obstacles: ';
-   str_m_sym             := 'Symmetric: ';
+   str_m_sym             := 'Symm.: ';
+   str_m_symt[0]         := 'no';
+   str_m_symt[1]         := 'point';
+   str_m_symt[2]         := 'line';
    str_map               := 'Map';
    str_players           := 'Players';
    str_mrandom           := 'Random map';
@@ -723,14 +734,14 @@ begin
    str_soundvol          := 'Sound volume';
    str_scrollspd         := 'Scroll speed';
    str_mousescrl         := 'Mouse scroll';
-   str_fullscreen        := 'Windowed:';
+   str_fullscreen        := 'Windowed';
    str_plname            := 'Player name';
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
    str_maction           := 'Right-click action';
    str_maction2[true ]   := tc_lime  +'move'  +tc_default;
    str_maction2[false]   := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
-   str_race[r_random]    := tc_white +'RANDOM'+tc_default;
+   str_race[r_random]    := tc_default+'RANDOM';
    str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
    str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
    str_observer          := 'OBSERV.';
@@ -768,7 +779,8 @@ begin
    str_apply             := 'apply';
    str_plout             := ' left the game';
    str_aislots           := 'Fill empty slots:';
-   str_resol             := 'Resolution';
+   str_resol_width       := 'Resolution (width)';
+   str_resol_height      := 'Resolution (height)';
    str_language          := 'UI language';
    str_requirements      := 'Requirements: ';
    str_req               := 'Req.: ';
@@ -784,7 +796,7 @@ begin
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
    str_ability           := 'Special ability: ';
-   str_transformation    := 'transformation to ';
+   str_transformation    := 'transformation into ';
    str_upgradeslvl       := 'Upgrades: ';
    str_demons            := 'demons&zombies';
    str_except            := 'except';
@@ -797,7 +809,7 @@ begin
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
    str_smith             := 'Researches and upgrades facility';
-   str_IncEnergyLevel    := 'Increase energy level';
+   str_IncEnergyLevel    := 'Increases energy level';
    str_CanRebuildTo      := 'Can be rebuilt into ';
    str_UnitArming        := 'Arming/Abilities: ';
    str_hits              := 'Hits: ';
@@ -851,11 +863,45 @@ begin
    str_attr_detector     := tc_purple+'detector'    ;
    str_attr_transport    := tc_gray  +'transport'   ;
 
+   str_PlayerSlots[ps_closed  ]:='closed';
+   str_PlayerSlots[ps_observer]:='observer';
+   str_PlayerSlots[ps_opened  ]:='opened';
+   str_PlayerSlots[ps_replace ]:='jump here';
+   str_PlayerSlots[ps_AI_1    ]:='AI 1';
+   str_PlayerSlots[ps_AI_2    ]:='AI 2';
+   str_PlayerSlots[ps_AI_3    ]:='AI 3';
+   str_PlayerSlots[ps_AI_4    ]:='AI 4';
+   str_PlayerSlots[ps_AI_5    ]:='AI 5';
+   str_PlayerSlots[ps_AI_6    ]:='AI 6';
+   str_PlayerSlots[ps_AI_7    ]:='AI 7';
+   str_PlayerSlots[ps_AI_8    ]:='AI cheater 1';
+   str_PlayerSlots[ps_AI_9    ]:='AI cheater 2';
+   str_PlayerSlots[ps_AI_10   ]:='AI cheater 3';
+   str_PlayerSlots[ps_AI_11   ]:='AI cheater 4';
+   {
+   ps_replace             = 3;  // menu option, not state
+   ps_AI_1                = 4;  // very easy
+   ps_AI_2                = 5;  // easy
+   ps_AI_3                = 6;  // medium
+   ps_AI_4                = 7;  // hard
+   ps_AI_5                = 8;  // harder
+   ps_AI_6                = 9;  // very hard
+   ps_AI_7                = 10; // elite
+   ps_AI_8                = 11; // Cheater 1 (Vision)
+   ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
+   ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
+   ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+   }
+
+   str_teams[0]          := 'OBS.';
+   for p:=1 to MaxPlayers do
+   str_teams[p]          := 'team '+b2s(p);
+
    str_panelpos          := 'Control panel position';
-   str_panelposp[0]      := tc_lime  +'left' +tc_default;
-   str_panelposp[1]      := tc_orange+'right'+tc_default;
-   str_panelposp[2]      := tc_yellow+'up'   +tc_default;
-   str_panelposp[3]      := tc_aqua  +'down' +tc_default;
+   str_panelposp[0]      := tc_lime  +'left'  +tc_default;
+   str_panelposp[1]      := tc_orange+'right' +tc_default;
+   str_panelposp[2]      := tc_yellow+'top'   +tc_default;
+   str_panelposp[3]      := tc_aqua  +'bottom'+tc_default;
 
    str_uhbar             := 'Health bars';
    str_uhbars[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
@@ -870,7 +916,7 @@ begin
    str_pcolors[4]        := tc_purple+'teams'  +tc_default;
    str_pcolors[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
-   str_starta            := 'Builders at game start:';
+   str_starta            := 'Builders at the game start:';
 
    str_fstarts           := 'Fixed player starts:';
 
@@ -904,22 +950,23 @@ begin
    str_cmpd[5]           := tc_red   +'Nightmare'           +tc_default;
    str_cmpd[6]           := tc_purple+'HELL'                +tc_default;
 
-   str_gmodet            := 'Game mode:';
+   str_gmodet            := 'Game mode';
    str_gmode[gm_scirmish]:= tc_lime  +'Skirmish'        +tc_default;
    str_gmode[gm_3x3     ]:= tc_orange+'3x3'             +tc_default;
    str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'           +tc_default;
    str_gmode[gm_capture ]:= tc_aqua  +'Capturing points'+tc_default;
    str_gmode[gm_invasion]:= tc_blue  +'Invasion'        +tc_default;
    str_gmode[gm_KotH    ]:= tc_purple+'King of the Hill'+tc_default;
-   str_gmode[gm_royale  ]:= tc_red   +'Royal Battle'    +tc_default;
+   str_gmode[gm_royale  ]:= tc_red   +'Battle Royal'    +tc_default;
 
    str_generators        := 'Generators:';
    str_generatorsO[0]    := 'own';
-   str_generatorsO[1]    := 'neutral(5 min)';
-   str_generatorsO[2]    := 'neutral(10 min)';
-   str_generatorsO[3]    := 'neutral(15 min)';
-   str_generatorsO[4]    := 'neutral(20 min)';
-   str_generatorsO[5]    := 'neutral(infinity)';
+   str_generatorsO[1]    := 'own,no new builders';
+   str_generatorsO[2]    := 'neutral(5 min)';
+   str_generatorsO[3]    := 'neutral(10 min)';
+   str_generatorsO[4]    := 'neutral(15 min)';
+   str_generatorsO[5]    := 'neutral(20 min)';
+   str_generatorsO[6]    := 'neutral(infinity)';
 
    str_team              := 'Team:';
    str_srace             := 'Race:';
@@ -932,6 +979,8 @@ begin
    str_pnu               := 'File size/quality: ';
    str_npnu              := 'Units update rate: ';
    str_connecting        := 'Connecting...';
+   str_netsearching      := 'Searching for servers...';
+   str_netsearch         := 'Search for LAN servers';
    str_sver              := 'Wrong version!';
    str_sfull             := 'Server full!';
    str_sgst              := 'Game started!';
@@ -967,10 +1016,10 @@ begin
    _mkHStrUid(UID_HSymbol        ,'Unholy Symbol'               ,'');
    _mkHStrUid(UID_HASymbol       ,'Great Unholy Symbol'         ,'');
    _mkHStrUid(UID_HPools         ,'Infernal Pools'              ,'');
-   _mkHStrUid(UID_HTeleport      ,'Teleport'                    ,'');
+   _mkHStrUid(UID_HTeleport      ,'Teleporter'                  ,'');
    _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
    _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
-   _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
+   _mkHStrUid(UID_HFortress      ,'Castle of the Damned'        ,'');
    _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Defensive structure'              );
    _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
    _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'');
@@ -995,12 +1044,12 @@ begin
    _mkHStrUid(UID_Archvile       ,'Arch-Vile'                   ,'');
    _mkHStrUid(UID_ZFormer        ,'Former Zombie'               ,'');
    _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer'             ,'');
-   _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner'            ,'');
-   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner'       ,'');
+   _mkHStrUid(UID_ZSergant       ,'Zombie Shotgunner'           ,'');
+   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotgunner'      ,'');
    _mkHStrUid(UID_ZCommando      ,'Zombie Commando'             ,'');
-   _mkHStrUid(UID_ZAntiaircrafter,'Zombie Antiaircrafter'       ,'');
+   _mkHStrUid(UID_ZAntiaircrafter,'Anti-aircraft Zombie'        ,'');
    _mkHStrUid(UID_ZSiegeMarine   ,'Zombie Siege Marine'         ,'');
-   _mkHStrUid(UID_ZFPlasmagunner ,'Zombie Plasmaguner'          ,'');
+   _mkHStrUid(UID_ZFPlasmagunner ,'Zombie Plasmagunner'         ,'');
    _mkHStrUid(UID_ZBFGMarine     ,'Zombie BFG Marine'           ,'');
 
 
@@ -1011,24 +1060,24 @@ begin
    _mkHStrUpid(upgr_hell_regen     ,'Flesh Regeneration'            ,'Health regeneration for all Hell units'                                 );
    _mkHStrUpid(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before being stunned by pain'             );
    _mkHStrUpid(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase the range of defensive structures'                             );
-   _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for Hell Keep`s ability'                                         );
-   _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
-   _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
-   _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except Teleport and those that can produce units, can be placed on doodads');
+   _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for the Hell Keep`s ability'                                     );
+   _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep damages all nearby enemy units. Decay Aura damage ignores unit armor.');
+   _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase the Hell Keep`s range of vision'                               );
+   _mkHStrUpid(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except the Teleporter and unit-producing structures, can be placed on doodads.');
    _mkHStrUpid(upgr_hell_ghostm    ,'Ghost Monsters'                ,'Pinky Demons can move over obstacles'                           );
 
-   _mkHStrUpid(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
+   _mkHStrUpid(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demons become invisible'                                  );
    _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
-   _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
-   _mkHStrUpid(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
-   _mkHStrUpid(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Reduced cooldown on Teleport ability'                           );
-   _mkHStrUpid(upgr_hell_rteleport ,'Reverse Teleportation'         ,'Units can teleport back to Teleport'                            );
+   _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Souls'            );
+   _mkHStrUpid(upgr_hell_t2attack  ,'Demonic Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
+   _mkHStrUpid(upgr_hell_teleport  ,'Teleporter Upgrade'            ,'Reduced cooldown on Teleporter ability'                         );
+   _mkHStrUpid(upgr_hell_rteleport ,'Reverse Teleportation'         ,'Units can teleport back to Teleporter'                          );
    _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
    _mkHStrUpid(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
    _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
-   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
+   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for the ability of Guard Tower and Totem of Horror');
    _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
-   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for Altar of Pain ability'      );
+   _mkHStrUpid(upgr_hell_invuln    ,'Invulnerability Sphere'        ,'Charge for the Altar of Pain ability'      );
 
 
    _mkHStrUid(UID_UCommandCenter   ,'Command Center'                ,''      );
@@ -1037,7 +1086,7 @@ begin
    _mkHStrUid(UID_UFactory         ,'Vehicle Factory'               ,''      );
    _mkHStrUid(UID_UGenerator       ,'Generator'                     ,''      );
    _mkHStrUid(UID_UAGenerator      ,'Advanced Generator'            ,''      );
-   _mkHStrUid(UID_UWeaponFactory   ,'Weapon Factory'                ,''      );
+   _mkHStrUid(UID_UWeaponFactory   ,'Weapons Factory'               ,''      );
    _mkHStrUid(UID_UGTurret         ,'Anti-ground Turret'            ,'Anti-ground defensive structure');
    _mkHStrUid(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
    _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
@@ -1049,9 +1098,9 @@ begin
    _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
    _mkHStrUid(UID_SSergant         ,'SuperShotguner'                ,'');
    _mkHStrUid(UID_Commando         ,'Commando'                      ,'');
-   _mkHStrUid(UID_Antiaircrafter   ,'Antiaircrafter'                ,'');
+   _mkHStrUid(UID_Antiaircrafter   ,'Anti-aircraft Marine'          ,'');
    _mkHStrUid(UID_SiegeMarine      ,'Siege Marine'                  ,'');
-   _mkHStrUid(UID_FPlasmagunner    ,'Plasmaguner'                   ,'');
+   _mkHStrUid(UID_FPlasmagunner    ,'Plasmagunner'                  ,'');
    _mkHStrUid(UID_BFGMarine        ,'BFG Marine'                    ,'');
    _mkHStrUid(UID_Engineer         ,'Engineer'                      ,'');
    _mkHStrUid(UID_Medic            ,'Medic'                         ,'');
@@ -1064,26 +1113,26 @@ begin
 
 
    _mkHStrUpid(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
-   _mkHStrUpid(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
+   _mkHStrUpid(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barracks-produced units'             );
    _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
    _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
-   _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
-   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Shotguner, SuperShotguner and Terminator deal more damage to ['+str_attr_bio+']' );
+   _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barracks-produced units'            );
+   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Shotgunner, SuperShotgunner and Terminator deal more damage to ['+str_attr_bio+']' );
    _mkHStrUpid(upgr_uac_towers     ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
    _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
    _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
    _mkHStrUpid(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
    _mkHStrUpid(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads');
-   _mkHStrUpid(upgr_uac_soaring    ,'Antigravity Platform'             ,'Drone can move over obstacles'              );
+   _mkHStrUpid(upgr_uac_soaring    ,'Antigravity Platform'             ,'Drones can move over obstacles'              );
 
-   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
+   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'A Drone can rebuild to Anti-ground turret'    );
    _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
    _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando becomes invisible'                 );
    _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'  );
-   _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
-   _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
+   _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory-produced units'      );
+   _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory-produced units'               );
    _mkHStrUpid(upgr_uac_lturret    ,'Fighter Laser Gun'                ,'Fighter anti-ground weapon'                              );
-   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                    );
+   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of the Dropship'                   );
    _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
    _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'           );
    _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
@@ -1091,8 +1140,10 @@ begin
 
 
    _mkHStrACT(0 ,'Specail ability');
-   _mkHStrACT(1 ,'Specail ability at point');
-   _mkHStrACT(2 ,'Rebuild/Advance');
+   t:='Specail ability at point';
+   _mkHStrACT(1 ,t);
+   str_NeedpsabilityOrder:= 'Use "'+t+'" order!';
+   _mkHStrACT(2 ,'Rebuild/Upgrade');
    t:='attack enemies';
    _mkHStrACT(3 ,'Move, '  +t);
    _mkHStrACT(4 ,'Stop, '  +t);
@@ -1257,11 +1308,12 @@ begin
   str_MMap              := 'КАРТА';
   str_MPlayers          := 'ИГРОКИ';
   str_MObjectives       := 'ЗАДАЧИ';
+  str_MServers          := 'СЕРВЕРЫ';
   str_menu_s1[ms1_sett] := 'НАСТРОЙКИ';
   str_menu_s1[ms1_svld] := 'СОХР./ЗАГР.';
   str_menu_s1[ms1_reps] := 'ЗАПИСИ';
   str_menu_s2[ms2_camp] := 'КАМПАНИИ';
-  str_menu_s2[ms2_scir] := 'СХВАТКА';
+  str_menu_s2[ms2_game] := 'ИГРА';
   str_menu_s2[ms2_mult] := 'СЕТЕВАЯ ИГРА';
   str_menu_s3[ms3_game] := 'ИГРА';
   str_menu_s3[ms3_vido] := 'ГРАФИКА';
@@ -1270,10 +1322,17 @@ begin
   str_reset[true ]      := 'СБРОС';
   str_exit[false]       := 'ВЫХОД';
   str_exit[true]        := 'НАЗАД';
-  str_m_liq             := 'Озера: ';
+  str_m_tpe             := 'Тип: ';
+  str_mapt[mapt_steppe] := tc_gray  +'Степь';
+  str_mapt[mapt_nature] := tc_green +'Горы';
+  str_mapt[mapt_lake  ] := tc_yellow+'Озеро';
+  str_mapt[mapt_shore ] := tc_orange+'Берег моря';
+  str_mapt[mapt_sea   ] := tc_red   +'Море';
   str_m_siz             := 'Размер: ';
-  str_m_obs             := 'Преграды: ';
-  str_m_sym             := 'Симметрия: ';
+  str_m_sym             := 'Симм.: ';
+  str_m_symt[0]         := 'нет';
+  str_m_symt[1]         := 'точка';
+  str_m_symt[2]         := 'линия';
   str_map               := 'Карта';
   str_players           := 'Игроки';
   str_mrandom           := 'Случайная карта';
@@ -1281,12 +1340,12 @@ begin
   str_soundvol          := 'Громкость звуков';
   str_scrollspd         := 'Скорость пр.';
   str_mousescrl         := 'Прокр. мышью';
-  str_fullscreen        := 'В окне:';
+  str_fullscreen        := 'В окне';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
   str_maction2[true ]   := tc_lime+'движение'+tc_default;
   str_maction2[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
-  str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
+  str_race[r_random]    := tc_default+'ЛЮБАЯ';
   str_observer          := 'ЗРИТЕЛЬ';
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
@@ -1322,7 +1381,8 @@ begin
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты:';
-  str_resol             := 'Разрешение';
+  str_resol_width       := 'Разрешение (ширина)';
+  str_resol_height      := 'Разрешение (высота)';
   str_language          := 'Язык интерфейса';
   str_requirements      := 'Требования: ';
   str_req               := 'Треб.: ';
@@ -1438,11 +1498,12 @@ begin
 
   str_generators        := 'Генераторы:';
   str_generatorsO[0]    := 'свои';
-  str_generatorsO[1]    := 'нейтральные(5 мин.)';
-  str_generatorsO[2]    := 'нейтральные(10 мин.)';
-  str_generatorsO[3]    := 'нейтральные(15 мин.)';
-  str_generatorsO[4]    := 'нейтральные(20 мин.)';
-  str_generatorsO[5]    := 'нейтральные(бесконечные)';
+  str_generatorsO[1]    := 'свои,без новых строителей';
+  str_generatorsO[2]    := 'нейтральные(5 мин.)';
+  str_generatorsO[3]    := 'нейтральные(10 мин.)';
+  str_generatorsO[4]    := 'нейтральные(15 мин.)';
+  str_generatorsO[5]    := 'нейтральные(20 мин.)';
+  str_generatorsO[6]    := 'нейтральные(бесконечные)';
 
   str_team              := 'Клан:';
   str_srace             := 'Раса:';
@@ -1455,6 +1516,8 @@ begin
   str_pnu               := 'Размер/качество: ';
   str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
+  str_netsearching      := 'Поиск серверов...';
+  str_netsearch         := 'Поиск серверов в локальной сети';
   str_sver              := 'Другая версия!';
   str_sfull             := 'Нет мест!';
   str_sgst              := 'Игра началась!';
@@ -1597,7 +1660,9 @@ begin
 
 
   _mkHStrACT(0 ,'Специальная способность'        );
-  _mkHStrACT(1 ,'Специальная способность в точке');
+  t:='Специальная способность в точке';
+  _mkHStrACT(1 ,t);
+  str_NeedpsabilityOrder:= 'Используйте приказ "'+t+'"!';
   _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
   _mkHStrACT(3 ,'Двигаться, '       +t);
@@ -1682,7 +1747,7 @@ tmp:shortstring;
 procedure upgrLine(upid:byte;info:shortstring);
 begin
    if(upid>0)then
-    with _upids[upid] do
+    with g_upids[upid] do
       writeln(f,'- ',_up_name,' - ',info,';');
 end;
 
@@ -1691,7 +1756,7 @@ begin
    rewrite(f);
 
    for u:=0 to 255 do
-    with _uids[u] do
+    with g_uids[u] do
      if(length(un_txt_uihint1)>0)and(_r>0)then
      begin
         writeln(f,un_txt_name);
@@ -1710,14 +1775,14 @@ begin
         if(_painc>0)then
         writeln(f,'PainState base threshold: ' , _painc);
         if(not _ukfly)and(not _ukbuilding)then
-        writeln(f,'Places in transport: ',_transportS );
+        writeln(f,'Slots in transport: ',_transportS );
         if(_transportM>0)then
         writeln(f,'Base transport capacity: ',_transportM );
 
         if(_zombie_uid>0)then
         if(_zombie_hits>0)or(_fastdeath_hits<0)then
         begin
-        writeln(f,'Zombie: ',_uids[_zombie_uid].un_txt_name );
+        writeln(f,'Zombie variant: ',g_uids[_zombie_uid].un_txt_name );
         writeln(f,'Zombification hits: ',_zombie_hits);
         end;
 
@@ -1770,7 +1835,7 @@ begin
         upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
 
         if(_ukbuilding)and(not _isbarrack)and(_ability<>uab_Teleport)then
-        upgrLine(upgr_race_extbuilding[_urace],'allow to build this building on doodads');
+        upgrLine(upgr_race_extbuilding[_urace],'allows building this structure on doodads');
 
 
         writeln(f);
@@ -1788,7 +1853,7 @@ begin
    writeln(f);
 
    for u:=0 to 255 do
-    with _upids[u] do
+    with g_upids[u] do
      if(length(_up_name)>0)then
      begin
         writeln(f,RemoveSpecChars(_makeUpgrBaseHint(u,255)));
@@ -1799,7 +1864,7 @@ begin
 {
 s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;
-hs4:=@_upids[uid]._up_hint;
+hs4:=@g_upids[uid]._up_hint;
 }
 
    close(f);

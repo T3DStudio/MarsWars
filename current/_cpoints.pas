@@ -8,17 +8,17 @@ begin
    begin
       if(cpOwnerTeam>0)then
        for p:=0 to MaxPlayers do
-        with _players[p] do
+        with g_players[p] do
          if(team=cpOwnerTeam)then
          begin
             cenergy-=cpenergy;
             menergy-=cpenergy;
          end;
       cpOwnerPlayer:=newOwnerPlayer;
-      cpOwnerTeam  :=_players[newOwnerPlayer].team;
+      cpOwnerTeam  :=g_players[newOwnerPlayer].team;
       if(cpOwnerTeam>0)then
        for p:=0 to MaxPlayers do
-        with _players[p] do
+        with g_players[p] do
          if(team=cpOwnerTeam)then
          begin
             cenergy+=cpenergy;
@@ -82,7 +82,7 @@ begin
        begin
           iTeams:=1;
           iOwnerPlayer:=0;
-          iOwnerTeam  :=_players[iOwnerPlayer].team;
+          iOwnerTeam  :=g_players[iOwnerPlayer].team;
        end;
 
        if(iTeams=0)
