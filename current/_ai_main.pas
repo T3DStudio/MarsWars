@@ -149,10 +149,10 @@ begin
           ddir:=-1;
           if(aiu_alarm_d<NOTSET)then
            case race of
-           r_hell: ddir:=point_dir(x,y,ai_alarm_x,ai_alarm_y)+_randomr(45);
-           r_uac : ddir:=point_dir(ai_alarm_x,ai_alarm_y,x,y)+_randomr(45);
+           r_hell: ddir:=point_dir(x,y,ai_alarm_x,ai_alarm_y)+g_randomr(45);
+           r_uac : ddir:=point_dir(ai_alarm_x,ai_alarm_y,x,y)+g_randomr(45);
            end;
-          l:=srange-_uids[aiucl_detect[race]]._r;
+          l:=srange-g_uids[aiucl_detect[race]]._r;
        end;
     end;
 end;
@@ -197,7 +197,7 @@ begin
             ai_towers_needy:=ai_alarm_y;
          end;
        if(ai_towers_needx>-1)
-       then ddir:=point_dir(x,y,ai_towers_needx,ai_towers_needy)+_randomr(45)
+       then ddir:=point_dir(x,y,ai_towers_needx,ai_towers_needy)+g_randomr(45)
        else ddir:=-1;
        l:=ai_towers_needl;
     end;
@@ -255,7 +255,7 @@ begin
            or(bt=aiucl_main0A[race])
            or(bt=aiucl_main1 [race])
            or(bt=aiucl_main1A[race])
-           then ddir:=point_dir(x,y,map_hmw,map_hmw)-_randomr(100);
+           then ddir:=point_dir(x,y,map_hmw,map_hmw)-g_randomr(100);
       end;
       rdir:=ddir*degtorad;
       if(l<0)
@@ -703,7 +703,7 @@ begin
       ai_tech0_cur     :=uid_e[aiucl_tech0 [race]];
       ai_tech1_cur     :=uid_e[aiucl_tech1 [race]];
       ai_tech2_cur     :=uid_e[aiucl_tech2 [race]];
-      ai_detect_cur    :=uid_e[aiucl_detect[race]]*_uids[aiucl_detect[race]]._limituse;
+      ai_detect_cur    :=uid_e[aiucl_detect[race]]*g_uids[aiucl_detect[race]]._limituse;
       ai_spec1_cur     :=uid_e[aiucl_spec1 [race]];
       ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
 
@@ -843,16 +843,16 @@ begin
         if(ow<0)then
         begin
            if(ox=x)
-           then uo_x:=ox+_randomr(-ow)
-           else uo_x:=ox+(sign(ox-x)*_random(-ow));
+           then uo_x:=ox+g_randomr(-ow)
+           else uo_x:=ox+(sign(ox-x)*g_random(-ow));
            if(oy=y)
-           then uo_x:=oy+_randomr(-ow)
-           else uo_y:=oy+(sign(oy-y)*_random(-ow));
+           then uo_x:=oy+g_randomr(-ow)
+           else uo_y:=oy+(sign(oy-y)*g_random(-ow));
         end
         else
         begin
-           uo_x:=ox-_randomr(ow);
-           uo_y:=oy-_randomr(ow);
+           uo_x:=ox-g_randomr(ow);
+           uo_y:=oy-g_randomr(ow);
         end;
       uo_tar:=0; }
    end;
@@ -865,7 +865,7 @@ begin
       uo_y:=mm3(1,uo_y,map_mw);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
-      or(_CheckRoyalBattlePoint(uo_x,uo_y,base_1r))
+      or(CheckRoyalBattleRadiusPoint(uo_x,uo_y,base_1r))
       then ai_RunTo(pu,-1,random(map_mw),random(map_mw),0,nil);      }
    end;
 end;
@@ -874,8 +874,8 @@ begin
    {with pu^  do
     if(x=ax)and(y=ay)then
     begin
-       uo_x:=x-_random(2);
-       uo_y:=y-_random(2);
+       uo_x:=x-g_random(2);
+       uo_y:=y-g_random(2);
     end
     else
       if(min2(x,abs(map_mw-x))<srange)
@@ -1249,7 +1249,7 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
       {if(isselected)then
       begin
          if(tar_d<NOTSET)then
-         UnitsInfoAddLine(x+_randomr(2),y+_randomr(2),tar_x+_randomr(2),tar_y+_randomr(2),c_aqua);
+         UnitsInfoAddLine(x+g_randomr(2),y+g_randomr(2),tar_x+g_randomr(2),tar_y+g_randomr(2),c_aqua);
          UnitsInfoAddText((x+tar_x)div 2,(y+tar_y)div 2,i2s(tar_d),c_white);
       end; }
 
@@ -1397,21 +1397,21 @@ begin
            if(g_mode=gm_royale)
            then w:=g_royal_r div 2
            else w:=map_hmw;
-           if(unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false))then exit;
+           if(unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false))then exit;
         end;
 
       case g_mode of
 gm_koth  : if(ai_ischoosen)and(base_1r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
            begin
               w:=base_1r;
-              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+_random(w),ai_cpoint_cp^.cpx+_random(w),false);
+              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+g_random(w),ai_cpoint_cp^.cpx+g_random(w),false);
               exit;
            end;
 gm_royale: if(ai_ischoosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2(g_royal_r div 4,base_2r);
-              unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false);
+              unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false);
               exit;
            end;
       end;
@@ -1575,7 +1575,7 @@ uab_UACScan          : begin
                             end;
                           if(ai_alarm_d=NOTSET)and(g_mode<>gm_invasion)then
                            if(ai_ischoosen)or(ai_ReadyForAttack)then
-                            if(unit_ability_UACScan(pu,_random(map_mw),_random(map_mw),false))then ai_detection_pause:=fr_fps1;
+                            if(unit_ability_UACScan(pu,g_random(map_mw),g_random(map_mw),false))then ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then
                          if(unit_ability_HellVision(pu,ai_need_heye_u^.unum,false))then ai_detection_pause:=fr_fps1;
@@ -1602,7 +1602,7 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
          if(ai_abase_d<NOTSET)then
          UnitsInfoAddLine(x,y,ai_abase_u^.x,ai_abase_u^.y,c_orange);
 
-         UnitsInfoAddLine(x+_randomr(2),y+_randomr(2),uo_x+_randomr(2),uo_y+_randomr(2),c_white);
+         UnitsInfoAddLine(x+g_randomr(2),y+g_randomr(2),uo_x+g_randomr(2),uo_y+g_randomr(2),c_white);
 
          {writeln(ai_generator_d);
          if(ai_generator_d<NOTSET)then

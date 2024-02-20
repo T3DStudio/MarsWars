@@ -44,7 +44,7 @@ begin
          BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
          BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_type    ));
-         if(vr<=gms_m_types)then begin rpls_str_info+=str_m_tpe+_str_mx(vr)+tc_nl3+' ';  end
+         if(vr<=gms_m_types)then begin rpls_str_info+=str_m_tpe+str_mapt[vr]+tc_default+tc_nl3+' '; end
                             else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(map_symmetry));rpls_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
 
@@ -54,7 +54,9 @@ begin
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
-         BlockRead(f,hp,SizeOf(HPlayer          ));
+         BlockRead(f,hp,SizeOf(PlayerClient          ));
+
+         rpls_str_info+=tc_nl3;
 
          for vr:=1 to MaxPlayers do
          begin
@@ -108,12 +110,12 @@ begin
                   +SizeOf(g_fixed_positions)
                   +SizeOf(g_generators     )
                   +sizeof(rpls_player      );
-   with _players[0] do
+   with g_players[0] do
    rpls_file_head_size
                  +=(sizeof(name )
                    +sizeof(state)
                    +sizeof(race )
-                   +sizeof(mrace)
+                   +sizeof(slot_race)
                    +sizeof(team ))*MaxPlayers;
 end;
 
@@ -135,11 +137,11 @@ begin
    or(rpls_state  <>rpls_state_read)then exit;
 
    if(rpls_ReadPosN>0)then
-    with rpls_ReadPosL[rpls_ReadPosN-1] do
-    begin
-       if( g_Step<=rp_gtick)then exit;
-       if((g_Step -rp_gtick)<fr_fps2)then exit;
-    end;
+     with rpls_ReadPosL[rpls_ReadPosN-1] do
+     begin
+        if( g_Step<=rp_gtick)then exit;
+        if((g_Step -rp_gtick)<fr_fps2)then exit;
+     end;
 
    rpls_ReadPosN+=1;
    setlength(rpls_ReadPosL,rpls_ReadPosN);
@@ -149,27 +151,33 @@ begin
       rp_fpos :=FilePos(rpls_file);
    end;
 end;
-procedure replay_SetPlayPosition(timetick:int64);
+function replay_SetPlayPosition(timetick,mindist:int64):boolean;
 var ni,i :cardinal;
     vi,vt:int64;
 begin
+   replay_SetPlayPosition:=false;
    if(rpls_ReadPosN=0)
    or(rpls_fstatus<>rpls_file_read)
    or(rpls_state  <>rpls_state_read)then exit;
 
-   ni:=0;
+   ni:=cardinal.MaxValue;
    vi:=0;
    for i:=0 to rpls_ReadPosN-1 do
     with rpls_ReadPosL[i] do
      if(rp_gtick<=timetick)then
      begin
         vt:=abs(rp_gtick-timetick);
-        if(vt<vi)or(ni=0)then
-        begin
-           ni:=i;
-           vi:=vt;
-        end;
+        if(mindist<0)or(vt<=mindist)then
+          if(vt<vi)or(ni=0)then
+          begin
+             ni:=i;
+             vi:=vt;
+          end;
      end;
+
+   if(ni=cardinal.MaxValue)then exit;
+
+   replay_SetPlayPosition:=true;
 
    with rpls_ReadPosL[ni] do
    begin
@@ -178,11 +186,11 @@ begin
    end;
    rpls_ForwardStep:=2;
    for i:=1 to MaxUnits do
-    with _units[i] do
-    begin
-       vx:=x;
-       vy:=y;
-    end;
+     with g_units[i] do
+     begin
+        vx:=x;
+        vy:=y;
+     end;
 end;
 
 procedure replay_Abort;
@@ -226,8 +234,8 @@ begin
       rpls_fstatus:=rpls_file_write;
       rpls_state  :=rpls_state_write;
       rpls_u      :=MaxPlayerUnits+1;
-      rpls_player :=HPlayer;
-      rpls_log_n  :=_players[rpls_player].log_n;
+      rpls_player :=PlayerClient;
+      rpls_log_n  :=g_players[rpls_player].log_n;
       rpls_plcam  :=false;
       rpls_ticks  :=0;
 
@@ -246,13 +254,13 @@ begin
       {$I+}
 
       for p:=1 to MaxPlayers do
-       with _Players[p] do
+       with g_players[p] do
        begin
           {$I-}
           BlockWrite(rpls_file,name ,sizeof(name ));
           BlockWrite(rpls_file,state,sizeof(state));
           BlockWrite(rpls_file,race ,sizeof(race ));
-          BlockWrite(rpls_file,mrace,sizeof(mrace));
+          BlockWrite(rpls_file,slot_race,sizeof(slot_race));
           BlockWrite(rpls_file,team ,sizeof(team ));
           {$I+}
        end;
@@ -273,7 +281,7 @@ begin
 
    gs:=G_Status and %00111111;
    i :=gs;
-   if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
+   if(g_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
    if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)then
     if(gs=gs_running)then i:=i or %01000000;
 
@@ -392,13 +400,13 @@ begin
          end;
 
          for p:=1 to MaxPlayers do
-          with _Players[p] do
+          with g_players[p] do
           begin
              {$I-}
              BlockRead(rpls_file,name ,sizeof(name ));
              BlockRead(rpls_file,state,sizeof(state));
              BlockRead(rpls_file,race ,sizeof(race ));
-             BlockRead(rpls_file,mrace,sizeof(mrace));
+             BlockRead(rpls_file,slot_race,sizeof(slot_race));
              BlockRead(rpls_file,team ,sizeof(team ));
              {$I+}
           end;
@@ -421,13 +429,13 @@ begin
          rpls_state  :=rpls_state_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
-         HPlayer     :=rpls_player;
-         UIPlayer    :=HPlayer;
+         PlayerClient     :=rpls_player;
+         UIPlayer    :=PlayerClient;
 
          rpls_plcam  :=false;
 
          map_premap;
-         MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
+         MoveCamToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
 
          CamBounds;
          ui_tab    :=3;

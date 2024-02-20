@@ -84,8 +84,8 @@ end;
 
 procedure map_RandomBaseVars;
 begin
-   map_iseed   := word(map_seed);
-   map_rpos    := byte(map_seed);
+   g_random_i  := word(map_seed);
+   g_random_p  := byte(map_seed);
 end;
 
 procedure map_Vars;
@@ -209,24 +209,27 @@ begin
      end;
 end;
 
-function map_IfDoodadHere(dtype:byte;ix0,iy0,ix1,iy1,ar:integer):boolean;
+function map_IfDoodadHere(dtype:byte;ix0,iy0,ix1,iy1,DoodadAR:integer):boolean;
 var d,o:integer;
 function DoodadMinR(t1,t2:byte):integer;
 begin
-   if(t1 in dids_liquids)
+   {if(t1 in dids_liquids)
   and(t2 in dids_liquids)then
    begin
-      DoodadMinR:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 5)-(DID_R[t2] div 5)-ar;
+      DoodadMinR:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 5)-(DID_R[t2] div 5)-DoodadAR;
       exit;
    end;
 
    if(t1 in dids_liquids)
    or(t2 in dids_liquids)then
    begin
-      DoodadMinR:=max2(DID_R[t1],DID_R[t2])-ar;
+      DoodadMinR:=max2(DID_R[t1],DID_R[t2])-DoodadAR;
       exit;
    end;
-   DoodadMinR:=DID_R[t1]+DID_R[t2]-ar-10;
+   DoodadMinR:=DID_R[t1]+DID_R[t2]-DoodadAR-10;  }
+   if(DoodadAR>=0)
+   then DoodadMinR:=DID_R[t1]+DID_R[t2]+DoodadAR
+   else DoodadMinR:=(DID_R[t1]+DID_R[t2])-(abs(DID_R[t1] div DoodadAR)+abs(DID_R[t2] div DoodadAR));
 end;
 begin
    map_IfDoodadHere:=false;
@@ -312,8 +315,8 @@ begin
       dst:=max2(base_1rh,map_mw div 8);
       while(c<1000)do
       begin
-         ix0:=u+_random(b);
-         iy0:=u+_random(b);
+         ix0:=u+g_random(b);
+         iy0:=u+g_random(b);
          SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
 
          c+=1;
@@ -367,8 +370,8 @@ begin
       u:=dst;
       while true do
       begin
-         ix0:=bb0+_random(bb1);
-         iy0:=bb0+_random(bb1);
+         ix0:=bb0+g_random(bb1);
+         iy0:=bb0+g_random(bb1);
          SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
 
          c+=1;
@@ -598,8 +601,8 @@ begin
       cnt:=0;
       while true do
       begin
-         ix0:=_randomx(ix0,map_mw);
-         iy0:=_randomx(iy0,map_mw);
+         ix0:=g_randomx(ix0,map_mw);
+         iy0:=g_randomx(iy0,map_mw);
          SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
 
          if(map_DoodadNoisePickSet(ix0,iy0,ix1,iy1,@lqs,@rks,ir,DoodadAR))then
@@ -619,7 +622,7 @@ begin
    end;
 end;
 
-procedure map_DoodadCircle(di:byte;cx,cy,cr:integer;forcesymmetry:byte);
+procedure map_DoodadFiledCircle(di:byte;cx,cy,cr:integer;forcesymmetry:byte);
 var sx,sy,
     ex,
     PStartDist,wr,
@@ -645,7 +648,7 @@ begin
          ix1:=NOTSET;
          iy1:=NOTSET;
       end;
-      map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist,wr2 div 2,wr2);
+      map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist,-3,wr2); //wr2 div 2
    end;
 end;
 begin
@@ -724,12 +727,12 @@ mapt_nature: begin
              end;
 mapt_lake  : begin
              ix:=round(map_mw/2.9);
-             map_DoodadCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
+             map_DoodadFiledCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
              if(map_mw<=3500)then
              begin
-             map_DoodadCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
+             //map_DoodadFiledCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
+             map_DoodadFiledCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
+             //map_DoodadFiledCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
              end;
 
              map_ddn:=map_ddn div 3;
@@ -741,12 +744,12 @@ mapt_shore: begin
              then symmetry:=0
              else symmetry:=map_symmetry;
 
-             map_DoodadCircle(DID_LiquidR1,map_symmetryX1,map_symmetryY1,ix,symmetry);
+             map_DoodadFiledCircle(DID_LiquidR1,map_symmetryX1,map_symmetryY1,ix,symmetry);
              if(map_mw<=3500)then
              begin
-             map_DoodadCircle(DID_LiquidR2,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             map_DoodadCircle(DID_LiquidR3,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             map_DoodadCircle(DID_LiquidR4,map_symmetryX1,map_symmetryY1,ix,symmetry);
+             //map_DoodadFiledCircle(DID_LiquidR2,map_symmetryX1,map_symmetryY1,ix,symmetry);
+             map_DoodadFiledCircle(DID_LiquidR3,map_symmetryX1,map_symmetryY1,ix,symmetry);
+            // map_DoodadFiledCircle(DID_LiquidR4,map_symmetryX1,map_symmetryY1,ix,symmetry);
              end;
 
              map_ddn:=map_ddn div 2;
@@ -754,12 +757,12 @@ mapt_shore: begin
              end;
 mapt_sea   : begin
              ix:=map_mw;
-             map_DoodadCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
+             map_DoodadFiledCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
              if(map_mw<=3500)then
              begin
-             map_DoodadCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
+             //map_DoodadFiledCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
+             map_DoodadFiledCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
+             //map_DoodadFiledCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
              end;
              map_ddn:=map_ddn div 6;
              map_DoodadNoise(0,1,-50);

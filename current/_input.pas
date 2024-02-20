@@ -36,10 +36,10 @@ begin
    case a of
 chat_all      : MakeChatTargets:=255;
 chat_allies   : for p:=1 to MaxPlayers do
-                 with _players[p] do
-                  if(state>ps_none)and(team=_players[player].team)then
+                 with g_players[p] do
+                  if(state>ps_none)and(team=g_players[player].team)then
                    SetBBit(@MakeChatTargets,p,true);
-1..MaxPlayers : if(_players[a].state=ps_play)then SetBBit(@MakeChatTargets,a,true);
+1..MaxPlayers : if(g_players[a].state=ps_play)then SetBBit(@MakeChatTargets,a,true);
    end;
 end;
 
@@ -48,7 +48,7 @@ var HPlayerAllies: byte;
 begin
    if(MainMenu=false)and(ingame_chat=0)and(net_status>ns_single)then
    begin
-      HPlayerAllies:=PlayerAllies(HPlayer,false);
+      HPlayerAllies:=PlayerAllies(PlayerClient,false);
       if(HPlayerAllies>0)
       then ingame_chat:=chat_allies
       else ingame_chat:=chat_all;
@@ -61,7 +61,7 @@ begin
       else
          if(ks_shift>0)
          then ingame_chat:=chat_all;
-      net_chat_tar:=MakeChatTargets(ingame_chat,HPlayer);
+      net_chat_tar:=MakeChatTargets(ingame_chat,PlayerClient);
    end
    else
     if(menu_item=100)or(ingame_chat>0)then
@@ -76,7 +76,7 @@ begin
        begin
           if(net_status=ns_client)
           then net_send_chat(        net_chat_tar,net_chat_str)
-          else GameLogChat  (HPlayer,net_chat_tar,net_chat_str,false);
+          else GameLogChat  (PlayerClient,net_chat_tar,net_chat_str,false);
        end;
        net_chat_str:='';
        ingame_chat :=0;
@@ -91,13 +91,13 @@ begin
      if(net_status=ns_server) then
        if(G_Status=gs_running)then
        begin
-          G_Status:=HPlayer;
-          GameLogChat(HPlayer,255,str_PlayerPaused,false);
+          G_Status:=PlayerClient;
+          GameLogChat(PlayerClient,255,str_PlayerPaused,false);
        end
        else
        begin
           G_Status:=gs_running;
-          GameLogChat(HPlayer,255,str_PlayerResumed,false);
+          GameLogChat(PlayerClient,255,str_PlayerResumed,false);
        end;
 end;
 
@@ -115,7 +115,7 @@ var pu:PTUnit;
 begin
    _checkEnemy:=false;
    if(IsUnitRange(otarget,@pu))then
-     if(pu^.player^.team<>_players[HPlayer].team)then _checkEnemy:=true;
+     if(pu^.player^.team<>g_players[PlayerClient].team)then _checkEnemy:=true;
 end;
 procedure _PlayCommand(ss:PTSoundSet);
 begin
@@ -148,27 +148,27 @@ begin
    SelectedAbility:=0;
    SelectedRebuild:=0;
 
-   with _players[HPlayer] do
+   with g_players[PlayerClient] do
     for i:=1 to MaxUnits do
-     with _units[i] do
+     with g_units[i] do
       with uid^ do
-       if(hits>0)and(isselected)and(playeri=HPlayer)then
+       if(hits>0)and(isselected)and(playeri=PlayerClient)then
        begin
           SelectedAll+=1;
-          if(CheckBOrders(_punits[i]))then
+          if(CheckBOrders(g_punits[i]))then
           begin
              SelectedBOrders+=1;
              if(iscomplete)then
              begin
                 if(LeaderUID<>0)then
-                 if(_mhits<=_uids[LeaderUID]._mhits)then
-                  if(_ucl<_uids[LeaderUID]._ucl)then continue;
+                 if(_mhits<=g_uids[LeaderUID]._mhits)then
+                  if(_ucl<g_uids[LeaderUID]._ucl)then continue;
 
                 LeaderUID:=uidi;
              end;
           end;
-          if(_ability    >0{unit_canAbility(_punits[i])=0})then SelectedAbility+=1;
-          if(_rebuild_uid>0{unit_canRebuild(_punits[i])=0})then SelectedRebuild+=1;
+          if(_ability    >0{unit_canAbility(g_punits[i])=0})then SelectedAbility+=1;
+          if(_rebuild_uid>0{unit_canRebuild(g_punits[i])=0})then SelectedRebuild+=1;
        end;
 
    case uo_order of
@@ -184,7 +184,7 @@ begin
    end;
 
    if(UnitSound)then
-     with _uids[LeaderUID] do
+     with g_uids[LeaderUID] do
        case uo_order of
    uo_psability,
    uo_move,
@@ -231,7 +231,7 @@ begin
          net_send(net_cl_svip,net_cl_svport);
       end
       else
-        with _players[pl] do
+        with g_players[pl] do
         begin
            o_x0:=ox0;
            o_y0:=oy0;
@@ -271,7 +271,7 @@ begin
       wip_own_unum   - own      unum
    }
    fly:=false;
-   with _players[UIPlayer] do
+   with g_players[UIPlayer] do
    begin
       sc:=ucl_cs[false]+ucl_cs[true ];
       tteam:=team;
@@ -279,9 +279,9 @@ begin
    ui_whoInPoint:=0;
    if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
-     with _punits[i]^ do
+     with g_punits[i]^ do
       if(hits>0)and(not IsUnitRange(transport,nil))and(CheckRType(player))then
-       if(CheckUnitTeamVision(tteam,_punits[i],false))or(CheckUnitUIVision(_punits[i]))then
+       if(CheckUnitTeamVision(tteam,g_punits[i],false))or(CheckUnitUIVision(g_punits[i]))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            if(ukfly<fly)then continue;
@@ -306,36 +306,36 @@ begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
 
-   if(UIPlayer<>HPlayer)
+   if(UIPlayer<>PlayerClient)
    then m_brush:=mb_empty
    else
    case m_brush of
    0     : m_brush:=mb_empty;
    1..255: begin
-              cndt:=_uid_conditionals(@_players[HPlayer],m_brush);
+              cndt:=_uid_conditionals(@g_players[PlayerClient],m_brush);
               if(cndt>0)then
               begin
-                 if(log)then GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
+                 if(log)then GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
                  m_brush:=mb_empty;
               end
               else
-               with _players[HPlayer] do
+               with g_players[PlayerClient] do
                begin
                   if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
                   begin
-                     GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
+                     GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
                      m_brush:=mb_empty;
                      exit;
                   end;
 
                   if(ks_ctrl<=0)then
                   begin
-                     BuildingNewPlace(mouse_map_x,mouse_map_y,m_brush,HPlayer,@m_brushx,@m_brushy);
+                     BuildingNewPlace(mouse_map_x,mouse_map_y,m_brush,PlayerClient,@m_brushx,@m_brushy);
                      m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
                      m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
                   end;
 
-                  case CheckBuildPlace(m_brushx,m_brushy,0,0,HPlayer,m_brush) of
+                  case CheckBuildPlace(m_brushx,m_brushy,0,0,PlayerClient,m_brush) of
                   0 :  m_brushc:=c_lime;
                   1 :  m_brushc:=c_red;
                   2 :  m_brushc:=c_blue;
@@ -354,22 +354,22 @@ procedure mb_MapMarker(x,y:integer);
 begin
    if(net_status=ns_client)
    then net_SendMapMark(x,y)
-   else GameLogMapMark(HPlayer,x,y);
+   else GameLogMapMark(PlayerClient,x,y);
    m_brush:=mb_empty;
 end;
 
 procedure mb_Command(x,y,target:integer);
 begin
    case m_brush of
-mb_move     : PlayerSetOrder(x,y,target,0,uo_move     ,po_unit_order_set,HPlayer);   // move
-mb_attack   : PlayerSetOrder(x,y,target,0,uo_attack   ,po_unit_order_set,HPlayer);   // attack
-mb_psability: PlayerSetOrder(x,y,target,0,uo_psability,po_unit_order_set,HPlayer);
-mb_patrol   : PlayerSetOrder(x,y,0     ,0,uo_patrol   ,po_unit_order_set,HPlayer);
-mb_apatrol  : PlayerSetOrder(x,y,0     ,0,uo_apatrol  ,po_unit_order_set,HPlayer);
+mb_move     : PlayerSetOrder(x,y,target,0,uo_move     ,po_unit_order_set,PlayerClient);   // move
+mb_attack   : PlayerSetOrder(x,y,target,0,uo_attack   ,po_unit_order_set,PlayerClient);   // attack
+mb_psability: PlayerSetOrder(x,y,target,0,uo_psability,po_unit_order_set,PlayerClient);
+mb_patrol   : PlayerSetOrder(x,y,0     ,0,uo_patrol   ,po_unit_order_set,PlayerClient);
+mb_apatrol  : PlayerSetOrder(x,y,0     ,0,uo_apatrol  ,po_unit_order_set,PlayerClient);
 mb_empty    : // rclick
          if(m_action)
-         then PlayerSetOrder(x,y,target,0,uo_move     ,po_unit_order_set,HPlayer)    // move
-         else PlayerSetOrder(x,y,target,0,uo_attack   ,po_unit_order_set,HPlayer);   // attack
+         then PlayerSetOrder(x,y,target,0,uo_move     ,po_unit_order_set,PlayerClient)    // move
+         else PlayerSetOrder(x,y,target,0,uo_attack   ,po_unit_order_set,PlayerClient);   // attack
    end;
 
    m_brush:=mb_empty;
@@ -414,7 +414,7 @@ begin
      u:=(by*3)+(bx mod 3);
 
      if(0<=u)and(u<=ui_ubtns)then
-       with _players[HPlayer] do
+       with g_players[PlayerClient] do
          case tab of
 0:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // buildings
       case click_type of
@@ -426,14 +426,14 @@ begin
 
 1:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // units
       case click_type of
-      pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_start,HPlayer);
-      pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_stop ,HPlayer);
+      pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_start,PlayerClient);
+      pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_stop ,PlayerClient);
       end;
 
 2:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // upgrades
       case click_type of
-      pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_start,HPlayer);
-      pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_stop ,HPlayer);
+      pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_start,PlayerClient);
+      pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_stop ,PlayerClient);
       end;
 
 3:  if(rpls_state>=rpls_state_read)then
@@ -441,14 +441,14 @@ begin
        if(rpls_fstatus=rpls_file_read)then  // replay player controls
        case u of
        1 : case click_type of
-           pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1);
-           pct_right  : replay_SetPlayPosition(g_step-(fr_fps1*10     )+1);
-           pct_middle : replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1);
+           pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,-1);
+           pct_right  : replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,-1);
+           pct_middle : replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,-1);
            end;
        2 : case click_type of
-           pct_left   : rpls_ForwardStep:=fr_fpsd2*2 ;
-           pct_right  : rpls_ForwardStep:=fr_fpsd2*10;
-           pct_middle : rpls_ForwardStep:=fr_fpsd2*fr_fps1;
+           pct_left   : if(not replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*2 ;
+           pct_right  : if(not replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*10;
+           pct_middle : if(not replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*fr_fps1;
            end;
        else
          if(click_type=pct_left)then
@@ -468,7 +468,7 @@ begin
        end;
    end
    else
-     if(_players[HPlayer].observer)then // observer controls
+     if(g_players[PlayerClient].observer)then // observer controls
      begin
         if(click_type=pct_left)then
           case u of
@@ -481,31 +481,31 @@ begin
          if(click_type=pct_left)then
          begin
             case u of
-            0 : PlayerSetOrder(0,0,0,0,uo_sability,po_unit_order_set,HPlayer);
+            0 : PlayerSetOrder(0,0,0,0,uo_sability,po_unit_order_set,PlayerClient);
             1 : m_brush :=mb_psability;
-            2 : PlayerSetOrder(0,0,0,0,uo_rebuild ,po_unit_order_set,HPlayer);
+            2 : PlayerSetOrder(0,0,0,0,uo_rebuild ,po_unit_order_set,PlayerClient);
 
             3 : m_brush :=mb_attack;
-            4 : PlayerSetOrder(0,0,0,0,uo_stay    ,po_unit_order_set,HPlayer);
+            4 : PlayerSetOrder(0,0,0,0,uo_stay    ,po_unit_order_set,PlayerClient);
             5 : m_brush :=mb_apatrol;
 
             6 : m_brush :=mb_move;
-            7 : PlayerSetOrder(0,0,0,0,uo_hold    ,po_unit_order_set,HPlayer);
+            7 : PlayerSetOrder(0,0,0,0,uo_hold    ,po_unit_order_set,PlayerClient);
             8 : m_brush :=mb_patrol;
 
             9 : if(s_barracks>0)
                 or(s_smiths  >0)
-                then PlayerSetOrder(0,0,0,0,0,po_prod_stop,HPlayer) // comon production stop
+                then PlayerSetOrder(0,0,0,0,0,po_prod_stop,PlayerClient) // comon production stop
                 else
                   case ui_tab of
-                  1 : PlayerSetOrder(0,0,0,0,255,po_prod_unit_stop,HPlayer);
-                  2 : PlayerSetOrder(0,0,0,0,255,po_prod_upgr_stop,HPlayer);
+                  1 : PlayerSetOrder(0,0,0,0,255,po_prod_unit_stop,PlayerClient);
+                  2 : PlayerSetOrder(0,0,0,0,255,po_prod_upgr_stop,PlayerClient);
                   end;
             10: if(ui_groups_x[MaxUnitGroups]>0)then
                   if(click_dbl)
                   then MoveCamToPoint(ui_groups_x[MaxUnitGroups],ui_groups_y[MaxUnitGroups])
-                  else PlayerSetOrder(0,0,0,0,0,po_select_special_set,HPlayer);
-            11: PlayerSetOrder(0,0,0,0,uo_destroy,po_unit_order_set,HPlayer);  // destroy
+                  else PlayerSetOrder(0,0,0,0,0,po_select_special_set,PlayerClient);
+            11: PlayerSetOrder(0,0,0,0,uo_destroy,po_unit_order_set,PlayerClient);  // destroy
             12: m_brush :=mb_mark;
             13: m_action:=not m_action;
             end;
@@ -520,7 +520,7 @@ function test_hotkeys(k:cardinal):boolean;
 procedure nullupgr(playeri:byte);
 var i:byte;
 begin
-   with _players[playeri] do
+   with g_players[playeri] do
     for i:=1 to 255 do
      upgr[i]:=0;
 end;
@@ -531,24 +531,24 @@ sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                  else uncappedFPS:=not uncappedFPS;
 sdlk_home      : _warpten:=not _warpten;
-sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
-sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
+sdlk_pageup    : with g_players[PlayerClient] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
+sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : rpls_fog:=not rpls_fog;
-SDLK_F3        : nullupgr(HPlayer);
-{SDLK_F4        : with _players[Hplayer] do
+SDLK_F3        : nullupgr(PlayerClient);
+{SDLK_F4        : with g_players[PlayerClient] do
                   if(IsUnitRange(ai_scout_u_cur,nil))then
-                   with _units[ai_scout_u_cur] do MoveCamToPoint(x,y); }
+                   with g_units[ai_scout_u_cur] do MoveCamToPoint(x,y); }
 SDLK_F4        : if(g_mode=gm_invasion)then
                    if(ks_ctrl>0)
                    then PlayerKill(0,true)
                    else GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));
-SDLK_F5        : HPlayer:=0;
-SDLK_F6        : HPlayer:=1;
-SDLK_F7        : HPlayer:=2;
-SDLK_F8        : HPlayer:=3;
-SDLK_F9        : HPlayer:=4;
-SDLK_F10       : HPlayer:=5;
-SDLK_F11       : HPlayer:=6;
+SDLK_F5        : PlayerClient:=0;
+SDLK_F6        : PlayerClient:=1;
+SDLK_F7        : PlayerClient:=2;
+SDLK_F8        : PlayerClient:=3;
+SDLK_F9        : PlayerClient:=4;
+SDLK_F10       : PlayerClient:=5;
+SDLK_F11       : PlayerClient:=6;
 sdlk_insert    : r_draw:= not r_draw;
    else test_hotkeys:=false;
    end;
@@ -567,7 +567,7 @@ begin
    ks_dbl:=fr_fpsd4;
    k_dblk:=k;
 
-   PlayerAPMInc(HPlayer);
+   PlayerAPMInc(PlayerClient);
 
    if(k=sdlk_pause)then
    begin
@@ -607,7 +607,7 @@ sdlk_tab: begin
          end;
       end
       else
-        if(_players[HPlayer].observer)then
+        if(g_players[PlayerClient].observer)then
         begin
            for ko:=0 to _mhkeys do  // observer
            begin
@@ -642,20 +642,20 @@ sdlk_tab: begin
               end;
               case k of
           sdlk_0..sdlk_9 : begin
-                              ko:=_event^.key.keysym.sym-sdlk_0;
+                              ko:=sys_EVENT^.key.keysym.sym-sdlk_0;
                               if(ko<MaxUnitGroups)then
                                 if(ks_ctrl>0)
-                                then PlayerSetOrder(0,0,0,0,ko,po_unit_group_set,HPlayer)
+                                then PlayerSetOrder(0,0,0,0,ko,po_unit_group_set,PlayerClient)
                                 else
                                   if(ks_alt>0)
-                                  then PlayerSetOrder(0,0,0,0,ko,po_unit_group_add,HPlayer)
+                                  then PlayerSetOrder(0,0,0,0,ko,po_unit_group_add,PlayerClient)
                                   else
                                     if(k_dbl)and(ui_groups_x[ko]>0)and(ko>0)
                                     then MoveCamToPoint(ui_groups_x[ko],ui_groups_y[ko])
                                     else
                                       if(ks_shift>0)
-                                      then PlayerSetOrder(0,0,0,0,ko,po_select_group_add,HPlayer)
-                                      else PlayerSetOrder(0,0,0,0,ko,po_select_group_set,HPlayer);
+                                      then PlayerSetOrder(0,0,0,0,ko,po_select_group_add,PlayerClient)
+                                      else PlayerSetOrder(0,0,0,0,ko,po_select_group_set,PlayerClient);
                            end;
               else
               end;
@@ -693,19 +693,19 @@ begin
    if(ks_LastChar>k_chrtt)then
      if(length(k_keyboard_string)<255)then k_keyboard_string+=k_LastChar;
 
-   while (SDL_PollEvent(_event)>0) do
-     case (_event^.type_) of
+   while (SDL_PollEvent(sys_EVENT)>0) do
+     case (sys_EVENT^.type_) of
       SDL_MOUSEMOTION    : begin
                               if(m_vmove)and(MainMenu=false)and(G_Started)then
                               begin
-                                 vid_cam_x-=_event^.motion.x-mouse_x;
-                                 vid_cam_y-=_event^.motion.y-mouse_y;
+                                 vid_cam_x-=sys_EVENT^.motion.x-mouse_x;
+                                 vid_cam_y-=sys_EVENT^.motion.y-mouse_y;
                                  CamBounds;
                               end;
-                              mouse_x:=_event^.motion.x;
-                              mouse_y:=_event^.motion.y;
+                              mouse_x:=sys_EVENT^.motion.x;
+                              mouse_y:=sys_EVENT^.motion.y;
                            end;
-      SDL_MOUSEBUTTONUP  : case (_event^.button.button) of
+      SDL_MOUSEBUTTONUP  : case (sys_EVENT^.button.button) of
                             SDL_BUTTON_LEFT   : ks_mleft  :=-1;
                             SDL_BUTTON_RIGHT  : ks_mright :=-1;
                             SDL_BUTTON_MIDDLE : begin
@@ -714,7 +714,7 @@ begin
                                                 end
                            else
                            end;
-      SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
+      SDL_MOUSEBUTTONDOWN: case (sys_EVENT^.button.button) of
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
@@ -723,7 +723,7 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(MainMenu)then
                                                    begin
-                                                      vid_menu_redraw:=true;
+                                                      menu_update:=true;
                                                       case menu_item of
                                                       98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
                                                       36 : ScrollInt(@svld_list_scroll   , 1,0,svld_list_size-vid_svld_m-1 );
@@ -733,7 +733,7 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(MainMenu)then
                                                    begin
-                                                      vid_menu_redraw:=true;
+                                                      menu_update:=true;
                                                       case menu_item of
                                                       98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
                                                       36 : ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size-vid_svld_m-1 );
@@ -746,7 +746,7 @@ begin
       SDL_QUITEV         : GameCycle:=false;
       SDL_KEYUP          : begin
                               ks_LastChar:=-1;
-                              case (_event^.key.keysym.sym) of
+                              case (sys_EVENT^.key.keysym.sym) of
                                 sdlk_up     : ks_up   :=-1;
                                 sdlk_down   : ks_down :=-1;
                                 sdlk_left   : ks_left :=-1;
@@ -762,10 +762,10 @@ begin
                            end;
       SDL_KEYDOWN        : begin
                               ks_LastChar  :=1;
-                              k_LastChar   :=Widechar(_event^.key.keysym.unicode);
+                              k_LastChar   :=Widechar(sys_EVENT^.key.keysym.unicode);
                               k_keyboard_string+=k_LastChar;
 
-                              case (_event^.key.keysym.sym) of
+                              case (sys_EVENT^.key.keysym.sym) of
                                 sdlk_up     : if(ks_up   =0)then ks_up   :=1;
                                 sdlk_down   : if(ks_down =0)then ks_down :=1;
                                 sdlk_left   : if(ks_left =0)then ks_left :=1;
@@ -780,7 +780,7 @@ begin
                                 sdlk_escape : input_key_escape;
                                 sdlk_return : input_key_return;
                               else
-                                if(MainMenu=false)and(G_Started)and(ingame_chat=0)then InGameHotkeys(_event^.key.keysym.sym);
+                                if(MainMenu=false)and(G_Started)and(ingame_chat=0)then InGameHotkeys(sys_EVENT^.key.keysym.sym);
                               end;
                            end;
      else
@@ -846,8 +846,8 @@ mb_empty    : if(ks_ctrl>0)then
                  u:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_own_uid);
                  if(0<u)and(u<255)then
                    if(ks_shift>0)
-                   then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,HPlayer)
-                   else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,HPlayer);
+                   then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,PlayerClient)
+                   else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,PlayerClient);
                  exit;
               end
               else
@@ -857,8 +857,8 @@ mb_empty    : if(ks_ctrl>0)then
                  mouse_select_y0:=mouse_map_y;
               end;
 1..255      : if(m_brushc=c_lime)
-              then PlayerSetOrder(m_brushx,m_brushy,0,0,m_brush,po_build,HPlayer)
-              else GameLogCantProduction(HPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
+              then PlayerSetOrder(m_brushx,m_brushy,0,0,m_brush,po_build,PlayerClient)
+              else GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
 mb_psability,
 mb_move,
 mb_attack,
@@ -878,14 +878,14 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
             u:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_own_uid);
             if(0<u)and(u<255)then
               if(ks_shift>0)
-              then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,HPlayer)
-              else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,HPlayer);
+              then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,PlayerClient)
+              else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,PlayerClient);
          end
          else
          begin
             if(ks_shift>0)
-            then PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_add,HPlayer)
-            else PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_set,HPlayer);
+            then PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_add,PlayerClient)
+            else PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_set,PlayerClient);
 
             if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
               if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
@@ -960,8 +960,12 @@ procedure InputGame;
 begin
    WindowEvents;
 
-   if(MainMenu)
-   then g_menu
+   if(MainMenu)then
+   begin
+      menu_keyborad;
+      menu_mouse;
+      if(menu_update)then Menu_ReInit;
+   end
    else
    begin
       if(ks_mleft =1)
@@ -970,7 +974,7 @@ begin
       or(ks_down  =1)
       or(ks_left  =1)
       or(ks_right =1)
-      then PlayerAPMInc(HPlayer);
+      then PlayerAPMInc(PlayerClient);
 
       g_keyboard;
       g_mouse;

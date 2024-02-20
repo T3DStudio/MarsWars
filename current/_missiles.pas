@@ -4,7 +4,7 @@ procedure missile_InitCLData;
 var m:byte;
 begin
    for m:=0 to 255 do
-   with _mids[m] do
+   with g_mids[m] do
    begin
       ms_smodel   :=spr_pdmodel;
 
@@ -128,7 +128,7 @@ MID_SSShot   : begin
 
    ms_eid_bio_death_uids:=[];
    for m:=0 to 255 do
-     with _uids[m] do
+     with g_uids[m] do
        if(not _ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then ms_eid_bio_death_uids+=[m];
 end;
 
@@ -146,7 +146,7 @@ begin
      end
      else
        for i:=0 to MaxDamageModFactors do
-         with _dmods[dmod][i] do
+         with g_dmods[dmod][i] do
            if(dm_flags>0)then
              if(CheckUnitBaseFlags(tu,dm_flags))then
                case dm_factor of
@@ -170,7 +170,7 @@ var m,d:integer;
     tu:PTUnit;
 begin
     for m:=1 to MaxUnits do
-    with _missiles[m] do
+    with g_missiles[m] do
     if(vstep<=0)then
     begin
        x      := mxt;  // end point
@@ -194,7 +194,7 @@ begin
 
        damage:=adddmg;
        if(player<=MaxPlayers)and(tu<>nil)then
-        with _players[player] do
+        with g_players[player] do
         begin
            if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
            if(not tu^.uid^._ukmech)then
@@ -204,7 +204,7 @@ begin
             end;
         end;
 
-       with _mids[mid] do
+       with g_mids[mid] do
        begin
           damage+=mid_base_damage;
           homing:=mid_homing;
@@ -218,8 +218,8 @@ begin
 
           if(tu<>nil)then
           begin
-             x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
-             y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
+             x-=sign(tu^.x-vx)*g_random(tu^.uid^._missile_r);
+             y-=sign(tu^.y-vy)*g_random(tu^.uid^._missile_r);
           end;
 
           if(tar<=0)or(mid_base_splashr>0)
@@ -241,15 +241,15 @@ teams : boolean;
 ud,rdamage: integer;
      painX: byte;
 begin
-   with _missiles[m] do
-   with _mids[mid] do
+   with g_missiles[m] do
+   with g_mids[mid] do
     if(IsUnitRange(tar,@tu))then
      if(tu^.hits>0)and(not IsUnitRange(tu^.transport,nil))then
      begin
         if(not mid_noflycheck)and(mfs<>tu^.ukfly)then exit;
         if(tu^.uidi in mid_nodamage)then exit;
 
-        teams  :=_players[player].team=tu^.player^.team;
+        teams  :=g_players[player].team=tu^.player^.team;
 
         if(teams)then
           if(mid_base_splashr<=0)
@@ -300,8 +300,8 @@ var m,u:integer;
      tu:PTUnit;
 begin
    for m:=1 to MaxMissiles do
-   with _missiles[m] do
-   with _mids[mid] do
+   with g_missiles[m] do
+   with g_mids[mid] do
    if(vstep>0)then
    begin
       tu:=nil;

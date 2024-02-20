@@ -2,7 +2,7 @@
 var
 
 GameCycle         : boolean = false;
-_EVENT            : pSDL_EVENT;
+sys_EVENT         : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -37,32 +37,30 @@ g_cpoints         : array[1..MaxCPoints] of TCTPoint;
 ServerSide        : boolean = true; // only server side code
 
 UnitStepTicks     : byte = 8;
+LastCreatedUnit   : integer = 0;
+LastCreatedUnitP  : PTUnit;
+PlayerClient      : byte = 1; // 'this' player
+PlayerLobby       : byte = 1; // Player who can change game settings
+player_APMdata    : array[0..MaxPlayers] of TAPMCounter;
 
-_players          : TPList;
-_units            : array[0..MaxUnits   ] of TUnit;
-_punits           : array[0..MaxUnits   ] of PTUnit;
+g_players         : TPList;
+g_units           : array[0..MaxUnits   ] of TUnit;
+g_punits          : array[0..MaxUnits   ] of PTUnit;
+g_missiles        : array[1..MaxMissiles] of TMissile;
+g_uids            : array[byte] of TUID;
+g_upids           : array[byte] of TUPID;
+g_mids            : array[byte] of TMID;
+g_dmods           : array[byte] of TDamageMod;
 
-_missiles         : array[1..MaxMissiles] of TMissile;
+g_cycle_order     : integer = 0;
+g_cycle_regen     : integer = 0;
 
-_cycle_order      : integer = 0;
-_cycle_regen      : integer = 0;
+g_random_i        : word = 0;
+g_random_p        : byte = 0;
 
-_uids             : array[byte] of TUID;
-_upids            : array[byte] of TUPID;
-_mids             : array[byte] of TMID;
-_dmods            : array[byte] of TDamageMod;
-
-_LastCreatedUnit  : integer = 0;
-_LastCreatedUnitP : PTUnit;
-
-HPlayer           : byte = 1; // 'this' player
-
-_playerAPM        : array[0..MaxPlayers] of TAPMCounter;
-
-
+map_i             : word     = 0;
+map_list          : array of TMap;
 map_seed          : cardinal = 1;
-map_iseed         : word     = 0;
-map_rpos          : byte     = 0;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
@@ -89,7 +87,7 @@ pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pfNodes           : array[1..pfMaxNodes] of TPFNode;
 //pfNodes_c         : integer;
 
-net_status        : byte = 0;
+net_status        : byte = ns_single;
 net_port          : word = 10666;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
@@ -115,7 +113,7 @@ fr_FPSSecondN,
 fr_FPSSecondC,
 fr_FrameCount,
 fr_LastTicks,
-fr_BaseTicks     : cardinal;
+fr_BaseTicks      : cardinal;
 
 wtrset_all,
 wtrset_enemy,
@@ -185,20 +183,23 @@ ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
 
-vid_menu_redraw   : boolean = true;
 vid_map_RedrawBack: boolean = false;
 
-MainMenu             : boolean = true;
+MainMenu          : boolean = true;
+menu_update       : boolean = false;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
-menu_s2           : byte = ms2_scir;
+menu_s2           : byte = ms2_game;
 menu_s3           : byte = ms3_game;
 
-menu_list_n       : integer = 0;
-menu_list_w       : integer = 0;
+menu_items        : array[byte] of TMenuItem;
+menu_list_n,
+menu_list_s,
+menu_list_c,
+menu_list_x,
+menu_list_y,
+menu_list_w       : integer;
 menu_list         : array of shortstring;
-
-m_chat            : boolean = false;
 
 m_vrx,
 m_vry,
@@ -737,10 +738,12 @@ spr_cp_gen        : TMWTexture;
 //  TEST
 //
 
+str_teams         : array[0..MaxPlayers ] of shortstring;
 str_mapt          : array[0..gms_m_types] of shortstring;
-str_ability_name  : array[byte     ] of shortstring;
-str_race          : array[0..r_cnt ] of shortstring;
-str_gmode         : array[0..gm_cnt] of shortstring;
+str_ability_name  : array[byte          ] of shortstring;
+str_race          : array[0..r_cnt      ] of shortstring;
+str_gmode         : array[0..gm_cnt     ] of shortstring;
+str_m_symt        : array[0..gms_m_symm ] of shortstring;
 str_ability_unload,
 str_need_energy,
 str_cant_build,
@@ -821,8 +824,8 @@ str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
-str_m_symt        : array[0..2] of shortstring;
-str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
+str_PlayerSlots   : array[0..ps_states_n-1    ] of shortstring;
+str_generatorsO   : array[0..gms_g_maxgens    ] of shortstring;
 str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
@@ -837,7 +840,8 @@ str_req,
 str_uprod,
 str_bprod,
 str_language,
-str_resol,
+str_resol_width,
+str_resol_height,
 str_apply,
 str_randoms,
 str_menu_chat,

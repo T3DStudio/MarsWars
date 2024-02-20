@@ -49,6 +49,27 @@ ps_none                = 0;  // player state
 ps_play                = 1;
 ps_comp                = 2;
 
+//  Player slot state
+ps_closed              = 0;
+ps_observer            = 1;
+ps_opened              = 2;
+ps_replace             = 3;  // menu option, not state
+ps_AI_1                = 4;  // very easy
+ps_AI_2                = 5;  // easy
+ps_AI_3                = 6;  // medium
+ps_AI_4                = 7;  // hard
+ps_AI_5                = 8;  // harder
+ps_AI_6                = 9;  // very hard
+ps_AI_7                = 10; // elite
+ps_AI_8                = 11; // Cheater 1 (Vision)
+ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
+ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
+ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+
+ps_states_n            = 4+gms_g_maxai;
+
+player_default_ai_level= ps_AI_7;
+
 gm_scirmish            = 0;  // game mode
 gm_3x3                 = 1;
 gm_2x2x2               = 2;
@@ -82,8 +103,7 @@ gs_win_team3           = 23;
 gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
-{
-}
+
 
 r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
@@ -107,7 +127,7 @@ map_b0                 = 5;
 //  CPoints life
 //
 
-g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,0,fr_fps60*5,fr_fps60*10,fr_fps60*15,fr_fps60*20,0);
 g_cgenerators_energy   = 900;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +165,6 @@ str_ps_none            : shortstring = '--';
 b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -227,7 +246,7 @@ net_svlsearch_portS    = swap(net_svlsearch_port);
 net_localAdv_ip        : cardinal = $FFFFFFFF; // 255.255.255.255
 net_localAdv_time      = fr_fps1*2;
 
-ns_single                = 0;
+ns_single              = 0;
 ns_server              = 1;
 ns_client              = 2;
 
@@ -520,7 +539,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
 MaxDIDs                = 7;
 
-DID_R                  : array[0..MaxDIDs] of smallint = (0,255,185,125,64,105,60,17);
+DID_R                  : array[0..MaxDIDs] of smallint = (0,255,170,85,56,105,64,18);
 
 mapt_steppe            = 0;
 mapt_nature            = 1;
@@ -529,6 +548,7 @@ mapt_shore             = 3;
 mapt_sea               = 4;
 
 gms_m_types            = 4;  // 0-4  max map types
+gms_m_symm             = 2;  // 0-2  max map symmetry types
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -938,7 +958,6 @@ mine_sr                = rocket_sr*2;
 blizzard_sr            = rocket_sr*4;
 
 bld_dec_mr             = 6;
-player_default_ai_level= 7;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
@@ -1047,6 +1066,8 @@ char_advanced          = #10;
 spr_upgrade_icons      = 24;
 
 vid_maxplcolors        = 6;
+
+max_CamSpeed           = 127;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1167,9 +1188,11 @@ ta_left                = 0;
 ta_middle              = 1;
 ta_right               = 2;
 ta_chat                = 3;
+ta_rightmid            = 4;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
+font_34                =(font_w div 4)*3;
 font_5w                = font_w*5;
 font_iw                = font_w-1;
 font_3hw               = font_w+(font_w div 2);
@@ -1200,6 +1223,10 @@ vid_minw               = 800;
 vid_minh               = 600;
 vid_maxw               = 1360;
 vid_maxh               = 768;
+
+vid_rw_list            : array[0..4] of Smallint = (vid_minw,960,1024,1280,vid_maxw);
+vid_rh_list            : array[0..3] of Smallint = (vid_minh,680,720,vid_maxh);
+
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
 vid_blink_persecond    = 6;
@@ -1221,8 +1248,8 @@ vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
 vid_oisw               = vid_oiw-(vid_oiw div 4);
 vid_oips               = 2*vid_oiw+vid_oisw;
-vid_svld_m             = 7;
-vid_rpls_m             = 8;
+vid_svld_m             = 9;
+vid_rpls_m             = 10;
 vid_camp_m             = 11;
 vid_srch_m             = 2;
 
@@ -1232,70 +1259,206 @@ ui_bottomsy            = vid_BW*4;
 ui_hwp                 = vid_panelw div 2;
 ui_ubtns               = 23;
 
-ui_menu_map_zx0        = 76;
+ui_menu_list_item_H    = font_w*2;
+ui_menu_list_item_S    = font_w div 2;
+
+////////////////////////   menu items
+////  MAIN
+mi_exit                = 1;
+mi_back                = 2;
+mi_start               = 3;
+mi_break               = 4;
+mi_ready               = 5;
+mi_surrender           = 6;
+
+////  MAP PARAMS
+mi_map_params1         = 11;
+mi_map_params2         = 12;
+mi_map_params3         = 13;
+mi_map_params4         = 14;
+mi_map_params5         = 15;
+mi_map_params6         = 16;
+mi_map_params7         = 17;
+
+////  TABS SETTINGS SAVELOAD REPLAYS
+mi_tab_settings        = 21;
+mi_tab_saveload        = 22;
+mi_tab_replays         = 23;
+
+////  TABS SETTINGS
+mi_settings_game       = 24;
+mi_settings_video      = 25;
+mi_settings_sound      = 26;
+
+////  SETTINGS GAME LINES
+mi_settings_ColoredShadows= 31;
+mi_settings_ShowAPM       = 32;
+mi_settings_HitBars       = 33;
+mi_settings_MRBAction     = 34;
+mi_settings_ScrollSpeed   = 35;
+mi_settings_MouseScroll   = 36;
+mi_settings_PlayerName    = 37;
+mi_settings_Langugage     = 38;
+mi_settings_PanelPosition = 39;
+mi_settings_PlayerColors  = 40;
+mi_settings_game11        = 41;
+
+////  SETTINGS VIDEO LINES
+mi_settings_video1     = 51;
+mi_settings_video2     = 52;
+mi_settings_ResWidth   = 53;
+mi_settings_ResHeight  = 54;
+mi_settings_ResApply   = 55;
+mi_settings_video6     = 56;
+mi_settings_Fullscreen = 57;
+mi_settings_video8     = 58;
+mi_settings_ShowFPS    = 59;
+mi_settings_video10    = 60;
+mi_settings_video11    = 61;
+
+////  SETTINGS SOUND LINES
+mi_settings_sound1     = 71;
+mi_settings_sound2     = 72;
+mi_settings_SoundVol   = 73;
+mi_settings_MusicVol   = 74;
+mi_settings_sound5     = 75;
+mi_settings_NextTrack  = 76;
+mi_settings_sound7     = 77;
+mi_settings_sound8     = 78;
+mi_settings_sound9     = 79;
+mi_settings_sound10    = 80;
+mi_settings_sound11    = 81;
+
+////  SAVE LOAD
+mi_saveload_list       = 90;
+mi_saveload_fname      = 91;
+mi_saveload_save       = 92;
+mi_saveload_load       = 93;
+mi_saveload_delete     = 94;
+
+////  REPLAYS
+mi_replays_list        = 97;
+mi_replays_play        = 98;
+mi_replays_delete      = 99;
+
+////  PLAYERS
+
+mi_player_status1      = 111;
+mi_player_status2      = 112;
+mi_player_status3      = 113;
+mi_player_status4      = 114;
+mi_player_status5      = 115;
+mi_player_status6      = 116;
+
+mi_player_race1        = 121;
+mi_player_race2        = 122;
+mi_player_race3        = 123;
+mi_player_race4        = 124;
+mi_player_race5        = 125;
+mi_player_race6        = 126;
+
+mi_player_team1        = 131;
+mi_player_team2        = 132;
+mi_player_team3        = 133;
+mi_player_team4        = 134;
+mi_player_team5        = 135;
+mi_player_team6        = 136;
+
+////  CAMPAINGS SCIRMISH MULTIPLAYER
+
+mi_tab_campaing        = 141;
+mi_tab_game            = 142;
+mi_tab_multiplayer     = 143;
+
+////  GAME
+mi_game_Caption        = 150;
+mi_game_mode           = 151;
+mi_game_builders       = 152;
+mi_game_generators     = 153;
+mi_game_FixStarts      = 154;
+mi_game_DeadPbserver   = 155;
+mi_game_EmptySlots     = 156;
+mi_game_RandomSkrimish = 157;
+
+mi_game_Record         = 159;
+mi_game_RecordName     = 160;
+mi_game_RecordQuality  = 161;
+
+////  MULTIPLAYER
+mi_mplayer_Server      = 170;
+mi_mplayer_ServerPort  = 171;
+mi_mplayer_ClientConnect= 172;
+mi_mplayer_ClientAddr  = 173;
+
+/////////////////////////////    MAIN MENU ZONES
+
+//// main buttons
+ui_menu_mbutton_lx0    = 32;
+ui_menu_mbutton_lx1    = 107;
+ui_menu_mbutton_rx0    = 692;
+ui_menu_mbutton_rx1    = 767;
+ui_menu_mbutton_y0     = 544;
+ui_menu_mbutton_y1     = 571;
+
+//// map section
+ui_menu_map_zx0        = 76;    // full zone
 ui_menu_map_zy0        = 110;
 ui_menu_map_zx1        = 381;
-ui_menu_map_zy1        = 289;
-ui_menu_map_ys         = 19;
-ui_menu_map_x0         = ((ui_menu_map_zx0+ui_menu_map_zx1) div 2)- vid_panelw;
-ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2);
-ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panelw;
-ui_menu_map_rx1        = ui_menu_map_zx1-12;
-ui_menu_map_y1         = ui_menu_map_y0+(ui_menu_map_ys*7);
-ui_menu_map_tx0        = ui_menu_map_rx0+4;
-ui_menu_map_tx1        = ui_menu_map_rx0+((ui_menu_map_rx1-ui_menu_map_rx0) div 2);
+ui_menu_map_zy1        = 253;
+ui_menu_map_cx         = (ui_menu_map_zx0+ui_menu_map_zx1) div 2;   // caption
+ui_menu_map_cy         = ui_menu_map_zy0-font_3hw-2;
+ui_menu_map_lh         = 20;                                        // line height
+ui_menu_map_lhh        = ui_menu_map_lh div 2;
+ui_menu_map_mx0        = ui_menu_map_zx0;                           // map position
+ui_menu_map_my0        = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2)+1;
+ui_menu_map_ph         = ui_menu_map_lh*7;                          // parameters count
+ui_menu_map_px0        = ui_menu_map_mx0+vid_panelw+ui_menu_map_lhh-font_hw;// parameters block
+ui_menu_map_py0        = ui_menu_map_my0+1;
+ui_menu_map_px1        = ui_menu_map_zx1-ui_menu_map_lhh+font_hw;
+ui_menu_map_py1        = ui_menu_map_py0+ui_menu_map_ph;
 
-ui_menu_ssr_x0         = 76;
-ui_menu_ssr_y0         = 326;
-ui_menu_ssr_x1         = 381;
-ui_menu_ssr_y1         = 523;
-ui_menu_ssr_xs         = 102;
-ui_menu_ssr_xhs        = ui_menu_ssr_xs div 2;
-ui_menu_ssr_xhhs       = ui_menu_ssr_xhs div 2;
-ui_menu_ssr_ys         = 18;
-ui_menu_ssr_barl       = 127;
-ui_menu_ssr_x3         = ui_menu_ssr_x1-10;
-ui_menu_ssr_x2         = ui_menu_ssr_x3-ui_menu_ssr_barl;
-ui_menu_ssr_x4         = ui_menu_ssr_x0+ui_menu_ssr_xs;
-ui_menu_ssr_x5         = ui_menu_ssr_x0+ui_menu_ssr_xs*2;
-ui_menu_ssr_x6         = ui_menu_ssr_x5+ui_menu_ssr_xhs;
-ui_menu_ssr_x7         = ui_menu_ssr_x3-ui_menu_ssr_barl;
-ui_menu_ssr_x7t        = ui_menu_ssr_x7-font_w;
-ui_menu_ssr_x7r        = ui_menu_ssr_x7+font_w;
-ui_menu_ssr_xt0        = ui_menu_ssr_x6-ui_menu_ssr_xhhs;
-ui_menu_ssr_xt1        = ui_menu_ssr_x6+ui_menu_ssr_xhhs;
-ui_menu_ssl_x0         = (ui_menu_ssr_x0+ui_menu_ssr_x1) div 2;
+//// settings save/load replays  tabs
+ui_menu_ssr_zx0        = 76;    // full zone
+ui_menu_ssr_zy0        = 290;
+ui_menu_ssr_zx1        = 381;
+ui_menu_ssr_zy1        = 523;
+ui_menu_ssr_lh         = 18;    // line height
+ui_menu_ssr_cw         = round((ui_menu_ssr_zx1-ui_menu_ssr_zx0)/3); // col width
+ui_menu_ssr_cx         = (ui_menu_ssr_zx0+ui_menu_ssr_zx1) div 2;    // center x
 
-ui_menu_pls_x0         = 418;
-ui_menu_pls_y0         = 110;
-ui_menu_pls_x1         = 723;
-ui_menu_pls_y1         = 253;
-ui_menu_pls_ys         = 18;
-ui_menu_pls_ys3        = (txt_line_h3*3)+3;
-ui_menu_pls_y2         = ui_menu_pls_y0+6;
-ui_menu_pls_ye         = ui_menu_pls_y1-ui_menu_pls_ys+1;
-ui_menu_pls_zh         = (MaxPlayers*ui_menu_pls_ys);
-ui_menu_pls_xc         = (ui_menu_pls_x0+ui_menu_pls_x1) div 2;
-ui_menu_pls_zy0        = ((ui_menu_pls_y0+ui_menu_pls_y1) div 2)-(ui_menu_pls_zh div 2);
-ui_menu_pls_zy1        = ui_menu_pls_zy0+ui_menu_pls_zh;
-ui_menu_pls_zxn        = ui_menu_pls_x0+16;   // name
-ui_menu_pls_zxs        = ui_menu_pls_zxn+130; // status
-ui_menu_pls_zxr        = ui_menu_pls_zxs+24;  // race
-ui_menu_pls_zxt        = ui_menu_pls_zxr+64;  // team
-ui_menu_pls_zxc        = ui_menu_pls_zxt+24;  // color box
-ui_menu_pls_zxe        = ui_menu_pls_x1-16;
-ui_menu_pls_zxnt       =  ui_menu_pls_zxn+6;
-ui_menu_pls_zxst       = (ui_menu_pls_zxs+ui_menu_pls_zxr) div 2;
-ui_menu_pls_zxrt       = (ui_menu_pls_zxr+ui_menu_pls_zxt) div 2;
-ui_menu_pls_zxtt       = (ui_menu_pls_zxt+ui_menu_pls_zxc) div 2;
-ui_menu_pls_zxc1       = ui_menu_pls_zxc+8;
-ui_menu_pls_zxc2       = ui_menu_pls_zxe-8;
+//// players section
+ui_menu_pls_zx0        = 418;   // full zone
+ui_menu_pls_zy0        = 110;
+ui_menu_pls_zx1        = 723;
+ui_menu_pls_zy1        = 253;
+ui_menu_pls_lh         = 20;
+ui_menu_pls_lhh        = ui_menu_pls_lh div 2;
+ui_menu_pls_cptx       = (ui_menu_pls_zx0+ui_menu_pls_zx1) div 2;
+ui_menu_pls_cpty       = ui_menu_pls_zy0-font_3hw-2;
+ui_menu_pls_pbh        = ui_menu_pls_lh*MaxPlayers; // players block height
+ui_menu_pls_pbx0       = ui_menu_pls_zx0;           // players block
+ui_menu_pls_pby0       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)-(ui_menu_pls_pbh div 2);
+ui_menu_pls_pbx1       = ui_menu_pls_zx1;
+ui_menu_pls_pby1       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)+(ui_menu_pls_pbh div 2);
 
-ui_menu_csm_x0         = 418;
-ui_menu_csm_y0         = 290;
-ui_menu_csm_x1         = 723;
-ui_menu_csm_y1         = 522;
-ui_menu_csm_xs         = 102;
+ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*NameLen+font_w*4;
+ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*10;
+ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*9;
+
+ui_menu_pls_border     = ui_menu_pls_lh div 3;
+ui_menu_pls_color_x0   = ui_menu_pls_cx_color+ui_menu_pls_border;
+ui_menu_pls_color_x1   = ui_menu_pls_pbx1    -ui_menu_pls_border+1;
+
+//// campaings game multiplayer  tabs
+ui_menu_cgm_zx0        = 418;
+ui_menu_cgm_zy0        = 290;
+ui_menu_cgm_zx1        = 723;
+ui_menu_cgm_zy1        = 523;
+ui_menu_cgm_lh         = 18;
+ui_menu_cgm_cw         = round((ui_menu_cgm_zx1-ui_menu_cgm_zx0)/3); // col width
+ui_menu_cgm_cx         = (ui_menu_cgm_zx0+ui_menu_cgm_zx1) div 2;    // center x
+
+{ui_menu_csm_xs         = 102;
 ui_menu_csm_xhs        = ui_menu_csm_xs div 2;
 ui_menu_csm_ys         = 18;
 ui_menu_csm_2ys        = ui_menu_csm_ys*2;
@@ -1308,7 +1471,7 @@ ui_menu_csm_x3         = ui_menu_csm_x2+ui_menu_csm_xs;
 ui_menu_csm_xt0        = ui_menu_csm_x0+6;
 ui_menu_csm_xt1        = ui_menu_csm_x0+18;
 ui_menu_csm_xt2        = ui_menu_csm_x1-6;
-ui_menu_csm_xt3        = ui_menu_csm_xc+6;
+ui_menu_csm_xt3        = ui_menu_csm_xc+6;  }
 
 
 chat_type              : array[false..true] of char = ('|',' ');
@@ -1345,6 +1508,8 @@ sss_music              = 5;
 
 // sound sources set size
 sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
+
+max_svolume            = 127;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1386,7 +1551,7 @@ ms1_svld               = 1;
 ms1_reps               = 2;
 
 ms2_camp               = 0;
-ms2_scir               = 1;
+ms2_game               = 1;
 ms2_mult               = 2;
 
 ms3_game               = 0;

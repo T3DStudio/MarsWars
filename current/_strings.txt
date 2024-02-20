@@ -508,7 +508,7 @@ Hell Knight
 
 Hotkey: F
 Categories/Attributes: [T1,unit,biological,light,ground]
-Max hits: 2000
+Max hits: 2500
 Limit used: 2
 Size: 14
 Base movement speed: 10
@@ -520,7 +520,7 @@ Slots in transport: 3
 Requirements: Infernal Pools
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 124*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
+- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 93*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
 - melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -536,7 +536,7 @@ Baron of Hell
 
 Hotkey: G
 Categories/Attributes: [T1,unit,biological,heavy,ground]
-Max hits: 4000
+Max hits: 4500
 Limit used: 3
 Size: 14
 Base movement speed: 10
@@ -548,7 +548,7 @@ Slots in transport: 3
 Requirements: Infernal Pools
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 124*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
+- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 93*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
 - melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -1647,7 +1647,7 @@ Requirements: Science Facility
 Produced by: Vehicle Factory
 Arming/Abilities: 
 - ranged attack, max. range: vision range, targets: [alive,flying], impact 62x2*2, upgrade: Weapons Upgrade(+8), factor: x1.5 [flying];
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*2, upgrade: Weapons Upgrade(+8), {Req.: "Fighter Laser Gun"};
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 31*2, upgrade: Weapons Upgrade(+8), {Req.: "Fighter Laser Gun"};
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +8;

@@ -138,7 +138,7 @@ begin
 end;
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       un_txt_name  :=NAME;
       un_txt_udescr:=DESCR;
@@ -147,7 +147,7 @@ end;
 
 procedure _mkHStrUpid(upid:byte;NAME,DESCR:shortstring);
 begin
-   with _upids[upid] do
+   with g_upids[upid] do
    begin
       _up_name :=NAME;
       _up_descr:=DESCR;
@@ -174,8 +174,8 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _ADDSTR(@up,_uids[i].un_txt_name,sep_comma);
-      if(uid in _uids[i].ups_builder)then _ADDSTR(@bp,_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_units  )then _ADDSTR(@up,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_builder)then _ADDSTR(@bp,g_uids[i].un_txt_name,sep_comma);
    end;
 
    if(length(up)>0)then _ADDSTR(@findprd,up,sep_comma);
@@ -187,12 +187,12 @@ function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
    begin
-      pu:=@_units[0];
+      pu:=@g_units[0];
       with pu^ do
       begin
          uidi:=auid;
          playeri:=0;
-         player :=@_players[playeri];
+         player :=@g_players[playeri];
          unit_apllyUID(pu);
          hits:=-32000;
       end;
@@ -280,7 +280,7 @@ begin
    then DamageStr:='x '+str_TargetLimit
    else
     for i:=0 to MaxDamageModFactors do
-     with _dmods[dmod][i] do
+     with g_dmods[dmod][i] do
       if(dm_factor<>100)and(dm_flags>0)then
        _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
@@ -294,8 +294,8 @@ end;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 
@@ -303,12 +303,12 @@ function _MakeDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):
 function RebuildStr(uid,uidl:byte):shortstring;
 begin
   if(uidl=0)
-  then RebuildStr:='"'+_uids[uid].un_txt_name+'"'
-  else RebuildStr:='"'+_uids[uid].un_txt_name+'['+str_attr_level+b2s(uidl+1)+']"';
+  then RebuildStr:='"'+g_uids[uid].un_txt_name+'"'
+  else RebuildStr:='"'+g_uids[uid].un_txt_name+'['+str_attr_level+b2s(uidl+1)+']"';
 end;
 begin
    _MakeDefaultDescription:=basedesc;
-    with _uids[uid] do
+    with g_uids[uid] do
     begin
        if(not for_doc)then
        _ADDSTR(@_MakeDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
@@ -356,9 +356,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','
-                                                                                +_uids[UID_Mastermind].un_txt_name+','
-                                                                                +_uids[UID_ArchVile  ].un_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
+                                                                                +g_uids[UID_Mastermind].un_txt_name+','
+                                                                                +g_uids[UID_ArchVile  ].un_txt_name+']'
     else
     begin
       inset:=[];
@@ -382,14 +382,14 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           _ADDSTR(@instr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@instr,g_uids[u].un_txt_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           _ADDSTR(@exstr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@exstr,g_uids[u].un_txt_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
       end;
    end;
@@ -409,7 +409,7 @@ var BaseDmg,
     sps    : single;
 begin
   _MakeWeaponDPS:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   with _a_weap[wid] do
   begin
      BaseDmg:=0;
@@ -417,12 +417,12 @@ begin
      case aw_type of
      wpt_suicide   : if(_death_missile>0)then
                      begin
-                        BaseDmg:=_mids[_death_missile].mid_base_damage;
+                        BaseDmg:=g_mids[_death_missile].mid_base_damage;
                         ocount:=1;
                      end
                      else exit;       //wpt_suicide
      wpt_missle    : begin
-                     BaseDmg:=_mids[aw_oid].mid_base_damage;
+                     BaseDmg:=g_mids[aw_oid].mid_base_damage;
                      if(aw_count>=0)
                      then ocount:=aw_count
                      else ocount:=2;
@@ -464,7 +464,7 @@ const tab : array[false..true] of shortstring = ('-','- ');
 var
 dmod_str:shortstring;
 begin
-  with _uids[uid] do
+  with g_uids[uid] do
    with _a_weap[wid] do
    begin
       _MakeWeaponString:='';
@@ -477,7 +477,7 @@ begin
                       else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
       wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
       wpt_heal      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
       wpt_suicide   :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
       end;
 
@@ -519,15 +519,15 @@ begin
       if(docSTR)then
       begin
          if(aw_type=wpt_missle)then
-          with _mids[aw_oid] do
+          with g_mids[aw_oid] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_type=wpt_suicide)and(_death_missile>0)then
-          with _mids[_death_missile] do
+          with g_mids[_death_missile] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_dupgr>0)then
-           _ADDSTR(@_MakeWeaponString,'upgrade: '+_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
+           _ADDSTR(@_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
       end;
 
       dmod_str:='';
@@ -555,7 +555,7 @@ var w:byte;
 weapons_str:shortstring;
 begin
   _MakeWeaponsDescription:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   begin
      weapons_str:='';
      if(_attack=atm_always)then
@@ -578,7 +578,7 @@ var HK,
     INFO:shortstring;
     i   :byte;
 begin
-  with _upids[upid] do
+  with g_upids[upid] do
   begin
      HK  :=_gHK(_up_btni);
      ENRG:='';
@@ -627,7 +627,7 @@ TIME,REQ    :shortstring;
 begin
    // units
    for uid:=0 to 255 do
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       REQ :='';
       PROD:='';
@@ -650,10 +650,10 @@ begin
          LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
-         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
-         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
-         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
+         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
+         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
+         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
+         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
 
          if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
          if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
@@ -679,14 +679,14 @@ begin
 
    // upgrades
    for uid:=0 to 255 do
-   with _upids[uid] do
+   with g_upids[uid] do
    begin
       REQ  :='';
 
-      if(_up_ruid1 >0)then _ADDSTR(@REQ,_uids [_up_ruid1].un_txt_name,sep_comma);
-      if(_up_ruid2 >0)then _ADDSTR(@REQ,_uids [_up_ruid2].un_txt_name,sep_comma);
-      if(_up_ruid3 >0)then _ADDSTR(@REQ,_uids [_up_ruid3].un_txt_name,sep_comma);
-      if(_up_rupgr >0)then _ADDSTR(@REQ,_upids[_up_rupgr]._up_name   ,sep_comma);
+      if(_up_ruid1 >0)then _ADDSTR(@REQ,g_uids [_up_ruid1].un_txt_name,sep_comma);
+      if(_up_ruid2 >0)then _ADDSTR(@REQ,g_uids [_up_ruid2].un_txt_name,sep_comma);
+      if(_up_ruid3 >0)then _ADDSTR(@REQ,g_uids [_up_ruid3].un_txt_name,sep_comma);
+      if(_up_rupgr >0)then _ADDSTR(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_requirements+tc_default+REQ;
@@ -695,6 +695,7 @@ end;
 
 procedure lng_eng;
 var t: shortstring;
+    p: byte;
 begin
    str_MMap              := 'MAP';
    str_MPlayers          := 'PLAYERS';
@@ -704,7 +705,7 @@ begin
    str_menu_s1[ms1_svld] := 'SAVE/LOAD';
    str_menu_s1[ms1_reps] := 'REPLAYS';
    str_menu_s2[ms2_camp] := 'CAMPAIGNS';
-   str_menu_s2[ms2_scir] := 'SKIRMISH';
+   str_menu_s2[ms2_game] := 'GAME';
    str_menu_s2[ms2_mult] := 'MULTIPLAYER';
    str_menu_s3[ms3_game] := 'GAME';
    str_menu_s3[ms3_vido] := 'VIDEO';
@@ -731,7 +732,7 @@ begin
    str_soundvol          := 'Sound volume';
    str_scrollspd         := 'Scroll speed';
    str_mousescrl         := 'Mouse scroll';
-   str_fullscreen        := 'Windowed:';
+   str_fullscreen        := 'Windowed';
    str_plname            := 'Player name';
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
@@ -776,7 +777,8 @@ begin
    str_apply             := 'apply';
    str_plout             := ' left the game';
    str_aislots           := 'Fill empty slots:';
-   str_resol             := 'Resolution';
+   str_resol_width       := 'Resolution (width)';
+   str_resol_height      := 'Resolution (height)';
    str_language          := 'UI language';
    str_requirements      := 'Requirements: ';
    str_req               := 'Req.: ';
@@ -859,6 +861,40 @@ begin
    str_attr_detector     := tc_purple+'detector'    ;
    str_attr_transport    := tc_gray  +'transport'   ;
 
+   str_PlayerSlots[ps_closed  ]:='closed';
+   str_PlayerSlots[ps_observer]:='observer';
+   str_PlayerSlots[ps_opened  ]:='opened';
+   str_PlayerSlots[ps_replace ]:='jump here';
+   str_PlayerSlots[ps_AI_1    ]:='AI 1';
+   str_PlayerSlots[ps_AI_2    ]:='AI 2';
+   str_PlayerSlots[ps_AI_3    ]:='AI 3';
+   str_PlayerSlots[ps_AI_4    ]:='AI 4';
+   str_PlayerSlots[ps_AI_5    ]:='AI 5';
+   str_PlayerSlots[ps_AI_6    ]:='AI 6';
+   str_PlayerSlots[ps_AI_7    ]:='AI 7';
+   str_PlayerSlots[ps_AI_8    ]:='AI cheater 1';
+   str_PlayerSlots[ps_AI_9    ]:='AI cheater 2';
+   str_PlayerSlots[ps_AI_10   ]:='AI cheater 3';
+   str_PlayerSlots[ps_AI_11   ]:='AI cheater 4';
+   {
+   ps_replace             = 3;  // menu option, not state
+   ps_AI_1                = 4;  // very easy
+   ps_AI_2                = 5;  // easy
+   ps_AI_3                = 6;  // medium
+   ps_AI_4                = 7;  // hard
+   ps_AI_5                = 8;  // harder
+   ps_AI_6                = 9;  // very hard
+   ps_AI_7                = 10; // elite
+   ps_AI_8                = 11; // Cheater 1 (Vision)
+   ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
+   ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
+   ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+   }
+
+   str_teams[0]          := 'OBS.';
+   for p:=1 to MaxPlayers do
+   str_teams[p]          := 'team '+b2s(p);
+
    str_panelpos          := 'Control panel position';
    str_panelposp[0]      := tc_lime  +'left'  +tc_default;
    str_panelposp[1]      := tc_orange+'right' +tc_default;
@@ -912,7 +948,7 @@ begin
    str_cmpd[5]           := tc_red   +'Nightmare'           +tc_default;
    str_cmpd[6]           := tc_purple+'HELL'                +tc_default;
 
-   str_gmodet            := 'Game mode:';
+   str_gmodet            := 'Game mode';
    str_gmode[gm_scirmish]:= tc_lime  +'Skirmish'        +tc_default;
    str_gmode[gm_3x3     ]:= tc_orange+'3x3'             +tc_default;
    str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'           +tc_default;
@@ -1275,7 +1311,7 @@ begin
   str_menu_s1[ms1_svld] := 'СОХР./ЗАГР.';
   str_menu_s1[ms1_reps] := 'ЗАПИСИ';
   str_menu_s2[ms2_camp] := 'КАМПАНИИ';
-  str_menu_s2[ms2_scir] := 'СХВАТКА';
+  str_menu_s2[ms2_game] := 'ИГРА';
   str_menu_s2[ms2_mult] := 'СЕТЕВАЯ ИГРА';
   str_menu_s3[ms3_game] := 'ИГРА';
   str_menu_s3[ms3_vido] := 'ГРАФИКА';
@@ -1302,7 +1338,7 @@ begin
   str_soundvol          := 'Громкость звуков';
   str_scrollspd         := 'Скорость пр.';
   str_mousescrl         := 'Прокр. мышью';
-  str_fullscreen        := 'В окне:';
+  str_fullscreen        := 'В окне';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
   str_maction2[true ]   := tc_lime+'движение'+tc_default;
@@ -1343,7 +1379,8 @@ begin
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты:';
-  str_resol             := 'Разрешение';
+  str_resol_width       := 'Разрешение (ширина)';
+  str_resol_height      := 'Разрешение (высота)';
   str_language          := 'Язык интерфейса';
   str_requirements      := 'Требования: ';
   str_req               := 'Треб.: ';
@@ -1708,7 +1745,7 @@ tmp:shortstring;
 procedure upgrLine(upid:byte;info:shortstring);
 begin
    if(upid>0)then
-    with _upids[upid] do
+    with g_upids[upid] do
       writeln(f,'- ',_up_name,' - ',info,';');
 end;
 
@@ -1717,7 +1754,7 @@ begin
    rewrite(f);
 
    for u:=0 to 255 do
-    with _uids[u] do
+    with g_uids[u] do
      if(length(un_txt_uihint1)>0)and(_r>0)then
      begin
         writeln(f,un_txt_name);
@@ -1743,7 +1780,7 @@ begin
         if(_zombie_uid>0)then
         if(_zombie_hits>0)or(_fastdeath_hits<0)then
         begin
-        writeln(f,'Zombie variant: ',_uids[_zombie_uid].un_txt_name );
+        writeln(f,'Zombie variant: ',g_uids[_zombie_uid].un_txt_name );
         writeln(f,'Zombification hits: ',_zombie_hits);
         end;
 
@@ -1814,7 +1851,7 @@ begin
    writeln(f);
 
    for u:=0 to 255 do
-    with _upids[u] do
+    with g_upids[u] do
      if(length(_up_name)>0)then
      begin
         writeln(f,RemoveSpecChars(_makeUpgrBaseHint(u,255)));
@@ -1825,7 +1862,7 @@ begin
 {
 s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;
-hs4:=@_upids[uid]._up_hint;
+hs4:=@g_upids[uid]._up_hint;
 }
 
    close(f);

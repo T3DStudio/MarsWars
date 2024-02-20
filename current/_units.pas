@@ -9,11 +9,11 @@ begin
    with player^ do
    if(hits>dead_hits)then
    begin
-      if(cycle_order=_cycle_order)then
+      if(cycle_order=g_cycle_order)then
         for uc:=1 to MaxUnits do
           if(uc<>unum)then
           begin
-             tu:=_punits[uc];
+             tu:=g_punits[uc];
              if(tu^.hits>fdead_hits)then unit_detect(pu,tu,point_dist_rint(x,y,tu^.x,tu^.y));
           end;
 
@@ -21,7 +21,7 @@ begin
       begin
          if(ServerSide)or(hits>fdead_hits)then hits-=1;
          {$IFDEF _FULLGAME}
-         if(cycle_order=_cycle_order)and(fsr>1)then fsr-=1;
+         if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
          {$ENDIF}
 
          if(ServerSide)then
@@ -134,7 +134,7 @@ begin
          exit;
       end;
 
-      puid  :=@_uids[ouid];
+      puid  :=@g_uids[ouid];
       avsni :=vsni;
       avsnt :=vsnt;
       select:=isselected;
@@ -183,8 +183,8 @@ begin
    end;
 
    if(bhits<0)then bhits:=puid^._mhits div abs(bhits);
-   if(_LastCreatedUnitP<>nil)then
-     with _LastCreatedUnitP^ do
+   if(LastCreatedUnitP<>nil)then
+     with LastCreatedUnitP^ do
      begin
         vsni:=avsni;
         vsnt:=avsnt;
@@ -193,7 +193,7 @@ begin
         if(select)then
         begin
            isselected:=true;
-           unit_PC_select_inc(_LastCreatedUnitP);
+           unit_PC_select_inc(LastCreatedUnitP);
         end;
      end;
 end;
@@ -219,15 +219,15 @@ begin
       begin
          if((tu^.x=x)and(tu^.y=y))then
          begin
-            case _random(4) of
+            case g_random(4) of
             0: unit_SetXY(pu,x-ud,y   ,mvxy_none);
             1: unit_SetXY(pu,x+ud,y   ,mvxy_none);
             2: unit_SetXY(pu,x   ,y-ud,mvxy_none);
             3: unit_SetXY(pu,x   ,y+ud,mvxy_none);
             end;
          end
-         else unit_SetXY(pu,x+round(uds*(tu^.x-x)/t)+_randomr(2),
-                            y+round(uds*(tu^.y-y)/t)+_randomr(2),mvxy_none);
+         else unit_SetXY(pu,x+round(uds*(tu^.x-x)/t)+g_randomr(2),
+                            y+round(uds*(tu^.y-y)/t)+g_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -265,15 +265,15 @@ begin
       begin
          if((td^.x=x)and(td^.y=y))then
          begin
-            case _random(4) of
+            case g_random(4) of
             0: unit_SetXY(pu,x-ud,y   ,mvxy_none);
             1: unit_SetXY(pu,x+ud,y   ,mvxy_none);
             2: unit_SetXY(pu,x   ,y-ud,mvxy_none);
             3: unit_SetXY(pu,x   ,y+ud,mvxy_none);
             end;
          end
-         else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+_randomr(2),
-                            y+round(ud*(td^.y-y)/t)+_randomr(2),mvxy_none);
+         else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+g_randomr(2),
+                            y+round(ud*(td^.y-y)/t)+g_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -341,7 +341,7 @@ begin
                 else ss+=upgr[upgr_race_mspeed_bio [_urace]]*3;
 
              if(mdist>70)
-             then mdist:=8+_random(25)
+             then mdist:=8+g_random(25)
              else mdist:=50;
 
              dir:=dir_turn(dir,point_dir(x,y,mv_x,mv_y),mdist);
@@ -762,7 +762,7 @@ begin
       pup_tar:=nil;
       if(IsUnitRange(ua_tar,@pup_tar))and(aicode=false)then
         if(pup_tar^.player=player)and(pup_tar^.hits>0)and(pup_tar^.reload>0)then
-          case _uids[pup_tar^.uidi]._ability of
+          case g_uids[pup_tar^.uidi]._ability of
 uab_Teleport      : swtarget:=true;
           end;
 
@@ -779,7 +779,7 @@ uab_Teleport      : swtarget:=true;
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
       begin
-         tu:=_punits[uc];
+         tu:=g_punits[uc];
 
          if(tu^.hits>fdead_hits)then
          begin
@@ -833,7 +833,7 @@ uab_Teleport      : swtarget:=true;
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
 
       aiu_code(pu);
-      if(aicode){and(playeri=HPlayer)}then ai_code(pu);
+      if(aicode){and(playeri=PlayerClient)}then ai_code(pu);
 
       if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
    end;
@@ -880,7 +880,7 @@ begin
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
       begin
-         tu:=_punits[uc];
+         tu:=g_punits[uc];
          if(tu^.hits>fdead_hits)then
          begin
             ud:=point_dist_rint(x,y,tu^.x,tu^.y);
@@ -932,8 +932,8 @@ begin
         pu^.buff[ub_CCast]:=fr_fpsd4;
         pu^.transportC-=uid^._transportS;
         transport:=0;
-        x    :=pu^.x-_randomr(pu^.uid^._r);
-        y    :=pu^.y-_randomr(pu^.uid^._r);
+        x    :=pu^.x-g_randomr(pu^.uid^._r);
+        y    :=pu^.y-g_randomr(pu^.uid^._r);
         ua_x :=x;
         ua_y :=y;
         {$IFDEF _FULLGAME}
@@ -983,7 +983,7 @@ end;
 function _unit_rebuild(pu:PTUnit;Check:boolean):boolean;
 function _getMHits(uid:byte):integer;
 begin
-   with _uids[uid] do
+   with g_uids[uid] do
     if(_isbarrack)
     or(_issmith  )
     or((_attack>0)and(not _isbuilder))
@@ -1064,7 +1064,7 @@ uab_RebuildInPoint   : begin
                           if(not Check)then
                             if(speed>0)then
                             begin
-                               _push_out(o_x,o_y,_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                               _push_out(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
                                unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
                             end
                             else unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
@@ -1121,7 +1121,7 @@ begin
    //tu - target
 
    if(tu^.uid^._zombie_uid=0)then exit;
-   _zuid:=@_uids[tu^.uid^._zombie_uid];
+   _zuid:=@g_uids[tu^.uid^._zombie_uid];
 
    with pu^ do
    with uid^ do
@@ -1152,8 +1152,8 @@ begin
       unit_add(tu^.x,tu^.y,pu^.unum,tu^.uid^._zombie_uid,pu^.playeri,true,true,_l);
       unit_kill(tu,true,true,false,false,true);
 
-      if(_LastCreatedUnit>0)then
-      with _LastCreatedUnitP^ do
+      if(LastCreatedUnit>0)then
+      with LastCreatedUnitP^ do
       begin
          group:=_o;
          dir  :=_d;
@@ -1165,8 +1165,8 @@ begin
          {$ENDIF}
          if(hits<=0)then
          begin
-            unit_PC_base_dec(_LastCreatedUnitP);
-            unit_StartResurrection(_LastCreatedUnitP);
+            unit_PC_base_dec(LastCreatedUnitP);
+            unit_StartResurrection(LastCreatedUnitP);
          end;
       end;
    end;
@@ -1291,8 +1291,8 @@ wmove_farther   : begin
                      if(not AttackInMove)or(ua_bx<=0)then
                        if(x=tu^.x)and(y=tu^.y)then
                        begin
-                          mv_x:=x-_randomr(2);
-                          mv_y:=y-_randomr(2);
+                          mv_x:=x-g_randomr(2);
+                          mv_y:=y-g_randomr(2);
                        end
                        else
                        begin
@@ -1363,7 +1363,7 @@ wmove_noneed    : if(not AttackInMove)then
             AttackEffects;
          end;
 
-         if(cycle_order=_cycle_order)then AttackEffects;
+         if(cycle_order=g_cycle_order)then AttackEffects;
 
          {$IFDEF _FULLGAME}
          if(targetvis)then
@@ -1387,7 +1387,7 @@ wmove_noneed    : if(not AttackInMove)then
              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
              begin
                 if(not IsUnitRange(tu^.transport,nil))then
-                effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+                effect_add(tu^.vx-g_randomr(tu^.uid^._missile_r),tu^.vy-g_randomr(tu^.uid^._missile_r),SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
 
                 SoundPlayUnit(aw_snd_target,tu,@targetvis);
              end;
@@ -1669,7 +1669,7 @@ begin
    begin
       unit_attack(pu);
 
-      if(transportu=nil)and(cycle_order=_cycle_order)then
+      if(transportu=nil)and(cycle_order=g_cycle_order)then
         if(mp_x<>x)or(mp_y<>y)then
         begin
            mp_x:=x;
@@ -1863,7 +1863,7 @@ begin
       uXCheck(@ucl_x[_ukbuilding,_ucl]);
 
       // REGENERATION
-      if(cycle_order=_cycle_regen)then
+      if(cycle_order=g_cycle_regen)then
        if(buff[ub_Damaged]<=0)and(hits<_mhits)then
        begin
           i:=upgr[_upgr_regen];
@@ -1885,7 +1885,7 @@ begin
    else
      if(cenergy>=0)then
      begin
-        if(_cycle_order=cycle_order)and(buff[ub_Damaged]<=0)then
+        if(g_cycle_order=cycle_order)and(buff[ub_Damaged]<=0)then
         begin
            hits+=_bstep;
            hits+=_bstep*upgr[upgr_fast_build];
@@ -1910,11 +1910,11 @@ begin
    for u:=1 to MaxUnits do
    begin
       transportu:=nil;
-      pu:=_punits[u];
+      pu:=g_punits[u];
       with pu^ do
       if(hits>dead_hits)then
       begin
-         if(cycle_order=_cycle_order)
+         if(cycle_order=g_cycle_order)
          then unit_reveal(pu,false);
 
          unit_BaseCounters(pu);
@@ -1937,7 +1937,7 @@ begin
             end;
 
             transportu:=nil;
-            if(cycle_order=_cycle_order)and(hits>0)then
+            if(cycle_order=g_cycle_order)and(hits>0)then
               if(ServerSide)and(transportu=nil)
               then unit_mcycle   (pu)
               else unit_mcycle_cl(pu,transportu);

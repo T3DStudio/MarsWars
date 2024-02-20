@@ -9,7 +9,6 @@ PTSoc = ^TSoc;
 TSob  = set of byte;
 PTSob = ^TSob;
 
-
 {$IFDEF _FULLGAME}
 
 string6 = string[6];
@@ -154,6 +153,12 @@ PTSoundSet = ^TSoundSet;
 TReplayPos = record
    rp_fpos : int64;
    rp_gtick: cardinal;
+end;
+
+TMenuItem = record
+   x0,y0,
+   x1,y1  : integer;
+   enabled: boolean;
 end;
 
 {$ENDIF}
@@ -435,8 +440,8 @@ TPlayer = record
    name    : shortstring;
 
    team,
-   race,mrace,
-   state,
+   race ,slot_race,
+   state,slot_state,
    pnum    : byte;
 
    build_cd,
@@ -694,5 +699,10 @@ TDCell = record
    n:integer;
    l:array of PTDoodad;
 end;
+
+TMap = record
+
+end;
+
 
 

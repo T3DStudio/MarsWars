@@ -198,15 +198,15 @@ var i: byte;
 begin
    for i:=1 to MaxPlayers do
     if(i<>p)then
-     if((_players[i].state>ps_none)and(_players[i].team<>_players[p].team))
+     if((g_players[i].state>ps_none)and(g_players[i].team<>g_players[p].team))
      or(not g_fixed_positions)
-     then ai_PlayerSetAlarm(@_players[p],map_psx[i],map_psy[i],1,base_1r,true,pf_get_area(map_psx[i],map_psy[i]));
+     then ai_PlayerSetAlarm(@g_players[p],map_psx[i],map_psy[i],1,base_1r,true,pf_get_area(map_psx[i],map_psy[i]));
 end;
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
 procedure SetBaseOpt(me,m,unp,upp,t0,t1,t2,dl,s1,s2,mint,maxt,atl,att,l:integer;mupl:byte;hpt:TSoB);
 begin
-   with _players[p] do
+   with g_players[p] do
    begin
       ai_maxcount_energy  :=me;
       ai_maxcount_mains   :=m;
@@ -228,7 +228,7 @@ begin
    end;
 end;
 begin
-   with _players[p] do
+   with g_players[p] do
    begin
       case ai_skill of
       //              energ buil uprod  pprod tech0 tech1 tech2 radar rsta    telepo  min    max    attack attack     max           upgr primary
@@ -456,7 +456,7 @@ begin
     with player^ do
      for i:=1 to 255 do
       if(uprodu[i]>0)then
-       with _uids[i] do
+       with g_uids[i] do
         if(_ukfly)and(not _ukbuilding)and(_transportM>0)then ai_transport_cur+=_transportM*uprodu[i];
 
    // enemy
@@ -944,7 +944,7 @@ begin
             begin
                if(not tu^.uid^._isbuilder)
                or((tu^.uid^._isbuilder)and(n_builders>1))
-               then ai_enrg_pot+=_uids[tu^.uid^._rebuild_uid]._genergy;
+               then ai_enrg_pot+=g_uids[tu^.uid^._rebuild_uid]._genergy;
             end
             else ai_enrg_pot+=tu^.uid^._genergy;
 
@@ -1023,7 +1023,7 @@ procedure ai_player_code(playeri:byte);
 var tu:PTunit;
     a :byte;
 begin
-   with _players[playeri] do
+   with g_players[playeri] do
    begin
       if(IsUnitRange(ai_scout_u_cur,@tu))
       then ai_scout_u_cur_w:=_unitWeaponPriority(tu,wtp_Scout,false)
@@ -1047,11 +1047,11 @@ begin
       for a:=0 to MaxPlayers do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
-         if(_CheckRoyalBattlePoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;
+         if(CheckRoyalBattleRadiusPoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;
 
       if(ai_detection_pause>0)then ai_detection_pause-=1;
 
-      if(_cycle_order=pnum)then
+      if(g_cycle_order=pnum)then
       begin
          if(ai_scout_u_cur=0)
          then ai_scout_timer:=0

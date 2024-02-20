@@ -79,6 +79,8 @@ begin
 end; }
 
 begin
+   writeln(sizeof(string6));
+
    InitGame;
    {$IFDEF DTEST}
    WriteUnitDescriptions;
@@ -94,7 +96,7 @@ begin
       if(r_draw)then DrawGame;
       {$ELSE}
       while(SDL_PollEvent(_EVENT)>0)do
-        case (_EVENT^.type_) of
+        case(_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
       CodeGame;

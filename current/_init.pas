@@ -16,7 +16,7 @@ begin
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
    _GfxColors;
-   _MakeScreen;
+   vid_MakeScreen;
    _LoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
 
@@ -77,6 +77,7 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
+   Menu_ReInit;
    InitRX2Y;
    lng_eng;
    SwitchLanguage;
@@ -91,7 +92,7 @@ begin
    Map_randommap;
    GameDefaultAll;
 
-   NEW(_event);
+   NEW(sys_EVENT);
 
    GameCycle:=true;
 

@@ -389,14 +389,14 @@ procedure units_clear_tar(tar:integer);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
-     with _punits[u]^ do
+     with g_punits[u]^ do
        if(ua_tar=tar)then ua_tar:=0;
 end;
 procedure missiles_clear_tar(u:integer;ResetTarget:boolean);
 var i:integer;
 begin
    for i:=1 to MaxUnits do
-    with _missiles[i] do
+    with g_missiles[i] do
      if(vstep>0)and(tar=u)then
      begin
         tar:=0;
@@ -484,7 +484,7 @@ begin
        buff[ub_Cast]:=fr_fps1;
 
        {$IFDEF _FULLGAME}
-       if(ServerSide)and(player^.team=_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+       if(ServerSide)and(player^.team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
        {$ENDIF}
     end;
 end;
@@ -676,7 +676,7 @@ begin
       end;
 
    for u:=1 to MaxUnits do
-    with _units[u] do
+    with g_units[u] do
      with uid^ do
       if(hits>0)and(ukfly=_ukfly)and(unum<>ignore_unum)then
        if(speed<=0)or(not iscomplete)then
@@ -704,10 +704,10 @@ aukfly  :boolean;
 dx,dy,o,
 u,sr,dr :integer;
 begin
-   with _uids[buid] do
+   with g_uids[buid] do
    begin
       aukfly:=_ukfly;
-      _push_out(tx,ty,_r+1,0,@tx,@ty,aukfly,(_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+      _push_out(tx,ty,_r+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
    end;
 
    dx:=-2000;
@@ -715,7 +715,7 @@ begin
    sr:=NOTSET;
    dr:=NOTSET;
    for u:=1 to MaxUnits do
-    with _units[u] do
+    with g_units[u] do
      with uid^ do
       if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(isbuildarea)then
        if(buid in ups_builder)and(not IsUnitRange(transport,nil))then
@@ -751,7 +751,7 @@ begin
 
    for u:=1 to MaxUnits do
     if(u<>skipunit)then
-     with _punits[u]^ do
+     with g_punits[u]^ do
       with uid^ do
        if(hits>0)and(ukfly=flylevel)and(IsUnitRange(transport,nil)=false)then
         if(speed<=0)or(not iscomplete)then
@@ -804,7 +804,7 @@ begin
    CheckBuildArea:=0;
 
    if(pl<=MaxPlayers)then
-    with _players[pl] do
+    with g_players[pl] do
      if(n_builders<=0)then
      begin
         CheckBuildArea:=1; // no builders
@@ -827,12 +827,12 @@ begin
          exit;
       end;
 
-   tr+=_uids[buid]._r;
+   tr+=g_uids[buid]._r;
 
    CheckBuildArea:=2;
 
    for u:=1 to MaxUnits do
-    with _punits[u]^ do
+    with g_punits[u]^ do
      with uid^ do
       if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=pl)then
        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
@@ -859,11 +859,11 @@ begin
    obstacles:=true;
    if(playern<=MaxPlayers)then
    begin
-      with _uids[buid] do
-       with _players[playern] do
+      with g_uids[buid] do
+       with g_players[playern] do
         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
 
-      if(obstacles)and(_players[playern].state=ps_comp)then
+      if(obstacles)and(g_players[playern].state=ps_comp)then
         if(pf_IfObstacleZone(pf_get_area(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
    end;
 
@@ -875,7 +875,7 @@ begin
    else begin CheckBuildPlace:=3;exit;end;
    end;
 
-   with _uids[buid] do
+   with g_uids[buid] do
     i:=CheckCollisionR(tx,ty,tr+_r,uskip,_ukbuilding,_ukfly,obstacles);
    if(i>0)then CheckBuildPlace:=1;
 end;
@@ -1169,7 +1169,7 @@ begin
       begin
          buff[ub_Summoned]:=fr_fps1;
          {$IFDEF _FULLGAME}
-         effect_UnitSummon(_LastCreatedUnitP,nil);
+         effect_UnitSummon(LastCreatedUnitP,nil);
          {$ENDIF}
       end;
    end;
@@ -1183,11 +1183,11 @@ begin
    m:=i+MaxPlayerUnits;
    while(i<m)do
    begin
-      with _units[i] do
+      with g_units[i] do
        if(hits<=dead_hits)then
        begin
-          _LastCreatedUnit :=i;
-          _LastCreatedUnitP:=_punits[i];
+          LastCreatedUnit :=i;
+          LastCreatedUnitP:=g_punits[i];
           break;
        end;
       i+=1;
@@ -1195,40 +1195,40 @@ begin
 end;
 begin
    unit_add:=false;
-   _LastCreatedUnit :=0;
-   _LastCreatedUnitP:=_punits[0];
-   with _players[pl] do
+   LastCreatedUnit :=0;
+   LastCreatedUnitP:=g_punits[0];
+   with g_players[pl] do
    begin
       if(ui=0)then exit;
 
       if(not IsUnitRange(aunum,nil))
       then _FindNotExistedUnit
       else
-        if(_units[aunum].hits>dead_hits)
+        if(g_units[aunum].hits>dead_hits)
         then _FindNotExistedUnit
         else
         begin
-           _LastCreatedUnit :=aunum;
-           _LastCreatedUnitP:=@_units[_LastCreatedUnit];
+           LastCreatedUnit :=aunum;
+           LastCreatedUnitP:=@g_units[LastCreatedUnit];
         end;
 
-      if(_LastCreatedUnit>0)then
+      if(LastCreatedUnit>0)then
       begin
          unit_add:=true;
-         FillChar(_LastCreatedUnitP^,SizeOf(TUnit),0);
+         FillChar(LastCreatedUnitP^,SizeOf(TUnit),0);
 
-         with _LastCreatedUnitP^ do
+         with LastCreatedUnitP^ do
          begin
             {$IFDEF _FULLGAME}
-            mmap_order := _LastCreatedUnit mod vid_blink_period1;
+            mmap_order := LastCreatedUnit mod vid_blink_period1;
             {$ENDIF}
-            cycle_order:= _LastCreatedUnit mod order_period;
-            unum       := _LastCreatedUnit;
+            cycle_order:= LastCreatedUnit mod order_period;
+            unum       := LastCreatedUnit;
 
-            unit_SetXY(_LastCreatedUnitP,ux,uy,mvxy_strict);
+            unit_SetXY(LastCreatedUnitP,ux,uy,mvxy_strict);
             uidi    := ui;
             playeri := pl;
-            player  :=@_players[playeri];
+            player  :=@g_players[playeri];
             ua_x    := x;
             ua_y    := y;
             ua_bx   := -1;
@@ -1246,10 +1246,10 @@ begin
             then ulevel:=MaxUnitLevel;
             level:=ulevel;
 
-            unit_SetDefaults(_LastCreatedUnitP,false);
-            unit_reveal     (_LastCreatedUnitP,false);
-            unit_apllyUID   (_LastCreatedUnitP);
-            unit_PC_add_inc (_LastCreatedUnitP,ubld,summoned);
+            unit_SetDefaults(LastCreatedUnitP,false);
+            unit_reveal     (LastCreatedUnitP,false);
+            unit_apllyUID   (LastCreatedUnitP);
+            unit_PC_add_inc (LastCreatedUnitP,ubld,summoned);
          end;
       end;
    end;
@@ -1257,9 +1257,9 @@ end;
 
 function StartBuild(bx,by:integer;buid,bp:byte):cardinal;
 begin
-   StartBuild:=_uid_conditionals(@_players[bp],buid);
+   StartBuild:=_uid_conditionals(@g_players[bp],buid);
    if(StartBuild=0)then
-    with _players[bp] do
+    with g_players[bp] do
      if(CheckBuildPlace(bx,by,0,0,bp,buid)=0)
      then unit_add(bx,by,-1,buid,bp,false,false,0)
      else StartBuild:=ureq_place;
@@ -1267,9 +1267,9 @@ end;
 
 function barrack_out_RStep(pu:PTUnit;_uid:byte):integer;
 begin
-   if(_uids[_uid]._ukfly=uf_fly)
+   if(g_uids[_uid]._ukfly=uf_fly)
    then barrack_out_RStep:=0
-   else barrack_out_RStep:=pu^.uid^._r;//+_uids[_uid]._r;
+   else barrack_out_RStep:=pu^.uid^._r;//+g_uids[_uid]._r;
 end;
 
 function barrack_out_unit(pu:PTUnit;_uid:byte;_sstep,_dir:integer):boolean;
@@ -1290,21 +1290,21 @@ begin
       else unit_add(x+trunc(_sstep*cos(cd)),
                     y-trunc(_sstep*sin(cd)),-1,_uid,playeri,true,false,0);
 
-      if(_LastCreatedUnit>0)then
+      if(LastCreatedUnit>0)then
       begin
-         _LastCreatedUnitP^.ua_x  :=ua_x;
-         _LastCreatedUnitP^.ua_y  :=ua_y;
-         _LastCreatedUnitP^.ua_id :=ua_id;
-         _LastCreatedUnitP^.ua_tar:=ua_tar;
-         _LastCreatedUnitP^.dir   :=dir;
+         LastCreatedUnitP^.ua_x  :=ua_x;
+         LastCreatedUnitP^.ua_y  :=ua_y;
+         LastCreatedUnitP^.ua_id :=ua_id;
+         LastCreatedUnitP^.ua_tar:=ua_tar;
+         LastCreatedUnitP^.dir   :=dir;
 
          if(_barrack_teleport)then
          begin
-            _LastCreatedUnitP^.buff[ub_Teleport]:=fr_fps1;
+            LastCreatedUnitP^.buff[ub_Teleport]:=fr_fps1;
             {$IFDEF _FULLGAME}
             if(SoundPlayUnit(snd_teleport,pu,nil))
-            then effect_add(_LastCreatedUnitP^.vx,
-                            _LastCreatedUnitP^.vy,SpriteDepth(_LastCreatedUnitP^.vy+1,_LastCreatedUnitP^.ukfly),EID_Teleport);
+            then effect_add(LastCreatedUnitP^.vx,
+                            LastCreatedUnitP^.vy,SpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.ukfly),EID_Teleport);
             {$ENDIF}
          end;
          barrack_out_unit:=true;
@@ -1328,7 +1328,7 @@ begin
       for i:=0 to count do announcer:=barrack_out_unit(pu,_uid,sstep,dir+i*15) or announcer;
 
       if(announcer)
-      then GameLogUnitReady(_LastCreatedUnitP);
+      then GameLogUnitReady(LastCreatedUnitP);
    end;
 end;
 
@@ -1351,12 +1351,12 @@ begin
                with player^ do
                begin
                   uproda+=1;
-                  uprodl+=_uids[puid]._limituse;
-                  uprodc[_uids[puid]._ucl]+=1;
+                  uprodl+=g_uids[puid]._limituse;
+                  uprodc[g_uids[puid]._ucl]+=1;
                   uprodu[ puid           ]+=1;
-                  cenergy-=_uids[puid]._renergy;
+                  cenergy-=g_uids[puid]._renergy;
                   uprod_u[pn]:=puid;
-                  uprod_r[pn]:=_uids[puid]._tprod;
+                  uprod_r[pn]:=g_uids[puid]._tprod;
 
                   unit_ProdUnitStart_p:=true;
                end;
@@ -1387,10 +1387,10 @@ begin
             puid:=uprod_u[pn];
 
             uproda-=1;
-            uprodl-=_uids[puid]._limituse;
-            uprodc[_uids[puid]._ucl]-=1;
+            uprodl-=g_uids[puid]._limituse;
+            uprodc[g_uids[puid]._ucl]-=1;
             uprodu[ puid           ]-=1;
-            cenergy+=_uids[puid]._renergy;
+            cenergy+=g_uids[puid]._renergy;
             uprod_r[pn]:=0;
 
             unit_ProdUnitStop_p:=true;
@@ -1427,7 +1427,7 @@ begin
            else
              if(not PlayerSetProdError(playeri,lmt_argt_upgr,upid,_upid_conditionals(player,upid),pu))then
                with player^ do
-               with _upids[upid] do
+               with g_upids[upid] do
                begin
                   upproda+=1;
                   upprodu[upid]+=1;
@@ -1465,7 +1465,7 @@ begin
 
             upproda-=1;
             upprodu[upid]-=1;
-            cenergy+=pprod_e[pn]; //_upids[upid]._up_renerg;
+            cenergy+=pprod_e[pn]; //g_upids[upid]._up_renerg;
             pprod_r[pn]:=0;
 
             unit_ProdUpgrStop_p:=true;
@@ -1531,7 +1531,7 @@ begin
       unit_UnSelect(pu);
 
       if(iscomplete=false)
-      then cenergy+=_uids[uidi]._renergy
+      then cenergy+=g_uids[uidi]._renergy
       else
       begin
          unit_ProdUnitStop(pu,255,true);
@@ -1604,7 +1604,7 @@ begin
            begin
               _uid:=pprod_u[i];
               if(cenergy<0)
-              or(upgr[_uid]>=_upids[_uid]._up_max)
+              or(upgr[_uid]>=g_upids[_uid]._up_max)
               or(upgr[_uid]>=a_upgrs[_uid])
               then
               else
@@ -1625,33 +1625,33 @@ begin
    with player^ do
    begin
       if(not _uid_player_limit(player,auid))
-      then _LastCreatedUnit:=0
+      then LastCreatedUnit:=0
       else
         if(not ServerSide)
-        then _LastCreatedUnit:=1
+        then LastCreatedUnit:=1
         else unit_add(tx,ty,-1,auid,playeri,true,true,0);
 
-      if(_LastCreatedUnit>0)then
+      if(LastCreatedUnit>0)then
       begin
          if(ServerSide)then
          begin
-            _LastCreatedUnitP^.dir   :=dir;
-            _LastCreatedUnitP^.a_tar :=a_tar;
-            _LastCreatedUnitP^.ua_id :=ua_id;
-            _LastCreatedUnitP^.ua_tar:=ua_tar;
+            LastCreatedUnitP^.dir   :=dir;
+            LastCreatedUnitP^.a_tar :=a_tar;
+            LastCreatedUnitP^.ua_id :=ua_id;
+            LastCreatedUnitP^.ua_tar:=ua_tar;
             if(IsUnitRange(a_tar,@tu))then
             begin
-               _LastCreatedUnitP^.ua_x :=tu^.x;
-               _LastCreatedUnitP^.ua_y :=tu^.y;
+               LastCreatedUnitP^.ua_x :=tu^.x;
+               LastCreatedUnitP^.ua_y :=tu^.y;
             end
             else
              if(ua_x<>x)or(ua_y<>y)then
              begin
-                _LastCreatedUnitP^.ua_x:=ua_x;
-                _LastCreatedUnitP^.ua_y:=ua_y;
+                LastCreatedUnitP^.ua_x:=ua_x;
+                LastCreatedUnitP^.ua_y:=ua_y;
              end;
          end
-         else _LastCreatedUnit:=0;
+         else LastCreatedUnit:=0;
       end
       {$IFDEF _FULLGAME}
       else
@@ -1810,7 +1810,7 @@ begin
       for i:=1 to MaxUnits do
       if(i<>unum)then
       begin
-         tu:=@_units[i];
+         tu:=@g_units[i];
          if(tu^.hits>0)then
          begin
             if(tu^.ua_tar=unum)then tu^.ua_tar:=0;
@@ -1823,8 +1823,8 @@ begin
                 begin
                    tu^.transport:=0;
                    transportC-=tu^.uid^._transportS;
-                   tu^.x+=_randomr(uid^._r);
-                   tu^.y+=_randomr(uid^._r);
+                   tu^.x+=g_randomr(uid^._r);
+                   tu^.y+=g_randomr(uid^._r);
                    tu^.ua_x:=tu^.x;
                    tu^.ua_y:=tu^.y;
                    if(tu^.hits>apc_exp_damage)
@@ -1855,7 +1855,7 @@ begin
             if(_death_uid>0)and(_death_uidn>0)then
               for i:=1 to _death_uidn do
                 if(_uid_player_limit(player,_death_uid))then
-                  unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
+                  unit_add(x-g_randomr(_missile_r),y-g_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
          end;
       end;
    end

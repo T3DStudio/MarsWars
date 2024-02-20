@@ -4,7 +4,7 @@ function SpawnMonster(uid:byte):boolean;
 var tx,ty:integer;
 begin
    SpawnMonster:=false;
-   if(limit<_uids[uid]._limituse)then exit;
+   if(limit<g_uids[uid]._limituse)then exit;
    if(random(2)=0)then
    begin
       if(random(2)=0)
@@ -20,7 +20,7 @@ begin
       tx:=random(map_mw);
    end;
    SpawnMonster:=unit_add(tx,ty,0,uid,0,true,true,0);
-   if(SpawnMonster)then limit-=_uids[uid]._limituse;
+   if(SpawnMonster)then limit-=g_uids[uid]._limituse;
 end;
 function SpawnL(ul:longint):boolean;
 begin
@@ -83,7 +83,7 @@ begin
    end;
 end;
 begin
-   while(limit>=ul1)and(_players[0].army<MaxPlayerUnits)do
+   while(limit>=ul1)and(g_players[0].army<MaxPlayerUnits)do
     if(not SpawnLR)then
      if(not SpawnL(ul12))then
       if(not SpawnL(ul10))then
@@ -104,7 +104,7 @@ const
 max_wave_time_s = 150;
 max_wave_time_t = fr_fps1*max_wave_time_s;
 begin
-   if(_players[0].armylimit<=0)then
+   if(g_players[0].armylimit<=0)then
    begin
       if(g_inv_wave_t_next<=0)then
       begin

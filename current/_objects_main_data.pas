@@ -26,7 +26,7 @@ procedure unit_apllyUID(pu:PTUnit);
 begin
    with pu^ do
    begin
-      uid:=@_uids[uidi];
+      uid:=@g_uids[uidi];
       with uid^ do
       begin
          isbuildarea:=_isbuilder;
@@ -60,7 +60,7 @@ var i,u:byte;
 
 procedure _weapon(aa,wtype:byte;max_range,min_range,count:integer;reload,oid,ruid,rupid,rupidl,dupgr:byte;dupgrs:integer;tarf,reqf:cardinal;uids,reload_s:TSoB;ax,ay:integer;atarprior:byte;afakeshots:byte;admod:byte);
 begin
-   with _uids[i] do
+   with g_uids[i] do
    if(aa<=MaxUnitWeapons)then
    with _a_weap[aa] do
    begin
@@ -89,10 +89,10 @@ begin
    end;
 end;
 begin
-   FillChar(_uids   ,SizeOf(_uids   ),0);
+   FillChar(g_uids   ,SizeOf(g_uids   ),0);
 
    for i:=0 to 255 do
-   with _uids[i] do
+   with g_uids[i] do
    begin
       _mhits     := 1000;
       _btime     := 1;
@@ -369,9 +369,14 @@ begin
    _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1   ,MID_Cacodemon,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive      ,wpr_any,uids_all-[UID_Cacodemon],[],0,0,wtp_UnitMech,0,dm_AntiUnitMech);
    _weapon(1,wpt_directdmg,aw_dmelee ,0,BaseDamage1,fr_fps1   ,0            ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_fly  ,wpr_any,         [UID_Cacodemon],[],0,0,wtp_distance ,0,0);
 end;
+{
+ul1  1000  BaseDamage1
+ul2  2000  BaseDamage2
+ul2  2500  BaseDamage1.5
+}
 UID_Knight    :
 begin
-   _mhits     := 2000;
+   _mhits     := 2500;
    _renergy   := 300;
    _r         := 14;
    _speed     := 10;
@@ -387,9 +392,15 @@ begin
    _weapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1  ,MID_Baron,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Knight,UID_Baron],[],0,0,wtp_UnitLight,0,dm_AntiUnitLight);
    _weapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1  ,0        ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,wtp_distance ,0,0);
 end;
+{
+ul1  1000  BaseDamage1
+ul3  3000  BaseDamage3
+ul3  4000  BaseDamage2
+ul2  4500  BaseDamage1.5
+}
 UID_Baron     :
 begin
-   _mhits     := 4000;
+   _mhits     := 4500;
    _renergy   := 500;
    _r         := 14;
    _speed     := 10;
@@ -1326,7 +1337,7 @@ end;
 
       if(_issmith)and(ups_upgrades=[])then
        for u:=1 to 255 do
-        with _upids[u] do
+        with g_upids[u] do
          if(_up_time>0)and(_urace=_up_race)then ups_upgrades+=[u];
 
       _srange_min:=_r+_r+25;
@@ -1356,10 +1367,10 @@ end;
 procedure InitMIDs;
 var m:byte;
 begin
-   FillChar(_mids,SizeOf(_mids),0);
+   FillChar(g_mids,SizeOf(g_mids),0);
 
    for m:=0 to 255 do
-   with _mids[m] do
+   with g_mids[m] do
    begin
       mid_size      := 0;
       mid_teamdamage:= true;
@@ -1392,6 +1403,7 @@ end;
 
 // damage
 case m of
+MID_Flyer,
 MID_Bullet         : mid_base_damage :=BaseDamageh;
 MID_Imp,
 MID_URocketS,
@@ -1400,13 +1412,12 @@ MID_Mancubus,
 MID_YPlasma,
 MID_BPlasma,
 MID_Chaingun,
-MID_Flyer,
 MID_Granade,
 MID_Tank,
 MID_Cacodemon,
 MID_SShot          : mid_base_damage :=BaseDamage1;
+MID_Baron,
 MID_Revenant       : mid_base_damage :=BaseDamage1h;
-MID_Baron          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;
 MID_BFG            : mid_base_damage :=BaseDamage4;
 MID_MChaingun      : mid_base_damage :=BaseDamage3;
@@ -1471,7 +1482,7 @@ begin
   and((flags and f2)=0)then flags:=flags or f1 or f2;
 end;
 begin
-   with _dmods[dm][n] do
+   with g_dmods[dm][n] do
    begin
       CorrentFlags(wtr_unit ,wtr_building);
       CorrentFlags(wtr_bio  ,wtr_mech    );
@@ -1483,7 +1494,7 @@ begin
    end;
 end;
 begin
-   FillChar(_dmods,SizeOf(_dmods),0);
+   FillChar(g_dmods,SizeOf(g_dmods),0);
 
    SetDMOD(dm_AntiUnitBioHeavy ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
    SetDMOD(dm_SSGShot          ,0,150,wtr_unit    +wtr_bio +wtr_heavy           );
@@ -1509,7 +1520,7 @@ procedure InitUpgrades;
 var u:byte;
 procedure _setUPGR(rc,upcl,stime,stimeX,stimeA,max,enrg,enrgX,enrgA:integer;rupgr,ruid1,ruid2,ruid3:byte;mfrg:boolean);
 begin
-   with _upids[upcl] do
+   with g_upids[upcl] do
    begin
       _up_ruid1     := ruid1;
       _up_ruid2     := ruid2;
@@ -1529,7 +1540,7 @@ begin
    end;
 end;
 begin
-   FillChar(_upids,SizeOf(_upids),0);
+   FillChar(g_upids,SizeOf(g_upids),0);
 
    //                                  base X +
    //         race id                  time      lvl  enr  X +    rupgr         ruid1                    multi
@@ -1593,7 +1604,7 @@ end;
 procedure GameObjectsInit;
 var u:integer;
 begin
-   for u:=0 to MaxUnits do _punits[u]:=@_units[u];
+   for u:=0 to MaxUnits do g_punits[u]:=@g_units[u];
 
    // weapon target requirements set
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy wtr_stun wtr_nostun;

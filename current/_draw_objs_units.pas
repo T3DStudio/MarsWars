@@ -5,7 +5,7 @@ begin
    with uid^ do
    begin
       with player^ do
-        if(team=_players[UIPlayer].team)then
+        if(team=g_players[UIPlayer].team)then
           if(_ability=uab_UACScan)and(reload>radar_vision_time)then
             if(r_minimap_scan_blink)
             then filledCircleColor(r_minimap,trunc(ua_x  *map_mmcx),
@@ -32,8 +32,8 @@ begin
 UID_UPortal,
 UID_HTeleport,
 UID_HPentagram,
-UID_HSymbol,
-UID_HASymbol,
+//UID_HSymbol,
+//UID_HASymbol,
 UID_HAltar,
 UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
     else
@@ -89,8 +89,8 @@ begin
    then UnitVisionRange:=2
    else
      with pu^ do
-      if(CheckUnitTeamVision(_players[UIPlayer].team,pu,false))then
-       if(player^.team=_players[UIPlayer].team)
+      if(CheckUnitTeamVision(g_players[UIPlayer].team,pu,false))then
+       if(player^.team=g_players[UIPlayer].team)
        then UnitVisionRange:=2
        else UnitVisionRange:=1;
 end;
@@ -182,7 +182,7 @@ begin
       end;
    end;
    ui_groups_n[i]+=1;
-   with _uids[uidi] do
+   with g_uids[uidi] do
      ui_groups_uids[i,_ukbuilding]+=[uidi];
 end;
 
@@ -446,8 +446,8 @@ begin
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_lime  ,@_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_yellow,@_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 
@@ -547,7 +547,7 @@ begin
 
    for u:=1 to MaxUnits do
    begin
-      pu:=@_units[u];
+      pu:=@g_units[u];
       with pu^ do
        if(IsUnitRange(transport,@tu))then
        begin
