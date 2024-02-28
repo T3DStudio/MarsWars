@@ -1079,13 +1079,13 @@ begin
    _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
    _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
    _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando becomes invisible'                 );
-   _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'  );
+   _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
    _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
    _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
-   _mkHStrUpid(upgr_uac_lturret    ,'Fighter Laser Gun'                ,'Fighter anti-ground weapon'                              );
-   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                    );
+   _mkHStrUpid(upgr_uac_antiair    ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
+   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
    _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
-   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'           );
+   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
    _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
    _mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability' );
 
@@ -1588,7 +1588,7 @@ begin
   _mkHStrUpid(upgr_uac_airsp      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
   _mkHStrUpid(upgr_uac_mechspd    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
   _mkHStrUpid(upgr_uac_mecharm    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
-  _mkHStrUpid(upgr_uac_lturret    ,'Лазерные Орудия'                   ,'Анти-наземное оружие для Истребителя'                    );
+  _mkHStrUpid(upgr_uac_antiair    ,'Анти-воздушное Орудии'             ,'Анти-воздушное оружие для Терминатора'                   );
   _mkHStrUpid(upgr_uac_transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
   _mkHStrUpid(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
   _mkHStrUpid(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');

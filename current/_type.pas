@@ -602,7 +602,7 @@ TUnit = record
    vsni,
    vsnt     : TUnitVisionData;
 
-   StayWaitForNextTarget:byte;
+   StayWaitForNewTarget:byte;
    ukfly,
    isbuildarea,
    ukfloater,

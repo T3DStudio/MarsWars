@@ -882,6 +882,12 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
    end;
 
  //  if(k_mr=2)then _effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
+   {if(ks_mright=1)and(ks_ctrl>2)then
+   begin
+      u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
+      if(u>0)then
+       with _units[u] do hits:=hits div 2;
+   end;      }
 
    if(ks_mright=1)then            // RMB down
     if(m_brush<>co_empty)

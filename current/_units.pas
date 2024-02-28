@@ -739,8 +739,8 @@ begin
       uontar  := 0;
       uontard := NOTSET;
       tu_transport:=nil;
-      if(StayWaitForNextTarget>0)
-      then StayWaitForNextTarget-=1;
+      if(StayWaitForNewTarget>0)
+      then StayWaitForNewTarget-=1;
 
       u_royal_cd:=NOTSET;
       u_royal_d :=NOTSET;
@@ -835,7 +835,7 @@ uab_Teleport      : swtarget:=true;
 
       if(fteleport_tar)and(uontar>0)then uo_tar:=uontar;
 
-      if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
+      if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
       aiu_code(pu);
       if(aicode){and(playeri=HPlayer)}then ai_code(pu);
@@ -858,7 +858,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      StayWaitForNextTarget:=0;
+      StayWaitForNewTarget:=0;
       if(ServerSide)then
       begin
          a_tar  :=0;
@@ -1376,7 +1376,7 @@ begin
                if(ServerSide)then
                begin
                   a_tar:=0;
-                  StayWaitForNextTarget:=1;
+                  StayWaitForNewTarget:=1;
                end;
                exit;
             end;
@@ -1392,7 +1392,7 @@ begin
                if(ServerSide)then
                begin
                   a_tar:=0;
-                  StayWaitForNextTarget:=1;
+                  StayWaitForNewTarget:=1;
                end;
                exit;
             end;
@@ -1436,7 +1436,7 @@ wmove_noneed    : if(not attackinmove)then
                   end;
          else
             // wmove_impassible
-           StayWaitForNextTarget:=1;
+           StayWaitForNewTarget:=1;
            exit;
          end;
       end
@@ -1484,7 +1484,7 @@ wmove_noneed    : if(not attackinmove)then
             begin
                if(x<>tu^.x)
                or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
-               if(ServerSide)then StayWaitForNextTarget:=(a_rld div order_period)+1;
+               if(ServerSide)then StayWaitForNewTarget:=(a_rld div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pu,true,@attackervis);
@@ -1644,17 +1644,23 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
 
       if(uo_id=ua_amove)
       then _unit_attack(pu)
-      else StayWaitForNextTarget:=0;
+      else StayWaitForNewTarget:=0;
 
-      if(apctu=nil)then
-        if(unit_canmove(pu))then
-          if(mp_x<>mv_x)or(mp_y<>mv_y)then
-          begin
-             if(not uid^._slowturn)and(player^.state<>ps_comp)then
-               if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
-             mp_x:=mv_x;
-             mp_y:=mv_y;
-          end;
+      if(uo_id=ua_amove)and(StayWaitForNewTarget>0)then
+      begin
+         mv_x:=x;
+         mv_y:=y;
+      end
+      else
+        if(apctu=nil)then
+          if(unit_canmove(pu))then
+            if(mp_x<>mv_x)or(mp_y<>mv_y)then
+            begin
+               if(not uid^._slowturn)and(player^.state<>ps_comp)then
+                 if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
+               mp_x:=mv_x;
+               mp_y:=mv_y;
+            end;
    end;
 end;
 

@@ -181,8 +181,7 @@ begin
 
        if(speed<=0)
        or(hits<=0)
-       or(iscomplete=false)
-       or(StayWaitForNextTarget>0)then exit;
+       or(iscomplete=false)then exit;
 
        if(a_rld>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -449,7 +448,7 @@ begin
         with player^ do
          if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
          begin
-            tu^.buff[ub_Invuln]:=invuln_time-round((tu^.uid^._limituse-MinUnitLimit)/MinUnitLimit*invuln_time_limit);
+            tu^.buff[ub_Invuln]:=invuln_time;
             if(tu^.buff[ub_Invuln]<=0)then
             begin
                tu^.buff[ub_Invuln]:=0;

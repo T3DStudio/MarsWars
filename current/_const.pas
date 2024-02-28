@@ -134,9 +134,9 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v52';
+str_ver                = 'v52.5';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
-str_cprt               : shortstring = '[ T3DStudio (c) 2016-2023 ]';
+str_cprt               : shortstring = '[ T3DStudio (c) 2016-2024 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
@@ -562,7 +562,7 @@ upgr_uac_commando      = 45; // commando invis
 upgr_uac_airsp         = 46; // anti-air missiles splash
 upgr_uac_mechspd       = 47; // mech speed
 upgr_uac_mecharm       = 48; // mech arm
-upgr_uac_lturret       = 49; // flyer laser turret
+upgr_uac_antiair       = 49; // termintator anti-air weapon
 upgr_uac_transport     = 50; // transport capacity upgrade
 upgr_uac_radar_r       = 51; // Radar
 upgr_uac_plasmt        = 52; // plasma weapons fro anti-ground turret
@@ -676,6 +676,7 @@ ptimehh                = ptimeh  div 2;
 ptimehhh               = ptimehh div 2;
 ptime1h                = ptime1+ptimeh;
 ptime1hh               = ptime1+ptimehh;
+ptime1mh               = ptime1-ptimeh;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
@@ -709,10 +710,10 @@ BaseArmorBonus1        = 8;
 BaseArmorBonus2        = BaseArmorBonus1*2;
 BaseArmorLevel1        = BaseArmorBonus1/4;
 
-BaseHeal1              = (BaseDamage1 div 4)*3;
-BaseHealBonus1         = BaseDamageBonus1*3;
-BaseRepair1            = (BaseDamage1 div 4)*3;
-BaseRepairBonus1       = BaseDamageBonus1*4;
+BaseHeal1              = BaseDamage1 div 5;
+BaseHealBonus1         = BaseDamageBonus1*2;
+BaseRepair1            = BaseDamage1 div 4;
+BaseRepairBonus1       = BaseDamageBonus1*3;
 
 DecayAuraDamage        = BaseDamage1 div 10;
 
@@ -908,8 +909,7 @@ mine_r                 = melee_r*3;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-invuln_time            = fr_fps1*60;
-invuln_time_limit      = fr_fps1*4;
+invuln_time            = fr_fps1*30;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;

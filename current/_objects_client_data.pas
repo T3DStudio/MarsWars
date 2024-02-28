@@ -652,7 +652,11 @@ begin
    setWeaponESND(1,nil,snd_revenant_attack,0,0);
 
    setWeaponTEID(0,nil,0,[0..255]);
-   with _a_weap[0] do aw_AnimStay:=sms_mattack;
+   with _a_weap[1] do
+   begin
+      aw_AnimStay:=sms_mattack;
+      aw_rld_a:=[];
+   end;
 
    DefaultRLDA_pa:=2;
 end;
@@ -889,7 +893,7 @@ upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm     : begin _up_btn:=spr_b_up[r_uac ,21]; end;
 upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
-upgr_uac_lturret    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
+upgr_uac_antiair    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
 
       end;
 

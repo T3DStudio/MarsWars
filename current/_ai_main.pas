@@ -560,7 +560,7 @@ r_uac : begin
         MakeUpgr(upgr_uac_soaring    ,1);
         MakeUpgr(upgr_uac_ccturr     ,1);
         MakeUpgr(upgr_uac_botturret  ,1);
-        MakeUpgr(upgr_uac_lturret    ,1);
+        MakeUpgr(upgr_uac_antiair    ,1);
 
         if(ai_maxcount_upgrlvl>0)then
         for i:=1 to ai_maxcount_upgrlvl do
