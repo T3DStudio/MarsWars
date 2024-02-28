@@ -7,7 +7,7 @@ begin
      _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
-procedure MakeScreenshot;
+procedure _screenshot;
 var i:integer;
     s:shortstring;
 begin
@@ -18,6 +18,12 @@ begin
    until not FileExists(s);
    s:=s+#0;
    sdl_saveBMP(r_screen,@s[1]);
+end;
+
+
+function rgba2c(r,g,b,a:byte):cardinal;
+begin
+   rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
 procedure _GfxColors;
@@ -51,7 +57,7 @@ begin
    c_lava    :=rgba2c(222,80 ,0  ,255);
 
    ui_max_color    [false]:=c_dorange;
-   ui_max_color    [true ]:=c_ltgray;
+   ui_max_color    [true ]:=c_gray;
    ui_cenergy[false]:=c_white;
    ui_cenergy[true ]:=c_red;
    ui_limit  [false]:=c_white;
@@ -227,7 +233,7 @@ begin
       y:=ys;
       while (y<d) do
       begin
-         draw_surf(surf,x,y,ts);
+         _draw_surf(surf,x,y,ts);
          y+=ts^.h;
       end;
       x+=ts^.w;
@@ -299,8 +305,8 @@ begin
 
    case theme_liquid_animt of
    0: begin
-         wsp:=(ts^.w div 4)*((map_seed   mod 3)-1);
-         hsp:=(ts^.h div 4)*((g_random_i mod 3)-1);
+         wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
+         hsp:=(ts^.h div 4)*((abs(map_iseed) mod 3)-1);
          if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
       end;
    else
@@ -419,7 +425,7 @@ begin
          y:=0;
          while (y<w) do
          begin
-            draw_surf(vid_terrain,x,y,ter_s);
+            _draw_surf(vid_terrain,x,y,ter_s);
             y+=ter_s^.h;
          end;
          x+=ter_s^.w;
@@ -437,8 +443,8 @@ begin
    ts:=loadIMG(fn,false,true);
    LoadBtn:=_createSurf(bw-1,bw-1);
    if(ts^.h>bw)
-   then draw_surf(LoadBtn,hwb-(ts^.w div 2),0,ts)
-   else draw_surf(LoadBtn,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
+   then _draw_surf(LoadBtn,hwb-(ts^.w div 2),0,ts)
+   else _draw_surf(LoadBtn,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
    _FreeSF(ts);
 end;
 
@@ -459,8 +465,8 @@ begin
    tst:=ROTOZOOMSURFACE(ts, 0, coff, 0);
    LoadBtnFS:=_createSurf(bw-1,bw-1);
    if(tst^.h>bw)
-   then draw_surf(LoadBtnFS,hwb-(tst^.w div 2),2,tst)
-   else draw_surf(LoadBtnFS,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
+   then _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),2,tst)
+   else _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
    rectangleColor(LoadBtnFS,0,0,LoadBtnFS^.w-1,LoadBtnFS^.h-1,c_black);
    rectangleColor(LoadBtnFS,1,1,LoadBtnFS^.w-2,LoadBtnFS^.h-2,c_black);
    SDL_FreeSurface(tst);
@@ -502,12 +508,8 @@ begin
    r_empty   :=_createSurf(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_minimap :=_createSurf(vid_panelwi,vid_panelwi);
-   r_bminimap:=_createSurf(vid_panelwi,vid_panelwi);
-
-   {r_sminimap:=_createSurf(vid_panelwi,vid_panelwi);
-   boxColor(r_sminimap,0,0,vid_panelwi,vid_panelwi,c_white);
-   SDL_SetColorKey(r_sminimap,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_sminimap,0,0));}
+   r_minimap :=_createSurf(vid_panelw-1,vid_panelw-1);
+   r_bminimap:=_createSurf(vid_panelw-1,vid_panelw-1);
 
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
@@ -541,21 +543,13 @@ begin
    filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
    SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
 
-  { for x:=fog_mm_Min to fog_mm_Max do
-   begin
-      r:=x*2;
-      vid_fog_mm[x]:=_createSurf(r,r);
-      boxColor(vid_fog_mm[x],0,0,r-1,r-1,c_black);
-      filledcircleColor(vid_fog_mm[x],x,x,x,c_white);
-      SDL_SetColorKey(vid_fog_mm[x],SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_mm[x],0,0));
-   end;     }
-
    spr_mback:= loadIMG('mback'   ,false,true);
 
    r_menu:=_createSurf(max2(vid_minw,spr_mback^.w), max2(vid_minh,spr_mback^.h));
 
    mv_x:=(vid_vw-r_menu^.w) div 2;
    mv_y:=(vid_vh-r_menu^.h) div 2;
+
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
    spr_b_paction  := LoadBtn('b_paction',vid_bw);
@@ -734,7 +728,7 @@ begin
       hw  := w div 2;hh   := hw;
    end;
 
-   effect_InitCLData;
+   initEffects;
    InitThemes;
 end;
 
@@ -743,7 +737,7 @@ procedure MakeUnitIcons;
 var u:byte;
 begin
    for u:=0 to 255 do
-   with g_uids[u] do
+   with _uids[u] do
    begin
       with un_btn do
       begin
@@ -776,20 +770,20 @@ begin
    vid_mha:= vid_cam_h+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
-   iy:=(g_random_i*5+ix) mod vid_mha;
+   iy:=(map_iseed*5+ix)  mod vid_mha;
    rn:=ix*iy;
    for i:=1 to _tdecaln do
     with _tdecals[i-1] do
     begin
        rn+=17;
-       ix:=g_randomx(ix+rn       ,vid_mwa);
-       iy:=g_randomx(iy+sqr(ix*i),vid_mha);
+       ix:=_randomx(ix+rn       ,vid_mwa);
+       iy:=_randomx(iy+sqr(ix*i),vid_mha);
        x :=ix;
        y :=iy;
     end;
 end;
 
-procedure vid_CommonVars;
+procedure _vidvars;
 begin
    vid_vmb_x1   := vid_vw-vid_vmb_x0;
    vid_vmb_y1   := vid_vh-vid_vmb_y0;
@@ -817,6 +811,8 @@ begin
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+txt_line_h3;
 
+
+   ui_menu_btnsy:= max2(font_3hw,(vid_vh div vid_BW)-1);
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
@@ -833,7 +829,9 @@ begin
    Map_tdmake;
 end;
 
-procedure vid_ScreenSurfaces;
+procedure _ScreenSurfaces;
+const
+  ystop = 16;
 var i,y:integer;
 
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
@@ -856,17 +854,6 @@ begin
 
    if(vid_ppos<2)then // left-right
    begin
-      ui_menu_btnsy:=(vid_vh div vid_BW);
-      if((vid_vh-(ui_menu_btnsy*vid_BW))<vid_hBW)then ui_menu_btnsy-=1;
-   end
-   else
-   begin
-      ui_menu_btnsy:=(vid_vw div vid_BW);
-      if((vid_vw-(ui_menu_btnsy*vid_BW))<vid_BW)then ui_menu_btnsy-=1;
-   end;
-
-   if(vid_ppos<2)then // left-right
-   begin
       vid_cam_w:=vid_vw-vid_panelw;
       vid_cam_h:=vid_vh;
 
@@ -883,7 +870,7 @@ begin
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
       r_panel  :=_createSurf(vid_panelw+1,vid_vh);
 
-      y:=vid_BW*ui_menu_btnsy+vid_BW;
+      y:=vid_BW*ystop;
       vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
       vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
    end
@@ -905,7 +892,7 @@ begin
       r_uipanel:=_createSurf(vid_cam_w,vid_panelw+1);
       r_panel  :=_createSurf(vid_cam_w,vid_panelw+1);
 
-      y:=vid_BW*ui_menu_btnsy+vid_BW;
+      y:=vid_BW*ystop;
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
       hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
    end;
@@ -924,21 +911,21 @@ begin
 
    i:=4;
    y:=vid_BW*i;
-   while (i<=(ui_menu_btnsy+1)) do
+   while (i<=ystop) do
    begin
       pline(0,y,vid_panelw,y,c_white);
       i+=1;
       y+=vid_BW;
    end;
 
-   draw_surf(r_uipanel,0,0,r_panel);
+   _draw_surf(r_uipanel,0,0,r_panel);
 
    r_dterrain:=_createSurf(vid_cam_w,vid_cam_h);
 
-   vid_CommonVars;
+   _vidvars;
 end;
 
-procedure vid_MakeScreen;
+procedure _MakeScreen;
 begin
    if (r_screen<>nil) then sdl_freesurface(r_screen);
 
@@ -948,7 +935,7 @@ begin
 
    if(r_screen=nil)then begin WriteSDLError; exit; end;
 
-   vid_ScreenSurfaces;
+   _ScreenSurfaces;
 end;
 
 

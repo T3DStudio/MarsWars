@@ -16,9 +16,10 @@ begin
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
    _GfxColors;
-   vid_MakeScreen;
+   _MakeScreen;
    _LoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
+   _cmp_Init;
 
    InitVideo:=true;
 end;
@@ -33,9 +34,7 @@ begin
       s:=ParamStr(i);
 
       if(s='test' )then TestMode:=1;
-      {$IFDEF DTEST}
       if(s='testD')then TestMode:=2;
-      {$ENDIF}
    end;
 end;
 
@@ -77,12 +76,11 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
-   Menu_ReInit;
    InitRX2Y;
    lng_eng;
    SwitchLanguage;
    InitUIDDataCL;
-   missile_InitCLData;
+   InitMIDDataCL;
    MakeUnitIcons;
 
    {$ENDIF}
@@ -92,13 +90,11 @@ begin
    Map_randommap;
    GameDefaultAll;
 
-   NEW(sys_EVENT);
+   NEW(_event);
 
    GameCycle:=true;
 
    {$IFNDEF _FULLGAME}
    Dedicated_Init;
-   {$ELSE}
-   campaings_InitData;
    {$ENDIF}
 end;

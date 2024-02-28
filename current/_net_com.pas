@@ -21,7 +21,7 @@ begin
    end;
 end;
 
-function net_UpSocket(port:word):boolean;
+function net_UpSocket:boolean;
 begin
    net_UpSocket:=false;
 
@@ -36,16 +36,11 @@ begin
       exit;
    end;
 
-   {if(net_status=ns_client)then
-   begin
-      if(net_svsearch)
-      then net_socket:=SDLNet_UDP_Open(net_svlsearch_port)
-      else net_socket:=SDLNet_UDP_Open(0);
-   end
+   if(net_status=ns_client)
+   then net_socket:=SDLNet_UDP_Open(0)
    else
      if(net_status=ns_server)
-     then net_socket:=SDLNet_UDP_Open(net_port); }
-   net_socket:=SDLNet_UDP_Open(port);
+     then net_socket:=SDLNet_UDP_Open(net_port);
 
    if (net_socket=nil) then
    begin
@@ -213,7 +208,7 @@ begin
    ip2c:=cardinal((@e)^);
 end;
 
-function c2ip(c:cardinal):shortstring;
+function c2ip(c:cardinal):string;
 begin
    c2ip:=b2s (c and $000000FF)
     +'.'+b2s((c and $0000FF00) shr 8 )

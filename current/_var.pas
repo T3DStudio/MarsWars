@@ -2,7 +2,7 @@
 var
 
 GameCycle         : boolean = false;
-sys_EVENT         : pSDL_EVENT;
+_EVENT            : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -15,7 +15,7 @@ g_mode            : byte     = 0;
 g_start_base      : byte     = 2;
 g_fixed_positions : boolean  = false;
 g_generators      : byte     = 2;
-g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
+g_ai_slots        : byte     = player_default_ai_level;
 g_deadobservers   : boolean  = true;
 g_step            : cardinal = 0;
 g_player_astatus  : byte     = 0;
@@ -37,40 +37,38 @@ g_cpoints         : array[1..MaxCPoints] of TCTPoint;
 ServerSide        : boolean = true; // only server side code
 
 UnitStepTicks     : byte = 8;
-LastCreatedUnit   : integer = 0;
-LastCreatedUnitP  : PTUnit;
-PlayerClient      : byte = 1; // 'this' player
-PlayerLobby       : byte = 1; // Player who can change game settings
-player_APMdata    : array[0..MaxPlayers] of TAPMCounter;
 
-g_players         : TPList;
-g_units           : array[0..MaxUnits   ] of TUnit;
-g_punits          : array[0..MaxUnits   ] of PTUnit;
-g_missiles        : array[1..MaxMissiles] of TMissile;
-g_uids            : array[byte] of TUID;
-g_upids           : array[byte] of TUPID;
-g_mids            : array[byte] of TMID;
-g_dmods           : array[byte] of TDamageMod;
+_players          : TPList;
+_units            : array[0..MaxUnits   ] of TUnit;
+_punits           : array[0..MaxUnits   ] of PTUnit;
 
-g_cycle_order     : integer = 0;
-g_cycle_regen     : integer = 0;
+_missiles         : array[1..MaxMissiles] of TMissile;
 
-g_random_i        : word = 0;
-g_random_p        : byte = 0;
+_cycle_order      : integer = 0;
+_cycle_regen      : integer = 0;
 
-map_i             : word     = 0;
-map_list          : array of TMap;
+_uids             : array[byte] of TUID;
+_upids            : array[byte] of TUPID;
+_mids             : array[byte] of TMID;
+_dmods            : array[byte] of TDamageMod;
+
+_LastCreatedUnit  : integer = 0;
+_LastCreatedUnitP : PTUnit;
+
+HPlayer           : byte = 1; // 'this' player
+
+_playerAPM        : array[0..MaxPlayers] of TAPMCounter;
+
+
 map_seed          : cardinal = 1;
+map_iseed         : word     = 0;
+map_rpos          : byte     = 0;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
-map_type          : byte     = 0;
-map_symmetry      : byte     = 0;
-map_symmetryDir,
-map_symmetryX0,
-map_symmetryY0,
-map_symmetryX1,
-map_symmetryY1    : integer;
+map_obs           : byte     = 1;
+map_liq           : byte     = 1;
+map_symmetry      : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
@@ -78,8 +76,6 @@ map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
 DID_Square        : array[0..MaxDIDs] of longint;
-DID_S2R           : array[0..MaxDIDs] of longint;
-DID_S2Rh          : array[0..MaxDIDs] of longint;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
@@ -87,7 +83,7 @@ pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pfNodes           : array[1..pfMaxNodes] of TPFNode;
 //pfNodes_c         : integer;
 
-net_status        : byte = ns_single;
+net_status        : byte = 0;
 net_port          : word = 10666;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
@@ -96,8 +92,6 @@ net_period        : byte = 0;
 net_log_n         : word = 0;
 net_wudata_t      : TWUDataTime;
 net_cpoints_t     : TWCPDataTime;
-net_localAdv      : boolean = true;
-net_localAdv_timer: integer = 0;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
@@ -113,7 +107,7 @@ fr_FPSSecondN,
 fr_FPSSecondC,
 fr_FrameCount,
 fr_LastTicks,
-fr_BaseTicks      : cardinal;
+fr_BaseTicks     : cardinal;
 
 wtrset_all,
 wtrset_enemy,
@@ -149,7 +143,7 @@ u_royal_d         : integer;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
-//tmpmid            : byte = MID_Imp;
+tmpmid            : byte = MID_Imp;
 
 _warpten          : boolean = false;
 TestMode          : byte = 0;
@@ -160,7 +154,6 @@ r_uipanel,
 r_empty,
 r_minimap,
 r_bminimap,
-//r_sminimap,
 r_screen,
 r_dterrain,
 r_menu            : pSDL_SURFACE;
@@ -183,23 +176,15 @@ ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
 
-vid_map_RedrawBack: boolean = false;
+vid_menu_redraw   : boolean  = true;
 
-MainMenu          : boolean = true;
-menu_update       : boolean = false;
+MainMenu             : boolean = true;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
-menu_s2           : byte = ms2_game;
+menu_s2           : byte = ms2_scir;
 menu_s3           : byte = ms3_game;
 
-menu_items        : array[byte] of TMenuItem;
-menu_list_n,
-menu_list_s,
-menu_list_c,
-menu_list_x,
-menu_list_y,
-menu_list_w       : integer;
-menu_list         : array of shortstring;
+m_chat            : boolean = false;
 
 m_vrx,
 m_vry,
@@ -250,7 +235,6 @@ vid_prim          : array of TVisPrim;
 vid_prims         : word = 0;
 vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
-vid_panel_timer    : byte = 0;
 
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
@@ -262,12 +246,6 @@ vid_fog_sx        : integer = 0;
 vid_fog_sy        : integer = 0;
 vid_fog_ex        : integer = 0;
 vid_fog_ey        : integer = 0;
-
-{vid_fog_mm        : array[fog_mm_Min..fog_mm_Max] of pSDL_Surface;
-vid_fog_mmn       : word;
-vid_fog_mmx,
-vid_fog_mmy,
-vid_fog_mmr       : array of integer;}
 
 ter_w,
 ter_h             : integer;
@@ -288,8 +266,6 @@ map_mmvw,
 map_mmvh          : integer;
 
 cmp_skill         : byte = 3;
-cmp_seed          : cardinal = 0;
-cmp_mission       : byte = 0;
 cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
 
 net_cl_svip       : cardinal = 0;
@@ -303,13 +279,6 @@ net_chat_shlm     : integer = 0;
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
 net_pnui          : byte = 4;
-
-net_svsearch      : boolean = false;
-net_svsearch_list : array of TServerInfo;
-net_svsearch_listn: integer = 0;
-net_svsearch_scroll: integer = 0;
-net_svsearch_sel  : integer = 0;
-
 
 svld_str_info     : shortstring = '';
 svld_str_fname    : shortstring = '';
@@ -331,7 +300,7 @@ rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
 rpls_ReadPosN     : int64 = 0;
 rpls_ReadPosL     : array of TReplayPos;
-rpls_ForwardStep  : integer = 1;
+rpls_step         : integer = 1;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
@@ -373,11 +342,11 @@ ui_tab            : byte = 0;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 
-ui_groups_n,                                             //
-ui_groups_d,                                             //
-ui_groups_x,                                             //
-ui_groups_y       : array[0..MaxUnitGroups] of integer;             //
-ui_groups_uids    : array[0..MaxUnitGroups,false..true] of TSob;    //
+ui_orders_n,                                             //
+ui_orders_d,                                             //
+ui_orders_x,                                             //
+ui_orders_y       : array[0..MaxUnitGroups] of integer;             //
+ui_orders_uids    : array[0..MaxUnitGroups,false..true] of TSob;    //
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -387,7 +356,7 @@ ui_mc_c           : cardinal;                            //
 ui_uprod_max,
 ui_uprod_cur,
 ui_uprod_first    : integer;
-ui_units_InTransport,
+ui_units_inapc,
 ui_uprod_uid_max,
 ui_uprod_uid_time,
 ui_pprod_max,
@@ -402,7 +371,7 @@ ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
-ui_uibtn_sability : integer = 0;   // ui action uid
+ui_uibtn_actionu  : PTUID   = nil; // ui action uid
 ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
@@ -436,7 +405,6 @@ ui_fpsx           : integer = 0;
 ui_fpsy           : integer = 0;
 ui_game_log_height: integer = 0;
 ui_menu_btnsy     : integer = 0;
-ui_menu_btnsh     : integer = 0;
 
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
@@ -445,7 +413,7 @@ ui_log_n          : integer = 0;
 
 k_dbl             : boolean = false;
 k_dblk            : cardinal;
-ks_dbl,
+k_dblt,
 ks_left,
 ks_right,
 ks_up,
@@ -456,9 +424,9 @@ ks_alt,
 ks_mleft,
 ks_mright,
 ks_mmiddle,
-ks_LastChar       : integer;
-k_LastChar        : char;
-k_keyboard_string : shortstring = '';
+k_chart           : integer;
+k_char            : char;
+k_keyboard_string         : shortstring = '';
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -738,12 +706,9 @@ spr_cp_gen        : TMWTexture;
 //  TEST
 //
 
-str_teams         : array[0..MaxPlayers ] of shortstring;
-str_mapt          : array[0..gms_m_types] of shortstring;
-str_ability_name  : array[byte          ] of shortstring;
-str_race          : array[0..r_cnt      ] of shortstring;
-str_gmode         : array[0..gm_cnt     ] of shortstring;
-str_m_symt        : array[0..gms_m_symm ] of shortstring;
+str_ability_name  : array[byte     ] of shortstring;
+str_race          : array[0..r_cnt ] of shortstring;
+str_gmode         : array[0..gm_cnt] of shortstring;
 str_ability_unload,
 str_need_energy,
 str_cant_build,
@@ -801,7 +766,6 @@ str_unit_attacked,
 str_base_attacked,
 str_allies_attacked,
 str_cant_execute,
-str_NeedpsabilityOrder,
 str_maxlimit_reached,
 str_mapMark,
 str_need_more_builders,
@@ -809,8 +773,9 @@ str_production_busy,
 str_cant_advanced,
 str_NeedMoreProd,
 str_MaximumReached,
-str_m_tpe,
+str_m_liq,
 str_m_siz,
+str_m_obs,
 str_m_sym,
 str_plname,
 str_aislots,
@@ -824,8 +789,7 @@ str_gmodet,
 str_starta,
 str_plout,
 str_player_def    : shortstring;
-str_PlayerSlots   : array[0..ps_states_n-1    ] of shortstring;
-str_generatorsO   : array[0..gms_g_maxgens    ] of shortstring;
+str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
 str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
@@ -840,8 +804,7 @@ str_req,
 str_uprod,
 str_bprod,
 str_language,
-str_resol_width,
-str_resol_height,
+str_resol,
 str_apply,
 str_randoms,
 str_menu_chat,
@@ -880,8 +843,6 @@ str_sfull,
 str_sgst,
 str_udpport,
 str_connecting,
-str_netsearching,
-str_netsearch,
 str_pnu,
 str_npnu,
 str_soundvol,
@@ -899,7 +860,6 @@ str_svld_errors_wdata,
 str_svld_errors_wver,
 str_rpls_errors_open,
 str_MObjectives,
-str_MServers,
 str_MMap,
 str_MPlayers      : shortstring;
 str_npnua,
@@ -945,6 +905,8 @@ MainContext        : TALCcontext;
 
 SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
 
+snd_music_n,
+snd_music_c        : byte;
 snd_music_game,
 snd_music_menu     : PTSoundSet;
 snd_music_current  : PTSoundSet = nil;
