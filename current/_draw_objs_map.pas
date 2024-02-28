@@ -58,11 +58,11 @@ begin
         if(not RectInCam(x,y,255,255,0))then continue;
 
         ro:=0;
-        with _players[HPlayer] do
+        with g_players[PlayerClient] do
          case m_brush of
-1..255         : with _uids[m_brush] do
+1..255         : with g_uids[m_brush] do
                    if(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport)then ro:=r-bld_dec_mr;
-co_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then ro:=r-bld_dec_mr;
+mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then ro:=r-bld_dec_mr;
          end;
 
         if(noanim=false)or(sprite=pspr_dummy)then

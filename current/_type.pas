@@ -4,14 +4,20 @@ type
 integer  = Smallint;
 pinteger = ^integer;
 
+TSoc  = set of char;
+PTSoc = ^TSoc;
 TSob  = set of byte;
 PTSob = ^TSob;
 
-
 {$IFDEF _FULLGAME}
-TSoc = set of char;
 
 string6 = string[6];
+
+TServerInfo = record
+   ip  :cardinal;
+   port:word;
+   info:shortstring;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -149,6 +155,12 @@ TReplayPos = record
    rp_gtick: cardinal;
 end;
 
+TMenuItem = record
+   x0,y0,
+   x1,y1  : integer;
+   enabled: boolean;
+end;
+
 {$ENDIF}
 
 TDamageMod = array[0..MaxDamageModFactors] of record
@@ -223,7 +235,7 @@ TUWeapon = record
   aw_min_range,
   aw_count : integer;
   aw_dmod,
-  aw_rld   : byte;
+  aw_reload   : byte;
   aw_rld_s : TSoB;
   {$IFDEF _FULLGAME}
   aw_rld_a : TSoB;
@@ -246,6 +258,7 @@ TUID = record
    _speed,
    _r,_missile_r,
    _srange,
+   _srange_min,
    _renergy,
    _genergy,
    _btime,
@@ -375,7 +388,9 @@ TUID = record
 end;
 PTUID = ^TUID;
 TUPID = record  // upgrade
-   _up_ruid,
+   _up_ruid1,
+   _up_ruid2,
+   _up_ruid3,
    _up_rupgr,
    _up_btni,
    _up_race     : byte;
@@ -427,8 +442,8 @@ TPlayer = record
    name    : shortstring;
 
    team,
-   race,mrace,
-   state,
+   race ,slot_race,
+   state,slot_state,
    pnum    : byte;
 
    build_cd,
@@ -556,7 +571,7 @@ TUnit = record
    x,y,
    zfall,
    srange,
-   speed,dir,rld,vstp,
+   speed,dir,reload,vstp,
    unum     : integer;
    pfzone   : word;
 
@@ -575,7 +590,7 @@ TUnit = record
    a_exp,
    a_exp_next,
    a_shots  : cardinal;
-   a_rld,
+   a_reload,
    a_weap_cl,
    a_weap   : byte;
    a_tx,a_ty,
@@ -585,11 +600,11 @@ TUnit = record
    mv_x,mv_y,
    mp_x,mp_y,
 
-   uo_bx,uo_by,
-   uo_tar,
-   uo_x,uo_y
+   ua_bx,ua_by,
+   ua_x ,ua_y,
+   ua_tar
             : integer;
-   uo_id    : byte;
+   ua_id    : byte;
 
    transport,
    pains,
@@ -608,7 +623,7 @@ TUnit = record
    ukfloater,
    iscomplete,
    solid,
-   sel      : boolean;
+   isselected      : boolean;
 
    aiu_FiledSquareNear,
    aiu_limitaround_ally,
@@ -637,6 +652,8 @@ TUnit = record
    lvlstr_a,  // armor
    lvlstr_s   // other upgrs
             : string6;
+   mmap_order
+            : byte;
    {$ENDIF}
 
    player   : PTPlayer;
@@ -684,5 +701,10 @@ TDCell = record
    n:integer;
    l:array of PTDoodad;
 end;
+
+TMap = record
+
+end;
+
 
 

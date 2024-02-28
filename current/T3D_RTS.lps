@@ -70,6 +70,7 @@
       </Unit7>
       <Unit8>
         <Filename Value="_input.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="40"/>
         <TopLine Value="856"/>
         <CursorPos X="88" Y="884"/>
@@ -78,10 +79,9 @@
       </Unit8>
       <Unit9>
         <Filename Value="_draw_menu.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="14"/>
         <TopLine Value="68"/>
-        <CursorPos X="67" Y="90"/>
+        <CursorPos X="49" Y="96"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit9>

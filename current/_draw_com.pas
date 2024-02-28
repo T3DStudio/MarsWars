@@ -1,3 +1,8 @@
+function rgba2c(r,g,b,a:byte):cardinal;
+begin
+   rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
+end;
+
 function ShadowColor(c:cardinal):cardinal;
 begin
    ShadowColor:=128 +
@@ -6,7 +11,7 @@ begin
    (((c and $0000FF00) shr  9) shl 8 );
 end;
 
-procedure _draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
+procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
    begin
@@ -18,7 +23,7 @@ begin
    end;
 end;
 
-procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
+procedure draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
 begin
    r_RECT^.x:=x;
    r_RECT^.y:=y;
@@ -28,7 +33,7 @@ begin
 end;
 
 
-procedure _draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
+procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
 var strLen,
     i,
     chars :byte;
@@ -90,7 +95,7 @@ begin
          else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
          end;
 
-         _draw_mwtexture(sur,ix,y,@font_ca[charc]);
+         draw_mwtexture(sur,ix,y,@font_ca[charc]);
 
          chars+= 1;
          ix   += font_w;
@@ -116,7 +121,7 @@ begin
    end;
 end;
 
-procedure _bmm_draw(sd:TSob);
+procedure map_MinimapBackDraw(sd:TSob);
 var d:integer;
 begin
    for d:=1 to MaxDoodads do
@@ -130,35 +135,52 @@ end;
 procedure map_MinimapBackground;
 begin
    sdl_FillRect(r_bminimap,nil,0);
-   _bmm_draw(dids_liquids);
-   _bmm_draw([DID_other,DID_srock,DID_brock]);
+   map_MinimapBackDraw(dids_liquids);
+   map_MinimapBackDraw([DID_other,DID_srock,DID_brock]);
 end;
 
-procedure map_minimap_cpoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
+procedure map_MinimapSpot(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
 begin
    circleColor   (tar,x  ,y  ,r  ,color);
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
-procedure map_MinimapPlayerStarts;
-var i  :byte;
-    x,y:integer;
-    c  :cardinal;
+procedure map_MinimapPlayerStarts(UnknownStarts:boolean);
+var i    :byte;
+    x,y,r:integer;
 begin
    for i:=0 to MaxPlayers do
    begin
       if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
 
-      //if(g_ai_slots=0)then
-      // if(_players[i].state=ps_none)then continue;
-
       x:=round(map_psx[i]*map_mmcx);
       y:=round(map_psy[i]*map_mmcx);
+      r:=trunc(base_1r*map_mmcx);
 
-      c:=PlayerGetColor(i);
+      // clear
+      filledcircleColor(r_minimap,x,y,r,c_black);
 
-      map_minimap_cpoint(r_minimap,x,y,trunc(base_1r*map_mmcx),char_start ,c);
+      if(UnknownStarts)
+      then map_MinimapSpot(r_minimap,x,y,r,'?',c_white)
+      else
+        if(g_players[i].state>ps_none)or(g_ai_slots>0)
+        then map_MinimapSpot(r_minimap,x,y,r,b2s(i)[1],PlayerGetColor(i))
+        else map_MinimapSpot(r_minimap,x,y,r,'+'      ,c_white);
    end;
+
+   {x:=round(map_symmetryX0*map_mmcx);
+   y:=round(map_symmetryY0*map_mmcx);
+   lineColor(r_minimap,
+   x,y,
+   round(map_symmetryX1*map_mmcx),
+   round(map_symmetryY1*map_mmcx),
+   c_lime);
+
+   lineColor(r_minimap,
+   x,y,
+   x-(round(map_symmetryX1*map_mmcx)-x),
+   y-(round(map_symmetryY1*map_mmcx)-y),
+   c_lime); }
 end;
 
 procedure map_MinimapCPoints;
@@ -168,20 +190,23 @@ begin
     with g_cpoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
-      then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
-      else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
+      then map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
+      else map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
 end;
 
-procedure map_RedrawMenuMinimap;
+procedure map_RedrawMenuMinimap(full:boolean);
 begin
-   sdl_FillRect(r_minimap,nil,0);
-   map_MinimapBackground;
-   _draw_surf(r_minimap,0,0,r_bminimap);
-   if(g_fixed_positions)then map_MinimapPlayerStarts;
+   if(full)then
+   begin
+      sdl_FillRect(r_minimap,nil,0);
+      map_MinimapBackground;
+      draw_surf(r_minimap,0,0,r_bminimap);
+   end;
+   map_MinimapPlayerStarts(not g_fixed_positions);
    map_MinimapCPoints;
-   _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
-   rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
-   vid_menu_redraw:=vid_menu_redraw or MainMenu;
+   draw_surf(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,r_minimap);
+   rectangleColor(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,ui_menu_map_mx0+r_minimap^.w,ui_menu_map_my0+r_minimap^.h,c_ltgray);
+   menu_update:=menu_update or MainMenu;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
@@ -201,7 +226,7 @@ begin
    if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
    str:=str+ms+':'+ss;
-   _draw_text(tar,x,y,str,ta,255,color);
+   draw_text(tar,x,y,str,ta,255,color);
 end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;
@@ -266,18 +291,18 @@ begin
    // true  - need announcer sound
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
-   with _players[UIPlayer] do
+   with g_players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
-lmt_unit_ready       : if(_uids[argx]._ukbuilding)
+lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);
 lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
 lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
-                       if(_uids[argx]._ukbuilding)
+                       if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_attacked_b,false)
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
                        LogMes2UIAlarm:=not PointInCam(xi,yi);
