@@ -5,8 +5,7 @@ program T3D_RTS;
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
-  {$DEFINE DTEST}
-  //{$APPTYPE GUI}
+  {$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}
@@ -79,12 +78,8 @@ begin
 end; }
 
 begin
-   writeln(sizeof(string6));
-
    InitGame;
-   {$IFDEF DTEST}
-   WriteUnitDescriptions;
-   {$ENDIF}
+   //WriteUnitDescriptions;
 
    while(GameCycle)do
    begin
@@ -96,7 +91,7 @@ begin
       if(r_draw)then DrawGame;
       {$ELSE}
       while(SDL_PollEvent(_EVENT)>0)do
-        case(_EVENT^.type_)of
+        case (_EVENT^.type_) of
         SDL_QUITEV  : break;
         end;
       CodeGame;

@@ -396,7 +396,7 @@ procedure SoundPlayUnitSelect;
 const annoystart = 6;
       annoystop  = 12;
 begin
-   if(IsUnitRange(ui_UnitSelectedNU,nil))then
+   if(_IsUnitRange(ui_UnitSelectedNU,nil))then
    begin
       if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
@@ -405,7 +405,7 @@ begin
         then ui_UnitSelectedn+=1
         else ui_UnitSelectedn:=0;
 
-      with g_units[ui_UnitSelectedNU] do
+      with _units[ui_UnitSelectedNU] do
        with uid^ do
         if(_ukbuilding)and(iscomplete=false)
         then SoundPlayUnitCommand(snd_building[_urace])
@@ -421,11 +421,11 @@ end;
 
 procedure SoundLogUIPlayer;
 begin
-   with g_players[UIPlayer] do
+   with _players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
-0..MaxPlayers         : if(mtype<>PlayerClient)
-                        or((rpls_state>=rpls_state_read)and(PlayerClient=0))then SoundPlayUI(snd_chat);
+0..MaxPlayers         : if(mtype<>HPlayer)
+                        or((rpls_state>=rpls_state_read)and(HPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=MaxPlayers)then
@@ -437,14 +437,12 @@ lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
-lmt_unit_ready        : with g_uids[argx] do
+lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_already_adv,
 lmt_NeedMoreProd,
 lmt_MaximumReached,
-lmt_unit_needbuilder,
-lmt_UsepsabilityOrder,
 lmt_unit_limit,
 lmt_production_busy,
 lmt_req_ruids,
@@ -452,7 +450,7 @@ lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
 lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
-lmt_unit_attacked     : with g_uids[argx] do
+lmt_unit_attacked     : with _uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;
 end;

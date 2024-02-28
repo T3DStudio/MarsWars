@@ -2,7 +2,7 @@
 procedure Dedicated_Init;
 begin
    net_status:=ns_server;
-   if(not net_UpSocket(net_port))then
+   if(net_UpSocket=false)then
    begin
       net_dispose;
       net_status:=ns_none;
@@ -290,7 +290,7 @@ begin
       4 : writeln('         ',str_starta       ,b2s(g_start_base+1)           );
       6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]        );
       8 : writeln('         ',str_aislots      ,g_ai_slots                    );
-      10: writeln('         ',str_cgenerators  ,str_cgeneratorsO[g_generators]);
+      10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_generators]);
       11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]         );
       12: writeln;
       13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);

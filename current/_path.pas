@@ -72,11 +72,6 @@ begin
    pf_IfObstacleZone:=(zone=pf_solid);
 end;
 
-function pf_EqZones(z1,z2:word):boolean;
-begin
-   pf_EqZones:=(z1=z2)and(not pf_IfObstacleZone(z1));
-end;
-
 {
 function pf_find(startx,starty,endx,endy:integer;nextx,nexty:pinteger):boolean;
 var i,pfdist,pfvx,pfvy,

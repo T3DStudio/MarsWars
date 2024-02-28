@@ -54,12 +54,10 @@ begin
      end;
 end;
 
-procedure map_AddDoodad(dx,dy:integer;dt:byte);
+procedure _dds_a(dx,dy:integer;dt:byte);
 begin
-   //if(map_ddn<0)then map_ddn:=0;
-   //if(map_ddn>=MaxDoodads)then exit;
-   if(map_ddn>MaxDoodads)then map_ddn:=MaxDoodads;
-   if(map_ddn<0)then exit;
+   if(map_ddn<0)then map_ddn:=0;
+   if(map_ddn>=MaxDoodads)then exit;
 
    case dt of
    DID_LiquidR1,
@@ -69,6 +67,7 @@ begin
    DID_Brock,
    DID_Srock,
    DID_Other     : begin
+                      map_ddn+=1;
                       with map_dds[map_ddn] do
                       begin
                          t:=dt;
@@ -76,29 +75,23 @@ begin
                          x:=dx;
                          y:=dy;
                       end;
-                      map_ddn-=1;
                    end;
    else
    end;
 end;
 
-procedure map_RandomBaseVars;
+procedure map_RandomBase;
 begin
-   g_random_i  := word(map_seed);
-   g_random_p  := byte(map_seed);
+   map_iseed   := word(map_seed);
+   map_rpos    := byte(map_seed);
 end;
 
-procedure map_Vars;
+procedure map_vars;
 begin
-   map_RandomBaseVars;
+   map_RandomBase;
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
-
-   map_symmetryDir:=map_seed mod 360;
-   map_symmetryX0 :=map_hmw;
-   map_symmetryY0 :=map_hmw;
-   map_symmetryX1 :=round(map_symmetryX0+map_mw*2*cos(map_symmetryDir*DEGTORAD));
-   map_symmetryY1 :=round(map_symmetryY0+map_mw*2*sin(map_symmetryDir*DEGTORAD));
+   //if(g_mode in gm_fixed_positions)then g_fixed_positions:=true;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
@@ -107,156 +100,116 @@ begin
    {$ENDIF}
 end;
 
-procedure SymmetryXY(x,y:integer;rx,ry:pinteger;SymmetryType:byte;sx0,sy0,sx1,sy1:integer);
-var dx,dy,c:longint;
-    a,b    :single;
-begin
-   case SymmetryType of
-   0:begin
-        rx^:=NOTSET;
-        ry^:=NOTSET;
-     end;
-   1:begin
-        rx^:=sx0-(x-sx0);
-        ry^:=sy0-(y-sy0);
-     end;
-   else
-     if (sx0=sx1)
-     and(sy0=sy1)then
-     begin
-        rx^:=sx0-(x-sx0);
-        ry^:=sy0-(y-sy0);
-     end
-     else
-     begin
-        dx:=sx0-sx1;
-        dy:=sy0-sy1;
-
-        c :=(dx*dx+dy*dy);
-        a :=(dx*dx-dy*dy)/c;
-        b :=(2*dx*dy)    /c;
-        rx^:= round(a*(x-sx0)+b*(y-sy0)+sx0);
-        ry^:= round(b*(x-sx0)-a*(y-sy0)+sy0);
-     end;
-   end;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  CHECKS
-
-function CheckMapBorders(x,y,aborder:integer):boolean;
-begin
-   if(x=NOTSET)or(y=NOTSET)
-   then CheckMapBorders:=true
-   else CheckMapBorders:=(-aborder<=x)and(x<=(map_mw+aborder))
-                      and(-aborder<=y)and(y<=(map_mw+aborder));
-end;
-
-function map_IfPlayerStartHere(ix0,iy0,ix1,iy1,d:integer):boolean;
+function _PlayerStartHere(x,y,m:integer;check_symmetry:boolean):boolean;
 var p:byte;
 begin
-   if(d<=0)then
+   if(m<=0)then
    begin
-      map_IfPlayerStartHere:=true;
+      _PlayerStartHere:=true;
       exit;
    end;
-   map_IfPlayerStartHere:=false;
+   _PlayerStartHere:=false;
 
-   if(point_dist_int(ix0,iy0,ix1,iy1)<d)then
-   begin
-      map_IfPlayerStartHere:=true;
-      exit;
-   end;
+   if(check_symmetry)then
+    if(point_dist_int(x,y,map_mw-x,map_mw-y)<m)then
+    begin
+       _PlayerStartHere:=true;
+       exit;
+    end;
 
    for p:=0 to MaxPlayers do
-    if(point_dist_int(ix0,iy0,map_psx[p],map_psy[p])<d)
-    or(point_dist_int(ix1,iy1,map_psx[p],map_psy[p])<d)then
+    if(point_dist_int(x,y,map_psx[p],map_psy[p])<m)then
     begin
-       map_IfPlayerStartHere:=true;
+       _PlayerStartHere:=true;
        break;
     end;
 end;
 
-function map_IfCPointHere(ix0,iy0,ix1,iy1,d:integer):boolean;
+function _CPointHere(x,y,m:integer;check_symmetry:boolean):boolean;
 var p:byte;
-    t:integer;
 begin
-   if(d<=0)then
+   if(m<=0)then
    begin
-      map_IfCPointHere:=true;
+      _CPointHere:=true;
       exit;
    end;
-   map_IfCPointHere:=false;
+   _CPointHere:=false;
 
-   if(point_dist_int(ix0,iy0,ix1,iy1)<(d*2))then
-   begin
-      map_IfCPointHere:=true;
-      exit;
-   end;
+   if(check_symmetry)then
+    if(point_dist_int(x,y,map_mw-x,map_mw-y)<(m*2))then
+    begin
+       _CPointHere:=true;
+       exit;
+    end;
 
    for p:=1 to MaxCpoints do
     with g_cpoints[p] do
      if(cpCaptureR>0)then
+      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpCaptureR)))then
+      begin
+         _CPointHere:=true;
+         break;
+      end;
+end;
+
+procedure map_Starts_Circle(cx,cy,sdir,r:integer);
+const dstep = 360 div MaxPlayers;
+var i:byte;
+begin
+   sdir:=abs(sdir mod 360);
+   for i:=1 to MaxPlayers do
+   begin
+      sdir+=dstep;
+      map_psx[i]:=cx+trunc(r*cos(sdir*degtorad));
+      map_psy[i]:=cy+trunc(r*sin(sdir*degtorad));
+   end;
+end;
+
+procedure map_Starts_Default;
+var ix,iy,i,u,c,bb0,bb1,dst:integer;
+begin
+   bb0:=base_1r+(map_mw-MinSMapW) div 7;
+   bb1:=map_mw-(bb0*2);
+   dst:=(map_mw div 5)+base_1r;
+
+   for i:=1 to MaxPlayers do
+   begin
+      if(map_symmetry)and(i>3)then break;
+      c:=0;
+      u:=dst;
+      while true do
+      begin
+         ix:=bb0+_random(bb1);
+         iy:=bb0+_random(bb1);
+         c+=1;
+         if(c>500 )then u-=1;
+
+         if(c>1000)
+         or(_PlayerStartHere(ix,iy,u,map_symmetry)=false)then break;
+      end;
+
+      map_psx[i]:=ix;
+      map_psy[i]:=iy;
+      if(map_symmetry)then
+      begin
+         map_psx[i+3]:=map_mw-map_psx[i];
+         map_psy[i+3]:=map_mw-map_psy[i];
+      end;
+   end;
+end;
+
+procedure map_ShuffleStarts;
+var x,y:byte;
+    i:integer;
+begin
+   for x:=1 to MaxPlayers do
+    for y:=1 to MaxPlayers do
+     if(random(2)=0)then
      begin
-        t:=d+max2(cpsolidr,cpCaptureR);
-        if(point_dist_int(ix0,iy0,cpx,cpy)<t)
-        or(point_dist_int(ix1,iy1,cpx,cpy)<t)then
-        begin
-           map_IfCPointHere:=true;
-           break;
-        end;
+        i:=map_psx[x];map_psx[x]:=map_psx[y];map_psx[y]:=i;
+        i:=map_psy[x];map_psy[x]:=map_psy[y];map_psy[y]:=i;
      end;
 end;
-
-function map_IfDoodadHere(dtype:byte;ix0,iy0,ix1,iy1,DoodadAR:integer):boolean;
-var d,o:integer;
-function DoodadMinR(t1,t2:byte):integer;
-begin
-   {if(t1 in dids_liquids)
-  and(t2 in dids_liquids)then
-   begin
-      DoodadMinR:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 5)-(DID_R[t2] div 5)-DoodadAR;
-      exit;
-   end;
-
-   if(t1 in dids_liquids)
-   or(t2 in dids_liquids)then
-   begin
-      DoodadMinR:=max2(DID_R[t1],DID_R[t2])-DoodadAR;
-      exit;
-   end;
-   DoodadMinR:=DID_R[t1]+DID_R[t2]-DoodadAR-10;  }
-   if(DoodadAR>=0)
-   then DoodadMinR:=DID_R[t1]+DID_R[t2]+DoodadAR
-   else DoodadMinR:=(DID_R[t1]+DID_R[t2])-(abs(DID_R[t1] div DoodadAR)+abs(DID_R[t2] div DoodadAR));
-end;
-begin
-   map_IfDoodadHere:=false;
-
-   if(point_dist_int(ix0,iy0,ix1,iy1)<DoodadMinR(dtype,dtype))then
-   begin
-      map_IfDoodadHere:=true;
-      exit;
-   end;
-
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)then
-     begin
-        o:=DoodadMinR(t,dtype);
-        if(point_dist_int(x,y,ix0,iy0)<o)
-        or(point_dist_int(x,y,ix1,iy1)<o)then
-        begin
-           map_IfDoodadHere:=true;
-           break;
-        end;
-     end;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  CPOINTS
 
 procedure map_CPoints_UpdatePFZone;
 var pn:integer;
@@ -267,10 +220,7 @@ begin
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
-var ix0,iy0,
-    ix1,iy1,
-    i,u,b,c,
-    dst:integer;
+var ix,iy,i,u,b,c:integer;
 function _setcpoint(px,py:integer):boolean;
 var pn:byte;
 begin
@@ -312,110 +262,25 @@ begin
    begin
       i+=1+byte(map_symmetry);
       c:=0;
-      dst:=max2(base_1rh,map_mw div 8);
       while(c<1000)do
       begin
-         ix0:=u+g_random(b);
-         iy0:=u+g_random(b);
-         SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
+         ix:=u+_random(b);
+         iy:=u+_random(b);
 
+         if (not _PlayerStartHere(ix,iy,base_1rh,map_symmetry))
+         and(not _CPointHere(ix,iy,base_1rh,map_symmetry))then
+         begin
+            if(_setcpoint(ix,iy))then exit;
+            if(map_symmetry)then
+             if(_setcpoint(map_mw-ix,map_mw-iy))then exit;
+            break;
+         end;
          c+=1;
-         if(c>500)then dst-=1;
-
-         if CheckMapBorders(ix1,iy1,0)then
-           if (not map_IfPlayerStartHere(ix0,iy0,ix1,iy1,dst))
-           and(not map_IfCPointHere     (ix0,iy0,ix1,iy1,dst))then
-           begin
-              if(_setcpoint(ix0,iy0))then exit;
-              if(ix1<>NOTSET)then
-                if(_setcpoint(ix1,iy1))then exit;
-              break;
-           end;
       end;
    end;
 end;
 
-////////////////////////////////////////////////////////////////////////////////
-//
-//  PLAYER STARTS
-
-procedure map_PlayerStartsCircle(cx,cy,sdir,r:integer);
-const dstep = 360 div MaxPlayers;
-var i:byte;
-begin
-   sdir:=abs(sdir mod 360)+(dstep div 2);
-   for i:=1 to 3 do
-   begin
-      sdir+=dstep;
-      map_psx[i  ]:=cx+trunc(r*cos(sdir*degtorad));
-      map_psy[i  ]:=cy+trunc(r*sin(sdir*degtorad));
-      map_psx[i+3]:=map_mw-map_psx[i  ];
-      map_psy[i+3]:=map_mw-map_psy[i  ];
-   end;
-end;
-
-procedure map_PlayerStartsDefault(FreeCenterR:integer);
-var ix0,iy0,
-    ix1,iy1,
-    i,u,c,bb0,bb1,dst:integer;
-begin
-   bb0:=base_1r+(map_mw-MinSMapW) div 9;
-   bb1:=map_mw-(bb0*2);
-   dst:=base_1r+(map_mw div 5);
-
-   for i:=1 to MaxPlayers do
-   begin
-      if(map_symmetry>0)and(i>3)then break;
-      c:=0;
-      u:=dst;
-      while true do
-      begin
-         ix0:=bb0+g_random(bb1);
-         iy0:=bb0+g_random(bb1);
-         SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
-
-         c+=1;
-         if(c>500 )then u-=1;
-
-         if(CheckMapBorders(ix1,iy1,-bb0))then
-           if(c>1000)
-           or (not map_IfPlayerStartHere(ix0,iy0,ix1,iy1,u)
-           and(point_dist_int(ix0,iy0,map_hmw,map_hmw)>FreeCenterR)
-           and(point_dist_int(ix1,iy1,map_hmw,map_hmw)>FreeCenterR))then break;
-      end;
-
-      map_psx[i]:=ix0;
-      map_psy[i]:=iy0;
-      if(map_symmetry>0)then
-      begin
-         map_psx[i+3]:=ix1;
-         map_psy[i+3]:=iy1;
-      end;
-   end;
-
-   dst-=dst div 5;
-   c:=0;
-   for i:=1 to MaxPlayers do
-   for u:=1 to MaxPlayers do
-    if(i<>u)then
-      if(point_dist_int(map_psx[i],map_psy[i],map_psx[u],map_psy[u])<dst)then c+=1;
-   if(c>0)then map_PlayerStartsCircle(map_hmw,map_hmw,map_symmetryDir,map_hmw-(map_mw div 8));
-end;
-
-procedure map_ShufflePlayerStarts;
-var x,y:byte;
-    i:integer;
-begin
-   for x:=1 to MaxPlayers do
-    for y:=1 to MaxPlayers do
-     if(random(2)=0)and(x<>y)then
-     begin
-        i:=map_psx[x];map_psx[x]:=map_psx[y];map_psx[y]:=i;
-        i:=map_psy[x];map_psy[x]:=map_psy[y];map_psy[y]:=i;
-     end;
-end;
-
-procedure map_PlayerStarts;
+procedure map_Starts;
 var ix,iy,i,u,c:integer;
 begin
    for i:=0 to MaxPlayers do
@@ -425,67 +290,82 @@ begin
    end;
 
    case g_mode of
-gm_3x3     :begin
-               u :=map_hmw-(map_mw div 7);
-               c :=u+base_hr;
-               i :=map_symmetryDir+90;
+gm_3x3 :
+      begin
+         ix:=map_mw div 2;
+         iy:=base_2r+(map_mw div 25);
+         u :=ix-(map_mw div 7);
+         i :=map_seed mod 360;
 
-               case map_type of
-               mapt_lake  : ix:=round(60*(MinSMapW/map_mw))+round(3*(map_mw/MinSMapW));
-               mapt_shore : ix:=round(60*(MinSMapW/map_mw))+round(5*(map_mw/MinSMapW));
-               else         ix:=round(65*(MinSMapW/map_mw));
-               end;
+         map_psx[1]:=trunc(ix+cos(i*degtorad)*u);
+         map_psy[1]:=trunc(ix+sin(i*degtorad)*u);
+         i+=105;
+         map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
+         map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
+         i-=210;
+         map_psx[3]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
+         map_psy[3]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
-               map_psx[1]:=round(map_hmw+cos( i    *degtorad)*u);
-               map_psy[1]:=round(map_hmw+sin( i    *degtorad)*u);
-               map_psx[2]:=round(map_hmw+cos((i-ix)*degtorad)*c);
-               map_psy[2]:=round(map_hmw+sin((i-ix)*degtorad)*c);
-               map_psx[3]:=round(map_hmw+cos((i+ix)*degtorad)*c);
-               map_psy[3]:=round(map_hmw+sin((i+ix)*degtorad)*c);
+         map_psx[4]:=map_mw-map_psx[1];
+         map_psy[4]:=map_mw-map_psy[1];
+         map_psx[5]:=map_mw-map_psx[2];
+         map_psy[5]:=map_mw-map_psy[2];
+         map_psx[6]:=map_mw-map_psx[3];
+         map_psy[6]:=map_mw-map_psy[3];
+      end;
+gm_2x2x2:
+      begin
+         ix:=map_mw div 2;
+         iy:=base_2r+(map_mw div 30);
+         u :=ix-(ix div 3);
+         c :=map_seed mod 360;
 
-               map_psx[4]:=map_mw-map_psx[1];
-               map_psy[4]:=map_mw-map_psy[1];
-               map_psx[5]:=map_mw-map_psx[2];
-               map_psy[5]:=map_mw-map_psy[2];
-               map_psx[6]:=map_mw-map_psx[3];
-               map_psy[6]:=map_mw-map_psy[3];
-            end;
-gm_2x2x2   :begin
-               iy:=base_2r+(map_mw div 30);
-               u :=map_hmw-(map_hmw div 3);
-               c :=map_symmetryDir;
+         map_psx[1]:=trunc(ix+cos(c*degtorad)*u);
+         map_psy[1]:=trunc(ix+sin(c*degtorad)*u);
+         i:=c+100;
+         map_psx[2]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
+         map_psy[2]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
-               ix:=round(60*(MinSMapW/map_mw));
-               iy:=ix div 2;
-               i:=1;
-               while(i<MaxPlayers)do
-               begin
-               map_psx[i  ]:=round(map_hmw+cos((c-iy)*degtorad)*u);
-               map_psy[i  ]:=round(map_hmw+sin((c-iy)*degtorad)*u);
-               map_psx[i+1]:=round(map_hmw+cos((c+iy)*degtorad)*u);
-               map_psy[i+1]:=round(map_hmw+sin((c+iy)*degtorad)*u);
-               c+=120;
-               i+=2;
-               end;
-            end;
-gm_invasion:begin
-               map_psx[0]:=map_hmw;
-               map_psy[0]:=map_hmw;
-               map_PlayerStartsCircle(map_hmw,map_hmw,map_symmetryDir,base_2r);
-            end;
-gm_KotH    :begin
-               map_psx[0]:=map_hmw;
-               map_psy[0]:=map_hmw;
-               map_PlayerStartsCircle(map_hmw,map_hmw,map_symmetryDir,map_hmw-(map_mw div 8));
-            end;
-gm_royale  :begin
-               map_PlayerStartsCircle(map_hmw,map_hmw,map_symmetryDir,map_hmw-(map_mw div 5));
-            end;
-gm_capture :begin
-               map_PlayerStartsDefault(byte(map_type=mapt_lake)*(map_mw div 3));
-            end;
+         c+=120;
+         map_psx[3]:=trunc(ix+cos(c*degtorad)*u);
+         map_psy[3]:=trunc(ix+sin(c*degtorad)*u);
+         i:=c+100;
+         map_psx[4]:=map_psx[3]+trunc(cos(i*degtorad)*iy);
+         map_psy[4]:=map_psy[3]+trunc(sin(i*degtorad)*iy);
+
+         c+=120;
+         map_psx[5]:=trunc(ix+cos(c*degtorad)*u);
+         map_psy[5]:=trunc(ix+sin(c*degtorad)*u);
+         i:=c+100;
+         map_psx[6]:=map_psx[5]+trunc(cos(i*degtorad)*iy);
+         map_psy[6]:=map_psy[5]+trunc(sin(i*degtorad)*iy);
+      end;
+gm_invasion:
+      begin
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_2r);
+      end;
+gm_KotH:
+      begin
+         map_psx[0]:=map_hmw;
+         map_psy[0]:=map_hmw;
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
+         if(not g_fixed_positions)then map_ShuffleStarts;
+      end;
+gm_royale :
+      begin
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 5));
+         if(not g_fixed_positions)then map_ShuffleStarts;
+      end;
+gm_capture:
+      begin
+         map_Starts_Default;
+         if(not g_fixed_positions)then map_ShuffleStarts;
+      end;
    else
-               map_PlayerStartsDefault(byte(map_type=mapt_lake)*(map_mw div 3));
+         map_Starts_Default;
+         if(not g_fixed_positions)then map_ShuffleStarts;
    end;
 end;
 
@@ -510,27 +390,88 @@ gm_KotH   : with g_cpoints[1] do
 gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
    end;
 
-   if(g_generators>1)then
+   if(g_generators>0)then
     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
 end;
 
-function map_TrySetDoodad(di:byte;ix0,iy0,ix1,iy1,PStartDist,DoodadAR,MapBorder:integer):boolean;
+function _dec_min_r(t1,t2:byte):integer;
 begin
-   map_TrySetDoodad:=false;
-   if (not map_IfPlayerStartHere(ix0,iy0,ix1,iy1,PStartDist))
-   and(not map_IfDoodadHere  (di,ix0,iy0,ix1,iy1,DoodadAR  ))then
+   _dec_min_r:=DID_R[t1];
+   if(t2 in dids_liquids)
+  and(t1 in dids_liquids)then
    begin
-      if CheckMapBorders(ix0,iy0,MapBorder)then map_AddDoodad(ix0,iy0,di);
-      if(ix1<>NOTSET)then
-      if CheckMapBorders(ix1,iy1,MapBorder)then map_AddDoodad(ix1,iy1,di);
-      map_TrySetDoodad:=true;
+      _dec_min_r:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 6)-(DID_R[t2] div 6);//max2(DID_R[t1],DID_R[t2])+64;
+      exit;
+   end;
+   if(t2 in [DID_SRock,DID_BRock])then
+   begin
+      if(t1 in [DID_SRock,DID_BRock])then _dec_min_r:=     DID_R[t1]+DID_R[t2]-20;
+      if(t1 in dids_liquids         )then _dec_min_r:=max2(DID_R[t1],DID_R[t2]);
    end;
 end;
 
-function map_DoodadNoisePickSet(ix0,iy0,ix1,iy1:integer;lqs,rks:pinteger;PStartDist,DoodadAR:integer):boolean;
+function _dnear(td:byte;ix,iy:pinteger):boolean;
+var d:integer;
+begin
+   _dnear:=false;
+
+   with map_dds[0] do
+   if(map_symmetry)then
+   begin
+      t:=td;
+      r:=DID_R[td];
+      x:=map_mw-ix^;
+      y:=map_mw-iy^;
+   end
+   else
+   begin
+      t:=0;
+      x:=-32000;
+      y:=-32000;
+   end;
+
+   for d:=0 to map_ddn do
+   with map_dds[d] do
+   if(t>0)then
+   if(point_dist_rint(x,y,ix^,iy^)<_dec_min_r(t,td))then
+   begin
+      _dnear:=true;
+      break;
+   end;
+end;
+
+function _checkPlace(di:byte;ix,iy,doodad_r:integer):boolean;
+begin
+   _checkPlace:=false;
+   if(_dnear(di,@ix,@iy))
+   or(_PlayerStartHere (ix,iy,doodad_r,false))
+   then _checkPlace:=true
+   else
+     if(map_symmetry)then
+     begin
+        ix:=map_mw-ix;
+        iy:=map_mw-iy;
+        if(_dnear(di,@ix,@iy))
+        or(_PlayerStartHere (ix,iy,doodad_r,false))then _checkPlace:=true;
+     end;
+end;
+
+function _trysetdd(di:byte;ix,iy:pinteger;doodad_r:integer):boolean;
+begin
+   if(_checkPlace(di,ix^,iy^,doodad_r+(DID_R[di] div 2)))
+   then _trysetdd:=false
+   else
+   begin
+      _dds_a(ix^,iy^,di);
+      if(map_symmetry)then _dds_a(map_mw-ix^,map_mw-iy^,di);
+      _trysetdd:=true;
+   end;
+end;
+
+function _PickDoodad(ix,iy,lqs,rks:pinteger;doodad_r:integer):boolean;
 var di:byte;
 begin
-   map_DoodadNoisePickSet:=false;
+   _PickDoodad:=false;
    for di:=DID_liquidR1 to DID_Other do
     case di of
     DID_LiquidR1,
@@ -539,9 +480,9 @@ begin
     DID_LiquidR4  : if(lqs^<=0)
                     then continue
                     else
-                      if(map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist+DID_S2Rh[di],DoodadAR,DID_R[di]))then
+                      if(_trysetdd(di,ix,iy,doodad_r))then
                       begin
-                         map_DoodadNoisePickSet:=true;
+                         _PickDoodad:=true;
                          lqs^-=1;
                          break;
                       end
@@ -550,157 +491,26 @@ begin
     DID_BRock     : if(rks^<=0)
                     then continue
                     else
-                      if(map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist+DID_S2Rh[di],DoodadAR,0))then
+                      if(_trysetdd(di,ix,iy,doodad_r))then
                       begin
-                         map_DoodadNoisePickSet:=true;
+                         _PickDoodad:=true;
                          rks^-=1;
                          break;
                       end
                       else continue;
     else
-      if(map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist+DID_S2Rh[di],DoodadAR,0))then
+      if(_trysetdd(di,ix,iy,doodad_r))then
       begin
-         map_DoodadNoisePickSet:=true;
+         _PickDoodad:=true;
          break;
       end
       else continue;
     end;
 end;
 
-procedure map_DoodadNoise(liquidX,othersX:byte;DoodadAR:integer);
+procedure map_make;
 const dpostime = 400;
-var ix0,iy0,
-    ix1,iy1,
-    i,lqs,rks,
-    cnt,ir,
-    cicles:integer;
-begin
-   rks :=0;
-   lqs :=0;
-
-   if(othersX>0)then
-   begin
-      i:=(map_ddn div 8);
-      if(liquidX>0)then
-      begin
-         ix0:=i*othersX;
-         lqs:=max2(liquidX,(ix0 div 8)*liquidX);
-         rks:=max2(othersX,ix0-lqs);
-      end
-      else rks:=max2(othersX,i*othersX);
-   end
-   else lqs:=max2(liquidX,(map_ddn div 80)*liquidX);
-
-   cicles:=0;
-   ir :=base_1r+(map_mw div 100);
-   ix0:=integer(map_seed);
-   iy0:=0;
-
-   while(map_ddn>=0)do
-   begin
-      cnt:=0;
-      while true do
-      begin
-         ix0:=g_randomx(ix0,map_mw);
-         iy0:=g_randomx(iy0,map_mw);
-         SymmetryXY(ix0,iy0,@ix1,@iy1,map_symmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1);
-
-         if(map_DoodadNoisePickSet(ix0,iy0,ix1,iy1,@lqs,@rks,ir,DoodadAR))then
-         begin
-            cicles:=0;
-            break;
-         end;
-
-         cnt+=1;
-         if(cnt>=dpostime)then
-         begin
-            cicles+=1;
-            break;
-         end;
-      end;
-      if(cicles>10)then exit;
-   end;
-end;
-
-procedure map_DoodadFiledCircle(di:byte;cx,cy,cr:integer;forcesymmetry:byte);
-var sx,sy,
-    ex,
-    PStartDist,wr,
-    wr2  :integer;
-    n    :boolean;
-    csxX,
-    csyX,
-    csxY,
-    csyY :integer;
-    oxX,oyX,
-    oxY,oyY,
-    dirX,
-    dirY :single;
-procedure CheckAndSet(ix0,iy0:integer;symmetry:boolean);
-var ix1,iy1:integer;
-begin
-   if(point_dist_int(cx,cy,ix0,iy0)<=(cr-DID_R[di]))then
-   begin
-      if(symmetry)
-      then SymmetryXY(ix0,iy0,@ix1,@iy1,forcesymmetry,map_symmetryX0,map_symmetryY0,map_symmetryX1,map_symmetryY1)
-      else
-      begin
-         ix1:=NOTSET;
-         iy1:=NOTSET;
-      end;
-      map_TrySetDoodad(di,ix0,iy0,ix1,iy1,PStartDist,-3,wr2); //wr2 div 2
-   end;
-end;
-begin
-   wr :=DID_S2R [di];
-   wr2:=DID_S2Rh[di];
-   PStartDist :=base_1r+wr2+(map_mw div 75);
-   cr+=wr;
-
-   sx:=0;
-   sy:=0;
-   ex:=cr+wr2;
-   n :=false;
-
-   dirX:=map_symmetryDir*DEGTORAD;
-   oxX:=cos(dirX);
-   oyX:=sin(dirX);
-   dirY:=(map_symmetryDir+90)*DEGTORAD;
-   oxY:=cos(dirY);
-   oyY:=sin(dirY);
-
-   while(sy<=ex)do
-   begin
-      csxY:=round(sy*oxY);
-      csyY:=round(sy*oyY);
-
-      if(n)
-      then sx:=wr2
-      else sx:=0;
-
-      while(sx<=ex)do
-      begin
-         csxX:=round(sx*oxX);
-         csyX:=round(sx*oyX);
-
-         CheckAndSet(cx+csxX+csxY,cy+csyX+csyY,(sy>0)and(forcesymmetry>0));
-         CheckAndSet(cx-csxX+csxY,cy-csyX+csyY,(sy>0)and(forcesymmetry>0));
-         if(forcesymmetry=0)and(sy>0)then
-         begin
-         CheckAndSet(cx+csxX-csxY,cy+csyX-csyY,false);
-         CheckAndSet(cx-csxX-csxY,cy-csyX-csyY,false);
-         end;
-         sx+=wr;
-      end;
-
-      n :=not n;
-      sy+=wr;
-   end;
-end;
-
-procedure map_ReMake;
-var ix,iy:integer;
- symmetry:byte;
+var i,ix,iy,lqs,rks,ddc,cnt,ir:integer;
 begin
    map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
@@ -712,72 +522,57 @@ begin
       setlength(l,n);
    end;
 
-   map_ddn:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
+   ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
 
-   if(map_symmetry>0)
-   then map_ddn:=mm3(1,round(map_ddn/1.5),MaxDoodads)
-   else map_ddn:=mm3(1,      map_ddn     ,MaxDoodads);
+   if(map_symmetry)
+   then ddc:=mm3(1,round(ddc/2),MaxDoodads)
+   else ddc:=mm3(1,      ddc   ,MaxDoodads);
 
-   case map_type of
-mapt_steppe: begin
-             map_DoodadNoise(0,0,0);
-             end;
-mapt_nature: begin
-             map_DoodadNoise(2,2,50);
-             end;
-mapt_lake  : begin
-             ix:=round(map_mw/2.9);
-             map_DoodadFiledCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
-             if(map_mw<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
-             //map_DoodadFiledCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
-             end;
+   rks :=0;
+   lqs :=0;
 
-             map_ddn:=map_ddn div 3;
-             map_DoodadNoise(0,0,50);
-             end;
-mapt_shore: begin
-             ix:=map_mw*2;
-             if(map_symmetry=1)
-             then symmetry:=0
-             else symmetry:=map_symmetry;
+   if(map_obs>0)then
+   begin
+      i:=(ddc div 8);
+      if(map_liq>0)then
+      begin
+         ix :=(i*map_obs);
+         lqs:=max2(map_liq,(ix div 8)*map_liq);
+         rks:=max2(map_obs,ix-lqs);
+      end
+      else rks:=max2(map_obs,i*map_obs);
+   end
+   else lqs:=max2(map_liq,(ddc div 80)*map_liq);
 
-             map_DoodadFiledCircle(DID_LiquidR1,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             if(map_mw<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_symmetryX1,map_symmetryY1,ix,symmetry);
-            // map_DoodadFiledCircle(DID_LiquidR4,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             end;
+   ir :=base_1r+(map_mw div 100);
+   ix :=map_seed;
+   iy :=0;
 
-             map_ddn:=map_ddn div 2;
-             map_DoodadNoise(1,2,50);
-             end;
-mapt_sea   : begin
-             ix:=map_mw;
-             map_DoodadFiledCircle(DID_LiquidR1,map_hmw,map_hmw,ix,map_symmetry);
-             if(map_mw<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_hmw,map_hmw,ix,map_symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_hmw,map_hmw,ix,map_symmetry);
-             //map_DoodadFiledCircle(DID_LiquidR4,map_hmw,map_hmw,ix,map_symmetry);
-             end;
-             map_ddn:=map_ddn div 6;
-             map_DoodadNoise(0,1,-50);
-             end;
+   for i:=1 to ddc do
+   begin
+      cnt:=0;
+      while true do
+      begin
+         ix:=_randomx(ix,map_mw);
+         iy:=_randomx(iy,map_mw); //+ix*cnt
+
+         if(_PickDoodad(@ix,@iy,@lqs,@rks,ir))then break;
+
+         cnt+=1;
+         if(cnt>=dpostime)then break;
+      end;
    end;
 
    map_RefreshDoodadsCells;
-   map_RandomBaseVars;
+
+   map_RandomBase;
    map_CPoints;
    pf_MakeZoneGrid;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
+   map_RedrawMenuMinimap;
    map_tdmake;
-   vid_map_RedrawBack:=true;
    {$ENDIF}
 end;
 
@@ -791,19 +586,20 @@ begin
    Map_randomseed;
 
    map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/StepSMap)*StepSMap;
-   map_type:=random(gms_m_types+1);
-   map_symmetry:=random(3);
+   map_liq:=random(8);
+   map_obs:=random(8);
+   map_symmetry:=random(2)>0;
 end;
 
 procedure Map_premap;
 begin
-   map_Vars;
-   map_PlayerStarts;
+   map_vars;
+   map_Starts;
    {$IFDEF _FULLGAME}
    map_seed2theme;
    map_MakeThemeSprites;
    {$ENDIF}
-   map_ReMake;
+   map_Make;
 end;
 
 
