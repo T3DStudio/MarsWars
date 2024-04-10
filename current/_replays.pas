@@ -257,11 +257,11 @@ begin
        with g_players[p] do
        begin
           {$I-}
-          BlockWrite(rpls_file,name ,sizeof(name ));
-          BlockWrite(rpls_file,state,sizeof(state));
-          BlockWrite(rpls_file,race ,sizeof(race ));
+          BlockWrite(rpls_file,name     ,sizeof(name ));
+          BlockWrite(rpls_file,state    ,sizeof(state));
+          BlockWrite(rpls_file,race     ,sizeof(race ));
           BlockWrite(rpls_file,slot_race,sizeof(slot_race));
-          BlockWrite(rpls_file,team ,sizeof(team ));
+          BlockWrite(rpls_file,team     ,sizeof(team ));
           {$I+}
        end;
 
@@ -290,7 +290,7 @@ begin
       {$I-}
       BlockWrite(rpls_file,i,sizeof(i));
       {$I+}
-      if((i and %10000000)>0)then _wudata_log(rpls_player,@rpls_log_n,true);
+      if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_n,true);
       if((i and %01000000)>0)then
       begin
          rpls_vidx:=_vx;
@@ -301,7 +301,7 @@ begin
          {$I+}
       end;
 
-      if(gs=gs_running)then _wclinet_gframe(rpls_player,true);
+      if(gs=gs_running)then wclinet_gframe(rpls_player,true);
    end;
 
    if(ioresult<>0)then
@@ -422,8 +422,8 @@ begin
          PlayersValidateName;
 
          if(rpls_pnu=0)then rpls_pnu:=NetTickN;
-         UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
-         if(UnitStepTicks=0)then UnitStepTicks:=1;
+         UnitMoveStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
+         if(UnitMoveStepTicks=0)then UnitMoveStepTicks:=1;
 
          rpls_fstatus:=rpls_file_read;
          rpls_state  :=rpls_state_read;
@@ -477,7 +477,7 @@ begin
       {$I+}
       G_Status:=i and %00111111;
 
-      if((i and %10000000)>0)then _rudata_log(rpls_player,true);
+      if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
       begin
          {$I-}
@@ -486,7 +486,7 @@ begin
          {$I+}
       end;
 
-      if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true,rpls_ForwardStep>1);
+      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_ForwardStep>1);
 
       if(rpls_ForwardStep>1)then effects_sprites(false,false);
       rpls_ForwardStep-=1;

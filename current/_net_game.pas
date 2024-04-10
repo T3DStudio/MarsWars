@@ -275,7 +275,7 @@ nmid_pause       : begin
             net_writebyte(nmid_snapshot);
             net_writebyte(G_Status);
             if(G_Status=gs_running)
-            then _wclinet_gframe(i,false);
+            then wclinet_gframe(i,false);
             net_send(nip,nport);
          end;
 
@@ -283,7 +283,7 @@ nmid_pause       : begin
          begin
             net_clearbuffer;
             net_writebyte(nmid_chatclupd);
-            _wudata_log(i,@log_n_cl,false);
+            wudata_log(i,@log_n_cl,false);
             net_send(nip,nport);
             net_logsend_pause:=fr_fpsd2;
          end;
@@ -414,7 +414,7 @@ nmid_notconnected: begin
                       GameDefaultAll;
                    end;
 nmid_chatclupd   : begin
-                      _rudata_log(PlayerClient,false);
+                      rudata_log(PlayerClient,false);
                       net_chat_shlm:=chat_shlm_t;
                       net_period:=0;
                    end;
@@ -466,7 +466,7 @@ nmid_lobby_info  : begin
             G_Status:=net_readbyte;
 
             if(G_Status=gs_running)
-            then _rclinet_gframe(PlayerClient,false,false);
+            then rclinet_gframe(PlayerClient,false,false);
          end;
       end;
    end;

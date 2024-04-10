@@ -62,17 +62,17 @@ PS_Play: begin ready:=false;name :='';                ttl:=0;end;
    end;
 end;
 
-function PlayerSlotChangeState(PlayerChanger,PlayerTarget,NewState:byte;Check:boolean):boolean;
+function PlayerSlotChangeState(PlayerRequestor,PlayerTarget,NewState:byte;Check:boolean):boolean;
 begin
    PlayerSlotChangeState:=false;
 
-   if(PlayerChanger=PlayerTarget)
-   or(PlayerChanger>MaxPlayers)
-   or(PlayerTarget >MaxPlayers)
+   if(PlayerRequestor=PlayerTarget)
+   or(PlayerRequestor>MaxPlayers)
+   or(PlayerTarget   >MaxPlayers)
    or(NewState>=ps_states_n)
    or(G_Started)then exit;
 
-   if(PlayerChanger<>PlayerLobby)and(PlayerLobby<>255)then exit;
+   if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<>255)then exit;
 
    PlayerSlotChangeState:=true;
 
@@ -91,24 +91,24 @@ ps_observer : begin
                  PlayerSetState(PlayerTarget,ps_none);
                  team:=0;
               end;
-ps_replace  : PlayersSwap(PlayerChanger,PlayerTarget);
+ps_replace  : PlayersSwap(PlayerRequestor,PlayerTarget);
 ps_AI_1..
 ps_AI_11    : begin
                  slot_state:=NewState;
-                 ai_skill:=NewState-ps_AI_1+1;
+                 ai_skill  :=NewState-ps_AI_1+1;
                  PlayerSetState(PlayerTarget,ps_comp);
                  if(team=0)then team:=PlayerTarget;
               end;
       end;
    end;
 end;
-function PlayerSlotChangeRace(PlayerChanger,PlayerTarget,NewRace:byte;Check:boolean):boolean;
+function PlayerSlotChangeRace(PlayerRequestor,PlayerTarget,NewRace:byte;Check:boolean):boolean;
 begin
    PlayerSlotChangeRace:=false;
 
    if(NewRace>r_cnt)
-   or(PlayerChanger>MaxPlayers)
-   or(PlayerTarget >MaxPlayers)
+   or(PlayerRequestor>MaxPlayers)
+   or(PlayerTarget   >MaxPlayers)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -117,8 +117,8 @@ begin
       or(slot_state=ps_closed  )
       or(slot_state=ps_observer)then exit;
 
-      if((PlayerChanger= PlayerTarget)and(state=ps_play))
-      or((PlayerChanger<>PlayerTarget)and(state=ps_comp)and((PlayerChanger=PlayerLobby)or(PlayerLobby=255)))
+      if((PlayerRequestor= PlayerTarget)and(state=ps_play))
+      or((PlayerRequestor<>PlayerTarget)and(state=ps_comp)and((PlayerRequestor=PlayerLobby)or(PlayerLobby=255)))
       then
       else exit;
 
@@ -129,20 +129,20 @@ begin
       slot_race:=NewRace;
    end;
 end;
-function PlayerSlotChangeTeam(PlayerChanger,PlayerTarget,NewTeam:byte;Check:boolean):boolean;
+function PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam:byte;Check:boolean):boolean;
 begin
    PlayerSlotChangeTeam:=false;
 
-   if(NewTeam      >MaxPlayers)
-   or(PlayerChanger>MaxPlayers)
-   or(PlayerTarget >MaxPlayers)
+   if(NewTeam        >MaxPlayers)
+   or(PlayerRequestor>MaxPlayers)
+   or(PlayerTarget   >MaxPlayers)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
    begin
-      if(slot_state=ps_observer)
-      or(slot_state=ps_closed  )
-      or((slot_state=ps_opened )and(state=ps_none))
+      if( slot_state=ps_observer)
+      or( slot_state=ps_closed  )
+      or((slot_state=ps_opened  )and(state=ps_none))
       or((state=ps_comp)and(NewTeam=0))then exit;
 
       PlayerSlotChangeTeam:=true;
@@ -223,11 +223,11 @@ var u:integer;
 begin
    randomize;
 
-   G_Step         :=0;
-   G_Status       :=0;
+   G_Step          :=0;
+   G_Status        :=0;
    g_player_astatus:=255;
 
-   ServerSide     :=true;
+   ServerSide      :=true;
 
    FillChar(g_cpoints ,SizeOf(g_cpoints ),0);
    FillChar(g_missiles,SizeOf(g_missiles),0);
@@ -245,7 +245,7 @@ begin
 
    PlayersSetDefault;
 
-   UnitStepTicks    := 8;
+   UnitMoveStepTicks:= 8;
 
    g_inv_wave_n     := 0;
    g_inv_wave_t_next:= 0;
@@ -259,7 +259,7 @@ begin
 
    {$IFDEF _FULLGAME}
    uncappedFPS:=false;
-   _warpten:=false;
+   test_fastprod:=false;
 
    menu_update:= true;
 
@@ -318,7 +318,6 @@ begin
    unit_add(tx,ty,0,uid    ,pl,true,false,0);
    n+=1;
 end;
-
 begin
    if(c>6)then c:=6;
    n:=0;
@@ -359,6 +358,26 @@ begin
    for p:=0 to MaxPlayers do
    with g_players[p] do
    begin
+      case slot_state of
+ps_closed   : PlayerSetState(p,ps_none);
+ps_observer : team:=0;
+ps_opened   : if(p>0)and(state=ps_none)and(g_ai_slots>0)then
+              begin
+                 ai_skill:=g_ai_slots;
+                 race    :=r_random;
+                 PlayerSetState(p,ps_comp);
+              end;
+ps_replace  : begin
+              slot_state:=ps_closed;
+              PlayerSetState(p,ps_none);
+              end;
+ps_AI_1..
+ps_AI_11    : begin
+                 ai_skill:=(slot_state-ps_AI_1)+1;
+              end;
+      else    PlayerSetState(p,ps_none);
+      end;
+
       team:=PlayerGetTeam(g_mode,p);
 
       if(p=0)then
@@ -371,14 +390,6 @@ begin
       end
       else
       begin
-         if(state=ps_none)then
-          if(g_ai_slots>0)then
-          begin
-             ai_skill:=g_ai_slots;
-             race    :=r_random;
-             PlayerSetState(p,ps_comp);
-          end;
-
          if(race=r_random)then race:=1+random(r_cnt);
 
          if(state=ps_play)then ai_skill:=player_default_ai_level;//g_ai_slots
@@ -392,9 +403,11 @@ begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
         if(team>0)and(0<=map_psx[p])and(map_psx[p]<=map_mw)
-        then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
-
-        unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
+        then
+        begin
+           GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
+           unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
+        end;
      end;
 
    {$IFDEF _FULLGAME}
@@ -792,7 +805,7 @@ begin
       begin
          G_Step+=1;
 
-         UpdatePlayersStatus;
+         UpdatePlayersStatusVars;
 
          GameModeCPoints;
          case g_mode of

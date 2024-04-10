@@ -1,4 +1,22 @@
 
+procedure D_menu_ScrollBar(tar:pSDL_Surface;mi:byte;scrolli,scrolls,scrollmax:integer);
+var posCY,
+    barh:integer;
+begin
+   with menu_items[mi] do
+   begin
+      barh :=(y1-y0);
+      if(scrolls<scrollmax)then
+      begin
+         barh :=mm3(1,round((y1-y0)*(scrolls/scrollmax)),barh);
+         posCY:=y0+round((y1-y0-barh)*(scrolli/(scrollmax-scrolls)));
+      end
+      else posCY:=y0;
+
+      vlineColor(tar,x0+1,posCY,posCY+barh,c_lime);
+      vlineColor(tar,x0+2,posCY,posCY+barh,c_lime);
+   end;
+end;
 
 function mic(enable,selected:boolean):cardinal;
 begin
@@ -51,9 +69,9 @@ begin
    begin
       tx1:=x1-font_w;
       tx0:=tx1-max;
-      vlineColor(tar,tx0,y0,y1,c_gray);
-      vlineColor(tar,tx1,y0,y1,c_gray);
-      boxColor  (tar,tx0,y0+font_hw,tx0+val,y1-font_hw,c_lime);
+      vlineColor(tar,tx0,y0+1,y1,c_gray);
+      vlineColor(tar,tx1,y0+1,y1,c_gray);
+      boxColor  (tar,tx0,y0+font_hw+1,tx0+val,y1-font_hw,c_lime);
 
       draw_text(tar,tx0-font_34,((y0+y1) div 2)-font_hw+1,i2s(round(val/max*100))+'%',ta_right,255,c_white);
    end;
@@ -67,12 +85,11 @@ procedure D_menu_ETextN(tar:pSDL_Surface;mi:byte;l_text,r_text:shortstring;lista
 begin
    D_menu_EText(tar,mi,ta_left    ,ta_middle,l_text,false    ,byte(listarrow)+selected);
    D_menu_EText(tar,mi,ta_rightmid,ta_middle,r_text,listarrow,selected);
-   with menu_items[mi] do vlineColor(tar,(x0+x1) div 2,y0,y1,c_gray);
+   with menu_items[mi] do vlineColor(tar,(x0+x1) div 2,y0+1,y1,c_gray);
 end;
 
 procedure D_MMap(tar:pSDL_Surface);
-var c:boolean;
-    i:integer;
+var i:integer;
 //function _yt(s:integer):integer;begin _yt:=ui_menu_map_y0+s*ui_menu_map_ys+6; end;
 begin
    draw_text(tar, ui_menu_map_cx, ui_menu_map_cy, str_MMap, ta_middle,255, c_white);
@@ -84,8 +101,8 @@ begin
 
    if(menu_s2=ms2_camp)then
    begin
-      //draw_surf(tar, 91 ,129,cmp_mmap  [_cmp_sel]);
-      //draw_text(tar, 252,132,str_camp_m[_cmp_sel], ta_left,255, c_white);
+      //draw_surf(tar, 91 ,129,cmp_mmap  [campain_mission_n]);
+      //draw_text(tar, 252,132,str_camp_m[campain_mission_n], ta_left,255, c_white);
    end
    else
    begin
@@ -125,31 +142,36 @@ begin
    begin
       draw_text(tar,ui_menu_pls_cptx, ui_menu_pls_cpty, str_MObjectives, ta_middle,255, c_white);
 
-      //draw_text(tar, ui_menu_pls_xc , ui_menu_pls_zy0+_yt(0)  ,str_camp_t[_cmp_sel],ta_middle,255,c_white);
-      //draw_text(tar, ui_menu_pls_zxn, ui_menu_pls_zy0+_yt(1)+8,str_camp_o[_cmp_sel],ta_left  ,255,c_white);
+      //draw_text(tar, ui_menu_pls_xc , ui_menu_pls_zy0+_yt(0)  ,str_camp_t[campain_mission_n],ta_middle,255,c_white);
+      //draw_text(tar, ui_menu_pls_zxn, ui_menu_pls_zy0+_yt(1)+8,str_camp_o[campain_mission_n],ta_left  ,255,c_white);
    end
    else
      if(net_svsearch)then
      begin
         draw_text(tar,ui_menu_pls_cptx, ui_menu_pls_cpty, str_MServers+'('+i2s(net_svsearch_listn)+')', ta_middle,255, c_white);
-        {draw_text(tar,ui_menu_pls_xc, ui_menu_pls_ye+5, str_connect[false], ta_middle,255, mic((0<=net_svsearch_sel)and(net_svsearch_sel<net_svsearch_listn),false));
 
-        hlineColor(tar,ui_menu_pls_zx0,ui_menu_pls_zx1,ui_menu_pls_zy0,c_white);
-        hlineColor(tar,ui_menu_pls_zx0,ui_menu_pls_zx1,ui_menu_pls_ye,c_white);
+        with menu_items[mi_mplay_NetSearchList] do
+        begin
+           hlineColor(tar,x0,x1,y0,c_white);
+           hlineColor(tar,x0,x1,y1,c_white);
 
-        if(net_svsearch_listn>0)then
-         for u:=0 to vid_srch_m do
-         begin
-            p:=u+net_svsearch_scroll;
-            if(p<net_svsearch_listn)then
-              with net_svsearch_list[p] do
-              begin
-                 y:=ui_menu_pls_zy0+u*ui_menu_pls_ys3;
-                 if(p=net_svsearch_sel)then boxColor(tar,ui_menu_pls_zx0,y+1,ui_menu_pls_zx1,y+ui_menu_pls_ys3,c_dgray);
-                 hlineColor(tar,ui_menu_pls_zx0,ui_menu_pls_zx1,y+ui_menu_pls_ys3,c_white);
-                 draw_text(tar,ui_menu_pls_zx0,ui_menu_pls_y2+u*ui_menu_pls_ys3,i2s(p+1)+')'+info,ta_left,ui_menu_chat_width,c_white);
-              end;
-         end; }
+           if(net_svsearch_listn>0)then
+            for u:=0 to vid_srch_m do
+            begin
+               p:=u+net_svsearch_scroll;
+               if(p<net_svsearch_listn)then
+                with net_svsearch_list[p] do
+                begin
+                   y:=y0+(u*ui_menu_nsrch_lh3);
+                   if(p=net_svsearch_sel)then boxColor(tar,x0,y+1,x1,y+ui_menu_nsrch_lh3,c_dgray);
+                   hlineColor(tar,x0,x1,y+ui_menu_nsrch_lh3,c_white);
+                   draw_text(tar,x0+3,y+font_hw,i2s(p+1)+')'+info,ta_left,ui_menu_chat_width,c_white);
+                end;
+            end;
+        end;
+
+        D_menu_ScrollBar(tar,mi_mplay_NetSearchList,net_svsearch_scroll,vid_srch_m+1,net_svsearch_listn);
+        D_menu_EText(tar,mi_mplay_NetSearchCon,ta_middle,ta_middle,str_connect[false],false,0);
      end
      else
      begin
@@ -359,6 +381,7 @@ begin
                        draw_text(tar,ui_menu_ssr_zx0+font_34,y+font_34,b2s(i+1)+'.'+svld_list[i],ta_left,255,mic(true,i=svld_list_sel));
                     end;
                  end;
+                 D_menu_ScrollBar(tar,mi_saveload_list,svld_list_scroll,vid_svld_m+1,svld_list_size);
 
                  draw_text(tar,ui_menu_ssr_cx+font_34,_yl(1)+font_34,svld_str_info,ta_left,19,c_white);
               end;
@@ -387,9 +410,10 @@ begin
                           hlineColor(tar,ui_menu_ssr_zx0,ui_menu_ssr_cx,y+1               ,c_gray);
                           hlineColor(tar,ui_menu_ssr_zx0,ui_menu_ssr_cx,y+ui_menu_ssr_lh-1,c_gray);
                        end;
-                       draw_text(tar,ui_menu_ssr_zx0+font_34,y+font_34,b2s(i+1)+'.'+rpls_list[i],ta_left,255,mic(true,i=rpls_list_sel));
+                       draw_text(tar,ui_menu_ssr_zx0+font_34,y+font_34,TrimString(b2s(i+1)+'.'+rpls_list[i],18),ta_left,255,mic(true,i=rpls_list_sel));
                     end;
                  end;
+                 D_menu_ScrollBar(tar,mi_replays_list,rpls_list_scroll,vid_rpls_m+1,rpls_list_size);
 
                  draw_text(tar,ui_menu_ssr_cx+font_34,_yl(1)+font_34,rpls_str_info,ta_left,19,c_white);
               end;
@@ -431,12 +455,12 @@ begin
                  for t:=1 to vid_camp_m do
                  begin
                     i:=t+_cmp_sm-1;
-                    if(i=_cmp_sel)then
+                    if(i=campain_mission_n)then
                     begin
                        hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y,c_gray);
                        hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y+ui_menu_csm_ys,c_gray);
                     end;
-                    //draw_text(tar,ui_menu_csm_xt0,y+6,str_camp_t[i],ta_left,255,mic(not g_started,i=_cmp_sel));
+                    //draw_text(tar,ui_menu_csm_xt0,y+6,str_camp_t[i],ta_left,255,mic(not g_started,i=campain_mission_n));
                     y+=ui_menu_csm_ys;
                  end;}
               end;
@@ -444,9 +468,7 @@ begin
                  default_lines;
 
                  // game options
-                 D_menu_EText (tar,mi_game_Caption   ,ta_middle,ta_middle,str_goptions,false,0);
-
-
+                 D_menu_EText (tar,mi_game_GameCaption   ,ta_middle,ta_middle,str_goptions,false,0);
                  D_menu_ETextD(tar,mi_game_mode          ,str_gmodet       ,str_gmode[g_mode]            ,true ,0);
                  D_menu_ETextD(tar,mi_game_builders      ,str_starta       ,b2s(g_start_base+1)          ,true ,0);
                  D_menu_ETextD(tar,mi_game_generators    ,str_generators   ,str_generatorsO[g_generators],true ,0);
@@ -455,61 +477,34 @@ begin
                  D_menu_ETextD(tar,mi_game_EmptySlots    ,str_aislots      ,ai_name(g_ai_slots)          ,true ,0);
                  D_menu_EText (tar,mi_game_RandomSkrimish,ta_middle,ta_middle,str_randoms,false,0);
 
-                 D_menu_ETextD(tar,mi_game_Record        ,str_replay       ,str_rstatus[rpls_state]      ,false,0);
+                 D_menu_EText (tar,mi_game_RecordCaption ,ta_middle,ta_middle,str_replay,false,0);
+                 D_menu_ETextD(tar,mi_game_RecordStatus  ,str_replay_status,str_rstatus[rpls_state]      ,false,0);
                  D_menu_ETextN(tar,mi_game_RecordName    ,str_replay_name  ,rpls_str_name                ,false,1);
-                 D_menu_ETextD(tar,mi_game_RecordQuality ,str_pnu          ,str_pnua[rpls_pnui]          ,true ,0);
-                 {
-                 if(rpls_state>rpls_state_none)and(g_cl_units>0)then
-                 draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
-                 }
-                 {
-
-                 y:=_yt(2);
-                 draw_text(tar,ui_menu_csm_xt0, y,              , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y,       , ta_right ,255, c_white);
-
-                 y:=_yt(3);
-                 draw_text(tar,ui_menu_csm_xt0, y,              , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y,     , ta_right ,255,c_white);
-
-                 y:=_yt(4);
-                 draw_text(tar,ui_menu_csm_xt0, y,             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y, , ta_right ,255 ,c_white);
-
-                 y:=_yt(5);
-                 draw_text(tar,ui_menu_csm_xt0, y,             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y,     , ta_right ,255 ,c_white);
-
-                 y:=_yt(6);
-                 draw_text(tar,ui_menu_csm_xt0, y,          , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y, ,
-                                                                             ta_right ,255 ,c_white);
-
-                 y:=_yt(7);
-                 draw_text(tar,ui_menu_csm_xt0, y,       , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 draw_text(tar,ui_menu_csm_xt2, y,   , ta_right ,255 ,c_white);
-
-                 y:=_yt(8);
-                 draw_text(tar,ui_menu_csm_xc , y,             , ta_middle,255, mic((G_Started=false)and(net_status=0       ),false));
-
-                 // replays
-                 y:=_yt(10);
-                 draw_text(tar,ui_menu_csm_xt1, y,              , ta_left  ,255, c_white);
-                 draw_text(tar,ui_menu_csm_xt2, y, , ta_right ,255, mic( rpls_state<rpls_state_read ,rpls_state>rpls_state_none));
-                 t:=_yl(10);
-                 vlineColor(tar,ui_menu_csm_x3 ,t,t+ui_menu_csm_ys, c_gray);
-                 y:=_yt(11);
-                 draw_text(tar,ui_menu_csm_xt0, y, , ta_left,255, mic( rpls_state=rpls_state_none ,false));
-                 draw_text(tar,ui_menu_csm_xt3, y,   , ta_left,255, mic( rpls_state=rpls_state_none ,menu_item=83));
-                 y:=_yl(11);
-                 vlineColor(tar,ui_menu_csm_xc ,y,y+ui_menu_csm_ys,c_gray);
-                 y:=_yt(12);
-                 draw_text(tar,ui_menu_csm_xt0, y, +, ta_left,255, mic( rpls_state<rpls_state_read ,false));
- }
+            if(rpls_state>rpls_state_none)and(g_cl_units>0)
+            then D_menu_ETextD(tar,mi_game_RecordQuality ,str_pnu          ,i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_pnui]          ,true ,0)
+            else D_menu_ETextD(tar,mi_game_RecordQuality ,str_pnu          ,str_pnua[rpls_pnui]          ,true ,0);
               end;
    ms2_mult : begin
                  default_lines;
-                 {draw_text(tar,ui_menu_csm_xc, _yt(12), str_menu_chat, ta_middle,255, mic((net_status<>ns_single)and(not net_svsearch),m_chat));
+
+
+                 D_menu_EText (tar,mi_mplay_ServerCaption ,ta_middle,ta_middle,str_server                    ,false,0);
+                 D_menu_EText (tar,mi_mplay_ServerToggle  ,ta_middle,ta_middle,str_svup[net_status=ns_server],false,0);
+                 D_menu_ETextD(tar,mi_mplay_ServerPort    ,str_udpport        ,net_sv_pstr                   ,false,1);
+
+                 D_menu_EText (tar,mi_mplay_ClientCaption ,ta_middle,ta_middle,str_client                    ,false,0);
+                 D_menu_EText (tar,mi_mplay_NetSearch,ta_middle,ta_middle,str_netsearch                 ,false,0);
+                 D_menu_ETextD(tar,mi_mplay_ClientAddress ,net_cl_svstr       ,''                            ,false,1);
+                 D_menu_ETextD(tar,mi_mplay_ClientConnect ,str_connect[net_status=ns_client],net_m_error     ,false,0);
+
+                 {
+                 mi_mplay_ServerToggle      = 170;
+                 mi_mplay_ServerPort  = 171;
+                 mi_mplay_NetSearch
+                 mi_mplay_ClientConnect= 172;
+                 mi_mplay_ClientAddress  = 173;
+
+                 draw_text(tar,ui_menu_csm_xc, _yt(12), str_menu_chat, ta_middle,255, mic((net_status<>ns_single)and(not net_svsearch),m_chat));
 
                  if(m_chat)then
                  begin
@@ -601,6 +596,7 @@ end;
 
 procedure D_Menu;
 var i,y:integer;
+      c:cardinal;
 begin
    if(menu_update)then
    begin
@@ -609,35 +605,27 @@ begin
       menu_update:=false;
       vid_map_RedrawBack:=false;
 
-      {if false then
+      if(menu_list_n>0)then
+       with menu_items[menu_item] do
+       begin
+          boxColor(r_menu,0   ,0 ,x0       ,r_menu^.h,c_ablack);
+          boxColor(r_menu,x1  ,0 ,r_menu^.w,r_menu^.h,c_ablack);
+          boxColor(r_menu,x0+1,0 ,x1-1     ,y0       ,c_ablack);
+          boxColor(r_menu,x0+1,y1,x1-1     ,r_menu^.h,c_ablack);
+       end;
+      //if false then
       for i:=0 to 255 do
        with menu_items[i] do
         if(x0>0)then
         begin
            rectangleColor(r_menu,x0,y0,x1,y1,rgba2c(128+random(128),128+random(128),128+random(128),255));
-        end; }
+        end;
    end;
 
    draw_surf(r_screen,mv_x,mv_y,r_menu);
 
    if(menu_list_n>0)then
    begin
-      with menu_items[menu_item] do
-      begin
-         x0+=mv_x;
-         y0+=mv_y;
-         x1+=mv_x;
-         y1+=mv_y;
-         boxColor(r_screen,mv_x,mv_y,x0            ,mv_y+r_menu^.h,c_ablack);
-         boxColor(r_screen,x1  ,mv_y,mv_x+r_menu^.w,mv_y+r_menu^.h,c_ablack);
-         boxColor(r_screen,x0+1,mv_y,x1-1          ,y0            ,c_ablack);
-         boxColor(r_screen,x0+1,y1  ,x1-1          ,mv_y+r_menu^.h,c_ablack);
-         //boxColor(r_screen,mv_x,mv_y,mv_x+r_menu^.w,mv_y+r_menu^.h,c_ablack);
-         x0-=mv_x;
-         y0-=mv_y;
-         x1-=mv_x;
-         y1-=mv_y;
-      end;
       menu_list_x+=mv_x;
       menu_list_y+=mv_y;
       y:=menu_list_y+(ui_menu_list_item_H*menu_list_n);
@@ -646,11 +634,14 @@ begin
       for i:=0 to menu_list_n-1 do
       begin
          y:=menu_list_y+(ui_menu_list_item_H*i);
+         c:=0;
          if(i=menu_list_s)
-         then boxColor(r_screen,menu_list_x-menu_list_w+1,y+1,menu_list_x-1,y+ui_menu_list_item_H,c_dgray)
+         then c:=c_dgray
          else
              if(i=menu_list_c)
-             then boxColor(r_screen,menu_list_x-menu_list_w+1,y+1,menu_list_x-1,y+ui_menu_list_item_H,c_gray);
+             then c:=c_gray;
+         if(c<>0)
+         then boxColor(r_screen,menu_list_x-menu_list_w+1,y+1,menu_list_x-1,y+ui_menu_list_item_H,c);
 
          draw_text(r_screen,menu_list_x-ui_menu_list_item_S,y+ui_menu_list_item_S,menu_list[i],ta_right,255,c_white);
          hlineColor(r_screen,menu_list_x-menu_list_w+1,menu_list_x-1,y+ui_menu_list_item_H,c_white);

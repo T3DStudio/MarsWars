@@ -156,7 +156,7 @@ pf_solid               : word = 65535;
 
 str_ver                = 'v53';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
-str_cprt               : shortstring = '[ T3DStudio (c) 2016-2023 ]';
+str_cprt               : shortstring = '[ T3DStudio (c) 2016-2024 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
@@ -265,6 +265,13 @@ nmid_swapp             = 14;
 nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
+nmid_lobbby_mapsize    = 18;
+nmid_lobbby_type       = 19;
+nmid_lobbby_symmetry   = 20;
+nmid_lobbby_playerslot = 21;
+nmid_lobbby_playerteam = 22;
+nmid_lobbby_playerrace = 23;
+nmid_lobbby_gamemode   = 24;
 nmid_getinfo           = 66;
 nmid_localadv          = 67;
 
@@ -1372,7 +1379,7 @@ mi_tab_game            = 142;
 mi_tab_multiplayer     = 143;
 
 ////  GAME
-mi_game_Caption        = 150;
+mi_game_GameCaption    = 150;
 mi_game_mode           = 151;
 mi_game_builders       = 152;
 mi_game_generators     = 153;
@@ -1381,15 +1388,22 @@ mi_game_DeadPbserver   = 155;
 mi_game_EmptySlots     = 156;
 mi_game_RandomSkrimish = 157;
 
-mi_game_Record         = 159;
+mi_game_RecordCaption  = 158;
+mi_game_RecordStatus   = 159;
 mi_game_RecordName     = 160;
 mi_game_RecordQuality  = 161;
 
 ////  MULTIPLAYER
-mi_mplayer_Server      = 170;
-mi_mplayer_ServerPort  = 171;
-mi_mplayer_ClientConnect= 172;
-mi_mplayer_ClientAddr  = 173;
+mi_mplay_ServerCaption = 170;
+mi_mplay_ServerPort    = 171;
+mi_mplay_ServerToggle  = 172;
+mi_mplay_ClientCaption = 173;
+mi_mplay_ClientAddress = 174;
+mi_mplay_ClientConnect = 175;
+mi_mplay_Chat          = 176;
+mi_mplay_NetSearch     = 177;
+mi_mplay_NetSearchList = 178;
+mi_mplay_NetSearchCon  = 179;
 
 /////////////////////////////    MAIN MENU ZONES
 
@@ -1449,6 +1463,16 @@ ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*9;
 ui_menu_pls_border     = ui_menu_pls_lh div 3;
 ui_menu_pls_color_x0   = ui_menu_pls_cx_color+ui_menu_pls_border;
 ui_menu_pls_color_x1   = ui_menu_pls_pbx1    -ui_menu_pls_border+1;
+
+ui_menu_nsrch_lh       = txt_line_h3;
+ui_menu_nsrch_lh2      = txt_line_h3*2;
+ui_menu_nsrch_lh3      = txt_line_h3*3;
+ui_menu_nsrch_zx0      = ui_menu_pls_pbx0;
+ui_menu_nsrch_zy0      = ui_menu_pls_pby0;
+ui_menu_nsrch_zx1      = ui_menu_pls_pbx1;
+ui_menu_nsrch_zy1      = ui_menu_pls_pby0+ui_menu_nsrch_lh3*3;
+
+
 
 //// campaings game multiplayer  tabs
 ui_menu_cgm_zx0        = 418;

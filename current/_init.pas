@@ -77,7 +77,7 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
-   Menu_ReInit;
+   menu_ReInit;
    InitRX2Y;
    lng_eng;
    SwitchLanguage;

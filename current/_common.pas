@@ -508,11 +508,11 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function PlayerObserver(player:PTPlayer):boolean;
+function PlayerIsObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_read){$ENDIF})
-                 or(team=0);
+   PlayerIsObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_read){$ENDIF})
+                   or(team=0);
 end;
 
 function PlayersReadyStatus:boolean;
@@ -579,7 +579,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure UpdatePlayersStatus;
+procedure UpdatePlayersStatusVars;
 var p:byte;
 begin
    g_player_astatus:=0;
@@ -592,7 +592,7 @@ begin
        if(state>ps_none)then
        begin
           SetBBit(@g_player_rstatus,p,revealed);
-          observer:=PlayerObserver(@g_players[p]);
+          observer:=PlayerIsObserver(@g_players[p]);
           if(army>0)then
           begin
              SetBBit(@g_player_astatus,p,true);
@@ -873,15 +873,15 @@ begin
    end;
 end;
 
-function _Hi2Si(h,mh:integer;s:single):shortint;
+function hits_li2si(h,mh:longint;s:single):shortint;
 begin
-   if(h>=mh                         )then _Hi2Si:=127  else
-   if(h =0                          )then _Hi2Si:=0    else
-   if(h =dead_hits                  )then _Hi2Si:=-127 else
-   if(h<=ndead_hits                 )then _Hi2Si:=-128 else
-   if(fdead_hits<h)and(h<0          )then _Hi2Si:=mm3(-125,h div _d2shi,-1  ) else
-   if( dead_hits<h)and(h<=fdead_hits)then _Hi2Si:=-126 else
-                                          _Hi2Si:=mm3(   1,trunc(h/s)  ,_mms);
+   if(h>=mh                         )then hits_li2si:=127  else
+   if(h =0                          )then hits_li2si:=0    else
+   if(h =dead_hits                  )then hits_li2si:=-127 else
+   if(h<=ndead_hits                 )then hits_li2si:=-128 else
+   if(fdead_hits<h)and(h<0          )then hits_li2si:=mm3(-125,h div _d2shi,-1  ) else
+   if( dead_hits<h)and(h<=fdead_hits)then hits_li2si:=-126 else
+                                          hits_li2si:=mm3(   1,trunc(h/s)  ,_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -1089,11 +1089,15 @@ begin
       end
       else pb^:=max;
 end;
-procedure ScrollInt(i:pinteger;s,min,max:integer);
+procedure ScrollInt(i:pinteger;s,min,max:integer;loop:boolean);
 begin
    i^+=s;
-   if(i^>max)then i^:=min;
-   if(i^<min)then i^:=max;
+   if(loop)then
+   begin
+      if(i^>max)then i^:=min;
+      if(i^<min)then i^:=max;
+   end
+   else i^:=mm3(min,i^,max);;
 end;
 
 procedure WriteLog(mess:shortstring);
@@ -1273,10 +1277,18 @@ gs_replaypause: begin
    end;
 end;
 
-procedure ToggleMenu;
+procedure menu_List_Clear;
+begin
+   menu_list_n:=0;
+   setlength(menu_list,menu_list_n);
+   menu_item  :=0;
+   menu_update:=true;
+end;
+procedure menu_Toggle;
 begin
    if(G_Started)then
    begin
+      if(MainMenu)then menu_List_Clear;
       MainMenu:=not MainMenu;
       menu_update:=MainMenu;
       menu_item:=0;
@@ -1284,7 +1296,8 @@ begin
        if(MainMenu)
        then g_Status:=PlayerClient
        else g_Status:=gs_running;
-   end;
+   end
+   else menu_List_Clear;
 end;
 
 procedure CamBounds;
@@ -1307,16 +1320,16 @@ begin
    CamBounds;
 end;
 
-function _Si2Hi(sh:shortint;mh:integer;s:single):integer;
+function hits_si2li(sh:shortint;mh:integer;s:single):longint;
 begin
    case sh of
-127     : _Si2Hi:=mh;
-1..126  : _Si2Hi:=mm3(1,trunc(sh*s),mh-1);
-0       : _Si2Hi:=0;
--125..-1: _Si2Hi:=mm3(dead_hits+1,sh*_d2shi,-1);
--126    : _Si2Hi:=fdead_hits;
--127    : _Si2Hi:=dead_hits;
--128    : _Si2Hi:=ndead_hits;
+127     : hits_si2li:=mh;
+1..126  : hits_si2li:=mm3(1,trunc(sh*s),mh-1);
+0       : hits_si2li:=0;
+-125..-1: hits_si2li:=mm3(dead_hits+1,sh*_d2shi,-1);
+-126    : hits_si2li:=fdead_hits;
+-127    : hits_si2li:=dead_hits;
+-128    : hits_si2li:=ndead_hits;
    end;
 end;
 
@@ -1340,6 +1353,23 @@ begin
          if(log_pi=log_i)then exit;
       end;
    end;
+end;
+
+function TrimString(s:shortstring;l:byte):shortstring;
+var n:byte;
+begin
+   if(length(s)>l)then
+   begin
+      setlength(s,l);
+      n:=0;
+      while(l>0)and(n<3)do
+      begin
+         s[l]:='.';
+         l-=1;
+         n+=1;
+      end;
+   end;
+   TrimString:=s;
 end;
 
 function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;

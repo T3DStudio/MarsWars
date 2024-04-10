@@ -460,8 +460,8 @@ begin
     end
     else
     begin
-       if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
-       if(vstp<=0)then vstp:=UnitStepTicks;
+       if(vstp>UnitMoveStepTicks)and(ServerSide)then vstp:=UnitMoveStepTicks;
+       if(vstp<=0)then vstp:=UnitMoveStepTicks;
        vx  +=(x-vx) div vstp;
        vy  +=(y-vy) div vstp;
        vstp-=1;
@@ -1583,7 +1583,7 @@ begin
               or(uid_e[_uid]>=a_units[_uid])
               then
               else
-                if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+                if(uprod_r[i]=1){$IFDEF _FULLGAME}or(test_fastprod){$ENDIF}then
                 begin
                    barrack_ProductionEnd(pu,uprod_u[i],upgr[upgr_mult_product]);
                    unit_ProdUnitStop_p(pu,255,i);
@@ -1608,7 +1608,7 @@ begin
               or(upgr[_uid]>=a_upgrs[_uid])
               then
               else
-                if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+                if(pprod_r[i]=1){$IFDEF _FULLGAME}or(test_fastprod){$ENDIF}then
                 begin
                    upgr[_uid]+=1;
                    unit_ProdUpgrStop_p(pu,255,i);

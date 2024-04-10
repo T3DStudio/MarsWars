@@ -43,7 +43,7 @@ begin
          BlockRead(f,vr,sizeof(menu_s2));
          if(vr=ms2_camp)then
          begin
-            BlockRead(f,vr,sizeof(_cmp_sel));
+            BlockRead(f,vr,sizeof(campain_mission_n));
             if(0<=vr)and(vr<=MaxMissions)then
             begin
                svld_str_info:='';//str_camp_t[vr];
@@ -56,19 +56,19 @@ begin
          end
          else
          begin
-            BlockRead(f,vr,sizeof(_cmp_sel    ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_skill   ));vr:=0;
+            BlockRead(f,vr,sizeof(campain_mission_n));vr:=0;
+            BlockRead(f,vr,sizeof(cmp_skill        ));vr:=0;
 
-            BlockRead(f,ms,sizeof(map_seed    ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
-            BlockRead(f,vr,sizeof(g_random_i  ));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw      ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_type    ));
+            BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
+            BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
+            BlockRead(f,mw,sizeof(map_mw           ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_type         ));
             if(vr>gms_m_types)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                               else       svld_str_info+=str_m_tpe+str_mapt[vr]+tc_default+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_symmetry));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
-            BlockRead(f,vr,sizeof(theme_i     ));
+            BlockRead(f,vr,sizeof(map_symmetry     ));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
+            BlockRead(f,vr,sizeof(theme_i          ));
             if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
-            BlockRead(f,vr,sizeof(g_mode   ));
+            BlockRead(f,vr,sizeof(g_mode           ));
             if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                                       else       svld_str_info+=str_gmode[vr  ]+tc_nl3+tc_default;
 
@@ -192,7 +192,7 @@ begin
    svld_file_size:=
    SizeOf(version          )+
    SizeOf(menu_s2          )+
-   SizeOf(_cmp_sel         )+
+   SizeOf(campain_mission_n)+
    SizeOf(cmp_skill        )+
    SizeOf(map_seed         )+
    SizeOf(g_random_i       )+
@@ -245,7 +245,7 @@ begin
 
    BlockWrite(f,version          ,SizeOf(version          ));
    BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
-   BlockWrite(f,_cmp_sel         ,SizeOf(_cmp_sel         ));
+   BlockWrite(f,campain_mission_n,SizeOf(campain_mission_n));
    BlockWrite(f,cmp_skill        ,SizeOf(cmp_skill        ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
    BlockWrite(f,g_random_i       ,SizeOf(g_random_i       ));
@@ -290,7 +290,7 @@ begin
    close(f);
 
    if(MainMenu)
-   then ToggleMenu;
+   then menu_Toggle;
 
    saveload_MakeFolderList;
 
@@ -319,7 +319,7 @@ begin
          GameDefaultAll;
 
          BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
-         BlockRead(f,_cmp_sel         ,SizeOf(_cmp_sel         ));
+         BlockRead(f,campain_mission_n,SizeOf(campain_mission_n));
          BlockRead(f,cmp_skill        ,SizeOf(cmp_skill        ));
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
          BlockRead(f,g_random_i       ,SizeOf(g_random_i       ));
@@ -380,7 +380,7 @@ begin
          G_Started:=true;
 
          if(MainMenu)
-         then ToggleMenu;
+         then menu_Toggle;
       end;
       close(f);
    end;

@@ -229,7 +229,7 @@ begin
          else unit_SetXY(pu,x+round(uds*(tu^.x-x)/t)+g_randomr(2),
                             y+round(uds*(tu^.y-y)/t)+g_randomr(2),mvxy_none);
 
-         vstp+=round(uds/speed*UnitStepTicks);
+         vstp+=round(uds/speed*UnitMoveStepTicks);
 
          if(a_reload<=0)then
            if(vx<>x)or(vy<>y)then
@@ -275,7 +275,7 @@ begin
          else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+g_randomr(2),
                             y+round(ud*(td^.y-y)/t)+g_randomr(2),mvxy_none);
 
-         vstp+=round(uds/speed*UnitStepTicks);
+         vstp+=round(uds/speed*UnitMoveStepTicks);
 
          if(a_reload<=0)then
            if(vx<>x)
@@ -1897,7 +1897,7 @@ begin
            hits+=_bstep*upgr[upgr_fast_build];
         end;
 
-        if(hits>=_mhits){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        if(hits>=_mhits){$IFDEF _FULLGAME}or(test_fastprod){$ENDIF}then
         begin
            hits:=_mhits;
            iscomplete :=true;

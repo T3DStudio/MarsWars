@@ -26,7 +26,7 @@ begin
       ingame_chat :=0;
       net_chat_str:='';
    end
-   else ToggleMenu;
+   else menu_Toggle;
 end;
 
 function MakeChatTargets(a,player:byte):byte;
@@ -46,7 +46,7 @@ end;
 procedure input_key_return;
 var HPlayerAllies: byte;
 begin
-   if(MainMenu=false)and(ingame_chat=0)and(net_status>ns_single)then
+   if(not MainMenu)and(ingame_chat=0)and(net_status>ns_single)then
    begin
       HPlayerAllies:=PlayerAllies(PlayerClient,false);
       if(HPlayerAllies>0)
@@ -64,7 +64,7 @@ begin
       net_chat_tar:=MakeChatTargets(ingame_chat,PlayerClient);
    end
    else
-    if(menu_item=100)or(ingame_chat>0)then
+    if(menu_item=100)or(ingame_chat>0)then //menu chat
     begin
        if(MainMenu)then
        begin
@@ -86,7 +86,7 @@ end;
 procedure GameTogglePause;
 begin
    if(net_status=ns_client)
-   then net_pause
+   then net_send_pause
    else
      if(net_status=ns_server) then
        if(G_Status=gs_running)then
@@ -100,7 +100,6 @@ begin
           GameLogChat(PlayerClient,255,str_PlayerResumed,false);
        end;
 end;
-
 
 procedure PlayerUnitOrderEffect(ox0,oy0,otarget,oy1,uo_order:integer;pl:byte;UnitSound:boolean);
 var
@@ -388,7 +387,7 @@ begin
      if(by=ui_menu_btnsy)then
      begin
         case bx of         // common buttons
-        0 : ToggleMenu;
+        0 : menu_Toggle;
         1 : ;
         2 : if(net_status>ns_single)then GameTogglePause;
         end;
@@ -530,7 +529,7 @@ begin
 sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                  else uncappedFPS:=not uncappedFPS;
-sdlk_home      : _warpten:=not _warpten;
+sdlk_home      : test_fastprod:=not test_fastprod;
 sdlk_pageup    : with g_players[PlayerClient] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
 sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : rpls_fog:=not rpls_fog;
@@ -718,28 +717,23 @@ begin
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
-                                                   if(MainMenu=false)and(G_Started)and(rpls_plcam=false)then m_vmove:=true;
+                                                   if(not MainMenu)and(G_Started)and(not rpls_plcam)then m_vmove:=true;
                                                    if(ks_mmiddle=0)then ks_mmiddle:=1;
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(MainMenu)then
                                                    begin
-                                                      menu_update:=true;
-                                                      case menu_item of
-                                                      98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
-                                                      36 : ScrollInt(@svld_list_scroll   , 1,0,svld_list_size-vid_svld_m-1 );
-                                                      41 : ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size-vid_rpls_m-1 );
-                                                      102: ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1 );
-                                                      end;
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then begin menu_update:=true;ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_replays_list       ))then begin menu_update:=true;ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then begin menu_update:=true;ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);end;
+                                                      //98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(MainMenu)then
                                                    begin
                                                       menu_update:=true;
-                                                      case menu_item of
-                                                      98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
-                                                      36 : ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size-vid_svld_m-1 );
-                                                      41 : ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size-vid_rpls_m-1 );
-                                                      102: ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1 );
-                                                      end;
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then begin menu_update:=true;ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_replays_list       ))then begin menu_update:=true;ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then begin menu_update:=true;ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);end;
+                                                      //98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
                                                    end;
                            else
                            end;
@@ -780,7 +774,7 @@ begin
                                 sdlk_escape : input_key_escape;
                                 sdlk_return : input_key_return;
                               else
-                                if(MainMenu=false)and(G_Started)and(ingame_chat=0)then InGameHotkeys(sys_EVENT^.key.keysym.sym);
+                                if(not MainMenu)and(G_Started)and(ingame_chat=0)then InGameHotkeys(sys_EVENT^.key.keysym.sym);
                               end;
                            end;
      else
@@ -964,7 +958,7 @@ begin
    begin
       menu_keyborad;
       menu_mouse;
-      if(menu_update)then Menu_ReInit;
+      if(menu_update)then menu_ReInit;
    end
    else
    begin

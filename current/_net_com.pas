@@ -265,7 +265,7 @@ begin
    end;
 end;
 
-procedure net_pause;
+procedure net_send_pause;
 begin
    if(net_status=ns_client)then
    begin
@@ -273,6 +273,66 @@ begin
       net_writebyte(nmid_pause);
       net_send(net_cl_svip,net_cl_svport);
    end;
+end;
+
+procedure net_send_mapSize(newSize:word);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_mapsize);
+   net_writeword(newSize);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_mapType(newType:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_type);
+   net_writebyte(newType);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_mapSymmetry(newSymmetry:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_symmetry);
+   net_writebyte(newSymmetry);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_PlayerSlot(PlayerTarget,newPlayerSlot:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_playerslot);
+   net_writebyte(PlayerTarget);
+   net_writebyte(newPlayerSlot);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_PlayerTeam(PlayerTarget,newPlayerTeam:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_playerteam);
+   net_writebyte(PlayerTarget);
+   net_writebyte(newPlayerTeam);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_PlayerRace(PlayerTarget,newPlayerRace:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_playerrace);
+   net_writebyte(PlayerTarget);
+   net_writebyte(newPlayerRace);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_SwapSlot(TargetSlot:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_swapp);
+   net_writebyte(TargetSlot);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+procedure net_send_GameMode(newGameMode:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(nmid_lobbby_gamemode);
+   net_writebyte(newGameMode);
+   net_send(net_cl_svip,net_cl_svport);
 end;
 
 procedure net_disconnect;
@@ -285,27 +345,13 @@ begin
    end;
 end;
 
-procedure net_swapp(p1:byte);
-begin
-   if(net_status=ns_client)then
-   begin
-      net_clearbuffer;
-      net_writebyte(nmid_swapp);
-      net_writebyte(p1);
-      net_send(net_cl_svip,net_cl_svport);
-   end;
-end;
-
 procedure net_SendMapMark(x,y:integer);
 begin
-   if(net_status=ns_client)then
-   begin
-      net_clearbuffer;
-      net_writebyte(nmid_map_mark);
-      net_writeint(x);
-      net_writeint(y);
-      net_send(net_cl_svip,net_cl_svport);
-   end;
+   net_clearbuffer;
+   net_writebyte(nmid_map_mark);
+   net_writeint(x);
+   net_writeint(y);
+   net_send(net_cl_svip,net_cl_svport);
 end;
 
 {$ENDIF}

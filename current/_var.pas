@@ -36,7 +36,7 @@ g_cpoints         : array[1..MaxCPoints] of TCTPoint;
 
 ServerSide        : boolean = true; // only server side code
 
-UnitStepTicks     : byte = 8;
+UnitMoveStepTicks : byte = 8;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 PlayerClient      : byte = 1; // 'this' player
@@ -151,7 +151,7 @@ _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 //tmpmid            : byte = MID_Imp;
 
-_warpten          : boolean = false;
+test_fastprod          : boolean = false;
 TestMode          : byte = 0;
 uncappedFPS       : boolean = false;
 
@@ -343,8 +343,8 @@ rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
 
-_cmp_sm           : integer = 0;
-_cmp_sel          : integer = 0;
+//_cmp_sm           : integer = 0;
+campain_mission_n : integer = 0;
 
 
 mouse_select_x0,
@@ -856,6 +856,7 @@ str_cmpdif,
 str_repend,
 str_reperror,
 str_replay,
+str_replay_status,
 str_replay_name,
 str_play,
 str_inv_ml,

@@ -766,8 +766,9 @@ begin
    str_inv_ml            := 'Monsters limit: ';
    str_play              := 'Play';
    str_replay            := 'RECORD';
-   str_replay_name       := 'Replay name:';
-   str_cmpdif            := 'Difficulty: ';
+   str_replay_status     := 'STATUS';
+   str_replay_name       := 'Replay name';
+   str_cmpdif            := 'Difficulty ';
    str_waitsv            := 'Awaiting server...';
    str_goptions          := 'GAME OPTIONS';
    str_server            := 'SERVER';
@@ -778,7 +779,7 @@ begin
    str_randoms           := 'Random skirmish';
    str_apply             := 'apply';
    str_plout             := ' left the game';
-   str_aislots           := 'Fill empty slots:';
+   str_aislots           := 'Fill empty slots';
    str_resol_width       := 'Resolution (width)';
    str_resol_height      := 'Resolution (height)';
    str_language          := 'UI language';
@@ -792,7 +793,7 @@ begin
    str_kothtime          := 'Center capture time left: ';
    str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
-   str_DeadObservers     := 'Observer mode after lose:';
+   str_DeadObservers     := 'Observer mode after lose';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
    str_ability           := 'Special ability: ';
@@ -916,9 +917,9 @@ begin
    str_pcolors[4]        := tc_purple+'teams'  +tc_default;
    str_pcolors[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
-   str_starta            := 'Builders at the game start:';
+   str_starta            := 'Builders at the game start';
 
-   str_fstarts           := 'Fixed player starts:';
+   str_fstarts           := 'Fixed player starts';
 
    str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
    str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
@@ -959,7 +960,7 @@ begin
    str_gmode[gm_KotH    ]:= tc_purple+'King of the Hill'+tc_default;
    str_gmode[gm_royale  ]:= tc_red   +'Battle Royal'    +tc_default;
 
-   str_generators        := 'Generators:';
+   str_generators        := 'Generators';
    str_generatorsO[0]    := 'own';
    str_generatorsO[1]    := 'own,no new builders';
    str_generatorsO[2]    := 'neutral(5 min)';
@@ -968,16 +969,20 @@ begin
    str_generatorsO[5]    := 'neutral(20 min)';
    str_generatorsO[6]    := 'neutral(infinity)';
 
+   str_rstatus[rpls_state_none ]:=           'OFF';
+   str_rstatus[rpls_state_write]:= tc_yellow+'RECORD';
+   str_rstatus[rpls_state_read ]:= tc_lime  +'PLAY';
+
    str_team              := 'Team:';
    str_srace             := 'Race:';
    str_ready             := 'Ready: ';
-   str_udpport           := 'UDP port:';
+   str_udpport           := 'UDP port';
    str_svup[false]       := 'Start server';
    str_svup[true ]       := 'Stop server';
    str_connect[false]    := 'Connect';
    str_connect[true ]    := 'Disconnect';
-   str_pnu               := 'File size/quality: ';
-   str_npnu              := 'Units update rate: ';
+   str_pnu               := 'File size/quality ';
+   str_npnu              := 'Units update rate ';
    str_connecting        := 'Connecting...';
    str_netsearching      := 'Searching for servers...';
    str_netsearch         := 'Search for LAN servers';
@@ -1368,7 +1373,8 @@ begin
   str_inv_ml            := 'Армия монстров: ';
   str_play              := 'Проиграть';
   str_replay            := 'ЗАПИСЬ';
-  str_replay_name       := 'Название записи:';
+  str_replay_status     := 'СТАТУС';
+  str_replay_name       := 'Название записи';
   str_cmpdif            := 'Сложность: ';
   str_waitsv            := 'Ожидание сервера...';
   str_goptions          := 'ПАРАМЕТРЫ ИГРЫ';
@@ -1380,7 +1386,7 @@ begin
   str_randoms           := 'Случайная схватка';
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
-  str_aislots           := 'Заполнить пустые слоты:';
+  str_aislots           := 'Заполнить пустые слоты';
   str_resol_width       := 'Разрешение (ширина)';
   str_resol_height      := 'Разрешение (высота)';
   str_language          := 'Язык интерфейса';
@@ -1394,7 +1400,7 @@ begin
   str_kothtime          := 'Время до захвата центра: ';
   str_kothtime_act      := 'Время до активации центральной зоны: ';
   str_kothwinner        := ' - Царь Горы!';
-  str_DeadObservers     := 'Наблюдатель после поражения:';
+  str_DeadObservers     := 'Наблюдатель после поражения';
   str_FPS               := 'Показать FPS';
   str_APM               := 'Показать APM';
   str_ability           := 'Специальная способность: ';
@@ -1483,11 +1489,11 @@ begin
   str_pcolors[3]        := tc_purple+'команды'+tc_default;
   str_pcolors[4]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
 
-  str_starta            := 'Количество строителей на старте:';
+  str_starta            := 'Количество строителей на старте';
 
-  str_fstarts           := 'Фиксированные старты:';
+  str_fstarts           := 'Фиксированные старты';
 
-  str_gmodet            := 'Режим игры:';
+  str_gmodet            := 'Режим игры';
   str_gmode[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
   str_gmode[gm_3x3     ]:= tc_orange+'3x3'               +tc_default;
   str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
@@ -1496,14 +1502,18 @@ begin
   str_gmode[gm_KotH    ]:= tc_purple+'Царь горы'         +tc_default;
   str_gmode[gm_royale  ]:= tc_red   +'Королевская битва' +tc_default;
 
-  str_generators        := 'Генераторы:';
+  str_generators        := 'Генераторы';
   str_generatorsO[0]    := 'свои';
-  str_generatorsO[1]    := 'свои,без новых строителей';
-  str_generatorsO[2]    := 'нейтральные(5 мин.)';
-  str_generatorsO[3]    := 'нейтральные(10 мин.)';
-  str_generatorsO[4]    := 'нейтральные(15 мин.)';
-  str_generatorsO[5]    := 'нейтральные(20 мин.)';
-  str_generatorsO[6]    := 'нейтральные(бесконечные)';
+  str_generatorsO[1]    := 'свои,без новых строит.';
+  str_generatorsO[2]    := 'нейтральн.(5 мин.)';
+  str_generatorsO[3]    := 'нейтральн.(10 мин.)';
+  str_generatorsO[4]    := 'нейтральн.(15 мин.)';
+  str_generatorsO[5]    := 'нейтральн.(20 мин.)';
+  str_generatorsO[6]    := 'нейтральн.(бескон.)';
+
+  str_rstatus[rpls_state_none ]:=           'ВЫКЛ.';
+  str_rstatus[rpls_state_write]:= tc_yellow+'ЗАПИСЬ';
+  str_rstatus[rpls_state_read ]:= tc_lime  +'ВОСПРОИЗВЕДЕНИЕ';
 
   str_team              := 'Клан:';
   str_srace             := 'Раса:';
