@@ -117,8 +117,8 @@ begin
       if(vid_uhbars  >2              )then vid_uhbars  :=0;
       if(vid_plcolors>vid_maxplcolors)then vid_plcolors:=0;
    end;
-   m_vrx:=vid_vw;
-   m_vry:=vid_vh;
+   menu_res_w:=vid_vw;
+   menu_res_h:=vid_vh;
    net_cl_saddr;
    net_sv_sport;
 end;

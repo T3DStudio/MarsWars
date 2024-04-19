@@ -101,7 +101,7 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
-    if(rpls_fog=false)
+    if(sys_fog=false)
     then unit_FogReveal:=true
     else
       case UnitVisionRange(pu) of

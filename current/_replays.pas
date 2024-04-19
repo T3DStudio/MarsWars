@@ -435,12 +435,12 @@ begin
          rpls_plcam  :=false;
 
          map_premap;
-         MoveCamToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
+         GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
 
-         CamBounds;
+         GameCameraBounds;
          ui_tab    :=3;
          G_Started :=true;
-         MainMenu     :=false;
+         menu_state     :=false;
          ServerSide:=false;
       end;
    end;
@@ -453,14 +453,14 @@ begin
    begin
       replay_Abort;
       G_Status   :=gs_replayerror;
-      uncappedFPS:=false;
+      sys_uncappedFPS:=false;
       exit;
    end;
 
    if(eof(rpls_file))then
    begin
       G_Status   :=gs_replayend;
-      uncappedFPS:=false;
+      sys_uncappedFPS:=false;
       rpls_ForwardStep  :=0;
       exit;
    end;
@@ -496,7 +496,7 @@ begin
    begin
       vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)) div 2;
       vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)) div 2;
-      CamBounds;
+      GameCameraBounds;
    end;
 
    if(gs=gs_replaypause)then G_Status:=gs;

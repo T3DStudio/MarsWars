@@ -161,6 +161,12 @@ TMenuItem = record
    enabled: boolean;
 end;
 
+TMenuListItem = record
+   mli_value  : integer;
+   mli_caption: shortstring;
+   mli_enabled: boolean;
+end;
+
 {$ENDIF}
 
 TDamageMod = array[0..MaxDamageModFactors] of record

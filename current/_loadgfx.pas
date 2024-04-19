@@ -554,8 +554,8 @@ begin
 
    r_menu:=_createSurf(max2(vid_minw,spr_mback^.w), max2(vid_minh,spr_mback^.h));
 
-   mv_x:=(vid_vw-r_menu^.w) div 2;
-   mv_y:=(vid_vh-r_menu^.h) div 2;
+   menu_x:=(vid_vw-r_menu^.w) div 2;
+   menu_y:=(vid_vh-r_menu^.h) div 2;
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
    spr_b_paction  := LoadBtn('b_paction',vid_bw);
@@ -820,15 +820,15 @@ begin
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
-      mv_x      :=(vid_vw-spr_mback^.w) div 2;
-      mv_y      :=(vid_vh-spr_mback^.h) div 2;
+      menu_x      :=(vid_vw-spr_mback^.w) div 2;
+      menu_y      :=(vid_vh-spr_mback^.h) div 2;
    end;
    vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
    vid_fog_vfh  :=(vid_cam_h div fog_cw)+2;
 
    map_mmvw     := round(vid_cam_w*map_mmcx);
    map_mmvh     := round(vid_cam_h*map_mmcx);
-   CamBounds;
+   GameCameraBounds;
 
    Map_tdmake;
 end;

@@ -67,7 +67,7 @@ begin
    fr_LastTicks   :=fr_CurrentTicks;
 
    {$IFDEF _FULLGAME}
-   if(uncappedFPS)and(not MainMenu)
+   if(sys_uncappedFPS)and(not menu_state)
    then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
    else
    {$ENDIF}
@@ -1051,14 +1051,14 @@ begin
 end;
 
 
-function UIUnitDrawRange(pu:PTUnit):boolean;
+function UIUnitDrawRangeConditionals(pu:PTUnit):boolean;
 begin
    with pu^  do
     with uid^ do
-     UIUnitDrawRange:=(_attack>0)
-                    or(isbuildarea)
-                    or(_ability=uab_UACScan)
-                    or(_ability=uab_HellVision);
+     UIUnitDrawRangeConditionals:=(_attack>0)
+                                or(isbuildarea)
+                                or(_ability=uab_UACScan)
+                                or(_ability=uab_HellVision);
 end;
 
 procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
@@ -1070,8 +1070,12 @@ begin
      else pb^-=1
    until pb^ in pset^
 end;
-procedure ScrollByte(pb:pbyte;fwrd:boolean;min,max:byte);
+function ScrollByte(pb:pbyte;fwrd:boolean;min,max:byte):boolean;
+var oldb:byte;
 begin
+   ScrollByte:=false;
+   if(max<min)then exit;
+   oldb:=pb^;
    if(fwrd)then
    begin
       if(pb^<255)then
@@ -1088,9 +1092,14 @@ begin
          if(pb^<min)then pb^:=max;
       end
       else pb^:=max;
+   ScrollByte:=oldb<>pb^;
 end;
-procedure ScrollInt(i:pinteger;s,min,max:integer;loop:boolean);
+function ScrollInt(i:pinteger;s,min,max:integer;loop:boolean):boolean;
+var oldi:integer;
 begin
+   ScrollInt:=false;
+   if(max<min)then exit;
+   oldi:=i^;
    i^+=s;
    if(loop)then
    begin
@@ -1098,6 +1107,7 @@ begin
       if(i^<min)then i^:=max;
    end
    else i^:=mm3(min,i^,max);;
+   ScrollInt:=oldi<>i^;
 end;
 
 procedure WriteLog(mess:shortstring);
@@ -1139,7 +1149,7 @@ function CheckUnitUIVision(tu:PTUnit):boolean;
 begin
    CheckUnitUIVision:=true;
 
-   if(not rpls_fog)then exit;
+   if(not sys_fog)then exit;
 
    if(UIPlayer=0)then
      if(rpls_state>=rpls_state_read)or(g_players[PlayerClient].observer)then exit;
@@ -1164,7 +1174,7 @@ begin
              exit;
           end;
 
-        CheckUnitUIVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not rpls_fog);
+        CheckUnitUIVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not sys_fog);
      end;
 end;
 
@@ -1175,7 +1185,7 @@ begin
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
-      if(not rpls_fog)
+      if(not sys_fog)
       then MapPointInScreenP:=true
       else MapPointInScreenP:=fog_check(x,y);
 end;
@@ -1279,28 +1289,28 @@ end;
 
 procedure menu_List_Clear;
 begin
-   menu_list_n:=0;
-   setlength(menu_list,menu_list_n);
    menu_item  :=0;
+   menu_list_n:=0;
+   setlength(menu_list_items,menu_list_n);
    menu_update:=true;
 end;
 procedure menu_Toggle;
 begin
    if(G_Started)then
    begin
-      if(MainMenu)then menu_List_Clear;
-      MainMenu:=not MainMenu;
-      menu_update:=MainMenu;
+      if(menu_state)then menu_List_Clear;
+      menu_state:=not menu_state;
+      menu_update:=menu_state;
       menu_item:=0;
       if(net_status=ns_single)and(g_Status<=MaxPlayers)then
-       if(MainMenu)
+       if(menu_state)
        then g_Status:=PlayerClient
        else g_Status:=gs_running;
    end
    else menu_List_Clear;
 end;
 
-procedure CamBounds;
+procedure GameCameraBounds;
 begin
    vid_cam_x:=mm3(0,vid_cam_x,map_mw-vid_cam_w);
    vid_cam_y:=mm3(0,vid_cam_y,map_mw-vid_cam_h);
@@ -1313,11 +1323,11 @@ begin
    vid_fog_ey :=vid_fog_sy+vid_fog_vfh;
 end;
 
-procedure MoveCamToPoint(mx,my:integer);
+procedure GameCameraMoveToPoint(mx,my:integer);
 begin
    vid_cam_x:=mx-(vid_cam_w shr 1);
    vid_cam_y:=my-(vid_cam_h shr 1);
-   CamBounds;
+   GameCameraBounds;
 end;
 
 function hits_si2li(sh:shortint;mh:integer;s:single):longint;
@@ -1333,7 +1343,7 @@ begin
    end;
 end;
 
-procedure MoveCamToLastEvent;
+procedure GameCameraMoveToLastEvent;
 var log_pi:cardinal;
 begin
    with g_players[UIPlayer] do
@@ -1344,7 +1354,7 @@ begin
          with log_l[log_pi] do
           if(xi>0)or(yi>0)then
           begin
-             MoveCamToPoint(xi,yi);
+             GameCameraMoveToPoint(xi,yi);
              break;
           end;
          if(log_pi>0)
@@ -1528,7 +1538,7 @@ begin
    while(ui_log_n<listheight)do _add('',0,0);
 end;
 
-procedure _LoadingScreen(load_str:pshortstring;color:cardinal);
+procedure DrawLoadingScreen(load_str:pshortstring;color:cardinal);
 begin
    SDL_FillRect(r_screen,nil,0);
    stringColor(r_screen,(vid_vw div 2)-(length(load_str^)*font_w div 2), vid_vh div 2,@(load_str^[1]),color);
@@ -1543,7 +1553,7 @@ begin
    c:=0;
    r:=0;
    for i:=1 to MaxPlayers do
-    with _Players[i] do
+    with g_players[i] do
      if (state=PS_Play) then
      begin
         c+=1;

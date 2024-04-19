@@ -66,13 +66,31 @@ function PlayerSlotChangeState(PlayerRequestor,PlayerTarget,NewState:byte;Check:
 begin
    PlayerSlotChangeState:=false;
 
+   if(NewState=255)and(Check)then
+   begin
+      for NewState:=0 to ps_states_n-1 do
+        if(PlayerSlotChangeState(PlayerRequestor,PlayerTarget,NewState,Check))then
+        begin
+           PlayerSlotChangeState:=true;
+           break;
+        end;
+      exit;
+   end;
+
    if(PlayerRequestor=PlayerTarget)
    or(PlayerRequestor>MaxPlayers)
    or(PlayerTarget   >MaxPlayers)
+   or(PlayerTarget   =0)
    or(NewState>=ps_states_n)
    or(G_Started)then exit;
 
-   if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<>255)then exit;
+   if(NewState=ps_replace)then
+   begin
+      with g_players[PlayerTarget] do
+        if(state=ps_play)then exit;
+   end
+   else
+     if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<>0)then exit;
 
    PlayerSlotChangeState:=true;
 
@@ -106,9 +124,21 @@ function PlayerSlotChangeRace(PlayerRequestor,PlayerTarget,NewRace:byte;Check:bo
 begin
    PlayerSlotChangeRace:=false;
 
+   if(NewRace=255)and(Check)then
+   begin
+      for NewRace:=0 to r_cnt do
+        if(PlayerSlotChangeRace(PlayerRequestor,PlayerTarget,NewRace,Check))then
+        begin
+           PlayerSlotChangeRace:=true;
+           break;
+        end;
+      exit;
+   end;
+
    if(NewRace>r_cnt)
    or(PlayerRequestor>MaxPlayers)
    or(PlayerTarget   >MaxPlayers)
+   or(PlayerTarget   =0)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -118,7 +148,7 @@ begin
       or(slot_state=ps_observer)then exit;
 
       if((PlayerRequestor= PlayerTarget)and(state=ps_play))
-      or((PlayerRequestor<>PlayerTarget)and(state=ps_comp)and((PlayerRequestor=PlayerLobby)or(PlayerLobby=255)))
+      or((PlayerRequestor<>PlayerTarget)and(state=ps_comp)and((PlayerRequestor=PlayerLobby)or(PlayerLobby=0)))
       then
       else exit;
 
@@ -133,9 +163,21 @@ function PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam:byte;Check:bo
 begin
    PlayerSlotChangeTeam:=false;
 
+   if(NewTeam=255)and(Check)then
+   begin
+      for NewTeam:=0 to MaxPlayers do
+        if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then
+        begin
+           PlayerSlotChangeTeam:=true;
+           break;
+        end;
+      exit;
+   end;
+
    if(NewTeam        >MaxPlayers)
    or(PlayerRequestor>MaxPlayers)
    or(PlayerTarget   >MaxPlayers)
+   or(PlayerTarget   =0)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -143,7 +185,8 @@ begin
       if( slot_state=ps_observer)
       or( slot_state=ps_closed  )
       or((slot_state=ps_opened  )and(state=ps_none))
-      or((state=ps_comp)and(NewTeam=0))then exit;
+      or((slot_state=ps_opened  )and(state=ps_comp)and(NewTeam=0))
+      or((slot_state=ps_opened  )and(state>ps_none)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
 
       PlayerSlotChangeTeam:=true;
 
@@ -179,7 +222,7 @@ begin
        PlayerSetSkirmishTech(p);
        PlayerClearLog(p);
        log_EnergyCheck:=0;
-   end;
+    end;
 
    with g_players[0] do
    begin
@@ -258,14 +301,14 @@ begin
    Map_premap;
 
    {$IFDEF _FULLGAME}
-   uncappedFPS:=false;
+   sys_uncappedFPS:=false;
    test_fastprod:=false;
 
    menu_update:= true;
 
    vid_cam_x:=-vid_panelw;
    vid_cam_y:=0;
-   CamBounds;
+   GameCameraBounds;
 
    vid_blink_timer1:=0;
    vid_blink_timer2:=0;
@@ -290,7 +333,7 @@ begin
    mouse_select_x0:=-1;
    m_brush:=mb_empty;
 
-   rpls_fog   :=true;
+   sys_fog   :=true;
 
    svld_str_fname:='';
 
@@ -353,7 +396,7 @@ begin
    g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
 
    if(not g_fixed_positions)then
-     if not(g_mode in gm_fixed_positions)then map_ShufflePlayerStarts;
+     if not(g_mode in gm_ModesFixedPositions)then map_ShufflePlayerStarts;
 
    for p:=0 to MaxPlayers do
    with g_players[p] do
@@ -411,7 +454,7 @@ ps_AI_11    : begin
      end;
 
    {$IFDEF _FULLGAME}
-   MoveCamToPoint(map_psx[PlayerClient] , map_psy[PlayerClient]);
+   GameCameraMoveToPoint(map_psx[PlayerClient] , map_psy[PlayerClient]);
    if(g_players[PlayerClient].team=0)then ui_tab:=3;
    {$ENDIF}
 end;
@@ -430,7 +473,7 @@ begin
     if(PlayersReadyStatus)then
     begin
        G_Started:=true;
-       MainMenu :=false;
+       menu_state :=false;
        if(menu_s2<>ms2_camp)
        then GameStartSkirmish
        else ;//_CMPMap;

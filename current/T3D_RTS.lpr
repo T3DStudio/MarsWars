@@ -79,7 +79,7 @@ begin
 end; }
 
 begin
-   writeln(sizeof(string6));
+   //writeln(sizeof(string6));
 
    InitGame;
    {$IFDEF DTEST}
@@ -95,8 +95,8 @@ begin
       CodeGame;
       if(r_draw)then DrawGame;
       {$ELSE}
-      while(SDL_PollEvent(_EVENT)>0)do
-        case(_EVENT^.type_)of
+      while(SDL_PollEvent(sys_EVENT)>0)do
+        case(sys_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
       CodeGame;

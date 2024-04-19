@@ -17,7 +17,7 @@ begin
 
    _GfxColors;
    vid_MakeScreen;
-   _LoadingScreen(@str_loading_gfx,c_yellow);
+   DrawLoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
 
    InitVideo:=true;
@@ -32,9 +32,9 @@ begin
    begin
       s:=ParamStr(i);
 
-      if(s='test' )then TestMode:=1;
+      if(s='test' )then test_mode:=1;
       {$IFDEF DTEST}
-      if(s='testD')then TestMode:=2;
+      if(s='testD')then test_mode:=2;
       {$ENDIF}
    end;
 end;

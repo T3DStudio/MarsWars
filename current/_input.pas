@@ -46,7 +46,7 @@ end;
 procedure input_key_return;
 var HPlayerAllies: byte;
 begin
-   if(not MainMenu)and(ingame_chat=0)and(net_status>ns_single)then
+   if(not menu_state)and(ingame_chat=0)and(net_status>ns_single)then
    begin
       HPlayerAllies:=PlayerAllies(PlayerClient,false);
       if(HPlayerAllies>0)
@@ -66,7 +66,7 @@ begin
    else
     if(menu_item=100)or(ingame_chat>0)then //menu chat
     begin
-       if(MainMenu)then
+       if(menu_state)then
        begin
           ingame_chat :=chat_all;
           net_chat_tar:=255;
@@ -452,7 +452,7 @@ begin
        else
          if(click_type=pct_left)then
            case u of
-           0 : uncappedFPS:=not uncappedFPS;
+           0 : sys_uncappedFPS:=not sys_uncappedFPS;
            3 : begin
                   if  (G_Status =gs_running    )
                   then G_Status:=gs_replaypause
@@ -461,7 +461,7 @@ begin
                end;
            4 : rpls_plcam  :=not rpls_plcam;
            5 : rpls_showlog:=not rpls_showlog;
-           6 : rpls_fog    :=not rpls_fog;
+           6 : sys_fog    :=not sys_fog;
        8..14 : UIPlayer    :=u-8;
            end;
        end;
@@ -471,7 +471,7 @@ begin
      begin
         if(click_type=pct_left)then
           case u of
-          0    :  rpls_fog:=not rpls_fog;
+          0    :  sys_fog:=not sys_fog;
           2..8 :  UIPlayer:=u-2;
           end;
      end
@@ -502,7 +502,7 @@ begin
                   end;
             10: if(ui_groups_x[MaxUnitGroups]>0)then
                   if(click_dbl)
-                  then MoveCamToPoint(ui_groups_x[MaxUnitGroups],ui_groups_y[MaxUnitGroups])
+                  then GameCameraMoveToPoint(ui_groups_x[MaxUnitGroups],ui_groups_y[MaxUnitGroups])
                   else PlayerSetOrder(0,0,0,0,0,po_select_special_set,PlayerClient);
             11: PlayerSetOrder(0,0,0,0,uo_destroy,po_unit_order_set,PlayerClient);  // destroy
             12: m_brush :=mb_mark;
@@ -528,15 +528,15 @@ begin
    case k of
 sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
-                 else uncappedFPS:=not uncappedFPS;
+                 else sys_uncappedFPS:=not sys_uncappedFPS;
 sdlk_home      : test_fastprod:=not test_fastprod;
 sdlk_pageup    : with g_players[PlayerClient] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
 sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
-sdlk_backspace : rpls_fog:=not rpls_fog;
+sdlk_backspace : sys_fog:=not sys_fog;
 SDLK_F3        : nullupgr(PlayerClient);
 {SDLK_F4        : with g_players[PlayerClient] do
                   if(IsUnitRange(ai_scout_u_cur,nil))then
-                   with g_units[ai_scout_u_cur] do MoveCamToPoint(x,y); }
+                   with g_units[ai_scout_u_cur] do GameCameraMoveToPoint(x,y); }
 SDLK_F4        : if(g_mode=gm_invasion)then
                    if(ks_ctrl>0)
                    then PlayerKill(0,true)
@@ -581,7 +581,7 @@ sdlk_tab: begin
           end;
 1       : ; // ?????
    else
-      if(TestMode>0)and(net_status=ns_single)then
+      if(test_mode>0)and(net_status=ns_single)then
         if(test_hotkeys(k))then exit;
 
       k2:=0;
@@ -591,7 +591,7 @@ sdlk_tab: begin
 
       if(k=sdlk_space)and(k2=0)then
       begin
-         MoveCamToLastEvent;
+         GameCameraMoveToLastEvent;
          exit;
       end;
 
@@ -650,7 +650,7 @@ sdlk_tab: begin
                                   then PlayerSetOrder(0,0,0,0,ko,po_unit_group_add,PlayerClient)
                                   else
                                     if(k_dbl)and(ui_groups_x[ko]>0)and(ko>0)
-                                    then MoveCamToPoint(ui_groups_x[ko],ui_groups_y[ko])
+                                    then GameCameraMoveToPoint(ui_groups_x[ko],ui_groups_y[ko])
                                     else
                                       if(ks_shift>0)
                                       then PlayerSetOrder(0,0,0,0,ko,po_select_group_add,PlayerClient)
@@ -695,11 +695,11 @@ begin
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
       SDL_MOUSEMOTION    : begin
-                              if(m_vmove)and(MainMenu=false)and(G_Started)then
+                              if(m_vmove)and(menu_state=false)and(G_Started)then
                               begin
                                  vid_cam_x-=sys_EVENT^.motion.x-mouse_x;
                                  vid_cam_y-=sys_EVENT^.motion.y-mouse_y;
-                                 CamBounds;
+                                 GameCameraBounds;
                               end;
                               mouse_x:=sys_EVENT^.motion.x;
                               mouse_y:=sys_EVENT^.motion.y;
@@ -717,22 +717,21 @@ begin
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
-                                                   if(not MainMenu)and(G_Started)and(not rpls_plcam)then m_vmove:=true;
+                                                   if(not menu_state)and(G_Started)and(not rpls_plcam)then m_vmove:=true;
                                                    if(ks_mmiddle=0)then ks_mmiddle:=1;
                                                    end;
-                            SDL_BUTTON_WHEELDOWN : if(MainMenu)then
+                            SDL_BUTTON_WHEELDOWN : if(menu_state)then
                                                    begin
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then begin menu_update:=true;ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);end;
-                                                      if(menu_UnderCursor(mi_replays_list       ))then begin menu_update:=true;ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);end;
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then begin menu_update:=true;ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_update:=menu_update or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_update:=menu_update or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_update:=menu_update or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);
                                                       //98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
                                                    end;
-                            SDL_BUTTON_WHEELUP   : if(MainMenu)then
+                            SDL_BUTTON_WHEELUP   : if(menu_state)then
                                                    begin
-                                                      menu_update:=true;
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then begin menu_update:=true;ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);end;
-                                                      if(menu_UnderCursor(mi_replays_list       ))then begin menu_update:=true;ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);end;
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then begin menu_update:=true;ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);end;
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_update:=menu_update or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_update:=menu_update or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_update:=menu_update or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);
                                                       //98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
                                                    end;
                            else
@@ -774,7 +773,7 @@ begin
                                 sdlk_escape : input_key_escape;
                                 sdlk_return : input_key_return;
                               else
-                                if(not MainMenu)and(G_Started)and(ingame_chat=0)then InGameHotkeys(sys_EVENT^.key.keysym.sym);
+                                if(not menu_state)and(G_Started)and(ingame_chat=0)then InGameHotkeys(sys_EVENT^.key.keysym.sym);
                               end;
                            end;
      else
@@ -892,8 +891,8 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
 
    if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
-      MoveCamToPoint(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
-      CamBounds;
+      GameCameraMoveToPoint(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+      GameCameraBounds;
    end;
 
  //  if(k_mr=2)then effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
@@ -941,7 +940,7 @@ begin
    if(ks_down >0)then vid_cam_y+=vid_CamSpeed;
    if(ks_right>0)then vid_cam_x+=vid_CamSpeed;
 
-   if(vx<>vid_cam_x)or(vy<>vid_cam_y)then CamBounds;
+   if(vx<>vid_cam_x)or(vy<>vid_cam_y)then GameCameraBounds;
 end;
 
 procedure g_keyboard;
@@ -954,7 +953,7 @@ procedure InputGame;
 begin
    WindowEvents;
 
-   if(MainMenu)then
+   if(menu_state)then
    begin
       menu_keyborad;
       menu_mouse;

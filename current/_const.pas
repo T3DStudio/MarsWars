@@ -78,7 +78,8 @@ gm_invasion            = 4;
 gm_KotH                = 5;
 gm_royale              = 6;
 
-gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2];
+gm_ModesFixedTeams     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
+gm_ModesFixedPositions : set of byte = [gm_3x3,gm_2x2x2];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gm_cnt                 = 6;
@@ -165,6 +166,8 @@ str_ps_none            : shortstring = '--';
 b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
+
+k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}',' ','_',',','.','(',')','-','+','`','&','@','#','%','?','$'];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -261,7 +264,6 @@ nmid_server_full       = 10;
 nmid_wrong_ver         = 11;
 nmid_game_started      = 12;
 nmid_notconnected      = 13;
-nmid_swapp             = 14;
 nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
@@ -1457,8 +1459,8 @@ ui_menu_pls_pbx1       = ui_menu_pls_zx1;
 ui_menu_pls_pby1       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)+(ui_menu_pls_pbh div 2);
 
 ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*NameLen+font_w*4;
-ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*10;
-ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*9;
+ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*9;
+ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*10;
 
 ui_menu_pls_border     = ui_menu_pls_lh div 3;
 ui_menu_pls_color_x0   = ui_menu_pls_cx_color+ui_menu_pls_border;
@@ -1651,7 +1653,6 @@ sep_wdash              = tc_white+'-';
 //
 
 k_chrtt                = fr_fps1 div 3;
-k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}',' ','_',',','.','(',')','-','+','`','&','@','#','%','?','$'];
 k_kbdig                : set of Char = ['0'..'9'];
 k_kbaddr               : set of Char = ['0'..'9','.',':'];
 

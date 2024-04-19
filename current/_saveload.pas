@@ -47,7 +47,7 @@ begin
             if(0<=vr)and(vr<=MaxMissions)then
             begin
                svld_str_info:='';//str_camp_t[vr];
-               BlockRead(f,vr,sizeof(cmp_skill));
+               BlockRead(f,vr,sizeof(campain_skill));
                if(0<=vr)and(vr<=CMPMaxSkills)
                then svld_str_info+=tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
                else svld_str_info:=str_svld_errors_wver;
@@ -57,7 +57,7 @@ begin
          else
          begin
             BlockRead(f,vr,sizeof(campain_mission_n));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_skill        ));vr:=0;
+            BlockRead(f,vr,sizeof(campain_skill        ));vr:=0;
 
             BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
@@ -193,7 +193,7 @@ begin
    SizeOf(version          )+
    SizeOf(menu_s2          )+
    SizeOf(campain_mission_n)+
-   SizeOf(cmp_skill        )+
+   SizeOf(campain_skill        )+
    SizeOf(map_seed         )+
    SizeOf(g_random_i       )+
    SizeOf(map_mw           )+
@@ -246,7 +246,7 @@ begin
    BlockWrite(f,version          ,SizeOf(version          ));
    BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
    BlockWrite(f,campain_mission_n,SizeOf(campain_mission_n));
-   BlockWrite(f,cmp_skill        ,SizeOf(cmp_skill        ));
+   BlockWrite(f,campain_skill        ,SizeOf(campain_skill        ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
    BlockWrite(f,g_random_i       ,SizeOf(g_random_i       ));
    BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
@@ -289,7 +289,7 @@ begin
 
    close(f);
 
-   if(MainMenu)
+   if(menu_state)
    then menu_Toggle;
 
    saveload_MakeFolderList;
@@ -320,7 +320,7 @@ begin
 
          BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
          BlockRead(f,campain_mission_n,SizeOf(campain_mission_n));
-         BlockRead(f,cmp_skill        ,SizeOf(cmp_skill        ));
+         BlockRead(f,campain_skill        ,SizeOf(campain_skill        ));
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
          BlockRead(f,g_random_i       ,SizeOf(g_random_i       ));
          BlockRead(f,map_mw           ,SizeOf(map_mw           ));
@@ -375,11 +375,11 @@ begin
          //map_RedrawMenuMinimap;
          map_DoodadsDrawData;
          pf_MakeZoneGrid;
-         CamBounds;
+         GameCameraBounds;
 
          G_Started:=true;
 
-         if(MainMenu)
+         if(menu_state)
          then menu_Toggle;
       end;
       close(f);

@@ -101,7 +101,7 @@ begin
 
    if(menu_s2=ms2_camp)then
    begin
-      //draw_surf(tar, 91 ,129,cmp_mmap  [campain_mission_n]);
+      //draw_surf(tar, 91 ,129,campain_mmap  [campain_mission_n]);
       //draw_text(tar, 252,132,str_camp_m[campain_mission_n], ta_left,255, c_white);
    end
    else
@@ -245,7 +245,7 @@ begin
                if(team=0)
                then draw_text(tar,ui_menu_pls_zxrt, u,str_observer   , ta_middle, 255, c)
                else draw_text(tar,ui_menu_pls_zxrt, u,str_race[slot_race], ta_middle, 255, c);
-               if(g_mode in gm_fixed_positions)then c:=c_gray;
+               if(g_mode in gm_FixedPositionsModes)then c:=c_gray;
                draw_text(tar,ui_menu_pls_zxtt, u,t2c(PlayerGetTeam(g_mode,p)), ta_middle, 255, c);
                if(not GetBBit(@g_player_astatus,p))and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_red);
             end
@@ -330,8 +330,8 @@ begin
                  end;
 
        ms3_vido: begin
-                    D_menu_ETextD(tar,mi_settings_ResWidth       ,str_resol_width    ,i2s(m_vrx)               ,true ,0);
-                    D_menu_ETextD(tar,mi_settings_ResHeight      ,str_resol_height   ,i2s(m_vry)               ,true ,0);
+                    D_menu_ETextD(tar,mi_settings_ResWidth       ,str_resol_width    ,i2s(menu_res_w)          ,true ,0);
+                    D_menu_ETextD(tar,mi_settings_ResHeight      ,str_resol_height   ,i2s(menu_res_h)          ,true ,0);
                     D_menu_EText (tar,mi_settings_ResApply       ,ta_middle,ta_middle,str_apply                ,false,0);
 
                     D_menu_ETextD(tar,mi_settings_Fullscreen     ,str_fullscreen     ,b2cc[not vid_fullscreen] ,false,0);
@@ -449,7 +449,7 @@ begin
 
    case menu_s2 of
    ms2_camp : begin
-                 {draw_text(tar,ui_menu_csm_xt0,_yt(1),str_cmpdif+str_cmpd[cmp_skill],ta_left,255,mic(not g_started,false));
+                 {draw_text(tar,ui_menu_csm_xt0,_yt(1),str_cmpdif+str_cmpd[campain_skill],ta_left,255,mic(not g_started,false));
                  y:=_yl(2);
                  hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,y,c_white);
                  for t:=1 to vid_camp_m do
@@ -493,7 +493,7 @@ begin
                  D_menu_ETextD(tar,mi_mplay_ServerPort    ,str_udpport        ,net_sv_pstr                   ,false,1);
 
                  D_menu_EText (tar,mi_mplay_ClientCaption ,ta_middle,ta_middle,str_client                    ,false,0);
-                 D_menu_EText (tar,mi_mplay_NetSearch,ta_middle,ta_middle,str_netsearch                 ,false,0);
+                 D_menu_ETextD(tar,mi_mplay_NetSearch     ,str_netsearch      ,b2cc[net_svsearch]            ,false,0);
                  D_menu_ETextD(tar,mi_mplay_ClientAddress ,net_cl_svstr       ,''                            ,false,1);
                  D_menu_ETextD(tar,mi_mplay_ClientConnect ,str_connect[net_status=ns_client],net_m_error     ,false,0);
 
@@ -578,7 +578,7 @@ begin
    draw_surf(tar,0,0,spr_mback);
    draw_text(tar,spr_mback^.w,spr_mback^.h-font_w,str_ver,ta_right,255,c_white);
 
-   if(TestMode>0)then draw_text(tar,spr_mback^.w div 2,spr_mback^.h-font_5w,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
+   if(test_mode>0)then draw_text(tar,spr_mback^.w div 2,spr_mback^.h-font_5w,'TEST MODE '+b2s(test_mode),ta_middle,255,c_white);
 
    draw_text(tar,spr_mback^.w div 2,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
@@ -594,9 +594,42 @@ begin
    D_M2      (tar);
 end;
 
-procedure D_Menu;
+procedure D_Menu_List;
 var i,y:integer;
-      c:cardinal;
+  color:cardinal;
+begin
+   menu_list_x+=menu_x;
+   menu_list_y+=menu_y;
+   y:=menu_list_y+(ui_menu_list_item_H*menu_list_n);
+   boxColor      (r_screen,menu_list_x-menu_list_w,menu_list_y,menu_list_x,y,c_black);
+   RectangleColor(r_screen,menu_list_x-menu_list_w,menu_list_y,menu_list_x,y,c_white);
+   for i:=0 to menu_list_n-1 do
+   with menu_list_items[i] do
+   begin
+      y:=menu_list_y+(ui_menu_list_item_H*i);
+      color:=0;
+      if(i=menu_list_selected)
+      then color:=c_dgray
+      else
+        if(i=menu_list_current)
+        then color:=c_gray;
+
+      if(color<>0)
+      then boxColor(r_screen,menu_list_x-menu_list_w+1,y+1,menu_list_x-1,y+ui_menu_list_item_H,color);
+
+      if(mli_enabled)
+      then color:=c_white
+      else color:=c_gray;
+
+      draw_text (r_screen,menu_list_x-ui_menu_list_item_S,y+ui_menu_list_item_S,mli_caption,ta_right,255,color);
+      hlineColor(r_screen,menu_list_x-menu_list_w+1,menu_list_x-1,y+ui_menu_list_item_H,c_white);
+   end;
+   menu_list_x-=menu_x;
+   menu_list_y-=menu_y;
+end;
+
+procedure D_Menu;
+var i:integer;
 begin
    if(menu_update)then
    begin
@@ -617,38 +650,12 @@ begin
       for i:=0 to 255 do
        with menu_items[i] do
         if(x0>0)then
-        begin
-           rectangleColor(r_menu,x0,y0,x1,y1,rgba2c(128+random(128),128+random(128),128+random(128),255));
-        end;
+         rectangleColor(r_menu,x0,y0,x1,y1,rgba2c(128+random(128),128+random(128),128+random(128),255));
    end;
 
-   draw_surf(r_screen,mv_x,mv_y,r_menu);
+   draw_surf(r_screen,menu_x,menu_y,r_menu);
 
-   if(menu_list_n>0)then
-   begin
-      menu_list_x+=mv_x;
-      menu_list_y+=mv_y;
-      y:=menu_list_y+(ui_menu_list_item_H*menu_list_n);
-      boxColor      (r_screen,menu_list_x-menu_list_w,menu_list_y,menu_list_x,y,c_black);
-      RectangleColor(r_screen,menu_list_x-menu_list_w,menu_list_y,menu_list_x,y,c_white);
-      for i:=0 to menu_list_n-1 do
-      begin
-         y:=menu_list_y+(ui_menu_list_item_H*i);
-         c:=0;
-         if(i=menu_list_s)
-         then c:=c_dgray
-         else
-             if(i=menu_list_c)
-             then c:=c_gray;
-         if(c<>0)
-         then boxColor(r_screen,menu_list_x-menu_list_w+1,y+1,menu_list_x-1,y+ui_menu_list_item_H,c);
-
-         draw_text(r_screen,menu_list_x-ui_menu_list_item_S,y+ui_menu_list_item_S,menu_list[i],ta_right,255,c_white);
-         hlineColor(r_screen,menu_list_x-menu_list_w+1,menu_list_x-1,y+ui_menu_list_item_H,c_white);
-      end;
-      menu_list_x-=mv_x;
-      menu_list_y-=mv_y;
-   end;
+   if(menu_list_n>0)then D_Menu_List;
 
    if(vid_FPS)then draw_text(r_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_right,255,c_white);
 

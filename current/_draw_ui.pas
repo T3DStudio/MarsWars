@@ -87,7 +87,7 @@ begin
    setlength(vid_fog_mmr,vid_fog_mmn);  }
 
    // debug
-   if(TestMode>1)then
+   if(test_mode>1)then
     with g_players[UIPlayer] do
      for i:=0 to MaxPlayers do
       with ai_alarms[i] do
@@ -137,7 +137,7 @@ begin
          end;
          unit_apllyUID(pdunit);
          unit_Bonuses (pdunit);
-         if(UIUnitDrawRange(pdunit))
+         if(UIUnitDrawRangeConditionals(pdunit))
          then circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink2_color_BG);
       end;
 
@@ -462,13 +462,13 @@ begin
       3: // actions
       if(rpls_state>=rpls_state_read)then
       begin
-         _drawBtn(tar,0,0,spr_b_rfast,uncappedFPS ,false);
+         _drawBtn(tar,0,0,spr_b_rfast,sys_uncappedFPS ,false);
          _drawBtn(tar,1,0,spr_b_rback,false       ,false);
          _drawBtn(tar,2,0,spr_b_rskip,false       ,false);
          _drawBtn(tar,0,1,spr_b_rstop,g_status>0  ,false);
          _drawBtn(tar,1,1,spr_b_rvis ,rpls_plcam  ,false);
          _drawBtn(tar,2,1,spr_b_rlog ,rpls_showlog,false);
-         _drawBtn(tar,0,2,spr_b_rfog ,rpls_fog    ,false);
+         _drawBtn(tar,0,2,spr_b_rfog ,sys_fog    ,false);
 
          ux:=2;
          uy:=2;
@@ -477,7 +477,7 @@ begin
       else
         if(g_players[PlayerClient].observer)then
         begin
-           _drawBtn(tar,0,0,spr_b_rfog ,rpls_fog    ,false);
+           _drawBtn(tar,0,0,spr_b_rfog ,sys_fog    ,false);
 
            ux:=2;
            uy:=0;
@@ -761,7 +761,7 @@ gm_koth    : with g_cpoints[1] do
                     else D_Timer(tar,ui_textx,ui_texty+font_3hw,cpCaptureTime-cpTimer,ta_left,str_kothtime,PlayerGetColor(cpTimerOwnerPlayer));
    end;
 
-   if(TestMode>0)then draw_text(tar,vid_mapx+vid_cam_hw,vid_mapy+vid_cam_hh,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
+   if(test_mode>0)then draw_text(tar,vid_mapx+vid_cam_hw,vid_mapy+vid_cam_hh,'TEST MODE '+b2s(test_mode),ta_middle,255,c_white);
 
    if(vid_APM)then draw_text(tar,ui_apmx,ui_apmy,'APM: '+player_APMdata[VisPlayer].APM_Str                ,ta_left,255,c_white);
    if(vid_FPS)then draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_left,255,c_white);

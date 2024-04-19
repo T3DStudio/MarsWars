@@ -894,7 +894,7 @@ begin
    ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
    }
 
-   str_teams[0]          := 'OBS.';
+   str_teams[0]          := str_observer;
    for p:=1 to MaxPlayers do
    str_teams[p]          := 'team '+b2s(p);
 
@@ -1309,6 +1309,7 @@ end;
 
 procedure lng_rus;
 var t: shortstring;
+    p: byte;
 begin
   str_MMap              := 'КАРТА';
   str_MPlayers          := 'ИГРОКИ';
@@ -1470,6 +1471,40 @@ begin
   str_attr_stuned       := tc_yellow+'оглушен'       ;
   str_attr_detector     := tc_purple+'детектор'      ;
   str_attr_transport    := tc_gray  +'транспорт'     ;
+
+  str_PlayerSlots[ps_closed  ]:='закрыто';
+  str_PlayerSlots[ps_observer]:='зритель';
+  str_PlayerSlots[ps_opened  ]:='открыто';
+  str_PlayerSlots[ps_replace ]:='на этот слот';
+  str_PlayerSlots[ps_AI_1    ]:='ИИ 1';
+  str_PlayerSlots[ps_AI_2    ]:='ИИ 2';
+  str_PlayerSlots[ps_AI_3    ]:='ИИ 3';
+  str_PlayerSlots[ps_AI_4    ]:='ИИ 4';
+  str_PlayerSlots[ps_AI_5    ]:='ИИ 5';
+  str_PlayerSlots[ps_AI_6    ]:='ИИ 6';
+  str_PlayerSlots[ps_AI_7    ]:='ИИ 7';
+  str_PlayerSlots[ps_AI_8    ]:='ИИ читер 1';
+  str_PlayerSlots[ps_AI_9    ]:='ИИ читер 2';
+  str_PlayerSlots[ps_AI_10   ]:='ИИ читер 3';
+  str_PlayerSlots[ps_AI_11   ]:='ИИ читер 4';
+  {
+  ps_replace             = 3;  // menu option, not state
+  ps_AI_1                = 4;  // very easy
+  ps_AI_2                = 5;  // easy
+  ps_AI_3                = 6;  // medium
+  ps_AI_4                = 7;  // hard
+  ps_AI_5                = 8;  // harder
+  ps_AI_6                = 9;  // very hard
+  ps_AI_7                = 10; // elite
+  ps_AI_8                = 11; // Cheater 1 (Vision)
+  ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
+  ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
+  ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+  }
+
+  str_teams[0]          := str_observer;
+  for p:=1 to MaxPlayers do
+  str_teams[p]          := 'ком. '+b2s(p);
 
   str_panelpos          := 'Положение игровой панели';
   str_panelposp[0]      := tc_lime  +'слева' +tc_default;

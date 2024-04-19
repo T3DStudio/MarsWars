@@ -12,7 +12,7 @@ var slatemp : PTVisSpr;
 function SpriteListAdd:PTVisSpr;
 begin
    SpriteListAdd:=nil;
-   if(vid_vsls<vid_mvs)and(MainMenu=false)then
+   if(vid_vsls<vid_mvs)and(menu_state=false)then
    begin
       vid_vsls+=1;
       SpriteListAdd:=vid_vsl[vid_vsls];
@@ -357,7 +357,7 @@ mb_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
         end;
 
 
-      if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
+      if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
 
       //ub_Scaned
       case r_blink3 of
@@ -567,7 +567,7 @@ begin
       for cy:=0 to vid_fog_vfh do
       begin
          vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
-         if(rpls_fog)then
+         if(sys_fog)then
          begin
             if(vid_fog_grid[cx,cy]=0)then draw_surf(tar,ssx, ssy,vid_fog_surf);
             vid_fog_grid[cx,cy]:=0;

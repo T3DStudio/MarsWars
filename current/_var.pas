@@ -149,11 +149,10 @@ u_royal_d         : integer;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
-//tmpmid            : byte = MID_Imp;
-
-test_fastprod          : boolean = false;
-TestMode          : byte = 0;
-uncappedFPS       : boolean = false;
+test_mode         : byte = 0;
+test_fastprod     : boolean = false;
+sys_uncappedFPS   : boolean = false;
+sys_fog           : boolean = false;
 
 r_panel,
 r_uipanel,
@@ -185,31 +184,28 @@ r_draw            : boolean = true;
 
 vid_map_RedrawBack: boolean = false;
 
-MainMenu          : boolean = true;
+menu_state        : boolean = true;
 menu_update       : boolean = false;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_game;
 menu_s3           : byte = ms3_game;
-
 menu_items        : array[byte] of TMenuItem;
 menu_list_n,
-menu_list_s,
-menu_list_c,
+menu_list_selected,
+menu_list_current,
 menu_list_x,
 menu_list_y,
 menu_list_w       : integer;
-menu_list         : array of shortstring;
+menu_list_items   : array of TMenuListItem;
 
-m_vrx,
-m_vry,
-mv_x,
-mv_y              : integer;
+menu_res_w,
+menu_res_h,
+menu_x,
+menu_y            : integer;
 
 PlayerName        : shortstring = 'DoomPlayer';
-PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
-PlayerRace        : byte = 0;
 
 PlayerColor       : array[0..MaxPlayers] of cardinal;
 
@@ -227,7 +223,7 @@ vid_vmb_x1        : integer = 794;
 vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
-vid_terrain       : pSDL_SURFACE;
+vid_terrain       : pSDL_SURFACE = nil;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
 vid_CamSpeed      : integer = 25;
@@ -287,10 +283,11 @@ map_mmcx          : single;
 map_mmvw,
 map_mmvh          : integer;
 
-cmp_skill         : byte = 3;
-cmp_seed          : cardinal = 0;
-cmp_mission       : byte = 0;
-cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
+campain_skill     : byte = 3;
+campain_seed      : cardinal = 0;
+campain_mission   : byte = 0;
+campain_mmap      : array[0..MaxMissions] of pSDL_Surface;
+campain_mission_n : integer = 0;
 
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
@@ -337,14 +334,10 @@ rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
 rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
-rpls_fog          : boolean = false;
 rpls_ticks        : byte = 0;
 rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
-
-//_cmp_sm           : integer = 0;
-campain_mission_n : integer = 0;
 
 
 mouse_select_x0,

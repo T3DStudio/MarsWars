@@ -42,7 +42,7 @@ begin
 
    d_uimouse(r_screen);
 
-   if(TestMode>1)and(net_status=ns_single)then _draw_dbg;
+   if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
 end;
 
 
@@ -51,13 +51,13 @@ var i,n:integer;
 begin
    sdl_FillRect(r_screen,nil,0);
 
-   if(MainMenu)
+   if(menu_state)
    then d_Menu
    else d_Game;
 
    //_drawMWSModel(@spr_HCommandCenter);
 
-   if(TestMode>1)then
+   if(test_mode>1)then
    begin
    n:=0;
    with g_players[UIPlayer] do
