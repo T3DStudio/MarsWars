@@ -345,7 +345,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
       else ThisPlayer:=UIPlayer;
       if(ptarget=ThisPlayer)then
       begin
-         net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
+         log_LastMesTimer:=min2(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
          menu_update:=true;
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer;
@@ -552,29 +552,6 @@ gm_2x2x2   : case p of
 gm_invasion:       PlayerGetTeam:=1;
         else       PlayerGetTeam:=g_players[p].team;
         end;
-end;
-
-function PlayerGetStatus(p:byte):char;
-begin
-   with g_players[p] do
-   begin
-      PlayerGetStatus:=str_ps_c[state];
-      if(state=ps_play)then
-      begin
-         if(g_started=false)
-         then PlayerGetStatus:=b2c[ready]
-         else PlayerGetStatus:=str_ps_c[ps_play];
-         if(ttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
-         {$IFDEF _FULLGAME}
-         if(net_cl_svpl=p)then
-         begin
-            PlayerGetStatus:=str_ps_sv;
-            if(net_cl_svttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
-         end;
-         {$ENDIF}
-      end;
-      if(p=PlayerClient)then PlayerGetStatus:=str_ps_h;
-   end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -899,11 +876,12 @@ begin
      5  : ai_name:=str_ps_comp+' '+tc_yellow+b2s(ain)+tc_default;
      6  : ai_name:=str_ps_comp+' '+tc_orange+b2s(ain)+tc_default;
      7  : ai_name:=str_ps_comp+' '+tc_red   +b2s(ain)+tc_default;
-     8  : ai_name:=str_ps_comp+' '+tc_purple+b2s(ain)+tc_default;
-     else ai_name:=str_ps_comp+' '+tc_white +b2s(ain)+tc_default;
+     else ai_name:=str_ps_comp+' '+str_ps_cheater+' '+tc_purple+b2s(ain)+tc_default;
      end;
      {$ELSE}
-     ai_name:=str_ps_comp+' '+b2s(ain);
+     if(ain<8)
+     then ai_name:=str_ps_comp+' '                   +b2s(ain)
+     else ai_name:=str_ps_comp+' '+str_ps_cheater+' '+b2s(ain);
      {$ENDIF}
 end;
 
@@ -1257,7 +1235,7 @@ gs_replayend  : begin
                 end;
 gs_waitserver : begin
                    pstr^:=str_waitsv;
-                   pcol^:=PlayerGetColor(net_cl_svpl);
+                   pcol^:=PlayerGetColor(PlayerLobby);
                 end;
 gs_replaypause: begin
                    pstr^:=str_pause;
@@ -1546,6 +1524,22 @@ begin
 end;
 
 {$ELSE}
+
+function PlayerGetStatus(p:byte):char;
+begin
+   with g_players[p] do
+   begin
+      PlayerGetStatus:=str_ps_c[state];
+      if(state=ps_play)then
+      begin
+         if(g_started=false)
+         then PlayerGetStatus:=str_b2c[ready]
+         else PlayerGetStatus:=str_ps_c[ps_play];
+         if(ttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
+      end;
+      if(p=PlayerClient)then PlayerGetStatus:=str_ps_h;
+   end;
+end;
 
 function PlayerAllOut:boolean;
 var i,c,r:byte;

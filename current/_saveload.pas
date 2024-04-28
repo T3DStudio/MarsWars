@@ -37,8 +37,8 @@ begin
          close(f);
          exit;
       end;
-      BlockRead(f,vr,SizeOf(version));
-      if(vr=version)then
+      BlockRead(f,vr,SizeOf(g_version));
+      if(vr=g_version)then
       begin
          BlockRead(f,vr,sizeof(menu_s2));
          if(vr=ms2_camp)then
@@ -61,11 +61,13 @@ begin
 
             BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw           ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,mw,sizeof(map_mw           ));svld_str_info+=str_map_size+w2s(mw)+tc_nl3+' ';vr:=0;
             BlockRead(f,vr,sizeof(map_type         ));
             if(vr>gms_m_types)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                              else       svld_str_info+=str_m_tpe+str_mapt[vr]+tc_default+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_symmetry     ));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
+                              else       svld_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' '; vr:=0;
+            BlockRead(f,vr,sizeof(map_symmetry     ));
+            if(vr>gms_m_symm )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                              else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';  vr:=0;
             BlockRead(f,vr,sizeof(theme_i          ));
             if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
             BlockRead(f,vr,sizeof(g_mode           ));
@@ -88,10 +90,10 @@ begin
                then svld_str_info+=chr(vr)+'*'+tc_default
                else svld_str_info+=chr(vr)+'#'+tc_default;
 
-               if(pls[vr].state>PS_None)then
+               if(pls[vr].state>ps_none)then
                  if(pls[vr].team=0)
                  then svld_str_info+=str_observer[1]           +','+t2c(pls[vr].team)+','
-                 else svld_str_info+=str_race[pls[vr].slot_race][2]+','+t2c(pls[vr].team)+',';
+                 else svld_str_info+=str_racel[pls[vr].slot_race][2]+','+t2c(pls[vr].team)+',';
                svld_str_info+=pls[vr].name+tc_nl3
             end;
          end;
@@ -139,61 +141,13 @@ begin
    saveload_Select;
 end;
 
-{
-ver
-menu_s2
-_cmp_sel
-cmp_skill
-map_seed
-map_iseed
-map_mw
-map_lqt
-map_obs
-map_sym
-theme_i
-g_mode
-g_starta
-g_sstart
-PlayerHuman
-_players
-_units
-_missiles
-_effects
-map_dds
-vid_vx
-vid_vy
-PlayerColor
-G_Step
-vid_rtui
-m_sbuild
-g_inv_wn
-g_inv_t
-g_inv_wt
-g_ct_pl
-g_royal_r
-G_Status
-ai_bx
-ai_by
-_uclord_c
-_uregen_c
-team_army
-ui_alrms
-map_psx
-map_psy
-map_rpos
-theme_map_lqt
-theme_map_blqt
-theme_map_trt
-theme_map_crt
-}
-
 procedure saveload_CalcSaveSize;
 begin
    svld_file_size:=
-   SizeOf(version          )+
+   SizeOf(g_version        )+
    SizeOf(menu_s2          )+
    SizeOf(campain_mission_n)+
-   SizeOf(campain_skill        )+
+   SizeOf(campain_skill    )+
    SizeOf(map_seed         )+
    SizeOf(g_random_i       )+
    SizeOf(map_mw           )+
@@ -243,10 +197,10 @@ begin
    {$I+}
    if(ioresult<>0)then exit;
 
-   BlockWrite(f,version          ,SizeOf(version          ));
+   BlockWrite(f,g_version        ,SizeOf(g_version        ));
    BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
    BlockWrite(f,campain_mission_n,SizeOf(campain_mission_n));
-   BlockWrite(f,campain_skill        ,SizeOf(campain_skill        ));
+   BlockWrite(f,campain_skill    ,SizeOf(campain_skill    ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
    BlockWrite(f,g_random_i       ,SizeOf(g_random_i       ));
    BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
@@ -313,14 +267,14 @@ begin
       assign(f,fn);
       {$I-}reset(f,1);{$I+} if (ioresult<>0) then exit;
       if(FileSize(f)<>svld_file_size)then begin close(f); exit; end;
-      BlockRead(f,vr,SizeOf(version));
-      if(vr=version)then
+      BlockRead(f,vr,SizeOf(g_version));
+      if(vr=g_version)then
       begin
          GameDefaultAll;
 
          BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
          BlockRead(f,campain_mission_n,SizeOf(campain_mission_n));
-         BlockRead(f,campain_skill        ,SizeOf(campain_skill        ));
+         BlockRead(f,campain_skill    ,SizeOf(campain_skill    ));
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
          BlockRead(f,g_random_i       ,SizeOf(g_random_i       ));
          BlockRead(f,map_mw           ,SizeOf(map_mw           ));
@@ -378,6 +332,7 @@ begin
          GameCameraBounds;
 
          G_Started:=true;
+         vid_map_RedrawBack:=true;
 
          if(menu_state)
          then menu_Toggle;
@@ -387,7 +342,7 @@ begin
 end;
 
 procedure saveload_Delete;
-var fn:string;
+var fn:shortstring;
 begin
    if(svld_list_sel<0)or(svld_list_sel>=svld_list_size)then exit;
 

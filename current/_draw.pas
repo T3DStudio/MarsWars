@@ -67,13 +67,13 @@ begin
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
-   ' '+b2c[MapPointInScreenP(mouse_map_x,mouse_map_y)]+
+   ' '+str_b2c[MapPointInScreenP(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div fog_cw)+
    ' '+i2s(mouse_map_y div fog_cw)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
    ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    ' '+tc_orange+i2s(g_players[UIPlayer].ai_attack_timer)+
-   ' '+tc_green+b2c[g_players[UIPlayer].ai_ReadyForAttack]+
+   ' '+tc_green+str_b2c[g_players[UIPlayer].ai_ReadyForAttack]+
    ' '+tc_gray+i2s(m_bx)+
    ' '+tc_gray+i2s(m_by),
 

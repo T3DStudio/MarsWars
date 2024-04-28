@@ -107,10 +107,10 @@ begin
       2 : writeln(str_gsettings);
       3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]          );
       4 : writeln('         ',str_starta       ,b2s(g_start_base+1)           );
-      6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]        );
+      6 : writeln('         ',str_fstarts      ,str_b2c[g_fixed_positions]    );
       8 : writeln('         ',str_aislots      ,g_ai_slots                    );
       10: writeln('         ',str_cgenerators  ,str_cgeneratorsO[g_generators]);
-      11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]         );
+      11: writeln('         ',str_deadobservers,str_b2c[g_deadobservers ]     );
       12: writeln;
       13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
       14: ;//Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);

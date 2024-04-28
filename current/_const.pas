@@ -1,7 +1,7 @@
 
 const
 
-version                : byte = 232;
+g_version              : byte = 232;
 
 degtorad               = pi/180;
 
@@ -161,9 +161,8 @@ str_cprt               : shortstring = '[ T3DStudio (c) 2016-2024 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
 str_ps_t               : char = '?';
 str_ps_h               : char = '<';
-str_ps_comp            : shortstring = 'AI';
 str_ps_none            : shortstring = '--';
-b2c                    : array[false..true] of char = ('-','+');
+str_b2c                : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
 
@@ -233,10 +232,10 @@ uia_newstrict          = 2;  }
 //  NETGAME
 //
 
-_cl_pnun               = 9;
-_cl_pnun_rpls          = _cl_pnun div 2;
-                                                    // 60 140 220 300 380 460 540 620 700 800
-_cl_pnua               : array[0.._cl_pnun] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
+cl_UpT_arrayN          = 9;
+cl_UpT_arrayN_RPLs     = cl_UpT_arrayN div 2;
+                                                         // 60 140 220 300 380 460 540 620 700 800
+cl_UpT_array           : array[0..cl_UpT_arrayN] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
 ClientTTL              = fr_fps1*10;
 ServerTTL              = fr_fps1;
@@ -257,7 +256,7 @@ nmid_lobby_info        = 3;
 nmid_connect           = 4;
 nmid_client_info       = 5;
 nmid_log_chat          = 6;
-nmid_chatclupd         = 7;
+nmid_log_upd         = 7;
 nmid_snapshot          = 8;
 nmid_pause             = 9;
 nmid_server_full       = 10;
@@ -1199,9 +1198,12 @@ ta_middle              = 1;
 ta_right               = 2;
 ta_chat                = 3;
 ta_rightmid            = 4;
+ta_x0y0                = 5;
+ta_x1y1                = 6;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
+font_hhw               = font_w div 4;
 font_34                =(font_w div 4)*3;
 font_5w                = font_w*5;
 font_iw                = font_w-1;
@@ -1402,10 +1404,11 @@ mi_mplay_ServerToggle  = 172;
 mi_mplay_ClientCaption = 173;
 mi_mplay_ClientAddress = 174;
 mi_mplay_ClientConnect = 175;
-mi_mplay_Chat          = 176;
-mi_mplay_NetSearch     = 177;
-mi_mplay_NetSearchList = 178;
-mi_mplay_NetSearchCon  = 179;
+mi_mplay_ClientQuality = 176;
+mi_mplay_Chat          = 177;
+mi_mplay_NetSearch     = 178;
+mi_mplay_NetSearchList = 179;
+mi_mplay_NetSearchCon  = 180;
 
 /////////////////////////////    MAIN MENU ZONES
 
@@ -1448,7 +1451,7 @@ ui_menu_pls_zx0        = 418;   // full zone
 ui_menu_pls_zy0        = 110;
 ui_menu_pls_zx1        = 723;
 ui_menu_pls_zy1        = 253;
-ui_menu_pls_lh         = 20;
+ui_menu_pls_lh         = 23;
 ui_menu_pls_lhh        = ui_menu_pls_lh div 2;
 ui_menu_pls_cptx       = (ui_menu_pls_zx0+ui_menu_pls_zx1) div 2;
 ui_menu_pls_cpty       = ui_menu_pls_zy0-font_3hw-2;
@@ -1462,7 +1465,7 @@ ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*NameLen+font_w*4;
 ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*9;
 ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*10;
 
-ui_menu_pls_border     = ui_menu_pls_lh div 3;
+ui_menu_pls_border     = ui_menu_pls_lh div 4;
 ui_menu_pls_color_x0   = ui_menu_pls_cx_color+ui_menu_pls_border;
 ui_menu_pls_color_x1   = ui_menu_pls_pbx1    -ui_menu_pls_border+1;
 
@@ -1473,8 +1476,6 @@ ui_menu_nsrch_zx0      = ui_menu_pls_pbx0;
 ui_menu_nsrch_zy0      = ui_menu_pls_pby0;
 ui_menu_nsrch_zx1      = ui_menu_pls_pbx1;
 ui_menu_nsrch_zy1      = ui_menu_pls_pby0+ui_menu_nsrch_lh3*3;
-
-
 
 //// campaings game multiplayer  tabs
 ui_menu_cgm_zx0        = 418;
@@ -1502,8 +1503,8 @@ ui_menu_csm_xt3        = ui_menu_csm_xc+6;  }
 
 
 chat_type              : array[false..true] of char = ('|',' ');
-chat_shlm_t            = fr_fps1*3;
-chat_shlm_max          = chat_shlm_t*6;
+log_LastMesTime        = fr_fps1*3;
+log_LastMesMaxN        = log_LastMesTime*6;
 
 ui_menu_chat_height    = 17; // lines
 ui_menu_chat_width     = 37; // chars
@@ -1639,7 +1640,7 @@ tc_green               = #23;
 tc_dgray               = #24;
 tc_default             = #25;
 
-b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
+//b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 
 sep_comma              = ',';
 sep_scomma             = ', ';
@@ -1679,6 +1680,8 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
 
 {$ELSE }
 
+str_ps_comp              : shortstring =  'AI';
+str_ps_cheater           : shortstring =  'cheater';
 
 str_gnstarted            : shortstring = 'Not started';
 str_grun                 : shortstring = 'Run';

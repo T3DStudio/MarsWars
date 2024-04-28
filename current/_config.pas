@@ -41,17 +41,17 @@ cfg_key_name  : PlayerName       := vl;
 cfg_key_sndv  : snd_svolume1     := b2si1(vlw);
 cfg_key_mscv  : snd_mvolume1     := b2si1(vlw);
 cfg_key_vspd  : vid_CamSpeed     := vli;
-cfg_key_fscr  : vid_fullscreen   :=(vl=b2c[true]);
-cfg_key_vmm   : vid_CamMScroll   :=(vl=b2c[true]);
-cfg_key_shdws : vid_ColoredShadow:=(vl=b2c[true]);
+cfg_key_fscr  : vid_fullscreen   :=(vl=str_b2c[true]);
+cfg_key_vmm   : vid_CamMScroll   :=(vl=str_b2c[true]);
+cfg_key_shdws : vid_ColoredShadow:=(vl=str_b2c[true]);
 cfg_key_saddr : net_cl_svstr     := vl;
 cfg_key_sport : net_sv_pstr      := vl;
-cfg_key_lng   : ui_language      :=(vl=b2c[true]);
-cfg_key_mai   : m_action         :=(vl=b2c[true]);
+cfg_key_lng   : ui_language      :=(vl=str_b2c[true]);
+cfg_key_mai   : m_action         :=(vl=str_b2c[true]);
 cfg_key_vidvw : vid_vw           := vli;
 cfg_key_vidvh : vid_vh           := vli;
 cfg_key_gsb   : g_start_base     := vlw;
-cfg_key_gsp   : g_fixed_positions:=(vl=b2c[true]);
+cfg_key_gsp   : g_fixed_positions:=(vl=str_b2c[true]);
 cfg_key_gai   : g_ai_slots       := vlw;
 cfg_key_gcg   : g_generators     := vlw;
 cfg_key_rpnui : rpls_pnui        := vlw;
@@ -59,8 +59,8 @@ cfg_key_npnui : net_pnui         := vlw;
 cfg_key_ppos  : vid_ppos         := vlw;
 cfg_key_uhbar : vid_uhbars       := vlw;
 cfg_key_plcol : vid_plcolors     := vlw;
-cfg_key_APM   : vid_APM          :=(vl=b2c[true]);
-cfg_key_FPS   : vid_FPS          :=(vl=b2c[true]);
+cfg_key_APM   : vid_APM          :=(vl=str_b2c[true]);
+cfg_key_FPS   : vid_FPS          :=(vl=str_b2c[true]);
    end;
 
 end;
@@ -88,7 +88,9 @@ begin
    if FileExists(cfgfn) then
    begin
       assign(f,cfgfn);
-      {$I-}reset(f);{$I+}
+      {$I-}
+      reset(f);
+      {$I+}
       if(ioresult<>0)then exit;
       while not eof(f) do
       begin
@@ -110,8 +112,8 @@ begin
       if(g_start_base>gms_g_startb   )then g_start_base:=gms_g_startb;
       if(g_generators>gms_g_maxgens  )then g_generators:=gms_g_maxgens;
 
-      if(rpls_pnui   >_cl_pnun_rpls  )then rpls_pnui   :=_cl_pnun_rpls;
-      if(net_pnui    >_cl_pnun       )then net_pnui    :=_cl_pnun;
+      if(rpls_pnui   >cl_UpT_arrayN_RPLs)then rpls_pnui:=cl_UpT_arrayN_RPLs;
+      if(net_pnui    >cl_UpT_arrayN     )then net_pnui :=cl_UpT_arrayN;
 
       if(vid_ppos    >3              )then vid_ppos    :=0;
       if(vid_uhbars  >2              )then vid_uhbars  :=0;
@@ -129,30 +131,30 @@ begin
    assign(f,cfgfn);
 {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
 
-   writeln(f,cfg_key_name  ,'=',PlayerName            );
-   writeln(f,cfg_key_sndv  ,'=',si12b(snd_svolume1)   );
-   writeln(f,cfg_key_mscv  ,'=',si12b(snd_mvolume1)   );
-   writeln(f,cfg_key_fscr  ,'=',b2c[vid_fullscreen]   );
-   writeln(f,cfg_key_vspd  ,'=',vid_CamSpeed          );
-   writeln(f,cfg_key_vmm   ,'=',b2c[vid_CamMScroll]   );
-   writeln(f,cfg_key_shdws ,'=',b2c[vid_ColoredShadow]);
-   writeln(f,cfg_key_saddr ,'=',net_cl_svstr          );
-   writeln(f,cfg_key_sport ,'=',net_sv_pstr           );
-   writeln(f,cfg_key_lng   ,'=',b2c[ui_language]      );
-   writeln(f,cfg_key_mai   ,'=',b2c[m_action]         );
-   writeln(f,cfg_key_vidvw ,'=',vid_vw                );
-   writeln(f,cfg_key_vidvh ,'=',vid_vh                );
-   writeln(f,cfg_key_rpnui ,'=',rpls_pnui             );
-   writeln(f,cfg_key_npnui ,'=',net_pnui              );
-   writeln(f,cfg_key_gsb   ,'=',g_start_base          );
-   writeln(f,cfg_key_gsp   ,'=',b2c[g_fixed_positions]);
-   writeln(f,cfg_key_gai   ,'=',g_ai_slots            );
-   writeln(f,cfg_key_gcg   ,'=',g_generators          );
-   writeln(f,cfg_key_ppos  ,'=',vid_ppos              );
-   writeln(f,cfg_key_uhbar ,'=',vid_uhbars            );
-   writeln(f,cfg_key_plcol ,'=',vid_plcolors          );
-   writeln(f,cfg_key_APM   ,'=',b2c[vid_APM]          );
-   writeln(f,cfg_key_FPS   ,'=',b2c[vid_FPS]          );
+   writeln(f,cfg_key_name  ,'=',PlayerName             );
+   writeln(f,cfg_key_sndv  ,'=',si12b(snd_svolume1)    );
+   writeln(f,cfg_key_mscv  ,'=',si12b(snd_mvolume1)    );
+   writeln(f,cfg_key_fscr  ,'=',str_b2c[vid_fullscreen]);
+   writeln(f,cfg_key_vspd  ,'=',vid_CamSpeed           );
+   writeln(f,cfg_key_vmm   ,'=',str_b2c[vid_CamMScroll]);
+   writeln(f,cfg_key_shdws ,'=',str_b2c[vid_ColoredShadow]);
+   writeln(f,cfg_key_saddr ,'=',net_cl_svstr           );
+   writeln(f,cfg_key_sport ,'=',net_sv_pstr            );
+   writeln(f,cfg_key_lng   ,'=',str_b2c[ui_language]   );
+   writeln(f,cfg_key_mai   ,'=',str_b2c[m_action]      );
+   writeln(f,cfg_key_vidvw ,'=',vid_vw                 );
+   writeln(f,cfg_key_vidvh ,'=',vid_vh                 );
+   writeln(f,cfg_key_rpnui ,'=',rpls_pnui              );
+   writeln(f,cfg_key_npnui ,'=',net_pnui               );
+   writeln(f,cfg_key_gsb   ,'=',g_start_base           );
+   writeln(f,cfg_key_gsp   ,'=',str_b2c[g_fixed_positions]);
+   writeln(f,cfg_key_gai   ,'=',g_ai_slots             );
+   writeln(f,cfg_key_gcg   ,'=',g_generators           );
+   writeln(f,cfg_key_ppos  ,'=',vid_ppos               );
+   writeln(f,cfg_key_uhbar ,'=',vid_uhbars             );
+   writeln(f,cfg_key_plcol ,'=',vid_plcolors           );
+   writeln(f,cfg_key_APM   ,'=',str_b2c[vid_APM]       );
+   writeln(f,cfg_key_FPS   ,'=',str_b2c[vid_FPS]       );
 
    close(f);
 end;

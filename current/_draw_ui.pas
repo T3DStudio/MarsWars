@@ -692,7 +692,7 @@ begin
    if(rpls_state=rpls_state_read)then D_ReplayProgress(tar);
 
    // LOG and HINTs
-   if(net_chat_shlm>0)then net_chat_shlm-=1;
+   if(log_LastMesTimer>0)then log_LastMesTimer-=1;
    if(ingame_chat>0)or(rpls_showlog)then
    begin
       if(net_status=ns_client)
@@ -704,11 +704,11 @@ begin
       if(ingame_chat>0)then draw_text(tar,ui_textx,ui_chaty,ChatString+net_chat_str+chat_type[r_blink1_colorb],ta_left,ui_ingamecl,c_white);
    end
    else
-     if(net_chat_shlm>0)then // last messages
+     if(log_LastMesTimer>0)then // last messages
      begin
         if(net_status=ns_client)
-        then MakeLogListForDraw(PlayerClient ,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages)
-        else MakeLogListForDraw(UIPlayer,ui_ingamecl,(net_chat_shlm div chat_shlm_t)+1,lmts_last_messages);
+        then MakeLogListForDraw(PlayerClient ,ui_ingamecl,(log_LastMesTimer div log_LastMesTime)+1,lmts_last_messages)
+        else MakeLogListForDraw(UIPlayer,ui_ingamecl,(log_LastMesTimer div log_LastMesTime)+1,lmts_last_messages);
         if(ui_log_n>0)then
          for i:=0 to ui_log_n-1 do
           if(ui_log_c[i]>0)then draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);

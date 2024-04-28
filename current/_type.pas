@@ -1,22 +1,22 @@
 
 type
 
-integer  = Smallint;
-pinteger = ^integer;
+integer     = Smallint;
+pinteger    = ^integer;
 
-TSoc  = set of char;
-PTSoc = ^TSoc;
-TSob  = set of byte;
-PTSob = ^TSob;
+TSoc        = set of char;
+PTSoc       = ^TSoc;
+TSob        = set of byte;
+PTSob       = ^TSob;
 
 {$IFDEF _FULLGAME}
 
-string6 = string[6];
+string6     = string[6];
 
 TServerInfo = record
-   ip  :cardinal;
-   port:word;
-   info:shortstring;
+   ip       : cardinal;
+   port     : word;
+   info     : shortstring;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,16 +24,10 @@ end;
 //   GRAPHIC
 //
 
-{TColor = record
-   r,g,b,a:byte;
-   c      :cardinal;
-end;
-PTColor = ^TColor;    }
-
 TMWTexture = record
-   surf:pSDL_Surface;
+   surf     : pSDL_Surface;
    w,h,
-   hw,hh:integer;
+   hw,hh    : integer;
 end;
 PTMWTexture = ^TMWTexture;
 
@@ -685,21 +679,21 @@ TCTPoint = record
    cpunitst_pstate,
    cpUnitsTeam,
    cpunitsp_pstate,
-   cpUnitsPlayer     : array[0..MaxPlayers] of longint;
+   cpUnitsPlayer: array[0..MaxPlayers] of longint;
 end;
 PTCTPoint = ^TCTPoint;
 
 TDoodad = record
-   x,y,r :integer;
-   t     :byte;
+   x,y,r        : integer;
+   t            : byte;
 
    {$IFDEF _FULLGAME}
    animn,animt,
    depth,shadowz,ox,oy,
-   mmx,mmy,mmr :integer;
-   mmc         :cardinal;
+   mmx,mmy,mmr  : integer;
+   mmc          : cardinal;
    sprite,
-   back_sprite :PTMWTexture;
+   back_sprite  : PTMWTexture;
    {$ENDIF}
 end;
 PTDoodad = ^TDoodad;
@@ -708,8 +702,15 @@ TDCell = record
    l:array of PTDoodad;
 end;
 
-TMap = record
-
+TGamePreset = record
+   gp_name      : shortstring;
+   gp_map_seed  : cardinal;
+   gp_map_mw    : integer;
+   gp_map_type,
+   gp_map_symmetry,
+   gp_g_mode    : byte;
+   gp_g_fixed_positions
+                : boolean;
 end;
 
 

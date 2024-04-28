@@ -803,8 +803,6 @@ begin
       u:=mouse_x-vid_panelx;m_by:=u div vid_BW;if(u<0)then m_by-=1;
    end;
 
-   if(m_ldblclk>0)then m_ldblclk-=1;
-
    mb_Check(false);
 
    ui_uhint:=0;
@@ -866,7 +864,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
 
       if(mouse_select_x0>-1)then //select
       begin
-         if(m_ldblclk>0)then
+         if(mleft_dbl_click>0)then
          begin
             u:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_own_uid);
             if(0<u)and(u<255)then
@@ -885,7 +883,6 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
          end;
 
          mouse_select_x0:=-1;
-         m_ldblclk:=fr_fpsd4;
       end;
    end;
 
@@ -952,6 +949,9 @@ end;
 procedure InputGame;
 begin
    WindowEvents;
+
+   if(mleft_dbl_click>0)then mleft_dbl_click-=1;
+   if(ks_mleft=-1)then mleft_dbl_click:=fr_fpsd4;
 
    if(menu_state)then
    begin

@@ -58,8 +58,10 @@ g_cycle_regen     : integer = 0;
 g_random_i        : word = 0;
 g_random_p        : byte = 0;
 
-map_i             : word     = 0;
-map_list          : array of TMap;
+g_preset_cur      : byte = 0;
+g_preset_n        : byte = 0;
+g_presets         : array of TGamePreset;
+
 map_seed          : cardinal = 1;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
@@ -77,8 +79,8 @@ map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
 
-DID_Square        : array[0..MaxDIDs] of longint;
-DID_S2R           : array[0..MaxDIDs] of longint;
+DID_Square,
+DID_S2R,
 DID_S2Rh          : array[0..MaxDIDs] of longint;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
@@ -292,11 +294,10 @@ campain_mission_n : integer = 0;
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
-net_cl_svpl       : byte = 0;
 net_cl_svstr      : shortstring = '127.0.0.1:10666';
-net_m_error       : shortstring = '';
+net_status_str    : shortstring = '';
 net_sv_pstr       : shortstring = '10666';
-net_chat_shlm     : integer = 0;
+log_LastMesTimer : integer = 0;
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
 net_pnui          : byte = 4;
@@ -346,7 +347,7 @@ mouse_map_x,
 mouse_map_y,
 mouse_x,
 mouse_y           : integer;
-m_ldblclk,
+mleft_dbl_click,
 m_brushc          : cardinal;
 m_brushx,
 m_brushy,
@@ -731,12 +732,13 @@ spr_cp_gen        : TMWTexture;
 //  TEST
 //
 
+str_bool          : array[false..true   ] of shortstring;
 str_teams         : array[0..MaxPlayers ] of shortstring;
-str_mapt          : array[0..gms_m_types] of shortstring;
+str_map_typel     : array[0..gms_m_types] of shortstring;
 str_ability_name  : array[byte          ] of shortstring;
-str_race          : array[0..r_cnt      ] of shortstring;
+str_racel         : array[0..r_cnt      ] of shortstring;
 str_gmode         : array[0..gm_cnt     ] of shortstring;
-str_m_symt        : array[0..gms_m_symm ] of shortstring;
+str_map_syml      : array[0..gms_m_symm ] of shortstring;
 str_ability_unload,
 str_need_energy,
 str_cant_build,
@@ -802,9 +804,9 @@ str_production_busy,
 str_cant_advanced,
 str_NeedMoreProd,
 str_MaximumReached,
-str_m_tpe,
-str_m_siz,
-str_m_sym,
+str_map_type,
+str_map_size,
+str_map_sym,
 str_plname,
 str_aislots,
 str_generators,
@@ -815,6 +817,8 @@ str_ready,
 str_fstarts,
 str_gmodet,
 str_starta,
+str_ps_comp,
+str_ps_cheater,
 str_plout,
 str_player_def    : shortstring;
 str_PlayerSlots   : array[0..ps_states_n-1    ] of shortstring;
@@ -869,9 +873,9 @@ str_pause,
 str_observer,
 str_win,
 str_lose,
-str_sver,
-str_sfull,
-str_sgst,
+str_WrongVersion,
+str_ServerFull,
+str_GameStarted,
 str_udpport,
 str_connecting,
 str_netsearching,
@@ -897,7 +901,7 @@ str_MServers,
 str_MMap,
 str_MPlayers      : shortstring;
 str_npnua,
-str_pnua          : array[0.._cl_pnun] of shortstring;
+str_pnua          : array[0..cl_UpT_arrayN] of shortstring;
 str_cmpd          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_army     : shortstring;
@@ -915,7 +919,7 @@ str_camp_m        : array[0..MaxMissions] of shortstring; }
 str_connect,
 str_svup,
 str_lng,
-str_maction2,
+str_mactionl,
 str_exit,
 str_reset         : array[false..true] of shortstring;
 str_menu_s1,

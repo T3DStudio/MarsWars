@@ -6,7 +6,7 @@ begin
    for i:=1 to MaxPlayers do
     if(i<>PlayerClient)then
      with g_players[i] do
-      if(state=PS_None)then
+      if(state=ps_none)then
       begin
          net_NewPlayer:=i;
          nip          :=sip;
@@ -81,8 +81,8 @@ begin
        net_writebyte  (race );
     end;
 
-   net_writebyte(pid         );
-   net_writebyte(PlayerClient);
+   net_writebyte(pid        );
+   net_writebyte(PlayerLobby);
 
    net_writeint (map_mw      );
    net_writebyte(map_type    );
@@ -116,7 +116,7 @@ procedure net_WriteGameInfo;
 var i:byte;
 begin
    net_writebyte(nmid_localadv);
-   net_writebyte(version);
+   net_writebyte(g_version);
    net_writebyte(g_mode);
    for i:=1 to MaxPlayers do
      with g_players[i] do
@@ -149,7 +149,7 @@ begin
       if(mid=nmid_connect)then
       begin
          i:=net_readbyte;
-         if(i<>version)then
+         if(i<>g_version)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_wrong_ver);
@@ -271,7 +271,7 @@ nmid_lobbby_playerrace :;
          if(net_logsend_pause<=0)and(log_n_cl<>log_n)then
          begin
             net_clearbuffer;
-            net_writebyte(nmid_chatclupd);
+            net_writebyte(nmid_log_upd);
             wudata_log(i,@log_n_cl,false);
             net_send(nip,nport);
             net_logsend_pause:=fr_fpsd2;
@@ -291,6 +291,10 @@ nmid_lobbby_playerrace :;
      end
      else net_localAdv_timer-=1;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   CLIENT
 
 {$IFDEF _FULLGAME}
 
@@ -346,7 +350,7 @@ begin
       if(i<>team)then menu_update:=true;
 
       i      :=slot_race;
-      slot_race  :=net_readbyte;
+      slot_race:=net_readbyte;
       if(i<>slot_race)then menu_update:=true;
 
       i      :=state;
@@ -369,8 +373,9 @@ begin
 end;
 
 procedure net_Client;
-var mid,i:byte;
-    gst:boolean;
+var
+mid,i:byte;
+gst  :boolean;
 begin
    net_clearbuffer;
    while(net_Receive>0)do
@@ -382,26 +387,26 @@ begin
       mid:=net_readbyte;
       case mid of
 nmid_server_full : begin
-                      net_m_error:=str_sfull;
-                      menu_update:=true;
+                      net_status_str:=str_ServerFull;
+                      menu_update   :=true;
                    end;
 nmid_wrong_ver   : begin
-                      net_m_error:=str_sver;
-                      menu_update:=true;
+                      net_status_str:=str_WrongVersion;
+                      menu_update   :=true;
                    end;
 nmid_game_started: begin
-                      net_m_error:=str_sgst;
-                      menu_update:=true;
+                      net_status_str:=str_GameStarted;
+                      menu_update   :=true;
                    end;
 nmid_notconnected: begin
-                      G_Started:=false;
-                      menu_state:=true;
-                      PlayerReady:=false;
+                      G_Started     :=false;
+                      menu_state    :=true;
+                      PlayerReady   :=false;
                       GameDefaultAll;
                    end;
-nmid_chatclupd   : begin
+nmid_log_upd     : begin
                       rudata_log(PlayerClient,false);
-                      net_chat_shlm:=chat_shlm_t;
+                      log_LastMesTimer:=log_LastMesTime;
                       net_period:=0;
                    end;
 nmid_lobby_info  : begin
@@ -419,11 +424,11 @@ nmid_lobby_info  : begin
 
                       i:=PlayerClient;
                       PlayerClient:=net_readbyte;if(PlayerClient<>i)then menu_update:=true;
-                      i:=net_cl_svpl;
-                      net_cl_svpl:=net_readbyte;if(net_cl_svpl<>i)then menu_update:=true;
+                      i:=PlayerLobby;
+                      PlayerLobby :=net_readbyte;if(PlayerLobby <>i)then menu_update:=true;
 
                       net_ClReadMapData(gst);
-                      net_m_error:='';
+                      net_status_str:='';
 
                       if(gst<>G_Started)then
                       begin
@@ -460,18 +465,18 @@ nmid_lobby_info  : begin
    if(net_period=0)then
    begin
       net_clearbuffer;
-      if (G_Started=false) then
+      if(not G_Started) then
       begin
          net_writebyte(nmid_connect);
-         net_writebyte(version);
-         net_writebool(PlayerReady);
-         net_writebyte(_cl_pnua[net_pnui]);
-         net_writecard(net_log_n  );
+         net_writebyte(g_version   );
+         net_writebool(PlayerReady );
+         net_writebyte(cl_UpT_array[net_pnui]);
+         net_writecard(net_log_n   );
       end
       else
       begin
          net_writebyte(nmid_client_info);
-         net_writebyte(_cl_pnua[net_pnui]);
+         net_writebyte(cl_UpT_array[net_pnui]);
          net_writecard(net_log_n);
       end;
       net_send(net_cl_svip,net_cl_svport);
@@ -495,11 +500,11 @@ var i,e:word;
 begin
    e:=0;
    if(net_svsearch_listn>0)then
-    for i:=1 to net_svsearch_listn do
-     with net_svsearch_list[i-1] do
+    for i:=0 to net_svsearch_listn-1 do
+     with net_svsearch_list[i] do
       if(aip=ip)and(aport=port)then
       begin
-         e:=i;
+         e:=i+1;
          break;
       end;
 
@@ -537,7 +542,7 @@ begin
       case mid of
 nmid_localadv : begin
                    v:=net_readbyte;
-                   if(v=version)then
+                   if(v=g_version)then
                    begin
                       v:=net_readbyte;
                       if(v in allgamemodes)then
@@ -549,7 +554,7 @@ nmid_localadv : begin
                          continue;
                       end;
                    end;
-                   net_DiscoweringUpdate(net_LastinIP,net_LastinPort,c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_sver);
+                   net_DiscoweringUpdate(net_LastinIP,net_LastinPort,c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_WrongVersion);
                 end;
       end;
    end;

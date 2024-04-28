@@ -26,27 +26,27 @@ begin
    end;
 end;
 
-procedure PlayersSwap(p0,p1:byte);
+procedure PlayersSwap(PlayerRequestor,PlayerTarget:byte);
 var tp:TPlayer;
 begin
-   if(p0>MaxPlayers)
-   or(p1>MaxPlayers)
-   or(p1=p0)then exit;
+   if(PlayerRequestor>MaxPlayers  )
+   or(PlayerTarget   >MaxPlayers  )
+   or(PlayerRequestor=PlayerTarget)then exit;
 
-   tp:=g_players[p0];
-   g_players[p0]:=g_players[p1];
-   g_players[p1]:=tp;
+   tp:=g_players[PlayerRequestor];
+   g_players[PlayerRequestor]:=g_players[PlayerTarget];
+   g_players[PlayerTarget   ]:=tp;
 
-   g_players[p0].pnum:=p0;
-   g_players[p1].pnum:=p1;
+   g_players[PlayerRequestor].pnum:=PlayerRequestor;
+   g_players[PlayerTarget   ].pnum:=PlayerTarget;
 
-   if(PlayerClient=p1)then PlayerClient:=p0
+   if(PlayerClient=PlayerTarget)then PlayerClient:=PlayerRequestor
    else
-     if(PlayerClient=p0)then PlayerClient:=p1;
+     if(PlayerClient=PlayerRequestor)then PlayerClient:=PlayerTarget;
 
-   if(PlayerLobby=p1)then PlayerLobby:=p0
+   if(PlayerLobby=PlayerTarget)then PlayerLobby:=PlayerRequestor
    else
-     if(PlayerLobby=p0)then PlayerLobby:=p1;
+     if(PlayerLobby=PlayerRequestor)then PlayerLobby:=PlayerTarget;
 end;
 
 procedure PlayerSetState(p,newstate:byte);
@@ -54,7 +54,7 @@ begin
    with g_players[p] do
    begin
       case newstate of
-PS_None: begin ready:=false;name :=str_ps_none;       ttl:=0;if(p>0)and(state=ps_comp)then team:=p;end;
+ps_none: begin ready:=false;name :=str_ps_none;       ttl:=0;if(p>0)and(state=ps_comp)then team:=p;end;
 PS_Comp: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;if(p>0)and(team=0)then team:=p;end;
 PS_Play: begin ready:=false;name :='';                ttl:=0;end;
       end;
@@ -103,6 +103,8 @@ ps_closed,
 ps_opened   : begin
                  PlayerSetState(PlayerTarget,ps_none);
                  slot_state:=NewState;
+                 if(team=0)then team:=PlayerTarget;
+                 team:=PlayerGetTeam(g_mode,PlayerTarget);
               end;
 ps_observer : begin
                  slot_state:=NewState;
@@ -116,6 +118,7 @@ ps_AI_11    : begin
                  ai_skill  :=NewState-ps_AI_1+1;
                  PlayerSetState(PlayerTarget,ps_comp);
                  if(team=0)then team:=PlayerTarget;
+                 team:=PlayerGetTeam(g_mode,PlayerTarget);
               end;
       end;
    end;
@@ -160,17 +163,16 @@ begin
    end;
 end;
 function PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam:byte;Check:boolean):boolean;
+var n:byte;
 begin
    PlayerSlotChangeTeam:=false;
 
    if(NewTeam=255)and(Check)then
    begin
+      n:=0;
       for NewTeam:=0 to MaxPlayers do
-        if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then
-        begin
-           PlayerSlotChangeTeam:=true;
-           break;
-        end;
+        if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then n+=1;
+      PlayerSlotChangeTeam:=(n>1);
       exit;
    end;
 
@@ -184,9 +186,18 @@ begin
    begin
       if( slot_state=ps_observer)
       or( slot_state=ps_closed  )
+      or((ps_AI_1<=slot_state   )and(slot_state<=ps_AI_11)and(state=ps_comp)and(NewTeam=0))
       or((slot_state=ps_opened  )and(state=ps_none))
-      or((slot_state=ps_opened  )and(state=ps_comp)and(NewTeam=0))
       or((slot_state=ps_opened  )and(state>ps_none)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
+
+      n:=team;
+      team:=NewTeam;
+      if(PlayerGetTeam(g_mode,PlayerTarget)<>team)then
+      begin
+         team:=n;
+         exit;
+      end
+      else team:=n;
 
       PlayerSlotChangeTeam:=true;
 
@@ -324,8 +335,7 @@ begin
    ingame_chat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
-   net_cl_svpl :=0;
-   net_m_error :='';
+   net_status_str :='';
 
    ui_umark_u:=0;
    ui_umark_t:=0;
@@ -409,6 +419,7 @@ ps_opened   : if(p>0)and(state=ps_none)and(g_ai_slots>0)then
                  ai_skill:=g_ai_slots;
                  race    :=r_random;
                  PlayerSetState(p,ps_comp);
+                 if(team=0)then team:=1;
               end;
 ps_replace  : begin
               slot_state:=ps_closed;
@@ -757,7 +768,7 @@ begin
            else
              if(G_Started=false)then
              begin
-                PlayerSetState(p,PS_None);
+                PlayerSetState(p,ps_none);
                 {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;

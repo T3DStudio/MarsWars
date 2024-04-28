@@ -10,7 +10,6 @@ var tx0,
     ty0,
     ty1,i:integer;
  enable  :boolean;
-
 procedure SetItem(item:byte;ax0,ay0,ax1,ay1:integer;aenabled:boolean);
 begin
    with menu_items[item] do
@@ -21,6 +20,34 @@ begin
       y1:=max2(ay0,ay1);
       enabled:=aenabled;
    end;
+end;
+function NeedColumnRace(p:byte):boolean;
+begin
+   NeedColumnRace:=false;
+   if(p<=MaxPlayers)then
+     with g_players[p] do
+       case slot_state of
+ps_replace,
+ps_closed,
+ps_observer : ;
+ps_opened   : NeedColumnRace:=((state=ps_none)and(g_ai_slots>0))or((state>ps_none)and(team>0));
+ps_AI_1..
+ps_AI_11    : NeedColumnRace:=true;
+       end;
+end;
+function NeedColumnTeam(p:byte):boolean;
+begin
+   NeedColumnTeam:=false;
+   if(p<=MaxPlayers)then
+     with g_players[p] do
+       case slot_state of
+ps_replace,
+ps_closed,
+ps_observer :; //: NeedColumnTeam:=true;
+ps_opened   : NeedColumnTeam:=((state=ps_none)and(g_ai_slots>0))or(state>ps_none);
+ps_AI_1..
+ps_AI_11    : NeedColumnTeam:=true;
+       end;
 end;
 begin
    //menu_List_Clear;
@@ -131,7 +158,9 @@ ms1_reps: begin
      begin
         ty0:=ui_menu_pls_pby0+i*ui_menu_pls_lh;
         SetItem(mi_player_status1+i,ui_menu_pls_pbx0   ,ty0,ui_menu_pls_cx_race ,ty0+ui_menu_pls_lh,PlayerSlotChangeState(PlayerClient,i+1,255,true));
+        if(NeedColumnRace(i+1))then
         SetItem(mi_player_race1  +i,ui_menu_pls_cx_race,ty0,ui_menu_pls_cx_team ,ty0+ui_menu_pls_lh,PlayerSlotChangeRace (PlayerClient,i+1,255,true));
+        if(NeedColumnTeam(i+1))then
         SetItem(mi_player_team1  +i,ui_menu_pls_cx_team,ty0,ui_menu_pls_cx_color,ty0+ui_menu_pls_lh,PlayerSlotChangeTeam (PlayerClient,i+1,255,true));
      end;
 
@@ -177,6 +206,7 @@ ms2_mult: begin
              SetItem(mi_mplay_NetSearch    ,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)and(not G_Started)   );ty0+=ui_menu_cgm_lh;
              SetItem(mi_mplay_ClientAddress,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh, net_status<>ns_client                      );ty0+=ui_menu_cgm_lh;
              SetItem(mi_mplay_ClientConnect,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)and(not net_svsearch));ty0+=ui_menu_cgm_lh;
+             SetItem(mi_mplay_ClientQuality,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh, net_status<>ns_server);
 {
 mi_mplay_Chat           : ;
 }
@@ -445,10 +475,15 @@ begin
    menu_list_SetCommonSettings(mi,@MinWidth);
    with menu_items[mi] do
    begin
-      menu_list_current:=g_players[PlayerTarget].slot_state;
+      menu_list_current:=-1;
       for i:=0 to ps_states_n-1 do
         if(PlayerSlotChangeState(PlayerClient,PlayerTarget,i,true))then
-          menu_list_AddItem(str_PlayerSlots[i],i,true,MinWidth);
+        begin
+           with g_players[PlayerTarget] do
+             if(slot_state=i)then
+               menu_list_current:=menu_list_n;
+           menu_list_AddItem(str_PlayerSlots[i],i,true,MinWidth);
+        end;
    end;
 end;
 procedure menu_list_MakePlayerTeam(mi:byte;PlayerTarget:byte;MinWidth:integer);
@@ -457,15 +492,54 @@ begin
    menu_list_SetCommonSettings(mi,@MinWidth);
    with menu_items[mi] do
    begin
-      menu_list_current:=g_players[PlayerTarget].team;
+      menu_list_current:=-1;
       for i:=0 to MaxPlayers do
         if(PlayerSlotChangeTeam(PlayerClient,PlayerTarget,i,true))then
+        begin
+           with g_players[PlayerTarget] do
+             if(team=i)then
+               menu_list_current:=menu_list_n;
            menu_list_AddItem(str_teams[i],i,true,MinWidth);
+        end;
+   end;
+end;
+
+procedure menu_list_MakeAISlots(mi:byte;CurVal,MinWidth:integer);
+var i:byte;
+begin
+   menu_list_SetCommonSettings(mi,@MinWidth);
+   with menu_items[mi] do
+   begin
+      menu_list_current:=CurVal;
+      menu_list_AddItem(str_ps_none,0,true,MinWidth);
+      for i:=ps_AI_1 to ps_AI_11 do
+        menu_list_AddItem(str_PlayerSlots[i],i-ps_AI_1+1,true,MinWidth);
    end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  MENU BASE
+
+procedure menu_nsearch_connect;
+begin
+   if(0<=net_svsearch_sel)and(net_svsearch_sel<net_svsearch_listn)then ;
+   begin
+      net_svsearch:=false;
+      net_dispose;
+      net_status    :=ns_single;
+      net_status_str:='';
+      if(net_UpSocket(0))then
+      begin
+         with net_svsearch_list[net_svsearch_sel] do net_cl_svstr:=c2ip(ip)+':'+w2s(swap(port));
+         net_cl_saddr;
+         net_status_str:=str_connecting;
+         net_status    :=ns_client;
+         rpls_pnu      :=0;
+         menu_s1       :=ms1_sett;
+      end
+      else net_dispose;
+   end;
+end;
 
 procedure menu_map_SetNewSize(new_size:integer);
 begin
@@ -584,10 +658,10 @@ mi_map_params3            : if(menu_list_selected>-1)
                             else menu_list_MakeFromInts(menu_item,MaxSMapW,MinSMapW,StepSMap,map_mw,-2);
 mi_map_params4            : if(menu_list_selected>-1)
                             then menu_map_SetNewType(menu_list_value)
-                            else menu_list_MakeFromStr(menu_item,@str_mapt[0],SizeOf(str_mapt),map_type,-2);
+                            else menu_list_MakeFromStr(menu_item,@str_map_typel[0],SizeOf(str_map_typel),map_type,-2);
 mi_map_params5            : if(menu_list_selected>-1)
                             then menu_map_SetNewSymmetry(menu_list_value)
-                            else menu_list_MakeFromStr(menu_item,@str_m_symt[0],SizeOf(str_m_symt),map_symmetry,-2);
+                            else menu_list_MakeFromStr(menu_item,@str_map_syml[0],SizeOf(str_map_syml),map_symmetry,-2);
 mi_map_params6            : begin
                                Map_randommap;
                                Map_premap;
@@ -615,7 +689,7 @@ mi_settings_HitBars       : if(menu_list_selected>-1)
                             else menu_list_MakeFromStr(menu_item,@str_uhbars[0],SizeOf(str_uhbars),vid_uhbars,-2);
 mi_settings_MRBAction     : if(menu_list_selected>-1)
                             then begin m_action:=menu_list_value>0;menu_List_Clear; end
-                            else menu_list_MakeFromStr(menu_item,@str_maction2[false],SizeOf(str_maction2),integer(m_action),-2);
+                            else menu_list_MakeFromStr(menu_item,@str_mactionl[false],SizeOf(str_mactionl),integer(m_action),-2);
 mi_settings_ScrollSpeed   : vid_CamSpeed:=menu_GetBarVal(menu_item,max_CamSpeed);
 mi_settings_MouseScroll   : vid_CamMScroll:=not vid_CamMScroll;
 mi_settings_PlayerName    : ;   // playername
@@ -724,7 +798,7 @@ mi_player_race6           : begin
                                     else PlayerSlotChangeRace(PlayerClient,p,menu_list_value,false);
                                   menu_List_Clear;
                                end
-                               else menu_list_MakeFromStr(menu_item,@str_race[0],SizeOf(str_race),g_players[p].slot_race,-1);
+                               else menu_list_MakeFromStr(menu_item,@str_racel[0],SizeOf(str_racel),g_players[p].slot_race,-1);
                             end;
 mi_player_team1,
 mi_player_team2,
@@ -780,7 +854,7 @@ mi_game_EmptySlots        : if(menu_list_selected>-1)then
                                Map_premap;
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromStr(menu_item,@str_PlayerSlots[ps_AI_1],SizeOf(str_PlayerSlots)-(SizeOf(str_PlayerSlots[0])*ps_AI_1),integer(g_ai_slots),-2);
+                            else menu_list_MakeAISlots(menu_item,integer(g_ai_slots),-2);
 mi_game_RandomSkrimish    : MakeRandomSkirmish(false);
 
 mi_game_RecordStatus      : if(rpls_state=rpls_state_none)
@@ -792,7 +866,7 @@ mi_game_RecordQuality     : if(menu_list_selected>-1)then
                                rpls_pnui:=menu_list_value;
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromStr(menu_item,@str_pnua[0],SizeOf(str_pnua[0])*(_cl_pnun_rpls+1),integer(rpls_pnui),-3);
+                            else menu_list_MakeFromStr(menu_item,@str_pnua[0],SizeOf(str_pnua[0])*(cl_UpT_arrayN_RPLs+1),integer(rpls_pnui),-3);
 
 //////////////////////////////////////////    MULTIPLAYER
 
@@ -831,7 +905,7 @@ mi_mplay_ClientConnect    : //if(net_status<>ns_server)and(not net_svsearch)then
                                else
                                  if(net_UpSocket(0))then
                                  begin
-                                    net_m_error:=str_connecting;
+                                    net_status_str:=str_connecting;
                                     net_status :=ns_client;
                                     net_cl_saddr;
                                     rpls_pnu:=0;
@@ -849,13 +923,13 @@ mi_mplay_NetSearch        : if(net_status=ns_client)then
                                   net_svsearch:=false;
                                   net_dispose;
                                   net_status :=ns_single;
-                                  net_m_error:='';
+                                  net_status_str:='';
                                end;
                             end
                             else
                               if(net_UpSocket(net_svlsearch_port))then
                               begin
-                                 net_m_error :=str_netsearching;
+                                 net_status_str:=str_netsearching;
                                  net_status  :=ns_client;
                                  net_svsearch:=true;
                                  menu_s1     :=ms1_sett;
@@ -865,10 +939,12 @@ mi_mplay_NetSearch        : if(net_status=ns_client)then
                                  net_svsearch_sel   :=0;
                               end
                               else net_dispose;
-mi_mplay_NetSearchList    : menu_item_ListLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,ui_menu_nsrch_lh3);
-mi_mplay_NetSearchCon     : if(0<=net_svsearch_sel)and(net_svsearch_sel<net_svsearch_listn)then ;
+mi_mplay_NetSearchList    : if(mleft_dbl_click>0)
+                            then menu_nsearch_connect
+                            else menu_item_ListLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,ui_menu_nsrch_lh3);
+mi_mplay_NetSearchCon     : menu_nsearch_connect;
+mi_mplay_ClientQuality    :;
 
-//
 
 {
 
@@ -911,7 +987,7 @@ mi_mplay_NetSearchCon     : if(0<=net_svsearch_sel)and(net_svsearch_sel<net_svse
               if(p<>PlayerClient)then
                with g_players[p] do
                 if (state<>ps_none)
-                then PlayerSetState(p,PS_None)
+                then PlayerSetState(p,ps_none)
                 else
                 begin
                    PlayerSetState(p,PS_Comp);
@@ -962,12 +1038,12 @@ mi_mplay_NetSearchCon     : if(0<=net_svsearch_sel)and(net_svsearch_sel<net_svse
               net_svsearch:=false;
               net_dispose;
               net_status :=ns_single;
-              net_m_error:='';
+              net_status_str:='';
               if(net_UpSocket(0))then
               begin
                  with net_svsearch_list[net_svsearch_sel] do net_cl_svstr:=c2ip(ip)+':'+w2s(swap(port));
                  net_cl_saddr;
-                 net_m_error:=str_connecting;
+                 net_status_str:=str_connecting;
                  net_status :=ns_client;
                  net_cl_saddr;
                  rpls_pnu:=0;
@@ -976,7 +1052,7 @@ mi_mplay_NetSearchCon     : if(0<=net_svsearch_sel)and(net_svsearch_sel<net_svse
               else net_dispose;
            end;
       92 : if(net_status<>ns_single)then menu_item:=0; // addr
-      93 : if(net_status<>ns_server)then ScrollByte(@net_pnui,true,0,_cl_pnun);
+      93 : if(net_status<>ns_server)then ScrollByte(@net_pnui,true,0,cl_UpT_arrayN);
       94 : if(G_Started=false)and(net_status<>ns_server)then
             if(mouse_x<ui_menu_csm_x2)
             then ScrollByte(@PlayerTeam,true,0,MaxPlayers)

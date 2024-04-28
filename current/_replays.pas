@@ -33,20 +33,21 @@ begin
          exit;
       end;
       vr:=0;
-      {$I-}
-      BlockRead(f,vr,SizeOf(version));
-      if(vr=version)then
+      BlockRead(f,vr,SizeOf(g_version));
+      if(vr=g_version)then
       begin
          hp:=0;
          vr:=0;
          mw:=0;
          wr:=0;
          BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
+         BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_map_size+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_type    ));
-         if(vr<=gms_m_types)then begin rpls_str_info+=str_m_tpe+str_mapt[vr]+tc_default+tc_nl3+' '; end
-                            else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(map_symmetry));rpls_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
+         if(vr>gms_m_types)then begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end
+                           else       rpls_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' '; vr:=0;
+         BlockRead(f,vr,sizeof(map_symmetry));
+         if(vr>gms_m_symm )then begin rpls_str_info:=str_svld_errors_wver;close(f);exit;     end
+                           else       rpls_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' '; vr:=0;
 
          BlockRead(f,vr,sizeof(g_mode      ));
          if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
@@ -54,43 +55,42 @@ begin
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
-         BlockRead(f,hp,SizeOf(PlayerClient          ));
+         BlockRead(f,hp,SizeOf(PlayerClient     ));
 
          rpls_str_info+=tc_nl3;
 
          for vr:=1 to MaxPlayers do
          begin
-            BlockRead(f,fn ,sizeof(fn));
+            BlockRead(f,fn,sizeof(fn));   // name
 
             rpls_str_info+=chr(vr)+pl_n_ch[vr=hp]+tc_default;
 
-            t:=0;
+            t :=0;
             tm:=0;
-            BlockRead(f,t,1);
-            if(t=PS_none)then
+            BlockRead(f,t ,1);  // state
+            BlockRead(f,tm,1);  // slot_state
+            if(t=ps_none)then
             begin
                rpls_str_info+=fn+tc_nl3;
-               BlockRead(f,mw,3);
+               BlockRead(f,mw,5);
             end
             else
             begin
-               BlockRead(f,t ,1);
-               BlockRead(f,tm,1);
-               BlockRead(f,t ,1);
+               BlockRead(f,t ,1); // race
+               BlockRead(f,tm,1); // slot_race
+               BlockRead(f,t ,1); // team
 
                if(t=0)
                then rpls_str_info+=str_observer[1]
                else
                  if(tm<=r_cnt)
-                 then rpls_str_info+=str_race[tm][2]
+                 then rpls_str_info+=str_racel[tm][2]
                  else rpls_str_info+='?';
                rpls_str_info+=','+t2c(t)+','+fn+tc_nl3;
             end;
          end;
       end
       else rpls_str_info:=str_svld_errors_wver;
-      if(IOResult<>0)then rpls_str_info:=str_svld_errors_wver;
-      {$I+}
       close(f);
    end
    else rpls_str_info:=str_svld_errors_file;
@@ -99,7 +99,7 @@ end;
 procedure replay_CalcHeaderSize;
 begin
    rpls_file_head_size
-                 :=SizeOf(version          )
+                 :=SizeOf(g_version        )
                   +SizeOf(map_seed         )
                   +SizeOf(map_mw           )
                   +SizeOf(map_type         )
@@ -112,11 +112,12 @@ begin
                   +sizeof(rpls_player      );
    with g_players[0] do
    rpls_file_head_size
-                 +=(sizeof(name )
-                   +sizeof(state)
-                   +sizeof(race )
-                   +sizeof(slot_race)
-                   +sizeof(team ))*MaxPlayers;
+                 +=(sizeof(name      )
+                   +sizeof(state     )
+                   +sizeof(slot_state)
+                   +sizeof(race      )
+                   +sizeof(slot_race )
+                   +sizeof(team     ))*MaxPlayers;
 end;
 
 function replay_GetProgress:single;
@@ -210,7 +211,6 @@ const vxyc = 5;
 var  i,gs,
       _vx,
       _vy  : byte;
-
 // WRITE
 procedure replay_WriteHead;
 var p:byte;
@@ -240,7 +240,7 @@ begin
       rpls_ticks  :=0;
 
       {$I-}
-      BlockWrite(rpls_file,version          ,SizeOf(version          ));
+      BlockWrite(rpls_file,g_version        ,SizeOf(g_version        ));
       BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
       BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
       BlockWrite(rpls_file,map_type         ,SizeOf(map_type         ));
@@ -249,21 +249,22 @@ begin
       BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
       BlockWrite(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
       BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-      BlockWrite(rpls_file,g_generators     ,SizeOf(g_generators    ));
+      BlockWrite(rpls_file,g_generators     ,SizeOf(g_generators     ));
       BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
       {$I+}
 
       for p:=1 to MaxPlayers do
-       with g_players[p] do
-       begin
-          {$I-}
-          BlockWrite(rpls_file,name     ,sizeof(name ));
-          BlockWrite(rpls_file,state    ,sizeof(state));
-          BlockWrite(rpls_file,race     ,sizeof(race ));
-          BlockWrite(rpls_file,slot_race,sizeof(slot_race));
-          BlockWrite(rpls_file,team     ,sizeof(team ));
-          {$I+}
-       end;
+        with g_players[p] do
+        begin
+           {$I-}
+           BlockWrite(rpls_file,name      ,sizeof(name      ));
+           BlockWrite(rpls_file,state     ,sizeof(state     ));
+           BlockWrite(rpls_file,slot_state,sizeof(slot_state));
+           BlockWrite(rpls_file,race      ,sizeof(race      ));
+           BlockWrite(rpls_file,slot_race ,sizeof(slot_race ));
+           BlockWrite(rpls_file,team      ,sizeof(team      ));
+           {$I+}
+        end;
 
       if(ioresult<>0)then
       begin
@@ -310,7 +311,6 @@ begin
       rpls_state:=rpls_state_none;
    end;
 end;
-
 
 // READ
 procedure replay_Readhead;
@@ -361,10 +361,10 @@ begin
 
       i:=0;
       {$I-}
-      BlockRead(rpls_file,i,SizeOf(version));
+      BlockRead(rpls_file,i,SizeOf(g_version));
       {$I+}
 
-      if(i<>version)then
+      if(i<>g_version)then
       begin
          replay_Abort;
          g_started    :=false;
@@ -387,7 +387,8 @@ begin
          {$I+}
 
          if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
-         or(map_type>gms_m_types)
+         or(map_type    >gms_m_types)
+         or(map_symmetry>gms_m_symm)
          or not(g_mode in allgamemodes)
          or(g_start_base>gms_g_startb)
          or(rpls_player>MaxPlayers)then
@@ -403,11 +404,12 @@ begin
           with g_players[p] do
           begin
              {$I-}
-             BlockRead(rpls_file,name ,sizeof(name ));
-             BlockRead(rpls_file,state,sizeof(state));
-             BlockRead(rpls_file,race ,sizeof(race ));
-             BlockRead(rpls_file,slot_race,sizeof(slot_race));
-             BlockRead(rpls_file,team ,sizeof(team ));
+             BlockRead(rpls_file,name      ,sizeof(name      ));
+             BlockRead(rpls_file,state     ,sizeof(state     ));
+             BlockRead(rpls_file,slot_state,sizeof(slot_state));
+             BlockRead(rpls_file,race      ,sizeof(race      ));
+             BlockRead(rpls_file,slot_race ,sizeof(slot_race ));
+             BlockRead(rpls_file,team      ,sizeof(team      ));
              {$I+}
           end;
 
@@ -429,18 +431,19 @@ begin
          rpls_state  :=rpls_state_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
-         PlayerClient     :=rpls_player;
+         PlayerClient:=rpls_player;
          UIPlayer    :=PlayerClient;
 
          rpls_plcam  :=false;
 
          map_premap;
+         vid_map_RedrawBack:=true;
          GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
 
          GameCameraBounds;
          ui_tab    :=3;
          G_Started :=true;
-         menu_state     :=false;
+         menu_state:=false;
          ServerSide:=false;
       end;
    end;
@@ -501,7 +504,6 @@ begin
 
    if(gs=gs_replaypause)then G_Status:=gs;
 end;
-
 
 begin
    rpls_ticks+=1;

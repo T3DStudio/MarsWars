@@ -33,8 +33,8 @@ begin
    fr:=limit mod base;
    case fr of
    0  : l2s:=i2s(limit div base);
-   50 : l2s:=i2s(limit div base)+'.5';
    25 : l2s:=i2s(limit div base)+'.25';
+   50 : l2s:=i2s(limit div base)+'.5';
    75 : l2s:=i2s(limit div base)+'.75';
    else l2s:=i2s(limit div base)+'.'+i2s(fr);
    end;
@@ -54,11 +54,9 @@ SDLK_LAlt,
 SDLK_RAlt           : GetKeyName:='Alt';
 SDLK_LShift,
 SDLK_RShift         : GetKeyName:='Shift';
-   else GetKeyName  :=UpperCase(SDL_GetKeyName(k));
+   else               GetKeyName:=UpperCase(SDL_GetKeyName(k));
    end
 end;
-
-
 
 function _gHK(ucl:byte):shortstring;  // hotkey units&upgrades tab
 begin
@@ -699,6 +697,12 @@ procedure lng_eng;
 var t: shortstring;
     p: byte;
 begin
+   str_bool[false]       := tc_red +'no';
+   str_bool[true ]       := tc_lime+'yes';
+
+   str_ps_comp           := 'AI';
+   str_ps_cheater        := 'cheater';
+
    str_MMap              := 'MAP';
    str_MPlayers          := 'PLAYERS';
    str_MObjectives       := 'OBJECTIVES';
@@ -716,17 +720,17 @@ begin
    str_reset[true ]      := 'RESET';
    str_exit[false]       := 'EXIT';
    str_exit[true]        := 'BACK';
-   str_m_tpe             := 'Type: ';
-   str_mapt[mapt_steppe] := tc_gray  +'Steppe';
-   str_mapt[mapt_nature] := tc_green +'Mountains';
-   str_mapt[mapt_lake  ] := tc_yellow+'Lake';
-   str_mapt[mapt_shore ] := tc_orange+'Sea shore';
-   str_mapt[mapt_sea   ] := tc_red   +'Sea';
-   str_m_siz             := 'Size: ';
-   str_m_sym             := 'Symm.: ';
-   str_m_symt[0]         := 'no';
-   str_m_symt[1]         := 'point';
-   str_m_symt[2]         := 'line';
+   str_map_type          := 'Type: ';
+   str_map_typel[mapt_steppe] := tc_gray  +'Steppe';
+   str_map_typel[mapt_nature] := tc_green +'Mountains';
+   str_map_typel[mapt_lake  ] := tc_yellow+'Lake';
+   str_map_typel[mapt_shore ] := tc_orange+'Sea shore';
+   str_map_typel[mapt_sea   ] := tc_red   +'Sea';
+   str_map_size          := 'Size: ';
+   str_map_sym           := 'Symm.: ';
+   str_map_syml[0]       := 'no';
+   str_map_syml[1]       := 'point';
+   str_map_syml[2]       := 'line';
    str_map               := 'Map';
    str_players           := 'Players';
    str_mrandom           := 'Random map';
@@ -739,11 +743,11 @@ begin
    str_lng[true]         := 'RUS';
    str_lng[false]        := 'ENG';
    str_maction           := 'Right-click action';
-   str_maction2[true ]   := tc_lime  +'move'  +tc_default;
-   str_maction2[false]   := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
-   str_race[r_random]    := tc_default+'RANDOM';
-   str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
-   str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
+   str_mactionl[true ]   := tc_lime  +'move'  +tc_default;
+   str_mactionl[false]   := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
+   str_racel[r_random]   := tc_default+'RANDOM';
+   str_racel[r_hell  ]   := tc_orange+'HELL'  +tc_default;
+   str_racel[r_uac   ]   := tc_lime  +'UAC'   +tc_default;
    str_observer          := 'OBSERV.';
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
@@ -868,31 +872,8 @@ begin
    str_PlayerSlots[ps_observer]:='observer';
    str_PlayerSlots[ps_opened  ]:='opened';
    str_PlayerSlots[ps_replace ]:='jump here';
-   str_PlayerSlots[ps_AI_1    ]:='AI 1';
-   str_PlayerSlots[ps_AI_2    ]:='AI 2';
-   str_PlayerSlots[ps_AI_3    ]:='AI 3';
-   str_PlayerSlots[ps_AI_4    ]:='AI 4';
-   str_PlayerSlots[ps_AI_5    ]:='AI 5';
-   str_PlayerSlots[ps_AI_6    ]:='AI 6';
-   str_PlayerSlots[ps_AI_7    ]:='AI 7';
-   str_PlayerSlots[ps_AI_8    ]:='AI cheater 1';
-   str_PlayerSlots[ps_AI_9    ]:='AI cheater 2';
-   str_PlayerSlots[ps_AI_10   ]:='AI cheater 3';
-   str_PlayerSlots[ps_AI_11   ]:='AI cheater 4';
-   {
-   ps_replace             = 3;  // menu option, not state
-   ps_AI_1                = 4;  // very easy
-   ps_AI_2                = 5;  // easy
-   ps_AI_3                = 6;  // medium
-   ps_AI_4                = 7;  // hard
-   ps_AI_5                = 8;  // harder
-   ps_AI_6                = 9;  // very hard
-   ps_AI_7                = 10; // elite
-   ps_AI_8                = 11; // Cheater 1 (Vision)
-   ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
-   ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
-   ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
-   }
+   for p:=ps_AI_1 to ps_AI_11 do
+   str_PlayerSlots[p]:=ai_name(p-ps_AI_1+1);
 
    str_teams[0]          := str_observer;
    for p:=1 to MaxPlayers do
@@ -986,9 +967,9 @@ begin
    str_connecting        := 'Connecting...';
    str_netsearching      := 'Searching for servers...';
    str_netsearch         := 'Search for LAN servers';
-   str_sver              := 'Wrong version!';
-   str_sfull             := 'Server full!';
-   str_sgst              := 'Game started!';
+   str_WrongVersion              := 'Wrong version!';
+   str_ServerFull             := 'Server full!';
+   str_GameStarted              := 'Game started!';
 
    str_hint_t[0]         := 'Buildings';
    str_hint_t[1]         := 'Units';
@@ -1311,6 +1292,12 @@ procedure lng_rus;
 var t: shortstring;
     p: byte;
 begin
+  str_bool[false]       := tc_red +'нет';
+  str_bool[true ]       := tc_lime+'да';
+
+  str_ps_comp           := 'ИИ';
+  str_ps_cheater        := 'читер';
+
   str_MMap              := 'КАРТА';
   str_MPlayers          := 'ИГРОКИ';
   str_MObjectives       := 'ЗАДАЧИ';
@@ -1328,17 +1315,17 @@ begin
   str_reset[true ]      := 'СБРОС';
   str_exit[false]       := 'ВЫХОД';
   str_exit[true]        := 'НАЗАД';
-  str_m_tpe             := 'Тип: ';
-  str_mapt[mapt_steppe] := tc_gray  +'Степь';
-  str_mapt[mapt_nature] := tc_green +'Горы';
-  str_mapt[mapt_lake  ] := tc_yellow+'Озеро';
-  str_mapt[mapt_shore ] := tc_orange+'Берег моря';
-  str_mapt[mapt_sea   ] := tc_red   +'Море';
-  str_m_siz             := 'Размер: ';
-  str_m_sym             := 'Симм.: ';
-  str_m_symt[0]         := 'нет';
-  str_m_symt[1]         := 'точка';
-  str_m_symt[2]         := 'линия';
+  str_map_type          := 'Тип: ';
+  str_map_typel[mapt_steppe] := tc_gray  +'Степь';
+  str_map_typel[mapt_nature] := tc_green +'Горы';
+  str_map_typel[mapt_lake  ] := tc_yellow+'Озеро';
+  str_map_typel[mapt_shore ] := tc_orange+'Берег моря';
+  str_map_typel[mapt_sea   ] := tc_red   +'Море';
+  str_map_size          := 'Размер: ';
+  str_map_sym           := 'Симм.: ';
+  str_map_syml[0]       := 'нет';
+  str_map_syml[1]       := 'точка';
+  str_map_syml[2]       := 'линия';
   str_map               := 'Карта';
   str_players           := 'Игроки';
   str_mrandom           := 'Случайная карта';
@@ -1349,9 +1336,9 @@ begin
   str_fullscreen        := 'В окне';
   str_plname            := 'Имя игрока';
   str_maction           := 'Действие на правый клик';
-  str_maction2[true ]   := tc_lime+'движение'+tc_default;
-  str_maction2[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
-  str_race[r_random]    := tc_default+'ЛЮБАЯ';
+  str_mactionl[true ]   := tc_lime+'движение'+tc_default;
+  str_mactionl[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
+  str_racel[r_random]   := tc_default+'ЛЮБАЯ';
   str_observer          := 'ЗРИТЕЛЬ';
   str_pause             := 'Пауза';
   str_win               := 'ПОБЕДА!';
@@ -1476,31 +1463,8 @@ begin
   str_PlayerSlots[ps_observer]:='зритель';
   str_PlayerSlots[ps_opened  ]:='открыто';
   str_PlayerSlots[ps_replace ]:='на этот слот';
-  str_PlayerSlots[ps_AI_1    ]:='ИИ 1';
-  str_PlayerSlots[ps_AI_2    ]:='ИИ 2';
-  str_PlayerSlots[ps_AI_3    ]:='ИИ 3';
-  str_PlayerSlots[ps_AI_4    ]:='ИИ 4';
-  str_PlayerSlots[ps_AI_5    ]:='ИИ 5';
-  str_PlayerSlots[ps_AI_6    ]:='ИИ 6';
-  str_PlayerSlots[ps_AI_7    ]:='ИИ 7';
-  str_PlayerSlots[ps_AI_8    ]:='ИИ читер 1';
-  str_PlayerSlots[ps_AI_9    ]:='ИИ читер 2';
-  str_PlayerSlots[ps_AI_10   ]:='ИИ читер 3';
-  str_PlayerSlots[ps_AI_11   ]:='ИИ читер 4';
-  {
-  ps_replace             = 3;  // menu option, not state
-  ps_AI_1                = 4;  // very easy
-  ps_AI_2                = 5;  // easy
-  ps_AI_3                = 6;  // medium
-  ps_AI_4                = 7;  // hard
-  ps_AI_5                = 8;  // harder
-  ps_AI_6                = 9;  // very hard
-  ps_AI_7                = 10; // elite
-  ps_AI_8                = 11; // Cheater 1 (Vision)
-  ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
-  ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
-  ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
-  }
+  for p:=ps_AI_1 to ps_AI_11 do
+  str_PlayerSlots[p]:=ai_name(p-ps_AI_1+1);
 
   str_teams[0]          := str_observer;
   for p:=1 to MaxPlayers do
@@ -1563,9 +1527,9 @@ begin
   str_connecting        := 'Соединение...';
   str_netsearching      := 'Поиск серверов...';
   str_netsearch         := 'Поиск серверов в локальной сети';
-  str_sver              := 'Другая версия!';
-  str_sfull             := 'Нет мест!';
-  str_sgst              := 'Игра началась!';
+  str_WrongVersion              := 'Другая версия!';
+  str_ServerFull             := 'Нет мест!';
+  str_GameStarted              := 'Игра началась!';
 
   str_hint_t[0]         := 'Здания';
   str_hint_t[1]         := 'Юниты';
