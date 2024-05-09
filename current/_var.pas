@@ -21,6 +21,7 @@ g_step            : cardinal = 0;
 g_player_astatus  : byte     = 0;
 g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
+g_slot_state      : array[0..MaxPlayers] of byte;
 
 g_inv_limit       : longint  = 0;
 g_inv_wave_n      : byte     = 0;
@@ -237,7 +238,7 @@ vid_APM           : boolean = false;
 vid_FPS           : boolean = false;
 vid_CamMScroll    : boolean = false;
 vid_ColoredShadow : boolean = true;
-vid_ppos          : byte = 0;
+vid_PannelPos     : byte = 0;
 vid_panelx        : integer = 0;
 vid_panely        : integer = 0;
 vid_mapx          : integer = 0;
@@ -811,9 +812,9 @@ str_plname,
 str_aislots,
 str_generators,
 str_DeadObservers,
-str_team,
-str_srace,
+str_Address,
 str_ready,
+str_nready,
 str_fstarts,
 str_gmodet,
 str_starta,
@@ -880,8 +881,8 @@ str_udpport,
 str_connecting,
 str_netsearching,
 str_netsearch,
-str_pnu,
-str_npnu,
+str_replay_Quality,
+str_net_Quality,
 str_soundvol,
 str_musicvol,
 str_maction,

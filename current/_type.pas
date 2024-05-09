@@ -443,7 +443,7 @@ TPlayer = record
 
    team,
    race ,slot_race,
-   state,slot_state,
+   state,
    pnum    : byte;
 
    build_cd,
@@ -453,9 +453,9 @@ TPlayer = record
    armylimit
            : longint;
 
-   observer,
-   revealed,
-   ready   : boolean;
+   isobserver,
+   isrevealed,
+   isready : boolean;
 
    o_id    : byte;
 o_a0,
@@ -463,7 +463,7 @@ o_x0,o_y0,
 o_x1,o_y1  : integer;
 
    ucl_e,                                        // existed class
-   ucl_eb,                                       // existed class bld=true and hits>0
+   ucl_eb,                                       // existed class iscomplete=true and hits>0
    ucl_s,                                        // selected
    ucl_x   : array[false..true,byte] of integer; // first unit class
 
@@ -709,8 +709,9 @@ TGamePreset = record
    gp_map_type,
    gp_map_symmetry,
    gp_g_mode    : byte;
-   gp_g_fixed_positions
-                : boolean;
+
+   gp_player_slot
+                : array[1..MaxPlayers] of boolean;
 end;
 
 

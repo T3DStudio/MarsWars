@@ -55,6 +55,26 @@ end;
 
 {$ENDIF}
 
+procedure InitGamePresets;
+begin
+   g_preset_cur:=0;
+   g_preset_n  :=gp_count;
+   setlength(g_presets,g_preset_n);
+
+   with g_presets[gp_1x1_plane] do
+   begin
+      gp_map_seed  := 667;
+      gp_map_mw    := 4000;
+      gp_map_type  := mapt_steppe;
+      gp_map_symmetry
+                   := 1;
+      gp_g_mode    := gm_scirmish;
+
+      FillChar(gp_player_slot,SizeOf(gp_player_slot),0);
+      gp_player_slot[1]:=true;
+      gp_player_slot[4]:=true;
+   end;
+end;
 
 procedure InitGame;
 begin
@@ -66,6 +86,7 @@ begin
    randomize;
 
    GameObjectsInit;
+   InitGamePresets;
 
    {$IFDEF _FULLGAME}
 
@@ -79,7 +100,7 @@ begin
 
    menu_ReInit;
    InitRX2Y;
-   lng_eng;
+   language_eng;
    SwitchLanguage;
    InitUIDDataCL;
    missile_InitCLData;

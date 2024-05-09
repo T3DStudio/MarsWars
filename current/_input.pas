@@ -305,7 +305,7 @@ begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
 
-   if(UIPlayer<>PlayerClient)
+   if(UIPlayer<>PlayerClient)or(g_players[PlayerClient].isobserver)
    then m_brush:=mb_empty
    else
    case m_brush of
@@ -379,7 +379,7 @@ var u:integer;
 begin
    SoundPlayUI(snd_click);
    case by of
-   3 : case vid_ppos of   // tabs
+   3 : case vid_PannelPos of   // tabs
        0,1: begin mouse_x-=vid_panelx; if(mouse_y>vid_panelw)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
        2,3: begin mouse_y-=vid_panely; if(mouse_x>vid_panelw)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
        end;
@@ -401,7 +401,7 @@ begin
 
      by-=4;// 0,0 under minimap
 
-     if(vid_ppos>=2)then
+     if(vid_PannelPos>=2)then
      begin
         u:=bx;
         bx:=by;
@@ -467,7 +467,7 @@ begin
        end;
    end
    else
-     if(g_players[PlayerClient].observer)then // observer controls
+     if(g_players[PlayerClient].isobserver)then // isobserver controls
      begin
         if(click_type=pct_left)then
           case u of
@@ -530,7 +530,7 @@ sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                  else sys_uncappedFPS:=not sys_uncappedFPS;
 sdlk_home      : test_fastprod:=not test_fastprod;
-sdlk_pageup    : with g_players[PlayerClient] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
+sdlk_pageup    : with g_players[PlayerClient] do if(state=ps_play      )then state:=PS_Comp       else state:=ps_play;
 sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : sys_fog:=not sys_fog;
 SDLK_F3        : nullupgr(PlayerClient);
@@ -557,7 +557,7 @@ procedure InGameHotkeys(k:cardinal);
 var ko,k2:cardinal;
 procedure ko2_panel_click(tabN,ClickType:byte;kdbl:boolean);
 begin
-   if(vid_ppos<2)
+   if(vid_PannelPos<2)
    then ui_PanelButton(tabN, ko mod 3      ,4+(ko div 3)             ,ClickType,kdbl)
    else ui_PanelButton(tabN,(ko div 3)mod 3,4+(ko div 9)*3+(ko mod 3),ClickType,kdbl);
 end;
@@ -606,7 +606,7 @@ sdlk_tab: begin
          end;
       end
       else
-        if(g_players[PlayerClient].observer)then
+        if(g_players[PlayerClient].isobserver)then
         begin
            for ko:=0 to _mhkeys do  // observer
            begin
@@ -792,7 +792,9 @@ var u:integer;
 begin
    mouse_map_x:=mouse_x+vid_cam_x-vid_mapx;
    mouse_map_y:=mouse_y+vid_cam_y-vid_mapy;
-   if(vid_ppos<2)then  //vertical
+
+   // pannel bx by
+   if(vid_PannelPos<2)then  //vertical
    begin
       u:=mouse_x-vid_panelx;m_bx:=u div vid_BW;if(u<0)then m_bx-=1;
       u:=mouse_y-vid_panely;m_by:=u div vid_BW;if(u<0)then m_by-=1;
@@ -916,7 +918,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
      else ;
 end;
 
-procedure _move_v_m;
+procedure GameCameraMoveMScroll;
 begin
    if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_CamSpeed;
    if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_CamSpeed;
@@ -924,13 +926,13 @@ begin
    if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_CamSpeed;
 end;
 
-procedure _view_move;
+procedure GameCameraMove;
 var vx,vy:integer;
 begin
    vx:=vid_cam_x;
    vy:=vid_cam_y;
 
-   if(vid_CamMScroll)then _move_v_m;
+   if(vid_CamMScroll)then GameCameraMoveMScroll;
 
    if(ks_up   >0)then vid_cam_y-=vid_CamSpeed;
    if(ks_left >0)then vid_cam_x-=vid_CamSpeed;
@@ -942,7 +944,7 @@ end;
 
 procedure g_keyboard;
 begin
-   if(m_vmove=false)and(rpls_plcam=false)then _view_move;
+   if(not m_vmove)and(not rpls_plcam)then GameCameraMove;
    if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2);
 end;
 
@@ -951,7 +953,6 @@ begin
    WindowEvents;
 
    if(mleft_dbl_click>0)then mleft_dbl_click-=1;
-   if(ks_mleft=-1)then mleft_dbl_click:=fr_fpsd4;
 
    if(menu_state)then
    begin
@@ -972,6 +973,8 @@ begin
       g_keyboard;
       g_mouse;
    end;
+
+   if(ks_mleft=-1)then mleft_dbl_click:=fr_fpsd4;
 end;
 
 

@@ -1,7 +1,7 @@
-Адская Крепость
+Hell Keep
 
 Hotkey: R
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
@@ -9,21 +9,21 @@ Base vision range: 275
 Build time: 56
 Energy required: 900
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Увеличение Области Обзора Адской Крепости - vision range +50;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Hell Keep Range Upgrade - vision range +50;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+300). Можно перестроить в "Великая Адская Крепость". Специальная способность: "Перемещение"{Треб.: "Телепортация Адской Крепости"}.
+Builder. Increases energy level(+300). Can be rebuilt into "Great Hell Keep". Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}.
 
 ---------------------------
 
-Великая Адская Крепость
+Great Hell Keep
 
 Hotkey: R
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
@@ -33,19 +33,19 @@ Energy required: 300
 
 
 Upgrades:
-- Увеличение Области Обзора Адской Крепости - vision range +50;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Hell Keep Range Upgrade - vision range +50;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+600). Специальная способность: "Перемещение"{Треб.: "Телепортация Адской Крепости"}.
+Builder. Increases energy level(+600). Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}.
 
 ---------------------------
 
-Врата Демонов
+Demon`s Gate
 
 Hotkey: T
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 60
@@ -53,19 +53,19 @@ Base vision range: 145
 Build time: 56
 Energy required: 300
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
 
-Производит юнитов. Можно перестроить в "Врата Демонов[уровень 2]"{Треб.: "Замок Проклятых"}.
+Unit production. Can be rebuilt into "Demon`s Gate[level2]"{Req.: "Castle of the Damned"}.
 
 ---------------------------
 
-Нечестивый Символ
+Unholy Symbol
 
 Hotkey: Y
-Categories/Attributes: [T1,здание,механический,легкий,наземный]
+Categories/Attributes: [T1,building,mechanical,light,ground]
 Max hits: 1000
 Limit used: 1.5
 Size: 38
@@ -73,20 +73,20 @@ Base vision range: 101
 Build time: 35
 Energy required: 50
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость,Проклятый Командный Центр,Продвинутый Проклятый Командный Центр
+Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Увеличивает уровень энергии(+50). Можно перестроить в "Великий Нечестивый Символ".
+Increases energy level(+50). Can be rebuilt into "Great Unholy Symbol".
 
 ---------------------------
 
-Великий Нечестивый Символ
+Great Unholy Symbol
 
 Hotkey: Y
-Categories/Attributes: [T1,здание,механический,легкий,наземный]
+Categories/Attributes: [T1,building,mechanical,light,ground]
 Max hits: 1000
 Limit used: 1.5
 Size: 38
@@ -96,18 +96,18 @@ Energy required: 0
 
 
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Увеличивает уровень энергии(+100).
+Increases energy level(+100).
 
 ---------------------------
 
-Инфернальные Омуты
+Infernal Pools
 
 Hotkey: H
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 53
@@ -115,20 +115,20 @@ Base vision range: 131
 Build time: 56
 Energy required: 300
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Исследует улучшения и апгрейды. Можно перестроить в "Инфернальные Омуты[уровень 2]"{Треб.: "Замок Проклятых"}.
+Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level2]"{Req.: "Castle of the Damned"}.
 
 ---------------------------
 
-Сторожевая Башня
+Guard Tower
 
 Hotkey: V
-Categories/Attributes: [T1,здание,механический,легкий,наземный]
+Categories/Attributes: [T1,building,mechanical,light,ground]
 Max hits: 5000
 Limit used: 1
 Size: 20
@@ -136,43 +136,43 @@ Base vision range: 275
 Build time: 28
 Energy required: 300
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость,Проклятый Командный Центр,Продвинутый Проклятый Командный Центр
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой] кроме [Imp], воздействие 62*3, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,биологический,тяжелый];
+Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 62*3, upgrade: Hell Firepower(+8), factor: x1.5 [unit,biological,heavy];
 Upgrades:
-- Демонические Призраки - vision range +25;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Demonic Spirits - vision range +25;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Защитное сооружение. Специальная способность: "Скачок"{Треб.: "Короткая Телепортация"}.
+Defensive structure. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
-Телепорт
+Teleporter
 
 Hotkey: K
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 3000
 Limit used: 4
 Size: 28
 Base vision range: 100
 Build time: 56
 Energy required: 300
-Требования: Великая Адская Крепость
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Requirements: Great Hell Keep
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
 
-Специальная способность: "Телепортация".
+Special ability: "Teleportation".
 
 ---------------------------
 
-Око Зла
+Evil Eye
 
 Hotkey: J
-Categories/Attributes: [T1,здание,механический,легкий,наземный,детектор]
+Categories/Attributes: [T1,building,mechanical,light,ground,detector]
 Max hits: 62
 Limit used: 1
 Size: 10
@@ -180,108 +180,108 @@ Base vision range: 300
 Build time: 28
 Energy required: 50
 
-Чем может быть построен: Адская Крепость,Великая Адская Крепость,Око Зла,Проклятый Командный Центр,Продвинутый Проклятый Командный Центр
+Constructed by: Hell Keep,Great Hell Keep,Evil Eye,Hell Command Center,Advanced Hell Command Center
 Upgrades:
-- Улучшение Ока Зла - vision range +50;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Evil Eye Upgrade - vision range +50;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Специальная способность: "Адское зрение".
+Passive scouting and detection. Special ability: "Hell Vision".
 
 ---------------------------
 
-Монастырь Отчаяния
+Monastery of Despair
 
 Hotkey: U
-Categories/Attributes: [T2,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T2,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 65
 Base vision range: 155
 Build time: 112
 Energy required: 1200
-Требования: Инфернальные Омуты
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Requirements: Infernal Pools
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
 ---------------------------
 
-Тотем Ужаса
+Totem of Horror
 
 Hotkey: B
-Categories/Attributes: [T3,здание,механический,легкий,наземный]
+Categories/Attributes: [T3,building,mechanical,light,ground]
 Max hits: 3000
 Limit used: 2
 Size: 21
 Base vision range: 275
 Build time: 42
 Energy required: 450
-Требования: Замок Проклятых
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
-Вооружение/Способности: 
-- дальний бой, max. range: vision range+50, цели: [живой,юнит], воздействие 496*0.5, splash damage radius: 20;
+Requirements: Castle of the Damned
+Constructed by: Hell Keep,Great Hell Keep
+Arming/Abilities: 
+- ranged attack, max. range: vision range+50, targets: [alive,unit], impact 496*0.5, splash damage radius: 20;
 Upgrades:
-- Демонические Призраки - vision range +25;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Demonic Spirits - vision range +25;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Продвинутое защитное сооружение. Специальная способность: "Скачок"{Треб.: "Короткая Телепортация"}.
+Advanced defensive structure. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
-Алтарь Боли
+Altar of Pain
 
 Hotkey: L
-Categories/Attributes: [T3,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T3,building,mechanical,heavy,ground]
 Max hits: 3000
 Limit used: 1
 Size: 50
 Base vision range: 125
 Build time: 56
 Energy required: 300
-Требования: Монастырь Отчаяния,Замок Проклятых
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Requirements: Monastery of Despair,Castle of the Damned
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Специальная способность: "Неуязвимость"{Треб.: "Сферы Неуязвимости"}.
+Special ability: "Invulnerability"{Req.: "Invulnerability Sphere"}.
 
 ---------------------------
 
-Замок Проклятых
+Castle of the Damned
 
 Hotkey: I
-Categories/Attributes: [T2,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T2,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 86
 Base vision range: 197
 Build time: 112
 Energy required: 1200
-Требования: Инфернальные Омуты
-Чем может быть построен: Адская Крепость,Великая Адская Крепость
+Requirements: Infernal Pools
+Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
 ---------------------------
 
-Проклятый Командный Центр
+Hell Command Center
 
 Hotkey: F
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный,транспорт]
+Categories/Attributes: [T1,building,mechanical,heavy,ground,transport]
 Max hits: 15000
 Limit used: 1
 Size: 66
@@ -290,23 +290,23 @@ Build time: 84
 Energy required: 900
 Base transport capacity: 30
 
-Чем может быть построен: Проклятый Командный Центр,Продвинутый Проклятый Командный Центр
-Вооружение/Способности: 
-- дальний бой, min. range: 66, max. range: 275, цели: [живой] кроме [Imp], воздействие 62*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,биологический,тяжелый];
+Constructed by: Hell Command Center,Advanced Hell Command Center
+Arming/Abilities: 
+- ranged attack, min. range: 66, max. range: 275, targets: [alive] except [Imp], impact 62*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,biological,heavy];
 Upgrades:
-- Увеличение Области Обзора Адской Крепости - vision range +50;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Hell Keep Range Upgrade - vision range +50;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+300). Можно перестроить в "Продвинутый Проклятый Командный Центр". Специальная способность: "Двигатели для полета".
+Corrupted Command Center. Builder. Increases energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Special ability: "Flight Engines".
 
 ---------------------------
 
-Продвинутый Проклятый Командный Центр
+Advanced Hell Command Center
 
 Hotkey: F
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный,транспорт]
+Categories/Attributes: [T1,building,mechanical,heavy,ground,transport]
 Max hits: 15000
 Limit used: 1
 Size: 66
@@ -316,22 +316,22 @@ Energy required: 300
 Base transport capacity: 30
 
 
-Вооружение/Способности: 
-- дальний бой, min. range: 66, max. range: 275, цели: [живой] кроме [Imp], воздействие 62*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,биологический,тяжелый];
+Arming/Abilities: 
+- ranged attack, min. range: 66, max. range: 275, targets: [alive] except [Imp], impact 62*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,biological,heavy];
 Upgrades:
-- Увеличение Области Обзора Адской Крепости - vision range +50;
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Hell Keep Range Upgrade - vision range +50;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+600). Специальная способность: "Двигатели для полета".
+Corrupted Advanced Command Center. Builder. Increases energy level(+600). Special ability: "Flight Engines".
 
 ---------------------------
 
-Казармы Зомби
+Zombie Barracks
 
 Hotkey: G
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 60
@@ -339,31 +339,31 @@ Base vision range: 145
 Build time: 56
 Energy required: 300
 
-Чем может быть построен: Проклятый Командный Центр,Продвинутый Проклятый Командный Центр
+Constructed by: Hell Command Center,Advanced Hell Command Center
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
 
-Производит юнитов. Можно перестроить в "Казармы Зомби[уровень 2]"{Треб.: "Продвинутый Проклятый Командный Центр"}.
+Corrupted Barracks. Unit production. Can be rebuilt into "Zombie Barracks[level2]"{Req.: "Advanced Hell Command Center"}.
 
 ---------------------------
 
-Пентаграмма Смерти
+Pentagram of Death
 
 Hotkey: O
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 65
 Base vision range: 155
 Build time: 112
 Energy required: 1200
-Требования: Инфернальные Омуты
+Requirements: Infernal Pools
 
 Upgrades:
-- Каменные Стены - armor +16;
-- Восстановление Зданий - hits regeneration +8;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Stone Walls - armor +16;
+- Building Restoration - hits regeneration +8;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
@@ -372,7 +372,7 @@ Upgrades:
 Lost Soul
 
 Hotkey: J
-Categories/Attributes: [T1,юнит,биологический,легкий,летающий]
+Categories/Attributes: [T1,unit,biological,light,flying]
 Max hits: 1000
 Limit used: 1
 Size: 10
@@ -382,14 +382,14 @@ Build time: 14
 Energy required: 100
 PainState base threshold: 1
 
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- ближний бой, цели: [живой], воздействие 15*1, upgrade: Когти и зубы(+8), factor: x0.5 [механический];
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- melee attack, targets: [alive], impact 15*1, upgrade: Claws and Teeth(+8), factor: x0.5 [mechanical];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
@@ -398,7 +398,7 @@ Upgrades:
 Phantom
 
 Hotkey: K
-Categories/Attributes: [T1,юнит,биологический,легкий,летающий]
+Categories/Attributes: [T1,unit,biological,light,flying]
 Max hits: 1000
 Limit used: 1
 Size: 10
@@ -408,15 +408,15 @@ Build time: 28
 Energy required: 200
 PainState base threshold: 1
 
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- ближний бой, +зомбификация, цели: [наземный,летающий], воздействие 15*1, upgrade: Когти и зубы(+8), factor: x0.5 [механический];
-- ближний бой, цели: [живой], воздействие 15*1, upgrade: Когти и зубы(+8), factor: x0.5 [механический];
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- melee attack, +zombification, targets: [ground,flying], impact 15*1, upgrade: Claws and Teeth(+8), factor: x0.5 [mechanical];
+- melee attack, targets: [alive], impact 15*1, upgrade: Claws and Teeth(+8), factor: x0.5 [mechanical];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
@@ -425,7 +425,7 @@ Upgrades:
 Imp
 
 Hotkey: R
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 750
 Limit used: 1
 Size: 11
@@ -436,15 +436,15 @@ Energy required: 200
 PainState base threshold: 2
 Slots in transport: 1
 
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой] кроме [Imp], воздействие 62*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,биологический,тяжелый];
-- ближний бой, цели: [Imp], воздействие 62*1, upgrade: Когти и зубы(+8);
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 62*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,biological,heavy];
+- melee attack, targets: [Imp], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
@@ -453,7 +453,7 @@ Upgrades:
 Pinky Demon
 
 Hotkey: T
-Categories/Attributes: [T1,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T1,unit,biological,heavy,ground]
 Max hits: 1500
 Limit used: 1
 Size: 14
@@ -463,15 +463,15 @@ Build time: 28
 Energy required: 250
 PainState base threshold: 8
 Slots in transport: 2
-Требования: Инфернальные Омуты
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- ближний бой, цели: [живой,наземный], воздействие 62*2, upgrade: Когти и зубы(+8), factor: x1.5 [тяжелый];
+Requirements: Infernal Pools
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- melee attack, targets: [alive,ground], impact 62*2, upgrade: Claws and Teeth(+8), factor: x1.5 [heavy];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -480,7 +480,7 @@ Upgrades:
 Cacodemon
 
 Hotkey: Y
-Categories/Attributes: [T1,юнит,биологический,тяжелый,летающий]
+Categories/Attributes: [T1,unit,biological,heavy,flying]
 Max hits: 2000
 Limit used: 1.5
 Size: 14
@@ -489,16 +489,16 @@ Base vision range: 200
 Build time: 35
 Energy required: 250
 PainState base threshold: 8
-Требования: Инфернальные Омуты,Великая Адская Крепость
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой] кроме [Cacodemon], воздействие 62*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,механический];
-- ближний бой, цели: [Cacodemon], воздействие 62*1, upgrade: Когти и зубы(+8);
+Requirements: Infernal Pools,Great Hell Keep
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive] except [Cacodemon], impact 62*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,mechanical];
+- melee attack, targets: [Cacodemon], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -507,7 +507,7 @@ Upgrades:
 Hell Knight
 
 Hotkey: F
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 2500
 Limit used: 2
 Size: 14
@@ -517,16 +517,16 @@ Build time: 42
 Energy required: 300
 PainState base threshold: 8
 Slots in transport: 3
-Требования: Инфернальные Омуты
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный] кроме [Hell Knight,Baron of Hell], воздействие 93*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,легкий];
-- ближний бой, цели: [Hell Knight,Baron of Hell], воздействие 62*1, upgrade: Когти и зубы(+8);
+Requirements: Infernal Pools
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 93*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
+- melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -535,7 +535,7 @@ Upgrades:
 Baron of Hell
 
 Hotkey: G
-Categories/Attributes: [T1,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T1,unit,biological,heavy,ground]
 Max hits: 4500
 Limit used: 3
 Size: 14
@@ -545,16 +545,16 @@ Build time: 42
 Energy required: 500
 PainState base threshold: 8
 Slots in transport: 3
-Требования: Инфернальные Омуты
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный] кроме [Hell Knight,Baron of Hell], воздействие 93*1, upgrade: Адская Огневая Мощь(+8), factor: x1.5 [юнит,легкий];
-- ближний бой, цели: [Hell Knight,Baron of Hell], воздействие 62*1, upgrade: Когти и зубы(+8);
+Requirements: Infernal Pools
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 93*1, upgrade: Hell Firepower(+8), factor: x1.5 [unit,light];
+- melee attack, targets: [Hell Knight,Baron of Hell], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -563,7 +563,7 @@ Upgrades:
 Pain Elemental
 
 Hotkey: H
-Categories/Attributes: [T2,юнит,биологический,тяжелый,летающий]
+Categories/Attributes: [T2,unit,biological,heavy,flying]
 Max hits: 1500
 Limit used: 1
 Size: 15
@@ -572,25 +572,25 @@ Base vision range: 200
 Build time: 56
 Energy required: 400
 PainState base threshold: 3
-Требования: Монастырь Отчаяния
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- порождение "Phantom", max. range: vision range+50, цели: [живой], воздействие *0.5, {Треб.: "Фантомы"};
-- порождение "Lost Soul", max. range: vision range+50, цели: [живой], воздействие *0.5;
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- spawn "Phantom", max. range: vision range+50, targets: [alive], impact *0.5, {Req.: "Phantoms"};
+- spawn "Lost Soul", max. range: vision range+50, targets: [alive], impact *0.5;
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +2;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +2;
 
-Специальная способность: "Выпустить Lost Soul".
+Special ability: "Spawn LostSoul".
 
 ---------------------------
 
 Revenant
 
 Hotkey: V
-Categories/Attributes: [T2,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,biological,heavy,ground]
 Max hits: 1500
 Limit used: 1.5
 Size: 13
@@ -600,16 +600,16 @@ Build time: 35
 Energy required: 250
 PainState base threshold: 5
 Slots in transport: 2
-Требования: Монастырь Отчаяния
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-fly range: +50, цели: [живой] кроме [Revenant], воздействие 93*1, upgrade: Демоническое Оружие(+8), factor: x1.5 [летающий];
-- ближний бой, цели: [Revenant], воздействие 62*1, upgrade: Когти и зубы(+8);
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-fly range: +50, targets: [alive] except [Revenant], impact 93*1, upgrade: Demonic Weapons(+8), factor: x1.5 [flying];
+- melee attack, targets: [Revenant], impact 62*1, upgrade: Claws and Teeth(+8);
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +3;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +3;
 
 
 
@@ -618,7 +618,7 @@ Upgrades:
 Mancubus
 
 Hotkey: B
-Categories/Attributes: [T2,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,biological,heavy,ground]
 Max hits: 3600
 Limit used: 3
 Size: 20
@@ -628,15 +628,15 @@ Build time: 42
 Energy required: 500
 PainState base threshold: 7
 Slots in transport: 4
-Требования: Монастырь Отчаяния
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-building range: +50, цели: [живой] кроме [Mancubus], воздействие 62x2*1.2, upgrade: Демоническое Оружие(+8), factor: x3 [здание];
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-building range: +50, targets: [alive] except [Mancubus], impact 62x2*1.2, upgrade: Demonic Weapons(+8), factor: x3 [building];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -645,7 +645,7 @@ Upgrades:
 Arachnotron
 
 Hotkey: N
-Categories/Attributes: [T2,юнит,механический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,mechanical,heavy,ground]
 Max hits: 3000
 Limit used: 3
 Size: 20
@@ -655,14 +655,14 @@ Build time: 42
 Energy required: 500
 PainState base threshold: 7
 Slots in transport: 4
-Требования: Монастырь Отчаяния
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-unit range: +50, цели: [живой] кроме [Arachnotron], воздействие 62*3, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,механический];
+Requirements: Monastery of Despair
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive] except [Arachnotron], impact 62*3, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
 
 
 
@@ -671,7 +671,7 @@ Upgrades:
 Arch-Vile
 
 Hotkey: U
-Categories/Attributes: [T3,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T3,unit,biological,heavy,ground]
 Max hits: 4000
 Limit used: 4
 Size: 14
@@ -681,16 +681,16 @@ Build time: 56
 Energy required: 600
 PainState base threshold: 7
 Slots in transport: 4
-Требования: Монастырь Отчаяния,Замок Проклятых
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- воскрешение, цели: [мертвый,демоны и зомби] кроме [Cyberdemon,Spider Mastermind,Arch-Vile], воздействие *2, {Треб.: "Воскрешение"};
-- дальний бой, max. range: vision range+100, цели: [живой,юнит], воздействие 496*0.5, splash damage radius: 20;
+Requirements: Monastery of Despair,Castle of the Damned
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- resurrection, targets: [dead,demons&zombies] except [Cyberdemon,Spider Mastermind,Arch-Vile], impact *2, {Req.: "Resurrection"};
+- ranged attack, max. range: vision range+100, targets: [alive,unit], impact 496*0.5, splash damage radius: 20;
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +4;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +4;
 
 
 
@@ -699,7 +699,7 @@ Upgrades:
 Spider Mastermind
 
 Hotkey: I
-Categories/Attributes: [T3,юнит,механический,тяжелый,наземный]
+Categories/Attributes: [T3,unit,mechanical,heavy,ground]
 Max hits: 14000
 Limit used: 10
 Size: 35
@@ -709,23 +709,23 @@ Build time: 112
 Energy required: 1200
 PainState base threshold: 8
 Slots in transport: 12
-Требования: Монастырь Отчаяния,Замок Проклятых
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 186*2, factor: x1.5 [легкий];
+Requirements: Monastery of Despair,Castle of the Damned
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 186*2, factor: x1.5 [light];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
 
-Невосприимчив к взрывной волне.
+Immune to splash damage.
 
 ---------------------------
 
 Cyberdemon
 
 Hotkey: O
-Categories/Attributes: [T3,юнит,механический,тяжелый,наземный]
+Categories/Attributes: [T3,unit,mechanical,heavy,ground]
 Max hits: 19000
 Limit used: 12
 Size: 20
@@ -735,23 +735,23 @@ Build time: 168
 Energy required: 1200
 PainState base threshold: 10
 Slots in transport: 12
-Требования: Монастырь Отчаяния,Замок Проклятых
-Создается в: Врата Демонов
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 310*1, splash damage radius: 40, factor: x3 [здание],x0.5 [юнит,легкий];
+Requirements: Monastery of Despair,Castle of the Damned
+Produced by: Demon`s Gate
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 310*1, splash damage radius: 40, factor: x3 [building],x0.5 [unit,light];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
 
-Невосприимчив к взрывной волне.
+Immune to splash damage.
 
 ---------------------------
 
-Обычный Зомби
+Former Zombie
 
 Hotkey: L
-Categories/Attributes: [T2,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T2,unit,biological,light,ground]
 Max hits: 500
 Limit used: 1
 Size: 12
@@ -762,23 +762,23 @@ Energy required: 200
 PainState base threshold: 1
 Slots in transport: 1
 
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 31*1, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,биологический,легкий];
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 31*1, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,biological,light];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
 ---------------------------
 
-Зомби Инженер
+Zombie Engineer
 
 Hotkey: Ctrl+R
-Categories/Attributes: [T2,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T2,unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -788,24 +788,24 @@ Build time: 42
 Energy required: 600
 PainState base threshold: 2
 Slots in transport: 2
-Требования: Казармы Зомби(x4)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- самоубийство, цели: [живой,наземный], воздействие 620*1, splash damage radius: 80, factor: x3 [здание],x0.5 [юнит,легкий];
+Requirements: Zombie Barracks(x4)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- suicide, targets: [alive,ground], impact 620*1, splash damage radius: 80, factor: x3 [building],x0.5 [unit,light];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
 ---------------------------
 
-Зомби Сержант
+Zombie Shotgunner
 
 Hotkey: Ctrl+T
-Categories/Attributes: [T2,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T2,unit,biological,light,ground]
 Max hits: 750
 Limit used: 1
 Size: 12
@@ -815,24 +815,24 @@ Build time: -14
 Energy required: 200
 PainState base threshold: 2
 Slots in transport: 1
-Требования: Казармы Зомби(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 62*1, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,биологический,тяжелый];
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*1, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,biological,heavy];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
 ---------------------------
 
-Зомби Старший Сержант
+Zombie SuperShotgunner
 
 Hotkey: Ctrl+Y
-Categories/Attributes: [T2,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,biological,heavy,ground]
 Max hits: 750
 Limit used: 1
 Size: 12
@@ -842,24 +842,24 @@ Build time: 28
 Energy required: 250
 PainState base threshold: 2
 Slots in transport: 1
-Требования: Казармы Зомби(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 186*0.67, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,биологический,тяжелый],x0.5 [механический];
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 186*0.67, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +1;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +1;
 
 
 
 ---------------------------
 
-Зомби Коммандо
+Zombie Commando
 
 Hotkey: Ctrl+F
-Categories/Attributes: [T2,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T2,unit,biological,light,ground]
 Max hits: 750
 Limit used: 1
 Size: 12
@@ -869,24 +869,24 @@ Build time: -14
 Energy required: 200
 PainState base threshold: 4
 Slots in transport: 1
-Требования: Казармы Зомби(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 62*1, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,биологический,легкий];
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 62*1, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,biological,light];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +2;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +2;
 
 
 
 ---------------------------
 
-Зомби Зенитчик
+Anti-aircraft Zombie
 
 Hotkey: Ctrl+G
-Categories/Attributes: [T2,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,biological,heavy,ground]
 Max hits: 750
 Limit used: 1
 Size: 12
@@ -896,24 +896,24 @@ Build time: -14
 Energy required: 200
 PainState base threshold: 4
 Slots in transport: 1
-Требования: Казармы Зомби(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, min. range: 40, max. range: vision range, bonus anti-fly range: +50, цели: [живой], воздействие 62*1, upgrade: Демоническое Оружие(+8), factor: x1.5 [летающий];
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +50, targets: [alive], impact 62*1, upgrade: Demonic Weapons(+8), factor: x1.5 [flying];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +2;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +2;
 
 
 
 ---------------------------
 
-Зомби Артиллерист
+Zombie Siege Marine
 
 Hotkey: Ctrl+H
-Categories/Attributes: [T2,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -923,24 +923,24 @@ Build time: 28
 Energy required: 200
 PainState base threshold: 5
 Slots in transport: 1
-Требования: Казармы Зомби(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, min. range: 40, max. range: vision range, bonus anti-building range: +50, цели: [живой,наземный], воздействие 62*1, splash damage radius: 20, upgrade: Демоническое Оружие(+8), factor: x3 [здание];
+Requirements: Zombie Barracks(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 62*1, splash damage radius: 20, upgrade: Demonic Weapons(+8), factor: x3 [building];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +3;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +3;
 
 
 
 ---------------------------
 
-Зомби Плазмаганнер
+Zombie Plasmagunner
 
 Hotkey: Ctrl+V
-Categories/Attributes: [T2,юнит,биологический,тяжелый,летающий]
+Categories/Attributes: [T2,unit,biological,heavy,flying]
 Max hits: 750
 Limit used: 1.5
 Size: 12
@@ -949,24 +949,24 @@ Base vision range: 200
 Build time: 28
 Energy required: 250
 PainState base threshold: 5
-Требования: Казармы Зомби(x2),Продвинутый Проклятый Командный Центр
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 62*2, upgrade: Демоническое Оружие(+8), factor: x1.5 [юнит,механический];
+Requirements: Zombie Barracks(x2),Advanced Hell Command Center
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 62*2, upgrade: Demonic Weapons(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +3;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +3;
 
 
 
 ---------------------------
 
-Зомби Солдат с BFG
+Zombie BFG Marine
 
 Hotkey: Ctrl+B
-Categories/Attributes: [T3,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T3,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 3
 Size: 12
@@ -976,114 +976,114 @@ Build time: 56
 Energy required: 600
 PainState base threshold: 5
 Slots in transport: 2
-Требования: Казармы Зомби(x4),Продвинутый Проклятый Командный Центр(x3)
-Создается в: Казармы Зомби
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-unit range: +50, цели: [живой], воздействие 372*0.5, splash damage radius: 160;
+Requirements: Zombie Barracks(x4),Advanced Hell Command Center(x3)
+Produced by: Zombie Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 372*0.5, splash damage radius: 160;
 Upgrades:
-- Адское Зрение - vision range +25;
-- Боевая Плоть - armor +8;
-- Регенерация Плоти - hits regeneration +8;
-- Болевой Порог - PainState threshold +3;
+- Hell Sight - vision range +25;
+- Combat Flesh - armor +8;
+- Flesh Regeneration - hits regeneration +8;
+- Pain Threshold - PainState threshold +3;
 
 
 
 ---------------------------
 
-Командный Центр
+Command Center
 
 Hotkey: R
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
 Build time: 84
 Energy required: 900
-Zombie variant: Проклятый Командный Центр
+Zombie variant: Hell Command Center
 Zombification hits: 3750
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
-Вооружение/Способности: 
-- дальний бой, min. range: 66, max. range: 275, цели: [живой], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,механический], {Треб.: "Турель Командного Центра"};
+Constructed by: Command Center,Advanced Command Center
+Arming/Abilities: 
+- ranged attack, min. range: 66, max. range: 275, targets: [alive], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
-- Увеличение Области Обзора Командного Центра - vision range +50;
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Command Center Range Upgrade - vision range +50;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+300). Можно перестроить в "Продвинутый Командный Центр". Специальная способность: "Двигатели для полета"{Треб.: "Летные Двигатели Командного Центра"}.
+Builder. Increases energy level(+300). Can be rebuilt into "Advanced Command Center". Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}.
 
 ---------------------------
 
-Продвинутый Командный Центр
+Advanced Command Center
 
 Hotkey: R
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
 Build time: 126
 Energy required: 300
-Zombie variant: Продвинутый Проклятый Командный Центр
+Zombie variant: Advanced Hell Command Center
 Zombification hits: 3750
 
 
-Вооружение/Способности: 
-- дальний бой, min. range: 66, max. range: 275, цели: [живой], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,механический], {Треб.: "Турель Командного Центра"};
+Arming/Abilities: 
+- ranged attack, min. range: 66, max. range: 275, targets: [alive], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
-- Увеличение Области Обзора Командного Центра - vision range +50;
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Command Center Range Upgrade - vision range +50;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Строитель. Увеличивает уровень энергии(+600). Специальная способность: "Двигатели для полета"{Треб.: "Летные Двигатели Командного Центра"}.
+Builder. Increases energy level(+600). Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}.
 
 ---------------------------
 
-Казармы
+Barracks
 
 Hotkey: T
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
 Build time: 56
 Energy required: 300
-Zombie variant: Казармы Зомби
+Zombie variant: Zombie Barracks
 Zombification hits: 2500
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
+- Concrete Walls - armor +16;
 
-Производит юнитов. Можно перестроить в "Казармы[уровень 2]"{Треб.: "Компьютерная Станция"}.
+Unit production. Can be rebuilt into "Barracks[level2]"{Req.: "Computer Station"}.
 
 ---------------------------
 
-Фабрика
+Vehicle Factory
 
 Hotkey: G
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
 Build time: 56
 Energy required: 300
-Требования: Завод Вооружений
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Requirements: Weapons Factory
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
+- Concrete Walls - armor +16;
 
-Производит юнитов. Можно перестроить в "Фабрика[уровень 2]"{Треб.: "Компьютерная Станция"}.
+Unit production. Can be rebuilt into "Vehicle Factory[level2]"{Req.: "Computer Station"}.
 
 ---------------------------
 
-Генератор
+Generator
 
 Hotkey: Y
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 3
 Size: 48
@@ -1091,19 +1091,19 @@ Base vision range: 121
 Build time: 35
 Energy required: 100
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Увеличивает уровень энергии(+100). Можно перестроить в "Продвинутый Генератор".
+Increases energy level(+100). Can be rebuilt into "Advanced Generator".
 
 ---------------------------
 
-Продвинутый Генератор
+Advanced Generator
 
 Hotkey: Y
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 3
 Size: 48
@@ -1113,17 +1113,17 @@ Energy required: 0
 
 
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Увеличивает уровень энергии(+200).
+Increases energy level(+200).
 
 ---------------------------
 
-Завод Вооружений
+Weapons Factory
 
 Hotkey: H
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T1,building,mechanical,heavy,ground]
 Max hits: 10000
 Limit used: 1
 Size: 62
@@ -1131,80 +1131,80 @@ Base vision range: 149
 Build time: 56
 Energy required: 300
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Исследует улучшения и апгрейды. Можно перестроить в "Завод Вооружений[уровень 2]"{Треб.: "Компьютерная Станция"}.
+Researches and upgrades facility. Can be rebuilt into "Weapons Factory[level2]"{Req.: "Computer Station"}.
 
 ---------------------------
 
-Радар
+Radar
 
 Hotkey: J
-Categories/Attributes: [T1,здание,механический,тяжелый,наземный,детектор]
+Categories/Attributes: [T1,building,mechanical,heavy,ground,detector]
 Max hits: 3000
 Limit used: 2
 Size: 35
 Base vision range: 300
 Build time: 56
 Energy required: 300
-Требования: Завод Вооружений
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Requirements: Weapons Factory
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Улучшение Радара - vision range +25;
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Radar Upgrade - vision range +25;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Разведует карту. Специальная способность: "Сканирование".
+Reveals map. Special ability: "Scan".
 
 ---------------------------
 
-Станция Ракетного Залпа
+Rocket Launcher Station
 
 Hotkey: L
-Categories/Attributes: [T3,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T3,building,mechanical,heavy,ground]
 Max hits: 3000
 Limit used: 2
 Size: 40
 Base vision range: 105
 Build time: 56
 Energy required: 300
-Требования: Научный Центр,Компьютерная Станция
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Requirements: Science Facility,Computer Station
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Специальная способность: "Ракетный удар"{Треб.: "Ракетный Залп"}.
+Special ability: "Missile Strike"{Req.: "Rocket Strike Charge"}.
 
 ---------------------------
 
-Научный Центр
+Science Facility
 
 Hotkey: U
-Categories/Attributes: [T2,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T2,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 86
 Base vision range: 197
 Build time: 112
 Energy required: 1200
-Требования: Завод Вооружений
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Requirements: Weapons Factory
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
 ---------------------------
 
-Анти-наземная Турель
+Anti-ground Turret
 
 Hotkey: V
-Categories/Attributes: [T1,здание,механический,легкий,наземный]
+Categories/Attributes: [T1,building,mechanical,light,ground]
 Max hits: 5000
 Limit used: 1
 Size: 15
@@ -1212,24 +1212,24 @@ Base vision range: 275
 Build time: 28
 Energy required: 300
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,юнит,механический,наземный], воздействие 62*3, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,механический], {Треб.: "Анти-наземное Плазменное Орудие"};
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 62*3, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,биологический,легкий];
+Constructed by: Command Center,Advanced Command Center
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,unit,mechanical,ground], impact 62*3, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical], {Req.: "Anti-ground Plasmagun"};
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*3, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological,light];
 Upgrades:
-- Прожекторы - vision range +25;
-- Дополнительное Бронирование - armor +16;
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Spotlights - vision range +25;
+- Additional Armoring - armor +16;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Анти-наземное защитное сооружение. Можно перестроить в "Анти-воздушная Турель".
+Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret".
 
 ---------------------------
 
-Анти-воздушная Турель
+Anti-air Turret
 
 Hotkey: B
-Categories/Attributes: [T1,здание,механический,легкий,наземный]
+Categories/Attributes: [T1,building,mechanical,light,ground]
 Max hits: 5000
 Limit used: 1
 Size: 15
@@ -1237,43 +1237,43 @@ Base vision range: 275
 Build time: 28
 Energy required: 300
 
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,летающий], воздействие 62*3, upgrade: Улучшение Воружений(+8), factor: x1.5 [летающий];
+Constructed by: Command Center,Advanced Command Center
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,flying], impact 62*3, upgrade: Weapons Upgrade(+8), factor: x1.5 [flying];
 Upgrades:
-- Прожекторы - vision range +25;
-- Дополнительное Бронирование - armor +16;
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Spotlights - vision range +25;
+- Additional Armoring - armor +16;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
-Анти-воздушное защитное сооружение. Можно перестроить в "Анти-наземная Турель".
+Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret".
 
 ---------------------------
 
-Компьютерная Станция
+Computer Station
 
 Hotkey: I
-Categories/Attributes: [T2,здание,механический,тяжелый,наземный]
+Categories/Attributes: [T2,building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 70
 Base vision range: 165
 Build time: 112
 Energy required: 1200
-Требования: Завод Вооружений
-Чем может быть построен: Командный Центр,Продвинутый Командный Центр
+Requirements: Weapons Factory
+Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
 ---------------------------
 
-Мина
+Mine
 
 Hotkey: Ctrl+V
-Categories/Attributes: [T1,здание,механический,легкий,наземный,детектор]
+Categories/Attributes: [T1,building,mechanical,light,ground,detector]
 Max hits: 100
 Limit used: 1
 Size: 5
@@ -1282,20 +1282,20 @@ Build time: 2
 Energy required: 50
 
 
-Вооружение/Способности: 
-- самоубийство, цели: [живой,наземный], воздействие 620*1, splash damage radius: 80;
+Arming/Abilities: 
+- suicide, targets: [alive,ground], impact 620*1, splash damage radius: 80;
 Upgrades:
-- Бетонные Стены - armor +16;
-- Адаптивный Фундамент - allows building this structure on doodads;
+- Concrete Walls - armor +16;
+- Adaptive Foundation - allows building this structure on doodads;
 
 
 
 ---------------------------
 
-Инженер
+Engineer
 
 Hotkey: B
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -1304,26 +1304,26 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Зомби Инженер
+Zombie variant: Zombie Engineer
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- лечение/ремонт, цели: [живой,механический], воздействие 21*2, upgrade: Продвинутые Инструменты(+16);
-- дальний бой, max. range: vision range, цели: [живой], воздействие 31*2, upgrade: Улучшение Воружений(+8);
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- heal/repair, targets: [alive,mechanical], impact 21*2, upgrade: Advanced Tools(+16);
+- ranged attack, max. range: vision range, targets: [alive], impact 31*2, upgrade: Weapons Upgrade(+8);
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Медик
+Medic
 
 Hotkey: N
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -1332,26 +1332,26 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Обычный Зомби
+Zombie variant: Former Zombie
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- лечение/ремонт, цели: [живой,юнит,биологический], воздействие 21*2, upgrade: Продвинутые Инструменты(+16);
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 31*2, upgrade: Улучшение Воружений(+8);
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- heal/repair, targets: [alive,unit,biological], impact 21*2, upgrade: Advanced Tools(+16);
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 31*2, upgrade: Weapons Upgrade(+8);
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Сержант
+Shotguner
 
 Hotkey: R
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -1360,25 +1360,25 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Зомби Сержант
+Zombie variant: Zombie Shotgunner
 Zombification hits: 0
 
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,биологический,тяжелый];
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological,heavy];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Старший Сержант
+SuperShotguner
 
 Hotkey: T
-Categories/Attributes: [T1,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T1,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 1.5
 Size: 12
@@ -1387,25 +1387,25 @@ Base vision range: 200
 Build time: 35
 Energy required: 250
 Slots in transport: 1
-Zombie variant: Зомби Старший Сержант
+Zombie variant: Zombie SuperShotgunner
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 186*0.67, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,биологический,тяжелый],x0.5 [механический];
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 186*0.67, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Коммандо
+Commando
 
 Hotkey: Y
-Categories/Attributes: [T1,юнит,биологический,легкий,наземный]
+Categories/Attributes: [T1,unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -1414,25 +1414,25 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Зомби Коммандо
+Zombie variant: Zombie Commando
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,биологический,легкий];
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological,light];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Зенитчик
+Anti-aircraft Marine
 
 Hotkey: F
-Categories/Attributes: [T1,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T1,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 1
 Size: 12
@@ -1441,25 +1441,25 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Зомби Зенитчик
+Zombie variant: Anti-aircraft Zombie
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, min. range: 40, max. range: vision range, bonus anti-fly range: +50, цели: [живой], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [летающий];
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +50, targets: [alive], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [flying];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Артиллерист
+Siege Marine
 
 Hotkey: G
-Categories/Attributes: [T1,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T1,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 1
 Size: 13
@@ -1468,25 +1468,25 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Зомби Артиллерист
+Zombie variant: Zombie Siege Marine
 Zombification hits: 0
-Требования: Завод Вооружений
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, min. range: 40, max. range: vision range, bonus anti-building range: +50, цели: [живой,наземный], воздействие 62*1, splash damage radius: 20, upgrade: Улучшение Воружений(+8), factor: x3 [здание];
+Requirements: Weapons Factory
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 62*1, splash damage radius: 20, upgrade: Weapons Upgrade(+8), factor: x3 [building];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Плазмаганнер
+Plasmagunner
 
 Hotkey: H
-Categories/Attributes: [T1,юнит,биологический,тяжелый,летающий]
+Categories/Attributes: [T1,unit,biological,heavy,flying]
 Max hits: 1000
 Limit used: 1.5
 Size: 12
@@ -1494,23 +1494,23 @@ Base movement speed: 14
 Base vision range: 200
 Build time: 35
 Energy required: 250
-Требования: Завод Вооружений,Продвинутый Командный Центр
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой], воздействие 62*2, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,механический];
+Requirements: Weapons Factory,Advanced Command Center
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive], impact 62*2, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Солдат с BFG
+BFG Marine
 
 Hotkey: V
-Categories/Attributes: [T3,юнит,биологический,тяжелый,наземный]
+Categories/Attributes: [T3,unit,biological,heavy,ground]
 Max hits: 1000
 Limit used: 3
 Size: 13
@@ -1519,25 +1519,25 @@ Base vision range: 250
 Build time: 56
 Energy required: 600
 Slots in transport: 2
-Zombie variant: Зомби Солдат с BFG
+Zombie variant: Zombie BFG Marine
 Zombification hits: 0
-Требования: Научный Центр,Компьютерная Станция
-Создается в: Казармы
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-unit range: +50, цели: [живой], воздействие 372*0.5, splash damage radius: 160, upgrade: Улучшение Воружений(+8);
+Requirements: Science Facility,Computer Station
+Produced by: Barracks
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 372*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+8);
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Пехотной Брони - armor +8;
-- Легковесная Броня - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Infantry Combat Armor Upgrade - armor +8;
+- Lightweight Armor - movement speed +2;
 
 
 
 ---------------------------
 
-Десантный корабль
+Dropship
 
 Hotkey: I
-Categories/Attributes: [T1,юнит,механический,тяжелый,летающий,транспорт]
+Categories/Attributes: [T1,unit,mechanical,heavy,flying,transport]
 Max hits: 2000
 Limit used: 1
 Size: 33
@@ -1546,21 +1546,21 @@ Base vision range: 200
 Build time: 28
 Energy required: 200
 Base transport capacity: 8
-Требования: Продвинутый Командный Центр
-Создается в: Фабрика
+Requirements: Advanced Command Center
+Produced by: Vehicle Factory
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Специальная способность: "Выгрузить". Невосприимчив к взрывной волне.
+Special ability: "Unload". Immune to splash damage.
 
 ---------------------------
 
-Дрон
+Drone
 
 Hotkey: U
-Categories/Attributes: [T1,юнит,механический,легкий,наземный]
+Categories/Attributes: [T1,unit,mechanical,light,ground]
 Max hits: 2000
 Limit used: 2
 Size: 15
@@ -1570,22 +1570,22 @@ Build time: 42
 Energy required: 300
 Slots in transport: 3
 
-Создается в: Фабрика
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 62*2, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,механический];
+Produced by: Vehicle Factory
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*2, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,mechanical];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Специальная способность: превращение в "Анти-наземная Турель"{Треб.: "Протокол Трансформации Дрона"}.
+Special ability: transformation into "Anti-ground Turret"{Req.: "Drone Transformation Protocol"}.
 
 ---------------------------
 
-Терминатор
+Terminator
 
 Hotkey: O
-Categories/Attributes: [T2,юнит,механический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 3
 Size: 16
@@ -1594,24 +1594,24 @@ Base vision range: 275
 Build time: 42
 Energy required: 500
 Slots in transport: 4
-Требования: Научный Центр
-Создается в: Фабрика
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, цели: [живой,наземный], воздействие 62*4, upgrade: Улучшение Воружений(+8), factor: x1.5 [юнит,биологический],x0.5 [здание];
-- дальний бой, max. range: vision range, цели: [живой,летающий], воздействие 62*1, upgrade: Улучшение Воружений(+8), factor: x1.5 [летающий], {Треб.: "Лазерные Орудия"};
+Requirements: Science Facility
+Produced by: Vehicle Factory
+Arming/Abilities: 
+- ranged attack, max. range: vision range, targets: [alive,ground], impact 62*4, upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological],x0.5 [building];
+- ranged attack, max. range: vision range, targets: [alive,flying], impact 62*1, upgrade: Weapons Upgrade(+8), factor: x1.5 [flying], {Req.: "Fighter Laser Gun"};
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Невосприимчив к взрывной волне.
+Immune to splash damage.
 
 ---------------------------
 
-Танк
+Tank
 
 Hotkey: J
-Categories/Attributes: [T2,юнит,механический,тяжелый,наземный]
+Categories/Attributes: [T2,unit,mechanical,heavy,ground]
 Max hits: 6000
 Limit used: 4
 Size: 20
@@ -1620,23 +1620,23 @@ Base vision range: 250
 Build time: 56
 Energy required: 600
 Slots in transport: 6
-Требования: Научный Центр
-Создается в: Фабрика
-Вооружение/Способности: 
-- дальний бой, min. range: 40, max. range: vision range, bonus anti-building range: +75, цели: [живой,наземный], воздействие 62x2*1, splash damage radius: 20, upgrade: Улучшение Воружений(+8), factor: x3 [здание];
+Requirements: Science Facility
+Produced by: Vehicle Factory
+Arming/Abilities: 
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +75, targets: [alive,ground], impact 62x2*1, splash damage radius: 20, upgrade: Weapons Upgrade(+8), factor: x3 [building];
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Невосприимчив к взрывной волне.
+Immune to splash damage.
 
 ---------------------------
 
-Истребитель
+Fighter
 
 Hotkey: K
-Categories/Attributes: [T2,юнит,механический,тяжелый,летающий]
+Categories/Attributes: [T2,unit,mechanical,heavy,flying]
 Max hits: 4000
 Limit used: 4
 Size: 18
@@ -1644,23 +1644,23 @@ Base movement speed: 16
 Base vision range: 275
 Build time: 56
 Energy required: 600
-Требования: Научный Центр
-Создается в: Фабрика
-Вооружение/Способности: 
-- дальний бой, max. range: vision range, bonus anti-unit range: +25, цели: [живой], воздействие 124*2, upgrade: Улучшение Воружений(+8);
+Requirements: Science Facility
+Produced by: Vehicle Factory
+Arming/Abilities: 
+- ranged attack, max. range: vision range, bonus anti-unit range: +25, targets: [alive], impact 124*2, upgrade: Weapons Upgrade(+8);
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Невосприимчив к взрывной волне.
+Immune to splash damage.
 
 ---------------------------
 
-БТР
+Ground APC
 
 Hotkey: L
-Categories/Attributes: [T1,юнит,механический,тяжелый,наземный,транспорт]
+Categories/Attributes: [T1,unit,mechanical,heavy,ground,transport]
 Max hits: 3000
 Limit used: 1
 Size: 25
@@ -1671,255 +1671,255 @@ Energy required: 200
 Slots in transport: 10
 Base transport capacity: 4
 
-Создается в: Фабрика
+Produced by: Vehicle Factory
 Upgrades:
-- Улучшенные Визоры - vision range +25;
-- Улучшение Технической Брони - armor +8;
-- Улучшеные Двигатели - movement speed +2;
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +8;
+- Advanced Engines - movement speed +2;
 
-Специальная способность: "Выгрузить". Невосприимчив к взрывной волне.
+Special ability: "Unload". Immune to splash damage.
 
 ---------------------------
 
 
-Адская Огневая Мощь (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Hell Firepower (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Увеличение урона от дальних атак всех Т1 юнитов и защитных сооружений.
+Increase the damage of ranged attacks for T1 units and defensive structures.
 
 
-Боевая Плоть (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Combat Flesh (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Увеличение защиты всех адских юнитов.
+Increase the armor of all Hell units.
 
 
-Каменные Стены (Y,600/900/1200/1500/1800,60/100/140/180/220,x5)
+Stone Walls (Y,600/900/1200/1500/1800,60/100/140/180/220,x5)
 
-Увеличение защиты всех адских зданий.
+Increase the armor of all Hell buildings.
 
 
-Когти и зубы (F,600/900/1200/1500/1800,60/100/140/180/220,x5)
+Claws and Teeth (F,600/900/1200/1500/1800,60/100/140/180/220,x5)
 
-Увеличение урона от ближних атак.
+Increase the damage of melee attacks.
 
 
-Регенерация Плоти (G,300/600,60/90,x2)
+Flesh Regeneration (G,300/600,60/90,x2)
 
-Восстановление здоровья всех адских юнитов.
+Health regeneration for all Hell units.
 
 
-Болевой Порог (H,600/600,60/60,x2)
+Pain Threshold (H,600/600,60/60,x2)
 
-Адские юниты реже испытывают болевой паралич.
+Hell units can take more hits before being stunned by pain.
 
 
-Увеличение Области Обзора Адской Крепости (V,600/600,60/75,x2)
+Hell Keep Range Upgrade (V,600/600,60/75,x2)
 
+Increase the Hell Keep`s range of vision.
 
 
+Hell Keep Blink Charge (B,300,120,x1)
 
-Телепортация Адской Крепости (B,300,120,x1)
+Charge for the Hell Keep`s ability.
 
-Заряд для способности Адской Крепости.
 
+Adaptive Foundation (N,600,60,x1)
 
-Адаптивный Фундамент (N,600,60,x1)
+All buildings, except the Teleporter and unit-producing structures, can be placed on doodads.
 
-Все здания, кроме телепорта и производящих юнитов можно строить на декорациях.
 
+Decay Aura (U,600,60,x1)
 
-Аура Разложения (U,600,60,x1)
+Hell Keep damages all nearby enemy units. Decay Aura damage ignores unit armor.
+Requirements: Great Hell Keep
 
-Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов.
-Требования: Великая Адская Крепость
+Demonic Spirits (I,600/900,60/75,x2)
 
-Демонические Призраки (I,600/900,60/75,x2)
+Increase the range of defensive structures.
+Requirements: Great Hell Keep
 
-Увеличение радиуса обзора и атаки для защитных сооружений.
-Требования: Великая Адская Крепость
+Ghost Monsters (O,600,60,x1)
 
-Призрачные Монстры (O,600,60,x1)
+Pinky Demons can move over obstacles.
+Requirements: Great Hell Keep
 
-Pinky Demon может бегать по декорациям.
-Требования: Великая Адская Крепость
+Specters (J,600,60,x1)
 
-Призраки (J,600,60,x1)
+Pinky Demons become invisible.
+Requirements: Great Hell Keep
 
-Pinky Demon становиться невидимым.
-Требования: Великая Адская Крепость
+Hell Sight (K,600/900,60/90,x2)
 
-Адское Зрение (K,600/900,60/90,x2)
+Increase the sight range of all Hell units.
+Requirements: Monastery of Despair
 
-Увеличение области обзора и атаки всех адских юнитов.
-Требования: Монастырь Отчаяния
+Phantoms (L,600,60,x1)
 
-Фантомы (L,600,60,x1)
+Pain Elemental spawns Phantoms instead of Lost Souls.
+Requirements: Monastery of Despair
 
-Pain Elemental создает Фантомов вместо Lost Soul.
-Требования: Монастырь Отчаяния
+Demonic Weapons (Ctrl+R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Демоническое Оружие (Ctrl+R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Increase the damage of ranged attacks for T2 units and defensive structures.
+Requirements: Monastery of Despair
 
-Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений.
-Требования: Монастырь Отчаяния
+Teleporter Upgrade (Ctrl+T,300/600,60/90,x2)
 
-Улучшение Телепорта (Ctrl+T,300/600,60/90,x2)
+Reduced cooldown on Teleporter ability.
+Requirements: Castle of the Damned
 
-Уменьшение времени перезарядки Телепорта.
-Требования: Замок Проклятых
+Reverse Teleportation (Ctrl+Y,600,60,x1)
 
-Обратная Телепортация (Ctrl+Y,600,60,x1)
+Units can teleport back to Teleporter.
+Requirements: Castle of the Damned
 
-Юнитов можно перемещать обратно в Телепорт.
-Требования: Замок Проклятых
+Evil Eye Upgrade (Ctrl+F,300/600/900,60/60/60,x3)
 
-Улучшение Ока Зла (Ctrl+F,300/600/900,60/60/60,x3)
+Increase the sight range of Evil Eye.
+Requirements: Castle of the Damned
 
-Увеличение области обзора Ока Зла.
-Требования: Замок Проклятых
+Totem of Horror Invisibility (Ctrl+G,600,60,x1)
 
-Невидимость Тотема Ужаса (Ctrl+G,600,60,x1)
+Totem of Horror becomes invisible.
+Requirements: Castle of the Damned
 
+Building Restoration (Ctrl+H,600/900/1200/1500/1800,60/60/60/60/60,x5)
 
-Требования: Замок Проклятых
+Health regeneration for all Hell buildings.
+Requirements: Castle of the Damned
 
-Восстановление Зданий (Ctrl+H,600/900/1200/1500/1800,60/60/60/60/60,x5)
+Tower Teleportation Charge (Ctrl+V,200,30,x15,*)
 
-Восстановление здоровья всех адских зданий.
-Требования: Замок Проклятых
+Charges for the ability of Guard Tower and Totem of Horror.
+Requirements: Castle of the Damned
 
-Короткая Телепортация (Ctrl+V,200,30,x15,*)
+Resurrection (Ctrl+B,900,90,x1)
 
-Заряды для способности Адской Башни и Тотема Ужаса.
-Требования: Замок Проклятых
+ArchVile`s ability.
+Requirements: Monastery of Despair,Castle of the Damned
 
-Воскрешение (Ctrl+B,900,90,x1)
+Invulnerability Sphere (Ctrl+N,1200,180,x2,*)
 
-Способность ArchVile.
-Требования: Монастырь Отчаяния,Замок Проклятых
+Charge for the Altar of Pain ability.
+Requirements: Altar of Pain
 
-Сферы Неуязвимости (Ctrl+N,1200,180,x2,*)
+Weapons Upgrade (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Заряды для способности Алтаря Боли.
-Требования: Алтарь Боли
+Increase the damage of ranged attacks for all UAC units and defensive structures.
 
-Улучшение Воружений (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Увеличение урона от дальних атак всех юнитов и защитных сооружений.
+Infantry Combat Armor Upgrade (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
+Increase the armor of all Barracks-produced units.
 
-Улучшение Пехотной Брони (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Увеличение защиты всех юнитов из Казарм.
+Concrete Walls (Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
+Increase the armor of all UAC buildings.
 
-Бетонные Стены (Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Увеличение защиты всех зданий.
+Advanced Tools (F,600/900,60/105,x2)
 
+Increase repair/healing efficiency of Engineers/Medics.
 
-Продвинутые Инструменты (F,600/900,60/105,x2)
 
-Увеличение эффективности ремонта Инженера и лечения Медика.
+Lightweight Armor (G,600,60,x1)
 
+Increase the movement speed of all Barracks-produced units.
 
-Легковесная Броня (G,600,60,x1)
 
-Увеличение скорости передвижения всех юнитов из Казарм.
+Expansive bullets (H,600,60,x1)
 
+Shotgunner, SuperShotgunner and Terminator deal more damage to [biological].
 
-Разрывные Пули (H,600,60,x1)
 
-Сержант, Старший Сержант и Терминатор наносят больше урона по [биологический].
+Command Center Range Upgrade (V,600/600,60/75,x2)
 
+Increase Command Center`s range of vision.
 
-Увеличение Области Обзора Командного Центра (V,600/600,60/75,x2)
 
+Command Center Flight Engines (B,600,120,x1)
 
+Command Center gains ability to fly.
 
 
-Летные Двигатели Командного Центра (B,600,120,x1)
+Adaptive Foundation (N,600,60,x1)
 
-Командный Центр может летать.
+All buildings, except those that can produce units, can be placed on doodads.
 
 
-Адаптивный Фундамент (N,600,60,x1)
+Command Center Turret (U,600,120,x1)
 
-Все здания, кроме производящих юнитов можно строить на декорациях.
+Plasma turret for Command Center.
+Requirements: Advanced Command Center
 
+Spotlights (I,600/900,60/75,x2)
 
-Турель Командного Центра (U,600,120,x1)
+Increase the range of defensive structures.
+Requirements: Advanced Command Center
 
-Командный Центр может атаковать.
-Требования: Продвинутый Командный Центр
+Antigravity Platform (O,600,60,x1)
 
-Прожекторы (I,600/900,60/75,x2)
+Drones can move over obstacles.
+Requirements: Advanced Command Center
 
-Увеличение радиуса обзора и атаки для защитных сооружений.
-Требования: Продвинутый Командный Центр
+Drone Transformation Protocol (J,600,60,x1)
 
-Антигравитационная Платформа (O,600,60,x1)
+A Drone can rebuild to Anti-ground turret.
+Requirements: Advanced Command Center
 
-Дрон может перемещаться по декорациям.
-Требования: Продвинутый Командный Центр
+Light Amplification Visors (K,600/900,60/90,x2)
 
-Протокол Трансформации Дрона (J,600,60,x1)
+Increase the sight range of all UAC units.
+Requirements: Science Facility
 
-Дрон может превратиться в Анти-наземную Турель.
-Требования: Продвинутый Командный Центр
+Stealth Technology (L,600,60,x1)
 
-Улучшенные Визоры (K,600/900,60/90,x2)
+Commando becomes invisible.
+Requirements: Science Facility
 
-Увеличение области обзора и атаки всех юнитов.
-Требования: Научный Центр
+Fragmentation Missiles (Ctrl+R,600,60,x1)
 
-Стелс-Технологии (L,600,60,x1)
+Anti-air missiles do extra damage around the target.
+Requirements: Science Facility
 
-Коммандо становиться невидимым.
-Требования: Научный Центр
+Advanced Engines (Ctrl+T,600,60,x1)
 
-Осколочные Снаряды (Ctrl+R,600,60,x1)
+Increase the movement speed of all Factory-produced units.
+Requirements: Science Facility
 
-Антивоздушные снаряды наносят урон по области.
-Требования: Научный Центр
+Mech Combat Armor Upgrade (Ctrl+Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
 
-Улучшеные Двигатели (Ctrl+T,600,60,x1)
+Increase the armor of all Factory-produced units.
+Requirements: Science Facility
 
-Увеличение скорости передвижения юнитов из Фабрики.
-Требования: Научный Центр
+Fighter Laser Gun (Ctrl+F,600,60,x1)
 
-Улучшение Технической Брони (Ctrl+Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Fighter anti-ground weapon.
+Requirements: Science Facility
 
-Увеличение защиты всех юнитов из Фабрики.
-Требования: Научный Центр
+Dropship Upgrade (Ctrl+G,600,60,x1)
 
-Лазерные Орудия (Ctrl+F,600,60,x1)
+Increase the capacity of the Dropship.
+Requirements: Science Facility
 
-Анти-наземное оружие для Истребителя.
-Требования: Научный Центр
+Radar Upgrade (Ctrl+H,300/600/900,60/60/60,x3)
 
-Улучшение Транспорта (Ctrl+G,600,60,x1)
+Increase radar scanning radius.
+Requirements: Computer Station
 
-Увеличение вместимости Десантного Корабля.
-Требования: Научный Центр
+Anti-ground Plasmagun (Ctrl+V,600,60,x1)
 
-Улучшение Радара (Ctrl+H,300/600/900,60/60/60,x3)
+Anti-[mechanical] weapon for Anti-ground turret.
+Requirements: Computer Station
 
-Увеличение области обзора Радара.
-Требования: Компьютерная Станция
+Additional Armoring (Ctrl+B,600,60,x1)
 
-Анти-наземное Плазменное Орудие (Ctrl+V,600,60,x1)
+Additional armor for Turrets.
+Requirements: Computer Station
 
-Анти-[механический] орудие для Анти-наземной Турели.
-Требования: Компьютерная Станция
+Rocket Strike Charge (Ctrl+N,1200,180,x2,*)
 
-Дополнительное Бронирование (Ctrl+B,600,60,x1)
-
-Дополнительная защита для турелей.
-Требования: Компьютерная Станция
-
-Ракетный Залп (Ctrl+N,1200,180,x2,*)
-
-Заряды для способности Станции Ракетного Залпа.
-Требования: Станция Ракетного Залпа
+Charge for Rocket Launcher Station ability.
+Requirements: Rocket Launcher Station
 
 

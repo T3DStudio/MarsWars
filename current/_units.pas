@@ -601,11 +601,11 @@ wtp_Scout            : begin
    end;
 end;
 
-function _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;
+function unit_PickTarget(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;
 var tw:byte;
 n_prio:integer;
 begin
-   _unit_target:=false;
+   unit_PickTarget:=false;
    with pu^ do
    with uid^ do
    begin
@@ -613,7 +613,7 @@ begin
 
       if(tw>MaxUnitWeapons)then exit;
 
-      _unit_target:=true;
+      unit_PickTarget:=true;
 
       if(tw>t_weap^)
       then exit
@@ -780,7 +780,7 @@ uab_Teleport      : swtarget:=true;
       end;
       aiu_CollectData(pu,pu,0,nil,false);
 
-      if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(attack_target)then unit_PickTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -798,7 +798,7 @@ uab_Teleport      : swtarget:=true;
             if(tu_transport=nil)then unit_detect(pu,tu,ud);
 
             if(attack_target)
-            then good_target:=_unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio)
+            then good_target:=unit_PickTarget(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio)
             else good_target:=false;
 
             aiu_CollectData(pu,tu,ud,tu_transport,good_target);
@@ -881,7 +881,7 @@ begin
 
       if(udetect=false)and(attack_target=false)then exit;  // in transport & client side
 
-      if(attack_target)and(ServerSide)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(attack_target)and(ServerSide)then unit_PickTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -897,7 +897,7 @@ begin
                if(transportu=nil)and(tu^.hits>0)then
                 if(not IsUnitRange(tu^.transport,nil))then unit_aura_effects(pu,tu,ud);
             end;
-            if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
+            if(attack_target)then unit_PickTarget(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
          end;
       end;
    end;

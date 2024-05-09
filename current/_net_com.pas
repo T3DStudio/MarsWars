@@ -275,27 +275,35 @@ begin
    end;
 end;
 
-procedure net_send_mapSize(newSize:word);
+procedure net_send_MIDByte(mid,bval:byte);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_mapsize);
-   net_writeword(newSize);
+   net_writebyte(mid);
+   net_writebyte(bval);
    net_send(net_cl_svip,net_cl_svport);
 end;
-procedure net_send_mapType(newType:byte);
+procedure net_send_MIDBool(mid:byte;bval:boolean);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_type);
-   net_writebyte(newType);
+   net_writebyte(mid);
+   net_writebool(bval);
    net_send(net_cl_svip,net_cl_svport);
 end;
-procedure net_send_mapSymmetry(newSymmetry:byte);
+procedure net_send_MIDInt(mid,ival:byte);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_symmetry);
-   net_writebyte(newSymmetry);
+   net_writebyte(mid);
+   net_writeint (ival);
    net_send(net_cl_svip,net_cl_svport);
 end;
+procedure net_send_MIDWord(mid,wval:byte);
+begin
+   net_clearbuffer;
+   net_writebyte(mid);
+   net_writeint (wval);
+   net_send(net_cl_svip,net_cl_svport);
+end;
+
 procedure net_send_PlayerSlot(PlayerTarget,newPlayerSlot:byte);
 begin
    net_clearbuffer;
@@ -320,13 +328,7 @@ begin
    net_writebyte(newPlayerTeam);
    net_send(net_cl_svip,net_cl_svport);
 end;
-procedure net_send_GameMode(newGameMode:byte);
-begin
-   net_clearbuffer;
-   net_writebyte(nmid_lobbby_gamemode);
-   net_writebyte(newGameMode);
-   net_send(net_cl_svip,net_cl_svport);
-end;
+
 
 procedure net_disconnect;
 begin

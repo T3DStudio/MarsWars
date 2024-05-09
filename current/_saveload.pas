@@ -57,24 +57,35 @@ begin
          else
          begin
             BlockRead(f,vr,sizeof(campain_mission_n));vr:=0;
-            BlockRead(f,vr,sizeof(campain_skill        ));vr:=0;
+            BlockRead(f,vr,sizeof(campain_skill    ));vr:=0;
 
             BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw           ));svld_str_info+=str_map_size+w2s(mw)+tc_nl3+' ';vr:=0;
+            BlockRead(f,vr,sizeof(map_mw           ));
+            if(vr<MinSMapW)and(MaxSMapW<vr)
+                                      then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                                      else       svld_str_info+=str_map_size+i2s(vr)+tc_nl3+' ';
+            vr:=0;
+
             BlockRead(f,vr,sizeof(map_type         ));
-            if(vr>gms_m_types)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                              else       svld_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' '; vr:=0;
+            if(vr>gms_m_types        )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                                      else       svld_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' ';
+            vr:=0;
+
             BlockRead(f,vr,sizeof(map_symmetry     ));
-            if(vr>gms_m_symm )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                              else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';  vr:=0;
+            if(vr>gms_m_symm         )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
+                                      else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';
+            vr:=0;
+
             BlockRead(f,vr,sizeof(theme_i          ));
-            if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
+            if(vr>=theme_n           )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;
+            vr:=0;
+
             BlockRead(f,vr,sizeof(g_mode           ));
             if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                                       else       svld_str_info+=str_gmode[vr  ]+tc_nl3+tc_default;
-
             vr:=0;
+
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
             BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
             BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
@@ -159,6 +170,7 @@ begin
    SizeOf(g_generators     )+
    SizeOf(PlayerClient     )+
    SizeOf(TPList           )+
+   SizeOf(g_slot_state     )+
    SizeOf(g_units          )+
    SizeOf(g_missiles       )+
    SizeOf(_effects         )+
@@ -213,6 +225,7 @@ begin
    BlockWrite(f,g_generators     ,SizeOf(g_generators     ));
    BlockWrite(f,PlayerClient     ,SizeOf(PlayerClient     ));
    BlockWrite(f,g_players        ,SizeOf(TPList           ));
+   BlockWrite(f,g_slot_state     ,SizeOf(g_slot_state     ));
    BlockWrite(f,g_units          ,SizeOf(g_units          ));
    BlockWrite(f,g_missiles       ,SizeOf(g_missiles       ));
    BlockWrite(f,_effects         ,SizeOf(_effects         ));
@@ -287,6 +300,7 @@ begin
          BlockRead(f,g_generators     ,SizeOf(g_generators     ));
          BlockRead(f,PlayerClient     ,SizeOf(PlayerClient     ));
          BlockRead(f,g_players        ,SizeOf(TPList           ));
+         BlockRead(f,g_slot_state     ,SizeOf(g_slot_state     ));
          BlockRead(f,g_units          ,SizeOf(g_units          ));
          BlockRead(f,g_missiles       ,SizeOf(g_missiles       ));
          BlockRead(f,_effects         ,SizeOf(_effects         ));

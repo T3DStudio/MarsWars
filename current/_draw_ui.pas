@@ -231,7 +231,7 @@ end;
 procedure _drawBtn(tar:pSDL_Surface;x,y:integer;surf:pSDL_Surface;sel,dsbl:boolean);
 var ux,uy:integer;
 begin
-   if(vid_ppos<2)then // left right
+   if(vid_PannelPos<2)then // left right
    begin
       ux:=x*vid_BW+1;
       uy:=ui_bottomsy+y*vid_BW+1;
@@ -259,7 +259,7 @@ clu1,clu2,cru,crd,cld:cardinal;ms:shortstring);
 var ux,uy:integer;
 function cs(ps:pshortstring):boolean;begin cs:=(ps^<>'')and(ps^[1]<>'0'); end;
 begin
-   if(vid_ppos<2)then
+   if(vid_PannelPos<2)then
    begin
       ux:=x*vid_BW+1;
       uy:=ui_bottomsy+y*vid_BW+1;
@@ -284,7 +284,7 @@ end;
 procedure d_TextBTN(tar:pSDL_Surface;bx,by:integer;txt:pshortstring;c:cardinal);
 var ux,uy:integer;
 begin
-   if(vid_ppos<2)then
+   if(vid_PannelPos<2)then
    begin
       ux:=bx*vid_BW+vid_hBW;
       uy:=ui_bottomsy+by*vid_BW+8;
@@ -304,7 +304,7 @@ i1,i2,i3,i4:integer;
 c1,c2,c3,c4:cardinal;
 sel:boolean);
 begin
-   if(vid_ppos<2)then
+   if(vid_PannelPos<2)then
    begin
       draw_surf(tar,bx,by+5,btn);
       if(sel)then
@@ -363,7 +363,7 @@ begin
 
       for ucl:=0 to 3 do
       begin
-         if(vid_ppos<2)then
+         if(vid_PannelPos<2)then
          begin
             ux:=ucl*vid_tBW+1;
             uy:=vid_panelw+1;
@@ -475,7 +475,7 @@ begin
          PlayersButtoms;
       end
       else
-        if(g_players[PlayerClient].observer)then
+        if(g_players[PlayerClient].isobserver)then
         begin
            _drawBtn(tar,0,0,spr_b_rfog ,sys_fog    ,false);
 
@@ -580,12 +580,12 @@ begin
       end
       else
       case m_by of  // tab hints
-      3  : case (vid_ppos<2) of
+      3  : case (vid_PannelPos<2) of
            true :if(mouse_y>vid_panelw)then hs1:=@str_hint_t[(mouse_x-vid_panelx) div vid_tBW];
            false:if(mouse_x>vid_panelw)then hs1:=@str_hint_t[(mouse_y-vid_panely) div vid_tBW];
            end;
       else
-        if(vid_ppos<2)then
+        if(vid_PannelPos<2)then
         begin
            bx:= m_bx;
            by:= m_by-4;
@@ -608,7 +608,7 @@ begin
                 if(rpls_state>=rpls_state_read)
                 then hs1:=@str_hint_r[i]
                 else
-                  if(g_players[PlayerClient].observer)
+                  if(g_players[PlayerClient].isobserver)
                   then hs1:=@str_hint_o[i]
                   else hs1:=@str_hint_a[i];
            end

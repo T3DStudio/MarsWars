@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[PlayerClient].observer)and(rpls_state<rpls_state_read)
+   if(not g_players[PlayerClient].isobserver)and(rpls_state<rpls_state_read)
    then UIPlayer:=PlayerClient
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -72,12 +72,10 @@ begin
    ' '+i2s(mouse_map_y div fog_cw)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
    ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
-   ' '+tc_orange+i2s(g_players[UIPlayer].ai_attack_timer)+
-   ' '+tc_green+str_b2c[g_players[UIPlayer].ai_ReadyForAttack]+
+   ' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
+   ' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
    ' '+tc_gray+i2s(m_bx)+
    ' '+tc_gray+i2s(m_by),
-
-
 
    ta_right,255, c_white);
 

@@ -158,14 +158,19 @@ begin
       r:=trunc(base_1r*map_mmcx);
 
       // clear
-      filledcircleColor(r_minimap,x,y,r,c_black);
+      filledcircleColor(r_minimap,x,y,r ,c_black);
+            circleColor(r_minimap,x,y,r ,c_black);
+         characterColor(r_minimap,x,y,#8,c_black);
 
       if(UnknownStarts)
       then map_MinimapSpot(r_minimap,x,y,r,'?',c_white)
       else
-        if(g_players[i].state>ps_none)or(g_ai_slots>0)
-        then map_MinimapSpot(r_minimap,x,y,r,b2s(i)[1],PlayerGetColor(i))
-        else map_MinimapSpot(r_minimap,x,y,r,'+'      ,c_white);
+        if (g_slot_state[i]<>ps_closed  )
+        and(g_slot_state[i]<>ps_observer)
+        then
+          if(g_players[i].state>ps_none)or(g_ai_slots>0)
+          then map_MinimapSpot(r_minimap,x,y,r,b2s(i)[1],PlayerGetColor(i))
+          else map_MinimapSpot(r_minimap,x,y,r,'+'      ,c_white);
    end;
 
    {x:=round(map_symmetryX0*map_mmcx);

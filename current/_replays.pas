@@ -68,7 +68,6 @@ begin
             t :=0;
             tm:=0;
             BlockRead(f,t ,1);  // state
-            BlockRead(f,tm,1);  // slot_state
             if(t=ps_none)then
             begin
                rpls_str_info+=fn+tc_nl3;
@@ -79,6 +78,7 @@ begin
                BlockRead(f,t ,1); // race
                BlockRead(f,tm,1); // slot_race
                BlockRead(f,t ,1); // team
+               BlockRead(f,tm,1); // slot_state
 
                if(t=0)
                then rpls_str_info+=str_observer[1]
@@ -114,10 +114,10 @@ begin
    rpls_file_head_size
                  +=(sizeof(name      )
                    +sizeof(state     )
-                   +sizeof(slot_state)
                    +sizeof(race      )
                    +sizeof(slot_race )
-                   +sizeof(team     ))*MaxPlayers;
+                   +sizeof(team      )
+                   +g_slot_state[0]  )*MaxPlayers;
 end;
 
 function replay_GetProgress:single;
@@ -259,10 +259,10 @@ begin
            {$I-}
            BlockWrite(rpls_file,name      ,sizeof(name      ));
            BlockWrite(rpls_file,state     ,sizeof(state     ));
-           BlockWrite(rpls_file,slot_state,sizeof(slot_state));
            BlockWrite(rpls_file,race      ,sizeof(race      ));
            BlockWrite(rpls_file,slot_race ,sizeof(slot_race ));
            BlockWrite(rpls_file,team      ,sizeof(team      ));
+           BlockWrite(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
            {$I+}
         end;
 
@@ -406,10 +406,11 @@ begin
              {$I-}
              BlockRead(rpls_file,name      ,sizeof(name      ));
              BlockRead(rpls_file,state     ,sizeof(state     ));
-             BlockRead(rpls_file,slot_state,sizeof(slot_state));
              BlockRead(rpls_file,race      ,sizeof(race      ));
              BlockRead(rpls_file,slot_race ,sizeof(slot_race ));
              BlockRead(rpls_file,team      ,sizeof(team      ));
+
+             BlockRead(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
              {$I+}
           end;
 

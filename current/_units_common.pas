@@ -353,7 +353,7 @@ begin
        AddToInt(@vsnt[team],vistime);
        AddToInt(@vsni[team],vistime);
 
-       if(revealed)then
+       if(isrevealed)then
         for t:=0 to MaxPlayers do
         begin
            AddToInt(@vsnt[t],fr_fps1);
@@ -1720,7 +1720,7 @@ begin
    scan_buff:=255;
    with uu^ do
    begin
-      if(tu^.player^.observer)
+      if(tu^.player^.isobserver)
       or((tu^.player^.upgr[upgr_fog_vision]>0)and(tu^.buff[ub_detect]<=0))
       then td:=0
       else

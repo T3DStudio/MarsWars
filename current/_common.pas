@@ -525,21 +525,26 @@ begin
      if(state=ps_play)then
      begin
         c+=1;
-        if(ready)or(p=PlayerClient)then r+=1;
+        if(isready)
+        or(p=PlayerClient)
+        or(p=PlayerLobby )then r+=1;
      end;
    PlayersReadyStatus:=(r=c)and(c>0);
 end;
 
-function PlayerGetTeam(gm,p:byte):byte;
+function PlayerGetTeam(gm,p,curTeam:byte):byte;
 begin
    PlayerGetTeam:=0;
    if(p<=MaxPlayers)then
     with g_players[p] do
-     if(team>0)then
-      if(p=0)
-      then PlayerGetTeam:=0
-      else
-        case gm of
+    begin
+       if(curTeam>MaxPlayers)then curTeam:=team;
+
+       if(curTeam>0)then
+         if(p=0)
+         then PlayerGetTeam:=0
+         else
+           case gm of
 gm_3x3     : case p of
              1..3: PlayerGetTeam:=1;
              4..6: PlayerGetTeam:=4;
@@ -550,8 +555,10 @@ gm_2x2x2   : case p of
              5,6 : PlayerGetTeam:=5;
              end;
 gm_invasion:       PlayerGetTeam:=1;
-        else       PlayerGetTeam:=g_players[p].team;
-        end;
+           else    PlayerGetTeam:=curTeam;
+           end;
+
+    end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -565,11 +572,11 @@ begin
    for p:=0 to MaxPlayers do
     with g_players[p] do
     begin
-       observer:=false;
+       isobserver:=false;
        if(state>ps_none)then
        begin
-          SetBBit(@g_player_rstatus,p,revealed);
-          observer:=PlayerIsObserver(@g_players[p]);
+          SetBBit(@g_player_rstatus,p,isrevealed);
+          isobserver:=PlayerIsObserver(@g_players[p]);
           if(army>0)then
           begin
              SetBBit(@g_player_astatus,p,true);
@@ -885,17 +892,6 @@ begin
      {$ENDIF}
 end;
 
-procedure PlayerSwitchAILevel(p:byte);
-begin
-   with g_players[p] do
-    if(state=PS_Comp)then
-    begin
-       ai_skill+=1;
-       if(ai_skill>gms_g_maxai)then ai_skill:=1;
-       name:=ai_name(ai_skill);
-    end;
-end;
-
 function UnitHaveRPoint(uid:byte):boolean;
 begin
    with g_uids[uid] do
@@ -1039,39 +1035,6 @@ begin
                                 or(_ability=uab_HellVision);
 end;
 
-procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
-begin
-   if(pset^=[])then exit;
-   repeat
-     if(fwrd)
-     then pb^+=1
-     else pb^-=1
-   until pb^ in pset^
-end;
-function ScrollByte(pb:pbyte;fwrd:boolean;min,max:byte):boolean;
-var oldb:byte;
-begin
-   ScrollByte:=false;
-   if(max<min)then exit;
-   oldb:=pb^;
-   if(fwrd)then
-   begin
-      if(pb^<255)then
-      begin
-         pb^+=1;
-         if(pb^>max)then pb^:=min;
-      end
-      else pb^:=min;
-   end
-   else
-      if(pb^>0  )then
-      begin
-         pb^-=1;
-         if(pb^<min)then pb^:=max;
-      end
-      else pb^:=max;
-   ScrollByte:=oldb<>pb^;
-end;
 function ScrollInt(i:pinteger;s,min,max:integer;loop:boolean):boolean;
 var oldi:integer;
 begin
@@ -1130,7 +1093,7 @@ begin
    if(not sys_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_state_read)or(g_players[PlayerClient].observer)then exit;
+     if(rpls_state>=rpls_state_read)or(g_players[PlayerClient].isobserver)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=g_players[UIPlayer].team)then exit;
@@ -1146,7 +1109,7 @@ begin
      if(RectInCam(vx,vy,_r,_r,0))then
      begin
         if(UIPlayer=0)then
-          if(rpls_state=rpls_state_read)or(g_players[PlayerClient].observer)then
+          if(rpls_state=rpls_state_read)or(g_players[PlayerClient].isobserver)then
           begin
              CheckUnitUIVisionScreen:=true;
              exit;
@@ -1182,17 +1145,17 @@ begin
          3: PlayerGetColor:=c_white;
          end
       else
-        if(PlayerGetTeam(g_mode,UIPlayer)=PlayerGetTeam(g_mode,player))then
+        if(PlayerGetTeam(g_mode,UIPlayer,255)=PlayerGetTeam(g_mode,player,255))then
           case vid_plcolors of
           1,
           2: PlayerGetColor:=c_yellow;
           3: PlayerGetColor:=c_aqua;
           end
         else PlayerGetColor:=c_red;
-   4: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
+   4: PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player,255)];
    5: if(player=UIPlayer)
       then PlayerGetColor:=c_white
-      else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player)];
+      else PlayerGetColor:=PlayerColor[PlayerGetTeam(g_mode,player,255)];
     else PlayerGetColor:=PlayerColor[player];
     end;
 end;

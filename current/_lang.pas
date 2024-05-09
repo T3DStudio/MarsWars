@@ -693,7 +693,7 @@ begin
    end;
 end;
 
-procedure lng_eng;
+procedure language_eng;
 var t: shortstring;
     p: byte;
 begin
@@ -722,7 +722,7 @@ begin
    str_exit[true]        := 'BACK';
    str_map_type          := 'Type: ';
    str_map_typel[mapt_steppe] := tc_gray  +'Steppe';
-   str_map_typel[mapt_nature] := tc_green +'Mountains';
+   str_map_typel[mapt_nature] := tc_green +'Cave';
    str_map_typel[mapt_lake  ] := tc_yellow+'Lake';
    str_map_typel[mapt_shore ] := tc_orange+'Sea shore';
    str_map_typel[mapt_sea   ] := tc_red   +'Sea';
@@ -780,7 +780,7 @@ begin
    str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
-   str_randoms           := 'Random skirmish';
+   str_randoms           := 'Make Random Skirmish';
    str_apply             := 'apply';
    str_plout             := ' left the game';
    str_aislots           := 'Fill empty slots';
@@ -810,6 +810,12 @@ begin
    str_NextTrack         := 'Play next track';
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
+   str_Address           := 'Address';
+
+   g_presets[gp_custom   ].gp_name:= 'custom preset';
+   g_presets[gp_1x1_plane].gp_name:= '1x1 Deimos Steppe';
+   g_presets[gp_1x1_lake ].gp_name:= '1x1 Phobos Lake';
+   g_presets[gp_1x1_cave ].gp_name:= '1x1 Mars Cave';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -871,7 +877,9 @@ begin
    str_PlayerSlots[ps_closed  ]:='closed';
    str_PlayerSlots[ps_observer]:='observer';
    str_PlayerSlots[ps_opened  ]:='opened';
-   str_PlayerSlots[ps_replace ]:='jump here';
+   str_PlayerSlots[ps_ready   ]:='ready';
+   str_PlayerSlots[ps_nready  ]:='not ready';
+   str_PlayerSlots[ps_swap    ]:='jump here';
    for p:=ps_AI_1 to ps_AI_11 do
    str_PlayerSlots[p]:=ai_name(p-ps_AI_1+1);
 
@@ -902,16 +910,16 @@ begin
 
    str_fstarts           := 'Fixed player starts';
 
-   str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
-   str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
-   str_pnua[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
-   str_pnua[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
-   str_pnua[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
-   str_pnua[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
-   str_pnua[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime  +' x7';
-   str_pnua[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime  +' x8';
-   str_pnua[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +' x9';
-   str_pnua[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua  +' x10';
+   str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +'x1';
+   str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +'x2';
+   str_pnua[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+'x3';
+   str_pnua[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+'x4';
+   str_pnua[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+'x5';
+   str_pnua[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+'x6';
+   str_pnua[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime  +'x7';
+   str_pnua[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime  +'x8';
+   str_pnua[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +'x9';
+   str_pnua[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua  +'x10';
 
    str_npnua[0]          := tc_red   +'x1 ';
    str_npnua[1]          := tc_red   +'x2 ';
@@ -954,22 +962,21 @@ begin
    str_rstatus[rpls_state_write]:= tc_yellow+'RECORD';
    str_rstatus[rpls_state_read ]:= tc_lime  +'PLAY';
 
-   str_team              := 'Team:';
-   str_srace             := 'Race:';
-   str_ready             := 'Ready: ';
+   str_ready             := 'ready';
+   str_nready            := 'not ready';
    str_udpport           := 'UDP port';
    str_svup[false]       := 'Start server';
    str_svup[true ]       := 'Stop server';
    str_connect[false]    := 'Connect';
    str_connect[true ]    := 'Disconnect';
-   str_pnu               := 'File size/quality ';
-   str_npnu              := 'Units update rate ';
+   str_replay_Quality    := 'File size/quality';
+   str_net_Quality       := 'Net traffic/Units upd. rate';
    str_connecting        := 'Connecting...';
    str_netsearching      := 'Searching for servers...';
    str_netsearch         := 'Search for LAN servers';
-   str_WrongVersion              := 'Wrong version!';
-   str_ServerFull             := 'Server full!';
-   str_GameStarted              := 'Game started!';
+   str_WrongVersion      := 'Wrong version!';
+   str_ServerFull        := 'Server full!';
+   str_GameStarted       := 'Game started!';
 
    str_hint_t[0]         := 'Buildings';
    str_hint_t[1]         := 'Units';
@@ -1288,7 +1295,7 @@ begin
    _makeHints;
 end;
 
-procedure lng_rus;
+procedure language_rus;
 var t: shortstring;
     p: byte;
 begin
@@ -1317,7 +1324,7 @@ begin
   str_exit[true]        := 'НАЗАД';
   str_map_type          := 'Тип: ';
   str_map_typel[mapt_steppe] := tc_gray  +'Степь';
-  str_map_typel[mapt_nature] := tc_green +'Горы';
+  str_map_typel[mapt_nature] := tc_green +'Пещера';
   str_map_typel[mapt_lake  ] := tc_yellow+'Озеро';
   str_map_typel[mapt_shore ] := tc_orange+'Берег моря';
   str_map_typel[mapt_sea   ] := tc_red   +'Море';
@@ -1371,7 +1378,7 @@ begin
   str_menu_chat         := 'ЧАТ(ВСЕ ИГРОКИ)';
   str_chat_all          := 'ВСЕ:';
   str_chat_allies       := 'СОЮЗНИКИ:';
-  str_randoms           := 'Случайная схватка';
+  str_randoms           := 'Случайная битва';
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты';
@@ -1401,6 +1408,12 @@ begin
   str_NextTrack         := 'Следующий трек';
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
+  str_Address           := 'Адрес';
+
+  g_presets[gp_custom   ].gp_name:= 'свои настройки';
+  g_presets[gp_1x1_plane].gp_name:= '1x1 Степь Деймоса';
+  g_presets[gp_1x1_lake ].gp_name:= '1x1 Озеро Фобоса';
+  g_presets[gp_1x1_cave ].gp_name:= '1x1 Пещера Марса';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
@@ -1462,7 +1475,9 @@ begin
   str_PlayerSlots[ps_closed  ]:='закрыто';
   str_PlayerSlots[ps_observer]:='зритель';
   str_PlayerSlots[ps_opened  ]:='открыто';
-  str_PlayerSlots[ps_replace ]:='на этот слот';
+  str_PlayerSlots[ps_ready   ]:='готов';
+  str_PlayerSlots[ps_nready  ]:='не готов';
+  str_PlayerSlots[ps_swap    ]:='на этот слот';
   for p:=ps_AI_1 to ps_AI_11 do
   str_PlayerSlots[p]:=ai_name(p-ps_AI_1+1);
 
@@ -1514,22 +1529,21 @@ begin
   str_rstatus[rpls_state_write]:= tc_yellow+'ЗАПИСЬ';
   str_rstatus[rpls_state_read ]:= tc_lime  +'ВОСПРОИЗВЕДЕНИЕ';
 
-  str_team              := 'Клан:';
-  str_srace             := 'Раса:';
-  str_ready             := 'Готов: ';
+  str_ready             := 'готов';
+  str_nready            := 'не готов';
   str_udpport           := 'UDP порт:';
   str_svup[false]       := 'Включить сервер';
   str_svup[true ]       := 'Выключить сервер';
   str_connect[false]    := 'Подключится';
   str_connect[true ]    := 'Отключится';
-  str_pnu               := 'Размер/качество: ';
-  str_npnu              := 'Обновление юнитов: ';
+  str_replay_Quality    := 'Размер файла/качество';
+  str_net_Quality       := 'Сет.трафик/Обновление юнитов';
   str_connecting        := 'Соединение...';
   str_netsearching      := 'Поиск серверов...';
   str_netsearch         := 'Поиск серверов в локальной сети';
-  str_WrongVersion              := 'Другая версия!';
-  str_ServerFull             := 'Нет мест!';
-  str_GameStarted              := 'Игра началась!';
+  str_WrongVersion      := 'Другая версия!';
+  str_ServerFull        := 'Нет мест!';
+  str_GameStarted       := 'Игра началась!';
 
   str_hint_t[0]         := 'Здания';
   str_hint_t[1]         := 'Юниты';
@@ -1882,8 +1896,8 @@ end;
 procedure SwitchLanguage;
 begin
   if(ui_language)
-  then lng_rus
-  else lng_eng;
+  then language_rus
+  else language_eng;
 end;
 
 

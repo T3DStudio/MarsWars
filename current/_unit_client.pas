@@ -235,7 +235,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(g_players[POVPlayer].team,pu,true))or(rpl)or(g_players[POVPlayer].observer)
+      if(CheckUnitTeamVision(g_players[POVPlayer].team,pu,true))or(rpl)or(g_players[POVPlayer].isobserver)
       then hits_si:=hits_li2si(hits,_mhits,_shcf)
       else hits_si:=-128;
 
@@ -277,7 +277,7 @@ begin
                  wudata_byte(byte(ua_y shr 5),rpl);
               end;
 
-            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
@@ -417,7 +417,7 @@ gm_royale   : wudata_int (g_royal_r        ,rpl);
    if(not rpl)
    then UpdatePlayersStatusVars;
 
-   if(g_player_astatus>0)and(g_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
+   if(g_player_astatus>0)and(g_players[POVPlayer].isobserver)then SetBBit(@g_player_astatus,7,true);
 
    wudata_byte(g_player_astatus,rpl);
    if(g_player_astatus>0)then
@@ -952,7 +952,7 @@ begin
          buff[ub_Decay   ]:=0;
       end;
 
-      if(not rpl)and(not g_players[POVPlayer].observer)then
+      if(not rpl)and(not g_players[POVPlayer].isobserver)then
        with g_players[POVPlayer] do
         if(team>0)then
           AddToInt(@vsnt[team],vistime);
@@ -1094,7 +1094,7 @@ begin
                  ua_y:=integer(rudata_byte(rpl,0) shl 5);
               end;
 
-            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
          end;
       end
       else hits:=hits_si2li(sh,uid^._mhits,uid^._shcf);
@@ -1230,7 +1230,7 @@ gm_royale   : g_royal_r        :=rudata_int (rpl,0);
       if(g_mode=gm_invasion)then
         if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
 
-      g_players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
+      g_players[POVPlayer].isobserver:=GetBBit(@g_player_astatus,7);
 
       _PNU:=rudata_byte(rpl,0)*4;
 
@@ -1254,7 +1254,7 @@ gm_royale   : g_royal_r        :=rudata_int (rpl,0);
          g_player_rstatus:=rudata_byte(rpl,0);
          for i:=0 to MaxPlayers do
           with g_players[i] do
-           revealed:=GetBBit(@g_player_rstatus,i);
+           isrevealed:=GetBBit(@g_player_rstatus,i);
       end;
 
       _N_U:=rudata_int(rpl,0);

@@ -37,7 +37,6 @@ APM_1Period            = fr_fps60;
 //
 
 gms_g_startb           = 6;  // 0-6  max start base options
-gms_g_maxai            = 11; // 0-11 max skirmish AI skills
 gms_g_maxgens          = 6;  // 0-6  max neutrall generators options
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,22 +52,26 @@ ps_comp                = 2;
 ps_closed              = 0;
 ps_observer            = 1;
 ps_opened              = 2;
-ps_replace             = 3;  // menu option, not state
-ps_AI_1                = 4;  // very easy
-ps_AI_2                = 5;  // easy
-ps_AI_3                = 6;  // medium
-ps_AI_4                = 7;  // hard
-ps_AI_5                = 8;  // harder
-ps_AI_6                = 9;  // very hard
-ps_AI_7                = 10; // elite
-ps_AI_8                = 11; // Cheater 1 (Vision)
-ps_AI_9                = 12; // Cheater 2 (Vision+MultiProd)
-ps_AI_10               = 13; // Cheater 3 (Vision+MultiProd+FastUProd)
-ps_AI_11               = 14; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+ps_ready               = 3;  // menu option, not state
+ps_nready              = 4;  // menu option, not state
+ps_swap                = 5;  // menu option, not state
+ps_AI_1                = 6;  // very easy
+ps_AI_2                = 7;  // easy
+ps_AI_3                = 8;  // medium
+ps_AI_4                = 9;  // hard
+ps_AI_5                = 10;  // harder
+ps_AI_6                = 11;  // very hard
+ps_AI_7                = 12; // elite
+ps_AI_8                = 13; // Cheater 1 (Vision)
+ps_AI_9                = 14; // Cheater 2 (Vision+MultiProd)
+ps_AI_10               = 15; // Cheater 3 (Vision+MultiProd+FastUProd)
+ps_AI_11               = 16; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
 
-ps_states_n            = 4+gms_g_maxai;
+gms_g_maxai            = ps_AI_11-ps_AI_1+1; // 0-11 max skirmish AI skills
 
-player_default_ai_level= ps_AI_7;
+ps_states_n            = 6+gms_g_maxai;
+
+player_default_ai_level= 7;
 
 gm_scirmish            = 0;  // game mode
 gm_3x3                 = 1;
@@ -122,6 +125,18 @@ MinSMapW               = 2000;
 StepSMap               = 250;
 
 map_b0                 = 5;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Game presets
+//
+
+gp_custom              = 0;
+gp_1x1_plane           = 1;
+gp_1x1_lake            = 2;
+gp_1x1_cave            = 3;
+
+gp_count               = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -266,15 +281,22 @@ nmid_notconnected      = 13;
 nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
-nmid_lobbby_mapsize    = 18;
-nmid_lobbby_type       = 19;
-nmid_lobbby_symmetry   = 20;
-nmid_lobbby_playerslot = 21;
-nmid_lobbby_playerteam = 22;
-nmid_lobbby_playerrace = 23;
-nmid_lobbby_gamemode   = 24;
+nmid_lobbby_preset     = 18;
+nmid_lobbby_mapsize    = 19;
+nmid_lobbby_type       = 20;
+nmid_lobbby_symmetry   = 21;
+nmid_lobbby_playerslot = 22;
+nmid_lobbby_playerteam = 23;
+nmid_lobbby_playerrace = 24;
+nmid_lobbby_gamemode   = 25;
+nmid_lobbby_builders   = 26;
+nmid_lobbby_generators = 27;
+nmid_lobbby_FixStarts  = 28;
+nmid_lobbby_DeadPbserver= 29;
+nmid_lobbby_EmptySlots = 30;
 nmid_getinfo           = 66;
 nmid_localadv          = 67;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

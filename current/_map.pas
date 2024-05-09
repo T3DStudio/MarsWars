@@ -56,8 +56,6 @@ end;
 
 procedure map_AddDoodad(dx,dy:integer;dt:byte);
 begin
-   //if(map_ddn<0)then map_ddn:=0;
-   //if(map_ddn>=MaxDoodads)then exit;
    if(map_ddn>MaxDoodads)then map_ddn:=MaxDoodads;
    if(map_ddn<0)then exit;
 
@@ -112,15 +110,15 @@ var dx,dy,c:longint;
     a,b    :single;
 begin
    case SymmetryType of
-   0:begin
+   0:begin // no symmetry
         rx^:=NOTSET;
         ry^:=NOTSET;
      end;
-   1:begin
+   1:begin // point symmetry
         rx^:=sx0-(x-sx0);
         ry^:=sy0-(y-sy0);
      end;
-   else
+   else    // line symmetry
      if (sx0=sx1)
      and(sy0=sy1)then
      begin
@@ -806,6 +804,37 @@ begin
    map_ReMake;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  map settings
+
+function map_SetSize(new_size:integer):boolean;
+begin
+   map_SetSize:=false;
+   if(new_size<MinSMapW)or(MaxSMapW<new_size)then exit;
+   map_SetSize:=true;
+   map_mw:=new_size;
+   map_premap;
+end;
+function map_SetType(new_type:byte):boolean;
+begin
+   map_SetType:=false;
+   if(gms_m_types<new_type)then exit;
+   map_SetType:=true;
+   map_type:=new_type;
+   map_premap;
+end;
+function map_SetSymmetry(new_symmetry:byte):boolean;
+begin
+   map_SetSymmetry:=false;
+   if(gms_m_symm<new_symmetry)then exit;
+   map_SetSymmetry:=true;
+   map_symmetry:=new_symmetry;
+   map_premap;
+end;
+
+
+//
 
 
 

@@ -838,13 +838,13 @@ var i,y:integer;
 
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
-   if(vid_ppos<2)
+   if(vid_PannelPos<2)
    then lineColor(r_panel,x0,y0,x1,y1,color)
    else lineColor(r_panel,y0,x0,y1,x1,color);
 end;
 procedure prect(x0,y0,x1,y1:integer;color:cardinal);
 begin
-   if(vid_ppos<2)
+   if(vid_PannelPos<2)
    then rectangleColor(r_panel,x0,y0,x1,y1,color)
    else rectangleColor(r_panel,y0,x0,y1,x1,color);
 end;
@@ -854,7 +854,7 @@ begin
    _FreeSF(r_panel   );
    _FreeSF(r_dterrain);
 
-   if(vid_ppos<2)then // left-right
+   if(vid_PannelPos<2)then // left-right
    begin
       ui_menu_btnsy:=(vid_vh div vid_BW);
       if((vid_vh-(ui_menu_btnsy*vid_BW))<vid_hBW)then ui_menu_btnsy-=1;
@@ -865,17 +865,17 @@ begin
       if((vid_vw-(ui_menu_btnsy*vid_BW))<vid_BW)then ui_menu_btnsy-=1;
    end;
 
-   if(vid_ppos<2)then // left-right
+   if(vid_PannelPos<2)then // left-right
    begin
       vid_cam_w:=vid_vw-vid_panelw;
       vid_cam_h:=vid_vh;
 
-      if(vid_ppos=0)
+      if(vid_PannelPos=0)
       then vid_mapx:=vid_panelw
       else vid_mapx:=0;
       vid_mapy:=0;
 
-      if(vid_ppos=0)
+      if(vid_PannelPos=0)
       then vid_panelx:=0
       else vid_panelx:=vid_cam_w-1;
       vid_panely:=0;
@@ -893,12 +893,12 @@ begin
       vid_cam_h:=vid_vh-vid_panelw;
 
       vid_mapx:=0;
-      if(vid_ppos=2)
+      if(vid_PannelPos=2)
       then vid_mapy:=vid_panelw-1
       else vid_mapy:=0;
 
       vid_panelx:=0;
-      if(vid_ppos=2)
+      if(vid_PannelPos=2)
       then vid_panely:=0
       else vid_panely:=vid_cam_h-1;
 

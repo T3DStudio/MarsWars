@@ -193,7 +193,7 @@ begin
    end;
 end;
 
-procedure ai_MakeScirmishStartAlarms(p:byte);
+procedure ai_MakeScirmishDefaultAlarms(p:byte);
 var i: byte;
 begin
    for i:=1 to MaxPlayers do
@@ -277,6 +277,7 @@ begin
                     +aif_ability_other
                     +aif_ability_mainsave; //all
       end;
+      if(state=ps_comp)then
       case ai_skill of
       8 : upgr[upgr_fog_vision  ]:=1;
       9 : begin
@@ -296,7 +297,7 @@ begin
           end;
       end;
    end;
-   ai_MakeScirmishStartAlarms(p);
+   ai_MakeScirmishDefaultAlarms(p);
 end;
 
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
