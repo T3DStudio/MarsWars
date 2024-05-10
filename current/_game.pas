@@ -46,14 +46,12 @@ begin
 
    with g_players[SlotTarget] do
      if(state=ps_play)then exit;
-   if(g_slot_state[SlotTarget]=ps_closed)then exit;
+   if(g_slot_state[SlotTarget]<>ps_opened  )and
+     (g_slot_state[SlotTarget]<>ps_observer)then exit;
 
    PlayersSwap:=true;
 
    if(Check)then exit;
-
-   g_slot_state[SlotTarget]:=g_slot_state[SlotSource];
-   g_slot_state[SlotSource]:=ps_opened;
 
    tp:=g_players[SlotSource];
    g_players[SlotSource]:=g_players[SlotTarget];
@@ -61,6 +59,15 @@ begin
 
    g_players[SlotSource].pnum:=SlotSource;
    g_players[SlotTarget].pnum:=SlotTarget;
+
+   case g_slot_state[SlotSource] of
+   ps_observer: g_players[SlotSource].team:=0;
+   ps_opened  : g_players[SlotSource].team:=PlayerGetTeam(g_mode,SlotSource,SlotSource);
+   end;
+   case g_slot_state[SlotTarget] of
+   ps_observer: g_players[SlotTarget].team:=0;
+   ps_opened  : g_players[SlotTarget].team:=PlayerGetTeam(g_mode,SlotTarget,SlotTarget);
+   end;
 
    if(PlayerClient=SlotTarget)then PlayerClient:=SlotSource
    else
@@ -80,7 +87,7 @@ ps_none: begin isready:=false;name :=str_ps_none;      end;
 PS_Comp: begin isready:=true; name :=ai_name(ai_skill);end;
 ps_play: begin isready:=false;name :='';               end;
       end;
-      ttl :=0;
+      nttl :=0;
       state:=newstate;
    end;
 end;
@@ -233,11 +240,14 @@ begin
       or( g_slot_state[PlayerTarget]=ps_closed  )
       or((ps_AI_1<=g_slot_state[PlayerTarget]   )and(g_slot_state[PlayerTarget]<=ps_AI_11)and(state=ps_comp)and(NewTeam=0))
       or((g_slot_state[PlayerTarget]=ps_opened  )and(state=ps_none))
-      or((g_slot_state[PlayerTarget]=ps_opened  )and(state>ps_none)and(PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
+      or((g_slot_state[PlayerTarget]=ps_opened  )and(state=ps_play)and(PlayerRequestor<>PlayerTarget))
+      or((g_slot_state[PlayerTarget]=ps_opened  )and(state=ps_comp)and(PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))
+      then exit;
 
       //if(g_preset_cur>0)then
       //  if(NewTeam<>PlayerGetTeam(g_mode,PlayerTarget,pnum))then exit;
-
+      //         в мультиплеере сервер может менять мою команду, а я - нет
+     //          в мультиплере не обновляется меню сразу
       n:=team;
       team:=NewTeam;
       if(PlayerGetTeam(g_mode,PlayerTarget,255)<>team)then
@@ -368,12 +378,12 @@ nmid_lobbby_gamemode    : begin
                              GameSetCommonSetting:=true;
                           end;
 nmid_lobbby_builders    : begin
-                             if(NewVal>gms_g_maxgens)then exit;
+                             if(NewVal>gms_g_startb)then exit;
                              g_start_base:=NewVal;
                              GameSetCommonSetting:=true;
                           end;
 nmid_lobbby_generators  : begin
-                             if(NewVal>gms_g_startb)then exit;
+                             if(NewVal>gms_g_maxgens)then exit;
                              g_generators:=NewVal;
                              map_premap;
                              GameSetCommonSetting:=true;
@@ -436,7 +446,8 @@ begin
    sys_uncappedFPS:=false;
    test_fastprod:=false;
 
-   menu_update:= true;
+   menu_remake:= true;
+   menu_redraw:= true;
 
    vid_cam_x:=-vid_panelw;
    vid_cam_y:=0;
@@ -470,7 +481,6 @@ begin
 
    rpls_pnu  :=0;
    rpls_plcam:=false;
-   //if(rpls_state>=rpls_state_read)then
    rpls_state:=rpls_state_none;
    {$ELSE}
    screen_redraw:=true;
@@ -478,6 +488,15 @@ begin
 end;
 
 {$IFDEF _FULLGAME}
+procedure GameBreakClientGame;
+begin
+   net_disconnect;
+   net_dispose;
+   GameDefaultAll;
+   G_started  :=false;
+   net_status :=ns_single;
+end;
+
 {$include _replays.pas}
 {$ENDIF}
 
@@ -880,16 +899,16 @@ begin
      begin
         if(state=ps_play)and(p<>PlayerClient)and(net_status=ns_server)then
         begin
-           if(ttl<ClientTTL)then
+           if(nttl<ClientTTL)then
            begin
-              ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
+              nttl+=1;
+              if(nttl=ClientTTL)or(nttl=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
            end
            else
              if(G_Started=false)then
              begin
                 PlayerSetState(p,ps_none);
-                {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
+                {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;

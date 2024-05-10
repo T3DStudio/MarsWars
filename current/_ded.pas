@@ -73,8 +73,8 @@ begin
         then   Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'               ,25, ''                          ,35, '',0, '',0)
         else
           if(team=0)
-          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer       ,25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
-          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[slot_race],25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0);
+          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer       ,25, t2c(PlayerGetTeam(g_mode,p,255)),35, '',0, '',0)
+          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[slot_race],25, t2c(PlayerGetTeam(g_mode,p,255)),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;

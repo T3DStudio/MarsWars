@@ -104,6 +104,7 @@ begin
       vid_CamSpeed:=mm3(1,vid_CamSpeed,max_CamSpeed);
 
       PlayerName:=ValidateStr(PlayerName,NameLen,@k_kbstr);
+      if(length(PlayerName)=0)then PlayerName:=str_defaultPlayerName;
 
       vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);

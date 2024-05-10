@@ -36,15 +36,6 @@ begin
       exit;
    end;
 
-   {if(net_status=ns_client)then
-   begin
-      if(net_svsearch)
-      then net_socket:=SDLNet_UDP_Open(net_svlsearch_port)
-      else net_socket:=SDLNet_UDP_Open(0);
-   end
-   else
-     if(net_status=ns_server)
-     then net_socket:=SDLNet_UDP_Open(net_port); }
    net_socket:=SDLNet_UDP_Open(port);
 
    if (net_socket=nil) then
@@ -296,13 +287,7 @@ begin
    net_writeint (ival);
    net_send(net_cl_svip,net_cl_svport);
 end;
-procedure net_send_MIDWord(mid,wval:byte);
-begin
-   net_clearbuffer;
-   net_writebyte(mid);
-   net_writeint (wval);
-   net_send(net_cl_svip,net_cl_svport);
-end;
+
 
 procedure net_send_PlayerSlot(PlayerTarget,newPlayerSlot:byte);
 begin

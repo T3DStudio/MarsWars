@@ -346,7 +346,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
       if(ptarget=ThisPlayer)then
       begin
          log_LastMesTimer:=min2(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
-         menu_update:=true;
+         menu_redraw:=true;
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer;
 
@@ -1233,7 +1233,7 @@ begin
    menu_item  :=0;
    menu_list_n:=0;
    setlength(menu_list_items,menu_list_n);
-   menu_update:=true;
+   menu_remake:=true;
 end;
 procedure menu_Toggle;
 begin
@@ -1241,7 +1241,7 @@ begin
    begin
       if(menu_state)then menu_List_Clear;
       menu_state:=not menu_state;
-      menu_update:=menu_state;
+      menu_remake:=menu_state;
       menu_item:=0;
       if(net_status=ns_single)and(g_Status<=MaxPlayers)then
        if(menu_state)
@@ -1496,9 +1496,9 @@ begin
       if(state=ps_play)then
       begin
          if(g_started=false)
-         then PlayerGetStatus:=str_b2c[ready]
+         then PlayerGetStatus:=str_b2c[isready]
          else PlayerGetStatus:=str_ps_c[ps_play];
-         if(ttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
+         if(nttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
       end;
       if(p=PlayerClient)then PlayerGetStatus:=str_ps_h;
    end;
@@ -1514,7 +1514,7 @@ begin
      if (state=PS_Play) then
      begin
         c+=1;
-        if(ttl=ClientTTL)then r+=1;
+        if(nttl=ClientTTL)then r+=1;
      end;
    PlayerAllOut:=(r=c)and(c>0);
 end;

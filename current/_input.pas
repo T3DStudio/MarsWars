@@ -722,16 +722,16 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(menu_state)then
                                                    begin
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_update:=menu_update or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);
-                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_update:=menu_update or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_update:=menu_update or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);
                                                       //98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(menu_state)then
                                                    begin
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_update:=menu_update or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);
-                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_update:=menu_update or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_update:=menu_update or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);
+                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);
                                                       //98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
                                                    end;
                            else
@@ -958,7 +958,12 @@ begin
    begin
       menu_keyborad;
       menu_mouse;
-      if(menu_update)then menu_ReInit;
+      if(menu_remake)then
+      begin
+         menu_ReInit;
+         menu_redraw:=true;
+         menu_remake:=false;
+      end;
    end
    else
    begin

@@ -211,12 +211,13 @@ begin
    map_MinimapCPoints;
    draw_surf(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,ui_menu_map_mx0+r_minimap^.w,ui_menu_map_my0+r_minimap^.h,c_ltgray);
-   menu_update:=menu_update or menu_state;
+   menu_redraw:=menu_redraw or menu_state;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
-var m,s,h:cardinal;
-    hs,ms,ss:shortstring;
+var
+m,s,h   :cardinal;
+hs,ms,ss:shortstring;
 begin
    s:=time div fr_fps1;
    m:=s div 60;

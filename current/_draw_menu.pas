@@ -216,7 +216,8 @@ begin
                                   then tstr:=str_ready
                                   else tstr:=str_nready;
                                 D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,tstr,true,0,c_gray);
-                             end;
+                             end
+                             else D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,str_PlayerSlots[g_slot_state[p]],true ,0,c_gray);
                           end
                           else
                           begin
@@ -472,7 +473,7 @@ begin
                  D_menu_ETextD(tar,mi_mplay_ClientAddress,str_Address        ,net_cl_svstr                  ,false,1,0);
                  D_menu_ETextD(tar,mi_mplay_ClientConnect,str_connect[net_status=ns_client],net_status_str  ,false,0,0);
             if(g_cl_units>0)
-            then D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,i2s(min2(cl_UpT_array[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_pnui]
+            then D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,i2s(min2(cl_UpT_array[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[net_pnui]
                                                                                                             ,true ,0,0)
             else D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,str_pnua[net_pnui]            ,true ,0,0);
 
@@ -551,11 +552,11 @@ end;
 procedure D_Menu;
 var i:integer;
 begin
-   if(menu_update)then
+   if(menu_redraw)then
    begin
       map_RedrawMenuMinimap(vid_map_RedrawBack);
       d_UpdateMenu(r_menu);
-      menu_update:=false;
+      menu_redraw:=false;
       vid_map_RedrawBack:=false;
 
       if(menu_list_n>0)then

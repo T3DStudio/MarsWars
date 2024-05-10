@@ -188,7 +188,8 @@ r_draw            : boolean = true;
 vid_map_RedrawBack: boolean = false;
 
 menu_state        : boolean = true;
-menu_update       : boolean = false;
+menu_remake       : boolean = false;
+menu_redraw       : boolean = false;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_game;
@@ -207,8 +208,7 @@ menu_res_h,
 menu_x,
 menu_y            : integer;
 
-PlayerName        : shortstring = 'DoomPlayer';
-PlayerReady       : boolean = false;
+PlayerName        : shortstring = str_defaultPlayerName;
 
 PlayerColor       : array[0..MaxPlayers] of cardinal;
 
@@ -292,13 +292,15 @@ campain_mission   : byte = 0;
 campain_mmap      : array[0..MaxMissions] of pSDL_Surface;
 campain_mission_n : integer = 0;
 
+log_LastMesTimer  : integer = 0;
+
+net_cl_svpreset   : shortstring = '';
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
 net_cl_svstr      : shortstring = '127.0.0.1:10666';
 net_status_str    : shortstring = '';
 net_sv_pstr       : shortstring = '10666';
-log_LastMesTimer : integer = 0;
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
 net_pnui          : byte = 4;

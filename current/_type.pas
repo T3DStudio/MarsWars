@@ -539,7 +539,7 @@ o_x1,o_y1  : integer;
 
    PNU     : byte;
    n_u,
-   ttl     : word;
+   nttl    : word;
    nip     : cardinal;
    nport   : word;
 

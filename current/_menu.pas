@@ -37,6 +37,7 @@ begin
    if(p<=MaxPlayers)then
      case g_slot_state[p] of
 ps_opened   : with g_players[p] do NeedColumnTeam:=((state=ps_none)and(g_ai_slots>0))or(state>ps_none);
+ps_observer,
 ps_AI_1..
 ps_AI_11    : NeedColumnTeam:=true;
      end;
@@ -197,7 +198,8 @@ ms2_mult: begin
              SetItem(mi_mplay_ClientCaption,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)                     );ty0+=ui_menu_cgm_lh;
              SetItem(mi_mplay_NetSearch    ,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)and(not G_Started)   );ty0+=ui_menu_cgm_lh;
              SetItem(mi_mplay_ClientAddress,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh, net_status<>ns_client                      );ty0+=ui_menu_cgm_lh;
-             SetItem(mi_mplay_ClientConnect,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)and(not net_svsearch));ty0+=ui_menu_cgm_lh;
+             SetItem(mi_mplay_ClientConnect,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh,(net_status<>ns_server)and(not net_svsearch)
+                                                                                                   and((net_status=ns_client)or(not G_Started)));ty0+=ui_menu_cgm_lh;
              SetItem(mi_mplay_ClientQuality,ui_menu_cgm_zx0,ty0,ui_menu_cgm_zx1,ty0+ui_menu_cgm_lh, net_status<>ns_server);
 {
 mi_mplay_Chat           : ;
@@ -595,10 +597,13 @@ begin
      begin
         case menu_item of
 mi_mplay_ClientAddress : net_cl_saddr;
-mi_settings_PlayerName : g_players[PlayerClient].name:=PlayerName;
+mi_settings_PlayerName : begin
+                         if(length(PlayerName)=0)then PlayerName:=str_defaultPlayerName;
+                         g_players[PlayerClient].name:=PlayerName;
+                         end;
         end;
         menu_SelectItem;
-        menu_update:=true;
+        menu_remake:=true;
         SoundPlayUI(snd_click);
      end;
 
@@ -629,7 +634,7 @@ mi_map_params3            : if(menu_list_selected>-1)then
                             begin
                                p:=MinSMapW+(StepSMap*menu_list_SIndex);
                                if(net_status=ns_client)
-                               then net_send_MIDWord(nmid_lobbby_mapsize,word(p))
+                               then net_send_MIDInt(nmid_lobbby_mapsize,p)
                                else map_SetSize(p);
                                menu_List_Clear;
                             end
@@ -799,7 +804,7 @@ mi_player_team6           : begin
                                begin
                                   if(PlayerSlotChangeTeam(PlayerClient,p,menu_list_SIndex,true))then
                                     if(net_status=ns_client)
-                                    then net_send_PlayerRace(p,menu_list_SIndex)
+                                    then net_send_PlayerTeam(p,menu_list_SIndex)
                                     else PlayerSlotChangeTeam(PlayerClient,p,menu_list_SIndex,false);
                                   menu_List_Clear;
                                end
@@ -886,29 +891,18 @@ mi_mplay_ServerToggle     : if(net_status=ns_server)then
                                else net_dispose;
                             end;
 
-mi_mplay_ClientConnect    : //if(net_status<>ns_server)and(not net_svsearch)then
-                            if(net_status=ns_client)or(not G_Started)then
-                            begin
-                               if(net_status=ns_client)then
-                               begin
-                                  net_disconnect;
-                                  net_dispose;
-                                  GameDefaultAll;
-                                  G_started  :=false;
-                                  PlayerReady:=false;
-                                  net_status :=ns_single;
-                               end
-                               else
-                                 if(net_UpSocket(0))then
-                                 begin
-                                    net_status_str:=str_connecting;
-                                    net_status :=ns_client;
-                                    net_cl_saddr;
-                                    rpls_pnu:=0;
-                                    menu_s1 :=ms1_sett;
-                                 end
-                                 else net_dispose;
-                            end;
+mi_mplay_ClientConnect    : if(net_status=ns_client)
+                            then GameBreakClientGame
+                            else
+                              if(net_UpSocket(0))then
+                              begin
+                                 net_status_str:=str_connecting;
+                                 net_status :=ns_client;
+                                 net_cl_saddr;
+                                 rpls_pnu:=0;
+                                 menu_s1 :=ms1_sett;
+                              end
+                              else net_dispose;
 mi_mplay_ClientAddress    : ;
 mi_mplay_Chat             : ;
 
@@ -1076,7 +1070,7 @@ mi_mplay_ClientQuality    : if(menu_list_selected>-1)then
       else UpdateItems:=false;
       end;
 
-      if(UpdateItems)then menu_update:=true;
+      if(UpdateItems)then menu_remake:=true;
    end;
 
    {if(ks_mright=1)then    // right button pressed
@@ -1145,7 +1139,7 @@ mi_mplay_Chat         : net_chat_str:=StringApplyInput(net_chat_str,k_kbstr ,255
          UpdateItems:=false;
       end;
 
-      if(UpdateItems)then menu_update:=true;
+      if(UpdateItems)then menu_remake:=true;
    end;
 end;
 

@@ -899,7 +899,7 @@ begin
       if(not rpl)then
       begin
          net_log_n:=rudata_card(rpl,net_log_n);
-         menu_update:=true;
+         menu_redraw:=true;
       end;
    end;
 end;

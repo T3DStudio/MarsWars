@@ -112,12 +112,12 @@ begin
                   +sizeof(rpls_player      );
    with g_players[0] do
    rpls_file_head_size
-                 +=(sizeof(name      )
-                   +sizeof(state     )
-                   +sizeof(race      )
-                   +sizeof(slot_race )
-                   +sizeof(team      )
-                   +g_slot_state[0]  )*MaxPlayers;
+                 +=cardinal((sizeof(name      )
+                            +sizeof(state     )
+                            +sizeof(race      )
+                            +sizeof(slot_race )
+                            +sizeof(team      )
+                            +g_slot_state[0]  )*MaxPlayers);
 end;
 
 function replay_GetProgress:single;
