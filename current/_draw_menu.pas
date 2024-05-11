@@ -215,16 +215,16 @@ begin
                                   if(isready)
                                   then tstr:=str_ready
                                   else tstr:=str_nready;
-                                D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,tstr,true,0,c_gray);
+                                D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,tstr,true,0,c_ltgray);
                              end
-                             else D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,str_PlayerSlots[g_slot_state[p]],true ,0,c_gray);
+                             else D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,str_PlayerSlots[g_slot_state[p]],true ,0,c_ltgray);
                           end
                           else
                           begin
                              if(g_ai_slots >0)and(g_slot_state[p]=ps_opened)then
-                             D_menu_EText(tar,mi_player_status1+p0,ta_x0y0,ta_x0y0,str_PlayerSlots[ps_AI_1+g_ai_slots-1],false,0,c_gray);
+                             D_menu_EText(tar,mi_player_status1+p0,ta_x0y0,ta_x0y0,str_PlayerSlots[ps_AI_1+g_ai_slots-1],false,0,c_ltgray);
 
-                             D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,str_PlayerSlots[g_slot_state[p]],true ,0,c_gray);
+                             D_menu_EText(tar,mi_player_status1+p0,ta_x1y1,ta_x1y1,str_PlayerSlots[g_slot_state[p]],true ,0,c_ltgray);
                           end;
             ps_AI_1..
             ps_AI_11    : if(state>ps_none)

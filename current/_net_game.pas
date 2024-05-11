@@ -228,16 +228,17 @@ nmid_pause       : begin
                  end
                else // not G_Started
                  case mid of
-nmid_lobbby_preset      : if(GameLoadPreset (net_readbyte))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_mapsize     : if(map_SetSize    (net_readint ))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_type        : if(map_SetType    (net_readbyte))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_symmetry    : if(map_SetSymmetry(net_readbyte))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_preset      : if(GameLoadPreset(pid,net_readbyte    ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_mapseed     : if(map_SetSetting(pid,mid,net_readcard,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_mapsize     : if(map_SetSetting(pid,mid,net_readint ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_type        : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_symmetry    : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_lobbby_gamemode,
 nmid_lobbby_builders,
 nmid_lobbby_generators,
 nmid_lobbby_FixStarts,
 nmid_lobbby_DeadPbserver,
-nmid_lobbby_EmptySlots  : if(GameSetCommonSetting(mid,net_readbyte))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_lobbby_EmptySlots  : if(GameSetCommonSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_lobbby_playerslot  : begin
                           i:=net_readbyte;
                           if(PlayerSlotChangeState(pid,i,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;

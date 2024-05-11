@@ -66,11 +66,19 @@ begin
    ty1:=0;
    while(ty1<ui_menu_map_ph)do
    begin
-   enable:=(not G_Started)and((PlayerLobby=PlayerClient)or(PlayerLobby=0))and((ty0=0)or(g_preset_cur=0));
-   SetItem(mi_map_params1+ty0,ui_menu_map_px0,ui_menu_map_py0+ty1,ui_menu_map_px1,ui_menu_map_py0+ty1+ui_menu_map_lh,enable);
+   //enable:=(not G_Started)and((PlayerLobby=PlayerClient)or(PlayerLobby=0))and((ty0=0)or(g_preset_cur=0));
+   SetItem(mi_map_params1+ty0,ui_menu_map_px0,ui_menu_map_py0+ty1,ui_menu_map_px1,ui_menu_map_py0+ty1+ui_menu_map_lh,true);
    ty0+=1;
    ty1+=ui_menu_map_lh;
    end;
+
+   menu_items[mi_map_params1].enabled:=GameLoadPreset(PlayerClient,0,true);
+   menu_items[mi_map_params2].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapseed ,0,true);
+   menu_items[mi_map_params3].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapsize ,MinSMapW,true);
+   menu_items[mi_map_params4].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_type    ,0,true);
+   menu_items[mi_map_params5].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_symmetry,0,true);
+   menu_items[mi_map_params6].enabled:=menu_items[mi_map_params5].enabled;
+   menu_items[mi_map_params7].enabled:=true;
 
    // settings block
 
@@ -182,8 +190,12 @@ ms2_game: begin
                 ty1+=1;
              end;
 
-             for ty1:=mi_game_mode to mi_game_RandomSkrimish do
-             menu_items[ty1].enabled:=(not G_Started)and((PlayerLobby=PlayerClient)or(PlayerLobby=0))and( not(ty1 in [mi_game_mode,mi_game_FixStarts])or(g_preset_cur=0));
+             menu_items[mi_game_mode         ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_gamemode    ,0,true);
+             menu_items[mi_game_builders     ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_builders    ,0,true);
+             menu_items[mi_game_generators   ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_generators  ,0,true);
+             menu_items[mi_game_FixStarts    ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,0,true);
+             menu_items[mi_game_DeadPbserver ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,0,true);
+             menu_items[mi_game_EmptySlots   ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_EmptySlots  ,0,true);
 
              menu_items[mi_game_RecordStatus ].enabled:=rpls_state<rpls_state_read;
              menu_items[mi_game_RecordName   ].enabled:=rpls_state=rpls_state_none;
@@ -625,7 +637,7 @@ mi_map_params1            : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
                                then net_send_MIDByte(nmid_lobbby_preset,byte(menu_list_selected))
-                               else GameLoadPreset(byte(menu_list_selected));
+                               else GameLoadPreset(PlayerClient,byte(menu_list_selected),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeGamePresets(menu_item,-2);
@@ -634,16 +646,16 @@ mi_map_params3            : if(menu_list_selected>-1)then
                             begin
                                p:=MinSMapW+(StepSMap*menu_list_SIndex);
                                if(net_status=ns_client)
-                               then net_send_MIDInt(nmid_lobbby_mapsize,p)
-                               else map_SetSize(p);
+                               then net_send_MIDInt(             nmid_lobbby_mapsize,p)
+                               else map_SetSetting (PlayerClient,nmid_lobbby_mapsize,p,false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromInts(menu_item,MaxSMapW,MinSMapW,StepSMap,map_mw,-2);
 mi_map_params4            : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
-                               then net_send_MIDByte(nmid_lobbby_type,byte(menu_list_selected))
-                               else map_SetType(byte(menu_list_selected));
+                               then net_send_MIDByte(             nmid_lobbby_type,byte(menu_list_selected))
+                               else map_SetSetting  (PlayerClient,nmid_lobbby_type,byte(menu_list_selected),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_map_typel[0],SizeOf(str_map_typel),map_type,-2);
@@ -651,8 +663,8 @@ mi_map_params5            : if(menu_list_selected>-1)then
                             begin
                                menu_List_Clear;
                                if(net_status=ns_client)
-                               then net_send_MIDByte(nmid_lobbby_symmetry,byte(menu_list_selected))
-                               else map_SetSymmetry(byte(menu_list_selected));
+                               then net_send_MIDByte(             nmid_lobbby_symmetry,byte(menu_list_selected))
+                               else map_SetSetting  (PlayerClient,nmid_lobbby_symmetry,byte(menu_list_selected),false);
                             end
                             else menu_list_MakeFromStr(menu_item,@str_map_syml[0],SizeOf(str_map_syml),map_symmetry,-2);
 mi_map_params6            : begin
@@ -820,16 +832,16 @@ mi_tab_multiplayer        : menu_s2:=ms2_mult;
 mi_game_mode              : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
-                               then net_send_MIDByte    (nmid_lobbby_gamemode,byte(menu_list_SIndex))
-                               else GameSetCommonSetting(nmid_lobbby_gamemode,byte(menu_list_SIndex));
+                               then net_send_MIDByte    (             nmid_lobbby_gamemode,byte(menu_list_SIndex))
+                               else GameSetCommonSetting(PlayerClient,nmid_lobbby_gamemode,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_gmode[0],SizeOf(str_gmode),integer(g_mode),-2);
 mi_game_builders          : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
-                               then net_send_MIDByte    (nmid_lobbby_builders,byte(menu_list_SIndex))
-                               else GameSetCommonSetting(nmid_lobbby_builders,byte(menu_list_SIndex));
+                               then net_send_MIDByte    (             nmid_lobbby_builders,byte(menu_list_SIndex))
+                               else GameSetCommonSetting(PlayerClient,nmid_lobbby_builders,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromInts(menu_item,gms_g_startb+1,1,1,integer(g_start_base)+1,-4);
@@ -837,22 +849,22 @@ mi_game_builders          : if(menu_list_selected>-1)then
 mi_game_generators        : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
-                               then net_send_MIDByte    (nmid_lobbby_generators,byte(menu_list_SIndex))
-                               else GameSetCommonSetting(nmid_lobbby_generators,byte(menu_list_SIndex));
+                               then net_send_MIDByte    (             nmid_lobbby_generators,byte(menu_list_SIndex))
+                               else GameSetCommonSetting(PlayerClient,nmid_lobbby_generators,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_generatorsO[0],SizeOf(str_generatorsO),integer(g_generators),-2);
 mi_game_FixStarts         : if(net_status=ns_client)
-                            then net_send_MIDByte    (nmid_lobbby_FixStarts   ,byte(not g_fixed_positions))
-                            else GameSetCommonSetting(nmid_lobbby_FixStarts   ,byte(not g_fixed_positions));
+                            then net_send_MIDByte    (             nmid_lobbby_FixStarts   ,byte(not g_fixed_positions))
+                            else GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,byte(not g_fixed_positions),false);
 mi_game_DeadPbserver      : if(net_status=ns_client)
-                            then net_send_MIDByte    (nmid_lobbby_DeadPbserver,byte(not g_deadobservers))
-                            else GameSetCommonSetting(nmid_lobbby_DeadPbserver,byte(not g_deadobservers));
+                            then net_send_MIDByte    (             nmid_lobbby_DeadPbserver,byte(not g_deadobservers))
+                            else GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,byte(not g_deadobservers),false);
 mi_game_EmptySlots        : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
-                               then net_send_MIDByte    (nmid_lobbby_EmptySlots,byte(menu_list_SIndex))
-                               else GameSetCommonSetting(nmid_lobbby_EmptySlots,byte(menu_list_SIndex));
+                               then net_send_MIDByte    (             nmid_lobbby_EmptySlots,byte(menu_list_SIndex))
+                               else GameSetCommonSetting(PlayerClient,nmid_lobbby_EmptySlots,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
                             else menu_list_MakeAISlots(menu_item,integer(g_ai_slots),-2);

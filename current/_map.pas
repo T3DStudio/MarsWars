@@ -808,29 +808,47 @@ end;
 //
 //  map settings
 
-function map_SetSize(new_size:integer):boolean;
+
+function map_SetSetting(PlayerRequestor,setting:byte;newVal:cardinal;Check:boolean):boolean;
 begin
-   map_SetSize:=false;
-   if(g_preset_cur>0)or(new_size<MinSMapW)or(MaxSMapW<new_size)then exit;
-   map_SetSize:=true;
-   map_mw:=new_size;
-   map_premap;
-end;
-function map_SetType(new_type:byte):boolean;
-begin
-   map_SetType:=false;
-   if(g_preset_cur>0)or(gms_m_types<new_type)then exit;
-   map_SetType:=true;
-   map_type:=new_type;
-   map_premap;
-end;
-function map_SetSymmetry(new_symmetry:byte):boolean;
-begin
-   map_SetSymmetry:=false;
-   if(g_preset_cur>0)or(gms_m_symm<new_symmetry)then exit;
-   map_SetSymmetry:=true;
-   map_symmetry:=new_symmetry;
-   map_premap;
+   map_SetSetting:=false;
+
+   if(G_Started)
+   or(g_preset_cur>0)
+   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   then exit;
+
+   case setting of
+nmid_lobbby_mapseed  : begin
+                          map_SetSetting:=true;
+                          if(Check)then exit;
+                          map_seed:=newVal;
+                          map_premap;
+                       end;
+nmid_lobbby_mapsize  : begin
+                          if(newVal<MinSMapW)or(MaxSMapW<newVal)then exit;
+                          map_SetSetting:=true;
+                          if(Check)then exit;
+                          map_mw:=newVal;
+                          map_premap;
+                       end;
+nmid_lobbby_type     : begin
+                          newVal:=byte(newVal);
+                          if(gms_m_types<newVal)then exit;
+                          map_SetSetting:=true;
+                          if(Check)then exit;
+                          map_type:=newVal;
+                          map_premap;
+                       end;
+nmid_lobbby_symmetry : begin
+                          newVal:=byte(newVal);
+                          if(gms_m_symm<newVal)then exit;
+                          map_SetSetting:=true;
+                          if(Check)then exit;
+                          map_symmetry:=newVal;
+                          map_premap;
+                       end;
+   end;
 end;
 
 

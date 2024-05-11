@@ -328,7 +328,7 @@ begin
    PlayerLobby:=PlayerClient;
 end;
 
-procedure GameCheckCurrentPreset;
+{procedure GameCheckCurrentPreset;
 var i,p:byte;
 begin
    g_preset_cur:=0;
@@ -351,16 +351,20 @@ begin
         g_preset_cur:=p;
         break;
      end;
-end;
+end;}
 
-function GameLoadPreset(preset:byte):boolean;
+function GameLoadPreset(PlayerRequestor,preset:byte;Check:boolean):boolean;
 var p:byte;
 begin
    GameLoadPreset:=false;
 
-   if(preset>=g_preset_n)then exit;
+   if(g_started)
+   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   or(preset>=g_preset_n)then exit;
 
    GameLoadPreset:=true;
+
+   if(Check)then exit;
 
    g_preset_cur:=preset;
 
@@ -389,39 +393,52 @@ begin
    end;
 end;
 
-function GameSetCommonSetting(setting,NewVal:byte):boolean;
+function GameSetCommonSetting(PlayerRequestor,setting,NewVal:byte;Check:boolean):boolean;
 begin
    GameSetCommonSetting:=false;
+   if(G_Started)
+   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   then exit;
+
    case setting of
 nmid_lobbby_gamemode    : if(g_preset_cur=0)then
                           begin
                              if not(NewVal in allgamemodes)then exit;
+                             GameSetCommonSetting:=true;
+                             if(Check)then exit;
                              g_mode:=NewVal;
                              map_premap;
-                             GameSetCommonSetting:=true;
                           end;
 nmid_lobbby_builders    : begin
                              if(NewVal>gms_g_startb)then exit;
-                             g_start_base:=NewVal;
                              GameSetCommonSetting:=true;
+                             if(Check)then exit;
+                             g_start_base:=NewVal;
                           end;
 nmid_lobbby_generators  : begin
                              if(NewVal>gms_g_maxgens)then exit;
+                             GameSetCommonSetting:=true;
+                             if(Check)then exit;
                              g_generators:=NewVal;
                              map_premap;
-                             GameSetCommonSetting:=true;
                           end;
 nmid_lobbby_FixStarts   : if(g_preset_cur=0)then
                           begin
+                             GameSetCommonSetting:=true;
+                             if(Check)then exit;
                              g_fixed_positions:=NewVal>0;
                              map_premap;
-                             GameSetCommonSetting:=true;
                           end;
-nmid_lobbby_DeadPbserver: g_deadobservers:=NewVal>0;
+nmid_lobbby_DeadPbserver: begin
+                             GameSetCommonSetting:=true;
+                             if(Check)then exit;
+                             g_deadobservers:=NewVal>0;
+                          end;
 nmid_lobbby_EmptySlots  : begin
                              if(NewVal>gms_g_maxai)then exit;
-                             g_ai_slots:=NewVal;
                              GameSetCommonSetting:=true;
+                             if(Check)then exit;
+                             g_ai_slots:=NewVal;
                           end;
    end;
 end;
@@ -665,6 +682,7 @@ begin
 
    Map_randommap;
 
+   g_preset_cur:=0;
    g_mode      :=gm_scirmish;
    g_start_base:=random(gms_g_startb +1);
    g_generators:=random(gms_g_maxgens+1);
