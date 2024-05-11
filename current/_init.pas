@@ -74,6 +74,10 @@ begin
       gp_player_slot[1]:=true;
       gp_player_slot[4]:=true;
    end;
+   {$IFNDEF _FULLGAME}
+   g_presets[gp_custom].gp_name:= 'custom preset';
+   MakeGamePresetsNames(@str_gmodel[0],@str_m_typel[0]);
+   {$ENDIF}
 end;
 
 procedure InitGame;

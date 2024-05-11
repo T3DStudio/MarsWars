@@ -232,6 +232,7 @@ begin
    or(PlayerRequestor>MaxPlayers)
    or(PlayerTarget   >MaxPlayers)
    or(PlayerTarget   =0)
+   or(g_preset_cur   >0)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -244,10 +245,6 @@ begin
       or((g_slot_state[PlayerTarget]=ps_opened  )and(state=ps_comp)and(PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))
       then exit;
 
-      //if(g_preset_cur>0)then
-      //  if(NewTeam<>PlayerGetTeam(g_mode,PlayerTarget,pnum))then exit;
-      //         в мультиплеере сервер может менять мою команду, а я - нет
-     //          в мультиплере не обновляется меню сразу
       n:=team;
       team:=NewTeam;
       if(PlayerGetTeam(g_mode,PlayerTarget,255)<>team)then
@@ -331,6 +328,31 @@ begin
    PlayerLobby:=PlayerClient;
 end;
 
+procedure GameCheckCurrentPreset;
+var i,p:byte;
+begin
+   g_preset_cur:=0;
+   if(g_preset_n>1)then
+    for p:=1 to g_preset_n-1 do
+     with g_presets[g_preset_cur] do
+     begin
+        if(map_seed    <> gp_map_seed)
+        or(map_mw      <> gp_map_mw  )
+        or(map_type    <> gp_map_type)
+        or(map_symmetry<> gp_map_symmetry)
+        or(g_mode      <> gp_g_mode  )
+        or(g_fixed_positions<> true  )then continue;
+
+        for i:=1 to MaxPlayers do
+          case (gp_player_slot[i]) of
+          true : if not(g_slot_state[i] in [ps_opened,ps_AI_1..ps_AI_11])then continue;
+          false: if not(g_slot_state[i] in [ps_observer,ps_closed      ])then continue;
+          end;
+        g_preset_cur:=p;
+        break;
+     end;
+end;
+
 function GameLoadPreset(preset:byte):boolean;
 var p:byte;
 begin
@@ -371,7 +393,8 @@ function GameSetCommonSetting(setting,NewVal:byte):boolean;
 begin
    GameSetCommonSetting:=false;
    case setting of
-nmid_lobbby_gamemode    : begin
+nmid_lobbby_gamemode    : if(g_preset_cur=0)then
+                          begin
                              if not(NewVal in allgamemodes)then exit;
                              g_mode:=NewVal;
                              map_premap;
@@ -388,11 +411,12 @@ nmid_lobbby_generators  : begin
                              map_premap;
                              GameSetCommonSetting:=true;
                           end;
-nmid_lobbby_FixStarts   : begin
+nmid_lobbby_FixStarts   : if(g_preset_cur=0)then
+                          begin
                              g_fixed_positions:=NewVal>0;
                              map_premap;
                              GameSetCommonSetting:=true;
-                           end;
+                          end;
 nmid_lobbby_DeadPbserver: g_deadobservers:=NewVal>0;
 nmid_lobbby_EmptySlots  : begin
                              if(NewVal>gms_g_maxai)then exit;

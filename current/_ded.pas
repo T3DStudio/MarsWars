@@ -74,7 +74,7 @@ begin
         else
           if(team=0)
           then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer       ,25, t2c(PlayerGetTeam(g_mode,p,255)),35, '',0, '',0)
-          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[slot_race],25, t2c(PlayerGetTeam(g_mode,p,255)),35, '',0, '',0);
+          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_racel[slot_race],25, t2c(PlayerGetTeam(g_mode,p,255)),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -103,25 +103,26 @@ begin
    begin
       case consoley of
       0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
-      1 : writeln(str_gstatus, SVGameStatus);
-      2 : writeln(str_gsettings);
-      3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]          );
-      4 : writeln('         ',str_starta       ,b2s(g_start_base+1)           );
-      6 : writeln('         ',str_fstarts      ,str_b2c[g_fixed_positions]    );
-      8 : writeln('         ',str_aislots      ,g_ai_slots                    );
-      10: writeln('         ',str_cgenerators  ,str_cgeneratorsO[g_generators]);
-      11: writeln('         ',str_deadobservers,str_b2c[g_deadobservers ]     );
-      12: writeln;
-      13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
-      14: ;//Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);
-      15: writeln;
-      16: ps(0);
-      18: ps(1);
-      20: ps(2);
-      22: ps(3);
-      24: ps(4);
-      26: ps(5);
-      28: ps(6);
+      2 : writeln(str_gstatus, SVGameStatus);
+      4 : writeln(str_gpreset, g_presets[g_preset_cur].gp_name);
+      6 : writeln(str_gsettings);
+      8 : writeln('         ',str_gmode        ,str_gmodel[g_mode ]           );
+      10: writeln('         ',str_starta       ,b2s(g_start_base+1)           );
+      12: writeln('         ',str_cgenerators  ,str_cgeneratorsl[g_generators]);
+      14: writeln('         ',str_fstarts      ,str_b2c[g_fixed_positions]    );
+      16: writeln('         ',str_deadobservers,str_b2c[g_deadobservers ]     );
+      18: writeln('         ',str_aislots      ,g_ai_slots                    );
+      20: writeln;
+      22: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_type           ,35, str_m_sym               ,45,'',56);
+      24: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, str_m_typel[map_type],35, str_m_syml[map_symmetry],45,'',56);
+      26: writeln;
+      28: ps(0);
+      30: ps(1);
+      32: ps(2);
+      34: ps(3);
+      36: ps(4);
+      38: ps(5);
+      40: ps(6);
       end;
 
       consoley+=1;

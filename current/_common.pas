@@ -104,12 +104,6 @@ function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
 
 function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
 
-function _str_mx(x:byte):shortstring;
-begin
-   if(x=0)
-   then _str_mx:='-'
-   else _str_mx:='x'+b2s(x);
-end;
 function ValidateStr(BaseStr:shortstring;MaxSize:byte;Chars:PTSoc):shortstring;
 var i:byte;
 begin
@@ -1005,6 +999,39 @@ begin
      if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
      then CheckUnitTeamVision:=(vsnt[POVTeam]>0)
      else CheckUnitTeamVision:=(vsnt[POVTeam]>0)and(vsni[POVTeam]>0);
+end;
+
+procedure MakeGamePresetsNames(pstr_gmode,pstr_maptype:pshortstring);
+var i,
+    p,
+    pn:byte;
+begin
+   if(g_preset_n>1)then
+    for i:=1 to g_preset_n-1 do
+     with g_presets[i] do
+     begin
+        pn:=0;
+        for p:=1 to MaxPlayers do
+          if(gp_player_slot[p])then pn+=1;
+
+        if(pn>0)
+        then gp_name:=b2s(pn)+')'
+        else gp_name:='';
+
+        if(pstr_gmode<>nil)then
+        begin
+           pstr_gmode+=gp_g_mode;
+           gp_name+=pstr_gmode^;
+           pstr_gmode-=gp_g_mode;
+        end;
+
+        if(pstr_maptype<>nil)then
+        begin
+           pstr_maptype+=gp_map_type;
+           gp_name+=' '+pstr_maptype^;
+           pstr_maptype-=gp_map_type;
+        end;
+     end;
 end;
 
 {$IFDEF _FULLGAME}

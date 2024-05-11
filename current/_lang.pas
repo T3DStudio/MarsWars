@@ -812,11 +812,6 @@ begin
    str_PlayerResumed     := 'player has resumed the game';
    str_Address           := 'Address';
 
-   g_presets[gp_custom   ].gp_name:= 'custom preset';
-   g_presets[gp_1x1_plane].gp_name:= '1x1 Deimos Steppe';
-   g_presets[gp_1x1_lake ].gp_name:= '1x1 Phobos Lake';
-   g_presets[gp_1x1_cave ].gp_name:= '1x1 Mars Cave';
-
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
    str_smith             := 'Researches and upgrades facility';
@@ -990,6 +985,8 @@ begin
    str_hint_m[1]         := '';
    str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
+   g_presets[gp_custom   ].gp_name:= 'custom preset';
+   MakeGamePresetsNames(@str_gmode[0],@str_map_typel[0]);
 
    str_ability_name[uab_Teleport        ]:='Teleportation';
    str_ability_name[uab_UACScan         ]:='Scan';
@@ -1410,11 +1407,6 @@ begin
   str_PlayerResumed     := 'игрок возобновил игру';
   str_Address           := 'Адрес';
 
-  g_presets[gp_custom   ].gp_name:= 'свои настройки';
-  g_presets[gp_1x1_plane].gp_name:= '1x1 Степь Деймоса';
-  g_presets[gp_1x1_lake ].gp_name:= '1x1 Озеро Фобоса';
-  g_presets[gp_1x1_cave ].gp_name:= '1x1 Пещера Марса';
-
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
   str_smith             := 'Исследует улучшения и апгрейды';
@@ -1555,6 +1547,9 @@ begin
 
   str_hint_army         := 'Армия: ';
   str_hint_energy       := 'Энергия: ';
+
+  g_presets[gp_custom   ].gp_name:= 'свои настройки';
+  MakeGamePresetsNames(@str_gmode[0],@str_map_typel[0]);
 
   str_ability_name[uab_Teleport        ]:='Телепортация';
   str_ability_name[uab_UACScan         ]:='Сканирование';

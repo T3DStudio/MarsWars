@@ -1456,9 +1456,9 @@ ui_menu_map_lhh        = ui_menu_map_lh div 2;
 ui_menu_map_mx0        = ui_menu_map_zx0;                           // map position
 ui_menu_map_my0        = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2)+1;
 ui_menu_map_ph         = ui_menu_map_lh*7;                          // parameters count
-ui_menu_map_px0        = ui_menu_map_mx0+vid_panelw+ui_menu_map_lhh-font_hw;// parameters block
+ui_menu_map_px0        = ui_menu_map_mx0+vid_panelw+ui_menu_map_lhh-font_w;// parameters block
 ui_menu_map_py0        = ui_menu_map_my0+1;
-ui_menu_map_px1        = ui_menu_map_zx1-ui_menu_map_lhh+font_hw;
+ui_menu_map_px1        = ui_menu_map_zx1-ui_menu_map_lhh+font_w;
 ui_menu_map_py1        = ui_menu_map_py0+ui_menu_map_ph;
 
 //// settings save/load replays  tabs
@@ -1713,18 +1713,22 @@ str_gpaused              : shortstring = 'Paused by player #';
 str_gwinner              : shortstring = 'Won by a team #';
 str_udpport              : shortstring = ' UPD port: ';
 str_gstatus              : shortstring = 'Game status:   ';
+str_gpreset              : shortstring = 'Game preset:   ';
 str_gsettings            : shortstring = 'Game settings:';
 str_map                  : shortstring = 'Map';
 
 str_m_seed               : shortstring = 'Seed';
-str_m_liq                : shortstring = 'Lakes';
+str_m_type               : shortstring = 'Type';
+str_m_typel              : array[0..gms_m_types] of shortstring = ('Steppe','Cave','Lake','Sea shore','Sea');
 str_m_siz                : shortstring = 'Size';
-str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';
+str_m_syml               : array[0..gms_m_symm] of shortstring = ('no','point','line');
 str_aislots              : shortstring = 'Fill empty slots:         ';
 str_fstarts              : shortstring = 'Fixed player starts:      ';
-str_gmodet               : shortstring = 'Game mode:                ';
-str_cgenerators          : shortstring = 'Neutral generators:       ';
+str_gmode                : shortstring = 'Game mode:                ';
+str_gmodel               : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
+str_cgenerators          : shortstring = 'Generators:               ';
+str_cgeneratorsl         : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
 str_deadobservers        : shortstring = 'Observer mode after lose: ';
 str_starta               : shortstring = 'Builders at game start:   ';
 str_plname               : shortstring = 'Player name';
@@ -1733,14 +1737,12 @@ str_PlayerResumed        : shortstring = 'player has resumed the game';
 str_plout                : shortstring = ' left the game';
 //str_player_def           : shortstring = ' was terminated!';
 
-str_cgeneratorsO         : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
-
 str_plstat               : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
 
-str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
-str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
+str_racel                : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
+
 str_observer             : shortstring = 'OBSERVER';
 {$ENDIF}
 

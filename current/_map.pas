@@ -811,7 +811,7 @@ end;
 function map_SetSize(new_size:integer):boolean;
 begin
    map_SetSize:=false;
-   if(new_size<MinSMapW)or(MaxSMapW<new_size)then exit;
+   if(g_preset_cur>0)or(new_size<MinSMapW)or(MaxSMapW<new_size)then exit;
    map_SetSize:=true;
    map_mw:=new_size;
    map_premap;
@@ -819,7 +819,7 @@ end;
 function map_SetType(new_type:byte):boolean;
 begin
    map_SetType:=false;
-   if(gms_m_types<new_type)then exit;
+   if(g_preset_cur>0)or(gms_m_types<new_type)then exit;
    map_SetType:=true;
    map_type:=new_type;
    map_premap;
@@ -827,7 +827,7 @@ end;
 function map_SetSymmetry(new_symmetry:byte):boolean;
 begin
    map_SetSymmetry:=false;
-   if(gms_m_symm<new_symmetry)then exit;
+   if(g_preset_cur>0)or(gms_m_symm<new_symmetry)then exit;
    map_SetSymmetry:=true;
    map_symmetry:=new_symmetry;
    map_premap;
