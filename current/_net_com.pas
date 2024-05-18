@@ -256,12 +256,13 @@ begin
    end;
 end;
 
-procedure net_send_pause;
+procedure net_send_byte(b:byte);
 begin
    if(net_status=ns_client)then
    begin
+      // nmid_pause
       net_clearbuffer;
-      net_writebyte(nmid_pause);
+      net_writebyte(b);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;
@@ -287,7 +288,13 @@ begin
    net_writeint (ival);
    net_send(net_cl_svip,net_cl_svport);
 end;
-
+procedure net_send_MIDCard(mid:byte;cval:cardinal);
+begin
+   net_clearbuffer;
+   net_writebyte(mid);
+   net_writecard(cval);
+   net_send(net_cl_svip,net_cl_svport);
+end;
 
 procedure net_send_PlayerSlot(PlayerTarget,newPlayerSlot:byte);
 begin

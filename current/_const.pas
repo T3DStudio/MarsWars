@@ -136,7 +136,7 @@ gp_1x1_plane           = 1;
 gp_1x1_lake            = 2;
 gp_1x1_cave            = 3;
 
-gp_count               = 4;
+//gp_count               = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -206,30 +206,32 @@ lmt_game_message       = 10;
 lmt_game_end           = 11;
 lmt_player_defeated    = 12;
 lmt_player_leave       = 13;
-lmt_cant_build         = 14;
-lmt_unit_ready         = 15;
-lmt_unit_advanced      = 16;
-lmt_upgrade_complete   = 17;
-lmt_req_energy         = 18;
-lmt_req_common         = 19;
-lmt_req_ruids          = 20;
-lmt_map_mark           = 21;
-lmt_unit_attacked      = 22;
-lmt_cant_order         = 23;
-lmt_allies_attacked    = 24;
-lmt_unit_limit         = 25;
-lmt_unit_needbuilder   = 26;
-lmt_production_busy    = 27;
-lmt_already_adv        = 28;
-lmt_NeedMoreProd       = 29;
-lmt_MaximumReached     = 30;
-lmt_UsepsabilityOrder  = 31;
+lmt_player_surrender   = 14;
+lmt_cant_build         = 15;
+lmt_unit_ready         = 16;
+lmt_unit_advanced      = 17;
+lmt_upgrade_complete   = 18;
+lmt_req_energy         = 19;
+lmt_req_common         = 20;
+lmt_req_ruids          = 21;
+lmt_map_mark           = 22;
+lmt_unit_attacked      = 23;
+lmt_cant_order         = 24;
+lmt_allies_attacked    = 25;
+lmt_unit_limit         = 26;
+lmt_unit_needbuilder   = 27;
+lmt_production_busy    = 28;
+lmt_already_adv        = 29;
+lmt_NeedMoreProd       = 30;
+lmt_MaximumReached     = 31;
+lmt_UsepsabilityOrder  = 32;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
                           0..MaxPlayers,
                           lmt_game_message,
                           lmt_game_end,
+                          lmt_player_surrender,
                           lmt_player_defeated,
                           lmt_player_leave,
                           lmt_player_chat
@@ -273,7 +275,7 @@ nmid_lobby_info        = 3;
 nmid_connect           = 4;
 nmid_client_info       = 5;
 nmid_log_chat          = 6;
-nmid_log_upd         = 7;
+nmid_log_upd           = 7;
 nmid_snapshot          = 8;
 nmid_pause             = 9;
 nmid_server_full       = 10;
@@ -297,6 +299,9 @@ nmid_lobbby_generators = 28;
 nmid_lobbby_FixStarts  = 29;
 nmid_lobbby_DeadPbserver=30;
 nmid_lobbby_EmptySlots = 31;
+nmid_surrender         = 32;
+nmid_start             = 33;
+nmid_break             = 34;
 nmid_getinfo           = 62;
 nmid_localadv          = 67;
 
@@ -576,7 +581,7 @@ MaxDIDs                = 7;
 DID_R                  : array[0..MaxDIDs] of smallint = (0,255,170,85,56,105,64,18);
 
 mapt_steppe            = 0;
-mapt_nature            = 1;
+mapt_cave            = 1;
 mapt_lake              = 2;
 mapt_shore             = 3;
 mapt_sea               = 4;
@@ -1305,8 +1310,7 @@ mi_exit                = 1;
 mi_back                = 2;
 mi_start               = 3;
 mi_break               = 4;
-mi_ready               = 5;
-mi_surrender           = 6;
+mi_surrender           = 5;
 
 ////  MAP PARAMS
 mi_map_params1         = 11;
@@ -1585,7 +1589,7 @@ SvRpLen                = 15;
 //
 
 MFogM                  = 64;
-fog_cw                 = 25;
+fog_cw                 = 32;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_vfwm               = (vid_maxw div fog_cw)+2;
@@ -1686,6 +1690,8 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 //
 //  MAP THEME
 //
+
+MaxTileSet             = 16;
 
 LiquidAnim             = 4;
 LiquidRs               = 4;

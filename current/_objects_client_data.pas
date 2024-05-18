@@ -815,10 +815,10 @@ end;
       if(_fr<1)then _fr:=1;
    end;
 
-   u:=UID_HCommandCenter;  setEffectEID2(0,_uid2spr(UID_UCommandCenter  ,0,0));
-   u:=UID_HACommandCenter; setEffectEID2(0,_uid2spr(UID_UACommandCenter ,0,0));
-   u:=UID_HBarracks;       setEffectEID2(0,_uid2spr(UID_UBarracks       ,0,0));
-                           setEffectEID2(1,_uid2spr(UID_UBarracks       ,0,1));
+   u:=UID_HCommandCenter;  setEffectEID2(0,sm_uid2MWTexture(UID_UCommandCenter  ,0,0));
+   u:=UID_HACommandCenter; setEffectEID2(0,sm_uid2MWTexture(UID_UACommandCenter ,0,0));
+   u:=UID_HBarracks;       setEffectEID2(0,sm_uid2MWTexture(UID_UBarracks       ,0,0));
+                           setEffectEID2(1,sm_uid2MWTexture(UID_UBarracks       ,0,1));
 
    // ui panel
    for r:=1 to r_cnt do

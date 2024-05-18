@@ -409,8 +409,8 @@ begin
       begin
          if(not ai_ExtBuildingUpgr)then ai_CollectDoodadsSquare(@aiu_FiledSquareNear,x,y,srange);
 
-         tx:=min2(x,map_mw-x);
-         ty:=min2(y,map_mw-y);
+         tx:=min2i(x,map_mw-x);
+         ty:=min2i(y,map_mw-y);
          if(tx<srange)or(ty<srange)then
          begin
             srs:=round(pi*sqr(srange));
@@ -1058,7 +1058,7 @@ begin
          then ai_scout_timer:=0
          else
            if(ai_scout_timer=0)
-           then ai_scout_timer:=max2(1,ai_attack_delay)
+           then ai_scout_timer:=max2i(1,ai_attack_delay)
            else ai_timer(@ai_scout_timer,0);
 
          ai_ReadyForAttack:=(armylimit>=ai_limit_border)
@@ -1069,7 +1069,7 @@ begin
          then ai_attack_timer:=0
          else
            if(ai_attack_timer=0)
-           then ai_attack_timer:=max2(1,ai_attack_delay)
+           then ai_attack_timer:=max2i(1,ai_attack_delay)
            else ai_timer(@ai_attack_timer,fr_fps60);
       end;
    end;

@@ -1,9 +1,9 @@
 
-function _xasurf(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
+function MakeReflectedSurface(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
-   _xasurf:=_createSurf(s^.w,s^.h);
+   MakeReflectedSurface:=gfx_SDLSurfaceCreate(s^.w,s^.h);
    for x:=1 to s^.w do
     for y:=1 to s^.h do
     begin
@@ -11,9 +11,9 @@ begin
        if(ya)then sy:=s^.h-y else sy:=y-1;
        c:=SDL_GETpixel(s,x-1,y-1);
 
-       SDL_SETpixel(_xasurf,sx,sy,c);
+       SDL_SETpixel(MakeReflectedSurface,sx,sy,c);
     end;
-   if(trans)then SDL_SetColorKey(_xasurf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(_xasurf,0,0));
+   if(trans)then SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(MakeReflectedSurface,0,0));
 end;
 
 procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
@@ -27,18 +27,18 @@ begin
    begin
       with t do
       begin
-         surf:=LoadIMG(str+i2s(i),false,false);
-         if(surf=r_empty)then break;
-         w   :=surf^.w;
-         h   :=surf^.h;
-         hw  :=surf^.w div 2;
-         hh  :=surf^.h div 2;
+         sdlSurface:=gfx_SDLSurfaceLoad(str+i2s(i),false,false);
+         if(sdlSurface=r_empty)then break;
+         w   :=sdlSurface^.w;
+         h   :=sdlSurface^.h;
+         hw  :=sdlSurface^.w div 2;
+         hh  :=sdlSurface^.h div 2;
       end;
       next;
 
       with t do
       begin
-         surf:=_xasurf(surf,true,false,false);
+         sdlSurface:=MakeReflectedSurface(sdlSurface,true,false,false);
       end;
       next;
 
@@ -90,14 +90,14 @@ begin
          else delete(v,p,1);
       end;
 
-      if(v<>'')then
+      if(length(v)>0)then
       begin
          p:=pos('_',v);
          if(p>0)then
          begin
             u:=copy(v,1,p-1);
             delete(v,1,p);
-            if(u<>'')and(v<>'')then
+            if(length(u)>0)and(length(v)>0)then
             begin
                p:=s2i(u);
                l:=s2i(v);
@@ -117,15 +117,15 @@ begin
    end;
 end;
 
-procedure _SetTrans(spr:PTMWTexture;xa:boolean);
+procedure gfx_MWTextureSetTransparent(spr:PTMWTexture;xa:boolean);
 begin
    with spr^ do
     if(xa)
-    then SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,w-1,0))
-    else SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0  ,0));
+    then SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,w-1,0))
+    else SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0  ,0));
 end;
 
-procedure ThemeSetTrans(l:PTUSpriteList;it:pinteger;str:shortstring);
+procedure ThemeSetTransparent(l:PTUSpriteList;it:pinteger;str:shortstring);
 var i,o,
  _iln:integer;
  _il :TIntList;
@@ -139,13 +139,13 @@ begin
          o:=_il[i-1]*2;
          if(o<it^)then
          begin
-            _SetTrans( @(l^[o  ]), ( o    mod 2)=1);
-            _SetTrans( @(l^[o+1]), ((o+1) mod 2)=1);
+            gfx_MWTextureSetTransparent( @(l^[o  ]), ( o    mod 2)=1);
+            gfx_MWTextureSetTransparent( @(l^[o+1]), ((o+1) mod 2)=1);
          end;
       end;
    end
    else
-    for o:=1 to it^ do _SetTrans( @(l^[o-1]), ((o-1) mod 2)=1 );
+    for o:=1 to it^ do gfx_MWTextureSetTransparent( @(l^[o-1]), ((o-1) mod 2)=1 );
 end;
 
 procedure DecAnim(l:PTThemeAnimL;it:pinteger;str:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
@@ -186,7 +186,7 @@ begin
    end;
 end;
 
-procedure _liqAnim(i:integer;r,g,b:byte;atp,animt:byte);
+procedure liqAnim(i:integer;r,g,b:byte;atp,animt:byte);
 begin
    theme_clr_liquids[i]:=rgba2c(r,g,b,255);
    theme_anm_liquids[i]:=atp;
@@ -195,8 +195,8 @@ end;
 
 procedure LiquidAnims(i:integer;r,g,b:byte;atp,animt:byte);
 begin
-   _liqAnim(i*2  ,r,g,b,atp,animt);
-   _liqAnim(i*2+1,r,g,b,atp,animt);
+   liqAnim(i*2  ,r,g,b,atp,animt);
+   liqAnim(i*2+1,r,g,b,atp,animt);
 end;
 
 procedure InitThemes;
@@ -211,10 +211,10 @@ begin
    LPTUSpriteL(@theme_spr_terrains, str_f_map+'terrains\ter'    , @theme_spr_terrainn);
 
    // transparent
-   ThemeSetTrans(@theme_spr_decals,@theme_spr_decaln,'0_20,23_34');
-   ThemeSetTrans(@theme_spr_decors,@theme_spr_decorn,'all');
-   ThemeSetTrans(@theme_spr_srocks,@theme_spr_srockn,'all');
-   ThemeSetTrans(@theme_spr_brocks,@theme_spr_brockn,'all');
+   ThemeSetTransparent(@theme_spr_decals,@theme_spr_decaln,'0_20,23_34');
+   ThemeSetTransparent(@theme_spr_decors,@theme_spr_decorn,'all');
+   ThemeSetTransparent(@theme_spr_srocks,@theme_spr_srockn,'all');
+   ThemeSetTransparent(@theme_spr_brocks,@theme_spr_brockn,'all');
 
    // animation and effects
    setlength(theme_anm_decors  ,theme_spr_decorn  );
@@ -373,10 +373,10 @@ theme_terrains    : TIntList;
 procedure SetTheme(i,ter,liq,bliq,crt:integer);
 procedure SetTLBlC;
 begin
-   if(theme_terrainn<=0)then theme_map_trt :=-1 else begin if(ter <0)then theme_map_trt :=abs(ter  mod theme_terrainn) else theme_map_trt :=min2(theme_terrainn-1,ter ); theme_map_trt :=theme_terrains[theme_map_trt  ];end;
-   if(theme_bliquidn<=0)then theme_map_blqt:=-1 else begin if(bliq<0)then theme_map_blqt:=abs(bliq mod theme_bliquidn) else theme_map_blqt:=min2(theme_bliquidn-1,bliq); theme_map_blqt:=theme_bliquids[theme_map_blqt ];end;
-   if(theme_cratern <=0)then theme_map_crt :=-1 else begin if(crt <0)then theme_map_crt :=abs(crt  mod theme_cratern ) else theme_map_crt :=min2(theme_cratern -1,crt ); theme_map_crt :=theme_craters [theme_map_crt  ];end;
-   if(theme_liquidn <=0)then theme_map_lqt :=-1 else begin if(liq <0)then theme_map_lqt :=abs(liq  mod theme_liquidn ) else theme_map_lqt :=min2(theme_liquidn -1,liq ); theme_map_lqt :=theme_liquids [theme_map_lqt  ];end;
+   if(theme_terrainn<=0)then theme_map_trt :=-1 else begin if(ter <0)then theme_map_trt :=abs(ter  mod theme_terrainn) else theme_map_trt :=min2i(theme_terrainn-1,ter ); theme_map_trt :=theme_terrains[theme_map_trt  ];end;
+   if(theme_bliquidn<=0)then theme_map_blqt:=-1 else begin if(bliq<0)then theme_map_blqt:=abs(bliq mod theme_bliquidn) else theme_map_blqt:=min2i(theme_bliquidn-1,bliq); theme_map_blqt:=theme_bliquids[theme_map_blqt ];end;
+   if(theme_cratern <=0)then theme_map_crt :=-1 else begin if(crt <0)then theme_map_crt :=abs(crt  mod theme_cratern ) else theme_map_crt :=min2i(theme_cratern -1,crt ); theme_map_crt :=theme_craters [theme_map_crt  ];end;
+   if(theme_liquidn <=0)then theme_map_lqt :=-1 else begin if(liq <0)then theme_map_lqt :=abs(liq  mod theme_liquidn ) else theme_map_lqt :=min2i(theme_liquidn -1,liq ); theme_map_lqt :=theme_liquids [theme_map_lqt  ];end;
 end;
 begin
    if(i<0)or(i>=theme_n)then i:=abs(i) mod theme_n;

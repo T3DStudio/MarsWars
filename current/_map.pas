@@ -2,10 +2,10 @@
 
 procedure map_MakeThemeSprites;
 begin
-   MakeTerrain;
-   MakeCrater;
-   MakeLiquid;
-   MakeLiquidBack;
+   gfx_MakeTerrain;
+   gfx_MakeCrater;
+   gfx_MakeLiquid;
+   gfx_MakeLiquidBack;
 end;
 
 procedure map_seed2theme;
@@ -98,7 +98,7 @@ begin
    map_symmetryX1 :=round(map_symmetryX0+map_mw*2*cos(map_symmetryDir*DEGTORAD));
    map_symmetryY1 :=round(map_symmetryY0+map_mw*2*sin(map_symmetryDir*DEGTORAD));
    {$IFDEF _FULLGAME}
-   if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
+   if(menu_s2<>ms2_camp)then map_mw:=mm3i(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
    map_mmvw    := trunc(vid_cam_w*map_mmcx)+1;
    map_mmvh    := trunc(vid_cam_h*map_mmcx)+1;
@@ -197,7 +197,7 @@ begin
     with g_cpoints[p] do
      if(cpCaptureR>0)then
      begin
-        t:=d+max2(cpsolidr,cpCaptureR);
+        t:=d+max2i(cpsolidr,cpCaptureR);
         if(point_dist_int(ix0,iy0,cpx,cpy)<t)
         or(point_dist_int(ix1,iy1,cpx,cpy)<t)then
         begin
@@ -221,7 +221,7 @@ begin
    if(t1 in dids_liquids)
    or(t2 in dids_liquids)then
    begin
-      DoodadMinR:=max2(DID_R[t1],DID_R[t2])-DoodadAR;
+      DoodadMinR:=max2i(DID_R[t1],DID_R[t2])-DoodadAR;
       exit;
    end;
    DoodadMinR:=DID_R[t1]+DID_R[t2]-DoodadAR-10;  }
@@ -310,7 +310,7 @@ begin
    begin
       i+=1+byte(map_symmetry);
       c:=0;
-      dst:=max2(base_1rh,map_mw div 8);
+      dst:=max2i(base_1rh,map_mw div 8);
       while(c<1000)do
       begin
          ix0:=u+g_random(b);
@@ -582,12 +582,12 @@ begin
       if(liquidX>0)then
       begin
          ix0:=i*othersX;
-         lqs:=max2(liquidX,(ix0 div 8)*liquidX);
-         rks:=max2(othersX,ix0-lqs);
+         lqs:=max2i(liquidX,(ix0 div 8)*liquidX);
+         rks:=max2i(othersX,ix0-lqs);
       end
-      else rks:=max2(othersX,i*othersX);
+      else rks:=max2i(othersX,i*othersX);
    end
-   else lqs:=max2(liquidX,(map_ddn div 80)*liquidX);
+   else lqs:=max2i(liquidX,(map_ddn div 80)*liquidX);
 
    cicles:=0;
    ir :=base_1r+(map_mw div 100);
@@ -713,14 +713,14 @@ begin
    map_ddn:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
 
    if(map_symmetry>0)
-   then map_ddn:=mm3(1,round(map_ddn/1.5),MaxDoodads)
-   else map_ddn:=mm3(1,      map_ddn     ,MaxDoodads);
+   then map_ddn:=mm3i(1,round(map_ddn/1.5),MaxDoodads)
+   else map_ddn:=mm3i(1,      map_ddn     ,MaxDoodads);
 
    case map_type of
 mapt_steppe: begin
              map_DoodadNoise(0,0,0);
              end;
-mapt_nature: begin
+mapt_cave  : begin
              map_DoodadNoise(2,2,50);
              end;
 mapt_lake  : begin

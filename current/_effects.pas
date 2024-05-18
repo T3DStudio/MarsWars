@@ -120,11 +120,11 @@ begin
       if(ans>0)then
       begin
          if(ei=-1)
-         then sc := sm^.sn
+         then sc := sm^.sm_listn
          else
-           if(ei<sm^.sn)
-           then sc := sm^.sn-ei
-           else sc := sm^.sn;
+           if(ei<sm^.sm_listn)
+           then sc := sm^.sm_listn-ei
+           else sc := sm^.sm_listn;
 
          anim_last_i:=(sc*anim_step)-1;
 
@@ -249,7 +249,7 @@ var i,o,r:byte;
 begin
    with g_missiles[m] do
    with g_mids[mid] do
-   if(MapPointInScreenP(vx,vy))then
+   if(ui_MapPointInRevealedInScreen(vx,vy))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -280,7 +280,7 @@ begin
    begin
       spr:=@spr_dummy;
 
-      spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
+      spr:=sm_SModel2MWTexture(ms_smodel,sms_stand,dir,0,nil);
 
       if(draw)then
        if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,SpriteDepth(vy,mfs)+100,0,spr,255);
@@ -290,8 +290,8 @@ end;
 
 procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
-   if MapPointInScreenP(vx,vy)
-   or MapPointInScreenP(tx,ty) then SoundPlayUnit(snd,nil,nil);
+   if ui_MapPointInRevealedInScreen(vx,vy)
+   or ui_MapPointInRevealedInScreen(tx,ty) then SoundPlayUnit(snd,nil,nil);
    effect_add(vx,vy,SpriteDepth(vy+1,ukfly),eidstart);
    effect_add(tx,ty,SpriteDepth(ty+1,ukfly),eidend  );
 end;
@@ -317,7 +317,7 @@ EID_HKeep_H,
 EID_HAKeep_H  : alpha:=anim_last_i_t*4;
 EID_HKeep_S,
 EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
-         else   alpha:=min2(255,anim_last_i_t);
+         else   alpha:=min2i(255,anim_last_i_t);
          end;
 
         if(noanim=false)then
@@ -337,8 +337,8 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
         end;
 
         if(anim_step>0)
-        then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
-        else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
+        then spr:=sm_SModel2MWTexture(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
+        else spr:=sm_SModel2MWTexture(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
          if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);

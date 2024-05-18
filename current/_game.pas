@@ -78,9 +78,9 @@ begin
      if(PlayerLobby=SlotSource)then PlayerLobby:=SlotTarget;
 end;
 
-procedure PlayerSetState(p,newstate:byte);
+procedure PlayerSetState(PlayerTarget,newstate:byte);
 begin
-   with g_players[p] do
+   with g_players[PlayerTarget] do
    begin
       case newstate of
 ps_none: begin isready:=false;name :=str_ps_none;      end;
@@ -135,12 +135,12 @@ ps_swap    : if(not PlayersSwap(PlayerRequestor,PlayerTarget,true))then exit;
 
          if(g_preset_cur>0)then
           with g_presets[g_preset_cur] do
-           if(gp_player_slot[PlayerTarget])then
-           case NewState of
+           if(gp_player_team[PlayerTarget]>0)then
+            case NewState of
       ps_closed,
       ps_observer : exit;
-           end
-           else exit;
+            end
+            else exit;
       end;
    end;
 
@@ -262,12 +262,45 @@ begin
    end;
 end;
 
-procedure PlayerKill(pl:byte;instant:boolean);
+procedure PlayerKill(PlayerTarget:byte);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
-    with g_punits[u]^ do
-     if(hits>0)and(playeri=pl)then unit_kill(g_punits[u],instant,true,false,true,true);
+    if(g_punits[u]^.playeri=PlayerTarget)then
+     unit_kill(g_punits[u],false,true,false,true,true);
+end;
+
+function PlayerSpecialDefeat(PlayerTarget:byte;Surrender,Check:boolean):boolean;
+begin
+   PlayerSpecialDefeat:=false;
+
+   if(not g_started)
+   or(PlayerTarget>MaxPlayers)then exit;
+
+   with g_players[PlayerTarget] do
+   begin
+      if(state<>ps_play)then exit;
+
+      if(Surrender)then
+        if(armylimit<=0)
+        or(isobserver)then exit;
+
+      PlayerSpecialDefeat:=true;
+
+      if(Check)then exit;
+
+      if(armylimit>0)then PlayerKill(PlayerTarget);
+
+      if(Surrender)then
+      begin
+         GameLogPlayerSurrender(PlayerTarget);
+      end
+      else
+      begin
+         GameLogPlayerLeave(PlayerTarget);
+         PlayerSetState(PlayerTarget,ps_none);
+      end;
+   end;
 end;
 
 procedure PlayersSetDefault;
@@ -380,7 +413,7 @@ begin
                   := true;
 
       for p:=1 to MaxPlayers do
-        if(gp_player_slot[p])
+        if(gp_player_team[p]>0)
         then PlayerSlotChangeState(0,p,ps_opened  ,false)
         else PlayerSlotChangeState(0,p,ps_observer,false);
 
@@ -635,8 +668,7 @@ ps_AI_11    : begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)and(0<=map_psx[p])and(map_psx[p]<=map_mw)
-        then
+        if(team>0)and(0<=map_psx[p])and(map_psx[p]<=map_mw)then
         begin
            GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
            unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
@@ -648,33 +680,57 @@ ps_AI_11    : begin
 
    {$IFDEF _FULLGAME}
    GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
-   if(g_players[PlayerClient].team=0)then ui_tab:=3;
+   if(g_players[PlayerClient].team=0)then
+   begin
+      ui_tab:=3;
+      UIPlayer:=0;
+   end
+   else UIPlayer:=PlayerClient;
    {$ENDIF}
 end;
 
 
-{$IFDEF _FULLGAME}
-procedure GameMakeReset;
+function GameStart(PlayerRequestor:byte;Check:boolean):boolean;
 begin
-   menu_item:=0;
-   if(G_Started)then
+   GameStart:=false;
+
+   if(G_Started)
+   or((PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
+
+   if(PlayersReadyStatus)then
    begin
-      G_Started:=false;
-      GameDefaultAll;
-   end
-   else
-    if(PlayersReadyStatus)then
-    begin
-       G_Started:=true;
-       menu_state :=false;
-       if(menu_s2<>ms2_camp)
-       then GameStartSkirmish
-       else ;//_CMPMap;
-       vid_panel_timer:=0;
-       UIPlayer:=PlayerClient;
-    end;
+      GameStart:=true;
+      if(Check)then exit;
+      G_Started :=true;
+      {$IFDEF _FULLGAME}
+      menu_state:=false;
+      menu_item:=0;
+      if(menu_s2<>ms2_camp)
+      then GameStartSkirmish
+      else ;//_CMPMap;
+      vid_panel_timer:=0;
+      {$ELSE}
+      GameStartSkirmish;
+      {$ENDIF}
+   end;
+end;
+function GameBreak(PlayerRequestor:byte;Check:boolean):boolean;
+begin
+   GameBreak:=false;
+
+   if(not G_Started)
+   or((PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby))then exit;
+
+   GameBreak:=true;
+   if(Check)then exit;
+   {$IFDEF _FULLGAME}
+   menu_item:=0;
+   {$ENDIF}
+   G_Started:=false;
+   GameDefaultAll;
 end;
 
+{$IFDEF _FULLGAME}
 procedure MakeRandomSkirmish(andstart:boolean);
 var p:byte;
 begin
@@ -712,7 +768,7 @@ begin
 
    Map_premap;
 
-   if(andstart)then GameMakeReset;
+   if(andstart)then GameStart(PlayerClient,false);
 end;
 {$ELSE}
 {$include _ded.pas}

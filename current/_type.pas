@@ -25,9 +25,9 @@ end;
 //
 
 TMWTexture = record
-   surf     : pSDL_Surface;
+   sdlSurface: pSDL_Surface;
    w,h,
-   hw,hh    : integer;
+   hw,hh     : integer;
 end;
 PTMWTexture = ^TMWTexture;
 
@@ -35,14 +35,17 @@ TUSpriteList  = array of TMWTexture;
 PTUSpriteList = ^TUSpriteList;
 
 TMWSModel = record
-   sl       : TUSpriteList;
-   sel_hw,
-   sel_hh,
-   sk,
-   sn       : integer;
-   mkind    : byte;
+   sm_list  : TUSpriteList;
+   sm_sel_hw,
+   sm_sel_hh,
+   sm_listi,   // last value
+   sm_listn : integer;
+   sm_type  : byte;
 end;
 PTMWSModel = ^TMWSModel;
+
+TMWTileSet  = array[0..MaxTileSet] of TMWTexture;
+PTMWTileSet = ^TMWTileSet;
 
 TDecal = record
    x,y      : integer;
@@ -710,8 +713,8 @@ TGamePreset = record
    gp_map_symmetry,
    gp_g_mode    : byte;
 
-   gp_player_slot
-                : array[1..MaxPlayers] of boolean;
+   gp_player_team
+                : array[1..MaxPlayers] of byte;
 end;
 
 

@@ -12,7 +12,7 @@ begin
       barh :=(y1-y0);
       if(scrolls<scrollmax)then
       begin
-         barh :=mm3(1,round((y1-y0)*(scrolls/scrollmax)),barh);
+         barh :=mm3i(1,round((y1-y0)*(scrolls/scrollmax)),barh);
          posCY:=y0+round((y1-y0-barh)*(scrolli/(scrollmax-scrolls)));
       end
       else posCY:=y0;
@@ -40,7 +40,7 @@ begin
       tx:=x0;
       ty:=y0;
       if(listarrow)
-      then tx1:=max2(x0,x1-larrow_w)
+      then tx1:=max2i(x0,x1-larrow_w)
       else tx1:=x1;
       if(not enabled)then listarrow:=false;
       case halignment of
@@ -457,7 +457,7 @@ begin
                  D_menu_ETextD(tar,mi_game_RecordStatus  ,str_replay_status  ,str_rstatus[rpls_state]       ,false,0,0);
                  D_menu_ETextN(tar,mi_game_RecordName    ,str_replay_name    ,rpls_str_name                 ,false,1,0);
             if(rpls_state>rpls_state_none)and(g_cl_units>0)
-            then D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,i2s(min2(cl_UpT_array[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_pnui]
+            then D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,i2s(min2i(cl_UpT_array[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_pnui]
                                                                                                             ,true ,0,0)
             else D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_pnui]           ,true ,0,0);
               end;
@@ -473,7 +473,7 @@ begin
                  D_menu_ETextD(tar,mi_mplay_ClientAddress,str_Address        ,net_cl_svstr                  ,false,1,0);
                  D_menu_ETextD(tar,mi_mplay_ClientConnect,str_connect[net_status=ns_client],net_status_str  ,false,0,0);
             if(g_cl_units>0)
-            then D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,i2s(min2(cl_UpT_array[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[net_pnui]
+            then D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,i2s(min2i(cl_UpT_array[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[net_pnui]
                                                                                                             ,true ,0,0)
             else D_menu_ETextD(tar,mi_mplay_ClientQuality,str_net_Quality    ,str_pnua[net_pnui]            ,true ,0,0);
 

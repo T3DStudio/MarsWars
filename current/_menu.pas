@@ -14,10 +14,10 @@ procedure SetItem(item:byte;ax0,ay0,ax1,ay1:integer;aenabled:boolean);
 begin
    with menu_items[item] do
    begin
-      x0:=min2(ax0,ax1);
-      y0:=min2(ay0,ay1);
-      x1:=max2(ax0,ax1);
-      y1:=max2(ay0,ay1);
+      x0:=min2i(ax0,ax1);
+      y0:=min2i(ay0,ay1);
+      x1:=max2i(ax0,ax1);
+      y1:=max2i(ay0,ay1);
       enabled:=aenabled;
    end;
 end;
@@ -52,21 +52,26 @@ begin
    else SetItem(mi_exit,ui_menu_mbutton_lx0,ui_menu_mbutton_y0,ui_menu_mbutton_lx1,ui_menu_mbutton_y1,true);
 
    //enable:=(net_status<>ns_client)and(G_Started or PlayersReadyStatus);
-   // mi_ready - net game
-   // mi_surrender - net play/break
-   if(not G_Started)
-   then SetItem(mi_start,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,PlayersReadyStatus)
+   if(not G_Started)then
+   begin
+      if(PlayerClient=PlayerLobby)or(PlayerLobby=0)
+      then SetItem(mi_start    ,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,GameStart(PlayerClient,true));
+      //else SetItem(mi_surrender,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,false             );
+   end
    else
-     if(net_status=ns_single)
+     if(PlayerSpecialDefeat(PlayerClient,true,true))
+     then SetItem(mi_surrender,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,true)
+     else SetItem(mi_break    ,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,GameBreak(PlayerClient,true));
+
+   {  if(net_status=ns_single)
      then SetItem(mi_break    ,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,net_status<>ns_client)
-     else SetItem(mi_surrender,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,true);
+     else SetItem(mi_surrender,ui_menu_mbutton_rx0,ui_menu_mbutton_y0,ui_menu_mbutton_rx1,ui_menu_mbutton_y1,true);}
 
    // map section
    ty0:=0;
    ty1:=0;
    while(ty1<ui_menu_map_ph)do
    begin
-   //enable:=(not G_Started)and((PlayerLobby=PlayerClient)or(PlayerLobby=0))and((ty0=0)or(g_preset_cur=0));
    SetItem(mi_map_params1+ty0,ui_menu_map_px0,ui_menu_map_py0+ty1,ui_menu_map_px1,ui_menu_map_py0+ty1+ui_menu_map_lh,true);
    ty0+=1;
    ty1+=ui_menu_map_lh;
@@ -424,7 +429,7 @@ begin
       mli_value  :=avalue;
       mli_enabled:=aenabled;
    end;
-   menu_list_w:=max3(MinWidth,menu_list_w,font_w*length(acaption)+font_w);
+   menu_list_w:=max3i(MinWidth,menu_list_w,font_w*length(acaption)+font_w);
 end;
 
 procedure menu_list_MakeFromStr(mi:byte;pfstring:pshortstring;size,CurrVal,MinWidth:integer);
@@ -568,7 +573,7 @@ begin
       mouse_x-=menu_x+tx0;
       mouse_y-=menu_y;
 
-      if(y0<mouse_y)and(mouse_y<y1)then menu_GetBarVal:=mm3(1,mouse_x,max);
+      if(y0<mouse_y)and(mouse_y<y1)then menu_GetBarVal:=mm3i(1,mouse_x,max);
 
       mouse_x+=menu_x+tx0;
       mouse_y+=menu_y;
@@ -629,8 +634,23 @@ mi_settings_PlayerName : begin
       case menu_item of
 mi_exit                   : GameCycle:=false;
 mi_back                   : menu_Toggle;
-mi_start                  ,
-mi_break                  : GameMakeReset;
+mi_start                  : if(net_status=ns_client)
+                            then net_send_byte(nmid_start)
+                            else GameStart(PlayerClient,false);
+mi_break                  : if(net_status=ns_client)
+                            then net_send_byte(nmid_break)
+                            else GameBreak(PlayerClient,false);
+mi_surrender              : begin
+                            if(net_status=ns_client)
+                            then net_send_byte(nmid_surrender)
+                            else
+                              if(net_status=ns_server)then
+                              begin
+                                 PlayerSpecialDefeat(PlayerClient,true,false);
+                                 if(g_started)then menu_Toggle;
+                              end
+                              else GameBreak(PlayerClient,false);
+                            end;
 
 //////////////////////////////////////////    MAP
 mi_map_params1            : if(menu_list_selected>-1)then
@@ -711,7 +731,7 @@ mi_settings_PanelPosition : if(menu_list_selected>-1)then
                                menu_List_Clear;
                                vid_ScreenSurfaces;
                                theme_map_ptrt:=255;
-                               MakeTerrain;
+                               gfx_MakeTerrain;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_panelposp[0],SizeOf(str_panelposp),integer(vid_PannelPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
@@ -731,7 +751,7 @@ mi_settings_ResApply      : begin
                             vid_vh:=menu_res_h;
                             vid_MakeScreen;
                             theme_map_ptrt:=255;
-                            MakeTerrain;
+                            gfx_MakeTerrain;
                             end;
 
 mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen; vid_MakeScreen;end;
@@ -1136,7 +1156,9 @@ begin
       case menu_item of
 mi_map_params2        : begin
                            map_seed   :=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
-                           map_premap;
+                           if(net_status=ns_client)
+                           then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed)
+                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
 mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_kbstr,NameLen);
 mi_saveload_fname     : svld_str_fname:=StringApplyInput(svld_str_fname,k_kbstr,SvRpLen);

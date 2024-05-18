@@ -17,7 +17,7 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 {$IFDEF _FULLGAME}
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
-function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
+function sm_uid2MWTexture(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer;  forward;
 procedure replay_SavePlayPosition;forward;
@@ -97,12 +97,12 @@ function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
 function t2c(l:byte):char;begin if(l=0)then t2c:='-' else t2c:=b2s(l)[1]; end;
 
-function max2(x1,x2   :integer):integer;begin if(x1>x2)then max2:=x1 else max2:=x2;end;
-function max3(x1,x2,x3:integer):integer;begin max3:=max2(max2(x1,x2),x3);end;
-function min2(x1,x2   :integer):integer;begin if(x1<x2)then min2:=x1 else min2:=x2;end;
-function min3(x1,x2,x3:integer):integer;begin min3:=min2(min2(x1,x2),x3);end;
+function max2i(x1,x2   :integer):integer;begin if(x1>x2)then max2i:=x1 else max2i:=x2;end;
+function max3i(x1,x2,x3:integer):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
+function min2i(x1,x2   :integer):integer;begin if(x1<x2)then min2i:=x1 else min2i:=x2;end;
+function min3i(x1,x2,x3:integer):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
 
-function mm3(mnx,x,mxx:integer):integer;begin mm3:=min2(mxx,max2(x,mnx)); end;
+function mm3i(mnx,x,mxx:integer):integer;begin mm3i:=min2i(mxx,max2i(x,mnx)); end;
 
 function ValidateStr(BaseStr:shortstring;MaxSize:byte;Chars:PTSoc):shortstring;
 var i:byte;
@@ -164,7 +164,7 @@ begin
       if(g<>[])then
        for i:=0 to 255 do
         if(i in g)then
-         with g_upids[i] do a_upgrs[i]:=min2(_up_max,lvl);
+         with g_upids[i] do a_upgrs[i]:=min2i(_up_max,lvl);
    end;
 end;
 procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new,NoCheck:boolean);  // current upgrades
@@ -178,8 +178,8 @@ begin
         if(i in g)then
          with g_upids[i] do
           if(NoCheck)
-          then upgr[i]:=min2(_up_max,lvl)
-          else upgr[i]:=min3(a_upgrs[i],_up_max,lvl);
+          then upgr[i]:=min2i(_up_max,lvl)
+          else upgr[i]:=min3i(a_upgrs[i],_up_max,lvl);
    end;
 end;
 
@@ -234,8 +234,8 @@ begin
       prod_error_uid :=uid;
       if(pu<>nil)then
       begin
-         prod_error_x:=mm3(1,pu^.x,map_mw);
-         prod_error_y:=mm3(1,pu^.y,map_mw);
+         prod_error_x:=mm3i(1,pu^.x,map_mw);
+         prod_error_y:=mm3i(1,pu^.y,map_mw);
       end
       else
       begin
@@ -301,6 +301,7 @@ begin
 0..MaxPlayers,
 lmt_player_chat,
 lmt_player_defeated,
+lmt_player_surrender,
 lmt_player_leave,
 lmt_game_end,
 lmt_game_message     :;
@@ -339,12 +340,14 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt
       else ThisPlayer:=UIPlayer;
       if(ptarget=ThisPlayer)then
       begin
-         log_LastMesTimer:=min2(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
+         log_LastMesTimer:=min2i(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
          menu_redraw:=true;
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer;
 
-         if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
+         if(amtype=lmt_player_defeated )
+         or(amtype=lmt_player_surrender)then
+           if(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
       end;
       {$ENDIF}
    end;
@@ -377,13 +380,18 @@ begin
 end;
 procedure GameLogPlayerDefeated(player:byte);
 begin
-   if(player>MaxPlayers)or(ServerSide=false)then exit;
+   if(player>MaxPlayers)or(not ServerSide)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0,false);
 end;
 procedure GameLogPlayerLeave(player:byte);
 begin
-   if(player>MaxPlayers)or(ServerSide=false)then exit;
+   if(player>MaxPlayers)or(not ServerSide)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_plout,0,0,false);
+end;
+procedure GameLogPlayerSurrender(player:byte);
+begin
+   if(player>MaxPlayers)or(not ServerSide)then exit;
+   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,player,'',0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
@@ -532,6 +540,13 @@ begin
    if(p<=MaxPlayers)then
     with g_players[p] do
     begin
+       if(g_preset_cur>0)then
+        with g_presets[g_preset_cur] do
+        begin
+           PlayerGetTeam:=gp_player_team[p];
+           exit;
+        end;
+
        if(curTeam>MaxPlayers)then curTeam:=team;
 
        if(curTeam>0)then
@@ -827,7 +842,7 @@ begin
      else
      begin
         lvl-=1;
-        _upid_time:=min2(upgr_max_time,_up_time*ipower(_up_time_xpl,lvl)+(_up_time_apl*lvl));
+        _upid_time:=min2i(upgr_max_time,_up_time*ipower(_up_time_xpl,lvl)+(_up_time_apl*lvl));
      end;
 end;
 
@@ -845,7 +860,7 @@ begin
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
       setr(ureq_energy , cenergy<_upid_energy(up,upgr[up]+1)   );
       setr(ureq_time   , _up_time<=0                           );
-      setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2(_up_max,a_upgrs[up])));
+      setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2i(_up_max,a_upgrs[up])));
       setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)     );
       setr(ureq_smiths , n_smiths<=0                           );
    end;
@@ -857,9 +872,9 @@ begin
    if(h =0                          )then hits_li2si:=0    else
    if(h =dead_hits                  )then hits_li2si:=-127 else
    if(h<=ndead_hits                 )then hits_li2si:=-128 else
-   if(fdead_hits<h)and(h<0          )then hits_li2si:=mm3(-125,h div _d2shi,-1  ) else
+   if(fdead_hits<h)and(h<0          )then hits_li2si:=mm3i(-125,h div _d2shi,-1  ) else
    if( dead_hits<h)and(h<=fdead_hits)then hits_li2si:=-126 else
-                                          hits_li2si:=mm3(   1,trunc(h/s)  ,_mms);
+                                          hits_li2si:=mm3i(   1,trunc(h/s)  ,_mms);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -1012,7 +1027,7 @@ begin
      begin
         pn:=0;
         for p:=1 to MaxPlayers do
-          if(gp_player_slot[p])then pn+=1;
+          if(gp_player_team[p]>0)then pn+=1;
 
         if(pn>0)
         then gp_name:=b2s(pn)+')'
@@ -1074,7 +1089,7 @@ begin
       if(i^>max)then i^:=min;
       if(i^<min)then i^:=max;
    end
-   else i^:=mm3(min,i^,max);;
+   else i^:=mm3i(min,i^,max);;
    ScrollInt:=oldi<>i^;
 end;
 
@@ -1099,13 +1114,13 @@ begin
    cy:=y div fog_cw;
    fog_check:=false;
    if(0<=cx)and(cx<=fog_vfwm)
-  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=(vid_fog_pgrid[cx,cy]>0);
+  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=vid_fog_pgrid[cx,cy];
 end;
 
 function RectInCam(x,y,hw,hh,s:integer):boolean;
 begin
-   RectInCam:=((vid_cam_x-hw          )<x)and(x<(vid_cam_x+vid_cam_w+hw))
-           and((vid_cam_y-hh-max2(0,s))<y)and(y<(vid_cam_y+vid_cam_h+hh));
+   RectInCam:=((vid_cam_x-hw           )<x)and(x<(vid_cam_x+vid_cam_w+hw))
+           and((vid_cam_y-hh-max2i(0,s))<y)and(y<(vid_cam_y+vid_cam_h+hh));
 end;
 function PointInCam(x,y:integer):boolean;
 begin
@@ -1113,9 +1128,18 @@ begin
             and(vid_cam_y<y)and(y<(vid_cam_y+vid_cam_h));
 end;
 
-function CheckUnitUIVision(tu:PTUnit):boolean;
+function ui_CheckUnitCommonVision(tu:PTUnit;CheckCam:boolean):boolean;
 begin
-   CheckUnitUIVision:=true;
+   ui_CheckUnitCommonVision:=true;
+
+   if(CheckCam)and(tu<>nil)then
+    with tu^ do
+     with uid^ do
+      if(not RectInCam(vx,vy,_r,_r,0))then
+      begin
+         ui_CheckUnitCommonVision:=false;
+         exit;
+      end;
 
    if(not sys_fog)then exit;
 
@@ -1123,14 +1147,15 @@ begin
      if(rpls_state>=rpls_state_read)or(g_players[PlayerClient].isobserver)then exit;
 
    if(tu<>nil)then
-     if(tu^.player^.team=g_players[UIPlayer].team)then exit;
+     if(tu^.vsnt[g_players[UIPlayer].team]>0)then exit;
+     //if(tu^.player^.team=g_players[UIPlayer].team)then exit;
 
-   CheckUnitUIVision:=false;
+   ui_CheckUnitCommonVision:=false;
 end;
 
-function CheckUnitUIVisionScreen(tu:PTUnit):boolean;
+{function ui_CheckUnitVisionScreen(tu:PTUnit):boolean;
 begin
-   CheckUnitUIVisionScreen:=false;
+   ui_CheckUnitVisionScreen:=false;
    with tu^ do
     with uid^ do
      if(RectInCam(vx,vy,_r,_r,0))then
@@ -1138,24 +1163,24 @@ begin
         if(UIPlayer=0)then
           if(rpls_state=rpls_state_read)or(g_players[PlayerClient].isobserver)then
           begin
-             CheckUnitUIVisionScreen:=true;
+             ui_CheckUnitVisionScreen:=true;
              exit;
           end;
 
-        CheckUnitUIVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not sys_fog);
+        ui_CheckUnitVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not sys_fog);
      end;
-end;
+end;  }
 
-function MapPointInScreenP(x,y:integer):boolean;
+function ui_MapPointInRevealedInScreen(x,y:integer):boolean;
 begin
-   MapPointInScreenP:=false;
+   ui_MapPointInRevealedInScreen:=false;
    x-=vid_cam_x;
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
       if(not sys_fog)
-      then MapPointInScreenP:=true
-      else MapPointInScreenP:=fog_check(x,y);
+      then ui_MapPointInRevealedInScreen:=true
+      else ui_MapPointInRevealedInScreen:=fog_check(x,y);
 end;
 
 function PlayerGetColor(player:byte):cardinal;
@@ -1255,8 +1280,9 @@ gs_replaypause: begin
    end;
 end;
 
-procedure menu_List_Clear;
+function menu_List_Clear:boolean;
 begin
+   menu_List_Clear:=menu_list_n>0;
    menu_item  :=0;
    menu_list_n:=0;
    setlength(menu_list_items,menu_list_n);
@@ -1266,7 +1292,8 @@ procedure menu_Toggle;
 begin
    if(G_Started)then
    begin
-      if(menu_state)then menu_List_Clear;
+      if(menu_state)then
+       if(menu_List_Clear)then exit;
       menu_state:=not menu_state;
       menu_remake:=menu_state;
       menu_item:=0;
@@ -1280,8 +1307,8 @@ end;
 
 procedure GameCameraBounds;
 begin
-   vid_cam_x:=mm3(0,vid_cam_x,map_mw-vid_cam_w);
-   vid_cam_y:=mm3(0,vid_cam_y,map_mw-vid_cam_h);
+   vid_cam_x:=mm3i(0,vid_cam_x,map_mw-vid_cam_w);
+   vid_cam_y:=mm3i(0,vid_cam_y,map_mw-vid_cam_h);
 
    vid_mmvx:=round(vid_cam_x*map_mmcx);
    vid_mmvy:=round(vid_cam_y*map_mmcx);
@@ -1302,9 +1329,9 @@ function hits_si2li(sh:shortint;mh:integer;s:single):longint;
 begin
    case sh of
 127     : hits_si2li:=mh;
-1..126  : hits_si2li:=mm3(1,trunc(sh*s),mh-1);
+1..126  : hits_si2li:=mm3i(1,trunc(sh*s),mh-1);
 0       : hits_si2li:=0;
--125..-1: hits_si2li:=mm3(dead_hits+1,sh*_d2shi,-1);
+-125..-1: hits_si2li:=mm3i(dead_hits+1,sh*_d2shi,-1);
 -126    : hits_si2li:=fdead_hits;
 -127    : hits_si2li:=dead_hits;
 -128    : hits_si2li:=ndead_hits;
@@ -1385,6 +1412,7 @@ lmt_game_end         : if(argx<=MaxPlayers)then
                         if(argx=g_players[UIPlayer].team)
                         then ParseLogMessage:=str_win
                         else ParseLogMessage:=str_lose;
+lmt_player_surrender : if(argx<=MaxPlayers)then ParseLogMessage:=g_players[argx].name+str_plsurrender;
 lmt_player_defeated  : if(argx<=MaxPlayers)then ParseLogMessage:=g_players[argx].name+str_player_def;
 lmt_upgrade_complete : begin
                        with g_upids[argx] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';

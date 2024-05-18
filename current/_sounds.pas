@@ -335,7 +335,7 @@ begin
    end
    else
      if(pu<>nil)then
-       if(not CheckUnitUIVisionScreen(pu))then exit;
+       if(not ui_CheckUnitCommonVision(pu,true))then exit;
 
    SoundPlay(ss,sss_world,true);
    SoundPlayUnit:=true;
@@ -432,6 +432,7 @@ lmt_game_end          : if(argx<=MaxPlayers)then
                           if(argx=team)
                           then SoundPlayAnoncer(snd_victory[race],false,true)
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
+lmt_player_surrender,
 lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);

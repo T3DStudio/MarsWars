@@ -1,5 +1,5 @@
 {$IFDEF _FULLGAME}
-procedure unit_MiniMapXY(pu:PTUnit);
+procedure unit_UpdateMiniMapXY(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -16,19 +16,19 @@ begin
    begin
       if(vischeck<>nil)then
       begin
-         if(vischeck^=false)then exit
+         if(not vischeck^)then exit
       end
       else
-         if(not CheckUnitUIVisionScreen(pu))then exit;
+         if(not ui_CheckUnitCommonVision(pu,false))then exit;
 
       case etype of
 EID_HVision : begin
               SoundPlayUnit(snd_hell_eye,pu,nil);
-              effect_add(vx,vy,SpriteDepth(vy+1,ukfly),EID_HVision);
+              effect_add(vx,vy,SpriteDepth(vy+1,ukfly),etype);
               end;
 EID_Invuln  : begin
               SoundPlayUnit(snd_hell_invuln,pu,nil);
-              effect_add(vx,vy,SpriteDepth(vy+1,ukfly),EID_Invuln);
+              effect_add(vx,vy,SpriteDepth(vy+1,ukfly),etype);
               end;
       else
          case uid^._urace of
@@ -57,7 +57,7 @@ end;
 procedure effect_CPExplode(vx,vy:integer);
 begin
    effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
-   if(MapPointInScreenP(vx,vy))then
+   if(ui_MapPointInRevealedInScreen(vx,vy))then
    begin
       effect_add(vx,vy,SpriteDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
@@ -72,10 +72,10 @@ begin
    begin
       if(vischeck<>nil)then
       begin
-         if(vischeck^=false)then exit
+         if(not vischeck^)then exit
       end
       else
-         if(not CheckUnitUIVisionScreen(pu))then exit;
+         if(not ui_CheckUnitCommonVision(pu,true))then exit;
 
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       effect_add(vx,vy,SpriteDepth(vy+1,ukfly),un_eid_summon[level]);
@@ -94,10 +94,10 @@ begin
 
       if(vischeck<>nil)then
       begin
-         if(vischeck^=false)then exit
+         if(not vischeck^)then exit
       end
       else
-        if(not CheckUnitUIVisionScreen(pu))then exit;
+        if(not ui_CheckUnitCommonVision(pu,true))then exit;
 
       if(fastdeath)then
       begin
@@ -119,24 +119,24 @@ begin
    begin
       if(vischeck<>nil)then
       begin
-         if(vischeck^=false)then exit
+         if(not vischeck^)then exit
       end
       else
-        if(not CheckUnitUIVisionScreen(pu))then exit;
+        if(not ui_CheckUnitCommonVision(pu,true))then exit;
 
       effect_add(vx,vy,SpriteDepth(vy+1,ukfly),un_eid_pain[level]);
       SoundPlayUnit(un_eid_snd_pain,nil,nil);
    end;
 end;
 
-procedure effect_InPoint(tx,ty,dy:integer;vischeck:pboolean;effect:byte;sound:PTSoundSet);
+procedure effect_Common(tx,ty,dy:integer;vischeck:pboolean;effect:byte;sound:PTSoundSet);
 begin
    if(vischeck<>nil)then
    begin
-      if(vischeck^=false)then exit
+      if(not vischeck^)then exit
    end
    else
-     if(MapPointInScreenP(tx,ty)=false)then exit;
+     if(not ui_MapPointInRevealedInScreen(tx,ty))then exit;
 
    effect_add(tx,ty,dy,effect);
    SoundPlayUnit(sound,nil,nil);
@@ -150,10 +150,10 @@ begin
    begin
       if(vischeck<>nil)then
       begin
-         if(vischeck^=false)then exit
+         if(not vischeck^)then exit
       end
       else
-        if(not CheckUnitUIVisionScreen(pu))then exit;
+        if(not ui_CheckUnitCommonVision(pu,true))then exit;
 
       if(start)then
       begin
@@ -282,7 +282,7 @@ begin
                     end;
                  end;
    atm_sturret : if(transportC<=0)then exit;
-   atm_inapc   : if(transport <=0)then exit;
+   atm_inapc   : if(not IsUnitRange(transport,nil))then exit;
       else exit;
       end;
    end;
@@ -301,7 +301,7 @@ begin
         if(not pf_IfObstacleZone(newzone))then pfzone:=newzone;
 
       {$IFDEF _FULLGAME}
-      unit_MiniMapXY(pu);
+      unit_UpdateMiniMapXY(pu);
       unit_UpdateFogXY(pu);
       {$ENDIF}
    end;
@@ -314,8 +314,8 @@ begin
    begin
       _px:=x;
       _py:=y;
-      x:=mm3(1,ax,map_mw);
-      y:=mm3(1,ay,map_mw);
+      x:=mm3i(1,ax,map_mw);
+      y:=mm3i(1,ay,map_mw);
       if(x<>_px)or(y<>_py)then
       begin
          unit_UpdateXY(pu);
@@ -413,15 +413,15 @@ procedure teleport_CalcReload(tu:PTUnit;limit:integer);
 begin
    // tu - teleporter
    with tu^ do
-    with player^ do reload:=integer(round(fr_fps1*limit/MinUnitLimit))*(teleport_SecPerLimit-mm3(0,upgr[upgr_hell_teleport],teleport_SecPerLimit));
+    with player^ do reload:=integer(round(fr_fps1*limit/MinUnitLimit))*(teleport_SecPerLimit-mm3i(0,upgr[upgr_hell_teleport],teleport_SecPerLimit));
 end;
 
 procedure unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
 begin
    with pu^ do
    begin
-      tx:=mm3(0,tx,map_mw);
-      ty:=mm3(0,ty,map_mw);
+      tx:=mm3i(0,tx,map_mw);
+      ty:=mm3i(0,ty,map_mw);
       {$IFDEF _FULLGAME}
       effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
@@ -737,8 +737,8 @@ begin
       if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   tx:=mm3(map_b0,tx,map_b1);
-   ty:=mm3(map_b0,ty,map_b1);
+   tx:=mm3i(map_b0,tx,map_b1);
+   ty:=mm3i(map_b0,ty,map_b1);
    newx^:=tx;
    newy^:=ty;
 end;
@@ -768,7 +768,7 @@ begin
      if(cpCaptureR>0)then
      begin
         if(building)
-        then dx:=max2(cpsolidr,cpNoBuildR)
+        then dx:=max2i(cpsolidr,cpNoBuildR)
         else dx:=cpsolidr;
         if(dx<=0)then continue;
         if(point_dist_int(tx,ty,cpx,cpy)<dx)then
@@ -893,8 +893,8 @@ begin
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly,obstacles);
-         blink_x:=mm3(1,blink_x,map_mw);
-         blink_y:=mm3(1,blink_y,map_mw);
+         blink_x:=mm3i(1,blink_x,map_mw);
+         blink_y:=mm3i(1,blink_y,map_mw);
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
 
          unit_ability_HKeepBlink:=true;
@@ -924,8 +924,8 @@ begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,blink_x,blink_y))then _1c_push(@blink_x,@blink_y,x,y,srange-1);
          _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly, obstacles  );
-         blink_x:=mm3(1,blink_x,map_mw);
-         blink_y:=mm3(1,blink_y,map_mw);
+         blink_x:=mm3i(1,blink_x,map_mw);
+         blink_y:=mm3i(1,blink_y,map_mw);
          if(point_dist_int(x,y,blink_x,blink_y)>srange)then exit;
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
 
@@ -1078,7 +1078,7 @@ begin
       {$IFDEF _FULLGAME}
       wanim    := false;
       anim     := 0;
-      unit_MiniMapXY  (pu);
+      unit_UpdateMiniMapXY  (pu);
       unit_UpdateFogXY(pu);
       {$ENDIF}
    end;
@@ -1588,7 +1588,7 @@ begin
                    barrack_ProductionEnd(pu,uprod_u[i],upgr[upgr_mult_product]);
                    unit_ProdUnitStop_p(pu,255,i);
                 end
-                else uprod_r[i]:=max2(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+                else uprod_r[i]:=max2i(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
            end;
 end;
 
@@ -1614,7 +1614,7 @@ begin
                    unit_ProdUpgrStop_p(pu,255,i);
                    GameLogUpgradeComplete(playeri,_uid,x,y);
                 end
-                else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+                else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
            end;
 end;
 
@@ -1656,8 +1656,8 @@ begin
       {$IFDEF _FULLGAME}
       else
         case auid of
-UID_Phantom : effect_InPoint(tx,ty,SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
-UID_LostSoul: effect_InPoint(tx,ty,SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
+UID_Phantom : effect_Common(tx,ty,SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
+UID_LostSoul: effect_Common(tx,ty,SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
         end;
       {$ENDIF};
    end;
@@ -1774,7 +1774,7 @@ begin
    if(hits>0)then
    with player^ do
    begin
-      if(instant=false)then
+      if(not instant)then
       begin
          with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits>=0)or(_ukbuilding);
          buff[ub_Pain]:=fr_fps1; // prevent fast resurrecting
@@ -1794,7 +1794,7 @@ begin
       with uid^ do
       begin
          if(_ukbuilding)and(buildcd)then
-           if(_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+           if(_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 
@@ -1987,8 +1987,8 @@ UID_Demon         : begin
                     then begin if(speed= _speed)then speed:=_speed div 2;{$IFDEF _FULLGAME}if(animw =_animw)then animw:=_animw div 2;{$ENDIF}end
                     else begin if(speed<>_speed)then speed:=_speed;      {$IFDEF _FULLGAME}if(animw<>_animw)then animw:=_animw;      {$ENDIF}end;
                     end;
-UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
-UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
+UID_UTransport    : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
+UID_APC           : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
       if(playeri=0)and(g_mode=gm_invasion)then

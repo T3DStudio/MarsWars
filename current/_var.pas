@@ -251,16 +251,18 @@ vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
 vid_panel_timer    : byte = 0;
 
-vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
-vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
+vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of boolean;
+vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of boolean;
 vid_fog_vfw       : byte = 0;
 vid_fog_vfh       : byte = 0;
-vid_fog           : boolean = true;
 vid_fog_surf      : pSDL_Surface;
 vid_fog_sx        : integer = 0;
 vid_fog_sy        : integer = 0;
 vid_fog_ex        : integer = 0;
 vid_fog_ey        : integer = 0;
+
+vid_fog_BaseSurf  : pSDL_Surface;
+vid_fog_tiles     : TMWTileSet;
 
 {vid_fog_mm        : array[fog_mm_Min..fog_mm_Max] of pSDL_Surface;
 vid_fog_mmn       : word;
@@ -431,7 +433,7 @@ ui_apmx           : integer = 0;
 ui_apmy           : integer = 0;
 ui_fpsx           : integer = 0;
 ui_fpsy           : integer = 0;
-ui_game_log_height: integer = 0;
+ui_GameLogHeight: integer = 0;
 ui_menu_btnsy     : integer = 0;
 ui_menu_btnsh     : integer = 0;
 
@@ -822,6 +824,7 @@ str_gmodet,
 str_starta,
 str_ps_comp,
 str_ps_cheater,
+str_plsurrender,
 str_plout,
 str_player_def    : shortstring;
 str_PlayerSlots   : array[0..ps_states_n-1    ] of shortstring;

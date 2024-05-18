@@ -16,12 +16,13 @@ end;
 procedure Dedicated_Code;
 begin
    case G_Started of
-false: if(PlayersReadyStatus)then
+false: ;
+       {if(PlayersReadyStatus)then
        begin
           screen_redraw:=true;
           G_Started:=true;
           GameStartSkirmish;
-       end;
+       end;}
 true : if(PlayerAllOut)then
        begin
           G_Started:=false;

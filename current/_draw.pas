@@ -45,6 +45,31 @@ begin
    if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
 end;
 
+procedure draw_DebugTileSet(tileSet:pTMWTileSet);
+var tileX:word;
+x,y,lineN:integer;
+begin
+   x:=menu_x+2;
+   y:=menu_y+2;
+   lineN:=8;
+   for tileX:=0 to MaxTileSet do
+   begin
+      draw_surf(r_screen,x,y,tileSet^[tileX].sdlSurface);
+
+      //draw_text(r_screen,x,y,w2s(tileX),ta_left,255,c_white);
+      x+=tileSet^[tileX].w+2;
+
+      lineN-=1;
+      if(lineN=0)then
+      begin
+         x:=menu_x+2;
+         lineN:=8;
+         y+=tileSet^[0].h+2;
+      end;
+   end;
+
+   draw_surf(r_screen,x,y,vid_fog_BaseSurf);
+end;
 
 procedure DrawGame;
 var i,n:integer;
@@ -67,10 +92,10 @@ begin
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
-   ' '+str_b2c[MapPointInScreenP(mouse_map_x,mouse_map_y)]+
+   ' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div fog_cw)+
    ' '+i2s(mouse_map_y div fog_cw)+
-   ' '+tc_green+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
+   ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
    ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    ' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
    ' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
@@ -88,6 +113,8 @@ begin
        i2s(rpls_state)+
    ' '+i2s(rpls_fstatus),
    ta_right,255, c_white);
+
+   //draw_DebugTileSet(@vid_fog_tiles);
    end;
 
    sdl_flip(r_screen);

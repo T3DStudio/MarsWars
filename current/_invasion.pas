@@ -119,7 +119,7 @@ begin
             19 : g_inv_wave_t_next:=120;
             else g_inv_wave_t_next:=WaveTime(60);
             end;
-            g_inv_wave_t_next:=mm3(30,g_inv_wave_t_next,max_wave_time_s)*fr_fps1;
+            g_inv_wave_t_next:=mm3i(30,g_inv_wave_t_next,max_wave_time_s)*fr_fps1;
          end;
       end
       else

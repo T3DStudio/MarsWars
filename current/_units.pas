@@ -102,7 +102,7 @@ begin
              begin
                 pains:=_painc;
 
-                buff[ub_Pain]:=max2(pain_time,a_reload);
+                buff[ub_Pain]:=max2i(pain_time,a_reload);
 
                 with player^ do
                  if(_urace=r_hell)then
@@ -189,7 +189,7 @@ begin
         vsni:=avsni;
         vsnt:=avsnt;
         if(bhits>0)then
-          if(not iscomplete)then hits:=mm3(1,bhits,puid^._mhits-1);
+          if(not iscomplete)then hits:=mm3i(1,bhits,puid^._mhits-1);
         if(select)then
         begin
            isselected:=true;
@@ -235,7 +235,7 @@ begin
            if(vx<>x)or(vy<>y)then
              if(shortcollision)
              then dir:=_DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))
-             else dir:=_DIR360(dir-( min2(90,max2(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
+             else dir:=_DIR360(dir-( min2i(90,max2i(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
 
          if(tu^.x=tu^.ua_x)and(tu^.y=tu^.ua_y)and(tu^.ua_bx<0)and(not IsUnitRange(ua_tar,nil))then
          begin
@@ -323,7 +323,7 @@ begin
        begin
           ss:=speed;
 
-          if(buff[ub_Slow]>0)then ss:=max2(2,ss div 2);
+          if(buff[ub_Slow]>0)then ss:=max2i(2,ss div 2);
 
           mdist:=point_dist_int(x,y,mv_x,mv_y);
           if(mdist<=speed)then
@@ -1232,7 +1232,7 @@ begin
         if(tu^.vsnt[i]>0)
         or(    vsnt[i]>0)then
         begin
-                vsnt[i]:=max2(vsnt[i],tu^.vsnt[i]);
+                vsnt[i]:=max2i(vsnt[i],tu^.vsnt[i]);
             tu^.vsnt[i]:=vsnt[i];
         end;
    end;
@@ -1341,8 +1341,8 @@ wmove_noneed    : if(not AttackInMove)then
       with _a_weap[a_weap] do
       begin
          {$IFDEF _FULLGAME}
-         targetvis  :=CheckUnitUIVisionScreen(tu);
-         attackervis:=CheckUnitUIVisionScreen(pu);
+         targetvis  :=ui_CheckUnitCommonVision(tu,true);
+         attackervis:=ui_CheckUnitCommonVision(pu,true);
          {$ENDIF}
 
          if(a_reload<=0)then
@@ -1436,10 +1436,10 @@ wpt_suicide    : if(ServerSide)then unit_kill(pu,false,true,true,false,true);
               case aw_type of
 wpt_resurect   : begin
                     unit_StartResurrection(tu);
-                    if((aw_reqf and wpr_reload)>0)then reload:=max2(0,aw_count*fr_fps1);
+                    if((aw_reqf and wpr_reload)>0)then reload:=max2i(0,aw_count*fr_fps1);
                  end;
 wpt_heal       : begin
-                    tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+                    tu^.hits:=mm3i(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
                     tu^.buff[ub_Heal]:=aw_reload;
                  end;
               end;
@@ -1624,7 +1624,7 @@ begin
         td :=point_dist_int(x,y,tu^.x,tu^.y);
         if(tu^.solid)
         then tdm:=td-    (_r+tu^.uid^._r)
-        else tdm:=td-min2(_r,tu^.uid^._r);
+        else tdm:=td-min2i(_r,tu^.uid^._r);
 
         if(tdm<melee_r)then
         begin
@@ -1688,8 +1688,8 @@ begin
       begin
          unit_OrderTarget(pu);
 
-         ua_x:=mm3(1,ua_x,map_mw);
-         ua_y:=mm3(1,ua_y,map_mw);
+         ua_x:=mm3i(1,ua_x,map_mw);
+         ua_y:=mm3i(1,ua_y,map_mw);
 
          mv_x:=ua_x;
          mv_y:=ua_y;

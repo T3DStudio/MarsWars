@@ -126,12 +126,12 @@ begin
        end;
        if(alpha>0)then
         if(alpha=255)
-        then draw_surf(tar,x,y,sprite^.surf)
+        then draw_surf(tar,x,y,sprite^.sdlSurface)
         else
         begin
-           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-           draw_surf(tar,x,y,sprite^.surf);
-           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+           SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+           draw_surf(tar,x,y,sprite^.sdlSurface);
+           SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
         end;
 
        if(aura>0)then
@@ -342,13 +342,13 @@ begin
       if(srect)then
       begin
          if(playeri=UIPlayer)
-         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
-         UnitsInfoAddText(vx,vy-sel_hh-font_w,lvlstr_l,c_white);
+         then UnitsInfoAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
+         else UnitsInfoAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
+         UnitsInfoAddText(vx,vy-sm_sel_hh-font_w,lvlstr_l,c_white);
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
+      if(hbar )then UnitsInfoProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
 
-      if(reload>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
+      if(reload>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sm_sel_hh+font_w,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
         case m_brush of
@@ -379,7 +379,7 @@ mb_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
 
       if(_ukbuilding)
       then buffy:=vy
-      else buffy:=vy-sel_hh-font_w;
+      else buffy:=vy-sm_sel_hh-font_w;
 
       if(buff[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
       if(buff[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
@@ -416,7 +416,7 @@ gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,u
        end;
 
        if(sprite<>nil)then
-        with sprite^ do draw_surf(tar,x0,y0,surf);
+        with sprite^ do draw_surf(tar,x0,y0,sdlSurface);
 
        if(kind=uinfo_sprite)then continue;
 
@@ -484,7 +484,7 @@ begin
         ix+=lx-vid_ab;
         iy+=ly-vid_ab;
 
-        with spr^ do draw_surf(tar,ix-hw,iy-hh,spr^.surf);
+        with spr^ do draw_surf(tar,ix-hw,iy-hh,spr^.sdlSurface);
      end;
 end;
 
@@ -531,7 +531,7 @@ begin
              SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
           end;
 
-        if(MapPointInScreenP(cpx,cpy))then
+        if(ui_MapPointInRevealedInScreen(cpx,cpy))then
         begin
            if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
            if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
@@ -550,29 +550,54 @@ end;
 
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
 var cx,cy,ssx,ssy,sty:integer;
+  tileX:byte;
    { b:boolean;
     cl:cardinal;
     ci:integer;
     pf:word;
     cl:cardinal; }
+function GetFogGridVal(fx,fy:integer):boolean;
 begin
-   if(not vid_fog)then exit;
+   GetFogGridVal:=false;
+   if (0<=fx)and(fx<=fog_vfwm)
+   and(0<=fy)and(fy<=fog_vfhm)then GetFogGridVal:=not vid_fog_pgrid[fx,fy];
+end;
 
-   ssx:=lx-(vid_cam_x mod fog_cw)+fog_chw-integer(fog_cr);
-   sty:=ly-(vid_cam_y mod fog_cw)+fog_chw-integer(fog_cr);
+begin
+   if(not sys_fog)then exit;
+
+   for sty:=1 to MaxUnits do
+    with g_units[sty] do
+     if(hits>0)then
+     begin
+        cx:=(fx*fog_cw)-vid_cam_x+lx;
+        cy:=(fy*fog_cw)-vid_cam_y+ly;
+        rectangleColor(tar,cx,cy,cx+fog_cw,cy+fog_cw,c_ltgray);
+
+        cx:=x-vid_cam_x+lx;
+        cy:=y-vid_cam_y+ly;
+        circleColor(tar,cx,cy,5,c_lime);
+     end;
+
+   ssx:=lx-(vid_cam_x mod fog_cw);
+   sty:=ly-(vid_cam_y mod fog_cw);
+
+   vid_fog_pgrid:=vid_fog_grid;
 
    for cx:=0 to vid_fog_vfw do
    begin
+      //vlineColor(tar,ssx,vid_mapx,vid_mapx+vid_cam_w,c_gray);
       ssy:=sty;
       for cy:=0 to vid_fog_vfh do
       begin
-         vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
-         if(sys_fog)then
-         begin
-            if(vid_fog_grid[cx,cy]=0)then draw_surf(tar,ssx, ssy,vid_fog_surf);
-            vid_fog_grid[cx,cy]:=0;
-         end
-         else vid_fog_grid[cx,cy]:=2;
+         tileX:=TileSetGetN(GetFogGridVal(cx  ,cy-1),
+                            GetFogGridVal(cx-1,cy  ),
+                            GetFogGridVal(cx  ,cy  ),
+                            GetFogGridVal(cx+1,cy  ),
+                            GetFogGridVal(cx  ,cy+1));
+         draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
+
+         vid_fog_grid[cx,cy]:=false;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
@@ -819,13 +844,13 @@ begin
    x:=0;
    with mwsm^ do
    begin
-      for i:=1 to sn do
-       with sl[i-1] do
+      for i:=1 to sm_listn do
+       with sm_list[i-1] do
        begin
-          draw_surf(r_screen,x,0,surf);
+          draw_surf(r_screen,x,0,sdlSurface);
           x+=w;
        end;
-      draw_text(r_screen,0,48,i2s(sn), ta_left,255, c_white);
+      draw_text(r_screen,0,48,i2s(sm_listn), ta_left,255, c_white);
    end;
 end;
 

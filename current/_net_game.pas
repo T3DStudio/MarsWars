@@ -188,7 +188,7 @@ nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
                       if(not G_Started)
                       then PlayerSetState(pid,ps_none)//PlayerSlotChangeState(0,pid,ps_opened,false)
-                      else PlayerKill(pid,false);
+                      else PlayerSpecialDefeat(pid,false,false);
                       {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                       continue;
                    end;
@@ -225,6 +225,7 @@ nmid_pause       : begin
                         end;
                      {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                    end;
+nmid_break       : GameBreak(pid,false);
                  end
                else // not G_Started
                  case mid of
@@ -245,7 +246,6 @@ nmid_lobbby_playerslot  : begin
                           end;
 nmid_lobbby_playerteam  : begin
                           i:=net_readbyte;
-                          writeln(pid,' ',i);
                           if(PlayerSlotChangeTeam (pid,i,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                           end;
 nmid_lobbby_playerrace  : begin
@@ -350,7 +350,15 @@ begin
    if(rByte(@g_preset_cur     ,g_preset_n       ))then begin redraw_menu:=true;new_map:=true;end;
    if(rInt (@map_mw           ,MinSMapW,MaxSMapW))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@map_type         ,gms_m_types      ))then begin redraw_menu:=true;new_map:=true;end;
+
+   if(StartGame)
+   or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))
+   or(menu_item<>mi_map_params2)then
+   begin
    if(rCard(@map_seed                           ))then begin redraw_menu:=true;new_map:=true;end;
+   end
+   else net_readcard;
+
    if(rByte(@map_symmetry     ,gms_m_symm       ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_mode           ,gm_cnt           ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_start_base     ,gms_g_startb     ))then begin redraw_menu:=true;              end;
@@ -370,7 +378,7 @@ begin
     end;
 end;
 
-function net_ClientReadPlayerData(pid:byte;gstarted:boolean):boolean;
+function net_ClientReadPlayerData(pid:byte;StartGame:boolean):boolean;
 var   i:integer;
 newname:shortstring;
 begin
@@ -452,7 +460,7 @@ begin
       if((i< fr_fps1)and(nttl>=fr_fps1))
       or((i>=fr_fps1)and(nttl< fr_fps1))then menu_remake:=true;
 
-      if(gstarted)then
+      if(StartGame)then
       begin
          i:=net_readbyte;
          if(i=r_random)or(i>r_cnt)then
@@ -558,7 +566,12 @@ nmid_lobby_info  : begin
                             menu_state:=false;
                             ServerSide:=false;
                             GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
-                            if(g_players[PlayerClient].team=0)then ui_tab:=3;
+                            if(g_players[PlayerClient].team=0)then
+                            begin
+                               ui_tab:=3;
+                               UIPlayer:=0;
+                            end
+                            else UIPlayer:=PlayerClient;
                          end
                          else
                          begin
@@ -566,7 +579,6 @@ nmid_lobby_info  : begin
                             GameDefaultAll;
                          end;
                       end;
-                      writeln(menu_remake);
                    end;
       end;
 

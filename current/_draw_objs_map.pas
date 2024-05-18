@@ -133,7 +133,7 @@ begin
 
         mmx:=round(x*map_mmcx);
         mmy:=round(y*map_mmcx);
-        mmr:=max2(1,round(r*map_mmcx));
+        mmr:=max2i(1,round(r*map_mmcx));
      end;
 end;
 

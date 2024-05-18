@@ -214,7 +214,7 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*550+(ai_builders_count*650) ,ai_GeneratorsEnergy);
+      ai_need_energy:=mm3i(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*550+(ai_builders_count*650) ,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then
       begin
@@ -719,19 +719,19 @@ begin
       prods:=(menergy div prods);
       if(g_generators>1)then prods+=2;
 
-      if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
-      if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
+      if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3i(1,prods div 4        ,ai_maxcount_upgrps);
+      if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3i(1,prods-ai_upgrp_need,ai_maxcount_unitps);
 
       if(ai_enemy_inv_u<>nil)
       then ai_detect_need:=ai_maxlimit_detect
       else
-        if(_N(@ai_detect_need  ,ai_maxlimit_detect))then ai_detect_need  :=mm3(0,ai_armylimit_alive_u div 8,ai_maxlimit_detect);
+        if(_N(@ai_detect_need  ,ai_maxlimit_detect))then ai_detect_need  :=mm3i(0,ai_armylimit_alive_u div 8,ai_maxlimit_detect);
 
       if(_N(@ai_towers_need  ,ai_maxcount_towers))then
       begin
          if(g_generators>0)then
          begin
-            ai_towers_need :=min2(ucl_c[false],ai_maxcount_towers);
+            ai_towers_need :=min2i(ucl_c[false],ai_maxcount_towers);
             ai_towers_needx:=random(map_mw);
             ai_towers_needy:=random(map_mw);
             ai_towers_needl:=srange;
@@ -740,7 +740,7 @@ begin
 
          if(ai_enemy_d<base_4r)then
          begin
-            ai_towers_need     :=mm3(ai_mincount_towers,(aiu_limitaround_enemy-aiu_limitaround_ally+MinUnitLimit) div MinUnitLimit,ai_maxcount_towers);
+            ai_towers_need     :=mm3i(ai_mincount_towers,(aiu_limitaround_enemy-aiu_limitaround_ally+MinUnitLimit) div MinUnitLimit,ai_maxcount_towers);
             ai_towers_needx    :=ai_enemy_u^.x;
             ai_towers_needy    :=ai_enemy_u^.y;
             ai_towers_need_type:=0;
@@ -861,8 +861,8 @@ procedure ai_DefaultIdle(pu:PTUnit);
 begin
    with pu^ do
    begin
-      {uo_x:=mm3(1,uo_x,map_mw);
-      uo_y:=mm3(1,uo_y,map_mw);
+      {uo_x:=mm3i(1,uo_x,map_mw);
+      uo_y:=mm3i(1,uo_y,map_mw);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
       or(CheckRoyalBattleRadiusPoint(uo_x,uo_y,base_1r))
@@ -878,8 +878,8 @@ begin
        uo_y:=y-g_random(2);
     end
     else
-      if(min2(x,abs(map_mw-x))<srange)
-      or(min2(y,abs(map_mw-y))<srange)
+      if(min2i(x,abs(map_mw-x))<srange)
+      or(min2i(y,abs(map_mw-y))<srange)
       then ai_DefaultIdle(pu)
       else
       begin
@@ -1339,7 +1339,7 @@ begin
            if(ai_ischoosen)and(g_mode=gm_royale)then
            begin
               ai_RunTo(pu,u_royal_cd,map_hmw,map_hmw,base_1r,nil);
-              if(u_royal_cd<min2(g_royal_r div 7,base_2r))
+              if(u_royal_cd<min2i(g_royal_r div 7,base_2r))
               then unit_sability(pu,false);
            end
            else
@@ -1372,7 +1372,7 @@ begin
       end
       else
         if(u_royal_d<base_1r)
-        or((    ai_ischoosen)and(g_mode=gm_royale)and(u_royal_cd>=min2(g_royal_r div 7,base_2r)))
+        or((    ai_ischoosen)and(g_mode=gm_royale)and(u_royal_cd>=min2i(g_royal_r div 7,base_2r)))
         or((    ai_ischoosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_1r))
         or((    ai_ischoosen)and(aiu_FiledSquareNear>ai_FiledSquareBorder)and(g_generators=1)and(player^.n_builders<5))
         or((not ai_ischoosen)and(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<3))
@@ -1410,7 +1410,7 @@ gm_koth  : if(ai_ischoosen)and(base_1r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai
 gm_royale: if(ai_ischoosen)
            or(u_royal_d<base_2r)then
            begin
-              w:=min2(g_royal_r div 4,base_2r);
+              w:=min2i(g_royal_r div 4,base_2r);
               unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false);
               exit;
            end;
@@ -1520,7 +1520,7 @@ begin
       if(hits<=0)then exit;
 
       // correct Player's alarm
-      alarmr:=max2(200,srange);
+      alarmr:=max2i(200,srange);
       if(ai_enemy_d>srange)then ai_PlayerSetAlarm(player,x,y,0,alarmr,false,0);
       if(ai_enemy_d<NOTSET)then
         if(ai_enemy_d<=srange)

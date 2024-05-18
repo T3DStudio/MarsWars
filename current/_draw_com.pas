@@ -19,7 +19,7 @@ begin
       r_RECT^.y:=y;
       r_RECT^.w:=sur^.w;
       r_RECT^.h:=sur^.h;
-      SDL_BLITSURFACE(surf,nil,tar,r_RECT);
+      SDL_BLITSURFACE(sdlSurface,nil,tar,r_RECT);
    end;
 end;
 
@@ -118,6 +118,20 @@ begin
           else     y+=txt_line_h3;
           end;
        end;
+   end;
+end;
+
+function TileSetGetN(b10,b01,b11,b21,b12:boolean):byte;
+begin
+   if(b11)
+   then TileSetGetN:=0
+   else
+   begin
+      TileSetGetN:=1;
+      if(b10)then TileSetGetN+=1;
+      if(b01)then TileSetGetN+=2;
+      if(b21)then TileSetGetN+=4;
+      if(b12)then TileSetGetN+=8;
    end;
 end;
 
@@ -245,8 +259,8 @@ begin
    }
    ui_AddMarker:=false;
 
-   ax:=mm3(1,ax,map_mw);
-   ay:=mm3(1,ay,map_mw);
+   ax:=mm3i(1,ax,map_mw);
+   ay:=mm3i(1,ay,map_mw);
 
    mx:=trunc(ax*map_mmcx);
    my:=trunc(ay*map_mmcx);

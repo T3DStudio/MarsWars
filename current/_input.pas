@@ -86,7 +86,7 @@ end;
 procedure GameTogglePause;
 begin
    if(net_status=ns_client)
-   then net_send_pause
+   then net_send_byte(nmid_pause)
    else
      if(net_status=ns_server) then
        if(G_Status=gs_running)then
@@ -280,7 +280,7 @@ begin
     for i:=1 to MaxUnits do
      with g_punits[i]^ do
       if(hits>0)and(not IsUnitRange(transport,nil))and(CheckRType(player))then
-       if(CheckUnitTeamVision(tteam,g_punits[i],false))or(CheckUnitUIVision(g_punits[i]))then
+       if(CheckUnitTeamVision(tteam,g_punits[i],false))or(ui_CheckUnitCommonVision(g_punits[i],true))then
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            if(ukfly<fly)then continue;
@@ -330,8 +330,8 @@ begin
                   if(ks_ctrl<=0)then
                   begin
                      BuildingNewPlace(mouse_map_x,mouse_map_y,m_brush,PlayerClient,@m_brushx,@m_brushy);
-                     m_brushx:=mm3(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
-                     m_brushy:=mm3(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
+                     m_brushx:=mm3i(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
+                     m_brushy:=mm3i(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
                   end;
 
                   case CheckBuildPlace(m_brushx,m_brushy,0,0,PlayerClient,m_brush) of
@@ -380,8 +380,8 @@ begin
    SoundPlayUI(snd_click);
    case by of
    3 : case vid_PannelPos of   // tabs
-       0,1: begin mouse_x-=vid_panelx; if(mouse_y>vid_panelw)then ui_tab:=mm3(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
-       2,3: begin mouse_y-=vid_panely; if(mouse_x>vid_panelw)then ui_tab:=mm3(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
+       0,1: begin mouse_x-=vid_panelx; if(mouse_y>vid_panelw)then ui_tab:=mm3i(0,mouse_x div vid_tBW,3);mouse_x+=vid_panelx;end;
+       2,3: begin mouse_y-=vid_panely; if(mouse_x>vid_panelw)then ui_tab:=mm3i(0,mouse_y div vid_tBW,3);mouse_y+=vid_panely;end;
        end;
    else
      if(by=ui_menu_btnsy)then
@@ -539,7 +539,7 @@ SDLK_F3        : nullupgr(PlayerClient);
                    with g_units[ai_scout_u_cur] do GameCameraMoveToPoint(x,y); }
 SDLK_F4        : if(g_mode=gm_invasion)then
                    if(ks_ctrl>0)
-                   then PlayerKill(0,true)
+                   then PlayerKill(0)
                    else GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));
 SDLK_F5        : PlayerClient:=0;
 SDLK_F6        : PlayerClient:=1;
@@ -695,7 +695,7 @@ begin
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
       SDL_MOUSEMOTION    : begin
-                              if(m_vmove)and(menu_state=false)and(G_Started)then
+                              if(m_vmove)and(not menu_state)and(G_Started)then
                               begin
                                  vid_cam_x-=sys_EVENT^.motion.x-mouse_x;
                                  vid_cam_y-=sys_EVENT^.motion.y-mouse_y;

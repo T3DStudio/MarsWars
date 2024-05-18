@@ -49,20 +49,20 @@ end;
 
 procedure fog_RevealScreenCircle(x,y,r:integer);
 var iy,i:integer;
-procedure _sf(tx,ty:integer);
-begin if(0<=tx)and(0<=ty)and(tx<=vid_fog_vfw)and(ty<=vid_fog_vfh)then vid_fog_grid[tx,ty]:=2;end;
+procedure SetFog(tx,ty:integer);
+begin if(0<=tx)and(0<=ty)and(tx<=vid_fog_vfw)and(ty<=vid_fog_vfh)then vid_fog_grid[tx,ty]:=true;end;
 begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
    for i:=0 to r do
     for iy:=0 to _RX2Y[r,i] do
     begin
-       _sf(x-i,y-iy);
-       _sf(x-i,y+iy);
+       SetFog(x-i,y-iy);
+       SetFog(x-i,y+iy);
        if(i>0)then
        begin
-          _sf(x+i,y-iy);
-          _sf(x+i,y+iy);
+          SetFog(x+i,y-iy);
+          SetFog(x+i,y+iy);
        end;
     end;
 end;
@@ -82,40 +82,40 @@ begin
    end;
 end;
 
-function UnitVisionRange(pu:PTUnit):byte;
+function UnitCheckVisionType(pu:PTUnit):byte;
 begin
-   UnitVisionRange:=0;
-   if(CheckUnitUIVision(pu))
-   then UnitVisionRange:=2
+   UnitCheckVisionType:=0;
+   if(ui_CheckUnitCommonVision(pu,false))
+   then UnitCheckVisionType:=2
    else
      with pu^ do
       if(CheckUnitTeamVision(g_players[UIPlayer].team,pu,false))then
        if(player^.team=g_players[UIPlayer].team)
-       then UnitVisionRange:=2
-       else UnitVisionRange:=1;
+       then UnitCheckVisionType:=2
+       else UnitCheckVisionType:=1;
 end;
 
 function unit_FogReveal(pu:PTUnit):boolean;
 begin
    unit_FogReveal:=false;
-   with pu^     do
-   with uid^    do
-   with player^ do
-    if(sys_fog=false)
-    then unit_FogReveal:=true
-    else
-      case UnitVisionRange(pu) of
-    1:begin
-         if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
-         unit_FogReveal:=true;
-      end;
-    2:begin
-         if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
-         unit_FogReveal:=true;
-         if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_cw)-vid_fog_sx,
-                                                                                          (ua_y div fog_cw)-vid_fog_sy,fsr);
-      end;
-      end;
+   if(not sys_fog)
+   then unit_FogReveal:=true
+   else
+     with pu^     do
+     with uid^    do
+     with player^ do
+       case UnitCheckVisionType(pu) of
+     1:begin
+          if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
+          unit_FogReveal:=true;
+       end;
+     2:begin
+          if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
+          unit_FogReveal:=true;
+          if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_cw)-vid_fog_sx,
+                                                                                           (ua_y div fog_cw)-vid_fog_sy,fsr);
+       end;
+       end;
 end;
 
 
@@ -235,7 +235,7 @@ begin
       end
       else
       begin
-         t:=min2(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
+         t:=min2i(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
          if(t>0)then
          begin
             if(ui_bprod_ucl_time[_ucl]<=0)
@@ -271,8 +271,8 @@ begin
 
    with _eids[eid] do
     if(smodel<>nil)then
-     if(smodel^.sn>0)then
-      EID2Spr:=@smodel^.sl[0];
+     if(smodel^.sm_listn>0)then
+      EID2Spr:=@smodel^.sm_list[0];
 end;
 
 procedure unit_UpdateStatusStrings(pu:PTUnit);
@@ -397,7 +397,7 @@ begin
           if(unit_canMove(pu))then
            wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
 
-         spr:=_unit2spr(pu);
+         spr:=sm_unit2MWTexture(pu);
 
          if(spr=pspr_dummy)then exit;
 
@@ -426,11 +426,11 @@ begin
 
             if(un_eid_summon_spr[level]<>nil)then
              if(buff[ub_Summoned]>0)then
-              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3(0,buff[ub_Summoned]*4,255));
+              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buff[ub_Summoned]*4,255));
 
             if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
-              if(sn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
+              if(sm_listn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sm_list[(G_Step div 4) mod cardinal(sm_listn)],255);
 
             if(_ukbuilding)then
              if(iscomplete)then
@@ -496,13 +496,13 @@ begin
    with player^ do
     if(hits>fdead_hits)then
     begin
-       spr:=_unit2spr(pu);
+       spr:=sm_unit2MWTexture(pu);
 
        if(spr=pspr_dummy)then exit;
 
        if(unit_FogReveal(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits) div 4,255),0,0);
+         SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits) div 4,255),0,0);
     end;
 end;
 

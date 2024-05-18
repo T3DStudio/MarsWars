@@ -722,7 +722,7 @@ begin
    str_exit[true]        := 'BACK';
    str_map_type          := 'Type: ';
    str_map_typel[mapt_steppe] := tc_gray  +'Steppe';
-   str_map_typel[mapt_nature] := tc_green +'Cave';
+   str_map_typel[mapt_cave  ] := tc_green +'Cave';
    str_map_typel[mapt_lake  ] := tc_yellow+'Lake';
    str_map_typel[mapt_shore ] := tc_orange+'Sea shore';
    str_map_typel[mapt_sea   ] := tc_red   +'Sea';
@@ -765,7 +765,9 @@ begin
    str_svld_errors_wver  := 'Wrong version!';
    str_time              := 'Time: ';
    str_menu              := 'Menu';
-   str_player_def        := ' was terminated!';
+   str_player_def        := ' was terminated';
+   str_plout             := ' left the game';
+   str_plsurrender       := ' gives up';
    str_inv_time          := 'Wave #';
    str_inv_ml            := 'Monsters limit: ';
    str_play              := 'Play';
@@ -782,7 +784,6 @@ begin
    str_chat_allies       := 'ALLIES:';
    str_randoms           := 'Make Random Skirmish';
    str_apply             := 'apply';
-   str_plout             := ' left the game';
    str_aislots           := 'Fill empty slots';
    str_resol_width       := 'Resolution (width)';
    str_resol_height      := 'Resolution (height)';
@@ -1321,7 +1322,7 @@ begin
   str_exit[true]        := 'НАЗАД';
   str_map_type          := 'Тип: ';
   str_map_typel[mapt_steppe] := tc_gray  +'Степь';
-  str_map_typel[mapt_nature] := tc_green +'Пещера';
+  str_map_typel[mapt_cave] := tc_green +'Пещера';
   str_map_typel[mapt_lake  ] := tc_yellow+'Озеро';
   str_map_typel[mapt_shore ] := tc_orange+'Берег моря';
   str_map_typel[mapt_sea   ] := tc_red   +'Море';
@@ -1360,7 +1361,9 @@ begin
   str_svld_errors_wver  := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
   str_menu              := 'Меню';
-  str_player_def        := ' уничтожен!';
+  str_player_def        := ' уничтожен';
+  str_plout             := ' покинул игру';
+  str_plsurrender       := ' сдается';
   str_inv_time          := 'Волна #';
   str_inv_ml            := 'Армия монстров: ';
   str_play              := 'Проиграть';
@@ -1377,7 +1380,6 @@ begin
   str_chat_allies       := 'СОЮЗНИКИ:';
   str_randoms           := 'Случайная битва';
   str_apply             := 'применить';
-  str_plout             := ' покинул игру';
   str_aislots           := 'Заполнить пустые слоты';
   str_resol_width       := 'Разрешение (ширина)';
   str_resol_height      := 'Разрешение (высота)';
@@ -1849,7 +1851,7 @@ begin
           then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+_i2s(2))
           else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+_i2s(2));
 
-        if(not _ukbuilding)and(not _ukmech)and(_painc>0)and(_urace=r_hell)then
+        if(not _ukbuilding)and(not _ukmech)and(_painc>0)and(_painc_upgr_step>0)then
         upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
 
         if(_ukbuilding)and(not _isbarrack)and(_ability<>uab_Teleport)then

@@ -117,10 +117,10 @@ begin
    begin
       with g_uids[m_brush] do
       begin
-         spr:=_uid2spr(m_brush,270,0);
-         SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
-         draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
-         SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+         spr:=sm_uid2MWTexture(m_brush,270,0);
+         SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA,128);
+         draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.sdlSurface);
+         SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
          circleColor(tar,m_brushx,m_brushy,_r,m_brushc);
 
@@ -164,20 +164,20 @@ mb_psability:
 uab_UACStrike     : if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
 uab_UACScan       : circleColor(tar,mouse_x,mouse_y,g_units[uid_x[i]].srange,c_gray);
 uab_RebuildInPoint: begin
-                    spr:=_uid2spr(_rebuild_uid,270,0);
-                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
-                    draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
-                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+                    spr:=sm_uid2MWTexture(_rebuild_uid,270,0);
+                    SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA,128);
+                    draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.sdlSurface);
+                    SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
                     circleColor(tar,m_brushx,m_brushy,g_uids[_rebuild_uid]._r,c_gray);
                     end;
 uab_HTowerBlink,
 uab_HKeepBlink,
 uab_CCFly         : begin
-                    spr:=_uid2spr(i,270,0);
-                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
-                    draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
-                    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+                    spr:=sm_uid2MWTexture(i,270,0);
+                    SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA,128);
+                    draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.sdlSurface);
+                    SDL_SetAlpha(spr^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
                     circleColor(tar,m_brushx,m_brushy,_r,c_gray);
                     end;
@@ -213,7 +213,7 @@ begin
             if(n>0)then y+=vid_oisw;
             x:=ui_oicox-vid_oips;
          end;
-         with g_uids[c] do draw_surf(tar,x,y,un_sbtn.surf);
+         with g_uids[c] do draw_surf(tar,x,y,un_sbtn.sdlSurface);
 
          x-=vid_oisw;
          n+=1;
@@ -405,7 +405,7 @@ begin
 
             req:=_uid_conditionals(PVisPlayer,uid);
 
-            _drawBtn (tar,ux,uy,un_btn.surf,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
+            _drawBtn (tar,ux,uy,un_btn.sdlSurface,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
             _drawBtnt(tar,ux,uy,
 
             i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),
@@ -433,7 +433,7 @@ begin
             //(uprodu[uid]>=ui_uprod_uid_max[uid])
             req:=_uid_conditionals(PVisPlayer,uid);
 
-            _drawBtn (tar,ux,uy,un_btn.surf,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
+            _drawBtn (tar,ux,uy,un_btn.sdlSurface,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
             _drawBtnt(tar,ux,uy,
             ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_InTransport[uid]),
             ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
@@ -451,7 +451,7 @@ begin
          ux:=(ucl mod 3);
          uy:=(ucl div 3);
 
-         _drawBtn(tar,ux,uy,g_upids[uid]._up_btn.surf,ui_pprod_time[uid]>0,
+         _drawBtn(tar,ux,uy,g_upids[uid]._up_btn.sdlSurface,ui_pprod_time[uid]>0,
          (_upid_conditionals(PVisPlayer,uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]) );
 
          _drawBtnt(tar,ux,uy,
@@ -696,8 +696,8 @@ begin
    if(ingame_chat>0)or(rpls_showlog)then
    begin
       if(net_status=ns_client)
-      then MakeLogListForDraw(PlayerClient ,ui_ingamecl,ui_game_log_height,lmts_menu_chat)
-      else MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_game_log_height,lmts_menu_chat);
+      then MakeLogListForDraw(PlayerClient ,ui_ingamecl,ui_GameLogHeight,lmts_menu_chat)
+      else MakeLogListForDraw(UIPlayer,ui_ingamecl,ui_GameLogHeight,lmts_menu_chat);
       if(ui_log_n>0)then
        for i:=0 to ui_log_n-1 do
         if(ui_log_c[i]>0)then draw_text(tar,ui_textx,ui_logy-font_3hw*i,ui_log_s[i],ta_left,255,ui_log_c[i]);

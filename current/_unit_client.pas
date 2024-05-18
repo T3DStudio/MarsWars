@@ -77,7 +77,7 @@ begin
 
        if(log_n>clog_n^)then
        begin
-          s:=min3(log_n,log_n-clog_n^,MaxPlayerLog);
+          s:=min3i(log_n,log_n-clog_n^,MaxPlayerLog);
           i:=log_i;
           clog_n^:=log_n;
 
@@ -159,7 +159,7 @@ function wudata_reload(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
    then wudata_reload:=0
-   else wudata_reload:=mm3(1,(r^ div fr_fps1)+1,255);
+   else wudata_reload:=mm3i(1,(r^ div fr_fps1)+1,255);
    wudata_byte(wudata_reload,rpl);
 end;
 
@@ -423,7 +423,7 @@ gm_royale   : wudata_int (g_royal_r        ,rpl);
    if(g_player_astatus>0)then
    begin
       wudata_byte(_PNU,rpl);
-      _PNU:=min2(g_cl_units,_PNU*4);
+      _PNU:=min2i(g_cl_units,_PNU*4);
 
       if(wstepb0)then
       begin
@@ -629,7 +629,7 @@ begin
         unit_reveal     (uu,true);
         vx:=x;
         vy:=y;
-        vis:=CheckUnitUIVisionScreen(uu);
+        vis:=ui_CheckUnitCommonVision(uu,true);
 
         if(IsUnitRange(transport,@tu))then
         begin
@@ -667,7 +667,7 @@ begin
 
           vx:=x;
           vy:=y;
-          vis:=CheckUnitUIVisionScreen(uu);
+          vis:=ui_CheckUnitCommonVision(uu,true);
 
           if(pu^.hits>0)and(vis)then
           begin
@@ -676,7 +676,7 @@ begin
                 if(buff[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
-                  if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+                  if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                 effect_UnitDeath(uu,true,@vis);
              end;
           end;
@@ -698,7 +698,7 @@ begin
                missiles_clear_tar(unum,true);
                unit_clear_a_tar(unum);
             end;
-            vis:=CheckUnitUIVisionScreen(uu);
+            vis:=ui_CheckUnitCommonVision(uu,true);
 
             unit_Bonuses(pu);
             unit_PC_client_dec(pu);
@@ -754,7 +754,7 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buff[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
-                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
@@ -1126,11 +1126,11 @@ begin
          case bp of
          0: begin
                bv:=rudata_byte(rpl,0);
-               upgr[n]:=min2(_up_max,bv and %00001111);
+               upgr[n]:=min2i(_up_max,bv and %00001111);
                bp:=1;
             end;
          1: begin
-               upgr[n]:=min2(_up_max,bv shr 4);
+               upgr[n]:=min2i(_up_max,bv shr 4);
                bp:=0;
             end;
          end;

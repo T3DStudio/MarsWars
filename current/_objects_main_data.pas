@@ -16,7 +16,7 @@ procedure unit_CalcFogR(pu:PTUnit);
 begin
    with pu^ do
    begin
-      fsr :=mm3(0,srange div fog_cw,MFogM);
+      fsr :=mm3i(0,srange div fog_cw,MFogM);
       //mmsr:=trunc(srange*map_mmcx)+2;
    end;
 end;
@@ -1380,7 +1380,7 @@ end;
       begin
          _zombie_hits:=_mhits div 4;
          _ukmech     :=true;
-         _srange:=max2(_srange_min,_srange);
+         _srange:=max2i(_srange_min,_srange);
       end;
 
       if(_limituse>=MinUnitLimit)then

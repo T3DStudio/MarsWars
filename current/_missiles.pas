@@ -286,7 +286,7 @@ begin
 
              if(not fake)then
              begin
-                rdamage:=mm3(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
+                rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
                 unit_damage(tu,rdamage,painX,player,false);
              end;
           end;
@@ -312,7 +312,7 @@ begin
         else
           if(tu^.x<>tu^.vx)
           or(tu^.y<>tu^.vy)
-          or(max2(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
+          or(max2i(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
             case homing of
 mh_magnetic : begin
                  x  +=sign(tu^.x-x)*3;
