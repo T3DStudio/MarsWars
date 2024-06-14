@@ -19,7 +19,7 @@ end;
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
- doodads_sprites(noanim);
+ //doodads_sprites(noanim);
     unit_sprites(noanim);
  effects_sprites(noanim,r_draw);
 missiles_sprites(r_draw);
@@ -34,6 +34,7 @@ begin
 
    D_terrain   (r_screen,vid_mapx,vid_mapy);
    D_SpriteList(r_screen,vid_mapx,vid_mapy);
+   if(sys_fog)then
    D_Fog       (r_screen,vid_mapx,vid_mapy);
    D_UnitsInfo (r_screen,vid_mapx,vid_mapy);
    D_ui        (r_screen,vid_mapx,vid_mapy,UIPlayer);
@@ -52,11 +53,12 @@ begin
    x:=menu_x+2;
    y:=menu_y+2;
    lineN:=8;
+   boxColor(r_screen,menu_x,menu_y,menu_x+800,menu_y+600,c_white);
    for tileX:=0 to MaxTileSet do
    begin
       draw_surf(r_screen,x,y,tileSet^[tileX].sdlSurface);
 
-      //draw_text(r_screen,x,y,w2s(tileX),ta_left,255,c_white);
+      draw_text(r_screen,x,y,w2s(tileX),ta_left,255,c_white);
       x+=tileSet^[tileX].w+2;
 
       lineN-=1;
@@ -68,19 +70,52 @@ begin
       end;
    end;
 
-   draw_surf(r_screen,x,y,vid_fog_BaseSurf);
+   //draw_surf(r_screen,x,y,vid_fog_BaseSurf);
 end;
 
 procedure DrawGame;
-var i,n:integer;
+var i,n,y:integer;
 begin
    sdl_FillRect(r_screen,nil,0);
 
-   if(menu_state)
+   {if(menu_state)
    then d_Menu
-   else d_Game;
+   else d_Game; }
 
    //_drawMWSModel(@spr_HCommandCenter);
+
+   {i:=10;
+   draw_surf(r_screen,i,i,theme_tile_terrain);
+   rectangleColor(r_screen,i,i,i+terrrain_cellw,i+terrrain_cellw,c_red);
+
+   i+=terrrain_cellw+10;
+   draw_surf(r_screen,i,i,theme_tile_crater);
+   rectangleColor(r_screen,i,i,i+terrrain_cellw,i+terrrain_cellw,c_red);
+
+   i+=terrrain_cellw+10;
+   draw_surf(r_screen,i,i,theme_tile_liquid);
+   rectangleColor(r_screen,i,i,i+terrrain_cellw,i+terrrain_cellw,c_red);
+
+   if(ks_ctrl=0)then
+   draw_DebugTileSet(@theme_tileset_liquid[ (SDL_GetTicks div 250) mod theme_anim_step_n ]);   }
+
+
+   {n:=0;
+   y:=0;
+   if(theme_all_terrain_n>0)then
+     for i:=0 to theme_all_terrain_n-1 do
+     begin
+        draw_surf(r_screen,n,y,theme_all_terrain_l[i].sdlSurface);
+        boxColor (r_screen,n,y,n+16,y+16,theme_all_terrain_mmcolor[i]);
+        draw_text(r_screen,n,y+16,i2s(i),ta_left,255,c_white);
+
+        n+=theme_all_terrain_l[i].w;
+        if((n+theme_all_terrain_l[i].w)>=vid_vw)then
+        begin
+           n:=0;
+           y+=128;
+        end;
+     end;}
 
    if(test_mode>1)then
    begin

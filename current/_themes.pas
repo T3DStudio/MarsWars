@@ -1,88 +1,89 @@
 
-function MakeReflectedSurface(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
+
+function MakeReflectedSurface(sourceSurface:PSDL_Surface;xa,ya,transparent:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
-   MakeReflectedSurface:=gfx_SDLSurfaceCreate(s^.w,s^.h);
-   for x:=1 to s^.w do
-    for y:=1 to s^.h do
+   MakeReflectedSurface:=gfx_SDLSurfaceCreate(sourceSurface^.w,sourceSurface^.h);
+   for x:=1 to sourceSurface^.w do
+    for y:=1 to sourceSurface^.h do
     begin
-       if(xa)then sx:=s^.w-x else sx:=x-1;
-       if(ya)then sy:=s^.h-y else sy:=y-1;
-       c:=SDL_GETpixel(s,x-1,y-1);
+       if(xa)then sx:=sourceSurface^.w-x else sx:=x-1;
+       if(ya)then sy:=sourceSurface^.h-y else sy:=y-1;
+       c:=SDL_GETpixel(sourceSurface,x-1,y-1);
 
        SDL_SETpixel(MakeReflectedSurface,sx,sy,c);
     end;
-   if(trans)then SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(MakeReflectedSurface,0,0));
+   if(transparent)then SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(MakeReflectedSurface,0,0));
 end;
 
-procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
+procedure LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;addReflected:boolean);
 var t:TMWTexture;
     i:integer;
-procedure next;begin it^+=1;setlength(l^,it^);l^[it^-1]:=t;end;
+procedure next;begin MWTextureList_n^+=1;setlength(MWTextureList^,MWTextureList_n^);MWTextureList^[MWTextureList_n^-1]:=t;end;
 begin
-   it^ :=0;
-   i   :=0;
+   MWTextureList_n^:=0;
+   i:=0;
    while true do
    begin
       with t do
       begin
-         sdlSurface:=gfx_SDLSurfaceLoad(str+i2s(i),false,false);
+         sdlSurface:=gfx_SDLSurfaceLoad(fname+i2s(i),false,false);
          if(sdlSurface=r_empty)then break;
-         w   :=sdlSurface^.w;
-         h   :=sdlSurface^.h;
-         hw  :=sdlSurface^.w div 2;
-         hh  :=sdlSurface^.h div 2;
+         w :=sdlSurface^.w;
+         h :=sdlSurface^.h;
+         hw:=sdlSurface^.w div 2;
+         hh:=sdlSurface^.h div 2;
       end;
       next;
 
-      with t do
+      if(addReflected)then
       begin
-         sdlSurface:=MakeReflectedSurface(sdlSurface,true,false,false);
+         with t do sdlSurface:=MakeReflectedSurface(sdlSurface,true,false,false);
+         next;
       end;
-      next;
 
       i+=1;
    end;
 
-   if(it^=0)then
+   if(MWTextureList_n^=0)then
    begin
       t:=spr_dummy;
       next;
    end;
 end;
 
-procedure IntListAdd(_il:PTIntList;_iln:pinteger;k:integer);
+procedure IntListAdd(intList:PTIntList;intListN:pinteger;value:integer);
 begin
-   _iln^+=1;
-   setlength(_il^,_iln^);
-   _il^[_iln^-1]:=k;
+   intListN^+=1;
+   setlength(intList^,intListN^);
+   intList^[intListN^-1]:=value;
 end;
 
-procedure Str2IntList(s:shortstring;_il:PTIntList;_iln:pinteger);
+procedure Str2IntList(intString:shortstring;intList:PTIntList;intListN:pinteger);
 var p,l:integer;
     v,u:shortstring;
 begin
-   _iln^:=0;
-   setlength(_il^,_iln^);
+   intListN^:=0;
+   setlength(intList^,intListN^);
 
-   l:=length(s);
-   while (l>0) do
+   l:=length(intString);
+   while(l>0)do
    begin
       v:='';
-      p:=pos(',',s);
+      p:=pos(',',intString);
       if(p>0)then
       begin
-         v:=copy(s,1,p-1);
-         delete(s,1,p);
+         v:=copy(intString,1,p-1);
+         delete(intString,1,p);
       end
       else
       begin
-         v:=s;
-         delete(s,1,l);
+         v:=intString;
+         delete(intString,1,l);
       end;
 
-      while (true) do
+      while true do
       begin
          p:=pos(' ',v);
          if(p=0)
@@ -103,17 +104,17 @@ begin
                l:=s2i(v);
                while (true) do
                begin
-                  IntListAdd(_il,_iln,p);
+                  IntListAdd(intList,intListN,p);
                   if(p=l)
                   then break
                   else p+=sign(l-p);
                end;
             end;
          end
-         else IntListAdd(_il,_iln,s2i(v));
+         else IntListAdd(intList,intListN,s2i(v));
       end;
 
-      l:=length(s);
+      l:=length(intString);
    end;
 end;
 
@@ -125,30 +126,32 @@ begin
     else SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0  ,0));
 end;
 
-procedure ThemeSetTransparent(l:PTUSpriteList;it:pinteger;str:shortstring);
+procedure ThemeSetTransparent(SpriteList:pTMWTextureList;SpriteListN:integer;intString:shortstring);
 var i,o,
- _iln:integer;
- _il :TIntList;
+intListN:integer;
+intList :TIntList;
 begin
-   if(str<>'all')then
+   if(intString<>'all')then
    begin
-      Str2IntList(str,@_il,@_iln);
+      Str2IntList(intString,@intList,@intListN);
 
-      for i:=1 to _iln do
-      begin
-         o:=_il[i-1]*2;
-         if(o<it^)then
-         begin
-            gfx_MWTextureSetTransparent( @(l^[o  ]), ( o    mod 2)=1);
-            gfx_MWTextureSetTransparent( @(l^[o+1]), ((o+1) mod 2)=1);
-         end;
-      end;
+      if(intListN>0)then
+        for i:=0 to intListN-1 do
+        begin
+           o:=intList[i]*2;
+           if(o<SpriteListN)then
+           begin
+              gfx_MWTextureSetTransparent( @(SpriteList^[o  ]), ( o    mod 2)=1);
+              gfx_MWTextureSetTransparent( @(SpriteList^[o+1]), ((o+1) mod 2)=1);
+           end;
+        end;
    end
    else
-    for o:=1 to it^ do gfx_MWTextureSetTransparent( @(l^[o-1]), ((o-1) mod 2)=1 );
+     if(SpriteListN>0)then
+       for o:=0 to SpriteListN-1 do gfx_MWTextureSetTransparent( @(SpriteList^[o]), (o mod 2)=1 );
 end;
 
-procedure DecAnim(l:PTThemeAnimL;it:pinteger;str:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
+{procedure DecAnim(l:PTThemeAnimL;it:pinteger;str:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
 var i,o,
  _iln:integer;
  _il :TIntList;
@@ -197,30 +200,31 @@ procedure LiquidAnims(i:integer;r,g,b:byte;atp,animt:byte);
 begin
    liqAnim(i*2  ,r,g,b,atp,animt);
    liqAnim(i*2+1,r,g,b,atp,animt);
-end;
+end;  }
 
 procedure InitThemes;
 var o:integer;
 begin
    // load graph
-   LPTUSpriteL(@theme_spr_decals  , str_f_map+'decals\adt'      , @theme_spr_decaln  );
-   LPTUSpriteL(@theme_spr_decors  , str_f_map+'decors\dec_'     , @theme_spr_decorn  );
-   LPTUSpriteL(@theme_spr_srocks  , str_f_map+'srocks\rocks'    , @theme_spr_srockn  );
-   LPTUSpriteL(@theme_spr_brocks  , str_f_map+'brocks\rockb'    , @theme_spr_brockn  );
-   LPTUSpriteL(@theme_spr_liquids , str_f_map+'liquids\liquid_' , @theme_spr_liquidn );
-   LPTUSpriteL(@theme_spr_terrains, str_f_map+'terrains\ter'    , @theme_spr_terrainn);
+   LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,str_f_map+'decals\adt'  ,true );
+   LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,str_f_map+'decors\dec_' ,true );
+   LoadTMWTextureList(@theme_all_srock_l  ,@theme_all_srock_n  ,str_f_map+'srocks\rocks',true );
+   LoadTMWTextureList(@theme_all_brock_l  ,@theme_all_brock_n  ,str_f_map+'brocks\rockb',true );
+   LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,str_f_map+'terrains\ter',false);
 
    // transparent
-   ThemeSetTransparent(@theme_spr_decals,@theme_spr_decaln,'0_20,23_34');
-   ThemeSetTransparent(@theme_spr_decors,@theme_spr_decorn,'all');
-   ThemeSetTransparent(@theme_spr_srocks,@theme_spr_srockn,'all');
-   ThemeSetTransparent(@theme_spr_brocks,@theme_spr_brockn,'all');
 
+   ThemeSetTransparent(@theme_all_decal_l,theme_all_decal_n,'0_20,23_34');
+   ThemeSetTransparent(@theme_all_decor_l,theme_all_decor_n,'all');
+   ThemeSetTransparent(@theme_all_srock_l,theme_all_srock_n,'all');
+   ThemeSetTransparent(@theme_all_brock_l,theme_all_brock_n,'all');
+   {
    // animation and effects
    setlength(theme_anm_decors  ,theme_spr_decorn  );
    setlength(theme_anm_srocks  ,theme_spr_srockn  );
    setlength(theme_anm_brocks  ,theme_spr_brockn  );
 
+   // shadow
    for o:=1 to theme_spr_decorn do begin FillChar(theme_anm_decors[o-1],SizeOf(theme_anm_decors[o-1]),0);with theme_anm_decors[o-1] do begin sh:=1;               end;end;
    for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);with theme_anm_srocks[o-1] do begin depth:=0;sh:=-32000; end;end;
    for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);with theme_anm_brocks[o-1] do begin depth:=0;sh:=-32000; end;end;
@@ -331,71 +335,94 @@ begin
    LiquidAnims(13, 200, 82 , 0    , 0, 15);  // blood orange water
    LiquidAnims(14, 0  , 128, 192  , 0, 10);  // duke3d water
    LiquidAnims(15, 100, 180, 100  , 0, 10);  // duke3d slime
-   LiquidAnims(16, 100, 100, 100  , 2, 10);  // doom pl2 ice
+   LiquidAnims(16, 100, 100, 100  , 2, 10);  // doom pl2 ice  }
+
+   setlength(theme_all_terrain_mmcolor,theme_all_terrain_n);
+   if(theme_all_terrain_n>0)then
+     for o:=0 to theme_all_terrain_n-1 do
+      theme_all_terrain_mmcolor[o]:=gfx_SDLSurfaceGetColor(theme_all_terrain_l[o].sdlSurface);
 end;
 
-procedure SetThemeList(lst:PTIntList;lstn,smax:pinteger;str:shortstring);
+
+procedure SetThemeList(intList:PTIntList;intListN:pinteger;smax:integer;addReflected:boolean;intString:shortstring);
 var i,o,
  _iln:integer;
  _il :TIntList;
 begin
-   Str2IntList(str,@_il,@_iln);
+   Str2IntList(intString,@_il,@_iln);
 
-   lstn^:=0;
-   setlength(lst^,lstn^);
+   intListN^:=0;
+   setlength(intList^,intListN^);
 
    for i:=1 to _iln do
    begin
       o:=_il[i-1];
       if(o>=0)then
       begin
-         o:=o*2;
-         if(o<smax^)then
+         if(addReflected)then
          begin
-            IntListAdd(lst,lstn,o  );
-            IntListAdd(lst,lstn,o+1);
-         end;
+            o:=o*2;
+            if(o<smax)then
+            begin
+               IntListAdd(intList,intListN,o  );
+               IntListAdd(intList,intListN,o+1);
+            end;
+         end
+         else
+           if(o<smax)then IntListAdd(intList,intListN,o);
       end
-      else IntListAdd(lst,lstn,o);
+      else IntListAdd(intList,intListN,o);
    end;
 end;
 
 {
-theme_decors,
-theme_srocks,
-theme_brocks,
-theme_craters,
-theme_liquids,
-theme_bliquids,
-theme_terrains    : TIntList;
+theme_cur_decal_l,
+theme_cur_decor_l,
+theme_cur_srock_l,
+theme_cur_brock_l,
+theme_cur_crater_l,
+theme_cur_liquid_l,
+theme_cur_terrain_l   : TIntList;
+theme_cur_decal_n,
+theme_cur_decor_n,
+theme_cur_srock_n,
+theme_cur_brock_n,
+theme_cur_crater_n,
+theme_cur_liquid_n,
+theme_cur_terrain_n   : integer;
+
+theme_tile_terrain_id,
+theme_tile_crater_id,
+theme_tile_liquid_id
 }
 
-procedure SetTheme(i,ter,liq,bliq,crt:integer);
-procedure SetTLBlC;
+procedure SetTerrainIDs(new_terrain,new_crater,new_liquid:integer);
+var t:integer;
 begin
-   if(theme_terrainn<=0)then theme_map_trt :=-1 else begin if(ter <0)then theme_map_trt :=abs(ter  mod theme_terrainn) else theme_map_trt :=min2i(theme_terrainn-1,ter ); theme_map_trt :=theme_terrains[theme_map_trt  ];end;
-   if(theme_bliquidn<=0)then theme_map_blqt:=-1 else begin if(bliq<0)then theme_map_blqt:=abs(bliq mod theme_bliquidn) else theme_map_blqt:=min2i(theme_bliquidn-1,bliq); theme_map_blqt:=theme_bliquids[theme_map_blqt ];end;
-   if(theme_cratern <=0)then theme_map_crt :=-1 else begin if(crt <0)then theme_map_crt :=abs(crt  mod theme_cratern ) else theme_map_crt :=min2i(theme_cratern -1,crt ); theme_map_crt :=theme_craters [theme_map_crt  ];end;
-   if(theme_liquidn <=0)then theme_map_lqt :=-1 else begin if(liq <0)then theme_map_lqt :=abs(liq  mod theme_liquidn ) else theme_map_lqt :=min2i(theme_liquidn -1,liq ); theme_map_lqt :=theme_liquids [theme_map_lqt  ];end;
+   if(theme_cur_terrain_n<=0)then theme_tile_terrain_id:=-1 else begin if(new_terrain<0)then t:=abs(new_terrain) mod theme_cur_terrain_n else t:=min2i(theme_cur_terrain_n-1,new_terrain);theme_tile_terrain_id:=theme_cur_terrain_l[t];end;
+   if(theme_cur_crater_n <=0)then theme_tile_crater_id :=-1 else begin if(new_crater <0)then t:=abs(new_crater ) mod theme_cur_crater_n  else t:=min2i(theme_cur_crater_n -1,new_crater );theme_tile_crater_id :=theme_cur_crater_l [t];end;
+   if(theme_cur_liquid_n <=0)then theme_tile_liquid_id :=-1 else begin if(new_liquid <0)then t:=abs(new_liquid ) mod theme_cur_liquid_n  else t:=min2i(theme_cur_liquid_n -1,new_liquid );theme_tile_liquid_id :=theme_cur_liquid_l [t];end;
 end;
-begin
-   if(i<0)or(i>=theme_n)then i:=abs(i) mod theme_n;
-   theme_i:=i;
-   case i of
-   0: begin  // TECH BASE
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_3,21,22,26,27,29,31,32');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'17,18'      );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'19,26'      );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'17,18,19,26');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_2,6,13_15');
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'13_19'      );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'9_12'       );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'19,22_27,29_32,35,37_41,52_53');
 
-         theme_liquid_style:=1;
-         theme_crater_style:=2;
+procedure SetTheme(new_theme:integer);
+begin
+   if(new_theme<0)or(new_theme>=theme_n)then new_theme:=abs(new_theme) mod theme_n;
+   theme_cur:=new_theme;
+   case theme_cur of
+   0: begin  // TECH BASE
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'0,2,7,9,'           );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'0,7,8,11,67'                   );
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,48,55,71,72'             );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'-1_-4,1_3,21,22,26,27,29,31,32');
+         SetThemeList(@theme_cur_srock_l  ,@theme_cur_srock_n  ,theme_all_srock_n  ,true ,'0'                         );
+         SetThemeList(@theme_cur_brock_l  ,@theme_cur_brock_n  ,theme_all_brock_n  ,true ,'0'                          );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'0' );
+
+         theme_crater_tes:=tes_tech;
+         //theme_liquid_style:=1;
+         //theme_crater_style:=2;
       end;
-   1: begin  // TECH BLUE BASE
+   {1: begin  // TECH BLUE BASE
          SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_3,21,22,26,27,29,31,32');
          SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'19'         );
          SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'17,18,26'   );
@@ -488,9 +515,8 @@ begin
 
          theme_liquid_style:=0;
          theme_crater_style:=0;
-      end;
+      end; }
    end;
-   SetTLBlC;
 end;
 
 

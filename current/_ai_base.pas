@@ -361,10 +361,11 @@ begin
        end;
 end;
 
+
 procedure ai_CollectDoodadsSquare(square:plongint;tx,ty,tr:integer);
 var dx,dy,u,dist,dm:integer;
 begin
-   dx:=tx div dcw;
+   {dx:=tx div dcw;
    dy:=ty div dcw;
 
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
@@ -381,7 +382,7 @@ begin
              if(dist<=0)
              then square^+=DID_Square[t]
              else square^+=DID_Square[t]-round(DID_Square[t]*(dist/dm));
-        end;
+        end; }
 end;
 
 procedure aiu_InitVars(pu:PTUnit);

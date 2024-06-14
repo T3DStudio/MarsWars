@@ -3,17 +3,17 @@ procedure effect_InitCLData;
 var x:byte;
 procedure setEID(sm:PTMWSModel;sms:byte);
 begin
-   with _eids[x] do
+   with g_eids[x] do
    begin
       smodel      :=sm;
       anim_smstate:=sms;
    end;
 end;
 begin
-   FillChar(_eids,SizeOf(_eids),0);
+   FillChar(g_eids,SizeOf(g_eids),0);
 
    for x:=0 to 255 do
-   with _eids[x] do
+   with g_eids[x] do
    begin
       anim_smstate:=sms_death;
       smodel:=spr_pdmodel;
@@ -104,13 +104,13 @@ procedure setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
 var sc:integer;
     sm:PTMWSModel;
 begin
-   with _effects[e] do
+   with g_effects[e] do
    begin
       x :=ex;
       y :=ey;
       d :=ed;
       z :=az;
-      sm:=_eids[ee].smodel;
+      sm:=g_eids[ee].smodel;
 
       anim_last_i_t:= it;
       anim_step    := ans;
@@ -139,10 +139,10 @@ begin
    end;
 end;
 begin
-   if(menu_state)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
+   if(menu_state)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
 
-   for e:=1 to vid_mvs do
-   with _effects[e] do
+   for e:=1 to vid_MaxScreenSprites do
+   with g_effects[e] do
    if(anim_last_i_t=0)then
    begin
       case ee of
@@ -302,10 +302,10 @@ var ei,
    spr:PTMWTexture;
 anim_stat:byte;
 begin
-   for ei:=1 to vid_mvs do
-    with _effects[ei] do
+   for ei:=1 to vid_MaxScreenSprites do
+    with g_effects[ei] do
      if(anim_last_i_t<>0)then
-     with _eids[eid] do
+     with g_eids[eid] do
      begin
         alpha:=255;
 

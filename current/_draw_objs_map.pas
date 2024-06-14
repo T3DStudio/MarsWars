@@ -1,5 +1,5 @@
 
-
+{
 function DoodadAnimationTime(base:integer):integer;
 const fr_h3fps = fr_fps1 div 3;
       fr_4fps  = fr_fps1*4;
@@ -135,6 +135,6 @@ begin
         mmy:=round(y*map_mmcx);
         mmr:=max2i(1,round(r*map_mmcx));
      end;
-end;
+end;  }
 
 

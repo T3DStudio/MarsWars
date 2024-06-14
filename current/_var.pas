@@ -76,13 +76,7 @@ map_symmetryX1,
 map_symmetryY1    : integer;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
-map_dds           : array[0..MaxDoodads] of TDoodad;
-map_ddn           : integer = 0;
-map_dcell         : array[0..dcn,0..dcn] of TDCell;
-
-DID_Square,
-DID_S2R,
-DID_S2Rh          : array[0..MaxDIDs] of longint;
+map_grid          : array[0..terrrain_celln,0..terrrain_celln] of TMapTerrainGridCell;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
 //pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
@@ -226,7 +220,6 @@ vid_vmb_x1        : integer = 794;
 vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
-vid_terrain       : pSDL_SURFACE = nil;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
 vid_CamSpeed      : integer = 25;
@@ -243,19 +236,18 @@ vid_panelx        : integer = 0;
 vid_panely        : integer = 0;
 vid_mapx          : integer = 0;
 vid_mapy          : integer = 0;
-vid_vsl           : array[1..vid_mvs] of PTVisSpr;
-vid_vsls          : word = 0;
-vid_prim          : array of TVisPrim;
-vid_prims         : word = 0;
+vid_Sprites_list  : array of PTVSprite;
+vid_Sprites_n     : word = 0;
+vid_UIItem_list   : array of TUIItem;
+vid_UIItem_n      : word = 0;
 vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
-vid_panel_timer    : byte = 0;
+vid_panel_timer   : byte = 0;
 
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of boolean;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of boolean;
 vid_fog_vfw       : byte = 0;
 vid_fog_vfh       : byte = 0;
-vid_fog_surf      : pSDL_Surface;
 vid_fog_sx        : integer = 0;
 vid_fog_sy        : integer = 0;
 vid_fog_ex        : integer = 0;
@@ -275,8 +267,8 @@ ter_h             : integer;
 
 font_ca           : array[char] of TMWTexture;
 
-_eids             : array[byte] of TEID;
-_effects          : array[1..vid_mvs] of TEffect;
+g_eids            : array[byte] of TEID;
+g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 
 ms_eid_bio_death_uids
                   : TSoB;
@@ -497,52 +489,20 @@ c_black           : cardinal;
 //  THEMES
 //
 
-theme_i           : integer = 0;
-
+theme_cur           : integer = 0;
+{
 theme_liquid_animt: byte;
 theme_liquid_animm: byte;
 theme_liquid_color: cardinal = 0;
 
-theme_map_trt     : integer=0;
-theme_map_ptrt    : integer = -1;
-theme_map_crt     : integer=0;
-theme_map_pcrt    : integer = -1;
-theme_map_lqt     : integer=0;
-theme_map_plqt    : integer = -1;
-theme_map_blqt    : integer=0;
-theme_map_pblqt   : integer = -1;
+theme_map_terrain1 : integer=0;
+theme_map_pterrain1: integer = -1;
+theme_map_terrain2 : integer=0;
+theme_map_pterrain2: integer = -1;
+theme_map_liquid  : integer=0;
+theme_map_pliquid : integer = -1;
 theme_liquid_style: byte = 0;
 theme_crater_style: byte = 0;
-
-theme_decals,
-theme_decors,
-theme_srocks,
-theme_brocks,
-theme_craters,
-theme_liquids,
-theme_bliquids,
-theme_terrains    : TIntList;
-theme_decaln,
-theme_decorn,
-theme_srockn,
-theme_brockn,
-theme_cratern,
-theme_liquidn,
-theme_bliquidn,
-theme_terrainn    : integer;
-
-theme_spr_decals,
-theme_spr_decors,
-theme_spr_srocks,
-theme_spr_brocks,
-theme_spr_liquids,
-theme_spr_terrains: TUSpriteList;
-theme_spr_decaln,
-theme_spr_decorn,
-theme_spr_srockn,
-theme_spr_brockn,
-theme_spr_liquidn,
-theme_spr_terrainn: integer;
 
 theme_anm_decors,
 theme_anm_srocks,
@@ -550,17 +510,58 @@ theme_anm_brocks  : TThemeAnimL;
 
 theme_anm_liquids : array of byte;     // animation type
 theme_ant_liquids : array of byte;     // animation period
-theme_clr_liquids : array of cardinal; // minimap color
+theme_clr_liquids : array of cardinal; // minimap color     }
 
+theme_tile_terrain    : pSDL_Surface = nil;
+theme_tile_crater     : pSDL_Surface = nil;
+theme_tile_liquid     : pSDL_Surface = nil;
+
+theme_tileset_crater  : TMWTileSet;
+theme_tileset_liquid  : array[0..theme_anim_step_n-1] of TMWTileSet;
+
+theme_crater_tes      : byte = tes_nature; // theme liquid edge style
+theme_liquid_tes      : byte = tes_nature; // theme liquid edge style
+theme_liquid_anim     : byte = tas_none;   // theme liquid animation style
+theme_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
+
+theme_tile_terrain_id,
+theme_tile_crater_id,
+theme_tile_liquid_id  : integer;
+
+theme_cur_decal_l,
+theme_cur_decor_l,
+theme_cur_srock_l,
+theme_cur_brock_l,
+theme_cur_crater_l,
+theme_cur_liquid_l,
+theme_cur_terrain_tas_l,
+theme_cur_terrain_l   : TIntList;
+theme_cur_decal_n,
+theme_cur_decor_n,
+theme_cur_srock_n,
+theme_cur_brock_n,
+theme_cur_crater_n,
+theme_cur_liquid_n,
+theme_cur_terrain_n   : integer;
+
+theme_all_decal_l,
+theme_all_decor_l,
+theme_all_srock_l,
+theme_all_brock_l,
+theme_all_terrain_l   : TMWTextureList;
+theme_all_decal_n,
+theme_all_decor_n,
+theme_all_srock_n,
+theme_all_brock_n,
+theme_all_terrain_n   : integer;
+
+theme_all_terrain_mmcolor
+                      : array of cardinal;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SPRITES
 //
-
-spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
-spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWTexture;
-spr_crater        : array[1..crater_ri] of TMWTexture;
 
 
 spr_dummy         : TMWTexture;

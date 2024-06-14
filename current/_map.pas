@@ -1,26 +1,38 @@
 {$IFDEF _FULLGAME}
 
-procedure map_MakeThemeSprites;
-begin
-   gfx_MakeTerrain;
-   gfx_MakeCrater;
-   gfx_MakeLiquid;
-   gfx_MakeLiquidBack;
-end;
-
 procedure map_seed2theme;
+var
+theme,
+terrain,
+crater,
+liquid :integer;
+mseed  :cardinal;
+function Pick(n:integer):integer;
 begin
-   SetTheme(
-      map_seed and $0000000F,            // theme number
-   -((map_seed and $00000FF0) shr 4 ),   // terrain
-   -((map_seed and $000FF000) shr 12),   // liquid
-   -((map_seed and $0FF00000) shr 20),   // liquid back
-   -((map_seed and $F0000000) shr 28));  // crater
+   if(n<=0)
+   then Pick:=-1
+   else
+   begin
+      Pick :=mseed mod n;
+      mseed:=mseed div n;
+   end;
+end;
+begin
+   mseed  :=map_seed;
+
+   theme  :=Pick(theme_n);
+
+   SetTheme(theme);
+
+   terrain:=Pick(theme_cur_terrain_n);
+   crater :=Pick(theme_cur_crater_n );
+   liquid :=Pick(theme_cur_liquid_n );
+   SetTerrainIDs(-terrain,-crater,-liquid);
 end;
 
 {$ENDIF}
 
-procedure map_RefreshDoodadsCells;
+{procedure map_RefreshDoodadsCells;
 var dx0,dy0,dx1,dy1,d,dy:integer;
 begin
    for dx0:=0 to dcn do
@@ -78,7 +90,7 @@ begin
                    end;
    else
    end;
-end;
+end;}
 
 procedure map_RandomBaseVars;
 begin
@@ -207,6 +219,7 @@ begin
      end;
 end;
 
+{
 function map_IfDoodadHere(dtype:byte;ix0,iy0,ix1,iy1,DoodadAR:integer):boolean;
 var d,o:integer;
 function DoodadMinR(t1,t2:byte):integer;
@@ -250,7 +263,7 @@ begin
            break;
         end;
      end;
-end;
+end; }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -512,7 +525,7 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
 end;
 
-function map_TrySetDoodad(di:byte;ix0,iy0,ix1,iy1,PStartDist,DoodadAR,MapBorder:integer):boolean;
+{function map_TrySetDoodad(di:byte;ix0,iy0,ix1,iy1,PStartDist,DoodadAR,MapBorder:integer):boolean;
 begin
    map_TrySetDoodad:=false;
    if (not map_IfPlayerStartHere(ix0,iy0,ix1,iy1,PStartDist))
@@ -694,13 +707,13 @@ begin
       n :=not n;
       sy+=wr;
    end;
-end;
+end;   }
 
 procedure map_ReMake;
 var ix,iy:integer;
  symmetry:byte;
 begin
-   map_ddn:=0;
+   {map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
    for ix:=0 to dcn do
    for iy:=0 to dcn do
@@ -767,14 +780,14 @@ mapt_sea   : begin
              end;
    end;
 
-   map_RefreshDoodadsCells;
+   map_RefreshDoodadsCells;  }
    map_RandomBaseVars;
    map_CPoints;
    pf_MakeZoneGrid;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
-   map_DoodadsDrawData;
-   map_tdmake;
+   //map_DoodadsDrawData;
+   //map_tdmake;
    vid_map_RedrawBack:=true;
    {$ENDIF}
 end;
@@ -799,7 +812,7 @@ begin
    map_PlayerStarts;
    {$IFDEF _FULLGAME}
    map_seed2theme;
-   map_MakeThemeSprites;
+   gfx_MakeThemeTiles;
    {$ENDIF}
    map_ReMake;
 end;

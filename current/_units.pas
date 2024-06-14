@@ -250,6 +250,7 @@ begin
    end;
 end;
 
+{
 procedure unit_PushFromObstacle(pu:PTUnit;td:PTDoodad);
 var t,uds:single;
       ud :integer;
@@ -309,7 +310,7 @@ procedure unit_PushFromObstacles(pu:PTUnit);
 begin
    with pu^ do
      if(speed>0)and(ukfly=uf_ground)and(solid)and(iscomplete)and(not ukfloater)then unit_PushFromObstaclesDCell(pu);
-end;
+end; }
 
 procedure unit_move(pu:PTUnit);
 var mdist,ss:integer;
@@ -350,7 +351,7 @@ begin
              unit_SetXY(pu,x+round(ss*cos(ddir)),
                            y-round(ss*sin(ddir)),mvxy_none);
           end;
-          unit_PushFromObstacles(pu);
+          //unit_PushFromObstacles(pu);
        end;
 end;
 
@@ -832,7 +833,7 @@ uab_Teleport      : swtarget:=true;
          end;
       end;
 
-      unit_PushFromObstacles(pu);
+      //unit_PushFromObstacles(pu);
 
       if(fteleport_tar)and(nup_tar>0)then ua_tar:=nup_tar;
 

@@ -5,22 +5,21 @@
 //  SpriteList
 //
 
-const TVisSprSize =  SizeOf(TVisSpr);
+const TVisSprSize =  SizeOf(TVSprite);
 
-var slatemp : PTVisSpr;
+var slatemp : PTVSprite;
 
-function SpriteListAdd:PTVisSpr;
+function SpriteListAdd:PTVSprite;
 begin
    SpriteListAdd:=nil;
-   if(vid_vsls<vid_mvs)and(menu_state=false)then
+   if(vid_Sprites_n<vid_MaxScreenSprites)and(not menu_state)then
    begin
-      vid_vsls+=1;
-      SpriteListAdd:=vid_vsl[vid_vsls];
+      setlength(vid_Sprites_List,vid_Sprites_n+1);
+      new(vid_Sprites_List[vid_Sprites_n]);
+      SpriteListAdd:=vid_Sprites_List[vid_Sprites_n];
       FillChar(SpriteListAdd^,TVisSprSize,0);
-      with vid_vsl[vid_vsls]^ do
-      begin
-         alpha:=255;
-      end;
+      with SpriteListAdd^ do alpha:=255;
+      vid_Sprites_n+=1;
    end;
 end;
 
@@ -89,17 +88,17 @@ begin
 end;
 
 procedure SpriteListSort;
-var i,u:word;
-    dt :PTVisSpr;
+var i,j:word;
+    dum:PTVSprite;
 begin
-   if(vid_vsls>1)then
-    for i:=1 to vid_vsls do
-     for u:=1 to (vid_vsls-1) do
-      if(vid_vsl[u]^.depth<vid_vsl[u+1]^.depth)then
+   if(vid_Sprites_n>1)then
+    for i:=0 to vid_Sprites_n-2 do
+     for j:=0 to (vid_Sprites_n-i-2) do
+      if(vid_Sprites_List[j]^.depth<vid_Sprites_List[j+1]^.depth)then
       begin
-        dt:=vid_vsl[u];
-        vid_vsl[u]:=vid_vsl[u+1];
-        vid_vsl[u+1]:=dt;
+         dum:=vid_Sprites_List[j];
+         vid_Sprites_List[j  ]:=vid_Sprites_List[j+1];
+         vid_Sprites_List[j+1]:=dum;
       end;
 end;
 
@@ -107,42 +106,45 @@ procedure D_SpriteList(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy:integer;
 begin
    SpriteListSort;
-   while(vid_vsls>0)do
-    with vid_vsl[vid_vsls]^ do
-    begin
-       vid_vsls-=1;
+   while(vid_Sprites_n>0)do
+   begin
+      vid_Sprites_n-=1;
+      with vid_Sprites_List[vid_Sprites_n]^ do
+      begin
+         x-=sprite^.hw;
+         y-=sprite^.hh;
 
-       x-=sprite^.hw;
-       y-=sprite^.hh;
+         x+=lx+xo;
+         y+=ly+yo;
 
-       x+=lx+xo;
-       y+=ly+yo;
+         if(shadowz>-fly_hz)then
+         begin
+            sx:=sprite^.hw;
+            sy:=sprite^.h-(sprite^.h shr 3);
+            filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
+         end;
+         if(alpha>0)then
+          if(alpha=255)
+          then draw_surf(tar,x,y,sprite^.sdlSurface)
+          else
+          begin
+             SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+             draw_surf(tar,x,y,sprite^.sdlSurface);
+             SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
+          end;
 
-       if(shadowz>-fly_hz)then
-       begin
-          sx:=sprite^.hw;
-          sy:=sprite^.h-(sprite^.h shr 3);
-          filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
-       end;
-       if(alpha>0)then
-        if(alpha=255)
-        then draw_surf(tar,x,y,sprite^.sdlSurface)
-        else
-        begin
-           SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-           draw_surf(tar,x,y,sprite^.sdlSurface);
-           SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
-        end;
-
-       if(aura>0)then
-       begin
-          x-=6;
-          y-=6;
-          sx:=sprite^.hw+6;
-          sy:=sprite^.hh+6;
-          filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
-       end;
-    end;
+         if(aura>0)then
+         begin
+            x-=6;
+            y-=6;
+            sx:=sprite^.hw+6;
+            sy:=sprite^.hh+6;
+            filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
+         end;
+      end;
+      dispose(vid_Sprites_List[vid_Sprites_n]);
+   end;
+   setlength(vid_Sprites_List,0);
 end;
 
 
@@ -151,19 +153,19 @@ end;
 //  UnitsInfo
 //
 
-const TVisPrimSize =  SizeOf(TVisPrim);
+const TVisPrimSize =  SizeOf(TUIItem);
 
 procedure UnitsInfoNew;
 begin
-   vid_prims+=1;
-   setlength(vid_prim,vid_prims);
-   FillChar(vid_prim[vid_prims-1],TVisPrimSize,0);
+   vid_UIItem_n+=1;
+   setlength(vid_UIItem_list,vid_UIItem_n);
+   FillChar(vid_UIItem_list[vid_UIItem_n-1],TVisPrimSize,0);
 end;
 
 procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_line;
       x0   :=ax0;
@@ -176,7 +178,7 @@ end;
 procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_rect;
       x0   :=ax0;
@@ -189,7 +191,7 @@ end;
 procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_rect;
       x0   :=ax0;
@@ -207,7 +209,7 @@ end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_box;
       x0   :=ax0;
@@ -220,7 +222,7 @@ end;
 procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_circle;
       x0   :=ax0;
@@ -232,7 +234,7 @@ end;
 procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind   :=uinfo_text;
       x0     :=ax0;
@@ -244,7 +246,7 @@ end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind    :=uinfo_rect;
       x0      :=ax0-aspr^.hw;
@@ -263,7 +265,7 @@ end;
 procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
    UnitsInfoNew;
-   with vid_prim[vid_prims-1] do
+   with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind   :=uinfo_sprite;
       x0     :=ax0-aspr^.hw;
@@ -395,10 +397,10 @@ gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,u
    end;
 
 
-   while(vid_prims>0)do
-    with vid_prim[vid_prims-1] do
+   while(vid_UIItem_n>0)do
+    with vid_UIItem_list[vid_UIItem_n-1] do
     begin
-       vid_prims-=1;
+       vid_UIItem_n-=1;
 
        x0+=lx-vid_cam_x;
        y0+=ly-vid_cam_y;
@@ -439,7 +441,7 @@ uinfo_text   : begin
        if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1-font_w,text_rd ,ta_right,255,c_white);
        if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1-font_w,text_ld ,ta_left ,255,c_white);
     end;
-   setlength(vid_prim,vid_prims);
+   setlength(vid_UIItem_list,vid_UIItem_n);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +455,7 @@ var i,t,
     vx,vy:integer;
     spr  :PTMWTexture;
 begin
-   draw_surf(tar,
+   {draw_surf(tar,
    lx-vid_cam_x mod ter_w,
    ly-vid_cam_y mod ter_h,
    vid_terrain);
@@ -470,7 +472,7 @@ begin
 
         s:=abs(i+(iy div vid_mha)+(ix div vid_mwa)) mod theme_decaln;
 
-        t:=theme_decals[s];
+        t:=theme_cur_decal_l[s];
         if(t<0)
         then spr:=@spr_crater[-t]
         else spr:=@theme_spr_decals[t];
@@ -485,7 +487,7 @@ begin
         iy+=ly-vid_ab;
 
         with spr^ do draw_surf(tar,ix-hw,iy-hh,spr^.sdlSurface);
-     end;
+     end; }
 end;
 
 
@@ -558,15 +560,13 @@ var cx,cy,ssx,ssy,sty:integer;
     cl:cardinal; }
 function GetFogGridVal(fx,fy:integer):boolean;
 begin
-   GetFogGridVal:=false;
+   GetFogGridVal:=true;
    if (0<=fx)and(fx<=fog_vfwm)
    and(0<=fy)and(fy<=fog_vfhm)then GetFogGridVal:=not vid_fog_pgrid[fx,fy];
 end;
-
 begin
-   if(not sys_fog)then exit;
 
-   for sty:=1 to MaxUnits do
+  { for sty:=1 to MaxUnits do
     with g_units[sty] do
      if(hits>0)then
      begin
@@ -577,12 +577,12 @@ begin
         cx:=x-vid_cam_x+lx;
         cy:=y-vid_cam_y+ly;
         circleColor(tar,cx,cy,5,c_lime);
-     end;
+     end;  }
+
+   vid_fog_pgrid:=vid_fog_grid;
 
    ssx:=lx-(vid_cam_x mod fog_cw);
    sty:=ly-(vid_cam_y mod fog_cw);
-
-   vid_fog_pgrid:=vid_fog_grid;
 
    for cx:=0 to vid_fog_vfw do
    begin
@@ -595,6 +595,7 @@ begin
                             GetFogGridVal(cx  ,cy  ),
                             GetFogGridVal(cx+1,cy  ),
                             GetFogGridVal(cx  ,cy+1));
+         if(tileX>0)then
          draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
 
          vid_fog_grid[cx,cy]:=false;

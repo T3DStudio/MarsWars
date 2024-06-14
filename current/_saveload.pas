@@ -77,7 +77,7 @@ begin
                                       else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';
             vr:=0;
 
-            BlockRead(f,vr,sizeof(theme_i          ));
+            BlockRead(f,vr,sizeof(theme_cur          ));
             if(vr>=theme_n           )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;
             vr:=0;
 
@@ -163,7 +163,7 @@ begin
    SizeOf(g_random_i       )+
    SizeOf(map_mw           )+
    SizeOf(map_type         )+
-   SizeOf(theme_i          )+
+   SizeOf(theme_cur          )+
    SizeOf(g_mode           )+
    SizeOf(g_start_base     )+
    SizeOf(g_fixed_positions)+
@@ -173,8 +173,8 @@ begin
    SizeOf(g_slot_state     )+
    SizeOf(g_units          )+
    SizeOf(g_missiles       )+
-   SizeOf(_effects         )+
-   SizeOf(map_dds          )+
+   SizeOf(g_effects         )+
+   //SizeOf(map_dds          )+
    SizeOf(vid_cam_x        )+
    SizeOf(vid_cam_y        )+
    SizeOf(PlayerColor      )+
@@ -193,11 +193,11 @@ begin
    SizeOf(ui_alarms        )+
    SizeOf(map_psx          )+
    SizeOf(map_psy          )+
-   SizeOf(g_random_p       )+
-   SizeOf(theme_map_lqt    )+
-   SizeOf(theme_map_blqt   )+
-   SizeOf(theme_map_trt    )+
-   SizeOf(theme_map_crt    )+1;
+   SizeOf(g_random_p       );
+   //SizeOf(theme_map_liquid    )+
+   //SizeOf(theme_map_terrain2   )+
+   //SizeOf(theme_map_terrain1    );
+   //SizeOf(theme_map_crt    )+1;
 end;
 
 procedure saveload_Save;
@@ -218,7 +218,7 @@ begin
    BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
    BlockWrite(f,map_type         ,SizeOf(map_type         ));
    BlockWrite(f,map_symmetry     ,sizeof(map_symmetry     ));
-   BlockWrite(f,theme_i          ,SizeOf(theme_i          ));
+   BlockWrite(f,theme_cur          ,SizeOf(theme_cur          ));
    BlockWrite(f,g_mode           ,SizeOf(g_mode           ));
    BlockWrite(f,g_start_base     ,SizeOf(g_start_base     ));
    BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
@@ -228,8 +228,8 @@ begin
    BlockWrite(f,g_slot_state     ,SizeOf(g_slot_state     ));
    BlockWrite(f,g_units          ,SizeOf(g_units          ));
    BlockWrite(f,g_missiles       ,SizeOf(g_missiles       ));
-   BlockWrite(f,_effects         ,SizeOf(_effects         ));
-   BlockWrite(f,map_dds          ,SizeOf(map_dds          ));
+   BlockWrite(f,g_effects         ,SizeOf(g_effects         ));
+  // BlockWrite(f,map_dds          ,SizeOf(map_dds          ));
    BlockWrite(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
    BlockWrite(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
    BlockWrite(f,PlayerColor      ,SizeOf(PlayerColor      ));
@@ -249,10 +249,10 @@ begin
    BlockWrite(f,map_psx          ,SizeOf(map_psx          ));
    BlockWrite(f,map_psy          ,SizeOf(map_psy          ));
    BlockWrite(f,g_random_p       ,SizeOf(g_random_p       ));
-   BlockWrite(f,theme_map_lqt    ,SizeOf(theme_map_lqt    ));
-   BlockWrite(f,theme_map_blqt   ,SizeOf(theme_map_blqt   ));
-   BlockWrite(f,theme_map_trt    ,SizeOf(theme_map_trt    ));
-   BlockWrite(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
+   //BlockWrite(f,theme_map_liquid    ,SizeOf(theme_map_liquid    ));
+   //BlockWrite(f,theme_map_terrain2   ,SizeOf(theme_map_terrain2   ));
+   //BlockWrite(f,theme_map_terrain1    ,SizeOf(theme_map_terrain1    ));
+   //BlockWrite(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
 
    close(f);
 
@@ -293,7 +293,7 @@ begin
          BlockRead(f,map_mw           ,SizeOf(map_mw           ));
          BlockRead(f,map_type         ,SizeOf(map_type         ));
          BlockRead(f,map_symmetry     ,sizeof(map_symmetry     ));
-         BlockRead(f,theme_i          ,SizeOf(theme_i          ));map_seed2theme;
+         BlockRead(f,theme_cur          ,SizeOf(theme_cur          ));map_seed2theme;
          BlockRead(f,g_mode           ,SizeOf(g_mode           ));
          BlockRead(f,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
@@ -303,8 +303,8 @@ begin
          BlockRead(f,g_slot_state     ,SizeOf(g_slot_state     ));
          BlockRead(f,g_units          ,SizeOf(g_units          ));
          BlockRead(f,g_missiles       ,SizeOf(g_missiles       ));
-         BlockRead(f,_effects         ,SizeOf(_effects         ));
-         BlockRead(f,map_dds          ,SizeOf(map_dds          ));
+         BlockRead(f,g_effects         ,SizeOf(g_effects         ));
+        // BlockRead(f,map_dds          ,SizeOf(map_dds          ));
          BlockRead(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
          BlockRead(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
          BlockRead(f,PlayerColor      ,SizeOf(PlayerColor      ));
@@ -324,10 +324,10 @@ begin
          BlockRead(f,map_psx          ,SizeOf(map_psx          ));
          BlockRead(f,map_psy          ,SizeOf(map_psy          ));
          BlockRead(f,g_random_p       ,SizeOf(g_random_p       ));
-         BlockRead(f,theme_map_lqt    ,SizeOf(theme_map_lqt    ));
-         BlockRead(f,theme_map_blqt   ,SizeOf(theme_map_blqt   ));
-         BlockRead(f,theme_map_trt    ,SizeOf(theme_map_trt    ));
-         BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
+         //BlockRead(f,theme_map_liquid    ,SizeOf(theme_map_liquid    ));
+         //BlockRead(f,theme_map_terrain2   ,SizeOf(theme_map_terrain2   ));
+         //BlockRead(f,theme_map_terrain1    ,SizeOf(theme_map_terrain1    ));
+         //BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
 
          for u:=1 to MaxUnits do
           with g_units[u] do
@@ -338,10 +338,10 @@ begin
 
          PlayersValidateName;
          map_Vars;
-         map_MakeThemeSprites;
-         map_RefreshDoodadsCells;
+         gfx_MakeThemeTiles;
+        // map_RefreshDoodadsCells;
          //map_RedrawMenuMinimap;
-         map_DoodadsDrawData;
+         //map_DoodadsDrawData;
          pf_MakeZoneGrid;
          GameCameraBounds;
 

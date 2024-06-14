@@ -26,16 +26,16 @@ end;
 
 TMWTexture = record
    sdlSurface: pSDL_Surface;
-   w,h,
+    w, h,
    hw,hh     : integer;
 end;
 PTMWTexture = ^TMWTexture;
 
-TUSpriteList  = array of TMWTexture;
-PTUSpriteList = ^TUSpriteList;
+TMWTextureList  = array of TMWTexture;
+PTMWTextureList = ^TMWTextureList;
 
 TMWSModel = record
-   sm_list  : TUSpriteList;
+   sm_list  : TMWTextureList;
    sm_sel_hw,
    sm_sel_hh,
    sm_listi,   // last value
@@ -67,7 +67,7 @@ TEffect = record
             : integer;
 end;
 
-TVisPrim = record
+TUIItem = record
    kind     : byte;
    sprite   : PTMWTexture;
    cx,cy,
@@ -80,9 +80,8 @@ TVisPrim = record
    text_rd,
    text_ld  : string6;
 end;
-//PTVisPrim = ^TVisPrim;
 
-TVisSpr = record
+TVSprite = record
    sprite   : PTMWTexture;
    x,y,xo,yo,
    depth,
@@ -91,7 +90,7 @@ TVisSpr = record
    aura     : cardinal;
    alpha    : byte;
 end;
-PTVisSpr = ^TVisSpr;
+PTVSprite = ^TVSprite;
 
  TIntList = array of integer;
 PTIntList = ^TIntList;
@@ -112,9 +111,9 @@ TAlarm = record
    al_mx,
    al_my,
    al_r,
-   al_t      : integer;
-   al_v      : byte;
-   al_c      : cardinal;
+   al_t     : integer;
+   al_v     : byte;
+   al_c     : cardinal;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -686,7 +685,7 @@ TCTPoint = record
 end;
 PTCTPoint = ^TCTPoint;
 
-TDoodad = record
+{TDoodad = record
    x,y,r        : integer;
    t            : byte;
 
@@ -703,6 +702,17 @@ PTDoodad = ^TDoodad;
 TDCell = record
    n:integer;
    l:array of PTDoodad;
+end; }
+
+TMapTerrainGridCell = record
+   tgc_nobuild,
+   tgc_nopath   : boolean; //bit[playeri]
+   tgc_area     : word;
+   {$IFDEF _FULLGAME}
+   tgc_tileX0,
+   tgc_tileX1,
+   tgc_tileX2   : byte;
+   {$ENDIF}
 end;
 
 TGamePreset = record

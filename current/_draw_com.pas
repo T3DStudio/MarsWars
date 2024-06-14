@@ -124,7 +124,7 @@ end;
 function TileSetGetN(b10,b01,b11,b21,b12:boolean):byte;
 begin
    if(b11)
-   then TileSetGetN:=0
+   then TileSetGetN:=1
    else
    begin
       TileSetGetN:=1;
@@ -132,25 +132,25 @@ begin
       if(b01)then TileSetGetN+=2;
       if(b21)then TileSetGetN+=4;
       if(b12)then TileSetGetN+=8;
+      if(TileSetGetN=1)then TileSetGetN:=0;
    end;
 end;
 
-procedure map_MinimapBackDraw(sd:TSob);
-var d:integer;
+procedure map_MinimapBackDraw();
 begin
-   for d:=1 to MaxDoodads do
+   {for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t in sd)then
       if(mmr>0)
       then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor       (r_bminimap,mmx,mmy,    mmc);
+      else pixelColor       (r_bminimap,mmx,mmy,    mmc);  }
 end;
 
 procedure map_MinimapBackground;
 begin
    sdl_FillRect(r_bminimap,nil,0);
-   map_MinimapBackDraw(dids_liquids);
-   map_MinimapBackDraw([DID_other,DID_srock,DID_brock]);
+   //map_MinimapBackDraw(dids_liquids);
+   //map_MinimapBackDraw([DID_other,DID_srock,DID_brock]);
 end;
 
 procedure map_MinimapSpot(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);

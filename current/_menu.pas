@@ -338,10 +338,11 @@ mi_mplay_Chat           : ;
      if(not enabled)then menu_List_Clear;
 end;
 
-function StringApplyInput(s:shortstring;charset:TSoc;ms:byte):shortstring;
+function StringApplyInput(s:shortstring;charset:TSoc;ms:byte;ChangedResult:pBoolean):shortstring;
 var i:byte;
     c:char;
 begin
+   StringApplyInput:=s;
    if(length(k_keyboard_string)>0)then
     for i:=1 to length(k_keyboard_string) do
     begin
@@ -355,6 +356,8 @@ begin
           if(c in charset)then s+=c;
    end;
    k_keyboard_string:='';
+   if(ChangedResult<>nil)then
+     ChangedResult^:=StringApplyInput<>s;
    StringApplyInput:=s;
 end;
 
@@ -730,8 +733,8 @@ mi_settings_PanelPosition : if(menu_list_selected>-1)then
                                vid_PannelPos:=menu_list_SIndex;
                                menu_List_Clear;
                                vid_ScreenSurfaces;
-                               theme_map_ptrt:=255;
-                               gfx_MakeTerrain;
+                               //theme_map_pterrain1:=255;
+                               //gfx_MakeTerrain;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_panelposp[0],SizeOf(str_panelposp),integer(vid_PannelPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
@@ -750,8 +753,8 @@ mi_settings_ResApply      : begin
                             vid_vw:=menu_res_w;
                             vid_vh:=menu_res_h;
                             vid_MakeScreen;
-                            theme_map_ptrt:=255;
-                            gfx_MakeTerrain;
+                            ///theme_map_pterrain1:=255;
+                            //gfx_MakeTerrain;
                             end;
 
 mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen; vid_MakeScreen;end;
@@ -1150,27 +1153,27 @@ end;
 procedure menu_keyborad;
 var UpdateItems:boolean;
 begin
-   UpdateItems:=true;
+   UpdateItems:=false;
    if(length(k_keyboard_string)>0)then
    begin
       case menu_item of
 mi_map_params2        : begin
-                           map_seed   :=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
-                           if(net_status=ns_client)
-                           then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed)
-                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
+                        map_seed  :=s2c(StringApplyInput(c2s(map_seed) ,k_kbdig ,10     ,@UpdateItems));
+                        if(UpdateItems)then
+                          if(net_status=ns_client)
+                          then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed)
+                          else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
-mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_kbstr,NameLen);
-mi_saveload_fname     : svld_str_fname:=StringApplyInput(svld_str_fname,k_kbstr,SvRpLen);
-mi_game_RecordName    : rpls_str_name :=StringApplyInput(rpls_str_name ,k_kbstr,SvRpLen);
+mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_kbstr ,NameLen,@UpdateItems);
+mi_saveload_fname     : svld_str_fname:=StringApplyInput(svld_str_fname,k_kbstr ,SvRpLen,@UpdateItems);
+mi_game_RecordName    : rpls_str_name :=StringApplyInput(rpls_str_name ,k_kbstr ,SvRpLen,@UpdateItems);
 mi_mplay_ServerPort   : begin
-                           net_sv_pstr:=StringApplyInput(net_sv_pstr,k_kbdig,5 );
-                           net_sv_sport;
+                        net_sv_pstr   :=StringApplyInput(net_sv_pstr   ,k_kbdig ,5      ,@UpdateItems);
+                        net_sv_sport;
                         end;
-mi_mplay_ClientAddress: net_cl_svstr:=StringApplyInput(net_cl_svstr,k_kbaddr,21 );
-mi_mplay_Chat         : net_chat_str:=StringApplyInput(net_chat_str,k_kbstr ,255);
+mi_mplay_ClientAddress: net_cl_svstr  :=StringApplyInput(net_cl_svstr  ,k_kbaddr,21     ,@UpdateItems);
+mi_mplay_Chat         : net_chat_str  :=StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@UpdateItems);
       else
-         UpdateItems:=false;
       end;
 
       if(UpdateItems)then menu_remake:=true;

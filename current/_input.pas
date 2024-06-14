@@ -945,7 +945,7 @@ end;
 procedure g_keyboard;
 begin
    if(not m_vmove)and(not rpls_plcam)then GameCameraMove;
-   if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2);
+   if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2,nil);
 end;
 
 procedure InputGame;

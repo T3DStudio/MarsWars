@@ -529,13 +529,12 @@ begin
 
    vid_blink_timer1:=0;
    vid_blink_timer2:=0;
-   vid_vsls:=0;
 
    ui_tab :=0;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
 
-   FillChar(_effects ,SizeOf(_effects ),0);
+   FillChar(g_effects ,SizeOf(g_effects ),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
 
    ingame_chat :=0;

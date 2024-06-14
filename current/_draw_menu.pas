@@ -137,7 +137,7 @@ begin
       D_menu_ETextD(tar,mi_map_params5,str_map_sym ,str_map_syml[map_symmetry],true ,0,0);
 
       D_menu_EText (tar,mi_map_params6,ta_middle,ta_middle,str_mrandom        ,false,0,0);
-      D_menu_EText (tar,mi_map_params7,ta_middle,ta_middle,theme_name[theme_i],false,0,0);
+      //D_menu_EText (tar,mi_map_params7,ta_middle,ta_middle,theme_name[theme_cur],false,0,0);
    end;
 end;
 

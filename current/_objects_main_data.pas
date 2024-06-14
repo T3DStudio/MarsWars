@@ -1673,11 +1673,4 @@ begin
    InitUIDS;
    InitMIDs;
    InitDMODs;
-
-   for u:=0 to MaxDIDs do
-   begin
-      DID_Square[u]:=round(pi*sqr(DID_R[u]));
-      DID_S2R   [u]:=trunc(DID_R[u]*1.57);
-      DID_S2Rh  [u]:=DID_S2R[u] div 2;
-   end;
 end;

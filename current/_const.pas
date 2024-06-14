@@ -556,32 +556,11 @@ b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 //  MAP
 //
 
-MaxDoodads             = 800;
-
-//
-ddc_div                = 1000000;
-ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div; // 36
-
-// doodads cell
-dcw                    = 200;
-dcn                    = MaxSMapW div dcw;
-
-DID_LiquidR1           = 1;
-DID_LiquidR2           = 2;
-DID_LiquidR3           = 3;
-DID_LiquidR4           = 4;
-DID_BRock              = 5;
-DID_SRock              = 6;
-DID_Other              = 7;
-
-dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
-
-MaxDIDs                = 7;
-
-DID_R                  : array[0..MaxDIDs] of smallint = (0,255,170,85,56,105,64,18);
+terrrain_cellw         = 80;
+terrrain_celln         = MaxSMapW div terrrain_cellw;
 
 mapt_steppe            = 0;
-mapt_cave            = 1;
+mapt_cave              = 1;
 mapt_lake              = 2;
 mapt_shore             = 3;
 mapt_sea               = 4;
@@ -1270,7 +1249,7 @@ vid_rw_list            : array[0..4] of Smallint = (vid_minw,960,1024,1280,vid_m
 vid_rh_list            : array[0..3] of Smallint = (vid_minh,680,720,vid_maxh);
 
 vid_ab                 = 128;
-vid_mvs                = 500; // max vis sprites;
+vid_MaxScreenSprites   = 500; // max vis sprites;
 vid_blink_persecond    = 6;
 vid_blink_period1      = fr_fps1  div vid_blink_persecond;
 vid_blink_periodh      = vid_blink_period1 div 2;
@@ -1693,64 +1672,70 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
 MaxTileSet             = 16;
 
-LiquidAnim             = 4;
-LiquidRs               = 4;
-
-crater_ri              = 4;
-crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
-
-theme_n                = 8;
-theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'  ,
-                                                               tc_blue  +'TECH BASE'  ,
+theme_n                = 1;
+theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'
+                                                               {tc_blue  +'TECH BASE'  ,
                                                                tc_white +'PLANET'     ,
                                                                tc_white +'PLANET MOON',
                                                                tc_gray  +'CAVES'      ,
                                                                tc_aqua  +'ICE CAVES'  ,
                                                                tc_orange+'HELL'       ,
-                                                               tc_yellow+'HELL CAVES' );
+                                                               tc_yellow+'HELL CAVES' });
+theme_anim_step_n      = 3;
+theme_anim_tile_step   = terrrain_cellw div theme_anim_step_n;
+
+// theme edge terrain style
+tes_fog                = 0;
+tes_nature             = 1;
+tes_tech               = 2;
+
+// theme animation style
+tas_none               = 0;
+tas_liquid             = 1;
+tas_magma              = 2;
 
 {$ELSE }
 
-str_ps_comp              : shortstring =  'AI';
-str_ps_cheater           : shortstring =  'cheater';
+str_ps_comp            : shortstring =  'AI';
+str_ps_cheater         : shortstring =  'cheater';
 
-str_gnstarted            : shortstring = 'Not started';
-str_grun                 : shortstring = 'Run';
-str_gpaused              : shortstring = 'Paused by player #';
-str_gwinner              : shortstring = 'Won by a team #';
-str_udpport              : shortstring = ' UPD port: ';
-str_gstatus              : shortstring = 'Game status:   ';
-str_gpreset              : shortstring = 'Game preset:   ';
-str_gsettings            : shortstring = 'Game settings:';
-str_map                  : shortstring = 'Map';
+str_gnstarted          : shortstring = 'Not started';
+str_grun               : shortstring = 'Run';
+str_gpaused            : shortstring = 'Paused by player #';
+str_gwinner            : shortstring = 'Won by a team #';
+str_udpport            : shortstring = ' UPD port: ';
+str_gstatus            : shortstring = 'Game status:   ';
+str_gpreset            : shortstring = 'Game preset:   ';
+str_gsettings          : shortstring = 'Game settings:';
+str_map                : shortstring = 'Map';
 
-str_m_seed               : shortstring = 'Seed';
-str_m_type               : shortstring = 'Type';
-str_m_typel              : array[0..gms_m_types] of shortstring = ('Steppe','Cave','Lake','Sea shore','Sea');
-str_m_siz                : shortstring = 'Size';
-str_m_sym                : shortstring = 'Symmetry';
-str_m_syml               : array[0..gms_m_symm] of shortstring = ('no','point','line');
-str_aislots              : shortstring = 'Fill empty slots:         ';
-str_fstarts              : shortstring = 'Fixed player starts:      ';
-str_gmode                : shortstring = 'Game mode:                ';
-str_gmodel               : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
-str_cgenerators          : shortstring = 'Generators:               ';
-str_cgeneratorsl         : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
-str_deadobservers        : shortstring = 'Observer mode after lose: ';
-str_starta               : shortstring = 'Builders at game start:   ';
-str_plname               : shortstring = 'Player name';
-str_PlayerPaused         : shortstring = 'player paused the game';
-str_PlayerResumed        : shortstring = 'player has resumed the game';
-str_plout                : shortstring = ' left the game';
-//str_player_def           : shortstring = ' was terminated!';
+str_m_seed             : shortstring = 'Seed';
+str_m_type             : shortstring = 'Type';
+str_m_typel            : array[0..gms_m_types] of shortstring = ('Steppe','Cave','Lake','Sea shore','Sea');
+str_m_siz              : shortstring = 'Size';
+str_m_sym              : shortstring = 'Symmetry';
+str_m_syml             : array[0..gms_m_symm] of shortstring = ('no','point','line');
+str_aislots            : shortstring = 'Fill empty slots:         ';
+str_fstarts            : shortstring = 'Fixed player starts:      ';
+str_gmode              : shortstring = 'Game mode:                ';
+str_gmodel             : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
+str_cgenerators        : shortstring = 'Generators:               ';
+str_cgeneratorsl       : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
+str_deadobservers      : shortstring = 'Observer mode after lose: ';
+str_starta             : shortstring = 'Builders at game start:   ';
+str_plname             : shortstring = 'Player name';
+str_PlayerPaused       : shortstring = 'player paused the game';
+str_PlayerResumed      : shortstring = 'player has resumed the game';
+str_plout              : shortstring = ' left the game';
+//str_player_def         : shortstring = ' was terminated!';
 
-str_plstat               : shortstring = 'State';
-str_team                 : shortstring = 'Team';
-str_srace                : shortstring = 'Race';
+str_plstat             : shortstring = 'State';
+str_team               : shortstring = 'Team';
+str_srace              : shortstring = 'Race';
 
-str_racel                : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
+str_racel              : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
 
-str_observer             : shortstring = 'OBSERVER';
+str_observer           : shortstring = 'OBSERVER';
 {$ENDIF}
 
 

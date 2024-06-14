@@ -18,7 +18,7 @@ begin
    FillChar(pf_pathgrid_areas,SizeOf(pf_pathgrid_areas),0);
 
    // solid cells
-   for d:=1 to MaxDoodads do
+  { for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)and(r>=pf_pathmap_w)then
      begin
@@ -47,7 +47,7 @@ begin
        carea+=1;
        pf_FillArea(sx,sy,carea);
        if(carea=65535)then break;
-    end;
+    end;  }
 end;
 
 function pf_CheckBorders(cx,cy:integer):boolean;

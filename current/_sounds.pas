@@ -193,6 +193,7 @@ end;
 function SoundSetGetChunk(ss:PTSoundSet;NewChunk:boolean):PTMWSound;
 begin
    SoundSetGetChunk:=nil;
+   if(ss=nil)then exit;
    with ss^ do
     if(sndn>0)then
      if(sndn=1)

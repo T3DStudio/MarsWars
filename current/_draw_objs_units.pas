@@ -269,7 +269,7 @@ function EID2Spr(eid:byte):PTMWTexture;
 begin
    EID2Spr:=@spr_dummy;
 
-   with _eids[eid] do
+   with g_eids[eid] do
     if(smodel<>nil)then
      if(smodel^.sm_listn>0)then
       EID2Spr:=@smodel^.sm_list[0];

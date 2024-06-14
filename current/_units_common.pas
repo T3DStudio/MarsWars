@@ -649,7 +649,7 @@ begin
    if(check_obstacles)then
    begin
       tr-=bld_dec_mr;
-      dx:=tx div dcw;
+      {dx:=tx div dcw;
       dy:=ty div dcw;
       if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
        with map_dcell[dx,dy] do
@@ -661,7 +661,7 @@ begin
               o:=tr+r;
               d:=point_dist_int(x,y,tx,ty)-o;
               add(x,y,d,o);
-           end;
+           end;     }
       tr+=bld_dec_mr;
    end;
 
@@ -782,7 +782,7 @@ begin
 
    tr-=bld_dec_mr;
 
-   dx:=tx div dcw;
+  { dx:=tx div dcw;
    dy:=ty div dcw;
 
    if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
@@ -795,7 +795,7 @@ begin
          begin
             CheckCollisionR:=4;
             exit;
-         end;
+         end;   }
 end;
 
 function CheckBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;

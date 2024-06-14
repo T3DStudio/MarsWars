@@ -111,6 +111,51 @@ begin
    move( (srf^.pixels+(y*srf^.pitch)+x*bpp)^, (@SDL_GETpixel)^, bpp);
 end;
 
+function cardinalBytes(c:cardinal):shortstring;
+begin
+   cardinalBytes:=b2s((c and $FF000000)shr 24)+','+b2s((c and $00FF0000)shr 16)+','+b2s((c and $0000FF00)shr 8)+','+b2s(c and $000000FF);
+end;
+
+function gfx_SDLSurfaceGetColor(surface:pSDL_Surface):cardinal;
+var
+rC,gC,bC,
+rR,gR,bR,
+rM,gM,bM:byte;
+color   :cardinal;
+x,y     :integer;
+begin
+   for x:=0 to surface^.w-1 do
+   for y:=0 to surface^.h-1 do
+   begin
+      color:=SDL_GETpixel(surface,x,y);
+
+      rC:=(color and $00FF0000) shr 16;
+      gC:=(color and $0000FF00) shr 8;
+      bC:=(color and $000000FF);
+
+
+      if(x=0)and(y=0)then
+      begin
+         rR:=rC;
+         gR:=gC;
+         bR:=bC;
+         rM:=rC;
+         gM:=gC;
+         bM:=bC;
+      end
+      else
+      begin
+         if(rC>rM)then rM:=rC;
+         if(gC>gM)then gM:=gC;
+         if(bC>bM)then bM:=bC;
+         rR:=(rR+rC+rM)div 3;
+         gR:=(gR+gC+gM)div 3;
+         bR:=(bR+bC+bM)div 3;
+      end;
+   end;
+   gfx_SDLSurfaceGetColor:=rgba2c(rR,gR,bR,255);
+end;
+
 function gfx_SDLSurfaceLoadFromFile(fn:shortstring):pSDL_SURFACE;
 var tmp:pSDL_SURFACE;
 begin
@@ -216,231 +261,15 @@ begin
    end;
 end;
 
-procedure gfx_MakeLiquidTemplate(surf,ts:pSDL_Surface;xs,ys,d,r:integer;animst,animstyle:byte;itb:boolean);
-var x,y,dir,i,e,p,rand:integer;
-begin
-   boxColor(surf,0,0,d,d,c_purple);
 
-   x:=xs;
-   while (x<d) do
-   begin
-      y:=ys;
-      while (y<d) do
-      begin
-         draw_surf(surf,x,y,ts);
-         y+=ts^.h;
-      end;
-      x+=ts^.w;
-   end;
 
-   if(animstyle>1)then exit;
-
-   if(animstyle=0)then
-   begin
-      if(animst=0)
-      then e:=12
-      else e:=d div 32;
-      rand:=0;
-      dir :=0;
-      i   :=r+e;
-      while(dir<=360)do
-      begin
-         case animst of
-         0:   p:=e+random(e);
-         else p:=e+((dir*i+rand) mod e);
-         end;
-         x:=r+trunc(i*cos(dir*degtorad));
-         y:=r+trunc(i*sin(dir*degtorad));
-         filledcircleColor(surf,x,y,p,c_purple);
-         dir+=max2i(1,(trunc(p*180/(pi*r)) div 3)*4 );
-         rand+=13;
-      end;
-   end;
-
-   dir:=0;
-   case animstyle of
-   0: i:=r div 12;
-   1: i:=-5;
-   end;
-
-   while(dir<=360)do
-   begin
-      p:=r-i;
-      dir+=3;
-      x:=r+trunc(d*cos(dir*degtorad));
-      y:=r+trunc(d*sin(dir*degtorad));
-      filledcircleColor(surf,x,y,p,c_purple);
-   end;
-   if(itb)then filledcircleColor(surf,r,r,r-(r div 6)-10,c_purple);
-end;
-
-procedure gfx_MakeLiquid;
-var ts : psdl_surface;
-a,i,
-wsp,hsp: integer;
-begin
-   if(theme_map_plqt=theme_map_lqt)and(theme_map_plqt>0)then exit;
-   theme_map_plqt:=theme_map_lqt;
-
-   if(theme_map_lqt<0)or(theme_map_lqt>=theme_spr_liquidn)then
-   begin
-      ts                :=r_dterrain;
-      theme_liquid_animt:=0;
-      theme_liquid_color:=c_gray;
-      theme_liquid_animm:=fr_fpsd2;
-   end
-   else
-   begin
-      ts                :=theme_spr_liquids[theme_map_lqt].sdlSurface;
-      theme_liquid_animt:=theme_anm_liquids[theme_map_lqt];
-      theme_liquid_color:=theme_clr_liquids[theme_map_lqt];
-      theme_liquid_animm:=theme_ant_liquids[theme_map_lqt];
-   end;
-
-   case theme_liquid_animt of
-   0: begin
-         wsp:=(ts^.w div 4)*((map_seed   mod 3)-1);
-         hsp:=(ts^.h div 4)*((g_random_i mod 3)-1);
-         if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
-      end;
-   else
-      wsp:=0;
-      hsp:=0;
-   end;
-
-   for i:=1 to LiquidRs do
-    for a:=1 to LiquidAnim do
-     with spr_liquid[a,i] do
-     begin
-        w:=DID_R[i]*2+10;
-        h:=w;
-        gfx_SDLSurfaceFree(sdlSurface);
-        sdlSurface:=gfx_SDLSurfaceCreate(w,w);
-        hw:=w div 2;
-        hh:=hw;
-
-        gfx_MakeLiquidTemplate(sdlSurface,ts,-ts^.w-(a*wsp),-ts^.h-(a*hsp),w,hh,theme_liquid_animt,0,false);
-
-        if(theme_liquid_animt=1)then
-         case a of
-         1,3 : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,30));
-         2   : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,60));
-         end;
-
-        SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0,0));
-     end;
-end;
-
-procedure gfx_MakeLiquidBack;
-var ts :psdl_surface;
-    i  :byte;
-begin
-   if(theme_map_pblqt=theme_map_blqt)and(theme_map_blqt>0)then exit;
-   theme_map_pblqt:=theme_map_blqt;
-
-   if(theme_map_blqt<0)or(theme_map_blqt>=theme_spr_terrainn)
-   then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_map_blqt].sdlSurface;
-
-   for i:=1 to LiquidRs do
-    with spr_liquidb[i] do
-    begin
-       w:=DID_R[i]*2+30;
-       h:=w;
-       gfx_SDLSurfaceFree(sdlSurface);
-       sdlSurface:=gfx_SDLSurfaceCreate(w,w);
-       hw:=w div 2;
-       hh:=hw;
-       gfx_MakeLiquidTemplate(sdlSurface,ts,0,0,w,hw,0,theme_liquid_style,true);
-       boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,50));
-       SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0,0));
-    end;
-end;
-
-procedure gfx_MakeCrater;
-var ts : psdl_surface;
-    i  : integer;
-begin
-   if(theme_map_pcrt=theme_map_crt)and(theme_map_pcrt>0)then exit;
-   theme_map_pcrt:=theme_map_crt;
-
-   if(theme_map_crt<0)or(theme_map_crt>=theme_spr_terrainn)
-   then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_map_crt].sdlSurface;
-
-   for i:=1 to crater_ri do
-    with spr_crater[i] do
-    begin
-       w:=crater_r[i]*2;
-       h:=w;
-       gfx_SDLSurfaceFree(sdlSurface);
-       sdlSurface:=gfx_SDLSurfaceCreate(w,w);
-       hw:=crater_r[i];
-       hh:=hw;
-       gfx_MakeLiquidTemplate(sdlSurface,ts,0,0,w,hw,0,theme_crater_style,false);
-       boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,70));
-       if(theme_crater_style<2)then
-       SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0,0));
-    end;
-end;
-
-procedure gfx_MakeTerrain;
-var x,y,w,h:integer;
-    ter_s  :pSDL_Surface;
-begin
-   if(theme_map_ptrt=theme_map_trt)and(theme_map_ptrt>0)then exit;
-   theme_map_ptrt:=theme_map_trt;
-
-   if(vid_terrain<>nil) then
-   begin
-      sdl_freesurface(vid_terrain);
-      vid_terrain:=nil;
-   end;
-
-   if(theme_map_trt<0)or(theme_map_trt>=theme_spr_terrainn)then
-   begin
-      ter_w:=1;
-      ter_h:=1;
-      vid_terrain:=r_dterrain;
-      SDl_FillRect(vid_terrain,nil,c_black);
-   end
-   else
-   begin
-      ter_s:=theme_spr_terrains[theme_map_trt].sdlSurface;
-
-      ter_w:=ter_s^.w;
-      ter_h:=ter_s^.h;
-      w:=vid_cam_w+(ter_w shl 1);
-      h:=vid_cam_h+(ter_h shl 1);
-      vid_terrain:=gfx_SDLSurfaceCreate(w,h);
-      x:=0;
-      while (x<w) do
-      begin
-         y:=0;
-         while (y<w) do
-         begin
-            draw_surf(vid_terrain,x,y,ter_s);
-            y+=ter_s^.h;
-         end;
-         x+=ter_s^.w;
-      end;
-   end;
-end;
-
-procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;transColor,transCKey,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet);
-var tileX  : word;
-b10,b01,
-b21,b12    : boolean;
-sTemplate  : pSDL_Surface;
-tr,tr2,thw,
-tw0,tw1,tw2: integer;
-procedure FillSurfaceBySurface(sTar,sTile:pSDL_Surface);
+procedure gfx_FillSurfaceBySurface(sTar,sTile:pSDL_Surface;animStepX,animStepY:integer);
 var tx,ty:integer;
 begin
-   tx:=0;
+   tx:=animStepX;
    while tx<sTar^.w do
    begin
-      ty:=0;
+      ty:=animStepy;
       while ty<sTar^.h do
       begin
          draw_surf(sTar,tx,ty,sTile);
@@ -448,6 +277,92 @@ begin
       end;
       tx+=sTile^.w;
    end;
+end;
+
+procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;transColor,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet;edgeStyle:byte;animStepX,animStepY:integer;colorMask:cardinal);
+var tileX  : byte;
+b10,b01,
+b21,b12    : boolean;
+sTemplate  : pSDL_Surface;
+tr ,tr2,thw,
+tw0,tw1,tw2: integer;
+brushx,
+brushy,
+brushr     : array[0..7] of integer;
+brushn     : byte;
+procedure AddBrush(ax,ay,ar:integer);
+begin
+   if(brushn<=7)then
+   begin
+      brushx[brushn]:=ax;
+      brushy[brushn]:=ay;
+      brushr[brushn]:=ar;
+   end;
+   brushn+=1;
+end;
+function CheckNearestBrush(bx,by:integer;bnSkip:byte):boolean;
+var bn:byte;
+begin
+   CheckNearestBrush:=false;
+   if(0<=bx)and(0<=by)and(bx<=tw)and(by<=tw)then
+   begin
+      for bn:=0 to 7 do
+       if(bn<>bnSkip)then
+        if(brushr[bn]>0)then
+         if(point_dist_int(brushx[bn],brushy[bn],bx,by)<=brushr[bn])then
+         begin
+            CheckNearestBrush:=true;
+            break;
+         end;
+   end
+   else CheckNearestBrush:=true;
+end;
+procedure DrawBrush(bn:byte);
+var
+bx,by,br,
+edgeR,
+tx,ty  : integer;
+dirStart,
+dir,
+dirStep: single;
+begin
+   bx:=brushx[bn];
+   by:=brushy[bn];
+   br:=brushr[bn];
+   if(br>0)then
+     case edgeStyle of
+tes_fog   : filledcircleColor(sTemplate,bx,by,br,templateColor);
+tes_nature: begin
+            filledcircleColor(sTemplate,bx,by,br,templateColor);
+            dirStep:=8;
+            edgeR  :=round((pi*br*dirStep)/180);
+            if(edgeR>1)then
+            begin
+               dirStart:=point_dir(bx,by,thw,thw);
+               dir:=dirStart;
+               while(true)do
+               begin
+                  tx:=bx+round(br*cos(dir*degtorad));
+                  ty:=by-round(br*sin(dir*degtorad));
+                  if(CheckNearestBrush(tx,ty,bn))
+                  then break
+                  else filledcircleColor(sTemplate,tx,ty,random(edgeR)+1,transColor);
+                  dir +=dirStep;
+               end;
+               dir:=dirStart;
+               while(true)do
+               begin
+                  dir-=dirStep;
+                  tx:=bx+round(br*cos(dir*degtorad));
+                  ty:=by-round(br*sin(dir*degtorad));
+                  if(CheckNearestBrush(tx,ty,bn))
+                  then break
+                  else filledcircleColor(sTemplate,tx,ty,random(edgeR)+1,transColor);
+               end;
+            end;
+            end;
+tes_tech  : boxColor(sTemplate,bx-br,by-br,bx+br,by+br,templateColor);
+     end;
 end;
 begin
    thw:=tw div 2;
@@ -461,13 +376,16 @@ begin
    boxColor(sTemplate,0,0,tw,tw,templateColor);
    SDL_SetColorKey(sTemplate,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sTemplate,0,0));
 
-   with tileSet^[0] do
+   // full tiled
+   with tileSet^[1] do
    begin
+      gfx_SDLSurfaceFree(sdlSurface);
       sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
       boxColor(sdlSurface,0,0,tw,tw,transColor);
-      FillSurfaceBySurface(sdlSurface,baseSurface);
-      SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY,transCKey);
-      w:=tw;h:=w;
+      SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
+      gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
+      if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      w :=tw; h :=w;
       hw:=thw;hh:=hw;
    end;
 
@@ -477,45 +395,137 @@ begin
    for b12:=false to true do
    begin
       boxColor(sTemplate,0,0,tw,tw,transColor);
-
       tileX:=1;
-      if(b10)then begin filledcircleColor(sTemplate,tw1,tw0,tr ,templateColor); tileX+=1; end;
-      if(b01)then begin filledcircleColor(sTemplate,tw0,tw1,tr ,templateColor); tileX+=2; end;
-      if(b21)then begin filledcircleColor(sTemplate,tw2,tw1,tr ,templateColor); tileX+=4; end;
-      if(b12)then begin filledcircleColor(sTemplate,tw1,tw2,tr ,templateColor); tileX+=8; end;
+      brushn:=0;
+      FillChar(brushx,SizeOf(brushx),0);
+      FillChar(brushy,SizeOf(brushy),0);
+      FillChar(brushr,SizeOf(brushr),0);
 
-      if(b10)and(b01)then filledcircleColor(sTemplate,tw0,tw0,tr2,templateColor);
-      if(b21)and(b10)then filledcircleColor(sTemplate,tw2,tw0,tr2,templateColor);
-      if(b01)and(b12)then filledcircleColor(sTemplate,tw0,tw2,tr2,templateColor);
-      if(b21)and(b12)then filledcircleColor(sTemplate,tw2,tw2,tr2,templateColor);
+      if(b10)then begin AddBrush(tw1,tw0,tr); tileX+=1; end;
+      if(b01)then begin AddBrush(tw0,tw1,tr); tileX+=2; end;
+      if(b21)then begin AddBrush(tw2,tw1,tr); tileX+=4; end;
+      if(b12)then begin AddBrush(tw1,tw2,tr); tileX+=8; end;
 
+      if(edgeStyle<>tes_tech)then
+      begin
+         if(b10)and(b01)then AddBrush(tw0,tw0,tr2);
+         if(b21)and(b10)then AddBrush(tw2,tw0,tr2);
+         if(b01)and(b12)then AddBrush(tw0,tw2,tr2);
+         if(b21)and(b12)then AddBrush(tw2,tw2,tr2);
+      end;
+
+      while(brushn>0)do
+      begin
+         brushn-=1;
+         DrawBrush(brushn);
+      end;
+
+      if(tileX=1)then tileX:=0;
       with tileSet^[tileX] do
       begin
+         gfx_SDLSurfaceFree(sdlSurface);
          sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
          boxColor(sdlSurface,0,0,tw,tw,transColor);
-         FillSurfaceBySurface(sdlSurface,baseSurface);
+         if(tileX>1)then
+         begin
+         gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
          draw_surf(sdlSurface,0,0,sTemplate);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,transCKey);
+         if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+         end;
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,thw,thw));
          w:=tw;h:=w;
          hw:=thw;hh:=hw;
       end;
    end;
+   gfx_SDLSurfaceFree(sTemplate);
 end;
 
-function gfx_LoadButton(fn:shortstring;bw:integer):pSDL_Surface;
+function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;YScale:single;animStepX,animStepY:integer):pSDL_Surface;
+var  ts,
+baseSurface2:pSDl_Surface;
+nsw,nsh:integer;
+begin
+   baseSurface2:=zoomSurface(baseSurface,1,YScale,0);
+
+   nsw:=0;
+   while(nsw<sw)do nsw+=baseSurface2^.w;
+
+   nsh:=0;
+   while(nsh<sw)do nsh+=baseSurface2^.h;
+
+   ts:=gfx_SDLSurfaceCreate(nsw,nsh);
+
+   gfx_FillSurfaceBySurface(ts,baseSurface2,animStepX,animStepY);
+
+   gfx_MakeBaseTile:=zoomSurface(ts,sw/ts^.w,sw/ts^.h,0);
+
+   gfx_SDLSurfaceFree(baseSurface2);
+   gfx_SDLSurfaceFree(ts);
+end;
+procedure gfx_MakeThemeTiles;
+var
+anim_seed:cardinal;
+animRX,
+animRY,
+i,
+animStepX,
+animStepY: integer;
+maskColor: cardinal;
+begin
+   gfx_SDLSurfaceFree(theme_tile_terrain);
+   gfx_SDLSurfaceFree(theme_tile_crater );
+   gfx_SDLSurfaceFree(theme_tile_liquid );
+
+   anim_seed:=map_seed mod 6;
+   case(anim_seed div 3)of
+  0: animRX:=-theme_anim_tile_step;
+  1: animRX:= theme_anim_tile_step;
+   end;
+   case(anim_seed mod 3)of
+  0: animRY:=-theme_anim_tile_step;
+  1: animRY:= 0;
+  2: animRY:= theme_anim_tile_step;
+   end;
+
+   animStepX:=-terrrain_cellw-animRX;
+   animStepY:=-terrrain_cellw-animRY;
+
+   if(theme_tile_terrain_id>=0)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_terrain_id].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
+   if(theme_tile_crater_id >=0)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_crater_id ].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
+   if(theme_tile_liquid_id >=0)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_liquid_id ].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
+
+   boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,c_ablack);
+
+   gfx_MakeTileSet(theme_tile_crater,c_white,c_black,terrrain_cellw,@theme_tileset_crater,tes_nature,animStepX,animStepY,0);
+   for i:=0 to theme_anim_step_n-1 do
+   begin
+      //if(theme_liquid_animt=1)then
+       {case a of
+       1,3 : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,30));
+       2   : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,60));
+       end; }
+      maskColor:=rgba2c(0,0,0,30);
+
+      gfx_MakeTileSet(theme_tile_liquid,c_white,c_black,terrrain_cellw,@theme_tileset_liquid[i],tes_nature,animStepX,animStepY,0);
+      animStepX+=animRX;
+      animStepY+=animRY;
+   end;
+end;
+
+function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
 var ts:pSDl_Surface;
    hwb:integer;
 begin
    hwb:=bw div 2;
    ts:=gfx_SDLSurfaceLoad(fn,false,true);
-   gfx_LoadButton:=gfx_SDLSurfaceCreate(bw-1,bw-1);
+   gfx_LoadUIButton:=gfx_SDLSurfaceCreate(bw-1,bw-1);
    if(ts^.h>bw)
-   then draw_surf(gfx_LoadButton,hwb-(ts^.w div 2),0,ts)
-   else draw_surf(gfx_LoadButton,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
+   then draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),0                ,ts)
+   else draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
    gfx_SDLSurfaceFree(ts);
 end;
 
-function gfx_MakeButtonFromSDLSurface(ts:pSDl_Surface;bw:integer):pSDL_Surface;
+function gfx_MakeUIButtonFromSDLSurface(ts:pSDl_Surface;bw:integer):pSDL_Surface;
 var tst:pSDL_Surface;
    coff:single;
     hwb:integer;
@@ -525,17 +535,17 @@ begin
    if(ts^.w<=bw)or(ts^.h<=bw)
    then coff:=1
    else
-    if(ts^.w<ts^.h)
-    then coff:=bw/ts^.w
-    else coff:=bw/ts^.h;
+     if(ts^.w<ts^.h)
+     then coff:=bw/ts^.w
+     else coff:=bw/ts^.h;
 
    tst:=ROTOZOOMSURFACE(ts, 0, coff, 0);
-   gfx_MakeButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
+   gfx_MakeUIButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
    if(tst^.h>bw)
-   then draw_surf(gfx_MakeButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
-   else draw_surf(gfx_MakeButtonFromSDLSurface,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
-   rectangleColor(gfx_MakeButtonFromSDLSurface,0,0,gfx_MakeButtonFromSDLSurface^.w-1,gfx_MakeButtonFromSDLSurface^.h-1,c_black);
-   rectangleColor(gfx_MakeButtonFromSDLSurface,1,1,gfx_MakeButtonFromSDLSurface^.w-2,gfx_MakeButtonFromSDLSurface^.h-2,c_black);
+   then draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
+   else draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
+   rectangleColor(gfx_MakeUIButtonFromSDLSurface,0,0,gfx_MakeUIButtonFromSDLSurface^.w-1,gfx_MakeUIButtonFromSDLSurface^.h-1,c_black);
+   rectangleColor(gfx_MakeUIButtonFromSDLSurface,1,1,gfx_MakeUIButtonFromSDLSurface^.w-2,gfx_MakeUIButtonFromSDLSurface^.h-2,c_black);
    SDL_FreeSurface(tst);
 end;
 
@@ -568,9 +578,9 @@ end;
 
 {$include _themes.pas}
 
+
 procedure gfx_LoadGraphics(firstload:boolean);
 var x,r:integer;
-transColor:cardinal;
 begin
    r_empty   :=gfx_SDLSurfaceCreate(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
@@ -578,21 +588,15 @@ begin
    r_minimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
    r_bminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
 
-   {r_sminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   boxColor(r_sminimap,0,0,vid_panelwi,vid_panelwi,c_white);
-   SDL_SetColorKey(r_sminimap,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_sminimap,0,0));}
-
-   for x:=1 to vid_mvs do new(vid_vsl[x]);
-
-   vid_prims:=0;
-   setlength(vid_prim,vid_prims);
+   vid_UIItem_n :=0;
+   setlength(vid_UIItem_list,vid_UIItem_n);
 
    with spr_dummy do
    begin
-      h   :=1;
-      w   :=1;
-      hh  :=1;
-      hw  :=1;
+      h :=1;
+      w :=1;
+      hh:=1;
+      hw:=1;
       sdlSurface:=r_empty;
    end;
    pspr_dummy:=@spr_dummy;
@@ -609,53 +613,44 @@ begin
 
    gfx_LoadFont;
 
-   vid_fog_surf := gfx_SDLSurfaceCreate(fog_cr*2,fog_cr*2);
-   boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
-   filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
-
    vid_fog_BaseSurf := gfx_SDLSurfaceCreate(fog_cw,fog_cw);
    boxColor(vid_fog_BaseSurf,0,0,fog_cw,fog_cw,c_white);
-   transColor:=SDL_GETpixel(vid_fog_BaseSurf,0,0);
-   SDL_SetColorKey(vid_fog_BaseSurf,SDL_SRCCOLORKEY,transColor);
    for x:=1 to fog_cw do
    for r:=1 to fog_cw do
-     if((x+r)mod 4)>0 then
+     if((x+r)mod 5)>0 then
        pixelColor(vid_fog_BaseSurf,x-1,r-1,c_black);
-
-   gfx_MakeTileSet(vid_fog_BaseSurf,c_white,transColor,c_black,fog_cw,@vid_fog_tiles);
-
+   gfx_MakeTileSet(vid_fog_BaseSurf,c_white,c_black,fog_cw,@vid_fog_tiles,tes_fog,0,0,0);
 
    spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
 
-   r_menu:=gfx_SDLSurfaceCreate(max2i(vid_minw,spr_mback^.w), max2i(vid_minh,spr_mback^.h));
+   r_menu:=gfx_SDLSurfaceCreate(max2i(vid_minw,spr_mback^.w),max2i(vid_minh,spr_mback^.h));
 
    menu_x:=(vid_vw-r_menu^.w) div 2;
    menu_y:=(vid_vh-r_menu^.h) div 2;
 
-   spr_b_action   := gfx_LoadButton('b_action' ,vid_bw);
-   spr_b_paction  := gfx_LoadButton('b_paction',vid_bw);
-   spr_b_delete   := gfx_LoadButton('b_destroy',vid_bw);
-   spr_b_attack   := gfx_LoadButton('b_attack' ,vid_bw);
-   spr_b_rebuild  := gfx_LoadButton('b_rebuild',vid_bw);
-   spr_b_move     := gfx_LoadButton('b_move'   ,vid_bw);
-   spr_b_patrol   := gfx_LoadButton('b_patrol' ,vid_bw);
-   spr_b_apatrol  := gfx_LoadButton('b_apatrol',vid_bw);
-   spr_b_stop     := gfx_LoadButton('b_stop'   ,vid_bw);
-   spr_b_hold     := gfx_LoadButton('b_hold'   ,vid_bw);
-   spr_b_selall   := gfx_LoadButton('b_selall' ,vid_bw);
-   spr_b_cancel   := gfx_LoadButton('b_cancle' ,vid_bw);
-   spr_b_rfast    := gfx_LoadButton('b_rfast'  ,vid_bw);
-   spr_b_rskip    := gfx_LoadButton('b_rskip'  ,vid_bw);
-   spr_b_rback    := gfx_LoadButton('b_rback'  ,vid_bw);
-   spr_b_rfog     := gfx_LoadButton('b_fog'    ,vid_bw);
-   spr_b_rlog     := gfx_LoadButton('b_log'    ,vid_bw);
-   spr_b_rstop    := gfx_LoadButton('b_rstop'  ,vid_bw);
-   spr_b_rvis     := gfx_LoadButton('b_rvis'   ,vid_bw);
-   spr_b_rclck    := gfx_LoadButton('b_rclick' ,vid_bw);
-   spr_b_mmark    := gfx_LoadButton('b_mmark'  ,vid_bw);
+   spr_b_action   := gfx_LoadUIButton('b_action' ,vid_bw);
+   spr_b_paction  := gfx_LoadUIButton('b_paction',vid_bw);
+   spr_b_delete   := gfx_LoadUIButton('b_destroy',vid_bw);
+   spr_b_attack   := gfx_LoadUIButton('b_attack' ,vid_bw);
+   spr_b_rebuild  := gfx_LoadUIButton('b_rebuild',vid_bw);
+   spr_b_move     := gfx_LoadUIButton('b_move'   ,vid_bw);
+   spr_b_patrol   := gfx_LoadUIButton('b_patrol' ,vid_bw);
+   spr_b_apatrol  := gfx_LoadUIButton('b_apatrol',vid_bw);
+   spr_b_stop     := gfx_LoadUIButton('b_stop'   ,vid_bw);
+   spr_b_hold     := gfx_LoadUIButton('b_hold'   ,vid_bw);
+   spr_b_selall   := gfx_LoadUIButton('b_selall' ,vid_bw);
+   spr_b_cancel   := gfx_LoadUIButton('b_cancle' ,vid_bw);
+   spr_b_rfast    := gfx_LoadUIButton('b_rfast'  ,vid_bw);
+   spr_b_rskip    := gfx_LoadUIButton('b_rskip'  ,vid_bw);
+   spr_b_rback    := gfx_LoadUIButton('b_rback'  ,vid_bw);
+   spr_b_rfog     := gfx_LoadUIButton('b_fog'    ,vid_bw);
+   spr_b_rlog     := gfx_LoadUIButton('b_log'    ,vid_bw);
+   spr_b_rstop    := gfx_LoadUIButton('b_rstop'  ,vid_bw);
+   spr_b_rvis     := gfx_LoadUIButton('b_rvis'   ,vid_bw);
+   spr_b_rclck    := gfx_LoadUIButton('b_rclick' ,vid_bw);
+   spr_b_mmark    := gfx_LoadUIButton('b_mmark'  ,vid_bw);
 
-   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadButton('tabs'+b2s(x),vid_tbw);
+   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadUIButton('tabs'+b2s(x),vid_tbw);
 
    spr_cursor     := gfx_SDLSurfaceLoad('cursor'   ,true ,true);
 
@@ -708,47 +703,46 @@ begin
    gfx_MWSModelLoad(@spr_Transport      ,race_units[r_uac ]+'transport'  ,smt_transport,firstload);
    gfx_MWSModelLoad(@spr_UACBot         ,race_units[r_uac ]+'uacd'       ,smt_flyer    ,firstload);
 
+   gfx_MWSModelLoad(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HASymbol       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HBarracks      ,race_buildings[r_hell]+'h_hbar_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HABarracks     ,race_buildings[r_hell]+'h_hbara',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding  ,firstload);
 
-   gfx_MWSModelLoad(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HASymbol       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks      ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HABarracks     ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
-
-   gfx_MWSModelLoad(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks      ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UABarracks     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret ,firstload);
-   gfx_MWSModelLoad(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret ,firstload);
-   gfx_MWSModelLoad(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2,firstload);
-   gfx_MWSModelLoad(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UAFactory      ,race_buildings[r_uac ] +'u_b11_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_UFactory       ,race_buildings[r_uac ] +'u_b12_',smt_buiding,firstload);
-   gfx_MWSModelLoad(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
+   gfx_MWSModelLoad(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UBarracks      ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UABarracks     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret   ,firstload);
+   gfx_MWSModelLoad(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret   ,firstload);
+   gfx_MWSModelLoad(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2  ,firstload);
+   gfx_MWSModelLoad(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UAFactory      ,race_buildings[r_uac ] +'u_b11_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UFactory       ,race_buildings[r_uac ] +'u_b12_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding  ,firstload);
 
    gfx_MWSModelLoad(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
    gfx_MWSModelLoad(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
@@ -772,45 +766,45 @@ begin
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_type:=smt_effect2;
 
-   gfx_MWSModelLoad(@spr_eff_bfg    ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_eb     ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_ebb    ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_gtel   ,effects_folder+'ef_gt_'         ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_tel    ,effects_folder+'ef_tel_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_exp    ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_exp2   ,effects_folder+'exp2_'          ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_g      ,effects_folder+'g_'             ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_blood      ,effects_folder+'blood'          ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_gtel       ,effects_folder+'ef_gt_'         ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_tel        ,effects_folder+'ef_tel_'        ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect ,firstload);
+   gfx_MWSModelLoad(@spr_blood          ,effects_folder+'blood'          ,smt_effect ,firstload);
 
-   gfx_MWTextureLoad(@spr_mp[r_hell],race_dir[r_hell]+'h_mp',firstload,true);
-   gfx_MWTextureLoad(@spr_mp[r_uac ],race_dir[r_uac ]+'u_mp',firstload,true);
-   gfx_MWTextureLoad(@spr_ptur      ,race_dir[r_uac ]+'ptur',firstload,true);
+   gfx_MWTextureLoad(@spr_mp[r_hell]    ,race_dir[r_hell]+'h_mp'        ,firstload,true);
+   gfx_MWTextureLoad(@spr_mp[r_uac ]    ,race_dir[r_uac ]+'u_mp'        ,firstload,true);
+   gfx_MWTextureLoad(@spr_ptur          ,race_dir[r_uac ]+'ptur'        ,firstload,true);
 
-   gfx_MWTextureLoad(@spr_b4_a      ,race_buildings[r_uac ]+'u_b4_a',firstload,true);
-   gfx_MWTextureLoad(@spr_b7_a      ,race_buildings[r_uac ]+'u_b7_a',firstload,true);
-   gfx_MWTextureLoad(@spr_b9_a      ,race_buildings[r_uac ]+'u_b9_a',firstload,true);
+   gfx_MWTextureLoad(@spr_b4_a          ,race_buildings[r_uac ]+'u_b4_a',firstload,true);
+   gfx_MWTextureLoad(@spr_b7_a          ,race_buildings[r_uac ]+'u_b7_a',firstload,true);
+   gfx_MWTextureLoad(@spr_b9_a          ,race_buildings[r_uac ]+'u_b9_a',firstload,true);
 
-   gfx_MWTextureLoad(@spr_stun      ,effects_folder+'stun'   ,firstload,true);
-   gfx_MWTextureLoad(@spr_invuln    ,effects_folder+'invuln' ,firstload,true);
-   gfx_MWTextureLoad(@spr_hvision   ,effects_folder+'hvision',firstload,true);
-   gfx_MWTextureLoad(@spr_scan      ,effects_folder+'scan'   ,firstload,true);
-   gfx_MWTextureLoad(@spr_decay     ,effects_folder+'decay'  ,firstload,true);
+   gfx_MWTextureLoad(@spr_stun          ,effects_folder+'stun'          ,firstload,true);
+   gfx_MWTextureLoad(@spr_invuln        ,effects_folder+'invuln'        ,firstload,true);
+   gfx_MWTextureLoad(@spr_hvision       ,effects_folder+'hvision'       ,firstload,true);
+   gfx_MWTextureLoad(@spr_scan          ,effects_folder+'scan'          ,firstload,true);
+   gfx_MWTextureLoad(@spr_decay         ,effects_folder+'decay'         ,firstload,true);
 
-
-   gfx_MWTextureLoad(@spr_cp_koth   ,'cp_koth',firstload,true);
-   gfx_MWTextureLoad(@spr_cp_out    ,'cp_out' ,firstload,true);
-   gfx_MWTextureLoad(@spr_cp_gen    ,'cp_gen' ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_koth       ,'cp_koth'                      ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_out        ,'cp_out'                       ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_gen        ,'cp_gen'                       ,firstload,true);
 
    for x:=0 to spr_upgrade_icons do
     for r:=1 to r_cnt do
      with spr_b_up[r,x] do
      begin
-        sdlSurface:= gfx_LoadButton(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
+        sdlSurface:= gfx_LoadUIButton(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
         w   := sdlSurface^.w;h    := w;
         hw  := w div 2      ;hh   := hw;
      end;
 
    effect_InitCLData;
+
    InitThemes;
 end;
 
@@ -824,8 +818,8 @@ begin
       with un_btn do
       begin
          case _urace of
-         r_hell: sdlSurface:= gfx_MakeButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_BW );
-         r_uac : sdlSurface:= gfx_MakeButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_BW );
+         r_hell: sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_BW );
+         r_uac : sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_BW );
          end;
          w   := sdlSurface^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -833,8 +827,8 @@ begin
       with un_sbtn do
       begin
          case _urace of
-         r_hell: sdlSurface:= gfx_MakeButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_oiw );
-         r_uac : sdlSurface:= gfx_MakeButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_oiw );
+         r_hell: sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_oiw );
+         r_uac : sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_oiw );
          end;
          w   := sdlSurface^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -842,7 +836,7 @@ begin
    end;
 end;
 
-procedure Map_tdmake;
+{procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
    _tdecaln:=(vid_cam_w*vid_cam_h) div 10000;
@@ -863,7 +857,7 @@ begin
        x :=ix;
        y :=iy;
     end;
-end;
+end;   }
 
 procedure vid_CommonVars;
 begin
@@ -906,7 +900,7 @@ begin
    map_mmvh     := round(vid_cam_h*map_mmcx);
    GameCameraBounds;
 
-   Map_tdmake;
+   //Map_tdmake;
 end;
 
 procedure vid_ScreenSurfaces;
