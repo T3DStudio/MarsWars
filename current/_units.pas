@@ -746,7 +746,7 @@ begin
       u_royal_d :=NOTSET;
       if(g_mode=gm_royale)then
       begin
-         u_royal_cd:=point_dist_int(x,y,map_hmw,map_hmw);
+         u_royal_cd:=point_dist_int(x,y,map_hsize,map_hsize);
          u_royal_d :=g_royal_r-u_royal_cd;
          if(u_royal_d<_missile_r)then
          begin
@@ -1689,8 +1689,8 @@ begin
       begin
          unit_OrderTarget(pu);
 
-         ua_x:=mm3i(1,ua_x,map_mw);
-         ua_y:=mm3i(1,ua_y,map_mw);
+         ua_x:=mm3i(1,ua_x,map_size);
+         ua_y:=mm3i(1,ua_y,map_size);
 
          mv_x:=ua_x;
          mv_y:=ua_y;

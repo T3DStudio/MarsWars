@@ -8,9 +8,9 @@ begin
         if(team=g_players[UIPlayer].team)then
           if(_ability=uab_UACScan)and(reload>radar_vision_time)then
             if(r_minimap_scan_blink)
-            then filledCircleColor(r_minimap,trunc(ua_x  *map_mmcx),
-                                             trunc(ua_y  *map_mmcx),
-                                             trunc(srange*map_mmcx),ShadowColor(PlayerGetColor(pnum)));
+            then filledCircleColor(r_minimap,trunc(ua_x  *map_mm_cx),
+                                             trunc(ua_y  *map_mm_cx),
+                                             trunc(srange*map_mm_cx),ShadowColor(PlayerGetColor(pnum)));
 
       if(uid^._ukbuilding)and(mmr>0)
       then boxColor  (r_minimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerGetColor(player^.pnum))
@@ -77,8 +77,8 @@ procedure unit_UpdateFogXY(pu:PTUnit);
 begin
    with pu^ do
    begin
-      fx :=x div fog_cw;
-      fy :=y div fog_cw;
+      fx :=x div fog_CellW;
+      fy :=y div fog_CellW;
    end;
 end;
 
@@ -112,8 +112,8 @@ begin
      2:begin
           if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
           unit_FogReveal:=true;
-          if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_cw)-vid_fog_sx,
-                                                                                           (ua_y div fog_cw)-vid_fog_sy,fsr);
+          if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_CellW)-vid_fog_sx,
+                                                                                           (ua_y div fog_CellW)-vid_fog_sy,fsr);
        end;
        end;
 end;

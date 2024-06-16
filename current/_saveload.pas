@@ -61,8 +61,8 @@ begin
 
             BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
-            BlockRead(f,vr,sizeof(map_mw           ));
-            if(vr<MinSMapW)and(MaxSMapW<vr)
+            BlockRead(f,vr,sizeof(map_size         ));
+            if(vr<MinMapSize)and(MaxMapDize<vr)
                                       then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                                       else       svld_str_info+=str_map_size+i2s(vr)+tc_nl3+' ';
             vr:=0;
@@ -77,7 +77,7 @@ begin
                                       else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';
             vr:=0;
 
-            BlockRead(f,vr,sizeof(theme_cur          ));
+            BlockRead(f,vr,sizeof(theme_cur        ));
             if(vr>=theme_n           )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;
             vr:=0;
 
@@ -90,7 +90,7 @@ begin
             BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
             BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
 
-            BlockRead(f,hp,sizeof(PlayerClient  ));
+            BlockRead(f,hp,sizeof(PlayerClient));
 
             BlockRead(f,pls,SizeOf(TPList));
             svld_str_info+=tc_nl3;
@@ -103,7 +103,7 @@ begin
 
                if(pls[vr].state>ps_none)then
                  if(pls[vr].team=0)
-                 then svld_str_info+=str_observer[1]           +','+t2c(pls[vr].team)+','
+                 then svld_str_info+=str_observer[1]                +','+t2c(pls[vr].team)+','
                  else svld_str_info+=str_racel[pls[vr].slot_race][2]+','+t2c(pls[vr].team)+',';
                svld_str_info+=pls[vr].name+tc_nl3
             end;
@@ -161,9 +161,9 @@ begin
    SizeOf(campain_skill    )+
    SizeOf(map_seed         )+
    SizeOf(g_random_i       )+
-   SizeOf(map_mw           )+
+   SizeOf(map_size         )+
    SizeOf(map_type         )+
-   SizeOf(theme_cur          )+
+   SizeOf(theme_cur        )+
    SizeOf(g_mode           )+
    SizeOf(g_start_base     )+
    SizeOf(g_fixed_positions)+
@@ -173,8 +173,7 @@ begin
    SizeOf(g_slot_state     )+
    SizeOf(g_units          )+
    SizeOf(g_missiles       )+
-   SizeOf(g_effects         )+
-   //SizeOf(map_dds          )+
+   SizeOf(g_effects        )+
    SizeOf(vid_cam_x        )+
    SizeOf(vid_cam_y        )+
    SizeOf(PlayerColor      )+
@@ -191,8 +190,9 @@ begin
    SizeOf(g_cycle_order    )+
    SizeOf(g_cycle_regen    )+
    SizeOf(ui_alarms        )+
-   SizeOf(map_psx          )+
-   SizeOf(map_psy          )+
+   SizeOf(map_PlayerStartX )+
+   SizeOf(map_PlayerStartY )+
+   SizeOf(map_grid         )+
    SizeOf(g_random_p       );
    //SizeOf(theme_map_liquid    )+
    //SizeOf(theme_map_terrain2   )+
@@ -215,10 +215,10 @@ begin
    BlockWrite(f,campain_skill    ,SizeOf(campain_skill    ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
    BlockWrite(f,g_random_i       ,SizeOf(g_random_i       ));
-   BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
+   BlockWrite(f,map_size         ,SizeOf(map_size         ));
    BlockWrite(f,map_type         ,SizeOf(map_type         ));
    BlockWrite(f,map_symmetry     ,sizeof(map_symmetry     ));
-   BlockWrite(f,theme_cur          ,SizeOf(theme_cur          ));
+   BlockWrite(f,theme_cur        ,SizeOf(theme_cur        ));
    BlockWrite(f,g_mode           ,SizeOf(g_mode           ));
    BlockWrite(f,g_start_base     ,SizeOf(g_start_base     ));
    BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
@@ -228,8 +228,7 @@ begin
    BlockWrite(f,g_slot_state     ,SizeOf(g_slot_state     ));
    BlockWrite(f,g_units          ,SizeOf(g_units          ));
    BlockWrite(f,g_missiles       ,SizeOf(g_missiles       ));
-   BlockWrite(f,g_effects         ,SizeOf(g_effects         ));
-  // BlockWrite(f,map_dds          ,SizeOf(map_dds          ));
+   BlockWrite(f,g_effects        ,SizeOf(g_effects        ));
    BlockWrite(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
    BlockWrite(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
    BlockWrite(f,PlayerColor      ,SizeOf(PlayerColor      ));
@@ -246,8 +245,9 @@ begin
    BlockWrite(f,g_cycle_order    ,SizeOf(g_cycle_order    ));
    BlockWrite(f,g_cycle_regen    ,SizeOf(g_cycle_regen    ));
    BlockWrite(f,ui_alarms        ,SizeOf(ui_alarms        ));
-   BlockWrite(f,map_psx          ,SizeOf(map_psx          ));
-   BlockWrite(f,map_psy          ,SizeOf(map_psy          ));
+   BlockWrite(f,map_PlayerStartX ,SizeOf(map_PlayerStartX ));
+   BlockWrite(f,map_PlayerStartY ,SizeOf(map_PlayerStartY ));
+   BlockWrite(f,map_grid         ,SizeOf(map_grid         ));
    BlockWrite(f,g_random_p       ,SizeOf(g_random_p       ));
    //BlockWrite(f,theme_map_liquid    ,SizeOf(theme_map_liquid    ));
    //BlockWrite(f,theme_map_terrain2   ,SizeOf(theme_map_terrain2   ));
@@ -290,10 +290,10 @@ begin
          BlockRead(f,campain_skill    ,SizeOf(campain_skill    ));
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
          BlockRead(f,g_random_i       ,SizeOf(g_random_i       ));
-         BlockRead(f,map_mw           ,SizeOf(map_mw           ));
+         BlockRead(f,map_size         ,SizeOf(map_size         ));
          BlockRead(f,map_type         ,SizeOf(map_type         ));
          BlockRead(f,map_symmetry     ,sizeof(map_symmetry     ));
-         BlockRead(f,theme_cur          ,SizeOf(theme_cur          ));map_seed2theme;
+         BlockRead(f,theme_cur        ,SizeOf(theme_cur        ));
          BlockRead(f,g_mode           ,SizeOf(g_mode           ));
          BlockRead(f,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
@@ -303,8 +303,7 @@ begin
          BlockRead(f,g_slot_state     ,SizeOf(g_slot_state     ));
          BlockRead(f,g_units          ,SizeOf(g_units          ));
          BlockRead(f,g_missiles       ,SizeOf(g_missiles       ));
-         BlockRead(f,g_effects         ,SizeOf(g_effects         ));
-        // BlockRead(f,map_dds          ,SizeOf(map_dds          ));
+         BlockRead(f,g_effects        ,SizeOf(g_effects        ));
          BlockRead(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
          BlockRead(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
          BlockRead(f,PlayerColor      ,SizeOf(PlayerColor      ));
@@ -321,8 +320,9 @@ begin
          BlockRead(f,g_cycle_order    ,SizeOf(g_cycle_order    ));
          BlockRead(f,g_cycle_regen    ,SizeOf(g_cycle_regen    ));
          BlockRead(f,ui_alarms        ,SizeOf(ui_alarms        ));
-         BlockRead(f,map_psx          ,SizeOf(map_psx          ));
-         BlockRead(f,map_psy          ,SizeOf(map_psy          ));
+         BlockRead(f,map_PlayerStartX ,SizeOf(map_PlayerStartX ));
+         BlockRead(f,map_PlayerStartY ,SizeOf(map_PlayerStartY ));
+         BlockRead(f,map_grid         ,SizeOf(map_grid         ));
          BlockRead(f,g_random_p       ,SizeOf(g_random_p       ));
          //BlockRead(f,theme_map_liquid    ,SizeOf(theme_map_liquid    ));
          //BlockRead(f,theme_map_terrain2   ,SizeOf(theme_map_terrain2   ));
@@ -330,14 +330,15 @@ begin
          //BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
 
          for u:=1 to MaxUnits do
-          with g_units[u] do
-          begin
-             player:=@g_players[playeri];
-             uid   :=@g_uids[uidi];
-          end;
+           with g_units[u] do
+           begin
+              player:=@g_players[playeri];
+              uid   :=@g_uids[uidi];
+           end;
 
          PlayersValidateName;
          map_Vars;
+         map_seed2theme;
          gfx_MakeThemeTiles;
         // map_RefreshDoodadsCells;
          //map_RedrawMenuMinimap;

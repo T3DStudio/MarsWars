@@ -16,8 +16,8 @@ procedure unit_CalcFogR(pu:PTUnit);
 begin
    with pu^ do
    begin
-      fsr :=mm3i(0,srange div fog_cw,MFogM);
-      //mmsr:=trunc(srange*map_mmcx)+2;
+      fsr :=mm3i(0,srange div fog_CellW,MFogM);
+      //mmsr:=trunc(srange*map_mm_cx)+2;
    end;
 end;
 {$ENDIF}
@@ -45,7 +45,7 @@ begin
          end;
 
          {$IFDEF _FULLGAME}
-         mmr   := trunc(_missile_r*map_mmcx)+1;
+         mmr   := trunc(_missile_r*map_mm_cx)+1;
          animw := _animw;
          shadow:= _unit_CalcShadowZ(pu);
 

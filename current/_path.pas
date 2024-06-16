@@ -3,19 +3,19 @@
 procedure pf_FillArea(px,py:integer;arean:word);
 var d:byte;
 begin
-   if(px<0)or(py<0)or(px>pf_pathmap_c)or(py>pf_pathmap_c)then exit;
+   {if(px<0)or(py<0)or(px>pf_pathmap_c)or(py>pf_pathmap_c)then exit;
    if(pf_pathgrid_areas[px,py]>0)then exit;
 
    pf_pathgrid_areas[px,py]:=arean;
 
-   for d:=0 to 7 do pf_FillArea(px+dir_stepX[d],py+dir_stepY[d],arean);
+   for d:=0 to 7 do pf_FillArea(px+dir_stepX[d],py+dir_stepY[d],arean); }
 end;
 
 procedure pf_MakeZoneGrid;
 var d,sx,sy,ix,iy,ex,ey: integer;
 carea:word;
 begin
-   FillChar(pf_pathgrid_areas,SizeOf(pf_pathgrid_areas),0);
+   //FillChar(pf_pathgrid_areas,SizeOf(pf_pathgrid_areas),0);
 
    // solid cells
   { for d:=1 to MaxDoodads do
@@ -33,7 +33,7 @@ begin
            pf_pathgrid_areas[ix,iy]:=pf_solid;
      end;
 
-   ex:=round(map_mw/pf_pathmap_w);
+   ex:=round(map_size/pf_pathmap_w);
    for sx:=0 to pf_pathmap_c do
    for sy:=0 to pf_pathmap_c do
     if(sx>=ex)or(sy>=ex)then pf_pathgrid_areas[sx,sy]:=pf_solid;
@@ -57,9 +57,9 @@ end;
 
 function pf_GetAreaZone(cx,cy:integer):word;
 begin
-   if(pf_CheckBorders(cx,cy)=false)
+  { if(pf_CheckBorders(cx,cy)=false)
    then pf_GetAreaZone:=pf_solid
-   else pf_GetAreaZone:=pf_pathgrid_areas[cx,cy];
+   else pf_GetAreaZone:=pf_pathgrid_areas[cx,cy];  }
 end;
 
 function pf_get_area(x,y:integer):word;

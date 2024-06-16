@@ -9,16 +9,16 @@ var posCY,
 begin
    with menu_items[mi] do
    begin
-      barh :=(y1-y0);
+      barh :=(mi_y1-mi_y0);
       if(scrolls<scrollmax)then
       begin
-         barh :=mm3i(1,round((y1-y0)*(scrolls/scrollmax)),barh);
-         posCY:=y0+round((y1-y0-barh)*(scrolli/(scrollmax-scrolls)));
+         barh :=mm3i(1,round((mi_y1-mi_y0)*(scrolls/scrollmax)),barh);
+         posCY:=mi_y0+round((mi_y1-mi_y0-barh)*(scrolli/(scrollmax-scrolls)));
       end
-      else posCY:=y0;
+      else posCY:=mi_y0;
 
-      vlineColor(tar,x0+1,posCY,posCY+barh,c_lime);
-      vlineColor(tar,x0+2,posCY,posCY+barh,c_lime);
+      vlineColor(tar,mi_x0+1,posCY,posCY+barh,c_lime);
+      vlineColor(tar,mi_x0+2,posCY,posCY+barh,c_lime);
    end;
 end;
 
@@ -35,24 +35,24 @@ const larrow_w  = 13;
 var tx,tx1,ty:integer;
 begin
    with menu_items[me] do
-   if(x0>0)then
+   if(mi_x0>0)then
    begin
-      tx:=x0;
-      ty:=y0;
+      tx:=mi_x0;
+      ty:=mi_y0;
       if(listarrow)
-      then tx1:=max2i(x0,x1-larrow_w)
-      else tx1:=x1;
-      if(not enabled)then listarrow:=false;
+      then tx1:=max2i(mi_x0,mi_x1-larrow_w)
+      else tx1:=mi_x1;
+      if(not mi_enabled)then listarrow:=false;
       case halignment of
-      ta_left    : tx:=x0+font_34;
-      ta_middle  : tx:=(x0+tx1) div 2;
+      ta_left    : tx:=mi_x0+font_34;
+      ta_middle  : tx:=(mi_x0+tx1) div 2;
       ta_right   : tx:=tx1-font_34;
       ta_rightmid: begin
-                   tx:=((x0+x1) div 2)+font_34;
+                   tx:=((mi_x0+mi_x1) div 2)+font_34;
                    halignment:=ta_left;
                    end;
       ta_x0y0    : begin
-                   tx:=x0+font_hw;
+                   tx:=mi_x0+font_hw;
                    halignment:=ta_left;
                    end;
       ta_x1y1    : begin
@@ -61,15 +61,15 @@ begin
                    end;
       end;
       case valignment of
-      ta_x0y0    : ty:= y0+font_hw;
-      ta_x1y1    : ty:= y1-font_hhw-font_w;
-      ta_left    : ty:= y0+font_34;
-      ta_middle  : ty:=((y0+y1) div 2)-font_hw+1;
-      ta_right   : ty:= y1-font_3hw;
+      ta_x0y0    : ty:= mi_y0+font_hw;
+      ta_x1y1    : ty:= mi_y1-font_hhw-font_w;
+      ta_left    : ty:= mi_y0+font_34;
+      ta_middle  : ty:=((mi_y0+mi_y1) div 2)-font_hw+1;
+      ta_right   : ty:= mi_y1-font_3hw;
       end;
 
       if(color=0)
-      then color:=mic(enabled,((selected>0) or listarrow)and((menu_item=me)or(selected>1)));
+      then color:=mic(mi_enabled,((selected>0) or listarrow)and((menu_item=me)or(selected>1)));
 
       draw_text(tar,tx,ty,text,halignment,255,color);
 
@@ -82,13 +82,13 @@ var tx0,tx1:integer;
 begin
    with menu_items[mi] do
    begin
-      tx1:=x1-font_w;
+      tx1:=mi_x1-font_w;
       tx0:=tx1-max;
-      vlineColor(tar,tx0,y0+1,y1,c_gray);
-      vlineColor(tar,tx1,y0+1,y1,c_gray);
-      boxColor  (tar,tx0,y0+font_hw+1,tx0+val,y1-font_hw,c_lime);
+      vlineColor(tar,tx0,mi_y0+1,mi_y1,c_gray);
+      vlineColor(tar,tx1,mi_y0+1,mi_y1,c_gray);
+      boxColor  (tar,tx0,mi_y0+font_hw+1,tx0+val,mi_y1-font_hw,c_lime);
 
-      draw_text(tar,tx0-font_34,((y0+y1) div 2)-font_hw+1,i2s(round(val/max*100))+'%',ta_right,255,c_white);
+      draw_text(tar,tx0-font_34,((mi_y0+mi_y1) div 2)-font_hw+1,i2s(round(val/max*100))+'%',ta_right,255,c_white);
    end;
 end;
 procedure D_menu_ETextD(tar:pSDL_Surface;mi:byte;l_text,r_text:shortstring;listarrow:boolean;selected:byte;color:cardinal);
@@ -100,7 +100,7 @@ procedure D_menu_ETextN(tar:pSDL_Surface;mi:byte;l_text,r_text:shortstring;lista
 begin
    D_menu_EText(tar,mi,ta_left    ,ta_middle,l_text,false    ,byte(listarrow)+selected,color);
    D_menu_EText(tar,mi,ta_rightmid,ta_middle,r_text,listarrow,selected                ,color);
-   with menu_items[mi] do vlineColor(tar,(x0+x1) div 2,y0+1,y1,c_gray);
+   with menu_items[mi] do vlineColor(tar,(mi_x0+mi_x1) div 2,mi_y0+1,mi_y1,c_gray);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,12 +132,12 @@ begin
                                                                               ,true ,0,0);
       D_menu_EText (tar,mi_map_params2,ta_middle,ta_middle,c2s(map_seed)      ,false,1,0);
 
-      D_menu_ETextD(tar,mi_map_params3,str_map_size,i2s(map_mw)               ,true ,0,0);
+      D_menu_ETextD(tar,mi_map_params3,str_map_size,i2s(map_size)               ,true ,0,0);
       D_menu_ETextD(tar,mi_map_params4,str_map_type,str_map_typel[map_type]   ,true ,0,0);
       D_menu_ETextD(tar,mi_map_params5,str_map_sym ,str_map_syml[map_symmetry],true ,0,0);
 
       D_menu_EText (tar,mi_map_params6,ta_middle,ta_middle,str_mrandom        ,false,0,0);
-      //D_menu_EText (tar,mi_map_params7,ta_middle,ta_middle,theme_name[theme_cur],false,0,0);
+      D_menu_EText (tar,mi_map_params7,ta_middle,ta_middle,theme_name[theme_cur],false,0,0);
    end;
 end;
 
@@ -163,8 +163,8 @@ begin
 
         with menu_items[mi_mplay_NetSearchList] do
         begin
-           hlineColor(tar,x0,x1,y0,c_white);
-           hlineColor(tar,x0,x1,y1,c_white);
+           hlineColor(tar,mi_x0,mi_x1,mi_y0,c_white);
+           hlineColor(tar,mi_x0,mi_x1,mi_y1,c_white);
 
            if(net_svsearch_listn>0)then
             for u:=0 to vid_srch_m do
@@ -173,10 +173,10 @@ begin
                if(p<net_svsearch_listn)then
                 with net_svsearch_list[p] do
                 begin
-                   y:=y0+(u*ui_menu_nsrch_lh3);
-                   if(p=net_svsearch_sel)then boxColor(tar,x0,y+1,x1,y+ui_menu_nsrch_lh3,c_dgray);
-                   hlineColor(tar,x0,x1,y+ui_menu_nsrch_lh3,c_white);
-                   draw_text(tar,x0+3,y+font_hw,i2s(p+1)+')'+info,ta_left,ui_menu_chat_width,c_white);
+                   y:=mi_y0+(u*ui_menu_nsrch_lh3);
+                   if(p=net_svsearch_sel)then boxColor(tar,mi_x0,y+1,mi_x1,y+ui_menu_nsrch_lh3,c_dgray);
+                   hlineColor(tar,mi_x0,mi_x1,y+ui_menu_nsrch_lh3,c_white);
+                   draw_text(tar,mi_x0+3,y+font_hw,i2s(p+1)+')'+info,ta_left,ui_menu_chat_width,c_white);
                 end;
             end;
         end;
@@ -562,10 +562,10 @@ begin
       if(menu_list_n>0)then
        with menu_items[menu_item] do
        begin
-          boxColor(r_menu,0   ,0 ,x0       ,r_menu^.h,c_ablack);
-          boxColor(r_menu,x1  ,0 ,r_menu^.w,r_menu^.h,c_ablack);
-          boxColor(r_menu,x0+1,0 ,x1-1     ,y0       ,c_ablack);
-          boxColor(r_menu,x0+1,y1,x1-1     ,r_menu^.h,c_ablack);
+          boxColor(r_menu,0   ,0 ,mi_x0       ,r_menu^.h,c_ablack);
+          boxColor(r_menu,mi_x1  ,0 ,r_menu^.w,r_menu^.h,c_ablack);
+          boxColor(r_menu,mi_x0+1,0 ,mi_x1-1     ,mi_y0       ,c_ablack);
+          boxColor(r_menu,mi_x0+1,mi_y1,mi_x1-1     ,r_menu^.h,c_ablack);
        end;
       //if false then
       {for i:=0 to 255 do

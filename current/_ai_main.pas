@@ -255,7 +255,7 @@ begin
            or(bt=aiucl_main0A[race])
            or(bt=aiucl_main1 [race])
            or(bt=aiucl_main1A[race])
-           then ddir:=point_dir(x,y,map_hmw,map_hmw)-g_randomr(100);
+           then ddir:=point_dir(x,y,map_hsize,map_hsize)-g_randomr(100);
       end;
       rdir:=ddir*degtorad;
       if(l<0)
@@ -732,8 +732,8 @@ begin
          if(g_generators>0)then
          begin
             ai_towers_need :=min2i(ucl_c[false],ai_maxcount_towers);
-            ai_towers_needx:=random(map_mw);
-            ai_towers_needy:=random(map_mw);
+            ai_towers_needx:=random(map_size);
+            ai_towers_needy:=random(map_size);
             ai_towers_needl:=srange;
          end
          else ai_towers_need:=0;
@@ -861,12 +861,12 @@ procedure ai_DefaultIdle(pu:PTUnit);
 begin
    with pu^ do
    begin
-      {uo_x:=mm3i(1,uo_x,map_mw);
-      uo_y:=mm3i(1,uo_y,map_mw);
+      {uo_x:=mm3i(1,uo_x,map_size);
+      uo_y:=mm3i(1,uo_y,map_size);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
       or(CheckRoyalBattleRadiusPoint(uo_x,uo_y,base_1r))
-      then ai_RunTo(pu,-1,random(map_mw),random(map_mw),0,nil);      }
+      then ai_RunTo(pu,-1,random(map_size),random(map_size),0,nil);      }
    end;
 end;
 procedure ai_RunFrom(pu:PTUnit;ax,ay:integer);
@@ -878,8 +878,8 @@ begin
        uo_y:=y-g_random(2);
     end
     else
-      if(min2i(x,abs(map_mw-x))<srange)
-      or(min2i(y,abs(map_mw-y))<srange)
+      if(min2i(x,abs(map_size-x))<srange)
+      or(min2i(y,abs(map_size-y))<srange)
       then ai_DefaultIdle(pu)
       else
       begin
@@ -1191,7 +1191,7 @@ begin
       {#########   royale battle: escape from death circle  ###########}
       if(g_mode=gm_royale)and(u_royal_d<100)then
       begin
-         ai_RunTo(pu,0,map_hmw,map_hmw,0,nil);
+         ai_RunTo(pu,0,map_hsize,map_hsize,0,nil);
          au_SetBusyGroup(pu);
          if(u_royal_d<50)then
          begin
@@ -1334,11 +1334,11 @@ begin
       if(ukfly)then
       begin
          if(u_royal_d<base_2r)
-         then ai_RunTo(pu,0,map_hmw,map_hmw,0,nil)
+         then ai_RunTo(pu,0,map_hsize,map_hsize,0,nil)
          else
            if(ai_ischoosen)and(g_mode=gm_royale)then
            begin
-              ai_RunTo(pu,u_royal_cd,map_hmw,map_hmw,base_1r,nil);
+              ai_RunTo(pu,u_royal_cd,map_hsize,map_hsize,base_1r,nil);
               if(u_royal_cd<min2i(g_royal_r div 7,base_2r))
               then unit_sability(pu,false);
            end
@@ -1396,8 +1396,8 @@ begin
         begin
            if(g_mode=gm_royale)
            then w:=g_royal_r div 2
-           else w:=map_hmw;
-           if(unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false))then exit;
+           else w:=map_hsize;
+           if(unit_ability_HKeepBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false))then exit;
         end;
 
       case g_mode of
@@ -1411,7 +1411,7 @@ gm_royale: if(ai_ischoosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2i(g_royal_r div 4,base_2r);
-              unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false);
+              unit_ability_HKeepBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false);
               exit;
            end;
       end;
@@ -1485,7 +1485,7 @@ begin
       if(srange<ai_alarm_d)and(ai_alarm_d<NOTSET)then
         SetBlinkTarget(ai_alarm_x,ai_alarm_y,ai_alarm_d,ai_alarm_zone);
 
-      if(g_mode=gm_royale)then SetBlinkTarget(map_hmw,map_hmw,0,pf_get_area(map_hmw,map_hmw));
+      if(g_mode=gm_royale)then SetBlinkTarget(map_hsize,map_hsize,0,pf_get_area(map_hsize,map_hsize));
 
       if(bd=NOTSET)then exit;
 
@@ -1575,7 +1575,7 @@ uab_UACScan          : begin
                             end;
                           if(ai_alarm_d=NOTSET)and(g_mode<>gm_invasion)then
                            if(ai_ischoosen)or(ai_ReadyForAttack)then
-                            if(unit_ability_UACScan(pu,g_random(map_mw),g_random(map_mw),false))then ai_detection_pause:=fr_fps1;
+                            if(unit_ability_UACScan(pu,g_random(map_size),g_random(map_size),false))then ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then
                          if(unit_ability_HellVision(pu,ai_need_heye_u^.unum,false))then ai_detection_pause:=fr_fps1;

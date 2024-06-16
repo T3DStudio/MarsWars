@@ -41,7 +41,7 @@ begin
          mw:=0;
          wr:=0;
          BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_map_size+i2s(mw)+tc_nl3+' ';mw:=0;
+         BlockRead(f,mw,SizeOf(map_size      ));rpls_str_info+=str_map_size+i2s(mw)+tc_nl3+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_type    ));
          if(vr>gms_m_types)then begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end
                            else       rpls_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' '; vr:=0;
@@ -101,7 +101,7 @@ begin
    rpls_file_head_size
                  :=SizeOf(g_version        )
                   +SizeOf(map_seed         )
-                  +SizeOf(map_mw           )
+                  +SizeOf(map_size           )
                   +SizeOf(map_type         )
                   +SizeOf(map_symmetry     )
 
@@ -242,7 +242,7 @@ begin
       {$I-}
       BlockWrite(rpls_file,g_version        ,SizeOf(g_version        ));
       BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
-      BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
+      BlockWrite(rpls_file,map_size           ,SizeOf(map_size           ));
       BlockWrite(rpls_file,map_type         ,SizeOf(map_type         ));
       BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
 
@@ -376,7 +376,7 @@ begin
 
          {$I-}
          BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
-         BlockRead(rpls_file,map_mw           ,SizeOf(map_mw           ));
+         BlockRead(rpls_file,map_size         ,SizeOf(map_size         ));
          BlockRead(rpls_file,map_type         ,SizeOf(map_type         ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
          BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
@@ -386,11 +386,12 @@ begin
          BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
          {$I+}
 
-         if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
+         if(map_size<MinMapSize)or(map_size>MaxMapDize)
          or(map_type    >gms_m_types)
          or(map_symmetry>gms_m_symm)
-         or not(g_mode in allgamemodes)
-         or(g_start_base>gms_g_startb)
+         or(g_mode>gms_count)
+         or(g_start_base>gms_g_startb )
+         or(g_generators>gms_g_maxgens)
          or(rpls_player>MaxPlayers)then
          begin
             replay_Abort;
@@ -439,7 +440,7 @@ begin
 
          map_premap;
          vid_map_RedrawBack:=true;
-         GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
+         GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
 
          GameCameraBounds;
          ui_tab    :=3;

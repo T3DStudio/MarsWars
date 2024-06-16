@@ -234,8 +234,8 @@ begin
       prod_error_uid :=uid;
       if(pu<>nil)then
       begin
-         prod_error_x:=mm3i(1,pu^.x,map_mw);
-         prod_error_y:=mm3i(1,pu^.y,map_mw);
+         prod_error_x:=mm3i(1,pu^.x,map_size);
+         prod_error_y:=mm3i(1,pu^.y,map_size);
       end
       else
       begin
@@ -670,7 +670,7 @@ end;
 function _DIR360(d:integer):integer;
 begin
    _DIR360:=d mod 360;
-   if(_DIR360<0)then _DIR360:=_DIR360+360;
+   if(_DIR360<0)then _DIR360+=360;
 end;
 
 function dir_turn(d1,d2,spd:integer):integer;
@@ -682,6 +682,55 @@ begin
    then dir_turn:=d2
    else dir_turn:=d1+(spd*sign(d));
    dir_turn:=_DIR360(dir_turn);
+end;
+
+
+procedure mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1:integer;rx,ry:pinteger);
+begin
+   if(tx<=gmx0)then
+   begin
+      rx^:=gmx0;
+      if(ty<=gmy0)
+      then ry^:=gmy0
+      else
+      if(gmy0<=ty)and(ty<=gmy1)
+      then ry^:=ty
+      else ry^:=gmy1;
+   end
+   else
+   if(gmx0<tx)and(tx<gmx1)then
+   begin
+      rx^:=tx;
+      if(ty<=gmy0)
+      then ry^:=gmy0
+      else
+      if(gmy0<=ty)and(ty<=gmy1)
+      then ry^:=ty
+      else ry^:=gmy1;
+   end
+   else // gmx1<=tx
+   begin
+      rx^:=gmx1;
+      if(ty<=gmy0)
+      then ry^:=gmy0
+      else
+      if(gmy0<=ty)and(ty<=gmy1)
+      then ry^:=ty
+      else ry^:=gmy1;
+   end;
+end;
+
+function dist2mgcell(tx,ty,gx,gy:integer):integer;
+var gmx0,gmy0,
+    gmx1,gmy1,
+    gmx ,gmy :integer;
+begin
+   gmx0:=gx*MapCellW;
+   gmy0:=gy*MapCellW;
+   gmx1:=gmx0+MapCellW;
+   gmy1:=gmy0+MapCellW;
+   mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1,@gmx,@gmy);
+   dist2mgcell:=point_dist_int(tx,ty,gmx,gmy);
 end;
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
@@ -707,34 +756,15 @@ end;
 function CheckRoyalBattleRadiusPoint(x,y,d:integer):boolean;
 begin
    if(g_mode=gm_royale)
-   then CheckRoyalBattleRadiusPoint:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
+   then CheckRoyalBattleRadiusPoint:=(point_dist_int(x,y,map_hsize,map_hsize)+d)>=g_royal_r
    else CheckRoyalBattleRadiusPoint:=false;
 end;
 
 function g_random(m:integer):integer;
 const a = 4;
-      t : array[byte] of byte = (
-   //   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14    15
-      0  ,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,  74,   21,
-      211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,  95, 110,  85,   48,
-      212, 140, 211, 249,  22,  79, 200,  50,  28, 188,  52, 140, 202, 120,  68,  145,
-      62 ,  70, 184, 190,  91, 197, 152, 224, 149, 104,  25, 178, 252, 182, 202,  182,
-      141, 197,   4,  81, 181, 242, 145,  42,  39, 227, 156, 198, 225, 193, 219,   93,
-      122, 175, 249,   0, 175, 143,  70, 239,  46, 246, 163,  53, 163, 109, 168,  135,
-      2  , 235,  25,  92,  20, 145, 138,  77,  69, 166,  78, 176, 173, 212, 166,  113,
-      94 , 161,  41,  50, 239,  49, 111, 164,  70,  60,   2,  37, 171,  75, 136,  156,
-      11 ,  56,  42, 146, 138, 229,  73, 146,  77,  61,  98, 196, 135, 106,  63,  197,
-      195,  86,  96, 203, 113, 101, 170, 247, 181, 113,  80, 250, 108,   7, 255,  237,
-      129, 226,  79, 107, 112, 166, 103, 241,  24, 223, 239, 120, 198,  58,  60,   82,
-      128,   3, 184,  66, 143, 224, 145, 224,  81, 206, 163,  45,  63,  90, 168,  114,
-      59 ,  33, 159,  95,  28, 139, 123,  98, 125, 196,  15,  70, 194, 253,  54,   14,
-      109, 226,  71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,   36,
-      17 ,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106, 197,  242,
-      98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249
-      );
 begin
    g_random_p+=1;
-   g_random_i:=g_random_i*a+t[g_random_p];
+   g_random_i:=g_random_i*a+random_table[g_random_p];
    if(m=0)
    then g_random:=0
    else g_random:=abs(integer(g_random_i) mod m);
@@ -1110,8 +1140,8 @@ end;
 function fog_check(x,y:integer):boolean;
 var cx,cy:integer;
 begin
-   cx:=x div fog_cw;
-   cy:=y div fog_cw;
+   cx:=x div fog_CellW;
+   cy:=y div fog_CellW;
    fog_check:=false;
    if(0<=cx)and(cx<=fog_vfwm)
   and(0<=cy)and(cy<=fog_vfhm)then fog_check:=vid_fog_pgrid[cx,cy];
@@ -1307,15 +1337,20 @@ end;
 
 procedure GameCameraBounds;
 begin
-   vid_cam_x:=mm3i(0,vid_cam_x,map_mw-vid_cam_w);
-   vid_cam_y:=mm3i(0,vid_cam_y,map_mw-vid_cam_h);
+   vid_cam_x:=mm3i(0,vid_cam_x,map_size-vid_cam_w);
+   vid_cam_y:=mm3i(0,vid_cam_y,map_size-vid_cam_h);
 
-   vid_mmvx:=round(vid_cam_x*map_mmcx);
-   vid_mmvy:=round(vid_cam_y*map_mmcx);
-   vid_fog_sx :=vid_cam_x div fog_cw;
-   vid_fog_sy :=vid_cam_y div fog_cw;
+   vid_mmvx:=round(vid_cam_x*map_mm_cx);
+   vid_mmvy:=round(vid_cam_y*map_mm_cx);
+   vid_fog_sx :=vid_cam_x div fog_CellW;
+   vid_fog_sy :=vid_cam_y div fog_CellW;
    vid_fog_ex :=vid_fog_sx+vid_fog_vfw;
    vid_fog_ey :=vid_fog_sy+vid_fog_vfh;
+
+   vid_map_sx :=vid_cam_x div MapCellW;
+   vid_map_sy :=vid_cam_y div MapCellW;
+   vid_map_ex :=vid_map_sx+vid_map_vfw;
+   vid_map_ey :=vid_map_sy+vid_map_vfh;
 end;
 
 procedure GameCameraMoveToPoint(mx,my:integer);

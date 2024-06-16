@@ -167,9 +167,9 @@ begin
    begin
       if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
 
-      x:=round(map_psx[i]*map_mmcx);
-      y:=round(map_psy[i]*map_mmcx);
-      r:=trunc(base_1r*map_mmcx);
+      x:=round(map_PlayerStartX[i]*map_mm_cx);
+      y:=round(map_PlayerStartY[i]*map_mm_cx);
+      r:=trunc(base_1r*map_mm_cx);
 
       // clear
       filledcircleColor(r_minimap,x,y,r ,c_black);
@@ -187,18 +187,18 @@ begin
           else map_MinimapSpot(r_minimap,x,y,r,'+'      ,c_white);
    end;
 
-   {x:=round(map_symmetryX0*map_mmcx);
-   y:=round(map_symmetryY0*map_mmcx);
+   {x:=round(map_symmetryX0*map_mm_cx);
+   y:=round(map_symmetryY0*map_mm_cx);
    lineColor(r_minimap,
    x,y,
-   round(map_symmetryX1*map_mmcx),
-   round(map_symmetryY1*map_mmcx),
+   round(map_symmetryX1*map_mm_cx),
+   round(map_symmetryY1*map_mm_cx),
    c_lime);
 
    lineColor(r_minimap,
    x,y,
-   x-(round(map_symmetryX1*map_mmcx)-x),
-   y-(round(map_symmetryY1*map_mmcx)-y),
+   x-(round(map_symmetryX1*map_mm_cx)-x),
+   y-(round(map_symmetryY1*map_mm_cx)-y),
    c_lime); }
 end;
 
@@ -259,11 +259,11 @@ begin
    }
    ui_AddMarker:=false;
 
-   ax:=mm3i(1,ax,map_mw);
-   ay:=mm3i(1,ay,map_mw);
+   ax:=mm3i(1,ax,map_size);
+   ay:=mm3i(1,ay,map_size);
 
-   mx:=trunc(ax*map_mmcx);
-   my:=trunc(ay*map_mmcx);
+   mx:=trunc(ax*map_mm_cx);
+   my:=trunc(ay*map_mm_cx);
 
    if(not new)then
     for i:=0 to ui_max_alarms do

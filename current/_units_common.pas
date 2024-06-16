@@ -3,8 +3,8 @@ procedure unit_UpdateMiniMapXY(pu:PTUnit);
 begin
    with pu^ do
    begin
-      mmx:=trunc(x*map_mmcx);
-      mmy:=trunc(y*map_mmcx);
+      mmx:=trunc(x*map_mm_cx);
+      mmy:=trunc(y*map_mm_cx);
       //mmsx:=(mmx shr 2)shl 2;
       //mmsy:=(mmy shr 2)shl 2;
    end;
@@ -314,8 +314,8 @@ begin
    begin
       _px:=x;
       _py:=y;
-      x:=mm3i(1,ax,map_mw);
-      y:=mm3i(1,ay,map_mw);
+      x:=mm3i(1,ax,map_size);
+      y:=mm3i(1,ay,map_size);
       if(x<>_px)or(y<>_py)then
       begin
          unit_UpdateXY(pu);
@@ -420,8 +420,8 @@ procedure unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eiden
 begin
    with pu^ do
    begin
-      tx:=mm3i(0,tx,map_mw);
-      ty:=mm3i(0,ty,map_mw);
+      tx:=mm3i(0,tx,map_size);
+      ty:=mm3i(0,ty,map_size);
       {$IFDEF _FULLGAME}
       effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
@@ -604,7 +604,7 @@ var nrx,
     nry,
     nrd,
     nrt : array[0..nrl] of integer;
-dx,dy,
+gx,gy,gx0,gy0,gx1,gy1,gmx,gmy,
 o,u,d   : integer;
 
 procedure add(ax,ay,ad,at:integer);
@@ -649,10 +649,30 @@ begin
    if(check_obstacles)then
    begin
       tr-=bld_dec_mr;
-      {dx:=tx div dcw;
-      dy:=ty div dcw;
-      if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-       with map_dcell[dx,dy] do
+
+      {gx0:=(tx-tr) div MapCellW;
+      gy0:=(ty-tr) div MapCellW;
+      gx1:=(tx+tr) div MapCellW;
+      gy1:=(ty+tr) div MapCellW;
+
+      for gx:=gx0 to gx1 do
+      for gy:=gy0 to gy1 do
+      begin
+         gmx:=gx*MapCellW;
+         gmy:=gy*MapCellW;
+         if (0<=gx)and(gx<=map_LastCell)
+         and(0<=gy)and(gy<=map_LastCell)then
+           if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
+
+         mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,@gmx,@gmy);
+         d:=point_dist_int(gmx,gmy,tx,ty)-tr;
+         add(gmx,gmy,d,tr);
+      end;}
+
+      {gx:=tx div dcw;
+      gy:=ty div dcw;
+      if(0<=gx)and(gx<=dcn)and(0<=gy)and(gy<=dcn)then
+       with map_dcell[gx,gy] do
         if(n>0)then
          for u:=0 to n-1 do
           with l[u]^ do
@@ -737,15 +757,14 @@ begin
       if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   tx:=mm3i(map_b0,tx,map_b1);
-   ty:=mm3i(map_b0,ty,map_b1);
+   tx:=mm3i(map_BuildBorder0,tx,map_BuildBorder1);
+   ty:=mm3i(map_BuildBorder0,ty,map_BuildBorder1);
    newx^:=tx;
    newy^:=ty;
 end;
 
-
 function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean):byte;
-var u,dx,dy:integer;
+var u,gx,gy,gx0,gy0,gx1,gy1:integer;
 begin
    CheckCollisionR:=0;
 
@@ -768,34 +787,39 @@ begin
      if(cpCaptureR>0)then
      begin
         if(building)
-        then dx:=max2i(cpsolidr,cpNoBuildR)
-        else dx:=cpsolidr;
-        if(dx<=0)then continue;
-        if(point_dist_int(tx,ty,cpx,cpy)<dx)then
+        then gx:=max2i(cpsolidr,cpNoBuildR)
+        else gx:=cpsolidr;
+        if(gx<=0)then continue;
+        if(point_dist_int(tx,ty,cpx,cpy)<gx)then
         begin
            CheckCollisionR:=3;
            exit;
         end;
      end;
 
-   if(check_obstacles=false)then exit;
+   if(not check_obstacles)then exit;
 
    tr-=bld_dec_mr;
 
-  { dx:=tx div dcw;
-   dy:=ty div dcw;
+   gx0:=(tx-tr) div MapCellW;
+   gy0:=(ty-tr) div MapCellW;
+   gx1:=(tx+tr) div MapCellW;
+   gy1:=(ty+tr) div MapCellW;
 
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-    with map_dcell[dx,dy] do
-     if(n>0)then
-      for u:=0 to n-1 do
-       with l[u]^ do
-        if(r>0)and(t>0)then
-         if(point_dist_int(x,y,tx,ty)<(tr+r))then
-         begin
-            CheckCollisionR:=4;
-            exit;
-         end;   }
+   for gx:=gx0 to gx1 do
+   for gy:=gy0 to gy1 do
+   begin
+      u:=dist2mgcell(tx,ty,gx,gy);
+      if(u<tr)then
+      begin
+         if (0<=gx)and(gx<=map_LastCell)
+         and(0<=gy)and(gy<=map_LastCell)then
+           if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
+
+         CheckCollisionR:=4;
+         exit;
+      end;
+   end;
 end;
 
 function CheckBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
@@ -811,8 +835,8 @@ begin
         exit;
      end;
 
-   if(tx<map_b0)or(map_b1<tx)
-   or(ty<map_b0)or(map_b1<ty)then
+   if(tx<map_BuildBorder0)or(map_BuildBorder1<tx)
+   or(ty<map_BuildBorder0)or(map_BuildBorder1<ty)then
    begin
       CheckBuildArea:=2;  // out of bounds
       exit;
@@ -893,8 +917,8 @@ begin
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly,obstacles);
-         blink_x:=mm3i(1,blink_x,map_mw);
-         blink_y:=mm3i(1,blink_y,map_mw);
+         blink_x:=mm3i(1,blink_x,map_size);
+         blink_y:=mm3i(1,blink_y,map_size);
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
 
          unit_ability_HKeepBlink:=true;
@@ -924,8 +948,8 @@ begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,blink_x,blink_y))then _1c_push(@blink_x,@blink_y,x,y,srange-1);
          _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly, obstacles  );
-         blink_x:=mm3i(1,blink_x,map_mw);
-         blink_y:=mm3i(1,blink_y,map_mw);
+         blink_x:=mm3i(1,blink_x,map_size);
+         blink_y:=mm3i(1,blink_y,map_size);
          if(point_dist_int(x,y,blink_x,blink_y)>srange)then exit;
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
 

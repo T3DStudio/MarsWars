@@ -69,22 +69,22 @@ begin
    for p:=0 to MaxPlayers do
     with g_players[p] do
     begin
-       net_writestring(name );
-       net_writebyte  (team );
+       net_writestring(name     );
+       net_writebyte  (team     );
        net_writebyte  (slot_race);
-       net_writebyte  (state);
+       net_writebyte  (state    );
        net_writebyte  (g_slot_state[p]);
-       net_writebool  (isready);
-       net_writeword  (nttl  );
+       net_writebool  (isready  );
+       net_writeword  (nttl     );
        if(G_Started)then
        net_writebyte  (race );
     end;
 
-   net_writebyte(pid        );
-   net_writebyte(PlayerLobby);
+   net_writebyte(pid         );
+   net_writebyte(PlayerLobby );
 
    net_writebyte(g_preset_cur);
-   net_writeint (map_mw      );
+   net_writeint (map_size    );
    net_writebyte(map_type    );
    net_writecard(map_seed    );
    net_writebyte(map_symmetry);
@@ -99,8 +99,8 @@ begin
    if(G_Started)and(not g_fixed_positions)then
     for p:=1 to MaxPlayers do
     begin
-       net_writeint(map_psx[p]);
-       net_writeint(map_psy[p]);
+       net_writeint(map_PlayerStartX[p]);
+       net_writeint(map_PlayerStartY[p]);
     end;
 end;
 
@@ -347,9 +347,9 @@ begin
    new_map    :=false;
    net_ClientReadMapData:=false;
 
-   if(rByte(@g_preset_cur     ,g_preset_n       ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rInt (@map_mw           ,MinSMapW,MaxSMapW))then begin redraw_menu:=true;new_map:=true;end;
-   if(rByte(@map_type         ,gms_m_types      ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@g_preset_cur     ,g_preset_n           ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rInt (@map_size         ,MinMapSize,MaxMapDize))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@map_type         ,gms_m_types          ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(StartGame)
    or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))
@@ -360,7 +360,7 @@ begin
    else net_readcard;
 
    if(rByte(@map_symmetry     ,gms_m_symm       ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rByte(@g_mode           ,gm_cnt           ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@g_mode           ,gms_count        ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_start_base     ,gms_g_startb     ))then begin redraw_menu:=true;              end;
    if(rBool(@g_fixed_positions                  ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_ai_slots       ,gms_g_maxai      ))then begin redraw_menu:=true;              end;
@@ -371,11 +371,11 @@ begin
    if(redraw_menu)then menu_remake:=true;
 
    if(StartGame)and(not g_fixed_positions)then
-    for i:=1 to MaxPlayers do
-    begin
-       map_psx[i]:=net_readint;
-       map_psy[i]:=net_readint;
-    end;
+     for i:=1 to MaxPlayers do
+     begin
+        map_PlayerStartX[i]:=net_readint;
+        map_PlayerStartY[i]:=net_readint;
+     end;
 end;
 
 function net_ClientReadPlayerData(pid:byte;StartGame:boolean):boolean;
@@ -565,7 +565,7 @@ nmid_lobby_info  : begin
                          begin
                             menu_state:=false;
                             ServerSide:=false;
-                            GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
+                            GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
                             if(g_players[PlayerClient].team=0)then
                             begin
                                ui_tab:=3;

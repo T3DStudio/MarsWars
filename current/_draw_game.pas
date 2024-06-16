@@ -393,7 +393,7 @@ procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case g_mode of
-gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
+gm_royale: circleColor(tar,lx+map_hsize-vid_cam_x,ly+map_hsize-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
    end;
 
 
@@ -450,44 +450,44 @@ end;
 //
 
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
-var i,t,
+{var i,t,
   ix,iy,s:integer;
     vx,vy:integer;
-    spr  :PTMWTexture;
+    spr  :PTMWTexture;   }
+var
+ssx,ssy,sty,
+sx0,sy0,
+cx,cy,
+mx,my
+:integer;
 begin
-   {draw_surf(tar,
-   lx-vid_cam_x mod ter_w,
-   ly-vid_cam_y mod ter_h,
-   vid_terrain);
 
-   vx:=vid_cam_x-vid_ab;
-   vy:=vid_cam_y-vid_ab;
+   ssx:=lx-(vid_cam_x mod MapCellW);
+   sty:=ly-(vid_cam_y mod MapCellW);
+   sx0:=vid_cam_x div MapCellW;
+   sy0:=vid_cam_y div MapCellW;
 
-   if(theme_decaln>0)then
-    for i:=1 to _tdecaln do
-     with _tdecals[i-1] do
-     begin
-        ix:=x-vx+vid_mwa;
-        iy:=y-vy+vid_mha;
+   for cx:=0 to vid_map_vfw do
+   begin
+      ssy:=sty;
+      for cy:=0 to vid_map_vfh do
+      begin
+         mx:=sx0+cx;
+         my:=sy0+cy;
+         if (0<=mx)and(mx<MaxMapSizeCelln)
+         and(0<=my)and(my<MaxMapSizeCelln)then
+           case map_grid[mx,my].tgc_solidlevel of
+mgsl_nobuild : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_green );
+mgsl_liquid  : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_orange);
+mgsl_rocks   : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_gray  );
+           end;
 
-        s:=abs(i+(iy div vid_mha)+(ix div vid_mwa)) mod theme_decaln;
-
-        t:=theme_cur_decal_l[s];
-        if(t<0)
-        then spr:=@spr_crater[-t]
-        else spr:=@theme_spr_decals[t];
-
-        ix:=ix mod vid_mwa;
-        iy:=iy mod vid_mha;
-
-        if(ix<0)then ix:=vid_mwa+ix;
-        if(iy<0)then iy:=vid_mha+iy;
-
-        ix+=lx-vid_ab;
-        iy+=ly-vid_ab;
-
-        with spr^ do draw_surf(tar,ix-hw,iy-hh,spr^.sdlSurface);
-     end; }
+         hlineColor(tar,vid_mapx,vid_mapx+vid_cam_w,ssy,c_gray);
+         ssy+=MapCellW;
+      end;
+      vlineColor(tar,ssx,vid_mapy,vid_mapy+vid_cam_h,c_gray);
+      ssx+=MapCellW;
+   end;
 end;
 
 
@@ -565,24 +565,10 @@ begin
    and(0<=fy)and(fy<=fog_vfhm)then GetFogGridVal:=not vid_fog_pgrid[fx,fy];
 end;
 begin
-
-  { for sty:=1 to MaxUnits do
-    with g_units[sty] do
-     if(hits>0)then
-     begin
-        cx:=(fx*fog_cw)-vid_cam_x+lx;
-        cy:=(fy*fog_cw)-vid_cam_y+ly;
-        rectangleColor(tar,cx,cy,cx+fog_cw,cy+fog_cw,c_ltgray);
-
-        cx:=x-vid_cam_x+lx;
-        cy:=y-vid_cam_y+ly;
-        circleColor(tar,cx,cy,5,c_lime);
-     end;  }
-
    vid_fog_pgrid:=vid_fog_grid;
 
-   ssx:=lx-(vid_cam_x mod fog_cw);
-   sty:=ly-(vid_cam_y mod fog_cw);
+   ssx:=lx-(vid_cam_x mod fog_CellW);
+   sty:=ly-(vid_cam_y mod fog_CellW);
 
    for cx:=0 to vid_fog_vfw do
    begin
@@ -596,96 +582,13 @@ begin
                             GetFogGridVal(cx+1,cy  ),
                             GetFogGridVal(cx  ,cy+1));
          if(tileX>0)then
-         draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
+           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
 
          vid_fog_grid[cx,cy]:=false;
-         ssy+=fog_cw;
+         ssy+=fog_CellW;
       end;
-      ssx+=fog_cw;
+      ssx+=fog_CellW;
    end;
-
-  { ssx:=-(vid_cam_x mod fog_cw);
-   while(ssx<=vid_cam_w)do
-   begin
-      lineColor(tar,ssx,ly,ssx,ly+vid_cam_h,c_gray);
-      ssx+=fog_cw;
-   end;
-   ssy:=-(vid_cam_y mod fog_cw);
-   while(ssy<=vid_cam_h)do
-   begin
-      lineColor(tar,lx,ssy,lx+vid_cam_w,ssy,c_gray);
-      ssy+=fog_cw;
-   end;    }
-
-
- {  if(pfNodes_c>0)then
-    for ci:=1 to pfNodes_c do
-     with pfNodes[ci] do
-     begin
-        ssx:=(pos_x*pf_pathmap_w+pf_pathmap_hw)-vid_cam_x+lx;
-        ssy:=(pos_y*pf_pathmap_w+pf_pathmap_hw)-vid_cam_y+ly;
-        circleColor(tar,ssx,ssy,16,c_lime);
-        cx:=(rootx*pf_pathmap_w+pf_pathmap_hw)-vid_cam_x+lx;
-        cy:=(rooty*pf_pathmap_w+pf_pathmap_hw)-vid_cam_y+ly;
-        linecolor(tar,ssx,ssy,cx,cy,c_green);
-     end;
-
-   ssx:=lx-(vid_cam_x mod pf_pathmap_w);
-   sty:=ly-(vid_cam_y mod pf_pathmap_w);
-
-   ci:=5;
-
-   while(ssx<vid_vw)do
-   begin
-
-      if(ci=5)
-      then ci:=-5
-      else ci:= 5;
-
-      ssy:=sty;
-      while(ssy<vid_vh)do
-      begin
-         cx:= (vid_cam_x+ssx+pf_pathmap_hw-lx) div pf_pathmap_w ;
-         cy:= (vid_cam_y+ssy+pf_pathmap_hw-ly) div pf_pathmap_w;
-         pf:=pf_pathgrid_areas[cx , cy  ];
-
-         if(pf=pf_solid)
-         then cl:=c_red
-         else cl:=c_white;
-
-         rectangleColor(tar,ssx,ssy,ssx+pf_pathmap_w-1,ssy+pf_pathmap_w-1,cl);
-
-         draw_text(tar,
-         ssx+pf_pathmap_hw,
-         ssy+pf_pathmap_hw+ci,
-         w2s(pf),
-         ta_middle,255,cl);
-
-         ssy+=pf_pathmap_w;
-      end;
-      ssx+=pf_pathmap_w;
-   end;    }
-
-   {if(menu_s2=ms2_camp)then
-   begin
-      if(ui_msks>=0)then
-      begin
-         if(integer(ui_msk+ui_msks)>255)
-         then ui_msk:=255
-         else inc(ui_msk,ui_msks);
-      end
-      else
-      begin
-         if(integer(ui_msk+ui_msks)<0)
-         then ui_msk:=0
-         else inc(ui_msk,ui_msks);
-      end;
-      if(ui_msk>0)then
-      begin
-         boxColor(tar,vid_panelw,0,vid_cam_w,vid_cam_h,rgba2c(255,255,255,ui_msk));
-         if(vid_rtui=0)then dec(ui_msks,1);
-      end;
-   end;  }
 end;
 
 
@@ -740,7 +643,7 @@ begin
         //if(k_shift>1)then
         begin
            circleColor(r_screen,ix,iy,_r  ,c_gray);
-          // circleColor(r_screen,ix,iy,srange,c_white);
+           circleColor(r_screen,ix,iy,srange,c_white);
            if(isselected)then
            begin
               //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );

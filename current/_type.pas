@@ -1,6 +1,12 @@
 
 type
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   BASIC
+//
+
 integer     = Smallint;
 pinteger    = ^integer;
 
@@ -95,15 +101,16 @@ PTVSprite = ^TVSprite;
  TIntList = array of integer;
 PTIntList = ^TIntList;
 
-TThemeAnim = record
-   depth,
-   xo,yo,
-   sh,
-   anext,
-   atime:integer
+TThemeDecorAnim = record
+   tda_depth,
+   tda_xo,
+   tda_yo,
+   tda_sh,
+   tda_anext,
+   tda_atime:integer
 end;
- TThemeAnimL = array of TThemeAnim;
-PTThemeAnimL = ^TThemeAnimL;
+ TThemeDecorAnimL = array of TThemeDecorAnim;
+PTThemeDecorAnimL = ^TThemeDecorAnimL;
 
 TAlarm = record
    al_x,
@@ -111,9 +118,21 @@ TAlarm = record
    al_mx,
    al_my,
    al_r,
-   al_t     : integer;
-   al_v     : byte;
-   al_c     : cardinal;
+   al_t       : integer;
+   al_v       : byte;
+   al_c       : cardinal;
+end;
+
+TMenuItem = record
+   mi_x0,mi_y0,
+   mi_x1,mi_y1: integer;
+   mi_enabled : boolean;
+end;
+
+TMenuListItem = record
+   mli_value  : integer;
+   mli_caption: shortstring;
+   mli_enabled: boolean;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,25 +164,34 @@ end;
 PTSoundSet = ^TSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
+//
+//   OTHER
+//
 
 TReplayPos = record
    rp_fpos : int64;
    rp_gtick: cardinal;
 end;
 
-TMenuItem = record
-   x0,y0,
-   x1,y1  : integer;
-   enabled: boolean;
-end;
+TMapTerrainGridCellAnim = record
+   //tgca_
 
-TMenuListItem = record
-   mli_value  : integer;
-   mli_caption: shortstring;
-   mli_enabled: boolean;
 end;
 
 {$ENDIF}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GAME
+//
+
+TMapTerrainGridCell = record
+   tgc_solidlevel,
+   tgc_teleportx,
+   tgc_teleporty : byte;
+   tgc_parea,
+   tgc_sarea     : word;
+end;
 
 TDamageMod = array[0..MaxDamageModFactors] of record
   dm_factor : integer;  // 100 = x1
@@ -684,36 +712,6 @@ TCTPoint = record
    cpUnitsPlayer: array[0..MaxPlayers] of longint;
 end;
 PTCTPoint = ^TCTPoint;
-
-{TDoodad = record
-   x,y,r        : integer;
-   t            : byte;
-
-   {$IFDEF _FULLGAME}
-   animn,animt,
-   depth,shadowz,ox,oy,
-   mmx,mmy,mmr  : integer;
-   mmc          : cardinal;
-   sprite,
-   back_sprite  : PTMWTexture;
-   {$ENDIF}
-end;
-PTDoodad = ^TDoodad;
-TDCell = record
-   n:integer;
-   l:array of PTDoodad;
-end; }
-
-TMapTerrainGridCell = record
-   tgc_nobuild,
-   tgc_nopath   : boolean; //bit[playeri]
-   tgc_area     : word;
-   {$IFDEF _FULLGAME}
-   tgc_tileX0,
-   tgc_tileX1,
-   tgc_tileX2   : byte;
-   {$ENDIF}
-end;
 
 TGamePreset = record
    gp_name      : shortstring;

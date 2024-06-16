@@ -405,7 +405,7 @@ begin
    with g_presets[g_preset_cur] do
    begin
       map_seed    := gp_map_seed;
-      map_mw      := gp_map_mw;
+      map_size      := gp_map_mw;
       map_type    := gp_map_type;
       map_symmetry:= gp_map_symmetry;
       g_mode      := gp_g_mode;
@@ -597,7 +597,7 @@ begin
          _Spawn(x,y);
          c-=1;
       end;
-      ds :=map_mw div 2;
+      ds :=map_size div 2;
       d  :=point_dir(x,y,ds,ds);
       ds :=360 div (c+1);
       r  :=70+c*28; //18
@@ -616,7 +616,7 @@ end;
 procedure GameStartSkirmish;
 var p:byte;
 begin
-   g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
+   g_royal_r:=trunc(sqrt(sqr(map_hsize)*2));
 
    if(not g_fixed_positions)then
      if not(g_mode in gm_ModesFixedPositions)then map_ShufflePlayerStarts;
@@ -667,18 +667,19 @@ ps_AI_11    : begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)and(0<=map_psx[p])and(map_psx[p]<=map_mw)then
+        if(team>0)and(0<=map_PlayerStartX[p])and(map_PlayerStartX[p]<=map_size)
+                  and(0<=map_PlayerStartY[p])and(map_PlayerStartY[p]<=map_size)then
         begin
-           GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
-           unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
-           unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
-           unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
-           unit_add(map_psx[p],map_psy[p],0,UID_Imp,p,true,false,0);
+           GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
+           unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
         end;
      end;
 
    {$IFDEF _FULLGAME}
-   GameCameraMoveToPoint(map_psx[PlayerClient],map_psy[PlayerClient]);
+   GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
    if(g_players[PlayerClient].team=0)then
    begin
       ui_tab:=3;

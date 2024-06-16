@@ -152,8 +152,8 @@ afree  : byte;
 begin
    afree  :=255;
    anobase:=255;  //no base alarm, low priority, can be replaced by base alarm
-   if(ax<0)or(map_mw<ax)
-   or(ay<0)or(map_mw<ay)then exit;
+   if(ax<0)or(map_size<ax)
+   or(ay<0)or(map_size<ay)then exit;
 
    with pplayer^ do
     for a:=0 to MaxPlayers do
@@ -196,11 +196,11 @@ end;
 procedure ai_MakeScirmishDefaultAlarms(p:byte);
 var i: byte;
 begin
-   for i:=1 to MaxPlayers do
+   {for i:=1 to MaxPlayers do
     if(i<>p)then
      if((g_players[i].state>ps_none)and(g_players[i].team<>g_players[p].team))
      or(not g_fixed_positions)
-     then ai_PlayerSetAlarm(@g_players[p],map_psx[i],map_psy[i],1,base_1r,true,pf_get_area(map_psx[i],map_psy[i]));
+     then ai_PlayerSetAlarm(@g_players[p],map_PlayerStartX[i],map_PlayerStartY[i],1,base_1r,true,pf_get_area(map_PlayerStartX[i],map_PlayerStartY[i]));}
 end;
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
@@ -410,8 +410,8 @@ begin
       begin
          if(not ai_ExtBuildingUpgr)then ai_CollectDoodadsSquare(@aiu_FiledSquareNear,x,y,srange);
 
-         tx:=min2i(x,map_mw-x);
-         ty:=min2i(y,map_mw-y);
+         tx:=min2i(x,map_size-x);
+         ty:=min2i(y,map_size-y);
          if(tx<srange)or(ty<srange)then
          begin
             srs:=round(pi*sqr(srange));
@@ -623,8 +623,8 @@ begin
 
             if(cpx<=0)
             or(cpy<=0)
-            or(cpx>=map_mw)
-            or(cpy>=map_mw)then continue;
+            or(cpx>=map_size)
+            or(cpy>=map_size)then continue;
 
             if(ai_istransport)then
               if(pf_IfObstacleZone(cpzone))

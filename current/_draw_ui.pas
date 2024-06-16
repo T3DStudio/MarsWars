@@ -56,7 +56,7 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
       else map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
 
    case g_mode of
-gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_max_color[r_blink2_colorb]);
+gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mm_cx)+1,ui_max_color[r_blink2_colorb]);
    end;
 end;
 
@@ -68,7 +68,7 @@ begin
    SDL_SetAlpha(r_sminimap,SDL_SRCALPHA or SDL_RLEACCEL,255);
    boxColor(r_sminimap,0,0,vid_panelwi,vid_panelwi,c_dgray); }
 
-   rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mmvw,vid_mmvy+map_mmvh, c_white);
+   rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mm_CamW,vid_mmvy+map_mm_CamH, c_white);
 
    d_MinimapAlarms;
 
@@ -92,7 +92,7 @@ begin
      for i:=0 to MaxPlayers do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then
-        circleColor(r_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
+        circleColor(r_minimap,round(aia_x*map_mm_cx),round(aia_y*map_mm_cx),5,c_orange);
    {$ENDIF}
 
    draw_surf(tar      ,1,1,r_minimap );
@@ -152,8 +152,8 @@ begin
 
       // map build rect
       rectangleColor(tar,
-      lx+map_b0-vid_cam_x,ly+map_b0-vid_cam_y,
-      lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
+      lx+map_BuildBorder0-vid_cam_x,ly+map_BuildBorder0-vid_cam_y,
+      lx+map_BuildBorder1-vid_cam_x,ly+map_BuildBorder1-vid_cam_y,
       c_white);
    end;
 mb_psability:

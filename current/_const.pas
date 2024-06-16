@@ -85,7 +85,7 @@ gm_ModesFixedTeams     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
 gm_ModesFixedPositions : set of byte = [gm_3x3,gm_2x2x2];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
-gm_cnt                 = 6;
+gms_count              = 6;
 
 g_step_koth_pause      = fr_fps60*4;
 
@@ -120,11 +120,22 @@ MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 MaxCPoints             = MaxPlayers*2;
 
-MaxSMapW               = 8000;
-MinSMapW               = 2000;
-StepSMap               = 250;
+MapCellW               = 86;
+MapCellhW              = MapCellW div 2;
+MapSizeCellnStep       = 4;
+MinMapSizeCelln        = 28;
+MaxMapSizeCelln        = 92;
 
-map_b0                 = 5;
+MaxMapDize             = (MapCellW*MaxMapSizeCelln)+(MapCellW-1);
+MinMapSize             = (MapCellW*MinMapSizeCelln)+(MapCellW-1);
+StepMapSize            =  MapCellW*MapSizeCellnStep;
+
+map_BuildBorder0       = 5;
+
+mgsl_free              = 0;
+mgsl_nobuild           = 1;
+mgsl_liquid            = 2;
+mgsl_rocks             = 3;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -135,8 +146,6 @@ gp_custom              = 0;
 gp_1x1_plane           = 1;
 gp_1x1_lake            = 2;
 gp_1x1_cave            = 3;
-
-//gp_count               = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -159,7 +168,7 @@ InvMaxWaves            = 20;
 //
 
 pf_pathmap_w           = 40;
-pf_pathmap_c           = (MaxSMapW div pf_pathmap_w)+1;
+pf_pathmap_c           = (MaxMapDize div pf_pathmap_w)+1;
 
 pf_pathmap_hw          = pf_pathmap_w div 2;
 
@@ -553,11 +562,8 @@ b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  MAP
+//  MAP OTHER
 //
-
-terrrain_cellw         = 80;
-terrrain_celln         = MaxSMapW div terrrain_cellw;
 
 mapt_steppe            = 0;
 mapt_cave              = 1;
@@ -565,8 +571,15 @@ mapt_lake              = 2;
 mapt_shore             = 3;
 mapt_sea               = 4;
 
+maps_none              = 0;
+maps_point             = 1;
+maps_lineV             = 2;
+maps_lineH             = 3;
+maps_lineL             = 4;
+maps_lineR             = 5;
+
 gms_m_types            = 4;  // 0-4  max map types
-gms_m_symm             = 2;  // 0-2  max map symmetry types
+gms_m_symm             = 5;  // 0-5  max map symmetry types
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -989,6 +1002,26 @@ fly_height             : array[false..true] of smallint = (1,fly_z);
 
 pain_time              = fr_fps1;
 
+
+random_table           : array[byte] of byte = (
+//   0      1    2    3    4    5    6    7    8    9   10   11   12   13   14    15
+     0  ,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,  74,   21,
+     211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,  95, 110,  85,   48,
+     212, 140, 211, 249,  22,  79, 200,  50,  28, 188,  52, 140, 202, 120,  68,  145,
+     62 ,  70, 184, 190,  91, 197, 152, 224, 149, 104,  25, 178, 252, 182, 202,  182,
+     141, 197,   4,  81, 181, 242, 145,  42,  39, 227, 156, 198, 225, 193, 219,   93,
+     122, 175, 249,   0, 175, 143,  70, 239,  46, 246, 163,  53, 163, 109, 168,  135,
+     2  , 235,  25,  92,  20, 145, 138,  77,  69, 166,  78, 176, 173, 212, 166,  113,
+     94 , 161,  41,  50, 239,  49, 111, 164,  70,  60,   2,  37, 171,  75, 136,  156,
+     11 ,  56,  42, 146, 138, 229,  73, 146,  77,  61,  98, 196, 135, 106,  63,  197,
+     195,  86,  96, 203, 113, 101, 170, 247, 181, 113,  80, 250, 108,   7, 255,  237,
+     129, 226,  79, 107, 112, 166, 103, 241,  24, 223, 239, 120, 198,  58,  60,   82,
+     128,   3, 184,  66, 143, 224, 145, 224,  81, 206, 163,  45,  63,  90, 168,  114,
+     59 ,  33, 159,  95,  28, 139, 123,  98, 125, 196,  15,  70, 194, 253,  54,   14,
+     109, 226,  71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,   36,
+     17 ,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106, 197,  242,
+     98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249);
+
 {$IFDEF _FULLGAME}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1096,14 +1129,14 @@ max_CamSpeed           = 127;
 sd_liquid_back         = -32500;
 sd_liquid              = -32000;
 // neytral generators
-sd_tcraters            = MaxSMapW+sd_liquid;    // -24000
+sd_tcraters            = MaxMapDize+sd_liquid;    // -24000
 // doodads
-sd_brocks              = MaxSMapW+sd_tcraters;  // -16000
-sd_srocks              = MaxSMapW+sd_brocks;    // -8000
-sd_build               = MaxSMapW+sd_srocks;    //  0
-sd_ground              = MaxSMapW+sd_build;     //  8000
-sd_fly                 = MaxSMapW+sd_ground;    //  16000
-sd_marker              = MaxSMapW+sd_fly;       //  24000
+sd_brocks              = MaxMapDize+sd_tcraters;  // -16000
+sd_srocks              = MaxMapDize+sd_brocks;    // -8000
+sd_build               = MaxMapDize+sd_srocks;    //  0
+sd_ground              = MaxMapDize+sd_build;     //  8000
+sd_fly                 = MaxMapDize+sd_ground;    //  16000
+sd_marker              = MaxMapDize+sd_fly;       //  24000
 
 map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
@@ -1568,14 +1601,11 @@ SvRpLen                = 15;
 //
 
 MFogM                  = 64;
-fog_cw                 = 32;
-fog_chw                = fog_cw div 2;
-fog_cr                 = round(fog_chw*1.45);
-fog_vfwm               = (vid_maxw div fog_cw)+2;
-fog_vfhm               = (vid_maxh div fog_cw)+2;
-
-{fog_mm_Min             = 1;
-fog_mm_Max             = vid_panelwi; }
+fog_CellW              = 32;
+fog_CellHW             = fog_CellW div 2;
+fog_CellR              = round(fog_CellHW*1.45);
+fog_vfwm               = (vid_maxw div fog_CellW)+2;
+fog_vfhm               = (vid_maxh div fog_CellW)+2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1682,7 +1712,7 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
                                                                tc_orange+'HELL'       ,
                                                                tc_yellow+'HELL CAVES' });
 theme_anim_step_n      = 3;
-theme_anim_tile_step   = terrrain_cellw div theme_anim_step_n;
+theme_anim_tile_step   = MapCellW div theme_anim_step_n;
 
 // theme edge terrain style
 tes_fog                = 0;
@@ -1690,7 +1720,7 @@ tes_nature             = 1;
 tes_tech               = 2;
 
 // theme animation style
-tas_none               = 0;
+tas_ice                = 0;
 tas_liquid             = 1;
 tas_magma              = 2;
 

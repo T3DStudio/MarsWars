@@ -827,8 +827,8 @@ mb_attack   : ui_uhint:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_enemy_unum);
        mb_move,
        mb_attack,
        mb_patrol,
-       mb_apatrol : mb_Command  (trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx),ui_uhint);
-       mb_mark    : mb_MapMarker(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+       mb_apatrol : mb_Command  (trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx),ui_uhint);
+       mb_mark    : mb_MapMarker(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx));
           else      if(rpls_plcam=false)then m_mmap_move:=true;
           end;
      end
@@ -890,7 +890,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
 
    if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
-      GameCameraMoveToPoint(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx));
+      GameCameraMoveToPoint(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx));
       GameCameraBounds;
    end;
 
@@ -903,7 +903,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
        if(0<=m_bx)and(m_bx<3)and(0<=m_by)and(m_by<=ui_menu_btnsy)then // panel
        begin
           if(m_by<3)               // minimap
-          then mb_Command(trunc((mouse_x-vid_panelx)/map_mmcx),trunc((mouse_y-vid_panely)/map_mmcx),ui_uhint)
+          then mb_Command(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx),ui_uhint)
           else ui_PanelButton(ui_tab,m_bx,m_by,pct_right,false);      // panel
        end
        else mb_Command(mouse_map_x,mouse_map_y,ui_uhint);

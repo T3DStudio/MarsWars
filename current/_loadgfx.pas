@@ -280,7 +280,9 @@ begin
 end;
 
 procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;transColor,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet;edgeStyle:byte;animStepX,animStepY:integer;colorMask:cardinal);
-var tileX  : byte;
+var
+tileX,
+random_i   : byte;
 b10,b01,
 b21,b12    : boolean;
 sTemplate  : pSDL_Surface;
@@ -320,6 +322,7 @@ end;
 procedure DrawBrush(bn:byte);
 var
 bx,by,br,
+edgeRMax,
 edgeR,
 tx,ty  : integer;
 dirStart,
@@ -334,30 +337,34 @@ begin
 tes_fog   : filledcircleColor(sTemplate,bx,by,br,templateColor);
 tes_nature: begin
             filledcircleColor(sTemplate,bx,by,br,templateColor);
-            dirStep:=8;
-            edgeR  :=round((pi*br*dirStep)/180);
-            if(edgeR>1)then
+            dirStep :=8;
+            edgeRMax:=round((pi*br*dirStep)/180);
+            if(edgeRMax>1)then
             begin
                dirStart:=point_dir(bx,by,thw,thw);
-               dir:=dirStart;
+               dir     :=dirStart;
                while(true)do
                begin
+                  edgeR:=(random_table[random_i] mod edgeRMax)+2;
                   tx:=bx+round(br*cos(dir*degtorad));
                   ty:=by-round(br*sin(dir*degtorad));
                   if(CheckNearestBrush(tx,ty,bn))
                   then break
-                  else filledcircleColor(sTemplate,tx,ty,random(edgeR)+1,transColor);
-                  dir +=dirStep;
+                  else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
+                  dir+=dirStep;
+                  random_i+=1;
                end;
                dir:=dirStart;
                while(true)do
                begin
+                  edgeR:=(random_table[random_i] mod edgeRMax)+2;
                   dir-=dirStep;
                   tx:=bx+round(br*cos(dir*degtorad));
                   ty:=by-round(br*sin(dir*degtorad));
                   if(CheckNearestBrush(tx,ty,bn))
                   then break
-                  else filledcircleColor(sTemplate,tx,ty,random(edgeR)+1,transColor);
+                  else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
+                  random_i+=1;
                end;
             end;
             end;
@@ -372,6 +379,7 @@ begin
    tw1:= thw;
    tw2:=tw+thw;
    sTemplate:=gfx_SDLSurfaceCreate(tw,tw);
+   random_i:=byte(animStepX*7+animStepy);
 
    boxColor(sTemplate,0,0,tw,tw,templateColor);
    SDL_SetColorKey(sTemplate,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sTemplate,0,0));
@@ -487,28 +495,29 @@ begin
   2: animRY:= theme_anim_tile_step;
    end;
 
-   animStepX:=-terrrain_cellw-animRX;
-   animStepY:=-terrrain_cellw-animRY;
+   animStepX:=-MapCellW-animRX;
+   animStepY:=-MapCellW-animRY;
 
-   if(theme_tile_terrain_id>=0)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_terrain_id].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
-   if(theme_tile_crater_id >=0)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_crater_id ].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
-   if(theme_tile_liquid_id >=0)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_tile_liquid_id ].sdlSurface,terrrain_cellw,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
+   if(theme_cur_tile_terrain_id>=0)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
+   if(theme_cur_tile_crater_id >=0)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
+   if(theme_cur_tile_liquid_id >=0)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
 
    boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,c_ablack);
 
-   gfx_MakeTileSet(theme_tile_crater,c_white,c_black,terrrain_cellw,@theme_tileset_crater,tes_nature,animStepX,animStepY,0);
+   gfx_MakeTileSet(theme_tile_crater,c_white,c_black,MapCellW,@theme_tileset_crater,theme_cur_crater_tes,animStepX,animStepY,0);
    for i:=0 to theme_anim_step_n-1 do
    begin
-      //if(theme_liquid_animt=1)then
-       {case a of
-       1,3 : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,30));
-       2   : boxColor(sdlSurface,0,0,w,w,rgba2c(0,0,0,60));
-       end; }
-      maskColor:=rgba2c(0,0,0,30);
+      maskColor:=0;
+      if(theme_cur_liquid_tas=tas_magma)and(i>0)then
+        maskColor:=rgba2c(0,0,0,20*i);
 
-      gfx_MakeTileSet(theme_tile_liquid,c_white,c_black,terrrain_cellw,@theme_tileset_liquid[i],tes_nature,animStepX,animStepY,0);
-      animStepX+=animRX;
-      animStepY+=animRY;
+      gfx_MakeTileSet(theme_tile_liquid,c_white,c_black,MapCellW,@theme_tileset_liquid[i],theme_cur_liquid_tes,animStepX,animStepY,maskColor);
+      if(theme_cur_liquid_tas=tas_liquid)then
+      begin
+         animStepX+=animRX;
+         animStepY+=animRY;
+      end;
+      if(theme_cur_liquid_tas=tas_ice)then break;
    end;
 end;
 
@@ -613,13 +622,13 @@ begin
 
    gfx_LoadFont;
 
-   vid_fog_BaseSurf := gfx_SDLSurfaceCreate(fog_cw,fog_cw);
-   boxColor(vid_fog_BaseSurf,0,0,fog_cw,fog_cw,c_white);
-   for x:=1 to fog_cw do
-   for r:=1 to fog_cw do
+   vid_fog_BaseSurf := gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
+   boxColor(vid_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
+   for x:=1 to fog_CellW do
+   for r:=1 to fog_CellW do
      if((x+r)mod 5)>0 then
        pixelColor(vid_fog_BaseSurf,x-1,r-1,c_black);
-   gfx_MakeTileSet(vid_fog_BaseSurf,c_white,c_black,fog_cw,@vid_fog_tiles,tes_fog,0,0,0);
+   gfx_MakeTileSet(vid_fog_BaseSurf,c_white,c_black,fog_CellW,@vid_fog_tiles,tes_fog,0,0,0);
 
    spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
 
@@ -893,11 +902,14 @@ begin
       menu_x    :=(vid_vw-spr_mback^.w) div 2;
       menu_y    :=(vid_vh-spr_mback^.h) div 2;
    end;
-   vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
-   vid_fog_vfh  :=(vid_cam_h div fog_cw)+2;
+   vid_fog_vfw  :=(vid_cam_w div fog_CellW)+1;
+   vid_fog_vfh  :=(vid_cam_h div fog_CellW)+1;
 
-   map_mmvw     := round(vid_cam_w*map_mmcx);
-   map_mmvh     := round(vid_cam_h*map_mmcx);
+   vid_map_vfw  :=(vid_cam_w div MapCellW)+1;
+   vid_map_vfh  :=(vid_cam_h div MapCellW)+1;
+
+   map_mm_CamW     := round(vid_cam_w*map_mm_cx);
+   map_mm_CamH     := round(vid_cam_h*map_mm_cx);
    GameCameraBounds;
 
    //Map_tdmake;

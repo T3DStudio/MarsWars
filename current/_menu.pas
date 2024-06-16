@@ -14,11 +14,11 @@ procedure SetItem(item:byte;ax0,ay0,ax1,ay1:integer;aenabled:boolean);
 begin
    with menu_items[item] do
    begin
-      x0:=min2i(ax0,ax1);
-      y0:=min2i(ay0,ay1);
-      x1:=max2i(ax0,ax1);
-      y1:=max2i(ay0,ay1);
-      enabled:=aenabled;
+      mi_x0:=min2i(ax0,ax1);
+      mi_y0:=min2i(ay0,ay1);
+      mi_x1:=max2i(ax0,ax1);
+      mi_y1:=max2i(ay0,ay1);
+      mi_enabled:=aenabled;
    end;
 end;
 function NeedColumnRace(p:byte):boolean;
@@ -77,13 +77,13 @@ begin
    ty1+=ui_menu_map_lh;
    end;
 
-   menu_items[mi_map_params1].enabled:=GameLoadPreset(PlayerClient,0,true);
-   menu_items[mi_map_params2].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapseed ,0,true);
-   menu_items[mi_map_params3].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapsize ,MinSMapW,true);
-   menu_items[mi_map_params4].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_type    ,0,true);
-   menu_items[mi_map_params5].enabled:=map_SetSetting(PlayerClient,nmid_lobbby_symmetry,0,true);
-   menu_items[mi_map_params6].enabled:=menu_items[mi_map_params5].enabled;
-   menu_items[mi_map_params7].enabled:=true;
+   menu_items[mi_map_params1].mi_enabled:=GameLoadPreset(PlayerClient,0,true);
+   menu_items[mi_map_params2].mi_enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapseed ,0,true);
+   menu_items[mi_map_params3].mi_enabled:=map_SetSetting(PlayerClient,nmid_lobbby_mapsize ,MinMapSize,true);
+   menu_items[mi_map_params4].mi_enabled:=map_SetSetting(PlayerClient,nmid_lobbby_type    ,0,true);
+   menu_items[mi_map_params5].mi_enabled:=map_SetSetting(PlayerClient,nmid_lobbby_symmetry,0,true);
+   menu_items[mi_map_params6].mi_enabled:=menu_items[mi_map_params5].mi_enabled;
+   menu_items[mi_map_params7].mi_enabled:=true;
 
    // settings block
 
@@ -120,8 +120,8 @@ ms1_sett: begin
                 ty1+=1;
              end;
 
-             menu_items[mi_settings_PlayerName].enabled:=(net_status=ns_single)and(not G_Started);
-             menu_items[mi_settings_ResApply  ].enabled:=(menu_res_w<>vid_vw)or(menu_res_h<>vid_vh);
+             menu_items[mi_settings_PlayerName].mi_enabled:=(net_status=ns_single)and(not G_Started);
+             menu_items[mi_settings_ResApply  ].mi_enabled:=(menu_res_w<>vid_vw)or(menu_res_h<>vid_vh);
           end;
 ms1_svld: begin
              tx0:=ui_menu_ssr_zx0;
@@ -195,16 +195,16 @@ ms2_game: begin
                 ty1+=1;
              end;
 
-             menu_items[mi_game_mode         ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_gamemode    ,0,true);
-             menu_items[mi_game_builders     ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_builders    ,0,true);
-             menu_items[mi_game_generators   ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_generators  ,0,true);
-             menu_items[mi_game_FixStarts    ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,0,true);
-             menu_items[mi_game_DeadPbserver ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,0,true);
-             menu_items[mi_game_EmptySlots   ].enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_EmptySlots  ,0,true);
+             menu_items[mi_game_mode         ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_gamemode    ,0,true);
+             menu_items[mi_game_builders     ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_builders    ,0,true);
+             menu_items[mi_game_generators   ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_generators  ,0,true);
+             menu_items[mi_game_FixStarts    ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,0,true);
+             menu_items[mi_game_DeadPbserver ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,0,true);
+             menu_items[mi_game_EmptySlots   ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_EmptySlots  ,0,true);
 
-             menu_items[mi_game_RecordStatus ].enabled:=rpls_state<rpls_state_read;
-             menu_items[mi_game_RecordName   ].enabled:=rpls_state=rpls_state_none;
-             menu_items[mi_game_RecordQuality].enabled:=true;
+             menu_items[mi_game_RecordStatus ].mi_enabled:=rpls_state<rpls_state_read;
+             menu_items[mi_game_RecordName   ].mi_enabled:=rpls_state=rpls_state_none;
+             menu_items[mi_game_RecordQuality].mi_enabled:=true;
           end;
 ms2_mult: begin
              ty0+=ui_menu_cgm_lh;
@@ -335,7 +335,7 @@ mi_mplay_Chat           : ;
 
    if(menu_list_n>0)then
     with menu_items[menu_item] do
-     if(not enabled)then menu_List_Clear;
+     if(not mi_enabled)then menu_List_Clear;
 end;
 
 function StringApplyInput(s:shortstring;charset:TSoc;ms:byte;ChangedResult:pBoolean):shortstring;
@@ -367,7 +367,7 @@ begin
    mouse_y-=menu_y;
    menu_UnderCursor:=false;
    with menu_items[mi] do
-     menu_UnderCursor:=(enabled)and(x0<=mouse_x)and(mouse_x<=x1)and(y0<=mouse_y)and(mouse_y<=y1);
+     menu_UnderCursor:=(mi_enabled)and(mi_x0<=mouse_x)and(mouse_x<=mi_x1)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1);
    mouse_x+=menu_x;
    mouse_y+=menu_y;
 end;
@@ -380,7 +380,7 @@ begin
    mouse_y-=menu_y;
    for i:=1 to 255 do
      with menu_items[i] do
-       if(enabled)and(x0<=mouse_x)and(mouse_x<=x1)and(y0<=mouse_y)and(mouse_y<=y1)then
+       if(mi_enabled)and(mi_x0<=mouse_x)and(mouse_x<=mi_x1)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1)then
        begin
           menu_item:=i;
           break;
@@ -414,9 +414,9 @@ procedure menu_list_SetCommonSettings(mi:byte;MinWidth:pinteger);
 begin
    with menu_items[mi] do
    begin
-      if(MinWidth^<0)then MinWidth^:=(x1-x0) div abs(MinWidth^);
-      menu_list_x:=x1;
-      menu_list_y:=y1;
+      if(MinWidth^<0)then MinWidth^:=(mi_x1-mi_x0) div abs(MinWidth^);
+      menu_list_x:=mi_x1;
+      menu_list_y:=mi_y1;
    end;
    menu_list_w:=0;
    menu_list_n:=0;
@@ -571,12 +571,12 @@ begin
    menu_GetBarVal:=0;
    with menu_items[mi] do
    begin
-      tx1:=x1-font_w;
+      tx1:=mi_x1-font_w;
       tx0:=tx1-max;
       mouse_x-=menu_x+tx0;
       mouse_y-=menu_y;
 
-      if(y0<mouse_y)and(mouse_y<y1)then menu_GetBarVal:=mm3i(1,mouse_x,max);
+      if(mi_y0<mouse_y)and(mouse_y<mi_y1)then menu_GetBarVal:=mm3i(1,mouse_x,max);
 
       mouse_x+=menu_x+tx0;
       mouse_y+=menu_y;
@@ -589,9 +589,9 @@ begin
       mouse_x-=menu_x;
       mouse_y-=menu_y;
 
-      if (x0<mouse_x)and(mouse_x<x1)
-      and(y0<mouse_y)and(mouse_y<y1)
-      then svar^:=scroll+((mouse_y-y0) div lineh);
+      if (mi_x0<mouse_x)and(mouse_x<mi_x1)
+      and(mi_y0<mouse_y)and(mouse_y<mi_y1)
+      then svar^:=scroll+((mouse_y-mi_y0) div lineh);
 
       mouse_x+=menu_x;
       mouse_y+=menu_y;
@@ -667,13 +667,13 @@ mi_map_params1            : if(menu_list_selected>-1)then
 mi_map_params2            : ;// seed;
 mi_map_params3            : if(menu_list_selected>-1)then
                             begin
-                               p:=MinSMapW+(StepSMap*menu_list_SIndex);
+                               p:=MinMapSize+(StepMapSize*menu_list_SIndex);
                                if(net_status=ns_client)
                                then net_send_MIDInt(             nmid_lobbby_mapsize,p)
                                else map_SetSetting (PlayerClient,nmid_lobbby_mapsize,p,false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromInts(menu_item,MaxSMapW,MinSMapW,StepSMap,map_mw,-2);
+                            else menu_list_MakeFromInts(menu_item,MaxMapDize,MinMapSize,StepMapSize,map_size,-2);
 mi_map_params4            : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1113,7 +1113,7 @@ mi_mplay_ClientQuality    : if(menu_list_selected>-1)then
       case menu_item of
       // MAP
       51 : begin Map_randomseed;                                  Map_premap;end;
-      52 : begin ScrollInt (@map_mw      ,-StepSMap,MinSMapW,MaxSMapW   );Map_premap;end;
+      52 : begin ScrollInt (@map_size      ,-StepMapSize,MinMapSize,MaxMapDize   );Map_premap;end;
       53 : begin ScrollByte(@map_type    ,false    ,0       ,gms_m_types);Map_premap;end;
       54 : begin ScrollByte(@map_symmetry,false    ,0       ,2          );Map_premap;end;
 

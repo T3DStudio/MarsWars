@@ -63,26 +63,18 @@ g_preset_cur      : byte = 0;
 g_preset_n        : byte = 0;
 g_presets         : array of TGamePreset;
 
-map_seed          : cardinal = 1;
-map_mw            : integer  = 5000;
-map_hmw           : integer  = 2500;
-map_b1            : integer  = 0;
+map_seed          : cardinal = 0;
+map_size          : integer  = 0;
+map_hsize         : integer  = 0;
+map_LastCell      : byte     = 0;
+map_CenterCell    : byte     = 0;
+map_BuildBorder1  : integer  = 0;
 map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
-map_symmetryDir,
-map_symmetryX0,
-map_symmetryY0,
-map_symmetryX1,
-map_symmetryY1    : integer;
-map_psx           : array[0..MaxPlayers] of integer;
-map_psy           : array[0..MaxPlayers] of integer;
-map_grid          : array[0..terrrain_celln,0..terrrain_celln] of TMapTerrainGridCell;
-
-pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
-//pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
-//pf_pathgrid_tmpb  : byte;
-//pfNodes           : array[1..pfMaxNodes] of TPFNode;
-//pfNodes_c         : integer;
+map_symmetryDir   : integer  = 0;
+map_PlayerStartX,
+map_PlayerStartY  : array[0..MaxPlayers] of integer;
+map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
 
 net_status        : byte = ns_single;
 net_port          : word = 10666;
@@ -143,6 +135,8 @@ u_royal_cd,
 u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
+
+map_grid_anim     : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
@@ -244,6 +238,13 @@ vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
 vid_panel_timer   : byte = 0;
 
+vid_map_vfw       : byte = 0;
+vid_map_vfh       : byte = 0;
+vid_map_sx        : integer = 0;
+vid_map_sy        : integer = 0;
+vid_map_ex        : integer = 0;
+vid_map_ey        : integer = 0;
+
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of boolean;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of boolean;
 vid_fog_vfw       : byte = 0;
@@ -256,15 +257,6 @@ vid_fog_ey        : integer = 0;
 vid_fog_BaseSurf  : pSDL_Surface;
 vid_fog_tiles     : TMWTileSet;
 
-{vid_fog_mm        : array[fog_mm_Min..fog_mm_Max] of pSDL_Surface;
-vid_fog_mmn       : word;
-vid_fog_mmx,
-vid_fog_mmy,
-vid_fog_mmr       : array of integer;}
-
-ter_w,
-ter_h             : integer;
-
 font_ca           : array[char] of TMWTexture;
 
 g_eids            : array[byte] of TEID;
@@ -273,12 +265,9 @@ g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 ms_eid_bio_death_uids
                   : TSoB;
 
-_tdecaln          : integer = 0;
-_tdecals          : array of TDecal;
-
-map_mmcx          : single;
-map_mmvw,
-map_mmvh          : integer;
+map_mm_cx          : single;
+map_mm_CamW,
+map_mm_CamH          : integer;
 
 campain_skill     : byte = 3;
 campain_seed      : cardinal = 0;
@@ -504,59 +493,53 @@ theme_map_pliquid : integer = -1;
 theme_liquid_style: byte = 0;
 theme_crater_style: byte = 0;
 
-theme_anm_decors,
-theme_anm_srocks,
-theme_anm_brocks  : TThemeAnimL;
-
 theme_anm_liquids : array of byte;     // animation type
 theme_ant_liquids : array of byte;     // animation period
 theme_clr_liquids : array of cardinal; // minimap color     }
 
-theme_tile_terrain    : pSDL_Surface = nil;
-theme_tile_crater     : pSDL_Surface = nil;
-theme_tile_liquid     : pSDL_Surface = nil;
+theme_anm_decors          : TThemeDecorAnimL;
 
-theme_tileset_crater  : TMWTileSet;
-theme_tileset_liquid  : array[0..theme_anim_step_n-1] of TMWTileSet;
+theme_tile_terrain        : pSDL_Surface = nil;
+theme_tile_crater         : pSDL_Surface = nil;
+theme_tile_liquid         : pSDL_Surface = nil;
 
-theme_crater_tes      : byte = tes_nature; // theme liquid edge style
-theme_liquid_tes      : byte = tes_nature; // theme liquid edge style
-theme_liquid_anim     : byte = tas_none;   // theme liquid animation style
-theme_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
+theme_tileset_crater      : TMWTileSet;
+theme_tileset_liquid      : array[0..theme_anim_step_n-1] of TMWTileSet;
 
-theme_tile_terrain_id,
-theme_tile_crater_id,
-theme_tile_liquid_id  : integer;
+// CURRENT THEME SETTINGS
+theme_cur_crater_tes      : byte = tes_nature; // theme liquid edge style
+theme_cur_liquid_tes      : byte = tes_nature; // theme liquid edge style
+theme_cur_liquid_tas      : byte = tas_liquid; // theme liquid animation style
+theme_cur_liquid_tasPeriod: byte = 30;
+theme_cur_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
+
+theme_cur_tile_terrain_id,
+theme_cur_tile_crater_id,
+theme_cur_tile_liquid_id  : integer;
 
 theme_cur_decal_l,
 theme_cur_decor_l,
-theme_cur_srock_l,
-theme_cur_brock_l,
 theme_cur_crater_l,
 theme_cur_liquid_l,
-theme_cur_terrain_tas_l,
-theme_cur_terrain_l   : TIntList;
+theme_cur_terrain_l       : TIntList;
 theme_cur_decal_n,
 theme_cur_decor_n,
-theme_cur_srock_n,
-theme_cur_brock_n,
 theme_cur_crater_n,
 theme_cur_liquid_n,
-theme_cur_terrain_n   : integer;
+theme_cur_terrain_n       : integer;
 
+// ALL DATA
 theme_all_decal_l,
 theme_all_decor_l,
-theme_all_srock_l,
-theme_all_brock_l,
 theme_all_terrain_l   : TMWTextureList;
 theme_all_decal_n,
 theme_all_decor_n,
-theme_all_srock_n,
-theme_all_brock_n,
 theme_all_terrain_n   : integer;
 
-theme_all_terrain_mmcolor
-                      : array of cardinal;
+theme_all_terrain_mmcolor  : array of cardinal;
+theme_all_terrain_tas,
+theme_all_terrain_tasPeriod: array of byte;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -743,7 +726,7 @@ str_teams         : array[0..MaxPlayers ] of shortstring;
 str_map_typel     : array[0..gms_m_types] of shortstring;
 str_ability_name  : array[byte          ] of shortstring;
 str_racel         : array[0..r_cnt      ] of shortstring;
-str_gmode         : array[0..gm_cnt     ] of shortstring;
+str_gmode         : array[0..gms_count     ] of shortstring;
 str_map_syml      : array[0..gms_m_symm ] of shortstring;
 str_ability_unload,
 str_need_energy,

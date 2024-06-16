@@ -811,7 +811,7 @@ end;
        with _a_weap[w] do
         if(aw_rld_a=[])then _CalcDefaultRLDA(@aw_rld_a,@aw_rld_s,DefaultRLDA_pa);
 
-      _fr:=(_r div fog_cw)+1;
+      _fr:=(_r div fog_CellW)+1;
       if(_fr<1)then _fr:=1;
    end;
 
