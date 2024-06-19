@@ -47,15 +47,15 @@ maps_lineL,
 maps_lineR: begin
                case map_symmetry of
                maps_lineV: map_GetSymmetryDir:=90;
-               maps_lineH: map_GetSymmetryDir:=0;
-               maps_lineL: map_GetSymmetryDir:=45;
+               maps_lineH: map_GetSymmetryDir:=180;
+               maps_lineL: map_GetSymmetryDir:=225;
                maps_lineR: map_GetSymmetryDir:=135;
                end;
                if((map_seed mod 2)=0)
-               then map_GetSymmetryDir:=_DIR360(map_GetSymmetryDir+180);
+               then map_GetSymmetryDir:=DIR360(map_GetSymmetryDir+180);
             end;
    else
-            map_GetSymmetryDir:=integer(map_seed mod 360);
+            map_GetSymmetryDir:=180;
    end;
 end;
 
@@ -70,9 +70,10 @@ begin
    map_CenterCell  := map_hsize div MapCellW;
 
    {$IFDEF _FULLGAME}
-   map_mm_cx  := (vid_panelw-2)/map_size;
-   map_mm_CamW:= trunc(vid_cam_w*map_mm_cx)+1;
-   map_mm_CamH:= trunc(vid_cam_h*map_mm_cx)+1;
+   map_mm_cx   := (vid_panelw-2)/map_size;
+   map_mm_CamW := trunc(vid_cam_w*map_mm_cx)+1;
+   map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
+   map_mm_gridW:= MapCellW*map_mm_cx;
    {$ENDIF}
 end;
 
@@ -105,6 +106,87 @@ maps_lineR: begin
    end;
 end;
 
+procedure map_RemoveTeleports;
+var x,y:byte;
+begin
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+   with map_grid[x,y] do
+   begin
+      tgc_teleportx:=255;
+      tgc_teleportx:=255;
+   end;
+end;
+
+procedure map_ZonesClear;
+var x,y:byte;
+begin
+   map_gridLastpZone:=0;
+   map_gridLastsZone:=0;
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+   with map_grid[x,y] do
+   begin
+      tgc_parea:=0;
+      tgc_sarea:=0;
+   end;
+end;
+
+procedure map_ZoneFillPart(x,y:integer;zone:word;pzone:boolean);
+begin
+   if(x<0)
+   or(y<0)
+   or(x>=MaxMapSizeCelln)
+   or(y>=MaxMapSizeCelln)then exit;
+
+   with map_grid[x,y] do
+   begin
+      if(tgc_solidlevel>=mgsl_liquid)then exit;
+
+      if(pzone)then
+      begin
+         if(tgc_parea>0)then exit;
+         tgc_parea:=zone
+      end
+      else
+      begin
+         if(tgc_sarea>0)then exit;
+         tgc_sarea:=zone;
+      end;
+
+      if(pzone)then
+        if (tgc_teleportx<MaxMapSizeCelln)
+        and(tgc_teleporty<MaxMapSizeCelln)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone);
+   end;
+
+   map_ZoneFillPart(x-1,y  ,zone,pzone);
+   map_ZoneFillPart(x+1,y  ,zone,pzone);
+   map_ZoneFillPart(x  ,y-1,zone,pzone);
+   map_ZoneFillPart(x  ,y+1,zone,pzone);
+end;
+
+procedure map_ZonesFill;
+var x,y:byte;
+begin
+   map_ZonesClear;
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+   with map_grid[x,y] do
+   if(tgc_solidlevel<mgsl_liquid)then
+   begin
+      if(tgc_parea=0)then
+      begin
+         map_gridLastpZone+=1;
+         map_ZoneFillPart(x,y,map_gridLastpZone,true );
+      end;
+      if(tgc_sarea=0)then
+      begin
+         map_gridLastsZone+=1;
+         map_ZoneFillPart(x,y,map_gridLastsZone,false);
+      end;
+   end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  CHECKS
@@ -117,22 +199,35 @@ begin
                       and(-aborder<=y)and(y<=(map_size+aborder));
 end;
 
-function map_PlayerStartsHereCell(cx,cy:byte;baser:integer):byte;
+function map_IfHereObjectCell(cx,cy:byte;baser:integer;players:boolean):byte;
 var p:byte;
-x0,y0,
+x0,y0,tr,
 mx,my:integer;
 begin
-   map_PlayerStartsHereCell:=0;
+   map_IfHereObjectCell:=0;
    if(cx<=map_LastCell)and(cy<=map_LastCell)then
    begin
       x0:=cx*MapCellW;
       y0:=cy*MapCellW;
-      for p:=0 to MaxPlayers do
-      begin
-         mgcell2NearestXY(cx,cy,x0,y0,x0+MapCellW,y0+MapCellW,@mx,@my);
-         if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
-         then map_PlayerStartsHereCell+=1;
-      end;
+case players of
+true : for p:=0 to MaxPlayers do
+       begin
+          mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,@mx,@my,0);
+          if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
+          then map_IfHereObjectCell+=1;
+       end;
+false: for p:=1 to MaxCpoints do
+        with g_cpoints[p] do
+         if(cpCaptureR>0)then
+         begin
+            if(baser<0)
+            then tr:=cpCaptureR//+MapCellhW
+            else tr:=baser;
+            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,@mx,@my,0);
+            if(point_dist_int(mx,my,cpx,cpy)<=tr)
+            then map_IfHereObjectCell+=1;
+         end;
+end;
    end;
 end;
 
@@ -375,7 +470,7 @@ gm_3x3     :begin
                i :=map_symmetryDir+90;
 
                case map_type of
-               mapt_lake  : ix:=round(60*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
+               mapt_clake  : ix:=round(60*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
                mapt_shore : ix:=round(60*(MinMapSize/map_size))+round(5*(map_size/MinMapSize));
                else         ix:=round(65*(MinMapSize/map_size));
                end;
@@ -426,10 +521,10 @@ gm_royale  :begin
                map_PlayerStartsCircle(map_hsize-(map_size div 5),map_symmetryDir);
             end;
 gm_capture :begin
-               map_PlayerStartsDefault(byte(map_type=mapt_lake)*(map_size div 3));
+               map_PlayerStartsDefault(byte(map_type=mapt_clake)*(map_size div 3));
             end;
    else
-               map_PlayerStartsDefault(byte(map_type=mapt_lake)*(map_size div 3));
+               map_PlayerStartsDefault(byte(map_type=mapt_clake)*(map_size div 3));
    end;
 end;
 
@@ -458,157 +553,125 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
      map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
 end;
 
-procedure map_Fill(tx,ty,tr:integer;value,skipFactor:byte;startsR:integer);
-var x,y,sx,sy:integer;
-procedure SetCell;
+procedure map_GridCycleInit;
 begin
-   if(map_grid[x,y].tgc_solidlevel=mgsl_free)then
+   map_gcx:=0;
+   map_gcy:=0;
+   SymmetryXY(map_gcx,map_gcy,map_LastCell,@map_gcsx,@map_gcsy,map_symmetry);
+end;
+
+function map_GridCycleNext:boolean;
+function Step(varx,vary,varsx,varsy:pinteger;lastx,lasty:integer):boolean;
+begin
+   Step:=false;
+   varsx^:=NOTSET;
+   varsy^:=NOTSET;
+   if(vary^<=lasty)then
    begin
-      if(skipFactor>0)then
-        if(random_table[byte(byte(x+1+ty)*byte(y+x+1+tx+tr))] mod skipFactor)>0 then exit;
-
-      if(tr>0)then
-        if(point_dist_int(tx,ty,x,y)>tr)then exit;
-
-      if (map_PlayerStartsHereCell(x,y,startsR)<>1)then
-      begin
-         map_grid[ x, y].tgc_solidlevel:=value;
-         if(sx<>NOTSET)then
-         map_grid[sx,sy].tgc_solidlevel:=value;
-      end;
-   end;
+       varx^+=1;
+       Step:=true;
+       if(varx^>lastx)then
+       begin
+          varx^:=0;
+          vary^+=1;
+          if(vary^>lasty)then
+          begin
+             Step:=false;
+             exit;
+          end;
+       end;
+       SymmetryXY(varx^,vary^,map_LastCell,varsx,varsy,map_symmetry);
+    end;
 end;
 begin
-   sx:=NOTSET;
-   sy:=NOTSET;
+   map_GridCycleNext:=false;
    case map_symmetry of
-maps_none : for y:=0 to map_LastCell   do
-            for x:=0 to map_LastCell   do
-            SetCell;
 maps_point,
-maps_lineV: for x:=0 to map_CenterCell do
-            for y:=0 to map_LastCell   do
-            begin
-            SymmetryXY(x,y,map_LastCell,@sx,@sy,map_symmetry);
-            SetCell;
-            end;
-maps_lineH: for x:=0 to map_LastCell   do
-            for y:=0 to map_CenterCell do
-            begin
-            SymmetryXY(x,y,map_LastCell,@sx,@sy,map_symmetry);
-            SetCell;
-            end;
-maps_lineL: for y:=0 to map_LastCell   do
-            for x:=0 to y              do
-            begin
-            SymmetryXY(x,y,map_LastCell,@sx,@sy,map_symmetry);
-            SetCell;
-            end;
-maps_lineR: for y:=0 to map_LastCell   do
-            for x:=0 to map_LastCell-y do
-            begin
-            SymmetryXY(x,y,map_LastCell,@sx,@sy,map_symmetry);
-            SetCell;
-            end;
+maps_none : map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell        ,map_LastCell  );
+maps_lineV: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_CenterCell      ,map_LastCell  );
+maps_lineH: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell        ,map_CenterCell);
+maps_lineL: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_gcy             ,map_LastCell  );
+maps_lineR: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell-map_gcy,map_LastCell  );
    end;
+end;
+
+procedure map_Fill(tx,ty,tr:integer;value,skipFactor:byte;startsR:integer);
+begin
+   map_GridCycleInit;
+
+   repeat
+     if(map_grid[map_gcx,map_gcy].tgc_solidlevel=mgsl_free)then
+     begin
+        if(skipFactor>0)then
+          if(random_table[byte(byte(map_gcx+1)*byte(map_gcy+map_gcx+1)+byte(tx+ty+tr))] mod skipFactor)>0 then continue;
+
+        if(tr>0)then
+          if(point_dist_int(tx,ty,map_gcx,map_gcy)> tr)then continue;
+
+        if(tr<0)then
+          if(point_dist_int(tx,ty,map_gcx,map_gcy)<-tr)then continue;
+
+        if (map_IfHereObjectCell(map_gcx,map_gcy,startsR,true )<>1)
+        and(map_IfHereObjectCell(map_gcx,map_gcy,-1     ,false) =0)then
+        begin
+           map_grid[ map_gcx, map_gcy].tgc_solidlevel:=value;
+           if(map_gcsx<>NOTSET)then
+           map_grid[map_gcsx,map_gcsy].tgc_solidlevel:=value;
+        end;
+     end;
+   until(not map_GridCycleNext)
 end;
 
 procedure map_ReMake;
+var msrx,px,py:integer;
 begin
-   FillChar(map_grid,SizeOf(map_grid),0);
-
-   case map_type of
-mapt_steppe : map_Fill(0,0,-1,mgsl_nobuild,7,base_1r);
-mapt_cave   : begin
-              map_Fill(0,0,-1,mgsl_rocks  ,5,base_1r);
-              map_Fill(0,0,-1,mgsl_nobuild,7,base_1r);
-              end;
-mapt_lake   : begin
-              map_Fill(map_CenterCell,map_CenterCell,map_LastCell div 3,mgsl_liquid ,0,base_1r);
-              map_Fill(0,0,-1,mgsl_nobuild,7,base_1r);
-              end;
-mapt_shore  : begin
-              //+ point симметрия = фигня
-              map_Fill(map_CenterCell+round(map_LastCell*cos(map_symmetryDir*degtorad)),
-                       map_CenterCell+round(map_LastCell*sin(map_symmetryDir*degtorad)),map_LastCell,mgsl_liquid ,0,base_1r);
-              end;
-mapt_sea    : begin
-              map_Fill(0,0,-1,mgsl_liquid ,0,base_1r);
-              map_Fill(0,0,-1,mgsl_nobuild,7,base_1r);
-              end;
-   end;
-
-   {map_ddn:=0;
-   FillChar(map_dds,SizeOf(map_dds),0);
-   for ix:=0 to dcn do
-   for iy:=0 to dcn do
-   with map_dcell[ix,iy] do
-   begin
-      n:=0;
-      setlength(l,n);
-   end;
-
-   map_ddn:=trunc(MaxDoodads*((sqr(map_size) div ddc_div)/ddc_cf))+1;
-
-   if(map_symmetry>0)
-   then map_ddn:=mm3i(1,round(map_ddn/1.5),MaxDoodads)
-   else map_ddn:=mm3i(1,      map_ddn     ,MaxDoodads);
-
-   case map_type of
-mapt_steppe: begin
-             map_DoodadNoise(0,0,0);
-             end;
-mapt_cave  : begin
-             map_DoodadNoise(2,2,50);
-             end;
-mapt_lake  : begin
-             ix:=round(map_size/2.9);
-             map_DoodadFiledCircle(DID_LiquidR1,map_hsize,map_hsize,ix,map_symmetry);
-             if(map_size<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_hsize,map_hsize,ix,map_symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_hsize,map_hsize,ix,map_symmetry);
-             //map_DoodadFiledCircle(DID_LiquidR4,map_hsize,map_hsize,ix,map_symmetry);
-             end;
-
-             map_ddn:=map_ddn div 3;
-             map_DoodadNoise(0,0,50);
-             end;
-mapt_shore: begin
-             ix:=map_size*2;
-             if(map_symmetry=1)
-             then symmetry:=0
-             else symmetry:=map_symmetry;
-
-             map_DoodadFiledCircle(DID_LiquidR1,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             if(map_size<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_symmetryX1,map_symmetryY1,ix,symmetry);
-            // map_DoodadFiledCircle(DID_LiquidR4,map_symmetryX1,map_symmetryY1,ix,symmetry);
-             end;
-
-             map_ddn:=map_ddn div 2;
-             map_DoodadNoise(1,2,50);
-             end;
-mapt_sea   : begin
-             ix:=map_size;
-             map_DoodadFiledCircle(DID_LiquidR1,map_hsize,map_hsize,ix,map_symmetry);
-             if(map_size<=3500)then
-             begin
-             //map_DoodadFiledCircle(DID_LiquidR2,map_hsize,map_hsize,ix,map_symmetry);
-             map_DoodadFiledCircle(DID_LiquidR3,map_hsize,map_hsize,ix,map_symmetry);
-             //map_DoodadFiledCircle(DID_LiquidR4,map_hsize,map_hsize,ix,map_symmetry);
-             end;
-             map_ddn:=map_ddn div 6;
-             map_DoodadNoise(0,1,-50);
-             end;
-   end;
-
-   map_RefreshDoodadsCells;  }
    map_RandomBaseVars;
    map_CPoints;
-   pf_MakeZoneGrid;
+
+   FillChar(map_grid,SizeOf(map_grid),0);
+   map_RemoveTeleports;
+   map_ZonesClear;
+
+   msrx:=integer(map_seed);
+
+   case map_type of
+mapt_steppe : map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r);
+mapt_canyon : begin
+              map_Fill(msrx,1,-1,mgsl_rocks  ,7,base_1r);
+              map_Fill(msrx,2,-1,mgsl_nobuild,5,base_1r);
+              end;
+mapt_ilake,
+mapt_clake  : begin
+              map_Fill(map_CenterCell,map_CenterCell,(map_LastCell div 3),mgsl_liquid ,0,base_1r);
+              map_Fill(msrx,3,-1,mgsl_nobuild,18,base_1r);
+              map_Fill(msrx,4,-1,mgsl_rocks  ,18,base_1r);
+              end;
+mapt_island : begin
+              px:=map_CenterCell div 4;
+              py:=map_LastCell div 4;
+              map_Fill(map_CenterCell-px+integer(map_seed mod byte(py)),
+                       map_CenterCell-px+integer(g_random_i mod py),
+                       -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r);
+              map_Fill(msrx,5,-1,mgsl_nobuild,18,base_1r);
+              map_Fill(msrx,6,-1,mgsl_rocks  ,18,base_1r);
+              end;
+mapt_shore  : begin
+              if(map_symmetry=maps_point)
+              then map_Fill(map_CenterCell+round(map_LastCell*10.3*cos((map_seed mod 360)*degtorad)),
+                            map_CenterCell+round(map_LastCell*10.3*sin((map_seed mod 360)*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r)
+              else map_Fill(map_CenterCell+round(map_LastCell*10  *cos(map_symmetryDir*degtorad)),
+                            map_CenterCell+round(map_LastCell*10  *sin(map_symmetryDir*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r);
+              map_Fill(msrx,7,-1,mgsl_nobuild,16,base_1r);
+              map_Fill(msrx,8,-1,mgsl_rocks  ,16,base_1r);
+              end;
+mapt_sea    : begin
+              map_Fill(msrx,9,-1,mgsl_liquid ,0,base_1r);
+              map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r);
+              end;
+   end;
+
+   map_ZonesFill;
+
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
    vid_map_RedrawBack:=true;

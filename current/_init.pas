@@ -17,7 +17,6 @@ begin
 
    gfx_InitColors;
    vid_MakeScreen;
-   DrawLoadingScreen(@str_loading_gfx,c_yellow);
    gfx_LoadGraphics(true);
 
    InitVideo:=true;
@@ -90,8 +89,8 @@ begin
    setlength(g_presets,g_preset_n);
 
    SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,1,2,0,0,0,0);
-   SetPreset(gp_1x1_lake    ,6667,4000,mapt_lake  ,1,gm_scirmish,1,2,0,0,0,0);
-   SetPreset(gp_1x1_cave    , 667,4000,mapt_cave  ,1,gm_scirmish,1,2,0,0,0,0);
+   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake  ,1,gm_scirmish,1,2,0,0,0,0);
+   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon  ,1,gm_scirmish,1,2,0,0,0,0);
 
    {$IFNDEF _FULLGAME}
    g_presets[gp_custom].gp_name:= 'custom preset';

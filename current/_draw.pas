@@ -39,6 +39,7 @@ begin
    D_UnitsInfo (r_screen,vid_mapx,vid_mapy);
    D_ui        (r_screen,vid_mapx,vid_mapy,UIPlayer);
 
+
    draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
 
    d_uimouse(r_screen);
@@ -99,7 +100,7 @@ begin
 
    {if(ks_ctrl=0)then
    draw_DebugTileSet(@theme_tileset_liquid[ (SDL_GetTicks div 250) mod theme_anim_step_n ]);
-   draw_text(r_screen,menu_x,menu_y,b2s( (SDL_GetTicks div 250) mod theme_anim_step_n ),ta_left,255,c_orange);  }
+   draw_text(r_screen,menu_x,menu_y,b2s( (SDL_GetTicks div 250) mod theme_anim_step_n ),ta_left,255,c_orange); }
 
   { n:=0;
    y:=0;
@@ -132,18 +133,22 @@ begin
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
-   ' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
-   ' '+i2s(mouse_map_x div fog_CellW)+
-   ' '+i2s(mouse_map_y div fog_CellW)+
-  // ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
-   ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
-   ' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
-   ' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
-   ' '+tc_gray+i2s(m_bx)+
-   ' '+tc_gray+i2s(m_by)+
-   ' '+tc_lime+i2s(dist2mgcell(mouse_map_x,mouse_map_y,1,1)),
+   //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
+   ' '+i2s(mouse_map_x div MapCellW)+
+   ' '+i2s(mouse_map_y div MapCellW)+
+   ' L'+i2s(map_LastCell)+
+   ' C'+i2s(map_CenterCell)+
+   //' r0: '+tc_green+i2s(debug_r0)+
+   //' r1: '+tc_blue+i2s(debug_r1)+
 
-   ta_right,255, c_white);
+  // ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
+   //' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
+   //' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
+   //' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
+   //' '+tc_gray+i2s(m_bx)+
+   //' '+tc_gray+i2s(m_by)+
+   //' '+tc_lime+i2s(dist2mgcell(mouse_map_x,mouse_map_y,1,1))
+   '',ta_right,255, c_white);
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-20,
        i2s(mouse_map_x)+

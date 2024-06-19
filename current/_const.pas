@@ -126,8 +126,8 @@ MapSizeCellnStep       = 4;
 MinMapSizeCelln        = 28;
 MaxMapSizeCelln        = 92;
 
-MaxMapDize             = (MapCellW*MaxMapSizeCelln)+(MapCellW-1);
-MinMapSize             = (MapCellW*MinMapSizeCelln)+(MapCellW-1);
+MaxMapDize             = (MapCellW*MaxMapSizeCelln)-1;
+MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
 StepMapSize            =  MapCellW*MapSizeCellnStep;
 
 map_BuildBorder0       = 5;
@@ -566,10 +566,12 @@ b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 //
 
 mapt_steppe            = 0;
-mapt_cave              = 1;
-mapt_lake              = 2;
-mapt_shore             = 3;
-mapt_sea               = 4;
+mapt_canyon            = 1;
+mapt_clake             = 2;
+mapt_ilake             = 3;
+mapt_island            = 4;
+mapt_shore             = 5;
+mapt_sea               = 6;
 
 maps_none              = 0;
 maps_point             = 1;
@@ -578,8 +580,8 @@ maps_lineH             = 3;
 maps_lineL             = 4;
 maps_lineR             = 5;
 
-gms_m_types            = 4;  // 0-4  max map types
-gms_m_symm             = 5;  // 0-5  max map symmetry types
+gms_m_types            = 6;  // 0-gms_m_types  max map types
+gms_m_symm             = 5;  // 0-gms_m_symm  max map symmetry types
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -988,7 +990,6 @@ rocket_sr              = tank_sr*2;
 mine_sr                = rocket_sr*2;
 blizzard_sr            = rocket_sr*4;
 
-bld_dec_mr             = 6;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
@@ -1700,7 +1701,7 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 //  MAP THEME
 //
 
-MaxTileSet             = 16;
+MaxTileSet             = 15;
 
 theme_n                = 1;
 theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'

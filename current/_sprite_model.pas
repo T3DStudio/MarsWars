@@ -20,8 +20,8 @@ begin
       if(sm_listn<=0)then exit;
 
       if(sm_type=smt_fapc)
-      then dd:=_DIR360(dir+12) div 23  // 0..15
-      else dd:=_DIR360(dir+23) div 45; // 0..7
+      then dd:=DIR360(dir+12) div 23  // 0..15
+      else dd:=DIR360(dir+23) div 45; // 0..7
 
       if(sm_listi=0)
       then i:=0

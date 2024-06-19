@@ -24,7 +24,7 @@ implementation
 
 type LTStream = TFileStream;
 
-function i2s (i:integer ):shortstring;begin str(i,i2s );end;
+function i2s(i:integer ):shortstring;begin str(i,i2s );end;
 
 function streamSeek(h: Pointer; off: ogg_int64_t; whence: cint): cint; cdecl;
 var S:LTStream;

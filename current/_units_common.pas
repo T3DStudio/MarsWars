@@ -554,103 +554,89 @@ begin
 end;
 
 
-
-procedure _1c_push(tx,ty:pinteger;x0,y0,r0:integer);
-var vx,vy,a:single;
-begin
-   vx :=x0-tx^;
-   vy :=y0-ty^;
-   a  :=sqrt(sqr(vx)+sqr(vy));
-   if(a=0)then exit;
-   vx :=vx/a;
-   vy :=vy/a;
-   tx^:=x0-trunc(r0*vx);
-   ty^:=y0-trunc(r0*vy);
+procedure pushOut_all(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
+const ptarn = 1;
+type TPush_tar = record
+   x,y,a,b,c:integer;
 end;
-
-procedure _2c_push(tx,ty:pinteger;x0,y0,r0,x1,y1,r1:integer);
-var d:integer;
-vx,vy,
-  a,h:single;
-begin
-   r0+=1;
-   r1+=1;
-   d:=point_dist_int(x0,y0,x1,y1);
-   if(abs(r0-r1)<=d)and(d<=(r0+r1))and(d>0)then
-   begin
-      a:=(sqr(r0)-sqr(r1)+sqr(d))/(2*d);
-      h:=sqrt(sqr(r0)-sqr(a));
-
-      vx:=(x1-x0)/d;
-      vy:=(y1-y0)/d;
-
-      if( trunc(-vy*(x0-tx^)+vx*(y0-ty^)) <= 0 )then
-      begin
-         tx^:=trunc( x0+a*vx-(h*vy) );
-         ty^:=trunc( y0+a*vy+(h*vx) );
-      end
-      else
-      begin
-         tx^:=trunc( x0+a*vx+(h*vy) );
-         ty^:=trunc( y0+a*vy-(h*vx) );
-      end;
-   end
-   else _1c_push(tx,ty,x0,y0,r0);
-end;
-
-procedure _push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
-const nrl = 1;
-var nrx,
-    nry,
-    nrd,
-    nrt : array[0..nrl] of integer;
-gx,gy,gx0,gy0,gx1,gy1,gmx,gmy,
+var ptars: array[0..ptarn] of TPush_tar;
+gx,gy,gx0,
+gy0,gx1,gy1,
+gmx,gmy,
 o,u,d   : integer;
-
-procedure add(ax,ay,ad,at:integer);
+procedure add(ax,ay,aa,ab,ac:integer);
 var i,n:integer;
 begin
-   // find insert i
    i:=0;
-   while(i<=nrl)do
+   while(i<=ptarn)do
    begin
-      if(ad<nrd[i])then break;
+      if(ac<ptars[i].c)then break;
       i+=1;
    end;
 
-   if(i>nrl)then exit;
+   if(i>ptarn)then exit;
 
-   if(i<>nrl)then
-    for n:=nrl-1 downto i do
-    begin
-       nrd[i+1]:=nrd[i];
-       nrx[i+1]:=nrx[i];
-       nry[i+1]:=nry[i];
-       nrt[i+1]:=nrt[i];
-    end;
+   if(i<>ptarn)then
+     for n:=ptarn-1 downto i do
+       ptars[i+1]:=ptars[i];
 
-   nrd[i]:=ad;
-   nrx[i]:=ax;
-   nry[i]:=ay;
-   nrt[i]:=at;
-end;
-
-begin
-   for u:=0 to nrl do
+   with ptars[i] do
    begin
-      nrd[u]:= NOTSET;
-      nrx[u]:=-2000;
-      nry[u]:=-2000;
-      nrt[u]:=0;
+      x:=ax;
+      y:=ay;
+      a:=aa;
+      b:=ab;
+      c:=ac;
    end;
+end;
+procedure clear;
+var i:byte;
+begin
+   for i:=0 to ptarn do
+     with ptars[i] do
+     begin
+        x:=0;
+        y:=0;
+        a:=0;
+        b:=0;
+        c:=NOTSET;
+     end;
+end;
+begin
+   clear;
 
    if(_ukfly)then check_obstacles:=false;
 
+   if(not _ukfly)then
+    for u:=1 to MaxCPoints do
+     with g_cpoints[u] do
+      if(cpCaptureR>0)and(cpNoBuildR>0)then
+      begin
+         o:=tr+cpNoBuildR;
+         d:=point_dist_int(cpx,cpy,tx,ty);
+         if(d<o)then add(cpx,cpy,o,0,d-o);
+      end;
+
+   for u:=1 to MaxUnits do
+    with g_units[u] do
+     with uid^ do
+      if(hits>0)and(ukfly=_ukfly)and(unum<>ignore_unum)then
+       if(speed<=0)or(not iscomplete)then
+        if(not IsUnitRange(transport,nil))then
+        begin
+           o:=tr+_r;
+           d:=point_dist_int(x,y,tx,ty);
+           if(d<o)then add(x,y,o,0,d-o);
+        end;
+
+   pushOut_2r(@tx,@ty,ptars[0].x,ptars[0].y,ptars[0].a,
+                      ptars[1].x,ptars[1].y,ptars[1].a);
+
    if(check_obstacles)then
    begin
-      tr-=bld_dec_mr;
+      clear;
 
-      {gx0:=(tx-tr) div MapCellW;
+      gx0:=(tx-tr) div MapCellW;
       gy0:=(ty-tr) div MapCellW;
       gx1:=(tx+tr) div MapCellW;
       gy1:=(ty+tr) div MapCellW;
@@ -664,55 +650,35 @@ begin
          and(0<=gy)and(gy<=map_LastCell)then
            if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
 
-         mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,@gmx,@gmy);
-         d:=point_dist_int(gmx,gmy,tx,ty)-tr;
-         add(gmx,gmy,d,tr);
-      end;}
+         mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,@u,@o,0);
+         d:=point_dist_int(tx,ty,u,o);
 
-      {gx:=tx div dcw;
-      gy:=ty div dcw;
-      if(0<=gx)and(gx<=dcn)and(0<=gy)and(gy<=dcn)then
-       with map_dcell[gx,gy] do
-        if(n>0)then
-         for u:=0 to n-1 do
-          with l[u]^ do
-           if(r>0)and(t>0)then
-           begin
-              o:=tr+r;
-              d:=point_dist_int(x,y,tx,ty)-o;
-              add(x,y,d,o);
-           end;     }
-      tr+=bld_dec_mr;
-   end;
-
-   if(_ukfly=false)then
-    for u:=1 to MaxCPoints do
-     with g_cpoints[u] do
-      if(cpCaptureR>0)and(cpNoBuildR>0)then
-      begin
-         o:=cpNoBuildR;
-         d:=point_dist_int(cpx,cpy,tx,ty)-o;
-         add(cpx,cpy,d,o);
+         if(d<tr)then add(gmx,gmy,MapCellW,MapCellW,d);
       end;
 
-   for u:=1 to MaxUnits do
-    with g_units[u] do
-     with uid^ do
-      if(hits>0)and(ukfly=_ukfly)and(unum<>ignore_unum)then
-       if(speed<=0)or(not iscomplete)then
-        if(not IsUnitRange(transport,nil))then
-        begin
-           o:=tr+_r;
-           d:=point_dist_int(x,y,tx,ty);
-           add(x,y,d-o,o);
-        end;
+      if(ptars[0].x=ptars[1].x)and(abs(ptars[0].y-ptars[1].y)<=MapCellW)then
+      begin
+         ptars[0].y:=min2i(ptars[0].y,ptars[1].y);
+         ptars[0].b:=MapCellW*2;
+         ptars[1].c:=NOTSET;
+      end
+      else
+      if(ptars[0].y=ptars[1].y)and(abs(ptars[0].x-ptars[1].x)<=MapCellW)then
+      begin
+         ptars[0].x:=min2i(ptars[0].x,ptars[1].x);
+         ptars[0].a:=MapCellW*2;
+         ptars[1].c:=NOTSET;
+      end;
 
-   if(nrd[1]<=-1)
-   then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
-   else
-     if(nrd[0]<=-1)
-     then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
-
+      for u:=0 to ptarn do
+        with ptars[u] do
+          if(c<>NOTSET)then
+          begin
+             mgcell2NearestXY(tx,ty,x,y,x+a,y+b,@gmx,@gmy,tr);
+             tx:=gmx;
+             ty:=gmy;
+          end;
+   end;
    newx^:=tx;
    newy^:=ty;
 end;
@@ -727,7 +693,7 @@ begin
    with g_uids[buid] do
    begin
       aukfly:=_ukfly;
-      _push_out(tx,ty,_r+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+      pushOut_all(tx,ty,_r+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
    end;
 
    dx:=-2000;
@@ -754,7 +720,7 @@ begin
    begin
       o :=point_dist_int(dx,dy,tx,ty);
       dr:=o-sr;
-      if(0<dr)then _1c_push(@tx,@ty,dx,dy,sr-1);
+      if(0<=dr)then pushIn_1r(@tx,@ty,dx,dy,sr-1);
    end;
 
    tx:=mm3i(map_BuildBorder0,tx,map_BuildBorder1);
@@ -789,6 +755,7 @@ begin
         if(building)
         then gx:=max2i(cpsolidr,cpNoBuildR)
         else gx:=cpsolidr;
+        gx+=tr;
         if(gx<=0)then continue;
         if(point_dist_int(tx,ty,cpx,cpy)<gx)then
         begin
@@ -799,8 +766,6 @@ begin
 
    if(not check_obstacles)then exit;
 
-   tr-=bld_dec_mr;
-
    gx0:=(tx-tr) div MapCellW;
    gy0:=(ty-tr) div MapCellW;
    gx1:=(tx+tr) div MapCellW;
@@ -808,14 +773,14 @@ begin
 
    for gx:=gx0 to gx1 do
    for gy:=gy0 to gy1 do
+   if (0<=gx)and(gx<=map_LastCell)
+   and(0<=gy)and(gy<=map_LastCell)then
    begin
+      if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
+
       u:=dist2mgcell(tx,ty,gx,gy);
       if(u<tr)then
       begin
-         if (0<=gx)and(gx<=map_LastCell)
-         and(0<=gy)and(gy<=map_LastCell)then
-           if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
-
          CheckCollisionR:=4;
          exit;
       end;
@@ -916,7 +881,7 @@ begin
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
-         _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly,obstacles);
+         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly,obstacles);
          blink_x:=mm3i(1,blink_x,map_size);
          blink_y:=mm3i(1,blink_y,map_size);
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
@@ -946,8 +911,8 @@ begin
       if(upgr[upgr_hell_tblink]>0)then
       begin
          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
-         if(srange<point_dist_int(x,y,blink_x,blink_y))then _1c_push(@blink_x,@blink_y,x,y,srange-1);
-         _push_out(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly, obstacles  );
+         if(srange<point_dist_int(x,y,blink_x,blink_y))then pushOut_1r(@blink_x,@blink_y,x,y,srange-1);
+         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly, obstacles  );
          blink_x:=mm3i(1,blink_x,map_size);
          blink_y:=mm3i(1,blink_y,map_size);
          if(point_dist_int(x,y,blink_x,blink_y)>srange)then exit;
@@ -1694,7 +1659,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      dd:=_DIR360(dir+23) div 45;
+      dd:=DIR360(dir+23) div 45;
       ability_SpawnUnit(pu,x+dir_stepX[dd]*_r,y+dir_stepY[dd]*_r,auid);
    end;
 end;

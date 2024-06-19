@@ -53,10 +53,6 @@ PTMWSModel = ^TMWSModel;
 TMWTileSet  = array[0..MaxTileSet] of TMWTexture;
 PTMWTileSet = ^TMWTileSet;
 
-TDecal = record
-   x,y      : integer;
-end;
-
 TEID = record
    anim_smstate: byte;
    smodel      : PTMWSModel;
@@ -105,7 +101,7 @@ TThemeDecorAnim = record
    tda_depth,
    tda_xo,
    tda_yo,
-   tda_sh,
+   tda_shadow,
    tda_anext,
    tda_atime:integer
 end;

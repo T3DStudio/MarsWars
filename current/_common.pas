@@ -22,6 +22,7 @@ function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer;  forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
+procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal); forward;
 function Float2Str(s:single):shortstring;
 var l:byte;
 begin
@@ -667,10 +668,10 @@ begin
    dir_diff:=((( (dir1-dir2) mod 360) + 540) mod 360) - 180;
 end;
 
-function _DIR360(d:integer):integer;
+function DIR360(d:integer):integer;
 begin
-   _DIR360:=d mod 360;
-   if(_DIR360<0)then _DIR360+=360;
+   DIR360:=d mod 360;
+   if(DIR360<0)then DIR360+=360;
 end;
 
 function dir_turn(d1,d2,spd:integer):integer;
@@ -681,56 +682,138 @@ begin
    if abs(d)<=spd
    then dir_turn:=d2
    else dir_turn:=d1+(spd*sign(d));
-   dir_turn:=_DIR360(dir_turn);
+   dir_turn:=DIR360(dir_turn);
 end;
 
-
-procedure mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1:integer;rx,ry:pinteger);
+procedure pushIn_1r(tx,ty:pinteger;x0,y0,r0:integer);
+var
+vx,vy:integer;
+a    :single;
 begin
-   if(tx<=gmx0)then
+   vx :=x0-tx^;
+   vy :=y0-ty^;
+   a  :=sqrt(sqr(vx)+sqr(vy));
+   if(a<=0)then exit;
+   tx^:=x0-trunc(r0*vx/a);
+   ty^:=y0-trunc(r0*vy/a);
+end;
+
+function pushOut_1r(tx,ty:pinteger;x0,y0,r0:integer):boolean;
+var
+vx,vy:integer;
+a    :single;
+begin
+   pushOut_1r:=false;
+   vx :=x0-tx^;
+   vy :=y0-ty^;
+   if (abs(vx)>r0)
+   and(abs(vy)>r0)then exit;
+   a  :=sqrt(sqr(vx)+sqr(vy));
+   if(a=0)or(a>r0)then exit;
+   tx^:=x0-trunc(r0*vx/a);
+   ty^:=y0-trunc(r0*vy/a);
+   pushOut_1r:=true;
+end;
+
+procedure pushOut_2r(tx,ty:pinteger;x0,y0,r0,x1,y1,r1:integer);
+var d:integer;
+vx,vy,
+  a,h:single;
+begin
+   if (r0<>NOTSET)
+   and(r1<>NOTSET)then
    begin
-      rx^:=gmx0;
-      if(ty<=gmy0)
-      then ry^:=gmy0
-      else
-      if(gmy0<=ty)and(ty<=gmy1)
-      then ry^:=ty
-      else ry^:=gmy1;
+      d:=point_dist_int(x0,y0,x1,y1);
+      if(abs(r0-r1)<=d)and(d<=(r0+r1))and(d>0)then
+      begin
+         a:=(sqr(r0)-sqr(r1)+sqr(d))/(2*d);
+         h:=sqrt(sqr(r0)-sqr(a));
+
+         vx:=(x1-x0)/d;
+         vy:=(y1-y0)/d;
+
+         if( trunc(-vy*(x0-tx^)+vx*(y0-ty^)) <= 0 )then
+         begin
+            tx^:=trunc( x0+a*vx-(h*vy) );
+            ty^:=trunc( y0+a*vy+(h*vx) );
+         end
+         else
+         begin
+            tx^:=trunc( x0+a*vx+(h*vy) );
+            ty^:=trunc( y0+a*vy-(h*vx) );
+         end;
+         exit;
+      end;
+   end;
+   if(r0<>NOTSET)then begin pushOut_1r(tx,ty,x0,y0,r0);exit;end;
+   if(r1<>NOTSET)then begin pushOut_1r(tx,ty,x1,y1,r1);exit;end;
+end;
+
+procedure mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1:integer;rx,ry:pinteger;pushOutR:integer);
+var td:integer;
+procedure SetpushOutXY(ad,ax,ay:integer);
+begin
+   if(ad<td)then
+   begin
+      td :=ad;
+      rx^:=ax;
+      ry^:=ay;
+   end;
+end;
+begin
+   rx^:=tx;
+   ry^:=ty;
+
+   if (gmx0<=tx)and(tx<=gmx1)
+   and(gmy0<=ty)and(ty<=gmy1)then
+   begin
+      if(pushOutR>0)then
+      begin
+         td:=integer.MaxValue;
+         SetpushOutXY(abs(gmx0-tx),gmx0-pushOutR,ty);
+         SetpushOutXY(abs(gmx1-tx),gmx1+pushOutR,ty);
+         SetpushOutXY(abs(gmy0-ty),tx,gmy0-pushOutR);
+         SetpushOutXY(abs(gmy1-ty),tx,gmy1+pushOutR);
+      end;
    end
    else
-   if(gmx0<tx)and(tx<gmx1)then
-   begin
-      rx^:=tx;
-      if(ty<=gmy0)
-      then ry^:=gmy0
-      else
-      if(gmy0<=ty)and(ty<=gmy1)
-      then ry^:=ty
-      else ry^:=gmy1;
-   end
-   else // gmx1<=tx
-   begin
-      rx^:=gmx1;
-      if(ty<=gmy0)
-      then ry^:=gmy0
-      else
-      if(gmy0<=ty)and(ty<=gmy1)
-      then ry^:=ty
-      else ry^:=gmy1;
-   end;
+     if(pushOutR>0)then
+     begin
+             if(tx<gmx0)and(ty<gmy0)then pushOut_1r(rx,ry,gmx0,gmy0,pushOutR+1)
+        else if(gmx1<tx)and(ty<gmy0)then pushOut_1r(rx,ry,gmx1,gmy0,pushOutR+1)
+        else if(gmx1<tx)and(gmy1<ty)then pushOut_1r(rx,ry,gmx1,gmy1,pushOutR+1)
+        else if(tx<gmx0)and(gmy1<ty)then pushOut_1r(rx,ry,gmx0,gmy1,pushOutR+1)
+        else
+             if(tx<gmx0)then begin if abs(gmx0-tx)<pushOutR then rx^:=gmx0-pushOutR end
+        else if(gmx1<tx)then begin if abs(tx-gmx1)<pushOutR then rx^:=gmx1+pushOutR end
+        else if(ty<gmy0)then begin if abs(gmy0-ty)<pushOutR then ry^:=gmy0-pushOutR end
+        else if(gmy1<ty)then begin if abs(ty-gmy1)<pushOutR then ry^:=gmy1+pushOutR end;
+        exit;
+     end
+     else
+     begin
+             if(tx<gmx0)and(ty<gmy0)then begin rx^:=gmx0;ry^:=gmy0;end
+        else if(gmx1<tx)and(ty<gmy0)then begin rx^:=gmx1;ry^:=gmy0;end
+        else if(gmx1<tx)and(gmy1<ty)then begin rx^:=gmx1;ry^:=gmy1;end
+        else if(tx<gmx0)and(gmy1<ty)then begin rx^:=gmx0;ry^:=gmy1;end
+        else
+             if(tx<gmx0)then rx^:=gmx0
+        else if(gmx1<tx)then rx^:=gmx1
+        else if(ty<gmy0)then ry^:=gmy0
+        else if(gmy1<ty)then ry^:=gmy1;
+     end;
 end;
 
 function dist2mgcell(tx,ty,gx,gy:integer):integer;
-var gmx0,gmy0,
-    gmx1,gmy1,
-    gmx ,gmy :integer;
+var gmx,gmy,
+    mx ,my :integer;
 begin
-   gmx0:=gx*MapCellW;
-   gmy0:=gy*MapCellW;
-   gmx1:=gmx0+MapCellW;
-   gmy1:=gmy0+MapCellW;
-   mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1,@gmx,@gmy);
-   dist2mgcell:=point_dist_int(tx,ty,gmx,gmy);
+   gmx:=gx*MapCellW;
+   gmy:=gy*MapCellW;
+   mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,@mx,@my,0);
+   if(tx=mx)and(ty=my)
+   then dist2mgcell:=0
+   else dist2mgcell:=point_dist_int(tx,ty,mx,my);
 end;
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
@@ -1567,13 +1650,6 @@ begin
       end;
    end;
    while(ui_log_n<listheight)do _add('',0,0);
-end;
-
-procedure DrawLoadingScreen(load_str:pshortstring;color:cardinal);
-begin
-   SDL_FillRect(r_screen,nil,0);
-   stringColor(r_screen,(vid_vw div 2)-(length(load_str^)*font_w div 2), vid_vh div 2,@(load_str^[1]),color);
-   SDL_FLIP(r_screen);
 end;
 
 {$ELSE}

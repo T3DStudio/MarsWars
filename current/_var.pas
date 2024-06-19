@@ -66,8 +66,8 @@ g_presets         : array of TGamePreset;
 map_seed          : cardinal = 0;
 map_size          : integer  = 0;
 map_hsize         : integer  = 0;
-map_LastCell      : byte     = 0;
-map_CenterCell    : byte     = 0;
+map_LastCell      : integer  = 0;
+map_CenterCell    : integer  = 0;
 map_BuildBorder1  : integer  = 0;
 map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
@@ -75,6 +75,13 @@ map_symmetryDir   : integer  = 0;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..MaxPlayers] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
+map_gridLastpZone : word = 0;
+map_gridLastsZone : word = 0;
+
+map_gcx,
+map_gcy,
+map_gcsx,
+map_gcsy          : integer;
 
 net_status        : byte = ns_single;
 net_port          : word = 10666;
@@ -135,6 +142,21 @@ u_royal_cd,
 u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
+
+{debug_x,
+debug_y           : integer;
+
+debug_a0,
+debug_b0,
+debug_a1,
+debug_b1,
+debug_r0,
+debug_r1,
+debug_x0,
+debug_y0,
+debug_x1,
+debug_y1          : integer; }
+
 
 map_grid_anim     : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
 
@@ -257,7 +279,7 @@ vid_fog_ey        : integer = 0;
 vid_fog_BaseSurf  : pSDL_Surface;
 vid_fog_tiles     : TMWTileSet;
 
-font_ca           : array[char] of TMWTexture;
+font_1            : array[char] of TMWTexture;
 
 g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
@@ -265,9 +287,11 @@ g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 ms_eid_bio_death_uids
                   : TSoB;
 
-map_mm_cx          : single;
+map_mm_cx         : single;
 map_mm_CamW,
-map_mm_CamH          : integer;
+map_mm_CamH       : integer;
+map_mm_gridW      : single;
+
 
 campain_skill     : byte = 3;
 campain_seed      : cardinal = 0;

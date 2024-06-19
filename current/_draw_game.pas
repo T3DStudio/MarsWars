@@ -450,15 +450,12 @@ end;
 //
 
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
-{var i,t,
-  ix,iy,s:integer;
-    vx,vy:integer;
-    spr  :PTMWTexture;   }
 var
 ssx,ssy,sty,
 sx0,sy0,
 cx,cy,
-mx,my
+mx,my,
+anim
 :integer;
 begin
 
@@ -476,11 +473,28 @@ begin
          my:=sy0+cy;
          if (0<=mx)and(mx<MaxMapSizeCelln)
          and(0<=my)and(my<MaxMapSizeCelln)then
-           case map_grid[mx,my].tgc_solidlevel of
-mgsl_nobuild : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_green );
-mgsl_liquid  : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_orange);
+         begin
+            case map_grid[mx,my].tgc_solidlevel of
+mgsl_free    : draw_surf(tar,ssx,ssy,theme_tile_terrain);
+mgsl_nobuild : begin
+               draw_surf(tar,ssx,ssy,theme_tile_terrain);
+               boxColor(tar,ssx+20,ssy+20,ssx+MapCellW-20,ssy+MapCellW-20,c_green );
+               end;
+mgsl_liquid  : begin
+               anim:=0;
+               if(theme_cur_liquid_tasPeriod>0)and(theme_cur_liquid_tas<>tas_ice)
+               then anim:=(G_Step div theme_cur_liquid_tasPeriod) mod theme_anim_step_n;
+               draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][0].sdlSurface);   //
+               end;
 mgsl_rocks   : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_gray  );
-           end;
+            end;
+
+            with map_grid[mx,my] do
+            begin
+               draw_text(tar,ssx+10,ssy+10,w2s(tgc_parea),ta_left,255,c_white);
+               draw_text(tar,ssx+10,ssy+30,w2s(tgc_sarea),ta_left,255,c_ltgray);
+            end;
+         end;
 
          hlineColor(tar,vid_mapx,vid_mapx+vid_cam_w,ssy,c_gray);
          ssy+=MapCellW;
@@ -488,6 +502,18 @@ mgsl_rocks   : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_gray  );
       vlineColor(tar,ssx,vid_mapy,vid_mapy+vid_cam_h,c_gray);
       ssx+=MapCellW;
    end;
+
+   {mx:=debug_x*MapCellW;
+   my:=debug_y*MapCellW;
+   mgcell2NearestXY(mouse_map_x,mouse_map_y,mx,my,mx+MapCellW,my+MapCellW,@mx,@my,0);
+
+   ssx:=mx-vid_cam_x+lx;
+   ssy:=my-vid_cam_y+ly;
+
+   circleColor(tar,ssx,ssy,5,c_yellow);
+
+   draw_text(tar,ssx+MapCellhW,ssy+MapCellhW,i2s(point_dist_int(mouse_map_x,mouse_map_y,mx,my)),ta_middle,255,c_white);
+   }
 end;
 
 
@@ -551,13 +577,11 @@ end;
 
 
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
-var cx,cy,ssx,ssy,sty:integer;
+var
+ cx, cy,
+ssx,ssy,
+    sty:integer;
   tileX:byte;
-   { b:boolean;
-    cl:cardinal;
-    ci:integer;
-    pf:word;
-    cl:cardinal; }
 function GetFogGridVal(fx,fy:integer):boolean;
 begin
    GetFogGridVal:=true;
@@ -582,7 +606,7 @@ begin
                             GetFogGridVal(cx+1,cy  ),
                             GetFogGridVal(cx  ,cy+1));
          if(tileX>0)then
-           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
+           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX-1].sdlSurface);
 
          vid_fog_grid[cx,cy]:=false;
          ssy+=fog_CellW;
@@ -606,6 +630,20 @@ begin
       draw_text(r_screen,vid_panelw,200,i2s(ai_pushtimei) , ta_left,255, c_white);
       draw_text(r_screen,vid_panelw,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
    end;       }
+
+   {ix:=-vid_cam_x+vid_mapx;
+   iy:=-vid_cam_y+vid_mapy;
+
+   if(debug_r0<>NOTSET)then
+   begin
+   circleColor(r_screen,debug_x0+ix,debug_y0+iy,5,c_lime);
+   rectangleColor(r_screen,ix+debug_x0,iy+debug_y0,ix+debug_x0+debug_a0,iy+debug_y0+debug_b0,c_lime);
+   end;
+   if(debug_r1<>NOTSET)then
+   begin
+   circleColor(r_screen,debug_x1-vid_cam_x+vid_mapx,debug_y1-vid_cam_y+vid_mapy,7,c_blue);
+   rectangleColor(r_screen,ix+debug_x1,iy+debug_y1,ix+debug_x1+debug_a1,iy+debug_y1+debug_b1,c_blue);
+   end;}
 
    if(ks_shift>0) then
    for u:=0 to MaxPlayers do

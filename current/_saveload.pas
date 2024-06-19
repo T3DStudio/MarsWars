@@ -343,7 +343,7 @@ begin
         // map_RefreshDoodadsCells;
          //map_RedrawMenuMinimap;
          //map_DoodadsDrawData;
-         pf_MakeZoneGrid;
+         //pf_MakeZoneGrid;
          GameCameraBounds;
 
          G_Started:=true;

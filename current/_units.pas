@@ -234,8 +234,8 @@ begin
          if(a_reload<=0)then
            if(vx<>x)or(vy<>y)then
              if(shortcollision)
-             then dir:=_DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))
-             else dir:=_DIR360(dir-( min2i(90,max2i(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
+             then dir:=DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))
+             else dir:=DIR360(dir-( min2i(90,max2i(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
 
          if(tu^.x=tu^.ua_x)and(tu^.y=tu^.ua_y)and(tu^.ua_bx<0)and(not IsUnitRange(ua_tar,nil))then
          begin
@@ -1071,7 +1071,7 @@ uab_RebuildInPoint   : begin
                           if(not Check)then
                             if(speed>0)then
                             begin
-                               _push_out(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                               pushOut_all(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
                                unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
                             end
                             else unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
@@ -1081,7 +1081,7 @@ uab_CCFly            : if(speed>0)then
                           unit_psability:=true;
                           if(not Check)then
                           begin
-                             _push_out(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                             pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                              unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability);
                           end;
                        end
@@ -1091,7 +1091,7 @@ uab_CCFly            : if(speed>0)then
                            then unit_psability:=true
                            else
                            begin
-                              _push_out(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                              pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
                               unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability);
                               unit_psability:=true;
                            end;

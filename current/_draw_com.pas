@@ -95,7 +95,7 @@ begin
          else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
          end;
 
-         draw_mwtexture(sur,ix,y,@font_ca[charc]);
+         draw_mwtexture(sur,ix,y,@font_1[charc]);
 
          chars+= 1;
          ix   += font_w;
@@ -119,6 +119,14 @@ begin
           end;
        end;
    end;
+end;
+
+procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal);
+begin
+   SDL_FillRect(r_screen,nil,0);
+   draw_text(r_screen,vid_vw div 2,vid_vh div 2,CaptionString,ta_middle,255,color);
+   //stringColor(r_screen,(vid_vw div 2)-(length(CaptionString^)*font_w div 2), vid_vh div 2,@(CaptionString^[1]),color);
+   SDL_FLIP(r_screen);
 end;
 
 function TileSetGetN(b10,b01,b11,b21,b12:boolean):byte;
@@ -147,10 +155,28 @@ begin
 end;
 
 procedure map_MinimapBackground;
+var
+gx ,gy :integer;
+mmx,mmy:single;
 begin
    sdl_FillRect(r_bminimap,nil,0);
-   //map_MinimapBackDraw(dids_liquids);
-   //map_MinimapBackDraw([DID_other,DID_srock,DID_brock]);
+
+   mmx:=0;
+   for gx:=0 to map_LastCell do
+   begin
+      mmy:=0;
+      for gy:=0 to map_LastCell do
+      begin
+         case map_grid[gx,gy].tgc_solidlevel of
+mgsl_nobuild : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_green );
+mgsl_liquid  : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),theme_cur_liquid_mmcolor);
+mgsl_rocks   : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_gray  );
+         end;
+
+         mmy+=map_mm_gridW;
+      end;
+      mmx+=map_mm_gridW;
+   end;
 end;
 
 procedure map_MinimapSpot(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);

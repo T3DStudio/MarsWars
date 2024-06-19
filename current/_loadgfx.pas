@@ -385,7 +385,7 @@ begin
    SDL_SetColorKey(sTemplate,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sTemplate,0,0));
 
    // full tiled
-   with tileSet^[1] do
+   with tileSet^[0] do
    begin
       gfx_SDLSurfaceFree(sdlSurface);
       sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
@@ -403,7 +403,7 @@ begin
    for b12:=false to true do
    begin
       boxColor(sTemplate,0,0,tw,tw,transColor);
-      tileX:=1;
+      tileX:=0;
       brushn:=0;
       FillChar(brushx,SizeOf(brushx),0);
       FillChar(brushy,SizeOf(brushy),0);
@@ -413,6 +413,8 @@ begin
       if(b01)then begin AddBrush(tw0,tw1,tr); tileX+=2; end;
       if(b21)then begin AddBrush(tw2,tw1,tr); tileX+=4; end;
       if(b12)then begin AddBrush(tw1,tw2,tr); tileX+=8; end;
+
+      if(tileX=0)then continue;
 
       if(edgeStyle<>tes_tech)then
       begin
@@ -428,20 +430,16 @@ begin
          DrawBrush(brushn);
       end;
 
-      if(tileX=1)then tileX:=0;
       with tileSet^[tileX] do
       begin
          gfx_SDLSurfaceFree(sdlSurface);
          sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
          boxColor(sdlSurface,0,0,tw,tw,transColor);
-         if(tileX>1)then
-         begin
          gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
          draw_surf(sdlSurface,0,0,sTemplate);
          if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
-         end;
          SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,thw,thw));
-         w:=tw;h:=w;
+         w :=tw ;h := w;
          hw:=thw;hh:=hw;
       end;
    end;
@@ -568,19 +566,18 @@ begin
    fspr:=gfx_SDLSurfaceLoad('font',false,true);
    for i:=0 to 255 do
    begin
-      c:=chr(i);
-      with font_ca[c] do
-      begin
-         sdlSurface:=gfx_SDLSurfaceCreate(font_w,font_w);
-         SDL_FillRect(sdlSurface,nil,0);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
-      end;
-
       r_RECT^.x:=ord(i)*font_w;
       r_RECT^.y:=0;
       r_RECT^.w:=font_w;
       r_RECT^.h:=font_w;
-      SDL_BLITSURFACE(fspr,r_RECT,font_ca[c].sdlSurface,nil);
+      c:=chr(i);
+      with font_1[c] do
+      begin
+         sdlSurface:=gfx_SDLSurfaceCreate(font_w,font_w);
+         SDL_FillRect(sdlSurface,nil,0);
+         SDL_BLITSURFACE(fspr,r_RECT,sdlSurface,nil);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+      end;
    end;
    gfx_SDLSurfaceFree(fspr);
 end;
@@ -621,6 +618,8 @@ begin
    spr_pdmodel:=@spr_dmodel;
 
    gfx_LoadFont;
+
+   DrawLoadingScreen(str_loading_gfx,c_yellow);
 
    vid_fog_BaseSurf := gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
    boxColor(vid_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
@@ -908,8 +907,8 @@ begin
    vid_map_vfw  :=(vid_cam_w div MapCellW)+1;
    vid_map_vfh  :=(vid_cam_h div MapCellW)+1;
 
-   map_mm_CamW     := round(vid_cam_w*map_mm_cx);
-   map_mm_CamH     := round(vid_cam_h*map_mm_cx);
+   map_mm_CamW  := round(vid_cam_w*map_mm_cx);
+   map_mm_CamH  := round(vid_cam_h*map_mm_cx);
    GameCameraBounds;
 
    //Map_tdmake;

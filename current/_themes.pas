@@ -14,7 +14,7 @@ begin
 
        SDL_SETpixel(MakeReflectedSurface,sx,sy,c);
     end;
-   if(transparent)then SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(MakeReflectedSurface,0,0));
+   if(transparent)then SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sourceSurface,0,0));
 end;
 
 procedure LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;addReflected:boolean);
@@ -151,7 +151,7 @@ begin
        for o:=0 to SpriteListN-1 do gfx_MWTextureSetTransparent( @(SpriteList^[o]), (o mod 2)=1 );
 end;
 
-procedure DecAnim(l:PTThemeDecorAnimL;it:pinteger;intString:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
+{procedure DecAnim(l:PTThemeDecorAnimL;it:pinteger;intString:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
 var i,o,
 tmp_intListN:integer;
 tmp_intList :TIntList;
@@ -187,6 +187,55 @@ begin
          SetDecAnim(o+1,true );
       end;
    end;
+end;
+tda_depth,
+tda_xo,
+tda_yo,
+tda_shadow,
+tda_anext,
+tda_atime:integer
+}
+
+procedure DecorationAnim();
+begin
+
+end;
+procedure DecorationData(decorID:byte;adepth,axo,ayo,ashadow:integer;intString:shortstring);
+var
+tmp_il :TIntList;
+tmp_iln,
+i,o    :integer;
+procedure SetPramas(oid:integer;xflip:boolean);
+begin
+   with theme_anm_decors[oid] do
+   begin
+      tda_depth  :=adepth;
+      if(xflip)
+      then tda_xo:=-axo
+      else tda_xo:= axo;
+      tda_yo     :=ayo;
+      tda_shadow :=ashadow;
+   end;
+end;
+begin
+   if(intString<>'all')then
+   begin
+      Str2IntList(intString,@tmp_il,@tmp_iln);
+
+      if(tmp_iln>0)then
+        for i:=0 to tmp_iln-1 do
+        begin
+           o:=tmp_il[i]*2;
+           if(0<=o)and(o<tmp_iln)then
+           begin
+              SetPramas(o  ,false);
+              SetPramas(o+1,true );
+           end;
+        end;
+   end
+   else
+     if(theme_all_decor_n>0)then
+       for o:=0 to theme_all_decor_n-1 do SetPramas(o,false);
 end;
 
 procedure SetTerrainsTAS(tas,tasPeriod:byte;intString:shortstring);
@@ -333,7 +382,7 @@ begin
      end;
 
    SetTerrainsTAS(tas_liquid,30,'13,20,23,28,48');
-   SetTerrainsTAS(tas_liquid,15,'52,53,60,71,72,73,77');
+   SetTerrainsTAS(tas_liquid,15,'52,53,55,60,71,72,73,77');
 end;
 
 
@@ -375,11 +424,11 @@ begin
    if(theme_cur_crater_n <=0)then theme_cur_tile_crater_id :=-1 else begin if(new_crater <0)then t:=abs(new_crater ) mod theme_cur_crater_n  else t:=min2i(theme_cur_crater_n -1,new_crater );theme_cur_tile_crater_id :=theme_cur_crater_l [t];end;
    if(theme_cur_liquid_n <=0)then theme_cur_tile_liquid_id :=-1 else begin if(new_liquid <0)then t:=abs(new_liquid ) mod theme_cur_liquid_n  else t:=min2i(theme_cur_liquid_n -1,new_liquid );theme_cur_tile_liquid_id :=theme_cur_liquid_l [t];end;
 
-   if(theme_cur_tile_terrain_id>0)then
+   if(theme_cur_tile_terrain_id>=0)then
    begin
-      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_terrain_id];
-      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_terrain_id];
-      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_terrain_id];
+      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
    end
    else
    begin
