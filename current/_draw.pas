@@ -48,26 +48,27 @@ begin
 end;
 
 procedure draw_DebugTileSet(tileSet:pTMWTileSet);
-var tileX:word;
+const lineLen = 24;
+var tileX,
 x,y,lineN:integer;
 begin
-   x:=menu_x+20;
-   y:=menu_y+20;
-   lineN:=8;
-   boxColor(r_screen,menu_x,menu_y,menu_x+800,menu_y+600,c_white);
+   x:=20;
+   y:=20;
+   lineN:=lineLen;
+   boxColor(r_screen,0,0,vid_vw,vid_vh,c_green);
    for tileX:=0 to MaxTileSet do
    begin
 
       draw_surf(r_screen,x,y,tileSet^[tileX].sdlSurface);
 
-      draw_text(r_screen,x,y,w2s(tileX),ta_left,255,c_white);
+      //draw_text(r_screen,x,y,w2s(tileX),ta_left,255,c_white);
       x+=tileSet^[tileX].w+2;
 
       lineN-=1;
       if(lineN=0)then
       begin
-         x:=menu_x+2;
-         lineN:=8;
+         x:=20;
+         lineN:=lineLen;
          y+=tileSet^[0].h+2;
       end;
    end;
@@ -98,9 +99,18 @@ begin
    draw_surf(r_screen,i,i,theme_tile_liquid);
    rectangleColor(r_screen,i,i,i+MapCellW,i+MapCellW,c_red);   }
 
-   {if(ks_ctrl=0)then
-   draw_DebugTileSet(@theme_tileset_liquid[ (SDL_GetTicks div 250) mod theme_anim_step_n ]);
-   draw_text(r_screen,menu_x,menu_y,b2s( (SDL_GetTicks div 250) mod theme_anim_step_n ),ta_left,255,c_orange); }
+   //if(ks_ctrl=0)then
+   //draw_DebugTileSet(@vid_fog_tiles);
+  { y:=0;
+   n:=0;
+   if(theme_cur_decor_n>0)then
+    for i:=0 to theme_cur_decor_n-1 do
+    begin
+       n:=i*48;
+       draw_surf(r_screen,n,y,theme_all_decor_l[theme_cur_decor_l[i]].sdlSurface);
+    end;
+   draw_text(r_screen,0,0,i2s(theme_cur_decor_n),ta_left,255,c_white); }
+
 
   { n:=0;
    y:=0;
@@ -121,15 +131,6 @@ begin
 
    if(test_mode>1)then
    begin
-   n:=0;
-   with g_players[UIPlayer] do
-    for i:=0 to MaxPlayers do
-    begin
-       with ai_alarms[i] do
-        if(aia_enemy_limit>0)then n+=1;
-       circleColor(r_screen,vid_mapx+map_PlayerStartX[i]-vid_cam_x,
-                            vid_mapy+map_PlayerStartY[i]-vid_cam_y,base_1r,c_white);
-    end;
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+

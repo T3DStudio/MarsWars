@@ -129,18 +129,25 @@ begin
    SDL_FLIP(r_screen);
 end;
 
-function TileSetGetN(b10,b01,b11,b21,b12:boolean):byte;
+function TileSetGetN(b00,b10,b20,
+                     b01,b11,b21,
+                     b02,b12,b22:boolean):integer;
 begin
+   TileSetGetN:=-1;
    if(b11)
-   then TileSetGetN:=1
+   then TileSetGetN:=0
    else
    begin
-      TileSetGetN:=1;
-      if(b10)then TileSetGetN+=1;
-      if(b01)then TileSetGetN+=2;
-      if(b21)then TileSetGetN+=4;
-      if(b12)then TileSetGetN+=8;
-      if(TileSetGetN=1)then TileSetGetN:=0;
+      TileSetGetN:=0;
+      if(b00)then TileSetGetN+=1;
+      if(b10)then TileSetGetN+=2;
+      if(b20)then TileSetGetN+=4;
+      if(b01)then TileSetGetN+=8;
+      if(b21)then TileSetGetN+=16;
+      if(b02)then TileSetGetN+=32;
+      if(b12)then TileSetGetN+=64;
+      if(b22)then TileSetGetN+=128;
+      if(TileSetGetN=0)then TileSetGetN:=-1;
    end;
 end;
 

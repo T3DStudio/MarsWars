@@ -85,7 +85,7 @@ end;
 
 TVSprite = record
    sprite   : PTMWTexture;
-   x,y,xo,yo,
+   x,y,
    depth,
    shadowz  : integer;
    shadowc,
@@ -98,15 +98,14 @@ PTVSprite = ^TVSprite;
 PTIntList = ^TIntList;
 
 TThemeDecorAnim = record
-   tda_depth,
    tda_xo,
    tda_yo,
    tda_shadow,
    tda_anext,
    tda_atime:integer
 end;
- TThemeDecorAnimL = array of TThemeDecorAnim;
-PTThemeDecorAnimL = ^TThemeDecorAnimL;
+PTThemeDecorAnim = ^TThemeDecorAnim;
+TThemeDecorAnimL = array of TThemeDecorAnim;
 
 TAlarm = record
    al_x,
@@ -169,9 +168,20 @@ TReplayPos = record
    rp_gtick: cardinal;
 end;
 
-TMapTerrainGridCellAnim = record
-   //tgca_
+TMapTerrainGridCellDecor = record
+   tgca_decorTime,
+   tgca_decorDepth,
+   tgca_decorX,
+   tgca_decorY,
+   tgca_decorN     : integer;
+   tgca_decorS     : PTMWTexture;
+   tgca_decorA     : PTThemeDecorAnim;
+end;
 
+TMapTerrainGridCellAnim = record
+   tgca_decor      : array[1..tGridDecorsMax] of TMapTerrainGridCellDecor;
+   tgca_tile_liquid,
+   tgca_tile_crater:integer;
 end;
 
 {$ENDIF}

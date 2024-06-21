@@ -8,13 +8,16 @@ crater,
 liquid :integer;
 mseed  :cardinal;
 function Pick(n:integer):integer;
+var c:cardinal;
 begin
-   if(n<=0)
+   c:=cardinal(n);
+   if(c=0)
    then Pick:=-1
    else
    begin
-      Pick :=mseed mod cardinal(n);
-      mseed:=mseed div cardinal(n);
+      if(mseed<c)then mseed:=cardinal.MaxValue-mseed;
+      Pick :=mseed mod c;
+      mseed:=mseed div c;
    end;
 end;
 begin
@@ -28,6 +31,135 @@ begin
    crater :=Pick(theme_cur_crater_n );
    liquid :=Pick(theme_cur_liquid_n );
    SetTerrainIDs(-terrain,-crater,-liquid);
+end;
+
+procedure map_MakeVisGrid;
+var
+ x, y,
+mx,my,
+ i   :integer;
+ddir :single;
+function GetTile(cx,cy:integer;val:byte;crater:boolean):boolean;
+begin
+   GetTile:=false;
+   if (0<=cx)and(cx<MaxMapSizeCelln)
+   and(0<=cy)and(cy<MaxMapSizeCelln)then
+     with map_grid_anim[cx,cy] do
+       if(crater)
+       then GetTile:=tgca_tile_crater=val
+       else GetTile:=tgca_tile_liquid=val;
+end;
+procedure Set2Rock(gx,gy,mx,my:integer);
+begin
+   with map_grid_anim[gx,gy] do
+     with tgca_decor[1] do
+     begin
+        tgca_decorN    :=theme_cur_2rock_l[abs((gx+1)*(gy+1)) mod theme_cur_2rock_n];
+        tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
+        tgca_decorDepth:=sd_brocks;
+        tgca_decorA    :=@theme_anm_decors [tgca_decorN];
+        tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
+        tgca_decorX    :=mx;
+        tgca_decorY    :=my;
+     end;
+end;
+begin
+   FillChar(map_grid_anim,SizeOf(map_grid_anim),0);
+
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+   with map_grid     [x,y] do
+   with map_grid_anim[x,y] do
+   begin
+      mx:=x*MapCellW+MapCellHW;
+      my:=y*MapCellW+MapCellHW;
+      tgca_tile_liquid:=-1;
+      tgca_tile_crater:=-1;
+      case tgc_solidlevel of
+mgsl_nobuild: begin
+                 tgca_tile_crater:=0;
+                 if(theme_cur_decor_n>0)then
+                  for i:=1 to tGridDecorsMax do
+                    with tgca_decor[i] do
+                    begin
+                       tgca_decorN    :=theme_cur_decor_l[abs((x+1)*(y+1)+i) mod theme_cur_decor_n];
+                       tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
+                       tgca_decorDepth:=sd_ground;
+                       tgca_decorA    :=@theme_anm_decors [tgca_decorN];
+                       tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
+                       ddir:=((i*tGridDecorD)+(x*135)+(y*69))*degtorad;
+                       tgca_decorX    :=mx+round(tGridDecorR*cos(ddir));
+                       tgca_decorY    :=my+round(tGridDecorR*sin(ddir));
+                    end;
+              end;
+mgsl_liquid : begin
+                 tgca_tile_liquid:=0;
+                 tgca_tile_crater:=0;
+              end;
+mgsl_rocks  : begin
+                 tgca_tile_crater:=0;
+
+                 if(tgca_decor[1].tgca_decorS=nil)then
+                 begin
+                    if(theme_cur_2rock_n>0)then
+                      if ((x+1)<MaxMapSizeCelln)
+                      and((y+1)<MaxMapSizeCelln)then
+                        if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
+                        and(map_grid[x+1,y+1].tgc_solidlevel=mgsl_rocks)
+                        and(map_grid[x  ,y+1].tgc_solidlevel=mgsl_rocks)then
+                        begin
+                           mx+=MapCellHW;
+                           my+=MapCellHW;
+                           Set2Rock(x  ,y  ,mx,my);
+                           Set2Rock(x+1,y  ,mx,my);
+                           Set2Rock(x+1,y+1,mx,my);
+                           Set2Rock(x  ,y+1,mx,my);
+                           mx-=MapCellHW;
+                           my-=MapCellHW;
+                           continue;
+                        end;
+
+                    if(theme_cur_1rock_n>0)then
+                      with tgca_decor[1] do
+                      begin
+                         tgca_decorN    :=theme_cur_1rock_l[abs((x+1)*(y+1)+i) mod theme_cur_1rock_n];
+                         tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
+                         tgca_decorDepth:=sd_srocks;
+                         tgca_decorA    :=@theme_anm_decors [tgca_decorN];
+                         tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
+                         tgca_decorX    :=mx;
+                         tgca_decorY    :=my;
+                      end;
+                 end;
+              end;
+      end;
+   end;
+
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+   with map_grid_anim[x,y] do
+   begin
+      tgca_tile_crater:=TileSetGetN(GetTile(x-1,y-1,0,true ),
+                                    GetTile(x  ,y-1,0,true ),
+                                    GetTile(x+1,y-1,0,true ),
+                                    GetTile(x-1,y  ,0,true ),
+                                    GetTile(x  ,y  ,0,true ),
+                                    GetTile(x+1,y  ,0,true ),
+                                    GetTile(x-1,y+1,0,true ),
+                                    GetTile(x  ,y+1,0,true ),
+                                    GetTile(x+1,y+1,0,true ));
+
+      if(theme_cur_liquid_tes=tes_nature)then
+      tgca_tile_liquid:=TileSetGetN(GetTile(x-1,y-1,0,false),
+                                    GetTile(x  ,y-1,0,false),
+                                    GetTile(x+1,y-1,0,false),
+                                    GetTile(x-1,y  ,0,false),
+                                    GetTile(x  ,y  ,0,false),
+                                    GetTile(x+1,y  ,0,false),
+                                    GetTile(x-1,y+1,0,false),
+                                    GetTile(x  ,y+1,0,false),
+                                    GetTile(x+1,y+1,0,false));
+   end;
 end;
 
 {$ENDIF}
@@ -674,6 +806,7 @@ mapt_sea    : begin
 
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
+   map_MakeVisGrid;
    vid_map_RedrawBack:=true;
    {$ENDIF}
 end;

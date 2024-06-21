@@ -24,6 +24,7 @@ fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
+fr_fps4                = fr_fps1*4;
 fr_fps6                = fr_fps1*6;
 fr_fps2d3              = fr_fpsd3*2; //2/3
 fr_fps60               = fr_fps1*60;
@@ -1317,7 +1318,7 @@ ui_ubtns               = 23;
 ui_menu_list_item_H    = font_w*2;
 ui_menu_list_item_S    = font_w div 2;
 
-////////////////////////   menu items
+////////////////////////   menu items      TerrGridMaxDecors
 ////  MAIN
 mi_exit                = 1;
 mi_back                = 2;
@@ -1635,9 +1636,11 @@ CMPMaxSkills           = 6;
 
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MVSCR_';
-str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
-str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
-str_loading_msc        : shortstring = 'LOADING MUSIC...'+#0;
+str_loading_srf        : shortstring = 'MAKING SURFACES...';
+str_loading_gfx        : shortstring = 'LOADING GRAPHICS...';
+str_loading_sfx        : shortstring = 'LOADING SOUNDS...';
+str_loading_msc        : shortstring = 'LOADING MUSIC...';
+str_loading_ini        : shortstring = 'INIT GAME...';
 str_f_grp              : shortstring = 'graphic\';
 str_f_map              : shortstring = 'map\';
 str_f_snd              : shortstring = 'sound\';
@@ -1701,17 +1704,10 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 //  MAP THEME
 //
 
-MaxTileSet             = 15;
+MaxTileSet             = 255;
 
-theme_n                = 1;
-theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'
-                                                               {tc_blue  +'TECH BASE'  ,
-                                                               tc_white +'PLANET'     ,
-                                                               tc_white +'PLANET MOON',
-                                                               tc_gray  +'CAVES'      ,
-                                                               tc_aqua  +'ICE CAVES'  ,
-                                                               tc_orange+'HELL'       ,
-                                                               tc_yellow+'HELL CAVES' });
+theme_n                = 2;
+
 theme_anim_step_n      = 3;
 theme_anim_tile_step   = MapCellW div theme_anim_step_n;
 
@@ -1724,6 +1720,10 @@ tes_tech               = 2;
 tas_ice                = 0;
 tas_liquid             = 1;
 tas_magma              = 2;
+
+tGridDecorsMax         = 2;
+tGridDecorD            = 360 div tGridDecorsMax;
+tGridDecorR            = MapCellW div 4;
 
 {$ELSE }
 

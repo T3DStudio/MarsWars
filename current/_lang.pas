@@ -1006,6 +1006,16 @@ begin
    str_ability_name[uab_CCFly           ]:='Flight Engines';
    str_ability_unload                    :='Unload';
 
+   theme_name[0] := tc_lime  +'UAC BASE';
+   {theme_name[1] := tc_blue  +'UAC BASE';
+   theme_name[2] := tc_white +'PLANET';
+   theme_name[3] := tc_white +'PLANET MOON';
+   theme_name[4] := tc_gray  +'CAVES';
+   theme_name[5] := tc_aqua  +'ICE CAVES';
+   theme_name[6] := tc_orange+'HELL';
+   theme_name[7] := tc_yellow+'HELL CAVES'; }
+
+
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
    _mkHStrUid(UID_HGate          ,'Demon`s Gate'                ,'');

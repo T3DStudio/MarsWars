@@ -143,21 +143,6 @@ u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
 
-{debug_x,
-debug_y           : integer;
-
-debug_a0,
-debug_b0,
-debug_a1,
-debug_b1,
-debug_r0,
-debug_r1,
-debug_x0,
-debug_y0,
-debug_x1,
-debug_y1          : integer; }
-
-
 map_grid_anim     : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
@@ -223,6 +208,11 @@ PlayerName        : shortstring = str_defaultPlayerName;
 PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 UIPlayer          : byte = 1;
+
+vid_TileTemplate_fog          : pTMWTileSet;
+vid_TileTemplate_crater_tech,
+vid_TileTemplate_crater_nature: TMWTileSet;
+vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of TMWTileSet;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
@@ -543,11 +533,15 @@ theme_cur_tile_liquid_id  : integer;
 
 theme_cur_decal_l,
 theme_cur_decor_l,
+theme_cur_1rock_l,
+theme_cur_2rock_l,
 theme_cur_crater_l,
 theme_cur_liquid_l,
 theme_cur_terrain_l       : TIntList;
 theme_cur_decal_n,
 theme_cur_decor_n,
+theme_cur_1rock_n,
+theme_cur_2rock_n,
 theme_cur_crater_n,
 theme_cur_liquid_n,
 theme_cur_terrain_n       : integer;
@@ -564,6 +558,8 @@ theme_all_terrain_mmcolor  : array of cardinal;
 theme_all_terrain_tas,
 theme_all_terrain_tasPeriod: array of byte;
 
+
+theme_name            : array[0..theme_n-1] of shortstring;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

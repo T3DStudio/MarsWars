@@ -9,11 +9,18 @@ const TVisSprSize =  SizeOf(TVSprite);
 
 var slatemp : PTVSprite;
 
-function SpriteListAdd:PTVSprite;
+function SpriteListAdd(nsx,nsy:integer;nspr:PTMWTexture):PTVSprite;
+var i:integer;
 begin
    SpriteListAdd:=nil;
    if(vid_Sprites_n<vid_MaxScreenSprites)and(not menu_state)then
    begin
+      if(vid_Sprites_n>0)then
+       for i:=0 to vid_Sprites_n-1 do
+        with vid_Sprites_List[i]^ do
+         if(x=nsx)and(y=nsy)and(sprite=nspr)then
+          exit;
+
       setlength(vid_Sprites_List,vid_Sprites_n+1);
       new(vid_Sprites_List[vid_Sprites_n]);
       SpriteListAdd:=vid_Sprites_List[vid_Sprites_n];
@@ -25,7 +32,7 @@ end;
 
 procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteListAdd(ax,ay,aspr);
    if(slatemp<>nil)then
     with slatemp^ do
     begin
@@ -39,9 +46,9 @@ begin
        alpha  := aalpha;
     end;
 end;
-procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axo,ayo:integer);
+procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteListAdd(ax,ay,aspr);
    if(slatemp<>nil)then
     with slatemp^ do
     begin
@@ -52,28 +59,25 @@ begin
        shadowc:= c_ablack;
        sprite := aspr;
        alpha  := aalpha;
-       xo     := axo;
-       yo     := ayo;
     end;
 end;
 procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteListAdd(ax,ay,aspr);
    if(slatemp<>nil)then
     with slatemp^ do
     begin
        x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
-       depth  :=  sd_marker;
+       y      := ay-vid_cam_y-aspr^.hh;
+       depth  := sd_marker;
        shadowz:= -32000;
        sprite := aspr;
        alpha  := 255;
-       yo     := -aspr^.hh;
     end;
 end;
 procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteListAdd(ax,ay,aspr);
    if(slatemp<>nil)then
     with slatemp^ do
     begin
@@ -111,11 +115,8 @@ begin
       vid_Sprites_n-=1;
       with vid_Sprites_List[vid_Sprites_n]^ do
       begin
-         x-=sprite^.hw;
-         y-=sprite^.hh;
-
-         x+=lx+xo;
-         y+=ly+yo;
+         x+=lx-sprite^.hw;
+         y+=ly-sprite^.hh;
 
          if(shadowz>-fly_hz)then
          begin
@@ -449,71 +450,118 @@ end;
 //  Terrain
 //
 
+function DoodadAnimationTime(base:integer):integer;
+begin
+   case base of
+   -1 : DoodadAnimationTime:=random(fr_fpsd3)+fr_fpsd3;
+   -2 : DoodadAnimationTime:=random(fr_fps2 )+1;
+   -3 : DoodadAnimationTime:=random(fr_fps1 )+1;
+   -4 : DoodadAnimationTime:=random(fr_fps2 )+1;
+   -5 : DoodadAnimationTime:=random(fr_fps3 )+1;
+   -6 : DoodadAnimationTime:=random(fr_fps4 )+1;
+   else if(base>0)
+        then DoodadAnimationTime:=base
+        else DoodadAnimationTime:=-100;
+   end;
+end;
+
 procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
 var
 ssx,ssy,sty,
 sx0,sy0,
 cx,cy,
-mx,my,
-anim
-:integer;
+gx,gy,
+mx,my,mty,
+anim,i  :integer;
+AddEdges:boolean;
 begin
 
    ssx:=lx-(vid_cam_x mod MapCellW);
    sty:=ly-(vid_cam_y mod MapCellW);
    sx0:=vid_cam_x div MapCellW;
    sy0:=vid_cam_y div MapCellW;
+   mx :=sx0*MapCellW;
+   mty:=sy0*MapCellW;
+
+   if(theme_cur_liquid_tas=tas_ice)
+   then anim:=0
+   else anim:=(G_Step div theme_cur_liquid_tasPeriod) mod theme_anim_step_n;
+
+   AddEdges:=false;
+   with g_players[PlayerClient] do
+     case m_brush of
+1..255         : with g_uids[m_brush] do
+                   if(upgr[upgr_race_extbuilding[_urace]]=0)
+                   or(_isbarrack)
+                   or(_ability=uab_Teleport)then AddEdges:=true;
+mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
+     end;
 
    for cx:=0 to vid_map_vfw do
    begin
       ssy:=sty;
+      my :=mty;
       for cy:=0 to vid_map_vfh do
       begin
-         mx:=sx0+cx;
-         my:=sy0+cy;
-         if (0<=mx)and(mx<MaxMapSizeCelln)
-         and(0<=my)and(my<MaxMapSizeCelln)then
+         gx:=sx0+cx;
+         gy:=sy0+cy;
+         if (0<=gx)and(gx<MaxMapSizeCelln)
+         and(0<=gy)and(gy<MaxMapSizeCelln)then
+         with map_grid_anim[gx,gy] do
          begin
-            case map_grid[mx,my].tgc_solidlevel of
-mgsl_free    : draw_surf(tar,ssx,ssy,theme_tile_terrain);
-mgsl_nobuild : begin
-               draw_surf(tar,ssx,ssy,theme_tile_terrain);
-               boxColor(tar,ssx+20,ssy+20,ssx+MapCellW-20,ssy+MapCellW-20,c_green );
-               end;
-mgsl_liquid  : begin
-               anim:=0;
-               if(theme_cur_liquid_tasPeriod>0)and(theme_cur_liquid_tas<>tas_ice)
-               then anim:=(G_Step div theme_cur_liquid_tasPeriod) mod theme_anim_step_n;
-               draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][0].sdlSurface);   //
-               end;
-mgsl_rocks   : boxColor(tar,ssx,ssy,ssx+MapCellW,ssy+MapCellW,c_gray  );
-            end;
+            if(AddEdges)then
+              if ((gx+1)<MaxMapSizeCelln)
+              and((gy+1)<MaxMapSizeCelln)then
+              begin
+                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)<>(map_grid[gx+1,gy].tgc_solidlevel>mgsl_free)
+                 then UnitsInfoAddLine(mx+MapCellw,my,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)<>(map_grid[gx,gy+1].tgc_solidlevel>mgsl_free)
+                 then UnitsInfoAddLine(mx,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+              end;
 
-            with map_grid[mx,my] do
-            begin
-               draw_text(tar,ssx+10,ssy+10,w2s(tgc_parea),ta_left,255,c_white);
-               draw_text(tar,ssx+10,ssy+30,w2s(tgc_sarea),ta_left,255,c_ltgray);
-            end;
+            if(tgca_tile_liquid=0)
+            then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface)
+            else
+              if(tgca_tile_crater=0)then
+              begin
+                 draw_surf(tar,ssx,ssy,theme_tileset_crater[tgca_tile_crater].sdlSurface);
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
+              end
+              else
+              begin
+                 draw_surf(tar,ssx,ssy,theme_tile_terrain);
+                 if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].sdlSurface);
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
+              end;
+
+            for i:=1 to tGridDecorsMax do
+              with tgca_decor[i] do
+                if(tgca_decorS<>nil)and(tgca_decorA<>nil)then
+                  with tgca_decorA^ do
+                  begin
+                     SpriteListAddDoodad(tgca_decorX+tda_xo,
+                                         tgca_decorY+tda_yo,
+                                         tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
+                     if(tgca_decorTime>0)then
+                     begin
+                        tgca_decorTime-=1;
+                        if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
+                        begin
+                           tgca_decorN   :=tda_anext;
+                           tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
+                           tgca_decorA   :=@theme_anm_decors [tgca_decorN];
+                           tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
+                        end;
+                     end;
+                  end;
          end;
 
-         hlineColor(tar,vid_mapx,vid_mapx+vid_cam_w,ssy,c_gray);
          ssy+=MapCellW;
+         my +=MapCellW;
       end;
-      vlineColor(tar,ssx,vid_mapy,vid_mapy+vid_cam_h,c_gray);
       ssx+=MapCellW;
+      mx +=MapCellW;
    end;
-
-   {mx:=debug_x*MapCellW;
-   my:=debug_y*MapCellW;
-   mgcell2NearestXY(mouse_map_x,mouse_map_y,mx,my,mx+MapCellW,my+MapCellW,@mx,@my,0);
-
-   ssx:=mx-vid_cam_x+lx;
-   ssy:=my-vid_cam_y+ly;
-
-   circleColor(tar,ssx,ssy,5,c_yellow);
-
-   draw_text(tar,ssx+MapCellhW,ssy+MapCellhW,i2s(point_dist_int(mouse_map_x,mouse_map_y,mx,my)),ta_middle,255,c_white);
-   }
 end;
 
 
@@ -580,8 +628,8 @@ procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
 var
  cx, cy,
 ssx,ssy,
-    sty:integer;
-  tileX:byte;
+    sty,
+  tileX:integer;
 function GetFogGridVal(fx,fy:integer):boolean;
 begin
    GetFogGridVal:=true;
@@ -600,13 +648,19 @@ begin
       ssy:=sty;
       for cy:=0 to vid_fog_vfh do
       begin
-         tileX:=TileSetGetN(GetFogGridVal(cx  ,cy-1),
+         tileX:=TileSetGetN(GetFogGridVal(cx-1,cy-1),
+                            GetFogGridVal(cx  ,cy-1),
+                            GetFogGridVal(cx+1,cy-1),
+
                             GetFogGridVal(cx-1,cy  ),
                             GetFogGridVal(cx  ,cy  ),
                             GetFogGridVal(cx+1,cy  ),
-                            GetFogGridVal(cx  ,cy+1));
-         if(tileX>0)then
-           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX-1].sdlSurface);
+
+                            GetFogGridVal(cx-1,cy+1),
+                            GetFogGridVal(cx  ,cy+1),
+                            GetFogGridVal(cx+1,cy+1));
+         if(0<=tileX)and(tileX<=MaxTileSet)then
+           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
 
          vid_fog_grid[cx,cy]:=false;
          ssy+=fog_CellW;

@@ -266,6 +266,8 @@ end;
 procedure gfx_FillSurfaceBySurface(sTar,sTile:pSDL_Surface;animStepX,animStepY:integer);
 var tx,ty:integer;
 begin
+   if(sTar =r_empty)
+   or(sTile=r_empty)then exit;
    tx:=animStepX;
    while tx<sTar^.w do
    begin
@@ -279,39 +281,91 @@ begin
    end;
 end;
 
-procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;transColor,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet;edgeStyle:byte;animStepX,animStepY:integer;colorMask:cardinal);
+procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;colorMask,TransColor:cardinal);
 var
-tileX,
-random_i   : byte;
-b10,b01,
-b21,b12    : boolean;
+tw,
+thw,
+tileX      : integer;
+b00,b10,b20,
+b01,    b21,
+b02,b12,b22: boolean;
+begin
+   tw :=tileSetTemplate^[0].w;
+   thw:=tileSetTemplate^[0].hw;
+
+   // full tiled
+   with tileSetTarget^[0] do
+   begin
+      gfx_SDLSurfaceFree(sdlSurface);
+      sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
+      boxColor(sdlSurface,0,0,tw,tw,TransColor);
+      SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
+      gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
+      if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      w :=tw; h :=w;
+      hw:=thw;hh:=hw;
+   end;
+
+   for b00:=false to true do
+   for b10:=false to true do
+   for b20:=false to true do
+   for b01:=false to true do
+   for b21:=false to true do
+   for b02:=false to true do
+   for b12:=false to true do
+   for b22:=false to true do
+   begin
+      tileX:=0;
+
+      if(b00)then tileX+=1  ;
+      if(b10)then tileX+=2  ;
+      if(b20)then tileX+=4  ;
+      if(b01)then tileX+=8  ;
+      if(b21)then tileX+=16 ;
+      if(b02)then tileX+=32 ;
+      if(b12)then tileX+=64 ;
+      if(b22)then tileX+=128;
+
+      if(tileX=0)then continue;
+
+      with tileSetTarget^[tileX] do
+      begin
+         gfx_SDLSurfaceFree(sdlSurface);
+         sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
+         gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
+         draw_surf(sdlSurface,0,0,tileSetTemplate^[tileX].sdlSurface);
+         if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,thw,thw));
+         w :=tw ;h := w;
+         hw:=thw;hh:=hw;
+      end;
+   end;
+end;
+
+procedure gfx_MakeTileSetTemplate(transColor,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet;edgeStyle:byte;rstep:integer;random_i:byte);
+var
+b00,b10,b20,
+b01,    b21,
+b02,b12,b22: boolean;
 sTemplate  : pSDL_Surface;
+tileX,
+ix,iy,
 tr ,tr2,thw,
 tw0,tw1,tw2: integer;
 brushx,
-brushy,
-brushr     : array[0..7] of integer;
-brushn     : byte;
-procedure AddBrush(ax,ay,ar:integer);
-begin
-   if(brushn<=7)then
-   begin
-      brushx[brushn]:=ax;
-      brushy[brushn]:=ay;
-      brushr[brushn]:=ar;
-   end;
-   brushn+=1;
-end;
-function CheckNearestBrush(bx,by:integer;bnSkip:byte):boolean;
-var bn:byte;
+brushy     : array[0..2] of integer;
+brushr     : array[0..2] of array[0..2] of integer;
+function CheckNearestBrush(tx,ty,bnxSkip,bnySkip:integer):boolean;
+var ix,iy:byte;
 begin
    CheckNearestBrush:=false;
-   if(0<=bx)and(0<=by)and(bx<=tw)and(by<=tw)then
+   if(0<=tx)and(0<=ty)and(tx<=tw)and(ty<=tw)then
    begin
-      for bn:=0 to 7 do
-       if(bn<>bnSkip)then
-        if(brushr[bn]>0)then
-         if(point_dist_int(brushx[bn],brushy[bn],bx,by)<=brushr[bn])then
+      for ix:=0 to 2 do
+      for iy:=0 to 2 do
+       if not((ix=bnxSkip)and(iy=bnySkip))then
+        if(brushr[ix,iy]>0)then
+         if(point_dist_int(brushx[ix],brushy[iy],tx,ty)<=brushr[ix,iy])then
          begin
             CheckNearestBrush:=true;
             break;
@@ -319,9 +373,8 @@ begin
    end
    else CheckNearestBrush:=true;
 end;
-procedure DrawBrush(bn:byte);
+procedure DrawBrush(ix,iy:byte;bx,by,br:integer);
 var
-bx,by,br,
 edgeRMax,
 edgeR,
 tx,ty  : integer;
@@ -329,11 +382,7 @@ dirStart,
 dir,
 dirStep: single;
 begin
-   bx:=brushx[bn];
-   by:=brushy[bn];
-   br:=brushr[bn];
-   if(br>0)then
-     case edgeStyle of
+   case edgeStyle of
 tes_fog   : filledcircleColor(sTemplate,bx,by,br,templateColor);
 tes_nature: begin
             filledcircleColor(sTemplate,bx,by,br,templateColor);
@@ -348,7 +397,7 @@ tes_nature: begin
                   edgeR:=(random_table[random_i] mod edgeRMax)+2;
                   tx:=bx+round(br*cos(dir*degtorad));
                   ty:=by-round(br*sin(dir*degtorad));
-                  if(CheckNearestBrush(tx,ty,bn))
+                  if(CheckNearestBrush(tx,ty,ix,iy))
                   then break
                   else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
                   dir+=dirStep;
@@ -361,7 +410,7 @@ tes_nature: begin
                   dir-=dirStep;
                   tx:=bx+round(br*cos(dir*degtorad));
                   ty:=by-round(br*sin(dir*degtorad));
-                  if(CheckNearestBrush(tx,ty,bn))
+                  if(CheckNearestBrush(tx,ty,ix,iy))
                   then break
                   else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
                   random_i+=1;
@@ -369,76 +418,79 @@ tes_nature: begin
             end;
             end;
 tes_tech  : boxColor(sTemplate,bx-br,by-br,bx+br,by+br,templateColor);
-     end;
+   end;
 end;
 begin
    thw:=tw div 2;
-   tr :=round(thw*1.45);
-   tr2:=round(thw*2.2);
+   tr :=round(thw*1.45)+rstep;
+   if(edgeStyle<>tes_tech)
+   then tr2:=round(thw*2.2 )+rstep
+   else tr2:=tr;
    tw0:=-thw;
    tw1:= thw;
    tw2:=tw+thw;
+   brushx[0]:=tw0;
+   brushx[1]:=tw1;
+   brushx[2]:=tw2;
+   brushy[0]:=tw0;
+   brushy[1]:=tw1;
+   brushy[2]:=tw2;
    sTemplate:=gfx_SDLSurfaceCreate(tw,tw);
-   random_i:=byte(animStepX*7+animStepy);
-
-   boxColor(sTemplate,0,0,tw,tw,templateColor);
-   SDL_SetColorKey(sTemplate,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sTemplate,0,0));
 
    // full tiled
    with tileSet^[0] do
    begin
       gfx_SDLSurfaceFree(sdlSurface);
-      sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
-      boxColor(sdlSurface,0,0,tw,tw,transColor);
-      SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
-      gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
-      if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      sdlSurface:=r_empty;
       w :=tw; h :=w;
       hw:=thw;hh:=hw;
    end;
 
+   for b00:=false to true do
    for b10:=false to true do
+   for b20:=false to true do
    for b01:=false to true do
    for b21:=false to true do
+   for b02:=false to true do
    for b12:=false to true do
+   for b22:=false to true do
    begin
       boxColor(sTemplate,0,0,tw,tw,transColor);
       tileX:=0;
-      brushn:=0;
-      FillChar(brushx,SizeOf(brushx),0);
-      FillChar(brushy,SizeOf(brushy),0);
       FillChar(brushr,SizeOf(brushr),0);
 
-      if(b10)then begin AddBrush(tw1,tw0,tr); tileX+=1; end;
-      if(b01)then begin AddBrush(tw0,tw1,tr); tileX+=2; end;
-      if(b21)then begin AddBrush(tw2,tw1,tr); tileX+=4; end;
-      if(b12)then begin AddBrush(tw1,tw2,tr); tileX+=8; end;
+      if(b00)then begin tileX+=1  ; brushr[0,0]:=tr; end;
+      if(b10)then begin tileX+=2  ; brushr[1,0]:=tr; end;
+      if(b20)then begin tileX+=4  ; brushr[2,0]:=tr; end;
 
-      if(tileX=0)then continue;
+      if(b01)then begin tileX+=8  ; brushr[0,1]:=tr; end;
+      if(b21)then begin tileX+=16 ; brushr[2,1]:=tr; end;
+
+      if(b02)then begin tileX+=32 ; brushr[0,2]:=tr; end;
+      if(b12)then begin tileX+=64 ; brushr[1,2]:=tr; end;
+      if(b22)then begin tileX+=128; brushr[2,2]:=tr; end;
 
       if(edgeStyle<>tes_tech)then
       begin
-         if(b10)and(b01)then AddBrush(tw0,tw0,tr2);
-         if(b21)and(b10)then AddBrush(tw2,tw0,tr2);
-         if(b01)and(b12)then AddBrush(tw0,tw2,tr2);
-         if(b21)and(b12)then AddBrush(tw2,tw2,tr2);
+         if(b10)and(b01)then brushr[0,0]:=tr2;
+         if(b10)and(b21)then brushr[2,0]:=tr2;
+         if(b12)and(b21)then brushr[2,2]:=tr2;
+         if(b12)and(b01)then brushr[0,2]:=tr2;
       end;
 
-      while(brushn>0)do
-      begin
-         brushn-=1;
-         DrawBrush(brushn);
-      end;
+      if(tileX=0)then continue;
+
+      for ix:=0 to 2 do
+      for iy:=0 to 2 do
+      if(brushr[ix,iy]>0)then DrawBrush(ix,iy,brushx[ix],brushy[iy],brushr[ix,iy]);
 
       with tileSet^[tileX] do
       begin
          gfx_SDLSurfaceFree(sdlSurface);
          sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
-         boxColor(sdlSurface,0,0,tw,tw,transColor);
-         gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
+         boxColor(sdlSurface,0,0,tw,tw,templateColor);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
          draw_surf(sdlSurface,0,0,sTemplate);
-         if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,thw,thw));
          w :=tw ;h := w;
          hw:=thw;hh:=hw;
       end;
@@ -468,6 +520,7 @@ begin
    gfx_SDLSurfaceFree(baseSurface2);
    gfx_SDLSurfaceFree(ts);
 end;
+
 procedure gfx_MakeThemeTiles;
 var
 anim_seed:cardinal;
@@ -500,16 +553,30 @@ begin
    if(theme_cur_tile_crater_id >=0)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
    if(theme_cur_tile_liquid_id >=0)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
 
-   boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,c_ablack);
+   boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
 
-   gfx_MakeTileSet(theme_tile_crater,c_white,c_black,MapCellW,@theme_tileset_crater,theme_cur_crater_tes,animStepX,animStepY,0);
+   if(theme_cur_crater_tes=tes_tech)
+   then gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
+   else gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
+
    for i:=0 to theme_anim_step_n-1 do
    begin
       maskColor:=0;
       if(theme_cur_liquid_tas=tas_magma)and(i>0)then
         maskColor:=rgba2c(0,0,0,20*i);
 
-      gfx_MakeTileSet(theme_tile_liquid,c_white,c_black,MapCellW,@theme_tileset_liquid[i],theme_cur_liquid_tes,animStepX,animStepY,maskColor);
+      if(theme_cur_liquid_tes=tes_nature)
+      then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,0,0)
+      else
+        with theme_tileset_liquid[i][0] do
+        begin
+           gfx_SDLSurfaceFree(sdlSurface);
+           sdlSurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
+           gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid,animStepX,animStepY);
+           if(maskColor>0)then boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
+           w :=MapCellW ;h := w;
+           hw:=MapCellhW;hh:=hw;
+        end;
       if(theme_cur_liquid_tas=tas_liquid)then
       begin
          animStepX+=animRX;
@@ -619,15 +686,28 @@ begin
 
    gfx_LoadFont;
 
-   DrawLoadingScreen(str_loading_gfx,c_yellow);
+   DrawLoadingScreen(str_loading_srf,c_orange);
 
-   vid_fog_BaseSurf := gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
+   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_tech  ,tes_tech  ,10,0);
+   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_nature,tes_nature,10,0);
+   for x:=0 to theme_anim_step_n-1 do
+   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_liquid[x]    ,tes_nature,0 ,byte(x*5));
+
+   // FOG tiles
+   new(vid_TileTemplate_fog);
+   FillChar(vid_TileTemplate_fog^,SizeOf(vid_TileTemplate_fog^),0);
+   gfx_MakeTileSetTemplate(c_white,c_black,fog_CellW,vid_TileTemplate_fog,tes_fog,0,0);
+   vid_fog_BaseSurf:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
    boxColor(vid_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
    for x:=1 to fog_CellW do
    for r:=1 to fog_CellW do
      if((x+r)mod 5)>0 then
        pixelColor(vid_fog_BaseSurf,x-1,r-1,c_black);
-   gfx_MakeTileSet(vid_fog_BaseSurf,c_white,c_black,fog_CellW,@vid_fog_tiles,tes_fog,0,0,0);
+   gfx_MakeTileSet(vid_fog_BaseSurf,@vid_fog_tiles,vid_TileTemplate_fog,0,0,0,c_white);
+   for x:=0 to MaxTileSet do gfx_SDLSurfaceFree(vid_TileTemplate_fog^[x].sdlSurface);
+   dispose(vid_TileTemplate_fog);
+
+   DrawLoadingScreen(str_loading_gfx,c_yellow);
 
    spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
 

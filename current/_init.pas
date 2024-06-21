@@ -114,12 +114,13 @@ begin
 
    cfg_read;
 
-   saveload_CalcSaveSize;
-   replay_CalcHeaderSize;
-
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
+   DrawLoadingScreen(str_loading_ini,c_red);
+
+   saveload_CalcSaveSize;
+   replay_CalcHeaderSize;
    menu_ReInit;
    InitRX2Y;
    language_eng;
