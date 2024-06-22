@@ -15,22 +15,29 @@ begin
    then Pick:=-1
    else
    begin
-      if(mseed<c)then mseed:=cardinal.MaxValue-mseed;
+      if(mseed=0)then mseed:=cardinal.MaxValue-mseed;
       Pick :=mseed mod c;
       mseed:=mseed div c;
    end;
 end;
 begin
    mseed  :=map_seed;
-
    theme  :=Pick(theme_n);
-
    SetTheme(theme);
 
    terrain:=Pick(theme_cur_terrain_n);
    crater :=Pick(theme_cur_crater_n );
    liquid :=Pick(theme_cur_liquid_n );
    SetTerrainIDs(-terrain,-crater,-liquid);
+
+   {theme:=6;//((map_seed and $FF000000)shr 24) mod theme_n;
+   SetTheme(theme);
+
+   if(theme_cur_terrain_n>0)then terrain:=((map_seed and $00FF0000)shr 16) mod theme_cur_terrain_n;
+   if(theme_cur_crater_n >0)then crater :=((map_seed and $0000FF00)shr 8 ) mod theme_cur_crater_n ;
+   if(theme_cur_liquid_n >0)then liquid :=((map_seed and $000000FF)      ) mod theme_cur_liquid_n ;
+   writeln(liquid,' ',theme_cur_liquid_n);
+   SetTerrainIDs(-terrain,-crater,-liquid); }
 end;
 
 procedure map_MakeVisGrid;
@@ -49,19 +56,50 @@ begin
        then GetTile:=tgca_tile_crater=val
        else GetTile:=tgca_tile_liquid=val;
 end;
-procedure Set2Rock(gx,gy,mx,my:integer);
+procedure SetDecor(gx,gy,N,depth,mx,my:integer);   //PTIntList
 begin
    with map_grid_anim[gx,gy] do
-     with tgca_decor[1] do
-     begin
-        tgca_decorN    :=theme_cur_2rock_l[abs((gx+1)*(gy+1)) mod theme_cur_2rock_n];
-        tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
-        tgca_decorDepth:=sd_brocks;
-        tgca_decorA    :=@theme_anm_decors [tgca_decorN];
-        tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
-        tgca_decorX    :=mx;
-        tgca_decorY    :=my;
-     end;
+   begin
+      tgca_decor_n+=1;
+      setlength(tgca_decor_l,tgca_decor_n);
+      with tgca_decor_l[tgca_decor_n-1] do
+      begin
+         tgca_decorN    :=N;
+         tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
+         tgca_decorDepth:=depth;
+         tgca_decorA    :=@theme_anm_decors [tgca_decorN];
+         tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
+         tgca_decorX    :=mx;
+         tgca_decorY    :=my;
+      end;
+   end;
+end;
+procedure SetDecal(N:integer);
+begin
+   with map_grid_anim[x,y] do
+   begin
+      tgca_decal_n+=1;
+      setlength(tgca_decal_l,tgca_decal_n);
+      with tgca_decal_l[tgca_decal_n-1] do
+      begin
+         tgca_decalS:=@theme_all_decal_l[N];
+         tgca_decalX:=max2i(0,random(MapCellW-tgca_decalS^.w));
+         tgca_decalY:=max2i(0,random(MapCellW-tgca_decalS^.h));
+      end;
+   end;
+end;
+procedure AddDecals;
+begin
+   if(theme_cur_decal_n>0)then
+   begin
+      i:=abs((x+1)*(y+1)) mod 8;
+      if(i<=3)then
+        while(i>0)do
+        begin
+           SetDecal(theme_cur_decal_l[abs((x+1)*(y+1)+i) mod theme_cur_decal_n]);
+           i-=1;
+        end;
+   end;
 end;
 begin
    FillChar(map_grid_anim,SizeOf(map_grid_anim),0);
@@ -71,26 +109,32 @@ begin
    with map_grid     [x,y] do
    with map_grid_anim[x,y] do
    begin
+      tgca_decor_n:=0;
+      setlength(tgca_decor_l,tgca_decor_n);
+      tgca_decal_n:=0;
+      setlength(tgca_decal_l,tgca_decal_n);
+
       mx:=x*MapCellW+MapCellHW;
       my:=y*MapCellW+MapCellHW;
       tgca_tile_liquid:=-1;
       tgca_tile_crater:=-1;
       case tgc_solidlevel of
+mgsl_free   : begin
+                 AddDecals;
+              end;
 mgsl_nobuild: begin
                  tgca_tile_crater:=0;
                  if(theme_cur_decor_n>0)then
-                  for i:=1 to tGridDecorsMax do
-                    with tgca_decor[i] do
-                    begin
-                       tgca_decorN    :=theme_cur_decor_l[abs((x+1)*(y+1)+i) mod theme_cur_decor_n];
-                       tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
-                       tgca_decorDepth:=sd_ground;
-                       tgca_decorA    :=@theme_anm_decors [tgca_decorN];
-                       tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
-                       ddir:=((i*tGridDecorD)+(x*135)+(y*69))*degtorad;
-                       tgca_decorX    :=mx+round(tGridDecorR*cos(ddir));
-                       tgca_decorY    :=my+round(tGridDecorR*sin(ddir));
-                    end;
+                   for i:=1 to tGridDecorsMax do
+                   begin
+                      ddir:=((i*tGridDecorD)+(x*135)+(y*69))*degtorad;
+                      SetDecor(x,y,
+                               theme_cur_decor_l[abs((x+1)*(y+1)+i) mod theme_cur_decor_n],
+                               sd_ground,
+                               mx+round(tGridDecorR*cos(ddir)),
+                               my+round(tGridDecorR*sin(ddir)) );
+                   end;
+                 AddDecals;
               end;
 mgsl_liquid : begin
                  tgca_tile_liquid:=0;
@@ -99,7 +143,13 @@ mgsl_liquid : begin
 mgsl_rocks  : begin
                  tgca_tile_crater:=0;
 
-                 if(tgca_decor[1].tgca_decorS=nil)then
+                 if(theme_cur_1rock_n>0)then
+                   SetDecor(x,y,
+                            theme_cur_1rock_l[abs((x+1)*(y+1)+i) mod theme_cur_1rock_n],
+                            sd_srocks,
+                            mx,my );
+
+                 {if(tgca_decor[1].tgca_decorS=nil)then
                  begin
                     if(theme_cur_2rock_n>0)then
                       if ((x+1)<MaxMapSizeCelln)
@@ -118,19 +168,7 @@ mgsl_rocks  : begin
                            my-=MapCellHW;
                            continue;
                         end;
-
-                    if(theme_cur_1rock_n>0)then
-                      with tgca_decor[1] do
-                      begin
-                         tgca_decorN    :=theme_cur_1rock_l[abs((x+1)*(y+1)+i) mod theme_cur_1rock_n];
-                         tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
-                         tgca_decorDepth:=sd_srocks;
-                         tgca_decorA    :=@theme_anm_decors [tgca_decorN];
-                         tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
-                         tgca_decorX    :=mx;
-                         tgca_decorY    :=my;
-                      end;
-                 end;
+                 end;}
               end;
       end;
    end;
@@ -769,8 +807,9 @@ begin
    case map_type of
 mapt_steppe : map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r);
 mapt_canyon : begin
-              map_Fill(msrx,1,-1,mgsl_rocks  ,7,base_1r);
-              map_Fill(msrx,2,-1,mgsl_nobuild,5,base_1r);
+              map_Fill(msrx,1,-1,mgsl_rocks  ,8 ,base_1r);
+              map_Fill(msrx,2,-1,mgsl_nobuild,25,base_1r);
+              map_Fill(msrx,3,-1,mgsl_liquid ,18,base_1r);
               end;
 mapt_ilake,
 mapt_clake  : begin

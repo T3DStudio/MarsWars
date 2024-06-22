@@ -151,16 +151,6 @@ begin
    end;
 end;
 
-procedure map_MinimapBackDraw();
-begin
-   {for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t in sd)then
-      if(mmr>0)
-      then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor       (r_bminimap,mmx,mmy,    mmc);  }
-end;
-
 procedure map_MinimapBackground;
 var
 gx ,gy :integer;
@@ -175,7 +165,7 @@ begin
       for gy:=0 to map_LastCell do
       begin
          case map_grid[gx,gy].tgc_solidlevel of
-mgsl_nobuild : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_green );
+mgsl_nobuild : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_ltgray);
 mgsl_liquid  : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),theme_cur_liquid_mmcolor);
 mgsl_rocks   : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_gray  );
          end;

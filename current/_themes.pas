@@ -333,7 +333,7 @@ begin
    DecorationData(NOTSET,-9    ,NOTSET,'52,22'         );
    DecorationData(NOTSET,-8    ,NOTSET,'53,23'         );
    DecorationData(4     ,-8    ,NOTSET,'48_50'         );
-   DecorationData(0     ,-17   ,NOTSET,'43_47'         );
+   DecorationData(0     ,-17   ,NOTSET,'42_47'         );
 
    DecorationAnim(-1  ,'51,14');
    DecorationAnim(-6  ,'52,22');
@@ -371,8 +371,9 @@ begin
         theme_all_terrain_tasPeriod[o]:=fr_fpsd3;
      end;
 
-   SetTerrainsTAS(tas_liquid,25,'13,20,23,28,48');
-   SetTerrainsTAS(tas_liquid,15,'52,53,55,60,71,72,73,77');
+   SetTerrainsTAS(tas_liquid,25,'13,20,23,28,48,60');
+   SetTerrainsTAS(tas_liquid,12,'52,53,55,71,72,73,77');
+   SetTerrainsTAS(tas_magma ,25,'64,35,36,39,40,69,76,90');
 end;
 
 
@@ -432,7 +433,7 @@ begin
    if(new_theme<0)or(new_theme>=theme_n)then new_theme:=abs(new_theme) mod theme_n;
    theme_cur:=new_theme;
    case theme_cur of
-   0: begin  // TECH BASE
+   0: begin  // UAC BASE
          SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'0,2,5,6,7,8,9'                );
          SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'0,2,5,6,7,8,9,11,79'          );
          SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,48,55,71,72'            );
@@ -444,8 +445,8 @@ begin
          theme_cur_crater_tes:=tes_tech;
          theme_cur_liquid_tes:=tes_tech;
       end;
-   1: begin  // TECH BLUE BASE
-         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'11,79,80,81,82,85,87'         );
+   1: begin  // TECH BASE
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'11,79,80,81,82,85,87,27'      );
          SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'80,81,82,85,87,67,83,84'      );
          SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,48,55,71,72'            );
          SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1_3,21,22,26,27,29,31,32'     );
@@ -457,86 +458,81 @@ begin
          theme_cur_liquid_tes:=tes_nature;
       end;
 
-  { 2: begin  // PLANET
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1,4_17,23_25');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2_16,20_25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2_16,20_25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2_16,20_25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_15'           );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'1_8,20,21'      );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'1_4'            );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'0_12,18,28_29,36,48_50 ');
+   2: begin  // UNKNOWN PLANET
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'4,5,8,10,16,17,24,25,26,30,31,32,33' );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'34,37,38,41,42,43,44,45,46,47,51,56' );
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,23,28,40,48,52,53,55,64,73,71'            );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1,4_6,8_17,23_25'     );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'0_12,18,28_29,36,48_50');
+         SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'77,88,89,90,91,92,96,97,98,99,100,101'      );
+         SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'55,58,66,69,70'               );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
+         theme_cur_crater_tes:=tes_nature;
+         theme_cur_liquid_tes:=tes_nature;
       end;
-   3: begin  // PLANET MOON
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1,4_17,23_25'       );
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0,4,6,8,9,11,14'          );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'1_8,20,21'   );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'1_4'         );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'0_12,29_34 ' );
+   3: begin  // UNKNOWN MOON
+          SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'34,37,38,41,42,43,44,45,46,47,51'   );
+          SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'57,59,61,62,63,65,66,68,70,78,89,14,15'      );
+          SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,23,28,40,48,52,53,55,64,73,71'                   );
+          SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1,4_6,8_17,23_25'          );
+          SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'0_12,18,28_29,36,48_50');
+          SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'77,88,89,90,91,92,96,97,98,99,100,101'        );
+          SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'55,58,66,69,70'               );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
+          theme_cur_crater_tes:=tes_nature;
+          theme_cur_liquid_tes:=tes_nature;
       end;
 
    4: begin  // CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1,4_20,23_25,28,30,33,34'   );
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0_4,8_16,20_25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0_4,8_16,20_25,28_30');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0_4,8_16,20_25,28_30');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_14'             );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'1_8,13,14,20,21'  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'1_4,12'           );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'0_22,28,35,36,42_47,48_50');
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'57,59,61,62,65,66,68,70,78,88'         );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'4,5,8,10,16,17,24,25,26,30,31,32,33,14,15,54'      );
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'13,20,23,28,40,48,52,53,55,64,73,60,71'            );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1,4_6,8_20,23_25,28,30,33,34'     );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'0_13,15_28,35,36,42_47,48_50');
+         SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'77,88,89,90,91,92,96,97,98,99,100,101'    );
+         SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'55,58,66,69,70'               );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
+         theme_cur_crater_tes:=tes_nature;
+         theme_cur_liquid_tes:=tes_nature;
       end;
    5: begin  // ICE CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2,11_13,20,25');
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2,11_13,20,25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2,11_13,20,25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'16'             );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'1,2,5_8,20,21'  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'1_4'            );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'0_23,28,35,36,42_47,48_50');
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'16,17,24,25,26,30,31,37,38,41,42,44,45,58,59,61,62,65'         );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'16,17,24,25,26,30,31,37,38,41,42,44,45,58,59,61,62,65,14,15,54');
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'75'            );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1_20,23_25,28,30,33,34'     );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'0_13,15_28,35,36,42_47,48_50');
+         SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'77,81,82,88,89,90,91,92,96,97,98,99,100,101'                 );
+         SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'55,56,58,66,69,70'               );
+
+         theme_cur_crater_tes:=tes_nature;
+         theme_cur_liquid_tes:=tes_nature;
       end;
 
    6: begin  // HELL
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'1,27'                  );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1,27'                  );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'1,27'                  );
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4,8_9,11'              );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'9_12'                  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'5_8,13,14'             );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'3,13_17,20,21,36,42_47');
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'49'         );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'29,35,36,39,40'      );
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'23,35,36,39,40,69,76,77,90'       );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1,4,9,15,18_20,23_25,28,30,33,34'     );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'3,13_17,20,21,36,42_47');
+         SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'76,78,79,80,93,94,95,102'           );
+         SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'54,59,60,61,62,63,64,69,71,72,73,74'      );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
+         theme_cur_crater_tes:=tes_nature;
+         theme_cur_liquid_tes:=tes_nature;
       end;
    7: begin  // HELL CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'4,10,14,16,21,23'      );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'4,10,14,16,21,23,29,30');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'4,10,14,16,21,23,29,30');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4,5,8_9,11'            );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_all_srock_n  ,'1_8'                   );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_all_brock_n  ,'1_4'                   );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_all_decor_n  ,'3,13_17,20,21,36,42_47');
+         SetThemeList(@theme_cur_terrain_l,@theme_cur_terrain_n,theme_all_terrain_n,false,'38,56,63,66,88'         );
+         SetThemeList(@theme_cur_crater_l ,@theme_cur_crater_n ,theme_all_terrain_n,false,'14,15,29,38,51'      );
+         SetThemeList(@theme_cur_liquid_l ,@theme_cur_liquid_n ,theme_all_terrain_n,false,'23,28,35,36,39,40,69,76,77,60'       );
+         SetThemeList(@theme_cur_decal_l  ,@theme_cur_decal_n  ,theme_all_decal_n  ,true ,'1,4,9,15,18_20,23_25,28,30,33,34'     );
+         SetThemeList(@theme_cur_decor_l  ,@theme_cur_decor_n  ,theme_all_decor_n  ,true ,'3,13_17,20,21,36,42_47');
+         SetThemeList(@theme_cur_1rock_l  ,@theme_cur_1rock_n  ,theme_all_decor_n  ,true ,'77,88,89,90,91,92,96,97,98,99,100,101'           );
+         SetThemeList(@theme_cur_2rock_l  ,@theme_cur_2rock_n  ,theme_all_decor_n  ,true ,'55,66,69,70'      );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end; }
+         theme_cur_crater_tes:=tes_nature;
+         theme_cur_liquid_tes:=tes_nature;
+      end;
    end;
 end;
 

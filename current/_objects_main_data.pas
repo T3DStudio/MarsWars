@@ -354,7 +354,7 @@ begin
    _srange    := 200;
    _ucl       := 0;
    _painc     := 2;
-   _btime     := ptime1-ptimehh;
+   _btime     := ptime1-ptime2h;
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;

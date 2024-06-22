@@ -563,10 +563,14 @@ begin
    begin
       maskColor:=0;
       if(theme_cur_liquid_tas=tas_magma)and(i>0)then
-        maskColor:=rgba2c(0,0,0,20*i);
+        maskColor:=rgba2c(0,0,0,30*i);
 
-      if(theme_cur_liquid_tes=tes_nature)
-      then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,0,0)
+      if(theme_cur_liquid_tes=tes_nature)then
+      begin
+         if(theme_cur_liquid_tas=tas_magma)
+         then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
+         else gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
+      end
       else
         with theme_tileset_liquid[i][0] do
         begin
@@ -574,7 +578,7 @@ begin
            sdlSurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
            gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid,animStepX,animStepY);
            if(maskColor>0)then boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
-           w :=MapCellW ;h := w;
+            w:=MapCellW ;h := w;
            hw:=MapCellhW;hh:=hw;
         end;
       if(theme_cur_liquid_tas=tas_liquid)then

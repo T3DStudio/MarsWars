@@ -177,11 +177,19 @@ TMapTerrainGridCellDecor = record
    tgca_decorS     : PTMWTexture;
    tgca_decorA     : PTThemeDecorAnim;
 end;
+TMapTerrainGridCellDecal = record
+   tgca_decalX,
+   tgca_decalY     : integer;
+   tgca_decalS     : PTMWTexture;
+end;
 
 TMapTerrainGridCellAnim = record
-   tgca_decor      : array[1..tGridDecorsMax] of TMapTerrainGridCellDecor;
    tgca_tile_liquid,
-   tgca_tile_crater:integer;
+   tgca_tile_crater,
+   tgca_decor_n,
+   tgca_decal_n    : integer;
+   tgca_decor_l    : array of TMapTerrainGridCellDecor;
+   tgca_decal_l    : array of TMapTerrainGridCellDecal;
 end;
 
 {$ENDIF}

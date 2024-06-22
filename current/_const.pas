@@ -744,12 +744,12 @@ ul100                  = MinUnitLimit*100;
 ul110                  = MinUnitLimit*110;
 
 // production time
-ptime1                 = 28;
+ptime1                 = 24;
 ptimeh                 = ptime1  div 2;
-ptimehh                = ptimeh  div 2;
-ptimehhh               = ptimehh div 2;
+ptime2h                = ptimeh  div 2;
+ptime4h                = ptime2h div 2;
 ptime1h                = ptime1+ptimeh;
-ptime1hh               = ptime1+ptimehh;
+ptime1hh               = ptime1+ptime2h;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
@@ -994,7 +994,7 @@ blizzard_sr            = rocket_sr*4;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
-gm_cptp_gtime          = fr_fps1*ptimehh;
+gm_cptp_gtime          = fr_fps1*ptime2h;
 gm_cptp_time           = fr_fps1*ptimeh;
 gm_cptp_r              = 100;
 
@@ -1706,7 +1706,7 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
 MaxTileSet             = 255;
 
-theme_n                = 2;
+theme_n                = 8;
 
 theme_anim_step_n      = 3;
 theme_anim_tile_step   = MapCellW div theme_anim_step_n;

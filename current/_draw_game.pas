@@ -475,7 +475,6 @@ mx,my,mty,
 anim,i  :integer;
 AddEdges:boolean;
 begin
-
    ssx:=lx-(vid_cam_x mod MapCellW);
    sty:=ly-(vid_cam_y mod MapCellW);
    sx0:=vid_cam_x div MapCellW;
@@ -534,26 +533,33 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
 
-            for i:=1 to tGridDecorsMax do
-              with tgca_decor[i] do
-                if(tgca_decorS<>nil)and(tgca_decorA<>nil)then
-                  with tgca_decorA^ do
-                  begin
-                     SpriteListAddDoodad(tgca_decorX+tda_xo,
-                                         tgca_decorY+tda_yo,
-                                         tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
-                     if(tgca_decorTime>0)then
-                     begin
-                        tgca_decorTime-=1;
-                        if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
-                        begin
-                           tgca_decorN   :=tda_anext;
-                           tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
-                           tgca_decorA   :=@theme_anm_decors [tgca_decorN];
-                           tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
-                        end;
-                     end;
-                  end;
+            if(tgca_decal_n>0)then
+              for i:=0 to tgca_decal_n-1 do
+                with tgca_decal_l[i] do
+                  if(tgca_decalS<>nil)then
+                   draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
+
+            if(tgca_decor_n>0)then
+              for i:=0 to tgca_decor_n-1 do
+                with tgca_decor_l[i] do
+                  if(tgca_decorS<>nil)and(tgca_decorA<>nil)then
+                    with tgca_decorA^ do
+                    begin
+                       SpriteListAddDoodad(tgca_decorX+tda_xo,
+                                           tgca_decorY+tda_yo,
+                                           tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
+                       if(tgca_decorTime>0)then
+                       begin
+                          tgca_decorTime-=1;
+                          if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
+                          begin
+                             tgca_decorN   :=tda_anext;
+                             tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
+                             tgca_decorA   :=@theme_anm_decors [tgca_decorN];
+                             tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
+                          end;
+                       end;
+                    end;
          end;
 
          ssy+=MapCellW;
