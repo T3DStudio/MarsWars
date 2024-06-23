@@ -1089,8 +1089,8 @@ begin
 
    if(G_Started)and(G_Status=gs_running)then
    begin
-      g_cycle_order+=1;g_cycle_order:=g_cycle_order mod order_period;
-      g_cycle_regen+=1;g_cycle_regen:=g_cycle_regen mod regen_period;
+      g_cycle_order:=(g_cycle_order+1) mod order_period;
+      g_cycle_regen:=(g_cycle_regen+1) mod regen_period;
 
       if(ServerSide)then
       begin

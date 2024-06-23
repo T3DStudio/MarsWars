@@ -474,7 +474,39 @@ gx,gy,
 mx,my,mty,
 anim,i  :integer;
 AddEdges:boolean;
+procedure DecorsProc(pdcell:PTMapTerrainGridCellAnim);
+var i:integer;
 begin
+   with pdcell^ do
+   if(tgca_decor_n>0)then
+     for i:=0 to tgca_decor_n-1 do
+       with tgca_decor_l[i] do
+         if(tgca_decorS<>nil)and(tgca_decorA<>nil)then
+           with tgca_decorA^ do
+           begin
+              //SpriteListAddDoodad(tgca_decorX+tda_xo,
+              //                    tgca_decorY+tda_yo,
+              //                    tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
+              UnitsInfoAddRect(tgca_decorX+tda_xo-tgca_decorS^.hw,tgca_decorY+tda_yo-tgca_decorS^.hh,
+                               tgca_decorX+tda_xo+tgca_decorS^.hw,tgca_decorY+tda_yo+tgca_decorS^.hh,
+                               c_yellow);
+
+              if(tgca_decorTime>0)then
+              begin
+                 tgca_decorTime-=1;
+                 if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
+                 begin
+                    tgca_decorN   :=tda_anext;
+                    tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
+                    tgca_decorA   :=@theme_anm_decors [tgca_decorN];
+                    tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
+                 end;
+              end;
+           end;
+end;
+begin
+   map_grid_decorstep+=1;
+
    ssx:=lx-(vid_cam_x mod MapCellW);
    sty:=ly-(vid_cam_y mod MapCellW);
    sx0:=vid_cam_x div MapCellW;
@@ -506,7 +538,7 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
          gy:=sy0+cy;
          if (0<=gx)and(gx<MaxMapSizeCelln)
          and(0<=gy)and(gy<MaxMapSizeCelln)then
-         with map_grid_anim[gx,gy] do
+         with map_grid_graph[gx,gy] do
          begin
             if(AddEdges)then
               if ((gx+1)<MaxMapSizeCelln)
@@ -516,6 +548,13 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  then UnitsInfoAddLine(mx+MapCellw,my,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
                  if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)<>(map_grid[gx,gy+1].tgc_solidlevel>mgsl_free)
                  then UnitsInfoAddLine(mx,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+
+                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)then
+                 begin
+                 UnitsInfoAddLine(mx+MapCellhw,my,mx,my+MapCellhw,r_blink2_color_BY);
+                 UnitsInfoAddLine(mx+MapCellw,my,mx,my+MapCellw,r_blink2_color_BY);
+                 UnitsInfoAddLine(mx+MapCellw,my+MapCellhw,mx+MapCellhw,my+MapCellw,r_blink2_color_BY);
+                 end;
               end;
 
             if(tgca_tile_liquid=0)
@@ -532,34 +571,25 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].sdlSurface);
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
+            draw_text(tar,ssx,ssy,i2s(tgca_decor_n),ta_left,255,c_white);
 
-            if(tgca_decal_n>0)then
-              for i:=0 to tgca_decal_n-1 do
-                with tgca_decal_l[i] do
-                  if(tgca_decalS<>nil)then
-                   draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
+            if(tgca_maincell<>nil)
+            then DecorsProc(tgca_maincell)
+            else DecorsProc(@map_grid_graph[gx,gy]);
 
-            if(tgca_decor_n>0)then
-              for i:=0 to tgca_decor_n-1 do
-                with tgca_decor_l[i] do
-                  if(tgca_decorS<>nil)and(tgca_decorA<>nil)then
-                    with tgca_decorA^ do
-                    begin
-                       SpriteListAddDoodad(tgca_decorX+tda_xo,
-                                           tgca_decorY+tda_yo,
-                                           tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
-                       if(tgca_decorTime>0)then
-                       begin
-                          tgca_decorTime-=1;
-                          if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
-                          begin
-                             tgca_decorN   :=tda_anext;
-                             tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
-                             tgca_decorA   :=@theme_anm_decors [tgca_decorN];
-                             tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
-                          end;
-                       end;
-                    end;
+            {if(tgca_maincell<>nil)then
+              if(tgca_maincell^.tgca_decorstep=map_grid_decorstep)then continue;
+            if(tgca_decorstep<>map_grid_decorstep)then
+            begin }
+               {if(tgca_decal_n>0)then
+                 for i:=0 to tgca_decal_n-1 do
+                   with tgca_decal_l[i] do
+                     if(tgca_decalS<>nil)then
+                       draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);  }
+            {end;
+
+            if(tgca_maincell<>nil)then tgca_maincell^.tgca_decorstep:=map_grid_decorstep;
+            tgca_decorstep:=map_grid_decorstep; }
          end;
 
          ssy+=MapCellW;

@@ -29,15 +29,6 @@ begin
    crater :=Pick(theme_cur_crater_n );
    liquid :=Pick(theme_cur_liquid_n );
    SetTerrainIDs(-terrain,-crater,-liquid);
-
-   {theme:=6;//((map_seed and $FF000000)shr 24) mod theme_n;
-   SetTheme(theme);
-
-   if(theme_cur_terrain_n>0)then terrain:=((map_seed and $00FF0000)shr 16) mod theme_cur_terrain_n;
-   if(theme_cur_crater_n >0)then crater :=((map_seed and $0000FF00)shr 8 ) mod theme_cur_crater_n ;
-   if(theme_cur_liquid_n >0)then liquid :=((map_seed and $000000FF)      ) mod theme_cur_liquid_n ;
-   writeln(liquid,' ',theme_cur_liquid_n);
-   SetTerrainIDs(-terrain,-crater,-liquid); }
 end;
 
 procedure map_MakeVisGrid;
@@ -51,14 +42,15 @@ begin
    GetTile:=false;
    if (0<=cx)and(cx<MaxMapSizeCelln)
    and(0<=cy)and(cy<MaxMapSizeCelln)then
-     with map_grid_anim[cx,cy] do
+     with map_grid_graph[cx,cy] do
        if(crater)
        then GetTile:=tgca_tile_crater=val
        else GetTile:=tgca_tile_liquid=val;
 end;
-procedure SetDecor(gx,gy,N,depth,mx,my:integer);   //PTIntList
+procedure SetDecor(gx,gy,N,depth,mx,my:integer;maincell:PTMapTerrainGridCellAnim);   //PTIntList
 begin
-   with map_grid_anim[gx,gy] do
+   with map_grid_graph[gx,gy] do
+   //if(tgca_maincell=nil)then
    begin
       tgca_decor_n+=1;
       setlength(tgca_decor_l,tgca_decor_n);
@@ -66,17 +58,18 @@ begin
       begin
          tgca_decorN    :=N;
          tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
-         tgca_decorDepth:=depth;
          tgca_decorA    :=@theme_anm_decors [tgca_decorN];
+         tgca_decorDepth:=depth;
          tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
          tgca_decorX    :=mx;
          tgca_decorY    :=my;
+         tgca_maincell  :=maincell;
       end;
    end;
 end;
 procedure SetDecal(N:integer);
 begin
-   with map_grid_anim[x,y] do
+   with map_grid_graph[x,y] do
    begin
       tgca_decal_n+=1;
       setlength(tgca_decal_l,tgca_decal_n);
@@ -102,12 +95,12 @@ begin
    end;
 end;
 begin
-   FillChar(map_grid_anim,SizeOf(map_grid_anim),0);
+   FillChar(map_grid_graph,SizeOf(map_grid_graph),0);
 
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid     [x,y] do
-   with map_grid_anim[x,y] do
+   with map_grid      [x,y],map_grid_graph[x,y] do
+   //with  do
    begin
       tgca_decor_n:=0;
       setlength(tgca_decor_l,tgca_decor_n);
@@ -132,7 +125,7 @@ mgsl_nobuild: begin
                                theme_cur_decor_l[abs((x+1)*(y+1)+i) mod theme_cur_decor_n],
                                sd_ground,
                                mx+round(tGridDecorR*cos(ddir)),
-                               my+round(tGridDecorR*sin(ddir)) );
+                               my+round(tGridDecorR*sin(ddir)),nil );
                    end;
                  AddDecals;
               end;
@@ -143,39 +136,41 @@ mgsl_liquid : begin
 mgsl_rocks  : begin
                  tgca_tile_crater:=0;
 
+                 if(tgca_maincell<>nil)then continue;
+
+                 if(theme_cur_2rock_n>0)then
+                   if ((x+1)<MaxMapSizeCelln)
+                   and((y+1)<MaxMapSizeCelln)then
+                     if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
+                     and(map_grid[x+1,y+1].tgc_solidlevel=mgsl_rocks)
+                     and(map_grid[x  ,y+1].tgc_solidlevel=mgsl_rocks)
+                     //and(map_grid_graph[x+1,y  ].tgca_decor_n=0)
+                     //and(map_grid_graph[x+1,y+1].tgca_decor_n=0)
+                     //and(map_grid_graph[x  ,y+1].tgca_decor_n=0)
+                     then
+                     begin
+                        mx+=MapCellHW;
+                        my+=MapCellHW;
+                        i:=theme_cur_2rock_l[abs((x+1)*(y+1)) mod theme_cur_2rock_n];
+                        SetDecor(x  ,y  ,i,sd_brocks,mx,my,nil);
+                        map_grid_graph[x+1,y  ].tgca_maincell:=@map_grid_graph[x,y];
+                        map_grid_graph[x+1,y+1].tgca_maincell:=@map_grid_graph[x,y];
+                        map_grid_graph[x  ,y+1].tgca_maincell:=@map_grid_graph[x,y];
+                        continue;
+                     end;
+
                  if(theme_cur_1rock_n>0)then
                    SetDecor(x,y,
-                            theme_cur_1rock_l[abs((x+1)*(y+1)+i) mod theme_cur_1rock_n],
+                            theme_cur_1rock_l[abs((x+1)*(y+1)) mod theme_cur_1rock_n],
                             sd_srocks,
-                            mx,my );
-
-                 {if(tgca_decor[1].tgca_decorS=nil)then
-                 begin
-                    if(theme_cur_2rock_n>0)then
-                      if ((x+1)<MaxMapSizeCelln)
-                      and((y+1)<MaxMapSizeCelln)then
-                        if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
-                        and(map_grid[x+1,y+1].tgc_solidlevel=mgsl_rocks)
-                        and(map_grid[x  ,y+1].tgc_solidlevel=mgsl_rocks)then
-                        begin
-                           mx+=MapCellHW;
-                           my+=MapCellHW;
-                           Set2Rock(x  ,y  ,mx,my);
-                           Set2Rock(x+1,y  ,mx,my);
-                           Set2Rock(x+1,y+1,mx,my);
-                           Set2Rock(x  ,y+1,mx,my);
-                           mx-=MapCellHW;
-                           my-=MapCellHW;
-                           continue;
-                        end;
-                 end;}
+                            mx,my,nil );
               end;
       end;
    end;
 
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid_anim[x,y] do
+   with map_grid_graph[x,y] do
    begin
       tgca_tile_crater:=TileSetGetN(GetTile(x-1,y-1,0,true ),
                                     GetTile(x  ,y-1,0,true ),
@@ -807,9 +802,9 @@ begin
    case map_type of
 mapt_steppe : map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r);
 mapt_canyon : begin
-              map_Fill(msrx,1,-1,mgsl_rocks  ,8 ,base_1r);
-              map_Fill(msrx,2,-1,mgsl_nobuild,25,base_1r);
-              map_Fill(msrx,3,-1,mgsl_liquid ,18,base_1r);
+              map_Fill(msrx,1,-1,mgsl_rocks  , 4,base_1r);
+              //map_Fill(msrx,2,-1,mgsl_nobuild,25,base_1r);
+              ///map_Fill(msrx,3,-1,mgsl_liquid , 8,base_1r);
               end;
 mapt_ilake,
 mapt_clake  : begin

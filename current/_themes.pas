@@ -534,6 +534,7 @@ begin
          theme_cur_liquid_tes:=tes_nature;
       end;
    end;
+   writeln(theme_cur_2rock_n);
 end;
 
 

@@ -549,9 +549,12 @@ begin
    animStepX:=-MapCellW-animRX;
    animStepY:=-MapCellW-animRY;
 
-   if(theme_cur_tile_terrain_id>=0)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
-   if(theme_cur_tile_crater_id >=0)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
-   if(theme_cur_tile_liquid_id >=0)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
+   if (0<=theme_cur_tile_terrain_id)
+   and(theme_cur_tile_terrain_id<theme_all_terrain_n)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
+   if (0<=theme_cur_tile_crater_id)
+   and(theme_cur_tile_crater_id <theme_all_terrain_n)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
+   if (0<=theme_cur_tile_liquid_id)
+   and(theme_cur_tile_liquid_id <theme_all_terrain_n)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
 
    boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
 
@@ -659,6 +662,7 @@ end;
 procedure gfx_LoadGraphics(firstload:boolean);
 var x,r:integer;
 begin
+   // basic surfaces
    r_empty   :=gfx_SDLSurfaceCreate(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
@@ -692,6 +696,7 @@ begin
 
    DrawLoadingScreen(str_loading_srf,c_orange);
 
+   // theme tileset templates
    gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_tech  ,tes_tech  ,10,0);
    gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_nature,tes_nature,10,0);
    for x:=0 to theme_anim_step_n-1 do
@@ -713,6 +718,7 @@ begin
 
    DrawLoadingScreen(str_loading_gfx,c_yellow);
 
+   // load game resouces
    spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
 
    r_menu:=gfx_SDLSurfaceCreate(max2i(vid_minw,spr_mback^.w),max2i(vid_minh,spr_mback^.h));
@@ -927,29 +933,6 @@ begin
       end;
    end;
 end;
-
-{procedure Map_tdmake;
-var i,ix,iy,rn:integer;
-begin
-   _tdecaln:=(vid_cam_w*vid_cam_h) div 10000;
-   setlength(_tdecals,_tdecaln);
-
-   vid_mwa:= vid_cam_w+vid_ab*2;
-   vid_mha:= vid_cam_h+vid_ab*2;
-
-   ix:=longint(map_seed) mod vid_mwa;
-   iy:=(g_random_i*5+ix) mod vid_mha;
-   rn:=ix*iy;
-   for i:=1 to _tdecaln do
-    with _tdecals[i-1] do
-    begin
-       rn+=17;
-       ix:=g_randomx(ix+rn       ,vid_mwa);
-       iy:=g_randomx(iy+sqr(ix*i),vid_mha);
-       x :=ix;
-       y :=iy;
-    end;
-end;   }
 
 procedure vid_CommonVars;
 begin

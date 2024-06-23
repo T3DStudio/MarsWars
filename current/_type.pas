@@ -184,13 +184,16 @@ TMapTerrainGridCellDecal = record
 end;
 
 TMapTerrainGridCellAnim = record
+   tgca_decorstep   : byte;
    tgca_tile_liquid,
    tgca_tile_crater,
    tgca_decor_n,
    tgca_decal_n    : integer;
    tgca_decor_l    : array of TMapTerrainGridCellDecor;
    tgca_decal_l    : array of TMapTerrainGridCellDecal;
+   tgca_maincell   : ^TMapTerrainGridCellAnim;
 end;
+PTMapTerrainGridCellAnim = ^TMapTerrainGridCellAnim;
 
 {$ENDIF}
 
