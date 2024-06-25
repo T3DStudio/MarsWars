@@ -1008,13 +1008,18 @@ begin
 
    theme_name[0] := tc_lime  +'UAC BASE';
    theme_name[1] := tc_blue  +'TECH BASE';
-   theme_name[2] := tc_white +'UNKNOWN PLANET';
+   theme_name[2] := tc_dgray +'UNKNOWN PLANET';
    theme_name[3] := tc_white +'UNKNOWN MOON';
    theme_name[4] := tc_gray  +'CAVES';
    theme_name[5] := tc_aqua  +'ICE CAVES';
    theme_name[6] := tc_orange+'HELL';
    theme_name[7] := tc_yellow+'HELL CAVES';
-
+   theme_name[8] := tc_red   +'HELL CITY';
+   {
+   tc_purple              = #14;
+   tc_white               = #22;
+   tc_green               = #23;
+   }
 
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');

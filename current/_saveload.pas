@@ -62,7 +62,7 @@ begin
             BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
             BlockRead(f,vr,sizeof(map_size         ));
-            if(vr<MinMapSize)and(MaxMapDize<vr)
+            if(vr<MinMapSize)and(MaxMapSize<vr)
                                       then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
                                       else       svld_str_info+=str_map_size+i2s(vr)+tc_nl3+' ';
             vr:=0;

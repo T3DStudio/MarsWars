@@ -143,9 +143,8 @@ end;
 
 procedure D_MPlayers(tar:pSDL_Surface);
 var y,u:integer;
-      c:cardinal;
    p,p0:byte;
-     tstr:shortstring;
+   tstr:shortstring;
 function _yl(s:integer):integer;begin _yl:=s*ui_menu_pls_lh; end;
 function _yt(s:integer):integer;begin _yt:=_yl(s)+font_34; end;
 begin

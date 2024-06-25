@@ -99,7 +99,7 @@ begin
    draw_surf(r_screen,i,i,theme_tile_liquid);
    rectangleColor(r_screen,i,i,i+MapCellW,i+MapCellW,c_red);   }
 
-   draw_surf(r_screen,0,0,theme_tile_liquid);
+   //draw_surf(r_screen,0,0,theme_tile_liquid.sdlsurface);
    //if(ks_ctrl=0)then
    //draw_DebugTileSet(@vid_fog_tiles);
   { y:=0;

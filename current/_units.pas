@@ -250,71 +250,16 @@ begin
    end;
 end;
 
-{
-procedure unit_PushFromObstacle(pu:PTUnit;td:PTDoodad);
-var t,uds:single;
-      ud :integer;
+function unit_MoveCheckCollision(curx,cury,newx,newy:integer):boolean;
 begin
-   with pu^ do
-   with uid^ do
-   begin
-      t  :=point_dist_real(x,y,td^.x,td^.y);
-      uds:=t-(_r+td^.r);
-      ud :=round(uds);
 
-      if(uds<0)then
-      begin
-         if((td^.x=x)and(td^.y=y))then
-         begin
-            case g_random(4) of
-            0: unit_SetXY(pu,x-ud,y   ,mvxy_none);
-            1: unit_SetXY(pu,x+ud,y   ,mvxy_none);
-            2: unit_SetXY(pu,x   ,y-ud,mvxy_none);
-            3: unit_SetXY(pu,x   ,y+ud,mvxy_none);
-            end;
-         end
-         else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+g_randomr(2),
-                            y+round(ud*(td^.y-y)/t)+g_randomr(2),mvxy_none);
-
-         vstp+=round(uds/speed*UnitMoveStepTicks);
-
-         if(a_reload<=0)then
-           if(vx<>x)
-           or(vy<>y)then dir:=_DIR360(dir-(dir_diff(dir,point_dir(vx,vy,x,y)) div 2 ));
-
-         ud:=point_dist_rint(ua_x,ua_y,td^.x,td^.y)-_r-td^.r;
-         if(ud<=0)then
-         begin
-            ua_x:=x;
-            ua_y:=y;
-         end;
-      end;
-   end;
 end;
-
-procedure unit_PushFromObstaclesDCell(pu:PTUnit);
-var i,dx,dy:integer;
-begin
-   dx:=pu^.x div dcw;
-   dy:=pu^.y div dcw;
-
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-     with map_dcell[dx,dy] do
-       if(n>0)then
-         for i:=0 to n-1 do
-           with l[i]^ do
-             if(r>0)and(t>0)then unit_PushFromObstacle(pu,l[i]);
-end;
-
-procedure unit_PushFromObstacles(pu:PTUnit);
-begin
-   with pu^ do
-     if(speed>0)and(ukfly=uf_ground)and(solid)and(iscomplete)and(not ukfloater)then unit_PushFromObstaclesDCell(pu);
-end; }
 
 procedure unit_move(pu:PTUnit);
-var mdist,ss:integer;
-    ddir    :single;
+var
+mdist,ss,
+newx,newy:integer;
+ddir     :single;
 begin
    with pu^ do
     if(x=vx)and(y=vy)then
@@ -329,7 +274,9 @@ begin
           mdist:=point_dist_int(x,y,mv_x,mv_y);
           if(mdist<=speed)then
           begin
-             unit_SetXY(pu,mv_x,mv_y,mvxy_none);
+             //unit_SetXY(pu,mv_x,mv_y,mvxy_none);
+             newx:=mv_x;
+             newy:=mv_y;
              dir:=point_dir(vx,vy,x,y);
           end
           else
@@ -348,10 +295,18 @@ begin
              dir:=dir_turn(dir,point_dir(x,y,mv_x,mv_y),mdist);
 
              ddir:=dir*degtorad;
-             unit_SetXY(pu,x+round(ss*cos(ddir)),
-                           y-round(ss*sin(ddir)),mvxy_none);
+             newx:=x+round(ss*cos(ddir));
+             newy:=y-round(ss*sin(ddir));
+
+             //unit_SetXY(pu,x+round(ss*cos(ddir)),
+             //              y-round(ss*sin(ddir)),mvxy_none);
           end;
-          //unit_PushFromObstacles(pu);
+
+          if(ukfly)or(ukfloater)
+          then unit_SetXY(pu,newx,newy,mvxy_none)
+          else
+            if(not unit_MoveCheckCollision(x,y,newx,newy))
+            then unit_SetXY(pu,newx,newy,mvxy_none);
        end;
 end;
 

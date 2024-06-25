@@ -144,7 +144,6 @@ u_royal_d         : integer;
 {$IFDEF _FULLGAME}
 
 map_grid_graph    : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
-map_grid_decorstep : byte = 0;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
@@ -158,7 +157,6 @@ r_uipanel,
 r_empty,
 r_minimap,
 r_bminimap,
-//r_sminimap,
 r_screen,
 r_dterrain,
 r_menu            : pSDL_SURFACE;
@@ -493,30 +491,14 @@ c_black           : cardinal;
 //  THEMES
 //
 
-theme_cur           : integer = 0;
-{
-theme_liquid_animt: byte;
-theme_liquid_animm: byte;
-theme_liquid_color: cardinal = 0;
-
-theme_map_terrain1 : integer=0;
-theme_map_pterrain1: integer = -1;
-theme_map_terrain2 : integer=0;
-theme_map_pterrain2: integer = -1;
-theme_map_liquid  : integer=0;
-theme_map_pliquid : integer = -1;
-theme_liquid_style: byte = 0;
-theme_crater_style: byte = 0;
-
-theme_anm_liquids : array of byte;     // animation type
-theme_ant_liquids : array of byte;     // animation period
-theme_clr_liquids : array of cardinal; // minimap color     }
+theme_cur                 : integer = 0;
 
 theme_anm_decors          : TThemeDecorAnimL;
 
 theme_tile_terrain        : pSDL_Surface = nil;
 theme_tile_crater         : pSDL_Surface = nil;
 theme_tile_liquid         : pSDL_Surface = nil;
+theme_tile_teleport       : pSDL_Surface = nil;
 
 theme_tileset_crater      : TMWTileSet;
 theme_tileset_liquid      : array[0..theme_anim_step_n-1] of TMWTileSet;
@@ -530,12 +512,14 @@ theme_cur_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
 
 theme_cur_tile_terrain_id,
 theme_cur_tile_crater_id,
-theme_cur_tile_liquid_id  : integer;
+theme_cur_tile_liquid_id,
+theme_cur_tile_teleport_id: integer;
 
 theme_cur_decal_l,
 theme_cur_decor_l,
 theme_cur_1rock_l,
 theme_cur_2rock_l,
+theme_cur_teleport_l,
 theme_cur_crater_l,
 theme_cur_liquid_l,
 theme_cur_terrain_l       : TIntList;
@@ -543,6 +527,7 @@ theme_cur_decal_n,
 theme_cur_decor_n,
 theme_cur_1rock_n,
 theme_cur_2rock_n,
+theme_cur_teleport_n,
 theme_cur_crater_n,
 theme_cur_liquid_n,
 theme_cur_terrain_n       : integer;

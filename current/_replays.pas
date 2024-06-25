@@ -386,7 +386,7 @@ begin
          BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
          {$I+}
 
-         if(map_size<MinMapSize)or(map_size>MaxMapDize)
+         if(map_size<MinMapSize)or(map_size>MaxMapSize)
          or(map_type    >gms_m_types)
          or(map_symmetry>gms_m_symm)
          or(g_mode>gms_count)

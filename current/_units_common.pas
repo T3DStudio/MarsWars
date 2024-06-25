@@ -307,15 +307,15 @@ begin
    end;
 end;
 
-procedure unit_SetXY(pu:PTUnit;ax,ay:integer;movevxy:byte);
+procedure unit_SetXY(pu:PTUnit;newx,newy:integer;movevxy:byte);
 var _px,_py:integer;
 begin
    with pu^ do
    begin
       _px:=x;
       _py:=y;
-      x:=mm3i(1,ax,map_size);
-      y:=mm3i(1,ay,map_size);
+      x:=mm3i(1,newx,map_size);
+      y:=mm3i(1,newy,map_size);
       if(x<>_px)or(y<>_py)then
       begin
          unit_UpdateXY(pu);

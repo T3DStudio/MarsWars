@@ -63,30 +63,11 @@ end;
 procedure d_Minimap(tar:pSDL_Surface);
 var i:byte;
 begin
-   {SDL_SetAlpha(r_sminimap,SDL_SRCALPHA or SDL_RLEACCEL,128);
-   draw_surf(r_minimap,1,1,r_sminimap);
-   SDL_SetAlpha(r_sminimap,SDL_SRCALPHA or SDL_RLEACCEL,255);
-   boxColor(r_sminimap,0,0,vid_panelwi,vid_panelwi,c_dgray); }
-
    rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mm_CamW,vid_mmvy+map_mm_CamH, c_white);
 
    d_MinimapAlarms;
 
    {$IFDEF DTEST}
-   {writeln(vid_fog_mmn);
-   {while(vid_fog_mmn>0)do
-   begin
-      vid_fog_mmn-=1;
-      circleColor(r_minimap,vid_fog_mmx[vid_fog_mmn],
-                            vid_fog_mmy[vid_fog_mmn],
-                            vid_fog_mmr[vid_fog_mmn],c_white);
-   end; }
-   vid_fog_mmn:=0;
-   setlength(vid_fog_mmx,vid_fog_mmn);
-   setlength(vid_fog_mmy,vid_fog_mmn);
-   setlength(vid_fog_mmr,vid_fog_mmn);  }
-
-   // debug
    if(test_mode>1)then
     with g_players[UIPlayer] do
      for i:=0 to MaxPlayers do

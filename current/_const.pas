@@ -127,7 +127,7 @@ MapSizeCellnStep       = 4;
 MinMapSizeCelln        = 28;
 MaxMapSizeCelln        = 92;
 
-MaxMapDize             = (MapCellW*MaxMapSizeCelln)-1;
+MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
 MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
 StepMapSize            =  MapCellW*MapSizeCellnStep;
 
@@ -169,7 +169,7 @@ InvMaxWaves            = 20;
 //
 
 pf_pathmap_w           = 40;
-pf_pathmap_c           = (MaxMapDize div pf_pathmap_w)+1;
+pf_pathmap_c           = (MaxMapSize div pf_pathmap_w)+1;
 
 pf_pathmap_hw          = pf_pathmap_w div 2;
 
@@ -1127,18 +1127,15 @@ max_CamSpeed           = 127;
 //  SPRITE DEPTH
 //
 
-// terrain
-sd_liquid_back         = -32500;
-sd_liquid              = -32000;
 // neytral generators
-sd_tcraters            = MaxMapDize+sd_liquid;    // -24000
+sd_liquid              = -32000;
+sd_tcraters            = MaxMapSize+sd_liquid;    //
 // doodads
-sd_brocks              = MaxMapDize+sd_tcraters;  // -16000
-sd_srocks              = MaxMapDize+sd_brocks;    // -8000
-sd_build               = MaxMapDize+sd_srocks;    //  0
-sd_ground              = MaxMapDize+sd_build;     //  8000
-sd_fly                 = MaxMapDize+sd_ground;    //  16000
-sd_marker              = MaxMapDize+sd_fly;       //  24000
+sd_rocks               = MaxMapSize+sd_tcraters;  // -16000
+sd_build               = MaxMapSize+sd_rocks;     //  0
+sd_ground              = MaxMapSize+sd_build;     //  8000
+sd_fly                 = MaxMapSize+sd_ground;    //  16000
+sd_marker              = MaxMapSize+sd_fly;       //  24000
 
 map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
@@ -1706,7 +1703,7 @@ k_kbaddr               : set of Char = ['0'..'9','.',':'];
 
 MaxTileSet             = 255;
 
-theme_n                = 8;
+theme_n                = 9;
 
 theme_anim_step_n      = 3;
 theme_anim_tile_step   = MapCellW div theme_anim_step_n;

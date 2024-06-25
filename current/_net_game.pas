@@ -348,7 +348,7 @@ begin
    net_ClientReadMapData:=false;
 
    if(rByte(@g_preset_cur     ,g_preset_n           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rInt (@map_size         ,MinMapSize,MaxMapDize))then begin redraw_menu:=true;new_map:=true;end;
+   if(rInt (@map_size         ,MinMapSize,MaxMapSize))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@map_type         ,gms_m_types          ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(StartGame)

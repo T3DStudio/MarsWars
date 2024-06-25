@@ -192,11 +192,7 @@ end;
 
 procedure gfx_SDLSurfaceFree(sf:PSDL_Surface);
 begin
-   if(sf<>nil)and(sf<>r_empty)then
-   begin
-      sdl_FreeSurface(sf);
-      sf:=nil;
-   end;
+   if(sf<>nil)and(sf<>r_empty)then sdl_FreeSurface(sf);
 end;
 
 procedure gfx_MWTextureLoad(mws:PTMWTexture;fn:shortstring;firstload,log:boolean);
@@ -498,6 +494,11 @@ begin
    gfx_SDLSurfaceFree(sTemplate);
 end;
 
+function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
+begin
+   gfx_SDLSurfaceResize:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
+end;
+
 function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;YScale:single;animStepX,animStepY:integer):pSDL_Surface;
 var  ts,
 baseSurface2:pSDl_Surface;
@@ -505,11 +506,15 @@ nsw,nsh:integer;
 begin
    baseSurface2:=zoomSurface(baseSurface,1,YScale,0);
 
+   //writeln('baseSurface2 ',baseSurface2^.w,' ',baseSurface2^.h);
+
    nsw:=0;
    while(nsw<sw)do nsw+=baseSurface2^.w;
 
    nsh:=0;
    while(nsh<sw)do nsh+=baseSurface2^.h;
+
+   //writeln('nsw nsh ',nsw,' ',nsh);
 
    ts:=gfx_SDLSurfaceCreate(nsw,nsh);
 
@@ -531,9 +536,10 @@ animStepX,
 animStepY: integer;
 maskColor: cardinal;
 begin
-   gfx_SDLSurfaceFree(theme_tile_terrain);
-   gfx_SDLSurfaceFree(theme_tile_crater );
-   gfx_SDLSurfaceFree(theme_tile_liquid );
+   gfx_SDLSurfaceFree(theme_tile_terrain );
+   gfx_SDLSurfaceFree(theme_tile_crater  );
+   gfx_SDLSurfaceFree(theme_tile_liquid  );
+   gfx_SDLSurfaceFree(theme_tile_teleport);
 
    anim_seed:=map_seed mod 6;
    case(anim_seed div 3)of
@@ -549,12 +555,14 @@ begin
    animStepX:=-MapCellW-animRX;
    animStepY:=-MapCellW-animRY;
 
+   if (0<=theme_cur_tile_teleport_id)
+   and(theme_cur_tile_teleport_id<theme_all_terrain_n)then theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW) else theme_tile_teleport:=r_empty;
    if (0<=theme_cur_tile_terrain_id)
-   and(theme_cur_tile_terrain_id<theme_all_terrain_n)then theme_tile_terrain:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
+   and(theme_cur_tile_terrain_id <theme_all_terrain_n)then theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
    if (0<=theme_cur_tile_crater_id)
-   and(theme_cur_tile_crater_id <theme_all_terrain_n)then theme_tile_crater :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
+   and(theme_cur_tile_crater_id  <theme_all_terrain_n)then theme_tile_crater  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
    if (0<=theme_cur_tile_liquid_id)
-   and(theme_cur_tile_liquid_id <theme_all_terrain_n)then theme_tile_liquid :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
+   and(theme_cur_tile_liquid_id  <theme_all_terrain_n)then theme_tile_liquid  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
 
    boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
 
@@ -697,8 +705,8 @@ begin
    DrawLoadingScreen(str_loading_srf,c_orange);
 
    // theme tileset templates
-   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_tech  ,tes_tech  ,10,0);
-   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_nature,tes_nature,10,0);
+   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_tech  ,tes_tech  ,8 ,0);
+   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_nature,tes_nature,11,0);
    for x:=0 to theme_anim_step_n-1 do
    gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_liquid[x]    ,tes_nature,0 ,byte(x*5));
 

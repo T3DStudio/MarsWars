@@ -191,9 +191,7 @@ TMapTerrainGridCellAnim = record
    tgca_decal_n    : integer;
    tgca_decor_l    : array of TMapTerrainGridCellDecor;
    tgca_decal_l    : array of TMapTerrainGridCellDecal;
-   tgca_maincell   : ^TMapTerrainGridCellAnim;
 end;
-PTMapTerrainGridCellAnim = ^TMapTerrainGridCellAnim;
 
 {$ENDIF}
 

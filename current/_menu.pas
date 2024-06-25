@@ -673,7 +673,7 @@ mi_map_params3            : if(menu_list_selected>-1)then
                                else map_SetSetting (PlayerClient,nmid_lobbby_mapsize,p,false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromInts(menu_item,MaxMapDize,MinMapSize,StepMapSize,map_size,-2);
+                            else menu_list_MakeFromInts(menu_item,MaxMapSize,MinMapSize,StepMapSize,map_size,-2);
 mi_map_params4            : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1113,7 +1113,7 @@ mi_mplay_ClientQuality    : if(menu_list_selected>-1)then
       case menu_item of
       // MAP
       51 : begin Map_randomseed;                                  Map_premap;end;
-      52 : begin ScrollInt (@map_size      ,-StepMapSize,MinMapSize,MaxMapDize   );Map_premap;end;
+      52 : begin ScrollInt (@map_size      ,-StepMapSize,MinMapSize,MaxMapSize   );Map_premap;end;
       53 : begin ScrollByte(@map_type    ,false    ,0       ,gms_m_types);Map_premap;end;
       54 : begin ScrollByte(@map_symmetry,false    ,0       ,2          );Map_premap;end;
 
