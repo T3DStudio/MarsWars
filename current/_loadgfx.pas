@@ -499,34 +499,28 @@ begin
    gfx_SDLSurfaceResize:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
 end;
 
-function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;YScale:single;animStepX,animStepY:integer):pSDL_Surface;
-var  ts,
-baseSurface2:pSDl_Surface;
+function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;yPress:boolean;animStepX,animStepY:integer):pSDL_Surface;
+var  ts:pSDl_Surface;
 nsw,nsh:integer;
 begin
-   baseSurface2:=zoomSurface(baseSurface,1,YScale,0);
-
-   //writeln('baseSurface2 ',baseSurface2^.w,' ',baseSurface2^.h);
-
    nsw:=0;
-   while(nsw<sw)do nsw+=baseSurface2^.w;
+   while(nsw<sw)do nsw+=baseSurface^.w;
 
    nsh:=0;
-   while(nsh<sw)do nsh+=baseSurface2^.h;
+   while(nsh<sw)do nsh+=baseSurface^.h;
 
-   //writeln('nsw nsh ',nsw,' ',nsh);
+   if(yPress)then nsh+=baseSurface^.h;
 
    ts:=gfx_SDLSurfaceCreate(nsw,nsh);
 
-   gfx_FillSurfaceBySurface(ts,baseSurface2,animStepX,animStepY);
+   gfx_FillSurfaceBySurface(ts,baseSurface,animStepX,animStepY);
 
    gfx_MakeBaseTile:=zoomSurface(ts,sw/ts^.w,sw/ts^.h,0);
 
-   gfx_SDLSurfaceFree(baseSurface2);
    gfx_SDLSurfaceFree(ts);
 end;
 
-procedure gfx_MakeThemeTiles;
+procedure gfx_MakeThemeTiles();
 var
 anim_seed:cardinal;
 animRX,
@@ -536,11 +530,6 @@ animStepX,
 animStepY: integer;
 maskColor: cardinal;
 begin
-   gfx_SDLSurfaceFree(theme_tile_terrain );
-   gfx_SDLSurfaceFree(theme_tile_crater  );
-   gfx_SDLSurfaceFree(theme_tile_liquid  );
-   gfx_SDLSurfaceFree(theme_tile_teleport);
-
    anim_seed:=map_seed mod 6;
    case(anim_seed div 3)of
   0: animRX:=-theme_anim_tile_step;
@@ -555,14 +544,19 @@ begin
    animStepX:=-MapCellW-animRX;
    animStepY:=-MapCellW-animRY;
 
+   gfx_SDLSurfaceFree(theme_tile_terrain );
+   gfx_SDLSurfaceFree(theme_tile_crater  );
+   gfx_SDLSurfaceFree(theme_tile_liquid  );
+   gfx_SDLSurfaceFree(theme_tile_teleport);
+
    if (0<=theme_cur_tile_teleport_id)
    and(theme_cur_tile_teleport_id<theme_all_terrain_n)then theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW) else theme_tile_teleport:=r_empty;
    if (0<=theme_cur_tile_terrain_id)
-   and(theme_cur_tile_terrain_id <theme_all_terrain_n)then theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_terrain:=r_empty;
+   and(theme_cur_tile_terrain_id <theme_all_terrain_n)then theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_terrain:=r_empty;
    if (0<=theme_cur_tile_crater_id)
-   and(theme_cur_tile_crater_id  <theme_all_terrain_n)then theme_tile_crater  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_crater :=r_empty;
+   and(theme_cur_tile_crater_id  <theme_all_terrain_n)then theme_tile_crater  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_crater :=r_empty;
    if (0<=theme_cur_tile_liquid_id)
-   and(theme_cur_tile_liquid_id  <theme_all_terrain_n)then theme_tile_liquid  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,0.7,animStepX,animStepY) else theme_tile_liquid :=r_empty;
+   and(theme_cur_tile_liquid_id  <theme_all_terrain_n)then theme_tile_liquid  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_liquid :=r_empty;
 
    boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
 
@@ -716,10 +710,10 @@ begin
    gfx_MakeTileSetTemplate(c_white,c_black,fog_CellW,vid_TileTemplate_fog,tes_fog,0,0);
    vid_fog_BaseSurf:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
    boxColor(vid_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
-   for x:=1 to fog_CellW do
-   for r:=1 to fog_CellW do
-     if((x+r)mod 5)>0 then
-       pixelColor(vid_fog_BaseSurf,x-1,r-1,c_black);
+   for x:=0 to fog_CellW-1 do
+   for r:=0 to fog_CellW-1 do
+     if((x+r)mod 4)>0 then
+       pixelColor(vid_fog_BaseSurf,x,r,c_black);
    gfx_MakeTileSet(vid_fog_BaseSurf,@vid_fog_tiles,vid_TileTemplate_fog,0,0,0,c_white);
    for x:=0 to MaxTileSet do gfx_SDLSurfaceFree(vid_TileTemplate_fog^[x].sdlSurface);
    dispose(vid_TileTemplate_fog);

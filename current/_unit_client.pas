@@ -147,7 +147,7 @@ begin
       SetBBit(@_bts1,3, (level and %10)      >0);
       SetBBit(@_bts1,4, buff[ub_Pain        ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_reload>0));
-      SetBBit(@_bts1,6, isselected                    );
+      SetBBit(@_bts1,6, isselected             );
       SetBBit(@_bts1,7, _bts2>0                );
 
       wudata_byte(_bts1,rpl);
@@ -728,7 +728,7 @@ begin
                   if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
                    case uid^._ability of
                0:;
-               uab_UACStrike   : unit_ability_UACStrike_Cast(uu);
+               uab_UACStrike   : unit_ability_UACStrike_Shot(uu);
                uab_UACScan     : if(team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
                                  then ability_SpawnUnitStep(pu,UID_Phantom )
@@ -776,7 +776,7 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               unit_UpdateXY(uu);
+               unit_UpdateXY(uu,true);
 
                if(speed>0)then
                begin
@@ -1105,7 +1105,7 @@ begin
       ou^.y :=uu^.y;
       ou^.vx:=uu^.x;
       ou^.vy:=uu^.y;
-      unit_UpdateXY(ou);
+      unit_UpdateXY(ou,true);
    end
    else client_ApplyNewUnitState(uu);
 end;

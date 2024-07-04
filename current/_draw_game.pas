@@ -478,6 +478,17 @@ function InGridRange(a:integer):boolean;
 begin
    InGridRange:=(0<=a)and(a<MaxMapSizeCelln);
 end;
+procedure DrawDecals;
+var i:integer;
+begin
+   with map_grid_graph[gx,gy] do
+    if(tgca_decal_n>0)then
+      for i:=0 to tgca_decal_n-1 do
+        with tgca_decal_l[i] do
+          if(tgca_decalS<>nil)then
+            draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
+end;
+
 begin
    ssx:=lx-(vid_cam_x mod MapCellW)-MapCellW*2;
    sty:=ly-(vid_cam_y mod MapCellW)-MapCellW*2;
@@ -533,21 +544,17 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
               if(tgca_tile_crater=0)then
               begin
                  draw_surf(tar,ssx,ssy,theme_tileset_crater[tgca_tile_crater].sdlSurface);
+                 DrawDecals;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end
               else
               begin
                  draw_surf(tar,ssx,ssy,theme_tile_terrain);
                  if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].sdlSurface);
+                 DrawDecals;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
             //draw_text(tar,ssx,ssy,i2s(tgca_decor_n),ta_left,255,c_white);
-
-            if(tgca_decal_n>0)then
-              for i:=0 to tgca_decal_n-1 do
-                with tgca_decal_l[i] do
-                  if(tgca_decalS<>nil)then
-                    draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
 
             if(tgca_decor_n>0)then
               for i:=0 to tgca_decor_n-1 do
@@ -557,7 +564,7 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                     begin
                        SpriteListAddDoodad(tgca_decorX+tda_xo,
                                            tgca_decorY+tda_yo,
-                                           tgca_decorDepth+tgca_decorY,tda_shadow,tgca_decorS,255);
+                                           tgca_decorDepth,tda_shadow,tgca_decorS,255);
                        //UnitsInfoAddRect(tgca_decorX+tda_xo-tgca_decorS^.hw,tgca_decorY+tda_yo-tgca_decorS^.hh,
                        //                 tgca_decorX+tda_xo+tgca_decorS^.hw,tgca_decorY+tda_yo+tgca_decorS^.hh,c_yellow);
 
@@ -689,6 +696,33 @@ begin
 end;
 
 
+function SpriteDepth(y:integer;isfly:boolean):integer;
+begin
+   SpriteDepth:=map_flydepths[isfly]+y;
+end;
+
+function unit_SpriteDepth(pu:PTUnit):integer;
+begin
+   unit_SpriteDepth:=0;
+   with pu^ do
+    case uidi of
+UID_UPortal,
+UID_HTeleport,
+UID_HPentagram,
+//UID_HSymbol,
+//UID_HASymbol,
+UID_HAltar,
+UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
+    else
+      if(uid^._ukbuilding)and(not iscomplete)
+      then unit_SpriteDepth:=sd_build+vy
+      else
+        if(hits>0)or(buff[ub_Resurect]>0)
+        then unit_SpriteDepth:=SpriteDepth(vy,ukfly or (zfall>0))
+        else unit_SpriteDepth:=SpriteDepth(vy,ukfly);
+    end;
+end;
+
 procedure _draw_dbg;
 var u,ix,iy:integer;
     c:cardinal;
@@ -773,8 +807,10 @@ begin
 
            draw_text(r_screen,ix,iy   ,i2s(u)           , ta_left,255, PlayerGetColor(playeri));
            draw_text(r_screen,ix,iy+10,i2s(hits)        , ta_left,255, PlayerGetColor(playeri));
-           draw_text(r_screen,ix,iy+20,b2s(ua_id)       , ta_left,255, PlayerGetColor(playeri));
-           draw_text(r_screen,ix,iy+30,li2s(aiu_alarm_d), ta_left,255, PlayerGetColor(playeri));
+           draw_text(r_screen,ix,iy+20,i2s(ua_id)       , ta_left,255, PlayerGetColor(playeri));
+           draw_text(r_screen,ix,iy+30,w2s(szone)       , ta_left,255, PlayerGetColor(playeri));
+
+
            //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

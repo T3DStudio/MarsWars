@@ -318,7 +318,7 @@ begin
    with uid^ do
      ai_BaseDestinationChecks:=(ukfly)
                              or(ukfloater)
-                             or(pf_EqZones(azone,pfzone))
+                             //or(pf_EqZones(azone,pfzone))
                              or(_isbarrack)
                              or(isbuildarea)
                              or(_ability=uab_UACScan)
@@ -333,7 +333,7 @@ begin
       begin
          x   :=tu^.x;
          y   :=tu^.y;
-         zone:=tu^.pfzone;
+         zone:=tu^.pzone;
       end;
       ai_alarm_x   :=x;
       ai_alarm_y   :=y;
@@ -347,12 +347,12 @@ begin
    begin
       ax   :=tu^.x;
       ay   :=tu^.y;
-      azone:=tu^.pfzone;
+      azone:=tu^.pzone;
    end;
    with pu^ do
    with uid^ do
      if(not ai_istransport)
-     or(not pf_IfObstacleZone(azone))then
+     or(not map_IfObstacleZone(azone))then
        if(ai_BaseDestinationChecks(pu,azone))then
        begin
           if(aud<0)or(aud=NOTSET)
@@ -627,13 +627,13 @@ begin
             or(cpy>=map_size)then continue;
 
             if(ai_istransport)then
-              if(pf_IfObstacleZone(cpzone))
+              if(map_IfObstacleZone(cppzone))
               or(cpOwnerTeam=team)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
 
             if(d>cpCaptureR)then
-              if ai_BaseDestinationChecks(pu,cpzone)
+              if ai_BaseDestinationChecks(pu,cppzone)
               then
               else continue;
 
@@ -752,7 +752,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      pfcheck:=(ukfly)or(ukfloater)or pf_EqZones(pfzone,tu^.pfzone);
+      pfcheck:=(ukfly)or(ukfloater){or pf_EqZones(pfzone,tu^.pfzone)};
       if(tu^.hits>0)then                         // alive
       begin
          if(tu_transport=nil)then                // not in transport
@@ -817,7 +817,7 @@ begin
 
                // teleporter beacon
                if(tu^.aiu_alarm_d<base_1r)then
-                 if(not pf_IfObstacleZone(tu^.pfzone))then
+                 if(not map_IfObstacleZone(tu^.pzone))then
                    if(ai_teleporter_beacon_u=nil)
                    then ai_teleporter_beacon_u:=tu
                    else

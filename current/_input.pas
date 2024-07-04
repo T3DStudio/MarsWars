@@ -503,7 +503,7 @@ begin
             10: if(ui_groups_x[MaxUnitGroups]>0)then
                   if(click_dbl)
                   then GameCameraMoveToPoint(ui_groups_x[MaxUnitGroups],ui_groups_y[MaxUnitGroups])
-                  else PlayerSetOrder(0,0,0,0,0,po_select_special_set,PlayerClient);
+                  else PlayerSetOrder(0,0,0,0,0,po_select_all_set,PlayerClient);
             11: PlayerSetOrder(0,0,0,0,uo_destroy,po_unit_order_set,PlayerClient);  // destroy
             12: m_brush :=mb_mark;
             13: m_action:=not m_action;
@@ -846,6 +846,10 @@ mb_empty    : if(ks_ctrl>0)then
               else
               begin
                  if(d_UpdateUIPlayer(ui_uhint))then exit;
+
+                 debug_x0:=(mouse_map_x div MapCellW)*MapCellW;
+                 debug_y0:=(mouse_map_y div MapCellW)*MapCellW;
+
                  mouse_select_x0:=mouse_map_x;
                  mouse_select_y0:=mouse_map_y;
               end;

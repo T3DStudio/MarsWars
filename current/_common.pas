@@ -11,8 +11,9 @@ procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function unit_CheckTransport(uu,tu:PTUnit):boolean;  forward;
-function pf_IfObstacleZone(zone:word):boolean;  forward;
+function unit_CheckTransport(pTransport,pTarget:PTUnit):boolean;  forward;
+function map_IfObstacleZone(zone:word):boolean;  forward;
+function map_GetSZoneM(mx,my:integer):word;forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 {$IFDEF _FULLGAME}
@@ -619,16 +620,27 @@ end;
 function point_dist_int(dx0,dy0,dx1,dy1:integer):integer;
 var t:int64;
 begin
-   t:=sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1));
-   if(t<0)
-   then point_dist_int:=integer.MaxValue
+   if(dx0=dx1)
+   then point_dist_int:=abs(dy0-dy1)
    else
-   begin
-      t:=round(sqrt(t));
-      if(t<smallint.MaxValue)
-      then point_dist_int:=t
-      else point_dist_int:=smallint.MaxValue;
-   end;
+     if(dy0=dy1)
+     then point_dist_int:=abs(dx0-dx1)
+     else
+     begin
+        t:=sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1));
+        if(t<0)
+        then point_dist_int:=integer.MaxValue
+        else
+          if(t=0)
+          then point_dist_int:=0
+          else
+          begin
+             t:=round(sqrt(t));
+             if(t<smallint.MaxValue)
+             then point_dist_int:=t
+             else point_dist_int:=smallint.MaxValue;
+          end;
+     end;
 end;
 
 function point_dist_real(dx0,dy0,dx1,dy1:integer):single;
@@ -749,72 +761,86 @@ begin
    if(r1<>NOTSET)then begin pushOut_1r(tx,ty,x1,y1,r1);exit;end;
 end;
 
-procedure mgcell2NearestXY(tx,ty,gmx0,gmy0,gmx1,gmy1:integer;rx,ry:pinteger;pushOutR:integer);
-var td:integer;
+procedure mgcell2NearestXY(px,py,gmx0,gmy0,gmx1,gmy1:integer;pushOutR:integer;rx,ry:pinteger);
+var td,
+    tx,
+    ty:integer;
 procedure SetpushOutXY(ad,ax,ay:integer);
 begin
    if(ad<td)then
    begin
-      td :=ad;
-      rx^:=ax;
-      ry^:=ay;
+      td:=ad;
+      tx:=ax;
+      ty:=ay;
    end;
 end;
 begin
-   rx^:=tx;
-   ry^:=ty;
+   td:=td.MaxValue;
+   tx:=px;
+   ty:=py;
 
-   if (gmx0<=tx)and(tx<=gmx1)
-   and(gmy0<=ty)and(ty<=gmy1)then
+   if (gmx0<=px)and(px<=gmx1)
+   and(gmy0<=py)and(py<=gmy1)then
    begin
       if(pushOutR>0)then
       begin
-         td:=integer.MaxValue;
-         SetpushOutXY(abs(gmx0-tx),gmx0-pushOutR,ty);
-         SetpushOutXY(abs(gmx1-tx),gmx1+pushOutR,ty);
-         SetpushOutXY(abs(gmy0-ty),tx,gmy0-pushOutR);
-         SetpushOutXY(abs(gmy1-ty),tx,gmy1+pushOutR);
+         SetpushOutXY(abs(gmx0-px),gmx0-pushOutR,py);
+         SetpushOutXY(abs(gmx1-px),gmx1+pushOutR,py);
+         SetpushOutXY(abs(gmy0-py),px,gmy0-pushOutR);
+         SetpushOutXY(abs(gmy1-py),px,gmy1+pushOutR);
       end;
    end
    else
      if(pushOutR>0)then
      begin
-             if(tx<gmx0)and(ty<gmy0)then pushOut_1r(rx,ry,gmx0,gmy0,pushOutR+1)
-        else if(gmx1<tx)and(ty<gmy0)then pushOut_1r(rx,ry,gmx1,gmy0,pushOutR+1)
-        else if(gmx1<tx)and(gmy1<ty)then pushOut_1r(rx,ry,gmx1,gmy1,pushOutR+1)
-        else if(tx<gmx0)and(gmy1<ty)then pushOut_1r(rx,ry,gmx0,gmy1,pushOutR+1)
+             if(px<gmx0)and(py<gmy0)then pushOut_1r(@tx,@ty,gmx0,gmy0,pushOutR+1)
+        else if(gmx1<px)and(py<gmy0)then pushOut_1r(@tx,@ty,gmx1,gmy0,pushOutR+1)
+        else if(gmx1<px)and(gmy1<py)then pushOut_1r(@tx,@ty,gmx1,gmy1,pushOutR+1)
+        else if(px<gmx0)and(gmy1<py)then pushOut_1r(@tx,@ty,gmx0,gmy1,pushOutR+1)
         else
-             if(tx<gmx0)then begin if abs(gmx0-tx)<pushOutR then rx^:=gmx0-pushOutR end
-        else if(gmx1<tx)then begin if abs(tx-gmx1)<pushOutR then rx^:=gmx1+pushOutR end
-        else if(ty<gmy0)then begin if abs(gmy0-ty)<pushOutR then ry^:=gmy0-pushOutR end
-        else if(gmy1<ty)then begin if abs(ty-gmy1)<pushOutR then ry^:=gmy1+pushOutR end;
-        exit;
+             if(px<gmx0)then begin if abs(gmx0-px)<pushOutR then tx:=gmx0-pushOutR end
+        else if(gmx1<px)then begin if abs(px-gmx1)<pushOutR then tx:=gmx1+pushOutR end
+        else if(py<gmy0)then begin if abs(gmy0-py)<pushOutR then ty:=gmy0-pushOutR end
+        else if(gmy1<py)then begin if abs(py-gmy1)<pushOutR then ty:=gmy1+pushOutR end;
      end
      else
      begin
-             if(tx<gmx0)and(ty<gmy0)then begin rx^:=gmx0;ry^:=gmy0;end
-        else if(gmx1<tx)and(ty<gmy0)then begin rx^:=gmx1;ry^:=gmy0;end
-        else if(gmx1<tx)and(gmy1<ty)then begin rx^:=gmx1;ry^:=gmy1;end
-        else if(tx<gmx0)and(gmy1<ty)then begin rx^:=gmx0;ry^:=gmy1;end
+             if(px<gmx0)and(py<gmy0)then begin tx:=gmx0;ty:=gmy0;end
+        else if(gmx1<px)and(py<gmy0)then begin tx:=gmx1;ty:=gmy0;end
+        else if(gmx1<px)and(gmy1<py)then begin tx:=gmx1;ty:=gmy1;end
+        else if(px<gmx0)and(gmy1<py)then begin tx:=gmx0;ty:=gmy1;end
         else
-             if(tx<gmx0)then rx^:=gmx0
-        else if(gmx1<tx)then rx^:=gmx1
-        else if(ty<gmy0)then ry^:=gmy0
-        else if(gmy1<ty)then ry^:=gmy1;
+             if(px<gmx0)then tx:=gmx0
+        else if(gmx1<px)then tx:=gmx1
+        else if(py<gmy0)then ty:=gmy0
+        else if(gmy1<py)then ty:=gmy1;
      end;
+   //rd^;=td;
+   rx^:=tx;
+   ry^:=ty;
 end;
 
-function dist2mgcell(tx,ty,gx,gy:integer):integer;
+function dist2mgcellC(tx,ty,gx,gy:integer):integer;
 var gmx,gmy,
     mx ,my :integer;
 begin
    gmx:=gx*MapCellW;
    gmy:=gy*MapCellW;
-   mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,@mx,@my,0);
+   mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@mx,@my);
    if(tx=mx)and(ty=my)
-   then dist2mgcell:=0
-   else dist2mgcell:=point_dist_int(tx,ty,mx,my);
+   then dist2mgcellC:=0
+   else dist2mgcellC:=point_dist_int(tx,ty,mx,my);
 end;
+
+function dist2mgcellM(tx,ty,gmx,gmy:integer):integer;
+var mx ,my :integer;
+begin
+   mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@mx,@my);
+   if(tx=mx)and(ty=my)
+   then dist2mgcellM:=0
+   else dist2mgcellM:=point_dist_int(tx,ty,mx,my);
+end;
+
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
@@ -1075,21 +1101,21 @@ begin
    unit_canAbility:=0;
    with pu^     do
    with uid^    do
-    if(iscomplete=false)
+    if(not iscomplete)
     or(hits<=0)
     or(_ability=0)
     then unit_canAbility:=ureq_unknown
     else
       with player^ do
       begin
-         if(_ability_no_obstacles)then
-          if(pf_IfObstacleZone(pfzone))then unit_canAbility+=ureq_place;
+         if(_ability_rNoObstacles)then
+           if(map_IfObstacleZone(szone))then unit_canAbility+=ureq_place;
 
          if(_ability_ruid>0)then
-          if(uid_eb[_ability_ruid]<=0)then unit_canAbility+=ureq_ruid;
+           if(uid_eb[_ability_ruid]<=0)then unit_canAbility+=ureq_ruid;
 
          if(_ability_rupgr>0)and(_ability_rupgrl>0)then
-          if(upgr[_ability_rupgr]<_ability_rupgrl)then unit_canAbility+=ureq_rupid;
+           if(upgr[_ability_rupgr]<_ability_rupgrl)then unit_canAbility+=ureq_rupid;
 
          if(_ability=uab_RebuildInPoint)and(unit_canAbility=0)then unit_canAbility+=unit_canRebuild(pu);
       end;

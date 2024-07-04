@@ -486,7 +486,6 @@ UID_HEye:
 begin
    setMWSModel(0,@spr_HEye);
    setBuildingSND(snd_hell_eye);
-   un_build_amode:=2;
    un_eid_bcrater:=255;
    setEffectEID(0,0  ,UID_HEye,UID_HEye,0  );
    setEffectSND(  nil,snd_pexp,snd_pexp,nil);

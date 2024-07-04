@@ -1,6 +1,6 @@
 
 
-function pf_CheckBorders(cx,cy:integer):boolean;
+{function pf_CheckBorders(cx,cy:integer):boolean;
 begin
    pf_CheckBorders:=(0<=cx)and(0<=cy)and(cx<=pf_pathmap_c)and(cy<=pf_pathmap_c);
 end;
@@ -25,7 +25,7 @@ end;
 function pf_EqZones(z1,z2:word):boolean;
 begin
    pf_EqZones:=(z1=z2)and(not pf_IfObstacleZone(z1));
-end;
+end;     }
 
 {
 function pf_find(startx,starty,endx,endy:integer;nextx,nexty:pinteger):boolean;

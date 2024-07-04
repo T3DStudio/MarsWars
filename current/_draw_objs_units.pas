@@ -18,51 +18,22 @@ begin
    end;
 end;
 
-
-function SpriteDepth(y:integer;isfly:boolean):integer;
-begin
-   SpriteDepth:=map_flydepths[isfly]+y;
-end;
-
-function unit_SpriteDepth(pu:PTUnit):integer;
-begin
-   unit_SpriteDepth:=0;
-   with pu^ do
-    case uidi of
-UID_UPortal,
-UID_HTeleport,
-UID_HPentagram,
-//UID_HSymbol,
-//UID_HASymbol,
-UID_HAltar,
-UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
-    else
-      if(uid^._ukbuilding)and(iscomplete=false)
-      then unit_SpriteDepth:=sd_build+vy
-      else
-        if(hits>0)or(buff[ub_Resurect]>0)
-        then unit_SpriteDepth:=SpriteDepth(vy,ukfly or (zfall>0))
-        else unit_SpriteDepth:=SpriteDepth(vy,ukfly);
-    end;
-end;
-
-
 procedure fog_RevealScreenCircle(x,y,r:integer);
-var iy,i:integer;
+var ix,iy:integer;
 procedure SetFog(tx,ty:integer);
 begin if(0<=tx)and(0<=ty)and(tx<=vid_fog_vfw)and(ty<=vid_fog_vfh)then vid_fog_grid[tx,ty]:=true;end;
 begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
-   for i:=0 to r do
-    for iy:=0 to _RX2Y[r,i] do
+   for ix:=0 to r do
+    for iy:=0 to _RX2Y[r,ix] do
     begin
-       SetFog(x-i,y-iy);
-       SetFog(x-i,y+iy);
-       if(i>0)then
+       SetFog(x-ix,y-iy);
+       SetFog(x-ix,y+iy);
+       if(ix>0)then
        begin
-          SetFog(x+i,y-iy);
-          SetFog(x+i,y+iy);
+          SetFog(x+ix,y-iy);
+          SetFog(x+ix,y+iy);
        end;
     end;
 end;
@@ -228,7 +199,7 @@ begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if(ua_id<>ua_psability)
-            and((unit_canAbility(pu)=0)or(transportC>0))
+            and((unit_canAbility(pu)=0)or(transportM>0))
                                      then ui_uibtn_sability+=1;
             if(unit_canRebuild(pu)=0)then ui_uibtn_rebuild +=1;
          end;

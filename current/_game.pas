@@ -574,7 +574,8 @@ end;
 {$ENDIF}
 
 procedure GameCreateStartBase(x,y:integer;uidF,uidA,pl,c:byte;AdvancedBase:boolean);
-var  i,n,uid:byte;
+var
+n,uid :byte;
 r,d,ds:integer;
 procedure _Spawn(tx,ty:integer);
 begin
@@ -585,31 +586,24 @@ begin
    n+=1;
 end;
 begin
-   if(c>6)then c:=6;
    n:=0;
+   if(c>6)then c:=6;
 
-   if(c=0)
-   then _Spawn(x,y)
-   else
+   _Spawn(x,y);
+
+   if(c=0)then exit;
+
+   d  :=point_dir(x,y,map_hsize,map_hsize);
+   ds :=360 div c;
+   r  :=g_uids[uid]._r*2+2;
+
+   while(c>0) do
    begin
-      if(c>5)then
-      begin
-         _Spawn(x,y);
-         c-=1;
-      end;
-      ds :=map_size div 2;
-      d  :=point_dir(x,y,ds,ds);
-      ds :=360 div (c+1);
-      r  :=70+c*28; //18
-      for i:=0 to c do
-      begin
-         _Spawn(
-         x+trunc(r*cos(d*degtorad)),
-         y-trunc(r*sin(d*degtorad))
-         );
-
-         d+=ds;
-      end;
+      _Spawn(
+      x+trunc(r*cos(d*degtorad)),
+      y-trunc(r*sin(d*degtorad)));
+      d+=ds;
+      c-=1;
    end;
 end;
 
@@ -644,6 +638,7 @@ ps_AI_11    : begin
       end;
 
       team:=PlayerGetTeam(g_mode,p,255);
+      race:=slot_race;
 
       if(p=0)then
       begin
@@ -782,10 +777,10 @@ end;
 
 procedure PlayerExecuteOrder(pl:byte);
 var
-su,eu,d: integer;
+su,eu,d     : integer;
 SelectBuildings,
 ClearErrors,
-pselected: boolean;
+pselected   : boolean;
 pu,
 sability_u  : PTUnit;
 sability_d  : integer;
@@ -795,10 +790,10 @@ begin
 end;
 begin
    with g_players[pl] do
-   if(o_id>0)and(army>0)then
+   if(o_id>0)and(army>0)and(not isobserver)and(state=ps_play)then
    begin
       if(pl<>PlayerClient)then   // ded serverside counter
-      PlayerAPMInc(pl);
+        PlayerAPMInc(pl);
 
       case o_id of
 po_build               : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),pl),nil);
@@ -842,14 +837,13 @@ po_prod_stop      : begin
            eu:=MaxUnits;
         end;
 
-     //   selected_n:=ucl_cs[true]+ucl_cs[false];
         sability_d:=sability_d.MaxValue;
         sability_u:=nil;
 
         while(su<>eu)do
         begin
            pu:=g_punits[su];
-           with pu^ do
+           with pu^  do
            with uid^ do
            if(hits>0)and(not IsUnitRange(transport,nil))and(pl=playeri)then
            begin
@@ -869,7 +863,7 @@ po_select_uid_add    : if(o_id=po_select_uid_set)
 po_select_group_set,
 po_select_group_add  : if(o_id=po_select_group_set)
                        or((not isselected)and(o_id=po_select_group_add))then isselected:=(group=o_a0);
-po_select_special_set: isselected:=UnitF2Select(pu);
+po_select_all_set    : isselected:=UnitF2Select(pu);
 
 // groups
 po_unit_group_set    : if(isselected)then
@@ -885,9 +879,8 @@ po_unit_order_set    : if(isselected)then
                          case o_a0 of
                        uo_move      : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_move  );
                        uo_attack    : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_attack);
-                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0,x ,y ,ua_move  );
-                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0,x ,y ,ua_attack);
-                       //uo_stay      : default
+                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_move  );
+                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_attack);
                        uo_hold      : unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_hold  );
                        uo_destroy   : begin unit_kill(pu,false,false,true,false,true);pselected:=isselected;end;
                        uo_sability  : if(ua_id<>ua_psability)then
@@ -903,8 +896,10 @@ po_unit_order_set    : if(isselected)then
                                               sability_u:=pu;
                                            end;
                                         end;
-                       uo_rebuild   : if(_unit_rebuild(pu,false))then ClearErrors:=true;
-                         else         unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack);
+                       uo_rebuild   : if(unit_rebuild(pu,false))then ClearErrors:=true;
+                         else
+                     //uo_stay      : default
+                                      unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack);
                          end;
 po_prod_stop         : if(isselected)then
                        begin
@@ -929,7 +924,7 @@ po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
 
               if(isselected)then
               begin
-                 if(pselected=false)then
+                 if(not pselected)then
                  begin
                     unit_PC_select_inc(pu);
                     {$IFDEF _FULLGAME}
@@ -938,7 +933,7 @@ po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
                  end;
               end
               else
-                if(pselected=true)then unit_PC_select_dec(pu);
+                if(pselected)then unit_PC_select_dec(pu);
            end;
 
            if(su>eu)
@@ -954,7 +949,8 @@ uo_psability : if(sability_u<>nil)then unit_psability(sability_u,o_x0,o_y0,o_x1,
       end;
 
       o_id:=0;
-   end;
+   end
+   else o_id:=0;
 end;
 
 procedure GameDefaultEndConditions;

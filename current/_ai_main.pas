@@ -307,9 +307,9 @@ end;
 function CheckAIRTarget:boolean;
 begin
    CheckAIRTarget:=true;
-   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.pfzone)then exit;
+   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.pzone)then exit;
    if(ai_generator_d<NOTSET)then
-     if(ai_generator_cp^.cpzone<>pu^.pfzone)then exit;
+     if(ai_generator_cp^.cppzone<>pu^.pzone)then exit;
    CheckAIRTarget:=false;
 end;
 
@@ -787,7 +787,7 @@ begin
 
       if(ai_AdvancedBuild)or(not _isbarrack and not _issmith)then
         if(ai_buildings_need_rebuild(pu))then
-          _unit_rebuild(pu,false);
+          unit_rebuild(pu,false);
 
       if(hits<=0)or(not iscomplete)then exit;
 
@@ -965,7 +965,7 @@ begin
       or(cpenergy<=0)then
         if(cpd<cpCaptureR)then
         begin
-           if(cpzone<>pu^.pfzone)and(not ai_cpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
+           if(cppzone<>pu^.pzone)and(not ai_cpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
            then ai_RunTo(pu,0,0,0,0,pu)
            else ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
            au_SetBusyGroup(pu);
@@ -987,10 +987,10 @@ begin
    begin
       tx:=tu^.x;
       ty:=tu^.y;
-      tz:=tu^.pfzone;
+      tz:=tu^.pzone;
    end;
    with pu^ do
-   if(pfzone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
+   if(pzone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
    begin
       if(tweight>tar_weight)
       then
@@ -1033,7 +1033,7 @@ begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
       if(ai_commander_grd_u<>nil)then
-        if((tar_d<NOTSET)and(ai_commander_grd_u^.pfzone=tar_z))
+        if((tar_d<NOTSET)and(ai_commander_grd_u^.pzone=tar_z))
         or(tar_d=NOTSET)then
         begin
            commander_u:=ai_commander_grd_u;
@@ -1144,7 +1144,7 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
            SpecialMicro:=true;
         end
         else
-          if(pf_IfObstacleZone(tar_z))then
+          if(map_IfObstacleZone(tar_z))then
           begin
              ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
              SpecialMicro:=true;
@@ -1158,7 +1158,7 @@ begin
    begin
       if(ai_teleporterR_u<>nil)then
       begin
-         if((ai_teleporterR_u^.pfzone<>pfzone)and(tar_d=NOTSET))then
+         if((ai_teleporterR_u^.pzone<>pzone)and(tar_d=NOTSET))then
            if(ai_TryTeleportR(pu))then exit;
 
          if(ai_alarm_d>base_2r)and(ai_teleporterR_u^.aiu_limitaround_ally<ai_teleporterR_u^.aiu_limitaround_enemy)then
@@ -1168,7 +1168,7 @@ begin
       if(ai_teleporterF_u<>nil)then
       begin
          if(ai_teleporterF_d<base_2r)and(ai_abase_d<NOTSET)and(tar_d>base_2r)then  // проверить
-           if((ai_abase_d>base_4r)and((cycle_order mod 5)=0) )or(ai_abase_u^.pfzone<>pfzone)then
+           if((ai_abase_d>base_4r)and((cycle_order mod 5)=0) )or(ai_abase_u^.pzone<>pzone)then
             if(ai_TryTeleportF(pu,ai_abase_u))then exit;
 
          if(tar_d=NOTSET)and(g_mode<>gm_invasion)then
@@ -1234,17 +1234,17 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
         then SetNearestTarget(ai_abase_u,0,0,ai_abase_d,0,ai_abase_d>base_3r,false,2*byte((group=aio_home)or(group=aio_home_busy)))
         else SetNearestTarget(nil,ai_abase_u^.aiu_alarm_x,
                                   ai_abase_u^.aiu_alarm_y,
-                                  0,pf_GetAreaZone(ai_abase_u^.aiu_alarm_x,
-                                                   ai_abase_u^.aiu_alarm_y),false,false,2);
+                                  0,map_GetSZoneM(ai_abase_u^.aiu_alarm_x,
+                                                 ai_abase_u^.aiu_alarm_y),false,false,2);
 
       if(ai_cpoint_d<NOTSET)then
-        with ai_cpoint_cp^ do SetNearestTarget(nil,cpx,cpy,ai_cpoint_d,cpzone,ai_cpoint_d>base_3r,(ai_cpoint_d>base_3r)and(not ai_cpoint_koth),byte(ai_cpoint_koth or(g_mode=gm_capture)));
+        with ai_cpoint_cp^ do SetNearestTarget(nil,cpx,cpy,ai_cpoint_d,cppzone,ai_cpoint_d>base_3r,(ai_cpoint_d>base_3r)and(not ai_cpoint_koth),byte(ai_cpoint_koth or(g_mode=gm_capture)));
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do
           if((cycle_order mod 5)=0)
-          then SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,false,false,1)
-          else SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,ai_generator_d>base_3r,ai_generator_d>base_3r,0);
+          then SetNearestTarget(nil,cpx,cpy,ai_generator_d,cppzone,false,false,1)
+          else SetNearestTarget(nil,cpx,cpy,ai_generator_d,cppzone,ai_generator_d>base_3r,ai_generator_d>base_3r,0);
 
       {if(isselected)then
       begin
@@ -1365,7 +1365,7 @@ begin
                         if(aiu_FiledSquareNear<=ai_FiledSquareBorder)
                         //or(ai_builders_count>=3)
                         or(g_mode=gm_royale)then
-                          if(not pf_IfObstacleZone(pfzone))
+                          if(not map_IfObstacleZone(pzone))
                           or(ai_ExtBuildingUpgr)
                           then unit_sability(pu,false);
                end;
@@ -1397,21 +1397,21 @@ begin
            if(g_mode=gm_royale)
            then w:=g_royal_r div 2
            else w:=map_hsize;
-           if(unit_ability_HKeepBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false))then exit;
+           if(unit_ability_HellLBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false))then exit;
         end;
 
       case g_mode of
 gm_koth  : if(ai_ischoosen)and(base_1r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
            begin
               w:=base_1r;
-              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+g_random(w),ai_cpoint_cp^.cpx+g_random(w),false);
+              unit_ability_HellLBlink(pu,ai_cpoint_cp^.cpx+g_random(w),ai_cpoint_cp^.cpx+g_random(w),false);
               exit;
            end;
 gm_royale: if(ai_ischoosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2i(g_royal_r div 4,base_2r);
-              unit_ability_HKeepBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false);
+              unit_ability_HellLBlink(pu,map_hsize+g_random(w),map_hsize+g_random(w),false);
               exit;
            end;
       end;
@@ -1423,7 +1423,7 @@ gm_royale: if(ai_ischoosen)
          then w:=point_dir(aiu_alarm_x,aiu_alarm_y,x,y)
          else w:=random(360);
          d:=w*degtorad;
-         unit_ability_HKeepBlink(pu,
+         unit_ability_HellLBlink(pu,
          x+trunc(srange*cos(d)),
          y-trunc(srange*sin(d)),false);
       end;
@@ -1453,7 +1453,7 @@ begin
    begin
       if(bd<NOTSET)then
        if(not ai_ExtBuildingUpgr)then
-         if(zone<>pu^.pfzone)then exit;
+         if(zone<>pu^.pzone)then exit;
       bd:=d;
       bx:=x;
       by:=y;
@@ -1473,23 +1473,23 @@ begin
           if(cpNoBuildR<cpCaptureR)then
             if(ai_cpoint_d<=cpCaptureR)
             then exit
-            else SetBlinkTarget(cpx,cpy,ai_cpoint_d,cpzone);
+            else SetBlinkTarget(cpx,cpy,ai_cpoint_d,cppzone);
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do
           if(cpNoBuildR<cpCaptureR)then
             if(ai_generator_d<=cpCaptureR)
             then exit
-            else SetBlinkTarget(cpx,cpy,ai_generator_d,cpzone);
+            else SetBlinkTarget(cpx,cpy,ai_generator_d,cppzone);
 
       if(srange<ai_alarm_d)and(ai_alarm_d<NOTSET)then
         SetBlinkTarget(ai_alarm_x,ai_alarm_y,ai_alarm_d,ai_alarm_zone);
 
-      if(g_mode=gm_royale)then SetBlinkTarget(map_hsize,map_hsize,0,pf_get_area(map_hsize,map_hsize));
+      if(g_mode=gm_royale)then SetBlinkTarget(map_hsize,map_hsize,0,map_GetSZoneM(map_hsize,map_hsize));
 
       if(bd=NOTSET)then exit;
 
-      unit_ability_HTowerBlink(pu,bx,by,false);
+      unit_ability_HellSBlink(pu,bx,by,false);
    end;
 end;
 
@@ -1524,8 +1524,8 @@ begin
       if(ai_enemy_d>srange)then ai_PlayerSetAlarm(player,x,y,0,alarmr,false,0);
       if(ai_enemy_d<NOTSET)then
         if(ai_enemy_d<=srange)
-        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pfzone)
-        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^._limituse,alarmr,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pfzone);
+        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pzone)
+        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^._limituse,alarmr,ai_enemy_u^.uid^._ukbuilding,ai_enemy_u^.pzone);
 
       if(not iscomplete)then exit;
 
@@ -1542,14 +1542,14 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
          begin
             case _ability of
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
-uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
+uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then unit_ability_HellInvuln  (pu,ai_invuln_tar_u^.unum,false);
 uab_UACStrike        : if(ai_strike_tar_u<>nil)then unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y,false);
 uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_phantoms]>0)then
                          if(srange<u_royal_d)or(g_royal_r<srange)then unit_sability(pu,false);
             end;
             case uidi of
 UID_UACDron           : if(ai_uab_Rebuild2Turret(pu))then
-                          if(_unit_rebuild(pu,false))then exit;
+                          if(unit_rebuild(pu,false))then exit;
             end;
          end;
 

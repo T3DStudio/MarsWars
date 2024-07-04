@@ -489,8 +489,8 @@ begin
 
       SetThemeList(@theme_cur_decal_l   ,@theme_cur_decal_n   ,theme_all_decal_n  ,true ,'1,4_6,8_17,23_25'                      );
 
-      SetThemeList(@theme_cur_decor_l   ,@theme_cur_decor_n   ,theme_all_decor_n  ,true ,'0_12,18,28_34,48_50'                   );
-      SetThemeList(@theme_cur_1rock_l   ,@theme_cur_1rock_n   ,theme_all_decor_n  ,true ,'77,88_92,96_101'                       );
+      SetThemeList(@theme_cur_decor_l   ,@theme_cur_decor_n   ,theme_all_decor_n  ,true ,'0_12,18,28_32,48_50'                   );
+      SetThemeList(@theme_cur_1rock_l   ,@theme_cur_1rock_n   ,theme_all_decor_n  ,true ,'77,88_92,96_101,33,34'                 );
       SetThemeList(@theme_cur_2rock_l   ,@theme_cur_2rock_n   ,theme_all_decor_n  ,true ,'55,58,66,69,70'                        );
 
       theme_cur_crater_tes:=tes_nature;

@@ -49,7 +49,7 @@ begin
        then GetTile:=tgca_tile_crater=val
        else GetTile:=tgca_tile_liquid=val;
 end;
-procedure AddDecor(N,depth,mx,my:integer);
+procedure AddDecor(N,depth,ax,ay:integer);
 begin
    with map_grid_graph[x,y] do
    if(tgca_decor_n>=0)then
@@ -63,8 +63,8 @@ begin
          tgca_decorA    :=@theme_anm_decors [tgca_decorN];
          tgca_decorDepth:=depth+my;
          tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
-         tgca_decorX    :=mx;
-         tgca_decorY    :=my;
+         tgca_decorX    :=mx+ax;
+         tgca_decorY    :=my+ax;
       end;
    end;
 end;
@@ -130,8 +130,8 @@ mgsl_nobuild: begin
                       ddir:=((i*tGridDecorD)+(x*135)+(y*69))*degtorad;
                       AddDecor(theme_cur_decor_l[abs((x+1)*(y+1)+i) mod theme_cur_decor_n],
                                sd_ground,
-                               mx+round(tGridDecorR*cos(ddir)),
-                               my+round(tGridDecorR*sin(ddir)));
+                               round(tGridDecorR*cos(ddir)),
+                               round(tGridDecorR*sin(ddir)));
                    end;
                  AddDecals;
               end;
@@ -153,7 +153,7 @@ mgsl_rocks  : begin
                         mx+=MapCellHW;
                         my+=MapCellHW;
                         i:=theme_cur_2rock_l[abs((x+1)*(y+1)) mod theme_cur_2rock_n];
-                        AddDecor(i,sd_rocks,mx,my);
+                        AddDecor(i,sd_rocks,0,0);
                         map_grid_graph[x+1,y  ].tgca_decor_n:=-1;
                         map_grid_graph[x+1,y+1].tgca_decor_n:=-1;
                         map_grid_graph[x  ,y+1].tgca_decor_n:=-1;
@@ -162,8 +162,8 @@ mgsl_rocks  : begin
 
                  if(theme_cur_1rock_n>0)then
                    AddDecor(theme_cur_1rock_l[abs((x+1)*(y+1)) mod theme_cur_1rock_n],
-                            sd_rocks,
-                            mx,my);
+                            sd_ground,
+                            0,0);
               end;
       end;
    end;
@@ -197,12 +197,6 @@ end;
 
 {$ENDIF}
 
-procedure map_RandomBaseVars;
-begin
-   g_random_i:= word(map_seed);
-   g_random_p:= byte(map_seed);
-end;
-
 function map_GetSymmetryDir:integer;
 begin
    case map_symmetry of
@@ -224,23 +218,10 @@ maps_lineR: begin
    end;
 end;
 
-procedure map_Vars;
-begin
-   map_size        := mm3i(MinMapSize,map_size,MaxMapSize);
-   map_RandomBaseVars;
-   map_BuildBorder1:= map_size-map_BuildBorder0;
-   map_hsize       := map_size div 2;
-   map_symmetryDir := map_GetSymmetryDir;
-   map_LastCell    := map_size div MapCellW;
-   map_CenterCell  := map_hsize div MapCellW;
 
-   {$IFDEF _FULLGAME}
-   map_mm_cx   := (vid_panelw-2)/map_size;
-   map_mm_CamW := trunc(vid_cam_w*map_mm_cx)+1;
-   map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
-   map_mm_gridW:= MapCellW*map_mm_cx;
-   {$ENDIF}
-end;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP SYMMETRY
 
 procedure SymmetryXY(basex,basey,msize:integer;resultx,resulty:pinteger;SymmetryType:byte);
 begin
@@ -271,6 +252,10 @@ maps_lineR: begin
    end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP TELEPORTS
+
 procedure map_RemoveTeleports;
 var x,y:byte;
 begin
@@ -281,6 +266,45 @@ begin
       tgc_teleportx:=255;
       tgc_teleportx:=255;
    end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP ZONES
+
+procedure map_GetZonesC(cx,cy:integer;pzone,szone:pword);
+begin
+   if(cx<0)
+   or(cy<0)
+   or(cx>map_LastCell)
+   or(cy>map_LastCell)then
+   begin
+      if(pzone<>nil)then pzone^:=word.MaxValue;
+      if(szone<>nil)then szone^:=word.MaxValue;
+   end
+   else
+   begin
+      if(pzone<>nil)then pzone^:=map_grid[cx,cy].tgc_parea;
+      if(szone<>nil)then szone^:=map_grid[cx,cy].tgc_sarea;
+   end;
+end;
+procedure map_GetZonesM(mx,my:integer;pzone,szone:pword);
+begin
+   map_GetZonesC(mx div MapCellW,my div MapCellW,pzone,szone);
+end;
+
+function map_GetSZoneC(cx,cy:integer):word;
+begin
+   map_GetZonesC(cx,cy,nil,@map_GetSZoneC);
+end;
+function map_GetSZoneM(mx,my:integer):word;
+begin
+   map_GetZonesM(mx,my,nil,@map_GetSZoneM);
+end;
+
+function map_IfObstacleZone(zone:word):boolean;
+begin
+   map_IfObstacleZone:=(zone=0);
 end;
 
 procedure map_ZonesClear;
@@ -301,8 +325,8 @@ procedure map_ZoneFillPart(x,y:integer;zone:word;pzone:boolean);
 begin
    if(x<0)
    or(y<0)
-   or(x>=MaxMapSizeCelln)
-   or(y>=MaxMapSizeCelln)then exit;
+   or(x>map_LastCell)
+   or(y>map_LastCell)then exit;
 
    with map_grid[x,y] do
    begin
@@ -320,8 +344,8 @@ begin
       end;
 
       if(pzone)then
-        if (tgc_teleportx<MaxMapSizeCelln)
-        and(tgc_teleporty<MaxMapSizeCelln)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone);
+        if (tgc_teleportx<=map_LastCell)
+        and(tgc_teleporty<=map_LastCell)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone);
    end;
 
    map_ZoneFillPart(x-1,y  ,zone,pzone);
@@ -334,8 +358,8 @@ procedure map_ZonesFill;
 var x,y:byte;
 begin
    map_ZonesClear;
-   for x:=0 to MaxMapSizeCelln-1 do
-   for y:=0 to MaxMapSizeCelln-1 do
+   for x:=0 to map_LastCell do
+   for y:=0 to map_LastCell do
    with map_grid[x,y] do
    if(tgc_solidlevel<mgsl_liquid)then
    begin
@@ -377,7 +401,7 @@ begin
 case players of
 true : for p:=0 to MaxPlayers do
        begin
-          mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,@mx,@my,0);
+          mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my);
           if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
           then map_IfHereObjectCell+=1;
        end;
@@ -388,7 +412,7 @@ false: for p:=1 to MaxCpoints do
             if(baser<0)
             then tr:=cpCaptureR//+MapCellhW
             else tr:=baser;
-            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,@mx,@my,0);
+            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my);
             if(point_dist_int(mx,my,cpx,cpy)<=tr)
             then map_IfHereObjectCell+=1;
          end;
@@ -462,7 +486,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCaptureR>0)then cpzone:=pf_get_area(cpx,cpy);
+     if(cpCaptureR>0)then cppzone:=map_GetSZoneM(cpx,cpy);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -533,6 +557,31 @@ begin
            end;
       end;
    end;
+end;
+
+procedure map_CPoints;
+begin
+   FillChar(g_cpoints,SizeOf(g_cpoints),0);
+
+   case g_mode of
+gm_KotH   : with g_cpoints[1] do
+            begin
+               cpx:=map_hsize;
+               cpy:=map_hsize;
+               cpCaptureR   :=base_1r;
+               cpCaptureTime:=fr_fps1*60;
+
+               {$IFDEF _FULLGAME}
+               cpmx:=round(cpx*map_mm_cx);
+               cpmy:=round(cpy*map_mm_cx);
+               cpmr:=round(cpCaptureR*map_mm_cx)+1;
+               {$ENDIF}
+            end;
+gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
+   end;
+
+   if(g_generators>1)then
+     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -693,30 +742,9 @@ gm_capture :begin
    end;
 end;
 
-procedure map_CPoints;
-begin
-   FillChar(g_cpoints,SizeOf(g_cpoints),0);
-
-   case g_mode of
-gm_KotH   : with g_cpoints[1] do
-            begin
-               cpx:=map_hsize;
-               cpy:=map_hsize;
-               cpCaptureR   :=base_1r;
-               cpCaptureTime:=fr_fps1*60;
-
-               {$IFDEF _FULLGAME}
-               cpmx:=round(cpx*map_mm_cx);
-               cpmy:=round(cpy*map_mm_cx);
-               cpmr:=round(cpCaptureR*map_mm_cx)+1;
-               {$ENDIF}
-            end;
-gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
-   end;
-
-   if(g_generators>1)then
-     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
-end;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  GRID CYCLE
 
 procedure map_GridCycleInit;
 begin
@@ -760,6 +788,10 @@ maps_lineR: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_La
    end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP GENERATOR BASE
+
 procedure map_Fill(tx,ty,tr:integer;value,skipFactor:byte;startsR:integer;replace:boolean);
 begin
    map_GridCycleInit;
@@ -785,6 +817,30 @@ begin
         end;
      end;
    until(not map_GridCycleNext)
+end;
+
+procedure map_RandomBaseVars;
+begin
+   g_random_i:= word(map_seed);
+   g_random_p:= byte(map_seed);
+end;
+
+procedure map_Vars;
+begin
+   map_size        := mm3i(MinMapSize,map_size,MaxMapSize);
+   map_RandomBaseVars;
+   map_BuildBorder1:= map_size-map_BuildBorder0;
+   map_hsize       := map_size div 2;
+   map_symmetryDir := map_GetSymmetryDir;
+   map_LastCell    := map_size div MapCellW;
+   map_CenterCell  := map_hsize div MapCellW;
+
+   {$IFDEF _FULLGAME}
+   map_mm_cx   := (vid_panelw-2)/map_size;
+   map_mm_CamW := trunc(vid_cam_w*map_mm_cx)+1;
+   map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
+   map_mm_gridW:= MapCellW*map_mm_cx;
+   {$ENDIF}
 end;
 
 procedure map_ReMake;

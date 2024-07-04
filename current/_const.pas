@@ -165,18 +165,6 @@ InvMaxWaves            = 20;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  PATH FIND SYSTEM
-//
-
-pf_pathmap_w           = 40;
-pf_pathmap_c           = (MaxMapSize div pf_pathmap_w)+1;
-
-pf_pathmap_hw          = pf_pathmap_w div 2;
-
-pf_solid               : word = 65535;
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  BASE STRINGS
 //
 
@@ -361,7 +349,7 @@ po_select_uid_set      = 4; // select uid
 po_select_uid_add      = 5; // select uid shift
 po_select_group_set    = 6; // select group
 po_select_group_add    = 7; // select group shift
-po_select_special_set  = 8; // select f2
+po_select_all_set      = 8; // select f2
 po_unit_order_set      = 9;
 po_unit_group_set      = 10;
 po_unit_group_add      = 11;
@@ -542,19 +530,18 @@ MaxUnitBuffs           = 15;
 ub_Pain                = 0;
 ub_Resurect            = 1;
 ub_Cast                = 2;
-ub_Slow                = 3;
-ub_CCast               = 4;
-ub_Invis               = 5;
-ub_Detect              = 6;
-ub_Invuln              = 7;
-ub_Summoned            = 8;
-ub_Teleport            = 9;
-ub_HVision             = 10;
-ub_Damaged             = 11;
-ub_Heal                = 12;
-ub_Scaned              = 13;
-ub_Decay               = 14;
-ub_ArchFire            = 15;
+ub_CCast               = 3;
+ub_Invis               = 4;
+ub_Detect              = 5;
+ub_Invuln              = 6;
+ub_Summoned            = 7;
+ub_Teleport            = 8;
+ub_HVision             = 9;
+ub_Damaged             = 10;
+ub_Heal                = 11;
+ub_Scaned              = 12;
+ub_Decay               = 13;
+ub_ArchFire            = 14;
 
 _ub_infinity           = NOTSET;
 b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
@@ -1004,6 +991,8 @@ fly_height             : array[false..true] of smallint = (1,fly_z);
 
 pain_time              = fr_fps1;
 
+unit_MaxSpeed          = MapCellhW-1;
+
 
 random_table           : array[byte] of byte = (
 //   0      1    2    3    4    5    6    7    8    9   10   11   12   13   14    15
@@ -1129,13 +1118,13 @@ max_CamSpeed           = 127;
 
 // neytral generators
 sd_liquid              = -32000;
-sd_tcraters            = MaxMapSize+sd_liquid;    //
+sd_tcraters            = MaxMapSize+sd_liquid;
 // doodads
-sd_rocks               = MaxMapSize+sd_tcraters;  // -16000
-sd_build               = MaxMapSize+sd_rocks;     //  0
-sd_ground              = MaxMapSize+sd_build;     //  8000
-sd_fly                 = MaxMapSize+sd_ground;    //  16000
-sd_marker              = MaxMapSize+sd_fly;       //  24000
+sd_rocks               = MaxMapSize+sd_tcraters;
+sd_build               = MaxMapSize+sd_rocks;
+sd_ground              = MaxMapSize+sd_build;
+sd_fly                 = MaxMapSize+sd_ground;
+sd_marker              = MaxMapSize+sd_fly;
 
 map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
@@ -1600,9 +1589,8 @@ SvRpLen                = 15;
 //
 
 MFogM                  = 64;
-fog_CellW              = 32;
+fog_CellW              = 36;
 fog_CellHW             = fog_CellW div 2;
-fog_CellR              = round(fog_CellHW*1.45);
 fog_vfwm               = (vid_maxw div fog_CellW)+2;
 fog_vfhm               = (vid_maxh div fog_CellW)+2;
 

@@ -143,6 +143,10 @@ u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
 
+debug_x0,
+debug_y0          : integer;
+
+
 map_grid_graph    : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;

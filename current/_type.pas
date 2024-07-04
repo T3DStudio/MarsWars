@@ -359,7 +359,7 @@ TUID = record
 
    _shcf        : single;
 
-   _ability_no_obstacles
+   _ability_rNoObstacles
                 : boolean;
    _ability,
    _ability_rupgr,
@@ -614,11 +614,14 @@ TUnit = record
    hits     : longint;
    vx,vy,
    x,y,
+   gridx,gridy,
    zfall,
    srange,
-   speed,dir,reload,vstp,
+   speed,dir,
+   reload,vstp,
    unum     : integer;
-   pfzone   : word;
+   pzone,
+   szone    : word;
 
    level,
    cycle_order,
@@ -720,7 +723,7 @@ TCTPoint = record
    cpTimerOwnerPlayer,
    cpOwnerPlayer,
    cpOwnerTeam  : byte;
-   cpzone       : word;
+   cppzone       : word;
    cpunitst_pstate,
    cpUnitsTeam,
    cpunitsp_pstate,

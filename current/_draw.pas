@@ -132,6 +132,10 @@ begin
    if(test_mode>1)then
    begin
 
+   {mgcell2NearestXY(mouse_map_x,mouse_map_y,debug_x0,debug_y0,debug_x0+MapCellW,debug_y0+MapCellW,MapCellhW,@n,@y);
+   circleColor(r_screen,mouse_x,mouse_y,MapCellhW,c_lime);
+   circleColor(r_screen,(n-vid_cam_x),(y-vid_cam_y),5,c_white);  }
+
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
@@ -142,13 +146,13 @@ begin
    //' r0: '+tc_green+i2s(debug_r0)+
    //' r1: '+tc_blue+i2s(debug_r1)+
 
-  // ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
+   ' '+tc_green+w2s(map_GetSZoneM(mouse_map_x,mouse_map_y))+tc_default+
    //' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    //' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
    //' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
    //' '+tc_gray+i2s(m_bx)+
    //' '+tc_gray+i2s(m_by)+
-   //' '+tc_lime+i2s(dist2mgcell(mouse_map_x,mouse_map_y,1,1))
+   //' '+tc_lime+i2s(dist2mgcellC(mouse_map_x,mouse_map_y,1,1))
    '',ta_right,255, c_white);
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-20,
