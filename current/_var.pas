@@ -68,13 +68,14 @@ map_size          : integer  = 0;
 map_hsize         : integer  = 0;
 map_LastCell      : integer  = 0;
 map_CenterCell    : integer  = 0;
-map_BuildBorder1  : integer  = 0;
 map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
 map_symmetryDir   : integer  = 0;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..MaxPlayers] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
+map_gridLastFpZone: word = 0;
+map_gridLastFsZone: word = 0;
 map_gridLastpZone : word = 0;
 map_gridLastsZone : word = 0;
 
@@ -145,6 +146,7 @@ u_royal_d         : integer;
 
 debug_x0,
 debug_y0          : integer;
+debug_zone        : word;
 
 
 map_grid_graph    : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
@@ -508,6 +510,18 @@ theme_tileset_crater      : TMWTileSet;
 theme_tileset_liquid      : array[0..theme_anim_step_n-1] of TMWTileSet;
 
 // CURRENT THEME SETTINGS
+
+// previous/current
+theme_last_crater_tes     : byte = 255;
+theme_last_liquid_tes     : byte = 255;
+theme_last_liquid_tas     : byte = 255;
+
+theme_last_tile_terrain_id: integer = integer.MinValue;
+theme_last_tile_crater_id : integer = integer.MinValue;
+theme_last_tile_liquid_id : integer = integer.MinValue;
+theme_last_tile_teleport_id: integer = integer.MinValue;
+
+// current/new
 theme_cur_crater_tes      : byte = tes_nature; // theme liquid edge style
 theme_cur_liquid_tes      : byte = tes_nature; // theme liquid edge style
 theme_cur_liquid_tas      : byte = tas_liquid; // theme liquid animation style

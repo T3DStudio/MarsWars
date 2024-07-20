@@ -409,28 +409,6 @@ begin
    end;
 end;
 
-procedure SetTerrainIDs(new_terrain,new_crater,new_liquid,new_teleport:integer);
-var t:integer;
-begin
-   if(theme_cur_terrain_n <=0)then theme_cur_tile_terrain_id :=-1 else begin if(new_terrain <0)then t:=abs(new_terrain ) mod theme_cur_terrain_n  else t:=min2i(theme_cur_terrain_n -1,new_terrain );theme_cur_tile_terrain_id :=theme_cur_terrain_l [t];end;
-   if(theme_cur_crater_n  <=0)then theme_cur_tile_crater_id  :=-1 else begin if(new_crater  <0)then t:=abs(new_crater  ) mod theme_cur_crater_n   else t:=min2i(theme_cur_crater_n  -1,new_crater  );theme_cur_tile_crater_id  :=theme_cur_crater_l  [t];end;
-   if(theme_cur_liquid_n  <=0)then theme_cur_tile_liquid_id  :=-1 else begin if(new_liquid  <0)then t:=abs(new_liquid  ) mod theme_cur_liquid_n   else t:=min2i(theme_cur_liquid_n  -1,new_liquid  );theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [t];end;
-   if(theme_cur_teleport_n<=0)then theme_cur_tile_teleport_id:=-1 else begin if(new_teleport<0)then t:=abs(new_teleport) mod theme_cur_teleport_n else t:=min2i(theme_cur_teleport_n-1,new_teleport);theme_cur_tile_teleport_id:=theme_cur_teleport_l[t];end;
-
-   if(theme_cur_tile_terrain_id>=0)then
-   begin
-      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
-   end
-   else
-   begin
-      theme_cur_liquid_mmcolor  :=c_white;
-      theme_cur_liquid_tas      :=tas_ice;
-      theme_cur_liquid_tasPeriod:=fr_fpsd2;
-   end;
-end;
-
 procedure SetTheme(new_theme:integer);
 begin
    if(new_theme<0)or(new_theme>=theme_n)then new_theme:=abs(new_theme) mod theme_n;

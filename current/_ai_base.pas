@@ -352,7 +352,7 @@ begin
    with pu^ do
    with uid^ do
      if(not ai_istransport)
-     or(not map_IfObstacleZone(azone))then
+     or(not map_IsObstacleZone(azone,false))then
        if(ai_BaseDestinationChecks(pu,azone))then
        begin
           if(aud<0)or(aud=NOTSET)
@@ -627,7 +627,7 @@ begin
             or(cpy>=map_size)then continue;
 
             if(ai_istransport)then
-              if(map_IfObstacleZone(cppzone))
+              if(map_IsObstacleZone(cppzone,false))
               or(cpOwnerTeam=team)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
@@ -817,7 +817,7 @@ begin
 
                // teleporter beacon
                if(tu^.aiu_alarm_d<base_1r)then
-                 if(not map_IfObstacleZone(tu^.pzone))then
+                 if(not map_IsObstacleZone(tu^.pzone,false))then
                    if(ai_teleporter_beacon_u=nil)
                    then ai_teleporter_beacon_u:=tu
                    else

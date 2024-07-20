@@ -1144,7 +1144,7 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
            SpecialMicro:=true;
         end
         else
-          if(map_IfObstacleZone(tar_z))then
+          if(map_IsObstacleZone(tar_z,false))then
           begin
              ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
              SpecialMicro:=true;
@@ -1234,8 +1234,8 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
         then SetNearestTarget(ai_abase_u,0,0,ai_abase_d,0,ai_abase_d>base_3r,false,2*byte((group=aio_home)or(group=aio_home_busy)))
         else SetNearestTarget(nil,ai_abase_u^.aiu_alarm_x,
                                   ai_abase_u^.aiu_alarm_y,
-                                  0,map_GetSZoneM(ai_abase_u^.aiu_alarm_x,
-                                                 ai_abase_u^.aiu_alarm_y),false,false,2);
+                                  0,map_GetZoneXY(ai_abase_u^.aiu_alarm_x,
+                                                  ai_abase_u^.aiu_alarm_y,false,true),false,false,2);
 
       if(ai_cpoint_d<NOTSET)then
         with ai_cpoint_cp^ do SetNearestTarget(nil,cpx,cpy,ai_cpoint_d,cppzone,ai_cpoint_d>base_3r,(ai_cpoint_d>base_3r)and(not ai_cpoint_koth),byte(ai_cpoint_koth or(g_mode=gm_capture)));
@@ -1365,7 +1365,7 @@ begin
                         if(aiu_FiledSquareNear<=ai_FiledSquareBorder)
                         //or(ai_builders_count>=3)
                         or(g_mode=gm_royale)then
-                          if(not map_IfObstacleZone(pzone))
+                          if(not map_IsObstacleZone(pzone,false))
                           or(ai_ExtBuildingUpgr)
                           then unit_sability(pu,false);
                end;
@@ -1485,7 +1485,7 @@ begin
       if(srange<ai_alarm_d)and(ai_alarm_d<NOTSET)then
         SetBlinkTarget(ai_alarm_x,ai_alarm_y,ai_alarm_d,ai_alarm_zone);
 
-      if(g_mode=gm_royale)then SetBlinkTarget(map_hsize,map_hsize,0,map_GetSZoneM(map_hsize,map_hsize));
+      if(g_mode=gm_royale)then SetBlinkTarget(map_hsize,map_hsize,0,map_GetZoneXY(map_hsize,map_hsize,false,true));
 
       if(bd=NOTSET)then exit;
 

@@ -132,6 +132,12 @@ begin
    if(test_mode>1)then
    begin
 
+      debug_x0:=mouse_map_x;
+      debug_y0:=mouse_map_y;
+      if(ks_ctrl>0)then
+        pushOut_GridUAction(@debug_x0,@debug_y0,10,debug_zone);
+      circleColor(r_screen,(debug_x0-vid_cam_x),(debug_y0-vid_cam_y),5,c_white);
+
    {mgcell2NearestXY(mouse_map_x,mouse_map_y,debug_x0,debug_y0,debug_x0+MapCellW,debug_y0+MapCellW,MapCellhW,@n,@y);
    circleColor(r_screen,mouse_x,mouse_y,MapCellhW,c_lime);
    circleColor(r_screen,(n-vid_cam_x),(y-vid_cam_y),5,c_white);  }
@@ -146,7 +152,7 @@ begin
    //' r0: '+tc_green+i2s(debug_r0)+
    //' r1: '+tc_blue+i2s(debug_r1)+
 
-   ' '+tc_green+w2s(map_GetSZoneM(mouse_map_x,mouse_map_y))+tc_default+
+   ' '+tc_green+w2s(map_GetZoneXY(mouse_map_x,mouse_map_y,false,true))+tc_default+
    //' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    //' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
    //' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+

@@ -6,8 +6,8 @@ theme,
 terrain,
 crater,
 liquid,
-teleport:integer;
-mseed   :cardinal;
+teleport: integer;
+mseed   : cardinal;
 function Pick(n:integer):integer;
 var c:cardinal;
 begin
@@ -22,6 +22,17 @@ begin
    end;
 end;
 begin
+   // default
+   theme_cur_tile_terrain_id :=-1;
+   theme_cur_tile_crater_id  :=-1;
+   theme_cur_tile_liquid_id  :=-1;
+   theme_cur_tile_teleport_id:=-1;
+
+   theme_cur_liquid_mmcolor  :=c_white;
+   theme_cur_liquid_tas      :=tas_ice;
+   theme_cur_liquid_tasPeriod:=fr_fpsd2;
+
+   // theme
    mseed  :=map_seed;
    theme  :=Pick(theme_n);
    SetTheme(theme);
@@ -30,7 +41,18 @@ begin
    crater  :=Pick(theme_cur_crater_n  );
    liquid  :=Pick(theme_cur_liquid_n  );
    teleport:=Pick(theme_cur_teleport_n);
-   SetTerrainIDs(-terrain,-crater,-liquid,-teleport);
+
+   if(terrain >=0)then theme_cur_tile_terrain_id :=theme_cur_terrain_l [terrain ];
+   if(crater  >=0)then theme_cur_tile_crater_id  :=theme_cur_crater_l  [crater  ];
+   if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
+   if(teleport>=0)then theme_cur_tile_teleport_id:=theme_cur_teleport_l[teleport];
+
+   if(theme_cur_tile_terrain_id>=0)then
+   begin
+      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
+   end
 end;
 
 procedure map_MakeVisGrid;
@@ -61,10 +83,10 @@ begin
          tgca_decorN    :=N;
          tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
          tgca_decorA    :=@theme_anm_decors [tgca_decorN];
-         tgca_decorDepth:=depth+my;
+         tgca_decorDepth:=depth+my+ay;
          tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
          tgca_decorX    :=mx+ax;
-         tgca_decorY    :=my+ax;
+         tgca_decorY    :=my+ay;
       end;
    end;
 end;
@@ -77,8 +99,8 @@ begin
       with tgca_decal_l[tgca_decal_n-1] do
       begin
          tgca_decalS:=@theme_all_decal_l[N];
-         tgca_decalX:=max2i(0,random(MapCellW-tgca_decalS^.w));
-         tgca_decalY:=max2i(0,random(MapCellW-tgca_decalS^.h));
+         tgca_decalX:=random(max2i(0,MapCellW-tgca_decalS^.w));
+         tgca_decalY:=random(max2i(0,MapCellW-tgca_decalS^.h));
       end;
    end;
 end;
@@ -87,9 +109,9 @@ begin
    with map_grid_graph[x,y] do
    if(tgca_decor_n>=0)and(theme_cur_decal_n>0)then
    begin
-      i:=abs((x+1)*(y+1)) mod 12;
-      if(i<=3)then
-        while(i>0)do
+      i:=abs((x+1)*(y+1)+tgca_decal_n) mod 10;
+      if(i=0)then
+        while(i>=0)do
         begin
            SetDecal(theme_cur_decal_l[abs((x+1)*(y+1)+i) mod theme_cur_decal_n]);
            i-=1;
@@ -142,7 +164,7 @@ mgsl_liquid : begin
 mgsl_rocks  : begin
                  tgca_tile_crater:=0;
 
-                 if(theme_cur_2rock_n>0)then
+                 if(theme_cur_2rock_n>0)and(tgca_decor_n=0)then
                    if ((x+1)<MaxMapSizeCelln)
                    and((y+1)<MaxMapSizeCelln)then
                      if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
@@ -264,7 +286,7 @@ begin
    with map_grid[x,y] do
    begin
       tgc_teleportx:=255;
-      tgc_teleportx:=255;
+      tgc_teleporty:=255;
    end;
 end;
 
@@ -272,7 +294,7 @@ end;
 //
 //  MAP ZONES
 
-procedure map_GetZonesC(cx,cy:integer;pzone,szone:pword);
+procedure map_GetZonesXYCell(cx,cy:integer;pzone,szone:pword);
 begin
    if(cx<0)
    or(cy<0)
@@ -288,30 +310,42 @@ begin
       if(szone<>nil)then szone^:=map_grid[cx,cy].tgc_sarea;
    end;
 end;
-procedure map_GetZonesM(mx,my:integer;pzone,szone:pword);
+procedure map_GetZonesXYMap(mx,my:integer;pzone,szone:pword);
 begin
-   map_GetZonesC(mx div MapCellW,my div MapCellW,pzone,szone);
+   map_GetZonesXYCell(mx div MapCellW,my div MapCellW,pzone,szone);
 end;
 
-function map_GetSZoneC(cx,cy:integer):word;
+function map_GetZoneXY(x,y:integer;pZone,mapXY:boolean):word;
 begin
-   map_GetZonesC(cx,cy,nil,@map_GetSZoneC);
+   case mapXY of
+   true : case pZone of
+          true : map_GetZonesXYMap (x,y,@map_GetZoneXY,nil           );
+          false: map_GetZonesXYMap (x,y,nil           ,@map_GetZoneXY);
+          end;
+   false: case pZone of
+          true : map_GetZonesXYCell(x,y,@map_GetZoneXY,nil           );
+          false: map_GetZonesXYCell(x,y,nil           ,@map_GetZoneXY);
+          end;
+   end;
 end;
-function map_GetSZoneM(mx,my:integer):word;
+function map_IsObstacleZone(zone:word;pZone:boolean):boolean;
 begin
-   map_GetZonesM(mx,my,nil,@map_GetSZoneM);
-end;
-
-function map_IfObstacleZone(zone:word):boolean;
-begin
-   map_IfObstacleZone:=(zone=0);
+   if(zone=0)
+   then map_IsObstacleZone:=true
+   else
+     case pZone of
+     true : map_IsObstacleZone:=(zone>map_gridLastFpZone);
+     false: map_IsObstacleZone:=(zone>map_gridLastFsZone);
+     end;
 end;
 
 procedure map_ZonesClear;
 var x,y:byte;
 begin
-   map_gridLastpZone:=0;
-   map_gridLastsZone:=0;
+   map_gridLastpZone :=0;
+   map_gridLastsZone :=0;
+   map_gridLastFpZone:=map_gridLastpZone;
+   map_gridLastFsZone:=map_gridLastsZone;
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
    with map_grid[x,y] do
@@ -321,7 +355,7 @@ begin
    end;
 end;
 
-procedure map_ZoneFillPart(x,y:integer;zone:word;pzone:boolean);
+procedure map_ZoneFillPart(x,y:integer;zone:word;pzone,obstacleZones:boolean);
 begin
    if(x<0)
    or(y<0)
@@ -330,7 +364,10 @@ begin
 
    with map_grid[x,y] do
    begin
-      if(tgc_solidlevel>=mgsl_liquid)then exit;
+      case obstacleZones of
+      false: if(tgc_solidlevel>=mgsl_liquid)then exit;
+      true : if(tgc_solidlevel< mgsl_liquid)then exit;
+      end;
 
       if(pzone)then
       begin
@@ -345,40 +382,56 @@ begin
 
       if(pzone)then
         if (tgc_teleportx<=map_LastCell)
-        and(tgc_teleporty<=map_LastCell)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone);
+        and(tgc_teleporty<=map_LastCell)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone,obstacleZones);
    end;
 
-   map_ZoneFillPart(x-1,y  ,zone,pzone);
-   map_ZoneFillPart(x+1,y  ,zone,pzone);
-   map_ZoneFillPart(x  ,y-1,zone,pzone);
-   map_ZoneFillPart(x  ,y+1,zone,pzone);
+   map_ZoneFillPart(x-1,y  ,zone,pzone,obstacleZones);
+   map_ZoneFillPart(x+1,y  ,zone,pzone,obstacleZones);
+   map_ZoneFillPart(x  ,y-1,zone,pzone,obstacleZones);
+   map_ZoneFillPart(x  ,y+1,zone,pzone,obstacleZones);
 end;
 
 procedure map_ZonesFill;
+procedure ZonesFillProc(obstacleZones:boolean);
 var x,y:byte;
 begin
-   map_ZonesClear;
    for x:=0 to map_LastCell do
    for y:=0 to map_LastCell do
    with map_grid[x,y] do
-   if(tgc_solidlevel<mgsl_liquid)then
    begin
+      case obstacleZones of
+      false: if(tgc_solidlevel>=mgsl_liquid)then continue;
+      true : if(tgc_solidlevel< mgsl_liquid)then continue;
+      end;
+
       if(tgc_parea=0)then
       begin
          map_gridLastpZone+=1;
-         map_ZoneFillPart(x,y,map_gridLastpZone,true );
+         map_ZoneFillPart(x,y,map_gridLastpZone,true ,obstacleZones);
       end;
       if(tgc_sarea=0)then
       begin
          map_gridLastsZone+=1;
-         map_ZoneFillPart(x,y,map_gridLastsZone,false);
+         map_ZoneFillPart(x,y,map_gridLastsZone,false,obstacleZones);
       end;
    end;
+end;
+begin
+   map_ZonesClear;
+   ZonesFillProc(false);
+   map_gridLastFpZone:=map_gridLastpZone;
+   map_gridLastFsZone:=map_gridLastsZone;
+   ZonesFillProc(true );
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  CHECKS
+
+function map_InGridRange(a:integer):boolean;
+begin
+   map_InGridRange:=(0<=a)and(a<=map_LastCell); //MaxMapSizeCelln
+end;
 
 function CheckMapBorders(x,y,aborder:integer):boolean;
 begin
@@ -401,7 +454,7 @@ begin
 case players of
 true : for p:=0 to MaxPlayers do
        begin
-          mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my);
+          mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
           if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
           then map_IfHereObjectCell+=1;
        end;
@@ -412,7 +465,7 @@ false: for p:=1 to MaxCpoints do
             if(baser<0)
             then tr:=cpCaptureR//+MapCellhW
             else tr:=baser;
-            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my);
+            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
             if(point_dist_int(mx,my,cpx,cpy)<=tr)
             then map_IfHereObjectCell+=1;
          end;
@@ -486,7 +539,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCaptureR>0)then cppzone:=map_GetSZoneM(cpx,cpy);
+     if(cpCaptureR>0)then cppzone:=map_GetZoneXY(cpx,cpy,false,true);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -829,7 +882,6 @@ procedure map_Vars;
 begin
    map_size        := mm3i(MinMapSize,map_size,MaxMapSize);
    map_RandomBaseVars;
-   map_BuildBorder1:= map_size-map_BuildBorder0;
    map_hsize       := map_size div 2;
    map_symmetryDir := map_GetSymmetryDir;
    map_LastCell    := map_size div MapCellW;
@@ -913,7 +965,7 @@ begin
 
    map_size    :=MinMapSize+round(random(MaxMapSize-MinMapSize)/StepMapSize)*StepMapSize;
    map_type    :=random(gms_m_types+1);
-   map_symmetry:=random(gms_m_symm+1);
+   map_symmetry:=random(gms_m_symm +1);
 end;
 
 procedure Map_premap;

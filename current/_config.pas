@@ -103,7 +103,7 @@ begin
       if(snd_mvolume1<0)then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
       vid_CamSpeed:=mm3i(1,vid_CamSpeed,max_CamSpeed);
 
-      PlayerName:=ValidateStr(PlayerName,NameLen,@k_kbstr);
+      PlayerName:=ValidateStr(PlayerName,PlayerNameLen,@k_kbstr);
       if(length(PlayerName)=0)then PlayerName:=str_defaultPlayerName;
 
       vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);

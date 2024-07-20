@@ -17,6 +17,8 @@ PTSob       = ^TSob;
 
 {$IFDEF _FULLGAME}
 
+ppSDL_Surface = ^pSDL_Surface;
+
 string6     = string[6];
 
 TServerInfo = record
@@ -665,7 +667,7 @@ TUnit = record
    vsni,
    vsnt     : TUnitVisionData;
 
-   StayWaitForNextTarget:byte;
+   WaitForNextTarget:byte;
    ukfly,
    isbuildarea,
    ukfloater,

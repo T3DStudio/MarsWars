@@ -462,7 +462,7 @@ nmid_lobbby_FixStarts   : if(g_preset_cur=0)then
                              g_fixed_positions:=NewVal>0;
                              map_premap;
                           end;
-nmid_lobbby_DeadPbserver: begin
+nmid_lobbby_DeadPObs: begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_deadobservers:=NewVal>0;
@@ -877,11 +877,11 @@ po_unit_group_add    : if(isselected)then
 // unit orders
 po_unit_order_set    : if(isselected)then
                          case o_a0 of
-                       uo_move      : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_move  );
-                       uo_attack    : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_attack);
-                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_move  );
-                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_attack);
-                       uo_hold      : unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_hold  );
+                       uo_move      : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_move  ,true );
+                       uo_attack    : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_attack,true );
+                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_move  ,true );
+                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_attack,true );
+                       uo_hold      : unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_hold  ,false);
                        uo_destroy   : begin unit_kill(pu,false,false,true,false,true);pselected:=isselected;end;
                        uo_sability  : if(ua_id<>ua_psability)then
                                         if(unit_sability (pu,false))then ClearErrors:=true;
@@ -899,7 +899,7 @@ po_unit_order_set    : if(isselected)then
                        uo_rebuild   : if(unit_rebuild(pu,false))then ClearErrors:=true;
                          else
                      //uo_stay      : default
-                                      unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack);
+                                      unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack,false);
                          end;
 po_prod_stop         : if(isselected)then
                        begin

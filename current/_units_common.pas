@@ -168,10 +168,75 @@ end;
 
 {$ENDIF}
 
-procedure unit_SetOrder(pu:PTUnit;otarget,ox,oy,obx,oby:integer;oid:byte);
+procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;apzone:word);
+var
+gr,gx,gy,
+cx,cy,
+rd,rx,ry,
+i,u,outc:integer;
+procedure AddResult(x,y:integer);
+var mx,my,d:integer;
+begin
+   if(map_GetZoneXY(x,y,true,false)<>apzone)then exit;
+   mx:=x*MapCellW+MapCellhW;
+   my:=y*MapCellW+MapCellhW;
+   d:=abs(cx-mx)+abs(cy-my);
+   if(d<rd)then
+   begin
+      rx:=x;
+      ry:=y;
+      rd:=d;
+   end;
+end;
+begin
+   cx:=apx^;
+   cy:=apy^;
+   gx:=cx div MapCellW;
+   gy:=cy div MapCellW;
+   rd:=NOTSET;
+   gr:=0;
+   while(rd=NOTSET)do
+   begin
+      if(gr=0)then
+      begin
+         if(map_GetZoneXY(gx,gy,true,false)=apzone)then
+         begin
+            rx:=gx;
+            ry:=gy;
+            rd:=0;
+            break;
+         end;
+      end
+      else
+      begin
+         outc:=0;
+
+         u:=gy-gr;if(map_InGridRange(u))then begin outc+=1;for i:=max2i(gx-gr  ,0) to min2i(gx+gr  ,map_LastCell) do AddResult(i,u);end;
+         u:=gy+gr;if(map_InGridRange(u))then begin outc+=1;for i:=max2i(gx-gr  ,0) to min2i(gx+gr  ,map_LastCell) do AddResult(i,u);end;
+         u:=gx-gr;if(map_InGridRange(u))then begin outc+=1;for i:=max2i(gy-gr+1,0) to min2i(gy+gr-1,map_LastCell) do AddResult(u,i);end;
+         u:=gx+gr;if(map_InGridRange(u))then begin outc+=1;for i:=max2i(gy-gr+1,0) to min2i(gy+gr-1,map_LastCell) do AddResult(u,i);end;
+
+         if(outc=0)then break;
+      end;
+      gr+=1;
+   end;
+
+   if(rd<NOTSET)then
+   begin
+      gx:=rx*MapCellW;
+      gy:=ry*MapCellW;
+      mgcell2NearestXY(cx,cy,gx+r,gy+r,gx+MapCellW-r,gy+MapCellW-r,0,@rx,@ry,nil);
+      apx^:=rx;
+      apy^:=ry;
+   end;
+end;
+
+procedure unit_SetOrder(pu:PTUnit;otarget,ox,oy,obx,oby:integer;oid:byte;tryPushOut:boolean);
 begin
    with pu^ do
    begin
+      if(tryPushOut)then
+        if(not ukfly)and(not ukfloater)then pushOut_GridUAction(@ox,@oy,uid^._r+1,pzone);
       ua_bx :=obx;
       ua_by :=oby;
       ua_x  :=ox;
@@ -208,15 +273,15 @@ procedure unit_ClientUO2UA(pu:PTUnit;uo_order:byte);
 begin
    with pu^ do
      case uo_order of
-     uo_move     : unit_SetOrder(pu,0,x,y,-1,-1,ua_move     );
+     uo_move     : unit_SetOrder(pu,0,x,y,-1,-1,ua_move     ,false);
      uo_stay,
-     uo_attack   : unit_SetOrder(pu,0,x,y,-1,-1,ua_attack   );
-     uo_hold     : unit_SetOrder(pu,0,x,y,-1,-1,ua_hold     );
-     uo_psability: unit_SetOrder(pu,0,x,y,-1,-1,ua_psability);
-     uo_unload   : unit_SetOrder(pu,0,x,y,-1,-1,ua_unload   );
-     uo_patrol   : unit_SetOrder(pu,0,x,y, x, y,ua_move     );
-     uo_apatrol  : unit_SetOrder(pu,0,x,y, x, y,ua_attack   );
-     else          unit_SetOrder(pu,0,x,y,-1,-1,ua_attack   );
+     uo_attack   : unit_SetOrder(pu,0,x,y,-1,-1,ua_attack   ,false);
+     uo_hold     : unit_SetOrder(pu,0,x,y,-1,-1,ua_hold     ,false);
+     uo_psability: unit_SetOrder(pu,0,x,y,-1,-1,ua_psability,false);
+     uo_unload   : unit_SetOrder(pu,0,x,y,-1,-1,ua_unload   ,false);
+     uo_patrol   : unit_SetOrder(pu,0,x,y, x, y,ua_move     ,false);
+     uo_apatrol  : unit_SetOrder(pu,0,x,y, x, y,ua_attack   ,false);
+     else          unit_SetOrder(pu,0,x,y,-1,-1,ua_attack   ,false);
      end;
 end;
 
@@ -232,8 +297,7 @@ begin
 
        if(speed<=0)
        or(hits<=0)
-       or(not iscomplete)
-       or(StayWaitForNextTarget>0)then exit;
+       or(not iscomplete)then exit;
 
        if(a_reload>0)then
         if(a_weap_cl>MaxUnitWeapons)
@@ -278,7 +342,7 @@ begin
                     end;
                  end;
    atm_sturret : if(transportC<=0)then exit;
-   atm_inapc   : if(not IsUnitRange(transport,nil))then exit;
+   atm_intransport   : if(not IsUnitRange(transport,nil))then exit;
       else exit;
       end;
    end;
@@ -291,7 +355,7 @@ begin
    begin
       gridx:=x div MapCellW;
       gridy:=y div MapCellW;
-      if(updateZone)then map_GetZonesC(gridx,gridy,@pzone,@szone);
+      if(updateZone)then map_GetZonesXYCell(gridx,gridy,@pzone,@szone);
 
       {$IFDEF _FULLGAME}
       unit_UpdateMiniMapXY(pu);
@@ -640,9 +704,7 @@ begin
          and(0<=gy)and(gy<=map_LastCell)then
            if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
 
-         mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@u,@o);
-         d:=point_dist_int(tx,ty,u,o);
-
+         mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@u,@o,@d);
          if(d<tr)then add(gmx,gmy,MapCellW,MapCellW,d);
       end;
 
@@ -664,7 +726,7 @@ begin
         with ptars[u] do
           if(c<>NOTSET)then
           begin
-             mgcell2NearestXY(tx,ty,x,y,x+a,y+b,tr,@gmx,@gmy);
+             mgcell2NearestXY(tx,ty,x,y,x+a,y+b,tr,@gmx,@gmy,nil);
              tx:=gmx;
              ty:=gmy;
           end;
@@ -677,13 +739,14 @@ end;
 procedure BuildingNewPlace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
 var
 aukfly  :boolean;
-dx,dy,o,
+dx,dy,o,tr,
 u,sr,dr :integer;
 begin
    with g_uids[buid] do
    begin
       aukfly:=_ukfly;
-      pushOut_all(tx,ty,_r+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+      tr:=_r;
+      pushOut_all(tx,ty,tr+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
    end;
 
    dx:=-2000;
@@ -713,8 +776,11 @@ begin
       if(0<=dr)then pushIn_1r(@tx,@ty,dx,dy,sr-1);
    end;
 
-   tx:=mm3i(map_BuildBorder0,tx,map_BuildBorder1);
-   ty:=mm3i(map_BuildBorder0,ty,map_BuildBorder1);
+   if((tx-tr)<=0       )then tx:=tr+1;
+   if((ty-tr)<=0       )then ty:=tr+1;
+   if((tx+tr)>=map_size)then tx:=map_size-tr-1;
+   if((ty+tr)>=map_size)then ty:=map_size-tr-1;
+
    newx^:=tx;
    newy^:=ty;
 end;
@@ -724,11 +790,20 @@ var u,gx,gy,gx0,gy0,gx1,gy1:integer;
 begin
    CheckCollisionR:=0;
 
+   if((tx-tr)<=0       )
+   or((ty-tr)<=0       )
+   or((tx+tr)>=map_size)
+   or((tx+tr)>=map_size)then
+   begin
+      CheckCollisionR:=5;
+      exit;
+   end;
+
    for u:=1 to MaxUnits do
     if(u<>skipunit)then
      with g_punits[u]^ do
       with uid^ do
-       if(hits>0)and(ukfly=flylevel)and(IsUnitRange(transport,nil)=false)then
+       if(hits>0)and(ukfly=flylevel)and(not IsUnitRange(transport,nil))then
         if(speed<=0)or(not iscomplete)then
          if(point_dist_int(x,y,tx,ty)<(tr+_r))then
          begin
@@ -791,13 +866,6 @@ begin
         exit;
      end;
 
-   if(tx<map_BuildBorder0)or(map_BuildBorder1<tx)
-   or(ty<map_BuildBorder0)or(map_BuildBorder1<ty)then
-   begin
-      CheckBuildArea:=2;  // out of bounds
-      exit;
-   end;
-
    for u:=1 to MaxCPoints do
     with g_cpoints[u] do
      if(cpCaptureR>0)and(cpNoBuildR>0)then
@@ -811,7 +879,7 @@ begin
 
    CheckBuildArea:=2;
 
-   tszone:=map_GetSZoneM(tx,ty);
+   tszone:=map_GetZoneXY(tx,ty,false,true);
 
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
@@ -838,6 +906,7 @@ begin
    2 :  m_brushc:=c_blue;
    else m_brushc:=c_gray;
    }
+
    obstacles:=true;
    if(playern<=MaxPlayers)then
    begin
@@ -846,9 +915,8 @@ begin
           obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
 
       if(obstacles)and(g_players[playern].state=ps_comp)then
-        if(map_IfObstacleZone(map_GetSZoneM(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
+        if(map_IsObstacleZone(map_GetZoneXY(tx,ty,false,true),false))then begin CheckBuildPlace:=2;exit;end;
    end;
-
 
    i:=CheckBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
@@ -893,7 +961,6 @@ begin
       end;
 end;
 
-
 function unit_ability_HellSBlink(pCaster:PTUnit;blink_x,blink_y:integer;Check:boolean):boolean;
 var obstacles:boolean;
 begin
@@ -935,9 +1002,12 @@ begin
      or(ukfly)
      or(hits<=0)
      or(buff[ub_Teleport]>0)
-     or(pCaster^.playeri<>playeri)
-     or(not pCaster^.iscomplete)
-     or(pCaster^.hits<=0)
+     then exit;
+
+   with pCaster^ do
+     if(playeri<>playeri)
+     or(not iscomplete)
+     or(hits<=0)
      then exit;
 
     with pCaster^  do
@@ -981,7 +1051,7 @@ begin
               if(pTeleportMarker^.hits<=0)then exit;
 
               if(ukfly=uf_ground)then
-                if(map_IfObstacleZone(pTeleportMarker^.szone))then exit;
+                if(map_IsObstacleZone(pTeleportMarker^.szone,false))then exit;
               pTeleporter^.ua_x:=pTeleportMarker^.x;
               pTeleporter^.ua_y:=pTeleportMarker^.y;
 
@@ -1219,7 +1289,7 @@ begin
             mv_y    := y;
             gridx   := x div MapCellW;
             gridy   := y div MapCellW;
-            map_GetZonesC(gridx,gridy,@pzone,@szone);
+            map_GetZonesXYCell(gridx,gridy,@pzone,@szone);
             isselected:= false;
             transportC:= 0;
 
@@ -1897,7 +1967,7 @@ begin
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
-uab_CCFly         : if(level>0)then
+uab_CCFly         : {if(level>0)then
                     begin
                        if(ukfly<>uf_fly)then
                        begin
@@ -1930,7 +2000,7 @@ uab_CCFly         : if(level>0)then
                             level:=1;
                             buff[ub_CCast]:=fr_fps2;
                          end;
-                    end;
+                    end};
       end;
 
       // DETECTION
@@ -1960,13 +2030,13 @@ UID_LostSoul      : begin
                     end;
 UID_UACDron       : begin
                     ukfloater:=upgr[upgr_uac_soaring]>0;
-                    {if(map_IfObstacleZone(szone))and(ukfloater)
+                    {if(map_IsObstacleZone(szone))and(ukfloater)
                     then begin if(speed= _speed)then speed:=_speed div 2;end
                     else begin if(speed<>_speed)then speed:=_speed;      end;  }
                     end;
 UID_Demon         : begin
                     ukfloater:=upgr[upgr_hell_ghostm]>0;
-                    {if(map_IfObstacleZone(szone))and(ukfloater)
+                    {if(map_IsObstacleZone(szone))and(ukfloater)
                     then begin if(speed= _speed)then speed:=_speed div 2;{$IFDEF _FULLGAME}if(animw =_animw)then animw:=_animw div 2;{$ENDIF}end
                     else begin if(speed<>_speed)then speed:=_speed;      {$IFDEF _FULLGAME}if(animw<>_animw)then animw:=_animw;      {$ENDIF}end; }
                     end;

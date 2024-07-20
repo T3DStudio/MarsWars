@@ -131,11 +131,6 @@ begin
          ly+cpy-vid_cam_y,
          cpNoBuildR,c_blue);
 
-      // map build rect
-      rectangleColor(tar,
-      lx+map_BuildBorder0-vid_cam_x,ly+map_BuildBorder0-vid_cam_y,
-      lx+map_BuildBorder1-vid_cam_x,ly+map_BuildBorder1-vid_cam_y,
-      c_white);
    end;
 mb_psability:
    for i:=0 to 255 do

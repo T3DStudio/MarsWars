@@ -60,8 +60,8 @@ ps_AI_1                = 6;  // very easy
 ps_AI_2                = 7;  // easy
 ps_AI_3                = 8;  // medium
 ps_AI_4                = 9;  // hard
-ps_AI_5                = 10;  // harder
-ps_AI_6                = 11;  // very hard
+ps_AI_5                = 10; // harder
+ps_AI_6                = 11; // very hard
 ps_AI_7                = 12; // elite
 ps_AI_8                = 13; // Cheater 1 (Vision)
 ps_AI_9                = 14; // Cheater 2 (Vision+MultiProd)
@@ -119,7 +119,7 @@ MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayers*2;
+MaxCPoints             = MaxPlayers*2+(MaxPlayers div 2);
 
 MapCellW               = 86;
 MapCellhW              = MapCellW div 2;
@@ -130,8 +130,6 @@ MaxMapSizeCelln        = 92;
 MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
 MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
 StepMapSize            =  MapCellW*MapSizeCellnStep;
-
-map_BuildBorder0       = 5;
 
 mgsl_free              = 0;
 mgsl_nobuild           = 1;
@@ -295,7 +293,7 @@ nmid_lobbby_gamemode   = 26;
 nmid_lobbby_builders   = 27;
 nmid_lobbby_generators = 28;
 nmid_lobbby_FixStarts  = 29;
-nmid_lobbby_DeadPbserver=30;
+nmid_lobbby_DeadPObs   = 30;
 nmid_lobbby_EmptySlots = 31;
 nmid_surrender         = 32;
 nmid_start             = 33;
@@ -364,7 +362,6 @@ po_prod_stop           = 16;
 //  UNIT ACTIONS
 //
 
-
 uo_nothing             = 0;
 uo_move                = 1;
 uo_attack              = 2;
@@ -384,24 +381,16 @@ ua_move                = 2;
 ua_unload              = 3;
 ua_psability           = 4;
 
-{ua_move                = 1;
-ua_hold                = 2;
-ua_amove               = 3;
-ua_unload              = 4;
-ua_psability           = 5;
-
-ua_patrol              = 6; // only for client data transfer    }
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Conditionals for attack
 //
 
 atm_none               = 0;   // cant attack
-atm_always             = 1;   // can attack
-atm_bunker             = 2;   // can attack, units inside can attack too
+atm_always             = 1;   // can attack always
+atm_bunker             = 2;   // can attack always, units inside can attack too
 atm_sturret            = 3;   // can attack when somebody inside
-atm_inapc              = 4;   // can attack only when in apc
+atm_intransport        = 4;   // can attack only when in transport
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -421,7 +410,7 @@ aw_fsr0                = 15000;
 aw_srange              =  0;            // attack range = sight range
 aw_fsr                 =  aw_fsr0+7500; // attack range = sight range + (x-aw_fsr)
 aw_dmelee              = -8;            // default melee range
-aw_hmelee              = -64;           // default heal/reapir melee range
+aw_hmelee              = -75;           // default heal/reapir melee range
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -499,6 +488,29 @@ wtp_max_hits           = 20;
 wtp_limit              = 21;
 wtp_limitaround        = 22;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Weapon: damage modificator
+//
+
+MaxDamageModFactors    = 1;  // 0..1
+
+dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
+dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
+dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
+dm_AntiUnitBio         = 4 ; // 1.5*[unit bio]       0.5*[buildings]
+dm_AntiUnitMech        = 5 ; // 1.5*[unit mech]
+dm_AntiUnitLight       = 6 ; // 1.5*[unit light]
+dm_AntiFly             = 7 ; // 1.5*[fly]
+dm_AntiHeavy           = 8 ; // 1.5*[heavy]
+dm_AntiLight           = 9 ; // 1.5*[light]
+dm_AntiBuildingLight   = 10; // 1.5*[buildings light]
+dm_Cyber               = 11; //   3*[buildings]      0.5*[light]
+dm_Siege               = 12; //   3*[buildings]
+dm_Blizzard            = 13; //   5*[buildings]      0.5*[light]
+dm_Lost                = 14; //                      0.5*[mech ]
+dm_BFG                 = 15; // limituse*
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -553,6 +565,7 @@ b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
 //  MAP OTHER
 //
 
+// map template types
 mapt_steppe            = 0;
 mapt_canyon            = 1;
 mapt_clake             = 2;
@@ -561,6 +574,7 @@ mapt_island            = 4;
 mapt_shore             = 5;
 mapt_sea               = 6;
 
+// map symmetry types
 maps_none              = 0;
 maps_point             = 1;
 maps_lineV             = 2;
@@ -636,7 +650,7 @@ upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
 
-// BASIC RACE UPGRADES                                 HELL                UAC
+// BASIC RACE UPGRADES                                      HELL                UAC
 upgr_race_armor_bio         : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
 upgr_race_armor_mech        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
 upgr_race_armor_build       : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
@@ -692,26 +706,6 @@ MaxUnitWeapons         = 3;  //0-3
 MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
 
-// damage modificator
-
-MaxDamageModFactors    = 1;
-
-dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
-dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
-dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
-dm_AntiUnitBio         = 4 ; // 1.5*[unit bio]       0.5*[buildings]
-dm_AntiUnitMech        = 5 ; // 1.5*[unit mech]
-dm_AntiUnitLight       = 6 ; // 1.5*[unit light]
-dm_AntiFly             = 7 ; // 1.5*[fly]
-dm_AntiHeavy           = 8 ; // 1.5*[heavy]
-dm_AntiLight           = 9 ; // 1.5*[light]
-dm_AntiBuildingLight   = 10; // 1.5*[buildings light]
-dm_Cyber               = 11; //   3*[buildings]      0.5*[light]
-dm_Siege               = 12; //   3*[buildings]
-dm_Blizzard            = 13; //   5*[buildings]      0.5*[light]
-dm_Lost                = 14; //                      0.5*[mech ]
-dm_BFG                 = 15; // limituse*
-
 // LIMIT
 ul1                    = MinUnitLimit;
 ul1hh                  = MinUnitLimit+(MinUnitLimit div 4);
@@ -731,7 +725,7 @@ ul100                  = MinUnitLimit*100;
 ul110                  = MinUnitLimit*110;
 
 // production time
-ptime1                 = 24;
+ptime1                 = 28;
 ptimeh                 = ptime1  div 2;
 ptime2h                = ptimeh  div 2;
 ptime4h                = ptime2h div 2;
@@ -746,7 +740,7 @@ ptime6                 = ptime1*6;
 uf_ground              = false;
 uf_fly                 = true;
 
-MaxUnitGroups          = 10;
+MaxUnitGroups          = 10;  //0..10, 0 - no group, 1-9 - user groups, 10 - f2 group
 
 mvxy_none              = 0;
 mvxy_relative          = 1;
@@ -778,7 +772,7 @@ BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamage1 div 10;
 
-ExpLevel1              = fr_fps1*30;
+ExpLevel1              = fr_fps1*ptime1;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -894,7 +888,7 @@ uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep   ,UID_UAComm
 //
 //  UNIT ABILITIES
 //
-
+                    // = 0 - no ability
 uab_Teleport           = 1;
 uab_UACScan            = 2;
 uab_HTowerBlink        = 3;
@@ -906,12 +900,15 @@ uab_SpawnLost          = 8;
 uab_HellVision         = 9;
 uab_CCFly              = 10;
 
+// write unit reload data if ability in
 client_rld_abils       = [
                          uab_Teleport
                          ];
+// write unit reload data if uid in
 client_rld_uids        = [
                           UID_ArchVile
                          ];
+// write unit cast info if ability in
 client_cast_abils      = [
                          uab_UACScan  ,
                          uab_UACStrike,
@@ -924,14 +921,16 @@ client_cast_abils      = [
 //
 
 
+// mancubus attack sequense timing
 fr_mancubus_rld        = fr_fps2+fr_fpsd2;  //2.5
 fr_mancubus_rld_s1     = fr_fps2-fr_fpsd6;
 fr_mancubus_rld_s2     = fr_fps1+fr_fpsd6;
 fr_mancubus_rld_s3     = fr_fpsd2;
 
+// archvile attack timing
 fr_archvile_s          = fr_fps1+fr_fpsd6;
 
-NameLen                = 13;
+PlayerNameLen          = 13;
 
 dead_hits              = -ptime1*fr_fps1;
 fdead_hits             = dead_hits+fr_fps3;
@@ -1490,7 +1489,7 @@ ui_menu_pls_pby0       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)-(ui_menu_pls_p
 ui_menu_pls_pbx1       = ui_menu_pls_zx1;
 ui_menu_pls_pby1       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)+(ui_menu_pls_pbh div 2);
 
-ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*NameLen+font_w*4;
+ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*PlayerNameLen+font_w*4;
 ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*9;
 ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*10;
 

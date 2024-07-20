@@ -847,8 +847,7 @@ mb_empty    : if(ks_ctrl>0)then
               begin
                  if(d_UpdateUIPlayer(ui_uhint))then exit;
 
-                 debug_x0:=(mouse_map_x div MapCellW)*MapCellW;
-                 debug_y0:=(mouse_map_y div MapCellW)*MapCellW;
+                 debug_zone:=map_GetZoneXY(mouse_map_x,mouse_map_y,true,true);
 
                  mouse_select_x0:=mouse_map_x;
                  mouse_select_y0:=mouse_map_y;

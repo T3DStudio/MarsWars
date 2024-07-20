@@ -6,7 +6,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 48
+Build time: 56
 Energy required: 900
 
 Constructed by: Hell Keep,Great Hell Keep
@@ -28,7 +28,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 144
+Build time: 168
 Energy required: 300
 
 
@@ -50,7 +50,7 @@ Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
-Build time: 48
+Build time: 56
 Energy required: 300
 
 Constructed by: Hell Keep,Great Hell Keep
@@ -70,7 +70,7 @@ Max hits: 1000
 Limit used: 1.5
 Size: 38
 Base vision range: 101
-Build time: 30
+Build time: 35
 Energy required: 50
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
@@ -91,7 +91,7 @@ Max hits: 1000
 Limit used: 1.5
 Size: 38
 Base vision range: 101
-Build time: 70
+Build time: 81
 Energy required: 0
 
 
@@ -112,7 +112,7 @@ Max hits: 10000
 Limit used: 1
 Size: 53
 Base vision range: 131
-Build time: 48
+Build time: 56
 Energy required: 300
 
 Constructed by: Hell Keep,Great Hell Keep
@@ -133,7 +133,7 @@ Max hits: 5000
 Limit used: 1
 Size: 20
 Base vision range: 275
-Build time: 24
+Build time: 28
 Energy required: 300
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
@@ -157,7 +157,7 @@ Max hits: 3000
 Limit used: 4
 Size: 28
 Base vision range: 100
-Build time: 48
+Build time: 56
 Energy required: 300
 Requirements: Great Hell Keep
 Constructed by: Hell Keep,Great Hell Keep
@@ -177,7 +177,7 @@ Max hits: 62
 Limit used: 1
 Size: 10
 Base vision range: 300
-Build time: 24
+Build time: 28
 Energy required: 50
 
 Constructed by: Hell Keep,Great Hell Keep,Evil Eye,Hell Command Center,Advanced Hell Command Center
@@ -199,7 +199,7 @@ Max hits: 15000
 Limit used: 1
 Size: 65
 Base vision range: 155
-Build time: 96
+Build time: 112
 Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
@@ -220,7 +220,7 @@ Max hits: 3000
 Limit used: 2
 Size: 21
 Base vision range: 275
-Build time: 36
+Build time: 42
 Energy required: 450
 Requirements: Castle of the Damned
 Constructed by: Hell Keep,Great Hell Keep
@@ -244,7 +244,7 @@ Max hits: 3000
 Limit used: 1
 Size: 50
 Base vision range: 125
-Build time: 48
+Build time: 56
 Energy required: 300
 Requirements: Monastery of Despair,Castle of the Damned
 Constructed by: Hell Keep,Great Hell Keep
@@ -265,7 +265,7 @@ Max hits: 15000
 Limit used: 1
 Size: 86
 Base vision range: 197
-Build time: 96
+Build time: 112
 Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
@@ -286,7 +286,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 72
+Build time: 84
 Energy required: 900
 Base transport capacity: 30
 
@@ -311,7 +311,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 108
+Build time: 126
 Energy required: 300
 Base transport capacity: 30
 
@@ -336,7 +336,7 @@ Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
-Build time: 48
+Build time: 56
 Energy required: 300
 
 Constructed by: Hell Command Center,Advanced Hell Command Center
@@ -356,7 +356,7 @@ Max hits: 15000
 Limit used: 1
 Size: 65
 Base vision range: 155
-Build time: 96
+Build time: 112
 Energy required: 1200
 Requirements: Infernal Pools
 
@@ -378,7 +378,7 @@ Limit used: 1
 Size: 10
 Base movement speed: 24
 Base vision range: 200
-Build time: 12
+Build time: 14
 Energy required: 100
 PainState base threshold: 1
 
@@ -404,7 +404,7 @@ Limit used: 1
 Size: 10
 Base movement speed: 24
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 PainState base threshold: 1
 
@@ -431,7 +431,7 @@ Limit used: 1
 Size: 11
 Base movement speed: 10
 Base vision range: 200
-Build time: 18
+Build time: 21
 Energy required: 200
 PainState base threshold: 2
 Slots in transport: 1
@@ -459,7 +459,7 @@ Limit used: 1
 Size: 14
 Base movement speed: 20
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 250
 PainState base threshold: 8
 Slots in transport: 2
@@ -486,7 +486,7 @@ Limit used: 1.5
 Size: 14
 Base movement speed: 10
 Base vision range: 200
-Build time: 30
+Build time: 35
 Energy required: 250
 PainState base threshold: 8
 Requirements: Infernal Pools,Great Hell Keep
@@ -513,7 +513,7 @@ Limit used: 2
 Size: 14
 Base movement speed: 10
 Base vision range: 250
-Build time: 36
+Build time: 42
 Energy required: 300
 PainState base threshold: 8
 Slots in transport: 3
@@ -541,7 +541,7 @@ Limit used: 3
 Size: 14
 Base movement speed: 10
 Base vision range: 275
-Build time: 36
+Build time: 42
 Energy required: 500
 PainState base threshold: 8
 Slots in transport: 3
@@ -569,7 +569,7 @@ Limit used: 1
 Size: 15
 Base movement speed: 7
 Base vision range: 200
-Build time: 48
+Build time: 56
 Energy required: 400
 PainState base threshold: 3
 Requirements: Monastery of Despair
@@ -596,7 +596,7 @@ Limit used: 1.5
 Size: 13
 Base movement speed: 12
 Base vision range: 200
-Build time: 30
+Build time: 35
 Energy required: 250
 PainState base threshold: 5
 Slots in transport: 2
@@ -624,7 +624,7 @@ Limit used: 3
 Size: 20
 Base movement speed: 7
 Base vision range: 250
-Build time: 36
+Build time: 42
 Energy required: 500
 PainState base threshold: 7
 Slots in transport: 4
@@ -651,7 +651,7 @@ Limit used: 3
 Size: 20
 Base movement speed: 10
 Base vision range: 250
-Build time: 36
+Build time: 42
 Energy required: 500
 PainState base threshold: 7
 Slots in transport: 4
@@ -677,7 +677,7 @@ Limit used: 4
 Size: 14
 Base movement speed: 14
 Base vision range: 300
-Build time: 48
+Build time: 56
 Energy required: 600
 PainState base threshold: 7
 Slots in transport: 4
@@ -705,7 +705,7 @@ Limit used: 10
 Size: 35
 Base movement speed: 12
 Base vision range: 275
-Build time: 96
+Build time: 112
 Energy required: 1200
 PainState base threshold: 8
 Slots in transport: 12
@@ -731,7 +731,7 @@ Limit used: 12
 Size: 20
 Base movement speed: 12
 Base vision range: 275
-Build time: 144
+Build time: 168
 Energy required: 1200
 PainState base threshold: 10
 Slots in transport: 12
@@ -757,7 +757,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: 12
+Build time: 14
 Energy required: 200
 PainState base threshold: 1
 Slots in transport: 1
@@ -784,7 +784,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 14
 Base vision range: 200
-Build time: 36
+Build time: 42
 Energy required: 600
 PainState base threshold: 2
 Slots in transport: 2
@@ -811,7 +811,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: -12
+Build time: -14
 Energy required: 200
 PainState base threshold: 2
 Slots in transport: 1
@@ -838,7 +838,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 10
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 250
 PainState base threshold: 2
 Slots in transport: 1
@@ -865,7 +865,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 10
 Base vision range: 200
-Build time: -12
+Build time: -14
 Energy required: 200
 PainState base threshold: 4
 Slots in transport: 1
@@ -892,7 +892,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 8
 Base vision range: 200
-Build time: -12
+Build time: -14
 Energy required: 200
 PainState base threshold: 4
 Slots in transport: 1
@@ -919,7 +919,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 8
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 PainState base threshold: 5
 Slots in transport: 1
@@ -946,7 +946,7 @@ Limit used: 1.5
 Size: 12
 Base movement speed: 14
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 250
 PainState base threshold: 5
 Requirements: Zombie Barracks(x2),Advanced Hell Command Center
@@ -972,7 +972,7 @@ Limit used: 3
 Size: 12
 Base movement speed: 6
 Base vision range: 250
-Build time: 48
+Build time: 56
 Energy required: 600
 PainState base threshold: 5
 Slots in transport: 2
@@ -998,7 +998,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 72
+Build time: 84
 Energy required: 900
 Zombie variant: Hell Command Center
 Zombification hits: 3750
@@ -1023,7 +1023,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 275
-Build time: 108
+Build time: 126
 Energy required: 300
 Zombie variant: Advanced Hell Command Center
 Zombification hits: 3750
@@ -1048,7 +1048,7 @@ Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
-Build time: 48
+Build time: 56
 Energy required: 300
 Zombie variant: Zombie Barracks
 Zombification hits: 2500
@@ -1069,7 +1069,7 @@ Max hits: 10000
 Limit used: 1
 Size: 60
 Base vision range: 145
-Build time: 48
+Build time: 56
 Energy required: 300
 Requirements: Weapons Factory
 Constructed by: Command Center,Advanced Command Center
@@ -1088,7 +1088,7 @@ Max hits: 2000
 Limit used: 3
 Size: 48
 Base vision range: 121
-Build time: 30
+Build time: 35
 Energy required: 100
 
 Constructed by: Command Center,Advanced Command Center
@@ -1108,7 +1108,7 @@ Max hits: 2000
 Limit used: 3
 Size: 48
 Base vision range: 121
-Build time: 70
+Build time: 81
 Energy required: 0
 
 
@@ -1128,7 +1128,7 @@ Max hits: 10000
 Limit used: 1
 Size: 62
 Base vision range: 149
-Build time: 48
+Build time: 56
 Energy required: 300
 
 Constructed by: Command Center,Advanced Command Center
@@ -1148,7 +1148,7 @@ Max hits: 3000
 Limit used: 2
 Size: 35
 Base vision range: 300
-Build time: 48
+Build time: 56
 Energy required: 300
 Requirements: Weapons Factory
 Constructed by: Command Center,Advanced Command Center
@@ -1169,7 +1169,7 @@ Max hits: 3000
 Limit used: 2
 Size: 40
 Base vision range: 105
-Build time: 48
+Build time: 56
 Energy required: 300
 Requirements: Science Facility,Computer Station
 Constructed by: Command Center,Advanced Command Center
@@ -1189,7 +1189,7 @@ Max hits: 15000
 Limit used: 1
 Size: 86
 Base vision range: 197
-Build time: 96
+Build time: 112
 Energy required: 1200
 Requirements: Weapons Factory
 Constructed by: Command Center,Advanced Command Center
@@ -1209,7 +1209,7 @@ Max hits: 5000
 Limit used: 1
 Size: 15
 Base vision range: 275
-Build time: 24
+Build time: 28
 Energy required: 300
 
 Constructed by: Command Center,Advanced Command Center
@@ -1234,7 +1234,7 @@ Max hits: 5000
 Limit used: 1
 Size: 15
 Base vision range: 275
-Build time: 24
+Build time: 28
 Energy required: 300
 
 Constructed by: Command Center,Advanced Command Center
@@ -1258,7 +1258,7 @@ Max hits: 15000
 Limit used: 1
 Size: 70
 Base vision range: 165
-Build time: 96
+Build time: 112
 Energy required: 1200
 Requirements: Weapons Factory
 Constructed by: Command Center,Advanced Command Center
@@ -1301,7 +1301,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Zombie Engineer
@@ -1329,7 +1329,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Former Zombie
@@ -1357,7 +1357,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 14
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Zombie Shotgunner
@@ -1384,7 +1384,7 @@ Limit used: 1.5
 Size: 12
 Base movement speed: 14
 Base vision range: 200
-Build time: 30
+Build time: 35
 Energy required: 250
 Slots in transport: 1
 Zombie variant: Zombie SuperShotgunner
@@ -1411,7 +1411,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Zombie Commando
@@ -1438,7 +1438,7 @@ Limit used: 1
 Size: 12
 Base movement speed: 12
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Anti-aircraft Zombie
@@ -1465,7 +1465,7 @@ Limit used: 1
 Size: 13
 Base movement speed: 10
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Slots in transport: 1
 Zombie variant: Zombie Siege Marine
@@ -1492,7 +1492,7 @@ Limit used: 1.5
 Size: 12
 Base movement speed: 14
 Base vision range: 200
-Build time: 30
+Build time: 35
 Energy required: 250
 Requirements: Weapons Factory,Advanced Command Center
 Produced by: Barracks
@@ -1516,7 +1516,7 @@ Limit used: 3
 Size: 13
 Base movement speed: 10
 Base vision range: 250
-Build time: 48
+Build time: 56
 Energy required: 600
 Slots in transport: 2
 Zombie variant: Zombie BFG Marine
@@ -1543,7 +1543,7 @@ Limit used: 1
 Size: 33
 Base movement speed: 18
 Base vision range: 200
-Build time: 24
+Build time: 28
 Energy required: 200
 Base transport capacity: 8
 Requirements: Advanced Command Center
@@ -1566,7 +1566,7 @@ Limit used: 2
 Size: 15
 Base movement speed: 14
 Base vision range: 250
-Build time: 36
+Build time: 42
 Energy required: 300
 Slots in transport: 3
 
@@ -1591,7 +1591,7 @@ Limit used: 3
 Size: 16
 Base movement speed: 12
 Base vision range: 275
-Build time: 36
+Build time: 42
 Energy required: 500
 Slots in transport: 4
 Requirements: Science Facility
@@ -1617,7 +1617,7 @@ Limit used: 4
 Size: 20
 Base movement speed: 8
 Base vision range: 250
-Build time: 48
+Build time: 56
 Energy required: 600
 Slots in transport: 6
 Requirements: Science Facility
@@ -1642,7 +1642,7 @@ Limit used: 4
 Size: 18
 Base movement speed: 16
 Base vision range: 275
-Build time: 48
+Build time: 56
 Energy required: 600
 Requirements: Science Facility
 Produced by: Vehicle Factory
@@ -1666,7 +1666,7 @@ Limit used: 1
 Size: 25
 Base movement speed: 15
 Base vision range: 225
-Build time: 48
+Build time: 56
 Energy required: 200
 Slots in transport: 10
 Base transport capacity: 4

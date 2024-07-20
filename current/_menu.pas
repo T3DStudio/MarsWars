@@ -199,7 +199,7 @@ ms2_game: begin
              menu_items[mi_game_builders     ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_builders    ,0,true);
              menu_items[mi_game_generators   ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_generators  ,0,true);
              menu_items[mi_game_FixStarts    ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,0,true);
-             menu_items[mi_game_DeadPbserver ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,0,true);
+             menu_items[mi_game_DeadPbserver ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPObs,0,true);
              menu_items[mi_game_EmptySlots   ].mi_enabled:=GameSetCommonSetting(PlayerClient,nmid_lobbby_EmptySlots  ,0,true);
 
              menu_items[mi_game_RecordStatus ].mi_enabled:=rpls_state<rpls_state_read;
@@ -881,8 +881,8 @@ mi_game_FixStarts         : if(net_status=ns_client)
                             then net_send_MIDByte    (             nmid_lobbby_FixStarts   ,byte(not g_fixed_positions))
                             else GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts   ,byte(not g_fixed_positions),false);
 mi_game_DeadPbserver      : if(net_status=ns_client)
-                            then net_send_MIDByte    (             nmid_lobbby_DeadPbserver,byte(not g_deadobservers))
-                            else GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPbserver,byte(not g_deadobservers),false);
+                            then net_send_MIDByte    (             nmid_lobbby_DeadPObs,byte(not g_deadobservers))
+                            else GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPObs,byte(not g_deadobservers),false);
 mi_game_EmptySlots        : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1164,7 +1164,7 @@ mi_map_params2        : begin
                           then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed)
                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
-mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_kbstr ,NameLen,@UpdateItems);
+mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_kbstr ,PlayerNameLen,@UpdateItems);
 mi_saveload_fname     : svld_str_fname:=StringApplyInput(svld_str_fname,k_kbstr ,SvRpLen,@UpdateItems);
 mi_game_RecordName    : rpls_str_name :=StringApplyInput(rpls_str_name ,k_kbstr ,SvRpLen,@UpdateItems);
 mi_mplay_ServerPort   : begin

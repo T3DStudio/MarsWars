@@ -257,13 +257,13 @@ begin
    end;
 end;
 
-
-
 procedure gfx_FillSurfaceBySurface(sTar,sTile:pSDL_Surface;animStepX,animStepY:integer);
 var tx,ty:integer;
 begin
    if(sTar =r_empty)
    or(sTile=r_empty)then exit;
+   animStepX:=-abs(animStepX mod sTile^.w);
+   animStepY:=-abs(animStepY mod sTile^.h);
    tx:=animStepX;
    while tx<sTar^.w do
    begin
@@ -529,6 +529,31 @@ i,
 animStepX,
 animStepY: integer;
 maskColor: cardinal;
+upd_tiles : boolean;
+function Compare(cur_id,last_id:pinteger):byte;
+begin
+   Compare:=0;
+   if(0<=cur_id^)and(cur_id^<theme_all_terrain_n)then
+     if(cur_id^=last_id^)
+     then Compare:=1
+     else
+     begin
+        Compare:=2;
+        last_id^:=cur_id^;
+     end;
+end;
+function DefaultTile(cur_id,last_id:pinteger;TargetTile:ppSDL_Surface):boolean;
+begin
+   DefaultTile:=false;
+   if(cur_id^<>last_id^)then
+   begin
+      gfx_SDLSurfaceFree(TargetTile^);
+      if(cur_id^<0)or(theme_all_terrain_n<=cur_id^)
+      then TargetTile^:=r_empty
+      else DefaultTile:=true;
+      last_id^:=cur_id^;
+   end;
+end;
 begin
    anim_seed:=map_seed mod 6;
    case(anim_seed div 3)of
@@ -540,58 +565,88 @@ begin
   1: animRY:= 0;
   2: animRY:= theme_anim_tile_step;
    end;
+   animStepX:=0;
+   animStepY:=0;
 
-   animStepX:=-MapCellW-animRX;
-   animStepY:=-MapCellW-animRY;
+   writeln('--------------------');
 
-   gfx_SDLSurfaceFree(theme_tile_terrain );
-   gfx_SDLSurfaceFree(theme_tile_crater  );
-   gfx_SDLSurfaceFree(theme_tile_liquid  );
-   gfx_SDLSurfaceFree(theme_tile_teleport);
-
-   if (0<=theme_cur_tile_teleport_id)
-   and(theme_cur_tile_teleport_id<theme_all_terrain_n)then theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW) else theme_tile_teleport:=r_empty;
-   if (0<=theme_cur_tile_terrain_id)
-   and(theme_cur_tile_terrain_id <theme_all_terrain_n)then theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_terrain:=r_empty;
-   if (0<=theme_cur_tile_crater_id)
-   and(theme_cur_tile_crater_id  <theme_all_terrain_n)then theme_tile_crater  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id ].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_crater :=r_empty;
-   if (0<=theme_cur_tile_liquid_id)
-   and(theme_cur_tile_liquid_id  <theme_all_terrain_n)then theme_tile_liquid  :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id ].sdlSurface,MapCellW,true,animStepX,animStepY) else theme_tile_liquid :=r_empty;
-
-   boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
-
-   if(theme_cur_crater_tes=tes_tech)
-   then gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
-   else gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
-
-   for i:=0 to theme_anim_step_n-1 do
+   // base terrain tile
+   if(DefaultTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,@theme_tile_terrain ))then
    begin
-      maskColor:=0;
-      if(theme_cur_liquid_tas=tas_magma)and(i>0)then
-        maskColor:=rgba2c(0,0,0,30*i);
+      theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id ].sdlSurface,MapCellW,true,animStepX,animStepy);
+      writeln('update 1 theme_tile_terrain');
+   end;
 
-      if(theme_cur_liquid_tes=tes_nature)then
+   // crater tileset
+   upd_tiles:=false;
+   if(DefaultTile(@theme_cur_tile_crater_id  ,@theme_last_tile_crater_id  ,@theme_tile_crater  ))then
+   begin
+      theme_tile_crater:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id  ].sdlSurface,MapCellW,true,animStepX,animStepy);
+      boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
+      upd_tiles:=true;
+      writeln('update 2 theme_tile_crater');
+   end;
+   if(upd_tiles)
+   or(theme_cur_crater_tes<>theme_last_crater_tes)then
+   begin
+      if(theme_cur_crater_tes=tes_tech)
+      then gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
+      else gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
+      theme_last_crater_tes:=theme_cur_crater_tes;
+      writeln('update 3 theme_tileset_crater');
+   end;
+
+   // liquid tileset
+   upd_tiles:=false;
+   if(DefaultTile(@theme_cur_tile_liquid_id  ,@theme_last_tile_liquid_id  ,@theme_tile_liquid  ))then
+   begin
+      theme_tile_liquid:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id].sdlSurface,MapCellW,true,animStepX,animStepy);
+      upd_tiles:=true;
+      writeln('update 4 theme_tile_liquid');
+   end;
+   if(upd_tiles)
+   or(theme_cur_liquid_tes<>theme_last_liquid_tes)
+   or(theme_cur_liquid_tas<>theme_last_liquid_tas)then
+   begin
+      writeln('update 5 theme_tileset_liquid');
+      for i:=0 to theme_anim_step_n-1 do
       begin
-         if(theme_cur_liquid_tas=tas_magma)
-         then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
-         else gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
-      end
-      else
-        with theme_tileset_liquid[i][0] do
-        begin
-           gfx_SDLSurfaceFree(sdlSurface);
-           sdlSurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
-           gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid,animStepX,animStepY);
-           if(maskColor>0)then boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
-            w:=MapCellW ;h := w;
-           hw:=MapCellhW;hh:=hw;
-        end;
-      if(theme_cur_liquid_tas=tas_liquid)then
-      begin
-         animStepX+=animRX;
-         animStepY+=animRY;
+         maskColor:=0;
+         if(theme_cur_liquid_tas=tas_magma)and(i>0)then
+           maskColor:=rgba2c(0,0,0,30*i);
+
+         if(theme_cur_liquid_tes=tes_nature)then
+         begin
+            if(theme_cur_liquid_tas=tas_magma)
+            then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
+            else gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
+         end
+         else
+           with theme_tileset_liquid[i][0] do
+           begin
+              gfx_SDLSurfaceFree(sdlSurface);
+              sdlSurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
+              gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid,animStepX,animStepY);
+              if(maskColor>0)then boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
+               w:=MapCellW ;h := w;
+              hw:=MapCellhW;hh:=hw;
+           end;
+         if(theme_cur_liquid_tas=tas_liquid)then
+         begin
+            animStepX+=animRX;
+            animStepY+=animRY;
+         end;
+         if(theme_cur_liquid_tas=tas_ice)then break;
       end;
-      if(theme_cur_liquid_tas=tas_ice)then break;
+      theme_last_liquid_tes:=theme_cur_liquid_tes;
+      theme_last_liquid_tas:=theme_cur_liquid_tas;
+   end;
+
+   // teleport sprite
+   if(DefaultTile(@theme_cur_tile_teleport_id,@theme_last_tile_teleport_id,@theme_tile_teleport))then
+   begin
+      theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW);
+      writeln('update 6 theme_tile_teleport');
    end;
 end;
 
@@ -718,9 +773,8 @@ begin
    for x:=0 to MaxTileSet do gfx_SDLSurfaceFree(vid_TileTemplate_fog^[x].sdlSurface);
    dispose(vid_TileTemplate_fog);
 
-   DrawLoadingScreen(str_loading_gfx,c_yellow);
-
    // load game resouces
+   DrawLoadingScreen(str_loading_gfx,c_yellow);
    spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
 
    r_menu:=gfx_SDLSurfaceCreate(max2i(vid_minw,spr_mback^.w),max2i(vid_minh,spr_mback^.h));

@@ -199,7 +199,7 @@ begin
 end;
 
 procedure unit_TryMoveToXY(pu:PTUnit;newx,newy:integer);
-var cx,cy:integer;
+var cx,cy   :integer;
 begin
    with pu^ do
      if(ukfly)or(ukfloater)
@@ -208,43 +208,44 @@ begin
      begin
         cx:=x;
         cy:=y;
-        if(map_GetsZoneM(cx,newy)=szone)then cy:=newy;
-        if(map_GetsZoneM(newx,cy)=szone)then cx:=newx;
+        if(map_GetZoneXY(cx,newy,false,true)=szone)then cy:=newy;
+        if(map_GetZoneXY(newx,cy,false,true)=szone)then cx:=newx;
+
         if(x<>cx)or(y<>cy)
         then unit_SetXY(pu,cx,cy,mvxy_none,false);
      end;
 end;
 
-procedure unit_PushFromUnit(pu,tu:PTUnit;uds:single);
+procedure unit_PushFromUnit(pTarget,pObstacle:PTUnit;uds:single);
 var t:single;
    ud:integer;
 shortcollision:boolean;
 begin
-   // pu - pushing unit
-   // tu - unit-obstacle
-   with pu^ do
+   // pTarget - pushing unit
+   // pObstacle - unit-obstacle
+   with pTarget^ do
    with uid^ do
    begin
       t :=uds;
-      shortcollision:=((tu^.speed<=0)or(not tu^.iscomplete))and(pu^.player=tu^.player);
+      shortcollision:=(pTarget^.player=pObstacle^.player)and((pObstacle^.speed<=0)or(not pObstacle^.iscomplete));
       if(shortcollision)
-      then uds-=tu^.uid^._r
-      else uds-=tu^.uid^._r+_r;
+      then uds-=pObstacle^.uid^._r
+      else uds-=pObstacle^.uid^._r+_r;
       ud:=round(uds);
 
       if(uds<0)then
       begin
-         if((tu^.x=x)and(tu^.y=y))then
+         if((pObstacle^.x=x)and(pObstacle^.y=y))then
          begin
             case g_random(4) of
-            0: unit_TryMoveToXY(pu,x-ud,y   );
-            1: unit_TryMoveToXY(pu,x+ud,y   );
-            2: unit_TryMoveToXY(pu,x   ,y-ud);
-            3: unit_TryMoveToXY(pu,x   ,y+ud);
+            0: unit_TryMoveToXY(pTarget,x-ud,y   );
+            1: unit_TryMoveToXY(pTarget,x+ud,y   );
+            2: unit_TryMoveToXY(pTarget,x   ,y-ud);
+            3: unit_TryMoveToXY(pTarget,x   ,y+ud);
             end;
          end
-         else unit_TryMoveToXY(pu,x+round(uds*(tu^.x-x)/t)+g_randomr(2),
-                                  y+round(uds*(tu^.y-y)/t)+g_randomr(2));
+         else unit_TryMoveToXY(pTarget,x+round(uds*(pObstacle^.x-x)/t)+g_randomr(2),
+                                       y+round(uds*(pObstacle^.y-y)/t)+g_randomr(2));
 
          vstp+=round(uds/speed*UnitMoveStepTicks);
 
@@ -254,9 +255,9 @@ begin
              then dir:=DIR360(dir-(          dir_diff(dir,point_dir(vx,vy,x,y))     div 2 ))
              else dir:=DIR360(dir-( mm3i(-90,dir_diff(dir,point_dir(vx,vy,x,y)),90) div 2 ));
 
-         if(tu^.x=tu^.ua_x)and(tu^.y=tu^.ua_y)and(tu^.ua_bx<0)and(not IsUnitRange(ua_tar,nil))then
+         if(pObstacle^.x=pObstacle^.ua_x)and(pObstacle^.y=pObstacle^.ua_y)and(pObstacle^.ua_bx<0)and(not IsUnitRange(ua_tar,nil))then
          begin
-            ud:=point_dist_rint(ua_x,ua_y,tu^.x,tu^.y)-_r-tu^.uid^._r;
+            ud:=point_dist_rint(ua_x,ua_y,pObstacle^.x,pObstacle^.y)-_r-pObstacle^.uid^._r;
             if(ud<=0)then
             begin
                ua_x:=x;
@@ -273,26 +274,25 @@ cx,cy,
 mx,my,
 sx,sy,
 px,py,
-pushr:integer;
+pushr: integer;
 begin
    with pu^  do
    with uid^ do
    begin
       sx:=gridx*MapCellW-MapCellW;
       sy:=gridy*MapCellW-MapCellW;
-      pushr:=min2i(_r,unit_MaxSpeed);
-
+      pushr :=min2i(_r,unit_MaxSpeed);
       mx:=sx;
       for cx:=-1 to 1 do
       begin
          my:=sy;
          for cy:=-1 to 1 do
          begin
-            if(map_GetSZoneC(gridx+cx,gridy+cy)<>szone)then
+            if(map_GetZoneXY(gridx+cx,gridy+cy,false,false)<>szone)then
             begin
                px:=x;
                py:=y;
-               mgcell2NearestXY(x,y,mx,my,mx+MapCellW,my+MapCellW,pushr,@px,@py);
+               mgcell2NearestXY(x,y,mx,my,mx+MapCellW,my+MapCellW,pushr,@px,@py,nil);
                unit_TryMoveToXY(pu,px,py);
             end;
 
@@ -740,8 +740,8 @@ begin
       nup_tar  := 0;
       uontard := NOTSET;
       tu_transport:=nil;
-      if(StayWaitForNextTarget>0)
-      then StayWaitForNextTarget-=1;
+      if(WaitForNextTarget>0)
+      then WaitForNextTarget-=1;
 
       u_royal_cd:=NOTSET;
       u_royal_d :=NOTSET;
@@ -841,7 +841,7 @@ uab_Teleport      : swtarget:=true;
 
       if(fteleport_tar)and(nup_tar>0)then ua_tar:=nup_tar;
 
-      if(attack_target)and(a_tard<NOTSET)then StayWaitForNextTarget:=0;
+      if(attack_target)and(a_tard<NOTSET)then WaitForNextTarget:=0;
 
       aiu_code(pu);
       if(aicode){and(playeri=PlayerClient)}then ai_code(pu);
@@ -864,7 +864,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      StayWaitForNextTarget:=0;
+      WaitForNextTarget:=0;
       if(ServerSide)then
       begin
          a_tar  :=0;
@@ -976,7 +976,7 @@ begin
       if(ServerSide)then
       begin
          if(ptransport^.ua_id=ua_unload)or(ptransport^.transportC>ptransport^.transportM)then
-           if(not map_IfObstacleZone(ptransport^.szone))then //(not ptransport^.ukfly)or
+           if(not map_IsObstacleZone(ptransport^.szone,false))then
              if(unit_unload(ptransport,pTarget))then exit;
 
          if(ptransport^.ua_id=ua_move  )
@@ -1040,9 +1040,9 @@ uab_CCFly         : if(zfall=0)and(buff[ub_CCast]<=0)then
                     begin
                        unit_sability:=true;
                        if(not Check)then
-                         if(level>0)
+                         {if(level>0)
                          then level:=0
-                         else level:=1;
+                         else level:=1};
                     end;
 uab_RebuildInPoint: unit_sability:=unit_rebuild(pu,Check);
            else
@@ -1057,7 +1057,7 @@ begin
      if(transportC>0)then
      begin
         unit_psability:=true;
-        if(not Check)then unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
+        if(not Check)then unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability,true );
      end
      else
        if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,unit_canAbility(pu),pu))then
@@ -1077,7 +1077,7 @@ uab_RebuildInPoint   : if(speed>0)then
                           if(not Check)then
                           begin
                              pushOut_all(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
-                             unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability);
+                             unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability,false);
                           end;
                        end;
 uab_CCFly            : if(speed>0)then
@@ -1086,7 +1086,7 @@ uab_CCFly            : if(speed>0)then
                           if(not Check)then
                           begin
                              pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
-                             unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability);
+                             unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability,false);
                           end;
                        end
                        else
@@ -1096,7 +1096,7 @@ uab_CCFly            : if(speed>0)then
                            else
                            begin
                               pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
-                              unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability);
+                              unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability,false);
                               unit_psability:=true;
                            end;
 
@@ -1259,7 +1259,7 @@ begin
                if(ServerSide)then
                begin
                   a_tar:=0;
-                  StayWaitForNextTarget:=1;
+                  WaitForNextTarget:=1;
                end;
                exit;
             end;
@@ -1275,7 +1275,7 @@ begin
                if(ServerSide)then
                begin
                   a_tar:=0;
-                  StayWaitForNextTarget:=1;
+                  WaitForNextTarget:=1;
                end;
                exit;
             end;
@@ -1318,7 +1318,7 @@ wmove_noneed    : if(not AttackInMove)then
                      mv_y:=y;
                   end;
          else
-           StayWaitForNextTarget:=1;
+           WaitForNextTarget:=1;
            exit;
          end;
       end
@@ -1366,7 +1366,7 @@ wmove_noneed    : if(not AttackInMove)then
             begin
                if(x<>tu^.x)
                or(y<>tu^.y)then dir:=point_dir(x,y,tu^.x,tu^.y);
-               if(ServerSide)then StayWaitForNextTarget:=(a_reload div order_period)+1;
+               if(ServerSide)then WaitForNextTarget:=(a_reload div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pu,true,@attackervis);
@@ -1476,7 +1476,7 @@ begin
 
         td :=point_dist_int(x,y,tu^.x,tu^.y);
         if(tu^.solid)
-        then tdm:=td-    (_r+tu^.uid^._r)
+        then tdm:=td-     (_r+tu^.uid^._r)
         else tdm:=td-min2i(_r,tu^.uid^._r);
 
         if(tdm<melee_r)then
@@ -1579,9 +1579,16 @@ begin
                if(ua_id=ua_move)then ua_id:=ua_attack;
       end;
 
-      if(ua_id=ua_attack)
-      then unit_attack(pu)
-      else StayWaitForNextTarget:=0;
+      if(ua_id=ua_attack)then
+      begin
+         unit_attack(pu);
+         if(WaitForNextTarget>0)then
+         begin
+            mv_x:=x;
+            mv_y:=y;
+         end;
+      end
+      else WaitForNextTarget:=0;
 
       if(pTransport=nil)then
         if(unit_canMove(pu))then

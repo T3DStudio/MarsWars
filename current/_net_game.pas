@@ -49,7 +49,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      name   :=ValidateStr(name,NameLen,@k_kbstr);
+      name   :=ValidateStr(name,PlayerNameLen,@k_kbstr);
       if(length(name)=0)then name:=str_defaultPlayerName;
       if(oldname<>name)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 
@@ -238,7 +238,7 @@ nmid_lobbby_gamemode,
 nmid_lobbby_builders,
 nmid_lobbby_generators,
 nmid_lobbby_FixStarts,
-nmid_lobbby_DeadPbserver,
+nmid_lobbby_DeadPObs,
 nmid_lobbby_EmptySlots  : if(GameSetCommonSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_lobbby_playerslot  : begin
                           i:=net_readbyte;
@@ -386,7 +386,7 @@ begin
    with g_players[pid] do
    begin
       // name
-      newname:=ValidateStr(net_readstring,NameLen,@k_kbstr);
+      newname:=ValidateStr(net_readstring,PlayerNameLen,@k_kbstr);
       if(length(newname)=0)then newname:=str_defaultPlayerName;
       if(newname<>name)then
       begin

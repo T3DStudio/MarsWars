@@ -473,10 +473,13 @@ cx,cy,
 gx,gy,
 mx,my,mty,
 anim,i  :integer;
+b,
 AddEdges:boolean;
-function InGridRange(a:integer):boolean;
+function GridGetSolidLevel(x,y:integer):byte;
 begin
-   InGridRange:=(0<=a)and(a<MaxMapSizeCelln);
+   if(map_InGridRange(x))and(map_InGridRange(y))
+   then GridGetSolidLevel:=map_grid[x,y].tgc_solidlevel
+   else GridGetSolidLevel:=mgsl_rocks;
 end;
 procedure DrawDecals;
 var i:integer;
@@ -494,8 +497,8 @@ begin
    sty:=ly-(vid_cam_y mod MapCellW)-MapCellW*2;
    sx0:=(vid_cam_x div MapCellW);
    sy0:=(vid_cam_y div MapCellW);
-   mx :=sx0*MapCellW-MapCellW*2;
-   mty:=sy0*MapCellW-MapCellW*2;
+   mx :=(sx0-2)*MapCellW;
+   mty:=(sy0-2)*MapCellW;
 
    if(theme_cur_liquid_tas=tas_ice)
    then anim:=0
@@ -519,24 +522,24 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
       begin
          gx:=sx0+cx;
          gy:=sy0+cy;
-         if(InGridRange(gx))and(InGridRange(gy))then
+         if(map_InGridRange(gx))and(map_InGridRange(gy))then
          with map_grid_graph[gx,gy] do
          begin
             if(AddEdges)then
-              if(InGridRange(gx+1))and(InGridRange(gy+1))then
-              begin
-                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)<>(map_grid[gx+1,gy].tgc_solidlevel>mgsl_free)
-                 then UnitsInfoAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
-                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)<>(map_grid[gx,gy+1].tgc_solidlevel>mgsl_free)
-                 then UnitsInfoAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+            begin
+               b:=GridGetSolidLevel(gx,gy)>mgsl_free;
+               if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
+               then UnitsInfoAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+               if(b)<>(GridGetSolidLevel(gx,gy+1)>mgsl_free)
+               then UnitsInfoAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
 
-                 if(map_grid[gx,gy].tgc_solidlevel>mgsl_free)then
-                 begin
-                 UnitsInfoAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,r_blink2_color_BY);
-                 UnitsInfoAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,r_blink2_color_BY);
-                 UnitsInfoAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,r_blink2_color_BY);
-                 end;
-              end;
+               if(b)then
+               begin
+               UnitsInfoAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,r_blink2_color_BY);
+               UnitsInfoAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,r_blink2_color_BY);
+               UnitsInfoAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,r_blink2_color_BY);
+               end;
+            end;
 
             if(tgca_tile_liquid=0)
             then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface)
@@ -554,7 +557,15 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  DrawDecals;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
-            //draw_text(tar,ssx,ssy,i2s(tgca_decor_n),ta_left,255,c_white);
+            {with map_grid[gx,gy] do
+            begin
+               if(map_IsObstacleZone(tgc_parea,true ))
+               then draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_left,255,c_gray )
+               else draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_left,255,c_white);
+               if(map_IsObstacleZone(tgc_sarea,false))
+               then draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_left,255,c_green)
+               else draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_left,255,c_lime );
+            end; }
 
             if(tgca_decor_n>0)then
               for i:=0 to tgca_decor_n-1 do
