@@ -6,15 +6,15 @@ begin
    for p:=1 to MaxPlayers do
     if(p<>PlayerClient)then
      with g_players[p] do
-      if(state=ps_none)then
-       if(g_slot_state[p]=ps_opened  )
-       or(g_slot_state[p]=ps_observer)then
+      if(player_type=pt_none)then
+       if(g_slot_state[p]=pss_opened  )
+       or(g_slot_state[p]=pss_observer)then
        begin
           net_NewPlayer:=p;
           nip          :=sip;
           nport        :=sport;
-          state        :=ps_play;
-          nttl          :=0;
+          player_type  :=pt_human;
+          nttl         :=0;
           isready      :=false;
           {$IFNDEF _FULLGAME}
           GameLogCommon(p,0,'MarsWars dedicated server, '+str_ver,false);
@@ -30,7 +30,7 @@ begin
    for i:=1 to MaxPlayers do
     if(i<>PlayerClient)then
      with g_players[i] do
-      if(state=ps_play)and(nip=aip)and(nport=ap)then
+      if(player_type=pt_human)and(nip=aip)and(nport=ap)then
       begin
          net_GetPlayer:=i;
          if(nttl>=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
@@ -49,7 +49,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      name   :=ValidateStr(name,PlayerNameLen,@k_kbstr);
+      name   :=ValidateStr(name,PlayerNameLen,@k_pname);
       if(length(name)=0)then name:=str_defaultPlayerName;
       if(oldname<>name)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 
@@ -72,7 +72,7 @@ begin
        net_writestring(name     );
        net_writebyte  (team     );
        net_writebyte  (slot_race);
-       net_writebyte  (state    );
+       net_writebyte  (player_type    );
        net_writebyte  (g_slot_state[p]);
        net_writebool  (isready  );
        net_writeword  (nttl     );
@@ -120,7 +120,7 @@ begin
    net_writebyte(g_mode);
    for i:=1 to MaxPlayers do
      with g_players[i] do
-       if(state=ps_none)
+       if(player_type=pt_none)
        then net_writestring('')
        else net_writestring(name);
 end;
@@ -187,8 +187,8 @@ nmid_log_chat    : begin
 nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
                       if(not G_Started)
-                      then PlayerSetState(pid,ps_none)//PlayerSlotChangeState(0,pid,ps_opened,false)
-                      else PlayerSpecialDefeat(pid,false,false);
+                      then PlayerSetState(pid,pt_none)//PlayerSlotChangeState(0,pid,pss_opened,false)
+                      else PlayerLeave(pid,false);
                       {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                       continue;
                    end;
@@ -215,13 +215,13 @@ nmid_pause       : begin
                       if(G_Status<>gs_running)and(G_Status<=MaxPlayers)then
                       begin
                          G_Status:=gs_running;
-                         GameLogChat(pid,255,str_PlayerResumed,false);
+                         GameLogChat(pid,255,str_msg_PlayerResumed,false);
                       end
                       else
                         if(G_Status=gs_running)then
                         begin
                            G_Status:=pid;
-                           GameLogChat(pid,255,str_PlayerPaused,false);
+                           GameLogChat(pid,255,str_msg_PlayerPaused,false);
                         end;
                      {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                    end;
@@ -269,7 +269,7 @@ nmid_lobbby_playerrace  : begin
    for i:=1 to MaxPlayers do
     if(i<>PlayerClient)then
      with g_players[i] do
-      if(state=ps_play)and(nttl<ClientTTL)then
+      if(player_type=pt_human)and(nttl<ClientTTL)then
       begin
          if(G_Started)and(net_period_step)then
          begin
@@ -353,7 +353,8 @@ begin
 
    if(StartGame)
    or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))
-   or(menu_item<>mi_map_params2)then
+   //or(menu_item<>mi_map_Seed)
+   then
    begin
    if(rCard(@map_seed                           ))then begin redraw_menu:=true;new_map:=true;end;
    end
@@ -386,7 +387,7 @@ begin
    with g_players[pid] do
    begin
       // name
-      newname:=ValidateStr(net_readstring,PlayerNameLen,@k_kbstr);
+      newname:=ValidateStr(net_readstring,PlayerNameLen,@k_pname);
       if(length(newname)=0)then newname:=str_defaultPlayerName;
       if(newname<>name)then
       begin
@@ -422,15 +423,15 @@ begin
 
       // state
       i:=net_readbyte;
-      if not(i in [ps_none,ps_play,ps_comp])then
+      if not(i in [pt_none,pt_human,pt_ai])then
       begin
          net_ClientReadPlayerData:=true;
          exit;
       end;
-      if(i<>state)then
+      if(i<>player_type)then
       begin
          menu_remake:=true;
-         state:=i;
+         player_type:=i;
       end;
 
       // slot state
@@ -481,7 +482,7 @@ gst  :boolean;
 procedure CleintProtocolError(perror:pshortstring);
 begin
    GameBreakClientGame;
-   menu_s2:=ms2_mult;
+   //menu_s2:=ms2_mult;
    net_status_str:=perror^;
    menu_remake   :=true;
    menu_state    :=true;
@@ -496,9 +497,9 @@ begin
 
       mid:=net_readbyte;
       case mid of
-nmid_server_full : begin CleintProtocolError(@str_ServerFull  );exit;end;
-nmid_wrong_ver   : begin CleintProtocolError(@str_WrongVersion);exit;end;
-nmid_game_started: begin CleintProtocolError(@str_GameStarted );exit;end;
+nmid_server_full : begin CleintProtocolError(@str_error_ServerFull  );exit;end;
+nmid_wrong_ver   : begin CleintProtocolError(@str_error_WrongVersion);exit;end;
+nmid_game_started: begin CleintProtocolError(@str_error_GameStarted );exit;end;
 nmid_notconnected: begin
                       G_Started     :=false;
                       menu_state    :=true;
@@ -518,7 +519,7 @@ nmid_lobby_info  : begin
                        begin
                           if(net_ClientReadPlayerData(i,gst))then
                           begin
-                             CleintProtocolError(@str_WrongVersion);
+                             CleintProtocolError(@str_error_WrongVersion);
                              exit;
                           end;
                           PlayerSetSkirmishTech(i);
@@ -528,7 +529,7 @@ nmid_lobby_info  : begin
                       i:=net_readbyte;
                       if(i>MaxPlayers)or(i=0)then
                       begin
-                         CleintProtocolError(@str_WrongVersion);
+                         CleintProtocolError(@str_error_WrongVersion);
                          exit;
                       end;
                       if(PlayerClient<>i)then
@@ -541,7 +542,7 @@ nmid_lobby_info  : begin
                       i:=net_readbyte;
                       if(i>MaxPlayers)then
                       begin
-                         CleintProtocolError(@str_WrongVersion);
+                         CleintProtocolError(@str_error_WrongVersion);
                          exit;
                       end;
                       if(PlayerLobby<>i)then
@@ -553,7 +554,7 @@ nmid_lobby_info  : begin
                       // map and game settings
                       if(net_ClientReadMapData(gst))then
                       begin
-                         CleintProtocolError(@str_WrongVersion);
+                         CleintProtocolError(@str_error_WrongVersion);
                          exit;
                       end;
                       net_status_str:='';
@@ -680,12 +681,12 @@ begin
             begin
                s:='';
                for i:=0 to MaxPlayers do _ADDSTR(@s,net_readstring,sep_comma);
-               s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_gmode[v]+'  '+s;
+               s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_emnu_GameModel[v]+'  '+s;
                net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
                continue;
             end;
          end;
-         net_DiscoweringUpdate(net_LastinIP,net_LastinPort,c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_WrongVersion);
+         net_DiscoweringUpdate(net_LastinIP,net_LastinPort,c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_error_WrongVersion);
       end;
    end;
 end;

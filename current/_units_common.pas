@@ -168,7 +168,7 @@ end;
 
 {$ENDIF}
 
-procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;apzone:word);
+procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;azone:word);
 var
 gr,gx,gy,
 cx,cy,
@@ -177,7 +177,7 @@ i,u,outc:integer;
 procedure AddResult(x,y:integer);
 var mx,my,d:integer;
 begin
-   if(map_GetZoneXY(x,y,true,false)<>apzone)then exit;
+   if(map_GetZone(x,y,false)<>azone)then exit;
    mx:=x*MapCellW+MapCellhW;
    my:=y*MapCellW+MapCellhW;
    d:=abs(cx-mx)+abs(cy-my);
@@ -199,7 +199,7 @@ begin
    begin
       if(gr=0)then
       begin
-         if(map_GetZoneXY(gx,gy,true,false)=apzone)then
+         if(map_GetZone(gx,gy,false)=azone)then
          begin
             rx:=gx;
             ry:=gy;
@@ -236,7 +236,7 @@ begin
    with pu^ do
    begin
       if(tryPushOut)then
-        if(not ukfly)and(not ukfloater)then pushOut_GridUAction(@ox,@oy,uid^._r+1,pzone);
+        if(not ukfly)and(not ukfloater)then pushOut_GridUAction(@ox,@oy,uid^._r+1,zone);
       ua_bx :=obx;
       ua_by :=oby;
       ua_x  :=ox;
@@ -290,7 +290,7 @@ begin
    with pu^ do
    with uid^ do
     if(not ServerSide)and(speed>0)
-    then unit_canMove:=(x<>mv_x)or(y<>mv_y)
+    then unit_canMove:=(x<>moveCurr_x)or(y<>moveCurr_y)
     else
     begin
        unit_canMove:=false;
@@ -355,7 +355,7 @@ begin
    begin
       gridx:=x div MapCellW;
       gridy:=y div MapCellW;
-      if(updateZone)then map_GetZonesXYCell(gridx,gridy,@pzone,@szone);
+      if(updateZone)then zone:=map_GetZone(gridx,gridy,false);
 
       {$IFDEF _FULLGAME}
       unit_UpdateMiniMapXY(pu);
@@ -853,8 +853,8 @@ begin
 end;
 
 function CheckBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
-var  u:integer;
-tszone:word;
+var u:integer;
+tzone:word;
 begin
    CheckBuildArea:=0;
 
@@ -879,13 +879,13 @@ begin
 
    CheckBuildArea:=2;
 
-   tszone:=map_GetZoneXY(tx,ty,false,true);
+   tzone:=map_GetZone(tx,ty,true);
 
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
      with uid^ do
       if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=pl)then
-       if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)and(tszone=szone)then
+       if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)and(tzone=zone)then
         if(buid in ups_builder)and(not IsUnitRange(transport,nil))then
          if(point_dist_int(x,y,tx,ty)<srange)then
          begin
@@ -914,8 +914,8 @@ begin
         with g_players[playern] do
           obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
 
-      if(obstacles)and(g_players[playern].state=ps_comp)then
-        if(map_IsObstacleZone(map_GetZoneXY(tx,ty,false,true),false))then begin CheckBuildPlace:=2;exit;end;
+      if(obstacles)and(g_players[playern].player_type=pt_ai)then
+        if(map_IsObstacleZone(map_GetZone(tx,ty,true)))then begin CheckBuildPlace:=2;exit;end;
    end;
 
    i:=CheckBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
@@ -1051,7 +1051,7 @@ begin
               if(pTeleportMarker^.hits<=0)then exit;
 
               if(ukfly=uf_ground)then
-                if(map_IsObstacleZone(pTeleportMarker^.szone,false))then exit;
+                if(map_IsObstacleZone(pTeleportMarker^.zone))then exit;
               pTeleporter^.ua_x:=pTeleportMarker^.x;
               pTeleporter^.ua_y:=pTeleportMarker^.y;
 
@@ -1285,11 +1285,11 @@ begin
             ua_y    := y;
             ua_bx   := -1;
             ua_by   := -1;
-            mv_x    := x;
-            mv_y    := y;
+            moveCurr_x    := x;
+            moveCurr_y    := y;
             gridx   := x div MapCellW;
             gridy   := y div MapCellW;
-            map_GetZonesXYCell(gridx,gridy,@pzone,@szone);
+            zone:=map_GetZone(gridx,gridy,false);
             isselected:= false;
             transportC:= 0;
 
@@ -1312,7 +1312,7 @@ end;
 
 function StartBuild(bx,by:integer;buid,bp:byte):cardinal;
 begin
-   StartBuild:=_uid_conditionals(@g_players[bp],buid);
+   StartBuild:=uid_CheckRequirements(@g_players[bp],buid);
    if(StartBuild=0)then
     with g_players[bp] do
      if(CheckBuildPlace(bx,by,0,0,bp,buid)=0)
@@ -1402,7 +1402,7 @@ begin
            if(uprod_r[pn]>0)
            then PlayerSetProdError(playeri,lmt_argt_unit,puid,ureq_busy,pu)
            else
-             if(not PlayerSetProdError(playeri,lmt_argt_unit,puid,_uid_conditionals(pu^.player,puid),pu))then
+             if(not PlayerSetProdError(playeri,lmt_argt_unit,puid,uid_CheckRequirements(pu^.player,puid),pu))then
                with player^ do
                begin
                   uproda+=1;
@@ -1480,15 +1480,15 @@ begin
            if(pprod_r[pn]>0)
            then PlayerSetProdError(playeri,lmt_argt_upgr,upid,ureq_busy,pu)
            else
-             if(not PlayerSetProdError(playeri,lmt_argt_upgr,upid,_upid_conditionals(player,upid),pu))then
+             if(not PlayerSetProdError(playeri,lmt_argt_upgr,upid,upid_CheckRequirements(player,upid),pu))then
                with player^ do
                with g_upids[upid] do
                begin
                   upproda+=1;
                   upprodu[upid]+=1;
-                  pprod_e[pn]:=_upid_energy(upid,upgr[upid]+1);
+                  pprod_e[pn]:=upid_CalcCostEnergy(upid,upgr[upid]+1);
                   cenergy-=pprod_e[pn];
-                  pprod_r[pn]:=_upid_time(upid,upgr[upid]+1);
+                  pprod_r[pn]:=upid_CalcCostTime(upid,upgr[upid]+1);
                   pprod_u[pn]:=upid;
 
                   unit_ProdUpgrStart_p:=true;
@@ -1679,7 +1679,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      if(not _uid_player_limit(player,auid))
+      if(not uid_CheckPlayerLimit(player,auid))
       then LastCreatedUnit:=0
       else
         if(not ServerSide)
@@ -1816,7 +1816,7 @@ begin
 
        //if(G_Status=gs_running)then
         if(playeri>0)or(g_mode<>gm_invasion)then
-         if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+         if(army<=0)and(player_type>pt_none)//{$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;
 end;
@@ -1856,8 +1856,8 @@ begin
       x       :=vx;
       y       :=vy;
       unit_clear_order(pu,true);
-      mv_x    :=x;
-      mv_y    :=y;
+      moveCurr_x    :=x;
+      moveCurr_y    :=y;
       a_tar   :=0;
       a_reload:=0;
       reload  :=0;
@@ -1909,7 +1909,7 @@ begin
             then missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
             if(_death_uid>0)and(_death_uidn>0)then
               for i:=1 to _death_uidn do
-                if(_uid_player_limit(player,_death_uid))then
+                if(uid_CheckPlayerLimit(player,_death_uid))then
                   unit_add(x-g_randomr(_missile_r),y-g_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
          end;
       end;

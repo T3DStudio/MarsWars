@@ -37,9 +37,9 @@ begin
 chat_all      : MakeChatTargets:=255;
 chat_allies   : for p:=1 to MaxPlayers do
                  with g_players[p] do
-                  if(state>ps_none)and(team=g_players[player].team)then
+                  if(player_type>pt_none)and(team=g_players[player].team)then
                    SetBBit(@MakeChatTargets,p,true);
-1..MaxPlayers : if(g_players[a].state=ps_play)then SetBBit(@MakeChatTargets,a,true);
+1..MaxPlayers : if(g_players[a].player_type=pt_human)then SetBBit(@MakeChatTargets,a,true);
    end;
 end;
 
@@ -48,7 +48,7 @@ var HPlayerAllies: byte;
 begin
    if(not menu_state)and(ingame_chat=0)and(net_status>ns_single)then
    begin
-      HPlayerAllies:=PlayerAllies(PlayerClient,false);
+      HPlayerAllies:=PlayerGetAlliesByte(PlayerClient,false);
       if(HPlayerAllies>0)
       then ingame_chat:=chat_allies
       else ingame_chat:=chat_all;
@@ -92,12 +92,12 @@ begin
        if(G_Status=gs_running)then
        begin
           G_Status:=PlayerClient;
-          GameLogChat(PlayerClient,255,str_PlayerPaused,false);
+          GameLogChat(PlayerClient,255,str_msg_PlayerPaused,false);
        end
        else
        begin
           G_Status:=gs_running;
-          GameLogChat(PlayerClient,255,str_PlayerResumed,false);
+          GameLogChat(PlayerClient,255,str_msg_PlayerResumed,false);
        end;
 end;
 
@@ -311,7 +311,7 @@ begin
    case m_brush of
    0     : m_brush:=mb_empty;
    1..255: begin
-              cndt:=_uid_conditionals(@g_players[PlayerClient],m_brush);
+              cndt:=uid_CheckRequirements(@g_players[PlayerClient],m_brush);
               if(cndt>0)then
               begin
                  if(log)then GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
@@ -476,7 +476,7 @@ begin
           end;
      end
      else
-       if(G_Status=gs_running)then
+       if(not g_players[PlayerClient].isdefeated)and(G_Status=gs_running)then
          if(click_type=pct_left)then
          begin
             case u of
@@ -530,7 +530,7 @@ sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                  else sys_uncappedFPS:=not sys_uncappedFPS;
 sdlk_home      : test_fastprod:=not test_fastprod;
-sdlk_pageup    : with g_players[PlayerClient] do if(state=ps_play      )then state:=PS_Comp       else state:=ps_play;
+sdlk_pageup    : with g_players[PlayerClient] do if(player_type=pt_human)then player_type:=pt_ai else player_type:=pt_human;
 sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : sys_fog:=not sys_fog;
 SDLK_F3        : nullupgr(PlayerClient);
@@ -722,16 +722,17 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(menu_state)then
                                                    begin
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);
-                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-vid_srch_m-1,false);
+                                                      //if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      //if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                                       //98 : ScrollInt(@_cmp_sm            , 1,0,MaxMissions-vid_camp_m      );
+
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(menu_state)then
                                                    begin
-                                                      if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);
-                                                      if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);
-                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-vid_srch_m-1,false);
+                                                      //if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -vid_svld_m-1,false);
+                                                      //if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -vid_rpls_m-1,false);
+                                                      if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                                       //98 : ScrollInt(@_cmp_sm            ,-1,0,MaxMissions-vid_camp_m      );
                                                    end;
                            else
@@ -793,6 +794,13 @@ begin
    mouse_map_x:=mouse_x+vid_cam_x-vid_mapx;
    mouse_map_y:=mouse_y+vid_cam_y-vid_mapy;
 
+   {
+   debug_vxM,
+   debug_vyM,
+   debug_vxC,
+   debug_vyC
+   }
+
    // pannel bx by
    if(vid_PannelPos<2)then  //vertical
    begin
@@ -847,7 +855,7 @@ mb_empty    : if(ks_ctrl>0)then
               begin
                  if(d_UpdateUIPlayer(ui_uhint))then exit;
 
-                 debug_zone:=map_GetZoneXY(mouse_map_x,mouse_map_y,true,true);
+                 //debug_zone:=map_GetZone(mouse_map_x,mouse_map_y,true);
 
                  mouse_select_x0:=mouse_map_x;
                  mouse_select_y0:=mouse_map_y;
@@ -970,19 +978,19 @@ begin
    end
    else
    begin
-      if(ks_mleft =1)
+      {if(ks_mleft =1)
       or(ks_mright=1)
       or(ks_up    =1)
       or(ks_down  =1)
       or(ks_left  =1)
       or(ks_right =1)
-      then PlayerAPMInc(PlayerClient);
+      then PlayerAPMInc(PlayerClient); }
 
       g_keyboard;
       g_mouse;
    end;
 
-   if(ks_mleft=-1)then mleft_dbl_click:=fr_fpsd4;
+   if(ks_mleft=-1)then mleft_dbl_click:=fr_fpsd5;
 end;
 
 

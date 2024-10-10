@@ -21,12 +21,12 @@ fr_fpsd4               = fr_fps1 div 4;
 fr_fpsd5               = fr_fps1 div 5;
 fr_fpsd6               = fr_fps1 div 6;
 fr_fpsd8               = fr_fps1 div 8;
-fr_fps1d2              = fr_fpsd2*3;   //1,5
+fr_fps1d2              = fr_fpsd2*3;    // 1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
 fr_fps4                = fr_fps1*4;
 fr_fps6                = fr_fps1*6;
-fr_fps2d3              = fr_fpsd3*2; //2/3
+fr_fps2d3              = fr_fpsd3*2;    // 2/3
 fr_fps60               = fr_fps1*60;
 
 APM_UPDPeriod          = fr_fps1*5;
@@ -45,30 +45,30 @@ gms_g_maxgens          = 6;  // 0-6  max neutrall generators options
 //  BASE
 //
 
-ps_none                = 0;  // player state
-ps_play                = 1;
-ps_comp                = 2;
+pt_none                = 0;  // player type
+pt_human               = 1;
+pt_ai                  = 2;
 
 //  Player slot state
-ps_closed              = 0;
-ps_observer            = 1;
-ps_opened              = 2;
-ps_ready               = 3;  // menu option, not state
-ps_nready              = 4;  // menu option, not state
-ps_swap                = 5;  // menu option, not state
-ps_AI_1                = 6;  // very easy
-ps_AI_2                = 7;  // easy
-ps_AI_3                = 8;  // medium
-ps_AI_4                = 9;  // hard
-ps_AI_5                = 10; // harder
-ps_AI_6                = 11; // very hard
-ps_AI_7                = 12; // elite
-ps_AI_8                = 13; // Cheater 1 (Vision)
-ps_AI_9                = 14; // Cheater 2 (Vision+MultiProd)
-ps_AI_10               = 15; // Cheater 3 (Vision+MultiProd+FastUProd)
-ps_AI_11               = 16; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+pss_closed             = 0;
+pss_observer           = 1;
+pss_opened             = 2;
+pss_ready              = 3;  // menu option, not state
+pss_nready             = 4;  // menu option, not state
+pss_swap               = 5;  // menu option, not state
+pss_AI_1               = 6;  // very easy
+//pss_AI_2               = 7;  // easy
+pss_AI_3               = 8;  // medium
+{pss_AI_4                = 9;  // hard
+pss_AI_5                = 10; // harder
+pss_AI_6                = 11; // very hard
+pss_AI_7                = 12; // elite
+pss_AI_8                = 13; // Cheater 1 (Vision)
+pss_AI_9                = 14; // Cheater 2 (Vision+MultiProd)
+pss_AI_10               = 15; // Cheater 3 (Vision+MultiProd+FastUProd)   }
+pss_AI_11              = 16; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
 
-gms_g_maxai            = ps_AI_11-ps_AI_1+1; // 0-11 max skirmish AI skills
+gms_g_maxai            = pss_AI_11-pss_AI_1+1; // 0-11 max skirmish AI skills
 
 ps_states_n            = 6+gms_g_maxai;
 
@@ -83,7 +83,7 @@ gm_KotH                = 5;
 gm_royale              = 6;
 
 gm_ModesFixedTeams     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
-gm_ModesFixedPositions : set of byte = [gm_3x3,gm_2x2x2];
+//gm_ModesFixedPositions : set of byte = [gm_3x3,gm_2x2x2];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gms_count              = 6;
@@ -178,6 +178,7 @@ str_b2c                : array[false..true] of char = ('-','+');
 outlogfn               : shortstring = 'out.txt';
 
 k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}',' ','_',',','.','(',')','-','+','`','&','@','#','%','?','$'];
+k_pname                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}','_',',','.','(',')','-','+','`','&','@','#','%','?','$'];
 
 str_defaultPlayerName  = 'DoomPlayer';
 
@@ -1222,26 +1223,32 @@ uinfo_text             = 6;
 //  TEXT
 //
 
-ta_left                = 0;
-ta_middle              = 1;
-ta_right               = 2;
-ta_chat                = 3;
-ta_rightmid            = 4;
-ta_x0y0                = 5;
-ta_x1y1                = 6;
+ta_LU                  = 0;   // |^| | |
+ta_MU                  = 1;   // | |^| |
+ta_RU                  = 2;   // | | |^|
+ta_LM                  = 3;   // |-| | |
+ta_MM                  = 4;   // | |-| |
+ta_RM                  = 5;   // | | |-|
+ta_LD                  = 6;   // |_| | |
+ta_MD                  = 7;   // | |_| |
+ta_RD                  = 8;   // | | |_|
+ta_chat                = 9;
+ta_MMR                 = 10;  // |  |- |
 
-font_w                 = 8;
-font_hw                = font_w div 2;
-font_hhw               = font_w div 4;
-font_34                =(font_w div 4)*3;
-font_5w                = font_w*5;
-font_iw                = font_w-1;
-font_3hw               = font_w+(font_w div 2);
-font_6hw               = font_3hw*2;
+basefont_w1            = 8;
+basefont_w2            = basefont_w1*2;
+basefont_w3            = basefont_w1*3;
+basefont_w4            = basefont_w1*4;
+basefont_wh            = basefont_w1 div 2;
+basefont_wq            = basefont_w1 div 4;
+basefont_wq3           = basefont_wq*3;
+basefont_w5            = basefont_w1*5;
+basefont_w1h           = basefont_w1+basefont_wh;
 
-txt_line_h1            = font_w+2;
-txt_line_h2            = 25-font_w;
-txt_line_h3            = font_w+5;
+
+//txt_line_h1            = basefont_w1+2;
+//txt_line_h2            = 25-basefont_w1;
+//txt_line_h3            = basefont_w1+5;
 
 chat_all               = 255;
 chat_allies            = 254;
@@ -1262,13 +1269,12 @@ fr_ifps                = fr_fps1-1;
 vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
-vid_maxw               = 1360;
-vid_maxh               = 768;
+vid_maxw               = 1440;
+vid_maxh               = 1080;
 
-vid_rw_list            : array[0..4] of Smallint = (vid_minw,960,1024,1280,vid_maxw);
-vid_rh_list            : array[0..3] of Smallint = (vid_minh,680,720,vid_maxh);
+vid_rw_list            : array[0..7] of Smallint = (vid_minw,960,1024,1280,1360,1366,1400,vid_maxw);
+vid_rh_list            : array[0..7] of Smallint = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
 
-vid_ab                 = 128;
 vid_MaxScreenSprites   = 500; // max vis sprites;
 vid_blink_persecond    = 6;
 vid_blink_period1      = fr_fps1  div vid_blink_persecond;
@@ -1289,10 +1295,10 @@ vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
 vid_oisw               = vid_oiw-(vid_oiw div 4);
 vid_oips               = 2*vid_oiw+vid_oisw;
-vid_svld_m             = 9;
+{vid_svld_m             = 9;
 vid_rpls_m             = 10;
 vid_camp_m             = 11;
-vid_srch_m             = 2;
+vid_srch_m             = 2; }
 
 ui_max_alarms          = 12;
 
@@ -1300,74 +1306,219 @@ ui_bottomsy            = vid_BW*4;
 ui_hwp                 = vid_panelw div 2;
 ui_ubtns               = 23;
 
-ui_menu_list_item_H    = font_w*2;
-ui_menu_list_item_S    = font_w div 2;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MENU
+//
 
-////////////////////////   menu items      TerrGridMaxDecors
+{ms1_sett               = 0;
+ms1_svld               = 1;
+ms1_reps               = 2;
+
+ms2_camp               = 0;
+ms2_game               = 1;
+ms2_mult               = 2;
+
+ms3_game               = 0;
+ms3_vido               = 1;
+ms3_sond               = 2; }
+
+MaxMissions            = 21;
+//CMPMaxSkills           = 6;
+
+chat_type              : array[false..true] of char = ('|',' ');
+log_LastMesTime        = fr_fps1*3;
+log_LastMesMaxN        = log_LastMesTime*6;
+
+menu_logo_h            = 96;
+
+menu_main_mp_bw1       = 300;
+menu_main_mp_bwh       = menu_main_mp_bw1 div 2;
+menu_main_mp_bwq       = menu_main_mp_bw1 div 4;
+menu_main_mp_bw3q      = menu_main_mp_bwq*3;
+menu_main_mp_bh1       = 38;
+menu_main_mp_bh2       = menu_main_mp_bh1*2;
+menu_main_mp_bh3       = menu_main_mp_bh1*3;
+menu_main_mp_bhh       = menu_main_mp_bh1 div 2;
+menu_main_mp_bhq       = menu_main_mp_bh1 div 4;
+menu_main_mp_bhq3      = menu_main_mp_bhq*3;
+menu_main_mp_bh1q      = menu_main_mp_bhq*5;
+menu_main_mp_bh1h      = menu_main_mp_bh1+menu_main_mp_bhh;
+menu_main_mp_bh3q      = menu_main_mp_bhq*3;
+
+menu_players_namew     = basefont_w1+(basefont_w1*PlayerNameLen)+
+                                     (basefont_w1*8            )+basefont_w2;
+menu_players_racew     = basefont_w1+(basefont_w1*7            )+basefont_w2;
+menu_players_teamw     = basefont_w1+(basefont_w1*7            )+basefont_w2;
+menu_map_settingsw     = basefont_w1+(basefont_w1*20           )+basefont_w2;
+
+menu_netsearch_lineh   = menu_main_mp_bh1;
+menu_netsearch_listh   = 8;
+
+
+////////////////////////   menu pages
+
+mp_main                   = 0;
+mp_campaings              = 1;
+mp_scirmish               = 2;
+mp_loadgame               = 3;
+mp_SaveGame               = 4;
+mp_loadreplay             = 5;
+mp_aboutgame              = 6;
+mp_settings               = 7;
+
+////////////////////////   menu items
+
+{
+Campaings
+Scirmish
+Load game
+Save game
+Load replay
+About game
+Exit
+}
+
 ////  MAIN
-mi_exit                = 1;
-mi_back                = 2;
-mi_start               = 3;
-mi_break               = 4;
-mi_surrender           = 5;
+mi_StartGame              = 1;
+mi_StartCampaings         = 2;
+mi_StartScirmish          = 3;
+mi_StartReplay            = 4;
 
-////  MAP PARAMS
-mi_map_params1         = 11;
-mi_map_params2         = 12;
-mi_map_params3         = 13;
-mi_map_params4         = 14;
-mi_map_params5         = 15;
-mi_map_params6         = 16;
-mi_map_params7         = 17;
+mi_EndGame                = 5;
+mi_EndSurrender           = 6;
+mi_EndLeave               = 7;
 
-////  TABS SETTINGS SAVELOAD REPLAYS
-mi_tab_settings        = 21;
-mi_tab_saveload        = 22;
-mi_tab_replays         = 23;
+mi_SaveLoad               = 8;
+mi_loadgame               = 9;
 
-////  TABS SETTINGS
-mi_settings_game       = 24;
-mi_settings_video      = 25;
-mi_settings_sound      = 26;
+mi_Settings               = 11;
+mi_AboutGame              = 12;
+mi_back                   = 13;
+mi_exit                   = 14;
+mi_start                  = 15;
+
+
+mi_title_campaings        = 21;
+mi_title_scirmish         = 22;
+mi_title_loadgame         = 23;
+mi_title_savegame         = 24;
+mi_title_loadreplay       = 25;
+mi_title_settings         = 26;
+mi_title_aboutgame        = 27;
+mi_title_players          = 28;
+mi_title_map              = 29;
+mi_title_goptions         = 30;
+mi_title_multiplayer      = 31;
+
+////  SETTINGS
+
+mi_settings_game          = 41;
+mi_settings_record        = 42;
+mi_settings_network       = 43;
+mi_settings_video         = 44;
+mi_settings_sound         = 45;
 
 ////  SETTINGS GAME LINES
-mi_settings_ColoredShadows= 31;
-mi_settings_ShowAPM       = 32;
-mi_settings_HitBars       = 33;
-mi_settings_MRBAction     = 34;
-mi_settings_ScrollSpeed   = 35;
-mi_settings_MouseScroll   = 36;
-mi_settings_PlayerName    = 37;
-mi_settings_Langugage     = 38;
-mi_settings_PanelPosition = 39;
-mi_settings_PlayerColors  = 40;
-mi_settings_game11        = 41;
+mi_settings_ColoredShadows= 51;
+mi_settings_ShowAPM       = 52;
+mi_settings_HitBars       = 53;
+mi_settings_MRBAction     = 54;
+mi_settings_ScrollSpeed   = 55;
+mi_settings_MouseScroll   = 56;
+mi_settings_PlayerName    = 57;
+mi_settings_Langugage     = 58;
+mi_settings_PanelPosition = 59;
+mi_settings_PlayerColors  = 60;
+
+////  RECORDING OPTIONS
+mi_settings_RecordStatus  = 61;
+mi_settings_RecordName    = 62;
+mi_settings_RecordQuality = 63;
+
+////  NETWORK SETTINGS
+mi_settings_ClientQuality = 71;
 
 ////  SETTINGS VIDEO LINES
-mi_settings_video1     = 51;
-mi_settings_video2     = 52;
-mi_settings_ResWidth   = 53;
-mi_settings_ResHeight  = 54;
-mi_settings_ResApply   = 55;
-mi_settings_video6     = 56;
-mi_settings_Fullscreen = 57;
-mi_settings_video8     = 58;
-mi_settings_ShowFPS    = 59;
-mi_settings_video10    = 60;
-mi_settings_video11    = 61;
+mi_settings_ResWidth      = 81;
+mi_settings_ResHeight     = 82;
+mi_settings_ResApply      = 83;
+mi_settings_Fullscreen    = 84;
+mi_settings_ShowFPS       = 85;
 
 ////  SETTINGS SOUND LINES
-mi_settings_sound1     = 71;
-mi_settings_sound2     = 72;
-mi_settings_SoundVol   = 73;
-mi_settings_MusicVol   = 74;
-mi_settings_sound5     = 75;
-mi_settings_NextTrack  = 76;
-mi_settings_sound7     = 77;
-mi_settings_sound8     = 78;
-mi_settings_sound9     = 79;
-mi_settings_sound10    = 80;
-mi_settings_sound11    = 81;
+mi_settings_SoundVol      = 91;
+mi_settings_MusicVol      = 92;
+mi_settings_NextTrack     = 93;
+
+
+////  SCIRMISH PLAYERS
+mi_player_status1         = 111;
+mi_player_status2         = 112;
+mi_player_status3         = 113;
+mi_player_status4         = 114;
+mi_player_status5         = 115;
+mi_player_status6         = 116;
+
+mi_player_race1           = 121;
+mi_player_race2           = 122;
+mi_player_race3           = 123;
+mi_player_race4           = 124;
+mi_player_race5           = 125;
+mi_player_race6           = 126;
+
+mi_player_team1           = 131;
+mi_player_team2           = 132;
+mi_player_team3           = 133;
+mi_player_team4           = 134;
+mi_player_team5           = 135;
+mi_player_team6           = 136;
+
+mi_player_color1          = 141;
+mi_player_color2          = 142;
+mi_player_color3          = 143;
+mi_player_color4          = 144;
+mi_player_color5          = 145;
+mi_player_color6          = 146;
+
+////  MAP PARAMS
+mi_map_Preset             = 151;
+mi_map_Seed               = 152;
+mi_map_Size               = 153;
+mi_map_Type               = 154;
+mi_map_Sym                = 155;
+mi_map_Random             = 156;
+mi_map_Theme              = 157;
+mi_map_MiniMap            = 158;
+
+////  GAME OPTIONS
+mi_game_mode              = 161;
+mi_game_builders          = 162;
+mi_game_generators        = 163;
+mi_game_FixStarts         = 164;
+mi_game_DeadPbserver      = 165;
+mi_game_EmptySlots        = 166;
+mi_game_RandomSkrimish    = 167;
+
+////  MULTIPLAYER
+mi_mplay_ServerCaption    = 180;
+mi_mplay_ServerPort       = 181;
+mi_mplay_ServerStart      = 182;
+mi_mplay_ServerStop       = 183;
+mi_mplay_ClientCaption    = 184;
+mi_mplay_ClientAddress    = 185;
+mi_mplay_ClientConnect    = 186;
+mi_mplay_ClientDisconnect = 187;
+mi_mplay_ChatCaption      = 189;
+mi_mplay_Chat             = 190;
+mi_mplay_NetSearchCaption = 191;
+mi_mplay_NetSearchStart   = 192;
+mi_mplay_NetSearchStop    = 193;
+mi_mplay_NetSearchList    = 194;
+mi_mplay_NetSearchCon     = 195;
+
+
+{
 
 ////  SAVE LOAD
 mi_saveload_list       = 90;
@@ -1381,163 +1532,9 @@ mi_replays_list        = 97;
 mi_replays_play        = 98;
 mi_replays_delete      = 99;
 
-////  PLAYERS
+}
 
-mi_player_status1      = 111;
-mi_player_status2      = 112;
-mi_player_status3      = 113;
-mi_player_status4      = 114;
-mi_player_status5      = 115;
-mi_player_status6      = 116;
-
-mi_player_race1        = 121;
-mi_player_race2        = 122;
-mi_player_race3        = 123;
-mi_player_race4        = 124;
-mi_player_race5        = 125;
-mi_player_race6        = 126;
-
-mi_player_team1        = 131;
-mi_player_team2        = 132;
-mi_player_team3        = 133;
-mi_player_team4        = 134;
-mi_player_team5        = 135;
-mi_player_team6        = 136;
-
-////  CAMPAINGS SCIRMISH MULTIPLAYER
-
-mi_tab_campaing        = 141;
-mi_tab_game            = 142;
-mi_tab_multiplayer     = 143;
-
-////  GAME
-mi_game_GameCaption    = 150;
-mi_game_mode           = 151;
-mi_game_builders       = 152;
-mi_game_generators     = 153;
-mi_game_FixStarts      = 154;
-mi_game_DeadPbserver   = 155;
-mi_game_EmptySlots     = 156;
-mi_game_RandomSkrimish = 157;
-
-mi_game_RecordCaption  = 158;
-mi_game_RecordStatus   = 159;
-mi_game_RecordName     = 160;
-mi_game_RecordQuality  = 161;
-
-////  MULTIPLAYER
-mi_mplay_ServerCaption = 170;
-mi_mplay_ServerPort    = 171;
-mi_mplay_ServerToggle  = 172;
-mi_mplay_ClientCaption = 173;
-mi_mplay_ClientAddress = 174;
-mi_mplay_ClientConnect = 175;
-mi_mplay_ClientQuality = 176;
-mi_mplay_Chat          = 177;
-mi_mplay_NetSearch     = 178;
-mi_mplay_NetSearchList = 179;
-mi_mplay_NetSearchCon  = 180;
-
-/////////////////////////////    MAIN MENU ZONES
-
-//// main buttons
-ui_menu_mbutton_lx0    = 32;
-ui_menu_mbutton_lx1    = 107;
-ui_menu_mbutton_rx0    = 692;
-ui_menu_mbutton_rx1    = 767;
-ui_menu_mbutton_y0     = 544;
-ui_menu_mbutton_y1     = 571;
-
-//// map section
-ui_menu_map_zx0        = 76;    // full zone
-ui_menu_map_zy0        = 110;
-ui_menu_map_zx1        = 381;
-ui_menu_map_zy1        = 253;
-ui_menu_map_cx         = (ui_menu_map_zx0+ui_menu_map_zx1) div 2;   // caption
-ui_menu_map_cy         = ui_menu_map_zy0-font_3hw-2;
-ui_menu_map_lh         = 20;                                        // line height
-ui_menu_map_lhh        = ui_menu_map_lh div 2;
-ui_menu_map_mx0        = ui_menu_map_zx0;                           // map position
-ui_menu_map_my0        = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2)+1;
-ui_menu_map_ph         = ui_menu_map_lh*7;                          // parameters count
-ui_menu_map_px0        = ui_menu_map_mx0+vid_panelw+ui_menu_map_lhh-font_w;// parameters block
-ui_menu_map_py0        = ui_menu_map_my0+1;
-ui_menu_map_px1        = ui_menu_map_zx1-ui_menu_map_lhh+font_w;
-ui_menu_map_py1        = ui_menu_map_py0+ui_menu_map_ph;
-
-//// settings save/load replays  tabs
-ui_menu_ssr_zx0        = 76;    // full zone
-ui_menu_ssr_zy0        = 290;
-ui_menu_ssr_zx1        = 381;
-ui_menu_ssr_zy1        = 523;
-ui_menu_ssr_lh         = 18;    // line height
-ui_menu_ssr_cw         = round((ui_menu_ssr_zx1-ui_menu_ssr_zx0)/3); // col width
-ui_menu_ssr_cx         = (ui_menu_ssr_zx0+ui_menu_ssr_zx1) div 2;    // center x
-
-//// players section
-ui_menu_pls_zx0        = 418;   // full zone
-ui_menu_pls_zy0        = 110;
-ui_menu_pls_zx1        = 723;
-ui_menu_pls_zy1        = 253;
-ui_menu_pls_lh         = 23;
-ui_menu_pls_lhh        = ui_menu_pls_lh div 2;
-ui_menu_pls_cptx       = (ui_menu_pls_zx0+ui_menu_pls_zx1) div 2;
-ui_menu_pls_cpty       = ui_menu_pls_zy0-font_3hw-2;
-ui_menu_pls_pbh        = ui_menu_pls_lh*MaxPlayers; // players block height
-ui_menu_pls_pbx0       = ui_menu_pls_zx0;           // players block
-ui_menu_pls_pby0       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)-(ui_menu_pls_pbh div 2);
-ui_menu_pls_pbx1       = ui_menu_pls_zx1;
-ui_menu_pls_pby1       = ((ui_menu_pls_zy0+ui_menu_pls_zy1)div 2)+(ui_menu_pls_pbh div 2);
-
-ui_menu_pls_cx_race    = ui_menu_pls_pbx0+font_w*PlayerNameLen+font_w*4;
-ui_menu_pls_cx_team    = ui_menu_pls_cx_race+font_w*9;
-ui_menu_pls_cx_color   = ui_menu_pls_cx_team+font_w*10;
-
-ui_menu_pls_border     = ui_menu_pls_lh div 4;
-ui_menu_pls_color_x0   = ui_menu_pls_cx_color+ui_menu_pls_border;
-ui_menu_pls_color_x1   = ui_menu_pls_pbx1    -ui_menu_pls_border+1;
-
-ui_menu_nsrch_lh       = txt_line_h3;
-ui_menu_nsrch_lh2      = txt_line_h3*2;
-ui_menu_nsrch_lh3      = txt_line_h3*3;
-ui_menu_nsrch_zx0      = ui_menu_pls_pbx0;
-ui_menu_nsrch_zy0      = ui_menu_pls_pby0;
-ui_menu_nsrch_zx1      = ui_menu_pls_pbx1;
-ui_menu_nsrch_zy1      = ui_menu_pls_pby0+ui_menu_nsrch_lh3*3;
-
-//// campaings game multiplayer  tabs
-ui_menu_cgm_zx0        = 418;
-ui_menu_cgm_zy0        = 290;
-ui_menu_cgm_zx1        = 723;
-ui_menu_cgm_zy1        = 523;
-ui_menu_cgm_lh         = 18;
-ui_menu_cgm_cw         = round((ui_menu_cgm_zx1-ui_menu_cgm_zx0)/3); // col width
-ui_menu_cgm_cx         = (ui_menu_cgm_zx0+ui_menu_cgm_zx1) div 2;    // center x
-
-{ui_menu_csm_xs         = 102;
-ui_menu_csm_xhs        = ui_menu_csm_xs div 2;
-ui_menu_csm_ys         = 18;
-ui_menu_csm_2ys        = ui_menu_csm_ys*2;
-//ui_menu_csm_yhs        = ui_menu_csm_ys div 2;
-ui_menu_csm_ycs        = 10;
-ui_menu_csm_xct        = ui_menu_csm_x0+2;
-ui_menu_csm_xc         = (ui_menu_csm_x0+ui_menu_csm_x1) div 2;
-ui_menu_csm_x2         = ui_menu_csm_x0+ui_menu_csm_xs;
-ui_menu_csm_x3         = ui_menu_csm_x2+ui_menu_csm_xs;
-ui_menu_csm_xt0        = ui_menu_csm_x0+6;
-ui_menu_csm_xt1        = ui_menu_csm_x0+18;
-ui_menu_csm_xt2        = ui_menu_csm_x1-6;
-ui_menu_csm_xt3        = ui_menu_csm_xc+6;  }
-
-
-chat_type              : array[false..true] of char = ('|',' ');
-log_LastMesTime        = fr_fps1*3;
-log_LastMesMaxN        = log_LastMesTime*6;
-
-ui_menu_chat_height    = 17; // lines
-ui_menu_chat_width     = 37; // chars
-
-ui_dBW                 = vid_BW-font_w-3;
+/////////////////////////////
 
 
 aummat_attacked_u      = 1;
@@ -1565,7 +1562,7 @@ sss_music              = 5;
 // sound sources set size
 sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
 
-max_svolume            = 127;
+max_SoundVolume        = 127;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1580,7 +1577,7 @@ rpls_state_none        = 0;
 rpls_state_write       = 1;
 rpls_state_read        = 2;
 
-SvRpLen                = 15;
+ReplayNameLen                = 15;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1592,26 +1589,6 @@ fog_CellW              = 36;
 fog_CellHW             = fog_CellW div 2;
 fog_vfwm               = (vid_maxw div fog_CellW)+2;
 fog_vfhm               = (vid_maxh div fog_CellW)+2;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  MENU
-//
-
-ms1_sett               = 0;
-ms1_svld               = 1;
-ms1_reps               = 2;
-
-ms2_camp               = 0;
-ms2_game               = 1;
-ms2_mult               = 2;
-
-ms3_game               = 0;
-ms3_vido               = 1;
-ms3_sond               = 2;
-
-MaxMissions            = 21;
-CMPMaxSkills           = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1652,7 +1629,6 @@ tc_player5             = #5;}
 tc_player6             = #6;
 tc_nl1                 = #11;
 tc_nl2                 = #12;
-tc_nl3                 = #13;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;
@@ -1665,6 +1641,8 @@ tc_white               = #22;
 tc_green               = #23;
 tc_dgray               = #24;
 tc_default             = #25;
+
+tc_SpecialChars        = [tc_player0..tc_default];
 
 //b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 
@@ -1726,22 +1704,22 @@ str_map                : shortstring = 'Map';
 
 str_m_seed             : shortstring = 'Seed';
 str_m_type             : shortstring = 'Type';
-str_m_typel            : array[0..gms_m_types] of shortstring = ('Steppe','Cave','Lake','Sea shore','Sea');
+str_m_typel            : array[0..gms_m_types] of shortstring = ('Steppe','Cave','Lake','Lake w/Islands','Island','Sea shore','Sea');
 str_m_siz              : shortstring = 'Size';
 str_m_sym              : shortstring = 'Symmetry';
-str_m_syml             : array[0..gms_m_symm] of shortstring = ('no','point','line');
+str_m_syml             : array[0..gms_m_symm] of shortstring = ('no','point','line |','line -','line \','line /');
 str_aislots            : shortstring = 'Fill empty slots:         ';
 str_fstarts            : shortstring = 'Fixed player starts:      ';
 str_gmode              : shortstring = 'Game mode:                ';
-str_gmodel             : array[0..gm_cnt      ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
+str_gmodel             : array[0..gms_count    ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
 str_cgenerators        : shortstring = 'Generators:               ';
 str_cgeneratorsl       : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
 str_deadobservers      : shortstring = 'Observer mode after lose: ';
 str_starta             : shortstring = 'Builders at game start:   ';
 str_plname             : shortstring = 'Player name';
-str_PlayerPaused       : shortstring = 'player paused the game';
-str_PlayerResumed      : shortstring = 'player has resumed the game';
-str_plout              : shortstring = ' left the game';
+str_msg_PlayerPaused   : shortstring = 'player paused the game';
+str_msg_PlayerResumed  : shortstring = 'player has resumed the game';
+str_msg_PlayerLeave    : shortstring = ' left the game';
 //str_player_def         : shortstring = ' was terminated!';
 
 str_plstat             : shortstring = 'State';

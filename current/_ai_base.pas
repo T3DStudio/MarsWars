@@ -198,7 +198,7 @@ var i: byte;
 begin
    {for i:=1 to MaxPlayers do
     if(i<>p)then
-     if((g_players[i].state>ps_none)and(g_players[i].team<>g_players[p].team))
+     if((g_players[i].state>pt_none)and(g_players[i].team<>g_players[p].team))
      or(not g_fixed_positions)
      then ai_PlayerSetAlarm(@g_players[p],map_PlayerStartX[i],map_PlayerStartY[i],1,base_1r,true,pf_get_area(map_PlayerStartX[i],map_PlayerStartY[i]));}
 end;
@@ -277,7 +277,7 @@ begin
                     +aif_ability_other
                     +aif_ability_mainsave; //all
       end;
-      if(state=ps_comp)then
+      if(player_type=pt_ai)then
       case ai_skill of
       8 : upgr[upgr_fog_vision  ]:=1;
       9 : begin
@@ -303,7 +303,7 @@ end;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
-   if(player^.state=ps_comp)then
+   if(player^.player_type=pt_ai)then
      ai_HighPriorityTarget:=tu^.uidi in player^.ai_hptargets;
 end;
 
@@ -333,7 +333,7 @@ begin
       begin
          x   :=tu^.x;
          y   :=tu^.y;
-         zone:=tu^.pzone;
+         zone:=tu^.zone;
       end;
       ai_alarm_x   :=x;
       ai_alarm_y   :=y;
@@ -347,12 +347,12 @@ begin
    begin
       ax   :=tu^.x;
       ay   :=tu^.y;
-      azone:=tu^.pzone;
+      azone:=tu^.zone;
    end;
    with pu^ do
    with uid^ do
      if(not ai_istransport)
-     or(not map_IsObstacleZone(azone,false))then
+     or(not map_IsObstacleZone(azone))then
        if(ai_BaseDestinationChecks(pu,azone))then
        begin
           if(aud<0)or(aud=NOTSET)
@@ -627,7 +627,7 @@ begin
             or(cpy>=map_size)then continue;
 
             if(ai_istransport)then
-              if(map_IsObstacleZone(cppzone,false))
+              if(map_IsObstacleZone(cppzone))
               or(cpOwnerTeam=team)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
@@ -817,7 +817,7 @@ begin
 
                // teleporter beacon
                if(tu^.aiu_alarm_d<base_1r)then
-                 if(not map_IsObstacleZone(tu^.pzone,false))then
+                 if(not map_IsObstacleZone(tu^.zone))then
                    if(ai_teleporter_beacon_u=nil)
                    then ai_teleporter_beacon_u:=tu
                    else

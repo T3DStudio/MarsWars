@@ -495,8 +495,21 @@ begin
 end;
 
 function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
+var ts:pSDl_Surface;
 begin
-   gfx_SDLSurfaceResize:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
+   ts:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
+   if(ts=nil)then
+   begin
+      WriteSDLError;
+      HALT;
+   end;
+   gfx_SDLSurfaceResize:=sdl_displayformat(ts);
+   if(gfx_SDLSurfaceResize=nil)then
+   begin
+      WriteSDLError;
+      HALT;
+   end;
+   SDL_FreeSurface(ts);
 end;
 
 function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;yPress:boolean;animStepX,animStepY:integer):pSDL_Surface;
@@ -697,17 +710,36 @@ begin
    fspr:=gfx_SDLSurfaceLoad('font',false,true);
    for i:=0 to 255 do
    begin
-      r_RECT^.x:=ord(i)*font_w;
+      r_RECT^.x:=ord(i)*basefont_w1;
       r_RECT^.y:=0;
-      r_RECT^.w:=font_w;
-      r_RECT^.h:=font_w;
+      r_RECT^.w:=basefont_w1;
+      r_RECT^.h:=basefont_w1;
       c:=chr(i);
-      with font_1[c] do
+      with font_1 [c] do
       begin
-         sdlSurface:=gfx_SDLSurfaceCreate(font_w,font_w);
+         sdlSurface:=gfx_SDLSurfaceCreate(basefont_w1,basefont_w1);
          SDL_FillRect(sdlSurface,nil,0);
          SDL_BLITSURFACE(fspr,r_RECT,sdlSurface,nil);
          SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
+      end;
+      with font_1h[c] do
+      begin
+         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1h,basefont_w1h);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
+      end;
+      with font_2 [c] do
+      begin
+         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1*2,basefont_w1*2);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
+      end;
+      with font_3 [c] do
+      begin
+         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1*3,basefont_w1*3);
+         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
+         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
       end;
    end;
    gfx_SDLSurfaceFree(fspr);
@@ -775,12 +807,11 @@ begin
 
    // load game resouces
    DrawLoadingScreen(str_loading_gfx,c_yellow);
-   spr_mback:= gfx_SDLSurfaceLoad('mback',false,firstload);
+   spr_mlogo :=gfx_SDLSurfaceLoad('logo' ,false,firstload);
+   spr_mback :=gfx_SDLSurfaceLoad('mback',false,firstload);
+   spr_mback2:=gfx_SDLSurfaceResize(spr_mback,vid_vw,vid_vh);
 
-   r_menu:=gfx_SDLSurfaceCreate(max2i(vid_minw,spr_mback^.w),max2i(vid_minh,spr_mback^.h));
-
-   menu_x:=(vid_vw-r_menu^.w) div 2;
-   menu_y:=(vid_vh-r_menu^.h) div 2;
+   r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
 
    spr_b_action   := gfx_LoadUIButton('b_action' ,vid_bw);
    spr_b_paction  := gfx_LoadUIButton('b_paction',vid_bw);
@@ -995,35 +1026,38 @@ begin
    vid_vmb_x1   := vid_vw-vid_vmb_x0;
    vid_vmb_y1   := vid_vh-vid_vmb_y0;
 
-   ui_textx     := vid_mapx+font_hw;
-   ui_texty     := vid_mapy+font_hw;
-   ui_hinty1    := vid_mapy+vid_cam_h-txt_line_h1*10;
-   ui_hinty2    := vid_mapy+vid_cam_h-txt_line_h1*8;
-   ui_hinty3    := vid_mapy+vid_cam_h-txt_line_h1*5;
-   ui_hinty4    := vid_mapy+vid_cam_h-txt_line_h1*2;
-   ui_chaty     := ui_hinty1-font_3hw;
-   ui_logy      := ui_chaty-font_3hw;
-   ui_oicox     := vid_mapx+vid_cam_w-font_hw;
+   ui_textx     := vid_mapx+basefont_wh;
+   ui_texty     := vid_mapy+basefont_wh;
+   ui_hinty1    := vid_mapy+vid_cam_h-draw_font_h1*10;
+   ui_hinty2    := vid_mapy+vid_cam_h-draw_font_h1*8;
+   ui_hinty3    := vid_mapy+vid_cam_h-draw_font_h1*5;
+   ui_hinty4    := vid_mapy+vid_cam_h-draw_font_h1*2;
+   ui_chaty     := ui_hinty1-basefont_w1h;
+   ui_logy      := ui_chaty-basefont_w1h;
+   ui_oicox     := vid_mapx+vid_cam_w-basefont_wh;
    ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
-   ui_uiuphy    := ui_texty+font_6hw;
-   ui_uiplayery := ui_uiuphy+font_3hw;
-   ui_GameLogHeight:=(ui_hinty1-font_5w) div font_3hw;
+   ui_uiuphy    := ui_texty+basefont_w3;
+   ui_uiplayery := ui_uiuphy+basefont_w1h;
+   ui_GameLogHeight:=(ui_hinty1-basefont_w5) div basefont_w1h;
 
    ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := vid_mapx+vid_cam_w-(font_w*font_3hw);
+   ui_fpsx      := vid_mapx+vid_cam_w-(basefont_w1*basefont_w1h);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
-   ui_apmy      := ui_fpsy+txt_line_h3;
+   ui_apmy      := ui_fpsy+draw_font_h2;
 
-   ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
+   ui_ingamecl  :=(vid_cam_w-basefont_w1) div basefont_w1;
    if(spr_mback<>nil)then
    begin
-      menu_x    :=(vid_vw-spr_mback^.w) div 2;
-      menu_y    :=(vid_vh-spr_mback^.h) div 2;
+      if(spr_mback2<>nil)then gfx_SDLSurfaceFree(spr_mback2);
+      spr_mback2:=gfx_SDLSurfaceResize(spr_mback,vid_vw,vid_vh);
    end;
+   if(r_menu<>nil)then gfx_SDLSurfaceFree(r_menu);
+   r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
+
    vid_fog_vfw  :=(vid_cam_w div fog_CellW)+1;
    vid_fog_vfh  :=(vid_cam_h div fog_CellW)+1;
 
@@ -1033,8 +1067,6 @@ begin
    map_mm_CamW  := round(vid_cam_w*map_mm_cx);
    map_mm_CamH  := round(vid_cam_h*map_mm_cx);
    GameCameraBounds;
-
-   //Map_tdmake;
 end;
 
 procedure vid_ScreenSurfaces;
@@ -1145,6 +1177,9 @@ end;
 procedure vid_MakeScreen;
 begin
    if (r_screen<>nil) then sdl_freesurface(r_screen);
+
+   vid_vhw:=vid_vw div 2;
+   vid_vhh:=vid_vh div 2;
 
    if(vid_fullscreen)
    then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)

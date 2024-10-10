@@ -208,8 +208,8 @@ begin
      begin
         cx:=x;
         cy:=y;
-        if(map_GetZoneXY(cx,newy,false,true)=szone)then cy:=newy;
-        if(map_GetZoneXY(newx,cy,false,true)=szone)then cx:=newx;
+        if(map_GetZone(cx,newy,true)=zone)then cy:=newy;
+        if(map_GetZone(newx,cy,true)=zone)then cx:=newx;
 
         if(x<>cx)or(y<>cy)
         then unit_SetXY(pu,cx,cy,mvxy_none,false);
@@ -288,7 +288,7 @@ begin
          my:=sy;
          for cy:=-1 to 1 do
          begin
-            if(map_GetZoneXY(gridx+cx,gridy+cy,false,false)<>szone)then
+            if(map_GetZone(gridx+cx,gridy+cy,false)<>zone)then
             begin
                px:=x;
                py:=y;
@@ -303,60 +303,282 @@ begin
    end;
 end;
 
+{
+vx:=vsx;
+vy:=vsy;
+
+repeat
+   kx:=pl[pp].x+vx;
+   ky:=pl[pp].y+vy;
+   pf_add(kx,ky,pl[pp].p);
+   kx:=vx;
+   vx:=sign(vx-vy);
+   vy:=sign(kx+vy);
+until (vx=vsx)and(vy=vsy);
+}
+
+procedure Vector1Calc(sx,sy,ex,ey:integer;rx,ry:pinteger);
+begin
+   sx:=ex-sx;
+   sy:=ey-sy;
+   if(abs(sx div 2)>abs(sy))then
+   begin
+      rx^:=sign(sx);
+      ry^:=0;
+   end
+   else
+     if(abs(sy div 2)>abs(sx))then
+     begin
+        rx^:=0;
+        ry^:=sign(sy);
+     end
+     else
+     begin
+        rx^:=sign(sx);
+        ry^:=sign(sy);
+     end
+end;
+function Vector1TurnTo(vx,vy:integer;rx,ry:pinteger;TurnTo,Side:boolean):boolean;
+var
+dx,dy,tx:integer;
+begin
+   Vector1TurnTo:=false;
+   dx:=rx^;
+   dy:=ry^;
+   case TurnTo of
+true : begin
+          if(dx= vx)and(dy= vy)then exit;
+          tx:=-dy* vx+dx* vy;
+       end;
+false: begin
+          if(dx=-vx)and(dy=-vy)then exit;
+          tx:=-dy*-vx+dx*-vy;
+       end;
+   end;
+
+   Vector1TurnTo:=true;
+   if(Side)
+   then Side:=(0<=tx)
+   else Side:=(0< tx);
+
+   tx:=vx;
+   if(Side)then
+   begin
+      rx^:=sign(tx+vy);
+      ry^:=sign(vy-tx);
+   end
+   else
+   begin
+      rx^:=sign(tx-vy);
+      ry^:=sign(vy+tx);
+   end;
+end;
+
+procedure Vector1Turn45(rx,ry:pinteger;side:boolean);
+var tx:integer;
+begin
+   tx:=rx^;
+   if(side)then
+   begin
+      rx^:=sign(tx+ry^);
+      ry^:=sign(ry^-tx);
+   end
+   else
+   begin
+      rx^:=sign(tx-ry^);
+      ry^:=sign(ry^+tx);
+   end;
+end;
+procedure Vector1Turn90(rx,ry:pinteger;side:boolean);
+var tx:integer;
+begin
+   tx:=rx^;
+   if(side)then
+   begin
+      rx^:= ry^;
+      ry^:=-tx;
+   end
+   else
+   begin
+      rx^:=-ry^;
+      ry^:= tx;
+   end;
+end;
+
+
+procedure pf_FindNextCell(zone:word;curGridX,curGridY,curX,curY,destX,destY:integer;curVX,curVY,debugDVX,debugDVY:pinteger);
+var
+side,i,
+destVX,
+destVY,
+destGridX,
+destGridY,
+nextVX,
+nextVY,
+nextd    : integer;
+function CheckResult(nvx,nvy:integer):boolean;
+var
+nx,ny,d:integer;
+begin
+   CheckResult:=false;
+   nx:=curGridX+nvx;
+   ny:=curGridY+nvy;
+   if(map_GetZone(nx      ,ny      ,false)<>zone)then exit;
+
+   if(abs(nvx)>0)and(abs(nvy)>0)then
+     if (map_GetZone(curGridX,ny      ,false)<>zone)
+     and(map_GetZone(nx      ,curGridY,false)<>zone)then exit;
+
+   d:=max2i(abs(destGridX-nx),abs(destGridY-ny));
+   if(d<nextd)then
+   begin
+      nextd :=d;
+      nextVX:=nvx;
+      nextVY:=nvy;
+      CheckResult:=true;
+   end;
+end;
+begin
+   nextd :=NOTSET;
+   nextVX:=0;
+   nextVY:=0;
+
+   destGridX:=destX div MapCellW;
+   destGridY:=destY div MapCellW;
+   if (curGridX<>destGridX)or(curGridY<>destGridY)then
+   begin
+      //Vector1Calc(curX,curY,destX,destY,@destVX,@destVY);
+      Vector1Calc(curGridX,curGridY,destGridX,destGridY,@destVX,@destVY);
+
+      if(debugDVX<>nil)then debugDVX^:=destVX;
+      if(debugDVY<>nil)then debugDVY^:=destVY;
+
+      if(curVX^=0)and(curVY^=0)then
+      begin
+         curVX^:=destVX;
+         curVY^:=destVY;
+      end;
+
+      if (curVX^=destVX)
+      and(curVy^=destVY)then
+      begin
+         //writeln('curV==destV');
+         if(not CheckResult(destVX,destVY))then
+         begin
+            i:=0;
+            Vector1Turn45(@destVX,@destVY,false);
+            i+=integer(CheckResult(destVX,destVY));
+            Vector1Turn90(@destVX,@destVY,true );
+            i+=integer(CheckResult(destVX,destVY));
+            if(i=0)then
+            begin
+               i:=0;
+               Vector1Turn45(@destVX,@destVY,true );
+               i+=integer(CheckResult(destVX,destVY));
+               destVX:=-destVX;
+               destVY:=-destVY;
+               i+=integer(CheckResult(destVX,destVY));
+               if(i=0)then
+               begin
+                  i:=0;
+                  Vector1Turn45(@destVX,@destVY,false);
+                  i+=integer(CheckResult(destVX,destVY));
+                  Vector1Turn90(@destVX,@destVY,false);
+                  i+=integer(CheckResult(destVX,destVY));
+                  if(i=0)then
+                  begin
+                     Vector1Turn45(@destVX,@destVY,true );
+                     CheckResult(destVX,destVY);
+                  end;
+               end;
+            end;
+         end;
+      end
+      else
+      begin
+         //writeln('curV<>destV');
+         side:=(-destVX*curVX^)+(destVY*curVY^);
+         for i:=0 to 7 do
+         begin
+            if(CheckResult(destVX,destVY))then break;
+            Vector1Turn45(@destVX,@destVY,side>0);
+         end;
+      end;
+   end;
+
+   curVX^:=nextVX;
+   curVY^:=nextVY;
+end;
+
 procedure unit_move(pu:PTUnit);
 var
-mdist,ss,
+tmpd,curSpeed,
 px,py,
 newx,newy:integer;
-ddir     :single;
+ddir :single;
 begin
    with pu^ do
     if(x=vx)and(y=vy)then
-     if(x<>mv_x)or(y<>mv_y)then
+     if(x<>moveCurr_x)or(y<>moveCurr_y)then
       if(not IsUnitRange(transport,nil))then
        if(unit_canMove(pu))then
        begin
-          ss:=speed;
+          curSpeed:=speed;
           with uid^ do
            if(not _ukbuilding)then
             with player^ do
              if(_ukmech)
-             then ss+=upgr[upgr_race_mspeed_mech[_urace]]*3
-             else ss+=upgr[upgr_race_mspeed_bio [_urace]]*3;
-          ss:=mm3i(2,ss,unit_MaxSpeed);
+             then curSpeed+=upgr[upgr_race_mspeed_mech[_urace]]*3
+             else curSpeed+=upgr[upgr_race_mspeed_bio [_urace]]*3;
+          curSpeed:=mm3i(2,curSpeed,unit_MaxSpeed);
 
-          mdist:=point_dist_int(x,y,mv_x,mv_y);
-          if(mdist<=ss)then
+          if(not ukfly)and(not ukfloater)then
           begin
-             newx:=mv_x;
-             newy:=mv_y;
-             dir :=point_dir(vx,vy,x,y);
+             pf_FindNextCell(zone,gridx,gridy,x,y,ua_x,ua_y,@movePath_vx,@movePath_vy,nil,nil);
+             moveCurr_x:=((gridx+movePath_vx)*MapCellW)+(ua_x mod MapCellW);
+             moveCurr_y:=((gridy+movePath_vy)*MapCellW)+(ua_y mod MapCellW);
+          end;
+
+          tmpd:=point_dist_int(x,y,moveCurr_x,moveCurr_y);
+          if(tmpd<=curSpeed)then
+          begin
+             newx:=moveCurr_x;
+             newy:=moveCurr_y;
+             dir :=point_dir(x,y,newx,newy);
           end
           else
           begin
-             if(mdist>70)
-             then mdist:=8+g_random(25)
-             else mdist:=50;
+             if(tmpd>70)
+             then tmpd:=8+g_random(25)
+             else tmpd:=50;
 
-             dir:=dir_turn(dir,point_dir(x,y,mv_x,mv_y),mdist);
+             dir:=dir_turn(dir,point_dir(x,y,moveCurr_x,moveCurr_y),tmpd);
 
              ddir:=dir*degtorad;
-             newx:=x+round(ss*cos(ddir));
-             newy:=y-round(ss*sin(ddir));
+             newx:=x+round(curSpeed*cos(ddir));
+             newy:=y-round(curSpeed*sin(ddir));
           end;
 
           px:=x;
           py:=y;
           unit_TryMoveToXY(pu,newx,newy);
+          {if((px=x)<>(py=y))then
+          begin
+             x:=px;
+             y:=py;
+             unit_TryMoveToXY(pu,newx,newy);
+          end;}
+
           if(not ukfly)and(not ukfloater)
           then unit_PushOutGrid(pu);
+
           if(px<>x)or(py<>y)
           then dir:=DIR360(dir-( mm3i(-90,dir_diff(dir,point_dir(px,py,x,y)),90) div 2 ))
           else dir:=DIR360(dir-g_randomr(90));
        end;
 end;
 
-function target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte;checkvis,nosrangecheck:boolean):byte;
+function target_weapon_check(pAttacker,pTarget:PTUnit;target_dist:integer;uWeaponN:byte;CheckVision,nosrangecheck:boolean):byte;
 var awr   :integer;
 transportu:PTUnit;
 pfcheck,
@@ -364,45 +586,46 @@ canmove   :boolean;
 begin
    target_weapon_check:=wmove_impassible;
 
-   //pu - attacker
-   //tu - target
+   //pAttacker - attacker
+   //pTarget   - target
 
-   if(checkvis)then
-    if(not CheckUnitTeamVision(pu^.player^.team,tu,false))then exit;
-   if(cw>MaxUnitWeapons)then exit;
-   if(tu^.hits<=fdead_hits)then exit;
-   if(ud<0)then ud:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
+   if(CheckVision)then
+     if(not CheckUnitTeamVision(pAttacker^.player^.team,pTarget,false))then exit;
+   if(uWeaponN>MaxUnitWeapons)then exit;
+   if(pTarget^.hits<=fdead_hits)then exit;
+   if(target_dist<0)
+   or(target_dist=NOTSET)then target_dist:=point_dist_int(pAttacker^.x,pAttacker^.y,pTarget^.x,pTarget^.y);
 
-   with pu^ do
+   with pAttacker^ do
    with uid^ do
    with player^ do
-   with _a_weap[cw] do
+   with _a_weap[uWeaponN] do
    begin
       if(aw_reload=0)then exit;
 
       // Weapon type requirements
       case aw_type of
-wpt_resurect : if(tu^.buff[ub_Resurect]>0  )
-               or(tu^.buff[ub_Pain ]>0     )
-               or(tu^.hits<=fdead_hits     )
-               or(tu^.hits> 0              )then exit;
-wpt_heal     : if(tu^.hits<=0)
-               or(tu^.hits>=tu^.uid^._mhits)
-               or(tu^.iscomplete=false     )
-               or(tu^.buff[ub_Heal]>0      )then exit;
+wpt_resurect : if(pTarget^.buff[ub_Resurect]>0)
+               or(pTarget^.buff[ub_Pain    ]>0)
+               or(pTarget^.hits<=fdead_hits   )
+               or(pTarget^.hits> 0            )then exit;
+wpt_heal     : if(pTarget^.hits<=0)
+               or(pTarget^.hits>=pTarget^.uid^._mhits)
+               or(pTarget^.iscomplete=false   )
+               or(pTarget^.buff[ub_Heal]>0    )then exit;
       end;
 
-      // transport check
+      // Transport check
       transportu:=nil;
       if(IsUnitRange(transport,@transportu))then
       begin
-         if(IsUnitRange(tu^.transport,nil))then
+         if(IsUnitRange(pTarget^.transport,nil))then
          begin
-            if(transportu<>tu)and(transport<>tu^.transport)then exit;
+            if(transportu<>pTarget)and(transport<>pTarget^.transport)then exit;
             if(aw_max_range>=0)then exit; // only melee attack
          end
          else
-           if(transportu<>tu)then
+           if(transportu<>pTarget)then
            begin
              if(aw_max_range< 0)then exit; // melee
            end
@@ -410,7 +633,7 @@ wpt_heal     : if(tu^.hits<=0)
              if(aw_max_range>=0)then exit; // ranged
       end
       else
-        if(IsUnitRange(tu^.transport,nil))then exit;
+        if(IsUnitRange(pTarget^.transport,nil))then exit;
 
       // UID and UPID requirements
 
@@ -419,84 +642,83 @@ wpt_heal     : if(tu^.hits<=0)
 
       // requirements to attacker and some flags
 
-      if not(tu^.uidi in aw_uids)then exit;
+      if not(pTarget^.uidi in aw_uids)then exit;
 
       if((aw_reqf and wpr_air   )>0)then
-       if(ukfly=uf_ground)or(tu^.ukfly=uf_ground)then exit;
+       if(ukfly=uf_ground)or(pTarget^.ukfly=uf_ground)then exit;
       if((aw_reqf and wpr_ground)>0)then
-       if(ukfly=uf_fly   )or(tu^.ukfly=uf_fly   )then exit;
+       if(ukfly=uf_fly   )or(pTarget^.ukfly=uf_fly   )then exit;
       if((aw_reqf and wpr_reload)>0)then
        if(reload>0)then exit;
 
       if(aw_type=wpt_directdmgZ)then
       begin
-         if(tu^.iscomplete=false)
-         or(tu^.uid^._zombie_uid =0)
-         or(tu^.uid^._zombie_hits<tu^.hits)
-         or(tu^.hits<=fdead_hits          )then exit;
+         if(not pTarget^.iscomplete)
+         or(pTarget^.uid^._zombie_uid =0)
+         or(pTarget^.uid^._zombie_hits<pTarget^.hits)
+         or(pTarget^.hits<=fdead_hits          )then exit;
       end;
 
       // requirements to target
 
-      if((aw_tarf and wtr_owner_p  )=0)and(tu^.playeri      =playeri  )then exit;
-      if((aw_tarf and wtr_owner_a  )=0)and(tu^.player^.team =team     )then exit;
-      if((aw_tarf and wtr_owner_e  )=0)and(tu^.player^.team<>team     )then exit;
+      if((aw_tarf and wtr_owner_p  )=0)and(pTarget^.playeri      =playeri       )then exit;
+      if((aw_tarf and wtr_owner_a  )=0)and(pTarget^.player^.team =team          )then exit;
+      if((aw_tarf and wtr_owner_e  )=0)and(pTarget^.player^.team<>team          )then exit;
 
-      if((aw_tarf and wtr_hits_h   )=0)and((0<tu^.hits)
-                                       and(tu^.hits< tu^.uid^._mhits ))then exit;
-      if((aw_tarf and wtr_hits_d   )=0)and(tu^.hits<=0                )then exit;
-      if((aw_tarf and wtr_hits_a   )=0)and(tu^.hits =tu^.uid^._mhits  )then exit;
+      if((aw_tarf and wtr_hits_h   )=0)and((0<pTarget^.hits)
+                                       and(pTarget^.hits< pTarget^.uid^._mhits ))then exit;
+      if((aw_tarf and wtr_hits_d   )=0)and(pTarget^.hits<=0                     )then exit;
+      if((aw_tarf and wtr_hits_a   )=0)and(pTarget^.hits =pTarget^.uid^._mhits  )then exit;
 
-      if((aw_tarf and wtr_complete )=0)and(tu^.iscomplete             )then exit;
-      if((aw_tarf and wtr_ncomplete)=0)and(tu^.iscomplete =false      )then exit;
+      if((aw_tarf and wtr_complete )=0)and(    pTarget^.iscomplete              )then exit;
+      if((aw_tarf and wtr_ncomplete)=0)and(not pTarget^.iscomplete              )then exit;
 
-      if(not tu^.uid^._ukbuilding  )then
+      if(not pTarget^.uid^._ukbuilding  )then
       begin
-      if((aw_tarf and wtr_stun     )=0)and(tu^.buff[ub_Pain]> 0       )then exit;
-      if((aw_tarf and wtr_nostun   )=0)and(tu^.buff[ub_Pain]<=0       )then exit;
+      if((aw_tarf and wtr_stun     )=0)and(pTarget^.buff[ub_Pain]> 0       )then exit;
+      if((aw_tarf and wtr_nostun   )=0)and(pTarget^.buff[ub_Pain]<=0       )then exit;
       end;
 
-      if(not CheckUnitBaseFlags(tu,aw_tarf))then exit;
+      if(not CheckUnitBaseFlags(pTarget,aw_tarf))then exit;
 
       // Distance requirements
       if(aw_max_range=aw_srange) // = srange
-      then awr:=ud-srange
+      then awr:=target_dist-srange
       else
         if(aw_max_range<aw_srange) // melee
-        then awr:=ud-(_r+tu^.uid^._r-aw_max_range)  // need transport check
+        then awr:=target_dist-(_r+pTarget^.uid^._r-aw_max_range)  // need transport check
         else
           if(aw_max_range>=aw_fsr0)  // relative srange
-          then awr:=ud-(srange+(aw_max_range-aw_fsr))
-          else awr:=ud-aw_max_range; // absolute
+          then awr:=target_dist-(srange+(aw_max_range-aw_fsr))
+          else awr:=target_dist-aw_max_range; // absolute
       if(aw_max_range>=aw_srange)then
       begin
-         if(tu^.ukfly)
+         if(pTarget^.ukfly)
          then awr-=_a_BonusAntiFlyRange
          else awr-=_a_BonusAntiGroundRange;
-         if(tu^.uid^._ukbuilding)
+         if(pTarget^.uid^._ukbuilding)
          then awr-=_a_BonusAntiBuildingRange
          else awr-=_a_BonusAntiUnitRange;
       end;
 
       canmove:=(speed>0)and(ua_id<>ua_hold)and(transportu=nil);
-      pfcheck:=(ukfly)or(ukfloater)or(pzone=tu^.pzone);
-
       // pfzone check for melee
+      pfcheck:=(ukfly)or(ukfloater)or(zone=pTarget^.zone);
 
       if(awr<0)then
       begin
-         if(ud>=aw_min_range)
+         if(target_dist>=aw_min_range)
          then target_weapon_check:=wmove_noneed     // can attack now
          else
            if(canmove)
            then target_weapon_check:=wmove_farther  // need move farther
-           else ;                                    // target too close & cant move
+           else ;                                   // target too close & cant move
       end
       else
         if(canmove)and(pfcheck)then
-         if(ud<=(srange+TargetCheckSRangeBonus))or(nosrangecheck)
+         if(target_dist<=(srange+TargetCheckSRangeBonus))or(nosrangecheck)
          then target_weapon_check:=wmove_closer     // need move closer
-         else ;                                      // target too far & cant move
+         else ;                                     // target too far & cant move
    end;
 end;
 
@@ -764,7 +986,7 @@ begin
 
       pushout      := solid and unit_canMove(pu) and (a_reload<=0);
       attack_target:= unit_canAttack(pu,false);
-      aicode       := (state=ps_comp);//and(isselected);
+      aicode       := (player_type=pt_ai);//and(isselected);
       fteleport_tar:= (not IsUnitRange(ua_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       pup_tar:=nil;
@@ -843,8 +1065,8 @@ uab_Teleport      : swtarget:=true;
 
       if(attack_target)and(a_tard<NOTSET)then WaitForNextTarget:=0;
 
-      aiu_code(pu);
-      if(aicode){and(playeri=PlayerClient)}then ai_code(pu);
+      //aiu_code(pu);
+      //if(aicode){and(playeri=PlayerClient)}then ai_code(pu);
 
       if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
    end;
@@ -964,8 +1186,7 @@ begin
       y    :=ptransport^.y;
       gridx:=ptransport^.gridx;
       gridy:=ptransport^.gridy;
-      szone:=ptransport^.szone;
-      pzone:=ptransport^.pzone;
+      zone :=ptransport^.zone;
       {$IFDEF _FULLGAME}
       fx   :=ptransport^.fx;
       fy   :=ptransport^.fy;
@@ -976,7 +1197,7 @@ begin
       if(ServerSide)then
       begin
          if(ptransport^.ua_id=ua_unload)or(ptransport^.transportC>ptransport^.transportM)then
-           if(not map_IsObstacleZone(ptransport^.szone,false))then
+           if(not map_IsObstacleZone(ptransport^.zone))then
              if(unit_unload(ptransport,pTarget))then exit;
 
          if(ptransport^.ua_id=ua_move  )
@@ -1293,8 +1514,8 @@ begin
 wmove_closer    : begin
                      if(not AttackInMove)then
                      begin
-                        mv_x:=tu^.x;
-                        mv_y:=tu^.y;
+                        moveCurr_x:=tu^.x;
+                        moveCurr_y:=tu^.y;
                      end;
                      exit;
                   end;
@@ -1302,20 +1523,20 @@ wmove_farther   : begin
                      if(not AttackInMove)or(ua_bx<=0)then
                        if(x=tu^.x)and(y=tu^.y)then
                        begin
-                          mv_x:=x-g_randomr(2);
-                          mv_y:=y-g_randomr(2);
+                          moveCurr_x:=x-g_randomr(2);
+                          moveCurr_y:=y-g_randomr(2);
                        end
                        else
                        begin
-                          mv_x:=x-(tu^.x-x);
-                          mv_y:=y-(tu^.y-y);
+                          moveCurr_x:=x-(tu^.x-x);
+                          moveCurr_y:=y-(tu^.y-y);
                        end;
                      exit;
                   end;
 wmove_noneed    : if(not AttackInMove)then
                   begin
-                     mv_x:=x;
-                     mv_y:=y;
+                     moveCurr_x:=x;
+                     moveCurr_y:=y;
                   end;
          else
            WaitForNextTarget:=1;
@@ -1336,8 +1557,8 @@ wmove_noneed    : if(not AttackInMove)then
 
       if(not unit_canAttack(pu,true))then
       begin
-         mv_x:=x;
-         mv_y:=y;
+         moveCurr_x:=x;
+         moveCurr_y:=y;
          exit;
       end;
 
@@ -1529,10 +1750,10 @@ begin
       unit_attack(pu);
 
       if(pTransport=nil)and(cycle_order=g_cycle_order)then
-        if(mp_x<>x)or(mp_y<>y)then
+        if(moveLast_x<>x)or(moveLast_y<>y)then
         begin
-           mp_x:=x;
-           mp_y:=y;
+           moveLast_x:=x;
+           moveLast_y:=y;
         end;
    end
    else
@@ -1544,14 +1765,14 @@ begin
          ua_x:=mm3i(1,ua_x,map_size);
          ua_y:=mm3i(1,ua_y,map_size);
 
-         mv_x:=ua_x;
-         mv_y:=ua_y;
+         moveCurr_x:=ua_x;
+         moveCurr_y:=ua_y;
 
          if(ua_id=ua_psability)then
            case uid^._ability of
          uab_SpawnLost: begin
-                           mv_x:=x;
-                           mv_y:=y;
+                           moveCurr_x:=x;
+                           moveCurr_y:=y;
                            ua_id:=ua_attack;
                            unit_sability(pu,false);
                            ua_id:=ua_psability;
@@ -1584,20 +1805,20 @@ begin
          unit_attack(pu);
          if(WaitForNextTarget>0)then
          begin
-            mv_x:=x;
-            mv_y:=y;
+            moveCurr_x:=x;
+            moveCurr_y:=y;
          end;
       end
       else WaitForNextTarget:=0;
 
       if(pTransport=nil)then
         if(unit_canMove(pu))then
-          if(mp_x<>mv_x)or(mp_y<>mv_y)then
+          if(moveLast_x<>moveCurr_x)or(moveLast_y<>moveCurr_y)then
           begin
-             if(not uid^._slowturn)and(player^.state<>ps_comp)then
-               if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
-             mp_x:=mv_x;
-             mp_y:=mv_y;
+             if(not uid^._slowturn)and(player^.player_type<>pt_ai)then
+               if(x<>moveCurr_x)or(y<>moveCurr_y)then dir:=point_dir(x,y,moveCurr_x,moveCurr_y);
+             moveLast_x:=moveCurr_x;
+             moveLast_y:=moveCurr_y;
           end;
    end;
 end;
@@ -1696,7 +1917,7 @@ begin
                unit_move(pu);
                unit_prod(pu);
 
-               if(player^.state=ps_comp)then ai_scout_pick(pu);
+               if(player^.player_type=pt_ai)then ai_scout_pick(pu);
             end;
 
             transportu:=nil;

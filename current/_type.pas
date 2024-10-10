@@ -55,6 +55,9 @@ PTMWSModel = ^TMWSModel;
 TMWTileSet  = array[0..MaxTileSet] of TMWTexture;
 PTMWTileSet = ^TMWTileSet;
 
+TFont = array[char] of TMWTexture;
+PTFont = ^TFont;
+
 TEID = record
    anim_smstate: byte;
    smodel      : PTMWSModel;
@@ -125,12 +128,16 @@ TMenuItem = record
    mi_x1,mi_y1: integer;
    mi_enabled : boolean;
 end;
+PTMenuItem = ^TMenuItem;
 
 TMenuListItem = record
    mli_value  : integer;
    mli_caption: shortstring;
    mli_enabled: boolean;
 end;
+
+TPlayerColorScheme  = array[0..MaxPlayers] of cardinal;
+PTPlayerColorScheme = ^TPlayerColorScheme;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -203,11 +210,8 @@ end;
 //
 
 TMapTerrainGridCell = record
-   tgc_solidlevel,
-   tgc_teleportx,
-   tgc_teleporty : byte;
-   tgc_parea,
-   tgc_sarea     : word;
+   tgc_solidlevel: byte;
+   tgc_area      : word;
 end;
 
 TDamageMod = array[0..MaxDamageModFactors] of record
@@ -490,7 +494,7 @@ TPlayer = record
 
    team,
    race ,slot_race,
-   state,
+   player_type,
    pnum    : byte;
 
    build_cd,
@@ -500,6 +504,7 @@ TPlayer = record
    armylimit
            : longint;
 
+   isdefeated,
    isobserver,
    isrevealed,
    isready : boolean;
@@ -622,8 +627,7 @@ TUnit = record
    speed,dir,
    reload,vstp,
    unum     : integer;
-   pzone,
-   szone    : word;
+   zone     : word;
 
    level,
    cycle_order,
@@ -647,8 +651,10 @@ TUnit = record
    a_tar,
    a_tar_cl,
 
-   mv_x,mv_y,
-   mp_x,mp_y,
+   moveCurr_x ,moveCurr_y ,
+   moveLast_x ,moveLast_y ,
+   movePath_x ,movePath_y ,
+   movePath_vx,movePath_vy,
 
    ua_bx,ua_by,
    ua_x ,ua_y,

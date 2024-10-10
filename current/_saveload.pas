@@ -27,20 +27,20 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         svld_str_info:=str_svld_errors_open;
+         svld_str_info:=str_error_OpenFile;
          close(f);
          exit;
       end;
       if(FileSize(f)<>svld_file_size)then
       begin
-         svld_str_info:=str_svld_errors_wdata;
+         svld_str_info:=str_error_WrongData;
          close(f);
          exit;
       end;
       BlockRead(f,vr,SizeOf(g_version));
       if(vr=g_version)then
       begin
-         BlockRead(f,vr,sizeof(menu_s2));
+         {BlockRead(f,vr,sizeof(menu_s2));
          if(vr=ms2_camp)then
          begin
             BlockRead(f,vr,sizeof(campain_mission_n));
@@ -50,40 +50,40 @@ begin
                BlockRead(f,vr,sizeof(campain_skill));
                if(0<=vr)and(vr<=CMPMaxSkills)
                then svld_str_info+=tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr]
-               else svld_str_info:=str_svld_errors_wver;
+               else svld_str_info:=str_error_WrongVersion;
             end
-            else svld_str_info:=str_svld_errors_wver;
+            else svld_str_info:=str_error_WrongVersion;
          end
-         else
+         else}
          begin
             BlockRead(f,vr,sizeof(campain_mission_n));vr:=0;
             BlockRead(f,vr,sizeof(campain_skill    ));vr:=0;
 
-            BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
+            BlockRead(f,ms,sizeof(map_seed         ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl2+' ';
             BlockRead(f,vr,sizeof(g_random_i       ));vr:=0;
             BlockRead(f,vr,sizeof(map_size         ));
             if(vr<MinMapSize)and(MaxMapSize<vr)
-                                      then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                      else       svld_str_info+=str_map_size+i2s(vr)+tc_nl3+' ';
+                                      then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
+                                      else       svld_str_info+=str_map_size+i2s(vr)+tc_nl2+' ';
             vr:=0;
 
             BlockRead(f,vr,sizeof(map_type         ));
-            if(vr>gms_m_types        )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                      else       svld_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' ';
+            if(vr>gms_m_types        )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
+                                      else       svld_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl2+' ';
             vr:=0;
 
             BlockRead(f,vr,sizeof(map_symmetry     ));
-            if(vr>gms_m_symm         )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                      else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' ';
+            if(vr>gms_m_symm         )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
+                                      else       svld_str_info+=str_map_sym+str_map_syml[vr]+tc_nl2+' ';
             vr:=0;
 
             BlockRead(f,vr,sizeof(theme_cur        ));
-            if(vr>=theme_n           )then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;
+            if(vr>=theme_n           )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end;
             vr:=0;
 
             BlockRead(f,vr,sizeof(g_mode           ));
-            if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                      else       svld_str_info+=str_gmode[vr  ]+tc_nl3+tc_default;
+            if not(vr in allgamemodes)then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
+                                      else       svld_str_info+=str_emnu_GameModel[vr  ]+tc_nl2+tc_default;
             vr:=0;
 
             BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
@@ -93,7 +93,7 @@ begin
             BlockRead(f,hp,sizeof(PlayerClient));
 
             BlockRead(f,pls,SizeOf(TPList));
-            svld_str_info+=tc_nl3;
+            svld_str_info+=tc_nl2;
 
             for vr:=1 to MaxPlayers do
             begin
@@ -101,18 +101,18 @@ begin
                then svld_str_info+=chr(vr)+'*'+tc_default
                else svld_str_info+=chr(vr)+'#'+tc_default;
 
-               if(pls[vr].state>ps_none)then
+               if(pls[vr].player_type>pt_none)then
                  if(pls[vr].team=0)
                  then svld_str_info+=str_observer[1]                +','+t2c(pls[vr].team)+','
                  else svld_str_info+=str_racel[pls[vr].slot_race][2]+','+t2c(pls[vr].team)+',';
-               svld_str_info+=pls[vr].name+tc_nl3
+               svld_str_info+=pls[vr].name+tc_nl2
             end;
          end;
       end
-      else svld_str_info:=str_svld_errors_wver;
+      else svld_str_info:=str_error_WrongVersion;
       close(f);
    end
-   else svld_str_info:=str_svld_errors_file;
+   else svld_str_info:=str_error_FileExists;
 end;
 
 procedure saveload_Select;
@@ -156,7 +156,7 @@ procedure saveload_CalcSaveSize;
 begin
    svld_file_size:=
    SizeOf(g_version        )+
-   SizeOf(menu_s2          )+
+   //SizeOf(menu_s2          )+
    SizeOf(campain_mission_n)+
    SizeOf(campain_skill    )+
    SizeOf(map_seed         )+
@@ -176,7 +176,6 @@ begin
    SizeOf(g_effects        )+
    SizeOf(vid_cam_x        )+
    SizeOf(vid_cam_y        )+
-   SizeOf(PlayerColor      )+
    SizeOf(G_Step           )+
    SizeOf(vid_blink_timer1 )+
    SizeOf(vid_blink_timer2 )+
@@ -210,7 +209,7 @@ begin
    if(ioresult<>0)then exit;
 
    BlockWrite(f,g_version        ,SizeOf(g_version        ));
-   BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
+  // BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
    BlockWrite(f,campain_mission_n,SizeOf(campain_mission_n));
    BlockWrite(f,campain_skill    ,SizeOf(campain_skill    ));
    BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
@@ -231,7 +230,6 @@ begin
    BlockWrite(f,g_effects        ,SizeOf(g_effects        ));
    BlockWrite(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
    BlockWrite(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
-   BlockWrite(f,PlayerColor      ,SizeOf(PlayerColor      ));
    BlockWrite(f,G_Step           ,SizeOf(G_Step           ));
    BlockWrite(f,vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
    BlockWrite(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
@@ -261,7 +259,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLogChat(PlayerClient,log_to_all,str_gsaved,true);
+   GameLogChat(PlayerClient,log_to_all,str_msg_GameSaved,true);
 end;
 
 
@@ -285,7 +283,7 @@ begin
       begin
          GameDefaultAll;
 
-         BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
+         //BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
          BlockRead(f,campain_mission_n,SizeOf(campain_mission_n));
          BlockRead(f,campain_skill    ,SizeOf(campain_skill    ));
          BlockRead(f,map_seed         ,SizeOf(map_seed         ));
@@ -306,7 +304,6 @@ begin
          BlockRead(f,g_effects        ,SizeOf(g_effects        ));
          BlockRead(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
          BlockRead(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
-         BlockRead(f,PlayerColor      ,SizeOf(PlayerColor      ));
          BlockRead(f,G_Step           ,SizeOf(G_Step           ));
          BlockRead(f,vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
          BlockRead(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));

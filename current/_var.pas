@@ -74,10 +74,8 @@ map_symmetryDir   : integer  = 0;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..MaxPlayers] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
-map_gridLastFpZone: word = 0;
-map_gridLastFsZone: word = 0;
-map_gridLastpZone : word = 0;
-map_gridLastsZone : word = 0;
+map_gridLastFZone : word = 0;
+map_gridLastZone  : word = 0;
 
 map_gcx,
 map_gcy,
@@ -144,8 +142,18 @@ u_royal_d         : integer;
 
 {$IFDEF _FULLGAME}
 
-debug_x0,
-debug_y0          : integer;
+debug_Sx,
+debug_Sy,
+debug_Sgx,
+debug_Sgy,
+debug_Svx,
+debug_Svy,
+debug_Dx,
+debug_Dy,
+debug_Dgx,
+debug_Dgy,
+debug_Dvx,
+debug_Dvy         : integer;
 debug_zone        : word;
 
 
@@ -188,29 +196,31 @@ r_draw            : boolean = true;
 vid_map_RedrawBack: boolean = false;
 
 menu_state        : boolean = true;
+menu_page1        : byte = mp_main;
+menu_page2        : byte = 0;
+menu_settings_page: byte = mi_settings_game;
 menu_remake       : boolean = false;
 menu_redraw       : boolean = false;
 menu_item         : integer;
-menu_s1           : byte = ms1_sett;
-menu_s2           : byte = ms2_game;
-menu_s3           : byte = ms3_game;
 menu_items        : array[byte] of TMenuItem;
 menu_list_n,
 menu_list_selected,
 menu_list_current,
 menu_list_x,
 menu_list_y,
+menu_list_font,
+menu_list_item_h,
+menu_list_item_hh,
 menu_list_w       : integer;
 menu_list_items   : array of TMenuListItem;
-
 menu_res_w,
-menu_res_h,
-menu_x,
-menu_y            : integer;
+menu_res_h        : integer;
 
 PlayerName        : shortstring = str_defaultPlayerName;
+PlayerColorSchemeFFA,
+PlayerColorSchemeTEAM,
+PlayerColorScheme : TPlayerColorScheme;
 
-PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 UIPlayer          : byte = 1;
 
@@ -219,18 +229,18 @@ vid_TileTemplate_crater_tech,
 vid_TileTemplate_crater_nature: TMWTileSet;
 vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of TMWTileSet;
 
-vid_vw            : integer = 800;
-vid_vh            : integer = 600;
-vid_cam_w         : integer = 800;
-vid_cam_hw        : integer = 400;
-vid_cam_h         : integer = 600;
-vid_cam_hh        : integer = 300;
+vid_vw            : integer = vid_minw;
+vid_vhw           : integer = vid_minw div 2;
+vid_vh            : integer = vid_minh;
+vid_vhh           : integer = vid_minh div 2;
+vid_cam_w         : integer = vid_minw;
+vid_cam_hw        : integer = vid_minw div 2;
+vid_cam_h         : integer = vid_minh;
+vid_cam_hh        : integer = vid_minh div 2;
 vid_vmb_x0        : integer = 6;
 vid_vmb_y0        : integer = 6;
-vid_vmb_x1        : integer = 794;
-vid_vmb_y1        : integer = 594;
-vid_mwa           : integer = 0;
-vid_mha           : integer = 0;
+vid_vmb_x1        : integer = vid_minw-6;
+vid_vmb_y1        : integer = vid_minh-6;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
 vid_CamSpeed      : integer = 25;
@@ -274,7 +284,22 @@ vid_fog_ey        : integer = 0;
 vid_fog_BaseSurf  : pSDL_Surface;
 vid_fog_tiles     : TMWTileSet;
 
-font_1            : array[char] of TMWTexture;
+font_1,
+font_1h,
+font_2,
+font_3            : TFont;
+
+draw_font         : PTFont;
+draw_font_w1,
+draw_font_wi,
+draw_font_wh,
+draw_font_wq,
+draw_font_w1h,
+draw_font_wq3,
+draw_font_h1,
+draw_font_h2
+
+                  : integer;
 
 g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
@@ -519,7 +544,7 @@ theme_last_liquid_tas     : byte = 255;
 theme_last_tile_terrain_id: integer = integer.MinValue;
 theme_last_tile_crater_id : integer = integer.MinValue;
 theme_last_tile_liquid_id : integer = integer.MinValue;
-theme_last_tile_teleport_id: integer = integer.MinValue;
+theme_last_tile_teleport_id:integer = integer.MinValue;
 
 // current/new
 theme_cur_crater_tes      : byte = tes_nature; // theme liquid edge style
@@ -543,9 +568,9 @@ theme_cur_liquid_l,
 theme_cur_terrain_l       : TIntList;
 theme_cur_decal_n,
 theme_cur_decor_n,
+theme_cur_teleport_n,
 theme_cur_1rock_n,
 theme_cur_2rock_n,
-theme_cur_teleport_n,
 theme_cur_crater_n,
 theme_cur_liquid_n,
 theme_cur_terrain_n       : integer;
@@ -729,7 +754,9 @@ spr_b_hold,
 spr_b_selall,
 spr_b_cancel,
 spr_b_delete,
+spr_mlogo,
 spr_mback,
+spr_mback2,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_tabs          : array[0..3] of pSDL_Surface;
@@ -742,48 +769,158 @@ spr_cp_gen        : TMWTexture;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  TEST
+//  TEXT
 //
 
-str_bool          : array[false..true   ] of shortstring;
-str_teams         : array[0..MaxPlayers ] of shortstring;
-str_map_typel     : array[0..gms_m_types] of shortstring;
-str_ability_name  : array[byte          ] of shortstring;
-str_racel         : array[0..r_cnt      ] of shortstring;
-str_gmode         : array[0..gms_count     ] of shortstring;
-str_map_syml      : array[0..gms_m_symm ] of shortstring;
-str_ability_unload,
-str_need_energy,
-str_cant_build,
-str_cant_prod,
-str_check_reqs,
-str_transformation,
-str_upgradeslvl,
-str_demons,
-str_except,
-str_UnitArming,
-str_weapon_melee,
-str_weapon_ranged,
-str_weapon_zombie,
-str_weapon_ressurect,
-str_weapon_heal,
-str_weapon_spawn,
-str_weapon_suicide,
-str_weapon_targets,
-str_weapon_damage,
-str_splashresist,
-str_hits,
-str_srange,
-str_ability,
-str_builder,
-str_barrack,
-str_smith,
-str_IncEnergyLevel,
-str_CanRebuildTo,
-str_TargetLimit,
-str_NextTrack,
-str_PlayerPaused,
-str_PlayerResumed,
+str_bool                : array[false..true   ] of shortstring;
+
+str_teams               : array[0..MaxPlayers ] of shortstring;
+str_ability_name        : array[byte          ] of shortstring;
+str_ability_unload      : shortstring;
+str_racel               : array[0..r_cnt      ] of shortstring;
+str_emnu_GameModel               : array[0..gms_count  ] of shortstring;
+
+str_map_typel           : array[0..gms_m_types] of shortstring;
+str_map_syml            : array[0..gms_m_symm ] of shortstring;
+str_map,
+str_map_seed,
+str_map_type,
+str_map_size,
+str_map_sym,
+str_map_random,
+
+str_pstate_AI,
+str_pstate_cheater      : shortstring;
+
+str_menu_PlayerSlots    : array[0..ps_states_n-1] of shortstring;
+str_menu_StartGame,
+str_menu_EndGame,
+str_menu_campaings,
+str_menu_scirmish,
+str_menu_SaveLoad,
+str_menu_loadgame,
+str_menu_savegame,
+str_menu_loadreplay,
+str_menu_Settings,
+str_menu_AboutGame,
+str_menu_Surrender,
+str_menu_LeaveGame,
+str_menu_back,
+str_menu_StartScirmish,
+str_menu_exit,
+str_menu_connecting,
+str_menu_maction,
+str_menu_settingsGame,
+str_menu_settingsRecord,
+str_menu_settingsNetwork,
+str_menu_settingsVideo,
+str_menu_settingsSound,
+
+str_menu_FPS,
+str_menu_APM,
+str_menu_language,
+str_menu_ColoredShadow,
+str_menu_ScrollSpeed,
+str_menu_MouseScroll,
+str_menu_PlayerName,
+str_menu_PanelPos,
+str_menu_unitHBar,
+str_menu_PlayersColor,
+
+str_menu_ResolutionWidth,
+str_menu_ResolutionHeight,
+str_menu_Apply,
+str_menu_fullscreen,
+
+str_menu_NextTrack,
+str_menu_SoundVolume,
+str_menu_MusicVolume,
+
+str_menu_ready,
+str_menu_nready,
+str_menu_server,
+str_menu_serverPort,
+str_menu_chat,
+str_menu_client,
+str_menu_clientAddress,
+str_menu_clientQuality,
+str_menu_LANSearchStart,
+str_menu_LANSearchStop,
+str_menu_LANSearching,
+str_menu_clientConnect,
+str_menu_clientDisconnect,
+str_menu_serverStart,
+str_menu_serverStop,
+
+str_menu_Name,
+str_menu_Slot,
+str_menu_Race,
+str_menu_Team,
+str_menu_Color,
+
+str_menu_players,
+str_menu_map,
+str_menu_goptions,
+str_menu_multiplayer,
+
+str_menu_RandomScirmish,
+str_menu_AISlots,
+str_menu_Generators,
+str_menu_DeadObservers,
+str_menu_FixedStarts,
+str_menu_GameMode,
+str_menu_StartBase
+                        : shortstring;
+str_menu_PlayersColorl  : array[0..vid_maxplcolors-1] of shortstring;
+str_menu_unitHBarl      : array[0..2] of shortstring;
+str_menu_PanelPosl      : array[0..3] of shortstring;
+str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
+str_menu_NetQuality     : array[0..cl_UpT_arrayN] of shortstring;
+
+str_menu_RecordName,
+str_menu_RecordQuality,
+str_menu_RecordState     : shortstring;
+str_menu_RecordStatel    : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
+
+str_menu_mactionl,
+str_menu_lang            : array[false..true] of shortstring;
+
+str_error_FileExists,
+str_error_OpenFile,
+str_error_WrongData,
+str_error_FileRead,
+str_error_WrongVersion,
+str_error_ServerFull,
+str_error_GameStarted,
+
+str_msg_GameSaved,
+str_msg_PlayerSurrender,
+str_msg_PlayerLeave,
+str_msg_PlayerDefeated,
+str_msg_PlayerPaused,
+str_msg_PlayerResumed,
+
+str_uiWarn_NeedEnergy,
+str_uiWarn_CantBuild,
+str_uiWarn_CantProd,
+str_uiWarn_CheckReqs,
+str_uiWarn_UnitPromoted,
+str_uiWarn_UpgradeComplete,
+str_uiWarn_BuildingComplete,
+str_uiWarn_UnitComplete,
+str_uiWarn_UnitAttacked,
+str_uiWarn_BaseAttacked,
+str_uiWarn_AlliesAttacked,
+str_uiWarn_CantExecute,
+str_uiWarn_ReqpsabilityOrder,
+str_uiWarn_MaxLimitReached,
+str_uiWarn_MapMark,
+str_uiWarn_NeedMoreBuilders,
+str_uiWarn_ProductionBusy,
+str_uiWarn_CantRebuild,
+str_uiWarn_NeedMoreProd,
+str_uiWarn_MaximumReached,
+
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
@@ -799,146 +936,137 @@ str_attr_heavy,
 str_attr_fly,
 str_attr_ground,
 str_attr_floater,
-str_unit_advanced,
 str_attr_transport,
-str_advanced,
-str_upgrade_complete,
-str_building_complete,
-str_unit_complete,
-str_unit_attacked,
-str_base_attacked,
-str_allies_attacked,
-str_cant_execute,
-str_NeedpsabilityOrder,
-str_maxlimit_reached,
-str_mapMark,
-str_need_more_builders,
-str_production_busy,
-str_cant_advanced,
-str_NeedMoreProd,
-str_MaximumReached,
-str_map_type,
-str_map_size,
-str_map_sym,
-str_plname,
-str_aislots,
-str_generators,
-str_DeadObservers,
-str_Address,
-str_ready,
-str_nready,
-str_fstarts,
-str_gmodet,
-str_starta,
-str_ps_comp,
-str_ps_cheater,
-str_plsurrender,
-str_plout,
-str_player_def    : shortstring;
-str_PlayerSlots   : array[0..ps_states_n-1    ] of shortstring;
-str_generatorsO   : array[0..gms_g_maxgens    ] of shortstring;
-str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
-str_uhbars        : array[0..2] of shortstring;
-str_panelposp     : array[0..3] of shortstring;
-str_panelpos,
-str_ColoredShadow,
-str_uhbar,
-str_pcolor,
-str_all,
-str_orders,
-str_requirements,
-str_req,
-str_uprod,
-str_bprod,
-str_language,
-str_resol_width,
-str_resol_height,
-str_apply,
-str_randoms,
-str_menu_chat,
+
+str_uhint_UnitLevel,
+str_uhint_UnitArming,
+str_uhint_hits,
+str_uhint_srange,
+str_uhint_builder,
+str_uhint_barrack,
+str_uhint_smith,
+str_uhint_IncEnergyLevel,
+str_uhint_CanRebuildTo,
+str_uhint_ability,
+str_uhint_transformation,
+str_uhint_requirements,
+str_uhint_uprod,
+str_uhint_bprod,
+str_uhint_TargetLimit,
+str_uhint_req,
+
+
+str_weapon_melee,
+str_weapon_ranged,
+str_weapon_zombie,
+str_weapon_ressurect,
+str_weapon_heal,
+str_weapon_spawn,
+str_weapon_suicide,
+str_weapon_targets,
+str_weapon_damage,
+
 str_chat_all,
 str_chat_allies,
-str_server,
+
+str_gsunknown,
+str_pause,
+str_win,
+str_lose,
+str_waitsv,
+str_repend,
+
+str_observer,
+
+str_demons,
+str_except,
+str_splashresist
+                    : shortstring;
+
+str_panelHint_all,
+str_panelHint_menu  : shortstring;
+str_panelHint_a,
+str_panelHint_r,
+str_panelHint_o     : array[0.._mhkeys] of shortstring;
+str_panelHint_Tab   : array[0..3      ] of shortstring;
+str_panelHint_Common: array[0..2      ] of shortstring;
+
+str_uiHint_InvLimit,
+str_uiHint_InvTime,
+str_uiHint_KotHTime,
+str_uiHint_KotHTimeAct,
+str_uiHint_KotHWinner,
+str_uiHint_Time,
+str_uiHint_UGroups,
+str_uiHint_Army,
+str_uiHint_Energy   : shortstring;
+
+
+{
+
+
+
+
+
+
+str_Address,
+
+
+
+                  : shortstring;
+
+
+
+str_menu_chat,
+
 str_client,
 str_goptions,
-str_waitsv,
-str_gsunknown,
+
 str_cmpdif,
-str_repend,
-str_reperror,
+
+
 str_replay,
-str_replay_status,
-str_replay_name,
+
 str_play,
-str_inv_ml,
-str_inv_time,
-str_menu,
-str_time,
-str_kothtime,
-str_kothtime_act,
-str_kothwinner,
+
 str_players,
-str_map,
 str_save,
 str_load,
 str_delete,
 str_gsaved,
 str_pause,
-str_observer,
+
 str_win,
 str_lose,
-str_WrongVersion,
-str_ServerFull,
-str_GameStarted,
+
 str_udpport,
-str_connecting,
-str_netsearching,
-str_netsearch,
+
+
 str_replay_Quality,
 str_net_Quality,
-str_soundvol,
-str_musicvol,
-str_maction,
-str_scrollspd,
-str_mousescrl,
-str_fullscreen,
-str_FPS,
-str_APM,
-str_mrandom,
-str_svld_errors_file,
-str_svld_errors_open,
-str_svld_errors_wdata,
-str_svld_errors_wver,
-str_rpls_errors_open,
-str_MObjectives,
+
+
+
+                  : shortstring;   }
+
+{str_MObjectives,
 str_MServers,
 str_MMap,
-str_MPlayers      : shortstring;
-str_npnua,
-str_pnua          : array[0..cl_UpT_arrayN] of shortstring;
-str_cmpd          : array[0..CMPMaxSkills] of shortstring;
-str_hint_t        : array[0..3] of shortstring;
-str_hint_army     : shortstring;
-str_hint_energy   : shortstring;
-str_hint_m        : array[0..2 ] of shortstring;
-str_hint_a,
-str_hint_r,
-str_hint_o        : array[0.._mhkeys] of shortstring;
-str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
+str_MPlayers      : shortstring;  }
+{str_npnua,
+
+str_cmpd            : array[0..CMPMaxSkills] of shortstring;
+
+
+
 
 {str_camp_t        : array[0..MaxMissions] of shortstring;
 str_camp_o        : array[0..MaxMissions] of shortstring;
 str_camp_m        : array[0..MaxMissions] of shortstring; }
 
-str_connect,
+{,
 str_svup,
-str_lng,
-str_mactionl,
-str_exit,
-str_reset         : array[false..true] of shortstring;
-str_menu_s1,
-str_menu_s2,
-str_menu_s3       : array[0..2] of shortstring;
+} }
 
 
 ////////////////////////////////////////////////////////////////////////////////

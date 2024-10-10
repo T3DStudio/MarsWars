@@ -10,11 +10,11 @@ begin
             if(r_minimap_scan_blink)
             then filledCircleColor(r_minimap,trunc(ua_x  *map_mm_cx),
                                              trunc(ua_y  *map_mm_cx),
-                                             trunc(srange*map_mm_cx),ShadowColor(PlayerGetColor(pnum)));
+                                             trunc(srange*map_mm_cx),ShadowColor(PlayerColorScheme[pnum]));
 
       if(uid^._ukbuilding)and(mmr>0)
-      then boxColor  (r_minimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerGetColor(player^.pnum))
-      else pixelColor(r_minimap,mmx,mmy,                        PlayerGetColor(player^.pnum));
+      then boxColor  (r_minimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerColorScheme[player^.pnum])
+      else pixelColor(r_minimap,mmx,mmy,                        PlayerColorScheme[player^.pnum]);
    end;
 end;
 
@@ -366,7 +366,7 @@ begin
          wanim:=false;
          if(G_Status=gs_running)then
           if(unit_canMove(pu))then
-           wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
+           wanim:=(x<>moveCurr_x)or(y<>moveCurr_y)or(x<>vx)or(y<>vy);
 
          spr:=sm_unit2MWTexture(pu);
 
@@ -450,7 +450,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
                 if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
 
             if(vid_ColoredShadow)
-            then ColorShadow:=ShadowColor(PlayerGetColor(playeri))
+            then ColorShadow:=ShadowColor(PlayerColorScheme[playeri])
             else ColorShadow:=c_ablack;
 
             SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha);

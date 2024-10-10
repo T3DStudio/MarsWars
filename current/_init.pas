@@ -16,6 +16,7 @@ begin
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
    gfx_InitColors;
+   draw_set_FontSize1(10);
    vid_MakeScreen;
    gfx_LoadGraphics(true);
 

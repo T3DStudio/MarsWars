@@ -276,86 +276,39 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  MAP TELEPORTS
-
-procedure map_RemoveTeleports;
-var x,y:byte;
-begin
-   for x:=0 to MaxMapSizeCelln-1 do
-   for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid[x,y] do
-   begin
-      tgc_teleportx:=255;
-      tgc_teleporty:=255;
-   end;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  MAP ZONES
 
-procedure map_GetZonesXYCell(cx,cy:integer;pzone,szone:pword);
+function map_GetZone(cx,cy:integer;mapXY:boolean):word;
 begin
-   if(cx<0)
-   or(cy<0)
-   or(cx>map_LastCell)
-   or(cy>map_LastCell)then
+   map_GetZone:=map_GetZone.MaxValue;
+   if(mapXY)then
    begin
-      if(pzone<>nil)then pzone^:=word.MaxValue;
-      if(szone<>nil)then szone^:=word.MaxValue;
-   end
-   else
-   begin
-      if(pzone<>nil)then pzone^:=map_grid[cx,cy].tgc_parea;
-      if(szone<>nil)then szone^:=map_grid[cx,cy].tgc_sarea;
+      cx:=cx div MapCellW;
+      cy:=cy div MapCellW;
    end;
-end;
-procedure map_GetZonesXYMap(mx,my:integer;pzone,szone:pword);
-begin
-   map_GetZonesXYCell(mx div MapCellW,my div MapCellW,pzone,szone);
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)
+   then map_GetZone:=map_grid[cx,cy].tgc_area;
 end;
 
-function map_GetZoneXY(x,y:integer;pZone,mapXY:boolean):word;
-begin
-   case mapXY of
-   true : case pZone of
-          true : map_GetZonesXYMap (x,y,@map_GetZoneXY,nil           );
-          false: map_GetZonesXYMap (x,y,nil           ,@map_GetZoneXY);
-          end;
-   false: case pZone of
-          true : map_GetZonesXYCell(x,y,@map_GetZoneXY,nil           );
-          false: map_GetZonesXYCell(x,y,nil           ,@map_GetZoneXY);
-          end;
-   end;
-end;
-function map_IsObstacleZone(zone:word;pZone:boolean):boolean;
+function map_IsObstacleZone(zone:word):boolean;
 begin
    if(zone=0)
    then map_IsObstacleZone:=true
-   else
-     case pZone of
-     true : map_IsObstacleZone:=(zone>map_gridLastFpZone);
-     false: map_IsObstacleZone:=(zone>map_gridLastFsZone);
-     end;
+   else map_IsObstacleZone:=(zone>map_gridLastFZone);
 end;
 
 procedure map_ZonesClear;
 var x,y:byte;
 begin
-   map_gridLastpZone :=0;
-   map_gridLastsZone :=0;
-   map_gridLastFpZone:=map_gridLastpZone;
-   map_gridLastFsZone:=map_gridLastsZone;
+   map_gridLastZone :=0;
+   map_gridLastFZone:=map_gridLastZone;
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid[x,y] do
-   begin
-      tgc_parea:=0;
-      tgc_sarea:=0;
-   end;
+   with map_grid[x,y] do tgc_area:=0;
 end;
 
-procedure map_ZoneFillPart(x,y:integer;zone:word;pzone,obstacleZones:boolean);
+procedure map_ZoneFillPart(x,y:integer;zone:word;obstacleZones:boolean);
 begin
    if(x<0)
    or(y<0)
@@ -369,26 +322,14 @@ begin
       true : if(tgc_solidlevel< mgsl_liquid)then exit;
       end;
 
-      if(pzone)then
-      begin
-         if(tgc_parea>0)then exit;
-         tgc_parea:=zone
-      end
-      else
-      begin
-         if(tgc_sarea>0)then exit;
-         tgc_sarea:=zone;
-      end;
-
-      if(pzone)then
-        if (tgc_teleportx<=map_LastCell)
-        and(tgc_teleporty<=map_LastCell)then map_ZoneFillPart(tgc_teleportx,tgc_teleporty,zone,pzone,obstacleZones);
+      if(tgc_area>0)then exit;
+      tgc_area:=zone
    end;
 
-   map_ZoneFillPart(x-1,y  ,zone,pzone,obstacleZones);
-   map_ZoneFillPart(x+1,y  ,zone,pzone,obstacleZones);
-   map_ZoneFillPart(x  ,y-1,zone,pzone,obstacleZones);
-   map_ZoneFillPart(x  ,y+1,zone,pzone,obstacleZones);
+   map_ZoneFillPart(x-1,y  ,zone,obstacleZones);
+   map_ZoneFillPart(x+1,y  ,zone,obstacleZones);
+   map_ZoneFillPart(x  ,y-1,zone,obstacleZones);
+   map_ZoneFillPart(x  ,y+1,zone,obstacleZones);
 end;
 
 procedure map_ZonesFill;
@@ -404,23 +345,17 @@ begin
       true : if(tgc_solidlevel< mgsl_liquid)then continue;
       end;
 
-      if(tgc_parea=0)then
+      if(tgc_area=0)then
       begin
-         map_gridLastpZone+=1;
-         map_ZoneFillPart(x,y,map_gridLastpZone,true ,obstacleZones);
-      end;
-      if(tgc_sarea=0)then
-      begin
-         map_gridLastsZone+=1;
-         map_ZoneFillPart(x,y,map_gridLastsZone,false,obstacleZones);
+         map_gridLastZone+=1;
+         map_ZoneFillPart(x,y,map_gridLastZone,obstacleZones);
       end;
    end;
 end;
 begin
    map_ZonesClear;
    ZonesFillProc(false);
-   map_gridLastFpZone:=map_gridLastpZone;
-   map_gridLastFsZone:=map_gridLastsZone;
+   map_gridLastFZone:=map_gridLastZone;
    ZonesFillProc(true );
 end;
 
@@ -539,7 +474,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCaptureR>0)then cppzone:=map_GetZoneXY(cpx,cpy,false,true);
+     if(cpCaptureR>0)then cppzone:=map_GetZone(cpx,cpy,true);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -656,7 +591,7 @@ begin
    end;
 end;
 
-procedure map_ShufflePlayerStarts;
+procedure map_ShufflePlayerStarts(teamShuffle:boolean);
 var
 x,y:byte;
 i  :integer;
@@ -665,6 +600,7 @@ begin
     for y:=1 to MaxPlayers do
      if(random(2)=0)and(x<>y)then
      begin
+        if(teamShuffle)and(g_players[x].team<>g_players[y].team)then continue;
         i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
         i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
      end;
@@ -902,7 +838,6 @@ begin
    map_CPoints;
 
    FillChar(map_grid,SizeOf(map_grid),0);
-   map_RemoveTeleports;
    map_ZonesClear;
 
    msrx:=integer(map_seed);

@@ -115,7 +115,7 @@ begin
       18: writeln('         ',str_aislots      ,g_ai_slots                    );
       20: writeln;
       22: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_type           ,35, str_m_sym               ,45,'',56);
-      24: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, str_m_typel[map_type],35, str_m_syml[map_symmetry],45,'',56);
+      24: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_size),25, str_m_typel[map_type],35, str_m_syml[map_symmetry],45,'',56);
       26: writeln;
       28: ps(0);
       30: ps(1);

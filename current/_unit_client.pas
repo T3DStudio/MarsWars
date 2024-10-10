@@ -507,7 +507,7 @@ begin
 
                    upproda+=1;
                    upprodu[_puid]+=1;
-                   pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                   pprod_e[i]:=upid_CalcCostEnergy(_puid,upgr[_puid]+1);
                    cenergy-=pprod_e[i];
                 end;
          end;
@@ -770,8 +770,8 @@ begin
 
             if(speed>0)then
             begin
-               mv_x:=pu^.x;
-               mv_y:=pu^.y;
+               moveCurr_x:=pu^.x;
+               moveCurr_y:=pu^.y;
             end;
 
             if(pu^.x<>x)or(pu^.y<>y)then
@@ -781,7 +781,7 @@ begin
                if(speed>0)then
                begin
                   vstp:=UnitMoveStepTicks;
-                  dir :=point_dir(mp_x,mp_y,x,y);
+                  dir :=point_dir(moveLast_x,moveLast_y,x,y);
                end
                else
                begin
@@ -891,8 +891,8 @@ begin
          end;
 
          if(x=255)
-         then PlayerAddLog(p,mtype,argt,argx,str,-1     ,-1     ,false)
-         else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5,false);
+         then PlayerLogAdd(p,mtype,argt,argx,str,-1     ,-1     ,false)
+         else PlayerLogAdd(p,mtype,argt,argx,str,x shl 5,y shl 5,false);
 
          s-=1;
       end;

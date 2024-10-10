@@ -23,13 +23,13 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         rpls_str_info:=str_svld_errors_open;
+         rpls_str_info:=str_error_OpenFile;
          exit;
       end;
       if(FileSize(f)<rpls_file_head_size)then
       begin
          close(f);
-         rpls_str_info:=str_svld_errors_wdata;
+         rpls_str_info:=str_error_WrongData;
          exit;
       end;
       vr:=0;
@@ -40,24 +40,24 @@ begin
          vr:=0;
          mw:=0;
          wr:=0;
-         BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_size      ));rpls_str_info+=str_map_size+i2s(mw)+tc_nl3+' ';mw:=0;
+         BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl2+' ';wr:=0;
+         BlockRead(f,mw,SizeOf(map_size    ));rpls_str_info+=str_map_size+i2s(mw)+tc_nl2+' ';mw:=0;
          BlockRead(f,vr,sizeof(map_type    ));
-         if(vr>gms_m_types)then begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end
-                           else       rpls_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl3+' '; vr:=0;
+         if(vr>gms_m_types)then begin rpls_str_info:=str_error_WrongVersion;close(f);exit;end
+                           else       rpls_str_info+=str_map_type+str_map_typel[vr]+tc_default+tc_nl2+' '; vr:=0;
          BlockRead(f,vr,sizeof(map_symmetry));
-         if(vr>gms_m_symm )then begin rpls_str_info:=str_svld_errors_wver;close(f);exit;     end
-                           else       rpls_str_info+=str_map_sym+str_map_syml[vr]+tc_nl3+' '; vr:=0;
+         if(vr>gms_m_symm )then begin rpls_str_info:=str_error_WrongVersion;close(f);exit;     end
+                           else       rpls_str_info+=str_map_sym+str_map_syml[vr]+tc_nl2+' '; vr:=0;
 
          BlockRead(f,vr,sizeof(g_mode      ));
-         if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
-                               else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
+         if(vr in allgamemodes)then begin rpls_str_info+=str_emnu_GameModel[vr]+tc_nl2;              end
+                               else begin rpls_str_info:=str_error_WrongVersion;close(f);exit;end;
          BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_generators     ));vr:=0;
          BlockRead(f,hp,SizeOf(PlayerClient     ));
 
-         rpls_str_info+=tc_nl3;
+         rpls_str_info+=tc_nl2;
 
          for vr:=1 to MaxPlayers do
          begin
@@ -68,9 +68,9 @@ begin
             t :=0;
             tm:=0;
             BlockRead(f,t ,1);  // state
-            if(t=ps_none)then
+            if(t=pt_none)then
             begin
-               rpls_str_info+=fn+tc_nl3;
+               rpls_str_info+=fn+tc_nl2;
                BlockRead(f,mw,5);
             end
             else
@@ -86,14 +86,14 @@ begin
                  if(tm<=r_cnt)
                  then rpls_str_info+=str_racel[tm][2]
                  else rpls_str_info+='?';
-               rpls_str_info+=','+t2c(t)+','+fn+tc_nl3;
+               rpls_str_info+=','+t2c(t)+','+fn+tc_nl2;
             end;
          end;
       end
-      else rpls_str_info:=str_svld_errors_wver;
+      else rpls_str_info:=str_error_WrongVersion;
       close(f);
    end
-   else rpls_str_info:=str_svld_errors_file;
+   else rpls_str_info:=str_error_FileExists;
 end;
 
 procedure replay_CalcHeaderSize;
@@ -101,7 +101,7 @@ begin
    rpls_file_head_size
                  :=SizeOf(g_version        )
                   +SizeOf(map_seed         )
-                  +SizeOf(map_size           )
+                  +SizeOf(map_size         )
                   +SizeOf(map_type         )
                   +SizeOf(map_symmetry     )
 
@@ -112,12 +112,12 @@ begin
                   +sizeof(rpls_player      );
    with g_players[0] do
    rpls_file_head_size
-                 +=cardinal((sizeof(name      )
-                            +sizeof(state     )
-                            +sizeof(race      )
-                            +sizeof(slot_race )
-                            +sizeof(team      )
-                            +g_slot_state[0]  )*MaxPlayers);
+                 +=cardinal((sizeof(name       )
+                            +sizeof(player_type)
+                            +sizeof(race       )
+                            +sizeof(slot_race  )
+                            +sizeof(team       )
+                            +g_slot_state[0]   )*MaxPlayers);
 end;
 
 function replay_GetProgress:single;
@@ -257,11 +257,11 @@ begin
         with g_players[p] do
         begin
            {$I-}
-           BlockWrite(rpls_file,name      ,sizeof(name      ));
-           BlockWrite(rpls_file,state     ,sizeof(state     ));
-           BlockWrite(rpls_file,race      ,sizeof(race      ));
-           BlockWrite(rpls_file,slot_race ,sizeof(slot_race ));
-           BlockWrite(rpls_file,team      ,sizeof(team      ));
+           BlockWrite(rpls_file,name       ,sizeof(name       ));
+           BlockWrite(rpls_file,player_type,sizeof(player_type));
+           BlockWrite(rpls_file,race       ,sizeof(race       ));
+           BlockWrite(rpls_file,slot_race  ,sizeof(slot_race  ));
+           BlockWrite(rpls_file,team       ,sizeof(team       ));
            BlockWrite(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
            {$I+}
         end;
@@ -332,7 +332,7 @@ begin
    begin
       rpls_state   :=rpls_state_none;
       g_started    :=false;
-      rpls_str_info:=str_svld_errors_file;
+      rpls_str_info:=str_error_FileExists;
       exit;
    end;
 
@@ -345,7 +345,7 @@ begin
    begin
       replay_Abort;
       g_started    :=false;
-      rpls_str_info:=str_svld_errors_open;
+      rpls_str_info:=str_error_OpenFile;
    end
    else
    begin
@@ -355,7 +355,7 @@ begin
       begin
          replay_Abort;
          g_started    :=false;
-         rpls_str_info:=str_svld_errors_wdata;
+         rpls_str_info:=str_error_WrongData;
          exit;
       end;
 
@@ -368,7 +368,7 @@ begin
       begin
          replay_Abort;
          g_started    :=false;
-         rpls_str_info:=str_svld_errors_wver;
+         rpls_str_info:=str_error_WrongVersion;
       end
       else
       begin
@@ -396,7 +396,7 @@ begin
          begin
             replay_Abort;
             g_started:=false;
-            rpls_str_info:=str_svld_errors_wver;
+            rpls_str_info:=str_error_WrongVersion;
             GameDefaultAll;
             exit;
          end;
@@ -405,11 +405,11 @@ begin
           with g_players[p] do
           begin
              {$I-}
-             BlockRead(rpls_file,name      ,sizeof(name      ));
-             BlockRead(rpls_file,state     ,sizeof(state     ));
-             BlockRead(rpls_file,race      ,sizeof(race      ));
-             BlockRead(rpls_file,slot_race ,sizeof(slot_race ));
-             BlockRead(rpls_file,team      ,sizeof(team      ));
+             BlockRead(rpls_file,name       ,sizeof(name       ));
+             BlockRead(rpls_file,player_type,sizeof(player_type));
+             BlockRead(rpls_file,race       ,sizeof(race       ));
+             BlockRead(rpls_file,slot_race  ,sizeof(slot_race  ));
+             BlockRead(rpls_file,team       ,sizeof(team       ));
 
              BlockRead(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
              {$I+}
@@ -418,7 +418,7 @@ begin
          if(ioresult<>0)then
          begin
             replay_Abort;
-            rpls_str_info:=str_svld_errors_wver;
+            rpls_str_info:=str_error_WrongVersion;
             GameDefaultAll;
             exit;
          end;
@@ -509,7 +509,7 @@ end;
 
 begin
    rpls_ticks+=1;
-   if(G_Started=false)or(rpls_state=rpls_state_none)or(menu_s2=ms2_camp)
+   if(G_Started=false)or(rpls_state=rpls_state_none)//or(menu_s2=ms2_camp)
    then replay_Abort
    else
      if(G_Started)then

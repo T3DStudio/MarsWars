@@ -1,4 +1,5 @@
 
+{
 function ai_isnoprod(pu:PTUnit):boolean;
 var i:integer;
 begin
@@ -307,9 +308,9 @@ end;
 function CheckAIRTarget:boolean;
 begin
    CheckAIRTarget:=true;
-   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.pzone)then exit;
+   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.zone)then exit;
    if(ai_generator_d<NOTSET)then
-     if(ai_generator_cp^.cppzone<>pu^.pzone)then exit;
+     if(ai_generator_cp^.cppzone<>pu^.zone)then exit;
    CheckAIRTarget:=false;
 end;
 
@@ -965,7 +966,7 @@ begin
       or(cpenergy<=0)then
         if(cpd<cpCaptureR)then
         begin
-           if(cppzone<>pu^.pzone)and(not ai_cpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
+           if(cppzone<>pu^.zone)and(not ai_cpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
            then ai_RunTo(pu,0,0,0,0,pu)
            else ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
            au_SetBusyGroup(pu);
@@ -987,10 +988,10 @@ begin
    begin
       tx:=tu^.x;
       ty:=tu^.y;
-      tz:=tu^.pzone;
+      tz:=tu^.zone;
    end;
    with pu^ do
-   if(pzone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
+   if(zone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
    begin
       if(tweight>tar_weight)
       then
@@ -1033,7 +1034,7 @@ begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
       if(ai_commander_grd_u<>nil)then
-        if((tar_d<NOTSET)and(ai_commander_grd_u^.pzone=tar_z))
+        if((tar_d<NOTSET)and(ai_commander_grd_u^.zone=tar_z))
         or(tar_d=NOTSET)then
         begin
            commander_u:=ai_commander_grd_u;
@@ -1144,7 +1145,7 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
            SpecialMicro:=true;
         end
         else
-          if(map_IsObstacleZone(tar_z,false))then
+          if(map_IsObstacleZone(tar_z))then
           begin
              ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
              SpecialMicro:=true;
@@ -1158,7 +1159,7 @@ begin
    begin
       if(ai_teleporterR_u<>nil)then
       begin
-         if((ai_teleporterR_u^.pzone<>pzone)and(tar_d=NOTSET))then
+         if((ai_teleporterR_u^.zone<>zone)and(tar_d=NOTSET))then
            if(ai_TryTeleportR(pu))then exit;
 
          if(ai_alarm_d>base_2r)and(ai_teleporterR_u^.aiu_limitaround_ally<ai_teleporterR_u^.aiu_limitaround_enemy)then
@@ -1631,5 +1632,5 @@ begin
    writeln(ai_cp_go_r,' ',ai_cpoint_d);
    UnitsInfoAddLine(x,y,ai_cpoint_x,ai_cpoint_y,c_aqua);
 end;  }
-
+       }
 
