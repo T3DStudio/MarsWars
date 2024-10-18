@@ -74,6 +74,8 @@ begin
    //draw_surf(r_screen,x,y,vid_fog_BaseSurf);
 end;
 
+
+
 procedure DrawGame;
 var i,n,y:integer;
 begin
@@ -84,13 +86,8 @@ begin
    if(menu_state)
    then d_Menu
    else
-     if(g_Started)
-     then d_Game
-     else
-     begin
-        d_MenuBack  (r_screen);
-        d_MenuCommon;
-     end;
+     if(G_Started)
+     then d_Game;
 
    //_drawMWSModel(@spr_HCommandCenter);
 

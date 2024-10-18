@@ -28,10 +28,6 @@ begin
    theme_cur_tile_liquid_id  :=-1;
    theme_cur_tile_teleport_id:=-1;
 
-   theme_cur_liquid_mmcolor  :=c_white;
-   theme_cur_liquid_tas      :=tas_ice;
-   theme_cur_liquid_tasPeriod:=fr_fpsd2;
-
    // theme
    mseed  :=map_seed;
    theme  :=Pick(theme_n);
@@ -47,12 +43,7 @@ begin
    if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
    if(teleport>=0)then theme_cur_tile_teleport_id:=theme_cur_teleport_l[teleport];
 
-   if(theme_cur_tile_terrain_id>=0)then
-   begin
-      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
-   end
+   SetThemeTES;
 end;
 
 procedure map_MakeVisGrid;

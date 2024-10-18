@@ -718,6 +718,7 @@ begin
 
    // TIMER
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_LU,str_uiHint_Time,c_white);
+   //draw_text(tar,ui_textx,ui_texty,str_uiHint_Time+GStep2TimeStr(g_step),ta_LU,255,c_white);
 
    // INVASION
    case g_mode of

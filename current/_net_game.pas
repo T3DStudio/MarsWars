@@ -160,7 +160,7 @@ begin
          if(pid=0)then
          begin
             net_clearbuffer;
-            if(g_started)
+            if(G_Started)
             then net_writebyte(nmid_game_started)
             else net_writebyte(nmid_server_full );
             net_send(net_LastinIP,net_LastinPort);
@@ -603,13 +603,13 @@ nmid_lobby_info  : begin
          net_writebyte  (nmid_connect);
          net_writebyte  (g_version   );
          net_writestring(PlayerName  );
-         net_writebyte  (cl_UpT_array[net_pnui]);
+         net_writebyte  (cl_UpT_array[net_Quality]);
          net_writecard  (net_log_n   );
       end
       else
       begin
          net_writebyte(nmid_client_info);
-         net_writebyte(cl_UpT_array[net_pnui]);
+         net_writebyte(cl_UpT_array[net_Quality]);
          net_writecard(net_log_n   );
       end;
       net_send(net_cl_svip,net_cl_svport);
@@ -634,7 +634,7 @@ begin
    e:=0;
    if(net_svsearch_listn>0)then
     for i:=0 to net_svsearch_listn-1 do
-     with net_svsearch_list[i] do
+     with net_svsearch_listi[i] do
       if(aip=ip)and(aport=port)then
       begin
          e:=i+1;
@@ -645,8 +645,9 @@ begin
     if(net_svsearch_listn<net_svsearch_listn.MaxValue)then
     begin
        net_svsearch_listn+=1;
-       setlength(net_svsearch_list,net_svsearch_listn);
-       with net_svsearch_list[net_svsearch_listn-1] do
+       setlength(net_svsearch_listi,net_svsearch_listn);
+       setlength(net_svsearch_lists,net_svsearch_listn);
+       with net_svsearch_listi[net_svsearch_listn-1] do
        begin
           ip  :=aip;
           port:=aport;
@@ -656,11 +657,11 @@ begin
     end;
 
     if(e>0)then
-     with net_svsearch_list[e-1] do
-     begin
-        if(info<>ainfo)then menu_remake:=true;
-        info:=ainfo;
-     end;
+    begin
+       e-=1;
+       if(net_svsearch_lists[e]<>ainfo)then menu_remake:=true;
+       net_svsearch_lists[e]:=ainfo;
+    end;
 end;
 
 procedure net_Discowering;

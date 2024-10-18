@@ -703,6 +703,7 @@ begin
    str_error_OpenFile                := 'Can`t open file!';
    str_error_WrongData               := 'Wrong file size!';
    str_error_FileRead                := 'Read file error!';
+   str_error_FileWrite               := 'Write file error!';
    str_error_WrongVersion            := 'Wrong version!';
    str_error_ServerFull              := 'Server full!';
    str_error_GameStarted             := 'Game started!';
@@ -712,14 +713,16 @@ begin
 
    str_menu_StartGame                := 'START GAME';
    str_menu_EndGame                  := 'END GAME';
-   str_menu_campaings                := 'CAMPAIGNS';
-   str_menu_scirmish                 := 'SCIRMISH';
+   str_menu_Campaings                := 'CAMPAIGNS';
+   str_menu_Scirmish                 := 'SCIRMISH';
    str_menu_SaveLoad                 := 'SAVE/LOAD';
-   str_menu_loadgame                 := 'LOAD GAME';
-   str_menu_savegame                 := 'SAVE GAME';
-   str_menu_loadreplay               := 'PLAY REPLAY';
+   str_menu_LoadGame                 := 'LOAD GAME';
+   str_menu_LoadReplay               := 'LOAD REPLAY';
    str_menu_Settings                 := 'SETTINGS';
    str_menu_AboutGame                := 'ABOUT GAME';
+   str_menu_ReplayPlayback           := 'REPLAY PLAYBACK';
+   str_menu_PlaybackBreak            := 'PLAYBACK BREAK';
+
    str_menu_Surrender                := 'SURRENDER';
    str_menu_LeaveGame                := 'LEAVE GAME';
    str_menu_back                     := 'BACK';
@@ -732,10 +735,15 @@ begin
    str_menu_mactionl[false]          := tc_lime+'move'+tc_default+'+'+tc_red+'attack'+tc_default;
    str_menu_connecting               := 'Connecting...';
    str_menu_settingsGame             := 'GAME';
-   str_menu_settingsRecord           := 'RECORD';
+   str_menu_settingsReplay           := 'REPLAY';
    str_menu_settingsNetwork          := 'NETWORK';
    str_menu_settingsVideo            := 'VIDEO';
    str_menu_settingsSound            := 'SOUND';
+   str_menu_DeleteFile               := 'DELETE';
+
+   str_menu_save                     := 'SAVE';
+   str_menu_load                     := 'LOAD';
+
 
    str_menu_Apply                    := 'APPLY';
    str_menu_ResolutionWidth          := 'Resolution (width)';
@@ -770,12 +778,14 @@ begin
    str_menu_serverStop               := 'Stop server';
    str_menu_chat                     := 'CHAT';
 
-   str_menu_RecordName               := 'Record name';
-   str_menu_RecordQuality            := 'Record quality';
-   str_menu_RecordState              := 'Record status';
-   str_menu_RecordStatel[rpls_state_none ]:=           'OFF';
-   str_menu_RecordStatel[rpls_state_write]:= tc_yellow+'RECORD';
-   str_menu_RecordStatel[rpls_state_read ]:= tc_lime  +'PLAY';
+   str_menu_ReplayName               := 'Replay name';
+   str_menu_ReplayQuality            := 'Replay quality';
+   str_menu_Recording                := 'Record games';
+   str_menu_ReplayState              := 'Replay status';
+   str_menu_ReplayStatel[rpls_state_none ]:=           'OFF';
+   str_menu_ReplayStatel[rpls_state_write]:= tc_yellow+'RECORD';
+   str_menu_ReplayStatel[rpls_state_read ]:= tc_lime  +'PLAY';
+   str_menu_ReplayPlay               := 'PLAY';
 
    str_menu_NetQuality[0]            := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +'x1';
    str_menu_NetQuality[1]            := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +'x2';
@@ -796,8 +806,10 @@ begin
 
    str_menu_players                  := 'PLAYERS';
    str_menu_map                      := 'MAP';
-   str_menu_goptions                 := 'GAME OPTIONS';
+   str_menu_GameOptions              := 'GAME OPTIONS';
    str_menu_multiplayer              := 'MULTIPLAYER';
+   str_menu_ReplayInfo               := 'REPLAY INFO';
+   str_menu_SaveInfo                 := 'SAVE INFO';
 
    str_menu_PanelPos                 := 'Control panel position';
    str_menu_PanelPosl[0]             := tc_lime  +'left'  +tc_default;
@@ -851,7 +863,7 @@ begin
    str_menu_Generatorsl[5]           := 'neutral(20 min)';
    str_menu_Generatorsl[6]           := 'neutral(infinity)';
 
-   str_map_type                      := 'Type: ';
+   str_map_type                      := 'Type';
    str_map_typel[mapt_steppe]        := tc_gray  +'Steppe';
    str_map_typel[mapt_canyon]        := tc_blue  +'Canyon';
    str_map_typel[mapt_clake ]        := tc_aqua  +'Lake';
@@ -860,8 +872,8 @@ begin
    str_map_typel[mapt_shore ]        := tc_orange+'Sea shore';
    str_map_typel[mapt_sea   ]        := tc_red   +'Sea';
    str_map_seed                      := 'Seed';
-   str_map_size                      := 'Size: ';
-   str_map_sym                       := 'Symmetry: ';
+   str_map_size                      := 'Size';
+   str_map_sym                       := 'Symmetry';
    str_map_syml[maps_none ]          := 'no';
    str_map_syml[maps_point]          := 'point';
    str_map_syml[maps_lineV]          := 'line |';
@@ -875,6 +887,8 @@ begin
    str_racel[r_uac   ]               := tc_lime  +'UAC' +tc_default;
    str_observer                      := 'OBSERVER';
 
+   str_msg_ReplayStart               := 'Start recording: ';
+   str_msg_ReplayFail                := 'Recording error! ';
    str_msg_PlayerDefeated            := ' was terminated';
    str_msg_PlayerLeave               := ' left the game';
    str_msg_PlayerSurrender           := ' gives up';
@@ -1016,7 +1030,7 @@ begin
    str_play              := 'Play';
    str_replay            := 'RECORD';
    str_replay_status     := 'STATUS';
-   str_menu_RecordName       := 'Replay name';
+   str_menu_ReplayName       := 'Replay name';
    str_cmpdif            := 'Difficulty ';
    str_goptions          := 'GAME OPTIONS';
 
@@ -1381,11 +1395,11 @@ begin
   str_MObjectives       := 'ÇÀÄÀ×È';
   str_MServers          := 'ÑÅĞÂÅĞÛ';
 
-  str_menu_campaings    := 'ÊÀÌÏÀÍÈÈ';
-  str_menu_scirmish     := 'ÑÕÂÀÒÊÀ';
-  str_menu_loadgame     := 'ÇÀÃĞÓÇÈÒÜ ÈÃĞÓ';
+  str_menu_Campaings    := 'ÊÀÌÏÀÍÈÈ';
+  str_menu_Scirmish     := 'ÑÕÂÀÒÊÀ';
+  str_menu_LoadGame     := 'ÇÀÃĞÓÇÈÒÜ ÈÃĞÓ';
   str_menu_savegame     := 'ÑÎÕĞÀÍÈÒÜ ÈÃĞÓ';
-  str_menu_loadreplay   := 'ÇÀÃĞÓÇÈÒÜ ÇÀÏÈÑÜ';
+  str_menu_LoadReplay   := 'ÇÀÃĞÓÇÈÒÜ ÇÀÏÈÑÜ';
   str_menu_Settings     := 'ÍÀÑÒĞÎÉÊÈ';
   str_menu_AboutGame    := 'Î ÈÃĞÅ';
   str_menu_Surrender    := 'ÑÄÀÒÜÑß';
@@ -1445,7 +1459,7 @@ begin
   str_play              := 'Ïğîèãğàòü';
   str_replay            := 'ÇÀÏÈÑÜ';
   str_replay_status     := 'ÑÒÀÒÓÑ';
-  str_menu_RecordName       := 'Íàçâàíèå çàïèñè';
+  str_menu_ReplayName       := 'Íàçâàíèå çàïèñè';
   str_cmpdif            := 'Ñëîæíîñòü: ';
   str_waitsv            := 'Îæèäàíèå ñåğâåğà...';
   str_goptions          := 'ÏÀĞÀÌÅÒĞÛ ÈÃĞÛ';
@@ -1595,9 +1609,9 @@ begin
   str_menu_Generatorsl[5]    := 'íåéòğàëüí.(20 ìèí.)';
   str_menu_Generatorsl[6]    := 'íåéòğàëüí.(áåñêîí.)';
 
-  str_menu_RecordStatel[rpls_state_none ]:=           'ÂÛÊË.';
-  str_menu_RecordStatel[rpls_state_write]:= tc_yellow+'ÇÀÏÈÑÜ';
-  str_menu_RecordStatel[rpls_state_read ]:= tc_lime  +'ÂÎÑÏĞÎÈÇÂÅÄÅÍÈÅ';
+  str_menu_ReplayStatel[rpls_state_none ]:=           'ÂÛÊË.';
+  str_menu_ReplayStatel[rpls_state_write]:= tc_yellow+'ÇÀÏÈÑÜ';
+  str_menu_ReplayStatel[rpls_state_read ]:= tc_lime  +'ÂÎÑÏĞÎÈÇÂÅÄÅÍÈÅ';
 
   str_menu_ready             := 'ãîòîâ';
   str_menu_nready            := 'íå ãîòîâ';

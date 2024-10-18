@@ -310,25 +310,31 @@ begin
    menu_redraw:=menu_redraw or menu_state;
 end;
 
-procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
+function GStep2TimeStr(gstep:cardinal):shortstring;
 var
-m,s,h   :cardinal;
-hs,ms,ss:shortstring;
+s , m, h: cardinal;
+ss,sm,sh:shortstring;
 begin
-   s:=time div fr_fps1;
+   s:=gstep div fr_fps1;
    m:=s div 60;
    s:=s mod 60;
    h:=m div 60;
    m:=m mod 60;
+
+   GStep2TimeStr:='';
    if(h>0)then
    begin
-      if(h<10)then hs:='0'+c2s(h) else hs:=c2s(h);
-      str:=hs+':';
+      if(h<10)then sh:='0'+c2s(h) else sh:=c2s(h);
+      GStep2TimeStr:=sh+':';
    end;
-   if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
+   if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
-   str:=str+ms+':'+ss;
-   draw_text(tar,x,y,str,ta,255,color);
+   GStep2TimeStr+=sm+':'+ss;
+end;
+
+procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
+begin
+   draw_text(tar,x,y,str+GStep2TimeStr(time),ta,255,color);
 end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;

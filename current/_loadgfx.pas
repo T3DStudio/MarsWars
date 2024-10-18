@@ -133,7 +133,6 @@ begin
       gC:=(color and $0000FF00) shr 8;
       bC:=(color and $000000FF);
 
-
       if(x=0)and(y=0)then
       begin
          rR:=rC;
@@ -497,6 +496,7 @@ end;
 function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
 var ts:pSDl_Surface;
 begin
+
    ts:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
    if(ts=nil)then
    begin
@@ -581,7 +581,7 @@ begin
    animStepX:=0;
    animStepY:=0;
 
-   writeln('--------------------');
+   //writeln('--------------------');
 
    // base terrain tile
    if(DefaultTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,@theme_tile_terrain ))then
@@ -676,21 +676,22 @@ begin
    gfx_SDLSurfaceFree(ts);
 end;
 
-function gfx_MakeUIButtonFromSDLSurface(ts:pSDl_Surface;bw:integer):pSDL_Surface;
-var tst:pSDL_Surface;
-   coff:single;
-    hwb:integer;
+function gfx_MakeUIButtonFromSDLSurface(sSource:pSDl_Surface;bw:integer):pSDL_Surface;
+var  tst:pSDL_Surface;
+    coff:single;
+     hwb:integer;
 begin
    hwb:=bw div 2;
 
-   if(ts^.w<=bw)or(ts^.h<=bw)
+   if(sSource^.w<=bw)or(sSource^.h<=bw)
    then coff:=1
    else
-     if(ts^.w<ts^.h)
-     then coff:=bw/ts^.w
-     else coff:=bw/ts^.h;
+     if(sSource^.w<sSource^.h)
+     then coff:=bw/sSource^.w
+     else coff:=bw/sSource^.h;
 
-   tst:=ROTOZOOMSURFACE(ts, 0, coff, 0);
+   tst:=gfx_SDLSurfaceResize(sSource,round(sSource^.w*coff),round(sSource^.h*coff));
+   SDL_SetColorKey(tst,SDL_SRCCOLORKEY,sSource^.format^.colorkey);
    gfx_MakeUIButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
    if(tst^.h>bw)
    then draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
@@ -747,6 +748,23 @@ end;
 
 {$include _themes.pas}
 
+procedure vid_MakeMenuBack;
+var
+cx,cy:single;
+ts   :pSDL_Surface;
+begin
+   if(r_mback<>nil)then gfx_SDLSurfaceFree(r_mback);
+   r_mback:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
+   boxColor(r_mback,0,0,vid_vw,vid_vh,c_black);
+
+   cx:=vid_vw/spr_mback^.w;
+   cy:=vid_vh/spr_mback^.h;
+   if(cx>cy)
+   then ts:=zoomSurface(spr_mback,cy,cy,0)
+   else ts:=zoomSurface(spr_mback,cx,cx,0);
+   draw_surf(r_mback,vid_vhw-(ts^.w div 2),vid_vhh-(ts^.h div 2),ts);
+   gfx_SDLSurfaceFree(ts);
+end;
 
 procedure gfx_LoadGraphics(firstload:boolean);
 var x,r:integer;
@@ -809,9 +827,9 @@ begin
    DrawLoadingScreen(str_loading_gfx,c_yellow);
    spr_mlogo :=gfx_SDLSurfaceLoad('logo' ,false,firstload);
    spr_mback :=gfx_SDLSurfaceLoad('mback',false,firstload);
-   spr_mback2:=gfx_SDLSurfaceResize(spr_mback,vid_vw,vid_vh);
 
    r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
+   vid_MakeMenuBack;
 
    spr_b_action   := gfx_LoadUIButton('b_action' ,vid_bw);
    spr_b_paction  := gfx_LoadUIButton('b_paction',vid_bw);
@@ -1050,13 +1068,9 @@ begin
    ui_apmy      := ui_fpsy+draw_font_h2;
 
    ui_ingamecl  :=(vid_cam_w-basefont_w1) div basefont_w1;
-   if(spr_mback<>nil)then
-   begin
-      if(spr_mback2<>nil)then gfx_SDLSurfaceFree(spr_mback2);
-      spr_mback2:=gfx_SDLSurfaceResize(spr_mback,vid_vw,vid_vh);
-   end;
    if(r_menu<>nil)then gfx_SDLSurfaceFree(r_menu);
    r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
+   if(spr_mback<>nil)then vid_MakeMenuBack;
 
    vid_fog_vfw  :=(vid_cam_w div fog_CellW)+1;
    vid_fog_vfh  :=(vid_cam_h div fog_CellW)+1;
@@ -1088,7 +1102,6 @@ end;
 begin
    gfx_SDLSurfaceFree(r_uipanel );
    gfx_SDLSurfaceFree(r_panel   );
-   gfx_SDLSurfaceFree(r_dterrain);
 
    if(vid_PannelPos<2)then // left-right
    begin
@@ -1168,8 +1181,6 @@ begin
    end;
 
    draw_surf(r_uipanel,0,0,r_panel);
-
-   r_dterrain:=gfx_SDLSurfaceCreate(vid_cam_w,vid_cam_h);
 
    vid_CommonVars;
 end;

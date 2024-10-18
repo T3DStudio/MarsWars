@@ -21,12 +21,6 @@ ppSDL_Surface = ^pSDL_Surface;
 
 string6     = string[6];
 
-TServerInfo = record
-   ip       : cardinal;
-   port     : word;
-   info     : shortstring;
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   GRAPHIC
@@ -171,6 +165,20 @@ PTSoundSet = ^TSoundSet;
 //
 //   OTHER
 //
+
+TSaveLoadItem = record
+   data_p:pointer;
+   data_s:cardinal;
+end;
+
+TArrayOfsString = array of shortstring;
+PTArrayOfsString = ^TArrayOfsString;
+
+TServerInfo = record
+   ip       : cardinal;
+   port     : word;
+   info     : shortstring;
+end;
 
 TReplayPos = record
    rp_fpos : int64;

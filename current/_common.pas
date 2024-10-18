@@ -1468,11 +1468,11 @@ end;
 
 procedure GameCameraBounds;
 begin
-   vid_cam_x:=mm3i(0,vid_cam_x,map_size-vid_cam_w);
-   vid_cam_y:=mm3i(0,vid_cam_y,map_size-vid_cam_h);
+   vid_cam_x  :=mm3i(0,vid_cam_x,map_size-vid_cam_w);
+   vid_cam_y  :=mm3i(0,vid_cam_y,map_size-vid_cam_h);
 
-   vid_mmvx:=round(vid_cam_x*map_mm_cx);
-   vid_mmvy:=round(vid_cam_y*map_mm_cx);
+   vid_mmvx   :=round(vid_cam_x*map_mm_cx);
+   vid_mmvy   :=round(vid_cam_y*map_mm_cx);
    vid_fog_sx :=vid_cam_x div fog_CellW;
    vid_fog_sy :=vid_cam_y div fog_CellW;
    vid_fog_ex :=vid_fog_sx+vid_fog_vfw;

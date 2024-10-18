@@ -405,7 +405,7 @@ gm_royale   : wudata_int (g_royal_r        ,rpl);
 
    if(rpl)then
    begin
-      _PNU:=cl_UpT_array[rpls_pnui];
+      _PNU:=cl_UpT_array[rpls_Quality];
       _N_U:=@rpls_u;
    end
    else

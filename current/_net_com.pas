@@ -181,26 +181,36 @@ function net_LastinPort:word    ;begin net_LastinPort:=net_buffer^.address.port;
 
 {$IFDEF _FULLGAME}
 
-procedure net_sv_sport;
+procedure txt_ValidateServerPort;
 begin
    net_port:=s2w(net_sv_pstr);
    net_sv_pstr:=w2s(net_port);
 end;
 
-function ip2c(s:shortstring):cardinal;
-var i,l,r:byte;
-    e:array[0..3] of byte = (0,0,0,0);
+function ip2c(s:shortstring;isip:pboolean):cardinal;
+{$IFNDEF FULLGAME}
+const chars_digits           : set of Char = ['0'..'9'];
+{$ENDIF}
+var i,l,
+     bn:byte;
+     e :array[0..3] of byte = (0,0,0,0);
 begin
-   r:=0;
-   l:=length(s);
+   ip2c:=0;
+   if(isip<>nil)then isip^:=false;
+   bn:=0;
+   l :=length(s);
    if(l>0)then
-    for i:=1 to l do
-     if(s[i]='.')then
-     begin
-        r += 1;
-        if(r>3)then break;
-     end
-     else e[r]:=s2b(b2s(e[r])+s[i]);
+     for i:=1 to l do
+       if(s[i]='.')then
+       begin
+          bn+=1;
+          if(bn>3)then exit;
+       end
+       else
+         if(s[i] in chars_digits)
+         then e[bn]:=s2b(b2s(e[bn])+s[i])
+         else exit;
+   if(isip<>nil)then isip^:=true;
    ip2c:=cardinal((@e)^);
 end;
 
@@ -212,37 +222,90 @@ begin
     +'.'+b2s((c and $FF000000) shr 24);
 end;
 
-procedure net_cl_saddr;
+procedure txt_ValidateServerAddr;
+var
+addr_str,
+port_str: shortstring;
+pstr    : PChar;
+    p   : byte;
+  ipc   : cardinal;
+ isip   : boolean;
+ipstruct: TIPaddress;
+begin
+   addr_str:='';
+   port_str:='';
+   p    :=pos(':',net_cl_svaddr);
+   if(p>0)then
+   begin
+      addr_str:=copy(net_cl_svaddr,1,p-1);
+      delete(net_cl_svaddr,1,p);
+      port_str:=net_cl_svaddr;
+   end
+   else
+   begin
+      addr_str:=net_cl_svaddr;
+      port_str:='10666';
+   end;
+
+   net_cl_svport:=swap(s2w(port_str));
+   port_str:=w2s(swap(net_cl_svport));
+
+   ipc:=ip2c(addr_str,@isip);
+   if(isip)then
+   begin
+      net_cl_svip  :=ipc;
+      net_cl_svaddr:=c2ip(net_cl_svip)+':'+port_str;
+   end
+   else
+   begin
+      net_cl_svaddr:=addr_str+':'+port_str;
+      addr_str+=#0;
+      pstr:=@addr_str[1];
+      if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)then
+      begin
+         net_cl_svip:=ipstruct.host;
+         //room_log_add(sv_clroom,log_local,net_cl_svaddr+': resolved host to '+c2ip(cl_net_svip));
+      end
+      else
+      begin
+         net_cl_svip:=0;
+         //room_log_add(sv_clroom,log_local,net_cl_svaddr+': resolve host fail');
+      end;
+   end;
+end;
+
+
+{procedure net_cl_saddr;
 var sp,sip:shortstring;
       i,sl:byte;
 begin
-   sl:=length(net_cl_svstr);
+   sl:=length(net_cl_svaddr);
 
-   i:=pos(':',net_cl_svstr);
+   i:=pos(':',net_cl_svaddr);
    if(i=1)then
    begin
       sip:='';
-      sp :=net_cl_svstr;
+      sp :=net_cl_svaddr;
       delete(sp,1,i);
    end
    else
     if(i=sl)or(i=0) then
     begin
-       sip:=net_cl_svstr;
+       sip:=net_cl_svaddr;
        if(i=sl)then delete(sip,sl,1);
        sp:='0';
     end
     else
     begin
-       sip:=copy(net_cl_svstr,1,i-1);
-       sp :=copy(net_cl_svstr,i+1,sl-i);
+       sip:=copy(net_cl_svaddr,1,i-1);
+       sp :=copy(net_cl_svaddr,i+1,sl-i);
     end;
 
    net_cl_svip   :=ip2c(sip);
    net_cl_svport :=swap(s2w(sp));
 
-   net_cl_svstr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
-end;
+   net_cl_svaddr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
+end;}
 
 procedure net_send_chat(targets:byte;msg:shortstring);
 begin

@@ -274,8 +274,9 @@ function PlayerSurrender(PlayerTarget:byte;Check:boolean):boolean;
 begin
    PlayerSurrender:=false;
 
-   if(not g_started)
-   or(PlayerTarget>MaxPlayers)then exit;
+   if(not G_Started)
+   or(PlayerTarget>MaxPlayers)
+   or(rpls_state=rpls_state_read)then exit;
 
    with g_players[PlayerTarget] do
    if(not isdefeated)then
@@ -292,7 +293,7 @@ function PlayerDefeat(PlayerTarget:byte;Check:boolean):boolean;
 begin
    PlayerDefeat:=false;
 
-   if(not g_started)
+   if(not G_Started)
    or(PlayerTarget>MaxPlayers)then exit;
 
    with g_players[PlayerTarget] do
@@ -310,7 +311,7 @@ function PlayerLeave(PlayerTarget:byte;Check:boolean):boolean;
 begin
    PlayerLeave:=false;
 
-   if(not g_started)
+   if(not G_Started)
    or(PlayerTarget>MaxPlayers)then exit;
 
    with g_players[PlayerTarget] do
@@ -458,7 +459,7 @@ var p:byte;
 begin
    GameLoadPreset:=false;
 
-   if(g_started)
+   if(G_Started)
    or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
    or(preset>=g_preset_n)then exit;
 
@@ -633,7 +634,7 @@ begin
    net_disconnect;
    net_dispose;
    GameDefaultAll;
-   G_started :=false;
+   G_Started :=false;
    net_status:=ns_single;
 end;
 
@@ -1108,6 +1109,160 @@ end;
 
 {$include _net_game.pas}
 
+{
+plotLine(x0, y0, x1, y1)
+    dx = abs(x1 - x0)
+    sx = x0 < x1 ? 1 : -1
+    dy = -abs(y1 - y0)
+    sy = y0 < y1 ? 1 : -1
+    error = dx + dy
+
+    while true
+        plot(x0, y0)
+        if x0 == x1 && y0 == y1 break
+        e2 = 2 * error
+        if e2 >= dy
+            if x0 == x1 break
+            error = error + dy
+            x0 = x0 + sx
+        end if
+        if e2 <= dx
+            if y0 == y1 break
+            error = error + dx
+            y0 = y0 + sy
+        end if
+    end while
+}
+procedure AddPoint(tx,ty,tw:integer;color:cardinal);
+begin
+   tx:=tx*MapCellW+tw;
+   ty:=ty*MapCellW+tw;
+   tw*=2;
+   UnitsInfoAddRect(tx,ty,tx+MapCellW-tw,ty+MapCellW-tw,color);
+end;
+function LineCollision(x0,y0,x1,y1:integer):boolean;
+var
+dx,dy,
+px,py,
+sx,sy:integer;
+e1,e2:longint;
+begin
+   dx:=abs(x1-x0);
+   if(x0<x1)
+   then sx:= 1
+   else sx:=-1;
+   dy:=-abs(y1-y0);
+   if(y0<y1)
+   then sy:= 1
+   else sy:=-1;
+   e1:=dx+dy;
+
+   LineCollision:=false;
+
+   //AddPoint(x0,y0,2,c_blue);
+   //AddPoint(x1,y1,4,c_lime);
+
+   while(true)do
+   begin
+      if(map_IsObstacleZone(map_GetZone(x0,y0,false)))then
+      begin
+         LineCollision:=true;
+         break;
+      end;
+      if(x0=x1)and(y0=y1)then break;
+      px:=x0;
+      py:=y0;
+      //AddPoint(x0,y0,6,c_orange);
+      e2:=e1+e1;
+      if(e2>=dy)then
+      begin
+          //if(x0=x1)then break;
+          e1+=dy;
+          x0+=sx;
+      end;
+      if(e2<=dx)then
+      begin
+          //if(y0=y1)then break;
+          e1+=dx;
+          y0+=sy
+      end;
+      if(px<>x0)and(py<>y0)then
+        if( map_IsObstacleZone(map_GetZone(px,y0,false))
+        and map_IsObstacleZone(map_GetZone(x0,py,false)))then
+        begin
+           LineCollision:=true;
+           break;
+        end;
+   end;
+end;
+
+{procedure MakeZone(startx,starty:integer);
+var
+local_array_i,
+local_array_n: integer;
+local_array_x,
+local_array_y:array of integer;
+function CheckPoint(px,py:integer):boolean;
+var i:integer;
+begin
+   CheckPoint:=false;
+   if(local_array_n=debug_array_n.MaxValue)then exit;
+   if(map_IsObstacleZone(map_GetZone(px,py,false)))then exit;
+   if(local_array_n>0)then
+    for i:=0 to local_array_n-1 do
+    begin
+       if(px=local_array_x[i])and(py=local_array_y[i])then exit;
+       if(LineCollision(px,py,local_array_x[i],local_array_y[i]))then exit;
+    end;
+
+   CheckPoint:=true;
+end;
+procedure ProcPoint(px,py:integer);
+var i:integer;
+begin
+   if(local_array_n=local_array_n.MaxValue)then exit;
+   if(local_array_n>0)then
+    for i:=0 to local_array_n-1 do
+     if(px=local_array_x[i])and(py=local_array_y[i])then exit;
+
+   if(CheckPoint(px,py))then
+   begin
+      local_array_n+=1;
+      setlength(local_array_x,local_array_n);
+      setlength(local_array_y,local_array_n);
+      local_array_x[local_array_n-1]:=px;
+      local_array_y[local_array_n-1]:=py;
+
+      debug_array_n+=1;
+      setlength(debug_array_x,debug_array_n);
+      setlength(debug_array_y,debug_array_n);
+      debug_array_x[debug_array_n-1]:=px;
+      debug_array_y[debug_array_n-1]:=py;
+   end;
+end;
+begin
+   debug_array_n:=0;
+   setlength(debug_array_x,0);
+   setlength(debug_array_y,0);
+
+   local_array_i:=0;
+   local_array_n:=0;
+   setlength(local_array_x,0);
+   setlength(local_array_y,0);
+   ProcPoint(startx,starty);
+
+   while(local_array_i<local_array_n)do
+   begin
+      startx:=local_array_x[local_array_i];
+      starty:=local_array_y[local_array_i];
+      ProcPoint(startx-1,starty);
+      ProcPoint(startx+1,starty);
+      ProcPoint(startx,starty-1);
+      ProcPoint(startx,starty+1);
+      local_array_i+=1;
+   end;
+end;}
+
 procedure CodeGame;
 var tx,ty:integer;
 begin
@@ -1151,10 +1306,23 @@ begin
       {$IFDEF _FULLGAME}
       if(r_blink2_colorb)then
       begin
-      debug_Sx  :=mouse_map_x;
-      debug_Sy  :=mouse_map_y;
-      debug_Sgx :=debug_Sx div MapCellW;
-      debug_Sgy :=debug_Sy div MapCellW;
+         debug_Sx  :=mouse_map_x;
+         debug_Sy  :=mouse_map_y;
+         debug_Sgx :=debug_Sx div MapCellW;
+         debug_Sgy :=debug_Sy div MapCellW;
+
+         //LineCollision(debug_Sgx,debug_Sgy,0,0)
+
+         {if(LineCollision(debug_Sgx,debug_Sgy,0,0))
+         then AddPoint(debug_Sgx,debug_Sgy,5,c_red )
+         else AddPoint(debug_Sgx,debug_Sgy,5,c_lime);}
+         {MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
+
+         if(debug_array_n>0)then
+          for tx:=0 to debug_array_n-1 do
+           AddPoint(debug_array_x[tx],debug_array_y[tx],5,c_orange);  }
+     {
+
       debug_Dx  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_x;
       debug_Dy  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_y;
       debug_Dgx :=debug_Dx div MapCellW;
@@ -1182,7 +1350,7 @@ begin
 
       tx:=(debug_Sgx+debug_Svx)*MapCellW+5;
       ty:=(debug_Sgy+debug_Svy)*MapCellW+5;
-      UnitsInfoAddRect(tx,ty,tx+MapCellW-10,ty+MapCellW-10,c_orange);
+      UnitsInfoAddRect(tx,ty,tx+MapCellW-10,ty+MapCellW-10,c_orange);  }
       end;
       {$ENDIF}
 

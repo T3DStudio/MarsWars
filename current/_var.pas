@@ -9,7 +9,7 @@ sys_EVENT         : pSDL_EVENT;
 //  GAME
 //
 
-g_started         : boolean  = false;
+G_Started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
 g_start_base      : byte     = 2;
@@ -17,6 +17,7 @@ g_fixed_positions : boolean  = false;
 g_generators      : byte     = 2;
 g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
 g_deadobservers   : boolean  = true;
+
 g_step            : cardinal = 0;
 g_player_astatus  : byte     = 0;
 g_player_rstatus  : byte     = 0;
@@ -96,7 +97,7 @@ net_localAdv_timer: integer = 0;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
-rpls_pnui         : byte = 0;
+rpls_Quality      : byte = 0;
 rpls_log_n        : word = 0;
 rpls_wudata_t     : TWUDataTime;
 rpls_cpoints_t    : TWCPDataTime;
@@ -155,6 +156,9 @@ debug_Dgy,
 debug_Dvx,
 debug_Dvy         : integer;
 debug_zone        : word;
+debug_array_n     : integer;
+debug_array_x,
+debug_array_y     : array of integer;
 
 
 map_grid_graph    : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
@@ -172,7 +176,6 @@ r_empty,
 r_minimap,
 r_bminimap,
 r_screen,
-r_dterrain,
 r_menu            : pSDL_SURFACE;
 r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
@@ -315,25 +318,25 @@ map_mm_gridW      : single;
 
 campain_skill     : byte = 3;
 campain_seed      : cardinal = 0;
-campain_mission   : byte = 0;
+campain_mission   : byte = 255;
 campain_mmap      : array[0..MaxMissions] of pSDL_Surface;
-campain_mission_n : integer = 0;
 
 log_LastMesTimer  : integer = 0;
 
-net_cl_svpreset   : shortstring = '';
+//net_cl_svpreset   : shortstring = '';
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
-net_cl_svstr      : shortstring = '127.0.0.1:10666';
+net_cl_svaddr     : shortstring = '127.0.0.1:10666';
 net_status_str    : shortstring = '';
 net_sv_pstr       : shortstring = '10666';
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
-net_pnui          : byte = 4;
+net_Quality       : byte = 4;
 
 net_svsearch      : boolean = false;
-net_svsearch_list : array of TServerInfo;
+net_svsearch_listi: array of TServerInfo;
+net_svsearch_lists: TArrayOfsString;
 net_svsearch_listn: integer = 0;
 net_svsearch_scroll: integer = 0;
 net_svsearch_sel  : integer = 0;
@@ -341,17 +344,23 @@ net_svsearch_sel  : integer = 0;
 
 svld_str_info     : shortstring = '';
 svld_str_fname    : shortstring = '';
-svld_list         : array of shortstring;
+svld_items        : array of TSaveLoadItem;
+svld_itemn        : integer = 0;
+svld_list         : TArrayOfsString;
 svld_list_size    : integer = 0;
 svld_list_sel     : integer = 0;
 svld_list_scroll  : integer = 0;
 svld_file_size    : cardinal = 0;
 
+rpls_Recording    : boolean = false;
+rpls_StartRecordPause
+                  : byte = 0;
 rpls_fstatus      : byte = 0;    // file status (none,write,read)
-rpls_pnu          : integer = 0; // quality
+rpls_pnu          : integer = 0;
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
-rpls_str_info     : shortstring = '';
+rpls_str_info1    : shortstring = '';
+rpls_str_info2    : shortstring = '';
 rpls_state        : byte = rpls_state_none;
 rpls_list         : array of shortstring;
 rpls_list_size    : integer = 0;
@@ -362,7 +371,7 @@ rpls_ReadPosL     : array of TReplayPos;
 rpls_ForwardStep  : integer = 1;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
-rpls_player       : byte = 0;
+rpls_POVPlayer       : byte = 0;
 rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_ticks        : byte = 0;
@@ -756,7 +765,7 @@ spr_b_cancel,
 spr_b_delete,
 spr_mlogo,
 spr_mback,
-spr_mback2,
+r_mback,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_tabs          : array[0..3] of pSDL_Surface;
@@ -782,7 +791,6 @@ str_emnu_GameModel               : array[0..gms_count  ] of shortstring;
 
 str_map_typel           : array[0..gms_m_types] of shortstring;
 str_map_syml            : array[0..gms_m_symm ] of shortstring;
-str_map,
 str_map_seed,
 str_map_type,
 str_map_size,
@@ -795,14 +803,15 @@ str_pstate_cheater      : shortstring;
 str_menu_PlayerSlots    : array[0..ps_states_n-1] of shortstring;
 str_menu_StartGame,
 str_menu_EndGame,
-str_menu_campaings,
-str_menu_scirmish,
+str_menu_Campaings,
+str_menu_Scirmish,
 str_menu_SaveLoad,
-str_menu_loadgame,
-str_menu_savegame,
-str_menu_loadreplay,
+str_menu_LoadGame,
+str_menu_LoadReplay,
 str_menu_Settings,
 str_menu_AboutGame,
+str_menu_ReplayPlayback,
+str_menu_PlaybackBreak,
 str_menu_Surrender,
 str_menu_LeaveGame,
 str_menu_back,
@@ -811,10 +820,14 @@ str_menu_exit,
 str_menu_connecting,
 str_menu_maction,
 str_menu_settingsGame,
-str_menu_settingsRecord,
+str_menu_settingsReplay,
 str_menu_settingsNetwork,
 str_menu_settingsVideo,
 str_menu_settingsSound,
+str_menu_DeleteFile,
+
+str_menu_save,
+str_menu_load,
 
 str_menu_FPS,
 str_menu_APM,
@@ -860,8 +873,10 @@ str_menu_Color,
 
 str_menu_players,
 str_menu_map,
-str_menu_goptions,
+str_menu_GameOptions,
 str_menu_multiplayer,
+str_menu_ReplayInfo,
+str_menu_SaveInfo,
 
 str_menu_RandomScirmish,
 str_menu_AISlots,
@@ -877,10 +892,12 @@ str_menu_PanelPosl      : array[0..3] of shortstring;
 str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
 str_menu_NetQuality     : array[0..cl_UpT_arrayN] of shortstring;
 
-str_menu_RecordName,
-str_menu_RecordQuality,
-str_menu_RecordState     : shortstring;
-str_menu_RecordStatel    : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
+str_menu_ReplayPlay,
+str_menu_ReplayName,
+str_menu_ReplayQuality,
+str_menu_Recording,
+str_menu_ReplayState     : shortstring;
+str_menu_ReplayStatel    : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 str_menu_mactionl,
 str_menu_lang            : array[false..true] of shortstring;
@@ -889,10 +906,13 @@ str_error_FileExists,
 str_error_OpenFile,
 str_error_WrongData,
 str_error_FileRead,
+str_error_FileWrite,
 str_error_WrongVersion,
 str_error_ServerFull,
 str_error_GameStarted,
 
+str_msg_ReplayStart,
+str_msg_ReplayFail,
 str_msg_GameSaved,
 str_msg_PlayerSurrender,
 str_msg_PlayerLeave,
@@ -1032,7 +1052,7 @@ str_play,
 str_players,
 str_save,
 str_load,
-str_delete,
+,
 str_gsaved,
 str_pause,
 

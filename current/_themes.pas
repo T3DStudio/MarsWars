@@ -1,10 +1,10 @@
 
 
-function MakeReflectedSurface(sourceSurface:PSDL_Surface;xa,ya,transparent:boolean):PSDL_Surface;
+function gfx_MakeReflectedSurface(sourceSurface:PSDL_Surface;xa,ya,transparent:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
-   MakeReflectedSurface:=gfx_SDLSurfaceCreate(sourceSurface^.w,sourceSurface^.h);
+   gfx_MakeReflectedSurface:=gfx_SDLSurfaceCreate(sourceSurface^.w,sourceSurface^.h);
    for x:=1 to sourceSurface^.w do
     for y:=1 to sourceSurface^.h do
     begin
@@ -12,18 +12,26 @@ begin
        if(ya)then sy:=sourceSurface^.h-y else sy:=y-1;
        c:=SDL_GETpixel(sourceSurface,x-1,y-1);
 
-       SDL_SETpixel(MakeReflectedSurface,sx,sy,c);
+       SDL_SETpixel(gfx_MakeReflectedSurface,sx,sy,c);
     end;
    if(transparent)then
    begin
       if(xa)
       then x:=sourceSurface^.w-1
       else x:=0;
-      SDL_SetColorKey(MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sourceSurface,x,0));
+      SDL_SetColorKey(gfx_MakeReflectedSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sourceSurface,x,0));
    end;
 end;
 
-procedure LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;addReflected:boolean);
+procedure gfx_MWTextureSetTransparent(spr:PTMWTexture;xa:boolean);
+begin
+   with spr^ do
+    if(xa)
+    then SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,w-1,0))
+    else SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0  ,0));
+end;
+
+procedure gfx_LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;addReflected:boolean);
 var t:TMWTexture;
     i:integer;
 procedure next;begin MWTextureList_n^+=1;setlength(MWTextureList^,MWTextureList_n^);MWTextureList^[MWTextureList_n^-1]:=t;end;
@@ -45,7 +53,7 @@ begin
 
       if(addReflected)then
       begin
-         with t do sdlSurface:=MakeReflectedSurface(sdlSurface,true,false,false);
+         with t do sdlSurface:=gfx_MakeReflectedSurface(sdlSurface,true,false,false);
          next;
       end;
 
@@ -124,13 +132,6 @@ begin
    end;
 end;
 
-procedure gfx_MWTextureSetTransparent(spr:PTMWTexture;xa:boolean);
-begin
-   with spr^ do
-    if(xa)
-    then SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,w-1,0))
-    else SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(sdlSurface,0  ,0));
-end;
 
 procedure ThemeSetTransparent(SpriteList:pTMWTextureList;SpriteListN:integer;intString:shortstring);
 var i,o,
@@ -158,51 +159,6 @@ begin
      else
        for o:=0 to SpriteListN-1 do SetParam(o);
 end;
-
-{procedure DecAnim(l:PTThemeDecorAnimL;it:pinteger;intString:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
-var i,o,
-tmp_intListN:integer;
-tmp_intList :TIntList;
-procedure SetDecAnim(p:integer;xa:boolean);
-begin
-   with l^[p] do
-   begin
-      tda_atime:=_at;
-      if(xa)then
-      begin
-         tda_anext:=_an*2+1;
-         tda_xo   :=-_xo;
-      end
-      else
-      begin
-         tda_anext:=_an*2;
-         tda_xo   :=_xo;
-      end;
-      tda_yo   :=_yo;
-      tda_sh   :=_sh;
-      tda_depth:=_dp;
-   end;
-end;
-begin
-   Str2IntList(intString,@tmp_intList,@tmp_intListN);
-
-   for i:=1 to tmp_intListN do
-   begin
-      o:=tmp_intList[i-1]*2;
-      if(0<=o)and(o<it^)then
-      begin
-         SetDecAnim(o  ,false);
-         SetDecAnim(o+1,true );
-      end;
-   end;
-end;
-tda_depth,
-tda_xo,
-tda_yo,
-tda_shadow,
-tda_anext,
-tda_atime:integer
-}
 
 procedure DecorationAnim(atime:integer;intString:shortstring);
 var
@@ -296,9 +252,9 @@ procedure InitThemes;
 var o:integer;
 begin
    // load graph
-   LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,str_f_map+'decals\adt'  ,true );
-   LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,str_f_map+'decors\dec_' ,true );
-   LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,str_f_map+'terrains\ter',false);
+   gfx_LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,str_f_map+'decals\adt'  ,true );
+   gfx_LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,str_f_map+'decors\dec_' ,true );
+   gfx_LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,str_f_map+'terrains\ter',false);
 
    // transparent
 
@@ -549,6 +505,22 @@ begin
       theme_cur_crater_tes:=tes_tech;
       theme_cur_liquid_tes:=tes_nature;
    end;
+   end;
+end;
+
+procedure SetThemeTES;
+begin
+   if(0<=theme_cur_tile_terrain_id)and(theme_cur_tile_terrain_id<theme_all_terrain_n)then
+   begin
+      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
+   end
+   else
+   begin
+      theme_cur_liquid_mmcolor  :=c_white;
+      theme_cur_liquid_tas      :=tas_ice;
+      theme_cur_liquid_tasPeriod:=fr_fpsd2;
    end;
 end;
 

@@ -1355,17 +1355,21 @@ menu_map_settingsw     = basefont_w1+(basefont_w1*20           )+basefont_w2;
 menu_netsearch_lineh   = menu_main_mp_bh1;
 menu_netsearch_listh   = 8;
 
+menu_replays_lineh     = menu_main_mp_bhh;
+menu_replays_listh     = 16;
+
+menu_saveload_lineh    = menu_main_mp_bhh;
+menu_saveload_listh    = 16;
 
 ////////////////////////   menu pages
 
 mp_main                   = 0;
 mp_campaings              = 1;
 mp_scirmish               = 2;
-mp_loadgame               = 3;
-mp_SaveGame               = 4;
-mp_loadreplay             = 5;
-mp_aboutgame              = 6;
-mp_settings               = 7;
+mp_saveload               = 3;
+mp_loadreplay             = 4;
+mp_aboutgame              = 5;
+mp_settings               = 6;
 
 ////////////////////////   menu items
 
@@ -1381,16 +1385,13 @@ Exit
 
 ////  MAIN
 mi_StartGame              = 1;
-mi_StartCampaings         = 2;
-mi_StartScirmish          = 3;
-mi_StartReplay            = 4;
 
 mi_EndGame                = 5;
 mi_EndSurrender           = 6;
 mi_EndLeave               = 7;
+mi_EndPlaybackBreak       = 8;
 
-mi_SaveLoad               = 8;
-mi_loadgame               = 9;
+mi_SaveLoad               = 9;
 
 mi_Settings               = 11;
 mi_AboutGame              = 12;
@@ -1398,23 +1399,25 @@ mi_back                   = 13;
 mi_exit                   = 14;
 mi_start                  = 15;
 
-
-mi_title_campaings        = 21;
-mi_title_scirmish         = 22;
-mi_title_loadgame         = 23;
-mi_title_savegame         = 24;
-mi_title_loadreplay       = 25;
-mi_title_settings         = 26;
-mi_title_aboutgame        = 27;
+mi_title_Campaings        = 21;
+mi_title_Scirmish         = 22;
+mi_title_SaveLoad         = 23;
+mi_title_LoadReplay       = 25;
+mi_title_Settings         = 26;
+mi_title_AboutGame        = 27;
 mi_title_players          = 28;
 mi_title_map              = 29;
-mi_title_goptions         = 30;
+mi_title_GameOptions      = 30;
 mi_title_multiplayer      = 31;
+mi_title_ReplayInfo1      = 32;
+mi_title_ReplayInfo2      = 33;
+mi_title_ReplayPlayback   = 34;
+mi_title_SaveInfo     = 35;
 
 ////  SETTINGS
 
 mi_settings_game          = 41;
-mi_settings_record        = 42;
+mi_settings_replay        = 42;
 mi_settings_network       = 43;
 mi_settings_video         = 44;
 mi_settings_sound         = 45;
@@ -1431,12 +1434,13 @@ mi_settings_Langugage     = 58;
 mi_settings_PanelPosition = 59;
 mi_settings_PlayerColors  = 60;
 
-////  RECORDING OPTIONS
-mi_settings_RecordStatus  = 61;
-mi_settings_RecordName    = 62;
-mi_settings_RecordQuality = 63;
+////  REPLAYING OPTIONS
+mi_settings_Replaying     = 61;
+mi_settings_ReplayName    = 62;
+mi_settings_ReplayQuality = 63;
 
 ////  NETWORK SETTINGS
+mi_settings_Client        = 70;
 mi_settings_ClientQuality = 71;
 
 ////  SETTINGS VIDEO LINES
@@ -1509,6 +1513,7 @@ mi_mplay_ClientCaption    = 184;
 mi_mplay_ClientAddress    = 185;
 mi_mplay_ClientConnect    = 186;
 mi_mplay_ClientDisconnect = 187;
+mi_mplay_ClientStatus     = 188;
 mi_mplay_ChatCaption      = 189;
 mi_mplay_Chat             = 190;
 mi_mplay_NetSearchCaption = 191;
@@ -1517,22 +1522,17 @@ mi_mplay_NetSearchStop    = 193;
 mi_mplay_NetSearchList    = 194;
 mi_mplay_NetSearchCon     = 195;
 
-
-{
+////  REPLAYS
+mi_replays_list           = 200;
+mi_replays_play           = 201;
+mi_replays_delete         = 202;
 
 ////  SAVE LOAD
-mi_saveload_list       = 90;
-mi_saveload_fname      = 91;
-mi_saveload_save       = 92;
-mi_saveload_load       = 93;
-mi_saveload_delete     = 94;
-
-////  REPLAYS
-mi_replays_list        = 97;
-mi_replays_play        = 98;
-mi_replays_delete      = 99;
-
-}
+mi_saveload_list          = 210;
+mi_saveload_fname         = 211;
+mi_saveload_save          = 212;
+mi_saveload_load          = 213;
+mi_saveload_delete        = 214;
 
 /////////////////////////////
 
