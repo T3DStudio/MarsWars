@@ -342,7 +342,9 @@ net_svsearch_scroll: integer = 0;
 net_svsearch_sel  : integer = 0;
 
 
-svld_str_info     : shortstring = '';
+svld_str_info1    : shortstring = '';
+svld_str_info2    : shortstring = '';
+svld_str_info3    : shortstring = '';
 svld_str_fname    : shortstring = '';
 svld_items        : array of TSaveLoadItem;
 svld_itemn        : integer = 0;

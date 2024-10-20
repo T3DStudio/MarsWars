@@ -289,11 +289,32 @@ begin
    else map_IsObstacleZone:=(zone>map_gridLastFZone);
 end;
 
+function map_IsNotAlongObstacle(x,y:integer):boolean;
+function map_GetZone2(cx,cy:integer):word;
+begin
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)
+   then map_GetZone2:=map_grid[cx,cy].tgc_area
+   else map_GetZone2:=map_gridLastFZone;
+end;
+begin
+   map_IsNotAlongObstacle:=false;
+   if(map_IsObstacleZone(map_GetZone2(x,y)))then
+     map_IsNotAlongObstacle:=map_IsObstacleZone(map_GetZone2(x-1,y-1))
+                       or map_IsObstacleZone(map_GetZone2(x  ,y-1))
+                       or map_IsObstacleZone(map_GetZone2(x+1,y-1))
+                       or map_IsObstacleZone(map_GetZone2(x-1,y  ))
+                       or map_IsObstacleZone(map_GetZone2(x+1,y  ))
+                       or map_IsObstacleZone(map_GetZone2(x-1,y+1))
+                       or map_IsObstacleZone(map_GetZone2(x  ,y+1))
+                       or map_IsObstacleZone(map_GetZone2(x+1,y+1));
+end;
+
 procedure map_ZonesClear;
 var x,y:byte;
 begin
    map_gridLastZone :=0;
-   map_gridLastFZone:=map_gridLastZone;
+   map_gridLastFZone:=0;
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
    with map_grid[x,y] do tgc_area:=0;

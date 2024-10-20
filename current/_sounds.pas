@@ -339,7 +339,7 @@ begin
    end
    else
      if(pu<>nil)then
-       if(not ui_CheckUnitCommonVision(pu,true))then exit;
+       if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
    SoundPlay(ss,sss_world,true);
    SoundPlayUnit:=true;

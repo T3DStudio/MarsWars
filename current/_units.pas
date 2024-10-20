@@ -34,7 +34,7 @@ begin
            hits+=1;
            if(hits>=0)then
            begin
-              unit_clear_order(pu,true);
+              unit_OrderClear(pu,true);
               zfall:=0;
               dir  :=270;
               hits :=_hmhits;
@@ -135,8 +135,8 @@ begin
       end;
 
       puid  :=@g_uids[ouid];
-      avsni :=vsni;
-      avsnt :=vsnt;
+      avsni :=TeamDetection;
+      avsnt :=TeamVision;
       select:=isselected;
 
       if(a_units[ouid]<=0)then
@@ -186,8 +186,8 @@ begin
    if(LastCreatedUnitP<>nil)then
      with LastCreatedUnitP^ do
      begin
-        vsni:=avsni;
-        vsnt:=avsnt;
+        TeamDetection:=avsni;
+        TeamVision:=avsnt;
         if(bhits>0)then
           if(not iscomplete)then hits:=mm3i(1,bhits,puid^._mhits-1);
         if(select)then
@@ -1101,7 +1101,7 @@ begin
       if(transportu<>nil)then
       begin
          if(IsUnitRange(transportu^.transport,nil))then exit;
-         vsnt   :=transportu^.vsnt;
+         TeamVision   :=transportu^.TeamVision;
          udetect:=false;
       end
       else udetect:=true;
@@ -1165,7 +1165,7 @@ begin
         transport:=0;
         unit_SetXY(pTarget,pTransport^.x,
                            pTransport^.y,mvxy_strict,false);
-        unit_clear_order(pTarget,true);
+        unit_OrderClear(pTarget,true);
         {$IFDEF _FULLGAME}
         SoundPlayUnit(snd_transport,pTransport,nil);
         {$ENDIF}
@@ -1446,20 +1446,20 @@ begin
    begin
       if((aw_reqf and wpr_avis)>0)then
       begin
-         AddToInt(@tu^.vsnt[player^.team],vistime);
+         AddToInt(@tu^.TeamVision[player^.team],MinVisionTime);
          {$IFDEF _FULLGAME}
          if not(a_reload in aw_rld_a)then
            if(AddToInt(@tu^.buff[ub_ArchFire],fr_fps1))then SoundPlayUnit(snd_archvile_fire,tu,@targetvis);
          {$ENDIF}
       end;
-      AddToInt(@vsnt[tu^.player^.team],a_reload+1);
-      AddToInt(@vsnt[tu^.player^.team],vistime);
+      AddToInt(@TeamVision[tu^.player^.team],a_reload+1);
+      AddToInt(@TeamVision[tu^.player^.team],MinVisionTime);
       for i:=0 to MaxPlayers do
-        if(tu^.vsnt[i]>0)
-        or(    vsnt[i]>0)then
+        if(tu^.TeamVision[i]>0)
+        or(    TeamVision[i]>0)then
         begin
-                vsnt[i]:=max2i(vsnt[i],tu^.vsnt[i]);
-            tu^.vsnt[i]:=vsnt[i];
+                TeamVision[i]:=max2i(TeamVision[i],tu^.TeamVision[i]);
+            tu^.TeamVision[i]:=TeamVision[i];
         end;
    end;
 end;
@@ -1567,8 +1567,8 @@ wmove_noneed    : if(not AttackInMove)then
       with _a_weap[a_weap] do
       begin
          {$IFDEF _FULLGAME}
-         targetvis  :=ui_CheckUnitCommonVision(tu,true);
-         attackervis:=ui_CheckUnitCommonVision(pu,true);
+         targetvis  :=ui_CheckUnitUIPlayerVision(tu,true);
+         attackervis:=ui_CheckUnitUIPlayerVision(pu,true);
          {$ENDIF}
 
          if(a_reload<=0)then
@@ -1899,7 +1899,7 @@ begin
       if(hits>dead_hits)then
       begin
          if(cycle_order=g_cycle_order)
-         then unit_reveal(pu,false);
+         then unit_BaseVision(pu,false);
 
          unit_BaseCounters(pu);
 

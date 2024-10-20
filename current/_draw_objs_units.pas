@@ -56,7 +56,7 @@ end;
 function UnitCheckVisionType(pu:PTUnit):byte;
 begin
    UnitCheckVisionType:=0;
-   if(ui_CheckUnitCommonVision(pu,false))
+   if(ui_CheckUnitUIPlayerVision(pu,false))
    then UnitCheckVisionType:=2
    else
      with pu^ do
@@ -75,18 +75,27 @@ begin
      with pu^     do
      with uid^    do
      with player^ do
-       case UnitCheckVisionType(pu) of
+       if(ui_CheckUnitFullFogVision(pu))then
+       begin
+          if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
+          if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_CellW)-vid_fog_sx,
+                                                                                           (ua_y div fog_CellW)-vid_fog_sy,fsr);
+          unit_FogReveal:=true
+       end
+       else
+         if(TeamVision[g_players[UIPlayer].team]>0)then unit_FogReveal:=true;
+
+       {case UnitCheckVisionType(pu) of
      1:begin
-          if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
+          //if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
           unit_FogReveal:=true;
        end;
      2:begin
           if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
           unit_FogReveal:=true;
-          if(_ability=uab_UACScan)and(reload>radar_vision_time)then fog_RevealScreenCircle((ua_x div fog_CellW)-vid_fog_sx,
-                                                                                           (ua_y div fog_CellW)-vid_fog_sy,fsr);
+
        end;
-       end;
+       end;}
 end;
 
 

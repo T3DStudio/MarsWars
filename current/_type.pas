@@ -599,9 +599,9 @@ o_x1,o_y1  : integer;
 
    PNU     : byte;
    n_u,
-   nttl    : word;
-   nip     : cardinal;
-   nport   : word;
+   net_ttl : word;
+   net_ip  : cardinal;
+   net_port: word;
 
    prod_error_cndt: cardinal;
    prod_error_utp,
@@ -678,8 +678,8 @@ TUnit = record
 
    buff     : array[0..MaxUnitBuffs] of integer;
 
-   vsni,
-   vsnt     : TUnitVisionData;
+   TeamDetection,
+   TeamVision     : TUnitVisionData;
 
    WaitForNextTarget:byte;
    ukfly,

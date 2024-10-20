@@ -864,7 +864,7 @@ begin
         end;
 
          //draw_text(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
-         //if(isselected)then            i2s(vsnt[g_players[player].team])+#13+i2s(vsni[g_players[player].team])
+         //if(isselected)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
          //if(alrm_r<=0)then
          //
 

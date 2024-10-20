@@ -626,10 +626,10 @@ begin
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // unit created
      begin
         unit_SetDefaults(uu,true);
-        unit_reveal     (uu,true);
+        unit_BaseVision     (uu,true);
         vx:=x;
         vy:=y;
-        vis:=ui_CheckUnitCommonVision(uu,true);
+        vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
         if(IsUnitRange(transport,@tu))then
         begin
@@ -655,7 +655,7 @@ begin
            end;
         end;
 
-        missiles_clear_tar(unum,true);
+        missiles_TargetClear(unum,true);
         unit_clear_a_tar(unum);
 
         unit_PC_client_inc(uu);
@@ -667,7 +667,7 @@ begin
 
           vx:=x;
           vy:=y;
-          vis:=ui_CheckUnitCommonVision(uu,true);
+          vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
           if(pu^.hits>0)and(vis)then
           begin
@@ -683,7 +683,7 @@ begin
 
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
-          missiles_clear_tar(unum,true);
+          missiles_TargetClear(unum,true);
           unit_clear_a_tar(unum);
 
           unit_PC_client_dec(pu);
@@ -695,10 +695,10 @@ begin
             begin
                vx:=x;
                vy:=y;
-               missiles_clear_tar(unum,true);
+               missiles_TargetClear(unum,true);
                unit_clear_a_tar(unum);
             end;
-            vis:=ui_CheckUnitCommonVision(uu,true);
+            vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
             unit_Bonuses(pu);
             unit_PC_client_dec(pu);
@@ -785,7 +785,7 @@ begin
                end
                else
                begin
-                  missiles_clear_tar(unum,true);
+                  missiles_TargetClear(unum,true);
                   unit_clear_a_tar(unum);
                end;
             end;
@@ -955,7 +955,7 @@ begin
       if(not rpl)and(not g_players[POVPlayer].isobserver)then
        with g_players[POVPlayer] do
         if(team>0)then
-          AddToInt(@vsnt[team],vistime);
+          AddToInt(@TeamVision[team],MinVisionTime);
    end;
 end;
 

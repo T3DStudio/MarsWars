@@ -580,11 +580,9 @@ begin
    for p:=0 to MaxPlayers do
     with g_players[p] do
     begin
-       isobserver:=false;
        if(player_type>pt_none)then
        begin
           SetBBit(@g_player_rstatus,p,isrevealed);
-          //isobserver:=PlayerIsObserver(@g_players[p]);
           if(army>0)then
           begin
              SetBBit(@g_player_astatus,p,true);
@@ -1178,8 +1176,8 @@ function CheckUnitTeamVision(POVTeam:byte;tu:PTUnit;SkipInvisCheck:boolean):bool
 begin
    with tu^ do
      if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
-     then CheckUnitTeamVision:=(vsnt[POVTeam]>0)
-     else CheckUnitTeamVision:=(vsnt[POVTeam]>0)and(vsni[POVTeam]>0);
+     then CheckUnitTeamVision:=(TeamVision[POVTeam]>0)
+     else CheckUnitTeamVision:=(TeamVision[POVTeam]>0)and(TeamDetection[POVTeam]>0);
 end;
 
 procedure MakeGamePresetsNames(pstr_gmode,pstr_maptype:pshortstring);
@@ -1298,48 +1296,49 @@ begin
             and(0<y)and(y<vid_cam_h);
 end;
 
-function ui_CheckUnitCommonVision(tu:PTUnit;CheckCam:boolean):boolean;
+function ui_CheckUnitUIPlayerVision(tu:PTUnit;CheckCam:boolean):boolean;
 begin
-   ui_CheckUnitCommonVision:=true;
+   if(tu=nil)then
+   begin
+      ui_CheckUnitUIPlayerVision:=false;
+      exit;
+   end;
 
-   if(CheckCam)and(tu<>nil)then
+   ui_CheckUnitUIPlayerVision:=true;
+
+   if(CheckCam)then
     with tu^ do
      with uid^ do
       if(not RectInCam(vx,vy,_r,_r,0))then
       begin
-         ui_CheckUnitCommonVision:=false;
+         ui_CheckUnitUIPlayerVision:=false;
          exit;
       end;
 
    if(not sys_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_state_read)or(g_players[PlayerClient].isobserver)then exit;
+     if(rpls_state=rpls_state_read)
+     or(g_players[PlayerClient].isobserver)then exit;
 
-   if(tu<>nil)then
-     if(tu^.vsnt[g_players[UIPlayer].team]>0)then exit;
-     //if(tu^.player^.team=g_players[UIPlayer].team)then exit;
+   if(tu^.TeamVision[g_players[UIPlayer].team]>0)then exit;
 
-   ui_CheckUnitCommonVision:=false;
+   ui_CheckUnitUIPlayerVision:=false;
 end;
 
-{function ui_CheckUnitVisionScreen(tu:PTUnit):boolean;
+function ui_CheckUnitFullFogVision(tu:PTUnit):boolean;
 begin
-   ui_CheckUnitVisionScreen:=false;
-   with tu^ do
-    with uid^ do
-     if(RectInCam(vx,vy,_r,_r,0))then
-     begin
-        if(UIPlayer=0)then
-          if(rpls_state=rpls_state_read)or(g_players[PlayerClient].isobserver)then
-          begin
-             ui_CheckUnitVisionScreen:=true;
-             exit;
-          end;
+   ui_CheckUnitFullFogVision:=false;
+   if(tu=nil)then exit;
 
-        ui_CheckUnitVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not sys_fog);
-     end;
-end;  }
+   if(rpls_state>=rpls_state_read)
+   or(g_players[PlayerClient].isobserver)then
+   begin
+      if(UIPlayer=0)
+      or(tu^.player^.team=g_players[UIPlayer].team)then ui_CheckUnitFullFogVision:=true;
+   end
+   else ui_CheckUnitFullFogVision:=(tu^.player^.team=g_players[PlayerClient].team);
+end;
 
 function ui_MapPointInRevealedInScreen(x,y:integer):boolean;
 begin

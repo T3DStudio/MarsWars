@@ -196,8 +196,7 @@ begin
    ty0:=ty1;ty1+=menu_main_mp_bh3q;
    SetItem(mi_mplay_NetSearchCon    ,tx0,ty0,tx1,ty1,menu_NetSearchConnect(true));
    ty0:=ty1;ty1+=menu_main_mp_bh3q;
-   //SetItem(mi_mplay_NetSearchStop   ,tx0,ty0,tx1,ty1,true);
-   //SetItem(mi_Back   ,tx0,ty0,tx1,ty1,true);
+
    ms_BottomButtons(1,mi_Back,0,0,0,0);
 end;
 
@@ -222,7 +221,7 @@ begin
    // PLAYERS
    ty0:=menu_logo_h+ty2+menu_main_mp_bh2+1;
 
-   tx0:=vid_vhw-396-((vid_vw-vid_minw) div 8);
+   tx0:=vid_vhw-396-((vid_vw-vid_minw) div 20);
    ty1:=menu_main_mp_bhh;
 
    tx1:=tx0+menu_players_namew+menu_players_racew+menu_players_teamw+ty1*2;
@@ -261,7 +260,7 @@ begin
 
 
    // MAP
-   tx0:=vid_vhw+396-menu_map_settingsw-r_minimap^.w-basefont_w2+((vid_vw-vid_minw) div 8);
+   tx0:=vid_vhw+396-menu_map_settingsw-r_minimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
    tx1:=tx0+menu_map_settingsw;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h+menu_main_mp_bhq;
 
@@ -420,9 +419,9 @@ procedure ms_Replays;
 begin
    ms_DefaultCaption(mi_title_LoadReplay);
 
-   tx0:=vid_vhw-menu_main_mp_bw1;
+   tx0:=vid_vhw-menu_main_mp_bw1-menu_main_mp_bwq;
    tx1:=vid_vhw+menu_main_mp_bwq;
-   tx2:=tx1+menu_main_mp_bw3q;
+   tx2:=tx1+menu_main_mp_bw1;
 
    ty2:=(vid_vh-vid_minh+10) div 2;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h;
@@ -442,9 +441,9 @@ begin
    ms_DefaultCaption(mi_title_SaveLoad);
    ms_BottomButtons(4,mi_back,mi_saveload_save,mi_saveload_load,mi_saveload_delete,0);
 
-   tx0:=vid_vhw-menu_main_mp_bw1;
+   tx0:=vid_vhw-menu_main_mp_bw1-menu_main_mp_bwq;
    tx1:=vid_vhw+menu_main_mp_bwq;
-   tx2:=tx1+menu_main_mp_bw3q;
+   tx2:=tx1+menu_main_mp_bw1;
 
    ty2:=(vid_vh-vid_minh+10) div 2;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h;
@@ -816,9 +815,12 @@ mi_EndGame                : if(menu_list_selected>-1)then
                                case menu_list_SIndex of
                                mi_EndPlaybackBreak: GameBreak(0,           false);
                                mi_EndLeave        : GameBreak(PlayerClient,false);
-                               mi_EndSurrender    : if(net_status=ns_client)
+                               mi_EndSurrender    : begin
+                                                    if(net_status=ns_client)
                                                     then net_send_byte(nmid_surrender)
                                                     else PlayerSurrender(PlayerClient,false);
+                                                    menu_Toggle;
+                                                    end;
                                end;
                                menu_List_Clear;
                             end
@@ -831,7 +833,7 @@ mi_EndGame                : if(menu_list_selected>-1)then
                                else
                                begin
                                   menu_list_AddItem(str_menu_LeaveGame,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0);
-                                  if(g_deadobservers)then
+                                  if(PlayerSurrender(PlayerClient,true))then
                                     menu_list_AddItem(str_menu_Surrender,mi_EndSurrender,PlayerSurrender(PlayerClient,true ),0);
                                end;
                                menu_list_UpdatePosition;

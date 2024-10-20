@@ -706,7 +706,7 @@ begin
 
                     if(ud<srange)then
                       if (tu^.buff[ub_Invis]>0)
-                      and(tu^.vsni[team]<=0)
+                      and(tu^.TeamDetection[team]<=0)
                       and(tu^.a_reload>0)
                       and(tu^.uid^._attack>0)
                       then aiu_need_detect:=ud-srange-hits;
@@ -876,7 +876,7 @@ begin
                if(CheckUnitTeamVision(team,tu,true))then
                begin
                   // invisible enemy unit
-                  if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.a_reload>0)and(tu^.buff[ub_Scaned]<=0)then
+                  if(tu^.buff[ub_Invis]>0)and(tu^.TeamDetection[team]<=0)and(tu^.a_reload>0)and(tu^.buff[ub_Scaned]<=0)then
                     _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
                end;
 

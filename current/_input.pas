@@ -280,7 +280,7 @@ begin
     for i:=1 to MaxUnits do
      with g_punits[i]^ do
       if(hits>0)and(not IsUnitRange(transport,nil))and(CheckRType(player))then
-       if(CheckUnitTeamVision(tteam,g_punits[i],false))or(ui_CheckUnitCommonVision(g_punits[i],true))then
+       if(ui_CheckUnitUIPlayerVision(g_punits[i],true))then // (CheckUnitTeamVision(tteam,g_punits[i],false))or
         if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
         begin
            if(ukfly<fly)then continue;
@@ -301,40 +301,42 @@ end;
 
 procedure mb_Check(log:boolean);
 var cndt:cardinal;
+     uid:byte;
 begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
 
-   if(UIPlayer<>PlayerClient)or(g_players[PlayerClient].isobserver)
+   if(UIPlayer<>PlayerClient)or(g_players[PlayerClient].isobserver)or(g_players[PlayerClient].isdefeated)
    then m_brush:=mb_empty
    else
    case m_brush of
    0     : m_brush:=mb_empty;
    1..255: begin
-              cndt:=uid_CheckRequirements(@g_players[PlayerClient],m_brush);
+              uid :=byte(m_brush);
+              cndt:=uid_CheckRequirements(@g_players[PlayerClient],uid);
               if(cndt>0)then
               begin
-                 if(log)then GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
+                 if(log)then GameLogCantProduction(PlayerClient,uid,lmt_argt_unit,cndt,-1,-1,true);
                  m_brush:=mb_empty;
               end
               else
                with g_players[PlayerClient] do
                begin
-                  if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
+                  if not(uid in ui_bprod_possible)or(n_builders<=0)then
                   begin
-                     GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
+                     GameLogCantProduction(PlayerClient,uid,lmt_argt_unit,ureq_needbuilders,-1,-1,true);
                      m_brush:=mb_empty;
                      exit;
                   end;
 
                   if(ks_ctrl<=0)then
                   begin
-                     BuildingNewPlace(mouse_map_x,mouse_map_y,m_brush,PlayerClient,@m_brushx,@m_brushy);
+                     BuildingNewPlace(mouse_map_x,mouse_map_y,uid,PlayerClient,@m_brushx,@m_brushy);
                      m_brushx:=mm3i(vid_cam_x,m_brushx,vid_cam_x+vid_cam_w);
                      m_brushy:=mm3i(vid_cam_y,m_brushy,vid_cam_y+vid_cam_h);
                   end;
 
-                  case CheckBuildPlace(m_brushx,m_brushy,0,0,PlayerClient,m_brush) of
+                  case CheckBuildPlace(m_brushx,m_brushy,0,0,PlayerClient,uid) of
                   0 :  m_brushc:=c_lime;
                   1 :  m_brushc:=c_red;
                   2 :  m_brushc:=c_blue;
@@ -345,7 +347,7 @@ begin
 mb_psability         : if(ui_uibtn_sability =0)then m_brush:=mb_empty;
 mb_move  ,mb_patrol  ,
 mb_attack,mb_apatrol : if(ui_uibtn_move     =0)then m_brush:=mb_empty;
-   else
+   else    m_brush:=mb_empty;
    end;
 end;
 
@@ -778,7 +780,7 @@ begin
      end;
 end;
 
-procedure ui_SicpleClick;
+procedure ui_PointClick;
 var u:integer;
 begin
    u:=ui_whoInPoint(mouse_map_x,mouse_map_y,4);
@@ -790,13 +792,6 @@ var u:integer;
 begin
    mouse_map_x:=mouse_x+vid_cam_x-vid_mapx;
    mouse_map_y:=mouse_y+vid_cam_y-vid_mapy;
-
-   {
-   debug_vxM,
-   debug_vyM,
-   debug_vxC,
-   debug_vyC
-   }
 
    // pannel bx by
    if(vid_PannelPos<2)then  //vertical
@@ -889,7 +884,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
             else PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_set,PlayerClient);
 
             if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
-              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
+              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_PointClick;
          end;
 
          mouse_select_x0:=-1;

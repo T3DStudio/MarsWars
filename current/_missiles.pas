@@ -139,17 +139,11 @@ var i:byte;
 begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
-     if(dmod=dm_BFG)then
-     begin
-        if(not tu^.uid^._ukbuilding)
-        then ApplyDamageMod:=round(base_damage*tu^.uid^._limituse/ul1);
-     end
-     else
-       for i:=0 to MaxDamageModFactors do
-         with g_dmods[dmod][i] do
-           if(dm_flags>0)then
-             if(CheckUnitBaseFlags(tu,dm_flags))then
-               case dm_factor of
+     for i:=0 to MaxDamageModFactors do
+       with g_dmods[dmod][i] do
+         if(dm_flags>0)then
+           if(CheckUnitBaseFlags(tu,dm_flags))then
+             case dm_factor of
                 0   : ApplyDamageMod:=0;
                 25  : ApplyDamageMod:=            (base_damage div 4);
                 50  : ApplyDamageMod:=            (base_damage div 2);
@@ -161,11 +155,12 @@ begin
                 200 : ApplyDamageMod:=base_damage* 2;
                 300 : ApplyDamageMod:=base_damage* 3;
                 500 : ApplyDamageMod:=base_damage* 5;
-                 else ApplyDamageMod:=round(base_damage*100/dm_factor);
-               end;
+             else     ApplyDamageMod:=round(base_damage*100/dm_factor);
+             end;
 end;
 
-procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
+// ;uVisionSource:PTUnit
+procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mplayer:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
 var m,d:integer;
     tu:PTUnit;
 begin
@@ -179,7 +174,7 @@ begin
        vy     := mvy;
        tar    := mtar;
        mid    := msid;
-       player := mpl;
+       player := mplayer;
        mfs    := mfst; // start floor
        mfe    := mfet; // end floor
        fake   := mfake;

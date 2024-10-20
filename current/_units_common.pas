@@ -17,7 +17,7 @@ begin
          if(not vischeck^)then exit
       end
       else
-         if(not ui_CheckUnitCommonVision(pu,false))then exit;
+         if(not ui_CheckUnitUIPlayerVision(pu,false))then exit;
 
       case etype of
 EID_HVision : begin
@@ -73,7 +73,7 @@ begin
          if(not vischeck^)then exit
       end
       else
-         if(not ui_CheckUnitCommonVision(pu,true))then exit;
+         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       effect_add(vx,vy,SpriteDepth(vy+1,ukfly),un_eid_summon[level]);
@@ -95,7 +95,7 @@ begin
          if(not vischeck^)then exit
       end
       else
-        if(not ui_CheckUnitCommonVision(pu,true))then exit;
+        if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
       if(fastdeath)then
       begin
@@ -120,7 +120,7 @@ begin
          if(not vischeck^)then exit
       end
       else
-        if(not ui_CheckUnitCommonVision(pu,true))then exit;
+        if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
       effect_add(vx,vy,SpriteDepth(vy+1,ukfly),un_eid_pain[level]);
       SoundPlayUnit(un_eid_snd_pain,nil,nil);
@@ -151,7 +151,7 @@ begin
          if(not vischeck^)then exit
       end
       else
-        if(not ui_CheckUnitCommonVision(pu,true))then exit;
+        if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
       if(start)then
       begin
@@ -396,40 +396,40 @@ mvxy_strict  : begin
    end;
 end;
 
-procedure unit_reveal(pu:PTUnit;reset:boolean);
+procedure unit_BaseVision(pu:PTUnit;reset:boolean);
 var t:byte;
 begin
    with pu^ do
-    with player^ do
-    begin
-       if(reset)then
-       begin
-          FillChar(vsnt,SizeOf(vsnt),0);
-          FillChar(vsni,SizeOf(vsni),0);
-       end;
-       AddToInt(@vsnt[team],vistime);
-       AddToInt(@vsni[team],vistime);
+   with player^ do
+   begin
+      if(reset)then
+      begin
+         FillChar(TeamVision   ,SizeOf(TeamVision   ),0);
+         FillChar(TeamDetection,SizeOf(TeamDetection),0);
+      end;
+      AddToInt(@TeamVision   [team],MinVisionTime);
+      AddToInt(@TeamDetection[team],MinVisionTime);
 
-       if(isrevealed)then
+      if(isrevealed)then
         for t:=0 to MaxPlayers do
         begin
-           AddToInt(@vsnt[t],fr_fps1);
-           AddToInt(@vsni[t],fr_fps1);
+           AddToInt(@TeamVision   [t],fr_fps1);
+           AddToInt(@TeamDetection[t],fr_fps1);
         end;
-    end;
+   end;
 end;
 procedure unit_UpVision(pu:PTUnit);
-var t:byte;
+var p:byte;
 begin
    with pu^ do
-    for t:=0 to MaxPlayers do
+    for p:=0 to MaxPlayers do
     begin
-       if(vsnt[t]>0)then AddToInt(@vsnt[t],vistime);
-       if(vsni[t]>0)then AddToInt(@vsni[t],vistime);
+       if(TeamVision   [p]>0)then AddToInt(@TeamVision   [p],MinVisionTime);
+       if(TeamDetection[p]>0)then AddToInt(@TeamDetection[p],MinVisionTime);
     end;
 end;
 
-procedure unit_clear_order(pu:PTUnit;clearid:boolean);
+procedure unit_OrderClear(pu:PTUnit;clearid:boolean);
 begin
    with pu^ do
    begin
@@ -442,14 +442,14 @@ begin
       ua_bx :=-1;
    end;
 end;
-procedure units_clear_tar(tar:integer);
+procedure units_TargetClear(utar:integer);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
-       if(ua_tar=tar)then ua_tar:=0;
+       if(ua_tar=utar)then ua_tar:=0;
 end;
-procedure missiles_clear_tar(u:integer;ResetTarget:boolean);
+procedure missiles_TargetClear(u:integer;ResetTargetXY:boolean);
 var i:integer;
 begin
    for i:=1 to MaxUnits do
@@ -457,7 +457,7 @@ begin
      if(vstep>0)and(tar=u)then
      begin
         tar:=0;
-        if(ResetTarget)then
+        if(ResetTargetXY)then
         begin
            x:=vx;
            y:=vy;
@@ -484,9 +484,9 @@ begin
       {$ENDIF}
       buff[ub_Teleport]:=fr_fps1;
       unit_SetXY(pTarget,tx,ty,mvxy_strict,true);
-      unit_clear_order(pTarget,false);
-      units_clear_tar(unum);
-      missiles_clear_tar(unum,false);
+      unit_OrderClear(pTarget,false);
+      units_TargetClear(unum);
+      missiles_TargetClear(unum,false);
       unit_UpVision(pTarget);
    end;
 end;
@@ -534,7 +534,7 @@ begin
        unit_ability_UACScan:=true;
        if(Check)then exit;
 
-       unit_clear_order(pCaster,true);
+       unit_OrderClear(pCaster,true);
        ua_x  :=scan_x;
        ua_y  :=scan_y;
        reload:=radar_reload;
@@ -596,10 +596,10 @@ begin
          unit_ability_UACStrike:=true;
          if(Check)then exit;
 
-         unit_clear_order(pCaster,true);
+         unit_OrderClear(pCaster,true);
          ua_x:=shot_x;
          ua_y:=shot_y;
-         for i:=0 to MaxPlayers do AddToInt(@vsnt[i],fr_fps2);
+         for i:=0 to MaxPlayers do AddToInt(@TeamVision[i],fr_fps2);
          reload:=mstrike_reload;
          upgr[upgr_uac_rstrike]-=1;
          unit_ability_UACStrike_Shot(pCaster);
@@ -609,32 +609,32 @@ end;
 
 
 procedure pushOut_all(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
-const ptarn = 1;
+const ptar_n = 1;
 type TPush_tar = record
    x,y,a,b,c:integer;
 end;
-var ptars: array[0..ptarn] of TPush_tar;
+var ptar_l: array[0..ptar_n] of TPush_tar;
 gx,gy,gx0,
 gy0,gx1,gy1,
 gmx,gmy,
 o,u,d   : integer;
-procedure add(ax,ay,aa,ab,ac:integer);
+procedure pTarAdd(ax,ay,aa,ab,ac:integer);
 var i,n:integer;
 begin
    i:=0;
-   while(i<=ptarn)do
+   while(i<=ptar_n)do
    begin
-      if(ac<ptars[i].c)then break;
+      if(ac<ptar_l[i].c)then break;
       i+=1;
    end;
 
-   if(i>ptarn)then exit;
+   if(i>ptar_n)then exit;
 
-   if(i<>ptarn)then
-     for n:=ptarn-1 downto i do
-       ptars[i+1]:=ptars[i];
+   if(i<>ptar_n)then
+     for n:=ptar_n-1 downto i do
+       ptar_l[i+1]:=ptar_l[i];
 
-   with ptars[i] do
+   with ptar_l[i] do
    begin
       x:=ax;
       y:=ay;
@@ -643,11 +643,11 @@ begin
       c:=ac;
    end;
 end;
-procedure clear;
+procedure pTarClear;
 var i:byte;
 begin
-   for i:=0 to ptarn do
-     with ptars[i] do
+   for i:=0 to ptar_n do
+     with ptar_l[i] do
      begin
         x:=0;
         y:=0;
@@ -657,7 +657,7 @@ begin
      end;
 end;
 begin
-   clear;
+   pTarClear;
 
    if(_ukfly)then check_obstacles:=false;
 
@@ -668,7 +668,7 @@ begin
       begin
          o:=tr+cpNoBuildR;
          d:=point_dist_int(cpx,cpy,tx,ty);
-         if(d<o)then add(cpx,cpy,o,0,d-o);
+         if(d<o)then pTarAdd(cpx,cpy,o,0,d-o);
       end;
 
    for u:=1 to MaxUnits do
@@ -680,15 +680,15 @@ begin
         begin
            o:=tr+_r;
            d:=point_dist_int(x,y,tx,ty);
-           if(d<o)then add(x,y,o,0,d-o);
+           if(d<o)then pTarAdd(x,y,o,0,d-o);
         end;
 
-   pushOut_2r(@tx,@ty,ptars[0].x,ptars[0].y,ptars[0].a,
-                      ptars[1].x,ptars[1].y,ptars[1].a);
+   pushOut_2r(@tx,@ty,ptar_l[0].x,ptar_l[0].y,ptar_l[0].a,
+                      ptar_l[1].x,ptar_l[1].y,ptar_l[1].a);
 
    if(check_obstacles)then
    begin
-      clear;
+      pTarClear;
 
       gx0:=(tx-tr) div MapCellW;
       gy0:=(ty-tr) div MapCellW;
@@ -705,25 +705,26 @@ begin
            if(map_grid[gx,gy].tgc_solidlevel=mgsl_free)then continue;
 
          mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@u,@o,@d);
-         if(d<tr)then add(gmx,gmy,MapCellW,MapCellW,d);
+         if(d<tr)then pTarAdd(gmx,gmy,MapCellW,MapCellW,d);
       end;
 
-      if(ptars[0].x=ptars[1].x)and(abs(ptars[0].y-ptars[1].y)<=MapCellW)then
+      // merge 2 cells to 1
+      if(ptar_l[0].x=ptar_l[1].x)and(abs(ptar_l[0].y-ptar_l[1].y)<=MapCellW)then
       begin
-         ptars[0].y:=min2i(ptars[0].y,ptars[1].y);
-         ptars[0].b:=MapCellW*2;
-         ptars[1].c:=NOTSET;
+         ptar_l[0].y:=min2i(ptar_l[0].y,ptar_l[1].y);
+         ptar_l[0].b:=MapCellW*2;
+         ptar_l[1].c:=NOTSET;
       end
       else
-      if(ptars[0].y=ptars[1].y)and(abs(ptars[0].x-ptars[1].x)<=MapCellW)then
-      begin
-         ptars[0].x:=min2i(ptars[0].x,ptars[1].x);
-         ptars[0].a:=MapCellW*2;
-         ptars[1].c:=NOTSET;
-      end;
+        if(ptar_l[0].y=ptar_l[1].y)and(abs(ptar_l[0].x-ptar_l[1].x)<=MapCellW)then
+        begin
+           ptar_l[0].x:=min2i(ptar_l[0].x,ptar_l[1].x);
+           ptar_l[0].a:=MapCellW*2;
+           ptar_l[1].c:=NOTSET;
+        end;
 
-      for u:=0 to ptarn do
-        with ptars[u] do
+      for u:=0 to ptar_n do
+        with ptar_l[u] do
           if(c<>NOTSET)then
           begin
              mgcell2NearestXY(tx,ty,x,y,x+a,y+b,tr,@gmx,@gmy,nil);
@@ -1025,7 +1026,7 @@ begin
 
                unit_teleport(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
                teleport_SetReloadTimer(pCaster,pTarget^.uid^._limituse);
-               unit_clear_order(pTarget,true);
+               unit_OrderClear(pTarget,true);
             end;
        end;
 end;
@@ -1224,46 +1225,43 @@ begin
    end;
 end;
 
-function unit_add(ux,uy,aunum:integer;ui,pl:byte;ubld,summoned:boolean;ulevel:byte):boolean;
-var m,i:integer;
-procedure _FindNotExistedUnit;
+function unit_add(ux,uy,aunum:integer;uuid,uplayer:byte;ubld,summoned:boolean;ulevel:byte):cardinal;
+procedure FindNotExistedUnit;
+var i:integer;
 begin
-   i:=MaxPlayerUnits*pl+1;
-   m:=i+MaxPlayerUnits;
-   while(i<m)do
-   begin
-      with g_units[i] do
-       if(hits<=dead_hits)then
-       begin
-          LastCreatedUnit :=i;
-          LastCreatedUnitP:=g_punits[i];
-          break;
-       end;
-      i+=1;
-   end;
+   for i:=MaxPlayerUnits*uplayer+1 to i+MaxPlayerUnits do
+    with g_units[i] do
+     if(hits<=dead_hits)then
+     begin
+        LastCreatedUnit :=i;
+        LastCreatedUnitP:=g_punits[i];
+        break;
+     end;
 end;
 begin
-   unit_add:=false;
+   unit_add:=0;
    LastCreatedUnit :=0;
    LastCreatedUnitP:=g_punits[0];
-   with g_players[pl] do
+   with g_players[uplayer] do
+   if(uuid=0)
+   then unit_add:=ureq_unknown
+   else
    begin
-      if(ui=0)then exit;
-
       if(not IsUnitRange(aunum,nil))
-      then _FindNotExistedUnit
+      then FindNotExistedUnit
       else
         if(g_units[aunum].hits>dead_hits)
-        then _FindNotExistedUnit
+        then FindNotExistedUnit
         else
         begin
            LastCreatedUnit :=aunum;
            LastCreatedUnitP:=@g_units[LastCreatedUnit];
         end;
 
-      if(LastCreatedUnit>0)then
+      if(LastCreatedUnit=0)
+      then unit_add:=ureq_unknown
+      else
       begin
-         unit_add:=true;
          FillChar(LastCreatedUnitP^,SizeOf(TUnit),0);
 
          with LastCreatedUnitP^ do
@@ -1274,35 +1272,35 @@ begin
             cycle_order:= LastCreatedUnit mod order_period;
             unum       := LastCreatedUnit;
 
-            x       := ux;
-            y       := uy;
-            vx      := x;
-            vy      := y;
-            uidi    := ui;
-            playeri := pl;
-            player  :=@g_players[playeri];
-            ua_x    := x;
-            ua_y    := y;
-            ua_bx   := -1;
-            ua_by   := -1;
-            moveCurr_x    := x;
-            moveCurr_y    := y;
-            gridx   := x div MapCellW;
-            gridy   := y div MapCellW;
-            zone:=map_GetZone(gridx,gridy,false);
-            isselected:= false;
-            transportC:= 0;
+            x          := ux;
+            y          := uy;
+            vx         := x;
+            vy         := y;
+            uidi       := uuid;
+            playeri    := uplayer;
+            player     :=@g_players[playeri];
+            ua_x       := x;
+            ua_y       := y;
+            ua_bx      := -1;
+            ua_by      := -1;
+            moveCurr_x := x;
+            moveCurr_y := y;
+            gridx      := x div MapCellW;
+            gridy      := y div MapCellW;
+            zone       :=map_GetZone(gridx,gridy,false);
+            isselected := false;
+            transportC := 0;
 
             FillChar(buff,sizeof(buff),0);
-            FillChar(vsnt,SizeOf(vsnt),0);
-            FillChar(vsni,SizeOf(vsni),0);
+            FillChar(TeamVision,SizeOf(TeamVision),0);
+            FillChar(TeamDetection,SizeOf(TeamDetection),0);
 
             if(ulevel>MaxUnitLevel)
             then ulevel:=MaxUnitLevel;
             level:=ulevel;
 
             unit_SetDefaults(LastCreatedUnitP,false);
-            unit_reveal     (LastCreatedUnitP,false);
+            unit_BaseVision     (LastCreatedUnitP,false);
             unit_apllyUID   (LastCreatedUnitP);
             unit_PC_add_inc (LastCreatedUnitP,ubld,summoned);
          end;
@@ -1310,13 +1308,13 @@ begin
    end;
 end;
 
-function StartBuild(bx,by:integer;buid,bp:byte):cardinal;
+function StartBuild(bx,by:integer;buid,bplayer:byte):cardinal;
 begin
-   StartBuild:=uid_CheckRequirements(@g_players[bp],buid);
+   StartBuild:=uid_CheckRequirements(@g_players[bplayer],buid);
    if(StartBuild=0)then
-    with g_players[bp] do
-     if(CheckBuildPlace(bx,by,0,0,bp,buid)=0)
-     then unit_add(bx,by,-1,buid,bp,false,false,0)
+    with g_players[bplayer] do
+     if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=0)
+     then unit_add(bx,by,-1,buid,bplayer,false,false,0)
      else StartBuild:=ureq_place;
 end;
 
@@ -1753,8 +1751,8 @@ begin
 
       for i:=0 to MaxPlayers do
       begin
-         if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then vsnt[i]-=1;
-         if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;
+         if(0<TeamVision[i])and(TeamVision[i]<_ub_infinity)then TeamVision[i]-=1;
+         if(0<TeamDetection[i])and(TeamDetection[i]<_ub_infinity)then TeamDetection[i]-=1;
       end;
 
       if(iscomplete)then
@@ -1791,17 +1789,17 @@ begin
       if(td<=(tu^.srange+uid^._r))then
         if(buff[ub_Invis]<=0)then
         begin
-           AddToInt(@vsnt[tu^.player^.team],vistime);
+           AddToInt(@TeamVision[tu^.player^.team],MinVisionTime);
            if(scan_buff<=MaxUnitBuffs)and(player^.team<>tu^.player^.team)
-           then AddToInt(@buff[scan_buff],vistime);
+           then AddToInt(@buff[scan_buff],MinVisionTime);
         end
         else
           if(tu^.buff[ub_Detect]>0)and(tu^.iscomplete)and(tu^.hits>0)then
           begin
-             AddToInt(@vsnt[tu^.player^.team],vistime);
-             AddToInt(@vsni[tu^.player^.team],vistime);
+             AddToInt(@TeamVision[tu^.player^.team],MinVisionTime);
+             AddToInt(@TeamDetection[tu^.player^.team],MinVisionTime);
              if(scan_buff<=MaxUnitBuffs)and(player^.team<>tu^.player^.team)
-             then AddToInt(@buff[scan_buff],vistime);
+             then AddToInt(@buff[scan_buff],MinVisionTime);
           end;
    end;
 end;
@@ -1855,7 +1853,7 @@ begin
 
       x       :=vx;
       y       :=vy;
-      unit_clear_order(pu,true);
+      unit_OrderClear(pu,true);
       moveCurr_x    :=x;
       moveCurr_y    :=y;
       a_tar   :=0;
@@ -1890,7 +1888,7 @@ begin
          end
          else tu^.transport:=0;
       end;
-      missiles_clear_tar(unum,false);
+      missiles_TargetClear(unum,false);
 
       if(instant)then
       begin
@@ -1977,7 +1975,7 @@ uab_CCFly         : {if(level>0)then
                           ukfly:=uf_fly;
                           zfall:=zfall-fly_hz;
                           if(ua_id<>ua_psability)
-                          then unit_clear_order(pu,false);
+                          then unit_OrderClear(pu,false);
                        end;
                        speed:=3;
                     end
@@ -1990,7 +1988,7 @@ uab_CCFly         : {if(level>0)then
                           {$ENDIF}
                           zfall:=fly_hz;
                           ukfly:=uf_ground;
-                          unit_clear_order(pu,false);
+                          unit_OrderClear(pu,false);
                        end;
                        speed:=0;
 

@@ -78,17 +78,17 @@ begin
      if(PlayerLobby=SlotSource)then PlayerLobby:=SlotTarget;
 end;
 
-procedure PlayerSetState(PlayerTarget,newstate:byte);
+procedure PlayerSetType(PlayerTarget,newType:byte);
 begin
    with g_players[PlayerTarget] do
    begin
-      case newstate of
+      case newType of
 pt_none : begin isready:=false;name :=str_ps_none;      end;
-pt_ai : begin isready:=true; name :=ai_name(ai_skill);end;
+pt_ai   : begin isready:=true; name :=ai_name(ai_skill);end;
 pt_human: begin isready:=false;name :='';               end;
       end;
-      nttl :=0;
-      player_type:=newstate;
+      net_ttl :=0;
+      player_type:=newType;
    end;
 end;
 
@@ -152,14 +152,14 @@ pss_swap    : if(not PlayersSwap(PlayerRequestor,PlayerTarget,true))then exit;
     case NewState of
 pss_closed,
 pss_opened   : begin
-                 PlayerSetState(PlayerTarget,pt_none);
+                 PlayerSetType(PlayerTarget,pt_none);
                  g_slot_state[PlayerTarget]:=NewState;
                  if(team=0)then team:=PlayerTarget;
                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
               end;
 pss_observer : begin
                  g_slot_state[PlayerTarget]:=NewState;
-                 PlayerSetState(PlayerTarget,pt_none);
+                 PlayerSetType(PlayerTarget,pt_none);
                  team:=0;
               end;
 pss_ready    : isready:=true;
@@ -169,7 +169,7 @@ pss_AI_1..
 pss_AI_11    : begin
                  g_slot_state[PlayerTarget]:=NewState;
                  ai_skill  :=NewState-pss_AI_1+1;
-                 PlayerSetState(PlayerTarget,pt_ai);
+                 PlayerSetType(PlayerTarget,pt_ai);
                  if(team=0)then team:=PlayerTarget;
                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
               end;
@@ -276,16 +276,18 @@ begin
 
    if(not G_Started)
    or(PlayerTarget>MaxPlayers)
-   or(rpls_state=rpls_state_read)then exit;
+   or(rpls_state=rpls_state_read)
+   or(not g_deadobservers)then exit;
 
    with g_players[PlayerTarget] do
-   if(not isdefeated)then
+   if(not isdefeated)and(not isobserver)then
    begin
       PlayerSurrender:=true;
 
       if(Check)then exit;
 
       isdefeated:=true;
+      isobserver:=true;
       GameLogPlayerSurrender(PlayerTarget);
    end;
 end;
@@ -297,7 +299,7 @@ begin
    or(PlayerTarget>MaxPlayers)then exit;
 
    with g_players[PlayerTarget] do
-   if(not isdefeated)then
+   if(not isdefeated)and(not isobserver)then
    begin
       PlayerDefeat:=true;
 
@@ -315,7 +317,7 @@ begin
    or(PlayerTarget>MaxPlayers)then exit;
 
    with g_players[PlayerTarget] do
-   if(not isdefeated)then
+   if(player_type>pt_none)then
    begin
       PlayerLeave:=true;
 
@@ -324,44 +326,10 @@ begin
       isdefeated:=true;
 
       GameLogPlayerLeave(PlayerTarget);
-      PlayerSetState(PlayerTarget,pt_none);
+      PlayerSetType(PlayerTarget,pt_none);
    end;
 end;
 
-{
-
-function PlayerSpecialDefeat(PlayerTarget:byte;Surrender,Check:boolean):boolean;
-begin
-   PlayerSpecialDefeat:=false;
-
-   if(not g_started)
-   or(PlayerTarget>MaxPlayers)then exit;
-
-   with g_players[PlayerTarget] do
-   begin
-      if(player_type<>pt_human)then exit;
-
-      if(Surrender)then
-        if(armylimit<=0)
-        or(isobserver)then exit;
-
-      PlayerSpecialDefeat:=true;
-
-      if(Check)then exit;
-
-      if(armylimit>0)then PlayerKill(PlayerTarget);
-
-      if(Surrender)then
-      begin
-         GameLogPlayerSurrender(PlayerTarget);
-      end
-      else
-      begin
-         GameLogPlayerLeave(PlayerTarget);
-         PlayerSetState(PlayerTarget,pt_none);
-      end;
-   end;
-end;  }
 
 procedure PlayersSetDefault;
 var p:byte;
@@ -371,13 +339,16 @@ begin
     with g_players[p] do
     begin
        g_slot_state[p]:=pss_opened;
-       ai_skill  :=player_default_ai_level;
-       slot_race :=r_random;
-       race      :=r_random;
-       team      :=p;
-       isready   :=false;
-       pnum      :=p;
-       PlayerSetState(p,pt_none);
+       ai_skill       :=player_default_ai_level;
+       slot_race      :=r_random;
+       race           :=r_random;
+       team           :=p;
+       pnum           :=p;
+       isready        :=false;
+       isobserver     :=false;
+       isdefeated     :=false;
+       isrevealed     :=false;
+       PlayerSetType(p,pt_none);
        PlayerSetSkirmishTech(p);
        PlayerClearLog(p);
        log_EnergyCheck:=0;
@@ -387,7 +358,7 @@ begin
    begin
       race       :=r_hell;
       player_type:=pt_ai;
-      PlayerSetAllowedUnits(0,[],0,true);
+      PlayerSetAllowedUnits   (0,[],0,true);
       PlayerSetAllowedUpgrades(0,[],0,true);
    end;
 
@@ -429,31 +400,6 @@ begin
    PlayerLobby:=PlayerClient;
 end;
 
-{procedure GameCheckCurrentPreset;
-var i,p:byte;
-begin
-   g_preset_cur:=0;
-   if(g_preset_n>1)then
-    for p:=1 to g_preset_n-1 do
-     with g_presets[g_preset_cur] do
-     begin
-        if(map_seed    <> gp_map_seed)
-        or(map_mw      <> gp_map_mw  )
-        or(map_type    <> gp_map_type)
-        or(map_symmetry<> gp_map_symmetry)
-        or(g_mode      <> gp_g_mode  )
-        or(g_fixed_positions<> true  )then continue;
-
-        for i:=1 to MaxPlayers do
-          case (gp_player_slot[i]) of
-          true : if not(g_slot_state[i] in [ps_opened,ps_AI_1..ps_AI_11])then continue;
-          false: if not(g_slot_state[i] in [ps_observer,ps_closed      ])then continue;
-          end;
-        g_preset_cur:=p;
-        break;
-     end;
-end;}
-
 function GameLoadPreset(PlayerRequestor,preset:byte;Check:boolean):boolean;
 var p:byte;
 begin
@@ -478,7 +424,7 @@ begin
       map_symmetry:= gp_map_symmetry;
       g_mode      := gp_g_mode;
       g_fixed_positions
-                  := true;
+                  := false;
 
       for p:=1 to MaxPlayers do
         if(gp_player_team[p]>0)
@@ -486,7 +432,7 @@ begin
         else PlayerSlotChangeState(0,p,pss_observer,false);
 
       {$IFDEF _FULLGAME}
-      PlayerSetState(PlayerClient,pt_human);
+      PlayerSetType(PlayerClient,pt_human);
       g_players[PlayerClient].name:=PlayerName;
       {$ENDIF}
 
@@ -684,20 +630,20 @@ begin
      with g_players[p] do
      begin
         case g_slot_state[p] of
-pss_closed   : PlayerSetState(p,pt_none);
+pss_closed   : PlayerSetType(p,pt_none);
 pss_observer : team:=0;
 pss_opened   : if(p>0)and(player_type=pt_none)and(g_ai_slots>0)then
               begin
                  ai_skill:=g_ai_slots;
                  race    :=r_random;
-                 PlayerSetState(p,pt_ai);
+                 PlayerSetType(p,pt_ai);
                  if(team=0)then team:=1;
               end;
 pss_AI_1..
 pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         else
           g_slot_state[p]:=pss_closed;
-          PlayerSetState(p,pt_none);
+          PlayerSetType(p,pt_none);
         end;
 
         team:=PlayerSlotGetTeam(g_mode,p,255);
@@ -707,7 +653,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         begin
            race    :=r_hell;
            ai_skill:=gms_g_maxai;
-           PlayerSetState(p,pt_ai);
+           PlayerSetType(p,pt_ai);
            PlayerSetCurrentUpgrades(p,[1..255],15,true,true);
            ai_PlayerSetSkirmishSettings(p);
         end
@@ -838,7 +784,7 @@ begin
 end;
 
 
-procedure PlayerExecuteOrder(pl:byte);
+procedure PlayerExecuteOrder(playern:byte);
 var
 su,eu,d     : integer;
 SelectBuildings,
@@ -852,14 +798,13 @@ begin
    RectInRect:=((x0-r)<=vx)and(vx<=(x1+r))and((y0-r)<=vy)and(vy<=(y1+r));
 end;
 begin
-   with g_players[pl] do
-   if(o_id>0)and(army>0)and(not isobserver)and(not isdefeated)and(player_type=pt_human)then
+   with g_players[playern] do
    begin
-      if(pl<>PlayerClient)then   // ded serverside counter
-        PlayerAPMInc(pl);
+      //if(playern<>PlayerClient)then   // ded serverside counter
+      //  PlayerAPMInc(playern);
 
       case o_id of
-po_build               : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),pl),nil);
+po_build        : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(playern,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),playern),nil);
       else
         SelectBuildings:=true;
         ClearErrors:=false;
@@ -872,7 +817,7 @@ po_build               : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(pl,lmt_a
 
            for su:=1 to MaxUnits do
             with g_punits[su]^ do
-             if(hits>0)and(pl=playeri)and(not IsUnitRange(transport,nil))then
+             if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
               with uid^ do
                if(RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r))and(not _ukbuilding)then
                begin
@@ -908,7 +853,7 @@ po_prod_stop      : begin
            pu:=g_punits[su];
            with pu^  do
            with uid^ do
-           if(hits>0)and(not IsUnitRange(transport,nil))and(pl=playeri)then
+           if(hits>0)and(not IsUnitRange(transport,nil))and(playern=playeri)then
            begin
               pselected:=isselected;
 
@@ -1008,12 +953,11 @@ po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
           case o_a0 of
 uo_psability : if(sability_u<>nil)then unit_psability(sability_u,o_x0,o_y0,o_x1,false);
           end;
-        if(ClearErrors)then PlayerClearProdError(@g_players[pl]);
+        if(ClearErrors)then PlayerClearProdError(@g_players[playern]);
       end;
 
       o_id:=0;
-   end
-   else o_id:=0;
+   end;
 end;
 
 procedure GameDefaultEndConditions;
@@ -1056,15 +1000,15 @@ begin
      begin
         if(player_type=pt_human)and(p<>PlayerClient)and(net_status=ns_server)then
         begin
-           if(nttl<ClientTTL)then
+           if(net_ttl<ClientTTL)then
            begin
-              nttl+=1;
-              if(nttl=ClientTTL)or(nttl=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+              net_ttl+=1;
+              if(net_ttl=ClientTTL)or(net_ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
            end
            else
-             if(G_Started=false)then
+             if(not G_Started)then
              begin
-                PlayerSetState(p,pt_none);
+                PlayerSetType(p,pt_none);
                 {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
@@ -1077,11 +1021,12 @@ begin
            if(ServerSide)then
            begin
               isrevealed:=false;
-              if(n_builders=0)then//{$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+              if(n_builders<=0)then//{$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
                 if(g_mode<>gm_invasion)
                 or(p>0)then isrevealed:=true;
 
-              PlayerExecuteOrder(p);
+              if(o_id>0)and(army>0)and(not isobserver)and(not isdefeated)and(player_type=pt_human)then
+                PlayerExecuteOrder(p);
 
               if(player_type=pt_ai)
               then ai_player_code(p)
@@ -1104,7 +1049,7 @@ begin
         end;
      end;
 
-   for p:=0 to MaxPlayers do PlayerAPMUpdate(p);
+   //for p:=0 to MaxPlayers do PlayerAPMUpdate(p);
 end;
 
 {$include _net_game.pas}
@@ -1138,7 +1083,8 @@ begin
    tx:=tx*MapCellW+tw;
    ty:=ty*MapCellW+tw;
    tw*=2;
-   UnitsInfoAddRect(tx,ty,tx+MapCellW-tw,ty+MapCellW-tw,color);
+   if(RectInCam(tx,ty,tw,tw,0))then
+     UnitsInfoAddRect(tx,ty,tx+MapCellW-tw,ty+MapCellW-tw,color);
 end;
 function LineCollision(x0,y0,x1,y1:integer):boolean;
 var
@@ -1147,24 +1093,20 @@ px,py,
 sx,sy:integer;
 e1,e2:longint;
 begin
-   dx:=abs(x1-x0);
-   if(x0<x1)
-   then sx:= 1
-   else sx:=-1;
+   dx:= abs(x1-x0);
    dy:=-abs(y1-y0);
-   if(y0<y1)
-   then sy:= 1
-   else sy:=-1;
    e1:=dx+dy;
+   if(x0<x1)then sx:= 1 else sx:=-1;
+   if(y0<y1)then sy:= 1 else sy:=-1;
 
    LineCollision:=false;
 
-   //AddPoint(x0,y0,2,c_blue);
-   //AddPoint(x1,y1,4,c_lime);
+   AddPoint(x0,y0,2,c_blue);
+   AddPoint(x1,y1,4,c_lime);
 
    while(true)do
    begin
-      if(map_IsObstacleZone(map_GetZone(x0,y0,false)))then
+      if(map_IsNotAlongObstacle(x0,y0))then
       begin
          LineCollision:=true;
          break;
@@ -1172,17 +1114,15 @@ begin
       if(x0=x1)and(y0=y1)then break;
       px:=x0;
       py:=y0;
-      //AddPoint(x0,y0,6,c_orange);
+      AddPoint(x0,y0,6,c_orange);
       e2:=e1+e1;
-      if(e2>=dy)then
+      if(e2>=dy)and(x0<>x1)then
       begin
-          //if(x0=x1)then break;
           e1+=dy;
           x0+=sx;
       end;
-      if(e2<=dx)then
+      if(e2<=dx)and(y0<>y1)then
       begin
-          //if(y0=y1)then break;
           e1+=dx;
           y0+=sy
       end;
@@ -1196,7 +1136,7 @@ begin
    end;
 end;
 
-{procedure MakeZone(startx,starty:integer);
+procedure MakeZone(startx,starty:integer);
 var
 local_array_i,
 local_array_n: integer;
@@ -1212,7 +1152,8 @@ begin
     for i:=0 to local_array_n-1 do
     begin
        if(px=local_array_x[i])and(py=local_array_y[i])then exit;
-       if(LineCollision(px,py,local_array_x[i],local_array_y[i]))then exit;
+       if  LineCollision(px,py,local_array_x[i],local_array_y[i])
+       and LineCollision(local_array_x[i],local_array_y[i],px,py) then exit;
     end;
 
    CheckPoint:=true;
@@ -1261,7 +1202,7 @@ begin
       ProcPoint(startx,starty+1);
       local_array_i+=1;
    end;
-end;}
+end;
 
 procedure CodeGame;
 var tx,ty:integer;
@@ -1304,23 +1245,32 @@ begin
    if(G_Started)and(G_Status=gs_running)then
    begin
       {$IFDEF _FULLGAME}
+      //if(ks_mright=1)then
+      //  MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
+
+      if(ks_mright=1)then
+      begin
+         debug_Sgx :=mouse_map_x div MapCellW;
+         debug_Sgy :=mouse_map_y div MapCellW;
+      end;
+
       if(r_blink2_colorb)then
       begin
-         debug_Sx  :=mouse_map_x;
+         {debug_Sx  :=mouse_map_x;
          debug_Sy  :=mouse_map_y;
          debug_Sgx :=debug_Sx div MapCellW;
-         debug_Sgy :=debug_Sy div MapCellW;
+         debug_Sgy :=debug_Sy div MapCellW; }
 
-         //LineCollision(debug_Sgx,debug_Sgy,0,0)
+         LineCollision(debug_Sgx,debug_Sgy,mouse_map_x div MapCellW,mouse_map_y div MapCellW)
 
          {if(LineCollision(debug_Sgx,debug_Sgy,0,0))
          then AddPoint(debug_Sgx,debug_Sgy,5,c_red )
          else AddPoint(debug_Sgx,debug_Sgy,5,c_lime);}
-         {MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
 
-         if(debug_array_n>0)then
+         {if(debug_array_n>0)then
           for tx:=0 to debug_array_n-1 do
-           AddPoint(debug_array_x[tx],debug_array_y[tx],5,c_orange);  }
+           AddPoint(debug_array_x[tx],debug_array_y[tx],5,c_orange); }
+
      {
 
       debug_Dx  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_x;

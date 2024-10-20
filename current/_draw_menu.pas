@@ -511,7 +511,11 @@ mi_saveload_fname          : with menu_items[i] do
                              D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,2);
                              D_menu_EText(tar,i,ta_LU,svld_str_fname+chat_type[false],false,2,0);
                              end;
-mi_title_SaveInfo          : D_menu_EText(tar,i,ta_LM,svld_str_info ,false,0,0);
+mi_title_SaveInfo          : begin
+                             D_menu_EText(tar,i,ta_LU,svld_str_info1,false,0,0);
+                             D_menu_EText(tar,i,ta_LM,svld_str_info2,false,0,0);
+                             D_menu_EText(tar,i,ta_LD,svld_str_info3,false,0,0);
+                             end;
 
 
 {

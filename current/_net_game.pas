@@ -11,10 +11,10 @@ begin
        or(g_slot_state[p]=pss_observer)then
        begin
           net_NewPlayer:=p;
-          nip          :=sip;
-          nport        :=sport;
+          net_ip          :=sip;
+          net_port        :=sport;
           player_type  :=pt_human;
-          nttl         :=0;
+          net_ttl         :=0;
           isready      :=false;
           {$IFNDEF _FULLGAME}
           GameLogCommon(p,0,'MarsWars dedicated server, '+str_ver,false);
@@ -30,11 +30,11 @@ begin
    for i:=1 to MaxPlayers do
     if(i<>PlayerClient)then
      with g_players[i] do
-      if(player_type=pt_human)and(nip=aip)and(nport=ap)then
+      if(player_type=pt_human)and(net_ip=aip)and(net_port=ap)then
       begin
          net_GetPlayer:=i;
-         if(nttl>=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-         nttl:=0;
+         if(net_ttl>=fr_fps1)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+         net_ttl:=0;
          break;
       end;
 
@@ -75,7 +75,7 @@ begin
        net_writebyte  (player_type    );
        net_writebyte  (g_slot_state[p]);
        net_writebool  (isready  );
-       net_writeword  (nttl     );
+       net_writeword  (net_ttl     );
        if(G_Started)then
        net_writebyte  (race );
     end;
@@ -187,7 +187,7 @@ nmid_log_chat    : begin
 nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
                       if(not G_Started)
-                      then PlayerSetState(pid,pt_none)//PlayerSlotChangeState(0,pid,pss_opened,false)
+                      then PlayerSetType(pid,pt_none)//PlayerSlotChangeState(0,pid,pss_opened,false)
                       else PlayerLeave(pid,false);
                       {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                       continue;
@@ -269,7 +269,7 @@ nmid_lobbby_playerrace  : begin
    for i:=1 to MaxPlayers do
     if(i<>PlayerClient)then
      with g_players[i] do
-      if(player_type=pt_human)and(nttl<ClientTTL)then
+      if(player_type=pt_human)and(net_ttl<ClientTTL)then
       begin
          if(G_Started)and(net_period_step)then
          begin
@@ -278,7 +278,7 @@ nmid_lobbby_playerrace  : begin
             net_writebyte(G_Status);
             if(G_Status=gs_running)
             then wclinet_gframe(i,false);
-            net_send(nip,nport);
+            net_send(net_ip,net_port);
          end;
 
          if(net_logsend_pause<=0)and(log_n_cl<>log_n)then
@@ -286,7 +286,7 @@ nmid_lobbby_playerrace  : begin
             net_clearbuffer;
             net_writebyte(nmid_log_upd);
             wudata_log(i,@log_n_cl,false);
-            net_send(nip,nport);
+            net_send(net_ip,net_port);
             net_logsend_pause:=fr_fpsd2;
          end;
       end;
@@ -455,11 +455,11 @@ begin
          isready:=i<>0;
       end;
 
-      // nttl
-      i   :=nttl;
-      nttl:=net_readint;
-      if((i< fr_fps1)and(nttl>=fr_fps1))
-      or((i>=fr_fps1)and(nttl< fr_fps1))then menu_remake:=true;
+      // net_ttl
+      i   :=net_ttl;
+      net_ttl:=net_readint;
+      if((i< fr_fps1)and(net_ttl>=fr_fps1))
+      or((i>=fr_fps1)and(net_ttl< fr_fps1))then menu_remake:=true;
 
       if(StartGame)then
       begin

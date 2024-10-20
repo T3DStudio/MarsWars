@@ -16,7 +16,8 @@ begin
    dcard:=0;
    FillChar(dplayers,Sizeof(dplayers),0);
 
-   svld_str_info:='';
+   svld_str_info1:='';
+   svld_str_info2:='';
 
    if(svld_list_sel<0)or(svld_list_sel>=svld_list_size)then exit;
    if(length(svld_list[svld_list_sel])=0)then exit;
@@ -30,13 +31,13 @@ begin
       {$I+}
       if(ioresult<>0)then
       begin
-         svld_str_info:=str_error_OpenFile;
+         svld_str_info1:=str_error_OpenFile;
          close(f);
          exit;
       end;
       if(FileSize(f)<>svld_file_size)then
       begin
-         svld_str_info:=str_error_WrongData;
+         svld_str_info1:=str_error_WrongData;
          close(f);
          exit;
       end;
@@ -46,7 +47,7 @@ begin
          BlockRead(f,dbyte,sizeof(campain_mission));
          if(dbyte<=MaxMissions)then
          begin
-            svld_str_info:='camp';//str_camp_t[vr];
+            svld_str_info1:='camp';//str_camp_t[vr];
             //BlockRead(f,dbyte,sizeof(campain_skill));dbyte:=0;
             //BlockRead(f,dcard,sizeof(campain_seed ));dcard:=0;
             {if(0<=vr)and(vr<=CMPMaxSkills)
@@ -58,59 +59,74 @@ begin
             BlockRead(f,dbyte,sizeof(campain_skill));
             BlockRead(f,dcard,sizeof(campain_seed ));
 
-            BlockRead(f,dcard,sizeof(G_Step       ));svld_str_info:=str_uiHint_Time+GStep2TimeStr(dcard)+tc_nl2+str_menu_map+tc_nl2+' ';
+            BlockRead(f,dcard,sizeof(G_Step       ));svld_str_info1+=tc_nl2+tc_nl2+str_uiHint_Time+GStep2TimeStr(dcard)+tc_nl2+tc_nl2+str_menu_map+tc_nl2+' ';
 
-            BlockRead(f,dcard,sizeof(map_seed     ));svld_str_info+=str_map_seed+dots+c2s(dcard)+tc_nl2+' ';
+            // MAP info
+            BlockRead(f,dcard,sizeof(map_seed     ));svld_str_info1+=str_map_seed+dots+c2s(dcard)+tc_nl2+' ';
             BlockRead(f,dint ,sizeof(map_size     ));
             if(dint<MinMapSize)or(MaxMapSize<dint)
-                                          then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
-                                          else       svld_str_info+=str_map_size+dots+i2s(dint)+tc_nl2+' ';
+                                          then begin svld_str_info1:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info1+=str_map_size+dots+i2s(dint)+tc_nl2+' ';
 
             BlockRead(f,dbyte,sizeof(map_type     ));
-            if(dbyte>gms_m_types         )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
-                                          else       svld_str_info+=str_map_type+dots+str_map_typel[dbyte]+tc_default+tc_nl2+' ';
+            if(dbyte>gms_m_types         )then begin svld_str_info1:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info1+=str_map_type+dots+str_map_typel[dbyte]+tc_default+tc_nl2+' ';
 
             BlockRead(f,dbyte,sizeof(map_symmetry ));
-            if(dbyte>gms_m_symm          )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
-                                          else       svld_str_info+=str_map_sym+dots+str_map_syml[dbyte]+tc_nl2+' ';
+            if(dbyte>gms_m_symm          )then begin svld_str_info1:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info1+=str_map_sym+dots+str_map_syml[dbyte]+tc_nl2+' ';
 
             BlockRead(f,dint ,sizeof(theme_cur    ));
-            if(dint<0)or(dint>=theme_n   )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
-                                          else       svld_str_info+=theme_name[dint]+tc_nl2+tc_default+tc_nl2;
+            if(dint<0)or(dint>=theme_n   )then begin svld_str_info1:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info1+=theme_name[dint];
 
+            // GAME info
             BlockRead(f,dbyte,sizeof(g_mode       ));
-            if not(dbyte in allgamemodes )then begin svld_str_info:=str_error_WrongVersion;close(f);exit; end
-                                          else       svld_str_info+=str_menu_GameMode+dots+str_emnu_GameModel[dbyte]+tc_nl2;
+            if not(dbyte in allgamemodes )then begin svld_str_info2:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info2+=tc_nl2+str_menu_GameMode+dots+str_emnu_GameModel[dbyte]+tc_nl2;
 
-            BlockRead(f,dbyte,SizeOf(g_start_base     ));
-            BlockRead(f,dbyte,SizeOf(g_generators     ));
+            BlockRead(f,dbyte,SizeOf(g_start_base ));
+            if(dbyte>gms_g_startb        )then begin svld_str_info2:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info2+=str_menu_StartBase+dots+b2s(dbyte+1)+tc_nl2;
+
+            BlockRead(f,dbyte,SizeOf(g_generators ));
+            if(dbyte>gms_g_maxgens       )then begin svld_str_info2:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info2+=str_menu_Generators+dots+str_menu_Generatorsl[dbyte]+tc_nl2;
+
             BlockRead(f,dbyte,SizeOf(g_fixed_positions));
+                                                     svld_str_info2+=str_menu_FixedStarts+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+
             BlockRead(f,dbyte,SizeOf(g_deadobservers  ));
+                                                     svld_str_info2+=str_menu_DeadObservers+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+
             BlockRead(f,dbyte,SizeOf(g_ai_slots       ));
+            if(dbyte>gms_g_maxai         )then begin svld_str_info2:=str_error_WrongVersion;close(f);exit; end
+                                          else       svld_str_info2+=str_menu_AISlots+dots+ai_name(dbyte);
 
-            BlockRead(f,dbyte   ,sizeof(PlayerClient     ));
+            // PLAYERS info
+            BlockRead(f,dbyte   ,sizeof(PlayerClient  ));
 
-            BlockRead(f,dplayers,SizeOf(TPList           ));
-            svld_str_info+=tc_nl2+str_menu_players+tc_nl2;
+            BlockRead(f,dplayers,SizeOf(TPList        ));
+            svld_str_info3+=tc_nl2+str_menu_players+tc_nl2;
 
             for dint:=1 to MaxPlayers do
             begin
                if(dint=dbyte)
-               then svld_str_info+=chr(dint)+' *'+tc_default
-               else svld_str_info+=chr(dint)+' #'+tc_default;
+               then svld_str_info3+=chr(dint)+' *'+tc_default
+               else svld_str_info3+=chr(dint)+' #'+tc_default;
 
                if(dplayers[dint].player_type>pt_none)then
                  if(dplayers[dint].team=0)
-                 then svld_str_info+=str_observer[1]                       +','+t2c(dplayers[dint].team)+','
-                 else svld_str_info+=str_racel[dplayers[dint].slot_race][2]+','+t2c(dplayers[dint].team)+',';
-               svld_str_info+=dplayers[dint].name+tc_nl2
+                 then svld_str_info3+=str_observer[1]                       +','+t2c(dplayers[dint].team)+','
+                 else svld_str_info3+=str_racel[dplayers[dint].slot_race][2]+','+t2c(dplayers[dint].team)+',';
+               svld_str_info3+=dplayers[dint].name+tc_nl2;
             end;
          end;
       end
-      else svld_str_info:=str_error_WrongVersion;
+      else svld_str_info1:=str_error_WrongVersion;
       close(f);
    end
-   else svld_str_info:=str_error_FileExists;
+   else svld_str_info1:=str_error_FileExists;
 end;
 
 procedure saveload_Select;
@@ -123,15 +139,19 @@ begin
    else
    begin
       svld_str_fname:='';
-      svld_str_info :='';
+      svld_str_info1:='';
+      svld_str_info2:='';
+      svld_str_info3:='';
    end;
 end;
 
 procedure saveload_SelectByName(name:shortstring);
 var i:integer;
 begin
-   svld_list_sel:=-1;
-   svld_str_info:='';
+   svld_list_sel :=-1;
+   svld_str_info1:='';
+   svld_str_info2:='';
+   svld_str_info3:='';
    if(svld_list_size>0)then
     for i:=0 to svld_list_size-1 do
      if(svld_list[i]=name)then

@@ -19,7 +19,7 @@ begin
       else ty:=0;
       tx:=random(map_size);
    end;
-   SpawnMonster:=unit_add(tx,ty,0,uid,0,true,true,0);
+   SpawnMonster:=unit_add(tx,ty,0,uid,0,true,true,0)=0;
    if(SpawnMonster)then limit-=g_uids[uid]._limituse;
 end;
 function SpawnL(ul:longint):boolean;
