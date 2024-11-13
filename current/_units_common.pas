@@ -177,7 +177,7 @@ i,u,outc:integer;
 procedure AddResult(x,y:integer);
 var mx,my,d:integer;
 begin
-   if(map_GetZone(x,y,false)<>azone)then exit;
+   if(map_CellGetZone(x,y)<>azone)then exit;
    mx:=x*MapCellW+MapCellhW;
    my:=y*MapCellW+MapCellhW;
    d:=abs(cx-mx)+abs(cy-my);
@@ -199,7 +199,7 @@ begin
    begin
       if(gr=0)then
       begin
-         if(map_GetZone(gx,gy,false)=azone)then
+         if(map_CellGetZone(gx,gy)=azone)then
          begin
             rx:=gx;
             ry:=gy;
@@ -355,7 +355,7 @@ begin
    begin
       gridx:=x div MapCellW;
       gridy:=y div MapCellW;
-      if(updateZone)then zone:=map_GetZone(gridx,gridy,false);
+      if(updateZone)then zone:=map_CellGetZone(gridx,gridy);
 
       {$IFDEF _FULLGAME}
       unit_UpdateMiniMapXY(pu);
@@ -608,7 +608,7 @@ begin
 end;
 
 
-procedure pushOut_all(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean);
+procedure pushOut_all(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;FlyLevel:boolean);
 const ptar_n = 1;
 type TPush_tar = record
    x,y,a,b,c:integer;
@@ -618,6 +618,7 @@ gx,gy,gx0,
 gy0,gx1,gy1,
 gmx,gmy,
 o,u,d   : integer;
+check_obstacles: boolean;
 procedure pTarAdd(ax,ay,aa,ab,ac:integer);
 var i,n:integer;
 begin
@@ -659,9 +660,9 @@ end;
 begin
    pTarClear;
 
-   if(_ukfly)then check_obstacles:=false;
+   if(FlyLevel)then check_obstacles:=false;
 
-   if(not _ukfly)then
+   if(not FlyLevel)then
     for u:=1 to MaxCPoints do
      with g_cpoints[u] do
       if(cpCaptureR>0)and(cpNoBuildR>0)then
@@ -747,7 +748,8 @@ begin
    begin
       aukfly:=_ukfly;
       tr:=_r;
-      pushOut_all(tx,ty,tr+1,0,@tx,@ty,aukfly,(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+      //(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport)
+      pushOut_all(tx,ty,tr+1,0,@tx,@ty,aukfly);
    end;
 
    dx:=-2000;
@@ -880,7 +882,7 @@ begin
 
    CheckBuildArea:=2;
 
-   tzone:=map_GetZone(tx,ty,true);
+   tzone:=map_MapGetZone(tx,ty);
 
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
@@ -911,12 +913,12 @@ begin
    obstacles:=true;
    if(playern<=MaxPlayers)then
    begin
-      with g_uids[buid] do
-        with g_players[playern] do
-          obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+      //with g_uids[buid] do
+      //  with g_players[playern] do
+      //    obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
 
-      if(obstacles)and(g_players[playern].player_type=pt_ai)then
-        if(map_IsObstacleZone(map_GetZone(tx,ty,true)))then begin CheckBuildPlace:=2;exit;end;
+      //if(obstacles)and(g_players[playern].player_type=pt_ai)then
+      //  if(map_IsObstacleZone(map_MapGetZone(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
    end;
 
    i:=CheckBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
@@ -942,8 +944,8 @@ begin
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
-         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly,obstacles);
+         obstacles:=true;//(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly);
          blink_x:=mm3i(1,blink_x,map_size);
          blink_y:=mm3i(1,blink_y,map_size);
          if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
@@ -972,9 +974,9 @@ begin
      with player^ do
       if(upgr[upgr_hell_tblink]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+         obstacles:=true;//(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
          if(srange<point_dist_int(x,y,blink_x,blink_y))then pushIn_1r(@blink_x,@blink_y,x,y,srange-1);
-         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly, obstacles  );
+         pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly  );
          blink_x:=mm3i(1,blink_x,map_size);
          blink_y:=mm3i(1,blink_y,map_size);
          if(point_dist_int(x,y,blink_x,blink_y)>srange)then exit;
@@ -1229,7 +1231,8 @@ function unit_add(ux,uy,aunum:integer;uuid,uplayer:byte;ubld,summoned:boolean;ul
 procedure FindNotExistedUnit;
 var i:integer;
 begin
-   for i:=MaxPlayerUnits*uplayer+1 to i+MaxPlayerUnits do
+   i:=MaxPlayerUnits*uplayer+1;
+   for i:=i to i+MaxPlayerUnits do
     with g_units[i] do
      if(hits<=dead_hits)then
      begin
@@ -1287,7 +1290,7 @@ begin
             moveCurr_y := y;
             gridx      := x div MapCellW;
             gridy      := y div MapCellW;
-            zone       :=map_GetZone(gridx,gridy,false);
+            zone       := map_CellGetZone(gridx,gridy);
             isselected := false;
             transportC := 0;
 
@@ -1300,7 +1303,7 @@ begin
             level:=ulevel;
 
             unit_SetDefaults(LastCreatedUnitP,false);
-            unit_BaseVision     (LastCreatedUnitP,false);
+            unit_BaseVision (LastCreatedUnitP,false);
             unit_apllyUID   (LastCreatedUnitP);
             unit_PC_add_inc (LastCreatedUnitP,ubld,summoned);
          end;

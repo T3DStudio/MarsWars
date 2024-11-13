@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[PlayerClient].isobserver)and(rpls_state<rpls_state_read)
+   if(not g_players[PlayerClient].isobserver)and(rpls_rstate<rpls_state_read)
    then UIPlayer:=PlayerClient
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -42,7 +42,7 @@ begin
 
    d_uimouse(r_screen);
 
-   //if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
+   if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
 end;
 
 procedure draw_DebugTileSet(tileSet:pTMWTileSet);
@@ -175,8 +175,8 @@ begin
    ta_RU,255, c_white);
 
    draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
-       i2s(rpls_state)+
-   ' '+i2s(rpls_fstatus),
+       i2s(rpls_rstate)+
+   ' '+i2s(rpls_fstate),
    ta_RU,255, c_white);  }
 
    end;

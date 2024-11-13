@@ -112,7 +112,7 @@ begin
 end;
 
 
-procedure menu_ReInit;
+procedure menu_ReBuild;
 const mainBtnW  = (vid_minw div 5)-4;
       mainBtnWh = mainBtnW div 2;
 var tx0,tx1,tx2,
@@ -212,7 +212,7 @@ begin
    tx1:=vid_vhw+menu_main_mp_bwh;
    ty0:=ty2+menu_logo_h;
    ty1:=ty0+menu_main_mp_bh1;
-   if(rpls_state=rpls_state_read)
+   if(rpls_rstate=rpls_state_read)
    then SetItem(mi_title_ReplayPlayback,tx0,ty0,tx1,ty1,true )
    else SetItem(mi_title_Scirmish      ,tx0,ty0,tx1,ty1,true );
 
@@ -260,12 +260,12 @@ begin
 
 
    // MAP
-   tx0:=vid_vhw+396-menu_map_settingsw-r_minimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
+   tx0:=vid_vhw+396-menu_map_settingsw-r_mminimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
    tx1:=tx0+menu_map_settingsw;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h+menu_main_mp_bhq;
 
-   SetItem(mi_title_map  ,tx0-basefont_w2             ,ty0-menu_main_mp_bhq3,
-                          tx1+basefont_w3+r_minimap^.w,ty0+r_minimap^.w+basefont_w1,true );
+   SetItem(mi_title_map  ,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                          tx1+basefont_w3+r_mminimap^.w,ty0+r_mminimap^.w+basefont_w1,true );
 
    SetItem(mi_map_Preset ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,GameLoadPreset(PlayerClient,0,true)                              );ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Seed   ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,map_SetSetting(PlayerClient,nmid_lobbby_mapseed          ,0,true));ty0+=menu_main_mp_bhh;
@@ -275,25 +275,25 @@ begin
    SetItem(mi_map_Random ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,menu_items[mi_map_Sym].mi_enabled);ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Theme  ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,true);
 
-   ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(r_minimap^.h div 2);
-   SetItem(mi_map_MiniMap,tx1+basefont_w1,ty0,tx1+basefont_w1+r_minimap^.w,ty0+r_minimap^.h,false);
+   ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(r_mminimap^.h div 2);
+   SetItem(mi_map_MiniMap,tx1+basefont_w1,ty0,tx1+basefont_w1+r_mminimap^.w,ty0+r_mminimap^.h,false);
 
    // MULTIPLAYER / RECORD INFO
-   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+r_minimap^.w+basefont_w2-menu_main_mp_bhq;
+   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+r_mminimap^.w+basefont_w2-menu_main_mp_bhq;
 
-   if(rpls_state=rpls_state_read)then
+   if(rpls_rstate=rpls_state_read)then
    begin
-      SetItem(mi_title_ReplayInfo2,tx0-basefont_w2             ,ty0-menu_main_mp_bhq3,
-                                   tx1+basefont_w3+r_minimap^.w,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );
+      SetItem(mi_title_ReplayInfo2,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );
 
    end
    else
    begin
-      SetItem(mi_title_multiplayer,tx0-basefont_w2             ,ty0-menu_main_mp_bhq3,
-                                   tx1+basefont_w3+r_minimap^.w,ty0+menu_main_mp_bhh*8+basefont_w2+basefont_wq,true );
+      SetItem(mi_title_multiplayer,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*8+basefont_w2+basefont_wq,true );
 
       ty1:=menu_main_mp_bhh;
-      tx1+=basefont_w1+r_minimap^.w;
+      tx1+=basefont_w1+r_mminimap^.w;
       case net_status of
 ns_single: begin
            SetItem(mi_mplay_ServerCaption   ,tx0,ty0,tx1,ty0+ty1, not G_Started);ty0+=ty1;
@@ -326,16 +326,17 @@ ns_client: begin
 
    if(G_Started)then
    begin
-      if(rpls_state=rpls_state_read)or(net_status>ns_single)
+      if(rpls_rstate=rpls_state_read)or(net_status>ns_single)
       then ms_BottomButtons(4,mi_EndGame,mi_Settings,mi_AboutGame,mi_back,0 )
       else ms_BottomButtons(5,mi_EndGame,mi_SaveLoad,mi_Settings,mi_AboutGame,mi_back );
    end
    else
    begin
-      ms_BottomButtons(4,mi_back,mi_Settings,mi_AboutGame,mi_start,0);
+      ms_BottomButtons(4,mi_back,mi_Settings,mi_AboutGame,mi_StartScirmish,0);
 
-     if(net_status>ns_single)
-     then menu_items[mi_back].mi_enabled:=false;
+      menu_items[mi_StartScirmish].mi_enabled:=GameStartScirmish(PlayerClient,true);
+      if(net_status>ns_single)
+      then menu_items[mi_back].mi_enabled:=false;
    end;
 end;
 
@@ -384,9 +385,9 @@ begin
                         SetItem(mi_settings_PlayerColors   ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         end;
    mi_settings_replay : begin
-                        SetItem(mi_settings_Replaying      ,tx0,ty0,tx1,ty1,rpls_state<rpls_state_read );
+                        SetItem(mi_settings_Replaying      ,tx0,ty0,tx1,ty1,rpls_rstate<rpls_state_read );
                                                                                    ty0+=ty2;ty1+=ty2;
-                        SetItem(mi_settings_ReplayName     ,tx0,ty0,tx1,ty1,rpls_state=rpls_state_none );
+                        SetItem(mi_settings_ReplayName     ,tx0,ty0,tx1,ty1,rpls_rstate=rpls_state_none );
                                                                                    ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_ReplayQuality  ,tx0,ty0,tx1,ty1,true );
                         end;
@@ -478,7 +479,7 @@ mp_campaings : begin
 
                if(G_Started)
                then ms_BottomButtons(5,mi_EndGame,mi_SaveLoad,mi_Settings,mi_AboutGame,mi_back)
-               else ms_BottomButtons(4,mi_back   ,mi_Settings,mi_AboutGame,mi_start   ,0      );
+               else ms_BottomButtons(4,mi_back   ,mi_Settings,mi_AboutGame,mi_StartCampaing   ,0      );
                end;
 mp_scirmish  : ms_StartedGame;
 mp_saveload  : ms_SaveLoad;
@@ -695,7 +696,7 @@ begin
    with menu_items[mi] do
    begin
       menu_list_current:=CurVal;
-      menu_list_AddItem(str_ps_none,0,true,MinWidth);
+      menu_list_AddItem(str_pt_none,0,true,MinWidth);
       for i:=pss_AI_1 to pss_AI_11 do
         menu_list_AddItem(str_menu_PlayerSlots[i],i-pss_AI_1+1,true,MinWidth);
    end;
@@ -786,9 +787,9 @@ mi_settings_PlayerName : begin
 mi_exit                   : GameCycle:=false;
 mi_back                   : menu_Toggle;
 
-mi_start                  : if(net_status=ns_client)
+mi_StartScirmish          : if(net_status=ns_client)
                             then net_send_byte(nmid_start)
-                            else GameStart(PlayerClient,false);
+                            else GameStartScirmish(PlayerClient,false);
 
 mi_StartGame              : if(menu_list_selected>-1)then
                             begin
@@ -813,7 +814,7 @@ mi_StartGame              : if(menu_list_selected>-1)then
 mi_EndGame                : if(menu_list_selected>-1)then
                             begin
                                case menu_list_SIndex of
-                               mi_EndPlaybackBreak: GameBreak(0,           false);
+                               mi_EndReplayQuit   : GameBreak(0,           false);
                                mi_EndLeave        : GameBreak(PlayerClient,false);
                                mi_EndSurrender    : begin
                                                     if(net_status=ns_client)
@@ -828,8 +829,8 @@ mi_EndGame                : if(menu_list_selected>-1)then
                             begin
                                menu_list_SetCommonSettings(menu_item,nil);
                                menu_list_current:=-1;
-                               if(rpls_state=rpls_state_read)
-                               then menu_list_AddItem(str_menu_PlaybackBreak,mi_EndPlaybackBreak    ,GameBreak      (0,true ),0)
+                               if(rpls_rstate=rpls_state_read)
+                               then menu_list_AddItem(str_menu_ReplayQuit,mi_EndReplayQuit    ,GameBreak      (0,true ),0)
                                else
                                begin
                                   menu_list_AddItem(str_menu_LeaveGame,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0);
@@ -876,7 +877,7 @@ mi_settings_Langugage     : if(menu_list_selected>-1)then
                             begin
                                ui_language:=menu_list_SIndex>0;
                                menu_List_Clear;
-                               SwitchLanguage;
+                               language_Switch;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_lang[false],SizeOf(str_menu_lang),integer(ui_language),-3);
 mi_settings_PanelPosition : if(menu_list_selected>-1)then
@@ -1013,7 +1014,7 @@ mi_map_Sym                : if(menu_list_selected>-1)then
                             else menu_list_MakeFromStr(menu_item,@str_map_syml[0],SizeOf(str_map_syml),map_symmetry,-2);
 mi_map_Random             : begin
                                Map_randommap;
-                               Map_premap;
+                               map_Make1;
                             end;
 //////////////////////////////////////////    GAME SETTINGS
 mi_game_mode              : if(menu_list_selected>-1)then
@@ -1158,7 +1159,7 @@ mi_mplay_ServerPort   : begin
                         net_sv_pstr   :=StringApplyInput(net_sv_pstr   ,k_kbdig ,5            ,@Changed);
                         txt_ValidateServerPort;
                         end;
-mi_mplay_ClientAddress: net_cl_svaddr  :=StringApplyInput(net_cl_svaddr,k_kbstr ,30           ,@Changed);
+mi_mplay_ClientAddress: net_cl_svaddr :=StringApplyInput(net_cl_svaddr,k_kbstr  ,30           ,@Changed);
       else
         if(net_status>ns_single)and(menu_items[mi_mplay_Chat].mi_enabled)
         then net_chat_str  :=StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)

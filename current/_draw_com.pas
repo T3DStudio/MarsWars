@@ -237,7 +237,7 @@ begin
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
-procedure map_MinimapPlayerStarts(UnknownStarts,teamStarts:boolean);
+procedure map_MinimapPlayerStarts(tar:pSDL_Surface;UnknownStarts,teamStarts:boolean);
 var i    :byte;
     x,y,r:integer;
 begin
@@ -250,23 +250,23 @@ begin
       r:=trunc(base_1r*map_mm_cx);
 
       // clear
-      filledcircleColor(r_minimap,x,y,r ,c_black);
-            circleColor(r_minimap,x,y,r ,c_black);
-         characterColor(r_minimap,x,y,#8,c_black);
+      filledcircleColor(tar,x,y,r ,c_black);
+            circleColor(tar,x,y,r ,c_black);
+         characterColor(tar,x,y,#8,c_black);
 
       if(UnknownStarts)then
       begin
          if(teamStarts)
-         then map_MinimapSpot(r_minimap,x,y,r,chr(ord('0')+PlayerSlotGetTeam(g_mode,i,255)),c_white)
-         else map_MinimapSpot(r_minimap,x,y,r,'?',c_white)
+         then map_MinimapSpot(tar,x,y,r,chr(ord('0')+PlayerSlotGetTeam(g_mode,i,255)),c_white)
+         else map_MinimapSpot(tar,x,y,r,'?',c_white)
       end
       else
         if (g_slot_state[i]<>pss_closed  )
         and(g_slot_state[i]<>pss_observer)
         then
           if(g_players[i].player_type>pt_none)or(g_ai_slots>0)
-          then map_MinimapSpot(r_minimap,x,y,r,b2s(i)[1],PlayerColorScheme[i])
-          else map_MinimapSpot(r_minimap,x,y,r,'+'      ,c_white);
+          then map_MinimapSpot(tar,x,y,r,b2s(i)[1],PlayerColorScheme[i])
+          else map_MinimapSpot(tar,x,y,r,'+'      ,c_white);
    end;
 
    {x:=round(map_symmetryX0*map_mm_cx);
@@ -284,53 +284,27 @@ begin
    c_lime); }
 end;
 
-procedure map_MinimapCPoints;
+procedure map_MinimapCPoints(tar:pSDL_Surface);
 var i  :byte;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
-      then map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
-      else map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
+      then map_MinimapSpot(tar,cpmx,cpmy,cpmr,char_cp ,c_purple)
+      else map_MinimapSpot(tar,cpmx,cpmy,cpmr,char_gen,c_white );
 end;
 
-procedure map_RedrawMenuMinimap(full:boolean);
+procedure map_RedrawMenuMinimap;
 begin
-   if(full)then
-   begin
-      sdl_FillRect(r_minimap,nil,0);
-      map_MinimapBackground;
-      draw_surf(r_minimap,0,0,r_bminimap);
-   end;
-   map_MinimapPlayerStarts(not g_fixed_positions,g_mode in gm_ModesFixedTeams);
-   map_MinimapCPoints;
-   //draw_surf(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,r_minimap);
-   //rectangleColor(spr_mback,ui_menu_map_mx0,ui_menu_map_my0,ui_menu_map_mx0+r_minimap^.w,ui_menu_map_my0+r_minimap^.h,c_ltgray);
-   menu_redraw:=menu_redraw or menu_state;
+   sdl_FillRect(r_mminimap,nil,0);
+   draw_surf(r_mminimap,0,0,r_bminimap);
+
+   map_MinimapPlayerStarts(r_mminimap,not g_fixed_positions,g_mode in gm_ModesFixedTeams);
+   map_MinimapCPoints(r_mminimap);
 end;
 
-function GStep2TimeStr(gstep:cardinal):shortstring;
-var
-s , m, h: cardinal;
-ss,sm,sh:shortstring;
-begin
-   s:=gstep div fr_fps1;
-   m:=s div 60;
-   s:=s mod 60;
-   h:=m div 60;
-   m:=m mod 60;
 
-   GStep2TimeStr:='';
-   if(h>0)then
-   begin
-      if(h<10)then sh:='0'+c2s(h) else sh:=c2s(h);
-      GStep2TimeStr:=sh+':';
-   end;
-   if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
-   if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
-   GStep2TimeStr+=sm+':'+ss;
-end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
 begin

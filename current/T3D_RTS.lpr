@@ -78,8 +78,6 @@ begin
 end; }
 
 begin
-   //writeln(sizeof(string6));
-
    InitGame;
    {$IFDEF DTEST}
    WriteUnitDescriptions;

@@ -556,15 +556,28 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  DrawDecals;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
-            {with map_grid[gx,gy] do
+            with map_grid[gx,gy] do
             begin
-               if(map_IsObstacleZone(tgc_parea,true ))
+               {if(map_IsObstacleZone(tgc_parea,true ))
                then draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_gray )
                else draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_white);
                if(map_IsObstacleZone(tgc_sarea,false))
                then draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_green)
-               else draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_lime );
-            end; }
+               else draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_lime ); }
+               //if(tgc_pf_solid)then UnitsInfoAddRect(mx,my,mx+MapCellw,my+MapCellw,c_red);
+               //draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_zone),ta_LU,255,c_gray );
+               if(tgc_pf_domain>0)then
+               begin
+                  draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_domain),ta_LU,255,c_white );
+                  UnitsInfoAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_gray);
+               end;
+               if(tgc_pf_solid)then
+               begin
+                  UnitsInfoAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
+                  UnitsInfoAddLine(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
+                  UnitsInfoAddLine(mx+MapCellw,my+1,mx+1,my+MapCellw,c_red);
+               end;
+            end;
 
             if(tgca_decor_n>0)then
               for i:=0 to tgca_decor_n-1 do
@@ -821,12 +834,12 @@ begin
 
            draw_text(r_screen,ix,iy   ,i2s(u)           , ta_LU,255, PlayerColorScheme[playeri]);
            draw_text(r_screen,ix,iy+10,i2s(hits)        , ta_LU,255, PlayerColorScheme[playeri]);
-           draw_text(r_screen,ix,iy+20,i2s(ua_id)       , ta_LU,255, PlayerColorScheme[playeri]);
-           draw_text(r_screen,ix,iy+30,w2s(zone)        , ta_LU,255, PlayerColorScheme[playeri]);
+           draw_text(r_screen,ix,iy+20,w2s(zone)        , ta_LU,255, PlayerColorScheme[playeri]);
+           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorScheme[playeri]);
 
 
            //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
-
+           //isbuildarea
 //           draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
 
 

@@ -8,13 +8,13 @@ begin
         if(team=g_players[UIPlayer].team)then
           if(_ability=uab_UACScan)and(reload>radar_vision_time)then
             if(r_minimap_scan_blink)
-            then filledCircleColor(r_minimap,trunc(ua_x  *map_mm_cx),
-                                             trunc(ua_y  *map_mm_cx),
-                                             trunc(srange*map_mm_cx),ShadowColor(PlayerColorScheme[pnum]));
+            then filledCircleColor(r_gminimap,trunc(ua_x  *map_mm_cx),
+                                              trunc(ua_y  *map_mm_cx),
+                                              trunc(srange*map_mm_cx),ShadowColor(PlayerColorScheme[pnum]));
 
       if(uid^._ukbuilding)and(mmr>0)
-      then boxColor  (r_minimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerColorScheme[player^.pnum])
-      else pixelColor(r_minimap,mmx,mmy,                        PlayerColorScheme[player^.pnum]);
+      then boxColor  (r_gminimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerColorScheme[player^.pnum])
+      else pixelColor(r_gminimap,mmx,mmy,                        PlayerColorScheme[player^.pnum]);
    end;
 end;
 

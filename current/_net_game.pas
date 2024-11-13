@@ -368,7 +368,7 @@ begin
    if(rByte(@g_generators     ,gms_g_maxgens    ))then begin redraw_menu:=true;new_map:=true;end;
    if(rBool(@g_deadobservers                    ))then begin redraw_menu:=true;              end;
 
-   if(new_map    )then Map_premap;
+   if(new_map    )then map_Make1;
    if(redraw_menu)then menu_remake:=true;
 
    if(StartGame)and(not g_fixed_positions)then

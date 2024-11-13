@@ -22,11 +22,11 @@
 --- invisibility
 --- invulnerability
 -- Hell:
--- Hell vision
--- Building Restoration
--- Double damage sphere
--- Stone sphere
--- Haste sphere
+--- Hell vision
+--- Building Restoration
+--- Double damage sphere
+--- Stone sphere
+--- Haste sphere
 
 Баланс:
 - Какодемон: урон уменьшен до 62, здоровье увеличено до 2000;

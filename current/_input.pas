@@ -215,7 +215,7 @@ end;
 
 procedure PlayerSetOrder(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
 begin
-   if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
+   if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then
    begin
       if(net_status=ns_client)then
       begin
@@ -417,7 +417,7 @@ begin
      if(0<=u)and(u<=ui_ubtns)then
        with g_players[PlayerClient] do
          case tab of
-0:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // buildings
+0:  if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then  // buildings
       case click_type of
       pct_left   : begin
                    m_brush:=ui_panel_uids[race,tab,u];
@@ -425,21 +425,21 @@ begin
                    end;
       end;
 
-1:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // units
+1:  if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then  // units
       case click_type of
       pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_start,PlayerClient);
       pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_stop ,PlayerClient);
       end;
 
-2:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // upgrades
+2:  if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then  // upgrades
       case click_type of
       pct_left   : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_start,PlayerClient);
       pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_stop ,PlayerClient);
       end;
 
-3:  if(rpls_state>=rpls_state_read)then
+3:  if(rpls_rstate>=rpls_state_read)then
     begin
-       if(rpls_fstatus=rpls_file_read)then  // replay player controls
+       if(rpls_fstate=rpls_state_read)then  // replay player controls
        case u of
        1 : case click_type of
            pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,-1);
@@ -461,7 +461,7 @@ begin
                   else G_Status:=gs_running;
                   rpls_ForwardStep:=0;
                end;
-           4 : rpls_plcam  :=not rpls_plcam;
+           4 : rpls_POVCam  :=not rpls_POVCam;
            5 : rpls_showlog:=not rpls_showlog;
            6 : sys_fog    :=not sys_fog;
        8..14 : UIPlayer    :=u-8;
@@ -597,7 +597,7 @@ sdlk_tab: begin
          exit;
       end;
 
-      if(rpls_state>=rpls_state_read)then
+      if(rpls_rstate>=rpls_state_read)then
       begin
          for ko:=0 to _mhkeys do  // replays
          begin
@@ -719,7 +719,7 @@ begin
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
-                                                   if(not menu_state)and(G_Started)and(not rpls_plcam)then m_vmove:=true;
+                                                   if(not menu_state)and(G_Started)and(not rpls_POVCam)then m_vmove:=true;
                                                    if(ks_mmiddle=0)then ks_mmiddle:=1;
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(menu_state)then
@@ -829,7 +829,7 @@ mb_attack   : ui_uhint:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_enemy_unum);
        mb_patrol,
        mb_apatrol : mb_Command  (trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx),ui_uhint);
        mb_mark    : mb_MapMarker(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx));
-          else      if(rpls_plcam=false)then m_mmap_move:=true;
+          else      if(rpls_POVCam=false)then m_mmap_move:=true;
           end;
      end
      else
@@ -883,7 +883,7 @@ mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
             then PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_add,PlayerClient)
             else PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_set,PlayerClient);
 
-            if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
+            if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then
               if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_PointClick;
          end;
 
@@ -947,7 +947,7 @@ end;
 
 procedure g_keyboard;
 begin
-   if(not m_vmove)and(not rpls_plcam)then GameCameraMove;
+   if(not m_vmove)and(not rpls_POVCam)then GameCameraMove;
    if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2,nil);
 end;
 
@@ -963,7 +963,7 @@ begin
       menu_mouse;
       if(menu_remake)then
       begin
-         menu_ReInit;
+         menu_ReBuild;
          menu_redraw:=true;
          menu_remake:=false;
       end;

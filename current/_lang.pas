@@ -692,7 +692,7 @@ begin
    end;
 end;
 
-procedure language_eng;
+procedure language_ENG;
 var t: shortstring;
     p: byte;
 begin
@@ -708,8 +708,8 @@ begin
    str_error_ServerFull              := 'Server full!';
    str_error_GameStarted             := 'Game started!';
 
-   str_pstate_AI                     := 'AI';
-   str_pstate_cheater                := 'cheater';
+   str_ptype_AI                      := 'AI';
+   str_ptype_cheater                 := 'cheater';
 
    str_menu_StartGame                := 'START GAME';
    str_menu_EndGame                  := 'END GAME';
@@ -721,13 +721,13 @@ begin
    str_menu_Settings                 := 'SETTINGS';
    str_menu_AboutGame                := 'ABOUT GAME';
    str_menu_ReplayPlayback           := 'REPLAY PLAYBACK';
-   str_menu_PlaybackBreak            := 'PLAYBACK BREAK';
+   str_menu_ReplayQuit               := 'QUIT REPLAY';
 
    str_menu_Surrender                := 'SURRENDER';
    str_menu_LeaveGame                := 'LEAVE GAME';
-   str_menu_back                     := 'BACK';
-   str_menu_exit                     := 'EXIT';
-   str_menu_StartScirmish            := 'START';
+   str_menu_Back                     := 'BACK';
+   str_menu_Exit                     := 'EXIT';
+   str_menu_Start                    := 'START';
    str_menu_lang[true ]              := 'RUS';
    str_menu_lang[false]              := 'ENG';
    str_menu_maction                  := 'Right-click action';
@@ -1387,8 +1387,8 @@ begin
   {str_bool[false]       := tc_red +'íåò';
   str_bool[true ]       := tc_lime+'äà';
 
-  str_pstate_AI           := 'ÈÈ';
-  str_pstate_cheater        := '÷èòåğ';
+  str_ptype_AI           := 'ÈÈ';
+  str_ptype_cheater        := '÷èòåğ';
 
   str_MMap              := 'ÊÀĞÒÀ';
   str_MPlayers          := 'ÈÃĞÎÊÈ';
@@ -1403,8 +1403,8 @@ begin
   str_menu_Settings     := 'ÍÀÑÒĞÎÉÊÈ';
   str_menu_AboutGame    := 'Î ÈÃĞÅ';
   str_menu_Surrender    := 'ÑÄÀÒÜÑß';
-  str_menu_back         := 'ÍÀÇÀÄ';
-  str_menu_exit         := 'ÂÛÕÎÄ';
+  str_menu_Back         := 'ÍÀÇÀÄ';
+  str_menu_Exit         := 'ÂÛÕÎÄ';
 
   str_map_typel[mapt_steppe ] := tc_gray  +'Ñòåïü';
   str_map_typel[mapt_canyon ] := tc_blue  +'Êàíüîí';
@@ -1980,11 +1980,11 @@ hs4:=@g_upids[uid]._up_hint;
    close(f);
 end;
 
-procedure SwitchLanguage;
+procedure language_Switch;
 begin
   if(ui_language)
   then language_rus
-  else language_eng;
+  else language_ENG;
 end;
 
 

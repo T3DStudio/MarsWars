@@ -121,7 +121,7 @@ MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 MaxCPoints             = MaxPlayers*2+(MaxPlayers div 2);
 
-MapCellW               = 86;
+MapCellW               = 88; //86
 MapCellhW              = MapCellW div 2;
 MapSizeCellnStep       = 4;
 MinMapSizeCelln        = 28;
@@ -169,10 +169,7 @@ InvMaxWaves            = 20;
 str_ver                = 'v53';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2024 ]';
-str_ps_c               : array[0..2] of char = (' ','P','C');
-str_ps_t               : char = '?';
-str_ps_h               : char = '<';
-str_ps_none            : shortstring = '--';
+str_pt_none            : shortstring = '--';
 str_b2c                : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
@@ -951,7 +948,7 @@ base_6r                = base_1r*6;
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1*2;
 order_period           = fr_fpsd2+1;
-MinVisionTime                = fr_fps1d2;
+MinVisionTime          = fr_fps1d2;
 
 radar_reload           = fr_fps1*60;
 radar_vision_time      = radar_reload-(fr_fps1*8);
@@ -1385,11 +1382,13 @@ Exit
 
 ////  MAIN
 mi_StartGame              = 1;
+mi_StartScirmish          = 2;
+mi_StartCampaing          = 3;
 
 mi_EndGame                = 5;
 mi_EndSurrender           = 6;
 mi_EndLeave               = 7;
-mi_EndPlaybackBreak       = 8;
+mi_EndReplayQuit          = 8;
 
 mi_SaveLoad               = 9;
 
@@ -1397,7 +1396,6 @@ mi_Settings               = 11;
 mi_AboutGame              = 12;
 mi_back                   = 13;
 mi_exit                   = 14;
-mi_start                  = 15;
 
 mi_title_Campaings        = 21;
 mi_title_Scirmish         = 22;
@@ -1569,15 +1567,11 @@ max_SoundVolume        = 127;
 //  SAVE/LOAD/REPLAY
 //
 
-rpls_file_none         = 0;
-rpls_file_write        = 1;
-rpls_file_read         = 2;
-
 rpls_state_none        = 0;
 rpls_state_write       = 1;
 rpls_state_read        = 2;
 
-ReplayNameLen                = 15;
+ReplayNameLen          = 15;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1585,7 +1579,7 @@ ReplayNameLen                = 15;
 //
 
 MFogM                  = 64;
-fog_CellW              = 36;
+fog_CellW              = 44;
 fog_CellHW             = fog_CellW div 2;
 fog_vfwm               = (vid_maxw div fog_CellW)+2;
 fog_vfhm               = (vid_maxh div fog_CellW)+2;

@@ -781,7 +781,7 @@ begin
                if(speed>0)then
                begin
                   vstp:=UnitMoveStepTicks;
-                  dir :=point_dir(moveLast_x,moveLast_y,x,y);
+                  dir :=point_dir(movePF_destY,movePF_destY,x,y);
                end
                else
                begin

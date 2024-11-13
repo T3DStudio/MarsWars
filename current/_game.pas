@@ -19,7 +19,7 @@ begin
       0:;
       1    :PlayerSetAllowedUnits(p,[ UID_HKeep     ,UID_HCommandCenter,UID_UCommandCenter                    ],0,false);
       else  PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol      ,UID_HKeep          ,UID_HCommandCenter,
-                                         UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter                    ],0,false);
+                                      UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter                    ],0,false);
       end;
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true);
@@ -83,7 +83,7 @@ begin
    with g_players[PlayerTarget] do
    begin
       case newType of
-pt_none : begin isready:=false;name :=str_ps_none;      end;
+pt_none : begin isready:=false;name :=str_pt_none;      end;
 pt_ai   : begin isready:=true; name :=ai_name(ai_skill);end;
 pt_human: begin isready:=false;name :='';               end;
       end;
@@ -276,7 +276,7 @@ begin
 
    if(not G_Started)
    or(PlayerTarget>MaxPlayers)
-   or(rpls_state=rpls_state_read)
+   or(rpls_rstate=rpls_state_read)
    or(not g_deadobservers)then exit;
 
    with g_players[PlayerTarget] do
@@ -436,7 +436,7 @@ begin
       g_players[PlayerClient].name:=PlayerName;
       {$ENDIF}
 
-      map_premap;
+      map_Make1;
    end;
 end;
 
@@ -454,7 +454,7 @@ nmid_lobbby_gamemode    : if(g_preset_cur=0)then
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_mode:=NewVal;
-                             map_premap;
+                             map_Make1;
                           end;
 nmid_lobbby_builders    : begin
                              if(NewVal>gms_g_startb)then exit;
@@ -467,14 +467,14 @@ nmid_lobbby_generators  : begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_generators:=NewVal;
-                             map_premap;
+                             map_Make1;
                           end;
 nmid_lobbby_FixStarts   : if(g_preset_cur=0)then
                           begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_fixed_positions:=NewVal>0;
-                             map_premap;
+                             map_Make1;
                           end;
 nmid_lobbby_DeadPObs: begin
                              GameSetCommonSetting:=true;
@@ -528,7 +528,7 @@ begin
    g_cycle_order    := 0;
    g_cycle_regen    := 0;
 
-   Map_premap;
+   map_Make1;
 
    {$IFDEF _FULLGAME}
    sys_uncappedFPS:=false;
@@ -567,8 +567,8 @@ begin
    svld_str_fname:='';
 
    rpls_pnu  :=0;
-   rpls_plcam:=false;
-   rpls_state:=rpls_state_none;
+   rpls_POVCam:=false;
+   rpls_rstate:=rpls_state_none;
    {$ELSE}
    screen_redraw:=true;
    {$ENDIF}
@@ -621,7 +621,7 @@ begin
    end;
 end;
 
-procedure GameStartSkirmish;
+procedure GameConfigureSkirmish;
 var p:byte;
 begin
    g_royal_r:=trunc(sqrt(sqr(map_hsize)*2));
@@ -633,12 +633,12 @@ begin
 pss_closed   : PlayerSetType(p,pt_none);
 pss_observer : team:=0;
 pss_opened   : if(p>0)and(player_type=pt_none)and(g_ai_slots>0)then
-              begin
-                 ai_skill:=g_ai_slots;
-                 race    :=r_random;
-                 PlayerSetType(p,pt_ai);
-                 if(team=0)then team:=1;
-              end;
+               begin
+                  ai_skill:=g_ai_slots;
+                  race    :=r_random;
+                  PlayerSetType(p,pt_ai);
+                  if(team=0)then team:=1;
+               end;
 pss_AI_1..
 pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         else
@@ -648,6 +648,8 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
 
         team:=PlayerSlotGetTeam(g_mode,p,255);
         race:=slot_race;
+
+        isobserver:=(team=0);
 
         if(p=0)then
         begin
@@ -669,24 +671,27 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
 
    for p:=1 to MaxPlayers do
     with g_players[p] do
-     if(player_type<>pt_none)then
+     if(player_type<>pt_none)and(not isobserver)then
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)and(0<=map_PlayerStartX[p])and(map_PlayerStartX[p]<=map_size)
-                  and(0<=map_PlayerStartY[p])and(map_PlayerStartY[p]<=map_size)then
+        if (0<=map_PlayerStartX[p])and(map_PlayerStartX[p]<=map_size)
+        and(0<=map_PlayerStartY[p])and(map_PlayerStartY[p]<=map_size)then
         begin
-           //GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
-           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
-           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
-           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           GameCreateStartBase(map_PlayerStartX[p],
+                               map_PlayerStartY[p],
+                               uid_race_start_fbase[race],
+                               uid_race_start_abase[race],p,g_start_base,g_generators>0);
            unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
+           //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
         end;
      end;
 
    {$IFDEF _FULLGAME}
    GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
-   if(g_players[PlayerClient].team=0)then
+   if(g_players[PlayerClient].isobserver)then
    begin
       ui_tab:=3;
       UIPlayer:=0;
@@ -696,16 +701,16 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
 end;
 
 
-function GameStart(PlayerRequestor:byte;Check:boolean):boolean;
+function GameStartScirmish(PlayerRequestor:byte;Check:boolean):boolean;
 begin
-   GameStart:=false;
+   GameStartScirmish:=false;
 
    if(G_Started)
    or((PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
 
    if(PlayersReadyStatus)then
    begin
-      GameStart :=true;
+      GameStartScirmish :=true;
       if(Check)then exit;
       G_Started :=true;
       {$IFDEF _FULLGAME}
@@ -714,7 +719,8 @@ begin
       G_Status  :=gs_running;
       vid_panel_timer:=0;
       {$ENDIF}
-      GameStartSkirmish;
+      map_Make2;
+      GameConfigureSkirmish;
    end;
 end;
 function GameBreak(PlayerRequestor:byte;Check:boolean):boolean;
@@ -770,9 +776,9 @@ begin
    then g_ai_slots:=0
    else g_ai_slots:=random(player_default_ai_level+1);
 
-   Map_premap;
+   map_Make1;
 
-   if(andstart)then GameStart(PlayerClient,false);
+   if(andstart)then GameStartScirmish(PlayerClient,false);
 end;
 {$ELSE}
 {$include _ded.pas}
@@ -1054,158 +1060,11 @@ end;
 
 {$include _net_game.pas}
 
-{
-plotLine(x0, y0, x1, y1)
-    dx = abs(x1 - x0)
-    sx = x0 < x1 ? 1 : -1
-    dy = -abs(y1 - y0)
-    sy = y0 < y1 ? 1 : -1
-    error = dx + dy
 
-    while true
-        plot(x0, y0)
-        if x0 == x1 && y0 == y1 break
-        e2 = 2 * error
-        if e2 >= dy
-            if x0 == x1 break
-            error = error + dy
-            x0 = x0 + sx
-        end if
-        if e2 <= dx
-            if y0 == y1 break
-            error = error + dx
-            y0 = y0 + sy
-        end if
-    end while
-}
-procedure AddPoint(tx,ty,tw:integer;color:cardinal);
-begin
-   tx:=tx*MapCellW+tw;
-   ty:=ty*MapCellW+tw;
-   tw*=2;
-   if(RectInCam(tx,ty,tw,tw,0))then
-     UnitsInfoAddRect(tx,ty,tx+MapCellW-tw,ty+MapCellW-tw,color);
-end;
-function LineCollision(x0,y0,x1,y1:integer):boolean;
-var
-dx,dy,
-px,py,
-sx,sy:integer;
-e1,e2:longint;
-begin
-   dx:= abs(x1-x0);
-   dy:=-abs(y1-y0);
-   e1:=dx+dy;
-   if(x0<x1)then sx:= 1 else sx:=-1;
-   if(y0<y1)then sy:= 1 else sy:=-1;
-
-   LineCollision:=false;
-
-   AddPoint(x0,y0,2,c_blue);
-   AddPoint(x1,y1,4,c_lime);
-
-   while(true)do
-   begin
-      if(map_IsNotAlongObstacle(x0,y0))then
-      begin
-         LineCollision:=true;
-         break;
-      end;
-      if(x0=x1)and(y0=y1)then break;
-      px:=x0;
-      py:=y0;
-      AddPoint(x0,y0,6,c_orange);
-      e2:=e1+e1;
-      if(e2>=dy)and(x0<>x1)then
-      begin
-          e1+=dy;
-          x0+=sx;
-      end;
-      if(e2<=dx)and(y0<>y1)then
-      begin
-          e1+=dx;
-          y0+=sy
-      end;
-      if(px<>x0)and(py<>y0)then
-        if( map_IsObstacleZone(map_GetZone(px,y0,false))
-        and map_IsObstacleZone(map_GetZone(x0,py,false)))then
-        begin
-           LineCollision:=true;
-           break;
-        end;
-   end;
-end;
-
-procedure MakeZone(startx,starty:integer);
-var
-local_array_i,
-local_array_n: integer;
-local_array_x,
-local_array_y:array of integer;
-function CheckPoint(px,py:integer):boolean;
-var i:integer;
-begin
-   CheckPoint:=false;
-   if(local_array_n=debug_array_n.MaxValue)then exit;
-   if(map_IsObstacleZone(map_GetZone(px,py,false)))then exit;
-   if(local_array_n>0)then
-    for i:=0 to local_array_n-1 do
-    begin
-       if(px=local_array_x[i])and(py=local_array_y[i])then exit;
-       if  LineCollision(px,py,local_array_x[i],local_array_y[i])
-       and LineCollision(local_array_x[i],local_array_y[i],px,py) then exit;
-    end;
-
-   CheckPoint:=true;
-end;
-procedure ProcPoint(px,py:integer);
-var i:integer;
-begin
-   if(local_array_n=local_array_n.MaxValue)then exit;
-   if(local_array_n>0)then
-    for i:=0 to local_array_n-1 do
-     if(px=local_array_x[i])and(py=local_array_y[i])then exit;
-
-   if(CheckPoint(px,py))then
-   begin
-      local_array_n+=1;
-      setlength(local_array_x,local_array_n);
-      setlength(local_array_y,local_array_n);
-      local_array_x[local_array_n-1]:=px;
-      local_array_y[local_array_n-1]:=py;
-
-      debug_array_n+=1;
-      setlength(debug_array_x,debug_array_n);
-      setlength(debug_array_y,debug_array_n);
-      debug_array_x[debug_array_n-1]:=px;
-      debug_array_y[debug_array_n-1]:=py;
-   end;
-end;
-begin
-   debug_array_n:=0;
-   setlength(debug_array_x,0);
-   setlength(debug_array_y,0);
-
-   local_array_i:=0;
-   local_array_n:=0;
-   setlength(local_array_x,0);
-   setlength(local_array_y,0);
-   ProcPoint(startx,starty);
-
-   while(local_array_i<local_array_n)do
-   begin
-      startx:=local_array_x[local_array_i];
-      starty:=local_array_y[local_array_i];
-      ProcPoint(startx-1,starty);
-      ProcPoint(startx+1,starty);
-      ProcPoint(startx,starty-1);
-      ProcPoint(startx,starty+1);
-      local_array_i+=1;
-   end;
-end;
 
 procedure CodeGame;
 var tx,ty:integer;
+w,dx:word;
 begin
    {$IFDEF _FULLGAME}
    vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
@@ -1248,20 +1107,63 @@ begin
       //if(ks_mright=1)then
       //  MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
 
-      if(ks_mright=1)then
+      if(ks_mleft=1)then
       begin
          debug_Sgx :=mouse_map_x div MapCellW;
          debug_Sgy :=mouse_map_y div MapCellW;
+
+
+         if (0<=debug_Sgx)and(debug_Sgx<MaxMapSizeCelln)
+         and(0<=debug_Sgy)and(debug_Sgy<MaxMapSizeCelln)
+         then debug_d1:=map_grid[debug_Sgx,debug_Sgy].tgc_pf_domain
+         else debug_d1:=0;
+      end;
+      if(ks_mright=1)then
+      begin
+         debug_Dgx :=mouse_map_x div MapCellW;
+         debug_Dgy :=mouse_map_y div MapCellW;
+
+         if (0<=debug_Dgx)and(debug_Dgx<MaxMapSizeCelln)
+         and(0<=debug_Dgy)and(debug_Dgy<MaxMapSizeCelln)
+         then debug_d2:=map_grid[debug_Dgx,debug_Dgy].tgc_pf_domain
+         else debug_d2:=0;
+      end;
+
+      if(ks_mleft=1)or(ks_mright=1)then
+      begin
+         writeln('Sg ',debug_Sgx,' ',debug_Sgy,' ',map_LastCell,' d1 ',debug_d1);
+         writeln('Dg ',debug_Dgx,' ',debug_Dgy,' ',map_LastCell,' d2 ',debug_d2);
+         if(debug_d1>0)and(debug_d2>0)then
+           writeln(map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain);
       end;
 
       if(r_blink2_colorb)then
       begin
+         debug_cell(debug_Sgx,debug_Sgy,5,c_lime);
+         debug_cell(debug_Dgx,debug_Dgy,5,c_blue);
+
+         if(debug_d1>0)and(debug_d2>0)then
+         begin
+            dx:=map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain;
+            if(dx>0)then
+             with map_gridDomainMX[debug_d1-1,dx-1] do
+               if(edgeCells_n>0)then
+                for w:=0 to edgeCells_n-1 do
+                 with edgeCells_l[w] do
+                  UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange);
+         end;
+      end;
+
+         {if(map_gridDomain_n>0)then
+           for w:=0 to map_gridDomain_n-1 do
+             with domain_center_l[w-1] do debug_cell(p_x,p_y,9,map_gridDomain_color[w-1]); }
+
          {debug_Sx  :=mouse_map_x;
          debug_Sy  :=mouse_map_y;
          debug_Sgx :=debug_Sx div MapCellW;
          debug_Sgy :=debug_Sy div MapCellW; }
 
-         LineCollision(debug_Sgx,debug_Sgy,mouse_map_x div MapCellW,mouse_map_y div MapCellW)
+         //map_GridLineCollision(debug_Sgx,debug_Sgy,mouse_map_x div MapCellW,mouse_map_y div MapCellW,0,true);
 
          {if(LineCollision(debug_Sgx,debug_Sgy,0,0))
          then AddPoint(debug_Sgx,debug_Sgy,5,c_red )
@@ -1301,7 +1203,7 @@ begin
       tx:=(debug_Sgx+debug_Svx)*MapCellW+5;
       ty:=(debug_Sgy+debug_Svy)*MapCellW+5;
       UnitsInfoAddRect(tx,ty,tx+MapCellW-10,ty+MapCellW-10,c_orange);  }
-      end;
+
       {$ENDIF}
 
       g_cycle_order:=(g_cycle_order+1) mod order_period;

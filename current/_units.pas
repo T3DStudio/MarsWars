@@ -199,17 +199,19 @@ begin
 end;
 
 procedure unit_TryMoveToXY(pu:PTUnit;newx,newy:integer);
-var cx,cy   :integer;
+var cx,cy,px,py:integer;
 begin
    with pu^ do
      if(ukfly)or(ukfloater)
      then unit_SetXY(pu,newx,newy,mvxy_none,true)
      else
      begin
+        px:=x;
+        py:=y;
         cx:=x;
         cy:=y;
-        if(map_GetZone(cx,newy,true)=zone)then cy:=newy;
-        if(map_GetZone(newx,cy,true)=zone)then cx:=newx;
+        if(map_MapGetZone(cx,newy)=zone)then cy:=newy;
+        if(map_MapGetZone(newx,cy)=zone)then cx:=newx;
 
         if(x<>cx)or(y<>cy)
         then unit_SetXY(pu,cx,cy,mvxy_none,false);
@@ -281,14 +283,14 @@ begin
    begin
       sx:=gridx*MapCellW-MapCellW;
       sy:=gridy*MapCellW-MapCellW;
-      pushr :=min2i(_r,unit_MaxSpeed);
+      pushr:=min2i(_r,unit_MaxSpeed);
       mx:=sx;
       for cx:=-1 to 1 do
       begin
          my:=sy;
          for cy:=-1 to 1 do
          begin
-            if(map_GetZone(gridx+cx,gridy+cy,false)<>zone)then
+            if(map_CellGetZone(gridx+cx,gridy+cy)<>zone)then
             begin
                px:=x;
                py:=y;
@@ -303,219 +305,31 @@ begin
    end;
 end;
 
-{
-vx:=vsx;
-vy:=vsy;
-
-repeat
-   kx:=pl[pp].x+vx;
-   ky:=pl[pp].y+vy;
-   pf_add(kx,ky,pl[pp].p);
-   kx:=vx;
-   vx:=sign(vx-vy);
-   vy:=sign(kx+vy);
-until (vx=vsx)and(vy=vsy);
-}
-
-procedure Vector1Calc(sx,sy,ex,ey:integer;rx,ry:pinteger);
-begin
-   sx:=ex-sx;
-   sy:=ey-sy;
-   if(abs(sx div 2)>abs(sy))then
-   begin
-      rx^:=sign(sx);
-      ry^:=0;
-   end
-   else
-     if(abs(sy div 2)>abs(sx))then
-     begin
-        rx^:=0;
-        ry^:=sign(sy);
-     end
-     else
-     begin
-        rx^:=sign(sx);
-        ry^:=sign(sy);
-     end
-end;
-function Vector1TurnTo(vx,vy:integer;rx,ry:pinteger;TurnTo,Side:boolean):boolean;
-var
-dx,dy,tx:integer;
-begin
-   Vector1TurnTo:=false;
-   dx:=rx^;
-   dy:=ry^;
-   case TurnTo of
-true : begin
-          if(dx= vx)and(dy= vy)then exit;
-          tx:=-dy* vx+dx* vy;
-       end;
-false: begin
-          if(dx=-vx)and(dy=-vy)then exit;
-          tx:=-dy*-vx+dx*-vy;
-       end;
-   end;
-
-   Vector1TurnTo:=true;
-   if(Side)
-   then Side:=(0<=tx)
-   else Side:=(0< tx);
-
-   tx:=vx;
-   if(Side)then
-   begin
-      rx^:=sign(tx+vy);
-      ry^:=sign(vy-tx);
-   end
-   else
-   begin
-      rx^:=sign(tx-vy);
-      ry^:=sign(vy+tx);
-   end;
-end;
-
-procedure Vector1Turn45(rx,ry:pinteger;side:boolean);
-var tx:integer;
-begin
-   tx:=rx^;
-   if(side)then
-   begin
-      rx^:=sign(tx+ry^);
-      ry^:=sign(ry^-tx);
-   end
-   else
-   begin
-      rx^:=sign(tx-ry^);
-      ry^:=sign(ry^+tx);
-   end;
-end;
-procedure Vector1Turn90(rx,ry:pinteger;side:boolean);
-var tx:integer;
-begin
-   tx:=rx^;
-   if(side)then
-   begin
-      rx^:= ry^;
-      ry^:=-tx;
-   end
-   else
-   begin
-      rx^:=-ry^;
-      ry^:= tx;
-   end;
-end;
-
-
-procedure pf_FindNextCell(zone:word;curGridX,curGridY,curX,curY,destX,destY:integer;curVX,curVY,debugDVX,debugDVY:pinteger);
-var
-side,i,
-destVX,
-destVY,
-destGridX,
-destGridY,
-nextVX,
-nextVY,
-nextd    : integer;
-function CheckResult(nvx,nvy:integer):boolean;
-var
-nx,ny,d:integer;
-begin
-   CheckResult:=false;
-   nx:=curGridX+nvx;
-   ny:=curGridY+nvy;
-   if(map_GetZone(nx      ,ny      ,false)<>zone)then exit;
-
-   if(abs(nvx)>0)and(abs(nvy)>0)then
-     if (map_GetZone(curGridX,ny      ,false)<>zone)
-     and(map_GetZone(nx      ,curGridY,false)<>zone)then exit;
-
-   d:=max2i(abs(destGridX-nx),abs(destGridY-ny));
-   if(d<nextd)then
-   begin
-      nextd :=d;
-      nextVX:=nvx;
-      nextVY:=nvy;
-      CheckResult:=true;
-   end;
-end;
-begin
-   nextd :=NOTSET;
-   nextVX:=0;
-   nextVY:=0;
-
-   destGridX:=destX div MapCellW;
-   destGridY:=destY div MapCellW;
-   if (curGridX<>destGridX)or(curGridY<>destGridY)then
-   begin
-      //Vector1Calc(curX,curY,destX,destY,@destVX,@destVY);
-      Vector1Calc(curGridX,curGridY,destGridX,destGridY,@destVX,@destVY);
-
-      if(debugDVX<>nil)then debugDVX^:=destVX;
-      if(debugDVY<>nil)then debugDVY^:=destVY;
-
-      if(curVX^=0)and(curVY^=0)then
-      begin
-         curVX^:=destVX;
-         curVY^:=destVY;
-      end;
-
-      if (curVX^=destVX)
-      and(curVy^=destVY)then
-      begin
-         //writeln('curV==destV');
-         if(not CheckResult(destVX,destVY))then
-         begin
-            i:=0;
-            Vector1Turn45(@destVX,@destVY,false);
-            i+=integer(CheckResult(destVX,destVY));
-            Vector1Turn90(@destVX,@destVY,true );
-            i+=integer(CheckResult(destVX,destVY));
-            if(i=0)then
-            begin
-               i:=0;
-               Vector1Turn45(@destVX,@destVY,true );
-               i+=integer(CheckResult(destVX,destVY));
-               destVX:=-destVX;
-               destVY:=-destVY;
-               i+=integer(CheckResult(destVX,destVY));
-               if(i=0)then
-               begin
-                  i:=0;
-                  Vector1Turn45(@destVX,@destVY,false);
-                  i+=integer(CheckResult(destVX,destVY));
-                  Vector1Turn90(@destVX,@destVY,false);
-                  i+=integer(CheckResult(destVX,destVY));
-                  if(i=0)then
-                  begin
-                     Vector1Turn45(@destVX,@destVY,true );
-                     CheckResult(destVX,destVY);
-                  end;
-               end;
-            end;
-         end;
-      end
-      else
-      begin
-         //writeln('curV<>destV');
-         side:=(-destVX*curVX^)+(destVY*curVY^);
-         for i:=0 to 7 do
-         begin
-            if(CheckResult(destVX,destVY))then break;
-            Vector1Turn45(@destVX,@destVY,side>0);
-         end;
-      end;
-   end;
-
-   curVX^:=nextVX;
-   curVY^:=nextVY;
-end;
-
 procedure unit_move(pu:PTUnit);
 var
 tmpd,curSpeed,
 px,py,
-newx,newy:integer;
-ddir :single;
+newx,newy: integer;
+ddir     : single;
+pf_update: boolean;
+movePF_d2: word;
+function StepCollision(cx,cy:integer;azone,adomain1,adomain2:word):boolean;
+begin
+   StepCollision:=true;
+   cx:=cx div MapCellW;
+   cy:=cy div MapCellW;
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)then
+     with map_grid[cx,cy] do
+     begin
+        if(tgc_pf_zone<>azone)
+        or(azone=0           )then exit;
+        if (adomain1>0)and(adomain2>0)then
+          if (tgc_pf_domain<>adomain1)
+          and(tgc_pf_domain<>adomain2)then exit;
+        StepCollision:=false;
+     end;
+end;
 begin
    with pu^ do
     if(x=vx)and(y=vy)then
@@ -523,6 +337,76 @@ begin
       if(not IsUnitRange(transport,nil))then
        if(unit_canMove(pu))then
        begin
+          pf_update:=false;
+          movePF_direct:=false;
+          if(movePF_destX<>moveCurr_x)or(movePF_destY<>moveCurr_y)then
+          begin
+             if(not uid^._slowturn)then
+               if(x<>moveCurr_x)or(y<>moveCurr_y)then dir:=point_dir(x,y,moveCurr_x,moveCurr_y);
+
+             movePF_destX:=moveCurr_x;
+             movePF_destY:=moveCurr_y;
+             px:=movePF_destX div MapCellW;
+             py:=movePF_destY div MapCellW;
+             if(px<>movePF_destcX)or(py<>movePF_destcY)then pf_update:=true;
+             movePF_destcX:=px;
+             movePF_destcY:=py;
+          end;
+          if(gridx<>movePF_curcX)or(gridy<>movePF_curcY)then
+          begin
+             pf_update:=true;
+             movePF_curcX:=gridx;
+             movePF_curcY:=gridy;
+          end;
+
+          if(ukfly)or(ukfloater)
+          or( (abs(movePF_destcX-movePF_curcX)<2)and(abs(movePF_destcY-movePF_curcY)<2) )
+          then movePF_direct:=true
+          else
+            if(pf_update)then
+            begin
+               movePF_d1:=map_grid[movePF_curcX ,movePF_curcY ].tgc_pf_domain;
+               movePF_d2:=map_grid[movePF_destcX,movePF_destcY].tgc_pf_domain;
+               movePF_dx:=movePF_d1;
+               if(movePF_d1>0)and(movePF_d2>0)then
+                 if(movePF_d1=movePF_d2)
+                 then movePF_direct:=true
+                 else
+                   if(not map_GridLineCollision(movePF_curcX,movePF_curcY,movePF_destcX,movePF_destcY,0))
+                   then movePF_direct:=true
+                   else
+                   begin
+                      movePF_nextX:=x;
+                      movePF_nextY:=y;
+                      movePF_dx:=map_gridDomainMX[movePF_d1-1,movePF_d2-1].nextDomain;
+                      //writeln(movePF_d1,' ',movePF_d2,' ',movePF_dx);
+                      if(movePF_dx>0)then
+                        with map_gridDomainMX[movePF_d1-1,movePF_dx-1] do
+                          if(edgeCells_n>0)then
+                          begin
+                             px:=px.MaxValue;
+                             for newx:=0 to edgeCells_n-1 do
+                               with edgeCells_l[newx] do
+                               begin
+                                  py:=point_dist_rint(x,y,p_x,p_y);
+                                  if(py<px)then
+                                  begin
+                                     px:=py;
+                                     movePF_nextX:=p_x;
+                                     movePF_nextY:=p_y;
+                                  end;
+                               end;
+                          end;
+                   end;
+            end;
+          if(movePF_direct)then
+          begin
+             movePF_d1:=0;
+             movePF_dx:=0;
+             movePF_nextX:=movePF_destX;
+             movePF_nextY:=movePF_destY;
+          end;
+
           curSpeed:=speed;
           with uid^ do
            if(not _ukbuilding)then
@@ -532,49 +416,46 @@ begin
              else curSpeed+=upgr[upgr_race_mspeed_bio [_urace]]*3;
           curSpeed:=mm3i(2,curSpeed,unit_MaxSpeed);
 
-          if(not ukfly)and(not ukfloater)then
-          begin
-             pf_FindNextCell(zone,gridx,gridy,x,y,ua_x,ua_y,@movePath_vx,@movePath_vy,nil,nil);
-             moveCurr_x:=((gridx+movePath_vx)*MapCellW)+(ua_x mod MapCellW);
-             moveCurr_y:=((gridy+movePath_vy)*MapCellW)+(ua_y mod MapCellW);
-          end;
-
-          tmpd:=point_dist_int(x,y,moveCurr_x,moveCurr_y);
+          tmpd:=point_dist_int(x,y,movePF_nextX,movePF_nextY);
           if(tmpd<=curSpeed)then
           begin
-             newx:=moveCurr_x;
-             newy:=moveCurr_y;
+             newx:=movePF_nextX;
+             newy:=movePF_nextY;
              dir :=point_dir(x,y,newx,newy);
           end
           else
           begin
-             if(tmpd>70)
-             then tmpd:=8+g_random(25)
-             else tmpd:=50;
-
-             dir:=dir_turn(dir,point_dir(x,y,moveCurr_x,moveCurr_y),tmpd);
-
+             dir :=dir_turn(dir,point_dir(x,y,movePF_nextX,movePF_nextY),23);
              ddir:=dir*degtorad;
              newx:=x+round(curSpeed*cos(ddir));
              newy:=y-round(curSpeed*sin(ddir));
           end;
 
-          px:=x;
-          py:=y;
-          unit_TryMoveToXY(pu,newx,newy);
-          {if((px=x)<>(py=y))then
+          if(ukfly)or(ukfloater)
+          then unit_SetXY(pu,newx,newy,mvxy_none,true)
+          else
           begin
-             x:=px;
-             y:=py;
-             unit_TryMoveToXY(pu,newx,newy);
-          end;}
-
-          if(not ukfly)and(not ukfloater)
-          then unit_PushOutGrid(pu);
-
-          if(px<>x)or(py<>y)
-          then dir:=DIR360(dir-( mm3i(-90,dir_diff(dir,point_dir(px,py,x,y)),90) div 2 ))
-          else dir:=DIR360(dir-g_randomr(90));
+             px:=x;
+             py:=y;
+             if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
+             if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+             if(x=px)and(y=py)
+             then dir+=90+g_random(180)
+             else
+               if(x=newx)and(y=newy)
+               then
+               else
+               begin
+                  newx:=px+(sign(x-px)*curSpeed);
+                  newy:=py+(sign(y-py)*curSpeed);
+                  if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
+                  if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+                  if(x=px)and(y=py)
+                  then dir+=90+g_random(180)
+                  else dir:=point_dir(px,py,x,y)
+               end;
+          end;
+          unit_UpdateXY(pu,true);
        end;
 end;
 
@@ -1297,7 +1178,8 @@ uab_RebuildInPoint   : if(speed>0)then
                           unit_psability:=true;
                           if(not Check)then
                           begin
-                             pushOut_all(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false, not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                             //not ukfloater or(player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0)
+                             pushOut_all(o_x,o_y,g_uids[_rebuild_uid]._r,unum,@o_x,@o_y,false);
                              unit_SetOrder(pu,0,o_x,o_y,-1,-1,ua_psability,false);
                           end;
                        end;
@@ -1306,7 +1188,8 @@ uab_CCFly            : if(speed>0)then
                           unit_psability:=true;
                           if(not Check)then
                           begin
-                             pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                             //player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0
+                             pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false );
                              unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability,false);
                           end;
                        end
@@ -1316,7 +1199,8 @@ uab_CCFly            : if(speed>0)then
                            then unit_psability:=true
                            else
                            begin
-                              pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false, player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                              // player^.upgr[upgr_race_extbuilding[uid^._urace]]<=0
+                              pushOut_all(o_x,o_y,_r,unum,@o_x,@o_y,false );
                               unit_SetOrder(pu,0,o_x,o_y-fly_hz,-1,-1,ua_psability,false);
                               unit_psability:=true;
                            end;
@@ -1750,10 +1634,10 @@ begin
       unit_attack(pu);
 
       if(pTransport=nil)and(cycle_order=g_cycle_order)then
-        if(moveLast_x<>x)or(moveLast_y<>y)then
+        if(movePF_destX<>x)or(movePF_destY<>y)then
         begin
-           moveLast_x:=x;
-           moveLast_y:=y;
+           movePF_destX:=x;
+           movePF_destY:=y;
         end;
    end
    else
@@ -1810,16 +1694,6 @@ begin
          end;
       end
       else WaitForNextTarget:=0;
-
-      if(pTransport=nil)then
-        if(unit_canMove(pu))then
-          if(moveLast_x<>moveCurr_x)or(moveLast_y<>moveCurr_y)then
-          begin
-             if(not uid^._slowturn)and(player^.player_type<>pt_ai)then
-               if(x<>moveCurr_x)or(y<>moveCurr_y)then dir:=point_dir(x,y,moveCurr_x,moveCurr_y);
-             moveLast_x:=moveCurr_x;
-             moveLast_y:=moveCurr_y;
-          end;
    end;
 end;
 
@@ -1887,9 +1761,10 @@ begin
 end;
 
 procedure GameObjectsCode;
-var u : integer;
-    pu,
-    transportu: PTUnit;
+var
+u         : integer;
+pu,
+transportu: PTUnit;
 begin
    for u:=1 to MaxUnits do
    begin

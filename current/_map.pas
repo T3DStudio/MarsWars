@@ -1,6 +1,21 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  COMMON
+
+function map_InGridRange(a:integer):boolean;
+begin
+   map_InGridRange:=(0<=a)and(a<=map_LastCell); //MaxMapSizeCelln
+end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  VISUAL
+
 {$IFDEF _FULLGAME}
 
-procedure map_seed2theme;
+procedure map_ThemeFromSeed;
 var
 theme,
 terrain,
@@ -46,7 +61,7 @@ begin
    SetThemeTES;
 end;
 
-procedure map_MakeVisGrid;
+procedure map_VisGridMake;
 var
  x, y,
 mx,my,
@@ -102,17 +117,26 @@ begin
    begin
       i:=abs((x+1)*(y+1)+tgca_decal_n) mod 10;
       if(i=0)then
-        while(i>=0)do
-        begin
+        //while(i>=0)do
+        //begin
            SetDecal(theme_cur_decal_l[abs((x+1)*(y+1)+i) mod theme_cur_decal_n]);
-           i-=1;
-        end;
+           //i-=1;
+        //end;
    end;
 end;
+function CheckDecorCell(cx,cy:integer):boolean;
+begin
+   CheckDecorCell:=false;
+   if map_InGridRange(cx) and map_InGridRange(cy)then
+     with map_grid      [cx,cy] do
+     with map_grid_graph[cx,cy] do
+       if(tgc_solidlevel=mgsl_rocks)and(tgca_decor_n=0)then
+         CheckDecorCell:=true;
+end;
+
 begin
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid      [x,y] do
    with map_grid_graph[x,y] do
    begin
       tgca_decor_n:=0;
@@ -122,8 +146,8 @@ begin
    end;
    FillChar(map_grid_graph,SizeOf(map_grid_graph),0);
 
-   for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
+   for x:=0 to MaxMapSizeCelln-1 do
    with map_grid      [x,y] do
    with map_grid_graph[x,y] do
    begin
@@ -158,9 +182,12 @@ mgsl_rocks  : begin
                  if(theme_cur_2rock_n>0)and(tgca_decor_n=0)then
                    if ((x+1)<MaxMapSizeCelln)
                    and((y+1)<MaxMapSizeCelln)then
-                     if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
-                     and(map_grid[x+1,y+1].tgc_solidlevel=mgsl_rocks)
-                     and(map_grid[x  ,y+1].tgc_solidlevel=mgsl_rocks)
+                     //if (map_grid[x+1,y  ].tgc_solidlevel=mgsl_rocks)
+                     //and(map_grid[x+1,y+1].tgc_solidlevel=mgsl_rocks)
+                     //and(map_grid[x  ,y+1].tgc_solidlevel=mgsl_rocks)
+                     if  CheckDecorCell(x+1,y  )
+                     and CheckDecorCell(x+1,y+1)
+                     and CheckDecorCell(x  ,y+1)
                      then
                      begin
                         mx+=MapCellHW;
@@ -210,6 +237,11 @@ end;
 
 {$ENDIF}
 
+function x2CellCenter(x:integer):integer;
+begin
+   x2CellCenter:=(x div MapCellW)*MapCellW+MapCellhW;
+end;
+
 function map_GetSymmetryDir:integer;
 begin
    case map_symmetry of
@@ -227,7 +259,7 @@ maps_lineR: begin
                then map_GetSymmetryDir:=DIR360(map_GetSymmetryDir+180);
             end;
    else
-            map_GetSymmetryDir:=180;
+            map_GetSymmetryDir:=(DIR360(map_seed) div 45)*45;
    end;
 end;
 
@@ -269,59 +301,27 @@ end;
 //
 //  MAP ZONES
 
-function map_GetZone(cx,cy:integer;mapXY:boolean):word;
+function map_CellGetZone(cx,cy:integer):word;
 begin
-   map_GetZone:=map_GetZone.MaxValue;
-   if(mapXY)then
-   begin
-      cx:=cx div MapCellW;
-      cy:=cy div MapCellW;
-   end;
    if (0<=cx)and(cx<=map_LastCell)
    and(0<=cy)and(cy<=map_LastCell)
-   then map_GetZone:=map_grid[cx,cy].tgc_area;
+   then map_CellGetZone:=map_grid[cx,cy].tgc_pf_zone
+   else map_CellGetZone:=map_CellGetZone.MaxValue;
+end;
+function map_MapGetZone(mx,my:integer):word;
+begin
+   map_MapGetZone:=map_CellGetZone(mx div MapCellW,my div MapCellW);
 end;
 
 function map_IsObstacleZone(zone:word):boolean;
 begin
-   if(zone=0)
-   then map_IsObstacleZone:=true
-   else map_IsObstacleZone:=(zone>map_gridLastFZone);
+   map_IsObstacleZone:=(zone=0)or(zone>map_gridZone_n);
 end;
 
-function map_IsNotAlongObstacle(x,y:integer):boolean;
-function map_GetZone2(cx,cy:integer):word;
+function map_ZoneFillPart(x,y:integer;zone:word;Check:boolean):boolean;
 begin
-   if (0<=cx)and(cx<=map_LastCell)
-   and(0<=cy)and(cy<=map_LastCell)
-   then map_GetZone2:=map_grid[cx,cy].tgc_area
-   else map_GetZone2:=map_gridLastFZone;
-end;
-begin
-   map_IsNotAlongObstacle:=false;
-   if(map_IsObstacleZone(map_GetZone2(x,y)))then
-     map_IsNotAlongObstacle:=map_IsObstacleZone(map_GetZone2(x-1,y-1))
-                       or map_IsObstacleZone(map_GetZone2(x  ,y-1))
-                       or map_IsObstacleZone(map_GetZone2(x+1,y-1))
-                       or map_IsObstacleZone(map_GetZone2(x-1,y  ))
-                       or map_IsObstacleZone(map_GetZone2(x+1,y  ))
-                       or map_IsObstacleZone(map_GetZone2(x-1,y+1))
-                       or map_IsObstacleZone(map_GetZone2(x  ,y+1))
-                       or map_IsObstacleZone(map_GetZone2(x+1,y+1));
-end;
+   map_ZoneFillPart:=false;
 
-procedure map_ZonesClear;
-var x,y:byte;
-begin
-   map_gridLastZone :=0;
-   map_gridLastFZone:=0;
-   for x:=0 to MaxMapSizeCelln-1 do
-   for y:=0 to MaxMapSizeCelln-1 do
-   with map_grid[x,y] do tgc_area:=0;
-end;
-
-procedure map_ZoneFillPart(x,y:integer;zone:word;obstacleZones:boolean);
-begin
    if(x<0)
    or(y<0)
    or(x>map_LastCell)
@@ -329,63 +329,535 @@ begin
 
    with map_grid[x,y] do
    begin
-      case obstacleZones of
-      false: if(tgc_solidlevel>=mgsl_liquid)then exit;
-      true : if(tgc_solidlevel< mgsl_liquid)then exit;
-      end;
+      if(tgc_solidlevel>=mgsl_liquid)then exit;
+      if(tgc_pf_zone>0)then exit;
 
-      if(tgc_area>0)then exit;
-      tgc_area:=zone
+      map_ZoneFillPart:=true;
+
+      if(Check)then exit;
+
+      tgc_pf_zone:=zone;
    end;
 
-   map_ZoneFillPart(x-1,y  ,zone,obstacleZones);
-   map_ZoneFillPart(x+1,y  ,zone,obstacleZones);
-   map_ZoneFillPart(x  ,y-1,zone,obstacleZones);
-   map_ZoneFillPart(x  ,y+1,zone,obstacleZones);
+   map_ZoneFillPart(x-1,y  ,zone,false);
+   map_ZoneFillPart(x+1,y  ,zone,false);
+   map_ZoneFillPart(x  ,y-1,zone,false);
+   map_ZoneFillPart(x  ,y+1,zone,false);
 end;
 
-procedure map_ZonesFill;
-procedure ZonesFillProc(obstacleZones:boolean);
-var x,y:byte;
+procedure map_ZonesMake;
+var x,y:integer;
+begin
+   map_gridZone_n:=0;
+   for x:=0 to MaxMapSizeCelln-1 do
+   for y:=0 to MaxMapSizeCelln-1 do
+     with map_grid[x,y] do
+       tgc_pf_zone:=0;
+
+   for x:=0 to map_LastCell do
+   for y:=0 to map_LastCell do
+     with map_grid[x,y] do
+       if(map_ZoneFillPart(x,y,0,true))then
+       begin
+          map_gridZone_n+=1;
+          map_ZoneFillPart(x,y,map_gridZone_n,false);
+       end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  PATH FIND
+
+type
+TtmpGrid = array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of word;
+ptmpGrid = ^TtmpGrid;
+var
+tmpGrid  : ptmpGrid;
+
+procedure map_pf_InitTmpGrid;
+begin
+   new(tmpGrid);
+   FillChar(tmpGrid^,sizeOf(TtmpGrid),0);
+end;
+
+procedure map_pf_MarkSolidCells;
+var x,y:integer;
+function SolidLevel(cx,cy:integer):boolean;
+begin
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)
+   then SolidLevel:=map_grid[cx,cy].tgc_solidlevel>=mgsl_liquid
+   else SolidLevel:=false;
+end;
+function CheckNoSolidAround(cx0,cy0,cx1,cy1:integer):boolean;
+var x,y:integer;
+begin
+   CheckNoSolidAround:=true;
+   for x:=cx0 to cx1 do
+   for y:=cy0 to cy1 do
+     if(x=cx0)or(y=cy0)or(x=cx1)or(y=cy1)then
+       if(SolidLevel(x,y))then
+       begin
+          CheckNoSolidAround:=false;
+          exit;
+       end;
+end;
 begin
    for x:=0 to map_LastCell do
    for y:=0 to map_LastCell do
-   with map_grid[x,y] do
-   begin
-      case obstacleZones of
-      false: if(tgc_solidlevel>=mgsl_liquid)then continue;
-      true : if(tgc_solidlevel< mgsl_liquid)then continue;
-      end;
+     with map_grid[x,y] do
+       if(SolidLevel(x,y))then
+         tgc_pf_solid:= not(CheckNoSolidAround(x-1,y-1,x+1,y+1)
+                         or CheckNoSolidAround(x-2,y-2,x+1,y+1)
+                         or CheckNoSolidAround(x-1,y-2,x+2,y+1)
+                         or CheckNoSolidAround(x-2,y-1,x+1,y+2)
+                         or CheckNoSolidAround(x-1,y-1,x+2,y+2));
+end;
 
-      if(tgc_area=0)then
+procedure debug_cell(cx,cy,cw:integer;color:cardinal);
+begin
+   cx:=cx*MapCellw+cw;
+   cy:=cy*MapCellw+cw;
+   cw*=2;
+   UnitsInfoAddRect(cx,cy,cx+MapCellw-cw,cy+MapCellw-cw,color);
+end;
+
+function map_GridLineCollision(x0,y0,x1,y1:integer;domainCheck:word):boolean;
+var
+dx,dy,
+px,py,
+sx,sy:integer;
+e1,e2:longint;
+function map_GetPFSolid(cx,cy:integer):boolean;
+begin
+   map_GetPFSolid:=true;
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)then
+     with map_grid[cx,cy] do
+       if(domainCheck>0)and(tgc_pf_domain>0)
+       then map_GetPFSolid:=tgc_pf_solid or (domainCheck<>tgc_pf_domain)
+       else map_GetPFSolid:=tgc_pf_solid;
+end;
+begin
+   if map_GetPFSolid(x0,y0)
+   or map_GetPFSolid(x1,y1)then
+   begin
+      map_GridLineCollision:=true;
+      exit;
+   end;
+
+   dx:= abs(x1-x0);
+   dy:=-abs(y1-y0);
+   e1:=dx+dy;
+   if(x0<x1)then sx:=1 else sx:=-1;
+   if(y0<y1)then sy:=1 else sy:=-1;
+
+   map_GridLineCollision:=false;
+
+   while(true)do
+   begin
+      if(map_GetPFSolid(x0,y0))then
       begin
-         map_gridLastZone+=1;
-         map_ZoneFillPart(x,y,map_gridLastZone,obstacleZones);
+         map_GridLineCollision:=true;
+         break;
       end;
+      if(x0=x1)and(y0=y1)then break;
+      px:=x0;
+      py:=y0;
+      e2:=e1+e1;
+      if(e2>=dy)and(x0<>x1)then
+      begin
+          e1+=dy;
+          x0+=sx;
+      end;
+      if(e2<=dx)and(y0<>y1)then
+      begin
+          e1+=dx;
+          y0+=sy
+      end;
+      if(px<>x0)and(py<>y0)then
+        if  map_GetPFSolid(px,y0)
+        and map_GetPFSolid(x0,py) then
+        begin
+           map_GridLineCollision:=true;
+           break;
+        end;
+   end;
+end;
+
+procedure map_pf_DomainsClear;
+var d1,d2:word;
+begin
+   if(map_gridDomain_n>0)then
+    for d1:=0 to map_gridDomain_n-1 do
+    for d2:=0 to map_gridDomain_n-1 do
+      with map_gridDomainMX[d1,d2] do
+       setlength(edgeCells_l,0);
+
+   map_gridDomain_n:=0;
+   setlength(map_gridDomainMX,0,0);
+end;
+
+procedure map_pf_DomainsFill;
+var
+x,y         :integer;
+domain2count: array of word;
+domain2point,
+tmp_points_l: array of TPoint;
+tmp_points_n,dn,
+tmp_points_i: word;
+function FillDomain(cx,cy:integer):boolean;
+var i:word;
+begin
+   FillDomain:=false;
+
+   if(cx<0)
+   or(cy<0)
+   or(cx>map_LastCell)
+   or(cy>map_LastCell)then exit;
+
+   with map_grid[cx,cy] do
+   begin
+      if(tgc_solidlevel>=mgsl_liquid)
+      or(tgc_pf_domain>0)
+      or(tgc_pf_domain=map_gridDomain_n)
+      or(tgc_pf_solid)then exit;
+
+      if(tmp_points_n>0)then
+        for i:=0 to tmp_points_n-1 do
+          with tmp_points_l[i] do
+           if (map_GridLineCollision(cx,cy,p_x,p_y,map_gridDomain_n)
+           and map_GridLineCollision(p_x,p_y,cx,cy,map_gridDomain_n))then exit;
+
+      FillDomain:=true;
+
+      tgc_pf_domain  :=map_gridDomain_n;
+   end;
+
+   tmp_points_n+=1;
+   setlength(tmp_points_l,tmp_points_n);
+   with tmp_points_l[tmp_points_n-1] do
+   begin
+      p_x:=cx;
+      p_y:=cy;
+   end;
+end;
+procedure StartFillDomain(sx,sy:integer);
+procedure AddCount(px,py:integer);
+begin
+   domain2count[map_gridDomain_n-1]+=1;
+   with domain2point[map_gridDomain_n-1] do
+   begin
+      p_x:=px;
+      p_y:=py;
    end;
 end;
 begin
-   map_ZonesClear;
-   ZonesFillProc(false);
-   map_gridLastFZone:=map_gridLastZone;
-   ZonesFillProc(true );
+   tmp_points_i:=0;
+   tmp_points_n:=0;
+   setlength(tmp_points_l,0);
+
+   if(map_gridDomain_n=65535)then exit;
+
+   map_gridDomain_n+=1;
+   if(not FillDomain(sx,sy))then
+   begin
+      map_gridDomain_n-=1;
+      exit;
+   end;
+
+   setlength(domain2point,map_gridDomain_n);
+   setlength(domain2count,map_gridDomain_n);
+   domain2count[map_gridDomain_n-1]:=0;
+   AddCount(sx,sy);
+
+   while(tmp_points_i<tmp_points_n)do
+   begin
+      with tmp_points_l[tmp_points_i] do
+      begin
+         if(FillDomain(p_x-1,p_y))then AddCount(p_x-1,p_y);
+         if(FillDomain(p_x+1,p_y))then AddCount(p_x+1,p_y);
+         if(FillDomain(p_x,p_y-1))then AddCount(p_x,p_y-1);
+         if(FillDomain(p_x,p_y+1))then AddCount(p_x,p_y+1);
+      end;
+      tmp_points_i+=1;
+   end;
+end;
+procedure CheckDomainNeighbor(cx,cy:integer);
+var d:word;
+begin
+   if(cx<0)
+   or(cy<0)
+   or(cx>map_LastCell)
+   or(cy>map_LastCell)then exit;
+
+   d:=map_grid[cx,cy].tgc_pf_domain;
+   if(d>0)then
+   begin
+      d-=1;
+      if(domain2count[d]<tmp_points_i)then
+      begin
+         tmp_points_i:=domain2count[d];
+         dn:=d;
+      end;
+   end;
+end;
+
+begin
+   setlength(domain2point,0);
+   setlength(domain2count,0);
+
+   for x:=0 to MaxPlayers do
+     StartFillDomain(map_PlayerStartX[x] div MapCellw,map_PlayerStartY[x] div MapCellw);
+
+   for x:=0 to map_LastCell do
+   for y:=0 to map_LastCell do
+     StartFillDomain(x,y);
+
+   if(map_gridDomain_n>0)then
+     for tmp_points_n:=0 to map_gridDomain_n-1 do
+       if(domain2count[tmp_points_n]=1)then
+       begin
+          dn:=0;
+          tmp_points_i:=tmp_points_i.MaxValue;
+          with domain2point[tmp_points_n] do
+          begin
+             CheckDomainNeighbor(p_x-1,p_y);
+             CheckDomainNeighbor(p_x+1,p_y);
+             CheckDomainNeighbor(p_x,p_y-1);
+             CheckDomainNeighbor(p_x,p_y+1);
+             if(tmp_points_i<tmp_points_i.MaxValue)then
+             begin
+                map_grid[p_x,p_y].tgc_pf_domain:=dn+1;
+             end;
+          end;
+       end;
+
+   writeln('map_gridDomain_n ',map_gridDomain_n);
+   setlength(domain2point,0);
+   setlength(domain2count,0);
+end;
+
+procedure map_pf_DomainEdges;
+var
+d1,d2:word;
+x ,y :integer;
+function GetDomain(cx,cy:integer):word;
+begin
+   GetDomain:=GetDomain.MaxValue;
+   if (0<=cx)and(cx<=map_LastCell)
+   and(0<=cy)and(cy<=map_LastCell)then
+    with map_grid[cx,cy] do
+     if(tgc_pf_domain>0)
+     then GetDomain:=tgc_pf_domain-1;
+end;
+procedure CheckAddDomainEdge(cx,cy:integer);
+begin
+   d2:=GetDomain(cx,cy);
+   if(d2<d2.MaxValue)and(d1<>d2)then
+     with map_gridDomainMX[d1,d2] do
+     begin
+        edgeCells_n+=1;
+        setlength(edgeCells_l,edgeCells_n);
+        with edgeCells_l[edgeCells_n-1] do
+        begin
+           p_x:=cx;
+           p_y:=cy;
+        end;
+     end;
+end;
+begin
+   setlength(map_gridDomainMX,map_gridDomain_n,map_gridDomain_n);
+   for d1:=0 to map_gridDomain_n-1 do
+   for d2:=0 to map_gridDomain_n-1 do
+     with map_gridDomainMX[d1,d2] do
+     begin
+        nextDomain :=0;
+        edgeCells_n:=0;
+        setlength(edgeCells_l,0);
+     end;
+
+   for x:=0 to map_LastCell do
+   for y:=0 to map_LastCell do
+     with map_grid[x,y] do
+      if(tgc_pf_domain>0)and(tgc_pf_zone>0)then
+      begin
+         d1:=tgc_pf_domain-1;
+         CheckAddDomainEdge(x-1,y);
+         CheckAddDomainEdge(x+1,y);
+         CheckAddDomainEdge(x,y-1);
+         CheckAddDomainEdge(x,y+1);
+      end;
+end;
+
+procedure map_pf_MakeNext;
+var
+d1,d2,dx,di,
+wave_init_n,
+wave_data_n,
+wave_data_i  : word;
+wave_data_dl : array of word;
+wave_data_pl,
+wave_init_pl : array of TPoint;
+domain_zone_l: array of word;
+need_wave    : boolean;
+procedure WavePoint(cx,cy:integer;rootDomain,skipDomain:word);
+begin
+   if(cx<0)
+   or(cy<0)
+   or(cx>map_LastCell)
+   or(cy>map_LastCell)then exit;
+
+   if(tmpGrid^[cx,cy]=skipDomain)then exit;
+
+   with map_grid[cx,cy] do
+   begin
+      if(tgc_pf_domain=0)
+      or(tgc_pf_domain=skipDomain)
+      or(tgc_pf_solid)then exit;
+
+      if(rootDomain=0)then rootDomain:=tgc_pf_domain;
+
+      with map_gridDomainMX[skipDomain-1,tgc_pf_domain-1] do
+       if(nextDomain=0)and(tgc_pf_domain<>skipDomain)and(tgc_pf_domain<>rootDomain)then
+        nextDomain:=rootDomain;
+   end;
+   tmpGrid^[cx,cy]:=skipDomain;
+
+   wave_data_n+=1;
+   setlength(wave_data_pl,wave_data_n);
+   setlength(wave_data_dl,wave_data_n);
+   wave_data_dl[wave_data_n-1]:=rootDomain;
+   with wave_data_pl[wave_data_n-1] do
+   begin
+      p_x:=cx;
+      p_y:=cy;
+   end;
+end;
+begin
+   setlength(domain_zone_l,map_gridDomain_n-1);
+   for d1:=0 to map_LastCell do
+   for d2:=0 to map_LastCell do
+    with map_grid[d1,d2] do
+     if(tgc_pf_zone>0)and(tgc_pf_domain>0)then
+      domain_zone_l[tgc_pf_domain-1]:=tgc_pf_zone;
+
+   map_pf_InitTmpGrid;
+
+   for d1:=0 to map_gridDomain_n-1 do
+   begin
+      need_wave:=false;
+      for d2:=0 to map_gridDomain_n-1 do
+        with map_gridDomainMX[d1,d2] do
+          if(d1=d2)
+          then nextDomain:=d1+1
+          else
+            if(edgeCells_n>0)
+            then nextDomain:=d2+1
+            else
+              if(domain_zone_l[d1]=domain_zone_l[d2])
+              then need_wave:=true;
+
+      if(need_wave)then
+      begin
+         // wave initial points list
+         wave_init_n:=0;
+         setlength(wave_init_pl,0);
+         for d2:=0 to map_gridDomain_n-1 do
+           with map_gridDomainMX[d1,d2] do
+            if(d1<>d2)and(edgeCells_n>0)then
+             for dx:=0 to edgeCells_n-1 do
+             begin
+                wave_init_n+=1;
+                setlength(wave_init_pl,wave_init_n);
+                wave_init_pl[wave_init_n-1]:=edgeCells_l[dx];
+             end;
+
+         di:=d1+1;
+         if(wave_init_n>0)then
+         begin
+            wave_data_n:=0;
+            wave_data_i:=0;
+            setlength(wave_data_pl,0);
+            setlength(wave_data_dl,0);
+
+            for dx:=0 to wave_init_n-1 do
+              with wave_init_pl[dx] do
+                WavePoint(p_x,p_y,0,di);
+
+            while(wave_data_i<wave_data_n)do
+            begin
+               with wave_data_pl[wave_data_i] do
+               begin
+                  dx:=wave_data_dl[wave_data_i];
+                  WavePoint(p_x-1,p_y  ,dx,di);
+                  WavePoint(p_x+1,p_y  ,dx,di);
+                  WavePoint(p_x  ,p_y-1,dx,di);
+                  WavePoint(p_x  ,p_y+1,dx,di);
+               end;
+               wave_data_i+=1;
+            end;
+         end;
+      end;
+   end;
+   dispose(tmpGrid);
+   wave_data_n:=0;
+   wave_data_i:=0;
+   wave_init_n:=0;
+   setlength(wave_data_pl,0);
+   setlength(wave_data_dl,0);
+   setlength(wave_init_pl,0);
+end;
+
+procedure map_pf_MakeDomains;
+var time:cardinal;
+d1,d2,w:word;
+begin
+   // clear domains
+   time:=sdl_GetTicks;
+   map_pf_DomainsClear;
+   writeln('Domains: clear ',sdl_GetTicks-time);
+
+   // make domains
+   time:=sdl_GetTicks;
+   map_pf_DomainsFill;
+   writeln('Domains: make ',sdl_GetTicks-time);
+
+   if(map_gridDomain_n=0)then exit;
+
+   // make domain edgeds
+   time:=sdl_GetTicks;
+   map_pf_DomainEdges;
+   writeln('Domains: edges ',sdl_GetTicks-time);
+
+   // make 'next' domain
+   time:=sdl_GetTicks;
+   map_pf_MakeNext;
+   writeln('Domains: next ',sdl_GetTicks-time);
+
+   // make edges cx to mx
+   for d1:=0 to map_gridDomain_n-1 do
+   for d2:=0 to map_gridDomain_n-1 do
+     with map_gridDomainMX[d1,d2] do
+       if(edgeCells_n>0)then
+         for w:=0 to edgeCells_n-1 do
+           with edgeCells_l[w] do
+           begin
+              p_x:=(p_x*MapCellW)+MapCellhW;
+              p_y:=(p_y*MapCellW)+MapCellhW;
+           end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  CHECKS
 
-function map_InGridRange(a:integer):boolean;
-begin
-   map_InGridRange:=(0<=a)and(a<=map_LastCell); //MaxMapSizeCelln
-end;
-
-function CheckMapBorders(x,y,aborder:integer):boolean;
+function map_InMapRange(x,y,aborder:integer):boolean;
 begin
    if(x=NOTSET)or(y=NOTSET)
-   then CheckMapBorders:=true
-   else CheckMapBorders:=(-aborder<=x)and(x<=(map_size+aborder))
-                      and(-aborder<=y)and(y<=(map_size+aborder));
+   then map_InMapRange:=true
+   else map_InMapRange:=(-aborder<=x)and(x<=(map_size+aborder))
+                     and(-aborder<=y)and(y<=(map_size+aborder));
 end;
 
 function map_IfHereObjectCell(cx,cy:byte;baser:integer;players:boolean):byte;
@@ -486,7 +958,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCaptureR>0)then cppzone:=map_GetZone(cpx,cpy,true);
+     if(cpCaptureR>0)then cppzone:=map_MapGetZone(cpx,cpy);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -539,14 +1011,14 @@ begin
       dst:=max2i(base_1rh,map_size div 8);
       while(c<1000)do
       begin
-         basex:=u+g_random(b);
-         basey:=u+g_random(b);
+         basex:=x2CellCenter(u+g_random(b));
+         basey:=x2CellCenter(u+g_random(b));
          SymmetryXY(basex,basey,map_size,@symx,@symy,map_symmetry);
 
          c+=1;
          if(c>500)then dst-=1;
 
-         if CheckMapBorders(symx,symy,0)then
+         if map_InMapRange(symx,symy,0)then
            if (not map_IfPlayerStartHere(basex,basey,symx,symy,dst))
            and(not map_IfCPointHere     (basex,basey,symx,symy,dst))then
            begin
@@ -588,21 +1060,6 @@ end;
 //
 //  PLAYER STARTS
 
-procedure map_PlayerStartsCircle(r,sdir:integer);
-const dstep = 360 div MaxPlayers;
-var i:byte;
-begin
-   sdir:=abs(sdir mod 360)+(dstep div 2);
-   for i:=1 to 3 do
-   begin
-      sdir+=dstep;
-      map_PlayerStartX[i  ]:=map_hsize+round(r*cos(sdir*degtorad));
-      map_PlayerStartY[i  ]:=map_hsize+round(r*sin(sdir*degtorad));
-      map_PlayerStartX[i+3]:=map_size-map_PlayerStartX[i];
-      map_PlayerStartY[i+3]:=map_size-map_PlayerStartY[i];
-   end;
-end;
-
 procedure map_ShufflePlayerStarts(teamShuffle:boolean);
 var
 x,y:byte;
@@ -616,6 +1073,21 @@ begin
         i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
         i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
      end;
+end;
+
+procedure map_PlayerStartsCircle(r,sdir:integer);
+const dstep = 360 div MaxPlayers;
+var i:byte;
+begin
+   sdir:=abs(sdir mod 360)+(dstep div 2);
+   for i:=1 to 3 do
+   begin
+      sdir+=dstep;
+      map_PlayerStartX[i  ]:=map_hsize+round(r*cos(sdir*degtorad));
+      map_PlayerStartY[i  ]:=map_hsize+round(r*sin(sdir*degtorad));
+      map_PlayerStartX[i+3]:=map_size-map_PlayerStartX[i];
+      map_PlayerStartY[i+3]:=map_size-map_PlayerStartY[i];
+   end;
 end;
 
 procedure map_PlayerStartsDefault(FreeCenterR:integer);
@@ -644,7 +1116,7 @@ begin
          c+=1;
          if(c>500)then r-=1;
 
-         if(CheckMapBorders(symx,symy,-bb0))then
+         if(map_InMapRange(symx,symy,-bb0))then
            if(c>1000)
            or (not map_IfPlayerStartHere(basex,basey,symx,symy,r)
            and(point_dist_int(basex,basey,map_hsize,map_hsize)>FreeCenterR)
@@ -686,8 +1158,8 @@ gm_3x3     :begin
 
                case map_type of
                mapt_clake  : ix:=round(60*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
-               mapt_shore : ix:=round(60*(MinMapSize/map_size))+round(5*(map_size/MinMapSize));
-               else         ix:=round(65*(MinMapSize/map_size));
+               mapt_shore  : ix:=round(60*(MinMapSize/map_size))+round(5*(map_size/MinMapSize));
+               else          ix:=round(65*(MinMapSize/map_size));
                end;
 
                map_PlayerStartX[1]:=round(map_hsize+cos( i    *degtorad)*u);
@@ -741,6 +1213,12 @@ gm_capture :begin
    else
                map_PlayerStartsDefault(byte(map_type=mapt_clake)*(map_size div 3));
    end;
+
+   for i:=1 to MaxPlayers do
+   begin
+      map_PlayerStartX[i]:=x2CellCenter(map_PlayerStartX[i]);
+      map_PlayerStartY[i]:=x2CellCenter(map_PlayerStartY[i]);
+   end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -793,24 +1271,33 @@ end;
 //
 //  MAP GENERATOR BASE
 
-procedure map_Fill(tx,ty,tr:integer;value,skipFactor:byte;startsR:integer;replace:boolean);
+procedure map_GridFill(tx,ty,tr:integer;value,skipFactor:byte;startsR:integer;replace,outLineR:boolean);
+var d:integer;
 begin
    map_GridCycleInit;
 
+   d:=NOTSET;
    repeat
-     if(map_grid[map_gcx,map_gcy].tgc_solidlevel=mgsl_free)or(replace)then
+     if(map_grid[map_gcx,map_gcy].tgc_solidlevel=mgsl_free)or(replace)or(outLineR)then
      begin
+        if(tr<>0)or(outLineR)then d:=point_dist_int(tx,ty,map_gcx,map_gcy);
+
         if(skipFactor>0)then
           if(random_table[byte(byte(map_gcx+1)*byte(map_gcy+map_gcx+1)+byte(tx+ty+tr))] mod skipFactor)>0 then continue;
 
         if(tr>0)then
-          if(point_dist_int(tx,ty,map_gcx,map_gcy)> tr)then continue;
+          if(outLineR)then
+          begin if(abs(abs(tr)-d)>1 )then continue; end
+          else  if(d> tr)then continue;
 
         if(tr<0)then
-          if(point_dist_int(tx,ty,map_gcx,map_gcy)<-tr)then continue;
+          if(outLineR)then
+          begin if(abs(abs(tr)-d)<=1)then continue; end
+          else  if(d<-tr)then continue;
 
         if (map_IfHereObjectCell(map_gcx,map_gcy,startsR,true )<>1)
-        and(map_IfHereObjectCell(map_gcx,map_gcy,-1     ,false) =0)then
+        and(map_IfHereObjectCell(map_gcx,map_gcy,-1     ,false) =0)
+        or (value=mgsl_free)then
         begin
            map_grid[ map_gcx, map_gcy].tgc_solidlevel:=value;
            if(map_gcsx<>NOTSET)then
@@ -818,6 +1305,38 @@ begin
         end;
      end;
    until(not map_GridCycleNext)
+end;
+
+procedure map_GridCutCircles();
+var
+tx,ty:integer;
+procedure CircleBy2Points(tx0,ty0,tx1,ty1:integer);
+begin
+   tx0:=tx0 div MapCellW;
+   ty0:=ty0 div MapCellW;
+   tx1:=tx1 div MapCellW;
+   ty1:=ty1 div MapCellW;
+   map_GridFill((tx0+tx1) div 2,
+                (ty0+ty1) div 2,
+                point_dist_int(tx0,ty0,tx1,ty1) div 2,
+                mgsl_free,0,0,true,true);
+end;
+
+begin
+
+   for tx:=0 to MaxPlayers do
+   begin
+      //if(tx mod 3)=0 then CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],map_hsize,map_hsize);
+
+      for ty:=0 to tx do
+        if(tx<>ty)and(abs(tx-ty)<2)then
+          CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],
+                          map_PlayerStartX[ty],map_PlayerStartY[ty]);
+
+      CircleBy2Points(map_hsize,map_hsize,
+      map_hsize+sign(map_PlayerStartX[tx]-map_hsize)*map_size,
+      map_hsize+sign(map_PlayerStartY[tx]-map_hsize)*map_size);
+   end;
 end;
 
 procedure map_RandomBaseVars;
@@ -828,8 +1347,8 @@ end;
 
 procedure map_Vars;
 begin
-   map_size        := mm3i(MinMapSize,map_size,MaxMapSize);
    map_RandomBaseVars;
+   map_size        := mm3i(MinMapSize,map_size,MaxMapSize);
    map_hsize       := map_size div 2;
    map_symmetryDir := map_GetSymmetryDir;
    map_LastCell    := map_size div MapCellW;
@@ -843,62 +1362,64 @@ begin
    {$ENDIF}
 end;
 
-procedure map_ReMake;
+procedure map_GridMake;
 var msrx,px,py:integer;
 begin
-   map_RandomBaseVars;
-   map_CPoints;
-
    FillChar(map_grid,SizeOf(map_grid),0);
-   map_ZonesClear;
 
    msrx:=integer(map_seed);
 
    case map_type of
-mapt_steppe : map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r,false);
+mapt_steppe : begin
+              map_GridFill(msrx,0, 0,mgsl_nobuild, 7,base_1r,false,false);
+              map_GridFill(msrx,1, 0,mgsl_rocks  ,24,base_1r,false,false);
+              map_GridFill(msrx,2, 0,mgsl_liquid ,32,base_1r,false,false);
+              end;
 mapt_canyon : begin
-              map_Fill(msrx,1,-1,mgsl_rocks  , 7,base_1r,false);
-              map_Fill(msrx,2,-1,mgsl_nobuild,25,base_1r,false);
+              map_GridFill(msrx,0, 0,mgsl_liquid ,0 ,base_1r,false,false);
+              map_GridFill(msrx,1, 0,mgsl_rocks  ,18,base_1r,true ,false);
+              map_GridFill(msrx,2, 0,mgsl_nobuild,24,base_1r,false,false);
+              map_GridCutCircles;
               end;
 mapt_clake,
 mapt_ilake  : begin
-              map_Fill(map_CenterCell,map_CenterCell,(map_LastCell div 3),mgsl_liquid ,0,base_1r,false);
-              map_Fill(msrx,3,-1,mgsl_nobuild,18,base_1r,false);
-              map_Fill(msrx,4,-1,mgsl_rocks  ,18,base_1r,false);
+              map_GridFill(map_CenterCell,map_CenterCell,(map_LastCell div 3),mgsl_liquid ,0,base_1r,false,false);
+              map_GridFill(msrx,3, 0,mgsl_nobuild,18,base_1r,false,false);
+              map_GridFill(msrx,4, 0,mgsl_rocks  ,18,base_1r,false,false);
               end;
 mapt_island : begin
               px:=map_CenterCell div 4;
               py:=map_LastCell div 4;
-              map_Fill(map_CenterCell-px+integer(map_seed mod byte(py)),
-                       map_CenterCell-px+integer(g_random_i mod py),
-                       -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false);
-              map_Fill(msrx,5,-1,mgsl_nobuild,18,base_1r,false);
-              map_Fill(msrx,6,-1,mgsl_rocks  ,18,base_1r,false);
+              map_GridFill(map_CenterCell-px+integer(map_seed mod byte(py)),
+                           map_CenterCell-px+integer(g_random_i mod py),
+                           -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false,false);
+              map_GridFill(msrx,5, 0,mgsl_nobuild,18,base_1r,false,false);
+              map_GridFill(msrx,6, 0,mgsl_rocks  ,18,base_1r,false,false);
               end;
 mapt_shore  : begin
-              if(map_symmetry=maps_point)
-              then map_Fill(map_CenterCell+round(map_LastCell*10.3*cos((map_seed mod 360)*degtorad)),
-                            map_CenterCell+round(map_LastCell*10.3*sin((map_seed mod 360)*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false)
-              else map_Fill(map_CenterCell+round(map_LastCell*10  *cos(map_symmetryDir*degtorad)),
-                            map_CenterCell+round(map_LastCell*10  *sin(map_symmetryDir*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false);
-              map_Fill(msrx,7,-1,mgsl_nobuild,16,base_1r,false);
-              map_Fill(msrx,8,-1,mgsl_rocks  ,16,base_1r,false);
-              map_Fill(msrx,1,-1,mgsl_rocks  ,64,base_1r,true );
+              if(map_symmetry=maps_point)then
+              begin
+                 map_GridFill(map_CenterCell+round(map_LastCell*10.25*cos((map_seed mod 360)*degtorad)),
+                              map_CenterCell+round(map_LastCell*10.25*sin((map_seed mod 360)*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false,false);
+                 map_GridFill(msrx,7, 0,mgsl_nobuild,24,base_1r,false,false);
+                 map_GridFill(msrx,8, 0,mgsl_rocks  ,24,base_1r,false,false);
+                 map_GridFill(msrx,1, 0,mgsl_rocks  ,86,base_1r,true ,false);
+              end
+              else
+              begin
+                 map_GridFill(map_CenterCell+round(map_LastCell*10  *cos(map_symmetryDir   *degtorad)),
+                              map_CenterCell+round(map_LastCell*10  *sin(map_symmetryDir   *degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false,false);
+                 map_GridFill(msrx,7, 0,mgsl_nobuild,16,base_1r,false,false);
+                 map_GridFill(msrx,8, 0,mgsl_rocks  ,16,base_1r,false,false);
+                 map_GridFill(msrx,1, 0,mgsl_rocks  ,64,base_1r,true ,false);
+              end;
               end;
 mapt_sea    : begin
-              map_Fill(msrx,9,-1,mgsl_liquid ,0,base_1r,false);
-              map_Fill(msrx,0,-1,mgsl_nobuild,7,base_1r,false);
-              map_Fill(msrx,1,-1,mgsl_rocks  ,64,base_1r,true );
+              map_GridFill(msrx,9, 0,mgsl_liquid ,0 ,base_1r,false,false);
+              map_GridFill(msrx,0, 0,mgsl_nobuild,7 ,base_1r,false,false);
+              map_GridFill(msrx,1, 0,mgsl_rocks  ,64,base_1r,true ,false);
               end;
    end;
-
-   map_ZonesFill;
-
-   map_CPoints_UpdatePFZone;
-   {$IFDEF _FULLGAME}
-   map_MakeVisGrid;
-   vid_map_RedrawBack:=true;
-   {$ENDIF}
 end;
 
 procedure Map_randomseed;
@@ -915,15 +1436,29 @@ begin
    map_symmetry:=random(gms_m_symm +1);
 end;
 
-procedure Map_premap;
+procedure map_Make1;
 begin
    map_Vars;
    map_PlayerStarts;
+   map_CPoints;
+   map_GridMake;
    {$IFDEF _FULLGAME}
-   map_seed2theme;
-   gfx_MakeThemeTiles;
+   map_ThemeFromSeed;
+   map_MinimapBackground;
+   map_RedrawMenuMinimap;
    {$ENDIF}
-   map_ReMake;
+end;
+
+procedure map_Make2;
+begin
+   map_ZonesMake;
+   map_pf_MarkSolidCells;
+   map_pf_MakeDomains;
+   map_CPoints_UpdatePFZone;
+   {$IFDEF _FULLGAME}
+   gfx_MakeThemeTiles;
+   map_VisGridMake;
+   {$ENDIF}
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -945,14 +1480,14 @@ nmid_lobbby_mapseed  : begin
                           map_SetSetting:=true;
                           if(Check)then exit;
                           map_seed:=newVal;
-                          map_premap;
+                          map_Make1;
                        end;
 nmid_lobbby_mapsize  : begin
                           if(newVal<MinMapSize)or(MaxMapSize<newVal)then exit;
                           map_SetSetting:=true;
                           if(Check)then exit;
                           map_size:=integer(newVal);
-                          map_premap;
+                          map_Make1;
                        end;
 nmid_lobbby_type     : begin
                           newVal:=byte(newVal);
@@ -960,7 +1495,7 @@ nmid_lobbby_type     : begin
                           map_SetSetting:=true;
                           if(Check)then exit;
                           map_type:=newVal;
-                          map_premap;
+                          map_Make1;
                        end;
 nmid_lobbby_symmetry : begin
                           newVal:=byte(newVal);
@@ -968,7 +1503,7 @@ nmid_lobbby_symmetry : begin
                           map_SetSetting:=true;
                           if(Check)then exit;
                           map_symmetry:=newVal;
-                          map_premap;
+                          map_Make1;
                        end;
    end;
 end;

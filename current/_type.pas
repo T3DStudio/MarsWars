@@ -182,7 +182,7 @@ end;
 
 TReplayPos = record
    rp_fpos : int64;
-   rp_gtick: cardinal;
+   rp_gstep: cardinal;
 end;
 
 TMapTerrainGridCellDecor = record
@@ -217,9 +217,20 @@ end;
 //   GAME
 //
 
+TPoint = record
+   p_x,p_y:integer;
+end;
+TMapGridPFDomainData = record
+   nextDomain,
+   edgeCells_n: word;
+   edgeCells_l: array of TPoint;
+end;
+
 TMapTerrainGridCell = record
    tgc_solidlevel: byte;
-   tgc_area      : word;
+   tgc_pf_solid  : boolean;
+   tgc_pf_zone,
+   tgc_pf_domain : word;
 end;
 
 TDamageMod = array[0..MaxDamageModFactors] of record
@@ -635,6 +646,7 @@ TUnit = record
    speed,dir,
    reload,vstp,
    unum     : integer;
+
    zone     : word;
 
    level,
@@ -660,15 +672,21 @@ TUnit = record
    a_tar_cl,
 
    moveCurr_x ,moveCurr_y ,
-   moveLast_x ,moveLast_y ,
-   movePath_x ,movePath_y ,
-   movePath_vx,movePath_vy,
 
    ua_bx,ua_by,
    ua_x ,ua_y,
    ua_tar
             : integer;
    ua_id    : byte;
+
+
+   movePF_direct
+            : boolean;
+   movePF_nextX,movePF_destX,movePF_destcX,movePF_curcX,
+   movePF_nextY,movePF_destY,movePF_destcY,movePF_curcY
+            : integer;
+   movePF_d1,
+   movePF_dx: word;
 
    transport,
    pains,

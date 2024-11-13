@@ -429,7 +429,7 @@ begin
     with log_l[log_i] do
      case mtype of
 0..MaxPlayers         : if(mtype<>PlayerClient)
-                        or((rpls_state>=rpls_state_read)and(PlayerClient=0))then SoundPlayUI(snd_chat);
+                        or((rpls_rstate>=rpls_state_read)and(PlayerClient=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=MaxPlayers)then

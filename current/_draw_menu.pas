@@ -367,9 +367,10 @@ mi_SaveLoad                : D_menu_MButtonD(tar,i,str_menu_SaveLoad ,'',true);
 mi_Settings                : D_menu_MButton (tar,i,str_menu_Settings         );
 mi_AboutGame               : D_menu_MButton (tar,i,str_menu_AboutGame        );
 
-mi_back                    : D_menu_MButton (tar,i,str_menu_back             );
-mi_exit                    : D_menu_MButton (tar,i,str_menu_exit             );
-mi_start                   : D_menu_MButton (tar,i,str_menu_StartScirmish    );
+mi_back                    : D_menu_MButton (tar,i,str_menu_Back             );
+mi_exit                    : D_menu_MButton (tar,i,str_menu_Exit             );
+mi_StartScirmish,
+mi_StartCampaing           : D_menu_MButton (tar,i,str_menu_Start            );
 
 mi_settings_ColoredShadows : D_menu_MButtonD(tar,i,str_menu_ColoredShadow   ,str_bool[vid_ColoredShadow]         ,false);
 mi_settings_ShowAPM        : D_menu_MButtonD(tar,i,str_menu_APM             ,str_bool[vid_APM]                   ,false);
@@ -383,7 +384,7 @@ mi_settings_PanelPosition  : D_menu_MButtonD(tar,i,str_menu_PanelPos        ,str
 mi_settings_PlayerColors   : D_menu_MButtonD(tar,i,str_menu_PlayersColor    ,str_menu_PlayersColorl[vid_plcolors],true );
 
 {
-if(rpls_state>rpls_state_none)and(g_cl_units>0)
+if(rpls_rstate>rpls_state_none)and(g_cl_units>0)
 then D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,i2s(min2i(cl_UpT_array[rpls_Quality]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_Quality]
                                                                                            ,true ,0,0)
 else D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_Quality]           ,true ,0,0);
@@ -471,7 +472,7 @@ mi_map_Theme               : D_menu_MButton (tar,i,theme_name[theme_cur]);
 mi_map_MiniMap             : with menu_items[i] do
                              begin
                              D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,2);
-                             draw_surf(tar,mi_x0,mi_y0,r_minimap);
+                             draw_surf(tar,mi_x0,mi_y0,r_mminimap);
                              end;
 
 mi_game_mode               : D_menu_MButtonD(tar,i,str_menu_GameMode     ,str_emnu_GameModel[g_mode]        ,true );
@@ -502,8 +503,13 @@ mi_mplay_NetSearchStart    : D_menu_MButton (tar,i,str_menu_LANSearchStart );
 mi_mplay_NetSearchList     : D_menu_List(tar,i,net_svsearch_listn,net_svsearch_scroll,net_svsearch_sel,menu_netsearch_lineh,menu_netsearch_listh,@net_svsearch_lists); //D_menu_LANSearchList(tar,i);
 
 mi_replays_list            : D_menu_List (tar,i,rpls_list_size,rpls_list_scroll,rpls_list_sel,menu_replays_lineh,menu_replays_listh,@rpls_list); //D_menu_ReplaysList(tar,i);
-mi_title_ReplayInfo1       : D_menu_EText(tar,i,ta_LM,rpls_str_info1,false,0,0);
-mi_title_ReplayInfo2       : D_menu_EText(tar,i,ta_LM,rpls_str_info2,false,0,0);
+mi_title_ReplayInfo1       : begin
+                             D_menu_EText(tar,i,ta_LU,rpls_str_info1,false,0,0);
+                             D_menu_EText(tar,i,ta_LM,rpls_str_info2,false,0,0);
+                             D_menu_EText(tar,i,ta_LD,rpls_str_info3,false,0,0);
+                             writeln('replay info');
+                             end;
+mi_title_ReplayInfo2       : D_menu_EText(tar,i,ta_LM,rpls_str_infoS,false,0,0);
 
 mi_saveload_list           : D_menu_List (tar,i,svld_list_size,svld_list_scroll,svld_list_sel,menu_saveload_lineh,menu_saveload_listh,@svld_list);
 mi_saveload_fname          : with menu_items[i] do
@@ -515,6 +521,7 @@ mi_title_SaveInfo          : begin
                              D_menu_EText(tar,i,ta_LU,svld_str_info1,false,0,0);
                              D_menu_EText(tar,i,ta_LM,svld_str_info2,false,0,0);
                              D_menu_EText(tar,i,ta_LD,svld_str_info3,false,0,0);
+                             writeln('save info');
                              end;
 
 
@@ -561,14 +568,12 @@ end;
 
 procedure D_Menu;
 var i:integer;
-  //tstr:shortstring;
 begin
    if(menu_redraw)then
    begin
-      map_RedrawMenuMinimap(vid_map_RedrawBack);
+      //map_RedrawMenuMinimap(r_mminimap,true);
       d_UpdateMenu(r_menu);
       menu_redraw:=false;
-      vid_map_RedrawBack:=false;
 
       if(menu_list_n>0)then
        with menu_items[menu_item] do

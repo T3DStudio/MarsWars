@@ -75,8 +75,9 @@ map_symmetryDir   : integer  = 0;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..MaxPlayers] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
-map_gridLastFZone : word = 0;
-map_gridLastZone  : word = 0;
+map_gridZone_n    : word = 0;
+map_gridDomain_n  : word = 0;
+map_gridDomainMX  : array of array of TMapGridPFDomainData;
 
 map_gcx,
 map_gcy,
@@ -155,6 +156,8 @@ debug_Dgx,
 debug_Dgy,
 debug_Dvx,
 debug_Dvy         : integer;
+debug_d1,
+debug_d2,
 debug_zone        : word;
 debug_array_n     : integer;
 debug_array_x,
@@ -173,8 +176,9 @@ sys_fog           : boolean = false;
 r_panel,
 r_uipanel,
 r_empty,
-r_minimap,
 r_bminimap,
+r_gminimap,
+r_mminimap,
 r_screen,
 r_menu            : pSDL_SURFACE;
 r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
@@ -196,7 +200,7 @@ ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
 
-vid_map_RedrawBack: boolean = false;
+//vid_map_RedrawBack: boolean = false;
 
 menu_state        : boolean = true;
 menu_page1        : byte = mp_main;
@@ -357,13 +361,17 @@ svld_file_size    : cardinal = 0;
 rpls_Recording    : boolean = false;
 rpls_StartRecordPause
                   : byte = 0;
-rpls_fstatus      : byte = 0;    // file status (none,write,read)
+rpls_fstate       : byte = 0;    // file status (none,write,read)
 rpls_pnu          : integer = 0;
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
-rpls_state        : byte = rpls_state_none;
+rpls_str_info3    : shortstring = '';
+rpls_str_infoS    : shortstring = '';
+rpls_rstate       : byte = rpls_state_none;
+rpls_head_itemn   : integer = 0;
+rpls_head_items   : array of TSaveLoadItem;
 rpls_list         : array of shortstring;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
@@ -375,7 +383,7 @@ rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_POVPlayer       : byte = 0;
 rpls_showlog      : boolean = false;
-rpls_plcam        : boolean = false;
+rpls_POVCam        : boolean = false;
 rpls_ticks        : byte = 0;
 rpls_file_head_size
                   : cardinal = 0;
@@ -552,10 +560,10 @@ theme_last_crater_tes     : byte = 255;
 theme_last_liquid_tes     : byte = 255;
 theme_last_liquid_tas     : byte = 255;
 
-theme_last_tile_terrain_id: integer = integer.MinValue;
-theme_last_tile_crater_id : integer = integer.MinValue;
-theme_last_tile_liquid_id : integer = integer.MinValue;
-theme_last_tile_teleport_id:integer = integer.MinValue;
+theme_last_tile_terrain_id: integer = -1;
+theme_last_tile_crater_id : integer = -1;
+theme_last_tile_liquid_id : integer = -1;
+theme_last_tile_teleport_id:integer = -1;
 
 // current/new
 theme_cur_crater_tes      : byte = tes_nature; // theme liquid edge style
@@ -799,8 +807,8 @@ str_map_size,
 str_map_sym,
 str_map_random,
 
-str_pstate_AI,
-str_pstate_cheater      : shortstring;
+str_ptype_AI,
+str_ptype_cheater      : shortstring;
 
 str_menu_PlayerSlots    : array[0..ps_states_n-1] of shortstring;
 str_menu_StartGame,
@@ -813,12 +821,12 @@ str_menu_LoadReplay,
 str_menu_Settings,
 str_menu_AboutGame,
 str_menu_ReplayPlayback,
-str_menu_PlaybackBreak,
+str_menu_ReplayQuit,
 str_menu_Surrender,
 str_menu_LeaveGame,
-str_menu_back,
-str_menu_StartScirmish,
-str_menu_exit,
+str_menu_Back,
+str_menu_Start,
+str_menu_Exit,
 str_menu_connecting,
 str_menu_maction,
 str_menu_settingsGame,

@@ -14,11 +14,11 @@ procedure ai_scout_pick(pu:PTUnit);forward;
 //procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function map_IsObstacleZone(zone:word):boolean; forward;
-function map_GetZone(cx,cy:integer;mapXY:boolean):word;forward;
+function map_CellGetZone(cx,cy:integer):word;forward;
+function map_MapGetZone(mx,my:integer):word;forward;
 function map_InGridRange(a:integer):boolean;forward;
 
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
-procedure Vector1Calc(sx,sy,ex,ey:integer;rx,ry:pinteger); forward;
 
 procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;azone:word);forward;
 
@@ -1044,19 +1044,19 @@ end;
 function ai_name(ain:byte):shortstring;
 begin
    if(ain=0)
-   then ai_name:=str_ps_none
+   then ai_name:=str_pt_none
    else
      {$IFDEF _FULLGAME}
      case ain of
-     0  : ai_name:=str_pstate_AI+' '+tc_gray  +b2s(ain)+tc_default;
-     1  : ai_name:=str_pstate_AI+' '+tc_blue  +b2s(ain)+tc_default;
-     2  : ai_name:=str_pstate_AI+' '+tc_aqua  +b2s(ain)+tc_default;
-     3  : ai_name:=str_pstate_AI+' '+tc_lime  +b2s(ain)+tc_default;
-     4  : ai_name:=str_pstate_AI+' '+tc_green +b2s(ain)+tc_default;
-     5  : ai_name:=str_pstate_AI+' '+tc_yellow+b2s(ain)+tc_default;
-     6  : ai_name:=str_pstate_AI+' '+tc_orange+b2s(ain)+tc_default;
-     7  : ai_name:=str_pstate_AI+' '+tc_red   +b2s(ain)+tc_default;
-     else ai_name:=str_pstate_AI+' '+str_pstate_cheater+' '+tc_purple+b2s(ain)+tc_default;
+     0  : ai_name:=str_ptype_AI+' '+tc_gray  +b2s(ain)+tc_default;
+     1  : ai_name:=str_ptype_AI+' '+tc_blue  +b2s(ain)+tc_default;
+     2  : ai_name:=str_ptype_AI+' '+tc_aqua  +b2s(ain)+tc_default;
+     3  : ai_name:=str_ptype_AI+' '+tc_lime  +b2s(ain)+tc_default;
+     4  : ai_name:=str_ptype_AI+' '+tc_green +b2s(ain)+tc_default;
+     5  : ai_name:=str_ptype_AI+' '+tc_yellow+b2s(ain)+tc_default;
+     6  : ai_name:=str_ptype_AI+' '+tc_orange+b2s(ain)+tc_default;
+     7  : ai_name:=str_ptype_AI+' '+tc_red   +b2s(ain)+tc_default;
+     else ai_name:=str_ptype_AI+' '+str_ptype_cheater+' '+tc_purple+b2s(ain)+tc_default;
      end;
      {$ELSE}
      if(ain<8)
@@ -1215,6 +1215,121 @@ end;
 
 {$IFDEF _FULLGAME}
 
+function str_SpaceSize(str:shortstring;newSize:byte):shortstring;
+var l,i:byte;
+begin
+   str_SpaceSize:=str;
+   l:=0;
+   i:=length(str_SpaceSize);
+   while(i>0)do
+   begin
+      if not(str_SpaceSize[i] in tc_SpecialChars)then l+=1;
+      i-=1;
+   end;
+   if(newSize>l)then
+   begin
+      while(l<newSize)do
+      begin
+         l+=1;
+         str_SpaceSize+=' ';
+      end;
+   end
+   else
+     if(newSize<l)then
+       setlength(str_SpaceSize,newSize);
+end;
+
+function GStep2TimeStr(gstep:cardinal):shortstring;
+var
+s , m, h: cardinal;
+ss,sm,sh:shortstring;
+begin
+   s:=gstep div fr_fps1;
+   m:=s div 60;
+   s:=s mod 60;
+   h:=m div 60;
+   m:=m mod 60;
+
+   GStep2TimeStr:='';
+   if(h>0)then
+   begin
+      if(h<10)then sh:='0'+c2s(h) else sh:=c2s(h);
+      GStep2TimeStr:=sh+':';
+   end;
+   if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
+   if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
+   GStep2TimeStr+=sm+':'+ss;
+end;
+
+function str_NowDateTime:shortstring;
+var YY,MM,DD,H,M,S,MS:word;
+begin
+   DeCodeDate(Date,YY,MM,DD);
+   DeCodeTime(Time,H,M,S,MS);
+   str_NowDateTime:=w2s(YY)+'_'+w2s(MM)+'_'+w2s(DD)+' '+w2s(H)+'-'+w2s(M)+'-'+w2s(S)+'-'+w2s(MS);
+end;
+
+// replay/save
+function FileReadBaseGameInfo(var f:file;str_info1,str_info2:pshortstring):boolean;
+const dots: shortstring = ': ';
+var
+dbyte : byte;
+dint  : integer;
+dcard : cardinal;
+begin
+   FileReadBaseGameInfo:=false;
+   dbyte:=0;
+   dint :=0;
+   dcard:=0;
+
+   // TIME
+   BlockRead(f,dcard,SizeOf(G_Step       ));str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+GStep2TimeStr(dcard)+tc_nl2+tc_nl2+str_menu_map+tc_nl2+' ';
+
+   // MAP info
+   BlockRead(f,dcard,SizeOf(map_seed     ));str_info1^+=str_SpaceSize(str_map_seed+dots,12)+c2s(dcard)+tc_nl2+' ';
+   BlockRead(f,dint ,SizeOf(map_size     ));
+   if(dint<MinMapSize)or(MaxMapSize<dint)
+                                 then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info1^+=str_SpaceSize(str_map_size+dots,12)+i2s(dint)+tc_nl2+' ';
+
+   BlockRead(f,dbyte,SizeOf(map_type     ));
+   if(dbyte>gms_m_types         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info1^+=str_SpaceSize(str_map_type+dots,12)+str_map_typel[dbyte]+tc_default+tc_nl2+' ';
+
+   BlockRead(f,dbyte,SizeOf(map_symmetry ));
+   if(dbyte>gms_m_symm          )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info1^+=str_SpaceSize(str_map_sym +dots,12)+str_map_syml[dbyte]+tc_nl2+' ';
+
+   BlockRead(f,dint ,SizeOf(theme_cur    ));
+   if(dint<0)or(dint>=theme_n   )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info1^+=theme_name[dint];
+
+   // GAME info
+   str_info2^+=tc_nl2;
+   BlockRead(f,dbyte,SizeOf(g_mode           ));
+   if not(dbyte in allgamemodes )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info2^+=str_menu_GameMode+dots+str_emnu_GameModel[dbyte]+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(g_start_base     ));
+   if(dbyte>gms_g_startb        )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info2^+=str_menu_StartBase+dots+b2s(dbyte+1)+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(g_generators     ));
+   if(dbyte>gms_g_maxgens       )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info2^+=str_menu_Generators+dots+str_menu_Generatorsl[dbyte]+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(g_fixed_positions));
+                                            str_info2^+=str_menu_FixedStarts+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(g_deadobservers  ));
+                                            str_info2^+=str_menu_DeadObservers+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(g_ai_slots       ));
+   if(dbyte>gms_g_maxai         )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info2^+=str_menu_AISlots+dots+ai_name(dbyte);
+   FileReadBaseGameInfo:=true;
+end;
+
 procedure UpdateLastSelectedUnit(u:integer);
 var tu:PTUnit;
 begin
@@ -1318,7 +1433,7 @@ begin
    if(not sys_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state=rpls_state_read)
+     if(rpls_rstate=rpls_state_read)
      or(g_players[PlayerClient].isobserver)then exit;
 
    if(tu^.TeamVision[g_players[UIPlayer].team]>0)then exit;
@@ -1331,7 +1446,7 @@ begin
    ui_CheckUnitFullFogVision:=false;
    if(tu=nil)then exit;
 
-   if(rpls_state>=rpls_state_read)
+   if(rpls_rstate>=rpls_state_read)
    or(g_players[PlayerClient].isobserver)then
    begin
       if(UIPlayer=0)

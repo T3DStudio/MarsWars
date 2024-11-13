@@ -543,7 +543,7 @@ animStepX,
 animStepY: integer;
 maskColor: cardinal;
 upd_tiles : boolean;
-function Compare(cur_id,last_id:pinteger):byte;
+{function Compare(cur_id,last_id:pinteger):byte;
 begin
    Compare:=0;
    if(0<=cur_id^)and(cur_id^<theme_all_terrain_n)then
@@ -554,16 +554,16 @@ begin
         Compare:=2;
         last_id^:=cur_id^;
      end;
-end;
+end; }
 function DefaultTile(cur_id,last_id:pinteger;TargetTile:ppSDL_Surface):boolean;
 begin
    DefaultTile:=false;
    if(cur_id^<>last_id^)then
    begin
       gfx_SDLSurfaceFree(TargetTile^);
-      if(cur_id^<0)or(theme_all_terrain_n<=cur_id^)
-      then TargetTile^:=r_empty
-      else DefaultTile:=true;
+      if(0<=cur_id^)and(cur_id^<theme_all_terrain_n)
+      then DefaultTile:=true
+      else TargetTile^:=r_empty;
       last_id^:=cur_id^;
    end;
 end;
@@ -773,7 +773,8 @@ begin
    r_empty   :=gfx_SDLSurfaceCreate(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_minimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   r_gminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   r_mminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
    r_bminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
 
    vid_UIItem_n :=0;
@@ -979,23 +980,23 @@ begin
    gfx_MWSModelLoad(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect ,firstload);
    gfx_MWSModelLoad(@spr_blood          ,effects_folder+'blood'          ,smt_effect ,firstload);
 
-   gfx_MWTextureLoad(@spr_mp[r_hell]    ,race_dir[r_hell]+'h_mp'        ,firstload,true);
-   gfx_MWTextureLoad(@spr_mp[r_uac ]    ,race_dir[r_uac ]+'u_mp'        ,firstload,true);
-   gfx_MWTextureLoad(@spr_ptur          ,race_dir[r_uac ]+'ptur'        ,firstload,true);
+   gfx_MWTextureLoad(@spr_mp[r_hell]    ,race_dir[r_hell]+'h_mp'         ,firstload,true);
+   gfx_MWTextureLoad(@spr_mp[r_uac ]    ,race_dir[r_uac ]+'u_mp'         ,firstload,true);
+   gfx_MWTextureLoad(@spr_ptur          ,race_dir[r_uac ]+'ptur'         ,firstload,true);
 
-   gfx_MWTextureLoad(@spr_b4_a          ,race_buildings[r_uac ]+'u_b4_a',firstload,true);
-   gfx_MWTextureLoad(@spr_b7_a          ,race_buildings[r_uac ]+'u_b7_a',firstload,true);
-   gfx_MWTextureLoad(@spr_b9_a          ,race_buildings[r_uac ]+'u_b9_a',firstload,true);
+   gfx_MWTextureLoad(@spr_b4_a          ,race_buildings[r_uac ]+'u_b4_a' ,firstload,true);
+   gfx_MWTextureLoad(@spr_b7_a          ,race_buildings[r_uac ]+'u_b7_a' ,firstload,true);
+   gfx_MWTextureLoad(@spr_b9_a          ,race_buildings[r_uac ]+'u_b9_a' ,firstload,true);
 
-   gfx_MWTextureLoad(@spr_stun          ,effects_folder+'stun'          ,firstload,true);
-   gfx_MWTextureLoad(@spr_invuln        ,effects_folder+'invuln'        ,firstload,true);
-   gfx_MWTextureLoad(@spr_hvision       ,effects_folder+'hvision'       ,firstload,true);
-   gfx_MWTextureLoad(@spr_scan          ,effects_folder+'scan'          ,firstload,true);
-   gfx_MWTextureLoad(@spr_decay         ,effects_folder+'decay'         ,firstload,true);
+   gfx_MWTextureLoad(@spr_stun          ,effects_folder+'stun'           ,firstload,true);
+   gfx_MWTextureLoad(@spr_invuln        ,effects_folder+'invuln'         ,firstload,true);
+   gfx_MWTextureLoad(@spr_hvision       ,effects_folder+'hvision'        ,firstload,true);
+   gfx_MWTextureLoad(@spr_scan          ,effects_folder+'scan'           ,firstload,true);
+   gfx_MWTextureLoad(@spr_decay         ,effects_folder+'decay'          ,firstload,true);
 
-   gfx_MWTextureLoad(@spr_cp_koth       ,'cp_koth'                      ,firstload,true);
-   gfx_MWTextureLoad(@spr_cp_out        ,'cp_out'                       ,firstload,true);
-   gfx_MWTextureLoad(@spr_cp_gen        ,'cp_gen'                       ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_koth       ,'cp_koth'                       ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_out        ,'cp_out'                        ,firstload,true);
+   gfx_MWTextureLoad(@spr_cp_gen        ,'cp_gen'                        ,firstload,true);
 
    for x:=0 to spr_upgrade_icons do
     for r:=1 to r_cnt do

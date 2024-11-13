@@ -38,11 +38,11 @@ begin
         case al_v of
 aummat_attacked_b,
 aummat_created_b,
-aummat_upgrade    : RectangleColor(r_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
+aummat_upgrade    : RectangleColor(r_gminimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
 aummat_advance,
 aummat_attacked_u,
 aummat_created_u,
-aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al_c);
+aummat_info       : CircleColor   (r_gminimap,al_mx  ,al_my  ,              r, al_c);
         end;
 
         al_t-=2;
@@ -52,18 +52,18 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
     with g_cpoints[i] do
      if(cpCaptureR>0)then
       if(cpenergy>0)
-      then map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
-      else map_MinimapSpot(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
+      then map_MinimapSpot(r_gminimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
+      else map_MinimapSpot(r_gminimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
 
    case g_mode of
-gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mm_cx)+1,ui_max_color[r_blink2_colorb]);
+gm_royale   : circleColor(r_gminimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mm_cx)+1,ui_max_color[r_blink2_colorb]);
    end;
 end;
 
 procedure d_Minimap(tar:pSDL_Surface);
 var i:byte;
 begin
-   rectangleColor(r_minimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mm_CamW,vid_mmvy+map_mm_CamH, c_white);
+   rectangleColor(r_gminimap,vid_mmvx,vid_mmvy,vid_mmvx+map_mm_CamW,vid_mmvy+map_mm_CamH, c_white);
 
    d_MinimapAlarms;
 
@@ -73,12 +73,12 @@ begin
      for i:=0 to MaxPlayers do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then
-        circleColor(r_minimap,round(aia_x*map_mm_cx),round(aia_y*map_mm_cx),5,c_orange);
+        circleColor(r_gminimap,round(aia_x*map_mm_cx),round(aia_y*map_mm_cx),5,c_orange);
    {$ENDIF}
 
-   draw_surf(tar      ,1,1,r_minimap );
+   draw_surf(tar      ,1,1,r_gminimap );
 
-   draw_surf(r_minimap,0,0,r_bminimap);
+   draw_surf(r_gminimap,0,0,r_bminimap);
 
    r_minimap_scan_blink:=not r_minimap_scan_blink;
 end;
@@ -436,13 +436,13 @@ begin
       end;
 
       3: // actions
-      if(rpls_state>=rpls_state_read)then
+      if(rpls_rstate>=rpls_state_read)then
       begin
          _drawBtn(tar,0,0,spr_b_rfast,sys_uncappedFPS ,false);
          _drawBtn(tar,1,0,spr_b_rback,false       ,false);
          _drawBtn(tar,2,0,spr_b_rskip,false       ,false);
          _drawBtn(tar,0,1,spr_b_rstop,g_status>0  ,false);
-         _drawBtn(tar,1,1,spr_b_rvis ,rpls_plcam  ,false);
+         _drawBtn(tar,1,1,spr_b_rvis ,rpls_POVCam  ,false);
          _drawBtn(tar,2,1,spr_b_rlog ,rpls_showlog,false);
          _drawBtn(tar,0,2,spr_b_rfog ,sys_fog    ,false);
 
@@ -489,7 +489,7 @@ end;
 procedure d_MapMouse(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy,i,r:integer;
 begin
-   if(rpls_state<rpls_state_read)then
+   if(rpls_rstate<rpls_state_read)then
    begin
       D_BuildUI(tar,lx,ly);
 
@@ -582,7 +582,7 @@ begin
            if(ui_tab=3)then
            begin
               if(i<=_mhkeys)then
-                if(rpls_state>=rpls_state_read)
+                if(rpls_rstate>=rpls_state_read)
                 then hs1:=@str_panelHint_r[i]
                 else
                   if(g_players[PlayerClient].isobserver)
@@ -668,7 +668,7 @@ chat_allies  : ChatString:=str_chat_allies;
 end;
 begin
    // replay progress bar
-   if(rpls_state=rpls_state_read)then D_ReplayProgress(tar);
+   if(rpls_rstate=rpls_state_read)then D_ReplayProgress(tar);
 
    // LOG and HINTs
    if(log_LastMesTimer>0)then log_LastMesTimer-=1;
@@ -711,7 +711,7 @@ begin
    // VICTORY/DEFEAT/PAUSE/REPLAY END
    if(GameGetStatus(@str,@col,VisPlayer))then draw_text(tar,ui_uiuphx,ui_uiuphy,str,ta_MU,255,col);
 
-   if(VisPlayer<>PlayerClient)or(rpls_state>=rpls_state_read)then
+   if(VisPlayer<>PlayerClient)or(rpls_rstate>=rpls_state_read)then
      if(VisPlayer>0)
      then draw_text(tar,ui_uiuphx,ui_uiplayery,g_players[VisPlayer].name,ta_MU,255,PlayerColorScheme[VisPlayer])
      else draw_text(tar,ui_uiuphx,ui_uiplayery,str_panelHint_all                  ,ta_MU,255,c_white           );
