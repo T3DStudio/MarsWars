@@ -1134,7 +1134,8 @@ begin
          writeln('Sg ',debug_Sgx,' ',debug_Sgy,' ',map_LastCell,' d1 ',debug_d1);
          writeln('Dg ',debug_Dgx,' ',debug_Dgy,' ',map_LastCell,' d2 ',debug_d2);
          if(debug_d1>0)and(debug_d2>0)then
-           writeln(map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain);
+           with map_gridDomainMX[debug_d1-1,debug_d2-1] do
+             writeln(nextDomain,' ',edgeCells_n);
       end;
 
       if(r_blink2_colorb)then
@@ -1144,13 +1145,18 @@ begin
 
          if(debug_d1>0)and(debug_d2>0)then
          begin
-            dx:=map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain;
+            with map_gridDomainMX[debug_d1-1,debug_d2-1] do
+              if(edgeCells_n>0)then
+               for w:=0 to edgeCells_n-1 do
+                with edgeCells_l[w] do
+                 UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange);
+            {dx:=map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain;
             if(dx>0)then
              with map_gridDomainMX[debug_d1-1,dx-1] do
                if(edgeCells_n>0)then
                 for w:=0 to edgeCells_n-1 do
                  with edgeCells_l[w] do
-                  UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange);
+                  UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange); }
          end;
       end;
 

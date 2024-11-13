@@ -225,6 +225,7 @@ TMapGridPFDomainData = record
    edgeCells_n: word;
    edgeCells_l: array of TPoint;
 end;
+PTMapGridPFDomainData = ^TMapGridPFDomainData;
 
 TMapTerrainGridCell = record
    tgc_solidlevel: byte;

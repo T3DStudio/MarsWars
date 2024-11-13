@@ -378,25 +378,25 @@ begin
                    begin
                       movePF_nextX:=x;
                       movePF_nextY:=y;
-                      movePF_dx:=map_gridDomainMX[movePF_d1-1,movePF_d2-1].nextDomain;
-                      //writeln(movePF_d1,' ',movePF_d2,' ',movePF_dx);
-                      if(movePF_dx>0)then
-                        with map_gridDomainMX[movePF_d1-1,movePF_dx-1] do
-                          if(edgeCells_n>0)then
-                          begin
-                             px:=px.MaxValue;
-                             for newx:=0 to edgeCells_n-1 do
-                               with edgeCells_l[newx] do
-                               begin
-                                  py:=point_dist_rint(x,y,p_x,p_y);
-                                  if(py<px)then
-                                  begin
-                                     px:=py;
-                                     movePF_nextX:=p_x;
-                                     movePF_nextY:=p_y;
-                                  end;
-                               end;
-                          end;
+                      with map_gridDomainMX[movePF_d1-1,movePF_d2-1] do
+                      begin
+                         movePF_dx:=nextDomain;
+                         if(edgeCells_n>0)then
+                         begin
+                            px:=px.MaxValue;
+                            for newx:=0 to edgeCells_n-1 do
+                              with edgeCells_l[newx] do
+                              begin
+                                 py:=point_dist_rint(x,y,p_x,p_y);
+                                 if(py<px)then
+                                 begin
+                                    px:=py;
+                                    movePF_nextX:=p_x;
+                                    movePF_nextY:=p_y;
+                                 end;
+                              end;
+                         end;
+                      end;
                    end;
             end;
           if(movePF_direct)then

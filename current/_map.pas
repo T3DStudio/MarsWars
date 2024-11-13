@@ -368,18 +368,6 @@ end;
 //
 //  PATH FIND
 
-type
-TtmpGrid = array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of word;
-ptmpGrid = ^TtmpGrid;
-var
-tmpGrid  : ptmpGrid;
-
-procedure map_pf_InitTmpGrid;
-begin
-   new(tmpGrid);
-   FillChar(tmpGrid^,sizeOf(TtmpGrid),0);
-end;
-
 procedure map_pf_MarkSolidCells;
 var x,y:integer;
 function SolidLevel(cx,cy:integer):boolean;
@@ -492,7 +480,11 @@ begin
     for d1:=0 to map_gridDomain_n-1 do
     for d2:=0 to map_gridDomain_n-1 do
       with map_gridDomainMX[d1,d2] do
-       setlength(edgeCells_l,0);
+      begin
+         setlength(edgeCells_l,0);
+         edgeCells_n:=0;
+         nextDomain:=0;
+      end;
 
    map_gridDomain_n:=0;
    setlength(map_gridDomainMX,0,0);
@@ -531,7 +523,7 @@ begin
 
       FillDomain:=true;
 
-      tgc_pf_domain  :=map_gridDomain_n;
+      tgc_pf_domain:=map_gridDomain_n;
    end;
 
    tmp_points_n+=1;
@@ -627,13 +619,12 @@ begin
              CheckDomainNeighbor(p_x,p_y-1);
              CheckDomainNeighbor(p_x,p_y+1);
              if(tmp_points_i<tmp_points_i.MaxValue)then
-             begin
-                map_grid[p_x,p_y].tgc_pf_domain:=dn+1;
-             end;
+               map_grid[p_x,p_y].tgc_pf_domain:=dn+1;
           end;
        end;
 
    writeln('map_gridDomain_n ',map_gridDomain_n);
+   setlength(tmp_points_l,0);
    setlength(domain2point,0);
    setlength(domain2count,0);
 end;
@@ -691,38 +682,39 @@ begin
 end;
 
 procedure map_pf_MakeNext;
+type
+TtmpGrid = array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of word;
+ptmpGrid = ^TtmpGrid;
 var
+tmpGrid      : ptmpGrid;
 d1,d2,dx,di,
-wave_init_n,
 wave_data_n,
 wave_data_i  : word;
 wave_data_dl : array of word;
-wave_data_pl,
-wave_init_pl : array of TPoint;
-domain_zone_l: array of word;
-need_wave    : boolean;
-procedure WavePoint(cx,cy:integer;rootDomain,skipDomain:word);
+wave_data_pl : array of TPoint;
+pdx          : PTMapGridPFDomainData;
+procedure WavePoint(cx,cy:integer;rootDomain,startDomain:word);
 begin
    if(cx<0)
    or(cy<0)
    or(cx>map_LastCell)
    or(cy>map_LastCell)then exit;
 
-   if(tmpGrid^[cx,cy]=skipDomain)then exit;
+   if(tmpGrid^[cx,cy]=startDomain)then exit;
 
    with map_grid[cx,cy] do
    begin
-      if(tgc_pf_domain=0)
-      or(tgc_pf_domain=skipDomain)
-      or(tgc_pf_solid)then exit;
-
       if(rootDomain=0)then rootDomain:=tgc_pf_domain;
 
-      with map_gridDomainMX[skipDomain-1,tgc_pf_domain-1] do
-       if(nextDomain=0)and(tgc_pf_domain<>skipDomain)and(tgc_pf_domain<>rootDomain)then
-        nextDomain:=rootDomain;
+      if(tgc_pf_domain=0)
+      or(tgc_pf_domain=startDomain)
+      or(tgc_pf_solid)then exit;
+
+      with map_gridDomainMX[startDomain-1,tgc_pf_domain-1] do
+        if(nextDomain=0)then
+          nextDomain:=rootDomain;
    end;
-   tmpGrid^[cx,cy]:=skipDomain;
+   tmpGrid^[cx,cy]:=startDomain;
 
    wave_data_n+=1;
    setlength(wave_data_pl,wave_data_n);
@@ -735,78 +727,59 @@ begin
    end;
 end;
 begin
-   setlength(domain_zone_l,map_gridDomain_n-1);
-   for d1:=0 to map_LastCell do
-   for d2:=0 to map_LastCell do
-    with map_grid[d1,d2] do
-     if(tgc_pf_zone>0)and(tgc_pf_domain>0)then
-      domain_zone_l[tgc_pf_domain-1]:=tgc_pf_zone;
-
-   map_pf_InitTmpGrid;
+   new(tmpGrid);
+   FillChar(tmpGrid^,sizeOf(TtmpGrid),0);
 
    for d1:=0 to map_gridDomain_n-1 do
    begin
-      need_wave:=false;
+      di:=d1+1;
+      wave_data_n:=0;
+      wave_data_i:=0;
+      setlength(wave_data_pl,0);
+      setlength(wave_data_dl,0);
+
       for d2:=0 to map_gridDomain_n-1 do
         with map_gridDomainMX[d1,d2] do
-          if(d1=d2)
-          then nextDomain:=d1+1
-          else
-            if(edgeCells_n>0)
-            then nextDomain:=d2+1
-            else
-              if(domain_zone_l[d1]=domain_zone_l[d2])
-              then need_wave:=true;
-
-      if(need_wave)then
-      begin
-         // wave initial points list
-         wave_init_n:=0;
-         setlength(wave_init_pl,0);
-         for d2:=0 to map_gridDomain_n-1 do
-           with map_gridDomainMX[d1,d2] do
-            if(d1<>d2)and(edgeCells_n>0)then
-             for dx:=0 to edgeCells_n-1 do
-             begin
-                wave_init_n+=1;
-                setlength(wave_init_pl,wave_init_n);
-                wave_init_pl[wave_init_n-1]:=edgeCells_l[dx];
-             end;
-
-         di:=d1+1;
-         if(wave_init_n>0)then
-         begin
-            wave_data_n:=0;
-            wave_data_i:=0;
-            setlength(wave_data_pl,0);
-            setlength(wave_data_dl,0);
-
-            for dx:=0 to wave_init_n-1 do
-              with wave_init_pl[dx] do
+          if(d1<>d2)and(edgeCells_n>0)then
+            for dx:=0 to edgeCells_n-1 do
+              with edgeCells_l[dx] do
                 WavePoint(p_x,p_y,0,di);
 
-            while(wave_data_i<wave_data_n)do
-            begin
-               with wave_data_pl[wave_data_i] do
-               begin
-                  dx:=wave_data_dl[wave_data_i];
-                  WavePoint(p_x-1,p_y  ,dx,di);
-                  WavePoint(p_x+1,p_y  ,dx,di);
-                  WavePoint(p_x  ,p_y-1,dx,di);
-                  WavePoint(p_x  ,p_y+1,dx,di);
-               end;
-               wave_data_i+=1;
-            end;
+      while(wave_data_i<wave_data_n)do
+      begin
+         with wave_data_pl[wave_data_i] do
+         begin
+            dx:=wave_data_dl[wave_data_i];
+            WavePoint(p_x-1,p_y  ,dx,di);
+            WavePoint(p_x+1,p_y  ,dx,di);
+            WavePoint(p_x  ,p_y-1,dx,di);
+            WavePoint(p_x  ,p_y+1,dx,di);
          end;
+         wave_data_i+=1;
       end;
    end;
+
    dispose(tmpGrid);
    wave_data_n:=0;
    wave_data_i:=0;
-   wave_init_n:=0;
    setlength(wave_data_pl,0);
    setlength(wave_data_dl,0);
-   setlength(wave_init_pl,0);
+
+   // add edgeCells
+   for d1:=0 to map_gridDomain_n-1 do
+   for d2:=0 to map_gridDomain_n-1 do
+   begin
+      pdx:=@map_gridDomainMX[d1,d2];
+      if(pdx^.nextDomain>0)and(pdx^.edgeCells_n=0)then
+        with map_gridDomainMX[d1,pdx^.nextDomain-1] do
+          if(edgeCells_n>0)then
+          begin
+             pdx^.edgeCells_n:=edgeCells_n;
+             setlength(pdx^.edgeCells_l,edgeCells_n);
+             for di:=0 to edgeCells_n-1 do
+               pdx^.edgeCells_l[di]:=edgeCells_l[di];
+          end;
+   end;
 end;
 
 procedure map_pf_MakeDomains;
@@ -1337,6 +1310,7 @@ begin
       map_hsize+sign(map_PlayerStartX[tx]-map_hsize)*map_size,
       map_hsize+sign(map_PlayerStartY[tx]-map_hsize)*map_size);
    end;
+   CircleBy2Points(0,map_hsize,map_size,map_hsize);
 end;
 
 procedure map_RandomBaseVars;
@@ -1377,8 +1351,8 @@ mapt_steppe : begin
               end;
 mapt_canyon : begin
               map_GridFill(msrx,0, 0,mgsl_liquid ,0 ,base_1r,false,false);
-              map_GridFill(msrx,1, 0,mgsl_rocks  ,18,base_1r,true ,false);
-              map_GridFill(msrx,2, 0,mgsl_nobuild,24,base_1r,false,false);
+              map_GridFill(msrx,1, 0,mgsl_rocks  ,14,base_1r,true ,false);
+              map_GridFill(msrx,2, 0,mgsl_nobuild,18,base_1r,false,false);
               map_GridCutCircles;
               end;
 mapt_clake,
