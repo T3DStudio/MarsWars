@@ -308,7 +308,7 @@ end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
 begin
-   draw_text(tar,x,y,str+GStep2TimeStr(time),ta,255,color);
+   draw_text(tar,x,y,str+str_GStep2Time(time),ta,255,color);
 end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;

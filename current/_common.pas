@@ -1215,6 +1215,13 @@ end;
 
 {$IFDEF _FULLGAME}
 
+function RoundN(x,n:integer):integer;
+begin
+   if(n>0)
+   then RoundN:=round(x/n)*n
+   else RoundN:=x
+end;
+
 function str_SpaceSize(str:shortstring;newSize:byte):shortstring;
 var l,i:byte;
 begin
@@ -1239,7 +1246,7 @@ begin
        setlength(str_SpaceSize,newSize);
 end;
 
-function GStep2TimeStr(gstep:cardinal):shortstring;
+function str_GStep2Time(gstep:cardinal):shortstring;
 var
 s , m, h: cardinal;
 ss,sm,sh:shortstring;
@@ -1250,15 +1257,15 @@ begin
    h:=m div 60;
    m:=m mod 60;
 
-   GStep2TimeStr:='';
+   str_GStep2Time:='';
    if(h>0)then
    begin
       if(h<10)then sh:='0'+c2s(h) else sh:=c2s(h);
-      GStep2TimeStr:=sh+':';
+      str_GStep2Time:=sh+':';
    end;
    if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
-   GStep2TimeStr+=sm+':'+ss;
+   str_GStep2Time+=sm+':'+ss;
 end;
 
 function str_NowDateTime:shortstring;
@@ -1283,7 +1290,7 @@ begin
    dcard:=0;
 
    // TIME
-   BlockRead(f,dcard,SizeOf(G_Step       ));str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+GStep2TimeStr(dcard)+tc_nl2+tc_nl2+str_menu_map+tc_nl2+' ';
+   BlockRead(f,dcard,SizeOf(G_Step       ));str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+str_GStep2Time(dcard)+tc_nl2+tc_nl2+str_menu_map+tc_nl2+' ';
 
    // MAP info
    BlockRead(f,dcard,SizeOf(map_seed     ));str_info1^+=str_SpaceSize(str_map_seed+dots,12)+c2s(dcard)+tc_nl2+' ';

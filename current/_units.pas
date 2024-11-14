@@ -199,15 +199,13 @@ begin
 end;
 
 procedure unit_TryMoveToXY(pu:PTUnit;newx,newy:integer);
-var cx,cy,px,py:integer;
+var cx,cy:integer;
 begin
    with pu^ do
      if(ukfly)or(ukfloater)
      then unit_SetXY(pu,newx,newy,mvxy_none,true)
      else
      begin
-        px:=x;
-        py:=y;
         cx:=x;
         cy:=y;
         if(map_MapGetZone(cx,newy)=zone)then cy:=newy;
@@ -283,7 +281,9 @@ begin
    begin
       sx:=gridx*MapCellW-MapCellW;
       sy:=gridy*MapCellW-MapCellW;
-      pushr:=min2i(_r,unit_MaxSpeed);
+      if(_r>unit_MaxSpeed)
+      then pushr:=unit_MaxSpeed
+      else pushr:=_r;
       mx:=sx;
       for cx:=-1 to 1 do
       begin
@@ -360,44 +360,44 @@ begin
           end;
 
           if(ukfly)or(ukfloater)
-          or( (abs(movePF_destcX-movePF_curcX)<2)and(abs(movePF_destcY-movePF_curcY)<2) )
+          or((movePF_destcX=movePF_curcX)and(movePF_destcY=movePF_curcY))
           then movePF_direct:=true
           else
             if(pf_update)then
             begin
                movePF_d1:=map_grid[movePF_curcX ,movePF_curcY ].tgc_pf_domain;
                movePF_d2:=map_grid[movePF_destcX,movePF_destcY].tgc_pf_domain;
-               movePF_dx:=movePF_d1;
-               if(movePF_d1>0)and(movePF_d2>0)then
-                 if(movePF_d1=movePF_d2)
+               movePF_dx:=movePF_d2;
+               movePF_direct:=true;
+               if(movePF_d1>0)and(movePF_d2>0)and(movePF_d1<>movePF_d2)then
+                 if(not map_GridLineCollision(movePF_curcX,movePF_curcY,movePF_destcX,movePF_destcY,0))
                  then movePF_direct:=true
                  else
-                   if(not map_GridLineCollision(movePF_curcX,movePF_curcY,movePF_destcX,movePF_destcY,0))
-                   then movePF_direct:=true
-                   else
-                   begin
-                      movePF_nextX:=x;
-                      movePF_nextY:=y;
-                      with map_gridDomainMX[movePF_d1-1,movePF_d2-1] do
-                      begin
-                         movePF_dx:=nextDomain;
-                         if(edgeCells_n>0)then
-                         begin
-                            px:=px.MaxValue;
-                            for newx:=0 to edgeCells_n-1 do
-                              with edgeCells_l[newx] do
-                              begin
-                                 py:=point_dist_rint(x,y,p_x,p_y);
-                                 if(py<px)then
-                                 begin
-                                    px:=py;
-                                    movePF_nextX:=p_x;
-                                    movePF_nextY:=p_y;
-                                 end;
-                              end;
-                         end;
-                      end;
-                   end;
+                 begin
+                    movePF_nextX:=x;
+                    movePF_nextY:=y;
+                    movePF_direct:=true;
+                    with map_gridDomainMX[movePF_d1-1,movePF_d2-1] do
+                    begin
+                       movePF_dx:=nextDomain;
+                       if(edgeCells_n>0)then
+                       begin
+                          px:=px.MaxValue;
+                          for newx:=0 to edgeCells_n-1 do
+                            with edgeCells_l[newx] do
+                            begin
+                               py:=point_dist_rint(x,y,p_x,p_y);
+                               if(py<px)then
+                               begin
+                                  px:=py;
+                                  movePF_nextX :=p_x;
+                                  movePF_nextY :=p_y;
+                                  movePF_direct:=false;
+                               end;
+                            end;
+                       end;
+                    end;
+                 end;
             end;
           if(movePF_direct)then
           begin
@@ -406,6 +406,8 @@ begin
              movePF_nextX:=movePF_destX;
              movePF_nextY:=movePF_destY;
           end;
+
+          if(x=movePF_nextX)and(y=movePF_nextY)then exit;
 
           curSpeed:=speed;
           with uid^ do
@@ -439,6 +441,7 @@ begin
              py:=y;
              if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
              if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+             unit_PushOutGrid(pu);
              if(x=px)and(y=py)
              then dir+=90+g_random(180)
              else
@@ -450,6 +453,7 @@ begin
                   newy:=py+(sign(y-py)*curSpeed);
                   if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
                   if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+                  unit_PushOutGrid(pu);
                   if(x=px)and(y=py)
                   then dir+=90+g_random(180)
                   else dir:=point_dir(px,py,x,y)

@@ -620,7 +620,7 @@ begin
    end;
    menu_list_UpdatePosition;
 end;
-procedure menu_list_MakeFromInts(mi:byte;maxI,minI,StepI,CurrVal,MinWidth:integer);
+procedure menu_list_MakeFromInts(mi:byte;maxI,minI,StepI,CurrVal,MinWidth,Round_N:integer);
 begin
    menu_list_SetCommonSettings(mi,@MinWidth);
    with menu_items[mi] do
@@ -630,7 +630,7 @@ begin
       while(minI<=maxI)do
       begin
          if(CurrVal=minI)then menu_list_current:=menu_list_n;
-         menu_list_AddItem(i2s(minI),menu_list_n,menu_list_current<>menu_list_n,MinWidth);
+         menu_list_AddItem(i2s(RoundN(minI,Round_N)),menu_list_n,menu_list_current<>menu_list_n,MinWidth);
          minI+=StepI;
       end;
    end;
@@ -995,7 +995,7 @@ mi_map_Size               : if(menu_list_selected>-1)then
                                else map_SetSetting (PlayerClient,nmid_lobbby_mapsize,p,false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromInts(menu_item,MaxMapSize,MinMapSize,StepMapSize,map_size,-2);
+                            else menu_list_MakeFromInts(menu_item,MaxMapSize,MinMapSize,StepMapSize,map_size,-2,100);
 mi_map_Type               : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1032,7 +1032,7 @@ mi_game_builders          : if(menu_list_selected>-1)then
                                else GameSetCommonSetting(PlayerClient,nmid_lobbby_builders,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromInts(menu_item,gms_g_startb+1,1,1,integer(g_start_base)+1,-4);
+                            else menu_list_MakeFromInts(menu_item,gms_g_startb+1,1,1,integer(g_start_base)+1,-4,0);
 
 mi_game_generators        : if(menu_list_selected>-1)then
                             begin

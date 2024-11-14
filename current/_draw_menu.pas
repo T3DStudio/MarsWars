@@ -464,7 +464,7 @@ mi_player_color6           : D_menu_MButtonPC(tar,i,i-mi_player_color1+1);
 
 mi_map_Preset              : D_menu_MButtonM(tar,i,g_presets[g_preset_cur].gp_name        ,true );
 mi_map_Seed                : D_menu_MButtonU(tar,i,str_map_seed,c2s(map_seed)                   );
-mi_map_Size                : D_menu_MButtonD(tar,i,str_map_size,i2s(map_size)             ,true );
+mi_map_Size                : D_menu_MButtonD(tar,i,str_map_size,i2s(RoundN(map_size,100)) ,true );
 mi_map_Type                : D_menu_MButtonD(tar,i,str_map_type,str_map_typel[map_type   ],true );
 mi_map_Sym                 : D_menu_MButtonD(tar,i,str_map_sym ,str_map_syml[map_symmetry],true );
 mi_map_Random              : D_menu_MButton (tar,i,str_map_random);

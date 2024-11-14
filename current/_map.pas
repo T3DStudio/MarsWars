@@ -1231,9 +1231,9 @@ end;
 begin
    map_GridCycleNext:=false;
    case map_symmetry of
-maps_point,
 maps_none : map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell        ,map_LastCell  );
 maps_lineV: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_CenterCell      ,map_LastCell  );
+maps_point,
 maps_lineH: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell        ,map_CenterCell);
 maps_lineL: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_gcy             ,map_LastCell  );
 maps_lineR: map_GridCycleNext:=Step(@map_gcx,@map_gcy,@map_gcsx,@map_gcsy,map_LastCell-map_gcy,map_LastCell  );
@@ -1280,9 +1280,9 @@ begin
    until(not map_GridCycleNext)
 end;
 
-procedure map_GridCutCircles();
+procedure map_GridCutCanyonCircles;
 var
-tx,ty:integer;
+tx,ty,d:integer;
 procedure CircleBy2Points(tx0,ty0,tx1,ty1:integer);
 begin
    tx0:=tx0 div MapCellW;
@@ -1294,23 +1294,21 @@ begin
                 point_dist_int(tx0,ty0,tx1,ty1) div 2,
                 mgsl_free,0,0,true,true);
 end;
-
 begin
-
+   CircleBy2Points(0         ,map_hsize,map_size          ,map_hsize);// center
    for tx:=0 to MaxPlayers do
    begin
-      //if(tx mod 3)=0 then CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],map_hsize,map_hsize);
-
-      for ty:=0 to tx do
-        if(tx<>ty)and(abs(tx-ty)<2)then
-          CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],
-                          map_PlayerStartX[ty],map_PlayerStartY[ty]);
-
-      CircleBy2Points(map_hsize,map_hsize,
-      map_hsize+sign(map_PlayerStartX[tx]-map_hsize)*map_size,
-      map_hsize+sign(map_PlayerStartY[tx]-map_hsize)*map_size);
+      d:=point_dist_int(map_PlayerStartX[tx],map_PlayerStartY[tx],map_hsize,map_hsize);
+      if(d<=0)then continue;
+      CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],
+      map_hsize+round((map_PlayerStartX[tx]-map_hsize)/d*map_size),
+      map_hsize+round((map_PlayerStartY[tx]-map_hsize)/d*map_size) );
    end;
-   CircleBy2Points(0,map_hsize,map_size,map_hsize);
+   for tx:=1 to MaxPlayers do
+    for ty:=1 to tx do
+     if(tx<>ty)and(abs(tx-ty)<2)then
+      CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],
+                      map_PlayerStartX[ty],map_PlayerStartY[ty]);
 end;
 
 procedure map_RandomBaseVars;
@@ -1353,7 +1351,7 @@ mapt_canyon : begin
               map_GridFill(msrx,0, 0,mgsl_liquid ,0 ,base_1r,false,false);
               map_GridFill(msrx,1, 0,mgsl_rocks  ,14,base_1r,true ,false);
               map_GridFill(msrx,2, 0,mgsl_nobuild,18,base_1r,false,false);
-              map_GridCutCircles;
+              map_GridCutCanyonCircles;
               end;
 mapt_clake,
 mapt_ilake  : begin
@@ -1373,20 +1371,14 @@ mapt_island : begin
 mapt_shore  : begin
               if(map_symmetry=maps_point)then
               begin
-                 map_GridFill(map_CenterCell+round(map_LastCell*10.25*cos((map_seed mod 360)*degtorad)),
-                              map_CenterCell+round(map_LastCell*10.25*sin((map_seed mod 360)*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false,false);
-                 map_GridFill(msrx,7, 0,mgsl_nobuild,24,base_1r,false,false);
-                 map_GridFill(msrx,8, 0,mgsl_rocks  ,24,base_1r,false,false);
-                 map_GridFill(msrx,1, 0,mgsl_rocks  ,86,base_1r,true ,false);
+                 px:=map_seed mod byte(map_LastCell);
+                 map_GridFill(px,(map_CenterCell-abs(map_CenterCell-px)) div -8,map_CenterCell,mgsl_liquid,0 ,base_1r,false,false);
               end
-              else
-              begin
-                 map_GridFill(map_CenterCell+round(map_LastCell*10  *cos(map_symmetryDir   *degtorad)),
-                              map_CenterCell+round(map_LastCell*10  *sin(map_symmetryDir   *degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false,false);
-                 map_GridFill(msrx,7, 0,mgsl_nobuild,16,base_1r,false,false);
-                 map_GridFill(msrx,8, 0,mgsl_rocks  ,16,base_1r,false,false);
-                 map_GridFill(msrx,1, 0,mgsl_rocks  ,64,base_1r,true ,false);
-              end;
+              else map_GridFill(map_CenterCell+round(map_LastCell*10*cos(map_symmetryDir*degtorad)),
+                                map_CenterCell+round(map_LastCell*10*sin(map_symmetryDir*degtorad)),map_LastCell*10,mgsl_liquid ,0,base_1r,false,false);
+              map_GridFill(msrx,7, 0,mgsl_nobuild,16,base_1r,false,false);
+              map_GridFill(msrx,8, 0,mgsl_rocks  ,16,base_1r,false,false);
+              map_GridFill(msrx,1, 0,mgsl_rocks  ,64,base_1r,true ,false);
               end;
 mapt_sea    : begin
               map_GridFill(msrx,9, 0,mgsl_liquid ,0 ,base_1r,false,false);

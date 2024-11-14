@@ -1107,7 +1107,7 @@ begin
       //if(ks_mright=1)then
       //  MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
 
-      if(ks_mleft=1)then
+     { if(ks_mleft=1)then
       begin
          debug_Sgx :=mouse_map_x div MapCellW;
          debug_Sgy :=mouse_map_y div MapCellW;
@@ -1158,7 +1158,7 @@ begin
                  with edgeCells_l[w] do
                   UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange); }
          end;
-      end;
+      end;  }
 
          {if(map_gridDomain_n>0)then
            for w:=0 to map_gridDomain_n-1 do

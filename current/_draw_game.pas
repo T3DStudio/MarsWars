@@ -556,7 +556,7 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                  DrawDecals;
                  if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
               end;
-            with map_grid[gx,gy] do
+           { with map_grid[gx,gy] do
             begin
                {if(map_IsObstacleZone(tgc_parea,true ))
                then draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_gray )
@@ -577,7 +577,7 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                   UnitsInfoAddLine(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
                   UnitsInfoAddLine(mx+MapCellw,my+1,mx+1,my+MapCellw,c_red);
                end;
-            end;
+            end; }
 
             if(tgca_decor_n>0)then
               for i:=0 to tgca_decor_n-1 do
