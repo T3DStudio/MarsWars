@@ -581,6 +581,10 @@ wtp_Bio              : begin
                        incPrio(not iscomplete    );
                        end;
 wtp_Light            : incPrio(    _uklight      );
+wtp_GroundLight      : begin
+                       incPrio(    _uklight      );
+                       incPrio(not ukfly         );
+                       end;
 wtp_Fly              : begin
                        incPrio(     ukfly        );
                        incPrio(uidi<>UID_LostSoul);
@@ -774,7 +778,7 @@ uab_Teleport      : swtarget:=true;
         end;
 
       aiu_InitVars(pu);
-      if(aicode)then
+      if(aicode){or(sel)}then
       begin
          ai_InitVars(pu);
          ai_CollectData(pu,pu,0,nil);
@@ -801,7 +805,7 @@ uab_Teleport      : swtarget:=true;
             if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
             aiu_CollectData(pu,tu,ud,tu_transport);
-            if(aicode)then ai_CollectData(pu,tu,ud,tu_transport);
+            if(aicode){or(sel)}then ai_CollectData(pu,tu,ud,tu_transport);
 
             if(tu^.hits>0)and(tu_transport=nil)then
             begin

@@ -21,8 +21,8 @@ aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret  
 aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret        );
 
 ai_GeneratorsLimit        = ul1*60;
-ai_GeneratorsEnergy       = 4500;
-ai_GeneratorsDestroyEnergy= 4750;
+ai_GeneratorsEnergy       = 5000;
+ai_GeneratorsDestroyEnergy= 5400;
 ai_GeneratorsDestoryLimit = ul1*80;
 ai_TowerLifeTime          = fr_fps1*60;
 ai_MinArmyForScout        = 0;
@@ -129,6 +129,7 @@ ai_towers_needl,
 ai_transport_cur,
 ai_transport_need,
 ai_inprogress_uid,
+ai_inprogress_auid,
 ai_radars,
 ai_nearest_builder_d
                         : integer;
@@ -631,7 +632,8 @@ begin
    ai_towers_need     :=0;
    ai_towers_need_type:=0;
 
-   ai_inprogress_uid:=0;
+   ai_inprogress_uid  :=0;
+   ai_inprogress_auid :=0;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -903,8 +905,6 @@ begin
 
          if(player=tu^.player)then
          begin
-            if(uid=tu^.uid)and(not iscomplete)then ai_inprogress_uid+=1;
-
             if(tu^.uid^._rebuild_uid>0)and(ai_advanced_bld)then
             begin
                if(not tu^.uid^._isbuilder)
@@ -932,7 +932,13 @@ begin
                   if(tu^.transportM>0)and(tu^.ukfly)then ai_transport_cur+=tu^.transportM;
                   if(tu^.transportM=tu^.transportC)and(not tu^.ukfly)and(tu^.uid^._attack>0)then ai_transport_need+=tu^.uid^._transportS;
                end;
+            end
+            else
+            begin
+               if(uidi=tu^.uidi)then ai_inprogress_uid+=1;
+               if(_rebuild_uid>0)and(tu^.uidi=_rebuild_uid)then ai_inprogress_auid+=1;
             end;
+
             // armylimit
             if(tu^.uid^._ukbuilding)
             then ai_armylimit_alive_b+=tu^.uid^._limituse

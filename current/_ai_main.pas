@@ -216,7 +216,7 @@ begin
    begin
       case race of
       r_uac : ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*500+(ai_builders_count*600) ,ai_GeneratorsEnergy);
-      r_hell: ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*550+(ai_builders_count*650) ,ai_GeneratorsEnergy);
+      r_hell: ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*650+(ai_builders_count*750) ,ai_GeneratorsEnergy);
       end;
 
       if((ai_flags and aif_base_smart_order)>0)then
@@ -655,11 +655,13 @@ UID_UATurret      : if(ai_towers_near_grd=0)then exit;
 UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter:
-                    //if(not ai_choosen)or((g_mode<>gm_royale)and(g_mode<>gm_koth))then
+                    begin
                       if((race=r_uac)and(u_royal_d>base_3r))
                       or(g_mode<>gm_royale)
                       or((race=r_hell)and(u_royal_d>base_5r))then
-                        if(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
+                        //if(race<>r_hell)orthen   //(ai_builders_count>=ai_maxcount_mains)
+                          if(ai_inprogress_auid<2)and(ai_inprogress_uid=0)and(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
+                    end;
 UID_HSymbol,
 UID_UGenerator    : if(ai_enrg_cur<ai_maxcount_energy)then exit;
       else
@@ -1488,6 +1490,7 @@ begin
       aiu_alarm_x:=ai_alarm_x;
       aiu_alarm_y:=ai_alarm_y;
    end;
+   //if(pu^.sel)then writeln(ai_inprogress_auid);
 end;
 
 procedure ai_code(pu:PTUnit);
@@ -1571,9 +1574,10 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
 
       ai_UnitBehaviour(pu,(player^.ai_flags and aif_army_smart_micro)>0);
 
-      {if(sel)then
+      if(sel)then
       begin
-         if(ai_teleporterR_u<>nil)then
+
+         {if(ai_teleporterR_u<>nil)then
          begin
          UnitsInfoAddLine(x,y,ai_teleporterR_u^.x,ai_teleporterR_u^.y,c_purple);
          //writeln(ai_teleporterR_d);
@@ -1583,14 +1587,14 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
          UnitsInfoAddLine(x,y,ai_abase_u^.x,ai_abase_u^.y,c_orange);
 
          UnitsInfoAddLine(x+_randomr(2),y+_randomr(2),uo_x+_randomr(2),uo_y+_randomr(2),c_white);
-
+           }
          {writeln(ai_generator_d);
          if(ai_generator_d<NOTSET)then
          begin
             with ai_generator_cp^ do
               UnitsInfoAddLine(x,y,cpx,cpy,c_lime);
          end; }
-      end;  }
+      end;
    end;
 end;
 

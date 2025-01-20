@@ -74,7 +74,7 @@ begin
       end
       else
          if(not CheckUnitUIVisionScreen(pu))then exit;
-      writeln(uid^.un_txt_name);
+      //writeln(uid^.un_txt_name);
 
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),un_eid_summon[level]);

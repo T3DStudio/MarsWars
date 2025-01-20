@@ -428,6 +428,7 @@ wtp_nolost_hits        = 19;
 wtp_max_hits           = 20;
 wtp_limit              = 21;
 wtp_limitaround        = 22;
+wtp_GroundLight        = 23;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -650,6 +651,7 @@ dm_Siege               = 12; //   3*[buildings]
 dm_Blizzard            = 13; //   5*[buildings]      0.5*[light]
 dm_Lost                = 14; //                      0.5*[mech ]
 dm_BFG                 = 15; // limituse*
+dm_AntiGroundLight     = 16; // 1.5*[light ground]
 
 // LIMIT
 ul1                    = MinUnitLimit;
@@ -670,7 +672,7 @@ ul100                  = MinUnitLimit*100;
 ul110                  = MinUnitLimit*110;
 
 // production time
-ptime1                 = 28;
+ptime1                 = 20;
 ptimeh                 = ptime1  div 2;
 ptimehh                = ptimeh  div 2;
 ptimehhh               = ptimehh div 2;
@@ -713,7 +715,7 @@ BaseArmorLevel1        = BaseArmorBonus1/4;
 BaseHeal1              = BaseDamage1 div 5;
 BaseHealBonus1         = BaseDamageBonus1*2;
 BaseRepair1            = BaseDamage1 div 4;
-BaseRepairBonus1       = BaseDamageBonus1*3;
+BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamage1 div 10;
 
@@ -888,7 +890,7 @@ base_5r                = base_1r*5;
 base_6r                = base_1r*6;
 
 apc_exp_damage         = BaseDamage4;
-regen_period           = fr_fps1*2;
+regen_period           = fr_fps1d2;
 order_period           = fr_fpsd2+1;
 vistime                = fr_fps1d2;
 
