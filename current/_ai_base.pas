@@ -156,7 +156,7 @@ begin
    or(ay<0)or(map_size<ay)then exit;
 
    with pplayer^ do
-    for a:=0 to MaxPlayers do
+    for a:=0 to LastPlayer do
      with ai_alarms[a] do
       if(alimit<=0)then
       begin
@@ -597,7 +597,7 @@ begin
    with player^ do
    begin
       // get initial alarm point
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
        with ai_alarms[i] do
         if(aia_enemy_limit>0)then
          aiu_SetCurrentAlarm(pu,nil,aia_x,aia_y,-1,aia_zone);
@@ -627,13 +627,13 @@ begin
             or(cpy>=map_size)then continue;
 
             if(ai_istransport)then
-              if(map_IsObstacleZone(cppzone))
+              if(map_IsObstacleZone(cpZone))
               or(cpOwnerTeam=team)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
 
             if(d>cpCaptureR)then
-              if ai_BaseDestinationChecks(pu,cppzone)
+              if ai_BaseDestinationChecks(pu,cpZone)
               then
               else continue;
 
@@ -812,7 +812,6 @@ begin
                and(tu^.uidi<>UID_HEye     )
                and(tu^.aiu_alarm_d<base_1rh)then
                  if(tu^.aiu_limitaround_enemy>=tu^.aiu_limitaround_ally)
-                 or(g_mode=gm_invasion)
                  then _setNearestTarget(@ai_abase_u,@ai_abase_d,ud);
 
                // teleporter beacon
@@ -1046,7 +1045,7 @@ begin
       ai_scout_u_new_w:=0;
 
      if(g_mode=gm_royale)then
-      for a:=0 to MaxPlayers do
+      for a:=0 to LastPlayer do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
          if(CheckRoyalBattleRadiusPoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;
@@ -1082,7 +1081,6 @@ var w:integer;
 begin
    if(g_mode=gm_koth    )
    or(g_mode=gm_capture )
-   or(g_mode=gm_invasion)
    or(g_mode=gm_royale  )then exit;
 
    with pu^ do

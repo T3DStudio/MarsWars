@@ -425,19 +425,20 @@ end;
 
 procedure SoundLogUIPlayer;
 begin
+   if(UIPlayer<=LastPlayer)then
    with g_players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
-0..MaxPlayers         : if(mtype<>PlayerClient)
+0..LastPlayer         : if(mtype<>PlayerClient)
                         or((rpls_rstate>=rpls_state_read)and(PlayerClient=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
-lmt_game_end          : if(argx<=MaxPlayers)then
+lmt_game_end          : if(argx<=LastPlayer)then
                           if(argx=team)
                           then SoundPlayAnoncer(snd_victory[race],false,true)
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
 lmt_player_surrender,
-lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
+lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);

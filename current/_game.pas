@@ -1,28 +1,28 @@
 
-procedure PlayerSetSkirmishTech(p:byte);
+procedure PlayerSetSkirmishTech(PlayerTarget:byte);
 begin
-   with g_players[p] do
+   with g_players[PlayerTarget] do
    begin
-      PlayerSetAllowedUnits(p,[UID_HKeep         ..UID_HBarracks,
-                                  UID_LostSoul      ..UID_ZBFGMarine,
-                                  UID_UCommandCenter..UID_UComputerStation,
-                                  UID_Engineer      ..UID_Flyer  ],
-                                  MaxUnits,true);
+      PlayerSetAllowedUnits(PlayerTarget,[UID_HKeep         ..UID_HBarracks,
+                                          UID_LostSoul      ..UID_ZBFGMarine,
+                                          UID_UCommandCenter..UID_UComputerStation,
+                                          UID_Engineer      ..UID_Flyer  ],
+                                          MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_HMonastery ,UID_HFortress       ,UID_HAltar,
-                                   UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
+      PlayerSetAllowedUnits(PlayerTarget,[UID_HMonastery ,UID_HFortress       ,UID_HAltar,
+                                          UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
 
-      PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
+      PlayerSetAllowedUnits(PlayerTarget,[UID_LostSoul, UID_Phantom ],20,false);
 
 
       case g_generators of
       0:;
-      1    :PlayerSetAllowedUnits(p,[ UID_HKeep     ,UID_HCommandCenter,UID_UCommandCenter                    ],0,false);
-      else  PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol      ,UID_HKeep          ,UID_HCommandCenter,
-                                      UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter                    ],0,false);
+      1    :PlayerSetAllowedUnits(PlayerTarget,[UID_HKeep     ,UID_HCommandCenter,UID_UCommandCenter                    ],0,false);
+      else  PlayerSetAllowedUnits(PlayerTarget,[UID_HSymbol   ,UID_HASymbol      ,UID_HKeep          ,UID_HCommandCenter,
+                                                UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter                    ],0,false);
       end;
 
-      PlayerSetAllowedUpgrades(p,[0..255],255,true);
+      PlayerSetAllowedUpgrades(PlayerTarget,[0..255],255,true);
    end;
 end;
 
@@ -31,10 +31,8 @@ var tp:TPlayer;
 begin
    PlayersSwap:=false;
 
-   if(SlotSource>MaxPlayers  )
-   or(SlotTarget>MaxPlayers  )
-   or(SlotSource=0           )
-   or(SlotTarget=0           )
+   if(SlotSource>LastPlayer  )
+   or(SlotTarget>LastPlayer  )
    or(SlotSource=SlotTarget)then exit;
 
    with g_players[SlotSource] do
@@ -61,11 +59,11 @@ begin
    g_players[SlotTarget].pnum:=SlotTarget;
 
    case g_slot_state[SlotSource] of
-   pss_observer: g_players[SlotSource].team:=0;
+   pss_observer: ;
    pss_opened  : g_players[SlotSource].team:=PlayerSlotGetTeam(g_mode,SlotSource,SlotSource);
    end;
    case g_slot_state[SlotTarget] of
-   pss_observer: g_players[SlotTarget].team:=0;
+   pss_observer: ;
    pss_opened  : g_players[SlotTarget].team:=PlayerSlotGetTeam(g_mode,SlotTarget,SlotTarget);
    end;
 
@@ -107,41 +105,48 @@ begin
       exit;
    end;
 
-   if(PlayerRequestor>MaxPlayers)
-   or(PlayerTarget   >MaxPlayers)
-   or(PlayerTarget   =0)
-   or(NewState>=ps_states_n)
+   if(NewState     >=ps_states_n)
+   or(PlayerRequestor>LastPlayer)
+   or(PlayerTarget   >LastPlayer)
    or(G_Started)then exit;
 
    case NewState of
-pss_ready   : with g_players[PlayerTarget] do
-               if(player_type<>pt_human)
-               or(PlayerTarget=PlayerLobby)
-               or(    isready)
-               or(net_status=ns_single)
-               or(PlayerRequestor<>PlayerTarget)then exit;
-pss_nready  : with g_players[PlayerTarget] do
-               if(player_type<>pt_human)
-               or(PlayerTarget=PlayerLobby)
-               or(not isready)
-               or(net_status=ns_single)
-               or(PlayerRequestor<>PlayerTarget)then exit;
-pss_swap    : if(not PlayersSwap(PlayerRequestor,PlayerTarget,true))then exit;
+pss_ready    : with g_players[PlayerTarget] do
+                 if(player_type<>pt_human)
+                 or(PlayerTarget=PlayerLobby)
+                 or(    isready)
+                 or(net_status=ns_single)
+                 or(PlayerRequestor<>PlayerTarget)then exit;
+pss_nready   : with g_players[PlayerTarget] do
+                 if(player_type<>pt_human)
+                 or(PlayerTarget=PlayerLobby)
+                 or(not isready)
+                 or(net_status=ns_single)
+                 or(PlayerRequestor<>PlayerTarget)then exit;
+pss_swap     : if(not PlayersSwap(PlayerRequestor,PlayerTarget,true))then exit;
+pss_sobserver: with g_players[PlayerTarget] do
+                 if(player_type<>pt_human)
+                 or(    isobserver)
+                 or(g_slot_state[PlayerTarget]=pss_observer)
+                 or(PlayerRequestor<>PlayerTarget)then exit;
+pss_splayer  : with g_players[PlayerTarget] do
+                 if(player_type<>pt_human)
+                 or(not isobserver)
+                 or(g_slot_state[PlayerTarget]=pss_observer)
+                 or(PlayerRequestor<>PlayerTarget)then exit;
    else
       if(PlayerRequestor=PlayerTarget)then exit;
-      if(PlayerRequestor>0)then
-      begin
-         if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<>0)then exit;
 
-         if(g_preset_cur>0)then
-          with g_presets[g_preset_cur] do
-           if(gp_player_team[PlayerTarget]>0)then
-            case NewState of
+      if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer)then exit;
+
+      {if(g_preset_cur>0)then
+       with g_presets[g_preset_cur] do
+        if(gp_player_team[PlayerTarget]<=LastPlayer)then
+         case NewState of
       pss_closed,
       pss_observer : exit;
-            end
-            else exit;
-      end;
+         end
+       else exit; }
    end;
 
    PlayerSlotChangeState:=true;
@@ -154,14 +159,14 @@ pss_closed,
 pss_opened   : begin
                  PlayerSetType(PlayerTarget,pt_none);
                  g_slot_state[PlayerTarget]:=NewState;
-                 if(team=0)then team:=PlayerTarget;
                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
               end;
 pss_observer : begin
                  g_slot_state[PlayerTarget]:=NewState;
                  PlayerSetType(PlayerTarget,pt_none);
-                 team:=0;
               end;
+pss_sobserver: isobserver:=true;
+pss_splayer  : isobserver:=false;
 pss_ready    : isready:=true;
 pss_nready   : isready:=false;
 pss_swap     : PlayersSwap(PlayerRequestor,PlayerTarget,false);
@@ -170,7 +175,6 @@ pss_AI_11    : begin
                  g_slot_state[PlayerTarget]:=NewState;
                  ai_skill  :=NewState-pss_AI_1+1;
                  PlayerSetType(PlayerTarget,pt_ai);
-                 if(team=0)then team:=PlayerTarget;
                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
               end;
     end;
@@ -191,19 +195,18 @@ begin
    end;
 
    if(NewRace>r_cnt)
-   or(PlayerRequestor>MaxPlayers)
-   or(PlayerTarget   >MaxPlayers)
-   or(PlayerTarget   =0)
+   or(PlayerRequestor>LastPlayer)
+   or(PlayerTarget   >LastPlayer)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
    begin
-      if(team=0)
+      if(isobserver)
       or(g_slot_state[PlayerTarget]=pss_closed  )
       or(g_slot_state[PlayerTarget]=pss_observer)then exit;
 
       if((PlayerRequestor= PlayerTarget)and(player_type=pt_human))
-      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=0)or(PlayerRequestor=PlayerLobby)or(PlayerLobby=0)))
+      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=PlayerLobby)or(PlayerLobby>LastPlayer)))
       then
       else exit;
 
@@ -222,16 +225,15 @@ begin
    if(NewTeam=255)and(Check)then
    begin
       n:=0;
-      for NewTeam:=0 to MaxPlayers do
+      for NewTeam:=0 to LastPlayer do
         if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then n+=1;
       PlayerSlotChangeTeam:=(n>1);
       exit;
    end;
 
-   if(NewTeam        >MaxPlayers)
-   or(PlayerRequestor>MaxPlayers)
-   or(PlayerTarget   >MaxPlayers)
-   or(PlayerTarget   =0)
+   if(NewTeam        >LastPlayer)
+   or(PlayerRequestor>LastPlayer)
+   or(PlayerTarget   >LastPlayer)
    or(g_preset_cur   >0)
    or(G_Started)then exit;
 
@@ -239,10 +241,14 @@ begin
    begin
       if( g_slot_state[PlayerTarget]=pss_observer)
       or( g_slot_state[PlayerTarget]=pss_closed  )
-      or((pss_AI_1<=g_slot_state[PlayerTarget]   )and(g_slot_state[PlayerTarget]<=pss_AI_11)and(player_type=pt_ai)and(NewTeam=0))
+
+      or((pss_AI_1<=g_slot_state[PlayerTarget]   )
+      and(g_slot_state[PlayerTarget]<=pss_AI_11  )and(player_type=pt_ai  )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
+
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_none))
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_human)and(PlayerRequestor<>PlayerTarget))
-      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai)and(PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))
+      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai   )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
+      or(isobserver)
       then exit;
 
       n:=team;
@@ -275,8 +281,9 @@ begin
    PlayerSurrender:=false;
 
    if(not G_Started)
-   or(PlayerTarget>MaxPlayers)
+   or(PlayerTarget>LastPlayer)
    or(rpls_rstate=rpls_state_read)
+   or(GameStatus_End)
    or(not g_deadobservers)then exit;
 
    with g_players[PlayerTarget] do
@@ -296,7 +303,7 @@ begin
    PlayerDefeat:=false;
 
    if(not G_Started)
-   or(PlayerTarget>MaxPlayers)then exit;
+   or(PlayerTarget>LastPlayer)then exit;
 
    with g_players[PlayerTarget] do
    if(not isdefeated)and(not isobserver)then
@@ -314,7 +321,7 @@ begin
    PlayerLeave:=false;
 
    if(not G_Started)
-   or(PlayerTarget>MaxPlayers)then exit;
+   or(PlayerTarget>LastPlayer)then exit;
 
    with g_players[PlayerTarget] do
    if(player_type>pt_none)then
@@ -335,7 +342,7 @@ procedure PlayersSetDefault;
 var p:byte;
 begin
    FillChar(g_players,SizeOf(TPList),0);
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
     begin
        g_slot_state[p]:=pss_opened;
@@ -362,42 +369,88 @@ begin
       PlayerSetAllowedUpgrades(0,[],0,true);
    end;
 
-   FillChar(player_APMdata,SizeOf(player_APMdata),0);
-
    {$IFDEF _FULLGAME}
-   PlayerColorSchemeFFA[0]:=c_ltgray;
-   PlayerColorSchemeFFA[1]:=c_red;
-   PlayerColorSchemeFFA[2]:=c_orange;
-   PlayerColorSchemeFFA[3]:=c_yellow;
-   PlayerColorSchemeFFA[4]:=c_lime;
-   PlayerColorSchemeFFA[5]:=c_aqua;
-   PlayerColorSchemeFFA[6]:=c_blue;
+   PlayerColorSchemeFFA[0]:=c_red;
+   PlayerColorSchemeFFA[1]:=c_orange;
+   PlayerColorSchemeFFA[2]:=c_yellow;
+   PlayerColorSchemeFFA[3]:=c_lime;
+   PlayerColorSchemeFFA[4]:=c_aqua;
+   PlayerColorSchemeFFA[5]:=c_blue;
+   PlayerColorSchemeFFA[6]:=c_lpurple;
+   PlayerColorSchemeFFA[7]:=c_purple;
 
-   PlayerColorSchemeTEAM[0]:=c_ltgray;
-   PlayerColorSchemeTEAM[1]:=c_lime;
-   PlayerColorSchemeTEAM[2]:=c_red;
-   PlayerColorSchemeTEAM[3]:=c_aqua;
-   PlayerColorSchemeTEAM[4]:=c_yellow;
-   PlayerColorSchemeTEAM[5]:=c_blue;
-   PlayerColorSchemeTEAM[6]:=c_orange;
+   PlayerColorSchemeTEAM[0]:=c_lime;
+   PlayerColorSchemeTEAM[1]:=c_red;
+   PlayerColorSchemeTEAM[2]:=c_aqua;
+   PlayerColorSchemeTEAM[3]:=c_yellow;
+   PlayerColorSchemeTEAM[4]:=c_blue;
+   PlayerColorSchemeTEAM[5]:=c_orange;
+   PlayerColorSchemeTEAM[6]:=c_purple;
+   PlayerColorSchemeTEAM[7]:=c_lpurple;
 
-   PlayerClient:=1;
+   UpdateScirmishColorScheme;
+
+   PlayerClient:=0;
 
    with g_players[PlayerClient] do
    begin
       player_type:=pt_human;
       name       :=PlayerName;
    end;
-
-   {$ELSE}
-   PlayerClient:=0;
-   with g_players[PlayerClient] do
-   begin
-      name :='SERVER';
-   end;
-   {$ENDIF}
    g_slot_state[PlayerClient]:=pss_opened;
    PlayerLobby:=PlayerClient;
+
+   {$ELSE}
+   PlayerClient:=255;
+  { with g_players[PlayerClient] do
+   begin
+      name :='SERVER';
+   end;  }
+   {$ENDIF}
+end;
+
+procedure InitGamePresets;
+procedure SetPreset(pid:byte;mseed:cardinal;msize:integer;mtype,msym,gmode,t1,t2,t3,t4,t5,t6:byte);
+begin
+   if(g_preset_n<=pid)then
+   begin
+      if(g_preset_n=255)then exit;
+      while(g_preset_n<=pid)do
+      begin
+         g_preset_n+=1;
+         setlength(g_presets,g_preset_n);
+      end;
+   end;
+
+   with g_presets[pid] do
+   begin
+      gp_map_seed    := mseed;
+      gp_map_mw      := msize;
+      gp_map_type    := mtype;
+      gp_map_symmetry:= msym;
+      gp_g_mode      := gmode;
+      FillChar(gp_player_team,SizeOf(gp_player_team),0);
+      gp_player_team[1]:=t1;
+      gp_player_team[2]:=t2;
+      gp_player_team[3]:=t3;
+      gp_player_team[4]:=t4;
+      gp_player_team[5]:=t5;
+      gp_player_team[6]:=t6;
+   end;
+end;
+begin
+   g_preset_cur:=0;
+   g_preset_n  :=0;
+   setlength(g_presets,g_preset_n);
+
+   SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,0,1,255,255,255,255);
+   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake ,1,gm_scirmish,0,1,155,255,255,255);
+   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon,1,gm_scirmish,0,1,255,255,255,255);
+
+   {$IFNDEF _FULLGAME}
+   g_presets[gp_custom].gp_name:= 'custom preset';
+   MakeGamePresetsNames(@str_gmodel[0],@str_m_typel[0]);
+   {$ENDIF}
 end;
 
 function GameLoadPreset(PlayerRequestor,preset:byte;Check:boolean):boolean;
@@ -406,7 +459,8 @@ begin
    GameLoadPreset:=false;
 
    if(G_Started)
-   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   or(PlayerRequestor>lastPlayer)
+   or((PlayerLobby<>PlayerRequestor)and(PlayerLobby<=LastPlayer))
    or(preset>=g_preset_n)then exit;
 
    GameLoadPreset:=true;
@@ -426,7 +480,7 @@ begin
       g_fixed_positions
                   := false;
 
-      for p:=1 to MaxPlayers do
+      for p:=0 to LastPlayer do
         if(gp_player_team[p]>0)
         then PlayerSlotChangeState(0,p,pss_opened  ,false)
         else PlayerSlotChangeState(0,p,pss_observer,false);
@@ -444,7 +498,7 @@ function GameSetCommonSetting(PlayerRequestor,setting,NewVal:byte;Check:boolean)
 begin
    GameSetCommonSetting:=false;
    if(G_Started)
-   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   or((PlayerRequestor<=LastPlayer)and(PlayerLobby<=LastPlayer)and(PlayerLobby<>PlayerRequestor))
    then exit;
 
    case setting of
@@ -520,9 +574,6 @@ begin
 
    UnitMoveStepTicks:= 8;
 
-   g_inv_wave_n     := 0;
-   g_inv_wave_t_next:= 0;
-   g_inv_wave_t_curr:= 0;
    g_royal_r        := 0;
 
    g_cycle_order    := 0;
@@ -531,6 +582,7 @@ begin
    map_Make1;
 
    {$IFDEF _FULLGAME}
+
    sys_uncappedFPS:=false;
    test_fastprod:=false;
 
@@ -626,18 +678,17 @@ var p:byte;
 begin
    g_royal_r:=trunc(sqrt(sqr(map_hsize)*2));
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
      with g_players[p] do
      begin
         case g_slot_state[p] of
 pss_closed   : PlayerSetType(p,pt_none);
-pss_observer : team:=0;
-pss_opened   : if(p>0)and(player_type=pt_none)and(g_ai_slots>0)then
+pss_observer : isobserver:=true;
+pss_opened   : if(player_type=pt_none)and(g_ai_slots>0)then
                begin
                   ai_skill:=g_ai_slots;
                   race    :=r_random;
                   PlayerSetType(p,pt_ai);
-                  if(team=0)then team:=1;
                end;
 pss_AI_1..
 pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
@@ -649,27 +700,14 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         team:=PlayerSlotGetTeam(g_mode,p,255);
         race:=slot_race;
 
-        isobserver:=(team=0);
+        if(race=r_random)then race:=1+random(r_cnt);
 
-        if(p=0)then
-        begin
-           race    :=r_hell;
-           ai_skill:=gms_g_maxai;
-           PlayerSetType(p,pt_ai);
-           PlayerSetCurrentUpgrades(p,[1..255],15,true,true);
-           ai_PlayerSetSkirmishSettings(p);
-        end
-        else
-        begin
-           if(race=r_random)then race:=1+random(r_cnt);
-
-           if(player_type=pt_human)then ai_skill:=player_default_ai_level;//g_ai_slots
-        end;
+        if(player_type=pt_human)then ai_skill:=player_default_ai_level;//g_ai_slots
      end;
 
    if(not g_fixed_positions)then map_ShufflePlayerStarts(g_mode in gm_ModesFixedTeams);
 
-   for p:=1 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
      if(player_type<>pt_none)and(not isobserver)then
      begin
@@ -691,12 +729,8 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
 
    {$IFDEF _FULLGAME}
    GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
-   if(g_players[PlayerClient].isobserver)then
-   begin
-      ui_tab:=3;
-      UIPlayer:=0;
-   end
-   else UIPlayer:=PlayerClient;
+   if(g_players[PlayerClient].isobserver)then ui_tab:=3;
+   UIPlayer:=PlayerClient;
    {$ENDIF}
 end;
 
@@ -706,7 +740,7 @@ begin
    GameStartScirmish:=false;
 
    if(G_Started)
-   or((PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby>0))then exit;
+   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer))then exit;
 
    if(PlayersReadyStatus)then
    begin
@@ -729,7 +763,7 @@ begin
 
    if(not G_Started)
    or(net_status=ns_client)
-   or((PlayerRequestor>0)and(PlayerRequestor<>PlayerLobby))then exit;
+   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobby))then exit;
 
    GameBreak:=true;
    if(Check)then exit;
@@ -755,7 +789,7 @@ begin
 
    PlayersSetDefault;
 
-   for p:=2 to MaxPlayers do
+   for p:=1 to LastPlayer do
     with g_players[p] do
     begin
        race :=random(r_cnt+1);
@@ -765,12 +799,12 @@ begin
        then team:=1+random(4)
        else team:=2+random(3);
 
-       if(random(2)=0)and(p>2)
+       if(random(2)=0)and(p>1)
        then PlayerSlotChangeState(0,p,pss_opened        ,false)
        else PlayerSlotChangeState(0,p,pss_AI_3+random(6),false);
     end;
 
-   PlayersSwap(PlayerClient,random(MaxPlayers)+1,false);
+   PlayersSwap(PlayerClient,random(MaxPlayer),false);
 
    if(random(3)=0)
    then g_ai_slots:=0
@@ -968,18 +1002,18 @@ end;
 
 procedure GameDefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
-teams_army: array[0..MaxPlayers] of integer;
+teams_army: array[0..LastPlayer] of integer;
 begin
    if(net_status>ns_single)and(G_Step<fr_fps1)then exit;
 
    wteam_last:=255;
    wteams_n  :=0;
    FillChar(teams_army,SizeOf(teams_army),0);
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
      teams_army[team]+=army;
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     if(teams_army[p]>0)then
     begin
        wteam_last:=p;
@@ -992,7 +1026,7 @@ end;
 procedure GameDefaultDefeatConditions;
 var i:byte;
 begin
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
      if(g_players[i].army>0)then exit;
    GameSetStatusWinnerTeam(0);
 end;
@@ -1000,7 +1034,7 @@ end;
 procedure PlayersCycle;
 var p:byte;
 begin
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
      if(player_type>pt_none)then
      begin
@@ -1028,8 +1062,7 @@ begin
            begin
               isrevealed:=false;
               if(n_builders<=0)then//{$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
-                if(g_mode<>gm_invasion)
-                or(p>0)then isrevealed:=true;
+                isrevealed:=true;
 
               if(o_id>0)and(army>0)and(not isobserver)and(not isdefeated)and(player_type=pt_human)then
                 PlayerExecuteOrder(p);
@@ -1089,9 +1122,9 @@ begin
    SoundControl;
 
    if(net_status=ns_client)then
-    if(net_svsearch)
-    then net_Discowering
-    else net_Client;
+     if(net_svsearch)
+     then net_Discowering
+     else net_Client;
    replay_Code;
 
    {$ELSE}
@@ -1221,12 +1254,8 @@ begin
 
          UpdatePlayersStatusVars;
 
-         GameModeCPoints;
+         {GameModeCPoints;
          case g_mode of
-         gm_invasion  : begin
-                        GameModeInvasion;
-                        GameDefaultDefeatConditions;
-                        end;
          gm_royale    : begin
                            if(g_cycle_order=0)then
                              if(g_royal_r>0)then g_royal_r-=1;
@@ -1235,7 +1264,7 @@ begin
          gm_capture,
          gm_KotH      : GameDefaultDefeatConditions;
          else           GameDefaultEndConditions;
-         end;
+         end;}
       end;
       GameObjectsCode;
    end;

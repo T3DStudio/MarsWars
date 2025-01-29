@@ -35,11 +35,11 @@ begin
    MakeChatTargets:=0;
    case a of
 chat_all      : MakeChatTargets:=255;
-chat_allies   : for p:=1 to MaxPlayers do
+chat_allies   : for p:=0 to LastPlayer do
                  with g_players[p] do
                   if(player_type>pt_none)and(team=g_players[player].team)then
                    SetBBit(@MakeChatTargets,p,true);
-1..MaxPlayers : if(g_players[a].player_type=pt_human)then SetBBit(@MakeChatTargets,a,true);
+0..LastPlayer : if(g_players[a].player_type=pt_human)then SetBBit(@MakeChatTargets,a,true);
    end;
 end;
 
@@ -63,8 +63,8 @@ begin
          then ingame_chat:=chat_all;
       net_chat_tar:=MakeChatTargets(ingame_chat,PlayerClient);
    end
-   else
-    if(menu_item=100)or(ingame_chat>0)then //menu chat
+   else ;
+    {if(menu_item=100)or(ingame_chat>0)then //menu chat   ?????????????
     begin
        if(menu_state)then
        begin
@@ -75,12 +75,12 @@ begin
        if(length(net_chat_str)>0)and(net_chat_tar>0)then
        begin
           if(net_status=ns_client)
-          then net_send_chat(        net_chat_tar,net_chat_str)
+          then net_send_chat(             net_chat_tar,net_chat_str )
           else GameLogChat  (PlayerClient,net_chat_tar,net_chat_str,false);
        end;
        net_chat_str:='';
        ingame_chat :=0;
-    end;
+    end;}
 end;
 
 procedure GameTogglePause;
@@ -270,11 +270,14 @@ begin
       wip_own_unum   - own      unum
    }
    fly:=false;
-   with g_players[UIPlayer] do
-   begin
-      sc:=ucl_cs[false]+ucl_cs[true ];
-      tteam:=team;
-   end;
+   tteam:=255;
+   sc:=0;
+   if(UIPlayer<=LastPlayer)then
+     with g_players[UIPlayer] do
+     begin
+        sc:=ucl_cs[false]+ucl_cs[true ];
+        tteam:=team;
+     end;
    ui_whoInPoint:=0;
    if(PointInCam(tx,ty))then
     for i:=1 to MaxUnits do
@@ -437,48 +440,40 @@ begin
       pct_right  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_stop ,PlayerClient);
       end;
 
-3:  if(rpls_rstate>=rpls_state_read)then
-    begin
-       if(rpls_fstate=rpls_state_read)then  // replay player controls
-       case u of
-       1 : case click_type of
-           pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,-1);
-           pct_right  : replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,-1);
-           pct_middle : replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,-1);
-           end;
-       2 : case click_type of
-           pct_left   : if(not replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*2 ;
-           pct_right  : if(not replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*10;
-           pct_middle : if(not replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*fr_fps1;
-           end;
-       else
-         if(click_type=pct_left)then
-           case u of
-           0 : sys_uncappedFPS:=not sys_uncappedFPS;
-           3 : begin
-                  if  (G_Status =gs_running    )
-                  then G_Status:=gs_replaypause
-                  else G_Status:=gs_running;
-                  rpls_ForwardStep:=0;
+3:  case tab3PageType of
+    1:   case u of
+         1 : case click_type of
+             pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,-1);
+             pct_right  : replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,-1);
+             pct_middle : replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,-1);
+             end;
+         2 : case click_type of
+             pct_left   : if(not replay_SetPlayPosition(g_step-(fr_fps1*2      )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*2 ;
+             pct_right  : if(not replay_SetPlayPosition(g_step-(fr_fps1*10     )+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*10;
+             pct_middle : if(not replay_SetPlayPosition(g_step-(fr_fps1*fr_fps1)+1,fr_fps1))then rpls_ForwardStep:=fr_fpsd2*fr_fps1;
+             end;
+         else
+             if(click_type=pct_left)then
+               case u of
+             0 : sys_uncappedFPS:=not sys_uncappedFPS;
+             3 : begin
+                    if  (G_Status =gs_running    )
+                    then G_Status:=gs_replaypause
+                    else G_Status:=gs_running;
+                    rpls_ForwardStep:=0;
+                 end;
+             4 : rpls_POVCam :=not rpls_POVCam;
+             5 : rpls_showlog:=not rpls_showlog;
+             6 : sys_fog     :=not sys_fog;
+         8..17 : UIPlayer    :=u-8;
                end;
-           4 : rpls_POVCam  :=not rpls_POVCam;
-           5 : rpls_showlog:=not rpls_showlog;
-           6 : sys_fog    :=not sys_fog;
-       8..14 : UIPlayer    :=u-8;
-           end;
-       end;
-   end
-   else
-     if(g_players[PlayerClient].isobserver)then // isobserver controls
-     begin
-        if(click_type=pct_left)then
+         end;
+    2: if(click_type=pct_left)then
           case u of
           0    :  sys_fog:=not sys_fog;
-          2..8 :  UIPlayer:=u-2;
+          2..11:  UIPlayer:=u-2;
           end;
-     end
-     else
-       if(not g_players[PlayerClient].isdefeated)and(G_Status=gs_running)then
+    3: if(G_Status=gs_running)then
          if(click_type=pct_left)then
          begin
             case u of
@@ -496,7 +491,7 @@ begin
 
             9 : if(s_barracks>0)
                 or(s_smiths  >0)
-                then PlayerSetOrder(0,0,0,0,0,po_prod_stop,PlayerClient) // comon production stop
+                then PlayerSetOrder(0,0,0,0,0,po_prod_stop,PlayerClient) // common production stop
                 else
                   case ui_tab of
                   1 : PlayerSetOrder(0,0,0,0,255,po_prod_unit_stop,PlayerClient);
@@ -513,6 +508,7 @@ begin
 
             mb_Check(false);
          end;
+    end;
          end;
    end;
 end;
@@ -528,9 +524,7 @@ end;
 begin
    test_hotkeys:=true;
    case k of
-sdlk_end       : if(ks_ctrl>0)
-                 then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
-                 else sys_uncappedFPS:=not sys_uncappedFPS;
+sdlk_end       : if(ks_ctrl>0)then sys_uncappedFPS:=not sys_uncappedFPS;
 sdlk_home      : test_fastprod:=not test_fastprod;
 sdlk_pageup    : with g_players[PlayerClient] do if(player_type=pt_human)then player_type:=pt_ai else player_type:=pt_human;
 sdlk_pagedown  : with g_players[PlayerClient] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
@@ -539,10 +533,6 @@ SDLK_F3        : nullupgr(PlayerClient);
 {SDLK_F4        : with g_players[PlayerClient] do
                   if(IsUnitRange(ai_scout_u_cur,nil))then
                    with g_units[ai_scout_u_cur] do GameCameraMoveToPoint(x,y); }
-SDLK_F4        : if(g_mode=gm_invasion)then
-                   if(ks_ctrl>0)
-                   then PlayerKill(0)
-                   else GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));
 SDLK_F5        : PlayerClient:=0;
 SDLK_F6        : PlayerClient:=1;
 SDLK_F7        : PlayerClient:=2;
@@ -567,8 +557,6 @@ begin
    k_dbl:=(ks_dbl>0)and(k=k_dblk);
    ks_dbl:=fr_fpsd4;
    k_dblk:=k;
-
-   PlayerAPMInc(PlayerClient);
 
    if(k=sdlk_pause)then
    begin
@@ -724,15 +712,15 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(menu_state)then
                                                    begin
-                                                   if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -menu_saveload_listh ,false);
-                                                   if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -menu_replays_listh  ,false);
-                                                   if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-menu_netsearch_listh,false);
+                                                   if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -menu_saveload_listh ,false);
+                                                   if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -menu_replays_listh  ,false);
+                                                   if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                                    end;
                             SDL_BUTTON_WHEELUP   : if(menu_state)then
                                                    begin
-                                                   if(menu_UnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -menu_saveload_listh ,false);
-                                                   if(menu_UnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -menu_replays_listh  ,false);
-                                                   if(menu_UnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-menu_netsearch_listh,false);
+                                                   if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -menu_saveload_listh ,false);
+                                                   if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -menu_replays_listh  ,false);
+                                                   if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                                    end;
                            else
                            end;
@@ -948,7 +936,7 @@ end;
 procedure g_keyboard;
 begin
    if(not m_vmove)and(not rpls_POVCam)then GameCameraMove;
-   if(ingame_chat>0)then net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,ChatLen2,nil);
+   if(ingame_chat>0)then net_chat_str:=txt_StringApplyInput(net_chat_str,k_kbstr,ChatLen2,nil);
 end;
 
 procedure InputGame;

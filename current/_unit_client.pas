@@ -67,7 +67,7 @@ var t,s:integer;
       b:byte;
 begin
    wudata_log:=false;
-   if(p<=MaxPlayers)then
+   if(p<=LastPlayer)then
     with g_players[p] do
     begin
        if(log_n<clog_n^)then
@@ -286,7 +286,7 @@ end;
 procedure wpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to MaxPlayers do
+   for p:=0 to LastPlayer do
     if(GetBBit(@g_player_astatus,p))then
      with g_players[p] do
      begin
@@ -396,10 +396,6 @@ begin
 
    if(wstepb1)then
      case g_mode of
-gm_invasion : begin
-              wudata_byte(g_inv_wave_n     ,rpl);
-              wudata_int (g_inv_wave_t_next,rpl);
-              end;
 gm_royale   : wudata_int (g_royal_r        ,rpl);
      end;
 
@@ -417,7 +413,7 @@ gm_royale   : wudata_int (g_royal_r        ,rpl);
    if(not rpl)
    then UpdatePlayersStatusVars;
 
-   if(g_player_astatus>0)and(g_players[POVPlayer].isobserver)then SetBBit(@g_player_astatus,7,true);
+   //if(g_player_astatus>0)and(g_players[POVPlayer].isobserver)then SetBBit(@g_player_astatus,7,true);
 
    wudata_byte(g_player_astatus,rpl);
    if(g_player_astatus>0)then
@@ -729,7 +725,7 @@ begin
                    case uid^._ability of
                0:;
                uab_UACStrike   : unit_ability_UACStrike_Shot(uu);
-               uab_UACScan     : if(team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+               uab_UACScan     : if(ui_UIPlayerTeam(team))then SoundPlayUnit(snd_radar,nil,nil);
                uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
                                  then ability_SpawnUnitStep(pu,UID_Phantom )
                                  else ability_SpawnUnitStep(pu,UID_LostSoul);
@@ -1114,7 +1110,7 @@ end;
 procedure rpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to MaxPlayers do
+   for p:=0 to LastPlayer do
     if(GetBBit(@g_player_astatus,p))then
      with g_players[p] do
      begin
@@ -1141,8 +1137,8 @@ procedure rclient_cl_units;
 var i:byte;
 begin
    g_cl_units:=0;
-   for i:=1 to MaxPlayers do
-    if((g_player_astatus and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
+   for i:=0 to LastPlayer do
+    if(GetBBit(@g_player_astatus,i))then g_cl_units+=MaxPlayerUnits;
 end;
 
 procedure rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
@@ -1168,7 +1164,7 @@ begin
          p:=(b and %00011100) shr 2;
          CPoint_ChangeOwner(cpi,p);
          cpTimerOwnerPlayer:=(b and %11100000) shr 5;
-         if(cpTimerOwnerPlayer<=MaxPlayers)
+         if(cpTimerOwnerPlayer<=LastPlayer)
          then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team;
 
          case t of
@@ -1215,22 +1211,13 @@ begin
 
    if(wstepb1)then
      case g_mode of
-gm_invasion : begin
-              g_inv_wave_n     :=rudata_byte(rpl,0);
-              g_inv_wave_t_next:=rudata_int (rpl,0);
-              end;
 gm_royale   : g_royal_r        :=rudata_int (rpl,0);
      end;
-
-   if(g_mode=gm_invasion)then i:=byte(GetBBit(@g_player_astatus,0));
 
    g_player_astatus:=rudata_byte(rpl,0);
    if(g_player_astatus>0)then
    begin
-      if(g_mode=gm_invasion)then
-        if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
-
-      g_players[POVPlayer].isobserver:=GetBBit(@g_player_astatus,7);
+      //g_players[POVPlayer].isobserver:=GetBBit(@g_player_astatus,7);
 
       _PNU:=rudata_byte(rpl,0)*4;
 
@@ -1252,7 +1239,7 @@ gm_royale   : g_royal_r        :=rudata_int (rpl,0);
       begin
          rpdata_upgr(rpl);
          g_player_rstatus:=rudata_byte(rpl,0);
-         for i:=0 to MaxPlayers do
+         for i:=0 to LastPlayer do
           with g_players[i] do
            isrevealed:=GetBBit(@g_player_rstatus,i);
       end;

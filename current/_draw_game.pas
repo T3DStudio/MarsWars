@@ -490,7 +490,6 @@ begin
           if(tgca_decalS<>nil)then
             draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
 end;
-
 begin
    ssx:=lx-(vid_cam_x mod MapCellW)-MapCellW*2;
    sty:=ly-(vid_cam_y mod MapCellW)-MapCellW*2;
@@ -672,7 +671,6 @@ end;
 //  FOG
 //
 
-
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
 var
  cx, cy,
@@ -776,7 +774,7 @@ begin
    end;}
 
    if(ks_shift>0) then
-   for u:=0 to MaxPlayers do
+   for u:=0 to LastPlayer do
     with g_players[u] do
     begin
        ix:=170+89*u;

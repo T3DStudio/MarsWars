@@ -4,17 +4,21 @@ begin
    with pu^  do
    with uid^ do
    begin
-      with player^ do
-        if(team=g_players[UIPlayer].team)then
-          if(_ability=uab_UACScan)and(reload>radar_vision_time)then
-            if(r_minimap_scan_blink)
-            then filledCircleColor(r_gminimap,trunc(ua_x  *map_mm_cx),
-                                              trunc(ua_y  *map_mm_cx),
-                                              trunc(srange*map_mm_cx),ShadowColor(PlayerColorScheme[pnum]));
-
       if(uid^._ukbuilding)and(mmr>0)
       then boxColor  (r_gminimap,mmx-mmr,mmy-mmr,mmx+mmr,mmy+mmr,PlayerColorScheme[player^.pnum])
       else pixelColor(r_gminimap,mmx,mmy,                        PlayerColorScheme[player^.pnum]);
+
+      with player^ do
+      begin
+         if(UIPlayer<=LastPlayer)then
+           if(team<>g_players[UIPlayer].team)then exit;
+
+         if(_ability=uab_UACScan)and(reload>radar_vision_time)then
+           if(r_minimap_scan_blink)
+           then filledCircleColor(r_gminimap,trunc(ua_x  *map_mm_cx),
+                                             trunc(ua_y  *map_mm_cx),
+                                             trunc(srange*map_mm_cx),ShadowColor(PlayerColorScheme[pnum]));
+      end;
    end;
 end;
 
@@ -53,7 +57,7 @@ begin
    end;
 end;
 
-function UnitCheckVisionType(pu:PTUnit):byte;
+{function UnitCheckVisionType(pu:PTUnit):byte;
 begin
    UnitCheckVisionType:=0;
    if(ui_CheckUnitUIPlayerVision(pu,false))
@@ -64,7 +68,7 @@ begin
        if(player^.team=g_players[UIPlayer].team)
        then UnitCheckVisionType:=2
        else UnitCheckVisionType:=1;
-end;
+end;}
 
 function unit_FogReveal(pu:PTUnit):boolean;
 begin
@@ -83,7 +87,10 @@ begin
           unit_FogReveal:=true
        end
        else
-         if(TeamVision[g_players[UIPlayer].team]>0)then unit_FogReveal:=true;
+         if(UIPlayer>LastPlayer)
+         then unit_FogReveal:=true
+         else
+           if(TeamVision[g_players[UIPlayer].team]>0)then unit_FogReveal:=true;
 
        {case UnitCheckVisionType(pu) of
      1:begin

@@ -1,3 +1,8 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    Other
+
 function rgba2c(r,g,b,a:byte):cardinal;
 begin
    rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
@@ -11,25 +16,25 @@ begin
    (((c and $0000FF00) shr  9) shl 8 );
 end;
 
-procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
+procedure draw_mwtexture(s_dst:pSDL_Surface;x,y:integer;mwt_src:PTMWTexture);
 begin
-   with sur^ do
+   with mwt_src^ do
    begin
       r_RECT^.x:=x;
       r_RECT^.y:=y;
-      r_RECT^.w:=sur^.w;
-      r_RECT^.h:=sur^.h;
-      SDL_BLITSURFACE(sdlSurface,nil,tar,r_RECT);
+      r_RECT^.w:=mwt_src^.w;
+      r_RECT^.h:=mwt_src^.h;
+      SDL_BLITSURFACE(sdlSurface,nil,s_dst,r_RECT);
    end;
 end;
 
-procedure draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
+procedure draw_surf(s_dst:pSDL_Surface;x,y:integer;s_src:pSDL_Surface);
 begin
    r_RECT^.x:=x;
    r_RECT^.y:=y;
-   r_RECT^.w:=sur^.w;
-   r_RECT^.h:=sur^.h;
-   SDL_BLITSURFACE(sur,nil,tar,r_RECT);
+   r_RECT^.w:=s_src^.w;
+   r_RECT^.h:=s_src^.h;
+   SDL_BLITSURFACE(s_src,nil,s_dst,r_RECT);
 end;
 
 procedure draw_set_FontSize1(size:integer);
@@ -129,7 +134,7 @@ begin
 
       case charc of
       tc_player0..
-      tc_player6  : tcolor:=PlayerColorScheme[ord(charc)];
+      tc_player7  : tcolor:=PlayerColorScheme[ord(charc)];
       tc_nl1,
       tc_nl2      : begin
                        x:=ix;
@@ -180,7 +185,6 @@ procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal);
 begin
    SDL_FillRect(r_screen,nil,0);
    draw_text(r_screen,vid_vw div 2,vid_vh div 2,CaptionString,ta_MU,255,color);
-   //stringColor(r_screen,(vid_vw div 2)-(length(CaptionString^)*basefont_w1 div 2), vid_vh div 2,@(CaptionString^[1]),color);
    SDL_FLIP(r_screen);
 end;
 
@@ -205,6 +209,15 @@ begin
       if(TileSetGetN=0)then TileSetGetN:=-1;
    end;
 end;
+
+procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
+begin
+   draw_text(tar,x,y,str+str_GStep2Time(time),ta,255,color);
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    Minimap
 
 procedure map_MinimapBackground;
 var
@@ -241,10 +254,8 @@ procedure map_MinimapPlayerStarts(tar:pSDL_Surface;UnknownStarts,teamStarts:bool
 var i    :byte;
     x,y,r:integer;
 begin
-   for i:=0 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
-      if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
-
       x:=round(map_PlayerStartX[i]*map_mm_cx);
       y:=round(map_PlayerStartY[i]*map_mm_cx);
       r:=trunc(base_1r*map_mm_cx);
@@ -257,7 +268,7 @@ begin
       if(UnknownStarts)then
       begin
          if(teamStarts)
-         then map_MinimapSpot(tar,x,y,r,chr(ord('0')+PlayerSlotGetTeam(g_mode,i,255)),c_white)
+         then map_MinimapSpot(tar,x,y,r,chr(ord('1')+PlayerSlotGetTeam(g_mode,i,255)),c_white)
          else map_MinimapSpot(tar,x,y,r,'?',c_white)
       end
       else
@@ -265,8 +276,8 @@ begin
         and(g_slot_state[i]<>pss_observer)
         then
           if(g_players[i].player_type>pt_none)or(g_ai_slots>0)
-          then map_MinimapSpot(tar,x,y,r,b2s(i)[1],PlayerColorScheme[i])
-          else map_MinimapSpot(tar,x,y,r,'+'      ,c_white);
+          then map_MinimapSpot(tar,x,y,r,b2s(i+1)[1],PlayerColorScheme[i])
+          else map_MinimapSpot(tar,x,y,r,'+'        ,c_white);
    end;
 
    {x:=round(map_symmetryX0*map_mm_cx);
@@ -305,11 +316,6 @@ begin
 end;
 
 
-
-procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
-begin
-   draw_text(tar,x,y,str+str_GStep2Time(time),ta,255,color);
-end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;
 var i,ni,mx,my:integer;
@@ -372,10 +378,15 @@ function LogMes2UIAlarm:boolean;
 begin
    // true  - need announcer sound
    // false - no need announcer sound
-   LogMes2UIAlarm:=true;
-   with g_players[UIPlayer] do
-    with log_l[log_i] do
-     case mtype of
+
+   if(UIPlayer>LastPlayer)
+   then LogMes2UIAlarm:=false
+   else
+   begin
+      LogMes2UIAlarm:=true;
+      with g_players[UIPlayer] do
+        with log_l[log_i] do
+          case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
 lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
@@ -389,7 +400,8 @@ lmt_unit_attacked    : begin
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
                        LogMes2UIAlarm:=not PointInCam(xi,yi);
                        end;
-     end;
+          end;
+   end;
 end;
 
 

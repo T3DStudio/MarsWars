@@ -836,6 +836,9 @@ begin
    str_menu_PlayerSlots[pss_ready   ] :='ready';
    str_menu_PlayerSlots[pss_nready  ] :='not ready';
    str_menu_PlayerSlots[pss_swap    ] :='jump here';
+   str_menu_PlayerSlots[pss_sobserver]:='become observer';
+   str_menu_PlayerSlots[pss_splayer ] :='become player';
+
    for p:=pss_AI_1 to pss_AI_11 do
    str_menu_PlayerSlots[p]           :=ai_name(p-pss_AI_1+1);
 
@@ -847,12 +850,12 @@ begin
 
    str_menu_GameMode                 := 'Game mode';
    str_emnu_GameModel[gm_scirmish]   := tc_lime  +'Skirmish'        +tc_default;
-   str_emnu_GameModel[gm_3x3     ]   := tc_orange+'3x3'             +tc_default;
-   str_emnu_GameModel[gm_2x2x2   ]   := tc_yellow+'2x2x2'           +tc_default;
+   str_emnu_GameModel[gm_4x4     ]   := tc_orange+'4x4'             +tc_default;
+   str_emnu_GameModel[gm_2x2x2x2 ]   := tc_yellow+'2x2x2x2'         +tc_default;
    str_emnu_GameModel[gm_capture ]   := tc_aqua  +'Capturing points'+tc_default;
-   str_emnu_GameModel[gm_invasion]   := tc_blue  +'Invasion'        +tc_default;
    str_emnu_GameModel[gm_KotH    ]   := tc_purple+'King of the Hill'+tc_default;
    str_emnu_GameModel[gm_royale  ]   := tc_red   +'Battle Royal'    +tc_default;
+   str_emnu_GameModel[gm_assault ]   := tc_blue  +'Assault'         +tc_default;
 
    str_menu_Generators               := 'Generators';
    str_menu_Generatorsl[0]           := 'own';
@@ -974,9 +977,9 @@ begin
    str_attr_detector                 := tc_purple+'detector'    ;
    str_attr_transport                := tc_gray  +'transport'   ;
 
-   str_teams[0]                      := str_observer;
-   for p:=1 to MaxPlayers do
-   str_teams[p]                      := 'team '+b2s(p);
+   //str_teams[0]                      := str_observer;
+   for p:=0 to LastPlayer do
+   str_teams[p]                      := 'team '+b2s(p+1);
 
    {
    str_npnua[0]          := tc_red   +'x1 ';
@@ -1042,8 +1045,6 @@ begin
    str_uiHint_Energy                 := 'Energy: ';
    str_uiHint_UGroups                := 'Unit groups: ';
    str_uiHint_Time                   := 'Time: ';
-   str_uiHint_InvTime                := 'Wave #';
-   str_uiHint_InvLimit               := 'Monsters limit: ';
    str_uiHint_KotHTime               := 'Center capture time left: ';
    str_uiHint_KotHTimeAct            := 'Time left until center area is active: ';
    str_uiHint_KotHWinner             := ' is King of the Hill!';
@@ -1593,8 +1594,8 @@ begin
 
   str_menu_GameMode            := 'Режим игры';
   str_emnu_GameModel[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
-  str_emnu_GameModel[gm_3x3     ]:= tc_orange+'3x3'               +tc_default;
-  str_emnu_GameModel[gm_2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
+  str_emnu_GameModel[gm_4x4     ]:= tc_orange+'3x3'               +tc_default;
+  str_emnu_GameModel[gm_2x2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
   str_emnu_GameModel[gm_capture ]:= tc_aqua  +'Захват точек'      +tc_default;
   str_emnu_GameModel[gm_invasion]:= tc_blue  +'Вторжение'         +tc_default;
   str_emnu_GameModel[gm_KotH    ]:= tc_purple+'Царь горы'         +tc_default;

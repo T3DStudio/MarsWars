@@ -29,9 +29,6 @@ fr_fps6                = fr_fps1*6;
 fr_fps2d3              = fr_fpsd3*2;    // 2/3
 fr_fps60               = fr_fps1*60;
 
-APM_UPDPeriod          = fr_fps1*5;
-APM_1Period            = fr_fps60;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Game settings borders
@@ -45,7 +42,8 @@ gms_g_maxgens          = 6;  // 0-6  max neutrall generators options
 //  BASE
 //
 
-pt_none                = 0;  // player type
+// player type
+pt_none                = 0;
 pt_human               = 1;
 pt_ai                  = 2;
 
@@ -56,47 +54,49 @@ pss_opened             = 2;
 pss_ready              = 3;  // menu option, not state
 pss_nready             = 4;  // menu option, not state
 pss_swap               = 5;  // menu option, not state
-pss_AI_1               = 6;  // very easy
-//pss_AI_2               = 7;  // easy
-pss_AI_3               = 8;  // medium
-{pss_AI_4                = 9;  // hard
-pss_AI_5                = 10; // harder
-pss_AI_6                = 11; // very hard
-pss_AI_7                = 12; // elite
-pss_AI_8                = 13; // Cheater 1 (Vision)
-pss_AI_9                = 14; // Cheater 2 (Vision+MultiProd)
-pss_AI_10               = 15; // Cheater 3 (Vision+MultiProd+FastUProd)   }
-pss_AI_11              = 16; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
+pss_sobserver          = 6;  // menu option, not state
+pss_splayer            = 7;  // menu option, not state
+pss_AI_1               = 8;  // very easy
+//pss_AI_2             = 9;  // easy
+pss_AI_3               = 10; // medium
+{pss_AI_4              = 11; // hard
+pss_AI_5               = 12; // harder
+pss_AI_6               = 13; // very hard
+pss_AI_7               = 14; // elite
+pss_AI_8               = 15; // Cheater 1 (Vision)
+pss_AI_9               = 16; // Cheater 2 (Vision+MultiProd)
+pss_AI_10              = 17; // Cheater 3 (Vision+MultiProd+FastUProd)   }
+pss_AI_11              = 18; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
 
 gms_g_maxai            = pss_AI_11-pss_AI_1+1; // 0-11 max skirmish AI skills
 
-ps_states_n            = 6+gms_g_maxai;
+ps_states_n            = 8+gms_g_maxai;
 
 player_default_ai_level= 7;
 
 gm_scirmish            = 0;  // game mode
-gm_3x3                 = 1;
-gm_2x2x2               = 2;
+gm_4x4                 = 1;
+gm_2x2x2x2             = 2;
 gm_capture             = 3;
-gm_invasion            = 4;
-gm_KotH                = 5;
-gm_royale              = 6;
+gm_KotH                = 4;
+gm_royale              = 5;
+gm_assault             = 6;
 
-gm_ModesFixedTeams     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
-//gm_ModesFixedPositions : set of byte = [gm_3x3,gm_2x2x2];
+gm_ModesFixedTeams     : set of byte = [gm_4x4,gm_2x2x2x2,gm_assault];
 
-allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
+allgamemodes           : set of byte = [gm_scirmish,gm_4x4,gm_2x2x2x2,gm_capture,gm_KotH,gm_royale,gm_assault];
 gms_count              = 6;
 
 g_step_koth_pause      = fr_fps60*4;
 
-gs_running             = 0;  //
-{gs_paused1            = 1; 1..MaxPlayers
+{gs_paused0            = 0; 0..MaxPlayers
+ gs_paused1            = 1;
  gs_paused2            = 2;
  gs_paused3            = 3;
  gs_paused4            = 4;
  gs_paused5            = 5;
- gs_paused6            = 6;}
+ gs_paused6            = 6;
+ gs_paused7            = 7;}
 gs_replayend           = 10;
 gs_replayerror         = 11;
 gs_waitserver          = 12;
@@ -108,24 +108,26 @@ gs_win_team3           = 23;
 gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
-
+gs_win_team7           = 27;
+gs_running             = 255;
 
 r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
-MaxPlayers             = 6; //0-6
+MaxPlayer              = 8;
+LastPlayer             = MaxPlayer-1;
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayers*2+(MaxPlayers div 2);
+MaxCPoints             = MaxPlayer*2+(MaxPlayer div 2);
 
-MapCellW               = 88; //86
+MapCellW               = 88;
 MapCellhW              = MapCellW div 2;
 MapSizeCellnStep       = 4;
-MinMapSizeCelln        = 28;
-MaxMapSizeCelln        = 92;
+MinMapSizeCelln        = 32;
+MaxMapSizeCelln        = 96;
 
 MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
 MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
@@ -148,7 +150,7 @@ gp_1x1_cave            = 3;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  CPoints life
+//  CPoints
 //
 
 g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,0,fr_fps60*5,fr_fps60*10,fr_fps60*15,fr_fps60*20,0);
@@ -195,7 +197,9 @@ lmt_chat2              = 2;
 lmt_chat3              = 3;
 lmt_chat4              = 4;
 lmt_chat5              = 5;
-lmt_chat6              = 6; }
+lmt_chat6              = 6;
+lmt_chat7              = 7;}
+lmt_player_chat        = 8;
 lmt_game_message       = 10;
 lmt_game_end           = 11;
 lmt_player_defeated    = 12;
@@ -219,10 +223,9 @@ lmt_already_adv        = 29;
 lmt_NeedMoreProd       = 30;
 lmt_MaximumReached     = 31;
 lmt_UsepsabilityOrder  = 32;
-lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
-                          0..MaxPlayers,
+                          0..LastPlayer,
                           lmt_game_message,
                           lmt_game_end,
                           lmt_player_surrender,
@@ -235,11 +238,6 @@ lmts_last_messages     = [0..255];
 lmt_argt_unit          = 0;
 lmt_argt_upgr          = 1;
 
-{
-uia_nonew              = 0;
-uia_trynew             = 1;
-uia_newstrict          = 2;  }
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  NETGAME
@@ -247,8 +245,8 @@ uia_newstrict          = 2;  }
 
 cl_UpT_arrayN          = 9;
 cl_UpT_arrayN_RPLs     = cl_UpT_arrayN div 2;
-                                                         // 60 140 220 300 380 460 540 620 700 800
-cl_UpT_array           : array[0..cl_UpT_arrayN] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
+                                                         // 60  100 200 300 400 500 600 700 800 900
+cl_UpT_array           : array[0..cl_UpT_arrayN] of byte = (15 ,25 ,50 ,75 ,100,125,150,175,200,225);
 
 ClientTTL              = fr_fps1*10;
 ServerTTL              = fr_fps1;
@@ -699,7 +697,7 @@ mh_homing              = 2;
 //  UNITS
 //
 
-MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
+MaxUnits               = MaxPlayer*MaxPlayerUnits;
 MaxUnitWeapons         = 3;  //0-3
 MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
@@ -744,7 +742,7 @@ mvxy_none              = 0;
 mvxy_relative          = 1;
 mvxy_strict            = 2;
 
-BaseDamage1            = 62;
+BaseDamage1            = 50;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamageh4           = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
@@ -1242,19 +1240,8 @@ basefont_wq3           = basefont_wq*3;
 basefont_w5            = basefont_w1*5;
 basefont_w1h           = basefont_w1+basefont_wh;
 
-
-//txt_line_h1            = basefont_w1+2;
-//txt_line_h2            = 25-basefont_w1;
-//txt_line_h3            = basefont_w1+5;
-
 chat_all               = 255;
 chat_allies            = 254;
-{chat_1                 = 1;
-chat_2                 = 2;
-chat_3                 = 3;
-chat_4                 = 4;
-chat_5                 = 5;
-chat_6                 = 6;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1292,10 +1279,6 @@ vid_oiw                = 18;
 vid_oihw               = vid_oiw+(vid_oiw div 2);
 vid_oisw               = vid_oiw-(vid_oiw div 4);
 vid_oips               = 2*vid_oiw+vid_oisw;
-{vid_svld_m             = 9;
-vid_rpls_m             = 10;
-vid_camp_m             = 11;
-vid_srch_m             = 2; }
 
 ui_max_alarms          = 12;
 
@@ -1307,18 +1290,6 @@ ui_ubtns               = 23;
 //
 //  MENU
 //
-
-{ms1_sett               = 0;
-ms1_svld               = 1;
-ms1_reps               = 2;
-
-ms2_camp               = 0;
-ms2_game               = 1;
-ms2_mult               = 2;
-
-ms3_game               = 0;
-ms3_vido               = 1;
-ms3_sond               = 2; }
 
 MaxMissions            = 21;
 //CMPMaxSkills           = 6;
@@ -1369,16 +1340,6 @@ mp_aboutgame              = 5;
 mp_settings               = 6;
 
 ////////////////////////   menu items
-
-{
-Campaings
-Scirmish
-Load game
-Save game
-Load replay
-About game
-Exit
-}
 
 ////  MAIN
 mi_StartGame              = 1;
@@ -1455,33 +1416,41 @@ mi_settings_NextTrack     = 93;
 
 
 ////  SCIRMISH PLAYERS
+mi_player_status0         = 110;
 mi_player_status1         = 111;
 mi_player_status2         = 112;
 mi_player_status3         = 113;
 mi_player_status4         = 114;
 mi_player_status5         = 115;
 mi_player_status6         = 116;
+mi_player_status7         = 117;
 
+mi_player_race0           = 120;
 mi_player_race1           = 121;
 mi_player_race2           = 122;
 mi_player_race3           = 123;
 mi_player_race4           = 124;
 mi_player_race5           = 125;
 mi_player_race6           = 126;
+mi_player_race7           = 127;
 
+mi_player_team0           = 130;
 mi_player_team1           = 131;
 mi_player_team2           = 132;
 mi_player_team3           = 133;
 mi_player_team4           = 134;
 mi_player_team5           = 135;
 mi_player_team6           = 136;
+mi_player_team7           = 137;
 
+mi_player_color0          = 140;
 mi_player_color1          = 141;
 mi_player_color2          = 142;
 mi_player_color3          = 143;
 mi_player_color4          = 144;
 mi_player_color5          = 145;
 mi_player_color6          = 146;
+mi_player_color7          = 147;
 
 ////  MAP PARAMS
 mi_map_Preset             = 151;
@@ -1619,8 +1588,9 @@ tc_player0             = #0;
 tc_player2             = #2;
 tc_player3             = #3;
 tc_player4             = #4;
-tc_player5             = #5;}
-tc_player6             = #6;
+tc_player5             = #5;
+tc_player6             = #6;}
+tc_player7             = #7;
 tc_nl1                 = #11;
 tc_nl2                 = #12;
 tc_purple              = #14;

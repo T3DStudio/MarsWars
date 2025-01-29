@@ -146,76 +146,78 @@ begin
    with menu_items[mi] do D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
    D_menu_EText(tar,mi,ta_MM,text,false,0,0);
 end;
-procedure D_menu_MButtonPP(tar:pSDL_Surface;mi,p1:byte);
+procedure D_menu_PlayerSlot(tar:pSDL_Surface;mi,playeri:byte);
 var tstr:shortstring;
 begin
    with menu_items[mi] do
    begin
       D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
-      if(p1=1)then
+      if(playeri=0)then  // captions above first player line
       begin
          draw_text(tar,mi_x0+draw_font_wh,mi_y0-draw_font_w1,str_menu_Name,ta_LM,255,c_white);
          draw_text(tar,mi_x1-draw_font_wh,mi_y0-draw_font_w1,str_menu_Slot,ta_RM,255,c_white);
       end;
    end;
-   with g_players[p1]    do
-     case g_slot_state[p1] of
-       pss_closed   : D_menu_EText(tar,mi,ta_RM ,str_menu_PlayerSlots[g_slot_state[p1]],true,0,c_white);
+   with g_players[playeri]    do
+     case g_slot_state[playeri] of
+       pss_closed   : D_menu_EText(tar,mi,ta_RM ,str_menu_PlayerSlots[g_slot_state[playeri]],true,0,c_white);
        pss_observer,
        pss_opened   : if(player_type>pt_none)then
-                     begin
-                        D_menu_EText(tar,mi,ta_LM ,name,true,0,c_white);
-                        if(player_type=pt_human)and(net_status<>ns_single)then
-                        begin
-                           if(p1=PlayerLobby)
-                           then tstr:=str_menu_server
-                           else
-                             if(isready)
-                             then tstr:=str_menu_ready
-                             else tstr:=str_menu_nready;
-                           D_menu_EText(tar,mi,ta_RM,tstr,true,0,c_ltgray);
-                        end
-                        else
-                          if(g_slot_state[p1]=pss_observer)then D_menu_EText(tar,mi,ta_RM,str_menu_PlayerSlots[g_slot_state[p1]],true ,0,c_ltgray);
-                     end
-                     else
-                     begin
-                        if(g_ai_slots >0)and(g_slot_state[p1]=pss_opened)then
-                        D_menu_EText(tar,mi,ta_LM,str_menu_PlayerSlots[pss_AI_1+g_ai_slots-1],false,0,c_ltgray);
+                      begin
+                         D_menu_EText(tar,mi,ta_LM ,name,true,0,c_white);
+                         if(player_type=pt_human)and(net_status<>ns_single)then
+                         begin
+                            if(playeri=PlayerLobby)
+                            then tstr:=str_menu_server
+                            else
+                              if(isready)
+                              then tstr:=str_menu_ready
+                              else tstr:=str_menu_nready;
+                            D_menu_EText(tar,mi,ta_RM,tstr,true,0,c_ltgray);
+                         end
+                         else
+                           if(g_slot_state[playeri]=pss_observer)then D_menu_EText(tar,mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_ltgray);
+                      end
+                      else
+                      begin
+                         if(g_ai_slots >0)and(g_slot_state[playeri]=pss_opened)then
+                         D_menu_EText(tar,mi,ta_LM,str_menu_PlayerSlots[pss_AI_1+g_ai_slots-1],false,0,c_ltgray);
 
-                        D_menu_EText(tar,mi,ta_RM,str_menu_PlayerSlots[g_slot_state[p1]    ],true ,0,c_ltgray);
-                     end;
+                         D_menu_EText(tar,mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_ltgray);
+                      end;
        pss_AI_1..
        pss_AI_11    : if(player_type>pt_none)
-                     then D_menu_EText(tar,mi,ta_LM,name,true,0,0);
+                      then D_menu_EText(tar,mi,ta_LM,name,true,0,0);
      end;
 end;
-procedure D_menu_MButtonPR(tar:pSDL_Surface;mi,p1:byte);
+procedure D_menu_PlayerRace(tar:pSDL_Surface;mi,p1:byte);
 begin
    with menu_items[mi] do
    begin
       D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
-      if(p1=1)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Race,ta_MM,255,c_white);
-   end;
-   with g_players   [p1] do
-     D_menu_EText(tar,mi,ta_MM,str_racel[slot_race],true,0,0);
-end;
-procedure D_menu_MButtonPT(tar:pSDL_Surface;mi,p1:byte);
-begin
-   with menu_items[mi] do
-   begin
-      D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
-      if(p1=1)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Team,ta_MM,255,c_white);
+      if(p1=0)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Race,ta_MM,255,c_white);
    end;
    with g_players[p1] do
-     D_menu_EText(tar,mi,ta_MM,str_teams[PlayerSlotGetTeam(g_mode,p1,255)],true,0,0);
+     D_menu_EText(tar,mi,ta_MM,str_racel[slot_race],true,0,0);
 end;
-procedure D_menu_MButtonPC(tar:pSDL_Surface;mi,p1:byte);
+procedure D_menu_PlayerTeam(tar:pSDL_Surface;mi,p1:byte);
 begin
    with menu_items[mi] do
    begin
       D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
-      if(p1=1)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_white);
+      if(p1=0)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Team,ta_MM,255,c_white);
+   end;
+   with g_players[p1] do
+     if(isobserver)or(g_slot_state[p1]=pss_observer)
+     then D_menu_EText(tar,mi,ta_MM,str_observer,true,0,0)
+     else D_menu_EText(tar,mi,ta_MM,str_teams[PlayerSlotGetTeam(g_mode,p1,255)],true,0,0);
+end;
+procedure D_menu_PlayerColor(tar:pSDL_Surface;mi,p1:byte);
+begin
+   with menu_items[mi] do
+   begin
+      D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
+      if(p1=0)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_white);
       boxColor(tar,mi_x0+basefont_wh,mi_y0+basefont_wh,
                    mi_x1-basefont_wh,mi_y1-basefont_wh,PlayerColorScheme[p1]);
    end;
@@ -317,7 +319,7 @@ begin
    draw_text(tar,vid_vw ,vid_vh,str_ver ,ta_RD,255,c_white);
 
    if(test_mode>0)then
-   draw_text(tar,vid_vhw,0,'TEST MODE #'+b2s(test_mode),ta_MU,255,c_white);
+     draw_text(tar,vid_vhw,0,'TEST MODE #'+b2s(test_mode),ta_MU,255,c_white);
 
    draw_text(tar,vid_vhw,vid_vh,str_cprt,ta_MD,255,c_white);
 end;
@@ -434,33 +436,41 @@ mi_saveload_delete         : D_menu_MButton (tar,i,str_menu_DeleteFile      );
      with menu_items[i] do
        if(mi_x1>0)then
          case i of
+mi_player_status0,
 mi_player_status1,
 mi_player_status2,
 mi_player_status3,
 mi_player_status4,
 mi_player_status5,
-mi_player_status6          : D_menu_MButtonPP(tar,i,i-mi_player_status1+1);
+mi_player_status6,
+mi_player_status7          : D_menu_PlayerSlot(tar,i,i-mi_player_status0);
 
+mi_player_race0,
 mi_player_race1,
 mi_player_race2,
 mi_player_race3,
 mi_player_race4,
 mi_player_race5,
-mi_player_race6            : D_menu_MButtonPR(tar,i,i-mi_player_race1+1);
+mi_player_race6,
+mi_player_race7            : D_menu_PlayerRace(tar,i,i-mi_player_race0  );
 
+mi_player_team0,
 mi_player_team1,
 mi_player_team2,
 mi_player_team3,
 mi_player_team4,
 mi_player_team5,
-mi_player_team6            : D_menu_MButtonPT(tar,i,i-mi_player_team1+1);
+mi_player_team6,
+mi_player_team7            : D_menu_PlayerTeam(tar,i,i-mi_player_team0  );
 
+mi_player_color0,
 mi_player_color1,
 mi_player_color2,
 mi_player_color3,
 mi_player_color4,
 mi_player_color5,
-mi_player_color6           : D_menu_MButtonPC(tar,i,i-mi_player_color1+1);
+mi_player_color6,
+mi_player_color7           : D_menu_PlayerColor(tar,i,i-mi_player_color0);
 
 mi_map_Preset              : D_menu_MButtonM(tar,i,g_presets[g_preset_cur].gp_name        ,true );
 mi_map_Seed                : D_menu_MButtonU(tar,i,str_map_seed,c2s(map_seed)                   );

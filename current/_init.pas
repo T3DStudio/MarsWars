@@ -55,49 +55,7 @@ end;
 
 {$ENDIF}
 
-procedure InitGamePresets;
-procedure SetPreset(pid:byte;mseed:cardinal;msize:integer;mtype,msym,gmode,t1,t2,t3,t4,t5,t6:byte);
-begin
-   if(g_preset_n<=pid)then
-   begin
-      if(g_preset_n=255)then exit;
-      while(g_preset_n<=pid)do
-      begin
-         g_preset_n+=1;
-         setlength(g_presets,g_preset_n);
-      end;
-   end;
 
-   with g_presets[pid] do
-   begin
-      gp_map_seed    := mseed;
-      gp_map_mw      := msize;
-      gp_map_type    := mtype;
-      gp_map_symmetry:= msym;
-      gp_g_mode      := gmode;
-      FillChar(gp_player_team,SizeOf(gp_player_team),0);
-      gp_player_team[1]:=t1;
-      gp_player_team[2]:=t2;
-      gp_player_team[3]:=t3;
-      gp_player_team[4]:=t4;
-      gp_player_team[5]:=t5;
-      gp_player_team[6]:=t6;
-   end;
-end;
-begin
-   g_preset_cur:=0;
-   g_preset_n  :=0;
-   setlength(g_presets,g_preset_n);
-
-   SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,1,2,0,0,0,0);
-   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake ,1,gm_scirmish,1,2,0,0,0,0);
-   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon,1,gm_scirmish,1,2,0,0,0,0);
-
-   {$IFNDEF _FULLGAME}
-   g_presets[gp_custom].gp_name:= 'custom preset';
-   MakeGamePresetsNames(@str_gmodel[0],@str_m_typel[0]);
-   {$ENDIF}
-end;
 
 procedure InitGame;
 begin
@@ -129,6 +87,7 @@ begin
    InitUIDDataCL;
    missile_InitCLData;
    MakeUnitIcons;
+   FillChar(ui_dPlayer,SizeOf(ui_dPlayer),0);
 
    {$ENDIF}
 

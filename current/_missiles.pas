@@ -188,7 +188,7 @@ begin
        IsUnitRange(tar,@tu);
 
        damage:=adddmg;
-       if(player<=MaxPlayers)and(tu<>nil)then
+       if(player<=LastPlayer)and(tu<>nil)then
         with g_players[player] do
         begin
            if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;

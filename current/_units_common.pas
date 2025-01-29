@@ -411,7 +411,7 @@ begin
       AddToInt(@TeamDetection[team],MinVisionTime);
 
       if(isrevealed)then
-        for t:=0 to MaxPlayers do
+        for t:=0 to LastPlayer do
         begin
            AddToInt(@TeamVision   [t],fr_fps1);
            AddToInt(@TeamDetection[t],fr_fps1);
@@ -422,7 +422,7 @@ procedure unit_UpVision(pu:PTUnit);
 var p:byte;
 begin
    with pu^ do
-    for p:=0 to MaxPlayers do
+    for p:=0 to LastPlayer do
     begin
        if(TeamVision   [p]>0)then AddToInt(@TeamVision   [p],MinVisionTime);
        if(TeamDetection[p]>0)then AddToInt(@TeamDetection[p],MinVisionTime);
@@ -541,7 +541,7 @@ begin
        buff[ub_Cast]:=fr_fps1;
 
        {$IFDEF _FULLGAME}
-       if(ServerSide)and(player^.team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+       if(ServerSide)and(ui_UIPlayerTeam(player^.team))then SoundPlayUnit(snd_radar,nil,nil);
        {$ENDIF}
     end;
 end;
@@ -599,7 +599,7 @@ begin
          unit_OrderClear(pCaster,true);
          ua_x:=shot_x;
          ua_y:=shot_y;
-         for i:=0 to MaxPlayers do AddToInt(@TeamVision[i],fr_fps2);
+         for i:=0 to LastPlayer do AddToInt(@TeamVision[i],fr_fps2);
          reload:=mstrike_reload;
          upgr[upgr_uac_rstrike]-=1;
          unit_ability_UACStrike_Shot(pCaster);
@@ -861,7 +861,7 @@ tzone:word;
 begin
    CheckBuildArea:=0;
 
-   if(pl<=MaxPlayers)then
+   if(pl<=LastPlayer)then
     with g_players[pl] do
      if(n_builders<=0)then
      begin
@@ -911,7 +911,7 @@ begin
    }
 
    obstacles:=true;
-   if(playern<=MaxPlayers)then
+   if(playern<=LastPlayer)then
    begin
       //with g_uids[buid] do
       //  with g_players[playern] do
@@ -1752,9 +1752,9 @@ begin
       for i:=0 to MaxUnitBuffs do
         if(0<buff[i])and(buff[i]<_ub_infinity)then buff[i]-=1;
 
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
       begin
-         if(0<TeamVision[i])and(TeamVision[i]<_ub_infinity)then TeamVision[i]-=1;
+         if(0<TeamVision   [i])and(TeamVision   [i]<_ub_infinity)then TeamVision   [i]-=1;
          if(0<TeamDetection[i])and(TeamDetection[i]<_ub_infinity)then TeamDetection[i]-=1;
       end;
 
@@ -1816,7 +1816,6 @@ begin
        unit_PC_add_dec(pu);
 
        //if(G_Status=gs_running)then
-        if(playeri>0)or(g_mode<>gm_invasion)then
          if(army<=0)and(player_type>pt_none)//{$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;
@@ -2045,17 +2044,6 @@ UID_UTransport    : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);tr
 UID_APC           : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
-      if(playeri=0)and(g_mode=gm_invasion)then
-      begin
-         ukfloater:=true;
-         if(cycle_order<4 )
-         or(cycle_order=11)
-         or(cycle_order=21)then buff[ub_HVision]:=_ub_infinity else buff[ub_HVision]:=0;
-         if(g_inv_wave_n>3)then
-           if(cycle_order<2 )
-           or(cycle_order=10)
-           or(cycle_order=20)then buff[ub_Invis]:=_ub_infinity else buff[ub_Invis]:=0;
-      end;
 
       // BUILD AREA
       case uidi of

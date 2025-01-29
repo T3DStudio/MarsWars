@@ -35,6 +35,8 @@ begin
    c_aaqua   :=rgba2c(0  ,255,255,42 );
    c_aqua    :=rgba2c(0  ,255,255,255);
    c_purple  :=rgba2c(255,0  ,255,255);
+   c_lpurple :=rgba2c(160,113,255,255);
+   c_dpurple :=rgba2c(128,0  ,255,255);
    c_green   :=rgba2c(0  ,150,0  ,255);
    c_agreen  :=rgba2c(0  ,150,0  ,42 );
    c_dblue   :=rgba2c(100,100,192,255);

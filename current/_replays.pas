@@ -51,38 +51,14 @@ begin
 
          rpls_str_info3+=tc_nl2+str_menu_players+tc_nl2;
 
-         for i:=1 to MaxPlayers do
+         for i:=0 to LastPlayer do
          begin
             BlockRead(f,dstr,sizeof(dstr));   // name
 
             rpls_str_info3+=chr(i)+pl_n_ch[i=dbyte1]+tc_default;
             if(i=dbyte1)then rpls_str_infoS+=pl_n_ch[i=dbyte1]+dstr;
 
-            {t :=0;
-            tm:=0;
-            BlockRead(f,t ,1);  // state
-            if(t=pt_none)then
-            begin
-               rpls_str_info3+=fn;
-               BlockRead(f,dcard,4);
-               BlockRead(f,dbyte,1);
-            end
-            else
-            begin
-               BlockRead(f,t ,1); // race
-               BlockRead(f,tm,1); // slot_race
-               BlockRead(f,t ,1); // team
-               BlockRead(f,tm,1); // slot_state
-
-               if(t=0)
-               then rpls_str_info3+=str_observer
-               else
-                 if(tm<=r_cnt)
-                 then rpls_str_info3+=str_racel[tm][2]
-                 else rpls_str_info3+='?';
-               rpls_str_info3+=','+t2c(t)+','+fn;
-            end; }
-            if(i<MaxPlayers)then rpls_str_info3+=tc_nl2;
+            if(i<LastPlayer)then rpls_str_info3+=tc_nl2;
          end;
       end
       else rpls_str_info1:=str_error_WrongVersion;
@@ -130,7 +106,7 @@ begin
                             +sizeof(race       )
                             +sizeof(slot_race  )
                             +sizeof(team       )
-                            +g_slot_state[0]    )*MaxPlayers);
+                            +g_slot_state[0]    )*MaxPlayer);
 end;
 
 function replay_GetProgress:single;
@@ -267,8 +243,8 @@ begin
    end
    else
    begin
-      rpls_fstate  :=rpls_state_write;
-      rpls_rstate    :=rpls_state_write;
+      rpls_fstate   :=rpls_state_write;
+      rpls_rstate   :=rpls_state_write;
       rpls_u        :=MaxPlayerUnits+1;
       rpls_POVPlayer:=PlayerClient;
       rpls_log_n    :=g_players[rpls_POVPlayer].log_n;
@@ -282,7 +258,7 @@ begin
          BlockWrite(rpls_file,data_p^,data_s);
       {$I+}
 
-      for p:=1 to MaxPlayers do
+      for p:=0 to LastPlayer do
         with g_players[p] do
         begin
            {$I-}
@@ -437,7 +413,7 @@ begin
          or(g_start_base  >gms_g_startb )
          or(g_generators  >gms_g_maxgens)
          or(g_ai_slots    >gms_g_maxai  )
-         or(rpls_POVPlayer>MaxPlayers   )then
+         or(rpls_POVPlayer>LastPlayer   )then
          begin
             replay_Abort;
             G_Started:=false;
@@ -446,7 +422,7 @@ begin
             exit;
          end;
 
-         for p:=1 to MaxPlayers do
+         for p:=0 to LastPlayer do
           with g_players[p] do
           begin
              {$I-}

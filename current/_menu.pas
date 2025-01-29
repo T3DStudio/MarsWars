@@ -17,12 +17,24 @@ begin
    menu_NetSearchStop:=false;
    if(net_status=ns_client)and(net_svsearch)then
    begin
-      menu_NetSearchStop:=true;
-      net_svsearch:=false;
       net_dispose;
-      net_status :=ns_single;
+      menu_NetSearchStop:=true;
+      net_svsearch  :=false;
+      net_status    :=ns_single;
       net_status_str:='';
    end;
+end;
+procedure menu_NetClientConnect;
+begin
+   if(net_UpSocket(0))then
+   begin
+      txt_ValidateServerAddr;
+      net_status_str:=str_menu_connecting;
+      net_status    :=ns_client;
+      rpls_pnu      :=0;
+      PlayerLobby   :=255;
+   end
+   else net_dispose;
 end;
 function menu_NetSearchConnect(Check:boolean):boolean;
 begin
@@ -31,19 +43,11 @@ begin
    begin
       menu_NetSearchConnect:=true;
       if(Check)then exit;
-      net_svsearch:=false;
-      net_dispose;
+      net_svsearch  :=false;
       net_status    :=ns_single;
       net_status_str:='';
-      if(net_UpSocket(0))then
-      begin
-         with net_svsearch_listi[net_svsearch_sel] do net_cl_svaddr:=c2ip(ip)+':'+w2s(swap(port));
-         txt_ValidateServerAddr;
-         net_status_str:=str_menu_connecting;
-         net_status    :=ns_client;
-         rpls_pnu      :=0;
-      end
-      else net_dispose;
+      net_dispose;
+      menu_NetClientConnect;
    end;
 end;
 function menu_ServerStop:boolean;
@@ -52,7 +56,6 @@ begin
    if(net_status=ns_server)then
    begin
       menu_ServerStop:=true;
-
       net_dispose;
       GameDefaultAll;
       G_Started :=false;
@@ -89,23 +92,21 @@ begin
             exit;
          end
          else
-         begin
-            if(not G_Started)then
-            begin
-               if(net_status>ns_single)then exit;
-               if(menu_page1>mp_main)then
-               begin
-                  menu_item :=0;
-                  menu_page1:=mp_main;
-                  exit;
-               end;
-               if(menu_state)then exit;
-            end;
-         end;
+           if(not G_Started)then
+           begin
+              if(net_status>ns_single)then exit;
+              if(menu_page1>mp_main)then
+              begin
+                 menu_item :=0;
+                 menu_page1:=mp_main;
+                 exit;
+              end;
+              if(menu_state)then exit;
+           end;
 
    menu_state:=not menu_state;
 
-   if(net_status=ns_single)and(g_Status<=MaxPlayers)then
+   if(net_status=ns_single)and(g_Status<=LastPlayer)then
      if(menu_state)
      then g_Status:=PlayerClient
      else g_Status:=gs_running;
@@ -131,9 +132,9 @@ end;
 function NeedColumnRace(p:byte):boolean;
 begin
    NeedColumnRace:=false;
-   if(p<=MaxPlayers)then
+   if(p<=LastPlayer)then
      case g_slot_state[p] of
-pss_opened   : with g_players[p] do NeedColumnRace:=((player_type=pt_none)and(g_ai_slots>0))or((player_type>pt_none)and(team>0));
+pss_opened   : with g_players[p] do NeedColumnRace:=((player_type=pt_none)and(g_ai_slots>0))or((player_type>pt_none)and(not isobserver));
 pss_AI_1..
 pss_AI_11    : NeedColumnRace:=true;
      end;
@@ -141,7 +142,7 @@ end;
 function NeedColumnTeam(p:byte):boolean;
 begin
    NeedColumnTeam:=false;
-   if(p<=MaxPlayers)then
+   if(p<=LastPlayer)then
      case g_slot_state[p] of
 pss_opened   : with g_players[p] do NeedColumnTeam:=((player_type=pt_none)and(g_ai_slots>0))or(player_type>pt_none);
 pss_observer,
@@ -222,23 +223,23 @@ begin
    ty0:=menu_logo_h+ty2+menu_main_mp_bh2+1;
 
    tx0:=vid_vhw-396-((vid_vw-vid_minw) div 20);
-   ty1:=menu_main_mp_bhh;
+   ty1:=menu_main_mp_bhh-2;
 
    tx1:=tx0+menu_players_namew+menu_players_racew+menu_players_teamw+ty1*2;
    SetItem(mi_title_players,tx0-basefont_w2,ty0-menu_main_mp_bh1,
-                            tx1+basefont_w2,ty0+ty1*6+basefont_w2,true );
+                            tx1+basefont_w2,ty0+ty1*8+basefont_w2,true );
 
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       tx1:=tx0;
 
-      SetItem(mi_player_status1+i-1,tx1,ty0,tx1+menu_players_namew,ty0+ty1,PlayerSlotChangeState(PlayerClient,i,255,true));tx1+=menu_players_namew;
+      SetItem(mi_player_status0+i,tx1,ty0,tx1+menu_players_namew,ty0+ty1,PlayerSlotChangeState(PlayerClient,i,255,true));tx1+=menu_players_namew;
       if(NeedColumnRace(i))then
-      SetItem(mi_player_race1  +i-1,tx1,ty0,tx1+menu_players_racew,ty0+ty1,PlayerSlotChangeRace (PlayerClient,i,255,true));tx1+=menu_players_racew;
+      SetItem(mi_player_race0  +i,tx1,ty0,tx1+menu_players_racew,ty0+ty1,PlayerSlotChangeRace (PlayerClient,i,255,true));tx1+=menu_players_racew;
       if(NeedColumnTeam(i))then
-      SetItem(mi_player_team1  +i-1,tx1,ty0,tx1+menu_players_teamw,ty0+ty1,PlayerSlotChangeTeam (PlayerClient,i,255,true));tx1+=menu_players_teamw;
+      SetItem(mi_player_team0  +i,tx1,ty0,tx1+menu_players_teamw,ty0+ty1,PlayerSlotChangeTeam (PlayerClient,i,255,true));tx1+=menu_players_teamw;
 
-      SetItem(mi_player_color1 +i-1,tx1,ty0,tx1+ty1*2             ,ty0+ty1,false);tx1+=ty1*2;
+      SetItem(mi_player_color0 +i,tx1,ty0,tx1+ty1*2             ,ty0+ty1,false);tx1+=ty1*2;
 
       ty0+=ty1;
    end;
@@ -492,17 +493,19 @@ mp_loadreplay: ms_Replays;
      if(not mi_enabled)then menu_List_Clear;
 end;
 
-function StringApplyInput(s:shortstring;charset:TSoc;ms:byte;ChangedResult:pBoolean):shortstring;
+////////////////////////////////////////////////////////////////////////////////
+
+function txt_StringApplyInput(s:shortstring;charset:TSoc;ms:byte;ChangedResult:pBoolean):shortstring;
 var i:byte;
     c:char;
 begin
-   StringApplyInput:=s;
+   txt_StringApplyInput:=s;
    if(length(k_keyboard_string)>0)then
     for i:=1 to length(k_keyboard_string) do
     begin
        c:=k_keyboard_string[i];
        if(c=#8)   // backspace
-       then delete(s,length(s),1)
+       then begin if(length(s)>0)then setlength(s,length(s)-1)end //delete(s,length(s),1)
        else
         if(length(s)>=ms)
         then break
@@ -511,18 +514,18 @@ begin
    end;
    k_keyboard_string:='';
    if(ChangedResult<>nil)then
-     ChangedResult^:=StringApplyInput<>s;
-   StringApplyInput:=s;
+     ChangedResult^:=txt_StringApplyInput<>s;
+   txt_StringApplyInput:=s;
 end;
 
-function menu_UnderCursor(mi:byte):boolean;
+function menu_ItemIsUnderCursor(mi:byte):boolean;
 begin
-   menu_UnderCursor:=false;
+   menu_ItemIsUnderCursor:=false;
    with menu_items[mi] do
-     menu_UnderCursor:=(mi_enabled)and(mi_x0<=mouse_x)and(mouse_x<=mi_x1)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1);
+     menu_ItemIsUnderCursor:=(mi_enabled)and(mi_x0<=mouse_x)and(mouse_x<=mi_x1)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1);
 end;
 
-procedure menu_SelectItem;
+procedure menu_ItemSelect;
 var i:byte;
 begin
    menu_item:=0;
@@ -548,9 +551,10 @@ begin
    if(0<=mouse_x)and(mouse_x<=menu_list_w)and(0<=mouse_y)then menu_list_selected:=mouse_y div menu_list_item_H;
    if(menu_list_selected>=menu_list_n)
    or(menu_list_selected< 0)
-   then menu_list_selected:=-1;
-   if(not menu_list_items[menu_list_selected].mli_enabled)
-   then menu_list_selected:=-1;
+   then menu_list_selected:=-1
+   else
+     if(not menu_list_items[menu_list_selected].mli_enabled)
+     then menu_list_selected:=-1;
    mouse_x+=x;
    mouse_y+=y;
 end;
@@ -678,7 +682,7 @@ begin
    with menu_items[mi] do
    begin
       menu_list_current:=-1;
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
         if(PlayerSlotChangeTeam(PlayerClient,PlayerTarget,i,true))then
         begin
            with g_players[PlayerTarget] do
@@ -738,7 +742,7 @@ begin
             else menu_GetBarVal:=mm3i(min,mouse_x-tx0,max);
    end;
 end;
-procedure menu_item_ListLine(mi:byte;svar:pinteger;scroll,lineh:integer);
+procedure menu_item_ListScrollLine(mi:byte;svar:pinteger;scroll,lineh:integer);
 begin
    with menu_items[mi] do
    begin
@@ -771,7 +775,7 @@ mi_settings_PlayerName : begin
                          g_players[PlayerClient].name:=PlayerName;
                          end;
         end;
-        menu_SelectItem;
+        menu_ItemSelect;
         menu_remake:=true;
         SoundPlayUI(snd_click);
      end;
@@ -830,10 +834,12 @@ mi_EndGame                : if(menu_list_selected>-1)then
                                menu_list_SetCommonSettings(menu_item,nil);
                                menu_list_current:=-1;
                                if(rpls_rstate=rpls_state_read)
-                               then menu_list_AddItem(str_menu_ReplayQuit,mi_EndReplayQuit    ,GameBreak      (0,true ),0)
+                               then menu_list_AddItem(str_menu_ReplayQuit,mi_EndReplayQuit,GameBreak      (0,true ),0)
                                else
                                begin
-                                  menu_list_AddItem(str_menu_LeaveGame,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0);
+                                  if(g_deadobservers)
+                                  then menu_list_AddItem(str_menu_LeaveGame,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0)
+                                  else menu_list_AddItem(str_menu_Surrender,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0);
                                   if(PlayerSurrender(PlayerClient,true))then
                                     menu_list_AddItem(str_menu_Surrender,mi_EndSurrender,PlayerSurrender(PlayerClient,true ),0);
                                end;
@@ -891,6 +897,14 @@ mi_settings_PlayerColors  : if(menu_list_selected>-1)
                             then begin vid_plcolors:=menu_list_SIndex;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_PlayersColorl[0],SizeOf(str_menu_PlayersColorl),integer(vid_plcolors),-2);
 
+//////////////////////////////////////////    SETTINGS  NETWORK
+mi_settings_ClientQuality : if(menu_list_selected>-1)then
+                            begin
+                               net_Quality:=menu_list_SIndex;
+                               menu_List_Clear;
+                            end
+                            else menu_list_MakeFromStr(menu_item,@str_menu_NetQuality[0],SizeOf(str_menu_NetQuality),integer(net_Quality),-3);
+
 //////////////////////////////////////////    SETTINGS  RECORD
 mi_settings_Replaying     : rpls_Recording:=not rpls_Recording;
 mi_settings_ReplayName    : ;
@@ -925,14 +939,17 @@ mi_settings_MusicVol      : begin
 mi_settings_NextTrack     : SoundMusicControll(true);
 
 
+
 //////////////////////////////////////////    SCIRMISH PLAYERS
+mi_player_status0,
 mi_player_status1,
 mi_player_status2,
 mi_player_status3,
 mi_player_status4,
 mi_player_status5,
-mi_player_status6         : begin
-                               p:=menu_item-mi_player_status1+1;
+mi_player_status6,
+mi_player_status7         : begin
+                               p:=menu_item-mi_player_status0;
                                if(menu_list_selected>-1)then
                                begin
                                   if(PlayerSlotChangeState(PlayerClient,p,menu_list_SIndex,true))then
@@ -943,13 +960,15 @@ mi_player_status6         : begin
                                end
                                else menu_list_MakePlayerSlot(menu_item,p,-1);
                             end;
+mi_player_race0,
 mi_player_race1,
 mi_player_race2,
 mi_player_race3,
 mi_player_race4,
 mi_player_race5,
-mi_player_race6           : begin
-                               p:=menu_item-mi_player_race1+1;
+mi_player_race6,
+mi_player_race7           : begin
+                               p:=menu_item-mi_player_race0;
                                if(menu_list_selected>-1)then
                                begin
                                   if(PlayerSlotChangeRace(PlayerClient,p,menu_list_SIndex,true))then
@@ -960,13 +979,15 @@ mi_player_race6           : begin
                                end
                                else menu_list_MakeFromStr(menu_item,@str_racel[0],SizeOf(str_racel),g_players[p].slot_race,-1);
                             end;
+mi_player_team0,
 mi_player_team1,
 mi_player_team2,
 mi_player_team3,
 mi_player_team4,
 mi_player_team5,
-mi_player_team6           : begin
-                               p:=menu_item-mi_player_team1+1;
+mi_player_team6,
+mi_player_team7           : begin
+                               p:=menu_item-mi_player_team0;
                                if(menu_list_selected>-1)then
                                begin
                                   if(PlayerSlotChangeTeam(PlayerClient,p,menu_list_SIndex,true))then
@@ -1074,24 +1095,8 @@ mi_mplay_ServerStart      : if(net_status=ns_single)then
                             end;
 mi_mplay_ServerStop       : menu_ServerStop;
 
-mi_mplay_ClientConnect    : if(net_status=ns_single)then
-                              if(net_UpSocket(0))then
-                              begin
-                                 net_status_str:=str_menu_connecting;
-                                 net_status    :=ns_client;
-                                 txt_ValidateServerAddr;
-                                 rpls_pnu:=0;
-                                 PlayerLobby:=254;
-                              end
-                              else net_dispose;
-mi_mplay_ClientDisconnect : if(net_status=ns_client)
-                            then GameBreakClientGame;
-mi_settings_ClientQuality : if(menu_list_selected>-1)then
-                            begin
-                               net_Quality:=menu_list_SIndex;
-                               menu_List_Clear;
-                            end
-                            else menu_list_MakeFromStr(menu_item,@str_menu_NetQuality[0],SizeOf(str_menu_NetQuality),integer(net_Quality),-3);
+mi_mplay_ClientConnect    : if(net_status=ns_single)then menu_NetClientConnect;
+mi_mplay_ClientDisconnect : if(net_status=ns_client)then GameBreakClientGame;
 
 mi_mplay_ClientAddress    : ;
 mi_mplay_Chat             : ;
@@ -1111,7 +1116,7 @@ mi_mplay_NetSearchStart   : if(net_UpSocket(net_svlsearch_port))then
 mi_mplay_NetSearchStop    : menu_NetSearchStop;
 mi_mplay_NetSearchList    : if(mleft_dbl_click>0)
                             then menu_NetSearchConnect(false)
-                            else menu_item_ListLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,menu_netsearch_lineh);
+                            else menu_item_ListScrollLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,menu_netsearch_lineh);
 mi_mplay_NetSearchCon     : menu_NetSearchConnect(false);
 
 
@@ -1120,7 +1125,7 @@ mi_replays_list           : if(mleft_dbl_click>0)
                             then replay_Play(false)
                             else
                             begin
-                               menu_item_ListLine(menu_item,@rpls_list_sel,rpls_list_scroll,menu_replays_lineh);
+                               menu_item_ListScrollLine(menu_item,@rpls_list_sel,rpls_list_scroll,menu_replays_lineh);
                                replay_Select;
                             end;
 mi_replays_play           : replay_Play  (false);
@@ -1132,7 +1137,7 @@ mi_saveload_save          : saveload_Save  (false);
 mi_saveload_load          : saveload_Load  (false);
 mi_saveload_delete        : saveload_Delete(false);
 mi_saveload_list          : begin
-                            menu_item_ListLine(menu_item,@svld_list_sel,svld_list_scroll,menu_saveload_lineh);
+                            menu_item_ListScrollLine(menu_item,@svld_list_sel,svld_list_scroll,menu_saveload_lineh);
                             saveload_Select;
                             end;
       end;
@@ -1147,26 +1152,26 @@ begin
    begin
       case menu_item of
 mi_map_Seed           : begin
-                        map_seed  :=s2c(StringApplyInput(c2s(map_seed) ,k_kbdig ,10           ,@Changed));
+                        map_seed  :=s2c(txt_StringApplyInput(c2s(map_seed) ,k_kbdig ,10           ,@Changed));
                         if(Changed)then
                           if(net_status=ns_client)
                           then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed      )
                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
-mi_settings_PlayerName: PlayerName    :=StringApplyInput(PlayerName    ,k_pname ,PlayerNameLen,@Changed);
-mi_settings_ReplayName: rpls_str_name :=StringApplyInput(rpls_str_name ,k_kbstr ,ReplayNameLen,@Changed);
+mi_settings_PlayerName: PlayerName    :=txt_StringApplyInput(PlayerName    ,k_pname ,PlayerNameLen,@Changed);
+mi_settings_ReplayName: rpls_str_name :=txt_StringApplyInput(rpls_str_name ,k_kbstr ,ReplayNameLen,@Changed);
 mi_mplay_ServerPort   : begin
-                        net_sv_pstr   :=StringApplyInput(net_sv_pstr   ,k_kbdig ,5            ,@Changed);
-                        txt_ValidateServerPort;
+                        net_sv_pstr   :=txt_StringApplyInput(net_sv_pstr   ,k_kbdig ,5            ,@Changed);
+                        if(Changed)then txt_ValidateServerPort;
                         end;
-mi_mplay_ClientAddress: net_cl_svaddr :=StringApplyInput(net_cl_svaddr,k_kbstr  ,30           ,@Changed);
+mi_mplay_ClientAddress: net_cl_svaddr :=txt_StringApplyInput(net_cl_svaddr,k_kbstr  ,30           ,@Changed);
       else
         if(net_status>ns_single)and(menu_items[mi_mplay_Chat].mi_enabled)
-        then net_chat_str  :=StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)
+        then net_chat_str  :=txt_StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)
         else
           if(menu_items[mi_saveload_fname].mi_enabled)then
           begin
-             svld_str_fname:=StringApplyInput(svld_str_fname,k_kbstr ,ReplayNameLen,@Changed);
+             svld_str_fname:=txt_StringApplyInput(svld_str_fname,k_kbstr ,ReplayNameLen,@Changed);
              if(Changed)then saveload_SelectByName(svld_str_fname);
           end;
       end;

@@ -1342,7 +1342,7 @@ begin
       end;
       AddToInt(@TeamVision[tu^.player^.team],a_reload+1);
       AddToInt(@TeamVision[tu^.player^.team],MinVisionTime);
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
         if(tu^.TeamVision[i]>0)
         or(    TeamVision[i]>0)then
         begin
@@ -1468,7 +1468,6 @@ wmove_noneed    : if(not AttackInMove)then
 
             if(ServerSide)and(not _ukbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
-              or((playeri=0)and(g_mode=gm_invasion))
               then unit_AddExp(pu,aw_reload*2)
               else unit_AddExp(pu,aw_reload  );
             if(not AttackInMove)then

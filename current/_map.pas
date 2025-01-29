@@ -366,7 +366,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  PATH FIND
+//  PATH FIND DATA
 
 procedure map_pf_MarkSolidCells;
 var x,y:integer;
@@ -400,6 +400,10 @@ begin
                          or CheckNoSolidAround(x-1,y-2,x+2,y+1)
                          or CheckNoSolidAround(x-2,y-1,x+1,y+2)
                          or CheckNoSolidAround(x-1,y-1,x+2,y+2));
+   {
+    #      ##
+           ##
+   }
 end;
 
 procedure debug_cell(cx,cy,cw:integer;color:cardinal);
@@ -427,8 +431,7 @@ begin
        else map_GetPFSolid:=tgc_pf_solid;
 end;
 begin
-   if map_GetPFSolid(x0,y0)
-   or map_GetPFSolid(x1,y1)then
+   if(map_GetPFSolid(x1,y1))then
    begin
       map_GridLineCollision:=true;
       exit;
@@ -599,7 +602,7 @@ begin
    setlength(domain2point,0);
    setlength(domain2count,0);
 
-   for x:=0 to MaxPlayers do
+   for x:=0 to LastPlayer do
      StartFillDomain(map_PlayerStartX[x] div MapCellw,map_PlayerStartY[x] div MapCellw);
 
    for x:=0 to map_LastCell do
@@ -844,7 +847,7 @@ begin
       x0:=cx*MapCellW;
       y0:=cy*MapCellW;
 case players of
-true : for p:=0 to MaxPlayers do
+true : for p:=0 to LastPlayer do
        begin
           mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
           if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
@@ -881,7 +884,7 @@ begin
       exit;
    end;
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     if(point_dist_int(basex,basey,map_PlayerStartX[p],map_PlayerStartY[p])<r)
     or(point_dist_int(symx ,symy ,map_PlayerStartX[p],map_PlayerStartY[p])<r)then
     begin
@@ -931,7 +934,7 @@ var pn:integer;
 begin
    for pn:=1 to MaxCPoints do
     with g_cpoints[pn] do
-     if(cpCaptureR>0)then cppzone:=map_MapGetZone(cpx,cpy);
+     if(cpCaptureR>0)then cpZone:=map_MapGetZone(cpx,cpy);
 end;
 
 procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time:integer;lifetime:cardinal;newpoints:boolean);
@@ -1038,8 +1041,8 @@ var
 x,y:byte;
 i  :integer;
 begin
-   for x:=1 to MaxPlayers do
-    for y:=1 to MaxPlayers do
+   for x:=0 to LastPlayer do
+    for y:=0 to LastPlayer do
      if(random(2)=0)and(x<>y)then
      begin
         if(teamShuffle)and(g_players[x].team<>g_players[y].team)then continue;
@@ -1048,18 +1051,19 @@ begin
      end;
 end;
 
-procedure map_PlayerStartsCircle(r,sdir:integer);
-const dstep = 360 div MaxPlayers;
+procedure map_PlayerStartsCircle(r,sdir,pcount:integer);
+const dstep = 360 div MaxPlayer;
 var i:byte;
 begin
+   if(pcount<=0)then exit;
    sdir:=abs(sdir mod 360)+(dstep div 2);
-   for i:=1 to 3 do
+   for i:=0 to pcount-1 do
    begin
       sdir+=dstep;
-      map_PlayerStartX[i  ]:=map_hsize+round(r*cos(sdir*degtorad));
-      map_PlayerStartY[i  ]:=map_hsize+round(r*sin(sdir*degtorad));
-      map_PlayerStartX[i+3]:=map_size-map_PlayerStartX[i];
-      map_PlayerStartY[i+3]:=map_size-map_PlayerStartY[i];
+      map_PlayerStartX[i       ]:=map_hsize+round(r*cos(sdir*degtorad));
+      map_PlayerStartY[i       ]:=map_hsize+round(r*sin(sdir*degtorad));
+      map_PlayerStartX[i+pcount]:=map_size-map_PlayerStartX[i];
+      map_PlayerStartY[i+pcount]:=map_size-map_PlayerStartY[i];
    end;
 end;
 
@@ -1075,7 +1079,7 @@ begin
    bb1:=map_size-(bb0*2);
    dst:=base_1r+(map_size div 5);
 
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       if(map_symmetry>0)and(i>3)then break;
       c:=0;
@@ -1100,85 +1104,92 @@ begin
       map_PlayerStartY[i]:=basey;
       if(map_symmetry>0)then
       begin
-         map_PlayerStartX[i+3]:=symx;
-         map_PlayerStartY[i+3]:=symy;
+         map_PlayerStartX[i+4]:=symx;
+         map_PlayerStartY[i+4]:=symy;
       end;
    end;
 
    dst-=dst div 5;
    c:=0;
-   for i:=1 to MaxPlayers do
-   for r:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
+   for r:=0 to LastPlayer do
     if(i<>r)then
       if(point_dist_int(map_PlayerStartX[i],map_PlayerStartY[i],map_PlayerStartX[r],map_PlayerStartY[r])<dst)then c+=1;
-   if(c>0)then map_PlayerStartsCircle(map_hsize-(map_size div 8),map_symmetryDir);
+   if(c>0)then map_PlayerStartsCircle(map_hsize-(map_size div 8),map_symmetryDir,4);
 end;
 
-procedure map_PlayerStarts;
+procedure map_DefaultPlayerStarts;
 var ix,iy,i,u,c:integer;
 begin
-   for i:=0 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
-      map_PlayerStartX[i]:=-5000;
-      map_PlayerStartY[i]:=-5000;
+      map_PlayerStartX[i]:=0;
+      map_PlayerStartY[i]:=0;
    end;
 
    case g_mode of
-gm_3x3     :begin
-               u :=map_hsize-(map_size div 7);
-               c :=u+base_hr;
+gm_4x4     :begin
+               c :=map_hsize-(map_size div 7);
+               u :=c+base_1r;
                i :=map_symmetryDir+90;
 
-               case map_type of
-               mapt_clake  : ix:=round(60*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
-               mapt_shore  : ix:=round(60*(MinMapSize/map_size))+round(5*(map_size/MinMapSize));
-               else          ix:=round(65*(MinMapSize/map_size));
-               end;
+               {case map_type of
+               mapt_clake  : ix:=round(45*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
+               mapt_shore  : ix:=round(45*(MinMapSize/map_size))+round(5*(map_size/MinMapSize));
+               else          ix:=round(50*(MinMapSize/map_size));
+               end;}
+               ix:=round(45*(MinMapSize/map_size))+round(3*(map_size/MinMapSize));
+               iy:=ix div 2;
 
-               map_PlayerStartX[1]:=round(map_hsize+cos( i    *degtorad)*u);
-               map_PlayerStartY[1]:=round(map_hsize+sin( i    *degtorad)*u);
-               map_PlayerStartX[2]:=round(map_hsize+cos((i-ix)*degtorad)*c);
-               map_PlayerStartY[2]:=round(map_hsize+sin((i-ix)*degtorad)*c);
-               map_PlayerStartX[3]:=round(map_hsize+cos((i+ix)*degtorad)*c);
-               map_PlayerStartY[3]:=round(map_hsize+sin((i+ix)*degtorad)*c);
+               map_PlayerStartX[0]:=round(map_hsize+cos((i-iy*3)*degtorad)*u);
+               map_PlayerStartY[0]:=round(map_hsize+sin((i-iy*3)*degtorad)*u);
+               map_PlayerStartX[1]:=round(map_hsize+cos((i-iy  )*degtorad)*c);
+               map_PlayerStartY[1]:=round(map_hsize+sin((i-iy  )*degtorad)*c);
+               map_PlayerStartX[2]:=round(map_hsize+cos((i+iy  )*degtorad)*c);
+               map_PlayerStartY[2]:=round(map_hsize+sin((i+iy  )*degtorad)*c);
+               map_PlayerStartX[3]:=round(map_hsize+cos((i+iy*3)*degtorad)*u);
+               map_PlayerStartY[3]:=round(map_hsize+sin((i+iy*3)*degtorad)*u);
 
-               map_PlayerStartX[4]:=map_size-map_PlayerStartX[1];
-               map_PlayerStartY[4]:=map_size-map_PlayerStartY[1];
-               map_PlayerStartX[5]:=map_size-map_PlayerStartX[2];
-               map_PlayerStartY[5]:=map_size-map_PlayerStartY[2];
-               map_PlayerStartX[6]:=map_size-map_PlayerStartX[3];
-               map_PlayerStartY[6]:=map_size-map_PlayerStartY[3];
+               map_PlayerStartX[4]:=map_size-map_PlayerStartX[0];
+               map_PlayerStartY[4]:=map_size-map_PlayerStartY[0];
+               map_PlayerStartX[5]:=map_size-map_PlayerStartX[1];
+               map_PlayerStartY[5]:=map_size-map_PlayerStartY[1];
+               map_PlayerStartX[6]:=map_size-map_PlayerStartX[2];
+               map_PlayerStartY[6]:=map_size-map_PlayerStartY[2];
+               map_PlayerStartX[7]:=map_size-map_PlayerStartX[3];
+               map_PlayerStartY[7]:=map_size-map_PlayerStartY[3];
+
             end;
-gm_2x2x2   :begin
+gm_2x2x2x2 :begin
                iy:=base_2r+(map_size div 30);
                u :=map_hsize-(map_hsize div 3);
                c :=map_symmetryDir;
 
-               ix:=round(60*(MinMapSize/map_size));
+               ix:=round(50*(MinMapSize/map_size));
                iy:=ix div 2;
-               i:=1;
-               while(i<MaxPlayers)do
+               i:=0;
+               while(i<LastPlayer)do
                begin
                map_PlayerStartX[i  ]:=round(map_hsize+cos((c-iy)*degtorad)*u);
                map_PlayerStartY[i  ]:=round(map_hsize+sin((c-iy)*degtorad)*u);
                map_PlayerStartX[i+1]:=round(map_hsize+cos((c+iy)*degtorad)*u);
                map_PlayerStartY[i+1]:=round(map_hsize+sin((c+iy)*degtorad)*u);
-               c+=120;
+               c+=90;
                i+=2;
                end;
             end;
-gm_invasion:begin
-               map_PlayerStartX[0]:=map_hsize;
-               map_PlayerStartY[0]:=map_hsize;
-               map_PlayerStartsCircle(base_2r,map_symmetryDir);
+gm_assault :begin
+               map_PlayerStartsCircle(map_hsize-(map_size div 8),map_symmetryDir,3);
+               map_PlayerStartX[6]:=map_hsize-base_1r;
+               map_PlayerStartY[6]:=map_hsize-base_1r;
+               map_PlayerStartX[7]:=map_hsize+base_1r;
+               map_PlayerStartY[7]:=map_hsize+base_1r;
             end;
 gm_KotH    :begin
-               map_PlayerStartX[0]:=map_hsize;
-               map_PlayerStartY[0]:=map_hsize;
-               map_PlayerStartsCircle(map_hsize-(map_size div 8),map_symmetryDir);
+               map_PlayerStartsCircle(map_hsize-(map_size div 8),map_symmetryDir,4);
             end;
 gm_royale  :begin
-               map_PlayerStartsCircle(map_hsize-(map_size div 5),map_symmetryDir);
+               map_PlayerStartsCircle(map_hsize-(map_size div 5),map_symmetryDir,4);
             end;
 gm_capture :begin
                map_PlayerStartsDefault(byte(map_type=mapt_clake)*(map_size div 3));
@@ -1187,7 +1198,7 @@ gm_capture :begin
                map_PlayerStartsDefault(byte(map_type=mapt_clake)*(map_size div 3));
    end;
 
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       map_PlayerStartX[i]:=x2CellCenter(map_PlayerStartX[i]);
       map_PlayerStartY[i]:=x2CellCenter(map_PlayerStartY[i]);
@@ -1296,7 +1307,7 @@ begin
 end;
 begin
    CircleBy2Points(0         ,map_hsize,map_size          ,map_hsize);// center
-   for tx:=0 to MaxPlayers do
+   for tx:=0 to LastPlayer do
    begin
       d:=point_dist_int(map_PlayerStartX[tx],map_PlayerStartY[tx],map_hsize,map_hsize);
       if(d<=0)then continue;
@@ -1304,8 +1315,8 @@ begin
       map_hsize+round((map_PlayerStartX[tx]-map_hsize)/d*map_size),
       map_hsize+round((map_PlayerStartY[tx]-map_hsize)/d*map_size) );
    end;
-   for tx:=1 to MaxPlayers do
-    for ty:=1 to tx do
+   for tx:=0 to LastPlayer do
+    for ty:=0 to tx do
      if(tx<>ty)and(abs(tx-ty)<2)then
       CircleBy2Points(map_PlayerStartX[tx],map_PlayerStartY[tx],
                       map_PlayerStartX[ty],map_PlayerStartY[ty]);
@@ -1334,7 +1345,7 @@ begin
    {$ENDIF}
 end;
 
-procedure map_GridMake;
+procedure map_MakeDeafultGrid;
 var msrx,px,py:integer;
 begin
    FillChar(map_grid,SizeOf(map_grid),0);
@@ -1362,9 +1373,14 @@ mapt_ilake  : begin
 mapt_island : begin
               px:=map_CenterCell div 4;
               py:=map_LastCell div 4;
-              map_GridFill(map_CenterCell-px+integer(map_seed mod byte(py)),
-                           map_CenterCell-px+integer(g_random_i mod py),
-                           -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false,false);
+              if(map_symmetry=maps_point)then
+                map_GridFill(map_CenterCell,
+                             map_CenterCell-px+integer(map_seed mod byte(py)),
+                             -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false,false)
+              else
+                map_GridFill(map_CenterCell-px+integer(map_seed mod byte(py)),
+                             map_CenterCell-px+integer(g_random_i mod py),
+                             -round(map_LastCell/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false,false);
               map_GridFill(msrx,5, 0,mgsl_nobuild,18,base_1r,false,false);
               map_GridFill(msrx,6, 0,mgsl_rocks  ,18,base_1r,false,false);
               end;
@@ -1405,9 +1421,9 @@ end;
 procedure map_Make1;
 begin
    map_Vars;
-   map_PlayerStarts;
+   map_DefaultPlayerStarts;
    map_CPoints;
-   map_GridMake;
+   map_MakeDeafultGrid;
    {$IFDEF _FULLGAME}
    map_ThemeFromSeed;
    map_MinimapBackground;
@@ -1436,9 +1452,10 @@ function map_SetSetting(PlayerRequestor,setting:byte;newVal:cardinal;Check:boole
 begin
    map_SetSetting:=false;
 
-   if(G_Started)
-   or(g_preset_cur>0)
-   or((PlayerRequestor>0)and(PlayerLobby>0)and(PlayerLobby<>PlayerRequestor))
+   if(g_preset_cur>0)
+   or(PlayerRequestor>LastPlayer)
+   or((PlayerLobby  <=LastPlayer)and(PlayerLobby<>PlayerRequestor))
+   or(G_Started)
    then exit;
 
    case setting of

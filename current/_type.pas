@@ -130,8 +130,7 @@ TMenuListItem = record
    mli_enabled: boolean;
 end;
 
-TPlayerColorScheme  = array[0..MaxPlayers] of cardinal;
-PTPlayerColorScheme = ^TPlayerColorScheme;
+TPlayerColorScheme  = array[0..LastPlayer] of cardinal;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -218,7 +217,8 @@ end;
 //
 
 TPoint = record
-   p_x,p_y:integer;
+   p_x,
+   p_y   :integer;
 end;
 TMapGridPFDomainData = record
    nextDomain,
@@ -295,21 +295,21 @@ TUWeapon = record
   aw_rupgr_l,
   aw_ruid,
   aw_dupgr,
-  aw_oid   : byte;
-  aw_uids  : TSob;
+  aw_oid      : byte;
+  aw_uids     : TSob;
   aw_tarf,
-  aw_reqf  : cardinal;
+  aw_reqf     : cardinal;
   aw_x,
   aw_y,
   aw_dupgr_s,
   aw_max_range,
   aw_min_range,
-  aw_count : integer;
+  aw_count    : integer;
   aw_dmod,
   aw_reload   : byte;
-  aw_rld_s : TSoB;
+  aw_rld_s    : TSoB;
   {$IFDEF _FULLGAME}
-  aw_rld_a : TSoB;
+  aw_rld_a    : TSoB;
   aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
@@ -482,13 +482,6 @@ TUPID = record  // upgrade
    {$ENDIF}
 end;
 
-TAPMCounter = record
-   APM_Time,
-   APM_Current,
-   APM_New       : cardinal;
-   APM_Str       : shortstring;
-end;
-
 TAIAlarm = record
    aia_enemy_base
                 : boolean;
@@ -530,9 +523,10 @@ TPlayer = record
    isready : boolean;
 
    o_id    : byte;
-o_a0,
-o_x0,o_y0,
-o_x1,o_y1  : integer;
+   o_a0,
+   o_x0,o_y0,
+   o_x1,o_y1
+           : integer;
 
    ucl_e,                                        // existed class
    ucl_eb,                                       // existed class iscomplete=true and hits>0
@@ -593,7 +587,7 @@ o_x1,o_y1  : integer;
    ai_skill: byte;
    ai_flags: cardinal;
    ai_alarms
-           : array[0..MaxPlayers] of TAIAlarm;
+           : array[0..LastPlayer] of TAIAlarm;
    ai_attack_timer,
    ai_scout_timer
            : integer;
@@ -633,9 +627,9 @@ o_x1,o_y1  : integer;
            : integer;
 end;
 PTPlayer = ^TPlayer;
-TPList = array[0..MaxPlayers] of TPLayer;
+TPList = array[0..LastPlayer] of TPLayer;
 
-TUnitVisionData = array[0..MaxPlayers] of integer;
+TUnitVisionData = array[0..LastPlayer] of integer;
 
 TUnit = record
    hits     : longint;
@@ -758,11 +752,11 @@ TCTPoint = record
    cpTimerOwnerPlayer,
    cpOwnerPlayer,
    cpOwnerTeam  : byte;
-   cppzone       : word;
+   cpZone       : word;
    cpunitst_pstate,
    cpUnitsTeam,
    cpunitsp_pstate,
-   cpUnitsPlayer: array[0..MaxPlayers] of longint;
+   cpUnitsPlayer: array[0..LastPlayer] of longint;
 end;
 PTCTPoint = ^TCTPoint;
 
@@ -775,7 +769,7 @@ TGamePreset = record
    gp_g_mode    : byte;
 
    gp_player_team
-                : array[1..MaxPlayers] of byte;
+                : array[0..LastPlayer] of byte;
 end;
 
 

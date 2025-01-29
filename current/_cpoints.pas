@@ -2,12 +2,11 @@
 procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte);
 var p:byte;
 begin
-   if(newOwnerPlayer<=MaxPlayers)then
    with g_cpoints[i] do
    if(cpOwnerPlayer<>newOwnerPlayer)then
    begin
-      if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
+      if(cpOwnerTeam<=LastPlayer)then
+       for p:=0 to LastPlayer do
         with g_players[p] do
          if(team=cpOwnerTeam)then
          begin
@@ -15,20 +14,26 @@ begin
             menergy-=cpenergy;
          end;
       cpOwnerPlayer:=newOwnerPlayer;
-      cpOwnerTeam  :=g_players[newOwnerPlayer].team;
-      if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
-        with g_players[p] do
-         if(team=cpOwnerTeam)then
-         begin
-            cenergy+=cpenergy;
-            menergy+=cpenergy;
-         end;
+      cpOwnerTeam  :=newOwnerPlayer;
+      if(newOwnerPlayer<=LastPlayer)then
+      begin
+         cpOwnerTeam:=g_players[newOwnerPlayer].team;
+         if(cpOwnerTeam>0)then
+          for p:=0 to LastPlayer do
+           with g_players[p] do
+            if(team=cpOwnerTeam)then
+            begin
+               cenergy+=cpenergy;
+               menergy+=cpenergy;
+            end;
+      end;
    end;
 end;
 
 procedure GameModeCPoints;
-var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams,
+var i,p,
+iOwnerTeam,iOwnerPlayer,
+iArmy,iTeams,
 wteam  ,
 wteam_n,
 cp_captured_n :integer;
@@ -47,7 +52,7 @@ begin
 
        if(p>0)then
        begin
-          CPoint_ChangeOwner(i,0);
+          CPoint_ChangeOwner(i,255);
           cpCaptureR:=-cpCaptureR;
           {$IFDEF _FULLGAME}
           effect_CPExplode(cpx,cpy);
@@ -61,7 +66,7 @@ begin
        iOwnerTeam     :=cpOwnerTeam;
        iArmy :=0;
        iTeams:=0;
-       for p:=0 to MaxPlayers do
+       for p:=0 to LastPlayer do
        begin
           if(cpUnitsTeam[p]>0)then
           begin
@@ -80,9 +85,9 @@ begin
        if((iTeams=0)and(cpenergy>0))
        or((i=1)and(g_mode=gm_koth)and(g_step<g_step_koth_pause))then
        begin
-          iTeams:=1;
-          iOwnerPlayer:=0;
-          iOwnerTeam  :=g_players[iOwnerPlayer].team;
+          iTeams:=0;
+          iOwnerPlayer:=255;
+          iOwnerTeam  :=255;
        end;
 
        if(iTeams=0)

@@ -1,20 +1,16 @@
 
 function d_UpdateUIPlayer(u:integer):boolean;
 var tu:PTUnit;
-function TryUpd(pplayer:pbyte):boolean;
-begin
-   TryUpd:=false;
-   if(IsUnitRange(u,@tu))then
-   begin
-      pplayer^:=tu^.playeri;
-      TryUpd  :=true;
-   end;
-end;
 begin
    d_UpdateUIPlayer:=false;
    if(not g_players[PlayerClient].isobserver)and(rpls_rstate<rpls_state_read)
    then UIPlayer:=PlayerClient
-   else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
+   else
+     if(IsUnitRange(u,@tu))then
+     begin
+        UIPlayer:=tu^.playeri;
+        d_UpdateUIPlayer:=true;
+     end;
 end;
 
 procedure d_AddObjSprites(noanim:boolean);
@@ -29,7 +25,7 @@ procedure d_Game;
 begin
    d_UpdateUIPlayer(0);
 
-   D_AddObjSprites(G_Status>gs_running);
+   D_AddObjSprites(G_Status<>gs_running);
 
    D_terrain   (r_screen,vid_mapx,vid_mapy);
    D_SpriteList(r_screen,vid_mapx,vid_mapy);
@@ -40,7 +36,7 @@ begin
 
    draw_surf(r_screen,vid_panelx,vid_panely,r_uipanel);
 
-   d_uimouse(r_screen);
+   d_UIMouseCursor(r_screen);
 
    if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
 end;

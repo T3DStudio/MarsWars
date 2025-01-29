@@ -68,7 +68,7 @@ begin
                                   +str_SpaceSize(str_menu_race   ,9)
                                                 +str_menu_team+tc_nl2;
 
-            for i:=1 to MaxPlayers do
+            for i:=0 to LastPlayer do
             begin
                if(i=dbyte)
                then svld_str_info3+=chr(i)+' * '+tc_default
@@ -197,8 +197,6 @@ begin
    AddItem(@vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
    AddItem(@vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
    AddItem(@m_brush          ,SizeOf(m_brush          ));
-   AddItem(@g_inv_wave_n     ,SizeOf(g_inv_wave_n     ));
-   AddItem(@g_inv_wave_t_next,SizeOf(g_inv_wave_t_next));
    AddItem(@g_cpoints        ,SizeOf(g_cpoints        ));
    AddItem(@g_royal_r        ,SizeOf(g_royal_r        ));
    AddItem(@g_status         ,SizeOf(g_status         ));

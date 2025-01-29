@@ -22,12 +22,8 @@ g_step            : cardinal = 0;
 g_player_astatus  : byte     = 0;
 g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
-g_slot_state      : array[0..MaxPlayers] of byte;
+g_slot_state      : array[0..LastPlayer] of byte;
 
-g_inv_limit       : longint  = 0;
-g_inv_wave_n      : byte     = 0;
-g_inv_wave_t_next : integer  = 0;
-g_inv_wave_t_curr : integer  = 0;
 g_royal_r         : integer  = 0;
 g_cpoints         : array[1..MaxCPoints] of TCTPoint;
 
@@ -41,9 +37,8 @@ ServerSide        : boolean = true; // only server side code
 UnitMoveStepTicks : byte = 8;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
-PlayerClient      : byte = 1; // 'this' player
-PlayerLobby       : byte = 1; // Player who can change game settings
-player_APMdata    : array[0..MaxPlayers] of TAPMCounter;
+PlayerClient      : byte = 0; // 'this' player
+PlayerLobby       : byte = 0; // Player who can change game settings
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
@@ -73,7 +68,7 @@ map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
 map_symmetryDir   : integer  = 0;
 map_PlayerStartX,
-map_PlayerStartY  : array[0..MaxPlayers] of integer;
+map_PlayerStartY  : array[0..LastPlayer] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
 map_gridZone_n    : word = 0;
 map_gridDomain_n  : word = 0;
@@ -200,7 +195,6 @@ ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
 
-//vid_map_RedrawBack: boolean = false;
 
 menu_state        : boolean = true;
 menu_page1        : byte = mp_main;
@@ -229,7 +223,7 @@ PlayerColorSchemeTEAM,
 PlayerColorScheme : TPlayerColorScheme;
 
 
-UIPlayer          : byte = 1;
+UIPlayer          : byte = 0;
 
 vid_TileTemplate_fog          : pTMWTileSet;
 vid_TileTemplate_crater_tech,
@@ -327,7 +321,6 @@ campain_mmap      : array[0..MaxMissions] of pSDL_Surface;
 
 log_LastMesTimer  : integer = 0;
 
-//net_cl_svpreset   : shortstring = '';
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
@@ -381,9 +374,9 @@ rpls_ReadPosL     : array of TReplayPos;
 rpls_ForwardStep  : integer = 1;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
-rpls_POVPlayer       : byte = 0;
+rpls_POVPlayer    : byte = 0;
 rpls_showlog      : boolean = false;
-rpls_POVCam        : boolean = false;
+rpls_POVCam       : boolean = false;
 rpls_ticks        : byte = 0;
 rpls_file_head_size
                   : cardinal = 0;
@@ -415,6 +408,7 @@ ui_UnitSelectedn  : byte = 0;
 ui_tab            : byte = 0;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
+ui_dPlayer        : TPlayer;
 
 ui_groups_n,                                             //
 ui_groups_d,                                             //
@@ -534,6 +528,8 @@ c_gray,
 c_dgray,
 c_ablack,
 c_purple,
+c_lpurple,
+c_dpurple,
 c_black           : cardinal;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -793,11 +789,11 @@ spr_cp_gen        : TMWTexture;
 
 str_bool                : array[false..true   ] of shortstring;
 
-str_teams               : array[0..MaxPlayers ] of shortstring;
+str_teams               : array[0..LastPlayer ] of shortstring;
 str_ability_name        : array[byte          ] of shortstring;
 str_ability_unload      : shortstring;
 str_racel               : array[0..r_cnt      ] of shortstring;
-str_emnu_GameModel               : array[0..gms_count  ] of shortstring;
+str_emnu_GameModel      : array[0..gms_count  ] of shortstring;
 
 str_map_typel           : array[0..gms_m_types] of shortstring;
 str_map_syml            : array[0..gms_m_symm ] of shortstring;
@@ -900,7 +896,7 @@ str_menu_PlayersColorl  : array[0..vid_maxplcolors-1] of shortstring;
 str_menu_unitHBarl      : array[0..2] of shortstring;
 str_menu_PanelPosl      : array[0..3] of shortstring;
 str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
-str_menu_NetQuality     : array[0..cl_UpT_arrayN] of shortstring;
+str_menu_NetQuality     : array[0..cl_UpT_arrayN    ] of shortstring;
 
 str_menu_ReplayPlay,
 str_menu_ReplayName,
@@ -1021,8 +1017,6 @@ str_panelHint_o     : array[0.._mhkeys] of shortstring;
 str_panelHint_Tab   : array[0..3      ] of shortstring;
 str_panelHint_Common: array[0..2      ] of shortstring;
 
-str_uiHint_InvLimit,
-str_uiHint_InvTime,
 str_uiHint_KotHTime,
 str_uiHint_KotHTimeAct,
 str_uiHint_KotHWinner,
@@ -1030,74 +1024,6 @@ str_uiHint_Time,
 str_uiHint_UGroups,
 str_uiHint_Army,
 str_uiHint_Energy   : shortstring;
-
-
-{
-
-
-
-
-
-
-str_Address,
-
-
-
-                  : shortstring;
-
-
-
-str_menu_chat,
-
-str_client,
-str_goptions,
-
-str_cmpdif,
-
-
-str_replay,
-
-str_play,
-
-str_players,
-str_save,
-str_load,
-,
-str_gsaved,
-str_pause,
-
-str_win,
-str_lose,
-
-str_udpport,
-
-
-str_replay_Quality,
-str_net_Quality,
-
-
-
-                  : shortstring;   }
-
-{str_MObjectives,
-str_MServers,
-str_MMap,
-str_MPlayers      : shortstring;  }
-{str_npnua,
-
-str_cmpd            : array[0..CMPMaxSkills] of shortstring;
-
-
-
-
-{str_camp_t        : array[0..MaxMissions] of shortstring;
-str_camp_o        : array[0..MaxMissions] of shortstring;
-str_camp_m        : array[0..MaxMissions] of shortstring; }
-
-{,
-str_svup,
-} }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //

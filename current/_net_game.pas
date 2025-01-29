@@ -2,8 +2,8 @@
 function net_NewPlayer(sip:cardinal;sport:word):byte;
 var p:byte;
 begin
-   net_NewPlayer:=0;
-   for p:=1 to MaxPlayers do
+   net_NewPlayer:=255;
+   for p:=0 to LastPlayer do
     if(p<>PlayerClient)then
      with g_players[p] do
       if(player_type=pt_none)then
@@ -11,13 +11,13 @@ begin
        or(g_slot_state[p]=pss_observer)then
        begin
           net_NewPlayer:=p;
-          net_ip          :=sip;
-          net_port        :=sport;
+          net_ip       :=sip;
+          net_port     :=sport;
           player_type  :=pt_human;
-          net_ttl         :=0;
+          net_ttl      :=0;
           isready      :=false;
           {$IFNDEF _FULLGAME}
-          GameLogCommon(p,0,'MarsWars dedicated server, '+str_ver,false);
+          GameLogCommon(p,255,'MarsWars dedicated server, '+str_ver,false);
           {$ENDIF}
           break;
        end;
@@ -26,8 +26,8 @@ end;
 function net_GetPlayer(aip:cardinal;ap:word;MakeNew:boolean):byte;
 var i:byte;
 begin
-   net_GetPlayer:=0;
-   for i:=1 to MaxPlayers do
+   net_GetPlayer:=255;
+   for i:=0 to LastPlayer do
     if(i<>PlayerClient)then
      with g_players[i] do
       if(player_type=pt_human)and(net_ip=aip)and(net_port=ap)then
@@ -38,7 +38,7 @@ begin
          break;
       end;
 
-   if(net_GetPlayer=0)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
+   if(net_GetPlayer=255)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
 end;
 
 procedure net_SvReadPlayerData(pid:byte);
@@ -49,7 +49,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      name   :=ValidateStr(name,PlayerNameLen,@k_pname);
+      name   :=txt_ValidateStr(name,PlayerNameLen,@k_pname);
       if(length(name)=0)then name:=str_defaultPlayerName;
       if(oldname<>name)then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 
@@ -66,7 +66,7 @@ begin
    net_writebyte(nmid_lobby_info);
    net_writebool(G_Started);
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
     begin
        net_writestring(name     );
@@ -75,9 +75,9 @@ begin
        net_writebyte  (player_type    );
        net_writebyte  (g_slot_state[p]);
        net_writebool  (isready  );
-       net_writeword  (net_ttl     );
+       net_writeword  (net_ttl  );
        if(G_Started)then
-       net_writebyte  (race );
+       net_writebyte  (race     );
     end;
 
    net_writebyte(pid         );
@@ -97,7 +97,7 @@ begin
    net_writebool(g_deadobservers  );
 
    if(G_Started)and(not g_fixed_positions)then
-    for p:=1 to MaxPlayers do
+    for p:=0 to LastPlayer do
     begin
        net_writeint(map_PlayerStartX[p]);
        net_writeint(map_PlayerStartY[p]);
@@ -118,7 +118,7 @@ begin
    net_writebyte(nmid_localadv);
    net_writebyte(g_version);
    net_writebyte(g_mode);
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
      with g_players[i] do
        if(player_type=pt_none)
        then net_writestring('')
@@ -157,7 +157,7 @@ begin
             continue;
          end;
          pid:=net_GetPlayer(net_LastinIP,net_LastinPort,true);
-         if(pid=0)then
+         if(pid>LastPlayer)then
          begin
             net_clearbuffer;
             if(G_Started)
@@ -176,7 +176,7 @@ begin
       else   // other net mess
       begin
          pid:=net_GetPlayer(net_LastinIP,net_LastinPort,false);
-         if(pid>0)then
+         if(pid<=LastPlayer)then
          begin
             case mid of
 nmid_log_chat    : begin
@@ -212,7 +212,7 @@ nmid_client_info : with g_players[pid] do
                       if(log_n_cl=log_n)then net_logsend_pause:=0;
                    end;
 nmid_pause       : begin
-                      if(G_Status<>gs_running)and(G_Status<=MaxPlayers)then
+                      if(G_Status<>gs_running)and(G_Status<=LastPlayer)then
                       begin
                          G_Status:=gs_running;
                          GameLogChat(pid,255,str_msg_PlayerResumed,false);
@@ -266,7 +266,7 @@ nmid_lobbby_playerrace  : begin
 
    net_period_step:=(net_period mod NetTickN)=0;
 
-   for i:=1 to MaxPlayers do
+   for i:=0 to LastPlayer do
     if(i<>PlayerClient)then
      with g_players[i] do
       if(player_type=pt_human)and(net_ttl<ClientTTL)then
@@ -352,9 +352,7 @@ begin
    if(rByte(@map_type         ,gms_m_types          ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(StartGame)
-   or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))
-   //or(menu_item<>mi_map_Seed)
-   then
+   or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))then
    begin
    if(rCard(@map_seed                           ))then begin redraw_menu:=true;new_map:=true;end;
    end
@@ -372,7 +370,7 @@ begin
    if(redraw_menu)then menu_remake:=true;
 
    if(StartGame)and(not g_fixed_positions)then
-     for i:=1 to MaxPlayers do
+     for i:=0 to LastPlayer do
      begin
         map_PlayerStartX[i]:=net_readint;
         map_PlayerStartY[i]:=net_readint;
@@ -387,7 +385,7 @@ begin
    with g_players[pid] do
    begin
       // name
-      newname:=ValidateStr(net_readstring,PlayerNameLen,@k_pname);
+      newname:=txt_ValidateStr(net_readstring,PlayerNameLen,@k_pname);
       if(length(newname)=0)then newname:=str_defaultPlayerName;
       if(newname<>name)then
       begin
@@ -397,7 +395,7 @@ begin
 
       // team
       i:=net_readbyte;
-      if(i>MaxPlayers)then
+      if(i>LastPlayer)then
       begin
          net_ClientReadPlayerData:=true;
          exit;
@@ -514,7 +512,7 @@ nmid_lobby_info  : begin
                       gst:=net_readbool;
 
                       // players
-                      for i:=0 to MaxPlayers do
+                      for i:=0 to LastPlayer do
                        with g_players[i] do
                        begin
                           if(net_ClientReadPlayerData(i,gst))then
@@ -527,7 +525,7 @@ nmid_lobby_info  : begin
 
                       // PlayerClient
                       i:=net_readbyte;
-                      if(i>MaxPlayers)or(i=0)then
+                      if(i>LastPlayer)then
                       begin
                          CleintProtocolError(@str_error_WrongVersion);
                          exit;
@@ -540,7 +538,7 @@ nmid_lobby_info  : begin
 
                       // PlayerLobby
                       i:=net_readbyte;
-                      if(i>MaxPlayers)then
+                      if(i>LastPlayer)then
                       begin
                          CleintProtocolError(@str_error_WrongVersion);
                          exit;
@@ -681,7 +679,7 @@ begin
             if(v in allgamemodes)then
             begin
                s:='';
-               for i:=0 to MaxPlayers do _ADDSTR(@s,net_readstring,sep_comma);
+               for i:=0 to LastPlayer do _ADDSTR(@s,net_readstring,sep_comma);
                s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_emnu_GameModel[v]+'  '+s;
                net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
                continue;
