@@ -41,7 +41,7 @@ begin
               uo_x :=x;
               uo_y :=y;
               dir  :=270;
-              hits :=_hmhits;
+              hits :=_mhits;
               buff[ub_Resurect]:=0;
               buff[ub_Summoned]:=fr_fps1;
               {$IFDEF _FULLGAME}
@@ -65,7 +65,7 @@ begin
 
       if(iscomplete)and(not IgnoreArmor)then
       begin
-         armor:=_base_armor;
+         armor:=0;//_base_armor;
          with player^ do
           if(_ukbuilding)
           then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*BaseArmorBonus2
@@ -174,7 +174,7 @@ begin
             _unit_morph:=ureq_energy;
             exit;
          end;
-         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,(upgr[upgr_race_extbuilding[puid^._urace]]=0)or(puid^._isbarrack)or(puid^._ability=uab_Teleport) )>0)then
+         if(_collisionr(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,true )>0)then
          begin
             _unit_morph:=ureq_place;
             exit;
@@ -356,6 +356,54 @@ begin
        end;
 end;
 
+function _StartResurrection(pu,tu:PTUnit;check:boolean):boolean;
+begin
+   // pu - resurrector
+   // tu - target
+   _StartResurrection:=false;
+
+   with tu^ do
+   begin
+      if(tu^.buff[ub_Resurect]>0)
+      or(tu^.buff[ub_Pain    ]>0)
+      or(tu^.hits<=fdead_hits   )
+      or(tu^.hits> 0            )then exit;
+   end;
+
+   if(pu<>nil)then
+     if(tu^.playeri<>pu^.playeri)then
+       with pu^ do
+       with uid^ do
+       with player^ do
+         if((armylimit+tu^.uid^._limituse)>MaxPlayerLimit)then exit;
+
+   _StartResurrection:=true;
+
+   if(check)then exit;
+
+   if(pu<>nil)then
+     if(tu^.playeri<>pu^.playeri)then
+     begin
+        _unit_add(tu^.x,tu^.y,pu^.unum,tu^.uidi,pu^.playeri,true,false,tu^.level);
+
+        if(_LastCreatedUnit>0)then
+        with _LastCreatedUnitP^ do
+        begin
+           hits := tu^.hits;
+           _unit_dec_Kcntrs(_LastCreatedUnitP);
+        end;
+        _unit_kill(tu,true,true,false,false,true);
+        tu:=_LastCreatedUnitP;
+     end;
+
+   with tu^ do
+   begin
+      buff[ub_Resurect]:=fr_fps2;
+      zfall:=-uid^._zfall;
+      ukfly:= uid^._ukfly;
+   end;
+end;
+
 function _target_weapon_check(pu,tu:PTUnit;ud:integer;cw:byte;checkvis,nosrangecheck:boolean):byte;
 var awr:integer;
      au:PTUnit;
@@ -382,10 +430,7 @@ begin
 
       // Weapon type requirements
       case aw_type of
-wpt_resurect : if(tu^.buff[ub_Resurect]>0  )
-               or(tu^.buff[ub_Pain ]>0     )
-               or(tu^.hits<=fdead_hits     )
-               or(tu^.hits> 0              )then exit;
+wpt_resurect : if(not _StartResurrection(pu,tu,true))then exit;
 wpt_heal     : if(tu^.hits<=0)
                or(tu^.hits>=tu^.uid^._mhits)
                or(tu^.iscomplete=false     )
@@ -1106,21 +1151,12 @@ begin
 end;
 
 function _unit_rebuild(pu:PTUnit):boolean;
-function _getMHits(uid:byte):integer;
-begin
-   with _uids[uid] do
-    if(_isbarrack)
-    or(_issmith  )
-    or((_attack>0)and(not _isbuilder))
-    then _getMHits:=_hhmhits
-    else _getMHits:=_hmhits;
-end;
 begin
    _unit_rebuild:=false;
    with pu^ do
     with uid^ do
      if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canRebuild(pu),pu))then
-      _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,trunc(_getMHits(_rebuild_uid)*(hits/_mhits)),_rebuild_level),pu);
+       _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,_uids[_rebuild_uid]._hhmhits,(level+1)*byte(_rebuild_uid=uidi) ),pu);
 end;
 
 function _unit_sability(pu:PTUnit):boolean;
@@ -1225,16 +1261,6 @@ uab_Teleport     : if(_ability_teleport(pu,tu,td))then exit;//team
       end;
 end;
 
-procedure _StartResurrection(tu:PTUnit);
-begin
-   with tu^ do
-   begin
-      buff[ub_Resurect]:=fr_fps2;
-      zfall:=-uid^._zfall;
-      ukfly:= uid^._ukfly;
-   end;
-end;
-
 function _TryZombification(pu,tu:PTUnit):boolean;
 var _h:single;
     _l,
@@ -1261,6 +1287,7 @@ begin
    begin
       if((armylimit-_limituse+_zuid^._limituse)>MaxPlayerLimit)then exit;
       if((menergy-_genergy+_zuid^._genergy)<=0)then exit;
+      if(tu^.uid^._isbuilder)and(e_builders>=PlayerMaxBuilders)then exit;
    end;
 
    if(tu^.iscomplete=false)
@@ -1298,7 +1325,7 @@ begin
          if(hits<=0)then
          begin
             _unit_dec_Kcntrs(_LastCreatedUnitP);
-            _StartResurrection(_LastCreatedUnitP);
+            _StartResurrection(nil,_LastCreatedUnitP,false);
          end;
       end;
    end;
@@ -1316,7 +1343,7 @@ begin
       begin
          level+=1;
          a_exp:=0;
-         a_exp_next:=level*ExpLevel1+ExpLevel1;
+         a_exp_next:=ExpLevel1; //level*ExpLevel1+
          GameLogUnitPromoted(pu);
          {$IFDEF _FULLGAME}
          effect_LevelUp(pu,0,nil);
@@ -1562,7 +1589,7 @@ wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false,true);
               if(ServerSide)and(not fakemissile)then
               case aw_type of
 wpt_resurect   : begin
-                    _StartResurrection(tu);
+                    _StartResurrection(pu,tu,false);
                     if((aw_reqf and wpr_reload)>0)then rld:=max2(0,aw_count*fr_fps1);
                  end;
 wpt_heal       : begin
@@ -1736,7 +1763,7 @@ uab_CCFly            : if(speed>0)then
                           if(_canAbility(pu)=0)then
                           begin
                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                             _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
                              uo_y-=fly_hz;
                              exit;
                           end;
@@ -1745,7 +1772,7 @@ uab_CCFly            : if(speed>0)then
                          if(_unit_sability(pu))then
                          begin
                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
-                            _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, upgr[upgr_race_extbuilding[uid^._urace]]<=0 );
+                            _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
                             uo_y-=fly_hz;
                             exit;
                          end;
@@ -1753,7 +1780,7 @@ uab_RebuildInPoint   : begin
                           if(speed>0)then
                           begin
                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, not ukfloater or (upgr[upgr_race_extbuilding[uid^._urace]]<=0) );
+                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, true );
                           end
                           else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                           exit;

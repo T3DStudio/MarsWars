@@ -12,7 +12,6 @@ _EVENT            : pSDL_EVENT;
 g_started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
-g_start_base      : byte     = 2;
 g_fixed_positions : boolean  = false;
 g_generators      : byte     = 2;
 g_ai_slots        : byte     = player_default_ai_level;
@@ -78,10 +77,6 @@ map_dcell         : array[0..dcn,0..dcn] of TDCell;
 DID_Square        : array[0..MaxDIDs] of longint;
 
 pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
-//pf_pathgrid_tmpg  : array[0..pf_pathmap_c,0..pf_pathmap_c] of byte;
-//pf_pathgrid_tmpb  : byte;
-//pfNodes           : array[1..pfMaxNodes] of TPFNode;
-//pfNodes_c         : integer;
 
 net_status        : byte = 0;
 net_port          : word = 10666;
@@ -133,6 +128,7 @@ wtrset_enemy_alive_ground_heavy_bio,
 wtrset_enemy_alive_ground_bio,
 wtrset_enemy_alive_ground_light_bio,
 wtrset_heal,
+wtrset_healu,
 wtrset_repair,
 wtrset_resurect   : cardinal;
 
@@ -581,12 +577,18 @@ spr_UACBot,
 
 spr_HKeep,
 spr_HAKeep,
-spr_HGate,
-spr_HAGate,
-spr_HSymbol,
-spr_HASymbol,
-spr_HPools,
-spr_HAPools,
+spr_HGate1,
+spr_HGate2,
+spr_HGate3,
+spr_HGate4,
+spr_HSymbol1,
+spr_HSymbol2,
+spr_HSymbol3,
+spr_HSymbol4,
+spr_HPools1,
+spr_HPools2,
+spr_HPools3,
+spr_HPools4,
 spr_HTower,
 spr_HTeleport,
 spr_HMonastery,
@@ -596,23 +598,33 @@ spr_HFortress,
 spr_HPentagram,
 spr_HCommandCenter,
 spr_HACommandCenter,
-spr_HBarracks,
-spr_HABarracks,
+spr_HBarracks1,
+spr_HBarracks2,
+spr_HBarracks3,
+spr_HBarracks4,
 spr_HEye,
 
 spr_UCommandCenter,
 spr_UACommandCenter,
-spr_UBarracks,
-spr_UABarracks,
-spr_UFactory,
-spr_UAFactory,
-spr_UGenerator,
-spr_UAGenerator,
-spr_UWeaponFactory,
-spr_UAWeaponFactory,
+spr_UBarracks1,
+spr_UBarracks2,
+spr_UBarracks3,
+spr_UBarracks4,
+spr_UFactory1,
+spr_UFactory2,
+spr_UFactory3,
+spr_UFactory4,
+spr_UGenerator1,
+spr_UGenerator2,
+spr_UGenerator3,
+spr_UGenerator4,
+spr_UWeaponFactory1,
+spr_UWeaponFactory2,
+spr_UWeaponFactory3,
+spr_UWeaponFactory4,
 spr_UTurret,
 spr_URadar,
-spr_UVehicleFactory,
+//spr_UVehicleFactory,
 spr_UTechCenter,
 spr_UPTurret,
 spr_URTurret,
@@ -786,7 +798,6 @@ str_srace,
 str_ready,
 str_fstarts,
 str_gmodet,
-str_starta,
 str_plout,
 str_player_def    : shortstring;
 str_generatorsO   : array[0..gms_g_maxgens] of shortstring;

@@ -371,10 +371,6 @@ begin
                  _draw_text(tar,ui_menu_csm_xt0, y, str_gmodet             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, str_gmode[g_mode]      , ta_right ,255, c_white);
 
-                 y:=_yt(3);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_starta             , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
-                 _draw_text(tar,ui_menu_csm_xt2, y, b2s(g_start_base+1)    , ta_right ,255,c_white);
-
                  y:=_yt(4);
                  _draw_text(tar,ui_menu_csm_xt0, y, str_fstarts            , ta_left  ,255, mic((G_Started=false)and(net_status<>ns_client),false));
                  _draw_text(tar,ui_menu_csm_xt2, y, b2cc[g_fixed_positions], ta_right ,255 ,c_white);

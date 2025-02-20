@@ -194,11 +194,11 @@ begin
         with _players[player] do
         begin
            if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
-           if(not tu^.uid^._ukmech)then
+           {if(not tu^.uid^._ukmech)then
             case mid of
            MID_SSShot : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus3;
            MID_SShot  : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus1;
-            end;
+            end;}
         end;
 
        with _mids[mid] do
@@ -259,6 +259,12 @@ begin
 
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
+        if(player<=MaxPlayers)and(tu<>nil)then
+          with _players[player] do
+            case mid of
+          MID_SSShot,
+          MID_SShot  : painX+=upgr[upgr_uac_ssgup]*2;
+            end;
 
         if(ud<=0)and(dtars=0)then // direct target
         begin

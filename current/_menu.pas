@@ -329,7 +329,6 @@ begin
 
       // game options
       74 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByteSet(@g_mode,true,@allgamemodes);         Map_premap;end;
-      75 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte   (@g_start_base,true,0,gms_g_startb);
       76 : if(net_status<>ns_client)and(not G_Started)then begin g_fixed_positions:=not g_fixed_positions;          Map_premap;end;
       77 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);     Map_premap;end;
       78 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte   (@g_generators,true,0,gms_g_maxgens);Map_premap;end;
@@ -448,8 +447,7 @@ begin
                 if(team>byte(state=ps_comp))then team-=1;
            end;
 
-      75 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte(@g_start_base ,false,0,gms_g_startb );
-      77 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte(@g_ai_slots   ,false,0,gms_g_maxai  );
+      77 : if(net_status<>ns_client)and(not G_Started)then       ScrollByte(@g_ai_slots  ,false,0,gms_g_maxai  );
       78 : if(net_status<>ns_client)and(not G_Started)then begin ScrollByte(@g_generators,false,0,gms_g_maxgens); Map_premap;end;
 
       80 : if(net_status<>ns_client)and(not G_Started)then MakeRandomSkirmish(true);

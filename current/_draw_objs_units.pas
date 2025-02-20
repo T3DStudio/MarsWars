@@ -32,8 +32,8 @@ begin
 UID_UPortal,
 UID_HTeleport,
 UID_HPentagram,
-UID_HSymbol,
-UID_HASymbol,
+UID_HSymbol1,
+UID_HSymbol2,
 UID_HAltar,
 UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
     else
@@ -298,7 +298,7 @@ begin
       if(buff[ub_Detect  ]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
-      if(not _ukbuilding)then
+      if(not _ukbuilding)or(_isbarrack)or(_issmith)then
        case level of
        1: lvlstr_l:='>';
        2: lvlstr_l:='||';

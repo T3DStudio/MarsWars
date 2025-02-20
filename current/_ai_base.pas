@@ -5,7 +5,7 @@ aiucl_main0      : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCe
 aiucl_main0A     : array[1..r_cnt] of byte = (UID_HAKeep         ,UID_UACommandCenter );
 aiucl_main1      : array[1..r_cnt] of byte = (UID_HCommandCenter ,0                   );
 aiucl_main1A     : array[1..r_cnt] of byte = (UID_HACommandCenter,0                   );
-aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator      );
+aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol1       ,UID_UGenerator1     );
 aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UBarracks       );
 aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HBarracks      ,UID_UFactory        );
 aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory  );
@@ -20,16 +20,16 @@ aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret  
 aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret        );
 aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret        );
 
-ai_GeneratorsLimit        = ul1*60;
-ai_GeneratorsEnergy       = 5000;
-ai_GeneratorsDestroyEnergy= 5400;
-ai_GeneratorsDestoryLimit = ul1*80;
+ai_GeneratorsLimit        = ul1*40;
+ai_GeneratorsEnergy       = 7000;
+ai_GeneratorsDestroyEnergy= 8000;
+ai_GeneratorsDestoryLimit = ul1*60;
 ai_TowerLifeTime          = fr_fps1*60;
-ai_MinArmyForScout        = 0;
+ai_MinArmyForScout        = ul10;
 ai_BasePatrolRange        = 100;
-ai_MinBaseSaveCountBorder = 6;
-ai_MinChoosenCount        = 6;
-ai_FiledSquareBorder      = 145000;
+ai_MinBaseSaveCountBorder = 3;
+ai_MinChoosenCount        = 3;
+ai_FiledSquareBorder      = 150000;//145000;
 
 // ai groups
 aio_home       = 0;
@@ -66,7 +66,6 @@ ai_generator_cp,
 ai_cpoint_cp      : PTCTPoint;
 
 //ai_ReadyForAttack,
-ai_ExtBuildingUpgr,
 ai_PhantomWantZombieMe,
 ai_advanced_bld,
 ai_teleport_use,
@@ -221,7 +220,7 @@ begin
       ai_maxcount_tech1   :=t1;
       ai_maxcount_tech2   :=t2;
       ai_maxlimit_detect  :=dl*MinUnitLimit;
-      ai_maxcount_spec1   :=s1;
+      ai_maxcount_spec1   :=random(s1+1);
       ai_maxcount_spec2   :=s2;
       ai_mincount_towers  :=mint;
       ai_maxcount_towers  :=maxt;
@@ -241,12 +240,12 @@ begin
       //                                                        limit
       0  : SetBaseOpt(0    ,0   ,0     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
       1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,12    ,fr_fps1*180,12            ,0  ,[]);
-      2  : SetBaseOpt(1200 ,2   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,30    ,fr_fps1*150,30            ,0  ,[]);
-      3  : SetBaseOpt(2400 ,4   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*120,45            ,1  ,[]);
-      4  : SetBaseOpt(3600 ,8   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,60            ,2  ,[]);
-      5  : SetBaseOpt(4200 ,12  ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*60 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
-      6  : SetBaseOpt(4900 ,18  ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(6000 ,24  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
+      2  : SetBaseOpt(1200 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,30    ,fr_fps1*150,30            ,0  ,[]);
+      3  : SetBaseOpt(2400 ,2   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*120,45            ,1  ,[]);
+      4  : SetBaseOpt(3600 ,2   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,60            ,2  ,[]);
+      5  : SetBaseOpt(4200 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*60 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
+      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
       case ai_skill of
@@ -368,14 +367,13 @@ begin
       aiu_limitaround_enemy:=0;
       aiu_FiledSquareNear  :=0;
 
-      ai_ExtBuildingUpgr   :=(upgr[upgr_race_extbuilding[_urace]]>0);
 
       if(uidi=aiucl_main0 [race])
       or(uidi=aiucl_main0A[race])
       or(uidi=aiucl_main1 [race])
       or(uidi=aiucl_main1A[race])then
       begin
-         if(not ai_ExtBuildingUpgr)then ai_CollectDIDSquare(@aiu_FiledSquareNear,x,y,srange);
+         ai_CollectDIDSquare(@aiu_FiledSquareNear,x,y,srange);
 
          tx:=min2(x,map_mw-x);
          ty:=min2(y,map_mw-y);
@@ -519,8 +517,7 @@ begin
             if(d>cpCaptureR)and(pfzone<>cpzone)then
               if not( ukfly
                    or ukfloater
-                   or _isbarrack
-                   or(ai_ExtBuildingUpgr and _ukbuilding))
+                   or _isbarrack)
                    then continue;
 
             koth_point:=(i=1)and(g_mode=gm_koth)and(g_step>=g_step_koth_pause);
@@ -825,7 +822,7 @@ begin
                    if(tu^.uid^._ukbuilding)and(not tu^.ukfly)and(pfcheck)then _setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
 
                    // uac strike target
-                   if(tu^.speed<8)then
+                   if(tu^.speed<11)then
                     if(ai_strike_tar_u=nil)
                     then ai_strike_tar_u:=tu
                     else
@@ -863,7 +860,6 @@ begin
                   end;
 
                   if(tu^.unum<>ai_scout_u_cur)then
-
                   begin
                      // transport target
                      if(tu^.group<>aio_attack_busy)and(tu^.group<>aio_home_busy)then

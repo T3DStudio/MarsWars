@@ -379,7 +379,7 @@ gm_KotH   : with g_cpoints[1] do
                cpx:=map_hmw;
                cpy:=map_hmw;
                cpCaptureR   :=base_1r;
-               cpCaptureTime:=fr_fps1*60;
+               cpCaptureTime:=ptime2*fr_fps1;
 
                {$IFDEF _FULLGAME}
                cpmx:=round(cpx*map_mmcx);
@@ -392,22 +392,6 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
 
    if(g_generators>0)then
     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
-end;
-
-function _dec_min_r(t1,t2:byte):integer;
-begin
-   _dec_min_r:=DID_R[t1];
-   if(t2 in dids_liquids)
-  and(t1 in dids_liquids)then
-   begin
-      _dec_min_r:=DID_R[t1]+DID_R[t2]-(DID_R[t1] div 6)-(DID_R[t2] div 6);//max2(DID_R[t1],DID_R[t2])+64;
-      exit;
-   end;
-   if(t2 in [DID_SRock,DID_BRock])then
-   begin
-      if(t1 in [DID_SRock,DID_BRock])then _dec_min_r:=     DID_R[t1]+DID_R[t2]-20;
-      if(t1 in dids_liquids         )then _dec_min_r:=max2(DID_R[t1],DID_R[t2]);
-   end;
 end;
 
 function _dnear(td:byte;ix,iy:pinteger):boolean;
@@ -433,7 +417,7 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
-   if(point_dist_rint(x,y,ix^,iy^)<_dec_min_r(t,td))then
+   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+30))then         //_dec_min_r(t,td)
    begin
       _dnear:=true;
       break;
@@ -458,7 +442,7 @@ end;
 
 function _trysetdd(di:byte;ix,iy:pinteger;doodad_r:integer):boolean;
 begin
-   if(_checkPlace(di,ix^,iy^,doodad_r+(DID_R[di] div 2)))
+   if(_checkPlace(di,ix^,iy^,doodad_r+DID_R[di]))
    then _trysetdd:=false
    else
    begin

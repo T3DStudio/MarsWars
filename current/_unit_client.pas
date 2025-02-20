@@ -464,6 +464,7 @@ begin
       ucl_c[_ukbuilding     ]+=1;
       ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
+      if(_isbuilder)then e_builders+=1;
 
       ptransport:=nil;
       if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
@@ -531,6 +532,7 @@ begin
       ucl_c[_ukbuilding     ]-=1;
       ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
+      if(_isbuilder)then e_builders-=1;
 
       ptransport:=nil;
       if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;

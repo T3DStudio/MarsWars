@@ -60,9 +60,8 @@ begin
         ro:=0;
         with _players[HPlayer] do
          case m_brush of
-1..255         : with _uids[m_brush] do
-                   if(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport)then ro:=r-bld_dec_mr;
-co_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then ro:=r-bld_dec_mr;
+1..255,
+co_psability   : ro:=r-bld_dec_mr;
          end;
 
         if(noanim=false)or(sprite=pspr_dummy)then

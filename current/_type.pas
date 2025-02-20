@@ -256,7 +256,7 @@ TUID = record
    _zfall,
    _transportS,
    _transportM,
-   _base_armor,
+   //_base_armor,
    _baseregen,
    _zombie_hits,
    _upgr_srange_step,
@@ -269,7 +269,7 @@ TUID = record
    _upgr_armor,
    _upgr_regen,
    _rebuild_uid,
-   _rebuild_level,
+   //_rebuild_level,
    _rebuild_ruid,
    _rebuild_rupgr,
    _rebuild_rupgrl,
@@ -514,6 +514,7 @@ o_x1,o_y1  : integer;
            : boolean;
 
 
+   e_builders,
    s_builders,
    s_barracks,
    s_smiths,

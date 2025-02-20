@@ -276,7 +276,7 @@ begin
 end;
 UID_Mancubus:
 begin
-   _animw:=11;
+   _animw:=12;
    _animd:=13;
    setMWSModel  (0,@spr_mancubus);
    setCommandSND(snd_mancubus_ready,snd_zimba_move,snd_mancubus_ready,snd_mancubus_pain,snd_zimba_move);
@@ -286,7 +286,7 @@ begin
 end;
 UID_Arachnotron:
 begin
-   _animw:=13;
+   _animw:=14;
    _animd:=13;
    setMWSModel  (0,@spr_arachnotron);
    setCommandSND(snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_hell_pain,snd_arachno_move);
@@ -309,7 +309,7 @@ begin
    setWeaponTEID(1,nil  ,0,[0..65]); //snd_archvile_fire EID_ArchFire
 end;
 
-UID_ZFormer:
+UID_ZMedic:
 begin
    _animw:=15;
    _animd:=8;
@@ -317,7 +317,9 @@ begin
    setMWSModel  (0,@spr_ZFormer);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
    setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
-   setWeaponESND(0,nil,snd_pistol,0,0);
+   setWeaponESND(0,nil,snd_healing,0,0);
+   setWeaponESND(1,nil,snd_pistol,0,0);
+   with _a_weap[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_ZEngineer:
 begin
@@ -414,24 +416,38 @@ begin
 end;
 UID_HGate:
 begin
-   setMWSModel(0,@spr_HGate );
-   setMWSModel(1,@spr_HAGate);
+   setMWSModel(0,@spr_HGate1);
+   setMWSModel(1,@spr_HGate2);
+   setMWSModel(2,@spr_HGate3);
+   setMWSModel(3,@spr_HGate4);
    setBuildingSND(snd_hell_hgate);
 end;
-UID_HSymbol:
+UID_HSymbol1:
 begin
-   setMWSModel(0,@spr_HSymbol);
+   setMWSModel(0,@spr_HSymbol1);
    setBuildingSND(snd_hell_hsymbol);
 end;
-UID_HASymbol:
+UID_HSymbol2:
 begin
-   setMWSModel(0,@spr_HASymbol);
+   setMWSModel(0,@spr_HSymbol2);
+   setBuildingSND(snd_hell_hsymbol);
+end;
+UID_HSymbol3:
+begin
+   setMWSModel(0,@spr_HSymbol3);
+   setBuildingSND(snd_hell_hsymbol);
+end;
+UID_HSymbol4:
+begin
+   setMWSModel(0,@spr_HSymbol4);
    setBuildingSND(snd_hell_hsymbol);
 end;
 UID_HPools:
 begin
-   setMWSModel(0,@spr_HPools );
-   setMWSModel(1,@spr_HAPools);
+   setMWSModel(0,@spr_HPools1);
+   setMWSModel(1,@spr_HPools2);
+   setMWSModel(2,@spr_HPools3);
+   setMWSModel(3,@spr_HPools4);
    setBuildingSND(snd_hell_hpool);
 end;
 UID_HTower:
@@ -511,8 +527,10 @@ begin
 end;
 UID_HBarracks:
 begin
-   setMWSModel(0,@spr_HBarracks );
-   setMWSModel(1,@spr_HABarracks);
+   setMWSModel(0,@spr_HBarracks1);
+   setMWSModel(1,@spr_HBarracks2);
+   setMWSModel(2,@spr_HBarracks3);
+   setMWSModel(3,@spr_HBarracks4);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,0     ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectEID(1,0     ,EID_BBExp           ,EID_BBExp           ,0  );
@@ -694,30 +712,46 @@ begin
 end;
 UID_UBarracks:
 begin
-   setMWSModel(0,@spr_UBarracks);
-   setMWSModel(1,@spr_UABarracks);
+   setMWSModel(0,@spr_UBarracks1);
+   setMWSModel(1,@spr_UBarracks2);
+   setMWSModel(2,@spr_UBarracks3);
+   setMWSModel(3,@spr_UBarracks4);
    setBuildingSND(snd_uac_barracks);
 end;
 UID_UFactory:
 begin
-   setMWSModel(0,@spr_UFactory );
-   setMWSModel(1,@spr_UAFactory);
+   setMWSModel(0,@spr_UFactory1 );
+   setMWSModel(1,@spr_UFactory2);
+   setMWSModel(2,@spr_UFactory3);
+   setMWSModel(3,@spr_UFactory4);
    setBuildingSND(snd_uac_factory);
 end;
-UID_UGenerator:
+UID_UGenerator1:
 begin
-   setMWSModel(0,@spr_UGenerator);
+   setMWSModel(0,@spr_UGenerator1);
    setBuildingSND(snd_uac_generator);
 end;
-UID_UAGenerator:
+UID_UGenerator2:
 begin
-   setMWSModel(0,@spr_UAGenerator);
+   setMWSModel(0,@spr_UGenerator2);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_UGenerator3:
+begin
+   setMWSModel(0,@spr_UGenerator3);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_UGenerator4:
+begin
+   setMWSModel(0,@spr_UGenerator4);
    setBuildingSND(snd_uac_suply);
 end;
 UID_UWeaponFactory:
 begin
-   setMWSModel(0,@spr_UWeaponFactory); //@
-   setMWSModel(1,@spr_UAWeaponFactory);
+   setMWSModel(0,@spr_UWeaponFactory1); //@
+   setMWSModel(1,@spr_UWeaponFactory2);
+   setMWSModel(2,@spr_UWeaponFactory3);
+   setMWSModel(3,@spr_UWeaponFactory4);
    setBuildingSND(snd_uac_smith);
 end;
 UID_UTechCenter:
@@ -858,9 +892,7 @@ upgr_hell_teleport  : begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_HKTeleport: begin _up_btn:=spr_b_up[r_hell,9 ]; end;
 upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
 upgr_hell_buildr    : begin _up_btn:=spr_b_up[r_hell,11]; end;
-upgr_hell_extbuild  : begin _up_btn:=spr_b_up[r_hell,20]; end;
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
-upgr_hell_ghostm    : begin _up_btn:=spr_b_up[r_hell,12]; end;
 upgr_hell_phantoms  : begin _up_btn:=spr_b_up[r_hell,17]; end;
 upgr_hell_t2attack  : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_rteleport : begin _up_btn:=spr_b_up[r_hell,16]; end;
@@ -868,7 +900,6 @@ upgr_hell_totminv   : begin _up_btn:=spr_b_up[r_hell,18]; end;
 upgr_hell_bldrep    : begin _up_btn:=spr_b_up[r_hell,19]; end;
 upgr_hell_tblink    : begin _up_btn:=spr_b_up[r_hell,21]; end;
 upgr_hell_resurrect : begin _up_btn:=spr_b_up[r_hell,13]; end;
-upgr_hell_invuln    : begin _up_btn:=spr_b_up[r_hell,22]; end;
 
 upgr_uac_attack     : begin _up_btn:=spr_b_up[r_uac ,0 ]; end;
 upgr_uac_uarmor     : begin _up_btn:=spr_b_up[r_uac ,1 ]; end;
@@ -877,13 +908,11 @@ upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_vision     : begin _up_btn:=spr_b_up[r_uac ,12]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_soaring    : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_CCFly      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
 upgr_uac_ccturr     : begin _up_btn:=spr_b_up[r_uac ,10]; end;
 upgr_uac_buildr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
-upgr_uac_extbuild   : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
@@ -892,7 +921,6 @@ upgr_uac_transport  : begin _up_btn:=spr_b_up[r_uac ,24]; end;
 upgr_uac_mechspd    : begin _up_btn:=spr_b_up[r_uac ,17]; end;
 upgr_uac_mecharm    : begin _up_btn:=spr_b_up[r_uac ,18]; end;
 upgr_uac_turarm     : begin _up_btn:=spr_b_up[r_uac ,21]; end;
-upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 upgr_uac_antiair    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
 
       end;

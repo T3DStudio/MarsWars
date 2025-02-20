@@ -102,10 +102,9 @@ begin
    net_writebool(map_symmetry);
 
    net_writebyte(g_mode           );
-   net_writebyte(g_start_base     );
    net_writebool(g_fixed_positions);
    net_writebyte(g_ai_slots       );
-   net_writebyte(g_generators    );
+   net_writebyte(g_generators     );
    net_writebool(g_deadobservers  );
 
    if(G_Started)and(not g_fixed_positions)then
@@ -317,7 +316,6 @@ begin
    if(_rmCard(@map_seed         ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmBool(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_mode           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_start_base     ))then begin redraw_menu:=true;              end;
    if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;              end;
    if(_rmByte(@g_generators     ))then begin redraw_menu:=true;new_map:=true;end;

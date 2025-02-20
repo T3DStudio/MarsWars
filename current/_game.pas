@@ -9,30 +9,17 @@ begin
                                 UID_Engineer      ..UID_Flyer  ],
                                 MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_HPentagram, UID_HMonastery ,UID_HFortress       ,UID_HAltar,
-                                                UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
+      //PlayerSetAllowedUnits(p,[ UID_HPentagram, UID_HMonastery ,UID_HFortress       ,UID_HAltar,
+      //                                          UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
 
       PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
 
       if(g_generators>0)then
-      PlayerSetAllowedUnits(p,[ UID_HSymbol   ,UID_HASymbol   ,UID_HKeep         ,UID_HCommandCenter,
-                                UID_UGenerator,UID_UAGenerator,UID_UCommandCenter],0,false);
+      PlayerSetAllowedUnits(p,[ UID_HSymbol1   ,UID_HSymbol2   ,
+                                UID_UGenerator1,UID_UGenerator2],0,false);
 
 
       PlayerSetAllowedUpgrades(p,[0..255],255,true); //
-
-      //if(not g_addon)then
-      //upgr[upgr_hell_baron]:=1;
-
-
-      {ai_pushtime := fr_fps1*30;
-      ai_pushmin  := 55;
-      ai_pushuids := [];
-      ai_towngrd  := 3;
-      ai_maxunits := 100;
-      ai_flags    := $FFFFFFFF;
-      ai_pushtimei:= 0;
-      ai_pushfrmi := 0; }
    end;
 end;
 
@@ -223,7 +210,7 @@ var  i,n,uid:byte;
 r,d,ds:integer;
 procedure _Spawn(tx,ty:integer);
 begin
-   if(n=0)and(AdvancedBase)and(c=0)
+   if(AdvancedBase)
    then uid:=uidA
    else uid:=uidF;
    _unit_add(tx,ty,0,uid    ,pl,true,false,0);
@@ -299,7 +286,10 @@ begin
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if(team>0)then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,g_start_base,g_generators>0);
+        if(team>0)then
+           if(g_generators>0)
+           then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,1,true )
+           else GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,0,false);
      end;
 
    {$IFDEF _FULLGAME}
@@ -339,7 +329,6 @@ begin
    Map_randommap;
 
    g_mode      :=gm_scirmish;
-   g_start_base:=random(gms_g_startb+1);
    g_generators:=random(gms_g_maxgens+1);
 
    PlayersSwap(1,HPlayer);

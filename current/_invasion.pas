@@ -95,8 +95,7 @@ function WaveTime(base:integer):integer;
 begin
    WaveTime:=base;
    WaveTime+=round(g_inv_wave_t_curr/fr_fps2*(MinSMapW/map_mw));
-   WaveTime-=12*g_start_base;
-   WaveTime+=5*g_inv_wave_n;
+   WaveTime+=4*g_inv_wave_n;
 end;
 
 procedure GameModeInvasion;
@@ -133,8 +132,8 @@ begin
             {$ENDIF}
             case g_inv_wave_n of
             0  : g_inv_limit:=0;
-            1  : g_inv_limit:=ul5;
-            2  : g_inv_limit:=ul20;
+            1  : g_inv_limit:=ul20;
+            2  : g_inv_limit:=ul20*2;
             else g_inv_limit:=(g_inv_wave_n*g_inv_wave_n)*ul3+ul32;
             end;
             GameModeInvasionSpawnMonsters(g_inv_limit,(ul1*g_inv_wave_n));

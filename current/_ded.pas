@@ -123,7 +123,6 @@ begin
               GameLogCommon(0,log_to_all,'  capturing points, -koth - king of'  ,false);
               GameLogCommon(0,log_to_all,'  the hill, -rb - royal battle'       ,false);
               GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
-              GameLogCommon(0,log_to_all,'Starting base options: -st 1-7'       ,false);
               GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-11'   ,false);
               GameLogCommon(0,log_to_all,'Neytral generators: -ng 0-5'          ,false);
               GameLogCommon(0,log_to_all,'Observer mode after lose: -lo'        ,false);
@@ -157,13 +156,11 @@ begin
 '-fp'    : begin g_fixed_positions :=not g_fixed_positions;Map_premap;end;
 '-lo'    : begin g_deadobservers   :=not g_deadobservers; end;
 '-ng'    : if(a=2)then begin g_generators:=mm3(0,s2b(args[1])  ,gms_g_maxgens);Map_premap;end;
-'-st'    : if(a=2)then       g_start_base:=mm3(0,s2b(args[1])-1,gms_g_startb );
 '-fs'    : if(a=2)then       g_ai_slots  :=mm3(0,s2b(args[1])  ,gms_g_maxai  );
 '-r'     : begin
               Map_randommap;
 
               g_mode      :=gm_scirmish;
-              g_start_base:=random(gms_g_startb+1);
               g_generators:=random(gms_g_maxgens+1);
               if(random(3)=0)
               then g_ai_slots:=0
@@ -287,7 +284,6 @@ begin
       1 : writeln(str_gstatus, SVGameStatus);
       2 : writeln(str_gsettings);
       3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]          );
-      4 : writeln('         ',str_starta       ,b2s(g_start_base+1)           );
       6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]        );
       8 : writeln('         ',str_aislots      ,g_ai_slots                    );
       10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_generators]);

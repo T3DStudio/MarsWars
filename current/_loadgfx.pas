@@ -265,7 +265,7 @@ begin
 
    dir:=0;
    case animstyle of
-   0: i:=r div 12;
+   0: i:=r div 14;
    1: i:=-5;
    end;
 
@@ -629,12 +629,18 @@ begin
 
    _LoadMWSModel(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HASymbol       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate1         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate2         ,race_buildings[r_hell]+'h_b1b'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate3         ,race_buildings[r_hell]+'h_b1c'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HGate4         ,race_buildings[r_hell]+'h_b1d'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol1       ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol2       ,race_buildings[r_hell]+'h_b2a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol3       ,race_buildings[r_hell]+'h_b2b'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HSymbol4       ,race_buildings[r_hell]+'h_b2c'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools1        ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools2        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools3        ,race_buildings[r_hell]+'h_b3b'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HPools4        ,race_buildings[r_hell]+'h_b3c'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding,firstload);
@@ -644,28 +650,37 @@ begin
    _LoadMWSModel(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HBarracks      ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HABarracks     ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HBarracks1     ,race_buildings[r_hell]+'h_hbar_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HBarracks2     ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HBarracks3     ,race_buildings[r_hell]+'h_hbarb',smt_buiding,firstload);
+   _LoadMWSModel(@spr_HBarracks4     ,race_buildings[r_hell]+'h_hbarc',smt_buiding,firstload);
    _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
 
    _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_UBarracks      ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UABarracks     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UBarracks1     ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UBarracks2     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UBarracks3     ,race_buildings[r_uac ] +'u_b1b' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UBarracks4     ,race_buildings[r_uac ] +'u_b1c' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator1    ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator2    ,race_buildings[r_uac ] +'u_b2b_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator3    ,race_buildings[r_uac ] +'u_b2c_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UGenerator4    ,race_buildings[r_uac ] +'u_b2d_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory1,race_buildings[r_uac ] +'u_b3_' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory2,race_buildings[r_uac ] +'u_b3a' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory3,race_buildings[r_uac ] +'u_b3b' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_UWeaponFactory4,race_buildings[r_uac ] +'u_b6_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret ,firstload);
    _LoadMWSModel(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding,firstload);
-   _LoadMWSModel(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding,firstload);
    _LoadMWSModel(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret ,firstload);
    _LoadMWSModel(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2,firstload);
    _LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_UAFactory      ,race_buildings[r_uac ] +'u_b11_',smt_buiding,firstload);
-   _LoadMWSModel(@spr_UFactory       ,race_buildings[r_uac ] +'u_b12_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UFactory1      ,race_buildings[r_uac ] +'u_b11_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UFactory2      ,race_buildings[r_uac ] +'u_b12_',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UFactory3      ,race_buildings[r_uac ] +'u_b12a',smt_buiding,firstload);
+   _LoadMWSModel(@spr_UFactory4      ,race_buildings[r_uac ] +'u_b12b',smt_buiding,firstload);
    _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
 
    _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);

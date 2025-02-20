@@ -54,7 +54,6 @@ begin
          BlockRead(f,vr,sizeof(g_mode      ));
          if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
                                else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(g_start_base     ));vr:=0;
          BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
          BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
          BlockRead(f,hp,SizeOf(HPlayer          ));
@@ -108,9 +107,8 @@ begin
                   +SizeOf(map_symmetry     )
 
                   +SizeOf(g_mode           )
-                  +SizeOf(g_start_base     )
                   +SizeOf(g_fixed_positions)
-                  +SizeOf(g_generators    )
+                  +SizeOf(g_generators     )
                   +sizeof(rpls_player      );
    with _players[0] do
    rpls_file_head_size
@@ -244,9 +242,8 @@ begin
       BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
 
       BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
-      BlockWrite(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
       BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-      BlockWrite(rpls_file,g_generators    ,SizeOf(g_generators    ));
+      BlockWrite(rpls_file,g_generators     ,SizeOf(g_generators     ));
       BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
       {$I+}
 
@@ -378,16 +375,14 @@ begin
          BlockRead(rpls_file,map_obs          ,SizeOf(map_obs          ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
          BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
-         BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
          BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(rpls_file,g_generators    ,SizeOf(g_generators    ));
+         BlockRead(rpls_file,g_generators     ,SizeOf(g_generators     ));
          BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
          {$I+}
 
          if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
          or(map_liq>7)or(map_obs>7)
          or not(g_mode in allgamemodes)
-         or(g_start_base>gms_g_startb)
          or(rpls_player>MaxPlayers)then
          begin
             replay_Abort;

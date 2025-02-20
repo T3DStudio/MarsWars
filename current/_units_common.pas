@@ -446,7 +446,7 @@ begin
       with pu^ do
        if(iscomplete)and(rld<=0)then
         with player^ do
-         if(team=tu^.player^.team)and(upgr[upgr_hell_invuln]>0)and(tu^.buff[ub_Invuln]<=0)then
+         if(team=tu^.player^.team)and(tu^.buff[ub_Invuln]<=0)then
          begin
             tu^.buff[ub_Invuln]:=invuln_time;
             if(tu^.buff[ub_Invuln]<=0)then
@@ -455,7 +455,6 @@ begin
                exit;
             end;
             rld:=haltar_reload;
-            upgr[upgr_hell_invuln]-=1;
             _unit_ability_HInvuln:=true;
             {$IFDEF _FULLGAME}
             effect_LevelUp(tu,EID_Invuln,nil);
@@ -482,18 +481,16 @@ begin
    with pu^ do
     if(iscomplete)and(rld<=0)then
      with player^ do
-      if(upgr[upgr_uac_rstrike]>0)then
-      begin
-         _unit_clear_order(pu,true);
-         uo_x:=x0;
-         uo_y:=y0;
-         for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_fps2);
-         rld:=mstrike_reload;
-         upgr[upgr_uac_rstrike]-=1;
-         _unit_umstrike_missile(pu);
-         buff[ub_Cast]:=fr_fps1;
-         _unit_ability_UACStrike:=true;
-      end;
+     begin
+        _unit_clear_order(pu,true);
+        uo_x:=x0;
+        uo_y:=y0;
+        for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_fps2);
+        rld:=mstrike_reload;
+        _unit_umstrike_missile(pu);
+        buff[ub_Cast]:=fr_fps1;
+        _unit_ability_UACStrike:=true;
+     end;
 end;
 
 
@@ -651,7 +648,7 @@ begin
    begin
       aukfly:=_ukfly;
       with _players[pl] do
-       _push_out(tx,ty,_r,0,@tx,@ty,aukfly,(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport));
+       _push_out(tx,ty,_r,0,@tx,@ty,aukfly,true);
    end;
 
    dx:=-2000;
@@ -803,9 +800,7 @@ begin
    obstacles:=true;
    if(playern<=MaxPlayers)then
    begin
-      with _uids[buid] do
-       with _players[playern] do
-        obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+      obstacles:=true;
 
       if(obstacles)and(_players[playern].state=ps_comp)then
         if(pf_IfObstacleZone(pf_get_area(tx,ty)))then begin _CheckBuildPlace:=2;exit;end;
@@ -835,7 +830,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+         obstacles:=true;
          _push_out(x0,y0,_r,unum,@x0,@y0,ukfly, obstacles );
          x0:=mm3(1,x0,map_mw);
          y0:=mm3(1,y0,map_mw);
@@ -863,7 +858,7 @@ begin
      with player^ do
       if(upgr[upgr_hell_tblink]>0)then
       begin
-         obstacles:=(upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=uab_Teleport);
+         obstacles:=true;
          if(srange<point_dist_int(x,y,x0,y0))then _1c_push(@x0,@y0,x,y,srange-1);
          _push_out(x0,y0,_r,unum,@x0,@y0,ukfly, obstacles  );
          x0:=mm3(1,x0,map_mw);
@@ -993,6 +988,7 @@ begin
       ucl_c[_ukbuilding     ]+=1;
       ucl_l[_ukbuilding     ]+=_limituse;
       uid_e[uidi            ]+=1;
+      if(_isbuilder)then e_builders+=1;
 
       iscomplete:=ubld;
 
@@ -1086,10 +1082,9 @@ begin
             level:=ulevel;
 
             _unit_default  (_LastCreatedUnitP,false);
-            _unit_reveal(_LastCreatedUnitP,false);
+            _unit_reveal   (_LastCreatedUnitP,false);
             _unit_apUID    (_LastCreatedUnitP);
             _unit_inc_cntrs(_LastCreatedUnitP,ubld,summoned);
-
          end;
       end;
    end;
@@ -1402,6 +1397,7 @@ begin
       ucl_c[_ukbuilding     ]-=1;
       ucl_l[_ukbuilding     ]-=_limituse;
       uid_e[uidi            ]-=1;
+      if(_isbuilder)then e_builders-=1;
    end;
 end;
 
@@ -1752,7 +1748,7 @@ uab_CCFly         :
                  if(uo_id<>ua_psability)
                  then _unit_clear_order(pu,false);
               end;
-              speed:=3;
+              speed:=5;
            end
            else
            begin
@@ -1768,7 +1764,7 @@ uab_CCFly         :
               speed:=0;
 
               if(ServerSide)and(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[_urace]]=0 )>0)then
+               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false,true )>0)then
                begin
                   level:=1;
                   buff[ub_CCast]:=fr_fps2;
@@ -1800,18 +1796,6 @@ UID_LostSoul      : begin
                        if(buff[ub_pain]<=0)then
                          if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
-                    end;
-UID_UACDron       : begin
-                    ukfloater:=upgr[upgr_uac_soaring ]>0;
-                    if(pf_IfObstacleZone(pfzone))and(ukfloater)
-                    then begin if(speed= _speed)then speed:=_speed div 2;end
-                    else begin if(speed<>_speed)then speed:=_speed;      end;
-                    end;
-UID_Demon         : begin
-                    ukfloater:=upgr[upgr_hell_ghostm]>0;
-                    if(pf_IfObstacleZone(pfzone))and(ukfloater)
-                    then begin if(speed= _speed)then speed:=_speed div 2;{$IFDEF _FULLGAME}if(animw =_animw)then animw:=_animw div 2;{$ENDIF}end
-                    else begin if(speed<>_speed)then speed:=_speed;      {$IFDEF _FULLGAME}if(animw<>_animw)then animw:=_animw;      {$ENDIF}end;
                     end;
 UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
 UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;

@@ -294,6 +294,7 @@ lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
 lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],timeDiff5,ax,ay))then exit;
+lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],timeDiff3,ax,ay))then exit;
       else
          with log_l[log_i] do
            if(tick<=G_Step)then
@@ -767,7 +768,8 @@ begin
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrl));
       setr(ureq_energy    , cenergy<_renergy                     );
       setr(ureq_time      , _btime<=0                            );
-      setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
+      setr(ureq_max       ,((uid_e[uid]+uprodu[uid])>=a_units[uid])or
+                          ((_isbuilder)and(e_builders>=PlayerMaxBuilders)));
 
       case _ukbuilding of
 true  : begin
@@ -924,7 +926,8 @@ begin
     if(iscomplete=false)
     or(hits<=0)
     or(_rebuild_uid=0)
-    or((_rebuild_level>0)and(level>=_rebuild_level))
+    //or((_rebuild_level>0)and(level>=_rebuild_level))//
+    or((_rebuild_uid=pu^.uidi)and(level>=MaxUnitLevel))
     then _canRebuild:=ureq_alreadyAdv
     else
       with player^ do

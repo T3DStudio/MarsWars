@@ -137,11 +137,11 @@ begin
    end;
 co_psability:
    for i:=0 to 255 do
-    if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],nil))then
+    if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],@pdunit))then
      with _uids[i] do
       case _ability of
-uab_UACStrike     : if(upgr[upgr_uac_rstrike]>0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_UACScan       : circleColor(tar,mouse_x,mouse_y,_units[uid_x[i]].srange,c_gray);
+uab_UACStrike     : if(ui_bucl_reload[pdunit^.uid^._ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
+uab_UACScan       : if(ui_bucl_reload[pdunit^.uid^._ucl]=0)then circleColor(tar,mouse_x,mouse_y,pdunit^.srange,c_gray);
 uab_RebuildInPoint: begin
                     spr:=_uid2spr(_rebuild_uid,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
