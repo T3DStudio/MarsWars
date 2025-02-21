@@ -106,7 +106,7 @@ begin
     else
       case UnitVisionRange(pu) of
     1:begin
-         if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
+         //if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
          _unit_fogrev:=true;
       end;
     2:begin

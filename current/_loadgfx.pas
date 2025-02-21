@@ -538,10 +538,19 @@ begin
 
    LoadFont;
 
+   {
    vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
    boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
    filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
+   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));  }
+   vid_fog_surf:=_createSurf(fog_cw,fog_cw);
+   boxColor(vid_fog_surf,0,0,fog_cw,fog_cw,c_white);
    SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
+   for x:=0 to fog_cw-1 do
+   for r:=0 to fog_cw-1 do
+     if((x+r)mod 4)>0 then
+       pixelColor(vid_fog_surf,x,r,c_black);
+
 
    spr_mback:= loadIMG('mback'   ,false,true);
 
@@ -618,7 +627,7 @@ begin
    _LoadMWSModel(@spr_Siege          ,race_units[r_uac ]+'u_u4_'      ,smt_imp      ,firstload);
    _LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   ,firstload);
    _LoadMWSModel(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_imp      ,firstload);
-   _LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_fapc     ,firstload);
+   _LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_transport,firstload);
    _LoadMWSModel(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
    _LoadMWSModel(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'      ,smt_terminat ,firstload);
    _LoadMWSModel(@spr_Tank           ,race_units[r_uac ]+'u_u10_'     ,smt_tank     ,firstload);

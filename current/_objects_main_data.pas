@@ -14,7 +14,7 @@ end;
 
 procedure _unit_CalcForR(pu:PTUnit);
 begin
-   with pu^ do fsr:=mm3(0,srange div fog_cw,MFogM);
+   with pu^ do fsr:=mm3(1,srange div fog_cw,MFogM);
 end;
 {$ENDIF}
 
@@ -382,7 +382,7 @@ begin
    _painc     := 8;
    _btime     := ptime1;
    //_limituse  := ul1h;
-   _ruid1     := UID_HPools;
+   //_ruid1     := UID_HPools;
    _attack    := atm_always;
    _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpsd2,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitHeavy);
 end;
@@ -1095,7 +1095,7 @@ begin
    _attack    := atm_always;
    _zombie_uid:= UID_ZSSergant;
    _uklight   := false;
-   _ruid1     := UID_UWeaponFactory;
+   //_ruid1     := UID_UWeaponFactory;
    _limituse  := ul1h;
    _fastdeath_hits:=fdead_hits_border;
    _weapon(0,wpt_missle,aw_srange,0,0,fr_fps1d2,MID_SSShot,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_SSGShot);
@@ -1488,7 +1488,7 @@ MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage8;
 MID_Mine,
-MID_Blizzard       : mid_base_damage :=BaseDamage10;
+MID_Blizzard       : mid_base_damage :=BaseDamage10*2;
 end;
 
 // splash R
@@ -1576,8 +1576,7 @@ begin
    SetDMOD(dm_Cyber            ,0,300,wtr_building                              );
    SetDMOD(dm_Cyber            ,1, 50,wtr_unit+             wtr_light           );
    SetDMOD(dm_Siege            ,0,300,wtr_building                              );
-   SetDMOD(dm_Blizzard         ,0,500,wtr_building                              );
-   SetDMOD(dm_Blizzard         ,1, 50,wtr_unit+             wtr_light           );
+   SetDMOD(dm_Blizzard         ,0,200,wtr_building                              );
    SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
 end;
 

@@ -142,6 +142,8 @@ end;
 begin
    if(MainMenu)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
 
+   if not MapPointInScreenP(ex,ey)then exit;
+
    for e:=1 to vid_mvs do
    with _effects[e] do
    if(anim_last_i_t=0)then
@@ -280,10 +282,11 @@ begin
    begin
       spr:=@spr_dummy;
 
-      spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
+      if(not draw)then continue;
+      if(not MapPointInScreenP(vx,vy))then continue;
 
-      if(draw)then
-       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,_SpriteDepth(vy,mfs)+100,0,spr,255);
+      spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
+      SpriteListAddEffect(vx,vy,_SpriteDepth(vy,mfs)+100,0,spr,255);
    end;
 end;
 
