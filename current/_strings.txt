@@ -495,13 +495,13 @@ Size: 14
 Base movement speed: 20
 Base vision range: 200
 Build time: 20
-Energy required: 200
+Energy required: 300
 PainState base threshold: 8
 Places in transport: 2
-Requirements: Infernal Pools
+
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- melee attack, targets: [alive,ground], impact 62*2, target priority: distance, upgrade: Claws and Teeth(+8), factor: x1.5 [unit,heavy];
+- melee attack, targets: [alive,ground], impact 62*1.5, target priority: distance, upgrade: Claws and Teeth(+8), factor: x1.5 [unit,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +8;
@@ -1451,7 +1451,7 @@ Energy required: 300
 Places in transport: 1
 Zombie: Zombie SuperShotguner
 Zombification hits: 0
-Requirements: Weapon Factory
+
 Produced by: Barracks
 Arming/Abilities: 
 - ranged attack, max. range: vision range, targets: [alive,ground], impact 186*0.67, target priority: [unit,bio,heavy], upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological,heavy],x0.5 [mechanical];

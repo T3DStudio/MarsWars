@@ -100,7 +100,11 @@ procedure BuildMain(a:integer);   // Builders
 begin
    with pu^.player^ do
     if(ai_builders_count<a)and(ai_builders_count<ai_maxcount_mains)then
-     if(SetBTA(aiucl_main0[race],aiucl_main1[race],4))then ddir:=-1;
+     if(SetBTA(aiucl_main0[race],aiucl_main1[race],4))then
+     begin
+        ddir:=-1;
+        l:=pu^.srange;
+     end;
 end;
 procedure BuildEnergy(a:integer); // Energy
 begin
@@ -228,8 +232,9 @@ begin
          BuildUProd (ai_unitp_need);
          BuildSmith (ai_upgrp_need);
          BuildDetect(ai_detect_need);
-         if(ai_builders_count>1)then
-         BuildTech  (1);
+         if(ai_builders_count>1)
+    then BuildTech  (1)
+    else BuildMain  (ai_builders_need);
          BuildSpec1 (ai_maxcount_spec1 );
          BuildSpec2 (ai_maxcount_spec2 );
          BuildMain  (ai_builders_need);
@@ -516,11 +521,9 @@ begin
 r_hell: begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
-        if(g_generators=0)then
-        MakeUpgr(upgr_hell_buildr    ,1);
-
-        MakeUpgr(upgr_hell_HKTeleport,1);
+        //if(g_generators=0)then
         MakeUpgr(upgr_hell_buildr    ,2);
+        MakeUpgr(upgr_hell_HKTeleport,1);
         MakeUpgr(upgr_hell_spectre   ,1);
         MakeUpgr(upgr_hell_paina     ,1);
 
@@ -546,11 +549,9 @@ r_hell: begin
 r_uac : begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
         begin
-        if(g_generators=0)then
-        MakeUpgr(upgr_uac_buildr     ,1);
-
-        MakeUpgr(upgr_uac_CCFly      ,1);
+        //if(g_generators=0)then
         MakeUpgr(upgr_uac_buildr     ,2);
+        MakeUpgr(upgr_uac_CCFly      ,1);
         MakeUpgr(upgr_uac_commando   ,1);
         MakeUpgr(upgr_uac_ccturr     ,1);
         MakeUpgr(upgr_uac_botturret  ,1);
@@ -712,7 +713,7 @@ begin
       or((ai_maxcount_mains>=8)and(ai_builders_count<8))
       then prods+=150;
       prods:=(menergy div prods); }
-      prods:=(menergy div 500)+2;
+      prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
       if(g_generators>0)then prods+=1;
 
       if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
@@ -1349,25 +1350,30 @@ begin
                else
                begin
                   ai_BaseIdle(pu,base_hr+uid^._r);
-                  with player^ do
+                  if(ai_base_d<base_1r)
+                  or(ai_base_d=NOTSET)
+                  then
+                    if(not pf_IfObstacleZone(pfzone))
+                    then _unit_sability(pu);
+                  {with player^ do
                   with uid^ do
                     if(ai_base_d>0)then
-                      if(ai_base_d<base_1r)
-                      or(ai_base_d=NOTSET)
+                      if//(ai_base_d<base_1r)
+                      (ai_base_d=NOTSET)
                       or(g_mode=gm_royale)
                       then
                         if(aiu_FiledSquareNear<=ai_FiledSquareBorder)
                         //or(ai_builders_count>=3)
                         or(g_mode=gm_royale)then
                           if(not pf_IfObstacleZone(pfzone))
-                          then _unit_sability(pu);
+                          then _unit_sability(pu);  }
                end;
       end
       else
         if(u_royal_d<base_1r)
         or((    ai_choosen)and(g_mode=gm_royale)and(u_royal_cd>=min2(g_royal_r div 7,base_2r)))
         or((    ai_choosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_1r))
-        or((not ai_choosen)and(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<3))
+        or((not ai_choosen)and(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<2))
         then _unit_sability(pu)
         else
           if(not ai_cpoint_koth)or(ai_cpoint_d>base_1r)then

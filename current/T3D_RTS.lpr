@@ -79,7 +79,8 @@ end; }
 
 begin
    InitGame;
-  // WriteUnitDescriptions;
+   //WriteUnitDescriptions;
+   //writeln(fog_chw,' ',fog_cr,' ',fog_ds);
 
    while(GameCycle)do
    begin

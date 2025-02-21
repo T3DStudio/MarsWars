@@ -373,7 +373,7 @@ end;
 UID_Demon     :
 begin
    _mhits     := 1500;
-   _renergy   := 200;
+   _renergy   := 300;
    _r         := 14;
    _speed     := 20;
    _srange    := 200;
@@ -384,7 +384,7 @@ begin
    //_limituse  := ul1h;
    //_ruid1     := UID_HPools;
    _attack    := atm_always;
-   _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpsd2,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitHeavy);
+   _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps2d3,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitHeavy);
 end;
 UID_Cacodemon :
 begin
@@ -1487,7 +1487,7 @@ MID_SSShot         : mid_base_damage :=BaseDamage3;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage8;
-MID_Mine,
+MID_Mine           : mid_base_damage :=BaseDamage10;
 MID_Blizzard       : mid_base_damage :=BaseDamage10*2;
 end;
 

@@ -569,7 +569,8 @@ begin
          vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
          if(rpls_fog)then
          begin
-            if(vid_fog_grid[cx,cy]=0)then _draw_surf(tar,ssx, ssy, vid_fog_surf);
+            if(vid_fog_grid[cx,cy]=0)then //_draw_surf(tar,ssx, ssy, vid_fog_surf);
+              _draw_surf(tar,ssx-fog_ds, ssy-fog_ds, vid_fog_surf);
             vid_fog_grid[cx,cy]:=0;
          end
          else vid_fog_grid[cx,cy]:=2;

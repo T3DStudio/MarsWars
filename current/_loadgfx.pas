@@ -538,18 +538,28 @@ begin
 
    LoadFont;
 
-   {
+
+   {vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
+   boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
+   filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
+   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0)); }
+
    vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
    boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
    filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));  }
-   vid_fog_surf:=_createSurf(fog_cw,fog_cw);
+   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
+   for x:=0 to vid_fog_surf^.w-1 do
+   for r:=0 to vid_fog_surf^.h-1 do
+     if((x+r)mod 4)=0 then
+       pixelColor(vid_fog_surf,x,r,c_purple);
+
+   {vid_fog_surf:=_createSurf(fog_cw,fog_cw);
    boxColor(vid_fog_surf,0,0,fog_cw,fog_cw,c_white);
    SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
    for x:=0 to fog_cw-1 do
    for r:=0 to fog_cw-1 do
      if((x+r)mod 4)>0 then
-       pixelColor(vid_fog_surf,x,r,c_black);
+       pixelColor(vid_fog_surf,x,r,c_black);  }
 
 
    spr_mback:= loadIMG('mback'   ,false,true);
