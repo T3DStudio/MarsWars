@@ -173,7 +173,7 @@ Limit used: 1
 Size: 20
 Base vision range: 300
 Build time: 25
-Energy required: 300
+Energy required: 200
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
@@ -275,7 +275,7 @@ Totem of Horror
 
 Hotkey: B
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 3000
+Max hits: 2500
 Limit used: 1
 Size: 21
 Base vision range: 300

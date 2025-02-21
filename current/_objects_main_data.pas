@@ -289,7 +289,7 @@ end;
 UID_HTower:
 begin
    _mhits     := 5000;
-   _renergy   := 300;
+   _renergy   := 200;
    _r         := 20;
    _srange    := 300;
    _ucl       := 6;
@@ -305,7 +305,7 @@ begin
 end;
 UID_HTotem:
 begin
-   _mhits     := 3000;
+   _mhits     := 2500;
    _renergy   := 400;
    _r         := 21;
    _srange    := 300;

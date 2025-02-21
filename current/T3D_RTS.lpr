@@ -79,7 +79,10 @@ end; }
 
 begin
    InitGame;
-   //WriteUnitDescriptions;
+   {$IFDEF _FULLGAME}
+   if(TestMode=2)then
+   WriteUnitDescriptions;
+   {$ENDIF}
    //writeln(fog_chw,' ',fog_cr,' ',fog_ds);
 
    while(GameCycle)do

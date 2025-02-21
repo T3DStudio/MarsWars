@@ -8,7 +8,8 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="3" Y="8"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="3" Y="4"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -60,10 +61,9 @@
       </Unit6>
       <Unit7>
         <Filename Value="_init.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="41"/>
-        <TopLine Value="10"/>
-        <CursorPos X="103" Y="27"/>
+        <TopLine Value="19"/>
+        <CursorPos X="33" Y="37"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit7>
@@ -172,8 +172,8 @@
       <Unit21>
         <Filename Value="_units.pas"/>
         <EditorIndex Value="29"/>
-        <TopLine Value="1523"/>
-        <CursorPos X="128" Y="1531"/>
+        <TopLine Value="44"/>
+        <CursorPos X="83" Y="71"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -266,6 +266,7 @@
       <Unit33>
         <Filename Value="_draw_objs_units.pas"/>
         <EditorIndex Value="17"/>
+        <TopLine Value="65"/>
         <CursorPos X="104" Y="21"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -297,8 +298,8 @@
       <Unit37>
         <Filename Value="_objects_main_data.pas"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="1496"/>
-        <CursorPos X="81" Y="1515"/>
+        <TopLine Value="285"/>
+        <CursorPos X="42" Y="309"/>
         <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit37>
@@ -343,7 +344,7 @@
         <Loaded Value="True"/>
       </Unit42>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="_lang.pas"/>
         <Caret Line="1798" Column="16" TopLine="1753"/>
@@ -460,10 +461,23 @@
         <Filename Value="_ded.pas"/>
         <Caret Line="291" Column="18" TopLine="245"/>
       </Position29>
+      <Position30>
+        <Filename Value="_units.pas"/>
+        <Caret Line="1534" Column="129" TopLine="1523"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>
     </RunParams>
+    <HistoryLists Count="3">
+      <List0 Name="WorkingDirectory" Type="File" Count="1"/>
+      <List1 Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
+      </List1>
+      <List2 Name="CommandLineParameters" Count="1">
+        <Item1 Value="testD"/>
+      </List2>
+    </HistoryLists>
   </ProjectSession>
 </CONFIG>
