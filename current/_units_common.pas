@@ -55,7 +55,7 @@ end;
 procedure effect_CPExplode(vx,vy:integer);
 begin
    _effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
-   if(MapPointInScreenP(vx,vy))then
+   if(MapPointInScreenP(vx,vy,true))then
    begin
       _effect_add(vx,vy,_SpriteDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
@@ -135,7 +135,7 @@ begin
       if(vischeck^=false)then exit
    end
    else
-     if(MapPointInScreenP(tx,ty)=false)then exit;
+     if(MapPointInScreenP(tx,ty,true)=false)then exit;
 
    _effect_add(tx,ty,dy,effect);
    SoundPlayUnit(sound,nil,nil);

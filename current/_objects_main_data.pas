@@ -127,7 +127,7 @@ begin
    _isbuilder := true;
    //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
-   ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HSymbol2,UID_HAKeep];
+   ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HSymbol2,UID_HAKeep,UID_HTotem];
    _upgr_srange     :=upgr_hell_buildr;
    _upgr_srange_step:=50;
    _ability         :=uab_HKeepBlink;
@@ -301,6 +301,8 @@ begin
    _uklight   := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
+   _rebuild_uid :=UID_HTotem;
+   _rebuild_ruid:=UID_HFortress;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Imp],[],0,-26,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy);
 end;
 UID_HTotem:
@@ -311,7 +313,7 @@ begin
    _srange    := 300;
    _ucl       := 7;
    _btime     := ptime1h;
-   _ruid1     := UID_HFortress;
+   //_ruid1     := UID_HFortress;
    _attack    := atm_always;
    _ability   := uab_HTowerBlink;
    _ability_rupgr :=upgr_hell_tblink;
@@ -476,7 +478,7 @@ begin
    _upgr_regen:= upgr_race_regen_bio[r_hell];
    _upgr_armor:= upgr_race_armor_bio[r_hell];
    _a_BonusAntiUnitRange:=50;
-   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fpsd6,MID_Chaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Light,0,dm_AntiLight2);
+   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fpsd6,MID_SChaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Light,2,dm_AntiLight2);
 end;
 {
 12000  18000  19000
@@ -559,7 +561,7 @@ begin
    _renergy   := 500;
    _r         := 20;
    _speed     := 8;
-   _srange    := 250;
+   _srange    := 275;
    _ucl       := 9;
    _transportS:= 4;
    _painc     := 7;
@@ -567,7 +569,7 @@ begin
    _ruid1     := UID_HMonastery;
    _limituse  := ul3;
    _attack    := atm_always;
-   _a_BonusAntiBuildingRange:=75;
+   _a_BonusAntiBuildingRange:=50;
    _weapon(0,wpt_missle,aw_srange,0,-9,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0,dm_Siege);
 end;
 UID_Arachnotron:
@@ -1287,7 +1289,7 @@ begin
    _uklight   := false;
    _a_BonusAntiFlyRange:=-50;
    _a_BonusAntiUnitRange:=50;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SShot  ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,0,dm_AntiUnitBio);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SSShot ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,3,dm_AntiUnitBio);
    _weapon(1,wpt_missle,aw_srange,0,0,fr_fps1 ,MID_URocket,0,upgr_uac_antiair,1,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,dm_AntiFly    );
 end;
 UID_Tank:
@@ -1446,6 +1448,7 @@ case m of
 MID_ArchFire,
 MID_Mine           : mid_speed       :=32000;
 MID_Tank           : mid_speed       :=100;
+MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot,
@@ -1481,6 +1484,7 @@ MID_Tank,
 MID_SShot          : mid_base_damage :=BaseDamage1;
 MID_Revenant,
 MID_Baron          : mid_base_damage :=BaseDamage1h;
+MID_SChaingun,
 MID_YPlasma,
 MID_Flyer          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;

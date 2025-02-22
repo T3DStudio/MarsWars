@@ -22,6 +22,7 @@ function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer;  forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
+
 function Float2Str(s:single):shortstring;
 var l:byte;
 begin
@@ -266,16 +267,13 @@ begin
                  and(yi=y)
                  then exit
                  else
-                   if(point_dist_rint(xi,yi,x,y)<base_1rh)then exit;
+                   if(point_dist_rint(xi,yi,x,y)<base_2r)then exit;
       end;
    end;
    PlayerLogCheckNearEvent:=false;
 end;
 
 procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer;local:boolean);
-const
-timeDiff5 = fr_fps1*5;
-timeDiff3 = fr_fps1*3;
 {$IFDEF _FULLGAME}
 var ThisPlayer:byte;
 {$ENDIF}
@@ -293,8 +291,8 @@ lmt_player_leave,
 lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
-lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],timeDiff5,ax,ay))then exit;
-lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],timeDiff5,ax,ay))then exit;
+lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],fr_fps8,ax,ay))then exit;
+lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps8,ax,ay))then exit;
       else
          with log_l[log_i] do
            if(tick<=G_Step)then
@@ -302,7 +300,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],timeDiff5,ax,
              and(argt=aargt)
              and(argx=aargx)
              then
-              if((G_Step-tick)<timeDiff3)then exit;
+              if((G_Step-tick)<fr_fps3)then exit;
       end;
 
       if(not local)then
@@ -948,6 +946,7 @@ begin
     if(iscomplete=false)
     or(hits<=0)
     or(_ability=0)
+    or(rld>0)
     then _canAbility:=ureq_unknown
     else
       with player^ do
@@ -1130,16 +1129,27 @@ begin
      end;
 end;
 
-function MapPointInScreenP(x,y:integer):boolean;
+function MapPointInScreenP(x,y:integer;CheckSquare:boolean):boolean;
 begin
    MapPointInScreenP:=false;
    x-=vid_cam_x;
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
+   begin
       if(not rpls_fog)
       then MapPointInScreenP:=true
       else MapPointInScreenP:=fog_check(x,y);
+      if(CheckSquare)and(not MapPointInScreenP)then
+        MapPointInScreenP:=MapPointInScreenP(x-fog_cw,y,false)or
+                           MapPointInScreenP(x+fog_cw,y,false)or
+                           MapPointInScreenP(x,y+fog_cw,false)or
+                           MapPointInScreenP(x,y-fog_cw,false)or
+                           MapPointInScreenP(x-fog_cw,y-fog_cw,false)or
+                           MapPointInScreenP(x+fog_cw,y-fog_cw,false)or
+                           MapPointInScreenP(x+fog_cw,y+fog_cw,false)or
+                           MapPointInScreenP(x-fog_cw,y+fog_cw,false);
+   end;
 end;
 
 function PlayerGetColor(player:byte):cardinal;

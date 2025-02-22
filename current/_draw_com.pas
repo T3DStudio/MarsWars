@@ -157,7 +157,7 @@ begin
 
       c:=PlayerGetColor(i);
 
-      map_minimap_cpoint(r_minimap,x,y,trunc(base_1r*map_mmcx),char_start ,c);
+      map_minimap_cpoint(r_minimap,x,y,trunc(base_1r*map_mmcx),i2s(i)[1],c);//char_start
    end;
 end;
 
@@ -280,6 +280,7 @@ lmt_unit_attacked    : begin
                        if(_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_attacked_b,false)
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
+
                        LogMes2UIAlarm:=not PointInCam(xi,yi);
                        end;
      end;

@@ -183,7 +183,7 @@ Upgrades:
 - Stone Walls - armor +16;
 - Building Restoration - hits regeneration +8;
 
-Defensive structure. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Defensive structure. Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
@@ -281,8 +281,8 @@ Size: 21
 Base vision range: 300
 Build time: 30
 Energy required: 400
-Requirements: Castle of Damned
-Constructed by: Hell Keep,Great Hell Keep
+
+
 Arming/Abilities: 
 - ranged attack, max. range: vision range+50, targets: [alive,unit], impact 496*0.5, splash damage radius: 20, target priority: highest hits;
 Upgrades:
@@ -637,7 +637,7 @@ Places in transport: 12
 Requirements: Pentagram of Death
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 62*6, target priority: [light], upgrade: Demon`s Weapons(+8), factor: x2 [light];
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 124*3, target priority: [light], upgrade: Demon`s Weapons(+8), factor: x2 [light];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +8;
@@ -710,7 +710,7 @@ Max hits: 4000
 Limit used: 3
 Size: 20
 Base movement speed: 8
-Base vision range: 250
+Base vision range: 275
 Build time: 30
 Energy required: 500
 PainState base threshold: 7
@@ -718,7 +718,7 @@ Places in transport: 4
 Requirements: Monastery of Despair
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-building range: +75, targets: [alive] except [Mancubus], impact 62x2*1.2, target priority: buildings, upgrade: Demon`s Weapons(+8), factor: x3 [building];
+- ranged attack, max. range: vision range, bonus anti-building range: +50, targets: [alive] except [Mancubus], impact 62x2*1.2, target priority: buildings, upgrade: Demon`s Weapons(+8), factor: x3 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +8;
@@ -1659,7 +1659,7 @@ Places in transport: 4
 Requirements: Science Facility
 Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 62*4, target priority: [unit,bio], upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological],x0.5 [building];
+- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 186*1.33, target priority: [unit,bio], upgrade: Weapons Upgrade(+8), factor: x1.5 [unit,biological],x0.5 [building];
 - ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,flying], impact 62*1, target priority: lowest hits, upgrade: Weapons Upgrade(+8), factor: x1.5 [flying], {Req.: "Anti-air Weapon"};
 Upgrades:
 - Light Amplification Visors - vision range +25;

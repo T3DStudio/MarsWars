@@ -250,6 +250,9 @@ begin
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_NextTrack, ta_left,255, c_white);
 
+                    y:=_yt(9);
+                    _draw_text(tar,i,y, str_ReloadMusic, ta_left,255, c_white);
+
                  end;
               end;
    ms1_svld : begin

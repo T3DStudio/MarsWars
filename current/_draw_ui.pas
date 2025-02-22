@@ -136,12 +136,11 @@ begin
       c_white);
    end;
 co_psability:
-   for i:=0 to 255 do
-    if(uid_s[i]>0)and(_IsUnitRange(uid_x[i],@pdunit))then
-     with _uids[i] do
+    if(ui_uibtn_psaunit<>nil)then
+     with ui_uibtn_psaunit^.uid^ do
       case _ability of
-uab_UACStrike     : if(ui_bucl_reload[pdunit^.uid^._ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr,c_gray);
-uab_UACScan       : if(ui_bucl_reload[pdunit^.uid^._ucl]=0)then circleColor(tar,mouse_x,mouse_y,pdunit^.srange,c_gray);
+uab_UACStrike     : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr             ,c_gray);
+uab_UACScan       : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,ui_uibtn_psaunit^.srange,c_gray);
 uab_RebuildInPoint: begin
                     spr:=_uid2spr(_rebuild_uid,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
@@ -153,7 +152,7 @@ uab_RebuildInPoint: begin
 uab_HTowerBlink,
 uab_HKeepBlink,
 uab_CCFly         : begin
-                    spr:=_uid2spr(i,270,0);
+                    spr:=_uid2spr(ui_uibtn_psaunit^.uidi,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
                     _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
@@ -460,8 +459,8 @@ begin
         end
         else
         begin
-           _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_actionu=nil);
-           _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_actionu=nil);
+           _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_psaunit=nil);
+           _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_psaunit=nil);
            _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild<=0);
 
            _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
@@ -604,22 +603,33 @@ begin
       if(hs4<>nil)then _draw_text(tar,ui_textx,ui_hinty4,hs4^,ta_left,ui_ingamecl,c_white);
    end
    else
-     if(_IsUnitRange(ui_uhint,@tu))then
-       with tu^ do
-       with uid^ do
-       with player^ do
-       begin
-          _draw_text(tar,ui_textx,ui_hinty1,un_txt_uihintS+_makeAttributeStr(tu,0),ta_left,ui_ingamecl,c_white);
+     if(ui_uibtn_psaunit<>nil)and(m_brush=co_psability)then
+     begin
+        s1:='';
+        if(ui_uibtn_psaunit^.uid^._ability>0)
+        then s1:=str_ability_name[ui_uibtn_psaunit^.uid^._ability]
+        else
+          if(ui_uibtn_psaunit^.transportC>0)
+          then s1:=str_ability_unload;
+        _draw_text(tar,ui_textx,ui_hinty1,s1,ta_left,ui_ingamecl,c_white);
+     end
+     else
+       if(_IsUnitRange(ui_uhint,@tu))then
+         with tu^ do
+         with uid^ do
+         with player^ do
+         begin
+            _draw_text(tar,ui_textx,ui_hinty1,un_txt_uihintS+_makeAttributeStr(tu,0),ta_left,ui_ingamecl,c_white);
 
-          s1:='';
-          _ADDSTR(@s1,lvlstr_w,sep_wdash);
-          _ADDSTR(@s1,lvlstr_a,sep_wdash);
-          _ADDSTR(@s1,lvlstr_s,sep_wdash);
-          if(length(s1)>0)then
-          _draw_text(tar,ui_textx,ui_hinty2,str_upgradeslvl+s1,ta_left,ui_ingamecl,c_white);
+            s1:='';
+            _ADDSTR(@s1,lvlstr_w,sep_wdash);
+            _ADDSTR(@s1,lvlstr_a,sep_wdash);
+            _ADDSTR(@s1,lvlstr_s,sep_wdash);
+            if(length(s1)>0)then
+            _draw_text(tar,ui_textx,ui_hinty2,str_upgradeslvl+s1,ta_left,ui_ingamecl,c_white);
 
-          _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(pnum));
-     end;
+            _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(pnum));
+       end;
 end;
 
 procedure D_ReplayProgress(tar:pSDL_Surface);

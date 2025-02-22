@@ -61,7 +61,13 @@ begin
         with _players[HPlayer] do
          case m_brush of
 1..255,
-co_psability   : ro:=r-bld_dec_mr;
+co_psability   : if(ui_uibtn_psaunit<>nil)then
+                  case ui_uibtn_psaunit^.uid^._ability of
+                  uab_RebuildInPoint,
+                  uab_HTowerBlink,
+                  uab_HKeepBlink,
+                  uab_CCFly         : ro:=r-bld_dec_mr;
+                  end;
          end;
 
         if(noanim=false)or(sprite=pspr_dummy)then

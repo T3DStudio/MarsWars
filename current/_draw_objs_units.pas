@@ -227,7 +227,7 @@ begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_canAbility(pu)=0)and(uo_id<>ua_psability))
-            or(transportC>0)     then ui_uibtn_actionu:=uid;
+            or(transportC>0)     then ui_uibtn_psaunit:=pu;
             if(_canRebuild(pu)=0)then ui_uibtn_rebuild+=1;
          end;
       end
@@ -534,7 +534,7 @@ begin
    ui_uprod_cur      :=0;
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
-   ui_uibtn_actionu  :=nil;
+   ui_uibtn_psaunit  :=nil;
    ui_uibtn_rebuild  :=0;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];

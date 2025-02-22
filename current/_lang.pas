@@ -813,6 +813,7 @@ begin
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
    str_NextTrack         := 'Play next track';
+   str_ReloadMusic       := 'Load new playlist';
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
 
@@ -1365,6 +1366,7 @@ begin
   str_splashresist      := 'Невосприимчив к взрывной волне';
   str_TargetLimit       := 'лимит цели';
   str_NextTrack         := 'Следующий трек';
+  str_ReloadMusic       := 'Загрузить новый плейлист';
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
 
@@ -1488,7 +1490,7 @@ begin
   str_hint_army         := 'Армия: ';
   str_hint_energy       := 'Энергия: ';
 
-  str_ability_name[uab_Teleport        ]:='Телепортация';
+  str_ability_name[uab_Teleport        ]:='Призыв';
   str_ability_name[uab_UACScan         ]:='Сканирование';
   str_ability_name[uab_HTowerBlink     ]:='Скачок';
   str_ability_name[uab_UACStrike       ]:='Ракетный удар';

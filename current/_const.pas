@@ -25,6 +25,7 @@ fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
 fr_fps6                = fr_fps1*6;
+fr_fps8                = fr_fps1*8;
 fr_fps2d3              = fr_fpsd3*2; //2/3
 fr_fps60               = fr_fps1*60;
 
@@ -522,20 +523,20 @@ upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
 upgr_hell_buildr       = 7;  // main range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
-upgr_hell_paina        = 10; // decay aura
-upgr_hell_towers       = 11; // towers range
+upgr_hell_paina        = 9; // decay aura
+upgr_hell_towers       = 10; // towers range
 
-upgr_hell_spectre      = 13; // demon spectre                 // t2
-upgr_hell_vision       = 14; // demons vision
-upgr_hell_phantoms     = 15; // phantoms
-upgr_hell_t2attack     = 16; // t2 distance attacks damage
-upgr_hell_resurrect    = 17; // archvile ability
-upgr_hell_teleport     = 18; // Teleport reload
-upgr_hell_rteleport    = 19; // revers teleport
-upgr_hell_heye         = 20; // hell Eye time
-upgr_hell_totminv      = 21; // totem and eye invisible
-upgr_hell_bldrep       = 22; // build restoration
-upgr_hell_tblink       = 23; // teleport towers
+upgr_hell_spectre      = 11; // demon spectre                 // t2
+upgr_hell_vision       = 12; // demons vision
+upgr_hell_phantoms     = 13; // phantoms
+upgr_hell_t2attack     = 14; // t2 distance attacks damage
+upgr_hell_resurrect    = 15; // archvile ability
+upgr_hell_teleport     = 16; // Teleport reload
+upgr_hell_rteleport    = 17; // revers teleport
+upgr_hell_heye         = 18; // hell Eye time
+upgr_hell_totminv      = 19; // totem and eye invisible
+upgr_hell_bldrep       = 20; // build restoration
+upgr_hell_tblink       = 21; // teleport towers
 //upgr_hell_invuln       = 24; // hell invuln powerup
 
 
@@ -547,20 +548,20 @@ upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_ssgup         = 36; // expansive bullets
 upgr_uac_buildr        = 37; // main sr
 upgr_uac_CCFly         = 38; // CC fly
-upgr_uac_ccturr        = 40; // CC turret
-upgr_uac_towers        = 41; // towers sr
+upgr_uac_ccturr        = 39; // CC turret
+upgr_uac_towers        = 40; // towers sr
 
-upgr_uac_botturret     = 43; // bot turret                    // t2
-upgr_uac_vision        = 44; // infatry vision
-upgr_uac_commando      = 45; // commando invis
-upgr_uac_airsp         = 46; // anti-air missiles splash
-upgr_uac_mechspd       = 47; // mech speed
-upgr_uac_mecharm       = 48; // mech arm
-upgr_uac_antiair       = 49; // termintator anti-air weapon
-upgr_uac_transport     = 50; // transport capacity upgrade
-upgr_uac_radar_r       = 51; // Radar
-upgr_uac_plasmt        = 52; // plasma weapons fro anti-ground turret
-upgr_uac_turarm        = 53; // turrets armor
+upgr_uac_botturret     = 41; // bot turret                    // t2
+upgr_uac_vision        = 42; // infatry vision
+upgr_uac_commando      = 43; // commando invis
+upgr_uac_airsp         = 44; // anti-air missiles splash
+upgr_uac_mechspd       = 45; // mech speed
+upgr_uac_mecharm       = 46; // mech arm
+upgr_uac_antiair       = 47; // termintator anti-air weapon
+upgr_uac_transport     = 48; // transport capacity upgrade
+upgr_uac_radar_r       = 49; // Radar
+upgr_uac_plasmt        = 50; // plasma weapons fro anti-ground turret
+upgr_uac_turarm        = 51; // turrets armor
 //upgr_uac_rstrike       = 54; // rstrike launch
 
 
@@ -608,6 +609,7 @@ MID_Mine               = 118;
 MID_URocket            = 119;
 MID_URocketS           = 120;
 MID_Chaingun           = 121;
+MID_SChaingun          = 122;
 
 
 mh_none                = 0;
@@ -636,7 +638,7 @@ dm_AntiUnitMech        = 5 ; // 1.5*[unit mech]
 dm_AntiUnitLight       = 6 ; // 1.5*[unit light]
 dm_AntiUnitLight2      = 7 ; //   2*[unit light]
 dm_AntiFly             = 8 ; // 1.5*[fly]
-dm_AntiUnitHeavy           = 9 ; // 1.5*[heavy]
+dm_AntiUnitHeavy       = 9 ; // 1.5*[heavy]
 dm_AntiLight           = 10; // 1.5*[light]
 dm_AntiLight2          = 11; //   2*[light]
 dm_AntiBuildingLight   = 12; // 1.5*[buildings light]
@@ -846,7 +848,7 @@ client_rld_abils       = [
                          uab_Teleport
                          ];
 client_rld_uids        = [
-                          UID_ArchVile
+                          UID_HAltar
                          ];
 client_cast_abils      = [
                          uab_UACScan  ,

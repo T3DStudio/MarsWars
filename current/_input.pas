@@ -167,8 +167,8 @@ begin
                   LeaderUID:=uidi;
                end;
             end;
-            if(_ability    >0{_canAbility(_punits[i])=0})then SelectedActions+=1;
-            if(_rebuild_uid>0{_canRebuild(_punits[i])=0})then SelectedRebuild+=1;
+            if(_ability    >0)or(transportC>0)then SelectedActions+=1;
+            if(_rebuild_uid>0)then SelectedRebuild+=1;
          end;
 
       case cmd of
@@ -354,7 +354,7 @@ begin
                   end;
                end;
            end;
-co_psability          : if(ui_uibtn_actionu=nil)then m_brush:=co_empty;
+co_psability          : if(ui_uibtn_psaunit=nil)then m_brush:=co_empty;
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else
@@ -366,7 +366,9 @@ begin
    case m_brush of
 co_move     : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // move
 co_amove    : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // attack
-co_psability: _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);
+co_psability: if(ui_uibtn_psaunit<>nil)then
+              _player_s_o(m_brush   ,target,x,y,ui_uibtn_psaunit^.uid^._ability,
+                                                  uo_corder,HPlayer);
 co_patrol,
 co_apatrol  : _player_s_o(m_brush   ,0     ,x,y,0,uo_corder,HPlayer);
 co_empty    :

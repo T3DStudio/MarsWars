@@ -372,12 +372,14 @@ end;
 
 procedure PlayerExecuteOrder(pl:byte);
 var
-_su,_eu,
+_su,_eu,d,
 usel_n,
-usel_max : integer;
-psel     : boolean;
+usel_max  : integer;
+psel      : boolean;
 oa,
-pu       : PTUnit;
+pu,
+sability_u: PTUnit;
+sability_d: integer;
 begin
    oa:=nil;
    with _players[pl] do
@@ -412,6 +414,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
           co_supgrade : if(n_smiths  <=0)then begin PlayerSetProdError(pl,lmt_argt_upgr,o_y0,ureq_smiths  ,nil);o_id:=0;end;
           co_suprod   : if(n_barracks<=0)then begin PlayerSetProdError(pl,lmt_argt_unit,o_y0,ureq_barracks,nil);o_id:=0;end;
           end;
+
+         sability_d:=sability_d.MaxValue;
+         sability_u:=nil;
 
          while(_su<>_eu)do
          begin
@@ -465,7 +470,22 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                    case o_id of
                uo_setorder,
                uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitGroups)then group:=o_x0;
-               uo_corder     : if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1))then begin PlayerClearProdError(player);break;end;
+               uo_corder     : if(o_x0=co_psability)then
+                               begin
+                                  if(uo_id<>ua_psability)
+                                  or((ucl_cs[true]+ucl_cs[false])=1)then
+                                     if((transportM>0)and(transportC>0))or((_canAbility(pu)=0)and(o_a0=_ability))then
+                                     begin
+                                        d:=point_dist_int(o_x1,o_y1,x,y);
+                                        if(d<sability_d)then
+                                        begin
+                                           sability_d:=d;
+                                           sability_u:=pu;
+                                        end;
+                                     end;
+                               end
+                               else
+                                  if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1,o_a0))then begin PlayerClearProdError(player);break;end;
                    end;
 
                    if(psel=false)then
@@ -488,6 +508,9 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
             then _su-=1
             else _su+=1;
          end;
+
+         if(o_id=uo_corder)and(o_x0=co_psability)and(sability_u<>nil)then
+            if(_unit_player_order(sability_u,o_x0,o_y0,o_x1,o_y1,o_a0))then PlayerClearProdError(@_players[pl]);
       end;
 
       o_id:=0;

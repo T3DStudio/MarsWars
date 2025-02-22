@@ -178,6 +178,7 @@ end;
 
 procedure _wudata_OwnerUData(pu:PTUnit;rpl:boolean);
 var wudtick : pcardinal;
+    wudelay : cardinal;
     wb      : boolean;
     b,uo    : byte;
 begin
@@ -189,11 +190,14 @@ begin
       if(rpl)
       then wudtick:=@rpls_wudata_t[unum]
       else wudtick:=@net_wudata_t[unum];
+      if(rpl)
+      then wudelay:=fr_fpsd2
+      else wudelay:=fr_fpsd4;
 
       if(wudtick^>G_Step)
       then wb:=true
       else
-        if((G_Step-wudtick^)>=fr_fpsd2)
+        if((G_Step-wudtick^)>=wudelay)
         then wb:=true;
 
       b:=group and %00001111;

@@ -367,7 +367,7 @@ ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
-ui_uibtn_actionu  : PTUID   = nil; // ui action uid
+ui_uibtn_psaunit  : PTUnit  = nil; // ui action unit
 ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
@@ -751,6 +751,7 @@ str_IncEnergyLevel,
 str_CanRebuildTo,
 str_TargetLimit,
 str_NextTrack,
+str_ReloadMusic,
 str_PlayerPaused,
 str_PlayerResumed,
 str_attr_alive,
@@ -916,8 +917,6 @@ MainContext        : TALCcontext;
 
 SoundSources       : array[0..sss_count-1] of TMWSoundSourceSet;
 
-snd_music_n,
-snd_music_c        : byte;
 snd_music_game,
 snd_music_menu     : PTSoundSet;
 snd_music_current  : PTSoundSet = nil;

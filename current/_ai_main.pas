@@ -232,6 +232,8 @@ begin
          BuildUProd (ai_unitp_need);
          BuildSmith (ai_upgrp_need);
          BuildDetect(ai_detect_need);
+         if(g_generators>0)then
+         BuildMain  (ai_builders_need);
          if(ai_builders_count>1)
     then BuildTech  (1)
     else BuildMain  (ai_builders_need);
@@ -544,7 +546,8 @@ r_hell: begin
         end;
         end;
 
-        MakeUpgr(upgr_hell_t1attack+random(24),ai_maxcount_upgrlvl);
+        MakeUpgr(upgr_hell_t1attack+random(21),ai_maxcount_upgrlvl);
+        MakeUpgr(upgr_hell_tblink    ,15);
         end;
 r_uac : begin
         if((ai_flags and aif_upgr_smart_opening)>0)then
@@ -571,7 +574,7 @@ r_uac : begin
         end;
         end;
 
-        MakeUpgr(upgr_uac_attack+random(24),ai_maxcount_upgrlvl);
+        MakeUpgr(upgr_uac_attack+random(21),ai_maxcount_upgrlvl);
         end;
       end;
 end;
@@ -651,6 +654,8 @@ UID_UATurret      : if(ai_towers_near_grd=0)then exit;
         end;
 
       case uidi of
+UID_HTower        : if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
+                     if(uid_e[uidi]>uid_e[UID_HTotem])then exit;
 UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter:
@@ -693,9 +698,9 @@ begin
       group:=0;
 
       ai_builders_count:=uid_e[aiucl_main0 [race]]
-                        +uid_e[aiucl_main0A[race]]*2
+                        +uid_e[aiucl_main0A[race]]
                         +uid_e[aiucl_main1 [race]]
-                        +uid_e[aiucl_main1A[race]]*2;
+                        +uid_e[aiucl_main1A[race]];
       ai_tech0_cur     :=uid_e[aiucl_tech0 [race]];
       ai_tech1_cur     :=uid_e[aiucl_tech1 [race]];
       ai_tech2_cur     :=uid_e[aiucl_tech2 [race]];
@@ -1483,6 +1488,8 @@ begin
       if(g_mode=gm_royale)then SetBlinkTarget(map_hmw,map_hmw,0,pf_get_area(map_hmw,map_hmw));
 
       if(bd=NOTSET)then exit;
+
+      aiu_alarm_timer:=ai_TowerLifeTime;
 
       _unit_ability_HTowerBlink(pu,bx,by);
    end;

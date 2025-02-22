@@ -247,6 +247,7 @@ begin
               SoundSourceUpdateGainAll;
            end;
       29  : SoundMusicControll(true);
+      31  : GameMusicReLoad;
 
       33 : menu_s3:=ms3_game;
       34 : menu_s3:=ms3_vido;

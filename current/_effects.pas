@@ -27,6 +27,7 @@ begin
         MID_SShot,
         MID_SSShot,
         MID_Bullet,
+        MID_SChaingun,
         MID_Chaingun      : _setEID(@spr_u_p1          ,sms_death);
         MID_BFG           : _setEID(@spr_u_p2          ,sms_death);
         MID_Flyer         : _setEID(@spr_u_p3          ,sms_death);
@@ -142,7 +143,7 @@ end;
 begin
    if(MainMenu)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
 
-   if not MapPointInScreenP(ex,ey)then exit;
+   if not MapPointInScreenP(ex,ey,true)then exit;
 
    for e:=1 to vid_mvs do
    with _effects[e] do
@@ -160,6 +161,7 @@ MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
 MID_SSShot,
 MID_Bullet,
+MID_SChaingun,
 MID_Chaingun      : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_BFG           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
@@ -251,7 +253,7 @@ var i,o,r:byte;
 begin
    with _missiles[m] do
    with _mids[mid] do
-   if(MapPointInScreenP(vx,vy))then
+   if(MapPointInScreenP(vx,vy,true))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -283,7 +285,7 @@ begin
       spr:=@spr_dummy;
 
       if(not draw)then continue;
-      if(not MapPointInScreenP(vx,vy))then continue;
+      if(not MapPointInScreenP(vx,vy,true))then continue;
 
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
       SpriteListAddEffect(vx,vy,_SpriteDepth(vy,mfs)+100,0,spr,255);
@@ -293,8 +295,8 @@ end;
 
 procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
-   if MapPointInScreenP(vx,vy)
-   or MapPointInScreenP(tx,ty) then SoundPlayUnit(snd,nil,nil);
+   if MapPointInScreenP(vx,vy,true)
+   or MapPointInScreenP(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
    _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),eidstart);
    _effect_add(tx,ty,_SpriteDepth(ty+1,ukfly),eidend  );
 end;

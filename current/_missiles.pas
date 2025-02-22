@@ -21,6 +21,7 @@ MID_Mancubus : ms_smodel:=@spr_h_p5;
 MID_YPlasma  : ms_smodel:=@spr_h_p7;
 MID_BPlasma  : ms_smodel:=@spr_u_p0;
 MID_Bullet,
+MID_SChaingun,
 MID_Chaingun : ms_smodel:=@spr_u_p1;
 MID_SShot,
 MID_SSShot   : ms_smodel:=@spr_u_p1s;
@@ -374,7 +375,7 @@ mh_homing   : begin
       else
         if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
          if((vstep mod ms_eid_fly_st)=0)then
-           if(MapPointInScreenP(vx,vy))then _effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
+           if(MapPointInScreenP(vx,vy,true))then _effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;

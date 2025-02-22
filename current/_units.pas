@@ -1695,7 +1695,7 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
    end;
 end;
 
-function _unit_player_order(pu:PTUnit;order_id,order_tar,order_x,order_y:integer):boolean;
+function _unit_player_order(pu:PTUnit;order_id,order_tar,order_x,order_y,order_a:integer):boolean;
 procedure _setUO(aid,atar,ax,ay,apx,apy:integer;atarz,nospeedcheck:boolean);
 begin
    with pu^     do
@@ -1736,10 +1736,9 @@ co_stand    : _setUO(ua_hold, 0        ,x      ,y      ,-1,-1,true ,false);
 co_move     : _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,true ,false);
 co_patrol   : _setUO(ua_move ,0        ,order_x,order_y, x, y,true ,false);
 co_astand   : _setUO(ua_amove,0        ,x      ,y      ,-1,-1,false,false);
-co_amove    :
-         if(_IsUnitRange(order_tar,nil))
-         then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
-         else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
+co_amove    : if(_IsUnitRange(order_tar,nil))
+              then _setUO(ua_move ,order_tar,order_x,order_y,-1,-1,false,false)
+              else _setUO(ua_amove,0        ,order_x,order_y,-1,-1,false,false);
 co_apatrol  : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
 co_psability: if(uo_id<>ua_psability)
               or((ucl_cs[true]+ucl_cs[false])=1)then
@@ -1749,49 +1748,50 @@ co_psability: if(uo_id<>ua_psability)
                    exit;
                 end
                 else
+                  if(_ability=order_a)and(rld=0)then
                   case _ability of
-0                    : ;
-uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y ))then exit;
-uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y ))then exit;
-uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar       ))then exit;
-uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y ))then exit;
-uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y ))then exit;
-uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar       ))then exit;
-uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
-uab_CCFly            : if(speed>0)then
-                       begin
-                          if(_canAbility(pu)=0)then
-                          begin
-                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
-                             uo_y-=fly_hz;
-                             exit;
-                          end;
-                       end
-                       else
-                         if(_unit_sability(pu))then
-                         begin
-                            _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
-                            _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
-                            uo_y-=fly_hz;
-                            exit;
-                         end;
-uab_RebuildInPoint   : begin
-                          if(speed>0)then
-                          begin
-                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, true );
-                          end
-                          else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                          exit;
-                       end;
-                  else
-                    _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                    exit;
+                  0                    : ;
+                  uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y ))then exit;
+                  uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y ))then exit;
+                  uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar       ))then exit;
+                  uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y ))then exit;
+                  uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y ))then exit;
+                  uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar       ))then exit;
+                  uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
+                  uab_CCFly            : if(speed>0)then
+                                         begin
+                                            if(_canAbility(pu)=0)then
+                                            begin
+                                               _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                               _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
+                                               uo_y-=fly_hz;
+                                               exit;
+                                            end;
+                                         end
+                                         else
+                                           if(_unit_sability(pu))then
+                                           begin
+                                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
+                                              _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
+                                              uo_y-=fly_hz;
+                                              exit;
+                                           end;
+                  uab_RebuildInPoint   : begin
+                                            if(speed>0)then
+                                            begin
+                                               _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                               _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, true );
+                                            end
+                                            else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                            exit;
+                                         end;
+                                    else
+                                      _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                      exit;
                   end;
-co_rebuild :  if(_unit_rebuild (pu))then exit;
-co_sability:  if(_unit_sability(pu))then
-               if(uo_id<>ua_unload)then exit;
+co_rebuild  :  if(_unit_rebuild (pu))then exit;
+co_sability :  if(_unit_sability(pu))and(_ability=order_a)then
+                 if(uo_id<>ua_unload)then exit;
    end;
    _unit_player_order:=false;
 end;

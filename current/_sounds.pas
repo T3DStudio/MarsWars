@@ -1,4 +1,6 @@
 
+procedure StopSoundSource(sss:byte);forward;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   LOAD
@@ -142,11 +144,30 @@ begin
       if(sndn<=0)then WriteLog(fname);
    end;
 end;
-function MusicSetLoad(dir:shortstring):PTSoundSet;
+function MusicSetLoad(dir:shortstring;count:integer):PTSoundSet;
 var tsnd: PTMWSound;
     Info: TSearchRec;
     s   : shortstring;
+flist_l : array of shortstring;
+i,
+flist_n : integer;
 begin
+   flist_n:=0;
+   if(FindFirst(str_f_snd+dir+'*.ogg',faReadonly,info)=0)then
+    repeat
+      s:=info.Name;
+      if(length(s)>4)then
+      begin
+         delete(s,length(s)-3,4);
+         flist_n+=1;
+         setlength(flist_l,flist_n);
+         flist_l[flist_n-1]:=s;
+      end;
+    until(FindNext(info)<>0);
+   FindClose(info);
+
+   if(flist_n<count)then count:=flist_n;
+
    new(MusicSetLoad);
    with MusicSetLoad^ do
    begin
@@ -154,18 +175,45 @@ begin
       sndn :=0;
       setlength(snds,sndn);
 
-      if(FindFirst(str_f_snd+dir+'*.ogg',faReadonly,info)=0)then
-       repeat
-         s:=info.Name;
-         if(length(s)>4)then
-         begin
-            delete(s,length(s)-3,4);
-            tsnd:=load_sound(dir+s);
-            if(tsnd<>nil)then SoundSetAdd(MusicSetLoad,tsnd);
-         end;
-       until(FindNext(info)<>0);
-      FindClose(info);
+      while(count>0)do
+      begin
+         repeat
+            i:=random(flist_n);
+         until length(flist_l[i])>0;
+
+         tsnd:=load_sound(dir+flist_l[i]);
+         if(tsnd<>nil)then SoundSetAdd(MusicSetLoad,tsnd);
+
+         flist_l[i]:='';
+         count-=1;
+      end;
    end;
+end;
+
+procedure SoundSetUnLoad(sSet:PTSoundSet);
+var ali:int32;
+begin
+   if(sSet=nil)then exit;
+   with sSet^ do
+   begin
+      while(sndn>0)do
+      begin
+         sndn-=1;
+         alGetBufferi(snds[sndn]^.sound, AL_SIZE, @ali);
+         alDeleteBuffers(ali,@snds[sndn]^.sound);
+      end;
+      setlength(snds,0);
+   end;
+   dispose(sSet);
+end;
+
+procedure GameMusicReLoad;
+begin
+   StopSoundSource(sss_music);
+   _LoadingScreen(@str_loading_msc,c_aqua);
+   SoundSetUnLoad(snd_music_game);
+
+   snd_music_game:=MusicSetLoad('music\game\',5);
 end;
 
 procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
@@ -374,7 +422,7 @@ begin
 
    SoundPlay(ss,sss_mmap,true);
 
-   snd_mmap_ticks:=fr_fps1;
+   snd_mmap_ticks:=fr_fps3;
    snd_mmap_last :=ss;
 end;
 
@@ -467,12 +515,12 @@ begin
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
 
-   if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)or(ForceNextTreck)then
+   if(snd_music_current<>current_music_ss)or(not SoundSourceSetIsPlaying(@SoundSources[sss_music]))or(ForceNextTreck)then
    begin
       if(snd_music_current<>current_music_ss)and(not ForceNextTreck)then SoundShafleSoundSet(current_music_ss);
       snd_music_current:=current_music_ss;
 
-      SoundPlay(snd_music_current,sss_music,ForceNextTreck);
+      SoundPlay(snd_music_current,sss_music,true);
    end;
 end;
 
@@ -483,9 +531,10 @@ end;
 
 procedure SoundControl;
 begin
-   if(vid_blink_timer1=0)then SoundMusicControll(false);
+   if(vid_blink_timer1 =0)then SoundMusicControll(false);
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
+   if(snd_mmap_ticks   >0)then snd_mmap_ticks   -=1;
 
    if(G_Started)and(G_status=0)and(not MainMenu)
    then SoundPlayUnitSelect;
@@ -519,13 +568,11 @@ begin
     else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
     end;
 
-   _LoadingScreen(@str_loading_msc,c_aqua);
+   GameMusicReLoad;
+   snd_music_menu:=MusicSetLoad('music\menu\',5);
 
-   snd_music_menu:=MusicSetLoad('music\menu\');
-   snd_music_game:=MusicSetLoad('music\game\');
-
-   SoundShafleSoundSet(@snd_music_menu);
-   SoundShafleSoundSet(@snd_music_game);
+   SoundShafleSoundSet(snd_music_menu);
+   SoundShafleSoundSet(snd_music_game);
    /////////////////////////////////////////////////////////////////////////////////
    //
    // COMMON

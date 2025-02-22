@@ -531,7 +531,7 @@ begin
              SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
           end;
 
-        if(MapPointInScreenP(cpx,cpy))then
+        if(MapPointInScreenP(cpx,cpy,true))then
         begin
            if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
            if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);

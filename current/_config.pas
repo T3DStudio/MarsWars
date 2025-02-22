@@ -24,7 +24,6 @@ cfg_key_uhbar   = 'vid_health_bars';
 cfg_key_plcol   = 'vid_player_colors';
 cfg_key_APM     = 'vid_APM';
 cfg_key_FPS     = 'vid_FPS';
-cfg_key_rmusic  = 'repeat_music';
 
 
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
@@ -61,7 +60,6 @@ cfg_key_uhbar : vid_uhbars       := vlw;
 cfg_key_plcol : vid_plcolors     := vlw;
 cfg_key_APM   : vid_APM          :=(vl=b2c[true]);
 cfg_key_FPS   : vid_FPS          :=(vl=b2c[true]);
-cfg_key_rmusic: snd_music_c      := vlw;
    end;
 
 end;
@@ -151,8 +149,6 @@ begin
    writeln(f,cfg_key_plcol ,'=',vid_plcolors          );
    writeln(f,cfg_key_APM   ,'=',b2c[vid_APM]          );
    writeln(f,cfg_key_FPS   ,'=',b2c[vid_FPS]          );
-   writeln(f,cfg_key_rmusic,'=',b2c[vid_FPS]          );
-
 
    close(f);
 end;
