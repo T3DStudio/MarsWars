@@ -218,16 +218,14 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      {case race of
-      r_uac : ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*500+(ai_builders_count*600) ,ai_GeneratorsEnergy);
-      r_hell: ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur+upgr[_upgr_srange])*650+(ai_builders_count*750) ,ai_GeneratorsEnergy);
-      end; }
       ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*600,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then
       begin
          skip_energy_check:=false;
          BuildTower (ai_towers_need,ai_towers_need_type);
+         if(ai_enemy_inv_u<>nil)then
+         BuildDetect(ai_detect_need);
          BuildEnergy(ai_need_energy);
          BuildUProd (ai_unitp_need);
          BuildSmith (ai_upgrp_need);
@@ -666,11 +664,11 @@ UID_UCommandCenter:
                         if(ai_inprogress_auid<2)and(ai_inprogress_uid=0)and(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
                     end;
 UID_HSymbol1,
-UID_UGenerator1   : if(cenergy>=300)and(ai_inprogress_uid=0){and(ai_enrg_cur<ai_maxcount_energy)}then exit;
+UID_UGenerator1,//   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then exit;
 UID_HSymbol2,
 UID_UGenerator2,
 UID_HSymbol3,
-UID_UGenerator3   : if(cenergy>=600)and(ai_inprogress_uid=0){and(ai_enrg_cur<ai_maxcount_energy)}then exit;
+UID_UGenerator3   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then exit;
       else
          if(_isbarrack)or(_issmith)then
            if(level<MaxUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
@@ -712,12 +710,6 @@ begin
 
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;
 
-      {prods:=400;
-      if(race=r_uac)and(ai_builders_count>1)then prods-=100;
-      if((ai_maxcount_tech0> 0)and((ai_tech0_cur=0)or(ai_tech1_cur=0)or(ai_tech2_cur=0)))
-      or((ai_maxcount_mains>=8)and(ai_builders_count<8))
-      then prods+=150;
-      prods:=(menergy div prods); }
       prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
       if(g_generators>0)then prods+=1;
 

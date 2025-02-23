@@ -291,8 +291,8 @@ lmt_player_leave,
 lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
-lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],fr_fps8,ax,ay))then exit;
-lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps8,ax,ay))then exit;
+lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,[lmt_unit_attacked,lmt_allies_attacked],fr_fps5,ax,ay))then exit;
+lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay))then exit;
       else
          with log_l[log_i] do
            if(tick<=G_Step)then

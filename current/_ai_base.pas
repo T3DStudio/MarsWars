@@ -244,8 +244,8 @@ begin
       3  : SetBaseOpt(2400 ,2   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*120,45            ,1  ,[]);
       4  : SetBaseOpt(3600 ,2   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,60            ,2  ,[]);
       5  : SetBaseOpt(4200 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*60 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
-      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
       case ai_skill of
@@ -267,7 +267,8 @@ begin
                     +aif_army_teleport
                     +aif_ability_detection
                     +aif_ability_other
-                    +aif_ability_mainsave;
+                    +aif_ability_mainsave
+                    +aif_army_smart_prio;
       else ai_flags:=aif_base_smart_order
                     +aif_base_suicide
                     +aif_base_advance
@@ -279,7 +280,8 @@ begin
                     +aif_upgr_smart_opening
                     +aif_ability_detection
                     +aif_ability_other
-                    +aif_ability_mainsave; //all
+                    +aif_ability_mainsave
+                    +aif_army_smart_prio; //all
       end;
       case ai_skill of
       8 : upgr[upgr_fog_vision  ]:=1;
@@ -307,7 +309,8 @@ function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
    if(player^.state=ps_comp)then
-    ai_HighPriorityTarget:=tu^.uidi in player^.ai_hptargets;
+     if(player^.ai_flags and aif_army_smart_prio)>0 then
+       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^._genergy>0);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -770,7 +773,10 @@ begin
                       if(ai_invuln_tar_u=nil)
                       then ai_invuln_tar_u:=tu
                       else
-                        if(tu^.hits>ai_invuln_tar_u^.hits)then ai_invuln_tar_u:=tu;
+                        if(ai_invuln_tar_u^.uid^._a_weap[0].aw_count<tu^.uid^._a_weap[0].aw_count)
+                        then ai_invuln_tar_u:=tu
+                        else
+                          if(tu^.hits>ai_invuln_tar_u^.hits)then ai_invuln_tar_u:=tu;
                   end;
                end;
                if (tu^.uid^._attack=0     )

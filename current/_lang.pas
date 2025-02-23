@@ -269,13 +269,10 @@ function DamageStr(dmod:byte):shortstring;
 var i:byte;
 begin
    DamageStr:='';
-   if(dmod=dm_BFG)
-   then DamageStr:='x '+str_TargetLimit
-   else
-    for i:=0 to MaxDamageModFactors do
-     with _dmods[dmod][i] do
-      if(dm_factor<>100)and(dm_flags>0)then
-       _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
+   for i:=0 to MaxDamageModFactors do
+    with _dmods[dmod][i] do
+     if(dm_factor<>100)and(dm_flags>0)then
+      _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
 
 function _req2s(basename:shortstring;reqn:byte):shortstring;
@@ -1765,15 +1762,15 @@ begin
         upgrLine(upgr_race_unit_srange[_urace],'vision range '+_i2s(upgr_race_srange_unit_bonus[_urace]));
 
         if(_ukbuilding)
-        then upgrLine(_upgr_armor,'armor '+_i2s(BaseArmorBonus2))
-        else upgrLine(_upgr_armor,'armor '+_i2s(BaseArmorBonus1));
+        then upgrLine(_upgr_armor,'armor '+_i2s(UpgradeBuildArmorBonus))
+        else upgrLine(_upgr_armor,'armor '+_i2s(UpgradeUnitArmorBonus ));
 
         if(_ukbuilding)
-        then upgrLine(upgr_race_armor_build[_urace],'armor '+_i2s(BaseArmorBonus2))
+        then upgrLine(upgr_race_armor_build[_urace],'armor '+_i2s(UpgradeBuildArmorBonus))
         else
           if(_ukmech)
-          then upgrLine(upgr_race_armor_mech[_urace],'armor '+_i2s(BaseArmorBonus1))
-          else upgrLine(upgr_race_armor_bio [_urace],'armor '+_i2s(BaseArmorBonus1));
+          then upgrLine(upgr_race_armor_mech[_urace],'armor '+_i2s(UpgradeUnitArmorBonus))
+          else upgrLine(upgr_race_armor_bio [_urace],'armor '+_i2s(UpgradeUnitArmorBonus));
 
         upgrLine(_upgr_regen,'hits regeneration '+_i2s(BaseArmorBonus1));
         if(_ukbuilding)
@@ -1790,7 +1787,7 @@ begin
           then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+_i2s(2))
           else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+_i2s(2));
 
-        if(not _ukbuilding)and(not _ukmech)and(_painc>0)and(_urace=r_hell)then
+        if(not _ukbuilding)and(_painc>0)and(_urace=r_hell)then
         upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
 
         writeln(f);

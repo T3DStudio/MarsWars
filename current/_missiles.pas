@@ -137,12 +137,6 @@ var i:byte;
 begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
-    if(dmod=dm_BFG)then
-    begin
-       if(not tu^.uid^._ukbuilding)
-       then ApplyDamageMod:=round(base_damage*tu^.uid^._limituse/ul1);
-    end
-    else
      for i:=0 to MaxDamageModFactors do
       with _dmods[dmod][i] do
        if(dm_flags>0)then
@@ -158,8 +152,9 @@ begin
        175 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4)*3;
        200 : ApplyDamageMod:=ApplyDamageMod* 2;
        300 : ApplyDamageMod:=ApplyDamageMod* 3;
+       400 : ApplyDamageMod:=ApplyDamageMod* 4;
        500 : ApplyDamageMod:=ApplyDamageMod* 5;
-         else ApplyDamageMod:=round(ApplyDamageMod*100/dm_factor);
+         else ApplyDamageMod:=round(ApplyDamageMod/100*dm_factor);
          end;
 end;
 

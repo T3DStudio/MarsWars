@@ -454,7 +454,7 @@ begin
                tu^.buff[ub_Invuln]:=0;
                exit;
             end;
-            rld:=haltar_reload;
+            rld:=uid^._btime*fr_fps1;
             _unit_ability_HInvuln:=true;
             {$IFDEF _FULLGAME}
             effect_LevelUp(tu,EID_Invuln,nil);
@@ -467,7 +467,7 @@ procedure _unit_umstrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
-      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_Blizzard);
+      _missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
       {$IFDEF _FULLGAME}
       effect_RStationShot(pu);
       {$ENDIF}
@@ -486,7 +486,7 @@ begin
         uo_x:=x0;
         uo_y:=y0;
         for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_fps2);
-        rld:=mstrike_reload;
+        rld:=uid^._btime*fr_fps1;
         _unit_umstrike_missile(pu);
         buff[ub_Cast]:=fr_fps1;
         _unit_ability_UACStrike:=true;

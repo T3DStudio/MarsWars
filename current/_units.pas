@@ -68,11 +68,11 @@ begin
          armor:=0;//_base_armor;
          with player^ do
           if(_ukbuilding)
-          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*BaseArmorBonus2
+          then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_build[_urace]])*UpgradeBuildArmorBonus
           else
             if(_ukmech)
-            then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_mech[_urace]])*BaseArmorBonus1
-            else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_bio [_urace]])*BaseArmorBonus1;
+            then armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_mech[_urace]])*UpgradeUnitArmorBonus
+            else armor+=integer(upgr[_upgr_armor]+upgr[upgr_race_armor_bio [_urace]])*UpgradeUnitArmorBonus;
 
          if(level>0)then armor+=level*_level_armor;
 

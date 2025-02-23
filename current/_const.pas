@@ -24,8 +24,10 @@ fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
+fr_fps5                = fr_fps1*6;
 fr_fps6                = fr_fps1*6;
 fr_fps8                = fr_fps1*8;
+fr_fps10               = fr_fps1*10;
 fr_fps2d3              = fr_fpsd3*2; //2/3
 fr_fps60               = fr_fps1*60;
 
@@ -448,6 +450,7 @@ aif_upgr_smart_opening : cardinal = 1 shl 9;
 aif_ability_detection  : cardinal = 1 shl 10;
 aif_ability_other      : cardinal = 1 shl 11;
 aif_ability_mainsave   : cardinal = 1 shl 12;
+aif_army_smart_prio    : cardinal = 1 shl 13;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -630,24 +633,21 @@ MaxMissiles            = MaxUnits;
 
 MaxDamageModFactors    = 1;
 
-dm_AntiUnitBioHeavy    = 1 ; // 1.5*[unit bio heavy]
-dm_SSGShot             = 2 ; // 1.5*[unit bio heavy] 0.5*[mech]
-dm_AntiUnitBioLight    = 3 ; // 1.5*[unit bio light]
-dm_AntiUnitBio         = 4 ; // 1.5*[unit bio]       0.5*[buildings]
-dm_AntiUnitMech        = 5 ; // 1.5*[unit mech]
-dm_AntiUnitLight       = 6 ; // 1.5*[unit light]
-dm_AntiUnitLight2      = 7 ; //   2*[unit light]
-dm_AntiFly             = 8 ; // 1.5*[fly]
-dm_AntiUnitHeavy       = 9 ; // 1.5*[heavy]
-dm_AntiLight           = 10; // 1.5*[light]
-dm_AntiLight2          = 11; //   2*[light]
-dm_AntiBuildingLight   = 12; // 1.5*[buildings light]
-dm_Cyber               = 13; //   3*[buildings]      0.5*[light]
-dm_Siege               = 14; //   3*[buildings]
-dm_Blizzard            = 15; //   5*[buildings]      0.5*[light]
-dm_Lost                = 16; //                      0.5*[mech ]
-dm_BFG                 = 17; // limituse*
-dm_AntiGroundLight     = 18; // 1.5*[light ground]
+dm_AntiUnitBioHeavy2   = 1 ; //   2*[unit bio heavy]
+dm_SSGShot2            = 2 ; //   2*[unit bio heavy] 0.5*[mech]
+dm_AntiUnitBioLight2   = 3 ; //   2*[unit bio light]
+dm_AntiUnitBio2        = 4 ; //   2*[unit bio]       0.5*[buildings]
+dm_AntiUnitMech2       = 5 ; //   2*[unit mech]
+dm_AntiUnitLight2      = 6 ; //   2*[unit light]
+dm_AntiFly2            = 7 ; //   2*[fly]
+dm_AntiUnitHeavy2      = 8 ; //   2*[heavy]
+dm_AntiLight2          = 9 ; //   2*[light]
+dm_AntiGroundLight2    = 10; //   2*[light ground]
+dm_RSMShot             = 11; //   2*[buildings]
+dm_Siege3              = 12; //   3*[buildings]
+dm_Siege4              = 13; //   4*[buildings]
+dm_Lost                = 14; //                      0.5*[mech]
+
 
 // LIMIT
 ul1                    = MinUnitLimit;
@@ -690,7 +690,7 @@ mvxy_none              = 0;
 mvxy_relative          = 1;
 mvxy_strict            = 2;
 
-BaseDamage1            = 62;
+BaseDamage1            = 52;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamageh4           = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
@@ -702,14 +702,15 @@ BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
-BaseDamageBonus1       = 8;
-BaseDamageBonus3       = BaseDamageBonus1*3;
-BaseDamageLevel1       = BaseDamageBonus1/4;
-BaseArmorBonus1        = 8;
-BaseArmorBonus2        = BaseArmorBonus1*2;
-BaseArmorLevel1        = BaseArmorBonus1/4;
+BaseDamageBonus1       = 7;
+BaseDamageLevel1       = 2;
+BaseArmorBonus1        = 7;
+BaseArmorLevel1        = 2;
 
-BaseHeal1              = BaseDamage1 div 5;
+UpgradeUnitArmorBonus  = BaseArmorBonus1;
+UpgradeBuildArmorBonus = BaseArmorBonus1*2+(BaseArmorBonus1 div 3);
+
+BaseHeal1              = BaseDamage1 div 4;
 BaseHealBonus1         = BaseDamageBonus1*2;
 BaseRepair1            = BaseDamage1 div 4;
 BaseRepairBonus1       = BaseDamageBonus1*2;
@@ -760,7 +761,7 @@ UID_Mancubus           = 31;
 UID_Arachnotron        = 32;
 UID_Archvile           = 33;
 
-UID_ZMedic            = 34;
+UID_ZMedic             = 34;
 UID_ZEngineer          = 35;
 UID_ZSergant           = 36;
 UID_ZSSergant          = 37;
@@ -819,7 +820,7 @@ UID_APC                = 94;
 uids_hell              = [1 ..49];
 uids_uac               = [50..99];
 
-uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
+uids_marines           = [UID_Engineer ,UID_Medic  ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
 uids_zimbas            = [UID_ZEngineer,UID_ZMedic ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
@@ -878,7 +879,7 @@ dead_hits              = -ptime1*fr_fps1;
 fdead_hits             = dead_hits+fr_fps3;
 ndead_hits             = dead_hits-1;
 
-fdead_hits_border      = -130;
+fdead_hits_border      = -140;
 
 base_1r                = 350;
 base_hr                = base_1r div 2;
@@ -899,8 +900,8 @@ radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-mstrike_reload         = fr_fps1*120;
-haltar_reload          = fr_fps1*120;
+//mstrike_reload         = fr_fps1*ptime5;
+//haltar_reload          = fr_fps1*ptime5;
 
 step_build_reload      = fr_fps1*4;
 max_build_reload       = step_build_reload*4;

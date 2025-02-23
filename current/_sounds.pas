@@ -422,7 +422,7 @@ begin
 
    SoundPlay(ss,sss_mmap,true);
 
-   snd_mmap_ticks:=fr_fps3;
+   snd_mmap_ticks:=fr_fps10;
    snd_mmap_last :=ss;
 end;
 
