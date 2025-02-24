@@ -309,7 +309,7 @@ UID_HTotem:
 begin
    _mhits     := 2500;
    _renergy   := 400;
-   _r         := 21;
+   _r         := 20;
    _srange    := 300;
    _ucl       := 7;
    _btime     := ptime1h;
@@ -321,6 +321,7 @@ begin
    _uklight   := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
+   _rebuild_uid :=UID_HTower;
    _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_max_hits,0,0);
 end;
 UID_HEye:
@@ -647,7 +648,7 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fps1   ,0,0,0,0,0,0                              ,wtrset_healu      ,wpr_any,uids_demons,[],0,0,wtp_notme_hits  ,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2  ,0,0,0,0,0,0                              ,wtrset_healu      ,wpr_any,uids_demons,[],0,0,wtp_notme_hits  ,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0,fr_fps1,MID_Bullet,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all   ,[],0,0,wtp_UnitBioLight,0,0);
 end;
 UID_ZEngineer:
@@ -1565,7 +1566,7 @@ begin
    SetDMOD(dm_SSGShot2         ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitBioLight2,0,200,wtr_unit    +wtr_bio +wtr_light           );
    SetDMOD(dm_AntiUnitBio2     ,0,200,wtr_unit    +wtr_bio                      );
-   SetDMOD(dm_AntiUnitBio2     ,1, 50,wtr_building                              );
+   SetDMOD(dm_AntiUnitBio2     ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitMech2    ,0,200,wtr_unit    +wtr_mech                     );
    SetDMOD(dm_AntiUnitLight2   ,0,200,wtr_unit             +wtr_light           );
    SetDMOD(dm_AntiFly2         ,0,200,                                wtr_fly   );

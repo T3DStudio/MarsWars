@@ -323,7 +323,7 @@ begin
            if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
            if(aw_type=wpt_missle)then
             if(aw_oid=MID_SShot )
-            or(aw_oid=MID_SSShot)then WeaponUpgrInc(upgr_uac_ssgup);
+            or(aw_oid=MID_SSShot)then sl+=1;
            if(aw_rupgr>0)and(aw_rupgr_l>=upgr[aw_rupgr])then sl+=1;
         end;
       lvlstr_w:=i2s6(wl,(_attack>atm_none)and(_attack<>atm_bunker));

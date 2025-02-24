@@ -797,7 +797,7 @@ end;
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   _tdecaln:=(vid_cam_w*vid_cam_h) div 10000;
+   _tdecaln:=(vid_cam_w*vid_cam_h) div 11000;
    setlength(_tdecals,_tdecaln);
 
    vid_mwa:= vid_cam_w+vid_ab*2;

@@ -891,7 +891,7 @@ base_5r                = base_1r*5;
 base_6r                = base_1r*6;
 
 apc_exp_damage         = BaseDamage4;
-regen_period           = fr_fps1d2;
+regen_period           = fr_fps1;
 order_period           = fr_fpsd2+1;
 vistime                = fr_fps1d2;
 

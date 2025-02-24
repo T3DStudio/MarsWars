@@ -329,7 +329,9 @@ begin
    Map_randommap;
 
    g_mode      :=gm_scirmish;
-   g_generators:=random(gms_g_maxgens+1);
+   if(random(3)=0)
+   then g_generators:=random(gms_g_maxgens)+1
+   else g_generators:=0;
 
    PlayersSwap(1,HPlayer);
 

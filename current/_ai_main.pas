@@ -218,7 +218,7 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*600,ai_GeneratorsEnergy);
+      ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then
       begin
@@ -296,8 +296,9 @@ const
 uprod_smart  = -1;
 uprod_any    = -2;
 uprod_base   = -3;
-uprod_air    = -4;
-uprod_antiair= -5;
+uprod_siedge = -4;
+uprod_air    = -5;
+uprod_antiair= -6;
 
 
 function ai_UnitProduction(pu:PTUnit;uclass,count:integer):boolean;
@@ -365,6 +366,9 @@ uprod_smart: begin
                            else if(ai_UnitProduction(pu,uprod_antiair,MaxUnits))then exit;
                    r_hell: if(ai_UnitProduction(pu,uprod_air,MaxUnits))then exit;
                    end;
+                if(ai_armylimit_siedge<=ul10)then
+                  if(ai_UnitProduction(pu,uprod_siedge,MaxUnits))then exit;
+
 
                 ai_UnitProduction:=false;
                 exit;
@@ -391,6 +395,22 @@ uprod_base : begin
                         if(ai_UnitProduction(pu,UID_Medic         ,i))then exit;
                         if(ai_UnitProduction(pu,UID_SSergant      ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Engineer      ,i))then exit;
+                     end;
+                end;
+                ai_UnitProduction:=false;
+                exit;
+             end;
+uprod_siedge: begin
+                ai_UnitProduction:=true;
+                case pu^.player^.race of
+             r_hell: case random(3)of
+                     0: if(ai_UnitProduction(pu,UID_Mancubus      ,MaxUnits))then exit;
+                     1: if(ai_UnitProduction(pu,UID_Cyberdemon    ,MaxUnits))then exit;
+                     2: if(ai_UnitProduction(pu,UID_ZSiegeMarine  ,MaxUnits))then exit;
+                     end;
+             r_uac : case random(2)of
+                     0: if(ai_UnitProduction(pu,UID_SiegeMarine   ,MaxUnits))then exit;
+                     1: if(ai_UnitProduction(pu,UID_Tank          ,MaxUnits))then exit;
                      end;
                 end;
                 ai_UnitProduction:=false;
@@ -653,7 +673,9 @@ UID_UATurret      : if(ai_towers_near_grd=0)then exit;
 
       case uidi of
 UID_HTower        : if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
-                     if(uid_e[uidi]>uid_e[UID_HTotem])then exit;
+                     if(uid_e[uidi]>uid_e[UID_HTotem])and(uid_e[uidi]>1)then exit;
+UID_HTotem        : if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
+                     if(uid_e[uidi]>uid_e[UID_HTower])and(uid_e[uidi]>1)then exit;
 UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter:

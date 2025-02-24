@@ -277,7 +277,7 @@ Hotkey: B
 Categories/Attributes: [building,mechanical,light,ground]
 Max hits: 2500
 Limit used: 1
-Size: 21
+Size: 20
 Base vision range: 300
 Build time: 30
 Energy required: 400
@@ -290,7 +290,7 @@ Upgrades:
 - Stone Walls - armor +16;
 - Building Restoration - hits regeneration +7;
 
-Advanced defensive structure. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Advanced defensive structure. Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
@@ -802,7 +802,7 @@ Places in transport: 1
 
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [demons&zombies], impact 13*1, target priority: lowest hits;
+- heal/repair, targets: [demons&zombies], impact 13*2, target priority: lowest hits;
 - ranged attack, max. range: vision range, targets: [alive], impact 26*1, target priority: [unit,bio,light], upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -1662,7 +1662,7 @@ Places in transport: 4
 Requirements: Science Facility
 Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 156*1.33, target priority: [unit,bio], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological],x0.5 [building];
+- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 156*1.33, target priority: [unit,bio], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological],x0.5 [mechanical];
 - ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,flying], impact 52*1, target priority: lowest hits, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
 Upgrades:
 - Light Amplification Visors - vision range +25;

@@ -20,7 +20,9 @@ aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret  
 aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret        );
 aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret        );
 
-ai_GeneratorsLimit        = ul1*40;
+siedge_uids = [UID_Mancubus,UID_Cyberdemon,UID_ZSiegeMarine,UID_SiegeMarine,UID_Tank];
+
+ai_GeneratorsLimit        = ul1*35;
 ai_GeneratorsEnergy       = 7000;
 ai_GeneratorsDestroyEnergy= 8000;
 ai_GeneratorsDestoryLimit = ul1*60;
@@ -136,6 +138,7 @@ ai_nearest_builder_d
 ai_nearest_builder_square,
 ai_armylimit_alive_u,
 ai_armylimit_alive_b,
+ai_armylimit_siedge,
 ai_limitaround_own,
 ai_limitaround_enemy_fly,
 ai_limitaround_enemy_grd,
@@ -239,12 +242,12 @@ begin
       //                    ders                                heye  altar           towers towers limit  delay      army          lvl  targets
       //                                                        limit
       0  : SetBaseOpt(0    ,0   ,0     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,12    ,fr_fps1*180,12            ,0  ,[]);
-      2  : SetBaseOpt(1200 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,30    ,fr_fps1*150,30            ,0  ,[]);
-      3  : SetBaseOpt(2400 ,2   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*120,45            ,1  ,[]);
-      4  : SetBaseOpt(3600 ,2   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,60            ,2  ,[]);
-      5  : SetBaseOpt(4200 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*60 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
-      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,12    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(1200 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,30    ,fr_fps1*100,30            ,0  ,[]);
+      3  : SetBaseOpt(2400 ,2   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*80 ,45            ,1  ,[]);
+      4  : SetBaseOpt(3600 ,3   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*60 ,60            ,2  ,[]);
+      5  : SetBaseOpt(4200 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*40 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
+      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,2    ,14    ,120   ,fr_fps1*20 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
@@ -409,14 +412,15 @@ begin
         ai_choosen         :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
      end;
 
-   ai_limitaround_own      :=0;
-   ai_limitaround_enemy_fly:=0;
-   ai_limitaround_enemy_grd:=0;
-   ai_limitaround_fly      :=0;
-   ai_limitaround_grd      :=0;
+   ai_limitaround_own      := 0;
+   ai_limitaround_enemy_fly:= 0;
+   ai_limitaround_enemy_grd:= 0;
+   ai_limitaround_fly      := 0;
+   ai_limitaround_grd      := 0;
+   ai_armylimit_siedge     := 0;
 
-   ai_armylimit_alive_u    :=0;
-   ai_armylimit_alive_b    :=0;
+   ai_armylimit_alive_u    := 0;
+   ai_armylimit_alive_b    := 0;
 
    // transport
    ai_transport_cur        := 0;
@@ -424,9 +428,19 @@ begin
    with pu^ do
     with player^ do
      for i:=1 to 255 do
-      if(uprodu[i]>0)then
-       with _uids[i] do
-        if(_ukfly)and(not _ukbuilding)and(_transportM>0)then ai_transport_cur+=_transportM*uprodu[i];
+     begin
+        if(uprodu[i]>0)then
+          with _uids[i] do
+          begin
+             // transport in production
+             if(_ukfly)and(not _ukbuilding)and(_transportM>0)then ai_transport_cur+=_transportM*uprodu[i];
+             if(i in siedge_uids)then ai_armylimit_siedge+=_limituse;
+          end;
+        if(uid_eb[i]>0)then
+          if(i in siedge_uids)then
+            with _uids[i] do ai_armylimit_siedge+=_limituse*uid_eb[i];
+     end;
+   //if(pu^.sel)then writeln(ai_armylimit_siedge);
 
 
    // enemy
@@ -773,7 +787,7 @@ begin
                       if(ai_invuln_tar_u=nil)
                       then ai_invuln_tar_u:=tu
                       else
-                        if(ai_invuln_tar_u^.uid^._a_weap[0].aw_count<tu^.uid^._a_weap[0].aw_count)
+                        if(tu^.uid^._mhits>ai_invuln_tar_u^.uid^._mhits)
                         then ai_invuln_tar_u:=tu
                         else
                           if(tu^.hits>ai_invuln_tar_u^.hits)then ai_invuln_tar_u:=tu;
