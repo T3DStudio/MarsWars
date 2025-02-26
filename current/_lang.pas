@@ -977,6 +977,8 @@ begin
    str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
    str_ability_name[uab_HellVision      ]:='Hell Vision';
    str_ability_name[uab_CCFly           ]:='Flight Engines';
+   str_ability_name[uab_ToUACDron       ]:='Deconstruction to Dron';
+
    str_ability_unload                    :='Unload';
 
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
@@ -1497,6 +1499,7 @@ begin
   str_ability_name[uab_SpawnLost       ]:='Выпустить Lost Soul';
   str_ability_name[uab_HellVision      ]:='Адское зрение';
   str_ability_name[uab_CCFly           ]:='Двигатели для полета';
+  str_ability_name[uab_ToUACDron       ]:='Разобрать в Дрона';
   str_ability_unload                    :='Выгрузить';
 
   _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');

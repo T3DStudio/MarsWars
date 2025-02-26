@@ -153,7 +153,7 @@ begin
          if(pprod_r[pn]>0)then
          begin
             i:=pprod_u[pn];
-            if(ui_pprod_first  <=0)or(pprod_r[pn]<  ui_pprod_first)then ui_pprod_first  :=pprod_r[pn];
+            if(ui_pprod_first  <=0)or(pprod_r[pn]<ui_pprod_first  )then ui_pprod_first  :=pprod_r[pn];
             if(ui_pprod_time[i]<=0)or(pprod_r[pn]<ui_pprod_time[i])then ui_pprod_time[i]:=pprod_r[pn];
          end;
       end;
@@ -228,22 +228,32 @@ begin
             if(speed>0)then ui_uibtn_move+=1;
             if((_canAbility(pu)=0)and(uo_id<>ua_psability))
             or(transportC>0)     then ui_uibtn_psaunit:=pu;
-            if(_canRebuild(pu)=0)then ui_uibtn_rebuild+=1;
+            if(_canRebuild(pu)=0)then ui_uibtn_rbldu  :=pu;
          end;
       end
       else
       begin
          t:=min2(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
-         if(t>0)then
+         if(_ukbuilding)then
          begin
-            if(ui_bprod_ucl_time[_ucl]<=0)
-            or(ui_bprod_ucl_time[_ucl]> t)then ui_bprod_ucl_time[_ucl]:=t;
-            if(ui_bprod_first<=0)
-            or(ui_bprod_first> t)then ui_bprod_first:=t;
+            if(t>0)then
+            begin
+               if(ui_bprod_ucl_time[_ucl]<=0)
+               or(ui_bprod_ucl_time[_ucl]> t)then ui_bprod_ucl_time[_ucl]:=t;
+               if(ui_bprod_first<=0)
+               or(ui_bprod_first> t)then ui_bprod_first:=t;
+            end;
+            ui_bprod_uid_count[uidi]+=1;
+            ui_bprod_ucl_count[_ucl]+=1;
+            ui_bprod_all            +=1;
+         end
+         else
+         begin
+            t*=fr_fps1;
+            ui_uprod_cur+=1;
+            if(ui_uprod_first         <=0)or(t<ui_uprod_first         )then ui_uprod_first         :=t;
+            if(ui_uprod_uid_time[uidi]<=0)or(t<ui_uprod_uid_time[uidi])then ui_uprod_uid_time[uidi]:=t;
          end;
-         ui_bprod_uid_count[uidi]+=1;
-         ui_bprod_ucl_count[_ucl]+=1;
-         ui_bprod_all            +=1;
       end;
    end;
 end;
@@ -340,7 +350,7 @@ begin
       lvlstr_a:=tc_lime+i2s6(al,true);
 
       // other
-      sl+=upgr[_upgr_regen]+upgr[_upgr_srange];
+      sl+=integer(upgr[_upgr_regen]+upgr[_upgr_srange]);
       if(_ukbuilding)
       then sl+=integer(upgr[upgr_race_regen_build[_urace]])
       else
@@ -431,6 +441,9 @@ begin
             if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
               if(sn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
+
+            if(uidi=UID_UACDron)and(not iscomplete)
+            then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sl[0],255);
 
             if(_ukbuilding)then
              if(iscomplete)then
@@ -535,7 +548,7 @@ begin
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
    ui_uibtn_psaunit  :=nil;
-   ui_uibtn_rebuild  :=0;
+   ui_uibtn_rbldu    :=nil;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];
    ui_bprod_first    :=0;

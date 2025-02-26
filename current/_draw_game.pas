@@ -721,7 +721,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,li2s(aiu_FiledSquareNear )+' '+i2s(_speed), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,i2s(aiu_alarm_timer ), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

@@ -657,6 +657,7 @@ begin
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
+   //un_eid_bcrater:=UID_UGturret;
 end;
 UID_Terminator:
 begin

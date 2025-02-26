@@ -151,6 +151,11 @@ begin
          _unit_morph:=ureq_max;
          exit;
       end;
+      if((armylimit-pu^.uid^._limituse+puid^._limituse)>MaxPlayerLimit)then
+      begin
+         _unit_morph:=ureq_armylimit;
+         exit;
+      end;
       if(not obld)or(puid^._ukbuilding)then
        if(menergy<=0)then
        begin
@@ -1191,6 +1196,7 @@ uab_CCFly         : if(zfall=0)and(buff[ub_CCast]<=0)then
                        _unit_sability:=true;
                     end;
 uab_RebuildInPoint: _unit_sability:=_unit_rebuild(pu);
+uab_ToUACDron     : _unit_sability:=PlayerSetProdError(playeri,lmt_argt_unit,uid_UACDron,_unit_morph(pu,uid_UACDron,false,_uids[uid_UACDron]._hmhits,0 ),pu);
             else
             end;
 end;

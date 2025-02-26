@@ -393,7 +393,7 @@ begin
       1: // units
       for ucl:=0 to ui_ubtns do
       begin
-         uid:=ui_panel_uids[race ,ui_tab,ucl];//_ReplaceUid(ui_panel_uids[race ,ui_tab,ucl],PVisPlayer);
+         uid:=ui_panel_uids[race ,ui_tab,ucl];
          if(uid=0)then continue;
 
          with _uids[uid] do
@@ -410,7 +410,7 @@ begin
             _drawBtn (tar,ux,uy,un_btn.surf,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
             _drawBtnt(tar,ux,uy,
             ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_inapc[uid]),
-            ui_cenergy[cenergy<0]      ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
+            ui_cenergy[cenergy<0]       ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                ,'');
          end;
       end;
 
@@ -461,7 +461,7 @@ begin
         begin
            _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_psaunit=nil);
            _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_psaunit=nil);
-           _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild<=0);
+           _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rbldu  =nil);
 
            _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
            _drawBtn(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );
@@ -572,7 +572,14 @@ begin
                 else
                   if(_players[HPlayer].observer)
                   then hs1:=@str_hint_o[i]
-                  else hs1:=@str_hint_a[i];
+                  else
+                  begin
+                     hs1:=@str_hint_a[i];
+                     case i of
+                     0,1: if(ui_uibtn_psaunit<>nil)then hs2:=@str_ability_name[ui_uibtn_psaunit^.uid^._ability];
+                       2: if(ui_uibtn_rbldu  <>nil)then hs2:=@_uids[ui_uibtn_rbldu^.uid^._rebuild_uid].un_txt_name;
+                     end;
+                  end;
            end
            else
            begin

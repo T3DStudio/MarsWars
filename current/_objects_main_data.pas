@@ -1026,9 +1026,11 @@ begin
    _ukbuilding:= true;
    _upgr_armor:= upgr_uac_turarm;
    _uklight   := true;
-   _upgr_srange     :=upgr_uac_towers;
-   _upgr_srange_step:=25;
-   _rebuild_uid    := UID_UATurret;
+   _ability      := uab_ToUACDron;
+   _ability_rupgr:= upgr_uac_botturret;
+   _upgr_srange     := upgr_uac_towers;
+   _upgr_srange_step:= 25;
+   _rebuild_uid     := UID_UATurret;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd6,MID_BPlasma ,0,upgr_uac_plasmt,1,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground_mech,wpr_any,uids_all,[],0,-11,wtp_hits        ,2,dm_AntiUnitMech2  );
    _weapon(1,wpt_missle,aw_srange,0,0 ,fr_fpsd6,MID_Chaingun,0,0              ,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,wtp_UnitBioLight,2,dm_AntiUnitBioLight2);
 end;
@@ -1044,6 +1046,8 @@ begin
    _ukbuilding:= true;
    _uklight   := true;
    _upgr_armor:= upgr_uac_turarm;
+   _ability      := uab_ToUACDron;
+   _ability_rupgr:= upgr_uac_botturret;
    _rebuild_uid     := UID_UGTurret;
    _upgr_srange     :=upgr_uac_towers;
    _upgr_srange_step:=25;

@@ -844,6 +844,7 @@ uab_HInvulnerability   = 7;
 uab_SpawnLost          = 8;
 uab_HellVision         = 9;
 uab_CCFly              = 10;
+uab_ToUACDron          = 11;
 
 client_rld_abils       = [
                          uab_Teleport

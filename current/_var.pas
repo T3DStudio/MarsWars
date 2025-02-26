@@ -368,7 +368,7 @@ ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_psaunit  : PTUnit  = nil; // ui action unit
-ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
+ui_uibtn_rbldu    : PTUnit  = nil; // ui rebuild button
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;

@@ -1290,7 +1290,7 @@ Upgrades:
 - Additional Armoring - armor +16;
 - Concrete Walls - armor +16;
 
-Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret".
+Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret". Special ability: "Dron deconstruction"{Req.: "Drone Transformation Protocol"}.
 
 ---------------------------
 
@@ -1313,7 +1313,7 @@ Upgrades:
 - Additional Armoring - armor +16;
 - Concrete Walls - armor +16;
 
-Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret".
+Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret". Special ability: "Dron deconstruction"{Req.: "Drone Transformation Protocol"}.
 
 ---------------------------
 

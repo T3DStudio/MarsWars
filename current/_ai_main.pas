@@ -602,6 +602,21 @@ end;
 //   BUILDINGS CODE
 //
 
+function ai_need_suicide_tower(pu:PTUnit):boolean;
+begin
+   ai_need_suicide_tower:=true;
+   with pu^     do
+   with uid^    do
+   with player^ do
+    if(ai_towers_cur_active>ai_mincount_towers)and(not ai_checkCPNear(50))then
+      if(aiu_alarm_d<base_1rh)or(aiu_alarm_timer=0)or(ai_nearest_builder_d<base_1rh)
+      then aiu_alarm_timer:=ai_TowerLifeTime
+      else
+        if(aiu_alarm_timer<0)
+        then exit;
+   ai_need_suicide_tower:=false;
+end;
+
 function ai_buildings_need_suicide(pu:PTUnit):boolean;
 var   i:integer;
 begin
@@ -644,14 +659,10 @@ UID_UGenerator4: if(cenergy>_genergy)and(armylimit>ai_GeneratorsDestoryLimit)and
 
       case uidi of
 UID_HTower,
-UID_HTotem,
+UID_HTotem         : if(ai_need_suicide_tower(pu))then exit;
 UID_UGTurret,
-UID_UATurret       : if(ai_towers_cur_active>ai_mincount_towers)and(not ai_checkCPNear(50))then
-                      if(aiu_alarm_d<base_1rh)or(aiu_alarm_timer=0)or(ai_nearest_builder_d<base_1rh)
-                      then aiu_alarm_timer:=ai_TowerLifeTime
-                      else
-                        if(aiu_alarm_timer<0)
-                        then exit;
+UID_UATurret       : if(upgr[upgr_uac_botturret]=0)then
+                       if(ai_need_suicide_tower(pu))then exit;
       end;
    end;
    ai_buildings_need_suicide:=false;
@@ -1563,6 +1574,8 @@ uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then _unit_ability_HInvuln  (pu,a
 uab_UACStrike        : if(ai_strike_tar_u<>nil)then _unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
 uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_phantoms]>0)then
                          if(srange<u_royal_d)or(g_royal_r<srange)then _unit_sability(pu);
+uab_ToUACDron        : if(ai_need_suicide_tower(pu))then
+                         if(_unit_sability(pu))then exit;
             end;
             case uidi of
 UID_UACDron           : if(ai_uab_Rebuild2Turret(pu))then
