@@ -312,8 +312,8 @@ begin
    _r         := 20;
    _srange    := 300;
    _ucl       := 7;
-   _btime     := ptime1h;
-   //_ruid1     := UID_HFortress;
+   _btime     := ptime2;
+   _ruid1     := UID_HFortress;
    _attack    := atm_always;
    _ability   := uab_HTowerBlink;
    _ability_rupgr :=upgr_hell_tblink;

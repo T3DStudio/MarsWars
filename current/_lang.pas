@@ -977,7 +977,7 @@ begin
    str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
    str_ability_name[uab_HellVision      ]:='Hell Vision';
    str_ability_name[uab_CCFly           ]:='Flight Engines';
-   str_ability_name[uab_ToUACDron       ]:='Deconstruction to Dron';
+   str_ability_name[uab_ToUACDron       ]:='Deconstruct to Drone';
 
    str_ability_unload                    :='Unload';
 

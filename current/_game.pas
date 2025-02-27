@@ -26,6 +26,7 @@ end;
 procedure PlayersSwap(p0,p1:byte);
 var tp:TPlayer;
 begin
+   //p1 - player target
    if(p0>MaxPlayers)
    or(p1>MaxPlayers)then exit;
    if(_players[p0].state=ps_play)or(p1=p0)then exit;
@@ -40,6 +41,8 @@ begin
    if(HPlayer=p1)then HPlayer:=p0
    else
      if(HPlayer=p0)then HPlayer:=p1;
+   //_players[p0].team:=PlayerGetTeam(g_mode,p0,true);
+   //_players[p1].team:=PlayerGetTeam(g_mode,p1,true);
 end;
 
 procedure PlayerSetState(p,newstate:byte);
@@ -267,12 +270,12 @@ begin
       else
       begin
          if(state=ps_none)then
-          if(g_ai_slots>0)then
-          begin
-             ai_skill:=g_ai_slots;
-             race    :=r_random;
-             PlayerSetState(p,ps_comp);
-          end;
+           if(g_ai_slots>0)then
+           begin
+              ai_skill:=g_ai_slots;
+              race    :=r_random;
+              PlayerSetState(p,ps_comp);
+           end;
 
          if(race=r_random)then race:=1+random(r_cnt);
 

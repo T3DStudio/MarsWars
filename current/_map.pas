@@ -89,9 +89,9 @@ end;
 procedure map_vars;
 begin
    map_RandomBase;
+   //if(g_mode in gm_fixed_positions)then g_fixed_positions:=true;
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
-   //if(g_mode in gm_fixed_positions)then g_fixed_positions:=true;
    {$IFDEF _FULLGAME}
    if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
    map_mmcx    := (vid_panelw-2)/map_mw;
@@ -153,10 +153,10 @@ begin
 end;
 
 procedure map_Starts_Circle(cx,cy,sdir,r:integer);
-const dstep = 360 div MaxPlayers;
+const dstep =360 div MaxPlayers;
 var i:byte;
 begin
-   sdir:=abs(sdir mod 360);
+   sdir :=abs(sdir mod 360);
    for i:=1 to MaxPlayers do
    begin
       sdir+=dstep;

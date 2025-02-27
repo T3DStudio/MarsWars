@@ -1156,12 +1156,20 @@ begin
 end;
 
 function _unit_rebuild(pu:PTUnit):boolean;
+function s_hits:longint;
+begin
+   with pu^ do
+   with uid^ do
+    if(_rebuild_uid=uidi)or(_uids[_rebuild_uid]._genergy>0)
+    then s_hits:=_uids[_rebuild_uid]._hhmhits
+    else s_hits:=_uids[_rebuild_uid]._hmhits;
+end;
 begin
    _unit_rebuild:=false;
    with pu^ do
     with uid^ do
      if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canRebuild(pu),pu))then
-       _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,_uids[_rebuild_uid]._hhmhits,(level+1)*byte(_rebuild_uid=uidi) ),pu);
+       _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,s_hits,(level+1)*byte(_rebuild_uid=uidi) ),pu);
 end;
 
 function _unit_sability(pu:PTUnit):boolean;

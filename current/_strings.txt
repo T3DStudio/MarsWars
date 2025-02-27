@@ -279,9 +279,9 @@ Max hits: 2500
 Limit used: 1
 Size: 20
 Base vision range: 300
-Build time: 30
+Build time: 40
 Energy required: 400
-
+Requirements: Castle of Damned
 
 Arming/Abilities: 
 - ranged attack, max. range: vision range+50, targets: [alive,unit], impact 416*0.5, splash damage radius: 20, target priority: highest hits;
@@ -1290,7 +1290,7 @@ Upgrades:
 - Additional Armoring - armor +16;
 - Concrete Walls - armor +16;
 
-Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret". Special ability: "Dron deconstruction"{Req.: "Drone Transformation Protocol"}.
+Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}.
 
 ---------------------------
 
@@ -1313,7 +1313,7 @@ Upgrades:
 - Additional Armoring - armor +16;
 - Concrete Walls - armor +16;
 
-Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret". Special ability: "Dron deconstruction"{Req.: "Drone Transformation Protocol"}.
+Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}.
 
 ---------------------------
 
