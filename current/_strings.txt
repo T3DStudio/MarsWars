@@ -461,12 +461,12 @@ Imp
 
 Hotkey: R
 Categories/Attributes: [unit,biological,light,ground]
-Max hits: 1000
+Max hits: 750
 Limit used: 1
 Size: 11
 Base movement speed: 10
 Base vision range: 200
-Build time: 20
+Build time: 15
 Energy required: 200
 PainState base threshold: 2
 Places in transport: 1

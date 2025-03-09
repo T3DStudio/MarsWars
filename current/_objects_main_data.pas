@@ -358,14 +358,14 @@ end;
 
 UID_Imp       :
 begin
-   _mhits     := 1000;
+   _mhits     := 750;
    _renergy   := 200;
    _r         := 11;
    _speed     := 10;
    _srange    := 200;
    _ucl       := 0;
    _painc     := 2;
-   _btime     := ptime1;
+   _btime     := ptime1mh;
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
