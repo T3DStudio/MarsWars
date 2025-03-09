@@ -82,6 +82,7 @@ begin
    InitUIDDataCL;
    InitMIDDataCL;
    MakeUnitIcons;
+   MakeAbilityIcons;
 
    {$ENDIF}
 

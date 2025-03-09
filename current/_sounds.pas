@@ -488,6 +488,7 @@ lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
 lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
+lmt_unit_needbuilder,
 lmt_already_adv,
 lmt_NeedMoreProd,
 lmt_MaximumReached,

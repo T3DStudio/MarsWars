@@ -134,7 +134,7 @@ begin
       if(iscomplete)then
        if(speed>0)
        or(unit_canAttack(pu,false))
-       or(_canAbility(pu)=0)then exit;
+       or(unit_canAbility(pu)=0)then exit;
       if(_UnitHaveRPoint(uidi))then exit;
    end;
    CheckBOrders:=false;
@@ -354,7 +354,7 @@ begin
                   end;
                end;
            end;
-co_psability          : if(ui_uibtn_psaunit=nil)then m_brush:=co_empty;
+co_psability          : if(ui_uibtn_pabilityu=nil)then m_brush:=co_empty;
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else
@@ -366,8 +366,8 @@ begin
    case m_brush of
 co_move     : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // move
 co_amove    : _player_s_o(m_brush   ,target,x,y,0,uo_corder,HPlayer);   // attack
-co_psability: if(ui_uibtn_psaunit<>nil)then
-              _player_s_o(m_brush   ,target,x,y,ui_uibtn_psaunit^.uid^._ability,
+co_psability: if(ui_uibtn_pabilityu<>nil)then
+              _player_s_o(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^._ability,
                                                   uo_corder,HPlayer);
 co_patrol,
 co_apatrol  : _player_s_o(m_brush   ,0     ,x,y,0,uo_corder,HPlayer);
@@ -478,9 +478,12 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
          if(click_type=pct_left)then
          begin
             case u of
-  0 : _player_s_o(co_sability,0,0,0,0, uo_corder  ,HPlayer);
-  1 : m_brush :=co_psability;
-  2 : _player_s_o(co_rebuild ,0,0,0,0, uo_corder  ,HPlayer);
+  0 : if(ui_uibtn_sabilityu<>nil)then
+      _player_s_o(co_sability,0,0,0,ui_uibtn_sabilityu^.uid^._ability  , uo_corder  ,HPlayer);
+  1 : if(ui_uibtn_pabilityu<>nil)then
+      m_brush :=co_psability;
+  2 : if(ui_uibtn_rebuildu<>nil)then
+      _player_s_o(co_rebuild ,0,0,0,ui_uibtn_rebuildu^.uid^._rebuild_uid, uo_corder  ,HPlayer);
 
   3 : m_brush :=co_amove;
   4 : _player_s_o(co_astand  ,0,0,0,0, uo_corder  ,HPlayer);

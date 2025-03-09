@@ -226,9 +226,11 @@ begin
          if(sel)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            if((_canAbility(pu)=0)and(uo_id<>ua_psability))
-            or(transportC>0)     then ui_uibtn_psaunit:=pu;
-            if(_canRebuild(pu)=0)then ui_uibtn_rbldu  :=pu;
+            if((unit_canAbility(pu,1)=0)and(uo_id<>ua_psability))
+                                     then ui_uibtn_sabilityu:=pu;
+            if((unit_canAbility(pu,2)=0)and(uo_id<>ua_psability))
+            or(transportC>0)         then ui_uibtn_pabilityu:=pu;
+            if(unit_canRebuild(pu)=0)then ui_uibtn_rebuildu :=pu;
          end;
       end
       else
@@ -547,8 +549,9 @@ begin
    ui_uprod_cur      :=0;
    ui_uprod_first    :=0;
    ui_pprod_first    :=0;
-   ui_uibtn_psaunit  :=nil;
-   ui_uibtn_rbldu    :=nil;
+   ui_uibtn_sabilityu:=nil;
+   ui_uibtn_pabilityu:=nil;
+   ui_uibtn_rebuildu :=nil;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];
    ui_bprod_first    :=0;

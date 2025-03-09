@@ -916,52 +916,62 @@ begin
    UnitF2Select:=true;
 end;
 
-function _canRebuild(pu:PTUnit):cardinal;
+function unit_canRebuild(pu:PTUnit):cardinal;
 begin
-   _canRebuild:=0;
-   with pu^     do
-   with uid^    do
-    if(iscomplete=false)
-    or(hits<=0)
-    or(_rebuild_uid=0)
-    //or((_rebuild_level>0)and(level>=_rebuild_level))//
-    or((_rebuild_uid=pu^.uidi)and(level>=MaxUnitLevel))
-    then _canRebuild:=ureq_alreadyAdv
-    else
-      with player^ do
-      begin
-         if(_rebuild_ruid>0)then
-          if(uid_eb[_rebuild_ruid]<=0)then _canRebuild+=ureq_ruid;
+   unit_canRebuild:=0;
+   if(pu=nil)
+   then unit_canRebuild:=ureq_unknown
+   else
+     with pu^     do
+     with uid^    do
+      if(iscomplete=false)
+      or(hits<=0)
+      or(_rebuild_uid=0)
+      or((_rebuild_uid=pu^.uidi)and(level>=MaxUnitLevel))
+      then unit_canRebuild:=ureq_alreadyAdv
+      else
+        with player^ do
+        begin
+           if(_rebuild_ruid>0)then
+            if(uid_eb[_rebuild_ruid]<=0)then unit_canRebuild+=ureq_ruid;
 
-         if(_rebuild_rupgr>0)and(_rebuild_rupgrl>0)then
-          if(upgr[_rebuild_rupgr]<_rebuild_rupgrl)then _canRebuild+=ureq_rupid;
-      end;
+           if(_rebuild_rupgr>0)and(_rebuild_rupgrl>0)then
+            if(upgr[_rebuild_rupgr]<_rebuild_rupgrl)then unit_canRebuild+=ureq_rupid;
+        end;
 end;
 
-function _canAbility(pu:PTUnit):cardinal;
+function unit_canAbility(pu:PTUnit;CheckMode:byte=0):cardinal;
 begin
-   _canAbility:=0;
-   with pu^     do
-   with uid^    do
-    if(iscomplete=false)
-    or(hits<=0)
-    or(_ability=0)
-    or(rld>0)
-    then _canAbility:=ureq_unknown
-    else
-      with player^ do
-      begin
-         if(_ability_no_obstacles)then
-          if(pf_IfObstacleZone(pfzone))then _canAbility+=ureq_place;
+   unit_canAbility:=0;
+   if(pu=nil)
+   then unit_canAbility:=ureq_unknown
+   else
+     with pu^     do
+     with uid^    do
+      if(iscomplete=false)
+      or(hits<=0)
+      or(_ability=0)
+      or(rld>0)
+      then unit_canAbility:=ureq_unknown
+      else
+        with player^ do
+        begin
+           case CheckMode of
+           1: if not(_ability in uab_abilityOrder )then unit_canAbility+=ureq_common;
+           2: if not(_ability in uab_pabilityOrder)then unit_canAbility+=ureq_unknown;
+           end;
 
-         if(_ability_ruid>0)then
-          if(uid_eb[_ability_ruid]<=0)then _canAbility+=ureq_ruid;
+           if(_ability_no_obstacles)then
+            if(pf_IfObstacleZone(pfzone))then unit_canAbility+=ureq_place;
 
-         if(_ability_rupgr>0)and(_ability_rupgrl>0)then
-          if(upgr[_ability_rupgr]<_ability_rupgrl)then _canAbility+=ureq_rupid;
+           if(_ability_ruid>0)then
+            if(uid_eb[_ability_ruid]<=0)then unit_canAbility+=ureq_ruid;
 
-         if(_ability=uab_RebuildInPoint)and(_canAbility=0)then _canAbility+=_canRebuild(pu);
-      end;
+           if(_ability_rupgr>0)and(_ability_rupgrl>0)then
+            if(upgr[_ability_rupgr]<_ability_rupgrl)then unit_canAbility+=ureq_rupid;
+
+           if(_ability=uab_RebuildInPoint)and(unit_canAbility=0)then unit_canAbility+=unit_canRebuild(pu);
+        end;
 end;
 
 procedure GameSetStatusWinnerTeam(team:byte);
@@ -1078,6 +1088,8 @@ end;
 function fog_check(x,y:integer):boolean;
 var cx,cy:integer;
 begin
+   x+=vid_cam_fx;
+   y+=vid_cam_fy;
    cx:=x div fog_cw;
    cy:=y div fog_cw;
    fog_check:=false;
@@ -1134,21 +1146,25 @@ begin
    MapPointInScreenP:=false;
    x-=vid_cam_x;
    y-=vid_cam_y;
-   if(0<x)and(x<vid_cam_w)and
-     (0<y)and(y<vid_cam_h)then
+   if(-fog_cw<x)and(x<(vid_cam_w+fog_cw))and
+     (-fog_cw<y)and(y<(vid_cam_h+fog_cw))then
    begin
       if(not rpls_fog)
       then MapPointInScreenP:=true
       else MapPointInScreenP:=fog_check(x,y);
       if(CheckSquare)and(not MapPointInScreenP)then
-        MapPointInScreenP:=MapPointInScreenP(x-fog_cw,y,false)or
-                           MapPointInScreenP(x+fog_cw,y,false)or
-                           MapPointInScreenP(x,y+fog_cw,false)or
-                           MapPointInScreenP(x,y-fog_cw,false)or
-                           MapPointInScreenP(x-fog_cw,y-fog_cw,false)or
-                           MapPointInScreenP(x+fog_cw,y-fog_cw,false)or
-                           MapPointInScreenP(x+fog_cw,y+fog_cw,false)or
-                           MapPointInScreenP(x-fog_cw,y+fog_cw,false);
+      begin
+         x+=vid_cam_x;
+         y+=vid_cam_y;
+         MapPointInScreenP:=MapPointInScreenP(x-fog_cw,y,false)or
+                            MapPointInScreenP(x+fog_cw,y,false)or
+                            MapPointInScreenP(x,y+fog_cw,false)or
+                            MapPointInScreenP(x,y-fog_cw,false)or
+                            MapPointInScreenP(x-fog_cw,y-fog_cw,false)or
+                            MapPointInScreenP(x+fog_cw,y-fog_cw,false)or
+                            MapPointInScreenP(x+fog_cw,y+fog_cw,false)or
+                            MapPointInScreenP(x-fog_cw,y+fog_cw,false);
+      end;
    end;
 end;
 
@@ -1267,6 +1283,8 @@ procedure CamBounds;
 begin
    vid_cam_x:=mm3(0,vid_cam_x,map_mw-vid_cam_w);
    vid_cam_y:=mm3(0,vid_cam_y,map_mw-vid_cam_h);
+   vid_cam_fx:=(vid_cam_x mod fog_cw);
+   vid_cam_fy:=(vid_cam_y mod fog_cw);
 
    vid_mmvx:=round(vid_cam_x*map_mmcx);
    vid_mmvy:=round(vid_cam_y*map_mmcx);

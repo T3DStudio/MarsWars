@@ -61,8 +61,8 @@ begin
         with _players[HPlayer] do
          case m_brush of
 1..255,
-co_psability   : if(ui_uibtn_psaunit<>nil)then
-                  case ui_uibtn_psaunit^.uid^._ability of
+co_psability   : if(ui_uibtn_pabilityu<>nil)then
+                  case ui_uibtn_pabilityu^.uid^._ability of
                   uab_RebuildInPoint,
                   uab_HTowerBlink,
                   uab_HKeepBlink,

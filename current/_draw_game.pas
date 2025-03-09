@@ -558,18 +558,20 @@ var cx,cy,ssx,ssy,sty:integer;
 begin
    if(not vid_fog)then exit;
 
-   ssx:=lx-(vid_cam_x mod fog_cw);
-   sty:=ly-(vid_cam_y mod fog_cw);
+   ssx:=lx-vid_cam_fx;
+   sty:=ly-vid_cam_fy;
 
    for cx:=0 to vid_fog_vfw do
    begin
       ssy:=sty;
+      //vlineColor(tar,ssx,0,vid_vh,c_white);
       for cy:=0 to vid_fog_vfh do
       begin
+         //hlineColor(tar,0,vid_vw,ssy,c_white);
          vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
          if(rpls_fog)then
          begin
-            if(vid_fog_grid[cx,cy]=0)then //_draw_surf(tar,ssx, ssy, vid_fog_surf);
+            if(vid_fog_grid[cx,cy]=0)then
               _draw_surf(tar,ssx-fog_ds, ssy-fog_ds, vid_fog_surf);
             vid_fog_grid[cx,cy]:=0;
          end
@@ -721,7 +723,7 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+30,i2s(aiu_alarm_timer ), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+20,i2s(fx )+' '+i2s(fy ), ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

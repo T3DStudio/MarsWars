@@ -211,6 +211,8 @@ vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
+vid_cam_fx        : integer = 0;
+vid_cam_fy        : integer = 0;
 vid_CamSpeed      : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
@@ -367,8 +369,9 @@ ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
-ui_uibtn_psaunit  : PTUnit  = nil; // ui action unit
-ui_uibtn_rbldu    : PTUnit  = nil; // ui rebuild button
+ui_uibtn_sabilityu: PTUnit  = nil; // ui self ability order unit
+ui_uibtn_pabilityu: PTUnit  = nil; // ui point ability order unit
+ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -705,6 +708,7 @@ spr_b_delete,
 spr_mback,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
+spr_b_ab          : array[byte] of pSDL_Surface;
 spr_tabs          : array[0..3] of pSDL_Surface;
 spr_cp_koth,
 spr_cp_out,

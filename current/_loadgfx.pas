@@ -762,6 +762,9 @@ begin
       hw  := w div 2;hh   := hw;
    end;
 
+   for x:=0 to 255 do
+   spr_b_ab[x]:=spr_b_action;
+
    initEffects;
    InitThemes;
 end;
@@ -792,6 +795,21 @@ begin
          hw  := w div 2;hh:= hw;
       end;
    end;
+end;
+
+procedure MakeAbilityIcons;
+begin
+   spr_b_ab[uab_Teleport        ]:=spr_b_up[r_hell,16].surf;
+   spr_b_ab[uab_UACScan         ]:=spr_b_up[r_uac ,8 ].surf;
+   spr_b_ab[uab_HTowerBlink     ]:=spr_b_up[r_hell,21].surf;
+   spr_b_ab[uab_UACStrike       ]:=spr_b_up[r_uac ,16].surf;
+   spr_b_ab[uab_HKeepBlink      ]:=spr_b_up[r_hell,9 ].surf;
+   spr_b_ab[uab_RebuildInPoint  ]:=spr_b_paction;
+   spr_b_ab[uab_HInvulnerability]:=spr_b_up[r_hell,22].surf;
+   spr_b_ab[uab_SpawnLost       ]:=_uids[UID_LostSoul].un_btn.surf;
+   spr_b_ab[uab_HellVision      ]:=spr_b_up[r_hell,6 ].surf;
+   spr_b_ab[uab_CCFly           ]:=spr_b_up[r_uac ,9 ].surf;
+   spr_b_ab[uab_ToUACDron       ]:=_uids[UID_UACDron].un_btn.surf;
 end;
 
 procedure Map_tdmake;

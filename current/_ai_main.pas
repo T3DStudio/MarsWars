@@ -881,13 +881,14 @@ begin
       uo_tar:=0;
    end;
 end;
-procedure ai_DefaultIdle(pu:PTUnit);
+procedure ai_DefaultIdle(pu:PTUnit;force:boolean=false);
 begin
    with pu^ do
    begin
       uo_x:=mm3(1,uo_x,map_mw);
       uo_y:=mm3(1,uo_y,map_mw);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
+      or(force)
       or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
       or(_CheckRoyalBattlePoint(uo_x,uo_y,base_1r))
       then ai_RunTo(pu,-1,random(map_mw),random(map_mw),0,nil);
@@ -1093,9 +1094,19 @@ begin
       if(group<>aio_scout)
       then ai_BaseIdle(pu,ai_BasePatrolRange)
       else
-        if(aiu_alarm_d<NOTSET)
+      begin
+         ai_DefaultIdle(pu);
+         if(ai_enemy_d<=srange)then
+         begin
+            ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
+            ai_DefaultIdle(pu,true);
+            a_tar:=0;
+            uo_id:=ua_move;
+         end;
+        {if(aiu_alarm_d<NOTSET)
         then ai_RunTo(pu,aiu_alarm_d,aiu_alarm_x,aiu_alarm_y,0,nil)
-        else ai_DefaultIdle(pu);
+        else ai_DefaultIdle(pu);}
+      end;
 
       CheckScout:=true;
    end
@@ -1563,7 +1574,7 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
                        then uo_tar:=ai_teleporter_beacon_u^.unum
                        else uo_tar:=0;
       end;
-      if(_canAbility(pu)=0)then
+      if(unit_canAbility(pu)=0)then
       begin
          // other ability
          if((player^.ai_flags and aif_ability_other)>0)then

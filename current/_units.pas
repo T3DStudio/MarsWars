@@ -1168,7 +1168,7 @@ begin
    _unit_rebuild:=false;
    with pu^ do
     with uid^ do
-     if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canRebuild(pu),pu))then
+     if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,unit_canRebuild(pu),pu))then
        _unit_rebuild:=not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_unit_morph(pu,_rebuild_uid,false,s_hits,(level+1)*byte(_rebuild_uid=uidi) ),pu);
 end;
 
@@ -1184,7 +1184,7 @@ begin
          _unit_sability:=true;
       end
       else
-        if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,_canAbility(pu),pu))then
+        if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,unit_canAbility(pu),pu))then
           with player^ do
             case _ability of
 uab_SpawnLost     : if(buff[ub_Cast]<=0)and(buff[ub_CCast]<=0)then
@@ -1774,7 +1774,7 @@ co_psability: if(uo_id<>ua_psability)
                   uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
                   uab_CCFly            : if(speed>0)then
                                          begin
-                                            if(_canAbility(pu)=0)then
+                                            if(unit_canAbility(pu)=0)then
                                             begin
                                                _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                                                _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
@@ -1803,9 +1803,10 @@ co_psability: if(uo_id<>ua_psability)
                                       _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
                                       exit;
                   end;
-co_rebuild  :  if(_unit_rebuild (pu))then exit;
-co_sability :  if(_unit_sability(pu))and(_ability=order_a)then
-                 if(uo_id<>ua_unload)then exit;
+co_rebuild  :  if(_rebuild_uid=order_a)then
+                 if(_unit_rebuild (pu))then exit;
+co_sability :  if(_ability=order_a)then
+                 if(_unit_sability(pu)and(uo_id<>ua_unload))then exit;
    end;
    _unit_player_order:=false;
 end;

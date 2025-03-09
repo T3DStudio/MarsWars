@@ -479,7 +479,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                                begin
                                   if(uo_id<>ua_psability)
                                   or((ucl_cs[true]+ucl_cs[false])=1)then
-                                     if((transportM>0)and(transportC>0))or((_canAbility(pu)=0)and(o_a0=_ability))then
+                                     if((transportM>0)and(transportC>0))or((unit_canAbility(pu)=0)and(o_a0=_ability))then
                                      begin
                                         d:=point_dist_int(o_x1,o_y1,x,y);
                                         if(d<sability_d)then

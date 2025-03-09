@@ -858,6 +858,11 @@ client_cast_abils      = [
                          uab_HInvulnerability
                          ];
 
+uab_abilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron];
+uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
+                          uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
+                          uab_SpawnLost,uab_HellVision,uab_CCFly];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  OTHER

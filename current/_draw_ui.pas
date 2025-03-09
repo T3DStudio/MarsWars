@@ -136,11 +136,11 @@ begin
       c_white);
    end;
 co_psability:
-    if(ui_uibtn_psaunit<>nil)then
-     with ui_uibtn_psaunit^.uid^ do
+    if(ui_uibtn_pabilityu<>nil)then
+     with ui_uibtn_pabilityu^.uid^ do
       case _ability of
-uab_UACStrike     : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr             ,c_gray);
-uab_UACScan       : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,ui_uibtn_psaunit^.srange,c_gray);
+uab_UACStrike     : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr              ,c_gray);
+uab_UACScan       : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,ui_uibtn_pabilityu^.srange,c_gray);
 uab_RebuildInPoint: begin
                     spr:=_uid2spr(_rebuild_uid,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
@@ -152,7 +152,7 @@ uab_RebuildInPoint: begin
 uab_HTowerBlink,
 uab_HKeepBlink,
 uab_CCFly         : begin
-                    spr:=_uid2spr(ui_uibtn_psaunit^.uidi,270,0);
+                    spr:=_uid2spr(ui_uibtn_pabilityu^.uidi,270,0);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
                     _draw_surf(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
@@ -307,6 +307,31 @@ by+=3;if(i1>0)then _draw_text(tar,bx+3,by         ,i2s(i1),ta_left,255,c1);
    end;
 end;
 
+function GetRebuildIco(pu:PTUnit):pSDL_Surface;
+begin
+   GetRebuildIco:=spr_b_rebuild;
+   if(pu<>nil)then
+     if(pu^.uid^._rebuild_uid>0)then
+       GetRebuildIco:=_uids[pu^.uid^._rebuild_uid].un_btn.surf;
+end;
+function GetAbilityIco(pu:PTUnit):pSDL_Surface;
+begin
+   GetAbilityIco:=spr_b_action;
+   if(pu<>nil)then
+     with pu^.uid^ do
+       if(_ability>0)and(_ability in uab_abilityOrder)then
+         GetAbilityIco:=spr_b_ab[_ability];
+end;
+function GetSAbilityIco(pu:PTUnit):pSDL_Surface;
+begin
+   GetSAbilityIco:=spr_b_paction;
+   if(pu<>nil)then
+     with pu^.uid^ do
+       if(_ability>0)and(_ability in uab_pabilityOrder)then
+         GetSAbilityIco:=spr_b_ab[_ability];
+end;
+
+
 procedure d_Panel(tar:pSDL_Surface;VisPlayer:byte);
 var ucl,ux,uy,uid:integer;
               req:cardinal;
@@ -459,9 +484,9 @@ begin
         end
         else
         begin
-           _drawBtn(tar,0,0,spr_b_action ,false   ,ui_uibtn_psaunit=nil);
-           _drawBtn(tar,1,0,spr_b_paction,false   ,ui_uibtn_psaunit=nil);
-           _drawBtn(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rbldu  =nil);
+           _drawBtn(tar,0,0,GetAbilityIco (ui_uibtn_sabilityu),false,unit_canAbility(ui_uibtn_sabilityu,1)>0);
+           _drawBtn(tar,1,0,GetSAbilityIco(ui_uibtn_pabilityu),false,unit_canAbility(ui_uibtn_pabilityu,2)>0);
+           _drawBtn(tar,2,0,GetRebuildIco (ui_uibtn_rebuildu ),false,unit_canRebuild(ui_uibtn_rebuildu   )>0);
 
            _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
            _drawBtn(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );
@@ -576,8 +601,9 @@ begin
                   begin
                      hs1:=@str_hint_a[i];
                      case i of
-                     0,1: if(ui_uibtn_psaunit<>nil)then hs2:=@str_ability_name[ui_uibtn_psaunit^.uid^._ability];
-                       2: if(ui_uibtn_rbldu  <>nil)then hs2:=@_uids[ui_uibtn_rbldu^.uid^._rebuild_uid].un_txt_name;
+                       0: if(ui_uibtn_sabilityu<>nil)then hs2:=@str_ability_name[ui_uibtn_sabilityu^.uid^._ability];
+                       1: if(ui_uibtn_pabilityu<>nil)then hs2:=@str_ability_name[ui_uibtn_pabilityu^.uid^._ability];
+                       2: if(ui_uibtn_rebuildu <>nil)then hs2:=@_uids[ui_uibtn_rebuildu^.uid^._rebuild_uid].un_txt_name;
                      end;
                   end;
            end
@@ -610,13 +636,13 @@ begin
       if(hs4<>nil)then _draw_text(tar,ui_textx,ui_hinty4,hs4^,ta_left,ui_ingamecl,c_white);
    end
    else
-     if(ui_uibtn_psaunit<>nil)and(m_brush=co_psability)then
+     if(ui_uibtn_pabilityu<>nil)and(m_brush=co_psability)then
      begin
         s1:='';
-        if(ui_uibtn_psaunit^.uid^._ability>0)
-        then s1:=str_ability_name[ui_uibtn_psaunit^.uid^._ability]
+        if(ui_uibtn_pabilityu^.uid^._ability>0)
+        then s1:=str_ability_name[ui_uibtn_pabilityu^.uid^._ability]
         else
-          if(ui_uibtn_psaunit^.transportC>0)
+          if(ui_uibtn_pabilityu^.transportC>0)
           then s1:=str_ability_unload;
         _draw_text(tar,ui_textx,ui_hinty1,s1,ta_left,ui_ingamecl,c_white);
      end
