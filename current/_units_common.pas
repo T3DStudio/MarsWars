@@ -1351,9 +1351,19 @@ end;
 procedure _unit_desel(pu:PTUnit);
 begin
    with pu^ do
+   if(sel)then
    begin
-      if(sel)then _unit_counters_dec_select(pu);
+      _unit_counters_dec_select(pu);
       sel:=false;
+   end;
+end;
+procedure _unit_sel(pu:PTUnit);
+begin
+   with pu^ do
+   if(not sel)then
+   begin
+      _unit_counters_inc_select(pu);
+      sel:=true;
    end;
 end;
 
@@ -1735,41 +1745,40 @@ begin
       // ABILITIES
       case _ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_rteleport]>0);
-uab_CCFly         :
-           if(level>0)then
-           begin
-              if(ukfly<>uf_fly)then
-              begin
-                 {$IFDEF _FULLGAME}
-                 SoundPlayUnit(snd_CCup ,pu,nil);
-                 {$ENDIF}
-                 ukfly:=uf_fly;
-                 zfall:=zfall-fly_hz;
-                 if(uo_id<>ua_psability)
-                 then _unit_clear_order(pu,false);
-              end;
-              speed:=5;
-           end
-           else
-           begin
-              if(ukfly<>uf_ground)then
-              begin
-                 {$IFDEF _FULLGAME}
-                 SoundPlayUnit(snd_transport,pu,nil);
-                 {$ENDIF}
-                 zfall:=fly_hz;
-                 ukfly:=uf_ground;
-                 _unit_clear_order(pu,false);
-              end;
-              speed:=0;
+uab_CCFly         : if(level>0)then
+                    begin
+                       if(ukfly<>uf_fly)then
+                       begin
+                          {$IFDEF _FULLGAME}
+                          SoundPlayUnit(snd_CCup ,pu,nil);
+                          {$ENDIF}
+                          ukfly:=uf_fly;
+                          if(ServerSide)then zfall:=zfall-fly_hz;
+                          if(uo_id<>ua_psability)
+                          then _unit_clear_order(pu,false);
+                       end;
+                       speed:=5;
+                    end
+                    else
+                    begin
+                       if(ukfly<>uf_ground)then
+                       begin
+                          {$IFDEF _FULLGAME}
+                          SoundPlayUnit(snd_transport,pu,nil);
+                          {$ENDIF}
+                          if(ServerSide)then zfall:=fly_hz;
+                          ukfly:=uf_ground;
+                          _unit_clear_order(pu,false);
+                       end;
+                       speed:=0;
 
-              if(ServerSide)and(zfall<>0)then
-               if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false,true )>0)then
-               begin
-                  level:=1;
-                  buff[ub_CCast]:=fr_fps2;
-               end;
-           end;
+                       if(ServerSide)and(zfall<>0)then
+                        if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false,true )>0)then
+                        begin
+                           level:=1;
+                           buff[ub_CCast]:=fr_fps2;
+                        end;
+                    end;
       end;
 
       // DETECTION

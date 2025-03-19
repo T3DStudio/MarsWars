@@ -60,7 +60,7 @@ begin
         ro:=0;
         with _players[HPlayer] do
          case m_brush of
-1..255,
+1..255         : ro:=r-bld_dec_mr;
 co_psability   : if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^._ability of
                   uab_RebuildInPoint,

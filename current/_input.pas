@@ -230,6 +230,7 @@ begin
 end;
 
 procedure _player_s_o(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
+var u:integer;
 begin
    if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
    begin
@@ -243,6 +244,14 @@ begin
          net_writeint (oy1);
          net_writeint (oa0);
          net_writebyte(oid);
+
+         with _players[HPlayer] do
+           net_writebyte(ucl_cs[false]+ucl_cs[true]);
+         for u:=1 to MaxUnits do
+           with _punits[u]^ do
+             if(hits>0)and(sel)and(HPlayer=playeri)and(not _isUnitRange(transport,nil))then
+               net_writeint(unum);
+
          net_send(net_cl_svip,net_cl_svport);
       end
       else
@@ -451,7 +460,9 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
          if(click_type=pct_left)then
            case u of
      0 : uncappedFPS:=not uncappedFPS;
-     3 : begin
+     3 : if (G_Status<>gs_replayend)
+         and(G_Status<>gs_replayerror)then
+         begin
             if  (G_Status =gs_running    )
             then G_Status:=gs_replaypause
             else G_Status:=gs_running;
@@ -504,7 +515,7 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
   10: if(ui_orders_x[MaxUnitGroups]>0)then
         if(click_dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups],ui_orders_y[MaxUnitGroups])
-        else _player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
+        else units_SelectGroup(false,HPlayer,255); //_player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
   11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
   12: m_brush :=co_mmark;
   13: m_action:=not m_action;
@@ -640,14 +651,14 @@ sdlk_tab: begin
                                   ko:=_event^.key.keysym.sym-sdlk_0;
                                   if(ko<MaxUnitGroups)then
                                    if(ks_ctrl>0)
-                                   then _player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
+                                   then units_Grouping(false,HPlayer,ko)//_player_s_o(ko,0,0,0,0,uo_setorder,HPlayer)
                                    else
                                      if(ks_alt>0)
-                                     then _player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
+                                     then units_Grouping(true ,HPlayer,ko) //_player_s_o(ko,0,0,0,0,uo_addorder,HPlayer)
                                      else
                                        if(k_dbl)and(ui_orders_x[ko]>0)and(ko>0)
                                        then MoveCamToPoint(ui_orders_x[ko] , ui_orders_y[ko])
-                                       else _player_s_o(ko,ks_shift,0,0,0,uo_selorder,HPlayer);
+                                       else units_SelectGroup(ks_shift>0,HPlayer,ko);//_player_s_o(ko,ks_shift,0,0,0,uo_selorder,HPlayer);
                                end;
                 else
                 end;
@@ -821,9 +832,10 @@ co_psability: ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
      case m_brush of
 co_empty  : if(ks_ctrl>0)then
             begin
-               if(ks_shift>0)
-               then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
-               else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
+               //if(ks_shift>0)
+               //then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
+               //else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
+               units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3));
             end
             else
             begin
@@ -862,14 +874,16 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       if(mouse_select_x0>-1)then //select
       begin
          if(m_ldblclk>0)then
-            if(ks_shift>0)
-            then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
-            else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
+            //if(ks_shift>0)
+            //then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
+            //else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
+            units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3))
          else
          begin
-            if(ks_shift>0)
-            then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer)
-            else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
+            //if(ks_shift>0)
+            //then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer)
+            //else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
+            units_SelectRect(ks_shift>0,HPlayer,mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,255);
 
             if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;

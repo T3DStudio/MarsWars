@@ -164,7 +164,7 @@ Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level+1]"{
 
 ---------------------------
 
-Guard Tower
+Imp`s Tower
 
 Hotkey: V
 Categories/Attributes: [building,mechanical,light,ground]
@@ -290,7 +290,7 @@ Upgrades:
 - Stone Walls - armor +16;
 - Building Restoration - hits regeneration +7;
 
-Advanced defensive structure. Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Advanced defensive structure. Can be rebuilt into "Imp`s Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
@@ -802,7 +802,7 @@ Places in transport: 1
 
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [demons&zombies], impact 13*2, target priority: lowest hits;
+- heal/repair, targets: [demons&zombies], impact 17*2, target priority: lowest hits;
 - ranged attack, max. range: vision range, targets: [alive], impact 26*1, target priority: [unit,bio,light], upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -1374,7 +1374,7 @@ Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,mechanical], impact 13*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- heal/repair, targets: [alive,mechanical], impact 17*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
 - ranged attack, max. range: vision range, targets: [alive], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1402,7 +1402,7 @@ Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,unit,biological], impact 13*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- heal/repair, targets: [alive,unit,biological], impact 17*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
 - ranged attack, max. range: vision range, targets: [alive,ground], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1849,7 +1849,7 @@ Requirements: Castle of Damned
 
 Tower Teleportation Charge (Ctrl+H,200,30,x15,*)
 
-Charges for ability of Guard Tower and Totem of Horror.
+Charges for ability of Imp`s Tower and Totem of Horror.
 Requirements: Castle of Damned
 
 Weapons Upgrade (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)

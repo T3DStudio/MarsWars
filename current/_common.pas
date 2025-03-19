@@ -887,6 +887,22 @@ begin
    _UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
 end;
 
+function UnitF1Select(pu:PTUnit):boolean;
+begin
+   UnitF1Select:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(not iscomplete)
+      or(_IsUnitRange(transport,nil))then exit;
+
+      if(not _isbuilder)then exit;
+
+   end;
+   UnitF1Select:=true;
+end;
+
 function UnitF2Select(pu:PTUnit):boolean;
 var tu:PTUnit;
 begin

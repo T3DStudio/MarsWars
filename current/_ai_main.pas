@@ -1096,7 +1096,7 @@ begin
       else
       begin
          ai_DefaultIdle(pu);
-         if(ai_enemy_d<=srange)then
+         if(ai_enemy_d<=base_1r)then
          begin
             ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
             ai_DefaultIdle(pu,true);

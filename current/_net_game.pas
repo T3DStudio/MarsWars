@@ -126,9 +126,11 @@ end;
 procedure net_Server;
 var mid,
     pid,
-    i  :byte;
+    i  : byte;
 net_period_step
-       :boolean;
+       : boolean;
+u      : integer;
+pu     : PTUnit;
 begin
    net_clearbuffer;
 
@@ -218,6 +220,19 @@ nmid_order       : with _players[pid]do
                       o_y1:=net_readint;
                       o_a0:=net_readint;
                       o_id:=net_readbyte;
+
+                      for u:=1 to MaxUnits do
+                        with _punits[u]^ do
+                          if(hits>0)and(pid=playeri)then _unit_desel(_punits[u]);
+                      i:=net_readbyte;
+                      while(i>0)do
+                      begin
+                         u:=net_readint;
+                         if(_IsUnitRange(u,@pu))then
+                           with pu^ do
+                             if(hits>0)and(pid=playeri)and(not _isUnitRange(transport,nil))then _unit_sel(pu);
+                         i-=1;
+                      end;
                    end;
 nmid_map_mark    : net_ReadMapMark(pid);
 nmid_client_info : with _players[pid] do

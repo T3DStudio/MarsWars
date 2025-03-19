@@ -200,7 +200,9 @@ begin
         if((G_Step-wudtick^)>=wudelay)
         then wb:=true;
 
-      b:=group and %00001111;
+      if(rpl)
+      then b:=group and %00001111
+      else b:=0;
       uo:=uo_id;
       if(uo_bx>0)then uo:=ua_patrol;
       uo:=(uo and %00000111) shl 4;
@@ -222,7 +224,7 @@ begin
       if(_ukbuilding)then
       begin
          if(iscomplete)then _wudata_prod(pu,rpl);
-         if(sel)and(_UnitHaveRPoint(pu^.uidi))then
+         if(sel or not rpl)and(_UnitHaveRPoint(pu^.uidi))then
           if(_IsUnitRange(uo_tar,nil))
           then _wudata_int(-uo_tar,rpl)
           else
@@ -453,7 +455,7 @@ end;
 
 {$IFDEF _FULLGAME}
 
-procedure _ucInc(pu:PTUnit);
+procedure _ucInc(pu:PTUnit;rpl:boolean);
 var i,_puid:byte;
     p:pinteger;
 ptransport:PTUnit;
@@ -475,7 +477,7 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)then _unit_counters_inc_select(pu);
+         if(sel)and(rpl)then _unit_counters_inc_select(pu);
          if(iscomplete=false)
          then cenergy-=_renergy
          else
@@ -522,7 +524,7 @@ begin
    end;
 end;
 
-procedure _ucDec(pu:PTUnit);
+procedure _ucDec(pu:PTUnit;rpl:boolean);
 var i,_puid:byte;
 ptransport:PTUnit;
 begin
@@ -543,7 +545,7 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)then _unit_counters_dec_select(pu);
+         if(sel)and(rpl)then _unit_counters_dec_select(pu);
          if(iscomplete=false)
          then cenergy+=_renergy
          else
@@ -624,13 +626,29 @@ begin
        if(a_tar=tar)then a_tar:=0;
 end;
 
-procedure _netSetUcl(uu:PTUnit);
+procedure _netSetUcl(uu:PTUnit;rpl:boolean);
 var pu,tu:PTUnit;
    vis:boolean;
 begin
    // pu - previous state
    // uu - current state
    pu:=@_units[0];
+
+   if(not rpl)then
+    if(pu^.uidi<>uu^.uidi)then
+    begin
+       _unit_desel(pu);
+       uu^.group:=0;
+       uu^.sel:=false;
+    end
+    else
+      if(uu^.hits<=0)
+      or(uu^.transport>0)then
+      begin
+         _unit_desel(uu);
+         uu^.group:=0;
+      end;
+
    with uu^ do
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
@@ -661,14 +679,14 @@ begin
            begin
               if(iscomplete=false)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
-              if(sel)then UpdateLastSelectedUnit(unum);
+              if(not rpl)and(sel)then UpdateLastSelectedUnit(unum);
            end;
         end;
 
         _missiles_clear_tar(unum,true);
         _unit_clear_a_tar(unum);
 
-        _ucInc(uu);
+        _ucInc(uu,rpl);
      end
      else
        if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
@@ -696,7 +714,7 @@ begin
           _missiles_clear_tar(unum,true);
           _unit_clear_a_tar(unum);
 
-          _ucDec(pu);
+          _ucDec(pu,rpl);
        end
        else
          if(pu^.hits>dead_hits)and(hits>dead_hits)then
@@ -711,10 +729,10 @@ begin
             vis:=CheckUnitUIVisionScreen(uu);
 
             _unit_upgr(pu);
-            _ucDec(pu);
+            _ucDec(pu,rpl);
 
             _unit_upgr(uu);
-            _ucInc(uu);
+            _ucInc(uu,rpl);
 
             if(hits>0)then
             begin
@@ -730,7 +748,7 @@ begin
                 if(playeri=UIPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
-               if(pu^.sel=false)and(sel)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
+               if(not rpl)and(pu^.sel=false)and(sel)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -771,7 +789,7 @@ begin
                   if(_death_missile>0)
                   then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
 
-                 if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+                 if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 
@@ -930,7 +948,8 @@ begin
       if(GetBBit(@_bts1,3))then level+=%10;
       buff[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
-      sel:=GetBBit(@_bts1,6);
+      if(rpl)then
+        sel:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
       then _bts2:=_rudata_byte(rpl,0)
       else _bts2:=0;
@@ -980,11 +999,18 @@ begin
    with uu^ do
    with uid^ do
    for i:=0 to MaxUnitLevel do
-   begin
-      if(i>level)then break;
-      if(_isbarrack)then if(_rudata_rld(@uprod_r[i],rpl)>0)then uprod_u[i]:=_rudata_byte(rpl,0);
-      if(_issmith  )then if(_rudata_rld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);
-   end;
+    if(i<=level)then
+    begin
+       if(_isbarrack)then if(_rudata_rld(@uprod_r[i],rpl)>0)then uprod_u[i]:=_rudata_byte(rpl,0);
+       if(_issmith  )then if(_rudata_rld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);
+    end
+    else
+    begin
+       uprod_r[i]:=0;
+       uprod_u[i]:=0;
+       pprod_r[i]:=0;
+       pprod_u[i]:=0;
+    end;
 end;
 
 procedure _rudata_OwnerUData(uu:PTUnit;rpl:boolean);
@@ -996,7 +1022,7 @@ begin
    begin
       b:=_rudata_byte(rpl,0);
 
-      group:=b and %00001111;
+      if(rpl)then group:=b and %00001111;
 
       uo_id:=(b and %01110000)shr 4;
       if(uo_id=ua_patrol)then
@@ -1015,7 +1041,7 @@ begin
       if(_ukbuilding)then
       begin
          if(iscomplete)then _rudata_prod(uu,rpl);
-         if(sel)and(_UnitHaveRPoint(uidi))then
+         if(sel or not rpl)and(_UnitHaveRPoint(uidi))then
          begin
             uo_x:=_rudata_int(rpl,0);
             if(_IsUnitRange(-uo_x,@tu))then
@@ -1124,7 +1150,7 @@ begin
       ou^.vy:=uu^.y;
       _unit_update_xy(ou);
    end
-   else _netSetUcl(uu);
+   else _netSetUcl(uu,rpl);
 end;
 
 

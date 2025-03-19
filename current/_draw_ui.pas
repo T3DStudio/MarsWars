@@ -724,6 +724,7 @@ begin
    d_Hints(tar,VisPlayer);
 
    // resources
+   if(VisPlayer>0)then
    with _players[VisPlayer] do
    begin
       limit:=armylimit+uprodl;
@@ -774,6 +775,7 @@ gm_koth    : with g_cpoints[1] do
    if(vid_APM)then _draw_text(tar,ui_apmx,ui_apmy,'APM: '+_playerAPM[VisPlayer].APM_Str                ,ta_left,255,c_white);
    if(vid_FPS)then _draw_text(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_left,255,c_white);
 
+   if(VisPlayer>0)then
    d_GroupsIcons(tar);
 end;
 

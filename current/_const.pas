@@ -249,16 +249,7 @@ nmid_getinfo           = 66;
 //
 
 uo_build               = 1;
-uo_dblselect           = 2;
-uo_adblselect          = 3;
-uo_select              = 4;
-uo_aselect             = 5;
-uo_selorder            = 6;
-uo_setorder            = 7;
-uo_corder              = 8;
-uo_specsel             = 9;
-uo_addorder            = 10;
-
+uo_corder              = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -710,9 +701,9 @@ BaseArmorLevel1        = 2;
 UpgradeUnitArmorBonus  = BaseArmorBonus1;
 UpgradeBuildArmorBonus = BaseArmorBonus1*2+(BaseArmorBonus1 div 3);
 
-BaseHeal1              = BaseDamage1 div 4;
+BaseHeal1              = BaseDamage1 div 3;
 BaseHealBonus1         = BaseDamageBonus1*2;
-BaseRepair1            = BaseDamage1 div 4;
+BaseRepair1            = BaseDamage1 div 3;
 BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamage1 div 10;
@@ -909,8 +900,8 @@ hell_vision_time       = fr_fps1*8;
 //mstrike_reload         = fr_fps1*ptime5;
 //haltar_reload          = fr_fps1*ptime5;
 
-step_build_reload      = fr_fps1*4;
-max_build_reload       = step_build_reload*4;
+step_build_reload      = fr_fps1*5;
+max_build_reload       = step_build_reload*3;
 
 melee_r                = 8;
 mine_r                 = melee_r*3;

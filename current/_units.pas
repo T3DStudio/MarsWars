@@ -380,7 +380,7 @@ begin
        with pu^ do
        with uid^ do
        with player^ do
-         if((armylimit+tu^.uid^._limituse)>MaxPlayerLimit)then exit;
+         if((armylimit+tu^.uid^._limituse+uprodl)>MaxPlayerLimit)then exit;
 
    _StartResurrection:=true;
 
@@ -1588,14 +1588,12 @@ wpt_unit       : if(not fakemissile)then _ability_unit_spawn(pu,aw_oid);
 wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
                  begin
                     damage:=ApplyDamageMod(tu,aw_dmod,aw_count+upgradd);
-                    painX :=1;
-                    _unit_damage(tu,damage,painX,playeri,false);
+                    _unit_damage(tu,damage,1,playeri,false);
                  end;
 wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
                   if(not _TryZombification(pu,tu))then
                   begin
                      damage:=ApplyDamageMod(tu,aw_dmod,aw_count+upgradd);
-                     painX :=1;
                      _unit_damage(tu,damage,1,playeri,false);
                   end;
 wpt_suicide    : if(ServerSide)then _unit_kill(pu,false,true,true,false,true);

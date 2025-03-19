@@ -652,7 +652,6 @@ begin
    end;  }
 end;
 
-
 procedure _draw_dbg;
 var u,ix,iy:integer;
     c:cardinal;
@@ -723,7 +722,8 @@ begin
 
            _draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
            _draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           _draw_text(r_screen,ix,iy+20,i2s(fx )+' '+i2s(fy ), ta_left,255, PlayerGetColor(playeri));
+           //_draw_text(r_screen,ix,iy+20,i2s(_unit_SpriteDepth(_punits[u]) ), ta_left,255, PlayerGetColor(playeri));
+           _draw_text(r_screen,ix,iy+30,b2c[ukfly], ta_left,255, PlayerGetColor(playeri));
            //_draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 //           _draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));

@@ -365,9 +365,6 @@ begin
 
    if(andstart)then GameMakeReset;
 end;
-{$ELSE}
-{$include _ded.pas}
-{$ENDIF}
 
 function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
 begin
@@ -375,18 +372,130 @@ begin
 end;
 
 
+procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
+var u ,
+usel_max:integer;
+wassel,
+SelectBuildings:boolean;
+begin
+   with _players[HPlayer] do
+     if(UIPlayer<>HPlayer)
+     or(observer)
+     or(army=0)
+     or(rpls_state=rpls_state_read)then exit;
+
+   if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
+   if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
+   usel_max:=32000;
+   if(CheckSimpleClick(x0,y0,x1,y1))then usel_max:=1;
+
+   SelectBuildings:=true;
+   if(fuid=255)then
+   for u:=1 to MaxUnits do
+    with _punits[u]^ do
+     if(hits>0)and(playern=playeri)and(not _isUnitRange(transport,nil))then
+      with uid^ do
+       if(not _ukbuilding)then
+         if((x0-_r)<=vx)and(vx<=(x1+_r))
+        and((y0-_r)<=vy)and(vy<=(y1+_r))then
+         begin
+            SelectBuildings:=false;
+            break;
+         end;
+
+   for u:=1 to MaxUnits do
+     with _punits[u]^ do
+       if(hits>0)and(playern=playeri)and(not _IsUnitRange(transport,nil))then
+       begin
+          wassel:=sel;
+
+          sel:=false;
+          if(usel_max>0)then
+            if(not add)or(not wassel and add)then
+              if(fuid=255)or(fuid=uidi)then
+                with uid^ do
+                  sel:=((x0-_r)<=vx)and(vx<=(x1+_r))
+                    and((y0-_r)<=vy)and(vy<=(y1+_r))
+                    and(SelectBuildings or not _ukbuilding);
+
+          if(wassel<>sel)then
+            if(sel)
+            then _unit_counters_inc_select(_punits[u])
+            else _unit_counters_dec_select(_punits[u]);
+          if(sel)then
+          begin
+             UpdateLastSelectedUnit(unum);
+             if(usel_max>0)then usel_max-=1;
+          end;
+       end;
+end;
+procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
+var u:integer;
+wassel:boolean;
+begin
+   with _players[HPlayer] do
+     if(UIPlayer<>HPlayer)
+     or(observer)
+     or(army=0)
+     or(rpls_state=rpls_state_read)then exit;
+
+   for u:=1 to MaxUnits do
+    with _punits[u]^ do
+     if(hits>0)and(playern=playeri)and(not _IsUnitRange(transport,nil))then
+     begin
+        wassel:=sel;
+
+        sel:=false;
+        if(not add)or(not wassel and add)then
+          case fgroup of
+          0..
+          MaxUnitGroups: sel:=group=fgroup;
+          254          : sel:=UnitF1Select(_punits[u]);
+          255          : sel:=UnitF2Select(_punits[u]);
+          end;
+
+        if(wassel<>sel)then
+          if(sel)
+          then _unit_counters_inc_select(_punits[u])
+          else _unit_counters_dec_select(_punits[u]);
+
+        if(sel)then UpdateLastSelectedUnit(unum);
+     end;
+end;
+procedure units_Grouping(add:boolean;playern,fgroup:byte);
+var u:integer;
+begin
+   with _players[HPlayer] do
+     if(UIPlayer<>HPlayer)
+     or(observer)
+     or(army=0)
+     or(rpls_state=rpls_state_read)then exit;
+
+   if(fgroup<=MaxUnitGroups)then
+     for u:=1 to MaxUnits do
+       with _punits[u]^ do
+         if(hits>0)and(playern=playeri)and(not _IsUnitRange(transport,nil))then
+           case add of
+           false: if(sel)
+                  then group:=fgroup
+                  else
+                    if(group=fgroup)then group:=0;
+           true : if(sel)
+                  then group:=fgroup;
+           end;
+end;
+
+{$ELSE}
+{$include _ded.pas}
+{$ENDIF}
+
 procedure PlayerExecuteOrder(pl:byte);
 var
-_su,_eu,d,
-usel_n,
-usel_max  : integer;
-psel      : boolean;
-oa,
+_su,_eu,d : integer;
 pu,
 sability_u: PTUnit;
 sability_d: integer;
 begin
-   oa:=nil;
    with _players[pl] do
    if(o_id>0)and(army>0)then
    begin
@@ -396,15 +505,6 @@ begin
       case o_id of
 uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_x1),_unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
       else
-         usel_n  :=0;
-         usel_max:=MaxPlayerUnits;
-         if(o_id in [uo_select,uo_aselect])then
-         begin
-            if(o_x0>o_x1)then begin _su:=o_x1;o_x1:=o_x0;o_x0:=_su;end;
-            if(o_y0>o_y1)then begin _su:=o_y1;o_y1:=o_y0;o_y0:=_su;end;
-            if(CheckSimpleClick(o_x0,o_y0,o_x1,o_y1))then usel_max:=1;
-         end;
-
          _su :=1;
          _eu:=MaxUnits+1;
          if(o_id=uo_corder)then
@@ -422,6 +522,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
 
          sability_d:=sability_d.MaxValue;
          sability_u:=nil;
+         writeln('order ',o_id,' ',o_x0,' ',o_y0,' ',o_x1,' ',o_y1,' ',o_a0);
 
          while(_su<>_eu)do
          begin
@@ -430,33 +531,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
             with uid^ do
              if(hits>0)and(not _IsUnitRange(transport,nil))and(pl=playeri)then
              begin
-                psel:=sel;
-
-                // common select
-                if (o_id=uo_select )
-                or((o_id=uo_aselect)and(not sel))then
-                begin
-                   sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
-                     and((o_y0-_r)<=vy)and(vy<=(o_y1+_r));
-                   if(speed <=0)and(usel_max>1)and(o_id<>uo_aselect)then sel:=false;
-                   if(usel_n>=usel_max)then sel:=false;
-                end;
-                if(o_id=uo_selorder)and((o_y0=0)or(not sel))then sel:=(group=o_x0);
-                if(o_id=uo_dblselect)or((o_id=uo_adblselect)and(not sel))then
-                begin
-                   if(oa=nil)then
-                    if(not _IsUnitRange(o_a0,@oa))then break;
-                   if(uidi=oa^.uidi)
-                   then sel:=((o_x0-_r)<=vx)and(vx<=(o_x1+_r))
-                          and((o_y0-_r)<=vy)and(vy<=(o_y1+_r))
-                   else if(o_id<>uo_adblselect)then sel:=false;
-                end;
-                if(o_id=uo_specsel)then
-                  if(UnitF2Select(pu))
-                  then sel:=true
-                  else
-                    if(o_y0=0)then sel:=false;
-
                 if(o_id=uo_corder)then
                  case o_x0 of
                  co_supgrade : if(s_smiths  <=0)or(sel)then if(_unit_supgrade (pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  upgr
@@ -473,8 +547,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                 if(sel)then
                 begin
                    case o_id of
-               uo_setorder,
-               uo_addorder   : if(0<=o_x0)and(o_x0<MaxUnitGroups)then group:=o_x0;
                uo_corder     : if(o_x0=co_psability)then
                                begin
                                   if(uo_id<>ua_psability)
@@ -490,22 +562,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                                      end;
                                end
                                else
-                                  if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1,o_a0))then begin PlayerClearProdError(player);break;end;
+                                  if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1,o_a0))then begin writeln('PlayerClearProdError'); PlayerClearProdError(player);break;end;
                    end;
-
-                   if(psel=false)then
-                   begin
-                      _unit_counters_inc_select(pu);
-                      {$IFDEF _FULLGAME}
-                      UpdateLastSelectedUnit(unum);
-                      {$ENDIF}
-                   end;
-                   usel_n+=1;
-                end
-                else
-                begin
-                   if(psel=true)then _unit_counters_dec_select(pu);
-                   if(o_id=uo_setorder)and(group=o_x0)then group:=0;
                 end;
              end;
 
