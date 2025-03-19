@@ -81,16 +81,15 @@ begin
     end;
 
    net_writebyte(pid         );
-   net_writebyte(PlayerLobby );
+   net_writebyte(PlayerLobb1 );
 
    net_writebyte(g_preset_cur);
-   net_writeint (map_size    );
+   net_writeint (map_psize    );
    net_writebyte(map_type    );
    net_writecard(map_seed    );
    net_writebyte(map_symmetry);
 
    net_writebyte(g_mode           );
-   net_writebyte(g_start_base     );
    net_writebool(g_fixed_positions);
    net_writebyte(g_ai_slots       );
    net_writebyte(g_generators     );
@@ -235,7 +234,6 @@ nmid_lobbby_mapsize     : if(map_SetSetting(pid,mid,net_readint ,false))then {$I
 nmid_lobbby_type        : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_lobbby_symmetry    : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_lobbby_gamemode,
-nmid_lobbby_builders,
 nmid_lobbby_generators,
 nmid_lobbby_FixStarts,
 nmid_lobbby_DeadPObs,
@@ -348,7 +346,7 @@ begin
    net_ClientReadMapData:=false;
 
    if(rByte(@g_preset_cur     ,g_preset_n           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rInt (@map_size         ,MinMapSize,MaxMapSize))then begin redraw_menu:=true;new_map:=true;end;
+   if(rInt (@map_psize         ,MinMapSize,MaxMapSize))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@map_type         ,gms_m_types          ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(StartGame)
@@ -360,7 +358,6 @@ begin
 
    if(rByte(@map_symmetry     ,gms_m_symm       ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_mode           ,gms_count        ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rByte(@g_start_base     ,gms_g_startb     ))then begin redraw_menu:=true;              end;
    if(rBool(@g_fixed_positions                  ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_ai_slots       ,gms_g_maxai      ))then begin redraw_menu:=true;              end;
    if(rByte(@g_generators     ,gms_g_maxgens    ))then begin redraw_menu:=true;new_map:=true;end;
@@ -543,10 +540,10 @@ nmid_lobby_info  : begin
                          CleintProtocolError(@str_error_WrongVersion);
                          exit;
                       end;
-                      if(PlayerLobby<>i)then
+                      if(PlayerLobb1<>i)then
                       begin
                          menu_remake:=true;
-                         PlayerLobby:=i;
+                         PlayerLobb1:=i;
                       end;
 
                       // map and game settings

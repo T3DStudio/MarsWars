@@ -8,14 +8,6 @@ begin
    rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
-function ShadowColor(c:cardinal):cardinal;
-begin
-   ShadowColor:=128 +
-   (((c and $FF000000) shr 25) shl 24) +
-   (((c and $00FF0000) shr 17) shl 16) +
-   (((c and $0000FF00) shr  9) shl 8 );
-end;
-
 procedure draw_mwtexture(s_dst:pSDL_Surface;x,y:integer;mwt_src:PTMWTexture);
 begin
    with mwt_src^ do
@@ -134,7 +126,7 @@ begin
 
       case charc of
       tc_player0..
-      tc_player7  : tcolor:=PlayerColorScheme[ord(charc)];
+      tc_player7  : tcolor:=PlayerColorNormal[ord(charc)];
       tc_nl1,
       tc_nl2      : begin
                        x:=ix;
@@ -227,10 +219,10 @@ begin
    sdl_FillRect(r_bminimap,nil,0);
 
    mmx:=0;
-   for gx:=0 to map_LastCell do
+   for gx:=0 to map_csize do
    begin
       mmy:=0;
-      for gy:=0 to map_LastCell do
+      for gy:=0 to map_csize do
       begin
          case map_grid[gx,gy].tgc_solidlevel of
 mgsl_nobuild : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_ltgray);
@@ -251,13 +243,13 @@ begin
 end;
 
 procedure map_MinimapPlayerStarts(tar:pSDL_Surface;UnknownStarts,teamStarts:boolean);
-var i    :byte;
+var p    :byte;
     x,y,r:integer;
 begin
-   for i:=0 to LastPlayer do
+   for p:=0 to LastPlayer do
    begin
-      x:=round(map_PlayerStartX[i]*map_mm_cx);
-      y:=round(map_PlayerStartY[i]*map_mm_cx);
+      x:=round(map_PlayerStartX[p]*map_mm_cx);
+      y:=round(map_PlayerStartY[p]*map_mm_cx);
       r:=trunc(base_1r*map_mm_cx);
 
       // clear
@@ -268,16 +260,16 @@ begin
       if(UnknownStarts)then
       begin
          if(teamStarts)
-         then map_MinimapSpot(tar,x,y,r,chr(ord('1')+PlayerSlotGetTeam(g_mode,i,255)),c_white)
+         then map_MinimapSpot(tar,x,y,r,chr(ord('1')+PlayerSlotGetTeam(g_mode,p,255)),c_white)
          else map_MinimapSpot(tar,x,y,r,'?',c_white)
       end
       else
-        if (g_slot_state[i]<>pss_closed  )
-        and(g_slot_state[i]<>pss_observer)
+        if (g_slot_state[p]<>pss_closed  )
+        and(g_slot_state[p]<>pss_observer)
         then
-          if(g_players[i].player_type>pt_none)or(g_ai_slots>0)
-          then map_MinimapSpot(tar,x,y,r,b2s(i+1)[1],PlayerColorScheme[i])
-          else map_MinimapSpot(tar,x,y,r,'+'        ,c_white);
+          if(g_players[p].player_type>pt_none)or(g_ai_slots>0)
+          then map_MinimapSpot(tar,x,y,r,b2s(p+1)[1],PlayerColorNormal[p])
+          else map_MinimapSpot(tar,x,y,r,'+'        ,c_white             );
    end;
 
    {x:=round(map_symmetryX0*map_mm_cx);
@@ -327,8 +319,8 @@ begin
    }
    ui_AddMarker:=false;
 
-   ax:=mm3i(1,ax,map_size);
-   ay:=mm3i(1,ay,map_size);
+   ax:=mm3i(1,ax,map_psize);
+   ay:=mm3i(1,ay,map_psize);
 
    mx:=trunc(ax*map_mm_cx);
    my:=trunc(ay*map_mm_cx);
@@ -387,7 +379,7 @@ begin
       with g_players[UIPlayer] do
         with log_l[log_i] do
           case mtype of
-lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
+lmt_unit_promoted    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
 lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);

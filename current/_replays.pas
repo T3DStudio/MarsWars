@@ -87,12 +87,11 @@ begin
    AddItem(@g_version        ,SizeOf(g_version        ));
    AddItem(@G_Step           ,SizeOf(G_Step           ));
    AddItem(@map_seed         ,SizeOf(map_seed         ));
-   AddItem(@map_size         ,SizeOf(map_size         ));
+   AddItem(@map_psize         ,SizeOf(map_psize         ));
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
    AddItem(@g_mode           ,SizeOf(g_mode           ));
-   AddItem(@g_start_base     ,SizeOf(g_start_base     ));
    AddItem(@g_generators     ,SizeOf(g_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
@@ -327,7 +326,7 @@ begin
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
    begin
-      rpls_rstate    :=rpls_state_none;
+      rpls_rstate   :=rpls_state_none;
       G_Started     :=false;
       rpls_str_info1:='';
       rpls_str_info2:='';
@@ -389,7 +388,7 @@ begin
          {$I-}
          {BlockRead(rpls_file,G_Step           ,SizeOf(G_Step           ));
          BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
-         BlockRead(rpls_file,map_size         ,SizeOf(map_size         ));
+         BlockRead(rpls_file,map_psize         ,SizeOf(map_psize         ));
          BlockRead(rpls_file,map_type         ,SizeOf(map_type         ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_type         ));
          BlockRead(rpls_file,theme_cur        ,SizeOf(theme_cur        ));
@@ -406,11 +405,10 @@ begin
             BlockRead(rpls_file,byte(data_p^),data_s);
          {$I+}
 
-         if(map_size<MinMapSize)or(map_size>MaxMapSize)
+         if(map_psize<MinMapSize)or(map_psize>MaxMapSize)
          or(map_type      >gms_m_types  )
          or(map_symmetry  >gms_m_symm   )
          or(g_mode        >gms_count    )
-         or(g_start_base  >gms_g_startb )
          or(g_generators  >gms_g_maxgens)
          or(g_ai_slots    >gms_g_maxai  )
          or(rpls_POVPlayer>LastPlayer   )then
@@ -515,7 +513,7 @@ begin
 
       if(G_Status=gs_running)then rclinet_gframe(rpls_POVPlayer,true,rpls_ForwardStep>1);
 
-      if(rpls_ForwardStep>1)then effects_sprites(false,false);
+      if(rpls_ForwardStep>1)then d_SpriteListAddEffects(false,false);
       rpls_ForwardStep-=1;
    end;
 

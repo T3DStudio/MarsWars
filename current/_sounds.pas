@@ -400,7 +400,7 @@ procedure SoundPlayUnitSelect;
 const annoystart = 6;
       annoystop  = 12;
 begin
-   if(IsUnitRange(ui_UnitSelectedNU,nil))then
+   if(IsIntUnitRange(ui_UnitSelectedNU,nil))then
    begin
       if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
@@ -441,7 +441,7 @@ lmt_player_surrender,
 lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
-lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
+lmt_unit_promoted     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
 lmt_unit_ready        : with g_uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
@@ -450,7 +450,6 @@ lmt_already_adv,
 lmt_NeedMoreProd,
 lmt_MaximumReached,
 lmt_unit_needbuilder,
-lmt_UsepsabilityOrder,
 lmt_unit_limit,
 lmt_production_busy,
 lmt_req_ruids,
@@ -495,7 +494,7 @@ begin
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 
-   if(G_Started)and(G_status=0)and(not menu_state)
+   if(G_Started)and(G_status=gs_running)and(not menu_state)
    then SoundPlayUnitSelect;
 end;
 

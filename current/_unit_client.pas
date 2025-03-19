@@ -142,12 +142,12 @@ begin
       SetBBit(@_bts2,7, buff[ub_Decay       ]>0);
 
       SetBBit(@_bts1,0, iscomplete             );
-      SetBBit(@_bts1,1, IsUnitRange(transport,nil));
+      SetBBit(@_bts1,1, IsIntUnitRange(transport,nil));
       SetBBit(@_bts1,2, (level and %01)      >0);
       SetBBit(@_bts1,3, (level and %10)      >0);
       SetBBit(@_bts1,4, buff[ub_Pain        ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_reload>0));
-      SetBBit(@_bts1,6, isselected             );
+      ///SetBBit(@_bts1,6, isselected             );
       SetBBit(@_bts1,7, _bts2>0                );
 
       wudata_byte(_bts1,rpl);
@@ -216,14 +216,14 @@ begin
       if(_ukbuilding)then
       begin
          if(iscomplete)then wudata_production(pu,rpl);
-         if(isselected)and(UnitHaveRPoint(pu^.uidi))then
-           if(IsUnitRange(ua_tar,nil))
+         {if(isselected)and(UnitHaveRPoint(pu^.uidi))then
+           if(IsIntUnitRange(ua_tar,nil))
            then wudata_int(-ua_tar,rpl)
            else
            begin
               wudata_int(ua_x,rpl);
               wudata_int(ua_y,rpl);
-           end;
+           end; }
       end;
    end;
 end;
@@ -245,7 +245,7 @@ begin
          wudata_byte(uidi,rpl);
          wudata_StatusBytes(pu,rpl);
 
-         if(IsUnitRange(transport,nil))
+         if(IsIntUnitRange(transport,nil))
          then wudata_int(transport,rpl)
          else
            if(hits_si>0)then
@@ -264,7 +264,7 @@ begin
             if(a_tar_cl>0)and(a_reload>0)then
             begin
                wt:=0;
-               if(IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
+               if(IsIntUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
                wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
                wudata_word(wt,rpl);
             end;
@@ -460,11 +460,10 @@ begin
       uid_e[uidi            ]+=1;
 
       ptransport:=nil;
-      if(IsUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
+      if(IsIntUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(isselected)then unit_PC_select_inc(pu);
          if(not iscomplete)
          then cenergy-=_renergy
          else
@@ -474,13 +473,13 @@ begin
             p:=@ucl_x[_ukbuilding,_ucl];
             if(p^=0)
             then p^:=unum
-            else if(IsUnitRange(p^,nil))then
+            else if(IsIntUnitRange(p^,nil))then
                    if(g_units[p^].uid^._ucl<>_ucl)then p^:=unum;
 
             p:=@uid_x[uidi];
             if(p^=0)
             then p^:=unum
-            else if(IsUnitRange(p^,nil))then
+            else if(IsIntUnitRange(p^,nil))then
                    if(g_units[p^].uidi<>uidi)then p^:=unum;
 
             if(_isbarrack)then
@@ -527,11 +526,10 @@ begin
       uid_e[uidi            ]-=1;
 
       ptransport:=nil;
-      if(IsUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;
+      if(IsIntUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(isselected)then unit_PC_select_dec(pu);
          if(not iscomplete)
          then cenergy+=_renergy
          else
@@ -588,11 +586,10 @@ begin
    begin
       vx:=x;
       vy:=y;
-      if(uid^._ability=uab_HKeepBlink)then
+      if(uid^._ability=ua_HKeepBlink)then
       begin
          case uidi of
 UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_cube    );
-UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_cube    );
          else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport);
          end;
          buff[ub_CCast]:=fr_fps1;
@@ -616,18 +613,18 @@ var pu,tu:PTUnit;
 begin
    // pu - previous state
    // uu - current state
-   pu:=@g_units[0];
+   pu:=g_punits[0];
    with uu^ do
    with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // unit created
      begin
         unit_SetDefaults(uu,true);
-        unit_BaseVision     (uu,true);
+        unit_BaseVision (uu,true);
         vx:=x;
         vy:=y;
         vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
-        if(IsUnitRange(transport,@tu))then
+        if(IsIntUnitRange(transport,@tu))then
         begin
            unit_InTransportCode(uu,tu);
            vx:=x;
@@ -647,7 +644,6 @@ begin
            begin
               if(not iscomplete)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
-              if(isselected)then UpdateLastSelectedUnit(unum);
            end;
         end;
 
@@ -667,12 +663,12 @@ begin
 
           if(pu^.hits>0)and(vis)then
           begin
-             if(hits>ndead_hits)and(not IsUnitRange(transport,nil))then
+             if(hits>ndead_hits)and(not IsIntUnitRange(transport,nil))then
              begin
                 if(buff[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
-                  if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                  if(_ukbuilding)and(_ability<>ua_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                 effect_UnitDeath(uu,true,@vis);
              end;
           end;
@@ -716,7 +712,7 @@ begin
                 if(playeri=UIPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
-               if(pu^.isselected=false)and(isselected)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
+               //if(pu^.isselected=false)and(isselected)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -724,9 +720,9 @@ begin
                   if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
                    case uid^._ability of
                0:;
-               uab_UACStrike   : unit_ability_UACStrike_Shot(uu);
-               uab_UACScan     : if(ui_UIPlayerTeam(team))then SoundPlayUnit(snd_radar,nil,nil);
-               uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
+               ua_UStrike   : unit_ability_UACStrike_Shot(uu);
+               ua_UScan     : if(ui_UIPlayerTeam(team))then SoundPlayUnit(snd_radar,nil,nil);
+               ua_HSpawnLost   : if(upgr[upgr_hell_phantoms]>0)
                                  then ability_SpawnUnitStep(pu,UID_Phantom )
                                  else ability_SpawnUnitStep(pu,UID_LostSoul);
                    end;
@@ -750,7 +746,7 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buff[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
-                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                   if(_ukbuilding)and(_ability<>ua_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
@@ -761,8 +757,8 @@ begin
                  reload:=0;
               end;
 
-            if(not IsUnitRange(pu^.transport,nil))then
-             if(IsUnitRange(transport,@tu))then unit_InTransportCode(uu,tu);
+            if(not IsIntUnitRange(pu^.transport,nil))then
+             if(IsIntUnitRange(transport,@tu))then unit_InTransportCode(uu,tu);
 
             if(speed>0)then
             begin
@@ -919,7 +915,7 @@ begin
       if(GetBBit(@_bts1,3))then level+=%10;
       buff[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
-      isselected:=GetBBit(@_bts1,6);
+      //isselected:=GetBBit(@_bts1,6);
       if(GetBBit(@_bts1,7))
       then _bts2:=rudata_byte(rpl,0)
       else _bts2:=0;
@@ -998,10 +994,10 @@ begin
       if(_ukbuilding)then
       begin
          if(iscomplete)then rudata_production(uu,rpl);
-         if(isselected)and(UnitHaveRPoint(uidi))then
+         {if(isselected)and(UnitHaveRPoint(uidi))then
          begin
             ua_x:=rudata_int(rpl,0);
-            if(IsUnitRange(-ua_x,@tu))then
+            if(IsIntUnitRange(-ua_x,@tu))then
             begin
                ua_tar:=-ua_x;
                ua_x  :=tu^.vx;
@@ -1012,7 +1008,7 @@ begin
                ua_tar:=0;
                ua_y  :=rudata_int(rpl,0);
             end;
-         end;
+         end; }
       end;
    end;
 end;
@@ -1059,7 +1055,7 @@ begin
          if(transport>0)then
          begin
             transport:=rudata_int(rpl,0);
-            if(not IsUnitRange(transport,nil))then transport:=0;
+            if(not IsIntUnitRange(transport,nil))then transport:=0;
          end
          else
            if(sh>0)then

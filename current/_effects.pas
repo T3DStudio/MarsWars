@@ -77,9 +77,9 @@ begin
         MID_Blizzard,
         EID_BBExp         : setEID(@spr_eff_ebb        ,sms_death);
         EID_HKeep_H,
-        EID_HKeep_S       : setEID(@spr_HKeep          ,sms_walk );
+        EID_HKeep_S       : setEID(@spr_HKeep1          ,sms_walk );
         EID_HAKeep_H,
-        EID_HAKeep_s      : setEID(@spr_HAKeep         ,sms_walk );
+        EID_HAKeep_s      : setEID(@spr_HKeep2         ,sms_walk );
         EID_db_h0         : setEID(@spr_db_h0          ,sms_death);
         EID_db_h1         : setEID(@spr_db_h1          ,sms_death);
         EID_db_u0         : setEID(@spr_db_u0          ,sms_death);
@@ -269,7 +269,7 @@ begin
    end;
 end;
 
-procedure missiles_sprites(draw:boolean);
+procedure d_SpriteListAddMissiles;
 var  m:integer;
    spr:PTMWTexture;
 begin
@@ -278,12 +278,8 @@ begin
    with g_mids[mid] do
    if(vstep>0)then
    begin
-      spr:=@spr_dummy;
-
       spr:=sm_SModel2MWTexture(ms_smodel,sms_stand,dir,0,nil);
-
-      if(draw)then
-       if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,SpriteDepth(vy,mfs)+100,0,spr,255);
+      if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then SpriteListAddEffect(vx,vy,SpriteDepth(vy,mfs)+100,0,spr,255);
    end;
 end;
 
@@ -296,7 +292,7 @@ begin
    effect_add(tx,ty,SpriteDepth(ty+1,ukfly),eidend  );
 end;
 
-procedure effects_sprites(noanim,draw:boolean);
+procedure d_SpriteListAddEffects(noanim,draw:boolean);
 var ei,
  alpha:integer;
    spr:PTMWTexture;
@@ -320,7 +316,7 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
          else   alpha:=min2i(255,anim_last_i_t);
          end;
 
-        if(noanim=false)then
+        if(not noanim)then
         begin
            if(anim_i<>anim_last_i)then
            begin
@@ -336,12 +332,13 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
            end;
         end;
 
+        if(not draw)then continue;
+
         if(anim_step>0)
         then spr:=sm_SModel2MWTexture(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
         else spr:=sm_SModel2MWTexture(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
-        if(draw)then
-         if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
+        if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
      end;
 end;
 

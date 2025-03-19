@@ -3,6 +3,7 @@ procedure PlayerSetSkirmishTech(PlayerTarget:byte);
 begin
    with g_players[PlayerTarget] do
    begin
+      {
       PlayerSetAllowedUnits(PlayerTarget,[UID_HKeep         ..UID_HBarracks,
                                           UID_LostSoul      ..UID_ZBFGMarine,
                                           UID_UCommandCenter..UID_UComputerStation,
@@ -10,19 +11,16 @@ begin
                                           MaxUnits,true);
 
       PlayerSetAllowedUnits(PlayerTarget,[UID_HMonastery ,UID_HFortress       ,UID_HAltar,
-                                          UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false);
+                                          UID_UTechCenter,UID_UComputerStation,UID_URMStation ],1,false); }
 
+      PlayerSetAllowedUnits(PlayerTarget,uids_all,MaxUnits              ,true );
       PlayerSetAllowedUnits(PlayerTarget,[UID_LostSoul, UID_Phantom ],20,false);
 
 
-      case g_generators of
-      0:;
-      1    :PlayerSetAllowedUnits(PlayerTarget,[UID_HKeep     ,UID_HCommandCenter,UID_UCommandCenter                    ],0,false);
-      else  PlayerSetAllowedUnits(PlayerTarget,[UID_HSymbol   ,UID_HASymbol      ,UID_HKeep          ,UID_HCommandCenter,
-                                                UID_UGenerator,UID_UAGenerator   ,UID_UCommandCenter                    ],0,false);
-      end;
+      if(g_generators>0)
+      then PlayerSetAllowedUnits(PlayerTarget,[UID_HSymbol,UID_UGenerator],0,false);
 
-      PlayerSetAllowedUpgrades(PlayerTarget,[0..255],255,true);
+      PlayerSetAllowedUpgrades(PlayerTarget,uids_all,255,true);
    end;
 end;
 
@@ -71,9 +69,9 @@ begin
    else
      if(PlayerClient=SlotSource)then PlayerClient:=SlotTarget;
 
-   if(PlayerLobby=SlotTarget)then PlayerLobby:=SlotSource
+   if(PlayerLobb1=SlotTarget)then PlayerLobb1:=SlotSource
    else
-     if(PlayerLobby=SlotSource)then PlayerLobby:=SlotTarget;
+     if(PlayerLobb1=SlotSource)then PlayerLobb1:=SlotTarget;
 end;
 
 procedure PlayerSetType(PlayerTarget,newType:byte);
@@ -106,20 +104,20 @@ begin
    end;
 
    if(NewState     >=ps_states_n)
-   or(PlayerRequestor>LastPlayer)
+   //or(PlayerRequestor>LastPlayer)
    or(PlayerTarget   >LastPlayer)
    or(G_Started)then exit;
 
    case NewState of
 pss_ready    : with g_players[PlayerTarget] do
                  if(player_type<>pt_human)
-                 or(PlayerTarget=PlayerLobby)
+                 or(PlayerTarget=PlayerLobb1)
                  or(    isready)
                  or(net_status=ns_single)
                  or(PlayerRequestor<>PlayerTarget)then exit;
 pss_nready   : with g_players[PlayerTarget] do
                  if(player_type<>pt_human)
-                 or(PlayerTarget=PlayerLobby)
+                 or(PlayerTarget=PlayerLobb1)
                  or(not isready)
                  or(net_status=ns_single)
                  or(PlayerRequestor<>PlayerTarget)then exit;
@@ -135,18 +133,20 @@ pss_splayer  : with g_players[PlayerTarget] do
                  or(g_slot_state[PlayerTarget]=pss_observer)
                  or(PlayerRequestor<>PlayerTarget)then exit;
    else
-      if(PlayerRequestor=PlayerTarget)then exit;
-
-      if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer)then exit;
-
-      {if(g_preset_cur>0)then
-       with g_presets[g_preset_cur] do
-        if(gp_player_team[PlayerTarget]<=LastPlayer)then
-         case NewState of
-      pss_closed,
-      pss_observer : exit;
-         end
-       else exit; }
+      if(PlayerRequestor<=LastPlayer)then
+      begin
+         if(PlayerRequestor=PlayerTarget)then exit;
+         if(PlayerRequestor<>PlayerLobb1)and(PlayerLobb1<=LastPlayer)then exit;
+         if(g_preset_cur>0)then
+          with g_presets[g_preset_cur] do
+           if(gp_player_team[PlayerTarget]>LastPlayer)
+           then exit
+           else
+             case NewState of
+         pss_closed,
+         pss_observer : exit;
+             end;
+      end;
    end;
 
    PlayerSlotChangeState:=true;
@@ -157,14 +157,14 @@ pss_splayer  : with g_players[PlayerTarget] do
     case NewState of
 pss_closed,
 pss_opened   : begin
-                 PlayerSetType(PlayerTarget,pt_none);
-                 g_slot_state[PlayerTarget]:=NewState;
-                 team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
-              end;
+                  PlayerSetType(PlayerTarget,pt_none);
+                  g_slot_state[PlayerTarget]:=NewState;
+                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
+               end;
 pss_observer : begin
-                 g_slot_state[PlayerTarget]:=NewState;
-                 PlayerSetType(PlayerTarget,pt_none);
-              end;
+                  g_slot_state[PlayerTarget]:=NewState;
+                  PlayerSetType(PlayerTarget,pt_none);
+               end;
 pss_sobserver: isobserver:=true;
 pss_splayer  : isobserver:=false;
 pss_ready    : isready:=true;
@@ -172,11 +172,11 @@ pss_nready   : isready:=false;
 pss_swap     : PlayersSwap(PlayerRequestor,PlayerTarget,false);
 pss_AI_1..
 pss_AI_11    : begin
-                 g_slot_state[PlayerTarget]:=NewState;
-                 ai_skill  :=NewState-pss_AI_1+1;
-                 PlayerSetType(PlayerTarget,pt_ai);
-                 team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
-              end;
+                  g_slot_state[PlayerTarget]:=NewState;
+                  ai_skill:=NewState-pss_AI_1+1;
+                  PlayerSetType(PlayerTarget,pt_ai);
+                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
+               end;
     end;
 end;
 function PlayerSlotChangeRace(PlayerRequestor,PlayerTarget,NewRace:byte;Check:boolean):boolean;
@@ -206,7 +206,7 @@ begin
       or(g_slot_state[PlayerTarget]=pss_observer)then exit;
 
       if((PlayerRequestor= PlayerTarget)and(player_type=pt_human))
-      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=PlayerLobby)or(PlayerLobby>LastPlayer)))
+      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=PlayerLobb1)or(PlayerLobb1>LastPlayer)))
       then
       else exit;
 
@@ -243,11 +243,11 @@ begin
       or( g_slot_state[PlayerTarget]=pss_closed  )
 
       or((pss_AI_1<=g_slot_state[PlayerTarget]   )
-      and(g_slot_state[PlayerTarget]<=pss_AI_11  )and(player_type=pt_ai  )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
+      and(g_slot_state[PlayerTarget]<=pss_AI_11  )and(player_type=pt_ai  )and(PlayerRequestor<>PlayerLobb1 )and(PlayerLobb1<=LastPlayer))
 
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_none))
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_human)and(PlayerRequestor<>PlayerTarget))
-      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai   )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
+      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai   )and(PlayerRequestor<>PlayerLobb1 )and(PlayerLobb1<=LastPlayer))
       or(isobserver)
       then exit;
 
@@ -388,7 +388,7 @@ begin
    PlayerColorSchemeTEAM[6]:=c_purple;
    PlayerColorSchemeTEAM[7]:=c_lpurple;
 
-   UpdateScirmishColorScheme;
+   UpdatePlayerColors;
 
    PlayerClient:=0;
 
@@ -398,7 +398,7 @@ begin
       name       :=PlayerName;
    end;
    g_slot_state[PlayerClient]:=pss_opened;
-   PlayerLobby:=PlayerClient;
+   PlayerLobb1:=PlayerClient;
 
    {$ELSE}
    PlayerClient:=255;
@@ -410,7 +410,7 @@ begin
 end;
 
 procedure InitGamePresets;
-procedure SetPreset(pid:byte;mseed:cardinal;msize:integer;mtype,msym,gmode,t1,t2,t3,t4,t5,t6:byte);
+procedure SetPreset(pid:byte;mseed:cardinal;msize:integer;mtype,msym,gmode,t1,t2,t3,t4,t5,t6,t7,t8:byte);
 begin
    if(g_preset_n<=pid)then
    begin
@@ -430,12 +430,14 @@ begin
       gp_map_symmetry:= msym;
       gp_g_mode      := gmode;
       FillChar(gp_player_team,SizeOf(gp_player_team),0);
-      gp_player_team[1]:=t1;
-      gp_player_team[2]:=t2;
-      gp_player_team[3]:=t3;
-      gp_player_team[4]:=t4;
-      gp_player_team[5]:=t5;
-      gp_player_team[6]:=t6;
+      gp_player_team[0]:=t1;
+      gp_player_team[1]:=t2;
+      gp_player_team[2]:=t3;
+      gp_player_team[3]:=t4;
+      gp_player_team[4]:=t5;
+      gp_player_team[5]:=t6;
+      gp_player_team[6]:=t7;
+      gp_player_team[7]:=t8;
    end;
 end;
 begin
@@ -443,9 +445,9 @@ begin
    g_preset_n  :=0;
    setlength(g_presets,g_preset_n);
 
-   SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,0,1,255,255,255,255);
-   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake ,1,gm_scirmish,0,1,155,255,255,255);
-   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon,1,gm_scirmish,0,1,255,255,255,255);
+   SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,0,1,255,255,255,255,255,255);
+   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake ,1,gm_scirmish,0,1,255,255,255,255,255,255);
+   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon,1,gm_scirmish,0,1,255,255,255,255,255,255);
 
    {$IFNDEF _FULLGAME}
    g_presets[gp_custom].gp_name:= 'custom preset';
@@ -459,8 +461,7 @@ begin
    GameLoadPreset:=false;
 
    if(G_Started)
-   or(PlayerRequestor>lastPlayer)
-   or((PlayerLobby<>PlayerRequestor)and(PlayerLobby<=LastPlayer))
+   or((PlayerRequestor<=LastPlayer)and(PlayerLobb1<>PlayerRequestor)and(PlayerLobb1<=LastPlayer))
    or(preset>=g_preset_n)then exit;
 
    GameLoadPreset:=true;
@@ -473,7 +474,7 @@ begin
    with g_presets[g_preset_cur] do
    begin
       map_seed    := gp_map_seed;
-      map_size    := gp_map_mw;
+      map_psize    := gp_map_mw;
       map_type    := gp_map_type;
       map_symmetry:= gp_map_symmetry;
       g_mode      := gp_g_mode;
@@ -481,9 +482,9 @@ begin
                   := false;
 
       for p:=0 to LastPlayer do
-        if(gp_player_team[p]>0)
-        then PlayerSlotChangeState(0,p,pss_opened  ,false)
-        else PlayerSlotChangeState(0,p,pss_observer,false);
+        if(gp_player_team[p]<=LastPlayer)
+        then PlayerSlotChangeState(255,p,pss_opened  ,false)
+        else PlayerSlotChangeState(255,p,pss_observer,false);
 
       {$IFDEF _FULLGAME}
       PlayerSetType(PlayerClient,pt_human);
@@ -498,7 +499,7 @@ function GameSetCommonSetting(PlayerRequestor,setting,NewVal:byte;Check:boolean)
 begin
    GameSetCommonSetting:=false;
    if(G_Started)
-   or((PlayerRequestor<=LastPlayer)and(PlayerLobby<=LastPlayer)and(PlayerLobby<>PlayerRequestor))
+   or((PlayerRequestor<=LastPlayer)and(PlayerLobb1<=LastPlayer)and(PlayerLobb1<>PlayerRequestor))
    then exit;
 
    case setting of
@@ -509,12 +510,6 @@ nmid_lobbby_gamemode    : if(g_preset_cur=0)then
                              if(Check)then exit;
                              g_mode:=NewVal;
                              map_Make1;
-                          end;
-nmid_lobbby_builders    : begin
-                             if(NewVal>gms_g_startb)then exit;
-                             GameSetCommonSetting:=true;
-                             if(Check)then exit;
-                             g_start_base:=NewVal;
                           end;
 nmid_lobbby_generators  : begin
                              if(NewVal>gms_g_maxgens)then exit;
@@ -639,33 +634,31 @@ end;
 {$include _replays.pas}
 {$ENDIF}
 
-procedure GameCreateStartBase(x,y:integer;uidF,uidA,pl,c:byte;AdvancedBase:boolean);
+procedure GameCreateStartBase(x,y:integer;uid,level,pl,c:byte);
 var
-n,uid :byte;
-r,d,ds:integer;
-procedure _Spawn(tx,ty:integer);
+n  : byte;
+r,d,
+ds : integer;
+procedure Spawn(tx,ty:integer);
 begin
-   if(n=0)and(AdvancedBase)and(c=0)
-   then uid:=uidA
-   else uid:=uidF;
-   unit_add(tx,ty,0,uid    ,pl,true,false,0);
+   unit_add(tx,ty,0,uid,pl,true,false,level);
    n+=1;
 end;
 begin
    n:=0;
    if(c>6)then c:=6;
 
-   _Spawn(x,y);
+   Spawn(x,y);
 
    if(c=0)then exit;
 
-   d  :=point_dir(x,y,map_hsize,map_hsize);
+   d  :=point_dir(x,y,map_phsize,map_phsize);
    ds :=360 div c;
    r  :=g_uids[uid]._r*2+2;
 
    while(c>0) do
    begin
-      _Spawn(
+      Spawn(
       x+trunc(r*cos(d*degtorad)),
       y-trunc(r*sin(d*degtorad)));
       d+=ds;
@@ -676,8 +669,9 @@ end;
 procedure GameConfigureSkirmish;
 var p:byte;
 begin
-   g_royal_r:=trunc(sqrt(sqr(map_hsize)*2));
+   g_royal_r:=trunc(sqrt(sqr(map_phsize)*2));
 
+   // Basic player settings
    for p:=0 to LastPlayer do
      with g_players[p] do
      begin
@@ -713,13 +707,13 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
      begin
         PlayerSetSkirmishTech(p);
         ai_PlayerSetSkirmishSettings(p);
-        if (0<=map_PlayerStartX[p])and(map_PlayerStartX[p]<=map_size)
-        and(0<=map_PlayerStartY[p])and(map_PlayerStartY[p]<=map_size)then
+        if (0<=map_PlayerStartX[p])and(map_PlayerStartX[p]<=map_psize)
+        and(0<=map_PlayerStartY[p])and(map_PlayerStartY[p]<=map_psize)then
         begin
            GameCreateStartBase(map_PlayerStartX[p],
                                map_PlayerStartY[p],
-                               uid_race_start_fbase[race],
-                               uid_race_start_abase[race],p,g_start_base,g_generators>0);
+                               uid_race_start_base[race],
+                               3*byte(g_generators>0),p,2);
            unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
@@ -740,9 +734,9 @@ begin
    GameStartScirmish:=false;
 
    if(G_Started)
-   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer))then exit;
+   or((PlayerRequestor<>PlayerLobb1)and(PlayerLobb1<=LastPlayer))then exit;
 
-   if(PlayersReadyStatus)then
+   if(PlayersGetReadyStatus)then
    begin
       GameStartScirmish :=true;
       if(Check)then exit;
@@ -763,7 +757,7 @@ begin
 
    if(not G_Started)
    or(net_status=ns_client)
-   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobby))then exit;
+   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobb1))then exit;
 
    GameBreak:=true;
    if(Check)then exit;
@@ -772,6 +766,7 @@ begin
    {$ENDIF}
    G_Started:=false;
    GameDefaultAll;
+   GameLoadPreset(255,g_preset_cur,false);
 end;
 
 {$IFDEF _FULLGAME}
@@ -784,7 +779,6 @@ begin
 
    g_preset_cur:=0;
    g_mode      :=gm_scirmish;
-   g_start_base:=random(gms_g_startb +1);
    g_generators:=random(gms_g_maxgens+1);
 
    PlayersSetDefault;
@@ -814,60 +808,125 @@ begin
 
    if(andstart)then GameStartScirmish(PlayerClient,false);
 end;
+
+procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
+var u:integer;
+wasselect,
+SelectBuildings:boolean;
+begin
+   if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
+   if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
+
+   SelectBuildings:=true;
+   if(fuid=255)then
+   for u:=1 to MaxUnits do
+    with g_punits[u]^ do
+     if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
+      with uid^ do
+       if(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(not _ukbuilding)then
+       begin
+          SelectBuildings:=false;
+          break;
+       end;
+
+   for u:=1 to MaxUnits do
+     with g_punits[u]^ do
+       if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
+       begin
+          wasselect:=isselected;
+
+          isselected:=false;
+          if(not add)or(not wasselect and add)then
+            if(fuid=255)or(fuid=uidi)then
+              with uid^ do
+                isselected:=(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(SelectBuildings or not _ukbuilding);
+
+          if(wasselect<>isselected)then
+            if(isselected)
+            then unit_PC_select_inc(g_punits[u])
+            else unit_PC_select_dec(g_punits[u]);
+          if(isselected)then UpdateLastSelectedUnit(unum);
+       end;
+end;
+procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
+var u:integer;
+wasselect:boolean;
+begin
+   for u:=1 to MaxUnits do
+    with g_punits[u]^ do
+     if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
+     begin
+        wasselect:=isselected;
+
+        isselected:=false;
+        if(not add)or(not wasselect and add)then
+          case fgroup of
+          0..
+          MaxUnitGroups: isselected:=group=fgroup;
+          254          : isselected:=UnitF1Select(g_punits[u]);
+          255          : isselected:=UnitF2Select(g_punits[u]);
+          end;
+
+        if(wasselect<>isselected)then
+          if(isselected)
+          then unit_PC_select_inc(g_punits[u])
+          else unit_PC_select_dec(g_punits[u]);
+
+        if(isselected)then UpdateLastSelectedUnit(unum);
+     end;
+end;
+procedure units_Grouping(add:boolean;playern,fgroup:byte);
+var u:integer;
+begin
+   if(fgroup<=MaxUnitGroups)then
+     for u:=1 to MaxUnits do
+       with g_punits[u]^ do
+         if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
+           case add of
+           false: if(isselected)
+                  then group:=fgroup
+                  else
+                    if(group=fgroup)then group:=0;
+           true : if(isselected)
+                  then group:=fgroup;
+           end;
+end;
+
 {$ELSE}
 {$include _ded.pas}
 {$ENDIF}
 
-function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
-begin
-   CheckSimpleClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
-end;
+
 
 
 procedure PlayerExecuteOrder(playern:byte);
 var
 su,eu,d     : integer;
-SelectBuildings,
-ClearErrors,
-pselected   : boolean;
+ClearErrors : boolean;
 pu,
-sability_u  : PTUnit;
-sability_d  : integer;
-function RectInRect(x0,y0,x1,y1,vx,vy,r:integer):boolean;
+order_u  : PTUnit;
+order_d  : integer;
+procedure SetOrderUnit;
 begin
-   RectInRect:=((x0-r)<=vx)and(vx<=(x1+r))and((y0-r)<=vy)and(vy<=(y1+r));
+   with pu^ do
+   with player^ do
+     d:=point_dist_int(o_x0,o_y0,x,y);
+   if(d<order_d)then
+   begin
+      order_d:=d;
+      order_u:=pu;
+   end;
 end;
 begin
    with g_players[playern] do
    begin
-      //if(playern<>PlayerClient)then   // ded serverside counter
-      //  PlayerAPMInc(playern);
-
       case o_id of
-po_build        : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(playern,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),playern),nil);
+po_build : if(0<o_a0)and(o_a0<255)then PlayerSetProdError(playern,lmt_argt_unit,byte(o_a0),StartBuild(o_x0,o_y0,byte(o_a0),playern),nil);
       else
-        SelectBuildings:=true;
         ClearErrors:=false;
 
-        if(o_id=po_select_rect_set)
-        or(o_id=po_select_rect_add)then
-        begin
-           if(o_x0>o_x1)then begin su:=o_x1;o_x1:=o_x0;o_x0:=su;end;
-           if(o_y0>o_y1)then begin su:=o_y1;o_y1:=o_y0;o_y0:=su;end;
-
-           for su:=1 to MaxUnits do
-            with g_punits[su]^ do
-             if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
-              with uid^ do
-               if(RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r))and(not _ukbuilding)then
-               begin
-                  SelectBuildings:=false;
-                  break;
-               end;
-        end;
-
         if(o_id=po_unit_order_set)then
-          if(IsUnitRange(o_x1,@pu))then
+          if(IsIntUnitRange(o_x1,@pu))then
           begin
              o_x0:=pu^.x;
              o_y0:=pu^.y;
@@ -885,70 +944,22 @@ po_prod_stop      : begin
            eu:=MaxUnits;
         end;
 
-        sability_d:=sability_d.MaxValue;
-        sability_u:=nil;
+        order_d:=order_d.MaxValue;
+        order_u:=nil;
 
         while(su<>eu)do
         begin
            pu:=g_punits[su];
            with pu^  do
            with uid^ do
-           if(hits>0)and(not IsUnitRange(transport,nil))and(playern=playeri)then
+           if(hits>0)and(not IsIntUnitRange(transport,nil))and(playern=playeri)then
            begin
-              pselected:=isselected;
-
               case o_id of
-// select
-po_select_rect_set,
-po_select_rect_add   : if(o_id=po_select_rect_set)
-                       or((not isselected)and(o_id=po_select_rect_add))
-                       then isselected:=RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r)and(SelectBuildings or not _ukbuilding);
-po_select_uid_set,
-po_select_uid_add    : if(o_id=po_select_uid_set)
-                       or((not isselected)and(o_id=po_select_uid_add))then
-                         if(0<o_a0)and(o_a0<255)
-                         then isselected:=RectInRect(o_x0,o_y0,o_x1,o_y1,vx,vy,_r)and(o_a0=uidi);
-po_select_group_set,
-po_select_group_add  : if(o_id=po_select_group_set)
-                       or((not isselected)and(o_id=po_select_group_add))then isselected:=(group=o_a0);
-po_select_all_set    : isselected:=UnitF2Select(pu);
-
-// groups
-po_unit_group_set    : if(isselected)then
-                       begin
-                          if(0<=o_a0)and(o_a0<MaxUnitGroups)then group:=o_a0;
-                       end
-                       else if(group=o_a0)then group:=0;
-po_unit_group_add    : if(isselected)then
-                         if(0<=o_a0)and(o_a0<MaxUnitGroups)then group:=o_a0;
-
 // unit orders
 po_unit_order_set    : if(isselected)then
-                         case o_a0 of
-                       uo_move      : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_move  ,true );
-                       uo_attack    : unit_SetOrder(pu,o_x1,o_x0,o_y0,-1,-1,ua_attack,true );
-                       uo_patrol    : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_move  ,true );
-                       uo_apatrol   : unit_SetOrder(pu,0   ,o_x0,o_y0, x, y,ua_attack,true );
-                       uo_hold      : unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_hold  ,false);
-                       uo_destroy   : begin unit_kill(pu,false,false,true,false,true);pselected:=isselected;end;
-                       uo_sability  : if(ua_id<>ua_psability)then
-                                        if(unit_sability (pu,false))then ClearErrors:=true;
-                       uo_psability : if(ua_id<>ua_psability)then
-                                        if(unit_psability(pu,o_x0,o_y0,o_x1,true))then
-                                        begin
-                                           ClearErrors:=true;
-                                           d:=point_dist_int(o_x0,o_y0,x,y);
-                                           if(d<sability_d)then
-                                           begin
-                                              sability_d:=d;
-                                              sability_u:=pu;
-                                           end;
-                                        end;
-                       uo_rebuild   : if(unit_rebuild(pu,false))then ClearErrors:=true;
-                         else
-                     //uo_stay      : default
-                                      unit_SetOrder(pu,0   ,x   ,y   ,-1,-1,ua_attack,false);
-                         end;
+                         if(o_a0 in ua_toAll)
+                         then unit_SetAction(pu,o_a0,o_x0,o_y0,o_x1);
+
 po_prod_stop         : if(isselected)then
                        begin
                        if(unit_ProdUnitStop(pu,255,false))then break;
@@ -969,19 +980,6 @@ po_prod_upgr_start   : if(unit_ProdUpgrStart(pu,o_a0      ))then begin PlayerCle
 po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
                    end;
               end;
-
-              if(isselected)then
-              begin
-                 if(not pselected)then
-                 begin
-                    unit_PC_select_inc(pu);
-                    {$IFDEF _FULLGAME}
-                    UpdateLastSelectedUnit(unum);
-                    {$ENDIF}
-                 end;
-              end
-              else
-                if(pselected)then unit_PC_select_dec(pu);
            end;
 
            if(su>eu)
@@ -989,10 +987,8 @@ po_prod_upgr_stop    : if(unit_ProdUpgrStop (pu,o_a0,false))then break;
            else su+=1;
         end;
 
-        if(o_id=po_unit_order_set)then
-          case o_a0 of
-uo_psability : if(sability_u<>nil)then unit_psability(sability_u,o_x0,o_y0,o_x1,false);
-          end;
+        if(o_id=po_unit_order_set)and(order_u<>nil)then unit_SetAction(order_u,o_a0,o_x0,o_y0,o_x1);
+
         if(ClearErrors)then PlayerClearProdError(@g_players[playern]);
       end;
 
@@ -1093,32 +1089,9 @@ end;
 
 {$include _net_game.pas}
 
-
-
 procedure CodeGame;
-var tx,ty:integer;
-w,dx:word;
 begin
    {$IFDEF _FULLGAME}
-   vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
-   vid_blink_timer2+=1;vid_blink_timer2:=vid_blink_timer2 mod vid_blink_period2;
-
-   if(vid_blink_timer1=0)then
-   begin
-      r_blink3+=1;
-      r_blink3:=r_blink3 mod 4;
-   end;
-
-   vid_panel_timer+=1;vid_panel_timer:=vid_panel_timer mod vid_panel_period;
-
-   r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
-   r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
-
-   r_blink1_color_BG:=ui_blink_color1[r_blink1_colorb];
-   r_blink1_color_BY:=ui_blink_color2[r_blink1_colorb];
-   r_blink2_color_BG:=ui_blink_color1[r_blink2_colorb];
-   r_blink2_color_BY:=ui_blink_color2[r_blink2_colorb];
-
    SoundControl;
 
    if(net_status=ns_client)then
@@ -1136,115 +1109,6 @@ begin
 
    if(G_Started)and(G_Status=gs_running)then
    begin
-      {$IFDEF _FULLGAME}
-      //if(ks_mright=1)then
-      //  MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
-
-     { if(ks_mleft=1)then
-      begin
-         debug_Sgx :=mouse_map_x div MapCellW;
-         debug_Sgy :=mouse_map_y div MapCellW;
-
-
-         if (0<=debug_Sgx)and(debug_Sgx<MaxMapSizeCelln)
-         and(0<=debug_Sgy)and(debug_Sgy<MaxMapSizeCelln)
-         then debug_d1:=map_grid[debug_Sgx,debug_Sgy].tgc_pf_domain
-         else debug_d1:=0;
-      end;
-      if(ks_mright=1)then
-      begin
-         debug_Dgx :=mouse_map_x div MapCellW;
-         debug_Dgy :=mouse_map_y div MapCellW;
-
-         if (0<=debug_Dgx)and(debug_Dgx<MaxMapSizeCelln)
-         and(0<=debug_Dgy)and(debug_Dgy<MaxMapSizeCelln)
-         then debug_d2:=map_grid[debug_Dgx,debug_Dgy].tgc_pf_domain
-         else debug_d2:=0;
-      end;
-
-      if(ks_mleft=1)or(ks_mright=1)then
-      begin
-         writeln('Sg ',debug_Sgx,' ',debug_Sgy,' ',map_LastCell,' d1 ',debug_d1);
-         writeln('Dg ',debug_Dgx,' ',debug_Dgy,' ',map_LastCell,' d2 ',debug_d2);
-         if(debug_d1>0)and(debug_d2>0)then
-           with map_gridDomainMX[debug_d1-1,debug_d2-1] do
-             writeln(nextDomain,' ',edgeCells_n);
-      end;
-
-      if(r_blink2_colorb)then
-      begin
-         debug_cell(debug_Sgx,debug_Sgy,5,c_lime);
-         debug_cell(debug_Dgx,debug_Dgy,5,c_blue);
-
-         if(debug_d1>0)and(debug_d2>0)then
-         begin
-            with map_gridDomainMX[debug_d1-1,debug_d2-1] do
-              if(edgeCells_n>0)then
-               for w:=0 to edgeCells_n-1 do
-                with edgeCells_l[w] do
-                 UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange);
-            {dx:=map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain;
-            if(dx>0)then
-             with map_gridDomainMX[debug_d1-1,dx-1] do
-               if(edgeCells_n>0)then
-                for w:=0 to edgeCells_n-1 do
-                 with edgeCells_l[w] do
-                  UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange); }
-         end;
-      end;  }
-
-         {if(map_gridDomain_n>0)then
-           for w:=0 to map_gridDomain_n-1 do
-             with domain_center_l[w-1] do debug_cell(p_x,p_y,9,map_gridDomain_color[w-1]); }
-
-         {debug_Sx  :=mouse_map_x;
-         debug_Sy  :=mouse_map_y;
-         debug_Sgx :=debug_Sx div MapCellW;
-         debug_Sgy :=debug_Sy div MapCellW; }
-
-         //map_GridLineCollision(debug_Sgx,debug_Sgy,mouse_map_x div MapCellW,mouse_map_y div MapCellW,0,true);
-
-         {if(LineCollision(debug_Sgx,debug_Sgy,0,0))
-         then AddPoint(debug_Sgx,debug_Sgy,5,c_red )
-         else AddPoint(debug_Sgx,debug_Sgy,5,c_lime);}
-
-         {if(debug_array_n>0)then
-          for tx:=0 to debug_array_n-1 do
-           AddPoint(debug_array_x[tx],debug_array_y[tx],5,c_orange); }
-
-     {
-
-      debug_Dx  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_x;
-      debug_Dy  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_y;
-      debug_Dgx :=debug_Dx div MapCellW;
-      debug_Dgy :=debug_Dy div MapCellW;
-
-      pf_FindNextCell(
-      g_units[g_players[PlayerClient].uid_x[UID_Imp]].zone,
-       debug_Sgx ,debug_Sgy,
-       debug_Sx  ,debug_Sy ,
-       debug_Dx  ,debug_Dy ,
-      @debug_Svx,@debug_Svy,
-      @debug_Dvx,@debug_Dvy);
-
-      tx:=debug_Sgx*MapCellW;
-      ty:=debug_Sgy*MapCellW;
-      UnitsInfoAddRect(tx,ty,tx+MapCellW,ty+MapCellW,c_lime);
-
-      UnitsInfoAddline(
-      debug_Sx,                   debug_Sy,
-      debug_Sx+debug_Dvx*MapCellW,debug_Sy+debug_Dvy*MapCellW,c_red);
-
-      tx:=debug_Dgx*MapCellW;
-      ty:=debug_Dgy*MapCellW;
-      UnitsInfoAddRect(tx,ty,tx+MapCellW,ty+MapCellW,c_blue);
-
-      tx:=(debug_Sgx+debug_Svx)*MapCellW+5;
-      ty:=(debug_Sgy+debug_Svy)*MapCellW+5;
-      UnitsInfoAddRect(tx,ty,tx+MapCellW-10,ty+MapCellW-10,c_orange);  }
-
-      {$ENDIF}
-
       g_cycle_order:=(g_cycle_order+1) mod order_period;
       g_cycle_regen:=(g_cycle_regen+1) mod regen_period;
 
@@ -1266,10 +1130,121 @@ begin
          else           GameDefaultEndConditions;
          end;}
       end;
-      GameObjectsCode;
+      UnitsCode;
+      MissilesCode;
    end;
 
    if(net_status=ns_server)then net_Server;
 end;
+
+{$IFDEF _FULLGAME}
+//if(kt_mright=1)then
+//  MakeZone(mouse_map_x div MapCellW,mouse_map_y div MapCellW);
+
+{ if(kt_mleft=1)then
+begin
+   debug_Sgx :=mouse_map_x div MapCellW;
+   debug_Sgy :=mouse_map_y div MapCellW;
+
+
+   if (0<=debug_Sgx)and(debug_Sgx<MaxMapSizeCelln)
+   and(0<=debug_Sgy)and(debug_Sgy<MaxMapSizeCelln)
+   then debug_d1:=map_grid[debug_Sgx,debug_Sgy].tgc_pf_domain
+   else debug_d1:=0;
+end;
+if(kt_mright=1)then
+begin
+   debug_Dgx :=mouse_map_x div MapCellW;
+   debug_Dgy :=mouse_map_y div MapCellW;
+
+   if (0<=debug_Dgx)and(debug_Dgx<MaxMapSizeCelln)
+   and(0<=debug_Dgy)and(debug_Dgy<MaxMapSizeCelln)
+   then debug_d2:=map_grid[debug_Dgx,debug_Dgy].tgc_pf_domain
+   else debug_d2:=0;
+end;
+
+if(kt_mleft=1)or(kt_mright=1)then
+begin
+   writeln('Sg ',debug_Sgx,' ',debug_Sgy,' ',map_csize,' d1 ',debug_d1);
+   writeln('Dg ',debug_Dgx,' ',debug_Dgy,' ',map_csize,' d2 ',debug_d2);
+   if(debug_d1>0)and(debug_d2>0)then
+     with map_gridDomainMX[debug_d1-1,debug_d2-1] do
+       writeln(nextDomain,' ',edgeCells_n);
+end;
+
+if(r_blink2_colorb)then
+begin
+   debug_cell(debug_Sgx,debug_Sgy,5,c_lime);
+   debug_cell(debug_Dgx,debug_Dgy,5,c_blue);
+
+   if(debug_d1>0)and(debug_d2>0)then
+   begin
+      with map_gridDomainMX[debug_d1-1,debug_d2-1] do
+        if(edgeCells_n>0)then
+         for w:=0 to edgeCells_n-1 do
+          with edgeCells_l[w] do
+           UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange);
+      {dx:=map_gridDomainMX[debug_d1-1,debug_d2-1].nextDomain;
+      if(dx>0)then
+       with map_gridDomainMX[debug_d1-1,dx-1] do
+         if(edgeCells_n>0)then
+          for w:=0 to edgeCells_n-1 do
+           with edgeCells_l[w] do
+            UnitsInfoAddRect(p_x-MapCellhw+5,p_y-MapCellhw+5,p_x+MapCellhw-5,p_y+MapCellhw-5,c_orange); }
+   end;
+end;  }
+
+   {if(map_gridDomain_n>0)then
+     for w:=0 to map_gridDomain_n-1 do
+       with domain_center_l[w-1] do debug_cell(p_x,p_y,9,map_gridDomain_color[w-1]); }
+
+   {debug_Sx  :=mouse_map_x;
+   debug_Sy  :=mouse_map_y;
+   debug_Sgx :=debug_Sx div MapCellW;
+   debug_Sgy :=debug_Sy div MapCellW; }
+
+   //map_GridLineCollision(debug_Sgx,debug_Sgy,mouse_map_x div MapCellW,mouse_map_y div MapCellW,0,true);
+
+   {if(LineCollision(debug_Sgx,debug_Sgy,0,0))
+   then AddPoint(debug_Sgx,debug_Sgy,5,c_red )
+   else AddPoint(debug_Sgx,debug_Sgy,5,c_lime);}
+
+   {if(debug_array_n>0)then
+    for tx:=0 to debug_array_n-1 do
+     AddPoint(debug_array_x[tx],debug_array_y[tx],5,c_orange); }
+
+{
+
+debug_Dx  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_x;
+debug_Dy  :=g_units[g_players[PlayerClient].uid_x[UID_Imp]].ua_y;
+debug_Dgx :=debug_Dx div MapCellW;
+debug_Dgy :=debug_Dy div MapCellW;
+
+pf_FindNextCell(
+g_units[g_players[PlayerClient].uid_x[UID_Imp]].zone,
+ debug_Sgx ,debug_Sgy,
+ debug_Sx  ,debug_Sy ,
+ debug_Dx  ,debug_Dy ,
+@debug_Svx,@debug_Svy,
+@debug_Dvx,@debug_Dvy);
+
+tx:=debug_Sgx*MapCellW;
+ty:=debug_Sgy*MapCellW;
+UnitsInfoAddRect(tx,ty,tx+MapCellW,ty+MapCellW,c_lime);
+
+UIInfoItemAddLine(
+debug_Sx,                   debug_Sy,
+debug_Sx+debug_Dvx*MapCellW,debug_Sy+debug_Dvy*MapCellW,c_red);
+
+tx:=debug_Dgx*MapCellW;
+ty:=debug_Dgy*MapCellW;
+UnitsInfoAddRect(tx,ty,tx+MapCellW,ty+MapCellW,c_blue);
+
+tx:=(debug_Sgx+debug_Svx)*MapCellW+5;
+ty:=(debug_Sgy+debug_Svy)*MapCellW+5;
+UnitsInfoAddRect(tx,ty,tx+MapCellW-10,ty+MapCellW-10,c_orange);  }
+
+{$ENDIF}
+
 
 

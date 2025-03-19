@@ -43,7 +43,6 @@ uses SysUtils, SDL, SDL_Net
         {$include _draw.pas}
         {$include _loadgfx.pas}
      {$ENDIF}
-{$include _path.pas}
 {$include _map.pas}
 {$Include _missiles.pas}
 {$include _units_common.pas}

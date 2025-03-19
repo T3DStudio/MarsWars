@@ -130,7 +130,7 @@ TMenuListItem = record
    mli_enabled: boolean;
 end;
 
-TPlayerColorScheme  = array[0..LastPlayer] of cardinal;
+TPlayerColorArray  = array[0..LastPlayer] of cardinal;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -162,27 +162,8 @@ PTSoundSet = ^TSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   OTHER
+//   MAP
 //
-
-TSaveLoadItem = record
-   data_p:pointer;
-   data_s:cardinal;
-end;
-
-TArrayOfsString = array of shortstring;
-PTArrayOfsString = ^TArrayOfsString;
-
-TServerInfo = record
-   ip       : cardinal;
-   port     : word;
-   info     : shortstring;
-end;
-
-TReplayPos = record
-   rp_fpos : int64;
-   rp_gstep: cardinal;
-end;
 
 TMapTerrainGridCellDecor = record
    tgca_decorTime,
@@ -209,6 +190,52 @@ TMapTerrainGridCellAnim = record
    tgca_decal_l    : array of TMapTerrainGridCellDecal;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   OTHER
+//
+
+TSaveLoadItem = record
+   data_p:pointer;
+   data_s:cardinal;
+end;
+
+TArrayOfsString = array of shortstring;
+PTArrayOfsString = ^TArrayOfsString;
+
+TServerInfo = record
+   ip       : cardinal;
+   port     : word;
+   info     : shortstring;
+end;
+
+TReplayPos = record
+   rp_fpos : int64;
+   rp_gstep: cardinal;
+end;
+
+THotKeyTable  = array[0..HotKeysArraySize] of cardinal;
+pTHotKeyTable = ^THotKeyTable;
+
+TPanelHintTable  = array[0..HotKeysArraySize] of shortstring;
+pTPanelHintTable = ^TPanelHintTable;
+
+TUnitList = record
+   ulist_n    : integer;
+   ulist_luid : array of byte;
+   ulist_lunum: array of integer;
+end;
+pTUnitList = ^TUnitList;
+
+TUnitGroup = record
+   ugroup_n,
+   ugroup_d,
+   ugroup_x,
+   ugroup_y   : integer;
+   ugroup_uids: array[boolean] of TSoB;
+end;
+pTUnitGroup = ^TUnitGroup;
+
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,6 +259,22 @@ TMapTerrainGridCell = record
    tgc_pf_solid  : boolean;
    tgc_pf_zone,
    tgc_pf_domain : word;
+end;
+
+TUnitAbilityType = (uat_passive,uat_notarget,uat_target);
+TUnitAbility = record
+   ua_type    : TUnitAbilityType;       // 0-passive, 1-no target, 2-need to go point and self cast, 3-point/unit target require
+   ua_morphUID,   // if >0 then ability - transformation to uid
+   ua_rupgr,
+   ua_rupgrl,
+   ua_ruid    : byte;
+   {$IFDEF _FULLGAME}
+   ua_mbrush_c: cardinal;
+   ua_mbrush_r: integer;
+   ua_btn     : pSDL_Surface;
+   ua_name,
+   ua_descr   : shortstring;
+   {$ENDIF}
 end;
 
 TDamageMod = array[0..MaxDamageModFactors] of record
@@ -373,25 +416,20 @@ TUID = record
    _rupgr,
    _rupgrl      : byte;
 
-   _shots2advanced
-                : byte;
-
-   _a_BonusAntiFlyRange,
-   _a_BonusAntiGroundRange,
-   _a_BonusAntiBuildingRange,
-   _a_BonusAntiUnitRange
+   _a_BonusRangeAntiFly,
+   _a_BonusRangeAntiGround,
+   _a_BonusRangeAntiBuilding,
+   _a_BonusRangeAntiUnit
                 : integer;
    _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
 
-   _shcf        : single;
-
+   _attack,
    _ability_rNoObstacles
                 : boolean;
    _ability,
    _ability_rupgr,
    _ability_rupgrl,
-   _ability_ruid,
-   _attack      : byte;
+   _ability_ruid: byte;
    _barrack_teleport,
    _slowturn,
    _ukbuilding,
@@ -407,11 +445,14 @@ TUID = record
    _fastdeath_hits
                 : integer;
 
+   _shcf        : single;
+
    ups_builder,
    ups_units,
    ups_upgrades,
    ups_transport      : TSoB;
    {$IFDEF _FULLGAME}
+   _mmr,
    _animw,
    _animd,
    _fr          : integer;
@@ -530,7 +571,7 @@ TPlayer = record
 
    ucl_e,                                        // existed class
    ucl_eb,                                       // existed class iscomplete=true and hits>0
-   ucl_s,                                        // selected
+   ucl_s,
    ucl_x   : array[false..true,byte] of integer; // first unit class
 
    uid_e,
@@ -555,6 +596,7 @@ TPlayer = record
 
    a_upgrs,
    a_units : array[byte] of integer;
+   a_builders: integer;
 
 
    ai_max_ulimit,
@@ -700,7 +742,7 @@ TUnit = record
    ukfloater,
    iscomplete,
    solid,
-   isselected      : boolean;
+   isselected: boolean;
 
    aiu_FiledSquareNear,
    aiu_limitaround_ally,
@@ -717,7 +759,7 @@ TUnit = record
    wanim    : boolean;
 
    animw,
-   mmx,mmy,mmr,
+   mmx,mmy,
    fx,fy,fsr,
    anim,animf,
    shadow

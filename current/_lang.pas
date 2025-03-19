@@ -58,81 +58,42 @@ SDLK_RShift         : GetKeyName:='Shift';
    end
 end;
 
-function hotKeyCommon(ucl:byte):shortstring;  // hotkey units&upgrades tab
+function hotKeyCommon(ucl:byte;phkt1,phkt2:pTHotKeyTable):shortstring;
 begin
    hotKeyCommon:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkey1[ucl]>0)then
-    begin
-       if(_hotkey2[ucl]>0)then
-       hotKeyCommon:=             tc_lime+GetKeyName(_hotkey2[ucl])+tc_default+'+';
-       hotKeyCommon:=hotKeyCommon+tc_lime+GetKeyName(_hotkey1[ucl])+tc_default;
-    end;
-end;
-function hotKeyAction(ucl:byte):shortstring;  // hotkey actions tab
-begin
-   hotKeyAction:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyA[ucl]>0)then
-    begin
-       if(_hotkeyA2[ucl]>0)then
-       hotKeyAction:=             tc_lime+GetKeyName(_hotkeyA2[ucl])+tc_default+'+';
-       hotKeyAction:=hotKeyAction+tc_lime+GetKeyName(_hotkeyA [ucl])+tc_default;
-    end;
-end;
-function hotKeyReplay(ucl:byte):shortstring;  // hotkey replays tab
-begin
-   hotKeyReplay:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyR[ucl]>0)then
-     hotKeyReplay:=tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
-end;
-function hotKeyObserver(ucl:byte):shortstring;  // hotkey observer tab
-begin
-   hotKeyObserver:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyO[ucl]>0)then
-     hotKeyObserver:=tc_lime+GetKeyName(_hotkeyO [ucl])+tc_default;
+   if(ucl<=HotKeysArraySize)then
+     if(phkt1^[ucl]>0)then
+     begin
+        if(phkt2^[ucl]>0)then
+        hotKeyCommon:=tc_lime+GetKeyName(phkt2^[ucl])+tc_default+'+';
+        hotKeyCommon+=tc_lime+GetKeyName(phkt1^[ucl])+tc_default;
+     end;
 end;
 
 
-procedure hintStrAction(ucl:byte;hint:shortstring);
+procedure SetHintStr(ucl:byte;pHintTable:pTPanelHintTable;phkt1,phkt2:pTHotKeyTable;noHK:boolean;hint:shortstring);
 var hk:shortstring;
 begin
-   if(ucl<=_mhkeys)then
-   begin
-      hk:=hotKeyAction(ucl);
-      if(length(hk)>0)
-      then str_panelHint_a[ucl]:=hint+' ('+hk+')'
-      else str_panelHint_a[ucl]:=hint;
-   end;
-end;
-procedure hintStrReplay(ucl:byte;hint:shortstring;noHK:boolean);
-var hk:shortstring;
-begin
-   if(ucl<=_mhkeys)then
+   if(ucl<=HotKeysArraySize)then
    begin
       if(noHK)
       then hk:=''
-      else hk:=hotKeyReplay(ucl);
+      else hk:=hotKeyCommon(ucl,phkt1,phkt2);
       if(length(hk)>0)
-      then str_panelHint_r[ucl]:=hint+' ('+hk+')'
-      else str_panelHint_r[ucl]:=hint;
+      then pHintTable^[ucl]:=hint+' ('+hk+')'
+      else pHintTable^[ucl]:=hint;
    end;
 end;
-procedure hintStrObserver(ucl:byte;hint:shortstring;noHK:boolean);
-var hk:shortstring;
+
+procedure SetStrUAbility(aid:byte;NAME,DESCR:shortstring);
 begin
-   if(ucl<=_mhkeys)then
+   with g_uability[aid] do
    begin
-      if(noHK)
-      then hk:=''
-      else hk:=hotKeyObserver(ucl);
-      if(length(hk)>0)
-      then str_panelHint_o[ucl]:=hint+' ('+hk+')'
-      else str_panelHint_o[ucl]:=hint;
+      ua_name :=NAME;
+      ua_descr:=DESCR;
    end;
 end;
+
 procedure hintStrUID(uid:byte;NAME,DESCR:shortstring);
 begin
    with g_uids[uid] do
@@ -180,64 +141,57 @@ begin
 end;
 
 
-function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
+function txt_makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
    begin
-      pu:=@g_units[0];
+      pu:=g_punits[0];
       with pu^ do
       begin
-         uidi:=auid;
+         uidi   :=auid;
          playeri:=0;
          player :=@g_players[playeri];
          unit_apllyUID(pu);
-         hits:=-32000;
+         hits   :=hits.MinValue;
       end;
    end;
-   _makeAttributeStr:='';
+   txt_makeAttributeStr:='';
    with pu^  do
    with uid^ do
    begin
-      if(uidi in T2)
-      then _ADDSTR(@_makeAttributeStr,'T2',sep_comma)
-      else
-      if(uidi in T3)
-      then _ADDSTR(@_makeAttributeStr,'T3',sep_comma)
-      else _ADDSTR(@_makeAttributeStr,'T1',sep_comma);
-
       if(hits>fdead_hits)then
        if(hits>0)
-       then _ADDSTR(@_makeAttributeStr,str_attr_alive    ,sep_comma)
-       else _ADDSTR(@_makeAttributeStr,str_attr_dead     ,sep_comma);
+       then _ADDSTR(@txt_makeAttributeStr,str_attr_alive    ,sep_comma)
+       else _ADDSTR(@txt_makeAttributeStr,str_attr_dead     ,sep_comma);
 
       if(_ukbuilding)
-      then _ADDSTR(@_makeAttributeStr,str_attr_building  ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_unit      ,sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_building  ,sep_comma)
+      else _ADDSTR(@txt_makeAttributeStr,str_attr_unit      ,sep_comma);
       if(_ukmech)
-      then _ADDSTR(@_makeAttributeStr,str_attr_mech      ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_bio       ,sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_mech      ,sep_comma)
+      else _ADDSTR(@txt_makeAttributeStr,str_attr_bio       ,sep_comma);
       if(_uklight)
-      then _ADDSTR(@_makeAttributeStr,str_attr_light     ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_heavy     ,sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_light     ,sep_comma)
+      else _ADDSTR(@txt_makeAttributeStr,str_attr_heavy     ,sep_comma);
       if(ukfly)
-      then _ADDSTR(@_makeAttributeStr,str_attr_fly       ,sep_comma)
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_fly       ,sep_comma)
       else
         if(ukfloater)
-        then _ADDSTR(@_makeAttributeStr,str_attr_floater,sep_comma)
-        else _ADDSTR(@_makeAttributeStr,str_attr_ground ,sep_comma);
+        then _ADDSTR(@txt_makeAttributeStr,str_attr_floater,sep_comma)
+        else _ADDSTR(@txt_makeAttributeStr,str_attr_ground ,sep_comma);
       if(transportM>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_transport,sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_transport,sep_comma);
       if(level>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
       if(buff[ub_Detect]>0)or(_detector)
-      then _ADDSTR(@_makeAttributeStr,str_attr_detector,sep_comma);
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_detector,sep_comma);
       if(buff[ub_Invuln]>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_invuln,sep_comma)
+      then _ADDSTR(@txt_makeAttributeStr,str_attr_invuln,sep_comma)
       else
         if(buff[ub_Pain]>0)
-        then _ADDSTR(@_makeAttributeStr,str_attr_stuned,sep_comma);
+        then _ADDSTR(@txt_makeAttributeStr,str_attr_stuned,sep_comma);
 
-      _makeAttributeStr:='['+_makeAttributeStr+tc_default+']';
+      txt_makeAttributeStr:='['+txt_makeAttributeStr+tc_default+']';
    end;
 end;
 
@@ -315,7 +269,7 @@ begin
        if(_isbarrack    )then _ADDSTR(@_MakeDefaultDescription,str_uhint_barrack,sep_sdot);
        if(_issmith      )then _ADDSTR(@_MakeDefaultDescription,str_uhint_smith  ,sep_sdot);
        if(_genergy    >0)then _ADDSTR(@_MakeDefaultDescription,str_uhint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
-       if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
+       {if(_rebuild_uid>0)and(_ability<>ua_RebuildInPoint)then
        begin
           _ADDSTR(@_MakeDefaultDescription,
           str_uhint_CanRebuildTo+
@@ -324,14 +278,15 @@ begin
        end;
        if(_ability>0)then
        begin
-          if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
+          if(_ability=ua_RebuildInPoint)and(_rebuild_uid>0)
           then _ADDSTR(@_MakeDefaultDescription,str_uhint_ability+str_uhint_transformation+RebuildStr(_rebuild_uid,_rebuild_level)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
           else
-            if(length(str_ability_name[_ability])>0)
-            then _ADDSTR(@_MakeDefaultDescription,str_uhint_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
+            with g_uability[_ability] do
+              if(length(ua_name)>0)
+              then _ADDSTR(@_MakeDefaultDescription,str_uhint_ability+'"'+ua_name+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
        end
        else
-         if(_transportM>0)then _ADDSTR(@_MakeDefaultDescription,str_uhint_ability+'"'+str_ability_unload+'"',sep_sdot);
+         if(_transportM>0)then _ADDSTR(@_MakeDefaultDescription,str_uhint_ability+'"'+str_ability_unload+'"',sep_sdot); }
 
        if(_splashresist)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
 
@@ -425,7 +380,6 @@ begin
                      else ocount:=2;
                      end;
      wpt_directdmg,
-     wpt_directdmgZ,
      wpt_heal      : BaseDmg:=aw_count;
      end;
      if(aw_type<>wpt_suicide)then
@@ -469,7 +423,7 @@ begin
       0             : exit;
       wpt_missle,
       wpt_directdmg,
-      wpt_directdmgZ: if(aw_max_range<0)
+      wpt_directdmgZ   : if(aw_max_range<0)
                       then _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_melee    ,sep_scomma)
                       else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
       wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
@@ -486,10 +440,10 @@ begin
          if(aw_max_range=aw_srange)then
          begin
             _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
-            if(_a_BonusAntiFlyRange     <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '     +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiGroundRange  <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '  +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiUnitRange    <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-unit range: '    +_i2s(_a_BonusAntiUnitRange    ),sep_scomma);
-            if(_a_BonusAntiBuildingRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-building range: '+_i2s(_a_BonusAntiBuildingRange),sep_scomma);
+            if(_a_BonusRangeAntiFly     <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '     +_i2s(_a_BonusRangeAntiFly     ),sep_scomma);
+            if(_a_BonusRangeAntiGround  <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '  +_i2s(_a_BonusRangeAntiFly     ),sep_scomma);
+            if(_a_BonusRangeAntiUnit    <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-unit range: '    +_i2s(_a_BonusRangeAntiUnit    ),sep_scomma);
+            if(_a_BonusRangeAntiBuilding<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-building range: '+_i2s(_a_BonusRangeAntiBuilding),sep_scomma);
          end
          else
            if(aw_max_range<aw_srange) // melee
@@ -504,8 +458,8 @@ begin
              else
              begin
                 _ADDSTR(@_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
-                if(_a_BonusAntiFlyRange   <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '   +_i2s(_a_BonusAntiFlyRange),sep_scomma);
-                if(_a_BonusAntiGroundRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '+_i2s(_a_BonusAntiFlyRange),sep_scomma);
+                if(_a_BonusRangeAntiFly   <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '   +_i2s(_a_BonusRangeAntiFly),sep_scomma);
+                if(_a_BonusRangeAntiGround<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '+_i2s(_a_BonusRangeAntiFly),sep_scomma);
              end;
       end;
 
@@ -534,8 +488,7 @@ begin
       case aw_type of
       wpt_suicide   : if(_death_missile>0)then dmod_str:=DamageStr(_death_missile_dmod);
       wpt_missle,
-      wpt_directdmg,
-      wpt_directdmgZ: if(aw_dmod>0)then dmod_str:=DamageStr(aw_dmod);
+      wpt_directdmg : if(aw_dmod>0)then dmod_str:=DamageStr(aw_dmod);
       end;
 
       if(length(dmod_str)>0)then
@@ -557,7 +510,7 @@ begin
   with g_uids[uid] do
   begin
      weapons_str:='';
-     if(_attack=atm_always)then
+     if(_attack)then
       for w:=0 to MaxUnitWeapons do
        with _a_weap[w] do
         _ADDSTR(@weapons_str,_MakeWeaponString(uid,w,docSTR),sep_sdots);
@@ -579,7 +532,7 @@ var HK,
 begin
   with g_upids[upid] do
   begin
-     HK  :=hotKeyCommon(_up_btni);
+     HK  :=hotKeyCommon(_up_btni,@hotkeyP1,@hotkeyP2);
      ENRG:='';
      TIME:='';
      INFO:='';
@@ -589,7 +542,6 @@ begin
      else
        if(curlvl>_up_max)and(curlvl<255)then curlvl:=_up_max;
 
-     HK:=hotKeyCommon(_up_btni);
      if(_up_renerg>0)then
        if(curlvl<255)
        then ENRG:=tc_aqua +i2s(upid_CalcCostEnergy(upid,curlvl))+tc_default
@@ -643,7 +595,7 @@ begin
       end
       else
       begin
-         HK:=hotKeyCommon(_ucl);
+         HK:=hotKeyCommon(_ucl,@hotkeyP1,@hotkeyP2);
          if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
          if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
          LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
@@ -661,7 +613,7 @@ begin
 
          un_txt_fdescr :=_MakeDefaultDescription(uid,un_txt_udescr,false);
 
-         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
+         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+txt_makeAttributeStr(nil,uid);
          un_txt_uihintS:=un_txt_name+tc_nl1;
          un_txt_uihint2:=un_txt_fdescr;
          un_txt_uihint3:=_MakeWeaponsDescription(uid,false);
@@ -730,7 +682,7 @@ begin
    str_menu_Start                    := 'START';
    str_menu_lang[true ]              := 'RUS';
    str_menu_lang[false]              := 'ENG';
-   str_menu_maction                  := 'Right-click action';
+   str_menu_maction                  := 'Mouse right-click action';
    str_menu_mactionl[true ]          := tc_lime+'move'+tc_default;
    str_menu_mactionl[false]          := tc_lime+'move'+tc_default+'+'+tc_red+'attack'+tc_default;
    str_menu_connecting               := 'Connecting...';
@@ -779,7 +731,7 @@ begin
    str_menu_chat                     := 'CHAT';
 
    str_menu_ReplayName               := 'Replay name';
-   str_menu_ReplayQuality            := 'Replay quality';
+   str_menu_ReplayQuality            := 'Replay quality/File size';
    str_menu_Recording                := 'Record games';
    str_menu_ReplayState              := 'Replay status';
    str_menu_ReplayStatel[rpls_state_none ]:=           'OFF';
@@ -817,6 +769,13 @@ begin
    str_menu_PanelPosl[2]             := tc_yellow+'top'   +tc_default;
    str_menu_PanelPosl[3]             := tc_aqua  +'bottom'+tc_default;
 
+   // [vertical][]
+   str_menu_MiniMapPos               := 'Mini map position';
+   str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[2];
+   str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[3];
+   str_menu_MiniMapPosl[false][true ]:= str_menu_PanelPosl[0];
+   str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[1];
+
    str_menu_unitHBar                 := 'Health bars';
    str_menu_unitHBarl[0]             := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
    str_menu_unitHBarl[1]             := tc_aqua  +'always'  +tc_default;
@@ -845,7 +804,6 @@ begin
    str_menu_RandomScirmish           := 'Make Random Skirmish';
    str_menu_AISlots                  := 'Fill empty slots';
    str_menu_DeadObservers            := 'Observer mode after lose';
-   str_menu_StartBase                := 'Builders at the game start';
    str_menu_FixedStarts              := 'Fixed player starts';
 
    str_menu_GameMode                 := 'Game mode';
@@ -854,17 +812,16 @@ begin
    str_emnu_GameModel[gm_2x2x2x2 ]   := tc_yellow+'2x2x2x2'         +tc_default;
    str_emnu_GameModel[gm_capture ]   := tc_aqua  +'Capturing points'+tc_default;
    str_emnu_GameModel[gm_KotH    ]   := tc_purple+'King of the Hill'+tc_default;
-   str_emnu_GameModel[gm_royale  ]   := tc_red   +'Battle Royal'    +tc_default;
+   str_emnu_GameModel[gm_royale  ]   := tc_red   +'Battle Royale'   +tc_default;
    str_emnu_GameModel[gm_assault ]   := tc_blue  +'Assault'         +tc_default;
 
    str_menu_Generators               := 'Generators';
    str_menu_Generatorsl[0]           := 'own';
-   str_menu_Generatorsl[1]           := 'own,no new builders';
-   str_menu_Generatorsl[2]           := 'neutral(5 min)';
-   str_menu_Generatorsl[3]           := 'neutral(10 min)';
-   str_menu_Generatorsl[4]           := 'neutral(15 min)';
-   str_menu_Generatorsl[5]           := 'neutral(20 min)';
-   str_menu_Generatorsl[6]           := 'neutral(infinity)';
+   str_menu_Generatorsl[1]           := 'neutral(5 min)';
+   str_menu_Generatorsl[2]           := 'neutral(10 min)';
+   str_menu_Generatorsl[3]           := 'neutral(15 min)';
+   str_menu_Generatorsl[4]           := 'neutral(20 min)';
+   str_menu_Generatorsl[5]           := 'neutral(infinity)';
 
    str_map_type                      := 'Type';
    str_map_typel[mapt_steppe]        := tc_gray  +'Steppe';
@@ -1062,18 +1019,6 @@ begin
    g_presets[gp_custom   ].gp_name   := 'custom preset';
    MakeGamePresetsNames(@str_emnu_GameModel[0],@str_map_typel[0]);
 
-   str_ability_name[uab_Teleport        ]:='Teleportation';
-   str_ability_name[uab_UACScan         ]:='Scan';
-   str_ability_name[uab_HTowerBlink     ]:='Blink';
-   str_ability_name[uab_UACStrike       ]:='Missile Strike';
-   str_ability_name[uab_HKeepBlink      ]:='Blink';
-   str_ability_name[uab_RebuildInPoint  ]:='';
-   str_ability_name[uab_HInvulnerability]:='Invulnerability';
-   str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
-   str_ability_name[uab_HellVision      ]:='Hell Vision';
-   str_ability_name[uab_CCFly           ]:='Flight Engines';
-   str_ability_unload                    :='Unload';
-
    theme_name[0] := tc_lime  +'UAC BASE';
    theme_name[1] := tc_blue  +'TECH BASE';
    theme_name[2] := tc_dgray +'UNKNOWN PLANET';
@@ -1083,17 +1028,25 @@ begin
    theme_name[6] := tc_orange+'HELL';
    theme_name[7] := tc_yellow+'HELL CAVES';
    theme_name[8] := tc_red   +'HELL CITY';
-   {
-   tc_purple              = #14;
-   tc_white               = #22;
-   tc_green               = #23;
-   }
+
+   t:='attack enemies';
+   SetStrUAbility(ua_amove        ,'Move, '  +t           ,'');
+   SetStrUAbility(ua_apatrol      ,'Patrol, '+t           ,'');
+   SetStrUAbility(ua_astay        ,'Stay, '  +t           ,'');
+   t:='ignore enemies';
+   SetStrUAbility(ua_move         ,'Move, '  +t           ,'');
+   SetStrUAbility(ua_patrol       ,'Patrol, '+t           ,'');
+   SetStrUAbility(ua_stay         ,'Stay, '  +t           ,'');
+
+   SetStrUAbility(ua_destroy      ,'Destroy'              ,'');
+   SetStrUAbility(ua_unload       ,'Unload'               ,'');
+   SetStrUAbility(ua_unloadto     ,'Unload at point'      ,'');
+   SetStrUAbility(ua_Upgrade      ,'Upgrade'              ,'');
+
 
    hintStrUID(UID_HKeep            ,'Hell Keep'                   ,'');
-   hintStrUID(UID_HAKeep           ,'Great Hell Keep'             ,'');
    hintStrUID(UID_HGate            ,'Demon`s Gate'                ,'');
    hintStrUID(UID_HSymbol          ,'Unholy Symbol'               ,'');
-   hintStrUID(UID_HASymbol         ,'Great Unholy Symbol'         ,'');
    hintStrUID(UID_HPools           ,'Infernal Pools'              ,'');
    hintStrUID(UID_HTeleport        ,'Teleporter'                  ,'');
    hintStrUID(UID_HPentagram       ,'Pentagram of Death'          ,'');
@@ -1103,7 +1056,6 @@ begin
    hintStrUID(UID_HTotem           ,'Totem of Horror'             ,'Advanced defensive structure'     );
    hintStrUID(UID_HAltar           ,'Altar of Pain'               ,'');
    hintStrUID(UID_HCommandCenter   ,'Hell Command Center'         ,'Corrupted Command Center'         );
-   hintStrUID(UID_HACommandCenter  ,'Advanced Hell Command Center','Corrupted Advanced Command Center');
    hintStrUID(UID_HBarracks        ,'Zombie Barracks'             ,'Corrupted Barracks'               );
    hintStrUID(UID_HEye             ,'Evil Eye'                    ,'Passive scouting and detection'   );
 
@@ -1131,6 +1083,48 @@ begin
    hintStrUID(UID_ZFPlasmagunner   ,'Zombie Plasmagunner'         ,'');
    hintStrUID(UID_ZBFGMarine       ,'Zombie BFG Marine'           ,'');
 
+   //g_uability
+   {
+          = 16;
+             = 17;
+           = 18;
+           = 19;
+            = 20;
+              = 21;
+                = 22;
+             = 23;
+           = 24;
+          = 25;
+           = 26;
+
+   ua_HSpawnLost          = 27;
+   ua_HSpawnLostTo        = 28;
+
+   ua_UCCUp               = 30;
+   ua_UCCLand             = 31;
+   ua_UTurretG2A          = 32;
+   ua_UTurretA2G          = 33;
+   ua_UTurret2Drone       = 34;
+   ua_UScan               = 35;
+   ua_UStrike             = 36;
+   ua_USphereSoul         = 37;
+   ua_USphereInvis        = 38;
+   ua_USphereInvuln       = 39;
+   }
+
+
+   SetStrUAbility(ua_HKeepPainAura,'Decay Aura'           ,'');
+   SetStrUAbility(ua_HKeepBlink   ,'Hell Keep Blink'      ,'');
+   SetStrUAbility(ua_HR2Totem     ,'Rebuild to '+g_uids[UID_HTotem].un_txt_name,'');
+   SetStrUAbility(ua_HR2Tower     ,'Rebuild to '+g_uids[UID_HTower].un_txt_name,'');
+   SetStrUAbility(ua_HShortBlink  ,'Tower Teleportation'  ,'');
+   SetStrUAbility(ua_HTeleport    ,'Teleport'             ,'');
+   SetStrUAbility(ua_HRecall      ,'Recall'               ,'');
+   SetStrUAbility(ua_HellVision   ,'Hell Vision'          ,'');
+   SetStrUAbility(ua_HSphereArmor ,'Armor Shpere'         ,'');
+   SetStrUAbility(ua_HSphereDamage,'Double Damage Sphere' ,'');
+   SetStrUAbility(ua_HSphereHaste ,'Haste Sphere'         ,'');
+
 
    hintStrUPID(upgr_hell_t1attack  ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures');
    hintStrUPID(upgr_hell_uarmor    ,'Combat Flesh'                  ,'Increase the armor of all Hell units'                                   );
@@ -1142,8 +1136,6 @@ begin
    hintStrUPID(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for the Hell Keep`s ability'                                     );
    hintStrUPID(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep damages all nearby enemy units. Decay Aura damage ignores unit armor.');
    hintStrUPID(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase the Hell Keep`s range of vision'                               );
-   hintStrUPID(upgr_hell_extbuild  ,'Adaptive Foundation'           ,'All buildings, except the Teleporter and unit-producing structures, can be placed on doodads.');
-   hintStrUPID(upgr_hell_ghostm    ,'Ghost Monsters'                ,'Pinky Demons can move over obstacles'                           );
 
    hintStrUPID(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demons become invisible'                                  );
    hintStrUPID(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
@@ -1160,11 +1152,9 @@ begin
 
 
    hintStrUID(UID_UCommandCenter   ,'Command Center'                ,''      );
-   hintStrUID(UID_UACommandCenter  ,'Advanced Command Center'       ,''      );
    hintStrUID(UID_UBarracks        ,'Barracks'                      ,''      );
    hintStrUID(UID_UFactory         ,'Vehicle Factory'               ,''      );
    hintStrUID(UID_UGenerator       ,'Generator'                     ,''      );
-   hintStrUID(UID_UAGenerator      ,'Advanced Generator'            ,''      );
    hintStrUID(UID_UWeaponFactory   ,'Weapons Factory'               ,''      );
    hintStrUID(UID_UGTurret         ,'Anti-ground Turret'            ,'Anti-ground defensive structure');
    hintStrUID(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
@@ -1172,7 +1162,6 @@ begin
    hintStrUID(UID_UComputerStation ,'Computer Station'              ,'');
    hintStrUID(UID_URadar           ,'Radar'                         ,'Reveals map');
    hintStrUID(UID_URMStation       ,'Rocket Launcher Station'       ,'');
-   hintStrUID(UID_UMine            ,'Mine'                          ,'');
 
    hintStrUID(UID_Sergant          ,'Shotguner'                     ,'');
    hintStrUID(UID_SSergant         ,'SuperShotguner'                ,'');
@@ -1188,7 +1177,6 @@ begin
    hintStrUID(UID_Terminator       ,'Terminator'                    ,'');
    hintStrUID(UID_Tank             ,'Tank'                          ,'');
    hintStrUID(UID_Flyer            ,'Fighter'                       ,'');
-   hintStrUID(UID_APC              ,'Ground APC'                    ,'');
 
 
    hintStrUPID(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
@@ -1201,8 +1189,6 @@ begin
    hintStrUPID(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
    hintStrUPID(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
    hintStrUPID(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
-   hintStrUPID(upgr_uac_extbuild   ,'Adaptive Foundation'              ,'All buildings, except those that can produce units, can be placed on doodads');
-   hintStrUPID(upgr_uac_soaring    ,'Antigravity Platform'             ,'Drones can move over obstacles'              );
 
    hintStrUPID(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'A Drone can rebuild to Anti-ground turret'    );
    hintStrUPID(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
@@ -1218,52 +1204,50 @@ begin
    hintStrUPID(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability' );
 
 
-   hintStrAction(0 ,'Specail ability');
-   t:='Specail ability at point';
-   hintStrAction(1 ,t);
-   str_uiWarn_ReqpsabilityOrder:= 'Use "'+t+'" order!';
-   hintStrAction(2 ,'Rebuild/Upgrade');
-   t:='attack enemies';
-   hintStrAction(3 ,'Move, '  +t);
-   hintStrAction(4 ,'Stop, '  +t);
-   hintStrAction(5 ,'Patrol, '+t);
-   t:='ignore enemies';
-   hintStrAction(6 ,'Move, '  +t);
-   hintStrAction(7 ,'Stop, '  +t);
-   hintStrAction(8 ,'Patrol, '+t);
-   hintStrAction(9 ,'Cancel production');
-   hintStrAction(10,'Select all battle units' );
-   hintStrAction(11,'Destroy'          );
-   hintStrAction(12,'Alarm mark'       );
-   hintStrAction(13,str_menu_maction);
+   SetHintStr(3 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_amove  ].ua_name);
+   SetHintStr(4 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_astay  ].ua_name);
+   SetHintStr(5 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_apatrol].ua_name);
+   SetHintStr(6 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_move   ].ua_name);
+   SetHintStr(7 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_stay   ].ua_name);
+   SetHintStr(8 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,g_uability[ua_patrol ].ua_name);
+   SetHintStr(9 ,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,'Cancel production');
+   SetHintStr(10,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,'To nearest base' );
+   SetHintStr(11,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,'Select all battle units' );
+   SetHintStr(12,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,'Destroy'          );
+   SetHintStr(13,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,'Alarm mark'       );
+   SetHintStr(14,@str_panelHint_a,@hotkeyA1,@hotkeyA2,false,str_menu_maction);
 
-   hintStrReplay  (0 ,'Faster game speed'    ,false);
-   hintStrReplay  (1 ,'Left click: back 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
-                      'Right click: back 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
-                      'Middle click: back 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
-   hintStrReplay  (2 ,'Left click: skip 2 seconds ('                                +tc_lime+'E'+tc_default+')'+tc_nl1+
-                      'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'E'+tc_default+')'+tc_nl1+
-                      'Middle click: skip 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'E'+tc_default+')',true);
-   hintStrReplay  (3 ,'Pause'                ,false);
-   hintStrReplay  (4 ,'Player-recorder POV'  ,false);
-   hintStrReplay  (5 ,'List of game messages',false);
-   hintStrReplay  (6 ,'Fog of war'           ,false);
-   hintStrReplay  (8 ,'Vision: All players'  ,false);
-   hintStrReplay  (9 ,'Vision: Player #1'    ,false);
-   hintStrReplay  (10,'Vision: Player #2'    ,false);
-   hintStrReplay  (11,'Vision: Player #3'    ,false);
-   hintStrReplay  (12,'Vision: Player #4'    ,false);
-   hintStrReplay  (13,'Vision: Player #5'    ,false);
-   hintStrReplay  (14,'Vision: Player #6'    ,false);
+   SetHintStr(0 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Faster game speed'    );
+   SetHintStr(1 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,true ,'Left click: back 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
+                                                            'Right click: back 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
+                                                            'Middle click: back 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')'        );
+   SetHintStr(2 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,true ,'Left click: skip 2 seconds ('                                +tc_lime+'E'+tc_default+')'+tc_nl1+
+                                                            'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'E'+tc_default+')'+tc_nl1+
+                                                            'Middle click: skip 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'E'+tc_default+')'        );
+   SetHintStr(3 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Pause'                );
+   SetHintStr(4 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Player-recorder POV'  );
+   SetHintStr(5 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'List of game messages');
+   SetHintStr(6 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Fog of war'           );
+   SetHintStr(8 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: All players'  );
+   SetHintStr(9 ,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #1'    );
+   SetHintStr(10,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #2'    );
+   SetHintStr(11,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #3'    );
+   SetHintStr(12,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #4'    );
+   SetHintStr(13,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #5'    );
+   SetHintStr(14,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #6'    );
+   SetHintStr(15,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #7'    );
+   SetHintStr(16,@str_panelHint_r,@hotkeyR1,@hotkeyR2,false,'Vision: Player #8'    );
 
-   hintStrObserver(0 ,'Fog of war'           ,false);
-   hintStrObserver(2 ,'Vision: All players'  ,false);
-   hintStrObserver(3 ,'Vision: Player #1'    ,false);
-   hintStrObserver(4 ,'Vision: Player #2'    ,false);
-   hintStrObserver(5 ,'Vision: Player #3'    ,false);
-   hintStrObserver(6 ,'Vision: Player #4'    ,false);
-   hintStrObserver(7 ,'Vision: Player #5'    ,false);
-   hintStrObserver(8 ,'Vision: Player #6'    ,false);
+   SetHintStr(0 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Fog of war'           );
+   SetHintStr(2 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: All players'  );
+   SetHintStr(3 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #1'    );
+   SetHintStr(4 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #2'    );
+   SetHintStr(5 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #3'    );
+   SetHintStr(6 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #4'    );
+   SetHintStr(7 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #5'    );
+   SetHintStr(8 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #6'    );
+   SetHintStr(9 ,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #7'    );
+   SetHintStr(10,@str_panelHint_o,@hotkeyO1,@hotkeyO2,false,'Vision: Player #8'    );
 
 
    {str_camp_t[0]         := 'Hell #1: Phobos invasion';
@@ -1644,16 +1628,16 @@ begin
   g_presets[gp_custom   ].gp_name:= 'свои настройки';
   MakeGamePresetsNames(@str_emnu_GameModel[0],@str_map_typel[0]);
 
-  str_ability_name[uab_Teleport        ]:='Телепортация';
-  str_ability_name[uab_UACScan         ]:='Сканирование';
-  str_ability_name[uab_HTowerBlink     ]:='Скачок';
-  str_ability_name[uab_UACStrike       ]:='Ракетный удар';
-  str_ability_name[uab_HKeepBlink      ]:='Перемещение';
-  str_ability_name[uab_RebuildInPoint  ]:='';
-  str_ability_name[uab_HInvulnerability]:='Неуязвимость';
-  str_ability_name[uab_SpawnLost       ]:='Выпустить Lost Soul';
-  str_ability_name[uab_HellVision      ]:='Адское зрение';
-  str_ability_name[uab_CCFly           ]:='Двигатели для полета';
+  str_ability_name[ua_Teleport        ]:='Телепортация';
+  str_ability_name[ua_UACScan         ]:='Сканирование';
+  str_ability_name[ua_HTowerBlink     ]:='Скачок';
+  str_ability_name[ua_UACStrike       ]:='Ракетный удар';
+  str_ability_name[ua_HKeepBlink      ]:='Перемещение';
+  str_ability_name[ua_RebuildInPoint  ]:='';
+  str_ability_name[ua_HInvulnerability]:='Неуязвимость';
+  str_ability_name[ua_SpawnLost       ]:='Выпустить Lost Soul';
+  str_ability_name[ua_HellVision      ]:='Адское зрение';
+  str_ability_name[ua_CCFly           ]:='Двигатели для полета';
   str_ability_unload                    :='Выгрузить';
 
   hintStrUID(UID_HKeep           ,'Адская Крепость'            ,'');
@@ -1873,8 +1857,8 @@ begin
         writeln(f,un_txt_name);
         writeln(f);
 
-        writeln(f,'Hotkey: ',RemoveSpecChars(hotKeyCommon(_ucl)));
-        writeln(f,'Categories/Attributes: ',RemoveSpecChars(_makeAttributeStr(nil,u)));
+        writeln(f,'Hotkey: ',RemoveSpecChars(hotKeyCommon(_ucl,@hotkeyP1,@hotkeyP2)));
+        writeln(f,'Categories/Attributes: ',RemoveSpecChars(txt_makeAttributeStr(nil,u)));
         writeln(f,'Max hits: ',_mhits);
         writeln(f,'Limit used: ', l2s(_limituse,ul1));
         writeln(f,'Size: ',_r);
@@ -1899,7 +1883,7 @@ begin
 
         writeln(f,RemoveSpecChars(un_txt_uihint4));
 
-        if(_attack=atm_always)then
+        if(_attack)then
         begin
            writeln(f,str_uhint_UnitArming);
            for w:=0 to MaxUnitWeapons do
@@ -1944,10 +1928,6 @@ begin
 
         if(not _ukbuilding)and(not _ukmech)and(_painc>0)and(_painc_upgr_step>0)then
         upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
-
-        if(_ukbuilding)and(not _isbarrack)and(_ability<>uab_Teleport)then
-        upgrLine(upgr_race_extbuilding[_urace],'allows building this structure on doodads');
-
 
         writeln(f);
 

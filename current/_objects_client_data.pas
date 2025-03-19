@@ -404,34 +404,32 @@ end;
 
 UID_HKeep:
 begin
-   setMWSModel(0,@spr_HKeep);
-   setBuildingSND(snd_hell_hk);
-end;
-UID_HAKeep:
-begin
-   setMWSModel(0,@spr_HAKeep);
+   setMWSModel(0,@spr_HKeep1);
+   setMWSModel(2,@spr_HKeep2);
    setBuildingSND(snd_hell_hk);
 end;
 UID_HGate:
 begin
-   setMWSModel(0,@spr_HGate );
-   setMWSModel(1,@spr_HAGate);
+   setMWSModel(0,@spr_HGate1);
+   setMWSModel(1,@spr_HGate2);
+   setMWSModel(2,@spr_HGate2);
+   setMWSModel(3,@spr_HGate3);
    setBuildingSND(snd_hell_hgate);
 end;
 UID_HSymbol:
 begin
-   setMWSModel(0,@spr_HSymbol);
-   setBuildingSND(snd_hell_hsymbol);
-end;
-UID_HASymbol:
-begin
-   setMWSModel(0,@spr_HASymbol);
+   setMWSModel(0,@spr_HSymbol1);
+   setMWSModel(1,@spr_HSymbol2);
+   setMWSModel(2,@spr_HSymbol3);
+   setMWSModel(3,@spr_HSymbol4);
    setBuildingSND(snd_hell_hsymbol);
 end;
 UID_HPools:
 begin
-   setMWSModel(0,@spr_HPools );
-   setMWSModel(1,@spr_HAPools);
+   setMWSModel(0,@spr_HPools1);
+   setMWSModel(1,@spr_HPools2);
+   setMWSModel(2,@spr_HPools3);
+   setMWSModel(3,@spr_HPools4);
    setBuildingSND(snd_hell_hpool);
 end;
 UID_HTower:
@@ -492,16 +490,8 @@ begin
 end;
 UID_HCommandCenter:
 begin
-   setMWSModel(0,@spr_HCommandCenter);
-   setBuildingSND(snd_hell_hbuild);
-   setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
-   setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
-   un_eid_bcrater_y:=10;
-   setWeaponESND(0    ,nil,snd_hell_attack,0,0);
-end;
-UID_HACommandCenter:
-begin
-   setMWSModel(0,@spr_HACommandCenter);
+   setMWSModel(0,@spr_HCommandCenter1);
+   setMWSModel(2,@spr_HCommandCenter2);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectSND(  snd_hell,snd_building_explode,snd_building_explode,nil);
@@ -510,8 +500,8 @@ begin
 end;
 UID_HBarracks:
 begin
-   setMWSModel(0,@spr_HBarracks );
-   setMWSModel(1,@spr_HABarracks);
+   setMWSModel(0,@spr_HBarracks1 );
+   setMWSModel(2,@spr_HBarracks2);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,0     ,EID_BBExp           ,EID_BBExp           ,0  );
    setEffectEID(1,0     ,EID_BBExp           ,EID_BBExp           ,0  );
@@ -623,14 +613,6 @@ begin
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
 end;
-UID_APC:
-begin
-   _animw:=17;
-   setMWSModel(0,@spr_APC);
-   setCommandSND(snd_APC_ready,snd_APC_move,snd_APC_move,snd_APC_move,snd_APC_move);
-   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (  nil,snd_exp ,snd_exp ,nil);
-end;
 UID_UACDron:
 begin
    setMWSModel(0,@spr_UACBot);
@@ -677,42 +659,33 @@ end;
 
 UID_UCommandCenter:
 begin
-   setMWSModel(0,@spr_UCommandCenter);
-   setBuildingSND(snd_uac_cc);
-   setWeaponESND(0    ,nil,snd_plasma,0,0);
-end;
-UID_UACommandCenter:
-begin
-   setMWSModel(0,@spr_UACommandCenter);
+   setMWSModel(0,@spr_UCommandCenter1);
+   setMWSModel(2,@spr_UCommandCenter2);
    setBuildingSND(snd_uac_cc);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
 end;
 UID_UBarracks:
 begin
-   setMWSModel(0,@spr_UBarracks);
-   setMWSModel(1,@spr_UABarracks);
+   setMWSModel(0,@spr_UBarracks1);
+   setMWSModel(1,@spr_UBarracks2);
    setBuildingSND(snd_uac_barracks);
 end;
 UID_UFactory:
 begin
-   setMWSModel(0,@spr_UFactory );
-   setMWSModel(1,@spr_UAFactory);
+   setMWSModel(0,@spr_UFactory1 );
+   setMWSModel(2,@spr_UFactory2);
    setBuildingSND(snd_uac_factory);
 end;
 UID_UGenerator:
 begin
-   setMWSModel(0,@spr_UGenerator);
+   setMWSModel(0,@spr_UGenerator1);
+   setMWSModel(2,@spr_UGenerator2);
    setBuildingSND(snd_uac_generator);
-end;
-UID_UAGenerator:
-begin
-   setMWSModel(0,@spr_UAGenerator);
-   setBuildingSND(snd_uac_suply);
 end;
 UID_UWeaponFactory:
 begin
-   setMWSModel(0,@spr_UWeaponFactory); //@
-   setMWSModel(1,@spr_UAWeaponFactory);
+   setMWSModel(0,@spr_UWeaponFactory1); //@
+   setMWSModel(2,@spr_UWeaponFactory2);
    setBuildingSND(snd_uac_smith);
 end;
 UID_UTechCenter:
@@ -752,18 +725,8 @@ end;
 
 UID_UComputerStation:
 begin
-   setMWSModel(0,@spr_UNuclearPlant);
+   setMWSModel(0,@spr_UCompStation);
    setBuildingSND(snd_uac_nucl);
-end;
-UID_UMine:
-begin
-   setMWSModel   (0,@spr_Mine);
-   setBuildingSND(snd_mine_place);
-   un_snd_ready:=snd_mine_place;
-   setWeaponESND(0,nil,snd_electro,0,0);
-   setEffectEID(0,0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND(  nil,snd_exp,snd_exp,nil);
-   un_eid_bcrater:=255;
 end;
 
       end;
@@ -815,7 +778,6 @@ end;
    end;
 
    u:=UID_HCommandCenter;  setEffectEID2(0,sm_uid2MWTexture(UID_UCommandCenter  ,0,0));
-   u:=UID_HACommandCenter; setEffectEID2(0,sm_uid2MWTexture(UID_UACommandCenter ,0,0));
    u:=UID_HBarracks;       setEffectEID2(0,sm_uid2MWTexture(UID_UBarracks       ,0,0));
                            setEffectEID2(1,sm_uid2MWTexture(UID_UBarracks       ,0,1));
 
@@ -853,9 +815,7 @@ upgr_hell_teleport  : begin _up_btn:=spr_b_up[r_hell,8 ]; end;
 upgr_hell_HKTeleport: begin _up_btn:=spr_b_up[r_hell,9 ]; end;
 upgr_hell_paina     : begin _up_btn:=spr_b_up[r_hell,10]; end;
 upgr_hell_buildr    : begin _up_btn:=spr_b_up[r_hell,11]; end;
-upgr_hell_extbuild  : begin _up_btn:=spr_b_up[r_hell,20]; end;
 upgr_hell_spectre   : begin _up_btn:=spr_b_up[r_hell,23]; end;
-upgr_hell_ghostm    : begin _up_btn:=spr_b_up[r_hell,12]; end;
 upgr_hell_phantoms  : begin _up_btn:=spr_b_up[r_hell,17]; end;
 upgr_hell_t2attack  : begin _up_btn:=spr_b_up[r_hell,24]; end;
 upgr_hell_rteleport : begin _up_btn:=spr_b_up[r_hell,16]; end;
@@ -872,13 +832,11 @@ upgr_uac_melee      : begin _up_btn:=spr_b_up[r_uac ,3 ]; end;
 upgr_uac_vision     : begin _up_btn:=spr_b_up[r_uac ,12]; end;
 upgr_uac_mspeed     : begin _up_btn:=spr_b_up[r_uac ,4 ]; end;
 upgr_uac_plasmt     : begin _up_btn:=spr_b_up[r_uac ,5 ]; end;
-upgr_uac_soaring    : begin _up_btn:=spr_b_up[r_uac ,6 ]; end;
 upgr_uac_towers     : begin _up_btn:=spr_b_up[r_uac ,7 ]; end;
 upgr_uac_radar_r    : begin _up_btn:=spr_b_up[r_uac ,8 ]; end;
 upgr_uac_CCFly      : begin _up_btn:=spr_b_up[r_uac ,9 ]; end;
 upgr_uac_ccturr     : begin _up_btn:=spr_b_up[r_uac ,10]; end;
 upgr_uac_buildr     : begin _up_btn:=spr_b_up[r_uac ,11]; end;
-upgr_uac_extbuild   : begin _up_btn:=spr_b_up[r_uac ,20]; end;
 upgr_uac_commando   : begin _up_btn:=spr_b_up[r_uac ,22]; end;
 upgr_uac_botturret  : begin _up_btn:=spr_b_up[r_uac ,23]; end;
 upgr_uac_airsp      : begin _up_btn:=spr_b_up[r_uac ,13]; end;
@@ -891,7 +849,67 @@ upgr_uac_rstrike    : begin _up_btn:=spr_b_up[r_uac ,16]; end;
 upgr_uac_lturret    : begin _up_btn:=spr_b_up[r_uac ,19]; end;
 
       end;
+   end;
 
+   {
+   ua_mbrush_c: cardinal;
+   ua_mbrush_r: integer;
+   ua_btn     : pSDL_Surface;
+   }
+   // abilities
+   for u:=0 to 255 do
+   with g_uability[u] do
+   begin
+      ua_mbrush_c:=c_white;
+
+      case u of
+ua_amove,
+ua_apatrol : ua_mbrush_c:=c_red;
+ua_move,
+ua_patrol  : ua_mbrush_c:=c_lime;
+ua_unloadto: ua_mbrush_c:=c_yellow;
+      end;
+
+      {
+      ua_amove               = 0;
+      ua_move                = 1;
+      ua_apatrol             = 2;
+      ua_patrol              = 3;
+      ua_astay               = 4;
+      ua_stay                = 5;
+      ua_destroy             = 6;
+
+      ua_unload              = 10;
+      ua_unloadto            = 11;
+
+      ua_Upgrade             = 15;
+
+      ua_HKeepPainAura       = 16;
+      ua_HKeepBlink          = 17;
+      ua_HR2Totem            = 18;
+      ua_HR2Tower            = 19;
+      ua_HShortBlink         = 20;
+      ua_HTeleport           = 21;
+      ua_HRecall             = 22;
+      ua_HellVision          = 23;
+      ua_HSphereArmor        = 24;
+      ua_HSphereDamage       = 25;
+      ua_HSphereHaste        = 26;
+
+      ua_HSpawnLost          = 27;
+      ua_HSpawnLostTo        = 28;
+
+      ua_UCCUp               = 30;
+      ua_UCCLand             = 31;
+      ua_UTurretG2A          = 32;
+      ua_UTurretA2G          = 33;
+      ua_UTurret2Drone       = 34;
+      ua_UScan               = 35;
+      ua_UStrike             = 36;
+      ua_USphereSoul         = 37;
+      ua_USphereInvis        = 38;
+      ua_USphereInvuln       = 39;
+      }
    end;
 end;
 

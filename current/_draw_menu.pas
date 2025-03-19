@@ -167,7 +167,7 @@ begin
                          D_menu_EText(tar,mi,ta_LM ,name,true,0,c_white);
                          if(player_type=pt_human)and(net_status<>ns_single)then
                          begin
-                            if(playeri=PlayerLobby)
+                            if(playeri=PlayerLobb1)
                             then tstr:=str_menu_server
                             else
                               if(isready)
@@ -219,7 +219,7 @@ begin
       D_menu_Panel(tar,mi_x0,mi_y0,mi_x1,mi_y1,255);
       if(p1=0)then draw_text(tar,(mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_white);
       boxColor(tar,mi_x0+basefont_wh,mi_y0+basefont_wh,
-                   mi_x1-basefont_wh,mi_y1-basefont_wh,PlayerColorScheme[p1]);
+                   mi_x1-basefont_wh,mi_y1-basefont_wh,PlayerColorNormal[p1]);
    end;
 end;
 
@@ -365,7 +365,7 @@ mi_settings_sound          : D_menu_MButtonS(tar,i,str_menu_settingsSound   ,men
 
 mi_StartGame               : D_menu_MButtonD(tar,i,str_menu_StartGame,'',true);
 mi_EndGame                 : D_menu_MButtonD(tar,i,str_menu_EndGame  ,'',true);
-mi_SaveLoad                : D_menu_MButtonD(tar,i,str_menu_SaveLoad ,'',true);
+mi_SaveLoad                : D_menu_MButton (tar,i,str_menu_SaveLoad         );
 mi_Settings                : D_menu_MButton (tar,i,str_menu_Settings         );
 mi_AboutGame               : D_menu_MButton (tar,i,str_menu_AboutGame        );
 
@@ -379,10 +379,11 @@ mi_settings_ShowAPM        : D_menu_MButtonD(tar,i,str_menu_APM             ,str
 mi_settings_HitBars        : D_menu_MButtonD(tar,i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_uhbars]      ,true );
 mi_settings_MRBAction      : D_menu_MButtonD(tar,i,str_menu_maction         ,str_menu_mactionl[m_action]         ,true );
 mi_settings_ScrollSpeed    : D_menu_MButtonB(tar,i,str_menu_ScrollSpeed     ,vid_CamSpeed,max_CamSpeed           ,false);
-mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMScroll]            ,false);
+mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]            ,false);
 mi_settings_PlayerName     : D_menu_MButtonN(tar,i,str_menu_PlayerName      ,PlayerName                                );
 mi_settings_Langugage      : D_menu_MButtonD(tar,i,str_menu_language        ,str_menu_lang[ui_language]          ,true );
 mi_settings_PanelPosition  : D_menu_MButtonD(tar,i,str_menu_PanelPos        ,str_menu_PanelPosl[vid_PannelPos]   ,true );
+mi_settings_MMapPosition   : D_menu_MButtonD(tar,i,str_menu_MiniMapPos      ,str_menu_MiniMapPosl[vid_PannelPos<2][vid_MiniMapPos],true );
 mi_settings_PlayerColors   : D_menu_MButtonD(tar,i,str_menu_PlayersColor    ,str_menu_PlayersColorl[vid_plcolors],true );
 
 {
@@ -472,9 +473,9 @@ mi_player_color5,
 mi_player_color6,
 mi_player_color7           : D_menu_PlayerColor(tar,i,i-mi_player_color0);
 
-mi_map_Preset              : D_menu_MButtonM(tar,i,g_presets[g_preset_cur].gp_name        ,true );
+mi_map_Preset              : D_menu_MButtonD(tar,i,g_presets[g_preset_cur].gp_name,''     ,true );
 mi_map_Seed                : D_menu_MButtonU(tar,i,str_map_seed,c2s(map_seed)                   );
-mi_map_Size                : D_menu_MButtonD(tar,i,str_map_size,i2s(RoundN(map_size,100)) ,true );
+mi_map_Size                : D_menu_MButtonD(tar,i,str_map_size,i2s(RoundN(map_psize,100)) ,true );
 mi_map_Type                : D_menu_MButtonD(tar,i,str_map_type,str_map_typel[map_type   ],true );
 mi_map_Sym                 : D_menu_MButtonD(tar,i,str_map_sym ,str_map_syml[map_symmetry],true );
 mi_map_Random              : D_menu_MButton (tar,i,str_map_random);
@@ -486,7 +487,6 @@ mi_map_MiniMap             : with menu_items[i] do
                              end;
 
 mi_game_mode               : D_menu_MButtonD(tar,i,str_menu_GameMode     ,str_emnu_GameModel[g_mode]        ,true );
-mi_game_builders           : D_menu_MButtonD(tar,i,str_menu_StartBase    ,b2s(g_start_base+1)               ,true );
 mi_game_generators         : D_menu_MButtonD(tar,i,str_menu_Generators   ,str_menu_Generatorsl[g_generators],true );
 mi_game_FixStarts          : D_menu_MButtonD(tar,i,str_menu_FixedStarts  ,str_bool[g_fixed_positions]       ,false);
 mi_game_DeadPbserver       : D_menu_MButtonD(tar,i,str_menu_DeadObservers,str_bool[g_deadobservers]         ,false);
@@ -570,7 +570,9 @@ begin
       then color:=c_white
       else color:=c_gray;
 
-      draw_text (r_screen,menu_list_x-basefont_wq3,y+menu_list_item_hh,mli_caption,ta_RM,255,color);
+      if(menu_list_aleft)
+      then draw_text (r_screen,menu_list_x+basefont_wq3-menu_list_w ,y+menu_list_item_hh,mli_caption,ta_LM,255,color)
+      else draw_text (r_screen,menu_list_x-basefont_wq3             ,y+menu_list_item_hh,mli_caption,ta_RM,255,color);
       hlineColor(r_screen,menu_list_x-menu_list_w+1,menu_list_x-1,y+menu_list_item_H,c_white);
    end;
    draw_set_FontSize1(10);

@@ -185,7 +185,7 @@ begin
        d      := point_dist_rint(x,y,vx,vy);
 
        tu:=nil;
-       IsUnitRange(tar,@tu);
+       IsIntUnitRange(tar,@tu);
 
        damage:=adddmg;
        if(player<=LastPlayer)and(tu<>nil)then
@@ -238,8 +238,8 @@ ud,rdamage: integer;
 begin
    with g_missiles[m] do
    with g_mids[mid] do
-    if(IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)and(not IsUnitRange(tu^.transport,nil))then
+    if(IsIntUnitRange(tar,@tu))then
+     if(tu^.hits>0)and(not IsIntUnitRange(tu^.transport,nil))then
      begin
         if(not mid_noflycheck)and(mfs<>tu^.ukfly)then exit;
         if(tu^.uidi in mid_nodamage)then exit;
@@ -288,7 +288,7 @@ begin
      end;
 end;
 
-procedure missile_Cycle;
+procedure MissilesCode;
 const  mb_s0 = fr_fps1 div 5;
        mb_s1 = fr_fps1-mb_s0;
 var m,u:integer;
@@ -300,7 +300,7 @@ begin
    if(vstep>0)then
    begin
       tu:=nil;
-      if(IsUnitRange(tar,@tu))then
+      if(IsIntUnitRange(tar,@tu))then
        if(homing>mh_none)then
         if(tu^.buff[ub_teleport]>0)
         then homing:=mh_none
@@ -348,7 +348,7 @@ mh_homing   : begin
       if(vstep=0)then
       begin
          if(damage>0)and(mid_base_splashr>=0)then
-          if IsUnitRange(tar,nil)and(mtars=1)
+          if IsIntUnitRange(tar,nil)and(mtars=1)
           then missle_damage(m)
           else
             for u:=1 to MaxUnits do

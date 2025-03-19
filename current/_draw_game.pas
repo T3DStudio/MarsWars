@@ -106,7 +106,7 @@ begin
       end;
 end;
 
-procedure D_SpriteList(tar:pSDL_Surface;lx,ly:integer);
+procedure d_SpriteList(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy:integer;
 begin
    SpriteListSort;
@@ -125,14 +125,14 @@ begin
             filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
          end;
          if(alpha>0)then
-          if(alpha=255)
-          then draw_surf(tar,x,y,sprite^.sdlSurface)
-          else
-          begin
-             SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-             draw_surf(tar,x,y,sprite^.sdlSurface);
-             SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
-          end;
+           if(alpha=255)
+           then draw_surf(tar,x,y,sprite^.sdlSurface)
+           else
+           begin
+              SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+              draw_surf(tar,x,y,sprite^.sdlSurface);
+              SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
+           end;
 
          if(aura>0)then
          begin
@@ -151,21 +151,21 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  UnitsInfo
+//  UIInfo
 //
 
 const TVisPrimSize =  SizeOf(TUIItem);
 
-procedure UnitsInfoNew;
+procedure UIInfoItemNew;
 begin
    vid_UIItem_n+=1;
    setlength(vid_UIItem_list,vid_UIItem_n);
    FillChar(vid_UIItem_list[vid_UIItem_n-1],TVisPrimSize,0);
 end;
 
-procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_line;
@@ -176,9 +176,9 @@ begin
       color:=acolor;
    end;
 end;
-procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_rect;
@@ -189,9 +189,9 @@ begin
       color:=acolor;
    end;
 end;
-procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
+procedure UIInfoItemAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_rect;
@@ -207,9 +207,9 @@ begin
       text_ld :=sld;
    end;
 end;
-procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_box;
@@ -220,9 +220,9 @@ begin
       color:=acolor;
    end;
 end;
-procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
+procedure UIInfoItemAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind :=uinfo_circle;
@@ -232,9 +232,9 @@ begin
       color:=acolor;
    end;
 end;
-procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
+procedure UIInfoItemAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind   :=uinfo_text;
@@ -244,9 +244,9 @@ begin
       color  :=acolor;
    end;
 end;
-procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
+procedure UIInfoItemAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind    :=uinfo_rect;
@@ -263,9 +263,9 @@ begin
       text_ld :=sld;
    end;
 end;
-procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
+procedure UIInfoItemAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
-   UnitsInfoNew;
+   UIInfoItemNew;
    with vid_UIItem_list[vid_UIItem_n-1] do
    begin
       kind   :=uinfo_sprite;
@@ -275,30 +275,30 @@ begin
    end;
 end;
 
-procedure UnitsInfoProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
+procedure UIInfoItemProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
 var vx:integer;
 begin
    if(per<0)then per:=0;
    if(per>1)then per:=1;
 
    if(per=0)
-   then UnitsInfoAddBox(ax0,ay0,ax1,ay1,c_black)
+   then UIInfoItemAddBox(ax0,ay0,ax1,ay1,c_black)
    else
      if(per=1)
-     then UnitsInfoAddBox(ax0,ay0,ax1,ay1,acolor)
+     then UIInfoItemAddBox(ax0,ay0,ax1,ay1,acolor)
      else
      begin
         vx:=trunc((ax1-ax0)*per);
 
-        UnitsInfoAddBox(ax0   ,ay0,ax0+vx,ay1,acolor );
-        UnitsInfoAddBox(ax0+vx,ay0,ax1   ,ay1,c_black);
+        UIInfoItemAddBox(ax0   ,ay0,ax0+vx,ay1,acolor );
+        UIInfoItemAddBox(ax0+vx,ay0,ax1   ,ay1,c_black);
      end;
 end;
 
-procedure UnitsInfoAddBuff(ax,ay:integer;pspr:PTMWTexture);
+procedure UIInfoItemAddBuff(ax,ay:integer;pspr:PTMWTexture);
 begin
    ay-=pspr^.hh;
-   UnitsInfoAddSprite(ax,ay,pspr);
+   UIInfoItemAddSprite(ax,ay,pspr);
 end;
 
 function i2s6(i:integer;null:boolean):string6;
@@ -311,7 +311,7 @@ begin
      else i2s6:='';
 end;
 
-procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
+procedure UIInfoItemsAddUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
 var srect,
 choosen,
@@ -325,12 +325,12 @@ begin
    with uid^  do
    with usmodel^ do
    begin
-      acolor:=PlayerColorScheme[playeri];
+      acolor:=PlayerColorNormal[playeri];
 
       choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
 
       srect :=((isselected)and(playeri=UIPlayer))
-            or(ks_alt>0)
+            or(kt_alt>0)
             or(choosen);
 
       hbar  :=false;
@@ -345,27 +345,26 @@ begin
       if(srect)then
       begin
          if(playeri=UIPlayer)
-         then UnitsInfoAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UnitsInfoAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
-         UnitsInfoAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
+         then UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
+         else UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
+         UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
+      if(hbar )then UIInfoItemProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
 
-      if(reload>0)and(playeri=UIPlayer)then UnitsInfoAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
+      if(reload>0)and(playeri=UIPlayer)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
         case m_brush of
-1..255,
-mb_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+   1..255: UIInfoItemAddCircle(x,y,_r,r_blink2_color_BY);
         end;
 
 
-      if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
+      if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UIInfoItemAddCircle(x,y,srange,r_blink2_color_BG);
 
       //ub_Scaned
       case r_blink3 of
-      0: if(buff[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
-      1: if(buff[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
+      0: if(buff[ub_Scaned]>0)then UIInfoItemAddBuff(vx,vy,@spr_scan );
+      1: if(buff[ub_Decay ]>0)then UIInfoItemAddBuff(vx,vy,@spr_decay);
       2:;
       end;
 
@@ -384,17 +383,17 @@ mb_psability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
       then buffy:=vy
       else buffy:=vy-sm_sel_hh-basefont_w1;
 
-      if(buff[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
-      if(buff[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
-      if(pain              )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
+      if(buff[ub_HVision]>0)then begin UIInfoItemAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
+      if(buff[ub_Invuln ]>0)then begin UIInfoItemAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
+      if(pain              )then begin UIInfoItemAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
 
-procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
+procedure d_UIInfoItems(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case g_mode of
-gm_royale: circleColor(tar,lx+map_hsize-vid_cam_x,ly+map_hsize-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
+gm_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
    end;
 
    while(vid_UIItem_n>0)do
@@ -464,7 +463,7 @@ begin
    end;
 end;
 
-procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
+procedure d_terrain(tar:pSDL_Surface;lx,ly:integer);
 var
 ssx,ssy,sty,
 sx0,sy0,
@@ -503,20 +502,15 @@ begin
    else anim:=(G_Step div theme_cur_liquid_tasPeriod) mod theme_anim_step_n;
 
    AddEdges:=false;
-   with g_players[PlayerClient] do
-     case m_brush of
-1..255         : with g_uids[m_brush] do
-                   if(upgr[upgr_race_extbuilding[_urace]]=0)
-                   or(_isbarrack)
-                   or(_ability=uab_Teleport)then AddEdges:=true;
-mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
-     end;
+   case m_brush of
+1..255          : AddEdges:=true;
+   end;
 
-   for cx:=-2 to vid_map_vfw do
+   for cx:=-2 to ui_MapView_cw do
    begin
       ssy:=sty;
       my :=mty;
-      for cy:=-2 to vid_map_vfh do
+      for cy:=-2 to ui_MapView_ch do
       begin
          gx:=sx0+cx;
          gy:=sy0+cy;
@@ -527,15 +521,15 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
             begin
                b:=GridGetSolidLevel(gx,gy)>mgsl_free;
                if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
-               then UnitsInfoAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+               then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
                if(b)<>(GridGetSolidLevel(gx,gy+1)>mgsl_free)
-               then UnitsInfoAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
 
                if(b)then
                begin
-               UnitsInfoAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,r_blink2_color_BY);
-               UnitsInfoAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,r_blink2_color_BY);
-               UnitsInfoAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,r_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,r_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,r_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,r_blink2_color_BY);
                end;
             end;
 
@@ -563,18 +557,18 @@ mb_psability   : if(upgr[upgr_race_extbuilding[race]]=0)then AddEdges:=true;
                if(map_IsObstacleZone(tgc_sarea,false))
                then draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_green)
                else draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_lime ); }
-               //if(tgc_pf_solid)then UnitsInfoAddRect(mx,my,mx+MapCellw,my+MapCellw,c_red);
+               //if(tgc_pf_solid)then UIInfoItemAddRect(mx,my,mx+MapCellw,my+MapCellw,c_red);
                //draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_zone),ta_LU,255,c_gray );
                if(tgc_pf_domain>0)then
                begin
                   draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_domain),ta_LU,255,c_white );
-                  UnitsInfoAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_gray);
+                  UIInfoItemAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_gray);
                end;
                if(tgc_pf_solid)then
                begin
-                  UnitsInfoAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
-                  UnitsInfoAddLine(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
-                  UnitsInfoAddLine(mx+MapCellw,my+1,mx+1,my+MapCellw,c_red);
+                  UIInfoItemAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
+                  UIInfoItemAddLine(mx+1,my+1,mx+MapCellw,my+MapCellw,c_red);
+                  UIInfoItemAddLine(mx+MapCellw,my+1,mx+1,my+MapCellw,c_red);
                end;
             end; }
 
@@ -618,15 +612,13 @@ end;
 //  CPoints
 //
 
-procedure cpoints_sprites(draw:boolean);
+procedure d_SpriteListAddCPoints;
 const marks     = 15;
       mark_step = round(360/marks);
 var t,i:integer;
    ddir:single;
   color:cardinal;
 begin
-   if(not draw)then exit;
-
    for t:=1 to MaxCPoints do
     with g_cpoints[t] do
      if(cpCaptureR>0)then
@@ -657,12 +649,12 @@ begin
 
         if(ui_MapPointInRevealedInScreen(cpx,cpy))then
         begin
-           if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
-           if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+           if(cpTimer   >0)then UIInfoItemAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
+           if(cplifetime>0)then UIInfoItemAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
         end;
 
        // for i:=0 to MaxPlayers do
-       //  UnitsInfoAddText(cpx,cpy+(i+2)*10,i2s(cpunitsp_pstate[i])+' '+i2s(cpunitst_pstate[i]),c_white);
+       //  UIInfoItemAddText(cpx,cpy+(i+2)*10,i2s(cpunitsp_pstate[i])+' '+i2s(cpunitst_pstate[i]),c_white);
      end;
 end;
 
@@ -681,19 +673,19 @@ function GetFogGridVal(fx,fy:integer):boolean;
 begin
    GetFogGridVal:=true;
    if (0<=fx)and(fx<=fog_vfwm)
-   and(0<=fy)and(fy<=fog_vfhm)then GetFogGridVal:=not vid_fog_pgrid[fx,fy];
+   and(0<=fy)and(fy<=fog_vfhm)then GetFogGridVal:=not ui_FogView_pgrid[fx,fy];
 end;
 begin
-   vid_fog_pgrid:=vid_fog_grid;
+   ui_FogView_pgrid:=ui_FogView_grid;
 
    ssx:=lx-(vid_cam_x mod fog_CellW);
    sty:=ly-(vid_cam_y mod fog_CellW);
 
-   for cx:=0 to vid_fog_vfw do
+   for cx:=0 to ui_FogView_cw do
    begin
       //vlineColor(tar,ssx,vid_mapx,vid_mapx+vid_cam_w,c_gray);
       ssy:=sty;
-      for cy:=0 to vid_fog_vfh do
+      for cy:=0 to ui_FogView_ch do
       begin
          tileX:=TileSetGetN(GetFogGridVal(cx-1,cy-1),
                             GetFogGridVal(cx  ,cy-1),
@@ -707,9 +699,9 @@ begin
                             GetFogGridVal(cx  ,cy+1),
                             GetFogGridVal(cx+1,cy+1));
          if(0<=tileX)and(tileX<=MaxTileSet)then
-           draw_surf(tar,ssx,ssy,vid_fog_tiles[tileX].sdlSurface);
+           draw_surf(tar,ssx,ssy,ui_fog_tiles[tileX].sdlSurface);
 
-         vid_fog_grid[cx,cy]:=false;
+         ui_FogView_grid[cx,cy]:=false;
          ssy+=fog_CellW;
       end;
       ssx+=fog_CellW;
@@ -732,8 +724,7 @@ UID_HTeleport,
 UID_HPentagram,
 //UID_HSymbol,
 //UID_HASymbol,
-UID_HAltar,
-UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
+UID_HAltar    : unit_SpriteDepth:=sd_tcraters+vy;
     else
       if(uid^._ukbuilding)and(not iscomplete)
       then unit_SpriteDepth:=sd_build+vy
@@ -773,15 +764,15 @@ begin
    rectangleColor(r_screen,ix+debug_x1,iy+debug_y1,ix+debug_x1+debug_a1,iy+debug_y1+debug_b1,c_blue);
    end;}
 
-   if(ks_shift>0) then
+   if(kt_shift>0) then
    for u:=0 to LastPlayer do
     with g_players[u] do
     begin
        ix:=170+89*u;
 
-       c:=PlayerColorScheme[u];
+       c:=PlayerColorNormal[u];
 
-       draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
+       //draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
 
        draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
 
@@ -789,19 +780,19 @@ begin
        draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
 
 
-       for iy:=0 to 8  do draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
-       for iy:=0 to 11 do draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
+      // for iy:=0 to 8  do draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
+      // for iy:=0 to 11 do draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
     end;
 
-   if(ks_ctrl>0)then
+   if(kt_ctrl>0)then
    for u:=1 to MaxUnits do
     with g_units[u] do
     with player^ do
     with uid^ do
      if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
-        ix:=x-vid_cam_x+vid_mapx;
-        iy:=y-vid_cam_y+vid_mapy;
+        ix:=x-vid_cam_x+ui_MapView_x;
+        iy:=y-vid_cam_y+ui_MapView_y;
 
         //draw_text(r_screen,ix,iy,i2s(anim), ta_LU,255, PlayerGetColor(playeri));
 
@@ -830,10 +821,10 @@ begin
 
            end;
 
-           draw_text(r_screen,ix,iy   ,i2s(u)           , ta_LU,255, PlayerColorScheme[playeri]);
-           draw_text(r_screen,ix,iy+10,i2s(hits)        , ta_LU,255, PlayerColorScheme[playeri]);
-           draw_text(r_screen,ix,iy+20,w2s(zone)        , ta_LU,255, PlayerColorScheme[playeri]);
-           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorScheme[playeri]);
+           draw_text(r_screen,ix,iy   ,i2s(u)              , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_text(r_screen,ix,iy+10,i2s(hits)           , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_text(r_screen,ix,iy+20,w2s(zone)           , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorNormal[playeri]);
 
 
            //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
@@ -891,13 +882,13 @@ begin
         //if(isselected)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
 
-   if(ks_ctrl>0)then
+   if(kt_ctrl>0)then
    for u:=1 to MaxMissiles do
    with g_missiles[u] do
    if(vstep>0)then
    begin
-      ix:=vx-vid_cam_x+vid_mapx;
-      iy:=vy-vid_cam_y+vid_mapy;
+      ix:=vx-vid_cam_x+ui_MapView_x;
+      iy:=vy-vid_cam_y+ui_MapView_y;
 
       circleColor(r_screen,ix,iy,5,c_lime);
       draw_text(r_screen,ix,iy,i2s(dir), ta_LU,255, c_white);

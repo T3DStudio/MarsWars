@@ -517,6 +517,7 @@ end;
 function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;yPress:boolean;animStepX,animStepY:integer):pSDL_Surface;
 var  ts:pSDl_Surface;
 nsw,nsh:integer;
+nsx,nsy:longInt;
 begin
    nsw:=0;
    while(nsw<sw)do nsw+=baseSurface^.w;
@@ -530,7 +531,15 @@ begin
 
    gfx_FillSurfaceBySurface(ts,baseSurface,animStepX,animStepY);
 
-   gfx_MakeBaseTile:=zoomSurface(ts,sw/ts^.w,sw/ts^.h,0);
+   while true do
+   begin
+      zoomSurfaceSize(nsw,nsh,sw/nsw,sw/nsh,nsx,nsy);
+      if(nsw=1)and(nsh=1)then break;
+      if(nsx>=sw)and(nsy>=sw)then break;
+      if(nsx< sw)and(nsw>1)then nsw-=1;
+      if(nsy< sw)and(nsh>1)then nsh-=1;
+   end;
+   gfx_MakeBaseTile:=zoomSurface(ts,sw/nsw,sw/nsh,0);
 
    gfx_SDLSurfaceFree(ts);
 end;
@@ -588,8 +597,9 @@ begin
    // base terrain tile
    if(DefaultTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,@theme_tile_terrain ))then
    begin
+      writeln('MapCellW ',MapCellW);
       theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id ].sdlSurface,MapCellW,true,animStepX,animStepy);
-      writeln('update 1 theme_tile_terrain');
+      writeln('update 1 theme_tile_terrain ',theme_tile_terrain^.w,' ',theme_tile_terrain^.h);
    end;
 
    // crater tileset
@@ -775,9 +785,11 @@ begin
    r_empty   :=gfx_SDLSurfaceCreate(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_gminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   r_mminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   r_bminimap:=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   r_uiminimap:=gfx_SDLSurfaceCreate(vid_panelwu,vid_panelwu);
+   r_gminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   r_mminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   r_bminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
+   rectangleColor(r_uiminimap,0,0,r_uiminimap^.w-1,r_uiminimap^.h-1,c_white);
 
    vid_UIItem_n :=0;
    setlength(vid_UIItem_list,vid_UIItem_n);
@@ -816,13 +828,13 @@ begin
    new(vid_TileTemplate_fog);
    FillChar(vid_TileTemplate_fog^,SizeOf(vid_TileTemplate_fog^),0);
    gfx_MakeTileSetTemplate(c_white,c_black,fog_CellW,vid_TileTemplate_fog,tes_fog,0,0);
-   vid_fog_BaseSurf:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
-   boxColor(vid_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
+   ui_fog_BaseSurf:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
+   boxColor(ui_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
    for x:=0 to fog_CellW-1 do
    for r:=0 to fog_CellW-1 do
      if((x+r)mod 4)>0 then
-       pixelColor(vid_fog_BaseSurf,x,r,c_black);
-   gfx_MakeTileSet(vid_fog_BaseSurf,@vid_fog_tiles,vid_TileTemplate_fog,0,0,0,c_white);
+       pixelColor(ui_fog_BaseSurf,x,r,c_black);
+   gfx_MakeTileSet(ui_fog_BaseSurf,@ui_fog_tiles,vid_TileTemplate_fog,0,0,0,c_white);
    for x:=0 to MaxTileSet do gfx_SDLSurfaceFree(vid_TileTemplate_fog^[x].sdlSurface);
    dispose(vid_TileTemplate_fog);
 
@@ -901,7 +913,7 @@ begin
    gfx_MWSModelLoad(@spr_Siege          ,race_units[r_uac ]+'u_u4_'      ,smt_imp      ,firstload);
    gfx_MWSModelLoad(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   ,firstload);
    gfx_MWSModelLoad(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_fapc     ,firstload);
+   gfx_MWSModelLoad(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_transport,firstload);
    gfx_MWSModelLoad(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
    gfx_MWSModelLoad(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'      ,smt_terminat ,firstload);
    gfx_MWSModelLoad(@spr_Tank           ,race_units[r_uac ]+'u_u10_'     ,smt_tank     ,firstload);
@@ -909,14 +921,20 @@ begin
    gfx_MWSModelLoad(@spr_Transport      ,race_units[r_uac ]+'transport'  ,smt_transport,firstload);
    gfx_MWSModelLoad(@spr_UACBot         ,race_units[r_uac ]+'uacd'       ,smt_flyer    ,firstload);
 
-   gfx_MWSModelLoad(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HGate          ,race_buildings[r_hell]+'h_b1_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HAGate         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol        ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HASymbol       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPools         ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HAPools        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HKeep1         ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HKeep2         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HGate1         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HGate2         ,race_buildings[r_hell]+'h_b1b'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HGate3         ,race_buildings[r_hell]+'h_b1c'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HGate4         ,race_buildings[r_hell]+'h_b1d'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HSymbol1       ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HSymbol2       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HSymbol3       ,race_buildings[r_hell]+'h_b2b_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HSymbol4       ,race_buildings[r_hell]+'h_b2c_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPools1        ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPools2        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPools3        ,race_buildings[r_hell]+'h_b3b'  ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HPools4        ,race_buildings[r_hell]+'h_b3c'  ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding  ,firstload);
@@ -924,30 +942,39 @@ begin
    gfx_MWSModelLoad(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks      ,race_buildings[r_hell]+'h_hbar_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HABarracks     ,race_buildings[r_hell]+'h_hbara',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HCommandCenter1,race_buildings[r_hell]+'h_hcc_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HCommandCenter2,race_buildings[r_hell]+'h_hcca_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HBarracks1     ,race_buildings[r_hell]+'h_hbar_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HBarracks2     ,race_buildings[r_hell]+'h_hbara',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HBarracks3     ,race_buildings[r_hell]+'h_hbarb',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_HBarracks4     ,race_buildings[r_hell]+'h_hbarc',smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding  ,firstload);
 
-   gfx_MWSModelLoad(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks      ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UABarracks     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator     ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UAGenerator    ,race_buildings[r_uac ] +'u_b2a_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory ,race_buildings[r_uac ] +'u_b3_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UAWeaponFactory,race_buildings[r_uac ] +'u_b3a' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UCommandCenter1,race_buildings[r_uac ] +'u_b0_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UCommandCenter2,race_buildings[r_uac ] +'u_b0a_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UBarracks1     ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UBarracks2     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UBarracks3     ,race_buildings[r_uac ] +'u_b1b' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UBarracks4     ,race_buildings[r_uac ] +'u_b1c' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UGenerator1    ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UGenerator2    ,race_buildings[r_uac ] +'u_b2b_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UGenerator3    ,race_buildings[r_uac ] +'u_b2c_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UGenerator4    ,race_buildings[r_uac ] +'u_b2d_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UWeaponFactory1,race_buildings[r_uac ] +'u_b3_' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UWeaponFactory2,race_buildings[r_uac ] +'u_b3a' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UWeaponFactory3,race_buildings[r_uac ] +'u_b3b' ,smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UWeaponFactory4,race_buildings[r_uac ] +'u_b6_' ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret   ,firstload);
    gfx_MWSModelLoad(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UVehicleFactory,race_buildings[r_uac ] +'u_b6_' ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret   ,firstload);
    gfx_MWSModelLoad(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2  ,firstload);
-   gfx_MWSModelLoad(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UAFactory      ,race_buildings[r_uac ] +'u_b11_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UFactory       ,race_buildings[r_uac ] +'u_b12_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UCompStation   ,race_buildings[r_uac ] +'u_b10_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UFactory1      ,race_buildings[r_uac ] +'u_b12_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UFactory2      ,race_buildings[r_uac ] +'u_b11_',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UFactory3      ,race_buildings[r_uac ] +'u_b12a',smt_buiding  ,firstload);
+   gfx_MWSModelLoad(@spr_UFactory4      ,race_buildings[r_uac ] +'u_b12b',smt_buiding  ,firstload);
    gfx_MWSModelLoad(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding  ,firstload);
 
    gfx_MWSModelLoad(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
@@ -1047,16 +1074,16 @@ begin
    vid_vmb_x1   := vid_vw-vid_vmb_x0;
    vid_vmb_y1   := vid_vh-vid_vmb_y0;
 
-   ui_textx     := vid_mapx+basefont_wh;
-   ui_texty     := vid_mapy+basefont_wh;
-   ui_hinty1    := vid_mapy+vid_cam_h-draw_font_h1*10;
-   ui_hinty2    := vid_mapy+vid_cam_h-draw_font_h1*8;
-   ui_hinty3    := vid_mapy+vid_cam_h-draw_font_h1*5;
-   ui_hinty4    := vid_mapy+vid_cam_h-draw_font_h1*2;
+   ui_textx     := ui_MapView_x+basefont_wh;
+   ui_texty     := ui_MapView_y+basefont_wh;
+   ui_hinty1    := ui_MapView_y+vid_cam_h-draw_font_h1*10;
+   ui_hinty2    := ui_MapView_y+vid_cam_h-draw_font_h1*8;
+   ui_hinty3    := ui_MapView_y+vid_cam_h-draw_font_h1*5;
+   ui_hinty4    := ui_MapView_y+vid_cam_h-draw_font_h1*2;
    ui_chaty     := ui_hinty1-basefont_w1h;
    ui_logy      := ui_chaty-basefont_w1h;
-   ui_oicox     := vid_mapx+vid_cam_w-basefont_wh;
-   ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
+   ui_oicox     := ui_MapView_x+vid_cam_w-basefont_wh;
+   ui_uiuphx    := ui_MapView_x+(vid_cam_w div 2);
    ui_uiuphy    := ui_texty+basefont_w3;
    ui_uiplayery := ui_uiuphy+basefont_w1h;
    ui_GameLogHeight:=(ui_hinty1-basefont_w5) div basefont_w1h;
@@ -1065,7 +1092,7 @@ begin
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := vid_mapx+vid_cam_w-(basefont_w1*basefont_w1h);
+   ui_fpsx      := ui_MapView_x+vid_cam_w-(basefont_w1*basefont_w1h);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+draw_font_h2;
@@ -1075,11 +1102,11 @@ begin
    r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
    if(spr_mback<>nil)then vid_MakeMenuBack;
 
-   vid_fog_vfw  :=(vid_cam_w div fog_CellW)+1;
-   vid_fog_vfh  :=(vid_cam_h div fog_CellW)+1;
+   ui_FogView_cw:=(vid_cam_w div fog_CellW)+1;
+   ui_FogView_ch:=(vid_cam_h div fog_CellW)+1;
 
-   vid_map_vfw  :=(vid_cam_w div MapCellW)+1;
-   vid_map_vfh  :=(vid_cam_h div MapCellW)+1;
+   ui_MapView_cw:=(vid_cam_w div MapCellW)+1;
+   ui_MapView_ch:=(vid_cam_h div MapCellW)+1;
 
    map_mm_CamW  := round(vid_cam_w*map_mm_cx);
    map_mm_CamH  := round(vid_cam_h*map_mm_cx);
@@ -1087,113 +1114,67 @@ begin
 end;
 
 procedure vid_ScreenSurfaces;
-var i,y:integer;
-
-procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
-   if(vid_PannelPos<2)
-   then lineColor(r_panel,x0,y0,x1,y1,color)
-   else lineColor(r_panel,y0,x0,y1,x1,color);
-end;
-procedure prect(x0,y0,x1,y1:integer;color:cardinal);
-begin
-   if(vid_PannelPos<2)
-   then rectangleColor(r_panel,x0,y0,x1,y1,color)
-   else rectangleColor(r_panel,y0,x0,y1,x1,color);
-end;
+   gfx_SDLSurfaceFree(r_uipanel);
 
-begin
-   gfx_SDLSurfaceFree(r_uipanel );
-   gfx_SDLSurfaceFree(r_panel   );
-
-   if(vid_PannelPos<2)then // left-right
+   if(vid_PannelPos<2)then // vertical
    begin
-      ui_menu_btnsy:=(vid_vh div vid_BW);
-      if((vid_vh-(ui_menu_btnsy*vid_BW))<vid_hBW)then ui_menu_btnsy-=1;
+      ui_ControlBar_w:=vid_panelwu;
+      ui_ControlBar_h:=vid_panelh;
+
+      if(vid_PannelPos=0)
+      then ui_ControlBar_x:=0
+      else ui_ControlBar_x:=vid_cam_w-vid_panelwu;
+           ui_MiniMap_x   :=ui_ControlBar_x;
+
+      if(vid_MiniMapPos)then   // top
+      begin
+         ui_ControlBar_y:=vid_panelw;
+         ui_MiniMap_y   :=0;
+      end
+      else
+      begin
+         ui_MiniMap_y   :=vid_vh-vid_panelwu;
+         ui_ControlBar_y:=ui_MiniMap_y-vid_panelhi;
+      end;
    end
    else
    begin
-      ui_menu_btnsy:=(vid_vw div vid_BW);
-      if((vid_vw-(ui_menu_btnsy*vid_BW))<vid_BW)then ui_menu_btnsy-=1;
-   end;
+      ui_ControlBar_w:=vid_panelh;
+      ui_ControlBar_h:=vid_panelwu;
 
-   if(vid_PannelPos<2)then // left-right
-   begin
-      vid_cam_w:=vid_vw-vid_panelw;
-      vid_cam_h:=vid_vh;
-
-      if(vid_PannelPos=0)
-      then vid_mapx:=vid_panelw
-      else vid_mapx:=0;
-      vid_mapy:=0;
-
-      if(vid_PannelPos=0)
-      then vid_panelx:=0
-      else vid_panelx:=vid_cam_w-1;
-      vid_panely:=0;
-
-      r_uipanel:=gfx_SDLSurfaceCreate(vid_panelw+1,vid_vh);
-      r_panel  :=gfx_SDLSurfaceCreate(vid_panelw+1,vid_vh);
-
-      y:=vid_BW*ui_menu_btnsy+vid_BW;
-      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
-      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
-   end
-   else
-   begin
-      vid_cam_w:=vid_vw;
-      vid_cam_h:=vid_vh-vid_panelw;
-
-      vid_mapx:=0;
       if(vid_PannelPos=2)
-      then vid_mapy:=vid_panelw-1
-      else vid_mapy:=0;
+      then ui_ControlBar_y:=0
+      else ui_ControlBar_y:=vid_cam_h-vid_panelwu;
+           ui_MiniMap_y   :=ui_ControlBar_y;
 
-      vid_panelx:=0;
-      if(vid_PannelPos=2)
-      then vid_panely:=0
-      else vid_panely:=vid_cam_h-1;
-
-      r_uipanel:=gfx_SDLSurfaceCreate(vid_cam_w,vid_panelw+1);
-      r_panel  :=gfx_SDLSurfaceCreate(vid_cam_w,vid_panelw+1);
-
-      y:=vid_BW*ui_menu_btnsy+vid_BW;
-      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
-      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
+      if(vid_MiniMapPos)then //left
+      begin
+         ui_ControlBar_x:=vid_panelw;
+         ui_MiniMap_x   :=0;
+      end
+      else
+      begin
+         ui_MiniMap_x   :=vid_vw-vid_panelwu;
+         ui_ControlBar_x:=ui_MiniMap_x-vid_panelhi;
+      end;
    end;
 
-   vid_cam_hw:=vid_cam_w div 2;
-   vid_cam_hh:=vid_cam_h div 2;
-
-   rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
-   pline(0,vid_panelw,vid_panelw,vid_panelw,c_white);
-
-   //pline(0,vid_panelw+ui_h3bw,r_panel^.w,vid_panelw+ui_h3bw,c_white);
-   pline(0,vid_panelw+vid_BW ,r_panel^.w,vid_panelw+vid_BW ,c_white);
-
-   for y:=0 to 3 do
-   pline(y*vid_tBW,vid_panelw,y*vid_tBW,vid_panelw+vid_BW,c_white);
-
-   i:=4;
-   y:=vid_BW*i;
-   while (i<=(ui_menu_btnsy+1)) do
-   begin
-      pline(0,y,vid_panelw,y,c_white);
-      i+=1;
-      y+=vid_BW;
-   end;
-
-   draw_surf(r_uipanel,0,0,r_panel);
+   r_uipanel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
 
    vid_CommonVars;
 end;
 
 procedure vid_MakeScreen;
 begin
-   if (r_screen<>nil) then sdl_freesurface(r_screen);
+   if(r_screen<>nil)then sdl_freesurface(r_screen);
 
+   vid_cam_w:=vid_vw;
+   vid_cam_h:=vid_vh;
    vid_vhw:=vid_vw div 2;
    vid_vhh:=vid_vh div 2;
+   vid_cam_hw:=vid_vhw;
+   vid_cam_hh:=vid_vhh;
 
    if(vid_fullscreen)
    then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)

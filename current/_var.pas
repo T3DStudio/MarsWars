@@ -12,7 +12,6 @@ sys_EVENT         : pSDL_EVENT;
 G_Started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
-g_start_base      : byte     = 2;
 g_fixed_positions : boolean  = false;
 g_generators      : byte     = 2;
 g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
@@ -38,16 +37,18 @@ UnitMoveStepTicks : byte = 8;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 PlayerClient      : byte = 0; // 'this' player
-PlayerLobby       : byte = 0; // Player who can change game settings
+PlayerLobb1       : byte = 0; // Player who can change game settings
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
 g_missiles        : array[1..MaxMissiles] of TMissile;
+
 g_uids            : array[byte] of TUID;
 g_upids           : array[byte] of TUPID;
 g_mids            : array[byte] of TMID;
 g_dmods           : array[byte] of TDamageMod;
+g_uability        : array[byte] of TUnitAbility;
 
 g_cycle_order     : integer = 0;
 g_cycle_regen     : integer = 0;
@@ -60,10 +61,11 @@ g_preset_n        : byte = 0;
 g_presets         : array of TGamePreset;
 
 map_seed          : cardinal = 0;
-map_size          : integer  = 0;
-map_hsize         : integer  = 0;
-map_LastCell      : integer  = 0;
-map_CenterCell    : integer  = 0;
+map_psize         : integer  = 0; // pixel size
+map_phsize        : integer  = 0; // pixel half size
+map_FreeCenterR   : integer  = 0;
+map_csize         : integer  = 0; // cell size
+map_chsize        : integer  = 0; // cell half size
 map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
 map_symmetryDir   : integer  = 0;
@@ -104,9 +106,10 @@ fr_FPSSecondU,
 fr_FPSSecondN,
 fr_FPSSecondC,
 fr_FrameCount,
-fr_LastTicks,
+fr_LastTocks,
 fr_BaseTicks      : cardinal;
 
+// weapon target bits
 wtrset_all,
 wtrset_enemy,
 wtrset_enemy_alive,
@@ -168,8 +171,8 @@ test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
 sys_fog           : boolean = false;
 
-r_panel,
 r_uipanel,
+r_uiminimap,
 r_empty,
 r_bminimap,
 r_gminimap,
@@ -195,7 +198,6 @@ ingame_chat       : byte = 0;
 vid_fullscreen    : boolean = false;
 r_draw            : boolean = true;
 
-
 menu_state        : boolean = true;
 menu_page1        : byte = mp_main;
 menu_page2        : byte = 0;
@@ -214,13 +216,15 @@ menu_list_item_h,
 menu_list_item_hh,
 menu_list_w       : integer;
 menu_list_items   : array of TMenuListItem;
+menu_list_aleft   : boolean = false;
 menu_res_w,
 menu_res_h        : integer;
 
 PlayerName        : shortstring = str_defaultPlayerName;
 PlayerColorSchemeFFA,
 PlayerColorSchemeTEAM,
-PlayerColorScheme : TPlayerColorScheme;
+PlayerColorNormal,
+PlayerColorShadow : TPlayerColorArray;
 
 
 UIPlayer          : byte = 0;
@@ -230,35 +234,24 @@ vid_TileTemplate_crater_tech,
 vid_TileTemplate_crater_nature: TMWTileSet;
 vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of TMWTileSet;
 
-vid_vw            : integer = vid_minw;
+vid_vw            : integer = vid_minw;       // window size
 vid_vhw           : integer = vid_minw div 2;
 vid_vh            : integer = vid_minh;
 vid_vhh           : integer = vid_minh div 2;
-vid_cam_w         : integer = vid_minw;
+vid_cam_w         : integer = vid_minw;       // in-game cam view
 vid_cam_hw        : integer = vid_minw div 2;
 vid_cam_h         : integer = vid_minh;
 vid_cam_hh        : integer = vid_minh div 2;
-vid_vmb_x0        : integer = 6;
+vid_cam_x         : integer = 0;
+vid_cam_y         : integer = 0;
+vid_mmvx,
+vid_mmvy          : integer;
+vid_vmb_x0        : integer = 6;              // cam scroll by mouse screen edges
 vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = vid_minw-6;
 vid_vmb_y1        : integer = vid_minh-6;
-vid_cam_x         : integer = 0;
-vid_cam_y         : integer = 0;
-vid_CamSpeed      : integer = 25;
-vid_mmvx,
-vid_mmvy          : integer;
-vid_uhbars        : byte = 0;
-vid_plcolors      : byte = 0;
-vid_APM           : boolean = false;
-vid_FPS           : boolean = false;
-vid_CamMScroll    : boolean = false;
-vid_ColoredShadow : boolean = true;
-vid_PannelPos     : byte = 0;
-vid_panelx        : integer = 0;
-vid_panely        : integer = 0;
-vid_mapx          : integer = 0;
-vid_mapy          : integer = 0;
-vid_Sprites_list  : array of PTVSprite;
+
+vid_Sprites_list  : array of PTVSprite;       // vid base
 vid_Sprites_n     : word = 0;
 vid_UIItem_list   : array of TUIItem;
 vid_UIItem_n      : word = 0;
@@ -266,24 +259,16 @@ vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
 vid_panel_timer   : byte = 0;
 
-vid_map_vfw       : byte = 0;
-vid_map_vfh       : byte = 0;
-vid_map_sx        : integer = 0;
-vid_map_sy        : integer = 0;
-vid_map_ex        : integer = 0;
-vid_map_ey        : integer = 0;
+vid_CamSpeed      : integer = 25;             // options
+vid_uhbars        : byte = 0;
+vid_plcolors      : byte = 0;
+vid_APM           : boolean = false;
+vid_FPS           : boolean = false;
+vid_CamMSEScroll    : boolean = false;
+vid_ColoredShadow : boolean = true;
+vid_PannelPos     : byte = 0;
+vid_MiniMapPos    : boolean = false;
 
-vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of boolean;
-vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of boolean;
-vid_fog_vfw       : byte = 0;
-vid_fog_vfh       : byte = 0;
-vid_fog_sx        : integer = 0;
-vid_fog_sy        : integer = 0;
-vid_fog_ex        : integer = 0;
-vid_fog_ey        : integer = 0;
-
-vid_fog_BaseSurf  : pSDL_Surface;
-vid_fog_tiles     : TMWTileSet;
 
 font_1,
 font_1h,
@@ -389,16 +374,47 @@ mouse_map_x,
 mouse_map_y,
 mouse_x,
 mouse_y           : integer;
-mleft_dbl_click,
 m_brushc          : cardinal;
-m_brushx,
-m_brushy,
+mbrush_x,
+mbrush_y,
 m_brush           : integer;
-m_bx,
-m_by              : integer;
+m_panelBtn_x,
+m_panelBtn_y              : integer;
 m_vmove           : boolean = false;
 m_action          : boolean = true;
 m_mmap_move       : boolean = false;
+
+m_Last            : cardinal = 0;
+m_TwiceLeft,
+m_TwiceLast       : boolean;
+mt_Last,
+mt_TwiceLast      : integer;
+
+
+// UID
+
+ui_ControlBar_x   : integer = 0;
+ui_ControlBar_y   : integer = 0;
+ui_ControlBar_w   : integer = 0;
+ui_ControlBar_h   : integer = 0;
+ui_MiniMap_x      : integer = 0;
+ui_MiniMap_y      : integer = 0;
+ui_MapView_x      : integer = 0;
+ui_MapView_y      : integer = 0;
+ui_MapView_cw     : integer = 0;
+ui_MapView_ch     : integer = 0;
+
+ui_FogView_grid,
+ui_FogView_pgrid  : array[0..fog_vfwm,0..fog_vfhm] of boolean;
+ui_FogView_cw     : integer = 0;
+ui_FogView_ch     : integer = 0;
+ui_FogView_sx     : integer = 0;
+ui_FogView_sy     : integer = 0;
+ui_FogView_ex     : integer = 0;
+ui_FogView_ey     : integer = 0;
+
+ui_fog_BaseSurf   : pSDL_Surface;
+ui_fog_tiles      : TMWTileSet;
 
 ui_language       : boolean = false;
 
@@ -410,17 +426,17 @@ ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_dPlayer        : TPlayer;
 
-ui_groups_n,                                             //
-ui_groups_d,                                             //
-ui_groups_x,                                             //
-ui_groups_y       : array[0..MaxUnitGroups] of integer;             //
-ui_groups_uids    : array[0..MaxUnitGroups,false..true] of TSob;    //
+ui_groups_d       : array[0..MaxUnitGroups] of TUnitGroup;
+ui_groups_f1      : TUnitGroup;
+ui_groups_f2      : TUnitGroup;
 
+// mouse click effect
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
 ui_mc_c           : cardinal;                            //
 
+// ui panel counters
 ui_uprod_max,
 ui_uprod_cur,
 ui_uprod_first    : integer;
@@ -439,9 +455,9 @@ ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
-ui_uibtn_sability : integer = 0;   // ui action uid
-ui_uibtn_rebuild  : integer = 0;   // ui rebuild button
+ui_uibtn_abilityu : PTUnit  = nil; // ui action unit
 ui_uhint          : integer = 0;
+ui_CursorUnit     : PTUnit;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_max_color,                                       // unit max count color
@@ -450,6 +466,7 @@ ui_limit,                                           // unit limit colors
 ui_blink_color2,
 ui_blink_color1   : array[false..true] of cardinal;
 
+// panel text positions
 ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
 ui_uiplayery      : integer = 0;
@@ -471,31 +488,132 @@ ui_apmx           : integer = 0;
 ui_apmy           : integer = 0;
 ui_fpsx           : integer = 0;
 ui_fpsy           : integer = 0;
-ui_GameLogHeight: integer = 0;
-ui_menu_btnsy     : integer = 0;
-ui_menu_btnsh     : integer = 0;
+ui_GameLogHeight  : integer = 0;
 
+// ui log
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
 ui_log_c          : array of cardinal;
 ui_log_n          : integer = 0;
 
-k_dbl             : boolean = false;
-k_dblk            : cardinal;
-ks_dbl,
-ks_left,
-ks_right,
-ks_up,
-ks_down,
-ks_shift,
-ks_ctrl,
-ks_alt,
-ks_mleft,
-ks_mright,
-ks_mmiddle,
-ks_LastChar       : integer;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Keyborad input
+//
+
+// key timer
+kt_TwiceLast,
+kt_left,
+kt_right,
+kt_up,
+kt_down,
+kt_shift,
+kt_ctrl,
+kt_alt,
+kt_mleft,
+kt_mright,
+kt_mmiddle,
+kt_Last           : integer;
+// key
+k_Last            : cardinal;
+k_TwiceLast       : boolean;
 k_LastChar        : char;
-k_keyboard_string : shortstring = '';
+k_KeyboardString  : shortstring = '';
+
+
+// hotkeys
+hotkeyP1 : THotKeyTable = (SDLK_R    , SDLK_T    , SDLK_Y     ,
+                           SDLK_F    , SDLK_G    , SDLK_H     ,
+                           SDLK_V    , SDLK_B    , SDLK_N     ,
+
+                           SDLK_U    , SDLK_I    , SDLK_O     ,
+                           SDLK_J    , SDLK_K    , SDLK_L     ,
+                           SDLK_R    , SDLK_T    , SDLK_Y     ,
+
+                           SDLK_F    , SDLK_G    , SDLK_H     ,
+                           SDLK_V    , SDLK_B    , SDLK_N     ,
+                           SDLK_R    , SDLK_T    , SDLK_Y     );
+
+hotkeyP2 : THotKeyTable = (0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+
+                           0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+                           SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl ,
+
+                           SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl ,
+                           SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl ,
+                           SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt  );
+
+// Action tab hotkeys
+// unit orders
+hotkeyA1 : THotKeyTable = (SDLK_Q    , SDLK_W    , SDLK_E     ,
+                           SDLK_A    , SDLK_S    , SDLK_D     ,
+                           SDLK_Z    , SDLK_X    , SDLK_C     ,
+
+                           SDLK_C    , SDLK_F1   , SDLK_F2    ,
+                           SDLK_Delete,SDLK_F5   , SDLK_Z     ,
+                           0         , 0         , 0,
+
+                           0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+                           0         , 0         , 0          );
+
+hotkeyA2 : THotKeyTable = (0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+                           0         , 0         , 0          ,
+
+                           SDLK_LCtrl, 0         , 0          ,
+                           0         , SDLK_LCtrl, 0          ,
+                           0         , 0         , 0          ,
+
+                           0,0,0,
+                           0,0,0,
+                           0,0,0);
+// replay controls
+hotkeyR1 : THotKeyTable = (SDLK_Q    , SDLK_W    , SDLK_E     ,
+                           SDLK_A    , SDLK_S    , SDLK_D     ,
+                           SDLK_Z    , 0         , 0          ,
+
+                           SDLK_1    , SDLK_2    , SDLK_3     ,
+                           SDLK_4    , SDLK_5    , SDLK_6     ,
+                           SDLK_7    , SDLK_8    , SDLK_0     ,
+
+                           0,0,0,
+                           0,0,0,
+                           0,0,0);
+hotkeyR2 : THotKeyTable = (0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0);
+
+// observer controls
+hotkeyO1 : THotKeyTable = (SDLK_Q    , SDLK_W    , 0          ,
+                           SDLK_1    , SDLK_2    , SDLK_3     ,
+                           SDLK_4    , SDLK_5    , SDLK_6     ,
+
+                           SDLK_7    , SDLK_8    , SDLK_0,
+                           0,0,0,
+                           0,0,0,
+
+                           0,0,0,
+                           0,0,0,
+                           0,0,0);
+hotkeyO2 : THotKeyTable = (0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0,
+                           0,0,0);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -658,14 +776,20 @@ spr_Flyer,
 spr_Transport,
 spr_UACBot,
 
-spr_HKeep,
-spr_HAKeep,
-spr_HGate,
-spr_HAGate,
-spr_HSymbol,
-spr_HASymbol,
-spr_HPools,
-spr_HAPools,
+spr_HKeep1,
+spr_HKeep2,
+spr_HGate1,
+spr_HGate2,
+spr_HGate3,
+spr_HGate4,
+spr_HSymbol1,
+spr_HSymbol2,
+spr_HSymbol3,
+spr_HSymbol4,
+spr_HPools1,
+spr_HPools2,
+spr_HPools3,
+spr_HPools4,
 spr_HTower,
 spr_HTeleport,
 spr_HMonastery,
@@ -673,29 +797,38 @@ spr_HTotem,
 spr_HAltar,
 spr_HFortress,
 spr_HPentagram,
-spr_HCommandCenter,
-spr_HACommandCenter,
-spr_HBarracks,
-spr_HABarracks,
+spr_HCommandCenter1,
+spr_HCommandCenter2,
+spr_HBarracks1,
+spr_HBarracks2,
+spr_HBarracks3,
+spr_HBarracks4,
 spr_HEye,
 
-spr_UCommandCenter,
-spr_UACommandCenter,
-spr_UBarracks,
-spr_UABarracks,
-spr_UFactory,
-spr_UAFactory,
-spr_UGenerator,
-spr_UAGenerator,
-spr_UWeaponFactory,
-spr_UAWeaponFactory,
+spr_UCommandCenter1,
+spr_UCommandCenter2,
+spr_UBarracks1,
+spr_UBarracks2,
+spr_UBarracks3,
+spr_UBarracks4,
+spr_UFactory1,
+spr_UFactory2,
+spr_UFactory3,
+spr_UFactory4,
+spr_UGenerator1,
+spr_UGenerator2,
+spr_UGenerator3,
+spr_UGenerator4,
+spr_UWeaponFactory1,
+spr_UWeaponFactory2,
+spr_UWeaponFactory3,
+spr_UWeaponFactory4,
 spr_UTurret,
 spr_URadar,
-spr_UVehicleFactory,
 spr_UTechCenter,
 spr_UPTurret,
 spr_URTurret,
-spr_UNuclearPlant,
+spr_UCompStation,
 spr_URocketL,
 spr_Mine,
 //spr_u_portal,
@@ -790,8 +923,6 @@ spr_cp_gen        : TMWTexture;
 str_bool                : array[false..true   ] of shortstring;
 
 str_teams               : array[0..LastPlayer ] of shortstring;
-str_ability_name        : array[byte          ] of shortstring;
-str_ability_unload      : shortstring;
 str_racel               : array[0..r_cnt      ] of shortstring;
 str_emnu_GameModel      : array[0..gms_count  ] of shortstring;
 
@@ -843,6 +974,7 @@ str_menu_ScrollSpeed,
 str_menu_MouseScroll,
 str_menu_PlayerName,
 str_menu_PanelPos,
+str_menu_MiniMapPos,
 str_menu_unitHBar,
 str_menu_PlayersColor,
 
@@ -889,12 +1021,12 @@ str_menu_AISlots,
 str_menu_Generators,
 str_menu_DeadObservers,
 str_menu_FixedStarts,
-str_menu_GameMode,
-str_menu_StartBase
+str_menu_GameMode
                         : shortstring;
 str_menu_PlayersColorl  : array[0..vid_maxplcolors-1] of shortstring;
 str_menu_unitHBarl      : array[0..2] of shortstring;
 str_menu_PanelPosl      : array[0..3] of shortstring;
+str_menu_MiniMapPosl    : array[boolean,boolean] of shortstring;
 str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
 str_menu_NetQuality     : array[0..cl_UpT_arrayN    ] of shortstring;
 
@@ -938,7 +1070,6 @@ str_uiWarn_UnitAttacked,
 str_uiWarn_BaseAttacked,
 str_uiWarn_AlliesAttacked,
 str_uiWarn_CantExecute,
-str_uiWarn_ReqpsabilityOrder,
 str_uiWarn_MaxLimitReached,
 str_uiWarn_MapMark,
 str_uiWarn_NeedMoreBuilders,
@@ -1013,7 +1144,7 @@ str_panelHint_all,
 str_panelHint_menu  : shortstring;
 str_panelHint_a,
 str_panelHint_r,
-str_panelHint_o     : array[0.._mhkeys] of shortstring;
+str_panelHint_o     : TPanelHintTable;
 str_panelHint_Tab   : array[0..3      ] of shortstring;
 str_panelHint_Common: array[0..2      ] of shortstring;
 

@@ -20,8 +20,8 @@ begin
       if(sm_listn<=0)then exit;
 
       if(sm_type=smt_fapc)
-      then dd:=DIR360(dir+12) div 23  // 0..15
-      else dd:=DIR360(dir+23) div 45; // 0..7
+      then dd:=dir360(dir+12) div 23  // 0..15
+      else dd:=dir360(dir+23) div 45; // 0..7
 
       if(sm_listi=0)
       then i:=0
@@ -344,7 +344,7 @@ begin
 end;
 
 function sm_unit2MWTexture(u:PTUnit):PTMWTexture;
-var ak:byte;
+var sms:byte;
 smodel:PTMWSModel;
 begin
    sm_unit2MWTexture:=@spr_dummy;
@@ -356,9 +356,9 @@ begin
 
       if(smodel<>spr_pdmodel)then
       begin
-         ak:=sm_unit2SMAnimState(u,wanim);
+         sms:=sm_unit2SMAnimState(u,wanim);
 
-         case ak of
+         case sms of
 sms_walk:    if(animw>0)then
              begin
                 if(wanim)or(_ukbuilding)then
@@ -366,22 +366,19 @@ sms_walk:    if(animw>0)then
                    anim+=animw;
                    if(anim<0)then anim:=0;
                 end;
-                sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,anim div 100,nil)
+                  sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,anim div 100,nil)
              end
-             else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,0,nil);
+             else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,0,nil);
 sms_dattack,
 sms_mattack: if(a_weap<=MaxUnitWeapons)
-             then sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,byte(a_reload in _a_weap[a_weap].aw_rld_a),nil)
-             else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,0                                         ,nil);
-sms_death:   begin
-                anim:=abs(hits);
-                if(_animd>0)
-                then sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,anim div _animd,nil)
-                else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,0              ,nil);
-             end;
-sms_build:   sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,(hits*3) div _mhits,nil);
+             then sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,byte(a_reload in _a_weap[a_weap].aw_rld_a),nil)
+             else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,0                                         ,nil);
+sms_death:   if(_animd>0)
+             then sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,abs(hits) div _animd,nil)
+             else sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,0                   ,nil);
+sms_build:        sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,(hits*3) div _mhits ,nil);
          else
-             sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,ak,dir,0,nil); //stand,pain,cast
+                  sm_unit2MWTexture:=sm_SModel2MWTexture(smodel,sms,dir,0,nil); //stand,pain,cast
          end;
       end;
    end;

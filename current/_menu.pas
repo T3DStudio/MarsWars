@@ -32,7 +32,7 @@ begin
       net_status_str:=str_menu_connecting;
       net_status    :=ns_client;
       rpls_pnu      :=0;
-      PlayerLobby   :=255;
+      PlayerLobb1   :=255;
    end
    else net_dispose;
 end;
@@ -251,7 +251,6 @@ begin
                                   tx1+basefont_w2,ty0+ty1*8+basefont_w2,true );
 
    SetItem(mi_game_mode          ,tx0,ty0,tx1,ty0+ty1,GameSetCommonSetting(PlayerClient,nmid_lobbby_gamemode  ,0,true));ty0+=ty1;
-   SetItem(mi_game_builders      ,tx0,ty0,tx1,ty0+ty1,GameSetCommonSetting(PlayerClient,nmid_lobbby_builders  ,0,true));ty0+=ty1;
    SetItem(mi_game_generators    ,tx0,ty0,tx1,ty0+ty1,GameSetCommonSetting(PlayerClient,nmid_lobbby_generators,0,true));ty0+=ty1;
    SetItem(mi_game_FixStarts     ,tx0,ty0,tx1,ty0+ty1,GameSetCommonSetting(PlayerClient,nmid_lobbby_FixStarts ,0,true));ty0+=ty1;
    SetItem(mi_game_DeadPbserver  ,tx0,ty0,tx1,ty0+ty1,GameSetCommonSetting(PlayerClient,nmid_lobbby_DeadPObs  ,0,true));ty0+=ty1;
@@ -354,7 +353,7 @@ begin
    ms_DefaultCaption(mi_title_Settings);
 
    tx0:=vid_vhw-350;
-   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 2);
+   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 10);
    tx1:=tx0+menu_main_mp_bwh;
    ty1:=ty0+menu_main_mp_bh1;
    ty2:=menu_main_mp_bh1+menu_main_mp_bhq3;
@@ -366,7 +365,7 @@ begin
    SetItem(mi_settings_sound  ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
 
    tx0+=menu_main_mp_bwh+(menu_main_mp_bwq div 2);
-   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 2);
+   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 10);
    tx1:=tx0+menu_main_mp_bwh*3+menu_main_mp_bwq;
    ty1:=ty0+menu_main_mp_bh3q;
    ty2:=menu_main_mp_bh3q;
@@ -383,6 +382,7 @@ begin
                                                                                    ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_Langugage      ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_PanelPosition  ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
+                        SetItem(mi_settings_MMapPosition   ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_PlayerColors   ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         end;
    mi_settings_replay : begin
@@ -479,8 +479,8 @@ mp_campaings : begin
                ms_DefaultCaption(mi_title_Campaings);
 
                if(G_Started)
-               then ms_BottomButtons(5,mi_EndGame,mi_SaveLoad,mi_Settings,mi_AboutGame,mi_back)
-               else ms_BottomButtons(4,mi_back   ,mi_Settings,mi_AboutGame,mi_StartCampaing   ,0      );
+               then ms_BottomButtons(5,mi_EndGame,mi_SaveLoad,mi_Settings ,mi_AboutGame    ,mi_back)
+               else ms_BottomButtons(4,mi_back   ,mi_Settings,mi_AboutGame,mi_StartCampaing,0      );
                end;
 mp_scirmish  : ms_StartedGame;
 mp_saveload  : ms_SaveLoad;
@@ -500,10 +500,10 @@ var i:byte;
     c:char;
 begin
    txt_StringApplyInput:=s;
-   if(length(k_keyboard_string)>0)then
-    for i:=1 to length(k_keyboard_string) do
+   if(length(k_KeyboardString)>0)then
+    for i:=1 to length(k_KeyboardString) do
     begin
-       c:=k_keyboard_string[i];
+       c:=k_KeyboardString[i];
        if(c=#8)   // backspace
        then begin if(length(s)>0)then setlength(s,length(s)-1)end //delete(s,length(s),1)
        else
@@ -512,7 +512,7 @@ begin
         else
           if(c in charset)then s+=c;
    end;
-   k_keyboard_string:='';
+   k_KeyboardString:='';
    if(ChangedResult<>nil)then
      ChangedResult^:=txt_StringApplyInput<>s;
    txt_StringApplyInput:=s;
@@ -578,6 +578,7 @@ begin
       then menu_list_font:=15
       else menu_list_font:=10;
    end;
+   menu_list_aleft:=false;
    menu_list_n:=0;
    setlength(menu_list_items,menu_list_n);
 end;
@@ -710,6 +711,7 @@ procedure menu_list_MakeGamePresets(mi:byte;MinWidth:integer);
 var i:byte;
 begin
    menu_list_SetCommonSettings(mi,@MinWidth);
+   menu_list_aleft:=true;
    with menu_items[mi] do
    begin
       menu_list_current:=g_preset_cur;
@@ -762,11 +764,11 @@ begin
    if(menu_list_n>0)then
    begin
       menu_list_SelectItem;
-      if(ks_mleft=1)and(menu_list_selected=-1)
+      if(kt_mleft=1)and(menu_list_selected=-1)
       then menu_List_Clear
    end
    else
-     if(ks_mleft=1)then
+     if(kt_mleft=1)then
      begin
         case menu_item of
 mi_mplay_ClientAddress : txt_ValidateServerAddr;
@@ -780,7 +782,7 @@ mi_settings_PlayerName : begin
         SoundPlayUI(snd_click);
      end;
 
-   if(ks_mleft=1)then        // left button pressed
+   if(kt_mleft=1)then        // left button pressed
    begin
       //UpdateItems:=true;
 
@@ -808,8 +810,9 @@ mi_StartGame              : if(menu_list_selected>-1)then
                             else
                             begin
                                menu_list_SetCommonSettings(menu_item,nil);
+                               menu_list_aleft:=true;
                                menu_list_current:=-1;
-                               menu_list_AddItem(str_menu_Campaings ,mp_campaings ,false,0);
+                               menu_list_AddItem(str_menu_Campaings ,mp_campaings ,true ,0);
                                menu_list_AddItem(str_menu_Scirmish  ,mp_scirmish  ,true ,0);
                                menu_list_AddItem(str_menu_LoadReplay,mp_loadreplay,true ,0);
                                menu_list_AddItem(str_menu_LoadGame  ,mp_saveload  ,true ,0);
@@ -832,16 +835,17 @@ mi_EndGame                : if(menu_list_selected>-1)then
                             else
                             begin
                                menu_list_SetCommonSettings(menu_item,nil);
+                               menu_list_aleft:=true;
                                menu_list_current:=-1;
                                if(rpls_rstate=rpls_state_read)
-                               then menu_list_AddItem(str_menu_ReplayQuit,mi_EndReplayQuit,GameBreak      (0,true ),0)
+                               then    menu_list_AddItem(str_menu_ReplayQuit,mi_EndReplayQuit,GameBreak      (0           ,true ),0)
                                else
                                begin
                                   if(g_deadobservers)
-                                  then menu_list_AddItem(str_menu_LeaveGame,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0)
-                                  else menu_list_AddItem(str_menu_Surrender,mi_EndLeave    ,GameBreak      (PlayerClient,true ),0);
+                                  then menu_list_AddItem(str_menu_LeaveGame ,mi_EndLeave     ,GameBreak      (PlayerClient,true ),0)
+                                  else menu_list_AddItem(str_menu_Surrender ,mi_EndLeave     ,GameBreak      (PlayerClient,true ),0);
                                   if(PlayerSurrender(PlayerClient,true))then
-                                    menu_list_AddItem(str_menu_Surrender,mi_EndSurrender,PlayerSurrender(PlayerClient,true ),0);
+                                       menu_list_AddItem(str_menu_Surrender ,mi_EndSurrender ,PlayerSurrender(PlayerClient,true ),0);
                                end;
                                menu_list_UpdatePosition;
                             end;
@@ -877,7 +881,7 @@ mi_settings_MRBAction     : if(menu_list_selected>-1)
                             then begin m_action:=menu_list_SIndex>0;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_mactionl[false],SizeOf(str_menu_mactionl),integer(m_action),-2);
 mi_settings_ScrollSpeed   : vid_CamSpeed  :=menu_GetBarVal(menu_item,vid_CamSpeed,1,max_CamSpeed);
-mi_settings_MouseScroll   : vid_CamMScroll:=not vid_CamMScroll;
+mi_settings_MouseScroll   : vid_CamMSEScroll:=not vid_CamMSEScroll;
 mi_settings_PlayerName    : ;   // playername
 mi_settings_Langugage     : if(menu_list_selected>-1)then
                             begin
@@ -893,6 +897,13 @@ mi_settings_PanelPosition : if(menu_list_selected>-1)then
                                vid_ScreenSurfaces;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_PanelPosl[0],SizeOf(str_menu_PanelPosl),integer(vid_PannelPos),-2);
+mi_settings_MMapPosition  : if(menu_list_selected>-1)then
+                            begin
+                               vid_MiniMapPos:=(menu_list_SIndex>0);
+                               menu_List_Clear;
+                               vid_ScreenSurfaces;
+                            end
+                            else menu_list_MakeFromStr(menu_item,@str_menu_MiniMapPosl[vid_PannelPos<2][false],SizeOf(str_menu_MiniMapPosl[vid_PannelPos<2]),integer(vid_MiniMapPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
                             then begin vid_plcolors:=menu_list_SIndex;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_PlayersColorl[0],SizeOf(str_menu_PlayersColorl),integer(vid_plcolors),-2);
@@ -1016,7 +1027,7 @@ mi_map_Size               : if(menu_list_selected>-1)then
                                else map_SetSetting (PlayerClient,nmid_lobbby_mapsize,p,false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromInts(menu_item,MaxMapSize,MinMapSize,StepMapSize,map_size,-2,100);
+                            else menu_list_MakeFromInts(menu_item,MaxMapSize,MinMapSize,StepMapSize,map_psize,-2,100);
 mi_map_Type               : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1046,15 +1057,6 @@ mi_game_mode              : if(menu_list_selected>-1)then
                                menu_List_Clear;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_emnu_GameModel[0],SizeOf(str_emnu_GameModel),integer(g_mode),-2);
-mi_game_builders          : if(menu_list_selected>-1)then
-                            begin
-                               if(net_status=ns_client)
-                               then net_send_MIDByte    (             nmid_lobbby_builders,byte(menu_list_SIndex))
-                               else GameSetCommonSetting(PlayerClient,nmid_lobbby_builders,byte(menu_list_SIndex),false);
-                               menu_List_Clear;
-                            end
-                            else menu_list_MakeFromInts(menu_item,gms_g_startb+1,1,1,integer(g_start_base)+1,-4,0);
-
 mi_game_generators        : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1114,14 +1116,14 @@ mi_mplay_NetSearchStart   : if(net_UpSocket(net_svlsearch_port))then
                             end
                             else net_dispose;
 mi_mplay_NetSearchStop    : menu_NetSearchStop;
-mi_mplay_NetSearchList    : if(mleft_dbl_click>0)
+mi_mplay_NetSearchList    : if(m_TwiceLeft)
                             then menu_NetSearchConnect(false)
                             else menu_item_ListScrollLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,menu_netsearch_lineh);
 mi_mplay_NetSearchCon     : menu_NetSearchConnect(false);
 
 
 //////////////////////////////////////////    REPLAYS PLAYER
-mi_replays_list           : if(mleft_dbl_click>0)
+mi_replays_list           : if(m_TwiceLeft)
                             then replay_Play(false)
                             else
                             begin
@@ -1148,7 +1150,7 @@ procedure menu_keyborad;
 var Changed:boolean;
 begin
    Changed:=false;
-   if(length(k_keyboard_string)>0)then
+   if(length(k_KeyboardString)>0)then
    begin
       case menu_item of
 mi_map_Seed           : begin

@@ -5,7 +5,6 @@ var     f : file;
  filename : shortstring;
     i,
     dbyte : byte;
-    dint  : integer;
     dcard : cardinal;
  dplayers : TPList;
 begin
@@ -38,7 +37,6 @@ begin
          exit;
       end;
       dbyte:=0;
-      dint :=0;
       dcard:=0;
       BlockRead(f,dbyte,SizeOf(g_version));
       if(dbyte=g_version)then
@@ -174,12 +172,11 @@ begin
    AddItem(@campain_seed     ,SizeOf(campain_seed     ));
    AddItem(@G_Step           ,SizeOf(G_Step           ));
    AddItem(@map_seed         ,SizeOf(map_seed         ));
-   AddItem(@map_size         ,SizeOf(map_size         ));
+   AddItem(@map_psize         ,SizeOf(map_psize         ));
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
    AddItem(@g_mode           ,SizeOf(g_mode           ));
-   AddItem(@g_start_base     ,SizeOf(g_start_base     ));
    AddItem(@g_generators     ,SizeOf(g_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
