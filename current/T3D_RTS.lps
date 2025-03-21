@@ -8,7 +8,8 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="126" Y="27"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="100" Y="25"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -126,8 +127,8 @@
       <Unit15>
         <Filename Value="_game.pas"/>
         <EditorIndex Value="36"/>
-        <TopLine Value="539"/>
-        <CursorPos X="79" Y="559"/>
+        <TopLine Value="384"/>
+        <CursorPos X="55" Y="385"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit15>
@@ -261,8 +262,8 @@
       <Unit32>
         <Filename Value="_draw_objs_units.pas"/>
         <EditorIndex Value="16"/>
-        <TopLine Value="208"/>
-        <CursorPos X="67" Y="217"/>
+        <TopLine Value="305"/>
+        <CursorPos X="9" Y="320"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -292,10 +293,9 @@
       </Unit35>
       <Unit36>
         <Filename Value="_objects_main_data.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="990"/>
-        <CursorPos X="56" Y="1005"/>
+        <TopLine Value="777"/>
+        <CursorPos X="29" Y="788"/>
         <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit36>

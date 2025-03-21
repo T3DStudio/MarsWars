@@ -379,6 +379,7 @@ begin
      or(observer)
      or(army=0)
      or(rpls_state=rpls_state_read)then exit;
+   if(g_status<>gs_running)then exit;
    UIAllowSelecting:=true;
 end;
 

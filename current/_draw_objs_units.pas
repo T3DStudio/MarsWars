@@ -315,9 +315,9 @@ begin
        1: lvlstr_l:='>';
        2: lvlstr_l:='||';
        3: lvlstr_l:='* * *';
-       end
-      else
-        if(level>0)then lvlstr_b+=char_advanced;
+       end;
+      //else
+      //  if(level>0)then lvlstr_b+=char_advanced;
 
       // reload
       if(rld>0)

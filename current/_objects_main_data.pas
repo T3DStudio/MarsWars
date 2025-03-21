@@ -795,7 +795,7 @@ begin
    _ruid1n    := 4;
    _ruid2     := UID_HACommandCenter;
    _ruid2n    := 2;
-   _limituse  := ul4;
+   _limituse  := ul5;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiUnitRange:=50;
    _weapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_BFG,0,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,wtp_limitaround,0,dm_BFG);
@@ -1186,7 +1186,7 @@ begin
    _attack    := atm_always;
    _zombie_uid:= UID_ZBFGMarine;
    _uklight   := false;
-   _limituse  := ul4;
+   _limituse  := ul5;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UComputerStation;
    _fastdeath_hits:=fdead_hits_border;
