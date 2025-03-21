@@ -454,7 +454,7 @@ begin
                tu^.buff[ub_Invuln]:=0;
                exit;
             end;
-            rld:=uid^._btime*fr_fps1;
+            rld:=haltar_reload;
             _unit_ability_HInvuln:=true;
             {$IFDEF _FULLGAME}
             effect_LevelUp(tu,EID_Invuln,nil);
@@ -486,7 +486,7 @@ begin
         uo_x:=x0;
         uo_y:=y0;
         for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_fps2);
-        rld:=uid^._btime*fr_fps1;
+        rld:=mstrike_reload;
         _unit_umstrike_missile(pu);
         buff[ub_Cast]:=fr_fps1;
         _unit_ability_UACStrike:=true;
@@ -1331,6 +1331,7 @@ begin
       if(_isbuilder)then s_builders+=1;
       if(_isbarrack)then s_barracks+=1;
       if(_issmith  )then s_smiths  +=1;
+      s_all+=1;
    end;
 end;
 procedure _unit_counters_dec_select(pu:PTUnit);
@@ -1345,6 +1346,7 @@ begin
       if(_isbuilder)then s_builders-=1;
       if(_isbarrack)then s_barracks-=1;
       if(_issmith  )then s_smiths  -=1;
+      s_all-=1;
    end;
 end;
 

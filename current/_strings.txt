@@ -177,7 +177,7 @@ Energy required: 200
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, max. range: vision range, targets: [alive] except [Imp`s Tower,Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +16;
@@ -303,8 +303,8 @@ Base regeneration: 7
 Limit used: 10
 Size: 50
 Base vision range: 100
-Build time: 100
-Energy required: 600
+Build time: 120
+Energy required: 800
 Requirements: Pentagram of Death,Monastery of Despair,Castle of Damned
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
@@ -339,18 +339,17 @@ Upgrades:
 Hell Command Center
 
 Hotkey: F
-Categories/Attributes: [building,mechanical,heavy,ground,transport]
+Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 250
 Build time: 60
 Energy required: 900
-Base transport capacity: 30
 
 Constructed by: Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +16;
@@ -363,18 +362,17 @@ Corrupted Command Center. Builder. Increase energy level(+300). Can be rebuilt i
 Advanced Hell Command Center
 
 Hotkey: F
-Categories/Attributes: [building,mechanical,heavy,ground,transport]
+Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 250
 Build time: 120
 Energy required: 300
-Base transport capacity: 30
 
 
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +16;
@@ -473,8 +471,8 @@ Places in transport: 1
 
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
-- melee attack, targets: [Imp], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- melee attack, targets: [Imp`s Tower,Imp], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -765,7 +763,7 @@ Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 4000
 Limit used: 4
 Size: 14
-Base movement speed: 15
+Base movement speed: 16
 Base vision range: 300
 Build time: 30
 Energy required: 700
@@ -793,7 +791,7 @@ Categories/Attributes: [unit,biological,light,ground]
 Max hits: 500
 Limit used: 1
 Size: 11
-Base movement speed: 12
+Base movement speed: 14
 Base vision range: 175
 Build time: 20
 Energy required: 200
@@ -821,7 +819,7 @@ Categories/Attributes: [unit,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 11
-Base movement speed: 14
+Base movement speed: 15
 Base vision range: 175
 Build time: 30
 Energy required: 600
@@ -848,7 +846,7 @@ Categories/Attributes: [unit,biological,light,ground]
 Max hits: 750
 Limit used: 1
 Size: 11
-Base movement speed: 12
+Base movement speed: 14
 Base vision range: 175
 Build time: 15
 Energy required: 200
@@ -875,7 +873,7 @@ Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 750
 Limit used: 1
 Size: 11
-Base movement speed: 10
+Base movement speed: 14
 Base vision range: 175
 Build time: 20
 Energy required: 250
@@ -988,7 +986,7 @@ Base vision range: 200
 Build time: 20
 Energy required: 250
 PainState base threshold: 5
-Requirements: Zombie Barracks(x2),Advanced Hell Command Center
+Requirements: Zombie Barracks(x3),Advanced Hell Command Center
 Produced by: Zombie Barracks
 Arming/Abilities: 
 - ranged attack, max. range: vision range, bonus anti-fly range: +50, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
@@ -1007,18 +1005,18 @@ Zombie BFG Marine
 Hotkey: Ctrl+B
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1000
-Limit used: 3
+Limit used: 4
 Size: 11
-Base movement speed: 6
+Base movement speed: 10
 Base vision range: 250
-Build time: 40
+Build time: 60
 Energy required: 600
 PainState base threshold: 5
 Places in transport: 2
-Requirements: Zombie Barracks(x4),Advanced Hell Command Center(x3)
+Requirements: Zombie Barracks(x4),Advanced Hell Command Center(x2)
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, target priority: distance;
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, factor: x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1240,8 +1238,8 @@ Max hits: 3000
 Limit used: 10
 Size: 40
 Base vision range: 80
-Build time: 100
-Energy required: 600
+Build time: 120
+Energy required: 800
 Requirements: Science Facility,Computer Station
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
@@ -1577,11 +1575,11 @@ BFG Marine
 Hotkey: V
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1000
-Limit used: 3
+Limit used: 4
 Size: 11
 Base movement speed: 10
 Base vision range: 250
-Build time: 40
+Build time: 60
 Energy required: 600
 Places in transport: 2
 Zombie: Zombie BFG Marine
@@ -1589,7 +1587,7 @@ Zombification hits: 0
 Requirements: Science Facility,Computer Station
 Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7);
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7), factor: x0.5 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;

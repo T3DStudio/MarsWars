@@ -1178,12 +1178,6 @@ begin
    with pu^ do
     if(_IsUnitRange(transport,nil)=false)then
      with uid^ do
-      if(transportC>0)then
-      begin
-         uo_id:=ua_unload;
-         _unit_sability:=true;
-      end
-      else
         if(not PlayerSetProdError(playeri,lmt_argt_unit,uidi,unit_canAbility(pu),pu))then
           with player^ do
             case _ability of
@@ -1205,6 +1199,11 @@ uab_CCFly         : if(zfall=0)and(buff[ub_CCast]<=0)then
                     end;
 uab_RebuildInPoint: _unit_sability:=_unit_rebuild(pu);
 uab_ToUACDron     : _unit_sability:=PlayerSetProdError(playeri,lmt_argt_unit,uid_UACDron,_unit_morph(pu,uid_UACDron,false,_uids[uid_UACDron]._hmhits,0 ),pu);
+uab_Unload        : if(transportC>0)then
+                    begin
+                       uo_id:=ua_unload;
+                       _unit_sability:=true;
+                    end
             else
             end;
 end;
@@ -1754,53 +1753,52 @@ co_amove    : if(_IsUnitRange(order_tar,nil))
 co_apatrol  : _setUO(ua_amove,0        ,order_x,order_y, x, y,false,false);
 co_psability: if(uo_id<>ua_psability)
               or((ucl_cs[true]+ucl_cs[false])=1)then
-                if(transportM>0)and(transportC>0)then
-                begin
-                   _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                   exit;
-                end
-                else
-                  if(_ability=order_a)and(rld=0)then
-                  case _ability of
-                  0                    : ;
-                  uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y ))then exit;
-                  uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y ))then exit;
-                  uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar       ))then exit;
-                  uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y ))then exit;
-                  uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y ))then exit;
-                  uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar       ))then exit;
-                  uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
-                  uab_CCFly            : if(speed>0)then
+                if(_ability=order_a)and(rld=0)then
+                case _ability of
+                0                    : ;
+                uab_Unload           : if(transportM>0)and(transportC>0)then
+                                       begin
+                                          _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                          exit;
+                                       end;
+                uab_UACStrike        : if(_unit_ability_UACStrike  (pu,order_x,order_y ))then exit;
+                uab_UACScan          : if(_unit_ability_uradar     (pu,order_x,order_y ))then exit;
+                uab_HInvulnerability : if(_unit_ability_HInvuln    (pu,order_tar       ))then exit;
+                uab_HTowerBlink      : if(_unit_ability_HTowerBlink(pu,order_x,order_y ))then exit;
+                uab_HKeepBlink       : if(_unit_ability_HKeepBlink (pu,order_x,order_y ))then exit;
+                uab_HellVision       : if(_unit_ability_HellVision (pu,order_tar       ))then exit;
+                uab_Teleport         : if(_unit_ability_RevTeleport(pu,order_tar,NOTSET))then exit;
+                uab_CCFly            : if(speed>0)then
+                                       begin
+                                          if(unit_canAbility(pu)=0)then
+                                          begin
+                                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                             _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
+                                             uo_y-=fly_hz;
+                                             exit;
+                                          end;
+                                       end
+                                       else
+                                         if(_unit_sability(pu))then
                                          begin
-                                            if(unit_canAbility(pu)=0)then
-                                            begin
-                                               _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                                               _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
-                                               uo_y-=fly_hz;
-                                               exit;
-                                            end;
-                                         end
-                                         else
-                                           if(_unit_sability(pu))then
-                                           begin
-                                              _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
-                                              _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
-                                              uo_y-=fly_hz;
-                                              exit;
-                                           end;
-                  uab_RebuildInPoint   : begin
-                                            if(speed>0)then
-                                            begin
-                                               _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                                               _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, true );
-                                            end
-                                            else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                            _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,true);
+                                            _push_out(uo_x,uo_y,_r,unum,@uo_x,@uo_y,false, true );
+                                            uo_y-=fly_hz;
                                             exit;
                                          end;
-                                    else
-                                      _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
-                                      exit;
-                  end;
+                uab_RebuildInPoint   : begin
+                                          if(speed>0)then
+                                          begin
+                                             _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                             _push_out(uo_x,uo_y,_uids[_rebuild_uid]._r,unum,@uo_x,@uo_y,false, true );
+                                          end
+                                          else _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                          exit;
+                                       end;
+                                  else
+                                    _setUO(ua_psability,0,order_x,order_y,-1,-1,true ,false);
+                                    exit;
+                end;
 co_rebuild  :  if(_rebuild_uid=order_a)then
                  if(_unit_rebuild (pu))then exit;
 co_sability :  if(_ability=order_a)then

@@ -810,6 +810,7 @@ begin
    spr_b_ab[uab_HellVision      ]:=spr_b_up[r_hell,6 ].surf;
    spr_b_ab[uab_CCFly           ]:=spr_b_up[r_uac ,9 ].surf;
    spr_b_ab[uab_ToUACDron       ]:=_uids[UID_UACDron].un_btn.surf;
+   spr_b_ab[uab_Unload          ]:=spr_b_paction;
 end;
 
 procedure Map_tdmake;

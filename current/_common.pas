@@ -11,6 +11,7 @@ procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function unit_canmove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
+function unit_canAbility(pu:PTUnit;CheckMode:byte=0):cardinal;  forward;
 function _itcanapc(uu,tu:PTUnit):boolean;  forward;
 function pf_IfObstacleZone(zone:word):boolean;  forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
@@ -19,7 +20,7 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
-procedure SoundLogUIPlayer;  forward;
+procedure SoundLogUIPlayer(playern:byte);   forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
 
@@ -329,7 +330,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
          net_chat_shlm:=min2(net_chat_shlm+chat_shlm_t,chat_shlm_max);
          vid_menu_redraw:=true;
 
-         if(LogMes2UIAlarm)then SoundLogUIPlayer;
+         if(LogMes2UIAlarm)then SoundLogUIPlayer(ThisPlayer);
 
          if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
       end;
@@ -957,24 +958,29 @@ begin
 end;
 
 function unit_canAbility(pu:PTUnit;CheckMode:byte=0):cardinal;
+procedure AddUREQ(ureq:cardinal);
+begin
+   unit_canAbility:=unit_canAbility or ureq;
+end;
 begin
    unit_canAbility:=0;
    if(pu=nil)
-   then unit_canAbility:=ureq_unknown
+   then AddUREQ(ureq_unknown)
    else
      with pu^     do
      with uid^    do
-      if(iscomplete=false)
+      if(not iscomplete)
       or(hits<=0)
       or(_ability=0)
       or(rld>0)
-      then unit_canAbility:=ureq_unknown
+      then AddUREQ(ureq_unknown)
       else
         with player^ do
         begin
+           // basic checks
            case CheckMode of
-           1: if not(_ability in uab_abilityOrder )then unit_canAbility+=ureq_common;
-           2: if not(_ability in uab_pabilityOrder)then unit_canAbility+=ureq_unknown;
+           1: if not(_ability in uab_abilityOrder )then AddUREQ(ureq_common );
+           2: if not(_ability in uab_pabilityOrder)then AddUREQ(ureq_unknown);
            end;
 
            if(_ability_no_obstacles)then
@@ -987,6 +993,10 @@ begin
             if(upgr[_ability_rupgr]<_ability_rupgrl)then unit_canAbility+=ureq_rupid;
 
            if(_ability=uab_RebuildInPoint)and(unit_canAbility=0)then unit_canAbility+=unit_canRebuild(pu);
+
+           case _ability of
+           uab_Unload : if(transportC=0)then AddUREQ(ureq_common);
+           end;
         end;
 end;
 

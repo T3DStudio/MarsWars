@@ -10,12 +10,10 @@ program T3D_RTS;
   {$APPTYPE CONSOLE}
 {$ENDIF}
 
-uses SysUtils, SDL, SDL_Net
+uses SysUtils, SDL, SDL_Net,crt
 {$IFDEF _FULLGAME}
-,crt, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader;
-{$ELSE}
-,crt;
-{$ENDIF}
+, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader
+{$ENDIF};
 
 
 {$include _const.pas}
@@ -83,7 +81,6 @@ begin
    if(TestMode=2)then
    WriteUnitDescriptions;
    {$ENDIF}
-   //writeln(fog_chw,' ',fog_cr,' ',fog_ds);
 
    while(GameCycle)do
    begin

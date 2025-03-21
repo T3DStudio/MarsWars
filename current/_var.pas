@@ -725,7 +725,6 @@ spr_cp_gen        : TMWTexture;
 str_ability_name  : array[byte     ] of shortstring;
 str_race          : array[0..r_cnt ] of shortstring;
 str_gmode         : array[0..gm_cnt] of shortstring;
-str_ability_unload,
 str_need_energy,
 str_cant_build,
 str_cant_prod,

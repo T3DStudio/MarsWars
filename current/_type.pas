@@ -514,6 +514,7 @@ o_x1,o_y1  : integer;
            : boolean;
 
 
+   s_all,
    e_builders,
    s_builders,
    s_barracks,

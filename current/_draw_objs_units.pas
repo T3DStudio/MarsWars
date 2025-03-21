@@ -226,10 +226,10 @@ begin
          if(sel)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            if((unit_canAbility(pu,1)=0)and(uo_id<>ua_psability))
+            if(unit_canAbility(pu,1)=0)and((uo_id<>ua_psability)or(s_all=1))
                                      then ui_uibtn_sabilityu:=pu;
-            if((unit_canAbility(pu,2)=0)and(uo_id<>ua_psability))
-            or(transportC>0)         then ui_uibtn_pabilityu:=pu;
+            if(unit_canAbility(pu,2)=0)and((uo_id<>ua_psability)or(s_all=1))
+                                     then ui_uibtn_pabilityu:=pu;
             if(unit_canRebuild(pu)=0)then ui_uibtn_rebuildu :=pu;
          end;
       end

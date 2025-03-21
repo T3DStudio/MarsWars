@@ -1095,14 +1095,13 @@ begin
       then ai_BaseIdle(pu,ai_BasePatrolRange)
       else
       begin
-         ai_DefaultIdle(pu);
          if(ai_enemy_d<=base_1r)then
          begin
             ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
-            ai_DefaultIdle(pu,true);
             a_tar:=0;
             uo_id:=ua_move;
-         end;
+         end
+         else ai_DefaultIdle(pu);
         {if(aiu_alarm_d<NOTSET)
         then ai_RunTo(pu,aiu_alarm_d,aiu_alarm_x,aiu_alarm_y,0,nil)
         else ai_DefaultIdle(pu);}

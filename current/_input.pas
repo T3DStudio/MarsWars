@@ -246,7 +246,7 @@ begin
          net_writebyte(oid);
 
          with _players[HPlayer] do
-           net_writebyte(ucl_cs[false]+ucl_cs[true]);
+           net_writebyte(byte(s_all));
          for u:=1 to MaxUnits do
            with _punits[u]^ do
              if(hits>0)and(sel)and(HPlayer=playeri)and(not _isUnitRange(transport,nil))then

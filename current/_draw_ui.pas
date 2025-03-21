@@ -640,10 +640,7 @@ begin
      begin
         s1:='';
         if(ui_uibtn_pabilityu^.uid^._ability>0)
-        then s1:=str_ability_name[ui_uibtn_pabilityu^.uid^._ability]
-        else
-          if(ui_uibtn_pabilityu^.transportC>0)
-          then s1:=str_ability_unload;
+        then s1:=str_ability_name[ui_uibtn_pabilityu^.uid^._ability];
         _draw_text(tar,ui_textx,ui_hinty1,s1,ta_left,ui_ingamecl,c_white);
      end
      else

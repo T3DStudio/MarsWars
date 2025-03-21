@@ -223,8 +223,9 @@ begin
         else _ADDSTR(@_makeAttributeStr,str_attr_ground ,sep_comma);
       if(transportM>0)
       then _ADDSTR(@_makeAttributeStr,str_attr_transport,sep_comma);
-      if(level>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
+      if(level>0)then
+        if(not _ukbuilding)
+        or(_ukbuilding and (_isbarrack or _issmith))then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
       if(buff[ub_Detect]>0)or(_detector)
       then _ADDSTR(@_makeAttributeStr,str_attr_detector,sep_comma);
       if(buff[ub_Invuln]>0)
@@ -322,9 +323,7 @@ begin
           else
             if(length(str_ability_name[_ability])>0)
             then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
-       end
-       else
-         if(_transportM>0)then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_unload+'"',sep_sdot);
+       end;
 
        if(_splashresist)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
 
@@ -978,8 +977,7 @@ begin
    str_ability_name[uab_HellVision      ]:='Hell Vision';
    str_ability_name[uab_CCFly           ]:='Flight Engines';
    str_ability_name[uab_ToUACDron       ]:='Deconstruct to Drone';
-
-   str_ability_unload                    :='Unload';
+   str_ability_name[uab_Unload          ]:='Unload';
 
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -1499,7 +1497,7 @@ begin
   str_ability_name[uab_HellVision      ]:='Адское зрение';
   str_ability_name[uab_CCFly           ]:='Двигатели для полета';
   str_ability_name[uab_ToUACDron       ]:='Разобрать в Дрона';
-  str_ability_unload                    :='Выгрузить';
+  str_ability_name[uab_Unload          ]:='Выгрузить';
 
   _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');
   _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,'');

@@ -297,7 +297,7 @@ begin
 end;
 UID_Archvile:
 begin
-   _animw:=15;
+   _animw:=16;
    _animd:=12;
    setMWSModel  (0,@spr_archvile);
    setCommandSND(snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
@@ -311,7 +311,7 @@ end;
 
 UID_ZMedic:
 begin
-   _animw:=15;
+   _animw:=16;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (0,@spr_ZFormer);
@@ -323,7 +323,7 @@ begin
 end;
 UID_ZEngineer:
 begin
-   _animw:=15;
+   _animw:=16;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (0,@spr_ZEngineer);
@@ -332,7 +332,7 @@ begin
 end;
 UID_ZSergant:
 begin
-   _animw:=15;
+   _animw:=17;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -342,7 +342,7 @@ begin
 end;
 UID_ZSSergant:
 begin
-   _animw:=14;
+   _animw:=17;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -393,7 +393,7 @@ begin
 end;
 UID_ZBFGMarine:
 begin
-   _animw:=11;
+   _animw:=14;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );

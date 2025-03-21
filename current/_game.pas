@@ -371,6 +371,16 @@ begin
    CheckSimpleClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
+function UIAllowSelecting(playern:byte):boolean;
+begin
+   UIAllowSelecting:=false;
+   with _players[playern] do
+     if(UIPlayer<>playern)
+     or(observer)
+     or(army=0)
+     or(rpls_state=rpls_state_read)then exit;
+   UIAllowSelecting:=true;
+end;
 
 procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
 var u ,
@@ -378,11 +388,7 @@ usel_max:integer;
 wassel,
 SelectBuildings:boolean;
 begin
-   with _players[HPlayer] do
-     if(UIPlayer<>HPlayer)
-     or(observer)
-     or(army=0)
-     or(rpls_state=rpls_state_read)then exit;
+   if(not UIAllowSelecting(playern))then exit;
 
    if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
    if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
@@ -390,18 +396,21 @@ begin
    if(CheckSimpleClick(x0,y0,x1,y1))then usel_max:=1;
 
    SelectBuildings:=true;
-   if(fuid=255)then
-   for u:=1 to MaxUnits do
-    with _punits[u]^ do
-     if(hits>0)and(playern=playeri)and(not _isUnitRange(transport,nil))then
-      with uid^ do
-       if(not _ukbuilding)then
-         if((x0-_r)<=vx)and(vx<=(x1+_r))
-        and((y0-_r)<=vy)and(vy<=(y1+_r))then
-         begin
-            SelectBuildings:=false;
-            break;
-         end;
+   if(add)
+   then SelectBuildings:=(_players[playern].ucl_cs[false]=0)
+   else
+     if(fuid=255)then
+       for u:=1 to MaxUnits do
+        with _punits[u]^ do
+         if(hits>0)and(playern=playeri)and(not _isUnitRange(transport,nil))then
+          with uid^ do
+           if(not _ukbuilding)then
+             if((x0-_r)<=vx)and(vx<=(x1+_r))
+            and((y0-_r)<=vy)and(vy<=(y1+_r))then
+             begin
+                SelectBuildings:=false;
+                break;
+             end;
 
    for u:=1 to MaxUnits do
      with _punits[u]^ do
@@ -409,9 +418,9 @@ begin
        begin
           wassel:=sel;
 
-          sel:=false;
+          if(not add)then sel:=false;
           if(usel_max>0)then
-            if(not add)or(not wassel and add)then
+            if(not add)or(not wassel and add)then    //что-то не так с счетчиками юнитов внутри транспорта и не работает спец способность не в точке
               if(fuid=255)or(fuid=uidi)then
                 with uid^ do
                   sel:=((x0-_r)<=vx)and(vx<=(x1+_r))
@@ -419,25 +428,20 @@ begin
                     and(SelectBuildings or not _ukbuilding);
 
           if(wassel<>sel)then
-            if(sel)
-            then _unit_counters_inc_select(_punits[u])
+            if(sel)then
+            begin
+               _unit_counters_inc_select(_punits[u]);
+               UpdateLastSelectedUnit(unum);
+            end
             else _unit_counters_dec_select(_punits[u]);
-          if(sel)then
-          begin
-             UpdateLastSelectedUnit(unum);
-             if(usel_max>0)then usel_max-=1;
-          end;
+          if(sel)and(usel_max>0)then usel_max-=1;
        end;
 end;
 procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
 var u:integer;
 wassel:boolean;
 begin
-   with _players[HPlayer] do
-     if(UIPlayer<>HPlayer)
-     or(observer)
-     or(army=0)
-     or(rpls_state=rpls_state_read)then exit;
+   if(not UIAllowSelecting(playern))then exit;
 
    for u:=1 to MaxUnits do
     with _punits[u]^ do
@@ -445,7 +449,7 @@ begin
      begin
         wassel:=sel;
 
-        sel:=false;
+        if(not add)then sel:=false;
         if(not add)or(not wassel and add)then
           case fgroup of
           0..
@@ -465,11 +469,7 @@ end;
 procedure units_Grouping(add:boolean;playern,fgroup:byte);
 var u:integer;
 begin
-   with _players[HPlayer] do
-     if(UIPlayer<>HPlayer)
-     or(observer)
-     or(army=0)
-     or(rpls_state=rpls_state_read)then exit;
+   if(not UIAllowSelecting(playern))then exit;
 
    if(fgroup<=MaxUnitGroups)then
      for u:=1 to MaxUnits do
@@ -522,7 +522,6 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
 
          sability_d:=sability_d.MaxValue;
          sability_u:=nil;
-         writeln('order ',o_id,' ',o_x0,' ',o_y0,' ',o_x1,' ',o_y1,' ',o_a0);
 
          while(_su<>_eu)do
          begin
@@ -550,8 +549,8 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                uo_corder     : if(o_x0=co_psability)then
                                begin
                                   if(uo_id<>ua_psability)
-                                  or((ucl_cs[true]+ucl_cs[false])=1)then
-                                     if((transportM>0)and(transportC>0))or((unit_canAbility(pu)=0)and(o_a0=_ability))then
+                                  or(s_all=1)then
+                                     if(unit_canAbility(pu)=0)and(o_a0=_ability)then
                                      begin
                                         d:=point_dist_int(o_x1,o_y1,x,y);
                                         if(d<sability_d)then
@@ -562,7 +561,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                                      end;
                                end
                                else
-                                  if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1,o_a0))then begin writeln('PlayerClearProdError'); PlayerClearProdError(player);break;end;
+                                  if(_unit_player_order(pu,o_x0,o_y0,o_x1,o_y1,o_a0))then begin PlayerClearProdError(player);break;end;
                    end;
                 end;
              end;

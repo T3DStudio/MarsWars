@@ -638,6 +638,7 @@ dm_RSMShot             = 11; //   2*[buildings]
 dm_Siege3              = 12; //   3*[buildings]
 dm_Siege4              = 13; //   4*[buildings]
 dm_Lost                = 14; //                      0.5*[mech]
+dm_BFG                 = 15; //   0.5*[buildings]
 
 
 // LIMIT
@@ -836,6 +837,7 @@ uab_SpawnLost          = 8;
 uab_HellVision         = 9;
 uab_CCFly              = 10;
 uab_ToUACDron          = 11;
+uab_Unload             = 12;
 
 client_rld_abils       = [
                          uab_Teleport
@@ -849,10 +851,10 @@ client_cast_abils      = [
                          uab_HInvulnerability
                          ];
 
-uab_abilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron];
+uab_abilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
 uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
                           uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
-                          uab_SpawnLost,uab_HellVision,uab_CCFly];
+                          uab_SpawnLost,uab_HellVision,uab_CCFly,uab_Unload];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -897,8 +899,8 @@ radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-//mstrike_reload         = fr_fps1*ptime5;
-//haltar_reload          = fr_fps1*ptime5;
+mstrike_reload         = fr_fps1*90;
+haltar_reload          = fr_fps1*90;
 
 step_build_reload      = fr_fps1*5;
 max_build_reload       = step_build_reload*3;

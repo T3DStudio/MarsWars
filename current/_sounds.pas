@@ -467,12 +467,12 @@ begin
    end;
 end;
 
-procedure SoundLogUIPlayer;
+procedure SoundLogUIPlayer(playern:byte);
 begin
-   with _players[UIPlayer] do
+   with _players[playern] do
     with log_l[log_i] do
      case mtype of
-0..MaxPlayers         : if(mtype<>HPlayer)
+0..MaxPlayers         : if(mtype<>playern)
                         or((rpls_state>=rpls_state_read)and(HPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
