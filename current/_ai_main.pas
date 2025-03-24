@@ -218,7 +218,9 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650,ai_GeneratorsEnergy);
+      if(g_generators=0)and(g_step<ai_noProdTime)
+      then ai_need_energy:=mm3(600, ai_builders_count         *1000,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
+      else ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then
       begin
@@ -739,15 +741,18 @@ begin
       ai_spec1_cur     :=uid_e[aiucl_spec1 [race]];
       ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
 
-
-
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;
 
-      prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
-      if(g_generators>0)then prods+=1;
+      if(g_generators=0)and(g_step<ai_noProdTime)
+      then prods:=0
+      else
+      begin
+         prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
+         if(g_generators>0)then prods+=1;
 
-      if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
-      if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
+         if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
+         if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
+      end;
 
       if(ai_enemy_inv_u<>nil)
       then ai_detect_need:=ai_maxlimit_detect

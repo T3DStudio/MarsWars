@@ -265,7 +265,7 @@ begin
 end;
 UID_Revenant:
 begin
-   _animw:=16;
+   _animw:=17;
    _animd:=9;
    setMWSModel  (0,@spr_revenant);
    setCommandSND(snd_revenant_ready,snd_revenant_move,snd_revenant_ready,snd_zimba_pain,snd_revenant_move);
@@ -297,7 +297,7 @@ begin
 end;
 UID_Archvile:
 begin
-   _animw:=16;
+   _animw:=17;
    _animd:=12;
    setMWSModel  (0,@spr_archvile);
    setCommandSND(snd_archvile_ready,snd_archvile_move,snd_archvile_ready,snd_archvile_pain,snd_archvile_move);
@@ -475,13 +475,11 @@ UID_HMonastery:
 begin
    setMWSModel(0,@spr_HMonastery);
    setBuildingSND(snd_hell_hmon);
-   un_build_amode:=2;
 end;
 UID_HTotem:
 begin
    setMWSModel(0,@spr_HTotem);
    setBuildingSND(snd_hell_htotem);
-   un_build_amode:=2;
    un_eid_bcrater_y:=12;
    setWeaponESND(0,snd_archvile_attack,nil,0,0);
    setWeaponTEID(0,nil,0,[0..65]); // snd_archvile_fire                EID_ArchFire
@@ -490,19 +488,16 @@ UID_HAltar:
 begin
    setMWSModel(0,@spr_HAltar);
    setBuildingSND(snd_hell_haltar);
-   un_build_amode:=2;
 end;
 UID_HFortress:
 begin
    setMWSModel(0,@spr_HFortress);
    setBuildingSND(snd_hell_hfort);
-   un_build_amode:=2;
 end;
 UID_HEye:
 begin
    setMWSModel(0,@spr_HEye);
    setBuildingSND(snd_hell_eye);
-   un_build_amode:=2;
    un_eid_bcrater:=255;
    setEffectEID(0,0  ,UID_HEye,UID_HEye,0  );
    setEffectSND(  nil,snd_pexp,snd_pexp,nil);

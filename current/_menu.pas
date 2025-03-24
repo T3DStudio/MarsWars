@@ -247,6 +247,7 @@ begin
               SoundSourceUpdateGainAll;
            end;
       29  : SoundMusicControll(true);
+      30  : ScrollByte(@snd_musicListSize,true,1,snd_musicListSizeMax);
       31  : GameMusicReLoad;
 
       33 : menu_s3:=ms3_game;
@@ -428,6 +429,7 @@ begin
    if(ks_mright=1)then    // right button pressed
    begin
       case menu_item of
+      30  : ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
       // MAP
       50 : begin Map_randomseed;                                  Map_premap;end;
       51 : begin ScrollInt (@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;

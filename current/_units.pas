@@ -586,9 +586,6 @@ begin
    i:=4096;
    _unitWeaponPriority:=0;
 
-   incPrio(tu^.buff[ub_Invuln]<=0);
-   incPrio(highprio);
-
    with tu^  do
    with uid^ do
    case priorset of
@@ -655,6 +652,7 @@ wtp_Scout            : begin
                        _unitWeaponPriority+=speed;
                        end;
    end;
+   incPrio(highprio);
 end;
 
 function _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;

@@ -658,6 +658,7 @@ spr_u_p1s,
 spr_u_p2,
 spr_u_p3,
 spr_u_p8,
+spr_u_p9,
 
 spr_db_h0,
 spr_db_h1,
@@ -754,6 +755,7 @@ str_IncEnergyLevel,
 str_CanRebuildTo,
 str_TargetLimit,
 str_NextTrack,
+str_MusicListSize,
 str_ReloadMusic,
 str_PlayerPaused,
 str_PlayerResumed,
@@ -914,6 +916,7 @@ SLori              : array[0..5] of TALfloat;
 
 snd_svolume1       : single = 0.5;
 snd_mvolume1       : single = 0.5;
+snd_musicListSize  : byte = 5;
 
 MainDevice         : TALCdevice;
 MainContext        : TALCcontext;

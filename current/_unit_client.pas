@@ -810,8 +810,8 @@ begin
                begin
                   vstp:=UnitStepTicks;
                   dir :=point_dir(mp_x,mp_y,x,y);
-               end
-               else
+               end;
+               if(speed<=0)or(buff[ub_Teleport]>0)then
                begin
                   _missiles_clear_tar(unum,true);
                   _unit_clear_a_tar(unum);

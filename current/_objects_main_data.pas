@@ -136,7 +136,7 @@ begin
    begin
       _genergy := 900;
       _renergy := 300;
-      _btime   := _btime*2;
+      _btime   := _btime+(_btime div 2);
    end
    else
    begin
@@ -167,7 +167,7 @@ UID_HSymbol2,
 UID_HSymbol3,
 UID_HSymbol4:
 begin
-   _mhits     := 750;
+   _mhits     := 1000;
    _genergy   := 50;
    _renergy   := 50;
    _r         := 22;  //1520
@@ -207,7 +207,6 @@ begin
    _btime     := ptime2;
    _ukbuilding:= true;
    _issmith   := true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    ups_upgrades := [];
    _rebuild_uid  := i;
@@ -222,7 +221,6 @@ begin
    _ucl       := 9;
    _btime     := ptime5;
    _ukbuilding:= true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    _issolid   := false;
    _ruid1     := UID_HPools;
@@ -235,7 +233,6 @@ begin
    _ucl       := 10;
    _btime     := ptime5;
    _ukbuilding:= true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    _ruid1     := UID_HPools;
 end;
@@ -247,7 +244,6 @@ begin
    _ucl       := 11;
    _btime     := ptime5;
    _ukbuilding:= true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    _ruid1     := UID_HPools;
 end;
@@ -263,14 +259,13 @@ begin
    _limituse  := ul4;
    _ability   := uab_Teleport;
    _ukbuilding:= true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    _issolid   := false;
    _ruid1     := UID_HAKeep;
 end;
 UID_HAltar:
 begin
-   _mhits     := 5000;
+   _mhits     := 12500;
    _renergy   := 800;
    _r         := 50;
    _ucl       := 14;
@@ -286,7 +281,7 @@ end;
 
 UID_HTower:
 begin
-   _mhits     := 5000;
+   _mhits     := 6000;
    _renergy   := 200;
    _r         := 20;
    _srange    := 300;
@@ -305,7 +300,7 @@ begin
 end;
 UID_HTotem:
 begin
-   _mhits     := 2500;
+   _mhits     := 3000;
    _renergy   := 400;
    _r         := 20;
    _srange    := 300;
@@ -536,7 +531,7 @@ begin
    _mhits     := 1500;
    _renergy   := 300;
    _r         := 13;
-   _speed     := 13;
+   _speed     := 14;
    _srange    := 225;
    _ucl       := 8;
    _painc     := 5;
@@ -754,7 +749,7 @@ begin
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
    _fastdeath_hits:=fdead_hits_border;
-   _a_BonusAntiBuildingRange:=50;
+   //_a_BonusAntiBuildingRange:=50;
    _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_building,0,dm_Siege4);
 end;
 UID_ZFPlasmagunner:
@@ -835,7 +830,7 @@ begin
       begin
          _genergy := 900;
          _renergy := 300;
-         _btime   := _btime*2;
+         _btime   := _btime+(_btime div 2);
       end
       else
       begin
@@ -857,7 +852,7 @@ begin
       begin
          _genergy := 900;
          _renergy := 300;
-         _btime   := _btime*2;
+         _btime   := _btime+(_btime div 2);
       end
       else
       begin
@@ -913,7 +908,7 @@ UID_UGenerator2,
 UID_UGenerator3,
 UID_UGenerator4:
 begin
-   _mhits     := 1500;
+   _mhits     := 2000;
    _genergy   := 100;
    _renergy   := 100;
    _r         := 44;
@@ -998,7 +993,7 @@ begin
 end;
 UID_URMStation:
 begin
-   _mhits     := 3000;
+   _mhits     := 10000;
    _renergy   := 800;
    _r         := 40;
    _ucl       := 14;
@@ -1012,7 +1007,7 @@ end;
 
 UID_UGTurret:
 begin
-   _mhits     := 5000;
+   _mhits     := 6000;
    _renergy   := 200;
    _r         := 15;
    _srange    := 300;
@@ -1032,7 +1027,7 @@ begin
 end;
 UID_UATurret:
 begin
-   _mhits     := 5000;
+   _mhits     := 6000;
    _renergy   := 200;
    _r         := 15;
    _srange    := 300;
@@ -1150,7 +1145,7 @@ begin
    _uklight   := false;
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
-   _a_BonusAntiBuildingRange:=50;
+   //_a_BonusAntiBuildingRange:=50;
    _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_building,0,dm_Siege4);
 end;
 UID_FPlasmagunner:

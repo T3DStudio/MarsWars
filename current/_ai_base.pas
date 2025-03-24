@@ -33,6 +33,9 @@ ai_MinBaseSaveCountBorder = 3;
 ai_MinChoosenCount        = 3;
 ai_FiledSquareBorder      = 150000;//145000;
 
+ai_noProdTimeMax          = fr_fps1*90;
+ai_noProdTimeStep         = ai_noProdTimeMax div 7;
+
 // ai groups
 aio_home       = 0;
 aio_home_busy  = 1;
@@ -251,6 +254,8 @@ begin
       else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
+      ai_noProdTime:=random(ai_skill*ai_noProdTimeStep);
+      if(ai_noProdTime>ai_noProdTimeMax)then ai_noProdTime:=ai_noProdTimeMax;
       case ai_skill of
       0  :;
       1,

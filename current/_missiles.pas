@@ -22,7 +22,7 @@ MID_YPlasma  : ms_smodel:=@spr_h_p7;
 MID_BPlasma  : ms_smodel:=@spr_u_p0;
 MID_Bullet,
 MID_SChaingun,
-MID_Chaingun : ms_smodel:=@spr_u_p1;
+MID_Chaingun : ms_smodel:=@spr_u_p9;
 MID_SShot,
 MID_SSShot   : ms_smodel:=@spr_u_p1s;
 MID_BFG      : ms_smodel:=@spr_u_p2;
@@ -68,6 +68,7 @@ MID_HRocket,
 MID_URocket,
 MID_Revenant : ms_snd_death[false]:=snd_exp;
 MID_Bullet,
+MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
@@ -99,6 +100,7 @@ MID_URocketS : begin
                   ms_eid_death_r  [false]:=20;
                end;
 MID_Bullet,
+MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
@@ -118,8 +120,8 @@ MID_SShot    : begin
 MID_SSShot   : begin
                   ms_eid_death_cnt[false]:=4;
                   ms_eid_death_cnt[true ]:=4;
-                  ms_eid_death_r  [false]:=8;
-                  ms_eid_death_r  [true ]:=8;
+                  ms_eid_death_r  [false]:=10;
+                  ms_eid_death_r  [true ]:=10;
                end;
       end;
    end;
@@ -188,14 +190,7 @@ begin
        damage:=adddmg;
        if(player<=MaxPlayers)and(tu<>nil)then
         with _players[player] do
-        begin
-           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
-           {if(not tu^.uid^._ukmech)then
-            case mid of
-           MID_SSShot : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus3;
-           MID_SShot  : damage+=upgr[upgr_uac_ssgup]*BaseDamageBonus1;
-            end;}
-        end;
+         if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
 
        with _mids[mid] do
        begin

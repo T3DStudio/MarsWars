@@ -1,5 +1,6 @@
 
 procedure StopSoundSource(sss:byte);forward;
+procedure SoundResetAllSources; forward;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -153,6 +154,7 @@ i,
 flist_n : integer;
 begin
    flist_n:=0;
+   setlength(flist_l,0);
    if(FindFirst(str_f_snd+dir+'*.ogg',faReadonly,info)=0)then
     repeat
       s:=info.Name;
@@ -191,16 +193,15 @@ begin
 end;
 
 procedure SoundSetUnLoad(sSet:PTSoundSet);
-var ali:int32;
 begin
+   SoundResetAllSources;
    if(sSet=nil)then exit;
    with sSet^ do
    begin
       while(sndn>0)do
       begin
          sndn-=1;
-         alGetBufferi(snds[sndn]^.sound, AL_SIZE, @ali);
-         alDeleteBuffers(ali,@snds[sndn]^.sound);
+         if alIsBuffer(snds[sndn]^.sound)then alDeleteBuffers(1,@(snds[sndn]^.sound));
       end;
       setlength(snds,0);
    end;
@@ -213,7 +214,7 @@ begin
    _LoadingScreen(@str_loading_msc,c_aqua);
    SoundSetUnLoad(snd_music_game);
 
-   snd_music_game:=MusicSetLoad('music\game\',5);
+   snd_music_game:=MusicSetLoad('music\game\',snd_musicListSize);
 end;
 
 procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
@@ -345,6 +346,20 @@ begin
     if(ssn>0)then
      for i:=0 to ssn-1 do
       with ssl[i] do alSourceStop(source);
+end;
+
+procedure SoundResetAllSources;
+var sss,sn:byte;
+begin
+   for sss:=0 to sss_count-1 do
+     with SoundSources[sss] do
+       if(ssn>0)then
+         for sn:=0 to ssn-1 do
+           with ssl[sn] do
+           begin
+              alSourceStop(source);
+              alSourcei   (source, AL_BUFFER, 0);
+           end;
 end;
 
 procedure SoundPlay(SoundSet:PTSoundSet;sss:byte;NewChunk:boolean);
@@ -570,7 +585,7 @@ begin
     end;
 
    GameMusicReLoad;
-   snd_music_menu:=MusicSetLoad('music\menu\',5);
+   snd_music_menu:=MusicSetLoad('music\menu\',snd_musicListSize);
 
    SoundShafleSoundSet(snd_music_menu);
    SoundShafleSoundSet(snd_music_game);

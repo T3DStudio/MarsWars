@@ -720,6 +720,7 @@ begin
    _LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
    _LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_missile,firstload);
+   _LoadMWSModel(@spr_u_p9           ,race_missiles[r_uac ]+'b'       ,smt_missile,firstload);
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do mkind:=smt_effect2;

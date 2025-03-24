@@ -250,6 +250,10 @@ begin
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_NextTrack, ta_left,255, c_white);
 
+                    y:=_yt(8);
+                    _draw_text(tar,i,y, str_MusicListSize, ta_left,255, c_white);
+                    _draw_text(tar,t,y, b2s(snd_musicListSize),ta_right,255, c_white);
+
                     y:=_yt(9);
                     _draw_text(tar,i,y, str_ReloadMusic, ta_left,255, c_white);
 

@@ -29,7 +29,7 @@ Base regeneration: 7
 Limit used: 1
 Size: 66
 Base vision range: 250
-Build time: 120
+Build time: 90
 Energy required: 300
 
 
@@ -67,7 +67,7 @@ Unholy Symbol level 1
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 750
+Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
@@ -87,7 +87,7 @@ Unholy Symbol level 2
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 750
+Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
@@ -107,7 +107,7 @@ Unholy Symbol level 3
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 750
+Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
@@ -127,7 +127,7 @@ Unholy Symbol level 4
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 750
+Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
@@ -168,7 +168,7 @@ Imp`s Tower
 
 Hotkey: V
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 5000
+Max hits: 6000
 Limit used: 1
 Size: 20
 Base vision range: 300
@@ -275,7 +275,7 @@ Totem of Horror
 
 Hotkey: B
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 2500
+Max hits: 3000
 Limit used: 1
 Size: 20
 Base vision range: 300
@@ -298,7 +298,7 @@ Altar of Pain
 
 Hotkey: L
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 5000
+Max hits: 12500
 Base regeneration: 7
 Limit used: 10
 Size: 50
@@ -367,7 +367,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 250
-Build time: 120
+Build time: 90
 Energy required: 300
 
 
@@ -681,7 +681,7 @@ Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1500
 Limit used: 1.5
 Size: 13
-Base movement speed: 13
+Base movement speed: 14
 Base vision range: 225
 Build time: 20
 Energy required: 300
@@ -963,7 +963,7 @@ Places in transport: 1
 Requirements: Zombie Barracks(x3)
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1005,7 +1005,7 @@ Zombie BFG Marine
 Hotkey: Ctrl+B
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1000
-Limit used: 4
+Limit used: 5
 Size: 11
 Base movement speed: 10
 Base vision range: 250
@@ -1059,7 +1059,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 250
-Build time: 120
+Build time: 90
 Energy required: 300
 Zombie: Advanced Hell Command Center
 Zombification hits: 3750
@@ -1119,7 +1119,7 @@ Generator level 1
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 1500
+Max hits: 2000
 Limit used: 2
 Size: 44
 Base vision range: 88
@@ -1138,7 +1138,7 @@ Generator level 2
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 1500
+Max hits: 2000
 Limit used: 2
 Size: 44
 Base vision range: 88
@@ -1157,7 +1157,7 @@ Generator level 3
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 1500
+Max hits: 2000
 Limit used: 2
 Size: 44
 Base vision range: 88
@@ -1176,7 +1176,7 @@ Generator level 4
 
 Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 1500
+Max hits: 2000
 Limit used: 2
 Size: 44
 Base vision range: 88
@@ -1234,7 +1234,7 @@ Rocket Launcher Station
 
 Hotkey: L
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 3000
+Max hits: 10000
 Limit used: 10
 Size: 40
 Base vision range: 80
@@ -1272,7 +1272,7 @@ Anti-ground Turret
 
 Hotkey: V
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 5000
+Max hits: 6000
 Limit used: 1
 Size: 15
 Base vision range: 300
@@ -1296,7 +1296,7 @@ Anti-air Turret
 
 Hotkey: B
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 5000
+Max hits: 6000
 Limit used: 1
 Size: 15
 Base vision range: 300
@@ -1536,7 +1536,7 @@ Zombification hits: 0
 Requirements: Weapon Factory
 Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1575,7 +1575,7 @@ BFG Marine
 Hotkey: V
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1000
-Limit used: 4
+Limit used: 5
 Size: 11
 Base movement speed: 10
 Base vision range: 250

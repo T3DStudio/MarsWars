@@ -3,6 +3,7 @@ const
 
 cfg_key_name    = 'player_name';
 cfg_key_sndv    = 'sound_volume';
+cfg_key_mlistn  = 'music_list_size';
 cfg_key_mscv    = 'music_volume';
 cfg_key_vspd    = 'scroll_speed';
 cfg_key_fscr    = 'fullscreen';
@@ -40,6 +41,7 @@ begin
 cfg_key_name  : PlayerName       := vl;
 cfg_key_sndv  : snd_svolume1     := b2si1(vlw);
 cfg_key_mscv  : snd_mvolume1     := b2si1(vlw);
+cfg_key_mlistn: snd_musicListSize:= vlw;
 cfg_key_vspd  : vid_CamSpeed     := vli;
 cfg_key_fscr  : vid_fullscreen   :=(vl=b2c[true]);
 cfg_key_vmm   : vid_CamMScroll   :=(vl=b2c[true]);
@@ -97,6 +99,10 @@ begin
 
       if(snd_svolume1<0  )then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
       if(snd_mvolume1<0  )then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
+      if(snd_musicListSize=0)
+      then snd_musicListSize:=1
+      else
+        if(snd_musicListSize>snd_musicListSizeMax)then snd_musicListSize:=snd_musicListSizeMax;
       vid_CamSpeed:=mm3(1,vid_CamSpeed,127);
 
       if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
@@ -129,6 +135,7 @@ begin
    writeln(f,cfg_key_name  ,'=',PlayerName            );
    writeln(f,cfg_key_sndv  ,'=',si12b(snd_svolume1)   );
    writeln(f,cfg_key_mscv  ,'=',si12b(snd_mvolume1)   );
+   writeln(f,cfg_key_mlistn,'=',snd_musicListSize     );
    writeln(f,cfg_key_fscr  ,'=',b2c[vid_fullscreen]   );
    writeln(f,cfg_key_vspd  ,'=',vid_CamSpeed          );
    writeln(f,cfg_key_vmm   ,'=',b2c[vid_CamMScroll]   );

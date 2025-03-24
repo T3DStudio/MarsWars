@@ -892,15 +892,15 @@ base_6r                = base_1r*6;
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1;
 order_period           = fr_fpsd2+1;
-vistime                = fr_fps1d2;
+vistime                = fr_fps2;
 
 radar_reload           = fr_fps1*60;
 radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-mstrike_reload         = fr_fps1*90;
-haltar_reload          = fr_fps1*90;
+mstrike_reload         = fr_fps1*ptime6;
+haltar_reload          = fr_fps1*ptime6;
 
 step_build_reload      = fr_fps1*5;
 max_build_reload       = step_build_reload*3;
@@ -934,6 +934,8 @@ fly_height             : array[false..true] of smallint = (1,fly_z);
 pain_time              = fr_fps1;
 
 {$IFDEF _FULLGAME}
+
+snd_musicListSizeMax   = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1451,8 +1453,8 @@ crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
 theme_n                = 8;
 theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'  ,
                                                                tc_blue  +'TECH BASE'  ,
-                                                               tc_white +'PLANET'     ,
-                                                               tc_white +'PLANET MOON',
+                                                               tc_white +'UNKNOWN PLANET',
+                                                               tc_white +'UNKNOWN MOON',
                                                                tc_gray  +'CAVES'      ,
                                                                tc_aqua  +'ICE CAVES'  ,
                                                                tc_orange+'HELL'       ,

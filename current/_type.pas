@@ -504,6 +504,7 @@ o_x1,o_y1  : integer;
    ai_hptargets
            : TSoB;
    ai_skill: byte;
+   ai_noProdTime,
    ai_flags: cardinal;
    ai_alarms
            : array[0..MaxPlayers] of TAIAlarm;

@@ -812,6 +812,7 @@ begin
    str_ReloadMusic       := 'Load new playlist';
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
+   str_MusicListSize     := 'Music playlist size';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1365,6 +1366,7 @@ begin
   str_ReloadMusic       := 'Загрузить новый плейлист';
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
+  str_MusicListSize     := 'Размер плейлиста';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
