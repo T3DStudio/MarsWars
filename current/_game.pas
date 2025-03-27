@@ -809,25 +809,52 @@ begin
    if(andstart)then GameStartScirmish(PlayerClient,false);
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CLEINT-SIDE SELECTIOn&GROUPING
+
+function CheckSimpleClick(x0,y0,x1,y1:integer):boolean;
+begin
+   CheckSimpleClick:=max2i(abs(x0-x1),abs(y0-y1))<3;
+end;
+
+function ui_SelectionIsAllowed(playern:byte):boolean;
+begin
+   ui_SelectionIsAllowed:=false;
+   with g_players[playern] do
+     if(UIPlayer<>playern)
+     or(isobserver)
+     or(isdefeated)
+     or(rpls_rstate=rpls_state_read)then exit;
+   ui_SelectionIsAllowed:=true;
+end;
+
 procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
-var u:integer;
+var u,
+usel_max:integer;
 wasselect,
 SelectBuildings:boolean;
 begin
+   if(not ui_SelectionIsAllowed(playern))then exit;
+
    if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
    if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
 
+   if(CheckSimpleClick(x0,y0,x1,y1))
+   then usel_max:=1
+   else usel_max:=32000;
+
    SelectBuildings:=true;
    if(fuid=255)then
-   for u:=1 to MaxUnits do
-    with g_punits[u]^ do
-     if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
-      with uid^ do
-       if(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(not _ukbuilding)then
-       begin
-          SelectBuildings:=false;
-          break;
-       end;
+     for u:=1 to MaxUnits do
+      with g_punits[u]^ do
+       if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
+        with uid^ do
+         if(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(not _ukbuilding)then
+         begin
+            SelectBuildings:=false;
+            break;
+         end;
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
@@ -836,22 +863,29 @@ begin
           wasselect:=isselected;
 
           isselected:=false;
-          if(not add)or(not wasselect and add)then
-            if(fuid=255)or(fuid=uidi)then
-              with uid^ do
-                isselected:=(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(SelectBuildings or not _ukbuilding);
+          if(usel_max>0)then
+            if(not add)or(not wasselect and add)then
+              if(fuid=255)or(fuid=uidi)then
+                with uid^ do
+                  isselected:=(RectInRect(x0,y0,x1,y1,vx,vy,_r))and(SelectBuildings or not _ukbuilding);
 
           if(wasselect<>isselected)then
             if(isselected)
             then unit_PC_select_inc(g_punits[u])
             else unit_PC_select_dec(g_punits[u]);
-          if(isselected)then UpdateLastSelectedUnit(unum);
+          if(isselected)then
+          begin
+             UpdateLastSelectedUnit(unum);
+             if(usel_max>0)then usel_max-=1;
+          end;
        end;
 end;
 procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
 var u:integer;
 wasselect:boolean;
 begin
+   if(not ui_SelectionIsAllowed(playern))then exit;
+
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
      if(hits>0)and(playern=playeri)and(not IsIntUnitRange(transport,nil))then
@@ -878,6 +912,8 @@ end;
 procedure units_Grouping(add:boolean;playern,fgroup:byte);
 var u:integer;
 begin
+   if(not ui_SelectionIsAllowed(playern))then exit;
+
    if(fgroup<=MaxUnitGroups)then
      for u:=1 to MaxUnits do
        with g_punits[u]^ do
@@ -954,18 +990,20 @@ po_prod_stop      : begin
            with uid^ do
            if(hits>0)and(not IsIntUnitRange(transport,nil))and(playern=playeri)then
            begin
-              case o_id of
+              if(isselected)then
+                case o_id of
 // unit orders
-po_unit_order_set    : if(isselected)then
-                         if(o_a0 in ua_toAll)
-                         then unit_SetAction(pu,o_a0,o_x0,o_y0,o_x1);
+po_unit_order_set    : if(o_a0 in ua_toAll)
+                       then unit_SetAction(pu,o_a0,o_x0,o_y0,o_x1)
+                       else
+                         if(ua_id<>o_a0)
+                         then SetOrderUnit;
 
-po_prod_stop         : if(isselected)then
-                       begin
+po_prod_stop         : begin
                        if(unit_ProdUnitStop(pu,255,false))then break;
                        if(unit_ProdUpgrStop(pu,255,false))then break;
                        end;
-              end;
+                end;
 
               if(0<o_a0)and(o_a0<=255)then
               begin
@@ -1090,6 +1128,9 @@ end;
 {$include _net_game.pas}
 
 procedure CodeGame;
+var w:word;
+x0,y0:integer;
+pu:PTUnit;
 begin
    {$IFDEF _FULLGAME}
    SoundControl;
@@ -1111,6 +1152,25 @@ begin
    begin
       g_cycle_order:=(g_cycle_order+1) mod order_period;
       g_cycle_regen:=(g_cycle_regen+1) mod regen_period;
+
+      debug_AddDoaminCells;
+
+      with g_players[PlayerClient] do
+        if(IsIntUnitRange(uid_x[UID_Imp],@pu))then
+          with pu^ do
+          with uid^ do
+            if(isselected)then
+            begin
+               UIInfoItemAddCircle(movePFNext_x,movePFNext_y,5,c_orange );
+               if(StepCollisionR(mouse_map_x,mouse_map_y,g_uids[UID_Imp]._r,zone,328,348))then
+                 UIInfoItemAddCircle(mouse_map_x,mouse_map_y,5,c_lime );
+            end;
+
+      x0:=8360;
+      y0:=6782;
+
+
+
 
       if(ServerSide)then
       begin

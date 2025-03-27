@@ -31,7 +31,7 @@ procedure menu_Toggle; forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function sm_uid2MWTexture(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
-procedure SoundLogUIPlayer;  forward;
+procedure SoundLogUIPlayer(playern:byte);  forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
 procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal); forward;
@@ -431,7 +431,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(PlayerTarget,[lmt_unit_attacke
          log_LastMesTimer:=min2i(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
          menu_redraw:=true;
 
-         if(LogMes2UIAlarm)then SoundLogUIPlayer;
+         if(LogMes2UIAlarm)then SoundLogUIPlayer(UIPlayer);
 
          if(amtype=lmt_player_defeated )
          or(amtype=lmt_player_surrender)then
@@ -842,43 +842,41 @@ begin
                                       else begin          tx:=gmx0;ty:=gmy1;end;
                                       if(rd<>nil)then td:=point_dist_int(px,py,gmx0,gmy1);
                                    end
-  else
-       if(px<gmx0)then begin
-                          td:=abs(gmx0-px);
-                          if(pushOutR<=0)
-                          then tx:=gmx0
-                          else if(td<pushOutR)then tx:=gmx0-pushOutR;
-                       end
-  else if(gmx1<px)then begin
-                          td:=abs(px-gmx1);
-                          if(pushOutR<=0)
-                          then tx:=gmx1
-                          else if(td<pushOutR)then tx:=gmx1+pushOutR;
-                       end
-  else if(py<gmy0)then begin
-                          td:=abs(gmy0-py);
-                          if(pushOutR<=0)
-                          then ty:=gmy0
-                          else if(td<pushOutR)then ty:=gmy0-pushOutR;
-                       end
-  else if(gmy1<py)then begin
-                          td:=abs(py-gmy1);
-                          if(pushOutR<=0)
-                          then ty:=gmy1
-                          else if(td<pushOutR)then ty:=gmy1+pushOutR;
-                       end;
+  else if(px<gmx0)then             begin
+                                      td:=abs(gmx0-px);
+                                      if(pushOutR<=0)
+                                      then tx:=gmx0
+                                      else if(td<pushOutR)then tx:=gmx0-pushOutR;
+                                   end
+  else if(gmx1<px)then             begin
+                                      td:=abs(px-gmx1);
+                                      if(pushOutR<=0)
+                                      then tx:=gmx1
+                                      else if(td<pushOutR)then tx:=gmx1+pushOutR;
+                                   end
+  else if(py<gmy0)then             begin
+                                      td:=abs(gmy0-py);
+                                      if(pushOutR<=0)
+                                      then ty:=gmy0
+                                      else if(td<pushOutR)then ty:=gmy0-pushOutR;
+                                   end
+  else if(gmy1<py)then             begin
+                                      td:=abs(py-gmy1);
+                                      if(pushOutR<=0)
+                                      then ty:=gmy1
+                                      else if(td<pushOutR)then ty:=gmy1+pushOutR;
+                                   end;
    if(rx<>nil)then rx^:=tx;
    if(ry<>nil)then ry^:=ty;
    if(rd<>nil)then rd^:=td;
 end;
 
-function dist2mgcellC(tx,ty,gx,gy:integer):integer;
-var gmx,gmy,
-    mx ,my :integer;
+function dist2mgcellC(mx,my,gx,gy:integer):integer;
+var gmx,gmy:integer;
 begin
    gmx:=gx*MapCellW;
    gmy:=gy*MapCellW;
-   mgcell2NearestXY(tx,ty,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,@mx,@my,@dist2mgcellC);
+   mgcell2NearestXY(mx,my,gmx,gmy,gmx+MapCellW,gmy+MapCellW,0,nil,nil,@dist2mgcellC);
 end;
 
 {function dist2mgcellM(tx,ty,gmx,gmy:integer):integer;

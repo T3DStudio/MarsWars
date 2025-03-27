@@ -7,9 +7,6 @@ type
 //   BASIC
 //
 
-integer     = Smallint;
-pinteger    = ^integer;
-
 TSoc        = set of char;
 PTSoc       = ^TSoc;
 TSob        = set of byte;
@@ -138,25 +135,25 @@ TPlayerColorArray  = array[0..LastPlayer] of cardinal;
 //
 
 TMWSoundSource = record
-   source   :TALuint;
-   volumevar:psingle;
+   ssrc_source   :TALuint;
+   ssrc_volumeVar:psingle;
 end;
 PTMWSoundSource   = ^TMWSoundSource;
 TMWSoundSourceSet = record
-   ssl: array of TMWSoundSource;
-   ssn: integer;
+   sss_list: array of TMWSoundSource;
+   sss_size: integer;
 end;
 PTMWSoundSourceSet = ^TMWSoundSourceSet;
 
 TMWSound = record
-   sound  : TALuint;
+   s_sound  : TALuint;
 end;
 PTMWSound = ^TMWSound;
 
 TSoundSet = record
-   snds : array of PTMWSound;
-   sndn,
-   sndps: integer;
+   snds_list : array of PTMWSound;
+   snds_size,
+   snds_cur  : integer;
 end;
 PTSoundSet = ^TSoundSet;
 
@@ -242,6 +239,10 @@ pTUnitGroup = ^TUnitGroup;
 //
 //   GAME
 //
+
+TCheckCollisionR = (cbr_no,cbr_mapSide,cbr_unit,cbr_cpoint,cbr_obstacle);
+TCheckBuildArea  = (cba_inBuildArea,cba_noBuilders,cba_NoBuildArea,cba_outBuildArea);
+TCheckBuildPlace = (cbp_good,cbp_noplace,cbp_out,cbp_unknown);
 
 TPoint = record
    p_x,
@@ -673,6 +674,8 @@ TPList = array[0..LastPlayer] of TPLayer;
 
 TUnitVisionData = array[0..LastPlayer] of integer;
 
+TMoveXY = (mvxy_none,mvxy_relative,mvxy_strict);
+
 TUnit = record
    hits     : longint;
    vx,vy,
@@ -704,11 +707,8 @@ TUnit = record
    a_reload,
    a_weap_cl,
    a_weap   : byte;
-   a_tx,a_ty,
    a_tar,
    a_tar_cl,
-
-   moveCurr_x ,moveCurr_y ,
 
    ua_bx,ua_by,
    ua_x ,ua_y,
@@ -717,10 +717,20 @@ TUnit = record
    ua_id    : byte;
 
 
+   moveDest_x,
+   moveDest_y    // unit destination map xy
+            : integer;
+
    movePF_direct
             : boolean;
-   movePF_nextX,movePF_destX,movePF_destcX,movePF_curcX,
-   movePF_nextY,movePF_destY,movePF_destcY,movePF_curcY
+   movePFDest_x,
+   movePFDest_y, // pf destination map xy
+   movePFDest_cx,
+   movePFDest_cy,// pf destination grid xy
+   movePFPos_cx,
+   movePFPos_cy, // pf unit position grid xy
+   movePFNext_x,
+   movePFNext_y
             : integer;
    movePF_d1,
    movePF_dx: word;

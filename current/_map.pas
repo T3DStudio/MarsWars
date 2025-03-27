@@ -362,6 +362,7 @@ begin
           map_gridZone_n+=1;
           map_ZoneFillPart(x,y,map_gridZone_n,false);
        end;
+   writeln('map_gridZone_n ',map_gridZone_n);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -400,12 +401,8 @@ begin
                          or CheckNoSolidAround(x-1,y-2,x+2,y+1)
                          or CheckNoSolidAround(x-2,y-1,x+1,y+2)
                          or CheckNoSolidAround(x-1,y-1,x+2,y+2));
-   {
-    #      ##
-           ##
-   }
 end;
-
+{$IFDEF DTEST}
 procedure debug_cell(cx,cy,cw:integer;color:cardinal);
 begin
    cx:=cx*MapCellw+cw;
@@ -414,24 +411,67 @@ begin
    UIInfoItemAddRect(cx,cy,cx+MapCellw-cw,cy+MapCellw-cw,color);
 end;
 
+procedure debug_AddDoaminCells;
+var
+sx0,sy0,
+x0,y0,
+gx,gy:integer;
+begin
+   if(map_gridDomain_n=0)then exit;
+
+   sx0:=vid_cam_x div MapCellW;
+   sy0:=vid_cam_y div MapCellW;
+
+   for x0:=0 to ui_MapView_cw do
+   for y0:=0 to ui_MapView_ch do
+   begin
+      gx:=x0+sx0;
+      gy:=y0+sy0;
+      if(not map_InGridRange(gx))
+      or(not map_InGridRange(gy))then continue;
+      with map_grid[gx,gy] do
+        if(tgc_pf_domain>0)then
+        begin
+           debug_cell(gx,gy,1,map_gridDomain_color[tgc_pf_domain-1]);
+           with vid_UIItem_list[vid_UIItem_n-1] do
+           begin
+              text_lt :=b2s(tgc_solidlevel);
+              text_lt2:=w2s(tgc_pf_domain)+' '+str_b2c[tgc_pf_solid];
+              text_ld :=i2s(gx)+'_'+i2s(gy);
+           end;
+        end;
+   end;
+end;
+procedure debug_SetDomainColors;
+var w:word;
+begin
+   setlength(map_gridDomain_color,map_gridDomain_n);
+   if(map_gridDomain_n>0)then
+     for w:=0 to map_gridDomain_n-1 do
+       map_gridDomain_color[w]:=rgba2c(random(255),random(255),random(255),255);
+end;
+
+
+{$ENDIF}
+
 function map_GridLineCollision(x0,y0,x1,y1:integer;domainCheck:word):boolean;
 var
 dx,dy,
 px,py,
 sx,sy:integer;
 e1,e2:longint;
-function map_GetPFSolid(cx,cy:integer):boolean;
+function map_CheckPFSolid(cx,cy:integer):boolean;
 begin
-   map_GetPFSolid:=true;
+   map_CheckPFSolid:=true;
    if (0<=cx)and(cx<=map_csize)
    and(0<=cy)and(cy<=map_csize)then
      with map_grid[cx,cy] do
        if(domainCheck>0)and(tgc_pf_domain>0)
-       then map_GetPFSolid:=tgc_pf_solid or (domainCheck<>tgc_pf_domain)
-       else map_GetPFSolid:=tgc_pf_solid;
+       then map_CheckPFSolid:=tgc_pf_solid or (domainCheck<>tgc_pf_domain)
+       else map_CheckPFSolid:=tgc_pf_solid;
 end;
 begin
-   if(map_GetPFSolid(x1,y1))then
+   if(map_CheckPFSolid(x1,y1))then
    begin
       map_GridLineCollision:=true;
       exit;
@@ -447,7 +487,7 @@ begin
 
    while(true)do
    begin
-      if(map_GetPFSolid(x0,y0))then
+      if(map_CheckPFSolid(x0,y0))then
       begin
          map_GridLineCollision:=true;
          break;
@@ -467,8 +507,8 @@ begin
           y0+=sy
       end;
       if(px<>x0)and(py<>y0)then
-        if  map_GetPFSolid(px,y0)
-        and map_GetPFSolid(x0,py) then
+        if  map_CheckPFSolid(px,y0)
+        and map_CheckPFSolid(x0,py) then
         begin
            map_GridLineCollision:=true;
            break;
@@ -486,12 +526,20 @@ begin
       begin
          setlength(edgeCells_l,0);
          edgeCells_n:=0;
-         nextDomain:=0;
+         nextDomain :=0;
       end;
+   for d1:=0 to map_csize do
+   for d2:=0 to map_csize do
+   with map_grid[d1,d2] do tgc_pf_domain:=0;
 
    map_gridDomain_n:=0;
    setlength(map_gridDomainMX,0,0);
+   {$IFDEF DTEST}
+   setlength(map_gridDomain_color,0);
+   {$ENDIF}
 end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure map_pf_DomainsFill;
 var
@@ -501,32 +549,34 @@ domain2point,
 tmp_points_l: array of TPoint;
 tmp_points_n,dn,
 tmp_points_i: word;
-function FillDomain(cx,cy:integer):boolean;
+function SetDomain(cx,cy:integer;newDomain:word):boolean;
 var i:word;
 begin
-   FillDomain:=false;
+   SetDomain:=false;
 
    if(cx<0)
    or(cy<0)
    or(cx>map_csize)
    or(cy>map_csize)then exit;
 
+   if(tmp_points_n=tmp_points_n.MaxValue)then exit;
+
    with map_grid[cx,cy] do
    begin
       if(tgc_solidlevel>=mgsl_liquid)
       or(tgc_pf_domain>0)
-      or(tgc_pf_domain=map_gridDomain_n)
+      or(tgc_pf_domain=newDomain)
       or(tgc_pf_solid)then exit;
 
       if(tmp_points_n>0)then
         for i:=0 to tmp_points_n-1 do
           with tmp_points_l[i] do
-           if (map_GridLineCollision(cx,cy,p_x,p_y,map_gridDomain_n)
-           and map_GridLineCollision(p_x,p_y,cx,cy,map_gridDomain_n))then exit;
+           if (map_GridLineCollision(cx,cy,p_x,p_y,newDomain)
+           and map_GridLineCollision(p_x,p_y,cx,cy,newDomain))then exit;
 
-      FillDomain:=true;
+      SetDomain:=true;
 
-      tgc_pf_domain:=map_gridDomain_n;
+      tgc_pf_domain:=newDomain;
    end;
 
    tmp_points_n+=1;
@@ -538,47 +588,41 @@ begin
    end;
 end;
 procedure StartFillDomain(sx,sy:integer);
-procedure AddCount(px,py:integer);
-begin
-   domain2count[map_gridDomain_n-1]+=1;
-   with domain2point[map_gridDomain_n-1] do
-   begin
-      p_x:=px;
-      p_y:=py;
-   end;
-end;
 begin
    tmp_points_i:=0;
    tmp_points_n:=0;
    setlength(tmp_points_l,0);
 
-   if(map_gridDomain_n=65535)then exit;
+   if(map_gridDomain_n=map_gridDomain_n.MaxValue)then exit;
 
+   if(not SetDomain(sx,sy,map_gridDomain_n+1))then exit;
    map_gridDomain_n+=1;
-   if(not FillDomain(sx,sy))then
-   begin
-      map_gridDomain_n-=1;
-      exit;
-   end;
 
    setlength(domain2point,map_gridDomain_n);
    setlength(domain2count,map_gridDomain_n);
-   domain2count[map_gridDomain_n-1]:=0;
-   AddCount(sx,sy);
+   domain2count[map_gridDomain_n-1]:=1;
+   with domain2point[map_gridDomain_n-1] do
+   begin
+      p_x:=sx;
+      p_y:=sy;
+   end;
 
    while(tmp_points_i<tmp_points_n)do
    begin
       with tmp_points_l[tmp_points_i] do
       begin
-         if(FillDomain(p_x-1,p_y))then AddCount(p_x-1,p_y);
-         if(FillDomain(p_x+1,p_y))then AddCount(p_x+1,p_y);
-         if(FillDomain(p_x,p_y-1))then AddCount(p_x,p_y-1);
-         if(FillDomain(p_x,p_y+1))then AddCount(p_x,p_y+1);
+         sx:=p_x;
+         sy:=p_y;
       end;
+      SetDomain(sx-1,sy  ,map_gridDomain_n);
+      SetDomain(sx+1,sy  ,map_gridDomain_n);
+      SetDomain(sx  ,sy-1,map_gridDomain_n);
+      SetDomain(sx  ,sy+1,map_gridDomain_n);
       tmp_points_i+=1;
    end;
+   domain2count[map_gridDomain_n-1]:=tmp_points_n;
 end;
-procedure CheckDomainNeighbor(cx,cy:integer);
+{procedure CheckDomainNeighbor(cx,cy:integer);
 var d:word;
 begin
    if(cx<0)
@@ -596,20 +640,19 @@ begin
          dn:=d;
       end;
    end;
-end;
+end; }
 
 begin
    setlength(domain2point,0);
    setlength(domain2count,0);
 
-   for x:=0 to LastPlayer do
-     StartFillDomain(map_PlayerStartX[x] div MapCellw,map_PlayerStartY[x] div MapCellw);
+   //for x:=0 to LastPlayer do
+  //   StartFillDomain(map_PlayerStartX[x] div MapCellw,map_PlayerStartY[x] div MapCellw);
 
    for x:=0 to map_csize do
-   for y:=0 to map_csize do
-     StartFillDomain(x,y);
+   for y:=0 to map_csize do StartFillDomain(x,y);
 
-   if(map_gridDomain_n>0)then
+  { if(map_gridDomain_n>0)then
      for tmp_points_n:=0 to map_gridDomain_n-1 do
        if(domain2count[tmp_points_n]=1)then
        begin
@@ -624,18 +667,17 @@ begin
              if(tmp_points_i<tmp_points_i.MaxValue)then
                map_grid[p_x,p_y].tgc_pf_domain:=dn+1;
           end;
-       end;
+       end;}
 
    writeln('map_gridDomain_n ',map_gridDomain_n);
    setlength(tmp_points_l,0);
    setlength(domain2point,0);
    setlength(domain2count,0);
+   {$IFDEF DTEST}
+   debug_SetDomainColors;
+   {$ENDIF}
 end;
 
-procedure map_pf_DomainEdges;
-var
-d1,d2:word;
-x ,y :integer;
 function GetDomain(cx,cy:integer):word;
 begin
    GetDomain:=GetDomain.MaxValue;
@@ -645,6 +687,11 @@ begin
      if(tgc_pf_domain>0)
      then GetDomain:=tgc_pf_domain-1;
 end;
+
+procedure map_pf_DomainEdges; //////////////////////////////////////////////////
+var
+d1,d2:word;
+x ,y :integer;
 procedure CheckAddDomainEdge(cx,cy:integer);
 begin
    d2:=GetDomain(cx,cy);
@@ -684,7 +731,7 @@ begin
       end;
 end;
 
-procedure map_pf_MakeNext;
+procedure map_pf_MakeNext;    //////////////////////////////////////////////////
 type
 TtmpGrid = array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of word;
 ptmpGrid = ^TtmpGrid;
@@ -785,43 +832,69 @@ begin
    end;
 end;
 
-procedure map_pf_MakeDomains;
-var time:cardinal;
+procedure map_pf_DomainEdgesCX2MX;//////////////////////////////////////////////
+const MapCellqW = MapCellW div 4;
+var
 d1,d2,w:word;
+//d1x,d1y:integer;
+{procedure SetD1XY(x,y,sx,sy:integer);
+begin
+   if(GetDomain(x+sx,y+sy)=d1)then
+   begin
+      d1x+=sx;
+      d1y+=sy;
+   end;
+end; }
+begin
+   if(map_gridDomain_n>0)then
+     for d1:=0 to map_gridDomain_n-1 do
+     for d2:=0 to map_gridDomain_n-1 do
+       with map_gridDomainMX[d1,d2] do
+         if(edgeCells_n>0)then
+           for w:=0 to edgeCells_n-1 do
+             with edgeCells_l[w] do
+             begin
+                {d1x:=0;
+                d1y:=0;
+                SetD1XY(p_x,p_y,-1, 0);
+                SetD1XY(p_x,p_y, 1, 0);
+                SetD1XY(p_x,p_y, 0,-1);
+                SetD1XY(p_x,p_y, 0, 1);   }
+                p_x:=(p_x*MapCellW);//+MapCellhW+(d1x*MapCellqW);
+                p_y:=(p_y*MapCellW);//+MapCellhW+(d1y*MapCellqW);
+             end;
+end;
+
+procedure map_pf_MakeDomains;
+var
+time:cardinal;
 begin
    // clear domains
    time:=sdl_GetTicks;
    map_pf_DomainsClear;
-   writeln('Domains: clear ',sdl_GetTicks-time);
+   writeln('Domains: clear ',sdl_GetTicks-time,'ms');
 
    // make domains
    time:=sdl_GetTicks;
    map_pf_DomainsFill;
-   writeln('Domains: make ',sdl_GetTicks-time);
+   writeln('Domains: make ',sdl_GetTicks-time,'ms');
 
    if(map_gridDomain_n=0)then exit;
 
    // make domain edgeds
    time:=sdl_GetTicks;
    map_pf_DomainEdges;
-   writeln('Domains: edges ',sdl_GetTicks-time);
+   writeln('Domains: edges ',sdl_GetTicks-time,'ms');
 
    // make 'next' domain
    time:=sdl_GetTicks;
    map_pf_MakeNext;
-   writeln('Domains: next ',sdl_GetTicks-time);
+   writeln('Domains: next ',sdl_GetTicks-time,'ms');
 
    // make edges cx to mx
-   for d1:=0 to map_gridDomain_n-1 do
-   for d2:=0 to map_gridDomain_n-1 do
-     with map_gridDomainMX[d1,d2] do
-       if(edgeCells_n>0)then
-         for w:=0 to edgeCells_n-1 do
-           with edgeCells_l[w] do
-           begin
-              p_x:=(p_x*MapCellW)+MapCellhW;
-              p_y:=(p_y*MapCellW)+MapCellhW;
-           end;
+   time:=sdl_GetTicks;
+   map_pf_DomainEdgesCX2MX;
+   writeln('cx to mx ',sdl_GetTicks-time,'ms');
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1044,14 +1117,14 @@ var
 x,y:byte;
 i  :integer;
 begin
-   for x:=0 to LastPlayer do
+   {for x:=0 to LastPlayer do
     for y:=0 to LastPlayer do
      if(random(2)=0)and(x<>y)then
      begin
         if(teamShuffle)and(g_players[x].team<>g_players[y].team)then continue;
         i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
         i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
-     end;
+     end;}
 end;
 
 procedure map_PlayerStartsCircle(r,sdir,pcount:integer);
@@ -1124,6 +1197,7 @@ end;
 procedure map_DefaultPlayerStarts;
 var ix,iy,i,u,c:integer;
 begin
+   writeln('map_DefaultPlayerStarts');
    for i:=0 to LastPlayer do
    begin
       map_PlayerStartX[i]:=0;
@@ -1197,12 +1271,6 @@ gm_capture :begin
    else
                map_PlayerStartsDefault(map_FreeCenterR);
    end;
-
-   {for i:=0 to LastPlayer do
-   begin
-      map_PlayerStartX[i]:=x2CellCenter(map_PlayerStartX[i]);
-      map_PlayerStartY[i]:=x2CellCenter(map_PlayerStartY[i]);
-   end;  }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1333,10 +1401,10 @@ begin
    map_RandomBaseVars;
    map_psize        := mm3i(MinMapSize,map_psize,MaxMapSize);
    map_phsize       := map_psize div 2;
-   map_symmetryDir := map_GetSymmetryDir;
-   map_csize    := map_psize div MapCellW;
-   map_chsize  := map_phsize div MapCellW;
-   map_FreeCenterR := byte(map_type=mapt_clake)*(map_psize div 3);
+   map_symmetryDir  := map_GetSymmetryDir;
+   map_csize        := map_psize div MapCellW;
+   map_chsize       := map_phsize div MapCellW;
+   map_FreeCenterR  := byte(map_type=mapt_clake)*(map_psize div 3);
 
    {$IFDEF _FULLGAME}
    map_mm_cx   := vid_panelwi/map_psize;
@@ -1344,6 +1412,7 @@ begin
    map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
    map_mm_gridW:= MapCellW*map_mm_cx;
    {$ENDIF}
+   writeln('map_psize ',map_psize,' map_csize ',map_csize);
 end;
 
 procedure map_MakeDeafultGrid;
@@ -1414,14 +1483,15 @@ procedure Map_randommap;
 begin
    Map_randomseed;
 
-   map_psize    :=MinMapSize+round(random(MaxMapSize-MinMapSize)/StepMapSize)*StepMapSize;
+   map_psize   :=MinMapSize+round(random(MaxMapSize-MinMapSize)/StepMapSize)*StepMapSize;
    map_type    :=random(gms_m_types+1);
    map_symmetry:=random(gms_m_symm +1);
 end;
 
-procedure map_Make1;
+procedure map_Make1(skipPlayers:boolean=false);
 begin
    map_Vars;
+   if(not skipPlayers)then
    map_DefaultPlayerStarts;
    map_CPoints;
    map_MakeDeafultGrid;

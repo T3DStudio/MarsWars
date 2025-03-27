@@ -379,7 +379,7 @@ mi_settings_ShowAPM        : D_menu_MButtonD(tar,i,str_menu_APM             ,str
 mi_settings_HitBars        : D_menu_MButtonD(tar,i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_uhbars]      ,true );
 mi_settings_MRBAction      : D_menu_MButtonD(tar,i,str_menu_maction         ,str_menu_mactionl[m_action]         ,true );
 mi_settings_ScrollSpeed    : D_menu_MButtonB(tar,i,str_menu_ScrollSpeed     ,vid_CamSpeed,max_CamSpeed           ,false);
-mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]            ,false);
+mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]          ,false);
 mi_settings_PlayerName     : D_menu_MButtonN(tar,i,str_menu_PlayerName      ,PlayerName                                );
 mi_settings_Langugage      : D_menu_MButtonD(tar,i,str_menu_language        ,str_menu_lang[ui_language]          ,true );
 mi_settings_PanelPosition  : D_menu_MButtonD(tar,i,str_menu_PanelPos        ,str_menu_PanelPosl[vid_PannelPos]   ,true );
@@ -407,9 +407,11 @@ mi_settings_ResApply       : D_menu_MButton (tar,i,str_menu_Apply           );
 mi_settings_Fullscreen     : D_menu_MButtonD(tar,i,str_menu_fullscreen      ,str_bool[not vid_fullscreen]         ,false);
 mi_settings_ShowFPS        : D_menu_MButtonD(tar,i,str_menu_FPS             ,str_bool[vid_fps]                    ,false);
 
-mi_settings_SoundVol       : D_menu_MButtonB(tar,i,str_menu_SoundVolume     ,round(snd_svolume1*max_SoundVolume),max_SoundVolume,true);
-mi_settings_MusicVol       : D_menu_MButtonB(tar,i,str_menu_MusicVolume     ,round(snd_mvolume1*max_SoundVolume),max_SoundVolume,true);
+mi_settings_SoundVol       : D_menu_MButtonB(tar,i,str_menu_SoundVolume     ,round(snd_svolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
+mi_settings_MusicVol       : D_menu_MButtonB(tar,i,str_menu_MusicVolume     ,round(snd_mvolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
 mi_settings_NextTrack      : D_menu_MButton (tar,i,str_menu_NextTrack       );
+mi_settings_PlayListSize   : D_menu_MButtonB(tar,i,str_menu_PlayListSize    ,snd_PlayListSize,snd_PlayListSizeMax,false);
+mi_settings_MusicReload    : D_menu_MButton (tar,i,str_menu_MusicReload     );
 
 mi_title_players           : D_menu_MButtonT(tar,i,str_menu_players         );
 mi_title_map               : D_menu_MButtonT(tar,i,str_menu_map             );

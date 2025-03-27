@@ -597,9 +597,8 @@ begin
    // base terrain tile
    if(DefaultTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,@theme_tile_terrain ))then
    begin
-      writeln('MapCellW ',MapCellW);
       theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id ].sdlSurface,MapCellW,true,animStepX,animStepy);
-      writeln('update 1 theme_tile_terrain ',theme_tile_terrain^.w,' ',theme_tile_terrain^.h);
+      //writeln('update 1 theme_tile_terrain ',theme_tile_terrain^.w,' ',theme_tile_terrain^.h);
    end;
 
    // crater tileset
@@ -609,7 +608,7 @@ begin
       theme_tile_crater:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id  ].sdlSurface,MapCellW,true,animStepX,animStepy);
       boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
       upd_tiles:=true;
-      writeln('update 2 theme_tile_crater');
+      //writeln('update 2 theme_tile_crater');
    end;
    if(upd_tiles)
    or(theme_cur_crater_tes<>theme_last_crater_tes)then
@@ -618,7 +617,7 @@ begin
       then gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
       else gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
       theme_last_crater_tes:=theme_cur_crater_tes;
-      writeln('update 3 theme_tileset_crater');
+      //writeln('update 3 theme_tileset_crater');
    end;
 
    // liquid tileset
@@ -627,13 +626,13 @@ begin
    begin
       theme_tile_liquid:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id].sdlSurface,MapCellW,true,animStepX,animStepy);
       upd_tiles:=true;
-      writeln('update 4 theme_tile_liquid');
+      //writeln('update 4 theme_tile_liquid');
    end;
    if(upd_tiles)
    or(theme_cur_liquid_tes<>theme_last_liquid_tes)
    or(theme_cur_liquid_tas<>theme_last_liquid_tas)then
    begin
-      writeln('update 5 theme_tileset_liquid');
+      //writeln('update 5 theme_tileset_liquid');
       for i:=0 to theme_anim_step_n-1 do
       begin
          maskColor:=0;
@@ -671,7 +670,7 @@ begin
    if(DefaultTile(@theme_cur_tile_teleport_id,@theme_last_tile_teleport_id,@theme_tile_teleport))then
    begin
       theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW);
-      writeln('update 6 theme_tile_teleport');
+      //writeln('update 6 theme_tile_teleport');
    end;
 end;
 

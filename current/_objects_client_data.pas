@@ -309,7 +309,7 @@ begin
    setWeaponTEID(1,nil  ,0,[0..65]); //snd_archvile_fire EID_ArchFire
 end;
 
-UID_ZFormer:
+UID_ZMedic:
 begin
    _animw:=15;
    _animd:=8;

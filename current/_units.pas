@@ -165,7 +165,7 @@ begin
             unit_morph:=ureq_energy;
             exit;
          end;
-         if(CheckCollisionR(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,true )>0)then
+         if(CheckCollisionR(x,y,puid^._r,unum,puid^._ukbuilding,puid^._ukfly,true )<>cbr_no)then
          begin
             unit_morph:=ureq_place;
             exit;
@@ -265,7 +265,7 @@ begin
    end;
 end;
 
-procedure unit_PushOutGrid(pu:PTUnit);
+procedure unit_PushOutGrid(pu:PTUnit;debug:boolean=false);
 var
 cx,cy,
 mx,my,
@@ -289,6 +289,7 @@ begin
          begin
             if(map_CellGetZone(gridx+cx,gridy+cy)<>zone)then
             begin
+               //if(isselected)and(debug)then writeln('unit_PushOutGrid ',cx,' ',cy);
                px:=x;
                py:=y;
                mgcell2NearestXY(x,y,mx,my,mx+MapCellW,my+MapCellW,pushr,@px,@py,nil);
@@ -302,96 +303,125 @@ begin
    end;
 end;
 
+function StepCollisionR(sx,sy,sr:integer;azone,adomain1,adomain2:word):boolean;
+var
+cx0,cy0,
+cx1,cy1,
+cx ,cy :integer;
+begin
+   StepCollisionR:=true;
+   if(azone=0)then exit;
+   cx0:=(sx-sr) div MapCellW;
+   cy0:=(sy-sr) div MapCellW;
+   cx1:=(sx+sr) div MapCellW;
+   cy1:=(sy+sr) div MapCellW;
+   for cx:=cx0 to cx1 do
+   for cy:=cy0 to cy1 do
+     if(cx<0)or(map_csize<cx)
+     or(cy<0)or(map_csize<cy)
+     then exit
+     else
+       with map_grid[cx,cy] do
+         if(tgc_pf_zone<>azone)
+         or((adomain1>0)and(adomain1<>tgc_pf_domain)and((adomain2>0)and(adomain2<>tgc_pf_domain)))    // need (adomain1<>tgc_pf_domain)and(adomain2<>tgc_pf_domain)
+         then
+           if(dist2mgcellC(sx,sy,cx,cy)<=sr)then exit;
+     StepCollisionR:=false;
+end;
+
 procedure unit_move(pu:PTUnit);
 var
-tmpd,curSpeed,
-px,py,
+px,py,d,
+movePFNext_px,
+movePFNext_py,
 newx,newy: integer;
-ddir     : single;
+rdir     : single;
 pf_update: boolean;
 movePF_d2: word;
-function StepCollision(cx,cy:integer;azone,adomain1,adomain2:word):boolean;
+{function StepCollision(cx,cy:integer;azone,adomain1,adomain2:word):boolean;
 begin
    StepCollision:=true;
+   if(azone=0)then exit;
    cx:=cx div MapCellW;
    cy:=cy div MapCellW;
    if (0<=cx)and(cx<=map_csize)
    and(0<=cy)and(cy<=map_csize)then
      with map_grid[cx,cy] do
+     if(tgc_pf_zone=azone)then
      begin
-        if(tgc_pf_zone<>azone)
-        or(azone=0           )then exit;
-        if (adomain1>0)and(adomain2>0)then
+        if(adomain1>0)and(adomain2>0)then
           if (tgc_pf_domain<>adomain1)
           and(tgc_pf_domain<>adomain2)then exit;
         StepCollision:=false;
      end;
-end;
+end;  }
+
 begin
    with pu^ do
     if(x=vx)and(y=vy)then
-     if(x<>moveCurr_x)or(y<>moveCurr_y)then
+     if(x<>moveDest_x)or(y<>moveDest_y)then
       if(not IsIntUnitRange(transport,nil))then
        if(unit_canMove(pu))then
        begin
           pf_update:=false;
-          movePF_direct:=false;
-          if(movePF_destX<>moveCurr_x)or(movePF_destY<>moveCurr_y)then
+          movePFNext_px:=movePFNext_x;
+          movePFNext_py:=movePFNext_y;
+          if(movePFDest_x<>moveDest_x)or(movePFDest_y<>moveDest_y)then
           begin
-             if(not uid^._slowturn)then
-               if(x<>moveCurr_x)or(y<>moveCurr_y)then dir:=point_dir(x,y,moveCurr_x,moveCurr_y);
-
-             movePF_destX:=moveCurr_x;
-             movePF_destY:=moveCurr_y;
-             px:=movePF_destX div MapCellW;
-             py:=movePF_destY div MapCellW;
-             if(px<>movePF_destcX)or(py<>movePF_destcY)then pf_update:=true;
-             movePF_destcX:=px;
-             movePF_destcY:=py;
+             movePFDest_x:=moveDest_x;
+             movePFDest_y:=moveDest_y;
+             px:=movePFDest_x div MapCellW;
+             py:=movePFDest_y div MapCellW;
+             if(px<>movePFDest_cx)or(py<>movePFDest_cy)then pf_update:=true;
+             movePFDest_cx:=px;
+             movePFDest_cy:=py;
           end;
-          if(gridx<>movePF_curcX)or(gridy<>movePF_curcY)then
+          if(gridx<>movePFPos_cx)or(gridy<>movePFPos_cy)then
           begin
              pf_update:=true;
-             movePF_curcX:=gridx;
-             movePF_curcY:=gridy;
+             movePFPos_cx:=gridx;
+             movePFPos_cy:=gridy;
           end;
+          if(pf_update)then movePF_direct:=false;
 
           if(ukfly)or(ukfloater)
-          or((movePF_destcX=movePF_curcX)and(movePF_destcY=movePF_curcY))
+          or((movePFDest_cx=movePFPos_cx)and(movePFDest_cy=movePFPos_cy))
           then movePF_direct:=true
           else
             if(pf_update)then
             begin
-               movePF_d1:=map_grid[movePF_curcX ,movePF_curcY ].tgc_pf_domain;
-               movePF_d2:=map_grid[movePF_destcX,movePF_destcY].tgc_pf_domain;
+               movePF_d1:=map_grid[movePFPos_cx ,movePFPos_cy ].tgc_pf_domain;
+               movePF_d2:=map_grid[movePFDest_cx,movePFDest_cy].tgc_pf_domain;
                movePF_dx:=movePF_d2;
                movePF_direct:=true;
                if(movePF_d1>0)and(movePF_d2>0)and(movePF_d1<>movePF_d2)then
-                 if(not map_GridLineCollision(movePF_curcX,movePF_curcY,movePF_destcX,movePF_destcY,0))
+                 if(not map_GridLineCollision(movePFPos_cx,movePFPos_cy,movePFDest_cx,movePFDest_cy,0))
                  then movePF_direct:=true
                  else
                  begin
-                    movePF_nextX:=x;
-                    movePF_nextY:=y;
+                    movePFNext_x:=x;
+                    movePFNext_y:=y;
                     movePF_direct:=true;
                     with map_gridDomainMX[movePF_d1-1,movePF_d2-1] do
                     begin
                        movePF_dx:=nextDomain;
                        if(edgeCells_n>0)then
                        begin
-                          px:=px.MaxValue;
-                          for newx:=0 to edgeCells_n-1 do
-                            with edgeCells_l[newx] do
-                            begin
-                               py:=point_dist_rint(x,y,p_x,p_y);
-                               if(py<px)then
-                               begin
-                                  px:=py;
-                                  movePF_nextX :=p_x;
-                                  movePF_nextY :=p_y;
-                                  movePF_direct:=false;
-                               end;
-                            end;
+                          d:=px.MaxValue;
+                          movePF_direct:=false;
+                          for px:=0 to edgeCells_n-1 do
+                          begin
+                             with edgeCells_l[px] do
+                               with uid^ do
+                                 mgcell2NearestXY(x,y,p_x+_r,p_y+_r,p_x+MapCellW-_r,p_y+MapCellW-_r,0,@newx,@newy,@py);
+                             //py:=point_dist_rint(x,y,p_x,p_y);
+                             if(py<d)then
+                             begin
+                                d:=py;
+                                movePFNext_x:=newx;
+                                movePFNext_y:=newy;
+                             end;
+                          end;
                        end;
                     end;
                  end;
@@ -400,64 +430,104 @@ begin
           begin
              movePF_d1:=0;
              movePF_dx:=0;
-             movePF_nextX:=movePF_destX;
-             movePF_nextY:=movePF_destY;
+             movePFNext_x:=movePFDest_x;
+             movePFNext_y:=movePFDest_y;
           end;
 
-          if(x=movePF_nextX)and(y=movePF_nextY)then exit;
+          if(x=movePFNext_x)and(y=movePFNext_y)then exit;
 
-          curSpeed:=speed;
-          with uid^ do
-           if(not _ukbuilding)then
-            with player^ do
-             if(_ukmech)
-             then curSpeed+=upgr[upgr_race_mspeed_mech[_urace]]*3
-             else curSpeed+=upgr[upgr_race_mspeed_bio [_urace]]*3;
-          curSpeed:=mm3i(2,curSpeed,unit_MaxSpeed);
+          if(not uid^._slowturn)then
+            if(movePFNext_px<>movePFNext_x)
+            or(movePFNext_py<>movePFNext_y)
+            then dir:=point_dir(x,y,movePFNext_x,movePFNext_y);
 
-          tmpd:=point_dist_int(x,y,movePF_nextX,movePF_nextY);
-          if(tmpd<=curSpeed)then
+          if(speed>unit_MaxSpeed)then speed:=unit_MaxSpeed;
+
+          px:=point_dist_int(x,y,movePFNext_x,movePFNext_y);
+          if(px<=speed)then
           begin
-             newx:=movePF_nextX;
-             newy:=movePF_nextY;
+             newx:=movePFNext_x;
+             newy:=movePFNext_y;
              dir :=point_dir(x,y,newx,newy);
           end
           else
           begin
-             dir :=dir_turn(dir,point_dir(x,y,movePF_nextX,movePF_nextY),23);
-             ddir:=dir*degtorad;
-             newx:=x+round(curSpeed*cos(ddir));
-             newy:=y-round(curSpeed*sin(ddir));
+             dir :=dir_turn(dir,point_dir(x,y,movePFNext_x,movePFNext_y),23);
+             rdir:=dir*degtorad;
+             newx:=x+round(speed*cos(rdir));
+             newy:=y-round(speed*sin(rdir));
           end;
 
           if(ukfly)or(ukfloater)
           then unit_SetXY(pu,newx,newy,mvxy_none,true)
           else
+          with uid^ do
           begin
              px:=x;
              py:=y;
-             if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
-             if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
-             unit_PushOutGrid(pu);
-             if(x=px)and(y=py)
-             then dir+=90+g_random(180)
-             else
-               if(x=newx)and(y=newy)
-               then
+             writeln('1 d1, dx, dir ',movePF_d1,' ',movePF_dx,' ',dir,' direct ',movePF_direct);
+             if(not StepCollisionR(newx,y,_r,zone,movePF_d1,movePF_dx))then x:=newx;
+             if(not StepCollisionR(x,newy,_r,zone,movePF_d1,movePF_dx))then y:=newy;
+             if(x<>newx)or(y<>newy)then
+               if(x=px)and(y=py)then
+               begin
+                  dir+=90+(180*g_random(2));
+                  writeln('dir ',dir);
+               end
                else
                begin
-                  newx:=px+(sign(x-px)*curSpeed);
-                  newy:=py+(sign(y-py)*curSpeed);
-                  if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
-                  if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
-                  unit_PushOutGrid(pu);
-                  if(x=px)and(y=py)
-                  then dir+=90+g_random(180)
-                  else dir:=point_dir(px,py,x,y)
+                  writeln('2 d1, dx, ',movePF_d1,' ',movePF_dx);
+                  newx:=px+(sign(x-px)*speed);
+                  newy:=py+(sign(y-py)*speed);
+                  if(not StepCollisionR(newx,y,_r,zone,movePF_d1,movePF_dx))then x:=newx;
+                  if(not StepCollisionR(x,newy,_r,zone,movePF_d1,movePF_dx))then y:=newy;
+                  dir:=point_dir(px,py,x,y);
                end;
+             unit_UpdateXY(pu,true);
           end;
-          unit_UpdateXY(pu,true);
        end;
+   {if(isselected)then writeln('step 1 ',movePF_d1,' ',movePF_dx,' dir ',dir);
+   if(isselected)then writeln('x y ',x,' ',y);
+   px:=x;
+   py:=y;
+   if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
+   if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+   if(isselected)then writeln('x y ',x,' ',y);
+   if(isselected)then writeln('push out 1');
+   unit_PushOutGrid(pu,true);
+   if(isselected)then writeln('x y ',x,' ',y);
+   if(x=px)and(y=py)then
+   begin
+      dir+=180+g_randomr(90);
+      if(isselected)then writeln('dir turn 180 ',dir);
+   end
+   else
+     if(x=newx)and(y=newy)
+     then begin if(isselected)then writeln('step ok ',movePF_d1,' ',movePF_dx) end
+     else
+     begin
+        if(isselected)then writeln('step 2 ',movePF_d1,' ',movePF_dx);
+        newx:=px+(sign(x-px)*speed);
+        newy:=py+(sign(y-py)*speed);
+        if(not StepCollision(newx,y,zone,movePF_d1,movePF_dx))then x:=newx;
+        if(not StepCollision(x,newy,zone,movePF_d1,movePF_dx))then y:=newy;
+        if(isselected)then writeln('x y ',x,' ',y);
+        if(isselected)then writeln('push out 2');
+        unit_PushOutGrid(pu,true);
+        if(isselected)then writeln('x y ',x,' ',y);
+        if(x<>px)or(y<>py)
+        then dir:=point_dir(px,py,x,y);
+        {if(x=px)and(y=py)then
+        begin
+           dir+=90+g_random(180);
+           if(isselected)then writeln('dir turn 2 ',dir);
+        end
+        else
+        begin
+           dir:=point_dir(px,py,x,y);
+           if(isselected)then writeln('point_dir  ',dir);
+        end;}
+     end;  }
 end;
 
 function target_weapon_check(pAttacker,pTarget:PTUnit;target_dist:integer;uWeaponN:byte;CheckVision,noSRangeCheck:boolean):byte;
@@ -1387,8 +1457,8 @@ begin
 wmove_closer    : begin
                      if(not AttackInMove)then
                      begin
-                        moveCurr_x:=pTarget^.x;
-                        moveCurr_y:=pTarget^.y;
+                        moveDest_x:=pTarget^.x;
+                        moveDest_y:=pTarget^.y;
                      end;
                      exit;
                   end;
@@ -1396,20 +1466,20 @@ wmove_farther   : begin
                      if(not AttackInMove)or(ua_bx<=0)then  // not patroling
                        if(x=pTarget^.x)and(y=pTarget^.y)then
                        begin
-                          moveCurr_x:=x-g_randomr(2);
-                          moveCurr_y:=y-g_randomr(2);
+                          moveDest_x:=x-g_randomr(2);
+                          moveDest_y:=y-g_randomr(2);
                        end
                        else
                        begin
-                          moveCurr_x:=x-(pTarget^.x-x);
-                          moveCurr_y:=y-(pTarget^.y-y);
+                          moveDest_x:=x-(pTarget^.x-x);
+                          moveDest_y:=y-(pTarget^.y-y);
                        end;
                      exit;
                   end;
 wmove_noneed    : if(not AttackInMove)then
                   begin
-                     moveCurr_x:=x;
-                     moveCurr_y:=y;
+                     moveDest_x:=x;
+                     moveDest_y:=y;
                   end;
          else
            WaitForNextTarget:=1;
@@ -1430,8 +1500,8 @@ wmove_noneed    : if(not AttackInMove)then
 
       if(not unit_canAttack(pAttacker,true))then
       begin
-         moveCurr_x:=x;
-         moveCurr_y:=y;
+         moveDest_x:=x;
+         moveDest_y:=y;
          exit;
       end;
 
@@ -1632,8 +1702,8 @@ begin
   ua_move    : begin
                   unit_uaTar(pu);
                   unit_Action:=(x=ua_x)and(y=ua_y);
-                  moveCurr_x :=ua_x;
-                  moveCurr_y :=ua_y;
+                  moveDest_x :=ua_x;
+                  moveDest_y :=ua_y;
                end;
   ua_apatrol,
   ua_patrol  : begin
@@ -1645,8 +1715,8 @@ begin
                      ua_bx :=x;
                      ua_by :=y;
                   end;
-                  moveCurr_x:=ua_x;
-                  moveCurr_y:=ua_y;
+                  moveDest_x:=ua_x;
+                  moveDest_y:=ua_y;
                end;
   ua_astay,
   ua_stay    : begin
@@ -1654,21 +1724,21 @@ begin
                   ua_bx :=-1;
                   ua_x  :=x;
                   ua_y  :=y;
-                  moveCurr_x:=ua_x;
-                  moveCurr_y:=ua_y;
+                  moveDest_x:=ua_x;
+                  moveDest_y:=ua_y;
                end;
   ua_unload  : begin
                   unit_Action:=(transportC<=0);
                   ua_x:=x;
                   ua_y:=y;
-                  moveCurr_x:=ua_x;
-                  moveCurr_y:=ua_y;
+                  moveDest_x:=ua_x;
+                  moveDest_y:=ua_y;
                end;
   ua_unloadto: begin
                   if(x=ua_x)and(y=ua_y)
                   then ua_id:=ua_unload;
-                  moveCurr_x:=ua_x;
-                  moveCurr_y:=ua_y;
+                  moveDest_x:=ua_x;
+                  moveDest_y:=ua_y;
                end;
   ua_destroy : unit_kill(pu,false,false,true,true,true);
   ua_Upgrade : ;
@@ -1714,8 +1784,8 @@ begin
            unit_attack(pu);
            if(WaitForNextTarget>0)then
            begin
-              moveCurr_x:=x;
-              moveCurr_y:=y;
+              moveDest_x:=x;
+              moveDest_y:=y;
            end;
         end
         else WaitForNextTarget:=0;
@@ -1725,10 +1795,10 @@ begin
       unit_attack(pu);
 
       if(pTransport=nil)and(cycle_order=g_cycle_order)then
-        if(movePF_destX<>x)or(movePF_destY<>y)then
+        if(movePFDest_x<>x)or(movePFDest_y<>y)then
         begin
-           movePF_destX:=x;
-           movePF_destY:=y;
+           movePFDest_x:=x;
+           movePFDest_y:=y;
         end;
    end;
 end;

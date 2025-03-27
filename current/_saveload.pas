@@ -172,7 +172,7 @@ begin
    AddItem(@campain_seed     ,SizeOf(campain_seed     ));
    AddItem(@G_Step           ,SizeOf(G_Step           ));
    AddItem(@map_seed         ,SizeOf(map_seed         ));
-   AddItem(@map_psize         ,SizeOf(map_psize         ));
+   AddItem(@map_psize        ,SizeOf(map_psize        ));
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
@@ -202,7 +202,6 @@ begin
    AddItem(@ui_alarms        ,SizeOf(ui_alarms        ));
    AddItem(@map_PlayerStartX ,SizeOf(map_PlayerStartX ));
    AddItem(@map_PlayerStartY ,SizeOf(map_PlayerStartY ));
-   AddItem(@map_grid         ,SizeOf(map_grid         ));
 
    AddItem(@theme_cur_liquid_tas      ,SizeOf(theme_cur_liquid_tas      ));
    AddItem(@theme_cur_liquid_tasPeriod,SizeOf(theme_cur_liquid_tasPeriod));
@@ -288,8 +287,10 @@ begin
            end;
 
          PlayersValidateName;
-         map_Make1;
+         writeln('loadgame map make start');
+         map_Make1(true);
          map_Make2;
+         GameCameraBounds;
 
          G_Started:=true;
 

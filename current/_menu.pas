@@ -106,10 +106,11 @@ begin
 
    menu_state:=not menu_state;
 
-   if(net_status=ns_single)and(g_Status<=LastPlayer)then
-     if(menu_state)
-     then g_Status:=PlayerClient
-     else g_Status:=gs_running;
+   if(net_status=ns_single)then
+     if(g_Status<=LastPlayer)or(g_Status=gs_running)then
+       if(menu_state)
+       then g_Status:=PlayerClient
+       else g_Status:=gs_running;
 end;
 
 
@@ -411,6 +412,10 @@ begin
                         SetItem(mi_settings_MusicVol       ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                                                                                    ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_NextTrack      ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
+                                                                                   ty0+=ty2;ty1+=ty2;
+                        SetItem(mi_settings_PlayListSize   ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
+                                                                                   ty0+=ty2;ty1+=ty2;
+                        SetItem(mi_settings_MusicReload    ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         end;
    end;
 
@@ -880,7 +885,7 @@ mi_settings_HitBars       : if(menu_list_selected>-1)
 mi_settings_MRBAction     : if(menu_list_selected>-1)
                             then begin m_action:=menu_list_SIndex>0;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_mactionl[false],SizeOf(str_menu_mactionl),integer(m_action),-2);
-mi_settings_ScrollSpeed   : vid_CamSpeed  :=menu_GetBarVal(menu_item,vid_CamSpeed,1,max_CamSpeed);
+mi_settings_ScrollSpeed   : vid_CamSpeed    :=menu_GetBarVal(menu_item,vid_CamSpeed,1,max_CamSpeed);
 mi_settings_MouseScroll   : vid_CamMSEScroll:=not vid_CamMSEScroll;
 mi_settings_PlayerName    : ;   // playername
 mi_settings_Langugage     : if(menu_list_selected>-1)then
@@ -940,14 +945,17 @@ mi_settings_ShowFPS       : vid_FPS:=not vid_FPS;
 
 //////////////////////////////////////////    SETTINGS  SOUND
 mi_settings_SoundVol      : begin
-                            snd_svolume1:=menu_GetBarVal(menu_item,round(snd_svolume1*max_SoundVolume),0,max_SoundVolume)/max_SoundVolume;
+                            snd_svolume1:=menu_GetBarVal(menu_item,round(snd_svolume1*snd_MaxSoundVolume),0,snd_MaxSoundVolume)/snd_MaxSoundVolume;
                             SoundSourceUpdateGainAll;
                             end;
 mi_settings_MusicVol      : begin
-                            snd_mvolume1:=menu_GetBarVal(menu_item,round(snd_mvolume1*max_SoundVolume),0,max_SoundVolume)/max_SoundVolume;
+                            snd_mvolume1:=menu_GetBarVal(menu_item,round(snd_mvolume1*snd_MaxSoundVolume),0,snd_MaxSoundVolume)/snd_MaxSoundVolume;
                             SoundSourceUpdateGainAll;
                             end;
 mi_settings_NextTrack     : SoundMusicControll(true);
+
+mi_settings_PlayListSize  : snd_PlayListSize:=menu_GetBarVal(menu_item,snd_PlayListSize,0,snd_PlayListSizeMax);
+mi_settings_MusicReload   : SoundMusicReload;
 
 
 
@@ -1138,7 +1146,10 @@ mi_replays_delete         : replay_Delete(false);
 mi_saveload_save          : saveload_Save  (false);
 mi_saveload_load          : saveload_Load  (false);
 mi_saveload_delete        : saveload_Delete(false);
-mi_saveload_list          : begin
+mi_saveload_list          : if(m_TwiceLeft)
+                            then saveload_Load(false)
+                            else
+                            begin
                             menu_item_ListScrollLine(menu_item,@svld_list_sel,svld_list_scroll,menu_saveload_lineh);
                             saveload_Select;
                             end;

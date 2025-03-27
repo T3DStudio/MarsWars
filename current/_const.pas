@@ -1,11 +1,23 @@
 
+// redefine basic types
+type
+
+integer     = int16;
+pinteger    = ^int16;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Game CONSTANTS
+//
+
+
 const
 
 g_version              : byte = 234;
 
 degtorad               = pi/180;
 
-NOTSET                 = smallint.MaxValue;
+NOTSET                 = integer.MaxValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -126,7 +138,7 @@ MaxCPoints             = MaxPlayer*2+(MaxPlayer div 2);
 MapCellW               = 88;
 MapCellhW              = MapCellW div 2;
 MapSizeCellnStep       = 4;
-MinMapSizeCelln        = 32;
+MinMapSizeCelln        = 16;
 MaxMapSizeCelln        = 96;
 
 MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
@@ -321,11 +333,7 @@ ureq_common            : cardinal = 1 shl 17; // common
 // mouse brush
 // 0..255   - unit
 // -1..-255 - ability
-mb_empty               = smallint.MinValue;
-mb_move                = -301;
-mb_amove               = -302;
-mb_patrol              = -303;
-mb_apatrol             = -304;
+mb_empty               = integer.MinValue;
 mb_mark                = -306;
 
 po_build               = 1;
@@ -570,7 +578,7 @@ ub_PauseResurect       = 16;
 MaxUnitBuffs           = 16;
 
 _ub_infinity           = NOTSET;
-b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
+b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 
 
 
@@ -670,7 +678,7 @@ upgr_race_regen_build       : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 
 upgr_race_mspeed_bio        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
 upgr_race_mspeed_mech       : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
 upgr_race_unit_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
-upgr_race_srange_unit_bonus : array[1..r_cnt] of smallint= (25                , 25               );
+upgr_race_srange_unit_bonus : array[1..r_cnt] of integer = (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -751,10 +759,6 @@ uf_fly                 = true;
 
 MaxUnitGroups          = 9;  //0..9
 
-mvxy_none              = 0;
-mvxy_relative          = 1;
-mvxy_strict            = 2;
-
 BaseDamage1            = 52;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamageh4           = BaseDamage1 div 4;
@@ -820,7 +824,7 @@ UID_Archvile           = 31;
 UID_Mastermind         = 32;
 UID_Cyberdemon         = 33;
 
-UID_ZFormer            = 34;
+UID_ZMedic             = 34;
 UID_ZEngineer          = 35;
 UID_ZSergant           = 36;
 UID_ZSSergant          = 37;
@@ -874,12 +878,12 @@ uids_hell              = [1 ..50];
 uids_uac               = [51..99];
 
 uids_marines           = [UID_Engineer ,UID_Medic   ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
-uids_zimbas            = [UID_ZEngineer,UID_ZFormer ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
+uids_zimbas            = [UID_ZEngineer,UID_ZMedic ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-uid_race_start_base    : array[1..r_cnt] of smallint = (UID_HKeep    ,UID_UCommandCenter );
+uid_race_start_base    : array[1..r_cnt] of byte = (UID_HKeep    ,UID_UCommandCenter );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -952,7 +956,7 @@ gm_cptp_r              = 100;
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
-fly_height             : array[false..true] of smallint = (1,fly_z);
+fly_height             : array[false..true] of integer = (1,fly_z);
 
 pain_time              = fr_fps1;
 
@@ -981,7 +985,7 @@ random_table           : array[byte] of byte = (
 {$IFDEF _FULLGAME}
 
 
-_buffst                : array[false..true] of smallint = (0,_ub_infinity);
+_buffst                : array[false..true] of integer = (0,_ub_infinity);
 
 str_ps_sv              : char = '@';
 
@@ -1000,6 +1004,8 @@ vid_maxplcolors        = 6;
 
 max_CamSpeed           = 127;
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SPRITE DEPTH
@@ -1015,7 +1021,7 @@ sd_ground              = MaxMapSize+sd_build;
 sd_fly                 = MaxMapSize+sd_ground;
 sd_marker              = MaxMapSize+sd_fly;
 
-map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
+map_flydepths          : array[false..true] of integer = (sd_ground,sd_fly);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1150,8 +1156,8 @@ vid_minh               = 600;
 vid_maxw               = 1440;
 vid_maxh               = 1080;
 
-vid_rw_list            : array[0..7] of Smallint = (vid_minw,960,1024,1280,1360,1366,1400,vid_maxw);
-vid_rh_list            : array[0..7] of Smallint = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
+vid_rw_list            : array[0..7] of integer = (vid_minw,960,1024,1280,1360,1366,1400,vid_maxw);
+vid_rh_list            : array[0..7] of integer = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
 
 vid_MaxScreenSprites   = 1000; // max vis sprites;
 vid_blink_persecond    = 6;
@@ -1313,6 +1319,8 @@ mi_settings_ShowFPS       = 85;
 mi_settings_SoundVol      = 91;
 mi_settings_MusicVol      = 92;
 mi_settings_NextTrack     = 93;
+mi_settings_PlayListSize  = 94;
+mi_settings_MusicReload   = 95;
 
 
 ////  SCIRMISH PLAYERS
@@ -1426,9 +1434,10 @@ sss_ucommand           = 4;
 sss_music              = 5;
 
 // sound sources set size
-sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
+sss_sssize             : array[0..sss_count-1] of integer = (1,12,1,3,1,1);
 
-max_SoundVolume        = 127;
+snd_MaxSoundVolume     = 127;
+snd_PlayListSizeMax    = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1467,6 +1476,7 @@ str_loading_ini        : shortstring = 'INIT GAME...';
 str_f_grp              : shortstring = 'graphic\';
 str_f_map              : shortstring = 'map\';
 str_f_snd              : shortstring = 'sound\';
+str_e_music            : shortstring = '.ogg';
 str_f_svld             : shortstring = 'save\';
 str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
@@ -1563,6 +1573,8 @@ km_test_BePlayer4      = SDLK_F8;
 km_test_BePlayer5      = SDLK_F9;
 km_test_BePlayer6      = SDLK_F10;
 km_test_BePlayer7      = SDLK_F11;
+km_test_debug0         = SDLK_KP0;
+km_test_debug1         = SDLK_KP1;
 
 km_group0              = sdlk_0;
 km_group9              = sdlk_9;

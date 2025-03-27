@@ -75,6 +75,9 @@ map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerr
 map_gridZone_n    : word = 0;
 map_gridDomain_n  : word = 0;
 map_gridDomainMX  : array of array of TMapGridPFDomainData;
+{$IFDEF DTEST}
+map_gridDomain_color: array of cardinal;
+{$ENDIF}
 
 map_gcx,
 map_gcy,
@@ -986,6 +989,8 @@ str_menu_fullscreen,
 str_menu_NextTrack,
 str_menu_SoundVolume,
 str_menu_MusicVolume,
+str_menu_MusicReload,
+str_menu_PlayListSize,
 
 str_menu_ready,
 str_menu_nready,
@@ -1166,6 +1171,8 @@ SLori              : array[0..5] of TALfloat;
 
 snd_svolume1       : single = 0.5;
 snd_mvolume1       : single = 0.5;
+
+snd_PlayListSize   : word = 5;
 
 MainDevice         : TALCdevice;
 MainContext        : TALCcontext;

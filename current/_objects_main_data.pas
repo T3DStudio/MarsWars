@@ -613,7 +613,7 @@ begin
    end;
    _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Bio     ,0,dm_Lost);
 end;
-UID_ZFormer:            // need make zombi medic
+UID_ZMedic:
 begin
    _mhits            := 500;
    _renergy          := 400;
@@ -1110,7 +1110,7 @@ begin
    _ucl               := 8;
    _btime             := ptime1;
    _attack            := true;
-   _zombie_uid        := UID_ZFormer;
+   _zombie_uid        := UID_ZMedic;
    _uklight           := true;
    _ruid1             := UID_UTechCenter;
    _fastdeath_hits    := fdead_hits_border;

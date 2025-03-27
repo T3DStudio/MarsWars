@@ -6,16 +6,16 @@ program T3D_RTS;
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE DTEST}
-  //{$APPTYPE GUI}
+  {$IFNDEF DTEST}
+    {$APPTYPE GUI}
+  {$ENDIF}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}
 
-uses SysUtils, SDL, SDL_Net
+uses SysUtils,crt,SDL,SDL_Net
 {$IFDEF _FULLGAME}
-,crt, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader;
-{$ELSE}
-,crt;
+,SDL_Image,SDL_Gfx,openal,_sound_OGGLoader;
 {$ENDIF}
 
 
@@ -64,21 +64,10 @@ uses SysUtils, SDL, SDL_Net
 
 {$R *.res}
 
-{procedure _test;
-var i:byte;
-begin
-   for i:=0 to 255 do
-   with _uids[i] do
-   if(_r>0)then
-   begin
-      writeln(_r,' ',(_r/12):4:4,' ',un_txt_name);
-   end;
-end; }
-
 begin
    InitGame;
    {$IFDEF DTEST}
-   WriteUnitDescriptions;
+   if(test_mode=2)then WriteUnitDescriptions;
    {$ENDIF}
 
    while(GameCycle)do

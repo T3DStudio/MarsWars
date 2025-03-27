@@ -362,7 +362,7 @@ begin
          wanim:=false;
          if(G_Status=gs_running)then
           if(unit_canMove(pu))then
-           wanim:=(x<>moveCurr_x)or(y<>moveCurr_y)or(x<>vx)or(y<>vy);
+           wanim:=(x<>moveDest_x)or(y<>moveDest_y)or(x<>vx)or(y<>vy);
 
          spr:=sm_unit2MWTexture(pu);
 

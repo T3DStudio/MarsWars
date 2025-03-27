@@ -762,8 +762,8 @@ begin
 
             if(speed>0)then
             begin
-               moveCurr_x:=pu^.x;
-               moveCurr_y:=pu^.y;
+               moveDest_x:=pu^.x;
+               moveDest_y:=pu^.y;
             end;
 
             if(pu^.x<>x)or(pu^.y<>y)then
@@ -773,7 +773,7 @@ begin
                if(speed>0)then
                begin
                   vstp:=UnitMoveStepTicks;
-                  dir :=point_dir(movePF_destY,movePF_destY,x,y);
+                  dir :=point_dir(movePFDest_y,movePFDest_y,x,y);
                end
                else
                begin

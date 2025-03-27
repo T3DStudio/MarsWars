@@ -331,7 +331,7 @@ PainState base threshold: 1
 
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- melee attack, +zombification, targets: [ground,flying], impact 13*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+- melee attack, +zombification, targets: [ground,flying], impact *1, upgrade: Claws and Teeth(+7);
 - melee attack, targets: [alive], impact 13*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;

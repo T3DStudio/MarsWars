@@ -1,12 +1,10 @@
 
-const
-// pannel click type
-pct_left   = 1;
-pct_right  = 2;
-pct_middle = 3;
 
 
-function kbState2pct:byte;
+type TkbState = (pct_left,pct_right,pct_middle);
+
+
+function kbState2pct:TkbState;
 begin
    kbState2pct:=pct_left;
    if(kt_ctrl>0)then kbState2pct:=pct_right;
@@ -243,7 +241,6 @@ end;
 
 function ui_GetCursorUnit(mx,my:integer):PTUnit;
 var u:integer;
-   tp:word;
 begin
    ui_GetCursorUnit:=nil;
    for u:=1 to MaxUnits do
@@ -309,10 +306,10 @@ begin
                       end;
 
                       case CheckBuildPlace(mbrush_x,mbrush_y,0,0,PlayerClient,uid) of
-                      0 :  m_brushc:=c_lime;
-                      1 :  m_brushc:=c_red;
-                      2 :  m_brushc:=c_blue;
-                      else m_brushc:=c_gray;
+                      cbp_good   :  m_brushc:=c_lime;
+                      cbp_noplace:  m_brushc:=c_red;
+                      cbp_out    :  m_brushc:=c_blue;
+                      else          m_brushc:=c_gray;
                       end;
                    end;
                end;
@@ -332,8 +329,6 @@ mb_apatrol   : if(ui_uibtn_move     =0  )then m_brush:=mb_empty;  }
    end;
 end;
 
-
-
 procedure mb_MapMarker(x,y:integer);
 begin
    if(net_status=ns_client)
@@ -342,7 +337,7 @@ begin
    m_brush:=mb_empty;
 end;
 
-procedure mb_Command(x,y,target:integer);
+{procedure mb_Command(x,y,target:integer);
 begin
    case m_brush of
 mb_move     : PlayerSetOrder(x,y,target,0,ua_move     ,po_unit_order_set,PlayerClient);   // move
@@ -356,9 +351,9 @@ mb_empty    : // rclick
    end;
 
    m_brush:=mb_empty;
-end;
+end; }
 
-procedure ui_PanelButton(tab,bx,by:integer;click_type:byte;twice:boolean);
+procedure ui_PanelButton(tab,bx,by:integer;click_type:TkbState;twice:boolean);
 var u:integer;
 begin
    SoundPlayUI(snd_click);
@@ -523,16 +518,22 @@ km_test_BePlayer4   : PlayerClient:=4;
 km_test_BePlayer5   : PlayerClient:=5;
 km_test_BePlayer6   : PlayerClient:=6;
 km_test_BePlayer7   : PlayerClient:=7;
+km_test_debug0      : debug_SetDomainColors;
+km_test_debug1      : begin
+                       map_ZonesMake;
+                       map_pf_MarkSolidCells;
+                       map_pf_MakeDomains;
+                      end;
    else test_hotkeys:=false;
    end;
 end;
 
 procedure InGameHotkeys(key1:cardinal);
 var i,key2:cardinal;
-procedure ko2_panel_click(tabN,ClickType:byte;kdbl:boolean);
+procedure ko2_panel_click(tabN:byte;ClickType:TkbState;kdbl:boolean);
 begin
    if(vid_PannelPos<2)
-   then ui_PanelButton(tabN, i mod 3      ,1+(i div 3)             ,ClickType,kdbl)
+   then ui_PanelButton(tabN, i mod 3      ,1+(i div 3)            ,ClickType,kdbl)
    else ui_PanelButton(tabN,(i div 3)mod 3,1+(i div 9)*3+(i mod 3),ClickType,kdbl);
 end;
 begin
@@ -685,12 +686,9 @@ begin
                               m_TwiceLeft :=(m_TwiceLast)and(m_Last=km_mouse_l);
 
                               case (sys_EVENT^.button.button) of
-                              km_mouse_l  : if(kt_mleft =0)then kt_mleft   :=1;
-                              km_mouse_r  : if(kt_mright=0)then kt_mright  :=1;
-                              km_mouse_m  : begin
-                                               if(not menu_state)and(G_Started)and(not rpls_POVCam)then m_vmove:=true;
-                                               if(kt_mmiddle=0)then kt_mmiddle:=1;
-                                            end;
+                              km_mouse_l  : if(kt_mleft  =0)then kt_mleft  :=1;
+                              km_mouse_r  : if(kt_mright =0)then kt_mright :=1;
+                              km_mouse_m  : if(kt_mmiddle=0)then kt_mmiddle:=1;
                               km_mouse_wd : if(menu_state)then
                                             begin
                                                if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -menu_saveload_listh ,false);
@@ -724,8 +722,8 @@ begin
                               end;
                            end;
       SDL_KEYDOWN        : begin
-                              kt_Last    :=1;
-                              k_LastChar :=Widechar(sys_EVENT^.key.keysym.unicode);
+                              kt_Last     :=1;
+                              k_LastChar  :=Widechar(sys_EVENT^.key.keysym.unicode);
                               k_KeyboardString+=k_LastChar;
 
                               k_TwiceLast :=(k_Last=sys_EVENT^.key.keysym.sym)and(kt_TwiceLast>0);
@@ -885,6 +883,7 @@ begin
    if(kt_mmiddle=1)then // mouse middle down
      if(m_brush=mb_empty)then
        case mouse_f of
+       mf_map   : if(not rpls_POVCam)then m_vmove:=true;
        mf_panel : ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_middle,false);
        end;
 

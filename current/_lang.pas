@@ -706,6 +706,8 @@ begin
    str_menu_MusicVolume              := 'Music volume';
    str_menu_SoundVolume              := 'Sound volume';
    str_menu_NextTrack                := 'Play next track';
+   str_menu_MusicReload              := 'Reload music playlist';
+   str_menu_PlayListSize             := 'Music playlist size';
 
    str_menu_APM                      := 'Show APM';
    str_menu_language                 := 'UI language';
@@ -1073,7 +1075,7 @@ begin
    hintStrUID(UID_Mancubus         ,'Mancubus'                    ,'');
    hintStrUID(UID_Arachnotron      ,'Arachnotron'                 ,'');
    hintStrUID(UID_Archvile         ,'Arch-Vile'                   ,'');
-   hintStrUID(UID_ZFormer          ,'Former Zombie'               ,'');
+   hintStrUID(UID_ZMedic          ,'Former Zombie'               ,'');
    hintStrUID(UID_ZEngineer        ,'Zombie Engineer'             ,'');
    hintStrUID(UID_ZSergant         ,'Zombie Shotgunner'           ,'');
    hintStrUID(UID_ZSSergant        ,'Zombie SuperShotgunner'      ,'');
@@ -1658,7 +1660,7 @@ begin
   hintStrUID(UID_HBarracks       ,'Казармы Зомби'              ,''          );
   hintStrUID(UID_HEye            ,'Око Зла'                    ,''          );
 
-  hintStrUID(UID_ZFormer         ,'Обычный Зомби'              ,'');
+  hintStrUID(UID_ZMedic         ,'Обычный Зомби'              ,'');
   hintStrUID(UID_ZEngineer       ,'Зомби Инженер'              ,'');
   hintStrUID(UID_ZSergant        ,'Зомби Сержант'              ,'');
   hintStrUID(UID_ZSSergant       ,'Зомби Старший Сержант'      ,'');

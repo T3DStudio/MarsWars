@@ -1,4 +1,6 @@
 
+procedure SoundStopResetAllSources; forward;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   LOAD
@@ -93,7 +95,7 @@ begin
    if(t<>0)then
    begin
       new(load_sound);
-      load_sound^.sound:=t;
+      load_sound^.s_sound:=t;
    end;
 end;
 
@@ -102,14 +104,30 @@ end;
 //   SoundSets
 //
 
+procedure SoundSetUnLoad(sSet:PTSoundSet);
+begin
+   SoundStopResetAllSources;
+   if(sSet=nil)then exit;
+   with sSet^ do
+   begin
+      while(snds_size>0)do
+      begin
+         snds_size-=1;
+         if(alIsBuffer(snds_list[snds_size]^.s_sound))then alDeleteBuffers(1,@(snds_list[snds_size]^.s_sound));
+      end;
+      setlength(snds_list,0);
+   end;
+   dispose(sSet);
+end;
+
 procedure SoundSetAdd(ss:PTSoundSet;tsnd:PTMWSound);
 begin
    if(tsnd<>nil)then
    with ss^ do
    begin
-      sndn+=1;
-      setlength(snds,sndn);
-      snds[sndn-1]:=tsnd;
+      snds_size+=1;
+      setlength(snds_list,snds_size);
+      snds_list[snds_size-1]:=tsnd;
    end;
 end;
 
@@ -121,9 +139,9 @@ begin
    new(SoundSetLoad);
    with SoundSetLoad^ do
    begin
-      sndps:=0;
-      sndn :=0;
-      setlength(snds,sndn);
+      snds_cur :=0;
+      snds_size:=0;
+      setlength(snds_list,snds_size);
 
       tsnd:=load_sound(fname);
       if(tsnd<>nil)then SoundSetAdd(SoundSetLoad,tsnd);
@@ -142,10 +160,64 @@ begin
          SoundSetAdd(SoundSetLoad,tsnd);
          i+=1;
       end;
-      if(sndn<=0)then WriteLog(fname);
+      if(snds_size<=0)then WriteLog(fname);
    end;
 end;
-function MusicSetLoad(dir:shortstring):PTSoundSet;
+function MusicSetLoad(dir:shortstring;count:word):PTSoundSet;
+var tsnd: PTMWSound;
+    Info: TSearchRec;
+    s   : shortstring;
+flist_l : array of shortstring;
+i,el,
+flist_n : word;
+begin
+   new(MusicSetLoad);
+   with MusicSetLoad^ do
+   begin
+      snds_cur :=0;
+      snds_size:=0;
+      setlength(snds_list,snds_size);
+   end;
+
+   if(count=0)then exit;
+
+   // build file list
+   flist_n:=0;
+   el:=length(str_e_music);
+   setlength(flist_l,0);
+   if(FindFirst(str_f_snd+dir+'*'+str_e_music,faReadonly,info)=0)then
+    repeat
+      s:=info.Name;
+      if(length(s)>el)then
+      begin
+         delete(s,length(s)-el+1,el);
+         flist_n+=1;
+         setlength(flist_l,flist_n);
+         flist_l[flist_n-1]:=s;
+      end;
+    until(FindNext(info)<>0);
+   FindClose(info);
+
+   // shuffle
+   if(flist_n>1)then
+     for i:=0 to flist_n-1 do
+     begin
+        el:=random(flist_n);
+        s :=flist_l[el];
+        flist_l[el]:=flist_l[i];
+        flist_l[i ]:=s;
+     end;
+
+   if(flist_n<count)then count:=flist_n;
+
+   if(count>0)then
+     for i:=0 to count-1 do
+     begin
+        tsnd:=load_sound(dir+flist_l[i]);
+        if(tsnd<>nil)then SoundSetAdd(MusicSetLoad,tsnd);
+     end;
+end;
+{function MusicSetLoad(dir:shortstring;):PTSoundSet;
 var tsnd: PTMWSound;
     Info: TSearchRec;
     s   : shortstring;
@@ -153,9 +225,9 @@ begin
    new(MusicSetLoad);
    with MusicSetLoad^ do
    begin
-      sndps:=0;
-      sndn :=0;
-      setlength(snds,sndn);
+      snds_cur :=0;
+      snds_size:=0;
+      setlength(snds_list,snds_size);
 
       if(FindFirst(str_f_snd+dir+'*.ogg',faReadonly,info)=0)then
        repeat
@@ -169,7 +241,7 @@ begin
        until(FindNext(info)<>0);
       FindClose(info);
    end;
-end;
+end; }
 
 procedure SoundShafleSoundSet(SoundSet:PTSoundSet);
 var i,
@@ -178,17 +250,17 @@ m1,m2 : integer;
 begin
    with SoundSet^ do
    begin
-      sndps:=0;
-      if(sndn>1)then
-       for i:=0 to sndn+5 do
+      snds_cur:=0;
+      if(snds_size>1)then
+       for i:=0 to snds_size+5 do
        begin
-          m1:=random(sndn);
-          m2:=random(sndn);
+          m1:=random(snds_size);
+          m2:=random(snds_size);
 
-          snd:=snds[m1];
-          snds[m1]:=snds[m2];
-          snds[m2]:=snd;
-          sndps:=random(sndn);
+          snd:=snds_list[m1];
+          snds_list[m1]:=snds_list[m2];
+          snds_list[m2]:=snd;
+          snds_cur:=random(snds_size);
        end;
    end;
 end;
@@ -198,14 +270,14 @@ begin
    SoundSetGetChunk:=nil;
    if(ss=nil)then exit;
    with ss^ do
-    if(sndn>0)then
-     if(sndn=1)
-     then SoundSetGetChunk:=snds[0]
+    if(snds_size>0)then
+     if(snds_size=1)
+     then SoundSetGetChunk:=snds_list[0]
      else
      begin
-        if(NewChunk)then sndps+=1;
-        if(sndps<0)or(sndps>=sndn)then sndps:=0;
-        SoundSetGetChunk:=snds[sndps];
+        if(NewChunk)then snds_cur+=1;
+        if(snds_cur<0)or(snds_cur>=snds_size)then snds_cur:=0;
+        SoundSetGetChunk:=snds_list[snds_cur];
      end;
 end;
 
@@ -219,17 +291,17 @@ begin
    if(sssn>0)then
    with sss^ do
    begin
-      setlength(ssl,sssn);
-      ssn:=sssn;
+      setlength(sss_list,sssn);
+      sss_size:=sssn;
 
       while(sssn>0)do
       begin
          sssn-=1;
-         with ssl[sssn] do
+         with sss_list[sssn] do
          begin
-            alGenSources(1,@source);
-            alSourcefv(source, AL_POSITION, @SLpos);
-            volumevar:=avolumevar;
+            alGenSources(1,@ssrc_source);
+            alSourcefv(ssrc_source, AL_POSITION, @SLpos);
+            ssrc_volumeVar:=avolumevar;
          end;
       end;
    end;
@@ -239,10 +311,10 @@ procedure SoundSourceUpdateGain(SoundSourceSet:PTMWSoundSourceSet);
 var i:integer;
 begin
    with SoundSourceSet^ do
-    if(ssn>0)then
-     for i:=0 to ssn-1 do
-      with ssl[i] do
-       if(volumevar<>nil)then alSourcef(source,AL_GAIN,volumevar^);
+    if(sss_size>0)then
+     for i:=0 to sss_size-1 do
+      with sss_list[i] do
+       if(ssrc_volumeVar<>nil)then alSourcef(ssrc_source,AL_GAIN,ssrc_volumeVar^);
 end;
 procedure SoundSourceUpdateGainAll;
 var s:integer;
@@ -262,10 +334,10 @@ begin
    SoundSourceSetIsPlaying:=false;
 
    with SoundSourceSet^ do
-    if(ssn>0)then
-     for i:=0 to ssn-1 do
-      with ssl[i] do
-       if(SourceIsPlaying(source))then
+    if(sss_size>0)then
+     for i:=0 to sss_size-1 do
+      with sss_list[i] do
+       if(SourceIsPlaying(ssrc_source))then
        begin
           SoundSourceSetIsPlaying:=true;
           break;
@@ -278,13 +350,13 @@ begin
    SoundSourceSetGetSource:=nil;
 
    with SoundSourceSet^ do
-    if(ssn>0)then
-     if(ssn=1)
-     then SoundSourceSetGetSource:=@ssl[0]
+    if(sss_size>0)then
+     if(sss_size=1)
+     then SoundSourceSetGetSource:=@sss_list[0]
      else
-      for i:=0 to ssn-1 do
-       with ssl[i] do
-        if(SourceIsPlaying(source)=false)then SoundSourceSetGetSource:=@ssl[i];
+      for i:=0 to sss_size-1 do
+       with sss_list[i] do
+        if(SourceIsPlaying(ssrc_source)=false)then SoundSourceSetGetSource:=@sss_list[i];
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,9 +370,23 @@ begin
    if(sss>=sss_count)then exit;
 
    with SoundSources[sss] do
-    if(ssn>0)then
-     for i:=0 to ssn-1 do
-      with ssl[i] do alSourceStop(source);
+    if(sss_size>0)then
+     for i:=0 to sss_size-1 do
+      with sss_list[i] do alSourceStop(ssrc_source);
+end;
+
+procedure SoundStopResetAllSources;
+var sss,sn:byte;
+begin
+   for sss:=0 to sss_count-1 do
+     with SoundSources[sss] do
+       if(sss_size>0)then
+         for sn:=0 to sss_size-1 do
+           with sss_list[sn] do
+           begin
+              alSourceStop(ssrc_source);
+              alSourcei   (ssrc_source, AL_BUFFER, 0);
+           end;
 end;
 
 procedure SoundPlay(SoundSet:PTSoundSet;sss:byte;NewChunk:boolean);
@@ -316,13 +402,13 @@ begin
    with vsound^  do
    with vsource^ do
    begin
-      alSourceStop(source);
+      alSourceStop(ssrc_source);
 
-      if(volumevar<>nil)then
-      alSourcef   (source, AL_GAIN  , volumevar^);
+      if(ssrc_volumeVar<>nil)then
+      alSourcef   (ssrc_source, AL_GAIN  , ssrc_volumeVar^);
 
-      alSourcei   (source, AL_BUFFER, sound  );
-      alSourcePlay(source);
+      alSourcei   (ssrc_source, AL_BUFFER, s_sound  );
+      alSourcePlay(ssrc_source);
    end;
 end;
 
@@ -423,14 +509,15 @@ begin
    end;
 end;
 
-procedure SoundLogUIPlayer;
+procedure SoundLogUIPlayer(playern:byte);
 begin
-   if(UIPlayer<=LastPlayer)then
-   with g_players[UIPlayer] do
-    with log_l[log_i] do
-     case mtype of
+   if(playern<=LastPlayer)then
+    with g_players[playern] do
+     with log_l[log_i] do
+      case mtype of
 0..LastPlayer         : if(mtype<>PlayerClient)
-                        or((rpls_rstate>=rpls_state_read)and(PlayerClient=0))then SoundPlayUI(snd_chat);
+                        //or((rpls_rstate>=rpls_state_read)and(PlayerClient=0)) ?????????
+                        then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=LastPlayer)then
@@ -459,13 +546,24 @@ lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with g_uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
-     end;
+      end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   MUSIC
 //
+
+procedure SoundMusicReload;
+begin
+   StopSoundSource(sss_music);
+   DrawLoadingScreen(str_loading_msc,c_aqua);
+   SoundSetUnLoad(snd_music_game);
+   SoundSetUnLoad(snd_music_menu);
+
+   snd_music_menu:=MusicSetLoad('music\menu\',snd_PlayListSize);
+   snd_music_game:=MusicSetLoad('music\game\',snd_PlayListSize);
+end;
 
 procedure SoundMusicControll(ForceNextTreck:boolean);
 var current_music_ss: PTSoundSet;
@@ -474,7 +572,7 @@ begin
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
 
-   if(snd_music_current<>current_music_ss)or(SoundSourceSetIsPlaying(@SoundSources[sss_music])=false)or(ForceNextTreck)then
+   if(snd_music_current<>current_music_ss)or(not SoundSourceSetIsPlaying(@SoundSources[sss_music]))or(ForceNextTreck)then
    begin
       if(snd_music_current<>current_music_ss)and(not ForceNextTreck)then SoundShafleSoundSet(current_music_ss);
       snd_music_current:=current_music_ss;
@@ -520,16 +618,14 @@ begin
    alListenerfv(AL_POSITION   ,@SLPos);
    alListenerfv(AL_ORIENTATION,@SLOri);
 
+   // set sound source volume var
    for r:=0 to sss_count-1 do
-    case r of
-    sss_music: SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_mvolume1);
-    else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
-    end;
+     case r of
+     sss_music: SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_mvolume1);
+     else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
+     end;
 
-   DrawLoadingScreen(str_loading_msc,c_aqua);
-
-   snd_music_menu:=MusicSetLoad('music\menu\');
-   snd_music_game:=MusicSetLoad('music\game\');
+   SoundMusicReload;
 
    SoundShafleSoundSet(@snd_music_menu);
    SoundShafleSoundSet(@snd_music_game);

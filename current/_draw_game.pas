@@ -804,7 +804,7 @@ begin
            if(isselected)then
            begin
               //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
-              //lineColor(r_screen,ix,iy,vid_mapx+moveCurr_x    -vid_cam_x+1,vid_mapy+moveCurr_y    -vid_cam_y+1,c_lime);
+              //lineColor(r_screen,ix,iy,vid_mapx+moveDest_x    -vid_cam_x+1,vid_mapy+moveDest_y    -vid_cam_y+1,c_lime);
 
               //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_x+vid_mapx;
               //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_y+vid_mapy;

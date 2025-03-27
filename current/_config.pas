@@ -4,6 +4,7 @@ const
 cfg_key_PlayerName     = 'player_name';
 cfg_key_SoundVolume    = 'sound_volume';
 cfg_key_MusicBolume    = 'music_volume';
+cfg_key_PlayListSize   = 'music_playListSize';
 cfg_key_ScrollSpeed    = 'scroll_speed';
 cfg_key_FullScreen     = 'fullscreen';
 cfg_key_MouseScroll    = 'mouse_scroll';
@@ -28,6 +29,10 @@ cfg_key_ColorScheme    = 'vid_player_colors';
 cfg_key_APM            = 'vid_APM';
 cfg_key_FPS            = 'vid_FPS';
 
+
+// snd_PlayListSize
+
+
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
 function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
 
@@ -42,9 +47,10 @@ begin
 cfg_key_PlayerName    : PlayerName       := vl;
 cfg_key_SoundVolume   : snd_svolume1     := b2si1(vlw);
 cfg_key_MusicBolume   : snd_mvolume1     := b2si1(vlw);
+cfg_key_PlayListSize  : snd_PlayListSize := vlw;
 cfg_key_ScrollSpeed   : vid_CamSpeed     := vli;
 cfg_key_FullScreen    : vid_fullscreen   :=(vl=str_b2c[true]);
-cfg_key_MouseScroll   : vid_CamMSEScroll   :=(vl=str_b2c[true]);
+cfg_key_MouseScroll   : vid_CamMSEScroll :=(vl=str_b2c[true]);
 cfg_key_ShadowsMode   : vid_ColoredShadow:=(vl=str_b2c[true]);
 cfg_key_ServerAddr    : net_cl_svaddr    := vl;
 cfg_key_ServerPort    : net_sv_pstr      := vl;
@@ -105,6 +111,7 @@ begin
 
       if(snd_svolume1<0)then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
       if(snd_mvolume1<0)then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
+      if(snd_PlayListSize>snd_PlayListSizeMax)then snd_PlayListSize:=snd_PlayListSizeMax;
       vid_CamSpeed:=mm3i(1,vid_CamSpeed,max_CamSpeed);
 
       PlayerName:=txt_ValidateStr(PlayerName,PlayerNameLen,@k_pname);
@@ -139,9 +146,10 @@ begin
    writeln(f,cfg_key_PlayerName    ,'=',PlayerName                );
    writeln(f,cfg_key_SoundVolume   ,'=',si12b(snd_svolume1)       );
    writeln(f,cfg_key_MusicBolume   ,'=',si12b(snd_mvolume1)       );
+   writeln(f,cfg_key_PlayListSize  ,'=',snd_PlayListSize          );
    writeln(f,cfg_key_FullScreen    ,'=',str_b2c[vid_fullscreen]   );
    writeln(f,cfg_key_ScrollSpeed   ,'=',vid_CamSpeed              );
-   writeln(f,cfg_key_MouseScroll   ,'=',str_b2c[vid_CamMSEScroll]   );
+   writeln(f,cfg_key_MouseScroll   ,'=',str_b2c[vid_CamMSEScroll] );
    writeln(f,cfg_key_ShadowsMode   ,'=',str_b2c[vid_ColoredShadow]);
    writeln(f,cfg_key_ServerAddr    ,'=',net_cl_svaddr             );
    writeln(f,cfg_key_ServerPort    ,'=',net_sv_pstr               );

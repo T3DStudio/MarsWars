@@ -330,7 +330,7 @@ begin
    with pu^ do
    with uid^ do
     if(not ServerSide)and(speed>0)
-    then unit_canMove:=(x<>moveCurr_x)or(y<>moveCurr_y)
+    then unit_canMove:=(x<>moveDest_x)or(y<>moveDest_y)
     else
     begin
        unit_canMove:=false;
@@ -340,11 +340,11 @@ begin
        or(not iscomplete)then exit;
 
        if(a_reload>0)then
-        if(a_weap_cl>MaxUnitWeapons)
-        then exit
-        else
-         with _a_weap[a_weap_cl] do
-          if((aw_reqf and wpr_move)=0)then exit;
+         if(a_weap_cl>MaxUnitWeapons)
+         then exit
+         else
+           with _a_weap[a_weap_cl] do
+             if((aw_reqf and wpr_move)=0)then exit;
 
        if(not _ukbuilding)then
          if(buff[ub_Pain]>0)
@@ -355,7 +355,6 @@ begin
 end;
 
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean;
-var tu:PTUnit;
 begin
    unit_canAttack:=false;
    with pu^  do
@@ -388,7 +387,7 @@ begin
    end;
 end;
 
-procedure unit_SetXY(pu:PTUnit;newx,newy:integer;movevxy:byte;updateZone:boolean); //;
+procedure unit_SetXY(pu:PTUnit;newx,newy:integer;movevxy:TMoveXY;updateZone:boolean); //;
 var _px,_py:integer;
 begin
    with pu^ do
@@ -812,17 +811,17 @@ begin
    newy^:=ty;
 end;
 
-function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean):byte;
+function CheckCollisionR(tx,ty,tr,skipunit:integer;forBuild,flylevel,check_obstacles:boolean):TCheckCollisionR;
 var u,gx,gy,gx0,gy0,gx1,gy1:integer;
 begin
-   CheckCollisionR:=0;
+   CheckCollisionR:=cbr_no;
 
    if((tx-tr)<=0       )
    or((ty-tr)<=0       )
    or((tx+tr)>=map_psize)
    or((tx+tr)>=map_psize)then
    begin
-      CheckCollisionR:=5;
+      CheckCollisionR:=cbr_mapSide;
       exit;
    end;
 
@@ -834,7 +833,7 @@ begin
         if(speed<=0)or(not iscomplete)then
          if(point_dist_int(x,y,tx,ty)<(tr+_r))then
          begin
-            CheckCollisionR:=2;
+            CheckCollisionR:=cbr_unit;
             exit;
          end;
 
@@ -844,14 +843,14 @@ begin
     with g_cpoints[u] do
      if(cpCaptureR>0)then
      begin
-        if(building)
+        if(forBuild)
         then gx:=max2i(cpsolidr,cpNoBuildR)
         else gx:=cpsolidr;
         gx+=tr;
         if(gx<=0)then continue;
         if(point_dist_int(tx,ty,cpx,cpy)<gx)then
         begin
-           CheckCollisionR:=3;
+           CheckCollisionR:=cbr_cpoint;
            exit;
         end;
      end;
@@ -873,29 +872,21 @@ begin
       u:=dist2mgcellC(tx,ty,gx,gy);
       if(u<tr)then
       begin
-         CheckCollisionR:=4;
+         CheckCollisionR:=cbr_obstacle;
          exit;
       end;
    end;
 end;
 
-function CheckBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
+function CheckBuildArea(tx,ty,tr:integer;buid,playern:byte):TCheckBuildArea;
 var u:integer;
 tzone:word;
 begin
-   CheckBuildArea:=0;
-   {
-   0=inside
-   1=no builders
-   2=collision with no build area
-   3=outside
-   }
-
-   if(pl<=LastPlayer)then
-    with g_players[pl] do
+   if(playern<=LastPlayer)then
+    with g_players[playern] do
      if(n_builders<=0)then
      begin
-        CheckBuildArea:=1;
+        CheckBuildArea:=cba_noBuilders;
         exit;
      end;
 
@@ -904,50 +895,46 @@ begin
      if(cpCaptureR>0)and(cpNoBuildR>0)then
       if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
       begin
-         CheckBuildArea:=2;
+         CheckBuildArea:=cba_NoBuildArea;
          exit;
       end;
 
    tr+=g_uids[buid]._r;
 
-   CheckBuildArea:=3;
+   CheckBuildArea:=cba_outBuildArea;
 
    tzone:=map_MapGetZone(tx,ty);
 
+   if(tzone>0)then
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
      with uid^ do
-      if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=pl)then
+      if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=playern)then
        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)and(tzone=zone)then
         if(buid in ups_builder)and(not IsIntUnitRange(transport,nil))then
          if(point_dist_int(x,y,tx,ty)<srange)then
          begin
-            CheckBuildArea:=0; // inside build area
+            CheckBuildArea:=cba_inBuildArea; // inside build area
             break;
          end;
 end;
 
-function CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte):byte;
-var i:byte;
+function CheckBuildPlace(tx,ty,tr,skip_unit:integer;playern,buid:byte):TCheckBuildPlace;
 begin
-   CheckBuildPlace:=0;
+   CheckBuildPlace:=cbp_good;
    {
-   0 :  m_brushc:=c_lime;
-   1 :  m_brushc:=c_red;
-   2 :  m_brushc:=c_blue;
-   else m_brushc:=c_gray;
+   cbp_good    :  m_brushc:=c_lime;
+   cbp_noplace :  m_brushc:=c_red;
+   cbp_out     :  m_brushc:=c_blue;
+   else           m_brushc:=c_gray;
    }
 
-   i:=CheckBuildArea(tx,ty,0,buid,playern); // 0=inside;  1=no builders; 2=collision; 3=outside
-   case i of
-   0  : begin
-           with g_uids[buid] do
-             i:=CheckCollisionR(tx,ty,tr+_r,uskip,_ukbuilding,_ukfly,true);
-           if(i>0)then CheckBuildPlace:=1;
-        end;
-   2  : CheckBuildPlace:=1;
-   3  : CheckBuildPlace:=2;
-   else CheckBuildPlace:=3;
+   case CheckBuildArea(tx,ty,0,buid,playern) of
+cba_inBuildArea : with g_uids[buid] do
+                    if(CheckCollisionR(tx,ty,tr+_r,skip_unit,_ukbuilding,_ukfly,true)<>cbr_no)then CheckBuildPlace:=cbp_noplace;
+cba_NoBuildArea: CheckBuildPlace:=cbp_noplace;
+cba_outBuildArea  : CheckBuildPlace:=cbp_out;
+   else CheckBuildPlace:=cbp_unknown;
    end;
 end;
 
@@ -966,7 +953,7 @@ begin
          pushOut_all(blink_x,blink_y,_r,unum,@blink_x,@blink_y,ukfly);
          blink_x:=mm3i(1,blink_x,map_psize);
          blink_y:=mm3i(1,blink_y,map_psize);
-         if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)>0)then exit;
+         if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,obstacles)<>cbr_no)then exit;
 
          unit_ability_HellLBlink:=true;
          if(Check)then exit;
@@ -996,7 +983,7 @@ begin
          blink_x:=mm3i(1,blink_x,map_psize);
          blink_y:=mm3i(1,blink_y,map_psize);
          if(point_dist_int(x,y,blink_x,blink_y)>srange)then exit;
-         if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,true)>0)then exit;
+         if(CheckCollisionR(blink_x,blink_y,_r,unum,_ukbuilding,ukfly,true)<>cbr_no)then exit;
 
          unit_ability_HellSBlink:=true;
          if(Check)then exit;
@@ -1313,8 +1300,8 @@ begin
             ua_y       := y;
             ua_bx      := -1;
             ua_by      := -1;
-            moveCurr_x := x;
-            moveCurr_y := y;
+            moveDest_x := x;
+            moveDest_y := y;
             gridx      := x div MapCellW;
             gridy      := y div MapCellW;
             zone       := map_CellGetZone(gridx,gridy);
@@ -1343,7 +1330,7 @@ begin
    StartBuild:=uid_CheckRequirements(@g_players[bplayer],buid);
    if(StartBuild=0)then
     with g_players[bplayer] do
-     if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=0)
+     if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=cbp_good)
      then unit_add(bx,by,-1,buid,bplayer,false,false,0)
      else StartBuild:=ureq_place;
 end;
@@ -1436,7 +1423,7 @@ begin
                   uproda+=1;
                   uprodl+=g_uids[puid]._limituse;
                   uprodc[g_uids[puid]._ucl]+=1;
-                  uprodu[ puid           ]+=1;
+                  uprodu[ puid            ]+=1;
                   cenergy-=g_uids[puid]._renergy;
                   uprod_u[pn]:=puid;
                   uprod_r[pn]:=g_uids[puid]._tprod;
@@ -1457,7 +1444,8 @@ begin
 
    unit_ProdUnitStart:=false;
 end;
-/// Stop unit prod
+//////   Stop unit prod
+//
 function unit_ProdUnitStop_p(pu:PTUnit;puid,pn:byte):boolean;
 begin
    unit_ProdUnitStop_p:=false;
@@ -1472,7 +1460,7 @@ begin
             uproda-=1;
             uprodl-=g_uids[puid]._limituse;
             uprodc[g_uids[puid]._ucl]-=1;
-            uprodu[ puid           ]-=1;
+            uprodu[ puid            ]-=1;
             cenergy+=g_uids[puid]._renergy;
             uprod_r[pn]:=0;
 
@@ -1535,6 +1523,8 @@ begin
 
    unit_ProdUpgrStart:=false;
 end;
+//////   Stop upgrade production
+//
 function unit_ProdUpgrStop_p(pu:PTUnit;upid:byte;pn:integer):boolean;
 begin
    unit_ProdUpgrStop_p:=false;
@@ -1890,8 +1880,8 @@ begin
       x       :=vx;
       y       :=vy;
       unit_OrderClear(pu,true);
-      moveCurr_x    :=x;
-      moveCurr_y    :=y;
+      moveDest_x    :=x;
+      moveDest_y    :=y;
       a_tar   :=0;
       a_reload:=0;
       reload  :=0;
@@ -1998,6 +1988,17 @@ begin
    if(iscomplete)then
    begin
       speed:=_speed;
+      if(_speed>0)then
+      begin
+         if(not _ukbuilding)then
+          with player^ do
+           if(_ukmech)
+           then speed+=upgr[upgr_race_mspeed_mech[_urace]]*3
+           else speed+=upgr[upgr_race_mspeed_bio [_urace]]*3;
+         speed:=mm3i(2,speed,unit_MaxSpeed);
+      end;
+
+
       // ABILITIES
      { case _ability of
 ua_CCFly         : if(level>0)then
