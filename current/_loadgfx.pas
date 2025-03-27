@@ -770,7 +770,6 @@ begin
    InitThemes;
 end;
 
-
 procedure MakeUnitIcons;
 var u:byte;
 begin
@@ -866,7 +865,7 @@ begin
    ui_apmy      := ui_fpsy+txt_line_h3;
 
 
-   ui_menu_btnsy:= max2(font_3hw,(vid_vh div vid_BW)-1);
+   ui_menu_btnsy:= vid_panelll-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
    if(spr_mback<>nil)then
    begin
@@ -884,10 +883,7 @@ begin
 end;
 
 procedure _ScreenSurfaces;
-const
-  ystop = 16;
 var i,y:integer;
-
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
    if(vid_ppos<2)
@@ -900,7 +896,6 @@ begin
    then rectangleColor(r_panel,x0,y0,x1,y1,color)
    else rectangleColor(r_panel,y0,x0,y1,x1,color);
 end;
-
 begin
    _FreeSF(r_uipanel );
    _FreeSF(r_panel   );
@@ -924,9 +919,8 @@ begin
       r_uipanel:=_createSurf(vid_panelw+1,vid_vh);
       r_panel  :=_createSurf(vid_panelw+1,vid_vh);
 
-      y:=vid_BW*ystop;
-      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,y,c_white);
-      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,y,c_white);
+      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,vid_panelh,c_white);
+      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,vid_panelh,c_white);
    end
    else
    begin
@@ -943,12 +937,11 @@ begin
       then vid_panely:=0
       else vid_panely:=vid_cam_h-1;
 
-      r_uipanel:=_createSurf(vid_cam_w,vid_panelw+1);
-      r_panel  :=_createSurf(vid_cam_w,vid_panelw+1);
+      r_uipanel:=_createSurf(vid_vw,vid_panelw+1);
+      r_panel  :=_createSurf(vid_vw,vid_panelw+1);
 
-      y:=vid_BW*ystop;
-      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_BW ,c_white);
-      hlineColor(r_panel,vid_panelw+vid_BW,y,vid_2BW,c_white);
+      hlineColor(r_panel,vid_panelw+vid_BW,vid_panelh,vid_BW ,c_white);
+      hlineColor(r_panel,vid_panelw+vid_BW,vid_panelh,vid_2BW,c_white);
    end;
 
    vid_cam_hw:=vid_cam_w div 2;
@@ -965,7 +958,7 @@ begin
 
    i:=4;
    y:=vid_BW*i;
-   while (i<=ystop) do
+   while (i<=vid_panelll) do
    begin
       pline(0,y,vid_panelw,y,c_white);
       i+=1;

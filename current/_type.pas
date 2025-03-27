@@ -1,9 +1,5 @@
 
 type
-
-integer  = Smallint;
-pinteger = ^integer;
-
 TSob  = set of byte;
 PTSob = ^TSob;
 

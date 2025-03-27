@@ -232,7 +232,7 @@ end;
 procedure _player_s_o(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
 var u:integer;
 begin
-   if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
+   if(G_Status=gs_running)and(rpls_state<rpls_read)then
    begin
       if(net_status=ns_client)then
       begin
@@ -422,7 +422,7 @@ begin
      if(u<=ui_ubtns)then
        with _players[HPlayer] do
          case tab of
-0:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // buildings
+0:  if(G_Status=gs_running)and(rpls_state<rpls_read)then  // buildings
       case click_type of
 pct_left   : begin
              m_brush:=ui_panel_uids[race,tab,u];
@@ -430,21 +430,21 @@ pct_left   : begin
              end;
       end;
 
-1:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // units
+1:  if(G_Status=gs_running)and(rpls_state<rpls_read)then  // units
       case click_type of
 pct_left   : _player_s_o(co_suprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
 pct_right  : _player_s_o(co_cuprod  ,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
       end;
 
-2:  if(G_Status=gs_running)and(rpls_state<rpls_state_read)then  // upgrades
+2:  if(G_Status=gs_running)and(rpls_state<rpls_read)then  // upgrades
       case click_type of
 pct_left   : _player_s_o(co_supgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
 pct_right  : _player_s_o(co_cupgrade,ui_panel_uids[race,tab,u],0,0,0,uo_corder,HPlayer);
       end;
 
-3:  if(rpls_state>=rpls_state_read)then
+3:  if(rpls_state>=rpls_read)then
     begin
-       if(rpls_fstatus=rpls_file_read)then
+       if(rpls_fstatus=rpls_read)then
        case u of
      1 : case click_type of
 pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2      )+1);
@@ -601,7 +601,7 @@ sdlk_tab: begin
          exit;
       end;
 
-      if(rpls_state>=rpls_state_read)then
+      if(rpls_state>=rpls_read)then
       begin
          for ko:=0 to _mhkeys do  // replays
          begin
@@ -885,7 +885,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
             //else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
             units_SelectRect(ks_shift>0,HPlayer,mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,255);
 
-            if(G_Status=gs_running)and(rpls_state<rpls_state_read)then
+            if(G_Status=gs_running)and(rpls_state<rpls_read)then
              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
          end;
 

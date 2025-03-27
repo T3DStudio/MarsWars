@@ -195,7 +195,7 @@ begin
 
                     y:=_yt(7);
                     _draw_text(tar,i,y, str_plname, ta_left,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));
-                    _draw_text(tar,ui_menu_ssr_x2+6,y, PlayerName, ta_left  ,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));
+                    _draw_text(tar,ui_menu_ssr_x2+6,y, PlayerName+chat_type[menu_item<>11], ta_left  ,255, mic((net_status=ns_none)and(G_Started=false),menu_item=11));
                     vlineColor(tar,ui_menu_ssr_x2,y-6,y+12,c_gray);
 
                     y:=_yt(8);
@@ -231,6 +231,14 @@ begin
                     y:=_yt(7);
                     _draw_text(tar,i ,y, str_fps, ta_left ,255, mic(true,false));
                     _draw_text(tar,t ,y, b2cc[vid_fps],ta_right,255, mic(true,false));
+
+                    y:=_yt(9);
+                    _draw_text(tar,i ,y, str_menu_scale, ta_left ,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[vid_menu_scale],ta_right,255, mic(true,false));
+
+                    y:=_yt(10);
+                    _draw_text(tar,i ,y, str_menu_scales, ta_left ,255, mic(true,false));
+                    _draw_text(tar,t ,y, b2cc[vid_menu_scales],ta_right,255, mic(true,false));
                  end;
 
                  if(menu_s3=ms3_sond)then
@@ -268,7 +276,7 @@ begin
                  vlineColor(tar,ui_menu_ssr_x4,y,y+ui_menu_ssr_ys,c_gray);
                  vlineColor(tar,ui_menu_ssr_x5,y,y+ui_menu_ssr_ys,c_gray);
 
-                 _draw_text(tar,_set_x0,_yt(9),svld_str_fname,ta_left,255,mic(true,menu_item=37) );
+                 _draw_text(tar,_set_x0,_yt(9),svld_str_fname+chat_type[menu_item<>37],ta_left,255,mic(true,menu_item=37) );
 
                  y:=_yt(10);
                  _draw_text(tar,ui_menu_ssr_x0+ui_menu_ssr_xhs, y, str_save  , ta_middle,255, mic(G_Started and (svld_str_fname<>''),false));
@@ -281,7 +289,7 @@ begin
                     if(i<svld_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+svld_list[i],ta_left,255,mic(true,i=svld_list_sel));
+                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+str_Trim(svld_list[i],16),ta_left,255,mic(true,i=svld_list_sel));
                        if(i=svld_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
@@ -310,7 +318,7 @@ begin
                     if(i<rpls_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+rpls_list[i],ta_left,255,mic(true,i=rpls_list_sel));
+                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+']'+str_Trim(rpls_list[i],16),ta_left,255,mic(true,i=rpls_list_sel));
                        if(i=rpls_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
@@ -401,17 +409,17 @@ begin
                  // replays
                  y:=_yt(10);
                  _draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_left  ,255, c_white);
-                 _draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_state], ta_right ,255, mic( rpls_state<rpls_state_read ,rpls_state>rpls_state_none));
+                 _draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_state], ta_right ,255, mic( rpls_state<rpls_read ,rpls_state>rpls_none));
                  t:=_yl(10);
                  vlineColor(tar,ui_menu_csm_x3 ,t,t+ui_menu_csm_ys, c_gray);
                  y:=_yt(11);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_replay_name, ta_left,255, mic( rpls_state=rpls_state_none ,false));
-                 _draw_text(tar,ui_menu_csm_xt3, y, rpls_str_name  , ta_left,255, mic( rpls_state=rpls_state_none ,menu_item=83));
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_replay_name, ta_left,255, mic( rpls_state=rpls_none ,false));
+                 _draw_text(tar,ui_menu_csm_xt3, y, rpls_str_name+chat_type[menu_item<>83]  , ta_left,255, mic( rpls_state=rpls_none ,menu_item=83));
                  y:=_yl(11);
                  vlineColor(tar,ui_menu_csm_xc ,y,y+ui_menu_csm_ys,c_gray);
                  y:=_yt(12);
-                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpls_state_read ,false));
-                 if(rpls_state>rpls_state_none)and(g_cl_units>0)then
+                 _draw_text(tar,ui_menu_csm_xt0, y, str_pnu+str_pnua[rpls_pnui], ta_left,255, mic( rpls_state<rpls_read ,false));
+                 if(rpls_state>rpls_none)and(g_cl_units>0)then
                  _draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
               end;
    ms2_mult : begin
@@ -443,20 +451,20 @@ begin
 
                     y:=_yt(2);
                     _draw_text(tar,ui_menu_csm_xt1, y, str_server, ta_left,255, c_white);
-                    _draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_server]         , ta_right ,255, mic((net_status<>ns_client)and(G_Started=false),false));
+                    _draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_server]       , ta_right ,255, mic((net_status<>ns_client)and(G_Started=false),false));
                     vlineColor(tar,ui_menu_csm_xc , _yl(2),_yl(2)+ui_menu_csm_ys, c_gray);
                     y:=_yt(3);
                     _draw_text(tar,ui_menu_csm_xt0, y,str_udpport                          , ta_left  ,255 ,mic((net_status=ns_none),menu_item=87));
-                    _draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr                          , ta_right ,255 ,mic((net_status=ns_none),menu_item=87));
+                    _draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr+chat_type[menu_item<>87]  , ta_right ,255 ,mic((net_status=ns_none),menu_item=87));
 
 
                     y:=_yt(5);
                     _draw_text(tar,ui_menu_csm_xt1, y, str_client , ta_left,255, c_white);
-                    _draw_text(tar,ui_menu_csm_xt2, y, str_connect[net_status=ns_client]     , ta_right ,255, mic((net_status<>ns_server)and((net_status=ns_client)or(G_Started=false)),false));
+                    _draw_text(tar,ui_menu_csm_xt2, y, str_connect[net_status=ns_client]   , ta_right ,255, mic((net_status<>ns_server)and((net_status=ns_client)or(G_Started=false)),false));
                     vlineColor(tar,ui_menu_csm_xc , _yl(5),_yl(5)+ui_menu_csm_ys, c_gray);
 
                     y:=_yt(6);
-                    _draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr                        , ta_left  ,255, mic((net_status=ns_none),menu_item=90));
+                    _draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr+chat_type[menu_item<>90], ta_left  ,255, mic((net_status=ns_none),menu_item=90));
                     _draw_text(tar,ui_menu_csm_xt2, y, net_m_error                         , ta_right ,255, c_red);
                     y:=_yt(7);
                     _draw_text(tar,ui_menu_csm_xt0, y, str_npnu+str_npnua[net_pnui]        , ta_left  ,255, mic((net_status<>ns_server),false));
@@ -479,12 +487,39 @@ begin
    end;
 end;
 
+procedure vid_MakeBigMenu;
+var
+cx,cy:single;
+begin
+   if(r_menusc<>nil)and(r_menusc<>r_menu)then sdl_FreeSurface(r_menusc);
+
+   if(vid_menu_scale)then
+   begin
+      cx:=vid_vw/r_menu^.w;
+      cy:=vid_vh/r_menu^.h;
+      if(cx>cy)
+      then r_menusc_s:=cy
+      else r_menusc_s:=cx;
+      r_menusc  :=zoomSurface(r_menu,r_menusc_s,r_menusc_s,byte(vid_menu_scales));
+      r_menusc_s:=1/r_menusc_s;
+   end
+   else
+   begin
+      r_menusc_s:=1;
+      r_menusc  :=r_menu;
+   end;
+
+   r_menusc_x:=(vid_vw-r_menusc^.w) div 2;
+   r_menusc_y:=(vid_vh-r_menusc^.h) div 2;
+end;
+
 procedure d_updmenu(tar:pSDL_Surface);
 begin
    _draw_surf(tar,0,0,spr_mback);
    _draw_text(tar,spr_mback^.w,spr_mback^.h-font_w,str_ver,ta_right,255,c_white);
 
    if(TestMode>0)then _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_5w,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
+   _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_3w,str_menu_controls,ta_middle,255,c_white);
 
    _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
@@ -503,12 +538,16 @@ begin
    begin
       //map_RedrawMenuMinimap;
       d_updmenu(r_menu);
+      vid_MakeBigMenu;
       vid_menu_redraw:=false;
    end;
 
-   _draw_surf(r_screen,mv_x,mv_y,r_menu    );
+   //_draw_surf(r_screen,mv_x,mv_y,r_menu);
+   _draw_surf(r_screen,r_menusc_x,r_menusc_y,r_menusc);
 
    if(vid_FPS)then _draw_text(r_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_right,255,c_white);
+
+   //_draw_text(r_screen,vid_vw,20,i2s(round((mouse_x-r_menusc_x)*r_menusc_s))+' '+i2s(round((mouse_y-r_menusc_y)*r_menusc_s)),ta_right,255,c_white);
 
    _draw_surf(r_screen,mouse_x,mouse_y,spr_cursor);
 end;

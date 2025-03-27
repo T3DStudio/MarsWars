@@ -799,6 +799,8 @@ begin
    str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
    str_DeadObservers     := 'Observer mode after lose:';
+   str_menu_scale        := 'Menu scaling';
+   str_menu_scales       := 'Scaled menu smoothyng';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
    str_ability           := 'Special ability: ';
@@ -813,6 +815,9 @@ begin
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
    str_MusicListSize     := 'Music playlist size';
+   str_menu_controls     := '-use the left and right mouse buttons to manipulate the menu items-';
+   str_RecordingStart    := 'Start recording: ';
+   str_RecordingStop     := 'Stop recording: ';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1353,6 +1358,8 @@ begin
   str_kothtime_act      := 'Время до активации центральной зоны: ';
   str_kothwinner        := ' - Царь Горы!';
   str_DeadObservers     := 'Наблюдатель после поражения:';
+  str_menu_scale        := 'Растягивание меню';
+  str_menu_scales       := 'Гладкое растянутое меню';
   str_FPS               := 'Показать FPS';
   str_APM               := 'Показать APM';
   str_ability           := 'Специальная способность: ';
@@ -1367,6 +1374,9 @@ begin
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
   str_MusicListSize     := 'Размер плейлиста';
+  str_menu_controls     := '-используйте левую и правую кнопки мыши для управления пунктами меню-';
+  str_RecordingStart    := 'Начало записи: ';
+  str_RecordingStop     := 'Остановка записи: ';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
@@ -1440,8 +1450,9 @@ begin
   str_pcolors[0]        := tc_white +'по умолчанию'+tc_default;
   str_pcolors[1]        := tc_lime  +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
   str_pcolors[2]        := tc_white +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
-  str_pcolors[3]        := tc_purple+'команды'+tc_default;
-  str_pcolors[4]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
+  str_pcolors[3]        := tc_white +'свои '+tc_aqua  +'союзники '+tc_red+'враги'+tc_default;
+  str_pcolors[4]        := tc_purple+'команды'+tc_default;
+  str_pcolors[5]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
 
   str_fstarts           := 'Фиксированные старты:';
 

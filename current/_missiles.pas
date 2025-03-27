@@ -187,6 +187,9 @@ begin
        tu:=nil;
        _IsUnitRange(tar,@tu);
 
+       if(not ServerSide)then
+         if(d>base_1r)and(tu<>nil)then exit;
+
        damage:=adddmg;
        if(player<=MaxPlayers)and(tu<>nil)then
         with _players[player] do

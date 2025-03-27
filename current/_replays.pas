@@ -123,7 +123,7 @@ function replay_GetProgress:single;
 begin
    replay_GetProgress:=0;
 
-   if(rpls_state=rpls_state_read)and(rpls_fstatus=rpls_file_read)and(rpls_file_size>0)then
+   if(rpls_state=rpls_read)and(rpls_fstatus=rpls_read)and(rpls_file_size>0)then
    begin
       replay_GetProgress:=FilePos(rpls_file)/rpls_file_size;
       if(replay_GetProgress>1)then replay_GetProgress:=1;
@@ -133,8 +133,8 @@ end;
 
 procedure replay_SavePlayPosition;
 begin
-   if(rpls_fstatus<>rpls_file_read)
-   or(rpls_state  <>rpls_state_read)then exit;
+   if(rpls_fstatus<>rpls_read)
+   or(rpls_state  <>rpls_read)then exit;
 
    if(rpls_ReadPosN>0)then
     with rpls_ReadPosL[rpls_ReadPosN-1] do
@@ -156,8 +156,8 @@ var ni,i :cardinal;
     vi,vt:int64;
 begin
    if(rpls_ReadPosN=0)
-   or(rpls_fstatus<>rpls_file_read)
-   or(rpls_state  <>rpls_state_read)then exit;
+   or(rpls_fstatus<>rpls_read)
+   or(rpls_state  <>rpls_read)then exit;
 
    ni:=0;
    vi:=0;
@@ -189,12 +189,18 @@ end;
 
 procedure replay_Abort;
 begin
-   if(rpls_fstatus>rpls_file_none)then
+   if(length(rpls_str_path)>0)then
+   begin
+      if(rpls_state=rpls_write)
+      or(rpls_fstatus=rpls_write)then GameLogCommon(0,255,str_RecordingStop+rpls_str_path,true);
+   end;
+   if(rpls_fstatus>rpls_none)then
    begin
       close(rpls_file);
-      rpls_fstatus:=rpls_file_none;
+      rpls_fstatus:=rpls_none;
    end;
-   if(rpls_state>=rpls_state_read)then rpls_state:=rpls_state_none;
+   rpls_str_path:='';
+   if(rpls_state>=rpls_read)then rpls_state:=rpls_none;
    rpls_ReadPosN:=0;
    setlength(rpls_ReadPosl,rpls_ReadPosN);
 end;
@@ -211,7 +217,7 @@ var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
+   rpls_str_path:=str_f_rpls+rpls_str_name+'_'+str_DateTime+str_e_rpls;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -221,12 +227,12 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      rpls_state:=rpls_state_none;
+      rpls_state:=rpls_none;
    end
    else
    begin
-      rpls_fstatus:=rpls_file_write;
-      rpls_state  :=rpls_state_write;
+      rpls_fstatus:=rpls_write;
+      rpls_state  :=rpls_write;
       rpls_u      :=MaxPlayerUnits+1;
       rpls_player :=HPlayer;
       rpls_log_n  :=_players[rpls_player].log_n;
@@ -262,8 +268,10 @@ begin
       if(ioresult<>0)then
       begin
          replay_Abort;
-         rpls_state:=rpls_state_none;
+         rpls_state:=rpls_none;
       end;
+
+      GameLogCommon(0,255,str_RecordingStart+rpls_str_path,true);
    end;
 end;
 procedure replay_WriteGameFrame;
@@ -301,7 +309,7 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      rpls_state:=rpls_state_none;
+      rpls_state:=rpls_none;
    end;
 end;
 
@@ -314,7 +322,7 @@ begin
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
    begin
-      rpls_state   :=rpls_state_none;
+      rpls_state   :=rpls_none;
       g_started    :=false;
       rpls_str_info:='';
       exit;
@@ -324,7 +332,7 @@ begin
 
    if(not FileExists(rpls_str_path))then
    begin
-      rpls_state   :=rpls_state_none;
+      rpls_state   :=rpls_none;
       g_started    :=false;
       rpls_str_info:=str_svld_errors_file;
       exit;
@@ -416,8 +424,8 @@ begin
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
 
-         rpls_fstatus:=rpls_file_read;
-         rpls_state  :=rpls_state_read;
+         rpls_fstatus:=rpls_read;
+         rpls_state  :=rpls_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
          HPlayer     :=rpls_player;
@@ -496,15 +504,15 @@ end;
 
 begin
    rpls_ticks+=1;
-   if(G_Started=false)or(rpls_state=rpls_state_none)or(menu_s2=ms2_camp)
+   if(G_Started=false)or(rpls_state=rpls_none)or(menu_s2=ms2_camp)
    then replay_Abort
    else
      if(G_Started)then
        case rpls_state of
-rpls_state_write : if(rpls_fstatus<>rpls_file_write)
+rpls_write : if(rpls_fstatus<>rpls_write)
                    then replay_WriteHead
                    else replay_WriteGameFrame;
-rpls_state_read  : if(rpls_fstatus<>rpls_file_read)
+rpls_read  : if(rpls_fstatus<>rpls_read)
                    then replay_Readhead
                    else replay_ReadGameFrame;
        else replay_Abort;

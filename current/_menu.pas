@@ -43,7 +43,7 @@ begin
          menu_item:=3+((mouse_x-ui_menu_ssr_x0) div ui_menu_ssr_xs);
 
          case menu_item of
-         4: if not ((net_status=ns_none)and(rpls_state<rpls_state_read))then menu_item:=0;
+         4: if not ((net_status=ns_none)and(rpls_state<rpls_read))then menu_item:=0;
          5: if (net_status<>ns_none)then menu_item:=0;
          end;
       end
@@ -131,13 +131,27 @@ begin
    end;
 end;
 
-
+function GetIndex(cval:integer;firsti:pinteger;size:integer):integer;
+begin
+   GetIndex:=0;
+   if(size>0)then
+     while(GetIndex<size)do
+     begin
+        if(firsti^=cval)then break;
+        firsti+=1;
+        GetIndex+=1;
+     end;
+end;
 
 procedure g_menu;
 var p:byte;
+mnx,
+mny :integer;
 begin
-   mouse_x-=mv_x;
-   mouse_y-=mv_y;
+   mnx:=mouse_x;
+   mny:=mouse_y;
+   mouse_x:=round((mouse_x-r_menusc_x)*r_menusc_s);
+   mouse_y:=round((mouse_y-r_menusc_y)*r_menusc_s);
 
    if(ks_mleft=1)or(ks_mright=1) then   //right or left click
    begin
@@ -185,33 +199,14 @@ begin
               theme_map_ptrt:=255;
               MakeTerrain;
            end;
-      14 : begin
-              vid_plcolors+=1;
-              vid_plcolors:=vid_plcolors mod vid_maxplcolors;
-           end;
+      14 : ScrollByte(@vid_plcolors,true,0,vid_maxplcolors);
 
       // video
       16 : if(mouse_x>ui_menu_ssr_x5)then
            begin
-              if(mouse_x<ui_menu_ssr_x6)then
-              begin
-                 case m_vrx of
-                 vid_minw : m_vrx:=960;
-                 960      : m_vrx:=1024;
-                 1024     : m_vrx:=1280;
-                 1280     : m_vrx:=vid_maxw;
-                 else       m_vrx:=vid_minw;
-                 end;
-              end
-              else
-              begin
-                 case m_vry of
-                 vid_minh : m_vry:=680;
-                 680      : m_vry:=720;
-                 720      : m_vry:=vid_maxh;
-                 else       m_vry:=vid_minh;
-                 end;
-              end;
+              if(mouse_x<ui_menu_ssr_x6)
+              then m_vrx:=vid_wl[(GetIndex(m_vrx,@vid_wl[0],vid_wl_n)+1) mod vid_wl_n]
+              else m_vry:=vid_hl[(GetIndex(m_vry,@vid_hl[0],vid_hl_n)+1) mod vid_hl_n];
            end
            else
             if(mouse_x>ui_menu_ssr_x4)then
@@ -226,6 +221,8 @@ begin
              end;
       18 : begin vid_fullscreen:=not vid_fullscreen; _MakeScreen;end;
       20 : vid_FPS:=not vid_FPS;
+      22 : vid_menu_scale:=not vid_menu_scale;
+      23 : vid_menu_scales:=not vid_menu_scales;
 
       // sounds
       26 : begin
@@ -266,7 +263,7 @@ begin
       40 : if(0<=svld_list_sel)and(svld_list_sel<svld_list_size)then saveload_Delete;
 
       // replays
-      41 : if(rpls_list_size>0)and(rpls_state<rpls_state_read)then
+      41 : if(rpls_list_size>0)and(rpls_state<rpls_read)then
            begin
               rpls_list_sel :=rpls_list_scroll+((mouse_y-ui_menu_ssr_y0)div ui_menu_ssr_ys)-1;
               replay_Select;
@@ -274,7 +271,7 @@ begin
       42 : if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)and(G_Started=false)then
            begin
               menu_s2:=ms2_scir;
-              rpls_state:=rpls_state_read;
+              rpls_state:=rpls_read;
               g_started:=true;
            end;
       43 : ;
@@ -339,10 +336,10 @@ begin
 
       // replays
       82 : if(mouse_x>ui_menu_csm_x3)then
-            if(rpls_state=rpls_state_none)
-            then rpls_state:=rpls_state_write
-            else rpls_state:=rpls_state_none;
-      83 : if(rpls_state<>rpls_state_none)then menu_item:=0;
+            if(rpls_state=rpls_none)
+            then rpls_state:=rpls_write
+            else rpls_state:=rpls_none;
+      83 : if(rpls_state<>rpls_none)then menu_item:=0;
       84 : ScrollByte(@rpls_pnui,true,0,_cl_pnun_rpls);
 
       //// multiplayer
@@ -429,6 +426,15 @@ begin
    if(ks_mright=1)then    // right button pressed
    begin
       case menu_item of
+      14 : ScrollByte(@vid_plcolors,false,0,vid_maxplcolors);
+
+      16 : if(mouse_x>ui_menu_ssr_x5)then
+           begin
+              if(mouse_x<ui_menu_ssr_x6)
+              then m_vrx:=vid_wl[(GetIndex(m_vrx,@vid_wl[0],vid_wl_n)+vid_wl_n-1) mod vid_wl_n]
+              else m_vry:=vid_hl[(GetIndex(m_vry,@vid_hl[0],vid_hl_n)+vid_hl_n-1) mod vid_hl_n];
+           end;
+
       30  : ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
       // MAP
       50 : begin Map_randomseed;                                  Map_premap;end;
@@ -479,15 +485,14 @@ begin
               net_sv_pstr:=StringApplyInput(net_sv_pstr,k_kbdig,5);
               net_sv_sport;
            end;
-      90 : net_cl_svstr:=StringApplyInput(net_cl_svstr,k_kbaddr,21);
-      100: net_chat_str:=StringApplyInput(net_chat_str,k_kbstr ,255);
+      90 : net_cl_svstr:=StringApplyInput(net_cl_svstr,k_kbstr,21);
+      100: net_chat_str:=StringApplyInput(net_chat_str,k_kbstr,255);
       end;
 
       vid_menu_redraw:=true;
    end;
 
-
-   mouse_x+=mv_x;
-   mouse_y+=mv_y;
+   mouse_x:=mnx;
+   mouse_y:=mny;
 end;
 

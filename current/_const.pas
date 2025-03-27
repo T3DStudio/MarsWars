@@ -1,4 +1,8 @@
 
+type
+integer  = Smallint;
+pinteger = ^integer;
+
 const
 
 ver                    : byte = 232;
@@ -1029,7 +1033,7 @@ char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
 
-vid_maxplcolors        = 6;
+vid_maxplcolors        = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1153,6 +1157,7 @@ ta_chat                = 3;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
+font_3w                = font_w*3;
 font_5w                = font_w*5;
 font_iw                = font_w-1;
 font_3hw               = font_w+(font_w div 2);
@@ -1181,8 +1186,14 @@ fr_ifps                = fr_fps1-1;
 vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
-vid_maxw               = 1360;
-vid_maxh               = 768;
+vid_maxw               = 1920;
+vid_maxh               = 1080;
+
+vid_wl_n               = 11;
+vid_hl_n               = 8;
+vid_wl                 : array[0..vid_wl_n-1] of Smallint = (vid_minw,960,1024,1280,1360,1366,1400,1440,1600,1680,vid_maxw);
+vid_hl                 : array[0..vid_hl_n-1] of Smallint = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
+
 vid_ab                 = 128;
 vid_mvs                = 500; // max vis sprites;
 vid_blink_persecond    = 6;
@@ -1195,6 +1206,8 @@ ui_alarm_time          = vid_blink_period2;
 vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;
+vid_panelll            = 13;
+vid_panelh             = vid_BW*vid_panelll;
 vid_tBW                = vid_panelw div 4;
 vid_hBW                = vid_BW div 2;
 vid_oiw                = 18;
@@ -1326,14 +1339,9 @@ sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
 //
 //  SAVE/LOAD/REPLAY
 //
-
-rpls_file_none         = 0;
-rpls_file_write        = 1;
-rpls_file_read         = 2;
-
-rpls_state_none        = 0;
-rpls_state_write       = 1;
-rpls_state_read        = 2;
+rpls_none              = 0;
+rpls_write             = 1;
+rpls_read              = 2;
 
 SvRpLen                = 15;
 

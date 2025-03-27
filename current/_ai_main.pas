@@ -219,7 +219,7 @@ begin
    if(build_cd<=0)then
    begin
       if(g_generators=0)and(g_step<ai_noProdTime)
-      then ai_need_energy:=mm3(600, ai_builders_count         *1000,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
+      then ai_need_energy:=mm3(600, ai_builders_count         *1200,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
       else ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then

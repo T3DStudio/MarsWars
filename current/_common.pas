@@ -490,7 +490,7 @@ end;
 function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_state_read){$ENDIF})
+   PlayerObserver:=(g_deadobservers and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_read){$ENDIF})
                  or(team=0);
 end;
 
@@ -1036,6 +1036,39 @@ end;
 
 {$IFDEF _FULLGAME}
 
+function str_DateTime:shortstring;
+var YY,MM,DD,H,M,S,MS:word;
+function w2sZ(v,l:word):shortstring;
+begin
+   w2sZ:=w2s(v);
+   if(l>0)then
+     while(length(w2sZ)<l)do
+       insert('0',w2sZ,1);
+end;
+begin
+   DeCodeDate(Date,YY,MM,DD);
+   DeCodeTime(Time,H,M,S,MS);
+   str_DateTime:=w2sZ(YY,4)+'_'+w2sZ(MM,2)+'_'+w2sZ(DD,2)+' '+w2sZ(H,2)+'-'+w2sZ(M,2)+'-'+w2sZ(S,2)+'-'+w2sZ(MS,4);
+end;
+
+
+function str_Trim(s:shortstring;l:byte):shortstring;
+var n:byte;
+begin
+   if(length(s)>l)then
+   begin
+      setlength(s,l);
+      n:=0;
+      while(l>0)and(n<3)do
+      begin
+         s[l]:='.';
+         l-=1;
+         n+=1;
+      end;
+   end;
+   str_Trim:=s;
+end;
+
 procedure UpdateLastSelectedUnit(u:integer);
 var tu:PTUnit;
 begin
@@ -1141,7 +1174,7 @@ begin
    if(not rpls_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_state_read)or(_players[HPlayer].observer)then exit;
+     if(rpls_state>=rpls_read)or(_players[HPlayer].observer)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=_players[UIPlayer].team)then exit;
@@ -1157,7 +1190,7 @@ begin
      if(RectInCam(vx,vy,_r,_r,0))then
      begin
         if(UIPlayer=0)then
-          if(rpls_state=rpls_state_read)or(_players[HPlayer].observer)then
+          if(rpls_state=rpls_read)or(_players[HPlayer].observer)then
           begin
              CheckUnitUIVisionScreen:=true;
              exit;

@@ -152,8 +152,12 @@ r_minimap,
 r_bminimap,
 r_screen,
 r_dterrain,
+r_menusc,
 r_menu            : pSDL_SURFACE;
 r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
+r_menusc_x,
+r_menusc_y        : integer;
+r_menusc_s        : single;
 
 r_RECT            : pSDL_RECT;
 
@@ -195,6 +199,9 @@ PlayerRace        : byte = 0;
 PlayerColor       : array[0..MaxPlayers] of cardinal;
 
 UIPlayer          : byte = 1;
+
+vid_menu_scale    : boolean = true;
+vid_menu_scales   : boolean = true;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
@@ -291,7 +298,7 @@ rpls_pnu          : integer = 0; // quality
 rpls_str_name     : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info     : shortstring = '';
-rpls_state        : byte = rpls_state_none;
+rpls_state        : byte = rpls_none;
 rpls_list         : array of shortstring;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
@@ -756,6 +763,9 @@ str_CanRebuildTo,
 str_TargetLimit,
 str_NextTrack,
 str_MusicListSize,
+str_menu_controls,
+str_RecordingStart,
+str_RecordingStop,
 str_ReloadMusic,
 str_PlayerPaused,
 str_PlayerResumed,
@@ -807,7 +817,7 @@ str_gmodet,
 str_plout,
 str_player_def    : shortstring;
 str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
-str_pcolors       : array[0..vid_maxplcolors-1] of shortstring;
+str_pcolors       : array[0..vid_maxplcolors] of shortstring;
 str_uhbars        : array[0..2] of shortstring;
 str_panelposp     : array[0..3] of shortstring;
 str_panelpos,
@@ -868,6 +878,8 @@ str_maction,
 str_scrollspd,
 str_mousescrl,
 str_fullscreen,
+str_menu_scale,
+str_menu_scales,
 str_FPS,
 str_APM,
 str_mrandom,

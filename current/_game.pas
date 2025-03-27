@@ -197,8 +197,8 @@ begin
 
    rpls_pnu  :=0;
    rpls_plcam:=false;
-   //if(rpls_state>=rpls_state_read)then
-   rpls_state:=rpls_state_none;
+   //if(rpls_state>=rpls_read)then
+   rpls_state:=rpls_none;
    {$ELSE}
    screen_redraw:=true;
    {$ENDIF}
@@ -378,7 +378,7 @@ begin
      if(UIPlayer<>playern)
      or(observer)
      or(army=0)
-     or(rpls_state=rpls_state_read)then exit;
+     or(rpls_state=rpls_read)then exit;
    if(g_status<>gs_running)then exit;
    UIAllowSelecting:=true;
 end;

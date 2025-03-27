@@ -191,7 +191,89 @@ begin
    net_sv_pstr:=w2s(net_port);
 end;
 
-function ip2c(s:shortstring):cardinal;
+function ip2c(s:shortstring;isip:pboolean):cardinal;
+{$IFNDEF FULLGAME}
+const chars_digits           : set of Char = ['0'..'9'];
+{$ENDIF}
+var i,l,
+     bn:byte;
+     e :array[0..3] of byte = (0,0,0,0);
+begin
+   ip2c:=0;
+   if(isip<>nil)then isip^:=false;
+   bn:=0;
+   l :=length(s);
+   if(l>0)then
+     for i:=1 to l do
+       if(s[i]='.')then
+       begin
+          bn+=1;
+          if(bn>3)then exit;
+       end
+       else
+         if(s[i] in chars_digits)
+         then e[bn]:=s2b(b2s(e[bn])+s[i])
+         else exit;
+   if(isip<>nil)then isip^:=true;
+   ip2c:=cardinal((@e)^);
+end;
+
+function c2ip(c:cardinal):shortstring;
+begin
+   c2ip:=b2s (c and $000000FF)
+    +'.'+b2s((c and $0000FF00) shr 8 )
+    +'.'+b2s((c and $00FF0000) shr 16)
+    +'.'+b2s((c and $FF000000) shr 24);
+end;
+
+procedure net_cl_saddr;
+var
+addr_str,
+port_str: shortstring;
+pstr    : PChar;
+    p   : byte;
+  ipc   : cardinal;
+ isip   : boolean;
+ipstruct: TIPaddress;
+begin
+   addr_str:='';
+   port_str:='';
+   p    :=pos(':',net_cl_svstr);
+   if(p>0)then
+   begin
+      addr_str:=copy(net_cl_svstr,1,p-1);
+      delete(net_cl_svstr,1,p);
+      port_str:=net_cl_svstr;
+   end
+   else
+   begin
+      addr_str:=net_cl_svstr;
+      port_str:='10666';
+   end;
+
+   net_cl_svport:=swap(s2w(port_str));
+   port_str:=w2s(swap(net_cl_svport));
+
+   ipc:=ip2c(addr_str,@isip);
+   if(isip)then
+   begin
+      net_cl_svip  :=ipc;
+      net_cl_svstr:=c2ip(net_cl_svip)+':'+port_str;
+   end
+   else
+   begin
+      net_cl_svstr:=addr_str+':'+port_str;
+      addr_str+=#0;
+      pstr:=@addr_str[1];
+      if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)
+      then net_cl_svip:=ipstruct.host
+      else net_cl_svip:=0;
+   end;
+end;
+
+
+
+{function ip2c(s:shortstring):cardinal;
 var i,l,r:byte;
     e:array[0..3] of byte = (0,0,0,0);
 begin
@@ -246,7 +328,7 @@ begin
    net_cl_svport :=swap(s2w(sp));
 
    net_cl_svstr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
-end;
+end; }
 
 procedure net_send_chat(targets:byte;msg:shortstring);
 begin
