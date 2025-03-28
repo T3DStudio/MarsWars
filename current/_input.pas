@@ -830,13 +830,8 @@ co_psability: ui_uhint:=_whoInPoint(mouse_map_x,mouse_map_y,5);
    if(ks_mleft=1)then                // LMB down
     if(m_bx<0)or(3<=m_bx)then        // map
      case m_brush of
-co_empty  : if(ks_ctrl>0)then
-            begin
-               //if(ks_shift>0)
-               //then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
-               //else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
-               units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3));
-            end
+co_empty  : if(ks_ctrl>0)
+            then units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3))
             else
             begin
                if(ui_uhint>0)and(ks_mleft=1)then
@@ -873,16 +868,10 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
 
       if(mouse_select_x0>-1)then //select
       begin
-         if(m_ldblclk>0)then
-            //if(ks_shift>0)
-            //then _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_adblselect,HPlayer)
-            //else _player_s_o(vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,4), uo_dblselect ,HPlayer)
-            units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3))
+         if(m_ldblclk>0)
+         then units_SelectRect(ks_shift>0,HPlayer,vid_cam_x,vid_cam_y, vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3))
          else
          begin
-            //if(ks_shift>0)
-            //then _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_aselect,HPlayer)
-            //else _player_s_o(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,uo_select ,HPlayer);
             units_SelectRect(ks_shift>0,HPlayer,mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,255);
 
             if(G_Status=gs_running)and(rpls_state<rpls_read)then
@@ -906,7 +895,7 @@ co_mmark  : MapMarker(mouse_map_x,mouse_map_y);
       u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
       if(u>0)then
        with _units[u] do hits:=hits div 2;
-   end;      }
+   end; }
 
    if(ks_mright=1)then            // RMB down
     if(m_brush<>co_empty)

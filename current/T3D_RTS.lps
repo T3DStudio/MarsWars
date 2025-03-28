@@ -8,8 +8,7 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="64" Y="15"/>
+        <CursorPos X="3" Y="4"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -63,16 +62,17 @@
       <Unit7>
         <Filename Value="_init.pas"/>
         <EditorIndex Value="41"/>
-        <TopLine Value="62"/>
+        <TopLine Value="48"/>
         <CursorPos X="24" Y="75"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="_input.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="40"/>
-        <TopLine Value="682"/>
-        <CursorPos X="140" Y="691"/>
+        <TopLine Value="883"/>
+        <CursorPos X="62" Y="903"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -95,7 +95,7 @@
         <Filename Value="_menu.pas"/>
         <EditorIndex Value="39"/>
         <TopLine Value="414"/>
-        <CursorPos X="42" Y="429"/>
+        <CursorPos X="80" Y="437"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -172,8 +172,8 @@
       <Unit21>
         <Filename Value="_units.pas"/>
         <EditorIndex Value="29"/>
-        <TopLine Value="1872"/>
-        <CursorPos X="20" Y="642"/>
+        <TopLine Value="471"/>
+        <CursorPos X="27" Y="488"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -220,8 +220,8 @@
       <Unit27>
         <Filename Value="_units_common.pas"/>
         <EditorIndex Value="25"/>
-        <TopLine Value="267"/>
-        <CursorPos X="11" Y="286"/>
+        <TopLine Value="1736"/>
+        <CursorPos X="73" Y="287"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit27>

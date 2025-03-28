@@ -484,6 +484,7 @@ wpt_heal     : if(tu^.hits<=0)
          or(tu^.uid^._zombie_uid =0)
          or(tu^.uid^._zombie_hits<tu^.hits)
          or(tu^.hits<=fdead_hits          )then exit;
+         if(tu^.player^.team=team)and(tu^.hits>0)then exit;
       end;
 
       // requirements to target
