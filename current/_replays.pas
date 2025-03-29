@@ -43,9 +43,6 @@ begin
          wr:=0;
          BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
          BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
-         BlockRead(f,vr,sizeof(map_liq     ));
-         if(vr<=7)then begin rpls_str_info+=str_m_liq+_str_mx(vr)+tc_nl3+' ';  end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
          BlockRead(f,vr,sizeof(map_obs     ));
          if(vr<=7)then begin rpls_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';  end
                   else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
@@ -102,7 +99,6 @@ begin
                  :=SizeOf(ver              )
                   +SizeOf(map_seed         )
                   +SizeOf(map_mw           )
-                  +SizeOf(map_liq          )
                   +SizeOf(map_obs          )
                   +SizeOf(map_symmetry     )
 
@@ -243,7 +239,6 @@ begin
       BlockWrite(rpls_file,ver              ,SizeOf(ver              ));
       BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
       BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
-      BlockWrite(rpls_file,map_liq          ,SizeOf(map_liq          ));
       BlockWrite(rpls_file,map_obs          ,SizeOf(map_obs          ));
       BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
 
@@ -379,7 +374,6 @@ begin
          {$I-}
          BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
          BlockRead(rpls_file,map_mw           ,SizeOf(map_mw           ));
-         BlockRead(rpls_file,map_liq          ,SizeOf(map_liq          ));
          BlockRead(rpls_file,map_obs          ,SizeOf(map_obs          ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
          BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
@@ -389,7 +383,7 @@ begin
          {$I+}
 
          if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
-         or(map_liq>7)or(map_obs>7)
+         or(map_obs>7)
          or not(g_mode in allgamemodes)
          or(rpls_player>MaxPlayers)then
          begin
@@ -510,11 +504,11 @@ begin
      if(G_Started)then
        case rpls_state of
 rpls_write : if(rpls_fstatus<>rpls_write)
-                   then replay_WriteHead
-                   else replay_WriteGameFrame;
+             then replay_WriteHead
+             else replay_WriteGameFrame;
 rpls_read  : if(rpls_fstatus<>rpls_read)
-                   then replay_Readhead
-                   else replay_ReadGameFrame;
+             then replay_Readhead
+             else replay_ReadGameFrame;
        else replay_Abort;
        end;
 end;

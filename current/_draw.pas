@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not _players[HPlayer].observer)and(rpls_state<rpls_read)
+   if(not _players[HPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)
    then UIPlayer:=HPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;

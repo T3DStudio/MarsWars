@@ -730,7 +730,6 @@ begin
    str_reset[true ]      := 'RESET';
    str_exit[false]       := 'EXIT';
    str_exit[true]        := 'BACK';
-   str_m_liq             := 'Lakes: ';
    str_m_siz             := 'Size: ';
    str_m_obs             := 'Obstacles: ';
    str_m_sym             := 'Symmetric: ';
@@ -773,7 +772,7 @@ begin
    str_inv_ml            := 'Monsters limit: ';
    str_play              := 'Play';
    str_replay            := 'RECORD';
-   str_replay_name       := 'Replay name:';
+   str_replay_name       := 'Replay prefix:';
    str_cmpdif            := 'Difficulty: ';
    str_waitsv            := 'Awaiting server...';
    str_goptions          := 'GAME OPTIONS';
@@ -1293,7 +1292,6 @@ begin
   str_reset[true ]      := 'СБРОС';
   str_exit[false]       := 'ВЫХОД';
   str_exit[true]        := 'НАЗАД';
-  str_m_liq             := 'Озера: ';
   str_m_siz             := 'Размер: ';
   str_m_obs             := 'Преграды: ';
   str_m_sym             := 'Симметрия: ';
@@ -1332,7 +1330,7 @@ begin
   str_inv_ml            := 'Армия монстров: ';
   str_play              := 'Проиграть';
   str_replay            := 'ЗАПИСЬ';
-  str_replay_name       := 'Название записи:';
+  str_replay_name       := 'Префикс записи:';
   str_cmpdif            := 'Сложность: ';
   str_waitsv            := 'Ожидание сервера...';
   str_goptions          := 'ПАРАМЕТРЫ ИГРЫ';

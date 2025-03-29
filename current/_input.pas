@@ -476,7 +476,7 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
        end;
    end
    else
-     if(_players[HPlayer].observer)then
+     if(_players[HPlayer].observer)or(GameCheckEndStatus)then
      begin
         if(click_type=pct_left)then
           case u of
@@ -612,7 +612,7 @@ sdlk_tab: begin
          end;
         end
         else
-          if(_players[HPlayer].observer)then
+          if(_players[HPlayer].observer)or(GameCheckEndStatus)then
           begin
              for ko:=0 to _mhkeys do  // observer
              begin

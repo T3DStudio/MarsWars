@@ -96,7 +96,6 @@ begin
    net_writebyte(HPlayer     );
 
    net_writeint (map_mw      );
-   net_writebyte(map_liq     );
    net_writebyte(map_obs     );
    net_writecard(map_seed    );
    net_writebool(map_symmetry);
@@ -326,7 +325,6 @@ begin
    new_map    :=false;
 
    if(_rmInt (@map_mw           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@map_liq          ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmByte(@map_obs          ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmCard(@map_seed         ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmBool(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;

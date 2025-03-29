@@ -66,7 +66,6 @@ map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_b1            : integer  = 0;
 map_obs           : byte     = 1;
-map_liq           : byte     = 1;
 map_symmetry      : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
@@ -801,7 +800,6 @@ str_production_busy,
 str_cant_advanced,
 str_NeedMoreProd,
 str_MaximumReached,
-str_m_liq,
 str_m_siz,
 str_m_obs,
 str_m_sym,

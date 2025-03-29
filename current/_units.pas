@@ -1053,8 +1053,8 @@ begin
               _teleport_CalcReload(tu,_limituse);
               _ability_teleport:=true;
            end;
-        end
-        else
+        end;
+        {else
           if(tu^.player^.upgr[upgr_hell_rteleport]>0)and(td>base_1r)then
            if(tu^.rld<=0)then
            begin
@@ -1070,7 +1070,7 @@ begin
               uo_x  :=x;
               uo_y  :=y;
               _ability_teleport:=true;
-           end;
+           end;  }
 end;
 
 function _unit_load(pu,tu:PTUnit):boolean;

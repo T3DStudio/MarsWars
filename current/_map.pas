@@ -417,7 +417,7 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
-   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+30))then         //_dec_min_r(t,td)
+   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+40))then         //_dec_min_r(t,td)
    begin
       _dnear:=true;
       break;
@@ -515,18 +515,10 @@ begin
    rks :=0;
    lqs :=0;
 
-   if(map_obs>0)then
-   begin
-      i:=(ddc div 8);
-      if(map_liq>0)then
-      begin
-         ix :=(i*map_obs);
-         lqs:=max2(map_liq,(ix div 8)*map_liq);
-         rks:=max2(map_obs,ix-lqs);
-      end
-      else rks:=max2(map_obs,i*map_obs);
-   end
-   else lqs:=max2(map_liq,(ddc div 80)*map_liq);
+   i  :=(ddc div 8);
+   ix :=i*map_obs;
+   rks:=ix div 2;
+   lqs:=rks;
 
    ir :=base_1r+(map_mw div 100);
    ix :=map_seed;
@@ -570,7 +562,6 @@ begin
    Map_randomseed;
 
    map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/StepSMap)*StepSMap;
-   map_liq:=random(8);
    map_obs:=random(8);
    map_symmetry:=random(2)>0;
 end;

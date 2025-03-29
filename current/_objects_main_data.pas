@@ -125,7 +125,6 @@ begin
    _btime     := ptime3;
    _ukbuilding:= true;
    _isbuilder := true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HSymbol2,UID_HAKeep,UID_HTotem];
    _upgr_srange     :=upgr_hell_buildr;
@@ -155,7 +154,6 @@ begin
    _barrack_teleport:=true;
    _ukbuilding:= true;
    _isbarrack := true;
-   //_base_armor:= BaseArmorBonus2;
    _baseregen := BaseArmorBonus1;
    ups_units  := [UID_Imp..UID_Archvile];
    _rebuild_uid  := i;
@@ -1260,7 +1258,6 @@ begin
    _attack    := atm_none;
    _ukmech    := true;
    _splashresist:=true;
-   _slowturn  := false;
    _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;
    ups_transport:=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];

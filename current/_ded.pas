@@ -114,7 +114,7 @@ begin
 '-h',
 '-help'  : begin
               GameLogCommon(0,log_to_all,'MarsWars dedicated server, '+str_ver  ,false);
-              GameLogCommon(0,log_to_all,'New map: -m [seed size lakes obs sym]',false);
+              GameLogCommon(0,log_to_all,'New map: -m [seed size obs sym]'      ,false);
               GameLogCommon(0,log_to_all,'Add AI player: -p [R/H/U team skill]' ,false);
               GameLogCommon(0,log_to_all,'Remove all AI players: -noai'         ,false);
               GameLogCommon(0,log_to_all,'Set 1..6 teams to AI players: -ffa'   ,false);
@@ -129,15 +129,14 @@ begin
 
            exit;
            end;
-'-m'     : if(a<6)
+'-m'     : if(a<5)
            then GameLogCommon(0,log_to_all,'command syntax error, see -h',false)
            else
            begin
               map_seed    :=s2c(args[1]);
               map_mw      :=mm3(MinSMapW, s2i(args[2]), MaxSMapW);
-              map_liq     :=min2(7,s2b(args[3]));
-              map_obs     :=min2(7,s2b(args[4]));
-              map_symmetry:=_str2b(args[5]);
+              map_obs     :=min2(7,s2b(args[3]));
+              map_symmetry:=_str2b(args[4]);
               Map_premap;
            end;
 '-p'     : if(a<3)
@@ -289,8 +288,8 @@ begin
       10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_generators]);
       11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]         );
       12: writeln;
-      13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_liq       ,35, str_m_obs       ,45,str_m_sym        ,56);
-      14: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25, _str_mx(map_liq),35, _str_mx(map_obs),45,b2c[map_symmetry],56);
+      13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_obs        ,35,str_m_sym        ,45,'',56);
+      14: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25,  _str_mx(map_obs),35,b2c[map_symmetry],45,'',56);
       15: writeln;
       16: ps(0);
       18: ps(1);

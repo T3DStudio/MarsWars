@@ -474,7 +474,7 @@ begin
          PlayersButtoms;
       end
       else
-        if(_players[HPlayer].observer)then
+        if(_players[HPlayer].observer)or(GameCheckEndStatus)then
         begin
            _drawBtn(tar,0,0,spr_b_rfog ,rpls_fog    ,false);
 
@@ -595,7 +595,7 @@ begin
                 if(rpls_state>=rpls_read)
                 then hs1:=@str_hint_r[i]
                 else
-                  if(_players[HPlayer].observer)
+                  if(_players[HPlayer].observer)or(GameCheckEndStatus)
                   then hs1:=@str_hint_o[i]
                   else
                   begin

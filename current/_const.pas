@@ -1481,7 +1481,6 @@ str_gsettings            : shortstring = 'Game settings:';
 str_map                  : shortstring = 'Map';
 
 str_m_seed               : shortstring = 'Seed';
-str_m_liq                : shortstring = 'Lakes';
 str_m_siz                : shortstring = 'Size';
 str_m_obs                : shortstring = 'Obstacles';
 str_m_sym                : shortstring = 'Symmetry';

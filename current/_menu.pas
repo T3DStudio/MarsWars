@@ -280,9 +280,8 @@ begin
       ///  MAP
       50 : ;
       51 : begin ScrollInt (@map_mw,StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin ScrollByte(@map_liq,true,0,7); Map_premap;end;
-      53 : begin ScrollByte(@map_obs,true,0,7); Map_premap;end;
-      54 : begin map_symmetry:=not map_symmetry; Map_premap;end;
+      52 : begin ScrollByte(@map_obs,true,0,7); Map_premap;end;
+      53 : begin map_symmetry:=not map_symmetry; Map_premap;end;
       56 : begin Map_randommap; Map_premap;end;
 
 
@@ -439,8 +438,7 @@ begin
       // MAP
       50 : begin Map_randomseed;                                  Map_premap;end;
       51 : begin ScrollInt (@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin ScrollByte(@map_liq,false,0,7);                  Map_premap;end;
-      53 : begin ScrollByte(@map_obs,false,0,7);                  Map_premap;end;
+      52 : begin ScrollByte(@map_obs,false,0,7);                  Map_premap;end;
 
       60 : begin
               p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys)+1;

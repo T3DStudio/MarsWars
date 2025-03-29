@@ -1036,6 +1036,11 @@ end;
 
 {$IFDEF _FULLGAME}
 
+function GameCheckEndStatus:boolean;
+begin
+   GameCheckEndStatus:=(gs_win_team0<=G_status)and(G_status<=gs_win_team6);
+end;
+
 function str_DateTime:shortstring;
 var YY,MM,DD,H,M,S,MS:word;
 function w2sZ(v,l:word):shortstring;

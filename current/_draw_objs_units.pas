@@ -214,7 +214,11 @@ begin
              then break
              else ui_ProductionCounters(pu,i);
          end;
-         if(sel)and(_UnitHaveRPoint(pu^.uidi))then SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
+         if(sel)and(_UnitHaveRPoint(pu^.uidi))then
+         begin
+            UnitsInfoAddLine(x,y,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+            SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
+         end;
       end;
 
       if(iscomplete)then
