@@ -180,7 +180,7 @@ begin
 
       2  : if(G_Started)then
            begin
-              if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)then
+              if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)then
               begin
                  case net_status  of
                  ns_server,

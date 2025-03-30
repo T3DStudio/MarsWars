@@ -83,9 +83,27 @@ end;
 
 procedure d_BuildUI(tar:pSDL_Surface;lx,ly:integer);
 var spr:PTMWTexture;
-      i:integer;
  dunit:TUnit;
 pdunit:PTUnit;
+procedure DrawNoBuildAreas;
+var i:integer;
+begin
+   // points areas
+   for i:=1 to MaxCPoints do
+    with g_cpoints[i] do
+     if(cpCaptureR>0)and(cpNoBuildR>0)then
+      circleColor(tar,
+      lx+cpx-vid_cam_x,
+      ly+cpy-vid_cam_y,
+      cpNoBuildR,c_blue);
+
+   // map build rect
+   rectangleColor(tar,
+   lx+map_b0-vid_cam_x,ly+map_b0-vid_cam_y,
+   lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
+   c_white);
+end;
+
 begin
    m_brushx-=vid_cam_x-lx;
    m_brushy-=vid_cam_y-ly;
@@ -120,20 +138,7 @@ begin
          then circleColor(tar,m_brushx,m_brushy,dunit.srange,r_blink2_color_BG);
       end;
 
-      // points areas
-      for i:=1 to MaxCPoints do
-       with g_cpoints[i] do
-        if(cpCaptureR>0)and(cpNoBuildR>0)then
-         circleColor(tar,
-         lx+cpx-vid_cam_x,
-         ly+cpy-vid_cam_y,
-         cpNoBuildR,c_blue);
-
-      // map build rect
-      rectangleColor(tar,
-      lx+map_b0-vid_cam_x,ly+map_b0-vid_cam_y,
-      lx+map_b1-vid_cam_x,ly+map_b1-vid_cam_y,
-      c_white);
+      DrawNoBuildAreas;
    end;
 co_psability:
     if(ui_uibtn_pabilityu<>nil)then
@@ -148,6 +153,7 @@ uab_RebuildInPoint: begin
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
                     circleColor(tar,m_brushx,m_brushy,_uids[_rebuild_uid]._r,c_gray);
+                    DrawNoBuildAreas;
                     end;
 uab_HTowerBlink,
 uab_HKeepBlink,
@@ -158,6 +164,7 @@ uab_CCFly         : begin
                     SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
                     circleColor(tar,m_brushx,m_brushy,_r,c_gray);
+                    DrawNoBuildAreas;
                     end;
         end;
    end;

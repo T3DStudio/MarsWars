@@ -124,7 +124,7 @@ begin
               GameLogCommon(0,log_to_all,'  the hill, -rb - royal battle'       ,false);
               GameLogCommon(0,log_to_all,'Fixed player starts: -fp'             ,false);
               GameLogCommon(0,log_to_all,'Fill empty slots with AI: -fs 0-11'   ,false);
-              GameLogCommon(0,log_to_all,'Neytral generators: -ng 0-5'          ,false);
+              GameLogCommon(0,log_to_all,'Neutral generators: -ng 0-5'          ,false);
               GameLogCommon(0,log_to_all,'Observer mode after lose: -lo'        ,false);
 
            exit;

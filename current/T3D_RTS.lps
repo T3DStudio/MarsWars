@@ -8,7 +8,7 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="44" Y="14"/>
+        <CursorPos X="3" Y="4"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -55,13 +55,13 @@
         <Filename Value="_common.pas"/>
         <EditorIndex Value="4"/>
         <TopLine Value="314"/>
-        <CursorPos X="20" Y="337"/>
+        <CursorPos X="55" Y="337"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="_init.pas"/>
-        <EditorIndex Value="42"/>
+        <EditorIndex Value="41"/>
         <TopLine Value="48"/>
         <CursorPos X="24" Y="75"/>
         <UsageCount Value="100"/>
@@ -69,18 +69,17 @@
       </Unit7>
       <Unit8>
         <Filename Value="_input.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="40"/>
         <TopLine Value="755"/>
-        <CursorPos X="60" Y="769"/>
+        <CursorPos X="78" Y="764"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="_draw_menu.pas"/>
         <EditorIndex Value="18"/>
-        <TopLine Value="520"/>
-        <CursorPos X="20" Y="537"/>
+        <TopLine Value="533"/>
+        <CursorPos X="92" Y="543"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit9>
@@ -94,16 +93,16 @@
       <Unit11>
         <Filename Value="_menu.pas"/>
         <EditorIndex Value="39"/>
-        <TopLine Value="180"/>
-        <CursorPos X="76" Y="188"/>
+        <TopLine Value="155"/>
+        <CursorPos X="96" Y="183"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="_lang.pas"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="781"/>
-        <CursorPos X="109" Y="813"/>
+        <TopLine Value="901"/>
+        <CursorPos X="75" Y="914"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -134,8 +133,8 @@
       <Unit16>
         <Filename Value="_draw_ui.pas"/>
         <EditorIndex Value="14"/>
-        <TopLine Value="48"/>
-        <CursorPos X="66" Y="59"/>
+        <TopLine Value="73"/>
+        <CursorPos X="77" Y="86"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit16>
@@ -173,8 +172,8 @@
       <Unit21>
         <Filename Value="_units.pas"/>
         <EditorIndex Value="29"/>
-        <TopLine Value="442"/>
-        <CursorPos X="58" Y="468"/>
+        <TopLine Value="818"/>
+        <CursorPos X="11" Y="764"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -213,32 +212,32 @@
       <Unit26>
         <Filename Value="_unit_client.pas"/>
         <EditorIndex Value="31"/>
-        <TopLine Value="1203"/>
-        <CursorPos X="92" Y="1210"/>
+        <TopLine Value="954"/>
+        <CursorPos X="51" Y="966"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit26>
       <Unit27>
         <Filename Value="_units_common.pas"/>
         <EditorIndex Value="25"/>
-        <TopLine Value="1737"/>
-        <CursorPos X="101" Y="1742"/>
+        <TopLine Value="1554"/>
+        <CursorPos X="30" Y="1575"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit27>
       <Unit28>
         <Filename Value="_ded.pas"/>
         <EditorIndex Value="33"/>
-        <TopLine Value="152"/>
-        <CursorPos Y="162"/>
+        <TopLine Value="109"/>
+        <CursorPos X="48" Y="125"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="_draw_game.pas"/>
         <EditorIndex Value="15"/>
-        <TopLine Value="364"/>
-        <CursorPos X="65" Y="374"/>
+        <TopLine Value="540"/>
+        <CursorPos X="21" Y="506"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit29>
@@ -260,9 +259,10 @@
       </Unit31>
       <Unit32>
         <Filename Value="_draw_objs_units.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="16"/>
-        <TopLine Value="325"/>
-        <CursorPos X="41" Y="343"/>
+        <TopLine Value="540"/>
+        <CursorPos X="36" Y="559"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -343,137 +343,136 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1694"/>
         <CursorPos X="3" Y="1713"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit42>
       <Unit43>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <EditorIndex Value="41"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="989"/>
         <CursorPos X="16" Y="1032"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="12"/>
       </Unit43>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="_game.pas"/>
-        <Caret Line="303" Column="29" TopLine="289"/>
-      </Position1>
-      <Position2>
-        <Filename Value="_game.pas"/>
-        <Caret Line="175" Column="10" TopLine="157"/>
-      </Position2>
-      <Position3>
-        <Filename Value="_game.pas"/>
-        <Caret Line="302" Column="13" TopLine="272"/>
-      </Position3>
-      <Position4>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="203" Column="73" TopLine="199"/>
-      </Position4>
-      <Position5>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="460" Column="44" TopLine="432"/>
-      </Position5>
-      <Position6>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="459" Column="38" TopLine="434"/>
-      </Position6>
-      <Position7>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="455" Column="62" TopLine="434"/>
-      </Position7>
-      <Position8>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="459" Column="38" TopLine="434"/>
-      </Position8>
-      <Position9>
-        <Filename Value="_net_game.pas"/>
-        <Caret Line="459" Column="38" TopLine="446"/>
-      </Position9>
-      <Position10>
-        <Filename Value="_common.pas"/>
-        <Caret Line="373" Column="48" TopLine="363"/>
-      </Position10>
-      <Position11>
-        <Filename Value="_draw_objs_units.pas"/>
-        <Caret Line="363" Column="8" TopLine="346"/>
-      </Position11>
-      <Position12>
-        <Filename Value="_draw_objs_units.pas"/>
-        <Caret Line="360" Column="67" TopLine="346"/>
-      </Position12>
-      <Position13>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1043" Column="162" TopLine="1040"/>
-      </Position13>
-      <Position14>
         <Filename Value="_ded.pas"/>
         <Caret Line="142" Column="34" TopLine="151"/>
-      </Position14>
-      <Position15>
+      </Position1>
+      <Position2>
         <Filename Value="_common.pas"/>
         <Caret Line="337" Column="14" TopLine="314"/>
-      </Position15>
-      <Position16>
+      </Position2>
+      <Position3>
         <Filename Value="_draw_ui.pas"/>
         <Caret Line="688" Column="54" TopLine="681"/>
-      </Position16>
-      <Position17>
+      </Position3>
+      <Position4>
         <Filename Value="_draw_ui.pas"/>
         <Caret Line="64" Column="75" TopLine="47"/>
-      </Position17>
-      <Position18>
+      </Position4>
+      <Position5>
         <Filename Value="_draw_game.pas"/>
         <Caret Line="337" Column="54" TopLine="331"/>
-      </Position18>
-      <Position19>
+      </Position5>
+      <Position6>
         <Filename Value="_input.pas"/>
         <Caret Line="615" Column="63" TopLine="754"/>
+      </Position6>
+      <Position7>
+        <Filename Value="_draw.pas"/>
+        <Caret Line="12" Column="33"/>
+      </Position7>
+      <Position8>
+        <Filename Value="_draw_game.pas"/>
+        <Caret Line="507" Column="19" TopLine="492"/>
+      </Position8>
+      <Position9>
+        <Filename Value="_draw.pas"/>
+        <Caret Line="12" Column="33"/>
+      </Position9>
+      <Position10>
+        <Filename Value="_draw_ui.pas"/>
+        <Caret Line="800" Column="11" TopLine="769"/>
+      </Position10>
+      <Position11>
+        <Filename Value="_draw_ui.pas"/>
+        <Caret Line="52" Column="19" TopLine="33"/>
+      </Position11>
+      <Position12>
+        <Filename Value="_unit_client.pas"/>
+        <Caret Line="1222" Column="67" TopLine="1191"/>
+      </Position12>
+      <Position13>
+        <Filename Value="_draw_menu.pas"/>
+        <Caret Line="543" Column="106" TopLine="523"/>
+      </Position13>
+      <Position14>
+        <Filename Value="_draw_menu.pas"/>
+        <Caret Line="411" Column="108" TopLine="392"/>
+      </Position14>
+      <Position15>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="787" Column="63" TopLine="781"/>
+      </Position15>
+      <Position16>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="942" Column="37" TopLine="897"/>
+      </Position16>
+      <Position17>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="943" Column="37" TopLine="898"/>
+      </Position17>
+      <Position18>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="944" Column="37" TopLine="899"/>
+      </Position18>
+      <Position19>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="945" Column="37" TopLine="900"/>
       </Position19>
       <Position20>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="666" Column="28" TopLine="650"/>
+        <Filename Value="_lang.pas"/>
+        <Caret Line="946" Column="37" TopLine="901"/>
       </Position20>
       <Position21>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="667" Column="26" TopLine="650"/>
+        <Filename Value="_ded.pas"/>
+        <Caret Line="159" Column="71" TopLine="152"/>
       </Position21>
       <Position22>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1322" Column="57" TopLine="1276"/>
+        <Filename Value="_units.pas"/>
+        <Caret Line="1877" Column="106" TopLine="1861"/>
       </Position22>
       <Position23>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1500" Column="73" TopLine="1454"/>
+        <Filename Value="_draw_objs_units.pas"/>
+        <Caret Line="579" Column="28" TopLine="533"/>
       </Position23>
       <Position24>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1501" Column="43" TopLine="1455"/>
+        <Filename Value="_draw_objs_units.pas"/>
+        <Caret Line="400" TopLine="375"/>
       </Position24>
       <Position25>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1503" Column="38" TopLine="1457"/>
+        <Filename Value="_draw_objs_units.pas"/>
+        <Caret Line="515" TopLine="470"/>
       </Position25>
       <Position26>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1540" Column="31" TopLine="1494"/>
+        <Filename Value="T3D_RTS.lpr"/>
+        <Caret Line="4" Column="3"/>
       </Position26>
       <Position27>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="1675" Column="61" TopLine="1629"/>
+        <Filename Value="_units.pas"/>
+        <Caret Line="1890" Column="44" TopLine="1872"/>
       </Position27>
       <Position28>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="15" Column="119"/>
+        <Filename Value="_units.pas"/>
+        <Caret Line="764" Column="11" TopLine="818"/>
       </Position28>
       <Position29>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="505" Column="15" TopLine="468"/>
+        <Filename Value="_units_common.pas"/>
+        <Caret Line="1584" Column="49" TopLine="1554"/>
       </Position29>
       <Position30>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\sdl\src\sdl.pas"/>
-        <Caret Line="628" Column="65" TopLine="594"/>
+        <Filename Value="_units_common.pas"/>
+        <Caret Line="1575" Column="30" TopLine="1554"/>
       </Position30>
     </JumpHistory>
     <RunParams>

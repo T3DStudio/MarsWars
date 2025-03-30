@@ -540,7 +540,7 @@ false: begin
        end;
 true : begin
           _draw_text(tar, 70,554, str_back , ta_middle,255, c_white);
-          if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)
+          if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)
           then _draw_text(tar,730,554, str_surrender, ta_middle,255, c_white)
           else _draw_text(tar,730,554, str_quit     , ta_middle,255, c_white)
        end;

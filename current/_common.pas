@@ -333,12 +333,13 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer(ThisPlayer);
 
-         if((amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer))
-         or(amtype=lmt_game_end)then
-         begin
-            ui_tab:=3;
-            UIPlayer:=0;
-         end;
+         if(rpls_state<rpls_read)then
+           if((amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer))
+           or(amtype=lmt_game_end)then
+           begin
+              ui_tab:=3;
+              UIPlayer:=0;
+           end;
       end;
       {$ENDIF}
    end;

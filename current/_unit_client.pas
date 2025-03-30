@@ -362,7 +362,7 @@ begin
           else
           begin
              _wudata_byte(b or %00000011,rpl);
-             _wudata_byte((cpLifeTime div fr_fps1) shr 2,rpl);
+             _wudata_byte((cpLifeTime div fr_fps1) div 5,rpl);
           end;
        end;
     end;
@@ -1221,7 +1221,7 @@ begin
                then _rudata_rld(@cpTimer,rpl)
                else cpTimer:=0;
             end;
-%00000011 : cpLifeTime:=(_rudata_byte(rpl,0)*fr_fps1) shl 2;
+%00000011 : cpLifeTime:=(_rudata_byte(rpl,0)*fr_fps1)*5;
          end;
       end;
    end;
