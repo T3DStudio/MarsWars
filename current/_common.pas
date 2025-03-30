@@ -1191,7 +1191,7 @@ begin
    if(not rpls_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_read)or(_players[HPlayer].observer)then exit;
+     if(rpls_state>=rpls_read)or(_players[HPlayer].observer)or(GameCheckEndStatus)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=_players[UIPlayer].team)then exit;
@@ -1207,7 +1207,7 @@ begin
      if(RectInCam(vx,vy,_r,_r,0))then
      begin
         if(UIPlayer=0)then
-          if(rpls_state=rpls_read)or(_players[HPlayer].observer)then
+          if(rpls_state=rpls_read)or(_players[HPlayer].observer)or(GameCheckEndStatus)then
           begin
              CheckUnitUIVisionScreen:=true;
              exit;

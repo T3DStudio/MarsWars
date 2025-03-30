@@ -164,7 +164,7 @@ Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level+1]"{
 
 ---------------------------
 
-Imp`s Tower
+Guard Tower
 
 Hotkey: V
 Categories/Attributes: [building,mechanical,light,ground]
@@ -177,13 +177,13 @@ Energy required: 200
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive] except [Imp`s Tower,Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +16;
 - Building Restoration - hits regeneration +7;
 
-Defensive structure. Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Basic defensive structure. Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
@@ -290,7 +290,7 @@ Upgrades:
 - Stone Walls - armor +16;
 - Building Restoration - hits regeneration +7;
 
-Advanced defensive structure. Can be rebuilt into "Imp`s Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
+Advanced defensive structure. Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}.
 
 ---------------------------
 
@@ -349,7 +349,7 @@ Energy required: 900
 
 Constructed by: Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +16;
@@ -372,7 +372,7 @@ Energy required: 300
 
 
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: 250, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +16;
@@ -471,8 +471,8 @@ Places in transport: 1
 
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive] except [Imp`s Tower,Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
-- melee attack, targets: [Imp`s Tower,Imp], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- melee attack, targets: [Imp], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1847,7 +1847,7 @@ Requirements: Castle of Damned
 
 Tower Teleportation Charge (Ctrl+H,200,30,x15,*)
 
-Charges for ability of Imp`s Tower and Totem of Horror.
+Charges for ability of Guard Tower and Totem of Horror.
 Requirements: Castle of Damned
 
 Weapons Upgrade (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)

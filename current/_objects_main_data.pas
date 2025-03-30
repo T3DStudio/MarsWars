@@ -294,7 +294,7 @@ begin
    _upgr_srange_step:=25;
    _rebuild_uid :=UID_HTotem;
    _rebuild_ruid:=UID_HFortress;
-   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Imp,UID_HTower],[],0,-26,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
+   _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Imp],[],0,-26,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
 end;
 UID_HTotem:
 begin
@@ -361,8 +361,8 @@ begin
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiFlyRange:=-50;
-   _weapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Imp,UID_HTower],[],0,-5,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
-   _weapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1,0      ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Imp,UID_HTower],[],0, 0,wtp_distance    ,0,0);
+   _weapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Imp],[],0,-5,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
+   _weapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1,0      ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Imp],[],0, 0,wtp_distance    ,0,0);
 end;
 UID_Demon     :
 begin
@@ -822,7 +822,7 @@ begin
       ups_transport    :=uids_demons;
 
       _upgr_srange     :=upgr_hell_buildr;
-      _weapon(0,wpt_missle,_srange,_r,0,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp,UID_HTower],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
+      _weapon(0,wpt_missle,_srange,_r,0,fr_fps1,MID_Imp,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
 
       if(i=UID_HACommandCenter)then
       begin
@@ -1508,7 +1508,7 @@ end;
 
 // nodamage uids
 case m of
-MID_Imp            : mid_nodamage    :=[UID_Imp        ,UID_HTower];
+MID_Imp            : mid_nodamage    :=[UID_Imp        ];
 MID_Cacodemon      : mid_nodamage    :=[UID_Cacodemon  ];
 MID_Baron          : mid_nodamage    :=[UID_Knight,
                                         UID_Baron      ];

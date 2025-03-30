@@ -45,8 +45,7 @@ Most important balance changes:
 - "Cyberdemon": now takes 10 limit instead of 12, health, damage and cost have been proportionally reduced;
 - Health of the main Hell buildings (all except generators, static defense and "Evil Eye") increased by 2500; the same buildings now have initial health regeneration;
 - "Advanced Command Center"/"Great Hell Keep" now give more energy (increased by 300);
-- "Guard Tower" renamed to "Imp`s Tower"; "Imp`s Tower" can no longer attack other "Imp`s Towers"; "Imp" can no longer attack "Imp`s Towers" with long-range attacks;
-- "Imp`s Tower" can now be rebuilt into "Totem Of Horror" and "Totem Of Horror" back into "Imp`s Tower"; you cannot get "Totem Of Horror" without building "Imp`s Tower";
+- "Guard Tower" can now be rebuilt into "Totem Of Horror" and "Totem Of Horror" back into "Guard Tower"; you cannot get "Totem Of Horror" without building "Guard Tower";
 - "UAC Fighter": removed missile attack on air units; removed upgrade that allows "laser" attack on ground targets - now this unit can attack both ground and air units with "laser" attack at once; multiplier *2 on ground light units/buildings;
 - "UAC Terminator": added upgrade that allows attacking air units; air attack is less effective than Antiaircrafter;
 - "Anti-ground/air Turret" now has a "special ability" to deconstruct this turret in "UAC Drone"; "Drone Transformation Protocol" upgrade required;

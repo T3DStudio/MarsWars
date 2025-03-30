@@ -870,7 +870,7 @@ uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike
 
 PlayerMaxBuilders      = 4;
 
-g_step_koth_pause      = ptime1*fr_fps1*6;
+g_step_koth_pause      = fr_fps1*120;
 
 fr_mancubus_rld        = fr_fps2+fr_fpsd2;  //2.5
 fr_mancubus_rld_s1     = fr_fps2-fr_fpsd6;

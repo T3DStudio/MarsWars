@@ -998,7 +998,7 @@ begin
    _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
    _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
    _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
-   _mkHStrUid(UID_HTower         ,'Imp`s Tower'                 ,'Defensive structure'              );
+   _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Basic defensive structure'        );
    _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
    _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'');
    _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
@@ -1051,7 +1051,7 @@ begin
    _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
    _mkHStrUpid(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
    _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
-   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Imp`s Tower and Totem of Horror');
+   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
    _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
 
 
@@ -1526,7 +1526,7 @@ begin
   _mkHStrUid(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
   _mkHStrUid(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
   _mkHStrUid(UID_HFortress       ,'Замок Проклятых'            ,'');
-  _mkHStrUid(UID_HTower          ,'Башня Импов'                ,'Защитное сооружение'                  );
+  _mkHStrUid(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
   _mkHStrUid(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
   _mkHStrUid(UID_HAltar          ,'Алтарь Боли'                ,'');
   _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
@@ -1564,7 +1564,7 @@ begin
   _mkHStrUpid(upgr_hell_heye      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
   _mkHStrUpid(upgr_hell_totminv   ,'Невидимость Тотема Ужаса'      ,''                               );
   _mkHStrUpid(upgr_hell_bldrep    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
-  _mkHStrUpid(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Башни Импов и Тотема Ужаса');
+  _mkHStrUpid(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Сторожевой Башни и Тотема Ужаса');
   _mkHStrUpid(upgr_hell_resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
 
 
