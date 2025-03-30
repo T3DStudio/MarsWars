@@ -361,6 +361,15 @@ begin
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;
+procedure net_surrender;
+begin
+   if(net_status=ns_client)then
+   begin
+      net_clearbuffer;
+      net_writebyte(nmid_player_surrender);
+      net_send(net_cl_svip,net_cl_svport);
+   end;
+end;
 
 procedure net_swapp(p1:byte);
 begin

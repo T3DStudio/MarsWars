@@ -726,10 +726,11 @@ begin
    str_menu_s3[ms3_game] := 'GAME';
    str_menu_s3[ms3_vido] := 'VIDEO';
    str_menu_s3[ms3_sond] := 'SOUND';
-   str_reset[false]      := 'START';
-   str_reset[true ]      := 'RESET';
-   str_exit[false]       := 'EXIT';
-   str_exit[true]        := 'BACK';
+   str_start             := 'START';
+   str_surrender         := 'SURRENDER';
+   str_quit              := 'QUIT';
+   str_exit              := 'EXIT';
+   str_back              := 'BACK';
    str_m_siz             := 'Size: ';
    str_m_obs             := 'Obstacles: ';
    str_m_sym             := 'Symmetric: ';
@@ -784,6 +785,7 @@ begin
    str_randoms           := 'Random skirmish';
    str_apply             := 'apply';
    str_plout             := ' left the game';
+   str_player_surrender  := ' surrenders!';
    str_aislots           := 'Fill empty slots:';
    str_resol             := 'Resolution';
    str_language          := 'UI language';
@@ -799,7 +801,7 @@ begin
    str_kothwinner        := ' is King of the Hill!';
    str_DeadObservers     := 'Observer mode after lose:';
    str_menu_scale        := 'Menu scaling';
-   str_menu_scales       := 'Scaled menu smoothyng';
+   str_menu_scales       := 'Smooth scaled menu';
    str_FPS               := 'Show FPS';
    str_APM               := 'Show APM';
    str_ability           := 'Special ability: ';
@@ -814,7 +816,7 @@ begin
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
    str_MusicListSize     := 'Music playlist size';
-   str_menu_controls     := '-use the left and right mouse buttons to manipulate the menu items-';
+   str_menu_controls     := '- use the left and right mouse buttons to manipulate the menu items -';
    str_RecordingStart    := 'Start recording: ';
    str_RecordingStop     := 'Stop recording: ';
 
@@ -1288,10 +1290,11 @@ begin
   str_menu_s3[ms3_game] := 'ИГРА';
   str_menu_s3[ms3_vido] := 'ГРАФИКА';
   str_menu_s3[ms3_sond] := 'ЗВУК';
-  str_reset[false]      := 'НАЧАТЬ';
-  str_reset[true ]      := 'СБРОС';
-  str_exit[false]       := 'ВЫХОД';
-  str_exit[true]        := 'НАЗАД';
+  str_start             := 'НАЧАТЬ';
+  str_surrender         := 'СДАТЬСЯ';
+  str_quit              := 'ВЫЙТИ';
+  str_exit              := 'ВЫХОД';
+  str_back              := 'НАЗАД';
   str_m_siz             := 'Размер: ';
   str_m_obs             := 'Преграды: ';
   str_m_sym             := 'Симметрия: ';
@@ -1342,6 +1345,7 @@ begin
   str_randoms           := 'Случайная схватка';
   str_apply             := 'применить';
   str_plout             := ' покинул игру';
+  str_player_surrender  := ' сдается!';
   str_aislots           := 'Заполнить пустые слоты:';
   str_resol             := 'Разрешение';
   str_language          := 'Язык интерфейса';
@@ -1372,7 +1376,7 @@ begin
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
   str_MusicListSize     := 'Размер плейлиста';
-  str_menu_controls     := '-используйте левую и правую кнопки мыши для управления пунктами меню-';
+  str_menu_controls     := '- используйте левую и правую кнопки мыши для управления пунктами меню -';
   str_RecordingStart    := 'Начало записи: ';
   str_RecordingStop     := 'Остановка записи: ';
 

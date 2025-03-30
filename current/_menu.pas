@@ -18,15 +18,24 @@ begin
    StringApplyInput:=s;
 end;
 
+procedure menu_disconnect;
+begin
+   net_disconnect;
+   net_dispose;
+   GameDefaultAll;
+   G_started  :=false;
+   PlayerReady:=false;
+   net_status :=ns_none;
+end;
+
 procedure MenuItem;
 begin
    menu_item:=0;
 
    if(544<mouse_y)and(mouse_y<571)then
    begin
-      if(32 <mouse_x)and(mouse_x<107)then menu_item:=1;     // exit
-      if(net_status<>ns_client)then
-       if(692<mouse_x)and(mouse_x<767)then menu_item:=2;    // start
+      if(32 <mouse_x)and(mouse_x<107)then menu_item:=1;    // left
+      if(692<mouse_x)and(mouse_x<767)then menu_item:=2;    // right
    end;
 
    if(ui_menu_ssr_x0<mouse_x)and(mouse_x<ui_menu_ssr_x1)and(ui_menu_ssr_y0<mouse_y)and(mouse_y<ui_menu_ssr_y1)then
@@ -162,15 +171,40 @@ begin
       vid_menu_redraw:=true;
       SoundPlayUI(snd_click);
    end;
-
    if(ks_mleft=1)then              // left button pressed
    begin
       case menu_item of
       1  : if(G_Started)
-                 then ToggleMenu
-                 else GameCycle:=false;
-      2  : GameMakeReset;    // start/break game
+           then ToggleMenu
+           else GameCycle:=false;
 
+      2  : if(G_Started)then
+           begin
+              if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)then
+              begin
+                 case net_status  of
+                 ns_server,
+                 ns_none   : begin
+                             GameLogPlayerSurrender(HPlayer);
+                             PlayerKill(HPlayer,true);
+                             end;
+                 ns_client : net_surrender;// send surrender command, toggle menu
+                 end;
+                 ToggleMenu;
+              end
+              else
+                case net_status  of
+                ns_server,
+                ns_none   : GameMakeReset;
+                ns_client : menu_disconnect;// disconnet
+                end
+           end
+           else
+             case net_status  of
+             ns_server,
+             ns_none   : GameMakeReset;
+             ns_client : ;
+             end;
       /// SETTINGS SAVE REPLAYS
 
       3  : menu_s1:=ms1_sett;
@@ -371,15 +405,8 @@ begin
       89 : if(net_status<>ns_server)and(mouse_x>ui_menu_csm_xc)then
            if(net_status=ns_client)or(G_Started=false)then
            begin
-              if(net_status=ns_client)then
-              begin
-                 net_disconnect;
-                 net_dispose;
-                 GameDefaultAll;
-                 G_started  :=false;
-                 PlayerReady:=false;
-                 net_status :=ns_none;
-              end
+              if(net_status=ns_client)
+              then menu_disconnect
               else
               begin
                  net_status:=ns_client;

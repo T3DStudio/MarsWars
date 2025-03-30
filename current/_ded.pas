@@ -139,7 +139,7 @@ begin
               map_symmetry:=_str2b(args[4]);
               Map_premap;
            end;
-'-p'     : if(a<3)
+'-p'     : if(a<4)
            then with _players[pl] do Dedicated_NewAI(race,team,player_default_ai_level)
            else Dedicated_NewAI(_a2r(args[1]), mm3(1,s2b(args[2]),MaxPlayers), mm3(1,s2b(args[3]),gms_g_maxai));
 '-ffa'   : Dedicated_SetCompFFATeams;
@@ -159,7 +159,13 @@ begin
 '-r'     : begin
               Map_randommap;
 
-              g_mode      :=gm_scirmish;
+              case random(10) of
+              0:   g_mode:=gm_royale;
+              1:   g_mode:=gm_capture;
+              2:   g_mode:=gm_KotH;
+              else g_mode:=gm_scirmish;
+              end;
+
               g_generators:=random(gms_g_maxgens+1);
               if(random(3)=0)
               then g_ai_slots:=0

@@ -489,6 +489,8 @@ begin
      case mtype of
 0..MaxPlayers         : if(mtype<>playern)
                         or((rpls_state>=rpls_read)and(HPlayer=0))then SoundPlayUI(snd_chat);
+lmt_player_leave,
+lmt_player_surrender,
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=MaxPlayers)then

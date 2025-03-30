@@ -289,6 +289,7 @@ begin
 lmt_player_chat,
 lmt_player_defeated,
 lmt_player_leave,
+lmt_player_surrender,
 lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
@@ -332,7 +333,12 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer(ThisPlayer);
 
-         if(amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
+         if((amtype=lmt_player_defeated)and(g_deadobservers)and(aargx=UIPlayer))
+         or(amtype=lmt_game_end)then
+         begin
+            ui_tab:=3;
+            UIPlayer:=0;
+         end;
       end;
       {$ENDIF}
    end;
@@ -372,6 +378,11 @@ procedure GameLogPlayerLeave(player:byte);
 begin
    if(player>MaxPlayers)or(ServerSide=false)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,_players[player].name+str_plout,0,0,false);
+end;
+procedure GameLogPlayerSurrender(player:byte);
+begin
+   if(player>MaxPlayers)or(ServerSide=false)then exit;
+   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,_players[player].name+str_player_surrender,0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
@@ -418,19 +429,19 @@ begin
          or((condt and ureq_unitlimit )>0)
          then bt:=lmt_unit_limit
          else
-           if((condt and ureq_smiths  )>0)
-           or((condt and ureq_barracks)>0)
-           then bt:=lmt_NeedMoreProd
+           if((condt and ureq_energy)>0)
+           then bt:=lmt_req_energy
            else
-             if((condt and ureq_busy)>0)
-             then bt:=lmt_production_busy
+             if((condt and ureq_smiths  )>0)
+             or((condt and ureq_barracks)>0)
+             then bt:=lmt_NeedMoreProd
              else
                if((condt and ureq_needbuilders)>0)
                or((condt and ureq_builders    )>0)
                then bt:=lmt_unit_needbuilder
                else
-                 if((condt and ureq_energy)>0)
-                 then bt:=lmt_req_energy
+                 if((condt and ureq_busy)>0)
+                 then bt:=lmt_production_busy
                  else
                    if((condt and ureq_alreadyAdv)>0)
                    then bt:=lmt_already_adv
@@ -1430,6 +1441,7 @@ lmt_cant_build       : begin
                        end;
 lmt_player_chat,
 lmt_game_message     ,
+lmt_player_surrender,
 lmt_player_leave     : ParseLogMessage:=str;//if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
 lmt_game_end         : if(argx<=MaxPlayers)then
                         if(argx=_players[UIPlayer].team)

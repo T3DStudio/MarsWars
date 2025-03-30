@@ -1,3 +1,58 @@
+53:
+General:
+- edited some points in pdf help and in-game text (thanks to Õðþê Çëþêåì);
+- removed the "Builders at game start" setting; the number of builders at game start now depends on the value of the "generators" setting: on the "own" setting, players get one regular builder, and on the "neutral(...)" assignments - 2 improved;
+- added restriction on the maximum number of builders per player - no more than 4 (you can't get more, including using "Phantom" unit to capture enemy "Command Center");
+- removed the ban on building new "Command Center"/"Hell Keep" in the "neutral" generators mode;
+- removed the restriction on the number of special buildings (buildings that unlock technology and buildings-superweapons);
+-- changed the mechanics of super weapons: "Altar of Pain"/"Rocket Launcher Station" now take 10 limit, cost more energy, take 2 minutes to build and do not require special "upgrade charges" for themselves; recharge after use is equal to the build time;
+-- "upgrade-charges" for superweapons are removed;
+- the duration of invulnerability from the "Altar of Pain" ability no longer depends on the limit the target occupies and lasts for 30 seconds for everyone;
+- production buildings can now be upgraded 3 times (each next level allows you to produce more units/upgrades at the same time);
+- generators have two more improvement levels;
+- new sprites for each level of production buildings and generators;
+- new sprites for UAC transports;
+- added building animation sprites for Totem of Horror, Monastery of Despair, Castle of Damned, Evil Eye and Altar of Pain;
+- since there is currently no pathfinding for units in the game: the map generator can no longer create a map with islands or complex labyrinths (there will always be a passage between obstacles);
+- The "lakes" item has been removed from the map generator settings; lakes now always make up half of large map obstacles;
+- removed the ability (and the upgrade that opens it) to build some buildings on map obstacles;
+- removed the ability (and the upgrade that opens it) for some ground units to move on the map decorations;
+- implemented translucent fog of war;
+- corrected the mechanics of the "special ability at a point" order: now the order is given to the closest unit to the specified point that is able to execute this order;
+- changed the approach to loading music: previously the game loaded all tracks from the directory, which led to a very long launch; now the playlist is selected and loaded no more than a certain number of random tracks; in the sound options section added an item that allows you to specify the number of tracks in the playlist that will be loaded; also added a button that allows you to load a new playlist during the game; the same track played during the game is no longer looped (unless it is not the only one in the playlist);
+- if there is at least one unit with a special ability among the selected units (and able to execute it at the moment) - its ability icon will be displayed on the orders tab;
+-- similarly with units that can be improved or rebuilt in other units: the icon of the new unit will be displayed;
+- selecting units and assigning them to control groups on digits is now a client-side operation (in all previous versions it was server-side, because of what client players had a lag between the action in the interface and the reaction to this action in the game);
+- added option to stretch the menu (previously it always remained 800*600, regardless of the window resolution);
+-- there is also a separate option to smooth the stretched menu;
+- added "surrender" option;
+- you can use domain addresses when connecting to the server;
+- a number of bug fixes, as well as minor tweaks to AI bots;
+
+Most important balance changes:
+- changes in time/energy cost for all units: now, on average, they require more energy and less time to build(now units are generally built faster than before);
+- Veteran system: removed the progression of time required to level up to the next level (previously it was 30-60-90 seconds, now it is 30 seconds for each level);
+- base damage for all units decreased from 62 to 52; multipliers increased: where it was *1.5 - became *2, for siege units: it was *3, became *4 (for "Cyberdemon" remained *3, but removed *0. 5 multiplier on light units); base bonus from upgrades was reduced from 8 to 7; bonuses from veteranism remained the same; on average, in situations where the damage multiplier is not applied - units take longer to kill each other, and faster - where the multiplier is applied;
+- "Arch Vile" is now able to resurrect other player`s monsters (making them your own); ability cooldown removed;
+- zombie infantry attributes have been changed to complement the basic composition of the demon army;
+-- "Former Zombie" changed to "Zombie Medic" which can heal; healing is similar to UAC Medic, but only Hell units can be targeted;
+- all units that take less than 2 limits have reduced sight/shooting radiuses; slightly reduced the size of these units;
+-- "Siege Marine"/"Siege Zombie" no longer deal area damage next to the target;
+- "BFG Marine"/"Zombie BFG Marine" now takes 5 limits and has a 0.5 multiplier on buildings; old damage multiplier where damage depended on the limit the target occupied has been removed;
+- removed the "slow" turn towards the movement point for UAC transports;
+- increased Command Center flight speed;
+- some units now have an additional radius of attack on certain categories of units (for example - almost all siege units shoot farther at buildings);
+- "Cyberdemon": now takes 10 limit instead of 12, health, damage and cost have been proportionally reduced;
+- Health of the main Hell buildings (all except generators, static defense and "Evil Eye") increased by 2500; the same buildings now have initial health regeneration;
+- "Advanced Command Center"/"Great Hell Keep" now give more energy (increased by 300);
+- "Guard Tower" renamed to "Imp`s Tower"; "Imp`s Tower" can no longer attack other "Imp`s Towers"; "Imp" can no longer attack "Imp`s Towers" with long-range attacks;
+- "Imp`s Tower" can now be rebuilt into "Totem Of Horror" and "Totem Of Horror" back into "Imp`s Tower"; you cannot get "Totem Of Horror" without building "Imp`s Tower";
+- "UAC Fighter": removed missile attack on air units; removed upgrade that allows "laser" attack on ground targets - now this unit can attack both ground and air units with "laser" attack at once; multiplier *2 on ground light units/buildings;
+- "UAC Terminator": added upgrade that allows attacking air units; air attack is less effective than Antiaircrafter;
+- "Anti-ground/air Turret" now has a "special ability" to deconstruct this turret in "UAC Drone"; "Drone Transformation Protocol" upgrade required;
+- increased health of generators, towers (stat. defense) and super weapon buildings;
+
+
 52:
 
 Other:

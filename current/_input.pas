@@ -781,6 +781,7 @@ begin
                                 sdlk_lalt   : if(ks_alt  =0)then ks_alt  :=1;
                                 sdlk_print  : _screenshot;
                                 sdlk_escape : input_key_escape;
+                                SDLK_KP_ENTER,
                                 sdlk_return : input_key_return;
                               else
                                 if(MainMenu=false)and(G_Started)and(ingame_chat=0)then _hotkeys(_event^.key.keysym.sym);

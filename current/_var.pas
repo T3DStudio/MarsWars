@@ -200,7 +200,7 @@ PlayerColor       : array[0..MaxPlayers] of cardinal;
 UIPlayer          : byte = 1;
 
 vid_menu_scale    : boolean = true;
-vid_menu_scales   : boolean = true;
+vid_menu_scales   : boolean = false;
 
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
@@ -813,6 +813,7 @@ str_ready,
 str_fstarts,
 str_gmodet,
 str_plout,
+str_player_surrender,
 str_player_def    : shortstring;
 str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
 str_pcolors       : array[0..vid_maxplcolors] of shortstring;
@@ -886,6 +887,11 @@ str_svld_errors_open,
 str_svld_errors_wdata,
 str_svld_errors_wver,
 str_rpls_errors_open,
+str_start,
+str_surrender,
+str_quit,
+str_exit,
+str_back,
 str_MObjectives,
 str_MMap,
 str_MPlayers      : shortstring;
@@ -908,9 +914,7 @@ str_camp_m        : array[0..MaxMissions] of shortstring; }
 str_connect,
 str_svup,
 str_lng,
-str_maction2,
-str_exit,
-str_reset         : array[false..true] of shortstring;
+str_maction2      : array[false..true] of shortstring;
 str_menu_s1,
 str_menu_s2,
 str_menu_s3       : array[0..2] of shortstring;

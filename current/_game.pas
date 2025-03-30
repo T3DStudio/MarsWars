@@ -297,7 +297,11 @@ begin
 
    {$IFDEF _FULLGAME}
    MoveCamToPoint(map_psx[HPlayer] , map_psy[HPlayer]);
-   if(_players[HPlayer].team=0)then ui_tab:=3;
+   if(_players[HPlayer].team=0)then
+   begin
+      ui_tab:=3;
+      UIPlayer:=0;
+   end;
    {$ENDIF}
 end;
 
@@ -331,7 +335,13 @@ begin
 
    Map_randommap;
 
-   g_mode      :=gm_scirmish;
+   case random(10) of
+   0:   g_mode:=gm_royale;
+   1:   g_mode:=gm_capture;
+   2:   g_mode:=gm_KotH;
+   else g_mode:=gm_scirmish;
+   end;
+
    if(random(3)=0)
    then g_generators:=random(gms_g_maxgens)+1
    else g_generators:=0;

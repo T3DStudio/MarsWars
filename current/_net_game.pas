@@ -202,7 +202,17 @@ nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
                       if(G_Started=false)
                       then PlayerSetState(pid,ps_none)
-                      else PlayerKill(pid,false);
+                      else PlayerKill(pid,true);
+                      {$IFNDEF _FULLGAME}
+                      screen_redraw:=true;
+                      {$ENDIF}
+                      continue;
+                   end;
+nmid_player_surrender
+                 : if(G_Started)then
+                   begin
+                      GameLogPlayerSurrender(pid);
+                      PlayerKill(pid,true);
                       {$IFNDEF _FULLGAME}
                       screen_redraw:=true;
                       {$ENDIF}
@@ -444,7 +454,11 @@ nmid_lobby_info  : begin
                             MainMenu:=false;
                             ServerSide:=false;
                             MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
-                            if(_players[HPlayer].team=0)then ui_tab:=3;
+                            if(_players[HPlayer].team=0)then
+                            begin
+                               ui_tab:=3;
+                               UIPlayer:=0;
+                            end;
                          end
                          else
                          begin

@@ -120,8 +120,8 @@ MID_SShot    : begin
 MID_SSShot   : begin
                   ms_eid_death_cnt[false]:=4;
                   ms_eid_death_cnt[true ]:=4;
-                  ms_eid_death_r  [false]:=10;
-                  ms_eid_death_r  [true ]:=10;
+                  ms_eid_death_r  [false]:=12;
+                  ms_eid_death_r  [true ]:=12;
                end;
       end;
    end;

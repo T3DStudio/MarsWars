@@ -189,6 +189,7 @@ lmt_production_busy    = 27;
 lmt_already_adv        = 28;
 lmt_NeedMoreProd       = 29;
 lmt_MaximumReached     = 30;
+lmt_player_surrender   = 31;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -197,6 +198,7 @@ lmts_menu_chat         = [
                           lmt_game_end,
                           lmt_player_defeated,
                           lmt_player_leave,
+                          lmt_player_surrender,
                           lmt_player_chat
                          ];
 lmts_last_messages     = [0..255];
@@ -244,6 +246,7 @@ nmid_swapp             = 14;
 nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
+nmid_player_surrender  = 18;
 nmid_getinfo           = 66;
 
 
@@ -1489,11 +1492,11 @@ str_fstarts              : shortstring = 'Fixed player starts:      ';
 str_gmodet               : shortstring = 'Game mode:                ';
 str_cgenerators          : shortstring = 'Neutral generators:       ';
 str_deadobservers        : shortstring = 'Observer mode after lose: ';
-str_starta               : shortstring = 'Builders at game start:   ';
 str_plname               : shortstring = 'Player name';
 str_PlayerPaused         : shortstring = 'player paused the game';
 str_PlayerResumed        : shortstring = 'player has resumed the game';
 str_plout                : shortstring = ' left the game';
+str_player_surrender     : shortstring = ' surrenders!';
 //str_player_def           : shortstring = ' was terminated!';
 
 str_cgeneratorsM         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');

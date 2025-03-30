@@ -391,7 +391,7 @@ procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case g_mode of
-gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[(g_royal_r mod 2)=0]);
+gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[r_blink1_colorb]);
    end;
 
 

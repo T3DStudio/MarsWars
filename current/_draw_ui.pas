@@ -56,7 +56,7 @@ aummat_info       : CircleColor   (r_minimap,al_mx  ,al_my  ,              r, al
       else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));
 
    case g_mode of
-gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_max_color[(g_royal_r mod 2)=0]);
+gm_royale   : circleColor(r_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_max_color[r_minimap_scan_blink]);
    end;
 end;
 

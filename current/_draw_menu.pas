@@ -522,8 +522,31 @@ begin
 
    _draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
-   _draw_text(tar, 70,554, str_exit [G_Started], ta_middle,255, c_white);
-   _draw_text(tar,730,554, str_reset[G_Started], ta_middle,255, mic((net_status<>ns_client)and (G_Started or PlayersReadyStatus),false));
+   {
+   str_start             := 'START';
+   str_surrender         := 'SURRENDER';
+   str_quit              := 'QUIT';
+   str_exit              := 'EXIT';
+   str_back              := 'BACK';
+   }
+   case G_Started of
+false: begin
+          _draw_text(tar, 70,554, str_exit , ta_middle,255, c_white);
+          case net_status  of
+          ns_server,
+          ns_none   : _draw_text(tar,730,554, str_start, ta_middle,255, mic(PlayersReadyStatus,false));
+          ns_client : ;
+          end;
+       end;
+true : begin
+          _draw_text(tar, 70,554, str_back , ta_middle,255, c_white);
+          if(g_deadobservers)and(not _players[HPlayer].observer)and(not GameCheckEndStatus)
+          then _draw_text(tar,730,554, str_surrender, ta_middle,255, c_white)
+          else _draw_text(tar,730,554, str_quit     , ta_middle,255, c_white)
+       end;
+   end;
+   //(net_status<>ns_client)and (G_Started or )
+   //_draw_text(tar,730,554, str_reset[G_Started], ta_middle,255, mic((net_status<>ns_client)and (G_Started or PlayersReadyStatus),false));
 
    D_MMap    (tar);
    D_MPlayers(tar);
