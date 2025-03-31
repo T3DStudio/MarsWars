@@ -284,7 +284,7 @@ Energy required: 400
 Requirements: Castle of Damned
 
 Arming/Abilities: 
-- ranged attack, max. range: vision range+50, targets: [alive,unit], impact 416*0.5, splash damage radius: 20, target priority: highest hits;
+- ranged attack, max. range: vision range+50, targets: [alive,unit], impact 416*0.5, splash damage radius: 20, target priority: lowest hits;
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +16;
@@ -773,7 +773,7 @@ Requirements: Monastery of Despair
 Produced by: Demon`s Gate
 Arming/Abilities: 
 - resurrection, targets: [dead,demons&zombies] except [Cyberdemon,Spider Mastermind,Arch-Vile], impact *2, target priority: distance, {Req.: "Resurrection"};
-- ranged attack, max. range: vision range+100, targets: [alive,unit], impact 416*0.5, splash damage radius: 20, target priority: highest hits;
+- ranged attack, max. range: vision range+100, targets: [alive,unit], impact 416*0.5, splash damage radius: 20, target priority: lowest hits;
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;

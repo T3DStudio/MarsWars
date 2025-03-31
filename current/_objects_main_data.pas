@@ -313,7 +313,7 @@ begin
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
    _rebuild_uid :=UID_HTower;
-   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_max_hits,0,0);
+   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
 end;
 UID_HEye:
 begin
@@ -599,7 +599,7 @@ begin
    _limituse  := ul4;
    _attack    := atm_always;
    _weapon(0,wpt_resurect,aw_dmelee ,0,3  ,fr_fpsd2,0           ,0,upgr_hell_resurrect,1,0,0,wtrset_resurect         ,wpr_any           ,uids_arch_res,[             ],0,0,wtp_distance,0,0);
-   _weapon(1,wpt_missle  ,aw_fsr+100,0,0  ,fr_fps2 ,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis  ,uids_all     ,[fr_archvile_s],0,0,wtp_max_hits,0,0);
+   _weapon(1,wpt_missle  ,aw_fsr+100,0,0  ,fr_fps2 ,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis  ,uids_all     ,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
 end;
 
 UID_Phantom,
