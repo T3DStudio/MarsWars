@@ -13,7 +13,6 @@ end;
 
 procedure pf_MakeZoneGrid;
 var d,sx,sy,ix,iy,ex,ey: integer;
-carea:word;
 begin
    FillChar(pf_pathgrid_areas,SizeOf(pf_pathgrid_areas),0);
 
@@ -39,14 +38,14 @@ begin
     if(sx>=ex)or(sy>=ex)then pf_pathgrid_areas[sx,sy]:=pf_solid;
 
    // areas
-   carea:=0;
+   map_pf_lastZone:=0;
    for sx:=0 to pf_pathmap_c do
    for sy:=0 to pf_pathmap_c do
     if(pf_pathgrid_areas[sx,sy]=0)then
     begin
-       carea+=1;
-       pf_FillArea(sx,sy,carea);
-       if(carea=65535)then break;
+       map_pf_lastZone+=1;
+       pf_FillArea(sx,sy,map_pf_lastZone);
+       if(map_pf_lastZone=65535)then break;
     end;
 end;
 

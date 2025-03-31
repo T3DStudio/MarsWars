@@ -23,8 +23,8 @@ aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret  
 siedge_uids = [UID_Mancubus,UID_Cyberdemon,UID_ZSiegeMarine,UID_SiegeMarine,UID_Tank];
 
 ai_GeneratorsLimit        = ul1*35;
-ai_GeneratorsEnergy       = 7000;
-ai_GeneratorsDestroyEnergy= 8000;
+ai_GeneratorsEnergy       = 8000;
+ai_GeneratorsDestroyEnergy= 9000;
 ai_GeneratorsDestoryLimit = ul1*60;
 ai_TowerLifeTime          = fr_fps1*60;
 ai_MinArmyForScout        = ul10;
@@ -76,6 +76,8 @@ ai_advanced_bld,
 ai_teleport_use,
 ai_choosen,
 ai_cpoint_koth    : boolean;
+
+ai_anyDetectors,
 
 ai_generator_d,
 ai_cpoint_d,
@@ -245,13 +247,13 @@ begin
       //                    ders                                heye  altar           towers towers limit  delay      army          lvl  targets
       //                                                        limit
       0  : SetBaseOpt(0    ,0   ,0     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,12    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(1200 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,30    ,fr_fps1*100,30            ,0  ,[]);
-      3  : SetBaseOpt(2400 ,2   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*80 ,45            ,1  ,[]);
-      4  : SetBaseOpt(3600 ,3   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*60 ,60            ,2  ,[]);
-      5  : SetBaseOpt(4200 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*40 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
-      6  : SetBaseOpt(6500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,2    ,14    ,120   ,fr_fps1*20 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(8000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(2000 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,25    ,fr_fps1*80 ,30            ,0  ,[]);
+      3  : SetBaseOpt(3500 ,2   ,5     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
+      4  : SetBaseOpt(5000 ,3   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,1       ,10   ,10    ,55    ,1          ,60            ,2  ,[]);
+      5  : SetBaseOpt(6000 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
+      6  : SetBaseOpt(7500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(9000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
       ai_noProdTime:=random(ai_skill*ai_noProdTimeStep);
@@ -415,6 +417,7 @@ begin
         ai_advanced_bld    :=(ai_flags and aif_base_advance )>0;
         ai_teleport_use    :=(ai_flags and aif_army_teleport)>0;
         ai_choosen         :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
+        ai_anydetectors    := uid_e[UID_HEye]+uid_e[UID_URadar];
      end;
 
    ai_limitaround_own      := 0;
@@ -687,7 +690,7 @@ begin
                 then aiu_limitaround_ally+=tu^.uid^._limituse;
            end
            else
-             if(CheckUnitTeamVision(team,tu,true))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,ai_anyDetectors>0))then  // enemy in vision
                if(tu^.buff[ub_invuln]<=0)then
                begin
                   ai_SetCurrentAlarm(tu,0,0,ud,0);

@@ -220,7 +220,10 @@ begin
    begin
       if(g_generators=0)and(g_step<ai_noProdTime)
       then ai_need_energy:=mm3(600, ai_builders_count         *1200,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
-      else ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy);
+      else
+        if(ai_advanced_bld)
+        then ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy)
+        else ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*1000,ai_GeneratorsEnergy);
 
       if((ai_flags and aif_base_smart_order)>0)then
       begin
@@ -238,7 +241,8 @@ begin
     then BuildTech  (1)
     else BuildMain  (ai_builders_need);
          BuildSpec1 (ai_maxcount_spec1 );
-         BuildSpec2 (ai_maxcount_spec2 );
+         if(map_pf_lastZone>1)or(race<>r_hell)or(upgr[upgr_hell_rteleport]>0)
+    then BuildSpec2 (ai_maxcount_spec2 );
          BuildMain  (ai_builders_need);
          skip_energy_check:=true;
          BuildEnergy(ai_need_energy);
@@ -706,7 +710,8 @@ UID_HSymbol3,
 UID_UGenerator3   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then exit;
       else
          if(_isbarrack)or(_issmith)then
-           if(level<MaxUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
+           if(level<1)or((level>=1)and(ai_ReadyForAttack))then
+             if(level<MaxUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
       end;
    end;
    ai_buildings_need_rebuild:=false;
@@ -752,6 +757,10 @@ begin
 
          if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
          if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
+
+         //if(sel)then writeln(ai_enrg_pot,' ',ai_maxcount_energy,' ',ai_unitp_need,' ',ai_maxcount_unitps);
+
+         if(ai_enrg_pot>=ai_maxcount_energy)and(ai_unitp_need<ai_maxcount_unitps)then ai_unitp_need:=ai_maxcount_unitps;
       end;
 
       if(ai_enemy_inv_u<>nil)

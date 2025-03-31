@@ -72,6 +72,7 @@ map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
 map_dcell         : array[0..dcn,0..dcn] of TDCell;
+map_pf_lastZone   : word = 0;
 
 DID_Square        : array[0..MaxDIDs] of longint;
 
