@@ -592,7 +592,7 @@ begin
    _speed     := 16;
    _srange    := 300;
    _ucl       := 11;
-   _painc     := 7;
+   _painc     := 12;
    _btime     := ptime1h;
    _transportS:= 4;
    _ruid1     := UID_HMonastery;
@@ -622,9 +622,9 @@ begin
    _ucl       :=13;
    _renergy   :=200;
    _btime     :=ptime1;
-   _weapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0,dm_Lost);
+   _weapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamageh3,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0,dm_Lost);
    end;
-   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh4,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Bio     ,0,dm_Lost);
+   _weapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamageh3,fr_fps1,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Bio     ,0,dm_Lost);
 end;
 UID_ZMedic:
 begin
@@ -1228,7 +1228,7 @@ begin
    _mhits     := 2000;
    _renergy   := 400;
    _r         := 15;
-   _speed     := 14;
+   _speed     := 15;
    _srange    := 250;
    _ucl       := 9;
    _btime     := ptime1;
@@ -1308,7 +1308,7 @@ begin
    _mhits     := 4000;
    _renergy   := 600;
    _r         := 18;
-   _speed     := 16;
+   _speed     := 17;
    _srange    := 275;
    _ucl       := 13;
    _btime     := ptime2;
@@ -1495,7 +1495,7 @@ MID_HRocket        : mid_base_splashr:=rocket_sr;
 MID_URocketS,
 MID_ArchFire,
 MID_Tank           : mid_base_splashr:=tank_sr;
-MID_BFG            : mid_base_splashr:=blizzard_sr;
+MID_BFG            : mid_base_splashr:=bfg_sr;
 end;
 
 // homing

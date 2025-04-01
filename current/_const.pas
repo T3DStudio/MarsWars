@@ -691,7 +691,8 @@ mvxy_strict            = 2;
 
 BaseDamage1            = 52;
 BaseDamageh            = BaseDamage1 div 2;
-BaseDamageh4           = BaseDamage1 div 4;
+BaseDamageh3           = BaseDamage1 div 3;
+BaseDamageh2           = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
@@ -923,7 +924,8 @@ invuln_time            = fr_fps1*30;
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;
 mine_sr                = rocket_sr*2;
-blizzard_sr            = rocket_sr*4;
+bfg_sr                 = rocket_sr*4;
+blizzard_sr            = rocket_sr*5;
 
 bld_dec_mr             = 6;
 player_default_ai_level= 7;

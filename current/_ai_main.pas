@@ -385,8 +385,11 @@ uprod_base : begin
                 for i:=1 to 3 do
                 case pu^.player^.race of
              r_hell: begin
+                        if(ai_UnitProduction(pu,UID_ZBFGMarine    ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_ArchVile      ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Imp           ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Cacodemon     ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Pain          ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Knight        ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Baron         ,i))then exit;
                         if(ai_UnitProduction(pu,UID_ZSergant      ,i))then exit;
@@ -394,6 +397,7 @@ uprod_base : begin
                      end;
              r_uac : begin
                         if(tryTransport)then exit;
+                        if(ai_UnitProduction(pu,UID_BFGMarine     ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Antiaircrafter,i))then exit;
                         if(ai_UnitProduction(pu,UID_FPlasmagunner ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Sergant       ,i))then exit;
@@ -450,7 +454,7 @@ uprod_any  : case pu^.player^.race of
                      end;
              r_uac : begin
                      if(tryTransport)then exit;
-                     case random(15) of
+                     case random(16) of
                           0 : ut:=UID_Medic;
                           1 : ut:=UID_Engineer;
                           2 : ut:=UID_Sergant;
@@ -460,12 +464,13 @@ uprod_any  : case pu^.player^.race of
                           6 : ut:=UID_SiegeMarine;
                           7 : ut:=UID_FPlasmagunner;
                           8 : ut:=UID_BFGMarine;
-                          9 : ut:=UID_APC;
-                          10: ut:=UID_UTransport;
-                          11: ut:=UID_UACDron;
+                          9 : ut:=UID_UTransport;
+                          10: ut:=UID_UACDron;
+                          11: ut:=UID_Terminator;
                           12: ut:=UID_Terminator;
                           13: ut:=UID_Tank;
                           14: ut:=UID_Flyer;
+                          15: ut:=UID_Flyer;
                      end;
                      end;
              end;
@@ -510,6 +515,8 @@ UID_Cyberdemon   : up_m:=ai_max_specialist-(uid_e[UID_Mastermind]+uprodu[UID_Mas
 UID_APC,
 UID_UTransport,
 UID_Pain,
+UID_BFGMarine,
+UID_ZBFGMarine,
 UID_ZMedic,
 UID_Medic,
 UID_Engineer     : up_m:=ai_max_specialist;

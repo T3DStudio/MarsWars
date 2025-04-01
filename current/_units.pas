@@ -632,6 +632,7 @@ wtp_Light            : incPrio(    _uklight      );
 wtp_GroundLight      : begin
                        incPrio(    _uklight      );
                        incPrio(not ukfly         );
+                       incPrio(_genergy        >0);
                        end;
 wtp_Fly              : begin
                        incPrio(     ukfly        );

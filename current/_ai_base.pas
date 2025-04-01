@@ -24,7 +24,7 @@ siedge_uids = [UID_Mancubus,UID_Cyberdemon,UID_ZSiegeMarine,UID_SiegeMarine,UID_
 
 ai_GeneratorsLimit        = ul1*35;
 ai_GeneratorsEnergy       = 8000;
-ai_GeneratorsDestroyEnergy= 9000;
+ai_GeneratorsDestroyEnergy= 9300;
 ai_GeneratorsDestoryLimit = ul1*60;
 ai_TowerLifeTime          = fr_fps1*60;
 ai_MinArmyForScout        = ul10;

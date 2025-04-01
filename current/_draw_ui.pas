@@ -144,7 +144,7 @@ co_psability:
     if(ui_uibtn_pabilityu<>nil)then
      with ui_uibtn_pabilityu^.uid^ do
       case _ability of
-uab_UACStrike     : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr              ,c_gray);
+uab_UACStrike     : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,blizzard_sr               ,c_gray);
 uab_UACScan       : if(ui_bucl_reload[_ucl]=0)then circleColor(tar,mouse_x,mouse_y,ui_uibtn_pabilityu^.srange,c_gray);
 uab_RebuildInPoint: begin
                     spr:=_uid2spr(_rebuild_uid,270,0);
