@@ -13,6 +13,8 @@ program T3D_RTS;
   {$APPTYPE CONSOLE}
 {$ENDIF}
 
+{$minEnumSize 1}
+
 uses SysUtils,crt,SDL,SDL_Net
 {$IFDEF _FULLGAME}
 ,SDL_Image,SDL_Gfx,openal,_sound_OGGLoader;

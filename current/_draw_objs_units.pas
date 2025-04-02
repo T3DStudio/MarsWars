@@ -263,14 +263,14 @@ begin
       if(buff[ub_Detect  ]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
-      if(not _ukbuilding)then
+      if(not _ukbuilding)or(_isbarrack)or(_issmith)then
        case level of
        1: lvlstr_l:='>';
        2: lvlstr_l:='||';
        3: lvlstr_l:='* * *';
-       end
-      else
-        if(level>0)then lvlstr_b+=char_advanced;
+       end;
+     // else
+     //   if(level>0)then lvlstr_b+=char_advanced;
 
       // reload
       if(reload>0)
@@ -286,9 +286,6 @@ begin
         if(aw_reload>0)then
         begin
            if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
-           {if(aw_type=wpt_missle)then
-            if(aw_oid=MID_SShot )
-            or(aw_oid=MID_SSShot)then WeaponUpgrInc(upgr_uac_ssgup); }
            if(aw_rupgr>0)and(aw_rupgr_l<=upgr[aw_rupgr])then sl+=1;
         end;
       lvlstr_w:=i2s6(wl,_attack);
@@ -353,16 +350,16 @@ begin
 
       if(unit_FogReveal(pu))then
       begin
-         if(mmap_order=vid_panel_timer)
+         if(mmap_TickOrder=vid_PanelUpdTimer)
          then unit_DrawMinimap(pu);
 
          if(_ability=ua_HKeepBlink)then
-          if(buff[ub_CCast]>0)then exit;
+           if(buff[ub_CCast]>0)then exit;
 
-         wanim:=false;
+         anim_isMoving:=false;
          if(G_Status=gs_running)then
-          if(unit_canMove(pu))then
-           wanim:=(x<>moveDest_x)or(y<>moveDest_y)or(x<>vx)or(y<>vy);
+           if(unit_canMove(pu))then
+             anim_isMoving:=(x<>moveDest_x)or(y<>moveDest_y)or(x<>vx)or(y<>vy);
 
          spr:=sm_unit2MWTexture(pu);
 
@@ -382,7 +379,7 @@ begin
             alpha:=255;
             ColorAura :=0;
 
-            if(wanim)then unit_FootEffects(pu);
+            if(anim_isMoving)then unit_FootEffects(pu);
 
             UIInfoItemsAddUnit(pu,un_smodel[level]);
 

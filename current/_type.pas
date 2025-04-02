@@ -192,6 +192,24 @@ end;
 //   OTHER
 //
 
+TTab3PageType = (t3pt_none=0,t3pt_actions,t3pt_observer,t3pt_replay);
+
+TTabType      = (tt_buildings=0,tt_units,tt_upgrades,tt_controls);
+const
+i2tab         : array[ord(low(TTabType))..ord(high(TTabType))] of TTabType = (tt_buildings,tt_units,tt_upgrades,tt_controls);
+
+type
+TVidPannelPos = (vpp_left=0,vpp_right,vpp_top,vpp_bottom);
+const
+VPPSet_Vertical   = [vpp_left,vpp_right ];
+VPPSet_Horizontal = [vpp_top ,vpp_bottom];
+type
+
+TUIUnitHBarsOption= (uhb_damaged,uhb_always,uhb_selected);
+
+TPlayersColorSchema = (pcs_default=0,pcs_LYR,pcs_WYR,pcs_WAR,pcs_teams,pcs_wTeams);
+
+//Ti2
 TSaveLoadItem = record
    data_p:pointer;
    data_s:cardinal;
@@ -262,7 +280,7 @@ TMapTerrainGridCell = record
    tgc_pf_domain : word;
 end;
 
-TUnitAbilityType = (uat_passive,uat_notarget,uat_target);
+TUnitAbilityType = (uat_passive,uat_notarget,uat_point,uat_unit);
 TUnitAbility = record
    ua_type    : TUnitAbilityType;       // 0-passive, 1-no target, 2-need to go point and self cast, 3-point/unit target require
    ua_morphUID,   // if >0 then ability - transformation to uid
@@ -766,7 +784,8 @@ TUnit = record
             : integer;
 
    {$IFDEF _FULLGAME}
-   wanim    : boolean;
+   anim_isMoving
+            : boolean;
 
    animw,
    mmx,mmy,
@@ -781,7 +800,7 @@ TUnit = record
    lvlstr_a,  // armor
    lvlstr_s   // other upgrs
             : string6;
-   mmap_order
+   mmap_TickOrder
             : byte;
    {$ENDIF}
 

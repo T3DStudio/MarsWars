@@ -204,7 +204,7 @@ var    p: byte;
        i: integer;
 tmp_strt: shortstring;
 begin
-   // rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
+   // rpls_str_path:=str_f_rpls+rpls_str_prefix+str_e_rpls;
    tmp_strt:='';
 
 {
@@ -216,18 +216,12 @@ until not FileExists(s);
 }
 end;
 
-procedure replay_Code;
-const vxyc = 5;
-var  i,gs,
-      _vx,
-      _vy  : byte;
-// WRITE
 procedure replay_WriteHead;
 var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_str_name+str_e_rpls;
+   rpls_str_path:=str_f_rpls+rpls_str_prefix+str_e_rpls;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -278,6 +272,14 @@ begin
       end;
    end;
 end;
+
+procedure replay_Code;
+const vxyc = 5;
+var  i,gs,
+      _vx,
+      _vy  : byte;
+// WRITE
+
 procedure replay_WriteGameFrame;
 begin
    if((rpls_ticks mod 2)<>0)then exit;
@@ -449,8 +451,8 @@ begin
          UnitMoveStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
          if(UnitMoveStepTicks=0)then UnitMoveStepTicks:=1;
 
-         rpls_fstate:=rpls_state_read;
-         rpls_rstate  :=rpls_state_read;
+         rpls_fstate :=rpls_state_read;
+         rpls_rstate :=rpls_state_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
          PlayerClient:=rpls_POVPlayer;
@@ -463,7 +465,7 @@ begin
          GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
 
          GameCameraBounds;
-         ui_tab    :=3;
+         ui_tab    :=tt_controls;
          G_Started :=true;
          menu_state:=false;
          ServerSide:=false;
@@ -535,7 +537,7 @@ begin
      begin
         rpls_rstate:=rpls_state_write;
         rpls_StartRecordPause:=fr_fps2;
-        GameLogChat(PlayerClient,log_to_all,str_msg_ReplayStart+rpls_str_name,true);
+        GameLogChat(PlayerClient,log_to_all,str_msg_ReplayStart+rpls_str_prefix,true);
      end;
 
    if(not G_Started)or(rpls_rstate=rpls_state_none)//or(menu_s2=ms2_camp)

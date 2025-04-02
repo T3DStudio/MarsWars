@@ -784,11 +784,11 @@ begin
    r_empty   :=gfx_SDLSurfaceCreate(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_uiminimap:=gfx_SDLSurfaceCreate(vid_panelwu,vid_panelwu);
-   r_gminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   r_mminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   r_bminimap :=gfx_SDLSurfaceCreate(vid_panelwi,vid_panelwi);
-   rectangleColor(r_uiminimap,0,0,r_uiminimap^.w-1,r_uiminimap^.h-1,c_white);
+   r_ui_MiniMap:=gfx_SDLSurfaceCreate(vid_panel_pwu,vid_panel_pwu);
+   r_gminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
+   r_mminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
+   r_bminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
+   rectangleColor(r_ui_MiniMap,0,0,r_ui_MiniMap^.w-1,r_ui_MiniMap^.h-1,c_white);
 
    vid_UIItem_n :=0;
    setlength(vid_UIItem_list,vid_UIItem_n);
@@ -1114,52 +1114,54 @@ end;
 
 procedure vid_ScreenSurfaces;
 begin
-   gfx_SDLSurfaceFree(r_uipanel);
+   gfx_SDLSurfaceFree(r_ui_Panel);
 
-   if(vid_PannelPos<2)then // vertical
-   begin
-      ui_ControlBar_w:=vid_panelwu;
-      ui_ControlBar_h:=vid_panelh;
+   case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                ui_ControlBar_w:=vid_panel_pwu;
+                ui_ControlBar_h:=vid_panel_ph;
 
-      if(vid_PannelPos=0)
-      then ui_ControlBar_x:=0
-      else ui_ControlBar_x:=vid_cam_w-vid_panelwu;
-           ui_MiniMap_x   :=ui_ControlBar_x;
+                if(vid_PannelPos=vpp_left)
+                then ui_ControlBar_x:=0
+                else ui_ControlBar_x:=vid_cam_w-vid_panel_pwu;
+                     ui_MiniMap_x   :=ui_ControlBar_x;
 
-      if(vid_MiniMapPos)then   // top
-      begin
-         ui_ControlBar_y:=vid_panelw;
-         ui_MiniMap_y   :=0;
-      end
-      else
-      begin
-         ui_MiniMap_y   :=vid_vh-vid_panelwu;
-         ui_ControlBar_y:=ui_MiniMap_y-vid_panelhi;
-      end;
-   end
-   else
-   begin
-      ui_ControlBar_w:=vid_panelh;
-      ui_ControlBar_h:=vid_panelwu;
+                if(vid_MiniMapPos)then   // top
+                begin
+                   ui_ControlBar_y:=vid_panel_pw;
+                   ui_MiniMap_y   :=0;
+                end
+                else
+                begin
+                   ui_MiniMap_y   :=vid_vh-vid_panel_pwu;
+                   ui_ControlBar_y:=ui_MiniMap_y-vid_panel_phi;
+                end;
+             end;
+vpp_top,
+vpp_bottom : begin
+                ui_ControlBar_w:=vid_panel_ph;
+                ui_ControlBar_h:=vid_panel_pwu;
 
-      if(vid_PannelPos=2)
-      then ui_ControlBar_y:=0
-      else ui_ControlBar_y:=vid_cam_h-vid_panelwu;
-           ui_MiniMap_y   :=ui_ControlBar_y;
+                if(vid_PannelPos=vpp_top)
+                then ui_ControlBar_y:=0
+                else ui_ControlBar_y:=vid_cam_h-vid_panel_pwu;
+                     ui_MiniMap_y   :=ui_ControlBar_y;
 
-      if(vid_MiniMapPos)then //left
-      begin
-         ui_ControlBar_x:=vid_panelw;
-         ui_MiniMap_x   :=0;
-      end
-      else
-      begin
-         ui_MiniMap_x   :=vid_vw-vid_panelwu;
-         ui_ControlBar_x:=ui_MiniMap_x-vid_panelhi;
-      end;
+                if(vid_MiniMapPos)then //left
+                begin
+                   ui_ControlBar_x:=vid_panel_pw;
+                   ui_MiniMap_x   :=0;
+                end
+                else
+                begin
+                   ui_MiniMap_x   :=vid_vw-vid_panel_pwu;
+                   ui_ControlBar_x:=ui_MiniMap_x-vid_panel_phi;
+                end;
+             end;
    end;
 
-   r_uipanel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
+   r_ui_Panel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
 
    vid_CommonVars;
 end;

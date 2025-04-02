@@ -36,18 +36,19 @@ chat_allies   : for p:=0 to LastPlayer do
 end;
 
 procedure input_key_return;
-var HPlayerAllies: byte;
+var PlayerClientAllies: byte;
 begin
    if(not menu_state)and(ingame_chat=0)and(net_status>ns_single)then
    begin
-      HPlayerAllies:=PlayerGetAlliesByte(PlayerClient,false);
-      if(HPlayerAllies>0)
+      PlayerClientAllies:=PlayerGetAlliesByte(PlayerClient,false);
+      // default chat
+      if(PlayerClientAllies<>0)
       then ingame_chat:=chat_allies
       else ingame_chat:=chat_all;
 
       if(kt_ctrl>0)then
       begin
-         if(HPlayerAllies>0)
+         if(PlayerClientAllies<>0)
          then ingame_chat:=chat_allies;
       end
       else
@@ -314,17 +315,9 @@ begin
                    end;
                end;
 -255..-1     : with g_uability[-m_brush] do
-                 if(ua_type<>uat_target)
+                 if(ua_type<>uat_point)or(ua_type<>uat_unit)
                  then m_brush:=mb_empty
                  else ;
-
-               //if(ui_uibtn_abilityu=nil)
-               //then m_brush:=mb_empty
-               //else ;//check if unit have ability
-{mb_move  ,
-mb_patrol,
-mb_amove,
-mb_apatrol   : if(ui_uibtn_move     =0  )then m_brush:=mb_empty;  }
    else m_brush:=mb_empty;
    end;
 end;
@@ -337,85 +330,68 @@ begin
    m_brush:=mb_empty;
 end;
 
-{procedure mb_Command(x,y,target:integer);
-begin
-   case m_brush of
-mb_move     : PlayerSetOrder(x,y,target,0,ua_move     ,po_unit_order_set,PlayerClient);   // move
-mb_amove    : PlayerSetOrder(x,y,target,0,ua_amove    ,po_unit_order_set,PlayerClient);   // attack
-mb_patrol   : PlayerSetOrder(x,y,0     ,0,ua_patrol   ,po_unit_order_set,PlayerClient);
-mb_apatrol  : PlayerSetOrder(x,y,0     ,0,ua_apatrol  ,po_unit_order_set,PlayerClient);
-mb_empty    : // rclick
-         if(m_action)
-         then PlayerSetOrder(x,y,target,0,ua_move     ,po_unit_order_set,PlayerClient)    // move
-         else PlayerSetOrder(x,y,target,0,ua_amove    ,po_unit_order_set,PlayerClient);   // attack
-   end;
-
-   m_brush:=mb_empty;
-end; }
-
-procedure ui_PanelButton(tab,bx,by:integer;click_type:TkbState;twice:boolean);
-var u:integer;
+procedure ui_PanelClick;
 begin
    SoundPlayUI(snd_click);
+   vid_PanelUpdNow:=true;
+end;
 
-   if(by=0)then
-     case vid_PannelPos of   // tabs
-     0,1: begin mouse_x-=ui_ControlBar_x; if(mouse_y>vid_panelw)then ui_tab:=mm3i(0,mouse_x div vid_tBW,3);mouse_x+=ui_ControlBar_x;end;
-     2,3: begin mouse_y-=ui_ControlBar_y; if(mouse_x>vid_panelw)then ui_tab:=mm3i(0,mouse_y div vid_tBW,3);mouse_y+=ui_ControlBar_y;end;
-     end
-   else
+procedure ui_PanelButton(tab:TTabType;bx,by:integer;click_type:TkbState;twice:boolean);
+var u:integer;
+begin
+   if(by=vid_panel_bh)then
    begin
-      if(by=vid_panelch)then
-      begin
-         case bx of         // common buttons
-         0 : menu_Toggle;
-         2 : if(net_status>ns_single)then GameTogglePause;
-         end;
-         exit;
+      case bx of // last line,  common buttons
+      0 : menu_Toggle;
+      2 : if(net_status>ns_single)then GameTogglePause;
       end;
+      exit;
+   end;
+   by-=1;
 
-      if(by<1)
-      or(   vid_panelch<by)
-      or(bx<0)
-      or(   2<bx)then exit;
+   if(not ui_ActionsIsAllowed(PlayerClient))then exit;
 
-      by-=1;// 0,0
-      if(vid_PannelPos>=2)then
-      begin
-         u :=bx;
-         bx:=by;
-         by:=u;
-         by+=3*(bx div 3);
-         bx-=3*(bx div 3);
-      end;
+   if(by<0)
+   or(   vid_panel_bh<=by)
+   or(bx<0)
+   or(   vid_panel_bw<=bx)then exit;
 
-      u:=(by*3)+(bx mod 3);
+   if(vid_PannelPos in VPPSet_Horizontal)then
+   begin  // turn vid_panel_bw*vid_panel_bw block if horizontal panel
+      u :=bx;
+      bx:=by;
+      by:=u;
+      by+=vid_panel_bw*(bx div vid_panel_bw);
+      bx-=vid_panel_bw*(bx div vid_panel_bw);
+   end;
 
-      if(0<=u)and(u<=ui_ubtns)then
-       with g_players[PlayerClient] do
-       begin
-          if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then
-            case tab of
-            0: case click_type of
-               pct_left  : begin
-                           m_brush:=ui_panel_uids[race,tab,u];
-                           mbrush_Check(true);
-                           end;
-               end;
-            1: case click_type of
-               pct_left  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_start,PlayerClient);
-               pct_right : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_unit_stop ,PlayerClient);
-               end;
-            2: case click_type of
-               pct_left  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_start,PlayerClient);
-               pct_right : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,tab,u],po_prod_upgr_stop ,PlayerClient);
-               end;
-            end;
+   u:=(by*vid_panel_bw)+(bx mod vid_panel_bw);
 
-          if(tab=3)then
-            case tab3PageType of
-            // replay
-            1: case u of
+   if(0<=u)and(u<=ui_ubtns)then
+     with g_players[PlayerClient] do
+     begin
+        if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then
+          case tab of
+          tt_buildings : case click_type of
+                         pct_left  : begin
+                                     m_brush:=ui_panel_uids[race,ord(tab),u];
+                                     mbrush_Check(true);
+                                     end;
+                         end;
+          tt_units     : case click_type of
+                         pct_left  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,ord(tab),u],po_prod_unit_start,PlayerClient);
+                         pct_right : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,ord(tab),u],po_prod_unit_stop ,PlayerClient);
+                         end;
+          tt_upgrades  : case click_type of
+                         pct_left  : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,ord(tab),u],po_prod_upgr_start,PlayerClient);
+                         pct_right : PlayerSetOrder(0,0,0,0,ui_panel_uids[race,ord(tab),u],po_prod_upgr_stop ,PlayerClient);
+                         end;
+          end;
+
+        if(tab=tt_controls)then
+          case tab3PageType of
+             // replay
+t3pt_replay  : case u of
                1: case click_type of
                   pct_left   : replay_SetPlayPosition(g_step-(fr_fps1*2 )+1,-1);
                   pct_right  : replay_SetPlayPosition(g_step-(fr_fps1*10)+1,-1);
@@ -442,14 +418,14 @@ begin
                 8..17 : UIPlayer    :=u-8;
                     end;
                end;
-            // observer
-            2: if(click_type=pct_left)then
-                 case u of
-                 0    :  sys_fog:=not sys_fog;
-                 2..11:  UIPlayer:=u-2;
-                 end;
-            //
-            3: if(G_Status=gs_running)then
+             // observer
+t3pt_observer: if(click_type=pct_left)then
+               case u of
+               0    :  sys_fog:=not sys_fog;
+               2..11:  UIPlayer:=u-2;
+               end;
+             // actions
+t3pt_actions : if(G_Status=gs_running)then
                  if(click_type=pct_left)then
                  begin
                     case u of
@@ -487,9 +463,8 @@ begin
 
                     mbrush_Check(false);
                  end;
-            end;
-       end;
-   end;
+           end;
+     end;
 end;
 
 function test_hotkeys(k:cardinal):boolean;
@@ -528,24 +503,32 @@ km_test_debug1      : begin
    end;
 end;
 
-procedure InGameHotkeys(key1:cardinal);
+procedure GameHotkeys(key1:cardinal);
 var i,key2:cardinal;
-procedure ko2_panel_click(tabN:byte;ClickType:TkbState;kdbl:boolean);
+procedure ko2_panel_click(tab:TTabType;ClickType:TkbState;kdbl:boolean);
 begin
-   if(vid_PannelPos<2)
-   then ui_PanelButton(tabN, i mod 3      ,1+(i div 3)            ,ClickType,kdbl)
-   else ui_PanelButton(tabN,(i div 3)mod 3,1+(i div 9)*3+(i mod 3),ClickType,kdbl);
+   SoundPlayUI(snd_click);
+   vid_PanelUpdNow:=true;
+   case vid_PannelPos  of
+   vpp_left,
+   vpp_right  : ui_PanelButton(tab, i mod vid_panel_bw                 ,1+(i div vid_panel_bw),ClickType,kdbl);
+   vpp_top,
+   vpp_bottom : ui_PanelButton(tab,(i div vid_panel_bw)mod vid_panel_bw,
+                                 1+(i div vid_panel_bblock)*vid_panel_bw+(i mod vid_panel_bw),ClickType,kdbl);
+   end;
 end;
 begin
    case key1 of
-km_GamePause: GameTogglePause;
-km_Tab      : begin
-                 ui_tab+=1;
-                 ui_tab:=ui_tab mod 4;
-              end;
+km_Esc      : input_key_escape;
+km_GamePause: ui_PanelButton(tt_controls,2,vid_panel_bh,pct_left,false);
+km_Tab      : if(ui_tab=high(ui_tab))
+              then ui_tab:=low (ui_tab)
+              else ui_tab:=Succ(ui_tab);         //ui_PanelClick
    else
       if(test_mode>0)and(net_status=ns_single)then
         if(test_hotkeys(key1))then exit;
+
+      if(not ui_ActionsIsAllowed(PlayerClient))then exit;
 
       key2:=0;
       if(kt_shift>0)then key2:=km_lshift;
@@ -558,69 +541,70 @@ km_Tab      : begin
          exit;
       end;
 
-      if(rpls_rstate>=rpls_state_read)then
-         for i:=0 to HotKeysArraySize do  // replays
-         begin
-            if(hotkeyR2[i]<>key2)
-            or(hotkeyR1[i]= 0   )
-            or(hotkeyR1[i]<>key1 )then continue;
-            ko2_panel_click(3,kbState2pct,false);
-            exit;
-         end
-      else
-        if(g_players[PlayerClient].isobserver)then
-           for i:=0 to HotKeysArraySize do  // observer
-           begin
-              if(hotkeyO2[i]<>key2)
-              or(hotkeyO1[i]= 0   )
-              or(hotkeyO1[i]<>key1 )then continue;
-              ko2_panel_click(3,kbState2pct,false);
-              exit;
-           end
-        else
-          if(G_Status=gs_running)then
-          begin
-             case ui_tab of                // production panels
-       0,1,2:for i:=0 to HotKeysArraySize do
-             begin
-                if(hotkeyP2[i]<>key2 )
-                or(hotkeyP1[i]= 0    )
-                or(hotkeyP1[i]<>key1)then continue;
-                ko2_panel_click(ui_tab,pct_left,false);
-                exit;
-             end;
-             end;
+      case tab3PageType of
+               // replays
+t3pt_replay  : for i:=0 to HotKeysArraySize do
+               begin
+                  if(hotkeyR2[i]<>key2)
+                  or(hotkeyR1[i]= 0   )
+                  or(hotkeyR1[i]<>key1 )then continue;
+                  ko2_panel_click(tt_controls,kbState2pct,false);
+               end;
+               // observer
+t3pt_observer: for i:=0 to HotKeysArraySize do
+               begin
+                  if(hotkeyO2[i]<>key2)
+                  or(hotkeyO1[i]= 0   )
+                  or(hotkeyO1[i]<>key1 )then continue;
+                  ko2_panel_click(tt_controls,kbState2pct,false);
+               end;
+               // production panels
+t3pt_actions : if(G_Status=gs_running)then
+               begin
+                  case ui_tab of
+                  tt_buildings,
+                  tt_units,
+                  tt_upgrades : for i:=0 to HotKeysArraySize do
+                                begin
+                                    if(hotkeyP2[i]<>key2 )
+                                    or(hotkeyP1[i]= 0    )
+                                    or(hotkeyP1[i]<>key1)then continue;
+                                    ko2_panel_click(ui_tab,pct_left,false);
+                                    exit;
+                                 end;
+                   end;
 
-             for i:=0 to HotKeysArraySize do  // actions
-             begin
-                if(hotkeyA2[i]<>key2)
-                or(hotkeyA1[i]= 0 )
-                or(hotkeyA1[i]<>key1 )then continue;
-                ko2_panel_click(3,pct_left,k_TwiceLast);
-                exit;
-             end;
+                   for i:=0 to HotKeysArraySize do  // actions
+                   begin
+                      if(hotkeyA2[i]<>key2)
+                      or(hotkeyA1[i]= 0 )
+                      or(hotkeyA1[i]<>key1 )then continue;
+                      ko2_panel_click(tt_controls,pct_left,k_TwiceLast);
+                      exit;
+                   end;
 
-             // control groups
-             case key1 of
-  km_group0..km_group9 : begin
-                            i:=key1-km_group0;
-                            if(i<MaxUnitGroups)then
-                              if(kt_ctrl>0)
-                              then units_Grouping(false,PlayerClient,i)
-                              else
-                                if(kt_alt>0)
-                                then units_Grouping(true ,PlayerClient,i)
-                                else
-                                  if(not k_TwiceLast)
-                                  then units_SelectGroup(kt_shift>0,PlayerClient,i)
-                                  else
-                                    with ui_groups_d[i] do
-                                      if(ugroup_n>0)then
-                                        GameCameraMoveToPoint(ugroup_x,ugroup_y);
-                         end;
-             else
-             end;
-          end;
+                   // control groups
+                   case key1 of
+        km_group0..km_group9 : begin
+                                  i:=key1-km_group0;
+                                  if(i<MaxUnitGroups)then
+                                    if(kt_ctrl>0)
+                                    then units_Grouping(false,PlayerClient,i)
+                                    else
+                                      if(kt_alt>0)
+                                      then units_Grouping(true ,PlayerClient,i)
+                                      else
+                                        if(not k_TwiceLast)
+                                        then units_SelectGroup(kt_shift>0,PlayerClient,i)
+                                        else
+                                          with ui_groups_d[i] do
+                                            if(ugroup_n>0)then
+                                              GameCameraMoveToPoint(ugroup_x,ugroup_y);
+                               end;
+                   else
+                   end;
+                end;
+      end;
    end;
 end;
 
@@ -742,10 +726,13 @@ begin
                               km_lalt,
                               km_ralt       : if(kt_alt  =0)then kt_alt  :=1;
                               km_Screenshot : MakeScreenshot;
-                              km_Esc        : input_key_escape;
+                              //km_Esc        : input_key_escape;
                               km_Enter      : input_key_return;
                               else
-                                if(not menu_state)and(G_Started)and(ingame_chat=0)then InGameHotkeys(k_Last);
+                                 case menu_state of
+                                 false: if(G_Started)and(ingame_chat=0)then GameHotkeys(k_Last);
+                                 true : Menu_Hotkeys(k_Last);
+                                 end;
                               end;
                            end;
      else
@@ -775,7 +762,7 @@ end;
 begin
    mouse_f:=mf_none;
    if(PointInRect(mouse_x,mouse_y,ui_MapView_x   ,ui_MapView_y   ,vid_cam_w      ,vid_cam_h      ))then mouse_f:=mf_map;
-   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,vid_panelw     ,vid_panelw     ))then mouse_f:=mf_mmap;
+   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,vid_panel_pw   ,vid_panel_pw   ))then mouse_f:=mf_mmap;
    if(PointInRect(mouse_x,mouse_y,ui_ControlBar_x,ui_ControlBar_y,ui_ControlBar_w,ui_ControlBar_h))then mouse_f:=mf_panel;
 
    if(mouse_f<>mf_mmap)or(mouse_select_x0>-1)then
@@ -799,19 +786,25 @@ begin
    m_panelBtn_x:=-1;
    m_panelBtn_y:=-1;
    if(mouse_f=mf_panel)then
-     if(vid_PannelPos<2)then  //vertical
-     begin
-        m_panelBtn_x:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_x-=1;
-        m_panelBtn_y:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_y-=1;
-     end
-     else
-     begin
-        m_panelBtn_x:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_x-=1;
-        m_panelBtn_y:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_y-=1;
-     end;
+   begin
+      if(kt_mleft  =1)
+      or(kt_mright =1)
+      or(kt_mmiddle=1)then ui_PanelClick;
+      case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                m_panelBtn_x:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_x-=1;
+                m_panelBtn_y:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_y-=1;
+             end;
+vpp_top,
+vpp_bottom : begin
+                m_panelBtn_x:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_x-=1;
+                m_panelBtn_y:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_y-=1;
+             end;
+      end;
+   end;
 
    mbrush_Check(false);
-
 
    if(kt_mleft=1)then // LMB down
      case m_brush of
@@ -827,8 +820,17 @@ begin
                                mouse_select_y0:=mouse_map_y;
                             end;
                  mf_mmap  : m_mmap_move:=true;
-                 mf_panel : ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_left,m_TwiceLeft);
+                 mf_panel : if(m_panelBtn_y>0)
+                            then ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_left,m_TwiceLeft)
+                            else
+                              case vid_PannelPos of   // first line, tabs
+                              vpp_left,
+                              vpp_right  : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_rx div vid_tBW,ord(high(TTabType)))];
+                              vpp_top,
+                              vpp_bottom : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_ry div vid_tBW,ord(high(TTabType)))];
+                              end;
                  end;
+     mb_mark   : ;
      1..255    : case mouse_f of
                  mf_map,
                  mf_mmap  : if(m_brushc=c_lime)
@@ -842,14 +844,6 @@ begin
                             m_brush:=0;
                             end;
                  end;
-     {mb_move,
-     mb_amove,
-     mb_patrol,
-     mb_apatrol
-               : case mouse_f of
-                 mf_map,
-                 mf_mmap  : mb_Command(mouse_map_x,mouse_map_y,ui_uhint);
-                 end; }
      end;
 
 
@@ -886,119 +880,6 @@ begin
        mf_map   : if(not rpls_POVCam)then m_vmove:=true;
        mf_panel : ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_middle,false);
        end;
-
-{   ui_uhint:=0;
-   if(mouse_select_x0=-1)or(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then
-     case m_brush of
-mb_psability,
-mb_empty    : ui_uhint:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_any       );
-mb_move     : ui_uhint:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_ally_unum );
-mb_amove   : ui_uhint:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_enemy_unum);
-     end;
-
-   if(kt_mleft=1)then                // LMB down
-     if(0<=m_panelBtn_x)and(m_panelBtn_x<3)and(0<=m_panelBtn_y)and(m_panelBtn_y<=ui_panel_LastB)then // panel
-     begin
-        if(m_panelBtn_y>=3)
-        then ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_left,k_dbl)
-        else
-          case m_brush of
-       mb_psability,
-       mb_move,
-       mb_amove,
-       mb_patrol,
-       mb_apatrol : mb_Command  (trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx),ui_uhint);
-       mb_mark    : mb_MapMarker(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx));
-          else      if(rpls_POVCam=false)then m_mmap_move:=true;
-          end;
-     end
-     else
-       case m_brush of
-mb_empty    : if(kt_ctrl>0)then
-              begin
-                 u:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_own_uid);
-                 if(0<u)and(u<255)then
-                   if(kt_shift>0)
-                   then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,PlayerClient)
-                   else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,PlayerClient);
-                 exit;
-              end
-              else
-              begin
-                 if(d_UpdateUIPlayer(ui_uhint))then exit;
-
-                 //debug_zone:=map_GetZone(mouse_map_x,mouse_map_y,true);
-
-                 mouse_select_x0:=mouse_map_x;
-                 mouse_select_y0:=mouse_map_y;
-              end;
-1..255      : if(m_brushc=c_lime)
-              then PlayerSetOrder(mbrush_x,mbrush_y,0,0,m_brush,po_build,PlayerClient)
-              else GameLogCantProduction(PlayerClient,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
-mb_psability,
-mb_move,
-mb_amove,
-mb_patrol,
-mb_apatrol  : mb_Command  (mouse_map_x,mouse_map_y,ui_uhint);
-mb_mark     : mb_MapMarker(mouse_map_x,mouse_map_y);
-       end;
-
-   if(kt_mleft=-1)then  // LMB up
-   begin
-      m_mmap_move:=false;
-
-      if(mouse_select_x0>-1)then //select
-      begin
-         if(mt_TwiceLeft>0)then
-         begin
-            u:=ui_whoInPoint(mouse_map_x,mouse_map_y,wip_own_uid);
-            if(0<u)and(u<255)then
-              if(kt_shift>0)
-              then PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_add,PlayerClient)
-              else PlayerSetOrder(vid_cam_x,vid_cam_y,vid_cam_x+vid_cam_w,vid_cam_y+vid_cam_h,u,po_select_uid_set,PlayerClient);
-         end
-         else
-         begin
-            if(kt_shift>0)
-            then PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_add,PlayerClient)
-            else PlayerSetOrder(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,0,po_select_rect_set,PlayerClient);
-
-            if(G_Status=gs_running)and(rpls_rstate<rpls_state_read)then
-              if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_PointClick;
-         end;
-
-         mouse_select_x0:=-1;
-      end;
-   end;
-
-   if(m_mmap_move)and(mouse_select_x0=-1)then
-   begin
-      GameCameraMoveToPoint(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx));
-      GameCameraBounds;
-   end;
-
- //  if(k_mr=2)then effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
-
-   if(kt_mright =1)then
-     if(m_brush<>mb_empty)
-     then m_brush:=mb_empty
-     else
-       if(0<=m_panelBtn_x)and(m_panelBtn_x<3)and(0<=m_panelBtn_y)and(m_panelBtn_y<=ui_panel_LastB)then // panel
-       begin
-          if(m_panelBtn_y<3)               // minimap
-          then mb_Command(trunc((mouse_x-vid_panelx)/map_mm_cx),trunc((mouse_y-vid_panely)/map_mm_cx),ui_uhint)
-          else ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_right,false);      // panel
-       end
-       else mb_Command(mouse_map_x,mouse_map_y,ui_uhint);
-
-   if(kt_mmiddle=1)then            // middle down
-     if(0<=m_panelBtn_x)and(m_panelBtn_x<3)and(0<=m_panelBtn_y)and(m_panelBtn_y<=ui_panel_LastB)then   // panel
-     begin
-        if(m_panelBtn_y<3)                 // minimap
-        then
-        else ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_middle,false);
-     end
-     else ;  }
 end;
 
 procedure GameCameraScreenEdgeScroll;

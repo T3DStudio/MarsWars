@@ -237,8 +237,8 @@ begin
       3  : SetBaseOpt(2400 ,4   ,4     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,45    ,fr_fps1*120,45            ,1  ,[]);
       4  : SetBaseOpt(3600 ,8   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,2       ,10   ,10    ,60    ,fr_fps1*90 ,60            ,2  ,[]);
       5  : SetBaseOpt(4200 ,12  ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,70    ,fr_fps1*60 ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic]);
-      6  : SetBaseOpt(4900 ,18  ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,2    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(6000 ,24  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,2    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
+      6  : SetBaseOpt(4900 ,18  ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,3       ,5    ,14    ,120   ,fr_fps1*30 ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(6000 ,24  ,20    ,6    ,1    ,1    ,1    ,14   ,1      ,3       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
       case ai_skill of

@@ -32,7 +32,7 @@ begin
       net_status_str:=str_menu_connecting;
       net_status    :=ns_client;
       rpls_pnu      :=0;
-      PlayerLobb1   :=255;
+      PlayerLobby   :=255;
    end
    else net_dispose;
 end;
@@ -730,6 +730,25 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //  MENU BASE
 
+{function menu_GetIntVal(mi:byte;cur,min,max:integer):integer;
+var tx0,tx1:integer;
+begin
+   menu_GetBarVal:=cur;
+   with menu_items[mi] do
+   begin
+      tx1:=mi_x1-basefont_w2;
+      tx0:=tx1-basefont_w5;
+
+      if(mi_y0<mouse_y)and(mouse_y<mi_y1)then     ???????????????
+        if((tx0-basefont_w2)<mouse_x)and(mouse_x<mi_x1)then
+          if(mouse_x<tx0)
+          then menu_GetBarVal:=max2i(min,cur-1)
+          else
+            if(tx1<mouse_x)
+            then menu_GetBarVal:=min2i(cur+1,max)
+            else menu_GetBarVal:=mm3i(min,mouse_x-tx0,max);
+   end;
+end;}
 function menu_GetBarVal(mi:byte;cur,min,max:integer):integer;
 var tx0,tx1:integer;
 begin
@@ -880,8 +899,8 @@ mi_settings_sound         : menu_settings_page:=menu_item;
 mi_settings_ColoredShadows: vid_ColoredShadow:=not vid_ColoredShadow;
 mi_settings_ShowAPM       : vid_APM:=not vid_APM;
 mi_settings_HitBars       : if(menu_list_selected>-1)
-                            then begin vid_uhbars:=menu_list_SIndex;menu_List_Clear; end
-                            else menu_list_MakeFromStr(menu_item,@str_menu_unitHBarl[0],SizeOf(str_menu_unitHBarl),vid_uhbars,-2);
+                            then begin vid_UnitHealthBars:=enum_val2TUIUnitHBarsOption(menu_list_SIndex);menu_List_Clear; end
+                            else menu_list_MakeFromStr(menu_item,@str_menu_unitHBarl[low(TUIUnitHBarsOption)],SizeOf(str_menu_unitHBarl),ord(vid_UnitHealthBars),-2);
 mi_settings_MRBAction     : if(menu_list_selected>-1)
                             then begin m_action:=menu_list_SIndex>0;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_mactionl[false],SizeOf(str_menu_mactionl),integer(m_action),-2);
@@ -897,21 +916,21 @@ mi_settings_Langugage     : if(menu_list_selected>-1)then
                             else menu_list_MakeFromStr(menu_item,@str_menu_lang[false],SizeOf(str_menu_lang),integer(ui_language),-3);
 mi_settings_PanelPosition : if(menu_list_selected>-1)then
                             begin
-                               vid_PannelPos:=menu_list_SIndex;
+                               vid_PannelPos:=enum_val2TVidPannelPos(menu_list_SIndex);
                                menu_List_Clear;
                                vid_ScreenSurfaces;
                             end
-                            else menu_list_MakeFromStr(menu_item,@str_menu_PanelPosl[0],SizeOf(str_menu_PanelPosl),integer(vid_PannelPos),-2);
+                            else menu_list_MakeFromStr(menu_item,@str_menu_PanelPosl[low(TVidPannelPos)],SizeOf(str_menu_PanelPosl),integer(vid_PannelPos),-2);
 mi_settings_MMapPosition  : if(menu_list_selected>-1)then
                             begin
                                vid_MiniMapPos:=(menu_list_SIndex>0);
                                menu_List_Clear;
                                vid_ScreenSurfaces;
                             end
-                            else menu_list_MakeFromStr(menu_item,@str_menu_MiniMapPosl[vid_PannelPos<2][false],SizeOf(str_menu_MiniMapPosl[vid_PannelPos<2]),integer(vid_MiniMapPos),-2);
+                            else menu_list_MakeFromStr(menu_item,@str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical][false],SizeOf(str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical]),integer(vid_MiniMapPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
-                            then begin vid_plcolors:=menu_list_SIndex;menu_List_Clear; end
-                            else menu_list_MakeFromStr(menu_item,@str_menu_PlayersColorl[0],SizeOf(str_menu_PlayersColorl),integer(vid_plcolors),-2);
+                            then begin vid_PlayersColorSchema:=enum_val2TPlayersColorSchema(menu_list_SIndex);menu_List_Clear; end
+                            else menu_list_MakeFromStr(menu_item,@str_menu_PlayersColorl[low(TPlayersColorSchema)],SizeOf(str_menu_PlayersColorl),integer(vid_PlayersColorSchema),-2);
 
 //////////////////////////////////////////    SETTINGS  NETWORK
 mi_settings_ClientQuality : if(menu_list_selected>-1)then
@@ -1157,6 +1176,13 @@ mi_saveload_list          : if(m_TwiceLeft)
    end;
 end;
 
+procedure Menu_Hotkeys(key1:cardinal);
+begin
+   case key1 of
+km_Esc      : menu_Toggle;
+   end;
+end;
+
 procedure menu_keyborad;
 var Changed:boolean;
 begin
@@ -1172,7 +1198,7 @@ mi_map_Seed           : begin
                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
 mi_settings_PlayerName: PlayerName    :=txt_StringApplyInput(PlayerName    ,k_pname ,PlayerNameLen,@Changed);
-mi_settings_ReplayName: rpls_str_name :=txt_StringApplyInput(rpls_str_name ,k_kbstr ,ReplayNameLen,@Changed);
+mi_settings_ReplayName: rpls_str_prefix :=txt_StringApplyInput(rpls_str_prefix ,k_kbstr ,ReplayNameLen,@Changed);
 mi_mplay_ServerPort   : begin
                         net_sv_pstr   :=txt_StringApplyInput(net_sv_pstr   ,k_kbdig ,5            ,@Changed);
                         if(Changed)then txt_ValidateServerPort;

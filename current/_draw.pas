@@ -72,7 +72,7 @@ begin
       r_blink3:=r_blink3 mod 4;
    end;
 
-   vid_panel_timer+=1;vid_panel_timer:=vid_panel_timer mod vid_panel_period;
+   vid_PanelUpdTimer+=1;vid_PanelUpdTimer:=vid_PanelUpdTimer mod vid_panel_period;
 
    r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
    r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
@@ -106,11 +106,14 @@ begin
    //d_UIText(r_screen,ui_MapView_x,ui_MapView_y,UIPlayer);
 
    // Control bar view
-   if(vid_panel_timer=0)then d_UpdatePanel  (r_uipanel  ,UIPlayer);
-   if(vid_panel_timer=1)then d_UpdateMinimap(r_uiminimap);
+   if(vid_PanelUpdTimer=0)
+   or(vid_PanelUpdNow    )then d_UpdatePanel  (r_ui_Panel  ,UIPlayer);
+   if(vid_PanelUpdTimer=1)then d_UpdateMinimap(r_ui_MiniMap);
 
-   draw_surf(r_screen,ui_ControlBar_x,ui_ControlBar_y,r_uipanel  );
-   draw_surf(r_screen,ui_MiniMap_x   ,ui_MiniMap_y   ,r_uiminimap);
+   vid_PanelUpdNow:=false;
+
+   draw_surf(r_screen,ui_ControlBar_x,ui_ControlBar_y,r_ui_Panel  );
+   draw_surf(r_screen,ui_MiniMap_x   ,ui_MiniMap_y   ,r_ui_MiniMap);
 
    if(mouse_select_x0>-1)then
      if(UIPlayer<=LastPlayer)

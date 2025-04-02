@@ -515,9 +515,7 @@ begin
     with g_players[playern] do
      with log_l[log_i] do
       case mtype of
-0..LastPlayer         : if(mtype<>PlayerClient)
-                        //or((rpls_rstate>=rpls_state_read)and(PlayerClient=0)) ?????????
-                        then SoundPlayUI(snd_chat);
+0..LastPlayer         : if(mtype<>PlayerClient)then SoundPlayUI(snd_chat);
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
 lmt_game_end          : if(argx<=LastPlayer)then
@@ -602,7 +600,7 @@ var r:integer;
 begin
    InitSound:=false;
 
-   if(InitOpenAL=false)then exit;
+   if(not InitOpenAL)then exit;
 
    if(oalError)then exit;
 

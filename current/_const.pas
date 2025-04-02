@@ -1000,8 +1000,6 @@ char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
 
-vid_maxplcolors        = 6;
-
 max_CamSpeed           = 127;
 
 
@@ -1170,14 +1168,16 @@ vid_panel_period       = fr_fps1 div 6;
 ui_alarm_time          = vid_blink_period2;
 
 vid_BW                 = 48;
-vid_2BW                = vid_BW*2;
-vid_panelw             = vid_BW*3;
-vid_panelwi            = vid_panelw-1;
-vid_panelwu            = vid_panelw+1;
-vid_panelch            = 9;
-vid_panelh             = vid_panelch*vid_BW+vid_BW;
-vid_panelhi            = vid_panelh-1;
-vid_tBW                = vid_panelw div 4;
+vid_BW2                = vid_BW*2;
+vid_panel_bw           = 3;                   // panel button width
+vid_panel_bblock       = vid_panel_bw*vid_panel_bw;
+vid_panel_pw           = vid_BW*vid_panel_bw; // panel pixel width
+vid_panel_pwi          = vid_panel_pw-1;
+vid_panel_pwu          = vid_panel_pw+1;
+vid_panel_bh           = 9;
+vid_panel_ph           = vid_panel_bh*vid_BW+vid_BW;
+vid_panel_phi          = vid_panel_ph-1;
+vid_tBW                = vid_panel_pw div 4;
 vid_hBW                = vid_BW div 2;
 vid_hhBW               = vid_hBW div 2;
 vid_oiw                = 18;
@@ -1188,7 +1188,7 @@ vid_oips               = 2*vid_oiw+vid_oisw;
 ui_max_alarms          = 12;
 
 ui_bottomsy            = vid_BW*4;
-ui_hwp                 = vid_panelw div 2;
+ui_hwp                 = vid_panel_pw div 2;
 ui_ubtns               = 23;
 
 ////////////////////////////////////////////////////////////////////////////////

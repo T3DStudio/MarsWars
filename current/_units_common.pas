@@ -1131,7 +1131,7 @@ begin
       FillChar(pprod_u,SizeOf(pprod_u),0);
 
       {$IFDEF _FULLGAME}
-      wanim    := false;
+      anim_isMoving    := false;
       anim     := 0;
       unit_UpdateMiniMapXY(pu);
       unit_UpdateFogXY    (pu);
@@ -1284,7 +1284,7 @@ begin
          with LastCreatedUnitP^ do
          begin
             {$IFDEF _FULLGAME}
-            mmap_order := LastCreatedUnit mod vid_blink_period1;
+            mmap_TickOrder := LastCreatedUnit mod vid_blink_period1;
             {$ENDIF}
             cycle_order:= LastCreatedUnit mod order_period;
             unum       := LastCreatedUnit;

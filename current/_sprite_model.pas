@@ -356,12 +356,12 @@ begin
 
       if(smodel<>spr_pdmodel)then
       begin
-         sms:=sm_unit2SMAnimState(u,wanim);
+         sms:=sm_unit2SMAnimState(u,anim_isMoving);
 
          case sms of
 sms_walk:    if(animw>0)then
              begin
-                if(wanim)or(_ukbuilding)then
+                if(anim_isMoving)or(_ukbuilding)then
                 begin
                    anim+=animw;
                    if(anim<0)then anim:=0;

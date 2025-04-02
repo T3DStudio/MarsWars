@@ -223,27 +223,29 @@ end;
 //   Panel
 //
 
-procedure ui_Btn2XY(x,y,sx,sy:integer;px,py:pinteger;turn9:boolean);
+procedure ui_Btn2XY(x,y,sx,sy:integer;px,py:pinteger;turnBlock:boolean);
 begin
-   if(vid_PannelPos<2)then // left right
-   begin
-      px^:=(sx+x)*vid_BW;
-      py^:=(sy+y)*vid_BW;
-   end
-   else
-   begin
-      if(turn9)then
-      begin
-         px^:=x*vid_BW+vid_BW*3*(y div 3);
-         py^:=y*vid_BW-vid_BW*3*(y div 3);
-      end
-      else
-      begin
-         px^:=y*vid_BW;
-         py^:=x*vid_BW;
-      end;
-      px^+=sy*vid_BW;
-      py^+=sx*vid_BW;
+   case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                px^:=(sx+x)*vid_BW;
+                py^:=(sy+y)*vid_BW;
+             end;
+vpp_top,
+vpp_bottom : begin
+                if(turnBlock)then
+                begin
+                   px^:=x*vid_BW+vid_BW*vid_panel_bw*(y div vid_panel_bw);
+                   py^:=y*vid_BW-vid_BW*vid_panel_bw*(y div vid_panel_bw);
+                end
+                else
+                begin
+                   px^:=y*vid_BW;
+                   py^:=x*vid_BW;
+                end;
+                px^+=sy*vid_BW;
+                py^+=sx*vid_BW;
+             end;
    end;
 end;
 
@@ -290,46 +292,53 @@ procedure ui_BtnTab(tar,btn   :pSDL_Surface;
                    ucl,
                    i1,i2,i3,i4:integer;
                    c1,c2,c3,c4:cardinal;
-                   sel        :boolean);
+                   selected   :boolean);
 var bx,by:integer;
 begin
-   if(vid_PannelPos<2)then
-   begin
-      bx:=ucl*vid_tBW+1;
-      by:=1;
-      draw_surf(tar,bx,by+5,btn);
-      if(sel)then
-      begin
-         rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_BW-3,c_lime);
-         rectangleColor(tar,bx+2,by+2,bx+vid_tBW-4,by+vid_BW-4,c_lime);
-      end;
-by+=3;if(i1>0)then draw_text(tar,bx+4,by,i2s(i1),ta_LU,255,c1);by+=basefont_w1+3;
-      if(i2>0)then draw_text(tar,bx+4,by,i2s(i2),ta_LU,255,c2);by+=basefont_w1+3;
-      if(i3>0)then draw_text(tar,bx+4,by,i2s(i3),ta_LU,255,c3);by+=basefont_w1+3;
-      if(i4>0)then draw_text(tar,bx+4,by,i2s(i4),ta_LU,255,c4);
-   end
-   else
-   begin
-      bx:=1;
-      by:=ucl*vid_tBW+1;
-      draw_surf(tar,bx+5,by,btn);
-      if(sel)then
-      begin
-         rectangleColor(tar,bx+1,by+1,bx+vid_BW-3,by+vid_tBW-3,c_lime);
-         rectangleColor(tar,bx+2,by+2,bx+vid_BW-4,by+vid_tBW-4,c_lime);
-      end;
-by+=3;if(i1>0)then draw_text(tar,bx+3,by              ,i2s(i1),ta_LU,255,c1);
-      if(i2>0)then draw_text(tar,bx+3,by+basefont_w1+3,i2s(i2),ta_LU,255,c2);
+   case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                bx:=ucl*vid_tBW+1;
+                by:=1;
+                draw_surf(tar,bx,by+5,btn);
+                if(selected)then
+                begin
+                   rectangleColor(tar,bx+1,by+1,bx+vid_tBW-3,by+vid_BW-3,c_lime);
+                   rectangleColor(tar,bx+2,by+2,bx+vid_tBW-4,by+vid_BW-4,c_lime);
+                end;
+          by+=3;if(i1>0)then draw_text(tar,bx+4,by,i2s(i1),ta_LU,255,c1);by+=basefont_w1+3;
+                if(i2>0)then draw_text(tar,bx+4,by,i2s(i2),ta_LU,255,c2);by+=basefont_w1+3;
+                if(i3>0)then draw_text(tar,bx+4,by,i2s(i3),ta_LU,255,c3);by+=basefont_w1+3;
+                if(i4>0)then draw_text(tar,bx+4,by,i2s(i4),ta_LU,255,c4);
+             end;
 
-      if(i3>0)then draw_text(tar,bx+vid_BW-4,by              ,i2s(i3),ta_RU,255,c3);
-      if(i4>0)then draw_text(tar,bx+vid_BW-4,by+basefont_w1+3,i2s(i4),ta_RU,255,c4);
+vpp_top,
+vpp_bottom : begin
+                bx:=1;
+                by:=ucl*vid_tBW+1;
+                draw_surf(tar,bx+5,by,btn);
+                if(selected)then
+                begin
+                   rectangleColor(tar,bx+1,by+1,bx+vid_BW-3,by+vid_tBW-3,c_lime);
+                   rectangleColor(tar,bx+2,by+2,bx+vid_BW-4,by+vid_tBW-4,c_lime);
+                end;
+          by+=3;if(i1>0)then draw_text(tar,bx+3,by              ,i2s(i1),ta_LU,255,c1);
+                if(i2>0)then draw_text(tar,bx+3,by+basefont_w1+3,i2s(i2),ta_LU,255,c2);
+
+                if(i3>0)then draw_text(tar,bx+vid_BW-4,by              ,i2s(i3),ta_RU,255,c3);
+                if(i4>0)then draw_text(tar,bx+vid_BW-4,by+basefont_w1+3,i2s(i4),ta_RU,255,c4);
+             end;
    end;
 end;
 
 procedure d_UpdatePanel(tar:pSDL_Surface;POVPlayer:byte);
-var ucl,ux,uy,uid:integer;
-              req:cardinal;
-pPOVPlayer:PTPlayer;
+var
+tab       : TTabType;
+ucl,
+uid,
+ux,uy     : integer;
+req       : cardinal;
+pPOVPlayer: PTPlayer;
 procedure PlayersButtoms;
 var p:byte;
 begin
@@ -356,149 +365,151 @@ begin
    begin
       // panel background
       boxColor(tar,0,0,tar^.w-1,tar^.h-1,c_black);
-      if(vid_PannelPos<2)then // vertical
-      begin
-         ux:=vid_tBW;while(ux<vid_panelw )do begin vlineColor(tar,ux    ,0          ,vid_BW     ,c_white);ux+=vid_tBW;end;
-         ux:=vid_BW ;while(ux<vid_panelw )do begin vlineColor(tar,ux    ,vid_BW     ,vid_panelhi,c_white);ux+=vid_BW; end;
-         uy:=0      ;while(uy<vid_panelhi)do begin hlineColor(tar,0     ,vid_panelw ,uy         ,c_white);uy+=vid_BW; end;
-         vlineColor(tar,0         ,0,vid_panelhi,c_white);
-         vlineColor(tar,vid_panelw,0,vid_panelhi,c_white);
-         hlineColor(tar,0,vid_panelw,vid_panelhi,c_white);
-      end
-      else
-      begin
-         uy:=vid_tBW;while(uy<vid_panelw )do begin hlineColor(tar,0     ,vid_BW     ,uy         ,c_white);uy+=vid_tBW;end;
-         uy:=vid_BW ;while(uy<vid_panelw )do begin hlineColor(tar,vid_BW,vid_panelhi,uy         ,c_white);uy+=vid_BW; end;
-         ux:=0      ;while(ux<vid_panelhi)do begin vlineColor(tar,ux    ,0          ,vid_panelw ,c_white);ux+=vid_BW; end;
-         hlineColor(tar,0,vid_panelhi,0         ,c_white);
-         hlineColor(tar,0,vid_panelhi,vid_panelw,c_white);
-         vlineColor(tar,vid_panelhi,0,vid_panelw,c_white);
+      case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                ux:=vid_tBW;while(ux<vid_panel_pw )do begin vlineColor(tar,ux    ,0          ,vid_BW     ,c_white);ux+=vid_tBW;end;
+                ux:=vid_BW ;while(ux<vid_panel_pw )do begin vlineColor(tar,ux    ,vid_BW     ,vid_panel_phi,c_white);ux+=vid_BW; end;
+                uy:=0      ;while(uy<vid_panel_phi)do begin hlineColor(tar,0     ,vid_panel_pw ,uy         ,c_white);uy+=vid_BW; end;
+                vlineColor(tar,0         ,0,vid_panel_phi,c_white);
+                vlineColor(tar,vid_panel_pw,0,vid_panel_phi,c_white);
+                hlineColor(tar,0,vid_panel_pw,vid_panel_phi,c_white);
+             end;
+vpp_top,
+vpp_bottom : begin
+                uy:=vid_tBW;while(uy<vid_panel_pw )do begin hlineColor(tar,0     ,vid_BW     ,uy         ,c_white);uy+=vid_tBW;end;
+                uy:=vid_BW ;while(uy<vid_panel_pw )do begin hlineColor(tar,vid_BW,vid_panel_phi,uy         ,c_white);uy+=vid_BW; end;
+                ux:=0      ;while(ux<vid_panel_phi)do begin vlineColor(tar,ux    ,0          ,vid_panel_pw ,c_white);ux+=vid_BW; end;
+                hlineColor(tar,0,vid_panel_phi,0         ,c_white);
+                hlineColor(tar,0,vid_panel_phi,vid_panel_pw,c_white);
+                vlineColor(tar,vid_panel_phi,0,vid_panel_pw,c_white);
+             end;
       end;
 
       // tabs
-      for ucl:=0 to 3 do
-        case ucl of
-        0: ui_BtnTab(tar,spr_tabs[ucl],ucl, ui_bprod_first      ,ui_bprod_all,ucl_cs[true ],ucl_c[true ],c_white,c_yellow,c_lime,c_orange, ucl=ui_tab);
-        1: ui_BtnTab(tar,spr_tabs[ucl],ucl, it2s(ui_uprod_first),uproda      ,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange, ucl=ui_tab);
-        2: ui_BtnTab(tar,spr_tabs[ucl],ucl, it2s(ui_pprod_first),upproda     ,0            ,0           ,c_white,c_yellow,0     ,0       , ucl=ui_tab);
-        3: ui_BtnTab(tar,spr_tabs[ucl],ucl, 0                   ,0           ,0            ,0           ,0      ,0       ,0     ,0       , ucl=ui_tab);
+      for tab in TTabType do
+        case tab of
+tt_buildings: ui_BtnTab(tar,spr_tabs[ord(tab)],ord(tab), ui_bprod_first      ,ui_bprod_all,ucl_cs[true ],ucl_c[true ],c_white,c_yellow,c_lime,c_orange, tab=ui_tab);
+tt_units    : ui_BtnTab(tar,spr_tabs[ord(tab)],ord(tab), it2s(ui_uprod_first),uproda      ,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange, tab=ui_tab);
+tt_upgrades : ui_BtnTab(tar,spr_tabs[ord(tab)],ord(tab), it2s(ui_pprod_first),upproda     ,0            ,0           ,c_white,c_yellow,0     ,0       , tab=ui_tab);
+tt_controls : ui_BtnTab(tar,spr_tabs[ord(tab)],ord(tab), 0                   ,0           ,0            ,0           ,0      ,0       ,0     ,0       , tab=ui_tab);
         end;
 
       // bottom line buttons
-      d_BTNStr(tar,0,vid_panelch,@str_panelHint_menu,c_white);
+      d_BTNStr(tar,0,vid_panel_bh,@str_panelHint_menu,c_white);
       if(net_status>ns_single)then
-      d_BTNStr(tar,2,vid_panelch,@str_pause,GetPlayerColor(g_status,c_white));
+      d_BTNStr(tar,2,vid_panel_bh,@str_pause,GetPlayerColor(g_status,c_white));
 
       // main buttons
       case ui_tab of
-      0: if(POVPlayer<=LastPlayer)then
-         for ucl:=0 to ui_ubtns do  // buildings
-         begin
-            uid:=ui_panel_uids[race ,ui_tab,ucl];
-            if(uid=0)then continue;
+tt_buildings: if(POVPlayer<=LastPlayer)then
+                for ucl:=0 to ui_ubtns do  // buildings
+                begin
+                   uid:=ui_panel_uids[race ,ord(ui_tab),ucl];
+                   if(uid=0)then continue;
 
-            with g_uids[uid] do
-            begin
-               if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
+                   with g_uids[uid] do
+                   begin
+                      if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
 
-               ux:=(ucl mod 3);
-               uy:=(ucl div 3);
+                      ux:=(ucl mod vid_panel_bw);
+                      uy:=(ucl div vid_panel_bw);
 
-               req:=uid_CheckRequirements(pPOVPlayer,uid);
+                      req:=uid_CheckRequirements(pPOVPlayer,uid);
 
-               ui_BtnSprite(tar,ux,uy,un_btn.sdlSurface,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
-               ui_BtnText  (tar,ux,uy,
-               i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),
-               ui_cenergy[cenergy<0]       ,c_dyellow                   ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                   ,ir2s(build_cd));
+                      ui_BtnSprite(tar,ux,uy,un_btn.sdlSurface,m_brush=uid,(req>0) or not(uid in ui_bprod_possible));
+                      ui_BtnText  (tar,ux,uy,
+                      i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),
+                      ui_cenergy[cenergy<0]       ,c_dyellow                   ,c_lime              ,ui_max_color[ucl_e[true,ucl]>=a_units[uid]],c_aqua                   ,ir2s(build_cd));
 
-               ui_uid_reload [uid]:=-1;
-               ui_bucl_reload[ucl]:=-1;
-            end;
-         end;
+                      ui_uid_reload [uid]:=-1;
+                      ui_bucl_reload[ucl]:=-1;
+                   end;
+                end;
 
-      1: if(POVPlayer<=LastPlayer)then
-         for ucl:=0 to ui_ubtns do  // units
-         begin
-            uid:=ui_panel_uids[race ,ui_tab,ucl];
-            if(uid=0)then continue;
+tt_units    : if(POVPlayer<=LastPlayer)then
+                for ucl:=0 to ui_ubtns do  // units
+                begin
+                   uid:=ui_panel_uids[race ,ord(ui_tab),ucl];
+                   if(uid=0)then continue;
 
-            with g_uids[uid] do
-            begin
-               if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
+                   with g_uids[uid] do
+                   begin
+                      if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
 
-               ux:=(ucl mod 3);
-               uy:=(ucl div 3);
+                      ux:=(ucl mod vid_panel_bw);
+                      uy:=(ucl div vid_panel_bw);
 
-               req:=uid_CheckRequirements(pPOVPlayer,uid);
+                      req:=uid_CheckRequirements(pPOVPlayer,uid);
 
-               ui_BtnSprite(tar,ux,uy,un_btn.sdlSurface,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
-               ui_BtnText  (tar,ux,uy,
-               ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_InTransport[uid]),
-               ui_cenergy[cenergy<0]       ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                      ,'');
-            end;
-         end;
+                      ui_BtnSprite(tar,ux,uy,un_btn.sdlSurface,false,(req>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
+                      ui_BtnText  (tar,ux,uy,
+                      ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_InTransport[uid]),
+                      ui_cenergy[cenergy<0]       ,c_dyellow       ,c_lime         ,ui_max_color[uid_e[uid]>=a_units[uid]],c_purple                      ,'');
+                   end;
+                end;
 
-      2: if(POVPlayer<=LastPlayer)then
-         for ucl:=0 to ui_ubtns do  // upgrades
-         begin
-            uid:=ui_panel_uids[race ,ui_tab,ucl];
+tt_upgrades : if(POVPlayer<=LastPlayer)then
+                for ucl:=0 to ui_ubtns do  // upgrades
+                begin
+                   uid:=ui_panel_uids[race ,ord(ui_tab),ucl];
 
-            if(a_upgrs[uid]<=0)then continue;
+                   if(a_upgrs[uid]<=0)then continue;
 
-            ux:=(ucl mod 3);
-            uy:=(ucl div 3);
+                   ux:=(ucl mod vid_panel_bw);
+                   uy:=(ucl div vid_panel_bw);
 
-            ui_BtnSprite(tar,ux,uy,g_upids[uid]._up_btn.sdlSurface,ui_pprod_time[uid]>0,
-            (upid_CheckRequirements(pPOVPlayer,uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]) );
-            ui_BtnText  (tar,ux,uy,
-            ir2s(ui_pprod_time[uid]),i2s(upprodu[uid]),'',b2s(   upgr[uid])                            ,'',
-            ui_cenergy[cenergy<0]  ,c_dyellow         ,0 ,ui_max_color[upgr[uid]>=g_upids[uid]._up_max],0 ,'');
-         end;
+                   ui_BtnSprite(tar,ux,uy,g_upids[uid]._up_btn.sdlSurface,ui_pprod_time[uid]>0,
+                   (upid_CheckRequirements(pPOVPlayer,uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]) );
+                   ui_BtnText  (tar,ux,uy,
+                   ir2s(ui_pprod_time[uid]),i2s(upprodu[uid]),'',b2s(   upgr[uid])                            ,'',
+                   ui_cenergy[cenergy<0]  ,c_dyellow         ,0 ,ui_max_color[upgr[uid]>=g_upids[uid]._up_max],0 ,'');
+                end;
 
-      3: case tab3PageType of   // actions
-         1: begin
-               ui_BtnSprite(tar,0,0,spr_b_rfast,sys_uncappedFPS,false);
-               ui_BtnSprite(tar,1,0,spr_b_rback,false          ,false);
-               ui_BtnSprite(tar,2,0,spr_b_rskip,false          ,false);
-               ui_BtnSprite(tar,0,1,spr_b_rstop,g_status>0     ,false);
-               ui_BtnSprite(tar,1,1,spr_b_rvis ,rpls_POVCam    ,false);
-               ui_BtnSprite(tar,2,1,spr_b_rlog ,rpls_showlog   ,false);
-               ui_BtnSprite(tar,0,2,spr_b_rfog ,sys_fog        ,false);
+tt_controls : case tab3PageType of   // actions
+              t3pt_replay  : begin
+                             ui_BtnSprite(tar,0,0,spr_b_rfast,sys_uncappedFPS,false);
+                             ui_BtnSprite(tar,1,0,spr_b_rback,false          ,false);
+                             ui_BtnSprite(tar,2,0,spr_b_rskip,false          ,false);
+                             ui_BtnSprite(tar,0,1,spr_b_rstop,g_status>0     ,false);
+                             ui_BtnSprite(tar,1,1,spr_b_rvis ,rpls_POVCam    ,false);
+                             ui_BtnSprite(tar,2,1,spr_b_rlog ,rpls_showlog   ,false);
+                             ui_BtnSprite(tar,0,2,spr_b_rfog ,sys_fog        ,false);
 
-               ux:=2;
-               uy:=2;
-               PlayersButtoms;
-            end;
-         2: begin
-               ui_BtnSprite(tar,0,0,spr_b_rfog ,sys_fog    ,false);
+                             ux:=2;
+                             uy:=2;
+                             PlayersButtoms;
+                             end;
+              t3pt_observer: begin
+                             ui_BtnSprite(tar,0,0,spr_b_rfog ,sys_fog    ,false);
 
-               ux:=2;
-               uy:=0;
-               PlayersButtoms;
-            end;
-         3: begin
-               // добавить проверку на каждую икноку - имеет ли юнит абилку и может ли ее применять
-               //ui_BtnSprite(tar,0,0,spr_b_action ,false   ,unit_CheckAbility(ui_uibtn_abilityu));
-               //ui_BtnSprite(tar,1,0,spr_b_paction,false   ,ui_uibtn_abilityu=nil);
-               //ui_BtnSprite(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild <=0 );
+                             ux:=2;
+                             uy:=0;
+                             PlayersButtoms;
+                             end;
+              t3pt_actions : begin
+                             // добавить проверку на каждую икноку - имеет ли юнит абилку и может ли ее применять
+                             //ui_BtnSprite(tar,0,0,spr_b_action ,false   ,unit_CheckAbility(ui_uibtn_abilityu));
+                             //ui_BtnSprite(tar,1,0,spr_b_paction,false   ,ui_uibtn_abilityu=nil);
+                             //ui_BtnSprite(tar,2,0,spr_b_rebuild,false   ,ui_uibtn_rebuild <=0 );
 
-               ui_BtnSprite(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
-               ui_BtnSprite(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );
-               ui_BtnSprite(tar,2,1,spr_b_apatrol,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,2,1,spr_b_apatrol,false   ,ui_uibtn_move<=0   );
 
-               ui_BtnSprite(tar,0,2,spr_b_move   ,false   ,ui_uibtn_move<=0   );
-               ui_BtnSprite(tar,1,2,spr_b_hold   ,false   ,ui_uibtn_move<=0   );
-               ui_BtnSprite(tar,2,2,spr_b_patrol ,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,0,2,spr_b_move   ,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,1,2,spr_b_hold   ,false   ,ui_uibtn_move<=0   );
+                             ui_BtnSprite(tar,2,2,spr_b_patrol ,false   ,ui_uibtn_move<=0   );
 
-               ui_BtnSprite(tar,0,3,spr_b_cancel ,false   ,false              );
-               ui_BtnSprite(tar,1,3,spr_tabs[0]  ,false   ,ui_groups_f1.ugroup_n<=0);
-               ui_BtnSprite(tar,2,3,spr_b_selall ,false   ,ui_groups_f2.ugroup_n<=0);
+                             ui_BtnSprite(tar,0,3,spr_b_cancel ,false   ,false              );
+                             ui_BtnSprite(tar,1,3,spr_tabs[0]  ,false   ,ui_groups_f1.ugroup_n<=0);
+                             ui_BtnSprite(tar,2,3,spr_b_selall ,false   ,ui_groups_f2.ugroup_n<=0);
 
-               ui_BtnSprite(tar,0,4,spr_b_delete ,false   ,(ucl_cs[false]+ucl_cs[true])<=0);
-               ui_BtnSprite(tar,1,4,spr_b_mmark  ,false   ,false              );
-               ui_BtnSprite(tar,2,4,spr_b_rclck  ,m_action,false              );
-            end;
-         end;
+                             ui_BtnSprite(tar,0,4,spr_b_delete ,false   ,(ucl_cs[false]+ucl_cs[true])<=0);
+                             ui_BtnSprite(tar,1,4,spr_b_mmark  ,false   ,false              );
+                             ui_BtnSprite(tar,2,4,spr_b_rclck  ,m_action,false              );
+                             end;
+              end;
       end;
    end;
 end;
@@ -560,8 +571,8 @@ begin
       else
       case m_panelBtn_y of  // tab hints
       3  : case (vid_PannelPos<2) of
-           true :if(mouse_y>vid_panelw)then hs1:=@str_panelHint_Tab[(mouse_x-vid_panelx) div vid_tBW];
-           false:if(mouse_x>vid_panelw)then hs1:=@str_panelHint_Tab[(mouse_y-vid_panely) div vid_tBW];
+           true :if(mouse_y>vid_panel_pw)then hs1:=@str_panelHint_Tab[(mouse_x-vid_panelx) div vid_tBW];
+           false:if(mouse_x>vid_panel_pw)then hs1:=@str_panelHint_Tab[(mouse_y-vid_panely) div vid_tBW];
            end;
       else
         if(vid_PannelPos<2)then
@@ -576,7 +587,7 @@ begin
            by+=3*(bx div 3);
            bx-=3*(bx div 3);
         end;
-        i :=(by*3)+(bx mod 3);
+        i :=(by*vid_panel_bw)+(bx mod vid_panel_bw);
 
         if(0<=i)and(i<=ui_ubtns)then
         begin

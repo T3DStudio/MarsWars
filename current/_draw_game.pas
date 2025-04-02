@@ -337,9 +337,10 @@ begin
       if(srect)
       then hbar:=true
       else
-        case vid_uhbars of
-      0: if(hits<_mhits)then hbar:=true;
-      1: hbar:=true;
+        case vid_UnitHealthBars of
+uhb_damaged : if(hits<_mhits)then hbar:=true;
+uhb_always  : hbar:=true;
+uhb_selected: ;
         end;
 
       if(srect)then
@@ -746,8 +747,8 @@ begin
 
   { with g_players[PlayerClient] do
    begin
-      draw_text(r_screen,vid_panelw,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
-      draw_text(r_screen,vid_panelw,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
+      draw_text(r_screen,vid_panel_pw,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
+      draw_text(r_screen,vid_panel_pw,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
    end;       }
 
    {ix:=-vid_cam_x+vid_mapx;

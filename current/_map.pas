@@ -1407,7 +1407,7 @@ begin
    map_FreeCenterR  := byte(map_type=mapt_clake)*(map_psize div 3);
 
    {$IFDEF _FULLGAME}
-   map_mm_cx   := vid_panelwi/map_psize;
+   map_mm_cx   := vid_panel_pwi/map_psize;
    map_mm_CamW := trunc(vid_cam_w*map_mm_cx)+1;
    map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
    map_mm_gridW:= MapCellW*map_mm_cx;
@@ -1526,7 +1526,7 @@ begin
 
    if(g_preset_cur>0)
    or(PlayerRequestor>LastPlayer)
-   or((PlayerLobb1  <=LastPlayer)and(PlayerLobb1<>PlayerRequestor))
+   or((PlayerLobby  <=LastPlayer)and(PlayerLobby<>PlayerRequestor))
    or(G_Started)
    then exit;
 

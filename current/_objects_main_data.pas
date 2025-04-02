@@ -1549,7 +1549,7 @@ ua_move,
 ua_apatrol,
 ua_patrol,
 ua_unloadto
-           : ua_type:=uat_target;
+           : ua_type:=uat_point;
 ua_astay,
 ua_stay,
 ua_destroy,

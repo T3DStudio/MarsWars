@@ -10,12 +10,12 @@ function unit_canMove       (pu:PTUnit):boolean; forward;
 function unit_canAttack     (pu:PTUnit;check_buffs:boolean):boolean; forward;
 function unit_TransportCheck(pTransport,pTarget:PTUnit):boolean;     forward;
 
-procedure aiu_InitVars(pu:PTUnit);forward;
+procedure aiu_InitVars   (pu:PTUnit);forward;
 procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
-procedure ai_InitVars(pu:PTUnit);forward;
+procedure ai_InitVars       (pu:PTUnit);forward;
 procedure ai_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
-procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
-procedure ai_scout_pick(pu:PTUnit);forward;
+procedure ai_CollectData    (pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
+procedure ai_scout_pick     (pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 function map_IsObstacleZone(zone:word):boolean; forward;
 function map_CellGetZone(cx,cy:integer):word;forward;
@@ -237,7 +237,7 @@ begin
         c+=1;
         if(isready)
         or(p=PlayerClient)
-        or(p=PlayerLobb1 )then r+=1;
+        or(p=PlayerLobby )then r+=1;
      end;
    PlayersGetReadyStatus:=(r=c)and(c>0);
 end;
@@ -435,7 +435,7 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(PlayerTarget,[lmt_unit_attacke
 
          if(amtype=lmt_player_defeated )
          or(amtype=lmt_player_surrender)then
-           if(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=3;
+           if(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=tt_controls;
       end;
       {$ENDIF}
    end;
@@ -1080,19 +1080,14 @@ begin
 end;
 
 function UnitF1Select(pu:PTUnit):boolean;
-var tu:PTUnit;
 begin
    UnitF1Select:=false;
    with pu^  do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(not iscomplete)
-      or(IsIntUnitRange(transport,nil))then exit;
-
-      if(not _isbuilder)then exit;
-
-   end;
+     if(hits<=0)
+     or(not iscomplete)
+     or(IsIntUnitRange(transport,nil))
+     or(not _isbuilder)then exit;
    UnitF1Select:=true;
 end;
 
@@ -1243,17 +1238,36 @@ end;
 //   OTHER
 //
 
-function tab3PageType:byte;
+function enum_val2TVidPannelPos(val:integer):TVidPannelPos;
 begin
-   tab3PageType:=0;
+   for result in TVidPannelPos do
+     if(ord(result)=val)then exit;
+   result:=low(TVidPannelPos);
+end;
+function enum_val2TUIUnitHBarsOption(val:integer):TUIUnitHBarsOption;
+begin
+   for result in TUIUnitHBarsOption do
+     if(ord(result)=val)then exit;
+   result:=low(TUIUnitHBarsOption);
+end;
+function enum_val2TPlayersColorSchema(val:integer):TPlayersColorSchema;
+begin
+   for result in TPlayersColorSchema do
+     if(ord(result)=val)then exit;
+   result:=low(TPlayersColorSchema);
+end;
+
+function tab3PageType:TTab3PageType;
+begin
+   tab3PageType:=t3pt_none;
    if(rpls_rstate>=rpls_state_read)
-   then tab3PageType:=1
+   then tab3PageType:=t3pt_replay
    else
-     if(g_players[PlayerClient].isobserver)
-     then tab3PageType:=2
+     if(g_players[PlayerClient].isobserver)//or GameStatus_End
+     then tab3PageType:=t3pt_observer
      else
        if(not g_players[PlayerClient].isdefeated)
-       then tab3PageType:=3;
+       then tab3PageType:=t3pt_actions;
 end;
 
 function RoundN(x,n:integer):integer;
@@ -1531,37 +1545,37 @@ end;
 function PlayerGetColor(player:byte):cardinal;
 begin
    {
-   str_menu_PlayersColorl[0]         := tc_white +'default'+tc_default;
-   str_menu_PlayersColorl[1]         := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[2]         := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[3]         := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[4]         := tc_purple+'teams'  +tc_default;
-   str_menu_PlayersColorl[5]         := tc_white +'own '   +tc_purple+'teams'+tc_default;
+   str_menu_PlayersColorl[pcs_default]:= tc_white +'default'+tc_default;
+   str_menu_PlayersColorl[pcs_LYR    ]:= tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_WYR    ]:= tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_WAR    ]:= tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_teams  ]:= tc_lime+'t'+tc_red+'e'+tc_aqua+'a'+tc_yellow+'m'+tc_blue+'s'  +tc_default;
+   str_menu_PlayersColorl[pcs_wTeams ]:= tc_white +'own '   +str_menu_PlayersColorl[pcs_teams];
    }
    PlayerGetColor:=c_white;
    if(player<=LastPlayer)then
-     case vid_plcolors of
-0: PlayerGetColor:=PlayerColorSchemeFFA[player];
-1,
-2,
-3: if(player=UIPlayer)then
-     case vid_plcolors of
-     1: PlayerGetColor:=c_lime;
-     2,
-     3: PlayerGetColor:=c_white;
-     end
-   else
-     if(PlayerSlotGetTeam(g_mode,UIPlayer,255)=PlayerSlotGetTeam(g_mode,player,255))then
-       case vid_plcolors of
-       1,
-       2: PlayerGetColor:=c_yellow;
-       3: PlayerGetColor:=c_aqua;
-       end
-     else PlayerGetColor:=c_red;
-4: PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
-5: if(player=UIPlayer)
-   then PlayerGetColor:=c_white
-   else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
+     case vid_PlayersColorSchema of
+pcs_default: PlayerGetColor:=PlayerColorSchemeFFA[player];
+pcs_LYR,
+pcs_WYR,
+pcs_WAR    : if(player=UIPlayer)then
+               case vid_PlayersColorSchema of
+               pcs_LYR: PlayerGetColor:=c_lime;
+               pcs_WYR,
+               pcs_WAR: PlayerGetColor:=c_white;
+               end
+             else
+               if(PlayerSlotGetTeam(g_mode,UIPlayer,255)=PlayerSlotGetTeam(g_mode,player,255))then
+                 case vid_PlayersColorSchema of
+                 pcs_LYR,
+                 pcs_WYR: PlayerGetColor:=c_yellow;
+                 pcs_WAR: PlayerGetColor:=c_aqua;
+                 end
+               else PlayerGetColor:=c_red;
+pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
+pcs_wTeams : if(player=UIPlayer)
+             then PlayerGetColor:=c_white
+             else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
      else
      end;
 end;
@@ -1637,8 +1651,8 @@ gs_replayend  : begin
                 end;
 gs_waitserver : begin
                    pstr^:=str_waitsv;
-                   if(PlayerLobb1<=LastPlayer)
-                   then pcol^:=PlayerColorNormal[PlayerLobb1]
+                   if(PlayerLobby<=LastPlayer)
+                   then pcol^:=PlayerColorNormal[PlayerLobby]
                    else pcol^:=c_ltgray;
                 end;
 gs_replaypause: begin
@@ -1673,10 +1687,10 @@ begin
    x0:=0;x1:=0;
    y0:=0;y1:=0;
    case vid_PannelPos of
-   0  : x0:=-ui_ControlBar_w;
-   1  : x1:=+ui_ControlBar_w;
-   2  : y0:=-ui_ControlBar_h;
-   3  : y1:=+ui_ControlBar_h;
+vpp_left  : x0:=-ui_ControlBar_w;
+vpp_right : x1:=+ui_ControlBar_w;
+vpp_top   : y0:=-ui_ControlBar_h;
+vpp_bottom: y1:=+ui_ControlBar_h;
    end;
 
    vid_cam_x    :=mm3i(x0,vid_cam_x,map_psize-vid_cam_w+x1);

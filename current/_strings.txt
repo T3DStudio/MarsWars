@@ -669,7 +669,7 @@ Immune to splash damage.
 
 ---------------------------
 
-Former Zombie
+Zombie Medic
 
 Hotkey: L
 Categories/Attributes: [unit,biological,light,ground]
@@ -1177,7 +1177,7 @@ Base vision range: 200
 Build time: 20
 Energy required: 200
 Slots in transport: 1
-Zombie variant: Former Zombie
+Zombie variant: Zombie Medic
 Zombification hits: 0
 Requirements: Science Facility
 Produced by: Barracks

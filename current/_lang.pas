@@ -766,39 +766,39 @@ begin
    str_menu_SaveInfo                 := 'SAVE INFO';
 
    str_menu_PanelPos                 := 'Control panel position';
-   str_menu_PanelPosl[0]             := tc_lime  +'left'  +tc_default;
-   str_menu_PanelPosl[1]             := tc_orange+'right' +tc_default;
-   str_menu_PanelPosl[2]             := tc_yellow+'top'   +tc_default;
-   str_menu_PanelPosl[3]             := tc_aqua  +'bottom'+tc_default;
+   str_menu_PanelPosl[vpp_left  ]    := tc_lime  +'left'  +tc_default;
+   str_menu_PanelPosl[vpp_right ]    := tc_orange+'right' +tc_default;
+   str_menu_PanelPosl[vpp_top   ]    := tc_yellow+'top'   +tc_default;
+   str_menu_PanelPosl[vpp_bottom]    := tc_aqua  +'bottom'+tc_default;
 
    // [vertical][]
    str_menu_MiniMapPos               := 'Mini map position';
-   str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[2];
-   str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[3];
-   str_menu_MiniMapPosl[false][true ]:= str_menu_PanelPosl[0];
-   str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[1];
+   str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[vpp_top   ];
+   str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[vpp_bottom];
+   str_menu_MiniMapPosl[false][true ]:= str_menu_PanelPosl[vpp_left  ];
+   str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[vpp_right ];
 
    str_menu_unitHBar                 := 'Health bars';
-   str_menu_unitHBarl[0]             := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
-   str_menu_unitHBarl[1]             := tc_aqua  +'always'  +tc_default;
-   str_menu_unitHBarl[2]             := tc_orange+'only '   +tc_lime+'selected'+tc_default;
+   str_menu_unitHBarl[uhb_damaged ]  := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
+   str_menu_unitHBarl[uhb_always  ]  := tc_aqua  +'always'  +tc_default;
+   str_menu_unitHBarl[uhb_selected]  := tc_orange+'only '   +tc_lime+'selected'+tc_default;
 
    str_menu_PlayersColor             := 'Players color';
-   str_menu_PlayersColorl[0]         := tc_white +'default'+tc_default;
-   str_menu_PlayersColorl[1]         := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[2]         := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[3]         := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[4]         := tc_lime+'t'+tc_red+'e'+tc_aqua+'a'+tc_yellow+'m'+tc_blue+'s'  +tc_default;
-   str_menu_PlayersColorl[5]         := tc_white +'own '   +str_menu_PlayersColorl[4];
+   str_menu_PlayersColorl[pcs_default]:= tc_white +'default'+tc_default;
+   str_menu_PlayersColorl[pcs_LYR    ]:= tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_WYR    ]:= tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_WAR    ]:= tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_menu_PlayersColorl[pcs_teams  ]:= tc_lime+'t'+tc_red+'e'+tc_aqua+'a'+tc_yellow+'m'+tc_blue+'s'  +tc_default;
+   str_menu_PlayersColorl[pcs_wTeams ]:= tc_white +'own '   +str_menu_PlayersColorl[pcs_teams];
 
-   str_menu_PlayerSlots[pss_closed  ] :='closed';
-   str_menu_PlayerSlots[pss_observer] :='observer';
-   str_menu_PlayerSlots[pss_opened  ] :='opened';
-   str_menu_PlayerSlots[pss_ready   ] :='ready';
-   str_menu_PlayerSlots[pss_nready  ] :='not ready';
-   str_menu_PlayerSlots[pss_swap    ] :='jump here';
+   str_menu_PlayerSlots[pss_closed   ]:='closed';
+   str_menu_PlayerSlots[pss_observer ]:='observer';
+   str_menu_PlayerSlots[pss_opened   ]:='opened';
+   str_menu_PlayerSlots[pss_ready    ]:='ready';
+   str_menu_PlayerSlots[pss_nready   ]:='not ready';
+   str_menu_PlayerSlots[pss_swap     ]:='jump here';
    str_menu_PlayerSlots[pss_sobserver]:='become observer';
-   str_menu_PlayerSlots[pss_splayer ] :='become player';
+   str_menu_PlayerSlots[pss_splayer  ]:='become player';
 
    for p:=pss_AI_1 to pss_AI_11 do
    str_menu_PlayerSlots[p]           :=ai_name(p-pss_AI_1+1);
@@ -1011,10 +1011,10 @@ begin
    str_panelHint_Common[0]           := 'Menu (' +tc_lime+'Esc'+tc_default+')';
    str_panelHint_Common[1]           := '';
    str_panelHint_Common[2]           := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
-   str_panelHint_Tab[0]              := 'Buildings';
-   str_panelHint_Tab[1]              := 'Units';
-   str_panelHint_Tab[2]              := 'Researches';
-   str_panelHint_Tab[3]              := 'Controls';
+   str_panelHint_Tab[tt_buildings]   := 'Buildings';
+   str_panelHint_Tab[tt_units    ]   := 'Units';
+   str_panelHint_Tab[tt_upgrades ]   := 'Researches';
+   str_panelHint_Tab[tt_controls ]   := 'Controls';
    str_panelHint_all                 := 'All';
    str_panelHint_menu                := 'Menu';
 
@@ -1075,7 +1075,7 @@ begin
    hintStrUID(UID_Mancubus         ,'Mancubus'                    ,'');
    hintStrUID(UID_Arachnotron      ,'Arachnotron'                 ,'');
    hintStrUID(UID_Archvile         ,'Arch-Vile'                   ,'');
-   hintStrUID(UID_ZMedic          ,'Former Zombie'               ,'');
+   hintStrUID(UID_ZMedic           ,'Zombie Medic'                ,'');
    hintStrUID(UID_ZEngineer        ,'Zombie Engineer'             ,'');
    hintStrUID(UID_ZSergant         ,'Zombie Shotgunner'           ,'');
    hintStrUID(UID_ZSSergant        ,'Zombie SuperShotgunner'      ,'');

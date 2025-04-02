@@ -167,7 +167,7 @@ begin
                          D_menu_EText(tar,mi,ta_LM ,name,true,0,c_white);
                          if(player_type=pt_human)and(net_status<>ns_single)then
                          begin
-                            if(playeri=PlayerLobb1)
+                            if(playeri=PlayerLobby)
                             then tstr:=str_menu_server
                             else
                               if(isready)
@@ -374,17 +374,17 @@ mi_exit                    : D_menu_MButton (tar,i,str_menu_Exit             );
 mi_StartScirmish,
 mi_StartCampaing           : D_menu_MButton (tar,i,str_menu_Start            );
 
-mi_settings_ColoredShadows : D_menu_MButtonD(tar,i,str_menu_ColoredShadow   ,str_bool[vid_ColoredShadow]         ,false);
-mi_settings_ShowAPM        : D_menu_MButtonD(tar,i,str_menu_APM             ,str_bool[vid_APM]                   ,false);
-mi_settings_HitBars        : D_menu_MButtonD(tar,i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_uhbars]      ,true );
-mi_settings_MRBAction      : D_menu_MButtonD(tar,i,str_menu_maction         ,str_menu_mactionl[m_action]         ,true );
-mi_settings_ScrollSpeed    : D_menu_MButtonB(tar,i,str_menu_ScrollSpeed     ,vid_CamSpeed,max_CamSpeed           ,false);
-mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]          ,false);
-mi_settings_PlayerName     : D_menu_MButtonN(tar,i,str_menu_PlayerName      ,PlayerName                                );
-mi_settings_Langugage      : D_menu_MButtonD(tar,i,str_menu_language        ,str_menu_lang[ui_language]          ,true );
-mi_settings_PanelPosition  : D_menu_MButtonD(tar,i,str_menu_PanelPos        ,str_menu_PanelPosl[vid_PannelPos]   ,true );
-mi_settings_MMapPosition   : D_menu_MButtonD(tar,i,str_menu_MiniMapPos      ,str_menu_MiniMapPosl[vid_PannelPos<2][vid_MiniMapPos],true );
-mi_settings_PlayerColors   : D_menu_MButtonD(tar,i,str_menu_PlayersColor    ,str_menu_PlayersColorl[vid_plcolors],true );
+mi_settings_ColoredShadows : D_menu_MButtonD(tar,i,str_menu_ColoredShadow   ,str_bool[vid_ColoredShadow]           ,false);
+mi_settings_ShowAPM        : D_menu_MButtonD(tar,i,str_menu_APM             ,str_bool[vid_APM]                     ,false);
+mi_settings_HitBars        : D_menu_MButtonD(tar,i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_UnitHealthBars],true );
+mi_settings_MRBAction      : D_menu_MButtonD(tar,i,str_menu_maction         ,str_menu_mactionl[m_action]           ,true );
+mi_settings_ScrollSpeed    : D_menu_MButtonB(tar,i,str_menu_ScrollSpeed     ,vid_CamSpeed,max_CamSpeed             ,false);
+mi_settings_MouseScroll    : D_menu_MButtonD(tar,i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]            ,false);
+mi_settings_PlayerName     : D_menu_MButtonN(tar,i,str_menu_PlayerName      ,PlayerName                                  );
+mi_settings_Langugage      : D_menu_MButtonD(tar,i,str_menu_language        ,str_menu_lang[ui_language]            ,true );
+mi_settings_PanelPosition  : D_menu_MButtonD(tar,i,str_menu_PanelPos        ,str_menu_PanelPosl[vid_PannelPos]     ,true );
+mi_settings_MMapPosition   : D_menu_MButtonD(tar,i,str_menu_MiniMapPos      ,str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical][vid_MiniMapPos],true );
+mi_settings_PlayerColors   : D_menu_MButtonD(tar,i,str_menu_PlayersColor    ,str_menu_PlayersColorl[vid_PlayersColorSchema]  ,true );
 
 {
 if(rpls_rstate>rpls_state_none)and(g_cl_units>0)
@@ -395,7 +395,7 @@ else D_menu_ETextD(tar,mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_
 
 //
 mi_settings_Replaying      : D_menu_MButtonD(tar,i,str_menu_Recording       ,str_bool[rpls_Recording]             ,false);
-mi_settings_ReplayName     : D_menu_MButtonN(tar,i,str_menu_ReplayName      ,rpls_str_name                              );
+mi_settings_ReplayName     : D_menu_MButtonN(tar,i,str_menu_ReplayName      ,rpls_str_prefix                              );
 mi_settings_ReplayQuality  : D_menu_MButtonD(tar,i,str_menu_ReplayQuality   ,str_menu_NetQuality[rpls_Quality]    ,true );
 
 mi_settings_Client         : D_menu_EText   (tar,i,ta_MM,str_menu_Client,false,0,0);

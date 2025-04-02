@@ -81,7 +81,7 @@ begin
     end;
 
    net_writebyte(pid         );
-   net_writebyte(PlayerLobb1 );
+   net_writebyte(PlayerLobby );
 
    net_writebyte(g_preset_cur);
    net_writeint (map_psize    );
@@ -540,10 +540,10 @@ nmid_lobby_info  : begin
                          CleintProtocolError(@str_error_WrongVersion);
                          exit;
                       end;
-                      if(PlayerLobb1<>i)then
+                      if(PlayerLobby<>i)then
                       begin
                          menu_remake:=true;
-                         PlayerLobb1:=i;
+                         PlayerLobby:=i;
                       end;
 
                       // map and game settings
@@ -562,12 +562,13 @@ nmid_lobby_info  : begin
                             menu_state:=false;
                             ServerSide:=false;
                             GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
-                            if(g_players[PlayerClient].team=0)then
+                            {if(g_players[PlayerClient].team=0)then
                             begin
-                               ui_tab:=3;
-                               UIPlayer:=0;
+                               ui_tab:=tt_controls;
+                               UIPlayer:=255;
                             end
-                            else UIPlayer:=PlayerClient;
+                            else }
+                            UIPlayer:=PlayerClient;
                          end
                          else
                          begin

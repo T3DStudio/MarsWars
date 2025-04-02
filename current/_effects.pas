@@ -139,7 +139,7 @@ begin
    end;
 end;
 begin
-   if(menu_state)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
+   if(menu_state)or(G_Status<>gs_running)or(r_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
 
    for e:=1 to vid_MaxScreenSprites do
    with g_effects[e] do

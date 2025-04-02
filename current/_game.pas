@@ -69,9 +69,9 @@ begin
    else
      if(PlayerClient=SlotSource)then PlayerClient:=SlotTarget;
 
-   if(PlayerLobb1=SlotTarget)then PlayerLobb1:=SlotSource
+   if(PlayerLobby=SlotTarget)then PlayerLobby:=SlotSource
    else
-     if(PlayerLobb1=SlotSource)then PlayerLobb1:=SlotTarget;
+     if(PlayerLobby=SlotSource)then PlayerLobby:=SlotTarget;
 end;
 
 procedure PlayerSetType(PlayerTarget,newType:byte);
@@ -111,13 +111,13 @@ begin
    case NewState of
 pss_ready    : with g_players[PlayerTarget] do
                  if(player_type<>pt_human)
-                 or(PlayerTarget=PlayerLobb1)
+                 or(PlayerTarget=PlayerLobby)
                  or(    isready)
                  or(net_status=ns_single)
                  or(PlayerRequestor<>PlayerTarget)then exit;
 pss_nready   : with g_players[PlayerTarget] do
                  if(player_type<>pt_human)
-                 or(PlayerTarget=PlayerLobb1)
+                 or(PlayerTarget=PlayerLobby)
                  or(not isready)
                  or(net_status=ns_single)
                  or(PlayerRequestor<>PlayerTarget)then exit;
@@ -136,7 +136,7 @@ pss_splayer  : with g_players[PlayerTarget] do
       if(PlayerRequestor<=LastPlayer)then
       begin
          if(PlayerRequestor=PlayerTarget)then exit;
-         if(PlayerRequestor<>PlayerLobb1)and(PlayerLobb1<=LastPlayer)then exit;
+         if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer)then exit;
          if(g_preset_cur>0)then
           with g_presets[g_preset_cur] do
            if(gp_player_team[PlayerTarget]>LastPlayer)
@@ -206,7 +206,7 @@ begin
       or(g_slot_state[PlayerTarget]=pss_observer)then exit;
 
       if((PlayerRequestor= PlayerTarget)and(player_type=pt_human))
-      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=PlayerLobb1)or(PlayerLobb1>LastPlayer)))
+      or((PlayerRequestor<>PlayerTarget)and(player_type=pt_ai)and((PlayerRequestor=PlayerLobby)or(PlayerLobby>LastPlayer)))
       then
       else exit;
 
@@ -243,11 +243,11 @@ begin
       or( g_slot_state[PlayerTarget]=pss_closed  )
 
       or((pss_AI_1<=g_slot_state[PlayerTarget]   )
-      and(g_slot_state[PlayerTarget]<=pss_AI_11  )and(player_type=pt_ai  )and(PlayerRequestor<>PlayerLobb1 )and(PlayerLobb1<=LastPlayer))
+      and(g_slot_state[PlayerTarget]<=pss_AI_11  )and(player_type=pt_ai  )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
 
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_none))
       or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_human)and(PlayerRequestor<>PlayerTarget))
-      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai   )and(PlayerRequestor<>PlayerLobb1 )and(PlayerLobb1<=LastPlayer))
+      or((g_slot_state[PlayerTarget]=pss_opened  )and(player_type=pt_ai   )and(PlayerRequestor<>PlayerLobby )and(PlayerLobby<=LastPlayer))
       or(isobserver)
       then exit;
 
@@ -398,7 +398,7 @@ begin
       name       :=PlayerName;
    end;
    g_slot_state[PlayerClient]:=pss_opened;
-   PlayerLobb1:=PlayerClient;
+   PlayerLobby:=PlayerClient;
 
    {$ELSE}
    PlayerClient:=255;
@@ -461,7 +461,7 @@ begin
    GameLoadPreset:=false;
 
    if(G_Started)
-   or((PlayerRequestor<=LastPlayer)and(PlayerLobb1<>PlayerRequestor)and(PlayerLobb1<=LastPlayer))
+   or((PlayerRequestor<=LastPlayer)and(PlayerLobby<>PlayerRequestor)and(PlayerLobby<=LastPlayer))
    or(preset>=g_preset_n)then exit;
 
    GameLoadPreset:=true;
@@ -499,7 +499,7 @@ function GameSetCommonSetting(PlayerRequestor,setting,NewVal:byte;Check:boolean)
 begin
    GameSetCommonSetting:=false;
    if(G_Started)
-   or((PlayerRequestor<=LastPlayer)and(PlayerLobb1<=LastPlayer)and(PlayerLobb1<>PlayerRequestor))
+   or((PlayerRequestor<=LastPlayer)and(PlayerLobby<=LastPlayer)and(PlayerLobby<>PlayerRequestor))
    then exit;
 
    case setting of
@@ -584,14 +584,14 @@ begin
    menu_remake:= true;
    menu_redraw:= true;
 
-   vid_cam_x:=-vid_panelw;
+   vid_cam_x:=-vid_panel_pw;
    vid_cam_y:=0;
    GameCameraBounds;
 
    vid_blink_timer1:=0;
    vid_blink_timer2:=0;
 
-   ui_tab :=0;
+   ui_tab :=tt_buildings;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
 
@@ -634,35 +634,33 @@ end;
 {$include _replays.pas}
 {$ENDIF}
 
-procedure GameCreateStartBase(x,y:integer;uid,level,pl,c:byte);
+procedure GameCreateStartBase(x,y:integer;uid,level,playern:byte;count:integer);
 var
 n  : byte;
 r,d,
 ds : integer;
 procedure Spawn(tx,ty:integer);
 begin
-   unit_add(tx,ty,0,uid,pl,true,false,level);
+   unit_add(tx,ty,0,uid,playern,true,false,level);
    n+=1;
 end;
 begin
    n:=0;
-   if(c>6)then c:=6;
-
-   Spawn(x,y);
-
-   if(c=0)then exit;
+   if(count<=0)then exit;
 
    d  :=point_dir(x,y,map_phsize,map_phsize);
-   ds :=360 div c;
-   r  :=g_uids[uid]._r*2+2;
+   ds :=360 div count;
+   if(count=1)
+   then r:=0
+   else r:=g_uids[uid]._r;
 
-   while(c>0) do
+   while(count>0) do
    begin
       Spawn(
       x+trunc(r*cos(d*degtorad)),
       y-trunc(r*sin(d*degtorad)));
       d+=ds;
-      c-=1;
+      count-=1;
    end;
 end;
 
@@ -713,7 +711,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
            GameCreateStartBase(map_PlayerStartX[p],
                                map_PlayerStartY[p],
                                uid_race_start_base[race],
-                               3*byte(g_generators>0),p,2);
+                               3*byte(g_generators>0),p,1+integer(g_generators>0));
            unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
@@ -723,7 +721,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
 
    {$IFDEF _FULLGAME}
    GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
-   if(g_players[PlayerClient].isobserver)then ui_tab:=3;
+   if(g_players[PlayerClient].isobserver)then ui_tab:=tt_controls;
    UIPlayer:=PlayerClient;
    {$ENDIF}
 end;
@@ -734,7 +732,7 @@ begin
    GameStartScirmish:=false;
 
    if(G_Started)
-   or((PlayerRequestor<>PlayerLobb1)and(PlayerLobb1<=LastPlayer))then exit;
+   or((PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer))then exit;
 
    if(PlayersGetReadyStatus)then
    begin
@@ -745,7 +743,7 @@ begin
       menu_state:=false;
       menu_item :=0;
       G_Status  :=gs_running;
-      vid_panel_timer:=0;
+      vid_PanelUpdTimer:=0;
       {$ENDIF}
       map_Make2;
       GameConfigureSkirmish;
@@ -757,7 +755,7 @@ begin
 
    if(not G_Started)
    or(net_status=ns_client)
-   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobb1))then exit;
+   or((PlayerRequestor<=LastPlayer)and(PlayerRequestor<>PlayerLobby))then exit;
 
    GameBreak:=true;
    if(Check)then exit;
@@ -818,15 +816,16 @@ begin
    CheckSimpleClick:=max2i(abs(x0-x1),abs(y0-y1))<3;
 end;
 
-function ui_SelectionIsAllowed(playern:byte):boolean;
+function ui_ActionsIsAllowed(playern:byte):boolean;
 begin
-   ui_SelectionIsAllowed:=false;
+   ui_ActionsIsAllowed:=false;
    with g_players[playern] do
      if(UIPlayer<>playern)
      or(isobserver)
      or(isdefeated)
-     or(rpls_rstate=rpls_state_read)then exit;
-   ui_SelectionIsAllowed:=true;
+     or(rpls_rstate=rpls_state_read)
+     or(g_status<>gs_running)then exit;
+   ui_ActionsIsAllowed:=true;
 end;
 
 procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
@@ -835,7 +834,7 @@ usel_max:integer;
 wasselect,
 SelectBuildings:boolean;
 begin
-   if(not ui_SelectionIsAllowed(playern))then exit;
+   if(not ui_ActionsIsAllowed(playern))then exit;
 
    if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
    if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
@@ -884,7 +883,7 @@ procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
 var u:integer;
 wasselect:boolean;
 begin
-   if(not ui_SelectionIsAllowed(playern))then exit;
+   if(not ui_ActionsIsAllowed(playern))then exit;
 
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
@@ -912,7 +911,7 @@ end;
 procedure units_Grouping(add:boolean;playern,fgroup:byte);
 var u:integer;
 begin
-   if(not ui_SelectionIsAllowed(playern))then exit;
+   if(not ui_ActionsIsAllowed(playern))then exit;
 
    if(fgroup<=MaxUnitGroups)then
      for u:=1 to MaxUnits do

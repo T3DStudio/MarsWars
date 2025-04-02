@@ -37,7 +37,7 @@ UnitMoveStepTicks : byte = 8;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 PlayerClient      : byte = 0; // 'this' player
-PlayerLobb1       : byte = 0; // Player who can change game settings
+PlayerLobby       : byte = 0; // Player who can change game settings
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
@@ -174,8 +174,8 @@ test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
 sys_fog           : boolean = false;
 
-r_uipanel,
-r_uiminimap,
+r_ui_Panel,
+r_ui_MiniMap,
 r_empty,
 r_bminimap,
 r_gminimap,
@@ -260,16 +260,17 @@ vid_UIItem_list   : array of TUIItem;
 vid_UIItem_n      : word = 0;
 vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
-vid_panel_timer   : byte = 0;
+vid_PanelUpdTimer : byte = 0;
+vid_PanelUpdNow   : boolean = false;
 
 vid_CamSpeed      : integer = 25;             // options
-vid_uhbars        : byte = 0;
-vid_plcolors      : byte = 0;
+vid_UnitHealthBars: TUIUnitHBarsOption  = low(TUIUnitHBarsOption);
+vid_PlayersColorSchema: TPlayersColorSchema = low(TPlayersColorSchema);
 vid_APM           : boolean = false;
 vid_FPS           : boolean = false;
-vid_CamMSEScroll    : boolean = false;
+vid_CamMSEScroll  : boolean = false;
 vid_ColoredShadow : boolean = true;
-vid_PannelPos     : byte = 0;
+vid_PannelPos     : TVidPannelPos = low(TVidPannelPos);
 vid_MiniMapPos    : boolean = false;
 
 
@@ -342,15 +343,15 @@ svld_file_size    : cardinal = 0;
 rpls_Recording    : boolean = false;
 rpls_StartRecordPause
                   : byte = 0;
-rpls_fstate       : byte = 0;    // file status (none,write,read)
+rpls_fstate       : byte = rpls_state_none;  // file status (none,write,read)
+rpls_rstate       : byte = rpls_state_none;
 rpls_pnu          : integer = 0;
-rpls_str_name     : shortstring = 'LastReplay';
+rpls_str_prefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
 rpls_str_info3    : shortstring = '';
 rpls_str_infoS    : shortstring = '';
-rpls_rstate       : byte = rpls_state_none;
 rpls_head_itemn   : integer = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_list         : array of shortstring;
@@ -424,7 +425,7 @@ ui_language       : boolean = false;
 ui_UnitSelectedNU : integer = 0;
 ui_UnitSelectedpU : integer = 0;
 ui_UnitSelectedn  : byte = 0;
-ui_tab            : byte = 0;
+ui_tab            : TTabType = low(TTabType);
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_dPlayer        : TPlayer;
@@ -1028,10 +1029,10 @@ str_menu_DeadObservers,
 str_menu_FixedStarts,
 str_menu_GameMode
                         : shortstring;
-str_menu_PlayersColorl  : array[0..vid_maxplcolors-1] of shortstring;
-str_menu_unitHBarl      : array[0..2] of shortstring;
-str_menu_PanelPosl      : array[0..3] of shortstring;
-str_menu_MiniMapPosl    : array[boolean,boolean] of shortstring;
+str_menu_PlayersColorl  : array[TPlayersColorSchema ] of shortstring;
+str_menu_unitHBarl      : array[TUIUnitHBarsOption  ] of shortstring;
+str_menu_PanelPosl      : array[TVidPannelPos       ] of shortstring;
+str_menu_MiniMapPosl    : array[boolean,boolean     ] of shortstring;
 str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
 str_menu_NetQuality     : array[0..cl_UpT_arrayN    ] of shortstring;
 
@@ -1150,8 +1151,8 @@ str_panelHint_menu  : shortstring;
 str_panelHint_a,
 str_panelHint_r,
 str_panelHint_o     : TPanelHintTable;
-str_panelHint_Tab   : array[0..3      ] of shortstring;
-str_panelHint_Common: array[0..2      ] of shortstring;
+str_panelHint_Tab   : array[TTabType] of shortstring;
+str_panelHint_Common: array[0..2    ] of shortstring;
 
 str_uiHint_KotHTime,
 str_uiHint_KotHTimeAct,
