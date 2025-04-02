@@ -695,11 +695,13 @@ UID_UGTurret      : if(ai_towers_near_air=0)then exit;
 UID_UATurret      : if(ai_towers_near_grd=0)then exit;
         end;
 
+     if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
       case uidi of
-UID_HTower        : if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
-                     if(uid_e[uidi]>uid_e[UID_HTotem])and(uid_e[uidi]>1)then exit;
-UID_HTotem        : if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
-                     if(uid_e[uidi]>uid_e[UID_HTower])and(uid_e[uidi]>1)then exit;
+UID_HTower        : if(abs(uid_e[uidi]-uid_e[UID_HTotem])>1)and(uid_e[uidi]>1)then exit;
+UID_HTotem        : if(abs(uid_e[uidi]-uid_e[UID_HTower])>1)and(uid_e[uidi]>1)then exit;
+      end;
+
+     case uidi of
 UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter:
