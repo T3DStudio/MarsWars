@@ -46,7 +46,7 @@ begin
    // theme
    mseed  :=map_seed;
    theme  :=Pick(theme_n);
-   SetTheme(theme);
+   //SetTheme(theme);
 
    terrain :=Pick(theme_cur_terrain_n );
    crater  :=Pick(theme_cur_crater_n  );
@@ -58,7 +58,7 @@ begin
    if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
    if(teleport>=0)then theme_cur_tile_teleport_id:=theme_cur_teleport_l[teleport];
 
-   SetThemeTES;
+   //SetThemeTES;
 end;
 
 procedure map_VisGridMake;
@@ -403,12 +403,12 @@ begin
                          or CheckNoSolidAround(x-1,y-1,x+2,y+2));
 end;
 {$IFDEF DTEST}
-procedure debug_cell(cx,cy,cw:integer;color:cardinal);
+procedure debug_cell(cx,cy,cw:integer;color:TMWColor);
 begin
    cx:=cx*MapCellw+cw;
    cy:=cy*MapCellw+cw;
    cw*=2;
-   UIInfoItemAddRect(cx,cy,cx+MapCellw-cw,cy+MapCellw-cw,color);
+  // UIInfoItemAddRect(cx,cy,cx+MapCellw-cw,cy+MapCellw-cw,color);
 end;
 
 procedure debug_AddDoaminCells;
@@ -432,8 +432,8 @@ begin
       with map_grid[gx,gy] do
         if(tgc_pf_domain>0)then
         begin
-           debug_cell(gx,gy,1,map_gridDomain_color[tgc_pf_domain-1]);
-           with vid_UIItem_list[vid_UIItem_n-1] do
+          // debug_cell(gx,gy,1,map_gridDomain_color[tgc_pf_domain-1]);
+           with vid_UIItem_l[vid_UIItem_n-1] do
            begin
               text_lt :=b2s(tgc_solidlevel);
               text_lt2:=w2s(tgc_pf_domain)+' '+str_b2c[tgc_pf_solid];
@@ -448,7 +448,7 @@ begin
    setlength(map_gridDomain_color,map_gridDomain_n);
    if(map_gridDomain_n>0)then
      for w:=0 to map_gridDomain_n-1 do
-       map_gridDomain_color[w]:=rgba2c(random(255),random(255),random(255),255);
+       map_gridDomain_color[w]:=gfx_MakeTMWColor(random(255),random(255),random(255));
 end;
 
 
@@ -1509,7 +1509,7 @@ begin
    map_pf_MakeDomains;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
-   gfx_MakeThemeTiles;
+   //gfx_MakeThemeTiles;
    map_VisGridMake;
    uids_RecalcMMR;
    {$ENDIF}

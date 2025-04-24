@@ -10,28 +10,28 @@ begin
 
       // sprite model
       case m of
-MID_Imp      : ms_smodel:=@spr_h_p0;
-MID_Cacodemon: ms_smodel:=@spr_h_p1;
-MID_Baron    : ms_smodel:=@spr_h_p2;
+MID_Imp      : ms_smodel:=spr_h_p0;
+MID_Cacodemon: ms_smodel:=spr_h_p1;
+MID_Baron    : ms_smodel:=spr_h_p2;
 MID_Blizzard,
 MID_Mine,
-MID_HRocket  : ms_smodel:=@spr_h_p3;
-MID_Revenant : ms_smodel:=@spr_h_p4;
-MID_Mancubus : ms_smodel:=@spr_h_p5;
-MID_YPlasma  : ms_smodel:=@spr_h_p7;
-MID_BPlasma  : ms_smodel:=@spr_u_p0;
+MID_HRocket  : ms_smodel:=spr_h_p3;
+MID_Revenant : ms_smodel:=spr_h_p4;
+MID_Mancubus : ms_smodel:=spr_h_p5;
+MID_YPlasma  : ms_smodel:=spr_h_p7;
+MID_BPlasma  : ms_smodel:=spr_u_p0;
 MID_Bullet,
 MID_MChaingun,
-MID_Chaingun : ms_smodel:=@spr_u_p1;
+MID_Chaingun : ms_smodel:=spr_u_p1;
 MID_SShot,
-MID_SSShot   : ms_smodel:=@spr_u_p1s;
-MID_BFG      : ms_smodel:=@spr_u_p2;
+MID_SSShot   : ms_smodel:=spr_u_p1s;
+MID_BFG      : ms_smodel:=spr_u_p2;
 MID_ArchFire : ;
-MID_Flyer    : ms_smodel:=@spr_u_p3;
+MID_Flyer    : ms_smodel:=spr_u_p3;
 MID_Tank,
 MID_Granade,
 MID_URocketS,
-MID_URocket  : ms_smodel:=@spr_u_p8;
+MID_URocket  : ms_smodel:=spr_u_p8;
       end;
 
       // tracer

@@ -68,19 +68,19 @@ begin
 
    if(vid_blink_timer1=0)then
    begin
-      r_blink3+=1;
-      r_blink3:=r_blink3 mod 4;
+      vid_blink3+=1;
+      vid_blink3:=vid_blink3 mod 4;
    end;
 
    vid_PanelUpdTimer+=1;vid_PanelUpdTimer:=vid_PanelUpdTimer mod vid_panel_period;
 
-   r_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
-   r_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
+   vid_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
+   vid_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
 
-   r_blink1_color_BG:=ui_blink_color1[r_blink1_colorb];
-   r_blink1_color_BY:=ui_blink_color2[r_blink1_colorb];
-   r_blink2_color_BG:=ui_blink_color1[r_blink2_colorb];
-   r_blink2_color_BY:=ui_blink_color2[r_blink2_colorb];
+   vid_blink1_color_BG:=ui_color_blink1[vid_blink1_colorb];
+   vid_blink1_color_BY:=ui_color_blink2[vid_blink1_colorb];
+   vid_blink2_color_BG:=ui_color_blink1[vid_blink2_colorb];
+   vid_blink2_color_BY:=ui_color_blink2[vid_blink2_colorb];
 
    d_UpdateUIPlayer(0);
 
@@ -89,7 +89,7 @@ begin
    d_AddObjSprites(G_Status<>gs_running);
 
    // MAP View
-   d_terrain        (r_screen,ui_MapView_x,ui_MapView_y);
+   {d_terrain        (r_screen,ui_MapView_x,ui_MapView_y);
    d_SpriteList     (r_screen,ui_MapView_x,ui_MapView_y);
 
    if(sys_fog)then
@@ -101,11 +101,11 @@ begin
    begin
    d_UIMouseMapBrush(r_screen,ui_MapView_x,ui_MapView_y);
    d_UIMouseMapClick(r_screen,ui_MapView_x,ui_MapView_y);
-   end;
+   end;    }
 
    //d_UIText(r_screen,ui_MapView_x,ui_MapView_y,UIPlayer);
 
-   // Control bar view
+   {// Control bar view
    if(vid_PanelUpdTimer=0)
    or(vid_PanelUpdNow    )then d_UpdatePanel  (r_ui_Panel  ,UIPlayer);
    if(vid_PanelUpdTimer=1)then d_UpdateMinimap(r_ui_MiniMap);
@@ -122,6 +122,7 @@ begin
 
    d_UIMouseCursor(r_screen);
    //draw_surf(r_screen,mouse_x,mouse_y,theme_tile_terrain);
+                  }
 
 
    if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
@@ -135,21 +136,23 @@ begin
    x:=20;
    y:=20;
    lineN:=lineLen;
-   boxColor(r_screen,0,0,vid_vw,vid_vh,c_green);
+   //boxColor(r_screen,0,0,vid_vw,vid_vh,c_green);
    for tileX:=0 to MaxTileSet do
    begin
 
-      draw_surf(r_screen,x,y,tileSet^[tileX].sdlSurface);
+      draw_mwtexture1(x,y,tileSet^[tileX],1,1);
+      //draw_surf(r_screen,x,y,tileSet^[tileX].apidata);
 
-      //draw_text(r_screen,x,y,w2s(tileX),ta_LU,255,c_white);
-      x+=tileSet^[tileX].w+2;
+      draw_set_fontS(font_Base,1);
+      draw_text(x,y,w2s(tileX),ta_LU,255,0);
+      x+=tileSet^[tileX]^.w+2;
 
       lineN-=1;
       if(lineN=0)then
       begin
          x:=20;
          lineN:=lineLen;
-         y+=tileSet^[0].h+2;
+         y+=tileSet^[0]^.h+2;
       end;
    end;
 
@@ -161,7 +164,45 @@ end;
 procedure DrawGame;
 var i,n,y:integer;
 begin
-   sdl_FillRect(r_screen,nil,0);
+   draw_set_color(c_black);
+   draw_set_alpha(255);
+   draw_clear;
+
+   {draw_set_color(c_ltgray);
+   draw_frect(vid_vw,vid_vh,0,0);
+
+   draw_set_color(c_white);
+   draw_mwtexture1(0,0,spr_mback,1,1);
+
+   {draw_set_color(c_red);
+   draw_line(0,0,500,500);      }
+
+   draw_set_color(c_yellow);
+   draw_text(50,50,'ABCDabcd 123456789 $#^$ .   !',ta_LU,255,c_green);
+   draw_mwtexture1(500,300,@tex_ui_MiniMap,1,1);
+   draw_mwtexture1(0,0,@spr_mlogo,1,1);
+   spr_mlogo
+
+   draw_set_color(c_white);
+   draw_set_alpha(255);
+   draw_DebugTileSet(ui_fog_tileset);    }
+
+   //draw_set_alpha(127);
+   //_drawMWSModel(spr_lostsoul);
+
+  // draw_set_color(c_red);
+
+   //draw_fcircle(300,300,100);
+   {draw_ellipse(300,300,0  ,100);
+   draw_ellipse(300,600,100,50);
+   draw_frect(300,600,305,605);
+
+   draw_set_color(c_aqua);
+   draw_ellipse (600,300,100,0);
+   draw_fellipse(600,600,50,100);
+
+   draw_set_color(c_red);
+   draw_ellipse(900,300,0,0); }
 
    UpdatePlayerColors;
 
@@ -170,6 +211,8 @@ begin
    else
      if(G_Started)
      then d_Game;
+
+   draw_mwtexture1(mouse_x,mouse_y,spr_cursor,1,1);
 
    //_drawMWSModel(@spr_HCommandCenter1);
 
@@ -194,7 +237,7 @@ begin
     for i:=0 to theme_cur_decor_n-1 do
     begin
        n:=i*48;
-       draw_surf(r_screen,n,y,theme_all_decor_l[theme_cur_decor_l[i]].sdlSurface);
+       draw_surf(r_screen,n,y,theme_all_decor_l[theme_cur_decor_l[i]].apidata);
     end;
    draw_text(r_screen,0,0,i2s(theme_cur_decor_n),ta_LU,255,c_white); }
 
@@ -203,7 +246,7 @@ begin
    if(theme_all_terrain_n>0)then
      for i:=0 to theme_all_terrain_n-1 do
      begin
-        draw_surf(r_screen,n,y,theme_all_terrain_l[i].sdlSurface);
+        draw_surf(r_screen,n,y,theme_all_terrain_l[i].apidata);
         boxColor (r_screen,n,y,n+16,y+16,theme_all_terrain_mmcolor[i]);
         draw_text(r_screen,n,y+16,i2s(i),ta_LU,255,c_white);
 
@@ -251,10 +294,10 @@ begin
    //' '+tc_lime+i2s(dist2mgcellC(mouse_map_x,mouse_map_y,1,1))
    '',ta_RU,255, c_white);  }
 
-   draw_text(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,
+   {draw_text(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,
        i2s(m_panelBtn_x)+
    ' '+i2s(m_panelBtn_y),
-   ta_RU,255, c_white);
+   ta_RU,255, c_white);    }
 
   { draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
        i2s(rpls_rstate)+
@@ -265,7 +308,7 @@ begin
    end;
    //draw_DebugTileSet(@vid_fog_tiles);
 
-   sdl_flip(r_screen);
+   SDL_RenderPresent(vid_renderer);
 end;
 
 

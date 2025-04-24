@@ -555,7 +555,7 @@ end;
 procedure SoundMusicReload;
 begin
    StopSoundSource(sss_music);
-   DrawLoadingScreen(str_loading_msc,c_aqua);
+   //draw_LoadingScreen(str_loading_msc,c_aqua);
    SoundSetUnLoad(snd_music_game);
    SoundSetUnLoad(snd_music_menu);
 
@@ -632,7 +632,7 @@ begin
    // COMMON
    //
 
-   DrawLoadingScreen(str_loading_sfx,c_green);
+   //draw_LoadingScreen(str_loading_sfx,c_green);
 
    snd_click                :=SoundSetLoad('click'           );
    snd_chat                 :=SoundSetLoad('chat'            );

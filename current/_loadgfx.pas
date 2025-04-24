@@ -1,4 +1,7 @@
 
+const
+vid_BitsPerPixel        = 32;
+
 procedure InitRX2Y;
 var r,x:integer;
 begin
@@ -7,7 +10,7 @@ begin
      _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
-procedure MakeScreenshot;
+{procedure MakeScreenshot;
 var i:integer;
     s:shortstring;
 begin
@@ -17,78 +20,98 @@ begin
       s:=str_screenshot+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
-   sdl_saveBMP(r_screen,@s[1]);
+  // sdl_saveBMP(r_screen,@s[1]);
+end;   }
+
+procedure MakeScreenShot_CalcSize(w,h:integer);
+var aspecti:single;
+begin
+   {screenshot_w:=w;
+   screenshot_h:=h;
+   aspecti:=trunc((screenshot_w/screenshot_h)*100);
+   if(vid_aspecti>aspecti)then screenshot_h:=trunc(screenshot_w/vid_aspect);
+   if(vid_aspecti<aspecti)then screenshot_w:=trunc(screenshot_h*vid_aspect);}
 end;
+
+procedure MakeScreenShot;
+var      s: shortstring;
+tmpSDLSurf: pSDL_Surface;
+begin
+  // if(vid_window_w<=0)
+  // or(vid_window_w<=0)then exit;
+
+   s:=str_screenshot+str_NowDateTime+str_screenshotExt+#0;
+
+   //tmpSDLSurf := SDL_CreateRGBSurface(0, vid_window_w, vid_window_h, vid_BitsPerPixel, 0,0,0,0);
+   if(tmpSDLSurf=nil)then
+   begin
+      writeSDLError('MakeScreenShot -> SDL_CreateRGBSurface');
+      exit;
+   end;
+
+   SDL_RenderReadPixels(vid_renderer, nil, tmpSDLSurf^.format^.format, tmpSDLSurf^.pixels, tmpSDLSurf^.pitch);
+   IMG_SavePNG(tmpSDLSurf,@s[1]);
+   SDL_FreeSurface(tmpSDLSurf);
+end;
+
 
 procedure gfx_InitColors;
 begin
-   c_dred    :=rgba2c(190,  0,  0,255);
-   c_red     :=rgba2c(255,  0,  0,255);
-   c_ared    :=rgba2c(255,  0,  0,82 );
-   c_orange  :=rgba2c(255,140,  0,255);
-   c_dorange :=rgba2c(230, 96,  0,255);
-   c_brown   :=rgba2c(140, 90, 10,255);
-   c_yellow  :=rgba2c(255,255,  0,255);
-   c_dyellow :=rgba2c(220,220,  0,255);
-   c_lime    :=rgba2c(0  ,255,  0,255);
-   c_alime   :=rgba2c(0  ,255,  0,42 );
-   c_aaqua   :=rgba2c(0  ,255,255,42 );
-   c_aqua    :=rgba2c(0  ,255,255,255);
-   c_purple  :=rgba2c(255,0  ,255,255);
-   c_lpurple :=rgba2c(160,113,255,255);
-   c_dpurple :=rgba2c(128,0  ,255,255);
-   c_green   :=rgba2c(0  ,150,0  ,255);
-   c_agreen  :=rgba2c(0  ,150,0  ,42 );
-   c_dblue   :=rgba2c(100,100,192,255);
-   c_blue    :=rgba2c(50 ,50 ,255,255);
-   c_ablue   :=rgba2c(50 ,50 ,255,24 );
-   c_white   :=rgba2c(255,255,255,255);
-   c_awhite  :=rgba2c(255,255,255,40 );
-   c_gray    :=rgba2c(120,120,120,255);
-   c_ltgray  :=rgba2c(200,200,200,255);
-   c_dgray   :=rgba2c(70 ,70 ,70 ,255);
-   c_agray   :=rgba2c(80 ,80 ,80 ,128);
-   c_black   :=rgba2c(0  ,0  ,0  ,255);
-   c_ablack  :=rgba2c(0  ,0  ,0  ,128);
-   c_lava    :=rgba2c(222,80 ,0  ,255);
+   c_dred   :=gfx_MakeTMWColor(190,  0,  0);
+   c_red    :=gfx_MakeTMWColor(255,  0,  0);
+   c_orange :=gfx_MakeTMWColor(255,140,  0);
+   c_dorange:=gfx_MakeTMWColor(230, 96,  0);
+   c_brown  :=gfx_MakeTMWColor(140, 90, 10);
+   c_yellow :=gfx_MakeTMWColor(255,255,  0);
+   c_dyellow:=gfx_MakeTMWColor(220,220,  0);
+   c_lime   :=gfx_MakeTMWColor(0  ,255,  0);
+   c_aqua   :=gfx_MakeTMWColor(0  ,255,255);
+   c_purple :=gfx_MakeTMWColor(255,0  ,255);
+   c_lpurple:=gfx_MakeTMWColor(160,113,255);
+   c_dpurple:=gfx_MakeTMWColor(128,0  ,255);
+   c_green  :=gfx_MakeTMWColor(0  ,150,0  );
+   c_dblue  :=gfx_MakeTMWColor(100,100,192);
+   c_blue   :=gfx_MakeTMWColor(50 ,50 ,255);
+   c_white  :=gfx_MakeTMWColor(255,255,255);
+   c_gray   :=gfx_MakeTMWColor(120,120,120);
+   c_ltgray :=gfx_MakeTMWColor(200,200,200);
+   c_dgray  :=gfx_MakeTMWColor(70 ,70 ,70 );
+   c_black  :=gfx_MakeTMWColor(0  ,0  ,0  );
+   c_lava   :=gfx_MakeTMWColor(222,80 ,0  );
 
-   ui_max_color[false]:=c_dorange;
-   ui_max_color[true ]:=c_ltgray;
-   ui_cenergy  [false]:=c_white;
-   ui_cenergy  [true ]:=c_red;
-   ui_limit    [false]:=c_white;
-   ui_limit    [true ]:=c_red;
+   ui_color_max    [false]:=c_dorange;
+   ui_color_max    [true ]:=c_ltgray;
+   ui_color_cenergy[false]:=c_white;
+   ui_color_cenergy[true ]:=c_red;
+   ui_color_limit  [false]:=c_white;
+   ui_color_limit  [true ]:=c_red;
 
-   ui_blink_color2 [false]:=c_black;
-   ui_blink_color2 [true ]:=c_yellow;
+   ui_color_blink2 [false]:=c_black;
+   ui_color_blink2 [true ]:=c_yellow;
 
-   ui_blink_color1 [false]:=c_black;
-   ui_blink_color1 [true ]:=c_gray;
+   ui_color_blink1 [false]:=c_black;
+   ui_color_blink1 [true ]:=c_gray;
+
+   draw_set_color(c_white);
+   draw_set_alpha(255);
 end;
 
 function gfx_SDLSurfaceCreate(tw,th:integer):pSDL_Surface;
-var ts1,ts2:pSDL_Surface;
 begin
-   gfx_SDLSurfaceCreate:=nil;
-   ts1:=sdl_createRGBSurface(0,tw,th,vid_bpp,0,0,0,0);
-   if(ts1=nil)then
+   gfx_SDLSurfaceCreate:=sdl_createRGBSurface(0,tw,th,vid_BitsPerPixel,0,0,0,0);
+   if(gfx_SDLSurfaceCreate=nil)then
    begin
-      WriteSDLError;
+      WriteSDLError('gfx_SDLSurfaceCreate');
       HALT;
-   end
-   else
-   begin
-      ts2:=sdl_displayformat(ts1);
-      SDL_FreeSurface(ts1);
-      if(ts2=nil)then
-      begin
-         WriteSDLError;
-         HALT;
-      end;
-      gfx_SDLSurfaceCreate:=ts2;
    end;
 end;
 
+procedure gfx_SDLSurfaceFree(sf:PSDL_Surface);
+begin
+   if(sf<>nil)then sdl_FreeSurface(sf);
+end;
+
+{
 procedure SDL_SETpixel(srf:PSDL_SURFACE;x,y:integer;color:cardinal);
 var bpp:byte;
 begin
@@ -98,22 +121,19 @@ begin
    bpp:=srf^.format^.BytesPerPixel;
 
    move( (@(color))^, (srf^.pixels+(y*srf^.pitch)+x*bpp)^, bpp);
-end;
+end;}
 
-function SDL_GETpixel(srf:PSDL_SURFACE;x,y:integer):cardinal;
-var bpp:byte;
+function SDL_SurfaceGetPixel(srf:pSDL_SURFACE;x,y:integer):TMWColor;
 begin
-   SDL_GETpixel:=0;
+   SDL_SurfaceGetPixel:=0;
 
    if(x<0)or(srf^.w<=x)
    or(y<0)or(srf^.h<=y)then exit;
 
-   bpp:=srf^.format^.BytesPerPixel;
-
-   move( (srf^.pixels+(y*srf^.pitch)+x*bpp)^, (@SDL_GETpixel)^, bpp);
+   move( (srf^.pixels+(y*srf^.pitch)+x*srf^.format^.BytesPerPixel)^, SDL_SurfaceGetPixel, srf^.format^.BytesPerPixel);
 end;
 
-function cardinalBytes(c:cardinal):shortstring;
+{function cardinalBytes(c:cardinal):shortstring;
 begin
    cardinalBytes:=b2s((c and $FF000000)shr 24)+','+b2s((c and $00FF0000)shr 16)+','+b2s((c and $0000FF00)shr 8)+','+b2s(c and $000000FF);
 end;
@@ -154,63 +174,129 @@ begin
          bR:=(bR+bC+bM)div 3;
       end;
    end;
-   gfx_SDLSurfaceGetColor:=rgba2c(rR,gR,bR,255);
-end;
+   gfx_SDLSurfaceGetColor,rR,gR,bR,255);
+end;    }
 
-function gfx_SDLSurfaceLoadFromFile(fn:shortstring):pSDL_SURFACE;
-var tmp:pSDL_SURFACE;
+////////////////////////////////////////////////////////////////////////////////
+//
+//     TMWTexture Basics
+//
+
+function gfx_MWTextureLoadSDLSurfaceFromFile(fn:shortstring):pSDL_Surface;
 begin
-   gfx_SDLSurfaceLoadFromFile:=r_empty;
+   gfx_MWTextureLoadSDLSurfaceFromFile:=nil;
    if(not FileExists(fn))then exit;
+   if(length(fn)=255)then exit;
 
    fn:=fn+#0;
 
-   tmp:=img_load(@fn[1]);
-   if(tmp<>nil)then
+   gfx_MWTextureLoadSDLSurfaceFromFile:=IMG_Load(@fn[1]);
+   if(gfx_MWTextureLoadSDLSurfaceFromFile=nil)then writeSDLError('gfx_MWTextureLoadSDLSurfaceFromFile');
+end;
+
+function gfx_MWTextureMakeRenderTarget(tw,th:integer):pTMWTexture;
+begin
+   new(gfx_MWTextureMakeRenderTarget);
+   with gfx_MWTextureMakeRenderTarget^ do
    begin
-      gfx_SDLSurfaceLoadFromFile:=sdl_displayformat(tmp);
-      sdl_freesurface(tmp);
+      sdlsurface:=nil;
+      sdltexture:=SDL_CreateTexture(vid_renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,tw,th);
+      if(sdltexture=nil)then writeSDLError('gfx_MWTextureMakeRenderTarget');
+
+      w :=tw;
+      h :=th;
+      hw:=tw div 2;
+      hh:=th div 2;
    end;
 end;
 
-function gfx_SDLSurfaceLoad(fn:shortstring;trns,log:boolean):pSDL_SURFACE;
+procedure gfx_MWTextureInit(pMWT:PTMWTexture);
+begin
+   if(pMWT<>nil)and(pMWT<>ptex_dummy)then
+     with pMWT^ do
+     begin
+        sdlsurface:=nil;
+        sdltexture:=nil;
+        w :=1;
+        h :=1;
+        hw:=0;
+        hh:=0;
+     end;
+end;
+procedure gfx_MWTextureFree(pMWT:PTMWTexture);
+begin
+   if(pMWT<>nil)and(pMWT<>ptex_dummy)then
+   begin
+      with pMWT^ do
+      begin
+         if(sdlsurface<>nil)then sdl_FreeSurface(sdlsurface);
+         if(sdltexture<>nil)then sdl_DestroyTexture(sdltexture);
+         sdlsurface:=nil;
+         sdltexture:=nil;
+         w :=1;
+         h :=1;
+         hw:=0;
+         hh:=0;
+      end;
+      dispose(pMWT);
+   end;
+end;
+
+function gfx_MWTextureLoad(fn:shortstring;transparent00:boolean;
+                                          log          :boolean=true;
+                                          letsdlsurface:boolean=false):PTMWTexture;
 const fextn = 2;
       fexts : array[0..fextn] of shortstring = ('.png','.jpg','.bmp');
-var i:integer;
+var      i:integer;
+tsdlsurface:pSDL_SUrface;
+tsdltexture:pSDL_Texture;
 begin
+   gfx_MWTextureLoad:=ptex_dummy;
+
+   tsdlsurface:=nil;
+   tsdltexture:=nil;
    for i:=0 to fextn do
    begin
-      gfx_SDLSurfaceLoad:=gfx_SDLSurfaceLoadFromFile(str_f_grp+fn+fexts[i]);
-      if(gfx_SDLSurfaceLoad<>r_empty)then
+      tsdlsurface:=gfx_MWTextureLoadSDLSurfaceFromFile(str_f_grp+fn+fexts[i]);
+      if(tsdlsurface<>nil)then
       begin
-         if(trns)then SDL_SetColorKey(gfx_SDLSurfaceLoad,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(gfx_SDLSurfaceLoad,0,0));
-         break;
-      end
-      else
-        if(i=fextn)and(log)then WriteLog(str_f_grp+fn);
+         if(transparent00)then SDL_SetColorKey(tsdlsurface,1,SDL_SurfaceGetPixel(tsdlsurface,0,0));
+         tsdltexture:=SDL_CreateTextureFromSurface(vid_renderer,tsdlsurface);
+         if(transparent00)
+         then SDL_SetTextureBlendMode(tsdltexture,SDL_BLENDMODE_BLEND)
+         else SDL_SetTextureBlendMode(tsdltexture,SDL_BLENDMODE_NONE );
+         if(tsdltexture=nil)
+         then sdl_FreeSurface(tsdlsurface)
+         else break;
+      end;
    end;
+
+    if(tsdltexture=nil)then
+    begin
+       if(log)then WriteLog('gfx_MWTextureLoad: '+str_f_grp+fn);
+    end
+    else
+    begin
+       new(gfx_MWTextureLoad);
+       with gfx_MWTextureLoad^ do
+       begin
+          w :=tsdlsurface^.w;
+          h :=tsdlsurface^.h;
+          hw:=tsdlsurface^.w div 2;
+          hh:=tsdlsurface^.h div 2;
+          if(not letsdlsurface)then
+          begin
+             sdl_FreeSurface(tsdlsurface);
+             tsdlsurface:=nil;
+          end;
+          sdlsurface:=tsdlsurface;
+          sdltexture:=tsdltexture;
+       end;
+    end;
 end;
 
-procedure gfx_SDLSurfaceFree(sf:PSDL_Surface);
-begin
-   if(sf<>nil)and(sf<>r_empty)then sdl_FreeSurface(sf);
-end;
-
-procedure gfx_MWTextureLoad(mws:PTMWTexture;fn:shortstring;firstload,log:boolean);
-begin
-   with mws^ do
-   begin
-      if(not firstload)then gfx_SDLSurfaceFree(sdlSurface);
-      sdlSurface:=gfx_SDLSurfaceLoad(fn,true,log);
-      w :=sdlSurface^.w;
-      h :=sdlSurface^.h;
-      hw:=sdlSurface^.w div 2;
-      hh:=sdlSurface^.h div 2;
-   end;
-end;
-
-procedure gfx_MWSModelLoad(mwsm:PTMWSModel;name:shortstring;_mkind:byte;firstload:boolean);
-var t:TMWTexture;
+function gfx_MWSModelLoad(name:shortstring;asmtype:TMWSModelType):PTMWSModel;
+var tmwtex:pTMWTexture;
 procedure calcSelectionRect(ip:pinteger;vl:integer);
 begin
    if(ip^=0)
@@ -218,51 +304,48 @@ begin
    else ip^:=(ip^+vl) div 2;
 end;
 begin
-   with mwsm^ do
+   new(gfx_MWSModelLoad);
+   with gfx_MWSModelLoad^ do
    begin
-      if(firstload=false)then
-       while(sm_listn>0)do
-       begin
-          gfx_SDLSurfaceFree(sm_list[sm_listn-1].sdlSurface);
-          sm_listn-=1;
-       end;
-
       sm_sel_hw:=0;
       sm_sel_hh:=0;
       sm_listn :=0;
       setlength(sm_list,sm_listn);
 
-      gfx_MWTextureLoad(@t,name,firstload,false);
-      if(t.sdlSurface<>r_empty)then
+      //tmwtex
+      tmwtex:=gfx_MWTextureLoad(name,true,false);
+      if(tmwtex<>ptex_dummy)then
       begin
          sm_listn+=1;
          setlength(sm_list,sm_listn);
-         sm_list[sm_listn-1]:=t;
-         calcSelectionRect(@sm_sel_hw,t.hw);
-         calcSelectionRect(@sm_sel_hh,t.hh);
+         sm_list[sm_listn-1]:=ptex_dummy;
+         calcSelectionRect(@sm_sel_hw,tmwtex^.hw);
+         calcSelectionRect(@sm_sel_hh,tmwtex^.hh);
       end;
 
       while true do
       begin
-         gfx_MWTextureLoad(@t,name+i2s(sm_listn),firstload,false);
-         if(t.sdlSurface=r_empty)then break;
+         tmwtex:=gfx_MWTextureLoad(name+i2s(sm_listn),true,false);
+         if(tmwtex=ptex_dummy)then break;
 
          sm_listn+=1;
          setlength(sm_list,sm_listn);
-         sm_list[sm_listn-1]:=t;
-         calcSelectionRect(@sm_sel_hw,t.hw);
-         calcSelectionRect(@sm_sel_hh,t.hh);
+         sm_list[sm_listn-1]:=tmwtex;
+         calcSelectionRect(@sm_sel_hw,tmwtex^.hw);
+         calcSelectionRect(@sm_sel_hh,tmwtex^.hh);
       end;
-      sm_listi   :=sm_listn-1;
-      sm_type:=_mkind;
+      sm_listi:=sm_listn-1;
+      sm_type :=asmtype;
+
+      if(sm_listn=0)then WriteLog('gfx_MWSModelLoad: '+name);
    end;
 end;
 
 procedure gfx_FillSurfaceBySurface(sTar,sTile:pSDL_Surface;animStepX,animStepY:integer);
 var tx,ty:integer;
 begin
-   if(sTar =r_empty)
-   or(sTile=r_empty)then exit;
+   if(sTar =nil)
+   or(sTile=nil)then exit;
    animStepX:=-abs(animStepX mod sTile^.w);
    animStepY:=-abs(animStepY mod sTile^.h);
    tx:=animStepX;
@@ -271,14 +354,19 @@ begin
       ty:=animStepy;
       while ty<sTar^.h do
       begin
-         draw_surf(sTar,tx,ty,sTile);
+         draw_sdlsurface(sTar,tx,ty,sTile);
          ty+=sTile^.h;
       end;
       tx+=sTile^.w;
    end;
 end;
 
-procedure gfx_MakeTileSet(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;colorMask,TransColor:cardinal);
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Tile Sets
+//
+
+procedure gfx_TileSet_Render(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;colorMask,TransColor:cardinal);
 var
 tw,
 thw,
@@ -287,18 +375,23 @@ b00,b10,b20,
 b01,    b21,
 b02,b12,b22: boolean;
 begin
-   tw :=tileSetTemplate^[0].w;
-   thw:=tileSetTemplate^[0].hw;
+   tw :=tileSetTemplate^[0]^.w;
+   thw:=tileSetTemplate^[0]^.hw;
 
    // full tiled
-   with tileSetTarget^[0] do
+   with tileSetTarget^[0]^ do
    begin
-      gfx_SDLSurfaceFree(sdlSurface);
-      sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
-      boxColor(sdlSurface,0,0,tw,tw,TransColor);
-      SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
+      SDLSurf_boxColor(sdlSurface,0,0,tw,tw,TransColor);
+      SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,0,0));
       gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
-      if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      if(colorMask>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      if(sdltexture<>nil)then
+      begin
+         SDL_DestroyTexture(sdltexture);
+         sdltexture:=nil;
+      end;
+      sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+      if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget[0] -> SDL_CreateTextureFromSurface');
       w :=tw; h :=w;
       hw:=thw;hh:=hw;
    end;
@@ -325,21 +418,50 @@ begin
 
       if(tileX=0)then continue;
 
-      with tileSetTarget^[tileX] do
+      with tileSetTarget^[tileX]^ do
       begin
-         gfx_SDLSurfaceFree(sdlSurface);
-         sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
          gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
-         draw_surf(sdlSurface,0,0,tileSetTemplate^[tileX].sdlSurface);
-         if(colorMask>0)then boxColor(sdlSurface,0,0,tw,tw,colorMask);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,thw,thw));
+         draw_sdlsurface(sdlSurface,0,0,tileSetTemplate^[tileX]^.sdlSurface);
+         if(colorMask>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,colorMask);
+         SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,thw,thw));
+         if(sdltexture<>nil)then
+         begin
+            SDL_DestroyTexture(sdltexture);
+            sdltexture:=nil;
+         end;
+         sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+         if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget['+i2s(tileX)+'] -> SDL_CreateTextureFromSurface');
          w :=tw ;h := w;
          hw:=thw;hh:=hw;
       end;
    end;
 end;
 
-procedure gfx_MakeTileSetTemplate(transColor,templateColor:cardinal;tw:integer;tileSet:pTMWTileSet;edgeStyle:byte;rstep:integer;random_i:byte);
+function gfx_TileSet_Make(tw:integer):pTMWTileSet;
+var i:integer;
+begin
+   new(gfx_TileSet_Make);
+   for i:=0 to MaxTileSet do
+   begin
+      new(gfx_TileSet_Make^[i]);
+      with gfx_TileSet_Make^[i]^ do
+      begin
+         sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
+         sdltexture:=nil;
+         w :=tw; h :=w;
+         hw:=w div 2;hh:=hw;
+      end;
+   end;
+end;
+procedure gfx_TileSet_Free(ptmwts:pTMWTileSet);
+var i:integer;
+begin
+   for i:=0 to MaxTileSet do
+     gfx_MWTextureFree(ptmwts^[i]);
+   dispose(ptmwts);
+end;
+
+function gfx_TileSetTemplate_Make(transColor,templateColor:TMWColor;tw:integer;edgeStyle:TThemeEdgeTerrainStyle;rstep:integer;random_i:byte):pTMWTileSet;
 var
 b00,b10,b20,
 b01,    b21,
@@ -352,7 +474,7 @@ tw0,tw1,tw2: integer;
 brushx,
 brushy     : array[0..2] of integer;
 brushr     : array[0..2] of array[0..2] of integer;
-function CheckNearestBrush(tx,ty,bnxSkip,bnySkip:integer):boolean;
+{function CheckNearestBrush(tx,ty,bnxSkip,bnySkip:integer):boolean;
 var ix,iy:byte;
 begin
    CheckNearestBrush:=false;
@@ -369,21 +491,21 @@ begin
          end;
    end
    else CheckNearestBrush:=true;
-end;
+end;}
 procedure DrawBrush(ix,iy:byte;bx,by,br:integer);
-var
+{var
 edgeRMax,
 edgeR,
 tx,ty  : integer;
 dirStart,
 dir,
-dirStep: single;
+dirStep: single; }
 begin
    case edgeStyle of
-tes_fog   : filledcircleColor(sTemplate,bx,by,br,templateColor);
+tes_fog   : SDLSurf_filledCircleColor(sTemplate,bx,by,br,templateColor);
 tes_nature: begin
-            filledcircleColor(sTemplate,bx,by,br,templateColor);
-            dirStep :=8;
+            SDLSurf_filledcircleColor(sTemplate,bx,by,br,templateColor);
+            {dirStep :=8;
             edgeRMax:=round((pi*br*dirStep)/180);
             if(edgeRMax>1)then
             begin
@@ -396,7 +518,7 @@ tes_nature: begin
                   ty:=by-round(br*sin(dir*degtorad));
                   if(CheckNearestBrush(tx,ty,ix,iy))
                   then break
-                  else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
+                  else SDLSurf_filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
                   dir+=dirStep;
                   random_i+=1;
                end;
@@ -409,12 +531,12 @@ tes_nature: begin
                   ty:=by-round(br*sin(dir*degtorad));
                   if(CheckNearestBrush(tx,ty,ix,iy))
                   then break
-                  else filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
+                  else SDLSurf_filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
                   random_i+=1;
                end;
+            end; }
             end;
-            end;
-tes_tech  : boxColor(sTemplate,bx-br,by-br,bx+br,by+br,templateColor);
+tes_tech  : SDLSurf_boxColor(sTemplate,bx-br,by-br,bx+br,by+br,templateColor);
    end;
 end;
 begin
@@ -423,8 +545,8 @@ begin
    if(edgeStyle<>tes_tech)
    then tr2:=round(thw*2.2 )+rstep
    else tr2:=tr;
-   tw0:=-thw;
-   tw1:= thw;
+   tw0:=  -thw;
+   tw1:=   thw;
    tw2:=tw+thw;
    brushx[0]:=tw0;
    brushx[1]:=tw1;
@@ -434,11 +556,15 @@ begin
    brushy[2]:=tw2;
    sTemplate:=gfx_SDLSurfaceCreate(tw,tw);
 
-   // full tiled
-   with tileSet^[0] do
+   new(gfx_TileSetTemplate_Make);
+   for ix:=0 to MaxTileSet do
+   new(gfx_TileSetTemplate_Make^[ix]);
+
+  // full tiled
+   with gfx_TileSetTemplate_Make^[0]^ do
    begin
-      gfx_SDLSurfaceFree(sdlSurface);
-      sdlSurface:=r_empty;
+      sdlSurface:=nil;
+      sdltexture:=nil;
       w :=tw; h :=w;
       hw:=thw;hh:=hw;
    end;
@@ -452,7 +578,7 @@ begin
    for b12:=false to true do
    for b22:=false to true do
    begin
-      boxColor(sTemplate,0,0,tw,tw,transColor);
+      SDLSurf_boxColor(sTemplate,0,0,tw,tw,transColor);
       tileX:=0;
       FillChar(brushr,SizeOf(brushr),0);
 
@@ -481,13 +607,13 @@ begin
       for iy:=0 to 2 do
       if(brushr[ix,iy]>0)then DrawBrush(ix,iy,brushx[ix],brushy[iy],brushr[ix,iy]);
 
-      with tileSet^[tileX] do
+      with gfx_TileSetTemplate_Make^[tileX]^ do
       begin
-         gfx_SDLSurfaceFree(sdlSurface);
+         sdltexture:=nil;
          sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
-         boxColor(sdlSurface,0,0,tw,tw,templateColor);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(sdlSurface,0,0));
-         draw_surf(sdlSurface,0,0,sTemplate);
+         SDLSurf_boxColor(sdlSurface,0,0,tw,tw,templateColor);
+         SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,0,0));
+         draw_sdlsurface(sdlSurface,0,0,sTemplate);
          w :=tw ;h := w;
          hw:=thw;hh:=hw;
       end;
@@ -495,6 +621,28 @@ begin
    gfx_SDLSurfaceFree(sTemplate);
 end;
 
+procedure gfx_TileSet_MakeFog;
+var x,y:integer;
+tmp_TileTemplate: pTMWTileSet;
+tmp_fog_Texture:pSDL_Surface;
+begin
+   tmp_TileTemplate:=gfx_TileSetTemplate_Make(c_white,c_black,fog_CellW,tes_fog,0,0);
+   // fog 'texture'
+   tmp_fog_Texture:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
+   SDLSurf_boxColor(tmp_fog_Texture,0,0,fog_CellW,fog_CellW,c_white);
+   for x:=0 to fog_CellW-1 do
+   for y:=0 to fog_CellW-1 do
+     if((x+y)mod 4)>0 then
+       SDLSurf_boxColor(tmp_fog_Texture,x,y,x,y,c_black);
+   // fog tileset
+   gfx_TileSet_Render(tmp_fog_Texture,ui_fog_tileset,tmp_TileTemplate,0,0,0,c_white);
+   gfx_TileSet_Free(tmp_TileTemplate);
+   gfx_SDLSurfaceFree(tmp_fog_Texture);
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+
+{
 function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
 var ts:pSDl_Surface;
 begin
@@ -637,7 +785,7 @@ begin
       begin
          maskColor:=0;
          if(theme_cur_liquid_tas=tas_magma)and(i>0)then
-           maskColor:=rgba2c(0,0,0,30*i);
+           maskColor,0,0,0,30*i);
 
          if(theme_cur_liquid_tes=tes_nature)then
          begin
@@ -710,55 +858,83 @@ begin
    rectangleColor(gfx_MakeUIButtonFromSDLSurface,0,0,gfx_MakeUIButtonFromSDLSurface^.w-1,gfx_MakeUIButtonFromSDLSurface^.h-1,c_black);
    rectangleColor(gfx_MakeUIButtonFromSDLSurface,1,1,gfx_MakeUIButtonFromSDLSurface^.w-2,gfx_MakeUIButtonFromSDLSurface^.h-2,c_black);
    SDL_FreeSurface(tst);
-end;
+end;  }
 
-procedure gfx_LoadFont;
+function gfx_LoadFont(fn:shortstring):PTFont;
 var i:byte;
     c:char;
-  ccc:cardinal;
- fspr:pSDL_Surface;
+  ccc:TMWPixel;
+ fspr:pTMWTexture;
 begin
-   ccc:=(1 shl 24)-1;
-   fspr:=gfx_SDLSurfaceLoad('font',false,true);
+   fspr:=gfx_MWTextureLoad(fn,false,true,true);
+
+   new(gfx_LoadFont);
+   with gfx_LoadFont^ do
+   begin
+      font_w :=max2i(1,fspr^.w div 256);
+      font_h :=max2i(1,fspr^.h);
+      font_lh:=font_h+2;
+      font_hw:=font_w div 2;
+      font_hh:=font_h div 2;
+   end;
+
+   if(fspr^.sdlsurface=nil)then
+   begin
+      gfx_MWTextureFree(fspr);
+      exit;
+   end;
+
+   ccc :=SDL_SurfaceGetPixel(fspr^.sdlsurface,0,0);
+   with gfx_LoadFont^ do
    for i:=0 to 255 do
    begin
-      r_RECT^.x:=ord(i)*basefont_w1;
-      r_RECT^.y:=0;
-      r_RECT^.w:=basefont_w1;
-      r_RECT^.h:=basefont_w1;
       c:=chr(i);
-      with font_1 [c] do
+      new(MWTextures[c]);
+      gfx_MWTextureInit(MWTextures[c]);
+
+      with MWTextures[c]^ do
       begin
-         sdlSurface:=gfx_SDLSurfaceCreate(basefont_w1,basefont_w1);
-         SDL_FillRect(sdlSurface,nil,0);
-         SDL_BLITSURFACE(fspr,r_RECT,sdlSurface,nil);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
-         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
-      end;
-      with font_1h[c] do
-      begin
-         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1h,basefont_w1h);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
-         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
-      end;
-      with font_2 [c] do
-      begin
-         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1*2,basefont_w1*2);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
-         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
-      end;
-      with font_3 [c] do
-      begin
-         sdlSurface:=gfx_SDLSurfaceResize(font_1[c].sdlSurface,basefont_w1*3,basefont_w1*3);
-         SDL_SetColorKey(sdlSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
-         w :=sdlSurface^.w;h :=w;hw:=w div 2;hh:=hw;
+         sdlsurface:=sdl_createRGBSurface(0,font_w,font_h,fspr^.sdlsurface^.format^.BitsPerPixel,
+                                                          fspr^.sdlsurface^.format^.Rmask,
+                                                          fspr^.sdlsurface^.format^.Gmask,
+                                                          fspr^.sdlsurface^.format^.Bmask,
+                                                          fspr^.sdlsurface^.format^.Amask);
+
+         if(sdlsurface=nil)then
+         begin
+            writeLog('gfx_LoadFont -> sdl_createRGBSurface');
+            continue;
+         end;
+         SDL_FillRect(sdlsurface,nil,ccc);
+
+         vid_rect^.x:=i*font_w;
+         vid_rect^.y:=0;
+         vid_rect^.w:=font_w;
+         vid_rect^.h:=font_h;
+
+         SDL_BLITSURFACE(fspr^.sdlsurface,vid_rect,sdlsurface,nil);
+         SDL_SetColorKey(sdlsurface,1,ccc);
+
+         sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+         if(sdltexture=nil)
+         then writeLog('gfx_LoadFont -> SDL_CreateTextureFromSurface')
+         else SDL_SetTextureBlendMode(sdltexture,SDL_BLENDMODE_BLEND);
+
+         sdl_FreeSurface(sdlsurface);
+         sdlsurface:=nil;
+
+         w :=font_w;
+         h :=font_h;
+         hw:=font_hw;
+         hh:=font_hh;
       end;
    end;
-   gfx_SDLSurfaceFree(fspr);
+   gfx_MWTextureFree(fspr);
 end;
 
-{$include _themes.pas}
 
+{$include _themes.pas}
+{
 procedure vid_MakeMenuBack;
 var
 cx,cy:single;
@@ -775,272 +951,304 @@ begin
    else ts:=zoomSurface(spr_mback,cx,cx,0);
    draw_surf(r_mback,vid_vhw-(ts^.w div 2),vid_vhh-(ts^.h div 2),ts);
    gfx_SDLSurfaceFree(ts);
+end;}
+
+procedure dtest;
+begin
+   {SDL_SetRenderTarget(vid_renderer,tex_ui_MiniMap.sdltexture);
+
+   draw_set_color(c_aqua);
+   draw_clear;
+   draw_set_color(c_yellow);
+   draw_set_alpha(0);
+   SDL_SetRenderDrawBlendMode(vid_renderer,SDL_BLENDMODE_NONE);
+   SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_NONE);
+
+   //draw_fcircle(MapCellHW,MapCellHW,MapCellHW);
+   SDL_RenderDrawLine(vid_renderer,0,0,999,999);
+   SDL_RenderDrawLine(vid_renderer,1,0,999,999);
+   SDL_RenderDrawLine(vid_renderer,2,0,999,999);
+   SDL_RenderDrawLine(vid_renderer,3,0,999,999);
+   SDL_RenderDrawLine(vid_renderer,4,0,999,999);
+   SDL_RenderDrawLine(vid_renderer,5,0,999,999);
+
+
+   SDL_SetRenderTarget(vid_renderer,nil);
+   SDL_SetRenderDrawBlendMode(vid_renderer,SDL_BLENDMODE_BLEND);
+   SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_BLEND);
+   draw_set_alpha(255);}
+
+   with tex_ui_MiniMap^ do
+   begin
+      sdlsurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
+
+      {SDLSurf_boxColor(sdlsurface,0,0,MapCellW,MapCellW,c_white);
+      SDLSurf_boxColor(sdlsurface,MapCellhW,MapCellhW,MapCellW-10,MapCellW-10,c_red);
+      SDLSurf_boxColor(sdlsurface,10,10,MapCellhW-10,MapCellhW-10,c_green);
+      SDLSurf_boxColor(sdlsurface,10,MapCellhW,MapCellhW-10,MapCellW-10,c_blue);
+                                                                                  }
+
+      SDLSurf_filledCircleColor(sdlsurface,MapCellhW,MapCellhW,MapCellhW,c_red);
+      SDLSurf_filledCircleColor(sdlsurface,MapCellW-20,MapCellW-20,50,c_aqua);
+      SDLSurf_filledCircleColor(sdlsurface,20,MapCellW-20,50,c_lime);
+
+
+      sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+      gfx_SDLSurfaceFree(sdlsurface);
+
+   end;
+
+   writeln('redraw');
 end;
 
-procedure gfx_LoadGraphics(firstload:boolean);
+procedure gfx_LoadGraphics;
 var x,r:integer;
 begin
-   // basic surfaces
-   r_empty   :=gfx_SDLSurfaceCreate(1,1);
-   SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
-
-   r_ui_MiniMap:=gfx_SDLSurfaceCreate(vid_panel_pwu,vid_panel_pwu);
-   r_gminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
-   r_mminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
-   r_bminimap :=gfx_SDLSurfaceCreate(vid_panel_pwi,vid_panel_pwi);
-   rectangleColor(r_ui_MiniMap,0,0,r_ui_MiniMap^.w-1,r_ui_MiniMap^.h-1,c_white);
-
-   vid_UIItem_n :=0;
-   setlength(vid_UIItem_list,vid_UIItem_n);
-
-   with spr_dummy do
-   begin
-      h :=1;
-      w :=1;
-      hh:=1;
-      hw:=1;
-      sdlSurface:=r_empty;
-   end;
-   pspr_dummy:=@spr_dummy;
-
+   // basic textures
+   ptex_dummy:=nil;
+   gfx_MWTextureInit(@tex_dummy);
+   ptex_dummy:=@tex_dummy;
    with spr_dmodel do
    begin
       sm_listi:=0;
       sm_listn:=1;
       setlength(sm_list,sm_listn);
-      sm_list[sm_listi]:=spr_dummy;
+      sm_list[sm_listi]:=ptex_dummy;
       sm_type :=smt_effect;
    end;
    spr_pdmodel:=@spr_dmodel;
 
-   gfx_LoadFont;
+   font_Base:=gfx_LoadFont(str_f_FontBase);
+   draw_set_fontS(font_Base,1);
 
-   DrawLoadingScreen(str_loading_srf,c_orange);
+   draw_LoadingScreen(str_loading_srf,c_red);
+
+   tex_menu        :=gfx_MWTextureMakeRenderTarget(menu_w       ,menu_h       );
+   tex_ui_MiniMap  :=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi);
+   tex_map_gMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: unit & ui layer
+   tex_map_mMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: menu
+   tex_map_bMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: terrain background
 
    // theme tileset templates
-   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_tech  ,tes_tech  ,8 ,0);
-   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_crater_nature,tes_nature,11,0);
+
+   vid_TileTemplate_crater_tech  :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_tech  ,8 ,0);
+   vid_TileTemplate_crater_nature:=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,11,0);
    for x:=0 to theme_anim_step_n-1 do
-   gfx_MakeTileSetTemplate(c_white,c_black,MapCellW ,@vid_TileTemplate_liquid[x]    ,tes_nature,0 ,byte(x*5));
+   vid_TileTemplate_liquid[x]    :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,0 ,byte(x*5));
+
+   theme_tileset_crater   :=gfx_TileSet_Make(MapCellW);
+   for x:=0 to theme_anim_step_n-1 do
+   theme_tileset_liquid[x]:=gfx_TileSet_Make(MapCellW);
+
+   ui_fog_tileset         :=gfx_TileSet_Make(fog_CellW);
 
    // FOG tiles
-   new(vid_TileTemplate_fog);
-   FillChar(vid_TileTemplate_fog^,SizeOf(vid_TileTemplate_fog^),0);
-   gfx_MakeTileSetTemplate(c_white,c_black,fog_CellW,vid_TileTemplate_fog,tes_fog,0,0);
-   ui_fog_BaseSurf:=gfx_SDLSurfaceCreate(fog_CellW,fog_CellW);
-   boxColor(ui_fog_BaseSurf,0,0,fog_CellW,fog_CellW,c_white);
-   for x:=0 to fog_CellW-1 do
-   for r:=0 to fog_CellW-1 do
-     if((x+r)mod 4)>0 then
-       pixelColor(ui_fog_BaseSurf,x,r,c_black);
-   gfx_MakeTileSet(ui_fog_BaseSurf,@ui_fog_tiles,vid_TileTemplate_fog,0,0,0,c_white);
-   for x:=0 to MaxTileSet do gfx_SDLSurfaceFree(vid_TileTemplate_fog^[x].sdlSurface);
-   dispose(vid_TileTemplate_fog);
+   gfx_TileSet_MakeFog;
 
-   // load game resouces
-   DrawLoadingScreen(str_loading_gfx,c_yellow);
-   spr_mlogo :=gfx_SDLSurfaceLoad('logo' ,false,firstload);
-   spr_mback :=gfx_SDLSurfaceLoad('mback',false,firstload);
 
-   r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
-   vid_MakeMenuBack;
+   // load game resources
+   draw_LoadingScreen(str_loading_gfx1,c_orange);
 
-   spr_b_action   := gfx_LoadUIButton('b_action' ,vid_bw);
-   spr_b_paction  := gfx_LoadUIButton('b_paction',vid_bw);
-   spr_b_delete   := gfx_LoadUIButton('b_destroy',vid_bw);
-   spr_b_attack   := gfx_LoadUIButton('b_attack' ,vid_bw);
-   spr_b_rebuild  := gfx_LoadUIButton('b_rebuild',vid_bw);
-   spr_b_move     := gfx_LoadUIButton('b_move'   ,vid_bw);
-   spr_b_patrol   := gfx_LoadUIButton('b_patrol' ,vid_bw);
-   spr_b_apatrol  := gfx_LoadUIButton('b_apatrol',vid_bw);
-   spr_b_stop     := gfx_LoadUIButton('b_stop'   ,vid_bw);
-   spr_b_hold     := gfx_LoadUIButton('b_hold'   ,vid_bw);
-   spr_b_selall   := gfx_LoadUIButton('b_selall' ,vid_bw);
-   spr_b_cancel   := gfx_LoadUIButton('b_cancle' ,vid_bw);
-   spr_b_rfast    := gfx_LoadUIButton('b_rfast'  ,vid_bw);
-   spr_b_rskip    := gfx_LoadUIButton('b_rskip'  ,vid_bw);
-   spr_b_rback    := gfx_LoadUIButton('b_rback'  ,vid_bw);
-   spr_b_rfog     := gfx_LoadUIButton('b_fog'    ,vid_bw);
-   spr_b_rlog     := gfx_LoadUIButton('b_log'    ,vid_bw);
-   spr_b_rstop    := gfx_LoadUIButton('b_rstop'  ,vid_bw);
-   spr_b_rvis     := gfx_LoadUIButton('b_rvis'   ,vid_bw);
-   spr_b_rclck    := gfx_LoadUIButton('b_rclick' ,vid_bw);
-   spr_b_mmark    := gfx_LoadUIButton('b_mmark'  ,vid_bw);
+   spr_mlogo     :=gfx_MWTextureLoad('logo'       ,false);
+   spr_mback     :=gfx_MWTextureLoad('mback'      ,false);
 
-   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadUIButton('tabs'+b2s(x),vid_tbw);
+   spr_cursor    :=gfx_MWTextureLoad('cursor'     ,true );
 
-   spr_cursor     := gfx_SDLSurfaceLoad('cursor'   ,true ,true);
+   spr_b_delete  :=gfx_MWTextureLoad('b_destroy'  ,true );
+   spr_b_attack  :=gfx_MWTextureLoad('b_attack'   ,true );
+   spr_b_move    :=gfx_MWTextureLoad('b_move'     ,true );
+   spr_b_patrol  :=gfx_MWTextureLoad('b_patrol'   ,true );
+   spr_b_apatrol :=gfx_MWTextureLoad('b_apatrol'  ,true );
+   spr_b_stop    :=gfx_MWTextureLoad('b_stop'     ,true );
+   spr_b_hold    :=gfx_MWTextureLoad('b_hold'     ,true );
 
-   spr_c_earth    := gfx_SDLSurfaceLoad('M_EARTH'  ,false,true);
-   spr_c_mars     := gfx_SDLSurfaceLoad('M_MARS'   ,false,true);
-   spr_c_hell     := gfx_SDLSurfaceLoad('M_HELL'   ,false,true);
-   spr_c_phobos   := gfx_SDLSurfaceLoad('M_PHOBOS' ,false,true);
-   spr_c_deimos   := gfx_SDLSurfaceLoad('M_DEIMOS' ,false,true);
+   spr_b_selall  :=gfx_MWTextureLoad('b_selall'   ,true );
+   spr_b_cancel  :=gfx_MWTextureLoad('b_cancle'   ,true );
+   spr_b_rfast   :=gfx_MWTextureLoad('b_rfast'    ,true );
+   spr_b_rskip   :=gfx_MWTextureLoad('b_rskip'    ,true );
+   spr_b_rback   :=gfx_MWTextureLoad('b_rback'    ,true );
+   spr_b_rfog    :=gfx_MWTextureLoad('b_fog'      ,true );
+   spr_b_rlog    :=gfx_MWTextureLoad('b_log'      ,true );
+   spr_b_rstop   :=gfx_MWTextureLoad('b_rstop'    ,true );
+   spr_b_rvis    :=gfx_MWTextureLoad('b_rvis'     ,true );
+   spr_b_rclck   :=gfx_MWTextureLoad('b_rclick'   ,true );
+   spr_b_mmark   :=gfx_MWTextureLoad('b_mmark'    ,true );
 
-   gfx_MWSModelLoad(@spr_lostsoul       ,race_units[r_hell]+'h_u0_'      ,smt_lost     ,firstload);
-   gfx_MWSModelLoad(@spr_phantom        ,race_units[r_hell]+'h_u0a_'     ,smt_lost     ,firstload);
-   gfx_MWSModelLoad(@spr_imp            ,race_units[r_hell]+'h_u1_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_demon          ,race_units[r_hell]+'h_u2_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_cacodemon      ,race_units[r_hell]+'h_u3_'      ,smt_caco     ,firstload);
-   gfx_MWSModelLoad(@spr_knight         ,race_units[r_hell]+'h_u4k_'     ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_baron          ,race_units[r_hell]+'h_u4_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_cyberdemon     ,race_units[r_hell]+'h_u5_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_mastermind     ,race_units[r_hell]+'h_u6_'      ,smt_mmind    ,firstload);
-   gfx_MWSModelLoad(@spr_pain           ,race_units[r_hell]+'h_u7_'      ,smt_pain     ,firstload);
-   gfx_MWSModelLoad(@spr_revenant       ,race_units[r_hell]+'h_u8_'      ,smt_revenant ,firstload);
-   gfx_MWSModelLoad(@spr_mancubus       ,race_units[r_hell]+'h_u9_'      ,smt_mancubus ,firstload);
-   gfx_MWSModelLoad(@spr_arachnotron    ,race_units[r_hell]+'h_u10_'     ,smt_archno   ,firstload);
-   gfx_MWSModelLoad(@spr_archvile       ,race_units[r_hell]+'h_u11_'     ,smt_arch     ,firstload);
+   for x:=0 to 3 do
+   spr_tabs[x]   :=gfx_MWTextureLoad('tabs'+b2s(x),true );
 
-   gfx_MWSModelLoad(@spr_ZFormer        ,race_units[r_hell]+'h_z0_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_ZEngineer      ,race_units[r_hell]+'h_z0s_'     ,smt_zengineer,firstload);
-   gfx_MWSModelLoad(@spr_ZSergant       ,race_units[r_hell]+'h_z1_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_ZSSergant      ,race_units[r_hell]+'h_z1s_'     ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_ZCommando      ,race_units[r_hell]+'h_z2_'      ,smt_zcommando,firstload);
-   gfx_MWSModelLoad(@spr_ZAntiaircrafter,race_units[r_hell]+'h_zr_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_ZSiege         ,race_units[r_hell]+'h_z3_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_ZFMajor        ,race_units[r_hell]+'h_z4j_'     ,smt_fmajor   ,firstload);
-   gfx_MWSModelLoad(@spr_ZBFG           ,race_units[r_hell]+'h_z5_'      ,smt_imp      ,firstload);
 
-   gfx_MWSModelLoad(@spr_Medic          ,race_units[r_uac ]+'u_u0_'      ,smt_medic    ,firstload);
-   gfx_MWSModelLoad(@spr_Engineer       ,race_units[r_uac ]+'u_u1_'      ,smt_marine0  ,firstload);
-   gfx_MWSModelLoad(@spr_Scout          ,race_units[r_uac ]+'u_u1s_'     ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_Sergant        ,race_units[r_uac ]+'u_u2_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_SSergant       ,race_units[r_uac ]+'u_u2s_'     ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_Commando       ,race_units[r_uac ]+'u_u3_'      ,smt_zcommando,firstload);
-   gfx_MWSModelLoad(@spr_Antiaircrafter ,race_units[r_uac ]+'u_u4r_'     ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_Siege          ,race_units[r_uac ]+'u_u4_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   ,firstload);
-   gfx_MWSModelLoad(@spr_BFG            ,race_units[r_uac ]+'u_u6_'      ,smt_imp      ,firstload);
-   gfx_MWSModelLoad(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'      ,smt_transport,firstload);
-   gfx_MWSModelLoad(@spr_APC            ,race_units[r_uac ]+'uac_tank_'  ,smt_apc      ,firstload);
-   gfx_MWSModelLoad(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'      ,smt_terminat ,firstload);
-   gfx_MWSModelLoad(@spr_Tank           ,race_units[r_uac ]+'u_u10_'     ,smt_tank     ,firstload);
-   gfx_MWSModelLoad(@spr_Flyer          ,race_units[r_uac ]+'u_u11_'     ,smt_flyer    ,firstload);
-   gfx_MWSModelLoad(@spr_Transport      ,race_units[r_uac ]+'transport'  ,smt_transport,firstload);
-   gfx_MWSModelLoad(@spr_UACBot         ,race_units[r_uac ]+'uacd'       ,smt_flyer    ,firstload);
+   spr_c_earth   :=gfx_MWTextureLoad('M_EARTH'    ,false);
+   spr_c_mars    :=gfx_MWTextureLoad('M_MARS'     ,false);
+   spr_c_hell    :=gfx_MWTextureLoad('M_HELL'     ,false);
+   spr_c_phobos  :=gfx_MWTextureLoad('M_PHOBOS'   ,false);
+   spr_c_deimos  :=gfx_MWTextureLoad('M_DEIMOS'   ,false);
 
-   gfx_MWSModelLoad(@spr_HKeep1         ,race_buildings[r_hell]+'h_b0_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HKeep2         ,race_buildings[r_hell]+'h_b0a_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HGate1         ,race_buildings[r_hell]+'h_b1a'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HGate2         ,race_buildings[r_hell]+'h_b1b'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HGate3         ,race_buildings[r_hell]+'h_b1c'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HGate4         ,race_buildings[r_hell]+'h_b1d'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol1       ,race_buildings[r_hell]+'h_b2_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol2       ,race_buildings[r_hell]+'h_b2a_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol3       ,race_buildings[r_hell]+'h_b2b_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HSymbol4       ,race_buildings[r_hell]+'h_b2c_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPools1        ,race_buildings[r_hell]+'h_b3_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPools2        ,race_buildings[r_hell]+'h_b3a'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPools3        ,race_buildings[r_hell]+'h_b3b'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPools4        ,race_buildings[r_hell]+'h_b3c'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'  ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HCommandCenter1,race_buildings[r_hell]+'h_hcc_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HCommandCenter2,race_buildings[r_hell]+'h_hcca_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks1     ,race_buildings[r_hell]+'h_hbar_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks2     ,race_buildings[r_hell]+'h_hbara',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks3     ,race_buildings[r_hell]+'h_hbarb',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HBarracks4     ,race_buildings[r_hell]+'h_hbarc',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding  ,firstload);
+   spr_mp[r_hell]:=gfx_MWTextureLoad(race_dir[r_hell]+'h_mp'         ,true);
+   spr_mp[r_uac ]:=gfx_MWTextureLoad(race_dir[r_uac ]+'u_mp'         ,true);
+   spr_ptur      :=gfx_MWTextureLoad(race_dir[r_uac ]+'ptur'         ,true);
 
-   gfx_MWSModelLoad(@spr_UCommandCenter1,race_buildings[r_uac ] +'u_b0_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UCommandCenter2,race_buildings[r_uac ] +'u_b0a_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks1     ,race_buildings[r_uac ] +'u_b1_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks2     ,race_buildings[r_uac ] +'u_b1a' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks3     ,race_buildings[r_uac ] +'u_b1b' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UBarracks4     ,race_buildings[r_uac ] +'u_b1c' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator1    ,race_buildings[r_uac ] +'u_b2_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator2    ,race_buildings[r_uac ] +'u_b2b_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator3    ,race_buildings[r_uac ] +'u_b2c_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UGenerator4    ,race_buildings[r_uac ] +'u_b2d_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory1,race_buildings[r_uac ] +'u_b3_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory2,race_buildings[r_uac ] +'u_b3a' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory3,race_buildings[r_uac ] +'u_b3b' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UWeaponFactory4,race_buildings[r_uac ] +'u_b6_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_' ,smt_turret   ,firstload);
-   gfx_MWSModelLoad(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_' ,smt_turret   ,firstload);
-   gfx_MWSModelLoad(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_' ,smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_' ,smt_turret2  ,firstload);
-   gfx_MWSModelLoad(@spr_UCompStation   ,race_buildings[r_uac ] +'u_b10_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UFactory1      ,race_buildings[r_uac ] +'u_b12_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UFactory2      ,race_buildings[r_uac ] +'u_b11_',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UFactory3      ,race_buildings[r_uac ] +'u_b12a',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_UFactory4      ,race_buildings[r_uac ] +'u_b12b',smt_buiding  ,firstload);
-   gfx_MWSModelLoad(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding  ,firstload);
+   spr_b4_a      :=gfx_MWTextureLoad(race_buildings[r_uac ]+'u_b4_a' ,true);
+   spr_b7_a      :=gfx_MWTextureLoad(race_buildings[r_uac ]+'u_b7_a' ,true);
+   spr_b9_a      :=gfx_MWTextureLoad(race_buildings[r_uac ]+'u_b9_a' ,true);
 
-   gfx_MWSModelLoad(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_db_u0          ,race_dir[r_uac ]+'db_u0'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_db_u1          ,race_dir[r_uac ]+'db_u1'        ,smt_effect ,firstload);
+   spr_stun      :=gfx_MWTextureLoad(effects_folder+'stun'           ,true);
+   spr_invuln    :=gfx_MWTextureLoad(effects_folder+'invuln'         ,true);
+   spr_hvision   :=gfx_MWTextureLoad(effects_folder+'hvision'        ,true);
+   spr_scan      :=gfx_MWTextureLoad(effects_folder+'scan'           ,true);
+   spr_decay     :=gfx_MWTextureLoad(effects_folder+'decay'          ,true);
 
-   gfx_MWSModelLoad(@spr_h_p0           ,race_missiles[r_hell]+'h_p0_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_h_p1           ,race_missiles[r_hell]+'h_p1_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_h_p2           ,race_missiles[r_hell]+'h_p2_'   ,smt_missile,firstload);
-   gfx_MWSModelLoad(@spr_h_p3           ,race_missiles[r_hell]+'h_p3_'   ,smt_missile,firstload);
-   gfx_MWSModelLoad(@spr_h_p4           ,race_missiles[r_hell]+'h_p4_'   ,smt_missile,firstload);
-   gfx_MWSModelLoad(@spr_h_p5           ,race_missiles[r_hell]+'h_p5_'   ,smt_missile,firstload);
-   gfx_MWSModelLoad(@spr_h_p6           ,race_missiles[r_hell]+'h_p6_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_h_p7           ,race_missiles[r_hell]+'h_p7_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_u_p0           ,race_missiles[r_uac ]+'u_p0_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_u_p1           ,race_missiles[r_uac ]+'u_p1_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_missile,firstload);
+   spr_cp_koth   :=gfx_MWTextureLoad('cp_koth'                       ,true);
+   spr_cp_out    :=gfx_MWTextureLoad('cp_out'                        ,true);
+   spr_cp_gen    :=gfx_MWTextureLoad('cp_gen'                        ,true);
 
-   spr_u_p1s:=spr_u_p1;
-   with spr_u_p1s do sm_type:=smt_effect2;
 
-   gfx_MWSModelLoad(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_gtel       ,effects_folder+'ef_gt_'         ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_tel        ,effects_folder+'ef_tel_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect ,firstload);
-   gfx_MWSModelLoad(@spr_blood          ,effects_folder+'blood'          ,smt_effect ,firstload);
+   spr_lostsoul       :=gfx_MWSModelLoad(race_units[r_hell]+'h_u0_'      ,smt_lost     );
+   spr_phantom        :=gfx_MWSModelLoad(race_units[r_hell]+'h_u0a_'     ,smt_lost     );
+   spr_imp            :=gfx_MWSModelLoad(race_units[r_hell]+'h_u1_'      ,smt_imp      );
+   spr_demon          :=gfx_MWSModelLoad(race_units[r_hell]+'h_u2_'      ,smt_imp      );
+   spr_cacodemon      :=gfx_MWSModelLoad(race_units[r_hell]+'h_u3_'      ,smt_caco     );
+   spr_knight         :=gfx_MWSModelLoad(race_units[r_hell]+'h_u4k_'     ,smt_imp      );
+   spr_baron          :=gfx_MWSModelLoad(race_units[r_hell]+'h_u4_'      ,smt_imp      );
+   spr_cyberdemon     :=gfx_MWSModelLoad(race_units[r_hell]+'h_u5_'      ,smt_imp      );
+   spr_mastermind     :=gfx_MWSModelLoad(race_units[r_hell]+'h_u6_'      ,smt_mmind    );
+   spr_pain           :=gfx_MWSModelLoad(race_units[r_hell]+'h_u7_'      ,smt_pain     );
+   spr_revenant       :=gfx_MWSModelLoad(race_units[r_hell]+'h_u8_'      ,smt_revenant );
+   spr_mancubus       :=gfx_MWSModelLoad(race_units[r_hell]+'h_u9_'      ,smt_mancubus );
+   spr_arachnotron    :=gfx_MWSModelLoad(race_units[r_hell]+'h_u10_'     ,smt_archno   );
+   spr_archvile       :=gfx_MWSModelLoad(race_units[r_hell]+'h_u11_'     ,smt_arch     );
 
-   gfx_MWTextureLoad(@spr_mp[r_hell]    ,race_dir[r_hell]+'h_mp'         ,firstload,true);
-   gfx_MWTextureLoad(@spr_mp[r_uac ]    ,race_dir[r_uac ]+'u_mp'         ,firstload,true);
-   gfx_MWTextureLoad(@spr_ptur          ,race_dir[r_uac ]+'ptur'         ,firstload,true);
+   spr_ZFormer        :=gfx_MWSModelLoad(race_units[r_hell]+'h_z0_'      ,smt_imp      );
+   spr_ZEngineer      :=gfx_MWSModelLoad(race_units[r_hell]+'h_z0s_'     ,smt_zengineer);
+   spr_ZSergant       :=gfx_MWSModelLoad(race_units[r_hell]+'h_z1_'      ,smt_imp      );
+   spr_ZSSergant      :=gfx_MWSModelLoad(race_units[r_hell]+'h_z1s_'     ,smt_imp      );
+   spr_ZCommando      :=gfx_MWSModelLoad(race_units[r_hell]+'h_z2_'      ,smt_zcommando);
+   spr_ZAntiaircrafter:=gfx_MWSModelLoad(race_units[r_hell]+'h_zr_'      ,smt_imp      );
+   spr_ZSiege         :=gfx_MWSModelLoad(race_units[r_hell]+'h_z3_'      ,smt_imp      );
+   spr_ZFMajor        :=gfx_MWSModelLoad(race_units[r_hell]+'h_z4j_'     ,smt_fmajor   );
+   spr_ZBFG           :=gfx_MWSModelLoad(race_units[r_hell]+'h_z5_'      ,smt_imp      );
 
-   gfx_MWTextureLoad(@spr_b4_a          ,race_buildings[r_uac ]+'u_b4_a' ,firstload,true);
-   gfx_MWTextureLoad(@spr_b7_a          ,race_buildings[r_uac ]+'u_b7_a' ,firstload,true);
-   gfx_MWTextureLoad(@spr_b9_a          ,race_buildings[r_uac ]+'u_b9_a' ,firstload,true);
+   spr_Medic          :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u0_'      ,smt_medic    );
+   spr_Engineer       :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u1_'      ,smt_marine0  );
+   spr_Scout          :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u1s_'     ,smt_imp      );
+   spr_Sergant        :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u2_'      ,smt_imp      );
+   spr_SSergant       :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u2s_'     ,smt_imp      );
+   spr_Commando       :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u3_'      ,smt_zcommando);
+   spr_Antiaircrafter :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u4r_'     ,smt_imp      );
+   spr_Siege          :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u4_'      ,smt_imp      );
+   spr_FMajor         :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u5j_'     ,smt_fmajor   );
+   spr_BFG            :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u6_'      ,smt_imp      );
+   spr_FAPC           :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u8_'      ,smt_transport);
+   spr_APC            :=gfx_MWSModelLoad(race_units[r_uac ]+'uac_tank_'  ,smt_apc      );
+   spr_Terminator     :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u9_'      ,smt_terminat );
+   spr_Tank           :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u10_'     ,smt_tank     );
+   spr_Flyer          :=gfx_MWSModelLoad(race_units[r_uac ]+'u_u11_'     ,smt_flyer    );
+   spr_Transport      :=gfx_MWSModelLoad(race_units[r_uac ]+'transport'  ,smt_transport);
+   spr_UACBot         :=gfx_MWSModelLoad(race_units[r_uac ]+'uacd'       ,smt_flyer    );
 
-   gfx_MWTextureLoad(@spr_stun          ,effects_folder+'stun'           ,firstload,true);
-   gfx_MWTextureLoad(@spr_invuln        ,effects_folder+'invuln'         ,firstload,true);
-   gfx_MWTextureLoad(@spr_hvision       ,effects_folder+'hvision'        ,firstload,true);
-   gfx_MWTextureLoad(@spr_scan          ,effects_folder+'scan'           ,firstload,true);
-   gfx_MWTextureLoad(@spr_decay         ,effects_folder+'decay'          ,firstload,true);
+   spr_HKeep1         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b0_'  ,smt_buiding  );
+   spr_HKeep2         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b0a_' ,smt_buiding  );
+   spr_HGate1         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b1a'  ,smt_buiding  );
+   spr_HGate2         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b1b'  ,smt_buiding  );
+   spr_HGate3         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b1c'  ,smt_buiding  );
+   spr_HGate4         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b1d'  ,smt_buiding  );
+   spr_HSymbol1       :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b2_'  ,smt_buiding  );
+   spr_HSymbol2       :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b2a_' ,smt_buiding  );
+   spr_HSymbol3       :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b2b'  ,smt_buiding  );
+   spr_HSymbol4       :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b2c'  ,smt_buiding  );
+   spr_HPools1        :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b3_'  ,smt_buiding  );
+   spr_HPools2        :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b3a'  ,smt_buiding  );
+   spr_HPools3        :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b3b'  ,smt_buiding  );
+   spr_HPools4        :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b3c'  ,smt_buiding  );
+   spr_HTower         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b4_'  ,smt_buiding  );
+   spr_HTeleport      :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b5_'  ,smt_buiding  );
+   spr_HMonastery     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b6_'  ,smt_buiding  );
+   spr_HTotem         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b7_'  ,smt_buiding  );
+   spr_HAltar         :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b8_'  ,smt_buiding  );
+   spr_HFortress      :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b9_'  ,smt_buiding  );
+   spr_HPentagram     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_b10_' ,smt_buiding  );
+   spr_HCommandCenter1:=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hcc_' ,smt_buiding  );
+   spr_HCommandCenter2:=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hcca_',smt_buiding  );
+   spr_HBarracks1     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hbar_',smt_buiding  );
+   spr_HBarracks2     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hbara',smt_buiding  );
+   spr_HBarracks3     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hbarb',smt_buiding  );
+   spr_HBarracks4     :=gfx_MWSModelLoad(race_buildings[r_hell]+'h_hbarc',smt_buiding  );
+   spr_HEye           :=gfx_MWSModelLoad(race_buildings[r_hell]+'heye_'  ,smt_buiding  );
 
-   gfx_MWTextureLoad(@spr_cp_koth       ,'cp_koth'                       ,firstload,true);
-   gfx_MWTextureLoad(@spr_cp_out        ,'cp_out'                        ,firstload,true);
-   gfx_MWTextureLoad(@spr_cp_gen        ,'cp_gen'                        ,firstload,true);
+   spr_UCommandCenter1:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b0_' ,smt_buiding  );
+   spr_UCommandCenter2:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b0a_',smt_buiding  );
+   spr_UBarracks1     :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b1_' ,smt_buiding  );
+   spr_UBarracks2     :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b1a' ,smt_buiding  );
+   spr_UBarracks3     :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b1b' ,smt_buiding  );
+   spr_UBarracks4     :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b1c' ,smt_buiding  );
+   spr_UGenerator1    :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b2_' ,smt_buiding  );
+   spr_UGenerator2    :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b2a_',smt_buiding  );
+   spr_UGenerator3    :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b2c_',smt_buiding  );
+   spr_UGenerator4    :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b2d_',smt_buiding  );
+   spr_UWeaponFactory1:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b3_' ,smt_buiding  );
+   spr_UWeaponFactory2:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b3a' ,smt_buiding  );
+   spr_UWeaponFactory3:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b3b' ,smt_buiding  );
+   spr_UWeaponFactory4:=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b6_' ,smt_buiding  );
+   spr_UTurret        :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b4_' ,smt_turret   );
+   spr_URadar         :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b5_' ,smt_buiding  );
+   spr_UTechCenter    :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b13_',smt_buiding  );
+   spr_UPTurret       :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b7_' ,smt_turret   );
+   spr_URocketL       :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b8_' ,smt_buiding  );
+   spr_URTurret       :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b9_' ,smt_turret2  );
+   spr_UCompStation   :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b10_',smt_buiding  );
+   spr_UFactory1      :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b12_',smt_buiding  );
+   spr_UFactory2      :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b11_',smt_buiding  );
+   spr_UFactory3      :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b12a',smt_buiding  );
+   spr_UFactory4      :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_b12b',smt_buiding  );
+   spr_Mine           :=gfx_MWSModelLoad(race_buildings[r_uac ] +'u_mine',smt_buiding  );
 
-   for x:=0 to spr_upgrade_icons do
+   spr_db_h0          :=gfx_MWSModelLoad(race_dir[r_hell]+'db_h0'        ,smt_effect   );
+   spr_db_h1          :=gfx_MWSModelLoad(race_dir[r_hell]+'db_h1'        ,smt_effect   );
+   spr_db_u0          :=gfx_MWSModelLoad(race_dir[r_uac ]+'db_u0'        ,smt_effect   );
+   spr_db_u1          :=gfx_MWSModelLoad(race_dir[r_uac ]+'db_u1'        ,smt_effect   );
+
+   spr_h_p0           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p0_'   ,smt_effect   );
+   spr_h_p1           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p1_'   ,smt_effect   );
+   spr_h_p2           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p2_'   ,smt_missile  );
+   spr_h_p3           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p3_'   ,smt_missile  );
+   spr_h_p4           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p4_'   ,smt_missile  );
+   spr_h_p5           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p5_'   ,smt_missile  );
+   spr_h_p6           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p6_'   ,smt_effect   );
+   spr_h_p7           :=gfx_MWSModelLoad(race_missiles[r_hell]+'h_p7_'   ,smt_effect   );
+   spr_u_p0           :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p0_'   ,smt_effect   );
+   spr_u_p1           :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p1_'   ,smt_effect   );
+   spr_u_p1s          :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p1_'   ,smt_effect2  );
+   spr_u_p2           :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p2_'   ,smt_effect   );
+   spr_u_p3           :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p3_'   ,smt_effect   );
+   spr_u_p8           :=gfx_MWSModelLoad(race_missiles[r_uac ]+'u_p8_'   ,smt_missile  );
+
+   spr_eff_bfg        :=gfx_MWSModelLoad(effects_folder+'ef_bfg_'        ,smt_effect   );
+   spr_eff_eb         :=gfx_MWSModelLoad(effects_folder+'ef_eb'          ,smt_effect   );
+   spr_eff_ebb        :=gfx_MWSModelLoad(effects_folder+'ef_ebb'         ,smt_effect   );
+   spr_eff_gtel       :=gfx_MWSModelLoad(effects_folder+'ef_gt_'         ,smt_effect   );
+   spr_eff_tel        :=gfx_MWSModelLoad(effects_folder+'ef_tel_'        ,smt_effect   );
+   spr_eff_exp        :=gfx_MWSModelLoad(effects_folder+'ef_exp_'        ,smt_effect   );
+   spr_eff_exp2       :=gfx_MWSModelLoad(effects_folder+'exp2_'          ,smt_effect   );
+   spr_eff_g          :=gfx_MWSModelLoad(effects_folder+'g_'             ,smt_effect   );
+   spr_blood          :=gfx_MWSModelLoad(effects_folder+'blood'          ,smt_effect   );
+
+   // load game resources
+   draw_LoadingScreen(str_loading_gfx2,c_yellow);
+
+   InitThemes;
+
+   effect_InitCLData;
+ { for x:=0 to spr_upgrade_icons do
     for r:=1 to r_cnt do
      with spr_b_up[r,x] do
      begin
         sdlSurface:= gfx_LoadUIButton(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
         w   := sdlSurface^.w;h    := w;
         hw  := w div 2      ;hh   := hw;
-     end;
-
-   effect_InitCLData;
-
-   InitThemes;
+     end; }
 end;
 
-
+{
 procedure MakeUnitIcons;
 var u:byte;
 begin
@@ -1185,5 +1393,5 @@ begin
 
    vid_ScreenSurfaces;
 end;
-
+        }
 

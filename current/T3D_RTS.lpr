@@ -15,9 +15,9 @@ program T3D_RTS;
 
 {$minEnumSize 1}
 
-uses SysUtils,crt,SDL,SDL_Net
+uses SysUtils,crt,SDL2,SDL2_Net
 {$IFDEF _FULLGAME}
-,SDL_Image,SDL_Gfx,openal,_sound_OGGLoader;
+,SDL2_Image,openal,_sound_OGGLoader;
 {$ENDIF}
 
 
@@ -78,7 +78,7 @@ begin
 
       {$IFDEF _FULLGAME}
       InputGame;
-      CodeGame;
+      //CodeGame;
       if(r_draw)then DrawGame;
       {$ELSE}
       while(SDL_PollEvent(sys_EVENT)>0)do

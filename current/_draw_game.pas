@@ -5,90 +5,75 @@
 //  SpriteList
 //
 
-const TVisSprSize =  SizeOf(TVSprite);
-
-var slatemp : PTVSprite;
-
-function SpriteListAdd(nsx,nsy:integer;nspr:PTMWTexture):PTVSprite;
-var i:integer;
+function SpriteListNew:boolean;
 begin
-   SpriteListAdd:=nil;
-   if(vid_Sprites_n<vid_MaxScreenSprites)and(not menu_state)then
-   begin
-      if(vid_Sprites_n>0)then
-       for i:=0 to vid_Sprites_n-1 do
-        with vid_Sprites_List[i]^ do
-         if(x=nsx)and(y=nsy)and(sprite=nspr)then
-          exit;
+   SpriteListNew:=false;
 
-      setlength(vid_Sprites_List,vid_Sprites_n+1);
-      new(vid_Sprites_List[vid_Sprites_n]);
-      SpriteListAdd:=vid_Sprites_List[vid_Sprites_n];
-      FillChar(SpriteListAdd^,TVisSprSize,0);
-      with SpriteListAdd^ do alpha:=255;
-      vid_Sprites_n+=1;
-   end;
+   if(vid_Sprites_n>=vid_MaxScreenSprites)
+   or(menu_state)then exit;
+
+   SpriteListNew:=true;
+
+   FillChar(vid_Sprites_l[vid_Sprites_n]^,SizeOf(TVSprite),0);
+   vid_Sprites_l[vid_Sprites_n]^.alpha:=255;
+   vid_Sprites_n+=1;
 end;
 
-procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd(ax,ay,aspr);
-   if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
-       depth  := adepth;
-       shadowz:= ashadowz;
-       shadowc:= ashadowc;
-       sprite := aspr;
-       aura   := aaura;
-       alpha  := aalpha;
-    end;
+   if(SpriteListNew)then
+     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     begin
+        x           := ax-vid_cam_x;
+        y           := ay-vid_cam_y;
+        depth       := adepth;
+        shadowz     := ashadowz;
+        shadow_color:= ashadowc;
+        sprite      := aspr;
+        aura_color  := aaura;
+        alpha       := aalpha;
+     end;
 end;
 procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd(ax,ay,aspr);
-   if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
-       depth  := adepth;
-       shadowz:= ashadowz;
-       shadowc:= c_ablack;
-       sprite := aspr;
-       alpha  := aalpha;
-    end;
+   if(SpriteListNew)then
+     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     begin
+        x           := ax-vid_cam_x;
+        y           := ay-vid_cam_y;
+        depth       := adepth;
+        shadowz     := ashadowz;
+        shadow_color:= c_black;
+        sprite      := aspr;
+        alpha       := aalpha;
+     end;
 end;
 procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
 begin
-   slatemp:=SpriteListAdd(ax,ay,aspr);
-   if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y-aspr^.hh;
-       depth  := sd_marker;
-       shadowz:= -32000;
-       sprite := aspr;
-       alpha  := 255;
-    end;
+   if(SpriteListNew)then
+     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     begin
+        x      := ax-vid_cam_x;
+        y      := ay-vid_cam_y-aspr^.hh;
+        depth  := sd_marker;
+        shadowz:= -32000;
+        sprite := aspr;
+        alpha  := 255;
+     end;
 end;
-procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd(ax,ay,aspr);
-   if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
-       depth  := adepth;
-       shadowz:= -32000;
-       sprite := aspr;
-       aura   := aaura;
-       alpha  := aalpha;
-    end;
+   if(SpriteListNew)then
+     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     begin
+        x         := ax-vid_cam_x;
+        y         := ay-vid_cam_y;
+        depth     := adepth;
+        shadowz   := -32000;
+        sprite    := aspr;
+        aura_color:= aaura;
+        alpha     := aalpha;
+     end;
 end;
 
 procedure SpriteListSort;
@@ -98,54 +83,53 @@ begin
    if(vid_Sprites_n>1)then
     for i:=0 to vid_Sprites_n-2 do
      for j:=0 to (vid_Sprites_n-i-2) do
-      if(vid_Sprites_List[j]^.depth<vid_Sprites_List[j+1]^.depth)then
+      if(vid_Sprites_l[j]^.depth<vid_Sprites_l[j+1]^.depth)then
       begin
-         dum:=vid_Sprites_List[j];
-         vid_Sprites_List[j  ]:=vid_Sprites_List[j+1];
-         vid_Sprites_List[j+1]:=dum;
+         dum:=vid_Sprites_l[j];
+         vid_Sprites_l[j  ]:=vid_Sprites_l[j+1];
+         vid_Sprites_l[j+1]:=dum;
       end;
 end;
 
-procedure d_SpriteList(tar:pSDL_Surface;lx,ly:integer);
+procedure d_SpriteList;
 var sx,sy:integer;
 begin
    SpriteListSort;
    while(vid_Sprites_n>0)do
    begin
       vid_Sprites_n-=1;
-      with vid_Sprites_List[vid_Sprites_n]^ do
+      with vid_Sprites_l[vid_Sprites_n]^ do
       begin
-         x+=lx-sprite^.hw;
-         y+=ly-sprite^.hh;
+         x-=sprite^.hw;
+         y-=sprite^.hh;
 
          if(shadowz>-fly_hz)then
          begin
             sx:=sprite^.hw;
             sy:=sprite^.h-(sprite^.h shr 3);
-            filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
+
+           // filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadow_color);
          end;
          if(alpha>0)then
            if(alpha=255)
-           then draw_surf(tar,x,y,sprite^.sdlSurface)
+           then //draw_surf(tar,x,y,sprite^.apidata)
            else
            begin
-              SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-              draw_surf(tar,x,y,sprite^.sdlSurface);
-              SDL_SetAlpha(sprite^.sdlSurface,SDL_SRCALPHA or SDL_RLEACCEL,255);
+              {SDL_SetAlpha(sprite^.apidata,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+              draw_surf(tar,x,y,sprite^.apidata);
+              SDL_SetAlpha(sprite^.apidata,SDL_SRCALPHA or SDL_RLEACCEL,255); }
            end;
 
-         if(aura>0)then
+         if(aura_color>0)then
          begin
             x-=6;
             y-=6;
             sx:=sprite^.hw+6;
             sy:=sprite^.hh+6;
-            filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
+           // filledellipseColor(tar,x+sx,y+sy,sx,sy,aura_color);
          end;
       end;
-      dispose(vid_Sprites_List[vid_Sprites_n]);
    end;
-   setlength(vid_Sprites_List,0);
 end;
 
 
@@ -154,137 +138,138 @@ end;
 //  UIInfo
 //
 
-const TVisPrimSize =  SizeOf(TUIItem);
-
-procedure UIInfoItemNew;
+function UIInfoItemNew:boolean;
 begin
+   UIInfoItemNew:=false;
+
+   if(vid_UIItem_n>=vid_MaxScreenSprites)
+   or(menu_state)then exit;
+
+   UIInfoItemNew:=true;
+
+   FillChar(vid_UIItem_l[vid_UIItem_n],SizeOf(TUIItem),0);
    vid_UIItem_n+=1;
-   setlength(vid_UIItem_list,vid_UIItem_n);
-   FillChar(vid_UIItem_list[vid_UIItem_n-1],TVisPrimSize,0);
 end;
 
-procedure UIInfoItemAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddLine(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind :=uinfo_line;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind :=uinfo_line;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
-procedure UIInfoItemAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddRect(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind :=uinfo_rect;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind :=uinfo_rect;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
-procedure UIInfoItemAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
+procedure UIInfoItemAddRectText(ax0,ay0,ax1,ay1:integer;acolor:TMWColor;slt,slt2,srt,srd,sld:string6);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind :=uinfo_rect;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-      text_lt :=slt;
-      text_lt2:=slt2;
-      text_rt :=srt;
-      text_rd :=srd;
-      text_ld :=sld;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind    :=uinfo_rect;
+        x0      :=ax0;
+        y0      :=ay0;
+        x1      :=ax1;
+        y1      :=ay1;
+        color   :=acolor;
+        text_lt :=slt;
+        text_lt2:=slt2;
+        text_rt :=srt;
+        text_rd :=srd;
+        text_ld :=sld;
+     end;
 end;
-procedure UIInfoItemAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UIInfoItemAddBox(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind :=uinfo_box;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind :=uinfo_box;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
-procedure UIInfoItemAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
+procedure UIInfoItemAddCircle(ax0,ay0,ar:integer;acolor:TMWColor);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind :=uinfo_circle;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ar;
-      color:=acolor;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind :=uinfo_circle;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ar;
+        color:=acolor;
+     end;
 end;
-procedure UIInfoItemAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
+procedure UIInfoItemAddText(ax0,ay0:integer;text:string6;acolor:TMWColor);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind   :=uinfo_text;
-      x0     :=ax0;
-      y0     :=ay0;
-      text_lt:=text;
-      color  :=acolor;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind   :=uinfo_text;
+        x0     :=ax0;
+        y0     :=ay0;
+        text_lt:=text;
+        color  :=acolor;
+     end;
 end;
-procedure UIInfoItemAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
+procedure UIInfoItemAddUSprite(ax0,ay0:integer;acolor:TMWColor;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind    :=uinfo_rect;
-      x0      :=ax0-aspr^.hw;
-      y0      :=ay0-aspr^.hh;
-      x1      :=x0+aspr^.w;
-      y1      :=y0+aspr^.h;
-      sprite  :=aspr;
-      color   :=acolor;
-      text_lt :=slt;
-      text_lt2:=slt2;
-      text_rt :=srt;
-      text_rd :=srd;
-      text_ld :=sld;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind    :=uinfo_rect;
+        x0      :=ax0-aspr^.hw;
+        y0      :=ay0-aspr^.hh;
+        x1      :=x0+aspr^.w;
+        y1      :=y0+aspr^.h;
+        sprite  :=aspr;
+        color   :=acolor;
+        text_lt :=slt;
+        text_lt2:=slt2;
+        text_rt :=srt;
+        text_rd :=srd;
+        text_ld :=sld;
+     end;
 end;
 procedure UIInfoItemAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
-   UIInfoItemNew;
-   with vid_UIItem_list[vid_UIItem_n-1] do
-   begin
-      kind   :=uinfo_sprite;
-      x0     :=ax0-aspr^.hw;
-      y0     :=ay0-aspr^.hh;
-      sprite :=aspr;
-   end;
+   if(UIInfoItemNew)then
+     with vid_UIItem_l[vid_UIItem_n-1] do
+     begin
+        kind   :=uinfo_sprite;
+        x0     :=ax0-aspr^.hw;
+        y0     :=ay0-aspr^.hh;
+        sprite :=aspr;
+     end;
 end;
 
-procedure UIInfoItemProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
+procedure UIInfoItemProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:TMWColor);
 var vx:integer;
 begin
-   if(per<0)then per:=0;
-   if(per>1)then per:=1;
-
-   if(per=0)
+   if(per<=0)
    then UIInfoItemAddBox(ax0,ay0,ax1,ay1,c_black)
    else
-     if(per=1)
+     if(per>=1)
      then UIInfoItemAddBox(ax0,ay0,ax1,ay1,acolor)
      else
      begin
@@ -317,7 +302,7 @@ var srect,
 choosen,
 pain,
       hbar :boolean;
-    acolor :cardinal;
+    acolor :TMWColor;
    buffx,
    buffy   :integer;
 begin
@@ -327,10 +312,10 @@ begin
    begin
       acolor:=PlayerColorNormal[playeri];
 
-      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
+      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(vid_blink1_colorb);
 
       srect :=((isselected)and(playeri=UIPlayer))
-            or(kt_alt>0)
+            or(input_Check(iAct_alt,tis_Pressed))
             or(choosen);
 
       hbar  :=false;
@@ -348,22 +333,22 @@ uhb_selected: ;
          if(playeri=UIPlayer)
          then UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
          else UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
-         UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
+        // UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
       end;
       if(hbar )then UIInfoItemProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
 
-      if(reload>0)and(playeri=UIPlayer)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
+    //  if(reload>0)and(playeri=UIPlayer)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
 
-      if(speed<=0)or(not iscomplete)then
+     { if(speed<=0)or(not iscomplete)then
         case m_brush of
-   1..255: UIInfoItemAddCircle(x,y,_r,r_blink2_color_BY);
-        end;
+   1..255: UIInfoItemAddCircle(x,y,_r,vid_blink2_color_BY);
+        end;   }
 
 
-      if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UIInfoItemAddCircle(x,y,srange,r_blink2_color_BG);
+     // if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UIInfoItemAddCircle(x,y,srange,vid_blink2_color_BG);
 
       //ub_Scaned
-      case r_blink3 of
+      case vid_blink3 of
       0: if(buff[ub_Scaned]>0)then UIInfoItemAddBuff(vx,vy,@spr_scan );
       1: if(buff[ub_Decay ]>0)then UIInfoItemAddBuff(vx,vy,@spr_decay);
       2:;
@@ -393,12 +378,12 @@ end;
 procedure d_UIInfoItems(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
-   case g_mode of
-gm_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_royal_r,ui_max_color[r_blink2_colorb]);
-   end;
+   {case g_mode of
+gm_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_royal_r,ui_color_max[vid_blink2_colorb]);
+   end;}
 
    while(vid_UIItem_n>0)do
-    with vid_UIItem_list[vid_UIItem_n-1] do
+    with vid_UIItem_l[vid_UIItem_n-1] do
     begin
        vid_UIItem_n-=1;
 
@@ -417,12 +402,12 @@ gm_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_roy
           end;
        end;
 
-       if(sprite<>nil)then
-        with sprite^ do draw_surf(tar,x0,y0,sdlSurface);
+      // if(sprite<>nil)then
+       // with sprite^ do draw_surf(tar,x0,y0,apidata);
 
        if(kind=uinfo_sprite)then continue;
 
-       if(color>0)then
+      { if(color>0)then
         case kind of
 uinfo_line   : lineColor     (tar,x0,y0,x1,y1,color);
 uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
@@ -433,15 +418,14 @@ uinfo_text   : begin
                continue;
                end;
         else
-        end;
+        end; }
 
-       if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
+      { if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
        if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+basefont_w1+4,text_lt2,ta_LU,255,c_white);
        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1            ,text_rt ,ta_RU,255,c_white);
        if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1-basefont_w1,text_rd ,ta_RU,255,c_white);
-       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);
+       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);   }
     end;
-   setlength(vid_UIItem_list,vid_UIItem_n);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -488,7 +472,7 @@ begin
       for i:=0 to tgca_decal_n-1 do
         with tgca_decal_l[i] do
           if(tgca_decalS<>nil)then
-            draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.sdlSurface);
+            //draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.apidata);
 end;
 begin
    ssx:=lx-(vid_cam_x mod MapCellW)-MapCellW*2;
@@ -521,35 +505,35 @@ begin
             if(AddEdges)then
             begin
                b:=GridGetSolidLevel(gx,gy)>mgsl_free;
-               if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
-               then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+               {if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
+               then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);
                if(b)<>(GridGetSolidLevel(gx,gy+1)>mgsl_free)
-               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,r_blink2_color_BY);
+               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);     }
 
-               if(b)then
+               {if(b)then
                begin
-               UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,r_blink2_color_BY);
-               UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,r_blink2_color_BY);
-               UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,r_blink2_color_BY);
-               end;
+               UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,vid_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,vid_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,vid_blink2_color_BY);
+               end; }
             end;
 
-            if(tgca_tile_liquid=0)
-            then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface)
+            {if(tgca_tile_liquid=0)
+            then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata)
             else
               if(tgca_tile_crater=0)then
               begin
-                 draw_surf(tar,ssx,ssy,theme_tileset_crater[tgca_tile_crater].sdlSurface);
+                 draw_surf(tar,ssx,ssy,theme_tileset_crater[tgca_tile_crater].apidata);
                  DrawDecals;
-                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata);
               end
               else
               begin
-                 draw_surf(tar,ssx,ssy,theme_tile_terrain);
-                 if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].sdlSurface);
+                // draw_surf(tar,ssx,ssy,theme_tile_terrain);
+                 if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].apidata);
                  DrawDecals;
-                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].sdlSurface);
-              end;
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata);
+              end; }
            { with map_grid[gx,gy] do
             begin
                {if(map_IsObstacleZone(tgc_parea,true ))
@@ -618,7 +602,7 @@ const marks     = 15;
       mark_step = round(360/marks);
 var t,i:integer;
    ddir:single;
-  color:cardinal;
+  color:TMWColor;
 begin
    for t:=1 to MaxCPoints do
     with g_cpoints[t] do
@@ -626,32 +610,32 @@ begin
      begin
         if(not RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then continue;
 
-        color:=GetCPColor(t);
+      //  color:=GetCPColor(t);
 
         if(t=1)and(g_mode=gm_koth)then
         begin
            for i:=1 to marks do
            begin
               ddir:=(i*mark_step)*degtorad;
-              SpriteListAddEffect(
+              {SpriteListAddEffect(
               cpx+round(cpCaptureR*cos(ddir)),
               cpy+round(cpCaptureR*sin(ddir)),
-              sd_ground+cpy,ShadowColor(color),@spr_cp_koth,255);
+              sd_ground+cpy,ShadowColor(color),@spr_cp_koth,255);}
            end;
         end
         else
-          if(cpenergy<=0)
+          {if(cpenergy<=0)
           then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_out,255)
           else
           begin
              SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0                 ,@spr_cp_out,255);
              SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
-          end;
+          end; }
 
         if(ui_MapPointInRevealedInScreen(cpx,cpy))then
         begin
-           if(cpTimer   >0)then UIInfoItemAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
-           if(cplifetime>0)then UIInfoItemAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+          // if(cpTimer   >0)then UIInfoItemAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
+        //   if(cplifetime>0)then UIInfoItemAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
         end;
 
        // for i:=0 to MaxPlayers do
@@ -699,8 +683,8 @@ begin
                             GetFogGridVal(cx-1,cy+1),
                             GetFogGridVal(cx  ,cy+1),
                             GetFogGridVal(cx+1,cy+1));
-         if(0<=tileX)and(tileX<=MaxTileSet)then
-           draw_surf(tar,ssx,ssy,ui_fog_tiles[tileX].sdlSurface);
+         {if(0<=tileX)and(tileX<=MaxTileSet)then
+           draw_surf(tar,ssx,ssy,ui_fog_tileset[tileX].apidata);    }
 
          ui_FogView_grid[cx,cy]:=false;
          ssy+=fog_CellW;
@@ -738,7 +722,7 @@ end;
 
 procedure _draw_dbg;
 var u,ix,iy:integer;
-    c:cardinal;
+    c:TMWColor;
 begin
    //draw_text(r_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_RU,255, c_white);
    //draw_text(r_screen,750,0,i2s(spr_tdecsi), ta_RU,255, c_white);
@@ -765,27 +749,27 @@ begin
    rectangleColor(r_screen,ix+debug_x1,iy+debug_y1,ix+debug_x1+debug_a1,iy+debug_y1+debug_b1,c_blue);
    end;}
 
-   if(kt_shift>0) then
+   if(input_Check(iAct_shift,tis_Pressed))then
    for u:=0 to LastPlayer do
     with g_players[u] do
     begin
        ix:=170+89*u;
 
-       c:=PlayerColorNormal[u];
+     //  c:=PlayerColorNormal[u];
 
        //draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
 
-       draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
+      // draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
 
        //draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
-       draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
+       //draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
 
 
       // for iy:=0 to 8  do draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
       // for iy:=0 to 11 do draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
     end;
 
-   if(kt_ctrl>0)then
+   if(input_Check(iAct_control,tis_Pressed))then
    for u:=1 to MaxUnits do
     with g_units[u] do
     with player^ do
@@ -800,8 +784,8 @@ begin
         if(hits>0)then
         //if(k_shift>1)then
         begin
-           circleColor(r_screen,ix,iy,_r  ,c_gray);
-           circleColor(r_screen,ix,iy,srange,c_white);
+           //circleColor(r_screen,ix,iy,_r  ,c_gray);
+           //circleColor(r_screen,ix,iy,srange,c_white);
            if(isselected)then
            begin
               //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
@@ -822,10 +806,10 @@ begin
 
            end;
 
-           draw_text(r_screen,ix,iy   ,i2s(u)              , ta_LU,255, PlayerColorNormal[playeri]);
+           {draw_text(r_screen,ix,iy   ,i2s(u)              , ta_LU,255, PlayerColorNormal[playeri]);
            draw_text(r_screen,ix,iy+10,i2s(hits)           , ta_LU,255, PlayerColorNormal[playeri]);
            draw_text(r_screen,ix,iy+20,w2s(zone)           , ta_LU,255, PlayerColorNormal[playeri]);
-           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorNormal[playeri]);
+           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorNormal[playeri]);  }
 
 
            //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
@@ -883,7 +867,7 @@ begin
         //if(isselected)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
 
-   if(kt_ctrl>0)then
+  { if(kt_ctrl>0)then
    for u:=1 to MaxMissiles do
    with g_missiles[u] do
    if(vstep>0)then
@@ -893,7 +877,7 @@ begin
 
       circleColor(r_screen,ix,iy,5,c_lime);
       draw_text(r_screen,ix,iy,i2s(dir), ta_LU,255, c_white);
-   end;
+   end;  }
 
    {for u:=0 to 255 do
     if(ordx[u]>0)then
@@ -913,12 +897,12 @@ begin
    with mwsm^ do
    begin
       for i:=1 to sm_listn do
-       with sm_list[i-1] do
-       begin
-          draw_surf(r_screen,x,0,sdlSurface);
-          x+=w;
-       end;
-      draw_text(r_screen,0,48,i2s(sm_listn), ta_LU,255, c_white);
+        with sm_list[i-1]^ do
+        begin
+           draw_mwtexture1(x,0,sm_list[i-1],1,1);
+           x+=w;
+        end;
+      draw_text(0,48,i2s(sm_listn), ta_LU,255, 0);
    end;
 end;
 

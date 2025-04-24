@@ -1,24 +1,74 @@
 {$IFDEF _FULLGAME}
 
+
+procedure debug_printDriverInfo(rinfo:PSDL_RendererInfo);
+var t:integer;
+begin
+   with rinfo^ do
+   begin
+      writeln('name ',name);
+      writeln('flags ',flags);
+      writeln('num_texture_formats ',num_texture_formats);
+      if(num_texture_formats>0)then
+      for t:=0 to num_texture_formats-1 do write(texture_formats[t],' ');
+      writeln;
+      writeln('max_texture_width ',max_texture_width,' max_texture_height ',max_texture_height);
+   end;
+end;
+
+procedure debug_printAllDriversInfo;
+var i,c:integer;
+  rinfo:TSDL_RendererInfo;
+begin
+   c:=SDL_GetNumRenderDrivers;
+   if(c<0)then WriteSDLError('SDL_GetNumRenderDrivers');
+   if(c>0)then
+   for i:=0 to c-1 do
+   begin
+      SDL_GetRenderDriverInfo(i,@rinfo);
+      writeln(i+1,'  ---------------------');
+      debug_printDriverInfo(@rinfo);
+   end;
+end;
+
 function InitVideo:boolean;
+const sdl_windows_flags   = SDL_WINDOW_RESIZABLE; // or SDL_WINDOW_FULLSCREEN_DESKTOP
+      sdl_windows_flags_f : array[false..true] of cardinal = (sdl_windows_flags,sdl_windows_flags+SDL_WINDOW_FULLSCREEN);
+var i:integer;
 begin
    InitVideo:=false;
 
-   if(SDL_Init(SDL_INIT_VIDEO)<>0)then begin WriteSDLError; exit; end;
+   if(SDL_Init(SDL_INIT_VIDEO)<>0)then
+   begin
+      WriteSDLError('SDL_Init(SDL_INIT_VIDEO)');
+      exit;
+   end;
 
-   NEW(r_RECT);
+   new(vid_RECT);
+   for i:=0 to vid_MaxScreenSprites-1 do
+     new(vid_Sprites_l[i]);
 
-   SDL_putenv('SDL_VIDEO_WINDOW_POS');
-   SDL_putenv('SDL_VIDEO_CENTERED=1');
+   vid_window := SDL_CreateWindow(@str_wcaption[1], SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, menu_w, menu_h, sdl_windows_flags_f[vid_fullscreen]);
+   if(vid_window=nil)then
+   begin
+      WriteSDLError('SDL_CreateWindow');
+      exit;
+   end;
+
+   vid_renderer := SDL_CreateRenderer(vid_window, -1,SDL_RENDERER_ACCELERATED or SDL_RENDERER_TARGETTEXTURE);
+   if(vid_renderer=nil)then
+   begin
+      WriteSDLError('SDL_CreateRenderer');
+      exit;
+   end;
+
+   SDL_RenderSetLogicalSize(vid_renderer,menu_w,menu_h);
+
    SDL_ShowCursor(0);
-   SDL_enableUNICODE(1);
-
-   SDL_WM_SetCaption(@str_wcaption[1], nil );
+   SDL_StartTextInput;
 
    gfx_InitColors;
-   draw_set_FontSize1(10);
-   vid_MakeScreen;
-   gfx_LoadGraphics(true);
+   gfx_LoadGraphics;
 
    InitVideo:=true;
 end;
@@ -71,12 +121,14 @@ begin
 
    {$IFDEF _FULLGAME}
 
+   input_InitDefaultActionHotkeys;
+
    cfg_read;
 
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
-   DrawLoadingScreen(str_loading_ini,c_red);
+   draw_LoadingScreen(str_loading_ini,c_red);
 
    saveload_MakeSaveData;
    replay_MakeReplayHeaderData;
@@ -86,7 +138,7 @@ begin
    language_Switch;
    InitUIDDataCL;
    missile_InitCLData;
-   MakeUnitIcons;
+  { MakeUnitIcons;      }
    FillChar(ui_dPlayer,SizeOf(ui_dPlayer),0);
 
    {$ENDIF}
@@ -103,6 +155,6 @@ begin
    {$IFNDEF _FULLGAME}
    Dedicated_Init;
    {$ELSE}
-   campaings_InitData;
+  // campaings_InitData;
    {$ENDIF}
 end;

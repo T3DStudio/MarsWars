@@ -34,7 +34,7 @@ function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer(playern:byte);  forward;
 procedure replay_SavePlayPosition;forward;
 function replay_GetProgress:single;forward;
-procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal); forward;
+procedure draw_LoadingScreen(CaptionString:shortstring;color:TMWColor); forward;
 function Float2Str(s:single):shortstring;
 var l:byte;
 begin
@@ -132,6 +132,16 @@ begin
         if(BaseStr[i] in Chars^)then txt_ValidateStr+=BaseStr[i];
         if(length(txt_ValidateStr)>=MaxSize)then break;
      end;
+end;
+
+function str_NowDateTime(noMS:boolean=false):shortstring;
+var YY,MM,DD,H,M,S,MS:word;
+begin
+   DeCodeDate(Date,YY,MM,DD);
+   DeCodeTime(Time,H,M,S,MS);
+   if(noMS)
+   then str_NowDateTime:=w2s(YY)+'_'+w2s(MM)+'_'+w2s(DD)+' '+w2s(H)+'-'+w2s(M)+'-'+w2s(S)
+   else str_NowDateTime:=w2s(YY)+'_'+w2s(MM)+'_'+w2s(DD)+' '+w2s(H)+'-'+w2s(M)+'-'+w2s(S)+'-'+w2s(MS);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -600,14 +610,21 @@ end;}
 //   OTHER
 //
 
-procedure WriteSDLError;
-var f:Text;
+procedure WriteSDLError(comment:shortstring);
+var  f:Text;
+tmpStr:shortstring;
 begin
-   Assign(f,outlogfn);
-   if FileExists(outlogfn)
+   Assign(f,str_outLogFName);
+   if FileExists(str_outLogFName)
    then Append (f)
    else Rewrite(f);
-   writeln(f,sdl_GetError);
+   tmpStr:=str_NowDateTime(true);
+   if(str_outLogLastDate<>tmpStr)then
+   begin
+      str_outLogLastDate:=tmpStr;
+      writeln(str_outLogLastDate);
+   end;
+   writeln(f,comment,' ',sdl_GetError);
    SDL_ClearError;
    Close(f);
 end;
@@ -1238,6 +1255,22 @@ end;
 //   OTHER
 //
 
+type
+TInputState = (tis_NPressed,tis_NReleased,tis_Pressed,tis_DPressed,tis_Released);
+
+function input_Check(iact:byte;CheckState:TInputState):boolean;
+begin
+   input_Check:=false;
+   case CheckState of
+tis_NPressed  : input_Check:=input_actions[iact].ik_timer_pressed=1;
+tis_NReleased : input_Check:=input_actions[iact].ik_timer_pressed=-1;
+tis_Pressed   : input_Check:=input_actions[iact].ik_timer_pressed>0;
+tis_DPressed  : with input_actions[iact] do
+                input_Check:=(ik_timer_pressed=1)and(ik_timer_twice>0);
+tis_Released  : input_Check:=input_actions[iact].ik_timer_pressed=0;
+   end;
+end;
+
 function enum_val2TVidPannelPos(val:integer):TVidPannelPos;
 begin
    for result in TVidPannelPos do
@@ -1326,14 +1359,6 @@ begin
    if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
    str_GStep2Time+=sm+':'+ss;
-end;
-
-function str_NowDateTime:shortstring;
-var YY,MM,DD,H,M,S,MS:word;
-begin
-   DeCodeDate(Date,YY,MM,DD);
-   DeCodeTime(Time,H,M,S,MS);
-   str_NowDateTime:=w2s(YY)+'_'+w2s(MM)+'_'+w2s(DD)+' '+w2s(H)+'-'+w2s(M)+'-'+w2s(S)+'-'+w2s(MS);
 end;
 
 // replay/save
@@ -1433,12 +1458,19 @@ begin
 end;
 
 procedure WriteLog(mess:shortstring);
-var f:Text;
+var  f:Text;
+tmpStr:shortstring;
 begin
-   Assign(f,outlogfn);
-   if FileExists(outlogfn)
+   Assign(f,str_outLogFName);
+   if FileExists(str_outLogFName)
    then Append (f)
    else Rewrite(f);
+   tmpStr:=str_NowDateTime(true);
+   if(str_outLogLastDate<>tmpStr)then
+   begin
+      str_outLogLastDate:=tmpStr;
+      writeln(str_outLogLastDate);
+   end;
    writeln(f,mess);
    {$IFDEF CONSOLE}
    writeln(mess);
@@ -1542,7 +1574,7 @@ begin
    else ui_UIPlayerTeam:=team=g_players[UIPlayer].team;
 end;
 
-function PlayerGetColor(player:byte):cardinal;
+function PlayerGetColor(player:byte):TMWColor;
 begin
    {
    str_menu_PlayersColorl[pcs_default]:= tc_white +'default'+tc_default;
@@ -1580,12 +1612,12 @@ pcs_wTeams : if(player=UIPlayer)
      end;
 end;
 
-function ShadowColor(c:cardinal):cardinal;
+function ShadowColor(c:TMWColor):TMWColor;
 begin
-   ShadowColor:=128 +
-   (((c and $FF000000) shr 25) shl 24) +
+   ShadowColor:=
    (((c and $00FF0000) shr 17) shl 16) +
-   (((c and $0000FF00) shr  9) shl 8 );
+   (((c and $0000FF00) shr  9) shl 8 ) +
+   (((c and $000000FF) shr  1)       );
 end;
 
 procedure UpdatePlayerColors;
@@ -1597,20 +1629,20 @@ begin
       PlayerColorShadow[p]:=ShadowColor(PlayerColorNormal[p]);
    end;
 end;
-function GetPlayerColor(playern:byte;default:cardinal):cardinal;
+function GetPlayerColor(playern:byte;default:TMWColor):TMWColor;
 begin
    if(playern<=LastPlayer)
    then GetPlayerColor:=PlayerColorNormal[playern]
    else GetPlayerColor:=default;
 end;
 
-function GetCPColor(cp:byte):cardinal;
+function GetCPColor(cp:byte):TMWColor;
 begin
    GetCPColor:=c_gray;
    {if(cp<1)or(cp>MaxCPoints)then exit;
    with g_cpoints[cp] do
     if(cpCaptureR>0)then
-     if(cpTimer>0)and(r_blink3=0)
+     if(cpTimer>0)and(vid_blink3=0)
      then GetCPColor:=PlayerColorNormal[cpTimerOwnerPlayer]
      else GetCPColor:=PlayerColorNormal[cpOwnerPlayer     ]; }
 end;
@@ -1624,7 +1656,7 @@ begin
    GameStatus_End:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
 end;
 
-function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
+function GameGetStatus(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
 var t:byte;
 begin
    GameGetStatus:=false;
@@ -1764,7 +1796,7 @@ begin
    TrimString:=s;
 end;
 
-function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;
+function ParseLogMessage(ptlog:PTLogMes;mcolor:PTMWColor):shortstring;
 begin
    ParseLogMessage:='';
    mcolor^:=c_white;
@@ -1851,12 +1883,13 @@ end;
 
 procedure MakeLogListForDraw(POVPlayer:byte;widthchars,listheight:integer;logtypes:TSoB);
 var ts:shortstring;
-mc,n,i:cardinal;
+mc:TMWColor;
+n,i:cardinal;
 chunkp,
 chunkl,
 chunks:integer;
  st,sl:byte;
-procedure AddLine(s:shortstring;t:byte;c:cardinal);
+procedure AddLine(s:shortstring;t:byte;c:TMWColor);
 begin
    if(ui_log_n>=listheight)then exit;
    ui_log_n+=1;
@@ -1917,7 +1950,7 @@ begin
           end;
       end;
    end;
-   while(ui_log_n<listheight)do AddLine('',0,0);
+   while(ui_log_n<listheight)do AddLine('',0,c_black);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

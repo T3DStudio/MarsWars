@@ -1,3 +1,18 @@
-Couldn't bind to local port
-Couldn't bind to local port
-Couldn't bind to local port
+gfx_MWSModelLoad: hell\buildings\h_b2b_
+gfx_MWSModelLoad: hell\buildings\h_b2c_
+gfx_MWSModelLoad: uac\buildings\u_b1b
+gfx_MWSModelLoad: uac\buildings\u_b2b_
+gfx_MWTextureLoad: graphic\graphic\map\decals\adt0
+gfx_MWTextureLoad: graphic\graphic\map\decors\dec_0
+gfx_MWTextureLoad: graphic\graphic\map\terrains\ter0
+gfx_MWSModelLoad: hell\buildings\h_b2b_
+gfx_MWSModelLoad: hell\buildings\h_b2c_
+gfx_MWSModelLoad: uac\buildings\u_b1b
+gfx_MWSModelLoad: uac\buildings\u_b2b_
+gfx_MWTextureLoad: graphic\map\decals\adt35
+gfx_MWTextureLoad: graphic\map\decors\dec_121
+gfx_MWTextureLoad: graphic\map\terrains\ter93
+gfx_MWSModelLoad: hell\buildings\h_b2b_
+gfx_MWSModelLoad: hell\buildings\h_b2c_
+gfx_MWSModelLoad: uac\buildings\u_b1b
+gfx_MWSModelLoad: uac\buildings\u_b2b_

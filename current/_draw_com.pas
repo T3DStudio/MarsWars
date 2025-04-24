@@ -3,54 +3,174 @@
 //
 //    Other
 
-function rgba2c(r,g,b,a:byte):cardinal;
+{procedure DrawUpdateLogicalResolution;
+var
+window_w,
+window_h:longint;
 begin
-   rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
+   if(menu_state)
+   then SDL_RenderSetLogicalSize(vid_renderer,menu_w,menu_h)
+   else
+     if(vid_game_fres)then
+     begin
+        SDL_GetWindowSize(vid_windows,@window_w,@window_h);
+        SDL_RenderSetLogicalSize(vid_renderer,window_w,window_h);
+     end
+     else
+       if (vid_minw<=vid_game_w)and(vid_game_w<=vid_maxw)
+       and(vid_minh<=vid_game_h)and(vid_game_h<=vid_maxh)then
+       begin
+
+       end;
+end;  }
+
+function gfx_MakeTMWColor(ar,ag,ab:byte):TMWColor;
+begin
+   gfx_MakeTMWColor:=(ar shl 16)+(ag shl 8)+ab;
 end;
 
-procedure draw_mwtexture(s_dst:pSDL_Surface;x,y:integer;mwt_src:PTMWTexture);
+procedure draw_set_color(color:TMWColor);
 begin
-   with mwt_src^ do
+   if(draw_color=color)then exit;
+
+   draw_color:=color;
+
+   draw_color_r:=(color and $00FF0000) shr 16;
+   draw_color_g:=(color and $0000FF00) shr 8;
+   draw_color_b:= color and $000000FF;
+
+   SDL_SetRenderDrawColor(vid_renderer,draw_color_r,draw_color_g,draw_color_b,draw_color_a);
+end;
+
+procedure draw_set_alpha(a:byte);
+begin
+   draw_color_a:=a;
+   SDL_SetRenderDrawColor(vid_renderer,draw_color_r,draw_color_g,draw_color_b,draw_color_a);
+end;
+
+procedure draw_clear;
+begin
+   SDL_RenderClear(vid_renderer);
+end;
+
+procedure draw_set_target(mwtex:PTMWTexture);
+begin
+   if(mwtex<>nil)then
+     if(mwtex^.sdltexture<>nil)then
+     begin
+        SDL_SetRenderTarget(vid_renderer,mwtex^.sdltexture);
+        exit;
+     end;
+   SDL_SetRenderTarget(vid_renderer,nil);
+end;
+
+{$INCLUDE _draw_prims.pas}
+
+procedure draw_sdlsurface(tar:pSDL_Surface;x,y:integer;sur:pSDL_Surface);
+begin
+   if(tar=nil)
+   or(sur=nil)then exit;
+   vid_rect^.x:=x;
+   vid_rect^.y:=y;
+   vid_rect^.w:=sur^.w;
+   vid_rect^.h:=sur^.h;
+   SDL_BLITSURFACE(sur,nil,tar,vid_rect);
+end;
+
+procedure draw_sdltexture(x,y,w,h:integer;tex:pSDL_Texture);
+begin
+   if(tex=nil)then exit;
+
+   vid_rect^.x:=x;
+   vid_rect^.y:=y;
+   vid_rect^.w:=w;
+   vid_rect^.h:=h;
+
+   SDL_RenderCopy(vid_renderer,tex,nil,vid_rect);
+end;
+procedure draw_sdltexture_ext(x,y,w,h:integer;tex:pSDL_Texture;angle:single;flipx,flipy:boolean);
+var flip:integer;
+begin
+   if(tex=nil)then exit;
+
+   vid_rect^.x:=x;
+   vid_rect^.y:=y;
+   vid_rect^.w:=w;
+   vid_rect^.h:=h;
+
+   flip:=SDL_FLIP_NONE;
+   if(flipx)then flip+=SDL_FLIP_HORIZONTAL;
+   if(flipy)then flip+=SDL_FLIP_VERTICAL;
+
+   SDL_RenderCopyEx(vid_renderer,tex,nil,vid_rect,angle,nil,flip);
+end;
+
+procedure draw_mwtexture1(x,y:integer;mwtex:pTMWTexture;xscale,yscale:single);
+var nw,nh:integer;
+begin
+   if(mwtex<>nil)then
+    with mwtex^ do
+     if(sdltexture<>nil)then
+     begin
+        SDL_SetTextureColorMod(sdltexture,draw_color_r,draw_color_g,draw_color_b);
+        SDL_SetTextureAlphaMod(sdltexture,draw_color_a);
+        if(xscale<>1)and(xscale<>-1)then nw:=abs(trunc(w*xscale)) else nw:=w;
+        if(yscale<>1)and(yscale<>-1)then nh:=abs(trunc(h*yscale)) else nh:=h;
+        if(xscale<0)then x-=nw;
+        if(yscale<0)then y-=nh;
+        draw_sdltexture_ext(x,y,nw,nh,sdltexture,0,xscale<0,yscale<0);
+     end;
+end;
+procedure draw_mwtexture2(x,y:integer;mwtex:pTMWTexture;nw,nh:integer);
+begin
+   if(mwtex<>nil)then
+    with mwtex^ do
+     if(sdltexture<>nil)then
+     begin
+        SDL_SetTextureColorMod(sdltexture,draw_color_r,draw_color_g,draw_color_b);
+        SDL_SetTextureAlphaMod(sdltexture,draw_color_a);
+        draw_sdltexture(x,y,nw,nh,sdltexture);
+     end;
+end;
+
+procedure draw_set_fontUpdateSize(newSize:single);
+begin
+   if(draw_font_size<>newSize)then
+   with draw_font^ do
    begin
-      r_RECT^.x:=x;
-      r_RECT^.y:=y;
-      r_RECT^.w:=mwt_src^.w;
-      r_RECT^.h:=mwt_src^.h;
-      SDL_BLITSURFACE(sdlSurface,nil,s_dst,r_RECT);
+      draw_font_size:=newSize;
+
+      draw_font_w1 := round(font_w*draw_font_size);
+      draw_font_wi := draw_font_w1-1;
+      draw_font_wh := draw_font_w1 div 2;
+      draw_font_wq := draw_font_w1 div 4;
+      draw_font_w1h:= draw_font_wh*3;
+      draw_font_wq3:=(draw_font_w1 div 4)*3;
+
+      draw_font_h1 := round(font_h*draw_font_size);
+      draw_font_hi := draw_font_h1-1;
+      draw_font_hh := draw_font_h1 div 2;
+      draw_font_hq := draw_font_h1 div 4;
+
+      draw_font_lhq:=(draw_font_h1+draw_font_hq);
+      draw_font_lhh:=(draw_font_h1+draw_font_hh);
    end;
 end;
 
-procedure draw_surf(s_dst:pSDL_Surface;x,y:integer;s_src:pSDL_Surface);
+procedure draw_set_fontI(newFont:PTFont;newSizeW:integer);
 begin
-   r_RECT^.x:=x;
-   r_RECT^.y:=y;
-   r_RECT^.w:=s_src^.w;
-   r_RECT^.h:=s_src^.h;
-   SDL_BLITSURFACE(s_src,nil,s_dst,r_RECT);
+   draw_font:=newFont;
+   draw_set_fontUpdateSize(newSizeW/draw_font^.font_w);
 end;
 
-procedure draw_set_FontSize1(size:integer);
+procedure draw_set_fontS(newFont:PTFont;newSizeS:single);
 begin
-   case size of
-   15 : draw_font:=@font_1h;
-   20 : draw_font:=@font_2;
-   30 : draw_font:=@font_3;
-   else draw_font:=@font_1;
-        size:=10;
-   end;
-
-   draw_font_w1  := round(basefont_w1*size/10);
-   draw_font_wi  := draw_font_w1-1;
-   draw_font_wh  := draw_font_w1 div 2;
-   draw_font_wq  := draw_font_w1 div 4;
-   draw_font_w1h := draw_font_wh*3;
-   draw_font_wq3 :=(draw_font_w1 div 4)*3;
-
-   draw_font_h1  :=(draw_font_w1+draw_font_wq);
-   draw_font_h2  :=(draw_font_w1+draw_font_wh);
+   draw_font:=newFont;
+   draw_set_fontUpdateSize(newSizeS);
 end;
 
-procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineLength:byte;BaseColor:cardinal);
+
+procedure draw_text(x,y:integer;str:shortstring;alignment:TAlignment;MaxLineLength:byte;color_back:TMWColor);
 var
 strLen,
 i,charn,
@@ -58,15 +178,13 @@ line_l,
 line_n: byte;
 ix,iy : integer;
 charc : char;
-bcolor,
-tcolor: cardinal;
+tcolor: TMWColor;
 begin
-   if(BaseColor=0)then exit;
    strLen:=length(str);
    if(strLen=0)then exit;
    if(MaxLineLength<1)then MaxLineLength:=1;
 
-   line_l:=0;
+   line_l:=0;  // max line length
    line_n:=1;
    charn :=0;
    for i:=1 to strLen do
@@ -102,13 +220,13 @@ begin
    ta_LM,
    ta_MM,
    ta_RM  : if(line_n>1)
-            then iy:=y-((line_n*draw_font_w1h) div 2)+draw_font_wh
-            else iy:=y-draw_font_wh;
+            then iy:=y-((line_n*draw_font_lhh) div 2)+draw_font_hh
+            else iy:=y-draw_font_hh;
    ta_LD,
    ta_MD,
    ta_RD  : if(line_n>1)
-            then iy:=y- (line_n*draw_font_w1h)+draw_font_wh
-            else iy:=y-draw_font_w1;
+            then iy:=y- (line_n*draw_font_lhh)+draw_font_hh
+            else iy:=y-draw_font_h1;
    end;
 
    if(alignment=ta_chat)and(strLen>MaxLineLength)
@@ -119,7 +237,7 @@ begin
    y:=iy;
 
    charn:=0;
-   tcolor:=BaseColor;
+   tcolor:=draw_color;
    while i<=strLen do
    begin
       charc:=str[i];
@@ -131,40 +249,45 @@ begin
       tc_nl2      : begin
                        x:=ix;
                        case charc of
-                       tc_nl1 : y+=draw_font_h1;
-                       tc_nl2 : y+=draw_font_h2;
+                       tc_nl1 : y+=draw_font_lhq;
+                       tc_nl2 : y+=draw_font_lhh;
                        end;
                     end;
-      tc_purple   : tcolor:=c_purple ;
-      tc_red      : tcolor:=c_red    ;
-      tc_orange   : tcolor:=c_orange ;
-      tc_yellow   : tcolor:=c_yellow ;
-      tc_lime     : tcolor:=c_lime   ;
-      tc_aqua     : tcolor:=c_aqua   ;
-      tc_blue     : tcolor:=c_blue   ;
-      tc_gray     : tcolor:=c_gray   ;
-      tc_dgray    : tcolor:=c_dgray  ;
-      tc_white    : tcolor:=c_white  ;
-      tc_green    : tcolor:=c_green  ;
-      tc_default  : tcolor:=BaseColor;
+      tc_purple   : tcolor:=c_purple;
+      tc_red      : tcolor:=c_red   ;
+      tc_orange   : tcolor:=c_orange;
+      tc_yellow   : tcolor:=c_yellow;
+      tc_lime     : tcolor:=c_lime  ;
+      tc_aqua     : tcolor:=c_aqua  ;
+      tc_blue     : tcolor:=c_blue  ;
+      tc_gray     : tcolor:=c_gray  ;
+      tc_dgray    : tcolor:=c_dgray ;
+      tc_white    : tcolor:=c_white ;
+      tc_green    : tcolor:=c_green ;
+      tc_default  : tcolor:=draw_color;
       else
-         case charc of
-         char_detect  : bcolor:=c_purple;
-         char_advanced: bcolor:=c_white;
-         ',',';','[',
-         ']','{','}'  : bcolor:=BaseColor;
-         else           bcolor:=tcolor;
+         if(color_back<>0)then
+         begin
+            draw_set_color(color_back);
+            draw_frect(x,y,x+draw_font_wi,y+draw_font_hi);
          end;
-         boxColor(sur,x,y,x+draw_font_wi,y+draw_font_wi,bcolor);
+         {case charc of
+         char_detect  : tcolor:=@c_purple;  ??
+         char_advanced: tcolor:=@c_white;
+         ',',';','[',
+         ']','{','}'  : tcolor:=color_font;
+         else           tcolor:=tcolor;
+         end;}
 
-         draw_mwtexture(sur,x,y,@(draw_font^[charc]));
+         draw_set_color(tcolor);
+         draw_mwtexture2(x,y,draw_font^.MWTextures[charc],draw_font_w1,draw_font_h1);
 
          charn+= 1;
          x    += draw_font_w1;
          if(charn>=MaxLineLength)then
          begin
             x:=ix;
-            y+=draw_font_h2;
+            y+=draw_font_lhh;
             charn:=0;
          end;
       end;
@@ -173,11 +296,18 @@ begin
    end;
 end;
 
-procedure DrawLoadingScreen(CaptionString:shortstring;color:cardinal);
+procedure draw_LoadingScreen(CaptionString:shortstring;color:TMWColor);
+var w,h:longint;
 begin
-   SDL_FillRect(r_screen,nil,0);
-   draw_text(r_screen,vid_vw div 2,vid_vh div 2,CaptionString,ta_MU,255,color);
-   SDL_FLIP(r_screen);
+   SDL_RenderGetLogicalSize(vid_renderer,@w,@h);
+   draw_set_color(c_black);
+   draw_set_alpha(127);
+   draw_clear;
+   draw_set_fontI(font_Base,16);
+   draw_set_color(color);
+   draw_set_alpha(255);
+   draw_text(w div 2,h div 2,CaptionString,ta_MM,255,0);
+   SDL_RenderPresent(vid_renderer);
 end;
 
 function TileSetGetN(b00,b10,b20,
@@ -202,9 +332,10 @@ begin
    end;
 end;
 
-procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
+procedure d_timer(x,y:integer;time:cardinal;ta:TAlignment;str:shortstring;color:TMWColor);
 begin
-   draw_text(tar,x,y,str+str_GStep2Time(time),ta,255,color);
+   draw_set_color(color);
+   draw_text(x,y,str+str_GStep2Time(time),ta,255,c_black);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +347,7 @@ var
 gx ,gy :integer;
 mmx,mmy:single;
 begin
-   sdl_FillRect(r_bminimap,nil,0);
+  // sdl_FillRect(r_bminimap,nil,0);
 
    mmx:=0;
    for gx:=0 to map_csize do
@@ -224,11 +355,11 @@ begin
       mmy:=0;
       for gy:=0 to map_csize do
       begin
-         case map_grid[gx,gy].tgc_solidlevel of
+         {case map_grid[gx,gy].tgc_solidlevel of
 mgsl_nobuild : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_ltgray);
 mgsl_liquid  : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),theme_cur_liquid_mmcolor);
 mgsl_rocks   : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW),c_gray  );
-         end;
+         end; }
 
          mmy+=map_mm_gridW;
       end;
@@ -236,10 +367,10 @@ mgsl_rocks   : boxColor(r_bminimap,trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW)
    end;
 end;
 
-procedure map_MinimapSpot(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
+procedure map_MinimapSpot(tar:pSDL_Surface;x,y,r:integer;sym:char;color:TMWColor);
 begin
-   circleColor   (tar,x  ,y  ,r  ,color);
-   characterColor(tar,x-3,y-3,sym,color);
+   {circleColor   (tar,x  ,y  ,r  ,color);
+   characterColor(tar,x-3,y-3,sym,color);   }
 end;
 
 procedure map_MinimapPlayerStarts(tar:pSDL_Surface;UnknownStarts,teamStarts:boolean);
@@ -253,9 +384,9 @@ begin
       r:=trunc(base_1r*map_mm_cx);
 
       // clear
-      filledcircleColor(tar,x,y,r ,c_black);
+     { filledcircleColor(tar,x,y,r ,c_black);
             circleColor(tar,x,y,r ,c_black);
-         characterColor(tar,x,y,#8,c_black);
+         characterColor(tar,x,y,#8,c_black);      }
 
       if(UnknownStarts)then
       begin
@@ -300,11 +431,11 @@ end;
 
 procedure map_RedrawMenuMinimap;
 begin
-   sdl_FillRect(r_mminimap,nil,0);
+   {sdl_FillRect(r_mminimap,nil,0);
    draw_surf(r_mminimap,0,0,r_bminimap);
 
    map_MinimapPlayerStarts(r_mminimap,not g_fixed_positions,g_mode in gm_ModesFixedTeams);
-   map_MinimapCPoints(r_mminimap);
+   map_MinimapCPoints(r_mminimap); }
 end;
 
 
@@ -315,7 +446,7 @@ begin
    {
    new  false - not required new alarm point
         true  - required
-   return - true if alarm created
+   return - true if alarm was created
    }
    ui_AddMarker:=false;
 

@@ -180,7 +180,7 @@ str_pt_none            : shortstring = '--';
 str_b2c                : array[false..true] of char = ('-','+');
 str_defaultPlayerName  = 'DoomPlayer';
 
-outlogfn               : shortstring = 'out.txt';
+str_outLogFName        : shortstring = 'out.txt';
 
 k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}','_',',','.','(',')','-','+','`','&','@','#','%','?','$',' '];
 k_pname                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','[',']','{','}','_',',','.','(',')','-','+','`','&','@','#','%','?','$'    ];
@@ -1024,56 +1024,6 @@ map_flydepths          : array[false..true] of integer = (sd_ground,sd_fly);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  SPRITE MODEL KINDS
-//
-
-smt_effect             = 0;  // simple missile or effect
-smt_missile            = 1;  // missile with direction
-smt_buiding            = 2;
-smt_turret             = 3;
-smt_turret2            = 4;
-smt_lost               = 5;  //UID_Lost
-smt_imp                = 6;  //UID_Imp,UID_Demon,UID_ZFormer,UID_ZSergant,UID_ZBomber,UID_ZBFG,UID_Baron,UID_Cyberdemon:
-smt_zengineer          = 7;  //UID_ZEngineer
-smt_zcommando          = 8;  //UID_ZCommando
-smt_fmajor             = 9;  //UID_Majot,UID_ZMajor
-smt_caco               = 10; //UID_Cacodemon
-smt_mmind              = 11; //UID_Mastermind
-smt_pain               = 12; //UID_Pain
-smt_revenant           = 13; //UID_Revenant
-smt_mancubus           = 14; //UID_Mancubus
-smt_archno             = 15; //UID_Arachnotron
-smt_arch               = 16; //UID_ArachVile
-smt_apc                = 17; //UID_APC
-smt_fapc               = 18; //UID_FAPC
-smt_marine0            = 19; //UID_Engineer,UID_Sergant,UID_Bomber,UID_BFG
-smt_medic              = 20; //UID_Medic
-smt_commando           = 21; //UID_Commando
-smt_tank               = 22; //UID_Tank
-smt_terminat           = 23; //UID_Terminator
-smt_transport          = 24; //UID_Transport
-smt_flyer              = 25; //UID_FLyer
-smt_effect2            = 26; // simple missile or effect
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  SPRITE MODEL STATES
-//
-
-sms_walk               = 0;
-sms_stand              = 1;
-sms_pain               = 2;
-sms_cast               = 3;
-sms_dready             = 4;
-sms_dattack            = 5;
-sms_mattack            = 6;
-sms_death              = 7;
-sms_build              = 8;
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  EFFECTS
 //
 
@@ -1116,18 +1066,6 @@ uinfo_text             = 6;
 //  TEXT
 //
 
-ta_LU                  = 0;   // |^| | |
-ta_MU                  = 1;   // | |^| |
-ta_RU                  = 2;   // | | |^|
-ta_LM                  = 3;   // |-| | |
-ta_MM                  = 4;   // | |-| |
-ta_RM                  = 5;   // | | |-|
-ta_LD                  = 6;   // |_| | |
-ta_MD                  = 7;   // | |_| |
-ta_RD                  = 8;   // | | |_|
-ta_chat                = 9;
-ta_MMR                 = 10;  // |  |- |
-
 basefont_w1            = 8;
 basefont_w2            = basefont_w1*2;
 basefont_w3            = basefont_w1*3;
@@ -1141,6 +1079,14 @@ basefont_w1h           = basefont_w1+basefont_wh;
 chat_all               = 255;
 chat_allies            = 254;
 
+MaxMissions            = 21;
+//CMPMaxSkills           = 6;
+
+chat_type              : array[false..true] of char = ('|',' ');
+log_LastMesTime        = fr_fps1*3;
+log_LastMesMaxN        = log_LastMesTime*6;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  VIDEO & UI
@@ -1148,7 +1094,6 @@ chat_allies            = 254;
 
 fr_ifps                = fr_fps1-1;
 
-vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
 vid_maxw               = 1440;
@@ -1196,12 +1141,8 @@ ui_ubtns               = 23;
 //  MENU
 //
 
-MaxMissions            = 21;
-//CMPMaxSkills           = 6;
-
-chat_type              : array[false..true] of char = ('|',' ');
-log_LastMesTime        = fr_fps1*3;
-log_LastMesMaxN        = log_LastMesTime*6;
+menu_w                 = 1024;
+menu_h                 = 768;
 
 menu_logo_h            = 96;
 
@@ -1467,20 +1408,23 @@ fog_vfhm               = (vid_maxh div fog_CellW)+2;
 //
 
 cfgfn                  : shortstring = 'cfg';
-str_screenshot         : shortstring = 'MVSCR_';
-str_loading_srf        : shortstring = 'MAKING SURFACES...';
-str_loading_gfx        : shortstring = 'LOADING GRAPHICS...';
+str_screenshot         : shortstring = 'MWSCR_';
+str_screenshotExt      : shortstring = '.png';
+str_loading_srf        : shortstring = 'MAKING BASIC TEXTURES...';
+str_loading_gfx1       : shortstring = 'LOADING BASE GRAPHICS...';
+str_loading_gfx2       : shortstring = 'LOADING THEMES GRAPHICS...';
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...';
 str_loading_msc        : shortstring = 'LOADING MUSIC...';
 str_loading_ini        : shortstring = 'INIT GAME...';
 str_f_grp              : shortstring = 'graphic\';
-str_f_map              : shortstring = 'map\';
 str_f_snd              : shortstring = 'sound\';
 str_e_music            : shortstring = '.ogg';
 str_f_svld             : shortstring = 'save\';
 str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
+
+str_f_FontBase         : shortstring = 'font';
 
 race_dir               : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
 race_units             : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
@@ -1493,15 +1437,15 @@ missiles_folder        : shortstring = 'missiles\';
 ui_limitstr            : shortstring = '125';
 
 tc_player0             = #0;
-{tc_player1             = #1;
+{tc_player1            = #1;
 tc_player2             = #2;
 tc_player3             = #3;
 tc_player4             = #4;
 tc_player5             = #5;
 tc_player6             = #6;}
 tc_player7             = #7;
-tc_nl1                 = #11;
-tc_nl2                 = #12;
+tc_nl1                 = #8;
+tc_nl2                 = #9;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;
@@ -1530,6 +1474,114 @@ sep_wdash              = tc_white+'-';
 //  INPUT
 //
 
+iAct_mlb               = 1;
+iAct_mrb               = 2;
+iAct_mmb               = 3;
+
+iAct_mwu               = 4;
+iAct_mwd               = 5;
+
+iAct_left              = 6;
+iAct_right             = 7;
+iAct_up                = 8;
+iAct_down              = 9;
+
+iAct_esc               = 10;
+iAct_return            = 11;
+iAct_control           = 12;
+iAct_alt               = 13;
+iAct_shift             = 14;
+
+iAct_LastEvent         = 17;
+
+iAct_USetGroup0        = 20;
+iAct_USetGroup1        = 21;
+iAct_USetGroup2        = 22;
+iAct_USetGroup3        = 23;
+iAct_USetGroup4        = 24;
+iAct_USetGroup5        = 25;
+iAct_USetGroup6        = 26;
+iAct_USetGroup7        = 27;
+iAct_USetGroup8        = 28;
+iAct_USetGroup9        = 29;
+
+iAct_UAddGroup0        = 30;
+iAct_UAddGroup1        = 31;
+iAct_UAddGroup2        = 32;
+iAct_UAddGroup3        = 33;
+iAct_UAddGroup4        = 34;
+iAct_UAddGroup5        = 35;
+iAct_UAddGroup6        = 36;
+iAct_UAddGroup7        = 37;
+iAct_UAddGroup8        = 38;
+iAct_UAddGroup9        = 39;
+
+iAct_USelGroup0        = 40;
+iAct_USelGroup1        = 41;
+iAct_USelGroup2        = 42;
+iAct_USelGroup3        = 43;
+iAct_USelGroup4        = 44;
+iAct_USelGroup5        = 45;
+iAct_USelGroup6        = 46;
+iAct_USelGroup7        = 47;
+iAct_USelGroup8        = 48;
+iAct_USelGroup9        = 49;
+
+iAct_UASlGroup0        = 50;
+iAct_UASlGroup1        = 51;
+iAct_UASlGroup2        = 52;
+iAct_UASlGroup3        = 53;
+iAct_UASlGroup4        = 54;
+iAct_UASlGroup5        = 55;
+iAct_UASlGroup6        = 56;
+iAct_UASlGroup7        = 57;
+iAct_UASlGroup8        = 58;
+iAct_UASlGroup9        = 59;
+
+iAct_UF1               = 80;
+iAct_UF2               = 81;
+iAct_UF3               = 82;
+iAct_UF4               = 83;
+iAct_UF5               = 84;
+iAct_UF6               = 85;
+
+iAct_UAbility1         = 91;
+iAct_UAbility2         = 92;
+iAct_UAbility3         = 93;
+iAct_Destroy           = 94;
+
+iAct_UAMove            = 101;
+iAct_UAStop            = 102;
+iAct_UAPatrol          = 103;
+iAct_UMove             = 104;
+iAct_UStop             = 105;
+iAct_UPatrol           = 106;
+
+iAct_Prod1             = 111;
+iAct_Prod2             = 112;
+iAct_Prod3             = 113;
+iAct_Prod4             = 114;
+iAct_Prod5             = 115;
+iAct_Prod6             = 116;
+iAct_Prod7             = 117;
+iAct_Prod8             = 118;
+iAct_Prod9             = 119;
+iAct_Prod10            = 120;
+iAct_Prod11            = 121;
+iAct_Prod12            = 122;
+iAct_Prod13            = 123;
+iAct_Prod14            = 124;
+iAct_Prod15            = 125;
+iAct_Prod16            = 126;
+iAct_Prod17            = 127;
+iAct_Prod18            = 128;
+iAct_Prod19            = 129;
+iAct_Prod20            = 130;
+iAct_Prod21            = 131;
+iAct_Prod22            = 132;
+iAct_Prod23            = 133;
+iAct_Prod24            = 134;
+
 k_LastCharStuckDealy   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
 k_kbdig                : set of Char = ['0'..'9'];
@@ -1539,8 +1591,8 @@ k_kbdig                : set of Char = ['0'..'9'];
 km_mouse_l             = SDL_BUTTON_LEFT;
 km_mouse_r             = SDL_BUTTON_RIGHT;
 km_mouse_m             = SDL_BUTTON_MIDDLE;
-km_mouse_wd            = SDL_BUTTON_WHEELDOWN;
-km_mouse_wu            = SDL_BUTTON_WHEELUP;
+//km_mouse_wd            = SDL_BUTTON_WHEELDOWN;
+//km_mouse_wu            = SDL_BUTTON_WHEELUP;
 km_arrow_up            = sdlk_up;
 km_arrow_down          = sdlk_down;
 km_arrow_left          = sdlk_left;
@@ -1551,7 +1603,7 @@ km_lctrl               = sdlk_lctrl;
 km_rctrl               = sdlk_rctrl;
 km_lalt                = sdlk_lalt;
 km_ralt                = sdlk_ralt;
-km_Screenshot          = sdlk_print;
+km_Screenshot          = SDLK_PRINTSCREEN;
 km_Esc                 = sdlk_escape;
 km_Enter               = sdlk_return;
 km_Space               = sdlk_space;
@@ -1573,8 +1625,8 @@ km_test_BePlayer4      = SDLK_F8;
 km_test_BePlayer5      = SDLK_F9;
 km_test_BePlayer6      = SDLK_F10;
 km_test_BePlayer7      = SDLK_F11;
-km_test_debug0         = SDLK_KP0;
-km_test_debug1         = SDLK_KP1;
+km_test_debug0         = SDLK_KP_0;
+km_test_debug1         = SDLK_KP_1;
 
 km_group0              = sdlk_0;
 km_group9              = sdlk_9;
@@ -1598,11 +1650,6 @@ theme_n                = 9;
 
 theme_anim_step_n      = 3;
 theme_anim_tile_step   = MapCellW div theme_anim_step_n;
-
-// theme edge terrain style
-tes_fog                = 0;
-tes_nature             = 1;
-tes_tech               = 2;
 
 // theme animation style
 tas_ice                = 0;

@@ -1160,9 +1160,9 @@ begin
           with uid^ do
             if(isselected)then
             begin
-               UIInfoItemAddCircle(movePFNext_x,movePFNext_y,5,c_orange );
+               {UIInfoItemAddCircle(movePFNext_x,movePFNext_y,5,c_orange );
                if(StepCollisionR(mouse_map_x,mouse_map_y,g_uids[UID_Imp]._r,zone,328,348))then
-                 UIInfoItemAddCircle(mouse_map_x,mouse_map_y,5,c_lime );
+                 UIInfoItemAddCircle(mouse_map_x,mouse_map_y,5,c_lime );   }
             end;
 
       x0:=8360;

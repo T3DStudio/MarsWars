@@ -30,17 +30,16 @@ begin
    net_period:=0;
 
    net_buffer:=SDLNet_AllocPacket(MaxNetBuffer);
-   if (net_buffer=nil) then
+   if(net_buffer=nil)then
    begin
-      WriteSDLError;
+      WriteSDLError('SDLNet_AllocPacket');
       exit;
    end;
 
    net_socket:=SDLNet_UDP_Open(port);
-
-   if (net_socket=nil) then
+   if(net_socket=nil)then
    begin
-      WriteSDLError;
+      WriteSDLError('SDLNet_UDP_Open');
       exit;
    end;
 
@@ -50,7 +49,7 @@ end;
 function InitNET:boolean;
 begin
    InitNET:=(SDLNet_Init=0);
-   if(InitNET=false)then WriteSDLError;
+   if(not InitNET)then WriteSDLError('SDLNet_Init');
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,7 +260,7 @@ begin
       net_cl_svaddr:=addr_str+':'+port_str;
       addr_str+=#0;
       pstr:=@addr_str[1];
-      if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)then
+      if(SDLNet_ResolveHost(@ipstruct,pstr,net_cl_svport)=0)then
       begin
          net_cl_svip:=ipstruct.host;
          //room_log_add(sv_clroom,log_local,net_cl_svaddr+': resolved host to '+c2ip(cl_net_svip));

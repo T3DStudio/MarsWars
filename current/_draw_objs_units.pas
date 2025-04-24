@@ -4,20 +4,20 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(uid^._ukbuilding)and(_mmr>0)
+      {if(uid^._ukbuilding)and(_mmr>0)
       then boxColor  (r_gminimap,mmx-_mmr,mmy-_mmr,mmx+_mmr,mmy+_mmr,PlayerColorNormal[player^.pnum])
-      else pixelColor(r_gminimap,mmx,mmy,                            PlayerColorNormal[player^.pnum]);
+      else pixelColor(r_gminimap,mmx,mmy,                            PlayerColorNormal[player^.pnum]);  }
 
       with player^ do
       begin
          if(UIPlayer<=LastPlayer)then
            if(team<>g_players[UIPlayer].team)then exit;
 
-         if(_ability=ua_UScan)and(reload>radar_vision_time)then
-           if(r_minimap_scan_blink)
+        { if(_ability=ua_UScan)and(reload>radar_vision_time)then
+           if(vid_minimap_scan_blink)
            then filledCircleColor(r_gminimap,trunc(ua_x  *map_mm_cx),
                                              trunc(ua_y  *map_mm_cx),
-                                             trunc(srange*map_mm_cx),PlayerColorShadow[pnum]);
+                                             trunc(srange*map_mm_cx),PlayerColorShadow[pnum]);    }
       end;
    end;
 end;
@@ -173,7 +173,7 @@ begin
                ui_bprod_possible+=ups_builder;
                if(0<m_brush)and(m_brush<=255)then
                 if(m_brush in ups_builder)then
-                 if(RectInCam(x,y,srange,srange,0))then UIInfoItemAddCircle(x,y,srange,ui_blink_color1[r_blink2_colorb]);
+                 //if(RectInCam(x,y,srange,srange,0))then UIInfoItemAddCircle(x,y,srange,ui_color_blink1[vid_blink2_colorb]);
             end;
 
             for i:=0 to MaxUnitLevel do
@@ -233,12 +233,12 @@ end;
 
 function EID2Spr(eid:byte):PTMWTexture;
 begin
-   EID2Spr:=@spr_dummy;
+   EID2Spr:=@tex_dummy;
 
    with g_eids[eid] do
-    if(smodel<>nil)then
-     if(smodel^.sm_listn>0)then
-      EID2Spr:=@smodel^.sm_list[0];
+    if(eid_smodel<>nil)then
+     if(eid_smodel^.sm_listn>0)then
+      EID2Spr:=@eid_smodel^.sm_list[0];
 end;
 
 procedure unit_UpdateStatusStrings(pu:PTUnit);
@@ -363,7 +363,7 @@ begin
 
          spr:=sm_unit2MWTexture(pu);
 
-         if(spr=pspr_dummy)then exit;
+         if(spr=ptex_dummy)then exit;
 
          depth:=_unit_CalcShadowZ(pu)-shadow;
          t:=sign(depth);
@@ -385,16 +385,16 @@ begin
 
             if(buff[ub_Invis ]>0 )then alpha:=128;
 
-            if(buff[ub_Invuln]>fr_fpsd6)
+            {if(buff[ub_Invuln]>fr_fpsd6)
             then ColorAura:=c_awhite;
-
+                                        }
             if(un_eid_summon_spr[level]<>nil)then
              if(buff[ub_Summoned]>0)then
               SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buff[ub_Summoned]*4,255));
 
-            if(buff[ub_ArchFire]>0)then
+            {if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
-              if(sm_listn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sm_list[(G_Step div 4) mod cardinal(sm_listn)],255);
+              if(sm_listn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sm_list[(G_Step div 4) mod cardinal(sm_listn)],255);}
 
             if(_ukbuilding)then
              if(iscomplete)then
@@ -410,8 +410,8 @@ begin
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
+                    //  if(_isbarrack)and(uprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                   //   if(_issmith  )and(pprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 
@@ -441,10 +441,10 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
               else
                 if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
 
-            if(vid_ColoredShadow)
+            {if(vid_ColoredShadow)
             then ColorShadow:=PlayerColorShadow[playeri]
             else ColorShadow:=c_ablack;
-
+                                        }
             SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha);
          end;
       end;
@@ -461,7 +461,7 @@ begin
     begin
        spr:=sm_unit2MWTexture(pu);
 
-       if(spr=pspr_dummy)then exit;
+       if(spr=ptex_dummy)then exit;
 
        if(unit_FogReveal(pu))then
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then

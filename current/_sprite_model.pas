@@ -1,5 +1,5 @@
 
-function sm_SModel2MWTexture(sm:PTMWSModel;animState:byte;dir,animStep:integer;stat:pbyte):PTMWTexture;  // sprite model 2 sprite
+function sm_SModel2MWTexture(sm:PTMWSModel;animState:TMWSModelState;dir,animStep:integer;stat:pbyte):PTMWTexture;  // sprite model 2 sprite
 var dd,i:integer;
 function aa3(b0,a,b1:integer):integer;
 begin
@@ -11,7 +11,7 @@ begin
     else aa3:=b0+(a mod (b1-b0+1));
 end;
 begin
-   sm_SModel2MWTexture:=pspr_dummy;
+   sm_SModel2MWTexture:=ptex_dummy;
 
    if(sm=nil)then exit;
 
@@ -305,11 +305,11 @@ smt_terminat :case animState of
          if(i>sm_listi)then stat^:=2;
       end;
 
-      sm_SModel2MWTexture:=@sm_list[mm3i(0,i,sm_listi)];
+      sm_SModel2MWTexture:=sm_list[mm3i(0,i,sm_listi)];
    end;
 end;
 
-function sm_unit2SMAnimState(pu:PTUnit;_wanim_:boolean):byte;  // unit's animation state
+function sm_unit2SMAnimState(pu:PTUnit;_wanim_:boolean):TMWSModelState;  // unit's animation state
 begin
    with pu^   do
    with uid^  do
@@ -334,7 +334,7 @@ begin
            if not(a_reload in aw_rld_a)
            then sm_unit2SMAnimState:=sms_dready
            else
-             if(aw_AnimStay>0)
+             if(aw_AnimStay<>sms_none)
              then sm_unit2SMAnimState:=aw_AnimStay
              else sm_unit2SMAnimState:=sms_dattack;
         end
@@ -344,10 +344,10 @@ begin
 end;
 
 function sm_unit2MWTexture(u:PTUnit):PTMWTexture;
-var sms:byte;
-smodel:PTMWSModel;
+var sms:TMWSModelState;
+ smodel:PTMWSModel;
 begin
-   sm_unit2MWTexture:=@spr_dummy;
+   sm_unit2MWTexture:=@tex_dummy;
 
    with u^   do
    with uid^ do

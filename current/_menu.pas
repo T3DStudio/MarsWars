@@ -66,12 +66,12 @@ end;
 function menu_ApplyResolution(Check:boolean):boolean;
 begin
    menu_ApplyResolution:=false;
-   if(menu_res_w=vid_vw)and(menu_res_h=vid_vh)then exit;
+   if(menu_w=vid_vw)and(menu_h=vid_vh)then exit;
    menu_ApplyResolution:=true;
    if(Check)then exit;
-   vid_vw:=menu_res_w;
-   vid_vh:=menu_res_h;
-   vid_MakeScreen;
+   vid_vw:=menu_w;
+   vid_vh:=menu_h;
+   //vid_MakeScreen;
 end;
 
 procedure menu_Toggle;
@@ -261,12 +261,12 @@ begin
 
 
    // MAP
-   tx0:=vid_vhw+396-menu_map_settingsw-r_mminimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
+  { tx0:=vid_vhw+396-menu_map_settingsw-r_mminimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
    tx1:=tx0+menu_map_settingsw;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h+menu_main_mp_bhq;
 
    SetItem(mi_title_map  ,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
-                          tx1+basefont_w3+r_mminimap^.w,ty0+r_mminimap^.w+basefont_w1,true );
+                          tx1+basefont_w3+r_mminimap^.w,ty0+r_mminimap^.w+basefont_w1,true );  }
 
    SetItem(mi_map_Preset ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,GameLoadPreset(PlayerClient,0,true)                              );ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Seed   ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,map_SetSetting(PlayerClient,nmid_lobbby_mapseed          ,0,true));ty0+=menu_main_mp_bhh;
@@ -276,25 +276,25 @@ begin
    SetItem(mi_map_Random ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,menu_items[mi_map_Sym].mi_enabled);ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Theme  ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,true);
 
-   ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(r_mminimap^.h div 2);
+   {ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(r_mminimap^.h div 2);
    SetItem(mi_map_MiniMap,tx1+basefont_w1,ty0,tx1+basefont_w1+r_mminimap^.w,ty0+r_mminimap^.h,false);
 
    // MULTIPLAYER / RECORD INFO
-   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+r_mminimap^.w+basefont_w2-menu_main_mp_bhq;
+   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+r_mminimap^.w+basefont_w2-menu_main_mp_bhq; }
 
    if(rpls_rstate=rpls_state_read)then
    begin
-      SetItem(mi_title_ReplayInfo2,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
-                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );
+      {SetItem(mi_title_ReplayInfo2,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );  }
 
    end
    else
    begin
-      SetItem(mi_title_multiplayer,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+     { SetItem(mi_title_multiplayer,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
                                    tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*8+basefont_w2+basefont_wq,true );
 
       ty1:=menu_main_mp_bhh;
-      tx1+=basefont_w1+r_mminimap^.w;
+      tx1+=basefont_w1+r_mminimap^.w;   }
       case net_status of
 ns_single: begin
            SetItem(mi_mplay_ServerCaption   ,tx0,ty0,tx1,ty0+ty1, not G_Started);ty0+=ty1;
@@ -788,11 +788,11 @@ begin
    if(menu_list_n>0)then
    begin
       menu_list_SelectItem;
-      if(kt_mleft=1)and(menu_list_selected=-1)
+      if(input_Check(iAct_mlb,tis_NPressed))and(menu_list_selected=-1)
       then menu_List_Clear
    end
    else
-     if(kt_mleft=1)then
+     if(input_Check(iAct_mlb,tis_NPressed))then
      begin
         case menu_item of
 mi_mplay_ClientAddress : txt_ValidateServerAddr;
@@ -806,7 +806,7 @@ mi_settings_PlayerName : begin
         SoundPlayUI(snd_click);
      end;
 
-   if(kt_mleft=1)then        // left button pressed
+   if(input_Check(iAct_mlb,tis_NPressed))then        // left button pressed
    begin
       //UpdateItems:=true;
 
@@ -918,14 +918,14 @@ mi_settings_PanelPosition : if(menu_list_selected>-1)then
                             begin
                                vid_PannelPos:=enum_val2TVidPannelPos(menu_list_SIndex);
                                menu_List_Clear;
-                               vid_ScreenSurfaces;
+                               //vid_ScreenSurfaces;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_PanelPosl[low(TVidPannelPos)],SizeOf(str_menu_PanelPosl),integer(vid_PannelPos),-2);
 mi_settings_MMapPosition  : if(menu_list_selected>-1)then
                             begin
                                vid_MiniMapPos:=(menu_list_SIndex>0);
                                menu_List_Clear;
-                               vid_ScreenSurfaces;
+                               //vid_ScreenSurfaces;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical][false],SizeOf(str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical]),integer(vid_MiniMapPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
@@ -951,15 +951,15 @@ mi_settings_ReplayQuality : if(menu_list_selected>-1)then
                             else menu_list_MakeFromStr(menu_item,@str_menu_NetQuality[0],SizeOf(str_menu_NetQuality[0])*(cl_UpT_arrayN_RPLs+1),integer(rpls_Quality),-3);
 
 //////////////////////////////////////////    SETTINGS  VIDEO
-mi_settings_ResWidth      : if(menu_list_selected>-1)
-                            then begin menu_res_w:=vid_rw_list[menu_list_SIndex];menu_List_Clear;end
-                            else menu_list_MakeFromIntAr(menu_item,@vid_rw_list[0],SizeOf(vid_rw_list),menu_res_w,-3);
-mi_settings_ResHeight     : if(menu_list_selected>-1)
-                            then begin menu_res_h:=vid_rh_list[menu_list_SIndex];menu_List_Clear;end
-                            else menu_list_MakeFromIntAr(menu_item,@vid_rh_list[0],SizeOf(vid_rh_list),menu_res_h,-3);
+mi_settings_ResWidth      : ;{if(menu_list_selected>-1)
+                            then begin menu_w:=vid_rw_list[menu_list_SIndex];menu_List_Clear;end
+                            else menu_list_MakeFromIntAr(menu_item,@vid_rw_list[0],SizeOf(vid_rw_list),menu_w,-3); }
+mi_settings_ResHeight     : ;{if(menu_list_selected>-1)
+                            then begin menu_h:=vid_rh_list[menu_list_SIndex];menu_List_Clear;end
+                            else menu_list_MakeFromIntAr(menu_item,@vid_rh_list[0],SizeOf(vid_rh_list),menu_h,-3); }
 mi_settings_ResApply      : menu_ApplyResolution(false);
 
-mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen; vid_MakeScreen;end;
+mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen;{ vid_MakeScreen;}end;
 mi_settings_ShowFPS       : vid_FPS:=not vid_FPS;
 
 //////////////////////////////////////////    SETTINGS  SOUND

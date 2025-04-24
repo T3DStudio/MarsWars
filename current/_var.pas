@@ -9,11 +9,19 @@ sys_EVENT         : pSDL_EVENT;
 //  GAME
 //
 
+ServerSide        : boolean = true; // only server side code
+
+UnitMoveStepTicks : byte = 8;
+LastCreatedUnit   : integer = 0;
+LastCreatedUnitP  : PTUnit;
+PlayerClient      : byte = 0; // 'this' player
+PlayerLobby       : byte = 0; // Player who can change game settings
+
 G_Started         : boolean  = false;
 g_status          : byte     = 0;
 g_mode            : byte     = 0;
 g_fixed_positions : boolean  = false;
-g_generators      : byte     = 2;
+g_generators      : byte     = 0;
 g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
 g_deadobservers   : boolean  = true;
 
@@ -25,19 +33,6 @@ g_slot_state      : array[0..LastPlayer] of byte;
 
 g_royal_r         : integer  = 0;
 g_cpoints         : array[1..MaxCPoints] of TCTPoint;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  BASE
-//
-
-ServerSide        : boolean = true; // only server side code
-
-UnitMoveStepTicks : byte = 8;
-LastCreatedUnit   : integer = 0;
-LastCreatedUnitP  : PTUnit;
-PlayerClient      : byte = 0; // 'this' player
-PlayerLobby       : byte = 0; // Player who can change game settings
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
@@ -56,7 +51,7 @@ g_cycle_regen     : integer = 0;
 g_random_i        : word = 0;
 g_random_p        : byte = 0;
 
-g_preset_cur      : byte = 0;
+g_preset_cur      : byte = 0;  // rename to map_* ?????
 g_preset_n        : byte = 0;
 g_presets         : array of TGamePreset;
 
@@ -76,7 +71,7 @@ map_gridZone_n    : word = 0;
 map_gridDomain_n  : word = 0;
 map_gridDomainMX  : array of array of TMapGridPFDomainData;
 {$IFDEF DTEST}
-map_gridDomain_color: array of cardinal;
+map_gridDomain_color: array of TMWColor;
 {$ENDIF}
 
 map_gcx,
@@ -143,6 +138,8 @@ wtrset_resurect   : cardinal;
 u_royal_cd,
 u_royal_d         : integer;
 
+str_outLogLastDate: shortstring = '';
+
 {$IFDEF _FULLGAME}
 
 debug_Sx,
@@ -174,68 +171,36 @@ test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
 sys_fog           : boolean = false;
 
-r_ui_Panel,
+vid_window        : pSDL_Window;
+vid_renderer      : pSDL_Renderer;
+
+{r_ui_Panel,
 r_ui_MiniMap,
 r_empty,
 r_bminimap,
 r_gminimap,
 r_mminimap,
 r_screen,
-r_menu            : pSDL_SURFACE;
-r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
+r_menu            : pSDL_SURFACE;  }
+//r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
 
-r_RECT            : pSDL_RECT;
+vid_RECT          : pSDL_RECT;
 
-r_blink1_colorb,
-r_blink2_colorb   : boolean;
-r_blink1_color_BG,
-r_blink1_color_BY,
-r_blink2_color_BG,
-r_blink2_color_BY : cardinal;
-r_blink3          : byte;
+vid_blink1_colorb,
+vid_blink2_colorb : boolean;
+vid_blink1_color_BG,
+vid_blink1_color_BY,
+vid_blink2_color_BG,
+vid_blink2_color_BY : TMWColor;
+vid_blink3          : byte;
 
-r_minimap_scan_blink
-                  : boolean = false;
-
-ingame_chat       : byte = 0;
-vid_fullscreen    : boolean = false;
-r_draw            : boolean = true;
-
-menu_state        : boolean = true;
-menu_page1        : byte = mp_main;
-menu_page2        : byte = 0;
-menu_settings_page: byte = mi_settings_game;
-menu_remake       : boolean = false;
-menu_redraw       : boolean = false;
-menu_item         : integer;
-menu_items        : array[byte] of TMenuItem;
-menu_list_n,
-menu_list_selected,
-menu_list_current,
-menu_list_x,
-menu_list_y,
-menu_list_font,
-menu_list_item_h,
-menu_list_item_hh,
-menu_list_w       : integer;
-menu_list_items   : array of TMenuListItem;
-menu_list_aleft   : boolean = false;
-menu_res_w,
-menu_res_h        : integer;
-
-PlayerName        : shortstring = str_defaultPlayerName;
-PlayerColorSchemeFFA,
-PlayerColorSchemeTEAM,
-PlayerColorNormal,
-PlayerColorShadow : TPlayerColorArray;
-
-
-UIPlayer          : byte = 0;
-
-vid_TileTemplate_fog          : pTMWTileSet;
 vid_TileTemplate_crater_tech,
-vid_TileTemplate_crater_nature: TMWTileSet;
-vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of TMWTileSet;
+vid_TileTemplate_crater_nature: pTMWTileSet;
+vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of pTMWTileSet;
+
+vid_game_w        : integer = vid_minw;
+vid_game_h        : integer = vid_minh;
+vid_game_fres     : boolean = false;
 
 vid_vw            : integer = vid_minw;       // window size
 vid_vhw           : integer = vid_minw div 2;
@@ -254,9 +219,9 @@ vid_vmb_y0        : integer = 6;
 vid_vmb_x1        : integer = vid_minw-6;
 vid_vmb_y1        : integer = vid_minh-6;
 
-vid_Sprites_list  : array of PTVSprite;       // vid base
+vid_Sprites_l     : array[0..vid_MaxScreenSprites-1] of pTVSprite;       // vid base
 vid_Sprites_n     : word = 0;
-vid_UIItem_list   : array of TUIItem;
+vid_UIItem_l      : array[0..vid_MaxScreenSprites-1] of TUIItem;
 vid_UIItem_n      : word = 0;
 vid_blink_timer1  : integer = 0;
 vid_blink_timer2  : integer = 0;
@@ -273,13 +238,54 @@ vid_ColoredShadow : boolean = true;
 vid_PannelPos     : TVidPannelPos = low(TVidPannelPos);
 vid_MiniMapPos    : boolean = false;
 
+vid_minimap_scan_blink
+                  : boolean = false;
 
-font_1,
-font_1h,
-font_2,
-font_3            : TFont;
+UIPlayer          : byte = 0;
+ingame_chat       : byte = 0;
+vid_fullscreen    : boolean = false;
+r_draw            : boolean = true;
 
+menu_state        : boolean = true;
+menu_page1        : byte = mp_main;
+menu_page2        : byte = 0;
+menu_settings_page: byte = mi_settings_game;
+menu_remake       : boolean = false;
+menu_redraw       : boolean = false;
+menu_item         : integer;
+menu_items        : array[byte] of TMenuItem;
+menu_res_w,
+menu_res_h,
+menu_list_n,
+menu_list_selected,
+menu_list_current,
+menu_list_x,
+menu_list_y,
+menu_list_font,
+menu_list_item_h,
+menu_list_item_hh,
+menu_list_w       : integer;
+menu_list_items   : array of TMenuListItem;
+menu_list_aleft   : boolean = false;
+
+PlayerName        : shortstring = str_defaultPlayerName;
+PlayerColorSchemeFFA,
+PlayerColorSchemeTEAM,
+PlayerColorNormal,
+PlayerColorShadow : TPlayerColorArray;
+
+
+font_Base         : PTFont;
+
+
+
+draw_color        : TMWColor;
+draw_color_r,
+draw_color_g,
+draw_color_b,
+draw_color_a      : byte;
 draw_font         : PTFont;
+draw_font_size    : single = 0;
 draw_font_w1,
 draw_font_wi,
 draw_font_wh,
@@ -287,7 +293,11 @@ draw_font_wq,
 draw_font_w1h,
 draw_font_wq3,
 draw_font_h1,
-draw_font_h2
+draw_font_hi,
+draw_font_hh,
+draw_font_hq,
+draw_font_lhq,
+draw_font_lhh
 
                   : integer;
 
@@ -306,7 +316,7 @@ map_mm_gridW      : single;
 campain_skill     : byte = 3;
 campain_seed      : cardinal = 0;
 campain_mission   : byte = 255;
-campain_mmap      : array[0..MaxMissions] of pSDL_Surface;
+campain_mmap      : array[0..MaxMissions] of pTMWTexture;
 
 log_LastMesTimer  : integer = 0;
 
@@ -378,7 +388,7 @@ mouse_map_x,
 mouse_map_y,
 mouse_x,
 mouse_y           : integer;
-m_brushc          : cardinal;
+m_brushc          : TMWColor;
 mbrush_x,
 mbrush_y,
 m_brush           : integer;
@@ -417,8 +427,7 @@ ui_FogView_sy     : integer = 0;
 ui_FogView_ex     : integer = 0;
 ui_FogView_ey     : integer = 0;
 
-ui_fog_BaseSurf   : pSDL_Surface;
-ui_fog_tiles      : TMWTileSet;
+ui_fog_tileset    : pTMWTileSet;
 
 ui_language       : boolean = false;
 
@@ -435,10 +444,10 @@ ui_groups_f1      : TUnitGroup;
 ui_groups_f2      : TUnitGroup;
 
 // mouse click effect
-ui_mc_x,                                                 //
-ui_mc_y,                                                 // mouse click effect
-ui_mc_a           : integer;                             //
-ui_mc_c           : cardinal;                            //
+ui_mc_x,
+ui_mc_y,                        // mouse click effect
+ui_mc_a           : integer;
+ui_mc_c           : TMWColor;
 
 // ui panel counters
 ui_uprod_max,
@@ -464,11 +473,11 @@ ui_uhint          : integer = 0;
 ui_CursorUnit     : PTUnit;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
-ui_max_color,                                       // unit max count color
-ui_cenergy,                                         // energy limit colors
-ui_limit,                                           // unit limit colors
-ui_blink_color2,
-ui_blink_color1   : array[false..true] of cardinal;
+ui_color_max,                                       // unit max count color
+ui_color_cenergy,                                         // energy limit colors
+ui_color_limit,                                           // unit limit colors
+ui_color_blink2,
+ui_color_blink1   : array[false..true] of TMWColor;
 
 // panel text positions
 ui_uiuphx         : integer = 0;
@@ -497,31 +506,21 @@ ui_GameLogHeight  : integer = 0;
 // ui log
 ui_log_s          : array of shortstring;
 ui_log_t          : array of byte;
-ui_log_c          : array of cardinal;
+ui_log_c          : array of TMWColor;
 ui_log_n          : integer = 0;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  input keys
+//
+
+input_actions        : array[byte] of TInputKey;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Keyborad input
 //
 
-// key timer
-kt_TwiceLast,
-kt_left,
-kt_right,
-kt_up,
-kt_down,
-kt_shift,
-kt_ctrl,
-kt_alt,
-kt_mleft,
-kt_mright,
-kt_mmiddle,
-kt_Last           : integer;
-// key
-k_Last            : cardinal;
-k_TwiceLast       : boolean;
-k_LastChar        : char;
 k_KeyboardString  : shortstring = '';
 
 
@@ -625,10 +624,7 @@ hotkeyO2 : THotKeyTable = (0,0,0,
 //
 
 c_dred,
-c_awhite,
 c_red,
-c_ared,
-c_ablue,
 c_orange,
 c_dorange,
 c_brown,
@@ -636,23 +632,18 @@ c_yellow,
 c_dyellow,
 c_lava,
 c_lime,
-c_alime,
 c_green,
-c_agreen,
 c_dblue,
 c_blue,
 c_aqua,
-c_aaqua,
 c_white,
-c_agray,
 c_ltgray,
 c_gray,
 c_dgray,
-c_ablack,
 c_purple,
 c_lpurple,
 c_dpurple,
-c_black           : cardinal;
+c_black           : TMWColor;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -663,13 +654,13 @@ theme_cur                 : integer = 0;
 
 theme_anm_decors          : TThemeDecorAnimL;
 
-theme_tile_terrain        : pSDL_Surface = nil;
-theme_tile_crater         : pSDL_Surface = nil;
-theme_tile_liquid         : pSDL_Surface = nil;
-theme_tile_teleport       : pSDL_Surface = nil;
+{theme_tile_terrain        : pTMWTexture = nil;
+theme_tile_crater         : pTMWTexture = nil;
+theme_tile_liquid         : pTMWTexture = nil;
+theme_tile_teleport       : pTMWTexture = nil; }
 
-theme_tileset_crater      : TMWTileSet;
-theme_tileset_liquid      : array[0..theme_anim_step_n-1] of TMWTileSet;
+theme_tileset_crater      : pTMWTileSet;
+theme_tileset_liquid      : array[0..theme_anim_step_n-1] of pTMWTileSet;
 
 // CURRENT THEME SETTINGS
 
@@ -684,8 +675,8 @@ theme_last_tile_liquid_id : integer = -1;
 theme_last_tile_teleport_id:integer = -1;
 
 // current/new
-theme_cur_crater_tes      : byte = tes_nature; // theme liquid edge style
-theme_cur_liquid_tes      : byte = tes_nature; // theme liquid edge style
+theme_cur_crater_tes      : TThemeEdgeTerrainStyle = tes_nature; // theme liquid edge style
+theme_cur_liquid_tes      : TThemeEdgeTerrainStyle = tes_nature; // theme liquid edge style
 theme_cur_liquid_tas      : byte = tas_liquid; // theme liquid animation style
 theme_cur_liquid_tasPeriod: byte = 30;
 theme_cur_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
@@ -733,10 +724,19 @@ theme_name            : array[0..theme_n-1] of shortstring;
 //
 
 
-spr_dummy         : TMWTexture;
-pspr_dummy        : PTMWTexture;
+tex_temp,
+tex_dummy         : TMWTexture;
+ptex_dummy        : PTMWTexture;
 
-spr_dmodel,
+tex_menu,
+tex_ui_MiniMap,
+tex_map_gMiniMap,   // minimap: unit & ui layer
+tex_map_mMiniMap,   // minimap: menu
+tex_map_bMiniMap    // minimap: terrain background
+                  : PTMWTexture;
+
+spr_dmodel        : TMWSModel;
+spr_pdmodel       : PTMWSModel;
 
 spr_LostSoul,
 spr_phantom,
@@ -865,10 +865,9 @@ spr_db_h1,
 spr_db_u0,
 spr_db_u1,
 
-spr_blood         : TMWSModel;
-spr_pdmodel       : PTMWSModel;
+spr_blood         : pTMWSModel;
 
-spr_mp            : array[1..r_cnt] of TMWTexture;
+
 spr_b4_a,
 spr_b7_a,
 spr_b9_a,
@@ -877,8 +876,11 @@ spr_scan,
 spr_decay,
 spr_invuln,
 spr_hvision,
-spr_stun          : TMWTexture;
+spr_stun,
 
+spr_cp_koth,
+spr_cp_out,
+spr_cp_gen,
 
 spr_c_mars,
 spr_c_hell,
@@ -894,10 +896,7 @@ spr_b_rclck,
 spr_b_rlog,
 spr_b_rstop,
 spr_b_rvis,
-spr_b_action,
-spr_b_paction,
 spr_b_attack,
-spr_b_rebuild,
 spr_b_move,
 spr_b_patrol,
 spr_b_apatrol,
@@ -908,15 +907,11 @@ spr_b_cancel,
 spr_b_delete,
 spr_mlogo,
 spr_mback,
-r_mback,
-spr_cursor        : pSDL_Surface;
-spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
-spr_tabs          : array[0..3] of pSDL_Surface;
-spr_cp_koth,
-spr_cp_out,
-spr_cp_gen        : TMWTexture;
+spr_cursor        : pTMWTexture;
 
-//spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
+spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of pTMWTexture;
+spr_mp            : array[1..r_cnt] of pTMWTexture;
+spr_tabs          : array[0..3] of pTMWTexture;
 
 
 ////////////////////////////////////////////////////////////////////////////////

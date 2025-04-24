@@ -46,8 +46,8 @@ begin
 SDL_BUTTON_left     : GetKeyName:='Mouse left button';
 SDL_BUTTON_right    : GetKeyName:='Mouse right button';
 SDL_BUTTON_middle   : GetKeyName:='Mouse middle button';
-SDL_BUTTON_WHEELUP  : GetKeyName:='Mouse wheel up';
-SDL_BUTTON_WHEELDOWN: GetKeyName:='Mouse wheel down';
+//SDL_BUTTON_WHEELUP  : GetKeyName:='Mouse wheel up';
+//SDL_BUTTON_WHEELDOWN: GetKeyName:='Mouse wheel down';
 SDLK_LCtrl,
 SDLK_RCtrl          : GetKeyName:='Ctrl';
 SDLK_LAlt,

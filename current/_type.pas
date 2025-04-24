@@ -14,8 +14,6 @@ PTSob       = ^TSob;
 
 {$IFDEF _FULLGAME}
 
-ppSDL_Surface = ^pSDL_Surface;
-
 string6     = string[6];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,15 +21,72 @@ string6     = string[6];
 //   GRAPHIC
 //
 
+TMWPixel = cardinal;
+TMWColor = cardinal;{record
+   r,g,
+   b,a       : byte;
+end; }
+PTMWColor = ^TMWColor;
+//PPTMWColor = ^TMWColor;
+
 TMWTexture = record
-   sdlSurface: pSDL_Surface;
+   sdlsurface: pSDL_Surface;
+   sdltexture: pSDL_Texture;
     w, h,
    hw,hh     : integer;
 end;
 PTMWTexture = ^TMWTexture;
+PPTMWTexture = ^PTMWTexture;
 
-TMWTextureList  = array of TMWTexture;
+TMWTextureList  = array of pTMWTexture;
 PTMWTextureList = ^TMWTextureList;
+
+//  SPRITE MODEL
+
+TMWSModelType = (
+smt_effect,               // simple missile or effect
+smt_missile,              // missile with direction
+smt_buiding,
+smt_turret,
+smt_turret2,
+smt_lost,                 //UID_Lost
+smt_imp,                  //UID_Imp,UID_Demon,UID_ZFormer,UID_ZSergant,UID_ZBomber,UID_ZBFG,UID_Baron,UID_Cyberdemon:
+smt_zengineer,            //UID_ZEngineer
+smt_zcommando,            //UID_ZCommando
+smt_fmajor,               //UID_Majot,UID_ZMajor
+smt_caco,                 //UID_Cacodemon
+smt_mmind,                //UID_Mastermind
+smt_pain,                 //UID_Pain
+smt_revenant,             //UID_Revenant
+smt_mancubus,             //UID_Mancubus
+smt_archno,               //UID_Arachnotron
+smt_arch,                 //UID_ArachVile
+smt_apc,                  //UID_APC
+smt_fapc,                 //UID_FAPC
+smt_marine0,              //UID_Engineer,UID_Sergant,UID_Bomber,UID_BFG
+smt_medic,                //UID_Medic
+smt_commando,             //UID_Commando
+smt_tank,                 //UID_Tank
+smt_terminat,             //UID_Terminator
+smt_transport,            //UID_Transport
+smt_flyer,                //UID_FLyer
+smt_effect2              // simple missile or effect
+);
+
+//  SPRITE MODEL STATES
+
+TMWSModelState = (
+sms_none,
+sms_walk,
+sms_stand,
+sms_pain,
+sms_cast,
+sms_dready,
+sms_dattack,
+sms_mattack,
+sms_death,
+sms_build
+);
 
 TMWSModel = record
    sm_list  : TMWTextureList;
@@ -39,29 +94,40 @@ TMWSModel = record
    sm_sel_hh,
    sm_listi,   // last value
    sm_listn : integer;
-   sm_type  : byte;
+   sm_type  : TMWSModelType;
 end;
 PTMWSModel = ^TMWSModel;
 
-TMWTileSet  = array[0..MaxTileSet] of TMWTexture;
+TMWTileSet  = array[0..MaxTileSet] of pTMWTexture;
 PTMWTileSet = ^TMWTileSet;
 
-TFont = array[char] of TMWTexture;
+TFont = record
+   MWTextures: array[char] of pTMWTexture;
+   font_w,
+   font_h,
+   font_hw,
+   font_hh,
+   font_lh   : integer;
+end;
 PTFont = ^TFont;
 
 TEID = record
-   anim_smstate: byte;
-   smodel      : PTMWSModel;
-   smask       : cardinal;
+   eid_anim_smstate: TMWSModelState;
+   eid_smodel      : PTMWSModel;
+   eid_smask_color : TMWColor;
+   eid_smask_alpha : byte;
 end;
 
 TEffect = record
-   eid      : byte;
-   x,y,z,d,
-   anim_i,
-   anim_last_i,
-   anim_step,
-   anim_last_i_t
+   e_eid      : byte;
+   e_x,
+   e_y,
+   e_z,
+   e_depth,
+   e_anim_i,
+   e_anim_last_i,
+   e_anim_step,
+   e_anim_last_i_t
             : integer;
 end;
 
@@ -71,7 +137,7 @@ TUIItem = record
    cx,cy,
    x0,y0,
    x1,y1    : integer;
-   color    : cardinal;
+   color    : TMWColor;
    text_lt,
    text_lt2,
    text_rt,
@@ -80,13 +146,13 @@ TUIItem = record
 end;
 
 TVSprite = record
-   sprite   : PTMWTexture;
+   sprite    : PTMWTexture;
    x,y,
    depth,
-   shadowz  : integer;
-   shadowc,
-   aura     : cardinal;
-   alpha    : byte;
+   shadowz   : integer;
+   shadow_color,
+   aura_color: TMWColor;
+   alpha     : byte;
 end;
 PTVSprite = ^TVSprite;
 
@@ -111,7 +177,7 @@ TAlarm = record
    al_r,
    al_t       : integer;
    al_v       : byte;
-   al_c       : cardinal;
+   al_c       : TMWColor;
 end;
 
 TMenuItem = record
@@ -127,7 +193,22 @@ TMenuListItem = record
    mli_enabled: boolean;
 end;
 
-TPlayerColorArray  = array[0..LastPlayer] of cardinal;
+TPlayerColorArray  = array[0..LastPlayer] of TMWColor;
+
+TAlignment = (ta_LU,   // |^| | |
+              ta_MU,   // | |^| |
+              ta_RU,   // | | |^|
+              ta_LM,   // |-| | |
+              ta_MM,   // | |-| |
+              ta_RM,   // | | |-|
+              ta_LD,   // |_| | |
+              ta_MD,   // | |_| |
+              ta_RD,   // | | |_|
+              ta_chat, // special
+              ta_MMR );// |  |- |
+
+// theme edge terrain style
+TThemeEdgeTerrainStyle = (tes_fog,tes_nature,tes_tech);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -191,6 +272,17 @@ end;
 //
 //   OTHER
 //
+
+TInputKeyType = (ikt_keyboard,ikt_mouseb,ikt_mousew);
+
+TInputKey = record
+   ik_type  : TInputKeyType;
+   ik_value : cardinal;
+   ik_timer_twice,
+   ik_timer_pressed
+            : integer;
+   ik_depend: byte;
+end;
 
 TTab3PageType = (t3pt_none=0,t3pt_actions,t3pt_observer,t3pt_replay);
 
@@ -288,9 +380,9 @@ TUnitAbility = record
    ua_rupgrl,
    ua_ruid    : byte;
    {$IFDEF _FULLGAME}
-   ua_mbrush_c: cardinal;
+   ua_mbrush_c: TMWColor;
    ua_mbrush_r: integer;
-   ua_btn     : pSDL_Surface;
+   ua_btn     : PTMWTexture;
    ua_name,
    ua_descr   : shortstring;
    {$ENDIF}
@@ -379,7 +471,7 @@ TUWeapon = record
   aw_eid_target,
   aw_eid_shot,
   aw_eid_start: byte;
-  aw_AnimStay : byte;
+  aw_AnimStay : TMWSModelState;
   {$ENDIF}
 end;
 
@@ -535,7 +627,7 @@ TUPID = record  // upgrade
    _up_mfrg     : boolean;
 
    {$IFDEF _FULLGAME}
-   _up_btn      : TMWTexture;
+   _up_btn      : pTMWTexture;
    _up_name,
    _up_descr,
    _up_hint     : shortstring;
