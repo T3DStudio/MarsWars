@@ -63,7 +63,8 @@ var u:integer;
 begin
    for u:=1 to MaxUnits do
     with _punits[u]^ do
-     if(hits>0)and(playeri=pl)then _unit_kill(_punits[u],instant,true,false,true,true);
+     if(playeri=pl)then
+      _unit_kill(_punits[u],instant,true,false,true,true);
 end;
 
 procedure PlayersSetDefault;
@@ -335,7 +336,7 @@ begin
 
    Map_randommap;
 
-   case random(10) of
+   case random(7) of
    0:   g_mode:=gm_royale;
    1:   g_mode:=gm_capture;
    2:   g_mode:=gm_KotH;
@@ -370,6 +371,8 @@ begin
    if(random(3)=0)
    then g_ai_slots:=0
    else g_ai_slots:=random(player_default_ai_level+1);
+
+   g_fixed_positions:=random(2)=0;
 
    Map_premap;
 

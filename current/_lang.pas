@@ -528,7 +528,6 @@ wtp_Default      : dmod_str:='distance';
 wtp_hits         : dmod_str:='lowest hits';
 wtp_distance     : dmod_str:='distance';
 wtp_building     : dmod_str:='buildings';
-wtp_UnitLightBio : dmod_str:='[unit,light,bio]';
 wtp_UnitBioLight : dmod_str:='[unit,bio,light]';
 wtp_UnitBioHeavy : dmod_str:='[unit,bio,heavy]';
 wtp_UnitMech     : dmod_str:='[unit,mech]';

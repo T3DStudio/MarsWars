@@ -138,7 +138,7 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v53';
+str_ver                = 'v53.1';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
@@ -410,7 +410,6 @@ wtp_hits               = 1;
 wtp_Rmhits             = 2;
 wtp_distance           = 3;
 wtp_building           = 4;
-wtp_UnitLightBio       = 5;
 wtp_UnitBioLight       = 7;
 wtp_UnitBioHeavy       = 8;
 wtp_UnitMech           = 10;
@@ -524,7 +523,7 @@ upgr_hell_regen        = 5;  // regeneration
 upgr_hell_pains        = 6;  // pain state
 upgr_hell_buildr       = 7;  // main range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
-upgr_hell_paina        = 9; // decay aura
+upgr_hell_paina        = 9;  // decay aura
 upgr_hell_towers       = 10; // towers range
 
 upgr_hell_spectre      = 11; // demon spectre                 // t2
@@ -717,7 +716,7 @@ BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamage1 div 10;
 
-ExpLevel1              = fr_fps1*ptime1h;
+ExpLevel1              = fr_fps1*ptime2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

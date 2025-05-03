@@ -194,7 +194,7 @@ begin
 end;
 UID_Demon:
 begin
-   _animw:=19;
+   _animw:=15;
    _animd:=9;
    setMWSModel  (0,@spr_demon);
    setCommandSND(snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
@@ -236,23 +236,23 @@ begin
 end;
 UID_Cyberdemon:
 begin
-   _animw:=11;
+   _animw:=13;
    setMWSModel  (0,@spr_cyberdemon);
    setCommandSND(snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
    setEffectEID (0,0  ,0              ,0  ,0             );
    setEffectSND (  nil,snd_cyber_death,nil,snd_hell_pain );
-   setFOOT      (snd_cyber_foot,30);
+   setFOOT      (snd_cyber_foot,25); //30
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_Mastermind:
 begin
-   _animw:=13;
+   _animw:=15;
    _animd:=16;
    setMWSModel  (0,@spr_mastermind);
    setCommandSND(snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
    setEffectEID (0,0  ,0                   ,0  ,0             );
    setEffectSND (  nil,snd_mastermind_death,nil,snd_hell_pain );
-   setFOOT      (snd_mastermind_foot,22);
+   setFOOT      (snd_mastermind_foot,18);  //22
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
 UID_Pain:

@@ -443,7 +443,7 @@ begin
 
             if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
-              if(sn>0)then SpriteListAddUnit(vx,vy,depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
+              if(sn>0)then SpriteListAddUnit(vx-_randomr(_missile_r),vy-_randomr(_missile_r),depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
 
             if(uidi=UID_UACDron)and(not iscomplete)
             then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sl[0],255);

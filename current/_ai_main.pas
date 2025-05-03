@@ -559,6 +559,7 @@ r_hell: begin
         MakeUpgr(upgr_hell_HKTeleport,1);
         MakeUpgr(upgr_hell_spectre   ,1);
         MakeUpgr(upgr_hell_paina     ,1);
+        MakeUpgr(upgr_hell_resurrect ,1);
 
         if(ai_maxcount_upgrlvl>0)then
         for i:=1 to ai_maxcount_upgrlvl do
@@ -695,10 +696,10 @@ UID_UGTurret      : if(ai_towers_near_air=0)then exit;
 UID_UATurret      : if(ai_towers_near_grd=0)then exit;
         end;
 
-     if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
+     if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)and(uid_e[uidi]>1)then
       case uidi of
-UID_HTower        : if(abs(uid_e[uidi]-uid_e[UID_HTotem])>1)and(uid_e[uidi]>1)then exit;
-UID_HTotem        : if(abs(uid_e[uidi]-uid_e[UID_HTower])>1)and(uid_e[uidi]>1)then exit;
+UID_HTower        : if((uid_e[uidi]-uid_e[UID_HTotem])>1)then exit;
+UID_HTotem        : if((uid_e[uidi]-uid_e[UID_HTower])>1)then exit;
       end;
 
      case uidi of
@@ -1161,7 +1162,7 @@ UID_Pain       : begin
                if (base_1r<aiu_alarm_d)
                and(aiu_alarm_d<base_1rh)then _unit_sability(pu);
                end;
-UID_ArchVile   : ai_RunFromEnemy(pu,base_1r);
+//UID_ArchVile   : ai_RunFromEnemy(pu,base_1r);
 UID_SiegeMarine,
 UID_ZSiegeMarine,
 UID_Tank,

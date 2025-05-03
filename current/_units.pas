@@ -592,26 +592,20 @@ begin
    case priorset of
 wtp_building         : incPrio(    _ukbuilding   );
 wtp_BuildingHeavy    : begin
-                       incPrio(    _ukbuilding   );
-                       incPrio(not _uklight      );
-                       incPrio(not iscomplete    );
-                       end;
-wtp_UnitLightBio     : begin
-                       incPrio(not _ukbuilding   );
-                       incPrio(    _uklight      );
-                       incPrio(not _ukmech       );
+                       incPrio((   _ukbuilding  )
+                            and(not _uklight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitBioLight     : begin
-                       incPrio(not _ukbuilding   );
-                       incPrio(not _ukmech       );
-                       incPrio(    _uklight      );
+                       incPrio((not _ukbuilding )
+                            and(not _ukmech     )
+                            and(    _uklight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitBioHeavy     : begin
-                       incPrio(not _ukbuilding   );
-                       incPrio(not _ukmech       );
-                       incPrio(not _uklight      );
+                       incPrio((not _ukbuilding )
+                            and(not _ukmech     )
+                            and(not _uklight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitMech         : begin
@@ -630,17 +624,16 @@ wtp_Bio              : begin
                        end;
 wtp_Light            : incPrio(    _uklight      );
 wtp_GroundLight      : begin
-                       incPrio(    _uklight      );
-                       incPrio(not ukfly         );
+                       incPrio((    _uklight    )
+                            and(not ukfly       ));
                        incPrio(_genergy        >0);
                        end;
 wtp_Fly              : begin
                        incPrio(     ukfly        );
-                       incPrio(uidi<>UID_LostSoul);
                        incPrio(not iscomplete    );
                        end;
-wtp_nolost_hits      : incPrio(uidi<>UID_LostSoul);
-wtp_UnitLight       : begin
+wtp_nolost_hits      : ;
+wtp_UnitLight        : begin
                        incPrio(not _ukbuilding   );
                        incPrio(    _uklight      );
                        incPrio(not iscomplete    );
@@ -654,6 +647,9 @@ wtp_Scout            : begin
                        _unitWeaponPriority+=speed;
                        end;
    end;
+   with tu^  do
+   with uid^ do
+   incPrio((uidi<>UID_LostSoul)and(uidi<>UID_Phantom));
    incPrio(highprio);
 end;
 
@@ -866,7 +862,7 @@ uab_Teleport      : swtarget:=true;
                  if(tu^.solid)and(ukfly=tu^.ukfly)then _unit_push(pu,tu,uds);
 
                if(swtarget)then
-                if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)then
+                if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)and(tu^.iscomplete)then
                  if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=puo^.uo_tar))
                  or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))
                  then uo_tar:=tu^.unum;
@@ -1543,7 +1539,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not _IsUnitRange(tu^.transport,nil))then
-              if((G_Step mod fr_fpsd3)=0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+              if((G_Step mod fr_fpsd3)=0)then _effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((G_Step mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;

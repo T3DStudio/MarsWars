@@ -338,7 +338,8 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
            or(amtype=lmt_game_end)then
            begin
               ui_tab:=3;
-              UIPlayer:=0;
+              rpls_fog:=false;
+              //UIPlayer:=0;
            end;
       end;
       {$ENDIF}

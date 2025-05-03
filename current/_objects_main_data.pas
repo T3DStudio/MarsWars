@@ -298,7 +298,7 @@ begin
 end;
 UID_HTotem:
 begin
-   _mhits     := 3000;
+   _mhits     := 4000;
    _renergy   := 400;
    _r         := 20;
    _srange    := 300;
@@ -313,7 +313,8 @@ begin
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
    _rebuild_uid :=UID_HTower;
-   _weapon(0,wpt_missle,aw_fsr+50,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
+   _a_BonusAntiUnitRange:=50;
+   _weapon(0,wpt_missle,aw_fsr,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_hits,0,0);
 end;
 UID_HEye:
 begin
@@ -369,7 +370,7 @@ begin
    _mhits     := 1500;
    _renergy   := 300;
    _r         := 14;
-   _speed     := 20;
+   _speed     := 16;
    _srange    := 200;
    _ucl       := 1;
    _transportS:= 2;
@@ -456,7 +457,7 @@ begin
    _mhits     := 15000;
    _renergy   := 1200;
    _r         := 35;
-   _speed     := 12;
+   _speed     := 14;
    _srange    := 300;
    _ucl       := 5;
    _painc     := 10;
@@ -484,7 +485,7 @@ begin
    _mhits     := 15000;
    _renergy   := 1200;
    _r         := 20;
-   _speed     := 12;
+   _speed     := 14;
    _srange    := 275;
    _ucl       := 6;
    _painc     := 10;
@@ -586,7 +587,7 @@ begin
 end;
 UID_Archvile:
 begin
-   _mhits     := 4000;
+   _mhits     := 5000;
    _renergy   := 700;
    _r         := 14;
    _speed     := 16;
@@ -598,8 +599,10 @@ begin
    _ruid1     := UID_HMonastery;
    _limituse  := ul4;
    _attack    := atm_always;
-   _weapon(0,wpt_resurect,aw_dmelee ,0,3  ,fr_fpsd2,0           ,0,upgr_hell_resurrect,1,0,0,wtrset_resurect         ,wpr_any           ,uids_arch_res,[             ],0,0,wtp_distance,0,0);
-   _weapon(1,wpt_missle  ,aw_fsr+100,0,0  ,fr_fps2 ,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive_units,wpr_any+wpr_avis  ,uids_all     ,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
+   _uklight   := true;
+   _a_BonusAntiUnitRange:=50;
+   _weapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsd2,0           ,0,upgr_hell_resurrect,1,0,0,wtrset_resurect   ,wpr_any           ,uids_arch_res,[             ],0,0,wtp_distance,0,0);
+   _weapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2 ,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive,wpr_any+wpr_avis  ,uids_all     ,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
 end;
 
 UID_Phantom,
@@ -1482,7 +1485,7 @@ MID_Flyer          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
-MID_ArchFire       : mid_base_damage :=BaseDamage8;
+MID_ArchFire       : mid_base_damage :=BaseDamage6;
 MID_Mine           : mid_base_damage :=BaseDamage10;
 MID_Blizzard       : mid_base_damage :=BaseDamage10*2;
 end;
