@@ -274,7 +274,7 @@ begin
    _ruid3     := UID_HFortress;
    _baseregen := BaseArmorBonus1;
    _ukbuilding:= true;
-   _ability      := uab_HInvulnerability;
+   _ability   := uab_HInvulnerability;
 end;
 
 UID_HTower:
@@ -298,7 +298,7 @@ begin
 end;
 UID_HTotem:
 begin
-   _mhits     := 4000;
+   _mhits     := 3000;
    _renergy   := 400;
    _r         := 20;
    _srange    := 300;
@@ -376,10 +376,8 @@ begin
    _transportS:= 2;
    _painc     := 8;
    _btime     := ptime1;
-   //_limituse  := ul1h;
-   //_ruid1     := UID_HPools;
    _attack    := atm_always;
-   _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps2d3,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitHeavy2);
+   _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps2d3,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitBioHeavy2);
 end;
 UID_Cacodemon :
 begin

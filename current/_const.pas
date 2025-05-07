@@ -906,7 +906,7 @@ radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-mstrike_reload         = fr_fps1*ptime6;
+mstrike_reload         = fr_fps1*ptime5;
 haltar_reload          = fr_fps1*ptime6;
 
 step_build_reload      = fr_fps1*5;

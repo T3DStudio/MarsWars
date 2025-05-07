@@ -876,8 +876,8 @@ begin
      5  : ai_name:=str_ps_comp+' '+tc_yellow+b2s(ain)+tc_default;
      6  : ai_name:=str_ps_comp+' '+tc_orange+b2s(ain)+tc_default;
      7  : ai_name:=str_ps_comp+' '+tc_red   +b2s(ain)+tc_default;
-     8  : ai_name:=str_ps_comp+' '+tc_purple+b2s(ain)+tc_default;
-     else ai_name:=str_ps_comp+' '+tc_white +b2s(ain)+tc_default;
+     8  : ai_name:=str_ps_comp+' '+tc_purple+b2s(ain)+tc_default+' cheater';
+     else ai_name:=str_ps_comp+' '+tc_white +b2s(ain)+tc_default+' cheater';
      end;
      {$ELSE}
      ai_name:=str_ps_comp+' '+b2s(ain);

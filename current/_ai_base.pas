@@ -690,7 +690,8 @@ begin
                 then aiu_limitaround_ally+=tu^.uid^._limituse;
            end
            else
-             if(CheckUnitTeamVision(team,tu,ai_anyDetectors>0))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,ai_anyDetectors>0))
+             or(upgr[upgr_fog_vision]>0)then  // enemy in vision
                if(tu^.buff[ub_invuln]<=0)then
                begin
                   ai_SetCurrentAlarm(tu,0,0,ud,0);
@@ -829,7 +830,8 @@ begin
                  else _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
             end
             else
-             if(CheckUnitTeamVision(team,tu,false))then  // enemy in vision
+             if(CheckUnitTeamVision(team,tu,false))
+             or(upgr[upgr_fog_vision]>0)then  // enemy in vision
              begin
                 if(tu^.buff[ub_invuln]<=0)then
                 begin
@@ -867,7 +869,8 @@ begin
                   if((ud-_r-tu^.uid^._r)<=melee_r)then ai_PhantomWantZombieMe:=true;
              end
              else
-               if(CheckUnitTeamVision(team,tu,true))then
+               if(CheckUnitTeamVision(team,tu,true))
+               or(upgr[upgr_fog_vision]>0)then
                begin
                   // invisible enemy unit
                   if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.a_rld>0)and(tu^.buff[ub_Scaned]<=0)then

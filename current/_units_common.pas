@@ -353,7 +353,7 @@ begin
 end;
 
 procedure _teleport_CalcReload(tu:PTUnit;limit:integer);
-const seconds_per_limit = 6;
+const seconds_per_limit = 5;
 begin
    // tu - teleporter
    with tu^ do
@@ -1573,7 +1573,7 @@ begin
    with uu^ do
    begin
       if(tu^.player^.observer)
-      or((tu^.player^.upgr[upgr_fog_vision]>0)and(tu^.buff[ub_detect]<=0))
+      //or((tu^.player^.upgr[upgr_fog_vision]>0)and(tu^.buff[ub_detect]<=0))
       then td:=0
       else
         if(tu^.uid^._ability=uab_UACScan)and(tu^.rld>radar_vision_time)then

@@ -275,7 +275,7 @@ Totem of Horror
 
 Hotkey: B
 Categories/Attributes: [building,mechanical,light,ground]
-Max hits: 4000
+Max hits: 3000
 Limit used: 1
 Size: 20
 Base vision range: 300
@@ -499,7 +499,7 @@ Places in transport: 2
 
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- melee attack, targets: [alive,ground], impact 52*1.5, target priority: distance, upgrade: Claws and Teeth(+7), factor: x2 [unit,heavy];
+- melee attack, targets: [alive,ground], impact 52*1.5, target priority: distance, upgrade: Claws and Teeth(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
