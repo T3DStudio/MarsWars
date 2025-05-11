@@ -208,7 +208,7 @@ TAlignment = (ta_LU,   // |^| | |
               ta_MMR );// |  |- |
 
 // theme edge terrain style
-TThemeEdgeTerrainStyle = (tes_fog,tes_nature,tes_tech);
+TThemeEdgeTerrainStyle = (tes_fog,tes_nature,tes_tech,tes_none);
 
 ////////////////////////////////////////////////////////////////////////////////
 //

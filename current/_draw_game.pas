@@ -414,17 +414,17 @@ uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
 uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
 uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
 uinfo_text   : begin
-               draw_text(tar,x0,y0-basefont_wh,text_lt,ta_MU,255,color);
+               draw_line(tar,x0,y0-basefont_wh,text_lt,ta_MU,255,color);
                continue;
                end;
         else
         end; }
 
-      { if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
-       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+basefont_w1+4,text_lt2,ta_LU,255,c_white);
-       if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1            ,text_rt ,ta_RU,255,c_white);
-       if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1-basefont_w1,text_rd ,ta_RU,255,c_white);
-       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);   }
+      { if(length(text_lt )>0)then draw_line(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
+       if(length(text_lt2)>0)then draw_line(tar,x0+1,y0+basefont_w1+4,text_lt2,ta_LU,255,c_white);
+       if(length(text_rt )>0)then draw_line(tar,x1-1,y0+1            ,text_rt ,ta_RU,255,c_white);
+       if(length(text_rd )>0)then draw_line(tar,x1-1,y1-1-basefont_w1,text_rd ,ta_RU,255,c_white);
+       if(length(text_ld )>0)then draw_line(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);   }
     end;
 end;
 
@@ -537,16 +537,16 @@ begin
            { with map_grid[gx,gy] do
             begin
                {if(map_IsObstacleZone(tgc_parea,true ))
-               then draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_gray )
-               else draw_text(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_white);
+               then draw_line(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_gray )
+               else draw_line(tar,ssx+32,ssy+32,w2s(tgc_parea),ta_LU,255,c_white);
                if(map_IsObstacleZone(tgc_sarea,false))
-               then draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_green)
-               else draw_text(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_lime ); }
+               then draw_line(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_green)
+               else draw_line(tar,ssx+32,ssy+46,w2s(tgc_sarea),ta_LU,255,c_lime ); }
                //if(tgc_pf_solid)then UIInfoItemAddRect(mx,my,mx+MapCellw,my+MapCellw,c_red);
-               //draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_zone),ta_LU,255,c_gray );
+               //draw_line(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_zone),ta_LU,255,c_gray );
                if(tgc_pf_domain>0)then
                begin
-                  draw_text(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_domain),ta_LU,255,c_white );
+                  draw_line(tar,ssx+MapCellhw,ssy+MapCellhw,w2s(tgc_pf_domain),ta_LU,255,c_white );
                   UIInfoItemAddRect(mx+1,my+1,mx+MapCellw,my+MapCellw,c_gray);
                end;
                if(tgc_pf_solid)then
@@ -724,15 +724,15 @@ procedure _draw_dbg;
 var u,ix,iy:integer;
     c:TMWColor;
 begin
-   //draw_text(r_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_RU,255, c_white);
-   //draw_text(r_screen,750,0,i2s(spr_tdecsi), ta_RU,255, c_white);
+   //draw_line(r_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_RU,255, c_white);
+   //draw_line(r_screen,750,0,i2s(spr_tdecsi), ta_RU,255, c_white);
 
-   //draw_text(r_screen,750,0,b2pm[map_ffly] , ta_RU,255, c_white);
+   //draw_line(r_screen,750,0,b2pm[map_ffly] , ta_RU,255, c_white);
 
   { with g_players[PlayerClient] do
    begin
-      draw_text(r_screen,vid_panel_pw,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
-      draw_text(r_screen,vid_panel_pw,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
+      draw_line(r_screen,vid_panel_pw,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
+      draw_line(r_screen,vid_panel_pw,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
    end;       }
 
    {ix:=-vid_cam_x+vid_mapx;
@@ -757,16 +757,16 @@ begin
 
      //  c:=PlayerColorNormal[u];
 
-       //draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
+       //draw_line(r_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
 
-      // draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
+      // draw_line(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
 
-       //draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
-       //draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
+       //draw_line(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
+       //draw_line(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
 
 
-      // for iy:=0 to 8  do draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
-      // for iy:=0 to 11 do draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
+      // for iy:=0 to 8  do draw_line(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
+      // for iy:=0 to 11 do draw_line(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
     end;
 
    if(input_Check(iAct_control,tis_Pressed))then
@@ -779,7 +779,7 @@ begin
         ix:=x-vid_cam_x+ui_MapView_x;
         iy:=y-vid_cam_y+ui_MapView_y;
 
-        //draw_text(r_screen,ix,iy,i2s(anim), ta_LU,255, PlayerGetColor(playeri));
+        //draw_line(r_screen,ix,iy,i2s(anim), ta_LU,255, PlayerGetColor(playeri));
 
         if(hits>0)then
         //if(k_shift>1)then
@@ -806,18 +806,18 @@ begin
 
            end;
 
-           {draw_text(r_screen,ix,iy   ,i2s(u)              , ta_LU,255, PlayerColorNormal[playeri]);
-           draw_text(r_screen,ix,iy+10,i2s(hits)           , ta_LU,255, PlayerColorNormal[playeri]);
-           draw_text(r_screen,ix,iy+20,w2s(zone)           , ta_LU,255, PlayerColorNormal[playeri]);
-           draw_text(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorNormal[playeri]);  }
+           {draw_line(r_screen,ix,iy   ,i2s(u)              , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_line(r_screen,ix,iy+10,i2s(hits)           , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_line(r_screen,ix,iy+20,w2s(zone)           , ta_LU,255, PlayerColorNormal[playeri]);
+           draw_line(r_screen,ix,iy+30,str_b2c[isbuildarea], ta_LU,255, PlayerColorNormal[playeri]);  }
 
 
-           //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
+           //draw_line(r_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
            //isbuildarea
-//           draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
+//           draw_line(r_screen,ix,iy+40,i2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
 
 
-           //draw_text(r_screen,ix,iy+20,b2pm[iscomplete], ta_LU,255, PlayerGetColor(playeri));
+           //draw_line(r_screen,ix,iy+20,b2pm[iscomplete], ta_LU,255, PlayerGetColor(playeri));
 
         end;
 
@@ -838,19 +838,19 @@ begin
             lineColor(r_screen,ix,iy,uo_x-vid_cam_x,uo_y-vid_cam_y,c_white);
         end;
 
-        draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_LU,255, PlayerGetColor(playeri));}
+        draw_line(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_LU,255, PlayerGetColor(playeri));}
 
         if(transport>0)then continue;
 
         if(hits>0){and(uidi=UID_URMStation)}then
         begin
-           //draw_text(r_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_LU,255, plcolor[player]);
+           //draw_line(r_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_LU,255, plcolor[player]);
 
            //if(tar1>0)then lineColor(r_screen,ix,iy,g_units[tar1].x-vid_cam_x,g_units[tar1].y-vid_cam_y,c_white);
             //lineColor(r_screen,ix+10,iy+10,uo_x-vid_cam_x,uo_y-vid_cam_y,c_white);  and(player=PlayerClient)
         end;
 
-         //draw_text(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
+         //draw_line(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
          //if(isselected)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
          //if(alrm_r<=0)then
          //
@@ -862,7 +862,7 @@ begin
            if(alrm_x<>0)then
 
 
-        draw_text(r_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_LU,255, plcolor[player]);// }
+        draw_line(r_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_LU,255, plcolor[player]);// }
 
         //if(isselected)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
      end;
@@ -876,7 +876,7 @@ begin
       iy:=vy-vid_cam_y+ui_MapView_y;
 
       circleColor(r_screen,ix,iy,5,c_lime);
-      draw_text(r_screen,ix,iy,i2s(dir), ta_LU,255, c_white);
+      draw_line(r_screen,ix,iy,i2s(dir), ta_LU,255, c_white);
    end;  }
 
    {for u:=0 to 255 do
@@ -885,7 +885,7 @@ begin
        ix:=ordx[u]-vid_cam_x;
        iy:=ordy[u]-vid_cam_y;
 
-       draw_text(r_screen,ix,iy,i2s(u), ta_LU,255, c_white);
+       draw_line(r_screen,ix,iy,i2s(u), ta_LU,255, c_white);
     end; }
 end;
 
@@ -902,7 +902,7 @@ begin
            draw_mwtexture1(x,0,sm_list[i-1],1,1);
            x+=w;
         end;
-      draw_text(0,48,i2s(sm_listn), ta_LU,255, 0);
+      draw_line(0,48,i2s(sm_listn), ta_LU,255, 0);
    end;
 end;
 

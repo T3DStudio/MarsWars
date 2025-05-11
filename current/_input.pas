@@ -44,6 +44,7 @@ begin
    input_SetAction(iAct_control   ,0           ,ikt_keyboard,SDLK_LCtrl       );
    input_SetAction(iAct_alt       ,0           ,ikt_keyboard,SDLK_LALt        );
    input_SetAction(iAct_shift     ,0           ,ikt_keyboard,SDLK_LShift      );
+   input_SetAction(iAct_ScreenShot,0           ,ikt_keyboard,SDLK_PrintScreen );
 
    input_SetAction(iAct_LastEvent ,0           ,ikt_keyboard,SDLK_SPACE       );
 
@@ -182,23 +183,7 @@ begin
       net_chat_tar:=MakeChatTargets(ingame_chat,PlayerClient);
    end
    else ;
-    {if(menu_item=100)or(ingame_chat>0)then //menu chat   ?????????????
-    begin
-       if(menu_state)then
-       begin
-          ingame_chat :=chat_all;
-          net_chat_tar:=255;
-       end;
 
-       if(length(net_chat_str)>0)and(net_chat_tar>0)then
-       begin
-          if(net_status=ns_client)
-          then net_send_chat(             net_chat_tar,net_chat_str )
-          else GameLogChat  (PlayerClient,net_chat_tar,net_chat_str,false);
-       end;
-       net_chat_str:='';
-       ingame_chat :=0;
-    end;}
 end;
 
 procedure GameTogglePause;
@@ -967,6 +952,7 @@ begin
                            SDL_WINDOWEVENT_FOCUS_GAINED,
                            SDL_WINDOWEVENT_FOCUS_LOST    : ;//clear_keys:=true;
                            SDL_WINDOWEVENT_RESIZED       : begin
+                                                           if(menu_state)then menu_redraw:=true;
                                                            //vid_window_w:=sys_event^.window.data1;
                                                            //vid_window_h:=sys_event^.window.data2;
                                                            //MakeScreenShot_CalcSize(vid_window_w:=sys_event^.window.data1,vid_window_h);
@@ -998,15 +984,9 @@ begin
                               km_mouse_m  : if(kt_mmiddle=0)then kt_mmiddle:=1;
                               {km_mouse_wd : if(menu_state)then
                                             begin
-                                               if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , 1,0,svld_list_size    -menu_saveload_listh ,false);
-                                               if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , 1,0,rpls_list_size    -menu_replays_listh  ,false);
-                                               if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, 1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                             end;
                               km_mouse_wu : if(menu_state)then
                                             begin
-                                               if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-1,0,svld_list_size    -menu_saveload_listh ,false);
-                                               if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-1,0,rpls_list_size    -menu_replays_listh  ,false);
-                                               if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-1,0,net_svsearch_listn-menu_netsearch_listh,false);
                                             end;  }
                               else
                               end;  }
@@ -1239,7 +1219,17 @@ procedure InputGame;
 begin
    WindowEvents;
 
-   //if(input_Check(iAct_up,tis_NPressed))then dtest;
+   // common input
+   if(input_Check(iAct_ScreenShot,tis_NReleased))then
+   begin
+      MakeScreenShot;
+      exit;
+   end;
+   if(input_Check(iAct_esc,tis_NPressed))then
+   begin
+      menu_Toggle;
+      exit;
+   end;
 
    if(menu_state)then
    begin

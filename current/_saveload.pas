@@ -62,25 +62,27 @@ begin
             BlockRead(f,dbyte   ,sizeof(PlayerClient  ));
 
             BlockRead(f,dplayers,SizeOf(TPList        ));
-            svld_str_info3+=tc_nl2+str_SpaceSize(str_menu_players,PlayerNameLen+5)
-                                  +str_SpaceSize(str_menu_race   ,9)
-                                                +str_menu_team+tc_nl2;
+            svld_str_info2+=tc_nl2+tc_nl2
+                            +str_SpaceSize(str_menu_players,PlayerNameLen+3)
+                            +str_SpaceSize(str_menu_race   ,8)
+                                          +str_menu_team+tc_nl2;
 
             for i:=0 to LastPlayer do
             begin
                if(i=dbyte)
-               then svld_str_info3+=chr(i)+' * '+tc_default
-               else svld_str_info3+=chr(i)+' # '+tc_default;
+               then svld_str_info3+=chr(i)+'*'+tc_default
+               else svld_str_info3+=chr(i)+'#'+tc_default;
 
                if(dplayers[i].player_type=pt_none)
                then svld_str_info3+=str_SpaceSize(str_pt_none     ,PlayerNameLen+2)
                else svld_str_info3+=str_SpaceSize(dplayers[i].name,PlayerNameLen+2);
 
                if(dplayers[i].isobserver)
-               then svld_str_info3+=str_SpaceSize(str_observer                    ,9)+tc_default
-               else svld_str_info3+=str_SpaceSize(str_racel[dplayers[i].slot_race],9)+tc_default;
+               then svld_str_info3+=str_SpaceSize(str_observer                    ,8)+tc_default
+               else svld_str_info3+=str_SpaceSize(str_racel[dplayers[i].slot_race],8)+tc_default;
 
-               svld_str_info3+=t2c(dplayers[i].team)+tc_nl2;
+               if(not dplayers[i].isobserver)
+               then svld_str_info3+=b2s(dplayers[i].team+1)+tc_nl2;
             end;
          end;
       end
@@ -144,7 +146,8 @@ begin
     until(FindNext(info)<>0);
    FindClose(info);
 
-   svld_list_sel:=-1;
+   if(svld_list_size>0)then
+     svld_list_sel:=mm3i(0,svld_list_sel,svld_list_size-1);
    saveload_Select;
 end;
 
@@ -209,7 +212,6 @@ begin
    AddItem(@theme_cur_tile_terrain_id ,SizeOf(theme_cur_tile_terrain_id ));
    AddItem(@theme_cur_tile_crater_id  ,SizeOf(theme_cur_tile_crater_id  ));
    AddItem(@theme_cur_tile_liquid_id  ,SizeOf(theme_cur_tile_liquid_id  ));
-   AddItem(@theme_cur_tile_teleport_id,SizeOf(theme_cur_tile_liquid_id  ));
 end;
 
 function saveload_Save(Check:boolean):boolean;

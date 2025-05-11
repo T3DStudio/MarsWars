@@ -20,8 +20,7 @@ var
 theme,
 terrain,
 crater,
-liquid,
-teleport: integer;
+liquid  : integer;
 mseed   : cardinal;
 function Pick(n:integer):integer;
 var c:cardinal;
@@ -41,24 +40,21 @@ begin
    theme_cur_tile_terrain_id :=-1;
    theme_cur_tile_crater_id  :=-1;
    theme_cur_tile_liquid_id  :=-1;
-   theme_cur_tile_teleport_id:=-1;
 
    // theme
    mseed  :=map_seed;
    theme  :=Pick(theme_n);
-   //SetTheme(theme);
+   SetTheme(theme);
 
    terrain :=Pick(theme_cur_terrain_n );
    crater  :=Pick(theme_cur_crater_n  );
    liquid  :=Pick(theme_cur_liquid_n  );
-   teleport:=Pick(theme_cur_teleport_n);
 
    if(terrain >=0)then theme_cur_tile_terrain_id :=theme_cur_terrain_l [terrain ];
    if(crater  >=0)then theme_cur_tile_crater_id  :=theme_cur_crater_l  [crater  ];
    if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
-   if(teleport>=0)then theme_cur_tile_teleport_id:=theme_cur_teleport_l[teleport];
 
-   //SetThemeTES;
+   SetThemeTES;
 end;
 
 procedure map_VisGridMake;
@@ -135,6 +131,8 @@ begin
 end;
 
 begin
+   draw_LoadingScreen(str_map_Proc4VisGrid,c_white);
+
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
    with map_grid_graph[x,y] do
@@ -348,6 +346,9 @@ end;
 procedure map_ZonesMake;
 var x,y:integer;
 begin
+   {$IFDEF _FULLGAME}
+   draw_LoadingScreen(str_map_Proc1Zones,c_white);
+   {$ENDIF}
    map_gridZone_n:=0;
    for x:=0 to MaxMapSizeCelln-1 do
    for y:=0 to MaxMapSizeCelln-1 do
@@ -392,6 +393,9 @@ begin
        end;
 end;
 begin
+   {$IFDEF _FULLGAME}
+   draw_LoadingScreen(str_map_Proc2Solid,c_white);
+   {$ENDIF}
    for x:=0 to map_csize do
    for y:=0 to map_csize do
      with map_grid[x,y] do
@@ -869,6 +873,9 @@ procedure map_pf_MakeDomains;
 var
 time:cardinal;
 begin
+   {$IFDEF _FULLGAME}
+   draw_LoadingScreen(str_map_Proc3Domains,c_white);
+   {$ENDIF}
    // clear domains
    time:=sdl_GetTicks;
    map_pf_DomainsClear;
@@ -1499,6 +1506,8 @@ begin
    map_ThemeFromSeed;
    map_MinimapBackground;
    map_RedrawMenuMinimap;
+
+   gfx_MakeThemeTiles;
    {$ENDIF}
 end;
 
@@ -1509,7 +1518,7 @@ begin
    map_pf_MakeDomains;
    map_CPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
-   //gfx_MakeThemeTiles;
+   gfx_MakeThemeTiles;
    map_VisGridMake;
    uids_RecalcMMR;
    {$ENDIF}

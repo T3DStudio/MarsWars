@@ -1,6 +1,6 @@
 
 
-procedure gfx_LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;transparent00:boolean);
+procedure gfx_LoadTMWTextureList(MWTextureList:PTMWTextureList;MWTextureList_n:pinteger;fname:shortstring;transparent00:boolean;letSDLSurface:boolean=false);
 var
 tmpMWtext:pTMWTexture;
         i:integer;
@@ -10,7 +10,7 @@ begin
    i:=0;
    while true do
    begin
-      tmpMWtext:=gfx_MWTextureLoad(fname+i2s(i),transparent00,false);
+      tmpMWtext:=gfx_MWTextureLoad(fname+i2s(i),transparent00,false,letSDLSurface);
       if(tmpMWtext=ptex_dummy)then break;
       next;
       i+=1;
@@ -176,7 +176,7 @@ begin
    // load graph
    gfx_LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,'map\decals\adt'  ,true );
    gfx_LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,'map\decors\dec_' ,true );
-   gfx_LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,'map\terrains\ter',false);
+   gfx_LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,'map\terrains\ter',false,true);
 
    // animation and effects
    setlength(theme_anm_decors  ,theme_all_decor_n );

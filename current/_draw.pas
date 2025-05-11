@@ -144,7 +144,7 @@ begin
       //draw_surf(r_screen,x,y,tileSet^[tileX].apidata);
 
       draw_set_fontS(font_Base,1);
-      draw_text(x,y,w2s(tileX),ta_LU,255,0);
+      draw_line(x,y,w2s(tileX),ta_LU,255,0);
       x+=tileSet^[tileX]^.w+2;
 
       lineN-=1;
@@ -178,7 +178,7 @@ begin
    draw_line(0,0,500,500);      }
 
    draw_set_color(c_yellow);
-   draw_text(50,50,'ABCDabcd 123456789 $#^$ .   !',ta_LU,255,c_green);
+   draw_line(50,50,'ABCDabcd 123456789 $#^$ .   !',ta_LU,255,c_green);
    draw_mwtexture1(500,300,@tex_ui_MiniMap,1,1);
    draw_mwtexture1(0,0,@spr_mlogo,1,1);
    spr_mlogo
@@ -212,6 +212,8 @@ begin
      if(G_Started)
      then d_Game;
 
+   draw_DebugTileSet(theme_tileset_liquid[(SDL_GetTicks div 1000) mod theme_anim_step_n]);
+
    draw_mwtexture1(mouse_x,mouse_y,spr_cursor,1,1);
 
    //_drawMWSModel(@spr_HCommandCenter1);
@@ -239,7 +241,7 @@ begin
        n:=i*48;
        draw_surf(r_screen,n,y,theme_all_decor_l[theme_cur_decor_l[i]].apidata);
     end;
-   draw_text(r_screen,0,0,i2s(theme_cur_decor_n),ta_LU,255,c_white); }
+   draw_line(r_screen,0,0,i2s(theme_cur_decor_n),ta_LU,255,c_white); }
 
   { n:=0;
    y:=0;
@@ -248,7 +250,7 @@ begin
      begin
         draw_surf(r_screen,n,y,theme_all_terrain_l[i].apidata);
         boxColor (r_screen,n,y,n+16,y+16,theme_all_terrain_mmcolor[i]);
-        draw_text(r_screen,n,y+16,i2s(i),ta_LU,255,c_white);
+        draw_line(r_screen,n,y+16,i2s(i),ta_LU,255,c_white);
 
         n+=theme_all_terrain_l[i].w;
         if((n+theme_all_terrain_l[i].w)>=vid_vw)then
@@ -275,7 +277,7 @@ begin
    if(G_Started)then
    begin
 
-   {draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
+   {draw_line(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div MapCellW)+
@@ -294,12 +296,12 @@ begin
    //' '+tc_lime+i2s(dist2mgcellC(mouse_map_x,mouse_map_y,1,1))
    '',ta_RU,255, c_white);  }
 
-   {draw_text(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,
+   {draw_line(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,
        i2s(m_panelBtn_x)+
    ' '+i2s(m_panelBtn_y),
    ta_RU,255, c_white);    }
 
-  { draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
+  { draw_line(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
        i2s(rpls_rstate)+
    ' '+i2s(rpls_fstate),
    ta_RU,255, c_white)   }
@@ -308,7 +310,7 @@ begin
    end;
    //draw_DebugTileSet(@vid_fog_tiles);
 
-   SDL_RenderPresent(vid_renderer);
+   SDL_RenderPresent(vid_SDLRenderer);
 end;
 
 

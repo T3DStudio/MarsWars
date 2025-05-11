@@ -171,20 +171,20 @@ test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
 sys_fog           : boolean = false;
 
-vid_window        : pSDL_Window;
-vid_renderer      : pSDL_Renderer;
+vid_SDLWindow     : pSDL_Window;
+vid_SDLRenderer   : pSDL_Renderer;
 
-{r_ui_Panel,
-r_ui_MiniMap,
-r_empty,
-r_bminimap,
-r_gminimap,
-r_mminimap,
-r_screen,
-r_menu            : pSDL_SURFACE;  }
-//r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
+vid_SDLRendererName: shortstring = '';
+vid_SDLRendererNameConfig
+                   : shortstring = '';
+vid_SDLRenderersN : integer = 0;
+vid_SDLRendererI  : integer = -1;
 
-vid_RECT          : pSDL_RECT;
+vid_SDLRect       : pSDL_RECT;
+
+vid_SDLDisplayModeN: integer = 0;
+vid_SDLDisplayModes: array of TSDL_DisplayMode;
+vid_SDLDisplayModeC: TSDL_DisplayMode;
 
 vid_blink1_colorb,
 vid_blink2_colorb : boolean;
@@ -197,10 +197,6 @@ vid_blink3          : byte;
 vid_TileTemplate_crater_tech,
 vid_TileTemplate_crater_nature: pTMWTileSet;
 vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of pTMWTileSet;
-
-vid_game_w        : integer = vid_minw;
-vid_game_h        : integer = vid_minh;
-vid_game_fres     : boolean = false;
 
 vid_vw            : integer = vid_minw;       // window size
 vid_vhw           : integer = vid_minw div 2;
@@ -230,7 +226,8 @@ vid_PanelUpdNow   : boolean = false;
 
 vid_CamSpeed      : integer = 25;             // options
 vid_UnitHealthBars: TUIUnitHBarsOption  = low(TUIUnitHBarsOption);
-vid_PlayersColorSchema: TPlayersColorSchema = low(TPlayersColorSchema);
+vid_PlayersColorSchema
+                  : TPlayersColorSchema = low(TPlayersColorSchema);
 vid_APM           : boolean = false;
 vid_FPS           : boolean = false;
 vid_CamMSEScroll  : boolean = false;
@@ -254,17 +251,23 @@ menu_remake       : boolean = false;
 menu_redraw       : boolean = false;
 menu_item         : integer;
 menu_items        : array[byte] of TMenuItem;
-menu_res_w,
-menu_res_h,
+menu_tex_cx       : single = 1;
+menu_tex_x,
+menu_tex_y,
+menu_tex_w,
+menu_tex_h,
+menu_vid_vw,
+menu_vid_vh,
 menu_list_n,
+menu_list_pselected,
 menu_list_selected,
 menu_list_current,
 menu_list_x,
 menu_list_y,
-menu_list_font,
 menu_list_item_h,
 menu_list_item_hh,
 menu_list_w       : integer;
+menu_list_fontS   : single = 1;
 menu_list_items   : array of TMenuListItem;
 menu_list_aleft   : boolean = false;
 
@@ -643,6 +646,7 @@ c_dgray,
 c_purple,
 c_lpurple,
 c_dpurple,
+c_none,
 c_black           : TMWColor;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -654,6 +658,9 @@ theme_cur                 : integer = 0;
 
 theme_anm_decors          : TThemeDecorAnimL;
 
+theme_tile_terrain,
+theme_tile_crater,
+theme_tile_liquid         : pTMWTexture;
 {theme_tile_terrain        : pTMWTexture = nil;
 theme_tile_crater         : pTMWTexture = nil;
 theme_tile_liquid         : pTMWTexture = nil;
@@ -665,14 +672,13 @@ theme_tileset_liquid      : array[0..theme_anim_step_n-1] of pTMWTileSet;
 // CURRENT THEME SETTINGS
 
 // previous/current
-theme_last_crater_tes     : byte = 255;
-theme_last_liquid_tes     : byte = 255;
+theme_last_crater_tes     : TThemeEdgeTerrainStyle = tes_none;
+theme_last_liquid_tes     : TThemeEdgeTerrainStyle = tes_none;
 theme_last_liquid_tas     : byte = 255;
 
 theme_last_tile_terrain_id: integer = -1;
 theme_last_tile_crater_id : integer = -1;
 theme_last_tile_liquid_id : integer = -1;
-theme_last_tile_teleport_id:integer = -1;
 
 // current/new
 theme_cur_crater_tes      : TThemeEdgeTerrainStyle = tes_nature; // theme liquid edge style
@@ -683,8 +689,7 @@ theme_cur_liquid_mmcolor  : cardinal = 0;      // theme liquid minimap color
 
 theme_cur_tile_terrain_id,
 theme_cur_tile_crater_id,
-theme_cur_tile_liquid_id,
-theme_cur_tile_teleport_id: integer;
+theme_cur_tile_liquid_id  : integer;
 
 theme_cur_decal_l,
 theme_cur_decor_l,
@@ -932,6 +937,10 @@ str_map_type,
 str_map_size,
 str_map_sym,
 str_map_random,
+str_map_Proc1Zones,
+str_map_Proc2Solid,
+str_map_Proc3Domains,
+str_map_Proc4VisGrid,
 
 str_ptype_AI,
 str_ptype_cheater      : shortstring;
@@ -981,6 +990,8 @@ str_menu_ResolutionWidth,
 str_menu_ResolutionHeight,
 str_menu_Apply,
 str_menu_fullscreen,
+str_menu_SDLRenderer,
+str_menu_RestartReq,
 
 str_menu_NextTrack,
 str_menu_SoundVolume,

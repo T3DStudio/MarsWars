@@ -3,6 +3,7 @@ program T3D_RTS;
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
+
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE DTEST}
@@ -36,7 +37,7 @@ uses SysUtils,crt,SDL2,SDL2_Net
         {$include _lang.pas}
         {$include _config.pas}
         {$include _sprite_model.pas}
-        {$include _draw_com.pas}
+        {$include _draw_basic.pas}
         {$include _draw_menu.pas}
         {$include _draw_ui.pas}
         {$include _draw_game.pas}

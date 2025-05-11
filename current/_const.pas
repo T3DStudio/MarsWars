@@ -138,8 +138,8 @@ MaxCPoints             = MaxPlayer*2+(MaxPlayer div 2);
 MapCellW               = 88;
 MapCellhW              = MapCellW div 2;
 MapSizeCellnStep       = 4;
-MinMapSizeCelln        = 16;
-MaxMapSizeCelln        = 96;
+MinMapSizeCelln        = MapSizeCellnStep*7;
+MaxMapSizeCelln        = MapSizeCellnStep*24;
 
 MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
 MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
@@ -1099,9 +1099,6 @@ vid_minh               = 600;
 vid_maxw               = 1440;
 vid_maxh               = 1080;
 
-vid_rw_list            : array[0..7] of integer = (vid_minw,960,1024,1280,1360,1366,1400,vid_maxw);
-vid_rh_list            : array[0..7] of integer = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
-
 vid_MaxScreenSprites   = 1000; // max vis sprites;
 vid_blink_persecond    = 6;
 vid_blink_period1      = fr_fps1  div vid_blink_persecond;
@@ -1144,6 +1141,9 @@ ui_ubtns               = 23;
 menu_w                 = 1024;
 menu_h                 = 768;
 
+menu_hw                = menu_w div 2;
+menu_hh                = menu_h div 2;
+
 menu_logo_h            = 96;
 
 menu_main_mp_bw1       = 300;
@@ -1174,6 +1174,8 @@ menu_replays_listh     = 16;
 
 menu_saveload_lineh    = menu_main_mp_bhh;
 menu_saveload_listh    = 16;
+
+mwscroll_speed         = 5;
 
 ////////////////////////   menu pages
 
@@ -1250,11 +1252,11 @@ mi_settings_Client        = 70;
 mi_settings_ClientQuality = 71;
 
 ////  SETTINGS VIDEO LINES
-mi_settings_ResWidth      = 81;
-mi_settings_ResHeight     = 82;
-mi_settings_ResApply      = 83;
+mi_settings_Resolution    = 81;
+mi_settings_ResApply      = 82;
 mi_settings_Fullscreen    = 84;
-mi_settings_ShowFPS       = 85;
+mi_settings_SDLRenderer   = 85;
+mi_settings_ShowFPS       = 86;
 
 ////  SETTINGS SOUND LINES
 mi_settings_SoundVol      = 91;
@@ -1491,6 +1493,7 @@ iAct_return            = 11;
 iAct_control           = 12;
 iAct_alt               = 13;
 iAct_shift             = 14;
+iAct_ScreenShot        = 15;
 
 iAct_LastEvent         = 17;
 
@@ -1581,6 +1584,7 @@ iAct_Prod21            = 131;
 iAct_Prod22            = 132;
 iAct_Prod23            = 133;
 iAct_Prod24            = 134;
+
 
 k_LastCharStuckDealy   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;

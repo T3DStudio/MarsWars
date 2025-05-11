@@ -1375,24 +1375,24 @@ begin
    dcard:=0;
 
    // TIME
-   BlockRead(f,dcard,SizeOf(G_Step       ));str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+str_GStep2Time(dcard)+tc_nl2+tc_nl2+str_menu_map+tc_nl2+' ';
+   BlockRead(f,dcard,SizeOf(G_Step      )); str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+str_GStep2Time(dcard)+tc_nl2+str_menu_map+tc_nl2+' ';
 
    // MAP info
-   BlockRead(f,dcard,SizeOf(map_seed     ));str_info1^+=str_SpaceSize(str_map_seed+dots,12)+c2s(dcard)+tc_nl2+' ';
-   BlockRead(f,dint ,SizeOf(map_psize     ));
+   BlockRead(f,dcard,SizeOf(map_seed    )); str_info1^+=str_SpaceSize(str_map_seed+dots,12)+c2s(dcard)+tc_nl2+' ';
+   BlockRead(f,dint ,SizeOf(map_psize   ));
    if(dint<MinMapSize)or(MaxMapSize<dint)
                                  then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
                                  else       str_info1^+=str_SpaceSize(str_map_size+dots,12)+i2s(dint)+tc_nl2+' ';
 
-   BlockRead(f,dbyte,SizeOf(map_type     ));
+   BlockRead(f,dbyte,SizeOf(map_type    ));
    if(dbyte>gms_m_types         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
                                  else       str_info1^+=str_SpaceSize(str_map_type+dots,12)+str_map_typel[dbyte]+tc_default+tc_nl2+' ';
 
-   BlockRead(f,dbyte,SizeOf(map_symmetry ));
+   BlockRead(f,dbyte,SizeOf(map_symmetry));
    if(dbyte>gms_m_symm          )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
                                  else       str_info1^+=str_SpaceSize(str_map_sym +dots,12)+str_map_syml[dbyte]+tc_nl2+' ';
 
-   BlockRead(f,dint ,SizeOf(theme_cur    ));
+   BlockRead(f,dint ,SizeOf(theme_cur   ));
    if(dint<0)or(dint>=theme_n   )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
                                  else       str_info1^+=theme_name[dint];
 

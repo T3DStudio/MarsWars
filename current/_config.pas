@@ -28,6 +28,8 @@ cfg_key_HealthBars     = 'vid_health_bars';
 cfg_key_ColorScheme    = 'vid_player_colors';
 cfg_key_APM            = 'vid_APM';
 cfg_key_FPS            = 'vid_FPS';
+cfg_key_Renderer       = 'vid_SDLRenderer';
+
 
 
 // snd_PlayListSize
@@ -61,7 +63,7 @@ cfg_key_VidHeight     : vid_vh                := vli;
 cfg_key_g_FixedPos    : g_fixed_positions     :=(vl=str_b2c[true]);
 cfg_key_g_AISlots     : g_ai_slots            := vlw;
 cfg_key_g_Generators  : g_generators          := vlw;
-cfg_key_ReplayName    : rpls_str_prefix         := vl;
+cfg_key_ReplayName    : rpls_str_prefix       := vl;
 cfg_key_ReplayRecord  : rpls_Recording        :=(vl=str_b2c[true]);
 cfg_key_ReplayQuality : rpls_Quality          := vlw;
 cfg_key_ClientQuality : net_Quality           := vlw;
@@ -71,6 +73,8 @@ cfg_key_HealthBars    : vid_UnitHealthBars    := enum_val2TUIUnitHBarsOption (vl
 cfg_key_ColorScheme   : vid_PlayersColorSchema:= enum_val2TPlayersColorSchema(vli);
 cfg_key_APM           : vid_APM               :=(vl=str_b2c[true]);
 cfg_key_FPS           : vid_FPS               :=(vl=str_b2c[true]);
+cfg_key_Renderer      : if(length(vid_SDLRendererName)=0)
+                   then vid_SDLRendererName   :=vl;
    end;
 
 end;
@@ -126,8 +130,8 @@ begin
       if(rpls_Quality>cl_UpT_arrayN_RPLs)then rpls_Quality :=cl_UpT_arrayN_RPLs;
       if(net_Quality >cl_UpT_arrayN     )then net_Quality  :=cl_UpT_arrayN;
    end;
-   menu_res_w:=vid_vw;
-   menu_res_h:=vid_vh;
+   menu_vid_vw:=vid_vw;
+   menu_vid_vh:=vid_vh;
 
    txt_ValidateServerAddr;
    txt_ValidateServerPort;
@@ -154,7 +158,7 @@ begin
    writeln(f,cfg_key_VidWidth      ,'=',vid_vw                    );
    writeln(f,cfg_key_VidHeight     ,'=',vid_vh                    );
    writeln(f,cfg_key_ReplayQuality ,'=',rpls_Quality              );
-   writeln(f,cfg_key_ReplayName    ,'=',rpls_str_prefix             );
+   writeln(f,cfg_key_ReplayName    ,'=',rpls_str_prefix           );
    writeln(f,cfg_key_ReplayRecord  ,'=',str_b2c[rpls_Recording]   );
    writeln(f,cfg_key_ClientQuality ,'=',net_Quality               );
    writeln(f,cfg_key_g_FixedPos    ,'=',str_b2c[g_fixed_positions]);
@@ -166,6 +170,7 @@ begin
    writeln(f,cfg_key_ColorScheme   ,'=',ord(vid_PlayersColorSchema));
    writeln(f,cfg_key_APM           ,'=',str_b2c[vid_APM]          );
    writeln(f,cfg_key_FPS           ,'=',str_b2c[vid_FPS]          );
+   writeln(f,cfg_key_Renderer      ,'=',vid_SDLRendererName       );
 
    close(f);
 end;

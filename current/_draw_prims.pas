@@ -6,39 +6,39 @@
 
 procedure draw_pixel(x0,y0:integer);
 begin
-   SDL_RenderDrawPoint(vid_renderer,x0,y0);
+   SDL_RenderDrawPoint(vid_SDLRenderer,x0,y0);
 end;
 
 procedure draw_line(x0,y0,x1,y1:integer);
 begin
-   SDL_RenderDrawLine(vid_renderer,x0,y0,x1,y1);
+   SDL_RenderDrawLine(vid_SDLRenderer,x0,y0,x1,y1);
 end;
 
 procedure draw_hline(x0,x1,y0:integer);
 begin
-   SDL_RenderDrawLine(vid_renderer,x0,y0,x1,y0);
+   SDL_RenderDrawLine(vid_SDLRenderer,x0,y0,x1,y0);
 end;
 
 procedure draw_vline(x0,y0,y1:integer);
 begin
-   SDL_RenderDrawLine(vid_renderer,x0,y0,x0,y1);
+   SDL_RenderDrawLine(vid_SDLRenderer,x0,y0,x0,y1);
 end;
 
 procedure draw_rect(x0,y0,x1,y1:integer);
 begin
-   vid_rect^.x:=min2i(x0,x1);
-   vid_rect^.y:=min2i(y0,y1);
-   vid_rect^.w:=abs(x1-x0)+1;
-   vid_rect^.h:=abs(y1-y0)+1;
-   SDL_RenderDrawRect(vid_renderer,vid_rect);
+   vid_SDLRect^.x:=min2i(x0,x1);
+   vid_SDLRect^.y:=min2i(y0,y1);
+   vid_SDLRect^.w:=abs(x1-x0)+1;
+   vid_SDLRect^.h:=abs(y1-y0)+1;
+   SDL_RenderDrawRect(vid_SDLRenderer,vid_SDLRect);
 end;
 procedure draw_frect(x0,y0,x1,y1:integer);
 begin
-   vid_rect^.x:=min2i(x0,x1);
-   vid_rect^.y:=min2i(y0,y1);
-   vid_rect^.w:=abs(x1-x0)+1;
-   vid_rect^.h:=abs(y1-y0)+1;
-   SDL_RenderFillRect(vid_renderer,vid_rect);
+   vid_SDLRect^.x:=min2i(x0,x1);
+   vid_SDLRect^.y:=min2i(y0,y1);
+   vid_SDLRect^.w:=abs(x1-x0)+1;
+   vid_SDLRect^.h:=abs(y1-y0)+1;
+   SDL_RenderFillRect(vid_SDLRenderer,vid_SDLRect);
 end;
 
 procedure draw_ellipse_quadrants(x,y,dx,dy:integer;filled:boolean);
@@ -49,17 +49,17 @@ begin
    if(dx=0)then
    begin
       if(dy=0)
-      then SDL_RenderDrawPoint(vid_renderer,x,y)
+      then SDL_RenderDrawPoint(vid_SDLRenderer,x,y)
       else
       begin
          ypdy:=y+dy;
          ymdy:=y-dy;
          if(filled)
-         then SDL_RenderDrawLine(vid_renderer,x,ymdy,x,ypdy)
+         then SDL_RenderDrawLine(vid_SDLRenderer,x,ymdy,x,ypdy)
          else
          begin
-            SDL_RenderDrawPoint(vid_renderer,x,ymdy);
-            SDL_RenderDrawPoint(vid_renderer,x,ypdy);
+            SDL_RenderDrawPoint(vid_SDLRenderer,x,ymdy);
+            SDL_RenderDrawPoint(vid_SDLRenderer,x,ypdy);
          end;
       end;
    end
@@ -71,15 +71,15 @@ begin
       ymdy:=y-dy;
       if(filled)then
       begin
-         SDL_RenderDrawLine(vid_renderer,xpdx,ymdy,xpdx,ypdy);
-         SDL_RenderDrawLine(vid_renderer,xmdx,ymdy,xmdx,ypdy);
+         SDL_RenderDrawLine(vid_SDLRenderer,xpdx,ymdy,xpdx,ypdy);
+         SDL_RenderDrawLine(vid_SDLRenderer,xmdx,ymdy,xmdx,ypdy);
       end
       else
       begin
-         SDL_RenderDrawPoint(vid_renderer,xpdx,ymdy);
-         SDL_RenderDrawPoint(vid_renderer,xmdx,ymdy);
-         SDL_RenderDrawPoint(vid_renderer,xpdx,ypdy);
-         SDL_RenderDrawPoint(vid_renderer,xmdx,ypdy);
+         SDL_RenderDrawPoint(vid_SDLRenderer,xpdx,ymdy);
+         SDL_RenderDrawPoint(vid_SDLRenderer,xmdx,ymdy);
+         SDL_RenderDrawPoint(vid_SDLRenderer,xpdx,ypdy);
+         SDL_RenderDrawPoint(vid_SDLRenderer,xmdx,ypdy);
       end;
    end;
 end;
@@ -104,14 +104,14 @@ begin
    if(rx=0)then
    begin
       if(ry=0)
-      then SDL_RenderDrawPoint(vid_renderer,x,y)
-      else SDL_RenderDrawLine (vid_renderer,x,y-ry,x,y+ry);
+      then SDL_RenderDrawPoint(vid_SDLRenderer,x,y)
+      else SDL_RenderDrawLine (vid_SDLRenderer,x,y-ry,x,y+ry);
       exit;
    end
    else
      if(ry=0)then
      begin
-        SDL_RenderDrawLine(vid_renderer,x-rx,y,x+rx,y);
+        SDL_RenderDrawLine(vid_SDLRenderer,x-rx,y,x+rx,y);
         exit;
      end;
 
@@ -245,14 +245,14 @@ begin
    error:=tx-di;
    while(x>=y)do
    begin
-      SDL_RenderDrawPoint(vid_renderer,x0+x,y0-y);
-      SDL_RenderDrawPoint(vid_renderer,x0+x,y0+y);
-      SDL_RenderDrawPoint(vid_renderer,x0-x,y0-y);
-      SDL_RenderDrawPoint(vid_renderer,x0-x,y0+y);
-      SDL_RenderDrawPoint(vid_renderer,x0+y,y0-x);
-      SDL_RenderDrawPoint(vid_renderer,x0+y,y0+x);
-      SDL_RenderDrawPoint(vid_renderer,x0-y,y0-x);
-      SDL_RenderDrawPoint(vid_renderer,x0-y,y0+x);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0+x,y0-y);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0+x,y0+y);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0-x,y0-y);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0-x,y0+y);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0+y,y0-x);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0+y,y0+x);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0-y,y0-x);
+      SDL_RenderDrawPoint(vid_SDLRenderer,x0-y,y0+x);
       if(error<=0)then
       begin
          y    +=1;
@@ -283,10 +283,10 @@ begin
    error:=tx-di;
    while(x>=y)do
    begin
-      SDL_RenderDrawLine(vid_renderer,x0-y,y0+x,x0+y,y0+x);
-      SDL_RenderDrawLine(vid_renderer,x0-y,y0-x,x0+y,y0-x);
-      SDL_RenderDrawLine(vid_renderer,x0-x,y0+y,x0-x,y0-y);
-      SDL_RenderDrawLine(vid_renderer,x0+x,y0+y,x0+x,y0-y);
+      SDL_RenderDrawLine(vid_SDLRenderer,x0-y,y0+x,x0+y,y0+x);
+      SDL_RenderDrawLine(vid_SDLRenderer,x0-y,y0-x,x0+y,y0-x);
+      SDL_RenderDrawLine(vid_SDLRenderer,x0-x,y0+y,x0-x,y0-y);
+      SDL_RenderDrawLine(vid_SDLRenderer,x0+x,y0+y,x0+x,y0-y);
       if(error<=0)then
       begin
          y    +=1;
@@ -317,9 +317,10 @@ bottom   : integer;
 colorptr,
 pixel    : pbyte;
 pixellast: pointer;
-x, dx, dy,
-pixx, pixy,
-w, h, tmp: integer;
+x,dx,dy,
+pixx,pixy,
+w, h     : integer;
+alpha    : byte;
 begin
    if(dst=nil)then exit;
 
@@ -364,9 +365,8 @@ begin
    w:=x2-x1;
    h:=y2-y1;
 
-   //if(w=0)or(h=0)then exit;
-
    colorptr:=@color;
+   alpha   :=colorptr[3];
    color   :=SDL_MapRGBA(dst^.format,colorptr[2],colorptr[1],colorptr[0],255);
 
    if(SDL_MUSTLOCK(dst))and(lockSurf)then
@@ -385,12 +385,20 @@ begin
    while(pixel<=pixellast)do
    begin
       for x:=0 to dx-1 do
-      begin
-         pixel^:=colorptr[0];pixel+=1;
-         pixel^:=colorptr[1];pixel+=1;
-         pixel^:=colorptr[2];pixel+=1;
-         pixel^:=colorptr[3];pixel+=1;
-      end;
+        if(alpha=255)then
+        begin
+           pixel^:=colorptr[0];pixel+=1;
+           pixel^:=colorptr[1];pixel+=1;
+           pixel^:=colorptr[2];pixel+=1;
+           pixel^:=colorptr[3];pixel+=1;
+        end
+        else
+        begin
+           pixel^:=round(pixel^*alpha/255);pixel+=1;
+           pixel^:=round(pixel^*alpha/255);pixel+=1;
+           pixel^:=round(pixel^*alpha/255);pixel+=1;
+           pixel^:=round(pixel^*alpha/255);pixel+=1;
+        end;
       pixel+=pixy;
    end;
 

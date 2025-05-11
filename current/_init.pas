@@ -1,68 +1,88 @@
 {$IFDEF _FULLGAME}
 
-
-procedure debug_printDriverInfo(rinfo:PSDL_RendererInfo);
-var t:integer;
+procedure UpdateDisplayModes;
+var i,
+curDisplay:integer;
 begin
-   with rinfo^ do
-   begin
-      writeln('name ',name);
-      writeln('flags ',flags);
-      writeln('num_texture_formats ',num_texture_formats);
-      if(num_texture_formats>0)then
-      for t:=0 to num_texture_formats-1 do write(texture_formats[t],' ');
-      writeln;
-      writeln('max_texture_width ',max_texture_width,' max_texture_height ',max_texture_height);
-   end;
-end;
-
-procedure debug_printAllDriversInfo;
-var i,c:integer;
-  rinfo:TSDL_RendererInfo;
-begin
-   c:=SDL_GetNumRenderDrivers;
-   if(c<0)then WriteSDLError('SDL_GetNumRenderDrivers');
-   if(c>0)then
-   for i:=0 to c-1 do
-   begin
-      SDL_GetRenderDriverInfo(i,@rinfo);
-      writeln(i+1,'  ---------------------');
-      debug_printDriverInfo(@rinfo);
-   end;
+   curDisplay:=SDL_GetWindowDisplayIndex(vid_SDLWindow);
+   vid_SDLDisplayModeN:=SDL_GetNumDisplayModes(curDisplay);
+   setlength(vid_SDLDisplayModes,vid_SDLDisplayModeN);
+   for i:=0 to vid_SDLDisplayModeN-1 do
+     SDL_GetDisplayMode(curDisplay,i,@vid_SDLDisplayModes[i]);
+   SDL_GetDisplayBounds(curDisplay,vid_SDLRect);
+   vid_SDLDisplayModeC.w:=vid_SDLRect^.w;
+   vid_SDLDisplayModeC.h:=vid_SDLRect^.h;
 end;
 
 function InitVideo:boolean;
 const sdl_windows_flags   = SDL_WINDOW_RESIZABLE; // or SDL_WINDOW_FULLSCREEN_DESKTOP
       sdl_windows_flags_f : array[false..true] of cardinal = (sdl_windows_flags,sdl_windows_flags+SDL_WINDOW_FULLSCREEN);
-var i:integer;
+var i: integer;
+rInfo: TSDL_RendererInfo;
 begin
    InitVideo:=false;
 
-   if(SDL_Init(SDL_INIT_VIDEO)<>0)then
+   if(SDL_Init(SDL_INIT_VIDEO)<0)then
    begin
       WriteSDLError('SDL_Init(SDL_INIT_VIDEO)');
       exit;
    end;
 
-   new(vid_RECT);
+   new(vid_SDLRect);
    for i:=0 to vid_MaxScreenSprites-1 do
      new(vid_Sprites_l[i]);
 
-   vid_window := SDL_CreateWindow(@str_wcaption[1], SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, menu_w, menu_h, sdl_windows_flags_f[vid_fullscreen]);
-   if(vid_window=nil)then
+   // SDL Renderer info
+   vid_SDLRenderersN:=SDL_GetNumRenderDrivers;
+   if(vid_SDLRenderersN<0)then
+   begin
+      WriteSDLError('SDL_GetNumRenderDrivers: '+i2s(vid_SDLRenderersN));
+      exit;
+   end;
+   WriteLog('SDL_GetNumRenderDrivers: '+i2s(vid_SDLRenderersN));
+   if(vid_SDLRenderersN>0)then
+   begin
+      if(length(vid_SDLRendererName)=1)then
+        if(pos(vid_SDLRendererName,'0123456789')>0)then
+          vid_SDLRendererI:=s2i(vid_SDLRendererName);
+
+      for i:=0 to vid_SDLRenderersN-1 do
+        if(SDL_GetRenderDriverInfo(i,@rInfo)<0)
+        then begin WriteSDLError('SDL_GetRenderDriverInfo '+i2s(i));exit;end
+        else
+        begin
+           WriteLog(i2s(i)+' '+rInfo.name);
+           if(vid_SDLRendererI=-1)and(length(vid_SDLRendererName)>0)then
+             if(rInfo.name=vid_SDLRendererName)then vid_SDLRendererI:=i;
+        end;
+   end;
+
+   vid_SDLWindow := SDL_CreateWindow(@str_wcaption[1], SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, vid_vw, vid_vh, sdl_windows_flags_f[vid_fullscreen]);
+   if(vid_SDLWindow=nil)then
    begin
       WriteSDLError('SDL_CreateWindow');
       exit;
    end;
 
-   vid_renderer := SDL_CreateRenderer(vid_window, -1,SDL_RENDERER_ACCELERATED or SDL_RENDERER_TARGETTEXTURE);
-   if(vid_renderer=nil)then
+   // SDL Display modes info
+   UpdateDisplayModes;
+
+   vid_SDLRenderer:= SDL_CreateRenderer(vid_SDLWindow, vid_SDLRendererI,SDL_RENDERER_TARGETTEXTURE);
+   if(vid_SDLRenderer=nil)then
    begin
       WriteSDLError('SDL_CreateRenderer');
       exit;
    end;
+   if(SDL_GetRendererInfo(vid_SDLRenderer,@rInfo)<0)then
+   begin
+      WriteSDLError('SDL_GetRendererInfo');
+      exit;
+   end;
+   vid_SDLRendererName:=rInfo.name;
+   vid_SDLRendererNameConfig:=vid_SDLRendererName;
+   WriteLog('Selected renderer: '+rInfo.name);
 
-   SDL_RenderSetLogicalSize(vid_renderer,menu_w,menu_h);
+   vid_ApplyResolution;
 
    SDL_ShowCursor(0);
    SDL_StartTextInput;
@@ -82,10 +102,13 @@ begin
    begin
       s:=ParamStr(i);
 
-      if(s='test' )then test_mode:=1;
-      {$IFDEF DTEST}
-      if(s='testD')then test_mode:=2;
-      {$ENDIF}
+      case s of
+'-renderer': vid_SDLRendererName:=ParamStr(i+1);
+'test'     : test_mode:=1;
+{$IFDEF DTEST}
+'testD'    : test_mode:=2;
+{$ENDIF}
+      end;
    end;
 end;
 

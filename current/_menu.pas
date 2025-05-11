@@ -3,6 +3,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  MENU COMMON
 
+
+procedure menu_updatePos;
+var cx,cy:single;
+begin
+   cx:=vid_vw/menu_w;
+   cy:=vid_vh/menu_h;
+   if(cx>cy)
+   then menu_tex_cx:=cy
+   else menu_tex_cx:=cx;
+
+   menu_tex_w:=round(menu_w*menu_tex_cx);
+   menu_tex_h:=round(menu_h*menu_tex_cx);
+   menu_tex_cx:=1/menu_tex_cx;
+
+   menu_tex_x:=(vid_vw-menu_tex_w) div 2;
+   menu_tex_y:=(vid_vh-menu_tex_h) div 2;
+end;
+
+procedure vid_ApplyResolution;
+begin
+   SDL_RenderSetLogicalSize(vid_SDLRenderer,vid_vw,vid_vh);
+   menu_updatePos;
+   if(not vid_fullscreen)then
+   begin
+      SDL_SetWindowSize(vid_SDLWindow,vid_vw,vid_vh);
+      SDL_SetWindowPosition(vid_SDLWindow,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED);
+   end;
+end;
+
 function menu_List_Clear:boolean;
 begin
    menu_List_Clear:=menu_list_n>0;
@@ -66,12 +95,12 @@ end;
 function menu_ApplyResolution(Check:boolean):boolean;
 begin
    menu_ApplyResolution:=false;
-   if(menu_w=vid_vw)and(menu_h=vid_vh)then exit;
+   if(menu_vid_vw=vid_vw)and(menu_vid_vh=vid_vh)then exit;
    menu_ApplyResolution:=true;
    if(Check)then exit;
-   vid_vw:=menu_w;
-   vid_vh:=menu_h;
-   //vid_MakeScreen;
+   vid_vw:=menu_vid_vw;
+   vid_vh:=menu_vid_vh;
+   vid_ApplyResolution;
 end;
 
 procedure menu_Toggle;
@@ -115,7 +144,7 @@ end;
 
 
 procedure menu_ReBuild;
-const mainBtnW  = (vid_minw div 5)-4;
+const mainBtnW  = (menu_w div 6)-4;
       mainBtnWh = mainBtnW div 2;
 var tx0,tx1,tx2,
     ty0,ty1,ty2:integer;
@@ -153,23 +182,23 @@ pss_AI_11    : NeedColumnTeam:=true;
 end;
 procedure ms_DefaultCaption(mi:byte);
 begin
-   SetItem(mi,vid_vhw-menu_main_mp_bwh,menu_logo_h+menu_main_mp_bh1,
-              vid_vhw+menu_main_mp_bwh,menu_logo_h+menu_main_mp_bh2,true );
+   SetItem(mi,menu_hw-menu_main_mp_bwh,menu_logo_h+menu_main_mp_bh1,
+              menu_hw+menu_main_mp_bwh,menu_logo_h+menu_main_mp_bh2,true );
 end;
 
 procedure ms_BottomButtons(N,mi1,mi2,mi3,mi4,mi5:byte);
 begin
    if(N<2)then
    begin
-      ty0:=vid_vh-menu_main_mp_bh1h-((vid_vh-vid_minh) div 8);
-      SetItem(mi1,vid_vhw-menu_main_mp_bwq,ty0,
-                  vid_vhw+menu_main_mp_bwq,ty0+menu_main_mp_bh1,true );
+      ty0:=menu_h-menu_main_mp_bh1h-((menu_h-vid_minh) div 8);
+      SetItem(mi1,menu_hw-menu_main_mp_bwq,ty0,
+                  menu_hw+menu_main_mp_bwq,ty0+menu_main_mp_bh1,true );
    end
    else
    begin
-      tx1:=min2i(mainBtnWh,(vid_vw-integer(mainBtnW*N)) div (N+1));
-      tx0:=vid_vhw-((tx1*N+integer(mainBtnW)*N-tx1) div 2);
-      ty0:=vid_vh-menu_main_mp_bh1h-((vid_vh-vid_minh) div 8);
+      tx1:=min2i(mainBtnWh,(menu_w-integer(mainBtnW*N)) div (N+1));
+      tx0:=menu_hw-((tx1*N+integer(mainBtnW)*N-tx1) div 2);
+      ty0:=menu_h-menu_main_mp_bh1h-((menu_h-vid_minh) div 8);
 
       SetItem(mi1,tx0,ty0,tx0+mainBtnW,ty0+menu_main_mp_bh1,true );tx0+=mainBtnW+tx1;
       SetItem(mi2,tx0,ty0,tx0+mainBtnW,ty0+menu_main_mp_bh1,true );tx0+=mainBtnW+tx1;
@@ -181,10 +210,10 @@ end;
 
 procedure ms_NetSearch;
 begin
-   ty2:=(vid_vh-vid_minh+10) div 2;
+   ty2:=(menu_h-vid_minh+10) div 2;
 
-   tx0:=vid_vhw-menu_main_mp_bw1;
-   tx1:=vid_vhw+menu_main_mp_bw1;
+   tx0:=menu_hw-menu_main_mp_bw1;
+   tx1:=menu_hw+menu_main_mp_bw1;
    ty0:=menu_logo_h+ty2+menu_main_mp_bhh;
 
    SetItem(mi_mplay_NetSearchCaption,tx0,ty0,tx1,ty0+menu_main_mp_bh3q,true );
@@ -206,24 +235,22 @@ procedure ms_Scirmish;
 var i:integer;
 begin
    // CAPTION
-   if(vid_vh<700)
-   then ty2:=0
-   else ty2:=menu_main_mp_bh1;
+   ty2:=menu_main_mp_bh1;
    // scirmish / campaing / replay
-   tx0:=vid_vhw-menu_main_mp_bwh;
-   tx1:=vid_vhw+menu_main_mp_bwh;
+   tx0:=menu_hw-menu_main_mp_bwh;
+   tx1:=menu_hw+menu_main_mp_bwh;
    ty0:=ty2+menu_logo_h;
    ty1:=ty0+menu_main_mp_bh1;
    if(rpls_rstate=rpls_state_read)
    then SetItem(mi_title_ReplayPlayback,tx0,ty0,tx1,ty1,true )
    else SetItem(mi_title_Scirmish      ,tx0,ty0,tx1,ty1,true );
 
-   ty2:=(vid_vh-vid_minh+10) div 2;
+   ty2:=(menu_h-vid_minh+10) div 2;
 
    // PLAYERS
    ty0:=menu_logo_h+ty2+menu_main_mp_bh2+1;
 
-   tx0:=vid_vhw-396-((vid_vw-vid_minw) div 20);
+   tx0:=menu_hw-396-((menu_w-vid_minw) div 20);
    ty1:=menu_main_mp_bhh-2;
 
    tx1:=tx0+menu_players_namew+menu_players_racew+menu_players_teamw+ty1*2;
@@ -261,12 +288,12 @@ begin
 
 
    // MAP
-  { tx0:=vid_vhw+396-menu_map_settingsw-r_mminimap^.w-basefont_w2+((vid_vw-vid_minw) div 20);
+   tx0:=menu_hw+396-menu_map_settingsw-vid_panel_pwi-basefont_w2+((menu_w-vid_minw) div 20);
    tx1:=tx0+menu_map_settingsw;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h+menu_main_mp_bhq;
 
    SetItem(mi_title_map  ,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
-                          tx1+basefont_w3+r_mminimap^.w,ty0+r_mminimap^.w+basefont_w1,true );  }
+                          tx1+basefont_w3+vid_panel_pwi,ty0+vid_panel_pwi+basefont_w1,true );
 
    SetItem(mi_map_Preset ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,GameLoadPreset(PlayerClient,0,true)                              );ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Seed   ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,map_SetSetting(PlayerClient,nmid_lobbby_mapseed          ,0,true));ty0+=menu_main_mp_bhh;
@@ -276,25 +303,25 @@ begin
    SetItem(mi_map_Random ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,menu_items[mi_map_Sym].mi_enabled);ty0+=menu_main_mp_bhh;
    SetItem(mi_map_Theme  ,tx0,ty0,tx1,ty0+menu_main_mp_bhh,true);
 
-   {ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(r_mminimap^.h div 2);
-   SetItem(mi_map_MiniMap,tx1+basefont_w1,ty0,tx1+basefont_w1+r_mminimap^.w,ty0+r_mminimap^.h,false);
+   ty0:=((menu_items[mi_map_Preset].mi_y0+menu_items[mi_map_Theme].mi_y1) div 2)-(vid_panel_pwi div 2);
+   SetItem(mi_map_MiniMap,tx1+basefont_w1,ty0,tx1+basefont_w1+vid_panel_pwi,ty0+vid_panel_pwi,false);
 
    // MULTIPLAYER / RECORD INFO
-   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+r_mminimap^.w+basefont_w2-menu_main_mp_bhq; }
+   ty0:=menu_logo_h+ty2+menu_main_mp_bh3+vid_panel_pwi+basefont_w2-menu_main_mp_bhq;
 
    if(rpls_rstate=rpls_state_read)then
    begin
-      {SetItem(mi_title_ReplayInfo2,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
-                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );  }
+      SetItem(mi_title_ReplayInfo2,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                                   tx1+basefont_w3+vid_panel_pwi,ty0+menu_main_mp_bhh*3+basefont_w2+basefont_wq,true );
 
    end
    else
    begin
-     { SetItem(mi_title_multiplayer,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
-                                   tx1+basefont_w3+r_mminimap^.w,ty0+menu_main_mp_bhh*8+basefont_w2+basefont_wq,true );
+      SetItem(mi_title_multiplayer,tx0-basefont_w2              ,ty0-menu_main_mp_bhq3,
+                                   tx1+basefont_w3+vid_panel_pwi,ty0+menu_main_mp_bhh*8+basefont_w2+basefont_wq,true );
 
       ty1:=menu_main_mp_bhh;
-      tx1+=basefont_w1+r_mminimap^.w;   }
+      tx1+=basefont_w1+vid_panel_pwi;
       case net_status of
 ns_single: begin
            SetItem(mi_mplay_ServerCaption   ,tx0,ty0,tx1,ty0+ty1, not G_Started);ty0+=ty1;
@@ -353,8 +380,8 @@ procedure ms_Settings;
 begin
    ms_DefaultCaption(mi_title_Settings);
 
-   tx0:=vid_vhw-350;
-   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 10);
+   tx0:=menu_hw-350;
+   ty0:=menu_logo_h+menu_main_mp_bh3+((menu_h-vid_minh+10) div 10);
    tx1:=tx0+menu_main_mp_bwh;
    ty1:=ty0+menu_main_mp_bh1;
    ty2:=menu_main_mp_bh1+menu_main_mp_bhq3;
@@ -366,7 +393,7 @@ begin
    SetItem(mi_settings_sound  ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
 
    tx0+=menu_main_mp_bwh+(menu_main_mp_bwq div 2);
-   ty0:=menu_logo_h+menu_main_mp_bh3+((vid_vh-vid_minh+10) div 10);
+   ty0:=menu_logo_h+menu_main_mp_bh3+((menu_h-vid_minh+10) div 10);
    tx1:=tx0+menu_main_mp_bwh*3+menu_main_mp_bwq;
    ty1:=ty0+menu_main_mp_bh3q;
    ty2:=menu_main_mp_bh3q;
@@ -398,11 +425,10 @@ begin
                         SetItem(mi_settings_ClientQuality  ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         end;
    mi_settings_video  : begin
-                        SetItem(mi_settings_ResWidth       ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
-                        SetItem(mi_settings_ResHeight      ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
+                        SetItem(mi_settings_Resolution     ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_ResApply       ,tx0,ty0,tx1,ty1,menu_ApplyResolution(true));
                                                                                    ty0+=ty2;ty1+=ty2;
-                                                                                   ty0+=ty2;ty1+=ty2;
+                        SetItem(mi_settings_SDLRenderer    ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_Fullscreen     ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
                                                                                    ty0+=ty2;ty1+=ty2;
                         SetItem(mi_settings_ShowFPS        ,tx0,ty0,tx1,ty1,true );ty0+=ty2;ty1+=ty2;
@@ -426,11 +452,11 @@ procedure ms_Replays;
 begin
    ms_DefaultCaption(mi_title_LoadReplay);
 
-   tx0:=vid_vhw-menu_main_mp_bw1-menu_main_mp_bwq;
-   tx1:=vid_vhw+menu_main_mp_bwq;
+   tx0:=menu_hw-menu_main_mp_bw1-menu_main_mp_bwq;
+   tx1:=menu_hw+menu_main_mp_bwq;
    tx2:=tx1+menu_main_mp_bw1;
 
-   ty2:=(vid_vh-vid_minh+10) div 2;
+   ty2:=(menu_h-vid_minh+10) div 2;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h;
 
    ty0+=menu_main_mp_bh1;
@@ -448,11 +474,11 @@ begin
    ms_DefaultCaption(mi_title_SaveLoad);
    ms_BottomButtons(4,mi_back,mi_saveload_save,mi_saveload_load,mi_saveload_delete,0);
 
-   tx0:=vid_vhw-menu_main_mp_bw1-menu_main_mp_bwq;
-   tx1:=vid_vhw+menu_main_mp_bwq;
+   tx0:=menu_hw-menu_main_mp_bw1-menu_main_mp_bwq;
+   tx1:=menu_hw+menu_main_mp_bwq;
    tx2:=tx1+menu_main_mp_bw1;
 
-   ty2:=(vid_vh-vid_minh+10) div 2;
+   ty2:=(menu_h-vid_minh+10) div 2;
    ty0:=menu_logo_h+ty2+menu_main_mp_bh1h;
 
    ty0+=menu_main_mp_bh1;
@@ -580,8 +606,8 @@ begin
       menu_list_item_h :=abs(mi_y1-mi_y0);
       menu_list_item_hh:=menu_list_item_h div 2;
       if(menu_list_item_hh>=basefont_w1h)
-      then menu_list_font:=15
-      else menu_list_font:=10;
+      then menu_list_fontS:=1.5
+      else menu_list_fontS:=1;
    end;
    menu_list_aleft:=false;
    menu_list_n:=0;
@@ -591,7 +617,8 @@ procedure menu_list_UpdatePosition;
 var ty:integer;
 begin
    ty:=menu_list_y+menu_list_n*menu_list_item_h;
-   if(ty>vid_vh)then menu_list_y-=menu_list_item_h+(menu_list_n*menu_list_item_h);
+   if(ty>menu_h)then menu_list_y-=menu_list_item_h+(menu_list_n*menu_list_item_h);
+   if(menu_list_y<0)then menu_list_y:=0;
 end;
 
 procedure menu_list_AddItem(acaption:shortstring;avalue:integer;aenabled:boolean;MinWidth:integer);
@@ -604,10 +631,9 @@ begin
       mli_value  :=avalue;
       mli_enabled:=aenabled;
    end;
-   case menu_list_font of
-   15 : menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1h*length(acaption)+basefont_w1h);
-   10 : menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1 *length(acaption)+basefont_w1 );
-   end;
+   if(menu_list_fontS<=1)
+   then menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1 *length(acaption)+basefont_w1 )
+   else menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1h*length(acaption)+basefont_w1h);
 end;
 
 //-----------------------------------------------------
@@ -726,6 +752,50 @@ begin
    end;
    menu_list_UpdatePosition;
 end;
+procedure menu_list_MakeSDLDisplayModes(mi:byte);
+var
+MinWidth,
+    i: integer;
+begin
+   MinWidth:=-3;
+   menu_list_SetCommonSettings(mi,@MinWidth);
+   menu_list_aleft:=true;
+   menu_list_current:=-1;
+   with menu_items[mi] do
+     if(vid_SDLDisplayModeN>0)then
+       for i:=0 to vid_SDLDisplayModeN-1 do
+         with vid_SDLDisplayModes[i] do
+         begin
+            if(menu_vid_vw=w)and(menu_vid_vh=h)then menu_list_current:=i;
+            if (w=vid_SDLDisplayModeC.w)
+            and(h=vid_SDLDisplayModeC.h)
+            then menu_list_AddItem('['+i2s(w)+'x'+i2s(h)+']',i,true,MinWidth)
+            else menu_list_AddItem(' '+i2s(w)+'x'+i2s(h)    ,i,true,MinWidth);
+         end;
+   menu_list_UpdatePosition;
+end;
+procedure menu_list_MakeSDLRenderers(mi:byte);
+var
+MinWidth,
+    i: integer;
+rInfo: TSDL_RendererInfo;
+begin
+   MinWidth:=-3;
+   menu_list_SetCommonSettings(mi,@MinWidth);
+   menu_list_aleft:=true;
+   menu_list_current:=-1;
+   with menu_items[mi] do
+     if(vid_SDLRenderersN>0)then
+       for i:=0 to vid_SDLRenderersN-1 do
+         if(SDL_GetRenderDriverInfo(i,@rInfo)<0)
+         then begin WriteSDLError('SDL_GetRenderDriverInfo '+i2s(i));break;end
+         else
+         begin
+            if(rInfo.name=vid_SDLRendererName)then menu_list_current:=i;
+            menu_list_AddItem(rInfo.name,i,true,MinWidth);
+         end;
+   menu_list_UpdatePosition;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  MENU BASE
@@ -782,14 +852,25 @@ end;
 procedure menu_mouse;
 var
 menu_list_SIndex,
-p          :integer;
+mouse_px,
+mouse_py,
+p       :integer;
 begin
+   mouse_px:=mouse_x;
+   mouse_py:=mouse_y;
+   mouse_x :=round((mouse_x-menu_tex_x)*menu_tex_cx);
+   mouse_y :=round((mouse_y-menu_tex_y)*menu_tex_cx);
+
+   menu_list_pselected:=menu_list_selected;
+
    menu_list_selected:=-1;
    if(menu_list_n>0)then
    begin
       menu_list_SelectItem;
       if(input_Check(iAct_mlb,tis_NPressed))and(menu_list_selected=-1)
       then menu_List_Clear
+      else
+        if(menu_list_pselected<>menu_list_selected)then menu_redraw:=true;
    end
    else
      if(input_Check(iAct_mlb,tis_NPressed))then
@@ -880,14 +961,14 @@ mi_SaveLoad               : begin
                             end;
 mi_Settings               : begin
                             menu_page2:=mp_settings;
-                            menu_res_w:=vid_vw;
-                            menu_res_h:=vid_vh;
+                            menu_vid_vw:=vid_vw;
+                            menu_vid_vh:=vid_vh;
                             end;
 mi_AboutGame              : menu_page2:=mp_aboutgame;
 
 mi_settings_video         : begin
-                            menu_res_w:=vid_vw;
-                            menu_res_h:=vid_vh;
+                            menu_vid_vw:=vid_vw;
+                            menu_vid_vh:=vid_vh;
                             menu_settings_page:=menu_item;
                             end;
 mi_settings_game,
@@ -951,15 +1032,17 @@ mi_settings_ReplayQuality : if(menu_list_selected>-1)then
                             else menu_list_MakeFromStr(menu_item,@str_menu_NetQuality[0],SizeOf(str_menu_NetQuality[0])*(cl_UpT_arrayN_RPLs+1),integer(rpls_Quality),-3);
 
 //////////////////////////////////////////    SETTINGS  VIDEO
-mi_settings_ResWidth      : ;{if(menu_list_selected>-1)
-                            then begin menu_w:=vid_rw_list[menu_list_SIndex];menu_List_Clear;end
-                            else menu_list_MakeFromIntAr(menu_item,@vid_rw_list[0],SizeOf(vid_rw_list),menu_w,-3); }
-mi_settings_ResHeight     : ;{if(menu_list_selected>-1)
-                            then begin menu_h:=vid_rh_list[menu_list_SIndex];menu_List_Clear;end
-                            else menu_list_MakeFromIntAr(menu_item,@vid_rh_list[0],SizeOf(vid_rh_list),menu_h,-3); }
+mi_settings_Resolution    : if(menu_list_selected>-1)
+                            then begin menu_vid_vw:=vid_SDLDisplayModes[menu_list_SIndex].w;
+                                       menu_vid_vh:=vid_SDLDisplayModes[menu_list_SIndex].h;
+                                       menu_List_Clear;end
+                            else menu_list_MakeSDLDisplayModes(menu_item);
 mi_settings_ResApply      : menu_ApplyResolution(false);
 
-mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen;{ vid_MakeScreen;}end;
+mi_settings_Fullscreen    : begin vid_fullscreen:=not vid_fullscreen;WindowToggleFullscreen;end;
+mi_settings_SDLRenderer   : if(menu_list_selected>-1)
+                            then begin vid_SDLRendererName:=menu_list_items[menu_list_SIndex].mli_caption; menu_List_Clear;end
+                            else menu_list_MakeSDLRenderers(menu_item);
 mi_settings_ShowFPS       : vid_FPS:=not vid_FPS;
 
 //////////////////////////////////////////    SETTINGS  SOUND
@@ -1174,14 +1257,31 @@ mi_saveload_list          : if(m_TwiceLeft)
                             end;
       end;
    end;
+
+   if(input_Check(iAct_mwd,tis_NPressed))then
+   begin
+      if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   , mwscroll_speed,0,svld_list_size    -menu_saveload_listh ,false);
+      if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   , mwscroll_speed,0,rpls_list_size    -menu_replays_listh  ,false);
+      if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll, mwscroll_speed,0,net_svsearch_listn-menu_netsearch_listh,false);
+   end;
+
+   if(input_Check(iAct_mwu,tis_NPressed))then
+   begin
+      if(menu_ItemIsUnderCursor(mi_saveload_list      ))then menu_redraw:=menu_redraw or ScrollInt(@svld_list_scroll   ,-mwscroll_speed,0,svld_list_size    -menu_saveload_listh ,false);
+      if(menu_ItemIsUnderCursor(mi_replays_list       ))then menu_redraw:=menu_redraw or ScrollInt(@rpls_list_scroll   ,-mwscroll_speed,0,rpls_list_size    -menu_replays_listh  ,false);
+      if(menu_ItemIsUnderCursor(mi_mplay_NetSearchList))then menu_redraw:=menu_redraw or ScrollInt(@net_svsearch_scroll,-mwscroll_speed,0,net_svsearch_listn-menu_netsearch_listh,false);
+   end;
+
+   mouse_x:=mouse_px;
+   mouse_y:=mouse_py;
 end;
 
-procedure Menu_Hotkeys(key1:cardinal);
+{procedure Menu_Hotkeys(key1:cardinal);
 begin
    case key1 of
 km_Esc      : menu_Toggle;
    end;
-end;
+end;   }
 
 procedure menu_keyborad;
 var Changed:boolean;
@@ -1197,13 +1297,13 @@ mi_map_Seed           : begin
                           then net_send_MIDCard(             nmid_lobbby_mapseed,map_seed      )
                           else map_SetSetting  (PlayerClient,nmid_lobbby_mapseed,map_seed,false);
                         end;
-mi_settings_PlayerName: PlayerName    :=txt_StringApplyInput(PlayerName    ,k_pname ,PlayerNameLen,@Changed);
-mi_settings_ReplayName: rpls_str_prefix :=txt_StringApplyInput(rpls_str_prefix ,k_kbstr ,ReplayNameLen,@Changed);
+mi_settings_PlayerName: PlayerName     :=txt_StringApplyInput(PlayerName     ,k_pname ,PlayerNameLen,@Changed);
+mi_settings_ReplayName: rpls_str_prefix:=txt_StringApplyInput(rpls_str_prefix,k_kbstr ,ReplayNameLen,@Changed);
 mi_mplay_ServerPort   : begin
-                        net_sv_pstr   :=txt_StringApplyInput(net_sv_pstr   ,k_kbdig ,5            ,@Changed);
+                        net_sv_pstr    :=txt_StringApplyInput(net_sv_pstr    ,k_kbdig ,5            ,@Changed);
                         if(Changed)then txt_ValidateServerPort;
                         end;
-mi_mplay_ClientAddress: net_cl_svaddr :=txt_StringApplyInput(net_cl_svaddr,k_kbstr  ,30           ,@Changed);
+mi_mplay_ClientAddress: net_cl_svaddr  :=txt_StringApplyInput(net_cl_svaddr  ,k_kbstr ,30           ,@Changed);
       else
         if(net_status>ns_single)and(menu_items[mi_mplay_Chat].mi_enabled)
         then net_chat_str  :=txt_StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)
@@ -1217,6 +1317,25 @@ mi_mplay_ClientAddress: net_cl_svaddr :=txt_StringApplyInput(net_cl_svaddr,k_kbs
 
       if(Changed)then menu_remake:=true;
    end;
+
+   if(input_Check(iAct_return,tis_NPressed))then ;
+   {if(menu_item=100)or(ingame_chat>0)then //menu chat   ?????????????
+   begin
+      if(menu_state)then
+      begin
+         ingame_chat :=chat_all;
+         net_chat_tar:=255;
+      end;
+
+      if(length(net_chat_str)>0)and(net_chat_tar>0)then
+      begin
+         if(net_status=ns_client)
+         then net_send_chat(             net_chat_tar,net_chat_str )
+         else GameLogChat  (PlayerClient,net_chat_tar,net_chat_str,false);
+      end;
+      net_chat_str:='';
+      ingame_chat :=0;
+   end;}
 end;
 
 

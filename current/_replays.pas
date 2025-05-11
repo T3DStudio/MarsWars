@@ -591,6 +591,8 @@ begin
     until (FindNext(info)<>0);
    FindClose(info);
 
+   if(rpls_list_size>0)then
+     rpls_list_sel:=mm3i(0,rpls_list_sel,rpls_list_size-1);
    replay_Select;
 end;
 

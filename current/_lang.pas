@@ -701,6 +701,8 @@ begin
    str_menu_ResolutionWidth          := 'Resolution (width)';
    str_menu_ResolutionHeight         := 'Resolution (height)';
    str_menu_fullscreen               := 'Windowed';
+   str_menu_SDLRenderer              := 'SDL Renderer';
+   str_menu_RestartReq               := 'restart required';
    str_menu_FPS                      := 'Show FPS';
 
    str_menu_MusicVolume              := 'Music volume';
@@ -843,6 +845,10 @@ begin
    str_map_syml[maps_lineL]          := 'line \';
    str_map_syml[maps_lineR]          := 'line /';
    str_map_random                    := 'Random map';
+   str_map_Proc1Zones                := 'MAP CALCULATION 1: ZONES';
+   str_map_Proc2Solid                := 'MAP CALCULATION 2: SOLID CELLS';
+   str_map_Proc3Domains              := 'MAP CALCULATION 3: PATH DOMAINS';
+   str_map_Proc4VisGrid              := 'MAP CALCULATION 4: VISUAL GRID';
 
    str_racel[r_random]               := tc_default+'RANDOM';
    str_racel[r_hell  ]               := tc_orange+'HELL'+tc_default;

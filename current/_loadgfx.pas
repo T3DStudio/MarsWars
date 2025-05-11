@@ -10,46 +10,27 @@ begin
      _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
-{procedure MakeScreenshot;
-var i:integer;
-    s:shortstring;
+procedure WindowToggleFullscreen;
+const sdl_windows_flags_f : array[false..true] of cardinal = (0, SDL_WINDOW_FULLSCREEN);
 begin
-   i:=0;
-   repeat
-      i+=1;
-      s:=str_screenshot+i2s(i)+'.bmp';
-   until not FileExists(s);
-   s:=s+#0;
-  // sdl_saveBMP(r_screen,@s[1]);
-end;   }
-
-procedure MakeScreenShot_CalcSize(w,h:integer);
-var aspecti:single;
-begin
-   {screenshot_w:=w;
-   screenshot_h:=h;
-   aspecti:=trunc((screenshot_w/screenshot_h)*100);
-   if(vid_aspecti>aspecti)then screenshot_h:=trunc(screenshot_w/vid_aspect);
-   if(vid_aspecti<aspecti)then screenshot_w:=trunc(screenshot_h*vid_aspect);}
+   SDL_SetWindowFullscreen(vid_SDLWindow,sdl_windows_flags_f[vid_fullscreen]);
 end;
 
 procedure MakeScreenShot;
 var      s: shortstring;
 tmpSDLSurf: pSDL_Surface;
 begin
-  // if(vid_window_w<=0)
-  // or(vid_window_w<=0)then exit;
-
    s:=str_screenshot+str_NowDateTime+str_screenshotExt+#0;
 
-   //tmpSDLSurf := SDL_CreateRGBSurface(0, vid_window_w, vid_window_h, vid_BitsPerPixel, 0,0,0,0);
+   writeln('screenshot');
+   tmpSDLSurf := SDL_CreateRGBSurface(0, vid_vw, vid_vh, vid_BitsPerPixel, 0,0,0,0);
    if(tmpSDLSurf=nil)then
    begin
       writeSDLError('MakeScreenShot -> SDL_CreateRGBSurface');
       exit;
    end;
 
-   SDL_RenderReadPixels(vid_renderer, nil, tmpSDLSurf^.format^.format, tmpSDLSurf^.pixels, tmpSDLSurf^.pitch);
+   SDL_RenderReadPixels(vid_SDLRenderer, nil, tmpSDLSurf^.format^.format, tmpSDLSurf^.pixels, tmpSDLSurf^.pitch);
    IMG_SavePNG(tmpSDLSurf,@s[1]);
    SDL_FreeSurface(tmpSDLSurf);
 end;
@@ -57,6 +38,7 @@ end;
 
 procedure gfx_InitColors;
 begin
+   c_none   :=0;
    c_dred   :=gfx_MakeTMWColor(190,  0,  0);
    c_red    :=gfx_MakeTMWColor(255,  0,  0);
    c_orange :=gfx_MakeTMWColor(255,140,  0);
@@ -136,9 +118,9 @@ end;
 {function cardinalBytes(c:cardinal):shortstring;
 begin
    cardinalBytes:=b2s((c and $FF000000)shr 24)+','+b2s((c and $00FF0000)shr 16)+','+b2s((c and $0000FF00)shr 8)+','+b2s(c and $000000FF);
-end;
+end; }
 
-function gfx_SDLSurfaceGetColor(surface:pSDL_Surface):cardinal;
+{function gfx_SDLTextureGetColor(sdltexture:pSDL_Texture):TMWColor;
 var
 rC,gC,bC,
 rR,gR,bR,
@@ -146,7 +128,8 @@ rM,gM,bM:byte;
 color   :cardinal;
 x,y     :integer;
 begin
-   for x:=0 to surface^.w-1 do
+   //SDL_QueryTexture(sdltexture,,);
+   {or x:=0 to surface^.w-1 do
    for y:=0 to surface^.h-1 do
    begin
       color:=SDL_GETpixel(surface,x,y);
@@ -174,8 +157,8 @@ begin
          bR:=(bR+bC+bM)div 3;
       end;
    end;
-   gfx_SDLSurfaceGetColor,rR,gR,bR,255);
-end;    }
+   gfx_SDLSurfaceGetColor,rR,gR,bR,255);}
+end; }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -200,8 +183,23 @@ begin
    with gfx_MWTextureMakeRenderTarget^ do
    begin
       sdlsurface:=nil;
-      sdltexture:=SDL_CreateTexture(vid_renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,tw,th);
+      sdltexture:=SDL_CreateTexture(vid_SDLRenderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,tw,th);
       if(sdltexture=nil)then writeSDLError('gfx_MWTextureMakeRenderTarget');
+
+      w :=tw;
+      h :=th;
+      hw:=tw div 2;
+      hh:=th div 2;
+   end;
+end;
+
+function gfx_MWTextureMakeSDLSurface(tw,th:integer):pTMWTexture;
+begin
+   new(gfx_MWTextureMakeSDLSurface);
+   with gfx_MWTextureMakeSDLSurface^ do
+   begin
+      sdlsurface:=gfx_SDLSurfaceCreate(tw,tw);
+      sdltexture:=nil;
 
       w :=tw;
       h :=th;
@@ -233,10 +231,6 @@ begin
          if(sdltexture<>nil)then sdl_DestroyTexture(sdltexture);
          sdlsurface:=nil;
          sdltexture:=nil;
-         w :=1;
-         h :=1;
-         hw:=0;
-         hh:=0;
       end;
       dispose(pMWT);
    end;
@@ -261,7 +255,7 @@ begin
       if(tsdlsurface<>nil)then
       begin
          if(transparent00)then SDL_SetColorKey(tsdlsurface,1,SDL_SurfaceGetPixel(tsdlsurface,0,0));
-         tsdltexture:=SDL_CreateTextureFromSurface(vid_renderer,tsdlsurface);
+         tsdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,tsdlsurface);
          if(transparent00)
          then SDL_SetTextureBlendMode(tsdltexture,SDL_BLENDMODE_BLEND)
          else SDL_SetTextureBlendMode(tsdltexture,SDL_BLENDMODE_NONE );
@@ -366,7 +360,7 @@ end;
 //  Tile Sets
 //
 
-procedure gfx_TileSet_Render(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;colorMask,TransColor:cardinal);
+procedure gfx_TileSet_Render(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;maskColor,transColor:TMWColor);
 var
 tw,
 thw,
@@ -381,16 +375,16 @@ begin
    // full tiled
    with tileSetTarget^[0]^ do
    begin
-      SDLSurf_boxColor(sdlSurface,0,0,tw,tw,TransColor);
+      SDLSurf_boxColor(sdlSurface,0,0,tw,tw,transColor);
       SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,0,0));
       gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
-      if(colorMask>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,colorMask);
+      if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,maskColor);
       if(sdltexture<>nil)then
       begin
          SDL_DestroyTexture(sdltexture);
          sdltexture:=nil;
       end;
-      sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
       if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget[0] -> SDL_CreateTextureFromSurface');
       w :=tw; h :=w;
       hw:=thw;hh:=hw;
@@ -422,14 +416,14 @@ begin
       begin
          gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
          draw_sdlsurface(sdlSurface,0,0,tileSetTemplate^[tileX]^.sdlSurface);
-         if(colorMask>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,colorMask);
+         if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,maskColor);
          SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,thw,thw));
          if(sdltexture<>nil)then
          begin
             SDL_DestroyTexture(sdltexture);
             sdltexture:=nil;
          end;
-         sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+         sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
          if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget['+i2s(tileX)+'] -> SDL_CreateTextureFromSurface');
          w :=tw ;h := w;
          hw:=thw;hh:=hw;
@@ -441,17 +435,7 @@ function gfx_TileSet_Make(tw:integer):pTMWTileSet;
 var i:integer;
 begin
    new(gfx_TileSet_Make);
-   for i:=0 to MaxTileSet do
-   begin
-      new(gfx_TileSet_Make^[i]);
-      with gfx_TileSet_Make^[i]^ do
-      begin
-         sdlSurface:=gfx_SDLSurfaceCreate(tw,tw);
-         sdltexture:=nil;
-         w :=tw; h :=w;
-         hw:=w div 2;hh:=hw;
-      end;
-   end;
+   for i:=0 to MaxTileSet do gfx_TileSet_Make^[i]:=gfx_MWTextureMakeSDLSurface(tw,tw);
 end;
 procedure gfx_TileSet_Free(ptmwts:pTMWTileSet);
 var i:integer;
@@ -474,7 +458,7 @@ tw0,tw1,tw2: integer;
 brushx,
 brushy     : array[0..2] of integer;
 brushr     : array[0..2] of array[0..2] of integer;
-{function CheckNearestBrush(tx,ty,bnxSkip,bnySkip:integer):boolean;
+function CheckNearestBrush(tx,ty,bnxSkip,bnySkip:integer):boolean;
 var ix,iy:byte;
 begin
    CheckNearestBrush:=false;
@@ -491,21 +475,21 @@ begin
          end;
    end
    else CheckNearestBrush:=true;
-end;}
-procedure DrawBrush(ix,iy:byte;bx,by,br:integer);
-{var
+end;
+procedure DrawBrush(ix,iy,bx,by,br:integer);
+var
 edgeRMax,
 edgeR,
 tx,ty  : integer;
 dirStart,
 dir,
-dirStep: single; }
+dirStep: single;
 begin
    case edgeStyle of
 tes_fog   : SDLSurf_filledCircleColor(sTemplate,bx,by,br,templateColor);
 tes_nature: begin
             SDLSurf_filledcircleColor(sTemplate,bx,by,br,templateColor);
-            {dirStep :=8;
+            dirStep :=8;
             edgeRMax:=round((pi*br*dirStep)/180);
             if(edgeRMax>1)then
             begin
@@ -534,7 +518,7 @@ tes_nature: begin
                   else SDLSurf_filledcircleColor(sTemplate,tx,ty,edgeR,transColor);
                   random_i+=1;
                end;
-            end; }
+            end;
             end;
 tes_tech  : SDLSurf_boxColor(sTemplate,bx-br,by-br,bx+br,by+br,templateColor);
    end;
@@ -624,7 +608,7 @@ end;
 procedure gfx_TileSet_MakeFog;
 var x,y:integer;
 tmp_TileTemplate: pTMWTileSet;
-tmp_fog_Texture:pSDL_Surface;
+tmp_fog_Texture : pSDL_Surface;
 begin
    tmp_TileTemplate:=gfx_TileSetTemplate_Make(c_white,c_black,fog_CellW,tes_fog,0,0);
    // fog 'texture'
@@ -639,8 +623,6 @@ begin
    gfx_TileSet_Free(tmp_TileTemplate);
    gfx_SDLSurfaceFree(tmp_fog_Texture);
 end;
-
-////////////////////////////////////////////////////////////////////////////////
 
 {
 function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
@@ -660,39 +642,37 @@ begin
       HALT;
    end;
    SDL_FreeSurface(ts);
-end;
+end; }
 
-function gfx_MakeBaseTile(baseSurface:pSDL_Surface;sw:integer;yPress:boolean;animStepX,animStepY:integer):pSDL_Surface;
-var  ts:pSDl_Surface;
+procedure gfx_MakeBaseTile(targetTex,baseTex:pTMWTexture;sw:integer;yPress:boolean;animStepX,animStepY:integer);
+var
+tmpTex :pSDl_Surface;
 nsw,nsh:integer;
-nsx,nsy:longInt;
 begin
    nsw:=0;
-   while(nsw<sw)do nsw+=baseSurface^.w;
+   while(nsw<sw)do nsw+=baseTex^.w;
 
    nsh:=0;
-   while(nsh<sw)do nsh+=baseSurface^.h;
+   while(nsh<sw)do nsh+=baseTex^.h;
 
-   if(yPress)then nsh+=baseSurface^.h;
+   if(yPress)then nsh+=baseTex^.h;
 
-   ts:=gfx_SDLSurfaceCreate(nsw,nsh);
+   tmpTex:=gfx_SDLSurfaceCreate(nsw,nsh);
 
-   gfx_FillSurfaceBySurface(ts,baseSurface,animStepX,animStepY);
+   gfx_FillSurfaceBySurface(tmpTex,baseTex^.sdlsurface,animStepX,animStepY);
+   SDL_UpperBlitScaled(tmpTex,nil,targetTex^.sdlsurface,nil);
 
-   while true do
+   gfx_SDLSurfaceFree(tmpTex);
+
+   with targetTex^ do
    begin
-      zoomSurfaceSize(nsw,nsh,sw/nsw,sw/nsh,nsx,nsy);
-      if(nsw=1)and(nsh=1)then break;
-      if(nsx>=sw)and(nsy>=sw)then break;
-      if(nsx< sw)and(nsw>1)then nsw-=1;
-      if(nsy< sw)and(nsh>1)then nsh-=1;
+      if(sdltexture<>nil)then sdl_DestroyTexture(sdltexture);
+      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
+      if(sdltexture=nil)then writeLog('gfx_MakeBaseTile -> SDL_CreateTextureFromSurface');
    end;
-   gfx_MakeBaseTile:=zoomSurface(ts,sw/nsw,sw/nsh,0);
-
-   gfx_SDLSurfaceFree(ts);
 end;
 
-procedure gfx_MakeThemeTiles();
+procedure gfx_MakeThemeTiles;
 var
 anim_seed:cardinal;
 animRX,
@@ -700,8 +680,8 @@ animRY,
 i,
 animStepX,
 animStepY: integer;
-maskColor: cardinal;
-upd_tiles : boolean;
+maskColor: TMWColor;
+upd_tiles: boolean;
 {function Compare(cur_id,last_id:pinteger):byte;
 begin
    Compare:=0;
@@ -714,15 +694,15 @@ begin
         last_id^:=cur_id^;
      end;
 end; }
-function DefaultTile(cur_id,last_id:pinteger;TargetTile:ppSDL_Surface):boolean;
+function CheckTile(cur_id,last_id:pinteger;TargetMWTexture:pTMWTexture):boolean;
 begin
-   DefaultTile:=false;
+   CheckTile:=false;
    if(cur_id^<>last_id^)then
    begin
-      gfx_SDLSurfaceFree(TargetTile^);
       if(0<=cur_id^)and(cur_id^<theme_all_terrain_n)
-      then DefaultTile:=true
-      else TargetTile^:=r_empty;
+      then CheckTile:=true
+      else
+        with TargetMWTexture^ do SDLSurf_boxColor(sdlsurface,0,0,w,h,c_black);
       last_id^:=cur_id^;
    end;
 end;
@@ -743,18 +723,22 @@ begin
    //writeln('--------------------');
 
    // base terrain tile
-   if(DefaultTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,@theme_tile_terrain ))then
+   if(CheckTile(@theme_cur_tile_terrain_id ,@theme_last_tile_terrain_id ,theme_tile_terrain ))then
    begin
-      theme_tile_terrain :=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_terrain_id ].sdlSurface,MapCellW,true,animStepX,animStepy);
-      //writeln('update 1 theme_tile_terrain ',theme_tile_terrain^.w,' ',theme_tile_terrain^.h);
+       gfx_MakeBaseTile(theme_tile_terrain,
+                        theme_all_terrain_l[theme_cur_tile_terrain_id],MapCellW,true,animStepX,animStepy);
+       //writeln('update 1 theme_tile_terrain');
    end;
 
    // crater tileset
    upd_tiles:=false;
-   if(DefaultTile(@theme_cur_tile_crater_id  ,@theme_last_tile_crater_id  ,@theme_tile_crater  ))then
+   if(CheckTile(@theme_cur_tile_crater_id  ,@theme_last_tile_crater_id  ,theme_tile_crater  ))then
    begin
-      theme_tile_crater:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_crater_id  ].sdlSurface,MapCellW,true,animStepX,animStepy);
-      boxColor(theme_tile_crater,0,0,theme_tile_crater^.w,theme_tile_crater^.h,rgba2c(0,0,0,150));
+      gfx_MakeBaseTile(theme_tile_crater,
+                       theme_all_terrain_l[theme_cur_tile_crater_id  ],MapCellW,true,animStepX,animStepy);
+      // alpha black make texture darker
+
+      SDLSurf_boxColor(theme_tile_crater^.sdlsurface,0,0,theme_tile_crater^.w,theme_tile_crater^.h,gfx_MakeAlphaTMWColor(150));
       upd_tiles:=true;
       //writeln('update 2 theme_tile_crater');
    end;
@@ -762,17 +746,18 @@ begin
    or(theme_cur_crater_tes<>theme_last_crater_tes)then
    begin
       if(theme_cur_crater_tes=tes_tech)
-      then gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
-      else gfx_MakeTileSet(theme_tile_crater,@theme_tileset_crater,@vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
+      then gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
+      else gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
       theme_last_crater_tes:=theme_cur_crater_tes;
       //writeln('update 3 theme_tileset_crater');
    end;
 
    // liquid tileset
    upd_tiles:=false;
-   if(DefaultTile(@theme_cur_tile_liquid_id  ,@theme_last_tile_liquid_id  ,@theme_tile_liquid  ))then
+   if(CheckTile(@theme_cur_tile_liquid_id  ,@theme_last_tile_liquid_id  ,theme_tile_liquid  ))then
    begin
-      theme_tile_liquid:=gfx_MakeBaseTile(theme_all_terrain_l[theme_cur_tile_liquid_id].sdlSurface,MapCellW,true,animStepX,animStepy);
+      gfx_MakeBaseTile(theme_tile_liquid,
+                       theme_all_terrain_l[theme_cur_tile_liquid_id],MapCellW,true,animStepX,animStepy);
       upd_tiles:=true;
       //writeln('update 4 theme_tile_liquid');
    end;
@@ -784,24 +769,19 @@ begin
       for i:=0 to theme_anim_step_n-1 do
       begin
          maskColor:=0;
-         if(theme_cur_liquid_tas=tas_magma)and(i>0)then
-           maskColor,0,0,0,30*i);
+         if(theme_cur_liquid_tas=tas_magma)and(i>0)then maskColor:=gfx_MakeAlphaTMWColor(255-i*30);
 
          if(theme_cur_liquid_tes=tes_nature)then
          begin
             if(theme_cur_liquid_tas=tas_magma)
-            then gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
-            else gfx_MakeTileSet(theme_tile_liquid,@theme_tileset_liquid[i],@vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
+            then gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
+            else gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
          end
          else
-           with theme_tileset_liquid[i][0] do
+           with theme_tileset_liquid[i]^[0]^ do
            begin
-              gfx_SDLSurfaceFree(sdlSurface);
-              sdlSurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
-              gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid,animStepX,animStepY);
-              if(maskColor>0)then boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
-               w:=MapCellW ;h := w;
-              hw:=MapCellhW;hh:=hw;
+              gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid^.sdlsurface,animStepX,animStepY);
+              if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
            end;
          if(theme_cur_liquid_tas=tas_liquid)then
          begin
@@ -813,16 +793,11 @@ begin
       theme_last_liquid_tes:=theme_cur_liquid_tes;
       theme_last_liquid_tas:=theme_cur_liquid_tas;
    end;
-
-   // teleport sprite
-   if(DefaultTile(@theme_cur_tile_teleport_id,@theme_last_tile_teleport_id,@theme_tile_teleport))then
-   begin
-      theme_tile_teleport:=gfx_SDLSurfaceResize(theme_all_terrain_l[theme_cur_tile_teleport_id].sdlSurface,MapCellhW,MapCellhW);
-      //writeln('update 6 theme_tile_teleport');
-   end;
 end;
 
-function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
+////////////////////////////////////////////////////////////////////////////////
+
+{function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
 var ts:pSDl_Surface;
    hwb:integer;
 begin
@@ -907,15 +882,15 @@ begin
          end;
          SDL_FillRect(sdlsurface,nil,ccc);
 
-         vid_rect^.x:=i*font_w;
-         vid_rect^.y:=0;
-         vid_rect^.w:=font_w;
-         vid_rect^.h:=font_h;
+         vid_SDLRect^.x:=i*font_w;
+         vid_SDLRect^.y:=0;
+         vid_SDLRect^.w:=font_w;
+         vid_SDLRect^.h:=font_h;
 
-         SDL_BLITSURFACE(fspr^.sdlsurface,vid_rect,sdlsurface,nil);
+         SDL_BLITSURFACE(fspr^.sdlsurface,vid_SDLRect,sdlsurface,nil);
          SDL_SetColorKey(sdlsurface,1,ccc);
 
-         sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+         sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
          if(sdltexture=nil)
          then writeLog('gfx_LoadFont -> SDL_CreateTextureFromSurface')
          else SDL_SetTextureBlendMode(sdltexture,SDL_BLENDMODE_BLEND);
@@ -955,26 +930,26 @@ end;}
 
 procedure dtest;
 begin
-   {SDL_SetRenderTarget(vid_renderer,tex_ui_MiniMap.sdltexture);
+   {SDL_SetRenderTarget(vid_SDLRenderer,tex_ui_MiniMap.sdltexture);
 
    draw_set_color(c_aqua);
    draw_clear;
    draw_set_color(c_yellow);
    draw_set_alpha(0);
-   SDL_SetRenderDrawBlendMode(vid_renderer,SDL_BLENDMODE_NONE);
+   SDL_SetRenderDrawBlendMode(vid_SDLRenderer,SDL_BLENDMODE_NONE);
    SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_NONE);
 
    //draw_fcircle(MapCellHW,MapCellHW,MapCellHW);
-   SDL_RenderDrawLine(vid_renderer,0,0,999,999);
-   SDL_RenderDrawLine(vid_renderer,1,0,999,999);
-   SDL_RenderDrawLine(vid_renderer,2,0,999,999);
-   SDL_RenderDrawLine(vid_renderer,3,0,999,999);
-   SDL_RenderDrawLine(vid_renderer,4,0,999,999);
-   SDL_RenderDrawLine(vid_renderer,5,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,0,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,1,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,2,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,3,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,4,0,999,999);
+   SDL_RenderDrawLine(vid_SDLRenderer,5,0,999,999);
 
 
-   SDL_SetRenderTarget(vid_renderer,nil);
-   SDL_SetRenderDrawBlendMode(vid_renderer,SDL_BLENDMODE_BLEND);
+   SDL_SetRenderTarget(vid_SDLRenderer,nil);
+   SDL_SetRenderDrawBlendMode(vid_SDLRenderer,SDL_BLENDMODE_BLEND);
    SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_BLEND);
    draw_set_alpha(255);}
 
@@ -993,7 +968,7 @@ begin
       SDLSurf_filledCircleColor(sdlsurface,20,MapCellW-20,50,c_lime);
 
 
-      sdltexture:=SDL_CreateTextureFromSurface(vid_renderer,sdlsurface);
+      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
       gfx_SDLSurfaceFree(sdlsurface);
 
    end;
@@ -1030,6 +1005,10 @@ begin
    tex_map_bMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: terrain background
 
    // theme tileset templates
+
+   theme_tile_terrain:=gfx_MWTextureMakeSDLSurface(MapCellW,MapCellW);
+   theme_tile_crater :=gfx_MWTextureMakeSDLSurface(MapCellW,MapCellW);
+   theme_tile_liquid :=gfx_MWTextureMakeSDLSurface(MapCellW,MapCellW);
 
    vid_TileTemplate_crater_tech  :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_tech  ,8 ,0);
    vid_TileTemplate_crater_nature:=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,11,0);
