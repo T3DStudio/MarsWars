@@ -325,7 +325,7 @@ begin
             then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
        end;
 
-       if(_splashresist)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
+       if(_splashresist)or(_ukmech)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
 
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;

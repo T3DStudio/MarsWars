@@ -654,7 +654,7 @@ begin
            if(ServerSide)then
            begin
               revealed:=false;
-              if(n_builders=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}then
+              if(e_builders=0){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}then
                 if(g_mode<>gm_invasion)
                 or(p>0)then revealed:=true;
 

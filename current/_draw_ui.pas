@@ -663,8 +663,7 @@ begin
             _ADDSTR(@s1,lvlstr_a,sep_wdash);
             _ADDSTR(@s1,lvlstr_s,sep_wdash);
             if(length(s1)>0)then
-            _draw_text(tar,ui_textx,ui_hinty2,str_upgradeslvl+s1,ta_left,ui_ingamecl,c_white);
-
+            _draw_text(tar,ui_textx,ui_hinty2,str_upgradeslvl+s1+tc_default+', '+str_hits+li2s(hits),ta_left,ui_ingamecl,c_white);
             _draw_text(tar,ui_textx,ui_hinty3,tc_white+'('+tc_default+name+tc_white+')',ta_left,ui_ingamecl,PlayerGetColor(pnum));
        end;
 end;

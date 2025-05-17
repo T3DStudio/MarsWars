@@ -138,7 +138,7 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v53.1';
+str_ver                = 'v53.5';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
@@ -714,7 +714,7 @@ BaseHealBonus1         = BaseDamageBonus1*2;
 BaseRepair1            = BaseDamage1 div 3;
 BaseRepairBonus1       = BaseDamageBonus1*2;
 
-DecayAuraDamage        = BaseDamage1 div 10;
+DecayAuraDamage        = BaseDamageBonus1;
 
 ExpLevel1              = fr_fps1*ptime2;
 

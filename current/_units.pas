@@ -169,11 +169,11 @@ begin
             _unit_morph:=ureq_unknown;
             exit;
          end;
-         if(uid^._isbuilder)and(n_builders<=1)then
+         {if(uid^._isbuilder)and(n_builders<=1)then
          begin
             _unit_morph:=ureq_needbuilders;
             exit;
-         end;
+         end; }
          if((cenergy-uid^._genergy)<puid^._renergy)or(menergy<=uid^._genergy)then
          begin
             _unit_morph:=ureq_energy;
@@ -225,6 +225,8 @@ begin
 
       if(uds<0)then
       begin
+         _AddToInt(@tu^.vsnt[player^.team],vistime);
+
          if((tu^.x=x)and(tu^.y=y))then
          begin
             case _random(4) of

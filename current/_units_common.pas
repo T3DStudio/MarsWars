@@ -746,7 +746,7 @@ begin
 
    if(pl<=MaxPlayers)then
     with _players[pl] do
-     if(n_builders<=0)then
+     if(e_builders<=0)then
      begin
         _InBuildArea:=1; // no builders
         exit;

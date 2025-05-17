@@ -519,6 +519,7 @@ UID_BFGMarine,
 UID_ZBFGMarine,
 UID_ZMedic,
 UID_Medic,
+UID_ZEngineer,
 UID_Engineer     : up_m:=ai_max_specialist;
       else         up_m:=MaxUnits;
       end;
@@ -763,7 +764,7 @@ begin
       else
       begin
          prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
-         if(g_generators>0)then prods+=1;
+         if(g_generators>0)then prods+=2;
 
          if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
          if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
@@ -1275,6 +1276,7 @@ begin
           then au_SetBusyGroup(pu)
           else
             case uidi of
+UID_ZEngineer,
 UID_Engineer : if(CheckReparTargets(ai_mrepair_u,ai_mrepair_d))then exit;
 UID_ZMedic,
 UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;

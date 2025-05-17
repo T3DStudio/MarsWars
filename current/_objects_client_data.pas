@@ -327,8 +327,11 @@ begin
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setMWSModel  (0,@spr_ZEngineer);
-   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND (  nil,snd_exp,snd_exp,nil);
+   setEffectEID (0,0  ,0              ,EID_Gavno,0             );
+   setEffectSND (  nil,snd_zimba_death,snd_meat ,snd_zimba_pain);
+   setWeaponESND(0,nil,snd_electro,0,0);
+   setWeaponESND(1,nil,snd_pistol,0,0);
+   with _a_weap[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onlyshot:=true;end;
 end;
 UID_ZSergant:
 begin
@@ -352,7 +355,7 @@ begin
 end;
 UID_ZCommando:
 begin
-   _animw:=14;
+   _animw:=17;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -362,7 +365,7 @@ begin
 end;
 UID_ZSiegeMarine:
 begin
-   _animw:=13;
+   _animw:=17;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -372,7 +375,7 @@ begin
 end;
 UID_ZAntiaircrafter:
 begin
-   _animw:=13;
+   _animw:=17;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );
@@ -393,7 +396,7 @@ begin
 end;
 UID_ZBFGMarine:
 begin
-   _animw:=14;
+   _animw:=15;
    _animd:=8;
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_Gavno,0             );

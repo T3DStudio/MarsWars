@@ -251,9 +251,9 @@ begin
       2  : SetBaseOpt(2000 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,25    ,fr_fps1*80 ,30            ,0  ,[]);
       3  : SetBaseOpt(3500 ,2   ,5     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
       4  : SetBaseOpt(5000 ,3   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,1       ,10   ,10    ,55    ,1          ,60            ,2  ,[]);
-      5  : SetBaseOpt(6000 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic]);
-      6  : SetBaseOpt(7500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(9000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_BFGMarine,UID_ZBFGMarine]);
+      5  : SetBaseOpt(6000 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      6  : SetBaseOpt(7500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(9000 ,4   ,20    ,6    ,1    ,1    ,1    ,14   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       ai_max_specialist:=ai_skill-1;
       ai_noProdTime:=random(ai_skill*ai_noProdTimeStep);
@@ -700,12 +700,14 @@ begin
                   and(tu^.uid^._attack>0)then aiu_limitaround_enemy+=tu^.uid^._limituse;
 
                   if(ud<srange)then
-                    if (tu^.buff[ub_Invis]>0)
-                    and(tu^.vsni[team]<=0)
-                    and(tu^.a_rld>0)
-                    and(tu^.buff[ub_Scaned]<=0)
-                    and(tu^.uid^._attack>0)
-                    then aiu_need_detect:=ud-srange-hits;
+                    if(ai_generator_d<100)
+                    or(ai_cpoint_d<100)
+                    or(tu^.a_rld>0)then
+                      if (tu^.buff[ub_Invis]>0)
+                      and(tu^.vsni[team]<=0)
+                      and(tu^.buff[ub_Scaned]<=0)
+                      and(tu^.uid^._attack>0)
+                      then aiu_need_detect:=ud-srange-hits;
                end;
          end;
       end;
@@ -873,8 +875,9 @@ begin
                or(upgr[upgr_fog_vision]>0)then
                begin
                   // invisible enemy unit
-                  if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.a_rld>0)and(tu^.buff[ub_Scaned]<=0)then
-                    _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
+                  if(tu^.a_rld>0)or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)then
+                    if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.buff[ub_Scaned]<=0)then
+                      _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
                end;
 
             if(playeri=tu^.playeri)then

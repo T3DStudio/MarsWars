@@ -273,7 +273,7 @@ begin
            then _unit_damage(tu,rdamage,painX,player,false);
         end
         else
-          if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^._splashresist)then // splash damage
+          if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^._splashresist)and(not tu^.uid^._ukmech)then // splash damage
           begin
              {$IFDEF _FULLGAME}
              if(ms_eid_target_eff>0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
