@@ -218,8 +218,8 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      if(g_generators=0)and(g_step<ai_noProdTime)
-      then ai_need_energy:=mm3(600, ai_builders_count         *1200,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
+      if((g_generators=0)and(g_step<ai_noProdTime))or((ai_tech2_cur>0)and ai_advanced_bld)
+      then ai_need_energy:=mm3(600, ai_builders_count         *1250,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
       else
         if(ai_advanced_bld)
         then ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy)
@@ -764,7 +764,7 @@ begin
       else
       begin
          prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
-         if(g_generators>0)then prods+=2;
+         if(g_generators>0)or((ai_tech2_cur>0)and ai_advanced_bld)then prods+=2;
 
          if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
          if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);

@@ -640,8 +640,8 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1*2,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_notme_hits,0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_notme_hits,0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_ZEngineer:
 begin
@@ -656,8 +656,8 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1*2,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_notme_hits,0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0            ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_notme_hits,0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_ZSergant :
 begin
@@ -905,7 +905,7 @@ begin
    _mhits     := 2000;
    _genergy   := 100;
    _renergy   := 100;
-   _r         := 40;
+   _r         := 38;
    _ucl       := 2;
    _btime     := ptime1;
    _ukbuilding:= true;
@@ -1597,10 +1597,10 @@ begin
    //                                  base X +
    //         race id                  time      lvl  enr  X +    rupgr         ruid                 multi
    u:=0;
-   _setUPGR(r_hell,upgr_hell_t1attack  ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                   ,false);
-   _setUPGR(r_hell,upgr_hell_uarmor    ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                   ,false);
-   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,40,5   ,600 ,0,300 ,0            ,0                   ,false);
-   _setUPGR(r_hell,upgr_hell_mattack   ,60 ,0,40,5   ,600 ,0,300 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_t1attack  ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_uarmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_mattack   ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_regen     ,60 ,0,30,2   ,300 ,0,300 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_pains     ,60 ,0,0 ,2   ,300 ,0,300 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_buildr    ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   ,false);
@@ -1611,7 +1611,7 @@ begin
    _setUPGR(r_hell,upgr_hell_spectre   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          ,false);
    _setUPGR(r_hell,upgr_hell_vision    ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_HMonastery      ,false);
    _setUPGR(r_hell,upgr_hell_phantoms  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      ,false);
-   _setUPGR(r_hell,upgr_hell_t2attack  ,60 ,0,45,5   ,600 ,0,600 ,0            ,UID_HMonastery      ,false);
+   _setUPGR(r_hell,upgr_hell_t2attack  ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_HMonastery      ,false);
    _setUPGR(r_hell,upgr_hell_resurrect ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      ,false);
    _setUPGR(r_hell,upgr_hell_teleport  ,60 ,0,30,2   ,400 ,0,200 ,0            ,UID_HFortress       ,false);
    _setUPGR(r_hell,upgr_hell_rteleport ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       ,false);
@@ -1622,10 +1622,10 @@ begin
 
 
    u:=0;
-   _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,45,5   ,600 ,0,600 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,45,2   ,600 ,0,300 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,35,2   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_ssgup      ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_buildr     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   ,false);
@@ -1638,7 +1638,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_commando   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_airsp      ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_mechspd    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UTechCenter     ,false);
-   _setUPGR(r_uac ,upgr_uac_mecharm    ,60 ,0,45,5   ,600 ,0,600 ,0            ,UID_UTechCenter     ,false);
+   _setUPGR(r_uac ,upgr_uac_mecharm    ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_antiair    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_transport  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UTechCenter     ,false);
    _setUPGR(r_uac ,upgr_uac_radar_r    ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_UComputerStation,false);

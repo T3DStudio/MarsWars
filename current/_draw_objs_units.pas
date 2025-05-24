@@ -214,11 +214,31 @@ begin
              then break
              else ui_ProductionCounters(pu,i);
          end;
-         if(sel)and(_UnitHaveRPoint(pu^.uidi))then
+         if(sel)and(_UnitHaveRPoint(pu^.uidi))and(uo_x>0)then
          begin
             UnitsInfoAddLine(x,y,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
             SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
          end;
+      end;
+
+      if(uo_x>0)and((uo_x<>x)or(uo_y<>y))then
+      begin
+         if(sel)and(speed>0)and(rpls_state<rpls_read)then
+           if(uo_id=ua_move)or(uo_id=ua_amove)then
+             if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+
+         if(uo_id=ua_psability)then
+           case _ability of
+uab_RebuildInPoint: begin
+                    SpriteListAddEffect(uo_x,uo_y,32000,0,_uid2spr(_rebuild_uid,270,0),128);
+                    UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+                    end;
+uab_CCFly         : begin
+                    SpriteListAddEffect(uo_x,uo_y+fly_hz,32000,0,_uid2spr(uidi,270,0),128);
+                    UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[r_blink2_colorb]);
+                    end;
+           else     UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+           end;
       end;
 
       if(iscomplete)then

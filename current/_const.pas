@@ -5,7 +5,7 @@ pinteger = ^integer;
 
 const
 
-ver                    : byte = 232;
+ver                    : byte = 233;
 
 degtorad               = pi/180;
 
@@ -138,7 +138,7 @@ pf_solid               : word = 65535;
 //  BASE STRINGS
 //
 
-str_ver                = 'v53.5';
+str_ver                = 'v54';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
@@ -709,9 +709,9 @@ BaseArmorLevel1        = 2;
 UpgradeUnitArmorBonus  = BaseArmorBonus1;
 UpgradeBuildArmorBonus = BaseArmorBonus1*2+(BaseArmorBonus1 div 3);
 
-BaseHeal1              = BaseDamage1 div 3;
+BaseHeal1              = BaseDamage1 div 2;
 BaseHealBonus1         = BaseDamageBonus1*2;
-BaseRepair1            = BaseDamage1 div 3;
+BaseRepair1            = BaseDamage1 div 2;
 BaseRepairBonus1       = BaseDamageBonus1*2;
 
 DecayAuraDamage        = BaseDamageBonus1;

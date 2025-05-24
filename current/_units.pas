@@ -151,7 +151,7 @@ begin
          _unit_morph:=ureq_max;
          exit;
       end;
-      if((armylimit-pu^.uid^._limituse+puid^._limituse)>MaxPlayerLimit)then
+      if((armylimit-pu^.uid^._limituse+puid^._limituse+uprodl)>MaxPlayerLimit)then
       begin
          _unit_morph:=ureq_armylimit;
          exit;
@@ -487,6 +487,10 @@ wpt_heal     : if(tu^.hits<=0)
          or(tu^.uid^._zombie_hits<tu^.hits)
          or(tu^.hits<=fdead_hits          )then exit;
          if(tu^.player^.team=team)and(tu^.hits>0)then exit;
+
+         if((armylimit-_limituse+tu^.uid^._limituse+uprodl)>MaxPlayerLimit)then exit;
+         if((menergy-_genergy+tu^.uid^._genergy)<=0)then exit;
+         if(tu^.uid^._isbuilder)and(e_builders>=PlayerMaxBuilders)then exit;
       end;
 
       // requirements to target
@@ -586,13 +590,17 @@ begin
    i:=i div 2;
 end;
 begin
-   i:=4096;
+   i:=8192;
    _unitWeaponPriority:=0;
 
    with tu^  do
    with uid^ do
    case priorset of
-wtp_building         : incPrio(    _ukbuilding   );
+wtp_building         : begin
+                       incPrio(    _ukbuilding   );
+                       incPrio(_genergy>0);
+                       incPrio(not iscomplete    );
+                       end;
 wtp_BuildingHeavy    : begin
                        incPrio((   _ukbuilding  )
                             and(not _uklight    ));
@@ -1296,7 +1304,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      if((armylimit-_limituse+_zuid^._limituse)>MaxPlayerLimit)then exit;
+      if((armylimit-_limituse+_zuid^._limituse+uprodl)>MaxPlayerLimit)then exit;
       if((menergy-_genergy+_zuid^._genergy)<=0)then exit;
       if(tu^.uid^._isbuilder)and(e_builders>=PlayerMaxBuilders)then exit;
    end;

@@ -800,7 +800,7 @@ Places in transport: 1
 
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,unit,biological], impact 34*2, target priority: lowest hits;
+- heal/repair, targets: [alive,unit,biological], impact 26*2, target priority: lowest hits;
 - ranged attack, max. range: vision range, targets: [alive,ground], impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -828,7 +828,7 @@ Places in transport: 1
 
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,mechanical], impact 34*2, target priority: lowest hits;
+- heal/repair, targets: [alive,mechanical], impact 26*2, target priority: lowest hits;
 - ranged attack, max. range: vision range, targets: [alive], impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -1122,8 +1122,8 @@ Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 2
-Size: 40
-Base vision range: 80
+Size: 38
+Base vision range: 76
 Build time: 20
 Energy required: 100
 
@@ -1141,8 +1141,8 @@ Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 2
-Size: 40
-Base vision range: 80
+Size: 38
+Base vision range: 76
 Build time: 25
 Energy required: 0
 
@@ -1160,8 +1160,8 @@ Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 2
-Size: 40
-Base vision range: 80
+Size: 38
+Base vision range: 76
 Build time: 25
 Energy required: 0
 
@@ -1179,8 +1179,8 @@ Hotkey: Y
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 2000
 Limit used: 2
-Size: 40
-Base vision range: 80
+Size: 38
+Base vision range: 76
 Build time: 25
 Energy required: 0
 
@@ -1373,7 +1373,7 @@ Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,mechanical], impact 17*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- heal/repair, targets: [alive,mechanical], impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
 - ranged attack, max. range: vision range, targets: [alive], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1401,7 +1401,7 @@ Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,unit,biological], impact 17*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- heal/repair, targets: [alive,unit,biological], impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
 - ranged attack, max. range: vision range, targets: [alive,ground], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1746,22 +1746,22 @@ Special ability: "Unload". Immune to splash damage.
 ---------------------------
 
 
-Hell Firepower (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Hell Firepower (R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the damage of ranged attacks for T1 units and defensive structures.
 
 
-Combat Flesh (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Combat Flesh (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the armor of all Hell units.
 
 
-Stone Walls (Y,600/900/1200/1500/1800,60/100/140/180/220,x5)
+Stone Walls (Y,600/1000/1400/1800/2200,60/90/120/150/180,x5)
 
 Increase the armor of all Hell buildings.
 
 
-Claws and Teeth (F,600/900/1200/1500/1800,60/100/140/180/220,x5)
+Claws and Teeth (F,600/1000/1400/1800/2200,60/90/120/150/180,x5)
 
 Increase the damage of melee attacks.
 
@@ -1811,7 +1811,7 @@ Phantoms (J,600,60,x1)
 Pain Elemental spawns Phantoms instead of Lost Soul.
 Requirements: Monastery of Despair
 
-Demon`s Weapons (K,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Demon`s Weapons (K,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the damage of ranged attacks for T2 units and defensive structures.
 Requirements: Monastery of Despair
@@ -1851,22 +1851,22 @@ Tower Teleportation Charge (Ctrl+H,200,30,x15,*)
 Charges for ability of Guard Tower and Totem of Horror.
 Requirements: Castle of Damned
 
-Weapons Upgrade (R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Weapons Upgrade (R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the damage of ranged attacks for all UAC units and defensive structures.
 
 
-Infantry Combat Armor Upgrade (T,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Infantry Combat Armor Upgrade (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the armor of all Barrack`s units.
 
 
-Concrete Walls (Y,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Concrete Walls (Y,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the armor of all UAC buildings.
 
 
-Advanced Tools (F,600/900,60/105,x2)
+Advanced Tools (F,600/1000,60/95,x2)
 
 Increase repair/healing efficiency of Engineers/Medics.
 
@@ -1926,7 +1926,7 @@ Advanced Engines (L,600/900,60/75,x2)
 Increase the movement speed of all Factory`s units.
 Requirements: Science Facility
 
-Mech Combat Armor Upgrade (Ctrl+R,600/1200/1800/2400/3000,60/105/150/195/240,x5)
+Mech Combat Armor Upgrade (Ctrl+R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
 Increase the armor of all Factory`s units.
 Requirements: Science Facility

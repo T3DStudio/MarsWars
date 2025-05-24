@@ -168,6 +168,7 @@ var i: byte;
 begin
    with pu^ do
    with uid^ do
+   if(_ukbuilding)and(iscomplete)then
    for i:=0 to MaxUnitLevel do
    begin
       if(i>level)then break;
@@ -205,9 +206,8 @@ begin
       else b:=0;
       uo:=uo_id;
       if(uo_bx>0)then uo:=ua_patrol;
-      uo:=(uo and %00000111) shl 4;
 
-      b:=b or uo;
+      b:=b or ((uo and %00000111) shl 4);
 
       if(wb)then b:=b or %10000000;
 
@@ -218,13 +218,13 @@ begin
       wudtick^:=G_Step;
 
       if(iscomplete)then
-       if(_ability in client_rld_abils)
-       or(uidi     in client_rld_uids )then _wudata_rld(@rld,rpl);
+        if(_ability in client_rld_abils)
+        or(uidi     in client_rld_uids )then _wudata_rld(@rld,rpl);
 
-      if(_ukbuilding)then
-      begin
-         if(iscomplete)then _wudata_prod(pu,rpl);
-         if(sel or not rpl)and(_UnitHaveRPoint(pu^.uidi))then
+      _wudata_prod(pu,rpl);
+
+      if(sel or not rpl)then
+        if(_UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
           if(_IsUnitRange(uo_tar,nil))
           then _wudata_int(-uo_tar,rpl)
           else
@@ -232,7 +232,6 @@ begin
              _wudata_int(uo_x,rpl);
              _wudata_int(uo_y,rpl);
           end;
-      end;
    end;
 end;
 
@@ -998,6 +997,7 @@ var i: byte;
 begin
    with uu^ do
    with uid^ do
+   if(_ukbuilding)and(iscomplete)then
    for i:=0 to MaxUnitLevel do
     if(i<=level)then
     begin
@@ -1014,7 +1014,8 @@ begin
 end;
 
 procedure _rudata_OwnerUData(uu:PTUnit;rpl:boolean);
-var b : byte;
+var puo,
+    b : byte;
     tu: PTUnit;
 begin
    with uu^  do
@@ -1024,13 +1025,16 @@ begin
 
       if(rpl)then group:=b and %00001111;
 
+      puo:=uo_id;
       uo_id:=(b and %01110000)shr 4;
       if(uo_id=ua_patrol)then
       begin
-         uo_id:=ua_amove;
          uo_bx:=1;
+         uo_id:=ua_amove;
       end
       else uo_bx:=-1;
+
+      if(puo<>ua_psability)and(uo_id=ua_psability)then uo_x:=-1;
 
       if((b and %10000000)=0)then exit;
 
@@ -1038,25 +1042,24 @@ begin
        if(_ability in client_rld_abils)
        or(uidi     in client_rld_uids )then _rudata_rld(@rld,rpl);
 
-      if(_ukbuilding)then
-      begin
-         if(iscomplete)then _rudata_prod(uu,rpl);
-         if(sel or not rpl)and(_UnitHaveRPoint(uidi))then
-         begin
-            uo_x:=_rudata_int(rpl,0);
-            if(_IsUnitRange(-uo_x,@tu))then
-            begin
-               uo_tar:=-uo_x;
-               uo_x  :=tu^.vx;
-               uo_y  :=tu^.vy;
-            end
-            else
-            begin
-               uo_tar:=0;
-               uo_y  :=_rudata_int(rpl,0);
-            end;
-         end;
-      end;
+      _rudata_prod(uu,rpl);
+
+      if(sel or not rpl)then
+        if(_UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
+        begin
+           uo_x:=_rudata_int(rpl,0);
+           if(_IsUnitRange(-uo_x,@tu))then
+           begin
+              uo_tar:=-uo_x;
+              uo_x  :=tu^.vx;
+              uo_y  :=tu^.vy;
+           end
+           else
+           begin
+              uo_tar:=0;
+              uo_y  :=_rudata_int(rpl,0);
+           end;
+        end;
    end;
 end;
 

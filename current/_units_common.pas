@@ -886,6 +886,8 @@ begin
 
       uo_id    := ua_amove;
       uo_tar   := 0;
+      uo_x     := x;
+      uo_y     := y;
       rld      := 0;
       pains    := 0;
       dir      := 270;
