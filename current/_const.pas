@@ -707,7 +707,7 @@ BaseArmorBonus1        = 7;
 BaseArmorLevel1        = 2;
 
 UpgradeUnitArmorBonus  = BaseArmorBonus1;
-UpgradeBuildArmorBonus = BaseArmorBonus1*2+(BaseArmorBonus1 div 3);
+UpgradeBuildArmorBonus = BaseArmorBonus1*2+(BaseArmorBonus1 div 2);
 
 BaseHeal1              = BaseDamage1 div 2;
 BaseHealBonus1         = BaseDamageBonus1*2;

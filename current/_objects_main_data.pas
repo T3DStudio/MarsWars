@@ -1599,7 +1599,7 @@ begin
    u:=0;
    _setUPGR(r_hell,upgr_hell_t1attack  ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_uarmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
-   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,20,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_mattack   ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_regen     ,60 ,0,30,2   ,300 ,0,300 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_pains     ,60 ,0,0 ,2   ,300 ,0,300 ,0            ,0                   ,false);
@@ -1625,7 +1625,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,35,2   ,600 ,0,400 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_ssgup      ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_buildr     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   ,false);

@@ -729,6 +729,7 @@ begin
    // resources
    if(VisPlayer>0)then
    with _players[VisPlayer] do
+   if(armylimit>0)then
    begin
       limit:=armylimit+uprodl;
       _draw_text(tar,ui_energx,ui_energy,tc_aqua  +str_hint_energy+tc_default+i2s(cenergy           )+tc_white+' / '+tc_aqua  +i2s(menergy),ta_left,255,ui_cenergy[cenergy<=0]);

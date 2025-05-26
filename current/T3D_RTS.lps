@@ -16,8 +16,8 @@
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="676"/>
-        <CursorPos X="8" Y="671"/>
+        <TopLine Value="682"/>
+        <CursorPos X="69" Y="711"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -72,8 +72,8 @@
       <Unit8>
         <Filename Value="_input.pas"/>
         <EditorIndex Value="38"/>
-        <TopLine Value="866"/>
-        <CursorPos X="10" Y="274"/>
+        <TopLine Value="564"/>
+        <CursorPos X="64" Y="583"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -126,16 +126,16 @@
       <Unit15>
         <Filename Value="_game.pas"/>
         <EditorIndex Value="34"/>
-        <TopLine Value="693"/>
-        <CursorPos X="19" Y="724"/>
+        <TopLine Value="702"/>
+        <CursorPos X="27" Y="751"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="_draw_ui.pas"/>
         <EditorIndex Value="13"/>
-        <TopLine Value="595"/>
-        <CursorPos X="17" Y="602"/>
+        <TopLine Value="712"/>
+        <CursorPos X="44" Y="730"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit16>
@@ -260,8 +260,8 @@
       <Unit32>
         <Filename Value="_draw_objs_units.pas"/>
         <EditorIndex Value="15"/>
-        <TopLine Value="217"/>
-        <CursorPos X="54" Y="226"/>
+        <TopLine Value="205"/>
+        <CursorPos X="33" Y="232"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -291,8 +291,8 @@
       <Unit36>
         <Filename Value="_objects_main_data.pas"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="1610"/>
-        <CursorPos X="61" Y="1617"/>
+        <TopLine Value="1595"/>
+        <CursorPos X="49" Y="1602"/>
         <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit36>
@@ -351,7 +351,7 @@
         <UsageCount Value="5"/>
       </Unit43>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
         <Filename Value="_draw_objs_units.pas"/>
         <Caret Line="233" Column="26" TopLine="216"/>
@@ -405,73 +405,61 @@
         <Caret Line="224" Column="42" TopLine="200"/>
       </Position13>
       <Position14>
-        <Filename Value="_unit_client.pas"/>
-        <Caret Line="1027" TopLine="1064"/>
+        <Filename Value="_units_common.pas"/>
+        <Caret Line="876" Column="24" TopLine="869"/>
       </Position14>
       <Position15>
         <Filename Value="_units_common.pas"/>
-        <Caret Line="876" Column="24" TopLine="869"/>
+        <Caret Line="1086" Column="26" TopLine="1056"/>
       </Position15>
       <Position16>
         <Filename Value="_units_common.pas"/>
-        <Caret Line="1086" Column="26" TopLine="1056"/>
+        <Caret Line="876" Column="24" TopLine="866"/>
       </Position16>
       <Position17>
-        <Filename Value="_units_common.pas"/>
-        <Caret Line="876" Column="24" TopLine="866"/>
+        <Filename Value="_unit_client.pas"/>
+        <Caret Line="1019" Column="71" TopLine="1012"/>
       </Position17>
       <Position18>
         <Filename Value="_unit_client.pas"/>
-        <Caret Line="1019" Column="71" TopLine="1012"/>
+        <Caret Line="1099" Column="26" TopLine="1069"/>
       </Position18>
       <Position19>
         <Filename Value="_unit_client.pas"/>
-        <Caret Line="1099" Column="26" TopLine="1069"/>
+        <Caret Line="655" Column="22" TopLine="637"/>
       </Position19>
       <Position20>
         <Filename Value="_unit_client.pas"/>
-        <Caret Line="655" Column="22" TopLine="637"/>
+        <Caret Line="1099" Column="26" TopLine="1069"/>
       </Position20>
       <Position21>
-        <Filename Value="_unit_client.pas"/>
-        <Caret Line="1099" Column="26" TopLine="1069"/>
-      </Position21>
-      <Position22>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1773" Column="112" TopLine="1876"/>
-      </Position22>
-      <Position23>
         <Filename Value="_units.pas"/>
         <Caret Line="1841" Column="10" TopLine="1820"/>
-      </Position23>
-      <Position24>
+      </Position21>
+      <Position22>
         <Filename Value="_game.pas"/>
         <Caret Line="555" Column="87" TopLine="547"/>
+      </Position22>
+      <Position23>
+        <Filename Value="_ai_main.pas"/>
+        <Caret Line="650" Column="56" TopLine="635"/>
+      </Position23>
+      <Position24>
+        <Filename Value="_ai_main.pas"/>
+        <Caret Line="683" Column="29" TopLine="638"/>
       </Position24>
       <Position25>
         <Filename Value="_ai_main.pas"/>
-        <Caret Line="650" Column="56" TopLine="635"/>
+        <Caret Line="834" Column="37" TopLine="789"/>
       </Position25>
       <Position26>
-        <Filename Value="_ai_main.pas"/>
-        <Caret Line="683" Column="29" TopLine="638"/>
-      </Position26>
-      <Position27>
-        <Filename Value="_ai_main.pas"/>
-        <Caret Line="834" Column="37" TopLine="789"/>
-      </Position27>
-      <Position28>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1391" Column="99" TopLine="1507"/>
-      </Position28>
-      <Position29>
         <Filename Value="_units.pas"/>
         <Caret Line="1354" Column="11" TopLine="1333"/>
-      </Position29>
-      <Position30>
+      </Position26>
+      <Position27>
         <Filename Value="_const.pas"/>
         <Caret Line="719" Column="40" TopLine="698"/>
-      </Position30>
+      </Position27>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
