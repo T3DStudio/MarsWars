@@ -1232,6 +1232,7 @@ begin
          or(CheckUnitTeamVision(player^.team,tu,false)=false)then
          begin
             uo_tar:=0;
+            uo_id :=ua_amove;
             exit;
          end;
 
