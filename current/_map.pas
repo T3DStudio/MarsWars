@@ -83,7 +83,7 @@ begin
       with tgca_decor_l[tgca_decor_n-1] do
       begin
          tgca_decorN    :=N;
-         tgca_decorS    :=@theme_all_decor_l[tgca_decorN];
+         tgca_decorS    := theme_all_decor_l[tgca_decorN];
          tgca_decorA    :=@theme_anm_decors [tgca_decorN];
          tgca_decorDepth:=depth+my+ay;
          tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
@@ -100,7 +100,7 @@ begin
       setlength(tgca_decal_l,tgca_decal_n);
       with tgca_decal_l[tgca_decal_n-1] do
       begin
-         tgca_decalS:=@theme_all_decal_l[N];
+         tgca_decalS:=theme_all_decal_l[N];
          tgca_decalX:=random(max2i(0,MapCellW-tgca_decalS^.w));
          tgca_decalY:=random(max2i(0,MapCellW-tgca_decalS^.h));
       end;
@@ -1094,8 +1094,8 @@ procedure map_CPoints;
 begin
    FillChar(g_cpoints,SizeOf(g_cpoints),0);
 
-   case g_mode of
-gm_KotH   : with g_cpoints[1] do
+   case map_scenario of
+ms_KotH   : with g_cpoints[1] do
             begin
                cpx:=map_phsize;
                cpy:=map_phsize;
@@ -1108,11 +1108,11 @@ gm_KotH   : with g_cpoints[1] do
                cpmr:=round(cpCaptureR*map_mm_cx)+1;
                {$ENDIF}
             end;
-gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,byte(map_type=mapt_clake)*(map_psize div 3),0,true);
+ms_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,byte(map_type=mapt_clake)*(map_psize div 3),0,true);
    end;
 
-   if(g_generators>1)then
-     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,byte(map_type=mapt_clake)*(map_psize div 3),g_cgenerators_ltime[g_generators],false);
+   if(map_generators>1)then
+     map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,byte(map_type=mapt_clake)*(map_psize div 3),g_cgenerators_ltime[map_generators],false);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1213,8 +1213,8 @@ begin
 
    //gp_player_team
 
-   case g_mode of
-gm_4x4     :begin
+   case map_scenario of
+ms_4x4     :begin
                c :=map_phsize-(map_psize div 7);
                u :=c+base_1r;
                i :=map_symmetryDir+90;
@@ -1241,7 +1241,7 @@ gm_4x4     :begin
                map_PlayerStartY[7]:=map_psize-map_PlayerStartY[3];
 
             end;
-gm_2x2x2x2 :begin
+ms_2x2x2x2 :begin
                iy:=base_2r+(map_psize div 30);
                u :=map_phsize-(map_phsize div 3);
                c :=map_symmetryDir;
@@ -1259,20 +1259,20 @@ gm_2x2x2x2 :begin
                i+=2;
                end;
             end;
-gm_assault :begin
+ms_assault :begin
                map_PlayerStartsCircle(map_phsize-(map_psize div 8),map_symmetryDir,3);
                map_PlayerStartX[6]:=map_phsize-base_1r;
                map_PlayerStartY[6]:=map_phsize-base_1r;
                map_PlayerStartX[7]:=map_phsize+base_1r;
                map_PlayerStartY[7]:=map_phsize+base_1r;
             end;
-gm_KotH    :begin
+ms_KotH    :begin
                map_PlayerStartsCircle(map_phsize-(map_psize div 8),map_symmetryDir,4);
             end;
-gm_royale  :begin
+ms_royale  :begin
                map_PlayerStartsCircle(map_phsize-(map_psize div 5),map_symmetryDir,4);
             end;
-gm_capture :begin
+ms_capture :begin
                map_PlayerStartsDefault(map_FreeCenterR);
             end;
    else
@@ -1533,42 +1533,57 @@ function map_SetSetting(PlayerRequestor,setting:byte;newVal:cardinal;Check:boole
 begin
    map_SetSetting:=false;
 
-   if(g_preset_cur>0)
+   if(map_preset_cur>0)
    or(PlayerRequestor>LastPlayer)
    or((PlayerLobby  <=LastPlayer)and(PlayerLobby<>PlayerRequestor))
    or(G_Started)
    then exit;
 
    case setting of
-nmid_lobbby_mapseed  : begin
-                          map_SetSetting:=true;
-                          if(Check)then exit;
-                          map_seed:=newVal;
-                          map_Make1;
-                       end;
-nmid_lobbby_mapsize  : begin
-                          if(newVal<MinMapSize)or(MaxMapSize<newVal)then exit;
-                          map_SetSetting:=true;
-                          if(Check)then exit;
-                          map_psize:=integer(newVal);
-                          map_Make1;
-                       end;
-nmid_lobbby_type     : begin
-                          newVal:=byte(newVal);
-                          if(gms_m_types<newVal)then exit;
-                          map_SetSetting:=true;
-                          if(Check)then exit;
-                          map_type:=newVal;
-                          map_Make1;
-                       end;
-nmid_lobbby_symmetry : begin
-                          newVal:=byte(newVal);
-                          if(gms_m_symm<newVal)then exit;
-                          map_SetSetting:=true;
-                          if(Check)then exit;
-                          map_symmetry:=newVal;
-                          map_Make1;
-                       end;
+nmid_loby_mapScenario  : if(map_preset_cur=0)then
+                         begin
+                            if not(NewVal in allmapscenarios)then exit;
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_scenario:=NewVal;
+                            map_Make1;
+                         end;
+nmid_loby_mapGenerators: begin
+                            if(NewVal>gms_g_maxgens)then exit;
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_generators:=NewVal;
+                            map_Make1;
+                         end;
+nmid_loby_mapSeed      : begin
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_seed:=newVal;
+                            map_Make1;
+                         end;
+nmid_loby_mapSize      : begin
+                            if(newVal<MinMapSize)or(MaxMapSize<newVal)then exit;
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_psize:=integer(newVal);
+                            map_Make1;
+                         end;
+nmid_loby_mapType      : begin
+                            newVal:=byte(newVal);
+                            if(gms_m_types<newVal)then exit;
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_type:=newVal;
+                            map_Make1;
+                         end;
+nmid_loby_mapSymmetry  : begin
+                            newVal:=byte(newVal);
+                            if(gms_m_symm<newVal)then exit;
+                            map_SetSetting:=true;
+                            if(Check)then exit;
+                            map_symmetry:=newVal;
+                            map_Make1;
+                         end;
    end;
 end;
 

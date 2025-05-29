@@ -174,9 +174,9 @@ procedure InitThemes;
 var o:integer;
 begin
    // load graph
-   gfx_LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,'map\decals\adt'  ,true );
-   gfx_LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,'map\decors\dec_' ,true );
-   gfx_LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,'map\terrains\ter',false,true);
+   gfx_LoadTMWTextureList(@theme_all_decal_l  ,@theme_all_decal_n  ,'map\decals\adt'  ,true );     //writeln('decal ',theme_all_decal_n);
+   gfx_LoadTMWTextureList(@theme_all_decor_l  ,@theme_all_decor_n  ,'map\decors\dec_' ,true );     //writeln('decors ',theme_all_decor_n);
+   gfx_LoadTMWTextureList(@theme_all_terrain_l,@theme_all_terrain_n,'map\terrains\ter',false,true);//writeln('terrains ',theme_all_terrain_n);
 
    // animation and effects
    setlength(theme_anm_decors  ,theme_all_decor_n );

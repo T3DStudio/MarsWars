@@ -684,7 +684,7 @@ begin
    str_menu_lang[false]              := 'ENG';
    str_menu_maction                  := 'Mouse right-click action';
    str_menu_mactionl[true ]          := tc_lime+'move'+tc_default;
-   str_menu_mactionl[false]          := tc_lime+'move'+tc_default+'+'+tc_red+'attack'+tc_default;
+   str_menu_mactionl[false]          := tc_lime+'move'+tc_white+'+'+tc_red+'attack'+tc_default;
    str_menu_connecting               := 'Connecting...';
    str_menu_settingsGame             := 'GAME';
    str_menu_settingsReplay           := 'REPLAY';
@@ -743,16 +743,16 @@ begin
    str_menu_ReplayStatel[rpls_state_read ]:= tc_lime  +'PLAY';
    str_menu_ReplayPlay               := 'PLAY';
 
-   str_menu_NetQuality[0]            := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +'x1';
-   str_menu_NetQuality[1]            := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +'x2';
-   str_menu_NetQuality[2]            := tc_lime  +'x3 '+tc_default+'/'+tc_orange+'x3';
-   str_menu_NetQuality[3]            := tc_lime  +'x4 '+tc_default+'/'+tc_orange+'x4';
-   str_menu_NetQuality[4]            := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+'x5';
-   str_menu_NetQuality[5]            := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+'x6';
-   str_menu_NetQuality[6]            := tc_orange+'x7 '+tc_default+'/'+tc_lime  +'x7';
-   str_menu_NetQuality[7]            := tc_orange+'x8 '+tc_default+'/'+tc_lime  +'x8';
-   str_menu_NetQuality[8]            := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +'x9';
-   str_menu_NetQuality[9]            := tc_red   +'x10'+tc_default+'/'+tc_aqua  +'x10';
+   str_menu_NetQuality[0]            := tc_aqua  +'x1 '+tc_white+'/'+tc_red   +'x1';
+   str_menu_NetQuality[1]            := tc_aqua  +'x2 '+tc_white+'/'+tc_red   +'x2';
+   str_menu_NetQuality[2]            := tc_lime  +'x3 '+tc_white+'/'+tc_orange+'x3';
+   str_menu_NetQuality[3]            := tc_lime  +'x4 '+tc_white+'/'+tc_orange+'x4';
+   str_menu_NetQuality[4]            := tc_yellow+'x5 '+tc_white+'/'+tc_yellow+'x5';
+   str_menu_NetQuality[5]            := tc_yellow+'x6 '+tc_white+'/'+tc_yellow+'x6';
+   str_menu_NetQuality[6]            := tc_orange+'x7 '+tc_white+'/'+tc_lime  +'x7';
+   str_menu_NetQuality[7]            := tc_orange+'x8 '+tc_white+'/'+tc_lime  +'x8';
+   str_menu_NetQuality[8]            := tc_red   +'x9 '+tc_white+'/'+tc_aqua  +'x9';
+   str_menu_NetQuality[9]            := tc_red   +'x10'+tc_white+'/'+tc_aqua  +'x10';
 
    str_menu_Name                     := 'NAME';
    str_menu_Slot                     := 'SLOT STATE';
@@ -773,7 +773,7 @@ begin
    str_menu_PanelPosl[vpp_top   ]    := tc_yellow+'top'   +tc_default;
    str_menu_PanelPosl[vpp_bottom]    := tc_aqua  +'bottom'+tc_default;
 
-   // [vertical][]
+   // [vertical][minimap pos]
    str_menu_MiniMapPos               := 'Mini map position';
    str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[vpp_top   ];
    str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[vpp_bottom];
@@ -781,7 +781,7 @@ begin
    str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[vpp_right ];
 
    str_menu_unitHBar                 := 'Health bars';
-   str_menu_unitHBarl[uhb_damaged ]  := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
+   str_menu_unitHBarl[uhb_damaged ]  := tc_lime  +'selected'+tc_white+'+'+tc_red+'damaged'+tc_default;
    str_menu_unitHBarl[uhb_always  ]  := tc_aqua  +'always'  +tc_default;
    str_menu_unitHBarl[uhb_selected]  := tc_orange+'only '   +tc_lime+'selected'+tc_default;
 
@@ -790,7 +790,7 @@ begin
    str_menu_PlayersColorl[pcs_LYR    ]:= tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
    str_menu_PlayersColorl[pcs_WYR    ]:= tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
    str_menu_PlayersColorl[pcs_WAR    ]:= tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_menu_PlayersColorl[pcs_teams  ]:= tc_lime+'t'+tc_red+'e'+tc_aqua+'a'+tc_yellow+'m'+tc_blue+'s'  +tc_default;
+   str_menu_PlayersColorl[pcs_teams  ]:= tc_lime+'t'+tc_red+'e'+tc_aqua+'a'+tc_yellow+'m'+tc_blue+'s'+tc_default;
    str_menu_PlayersColorl[pcs_wTeams ]:= tc_white +'own '   +str_menu_PlayersColorl[pcs_teams];
 
    str_menu_PlayerSlots[pss_closed   ]:='closed';
@@ -810,23 +810,23 @@ begin
    str_menu_DeadObservers            := 'Observer mode after lose';
    str_menu_FixedStarts              := 'Fixed player starts';
 
-   str_menu_GameMode                 := 'Game mode';
-   str_emnu_GameModel[gm_scirmish]   := tc_lime  +'Skirmish'        +tc_default;
-   str_emnu_GameModel[gm_4x4     ]   := tc_orange+'4x4'             +tc_default;
-   str_emnu_GameModel[gm_2x2x2x2 ]   := tc_yellow+'2x2x2x2'         +tc_default;
-   str_emnu_GameModel[gm_capture ]   := tc_aqua  +'Capturing points'+tc_default;
-   str_emnu_GameModel[gm_KotH    ]   := tc_purple+'King of the Hill'+tc_default;
-   str_emnu_GameModel[gm_royale  ]   := tc_red   +'Battle Royale'   +tc_default;
-   str_emnu_GameModel[gm_assault ]   := tc_blue  +'Assault'         +tc_default;
+   str_map_Map                       := 'Map';
+   str_map_Generators                := 'Generators';
+   str_map_Generatorsl[0]            := 'own';
+   str_map_Generatorsl[1]            := '5 min';
+   str_map_Generatorsl[2]            := '10 min';
+   str_map_Generatorsl[3]            := '15 min';
+   str_map_Generatorsl[4]            := '20 min';
+   str_map_Generatorsl[5]            := 'infinity';
 
-   str_menu_Generators               := 'Generators';
-   str_menu_Generatorsl[0]           := 'own';
-   str_menu_Generatorsl[1]           := 'neutral(5 min)';
-   str_menu_Generatorsl[2]           := 'neutral(10 min)';
-   str_menu_Generatorsl[3]           := 'neutral(15 min)';
-   str_menu_Generatorsl[4]           := 'neutral(20 min)';
-   str_menu_Generatorsl[5]           := 'neutral(infinity)';
-
+   str_map_scenario                  := 'Scenario';
+   str_map_scenariol[ms_scirmish]    := tc_lime  +'Skirmish'        +tc_default;
+   str_map_scenariol[ms_4x4     ]    := tc_orange+'4x4'             +tc_default;
+   str_map_scenariol[ms_2x2x2x2 ]    := tc_yellow+'2x2x2x2'         +tc_default;
+   str_map_scenariol[ms_capture ]    := tc_aqua  +'Capturing points'+tc_default;
+   str_map_scenariol[ms_KotH    ]    := tc_purple+'King of the Hill'+tc_default;
+   str_map_scenariol[ms_royale  ]    := tc_red   +'Battle Royale'   +tc_default;
+   str_map_scenariol[ms_assault ]    := tc_blue  +'Assault'         +tc_default;
    str_map_type                      := 'Type';
    str_map_typel[mapt_steppe]        := tc_gray  +'Steppe';
    str_map_typel[mapt_canyon]        := tc_blue  +'Canyon';
@@ -844,6 +844,7 @@ begin
    str_map_syml[maps_lineh]          := 'line -';
    str_map_syml[maps_lineL]          := 'line \';
    str_map_syml[maps_lineR]          := 'line /';
+   str_map_theme                     := 'Theme';
    str_map_random                    := 'Random map';
    str_map_Proc1Zones                := 'MAP CALCULATION 1: ZONES';
    str_map_Proc2Solid                := 'MAP CALCULATION 2: SOLID CELLS';
@@ -1024,8 +1025,9 @@ begin
    str_panelHint_all                 := 'All';
    str_panelHint_menu                := 'Menu';
 
-   g_presets[gp_custom   ].gp_name   := 'custom preset';
-   MakeGamePresetsNames(@str_emnu_GameModel[0],@str_map_typel[0]);
+
+   map_presets[mapp_custom   ].mapp_name   := 'custom';
+   MakeMapPresetsNames(@str_map_scenariol[0],@str_map_typel[0]);
 
    theme_name[0] := tc_lime  +'UAC BASE';
    theme_name[1] := tc_blue  +'TECH BASE';
@@ -1584,23 +1586,23 @@ begin
 
   str_menu_FixedStarts           := 'Фиксированные старты';
 
-  str_menu_GameMode            := 'Режим игры';
-  str_emnu_GameModel[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
-  str_emnu_GameModel[gm_4x4     ]:= tc_orange+'3x3'               +tc_default;
-  str_emnu_GameModel[gm_2x2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
-  str_emnu_GameModel[gm_capture ]:= tc_aqua  +'Захват точек'      +tc_default;
-  str_emnu_GameModel[gm_invasion]:= tc_blue  +'Вторжение'         +tc_default;
-  str_emnu_GameModel[gm_KotH    ]:= tc_purple+'Царь горы'         +tc_default;
-  str_emnu_GameModel[gm_royale  ]:= tc_red   +'Королевская битва' +tc_default;
+  str_map_scenario            := 'Режим игры';
+  str_map_scenariol[ms_scirmish]:= tc_lime  +'Схватка'           +tc_default;
+  str_map_scenariol[ms_4x4     ]:= tc_orange+'3x3'               +tc_default;
+  str_map_scenariol[ms_2x2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
+  str_map_scenariol[ms_capture ]:= tc_aqua  +'Захват точек'      +tc_default;
+  str_map_scenariol[gm_invasion]:= tc_blue  +'Вторжение'         +tc_default;
+  str_map_scenariol[ms_KotH    ]:= tc_purple+'Царь горы'         +tc_default;
+  str_map_scenariol[ms_royale  ]:= tc_red   +'Королевская битва' +tc_default;
 
-  str_menu_Generators        := 'Генераторы';
-  str_menu_Generatorsl[0]    := 'свои';
-  str_menu_Generatorsl[1]    := 'свои,без новых строит.';
-  str_menu_Generatorsl[2]    := 'нейтральн.(5 мин.)';
-  str_menu_Generatorsl[3]    := 'нейтральн.(10 мин.)';
-  str_menu_Generatorsl[4]    := 'нейтральн.(15 мин.)';
-  str_menu_Generatorsl[5]    := 'нейтральн.(20 мин.)';
-  str_menu_Generatorsl[6]    := 'нейтральн.(бескон.)';
+  str_map_Generators        := 'Генераторы';
+  str_map_Generatorsl[0]    := 'свои';
+  str_map_Generatorsl[1]    := 'свои,без новых строит.';
+  str_map_Generatorsl[2]    := 'нейтральн.(5 мин.)';
+  str_map_Generatorsl[3]    := 'нейтральн.(10 мин.)';
+  str_map_Generatorsl[4]    := 'нейтральн.(15 мин.)';
+  str_map_Generatorsl[5]    := 'нейтральн.(20 мин.)';
+  str_map_Generatorsl[6]    := 'нейтральн.(бескон.)';
 
   str_menu_ReplayStatel[rpls_state_none ]:=           'ВЫКЛ.';
   str_menu_ReplayStatel[rpls_state_write]:= tc_yellow+'ЗАПИСЬ';
@@ -1633,8 +1635,8 @@ begin
   str_uiHint_Army         := 'Армия: ';
   str_uiHint_Energy       := 'Энергия: ';
 
-  g_presets[gp_custom   ].gp_name:= 'свои настройки';
-  MakeGamePresetsNames(@str_emnu_GameModel[0],@str_map_typel[0]);
+  map_presets[mapp_custom   ].mapp_name:= 'свои настройки';
+  MakeMapPresetsNames(@str_map_scenariol[0],@str_map_typel[0]);
 
   str_ability_name[ua_Teleport        ]:='Телепортация';
   str_ability_name[ua_UACScan         ]:='Сканирование';

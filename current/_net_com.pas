@@ -361,7 +361,7 @@ end;
 procedure net_send_PlayerSlot(PlayerTarget,newPlayerSlot:byte);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_playerslot);
+   net_writebyte(nmid_loby_playerSlot);
    net_writebyte(PlayerTarget);
    net_writebyte(newPlayerSlot);
    net_send(net_cl_svip,net_cl_svport);
@@ -369,7 +369,7 @@ end;
 procedure net_send_PlayerRace(PlayerTarget,newPlayerRace:byte);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_playerrace);
+   net_writebyte(nmid_loby_playerRace);
    net_writebyte(PlayerTarget);
    net_writebyte(newPlayerRace);
    net_send(net_cl_svip,net_cl_svport);
@@ -377,7 +377,7 @@ end;
 procedure net_send_PlayerTeam(PlayerTarget,newPlayerTeam:byte);
 begin
    net_clearbuffer;
-   net_writebyte(nmid_lobbby_playerteam);
+   net_writebyte(nmid_loby_playerTeam);
    net_writebyte(PlayerTarget);
    net_writebyte(newPlayerTeam);
    net_send(net_cl_svip,net_cl_svport);

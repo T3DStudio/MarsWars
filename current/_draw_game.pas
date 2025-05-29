@@ -100,25 +100,31 @@ begin
       vid_Sprites_n-=1;
       with vid_Sprites_l[vid_Sprites_n]^ do
       begin
-         x-=sprite^.hw;
-         y-=sprite^.hh;
+         x+=-sprite^.hw;
+         y+=-sprite^.hh;
 
-         if(shadowz>-fly_hz)then
+         if(shadowz>-fly_hz)and(shadow_color>0)then
          begin
             sx:=sprite^.hw;
             sy:=sprite^.h-(sprite^.h shr 3);
 
-           // filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadow_color);
+            draw_set_color(shadow_color);
+            draw_set_alpha(127);
+            draw_fellipse(x+sx,y+sy+shadowz,sx,sprite^.hh shr 1);
+            draw_set_alpha(255);
          end;
          if(alpha>0)then
-           if(alpha=255)
-           then //draw_surf(tar,x,y,sprite^.apidata)
-           else
-           begin
-              {SDL_SetAlpha(sprite^.apidata,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-              draw_surf(tar,x,y,sprite^.apidata);
-              SDL_SetAlpha(sprite^.apidata,SDL_SRCALPHA or SDL_RLEACCEL,255); }
-           end;
+         begin
+            draw_set_color(c_white);
+            if(alpha=255)
+            then draw_mwtexture1(x,y,sprite,1,1)
+            else
+            begin
+               draw_set_alpha(alpha);
+               draw_mwtexture1(x,y,sprite,1,1);
+               draw_set_alpha(255);
+            end;
+         end;
 
          if(aura_color>0)then
          begin
@@ -126,7 +132,10 @@ begin
             y-=6;
             sx:=sprite^.hw+6;
             sy:=sprite^.hh+6;
-           // filledellipseColor(tar,x+sx,y+sy,sx,sy,aura_color);
+            draw_set_color(aura_color);
+            draw_set_alpha(127);
+            draw_fellipse(x+sx,y+sy+shadowz,sx,sprite^.hh shr 1);
+            draw_set_alpha(255);
          end;
       end;
    end;
@@ -315,7 +324,7 @@ begin
       choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(vid_blink1_colorb);
 
       srect :=((isselected)and(playeri=UIPlayer))
-            or(input_Check(iAct_alt,tis_Pressed))
+            or(InputAction(iAct_alt))
             or(choosen);
 
       hbar  :=false;
@@ -378,8 +387,8 @@ end;
 procedure d_UIInfoItems(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
-   {case g_mode of
-gm_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_royal_r,ui_color_max[vid_blink2_colorb]);
+   {case map_scenario of
+ms_royale: circleColor(tar,lx+map_phsize-vid_cam_x,ly+map_phsize-vid_cam_y,g_royal_r,ui_color_max[vid_blink2_colorb]);
    end;}
 
    while(vid_UIItem_n>0)do
@@ -448,7 +457,7 @@ begin
    end;
 end;
 
-procedure d_terrain(tar:pSDL_Surface;lx,ly:integer);
+procedure d_MapTerrain;
 var
 ssx,ssy,sty,
 sx0,sy0,
@@ -472,15 +481,15 @@ begin
       for i:=0 to tgca_decal_n-1 do
         with tgca_decal_l[i] do
           if(tgca_decalS<>nil)then
-            //draw_surf(tar,ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS^.apidata);
+            draw_mwtexture1(ssx+tgca_decalX,ssy+tgca_decalX,tgca_decalS,1,1);
 end;
 begin
-   ssx:=lx-(vid_cam_x mod MapCellW)-MapCellW*2;
-   sty:=ly-(vid_cam_y mod MapCellW)-MapCellW*2;
-   sx0:=(vid_cam_x div MapCellW);
-   sy0:=(vid_cam_y div MapCellW);
-   mx :=(sx0-2)*MapCellW;
-   mty:=(sy0-2)*MapCellW;
+   ssx:=-(vid_cam_x mod MapCellW)-MapCellW*2;
+   sty:=-(vid_cam_y mod MapCellW)-MapCellW*2;
+   sx0:= (vid_cam_x div MapCellW);
+   sy0:= (vid_cam_y div MapCellW);
+   mx := (sx0-2)*MapCellW;
+   mty:= (sy0-2)*MapCellW;
 
    if(theme_cur_liquid_tas=tas_ice)
    then anim:=0
@@ -490,6 +499,8 @@ begin
    case m_brush of
 1..255          : AddEdges:=true;
    end;
+
+   draw_set_color(c_white);
 
    for cx:=-2 to ui_MapView_cw do
    begin
@@ -505,35 +516,35 @@ begin
             if(AddEdges)then
             begin
                b:=GridGetSolidLevel(gx,gy)>mgsl_free;
-               {if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
+               if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
                then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);
                if(b)<>(GridGetSolidLevel(gx,gy+1)>mgsl_free)
-               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);     }
+               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);
 
-               {if(b)then
+               if(b)then
                begin
                UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,vid_blink2_color_BY);
                UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,vid_blink2_color_BY);
                UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,vid_blink2_color_BY);
-               end; }
+               end;
             end;
 
-            {if(tgca_tile_liquid=0)
-            then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata)
+            if(tgca_tile_liquid=0)
+            then draw_mwtexture1(ssx,ssy,theme_tileset_liquid[anim]^[tgca_tile_liquid],1,1)
             else
               if(tgca_tile_crater=0)then
               begin
-                 draw_surf(tar,ssx,ssy,theme_tileset_crater[tgca_tile_crater].apidata);
+                 draw_mwtexture1(ssx,ssy,theme_tileset_crater^[tgca_tile_crater],1,1);
                  DrawDecals;
-                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata);
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_mwtexture1(ssx,ssy,theme_tileset_liquid[anim]^[tgca_tile_liquid],1,1);
               end
               else
               begin
-                // draw_surf(tar,ssx,ssy,theme_tile_terrain);
-                 if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_crater      [tgca_tile_crater].apidata);
+                 draw_mwtexture1(ssx,ssy,theme_tile_terrain,1,1);
+                 if(1<=tgca_tile_crater)and(tgca_tile_crater<=MaxTileSet)then draw_mwtexture1(ssx,ssy,theme_tileset_crater      ^[tgca_tile_crater],1,1);
                  DrawDecals;
-                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_surf(tar,ssx,ssy,theme_tileset_liquid[anim][tgca_tile_liquid].apidata);
-              end; }
+                 if(1<=tgca_tile_liquid)and(tgca_tile_liquid<=MaxTileSet)then draw_mwtexture1(ssx,ssy,theme_tileset_liquid[anim]^[tgca_tile_liquid],1,1);
+              end;
            { with map_grid[gx,gy] do
             begin
                {if(map_IsObstacleZone(tgc_parea,true ))
@@ -575,7 +586,7 @@ begin
                           if(tgca_decorTime=0)and(0<=tda_anext)and(tda_anext<theme_all_decor_n)then
                           begin
                              tgca_decorN   :=tda_anext;
-                             tgca_decorS   :=@theme_all_decor_l[tgca_decorN];
+                             tgca_decorS   := theme_all_decor_l[tgca_decorN];
                              tgca_decorA   :=@theme_anm_decors [tgca_decorN];
                              tgca_decorTime:=DoodadAnimationTime(tgca_decorA^.tda_atime);
                           end;
@@ -612,7 +623,7 @@ begin
 
       //  color:=GetCPColor(t);
 
-        if(t=1)and(g_mode=gm_koth)then
+        if(t=1)and(map_scenario=ms_KotH)then
         begin
            for i:=1 to marks do
            begin
@@ -648,7 +659,7 @@ end;
 //  FOG
 //
 
-procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
+procedure D_Fog;
 var
  cx, cy,
 ssx,ssy,
@@ -663,9 +674,10 @@ end;
 begin
    ui_FogView_pgrid:=ui_FogView_grid;
 
-   ssx:=lx-(vid_cam_x mod fog_CellW);
-   sty:=ly-(vid_cam_y mod fog_CellW);
+   ssx:=-(vid_cam_x mod fog_CellW);
+   sty:=-(vid_cam_y mod fog_CellW);
 
+   draw_set_color(c_white);
    for cx:=0 to ui_FogView_cw do
    begin
       //vlineColor(tar,ssx,vid_mapx,vid_mapx+vid_cam_w,c_gray);
@@ -683,8 +695,8 @@ begin
                             GetFogGridVal(cx-1,cy+1),
                             GetFogGridVal(cx  ,cy+1),
                             GetFogGridVal(cx+1,cy+1));
-         {if(0<=tileX)and(tileX<=MaxTileSet)then
-           draw_surf(tar,ssx,ssy,ui_fog_tileset[tileX].apidata);    }
+         if(0<=tileX)and(tileX<=MaxTileSet)then
+           draw_mwtexture1(ssx,ssy,ui_fog_tileset^[tileX],1,1);
 
          ui_FogView_grid[cx,cy]:=false;
          ssy+=fog_CellW;
@@ -749,7 +761,7 @@ begin
    rectangleColor(r_screen,ix+debug_x1,iy+debug_y1,ix+debug_x1+debug_a1,iy+debug_y1+debug_b1,c_blue);
    end;}
 
-   if(input_Check(iAct_shift,tis_Pressed))then
+   if(InputAction(iAct_shift))then
    for u:=0 to LastPlayer do
     with g_players[u] do
     begin
@@ -769,15 +781,15 @@ begin
       // for iy:=0 to 11 do draw_line(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
     end;
 
-   if(input_Check(iAct_control,tis_Pressed))then
+   if(InputAction(iAct_control))then
    for u:=1 to MaxUnits do
     with g_units[u] do
     with player^ do
     with uid^ do
      if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
-        ix:=x-vid_cam_x+ui_MapView_x;
-        iy:=y-vid_cam_y+ui_MapView_y;
+        ix:=x-vid_cam_x;
+        iy:=y-vid_cam_y;
 
         //draw_line(r_screen,ix,iy,i2s(anim), ta_LU,255, PlayerGetColor(playeri));
 

@@ -43,7 +43,7 @@ begin
     if(cpCaptureR>0)then
     begin
        p:=0;
-       if(g_mode=gm_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
+       if(map_scenario=ms_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
        if(cplifetime>0)and(cpOwnerTeam>0)then
        begin
           cplifetime-=1;
@@ -83,7 +83,7 @@ begin
        end;
 
        if((iTeams=0)and(cpenergy>0))
-       or((i=1)and(g_mode=gm_koth)and(g_step<g_step_koth_pause))then
+       or((i=1)and(map_scenario=ms_KotH)and(g_step<g_step_koth_pause))then
        begin
           iTeams:=0;
           iOwnerPlayer:=255;

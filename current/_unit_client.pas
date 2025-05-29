@@ -388,15 +388,15 @@ begin
     with g_players[POVPlayer] do wudata_reload(@build_cd,rpl);
 
    if(wstepb0)then
-     if(g_mode=gm_capture)
-     or(g_mode=gm_KotH)
-     or(g_generators>1)then
+     if(map_scenario=ms_capture)
+     or(map_scenario=ms_KotH)
+     or(map_generators>1)then
       for i:=1 to MaxCPoints do
        wclinet_cpoint(i,rpl);
 
    if(wstepb1)then
-     case g_mode of
-gm_royale   : wudata_int (g_royal_r        ,rpl);
+     case map_scenario of
+ms_royale   : wudata_int (g_royal_r        ,rpl);
      end;
 
    if(rpl)then
@@ -1199,15 +1199,15 @@ begin
      rudata_reload(@build_cd,rpl);
 
    if(wstepb0)then
-     if(g_mode=gm_capture)
-     or(g_mode=gm_KotH)
-     or(g_generators>1)then
+     if(map_scenario=ms_capture)
+     or(map_scenario=ms_KotH)
+     or(map_generators>1)then
       for i:=1 to MaxCPoints do
        rclinet_cpoint(i,rpl,fast_skip);
 
    if(wstepb1)then
-     case g_mode of
-gm_royale   : g_royal_r        :=rudata_int (rpl,0);
+     case map_scenario of
+ms_royale   : g_royal_r        :=rudata_int (rpl,0);
      end;
 
    g_player_astatus:=rudata_byte(rpl,0);

@@ -611,7 +611,7 @@ begin
                else ai_cpoint_n+=1;
             end;
 
-            if(g_mode=gm_royale)then
+            if(map_scenario=ms_royale)then
               if(g_royal_r<(cp_ToCenterD+100))then continue;
 
             if(cpx<=0)
@@ -630,7 +630,7 @@ begin
               then
               else continue;
 
-            koth_point:=(i=1)and(g_mode=gm_koth)and(g_step>=g_step_koth_pause);
+            koth_point:=(i=1)and(map_scenario=ms_KotH)and(g_step>=g_step_koth_pause);
 
             if(not koth_point)then
               if((cpunitst_pstate[team]>=ul3)and(d> cpCaptureR))
@@ -1033,7 +1033,7 @@ begin
       ai_scout_u_new  :=0;
       ai_scout_u_new_w:=0;
 
-     if(g_mode=gm_royale)then
+     if(map_scenario=ms_royale)then
       for a:=0 to LastPlayer do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
@@ -1068,9 +1068,9 @@ procedure ai_scout_pick(pu:PTUnit);
 var w:integer;
    tu:PTUnit;
 begin
-   if(g_mode=gm_koth    )
-   or(g_mode=gm_capture )
-   or(g_mode=gm_royale  )then exit;
+   if(map_scenario=ms_KotH    )
+   or(map_scenario=ms_capture )
+   or(map_scenario=ms_royale  )then exit;
 
    with pu^ do
    begin

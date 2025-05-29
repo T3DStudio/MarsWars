@@ -64,8 +64,8 @@ aummat_info       : CircleColor   (r_gminimap,al_mx  ,al_my  ,              r, a
       then map_MinimapSpot(r_gminimap,cpmx,cpmy,cpmr,char_gen,GetCPColor(i))
       else map_MinimapSpot(r_gminimap,cpmx,cpmy,cpmr,char_cp ,GetCPColor(i));  }
 
-   case g_mode of
-gm_royale   : ;//circleColor(r_gminimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mm_cx)+1,ui_color_max[vid_blink2_colorb]);
+   case map_scenario of
+ms_royale   : ;//circleColor(r_gminimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mm_cx)+1,ui_color_max[vid_blink2_colorb]);
    end;
 end;
 
@@ -487,7 +487,7 @@ tt_controls : case tab3PageType of   // actions
                              uy:=0;
                              PlayersButtoms;
                              end;
-              t3pt_actions : begin
+              t3pt_controls : begin
                              // добавить проверку на каждую икноку - имеет ли юнит абилку и может ли ее применять
                              //ui_BtnSprite(tar,0,0,spr_b_action ,false   ,unit_CheckAbility(ui_uibtn_abilityu));
                              //ui_BtnSprite(tar,1,0,spr_b_paction,false   ,ui_uibtn_abilityu=nil);
@@ -664,7 +664,7 @@ begin
    draw_line(tar,x,y,rpls_list[rpls_list_sel]+' '+i2s(round(cx*100))+'%',ta_LU,255,c_white);}
 end;
 
-procedure D_UIText(tar:pSDL_Surface;lx,ly:integer;POVPlayer:byte);
+procedure D_UIText;
 var i,
 limit:integer;
   str:shortstring;
@@ -732,8 +732,8 @@ begin
    D_Timer(tar,ui_textx,ui_texty,g_step,ta_LU,str_uiHint_Time,c_white);
 
    // Game mode specific info
-   {case g_mode of
-gm_koth    : with g_cpoints[1] do
+   {case map_scenario of
+ms_KotH    : with g_cpoints[1] do
               if(g_step<g_step_koth_pause)
               then D_Timer(tar,ui_textx,ui_texty+basefont_w1h,g_step_koth_pause-g_step,ta_LU,str_uiHint_KotHTimeAct,c_gray)
               else
@@ -750,10 +750,10 @@ gm_koth    : with g_cpoints[1] do
 
    //if(test_mode>0)then draw_line(tar,vid_mapx+vid_cam_hw,vid_mapy+vid_cam_hh,'TEST MODE '+b2s(test_mode),ta_MU,255,c_white);
 
-   //if(vid_APM)then draw_line(tar,ui_apmx,ui_apmy,'APM: '+player_APMdata[POVPlayer].APM_Str                ,ta_LU,255,c_white);
-   if(vid_FPS)then draw_line(tar,ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
+   //if(vid_APM)then draw_line(tar,ui_apmx,ui_apmy,'APM: '+player_APMdata[POVPlayer].APM_Str                ,ta_LU,255,c_white);}
+   if(vid_FPS)then draw_line(ui_fpsx,ui_fpsy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_RU,255,c_black);
 
-   ui_DrawGroupsIcons(tar);   }
+   //ui_DrawGroupsIcons(tar);
 end;
 
 procedure d_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash

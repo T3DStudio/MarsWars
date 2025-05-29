@@ -83,16 +83,16 @@ begin
    net_writebyte(pid         );
    net_writebyte(PlayerLobby );
 
-   net_writebyte(g_preset_cur);
+   net_writebyte(map_preset_cur);
    net_writeint (map_psize    );
    net_writebyte(map_type    );
    net_writecard(map_seed    );
    net_writebyte(map_symmetry);
 
-   net_writebyte(g_mode           );
+   net_writebyte(map_scenario           );
    net_writebool(g_fixed_positions);
    net_writebyte(g_ai_slots       );
-   net_writebyte(g_generators     );
+   net_writebyte(map_generators     );
    net_writebool(g_deadobservers  );
 
    if(G_Started)and(not g_fixed_positions)then
@@ -116,7 +116,7 @@ var i:byte;
 begin
    net_writebyte(nmid_localadv);
    net_writebyte(g_version);
-   net_writebyte(g_mode);
+   net_writebyte(map_scenario);
    for i:=0 to LastPlayer do
      with g_players[i] do
        if(player_type=pt_none)
@@ -228,25 +228,25 @@ nmid_break       : GameBreak(pid,false);
                  end
                else // not G_Started
                  case mid of
-nmid_lobbby_preset      : if(GameLoadPreset(pid,net_readbyte    ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_mapseed     : if(map_SetSetting(pid,mid,net_readcard,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_mapsize     : if(map_SetSetting(pid,mid,net_readint ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_type        : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_symmetry    : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_gamemode,
-nmid_lobbby_generators,
-nmid_lobbby_FixStarts,
-nmid_lobbby_DeadPObs,
-nmid_lobbby_EmptySlots  : if(GameSetCommonSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
-nmid_lobbby_playerslot  : begin
+nmid_loby_mapMap      : if(MapLoad(pid,net_readbyte    ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_mapSeed     : if(map_SetSetting(pid,mid,net_readcard,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_mapSize     : if(map_SetSetting(pid,mid,net_readint ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_mapType        : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_mapSymmetry    : if(map_SetSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_mapScenario,
+nmid_loby_mapGenerators,
+nmid_loby_gameFixStarts,
+nmid_loby_gameDeadPObs,
+nmid_loby_gameEmptySlots  : if(GameSetCommonSetting(pid,mid,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
+nmid_loby_playerSlot  : begin
                           i:=net_readbyte;
                           if(PlayerSlotChangeState(pid,i,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                           end;
-nmid_lobbby_playerteam  : begin
+nmid_loby_playerTeam  : begin
                           i:=net_readbyte;
                           if(PlayerSlotChangeTeam (pid,i,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                           end;
-nmid_lobbby_playerrace  : begin
+nmid_loby_playerRace  : begin
                           i:=net_readbyte;
                           if(PlayerSlotChangeRace (pid,i,net_readbyte,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                           end;
@@ -345,22 +345,22 @@ begin
    new_map    :=false;
    net_ClientReadMapData:=false;
 
-   if(rByte(@g_preset_cur     ,g_preset_n           ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@map_preset_cur     ,map_preset_n           ))then begin redraw_menu:=true;new_map:=true;end;
    if(rInt (@map_psize         ,MinMapSize,MaxMapSize))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@map_type         ,gms_m_types          ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(StartGame)
-   or(not map_SetSetting(PlayerClient,nmid_lobbby_mapseed,0,true))then
+   or(not map_SetSetting(PlayerClient,nmid_loby_mapSeed,0,true))then
    begin
    if(rCard(@map_seed                           ))then begin redraw_menu:=true;new_map:=true;end;
    end
    else net_readcard;
 
    if(rByte(@map_symmetry     ,gms_m_symm       ))then begin redraw_menu:=true;new_map:=true;end;
-   if(rByte(@g_mode           ,gms_count        ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@map_scenario           ,ms_count        ))then begin redraw_menu:=true;new_map:=true;end;
    if(rBool(@g_fixed_positions                  ))then begin redraw_menu:=true;new_map:=true;end;
    if(rByte(@g_ai_slots       ,gms_g_maxai      ))then begin redraw_menu:=true;              end;
-   if(rByte(@g_generators     ,gms_g_maxgens    ))then begin redraw_menu:=true;new_map:=true;end;
+   if(rByte(@map_generators     ,gms_g_maxgens    ))then begin redraw_menu:=true;new_map:=true;end;
    if(rBool(@g_deadobservers                    ))then begin redraw_menu:=true;              end;
 
    if(new_map    )then map_Make1;
@@ -674,11 +674,11 @@ begin
          if(v=g_version)then
          begin
             v:=net_readbyte;
-            if(v in allgamemodes)then
+            if(v in allmapscenarios)then
             begin
                s:='';
                for i:=0 to LastPlayer do _ADDSTR(@s,net_readstring,sep_comma);
-               s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_emnu_GameModel[v]+'  '+s;
+               s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_map_scenariol[v]+'  '+s;
                net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
                continue;
             end;

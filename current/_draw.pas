@@ -1,15 +1,15 @@
 
-function d_UpdateUIPlayer(u:integer):boolean;
+function d_CheckUIPlayer(u:integer):boolean;
 var tu:PTUnit;
 begin
-   d_UpdateUIPlayer:=false;
+   d_CheckUIPlayer:=false;
    if(not g_players[PlayerClient].isobserver)and(rpls_rstate<rpls_state_read)
    then UIPlayer:=PlayerClient
    else
      if(IsIntUnitRange(u,@tu))then
      begin
         UIPlayer:=tu^.playeri;
-        d_UpdateUIPlayer:=true;
+        d_CheckUIPlayer:=true;
      end;
 end;
 
@@ -82,20 +82,20 @@ begin
    vid_blink2_color_BG:=ui_color_blink1[vid_blink2_colorb];
    vid_blink2_color_BY:=ui_color_blink2[vid_blink2_colorb];
 
-   d_UpdateUIPlayer(0);
+   d_CheckUIPlayer(0);
 
    d_UI_ClearCounters;
 
    d_AddObjSprites(G_Status<>gs_running);
 
    // MAP View
-   {d_terrain        (r_screen,ui_MapView_x,ui_MapView_y);
-   d_SpriteList     (r_screen,ui_MapView_x,ui_MapView_y);
+   d_MapTerrain;
+   d_SpriteList;
 
    if(sys_fog)then
-   D_Fog            (r_screen,ui_MapView_x,ui_MapView_y);
+   D_Fog;
 
-   d_UIInfoItems    (r_screen,ui_MapView_x,ui_MapView_y);
+ {  d_UIInfoItems    (r_screen,ui_MapView_x,ui_MapView_y);
 
    if(rpls_rstate<rpls_state_read)then
    begin
@@ -103,7 +103,7 @@ begin
    d_UIMouseMapClick(r_screen,ui_MapView_x,ui_MapView_y);
    end;    }
 
-   //d_UIText(r_screen,ui_MapView_x,ui_MapView_y,UIPlayer);
+   d_UIText;
 
    {// Control bar view
    if(vid_PanelUpdTimer=0)
@@ -143,7 +143,7 @@ begin
       draw_mwtexture1(x,y,tileSet^[tileX],1,1);
       //draw_surf(r_screen,x,y,tileSet^[tileX].apidata);
 
-      draw_set_fontS(font_Base,1);
+      draw_set_font(font_Base,basefont_w1);
       draw_line(x,y,w2s(tileX),ta_LU,255,0);
       x+=tileSet^[tileX]^.w+2;
 
@@ -161,7 +161,7 @@ end;
 
 
 
-procedure DrawGame;
+procedure MainDraw;
 var i,n,y:integer;
 begin
    draw_set_color(c_black);
@@ -212,7 +212,7 @@ begin
      if(G_Started)
      then d_Game;
 
-   draw_DebugTileSet(theme_tileset_liquid[(SDL_GetTicks div 1000) mod theme_anim_step_n]);
+   //draw_DebugTileSet(theme_tileset_liquid[(SDL_GetTicks div 1000) mod theme_anim_step_n]);
 
    draw_mwtexture1(mouse_x,mouse_y,spr_cursor,1,1);
 
@@ -277,24 +277,29 @@ begin
    if(G_Started)then
    begin
 
-   {draw_line(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
+   draw_set_color(c_white);
+   draw_set_font(font_base,basefont_w2);
+   draw_line(vid_cam_w,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div MapCellW)+
    ' '+i2s(mouse_map_y div MapCellW)+
-   ' L'+i2s(map_csize)+
-   ' C'+i2s(map_chsize)+
+   //' L'+i2s(map_csize)+
+   //' C'+i2s(map_chsize)+
    //' r0: '+tc_green+i2s(debug_r0)+
    //' r1: '+tc_blue+i2s(debug_r1)+
 
-   ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y,true))+tc_default+
+   //' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y,true))+tc_default+
    //' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    //' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
    //' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
    //' '+tc_gray+i2s(m_panelBtn_x)+
    //' '+tc_gray+i2s(m_panelBtn_y)+
    //' '+tc_lime+i2s(dist2mgcellC(mouse_map_x,mouse_map_y,1,1))
-   '',ta_RU,255, c_white);  }
+   ' '+b2s(G_Status)+
+   ' '+str_b2c[G_Started]+
+   ' '+str_b2c[ServerSide]+
+   ' '+c2s(G_Step),ta_RD,255, c_none);
 
    {draw_line(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,
        i2s(m_panelBtn_x)+

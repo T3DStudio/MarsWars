@@ -916,7 +916,7 @@ begin
 
       u_royal_cd:=NOTSET;
       u_royal_d :=NOTSET;
-      if(g_mode=gm_royale)then
+      if(map_scenario=ms_royale)then
       begin
          u_royal_cd:=point_dist_int(x,y,map_phsize,map_phsize);
          u_royal_d :=g_royal_r-u_royal_cd;

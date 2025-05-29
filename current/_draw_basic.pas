@@ -147,17 +147,17 @@ begin
    end;
 end;
 
-procedure draw_set_fontI(newFont:PTFont;newSizeW:integer);
+procedure draw_set_font(newFont:PTFont;newSizeW:integer);
 begin
    draw_font:=newFont;
    draw_set_fontUpdateSize(newSizeW/draw_font^.font_w);
 end;
 
-procedure draw_set_fontS(newFont:PTFont;newSizeS:single);
+{procedure draw_set_fontS(newFont:PTFont;newSizeS:single);
 begin
    draw_font:=newFont;
    draw_set_fontUpdateSize(newSizeS);
-end;
+end;}
 
 
 procedure draw_char(x,y:integer;ch:char;color_back:TMWColor);
@@ -389,7 +389,7 @@ begin
    draw_set_color(c_black);
    draw_set_alpha(127);
    draw_clear;
-   draw_set_fontI(font_Base,16);
+   draw_set_font(font_Base,basefont_w2);
    draw_set_color(color);
    draw_set_alpha(255);
    draw_line(w div 2,h div 2,CaptionString,ta_MM,255,0);
@@ -490,7 +490,7 @@ begin
       if(UnknownStarts)then
       begin
          if(teamStarts)
-         then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(g_mode,p,255)),c_white)
+         then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(map_scenario,p,255)),c_white)
          else map_MinimapSpot(x,y,r,'?',c_white)
       end
       else
@@ -523,7 +523,7 @@ begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
      if(cpCaptureR>0)then
-      if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
+      if((i=0)and(map_scenario=ms_KotH))or(cpenergy<=0)
       then map_MinimapSpot(cpmx,cpmy,cpmr,char_cp ,c_purple)
       else map_MinimapSpot(cpmx,cpmy,cpmr,char_gen,c_white );
 end;
@@ -534,7 +534,7 @@ begin
    draw_set_color(c_white);
    draw_mwtexture1(0,0,tex_map_bMiniMap,1,1);
 
-   map_MinimapPlayerStarts(not g_fixed_positions,g_mode in gm_ModesFixedTeams);
+   map_MinimapPlayerStarts(not g_fixed_positions,map_scenario in ms_ScenariosFixedTeams);
    map_MinimapCPoints;
    draw_set_target(nil);
 end;

@@ -624,26 +624,6 @@ begin
    gfx_SDLSurfaceFree(tmp_fog_Texture);
 end;
 
-{
-function gfx_SDLSurfaceResize(baseSurface:pSDL_Surface;neww,newh:integer):pSDL_Surface;
-var ts:pSDl_Surface;
-begin
-
-   ts:=zoomSurface(baseSurface,neww/baseSurface^.w,newh/baseSurface^.h,0);
-   if(ts=nil)then
-   begin
-      WriteSDLError;
-      HALT;
-   end;
-   gfx_SDLSurfaceResize:=sdl_displayformat(ts);
-   if(gfx_SDLSurfaceResize=nil)then
-   begin
-      WriteSDLError;
-      HALT;
-   end;
-   SDL_FreeSurface(ts);
-end; }
-
 procedure gfx_MakeBaseTile(targetTex,baseTex:pTMWTexture;sw:integer;yPress:boolean;animStepX,animStepY:integer);
 var
 tmpTex :pSDl_Surface;
@@ -682,18 +662,6 @@ animStepX,
 animStepY: integer;
 maskColor: TMWColor;
 upd_tiles: boolean;
-{function Compare(cur_id,last_id:pinteger):byte;
-begin
-   Compare:=0;
-   if(0<=cur_id^)and(cur_id^<theme_all_terrain_n)then
-     if(cur_id^=last_id^)
-     then Compare:=1
-     else
-     begin
-        Compare:=2;
-        last_id^:=cur_id^;
-     end;
-end; }
 function CheckTile(cur_id,last_id:pinteger;TargetMWTexture:pTMWTexture):boolean;
 begin
    CheckTile:=false;
@@ -994,9 +962,9 @@ begin
    spr_pdmodel:=@spr_dmodel;
 
    font_Base:=gfx_LoadFont(str_f_FontBase);
-   draw_set_fontS(font_Base,1);
+   draw_set_font(font_Base,basefont_w1);
 
-   draw_LoadingScreen(str_loading_srf,c_red);
+   draw_LoadingScreen(str_loading_gfxd,c_red);
 
    tex_menu        :=gfx_MWTextureMakeRenderTarget(menu_w       ,menu_h       );
    tex_ui_MiniMap  :=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi);
@@ -1253,16 +1221,23 @@ begin
          hw  := w div 2;hh:= hw;
       end;
    end;
-end;
+end;}
 
-procedure vid_CommonVars;
+procedure vid_UpdateCommonVars;
 begin
    vid_vmb_x1   := vid_vw-vid_vmb_x0;
    vid_vmb_y1   := vid_vh-vid_vmb_y0;
 
-   ui_textx     := ui_MapView_x+basefont_wh;
-   ui_texty     := ui_MapView_y+basefont_wh;
-   ui_hinty1    := ui_MapView_y+vid_cam_h-draw_font_h1*10;
+   vid_cam_w    :=vid_vw;
+   vid_cam_h    :=vid_vh;
+   vid_vhw      :=vid_vw div 2;
+   vid_vhh      :=vid_vh div 2;
+   vid_cam_hw   :=vid_vhw;
+   vid_cam_hh   :=vid_vhh;
+
+   ui_textx     := basefont_wh;
+   ui_texty     := basefont_wh;
+  { ui_hinty1    := ui_MapView_y+vid_cam_h-draw_font_h1*10;
    ui_hinty2    := ui_MapView_y+vid_cam_h-draw_font_h1*8;
    ui_hinty3    := ui_MapView_y+vid_cam_h-draw_font_h1*5;
    ui_hinty4    := ui_MapView_y+vid_cam_h-draw_font_h1*2;
@@ -1277,16 +1252,16 @@ begin
    ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
-   ui_armyy     := ui_texty;
-   ui_fpsx      := ui_MapView_x+vid_cam_w-(basefont_w1*basefont_w1h);
+   ui_armyy     := ui_texty; }
+   ui_fpsx      := vid_cam_w;//-(basefont_w1*basefont_w1h);
    ui_fpsy      := ui_texty;
-   ui_apmx      := ui_fpsx;
+  { ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+draw_font_h2;
 
    ui_ingamecl  :=(vid_cam_w-basefont_w1) div basefont_w1;
    if(r_menu<>nil)then gfx_SDLSurfaceFree(r_menu);
    r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
-   if(spr_mback<>nil)then vid_MakeMenuBack;
+   if(spr_mback<>nil)then vid_MakeMenuBack; }
 
    ui_FogView_cw:=(vid_cam_w div fog_CellW)+1;
    ui_FogView_ch:=(vid_cam_h div fog_CellW)+1;
@@ -1301,7 +1276,7 @@ end;
 
 procedure vid_ScreenSurfaces;
 begin
-   gfx_SDLSurfaceFree(r_ui_Panel);
+   //gfx_SDLSurfaceFree(r_ui_Panel);
 
    case vid_PannelPos of
 vpp_left,
@@ -1348,29 +1323,24 @@ vpp_bottom : begin
              end;
    end;
 
-   r_ui_Panel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
+   //r_ui_Panel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
 
-   vid_CommonVars;
+   vid_UpdateCommonVars;
 end;
 
 procedure vid_MakeScreen;
 begin
-   if(r_screen<>nil)then sdl_freesurface(r_screen);
+   //if(r_screen<>nil)then sdl_freesurface(r_screen);
 
-   vid_cam_w:=vid_vw;
-   vid_cam_h:=vid_vh;
-   vid_vhw:=vid_vw div 2;
-   vid_vhh:=vid_vh div 2;
-   vid_cam_hw:=vid_vhw;
-   vid_cam_hh:=vid_vhh;
 
-   if(vid_fullscreen)
+
+   {if(vid_fullscreen)
    then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)
    else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags);
 
-   if(r_screen=nil)then begin WriteSDLError; exit; end;
+   if(r_screen=nil)then begin WriteSDLError; exit; end;}
 
    vid_ScreenSurfaces;
 end;
-        }
+
 

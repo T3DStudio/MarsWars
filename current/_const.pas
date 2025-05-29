@@ -59,7 +59,7 @@ pt_none                = 0;
 pt_human               = 1;
 pt_ai                  = 2;
 
-//  Player slot state
+// player slot state
 pss_closed             = 0;
 pss_observer           = 1;
 pss_opened             = 2;
@@ -81,25 +81,27 @@ pss_AI_10              = 17; // Cheater 3 (Vision+MultiProd+FastUProd)   }
 pss_AI_11              = 18; // Cheater 4 (Vision+MultiProd+FastUProd+FastBProd)
 
 gms_g_maxai            = pss_AI_11-pss_AI_1+1; // 0-11 max skirmish AI skills
-
 ps_states_n            = 8+gms_g_maxai;
 
 player_default_ai_level= 7;
 
-gm_scirmish            = 0;  // game mode
-gm_4x4                 = 1;
-gm_2x2x2x2             = 2;
-gm_capture             = 3;
-gm_KotH                = 4;
-gm_royale              = 5;
-gm_assault             = 6;
+// map scenario
+ms_scirmish            = 0;
+ms_4x4                 = 1;
+ms_2x2x2x2             = 2;
+ms_capture             = 3;
+ms_KotH                = 4;
+ms_royale              = 5;
+ms_assault             = 6;
 
-gm_ModesFixedTeams     : set of byte = [gm_4x4,gm_2x2x2x2,gm_assault];
+ms_ScenariosFixedTeams : set of byte = [ms_4x4,ms_2x2x2x2,ms_assault];
 
-allgamemodes           : set of byte = [gm_scirmish,gm_4x4,gm_2x2x2x2,gm_capture,gm_KotH,gm_royale,gm_assault];
-gms_count              = 6;
+allmapscenarios        : set of byte = [ms_scirmish,ms_4x4,ms_2x2x2x2,ms_capture,ms_KotH,ms_royale,ms_assault];
+ms_count               = 6;
 
 g_step_koth_pause      = fr_fps60*4;
+
+//  GAME STATE
 
 {gs_paused0            = 0; 0..MaxPlayers
  gs_paused1            = 1;
@@ -123,11 +125,13 @@ gs_win_team6           = 26;
 gs_win_team7           = 27;
 gs_running             = 255;
 
+// races
 r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
+// other limits
 MaxPlayer              = 8;
 LastPlayer             = MaxPlayer-1;
 MaxPlayerUnits         = 125;
@@ -152,13 +156,13 @@ mgsl_rocks             = 3;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Game presets
+//  Default map presets
 //
 
-gp_custom              = 0;
-gp_1x1_plane           = 1;
-gp_1x1_lake            = 2;
-gp_1x1_cave            = 3;
+mapp_custom            = 0;
+mapp_1x1_plane         = 1;
+mapp_1x1_lake          = 2;
+mapp_1x1_cave          = 3;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -268,8 +272,8 @@ ns_server              = 1;
 ns_client              = 2;
 
 nmid_lobby_info        = 3;
-nmid_connect           = 4;
 nmid_client_info       = 5;
+nmid_connect           = 4;
 nmid_log_chat          = 6;
 nmid_log_upd           = 7;
 nmid_snapshot          = 8;
@@ -281,19 +285,20 @@ nmid_notconnected      = 13;
 nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
-nmid_lobbby_preset     = 18;
-nmid_lobbby_mapseed    = 19;
-nmid_lobbby_mapsize    = 20;
-nmid_lobbby_type       = 21;
-nmid_lobbby_symmetry   = 22;
-nmid_lobbby_playerslot = 23;
-nmid_lobbby_playerteam = 24;
-nmid_lobbby_playerrace = 25;
-nmid_lobbby_gamemode   = 26;
-nmid_lobbby_generators = 27;
-nmid_lobbby_FixStarts  = 28;
-nmid_lobbby_DeadPObs   = 29;
-nmid_lobbby_EmptySlots = 30;
+nmid_loby_mapMap       = 18;
+nmid_loby_mapScenario  = 19;
+nmid_loby_mapGenerators= 20;
+nmid_loby_mapSeed      = 21;
+nmid_loby_mapSize      = 22;
+nmid_loby_mapType      = 23;
+nmid_loby_mapSymmetry  = 24;
+nmid_loby_playerSlot   = 25;
+nmid_loby_playerTeam   = 26;
+nmid_loby_playerRace   = 27;
+
+nmid_loby_gameFixStarts= 28;
+nmid_loby_gameDeadPObs = 29;
+nmid_loby_gameEmptySlots=30;
 nmid_surrender         = 31;
 nmid_start             = 32;
 nmid_break             = 33;
@@ -1146,34 +1151,30 @@ menu_hh                = menu_h div 2;
 
 menu_logo_h            = 96;
 
-menu_main_mp_bw1       = 300;
+menu_main_mp_bw1       = basefont_w1*38;//300;
 menu_main_mp_bwh       = menu_main_mp_bw1 div 2;
 menu_main_mp_bwq       = menu_main_mp_bw1 div 4;
-menu_main_mp_bw3q      = menu_main_mp_bwq*3;
-menu_main_mp_bh1       = 38;
+menu_main_mp_bh1       = basefont_w1*5;//38;
 menu_main_mp_bh2       = menu_main_mp_bh1*2;
 menu_main_mp_bh3       = menu_main_mp_bh1*3;
 menu_main_mp_bhh       = menu_main_mp_bh1 div 2;
 menu_main_mp_bhq       = menu_main_mp_bh1 div 4;
 menu_main_mp_bhq3      = menu_main_mp_bhq*3;
-menu_main_mp_bh1q      = menu_main_mp_bhq*5;
-menu_main_mp_bh1h      = menu_main_mp_bh1+menu_main_mp_bhh;
 menu_main_mp_bh3q      = menu_main_mp_bhq*3;
 
 menu_players_namew     = basefont_w1+(basefont_w1*PlayerNameLen)+
-                                     (basefont_w1*8            )+basefont_w2;
+                                     (basefont_w1*10           )+basefont_w2;
 menu_players_racew     = basefont_w1+(basefont_w1*7            )+basefont_w2;
 menu_players_teamw     = basefont_w1+(basefont_w1*7            )+basefont_w2;
-menu_map_settingsw     = basefont_w1+(basefont_w1*20           )+basefont_w2;
 
 menu_netsearch_lineh   = menu_main_mp_bh1;
-menu_netsearch_listh   = 8;
+menu_netsearch_listh   = 11;
 
 menu_replays_lineh     = menu_main_mp_bhh;
-menu_replays_listh     = 16;
+menu_replays_listh     = 23;
 
 menu_saveload_lineh    = menu_main_mp_bhh;
-menu_saveload_listh    = 16;
+menu_saveload_listh    = 22;
 
 mwscroll_speed         = 5;
 
@@ -1304,22 +1305,23 @@ mi_player_color6          = 146;
 mi_player_color7          = 147;
 
 ////  MAP PARAMS
-mi_map_Preset             = 151;
-mi_map_Seed               = 152;
-mi_map_Size               = 153;
-mi_map_Type               = 154;
-mi_map_Sym                = 155;
-mi_map_Random             = 156;
-mi_map_Theme              = 157;
-mi_map_MiniMap            = 158;
+mi_map_Map                = 151;
+mi_map_Scenario           = 152;
+mi_map_Generators         = 153;
+mi_map_Seed               = 154;
+mi_map_Size               = 155;
+mi_map_Type               = 156;
+mi_map_Sym                = 157;
+mi_map_Random             = 158;
+mi_map_Theme              = 159;
+mi_map_MiniMap            = 160;
 
 ////  GAME OPTIONS
-mi_game_mode              = 161;
-mi_game_generators        = 162;
-mi_game_FixStarts         = 163;
-mi_game_DeadPbserver      = 164;
-mi_game_EmptySlots        = 165;
-mi_game_RandomSkrimish    = 166;
+
+mi_game_FixStarts         = 161;
+mi_game_DeadPbserver      = 162;
+mi_game_EmptySlots        = 163;
+mi_game_RandomSkrimish    = 164;
 
 ////  MULTIPLAYER
 mi_mplay_ServerCaption    = 180;
@@ -1412,12 +1414,12 @@ fog_vfhm               = (vid_maxh div fog_CellW)+2;
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MWSCR_';
 str_screenshotExt      : shortstring = '.png';
-str_loading_srf        : shortstring = 'MAKING BASIC TEXTURES...';
+str_loading_gfxd       : shortstring = 'MAKING BASIC TEXTURES...';
 str_loading_gfx1       : shortstring = 'LOADING BASE GRAPHICS...';
 str_loading_gfx2       : shortstring = 'LOADING THEMES GRAPHICS...';
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...';
 str_loading_msc        : shortstring = 'LOADING MUSIC...';
-str_loading_ini        : shortstring = 'INIT GAME...';
+str_loading_init       : shortstring = 'INIT GAME...';
 str_f_grp              : shortstring = 'graphic\';
 str_f_snd              : shortstring = 'sound\';
 str_e_music            : shortstring = '.ogg';
@@ -1690,7 +1692,7 @@ str_fstarts            : shortstring = 'Fixed player starts:      ';
 str_gmode              : shortstring = 'Game mode:                ';
 str_gmodel             : array[0..gms_count    ] of shortstring = ('Skirmish','3x3','2x2x2','Capturing points','Invasion','King of the Hill','Battle Royal');
 str_cgenerators        : shortstring = 'Generators:               ';
-str_cgeneratorsl       : array[0..gms_g_maxgens] of shortstring = ('none','own,no new builders','5 min','10 min','15 min','20 min','infinity');
+str_cgeneratorsl       : array[0..gms_g_maxgens] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
 str_deadobservers      : shortstring = 'Observer mode after lose: ';
 str_starta             : shortstring = 'Builders at game start:   ';
 str_plname             : shortstring = 'Player name';

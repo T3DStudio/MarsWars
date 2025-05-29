@@ -17,7 +17,7 @@ begin
       PlayerSetAllowedUnits(PlayerTarget,[UID_LostSoul, UID_Phantom ],20,false);
 
 
-      if(g_generators>0)
+      if(map_generators>0)
       then PlayerSetAllowedUnits(PlayerTarget,[UID_HSymbol,UID_UGenerator],0,false);
 
       PlayerSetAllowedUpgrades(PlayerTarget,uids_all,255,true);
@@ -58,11 +58,11 @@ begin
 
    case g_slot_state[SlotSource] of
    pss_observer: ;
-   pss_opened  : g_players[SlotSource].team:=PlayerSlotGetTeam(g_mode,SlotSource,SlotSource);
+   pss_opened  : g_players[SlotSource].team:=PlayerSlotGetTeam(map_scenario,SlotSource,SlotSource);
    end;
    case g_slot_state[SlotTarget] of
    pss_observer: ;
-   pss_opened  : g_players[SlotTarget].team:=PlayerSlotGetTeam(g_mode,SlotTarget,SlotTarget);
+   pss_opened  : g_players[SlotTarget].team:=PlayerSlotGetTeam(map_scenario,SlotTarget,SlotTarget);
    end;
 
    if(PlayerClient=SlotTarget)then PlayerClient:=SlotSource
@@ -137,9 +137,9 @@ pss_splayer  : with g_players[PlayerTarget] do
       begin
          if(PlayerRequestor=PlayerTarget)then exit;
          if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer)then exit;
-         if(g_preset_cur>0)then
-          with g_presets[g_preset_cur] do
-           if(gp_player_team[PlayerTarget]>LastPlayer)
+         if(map_preset_cur>0)then
+          with map_presets[map_preset_cur] do
+           if(mapp_player_team[PlayerTarget]>LastPlayer)
            then exit
            else
              case NewState of
@@ -159,7 +159,7 @@ pss_closed,
 pss_opened   : begin
                   PlayerSetType(PlayerTarget,pt_none);
                   g_slot_state[PlayerTarget]:=NewState;
-                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
+                  team:=PlayerSlotGetTeam(map_scenario,PlayerTarget,255);
                end;
 pss_observer : begin
                   g_slot_state[PlayerTarget]:=NewState;
@@ -175,7 +175,7 @@ pss_AI_11    : begin
                   g_slot_state[PlayerTarget]:=NewState;
                   ai_skill:=NewState-pss_AI_1+1;
                   PlayerSetType(PlayerTarget,pt_ai);
-                  team:=PlayerSlotGetTeam(g_mode,PlayerTarget,255);
+                  team:=PlayerSlotGetTeam(map_scenario,PlayerTarget,255);
                end;
     end;
 end;
@@ -234,7 +234,7 @@ begin
    if(NewTeam        >LastPlayer)
    or(PlayerRequestor>LastPlayer)
    or(PlayerTarget   >LastPlayer)
-   or(g_preset_cur   >0)
+   or(map_preset_cur   >0)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -253,7 +253,7 @@ begin
 
       n:=team;
       team:=NewTeam;
-      if(PlayerSlotGetTeam(g_mode,PlayerTarget,255)<>team)then
+      if(PlayerSlotGetTeam(map_scenario,PlayerTarget,255)<>team)then
       begin
          team:=n;
          exit;
@@ -282,7 +282,9 @@ begin
 
    if(not G_Started)
    or(PlayerTarget>LastPlayer)
+   {$IFDEF _FULLGAME}
    or(rpls_rstate=rpls_state_read)
+   {$ENDIF}
    or(GameStatus_End)
    or(not g_deadobservers)then exit;
 
@@ -409,80 +411,80 @@ begin
    {$ENDIF}
 end;
 
-procedure InitGamePresets;
-procedure SetPreset(pid:byte;mseed:cardinal;msize:integer;mtype,msym,gmode,t1,t2,t3,t4,t5,t6,t7,t8:byte);
+procedure InitDefaultMaps;
+procedure SetMap(pid:byte;mseed:cardinal;msize:integer;mtype,msym,mscenario,t1,t2,t3,t4,t5,t6,t7,t8:byte);
 begin
-   if(g_preset_n<=pid)then
+   if(map_preset_n<=pid)then
    begin
-      if(g_preset_n=255)then exit;
-      while(g_preset_n<=pid)do
+      if(map_preset_n=255)then exit;
+      while(map_preset_n<=pid)do
       begin
-         g_preset_n+=1;
-         setlength(g_presets,g_preset_n);
+         map_preset_n+=1;
+         setlength(map_presets,map_preset_n);
       end;
    end;
 
-   with g_presets[pid] do
+   with map_presets[pid] do
    begin
-      gp_map_seed    := mseed;
-      gp_map_mw      := msize;
-      gp_map_type    := mtype;
-      gp_map_symmetry:= msym;
-      gp_g_mode      := gmode;
-      FillChar(gp_player_team,SizeOf(gp_player_team),0);
-      gp_player_team[0]:=t1;
-      gp_player_team[1]:=t2;
-      gp_player_team[2]:=t3;
-      gp_player_team[3]:=t4;
-      gp_player_team[4]:=t5;
-      gp_player_team[5]:=t6;
-      gp_player_team[6]:=t7;
-      gp_player_team[7]:=t8;
+      mapp_seed    := mseed;
+      mapp_psize   := msize;
+      mapp_type    := mtype;
+      mapp_symmetry:= msym;
+      mapp_scenario:= mscenario;
+      FillChar(mapp_player_team,SizeOf(mapp_player_team),0);
+      mapp_player_team[0]:=t1;
+      mapp_player_team[1]:=t2;
+      mapp_player_team[2]:=t3;
+      mapp_player_team[3]:=t4;
+      mapp_player_team[4]:=t5;
+      mapp_player_team[5]:=t6;
+      mapp_player_team[6]:=t7;
+      mapp_player_team[7]:=t8;
    end;
 end;
 begin
-   g_preset_cur:=0;
-   g_preset_n  :=0;
-   setlength(g_presets,g_preset_n);
+   map_preset_cur:=0;
+   map_preset_n  :=0;
+   setlength(map_presets,map_preset_n);
 
-   SetPreset(gp_1x1_plane   , 667,4000,mapt_steppe,1,gm_scirmish,0,1,255,255,255,255,255,255);
-   SetPreset(gp_1x1_lake    ,6667,4000,mapt_clake ,1,gm_scirmish,0,1,255,255,255,255,255,255);
-   SetPreset(gp_1x1_cave    , 667,4000,mapt_canyon,1,gm_scirmish,0,1,255,255,255,255,255,255);
+   SetMap(mapp_1x1_plane   , 667,4000,mapt_steppe,1,ms_scirmish,0,1,255,255,255,255,255,255);
+   SetMap(mapp_1x1_lake    ,6667,4000,mapt_clake ,1,ms_scirmish,0,1,255,255,255,255,255,255);
+   SetMap(mapp_1x1_cave    , 667,4000,mapt_canyon,1,ms_scirmish,0,1,255,255,255,255,255,255);
 
    {$IFNDEF _FULLGAME}
-   g_presets[gp_custom].gp_name:= 'custom preset';
+   g_presets[gp_custom].gp_name:= 'custom';
    MakeGamePresetsNames(@str_gmodel[0],@str_m_typel[0]);
    {$ENDIF}
 end;
 
-function GameLoadPreset(PlayerRequestor,preset:byte;Check:boolean):boolean;
+function MapLoad(PlayerRequestor,preset:byte;Check:boolean):boolean;
 var p:byte;
 begin
-   GameLoadPreset:=false;
+   MapLoad:=false;
 
    if(G_Started)
    or((PlayerRequestor<=LastPlayer)and(PlayerLobby<>PlayerRequestor)and(PlayerLobby<=LastPlayer))
-   or(preset>=g_preset_n)then exit;
+   or(preset>=map_preset_n)then exit;
 
-   GameLoadPreset:=true;
+   MapLoad:=true;
 
    if(Check)then exit;
 
-   g_preset_cur:=preset;
+   map_preset_cur:=preset;
 
-   if(g_preset_cur>0)then
-   with g_presets[g_preset_cur] do
+   if(map_preset_cur>0)then
+   with map_presets[map_preset_cur] do
    begin
-      map_seed    := gp_map_seed;
-      map_psize    := gp_map_mw;
-      map_type    := gp_map_type;
-      map_symmetry:= gp_map_symmetry;
-      g_mode      := gp_g_mode;
+      map_seed    := mapp_seed;
+      map_psize   := mapp_psize;
+      map_type    := mapp_type;
+      map_symmetry:= mapp_symmetry;
+      map_scenario:= mapp_scenario;
       g_fixed_positions
                   := false;
 
       for p:=0 to LastPlayer do
-        if(gp_player_team[p]<=LastPlayer)
+        if(mapp_player_team[p]<=LastPlayer)
         then PlayerSlotChangeState(255,p,pss_opened  ,false)
         else PlayerSlotChangeState(255,p,pss_observer,false);
 
@@ -503,34 +505,19 @@ begin
    then exit;
 
    case setting of
-nmid_lobbby_gamemode    : if(g_preset_cur=0)then
-                          begin
-                             if not(NewVal in allgamemodes)then exit;
-                             GameSetCommonSetting:=true;
-                             if(Check)then exit;
-                             g_mode:=NewVal;
-                             map_Make1;
-                          end;
-nmid_lobbby_generators  : begin
-                             if(NewVal>gms_g_maxgens)then exit;
-                             GameSetCommonSetting:=true;
-                             if(Check)then exit;
-                             g_generators:=NewVal;
-                             map_Make1;
-                          end;
-nmid_lobbby_FixStarts   : if(g_preset_cur=0)then
+nmid_loby_gameFixStarts   : if(map_preset_cur=0)then
                           begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_fixed_positions:=NewVal>0;
                              map_Make1;
                           end;
-nmid_lobbby_DeadPObs: begin
+nmid_loby_gameDeadPObs: begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_deadobservers:=NewVal>0;
                           end;
-nmid_lobbby_EmptySlots  : begin
+nmid_loby_gameEmptySlots  : begin
                              if(NewVal>gms_g_maxai)then exit;
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
@@ -689,7 +676,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
           PlayerSetType(p,pt_none);
         end;
 
-        team:=PlayerSlotGetTeam(g_mode,p,255);
+        team:=PlayerSlotGetTeam(map_scenario,p,255);
         race:=slot_race;
 
         if(race=r_random)then race:=1+random(r_cnt);
@@ -697,7 +684,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         if(player_type=pt_human)then ai_skill:=player_default_ai_level;//g_ai_slots
      end;
 
-   if(not g_fixed_positions)then map_ShufflePlayerStarts(g_mode in gm_ModesFixedTeams);
+   if(not g_fixed_positions)then map_ShufflePlayerStarts(map_scenario in ms_ScenariosFixedTeams);
 
    for p:=0 to LastPlayer do
     with g_players[p] do
@@ -711,7 +698,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
            GameCreateStartBase(map_PlayerStartX[p],
                                map_PlayerStartY[p],
                                uid_race_start_base[race],
-                               3*byte(g_generators>0),p,1+integer(g_generators>0));
+                               3*byte(map_generators>0),p,1+integer(map_generators>0));
            unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
            //unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_Imp,p,true,false,0);
@@ -764,7 +751,7 @@ begin
    {$ENDIF}
    G_Started:=false;
    GameDefaultAll;
-   GameLoadPreset(255,g_preset_cur,false);
+   MapLoad(255,map_preset_cur,false);
 end;
 
 {$IFDEF _FULLGAME}
@@ -775,9 +762,9 @@ begin
 
    Map_randommap;
 
-   g_preset_cur:=0;
-   g_mode      :=gm_scirmish;
-   g_generators:=random(gms_g_maxgens+1);
+   map_preset_cur:=0;
+   map_scenario      :=ms_scirmish;
+   map_generators:=random(gms_g_maxgens+1);
 
    PlayersSetDefault;
 
@@ -1126,7 +1113,7 @@ end;
 
 {$include _net_game.pas}
 
-procedure CodeGame;
+procedure MainGame;
 var w:word;
 x0,y0:integer;
 pu:PTUnit;
@@ -1152,7 +1139,7 @@ begin
       g_cycle_order:=(g_cycle_order+1) mod order_period;
       g_cycle_regen:=(g_cycle_regen+1) mod regen_period;
 
-      debug_AddDoaminCells;
+      {debug_AddDoaminCells;
 
       with g_players[PlayerClient] do
         if(IsIntUnitRange(uid_x[UID_Imp],@pu))then
@@ -1163,13 +1150,10 @@ begin
                {UIInfoItemAddCircle(movePFNext_x,movePFNext_y,5,c_orange );
                if(StepCollisionR(mouse_map_x,mouse_map_y,g_uids[UID_Imp]._r,zone,328,348))then
                  UIInfoItemAddCircle(mouse_map_x,mouse_map_y,5,c_lime );   }
-            end;
+            end;  }
 
-      x0:=8360;
-      y0:=6782;
-
-
-
+      //x0:=8360;
+      //y0:=6782;
 
       if(ServerSide)then
       begin
@@ -1178,14 +1162,14 @@ begin
          UpdatePlayersStatusVars;
 
          {GameModeCPoints;
-         case g_mode of
-         gm_royale    : begin
+         case map_scenario of
+         ms_royale    : begin
                            if(g_cycle_order=0)then
                              if(g_royal_r>0)then g_royal_r-=1;
                            GameDefaultEndConditions;
                         end;
-         gm_capture,
-         gm_KotH      : GameDefaultDefeatConditions;
+         ms_capture,
+         ms_KotH      : GameDefaultDefeatConditions;
          else           GameDefaultEndConditions;
          end;}
       end;

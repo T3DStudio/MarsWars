@@ -62,7 +62,7 @@ cfg_key_VidWidth      : vid_vw                := vli;
 cfg_key_VidHeight     : vid_vh                := vli;
 cfg_key_g_FixedPos    : g_fixed_positions     :=(vl=str_b2c[true]);
 cfg_key_g_AISlots     : g_ai_slots            := vlw;
-cfg_key_g_Generators  : g_generators          := vlw;
+cfg_key_g_Generators  : map_generators          := vlw;
 cfg_key_ReplayName    : rpls_str_prefix       := vl;
 cfg_key_ReplayRecord  : rpls_Recording        :=(vl=str_b2c[true]);
 cfg_key_ReplayQuality : rpls_Quality          := vlw;
@@ -125,7 +125,7 @@ begin
       vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
 
       if(g_ai_slots  >gms_g_maxai       )then g_ai_slots   :=gms_g_maxai;
-      if(g_generators>gms_g_maxgens     )then g_generators :=gms_g_maxgens;
+      if(map_generators>gms_g_maxgens     )then map_generators :=gms_g_maxgens;
 
       if(rpls_Quality>cl_UpT_arrayN_RPLs)then rpls_Quality :=cl_UpT_arrayN_RPLs;
       if(net_Quality >cl_UpT_arrayN     )then net_Quality  :=cl_UpT_arrayN;
@@ -163,7 +163,7 @@ begin
    writeln(f,cfg_key_ClientQuality ,'=',net_Quality               );
    writeln(f,cfg_key_g_FixedPos    ,'=',str_b2c[g_fixed_positions]);
    writeln(f,cfg_key_g_AISlots     ,'=',g_ai_slots                );
-   writeln(f,cfg_key_g_Generators  ,'=',g_generators              );
+   writeln(f,cfg_key_g_Generators  ,'=',map_generators              );
    writeln(f,cfg_key_PanelPos      ,'=',ord(vid_PannelPos)        );
    writeln(f,cfg_key_MiniMapPos    ,'=',str_b2c[vid_MiniMapPos]   );
    writeln(f,cfg_key_HealthBars    ,'=',ord(vid_UnitHealthBars)   );

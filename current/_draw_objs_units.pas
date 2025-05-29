@@ -441,10 +441,10 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
               else
                 if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
 
-            {if(vid_ColoredShadow)
+            if(vid_ColoredShadow)
             then ColorShadow:=PlayerColorShadow[playeri]
-            else ColorShadow:=c_ablack;
-                                        }
+            else ColorShadow:=c_black;
+
             SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha);
          end;
       end;

@@ -130,7 +130,7 @@ end;
 
 
 
-procedure InitGame;
+procedure MainInit;
 begin
    GameCycle:=false;
 
@@ -140,7 +140,7 @@ begin
    randomize;
 
    GameObjectsInit;
-   InitGamePresets;
+   InitDefaultMaps;
 
    {$IFDEF _FULLGAME}
 
@@ -151,7 +151,7 @@ begin
    if not(InitVideo)then exit;
    if not(InitSound)then exit;
 
-   draw_LoadingScreen(str_loading_ini,c_red);
+   draw_LoadingScreen(str_loading_init,c_red);
 
    saveload_MakeSaveData;
    replay_MakeReplayHeaderData;

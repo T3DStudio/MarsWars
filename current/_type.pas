@@ -284,7 +284,7 @@ TInputKey = record
    ik_depend: byte;
 end;
 
-TTab3PageType = (t3pt_none=0,t3pt_actions,t3pt_observer,t3pt_replay);
+TTab3PageType = (t3pt_none=0,t3pt_controls,t3pt_observer,t3pt_replay);
 
 TTabType      = (tt_buildings=0,tt_units,tt_upgrades,tt_controls);
 const
@@ -923,15 +923,15 @@ TCTPoint = record
 end;
 PTCTPoint = ^TCTPoint;
 
-TGamePreset = record
-   gp_name      : shortstring;
-   gp_map_seed  : cardinal;
-   gp_map_mw    : integer;
-   gp_map_type,
-   gp_map_symmetry,
-   gp_g_mode    : byte;
+TMapPreset = record
+   mapp_name    : shortstring;
+   mapp_seed    : cardinal;
+   mapp_psize    : integer;
+   mapp_type,
+   mapp_symmetry,
+   mapp_scenario: byte;
 
-   gp_player_team
+   mapp_player_team
                 : array[0..LastPlayer] of byte;
 end;
 

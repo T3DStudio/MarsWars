@@ -190,7 +190,7 @@ begin
                             D_menu_EText(mi,ta_RM,tstr,true,0,c_ltgray);
                          end
                          else
-                           if(g_slot_state[playeri]=pss_observer)then D_menu_EText(mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_ltgray);
+                           if(g_slot_state[playeri]=pss_observer)then D_menu_EText(mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_white);
                       end
                       else
                       begin
@@ -201,7 +201,7 @@ begin
                          draw_set_alpha(255);
                          end;
 
-                         D_menu_EText(mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_ltgray);
+                         D_menu_EText(mi,ta_RM,str_menu_PlayerSlots[g_slot_state[playeri]],true ,0,c_white);
                       end;
        pss_AI_1..
        pss_AI_11    : if(player_type>pt_none)
@@ -235,8 +235,8 @@ begin
    end;
    with g_players[p1] do
      if(isobserver)or(g_slot_state[p1]=pss_observer)
-     then D_menu_EText(mi,ta_MM,str_observer,true,0,c_none)
-     else D_menu_EText(mi,ta_MM,str_teams[PlayerSlotGetTeam(g_mode,p1,255)],true,0,c_none);
+     then D_menu_EText(mi,ta_MM,str_observer,true,0,c_none)        //str_teams[]
+     else D_menu_EText(mi,ta_RM,b2s(PlayerSlotGetTeam(map_scenario,p1,255)+1),true,0,c_none);
 end;
 procedure D_menu_PlayerColor(mi,p1:byte);
 begin
@@ -249,8 +249,8 @@ begin
          draw_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_none);
       end;
       draw_set_color(PlayerColorNormal[p1]);
-      draw_frect(mi_x0+basefont_wh,mi_y0+basefont_wh,
-                 mi_x1-basefont_wh,mi_y1-basefont_wh);
+      draw_frect(mi_x0+basefont_w1,mi_y0+basefont_w1,
+                 mi_x1-basefont_w1,mi_y1-basefont_w1);
    end;
 end;
 
@@ -355,7 +355,7 @@ begin
    draw_mwtexture2(0,0,spr_mback,menu_w,menu_h);
 
    // x2 FONT ELEMENTS
-   draw_set_fontS(font_Base,2);
+   draw_set_font(font_Base,basefont_w2);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
@@ -370,7 +370,7 @@ mi_title_ReplayPlayback    : D_menu_MButtonS(i,str_menu_ReplayPlayback,true);
          end;
 
    // x1.5 FONT ELEMENTS
-   draw_set_fontS(font_Base,1.5);
+   draw_set_font(font_Base,basefont_w1h);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
@@ -413,7 +413,7 @@ else D_menu_ETextD(mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_Qual
 
 //
 mi_settings_Replaying      : D_menu_MButtonD(i,str_menu_Recording       ,str_bool[rpls_Recording]             ,false);
-mi_settings_ReplayName     : D_menu_MButtonN(i,str_menu_ReplayName      ,rpls_str_prefix                              );
+mi_settings_ReplayName     : D_menu_MButtonN(i,str_menu_ReplayName      ,rpls_str_prefix                            );
 mi_settings_ReplayQuality  : D_menu_MButtonD(i,str_menu_ReplayQuality   ,str_menu_NetQuality[rpls_Quality]    ,true );
 
 mi_settings_Client         : D_menu_EText   (i,ta_MM,str_menu_Client,false,0,c_white);
@@ -456,7 +456,7 @@ mi_saveload_delete         : D_menu_MButton (i,str_menu_DeleteFile      );
          end;
 
    // x1 FONT ELEMENTS
-   draw_set_fontS(font_Base,1);
+   draw_set_font(font_Base,basefont_w1);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
@@ -497,13 +497,15 @@ mi_player_color5,
 mi_player_color6,
 mi_player_color7           : D_menu_PlayerColor(i,i-mi_player_color0);
 
-mi_map_Preset              : D_menu_MButtonD(i,g_presets[g_preset_cur].gp_name,''     ,true );
-mi_map_Seed                : D_menu_MButtonU(i,str_map_seed,c2s(map_seed)                   );
-mi_map_Size                : D_menu_MButtonD(i,str_map_size,i2s(RoundN(map_psize,100)) ,true );
-mi_map_Type                : D_menu_MButtonD(i,str_map_type,str_map_typel[map_type   ],true );
-mi_map_Sym                 : D_menu_MButtonD(i,str_map_sym ,str_map_syml[map_symmetry],true );
+mi_map_Map                 : D_menu_MButtonD(i,str_map_Map       ,map_presets[map_preset_cur].mapp_name,true);
+mi_map_Scenario            : D_menu_MButtonD(i,str_map_scenario  ,str_map_scenariol[map_scenario]      ,true);
+mi_map_Generators          : D_menu_MButtonD(i,str_map_Generators,str_map_Generatorsl[map_generators]  ,true);
+mi_map_Seed                : D_menu_MButtonU(i,str_map_seed      ,c2s(map_seed)                             );
+mi_map_Size                : D_menu_MButtonD(i,str_map_size      ,i2s(RoundN(map_psize,100))           ,true);
+mi_map_Type                : D_menu_MButtonD(i,str_map_type      ,str_map_typel[map_type   ]           ,true);
+mi_map_Sym                 : D_menu_MButtonD(i,str_map_sym       ,str_map_syml[map_symmetry]           ,true);
+mi_map_Theme               : D_menu_MButtonU(i,str_map_theme     ,theme_name[theme_cur]                     );
 mi_map_Random              : D_menu_MButton (i,str_map_random);
-mi_map_Theme               : D_menu_MButton (i,theme_name[theme_cur]);
 mi_map_MiniMap             : with menu_items[i] do
                              begin
                              D_menu_Panel(mi_x0,mi_y0,mi_x1,mi_y1,2);
@@ -512,8 +514,6 @@ mi_map_MiniMap             : with menu_items[i] do
                              draw_mwtexture2(mi_x0,mi_y0,tex_map_mMiniMap,mi_x1-mi_x0,mi_y1-mi_y0);
                              end;
 
-mi_game_mode               : D_menu_MButtonD(i,str_menu_GameMode     ,str_emnu_GameModel[g_mode]        ,true );
-mi_game_generators         : D_menu_MButtonD(i,str_menu_Generators   ,str_menu_Generatorsl[g_generators],true );
 mi_game_FixStarts          : D_menu_MButtonD(i,str_menu_FixedStarts  ,str_bool[g_fixed_positions]       ,false);
 mi_game_DeadPbserver       : D_menu_MButtonD(i,str_menu_DeadObservers,str_bool[g_deadobservers]         ,false);
 mi_game_EmptySlots         : D_menu_MButtonD(i,str_menu_AISlots      ,ai_name(g_ai_slots)               ,true );
@@ -588,7 +588,7 @@ begin
    draw_frect(menu_list_x-menu_list_w,menu_list_y,menu_list_x,y);
    draw_set_color(c_white);
    draw_rect(menu_list_x-menu_list_w,menu_list_y,menu_list_x,y);
-   draw_set_fontS(font_base,menu_list_fontS);
+   draw_set_font(font_base,menu_list_fontS);
    for i:=0 to menu_list_n-1 do
    with menu_list_items[i] do
    begin
@@ -614,7 +614,7 @@ begin
       draw_set_color(c_white);
       draw_hline(menu_list_x-menu_list_w+1,menu_list_x-1,y+menu_list_item_H);
    end;
-   draw_set_fontS(font_base,1);
+   draw_set_font(font_base,basefont_w1);
 end;
 
 procedure D_Menu;
@@ -665,7 +665,7 @@ begin
 
    if(vid_FPS)then
    begin
-      draw_set_fontS(font_Base,1);
+      draw_set_font(font_Base,basefont_w1);
       draw_set_color(c_white);
       draw_line(menu_tex_x+draw_font_wq,
                 menu_tex_y+draw_font_wq,

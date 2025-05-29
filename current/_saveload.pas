@@ -179,8 +179,8 @@ begin
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
-   AddItem(@g_mode           ,SizeOf(g_mode           ));
-   AddItem(@g_generators     ,SizeOf(g_generators     ));
+   AddItem(@map_scenario           ,SizeOf(map_scenario           ));
+   AddItem(@map_generators     ,SizeOf(map_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
    AddItem(@g_ai_slots       ,SizeOf(g_ai_slots       ));
@@ -241,8 +241,7 @@ begin
 
    close(f);
 
-   if(menu_state)
-   then menu_Toggle;
+   if(menu_state)then menu_Escape(true);
 
    saveload_MakeFolderList;
 
@@ -296,8 +295,8 @@ begin
 
          G_Started:=true;
 
-         if(menu_state)
-         then menu_Toggle;
+         if(menu_state)then menu_Escape(true);
+
          menu_page1:=mp_scirmish;
       end;
       close(f);

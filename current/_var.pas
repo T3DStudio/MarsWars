@@ -19,9 +19,7 @@ PlayerLobby       : byte = 0; // Player who can change game settings
 
 G_Started         : boolean  = false;
 g_status          : byte     = 0;
-g_mode            : byte     = 0;
 g_fixed_positions : boolean  = false;
-g_generators      : byte     = 0;
 g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
 g_deadobservers   : boolean  = true;
 
@@ -51,10 +49,12 @@ g_cycle_regen     : integer = 0;
 g_random_i        : word = 0;
 g_random_p        : byte = 0;
 
-g_preset_cur      : byte = 0;  // rename to map_* ?????
-g_preset_n        : byte = 0;
-g_presets         : array of TGamePreset;
+map_preset_cur    : byte = 0;  // rename to map_* ?????
+map_preset_n      : byte = 0;
+map_presets       : array of TMapPreset;
 
+map_scenario      : byte     = 0;
+map_generators    : byte     = 0;
 map_seed          : cardinal = 0;
 map_psize         : integer  = 0; // pixel size
 map_phsize        : integer  = 0; // pixel half size
@@ -267,7 +267,7 @@ menu_list_y,
 menu_list_item_h,
 menu_list_item_hh,
 menu_list_w       : integer;
-menu_list_fontS   : single = 1;
+menu_list_fontS   : integer = basefont_w1;
 menu_list_items   : array of TMenuListItem;
 menu_list_aleft   : boolean = false;
 
@@ -416,8 +416,6 @@ ui_ControlBar_w   : integer = 0;
 ui_ControlBar_h   : integer = 0;
 ui_MiniMap_x      : integer = 0;
 ui_MiniMap_y      : integer = 0;
-ui_MapView_x      : integer = 0;
-ui_MapView_y      : integer = 0;
 ui_MapView_cw     : integer = 0;
 ui_MapView_ch     : integer = 0;
 
@@ -914,9 +912,9 @@ spr_mlogo,
 spr_mback,
 spr_cursor        : pTMWTexture;
 
+spr_tabs          : array[0..3] of pTMWTexture;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of pTMWTexture;
 spr_mp            : array[1..r_cnt] of pTMWTexture;
-spr_tabs          : array[0..3] of pTMWTexture;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -928,14 +926,17 @@ str_bool                : array[false..true   ] of shortstring;
 
 str_teams               : array[0..LastPlayer ] of shortstring;
 str_racel               : array[0..r_cnt      ] of shortstring;
-str_emnu_GameModel      : array[0..gms_count  ] of shortstring;
+str_map_scenariol      : array[0..ms_count  ] of shortstring;
 
 str_map_typel           : array[0..gms_m_types] of shortstring;
 str_map_syml            : array[0..gms_m_symm ] of shortstring;
+str_map_Map,
+str_map_scenario,
 str_map_seed,
 str_map_type,
 str_map_size,
 str_map_sym,
+str_map_theme,
 str_map_random,
 str_map_Proc1Zones,
 str_map_Proc2Solid,
@@ -1030,16 +1031,15 @@ str_menu_SaveInfo,
 
 str_menu_RandomScirmish,
 str_menu_AISlots,
-str_menu_Generators,
+str_map_Generators,
 str_menu_DeadObservers,
-str_menu_FixedStarts,
-str_menu_GameMode
+str_menu_FixedStarts
                         : shortstring;
 str_menu_PlayersColorl  : array[TPlayersColorSchema ] of shortstring;
 str_menu_unitHBarl      : array[TUIUnitHBarsOption  ] of shortstring;
 str_menu_PanelPosl      : array[TVidPannelPos       ] of shortstring;
 str_menu_MiniMapPosl    : array[boolean,boolean     ] of shortstring;
-str_menu_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
+str_map_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
 str_menu_NetQuality     : array[0..cl_UpT_arrayN    ] of shortstring;
 
 str_menu_ReplayPlay,

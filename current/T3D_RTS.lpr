@@ -18,8 +18,8 @@ program T3D_RTS;
 
 uses SysUtils,crt,SDL2,SDL2_Net
 {$IFDEF _FULLGAME}
-,SDL2_Image,openal,_sound_OGGLoader;
-{$ENDIF}
+,SDL2_Image,openal,_sound_OGGLoader
+{$ENDIF};
 
 
 {$include _const.pas}
@@ -68,7 +68,7 @@ uses SysUtils,crt,SDL2,SDL2_Net
 {$R *.res}
 
 begin
-   InitGame;
+   MainInit;
    {$IFDEF DTEST}
    if(test_mode=2)then WriteUnitDescriptions;
    {$ENDIF}
@@ -78,15 +78,15 @@ begin
       fr_FPSSecondD:=SDL_GetTicks;
 
       {$IFDEF _FULLGAME}
-      InputGame;
-      //CodeGame;
-      if(r_draw)then DrawGame;
+      MainInput;
+      MainGame;
+      if(r_draw)then MainDraw;
       {$ELSE}
       while(SDL_PollEvent(sys_EVENT)>0)do
         case(sys_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
-      CodeGame;
+      MainGame;
       {$ENDIF}
 
       fr_FPSSecondU:=SDL_GetTicks-fr_FPSSecondD;

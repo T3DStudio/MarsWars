@@ -91,8 +91,8 @@ begin
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
-   AddItem(@g_mode           ,SizeOf(g_mode           ));
-   AddItem(@g_generators     ,SizeOf(g_generators     ));
+   AddItem(@map_scenario           ,SizeOf(map_scenario           ));
+   AddItem(@map_generators     ,SizeOf(map_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
    AddItem(@g_ai_slots       ,SizeOf(g_ai_slots       ));
@@ -394,9 +394,9 @@ begin
          BlockRead(rpls_file,map_type         ,SizeOf(map_type         ));
          BlockRead(rpls_file,map_symmetry     ,SizeOf(map_type         ));
          BlockRead(rpls_file,theme_cur        ,SizeOf(theme_cur        ));
-         BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
+         BlockRead(rpls_file,map_scenario           ,SizeOf(map_scenario           ));
          BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
-         BlockRead(rpls_file,g_generators     ,SizeOf(g_generators     ));
+         BlockRead(rpls_file,map_generators     ,SizeOf(map_generators     ));
          BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
          BlockRead(rpls_file,g_deadobservers  ,SizeOf(g_deadobservers  ));
          BlockRead(rpls_file,g_ai_slots       ,SizeOf(g_ai_slots       ));
@@ -410,8 +410,8 @@ begin
          if(map_psize<MinMapSize)or(map_psize>MaxMapSize)
          or(map_type      >gms_m_types  )
          or(map_symmetry  >gms_m_symm   )
-         or(g_mode        >gms_count    )
-         or(g_generators  >gms_g_maxgens)
+         or(map_scenario        >ms_count    )
+         or(map_generators  >gms_g_maxgens)
          or(g_ai_slots    >gms_g_maxai  )
          or(rpls_POVPlayer>LastPlayer   )then
          begin

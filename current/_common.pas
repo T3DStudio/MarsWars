@@ -17,17 +17,17 @@ procedure ai_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_CollectData    (pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;AttackableTarget:boolean);forward;
 procedure ai_scout_pick     (pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
-function map_IsObstacleZone(zone:word):boolean; forward;
-function map_CellGetZone(cx,cy:integer):word;forward;
-function map_MapGetZone(mx,my:integer):word;forward;
-function map_InGridRange(a:integer):boolean;forward;
+function map_IsObstacleZone(zone:word    ):boolean;forward;
+function map_CellGetZone   (cx,cy:integer):word;   forward;
+function map_MapGetZone    (mx,my:integer):word;   forward;
+function map_InGridRange   (a:integer    ):boolean;forward;
 
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;azone:word);forward;
 
 {$IFDEF _FULLGAME}
-procedure menu_Toggle; forward;
+function menu_Escape(exitMenu:boolean):boolean; forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 function sm_uid2MWTexture(_uid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
@@ -257,22 +257,22 @@ begin
    PlayerSlotGetTeam:=0;
    if(playeri<=LastPlayer)then
      with g_players[playeri] do
-       if(g_preset_cur>0)then
-         with g_presets[g_preset_cur] do
-           PlayerSlotGetTeam:=gp_player_team[playeri]
+       if(map_preset_cur>0)then
+         with map_presets[map_preset_cur] do
+           PlayerSlotGetTeam:=mapp_player_team[playeri]
        else
          case gameMode of
-gm_4x4     : case playeri of
+ms_4x4     : case playeri of
              0..3: PlayerSlotGetTeam:=0;
              4..7: PlayerSlotGetTeam:=1;
              end;
-gm_2x2x2x2 : case playeri of
+ms_2x2x2x2 : case playeri of
              0,1 : PlayerSlotGetTeam:=0;
              2,3 : PlayerSlotGetTeam:=1;
              4,5 : PlayerSlotGetTeam:=2;
              6,7 : PlayerSlotGetTeam:=3;
              end;
-gm_assault : case playeri of
+ms_assault : case playeri of
              0,1,
              2,3,
              4,5 : PlayerSlotGetTeam:=0;
@@ -924,7 +924,7 @@ end;
 
 function CheckRoyalBattleRadiusPoint(x,y,d:integer):boolean;
 begin
-   if(g_mode=gm_royale)
+   if(map_scenario=ms_royale)
    then CheckRoyalBattleRadiusPoint:=(point_dist_int(x,y,map_phsize,map_phsize)+d)>=g_royal_r
    else CheckRoyalBattleRadiusPoint:=false;
 end;
@@ -1181,6 +1181,11 @@ begin
       end;
 end; }
 
+function GameStatus_End:boolean;
+begin
+   GameStatus_End:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
+end;
+
 procedure GameSetStatusWinnerTeam(team:byte);
 begin
    if(team<=LastPlayer)then
@@ -1215,35 +1220,35 @@ begin
      else CheckUnitTeamVision:=(TeamVision[POVTeam]>0)and(TeamDetection[POVTeam]>0);
 end;
 
-procedure MakeGamePresetsNames(pstr_gmode,pstr_maptype:pshortstring);
+procedure MakeMapPresetsNames(pstr_gmode,pstr_maptype:pshortstring);
 var i,
     p,
     pn:byte;
 begin
-   if(g_preset_n>1)then
-    for i:=1 to g_preset_n-1 do
-     with g_presets[i] do
+   if(map_preset_n>1)then
+    for i:=1 to map_preset_n-1 do
+     with map_presets[i] do
      begin
         pn:=0;
         for p:=0 to LastPlayer do
-          if(gp_player_team[p]<=LastPlayer)then pn+=1;
+          if(mapp_player_team[p]<=LastPlayer)then pn+=1;
 
         if(pn>0)
-        then gp_name:=b2s(pn)+')'
-        else gp_name:='';
+        then mapp_name:=b2s(pn)+')'
+        else mapp_name:='';
 
         if(pstr_gmode<>nil)then
         begin
-           pstr_gmode+=gp_g_mode;
-           gp_name+=pstr_gmode^;
-           pstr_gmode-=gp_g_mode;
+           pstr_gmode+=mapp_scenario;
+           mapp_name+=pstr_gmode^;
+           pstr_gmode-=mapp_scenario;
         end;
 
         if(pstr_maptype<>nil)then
         begin
-           pstr_maptype+=gp_map_type;
-           gp_name+=' '+pstr_maptype^;
-           pstr_maptype-=gp_map_type;
+           pstr_maptype+=mapp_type;
+           mapp_name+=' '+pstr_maptype^;
+           pstr_maptype-=mapp_type;
         end;
      end;
 end;
@@ -1258,7 +1263,7 @@ end;
 type
 TInputState = (tis_NPressed,tis_NReleased,tis_Pressed,tis_DPressed,tis_Released);
 
-function input_Check(iact:byte;CheckState:TInputState):boolean;
+{function input_Check(iact:byte;CheckState:TInputState):boolean;
 begin
    input_Check:=false;
    case CheckState of
@@ -1269,7 +1274,25 @@ tis_DPressed  : with input_actions[iact] do
                 input_Check:=(ik_timer_pressed=1)and(ik_timer_twice>0);
 tis_Released  : input_Check:=input_actions[iact].ik_timer_pressed=0;
    end;
+end; }
+function InputAction(iact:byte):boolean;
+begin
+   InputAction:=input_actions[iact].ik_timer_pressed>0;
 end;
+function InputActionPressed(iact:byte):boolean;
+begin
+   InputActionPressed:=input_actions[iact].ik_timer_pressed=1;
+end;
+function InputActionReleased(iact:byte):boolean;
+begin
+   InputActionReleased:=input_actions[iact].ik_timer_pressed=-1;
+end;
+function InputActionDPressed(iact:byte):boolean;
+begin
+   with input_actions[iact] do
+   InputActionDPressed:=(ik_timer_pressed=1)and(ik_timer_twice>0);
+end;
+
 
 function enum_val2TVidPannelPos(val:integer):TVidPannelPos;
 begin
@@ -1300,7 +1323,7 @@ begin
      then tab3PageType:=t3pt_observer
      else
        if(not g_players[PlayerClient].isdefeated)
-       then tab3PageType:=t3pt_actions;
+       then tab3PageType:=t3pt_controls;
 end;
 
 function RoundN(x,n:integer):integer;
@@ -1398,13 +1421,13 @@ begin
 
    // GAME info
    str_info2^+=tc_nl2;
-   BlockRead(f,dbyte,SizeOf(g_mode           ));
-   if not(dbyte in allgamemodes )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info2^+=str_menu_GameMode+dots+str_emnu_GameModel[dbyte]+tc_nl2;
+   BlockRead(f,dbyte,SizeOf(map_scenario           ));
+   if not(dbyte in allmapscenarios )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                 else       str_info2^+=str_map_scenario+dots+str_map_scenariol[dbyte]+tc_nl2;
 
-   BlockRead(f,dbyte,SizeOf(g_generators     ));
+   BlockRead(f,dbyte,SizeOf(map_generators     ));
    if(dbyte>gms_g_maxgens       )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info2^+=str_menu_Generators+dots+str_menu_Generatorsl[dbyte]+tc_nl2;
+                                 else       str_info2^+=str_map_Generators+dots+str_map_Generatorsl[dbyte]+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(g_fixed_positions));
                                             str_info2^+=str_menu_FixedStarts+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
@@ -1597,17 +1620,17 @@ pcs_WAR    : if(player=UIPlayer)then
                pcs_WAR: PlayerGetColor:=c_white;
                end
              else
-               if(PlayerSlotGetTeam(g_mode,UIPlayer,255)=PlayerSlotGetTeam(g_mode,player,255))then
+               if(PlayerSlotGetTeam(map_scenario,UIPlayer,255)=PlayerSlotGetTeam(map_scenario,player,255))then
                  case vid_PlayersColorSchema of
                  pcs_LYR,
                  pcs_WYR: PlayerGetColor:=c_yellow;
                  pcs_WAR: PlayerGetColor:=c_aqua;
                  end
                else PlayerGetColor:=c_red;
-pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
+pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(map_scenario,player,255)];
 pcs_wTeams : if(player=UIPlayer)
              then PlayerGetColor:=c_white
-             else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(g_mode,player,255)];
+             else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(map_scenario,player,255)];
      else
      end;
 end;
@@ -1650,11 +1673,6 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   GAME
-
-function GameStatus_End:boolean;
-begin
-   GameStatus_End:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
-end;
 
 function GameGetStatus(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
 var t:byte;
@@ -2047,7 +2065,8 @@ function PlayerGetStatus(p:byte):char;
 begin
    with g_players[p] do
    begin
-      PlayerGetStatus:=str_ps_c[state];
+      PlayerGetStatus:=#0;
+      {PlayerGetStatus:=str_ps_c[state];
       if(state=ps_play)then
       begin
          if(g_started=false)
@@ -2055,7 +2074,7 @@ begin
          else PlayerGetStatus:=str_ps_c[ps_play];
          if(nttl>=fr_fps1)then PlayerGetStatus:=str_ps_t;
       end;
-      if(p=PlayerClient)then PlayerGetStatus:=str_ps_h;
+      if(p=PlayerClient)then PlayerGetStatus:=str_ps_h; }
    end;
 end;
 
@@ -2064,13 +2083,13 @@ var i,c,r:byte;
 begin
    c:=0;
    r:=0;
-   for i:=0 to LastPlayer do
+   {for i:=0 to LastPlayer do
     with g_players[i] do
-     if (state=PS_Play) then
+     if (state=pt_Play) then
      begin
         c+=1;
         if(nttl=ClientTTL)then r+=1;
-     end;
+     end;  }
    PlayerAllOut:=(r=c)and(c>0);
 end;
 
