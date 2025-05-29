@@ -550,7 +550,7 @@ UID_Mancubus  :
 begin
    _mhits     := 4000;
    _renergy   := 500;
-   _r         := 20;
+   _r         := 17;
    _speed     := 8;
    _srange    := 275;
    _ucl       := 9;
@@ -567,7 +567,7 @@ UID_Arachnotron:
 begin
    _mhits     := 3000;
    _renergy   := 500;
-   _r         := 20;
+   _r         := 17;
    _speed     := 11;
    _srange    := 275;
    _ucl       := 10;
@@ -1223,7 +1223,7 @@ UID_UACDron:
 begin
    _mhits     := 2000;
    _renergy   := 400;
-   _r         := 15;
+   _r         := 14;
    _speed     := 15;
    _srange    := 250;
    _ucl       := 9;

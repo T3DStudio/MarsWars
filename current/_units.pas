@@ -1528,6 +1528,7 @@ wmove_noneed    : if(not attackinmove)then
 
             if(ServerSide)and(not _ukbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
+              or(aw_type=wpt_heal)
               or((playeri=0)and(g_mode=gm_invasion))
               then _unit_exp(pu,aw_rld*2)
               else _unit_exp(pu,aw_rld  );

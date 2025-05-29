@@ -218,8 +218,8 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      if((g_generators=0)and(g_step<ai_noProdTime))or((ai_tech2_cur>0)and ai_advanced_bld)
-      then ai_need_energy:=mm3(600, ai_builders_count         *1250,ai_GeneratorsEnergy)//ai_GeneratorsEnergy
+      if((ai_tech2_cur>0)and ai_advanced_bld)
+      then ai_need_energy:=mm3(600, ai_builders_count*1250,ai_GeneratorsEnergy)
       else
         if(ai_advanced_bld)
         then ai_need_energy:=mm3(600,(ai_unitp_cur+ai_upgrp_cur)*650 ,ai_GeneratorsEnergy)
@@ -714,7 +714,7 @@ UID_UCommandCenter:
                         if(ai_inprogress_auid<2)and(ai_inprogress_uid=0)and(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
                     end;
 UID_HSymbol1,
-UID_UGenerator1,//   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then exit;
+UID_UGenerator1,
 UID_HSymbol2,
 UID_UGenerator2,
 UID_HSymbol3,
@@ -759,20 +759,12 @@ begin
 
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;
 
-      if(g_generators=0)and(g_step<ai_noProdTime)
-      then prods:=0
-      else
-      begin
-         prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
-         if(g_generators>0)or((ai_tech2_cur>0)and ai_advanced_bld)then prods+=2;
-
-         if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
-         if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
-
-         //if(sel)then writeln(ai_enrg_pot,' ',ai_maxcount_energy,' ',ai_unitp_need,' ',ai_maxcount_unitps);
-
-         if(ai_enrg_pot>=ai_maxcount_energy)and(ai_unitp_need<ai_maxcount_unitps)then ai_unitp_need:=ai_maxcount_unitps;
-      end;
+      prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
+      if(g_generators>0)or((ai_tech2_cur>0)and ai_advanced_bld)then prods+=2;
+      if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3(1,prods div 4        ,ai_maxcount_upgrps);
+      if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3(1,prods-ai_upgrp_need,ai_maxcount_unitps);
+      //if(sel)then writeln(ai_enrg_pot,' ',ai_maxcount_energy,' ',ai_unitp_need,' ',ai_maxcount_unitps);
+      if(ai_enrg_pot>=ai_maxcount_energy)and(ai_unitp_need<ai_maxcount_unitps)then ai_unitp_need:=ai_maxcount_unitps;
 
       if(ai_enemy_inv_u<>nil)
       then ai_detect_need:=ai_maxlimit_detect

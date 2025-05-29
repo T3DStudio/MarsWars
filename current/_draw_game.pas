@@ -251,6 +251,28 @@ begin
       y0      :=ay0-aspr^.hh;
       x1      :=x0+aspr^.w;
       y1      :=y0+aspr^.h;
+
+      if(x0<vid_cam_x)then
+      begin
+         x0:=vid_cam_x;
+         x1:=x0+aspr^.w;
+      end;
+      if(x1>(vid_cam_x+vid_cam_w))then
+      begin
+         x1:=(vid_cam_x+vid_cam_w);
+         x0:=x1-aspr^.w;
+      end;
+      if(y0<vid_cam_y)then
+      begin
+         y0:=vid_cam_y;
+         y1:=y0+aspr^.h;
+      end;
+      if(y1>(vid_cam_y+vid_cam_h))then
+      begin
+         y1:=(vid_cam_y+vid_cam_h);
+         y0:=y1-aspr^.h;
+      end;
+
       sprite  :=aspr;
       color   :=acolor;
       text_lt :=slt;
@@ -273,10 +295,34 @@ begin
 end;
 
 procedure UnitsInfoProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
-var vx:integer;
+var v:integer;
 begin
    if(per<0)then per:=0;
    if(per>1)then per:=1;
+   if(ax0<vid_cam_x)then
+   begin
+      v:=ax1-ax0;
+      ax0:=vid_cam_x;
+      ax1:=ax0+v;
+   end;
+   if(ax1>(vid_cam_x+vid_cam_w))then
+   begin
+      v:=ax1-ax0;
+      ax1:=(vid_cam_x+vid_cam_w);
+      ax0:=ax1-v;
+   end;
+   if(ay0<vid_cam_y)then
+   begin
+      v:=ay1-ay0;
+      ay0:=vid_cam_y;
+      ay1:=ay0+v;
+   end;
+   if(ay1>(vid_cam_y+vid_cam_h))then
+   begin
+      v:=ay1-ay0;
+      ay1:=(vid_cam_y+vid_cam_h);
+      ay0:=ay1-v;
+   end;
 
    if(per=0)
    then UnitsInfoAddBox(ax0,ay0,ax1,ay1,c_black)
@@ -285,10 +331,10 @@ begin
      then UnitsInfoAddBox(ax0,ay0,ax1,ay1,acolor)
      else
      begin
-        vx:=trunc((ax1-ax0)*per);
+        v:=trunc((ax1-ax0)*per);
 
-        UnitsInfoAddBox(ax0   ,ay0,ax0+vx,ay1,acolor );
-        UnitsInfoAddBox(ax0+vx,ay0,ax1   ,ay1,c_black);
+        UnitsInfoAddBox(ax0  ,ay0,ax0+v,ay1,acolor );
+        UnitsInfoAddBox(ax0+v,ay0,ax1  ,ay1,c_black);
      end;
 end;
 

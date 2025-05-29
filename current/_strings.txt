@@ -708,7 +708,7 @@ Hotkey: U
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 4000
 Limit used: 3
-Size: 20
+Size: 17
 Base movement speed: 8
 Base vision range: 275
 Build time: 30
@@ -735,7 +735,7 @@ Hotkey: I
 Categories/Attributes: [unit,mechanical,heavy,ground]
 Max hits: 3000
 Limit used: 3
-Size: 20
+Size: 17
 Base movement speed: 11
 Base vision range: 275
 Build time: 30
@@ -1627,7 +1627,7 @@ Hotkey: U
 Categories/Attributes: [unit,mechanical,light,ground]
 Max hits: 2000
 Limit used: 2
-Size: 15
+Size: 14
 Base movement speed: 15
 Base vision range: 250
 Build time: 20
