@@ -159,6 +159,17 @@ begin
    draw_set_fontUpdateSize(newSizeS);
 end;}
 
+function slength(str:shortstring):byte;
+var i:byte;
+begin
+   slength:=0;
+   i:=length(str);
+   while(i>0)do
+   begin
+      if not(str[i] in tc_SpecialChars)then slength+=1;
+      i-=1;
+   end;
+end;
 
 procedure draw_char(x,y:integer;ch:char;color_back:TMWColor);
 begin
@@ -174,7 +185,7 @@ begin
    draw_mwtexture2(x,y,draw_font^.MWTextures[ch],draw_font_w1,draw_font_h1);
 end;
 
-procedure draw_line(x,y:integer;str:shortstring;alignment:TAlignment;MaxLineLength:byte;color_back:TMWColor;restoreColor:boolean=true);
+procedure draw_text_line(x,y:integer;str:shortstring;alignment:TAlignment;MaxLineLength:byte;color_back:TMWColor;restoreColor:boolean=true);
 var
 strLen,
 cs,ce,
@@ -262,6 +273,7 @@ begin
       tc_player7  : tcolor:=PlayerColorNormal[ord(charc)];
       tc_nl1,
       tc_nl2      : ;
+      tc_brown    : tcolor:=c_brown ;
       tc_purple   : tcolor:=c_purple;
       tc_red      : tcolor:=c_red   ;
       tc_orange   : tcolor:=c_orange;
@@ -373,7 +385,7 @@ begin
 
    for i:=1 to line_n do
    begin
-      draw_line(x,y,line_l[i-1],ta_LU,255,color_back,i=line_n);
+      draw_text_line(x,y,line_l[i-1],ta_LU,255,color_back,i=line_n);
       y+=line_h[i-1];
    end;
 
@@ -392,7 +404,7 @@ begin
    draw_set_font(font_Base,basefont_w2);
    draw_set_color(color);
    draw_set_alpha(255);
-   draw_line(w div 2,h div 2,CaptionString,ta_MM,255,0);
+   draw_text_line(w div 2,h div 2,CaptionString,ta_MM,255,0);
    SDL_RenderPresent(vid_SDLRenderer);
 end;
 
@@ -421,7 +433,7 @@ end;
 procedure d_timer(x,y:integer;time:cardinal;ta:TAlignment;str:shortstring;color:TMWColor);
 begin
    draw_set_color(color);
-   draw_line(x,y,str+str_GStep2Time(time),ta,255,c_black);
+   draw_text_line(x,y,str+str_GStep2Time(time),ta,255,c_black);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -468,6 +480,7 @@ procedure map_MinimapSpot(x,y,r:integer;sym:char;color:TMWColor);
 begin
    draw_set_color(color);
    draw_circle(x,y,r);
+   draw_set_font(font_base,basefont_w1);
    draw_char(x,y,sym,c_none);
 end;
 
@@ -481,16 +494,10 @@ begin
       y:=round(map_PlayerStartY[p]*map_mm_cx);
       r:=trunc(base_1r*map_mm_cx);
 
-      // clear
-     { filledcircleColor(tar,x,y,r ,c_black);
-            circleColor(tar,x,y,r ,c_black);
-         characterColor(tar,x,y,#8,c_black);      }
-
-
       if(UnknownStarts)then
       begin
          if(teamStarts)
-         then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(map_scenario,p,255)),c_white)
+         then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(p,255)),c_white)
          else map_MinimapSpot(x,y,r,'?',c_white)
       end
       else
@@ -520,7 +527,7 @@ end;
 procedure map_MinimapCPoints;
 var i  :byte;
 begin
-   for i:=1 to MaxCPoints do
+   for i:=1 to LastCPoint do
     with g_cpoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(map_scenario=ms_KotH))or(cpenergy<=0)
@@ -536,6 +543,16 @@ begin
 
    map_MinimapPlayerStarts(not g_fixed_positions,map_scenario in ms_ScenariosFixedTeams);
    map_MinimapCPoints;
+
+   draw_set_color(c_red);
+   draw_line(
+   round(map_phsize*map_mm_cx),
+   round(map_phsize*map_mm_cx),
+   round(map_phsize*map_mm_cx)+round(2000*map_mm_cx*cos(map_symmetryDir*degtorad)),
+   round(map_phsize*map_mm_cx)+round(2000*map_mm_cx*sin(map_symmetryDir*degtorad))
+ );
+
+
    draw_set_target(nil);
 end;
 

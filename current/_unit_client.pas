@@ -341,12 +341,12 @@ begin
     else
     begin
        b:=b or (cpOwnerPlayer      shl 2) and %00011100;
-       b:=b or (cpTimerOwnerPlayer shl 5) and %11100000;
+       b:=b or (cpTimerPlayer shl 5) and %11100000;
 
        case wdcptime^ of
 0       : begin
              wudata_byte(b or %00000010,rpl);
-             if(cpOwnerPlayer<>cpTimerOwnerPlayer)
+             if(cpOwnerPlayer<>cpTimerPlayer)
              then wudata_reload(@cpTimer,rpl);
           end;
 1       : if(cpLifeTime<=0)
@@ -391,7 +391,7 @@ begin
      if(map_scenario=ms_capture)
      or(map_scenario=ms_KotH)
      or(map_generators>1)then
-      for i:=1 to MaxCPoints do
+      for i:=1 to LastCPoint do
        wclinet_cpoint(i,rpl);
 
    if(wstepb1)then
@@ -1159,14 +1159,14 @@ begin
          if(cpCaptureR<0)then cpCaptureR:=-cpCaptureR;
          p:=(b and %00011100) shr 2;
          CPoint_ChangeOwner(cpi,p);
-         cpTimerOwnerPlayer:=(b and %11100000) shr 5;
-         if(cpTimerOwnerPlayer<=LastPlayer)
-         then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team;
+         cpTimerPlayer:=(b and %11100000) shr 5;
+         if(cpTimerPlayer<=LastPlayer)
+         then cpTimerTeam:=g_players[cpTimerPlayer].team;
 
          case t of
 %00000001 : ;
 %00000010 : begin
-               if(cpOwnerPlayer<>cpTimerOwnerPlayer)
+               if(cpOwnerPlayer<>cpTimerPlayer)
                then rudata_reload(@cpTimer,rpl)
                else cpTimer:=0;
             end;
@@ -1202,7 +1202,7 @@ begin
      if(map_scenario=ms_capture)
      or(map_scenario=ms_KotH)
      or(map_generators>1)then
-      for i:=1 to MaxCPoints do
+      for i:=1 to LastCPoint do
        rclinet_cpoint(i,rpl,fast_skip);
 
    if(wstepb1)then

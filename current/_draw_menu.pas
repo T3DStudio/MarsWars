@@ -102,7 +102,7 @@ begin
       draw_set_color(color);
       if(multiLine)
       then draw_text(tx,ty,text,alignment,255,c_none)
-      else draw_line(tx,ty,text,alignment,255,c_none);
+      else draw_text_line(tx,ty,text,alignment,255,c_none);
 
       if(listarrow)then draw_char(tx1+draw_font_wh,ty,#31,c_none);
    end;
@@ -133,8 +133,8 @@ begin
       draw_set_color(c_white);
       tx0-=basefont_w2+basefont_wh;
       if(percentage)
-      then draw_line(tx0,ty,i2s(round(100*val/max))+'%',ta_RM,255,c_none)
-      else draw_line(tx0,ty,i2s(val)                   ,ta_RM,255,c_none);
+      then draw_text_line(tx0,ty,i2s(round(100*val/max))+'%',ta_RM,255,c_none)
+      else draw_text_line(tx0,ty,i2s(val)                   ,ta_RM,255,c_none);
    end;
 end;
 procedure D_menu_ETextD(mi:byte;l_text,r_text:shortstring;listarrow:boolean;selected:byte;color:TMWColor);
@@ -168,8 +168,8 @@ begin
       if(playeri=0)then  // captions above first player line
       begin
          draw_set_color(c_white);
-         draw_line(mi_x0+draw_font_wh,mi_y0-draw_font_w1,str_menu_Name,ta_LM,255,c_none);
-         draw_line(mi_x1-draw_font_wh,mi_y0-draw_font_w1,str_menu_Slot,ta_RM,255,c_none);
+         draw_text_line(mi_x0+draw_font_wh,mi_y0-draw_font_w1,str_menu_Name,ta_LM,255,c_none);
+         draw_text_line(mi_x1-draw_font_wh,mi_y0-draw_font_w1,str_menu_Slot,ta_RM,255,c_none);
       end;
    end;
    with g_players[playeri]    do
@@ -216,7 +216,7 @@ begin
       if(p1=0)then
       begin
          draw_set_color(c_white);
-         draw_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Race,ta_MM,255,c_none);
+         draw_text_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Race,ta_MM,255,c_none);
       end;
    end;
    with g_players[p1] do
@@ -230,13 +230,13 @@ begin
       if(p1=0)then
       begin
          draw_set_color(c_white);
-         draw_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Team,ta_MM,255,c_none);
+         draw_text_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Team,ta_MM,255,c_none);
       end;
    end;
    with g_players[p1] do
      if(isobserver)or(g_slot_state[p1]=pss_observer)
      then D_menu_EText(mi,ta_MM,str_observer,true,0,c_none)        //str_teams[]
-     else D_menu_EText(mi,ta_RM,b2s(PlayerSlotGetTeam(map_scenario,p1,255)+1),true,0,c_none);
+     else D_menu_EText(mi,ta_RM,b2s(PlayerSlotGetTeam(p1,team)+1),true,0,c_none);
 end;
 procedure D_menu_PlayerColor(mi,p1:byte);
 begin
@@ -246,11 +246,15 @@ begin
       if(p1=0)then
       begin
          draw_set_color(c_white);
-         draw_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_none);
+         draw_text_line((mi_x0+mi_x1) div 2,mi_y0-draw_font_w1,str_menu_Color,ta_MM,255,c_none);
       end;
-      draw_set_color(PlayerColorNormal[p1]);
-      draw_frect(mi_x0+basefont_w1,mi_y0+basefont_w1,
-                 mi_x1-basefont_w1,mi_y1-basefont_w1);
+      with g_players[p1] do
+        if(not isobserver)and(g_slot_state[p1]<>pss_observer)then
+        begin
+           draw_set_color(PlayerColorNormal[p1]);
+           draw_frect(mi_x0+basefont_w1,mi_y0+basefont_w1,
+                      mi_x1-basefont_w1,mi_y1-basefont_w1);
+        end;
    end;
 end;
 
@@ -497,14 +501,14 @@ mi_player_color5,
 mi_player_color6,
 mi_player_color7           : D_menu_PlayerColor(i,i-mi_player_color0);
 
-mi_map_Map                 : D_menu_MButtonD(i,str_map_Map       ,map_presets[map_preset_cur].mapp_name,true);
-mi_map_Scenario            : D_menu_MButtonD(i,str_map_scenario  ,str_map_scenariol[map_scenario]      ,true);
-mi_map_Generators          : D_menu_MButtonD(i,str_map_Generators,str_map_Generatorsl[map_generators]  ,true);
-mi_map_Seed                : D_menu_MButtonU(i,str_map_seed      ,c2s(map_seed)                             );
-mi_map_Size                : D_menu_MButtonD(i,str_map_size      ,i2s(RoundN(map_psize,100))           ,true);
-mi_map_Type                : D_menu_MButtonD(i,str_map_type      ,str_map_typel[map_type   ]           ,true);
-mi_map_Sym                 : D_menu_MButtonD(i,str_map_sym       ,str_map_syml[map_symmetry]           ,true);
-mi_map_Theme               : D_menu_MButtonU(i,str_map_theme     ,theme_name[theme_cur]                     );
+mi_map_Map                 : D_menu_MButtonD(i,str_map_Map       ,map_presets[map_preset_cur].mapp_name,true );
+mi_map_Scenario            : D_menu_MButtonD(i,str_map_scenario  ,str_map_scenariol[map_scenario]      ,true );
+mi_map_Generators          : D_menu_MButtonD(i,str_map_Generators,str_map_Generatorsl[map_generators]  ,true );
+mi_map_Seed                : D_menu_MButtonU(i,str_map_seed      ,c2s(map_seed)                              );
+mi_map_Size                : D_menu_MButtonD(i,str_map_size      ,i2s(RoundN(map_psize,100))           ,true );
+mi_map_Type                : D_menu_MButtonD(i,str_map_type      ,str_map_typel[map_type   ]           ,true );
+mi_map_Sym                 : D_menu_MButtonD(i,str_map_sym       ,str_map_syml[map_symmetry]           ,true );
+mi_map_Theme               : D_menu_MButtonD(i,str_map_theme     ,theme_name[theme_cur]                ,false);
 mi_map_Random              : D_menu_MButton (i,str_map_random);
 mi_map_MiniMap             : with menu_items[i] do
                              begin
@@ -573,10 +577,10 @@ else D_menu_ETextD(mi_settings_ClientQuality,str_net_Quality    ,str_menu_NetQua
    draw_set_alpha(255);
    draw_mwtexture1(menu_hw-(spr_mlogo^.w div 2),0,spr_mlogo,1,1);
 
-   draw_line(menu_w ,menu_h,str_ver ,ta_RD,255,c_none);
+   draw_text_line(menu_w ,menu_h,str_ver ,ta_RD,255,c_none);
    if(test_mode>0)then
-     draw_line(menu_hw,0,'TEST MODE #'+b2s(test_mode),ta_MU,255,c_none);
-   draw_line(menu_hw,menu_h,str_cprt,ta_MD,255,c_none);
+     draw_text_line(menu_hw,0,'TEST MODE #'+b2s(test_mode),ta_MU,255,c_none);
+   draw_text_line(menu_hw,menu_h,str_cprt,ta_MD,255,c_none);
 end;
 
 procedure D_Menu_List;
@@ -609,8 +613,8 @@ begin
 
       draw_set_color(color);
       if(menu_list_aleft)
-      then draw_line(menu_list_x+basefont_wq3-menu_list_w ,y+menu_list_item_hh,mli_caption,ta_LM,255,c_black)
-      else draw_line(menu_list_x-basefont_wq3             ,y+menu_list_item_hh,mli_caption,ta_RM,255,c_black);
+      then draw_text_line(menu_list_x+basefont_wq3-menu_list_w ,y+menu_list_item_hh,mli_caption,ta_LM,255,c_black)
+      else draw_text_line(menu_list_x-basefont_wq3             ,y+menu_list_item_hh,mli_caption,ta_RM,255,c_black);
       draw_set_color(c_white);
       draw_hline(menu_list_x-menu_list_w+1,menu_list_x-1,y+menu_list_item_H);
    end;
@@ -667,7 +671,7 @@ begin
    begin
       draw_set_font(font_Base,basefont_w1);
       draw_set_color(c_white);
-      draw_line(menu_tex_x+draw_font_wq,
+      draw_text_line(menu_tex_x+draw_font_wq,
                 menu_tex_y+draw_font_wq,
                 'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_none);
    end;

@@ -86,18 +86,27 @@ ps_states_n            = 8+gms_g_maxai;
 player_default_ai_level= 7;
 
 // map scenario
-ms_scirmish            = 0;
-ms_4x4                 = 1;
-ms_2x2x2x2             = 2;
-ms_capture             = 3;
-ms_KotH                = 4;
-ms_royale              = 5;
-ms_assault             = 6;
+ms_ffa3                = 0;
+ms_ffa4                = 1;
+ms_ffa5                = 2;
+ms_ffa6                = 3;
+ms_ffa7                = 4;
+ms_ffa8                = 5;
+ms_1x1                 = 6;
+ms_2x2                 = 7;
+ms_3x3                 = 8;
+ms_4x4                 = 9;
+ms_2x2x2               = 10;
+ms_2x2x2x2             = 11;
+ms_capture             = 12;
+ms_KotH                = 13;
+ms_royale              = 14;
+ms_assault             = 15;
 
-ms_ScenariosFixedTeams : set of byte = [ms_4x4,ms_2x2x2x2,ms_assault];
+ms_ScenariosFixedTeams : set of byte = [ms_1x1,ms_2x2,ms_3x3,ms_4x4,ms_2x2x2,ms_2x2x2x2,ms_assault];
 
-allmapscenarios        : set of byte = [ms_scirmish,ms_4x4,ms_2x2x2x2,ms_capture,ms_KotH,ms_royale,ms_assault];
-ms_count               = 6;
+allmapscenarios        : set of byte = [ms_ffa3..ms_assault];
+ms_count               = 15;
 
 g_step_koth_pause      = fr_fps60*4;
 
@@ -137,7 +146,8 @@ LastPlayer             = MaxPlayer-1;
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayer*2+(MaxPlayer div 2);
+MaxCPoints             = MaxPlayer*2;
+LastCPoint             = MaxCPoints-1;
 
 MapCellW               = 88;
 MapCellhW              = MapCellW div 2;
@@ -593,13 +603,14 @@ b2ib                   : array[false..true] of integer = (0,_ub_infinity);
 //
 
 // map template types
-mapt_steppe            = 0;
-mapt_canyon            = 1;
-mapt_clake             = 2;
-mapt_ilake             = 3;
-mapt_island            = 4;
-mapt_shore             = 5;
-mapt_sea               = 6;
+mapt_desert            = 0;
+mapt_steppe            = 1;
+mapt_canyon            = 2;
+mapt_clake             = 3;
+mapt_ilake             = 4;
+mapt_island            = 5;
+mapt_shore             = 6;
+mapt_sea               = 7;
 
 // map symmetry types
 maps_none              = 0;
@@ -609,7 +620,7 @@ maps_lineH             = 3;
 maps_lineL             = 4;
 maps_lineR             = 5;
 
-gms_m_types            = 6;  // 0-gms_m_types  max map types
+gms_m_types            = 7;  // 0-gms_m_types  max map types
 gms_m_symm             = 5;  // 0-gms_m_symm  max map symmetry types
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -905,7 +916,7 @@ fr_mancubus_rld_s3     = fr_fpsd2;
 // archvile attack timing
 fr_archvile_s          = fr_fps1+fr_fpsd6;
 
-PlayerNameLen          = 13;
+PlayerNameLen          = 15;
 
 dead_hits              = -ptime1*fr_fps1;
 fdead_hits             = dead_hits+fr_fps3;
@@ -986,6 +997,11 @@ random_table           : array[byte] of byte = (
      109, 226,  71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,   36,
      17 ,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106, 197,  242,
      98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CLIENT SIDE
+//
 
 {$IFDEF _FULLGAME}
 
@@ -1165,7 +1181,7 @@ menu_main_mp_bh3q      = menu_main_mp_bhq*3;
 menu_players_namew     = basefont_w1+(basefont_w1*PlayerNameLen)+
                                      (basefont_w1*10           )+basefont_w2;
 menu_players_racew     = basefont_w1+(basefont_w1*7            )+basefont_w2;
-menu_players_teamw     = basefont_w1+(basefont_w1*7            )+basefont_w2;
+menu_players_teamw     = basefont_w1+(basefont_w1*8            )+basefont_w2;
 
 menu_netsearch_lineh   = menu_main_mp_bh1;
 menu_netsearch_listh   = 11;
@@ -1450,6 +1466,7 @@ tc_player6             = #6;}
 tc_player7             = #7;
 tc_nl1                 = #8;
 tc_nl2                 = #9;
+tc_brown               = #13;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;
@@ -1495,7 +1512,8 @@ iAct_return            = 11;
 iAct_control           = 12;
 iAct_alt               = 13;
 iAct_shift             = 14;
-iAct_ScreenShot        = 15;
+iAct_backspace         = 15;
+iAct_ScreenShot        = 16;
 
 iAct_LastEvent         = 17;
 
@@ -1587,6 +1605,24 @@ iAct_Prod22            = 132;
 iAct_Prod23            = 133;
 iAct_Prod24            = 134;
 
+iAct_test_FastTime     = 200;
+iAct_test_InstaProd    = 201;
+iAct_test_ToggleAI     = 202;
+iAct_test_iddqd        = 203;
+iAct_test_FogToggle    = 204;
+iAct_test_DrawToggle   = 205;
+iAct_test_NullUpgrades = 206;
+iAct_test_BePlayer0    = 210;
+iAct_test_BePlayer1    = 211;
+iAct_test_BePlayer2    = 212;
+iAct_test_BePlayer3    = 213;
+iAct_test_BePlayer4    = 214;
+iAct_test_BePlayer5    = 215;
+iAct_test_BePlayer6    = 216;
+iAct_test_BePlayer7    = 217;
+iAct_test_debug0       = 220;
+iAct_test_debug1       = 221;
+
 
 k_LastCharStuckDealy   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
@@ -1664,6 +1700,7 @@ tas_magma              = 2;
 
 tGridDecorsMax         = 2;
 tGridDecorD            = 360 div tGridDecorsMax;
+tGridDecorSkipFactor   = 24;
 tGridDecorR            = MapCellW div 4;
 
 {$ELSE }

@@ -686,7 +686,7 @@ begin
    if(FlyLevel)then check_obstacles:=false;
 
    if(not FlyLevel)then
-    for u:=1 to MaxCPoints do
+    for u:=1 to LastCPoint do
      with g_cpoints[u] do
       if(cpCaptureR>0)and(cpNoBuildR>0)then
       begin
@@ -839,7 +839,7 @@ begin
 
    if(flylevel)then exit;
 
-   for u:=1 to MaxCPoints do
+   for u:=1 to LastCPoint do
     with g_cpoints[u] do
      if(cpCaptureR>0)then
      begin
@@ -890,7 +890,7 @@ begin
         exit;
      end;
 
-   for u:=1 to MaxCPoints do
+   for u:=1 to LastCPoint do
     with g_cpoints[u] do
      if(cpCaptureR>0)and(cpNoBuildR>0)then
       if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then

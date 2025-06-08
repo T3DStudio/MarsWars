@@ -92,7 +92,7 @@ begin
    d_MapTerrain;
    d_SpriteList;
 
-   if(sys_fog)then
+   if(ui_fog)then
    D_Fog;
 
  {  d_UIInfoItems    (r_screen,ui_MapView_x,ui_MapView_y);
@@ -105,27 +105,31 @@ begin
 
    d_UIText;
 
-   {// Control bar view
+   // Control bar view
    if(vid_PanelUpdTimer=0)
-   or(vid_PanelUpdNow    )then d_UpdatePanel  (r_ui_Panel  ,UIPlayer);
-   if(vid_PanelUpdTimer=1)then d_UpdateMinimap(r_ui_MiniMap);
+   or(vid_PanelUpdNow    )then d_UpdatePanel  ;
+   if(vid_PanelUpdTimer=1)then d_UpdateMinimap;
 
    vid_PanelUpdNow:=false;
 
-   draw_surf(r_screen,ui_ControlBar_x,ui_ControlBar_y,r_ui_Panel  );
-   draw_surf(r_screen,ui_MiniMap_x   ,ui_MiniMap_y   ,r_ui_MiniMap);
+   //draw_mwtexture1(ui_ControlBar_x,ui_ControlBar_y,r_ui_Panel  );
+   draw_mwtexture1(ui_MiniMap_x ,ui_MiniMap_y ,tex_ui_MiniMap1,1,1);
+
 
    if(mouse_select_x0>-1)then
-     if(UIPlayer<=LastPlayer)
-     then rectangleColor(r_screen,ui_MapView_x+mouse_select_x0-vid_cam_x, ui_MapView_y+mouse_select_y0-vid_cam_y, mouse_x, mouse_y, PlayerColorNormal[UIPlayer])
-     else rectangleColor(r_screen,ui_MapView_x+mouse_select_x0-vid_cam_x, ui_MapView_y+mouse_select_y0-vid_cam_y, mouse_x, mouse_y, c_white);
-
-   d_UIMouseCursor(r_screen);
+   begin
+      if(UIPlayer<=LastPlayer)
+      then draw_set_color(PlayerColorNormal[UIPlayer])
+      else draw_set_color(c_white);
+      draw_rect(mouse_select_x0-vid_cam_x, mouse_select_y0-vid_cam_y, mouse_x, mouse_y);
+   end;
+ {  d_UIMouseCursor(r_screen);
    //draw_surf(r_screen,mouse_x,mouse_y,theme_tile_terrain);
                   }
 
 
    if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
+
 end;
 
 procedure draw_DebugTileSet(tileSet:pTMWTileSet);
@@ -144,7 +148,7 @@ begin
       //draw_surf(r_screen,x,y,tileSet^[tileX].apidata);
 
       draw_set_font(font_Base,basefont_w1);
-      draw_line(x,y,w2s(tileX),ta_LU,255,0);
+      draw_text_line(x,y,w2s(tileX),ta_LU,255,0);
       x+=tileSet^[tileX]^.w+2;
 
       lineN-=1;
@@ -178,7 +182,7 @@ begin
    draw_line(0,0,500,500);      }
 
    draw_set_color(c_yellow);
-   draw_line(50,50,'ABCDabcd 123456789 $#^$ .   !',ta_LU,255,c_green);
+   draw_text_line(50,50,'ABCDabcd 123456789 $#^$ .   !',ta_LU,255,c_green);
    draw_mwtexture1(500,300,@tex_ui_MiniMap,1,1);
    draw_mwtexture1(0,0,@spr_mlogo,1,1);
    spr_mlogo
@@ -279,7 +283,7 @@ begin
 
    draw_set_color(c_white);
    draw_set_font(font_base,basefont_w2);
-   draw_line(vid_cam_w,vid_cam_h-10,
+   draw_text_line(vid_cam_w,vid_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
    ' '+i2s(mouse_map_x div MapCellW)+

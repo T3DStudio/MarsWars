@@ -820,14 +820,24 @@ begin
    str_map_Generatorsl[5]            := 'infinity';
 
    str_map_scenario                  := 'Scenario';
-   str_map_scenariol[ms_scirmish]    := tc_lime  +'Skirmish'        +tc_default;
-   str_map_scenariol[ms_4x4     ]    := tc_orange+'4x4'             +tc_default;
-   str_map_scenariol[ms_2x2x2x2 ]    := tc_yellow+'2x2x2x2'         +tc_default;
+   str_map_scenariol[ms_ffa3    ]    := tc_lime  +'FFA(3)'          +tc_default;
+   str_map_scenariol[ms_ffa4    ]    := tc_lime  +'FFA(4)'          +tc_default;
+   str_map_scenariol[ms_ffa5    ]    := tc_lime  +'FFA(5)'          +tc_default;
+   str_map_scenariol[ms_ffa6    ]    := tc_lime  +'FFA(6)'          +tc_default;
+   str_map_scenariol[ms_ffa7    ]    := tc_lime  +'FFA(7)'          +tc_default;
+   str_map_scenariol[ms_ffa8    ]    := tc_lime  +'FFA(8)'          +tc_default;
+   str_map_scenariol[ms_1x1     ]    := tc_yellow+'1x1'             +tc_default;
+   str_map_scenariol[ms_2x2     ]    := tc_yellow+'2x2'             +tc_default;
+   str_map_scenariol[ms_3x3     ]    := tc_yellow+'3x3'             +tc_default;
+   str_map_scenariol[ms_4x4     ]    := tc_yellow+'4x4'             +tc_default;
+   str_map_scenariol[ms_2x2x2   ]    := tc_orange+'2x2x2'           +tc_default;
+   str_map_scenariol[ms_2x2x2x2 ]    := tc_orange+'2x2x2x2'         +tc_default;
    str_map_scenariol[ms_capture ]    := tc_aqua  +'Capturing points'+tc_default;
    str_map_scenariol[ms_KotH    ]    := tc_purple+'King of the Hill'+tc_default;
    str_map_scenariol[ms_royale  ]    := tc_red   +'Battle Royale'   +tc_default;
    str_map_scenariol[ms_assault ]    := tc_blue  +'Assault'         +tc_default;
    str_map_type                      := 'Type';
+   str_map_typel[mapt_desert]        := tc_brown +'Desert';
    str_map_typel[mapt_steppe]        := tc_gray  +'Steppe';
    str_map_typel[mapt_canyon]        := tc_blue  +'Canyon';
    str_map_typel[mapt_clake ]        := tc_aqua  +'Lake';
@@ -1587,7 +1597,7 @@ begin
   str_menu_FixedStarts           := 'Фиксированные старты';
 
   str_map_scenario            := 'Режим игры';
-  str_map_scenariol[ms_scirmish]:= tc_lime  +'Схватка'           +tc_default;
+  str_map_scenariol[ms_ffa]:= tc_lime  +'Схватка'           +tc_default;
   str_map_scenariol[ms_4x4     ]:= tc_orange+'3x3'               +tc_default;
   str_map_scenariol[ms_2x2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
   str_map_scenariol[ms_capture ]:= tc_aqua  +'Захват точек'      +tc_default;

@@ -289,7 +289,7 @@ begin
 
          PlayersValidateName;
          writeln('loadgame map make start');
-         map_Make1(true);
+         map_Make1Scirmish(true);
          map_Make2;
          GameCameraBounds;
 

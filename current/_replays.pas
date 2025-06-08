@@ -460,7 +460,7 @@ begin
 
          rpls_POVCam  :=false;
 
-         map_Make1;
+         map_Make1Scirmish;
          //vid_map_RedrawBack:=true;
          GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
 

@@ -327,12 +327,12 @@ pTHotKeyTable = ^THotKeyTable;
 TPanelHintTable  = array[0..HotKeysArraySize] of shortstring;
 pTPanelHintTable = ^TPanelHintTable;
 
-TUnitList = record
+{TUnitList = record
    ulist_n    : integer;
    ulist_luid : array of byte;
    ulist_lunum: array of integer;
 end;
-pTUnitList = ^TUnitList;
+pTUnitList = ^TUnitList;  }
 
 TUnitGroup = record
    ugroup_n,
@@ -439,7 +439,7 @@ TMissile = record
 end;
 
 TWUDataTime  = array[1..MaxUnits] of cardinal;
-TWCPDataTime = array[1..MaxCPoints] of byte;
+TWCPDataTime = array[1..LastCPoint] of byte;
 
 TUWeapon = record
   aw_type,
@@ -911,8 +911,8 @@ TCTPoint = record
    cpCaptureTime,
    cpTimer      : integer;
    cplifetime   : cardinal;
-   cpTimerOwnerTeam,
-   cpTimerOwnerPlayer,
+   cpTimerTeam,
+   cpTimerPlayer,
    cpOwnerPlayer,
    cpOwnerTeam  : byte;
    cpZone       : word;
@@ -926,13 +926,10 @@ PTCTPoint = ^TCTPoint;
 TMapPreset = record
    mapp_name    : shortstring;
    mapp_seed    : cardinal;
-   mapp_psize    : integer;
+   mapp_psize   : integer;
    mapp_type,
    mapp_symmetry,
    mapp_scenario: byte;
-
-   mapp_player_team
-                : array[0..LastPlayer] of byte;
 end;
 
 

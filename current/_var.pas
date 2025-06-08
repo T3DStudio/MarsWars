@@ -30,7 +30,7 @@ g_cl_units        : integer  = 0;
 g_slot_state      : array[0..LastPlayer] of byte;
 
 g_royal_r         : integer  = 0;
-g_cpoints         : array[1..MaxCPoints] of TCTPoint;
+g_cpoints         : array[0..LastCPoint] of TCTPoint;
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
@@ -53,7 +53,7 @@ map_preset_cur    : byte = 0;  // rename to map_* ?????
 map_preset_n      : byte = 0;
 map_presets       : array of TMapPreset;
 
-map_scenario      : byte     = 0;
+map_scenario      : byte     = ms_ffa8;
 map_generators    : byte     = 0;
 map_seed          : cardinal = 0;
 map_psize         : integer  = 0; // pixel size
@@ -64,6 +64,8 @@ map_chsize        : integer  = 0; // cell half size
 map_type          : byte     = 0;
 map_symmetry      : byte     = 0;
 map_symmetryDir   : integer  = 0;
+map_MaxPlayers    : byte     = 0;
+map_MaxTeams      : byte     = 0;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..LastPlayer] of integer;
 map_grid          : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCell;
@@ -74,8 +76,8 @@ map_gridDomainMX  : array of array of TMapGridPFDomainData;
 map_gridDomain_color: array of TMWColor;
 {$ENDIF}
 
-map_gcx,
-map_gcy,
+map_gcpx,
+map_gcpy,
 map_gcsx,
 map_gcsy          : integer;
 
@@ -169,7 +171,7 @@ _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 test_mode         : byte = 0;
 test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
-sys_fog           : boolean = false;
+ui_fog           : boolean = false;
 
 vid_SDLWindow     : pSDL_Window;
 vid_SDLRenderer   : pSDL_Renderer;
@@ -659,10 +661,6 @@ theme_anm_decors          : TThemeDecorAnimL;
 theme_tile_terrain,
 theme_tile_crater,
 theme_tile_liquid         : pTMWTexture;
-{theme_tile_terrain        : pTMWTexture = nil;
-theme_tile_crater         : pTMWTexture = nil;
-theme_tile_liquid         : pTMWTexture = nil;
-theme_tile_teleport       : pTMWTexture = nil; }
 
 theme_tileset_crater      : pTMWTileSet;
 theme_tileset_liquid      : array[0..theme_anim_step_n-1] of pTMWTileSet;
@@ -732,7 +730,8 @@ tex_dummy         : TMWTexture;
 ptex_dummy        : PTMWTexture;
 
 tex_menu,
-tex_ui_MiniMap,
+tex_ui_MiniMap0,
+tex_ui_MiniMap1,
 tex_map_gMiniMap,   // minimap: unit & ui layer
 tex_map_mMiniMap,   // minimap: menu
 tex_map_bMiniMap    // minimap: terrain background
@@ -926,7 +925,7 @@ str_bool                : array[false..true   ] of shortstring;
 
 str_teams               : array[0..LastPlayer ] of shortstring;
 str_racel               : array[0..r_cnt      ] of shortstring;
-str_map_scenariol      : array[0..ms_count  ] of shortstring;
+str_map_scenariol       : array[0..ms_count   ] of shortstring;
 
 str_map_typel           : array[0..gms_m_types] of shortstring;
 str_map_syml            : array[0..gms_m_symm ] of shortstring;

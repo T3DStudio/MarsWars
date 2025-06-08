@@ -921,7 +921,7 @@ begin
    SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_BLEND);
    draw_set_alpha(255);}
 
-   with tex_ui_MiniMap^ do
+   with tex_ui_MiniMap0^ do
    begin
       sdlsurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
 
@@ -967,9 +967,10 @@ begin
    draw_LoadingScreen(str_loading_gfxd,c_red);
 
    tex_menu        :=gfx_MWTextureMakeRenderTarget(menu_w       ,menu_h       );
-   tex_ui_MiniMap  :=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi);
-   tex_map_gMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: unit & ui layer
+   tex_ui_MiniMap0 :=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: ui back
+   tex_ui_MiniMap1 :=gfx_MWTextureMakeRenderTarget(vid_panel_pwu,vid_panel_pwu); // minimap: ui front
    tex_map_mMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: menu
+   tex_map_gMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: unit & ui layer
    tex_map_bMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: terrain background
 
    // theme tileset templates
@@ -1330,15 +1331,6 @@ end;
 
 procedure vid_MakeScreen;
 begin
-   //if(r_screen<>nil)then sdl_freesurface(r_screen);
-
-
-
-   {if(vid_fullscreen)
-   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)
-   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags);
-
-   if(r_screen=nil)then begin WriteSDLError; exit; end;}
 
    vid_ScreenSurfaces;
 end;

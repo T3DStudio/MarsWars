@@ -58,11 +58,11 @@ begin
 
    case g_slot_state[SlotSource] of
    pss_observer: ;
-   pss_opened  : g_players[SlotSource].team:=PlayerSlotGetTeam(map_scenario,SlotSource,SlotSource);
+   pss_opened  : g_players[SlotSource].team:=PlayerSlotGetTeam(SlotSource,SlotSource);
    end;
    case g_slot_state[SlotTarget] of
    pss_observer: ;
-   pss_opened  : g_players[SlotTarget].team:=PlayerSlotGetTeam(map_scenario,SlotTarget,SlotTarget);
+   pss_opened  : g_players[SlotTarget].team:=PlayerSlotGetTeam(SlotTarget,SlotTarget);
    end;
 
    if(PlayerClient=SlotTarget)then PlayerClient:=SlotSource
@@ -104,9 +104,16 @@ begin
    end;
 
    if(NewState     >=ps_states_n)
-   //or(PlayerRequestor>LastPlayer)
-   or(PlayerTarget   >LastPlayer)
+   or(PlayerTarget > LastPlayer)
    or(G_Started)then exit;
+
+   if(PlayerTarget>=map_MaxPlayers)then
+     case NewState of
+pss_closed,
+pss_observer,
+pss_swap: ;
+     else exit;
+     end;
 
    case NewState of
 pss_ready    : with g_players[PlayerTarget] do
@@ -137,7 +144,7 @@ pss_splayer  : with g_players[PlayerTarget] do
       begin
          if(PlayerRequestor=PlayerTarget)then exit;
          if(PlayerRequestor<>PlayerLobby)and(PlayerLobby<=LastPlayer)then exit;
-         if(map_preset_cur>0)then
+         {if(map_preset_cur>0)then
           with map_presets[map_preset_cur] do
            if(mapp_player_team[PlayerTarget]>LastPlayer)
            then exit
@@ -145,7 +152,7 @@ pss_splayer  : with g_players[PlayerTarget] do
              case NewState of
          pss_closed,
          pss_observer : exit;
-             end;
+             end; }
       end;
    end;
 
@@ -154,12 +161,12 @@ pss_splayer  : with g_players[PlayerTarget] do
    if(Check)or(NewState=g_slot_state[PlayerTarget])then exit;
 
    with g_players[PlayerTarget] do
-    case NewState of
+     case NewState of
 pss_closed,
 pss_opened   : begin
                   PlayerSetType(PlayerTarget,pt_none);
                   g_slot_state[PlayerTarget]:=NewState;
-                  team:=PlayerSlotGetTeam(map_scenario,PlayerTarget,255);
+                  team:=PlayerSlotGetTeam(PlayerTarget,255);
                end;
 pss_observer : begin
                   g_slot_state[PlayerTarget]:=NewState;
@@ -175,9 +182,9 @@ pss_AI_11    : begin
                   g_slot_state[PlayerTarget]:=NewState;
                   ai_skill:=NewState-pss_AI_1+1;
                   PlayerSetType(PlayerTarget,pt_ai);
-                  team:=PlayerSlotGetTeam(map_scenario,PlayerTarget,255);
+                  team:=PlayerSlotGetTeam(PlayerTarget,255);
                end;
-    end;
+     end;
 end;
 function PlayerSlotChangeRace(PlayerRequestor,PlayerTarget,NewRace:byte;Check:boolean):boolean;
 begin
@@ -195,8 +202,9 @@ begin
    end;
 
    if(NewRace>r_cnt)
-   or(PlayerRequestor>LastPlayer)
-   or(PlayerTarget   >LastPlayer)
+   or(PlayerRequestor> LastPlayer)
+   or(PlayerTarget   > LastPlayer)
+   or(PlayerTarget   >=map_MaxPlayers)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -218,23 +226,28 @@ begin
    end;
 end;
 function PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam:byte;Check:boolean):boolean;
-var n:byte;
+//var n:byte;
 begin
    PlayerSlotChangeTeam:=false;
 
    if(NewTeam=255)and(Check)then
    begin
-      n:=0;
       for NewTeam:=0 to LastPlayer do
-        if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then n+=1;
-      PlayerSlotChangeTeam:=(n>1);
+        if(PlayerSlotChangeTeam(PlayerRequestor,PlayerTarget,NewTeam,Check))then
+        begin
+           PlayerSlotChangeTeam:=true;
+           break;
+        end;
       exit;
    end;
 
-   if(NewTeam        >LastPlayer)
-   or(PlayerRequestor>LastPlayer)
-   or(PlayerTarget   >LastPlayer)
-   or(map_preset_cur   >0)
+   if(NewTeam        > LastPlayer)
+   or(NewTeam        >=map_MaxTeams)
+   or(PlayerRequestor> LastPlayer)
+   or(PlayerTarget   > LastPlayer)
+   or(PlayerTarget   >=map_MaxPlayers)
+   or(map_preset_cur > 0)
+   or(map_Scenario in ms_ScenariosFixedTeams)
    or(G_Started)then exit;
 
    with g_players[PlayerTarget] do
@@ -251,20 +264,32 @@ begin
       or(isobserver)
       then exit;
 
-      n:=team;
-      team:=NewTeam;
-      if(PlayerSlotGetTeam(map_scenario,PlayerTarget,255)<>team)then
-      begin
-         team:=n;
-         exit;
-      end
-      else team:=n;
-
       PlayerSlotChangeTeam:=true;
 
       if(Check)or(NewTeam=team)then exit;
 
       team:=NewTeam;
+   end;
+end;
+
+procedure PlayerSlotValidate;
+var p:byte;
+begin
+   for p:=0 to LastPlayer do
+     if(p>=map_MaxPlayers)then
+     begin
+        PlayerSlotChangeState(255,p,pss_observer,false);
+        g_players[p].team:=PlayerSlotGetTeam(p,p);
+     end
+     else
+     begin
+        PlayerSlotChangeState(255,p,pss_opened,false);
+        PlayerSlotChangeTeam(255,p,PlayerSlotGetTeam(p,255),false);
+     end;
+   with g_players[PlayerClient] do
+   begin
+      player_type:=pt_human;
+      name       :=PlayerName;
    end;
 end;
 
@@ -363,14 +388,6 @@ begin
        log_EnergyCheck:=0;
     end;
 
-   with g_players[0] do
-   begin
-      race       :=r_hell;
-      player_type:=pt_ai;
-      PlayerSetAllowedUnits   (0,[],0,true);
-      PlayerSetAllowedUpgrades(0,[],0,true);
-   end;
-
    {$IFDEF _FULLGAME}
    PlayerColorSchemeFFA[0]:=c_red;
    PlayerColorSchemeFFA[1]:=c_orange;
@@ -412,7 +429,7 @@ begin
 end;
 
 procedure InitDefaultMaps;
-procedure SetMap(pid:byte;mseed:cardinal;msize:integer;mtype,msym,mscenario,t1,t2,t3,t4,t5,t6,t7,t8:byte);
+procedure SetMap(pid:byte;mseed:cardinal;msize:integer;mtype,msym,mscenario:byte);
 begin
    if(map_preset_n<=pid)then
    begin
@@ -431,15 +448,6 @@ begin
       mapp_type    := mtype;
       mapp_symmetry:= msym;
       mapp_scenario:= mscenario;
-      FillChar(mapp_player_team,SizeOf(mapp_player_team),0);
-      mapp_player_team[0]:=t1;
-      mapp_player_team[1]:=t2;
-      mapp_player_team[2]:=t3;
-      mapp_player_team[3]:=t4;
-      mapp_player_team[4]:=t5;
-      mapp_player_team[5]:=t6;
-      mapp_player_team[6]:=t7;
-      mapp_player_team[7]:=t8;
    end;
 end;
 begin
@@ -447,9 +455,9 @@ begin
    map_preset_n  :=0;
    setlength(map_presets,map_preset_n);
 
-   SetMap(mapp_1x1_plane   , 667,4000,mapt_steppe,1,ms_scirmish,0,1,255,255,255,255,255,255);
-   SetMap(mapp_1x1_lake    ,6667,4000,mapt_clake ,1,ms_scirmish,0,1,255,255,255,255,255,255);
-   SetMap(mapp_1x1_cave    , 667,4000,mapt_canyon,1,ms_scirmish,0,1,255,255,255,255,255,255);
+   SetMap(mapp_1x1_plane   , 667,4000,mapt_steppe,1,ms_1x1);
+   SetMap(mapp_1x1_lake    ,6667,4000,mapt_clake ,1,ms_1x1);
+   SetMap(mapp_1x1_cave    , 667,4000,mapt_canyon,1,ms_1x1);
 
    {$IFNDEF _FULLGAME}
    g_presets[gp_custom].gp_name:= 'custom';
@@ -475,26 +483,40 @@ begin
    if(map_preset_cur>0)then
    with map_presets[map_preset_cur] do
    begin
-      map_seed    := mapp_seed;
-      map_psize   := mapp_psize;
-      map_type    := mapp_type;
-      map_symmetry:= mapp_symmetry;
-      map_scenario:= mapp_scenario;
+      map_seed      := mapp_seed;
+      map_psize     := mapp_psize;
+      map_type      := mapp_type;
+      map_symmetry  := mapp_symmetry;
+      map_scenario  := mapp_scenario;
       g_fixed_positions
-                  := false;
-
-      for p:=0 to LastPlayer do
-        if(mapp_player_team[p]<=LastPlayer)
-        then PlayerSlotChangeState(255,p,pss_opened  ,false)
-        else PlayerSlotChangeState(255,p,pss_observer,false);
-
-      {$IFDEF _FULLGAME}
-      PlayerSetType(PlayerClient,pt_human);
-      g_players[PlayerClient].name:=PlayerName;
-      {$ENDIF}
-
-      map_Make1;
+                    := false;
    end;
+
+   {case map_scenario of
+   ms_ffa3   : map_MaxPlayers:=3;
+   ms_ffa4   : map_MaxPlayers:=4;
+   ms_ffa5   : map_MaxPlayers:=5;
+   ms_ffa6   : map_MaxPlayers:=6;
+   ms_ffa7   : map_MaxPlayers:=7;
+   ms_1x1    : map_MaxPlayers:=2;
+   ms_2x2    : map_MaxPlayers:=4;
+   ms_2x2x2  : map_MaxPlayers:=6;
+   ms_3x3    : map_MaxPlayers:=6;
+   ms_4x4    : map_MaxPlayers:=8;
+   ms_2x2x2x2: map_MaxPlayers:=8;
+   else        map_MaxPlayers:=MaxPlayer;
+   end;
+
+   for p:=0 to LastPlayer do
+     if(p<map_MaxPlayers)
+     then PlayerSlotChangeState(255,p,pss_opened  ,false)
+     else PlayerSlotChangeState(255,p,pss_observer,false);  }
+   {$IFDEF _FULLGAME}
+   PlayerSetType(PlayerClient,pt_human);
+   g_players[PlayerClient].name:=PlayerName;
+   {$ENDIF}
+
+   map_Make1Scirmish;
 end;
 
 function GameSetCommonSetting(PlayerRequestor,setting,NewVal:byte;Check:boolean):boolean;
@@ -510,7 +532,7 @@ nmid_loby_gameFixStarts   : if(map_preset_cur=0)then
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_fixed_positions:=NewVal>0;
-                             map_Make1;
+                             map_Make1Scirmish;
                           end;
 nmid_loby_gameDeadPObs: begin
                              GameSetCommonSetting:=true;
@@ -561,7 +583,7 @@ begin
    g_cycle_order    := 0;
    g_cycle_regen    := 0;
 
-   map_Make1;
+   map_Make1Scirmish;
 
    {$IFDEF _FULLGAME}
 
@@ -596,7 +618,7 @@ begin
    mouse_select_x0:=-1;
    m_brush:=mb_empty;
 
-   sys_fog   :=true;
+   ui_fog   :=true;
 
    svld_str_fname:='';
 
@@ -676,7 +698,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
           PlayerSetType(p,pt_none);
         end;
 
-        team:=PlayerSlotGetTeam(map_scenario,p,255);
+        team:=PlayerSlotGetTeam(p,255);
         race:=slot_race;
 
         if(race=r_random)then race:=1+random(r_cnt);
@@ -684,7 +706,7 @@ pss_AI_11    : ai_skill:=(g_slot_state[p]-pss_AI_1)+1;
         if(player_type=pt_human)then ai_skill:=player_default_ai_level;//g_ai_slots
      end;
 
-   if(not g_fixed_positions)then map_ShufflePlayerStarts(map_scenario in ms_ScenariosFixedTeams);
+   if(not g_fixed_positions)then map_PlayerStartsShuffle(map_scenario in ms_ScenariosFixedTeams);
 
    for p:=0 to LastPlayer do
     with g_players[p] do
@@ -763,7 +785,7 @@ begin
    Map_randommap;
 
    map_preset_cur:=0;
-   map_scenario      :=ms_scirmish;
+   map_scenario      :=ms_ffa8;
    map_generators:=random(gms_g_maxgens+1);
 
    PlayersSetDefault;
@@ -789,7 +811,7 @@ begin
    then g_ai_slots:=0
    else g_ai_slots:=random(player_default_ai_level+1);
 
-   map_Make1;
+   map_Make1Scirmish;
 
    if(andstart)then GameStartScirmish(PlayerClient,false);
 end;

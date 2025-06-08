@@ -347,7 +347,7 @@ begin
    SetItem(mi_map_Size      ,tx0,ty0,tx1,ty0+ty1,map_SetSetting(PlayerClient,nmid_loby_mapSize,MinMapSize,true));ty0+=ty1;
    SetItem(mi_map_Type      ,tx0,ty0,tx1,ty0+ty1,map_SetSetting(PlayerClient,nmid_loby_mapType         ,0,true));ty0+=ty1;
    SetItem(mi_map_Sym       ,tx0,ty0,tx1,ty0+ty1,map_SetSetting(PlayerClient,nmid_loby_mapSymmetry     ,0,true));ty0+=ty1;
-   SetItem(mi_map_Theme     ,tx0,ty0,tx1,ty0+ty1,true                                                          );ty0+=ty1;
+   SetItem(mi_map_Theme     ,tx0,ty0,tx1,ty0+ty1,false                                                         );ty0+=ty1;
    SetItem(mi_map_Random    ,tx0,ty0,tx1,ty0+ty1,menu_items[mi_map_Sym].mi_enabled);
 
    // MULTIPLAYER / RECORD INFO
@@ -558,11 +558,27 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function txt_StringApplyInput(s:shortstring;charset:TSoc;ms:byte;ChangedResult:pBoolean):shortstring;
+function txt_StringApplyInput(s:shortstring;charset:TSoc;maxLength:byte;ChangedResult:pBoolean):shortstring;
 var i:byte;
     c:char;
 begin
    txt_StringApplyInput:=s;
+   if(InputActionPressed(iAct_backspace))then//or(InputActionPressed(iAct_backspace))
+   begin
+      if(length(s)>0)then setlength(s,length(s)-1);
+   end
+   else
+     if(length(k_KeyboardString)>0)then
+      for i:=1 to length(k_KeyboardString) do
+      begin
+         c:=k_KeyboardString[i];
+         if(length(s)>=maxLength)
+         then break
+         else
+           if(c in charset)then s+=c;
+      end;
+
+   {//
    if(length(k_KeyboardString)>0)then
     for i:=1 to length(k_KeyboardString) do
     begin
@@ -570,11 +586,11 @@ begin
        if(c=#8)   // backspace
        then begin if(length(s)>0)then setlength(s,length(s)-1)end //delete(s,length(s),1)
        else
-        if(length(s)>=ms)
+        if(length(s)>=maxLength)
         then break
         else
           if(c in charset)then s+=c;
-   end;
+   end; }
    k_KeyboardString:='';
    if(ChangedResult<>nil)then
      ChangedResult^:=txt_StringApplyInput<>s;
@@ -665,9 +681,7 @@ begin
       mli_value  :=avalue;
       mli_enabled:=aenabled;
    end;
-   if(menu_list_fontS<=1)
-   then menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1 *length(acaption)+basefont_w1 )
-   else menu_list_w:=max3i(MinWidth,menu_list_w,basefont_w1h*length(acaption)+basefont_w1h);
+   menu_list_w:=max3i(MinWidth,menu_list_w,menu_list_fontS*slength(acaption)+menu_list_fontS*2);
 end;
 
 //-----------------------------------------------------
@@ -1170,7 +1184,7 @@ mi_map_Scenario           : if(menu_list_selected>-1)then
                                else map_SetSetting  (PlayerClient,nmid_loby_mapScenario,byte(menu_list_SIndex),false);
                                menu_List_Clear;
                             end
-                            else menu_list_MakeFromStr(menu_item,@str_map_scenariol[0],SizeOf(str_map_scenariol),integer(map_scenario),-2);
+                            else menu_list_MakeFromStr(menu_item,@str_map_scenariol[0],SizeOf(str_map_scenariol),integer(map_scenario),-3);
 mi_map_Generators         : if(menu_list_selected>-1)then
                             begin
                                if(net_status=ns_client)
@@ -1207,7 +1221,7 @@ mi_map_Sym                : if(menu_list_selected>-1)then
                             else menu_list_MakeFromStr(menu_item,@str_map_syml[0],SizeOf(str_map_syml),map_symmetry,-2);
 mi_map_Random             : begin
                                Map_randommap;
-                               map_Make1;
+                               map_Make1Scirmish;
                             end;
 //////////////////////////////////////////    GAME SETTINGS
 mi_game_FixStarts         : if(net_status=ns_client)
@@ -1322,9 +1336,7 @@ procedure menu_keyborad;
 var Changed:boolean;
 begin
    Changed:=false;
-   if(length(k_KeyboardString)>0)then
-   begin
-      case menu_item of
+   case menu_item of
 mi_map_Seed           : begin
                         map_seed  :=s2c(txt_StringApplyInput(c2s(map_seed) ,k_kbdig ,10           ,@Changed));
                         if(Changed)then
@@ -1339,19 +1351,18 @@ mi_mplay_ServerPort   : begin
                         if(Changed)then txt_ValidateServerPort;
                         end;
 mi_mplay_ClientAddress: net_cl_svaddr  :=txt_StringApplyInput(net_cl_svaddr  ,k_kbstr ,30           ,@Changed);
-      else
-        if(net_status>ns_single)and(menu_items[mi_mplay_Chat].mi_enabled)
-        then net_chat_str  :=txt_StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)
-        else
-          if(menu_items[mi_saveload_fname].mi_enabled)then
-          begin
-             svld_str_fname:=txt_StringApplyInput(svld_str_fname,k_kbstr ,ReplayNameLen,@Changed);
-             if(Changed)then saveload_SelectByName(svld_str_fname);
-          end;
-      end;
-
-      if(Changed)then menu_remake:=true;
+   else
+     if(net_status>ns_single)and(menu_items[mi_mplay_Chat].mi_enabled)
+     then net_chat_str  :=txt_StringApplyInput(net_chat_str  ,k_kbstr ,255    ,@Changed)
+     else
+       if(menu_items[mi_saveload_fname].mi_enabled)then
+       begin
+          svld_str_fname:=txt_StringApplyInput(svld_str_fname,k_kbstr ,ReplayNameLen,@Changed);
+          if(Changed)then saveload_SelectByName(svld_str_fname);
+       end;
    end;
+
+   if(Changed)then menu_remake:=true;
 
    if(InputActionPressed(iAct_esc))then
    begin

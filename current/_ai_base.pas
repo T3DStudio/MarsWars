@@ -597,7 +597,7 @@ begin
 
       // nearest point/generator
       ai_cpoint_koth:=false;
-      for i:=1 to MaxCPoints do
+      for i:=1 to LastCPoint do
        with g_cpoints[i] do
          if(cpCaptureR>0)then
          begin

@@ -4,21 +4,32 @@ begin
    with pu^  do
    with uid^ do
    begin
-      {if(uid^._ukbuilding)and(_mmr>0)
-      then boxColor  (r_gminimap,mmx-_mmr,mmy-_mmr,mmx+_mmr,mmy+_mmr,PlayerColorNormal[player^.pnum])
-      else pixelColor(r_gminimap,mmx,mmy,                            PlayerColorNormal[player^.pnum]);  }
+      draw_set_target(tex_ui_MiniMap0);
+
+      draw_set_color(PlayerColorNormal[player^.pnum]);
+      if(uid^._ukbuilding)and(_mmr>0)
+      then draw_frect(mmx-_mmr,mmy-_mmr,mmx+_mmr,mmy+_mmr)
+      else draw_pixel(mmx,mmy                            );
 
       with player^ do
       begin
          if(UIPlayer<=LastPlayer)then
-           if(team<>g_players[UIPlayer].team)then exit;
+           if(team<>g_players[UIPlayer].team)then
+           begin
+              draw_set_target(nil);
+              exit;
+           end;
 
-        { if(_ability=ua_UScan)and(reload>radar_vision_time)then
-           if(vid_minimap_scan_blink)
-           then filledCircleColor(r_gminimap,trunc(ua_x  *map_mm_cx),
-                                             trunc(ua_y  *map_mm_cx),
-                                             trunc(srange*map_mm_cx),PlayerColorShadow[pnum]);    }
+         if(_ability=ua_UScan)and(reload>radar_vision_time)then
+           if(vid_minimap_scan_blink)then
+           begin
+              draw_set_color(PlayerColorShadow[pnum]);
+              draw_fcircle(trunc(ua_x  *map_mm_cx),
+                           trunc(ua_y  *map_mm_cx),
+                           trunc(srange*map_mm_cx));
+           end;
       end;
+      draw_set_target(nil);
    end;
 end;
 
@@ -60,7 +71,7 @@ end;
 function unit_FogReveal(pu:PTUnit):boolean;
 begin
    unit_FogReveal:=false;
-   if(not sys_fog)
+   if(not ui_fog)
    then unit_FogReveal:=true
    else
      with pu^     do

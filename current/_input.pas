@@ -27,6 +27,7 @@ begin
    end;
 end;
 begin
+   //              action          parent act   source type  source key
    input_SetAction(iAct_mlb       ,0           ,ikt_mouseb  ,SDL_BUTTON_LEFT  );
    input_SetAction(iAct_mrb       ,0           ,ikt_mouseb  ,SDL_BUTTON_RIGHT );
    input_SetAction(iAct_mmb       ,0           ,ikt_mouseb  ,SDL_BUTTON_MIDDLE);
@@ -44,6 +45,8 @@ begin
    input_SetAction(iAct_control   ,0           ,ikt_keyboard,SDLK_LCtrl       );
    input_SetAction(iAct_alt       ,0           ,ikt_keyboard,SDLK_LALt        );
    input_SetAction(iAct_shift     ,0           ,ikt_keyboard,SDLK_LShift      );
+   input_SetAction(iAct_backspace ,0           ,ikt_keyboard,SDLK_BackSpace   );
+
    input_SetAction(iAct_ScreenShot,0           ,ikt_keyboard,SDLK_PrintScreen );
 
    input_SetAction(iAct_LastEvent ,0           ,ikt_keyboard,SDLK_SPACE       );
@@ -97,44 +100,66 @@ begin
    input_SetAction(iAct_UASlGroup8,iAct_shift  ,ikt_keyboard,SDLK_8           );
    input_SetAction(iAct_UASlGroup9,iAct_shift  ,ikt_keyboard,SDLK_9           );
 
-   input_SetAction(iAct_UF1      ,0           ,ikt_keyboard,SDLK_F1          );
-   input_SetAction(iAct_UF2      ,0           ,ikt_keyboard,SDLK_F2          );
-   input_SetAction(iAct_UF3      ,0           ,ikt_keyboard,SDLK_F3          );
-   input_SetAction(iAct_UF4      ,0           ,ikt_keyboard,SDLK_F4          );
-   input_SetAction(iAct_UF5      ,0           ,ikt_keyboard,SDLK_F5          );
-   input_SetAction(iAct_UF6      ,0           ,ikt_keyboard,SDLK_F6          );
+   input_SetAction(iAct_UF1      ,0            ,ikt_keyboard,SDLK_F1          );
+   input_SetAction(iAct_UF2      ,0            ,ikt_keyboard,SDLK_F2          );
+   input_SetAction(iAct_UF3      ,0            ,ikt_keyboard,SDLK_F3          );
+   input_SetAction(iAct_UF4      ,0            ,ikt_keyboard,SDLK_F4          );
+   input_SetAction(iAct_UF5      ,0            ,ikt_keyboard,SDLK_F5          );
+   input_SetAction(iAct_UF6      ,0            ,ikt_keyboard,SDLK_F6          );
 
-   input_SetAction(iAct_UAMove   ,0           ,ikt_keyboard,SDLK_A           );
-   input_SetAction(iAct_UAStop   ,0           ,ikt_keyboard,SDLK_S           );
-   input_SetAction(iAct_UAPatrol ,0           ,ikt_keyboard,SDLK_D           );
-   input_SetAction(iAct_UMove    ,0           ,ikt_keyboard,SDLK_Z           );
-   input_SetAction(iAct_UStop    ,0           ,ikt_keyboard,SDLK_X           );
-   input_SetAction(iAct_UPatrol  ,0           ,ikt_keyboard,SDLK_C           );
+   input_SetAction(iAct_UAMove   ,0            ,ikt_keyboard,SDLK_A           );
+   input_SetAction(iAct_UAStop   ,0            ,ikt_keyboard,SDLK_S           );
+   input_SetAction(iAct_UAPatrol ,0            ,ikt_keyboard,SDLK_D           );
+   input_SetAction(iAct_UMove    ,0            ,ikt_keyboard,SDLK_Z           );
+   input_SetAction(iAct_UStop    ,0            ,ikt_keyboard,SDLK_X           );
+   input_SetAction(iAct_UPatrol  ,0            ,ikt_keyboard,SDLK_C           );
 
-   input_SetAction(iAct_Prod1    ,0           ,ikt_keyboard,SDLK_R           );
-   input_SetAction(iAct_Prod2    ,0           ,ikt_keyboard,SDLK_T           );
-   input_SetAction(iAct_Prod3    ,0           ,ikt_keyboard,SDLK_Y           );
-   input_SetAction(iAct_Prod4    ,0           ,ikt_keyboard,SDLK_F           );
-   input_SetAction(iAct_Prod5    ,0           ,ikt_keyboard,SDLK_G           );
-   input_SetAction(iAct_Prod6    ,0           ,ikt_keyboard,SDLK_H           );
-   input_SetAction(iAct_Prod7    ,0           ,ikt_keyboard,SDLK_V           );
-   input_SetAction(iAct_Prod8    ,0           ,ikt_keyboard,SDLK_B           );
-   input_SetAction(iAct_Prod9    ,0           ,ikt_keyboard,SDLK_N           );
-   input_SetAction(iAct_Prod10   ,0           ,ikt_keyboard,SDLK_U           );
-   input_SetAction(iAct_Prod11   ,0           ,ikt_keyboard,SDLK_I           );
-   input_SetAction(iAct_Prod12   ,0           ,ikt_keyboard,SDLK_O           );
-   input_SetAction(iAct_Prod13   ,0           ,ikt_keyboard,SDLK_J           );
-   input_SetAction(iAct_Prod14   ,0           ,ikt_keyboard,SDLK_K           );
-   input_SetAction(iAct_Prod15   ,0           ,ikt_keyboard,SDLK_L           );
-   input_SetAction(iAct_Prod16   ,iAct_control,ikt_keyboard,SDLK_R           );
-   input_SetAction(iAct_Prod17   ,iAct_control,ikt_keyboard,SDLK_T           );
-   input_SetAction(iAct_Prod18   ,iAct_control,ikt_keyboard,SDLK_Y           );
-   input_SetAction(iAct_Prod19   ,iAct_control,ikt_keyboard,SDLK_F           );
-   input_SetAction(iAct_Prod20   ,iAct_control,ikt_keyboard,SDLK_G           );
-   input_SetAction(iAct_Prod21   ,iAct_control,ikt_keyboard,SDLK_H           );
-   input_SetAction(iAct_Prod22   ,iAct_control,ikt_keyboard,SDLK_V           );
-   input_SetAction(iAct_Prod23   ,iAct_control,ikt_keyboard,SDLK_B           );
-   input_SetAction(iAct_Prod24   ,iAct_control,ikt_keyboard,SDLK_N           );
+   input_SetAction(iAct_Prod1    ,0            ,ikt_keyboard,SDLK_R           );
+   input_SetAction(iAct_Prod2    ,0            ,ikt_keyboard,SDLK_T           );
+   input_SetAction(iAct_Prod3    ,0            ,ikt_keyboard,SDLK_Y           );
+   input_SetAction(iAct_Prod4    ,0            ,ikt_keyboard,SDLK_F           );
+   input_SetAction(iAct_Prod5    ,0            ,ikt_keyboard,SDLK_G           );
+   input_SetAction(iAct_Prod6    ,0            ,ikt_keyboard,SDLK_H           );
+   input_SetAction(iAct_Prod7    ,0            ,ikt_keyboard,SDLK_V           );
+   input_SetAction(iAct_Prod8    ,0            ,ikt_keyboard,SDLK_B           );
+   input_SetAction(iAct_Prod9    ,0            ,ikt_keyboard,SDLK_N           );
+   input_SetAction(iAct_Prod10   ,0            ,ikt_keyboard,SDLK_U           );
+   input_SetAction(iAct_Prod11   ,0            ,ikt_keyboard,SDLK_I           );
+   input_SetAction(iAct_Prod12   ,0            ,ikt_keyboard,SDLK_O           );
+   input_SetAction(iAct_Prod13   ,0            ,ikt_keyboard,SDLK_J           );
+   input_SetAction(iAct_Prod14   ,0            ,ikt_keyboard,SDLK_K           );
+   input_SetAction(iAct_Prod15   ,0            ,ikt_keyboard,SDLK_L           );
+   input_SetAction(iAct_Prod16   ,iAct_control ,ikt_keyboard,SDLK_R           );
+   input_SetAction(iAct_Prod17   ,iAct_control ,ikt_keyboard,SDLK_T           );
+   input_SetAction(iAct_Prod18   ,iAct_control ,ikt_keyboard,SDLK_Y           );
+   input_SetAction(iAct_Prod19   ,iAct_control ,ikt_keyboard,SDLK_F           );
+   input_SetAction(iAct_Prod20   ,iAct_control ,ikt_keyboard,SDLK_G           );
+   input_SetAction(iAct_Prod21   ,iAct_control ,ikt_keyboard,SDLK_H           );
+   input_SetAction(iAct_Prod22   ,iAct_control ,ikt_keyboard,SDLK_V           );
+   input_SetAction(iAct_Prod23   ,iAct_control ,ikt_keyboard,SDLK_B           );
+   input_SetAction(iAct_Prod24   ,iAct_control ,ikt_keyboard,SDLK_N           );
+
+   input_SetAction(iAct_Prod24   ,iAct_control ,ikt_keyboard,SDLK_N           );
+
+
+   input_SetAction(iAct_test_FastTime    ,0    ,ikt_keyboard,sdlk_end         );
+   input_SetAction(iAct_test_InstaProd   ,0    ,ikt_keyboard,sdlk_home        );
+   input_SetAction(iAct_test_ToggleAI    ,0    ,ikt_keyboard,sdlk_pageup      );
+   input_SetAction(iAct_test_iddqd       ,0    ,ikt_keyboard,sdlk_pagedown    );
+   input_SetAction(iAct_test_FogToggle   ,0    ,ikt_keyboard,sdlk_backspace   );
+   input_SetAction(iAct_test_DrawToggle  ,0    ,ikt_keyboard,sdlk_insert      );
+   input_SetAction(iAct_test_NullUpgrades,0    ,ikt_keyboard,SDLK_F3          );
+   input_SetAction(iAct_test_BePlayer0   ,0    ,ikt_keyboard,SDLK_F4          );
+   input_SetAction(iAct_test_BePlayer1   ,0    ,ikt_keyboard,SDLK_F5          );
+   input_SetAction(iAct_test_BePlayer2   ,0    ,ikt_keyboard,SDLK_F6          );
+   input_SetAction(iAct_test_BePlayer3   ,0    ,ikt_keyboard,SDLK_F7          );
+   input_SetAction(iAct_test_BePlayer4   ,0    ,ikt_keyboard,SDLK_F8          );
+   input_SetAction(iAct_test_BePlayer5   ,0    ,ikt_keyboard,SDLK_F9          );
+   input_SetAction(iAct_test_BePlayer6   ,0    ,ikt_keyboard,SDLK_F10         );
+   input_SetAction(iAct_test_BePlayer7   ,0    ,ikt_keyboard,SDLK_F11         );
+   input_SetAction(iAct_test_debug0      ,0    ,ikt_keyboard,SDLK_KP_0        );
+   input_SetAction(iAct_test_debug1      ,0    ,ikt_keyboard,SDLK_KP_1        );
+
 end;
 
 procedure input_key_escape;
@@ -526,14 +551,14 @@ t3pt_replay  : case u of
                         end;
                     4 : rpls_POVCam :=not rpls_POVCam;
                     5 : rpls_showlog:=not rpls_showlog;
-                    6 : sys_fog     :=not sys_fog;
+                    6 : ui_fog     :=not ui_fog;
                 8..17 : UIPlayer    :=u-8;
                     end;
                end;
              // observer
 t3pt_observer: if(click_type=pct_left)then
                case u of
-               0    :  sys_fog:=not sys_fog;
+               0    :  ui_fog:=not ui_fog;
                2..11:  UIPlayer:=u-2;
                end;
              // actions
@@ -579,43 +604,7 @@ t3pt_controls: if(G_Status=gs_running)then
      end;
 end;
 
-function test_hotkeys(k:cardinal):boolean;
-procedure nullupgr(playeri:byte);
-var i:byte;
-begin
-   with g_players[playeri] do
-    for i:=1 to 255 do
-     upgr[i]:=0;
-end;
-begin
-   test_hotkeys:=true;
-   case k of
-km_test_FastTime    : sys_uncappedFPS:=not sys_uncappedFPS;
-km_test_InstaProd   : test_fastprod:=not test_fastprod;
-km_test_ToggleAI    : with g_players[PlayerClient] do if(player_type=pt_human)then player_type:=pt_ai else player_type:=pt_human;
-km_test_iddqd       : with g_players[PlayerClient] do if(upgr[upgr_invuln ]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
-km_test_FogToggle   : sys_fog:=not sys_fog;
-km_test_DrawToggle  : r_draw :=not r_draw;
-km_test_NullUpgrades: nullupgr(PlayerClient);
-km_test_BePlayer0   : PlayerClient:=0;
-km_test_BePlayer1   : PlayerClient:=1;
-km_test_BePlayer2   : PlayerClient:=2;
-km_test_BePlayer3   : PlayerClient:=3;
-km_test_BePlayer4   : PlayerClient:=4;
-km_test_BePlayer5   : PlayerClient:=5;
-km_test_BePlayer6   : PlayerClient:=6;
-km_test_BePlayer7   : PlayerClient:=7;
-km_test_debug0      : debug_SetDomainColors;
-km_test_debug1      : begin
-                       map_ZonesMake;
-                       map_pf_MarkSolidCells;
-                       map_pf_MakeDomains;
-                      end;
-   else test_hotkeys:=false;
-   end;
-end;
-
-procedure GameHotkeys(key1:cardinal);
+{procedure GameHotkeys(key1:cardinal);
 var i,key2:cardinal;
 procedure ko2_panel_click(tab:TTabType;ClickType:TkbState;kdbl:boolean);
 begin
@@ -718,7 +707,7 @@ t3pt_controls : if(G_Status=gs_running)then
                 end;
       end;
    end;
-end;
+end;  }
 
 
 procedure KeyboardStringRussian;
@@ -829,7 +818,8 @@ ikt_keyboard: case kvalue of
          begin
             case down of
             false : ik_timer_pressed:=-1;
-            true  : begin
+            true  : if(ik_timer_pressed=0)then
+                    begin
                     ik_timer_pressed:= 1;
                     if(ik_timer_twice<=0)then
                     ik_timer_twice:=kt_TwiceDelay;
@@ -846,33 +836,15 @@ ikt_keyboard: case kvalue of
          begin
             case down of
             false : ik_timer_pressed:=-1;
-            true  : begin
+            true  : if(ik_timer_pressed=0)then
+                    begin
                     ik_timer_pressed:= 1;
                     if(ik_timer_twice<=0)then
                     ik_timer_twice:=kt_TwiceDelay;
                     end;
             end;
-            exit;
+            //exit;
          end;
-
-  { if(kvalue>0)then
-    if(down)then
-    begin
-       if(last_key_m=0)then
-       begin
-          last_key_t:=ktype;
-          last_key  :=kvalue;
-          last_key_m:=1;
-       end;
-    end
-    else
-     if (last_key_t=ktype )
-     and(last_key  =kvalue)then
-     begin
-        last_key_t:=0;
-        last_key  :=0;
-        last_key_m:=-1;
-     end; }
 end;
 
 
@@ -893,34 +865,7 @@ var i:byte;
 begin
    for i:=0 to 255 do inputAction_TimerProc(i);
 
-   {KeyTimerProc(@kt_up      ); // arrows
-   KeyTimerProc(@kt_down    );
-   KeyTimerProc(@kt_right   );
-   KeyTimerProc(@kt_left    );
-   KeyTimerProc(@kt_shift   ); // special
-   KeyTimerProc(@kt_ctrl    );
-   KeyTimerProc(@kt_alt     );
-   KeyTimerProc(@kt_mleft   ); // mouse btns
-   KeyTimerProc(@kt_mright  );
-   KeyTimerProc(@kt_mmiddle );
-   KeyTimerProc(@kt_Last    ); // last key
-
-   if(kt_TwiceLast>0)then kt_TwiceLast-=1;
-   if(mt_TwiceLast>0)then mt_TwiceLast-=1;
-   k_TwiceLast:=false;
-   m_TwiceLast:=false;
-   m_TwiceLeft:=false;
-
-   // mouse wheel action type
-
-
-   wy2mwkey               : array[false..true] of cardinal = (mw_up,mw_down);
-   }
-
    k_KeyboardString:='';
-
-   //if(kt_Last>k_LastCharStuckDealy)then
-   //  if(length(k_KeyboardString)<255)then k_KeyboardString+=k_LastChar;
 
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
@@ -1002,7 +947,7 @@ begin
    mouse_ry:=-1;
    mouse_f :=mf_none;
    if(PointInRect(mouse_x,mouse_y,0              ,0              ,vid_vw         ,vid_vh         ))then mouse_f:=mf_map;
-   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,vid_panel_pw   ,vid_panel_pw   ))then mouse_f:=mf_mmap;
+   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,vid_panel_pwu  ,vid_panel_pwu  ))then mouse_f:=mf_mmap;
    if(PointInRect(mouse_x,mouse_y,ui_ControlBar_x,ui_ControlBar_y,ui_ControlBar_w,ui_ControlBar_h))then mouse_f:=mf_panel;
 
    if(mouse_f<>mf_mmap)or(mouse_select_x0>-1)then
@@ -1152,12 +1097,46 @@ begin
    if(vx<>vid_cam_x)or(vy<>vid_cam_y)then GameCameraBounds;
 end;
 
+procedure test_nullupgr(playeri:byte);
+var i:byte;
+begin
+   with g_players[playeri] do
+    for i:=1 to 255 do
+     upgr[i]:=0;
+end;
+
 procedure g_keyboard;
 begin
    if(InputActionPressed(iAct_esc))then
      if(ingame_chat>0)
      then ingame_chat:=0
      else menu_state:=true;
+
+   if(test_mode>0)and(net_status=ns_single)then
+   begin
+      if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
+      if(InputActionPressed(iAct_test_InstaProd   ))then test_fastprod:=not test_fastprod;
+      if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[PlayerClient] do if(player_type=pt_human)then player_type:=pt_ai else player_type:=pt_human;
+      if(InputActionPressed(iAct_test_iddqd       ))then with g_players[PlayerClient] do if(upgr[upgr_invuln ]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
+      if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
+      if(InputActionPressed(iAct_test_DrawToggle  ))then r_draw :=not r_draw;
+      if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(PlayerClient);
+      if(InputActionPressed(iAct_test_BePlayer0   ))then PlayerClient:=0;
+      if(InputActionPressed(iAct_test_BePlayer1   ))then PlayerClient:=1;
+      if(InputActionPressed(iAct_test_BePlayer2   ))then PlayerClient:=2;
+      if(InputActionPressed(iAct_test_BePlayer3   ))then PlayerClient:=3;
+      if(InputActionPressed(iAct_test_BePlayer4   ))then PlayerClient:=4;
+      if(InputActionPressed(iAct_test_BePlayer5   ))then PlayerClient:=5;
+      if(InputActionPressed(iAct_test_BePlayer6   ))then PlayerClient:=6;
+      if(InputActionPressed(iAct_test_BePlayer7   ))then PlayerClient:=7;
+      if(InputActionPressed(iAct_test_debug0      ))then debug_SetDomainColors;
+      if(InputActionPressed(iAct_test_debug1      ))then begin
+                                                         map_ZonesMake;
+                                                         map_pf_MarkSolidCells;
+                                                         map_pf_MakeDomains;
+                                                         end;
+   end;
+
 
    if(ingame_chat>0)then
    begin

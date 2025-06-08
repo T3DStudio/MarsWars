@@ -38,7 +38,7 @@ wteam  ,
 wteam_n,
 cp_captured_n :integer;
 begin
-   for i:=1 to MaxCPoints do
+   for i:=1 to LastCPoint do
     with g_cpoints[i] do
     if(cpCaptureR>0)then
     begin
@@ -98,10 +98,10 @@ begin
           then cpTimer:=0
           else
           begin
-             cpTimerOwnerPlayer:=iOwnerPlayer;
-             if(cpTimerOwnerTeam<>iOwnerTeam)then
+             cpTimerPlayer:=iOwnerPlayer;
+             if(cpTimerTeam<>iOwnerTeam)then
              begin
-                cpTimerOwnerTeam:=iOwnerTeam;
+                cpTimerTeam:=iOwnerTeam;
                 cpTimer:=0;
              end;
              if(cpTimer<cpCaptureTime)
@@ -119,7 +119,7 @@ begin
    wteam_n      :=0;
    cp_captured_n:=0;
 
-   for i:=1 to MaxCPoints do
+   for i:=1 to LastCPoint do
     with g_cpoints[i] do
      if(cpCaptureR>0)and(cpenergy<=0)then
      begin

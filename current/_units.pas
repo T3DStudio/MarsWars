@@ -869,7 +869,7 @@ procedure unit_capture_point(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
-    for i:=1 to MaxCPoints do
+    for i:=1 to LastCPoint do
      with g_cpoints[i] do
       if(cpCaptureR>0)then
        if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then

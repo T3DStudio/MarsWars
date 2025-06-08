@@ -26,6 +26,8 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 procedure pushOut_GridUAction(apx,apy:pinteger;r:integer;azone:word);forward;
 
+procedure PlayerSlotValidate; forward;
+
 {$IFDEF _FULLGAME}
 function menu_Escape(exitMenu:boolean):boolean; forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
@@ -252,16 +254,27 @@ begin
    PlayersGetReadyStatus:=(r=c)and(c>0);
 end;
 
-function PlayerSlotGetTeam(gameMode,playeri,SuggestedTeam:byte):byte;
+function PlayerSlotGetTeam(playeri,SuggestedTeam:byte):byte;
 begin
    PlayerSlotGetTeam:=0;
-   if(playeri<=LastPlayer)then
+   if(playeri<=LastPlayer)and(map_MaxTeams>0)then
      with g_players[playeri] do
-       if(map_preset_cur>0)then
+     begin
+        if(map_Scenario in ms_ScenariosFixedTeams)then
+        begin
+           PlayerSlotGetTeam:=playeri div (map_MaxPlayers div map_MaxTeams);
+        end
+        else
+          if(SuggestedTeam>=map_MaxTeams)
+          then PlayerSlotGetTeam:=playeri
+          else PlayerSlotGetTeam:=SuggestedTeam;
+     end;
+
+       {{if(map_preset_cur>0)then
          with map_presets[map_preset_cur] do
            PlayerSlotGetTeam:=mapp_player_team[playeri]
-       else
-         case gameMode of
+       else}
+         case mapScenario of
 ms_4x4     : case playeri of
              0..3: PlayerSlotGetTeam:=0;
              4..7: PlayerSlotGetTeam:=1;
@@ -281,7 +294,7 @@ ms_assault : case playeri of
          else
              if(SuggestedTeam>LastPlayer)then SuggestedTeam:=team;
              PlayerSlotGetTeam:=SuggestedTeam;
-         end;
+         end;   }
 end;
 
 procedure UpdatePlayersStatusVars;    // ????????????????????????
@@ -943,22 +956,17 @@ begin
    else g_random:=abs(integer(g_random_i) mod m);
 end;
 
-{function g_randomx(x,m:integer):integer;
-begin
-   if(m=0)
-   then g_randomx:=0
-   else
-   begin
-      g_random_i+=word(x);
-      g_randomx:=g_random(m);
-   end;
-end;   }
-
 function g_randomr(r:integer):integer;
 begin
    if(r=0)
    then g_randomr:=0
    else g_randomr:=g_random(r)-g_random(r);
+end;
+
+procedure g_randomFromMapSeed;
+begin
+   g_random_i:= word(map_seed);
+   g_random_p:= byte(map_seed);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1230,8 +1238,8 @@ begin
      with map_presets[i] do
      begin
         pn:=0;
-        for p:=0 to LastPlayer do
-          if(mapp_player_team[p]<=LastPlayer)then pn+=1;
+        //for p:=0 to LastPlayer do
+       //   if(mapp_player_team[p]<=LastPlayer)then pn+=1;
 
         if(pn>0)
         then mapp_name:=b2s(pn)+')'
@@ -1549,7 +1557,7 @@ begin
          exit;
       end;
 
-   if(not sys_fog)then exit;
+   if(not ui_fog)then exit;
 
    if(UIPlayer>LastPlayer)then
    begin
@@ -1585,7 +1593,7 @@ begin
    y-=vid_cam_y;
    if(0<x)and(x<vid_cam_w)and
      (0<y)and(y<vid_cam_h)then
-      if(not sys_fog)
+      if(not ui_fog)
       then ui_MapPointInRevealedInScreen:=true
       else ui_MapPointInRevealedInScreen:=fog_check(x,y);
 end;
@@ -1620,17 +1628,17 @@ pcs_WAR    : if(player=UIPlayer)then
                pcs_WAR: PlayerGetColor:=c_white;
                end
              else
-               if(PlayerSlotGetTeam(map_scenario,UIPlayer,255)=PlayerSlotGetTeam(map_scenario,player,255))then
+               if(PlayerSlotGetTeam(UIPlayer,255)=PlayerSlotGetTeam(player,255))then
                  case vid_PlayersColorSchema of
                  pcs_LYR,
                  pcs_WYR: PlayerGetColor:=c_yellow;
                  pcs_WAR: PlayerGetColor:=c_aqua;
                  end
                else PlayerGetColor:=c_red;
-pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(map_scenario,player,255)];
+pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(player,255)];
 pcs_wTeams : if(player=UIPlayer)
              then PlayerGetColor:=c_white
-             else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(map_scenario,player,255)];
+             else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(player,255)];
      else
      end;
 end;
@@ -1662,31 +1670,44 @@ end;
 function GetCPColor(cp:byte):TMWColor;
 begin
    GetCPColor:=c_gray;
-   {if(cp<1)or(cp>MaxCPoints)then exit;
-   with g_cpoints[cp] do
-    if(cpCaptureR>0)then
-     if(cpTimer>0)and(vid_blink3=0)
-     then GetCPColor:=PlayerColorNormal[cpTimerOwnerPlayer]
-     else GetCPColor:=PlayerColorNormal[cpOwnerPlayer     ]; }
+   if(cp<=LastCPoint)then
+     with g_cpoints[cp] do
+       if(cpCaptureR>0)then
+         if(cpTimer>0)and(vid_blink3=0)
+         then GetCPColor:=PlayerColorNormal[cpTimerPlayer]
+         else GetCPColor:=PlayerColorNormal[cpOwnerPlayer];
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   GAME
 
-function GameGetStatus(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
+function hits_si2li(sh:shortint;mh:integer;s:single):longint;
+begin
+   case sh of
+127     : hits_si2li:=mh;
+1..126  : hits_si2li:=mm3i(1,trunc(sh*s),mh-1);
+0       : hits_si2li:=0;
+-125..-1: hits_si2li:=mm3i(dead_hits+1,sh*_d2shi,-1);
+-126    : hits_si2li:=fdead_hits;
+-127    : hits_si2li:=dead_hits;
+-128    : hits_si2li:=ndead_hits;
+   end;
+end;
+
+function GameGetStatusStrColor(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
 var t:byte;
 begin
-   GameGetStatus:=false;
+   GameGetStatusStrColor:=false;
 
    if(G_status<gs_running)then
    begin
-      GameGetStatus:=true;
+      GameGetStatusStrColor:=true;
       if(pstr<>nil)then pstr^:=str_gsunknown;
       if(pcol<>nil)then pcol^:=c_gray;
 
       if(pstr<>nil)and(pcol<>nil)then
-      case G_status of
+        case G_status of
 0..LastPlayer : begin
                    pstr^:=str_pause;
                    pcol^:=PlayerColorNormal[G_status];
@@ -1699,17 +1720,17 @@ gs_replayend  : begin
                    pstr^:=str_repend;
                    pcol^:=c_white;
                 end;
+gs_replaypause: begin
+                   pstr^:=str_pause;
+                   pcol^:=c_white;
+                end;
 gs_waitserver : begin
                    pstr^:=str_waitsv;
                    if(PlayerLobby<=LastPlayer)
                    then pcol^:=PlayerColorNormal[PlayerLobby]
                    else pcol^:=c_ltgray;
                 end;
-gs_replaypause: begin
-                   pstr^:=str_pause;
-                   pcol^:=c_white;
-                end;
-      else
+        else
          if(gs_win_team0<=G_status)and(G_status<=gs_win_team7)then
            if(POVPlayer<=LastPlayer)then
            begin
@@ -1727,9 +1748,13 @@ gs_replaypause: begin
            end
            else
              if(pstr<>nil)then pstr^:='';
-      end;
+        end;
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GAME CAMERA
 
 procedure GameCameraBounds;
 var x0,y0,x1,y1:integer;
@@ -1761,19 +1786,6 @@ begin
    GameCameraBounds;
 end;
 
-function hits_si2li(sh:shortint;mh:integer;s:single):longint;
-begin
-   case sh of
-127     : hits_si2li:=mh;
-1..126  : hits_si2li:=mm3i(1,trunc(sh*s),mh-1);
-0       : hits_si2li:=0;
--125..-1: hits_si2li:=mm3i(dead_hits+1,sh*_d2shi,-1);
--126    : hits_si2li:=fdead_hits;
--127    : hits_si2li:=dead_hits;
--128    : hits_si2li:=ndead_hits;
-   end;
-end;
-
 procedure GameCameraMoveToLastEvent;
 var log_pi:cardinal;
 begin
@@ -1797,6 +1809,10 @@ begin
    end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//    CLIENT LOG PROCESSIGN
+
 function TrimString(s:shortstring;l:byte):shortstring;
 var n:byte;
 begin
@@ -1814,9 +1830,9 @@ begin
    TrimString:=s;
 end;
 
-function ParseLogMessage(ptlog:PTLogMes;mcolor:PTMWColor):shortstring;
+function LogMessage2StrColor(ptlog:PTLogMes;mcolor:PTMWColor):shortstring;
 begin
-   ParseLogMessage:='';
+   LogMessage2StrColor:='';
    mcolor^:=c_white;
    with ptlog^ do
     case mtype of
@@ -1824,78 +1840,78 @@ begin
                        begin
                           //mtype = sender
                           mcolor^:=PlayerColorNormal[mtype];
-                          ParseLogMessage:=g_players[mtype].name+': '+str;
+                          LogMessage2StrColor:=g_players[mtype].name+': '+str;
                        end;
 lmt_req_ruids,
 lmt_req_common,
 lmt_req_energy,
 lmt_cant_build       : begin
                           case mtype of
-                          lmt_req_ruids : ParseLogMessage:=str_uiWarn_CheckReqs;
-                          lmt_req_common: ParseLogMessage:=str_uiWarn_CantProd;
-                          lmt_req_energy: ParseLogMessage:=str_uiWarn_NeedEnergy;
-                          lmt_cant_build: ParseLogMessage:=str_uiWarn_CantBuild;
+                          lmt_req_ruids : LogMessage2StrColor:=str_uiWarn_CheckReqs;
+                          lmt_req_common: LogMessage2StrColor:=str_uiWarn_CantProd;
+                          lmt_req_energy: LogMessage2StrColor:=str_uiWarn_NeedEnergy;
+                          lmt_cant_build: LogMessage2StrColor:=str_uiWarn_CantBuild;
                           end;
                           if(argx>0)then
                             case argt of
-                          lmt_argt_unit: with g_uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
-                          lmt_argt_upgr: with g_upids[argx] do ParseLogMessage+=' ('+_up_name   +')';
+                          lmt_argt_unit: with g_uids [argx] do LogMessage2StrColor+=' ('+un_txt_name+')';
+                          lmt_argt_upgr: with g_upids[argx] do LogMessage2StrColor+=' ('+_up_name   +')';
                             end;
                        end;
 lmt_player_chat,
 lmt_game_message     ,
-lmt_player_leave     : ParseLogMessage:=str;//if(argx<=MaxPlayers)then ParseLogMessage:=g_players[argx].name+str_msg_PlayerLeave;
+lmt_player_leave     : LogMessage2StrColor:=str;//if(argx<=MaxPlayers)then LogMessage2StrColor:=g_players[argx].name+str_msg_PlayerLeave;
 lmt_game_end         : if(argx<=LastPlayer)and(UIPlayer<=LastPlayer)then
                         if(argx=g_players[UIPlayer].team)
-                        then ParseLogMessage:=str_win
-                        else ParseLogMessage:=str_lose;
-lmt_player_surrender : if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_msg_PlayerSurrender;
-lmt_player_defeated  : if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_msg_PlayerDefeated;
+                        then LogMessage2StrColor:=str_win
+                        else LogMessage2StrColor:=str_lose;
+lmt_player_surrender : if(argx<=LastPlayer)then LogMessage2StrColor:=g_players[argx].name+str_msg_PlayerSurrender;
+lmt_player_defeated  : if(argx<=LastPlayer)then LogMessage2StrColor:=g_players[argx].name+str_msg_PlayerDefeated;
 lmt_upgrade_complete : begin
-                       with g_upids[argx] do ParseLogMessage:=str_uiWarn_UpgradeComplete+' ('+_up_name+')';
+                       with g_upids[argx] do LogMessage2StrColor:=str_uiWarn_UpgradeComplete+' ('+_up_name+')';
                        mcolor^:=c_yellow;
                        end;
 lmt_unit_ready       : begin
                        with g_uids[argx] do
                         case argt of
                          lmt_argt_unit : if(_ukbuilding)
-                                     then ParseLogMessage:=str_uiWarn_BuildingComplete+' ('+un_txt_name+')'
-                                     else ParseLogMessage:=str_uiWarn_UnitComplete    +' ('+un_txt_name+')';
+                                     then LogMessage2StrColor:=str_uiWarn_BuildingComplete+' ('+un_txt_name+')'
+                                     else LogMessage2StrColor:=str_uiWarn_UnitComplete    +' ('+un_txt_name+')';
                         end;
                        mcolor^:=c_green;
                        end;
 lmt_unit_promoted    : begin
-                       with g_uids[argx] do ParseLogMessage:=str_uiWarn_UnitPromoted+' ('+un_txt_name+')';
+                       with g_uids[argx] do LogMessage2StrColor:=str_uiWarn_UnitPromoted+' ('+un_txt_name+')';
                        mcolor^:=c_aqua;
                        end;
 lmt_allies_attacked  : begin
                        with g_uids[argx] do
-                        ParseLogMessage:=str_uiWarn_AlliesAttacked+' ('+un_txt_name+')';
+                        LogMessage2StrColor:=str_uiWarn_AlliesAttacked+' ('+un_txt_name+')';
                        mcolor^:=c_orange;
                        end;
 lmt_unit_attacked    : begin
                        with g_uids[argx] do
                         if(_ukbuilding)
-                        then ParseLogMessage:=str_uiWarn_BaseAttacked+' ('+un_txt_name+')'
-                        else ParseLogMessage:=str_uiWarn_UnitAttacked+' ('+un_txt_name+')';
+                        then LogMessage2StrColor:=str_uiWarn_BaseAttacked+' ('+un_txt_name+')'
+                        else LogMessage2StrColor:=str_uiWarn_UnitAttacked+' ('+un_txt_name+')';
                        mcolor^:=c_red;
                        end;
 lmt_cant_order       : begin
-                       ParseLogMessage:=str_uiWarn_CantExecute;
-                       with g_uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
+                       LogMessage2StrColor:=str_uiWarn_CantExecute;
+                       with g_uids [argx] do LogMessage2StrColor+=' ('+un_txt_name+')';
                        end;
-lmt_MaximumReached   : ParseLogMessage:=str_uiWarn_MaximumReached;
-lmt_NeedMoreProd     : ParseLogMessage:=str_uiWarn_NeedMoreProd;
-lmt_already_adv      : ParseLogMessage:=str_uiWarn_CantRebuild;
-lmt_production_busy  : ParseLogMessage:=str_uiWarn_ProductionBusy;
-lmt_unit_needbuilder : ParseLogMessage:=str_uiWarn_NeedMoreBuilders;
-lmt_unit_limit       : ParseLogMessage:=str_uiWarn_MaxLimitReached;
+lmt_MaximumReached   : LogMessage2StrColor:=str_uiWarn_MaximumReached;
+lmt_NeedMoreProd     : LogMessage2StrColor:=str_uiWarn_NeedMoreProd;
+lmt_already_adv      : LogMessage2StrColor:=str_uiWarn_CantRebuild;
+lmt_production_busy  : LogMessage2StrColor:=str_uiWarn_ProductionBusy;
+lmt_unit_needbuilder : LogMessage2StrColor:=str_uiWarn_NeedMoreBuilders;
+lmt_unit_limit       : LogMessage2StrColor:=str_uiWarn_MaxLimitReached;
 lmt_map_mark         : begin
                        mcolor^:=c_gray;
                        if(argx<=LastPlayer)then
-                         with g_players[argx] do ParseLogMessage:=name+str_uiWarn_MapMark;
+                         with g_players[argx] do LogMessage2StrColor:=name+str_uiWarn_MapMark;
                        end;
-    else               ParseLogMessage:='UNKNOWN MESSAGE TYPE'; mcolor^:=c_purple;
+    else               LogMessage2StrColor:='UNKNOWN MESSAGE TYPE'; mcolor^:=c_purple;
     end;
 end;
 
@@ -1938,7 +1954,7 @@ begin
          mc:=c_white;
          st:=log_l[i].mtype;
          if(st in logtypes)
-         then ts:=ParseLogMessage(@log_l[i],@mc)
+         then ts:=LogMessage2StrColor(@log_l[i],@mc)
          else ts:='';
          sl:=length(ts);
          if(i=0)
@@ -1971,95 +1987,10 @@ begin
    while(ui_log_n<listheight)do AddLine('',0,c_black);
 end;
 
+{$ELSE}
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   Unit Groups
-//
-
-procedure ulist_Clear(pulist:pTUnitList);
-begin
-   with pulist^ do
-   begin
-      ulist_n:= 0;
-      setlength(ulist_luid ,0);
-      setlength(ulist_lunum,0);
-   end;
-end;
-
-procedure ulist_Add(pulist:pTUnitList;pu:PTUnit;check:boolean);
-var u:integer;
-begin
-   with pulist^ do
-   if(ulist_n<ulist_n.MaxValue)then
-   begin
-      if(ulist_n>0)and(check)then
-        for u:=0 to ulist_n-1 do
-          if(ulist_lunum[u]=pu^.unum)then exit;
-
-      ulist_n+=1;
-      setlength(ulist_luid ,ulist_n);
-      setlength(ulist_lunum,ulist_n);
-      ulist_luid [ulist_n-1]:=pu^.uidi;
-      ulist_lunum[ulist_n-1]:=pu^.unum;
-   end;
-end;
-
-procedure ulist_Check(pulist:pTUnitList;playern:byte);
-var
-tulist:TUnitList;
-u     :integer;
-pu    :PTunit;
-begin
-   ulist_Clear(@tulist);
-   with pulist^ do
-     if(ulist_n>0)then
-       for u:=0 to ulist_n-1 do
-         if(IsIntUnitRange(ulist_lunum[u],@pu))then
-           with pu^ do
-             if(uidi=ulist_luid[u])and(hits>0)then
-               if(playeri=playern)or(playern>LastPlayer)then
-                 ulist_Add(@tulist,pu,false);
-   ulist_Clear(pulist);
-   if(tulist.ulist_n>0)then
-     with pulist^ do
-     begin
-        ulist_n:=tulist.ulist_n;
-        setlength(ulist_luid ,ulist_n);
-        setlength(ulist_lunum,ulist_n);
-        for u:=0 to ulist_n-1 do
-        begin
-           ulist_luid [u]:=tulist.ulist_luid [u];
-           ulist_lunum[u]:=tulist.ulist_lunum[u];
-        end;
-     end;
-end;
-
-procedure ulist_AddFromGroup(pulistS,pulistT:pTUnitList;add:boolean);
-var u:integer;
-begin
-   if(not add)then ulist_Clear(pulistT);
-   with pulistS^ do
-     if(ulist_n>0)then
-       for u:=0 to ulist_n-1 do
-         ulist_Add(pulistT,g_punits[ulist_lunum[u]],true);
-end;
-
-procedure ulist_SelectRect(pulist:pTUnitList;add:boolean;playern:byte;x0,y0,x1,y1:integer;auid:byte);
-var u:integer;
-begin
-   if(not add)then ulist_Clear(pulist);
-   if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
-   if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
-   for u:=1 to MaxUnits do
-     with g_units[u] do
-       if(hits>0)and(playeri=playern)then
-         if(auid=255)or(auid=uidi)then
-           with uid^ do
-             if(RectInRect(x0,y0,x1,y1,vx,vy,_r))then
-               ulist_Add(pulist,g_punits[u],add);
-end;
-
-{$ELSE}
+//   DEDICATED SERVER FUNCTIONS
 
 function PlayerGetStatus(p:byte):char;
 begin

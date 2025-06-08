@@ -423,17 +423,17 @@ uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
 uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
 uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
 uinfo_text   : begin
-               draw_line(tar,x0,y0-basefont_wh,text_lt,ta_MU,255,color);
+               draw_text_line(tar,x0,y0-basefont_wh,text_lt,ta_MU,255,color);
                continue;
                end;
         else
         end; }
 
-      { if(length(text_lt )>0)then draw_line(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
-       if(length(text_lt2)>0)then draw_line(tar,x0+1,y0+basefont_w1+4,text_lt2,ta_LU,255,c_white);
-       if(length(text_rt )>0)then draw_line(tar,x1-1,y0+1            ,text_rt ,ta_RU,255,c_white);
-       if(length(text_rd )>0)then draw_line(tar,x1-1,y1-1-basefont_w1,text_rd ,ta_RU,255,c_white);
-       if(length(text_ld )>0)then draw_line(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);   }
+      { if(length(text_lt )>0)then draw_text_line(tar,x0+1,y0+1            ,text_lt ,ta_LU,255,c_white);
+       if(length(text_lt2)>0)then draw_text_line(tar,x0+1,y0+basefont_w1+4,text_lt2,ta_LU,255,c_white);
+       if(length(text_rt )>0)then draw_text_line(tar,x1-1,y0+1            ,text_rt ,ta_RU,255,c_white);
+       if(length(text_rd )>0)then draw_text_line(tar,x1-1,y1-1-basefont_w1,text_rd ,ta_RU,255,c_white);
+       if(length(text_ld )>0)then draw_text_line(tar,x0+1,y1-1-basefont_w1,text_ld ,ta_LU,255,c_white);   }
     end;
 end;
 
@@ -615,7 +615,7 @@ var t,i:integer;
    ddir:single;
   color:TMWColor;
 begin
-   for t:=1 to MaxCPoints do
+   for t:=1 to LastCPoint do
     with g_cpoints[t] do
      if(cpCaptureR>0)then
      begin
@@ -914,7 +914,7 @@ begin
            draw_mwtexture1(x,0,sm_list[i-1],1,1);
            x+=w;
         end;
-      draw_line(0,48,i2s(sm_listn), ta_LU,255, 0);
+      draw_text_line(0,48,i2s(sm_listn), ta_LU,255, 0);
    end;
 end;
 
