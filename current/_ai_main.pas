@@ -382,6 +382,7 @@ uprod_smart: begin
 
 uprod_base : begin
                 ai_UnitProduction:=true;
+                if(ai_UnitProduction(pu,UID_Mastermind,1))then exit;
                 for i:=1 to 3 do
                 case pu^.player^.race of
              r_hell: begin
@@ -561,6 +562,7 @@ r_hell: begin
         MakeUpgr(upgr_hell_spectre   ,1);
         MakeUpgr(upgr_hell_paina     ,1);
         MakeUpgr(upgr_hell_resurrect ,1);
+        MakeUpgr(upgr_hell_phantoms  ,1);
 
         if(ai_maxcount_upgrlvl>0)then
         for i:=1 to ai_maxcount_upgrlvl do

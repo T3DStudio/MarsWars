@@ -1275,14 +1275,20 @@ begin
 end;
 
 function GetCPColor(cp:byte):cardinal;
+function PlayerForCPColor(p:byte):byte;
+begin
+   PlayerForCPColor:=p;
+   if(0<p)and(p<=MaxPlayers)and(UIPlayer>0)then
+     if(_players[UIPlayer].team=_players[p].team)then PlayerForCPColor:=UIPlayer;
+end;
 begin
    GetCPColor:=c_black;
    if(cp<1)or(cp>MaxCPoints)then exit;
    with g_cpoints[cp] do
     if(cpCaptureR>0)then
      if(cpTimer>0)and(r_blink3=0)
-     then GetCPColor:=PlayerGetColor(cpTimerOwnerPlayer)
-     else GetCPColor:=PlayerGetColor(cpOwnerPlayer     );
+     then GetCPColor:=PlayerGetColor(PlayerForCPColor(cpTimerOwnerPlayer))
+     else GetCPColor:=PlayerGetColor(PlayerForCPColor(cpOwnerPlayer     ))
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal;VisPlayer:byte):boolean;

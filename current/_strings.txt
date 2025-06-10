@@ -626,7 +626,7 @@ Hotkey: H
 Categories/Attributes: [unit,mechanical,heavy,ground]
 Max hits: 14000
 Limit used: 10
-Size: 32
+Size: 28
 Base movement speed: 14
 Base vision range: 300
 Build time: 80

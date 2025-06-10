@@ -454,7 +454,7 @@ UID_Mastermind :
 begin
    _mhits     := 14000;
    _renergy   := 1200;
-   _r         := 32;
+   _r         := 28;
    _speed     := 14;
    _srange    := 300;
    _ucl       := 5;
