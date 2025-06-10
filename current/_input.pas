@@ -747,6 +747,15 @@ begin
                            else
                            end;
       SDL_QUITEV         : GameCycle:=false;
+      SDL_VIDEORESIZE    : begin
+                           vid_vw:=_event^.resize.w;m_vrx:=vid_vw;
+                           vid_vh:=_event^.resize.h;m_vrx:=vid_vw;
+
+                           _MakeScreen;
+                           theme_map_ptrt:=255;
+                           MakeTerrain;
+                           vid_menu_redraw:=true;
+                           end;
       SDL_KEYUP          : begin
                               k_chart:=-1;
                               case (_event^.key.keysym.sym) of

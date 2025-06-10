@@ -645,6 +645,7 @@ dm_Siege3              = 12; //   3*[buildings]
 dm_Siege4              = 13; //   4*[buildings]
 dm_Lost                = 14; //                      0.5*[mech]
 dm_BFG                 = 15; //   0.5*[buildings]
+dm_AntiBio2            = 16; //   2*[unit bio]
 
 
 // LIMIT

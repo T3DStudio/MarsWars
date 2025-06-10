@@ -218,7 +218,7 @@ begin
    with player^ do
    if(build_cd<=0)then
    begin
-      if((ai_tech2_cur>0)and ai_advanced_bld)
+      if((ai_tech2_cur>0)and ai_advanced_bld)and(ai_builders_count>1)
       then ai_need_energy:=mm3(600, ai_builders_count*1250,ai_GeneratorsEnergy)
       else
         if(ai_advanced_bld)

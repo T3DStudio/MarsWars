@@ -364,8 +364,11 @@ begin
 
       // armor
       al:=upgr[_upgr_armor];
-      if(_ukbuilding)
-      then al+=upgr[upgr_race_armor_build[_urace]]
+      if(_ukbuilding)then
+      begin
+         if(iscomplete)then
+           al+=upgr[upgr_race_armor_build[_urace]]
+      end
       else
         if(_ukmech)
         then al+=upgr[upgr_race_armor_mech[_urace]]

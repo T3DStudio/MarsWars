@@ -254,13 +254,13 @@ Pentagram of Death
 
 Hotkey: U
 Categories/Attributes: [building,mechanical,heavy,ground]
-Max hits: 12500
+Max hits: 17500
 Base regeneration: 7
 Limit used: 1
 Size: 65
 Base vision range: 130
-Build time: 60
-Energy required: 900
+Build time: 100
+Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
@@ -343,7 +343,7 @@ Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
-Base vision range: 250
+Base vision range: 300
 Build time: 60
 Energy required: 900
 
@@ -366,7 +366,7 @@ Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
-Base vision range: 250
+Base vision range: 300
 Build time: 90
 Energy required: 300
 
@@ -624,9 +624,9 @@ Spider Mastermind
 
 Hotkey: H
 Categories/Attributes: [unit,mechanical,heavy,ground]
-Max hits: 15000
+Max hits: 14000
 Limit used: 10
-Size: 35
+Size: 32
 Base movement speed: 14
 Base vision range: 300
 Build time: 80
@@ -636,7 +636,7 @@ Places in transport: 12
 Requirements: Pentagram of Death
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 104*3, target priority: [light], upgrade: Demon`s Weapons(+7), factor: x2 [light];
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 104*3, target priority: [bio], upgrade: Demon`s Weapons(+7), factor: x2 [biological];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1035,7 +1035,7 @@ Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
-Base vision range: 250
+Base vision range: 300
 Build time: 60
 Energy required: 900
 Zombie: Hell Command Center
@@ -1059,7 +1059,7 @@ Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 1
 Size: 66
-Base vision range: 250
+Base vision range: 300
 Build time: 90
 Energy required: 300
 Zombie: Advanced Hell Command Center

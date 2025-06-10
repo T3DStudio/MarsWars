@@ -213,11 +213,11 @@ end;
 
 UID_HPentagram:
 begin
-   _mhits     := 12500;
-   _renergy   := 900;
+   _mhits     := 17500;
+   _renergy   := 1200;
    _r         := 65;
    _ucl       := 9;
-   _btime     := ptime3;
+   _btime     := ptime5;
    _ukbuilding:= true;
    _baseregen := BaseArmorBonus1;
    _issolid   := false;
@@ -447,14 +447,14 @@ begin
    _weapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1   ,0        ,0,0,0,upgr_hell_mattack ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,wtp_distance ,0,0);
 end;
 {
-ul10 = 10000hp + 620dps
-       15000hp + 310dps
+ul10 = 10000hp + 520dps
+       14000hp + 312dps
 }
 UID_Mastermind :
 begin
-   _mhits     := 15000;
+   _mhits     := 14000;
    _renergy   := 1200;
-   _r         := 35;
+   _r         := 32;
    _speed     := 14;
    _srange    := 300;
    _ucl       := 5;
@@ -464,12 +464,11 @@ begin
    _ruid1     := UID_HPentagram;
    _attack    := atm_always;
    _limituse  := ul10;
-   //_splashresist:=true;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
    _upgr_armor:= upgr_race_armor_bio[r_hell];
    _a_BonusAntiUnitRange:=50;
-   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fpsd6,MID_SChaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Light,2,dm_AntiLight2);
+   _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fpsd6,MID_SChaingun,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Bio,2,dm_AntiBio2);
 end;
 {
 12000  18000  19000
@@ -477,6 +476,11 @@ x12    x6     x5
 
 10000  15000
 x10    x5
+
+20     2000
+200    200
+100    1000
+80     1200
 }
 UID_Cyberdemon :
 begin
@@ -492,7 +496,6 @@ begin
    _ruid1     := UID_HPentagram;
    _attack    := atm_always;
    _limituse  := ul10;
-   //_splashresist:=true;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
    _upgr_armor:= upgr_race_armor_bio[r_hell];
@@ -800,7 +803,7 @@ begin
    _renergy   := 900;
    _speed     := 0;
    _r         := 66;
-   _srange    := 250;
+   _srange    := 300;
    _ucl       := 0;
    _btime     := ptime3;
    _attack    := atm_always;
@@ -1567,7 +1570,7 @@ begin
    SetDMOD(dm_Siege4           ,0,400,wtr_building                              );
    SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );
-
+   SetDMOD(dm_AntiBio2         ,0,200,             wtr_bio                      );
 end;
 
 procedure InitUpgrades;

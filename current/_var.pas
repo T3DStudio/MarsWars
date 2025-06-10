@@ -154,7 +154,7 @@ r_screen,
 r_dterrain,
 r_menusc,
 r_menu            : pSDL_SURFACE;
-r_vflags          : cardinal = SDL_HWSURFACE;   //SDL_SWSURFACE
+r_vflags          : cardinal = SDL_HWSURFACE+SDL_RESIZABLE;   //SDL_SWSURFACE
 r_menusc_x,
 r_menusc_y        : integer;
 r_menusc_s        : single;
@@ -178,7 +178,7 @@ r_draw            : boolean = true;
 
 vid_menu_redraw   : boolean  = true;
 
-MainMenu             : boolean = true;
+MainMenu          : boolean = true;
 menu_item         : integer;
 menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_scir;
