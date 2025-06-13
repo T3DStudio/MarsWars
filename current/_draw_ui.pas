@@ -321,27 +321,36 @@ begin
      if(pu^.uid^._rebuild_uid>0)then
        GetRebuildIco:=_uids[pu^.uid^._rebuild_uid].un_btn.surf;
 end;
-function GetAbilityIco(pu:PTUnit):pSDL_Surface;
+function GetSAbilityIco(pu:PTUnit;notDefault:pboolean):pSDL_Surface;
 begin
-   GetAbilityIco:=spr_b_action;
+   GetSAbilityIco:=spr_b_action;
+   if(notDefault<>nil)then notDefault^:=false;
    if(pu<>nil)then
      with pu^.uid^ do
        if(_ability>0)and(_ability in uab_abilityOrder)then
-         GetAbilityIco:=spr_b_ab[_ability];
+       begin
+          GetSAbilityIco:=spr_b_ab[_ability];
+          if(notDefault<>nil)then notDefault^:=true;
+       end;
 end;
-function GetSAbilityIco(pu:PTUnit):pSDL_Surface;
+function GetSPAbilityIco(pu:PTUnit;notDefault:pboolean):pSDL_Surface;
 begin
-   GetSAbilityIco:=spr_b_paction;
+   GetSPAbilityIco:=spr_b_paction;
+   if(notDefault<>nil)then notDefault^:=false;
    if(pu<>nil)then
      with pu^.uid^ do
        if(_ability>0)and(_ability in uab_pabilityOrder)then
-         GetSAbilityIco:=spr_b_ab[_ability];
+       begin
+          GetSPAbilityIco:=spr_b_ab[_ability];
+          if(notDefault<>nil)then notDefault^:=true;
+       end;
 end;
 
 
 procedure d_Panel(tar:pSDL_Surface;VisPlayer:byte);
 var ucl,ux,uy,uid:integer;
               req:cardinal;
+tbool:boolean;
 PVisPlayer:PTPlayer;
 procedure PlayersButtoms;
 var p:byte;
@@ -491,9 +500,13 @@ begin
         end
         else
         begin
-           _drawBtn(tar,0,0,GetAbilityIco (ui_uibtn_sabilityu),false,unit_canAbility(ui_uibtn_sabilityu,1)>0);
-           _drawBtn(tar,1,0,GetSAbilityIco(ui_uibtn_pabilityu),false,unit_canAbility(ui_uibtn_pabilityu,2)>0);
-           _drawBtn(tar,2,0,GetRebuildIco (ui_uibtn_rebuildu ),false,unit_canRebuild(ui_uibtn_rebuildu   )>0);
+           _drawBtn(tar,0,0,GetSAbilityIco (ui_uibtn_sabilityu,@tbool),false,unit_canAbility(ui_uibtn_sabilityu,1)>0);
+           if(tbool)then _drawBtnt(tar,0,0,'','','','',ir2s(ui_uibtn_sabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
+
+           _drawBtn(tar,1,0,GetSPAbilityIco(ui_uibtn_pabilityu,@tbool),false,unit_canAbility(ui_uibtn_pabilityu,2)>0);
+           if(tbool)then _drawBtnt(tar,1,0,'','','','',ir2s(ui_uibtn_pabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
+
+           _drawBtn(tar,2,0,GetRebuildIco  (ui_uibtn_rebuildu ),false,unit_canRebuild(ui_uibtn_rebuildu   )>0);
 
            _drawBtn(tar,0,1,spr_b_attack ,false   ,ui_uibtn_move<=0   );
            _drawBtn(tar,1,1,spr_b_stop   ,false   ,ui_uibtn_move<=0   );

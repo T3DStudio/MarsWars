@@ -188,6 +188,23 @@ end;
 procedure ui_counters(pu:PTUnit);
 var i:byte;
     t:integer;
+function LowerReload(pu1,pu2:PTUnit):PTUnit;
+begin
+   if(pu1<>nil)and(pu2=nil)then
+   begin
+      LowerReload:=pu1;
+      exit;
+   end;
+   if(pu1=nil)and(pu2<>nil)then
+   begin
+      LowerReload:=pu2;
+      exit;
+   end;
+
+   if(pu1^.rld>pu2^.rld)
+   then LowerReload:=pu2
+   else LowerReload:=pu1;
+end;
 begin
    with pu^ do
    if(playeri=UIPlayer)then
@@ -230,11 +247,11 @@ begin
          if(uo_id=ua_psability)then
            case _ability of
 uab_RebuildInPoint: begin
-                    SpriteListAddEffect(uo_x,uo_y,32000,0,_uid2spr(_rebuild_uid,270,0),128);
+                    SpriteListAddEffect(uo_x,uo_y,0,0,_uid2spr(_rebuild_uid,270,0),128);
                     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
                     end;
 uab_CCFly         : begin
-                    SpriteListAddEffect(uo_x,uo_y+fly_hz,32000,0,_uid2spr(uidi,270,0),128);
+                    SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,_uid2spr(uidi,270,0),128);
                     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[r_blink2_colorb]);
                     end;
            else     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
@@ -251,9 +268,9 @@ uab_CCFly         : begin
          begin
             if(speed>0)then ui_uibtn_move+=1;
             if(unit_canAbility(pu,1)=0)and((uo_id<>ua_psability)or(s_all=1))or(ui_uibtn_sabilityu=nil)
-                                     then ui_uibtn_sabilityu:=pu;
+                                     then ui_uibtn_sabilityu:=LowerReload(pu,ui_uibtn_sabilityu);
             if(unit_canAbility(pu,2)=0)and((uo_id<>ua_psability)or(s_all=1))or(ui_uibtn_pabilityu=nil)
-                                     then ui_uibtn_pabilityu:=pu;
+                                     then ui_uibtn_pabilityu:=LowerReload(pu,ui_uibtn_pabilityu);
             if(unit_canRebuild(pu)=0)then ui_uibtn_rebuildu :=pu;
          end;
       end
