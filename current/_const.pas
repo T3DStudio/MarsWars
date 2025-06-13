@@ -5,7 +5,7 @@ pinteger = ^integer;
 
 const
 
-ver                    : byte = 233;
+ver                    : byte = 234;
 
 degtorad               = pi/180;
 
@@ -190,6 +190,10 @@ lmt_already_adv        = 28;
 lmt_NeedMoreProd       = 29;
 lmt_MaximumReached     = 30;
 lmt_player_surrender   = 31;
+lmt_ability_needS      = 32;
+lmt_ability_needSP     = 33;
+lmt_ability_reload     = 34;
+lmt_ability_cantland   = 35;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -205,6 +209,7 @@ lmts_last_messages     = [0..255];
 
 lmt_argt_unit          = 0;
 lmt_argt_upgr          = 1;
+lmt_argt_abil          = 2;
 
 {
 uia_nonew              = 0;
@@ -281,6 +286,10 @@ ureq_unknown           : cardinal = 1 shl 14; //
 ureq_alreadyAdv        : cardinal = 1 shl 15; //
 ureq_needbuilders      : cardinal = 1 shl 16; // need more builders
 ureq_common            : cardinal = 1 shl 17; // common
+ureq_usespability      : cardinal = 1 shl 18; // need use 'special ability at point' order
+ureq_usesability       : cardinal = 1 shl 19; // need use 'special ability' order
+ureq_reloading         : cardinal = 1 shl 20; // reloading
+ureq_landplace         : cardinal = 1 shl 21; // can't land here
 
 ////////////////////////////////////////////////////////////////////////////////
 //

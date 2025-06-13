@@ -93,15 +93,15 @@ begin
              with log_l[i] do
              begin
                 _wudata_byte  (mtype,rpl);
-                b:=argt and %00000001;
-                if(argx       >0)then b:=b or %00000010;
-                if(length(str)>0)then b:=b or %00000100;
-                if(xi         >0)then b:=b or %00001000;
+                b:=argt and %00000011;
+                if(argx       >0)then b:=b or %00000100;
+                if(length(str)>0)then b:=b or %00001000;
+                if(xi         >0)then b:=b or %00010000;
                 _wudata_byte  (b,rpl);
 
-                if((b and %00000010)>0)then _wudata_byte  (argx ,rpl);
-                if((b and %00000100)>0)then _wudata_string(str  ,rpl);
-                if((b and %00001000)>0)then
+                if((b and %00000100)>0)then _wudata_byte  (argx ,rpl);
+                if((b and %00001000)>0)then _wudata_string(str  ,rpl);
+                if((b and %00010000)>0)then
                 begin
                    _wudata_byte(byte(xi shr 5),rpl);
                    _wudata_byte(byte(yi shr 5),rpl);
@@ -904,10 +904,10 @@ begin
          x   :=255;
          y   :=255;
 
-         argt:=b and %00000001;
-         if((b and %00000010)>0)then argx:=_rudata_byte(rpl,0);
-         if((b and %00000100)>0)then str :=_rudata_string(rpl);
-         if((b and %00001000)>0)then
+         argt:=b and %00000011;
+         if((b and %00000100)>0)then argx:=_rudata_byte(rpl,0);
+         if((b and %00001000)>0)then str :=_rudata_string(rpl);
+         if((b and %00010000)>0)then
          begin
             x:=_rudata_byte(rpl,0);
             y:=_rudata_byte(rpl,0);

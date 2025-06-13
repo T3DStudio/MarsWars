@@ -838,6 +838,7 @@ begin
    str_weapon_targets    := 'targets: ';
    str_weapon_damage     := 'impact';
 
+   str_cant_land         := 'Can`t land or teleport here';
    str_cant_build        := 'Can`t build here';
    str_need_energy       := 'Need more energy';
    str_cant_prod         := 'Can`t production this';
@@ -984,6 +985,7 @@ begin
    str_ability_name[uab_CCFly           ]:='Flight Engines';
    str_ability_name[uab_ToUACDron       ]:='Deconstruct to Drone';
    str_ability_name[uab_Unload          ]:='Unload';
+   str_ability_reloading:='The ability is on cooldown!' ;
 
    _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
    _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -1112,9 +1114,14 @@ begin
    _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
    //_mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability' );
 
+   str_sability := 'Specail ability';
+   str_spability:= 'Specail ability at point';
 
-   _mkHStrACT(0 ,'Specail ability');
-   _mkHStrACT(1 ,'Specail ability at point');
+   str_use_sability :='Use "'+str_sability +'" order!';
+   str_use_spability:='Use "'+str_spability+'" order!';
+
+   _mkHStrACT(0 ,str_sability );
+   _mkHStrACT(1 ,str_spability);
    _mkHStrACT(2 ,'Rebuild/Advance');
    t:='attack enemies';
    _mkHStrACT(3 ,'Move, '  +t);
@@ -1398,6 +1405,7 @@ begin
   str_weapon_targets    := 'цели: ';
   str_weapon_damage     := 'воздействие';
 
+  str_cant_land         := 'Нельзя переместиться или приземлиться здесь';
   str_cant_build        := 'Нельзя строить здесь';
   str_need_energy       := 'Необходимо больше энергии';
   str_cant_prod         := 'Невоможно произвести это';
@@ -1512,6 +1520,7 @@ begin
   str_ability_name[uab_CCFly           ]:='Двигатели для полета';
   str_ability_name[uab_ToUACDron       ]:='Разобрать в Дрона';
   str_ability_name[uab_Unload          ]:='Выгрузить';
+  str_ability_reloading:='Способность перезаряжается!';
 
   _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');
   _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
@@ -1623,11 +1632,15 @@ begin
   _mkHStrUpid(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
   _mkHStrUpid(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
   _mkHStrUpid(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
-  //_mkHStrUpid(upgr_uac_rstrike    ,'Ракетный Залп'                     ,'Заряды для способности Станции Ракетного Залпа' );
 
+  str_sability := 'Специальная способность';
+  str_spability:= 'Специальная способность в точке';
 
-  _mkHStrACT(0 ,'Специальная способность'        );
-  _mkHStrACT(1 ,'Специальная способность в точке');
+  str_use_sability :='Используйте приказ "'+str_sability +'"!';
+  str_use_spability:='Используйте приказ "'+str_spability+'"!';
+
+  _mkHStrACT(0 ,str_sability );
+  _mkHStrACT(1 ,str_spability);
   _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
   _mkHStrACT(3 ,'Двигаться, '       +t);

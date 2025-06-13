@@ -685,7 +685,7 @@ begin
 end;
 
 
-function _collisionr(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean):byte;
+function _collisionr(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;reveal_u:PTUnit=nil):byte;
 var u,dx,dy:integer;
 begin
    _collisionr:=0;
@@ -699,6 +699,13 @@ begin
          if(point_dist_int(x,y,tx,ty)<(tr+_r))then
          begin
             _collisionr:=2;
+            if(reveal_u<>nil)then
+            begin
+               _AddToInt(@vsnt[reveal_u^.player^.team],vistime);
+               _AddToInt(@vsni[reveal_u^.player^.team],vistime);
+               _AddToInt(@reveal_u^.vsnt[player^.team],vistime);
+               _AddToInt(@reveal_u^.vsni[player^.team],vistime);
+            end;
             exit;
          end;
 
@@ -825,7 +832,7 @@ var obstacles:boolean;
 begin
    _unit_ability_HKeepBlink:=false;
    with pu^ do
-    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)then
+    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)and(rld<=0)then
      with uid^ do
      with player^ do
       if(upgr[upgr_hell_HKTeleport]>0)then
@@ -834,7 +841,12 @@ begin
          _push_out(x0,y0,_r,unum,@x0,@y0,ukfly, obstacles );
          x0:=mm3(1,x0,map_mw);
          y0:=mm3(1,y0,map_mw);
-         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles)>0)then exit;
+         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles,pu)>0)then
+         begin
+            PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
+            rld:=fr_fps1*2;
+            exit;
+         end;
 
          upgr[upgr_hell_HKTeleport]-=1;
          buff[ub_CCast]:=fr_fps1;
@@ -853,7 +865,7 @@ var obstacles:boolean;
 begin
    _unit_ability_HTowerBlink:=false;
    with pu^ do
-    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)then
+    if(hits>0)and(iscomplete)and(buff[ub_CCast]<=0)and(rld<=0)then
      with uid^ do
      with player^ do
       if(upgr[upgr_hell_tblink]>0)then
@@ -864,7 +876,12 @@ begin
          x0:=mm3(1,x0,map_mw);
          y0:=mm3(1,y0,map_mw);
          if(point_dist_int(x,y,x0,y0)>srange)then exit;
-         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles )>0)then exit;
+         if(_collisionr(x0,y0,_r,unum,_ukbuilding,ukfly, obstacles,pu )>0)then
+         begin
+            PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
+            rld:=fr_fps1*2;
+            exit;
+         end;
 
          upgr[upgr_hell_tblink]-=1;
          buff[ub_CCast]:=fr_fpsd2;
@@ -1777,10 +1794,11 @@ uab_CCFly         : if(level>0)then
                        speed:=0;
 
                        if(ServerSide)and(zfall<>0)then
-                        if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false,true )>0)then
+                        if(_collisionr(x,y+zfall,_r,unum,_ukbuilding,false,true,pu )>0)then
                         begin
                            level:=1;
                            buff[ub_CCast]:=fr_fps2;
+                           PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
                         end;
                     end;
       end;

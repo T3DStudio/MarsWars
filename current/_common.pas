@@ -220,19 +220,21 @@ begin
    if(cndt>0)then
    begin
       prod_error_cndt:=cndt;
-      prod_error_utp :=utp;
-      prod_error_uid :=uid;
       if(pu<>nil)then
       begin
          prod_error_x:=mm3(1,pu^.x,map_mw);
          prod_error_y:=mm3(1,pu^.y,map_mw);
+         if(utp=lmt_argt_abil)then
+           if(uid=0)or(uid=254)or(uid=255)then uid:=pu^.uid^._ability;
       end
       else
       begin
          prod_error_x:=-1;
          prod_error_y:=-1;
       end;
-      PlayerSetProdError:=(cndt>0);
+      prod_error_utp :=utp;
+      prod_error_uid :=uid;
+      PlayerSetProdError:=true;
    end;
 end;
 procedure PlayerClearProdError(player:PTPlayer);
@@ -414,43 +416,56 @@ begin
    begin
       if(state=ps_comp)then exit;
 
-      if(a_units[uid]<=0)and(uid_e[uid]<=0)then exit;
+      if(uid>0)and(utp=lmt_argt_unit)then
+        if(a_units[uid]<=0)and(uid_e[uid]<=0)then exit;
    end;
 
-   if((condt and ureq_place)>0)
-   then bt:=lmt_cant_build
+   if((condt and ureq_usespability)>0)
+   then bt:=lmt_ability_needSP
    else
-     if((condt and ureq_ruid )>0)
-     or((condt and ureq_rupid)>0)
-     then bt:=lmt_req_ruids
+     if((condt and ureq_usesability)>0)
+     then bt:=lmt_ability_needS
      else
-       if((condt and ureq_max )>0)
-       then bt:=lmt_MaximumReached
+       if((condt and ureq_place)>0)
+       then bt:=lmt_cant_build
        else
-         if((condt and ureq_armylimit )>0)
-         or((condt and ureq_unitlimit )>0)
-         then bt:=lmt_unit_limit
+         if((condt and ureq_landplace)>0)
+         then bt:=lmt_ability_cantland
          else
-           if((condt and ureq_energy)>0)
-           then bt:=lmt_req_energy
+           if((condt and ureq_ruid )>0)
+           or((condt and ureq_rupid)>0)
+           then bt:=lmt_req_ruids
            else
-             if((condt and ureq_smiths  )>0)
-             or((condt and ureq_barracks)>0)
-             then bt:=lmt_NeedMoreProd
+             if((condt and ureq_reloading)>0)
+             then bt:=lmt_ability_reload
              else
-               if((condt and ureq_needbuilders)>0)
-               or((condt and ureq_builders    )>0)
-               then bt:=lmt_unit_needbuilder
+               if((condt and ureq_max )>0)
+               then bt:=lmt_MaximumReached
                else
-                 if((condt and ureq_busy)>0)
-                 then bt:=lmt_production_busy
+                 if((condt and ureq_armylimit )>0)
+                 or((condt and ureq_unitlimit )>0)
+                 then bt:=lmt_unit_limit
                  else
-                   if((condt and ureq_alreadyAdv)>0)
-                   then bt:=lmt_already_adv
+                   if((condt and ureq_energy)>0)
+                   then bt:=lmt_req_energy
                    else
-                     if((condt and ureq_unknown   )>0)
-                     then bt:=lmt_cant_order
-                     else bt:=lmt_req_common;
+                     if((condt and ureq_smiths  )>0)
+                     or((condt and ureq_barracks)>0)
+                     then bt:=lmt_NeedMoreProd
+                     else
+                       if((condt and ureq_needbuilders)>0)
+                       or((condt and ureq_builders    )>0)
+                       then bt:=lmt_unit_needbuilder
+                       else
+                         if((condt and ureq_busy)>0)
+                         then bt:=lmt_production_busy
+                         else
+                           if((condt and ureq_alreadyAdv)>0)
+                           then bt:=lmt_already_adv
+                           else
+                             if((condt and ureq_unknown   )>0)
+                             then bt:=lmt_cant_order
+                             else bt:=lmt_req_common;
 
    PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
 end;
@@ -985,16 +1000,17 @@ begin
       if(not iscomplete)
       or(hits<=0)
       or(_ability=0)
-      or(rld>0)
       then AddUREQ(ureq_unknown)
       else
         with player^ do
         begin
            // basic checks
            case CheckMode of
-           1: if not(_ability in uab_abilityOrder )then AddUREQ(ureq_common );
-           2: if not(_ability in uab_pabilityOrder)then AddUREQ(ureq_unknown);
+           1: if not(_ability in uab_abilityOrder )then AddUREQ(ureq_usespability);
+           2: if not(_ability in uab_pabilityOrder)then AddUREQ(ureq_usesability );
            end;
+
+           if(rld>0)then AddUREQ(ureq_reloading);
 
            if(_ability_no_obstacles)then
             if(pf_IfObstacleZone(pfzone))then unit_canAbility+=ureq_place;
@@ -1445,10 +1461,15 @@ lmt_cant_build       : begin
                             case argt of
                           lmt_argt_unit: with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
                           lmt_argt_upgr: with _upids[argx] do ParseLogMessage+=' ('+_up_name   +')';
+                          lmt_argt_abil: case argx of
+                                         254 : ParseLogMessage+=' ('+str_sability+')';
+                                         255 : ParseLogMessage+=' ('+str_spability+')';
+                                         else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
+                                         end;
                             end;
                        end;
 lmt_player_chat,
-lmt_game_message     ,
+lmt_game_message,
 lmt_player_surrender,
 lmt_player_leave     : ParseLogMessage:=str;//if(argx<=MaxPlayers)then ParseLogMessage:=_players[argx].name+str_plout;
 lmt_game_end         : if(argx<=MaxPlayers)then
@@ -1464,8 +1485,8 @@ lmt_unit_ready       : begin
                        with _uids[argx] do
                         case argt of
                          lmt_argt_unit : if(_ukbuilding)
-                                     then ParseLogMessage:=str_building_complete+' ('+un_txt_name+')'
-                                     else ParseLogMessage:=str_unit_complete    +' ('+un_txt_name+')';
+                                         then ParseLogMessage:=str_building_complete+' ('+un_txt_name+')'
+                                         else ParseLogMessage:=str_unit_complete    +' ('+un_txt_name+')';
                         end;
                        mcolor^:=c_green;
                        end;
@@ -1485,9 +1506,42 @@ lmt_unit_attacked    : begin
                         else ParseLogMessage:=str_unit_attacked+' ('+un_txt_name+')';
                        mcolor^:=c_red;
                        end;
+lmt_ability_cantland : begin
+                       ParseLogMessage:=str_cant_land;
+                        if(argx>0)then
+                          case argt of
+                        lmt_argt_abil: case argx of
+                                       254 : ParseLogMessage+=' ('+str_sability+')';
+                                       255 : ParseLogMessage+=' ('+str_spability+')';
+                                       else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
+                                       end;
+                          end;
+                       end;
+lmt_ability_reload   : begin
+                       ParseLogMessage:=str_ability_reloading;
+                        if(argx>0)then
+                          case argt of
+                        lmt_argt_abil: case argx of
+                                       254 : ParseLogMessage+=' ('+str_sability+')';
+                                       255 : ParseLogMessage+=' ('+str_spability+')';
+                                       else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
+                                       end;
+                          end;
+                       end;
+lmt_ability_needS    : ParseLogMessage:=str_use_sability;
+lmt_ability_needSP   : ParseLogMessage:=str_use_spability;
 lmt_cant_order       : begin
                        ParseLogMessage:=str_cant_execute;
-                       with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
+                       if(argx>0)then
+                         case argt of
+                       lmt_argt_unit: with _uids [argx] do ParseLogMessage+=' ('+un_txt_name+')';
+                       lmt_argt_upgr: with _upids[argx] do ParseLogMessage+=' ('+_up_name   +')';
+                       lmt_argt_abil: case argx of
+                                      254 : ParseLogMessage+=' ('+str_sability+')';
+                                      255 : ParseLogMessage+=' ('+str_spability+')';
+                                      else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
+                                      end;
+                         end;
                        end;
 lmt_MaximumReached   : ParseLogMessage:=str_MaximumReached;
 lmt_NeedMoreProd     : ParseLogMessage:=str_NeedMoreProd;

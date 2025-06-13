@@ -363,7 +363,8 @@ begin
                   end;
                end;
            end;
-co_psability          : if(ui_uibtn_pabilityu=nil)then m_brush:=co_empty;
+co_psability          : if(PlayerSetProdError(HPlayer,lmt_argt_abil,255,unit_CanAbility(ui_uibtn_pabilityu,2),ui_uibtn_pabilityu))then
+                        m_brush:=co_empty;
 co_move   ,co_patrol  ,
 co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
    else
@@ -489,11 +490,13 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
          if(click_type=pct_left)then
          begin
             case u of
-  0 : if(ui_uibtn_sabilityu<>nil)then
+  0 : if(not PlayerSetProdError(HPlayer,lmt_argt_abil,254,unit_CanAbility(ui_uibtn_sabilityu,1),ui_uibtn_sabilityu))then
       _player_s_o(co_sability,0,0,0,ui_uibtn_sabilityu^.uid^._ability  , uo_corder  ,HPlayer);
-  1 : if(ui_uibtn_pabilityu<>nil)then
-      m_brush :=co_psability;
-  2 : if(ui_uibtn_rebuildu<>nil)then
+  1 : begin
+         m_brush :=co_psability;
+         check_mouse_brush(true);
+      end;
+  2 : if(not PlayerSetProdError(HPlayer,lmt_argt_unit,0,unit_CanRebuild(ui_uibtn_rebuildu),ui_uibtn_rebuildu))then
       _player_s_o(co_rebuild ,0,0,0,ui_uibtn_rebuildu^.uid^._rebuild_uid, uo_corder  ,HPlayer);
 
   3 : m_brush :=co_amove;

@@ -733,6 +733,8 @@ spr_cp_gen        : TMWTexture;
 str_ability_name  : array[byte     ] of shortstring;
 str_race          : array[0..r_cnt ] of shortstring;
 str_gmode         : array[0..gm_cnt] of shortstring;
+str_sability,
+str_spability,
 str_need_energy,
 str_cant_build,
 str_cant_prod,
@@ -794,6 +796,10 @@ str_unit_attacked,
 str_base_attacked,
 str_allies_attacked,
 str_cant_execute,
+str_use_sability,
+str_use_spability,
+str_ability_reloading,
+str_cant_land,
 str_maxlimit_reached,
 str_mapMark,
 str_need_more_builders,
