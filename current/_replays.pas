@@ -273,8 +273,8 @@ procedure replay_WriteGameFrame;
 begin
    if((rpls_ticks mod 2)<>0)then exit;
 
-   _vx:=byte(vid_cam_x shr vxyc);
-   _vy:=byte(vid_cam_y shr vxyc);
+   _vx:=byte((vid_cam_x+vid_cam_hw) shr vxyc);
+   _vy:=byte((vid_cam_y+vid_cam_hh) shr vxyc);
 
    gs:=G_Status and %00111111;
    i :=gs;
@@ -487,8 +487,8 @@ begin
 
    if(rpls_plcam)then
    begin
-      vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)) div 2;
-      vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)) div 2;
+      vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)-vid_cam_hw) div 2;
+      vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)-vid_cam_hh) div 2;
       CamBounds;
    end;
 
