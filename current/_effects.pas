@@ -73,8 +73,8 @@ begin
         EID_Teleport      : _setEID(@spr_eff_tel        ,sms_death);
         EID_Gavno         : _setEID(@spr_eff_g          ,sms_death);
         MID_Mine,
-        EID_BExp          : _setEID(@spr_eff_eb         ,sms_death);
         MID_Blizzard,
+        EID_BExp          : _setEID(@spr_eff_eb         ,sms_death);
         EID_BBExp         : _setEID(@spr_eff_ebb        ,sms_death);
         EID_HKeep_H,
         EID_HKeep_S       : _setEID(@spr_HKeep          ,sms_walk );

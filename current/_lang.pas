@@ -298,7 +298,7 @@ begin
   else RebuildStr:='"'+_uids[uid].un_txt_name+'"';
 end;
 begin
-   _MakeDefaultDescription:=basedesc;
+   _MakeDefaultDescription:='';
     with _uids[uid] do
     begin
        if(not for_doc)then
@@ -327,6 +327,7 @@ begin
 
        if(_splashresist)or(_ukmech)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
 
+       _ADDSTR(@_MakeDefaultDescription,basedesc,sep_sdot);;
        if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
     end;
 end;
@@ -995,13 +996,13 @@ begin
    _mkHStrUid(UID_HSymbol3       ,'Unholy Symbol level 3'       ,'');
    _mkHStrUid(UID_HSymbol4       ,'Unholy Symbol level 4'       ,'');
    _mkHStrUid(UID_HPools         ,'Infernal Pools'              ,'');
-   _mkHStrUid(UID_HTeleport      ,'Teleport'                    ,'');
+   _mkHStrUid(UID_HTeleport      ,'Teleport'                    ,'Base teleportation cooldown is '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[limit of teleported unit]');
    _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
    _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
    _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
    _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Basic defensive structure'        );
    _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
-   _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'');
+   _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'The duration of the "'+str_ability_name[uab_HInvulnerability]+'" effect is '+i2s(invuln_time_sec)+' sec., the ability reload time is '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' sec');
    _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
    _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
    _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
@@ -1069,8 +1070,8 @@ begin
    _mkHStrUid(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
    _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
    _mkHStrUid(UID_UComputerStation ,'Computer Station'              ,'');
-   _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map');
-   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'');
+   _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
+   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
    _mkHStrUid(UID_UMine            ,'Mine'                          ,'');
 
    _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
@@ -1112,7 +1113,6 @@ begin
    _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
    _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
    _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
-   //_mkHStrUpid(upgr_uac_rstrike    ,'Rocket Strike Charge'             ,'Charge for Rocket Launcher Station ability' );
 
    str_sability := 'Specail ability';
    str_spability:= 'Specail ability at point';
@@ -1530,13 +1530,13 @@ begin
   _mkHStrUid(UID_HSymbol3        ,'Нечестивый Символ ур.3'     ,'');
   _mkHStrUid(UID_HSymbol4        ,'Нечестивый Символ ур.4'     ,'');
   _mkHStrUid(UID_HPools          ,'Инфернальные Омуты'         ,'');
-  _mkHStrUid(UID_HTeleport       ,'Телепорт'                   ,'');
+  _mkHStrUid(UID_HTeleport       ,'Телепорт'                   ,'Базовая перезарядка телепортации - '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[лимит перемещаемого юнита]');
   _mkHStrUid(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
   _mkHStrUid(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
   _mkHStrUid(UID_HFortress       ,'Замок Проклятых'            ,'');
   _mkHStrUid(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
   _mkHStrUid(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
-  _mkHStrUid(UID_HAltar          ,'Алтарь Боли'                ,'');
+  _mkHStrUid(UID_HAltar          ,'Алтарь Боли'                ,'Длительность эффекта "'+str_ability_name[uab_HInvulnerability]+'" - '+i2s(invuln_time_sec)+' сек., перезарядка способности - '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' сек');
   _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
   _mkHStrUid(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
   _mkHStrUid(UID_HBarracks       ,'Казармы Зомби'              ,''          );
@@ -1589,8 +1589,8 @@ begin
   _mkHStrUid(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
   _mkHStrUid(UID_UTechCenter     ,'Научный Центр'              ,'');
   _mkHStrUid(UID_UComputerStation,'Компьютерная Станция'       ,'');
-  _mkHStrUid(UID_URadar          ,'Радар'                      ,'Разведует карту');
-  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'');
+  _mkHStrUid(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
+  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
   _mkHStrUid(UID_UMine           ,'Мина'                       ,'');
 
   _mkHStrUid(UID_Sergant         ,'Сержант'                ,'');

@@ -47,7 +47,7 @@ MID_Revenant : begin
 MID_Blizzard : begin
                ms_eid_fly   :=MID_Granade;
                ms_eid_fly_st:=1;
-               ms_eid_decal :=EID_db_h0;
+               ms_eid_decal :=EID_db_h1;
                end;
       end;
 

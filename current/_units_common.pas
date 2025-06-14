@@ -353,11 +353,10 @@ begin
 end;
 
 procedure _teleport_CalcReload(tu:PTUnit;limit:integer);
-const seconds_per_limit = 5;
 begin
    // tu - teleporter
    with tu^ do
-    with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(seconds_per_limit-mm3(0,upgr[upgr_hell_teleport],seconds_per_limit));
+    with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3(0,upgr[upgr_hell_teleport],hteleport_rldPerLimit));
 end;
 
 procedure _unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});

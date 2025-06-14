@@ -268,7 +268,7 @@ begin
    _r         := 50;
    _ucl       := 14;
    _limituse  := ul10;
-   _btime     := ptime6;
+   _btime     := haltar_reload_sec;
    _ruid1     := UID_HPentagram;
    _ruid2     := UID_HMonastery;
    _ruid3     := UID_HFortress;
@@ -984,7 +984,7 @@ begin
    _ability   := uab_UACScan;
    _ukbuilding:= true;
    _detector  := true;
-   _upgr_srange     :=upgr_uac_radar_r;
+   _upgr_srange:=upgr_uac_radar_r;
    _upgr_srange_step:=25;
    _ruid1     := UID_UWeaponFactory;
 end;
@@ -994,7 +994,7 @@ begin
    _renergy   := 800;
    _r         := 40;
    _ucl       := 14;
-   _btime     := ptime6;
+   _btime     := mstrike_reload_sec;
    _limituse  := ul10;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UComputerStation;
@@ -1483,7 +1483,7 @@ MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage6;
 MID_Mine           : mid_base_damage :=BaseDamage10;
-MID_Blizzard       : mid_base_damage :=BaseDamage10*2;
+MID_Blizzard       : mid_base_damage :=BaseDamage10*3;
 end;
 
 // splash R
@@ -1571,6 +1571,7 @@ begin
    SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );
    SetDMOD(dm_AntiBio2         ,0,200,             wtr_bio                      );
+   SetDMOD(dm_AntiBio2         ,1, 50,wtr_building                              );
 end;
 
 procedure InitUpgrades;

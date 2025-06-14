@@ -183,7 +183,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Basic defensive structure. Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage.
+Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage. Basic defensive structure.
 
 ---------------------------
 
@@ -204,7 +204,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Special ability: "Teleportation". Immune to splash damage.
+Special ability: "Teleportation". Immune to splash damage. Base teleportation cooldown is 5*[limit of teleported unit].
 
 ---------------------------
 
@@ -225,7 +225,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Passive scouting and detection. Special ability: "Hell Vision". Immune to splash damage.
+Special ability: "Hell Vision". Immune to splash damage. Passive scouting and detection.
 
 ---------------------------
 
@@ -290,7 +290,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Advanced defensive structure. Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage.
+Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage. Advanced defensive structure.
 
 ---------------------------
 
@@ -311,7 +311,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Special ability: "Invulnerability". Immune to splash damage.
+Special ability: "Invulnerability". Immune to splash damage. The duration of the "Invulnerability" effect is 30 sec., the ability reload time is 120 sec.
 
 ---------------------------
 
@@ -355,7 +355,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Corrupted Command Center. Builder. Increase energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Special ability: "Flight Engines". Immune to splash damage.
+Builder. Increase energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Special ability: "Flight Engines". Immune to splash damage. Corrupted Command Center.
 
 ---------------------------
 
@@ -378,7 +378,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Corrupted Advanced Command Center. Builder. Increase energy level(+900). Special ability: "Flight Engines". Immune to splash damage.
+Builder. Increase energy level(+900). Special ability: "Flight Engines". Immune to splash damage. Corrupted Advanced Command Center.
 
 ---------------------------
 
@@ -398,7 +398,7 @@ Upgrades:
 - Stone Walls - armor +17;
 - Building Restoration - hits regeneration +7;
 
-Corrupted Barracks. Unit production. Can be rebuilt into "Zombie Barracks[level+1]"{Req.: "Advanced Hell Command Center"}. Immune to splash damage.
+Unit production. Can be rebuilt into "Zombie Barracks[level+1]"{Req.: "Advanced Hell Command Center"}. Immune to splash damage. Corrupted Barracks.
 
 ---------------------------
 
@@ -636,7 +636,7 @@ Places in transport: 12
 Requirements: Pentagram of Death
 Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 104*3, target priority: [bio], upgrade: Demon`s Weapons(+7), factor: x2 [biological];
+- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 104*3, target priority: [bio], upgrade: Demon`s Weapons(+7), factor: x2 [biological],x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1227,7 +1227,7 @@ Upgrades:
 - Radar Upgrade - vision range +25;
 - Concrete Walls - armor +17;
 
-Reveals map. Special ability: "Scan". Immune to splash damage.
+Special ability: "Scan". Immune to splash damage. Reveals map. Reload time of the ability is 60 sec.
 
 ---------------------------
 
@@ -1239,14 +1239,14 @@ Max hits: 10000
 Limit used: 10
 Size: 40
 Base vision range: 80
-Build time: 120
+Build time: 100
 Energy required: 800
 Requirements: Science Facility,Computer Station
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +17;
 
-Special ability: "Missile Strike". Immune to splash damage.
+Special ability: "Missile Strike". Immune to splash damage. The "Missile Strike" impact is 1560: x4 [building], the ability reload time is 100 sec.
 
 ---------------------------
 
@@ -1289,7 +1289,7 @@ Upgrades:
 - Additional Armoring - armor +17;
 - Concrete Walls - armor +17;
 
-Anti-ground defensive structure. Can be rebuilt into "Anti-air Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage.
+Can be rebuilt into "Anti-air Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage. Anti-ground defensive structure.
 
 ---------------------------
 
@@ -1312,7 +1312,7 @@ Upgrades:
 - Additional Armoring - armor +17;
 - Concrete Walls - armor +17;
 
-Anti-air defensive structure. Can be rebuilt into "Anti-ground Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage.
+Can be rebuilt into "Anti-ground Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage. Anti-air defensive structure.
 
 ---------------------------
 

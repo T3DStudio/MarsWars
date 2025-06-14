@@ -895,7 +895,7 @@ dead_hits              = -ptime1*fr_fps1;
 fdead_hits             = dead_hits+fr_fps3;
 ndead_hits             = dead_hits-1;
 
-fdead_hits_border      = -140;
+fdead_hits_border      = -BaseDamage1*3;
 
 base_1r                = 350;
 base_hr                = base_1r div 2;
@@ -911,13 +911,19 @@ regen_period           = fr_fps1;
 order_period           = fr_fpsd2+1;
 vistime                = fr_fps2;
 
-radar_reload           = fr_fps1*60;
+radar_reload_sec       = 60;
+radar_reload           = fr_fps1*radar_reload_sec;
 radar_vision_time      = radar_reload-(fr_fps1*8);
 
 hell_vision_time       = fr_fps1*8;
 
-mstrike_reload         = fr_fps1*ptime5;
-haltar_reload          = fr_fps1*ptime6;
+hteleport_rldPerLimit  = 5;
+
+mstrike_reload_sec     = ptime5;
+haltar_reload_sec      = ptime6;
+
+mstrike_reload         = fr_fps1*mstrike_reload_sec;
+haltar_reload          = fr_fps1*haltar_reload_sec;
 
 step_build_reload      = fr_fps1*5;
 max_build_reload       = step_build_reload*3;
@@ -928,13 +934,14 @@ mine_r                 = melee_r*3;
 dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
-invuln_time            = fr_fps1*30;
+invuln_time_sec        = 30;
+invuln_time            = fr_fps1*invuln_time_sec;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;
 mine_sr                = rocket_sr*2;
 bfg_sr                 = rocket_sr*4;
-blizzard_sr            = rocket_sr*5;
+blizzard_sr            = rocket_sr;
 
 bld_dec_mr             = 6;
 player_default_ai_level= 7;
