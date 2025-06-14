@@ -1372,7 +1372,7 @@ SvRpLen                = 15;
 //
 
 MFogM                  = 64;
-fog_cw                 = 40;
+fog_cw                 = 48;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_ds                 = fog_cw-fog_cr;

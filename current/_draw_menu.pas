@@ -288,7 +288,7 @@ begin
                     if(i<svld_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+'.'+str_Trim(svld_list[i],16),ta_left,255,mic(true,i=svld_list_sel));
+                       _draw_text(tar,_set_x0,y+6,str_Trim(b2s(i+1)+']'+svld_list[i],16),ta_left,255,mic(true,i=svld_list_sel));
                        if(i=svld_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
@@ -317,7 +317,7 @@ begin
                     if(i<rpls_list_size)then
                     begin
                        y:=_yl(t+1);
-                       _draw_text(tar,_set_x0,y+6,b2s(i+1)+']'+str_Trim(rpls_list[i],16),ta_left,255,mic(true,i=rpls_list_sel));
+                       _draw_text(tar,_set_x0,y+6,str_Trim(b2s(i+1)+']'+rpls_list[i],16),ta_left,255,mic(true,i=rpls_list_sel));
                        if(i=rpls_list_sel)then
                        begin
                           hlineColor(tar,ui_menu_ssr_x0,ui_menu_ssl_x0,y+1,c_gray);
