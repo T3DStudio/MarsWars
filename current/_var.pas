@@ -91,7 +91,6 @@ net_cpoints_t     : TWCPDataTime;
 rpls_file         : file;
 rpls_u            : integer = 0;
 rpls_pnui         : byte = 0;
-rpls_log_n        : word = 0;
 rpls_wudata_t     : TWUDataTime;
 rpls_cpoints_t    : TWCPDataTime;
 
@@ -135,13 +134,17 @@ wtrset_resurect   : cardinal;
 u_royal_cd,
 u_royal_d         : integer;
 
+{$IFDEF DEBUG0}
+_warpten          : boolean = true;
+{$ENDIF}
+
 {$IFDEF _FULLGAME}
 
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 tmpmid            : byte = MID_Imp;
 
-_warpten          : boolean = false;
+
 TestMode          : byte = 0;
 uncappedFPS       : boolean = false;
 
@@ -316,6 +319,7 @@ rpls_ticks        : byte = 0;
 rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
+rpls_log_c        : cardinal = 0;
 
 _cmp_sm           : integer = 0;
 _cmp_sel          : integer = 0;

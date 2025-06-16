@@ -307,8 +307,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
               if((G_Step-tick)<fr_fps3)then exit;
       end;
 
-      if(not local)then
-      log_n+=1;
+      if(ServerSide)then log_n+=1;
 
       log_i+=1;
       if(log_i>MaxPlayerLog)then log_i:=0;
@@ -325,6 +324,8 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
       end;
 
       {$IFDEF _FULLGAME}
+      if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstatus=rpls_write)then rpls_log_c+=1;
+
       if(net_status=ns_client)
       then ThisPlayer:=HPlayer
       else ThisPlayer:=UIPlayer;
@@ -617,17 +618,52 @@ begin
 end;
 
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;
+var t:longint;
 begin
    dx0:=abs(dx1-dx0);
    dy0:=abs(dy1-dy0);
-   if(dx0<dy0)
-   then point_dist_rint:=(123*dy0+51*dx0) shr 7
-   else point_dist_rint:=(123*dx0+51*dy0) shr 7;
+   if(dx0=0)
+   then point_dist_rint:=dy0
+   else
+     if(dy0=0)
+     then point_dist_rint:=dx0
+     else
+     begin
+        if(dx0<dy0)
+        then t:=(123*dy0+51*dx0) shr 7
+        else t:=(123*dx0+51*dy0) shr 7;
+        if(t>point_dist_rint.MaxValue)or(t<0)
+        then point_dist_rint:=point_dist_rint.MaxValue
+        else point_dist_rint:=t;
+     end;
 end;
 
-function point_dist_int(dx0,dy0,dx1,dy1:integer):integer;
+function point_dist_int(dx0,dy0,dx1,dy1:longint):integer;
+var t:longint;
 begin
-   point_dist_int:=round(sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1))));
+   dx0:=abs(dx0-dx1);
+   dy0:=abs(dy0-dy1);
+   if(dx0=0)
+   then point_dist_int:=dy0
+   else
+     if(dy0=0)
+     then point_dist_int:=dx0
+     else
+     begin
+        t:=longint(sqr(dx0))+longint(sqr(dy0));
+        if(t<0)
+        then point_dist_int:=integer.MaxValue
+        else
+          if(t=0)
+          then point_dist_int:=0
+          else
+          begin
+             t:=round(sqrt(t));
+             if(t<point_dist_int.MaxValue)
+             then point_dist_int:=t
+             else point_dist_int:=point_dist_int.MaxValue;
+          end;
+     end;
 end;
 
 function point_dist_real(dx0,dy0,dx1,dy1:integer):single;

@@ -1449,7 +1449,7 @@ begin
       or(uid_e[_uid]>=a_units[_uid])
       then
       else
-        if(uprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        if(uprod_r[i]=1){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
         begin
            _barrack_spawn(pu,uprod_u[i],upgr[upgr_mult_product]);
            _unit_ctraining_p(pu,255,i);
@@ -1474,7 +1474,7 @@ begin
       or(upgr[_uid]>=a_upgrs[_uid])
       then
       else
-        if(pprod_r[i]=1){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        if(pprod_r[i]=1){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
         begin
            upgr[_uid]+=1;
            _unit_cupgrade_p(pu,255,i);

@@ -231,7 +231,7 @@ begin
       rpls_state  :=rpls_write;
       rpls_u      :=MaxPlayerUnits+1;
       rpls_player :=HPlayer;
-      rpls_log_n  :=_players[rpls_player].log_n;
+      rpls_log_c  :=0;
       rpls_plcam  :=false;
       rpls_ticks  :=0;
 
@@ -278,7 +278,7 @@ begin
 
    gs:=G_Status and %00111111;
    i :=gs;
-   if(_players[rpls_player].log_n<>rpls_log_n)then i:=i or %10000000;
+   if(rpls_log_c>0)then i:=i or %10000000;
    if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)then
     if(gs=gs_running)then i:=i or %01000000;
 
@@ -287,7 +287,7 @@ begin
       {$I-}
       BlockWrite(rpls_file,i,sizeof(i));
       {$I+}
-      if((i and %10000000)>0)then _wudata_log(rpls_player,@rpls_log_n,true);
+      if((i and %10000000)>0)then _wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
          rpls_vidx:=_vx;
@@ -469,6 +469,11 @@ begin
       BlockRead(rpls_file,i,SizeOf(i));
       {$I+}
       G_Status:=i and %00111111;
+      {if(G_Status>26)then
+      begin
+         writeln('unknown game status ',G_Status);
+         readln;
+      end; }
 
       if((i and %10000000)>0)then _rudata_log(rpls_player,true);
       if((i and %01000000)>0)then

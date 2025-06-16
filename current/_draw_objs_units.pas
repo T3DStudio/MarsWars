@@ -560,7 +560,7 @@ begin
 
        if(_unit_fogrev(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits) div 4,255),0,0);
+         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits)*4,255),0,0);
     end;
 end;
 

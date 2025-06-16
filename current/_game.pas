@@ -158,10 +158,12 @@ begin
    _cycle_regen     := 0;
 
    Map_premap;
+   {$IFDEF DEBUG0}
+   _warpten:=false;
+   {$ENDIF}
 
    {$IFDEF _FULLGAME}
    uncappedFPS:=false;
-   _warpten:=false;
 
    vid_menu_redraw  := true;
 
@@ -673,11 +675,11 @@ begin
                      log_EnergyCheck:=fr_fps6;
                      PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1,false);
                   end;
-
-              if(prod_error_cndt>0)then
-                GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,false);
-              prod_error_cndt  :=0;
            end;
+
+           if(prod_error_cndt>0)then
+             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,not ServerSide);
+           prod_error_cndt  :=0;
         end;
      end;
 

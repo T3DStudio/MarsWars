@@ -544,7 +544,9 @@ begin
 sdlk_end       : if(ks_ctrl>0)
                  then begin if(g_mode=gm_invasion)then g_inv_wave_n+=1; end
                  else uncappedFPS:=not uncappedFPS;
+{$IFDEF DEBUG0}
 sdlk_home      : _warpten:=not _warpten;
+{$ENDIF}
 sdlk_pageup    : with _players[HPlayer] do if(state=PS_Play      )then state:=PS_Comp       else state:=PS_Play;
 sdlk_pagedown  : with _players[HPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
 sdlk_backspace : rpls_fog:=not rpls_fog;

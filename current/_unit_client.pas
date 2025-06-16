@@ -70,17 +70,29 @@ begin
    if(p<=MaxPlayers)then
     with _players[p] do
     begin
-       if(log_n<clog_n^)then
-        if(log_n=0)
-        then clog_n^:=0
-        else clog_n^:=log_n-1;
+       s:=0;
 
-       if(log_n>clog_n^)then
+       i:=log_i;
+       if(not rpl)then
        begin
-          s:=min3(log_n,log_n-clog_n^,MaxPlayerLog);
-          i:=log_i;
-          clog_n^:=log_n;
+          if(log_n<clog_n^)then
+            if(log_n=0)
+            then clog_n^:=0
+            else clog_n^:=log_n-1;
+          if(log_n>clog_n^)then
+          begin
+             s:=min3(log_n,log_n-clog_n^,MaxPlayerLog);
+             clog_n^:=log_n;
+          end;
+       end
+       else
+       begin
+          s:=min2(clog_n^,MaxPlayerLog);
+          clog_n^:=0;
+       end;
 
+       if(s>0)then
+       begin
           if(s>1)then
            for t:=1 to s-1 do
             if(i=0)
@@ -88,7 +100,7 @@ begin
             else i-=1;
 
           _wudata_byte(byte(s),rpl);
-          for t:=1 to s do
+          while(s>0)do
           begin
              with log_l[i] do
              begin
@@ -111,13 +123,14 @@ begin
              if(i=MaxPlayerLog)
              then i:=0
              else i+=1;
+             s-=1;
           end;
           if(rpl=false)then _wudata_card(clog_n^,rpl);
           _wudata_log:=true;
           exit;
        end;
     end;
-   _wudata_byte(0,rpl);
+    _wudata_byte(0,rpl);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -882,6 +895,19 @@ begin
    else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));{$I+}if(ioresult<>0)then _rudata_card:=def;  end;
 end;
 
+function byte2s(b:byte):shortstring;
+begin
+   byte2s:='00000000';
+   if(b and %00000001)>0 then byte2s[8]:='1';
+   if(b and %00000010)>0 then byte2s[7]:='1';
+   if(b and %00000100)>0 then byte2s[6]:='1';
+   if(b and %00001000)>0 then byte2s[5]:='1';
+   if(b and %00010000)>0 then byte2s[4]:='1';
+   if(b and %00100000)>0 then byte2s[3]:='1';
+   if(b and %01000000)>0 then byte2s[2]:='1';
+   if(b and %10000000)>0 then byte2s[1]:='1';
+end;
+
 procedure  _rudata_log(p:byte;rpl:boolean);
 var s,b,
 mtype,
@@ -893,10 +919,13 @@ begin
    s:=_rudata_byte(rpl,0);
    if(s>0)then
    begin
+      //writeln('----- ',s,': ');
+      //if(s>10)then readln;
       while(s>0)do
       begin
          mtype:=_rudata_byte(rpl,0);
          b    :=_rudata_byte(rpl,0);
+         //writeln(' mtype:',mtype,' b:',byte2s(b));
 
          argt:=0;
          argx:=0;
@@ -905,9 +934,9 @@ begin
          y   :=255;
 
          argt:=b and %00000011;
-         if((b and %00000100)>0)then argx:=_rudata_byte(rpl,0);
-         if((b and %00001000)>0)then str :=_rudata_string(rpl);
-         if((b and %00010000)>0)then
+         if((  b and %00000100)>0)then argx:=_rudata_byte(rpl,0);
+         if((  b and %00001000)>0)then str :=_rudata_string(rpl);
+         if((  b and %00010000)>0)then
          begin
             x:=_rudata_byte(rpl,0);
             y:=_rudata_byte(rpl,0);

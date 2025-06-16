@@ -897,8 +897,10 @@ uab_Teleport      : swtarget:=true;
 
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
+      {$IFNDEF DEBUG1}
       aiu_code(pu);
       if(aicode){and(playeri=HPlayer)}then ai_code(pu);
+      {$ENDIF}
 
       if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
    end;
@@ -1867,7 +1869,7 @@ begin
            hits+=_bstep*upgr[upgr_fast_build];
         end;
 
-        if(hits>=_mhits){$IFDEF _FULLGAME}or(_warpten){$ENDIF}then
+        if(hits>=_mhits){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
         begin
            hits:=_mhits;
            iscomplete :=true;
