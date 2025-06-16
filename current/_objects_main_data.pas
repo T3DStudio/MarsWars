@@ -124,6 +124,7 @@ begin
    _ucl       := 0;
    _btime     := ptime3;
    _ukbuilding:= true;
+   _ukmech    := true;
    _isbuilder := true;
    _baseregen := BaseArmorBonus1;
    ups_builder:= [UID_HKeep..UID_HFortress]-[UID_HSymbol2,UID_HAKeep,UID_HTotem];
@@ -153,6 +154,7 @@ begin
    _btime     := ptime2;
    _barrack_teleport:=true;
    _ukbuilding:= true;
+   _ukmech    := true;
    _isbarrack := true;
    _baseregen := BaseArmorBonus1;
    ups_units  := [UID_Imp..UID_Archvile];
@@ -173,6 +175,8 @@ begin
    _btime     := ptime1;
    _ukbuilding:= true;
    _uklight   := true;
+   _ukmech    := false;
+   _splashresist:=true;
 
    case i of
 UID_HSymbol1: _rebuild_uid:=UID_HSymbol2;
@@ -204,6 +208,7 @@ begin
    _ucl       := 5;
    _btime     := ptime2;
    _ukbuilding:= true;
+   _ukmech    := true;
    _issmith   := true;
    _baseregen := BaseArmorBonus1;
    ups_upgrades := [];
@@ -219,6 +224,7 @@ begin
    _ucl       := 9;
    _btime     := ptime5;
    _ukbuilding:= true;
+   _ukmech    := true;
    _baseregen := BaseArmorBonus1;
    _issolid   := false;
    _ruid1     := UID_HPools;
@@ -231,6 +237,7 @@ begin
    _ucl       := 10;
    _btime     := ptime5;
    _ukbuilding:= true;
+   _ukmech    := true;
    _baseregen := BaseArmorBonus1;
    _ruid1     := UID_HPools;
 end;
@@ -242,6 +249,7 @@ begin
    _ucl       := 11;
    _btime     := ptime5;
    _ukbuilding:= true;
+   _ukmech    := true;
    _baseregen := BaseArmorBonus1;
    _ruid1     := UID_HPools;
 end;
@@ -257,6 +265,7 @@ begin
    _limituse  := ul4;
    _ability   := uab_Teleport;
    _ukbuilding:= true;
+   _ukmech    := true;
    _baseregen := BaseArmorBonus1;
    _issolid   := false;
    _ruid1     := UID_HAKeep;
@@ -274,6 +283,8 @@ begin
    _ruid3     := UID_HFortress;
    _baseregen := BaseArmorBonus1;
    _ukbuilding:= true;
+   _ukmech    := false;
+   _splashresist:=true;
    _ability   := uab_HInvulnerability;
 end;
 
@@ -289,6 +300,7 @@ begin
    _ability   := uab_HTowerBlink;
    _ability_rupgr:=upgr_hell_tblink;
    _ukbuilding:= true;
+   _ukmech    := true;
    _uklight   := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
@@ -309,6 +321,7 @@ begin
    _ability   := uab_HTowerBlink;
    _ability_rupgr :=upgr_hell_tblink;
    _ukbuilding:= true;
+   _ukmech    := true;
    _uklight   := true;
    _upgr_srange     :=upgr_hell_towers;
    _upgr_srange_step:=25;
@@ -328,6 +341,8 @@ begin
    _ukbuilding:= true;
    _issolid   := false;
    _uklight   := true;
+   _ukmech    := false;
+   _splashresist:=true;
    _detector  := true;
    _upgr_srange     :=upgr_hell_heye;
    _upgr_srange_step:=50;
@@ -809,6 +824,7 @@ begin
    _attack    := atm_always;
    _ability   := uab_CCFly;
    _ukbuilding:= true;
+   _ukmech    := true;
    _isbuilder := true;
    _slowturn  := false;
    _upgr_srange_step:= 50;
@@ -868,6 +884,7 @@ begin
    _ucl       := 1;
    _btime     := ptime2;
    _ukbuilding:= true;
+   _ukmech    := true;
    _isbarrack := true;
    _rebuild_uid  := i;
 
@@ -892,6 +909,7 @@ begin
    _ucl       := 4;
    _btime     := ptime2;
    _ukbuilding:= true;
+   _ukmech    := true;
    _isbarrack := true;
    _ruid1     := UID_UWeaponFactory;
    _rebuild_uid  := i;
@@ -912,6 +930,7 @@ begin
    _ucl       := 2;
    _btime     := ptime1;
    _ukbuilding:= true;
+   _ukmech    := true;
    _limituse  := ul2;
    case i of
 UID_UGenerator1: _rebuild_uid:=UID_UGenerator2;
@@ -943,6 +962,7 @@ begin
    _ucl       := 5;
    _btime     := ptime2;
    _ukbuilding:= true;
+   _ukmech    := true;
    _issmith   := true;
 
    ups_upgrades := [];
@@ -959,6 +979,7 @@ begin
    _ucl       := 10;
    _btime     := ptime5;
    _ukbuilding:= true;
+   _ukmech    := true;
    _ruid1     := UID_UWeaponFactory;
 end;
 UID_UComputerStation:
@@ -969,6 +990,7 @@ begin
    _ucl       := 11;
    _btime     := ptime5;
    _ukbuilding:= true;
+   _ukmech    := true;
    _ruid1     := UID_UWeaponFactory;
 end;
 
@@ -983,6 +1005,7 @@ begin
    _limituse  := ul2;
    _ability   := uab_UACScan;
    _ukbuilding:= true;
+   _ukmech    := true;
    _detector  := true;
    _upgr_srange:=upgr_uac_radar_r;
    _upgr_srange_step:=25;
@@ -1000,6 +1023,7 @@ begin
    _ruid2     := UID_UComputerStation;
    _ability   := uab_UACStrike;
    _ukbuilding:= true;
+   _ukmech    := true;
 end;
 
 UID_UGTurret:
@@ -1012,6 +1036,7 @@ begin
    _btime     := ptime1hh;
    _attack    := atm_always;
    _ukbuilding:= true;
+   _ukmech    := true;
    _upgr_armor:= upgr_uac_turarm;
    _uklight   := true;
    _ability      := uab_ToUACDron;
@@ -1032,6 +1057,7 @@ begin
    _btime     := ptime1hh;
    _attack    := atm_always;
    _ukbuilding:= true;
+   _ukmech    := true;
    _uklight   := true;
    _upgr_armor:= upgr_uac_turarm;
    _ability      := uab_ToUACDron;
@@ -1053,6 +1079,7 @@ begin
    _ucl       := 21;
    _attack    := atm_always;
    _ukbuilding:= true;
+   _ukmech    := true;
    _uklight   := true;
    _detector  := true;
    _issolid   := false;
@@ -1404,7 +1431,7 @@ end;
       if(_ukbuilding)then
       begin
          _zombie_hits:=_mhits div 4;
-         _ukmech     :=true;
+         //_ukmech     :=true;
          _srange:=max2(_r+_r,_srange);
       end;
 
@@ -1603,7 +1630,7 @@ begin
    u:=0;
    _setUPGR(r_hell,upgr_hell_t1attack  ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_uarmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
-   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,20,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_hell,upgr_hell_barmor    ,60 ,0,20,5   ,600 ,0,800 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_mattack   ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_regen     ,60 ,0,30,2   ,300 ,0,300 ,0            ,0                   ,false);
    _setUPGR(r_hell,upgr_hell_pains     ,60 ,0,0 ,2   ,300 ,0,300 ,0            ,0                   ,false);
@@ -1628,7 +1655,7 @@ begin
    u:=0;
    _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,35,5   ,600 ,0,800 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_ssgup      ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);

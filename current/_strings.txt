@@ -13,7 +13,7 @@ Energy required: 900
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Builder. Increase energy level(+300). Can be rebuilt into "Great Hell Keep". Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}. Immune to splash damage.
@@ -35,7 +35,7 @@ Energy required: 300
 
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Builder. Increase energy level(+900). Special ability: "Blink"{Req.: "Hell Keep Blink Charge"}. Immune to splash damage.
@@ -56,7 +56,7 @@ Energy required: 300
 
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Unit production. Can be rebuilt into "Demon`s Gate[level+1]"{Req.: "Castle of Damned"}. Immune to splash damage.
@@ -66,7 +66,7 @@ Unit production. Can be rebuilt into "Demon`s Gate[level+1]"{Req.: "Castle of Da
 Unholy Symbol level 1
 
 Hotkey: Y
-Categories/Attributes: [building,mechanical,light,ground]
+Categories/Attributes: [building,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 22
@@ -76,7 +76,7 @@ Energy required: 50
 
 Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Increase energy level(+50). Can be rebuilt into "Unholy Symbol level 2". Immune to splash damage.
@@ -86,7 +86,7 @@ Increase energy level(+50). Can be rebuilt into "Unholy Symbol level 2". Immune 
 Unholy Symbol level 2
 
 Hotkey: Y
-Categories/Attributes: [building,mechanical,light,ground]
+Categories/Attributes: [building,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 22
@@ -96,7 +96,7 @@ Energy required: 0
 
 
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Increase energy level(+100). Can be rebuilt into "Unholy Symbol level 3". Immune to splash damage.
@@ -106,7 +106,7 @@ Increase energy level(+100). Can be rebuilt into "Unholy Symbol level 3". Immune
 Unholy Symbol level 3
 
 Hotkey: Y
-Categories/Attributes: [building,mechanical,light,ground]
+Categories/Attributes: [building,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 22
@@ -116,7 +116,7 @@ Energy required: 0
 
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Increase energy level(+150). Can be rebuilt into "Unholy Symbol level 4". Immune to splash damage.
@@ -126,7 +126,7 @@ Increase energy level(+150). Can be rebuilt into "Unholy Symbol level 4". Immune
 Unholy Symbol level 4
 
 Hotkey: Y
-Categories/Attributes: [building,mechanical,light,ground]
+Categories/Attributes: [building,biological,light,ground]
 Max hits: 1000
 Limit used: 1
 Size: 22
@@ -136,7 +136,7 @@ Energy required: 0
 
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Increase energy level(+200). Immune to splash damage.
@@ -157,7 +157,7 @@ Energy required: 300
 
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level+1]"{Req.: "Castle of Damned"}. Immune to splash damage.
@@ -180,7 +180,7 @@ Arming/Abilities:
 - ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Demonic Spirits - vision range +25;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage. Basic defensive structure.
@@ -201,7 +201,7 @@ Energy required: 400
 Requirements: Great Hell Keep
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Special ability: "Teleportation". Immune to splash damage. Base teleportation cooldown is 5*[limit of teleported unit].
@@ -211,7 +211,7 @@ Special ability: "Teleportation". Immune to splash damage. Base teleportation co
 Evil Eye
 
 Hotkey: J
-Categories/Attributes: [building,mechanical,light,ground,detector]
+Categories/Attributes: [building,biological,light,ground,detector]
 Max hits: 100
 Limit used: 1
 Size: 10
@@ -222,7 +222,7 @@ Energy required: 50
 Constructed by: Hell Keep,Great Hell Keep,Evil Eye,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Evil Eye Upgrade - vision range +50;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Special ability: "Hell Vision". Immune to splash damage. Passive scouting and detection.
@@ -243,7 +243,7 @@ Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Immune to splash damage.
@@ -264,7 +264,7 @@ Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Immune to splash damage.
@@ -287,7 +287,7 @@ Arming/Abilities:
 - ranged attack, max. range: vision range, targets: [alive], impact 312*0.5, splash damage radius: 20, target priority: lowest hits;
 Upgrades:
 - Demonic Spirits - vision range +25;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Teleportation Charge"}. Immune to splash damage. Advanced defensive structure.
@@ -297,7 +297,7 @@ Can be rebuilt into "Guard Tower". Special ability: "Blink"{Req.: "Tower Telepor
 Altar of Pain
 
 Hotkey: L
-Categories/Attributes: [building,mechanical,heavy,ground]
+Categories/Attributes: [building,biological,heavy,ground]
 Max hits: 12500
 Base regeneration: 7
 Limit used: 10
@@ -308,7 +308,7 @@ Energy required: 800
 Requirements: Pentagram of Death,Monastery of Despair,Castle of Damned
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Special ability: "Invulnerability". Immune to splash damage. The duration of the "Invulnerability" effect is 30 sec., the ability reload time is 120 sec.
@@ -329,7 +329,7 @@ Energy required: 1200
 Requirements: Infernal Pools
 Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Immune to splash damage.
@@ -352,7 +352,7 @@ Arming/Abilities:
 - ranged attack, min. range: 66, max. range: vision range, targets: [alive] except [Imp], impact 52*2, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Builder. Increase energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Special ability: "Flight Engines". Immune to splash damage. Corrupted Command Center.
@@ -375,7 +375,7 @@ Arming/Abilities:
 - ranged attack, min. range: 66, max. range: vision range, targets: [alive] except [Imp], impact 52*2, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Builder. Increase energy level(+900). Special ability: "Flight Engines". Immune to splash damage. Corrupted Advanced Command Center.
@@ -395,7 +395,7 @@ Energy required: 300
 
 Constructed by: Hell Command Center,Advanced Hell Command Center
 Upgrades:
-- Stone Walls - armor +17;
+- Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
 Unit production. Can be rebuilt into "Zombie Barracks[level+1]"{Req.: "Advanced Hell Command Center"}. Immune to splash damage. Corrupted Barracks.
@@ -1046,7 +1046,7 @@ Arming/Abilities:
 - ranged attack, min. range: 66, max. range: vision range, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Builder. Increase energy level(+300). Can be rebuilt into "Advanced Command Center". Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}. Immune to splash damage.
 
@@ -1070,7 +1070,7 @@ Arming/Abilities:
 - ranged attack, min. range: 66, max. range: vision range, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Builder. Increase energy level(+900). Special ability: "Flight Engines"{Req.: "Command Center Flight Engines"}. Immune to splash damage.
 
@@ -1091,7 +1091,7 @@ Zombification hits: 2500
 
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Unit production. Can be rebuilt into "Barracks[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
 
@@ -1110,7 +1110,7 @@ Energy required: 300
 Requirements: Weapon Factory
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Unit production. Can be rebuilt into "Vehicle Factory[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
 
@@ -1129,7 +1129,7 @@ Energy required: 100
 
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Increase energy level(+100). Can be rebuilt into "Generator level 2". Immune to splash damage.
 
@@ -1148,7 +1148,7 @@ Energy required: 0
 
 
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Increase energy level(+200). Can be rebuilt into "Generator level 3". Immune to splash damage.
 
@@ -1167,7 +1167,7 @@ Energy required: 0
 
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Increase energy level(+300). Can be rebuilt into "Generator level 4". Immune to splash damage.
 
@@ -1186,7 +1186,7 @@ Energy required: 0
 
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Increase energy level(+400). Immune to splash damage.
 
@@ -1205,7 +1205,7 @@ Energy required: 300
 
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Researches and upgrades facility. Can be rebuilt into "Weapon Factory[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
 
@@ -1225,7 +1225,7 @@ Requirements: Weapon Factory
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Radar Upgrade - vision range +25;
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Special ability: "Scan". Immune to splash damage. Reveals map. Reload time of the ability is 60 sec.
 
@@ -1244,7 +1244,7 @@ Energy required: 800
 Requirements: Science Facility,Computer Station
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Special ability: "Missile Strike". Immune to splash damage. The "Missile Strike" impact is 1560: x4 [building], the ability reload time is 100 sec.
 
@@ -1263,7 +1263,7 @@ Energy required: 1200
 Requirements: Weapon Factory
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Immune to splash damage.
 
@@ -1286,8 +1286,8 @@ Arming/Abilities:
 - ranged attack, max. range: vision range, targets: [alive,ground], impact 52*3, target priority: [unit,bio,light], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Spotlights - vision range +25;
-- Additional Armoring - armor +17;
-- Concrete Walls - armor +17;
+- Additional Armoring - armor +18;
+- Concrete Walls - armor +18;
 
 Can be rebuilt into "Anti-air Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage. Anti-ground defensive structure.
 
@@ -1309,8 +1309,8 @@ Arming/Abilities:
 - ranged attack, max. range: vision range, targets: [alive,flying], impact 52*3, target priority: lowest hits, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Spotlights - vision range +25;
-- Additional Armoring - armor +17;
-- Concrete Walls - armor +17;
+- Additional Armoring - armor +18;
+- Concrete Walls - armor +18;
 
 Can be rebuilt into "Anti-ground Turret". Special ability: "Deconstruct to Drone"{Req.: "Drone Transformation Protocol"}. Immune to splash damage. Anti-air defensive structure.
 
@@ -1329,7 +1329,7 @@ Energy required: 1200
 Requirements: Weapon Factory
 Constructed by: Command Center,Advanced Command Center
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Immune to splash damage.
 
@@ -1350,7 +1350,7 @@ Energy required: 10
 Arming/Abilities: 
 - suicide, targets: [alive,ground], impact 520*1, splash damage radius: 80, target priority: distance;
 Upgrades:
-- Concrete Walls - armor +17;
+- Concrete Walls - armor +18;
 
 Immune to splash damage.
 
@@ -1756,7 +1756,7 @@ Combat Flesh (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 Increase the armor of all Hell units.
 
 
-Stone Walls (Y,600/1300/2000/2700/3400,60/80/100/120/140,x5)
+Stone Walls (Y,600/1400/2200/3000/3800,60/80/100/120/140,x5)
 
 Increase the armor of all Hell buildings.
 
@@ -1861,7 +1861,7 @@ Infantry Combat Armor Upgrade (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 Increase the armor of all Barrack`s units.
 
 
-Concrete Walls (Y,600/1300/2000/2700/3400,60/95/130/165/200,x5)
+Concrete Walls (Y,600/1400/2200/3000/3800,60/95/130/165/200,x5)
 
 Increase the armor of all UAC buildings.
 
