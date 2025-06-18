@@ -3,16 +3,20 @@
 procedure saveload_MenuSelectedInfo;
 var     f : file;
  filename : shortstring;
+ pdstr    : pshortstring;
     i,
     dbyte : byte;
     dcard : cardinal;
  dplayers : TPList;
+ dpslots  : TPlayerSlots;
 begin
    FillChar(dplayers,Sizeof(dplayers),0);
+   FillChar(dpslots ,Sizeof(dpslots ),0);
 
    svld_str_info1:='';
    svld_str_info2:='';
    svld_str_info3:='';
+   svld_str_info4:='';
 
    if(svld_list_sel<0)or(svld_list_sel>=svld_list_size)then exit;
    if(length(svld_list[svld_list_sel])=0)then exit;
@@ -61,28 +65,48 @@ begin
             // PLAYERS info
             BlockRead(f,dbyte   ,sizeof(PlayerClient  ));
 
-            BlockRead(f,dplayers,SizeOf(TPList        ));
-            svld_str_info2+=tc_nl2+tc_nl2
-                            +str_SpaceSize(str_menu_players,PlayerNameLen+3)
-                            +str_SpaceSize(str_menu_race   ,8)
-                                          +str_menu_team+tc_nl2;
+            BlockRead(f,dplayers,SizeOf(dplayers      ));
+            BlockRead(f,dpslots ,SizeOf(dpslots       ));
 
             for i:=0 to LastPlayer do
+            with dplayers[i] do
             begin
-               if(i=dbyte)
-               then svld_str_info3+=chr(i)+'*'+tc_default
-               else svld_str_info3+=chr(i)+'#'+tc_default;
+               if(i<5)
+               then pdstr:=@svld_str_info3
+               else pdstr:=@svld_str_info4;
 
-               if(dplayers[i].player_type=pt_none)
-               then svld_str_info3+=str_SpaceSize(str_pt_none     ,PlayerNameLen+2)
-               else svld_str_info3+=str_SpaceSize(dplayers[i].name,PlayerNameLen+2);
+               pdstr^+=chr(i)+b2s(i+1)+tc_default+pl_n_ch[dbyte=i];
 
-               if(dplayers[i].isobserver)
-               then svld_str_info3+=str_SpaceSize(str_observer                    ,8)+tc_default
-               else svld_str_info3+=str_SpaceSize(str_racel[dplayers[i].slot_race],8)+tc_default;
+               case dpslots[i] of
+               pss_closed    : pdstr^+=str_SpaceSize(str_menu_PlayerSlots[dpslots[i]],PlayerNameLen);
+               pss_observer  : if(player_type=pt_none)
+                               then pdstr^+=str_SpaceSize(''  ,PlayerNameLen)+' '+str_observer
+                               else pdstr^+=str_SpaceSize(name,PlayerNameLen)+' '+str_observer;
+               pss_opened,
+               pss_AI_1..
+               pss_AI_11     : if(isobserver)and(player_type>pt_none)
+                               then pdstr^+=str_SpaceSize(name,PlayerNameLen)+' '+
+                                            str_SpaceSize(str_observer    ,8)+' '+
+                                            b2s(team+1)
+                               else
+                                 if(isdefeated)
+                                 then pdstr^+=str_SpaceSize(name,PlayerNameLen)+' '+
+                                              str_SpaceSize(str_defeated    ,8)+' '+
+                                              b2s(team+1)
+                                 else pdstr^+=str_SpaceSize(name,PlayerNameLen)    +' '+
+                                              str_SpaceSize(str_racel[slot_race],8)+' '+
+                                              b2s(team+1);
 
-               if(not dplayers[i].isobserver)
-               then svld_str_info3+=b2s(dplayers[i].team+1)+tc_nl2;
+               else
+                   svld_str_info1:=str_error_WrongData;
+                   svld_str_info2:='';
+                   svld_str_info3:='';
+                   svld_str_info4:='';
+                   close(f);
+                   exit;
+               end;
+
+               if(i<>4)then pdstr^+=tc_nl2;
             end;
          end;
       end
@@ -174,17 +198,19 @@ begin
    AddItem(@campain_skill    ,SizeOf(campain_skill    ));
    AddItem(@campain_seed     ,SizeOf(campain_seed     ));
    AddItem(@G_Step           ,SizeOf(G_Step           ));
+   AddItem(@map_preset_cur   ,SizeOf(map_preset_cur   ));
+   AddItem(@map_scenario     ,SizeOf(map_scenario     ));
+   AddItem(@map_generators   ,SizeOf(map_generators   ));
    AddItem(@map_seed         ,SizeOf(map_seed         ));
    AddItem(@map_psize        ,SizeOf(map_psize        ));
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
-   AddItem(@map_scenario           ,SizeOf(map_scenario           ));
-   AddItem(@map_generators     ,SizeOf(map_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
    AddItem(@g_ai_slots       ,SizeOf(g_ai_slots       ));
    AddItem(@PlayerClient     ,SizeOf(PlayerClient     ));
+   AddItem(@g_slot_state     ,SizeOf(g_slot_state     ));
    // other
    AddItem(@g_players        ,SizeOf(g_players        ));
    AddItem(@g_units          ,SizeOf(g_units          ));

@@ -21,9 +21,9 @@ begin
    end;
 end;
 
-function net_UpSocket(port:word):boolean;
+function net_setup(port:word):boolean;
 begin
-   net_UpSocket:=false;
+   net_setup:=false;
 
    net_dispose;
 
@@ -43,7 +43,7 @@ begin
       exit;
    end;
 
-   net_UpSocket:=true;
+   net_setup:=true;
 end;
 
 function InitNET:boolean;

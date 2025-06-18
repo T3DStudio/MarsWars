@@ -27,7 +27,7 @@ g_step            : cardinal = 0;
 g_player_astatus  : byte     = 0;
 g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
-g_slot_state      : array[0..LastPlayer] of byte;
+g_slot_state      : TPlayerSlots;
 
 g_royal_r         : integer  = 0;
 g_cpoints         : array[0..LastCPoint] of TCTPoint;
@@ -49,7 +49,7 @@ g_cycle_regen     : integer = 0;
 g_random_i        : word = 0;
 g_random_p        : byte = 0;
 
-map_preset_cur    : byte = 0;  // rename to map_* ?????
+map_preset_cur    : byte = 0;
 map_preset_n      : byte = 0;
 map_presets       : array of TMapPreset;
 
@@ -171,7 +171,7 @@ _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 test_mode         : byte = 0;
 test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
-ui_fog           : boolean = false;
+ui_fog            : boolean = false;
 
 vid_SDLWindow     : pSDL_Window;
 vid_SDLRenderer   : pSDL_Renderer;
@@ -187,6 +187,10 @@ vid_SDLRect       : pSDL_RECT;
 vid_SDLDisplayModeN: integer = 0;
 vid_SDLDisplayModes: array of TSDL_DisplayMode;
 vid_SDLDisplayModeC: TSDL_DisplayMode;
+vid_MinW           : integer = integer.MaxValue;
+vid_MinH           : integer = integer.MaxValue;
+vid_MaxW           : integer = integer.MinValue;
+vid_MaxH           : integer = integer.MinValue;
 
 vid_blink1_colorb,
 vid_blink2_colorb : boolean;
@@ -200,22 +204,25 @@ vid_TileTemplate_crater_tech,
 vid_TileTemplate_crater_nature: pTMWTileSet;
 vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of pTMWTileSet;
 
-vid_vw            : integer = vid_minw;       // window size
-vid_vhw           : integer = vid_minw div 2;
-vid_vh            : integer = vid_minh;
-vid_vhh           : integer = vid_minh div 2;
-vid_cam_w         : integer = vid_minw;       // in-game cam view
-vid_cam_hw        : integer = vid_minw div 2;
-vid_cam_h         : integer = vid_minh;
-vid_cam_hh        : integer = vid_minh div 2;
+vid_vw            : integer = 0;       // in game resolution
+vid_vhw           : integer = 0;
+vid_vh            : integer = 0;
+vid_vhh           : integer = 0;
+vid_cam_w         : integer = 0;       // in-game cam view
+vid_cam_hw        : integer = 0;
+vid_cam_h         : integer = 0;
+vid_cam_hh        : integer = 0;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
+vid_cam_x1        : integer = 0;
+vid_cam_y1        : integer = 0;
+vid_cam_sc        : single = 1;
 vid_mmvx,
 vid_mmvy          : integer;
 vid_vmb_x0        : integer = 6;              // cam scroll by mouse screen edges
 vid_vmb_y0        : integer = 6;
-vid_vmb_x1        : integer = vid_minw-6;
-vid_vmb_y1        : integer = vid_minh-6;
+vid_vmb_x1        : integer = -6;
+vid_vmb_y1        : integer = -6;
 
 vid_Sprites_l     : array[0..vid_MaxScreenSprites-1] of pTVSprite;       // vid base
 vid_Sprites_n     : word = 0;
@@ -226,7 +233,8 @@ vid_blink_timer2  : integer = 0;
 vid_PanelUpdTimer : byte = 0;
 vid_PanelUpdNow   : boolean = false;
 
-vid_CamSpeed      : integer = 25;             // options
+vid_CamSpeedBase  : integer = 25;
+vid_CamSpeedScaled: integer = 25;
 vid_UnitHealthBars: TUIUnitHBarsOption  = low(TUIUnitHBarsOption);
 vid_PlayersColorSchema
                   : TPlayersColorSchema = low(TPlayersColorSchema);
@@ -346,6 +354,7 @@ net_svsearch_sel  : integer = 0;
 svld_str_info1    : shortstring = '';
 svld_str_info2    : shortstring = '';
 svld_str_info3    : shortstring = '';
+svld_str_info4    : shortstring = '';
 svld_str_fname    : shortstring = '';
 svld_items        : array of TSaveLoadItem;
 svld_itemn        : integer = 0;
@@ -366,6 +375,7 @@ rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
 rpls_str_info3    : shortstring = '';
+rpls_str_info4    : shortstring = '';
 rpls_str_infoS    : shortstring = '';
 rpls_head_itemn   : integer = 0;
 rpls_head_items   : array of TSaveLoadItem;
@@ -403,12 +413,6 @@ m_vmove           : boolean = false;
 m_action          : boolean = true;
 m_mmap_move       : boolean = false;
 
-m_Last            : cardinal = 0;
-m_TwiceLeft,
-m_TwiceLast       : boolean;
-mt_Last,
-mt_TwiceLast      : integer;
-
 
 // UID
 
@@ -416,13 +420,18 @@ ui_ControlBar_x   : integer = 0;
 ui_ControlBar_y   : integer = 0;
 ui_ControlBar_w   : integer = 0;
 ui_ControlBar_h   : integer = 0;
+ui_ControlBar_sc  : single = 1;
 ui_MiniMap_x      : integer = 0;
 ui_MiniMap_y      : integer = 0;
+ui_MiniMap_w      : integer = 0;
+ui_MiniMap_sc     : single = 1.5;
 ui_MapView_cw     : integer = 0;
 ui_MapView_ch     : integer = 0;
 
 ui_FogView_grid,
-ui_FogView_pgrid  : array[0..fog_vfwm,0..fog_vfhm] of boolean;
+ui_FogView_pgrid  : array of array of boolean;
+ui_FogView_gridW  : integer = 0;
+ui_FogView_gridH  : integer = 0;
 ui_FogView_cw     : integer = 0;
 ui_FogView_ch     : integer = 0;
 ui_FogView_sx     : integer = 0;
@@ -487,8 +496,8 @@ ui_uiuphx         : integer = 0;
 ui_uiuphy         : integer = 0;
 ui_uiplayery      : integer = 0;
 ui_ingamecl       : byte = 0;
-ui_textx          : integer = 0;  // timer/chat screen X
-ui_texty          : integer = 0;  // timer/chat screen Y
+ui_textLUx        : integer = 0;  // timer/chat screen X
+ui_textLUy        : integer = 0;  // timer/chat screen Y
 ui_hinty1         : integer = 0;  // hints screen Y 1
 ui_hinty2         : integer = 0;  // hints screen Y 2
 ui_hinty3         : integer = 0;  // hints screen Y 3
@@ -729,10 +738,10 @@ tex_temp,
 tex_dummy         : TMWTexture;
 ptex_dummy        : PTMWTexture;
 
+tex_ui_ControlBar : PTMWTexture = nil;
 tex_menu,
 tex_ui_MiniMap0,
 tex_ui_MiniMap1,
-tex_map_gMiniMap,   // minimap: unit & ui layer
 tex_map_mMiniMap,   // minimap: menu
 tex_map_bMiniMap    // minimap: terrain background
                   : PTMWTexture;
@@ -1145,6 +1154,7 @@ str_waitsv,
 str_repend,
 
 str_observer,
+str_defeated,
 
 str_demons,
 str_except,

@@ -1,9 +1,9 @@
 
 
 procedure replay_MenuSelectedInfo;
-const pl_n_ch : array[false..true] of char = ('#','*');
 var    f : file;
    dstr  : shortstring;
+   pdstr : pshortstring;
    i,
    dbyte1,
    dbyte2: byte;
@@ -13,6 +13,7 @@ begin
    rpls_str_info1:='';
    rpls_str_info2:='';
    rpls_str_info3:='';
+   rpls_str_info4:='';
    rpls_str_infoS:='';
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
@@ -49,16 +50,62 @@ begin
 
          BlockRead(f,dbyte1,SizeOf(PlayerClient));
 
-         rpls_str_info3+=tc_nl2+str_menu_players+tc_nl2;
-
          for i:=0 to LastPlayer do
          begin
-            BlockRead(f,dstr,sizeof(dstr));   // name
+            if(i<5)
+            then pdstr:=@rpls_str_info3
+            else pdstr:=@rpls_str_info4;
 
-            rpls_str_info3+=chr(i)+pl_n_ch[i=dbyte1]+tc_default;
-            if(i=dbyte1)then rpls_str_infoS+=pl_n_ch[i=dbyte1]+dstr;
+            BlockRead(f,dbyte2,SizeOf(dbyte2));// slot state
+            pdstr^+=chr(i)+b2s(i+1)+tc_default+pl_n_ch[dbyte1=i];
+            case dbyte2 of
+            pss_closed    : begin
+                               pdstr^+=str_SpaceSize(str_menu_PlayerSlots[dbyte2],PlayerNameLen);
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dstr  ,sizeof(dstr  ));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                            end;
+            pss_observer  : begin
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               if(dbyte2=pt_none)then
+                               begin
+                                  pdstr^+=str_SpaceSize('',PlayerNameLen)+' '+str_observer;
+                                  BlockRead(f,dstr  ,sizeof(dstr  ));
+                               end
+                               else
+                               begin
+                                  BlockRead(f,dstr  ,sizeof(dstr  ));
+                                  pdstr^+=str_SpaceSize(dstr,PlayerNameLen)+' '+str_observer;
+                               end;
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                            end;
+            pss_opened,
+            pss_AI_1..
+            pss_AI_11     : begin
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dstr  ,sizeof(dstr  ));
+                               pdstr^+=str_SpaceSize(dstr,PlayerNameLen);
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               pdstr^+=' '+str_SpaceSize(str_racel[dbyte2],8);
+                               BlockRead(f,dbyte2,SizeOf(dbyte2));
+                               pdstr^+=' '+b2s(dbyte2+1);
+                            end;
+            else
+               rpls_str_info1:=str_error_WrongData;
+               rpls_str_info2:='';
+               rpls_str_info3:='';
+               rpls_str_info4:='';
+               rpls_str_infoS:='';
+               close(f);
+               exit;
+            end;
 
-            if(i<LastPlayer)then rpls_str_info3+=tc_nl2;
+            if(i<>4)then pdstr^+=tc_nl2;
          end;
       end
       else rpls_str_info1:=str_error_WrongVersion;
@@ -86,13 +133,14 @@ begin
 
    AddItem(@g_version        ,SizeOf(g_version        ));
    AddItem(@G_Step           ,SizeOf(G_Step           ));
+   AddItem(@map_preset_cur   ,SizeOf(map_preset_cur   ));
+   AddItem(@map_scenario     ,SizeOf(map_scenario     ));
+   AddItem(@map_generators   ,SizeOf(map_generators   ));
    AddItem(@map_seed         ,SizeOf(map_seed         ));
-   AddItem(@map_psize         ,SizeOf(map_psize         ));
+   AddItem(@map_psize        ,SizeOf(map_psize        ));
    AddItem(@map_type         ,SizeOf(map_type         ));
    AddItem(@map_symmetry     ,SizeOf(map_type         ));
    AddItem(@theme_cur        ,SizeOf(theme_cur        ));
-   AddItem(@map_scenario           ,SizeOf(map_scenario           ));
-   AddItem(@map_generators     ,SizeOf(map_generators     ));
    AddItem(@g_fixed_positions,SizeOf(g_fixed_positions));
    AddItem(@g_deadobservers  ,SizeOf(g_deadobservers  ));
    AddItem(@g_ai_slots       ,SizeOf(g_ai_slots       ));
@@ -100,12 +148,12 @@ begin
 
    with g_players[0] do
    rpls_file_head_size
-                 +=cardinal((sizeof(name       )
-                            +sizeof(player_type)
-                            +sizeof(race       )
-                            +sizeof(slot_race  )
-                            +sizeof(team       )
-                            +g_slot_state[0]    )*MaxPlayer);
+                 +=cardinal(sizeof(g_slot_state[0])
+                           +sizeof(player_type)
+                           +sizeof(name       )
+                           +sizeof(race       )
+                           +sizeof(slot_race  )
+                           +sizeof(team       ))*MaxPlayer;
 end;
 
 function replay_GetProgress:single;
@@ -255,12 +303,12 @@ begin
         with g_players[p] do
         begin
            {$I-}
-           BlockWrite(rpls_file,name           ,sizeof(name           ));
+           BlockWrite(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
            BlockWrite(rpls_file,player_type    ,sizeof(player_type    ));
+           BlockWrite(rpls_file,name           ,sizeof(name           ));
            BlockWrite(rpls_file,race           ,sizeof(race           ));
            BlockWrite(rpls_file,slot_race      ,sizeof(slot_race      ));
            BlockWrite(rpls_file,team           ,sizeof(team           ));
-           BlockWrite(rpls_file,g_slot_state[p],sizeof(g_slot_state[p]));
            {$I+}
         end;
 
@@ -388,32 +436,21 @@ begin
          GameDefaultAll;
 
          {$I-}
-         {BlockRead(rpls_file,G_Step           ,SizeOf(G_Step           ));
-         BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
-         BlockRead(rpls_file,map_psize         ,SizeOf(map_psize         ));
-         BlockRead(rpls_file,map_type         ,SizeOf(map_type         ));
-         BlockRead(rpls_file,map_symmetry     ,SizeOf(map_type         ));
-         BlockRead(rpls_file,theme_cur        ,SizeOf(theme_cur        ));
-         BlockRead(rpls_file,map_scenario           ,SizeOf(map_scenario           ));
-         BlockRead(rpls_file,g_start_base     ,SizeOf(g_start_base     ));
-         BlockRead(rpls_file,map_generators     ,SizeOf(map_generators     ));
-         BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(rpls_file,g_deadobservers  ,SizeOf(g_deadobservers  ));
-         BlockRead(rpls_file,g_ai_slots       ,SizeOf(g_ai_slots       ));
-         BlockRead(rpls_file,rpls_POVPlayer   ,SizeOf(rpls_POVPlayer   ));}
          if(rpls_head_itemn>1)then
           for p:=1 to rpls_head_itemn-1 do
            with rpls_head_items[p] do
             BlockRead(rpls_file,byte(data_p^),data_s);
          {$I+}
+         //
 
-         if(map_psize<MinMapSize)or(map_psize>MaxMapSize)
-         or(map_type      >gms_m_types  )
-         or(map_symmetry  >gms_m_symm   )
-         or(map_scenario        >ms_count    )
-         or(map_generators  >gms_g_maxgens)
-         or(g_ai_slots    >gms_g_maxai  )
-         or(rpls_POVPlayer>LastPlayer   )then
+         if(map_preset_cur>=map_preset_n )
+         or(map_scenario  > ms_count     )
+         or(map_generators> gms_g_maxgens)
+         or(map_psize<MinMapSize)or(map_psize>MaxMapSize)
+         or(map_type      > gms_m_types  )
+         or(map_symmetry  > gms_m_symm   )
+         or(g_ai_slots    > gms_g_maxai  )
+         or(rpls_POVPlayer> LastPlayer   )then
          begin
             replay_Abort;
             G_Started:=false;

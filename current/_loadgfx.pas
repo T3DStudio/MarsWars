@@ -242,7 +242,7 @@ function gfx_MWTextureLoad(fn:shortstring;transparent00:boolean;
 const fextn = 2;
       fexts : array[0..fextn] of shortstring = ('.png','.jpg','.bmp');
 var      i:integer;
-tsdlsurface:pSDL_SUrface;
+tsdlsurface:pSDL_Surface;
 tsdltexture:pSDL_Texture;
 begin
    gfx_MWTextureLoad:=ptex_dummy;
@@ -335,6 +335,86 @@ begin
    end;
 end;
 
+{
+
+function gfx_MakeUIButtonFromSDLSurface(sSource:pSDl_Surface;bw:integer):pSDL_Surface;
+var  tst:pSDL_Surface;
+    coff:single;
+     hwb:integer;
+begin
+   hwb:=bw div 2;
+
+   if(sSource^.w<=bw)or(sSource^.h<=bw)
+   then coff:=1
+   else
+     if(sSource^.w<sSource^.h)
+     then coff:=bw/sSource^.w
+     else coff:=bw/sSource^.h;
+
+   tst:=gfx_SDLSurfaceResize(sSource,round(sSource^.w*coff),round(sSource^.h*coff));
+   SDL_SetColorKey(tst,SDL_SRCCOLORKEY,sSource^.format^.colorkey);
+   gfx_MakeUIButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
+   if(tst^.h>bw)
+   then draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
+   else draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
+   rectangleColor(gfx_MakeUIButtonFromSDLSurface,0,0,gfx_MakeUIButtonFromSDLSurface^.w-1,gfx_MakeUIButtonFromSDLSurface^.h-1,c_black);
+   rectangleColor(gfx_MakeUIButtonFromSDLSurface,1,1,gfx_MakeUIButtonFromSDLSurface^.w-2,gfx_MakeUIButtonFromSDLSurface^.h-2,c_black);
+   SDL_FreeSurface(tst);
+end;
+
+
+
+function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
+var ts:pSDl_Surface;
+   hwb:integer;
+begin
+   hwb:=bw div 2;
+   ts:=gfx_SDLSurfaceLoad(fn,false,true);
+   gfx_LoadUIButton:=gfx_SDLSurfaceCreate(bw-1,bw-1);
+   if(ts^.h>bw)
+   then draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),0                ,ts)
+   else draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
+   gfx_SDLSurfaceFree(ts);
+end;
+ }
+
+function gfx_MWTextureLoadUIButtonFromFile(fn:shortstring;buttonw1:integer):pTMWTexture;
+var
+tmpMWTexture: pTMWTexture;
+buttonwh    : integer;
+begin
+   new(gfx_MWTextureLoadUIButtonFromFile);
+   with gfx_MWTextureLoadUIButtonFromFile^ do
+   begin
+      sdlsurface:=gfx_SDLSurfaceCreate(buttonw1,buttonw1);
+      sdltexture:=nil;
+      w:=buttonw1;h:=w;
+      hw:=w div 2;hh:=hw;
+   end;
+
+   tmpMWTexture:=gfx_MWTextureLoad(fn,true,true,true);
+   with tmpMWTexture^ do
+   begin
+      if(sdlsurface= nil)then sdlsurface:=gfx_SDLSurfaceCreate(buttonw1,buttonw1);
+      if(sdltexture<>nil)then sdl_DestroyTexture(sdltexture);
+
+      buttonwh:=buttonw1 div 2;
+
+      if(sdlsurface^.h>buttonw1)
+      then draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,buttonwh-(sdlsurface^.w div 2),0                             ,sdlsurface)
+      else draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,buttonwh-(sdlsurface^.w div 2),buttonwh-(sdlsurface^.h div 2),sdlsurface);
+      gfx_SDLSurfaceFree(sdlsurface);
+      sdlsurface:=nil;
+   end;
+   gfx_MWTextureFree(tmpMWTexture);
+
+   with gfx_MWTextureLoadUIButtonFromFile^ do
+   begin
+      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
+      SDL_SetTextureBlendMode(sdltexture,SDL_BLENDMODE_NONE );
+   end;
+end;
+
 procedure gfx_FillSurfaceBySurface(sTar,sTile:pSDL_Surface;animStepX,animStepY:integer);
 var tx,ty:integer;
 begin
@@ -360,6 +440,20 @@ end;
 //  Tile Sets
 //
 
+procedure gfx_UpdateSDLTexture(MWTexture:pTMWTexture);
+begin
+   with MWTexture^ do
+   begin
+      if(sdltexture<>nil)then
+      begin
+         SDL_DestroyTexture(sdltexture);
+         sdltexture:=nil;
+      end;
+      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
+      if(sdltexture=nil)then writeLog('gfx_UpdateSDLTexture -> SDL_CreateTextureFromSurface');
+   end;
+end;
+
 procedure gfx_TileSet_Render(baseSurface:pSDL_Surface;tileSetTarget,tileSetTemplate:pTMWTileSet;animStepX,animStepY:integer;maskColor,transColor:TMWColor);
 var
 tw,
@@ -379,13 +473,7 @@ begin
       SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,0,0));
       gfx_FillSurfaceBySurface(sdlSurface,baseSurface,animStepX,animStepY);
       if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,maskColor);
-      if(sdltexture<>nil)then
-      begin
-         SDL_DestroyTexture(sdltexture);
-         sdltexture:=nil;
-      end;
-      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
-      if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget[0] -> SDL_CreateTextureFromSurface');
+      gfx_UpdateSDLTexture(tileSetTarget^[0]);
       w :=tw; h :=w;
       hw:=thw;hh:=hw;
    end;
@@ -418,13 +506,7 @@ begin
          draw_sdlsurface(sdlSurface,0,0,tileSetTemplate^[tileX]^.sdlSurface);
          if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,tw,tw,maskColor);
          SDL_SetColorKey(sdlSurface,1,SDL_SurfaceGetPixel(sdlSurface,thw,thw));
-         if(sdltexture<>nil)then
-         begin
-            SDL_DestroyTexture(sdltexture);
-            sdltexture:=nil;
-         end;
-         sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
-         if(sdltexture=nil)then writeLog('gfx_TileSet_Render -> tileSetTarget['+i2s(tileX)+'] -> SDL_CreateTextureFromSurface');
+         gfx_UpdateSDLTexture(tileSetTarget^[tileX]);
          w :=tw ;h := w;
          hw:=thw;hh:=hw;
       end;
@@ -714,8 +796,8 @@ begin
    or(theme_cur_crater_tes<>theme_last_crater_tes)then
    begin
       if(theme_cur_crater_tes=tes_tech)
-      then gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,0)
-      else gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_nature,animStepX,animStepY,0,0);
+      then gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,cardinal.MaxValue)
+      else gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_nature,animStepX,animStepY,0,cardinal.MaxValue);
       theme_last_crater_tes:=theme_cur_crater_tes;
       //writeln('update 3 theme_tileset_crater');
    end;
@@ -742,14 +824,15 @@ begin
          if(theme_cur_liquid_tes=tes_nature)then
          begin
             if(theme_cur_liquid_tas=tas_magma)
-            then gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,0)
-            else gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,0);
+            then gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,cardinal.MaxValue)
+            else gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,cardinal.MaxValue);
          end
          else
            with theme_tileset_liquid[i]^[0]^ do
            begin
               gfx_FillSurfaceBySurface(sdlSurface,theme_tile_liquid^.sdlsurface,animStepX,animStepY);
               if(maskColor>0)then SDLSurf_boxColor(sdlSurface,0,0,MapCellW,MapCellW,maskColor);
+              gfx_UpdateSDLTexture(theme_tileset_liquid[i]^[0]);
            end;
          if(theme_cur_liquid_tas=tas_liquid)then
          begin
@@ -764,44 +847,6 @@ begin
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-{function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
-var ts:pSDl_Surface;
-   hwb:integer;
-begin
-   hwb:=bw div 2;
-   ts:=gfx_SDLSurfaceLoad(fn,false,true);
-   gfx_LoadUIButton:=gfx_SDLSurfaceCreate(bw-1,bw-1);
-   if(ts^.h>bw)
-   then draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),0                ,ts)
-   else draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
-   gfx_SDLSurfaceFree(ts);
-end;
-
-function gfx_MakeUIButtonFromSDLSurface(sSource:pSDl_Surface;bw:integer):pSDL_Surface;
-var  tst:pSDL_Surface;
-    coff:single;
-     hwb:integer;
-begin
-   hwb:=bw div 2;
-
-   if(sSource^.w<=bw)or(sSource^.h<=bw)
-   then coff:=1
-   else
-     if(sSource^.w<sSource^.h)
-     then coff:=bw/sSource^.w
-     else coff:=bw/sSource^.h;
-
-   tst:=gfx_SDLSurfaceResize(sSource,round(sSource^.w*coff),round(sSource^.h*coff));
-   SDL_SetColorKey(tst,SDL_SRCCOLORKEY,sSource^.format^.colorkey);
-   gfx_MakeUIButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
-   if(tst^.h>bw)
-   then draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
-   else draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
-   rectangleColor(gfx_MakeUIButtonFromSDLSurface,0,0,gfx_MakeUIButtonFromSDLSurface^.w-1,gfx_MakeUIButtonFromSDLSurface^.h-1,c_black);
-   rectangleColor(gfx_MakeUIButtonFromSDLSurface,1,1,gfx_MakeUIButtonFromSDLSurface^.w-2,gfx_MakeUIButtonFromSDLSurface^.h-2,c_black);
-   SDL_FreeSurface(tst);
-end;  }
 
 function gfx_LoadFont(fn:shortstring):PTFont;
 var i:byte;
@@ -967,11 +1012,10 @@ begin
    draw_LoadingScreen(str_loading_gfxd,c_red);
 
    tex_menu        :=gfx_MWTextureMakeRenderTarget(menu_w       ,menu_h       );
-   tex_ui_MiniMap0 :=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: ui back
-   tex_ui_MiniMap1 :=gfx_MWTextureMakeRenderTarget(vid_panel_pwu,vid_panel_pwu); // minimap: ui front
-   tex_map_mMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: menu
-   tex_map_gMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: unit & ui layer
-   tex_map_bMiniMap:=gfx_MWTextureMakeRenderTarget(vid_panel_pwi,vid_panel_pwi); // minimap: terrain background
+   tex_ui_MiniMap0 :=gfx_MWTextureMakeRenderTarget(ui_panel_pwi,ui_panel_pwi); // minimap: ui back
+   tex_ui_MiniMap1 :=gfx_MWTextureMakeRenderTarget(ui_panel_pwu,ui_panel_pwu); // minimap: ui front
+   tex_map_mMiniMap:=gfx_MWTextureMakeRenderTarget(ui_panel_pwi,ui_panel_pwi); // minimap: menu
+   tex_map_bMiniMap:=gfx_MWTextureMakeRenderTarget(ui_panel_pwi,ui_panel_pwi); // minimap: terrain background
 
    // theme tileset templates
 
@@ -1024,7 +1068,6 @@ begin
 
    for x:=0 to 3 do
    spr_tabs[x]   :=gfx_MWTextureLoad('tabs'+b2s(x),true );
-
 
    spr_c_earth   :=gfx_MWTextureLoad('M_EARTH'    ,false);
    spr_c_mars    :=gfx_MWTextureLoad('M_MARS'     ,false);
@@ -1186,14 +1229,14 @@ begin
    InitThemes;
 
    effect_InitCLData;
- { for x:=0 to spr_upgrade_icons do
-    for r:=1 to r_cnt do
-     with spr_b_up[r,x] do
-     begin
-        sdlSurface:= gfx_LoadUIButton(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
-        w   := sdlSurface^.w;h    := w;
-        hw  := w div 2      ;hh   := hw;
-     end; }
+
+   for x:=0 to 255 do
+     with g_uids[x] do
+       un_btn:=gfx_MWTextureMakeRenderTarget(ui_ButtonWi,ui_ButtonWi);
+
+ for x:=0 to spr_upgrade_icons do
+   for r:=1 to r_cnt do
+     spr_b_up[r,x]:=gfx_MWTextureLoadUIButtonFromFile(race_upgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
 end;
 
 {
@@ -1224,48 +1267,86 @@ begin
    end;
 end;}
 
-procedure vid_UpdateCommonVars;
+procedure gfx_ui_UpdateTextures;
 begin
-   vid_vmb_x1   := vid_vw-vid_vmb_x0;
-   vid_vmb_y1   := vid_vh-vid_vmb_y0;
+   gfx_MWTextureFree(tex_ui_ControlBar);
 
-   vid_cam_w    :=vid_vw;
-   vid_cam_h    :=vid_vh;
-   vid_vhw      :=vid_vw div 2;
-   vid_vhh      :=vid_vh div 2;
-   vid_cam_hw   :=vid_vhw;
-   vid_cam_hh   :=vid_vhh;
+   ui_MiniMap_w:=round(ui_panel_pwu*ui_MiniMap_sc);
 
-   ui_textx     := basefont_wh;
-   ui_texty     := basefont_wh;
-  { ui_hinty1    := ui_MapView_y+vid_cam_h-draw_font_h1*10;
-   ui_hinty2    := ui_MapView_y+vid_cam_h-draw_font_h1*8;
-   ui_hinty3    := ui_MapView_y+vid_cam_h-draw_font_h1*5;
-   ui_hinty4    := ui_MapView_y+vid_cam_h-draw_font_h1*2;
-   ui_chaty     := ui_hinty1-basefont_w1h;
-   ui_logy      := ui_chaty-basefont_w1h;
-   ui_oicox     := ui_MapView_x+vid_cam_w-basefont_wh;
-   ui_uiuphx    := ui_MapView_x+(vid_cam_w div 2);
-   ui_uiuphy    := ui_texty+basefont_w3;
-   ui_uiplayery := ui_uiuphy+basefont_w1h;
-   ui_GameLogHeight:=(ui_hinty1-basefont_w5) div basefont_w1h;
+   case vid_PannelPos of
+vpp_left,
+vpp_right  : begin
+                ui_ControlBar_w:=round(ui_panel_pwu*ui_ControlBar_sc);
+                ui_ControlBar_h:=round(ui_panel_ph *ui_ControlBar_sc);
 
-   ui_energx    := ui_uiuphx-150;
-   ui_energy    := ui_texty;
-   ui_armyx     := ui_uiuphx+40;
-   ui_armyy     := ui_texty; }
-   ui_fpsx      := vid_cam_w;//-(basefont_w1*basefont_w1h);
-   ui_fpsy      := ui_texty;
-  { ui_apmx      := ui_fpsx;
-   ui_apmy      := ui_fpsy+draw_font_h2;
+                if(vid_PannelPos=vpp_left)
+                then ui_ControlBar_x:=0
+                else ui_ControlBar_x:=vid_vw-ui_ControlBar_w;
 
-   ui_ingamecl  :=(vid_cam_w-basefont_w1) div basefont_w1;
-   if(r_menu<>nil)then gfx_SDLSurfaceFree(r_menu);
-   r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
-   if(spr_mback<>nil)then vid_MakeMenuBack; }
+                if(vid_PannelPos=vpp_left)
+                then ui_MiniMap_x:=0
+                else ui_MiniMap_x:=vid_vw-ui_MiniMap_w;
 
-   ui_FogView_cw:=(vid_cam_w div fog_CellW)+1;
-   ui_FogView_ch:=(vid_cam_h div fog_CellW)+1;
+                if(vid_MiniMapPos)then   // top
+                begin
+                   ui_MiniMap_y   :=0;
+                   ui_ControlBar_y:=ui_MiniMap_w;
+                end
+                else
+                begin
+                   ui_MiniMap_y   :=vid_vh-ui_MiniMap_w;
+                   ui_ControlBar_y:=ui_MiniMap_y-ui_ControlBar_h;
+                end;
+
+                tex_ui_ControlBar:=gfx_MWTextureMakeRenderTarget(ui_panel_pwu,ui_panel_ph);
+             end;
+vpp_top,
+vpp_bottom : begin
+                ui_ControlBar_w:=round(ui_panel_ph *ui_ControlBar_sc);
+                ui_ControlBar_h:=round(ui_panel_pwu*ui_ControlBar_sc);
+
+                if(vid_PannelPos=vpp_top)
+                then ui_ControlBar_y:=0
+                else ui_ControlBar_y:=vid_vh-ui_ControlBar_h;
+
+                if(vid_PannelPos=vpp_top)
+                then ui_MiniMap_y:=0
+                else ui_MiniMap_y:=vid_vh-ui_MiniMap_w;
+
+                if(vid_MiniMapPos)then //left
+                begin
+                   ui_ControlBar_x:=ui_MiniMap_w;
+                   ui_MiniMap_x   :=0;
+                end
+                else
+                begin
+                   ui_MiniMap_x   :=vid_vw-ui_MiniMap_w;
+                   ui_ControlBar_x:=ui_MiniMap_x-ui_ControlBar_w;
+                end;
+
+                tex_ui_ControlBar:=gfx_MWTextureMakeRenderTarget(ui_panel_ph,ui_panel_pwu);
+             end;
+   end;
+end;
+
+procedure vid_UpdateFogGridSize;
+begin
+   ui_FogView_gridW:=(round(vid_maxw/vid_cam_minsc) div fog_CellW)+2;
+   ui_FogView_gridH:=(round(vid_maxh/vid_cam_minsc) div fog_CellW)+2;
+   setlength(ui_FogView_grid ,ui_FogView_gridW,ui_FogView_gridH);
+   setlength(ui_FogView_pgrid,ui_FogView_gridW,ui_FogView_gridH);
+end;
+
+procedure vid_UpdateCamVars;
+begin
+   vid_cam_w    :=round(vid_vw/vid_cam_sc);
+   vid_cam_h    :=round(vid_vh/vid_cam_sc);
+
+   vid_cam_hw   :=vid_cam_w div 2;
+   vid_cam_hh   :=vid_cam_h div 2;
+
+   ui_FogView_cw:=min2i((vid_cam_w div fog_CellW)+2,ui_FogView_gridW-1);
+   ui_FogView_ch:=min2i((vid_cam_h div fog_CellW)+2,ui_FogView_gridH-1);
 
    ui_MapView_cw:=(vid_cam_w div MapCellW)+1;
    ui_MapView_ch:=(vid_cam_h div MapCellW)+1;
@@ -1275,64 +1356,85 @@ begin
    GameCameraBounds;
 end;
 
-procedure vid_ScreenSurfaces;
+procedure vid_UpdateCommonVars;
+var
+ui_textLDy: integer;
 begin
-   //gfx_SDLSurfaceFree(r_ui_Panel);
+   vid_vhw      := vid_vw div 2;
+   vid_vhh      := vid_vh div 2;
+
+   gfx_ui_UpdateTextures;
+
+   vid_vmb_x1   := vid_vw-vid_vmb_x0;
+   vid_vmb_y1   := vid_vh-vid_vmb_y0;
+
+   vid_UpdateCamVars;
+
+   case vid_PannelPos of
+vpp_right,
+vpp_bottom,
+vpp_top    : ui_textLUx:=basefont_wh;
+vpp_left   : ui_textLUx:=ui_ControlBar_x+basefont_wh;
+   end;
+   case vid_PannelPos of
+vpp_left,
+vpp_right,
+vpp_bottom : ui_textLUy:=basefont_wh;
+vpp_top    : ui_textLUy:=ui_ControlBar_y+basefont_wh;
+   end;
+   case vid_PannelPos of
+vpp_left,
+vpp_right,
+vpp_top    : ui_textLDy:=vid_vh-basefont_wh;
+vpp_bottom : ui_textLDy:=ui_ControlBar_y-basefont_wh;
+   end;
 
    case vid_PannelPos of
 vpp_left,
-vpp_right  : begin
-                ui_ControlBar_w:=vid_panel_pwu;
-                ui_ControlBar_h:=vid_panel_ph;
-
-                if(vid_PannelPos=vpp_left)
-                then ui_ControlBar_x:=0
-                else ui_ControlBar_x:=vid_cam_w-vid_panel_pwu;
-                     ui_MiniMap_x   :=ui_ControlBar_x;
-
-                if(vid_MiniMapPos)then   // top
-                begin
-                   ui_ControlBar_y:=vid_panel_pw;
-                   ui_MiniMap_y   :=0;
-                end
-                else
-                begin
-                   ui_MiniMap_y   :=vid_vh-vid_panel_pwu;
-                   ui_ControlBar_y:=ui_MiniMap_y-vid_panel_phi;
-                end;
-             end;
-vpp_top,
-vpp_bottom : begin
-                ui_ControlBar_w:=vid_panel_ph;
-                ui_ControlBar_h:=vid_panel_pwu;
-
-                if(vid_PannelPos=vpp_top)
-                then ui_ControlBar_y:=0
-                else ui_ControlBar_y:=vid_cam_h-vid_panel_pwu;
-                     ui_MiniMap_y   :=ui_ControlBar_y;
-
-                if(vid_MiniMapPos)then //left
-                begin
-                   ui_ControlBar_x:=vid_panel_pw;
-                   ui_MiniMap_x   :=0;
-                end
-                else
-                begin
-                   ui_MiniMap_x   :=vid_vw-vid_panel_pwu;
-                   ui_ControlBar_x:=ui_MiniMap_x-vid_panel_phi;
-                end;
-             end;
+vpp_bottom ,
+vpp_top    : ui_fpsx:=vid_vw-basefont_wh;
+vpp_right  : if(vid_MiniMapPos)
+             then ui_fpsx:=ui_MiniMap_x   -basefont_wh
+             else ui_fpsx:=ui_ControlBar_x-basefont_wh;
+   end;
+   case vid_PannelPos of
+vpp_left,
+vpp_bottom ,
+vpp_right  : ui_fpsy:=basefont_wh;
+vpp_top    : if(vid_MiniMapPos)
+             then ui_fpsy:=ui_ControlBar_y+basefont_wh
+             else ui_fpsy:=ui_MiniMap_y   +basefont_wh+ui_MiniMap_w;
    end;
 
-   //r_ui_Panel:=gfx_SDLSurfaceCreate(ui_ControlBar_w,ui_ControlBar_h);
 
-   vid_UpdateCommonVars;
+  { ui_hinty1    := ui_MapView_y+vid_cam_h-basefont_w1h*10;
+   ui_hinty2    := ui_MapView_y+vid_cam_h-basefont_w1h*8;
+   ui_hinty3    := ui_MapView_y+vid_cam_h-basefont_w1h*5;
+   ui_hinty4    := ui_MapView_y+vid_cam_h-basefont_w1h*2;
+   ui_chaty     := ui_hinty1-basefont_w1h;
+   ui_logy      := ui_chaty-basefont_w1h;
+   ui_oicox     := ui_MapView_x+vid_cam_w-basefont_wh;
+   ui_uiuphx    := ui_MapView_x+(vid_cam_w div 2);
+   ui_uiuphy    := ui_textLUy+basefont_w3;
+   ui_uiplayery := ui_uiuphy+basefont_w1h;
+   ui_GameLogHeight:=(ui_hinty1-basefont_w5) div basefont_w1h;
+
+   ui_energx    := ui_uiuphx-150;
+   ui_energy    := ui_textLUy;
+   ui_armyx     := ui_uiuphx+40;
+   ui_armyy     := ui_textLUy; }
+  // ui_fpsx      := vid_cam_w;//-(basefont_w1*basefont_w1h);
+   //ui_fpsy      := ui_textLUy;
+  { ui_apmx      := ui_fpsx;
+   ui_apmy      := ui_fpsy+draw_font_h2;
+
+   ui_ingamecl  :=(vid_cam_w-basefont_w1) div basefont_w1;
+   if(r_menu<>nil)then gfx_SDLSurfaceFree(r_menu);
+   r_menu:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
+   if(spr_mback<>nil)then vid_MakeMenuBack; }
+
+
 end;
 
-procedure vid_MakeScreen;
-begin
-
-   vid_ScreenSurfaces;
-end;
 
 

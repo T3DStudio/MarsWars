@@ -55,6 +55,8 @@ begin
    if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
 
    SetThemeTES;
+
+   writeln('theme_cur_decal_n ',theme_cur_decal_n);
 end;
 
 procedure map_VisGridMake;
@@ -62,6 +64,7 @@ var
  x, y,
 mx,my,
 o,i  :integer;
+decal_i:byte;
 ddir :single;
 function GetTile(cx,cy:integer;val:byte;crater:boolean):boolean;
 begin
@@ -89,6 +92,7 @@ begin
          tgca_decorTime :=DoodadAnimationTime(tgca_decorA^.tda_atime);
          tgca_decorX    :=mx+ax;
          tgca_decorY    :=my+ay;
+         tgca_decorF    :=random(2)=0;
       end;
    end;
 end;
@@ -103,6 +107,7 @@ begin
          tgca_decalS:=theme_all_decal_l[N];
          tgca_decalX:=random(max2i(0,MapCellW-tgca_decalS^.w));
          tgca_decalY:=random(max2i(0,MapCellW-tgca_decalS^.h));
+         tgca_decalF:=random(2)=0;
       end;
    end;
 end;
@@ -111,13 +116,13 @@ begin
    with map_grid_graph[x,y] do
    if(tgca_decor_n>=0)and(theme_cur_decal_n>0)then
    begin
-      i:=abs((x+1)*(y+1)+tgca_decal_n) mod 10;
+      decal_i+=1;
+      i:=random_table[decal_i] mod 7;
       if(i=0)then
-        //while(i>=0)do
-        //begin
-           SetDecal(theme_cur_decal_l[abs((x+1)*(y+1)+i) mod theme_cur_decal_n]);
-           //i-=1;
-        //end;
+      begin
+         decal_i+=1;
+         SetDecal(theme_cur_decal_l[(random_table[decal_i]+x+y*2) mod theme_cur_decal_n]);
+      end;
    end;
 end;
 function CheckDecorCell(cx,cy:integer):boolean;
@@ -144,6 +149,8 @@ begin
       setlength(tgca_decal_l,tgca_decal_n);
    end;
    FillChar(map_grid_graph,SizeOf(map_grid_graph),0);
+
+   decal_i:=0;
 
    for y:=0 to MaxMapSizeCelln-1 do
    for x:=0 to MaxMapSizeCelln-1 do
@@ -1292,10 +1299,16 @@ end;
 procedure map_PlayerStartsScirmish;
 var i:byte;
 begin
-   for i:=0 to map_MaxPlayers-1 do
+   for i:=0 to LastPlayer do
+   if(i<map_MaxPlayers)then
    begin
       map_PlayerStartX[i]:=NOTSET;
       map_PlayerStartY[i]:=NOTSET;
+   end
+   else
+   begin
+      map_PlayerStartX[i]:=map_phsize;
+      map_PlayerStartY[i]:=map_phsize;
    end;
 
    case map_scenario of
@@ -1560,7 +1573,7 @@ mapt_clake : map_FreeCenterR := map_psize div 3;
    map_CPoints;
    map_MakeScirmishGrid;
    {$IFDEF _FULLGAME}
-   map_mm_cx   := vid_panel_pwi/map_psize;
+   map_mm_cx   := ui_panel_pwi/map_psize;
    map_mm_CamW := trunc(vid_cam_w*map_mm_cx)+1;
    map_mm_CamH := trunc(vid_cam_h*map_mm_cx)+1;
    map_mm_gridW:= MapCellW*map_mm_cx;
@@ -1568,6 +1581,8 @@ mapt_clake : map_FreeCenterR := map_psize div 3;
    map_ThemeFromSeed;
    map_MinimapBackground;
    map_RedrawMenuMinimap;
+
+   //gfx_MakeThemeTiles;
    {$ENDIF}
 end;
 
@@ -1606,27 +1621,23 @@ nmid_loby_mapScenario  : if(map_preset_cur=0)then
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_scenario:=NewVal;
-                            map_Make1Scirmish;
                          end;
 nmid_loby_mapGenerators: begin
                             if(NewVal>gms_g_maxgens)then exit;
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_generators:=NewVal;
-                            map_Make1Scirmish;
                          end;
 nmid_loby_mapSeed      : begin
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_seed:=newVal;
-                            map_Make1Scirmish;
                          end;
 nmid_loby_mapSize      : begin
                             if(newVal<MinMapSize)or(MaxMapSize<newVal)then exit;
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_psize:=integer(newVal);
-                            map_Make1Scirmish;
                          end;
 nmid_loby_mapType      : begin
                             newVal:=byte(newVal);
@@ -1634,7 +1645,6 @@ nmid_loby_mapType      : begin
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_type:=newVal;
-                            map_Make1Scirmish;
                          end;
 nmid_loby_mapSymmetry  : begin
                             newVal:=byte(newVal);
@@ -1642,9 +1652,10 @@ nmid_loby_mapSymmetry  : begin
                             map_SetSetting:=true;
                             if(Check)then exit;
                             map_symmetry:=newVal;
-                            map_Make1Scirmish;
                          end;
+   else exit;
    end;
+   map_Make1Scirmish;
 end;
 
 

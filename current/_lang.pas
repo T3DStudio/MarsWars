@@ -861,10 +861,11 @@ begin
    str_map_Proc3Domains              := 'MAP CALCULATION 3: PATH DOMAINS';
    str_map_Proc4VisGrid              := 'MAP CALCULATION 4: VISUAL GRID';
 
-   str_racel[r_random]               := tc_default+'RANDOM';
-   str_racel[r_hell  ]               := tc_orange+'HELL'+tc_default;
-   str_racel[r_uac   ]               := tc_lime  +'UAC' +tc_default;
+   str_racel[r_random]               := tc_white +'RANDOM'+tc_default;
+   str_racel[r_hell  ]               := tc_orange+'HELL'  +tc_default;
+   str_racel[r_uac   ]               := tc_lime  +'UAC'   +tc_default;
    str_observer                      := 'OBSERVER';
+   str_defeated                      := 'DEFEATED';
 
    str_msg_ReplayStart               := 'Start recording: ';
    str_msg_ReplayFail                := 'Recording error! ';

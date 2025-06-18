@@ -474,7 +474,7 @@ end;
 procedure ui_PanelButton(tab:TTabType;bx,by:integer;click_type:TkbState;twice:boolean);
 var u:integer;
 begin
-   if(by=vid_panel_bh)then // last line,  common buttons
+   if(by=ui_panel_bh)then // last line,  common buttons
    begin
       case bx of
       0 : ;//menu_Toggle;
@@ -487,20 +487,20 @@ begin
    if(not ui_ActionsIsAllowed(PlayerClient))then exit;
 
    if(by<0)
-   or(   vid_panel_bh<=by)
+   or(   ui_panel_bh<=by)
    or(bx<0)
-   or(   vid_panel_bw<=bx)then exit;
+   or(   ui_panel_bw<=bx)then exit;
 
    if(vid_PannelPos in VPPSet_Horizontal)then
-   begin  // turn vid_panel_bw*vid_panel_bw block if horizontal panel
+   begin  // turn ui_panel_bw*ui_panel_bw block if horizontal panel
       u :=bx;
       bx:=by;
       by:=u;
-      by+=vid_panel_bw*(bx div vid_panel_bw);
-      bx-=vid_panel_bw*(bx div vid_panel_bw);
+      by+=ui_panel_bw*(bx div ui_panel_bw);
+      bx-=ui_panel_bw*(bx div ui_panel_bw);
    end;
 
-   u:=(by*vid_panel_bw)+(bx mod vid_panel_bw);
+   u:=(by*ui_panel_bw)+(bx mod ui_panel_bw);
 
    if(0<=u)and(u<=ui_ubtns)then
      with g_players[PlayerClient] do
@@ -817,13 +817,13 @@ ikt_keyboard: case kvalue of
          if(ik_depend>0)and(input_actions[ik_depend].ik_timer_pressed>0)then
          begin
             case down of
-            false : ik_timer_pressed:=-1;
-            true  : if(ik_timer_pressed=0)then
-                    begin
-                    ik_timer_pressed:= 1;
+            false : begin
+                    ik_timer_pressed:=-1;
                     if(ik_timer_twice<=0)then
                     ik_timer_twice:=kt_TwiceDelay;
                     end;
+            true  : if(ik_timer_pressed=0)then
+                    ik_timer_pressed:= 1;
             end;
             exit;
          end;
@@ -835,13 +835,13 @@ ikt_keyboard: case kvalue of
          if(ik_depend=0)then
          begin
             case down of
-            false : ik_timer_pressed:=-1;
-            true  : if(ik_timer_pressed=0)then
-                    begin
-                    ik_timer_pressed:= 1;
+            false : begin
+                    ik_timer_pressed:=-1;
                     if(ik_timer_twice<=0)then
                     ik_timer_twice:=kt_TwiceDelay;
                     end;
+            true  : if(ik_timer_pressed=0)then
+                    ik_timer_pressed:= 1;
             end;
             //exit;
          end;
@@ -851,13 +851,16 @@ end;
 procedure inputAction_TimerProc(keyi:byte);
 begin
    with input_actions[keyi] do
-     if(ik_timer_pressed<0)
-     then ik_timer_pressed:=0
-     else
-       if(0<ik_timer_pressed)and(ik_timer_pressed<ik_timer_pressed.MaxValue)then
-         if(ik_type=ikt_mousew)
-         then ik_timer_pressed-=1
-         else ik_timer_pressed+=1;
+   begin
+      if(ik_timer_pressed<0)
+      then ik_timer_pressed:=0
+      else
+        if(0<ik_timer_pressed)and(ik_timer_pressed<ik_timer_pressed.MaxValue)then
+          if(ik_type=ikt_mousew)
+          then ik_timer_pressed-=1
+          else ik_timer_pressed+=1;
+      if(ik_timer_twice>0)then ik_timer_twice-=1;
+   end;
 end;
 
 procedure WindowEvents;
@@ -869,59 +872,72 @@ begin
 
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
-      SDL_TEXTINPUT      : k_KeyboardString+=sys_event^.text.text;
-      SDL_MOUSEMOTION    : begin
-                              if(m_vmove)and(not menu_state)and(G_Started)then
-                              begin
-                                 vid_cam_x-=sys_EVENT^.motion.x-mouse_x;
-                                 vid_cam_y-=sys_EVENT^.motion.y-mouse_y;
-                                 GameCameraBounds;
-                              end;
-                              mouse_x:=sys_EVENT^.motion.x;
-                              mouse_y:=sys_EVENT^.motion.y;
-                           end;
-      SDL_QUITEV         : GameCycle:=false;
-      SDL_MOUSEBUTTONUP  : inputAction_KeyProc(sys_event^.button.button ,ikt_mouseb  ,false);
-      SDL_MOUSEBUTTONDOWN: inputAction_KeyProc(sys_event^.button.button ,ikt_mouseb  ,true );
-      SDL_KEYUP          : inputAction_KeyProc(sys_event^.key.keysym.sym,ikt_keyboard,false);
-      SDL_KEYDOWN        : inputAction_KeyProc(sys_event^.key.keysym.sym,ikt_keyboard,true );
-      SDL_MOUSEWHEEL     : if(sys_event^.wheel.y<0)
-                      then inputAction_KeyProc(mw_down                  ,ikt_mousew  ,true )
-                      else inputAction_KeyProc(mw_up                    ,ikt_mousew  ,true );
-      SDL_WINDOWEVENT    : case(sys_event^.window.event)of
-                           SDL_WINDOWEVENT_SHOWN,
-                           SDL_WINDOWEVENT_HIDDEN,
-                           SDL_WINDOWEVENT_EXPOSED,
-                           SDL_WINDOWEVENT_MINIMIZED,
-                           SDL_WINDOWEVENT_MAXIMIZED,
-                           SDL_WINDOWEVENT_RESTORED,
-                           SDL_WINDOWEVENT_TAKE_FOCUS,
-                           SDL_WINDOWEVENT_FOCUS_GAINED,
-                           SDL_WINDOWEVENT_FOCUS_LOST    : ;//clear_keys:=true;
-                           SDL_WINDOWEVENT_RESIZED       : begin
-                                                           if(menu_state)then menu_redraw:=true;
-                                                           //vid_window_w:=sys_event^.window.data1;
-                                                           //vid_window_h:=sys_event^.window.data2;
-                                                           //MakeScreenShot_CalcSize(vid_window_w:=sys_event^.window.data1,vid_window_h);
-                                                           //clear_keys:=true;
-                                                           end;
-                           end;
-
-
-      {
-                              //km_Esc        : input_key_escape;
-                              km_Enter      : input_key_return;
-                              else
-                                 case menu_state of
-                                 false: if(G_Started)and(ingame_chat=0)then GameHotkeys(k_Last);
-                                 true : Menu_Hotkeys(k_Last);
-                                 end;
-                              end;
-                           end; }
+      SDL_TEXTINPUT           : k_KeyboardString+=sys_event^.text.text;
+      SDL_MOUSEMOTION         : begin
+                                   if(m_vmove)and(not menu_state)and(G_Started)then
+                                   begin
+                                      vid_cam_x-=round((sys_EVENT^.motion.x-mouse_x)/vid_cam_sc);
+                                      vid_cam_y-=round((sys_EVENT^.motion.y-mouse_y)/vid_cam_sc);
+                                      GameCameraBounds;
+                                   end;
+                                   mouse_x:=sys_EVENT^.motion.x;
+                                   mouse_y:=sys_EVENT^.motion.y;
+                                end;
+      SDL_QUITEV              : GameCycle:=false;
+      SDL_MOUSEBUTTONUP       : inputAction_KeyProc(sys_event^.button.button ,ikt_mouseb  ,false);
+      SDL_MOUSEBUTTONDOWN     : inputAction_KeyProc(sys_event^.button.button ,ikt_mouseb  ,true );
+      SDL_KEYUP               : inputAction_KeyProc(sys_event^.key.keysym.sym,ikt_keyboard,false);
+      SDL_KEYDOWN             : inputAction_KeyProc(sys_event^.key.keysym.sym,ikt_keyboard,true );
+      SDL_MOUSEWHEEL          : if(sys_event^.wheel.y<0)
+                           then inputAction_KeyProc(mw_down                  ,ikt_mousew  ,true )
+                           else inputAction_KeyProc(mw_up                    ,ikt_mousew  ,true );
+      SDL_WINDOWEVENT         : case(sys_event^.window.event)of
+                                SDL_WINDOWEVENT_SHOWN,
+                                SDL_WINDOWEVENT_HIDDEN,
+                                SDL_WINDOWEVENT_EXPOSED,
+                                SDL_WINDOWEVENT_MINIMIZED,
+                                SDL_WINDOWEVENT_MAXIMIZED,
+                                SDL_WINDOWEVENT_RESTORED,
+                                SDL_WINDOWEVENT_TAKE_FOCUS,
+                                SDL_WINDOWEVENT_FOCUS_GAINED,
+                                SDL_WINDOWEVENT_FOCUS_LOST    : ;//clear_keys:=true;
+                                SDL_WINDOWEVENT_RESIZED       : begin
+                                                                if(menu_state)then menu_redraw:=true;
+                                                                {vid_vw:=sys_event^.window.data1;
+                                                                vid_vh:=sys_event^.window.data2;
+                                                                vid_ApplyResolution; }
+                                                                end;
+                                end;
+      SDL_RENDER_TARGETS_RESET: begin
+                                map_MinimapBackground;
+                                map_RedrawMenuMinimap;
+                                vid_PanelUpdNow:=true;
+                                end;
      else
      end;
 
    KeyboardStringRussian;
+end;
+
+procedure GameCameraZoom(zstep:single);
+var cw,ch:integer;
+begin
+   //cx:=vid_cam_x+vid_cam_hw;
+   //cy:=vid_cam_y+vid_cam_hh;
+   cw:=vid_cam_w;
+   ch:=vid_cam_h;
+
+   vid_cam_sc+=zstep;
+   if(vid_cam_sc>vid_cam_Maxsc)then vid_cam_sc:=vid_cam_Maxsc;
+   if(vid_cam_sc<vid_cam_Minsc)then vid_cam_sc:=vid_cam_Minsc;
+   vid_UpdateCamVars;
+   vid_CamSpeedScaled:=round(vid_CamSpeedBase/vid_cam_sc);
+
+   vid_cam_x-=round((vid_cam_w-cw)*((mouse_x/vid_cam_sc)/vid_cam_w));
+   vid_cam_y-=round((vid_cam_h-ch)*((mouse_y/vid_cam_sc)/vid_cam_h));
+
+   GameCameraBounds;
+   //GameCameraMoveToPoint(cx,cy);
 end;
 
 procedure g_mouse;
@@ -930,7 +946,7 @@ var
 mouse_rx,
 mouse_ry   : integer;
 mouse_f    : mf_type;
-function PointInRect(mx,my,rx,ry,rw,rh:integer):boolean;
+function PointInRect(mx,my,rx,ry,rw,rh:integer;scale:single):boolean;
 begin
    mx-=rx;
    my-=ry;
@@ -938,22 +954,22 @@ begin
              and(0<my)and(my<rh);
    if(PointInRect)then
    begin
-      mouse_rx:=mx;
-      mouse_ry:=my;
+      mouse_rx:=round(mx/scale);
+      mouse_ry:=round(my/scale);
    end;
 end;
 begin
    mouse_rx:=-1;
    mouse_ry:=-1;
    mouse_f :=mf_none;
-   if(PointInRect(mouse_x,mouse_y,0              ,0              ,vid_vw         ,vid_vh         ))then mouse_f:=mf_map;
-   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,vid_panel_pwu  ,vid_panel_pwu  ))then mouse_f:=mf_mmap;
-   if(PointInRect(mouse_x,mouse_y,ui_ControlBar_x,ui_ControlBar_y,ui_ControlBar_w,ui_ControlBar_h))then mouse_f:=mf_panel;
+   if(PointInRect(mouse_x,mouse_y,0              ,0              ,vid_vw         ,vid_vh         ,vid_cam_sc      ))then mouse_f:=mf_map;
+   if(PointInRect(mouse_x,mouse_y,ui_MiniMap_x   ,ui_MiniMap_y   ,ui_MiniMap_w   ,ui_MiniMap_w   ,ui_MiniMap_sc   ))then mouse_f:=mf_mmap;
+   if(PointInRect(mouse_x,mouse_y,ui_ControlBar_x,ui_ControlBar_y,ui_ControlBar_w,ui_ControlBar_h,ui_ControlBar_sc))then mouse_f:=mf_panel;
 
    if(mouse_f<>mf_mmap)or(mouse_select_x0>-1)then
    begin
-      mouse_map_x:=vid_cam_x+mouse_x;
-      mouse_map_y:=vid_cam_y+mouse_y;
+      mouse_map_x:=vid_cam_x+trunc(mouse_x/vid_cam_sc);
+      mouse_map_y:=vid_cam_y+trunc(mouse_y/vid_cam_sc);
    end
    else
      if(mouse_f=mf_mmap)then
@@ -978,13 +994,13 @@ begin
       case vid_PannelPos of
 vpp_left,
 vpp_right  : begin
-                m_panelBtn_x:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_x-=1;
-                m_panelBtn_y:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_y-=1;
+                m_panelBtn_x:=mouse_rx div ui_ButtonW1;if(mouse_rx<0)then m_panelBtn_x-=1;
+                m_panelBtn_y:=mouse_ry div ui_ButtonW1;if(mouse_ry<0)then m_panelBtn_y-=1;
              end;
 vpp_top,
 vpp_bottom : begin
-                m_panelBtn_x:=mouse_ry div vid_BW;if(mouse_ry<0)then m_panelBtn_x-=1;
-                m_panelBtn_y:=mouse_rx div vid_BW;if(mouse_rx<0)then m_panelBtn_y-=1;
+                m_panelBtn_x:=mouse_ry div ui_ButtonW1;if(mouse_ry<0)then m_panelBtn_x-=1;
+                m_panelBtn_y:=mouse_rx div ui_ButtonW1;if(mouse_rx<0)then m_panelBtn_y-=1;
              end;
       end;
    end;
@@ -1001,23 +1017,23 @@ vpp_bottom : begin
                             end
                             else
                             begin
-                               mouse_select_x0:=mouse_map_x;
-                               mouse_select_y0:=mouse_map_y;
+                               mouse_select_x0:=mouse_x;
+                               mouse_select_y0:=mouse_y;
                             end;
-                 mf_mmap  : m_mmap_move:=true;
+                 mf_mmap  : if(mouse_select_x0=-1)then m_mmap_move:=true;
                  mf_panel : if(m_panelBtn_y>0)
-                            then ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_left,m_TwiceLeft)
+                            then ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_left,InputActionDPressed(iAct_mlb))
                             else
                               case vid_PannelPos of   // first line, tabs
                               vpp_left,
-                              vpp_right  : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_rx div vid_tBW,ord(high(TTabType)))];
+                              vpp_right  : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_rx div ui_tBW,ord(high(TTabType)))];
                               vpp_top,
-                              vpp_bottom : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_ry div vid_tBW,ord(high(TTabType)))];
+                              vpp_bottom : ui_tab:=i2tab[mm3i(ord(low(TTabType)),mouse_ry div ui_tBW,ord(high(TTabType)))];
                               end;
                  end;
      mb_mark   : case mouse_f of
                  mf_map,
-                 mf_mmap  : ;//PlayerSetOrder(mbrush_x,mbrush_y,0,0,m_brush,po_build,PlayerClient)
+                 mf_mmap  : mb_MapMarker(mouse_map_x,mouse_map_y);
                  end;
      1..255    : case mouse_f of
                  mf_map,
@@ -1040,14 +1056,16 @@ vpp_bottom : begin
       m_mmap_move:=false;
       if(mouse_select_x0>-1)then // rect select
       begin
-         units_SelectRect(InputAction(iAct_shift),PlayerClient,mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,255);
+         units_SelectRect(InputAction(iAct_shift),PlayerClient,vid_cam_x+trunc(mouse_select_x0/vid_cam_sc),
+                                                               vid_cam_y+trunc(mouse_select_y0/vid_cam_sc),
+                                                               mouse_map_x,mouse_map_y,255);
          mouse_select_x0:=-1;
       end;
    end;
 
    if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
-      GameCameraMoveToPoint(trunc((mouse_x-ui_MiniMap_x)/map_mm_cx),trunc((mouse_y-ui_MiniMap_y)/map_mm_cx));
+      GameCameraMoveToPoint(trunc((mouse_x-ui_MiniMap_x)/ui_MiniMap_sc/map_mm_cx),trunc((mouse_y-ui_MiniMap_y)/ui_MiniMap_sc/map_mm_cx));
       GameCameraBounds;
    end;
 
@@ -1065,20 +1083,19 @@ vpp_bottom : begin
    if(InputActionPressed(iAct_mmb))then // mouse middle down
      if(m_brush=mb_empty)then
        case mouse_f of
-       mf_map   : if(not rpls_POVCam)then m_vmove:=true;
+       mf_map   : if(not rpls_POVCam)and(mouse_select_x0=-1)then m_vmove:=true;
        mf_panel : ui_PanelButton(ui_tab,m_panelBtn_x,m_panelBtn_y,pct_middle,false);
        end;
 
    if(InputActionReleased(iAct_mmb))then // mouse middle up
      m_vmove:=false;
-end;
 
-procedure GameCameraScreenEdgeScroll;
-begin
-   if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_CamSpeed;
-   if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_CamSpeed;
-   if(mouse_x>vid_vmb_x1)then vid_cam_x+=vid_CamSpeed;
-   if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_CamSpeed;
+   if(mouse_f=mf_map )
+   or(mouse_f=mf_mmap)then
+   begin
+      if(InputActionPressed(iAct_mwd))then GameCameraZoom( vid_cam_stepsc);  // mouse wheel down
+      if(InputActionPressed(iAct_mwu))then GameCameraZoom(-vid_cam_stepsc);  // mouse wheel up
+   end;
 end;
 
 procedure GameCameraMove;
@@ -1087,17 +1104,23 @@ begin
    vx:=vid_cam_x;
    vy:=vid_cam_y;
 
-   if(vid_CamMSEScroll)then GameCameraScreenEdgeScroll;
+   if(vid_CamMSEScroll)then
+   begin
+      if(mouse_x<vid_vmb_x0)then vid_cam_x-=vid_CamSpeedScaled;
+      if(mouse_y<vid_vmb_y0)then vid_cam_y-=vid_CamSpeedScaled;
+      if(mouse_x>vid_vmb_x1)then vid_cam_x+=vid_CamSpeedScaled;
+      if(mouse_y>vid_vmb_y1)then vid_cam_y+=vid_CamSpeedScaled;
+   end;
 
-   if(InputAction(iAct_up   ))then vid_cam_y-=vid_CamSpeed;
-   if(InputAction(iAct_left ))then vid_cam_x-=vid_CamSpeed;
-   if(InputAction(iAct_down ))then vid_cam_y+=vid_CamSpeed;
-   if(InputAction(iAct_right))then vid_cam_x+=vid_CamSpeed;
+   if(InputAction(iAct_up   ))then vid_cam_y-=vid_CamSpeedScaled;
+   if(InputAction(iAct_left ))then vid_cam_x-=vid_CamSpeedScaled;
+   if(InputAction(iAct_down ))then vid_cam_y+=vid_CamSpeedScaled;
+   if(InputAction(iAct_right))then vid_cam_x+=vid_CamSpeedScaled;
 
    if(vx<>vid_cam_x)or(vy<>vid_cam_y)then GameCameraBounds;
 end;
 
-procedure test_nullupgr(playeri:byte);
+procedure testmode_CancelUpgrades(playeri:byte);
 var i:byte;
 begin
    with g_players[playeri] do
@@ -1120,7 +1143,7 @@ begin
       if(InputActionPressed(iAct_test_iddqd       ))then with g_players[PlayerClient] do if(upgr[upgr_invuln ]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
       if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
       if(InputActionPressed(iAct_test_DrawToggle  ))then r_draw :=not r_draw;
-      if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(PlayerClient);
+      if(InputActionPressed(iAct_test_NullUpgrades))then testmode_CancelUpgrades(PlayerClient);
       if(InputActionPressed(iAct_test_BePlayer0   ))then PlayerClient:=0;
       if(InputActionPressed(iAct_test_BePlayer1   ))then PlayerClient:=1;
       if(InputActionPressed(iAct_test_BePlayer2   ))then PlayerClient:=2;
@@ -1137,14 +1160,14 @@ begin
                                                          end;
    end;
 
+   if(InputActionPressed(iAct_LastEvent))then GameCameraMoveToLastEvent;
 
    if(ingame_chat>0)then
    begin
       net_chat_str:=txt_StringApplyInput(net_chat_str,k_kbstr,ChatLen2,nil);
-
    end
    else
-     if(not m_vmove)and(not rpls_POVCam)then GameCameraMove;
+     if(not m_vmove)and(not rpls_POVCam)and(mouse_select_x0=-1)then GameCameraMove;
 end;
 
 procedure MainInput;

@@ -134,7 +134,7 @@ begin
    oldY := ryi;
    scrX := 0;
    scrY := ryi;
-   //draw_ellipse_quadrants(x,y,0,ry,filled);
+   draw_ellipse_quadrants(x,y,0,ry,filled);
 
    // Midpoint ellipse algorithm with overdraw
    rxi *= ellipseOverscan;

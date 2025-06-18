@@ -27,13 +27,13 @@
     </PublishOptions>
     <RunParams>
       <local>
-        <CommandLineParams Value="testD"/>
+        <CommandLineParams Value="-testD"/>
       </local>
       <FormatVersion Value="2"/>
       <Modes Count="1">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="testD"/>
+            <CommandLineParams Value="-testD"/>
           </local>
         </Mode0>
       </Modes>

@@ -358,6 +358,7 @@ po_prod_unit_stop      = 4;
 po_prod_upgr_start     = 5;
 po_prod_upgr_stop      = 6;
 po_prod_stop           = 7;
+po_other               = 8;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1115,10 +1116,9 @@ log_LastMesMaxN        = log_LastMesTime*6;
 
 fr_ifps                = fr_fps1-1;
 
-vid_minw               = 800;
-vid_minh               = 600;
-vid_maxw               = 1440;
-vid_maxh               = 1080;
+vid_cam_minsc          = 0.5;
+vid_cam_maxsc          = 2;
+vid_cam_stepsc         = 0.2;
 
 vid_MaxScreenSprites   = 1000; // max vis sprites;
 vid_blink_persecond    = 6;
@@ -1126,32 +1126,33 @@ vid_blink_period1      = fr_fps1  div vid_blink_persecond;
 vid_blink_periodh      = vid_blink_period1 div 2;
 vid_blink_period2      = vid_blink_period1*2;
 
-vid_panel_period       = fr_fps1 div 6;
+ui_panel_UpdateTime       = fr_fps1 div 6;
 
 ui_alarm_time          = vid_blink_period2;
 
-vid_BW                 = 48;
-vid_BW2                = vid_BW*2;
-vid_panel_bw           = 3;                   // panel button width
-vid_panel_bblock       = vid_panel_bw*vid_panel_bw;
-vid_panel_pw           = vid_BW*vid_panel_bw; // panel pixel width
-vid_panel_pwi          = vid_panel_pw-1;
-vid_panel_pwu          = vid_panel_pw+1;
-vid_panel_bh           = 9;
-vid_panel_ph           = vid_panel_bh*vid_BW+vid_BW;
-vid_panel_phi          = vid_panel_ph-1;
-vid_tBW                = vid_panel_pw div 4;
-vid_hBW                = vid_BW div 2;
-vid_hhBW               = vid_hBW div 2;
-vid_oiw                = 18;
-vid_oihw               = vid_oiw+(vid_oiw div 2);
-vid_oisw               = vid_oiw-(vid_oiw div 4);
-vid_oips               = 2*vid_oiw+vid_oisw;
+ui_ButtonW1            = 48;
+ui_ButtonWi            = ui_ButtonW1-1;
+ui_ButtonW2            = ui_ButtonW1*2;
+ui_panel_bw            = 3;                   // panel button width
+ui_panel_bblock        = ui_panel_bw*ui_panel_bw;
+ui_panel_pw            = ui_ButtonW1*ui_panel_bw; // panel pixel width
+ui_panel_pwi           = ui_panel_pw-1;
+ui_panel_pwu           = ui_panel_pw+1;
+ui_panel_bh            = 9;
+ui_panel_ph            = ui_panel_bh*ui_ButtonW1+ui_ButtonW1;
+ui_panel_phi           = ui_panel_ph-1;
+ui_tBW                 = ui_panel_pw div 4;
+ui_hBW                 = ui_ButtonW1 div 2;
+ui_hhBW                = ui_hBW div 2;
+ui_oiw                 = 18;
+ui_oihw                = ui_oiw+(ui_oiw div 2);
+ui_oisw                = ui_oiw-(ui_oiw div 4);
+ui_oips                = 2*ui_oiw+ui_oisw;
 
 ui_max_alarms          = 12;
 
-ui_bottomsy            = vid_BW*4;
-ui_hwp                 = vid_panel_pw div 2;
+ui_bottomsy            = ui_ButtonW1*4;
+ui_hwp                 = ui_panel_pw div 2;
 ui_ubtns               = 23;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1167,10 +1168,10 @@ menu_hh                = menu_h div 2;
 
 menu_logo_h            = 96;
 
-menu_main_mp_bw1       = basefont_w1*38;//300;
+menu_main_mp_bw1       = basefont_w1*38;
 menu_main_mp_bwh       = menu_main_mp_bw1 div 2;
 menu_main_mp_bwq       = menu_main_mp_bw1 div 4;
-menu_main_mp_bh1       = basefont_w1*5;//38;
+menu_main_mp_bh1       = basefont_w1*5;
 menu_main_mp_bh2       = menu_main_mp_bh1*2;
 menu_main_mp_bh3       = menu_main_mp_bh1*3;
 menu_main_mp_bhh       = menu_main_mp_bh1 div 2;
@@ -1419,13 +1420,15 @@ ReplayNameLen          = 15;
 MFogM                  = 64;
 fog_CellW              = 44;
 fog_CellHW             = fog_CellW div 2;
-fog_vfwm               = (vid_maxw div fog_CellW)+2;
-fog_vfhm               = (vid_maxh div fog_CellW)+2;
+//fog_vfwm               = (vid_maxw div fog_CellW)+2;
+//fog_vfhm               = (vid_maxh div fog_CellW)+2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  BASE STRINGS
 //
+
+pl_n_ch                : array[false..true] of char = (' ','*');
 
 cfgfn                  : shortstring = 'cfg';
 str_screenshot         : shortstring = 'MWSCR_';
@@ -1444,7 +1447,7 @@ str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
 
-str_f_FontBase         : shortstring = 'font';
+str_f_FontBase         : shortstring = 'fontbase';
 
 race_dir               : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
 race_units             : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
@@ -1628,57 +1631,12 @@ k_LastCharStuckDealy   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
 k_kbdig                : set of Char = ['0'..'9'];
 
-// key mapping
-
-km_mouse_l             = SDL_BUTTON_LEFT;
-km_mouse_r             = SDL_BUTTON_RIGHT;
-km_mouse_m             = SDL_BUTTON_MIDDLE;
-//km_mouse_wd            = SDL_BUTTON_WHEELDOWN;
-//km_mouse_wu            = SDL_BUTTON_WHEELUP;
-km_arrow_up            = sdlk_up;
-km_arrow_down          = sdlk_down;
-km_arrow_left          = sdlk_left;
-km_arrow_right         = sdlk_right;
-km_lshift              = sdlk_lshift;
-km_rshift              = sdlk_rshift;
-km_lctrl               = sdlk_lctrl;
-km_rctrl               = sdlk_rctrl;
-km_lalt                = sdlk_lalt;
-km_ralt                = sdlk_ralt;
-km_Screenshot          = SDLK_PRINTSCREEN;
-km_Esc                 = sdlk_escape;
-km_Enter               = sdlk_return;
-km_Space               = sdlk_space;
-km_GamePause           = sdlk_pause;
-km_Tab                 = sdlk_tab;
-
-km_test_FastTime       = sdlk_end;
-km_test_InstaProd      = sdlk_home;
-km_test_ToggleAI       = sdlk_pageup;
-km_test_iddqd          = sdlk_pagedown;
-km_test_FogToggle      = sdlk_backspace;
-km_test_DrawToggle     = sdlk_insert;
-km_test_NullUpgrades   = SDLK_F3;
-km_test_BePlayer0      = SDLK_F4;
-km_test_BePlayer1      = SDLK_F5;
-km_test_BePlayer2      = SDLK_F6;
-km_test_BePlayer3      = SDLK_F7;
-km_test_BePlayer4      = SDLK_F8;
-km_test_BePlayer5      = SDLK_F9;
-km_test_BePlayer6      = SDLK_F10;
-km_test_BePlayer7      = SDLK_F11;
-km_test_debug0         = SDLK_KP_0;
-km_test_debug1         = SDLK_KP_1;
-
-km_group0              = sdlk_0;
-km_group9              = sdlk_9;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  HOTKEYS
 //
 
-HotKeysArraySize  = 26;
+HotKeysArraySize       = 26;
 
 
 ////////////////////////////////////////////////////////////////////////////////

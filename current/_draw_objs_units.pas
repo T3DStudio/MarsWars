@@ -344,7 +344,7 @@ begin
 end;
 
 procedure unit_SpriteAlive(pu:PTUnit;noanim:boolean);
-const ProdIcoX: array[0..MaxUnitLevel] of integer = (0,vid_hBW,vid_BW,vid_BW+vid_hBW);
+const ProdIcoX: array[0..MaxUnitLevel] of integer = (0,ui_hBW,ui_ButtonW1,ui_ButtonW1+ui_hBW);
 var
 spr        : PTMWTexture;
 depth,
@@ -421,8 +421,8 @@ begin
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
-                    //  if(_isbarrack)and(uprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
-                   //   if(_issmith  )and(pprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+vid_BW*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
+                    //  if(_isbarrack)and(uprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                   //   if(_issmith  )and(pprod_r[t]>0)then UIInfoItemAddUSprite(vx-ProdIcoX[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 
@@ -476,7 +476,7 @@ begin
 
        if(unit_FogReveal(pu))then
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-           SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits) div 4,255));
+           SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits)*4,255),false);
     end;
 end;
 

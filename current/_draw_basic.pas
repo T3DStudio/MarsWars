@@ -106,8 +106,8 @@ begin
         SDL_SetTextureAlphaMod(sdltexture,draw_color_a);
         if(xscale<>1)and(xscale<>-1)then nw:=abs(trunc(w*xscale)) else nw:=w;
         if(yscale<>1)and(yscale<>-1)then nh:=abs(trunc(h*yscale)) else nh:=h;
-        if(xscale<0)then x-=nw;
-        if(yscale<0)then y-=nh;
+        //if(xscale<0)then x-=nw;
+       // if(yscale<0)then y-=nh;
         draw_sdltexture_ext(x,y,nw,nh,sdltexture,0,xscale<0,yscale<0);
      end;
 end;
@@ -456,15 +456,15 @@ begin
       begin
          case map_grid[gx,gy].tgc_solidlevel of
 mgsl_nobuild : begin
-               draw_set_color(c_ltgray);
+               draw_set_color(c_dgray);
                draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
                end;
 mgsl_liquid  : begin
-               draw_set_color(theme_cur_liquid_mmcolor);
+               draw_set_color(c_gray);
                draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
                end;
 mgsl_rocks   : begin
-               draw_set_color(c_gray);
+               draw_set_color(c_ltgray);
                draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
                end;
          end;
@@ -488,46 +488,33 @@ procedure map_MinimapPlayerStarts(UnknownStarts,teamStarts:boolean);
 var p    :byte;
     x,y,r:integer;
 begin
-   for p:=0 to LastPlayer do
-   begin
-      x:=round(map_PlayerStartX[p]*map_mm_cx);
-      y:=round(map_PlayerStartY[p]*map_mm_cx);
-      r:=trunc(base_1r*map_mm_cx);
+   if(map_MaxPlayers>0)then
+     for p:=0 to map_MaxPlayers-1 do
+     begin
+        x:=round(map_mm_cx*map_PlayerStartX[p]);
+        y:=round(map_mm_cx*map_PlayerStartY[p]);
+        r:=trunc(map_mm_cx*base_1r);
 
-      if(UnknownStarts)then
-      begin
-         if(teamStarts)
-         then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(p,255)),c_white)
-         else map_MinimapSpot(x,y,r,'?',c_white)
-      end
-      else
-        if (g_slot_state[p]<>pss_closed  )
-        and(g_slot_state[p]<>pss_observer)
-        then
-          if(g_players[p].player_type>pt_none)or(g_ai_slots>0)
-          then map_MinimapSpot(x,y,r,b2s(p+1)[1],PlayerColorNormal[p])
-          else map_MinimapSpot(x,y,r,'+'        ,c_white             );
-   end;
-
-   {x:=round(map_symmetryX0*map_mm_cx);
-   y:=round(map_symmetryY0*map_mm_cx);
-   lineColor(r_minimap,
-   x,y,
-   round(map_symmetryX1*map_mm_cx),
-   round(map_symmetryY1*map_mm_cx),
-   c_lime);
-
-   lineColor(r_minimap,
-   x,y,
-   x-(round(map_symmetryX1*map_mm_cx)-x),
-   y-(round(map_symmetryY1*map_mm_cx)-y),
-   c_lime); }
+        if(UnknownStarts)then
+        begin
+           if(teamStarts)
+           then map_MinimapSpot(x,y,r,chr(ord('1')+PlayerSlotGetTeam(p,255)),c_white)
+           else map_MinimapSpot(x,y,r,'?',c_white)
+        end
+        else
+          if (g_slot_state[p]<>pss_closed  )
+          and(g_slot_state[p]<>pss_observer)
+          then
+            if(g_players[p].player_type>pt_none)or(g_ai_slots>0)
+            then map_MinimapSpot(x,y,r,b2s(p+1)[1],PlayerColorNormal[p])
+            else map_MinimapSpot(x,y,r,'+'        ,c_white             );
+     end;
 end;
 
 procedure map_MinimapCPoints;
 var i  :byte;
 begin
-   for i:=1 to LastCPoint do
+   for i:=0 to LastCPoint do
     with g_cpoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(map_scenario=ms_KotH))or(cpenergy<=0)
@@ -544,14 +531,13 @@ begin
    map_MinimapPlayerStarts(not g_fixed_positions,map_scenario in ms_ScenariosFixedTeams);
    map_MinimapCPoints;
 
-   draw_set_color(c_red);
+   {draw_set_color(c_red);
    draw_line(
    round(map_phsize*map_mm_cx),
    round(map_phsize*map_mm_cx),
    round(map_phsize*map_mm_cx)+round(2000*map_mm_cx*cos(map_symmetryDir*degtorad)),
    round(map_phsize*map_mm_cx)+round(2000*map_mm_cx*sin(map_symmetryDir*degtorad))
- );
-
+   ); }
 
    draw_set_target(nil);
 end;

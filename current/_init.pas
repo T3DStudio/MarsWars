@@ -8,10 +8,22 @@ begin
    vid_SDLDisplayModeN:=SDL_GetNumDisplayModes(curDisplay);
    setlength(vid_SDLDisplayModes,vid_SDLDisplayModeN);
    for i:=0 to vid_SDLDisplayModeN-1 do
-     SDL_GetDisplayMode(curDisplay,i,@vid_SDLDisplayModes[i]);
+   begin
+      SDL_GetDisplayMode(curDisplay,i,@vid_SDLDisplayModes[i]);
+
+      vid_MinW:= min2i(vid_MinW,vid_SDLDisplayModes[i].w);
+      vid_MinH:= min2i(vid_MinH,vid_SDLDisplayModes[i].h);
+      vid_MaxW:= max2i(vid_MaxW,vid_SDLDisplayModes[i].w);
+      vid_MaxH:= max2i(vid_MaxH,vid_SDLDisplayModes[i].h);
+   end;
    SDL_GetDisplayBounds(curDisplay,vid_SDLRect);
    vid_SDLDisplayModeC.w:=vid_SDLRect^.w;
    vid_SDLDisplayModeC.h:=vid_SDLRect^.h;
+
+   vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);
+   vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
+   menu_vid_vw:=vid_vw;
+   menu_vid_vh:=vid_vh;
 end;
 
 function InitVideo:boolean;
@@ -104,9 +116,9 @@ begin
 
       case s of
 '-renderer': vid_SDLRendererName:=ParamStr(i+1);
-'test'     : test_mode:=1;
+'-test'    : test_mode:=1;
 {$IFDEF DTEST}
-'testD'    : test_mode:=2;
+'-testD'   : test_mode:=2;
 {$ENDIF}
       end;
    end;

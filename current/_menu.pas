@@ -25,6 +25,7 @@ procedure vid_ApplyResolution;
 begin
    SDL_RenderSetLogicalSize(vid_SDLRenderer,vid_vw,vid_vh);
    menu_updatePos;
+   vid_UpdateFogGridSize;
    vid_UpdateCommonVars;
    if(not vid_fullscreen)then
    begin
@@ -56,7 +57,7 @@ begin
 end;
 procedure menu_NetClientConnect;
 begin
-   if(net_UpSocket(0))then
+   if(net_setup(0))then
    begin
       txt_ValidateServerAddr;
       net_status_str:=str_menu_connecting;
@@ -485,12 +486,16 @@ begin
 end;
 
 procedure mpage_Replays;
+var w:integer;
 begin
    mpage_DefaultCaption(mi_title_LoadReplay);
 
-   tx0:=menu_hw-menu_main_mp_bw1-menu_main_mp_bwq;
-   tx1:=menu_hw+menu_main_mp_bwq;
-   tx2:=tx1+menu_main_mp_bw1;
+   w:=menu_main_mp_bw1+menu_main_mp_bw1+
+      menu_players_namew+menu_players_racew;
+
+   tx0:=menu_hw-(w div 2);
+   tx1:=tx0+menu_main_mp_bw1+menu_main_mp_bw1;
+   tx2:=tx1+menu_players_namew+menu_players_racew;
 
    ty0:=menu_logo_h+menu_main_mp_bh3;
 
@@ -1034,7 +1039,10 @@ mi_settings_HitBars       : if(menu_list_selected>-1)
 mi_settings_MRBAction     : if(menu_list_selected>-1)
                             then begin m_action:=menu_list_SIndex>0;menu_List_Clear; end
                             else menu_list_MakeFromStr(menu_item,@str_menu_mactionl[false],SizeOf(str_menu_mactionl),integer(m_action),-2);
-mi_settings_ScrollSpeed   : vid_CamSpeed    :=menu_GetBarVal(menu_item,vid_CamSpeed,1,max_CamSpeed);
+mi_settings_ScrollSpeed   : begin
+                            vid_CamSpeedBase  :=menu_GetBarVal(menu_item,vid_CamSpeedBase,1,max_CamSpeed);
+                            vid_CamSpeedScaled:=round(vid_CamSpeedBase/vid_cam_sc);
+                            end;
 mi_settings_MouseScroll   : vid_CamMSEScroll:=not vid_CamMSEScroll;
 mi_settings_PlayerName    : ;   // playername
 mi_settings_Langugage     : if(menu_list_selected>-1)then
@@ -1048,14 +1056,14 @@ mi_settings_PanelPosition : if(menu_list_selected>-1)then
                             begin
                                vid_PannelPos:=enum_val2TVidPannelPos(menu_list_SIndex);
                                menu_List_Clear;
-                               //vid_ScreenSurfaces;
+                               vid_UpdateCommonVars;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_PanelPosl[low(TVidPannelPos)],SizeOf(str_menu_PanelPosl),integer(vid_PannelPos),-2);
 mi_settings_MMapPosition  : if(menu_list_selected>-1)then
                             begin
                                vid_MiniMapPos:=(menu_list_SIndex>0);
                                menu_List_Clear;
-                               //vid_ScreenSurfaces;
+                               vid_UpdateCommonVars;
                             end
                             else menu_list_MakeFromStr(menu_item,@str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical][false],SizeOf(str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical]),integer(vid_MiniMapPos),-2);
 mi_settings_PlayerColors  : if(menu_list_selected>-1)
@@ -1247,7 +1255,7 @@ mi_mplay_ServerPort       : ;
 mi_mplay_ServerStart      : if(net_status=ns_single)then
                             begin
                                txt_ValidateServerPort;
-                               if(net_UpSocket(net_port))then
+                               if(net_setup(net_port))then
                                begin
                                   PlayersSetDefault;
                                   net_status:=ns_server;
@@ -1262,7 +1270,7 @@ mi_mplay_ClientDisconnect : if(net_status=ns_client)then GameBreakClientGame;
 mi_mplay_ClientAddress    : ;
 mi_mplay_Chat             : ;
 
-mi_mplay_NetSearchStart   : if(net_UpSocket(net_svlsearch_port))then
+mi_mplay_NetSearchStart   : if(net_setup(net_svlsearch_port))then
                             begin
                                net_status_str:='';
                                net_status  :=ns_client;
@@ -1275,14 +1283,14 @@ mi_mplay_NetSearchStart   : if(net_UpSocket(net_svlsearch_port))then
                             end
                             else net_dispose;
 mi_mplay_NetSearchStop    : menu_NetSearchStop;
-mi_mplay_NetSearchList    : if(m_TwiceLeft)
+mi_mplay_NetSearchList    : if(InputActionDPressed(iAct_mlb))
                             then menu_NetSearchConnect(false)
                             else menu_item_ListScrollLine(menu_item,@net_svsearch_sel,net_svsearch_scroll,menu_netsearch_lineh);
 mi_mplay_NetSearchCon     : menu_NetSearchConnect(false);
 
 
 //////////////////////////////////////////    REPLAYS PLAYER
-mi_replays_list           : if(m_TwiceLeft)
+mi_replays_list           : if(InputActionDPressed(iAct_mlb))
                             then replay_Play(false)
                             else
                             begin
@@ -1297,7 +1305,7 @@ mi_replays_delete         : replay_Delete(false);
 mi_saveload_save          : saveload_Save  (false);
 mi_saveload_load          : saveload_Load  (false);
 mi_saveload_delete        : saveload_Delete(false);
-mi_saveload_list          : if(m_TwiceLeft)
+mi_saveload_list          : if(InputActionDPressed(iAct_mlb))
                             then saveload_Load(false)
                             else
                             begin

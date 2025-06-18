@@ -54,10 +54,10 @@ begin
    else
      if(selected)then menu_ItemColor:=c_yellow;
 end;
-procedure D_menu_EText(me:byte;alignment:TAlignment;text:shortstring;listarrow:boolean;selected:byte;color:TMWColor;multiLine:boolean=false);
+procedure D_menu_EText(mi:byte;alignment:TAlignment;text:shortstring;listarrow:boolean;selected:byte;color:TMWColor;multiLine:boolean=false);
 var tx,tx1,ty:integer;
 begin
-   with menu_items[me] do
+   with menu_items[mi] do
    if(mi_x0>0)or(mi_y0>0)then
    begin
       tx:=mi_x0;
@@ -97,7 +97,7 @@ begin
       end;
 
       if(color=c_none)
-      then color:=menu_ItemColor(mi_enabled,((selected>0) or listarrow)and((menu_item=me)or(selected>1)));
+      then color:=menu_ItemColor(mi_enabled,((selected>0) or listarrow)and((menu_item=mi)or(selected>1)));
 
       draw_set_color(color);
       if(multiLine)
@@ -105,6 +105,30 @@ begin
       else draw_text_line(tx,ty,text,alignment,255,c_none);
 
       if(listarrow)then draw_char(tx1+draw_font_wh,ty,#31,c_none);
+   end;
+end;
+
+procedure D_menu_FileInfo(mi:byte;str1,str2,str3,str4:shortstring);
+var x,y:integer;
+begin
+
+   with menu_items[mi] do
+   if(mi_x0>0)or(mi_y0>0)then
+   begin
+      x:=mi_x0+basefont_wq3;
+
+      y:=mi_y0+basefont_w3;
+
+      draw_text(x,y,str1,ta_LU,255,c_none);
+      y+=str_linesCount(str1)*draw_font_lhh+draw_font_lhh;
+
+      draw_text(x,y,str2,ta_LU,255,c_none);
+      y+=str_linesCount(str2)*draw_font_lhh+draw_font_lhh;
+
+      draw_text(x,y,str3,ta_LU,255,c_none);
+      y+=str_linesCount(str3)*draw_font_lhh+draw_font_lhh;
+
+      draw_text(x,y,str4,ta_LU,255,c_none);
    end;
 end;
 
@@ -400,7 +424,7 @@ mi_settings_ColoredShadows : D_menu_MButtonD(i,str_menu_ColoredShadow   ,str_boo
 mi_settings_ShowAPM        : D_menu_MButtonD(i,str_menu_APM             ,str_bool[vid_APM]                     ,false);
 mi_settings_HitBars        : D_menu_MButtonD(i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_UnitHealthBars],true );
 mi_settings_MRBAction      : D_menu_MButtonD(i,str_menu_maction         ,str_menu_mactionl[m_action]           ,true );
-mi_settings_ScrollSpeed    : D_menu_MButtonB(i,str_menu_ScrollSpeed     ,vid_CamSpeed,max_CamSpeed             ,false);
+mi_settings_ScrollSpeed    : D_menu_MButtonB(i,str_menu_ScrollSpeed     ,vid_CamSpeedBase,max_CamSpeed             ,false);
 mi_settings_MouseScroll    : D_menu_MButtonD(i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]            ,false);
 mi_settings_PlayerName     : D_menu_MButtonN(i,str_menu_PlayerName      ,PlayerName                                  );
 mi_settings_Langugage      : D_menu_MButtonD(i,str_menu_language        ,str_menu_lang[ui_language]            ,true );
@@ -543,12 +567,7 @@ mi_mplay_NetSearchStart    : D_menu_MButton (i,str_menu_LANSearchStart );
 mi_mplay_NetSearchList     : D_menu_List(i,net_svsearch_listn,net_svsearch_scroll,net_svsearch_sel,menu_netsearch_lineh,menu_netsearch_listh,@net_svsearch_lists); //D_menu_LANSearchList(i);
 
 mi_replays_list            : D_menu_List (i,rpls_list_size,rpls_list_scroll,rpls_list_sel,menu_replays_lineh,menu_replays_listh,@rpls_list); //D_menu_ReplaysList(i);
-mi_title_ReplayInfo1       : begin
-                             D_menu_EText(i,ta_LU,rpls_str_info1,false,0,c_none,true);
-                             D_menu_EText(i,ta_LM,rpls_str_info2,false,0,c_none,true);
-                             D_menu_EText(i,ta_LD,rpls_str_info3,false,0,c_none,true);
-                             writeln('replay info');
-                             end;
+mi_title_ReplayInfo1       : D_menu_FileInfo(i,rpls_str_info1,rpls_str_info2,rpls_str_info3,rpls_str_info4);
 mi_title_ReplayInfo2       : D_menu_EText(i,ta_LM,rpls_str_infoS,false,0,c_none);
 
 mi_saveload_list           : D_menu_List (i,svld_list_size,svld_list_scroll,svld_list_sel,menu_saveload_lineh,menu_saveload_listh,@svld_list);
@@ -557,13 +576,7 @@ mi_saveload_fname          : with menu_items[i] do
                              D_menu_Panel(mi_x0,mi_y0,mi_x1,mi_y1,2);
                              D_menu_EText(i,ta_LU,svld_str_fname+chat_type[false],false,2,c_none);
                              end;
-mi_title_SaveInfo          : begin
-                             D_menu_EText(i,ta_LU,svld_str_info1,false,0,c_none,true);
-                             D_menu_EText(i,ta_LM,svld_str_info2,false,0,c_none,true);
-                             D_menu_EText(i,ta_LD,svld_str_info3,false,0,c_none,true);
-                             writeln('save info');
-                             end;
-
+mi_title_SaveInfo          : D_menu_FileInfo(i,svld_str_info1,svld_str_info2,svld_str_info3,svld_str_info4);
 
 {
 if(g_cl_units>0)
@@ -652,14 +665,23 @@ begin
       {for i:=0 to 255 do
        with menu_items[i] do
         if(x0>0)then
-         rectangleColor(r_menu,x0,y0,x1,y1,gfx_MakeTMWColor(128+random(128),128+random(128),128+random(128),255));}
+         rectangleColor(x0,y0,x1,y1,gfx_MakeTMWColor(128+random(128),128+random(128),128+random(128),255));}
       draw_set_target(nil);
    end;
 
    draw_set_color(c_white);
    draw_mwtexture2(menu_tex_x,menu_tex_y,tex_menu,menu_tex_w,menu_tex_h);
 
-   draw_mwtexture1(0,100,theme_tile_terrain,1,1);
+   //draw_mwtexture1(0,100,theme_tile_terrain,1,1);
+   //draw_mwtexture1(0,200,theme_tile_crater ,1,1);  draw_mwtexture1(100,200,theme_tileset_crater^[0]   ,1,1);
+   //draw_mwtexture1(0,300,theme_tile_liquid ,1,1);  draw_mwtexture1(100,300,theme_tileset_liquid[0]^[0],1,1);
+
+   draw_mwtexture1(0,0            ,spr_b_up[r_hell,0],1,1);
+   draw_mwtexture1(0,ui_buttonw1  ,spr_b_up[r_hell,1],1,1);
+   draw_mwtexture1(0,ui_buttonw1*2,spr_b_up[r_uac ,2],1,1);
+   draw_mwtexture1(0,ui_buttonw1*3,spr_b_up[r_uac ,3],1,1);
+
+
 
    //draw_DebugTileSet();
 
@@ -670,10 +692,10 @@ begin
    if(vid_FPS)then
    begin
       draw_set_font(font_Base,basefont_w1);
-      draw_set_color(c_white);
-      draw_text_line(menu_tex_x+draw_font_wq,
-                menu_tex_y+draw_font_wq,
-                'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_none);
+      draw_set_color(c_white);  //
+      draw_text_line(menu_tex_x-draw_font_wq+menu_tex_w,
+                     menu_tex_y+draw_font_wq,
+                     'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_RU,255,c_none);
    end;
 end;
 

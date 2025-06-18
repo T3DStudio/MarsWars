@@ -1346,6 +1346,19 @@ end;
 //   String
 //
 
+function str_linesCount(str:shortstring):byte;
+var l:byte;
+begin
+   str_linesCount:=0;
+   l:=length(str);
+   while(l>0)do
+   begin
+      if(str[l]=tc_nl1)
+      or(str[l]=tc_nl2)then str_linesCount+=1;
+      l-=1;
+   end;
+end;
+
 function str_SpaceSize(str:shortstring;newSize:byte):shortstring;
 var l,i:byte;
 begin
@@ -1392,9 +1405,10 @@ begin
    str_GStep2Time+=sm+':'+ss;
 end;
 
-// replay/save
+// replay/save common file data
 function FileReadBaseGameInfo(var f:file;str_info1,str_info2:pshortstring):boolean;
 const dots: shortstring = ': ';
+map_charsn= 12;
 var
 dbyte : byte;
 dint  : integer;
@@ -1406,46 +1420,56 @@ begin
    dcard:=0;
 
    // TIME
-   BlockRead(f,dcard,SizeOf(G_Step      )); str_info1^+=tc_nl2+tc_nl2+str_uiHint_Time+str_GStep2Time(dcard)+tc_nl2+str_menu_map+tc_nl2+' ';
+   BlockRead(f,dcard,SizeOf(G_Step      )); str_info1^+=str_uiHint_Time+str_GStep2Time(dcard)+tc_nl2;
 
    // MAP info
-   BlockRead(f,dcard,SizeOf(map_seed    )); str_info1^+=str_SpaceSize(str_map_seed+dots,12)+c2s(dcard)+tc_nl2+' ';
+   str_info1^+=str_menu_map+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(map_preset_cur   ));
+   if(dbyte>=map_preset_n         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_Map       +dots,map_charsn)+map_presets[dbyte].mapp_name+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(map_scenario     ));
+   if not(dbyte in allmapscenarios)then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_scenario  +dots,map_charsn)+str_map_scenariol[dbyte]+tc_nl2;
+
+   BlockRead(f,dbyte,SizeOf(map_generators   ));
+   if(dbyte>gms_g_maxgens         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_Generators+dots,map_charsn)+str_map_Generatorsl[dbyte]+tc_nl2;
+
+   BlockRead(f,dcard,SizeOf(map_seed    ));   str_info1^+=' '+str_SpaceSize(str_map_seed      +dots,map_charsn)+c2s(dcard)+tc_nl2;
    BlockRead(f,dint ,SizeOf(map_psize   ));
-   if(dint<MinMapSize)or(MaxMapSize<dint)
-                                 then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info1^+=str_SpaceSize(str_map_size+dots,12)+i2s(dint)+tc_nl2+' ';
+   if(dint<MinMapSize)
+   or(MaxMapSize<dint)             then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_size      +dots,map_charsn)+i2s(dint)+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(map_type    ));
-   if(dbyte>gms_m_types         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info1^+=str_SpaceSize(str_map_type+dots,12)+str_map_typel[dbyte]+tc_default+tc_nl2+' ';
+   if(dbyte>gms_m_types           )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_type      +dots,map_charsn)+str_map_typel[dbyte]+tc_default+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(map_symmetry));
-   if(dbyte>gms_m_symm          )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info1^+=str_SpaceSize(str_map_sym +dots,12)+str_map_syml[dbyte]+tc_nl2+' ';
+   if(dbyte>gms_m_symm            )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_sym       +dots,map_charsn)+str_map_syml[dbyte]+tc_nl2;
 
    BlockRead(f,dint ,SizeOf(theme_cur   ));
-   if(dint<0)or(dint>=theme_n   )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info1^+=theme_name[dint];
+   if(dint<0)or(dint>=theme_n)     then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_theme     +dots,map_charsn)+theme_name[dint]+tc_nl2;
 
    // GAME info
-   str_info2^+=tc_nl2;
-   BlockRead(f,dbyte,SizeOf(map_scenario           ));
-   if not(dbyte in allmapscenarios )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info2^+=str_map_scenario+dots+str_map_scenariol[dbyte]+tc_nl2;
-
-   BlockRead(f,dbyte,SizeOf(map_generators     ));
-   if(dbyte>gms_g_maxgens       )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info2^+=str_map_Generators+dots+str_map_Generatorsl[dbyte]+tc_nl2;
-
+   str_info2^:=str_menu_GameOptions+tc_nl2;
    BlockRead(f,dbyte,SizeOf(g_fixed_positions));
-                                            str_info2^+=str_menu_FixedStarts+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+                                              str_info2^+=str_menu_FixedStarts  +dots+str_bool[dbyte>0]+tc_default+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(g_deadobservers  ));
-                                            str_info2^+=str_menu_DeadObservers+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
+                                              str_info2^+=str_menu_DeadObservers+dots+str_bool[dbyte>0]+tc_default+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(g_ai_slots       ));
-   if(dbyte>gms_g_maxai         )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
-                                 else       str_info2^+=str_menu_AISlots+dots+ai_name(dbyte);
+   if(dbyte>gms_g_maxai           )then begin str_info2^:=str_error_WrongVersion;close(f);exit; end
+                                   else       str_info2^+=str_menu_AISlots+dots+ai_name(dbyte)+tc_nl2;
+   str_info2^+=tc_nl2+str_SpaceSize(str_menu_players,PlayerNameLen+3)
+                     +str_SpaceSize(str_menu_race   ,9)
+                     +str_menu_team;
+
    FileReadBaseGameInfo:=true;
 end;
 
@@ -1515,8 +1539,8 @@ begin
    cx:=x div fog_CellW;
    cy:=y div fog_CellW;
    fog_check:=false;
-   if(0<=cx)and(cx<=fog_vfwm)
-  and(0<=cy)and(cy<=fog_vfhm)then fog_check:=ui_FogView_pgrid[cx,cy];
+   if(0<=cx)and(cx<=ui_FogView_cw)
+  and(0<=cy)and(cy<=ui_FogView_ch)then fog_check:=ui_FogView_pgrid[cx,cy];
 end;
 
 function RectInCam(x,y,hw,hh,s:integer):boolean;
@@ -1762,14 +1786,22 @@ begin
    x0:=0;x1:=0;
    y0:=0;y1:=0;
    case vid_PannelPos of
-vpp_left  : x0:=-ui_ControlBar_w;
-vpp_right : x1:=+ui_ControlBar_w;
-vpp_top   : y0:=-ui_ControlBar_h;
-vpp_bottom: y1:=+ui_ControlBar_h;
+vpp_left  : x0:=-round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
+vpp_right : x1:=+round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
+vpp_top   : y0:=-round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
+vpp_bottom: y1:=+round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
    end;
 
-   vid_cam_x    :=mm3i(x0,vid_cam_x,map_psize-vid_cam_w+x1);
-   vid_cam_y    :=mm3i(y0,vid_cam_y,map_psize-vid_cam_h+y1);
+   if(vid_cam_w>=map_psize)
+   then vid_cam_x:=map_phsize-vid_cam_hw+(x0-x1) div 2
+   else vid_cam_x:=mm3i(x0,vid_cam_x,map_psize-vid_cam_w+x1);
+
+   if(vid_cam_h>=map_psize)
+   then vid_cam_y:=map_phsize-vid_cam_hh+(y0-y1) div 2
+   else vid_cam_y:=mm3i(y0,vid_cam_y,map_psize-vid_cam_h+y1);
+
+   vid_cam_x1   :=vid_cam_x+vid_cam_w;
+   vid_cam_y1   :=vid_cam_y+vid_cam_h;
 
    vid_mmvx     :=round(vid_cam_x*map_mm_cx);
    vid_mmvy     :=round(vid_cam_y*map_mm_cx);

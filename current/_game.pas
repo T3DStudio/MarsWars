@@ -466,7 +466,6 @@ begin
 end;
 
 function MapLoad(PlayerRequestor,preset:byte;Check:boolean):boolean;
-var p:byte;
 begin
    MapLoad:=false;
 
@@ -492,25 +491,6 @@ begin
                     := false;
    end;
 
-   {case map_scenario of
-   ms_ffa3   : map_MaxPlayers:=3;
-   ms_ffa4   : map_MaxPlayers:=4;
-   ms_ffa5   : map_MaxPlayers:=5;
-   ms_ffa6   : map_MaxPlayers:=6;
-   ms_ffa7   : map_MaxPlayers:=7;
-   ms_1x1    : map_MaxPlayers:=2;
-   ms_2x2    : map_MaxPlayers:=4;
-   ms_2x2x2  : map_MaxPlayers:=6;
-   ms_3x3    : map_MaxPlayers:=6;
-   ms_4x4    : map_MaxPlayers:=8;
-   ms_2x2x2x2: map_MaxPlayers:=8;
-   else        map_MaxPlayers:=MaxPlayer;
-   end;
-
-   for p:=0 to LastPlayer do
-     if(p<map_MaxPlayers)
-     then PlayerSlotChangeState(255,p,pss_opened  ,false)
-     else PlayerSlotChangeState(255,p,pss_observer,false);  }
    {$IFDEF _FULLGAME}
    PlayerSetType(PlayerClient,pt_human);
    g_players[PlayerClient].name:=PlayerName;
@@ -527,19 +507,19 @@ begin
    then exit;
 
    case setting of
-nmid_loby_gameFixStarts   : if(map_preset_cur=0)then
+nmid_loby_gameFixStarts : if(map_preset_cur=0)then
                           begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_fixed_positions:=NewVal>0;
                              map_Make1Scirmish;
                           end;
-nmid_loby_gameDeadPObs: begin
+nmid_loby_gameDeadPObs  : begin
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
                              g_deadobservers:=NewVal>0;
                           end;
-nmid_loby_gameEmptySlots  : begin
+nmid_loby_gameEmptySlots: begin
                              if(NewVal>gms_g_maxai)then exit;
                              GameSetCommonSetting:=true;
                              if(Check)then exit;
@@ -593,7 +573,7 @@ begin
    menu_remake:= true;
    menu_redraw:= true;
 
-   vid_cam_x:=-vid_panel_pw;
+   vid_cam_x:=-ui_panel_pw;
    vid_cam_y:=0;
    GameCameraBounds;
 

@@ -62,6 +62,7 @@ begin
 end;
 
 procedure d_Game;
+var lsx,lsy:single;
 begin
    vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
    vid_blink_timer2+=1;vid_blink_timer2:=vid_blink_timer2 mod vid_blink_period2;
@@ -72,7 +73,7 @@ begin
       vid_blink3:=vid_blink3 mod 4;
    end;
 
-   vid_PanelUpdTimer+=1;vid_PanelUpdTimer:=vid_PanelUpdTimer mod vid_panel_period;
+   vid_PanelUpdTimer+=1;vid_PanelUpdTimer:=vid_PanelUpdTimer mod ui_panel_UpdateTime;
 
    vid_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
    vid_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
@@ -88,6 +89,9 @@ begin
 
    d_AddObjSprites(G_Status<>gs_running);
 
+   sdl_RenderGetScale(vid_SDLRenderer,@lsx,@lsy);
+   sdl_RenderSetScale(vid_SDLRenderer,lsx*vid_cam_sc,lsy*vid_cam_sc);
+   draw_set_font(font_base,basefont_w1);
    // MAP View
    d_MapTerrain;
    d_SpriteList;
@@ -95,41 +99,37 @@ begin
    if(ui_fog)then
    D_Fog;
 
- {  d_UIInfoItems    (r_screen,ui_MapView_x,ui_MapView_y);
+   d_UIInfoItems;
 
-   if(rpls_rstate<rpls_state_read)then
+   { if(rpls_rstate<rpls_state_read)then
    begin
    d_UIMouseMapBrush(r_screen,ui_MapView_x,ui_MapView_y);
    d_UIMouseMapClick(r_screen,ui_MapView_x,ui_MapView_y);
    end;    }
 
+   sdl_RenderSetScale(vid_SDLRenderer,lsx,lsy);
+
    d_UIText;
 
    // Control bar view
    if(vid_PanelUpdTimer=0)
-   or(vid_PanelUpdNow    )then d_UpdatePanel  ;
+   or(vid_PanelUpdNow    )then d_UpdatePanel;
    if(vid_PanelUpdTimer=1)then d_UpdateMinimap;
 
-   vid_PanelUpdNow:=false;
-
-   //draw_mwtexture1(ui_ControlBar_x,ui_ControlBar_y,r_ui_Panel  );
-   draw_mwtexture1(ui_MiniMap_x ,ui_MiniMap_y ,tex_ui_MiniMap1,1,1);
-
+   draw_set_color(c_white);
+   draw_mwtexture2(ui_ControlBar_x,ui_ControlBar_y,tex_ui_ControlBar,ui_ControlBar_w,ui_ControlBar_h);
+   draw_mwtexture2(ui_MiniMap_x   ,ui_MiniMap_y   ,tex_ui_MiniMap1  ,ui_MiniMap_w   ,ui_MiniMap_w   );
 
    if(mouse_select_x0>-1)then
    begin
       if(UIPlayer<=LastPlayer)
       then draw_set_color(PlayerColorNormal[UIPlayer])
       else draw_set_color(c_white);
-      draw_rect(mouse_select_x0-vid_cam_x, mouse_select_y0-vid_cam_y, mouse_x, mouse_y);
+      draw_rect(mouse_select_x0, mouse_select_y0, mouse_x, mouse_y);
    end;
- {  d_UIMouseCursor(r_screen);
-   //draw_surf(r_screen,mouse_x,mouse_y,theme_tile_terrain);
-                  }
-
+ //  d_UIMouseCursor(r_screen);
 
    if(test_mode>1)and(net_status=ns_single)then _draw_dbg;
-
 end;
 
 procedure draw_DebugTileSet(tileSet:pTMWTileSet);
@@ -218,6 +218,7 @@ begin
 
    //draw_DebugTileSet(theme_tileset_liquid[(SDL_GetTicks div 1000) mod theme_anim_step_n]);
 
+   draw_set_color(c_white);
    draw_mwtexture1(mouse_x,mouse_y,spr_cursor,1,1);
 
    //_drawMWSModel(@spr_HCommandCenter1);
@@ -283,11 +284,14 @@ begin
 
    draw_set_color(c_white);
    draw_set_font(font_base,basefont_w2);
-   draw_text_line(vid_cam_w,vid_cam_h-10,
+   draw_text_line(vid_vw,vid_vh-basefont_w1h,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    //' '+str_b2c[ui_MapPointInRevealedInScreen(mouse_map_x,mouse_map_y)]+
-   ' '+i2s(mouse_map_x div MapCellW)+
-   ' '+i2s(mouse_map_y div MapCellW)+
+   ' '+Float2Str(vid_cam_sc)+
+   ' '+i2s(mouse_map_x)+
+   ':'+i2s(mouse_map_y)+
+   //' '+i2s(mouse_map_x div MapCellW)+
+   //' '+i2s(mouse_map_y div MapCellW)+
    //' L'+i2s(map_csize)+
    //' C'+i2s(map_chsize)+
    //' r0: '+tc_green+i2s(debug_r0)+

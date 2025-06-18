@@ -153,6 +153,7 @@ TVSprite = record
    shadow_color,
    aura_color: TMWColor;
    alpha     : byte;
+   xflip     : boolean;
 end;
 PTVSprite = ^TVSprite;
 
@@ -251,11 +252,13 @@ TMapTerrainGridCellDecor = record
    tgca_decorN     : integer;
    tgca_decorS     : PTMWTexture;
    tgca_decorA     : PTThemeDecorAnim;
+   tgca_decorF     : boolean;
 end;
 TMapTerrainGridCellDecal = record
    tgca_decalX,
    tgca_decalY     : integer;
    tgca_decalS     : PTMWTexture;
+   tgca_decalF     : boolean;
 end;
 
 TMapTerrainGridCellAnim = record
@@ -567,8 +570,7 @@ TUID = record
    _animw,
    _animd,
    _fr          : integer;
-   un_btn,
-   un_sbtn      : TMWTexture;
+   un_btn       : pTMWTexture;
    un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
 
    un_txt_name,
@@ -781,6 +783,8 @@ TPlayer = record
 end;
 PTPlayer = ^TPlayer;
 TPList = array[0..LastPlayer] of TPLayer;
+
+TPlayerSlots = array[0..LastPlayer] of byte;
 
 TUnitVisionData = array[0..LastPlayer] of integer;
 

@@ -31,10 +31,6 @@ cfg_key_FPS            = 'vid_FPS';
 cfg_key_Renderer       = 'vid_SDLRenderer';
 
 
-
-// snd_PlayListSize
-
-
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
 function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
 
@@ -50,7 +46,7 @@ cfg_key_PlayerName    : PlayerName            := vl;
 cfg_key_SoundVolume   : snd_svolume1          := b2si1(vlw);
 cfg_key_MusicBolume   : snd_mvolume1          := b2si1(vlw);
 cfg_key_PlayListSize  : snd_PlayListSize      := vlw;
-cfg_key_ScrollSpeed   : vid_CamSpeed          := vli;
+cfg_key_ScrollSpeed   : vid_CamSpeedBase      := vli;
 cfg_key_FullScreen    : vid_fullscreen        :=(vl=str_b2c[true]);
 cfg_key_MouseScroll   : vid_CamMSEScroll      :=(vl=str_b2c[true]);
 cfg_key_ShadowsMode   : vid_ColoredShadow     :=(vl=str_b2c[true]);
@@ -62,7 +58,7 @@ cfg_key_VidWidth      : vid_vw                := vli;
 cfg_key_VidHeight     : vid_vh                := vli;
 cfg_key_g_FixedPos    : g_fixed_positions     :=(vl=str_b2c[true]);
 cfg_key_g_AISlots     : g_ai_slots            := vlw;
-cfg_key_g_Generators  : map_generators          := vlw;
+cfg_key_g_Generators  : map_generators        := vlw;
 cfg_key_ReplayName    : rpls_str_prefix       := vl;
 cfg_key_ReplayRecord  : rpls_Recording        :=(vl=str_b2c[true]);
 cfg_key_ReplayQuality : rpls_Quality          := vlw;
@@ -116,22 +112,17 @@ begin
       if(snd_svolume1<0)then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
       if(snd_mvolume1<0)then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
       if(snd_PlayListSize>snd_PlayListSizeMax)then snd_PlayListSize:=snd_PlayListSizeMax;
-      vid_CamSpeed:=mm3i(1,vid_CamSpeed,max_CamSpeed);
+      vid_CamSpeedBase:=mm3i(1,vid_CamSpeedBase,max_CamSpeed);
 
       PlayerName:=txt_ValidateStr(PlayerName,PlayerNameLen,@k_pname);
       if(length(PlayerName)=0)then PlayerName:=str_defaultPlayerName;
 
-      vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);
-      vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
-
-      if(g_ai_slots  >gms_g_maxai       )then g_ai_slots   :=gms_g_maxai;
-      if(map_generators>gms_g_maxgens     )then map_generators :=gms_g_maxgens;
+      if(g_ai_slots    >gms_g_maxai       )then g_ai_slots    :=gms_g_maxai;
+      if(map_generators>gms_g_maxgens     )then map_generators:=gms_g_maxgens;
 
       if(rpls_Quality>cl_UpT_arrayN_RPLs)then rpls_Quality :=cl_UpT_arrayN_RPLs;
       if(net_Quality >cl_UpT_arrayN     )then net_Quality  :=cl_UpT_arrayN;
    end;
-   menu_vid_vw:=vid_vw;
-   menu_vid_vh:=vid_vh;
 
    txt_ValidateServerAddr;
    txt_ValidateServerPort;
@@ -141,14 +132,14 @@ procedure cfg_write;
 var f:text;
 begin
    assign(f,cfgfn);
-{$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
+{$I-}rewrite(f);{$I+}if(ioresult<>0)then exit;
 
    writeln(f,cfg_key_PlayerName    ,'=',PlayerName                );
    writeln(f,cfg_key_SoundVolume   ,'=',si12b(snd_svolume1)       );
    writeln(f,cfg_key_MusicBolume   ,'=',si12b(snd_mvolume1)       );
    writeln(f,cfg_key_PlayListSize  ,'=',snd_PlayListSize          );
    writeln(f,cfg_key_FullScreen    ,'=',str_b2c[vid_fullscreen]   );
-   writeln(f,cfg_key_ScrollSpeed   ,'=',vid_CamSpeed              );
+   writeln(f,cfg_key_ScrollSpeed   ,'=',vid_CamSpeedBase          );
    writeln(f,cfg_key_MouseScroll   ,'=',str_b2c[vid_CamMSEScroll] );
    writeln(f,cfg_key_ShadowsMode   ,'=',str_b2c[vid_ColoredShadow]);
    writeln(f,cfg_key_ServerAddr    ,'=',net_cl_svaddr             );
@@ -163,7 +154,7 @@ begin
    writeln(f,cfg_key_ClientQuality ,'=',net_Quality               );
    writeln(f,cfg_key_g_FixedPos    ,'=',str_b2c[g_fixed_positions]);
    writeln(f,cfg_key_g_AISlots     ,'=',g_ai_slots                );
-   writeln(f,cfg_key_g_Generators  ,'=',map_generators              );
+   writeln(f,cfg_key_g_Generators  ,'=',map_generators            );
    writeln(f,cfg_key_PanelPos      ,'=',ord(vid_PannelPos)        );
    writeln(f,cfg_key_MiniMapPos    ,'=',str_b2c[vid_MiniMapPos]   );
    writeln(f,cfg_key_HealthBars    ,'=',ord(vid_UnitHealthBars)   );
