@@ -1307,12 +1307,12 @@ begin
    _uklight   := false;
    _a_BonusAntiFlyRange:=-50;
    _a_BonusAntiUnitRange:=50;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4,MID_SSShot ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,3,dm_AntiUnitBio2);
-   _weapon(1,wpt_missle,aw_srange,0,0,fr_fps1 ,MID_URocket,0,upgr_uac_antiair,1,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,0    );
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4 ,MID_SSShot ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,3,dm_AntiUnitBio2);
+   _weapon(1,wpt_missle,aw_srange,0,0,fr_fps2d3,MID_URocket,0,upgr_uac_antiair,1,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,0    );
 end;
 UID_Tank:
 begin
-   _mhits     := 6000;
+   _mhits     := 5000;
    _renergy   := 600;
    _r         := 20;
    _speed     := 8;
@@ -1326,8 +1326,8 @@ begin
    //_splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
-   _a_BonusAntiBuildingRange:=75;
-   _weapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fps1,MID_Tank,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_building,0,dm_Siege4);
+   _a_BonusAntiBuildingRange:=50;
+   _weapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fps2d3,MID_Tank,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_building,0,dm_Siege4);
 end;
 UID_Flyer:
 begin

@@ -490,38 +490,42 @@ pct_middle : rpls_step:=fr_fpsd2*fr_fps1;
          if(click_type=pct_left)then
          begin
             case u of
-  0 : if(not PlayerSetProdError(HPlayer,lmt_argt_abil,254,unit_CanAbility(ui_uibtn_sabilityu,1),ui_uibtn_sabilityu))then
-      _player_s_o(co_sability,0,0,0,ui_uibtn_sabilityu^.uid^._ability  , uo_corder  ,HPlayer);
-  1 : begin
-         m_brush :=co_psability;
-         check_mouse_brush(true);
-      end;
-  2 : if(not PlayerSetProdError(HPlayer,lmt_argt_unit,0,unit_CanRebuild(ui_uibtn_rebuildu),ui_uibtn_rebuildu))then
-      _player_s_o(co_rebuild ,0,0,0,ui_uibtn_rebuildu^.uid^._rebuild_uid, uo_corder  ,HPlayer);
-
-  3 : m_brush :=co_amove;
-  4 : _player_s_o(co_astand  ,0,0,0,0, uo_corder  ,HPlayer);
-  5 : m_brush :=co_apatrol;
-
-  6 : m_brush :=co_move;
-  7 : _player_s_o(co_stand   ,0,0,0,0, uo_corder  ,HPlayer);
-  8 : m_brush :=co_patrol;
-
-  9 : if(s_barracks>0)
-      or(s_smiths  >0)
-      then _player_s_o(co_pcancle ,0,0,0,0, uo_corder  ,HPlayer)
-      else
-        case ui_tab of
-        1 : _player_s_o(co_cuprod  ,255,0,0,0,uo_corder,HPlayer);
-        2 : _player_s_o(co_cupgrade,255,0,0,0,uo_corder,HPlayer);
-        end;
   10: if(ui_orders_x[MaxUnitGroups]>0)then
         if(click_dbl)
         then MoveCamToPoint(ui_orders_x[MaxUnitGroups],ui_orders_y[MaxUnitGroups])
         else units_SelectGroup(false,HPlayer,255); //_player_s_o(0,0,0,0,0,uo_specsel,HPlayer);
-  11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
   12: m_brush :=co_mmark;
   13: m_action:=not m_action;
+            else
+            if(_players[HPlayer].s_all>0)then
+            case u of
+            0 : if(not PlayerSetProdError(HPlayer,lmt_argt_abil,254,unit_CanAbility(ui_uibtn_sabilityu,1),ui_uibtn_sabilityu))then
+                  _player_s_o(co_sability,0,0,0,ui_uibtn_sabilityu^.uid^._ability  , uo_corder  ,HPlayer);
+            1 : begin
+                   m_brush :=co_psability;
+                   check_mouse_brush(true);
+                end;
+            2 : if(not PlayerSetProdError(HPlayer,lmt_argt_unit,0,unit_CanRebuild(ui_uibtn_rebuildu),ui_uibtn_rebuildu))then
+                  _player_s_o(co_rebuild ,0,0,0,ui_uibtn_rebuildu^.uid^._rebuild_uid, uo_corder  ,HPlayer);
+
+            3 : m_brush :=co_amove;
+            4 : _player_s_o(co_astand  ,0,0,0,0, uo_corder  ,HPlayer);
+            5 : m_brush :=co_apatrol;
+
+            6 : m_brush :=co_move;
+            7 : _player_s_o(co_stand   ,0,0,0,0, uo_corder  ,HPlayer);
+            8 : m_brush :=co_patrol;
+
+            9 : if(s_barracks>0)
+                or(s_smiths  >0)
+                then _player_s_o(co_pcancle ,0,0,0,0, uo_corder  ,HPlayer)
+                else
+                  case ui_tab of
+                  1 : _player_s_o(co_cuprod  ,255,0,0,0,uo_corder,HPlayer);
+                  2 : _player_s_o(co_cupgrade,255,0,0,0,uo_corder,HPlayer);
+                  end;
+            11: _player_s_o(co_destroy,0,0,0,0 ,uo_corder  ,HPlayer);
+            end;
             end;
 
             check_mouse_brush(false);

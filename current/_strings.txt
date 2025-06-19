@@ -1662,7 +1662,7 @@ Requirements: Science Facility
 Produced by: Vehicle Factory
 Arming/Abilities: 
 - ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 156*1.33, target priority: [unit,bio], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological],x0.5 [mechanical];
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,flying], impact 52*1, target priority: lowest hits, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
+- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,flying], impact 52*1.5, target priority: lowest hits, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1676,7 +1676,7 @@ Tank
 
 Hotkey: J
 Categories/Attributes: [unit,mechanical,heavy,ground]
-Max hits: 6000
+Max hits: 5000
 Limit used: 4
 Size: 20
 Base movement speed: 8
@@ -1687,7 +1687,7 @@ Places in transport: 6
 Requirements: Science Facility
 Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +75, targets: [alive,ground], impact 52x2*1, splash damage radius: 20, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 52x2*1.5, splash damage radius: 20, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;

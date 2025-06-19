@@ -75,7 +75,7 @@ begin
        end;
     end;
 end;
-function SetBTA(b0,b1:byte;b0c:integer):boolean;
+function SetBTA(b0,b1:byte;b0c:integer;b01c:integer=2):boolean;
 begin
    SetBTA:=false;
    if(bt=0)then
@@ -90,7 +90,7 @@ begin
           if(uid_e[b1]<=0)
           then SetBTA:=SetBT(b1)
           else
-            if(uid_e[b1]<(uid_e[b0] div 2))then SetBTA:=SetBT(b1);
+            if(uid_e[b1]<(uid_e[b0] div b01c))then SetBTA:=SetBT(b1);
        if(not SetBTA)then SetBTA:=SetBT(b0);
        if(not SetBTA)then SetBTA:=SetBT(b1);
     end;
@@ -120,7 +120,13 @@ begin
     with player^ do
      if(ai_unitp_cur<a)and(ai_unitp_cur<ai_maxcount_unitps)then
       if(ai_tech1_cur<=0)or(ai_unitp_cur_na=0)or(ai_unitp_cur<4)then
-       if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3))then ddir:=-1;
+      case race of
+      r_hell: if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3))then ddir:=-1;
+      r_uac : case uid_e[aiucl_tech1[race]]>0 of
+              true : if(SetBTA(aiucl_barrack1[race],aiucl_barrack0[race],1,3))then ddir:=-1;
+              false: if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3,3))then ddir:=-1;
+              end;
+      end;
 end;
 procedure BuildSmith(a:integer);  // Smiths
 begin
@@ -663,7 +669,7 @@ UID_UGenerator4: if(cenergy>_genergy)and(armylimit>ai_GeneratorsDestoryLimit)and
           begin
              i:=level+1;
 
-             if(_isbarrack)and(ai_unitp_cur>2)then
+             if(_isbarrack)and(ai_unitp_cur>2)and(uid_e[uidi]>1)then
               if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
                if((ai_unitp_cur-i-5)>=ai_unitp_need)then exit;
              if(_issmith  )and(ai_upgrp_cur>1)then
