@@ -488,6 +488,53 @@ begin
       PlayersAddToLog(playeri,PlayerAllies(playeri,false),lmt_allies_attacked,0,uidi,'',x,y,false);
    end;
 end;
+procedure GameLogCPointCaptured(from_player,cpoint,to_team:byte);
+begin
+   if(to_team>MaxPlayers)
+   or(from_player>MaxPlayers)
+   or(cpoint<1)
+   or(MaxCPoints<cpoint)then exit;
+
+   if(cpoint=1)and(g_mode=gm_koth)then exit;
+
+   with g_cpoints[cpoint] do
+     if(cpenergy>0)
+     then PlayersAddToLog(from_player,PlayerAllies(from_player,false),lmt_ngen_captured  ,0,0,'',cpx,cpy,false)
+     else PlayersAddToLog(from_player,PlayerAllies(from_player,false),lmt_cpoint_captured,0,0,'',cpx,cpy,false);
+end;
+procedure GameLogCPointLost(from_player,cpoint,to_team:byte);
+begin
+   if(to_team>MaxPlayers)
+   or(from_player>MaxPlayers)
+   or(cpoint<1)
+   or(MaxCPoints<cpoint)then exit;
+
+   if(cpoint=1)and(g_mode=gm_koth)then exit;
+
+   with g_cpoints[cpoint] do
+     if(cpenergy>0)
+     then PlayersAddToLog(from_player,PlayerAllies(from_player,false),lmt_ngen_lost  ,0,0,'',cpx,cpy,false)
+     else PlayersAddToLog(from_player,PlayerAllies(from_player,false),lmt_cpoint_lost,0,0,'',cpx,cpy,false);
+end;
+procedure GameLogKotHControl;
+begin
+   if(g_mode<>gm_koth)then exit;
+
+   with g_cpoints[1] do
+     PlayersAddToLog(255,255,lmt_koth_control,0,cpTimerOwnerTeam,'',cpx,cpy,false);
+end;
+procedure GameLogNgenExh(from_player,cpoint,to_team:byte);
+begin
+   if(to_team>MaxPlayers)
+   or(from_player>MaxPlayers)
+   or(cpoint<1)
+   or(MaxCPoints<cpoint)then exit;
+
+   if(cpoint=1)and(g_mode=gm_koth)then exit;
+
+   with g_cpoints[cpoint] do
+     PlayersAddToLog(from_player,PlayerAllies(from_player,false),lmt_ngen_exh  ,0,0,'',cpx,cpy,false);
+end;
 
 procedure PlayerClearLog(pn:byte);
 var i:cardinal;
@@ -1541,6 +1588,30 @@ lmt_unit_attacked    : begin
                         then ParseLogMessage:=str_base_attacked+' ('+un_txt_name+')'
                         else ParseLogMessage:=str_unit_attacked+' ('+un_txt_name+')';
                        mcolor^:=c_red;
+                       end;
+lmt_cpoint_captured  : begin
+                       ParseLogMessage:=str_cpoint_captured;
+                       mcolor^:=c_dred;
+                       end;
+lmt_cpoint_lost      : begin
+                       ParseLogMessage:=str_cpoint_lost;
+                       mcolor^:=c_dred;
+                       end;
+lmt_koth_control     : begin
+                       ParseLogMessage:=b2s(argx)+str_koth_control;
+                       mcolor^:=c_dred;
+                       end;
+lmt_ngen_exh         : begin
+                       ParseLogMessage:=str_ngen_exh;
+                       mcolor^:=c_dyellow;
+                       end;
+lmt_ngen_captured    : begin
+                       ParseLogMessage:=str_ngen_captured;
+                       mcolor^:=c_dyellow;
+                       end;
+lmt_ngen_lost        : begin
+                       ParseLogMessage:=str_ngen_lost;
+                       mcolor^:=c_dyellow;
                        end;
 lmt_ability_cantland : begin
                        ParseLogMessage:=str_cant_land;

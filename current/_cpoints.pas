@@ -1,5 +1,5 @@
 
-procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte);
+procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
 var p:byte;
 begin
    if(newOwnerPlayer<=MaxPlayers)then
@@ -7,23 +7,31 @@ begin
    if(cpOwnerPlayer<>newOwnerPlayer)then
    begin
       if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
-        with _players[p] do
-         if(team=cpOwnerTeam)then
-         begin
-            cenergy-=cpenergy;
-            menergy-=cpenergy;
-         end;
+      begin
+         for p:=0 to MaxPlayers do
+          with _players[p] do
+           if(team=cpOwnerTeam)then
+           begin
+              cenergy-=cpenergy;
+              menergy-=cpenergy;
+           end;
+         if(cpOwnerPlayer<>0)and(log)then
+           GameLogCPointLost(cpOwnerPlayer,i,cpOwnerTeam);
+      end;
+
       cpOwnerPlayer:=newOwnerPlayer;
       cpOwnerTeam  :=_players[newOwnerPlayer].team;
       if(cpOwnerTeam>0)then
-       for p:=0 to MaxPlayers do
-        with _players[p] do
-         if(team=cpOwnerTeam)then
-         begin
-            cenergy+=cpenergy;
-            menergy+=cpenergy;
-         end;
+      begin
+         for p:=0 to MaxPlayers do
+          with _players[p] do
+           if(team=cpOwnerTeam)then
+           begin
+              cenergy+=cpenergy;
+              menergy+=cpenergy;
+           end;
+         if(log)then GameLogCPointCaptured(cpOwnerPlayer,i,cpOwnerTeam);
+      end;
    end;
 end;
 
@@ -47,7 +55,8 @@ begin
 
        if(p>0)then
        begin
-          CPoint_ChangeOwner(i,0);
+          GameLogNGenExh(cpOwnerPlayer,i,cpOwnerTeam);
+          CPoint_ChangeOwner(i,0,false);
           cpCaptureR:=-cpCaptureR;
           {$IFDEF _FULLGAME}
           effect_CPExplode(cpx,cpy);
@@ -97,6 +106,7 @@ begin
              if(cpTimerOwnerTeam<>iOwnerTeam)then
              begin
                 cpTimerOwnerTeam:=iOwnerTeam;
+                if(i=1)and(g_mode=gm_koth)then GameLogKotHControl;
                 cpTimer:=0;
              end;
              if(cpTimer<cpCaptureTime)

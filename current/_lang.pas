@@ -860,6 +860,12 @@ begin
    str_NeedMoreProd      := 'Nowhere to produce that';
    str_MaximumReached    := 'Maximum reached';
    str_mapMark           := ' set a mark on the map';
+   str_cpoint_captured   := 'The Key point was captured!';
+   str_cpoint_lost       := 'The Key point was lost!';
+   str_koth_control      := ' team starts controlling the center!';
+   str_ngen_captured     := 'The Neutral Generator was captured!';
+   str_ngen_lost         := 'The Neutral Generator was lost!';
+   str_ngen_exh          := 'The Neutral Generator was exhausted!';
 
    str_attr_alive        := tc_lime  +'alive'       ;
    str_attr_dead         := tc_dgray +'dead'        ;
@@ -1426,6 +1432,12 @@ begin
   str_NeedMoreProd      := 'Негде производить это';
   str_MaximumReached    := 'Достигнут максимум';
   str_mapMark           := ' поставил отметку на карте';
+  str_cpoint_captured   := 'Ключевая точка захвачена!';
+  str_cpoint_lost       := 'Ключевая точка потеряна!';
+  str_koth_control      := ' команда контролирует центр!';
+  str_ngen_captured     := 'Нейтральный генератор захвачен!';
+  str_ngen_lost         := 'Нейтральный генератор потерян!';
+  str_ngen_exh          := 'Нейтральный генератор истощился!';
 
   str_attr_alive        := tc_lime  +'живой'         ;
   str_attr_dead         := tc_dgray +'мертвый'       ;

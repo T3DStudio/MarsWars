@@ -796,8 +796,8 @@ end;
 UID_UMine:
 begin
    setMWSModel   (0,@spr_Mine);
-   setBuildingSND(snd_mine_place);
-   un_snd_ready:=snd_mine_place;
+   //setBuildingSND(snd_mine_place);
+   //un_snd_ready:=snd_mine_place;
    setWeaponESND(0,nil,snd_electro,0,0);
    setEffectEID(0,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND(  nil,snd_exp,snd_exp,nil);

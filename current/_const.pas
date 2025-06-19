@@ -194,6 +194,12 @@ lmt_ability_needS      = 32;
 lmt_ability_needSP     = 33;
 lmt_ability_reload     = 34;
 lmt_ability_cantland   = 35;
+lmt_cpoint_captured    = 36;
+lmt_cpoint_lost        = 37;
+lmt_ngen_exh           = 38;
+lmt_ngen_captured      = 39;
+lmt_ngen_lost          = 40;
+lmt_koth_control       = 41;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [

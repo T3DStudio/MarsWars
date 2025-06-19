@@ -505,6 +505,9 @@ lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
 lmt_unit_ready        : with _uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
+lmt_koth_control,
+lmt_ngen_captured,
+lmt_cpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
 lmt_ability_cantland,
 lmt_ability_reload,
 lmt_ability_needS ,
@@ -518,7 +521,10 @@ lmt_production_busy,
 lmt_req_ruids,
 lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
-lmt_map_mark          : SoundPlayAnoncer(snd_mapmark,false,false);
+lmt_ngen_exh,
+lmt_ngen_lost,
+lmt_cpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
+lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with _uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
@@ -607,11 +613,12 @@ begin
    snd_building_explode     :=SoundSetLoad('building_explode');
    snd_teleport             :=SoundSetLoad('teleport'        );
    snd_exp                  :=SoundSetLoad('explode'         );
-   snd_mine_place           :=SoundSetLoad('mine_place'      );
    snd_transport            :=SoundSetLoad('inapc'           );
    snd_meat                 :=SoundSetLoad('meat'            );
    snd_cube                 :=SoundSetLoad('cube_s'          );
    snd_mapmark              :=SoundSetLoad('mapmark'         );
+   snd_capture              :=SoundSetLoad('capture'         );
+   snd_cplost               :=SoundSetLoad('cplost'          );
 
    snd_pexp                 :=SoundSetLoad(missiles_folder+'p_exp'           );
    snd_launch               :=SoundSetLoad(missiles_folder+'launch'          );
