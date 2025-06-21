@@ -824,7 +824,8 @@ begin
                 if(tu^.iscomplete)and(tu^.hits<tu^.uid^._mhits)and(tu^.buff[ub_Heal]<=0)then
                  if(tu^.uid^._ukmech)
                  then _setNearestTarget(@ai_mrepair_u,@ai_mrepair_d,ud)
-                 else _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
+                 else
+                   if(not tu^.uid^._ukbuilding)then _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
             end
             else
              if(CheckUnitTeamVision(team,tu,false))

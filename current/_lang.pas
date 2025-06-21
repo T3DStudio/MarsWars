@@ -885,10 +885,10 @@ begin
    str_attr_transport    := tc_gray  +'transport'   ;
 
    str_panelpos          := 'Control panel position';
-   str_panelposp[0]      := tc_lime  +'left' +tc_default;
-   str_panelposp[1]      := tc_orange+'right'+tc_default;
-   str_panelposp[2]      := tc_yellow+'up'   +tc_default;
-   str_panelposp[3]      := tc_aqua  +'down' +tc_default;
+   str_panelposp[0]      := tc_lime  +'left'  +tc_default;
+   str_panelposp[1]      := tc_orange+'right' +tc_default;
+   str_panelposp[2]      := tc_yellow+'top'   +tc_default;
+   str_panelposp[3]      := tc_aqua  +'bottom'+tc_default;
 
    str_uhbar             := 'Health bars';
    str_uhbars[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;

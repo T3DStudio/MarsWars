@@ -80,9 +80,6 @@ begin
       end;
 
       if(damage<=0)then damage:=1;
-      { if(_random(abs(damage)+1)=0)
-       then damage:=1
-       else damage:=0; }
 
       if(hits<=damage)then
       begin
@@ -378,7 +375,7 @@ begin
    end;
 
    if(pu<>nil)then
-     if(tu^.playeri<>pu^.playeri)then
+     if(tu^.player^.team<>pu^.player^.team)then
        with pu^ do
        with uid^ do
        with player^ do
@@ -389,7 +386,7 @@ begin
    if(check)then exit;
 
    if(pu<>nil)then
-     if(tu^.playeri<>pu^.playeri)then
+     if(tu^.player^.team<>pu^.player^.team)then
      begin
         _unit_add(tu^.x,tu^.y,pu^.unum,tu^.uidi,pu^.playeri,true,false,tu^.level);
 
@@ -630,7 +627,7 @@ wtp_UnitBio          : begin
                        end;
 wtp_Bio              : begin
                        incPrio(not _ukmech       );
-                       incPrio(not iscomplete    );
+                       incPrio((not _ukbuilding)or(not iscomplete));
                        end;
 wtp_Light            : incPrio(    _uklight      );
 wtp_GroundLight      : begin
