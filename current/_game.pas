@@ -501,6 +501,180 @@ begin
            end;
 end;
 
+
+function CheckUIDBaseFlags(tuid:PTUID;flags:cardinal):boolean;
+begin
+   CheckUIDBaseFlags:=false;
+
+   if((flags and wtr_unit    )=0)and(not tuid^._ukbuilding   )then exit;
+   if((flags and wtr_building)=0)and(    tuid^._ukbuilding   )then exit;
+
+   if((flags and wtr_bio     )=0)and(not tuid^._ukmech       )then exit;
+   if((flags and wtr_mech    )=0)and(    tuid^._ukmech       )then exit;
+
+   if((flags and wtr_light   )=0)and    (tuid^._uklight      )then exit;
+   if((flags and wtr_heavy   )=0)and not(tuid^._uklight      )then exit;
+
+   if (tuid<>@_uids[UID_LostSoul])
+   and(tuid<>@_uids[UID_Phantom ])then
+   begin
+   if((flags and wtr_ground  )=0)and(tuid^._ukfly=uf_ground  )then exit;
+   if((flags and wtr_fly     )=0)and(tuid^._ukfly=uf_fly     )then exit;
+   end;
+
+   CheckUIDBaseFlags:=true;
+end;
+
+function WeaponCanAttackUid(pweap:PTUWeapon;uid:byte):single;
+var dm:byte;
+begin
+   WeaponCanAttackUid:=0;
+
+   with pweap^ do
+   if(CheckUIDBaseFlags(@_uids[uid],aw_tarf))and(uid in aw_uids)then
+   if(aw_type=wpt_missle)
+   or(aw_type=wpt_directdmg)
+   or(aw_type=wpt_unit)then
+   begin
+      WeaponCanAttackUid:=1;
+
+      if(aw_dmod>0)then
+        for dm:=0 to MaxDamageModFactors do
+          with _dmods[aw_dmod][dm] do
+            if(CheckUIDBaseFlags(@_uids[uid],dm_flags))then WeaponCanAttackUid*=(dm_factor/100);
+   end;
+end;
+
+function TSOB2Surface(psob:PTSoB):pSDL_Surface;
+const row = 7;
+var u,n,x,y,w,h:byte;
+begin
+   TSOB2Surface:=nil;
+
+   n:=0;
+   for u:=0 to 255 do
+     if(u in psob^)then
+       n+=1;
+
+   //writeln(n);
+
+   if(n>0)then
+   begin
+      if(n>row)
+      then w:=row
+      else w:=n;
+      h:=(n div row);
+      if(w mod row)>0 then h+=1;
+
+      TSOB2Surface:=_createSurf(vid_BW*w,vid_BW*h);
+      x:=0;
+      y:=0;
+      for u:=0 to 255 do
+        if(u in psob^)then
+        begin
+          _draw_surf(TSOB2Surface,x*vid_BW,y*vid_BW,_uids[u].un_btn.surf);
+          x+=1;
+          if(x>row)then
+          begin
+             x:=0;
+             y+=1;
+          end;
+        end;
+   end;
+end;
+
+procedure save_surf(fname:shortstring;surf:pSDL_Surface);
+begin
+   if(surf=nil)then exit;
+   fname:='temp\'+fname+'.bmp'+#0;
+   sdl_saveBMP(surf,@fname[1]);
+   sdl_freesurface(surf);
+end;
+
+procedure test_UnitsSpec;
+var
+unit2good,
+unit2fear,
+unit2usles : array[byte] of set of byte;
+var
+u1,u2,w:byte;
+dmg1,dmg2,t  :single;
+pu1,pu2:PTUID;
+begin
+   FillChar(unit2good ,SizeOf(unit2good  ),0);
+   FillChar(unit2fear ,SizeOf(unit2fear  ),0);
+   FillChar(unit2usles,SizeOf(unit2usles ),0);
+
+   for u1:=0 to 255 do
+   for u2:=0 to 255 do
+   begin
+      pu1:=@_uids[u1];
+      pu2:=@_uids[u2];
+
+      if(pu1^._mhits<=0)
+      or(pu2^._mhits<=0)
+      or(pu1^._ucl=255)
+      or(pu2^._ucl=255)then continue;
+
+      if(pu1^._attack=0)then continue;
+
+      dmg1:=0;
+      dmg2:=0;
+      for w:=0 to MaxUnitWeapons do
+      begin
+         t:=WeaponCanAttackUid(@pu1^._a_weap[w],u2);
+         if(t>dmg1)then dmg1:=t;
+
+         t:=WeaponCanAttackUid(@pu2^._a_weap[w],u1);
+         if(t>dmg2)then dmg2:=t;
+      end;
+
+      if(dmg1<=1)and(pu2^._ukbuilding)then continue;
+
+      if(dmg1>dmg2)and((dmg1>1)or(dmg2=0))
+      then unit2good[u1]+=[u2];
+
+      if(dmg1>dmg2)and(dmg1>1)then
+      begin
+
+         unit2fear[u2]+=[u1];
+      end
+      else
+        if(dmg1=0)and(dmg2>0)then unit2usles[u1]+=[u2];
+   end;
+
+   for u1 in [UID_Cacodemon,UID_Demon,UID_UACDron] do
+   begin
+      writeln(_uids[u1].un_txt_name);
+      write('Good against: ');
+      for u2:=0 to 255 do
+        if(u2 in unit2good[u1])then write(_uids[u2].un_txt_name,', ');
+      writeln;
+      write('Bad against: ');
+      for u2:=0 to 255 do
+        if(u2 in unit2fear[u1])then write(_uids[u2].un_txt_name,', ');
+      writeln;
+      write('Usles against: ');
+      for u2:=0 to 255 do
+        if(u2 in unit2usles[u1])then write(_uids[u2].un_txt_name,', ');
+      writeln;
+   end;
+
+   for u1:=0 to 255 do
+   begin
+      pu1:=@_uids[u1];
+
+      if(pu1^._mhits<=0)
+      or(pu1^._ucl=255)then continue;
+      if(pu1^._attack=0)then continue;
+
+      save_surf(_uids[u1].un_txt_name+'_good' ,TSOB2Surface(@unit2good [u1]));
+      save_surf(_uids[u1].un_txt_name+'_bad'  ,TSOB2Surface(@unit2fear [u1]));
+      save_surf(_uids[u1].un_txt_name+'_usles',TSOB2Surface(@unit2usles[u1]));
+   end;
+end;
+
+
 {$ELSE}
 {$include _ded.pas}
 {$ENDIF}

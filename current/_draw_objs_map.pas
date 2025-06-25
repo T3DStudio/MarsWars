@@ -55,7 +55,7 @@ begin
     with map_dds[d] do
      if(t>0)then
      begin
-        if(not RectInCam(x,y,255,255,0))then continue;
+        if(not RectInCam(x,y,r,r,0))then continue;
 
         ro:=0;
         with _players[HPlayer] do

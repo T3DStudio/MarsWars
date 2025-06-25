@@ -208,7 +208,8 @@ end;
 procedure _unit_push(pu,tu:PTUnit;uds:single);
 var t:single;
    ud:integer;
-shortcollision:boolean;
+shortcollision,
+dirturn:boolean;
 begin
    with pu^ do
    with uid^ do
@@ -219,6 +220,8 @@ begin
       then uds-=tu^.uid^._r
       else uds-=tu^.uid^._r+_r;
       ud:=round(uds);
+
+      dirturn:=(a_rld<=0)and((tu^.speed<=0)or(not tu^.iscomplete)or(tu^.uid^._ukbuilding)or((tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)) );
 
       if(uds<0)then
       begin
@@ -238,7 +241,7 @@ begin
 
          vstp+=round(uds/speed*UnitStepTicks);
 
-         if(a_rld<=0)then
+         if(dirturn)then
           if(vx<>x)or(vy<>y)then
            if(shortcollision)
            then dir:=_DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))

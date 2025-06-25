@@ -233,6 +233,7 @@ TUWeapon = record
   aw_AnimStay : byte;
   {$ENDIF}
 end;
+PTUWeapon = ^TUWeapon;
 
 TUID = record
    _square,

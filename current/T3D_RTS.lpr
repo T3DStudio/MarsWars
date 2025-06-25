@@ -7,7 +7,7 @@ program T3D_RTS;
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE DEBUG0}
-  {$APPTYPE GUI}
+  //{$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}
@@ -81,7 +81,10 @@ begin
    InitGame;
    {$IFDEF _FULLGAME}
    if(TestMode=2)then
+   begin
    WriteUnitDescriptions;
+   test_UnitsSpec;
+   end;
    {$ENDIF}
 
    while(GameCycle)do

@@ -127,7 +127,6 @@ wtrset_enemy_alive_ground_heavy_bio,
 wtrset_enemy_alive_ground_bio,
 wtrset_enemy_alive_ground_light_bio,
 wtrset_heal,
-wtrset_healu,
 wtrset_repair,
 wtrset_resurect   : cardinal;
 

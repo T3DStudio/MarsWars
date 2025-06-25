@@ -26,7 +26,7 @@ begin
       with uid^ do
       begin
          isbuildarea:=_isbuilder;
-         srange     :=_r+_r; //_srange;
+         srange     :=_r+_r;
          speed      :=_speed;
          ukfly      :=_ukfly;
          transportM :=_transportM;
@@ -170,7 +170,7 @@ begin
    _mhits     := 1000;
    _genergy   := 50;
    _renergy   := 50;
-   _r         := 22;  //1520
+   _r         := 22;
    _ucl       := 2;
    _btime     := ptime1;
    _ukbuilding:= true;
@@ -273,11 +273,11 @@ end;
 UID_HAltar:
 begin
    _mhits     := 12500;
-   _renergy   := 800;
+   _renergy   := 2000;
    _r         := 50;
    _ucl       := 14;
    _limituse  := ul10;
-   _btime     := haltar_reload_sec;
+   _btime     := ptime10;
    _ruid1     := UID_HPentagram;
    _ruid2     := UID_HMonastery;
    _ruid3     := UID_HFortress;
@@ -1014,10 +1014,10 @@ end;
 UID_URMStation:
 begin
    _mhits     := 10000;
-   _renergy   := 800;
+   _renergy   := 2000;
    _r         := 40;
    _ucl       := 14;
-   _btime     := mstrike_reload_sec;
+   _btime     := ptime10;
    _limituse  := ul10;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UComputerStation;
@@ -1068,7 +1068,7 @@ begin
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,wtp_nolost_hits,0,dm_AntiFly2);
 end;
 
-UID_UMine:
+{UID_UMine:
 begin
    _mhits     := 100;
    _renergy   := 10;
@@ -1087,7 +1087,7 @@ begin
    _fastdeath_hits:=1;
 
    _weapon(0,wpt_suicide,-mine_r,0,0,fr_fps1,0,0,0,0,0,0,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_distance,0,0);
-end;
+end; }
 
 ///////////////////////////////////
 UID_Sergant:
@@ -1169,7 +1169,6 @@ begin
    _uklight   := false;
    _ruid1     := UID_UWeaponFactory;
    _fastdeath_hits:=fdead_hits_border;
-   //_a_BonusAntiBuildingRange:=50;
    _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_building,0,dm_Siege4);
 end;
 UID_FPlasmagunner:
@@ -1283,7 +1282,6 @@ begin
    _ukfly     := uf_fly;
    _attack    := atm_none;
    _ukmech    := true;
-  // _splashresist:=true;
    _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;
    ups_transport:=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
@@ -1301,13 +1299,12 @@ begin
    _limituse  := ul3;
    _attack    := atm_always;
    _ukmech    := true;
-   //_splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _uklight   := false;
    _a_BonusAntiFlyRange:=-50;
    _a_BonusAntiUnitRange:=50;
-   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4 ,MID_SSShot ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,3,dm_AntiUnitBio2);
+   _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd4 ,MID_SShot  ,0,0               ,0,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,0,dm_AntiUnitBio2);
    _weapon(1,wpt_missle,aw_srange,0,0,fr_fps2d3,MID_URocket,0,upgr_uac_antiair,1,upgr_uac_attack,BaseDamageBonus1 ,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,0    );
 end;
 UID_Tank:
@@ -1323,7 +1320,6 @@ begin
    _limituse  := ul4;
    _attack    := atm_always;
    _ukmech    := true;
-   //_splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
    _a_BonusAntiBuildingRange:=50;
@@ -1343,7 +1339,6 @@ begin
    _limituse  := ul4;
    _attack    := atm_always;
    _ukmech    := true;
-   //_splashresist:=true;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=1;
@@ -1351,7 +1346,7 @@ begin
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd2,MID_Flyer  ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_GroundLight,0,dm_AntiGroundLight2);
 end;
 
-UID_APC:
+{UID_APC:
 begin
    _mhits     := 3000;
    _renergy   := 200;
@@ -1365,10 +1360,9 @@ begin
    _attack    := atm_bunker;
    _ukmech    := true;
    _slowturn  := true;
-   //_splashresist:=true;
    _fastdeath_hits:=1;
    ups_transport    :=uids_marines;
-end;
+end; }
 
 UID_UBaseMil:
 begin
@@ -1431,7 +1425,6 @@ end;
       if(_ukbuilding)then
       begin
          _zombie_hits:=_mhits div 4;
-         //_ukmech     :=true;
          _srange:=max2(_r+_r,_srange);
       end;
 
@@ -1510,7 +1503,7 @@ MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage6;
 MID_Mine           : mid_base_damage :=BaseDamage10;
-MID_Blizzard       : mid_base_damage :=BaseDamage10*3;
+MID_Blizzard       : mid_base_damage :=BaseDamage10*4;
 end;
 
 // splash R
@@ -1585,7 +1578,7 @@ begin
    SetDMOD(dm_SSGShot2         ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitBioLight2,0,200,wtr_unit    +wtr_bio +wtr_light           );
    SetDMOD(dm_AntiUnitBio2     ,0,200,wtr_unit    +wtr_bio                      );
-   SetDMOD(dm_AntiUnitBio2     ,1, 50,             wtr_mech                     );
+   //SetDMOD(dm_AntiUnitBio2     ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitMech2    ,0,200,wtr_unit    +wtr_mech                     );
    SetDMOD(dm_AntiUnitLight2   ,0,200,wtr_unit             +wtr_light           );
    SetDMOD(dm_AntiFly2         ,0,200,                                wtr_fly   );
@@ -1706,8 +1699,7 @@ begin
    wtrset_enemy_alive_heavy_bio          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          +wtr_stun+wtr_nostun;
    wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
    wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light          +wtr_stun+wtr_nostun;
-   wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_healu                          :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+wtr_mech+wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
+   wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+         wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
    wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
    wtrset_resurect                       :=wtr_owner_p+wtr_owner_a+wtr_owner_e+           wtr_hits_d           +wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
 

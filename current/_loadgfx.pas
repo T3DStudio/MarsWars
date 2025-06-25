@@ -265,7 +265,7 @@ begin
 
    dir:=0;
    case animstyle of
-   0: i:=r div 14;
+   0: i:=r div 17;
    1: i:=-5;
    end;
 

@@ -520,7 +520,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
 MaxDIDs                = 7;
 
-DID_R                  : array[0..MaxDIDs] of smallint = (0,290,210,125,64,105,60,17);
+DID_R                  : array[0..MaxDIDs] of smallint = (0,375,295,215,155,105,60,17);
 
 //pi*_r*_r
 
@@ -694,6 +694,7 @@ ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
 ptime5                 = ptime1*5;
 ptime6                 = ptime1*6;
+ptime10                = ptime1*10;
 
 uf_ground              = false;
 uf_fly                 = true;
@@ -925,8 +926,8 @@ hell_vision_time       = fr_fps1*8;
 
 hteleport_rldPerLimit  = 5;
 
-mstrike_reload_sec     = ptime5;
-haltar_reload_sec      = ptime6;
+mstrike_reload_sec     = 60;
+haltar_reload_sec      = 60;
 
 mstrike_reload         = fr_fps1*mstrike_reload_sec;
 haltar_reload          = fr_fps1*haltar_reload_sec;
