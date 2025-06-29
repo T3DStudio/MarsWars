@@ -1231,6 +1231,10 @@ vid_blink_period2      = vid_blink_period1*2;
 
 ui_alarm_time          = vid_blink_period2;
 
+{$IFDEF UNITDATA}
+vid_BWd                = 26;
+{$ENDIF}
+
 vid_BW                 = 48;
 vid_2BW                = vid_BW*2;
 vid_panelw             = vid_BW*3;

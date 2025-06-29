@@ -330,6 +330,9 @@ TUID = record
    _fr          : integer;
    un_btn,
    un_sbtn      : TMWTexture;
+   {$IFDEF UNITDATA}
+   un_btn2      : TMWTexture;
+   {$ENDIF}
    un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
 
    un_txt_name,

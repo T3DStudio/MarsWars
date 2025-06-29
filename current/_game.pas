@@ -502,6 +502,7 @@ begin
 end;
 
 
+{$IFDEF UNITDATA}
 function CheckUIDBaseFlags(tuid:PTUID;flags:cardinal):boolean;
 begin
    CheckUIDBaseFlags:=false;
@@ -547,7 +548,10 @@ end;
 
 function TSOB2Surface(psob:PTSoB):pSDL_Surface;
 const row = 7;
-var u,n,x,y,w,h:byte;
+var
+u,n,
+x,y,
+w,h:byte;
 begin
    TSOB2Surface:=nil;
 
@@ -556,25 +560,30 @@ begin
      if(u in psob^)then
        n+=1;
 
-   //writeln(n);
-
    if(n>0)then
    begin
-      if(n>row)
-      then w:=row
-      else w:=n;
-      h:=(n div row);
-      if(w mod row)>0 then h+=1;
+      if(n<=row)then
+      begin
+         w:=n;
+         h:=1;
+      end
+      else
+      begin
+         w:=row;
+         h:=(n div row);
+         if(n mod row)>0 then h+=1;
+         //writeln(n,' ',w,' ',h,' ',(n mod row));
+      end;
 
-      TSOB2Surface:=_createSurf(vid_BW*w,vid_BW*h);
+      TSOB2Surface:=_createSurf(vid_BWd*w,vid_BWd*h);
       x:=0;
       y:=0;
       for u:=0 to 255 do
         if(u in psob^)then
         begin
-          _draw_surf(TSOB2Surface,x*vid_BW,y*vid_BW,_uids[u].un_btn.surf);
+          _draw_surf(TSOB2Surface,x*vid_BWd,y*vid_BWd,_uids[u].un_btn2.surf);
           x+=1;
-          if(x>row)then
+          if(x>=row)then
           begin
              x:=0;
              y+=1;
@@ -629,21 +638,19 @@ begin
          if(t>dmg2)then dmg2:=t;
       end;
 
-      if(dmg1<=1)and(pu2^._ukbuilding)then continue;
+      //if(dmg1>1)or((pu2^._attack>0)or(not pu2^._ukbuilding))then
+      //  if(dmg1>dmg2)and((dmg1>1)or(dmg2=0))then unit2good[u1]+=[u2];
 
-      if(dmg1>dmg2)and((dmg1>1)or(dmg2=0))
-      then unit2good[u1]+=[u2];
-
-      if(dmg1>dmg2)and(dmg1>1)then
-      begin
-
-         unit2fear[u2]+=[u1];
-      end
+      if(dmg1=0)and(dmg2>0)
+      then unit2usles[u1]+=[u2]
       else
-        if(dmg1=0)and(dmg2>0)then unit2usles[u1]+=[u2];
+        if(dmg1<dmg2)then unit2fear[u1]+=[u2];
+
+      {if(u1=UID_Mastermind)and(u2=UID_HSymbol1)then writeln(dmg1:3:3,' ',dmg2:3:3,' ',pu2^._attack);
+}
    end;
 
-   for u1 in [UID_Cacodemon,UID_Demon,UID_UACDron] do
+  {for u1 in [UID_HTower] do
    begin
       writeln(_uids[u1].un_txt_name);
       write('Good against: ');
@@ -658,9 +665,9 @@ begin
       for u2:=0 to 255 do
         if(u2 in unit2usles[u1])then write(_uids[u2].un_txt_name,', ');
       writeln;
-   end;
+   end;}
 
-   for u1:=0 to 255 do
+   for u1 in [0..255] do     //
    begin
       pu1:=@_uids[u1];
 
@@ -672,8 +679,10 @@ begin
       save_surf(_uids[u1].un_txt_name+'_bad'  ,TSOB2Surface(@unit2fear [u1]));
       save_surf(_uids[u1].un_txt_name+'_usles',TSOB2Surface(@unit2usles[u1]));
    end;
+   //for u1 in [0..255] do
+   //  save_surf('btn_'+_uids[u1].un_txt_name,_uids[u1].un_btn.surf);
 end;
-
+{$ENDIF}
 
 {$ELSE}
 {$include _ded.pas}

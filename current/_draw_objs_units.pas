@@ -249,10 +249,18 @@ begin
 uab_RebuildInPoint: begin
                     SpriteListAddEffect(uo_x,uo_y,0,0,_uid2spr(_rebuild_uid,270,0),128);
                     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+                    case m_brush of
+                    1..255,
+                    co_psability   : UnitsInfoAddCircle(uo_x,uo_y,_uids[_rebuild_uid]._r,r_blink2_color_BY);
+                    end;
                     end;
 uab_CCFly         : begin
                     SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,_uid2spr(uidi,270,0),128);
                     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[r_blink2_colorb]);
+                    case m_brush of
+                    1..255,
+                    co_psability   : UnitsInfoAddCircle(uo_x,uo_y+fly_hz,_r,r_blink2_color_BY);
+                    end;
                     end;
            else     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
            end;

@@ -626,6 +626,25 @@ begin
            add(x,y,d-o,o);
         end;
 
+   for u:=1 to MaxUnits do
+    with _units[u] do
+     with uid^ do
+      if(hits>0)and(unum<>ignore_unum)and(iscomplete)then
+       if(not _IsUnitRange(transport,nil))then
+        if(uo_id=ua_psability)then
+          case _ability of
+     uab_RebuildInPoint: begin
+                         o:=tr+_uids[_rebuild_uid]._r;
+                         d:=point_dist_int(uo_x,uo_y,tx,ty);
+                         add(uo_x,uo_y,d-o,o);
+                         end;
+           uab_CCFly   : begin
+                         o:=tr+_r;
+                         d:=point_dist_int(uo_x,uo_y+fly_hz,tx,ty);
+                         add(uo_x,uo_y+fly_hz,d-o,o);
+                         end;
+          end;
+
    if(nrd[1]<=-1)
    then _2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
    else

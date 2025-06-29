@@ -448,7 +448,7 @@ begin
    _FreeSF(ts);
 end;
 
-function LoadBtnFS(ts:pSDl_Surface;bw:integer):pSDL_Surface;
+function LoadBtnFS(ts:pSDl_Surface;bw:integer;blackrect:byte=3):pSDL_Surface;
 var tst:pSDL_Surface;
    coff:single;
     hwb:integer;
@@ -467,8 +467,11 @@ begin
    if(tst^.h>bw)
    then _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),2,tst)
    else _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
-   rectangleColor(LoadBtnFS,0,0,LoadBtnFS^.w-1,LoadBtnFS^.h-1,c_black);
-   rectangleColor(LoadBtnFS,1,1,LoadBtnFS^.w-2,LoadBtnFS^.h-2,c_black);
+   while(blackrect>0)do
+   begin
+      blackrect-=1;
+      rectangleColor(LoadBtnFS,blackrect,blackrect,LoadBtnFS^.w-blackrect-1,LoadBtnFS^.h-blackrect-1,c_black);
+   end;
    SDL_FreeSurface(tst);
 end;
 
@@ -788,12 +791,23 @@ begin
       with un_sbtn do
       begin
          case _urace of
-         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_oiw );
-         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_oiw );
+         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_oiw,1 );
+         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_oiw,1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
+      {$IFDEF UNITDATA}
+      with un_btn2 do
+      begin
+         case _urace of
+         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_BWd,1 );
+         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_BWd,1 );
+         end;
+         w   := surf^.w;h := w;
+         hw  := w div 2;hh:= hw;
+      end;
+      {$ENDIF}
    end;
 end;
 
