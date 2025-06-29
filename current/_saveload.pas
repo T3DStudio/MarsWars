@@ -220,14 +220,14 @@ begin
    AddItem(@g_random_p       ,SizeOf(g_random_p       ));
    AddItem(@vid_cam_x        ,SizeOf(vid_cam_x        ));
    AddItem(@vid_cam_y        ,SizeOf(vid_cam_y        ));
-   AddItem(@vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
-   AddItem(@vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
+   AddItem(@ui_blink_timer1 ,SizeOf(ui_blink_timer1 ));
+   AddItem(@ui_blink_timer2 ,SizeOf(ui_blink_timer2 ));
    AddItem(@m_brush          ,SizeOf(m_brush          ));
-   AddItem(@g_cpoints        ,SizeOf(g_cpoints        ));
-   AddItem(@g_royal_r        ,SizeOf(g_royal_r        ));
+   AddItem(@g_KeyPoints        ,SizeOf(g_KeyPoints        ));
+   AddItem(@g_RoyalBattle_r        ,SizeOf(g_RoyalBattle_r        ));
    AddItem(@g_status         ,SizeOf(g_status         ));
-   AddItem(@g_cycle_order    ,SizeOf(g_cycle_order    ));
-   AddItem(@g_cycle_regen    ,SizeOf(g_cycle_regen    ));
+   AddItem(@g_timer_UnitCycle    ,SizeOf(g_timer_UnitCycle    ));
+   AddItem(@g_timer_UnitRegen    ,SizeOf(g_timer_UnitRegen    ));
    AddItem(@ui_alarms        ,SizeOf(ui_alarms        ));
    AddItem(@map_PlayerStartX ,SizeOf(map_PlayerStartX ));
    AddItem(@map_PlayerStartY ,SizeOf(map_PlayerStartY ));
@@ -246,7 +246,7 @@ var f:file;
 begin
    saveload_Save:=false;
 
-   if(not g_started)
+   if(not g_Started)
    or(length(svld_str_fname)=0)
    or(net_status>ns_single)
    or(rpls_rstate=rpls_state_read)then exit;
@@ -319,7 +319,7 @@ begin
          map_Make2;
          GameCameraBounds;
 
-         G_Started:=true;
+         g_Started:=true;
 
          if(menu_state)then menu_Escape(true);
 

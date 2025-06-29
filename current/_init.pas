@@ -41,8 +41,8 @@ begin
    end;
 
    new(vid_SDLRect);
-   for i:=0 to vid_MaxScreenSprites-1 do
-     new(vid_Sprites_l[i]);
+   for i:=0 to ui_MaxScreenSprites-1 do
+     new(ui_Sprites_l[i]);
 
    // SDL Renderer info
    vid_SDLRenderersN:=SDL_GetNumRenderDrivers;
@@ -144,7 +144,7 @@ end;
 
 procedure MainInit;
 begin
-   GameCycle:=false;
+   g_GameCycle:=false;
 
    fr_init;
 
@@ -173,7 +173,7 @@ begin
    language_Switch;
    InitUIDDataCL;
    missile_InitCLData;
-  { MakeUnitIcons;      }
+   gfx_MakeUnitIcons;
    FillChar(ui_dPlayer,SizeOf(ui_dPlayer),0);
 
    {$ENDIF}
@@ -185,7 +185,7 @@ begin
 
    NEW(sys_EVENT);
 
-   GameCycle:=true;
+   g_GameCycle:=true;
 
    {$IFNDEF _FULLGAME}
    Dedicated_Init;

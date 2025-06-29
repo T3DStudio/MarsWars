@@ -73,14 +73,14 @@ begin
    if(test_mode=2)then WriteUnitDescriptions;
    {$ENDIF}
 
-   while(GameCycle)do
+   while(g_GameCycle)do
    begin
       fr_FPSSecondD:=SDL_GetTicks;
 
       {$IFDEF _FULLGAME}
       MainInput;
       MainGame;
-      if(r_draw)then MainDraw;
+      if(vid_draw)then MainDraw;
       {$ELSE}
       while(SDL_PollEvent(sys_EVENT)>0)do
         case(sys_EVENT^.type_)of

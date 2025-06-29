@@ -146,11 +146,11 @@ end;
 begin
    if(menu_state)
    or(G_Status<>gs_running)
-   or(not r_draw)
+   or(not vid_draw)
    or(ee=0)
    or(g_eids[ee].eid_smodel=nil)then exit;
 
-   for e:=1 to vid_MaxScreenSprites do
+   for e:=1 to ui_MaxScreenSprites do
    with g_effects[e] do
    if(e_anim_last_i_t=0)then
    begin
@@ -253,10 +253,10 @@ mid,mf   : byte;
 homing   : boolean;
 }
 
-procedure missile_ExplodeEffect(m:integer);
+procedure missile_ExplodeEffect(missile:PTMissile);
 var i,o,r:byte;
 begin
-   with g_missiles[m] do
+   with missile^ do
    with g_mids[mid] do
    if(ui_MapPointInRevealedInScreen(vx,vy))then
    begin
@@ -282,7 +282,7 @@ procedure d_SpriteListAddMissiles;
 var  m:integer;
    spr:PTMWTexture;
 begin
-   for m:=1 to MaxMissiles do
+   for m:=0 to MaxMissiles do
    with g_missiles[m] do
    with g_mids[mid] do
    if(vstep>0)then
@@ -307,7 +307,7 @@ var ei,
    spr:PTMWTexture;
 anim_stat:byte;
 begin
-   for ei:=1 to vid_MaxScreenSprites do
+   for ei:=1 to ui_MaxScreenSprites do
     with g_effects[ei] do
      if(e_anim_last_i_t<>0)then
      with g_eids[e_eid] do

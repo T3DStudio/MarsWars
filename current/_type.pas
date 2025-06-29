@@ -287,17 +287,19 @@ TInputKey = record
    ik_depend: byte;
 end;
 
-TTab3PageType = (t3pt_none=0,t3pt_controls,t3pt_observer,t3pt_replay);
+TTabControlContent = (tcp_none=0,tcp_controls,tcp_observer,tcp_replay);
 
 TTabType      = (tt_buildings=0,tt_units,tt_upgrades,tt_controls);
 const
 i2tab         : array[ord(low(TTabType))..ord(high(TTabType))] of TTabType = (tt_buildings,tt_units,tt_upgrades,tt_controls);
 
 type
-TVidPannelPos = (vpp_left=0,vpp_right,vpp_top,vpp_bottom);
+TUIControlBarPos = (uicbp_left=0,uicbp_right,uicbp_top,uicbp_bottom);
+
 const
-VPPSet_Vertical   = [vpp_left,vpp_right ];
-VPPSet_Horizontal = [vpp_top ,vpp_bottom];
+VPPSet_Vertical   = [uicbp_left,uicbp_right ];
+VPPSet_Horizontal = [uicbp_top ,uicbp_bottom];
+
 type
 
 TUIUnitHBarsOption= (uhb_damaged,uhb_always,uhb_selected);
@@ -440,9 +442,10 @@ TMissile = record
    ms_eid_bio_death: boolean;
    {$ENDIF}
 end;
+PTMissile = ^TMissile;
 
 TWUDataTime  = array[1..MaxUnits] of cardinal;
-TWCPDataTime = array[1..LastCPoint] of byte;
+TWCPDataTime = array[1..LastKeyPoint] of byte;
 
 TUWeapon = record
   aw_type,
@@ -570,7 +573,7 @@ TUID = record
    _animw,
    _animd,
    _fr          : integer;
-   un_btn       : pTMWTexture;
+   uid_ui_button: pTMWTexture;
    un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
 
    un_txt_name,

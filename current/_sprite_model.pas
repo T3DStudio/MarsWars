@@ -13,7 +13,7 @@ end;
 begin
    sm_SModel2MWTexture:=ptex_dummy;
 
-   if(sm=nil)then exit;
+   if(sm=nil)or(sm=spr_pdmodel)then exit;
 
    with sm^ do
    begin
@@ -347,10 +347,11 @@ function sm_unit2MWTexture(u:PTUnit):PTMWTexture;
 var sms:TMWSModelState;
  smodel:PTMWSModel;
 begin
-   sm_unit2MWTexture:=@tex_dummy;
+   sm_unit2MWTexture:=ptex_dummy;
 
    with u^   do
    with uid^ do
+   if(level<=MaxUnitLevel)then
    begin
       smodel:=un_smodel[level];
 

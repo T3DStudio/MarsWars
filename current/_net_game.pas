@@ -38,7 +38,7 @@ begin
          break;
       end;
 
-   if(net_GetPlayer=255)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
+   if(net_GetPlayer=255)and(not g_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
 end;
 
 procedure net_SvReadPlayerData(pid:byte);
@@ -64,7 +64,7 @@ procedure net_WriteGameData(pid:byte);
 var p:byte;
 begin
    net_writebyte(nmid_lobby_info);
-   net_writebool(G_Started);
+   net_writebool(g_Started);
 
    for p:=0 to LastPlayer do
     with g_players[p] do
@@ -76,7 +76,7 @@ begin
        net_writebyte  (g_slot_state[p]);
        net_writebool  (isready  );
        net_writeword  (net_ttl  );
-       if(G_Started)then
+       if(g_Started)then
        net_writebyte  (race     );
     end;
 
@@ -95,7 +95,7 @@ begin
    net_writebyte(map_generators     );
    net_writebool(g_deadobservers  );
 
-   if(G_Started)and(not g_fixed_positions)then
+   if(g_Started)and(not g_fixed_positions)then
     for p:=0 to LastPlayer do
     begin
        net_writeint(map_PlayerStartX[p]);
@@ -159,14 +159,14 @@ begin
          if(pid>LastPlayer)then
          begin
             net_clearbuffer;
-            if(G_Started)
+            if(g_Started)
             then net_writebyte(nmid_game_started)
             else net_writebyte(nmid_server_full );
             net_send(net_LastinIP,net_LastinPort);
             continue;
          end;
 
-         if(not G_Started)then net_SvReadPlayerData(pid);
+         if(not g_Started)then net_SvReadPlayerData(pid);
 
          net_clearbuffer;
          net_WriteGameData(pid);
@@ -185,14 +185,14 @@ nmid_log_chat    : begin
                    end;
 nmid_player_leave: begin
                       GameLogPlayerLeave(pid);
-                      if(not G_Started)
+                      if(not g_Started)
                       then PlayerSetType(pid,pt_none)//PlayerSlotChangeState(0,pid,pss_opened,false)
                       else PlayerLeave(pid,false);
                       {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
                       continue;
                    end;
             else
-               if(G_Started)then
+               if(g_Started)then
                  case mid of
 nmid_order       : with g_players[pid]do
                    begin
@@ -226,7 +226,7 @@ nmid_pause       : begin
                    end;
 nmid_break       : GameBreak(pid,false);
                  end
-               else // not G_Started
+               else // not g_Started
                  case mid of
 nmid_loby_mapMap      : if(MapLoad(pid,net_readbyte    ,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
 nmid_loby_mapSeed     : if(map_SetSetting(pid,mid,net_readcard,false))then {$IFDEF _FULLGAME}menu_remake{$ELSE}screen_redraw{$ENDIF}:=true;
@@ -269,7 +269,7 @@ nmid_loby_playerRace  : begin
      with g_players[i] do
       if(player_type=pt_human)and(net_ttl<ClientTTL)then
       begin
-         if(G_Started)and(net_period_step)then
+         if(g_Started)and(net_period_step)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_snapshot);
@@ -292,7 +292,7 @@ nmid_loby_playerRace  : begin
    net_period+=1;
    net_period:=net_period mod fr_fpsd2;
 
-   if(net_localAdv)and(not G_Started)then
+   if(net_localAdv)and(not g_Started)then
      if(net_localAdv_timer<=0)then
      begin
         net_localAdv_timer:=net_localAdv_time;
@@ -405,7 +405,7 @@ begin
 
       // slot race
       i:=net_readbyte;
-      if(i>r_cnt)then
+      if(i>race_num)then
       begin
          net_ClientReadPlayerData:=true;
          exit;
@@ -459,7 +459,7 @@ begin
       if(StartGame)then
       begin
          i:=net_readbyte;
-         if(i=r_random)or(i>r_cnt)then
+         if(i=r_random)or(i>race_num)then
          begin
             net_ClientReadPlayerData:=true;
             exit;
@@ -496,13 +496,13 @@ nmid_server_full : begin CleintProtocolError(@str_error_ServerFull  );exit;end;
 nmid_wrong_ver   : begin CleintProtocolError(@str_error_WrongVersion);exit;end;
 nmid_game_started: begin CleintProtocolError(@str_error_GameStarted );exit;end;
 nmid_notconnected: begin
-                      G_Started     :=false;
+                      g_Started     :=false;
                       menu_state    :=true;
                       GameDefaultAll;
                    end;
 nmid_log_upd     : begin
                       rudata_log(PlayerClient,false);
-                      log_LastMesTimer:=log_LastMesTime;
+                      ui_LogLastMesTimer:=log_LastMesTime;
                       net_period:=0;
                    end;
 nmid_lobby_info  : begin
@@ -554,21 +554,21 @@ nmid_lobby_info  : begin
                       end;
                       net_status_str:='';
 
-                      if(gst<>G_Started)then
+                      if(gst<>g_Started)then
                       begin
-                         G_Started:=gst;
-                         if(G_Started)then
+                         g_Started:=gst;
+                         if(g_Started)then
                          begin
                             menu_state:=false;
-                            ServerSide:=false;
+                            g_ServerSide:=false;
                             GameCameraMoveToPoint(map_PlayerStartX[PlayerClient],map_PlayerStartY[PlayerClient]);
                             {if(g_players[PlayerClient].team=0)then
                             begin
                                ui_tab:=tt_controls;
-                               UIPlayer:=255;
+                               ui_player:=255;
                             end
                             else }
-                            UIPlayer:=PlayerClient;
+                            ui_player:=PlayerClient;
                          end
                          else
                          begin
@@ -579,7 +579,7 @@ nmid_lobby_info  : begin
                    end;
       end;
 
-      if(G_Started)then
+      if(g_Started)then
       begin
          if(mid=nmid_snapshot)then
          begin
@@ -594,7 +594,7 @@ nmid_lobby_info  : begin
    if(net_period=0)then
    begin
       net_clearbuffer;
-      if(not G_Started) then
+      if(not g_Started) then
       begin
          net_writebyte  (nmid_connect);
          net_writebyte  (g_version   );

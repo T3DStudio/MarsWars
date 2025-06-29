@@ -78,7 +78,7 @@ begin
       SoundPlayUnit(un_eid_snd_summon,nil,nil);
       effect_add(vx,vy,SpriteDepth(vy+1,ukfly),un_eid_summon[level]);
 
-      if(playeri=UIPlayer)then SoundPlayUnit(un_snd_ready,nil,nil);
+      if(playeri=ui_player)then SoundPlayUnit(un_snd_ready,nil,nil);
    end;
 end;
 
@@ -329,7 +329,7 @@ function unit_canMove(pu:PTUnit):boolean;
 begin
    with pu^ do
    with uid^ do
-    if(not ServerSide)and(speed>0)
+    if(not g_ServerSide)and(speed>0)
     then unit_canMove:=(x<>moveDest_x)or(y<>moveDest_y)
     else
     begin
@@ -473,17 +473,17 @@ begin
        if(ua_tar=utar)then ua_tar:=0;
 end;
 procedure missiles_TargetClear(u:integer;ResetTargetXY:boolean);
-var i:integer;
+var m:integer;
 begin
-   for i:=1 to MaxUnits do
-    with g_missiles[i] do
+   for m:=0 to MaxMissiles do
+    with g_missiles[m] do
      if(vstep>0)and(tar=u)then
      begin
         tar:=0;
         if(ResetTargetXY)then
         begin
-           x:=vx;
-           y:=vy;
+           x    :=vx;
+           y    :=vy;
            vstep:=1;
         end;
      end;
@@ -529,7 +529,7 @@ end;
 
 procedure unit_MoveSprite(pu:PTUnit);
 begin
-   if(ServerSide)then unit_zfall(pu);
+   if(g_ServerSide)then unit_zfall(pu);
    with pu^ do
    if(vx<>x)or(vy<>y)then
     if(IsIntUnitRange(transport,nil))then
@@ -541,7 +541,7 @@ begin
     else
     begin
        if(vstp<=0)
-       or((vstp>UnitMoveStepTicks)and(ServerSide))then vstp:=UnitMoveStepTicks;
+       or((vstp>UnitMoveStepTicks)and(g_ServerSide))then vstp:=UnitMoveStepTicks;
        vx  +=(x-vx) div vstp;
        vy  +=(y-vy) div vstp;
        vstp-=1;
@@ -564,7 +564,7 @@ begin
        buff[ub_Cast]:=fr_fps1;
 
        {$IFDEF _FULLGAME}
-       if(ServerSide)and(ui_UIPlayerTeam(player^.team))then SoundPlayUnit(snd_radar,nil,nil);
+       if(g_ServerSide)and(ui_UIPlayerTeam(player^.team))then SoundPlayUnit(snd_radar,nil,nil);
        {$ENDIF}
     end;
 end;
@@ -686,8 +686,8 @@ begin
    if(FlyLevel)then check_obstacles:=false;
 
    if(not FlyLevel)then
-    for u:=1 to LastCPoint do
-     with g_cpoints[u] do
+    for u:=1 to LastKeyPoint do
+     with g_KeyPoints[u] do
       if(cpCaptureR>0)and(cpNoBuildR>0)then
       begin
          o:=tr+cpNoBuildR;
@@ -839,8 +839,8 @@ begin
 
    if(flylevel)then exit;
 
-   for u:=1 to LastCPoint do
-    with g_cpoints[u] do
+   for u:=1 to LastKeyPoint do
+    with g_KeyPoints[u] do
      if(cpCaptureR>0)then
      begin
         if(forBuild)
@@ -890,8 +890,8 @@ begin
         exit;
      end;
 
-   for u:=1 to LastCPoint do
-    with g_cpoints[u] do
+   for u:=1 to LastKeyPoint do
+    with g_KeyPoints[u] do
      if(cpCaptureR>0)and(cpNoBuildR>0)then
       if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
       begin
@@ -1227,7 +1227,7 @@ begin
          hits  := 1;
          cenergy-=_renergy;
          {$IFDEF _FULLGAME}
-         if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[_urace],false,false);
+         if(playeri=ui_player)then SoundPlayAnoncer(snd_build_place[_urace],false,false);
          {$ENDIF}
       end;
 
@@ -1284,7 +1284,7 @@ begin
          with LastCreatedUnitP^ do
          begin
             {$IFDEF _FULLGAME}
-            mmap_TickOrder := LastCreatedUnit mod vid_blink_period1;
+            mmap_TickOrder := LastCreatedUnit mod ui_blink_period1;
             {$ENDIF}
             cycle_order:= LastCreatedUnit mod order_period;
             unum       := LastCreatedUnit;
@@ -1709,13 +1709,13 @@ begin
       if(not uid_CheckPlayerLimit(player,auid))
       then LastCreatedUnit:=0
       else
-        if(not ServerSide)
+        if(not g_ServerSide)
         then LastCreatedUnit:=1
         else unit_add(tx,ty,-1,auid,playeri,true,true,0);
 
       if(LastCreatedUnit>0)then
       begin
-         if(ServerSide)then
+         if(g_ServerSide)then
          begin
             LastCreatedUnitP^.dir   :=dir;
             LastCreatedUnitP^.a_tar :=a_tar;
@@ -2028,7 +2028,7 @@ ua_CCFly         : if(level>0)then
                        end;
                        speed:=0;
 
-                       if(ServerSide)and(zfall<>0)then
+                       if(g_ServerSide)and(zfall<>0)then
                          if(CheckCollisionR(x,y+zfall,_r,unum,_ukbuilding,false, upgr[upgr_race_extbuilding[_urace]]=0 )>0)then
                          begin
                             level:=1;

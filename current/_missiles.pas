@@ -164,7 +164,7 @@ procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mplayer:byte;mfst,mfet,m
 var m,d:integer;
     tu:PTUnit;
 begin
-    for m:=1 to MaxUnits do
+    for m:=0 to MaxMissiles do
     with g_missiles[m] do
     if(vstep<=0)then
     begin
@@ -230,13 +230,13 @@ begin
     end;
 end;
 
-procedure missle_damage(m:integer);
+procedure missle_damage(missile:PTMissile);
 var tu: PTUnit;
 teams : boolean;
 ud,rdamage: integer;
      painX: byte;
 begin
-   with g_missiles[m] do
+   with missile^ do
    with g_mids[mid] do
     if(IsIntUnitRange(tar,@tu))then
      if(tu^.hits>0)and(not IsIntUnitRange(tu^.transport,nil))then
@@ -294,7 +294,7 @@ const  mb_s0 = fr_fps1 div 5;
 var m,u:integer;
      tu:PTUnit;
 begin
-   for m:=1 to MaxMissiles do
+   for m:=0 to MaxMissiles do
    with g_missiles[m] do
    with g_mids[mid] do
    if(vstep>0)then
@@ -349,17 +349,17 @@ mh_homing   : begin
       begin
          if(damage>0)and(mid_base_splashr>=0)then
           if IsIntUnitRange(tar,nil)and(mtars=1)
-          then missle_damage(m)
+          then missle_damage(@g_missiles[m])
           else
             for u:=1 to MaxUnits do
             begin
                tar:=u;
-               missle_damage(m);
+               missle_damage(@g_missiles[m]);
                if(mtars<=0)then break;
             end;
 
          {$IFDEF _FULLGAME}
-         missile_ExplodeEffect(m);
+         missile_ExplodeEffect(@g_missiles[m]);
          {$ENDIF}
       end
       {$IFDEF _FULLGAME}

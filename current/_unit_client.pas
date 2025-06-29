@@ -335,7 +335,7 @@ begin
 
    wdcptime^:=(wdcptime^+1) mod 2;
 
-   with g_cpoints[cpi] do
+   with g_KeyPoints[cpi] do
     if(cpCaptureR<=0)
     then wudata_byte(0,rpl)
     else
@@ -391,12 +391,12 @@ begin
      if(map_scenario=ms_capture)
      or(map_scenario=ms_KotH)
      or(map_generators>1)then
-      for i:=1 to LastCPoint do
+      for i:=1 to LastKeyPoint do
        wclinet_cpoint(i,rpl);
 
    if(wstepb1)then
      case map_scenario of
-ms_royale   : wudata_int (g_royal_r        ,rpl);
+ms_royale   : wudata_int (g_RoyalBattle_r        ,rpl);
      end;
 
    if(rpl)then
@@ -640,7 +640,7 @@ begin
            if(buff[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
            if(buff[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
 
-           if(playeri=UIPlayer)then
+           if(playeri=ui_player)then
            begin
               if(not iscomplete)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
@@ -673,7 +673,7 @@ begin
              end;
           end;
 
-          if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+          if(playeri=ui_player)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           missiles_TargetClear(unum,true);
           unit_clear_a_tar(unum);
@@ -709,10 +709,10 @@ begin
                if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
 
                if(pu^.iscomplete)and(not iscomplete)then
-                if(playeri=UIPlayer)then
+                if(playeri=ui_player)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
-               //if(pu^.isselected=false)and(isselected)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
+               //if(pu^.isselected=false)and(isselected)and(playeri=ui_player)then UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -753,7 +753,7 @@ begin
                   if(_death_missile>0)
                   then missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
 
-                 if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+                 if(playeri=ui_player)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  reload:=0;
               end;
 
@@ -1140,7 +1140,7 @@ end;
 procedure rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
 var b,t,p:byte;
 begin
-   with g_cpoints[cpi] do
+   with g_KeyPoints[cpi] do
    begin
       b:=rudata_byte(rpl,0);
       t:=b and %00000011;
@@ -1202,12 +1202,12 @@ begin
      if(map_scenario=ms_capture)
      or(map_scenario=ms_KotH)
      or(map_generators>1)then
-      for i:=1 to LastCPoint do
+      for i:=1 to LastKeyPoint do
        rclinet_cpoint(i,rpl,fast_skip);
 
    if(wstepb1)then
      case map_scenario of
-ms_royale   : g_royal_r        :=rudata_int (rpl,0);
+ms_royale   : g_RoyalBattle_r        :=rudata_int (rpl,0);
      end;
 
    g_player_astatus:=rudata_byte(rpl,0);

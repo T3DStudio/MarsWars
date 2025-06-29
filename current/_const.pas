@@ -13,7 +13,7 @@ pinteger    = ^int16;
 
 const
 
-g_version              : byte = 234;
+g_version              : byte = 240;
 
 degtorad               = pi/180;
 
@@ -135,7 +135,7 @@ gs_win_team7           = 27;
 gs_running             = 255;
 
 // races
-r_cnt                  = 2;  // race num 0-r_cnt
+race_num               = 2;  // race num 0-r_cnt
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
@@ -146,14 +146,14 @@ LastPlayer             = MaxPlayer-1;
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayer*2;
-LastCPoint             = MaxCPoints-1;
+MaxKeyPoints           = MaxPlayer*2;
+LastKeyPoint           = MaxKeyPoints-1;
 
-MapCellW               = 88;
+MapCellW               = 96;
 MapCellhW              = MapCellW div 2;
 MapSizeCellnStep       = 4;
 MinMapSizeCelln        = MapSizeCellnStep*7;
-MaxMapSizeCelln        = MapSizeCellnStep*24;
+MaxMapSizeCelln        = MapSizeCellnStep*20;
 
 MaxMapSize             = (MapCellW*MaxMapSizeCelln)-1;
 MinMapSize             = (MapCellW*MinMapSizeCelln)-1;
@@ -187,7 +187,7 @@ g_cgenerators_energy   = 900;
 //  BASE STRINGS
 //
 
-str_ver                = 'v54';
+str_ver                = 'v55';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_pt_none            : shortstring = '--';
@@ -686,16 +686,16 @@ upgr_mult_product      = 252;
 upgr_invuln            = 255;
 
 // BASIC RACE UPGRADES                                      HELL                UAC
-upgr_race_armor_bio         : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
-upgr_race_armor_mech        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
-upgr_race_armor_build       : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
-upgr_race_regen_bio         : array[1..r_cnt] of byte    = (upgr_hell_regen   , 0                );
-upgr_race_regen_mech        : array[1..r_cnt] of byte    = (0                 , 0                );
-upgr_race_regen_build       : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 0                );
-upgr_race_mspeed_bio        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
-upgr_race_mspeed_mech       : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
-upgr_race_unit_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
-upgr_race_srange_unit_bonus : array[1..r_cnt] of integer = (25                , 25               );
+upgr_race_armor_bio         : array[1..race_num] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
+upgr_race_armor_mech        : array[1..race_num] of byte    = (0                 , upgr_uac_mecharm );
+upgr_race_armor_build       : array[1..race_num] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
+upgr_race_regen_bio         : array[1..race_num] of byte    = (upgr_hell_regen   , 0                );
+upgr_race_regen_mech        : array[1..race_num] of byte    = (0                 , 0                );
+upgr_race_regen_build       : array[1..race_num] of byte    = (upgr_hell_bldrep  , 0                );
+upgr_race_mspeed_bio        : array[1..race_num] of byte    = (0                 , upgr_uac_mspeed  );
+upgr_race_mspeed_mech       : array[1..race_num] of byte    = (0                 , upgr_uac_mechspd );
+upgr_race_unit_srange       : array[1..race_num] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
+upgr_race_srange_unit_bonus : array[1..race_num] of integer = (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -900,7 +900,7 @@ uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,U
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-uid_race_start_base    : array[1..r_cnt] of byte = (UID_HKeep    ,UID_UCommandCenter );
+uid_race_start_base    : array[1..race_num] of byte = (UID_HKeep    ,UID_UCommandCenter );
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1023,7 +1023,11 @@ char_advanced          = #10;
 spr_upgrade_icons      = 24;
 
 max_CamSpeed           = 127;
+max_MMapScalePrc       = 200;
+min_MMapScalePrc       = 100;
 
+min_CBarScalePrc       = 100;
+max_CBarScalePrc       = 150;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1085,7 +1089,7 @@ uinfo_text             = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  TEXT
+//  TEXT COMMON
 //
 
 basefont_w1            = 8;
@@ -1094,9 +1098,15 @@ basefont_w3            = basefont_w1*3;
 basefont_w4            = basefont_w1*4;
 basefont_wh            = basefont_w1 div 2;
 basefont_wq            = basefont_w1 div 4;
+basefont_w1q           = basefont_w1+basefont_wq;
 basefont_wq3           = basefont_wq*3;
 basefont_w5            = basefont_w1*5;
 basefont_w1h           = basefont_w1+basefont_wh;
+
+basefont_H1            = basefont_w1;
+basefont_H2            = basefont_w1h;
+basefont_H3            = basefont_w1+basefont_wq3;
+basefont_H4            = basefont_w2+basefont_wq;
 
 chat_all               = 255;
 chat_allies            = 254;
@@ -1120,40 +1130,41 @@ vid_cam_minsc          = 0.5;
 vid_cam_maxsc          = 2;
 vid_cam_stepsc         = 0.2;
 
-vid_MaxScreenSprites   = 1000; // max vis sprites;
-vid_blink_persecond    = 6;
-vid_blink_period1      = fr_fps1  div vid_blink_persecond;
-vid_blink_periodh      = vid_blink_period1 div 2;
-vid_blink_period2      = vid_blink_period1*2;
+ui_MaxScreenSprites    = 1000; // max vis sprites;
+ui_blink_persecond     = 6;
+ui_blink_period1       = fr_fps1  div ui_blink_persecond;
+ui_blink_periodh       = ui_blink_period1 div 2;
+ui_blink_period2       = ui_blink_period1*2;
 
-ui_panel_UpdateTime       = fr_fps1 div 6;
+ui_panel_UpdateTime    = fr_fps1 div 6;
 
-ui_alarm_time          = vid_blink_period2;
+ui_alarm_time          = ui_blink_period2;
 
-ui_ButtonW1            = 48;
-ui_ButtonWi            = ui_ButtonW1-1;
-ui_ButtonW2            = ui_ButtonW1*2;
-ui_panel_bw            = 3;                   // panel button width
-ui_panel_bblock        = ui_panel_bw*ui_panel_bw;
-ui_panel_pw            = ui_ButtonW1*ui_panel_bw; // panel pixel width
+ui_pButtonW1           = 52;
+ui_pButtonWh           = ui_pButtonW1 div 2;
+ui_pButtonWb           = 3;
+ui_pButtonWi           = ui_pButtonW1-(ui_pButtonWb*2);
+ui_pButtonWih          = ui_pButtonWi div 2;
+ui_panel_bw            = 3;                        // panel button width
+//ui_panel_bblock        = ui_panel_bw*ui_panel_bw;
+ui_panel_pw            = ui_pButtonW1*ui_panel_bw; // panel pixel width
 ui_panel_pwi           = ui_panel_pw-1;
 ui_panel_pwu           = ui_panel_pw+1;
 ui_panel_bh            = 9;
-ui_panel_ph            = ui_panel_bh*ui_ButtonW1+ui_ButtonW1;
+ui_panel_bhi           = ui_panel_bh-1;
+ui_panel_ph            = ui_panel_bh*ui_pButtonW1+ui_pButtonW1;
 ui_panel_phi           = ui_panel_ph-1;
-ui_tBW                 = ui_panel_pw div 4;
-ui_hBW                 = ui_ButtonW1 div 2;
-ui_hhBW                = ui_hBW div 2;
-ui_oiw                 = 18;
-ui_oihw                = ui_oiw+(ui_oiw div 2);
-ui_oisw                = ui_oiw-(ui_oiw div 4);
-ui_oips                = 2*ui_oiw+ui_oisw;
+ui_tButtonW1           = ui_panel_pw div 4;
+ui_tButtonWh           = ui_tButtonW1 div 2;
+ui_oButtonW1           =(ui_pButtonW1 div 5)*2;
+ui_oButtonWih          = ui_oButtonW1+(ui_oButtonW1 div 2);
+ui_oButtonWisw         = ui_oButtonW1-(ui_oButtonW1 div 4);
+ui_oButtonWips         = 2*ui_oButtonW1+ui_oButtonWisw;
 
 ui_max_alarms          = 12;
 
-ui_bottomsy            = ui_ButtonW1*4;
 ui_hwp                 = ui_panel_pw div 2;
-ui_ubtns               = 23;
+ui_pButtonsCount       = ui_panel_bhi*ui_panel_bw-1;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1256,9 +1267,11 @@ mi_settings_ScrollSpeed   = 55;
 mi_settings_MouseScroll   = 56;
 mi_settings_PlayerName    = 57;
 mi_settings_Langugage     = 58;
-mi_settings_PanelPosition = 59;
-mi_settings_MMapPosition  = 60;
-mi_settings_PlayerColors  = 61;
+mi_settings_CBarPosition  = 59;
+mi_settings_CBarScale     = 60;
+mi_settings_MMapPosition  = 61;
+mi_settings_MMapScale     = 62;
+mi_settings_PlayerColors  = 63;
 
 ////  REPLAYING OPTIONS
 mi_settings_Replaying     = 65;
@@ -1398,7 +1411,7 @@ sss_music              = 5;
 // sound sources set size
 sss_sssize             : array[0..sss_count-1] of integer = (1,12,1,3,1,1);
 
-snd_MaxSoundVolume     = 127;
+snd_MaxSoundVolume     = 100;
 snd_PlayListSizeMax    = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1410,7 +1423,7 @@ rpls_state_none        = 0;
 rpls_state_write       = 1;
 rpls_state_read        = 2;
 
-ReplayNameLen          = 15;
+MaxReplayNameLen       = 15;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1418,10 +1431,7 @@ ReplayNameLen          = 15;
 //
 
 MFogM                  = 64;
-fog_CellW              = 44;
-fog_CellHW             = fog_CellW div 2;
-//fog_vfwm               = (vid_maxw div fog_CellW)+2;
-//fog_vfhm               = (vid_maxh div fog_CellW)+2;
+fog_CellW              = MapCellW div 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1447,13 +1457,17 @@ str_e_svld             : shortstring = '.mws';
 str_f_rpls             : shortstring = 'replay\';
 str_e_rpls             : shortstring = '.mwr';
 
-str_f_FontBase         : shortstring = 'fontbase';
+str_f_FontBase         : shortstring = 'font1';
+str_f_FontBig          : shortstring = 'font2';
 
-race_dir               : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
-race_units             : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
-race_buildings         : array[1..r_cnt] of shortstring = ('hell\buildings\','uac\buildings\');
-race_upgrades          : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
-race_missiles          : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
+str_hell               = 'hell';
+str_uac                = 'uac';
+
+race_dir               : array[1..race_num] of shortstring = (str_hell+'\'          ,str_uac+'\'          );
+race_units             : array[1..race_num] of shortstring = (str_hell+'\units\'    ,str_uac+'\units\'    );
+race_buildings         : array[1..race_num] of shortstring = (str_hell+'\buildings\',str_uac+'\buildings\');
+race_upgrades          : array[1..race_num] of shortstring = (str_hell+'\upgrades\' ,str_uac+'\upgrades\' );
+race_missiles          : array[1..race_num] of shortstring = (str_hell+'\missiles\' ,str_uac+'\missiles\' );
 effects_folder         : shortstring = 'effs\';
 missiles_folder        : shortstring = 'missiles\';
 
@@ -1517,8 +1531,9 @@ iAct_alt               = 13;
 iAct_shift             = 14;
 iAct_backspace         = 15;
 iAct_ScreenShot        = 16;
+iAct_tab               = 17;
 
-iAct_LastEvent         = 17;
+iAct_LastEvent         = 18;
 
 iAct_USetGroup0        = 20;
 iAct_USetGroup1        = 21;

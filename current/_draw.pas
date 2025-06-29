@@ -4,11 +4,11 @@ var tu:PTUnit;
 begin
    d_CheckUIPlayer:=false;
    if(not g_players[PlayerClient].isobserver)and(rpls_rstate<rpls_state_read)
-   then UIPlayer:=PlayerClient
+   then ui_player:=PlayerClient
    else
      if(IsIntUnitRange(u,@tu))then
      begin
-        UIPlayer:=tu^.playeri;
+        ui_player:=tu^.playeri;
         d_CheckUIPlayer:=true;
      end;
 end;
@@ -40,7 +40,7 @@ begin
    ui_uibtn_abilityu :=nil;
    ui_uibtn_move     :=0;
    ui_bprod_possible :=[];
-   ui_bprod_first    :=0;
+   ui_bprod_NearTime    :=0;
    ui_bprod_all      :=0;
 
    if(ui_umark_t>0)then
@@ -53,9 +53,9 @@ end;
 procedure d_AddObjSprites(noanim:boolean);
 begin
    d_SpriteListAddUnits  (noanim);
-   d_SpriteListAddEffects(noanim,r_draw);
+   d_SpriteListAddEffects(noanim,vid_draw);
 
-   if(not r_draw)then exit;
+   if(not vid_draw)then exit;
 
    d_SpriteListAddMissiles;
    d_SpriteListAddCPoints;
@@ -64,24 +64,24 @@ end;
 procedure d_Game;
 var lsx,lsy:single;
 begin
-   vid_blink_timer1+=1;vid_blink_timer1:=vid_blink_timer1 mod vid_blink_period1;
-   vid_blink_timer2+=1;vid_blink_timer2:=vid_blink_timer2 mod vid_blink_period2;
+   ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;
+   ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod ui_blink_period2;
 
-   if(vid_blink_timer1=0)then
+   if(ui_blink_timer1=0)then
    begin
-      vid_blink3+=1;
-      vid_blink3:=vid_blink3 mod 4;
+      ui_blink3+=1;
+      ui_blink3:=ui_blink3 mod 4;
    end;
 
-   vid_PanelUpdTimer+=1;vid_PanelUpdTimer:=vid_PanelUpdTimer mod ui_panel_UpdateTime;
+   ui_PanelUpdTimer+=1;ui_PanelUpdTimer:=ui_PanelUpdTimer mod ui_panel_UpdateTime;
 
-   vid_blink1_colorb  :=vid_blink_timer1>vid_blink_periodh;
-   vid_blink2_colorb  :=vid_blink_timer2>vid_blink_period1;
+   ui_blink1_colorb  :=ui_blink_timer1>ui_blink_periodh;
+   ui_blink2_colorb  :=ui_blink_timer2>ui_blink_period1;
 
-   vid_blink1_color_BG:=ui_color_blink1[vid_blink1_colorb];
-   vid_blink1_color_BY:=ui_color_blink2[vid_blink1_colorb];
-   vid_blink2_color_BG:=ui_color_blink1[vid_blink2_colorb];
-   vid_blink2_color_BY:=ui_color_blink2[vid_blink2_colorb];
+   ui_blink1_color_BG:=ui_color_blink1[ui_blink1_colorb];
+   ui_blink1_color_BY:=ui_color_blink2[ui_blink1_colorb];
+   ui_blink2_color_BG:=ui_color_blink1[ui_blink2_colorb];
+   ui_blink2_color_BY:=ui_color_blink2[ui_blink2_colorb];
 
    d_CheckUIPlayer(0);
 
@@ -101,20 +101,17 @@ begin
 
    d_UIInfoItems;
 
-   { if(rpls_rstate<rpls_state_read)then
-   begin
-   d_UIMouseMapBrush(r_screen,ui_MapView_x,ui_MapView_y);
-   d_UIMouseMapClick(r_screen,ui_MapView_x,ui_MapView_y);
-   end;    }
+   if(m_brush<>mb_empty)then d_UIMouseMapBrush;
+   d_UIMouseMapClick;
 
    sdl_RenderSetScale(vid_SDLRenderer,lsx,lsy);
 
    d_UIText;
 
    // Control bar view
-   if(vid_PanelUpdTimer=0)
-   or(vid_PanelUpdNow    )then d_UpdatePanel;
-   if(vid_PanelUpdTimer=1)then d_UpdateMinimap;
+   if(ui_PanelUpdTimer=0)
+   or(ui_PanelUpdNow    )then d_UpdatePanel;
+   if(ui_PanelUpdTimer=1)then d_UpdateMinimap;
 
    draw_set_color(c_white);
    draw_mwtexture2(ui_ControlBar_x,ui_ControlBar_y,tex_ui_ControlBar,ui_ControlBar_w,ui_ControlBar_h);
@@ -122,8 +119,8 @@ begin
 
    if(mouse_select_x0>-1)then
    begin
-      if(UIPlayer<=LastPlayer)
-      then draw_set_color(PlayerColorNormal[UIPlayer])
+      if(ui_player<=LastPlayer)
+      then draw_set_color(PlayerColorNormal[ui_player])
       else draw_set_color(c_white);
       draw_rect(mouse_select_x0, mouse_select_y0, mouse_x, mouse_y);
    end;
@@ -213,7 +210,7 @@ begin
    if(menu_state)
    then d_Menu
    else
-     if(G_Started)
+     if(g_Started)
      then d_Game;
 
    //draw_DebugTileSet(theme_tileset_liquid[(SDL_GetTicks div 1000) mod theme_anim_step_n]);
@@ -279,7 +276,7 @@ begin
    circleColor(r_screen,mouse_x,mouse_y,MapCellhW,c_lime);
    circleColor(r_screen,(n-vid_cam_x),(y-vid_cam_y),5,c_white);  }
 
-   if(G_Started)then
+   if(g_Started)then
    begin
 
    draw_set_color(c_white);
@@ -298,15 +295,15 @@ begin
    //' r1: '+tc_blue+i2s(debug_r1)+
 
    //' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y,true))+tc_default+
-   //' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
-   //' '+tc_orange+i2s(g_players[UIPlayer].upgr[upgr_fog_vision])+
-   //' '+tc_green+str_b2c[g_players[UIPlayer].isobserver]+
+   //' '+tc_aqua+i2s(g_players[ui_player].ai_scout_timer)+
+   //' '+tc_orange+i2s(g_players[ui_player].upgr[upgr_fog_vision])+
+   //' '+tc_green+str_b2c[g_players[ui_player].isobserver]+
    //' '+tc_gray+i2s(m_panelBtn_x)+
    //' '+tc_gray+i2s(m_panelBtn_y)+
    //' '+tc_lime+i2s(dist2mgcellC(mouse_map_x,mouse_map_y,1,1))
    ' '+b2s(G_Status)+
-   ' '+str_b2c[G_Started]+
-   ' '+str_b2c[ServerSide]+
+   ' '+str_b2c[g_Started]+
+   ' '+str_b2c[g_ServerSide]+
    ' '+c2s(G_Step),ta_RD,255, c_none);
 
    {draw_line(r_screen,ui_MapView_x+vid_cam_w,ui_MapView_y+vid_cam_h-20,

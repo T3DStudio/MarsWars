@@ -698,8 +698,7 @@ begin
 
 
    str_menu_Apply                    := 'APPLY';
-   str_menu_ResolutionWidth          := 'Resolution (width)';
-   str_menu_ResolutionHeight         := 'Resolution (height)';
+   str_menu_Resolution               := 'Resolution';
    str_menu_fullscreen               := 'Windowed';
    str_menu_SDLRenderer              := 'SDL Renderer';
    str_menu_RestartReq               := 'restart required';
@@ -767,18 +766,21 @@ begin
    str_menu_ReplayInfo               := 'REPLAY INFO';
    str_menu_SaveInfo                 := 'SAVE INFO';
 
-   str_menu_PanelPos                 := 'Control panel position';
-   str_menu_PanelPosl[vpp_left  ]    := tc_lime  +'left'  +tc_default;
-   str_menu_PanelPosl[vpp_right ]    := tc_orange+'right' +tc_default;
-   str_menu_PanelPosl[vpp_top   ]    := tc_yellow+'top'   +tc_default;
-   str_menu_PanelPosl[vpp_bottom]    := tc_aqua  +'bottom'+tc_default;
+   str_menu_CtrlBarPos               := 'Control bar position';
+   str_menu_PanelPosl[uicbp_left  ]    := tc_lime  +'left'  +tc_default;
+   str_menu_PanelPosl[uicbp_right ]    := tc_orange+'right' +tc_default;
+   str_menu_PanelPosl[uicbp_top   ]    := tc_yellow+'top'   +tc_default;
+   str_menu_PanelPosl[uicbp_bottom]    := tc_aqua  +'bottom'+tc_default;
+
+   str_menu_CtrlBarScale             := 'Control bar scale';
+   str_menu_MiniMapScale             := 'Mini map scale';
 
    // [vertical][minimap pos]
    str_menu_MiniMapPos               := 'Mini map position';
-   str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[vpp_top   ];
-   str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[vpp_bottom];
-   str_menu_MiniMapPosl[false][true ]:= str_menu_PanelPosl[vpp_left  ];
-   str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[vpp_right ];
+   str_menu_MiniMapPosl[true ][true ]:= str_menu_PanelPosl[uicbp_top   ];
+   str_menu_MiniMapPosl[true ][false]:= str_menu_PanelPosl[uicbp_bottom];
+   str_menu_MiniMapPosl[false][true ]:= str_menu_PanelPosl[uicbp_left  ];
+   str_menu_MiniMapPosl[false][false]:= str_menu_PanelPosl[uicbp_right ];
 
    str_menu_unitHBar                 := 'Health bars';
    str_menu_unitHBarl[uhb_damaged ]  := tc_lime  +'selected'+tc_white+'+'+tc_red+'damaged'+tc_default;
@@ -1037,7 +1039,7 @@ begin
    str_panelHint_menu                := 'Menu';
 
 
-   map_presets[mapp_custom   ].mapp_name   := 'custom';
+   map_preset_l[mapp_custom   ].mapp_name   := 'custom';
    MakeMapPresetsNames(@str_map_scenariol[0],@str_map_typel[0]);
 
    theme_name[0] := tc_lime  +'UAC BASE';
@@ -1477,7 +1479,7 @@ begin
   str_menu_RandomScirmish           := 'Случайная битва';
   str_menu_Apply             := 'применить';
   str_menu_AISlots           := 'Заполнить пустые слоты';
-  str_menu_ResolutionWidth       := 'Разрешение (ширина)';
+  str_menu_Resolution       := 'Разрешение (ширина)';
   str_menu_ResolutionHeight      := 'Разрешение (высота)';
   str_menu_language          := 'Язык интерфейса';
   str_uhint_requirements      := 'Требования: ';
@@ -1575,7 +1577,7 @@ begin
   for p:=1 to MaxPlayers do
   str_teams[p]          := 'ком. '+b2s(p);
 
-  str_menu_PanelPos          := 'Положение игровой панели';
+  str_menu_CtrlBarPos          := 'Положение игровой панели';
   str_menu_PanelPosl[0]      := tc_lime  +'слева' +tc_default;
   str_menu_PanelPosl[1]      := tc_orange+'справа'+tc_default;
   str_menu_PanelPosl[2]      := tc_yellow+'вверху'+tc_default;
@@ -1646,7 +1648,7 @@ begin
   str_uiHint_Army         := 'Армия: ';
   str_uiHint_Energy       := 'Энергия: ';
 
-  map_presets[mapp_custom   ].mapp_name:= 'свои настройки';
+  map_preset_l[mapp_custom   ].mapp_name:= 'свои настройки';
   MakeMapPresetsNames(@str_map_scenariol[0],@str_map_typel[0]);
 
   str_ability_name[ua_Teleport        ]:='Телепортация';

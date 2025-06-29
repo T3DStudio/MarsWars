@@ -2,7 +2,7 @@
 procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte);
 var p:byte;
 begin
-   with g_cpoints[i] do
+   with g_KeyPoints[i] do
    if(cpOwnerPlayer<>newOwnerPlayer)then
    begin
       if(cpOwnerTeam<=LastPlayer)then
@@ -38,12 +38,12 @@ wteam  ,
 wteam_n,
 cp_captured_n :integer;
 begin
-   for i:=1 to LastCPoint do
-    with g_cpoints[i] do
+   for i:=1 to LastKeyPoint do
+    with g_KeyPoints[i] do
     if(cpCaptureR>0)then
     begin
        p:=0;
-       if(map_scenario=ms_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
+       if(map_scenario=ms_royale)and(g_RoyalBattle_r<cp_ToCenterD)then p:=1;
        if(cplifetime>0)and(cpOwnerTeam>0)then
        begin
           cplifetime-=1;
@@ -119,8 +119,8 @@ begin
    wteam_n      :=0;
    cp_captured_n:=0;
 
-   for i:=1 to LastCPoint do
-    with g_cpoints[i] do
+   for i:=1 to LastKeyPoint do
+    with g_KeyPoints[i] do
      if(cpCaptureR>0)and(cpenergy<=0)then
      begin
         cp_captured_n+=1;

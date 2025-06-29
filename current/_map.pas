@@ -447,7 +447,7 @@ begin
         if(tgc_pf_domain>0)then
         begin
           // debug_cell(gx,gy,1,map_gridDomain_color[tgc_pf_domain-1]);
-           with vid_UIItem_l[vid_UIItem_n-1] do
+           with ui_UIItem_l[ui_UIItem_n-1] do
            begin
               text_lt :=b2s(tgc_solidlevel);
               text_lt2:=w2s(tgc_pf_domain)+' '+str_b2c[tgc_pf_solid];
@@ -947,8 +947,8 @@ true : if(map_MaxPlayers>0)then
             if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
             then map_IfHereObjectCell+=1;
          end;
-false: for p:=0 to LastCPoint do
-        with g_cpoints[p] do
+false: for p:=0 to LastKeyPoint do
+        with g_KeyPoints[p] do
          if(cpCaptureR>0)then
          begin
             if(baser<0)
@@ -998,32 +998,32 @@ begin
        end;
 end;
 
-function map_IfCPointHere(basex,basey,symx,symy,r:integer):boolean;
+function map_IfKeyPointHere(basex,basey,symx,symy,r:integer):boolean;
 var p:byte;
     t:integer;
 begin
    if(r<=0)then
    begin
-      map_IfCPointHere:=true;
+      map_IfKeyPointHere:=true;
       exit;
    end;
-   map_IfCPointHere:=false;
+   map_IfKeyPointHere:=false;
 
    if(point_dist_int(basex,basey,symx,symy)<(r*2))then
    begin
-      map_IfCPointHere:=true;
+      map_IfKeyPointHere:=true;
       exit;
    end;
 
-   for p:=0 to LastCPoint do
-    with g_cpoints[p] do
+   for p:=0 to LastKeyPoint do
+    with g_KeyPoints[p] do
      if(cpCaptureR>0)then
      begin
         t:=r+max2i(cpsolidr,cpCaptureR);
         if(point_dist_int(basex,basey,cpx,cpy)<t)
         or(point_dist_int(symx ,symy ,cpx,cpy)<t)then
         begin
-           map_IfCPointHere:=true;
+           map_IfKeyPointHere:=true;
            break;
         end;
      end;
@@ -1032,36 +1032,36 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  CPOINTS
+//  Key Points
 
-procedure map_CPoints_UpdatePFZone;
+procedure map_KeyPoints_UpdatePFZone;
 var pn:integer;
 begin
-   for pn:=0 to LastCPoint do
-    with g_cpoints[pn] do
+   for pn:=0 to LastKeyPoint do
+    with g_KeyPoints[pn] do
      if(cpCaptureR>0)then cpZone:=map_MapGetZone(cpx,cpy);
 end;
 
-procedure map_CPoints_Default(num:byte;sr,cr,nr,energy,time,freeCenterR:integer;lifetime:cardinal;newpoints:boolean);
+procedure map_KeyPoints_Default(num:byte;sr,cr,nr,energy,time,freeCenterR:integer;lifetime:cardinal;newpoints:boolean);
 var
 basex,basey,
 symx,symy,
 i,u,b,c,
 dst        :integer;
-function setcpoint(px,py:integer):boolean;
+function setkpoint(px,py:integer):boolean;
 var pn:byte;
 begin
-   for pn:=0 to LastCPoint do
-     if(g_cpoints[pn].cpCaptureR<=0)then break;
+   for pn:=0 to LastKeyPoint do
+     if(g_KeyPoints[pn].cpCaptureR<=0)then break;
 
-   if(pn>LastCPoint)then
+   if(pn>LastKeyPoint)then
    begin
-      setcpoint:=true;
+      setkpoint:=true;
       exit;
    end
-   else setcpoint:=false;
+   else setkpoint:=false;
 
-   with g_cpoints[pn] do
+   with g_KeyPoints[pn] do
    begin
       cpx          :=px;
       cpy          :=py;
@@ -1080,7 +1080,7 @@ begin
    end;
 end;
 begin
-   if(newpoints)then FillChar(g_cpoints,SizeOf(g_cpoints),0);
+   if(newpoints)then FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
    u:=map_psize div 50;
    b:=map_psize-(u*2);
 
@@ -1101,26 +1101,26 @@ begin
 
          if map_InMapRange(symx,symy,0)then
            if (not map_IfPlayerStartHere(basex,basey,symx,symy,dst))
-           and(not map_IfCPointHere     (basex,basey,symx,symy,dst))then
+           and(not map_IfKeyPointHere   (basex,basey,symx,symy,dst))then
            begin
               if(freeCenterR>0)then
                 if(point_dist_int(basex,basey,map_phsize,map_phsize)<=freeCenterR)then continue;
 
-              if(setcpoint(basex,basey))then exit;
+              if(setkpoint(basex,basey))then exit;
               if(symx<>NOTSET)then
-                if(setcpoint(symx,symy))then exit;
+                if(setkpoint(symx,symy))then exit;
               break;
            end;
       end;
    end;
 end;
 
-procedure map_CPoints;
+procedure map_KeyPoints;
 begin
-   FillChar(g_cpoints,SizeOf(g_cpoints),0);
+   FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
 
    case map_scenario of
-ms_KotH   : with g_cpoints[1] do
+ms_KotH   : with g_KeyPoints[0] do
             begin
                cpx:=map_phsize;
                cpy:=map_phsize;
@@ -1133,11 +1133,11 @@ ms_KotH   : with g_cpoints[1] do
                cpmr:=round(cpCaptureR*map_mm_cx)+1;
                {$ENDIF}
             end;
-ms_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,byte(map_type=mapt_clake)*(map_psize div 3),0,true);
+ms_capture: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,byte(map_type=mapt_clake)*(map_psize div 3),0,true);
    end;
 
-   if(map_generators>1)then
-     map_CPoints_Default(LastCPoint,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,byte(map_type=mapt_clake)*(map_psize div 3),g_cgenerators_ltime[map_generators],false);
+   if(map_generators>0)then
+     map_KeyPoints_Default(LastKeyPoint,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,byte(map_type=mapt_clake)*(map_psize div 3),g_cgenerators_ltime[map_generators],false);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1179,7 +1179,7 @@ begin
    end;
 end;
 
-procedure project2rect(tarx,tary:pinteger;dir,rw:integer);
+procedure project2rect(tarx,tary:pinteger;dir:single;rw:integer);
 var
 sn,cs:single;
 rs   :integer;
@@ -1208,20 +1208,20 @@ var
 playerPerTeam,
 team,
 player,p,
+sideStep: integer;
 sdirStep,
 sdirStepT,
-sideStep,
 pdir,
-sdir  : integer;
+sdir    : single;
 begin
    if(map_maxTeams<=0)then exit;
    sideStep:=map_phsize-(map_phsize div 4);
-   sdirStep:=360 div map_maxTeams;
-   if(sdirStep=0)then sdirStep:=1;
    playerPerTeam:=map_MaxPlayers div map_maxTeams;
    if(playerPerTeam=0)then exit;
-   sdirStepT:=sdirStep div (playerPerTeam+1);
-   sdir    :=map_symmetryDir+90-(sdirStepT div 2)*(playerPerTeam-1);
+   sdirStep:=360/map_maxTeams;
+   if(sdirStep<1)then sdirStep:=1;
+   sdirStepT:=sdirStep/(playerPerTeam+1);
+   sdir    :=map_symmetryDir+90-(sdirStepT/2)*(playerPerTeam-1);
    for team:=0 to map_maxTeams-1 do
    begin
       pdir:=sdir;
@@ -1274,7 +1274,7 @@ begin
 
          if(point_dist_int(basex,basey,map_phsize,map_phsize)<=FreeCenterR)then continue;
          if(map_InMapRange(symx,symy,-bb0))then
-              if(point_dist_int(symx ,symy ,map_phsize,map_phsize)<=FreeCenterR)then continue;
+           if(point_dist_int(symx ,symy ,map_phsize,map_phsize)<=FreeCenterR)then continue;
 
          map_PlayerStartX[i]:=basex;
          map_PlayerStartY[i]:=basey;
@@ -1454,6 +1454,15 @@ var msrx,px,py:integer;
 begin
    FillChar(map_grid,SizeOf(map_grid),0);
 
+   {
+   ffa 8
+   own
+   2822825217
+   4200
+   canyon
+   \
+   }
+
    msrx:=integer(map_seed);
 
    case map_type of
@@ -1570,7 +1579,7 @@ mapt_clake : map_FreeCenterR := map_psize div 3;
    if(not skipPlayers)then
      map_PlayerStartsScirmish;
 
-   map_CPoints;
+   map_KeyPoints;
    map_MakeScirmishGrid;
    {$IFDEF _FULLGAME}
    map_mm_cx   := ui_panel_pwi/map_psize;
@@ -1591,7 +1600,7 @@ begin
    map_ZonesMake;
    map_pf_MarkSolidCells;
    map_pf_MakeDomains;
-   map_CPoints_UpdatePFZone;
+   map_KeyPoints_UpdatePFZone;
    {$IFDEF _FULLGAME}
    gfx_MakeThemeTiles;
    map_VisGridMake;
@@ -1611,7 +1620,7 @@ begin
    if(map_preset_cur>0)
    or(PlayerRequestor>LastPlayer)
    or((PlayerLobby  <=LastPlayer)and(PlayerLobby<>PlayerRequestor))
-   or(G_Started)
+   or(g_Started)
    then exit;
 
    case setting of

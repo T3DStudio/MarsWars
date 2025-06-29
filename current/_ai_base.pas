@@ -1,22 +1,22 @@
 
 const
 
-aiucl_main0      : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter  );
-aiucl_main1      : array[1..r_cnt] of byte = (UID_HCommandCenter ,0                   );
-aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol        ,UID_UGenerator      );
-aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UBarracks       );
-aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HBarracks      ,UID_UFactory        );
-aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory  );
-aiucl_tech0      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter     );
-aiucl_tech1      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UComputerStation);
-aiucl_tech2      : array[1..r_cnt] of byte = (UID_HPentagram     ,0                   );
-aiucl_detect     : array[1..r_cnt] of byte = (UID_HEye           ,UID_URadar          );
-aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation      );
-aiucl_spec2      : array[1..r_cnt] of byte = (UID_HTeleport      ,0                   );
-aiucl_twr_air1   : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret        );
-aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret        );
-aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret        );
-aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret        );
+aiucl_main0      : array[1..race_num] of byte = (UID_HKeep          ,UID_UCommandCenter  );
+aiucl_main1      : array[1..race_num] of byte = (UID_HCommandCenter ,0                   );
+aiucl_generator  : array[1..race_num] of byte = (UID_HSymbol        ,UID_UGenerator      );
+aiucl_barrack0   : array[1..race_num] of byte = (UID_HGate          ,UID_UBarracks       );
+aiucl_barrack1   : array[1..race_num] of byte = (UID_HBarracks      ,UID_UFactory        );
+aiucl_smith      : array[1..race_num] of byte = (UID_HPools         ,UID_UWeaponFactory  );
+aiucl_tech0      : array[1..race_num] of byte = (UID_HMonastery     ,UID_UTechCenter     );
+aiucl_tech1      : array[1..race_num] of byte = (UID_HFortress      ,UID_UComputerStation);
+aiucl_tech2      : array[1..race_num] of byte = (UID_HPentagram     ,0                   );
+aiucl_detect     : array[1..race_num] of byte = (UID_HEye           ,UID_URadar          );
+aiucl_spec1      : array[1..race_num] of byte = (UID_HAltar         ,UID_URMStation      );
+aiucl_spec2      : array[1..race_num] of byte = (UID_HTeleport      ,0                   );
+aiucl_twr_air1   : array[1..race_num] of byte = (UID_HTower         ,UID_UATurret        );
+aiucl_twr_air2   : array[1..race_num] of byte = (UID_HTotem         ,UID_UATurret        );
+aiucl_twr_ground1: array[1..race_num] of byte = (UID_HTower         ,UID_UGTurret        );
+aiucl_twr_ground2: array[1..race_num] of byte = (UID_HTotem         ,UID_UGTurret        );
 
 ai_GeneratorsLimit        = ul1*50;
 ai_GeneratorsEnergy       = 4500;
@@ -597,8 +597,8 @@ begin
 
       // nearest point/generator
       ai_cpoint_koth:=false;
-      for i:=1 to LastCPoint do
-       with g_cpoints[i] do
+      for i:=1 to LastKeyPoint do
+       with g_KeyPoints[i] do
          if(cpCaptureR>0)then
          begin
             if(cpOwnerTeam=team)then
@@ -612,7 +612,7 @@ begin
             end;
 
             if(map_scenario=ms_royale)then
-              if(g_royal_r<(cp_ToCenterD+100))then continue;
+              if(g_RoyalBattle_r<(cp_ToCenterD+100))then continue;
 
             if(cpx<=0)
             or(cpy<=0)
@@ -641,7 +641,7 @@ begin
                if(d<ai_generator_d)then
                begin
                   ai_generator_d :=d;
-                  ai_generator_cp:=@g_cpoints[i];
+                  ai_generator_cp:=@g_KeyPoints[i];
                end;
             end
             else
@@ -649,7 +649,7 @@ begin
               begin
                  ai_cpoint_d   :=d;
                  ai_cpoint_r   :=cpCaptureR;
-                 ai_cpoint_cp  :=@g_cpoints[i];
+                 ai_cpoint_cp  :=@g_KeyPoints[i];
                  ai_cpoint_koth:=koth_point;
               end;
 
@@ -1041,7 +1041,7 @@ begin
 
       if(ai_detection_pause>0)then ai_detection_pause-=1;
 
-      if(g_cycle_order=pnum)then
+      if(g_timer_UnitCycle=pnum)then
       begin
          if(ai_scout_u_cur=0)
          then ai_scout_timer:=0

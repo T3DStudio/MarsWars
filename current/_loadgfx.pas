@@ -289,7 +289,7 @@ begin
     end;
 end;
 
-function gfx_MWSModelLoad(name:shortstring;asmtype:TMWSModelType):PTMWSModel;
+function gfx_MWSModelLoad(name:shortstring;asmtype:TMWSModelType;log:boolean=false):PTMWSModel;
 var tmwtex:pTMWTexture;
 procedure calcSelectionRect(ip:pinteger;vl:integer);
 begin
@@ -319,7 +319,7 @@ begin
 
       while true do
       begin
-         tmwtex:=gfx_MWTextureLoad(name+i2s(sm_listn),true,false);
+         tmwtex:=gfx_MWTextureLoad(name+i2s(sm_listn),true,log);
          if(tmwtex=ptex_dummy)then break;
 
          sm_listn+=1;
@@ -335,74 +335,28 @@ begin
    end;
 end;
 
-{
-
-function gfx_MakeUIButtonFromSDLSurface(sSource:pSDl_Surface;bw:integer):pSDL_Surface;
-var  tst:pSDL_Surface;
-    coff:single;
-     hwb:integer;
-begin
-   hwb:=bw div 2;
-
-   if(sSource^.w<=bw)or(sSource^.h<=bw)
-   then coff:=1
-   else
-     if(sSource^.w<sSource^.h)
-     then coff:=bw/sSource^.w
-     else coff:=bw/sSource^.h;
-
-   tst:=gfx_SDLSurfaceResize(sSource,round(sSource^.w*coff),round(sSource^.h*coff));
-   SDL_SetColorKey(tst,SDL_SRCCOLORKEY,sSource^.format^.colorkey);
-   gfx_MakeUIButtonFromSDLSurface:=gfx_SDLSurfaceCreate(bw-1,bw-1);
-   if(tst^.h>bw)
-   then draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),2,tst)
-   else draw_surf(gfx_MakeUIButtonFromSDLSurface,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
-   rectangleColor(gfx_MakeUIButtonFromSDLSurface,0,0,gfx_MakeUIButtonFromSDLSurface^.w-1,gfx_MakeUIButtonFromSDLSurface^.h-1,c_black);
-   rectangleColor(gfx_MakeUIButtonFromSDLSurface,1,1,gfx_MakeUIButtonFromSDLSurface^.w-2,gfx_MakeUIButtonFromSDLSurface^.h-2,c_black);
-   SDL_FreeSurface(tst);
-end;
-
-
-
-function gfx_LoadUIButton(fn:shortstring;bw:integer):pSDL_Surface;
-var ts:pSDl_Surface;
-   hwb:integer;
-begin
-   hwb:=bw div 2;
-   ts:=gfx_SDLSurfaceLoad(fn,false,true);
-   gfx_LoadUIButton:=gfx_SDLSurfaceCreate(bw-1,bw-1);
-   if(ts^.h>bw)
-   then draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),0                ,ts)
-   else draw_surf(gfx_LoadUIButton,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
-   gfx_SDLSurfaceFree(ts);
-end;
- }
-
-function gfx_MWTextureLoadUIButtonFromFile(fn:shortstring;buttonw1:integer):pTMWTexture;
+function gfx_MWTextureLoadUIButtonFromFile(fn:shortstring):pTMWTexture;
 var
 tmpMWTexture: pTMWTexture;
-buttonwh    : integer;
 begin
    new(gfx_MWTextureLoadUIButtonFromFile);
    with gfx_MWTextureLoadUIButtonFromFile^ do
    begin
-      sdlsurface:=gfx_SDLSurfaceCreate(buttonw1,buttonw1);
+      sdlsurface:=gfx_SDLSurfaceCreate(ui_pButtonWi,ui_pButtonWi);
       sdltexture:=nil;
-      w:=buttonw1;h:=w;
-      hw:=w div 2;hh:=hw;
+      w :=ui_pButtonWi ;h :=w;
+      hw:=ui_pButtonWih;hh:=hw;
    end;
 
    tmpMWTexture:=gfx_MWTextureLoad(fn,true,true,true);
    with tmpMWTexture^ do
    begin
-      if(sdlsurface= nil)then sdlsurface:=gfx_SDLSurfaceCreate(buttonw1,buttonw1);
+      if(sdlsurface= nil)then sdlsurface:=gfx_SDLSurfaceCreate(ui_pButtonWi,ui_pButtonWi);
       if(sdltexture<>nil)then sdl_DestroyTexture(sdltexture);
 
-      buttonwh:=buttonw1 div 2;
-
-      if(sdlsurface^.h>buttonw1)
-      then draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,buttonwh-(sdlsurface^.w div 2),0                             ,sdlsurface)
-      else draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,buttonwh-(sdlsurface^.w div 2),buttonwh-(sdlsurface^.h div 2),sdlsurface);
+      if(sdlsurface^.h>ui_pButtonWi)
+      then draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,ui_pButtonWih-(sdlsurface^.w div 2),0                                  ,sdlsurface)
+      else draw_sdlsurface(gfx_MWTextureLoadUIButtonFromFile^.sdlsurface,ui_pButtonWih-(sdlsurface^.w div 2),ui_pButtonWih-(sdlsurface^.h div 2),sdlsurface);
       gfx_SDLSurfaceFree(sdlsurface);
       sdlsurface:=nil;
    end;
@@ -609,7 +563,7 @@ begin
    thw:=tw div 2;
    tr :=round(thw*1.45)+rstep;
    if(edgeStyle<>tes_tech)
-   then tr2:=round(thw*2.2 )+rstep
+   then tr2:=round(thw*2.15 )+rstep
    else tr2:=tr;
    tw0:=  -thw;
    tw1:=   thw;
@@ -796,8 +750,8 @@ begin
    or(theme_cur_crater_tes<>theme_last_crater_tes)then
    begin
       if(theme_cur_crater_tes=tes_tech)
-      then gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_tech  ,animStepX,animStepY,0,cardinal.MaxValue)
-      else gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,vid_TileTemplate_crater_nature,animStepX,animStepY,0,cardinal.MaxValue);
+      then gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,gfx_TileTemplate_crater_tech  ,animStepX,animStepY,0,cardinal.MaxValue)
+      else gfx_TileSet_Render(theme_tile_crater^.sdlsurface,theme_tileset_crater,gfx_TileTemplate_crater_nature,animStepX,animStepY,0,cardinal.MaxValue);
       theme_last_crater_tes:=theme_cur_crater_tes;
       //writeln('update 3 theme_tileset_crater');
    end;
@@ -824,8 +778,8 @@ begin
          if(theme_cur_liquid_tes=tes_nature)then
          begin
             if(theme_cur_liquid_tas=tas_magma)
-            then gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[0],animStepX,animStepY,maskColor,cardinal.MaxValue)
-            else gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],vid_TileTemplate_liquid[i],animStepX,animStepY,maskColor,cardinal.MaxValue);
+            then gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],gfx_TileTemplate_liquid[0],animStepX,animStepY,maskColor,cardinal.MaxValue)
+            else gfx_TileSet_Render(theme_tile_liquid^.sdlsurface,theme_tileset_liquid[i],gfx_TileTemplate_liquid[i],animStepX,animStepY,maskColor,cardinal.MaxValue);
          end
          else
            with theme_tileset_liquid[i]^[0]^ do
@@ -859,9 +813,9 @@ begin
    new(gfx_LoadFont);
    with gfx_LoadFont^ do
    begin
-      font_w :=max2i(1,fspr^.w div 256);
-      font_h :=max2i(1,fspr^.h);
-      font_lh:=font_h+2;
+      font_w :=max2i(1,fspr^.w div 16);
+      font_h :=max2i(1,fspr^.h div 16);
+      font_lh:=font_h+(font_h div 4);
       font_hw:=font_w div 2;
       font_hh:=font_h div 2;
    end;
@@ -895,12 +849,14 @@ begin
          end;
          SDL_FillRect(sdlsurface,nil,ccc);
 
-         vid_SDLRect^.x:=i*font_w;
+         {vid_SDLRect^.x:=i*font_w;
          vid_SDLRect^.y:=0;
          vid_SDLRect^.w:=font_w;
          vid_SDLRect^.h:=font_h;
 
-         SDL_BLITSURFACE(fspr^.sdlsurface,vid_SDLRect,sdlsurface,nil);
+         SDL_BLITSURFACE(fspr^.sdlsurface,vid_SDLRect,sdlsurface,nil);}
+         draw_sdlsurface(sdlsurface,-(i mod 16)*font_w,-(i div 16)*font_w,fspr^.sdlsurface);
+
          SDL_SetColorKey(sdlsurface,1,ccc);
 
          sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
@@ -922,78 +878,135 @@ end;
 
 
 {$include _themes.pas}
-{
-procedure vid_MakeMenuBack;
-var
-cx,cy:single;
-ts   :pSDL_Surface;
-begin
-   if(r_mback<>nil)then gfx_SDLSurfaceFree(r_mback);
-   r_mback:=gfx_SDLSurfaceCreate(vid_vw,vid_vh);
-   boxColor(r_mback,0,0,vid_vw,vid_vh,c_black);
 
-   cx:=vid_vw/spr_mback^.w;
-   cy:=vid_vh/spr_mback^.h;
-   if(cx>cy)
-   then ts:=zoomSurface(spr_mback,cy,cy,0)
-   else ts:=zoomSurface(spr_mback,cx,cx,0);
-   draw_surf(r_mback,vid_vhw-(ts^.w div 2),vid_vhh-(ts^.h div 2),ts);
-   gfx_SDLSurfaceFree(ts);
-end;}
+procedure SaveSurfacePart(surf:pSDL_Surface;x,y,w,h:integer;fn:shortstring);
+var tmp:pSDL_Surface;
+begin
+   tmp:=gfx_SDLSurfaceCreate(w,h);
+
+   vid_SDLRect^.x:=x;
+   vid_SDLRect^.y:=y;
+   vid_SDLRect^.w:=w;
+   vid_SDLRect^.h:=h;
+
+   SDL_BLITSURFACE(surf,vid_SDLRect,tmp,nil);
+   fn+=#0;
+   IMG_SavePNG(tmp,@fn[1]);
+   SDL_FreeSurface(tmp);
+end;
+
+function CheckFreeCol(surf:pSDL_Surface;x:integer;color:TMWColor):boolean;
+var y:integer;
+begin
+   for y:=0 to surf^.h-1 do
+     if(SDL_SurfaceGetPixel(surf,x,y)<>color)then
+     begin
+        CheckFreeCol:=false;
+        exit;
+     end;
+
+   CheckFreeCol:=true;
+end;
+
+procedure SplitFont;
+var
+tfont :pSDL_Surface;
+x,x0,wi,
+x1,i  :integer;
+bcolor:TMWColor;
+mode  :byte;
+begin
+   tfont:=gfx_MWTextureLoadSDLSurfaceFromFile(str_f_grp+'font_test1.png');
+
+   bcolor:=SDL_SurfaceGetPixel(tfont,0,0);
+
+   wi:=tfont^.w-1;
+   mode:=0;
+   x0:=0;
+   x1:=0;
+   i:=192;
+
+   for x:=0 to wi do
+   begin
+      case mode of
+      0 : begin
+             if(not CheckFreeCol(tfont,x,bcolor))then
+             begin
+                x0:=x;
+                mode:=1;
+             end;
+          end;
+      1 : begin
+             if(CheckFreeCol(tfont,x,bcolor))or(x=wi)then
+             begin
+                write(i,'=',chr(i),' ');
+                x1:=x;
+                mode:=0;
+                SaveSurfacePart(tfont,x0,0,x1-x0,tfont^.h,'temp\'+b2s(i)+'.png');
+                i+=1;
+             end;
+          end;
+      end;
+   end;
+   writeln;
+end;
 
 procedure dtest;
+const
+cw =18;
+cwh=cw div 2;
+var
+tchars:array[byte] of pSDL_Surface;
+tfont0,
+tfont :pSDL_Surface;
+ckey:TMWColor;
+tstr:shortstring;
+c:byte;
 begin
-   {SDL_SetRenderTarget(vid_SDLRenderer,tex_ui_MiniMap.sdltexture);
+  { tfont0:=gfx_MWTextureLoadSDLSurfaceFromFile(str_f_grp+'fontbase.png');
+   writeln(tfont0^.w,' ',tfont0^.h);
 
-   draw_set_color(c_aqua);
-   draw_clear;
-   draw_set_color(c_yellow);
-   draw_set_alpha(0);
-   SDL_SetRenderDrawBlendMode(vid_SDLRenderer,SDL_BLENDMODE_NONE);
-   SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_NONE);
-
-   //draw_fcircle(MapCellHW,MapCellHW,MapCellHW);
-   SDL_RenderDrawLine(vid_SDLRenderer,0,0,999,999);
-   SDL_RenderDrawLine(vid_SDLRenderer,1,0,999,999);
-   SDL_RenderDrawLine(vid_SDLRenderer,2,0,999,999);
-   SDL_RenderDrawLine(vid_SDLRenderer,3,0,999,999);
-   SDL_RenderDrawLine(vid_SDLRenderer,4,0,999,999);
-   SDL_RenderDrawLine(vid_SDLRenderer,5,0,999,999);
-
-
-   SDL_SetRenderTarget(vid_SDLRenderer,nil);
-   SDL_SetRenderDrawBlendMode(vid_SDLRenderer,SDL_BLENDMODE_BLEND);
-   SDL_SetTextureBlendMode(tex_ui_MiniMap.sdltexture,SDL_BLENDMODE_BLEND);
-   draw_set_alpha(255);}
-
-   with tex_ui_MiniMap0^ do
+   for c:=0 to 255 do
    begin
-      sdlsurface:=gfx_SDLSurfaceCreate(MapCellW,MapCellW);
+      tchars[c]:=gfx_SDLSurfaceCreate(cw,cw);
+      draw_sdlsurface(tchars[c],-c*cw,0,tfont0);
+   end; }
 
-      {SDLSurf_boxColor(sdlsurface,0,0,MapCellW,MapCellW,c_white);
-      SDLSurf_boxColor(sdlsurface,MapCellhW,MapCellhW,MapCellW-10,MapCellW-10,c_red);
-      SDLSurf_boxColor(sdlsurface,10,10,MapCellhW-10,MapCellhW-10,c_green);
-      SDLSurf_boxColor(sdlsurface,10,MapCellhW,MapCellhW-10,MapCellW-10,c_blue);
-                                                                                  }
+   //
 
-      SDLSurf_filledCircleColor(sdlsurface,MapCellhW,MapCellhW,MapCellhW,c_red);
-      SDLSurf_filledCircleColor(sdlsurface,MapCellW-20,MapCellW-20,50,c_aqua);
-      SDLSurf_filledCircleColor(sdlsurface,20,MapCellW-20,50,c_lime);
-
-
-      sdltexture:=SDL_CreateTextureFromSurface(vid_SDLRenderer,sdlsurface);
-      gfx_SDLSurfaceFree(sdlsurface);
-
+   for c:=0 to 255 do
+   begin
+      tchars[c]:=gfx_MWTextureLoadSDLSurfaceFromFile('temp\'+b2s(c)+'.png');
+      if(tchars[c]<>nil)then
+      SDL_SetColorKey(tchars[c],1,SDL_SurfaceGetPixel(tchars[c],0,0));
    end;
 
-   writeln('redraw');
+
+
+   tfont:=gfx_SDLSurfaceCreate(cw*16,cw*16);
+
+   //tfont0:=gfx_SDLSurfaceCreate(cw*16,cw*16);
+   //SDLSurf_boxColor(tfont0,0,0,tfont0^.w,tfont0^.h,c_white);
+   //SDL_SetSurfaceAlphaMod(tfont0,0);
+
+
+   for c:=0 to 255 do
+   if(tchars[c]<>nil)then draw_sdlsurface(tfont,(c mod 16)*cw+cwh-(tchars[c]^.w div 2),
+                                                (c div 16)*cw+cwh-(tchars[c]^.h div 2)-2,tchars[c]);
+
+   //draw_sdlsurface(tfont,0,0,tfont0);
+
+   tstr:=str_f_grp+'font2.png'+#0;
+   IMG_SavePNG(tfont,@tstr[1]);
 end;
 
 procedure gfx_LoadGraphics;
 var x,r:integer;
 begin
    // basic textures
-   ptex_dummy:=nil;
+   //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 'best');
+
+   new(ptex_dummy);
    gfx_MWTextureInit(@tex_dummy);
    ptex_dummy:=@tex_dummy;
    with spr_dmodel do
@@ -1006,8 +1019,15 @@ begin
    end;
    spr_pdmodel:=@spr_dmodel;
 
+   dtest;
+
+   //font_Base:=gfx_LoadFont(str_f_FontBig);
    font_Base:=gfx_LoadFont(str_f_FontBase);
-   draw_set_font(font_Base,basefont_w1);
+   font_Doom :=gfx_LoadFont(str_f_FontBig );
+
+   draw_set_font(font_Base,basefont_H1);
+
+
 
    draw_LoadingScreen(str_loading_gfxd,c_red);
 
@@ -1023,10 +1043,10 @@ begin
    theme_tile_crater :=gfx_MWTextureMakeSDLSurface(MapCellW,MapCellW);
    theme_tile_liquid :=gfx_MWTextureMakeSDLSurface(MapCellW,MapCellW);
 
-   vid_TileTemplate_crater_tech  :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_tech  ,8 ,0);
-   vid_TileTemplate_crater_nature:=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,11,0);
+   gfx_TileTemplate_crater_tech  :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_tech  ,-2,0);
+   gfx_TileTemplate_crater_nature:=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,10,0);
    for x:=0 to theme_anim_step_n-1 do
-   vid_TileTemplate_liquid[x]    :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,0 ,byte(x*5));
+   gfx_TileTemplate_liquid[x]    :=gfx_TileSetTemplate_Make(c_white,c_black,MapCellW,tes_nature,-2,byte(x*5));
 
    theme_tileset_crater   :=gfx_TileSet_Make(MapCellW);
    for x:=0 to theme_anim_step_n-1 do
@@ -1038,7 +1058,7 @@ begin
    gfx_TileSet_MakeFog;
 
 
-   // load game resources
+   // load main graphics
    draw_LoadingScreen(str_loading_gfx1,c_orange);
 
    spr_mlogo     :=gfx_MWTextureLoad('logo'       ,false);
@@ -1223,71 +1243,97 @@ begin
    spr_eff_g          :=gfx_MWSModelLoad(effects_folder+'g_'             ,smt_effect   );
    spr_blood          :=gfx_MWSModelLoad(effects_folder+'blood'          ,smt_effect   );
 
+   for x:=0 to spr_upgrade_icons do
+     for r:=1 to race_num do
+       spr_b_up[r,x]:=gfx_MWTextureLoadUIButtonFromFile(race_upgrades[r]+'b_up'+b2s(x));
+
+   for x:=0 to 255 do
+     with g_uids[x] do
+       uid_ui_button:=gfx_MWTextureMakeRenderTarget(ui_pButtonWi,ui_pButtonWi);
+
    // load game resources
    draw_LoadingScreen(str_loading_gfx2,c_yellow);
 
    InitThemes;
 
    effect_InitCLData;
-
-   for x:=0 to 255 do
-     with g_uids[x] do
-       un_btn:=gfx_MWTextureMakeRenderTarget(ui_ButtonWi,ui_ButtonWi);
-
- for x:=0 to spr_upgrade_icons do
-   for r:=1 to r_cnt do
-     spr_b_up[r,x]:=gfx_MWTextureLoadUIButtonFromFile(race_upgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
 end;
 
-{
-procedure MakeUnitIcons;
-var u:byte;
+procedure gfx_MakeUnitIcons;
+var
+tmpMWTexture:pTMWTexture;
+   u : byte;
+coff : single;
+nw,nh:integer;
 begin
+   draw_set_color(c_white);
+   draw_set_alpha(255);
    for u:=0 to 255 do
-   with g_uids[u] do
-   begin
-      with un_btn do
-      begin
-         case _urace of
-         r_hell: sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_BW );
-         r_uac : sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_BW );
-         end;
-         w   := sdlSurface^.w;h := w;
-         hw  := w div 2;hh:= hw;
-      end;
-      with un_sbtn do
-      begin
-         case _urace of
-         r_hell: sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,315,0)^.sdlSurface,vid_oiw );
-         r_uac : sdlSurface:= gfx_MakeUIButtonFromSDLSurface(sm_uid2MWTexture(u,225,0)^.sdlSurface,vid_oiw );
-         end;
-         w   := sdlSurface^.w;h := w;
-         hw  := w div 2;hh:= hw;
-      end;
-   end;
-end;}
+     with g_uids[u] do
+       with uid_ui_button^ do
+       begin
+          case _urace of
+          r_hell: tmpMWTexture:=sm_uid2MWTexture(u,315,0);
+          r_uac : tmpMWTexture:=sm_uid2MWTexture(u,225,0);
+          end;
+
+          if(tmpMWTexture^.w<=ui_pButtonWi)or(tmpMWTexture^.h<=ui_pButtonWi)
+          then coff:=1
+          else
+            if(tmpMWTexture^.w<tmpMWTexture^.h)
+            then coff:=ui_pButtonWi/tmpMWTexture^.w
+            else coff:=ui_pButtonWi/tmpMWTexture^.h;
+
+          nw:=round(tmpMWTexture^.w*coff);
+          nh:=round(tmpMWTexture^.h*coff);
+
+          draw_set_target(uid_ui_button);
+
+          if(nh>ui_pButtonWi)
+          then draw_mwtexture2(ui_pButtonWih-(nw div 2),ui_pButtonWb            ,tmpMWTexture,nw,nh)
+          else draw_mwtexture2(ui_pButtonWih-(nw div 2),ui_pButtonWih-(nh div 2),tmpMWTexture,nw,nh);
+
+          draw_set_target(nil);
+       end;
+end;
 
 procedure gfx_ui_UpdateTextures;
+var
+new_sc:single;
 begin
    gfx_MWTextureFree(tex_ui_ControlBar);
 
+   ui_MiniMap_sc   :=ui_MiniMap_msc   /100;
+   ui_ControlBar_sc:=ui_ControlBar_msc/100;
+
    ui_MiniMap_w:=round(ui_panel_pwu*ui_MiniMap_sc);
 
-   case vid_PannelPos of
-vpp_left,
-vpp_right  : begin
+   case ui_CBarPos of
+uicbp_left,
+uicbp_right  : begin
                 ui_ControlBar_w:=round(ui_panel_pwu*ui_ControlBar_sc);
                 ui_ControlBar_h:=round(ui_panel_ph *ui_ControlBar_sc);
 
-                if(vid_PannelPos=vpp_left)
+                if((ui_MiniMap_w+ui_ControlBar_h)>vid_vh)then
+                begin
+                   new_sc:=vid_vh/(ui_MiniMap_w+ui_ControlBar_h);
+                   ui_MiniMap_sc   *=new_sc;
+                   ui_ControlBar_sc*=new_sc;
+
+                   ui_MiniMap_w:=round(ui_panel_pwu*ui_MiniMap_sc);
+                   ui_ControlBar_w:=round(ui_panel_pwu*ui_ControlBar_sc);
+                   ui_ControlBar_h:=round(ui_panel_ph *ui_ControlBar_sc);
+                end;
+
+                if(ui_CBarPos=uicbp_left)
                 then ui_ControlBar_x:=0
                 else ui_ControlBar_x:=vid_vw-ui_ControlBar_w;
 
-                if(vid_PannelPos=vpp_left)
+                if(ui_CBarPos=uicbp_left)
                 then ui_MiniMap_x:=0
                 else ui_MiniMap_x:=vid_vw-ui_MiniMap_w;
 
-                if(vid_MiniMapPos)then   // top
+                if(ui_MiniMapPos)then   // top
                 begin
                    ui_MiniMap_y   :=0;
                    ui_ControlBar_y:=ui_MiniMap_w;
@@ -1300,20 +1346,31 @@ vpp_right  : begin
 
                 tex_ui_ControlBar:=gfx_MWTextureMakeRenderTarget(ui_panel_pwu,ui_panel_ph);
              end;
-vpp_top,
-vpp_bottom : begin
+uicbp_top,
+uicbp_bottom : begin
                 ui_ControlBar_w:=round(ui_panel_ph *ui_ControlBar_sc);
                 ui_ControlBar_h:=round(ui_panel_pwu*ui_ControlBar_sc);
 
-                if(vid_PannelPos=vpp_top)
+                if((ui_MiniMap_w+ui_ControlBar_w)>vid_vw)then
+                begin
+                   new_sc:=vid_vw/(ui_MiniMap_w+ui_ControlBar_w);
+                   ui_MiniMap_sc   *=new_sc;
+                   ui_ControlBar_sc*=new_sc;
+
+                   ui_MiniMap_w:=round(ui_panel_pwu*ui_MiniMap_sc);
+                   ui_ControlBar_w:=round(ui_panel_ph *ui_ControlBar_sc);
+                   ui_ControlBar_h:=round(ui_panel_pwu*ui_ControlBar_sc);
+                end;
+
+                if(ui_CBarPos=uicbp_top)
                 then ui_ControlBar_y:=0
                 else ui_ControlBar_y:=vid_vh-ui_ControlBar_h;
 
-                if(vid_PannelPos=vpp_top)
+                if(ui_CBarPos=uicbp_top)
                 then ui_MiniMap_y:=0
                 else ui_MiniMap_y:=vid_vh-ui_MiniMap_w;
 
-                if(vid_MiniMapPos)then //left
+                if(ui_MiniMapPos)then //left
                 begin
                    ui_ControlBar_x:=ui_MiniMap_w;
                    ui_MiniMap_x   :=0;
@@ -1370,38 +1427,38 @@ begin
 
    vid_UpdateCamVars;
 
-   case vid_PannelPos of
-vpp_right,
-vpp_bottom,
-vpp_top    : ui_textLUx:=basefont_wh;
-vpp_left   : ui_textLUx:=ui_ControlBar_x+basefont_wh;
+   case ui_CBarPos of
+uicbp_right,
+uicbp_bottom,
+uicbp_top    : ui_textLUx:=basefont_wh;
+uicbp_left   : ui_textLUx:=ui_ControlBar_x+basefont_wh;
    end;
-   case vid_PannelPos of
-vpp_left,
-vpp_right,
-vpp_bottom : ui_textLUy:=basefont_wh;
-vpp_top    : ui_textLUy:=ui_ControlBar_y+basefont_wh;
+   case ui_CBarPos of
+uicbp_left,
+uicbp_right,
+uicbp_bottom : ui_textLUy:=basefont_wh;
+uicbp_top    : ui_textLUy:=ui_ControlBar_y+basefont_wh;
    end;
-   case vid_PannelPos of
-vpp_left,
-vpp_right,
-vpp_top    : ui_textLDy:=vid_vh-basefont_wh;
-vpp_bottom : ui_textLDy:=ui_ControlBar_y-basefont_wh;
+   case ui_CBarPos of
+uicbp_left,
+uicbp_right,
+uicbp_top    : ui_textLDy:=vid_vh-basefont_wh;
+uicbp_bottom : ui_textLDy:=ui_ControlBar_y-basefont_wh;
    end;
 
-   case vid_PannelPos of
-vpp_left,
-vpp_bottom ,
-vpp_top    : ui_fpsx:=vid_vw-basefont_wh;
-vpp_right  : if(vid_MiniMapPos)
+   case ui_CBarPos of
+uicbp_left,
+uicbp_bottom ,
+uicbp_top    : ui_fpsx:=vid_vw-basefont_wh;
+uicbp_right  : if(ui_MiniMapPos)
              then ui_fpsx:=ui_MiniMap_x   -basefont_wh
              else ui_fpsx:=ui_ControlBar_x-basefont_wh;
    end;
-   case vid_PannelPos of
-vpp_left,
-vpp_bottom ,
-vpp_right  : ui_fpsy:=basefont_wh;
-vpp_top    : if(vid_MiniMapPos)
+   case ui_CBarPos of
+uicbp_left,
+uicbp_bottom ,
+uicbp_right  : ui_fpsy:=basefont_wh;
+uicbp_top    : if(ui_MiniMapPos)
              then ui_fpsy:=ui_ControlBar_y+basefont_wh
              else ui_fpsy:=ui_MiniMap_y   +basefont_wh+ui_MiniMap_w;
    end;

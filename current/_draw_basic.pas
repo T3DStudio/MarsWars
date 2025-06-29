@@ -123,9 +123,9 @@ begin
      end;
 end;
 
-procedure draw_set_fontUpdateSize(newSize:single);
+procedure draw_set_fontUpdateSize(newSize:single;force:boolean=false);
 begin
-   if(draw_font_size<>newSize)then
+   if(draw_font_size<>newSize)or(force)then
    with draw_font^ do
    begin
       draw_font_size:=newSize;
@@ -148,9 +148,11 @@ begin
 end;
 
 procedure draw_set_font(newFont:PTFont;newSizeW:integer);
+var new:boolean;
 begin
+   new:=draw_font<>newFont;
    draw_font:=newFont;
-   draw_set_fontUpdateSize(newSizeW/draw_font^.font_w);
+   draw_set_fontUpdateSize(newSizeW/draw_font^.font_w,new);
 end;
 
 {procedure draw_set_fontS(newFont:PTFont;newSizeS:single);
@@ -401,7 +403,7 @@ begin
    draw_set_color(c_black);
    draw_set_alpha(127);
    draw_clear;
-   draw_set_font(font_Base,basefont_w2);
+   draw_set_font(font_Doom,basefont_H4);
    draw_set_color(color);
    draw_set_alpha(255);
    draw_text_line(w div 2,h div 2,CaptionString,ta_MM,255,0);
@@ -514,8 +516,8 @@ end;
 procedure map_MinimapCPoints;
 var i  :byte;
 begin
-   for i:=0 to LastCPoint do
-    with g_cpoints[i] do
+   for i:=0 to LastKeyPoint do
+    with g_KeyPoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(map_scenario=ms_KotH))or(cpenergy<=0)
       then map_MinimapSpot(cpmx,cpmy,cpmr,char_cp ,c_purple)
@@ -604,12 +606,12 @@ begin
    // true  - need announcer sound
    // false - no need announcer sound
 
-   if(UIPlayer>LastPlayer)
+   if(ui_player>LastPlayer)
    then LogMes2UIAlarm:=false
    else
    begin
       LogMes2UIAlarm:=true;
-      with g_players[UIPlayer] do
+      with g_players[ui_player] do
         with log_l[log_i] do
           case mtype of
 lmt_unit_promoted    :      ui_AddMarker(xi,yi,aummat_advance   ,true);

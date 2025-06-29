@@ -377,7 +377,7 @@ begin
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
    begin
       rpls_rstate   :=rpls_state_none;
-      G_Started     :=false;
+      g_Started     :=false;
       rpls_str_info1:='';
       rpls_str_info2:='';
       rpls_str_info3:='';
@@ -390,7 +390,7 @@ begin
    if(not FileExists(rpls_str_path))then
    begin
       rpls_rstate   :=rpls_state_none;
-      G_Started    :=false;
+      g_Started    :=false;
       rpls_str_info1:=str_error_FileExists;
       //GameLogChat(PlayerClient,log_to_all,str_error_FileExists+' '+rpls_list[rpls_list_sel],true);
       exit;
@@ -404,7 +404,7 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      G_Started    :=false;
+      g_Started    :=false;
       rpls_str_info1:=str_error_OpenFile;
       //GameLogChat(PlayerClient,log_to_all,str_error_OpenFile+' '+rpls_list[rpls_list_sel],true);
    end
@@ -415,7 +415,7 @@ begin
       if(rpls_file_size<rpls_file_head_size)then
       begin
          replay_Abort;
-         G_Started    :=false;
+         g_Started    :=false;
          rpls_str_info1:=str_error_WrongData;
          exit;
       end;
@@ -428,7 +428,7 @@ begin
       if(i<>g_version)then
       begin
          replay_Abort;
-         G_Started    :=false;
+         g_Started    :=false;
          rpls_str_info1:=str_error_WrongVersion;
       end
       else
@@ -453,7 +453,7 @@ begin
          or(rpls_POVPlayer> LastPlayer   )then
          begin
             replay_Abort;
-            G_Started:=false;
+            g_Started:=false;
             rpls_str_info1:=str_error_WrongVersion;
             GameDefaultAll;
             exit;
@@ -493,7 +493,7 @@ begin
          rpls_pnu    :=0;
          rpls_ticks  :=0;
          PlayerClient:=rpls_POVPlayer;
-         UIPlayer    :=PlayerClient;
+         ui_player    :=PlayerClient;
 
          rpls_POVCam  :=false;
 
@@ -503,9 +503,9 @@ begin
 
          GameCameraBounds;
          ui_tab    :=tt_controls;
-         G_Started :=true;
+         g_Started :=true;
          menu_state:=false;
-         ServerSide:=false;
+         g_ServerSide:=false;
       end;
    end;
 end;
@@ -570,17 +570,17 @@ begin
    if(rpls_StartRecordPause>0)
    then rpls_StartRecordPause-=1
    else
-     if(rpls_Recording)and(G_Started)and(rpls_rstate=rpls_state_none)then
+     if(rpls_Recording)and(g_Started)and(rpls_rstate=rpls_state_none)then
      begin
         rpls_rstate:=rpls_state_write;
         rpls_StartRecordPause:=fr_fps2;
         GameLogChat(PlayerClient,log_to_all,str_msg_ReplayStart+rpls_str_prefix,true);
      end;
 
-   if(not G_Started)or(rpls_rstate=rpls_state_none)//or(menu_s2=ms2_camp)
+   if(not g_Started)or(rpls_rstate=rpls_state_none)//or(menu_s2=ms2_camp)
    then replay_Abort
    else
-     if(G_Started)then
+     if(g_Started)then
      begin
         rpls_ticks+=1;
         case rpls_rstate of
@@ -642,7 +642,7 @@ begin
    if(Check)then exit;
 
    rpls_rstate:=rpls_state_read;
-   G_Started :=true;
+   g_Started :=true;
    menu_page1:=mp_scirmish;
 end;
 

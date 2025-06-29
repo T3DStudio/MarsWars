@@ -9,7 +9,7 @@ begin
    with player^ do
    if(hits>dead_hits)then
    begin
-      if(cycle_order=g_cycle_order)then
+      if(cycle_order=g_timer_UnitCycle)then
         for uc:=1 to MaxUnits do
           if(uc<>unum)then
           begin
@@ -19,16 +19,16 @@ begin
 
       if(buff[ub_Resurect]<=0)then
       begin
-         if(ServerSide)or(hits>fdead_hits)then hits-=1;
+         if(g_ServerSide)or(hits>fdead_hits)then hits-=1;
          {$IFDEF _FULLGAME}
-         if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
+         if(cycle_order=g_timer_UnitCycle)and(fsr>1)then fsr-=1;
          {$ENDIF}
 
-         if(ServerSide)then
+         if(g_ServerSide)then
            if(hits<=dead_hits)then unit_remove(pu);
       end
       else
-        if(ServerSide)then
+        if(g_ServerSide)then
         begin
            if(hits<-fr_fpsd2)then hits:=-fr_fpsd2;
            hits+=1;
@@ -79,14 +79,14 @@ begin
 
       if(hits<=damage)then
       begin
-         if(ServerSide)
+         if(g_ServerSide)
          then unit_kill(pu,false,(hits-damage)<=_fastdeath_hits,true,false,false);
       end
       else
       begin
          buff[ub_Damaged]:=fr_fps2;
 
-         if(ServerSide)
+         if(g_ServerSide)
          then hits-=damage
          else
            if(buff[ub_Pain]<=0)then exit;
@@ -869,8 +869,8 @@ procedure unit_capture_point(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
-    for i:=1 to LastCPoint do
-     with g_cpoints[i] do
+    for i:=1 to LastKeyPoint do
+     with g_KeyPoints[i] do
       if(cpCaptureR>0)then
        if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then
        begin
@@ -919,7 +919,7 @@ begin
       if(map_scenario=ms_royale)then
       begin
          u_royal_cd:=point_dist_int(x,y,map_phsize,map_phsize);
-         u_royal_d :=g_royal_r-u_royal_cd;
+         u_royal_d :=g_RoyalBattle_r-u_royal_cd;
          if(u_royal_d<_missile_r)then
          begin
             unit_kill(pu,false,false,true,true,false);
@@ -1036,7 +1036,7 @@ begin
    with player^ do
    begin
       WaitForNextTarget:=0;
-      if(ServerSide)then
+      if(g_ServerSide)then
       begin
          a_tar  :=0;
          a_tard :=NOTSET;
@@ -1057,7 +1057,7 @@ begin
 
       if(not udetect)and(not attack_target)then exit;  // in transport & client side
 
-      if(attack_target)and(ServerSide)then unit_PickTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(attack_target)and(g_ServerSide)then unit_PickTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -1143,7 +1143,7 @@ begin
       mmy  :=pTransport^.mmy;
       {$ENDIF}
 
-      if(ServerSide)then
+      if(g_ServerSide)then
       begin
          //if(pTransport^.ua_id=ua_unload)or(pTransport^.transportC>pTransport^.transportM)then
          //  if(not map_IsObstacleZone(pTransport^.zone))then
@@ -1313,7 +1313,7 @@ begin
    or(tu^.uid^._zombie_hits<tu^.hits)
    or(tu^.hits<=fdead_hits          )then exit;
 
-   if(ServerSide)then
+   if(g_ServerSide)then
    begin
       _h:=tu^.hits/tu^.uid^._mhits;
       _d:=tu^.dir;
@@ -1412,7 +1412,7 @@ begin
    with pAttacker^ do
    if(IsIntUnitRange(a_tar,@pTarget))then
    begin
-      if(ServerSide)then
+      if(g_ServerSide)then
       begin
          if(a_reload<=0)then
          begin
@@ -1420,7 +1420,7 @@ begin
 
             if(w>MaxUnitWeapons)or(a=wmove_impassible)then
             begin
-               if(ServerSide)then
+               if(g_ServerSide)then
                begin
                   a_tar:=0;
                   WaitForNextTarget:=1;
@@ -1436,7 +1436,7 @@ begin
 
             if(a=0)then
             begin
-               if(ServerSide)then
+               if(g_ServerSide)then
                begin
                   a_tar:=0;
                   WaitForNextTarget:=1;
@@ -1521,7 +1521,7 @@ wmove_noneed    : if(not AttackInMove)then
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
 
-            if(ServerSide)and(not _ukbuilding)then
+            if(g_ServerSide)and(not _ukbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
               then unit_AddExp(pAttacker,aw_reload*2)
               else unit_AddExp(pAttacker,aw_reload  );
@@ -1529,7 +1529,7 @@ wmove_noneed    : if(not AttackInMove)then
             begin
                if(x<>pTarget^.x)
                or(y<>pTarget^.y)then dir:=point_dir(x,y,pTarget^.x,pTarget^.y);
-               if(ServerSide)then WaitForNextTarget:=(a_reload div order_period)+1;
+               if(g_ServerSide)then WaitForNextTarget:=(a_reload div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pAttacker,true,@attackervis);
@@ -1537,7 +1537,7 @@ wmove_noneed    : if(not AttackInMove)then
             AttackEffects;
          end;
 
-         if(cycle_order=g_cycle_order)then AttackEffects;
+         if(cycle_order=g_timer_UnitCycle)then AttackEffects;
 
          {$IFDEF _FULLGAME}
          if(targetvis)then
@@ -1590,9 +1590,9 @@ wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
 wpt_directdmgZ : if(not fakemissile)then
                    if(not unit_TryZombification(pAttacker,pTarget))then
                      unit_damage(pTarget,ApplyDamageMod(pTarget,aw_dmod,aw_count+upgradd),1,playeri,false);
-wpt_suicide    : if(ServerSide)then unit_kill(pAttacker,false,true,true,false,true);
+wpt_suicide    : if(g_ServerSide)then unit_kill(pAttacker,false,true,true,false,true);
             else
-              if(ServerSide)and(not fakemissile)then
+              if(g_ServerSide)and(not fakemissile)then
               case aw_type of
 wpt_resurect   : begin
                     unit_StartResurrection(pTarget);
@@ -1770,7 +1770,7 @@ begin
    if(pTransport<>nil)then unit_InTransportCode(pu,pTransport);
 
    with pu^ do
-   if(ServerSide)then
+   if(g_ServerSide)then
    begin
       if(pTransport=nil)then
         if(unit_Action(pu))then
@@ -1794,7 +1794,7 @@ begin
    begin
       unit_attack(pu);
 
-      if(pTransport=nil)and(cycle_order=g_cycle_order)then
+      if(pTransport=nil)and(cycle_order=g_timer_UnitCycle)then
         if(movePFDest_x<>x)or(movePFDest_y<>y)then
         begin
            movePFDest_x:=x;
@@ -1835,7 +1835,7 @@ begin
    with player^ do
    if(cenergy>=0)then
    begin
-      if(g_cycle_order=cycle_order)and(buff[ub_Damaged]<=0)then
+      if(g_timer_UnitCycle=cycle_order)and(buff[ub_Damaged]<=0)then
       begin
          hits+=_bstep;
          hits+=_bstep*upgr[upgr_fast_build];
@@ -1883,7 +1883,7 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         if(cycle_order=g_cycle_order)then
+         if(cycle_order=g_timer_UnitCycle)then
          unit_BaseVision(pu,false);
 
          unit_BaseCounters(pu);
@@ -1892,30 +1892,30 @@ begin
          begin
             IsIntUnitRange(transport,@transportu);
 
-            if(cycle_order=g_cycle_order)then
+            if(cycle_order=g_timer_UnitCycle)then
             unit_Bonuses(pu);
 
             unit_BaseBehavior(pu,transportu);
 
             if(hits<=0)then continue;
 
-            if(ServerSide)and(iscomplete)then
+            if(g_ServerSide)and(iscomplete)then
             begin
                unit_move(pu);
 
-               if(cycle_order=g_cycle_regen)then
+               if(cycle_order=g_timer_UnitRegen)then
                unit_regeneration(pu);
 
                unit_prod(pu);
             end
             else unit_build(pu);
 
-            {if(cycle_order=g_cycle_order)then
-              if(ServerSide)and(transportu=nil)
+            {if(cycle_order=g_timer_UnitCycle)then
+              if(g_ServerSide)and(transportu=nil)
               then unit_mcycle   (pu)
               else unit_mcycle_cl(pu,transportu);
 
-            if(ServerSide)and(transportu=nil)then
+            if(g_ServerSide)and(transportu=nil)then
               unit_capture_point(pu);   }
          end
          else unit_death(pu);

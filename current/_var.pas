@@ -1,7 +1,6 @@
 
 var
 
-GameCycle         : boolean = false;
 sys_EVENT         : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -9,15 +8,10 @@ sys_EVENT         : pSDL_EVENT;
 //  GAME
 //
 
-ServerSide        : boolean = true; // only server side code
+g_GameCycle       : boolean = false;
+g_ServerSide      : boolean = true; // only server side code
 
-UnitMoveStepTicks : byte = 8;
-LastCreatedUnit   : integer = 0;
-LastCreatedUnitP  : PTUnit;
-PlayerClient      : byte = 0; // 'this' player
-PlayerLobby       : byte = 0; // Player who can change game settings
-
-G_Started         : boolean  = false;
+g_Started         : boolean  = false;
 g_status          : byte     = 0;
 g_fixed_positions : boolean  = false;
 g_ai_slots        : byte     = {$IFDEF _FULLGAME}player_default_ai_level{$ELSE}0{$ENDIF};
@@ -29,13 +23,13 @@ g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
 g_slot_state      : TPlayerSlots;
 
-g_royal_r         : integer  = 0;
-g_cpoints         : array[0..LastCPoint] of TCTPoint;
+g_RoyalBattle_r   : integer  = 0;
+g_KeyPoints       : array[0..LastKeyPoint] of TCTPoint;
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
-g_missiles        : array[1..MaxMissiles] of TMissile;
+g_missiles        : array[0..MaxMissiles] of TMissile;
 
 g_uids            : array[byte] of TUID;
 g_upids           : array[byte] of TUPID;
@@ -43,15 +37,28 @@ g_mids            : array[byte] of TMID;
 g_dmods           : array[byte] of TDamageMod;
 g_uability        : array[byte] of TUnitAbility;
 
-g_cycle_order     : integer = 0;
-g_cycle_regen     : integer = 0;
+g_timer_UnitCycle : integer = 0;
+g_timer_UnitRegen : integer = 0;
 
 g_random_i        : word = 0;
 g_random_p        : byte = 0;
 
+// other
+
+UnitMoveStepTicks : byte = 8;
+LastCreatedUnit   : integer = 0;
+LastCreatedUnitP  : PTUnit;
+PlayerClient      : byte = 0; // 'this' player
+PlayerLobby       : byte = 0; // Player who can change game settings
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP
+//
+
 map_preset_cur    : byte = 0;
 map_preset_n      : byte = 0;
-map_presets       : array of TMapPreset;
+map_preset_l      : array of TMapPreset;
 
 map_scenario      : byte     = ms_ffa8;
 map_generators    : byte     = 0;
@@ -76,10 +83,16 @@ map_gridDomainMX  : array of array of TMapGridPFDomainData;
 map_gridDomain_color: array of TMWColor;
 {$ENDIF}
 
+// map grid cells cycle
 map_gcpx,
 map_gcpy,
 map_gcsx,
 map_gcsy          : integer;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  NETWORK
+//
 
 net_status        : byte = ns_single;
 net_port          : word = 10666;
@@ -93,6 +106,11 @@ net_cpoints_t     : TWCPDataTime;
 net_localAdv      : boolean = true;
 net_localAdv_timer: integer = 0;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  REPLAYS
+//
+
 rpls_file         : file;
 rpls_u            : integer = 0;
 rpls_Quality      : byte = 0;
@@ -100,16 +118,25 @@ rpls_log_n        : word = 0;
 rpls_wudata_t     : TWUDataTime;
 rpls_cpoints_t    : TWCPDataTime;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  FrameRate
+//
+
 fr_FPSSecond,
 fr_FPSSecondD,
 fr_FPSSecondU,
 fr_FPSSecondN,
 fr_FPSSecondC,
 fr_FrameCount,
-fr_LastTocks,
+fr_LastTicks,
 fr_BaseTicks      : cardinal;
 
-// weapon target bits
+////////////////////////////////////////////////////////////////////////////////
+//
+//  weapon target bits
+//
+
 wtrset_all,
 wtrset_enemy,
 wtrset_enemy_alive,
@@ -144,6 +171,12 @@ str_outLogLastDate: shortstring = '';
 
 {$IFDEF _FULLGAME}
 
+////  FULLGAME   ///////////////////////////////////////////////////////////////
+//
+//  OTHER
+//
+
+
 debug_Sx,
 debug_Sy,
 debug_Sgx,
@@ -166,92 +199,24 @@ debug_array_y     : array of integer;
 
 map_grid_graph    : array[0..MaxMapSizeCelln-1,0..MaxMapSizeCelln-1] of TMapTerrainGridCellAnim;
 
+g_eids            : array[byte] of TEID;
+g_effects         : array[1..ui_MaxScreenSprites] of TEffect;
+
+ms_eid_bio_death_uids
+                  : TSoB;
+
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 test_mode         : byte = 0;
 test_fastprod     : boolean = false;
 sys_uncappedFPS   : boolean = false;
-ui_fog            : boolean = false;
 
-vid_SDLWindow     : pSDL_Window;
-vid_SDLRenderer   : pSDL_Renderer;
+PlayerName        : shortstring = str_defaultPlayerName;
 
-vid_SDLRendererName: shortstring = '';
-vid_SDLRendererNameConfig
-                   : shortstring = '';
-vid_SDLRenderersN : integer = 0;
-vid_SDLRendererI  : integer = -1;
-
-vid_SDLRect       : pSDL_RECT;
-
-vid_SDLDisplayModeN: integer = 0;
-vid_SDLDisplayModes: array of TSDL_DisplayMode;
-vid_SDLDisplayModeC: TSDL_DisplayMode;
-vid_MinW           : integer = integer.MaxValue;
-vid_MinH           : integer = integer.MaxValue;
-vid_MaxW           : integer = integer.MinValue;
-vid_MaxH           : integer = integer.MinValue;
-
-vid_blink1_colorb,
-vid_blink2_colorb : boolean;
-vid_blink1_color_BG,
-vid_blink1_color_BY,
-vid_blink2_color_BG,
-vid_blink2_color_BY : TMWColor;
-vid_blink3          : byte;
-
-vid_TileTemplate_crater_tech,
-vid_TileTemplate_crater_nature: pTMWTileSet;
-vid_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of pTMWTileSet;
-
-vid_vw            : integer = 0;       // in game resolution
-vid_vhw           : integer = 0;
-vid_vh            : integer = 0;
-vid_vhh           : integer = 0;
-vid_cam_w         : integer = 0;       // in-game cam view
-vid_cam_hw        : integer = 0;
-vid_cam_h         : integer = 0;
-vid_cam_hh        : integer = 0;
-vid_cam_x         : integer = 0;
-vid_cam_y         : integer = 0;
-vid_cam_x1        : integer = 0;
-vid_cam_y1        : integer = 0;
-vid_cam_sc        : single = 1;
-vid_mmvx,
-vid_mmvy          : integer;
-vid_vmb_x0        : integer = 6;              // cam scroll by mouse screen edges
-vid_vmb_y0        : integer = 6;
-vid_vmb_x1        : integer = -6;
-vid_vmb_y1        : integer = -6;
-
-vid_Sprites_l     : array[0..vid_MaxScreenSprites-1] of pTVSprite;       // vid base
-vid_Sprites_n     : word = 0;
-vid_UIItem_l      : array[0..vid_MaxScreenSprites-1] of TUIItem;
-vid_UIItem_n      : word = 0;
-vid_blink_timer1  : integer = 0;
-vid_blink_timer2  : integer = 0;
-vid_PanelUpdTimer : byte = 0;
-vid_PanelUpdNow   : boolean = false;
-
-vid_CamSpeedBase  : integer = 25;
-vid_CamSpeedScaled: integer = 25;
-vid_UnitHealthBars: TUIUnitHBarsOption  = low(TUIUnitHBarsOption);
-vid_PlayersColorSchema
-                  : TPlayersColorSchema = low(TPlayersColorSchema);
-vid_APM           : boolean = false;
-vid_FPS           : boolean = false;
-vid_CamMSEScroll  : boolean = false;
-vid_ColoredShadow : boolean = true;
-vid_PannelPos     : TVidPannelPos = low(TVidPannelPos);
-vid_MiniMapPos    : boolean = false;
-
-vid_minimap_scan_blink
-                  : boolean = false;
-
-UIPlayer          : byte = 0;
-ingame_chat       : byte = 0;
-vid_fullscreen    : boolean = false;
-r_draw            : boolean = true;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  menu
+//
 
 menu_state        : boolean = true;
 menu_page1        : byte = mp_main;
@@ -277,61 +242,36 @@ menu_list_y,
 menu_list_item_h,
 menu_list_item_hh,
 menu_list_w       : integer;
+menu_list_font    : PTFont;
 menu_list_fontS   : integer = basefont_w1;
 menu_list_items   : array of TMenuListItem;
 menu_list_aleft   : boolean = false;
 
-PlayerName        : shortstring = str_defaultPlayerName;
-PlayerColorSchemeFFA,
-PlayerColorSchemeTEAM,
-PlayerColorNormal,
-PlayerColorShadow : TPlayerColorArray;
 
-
-font_Base         : PTFont;
-
-
-
-draw_color        : TMWColor;
-draw_color_r,
-draw_color_g,
-draw_color_b,
-draw_color_a      : byte;
-draw_font         : PTFont;
-draw_font_size    : single = 0;
-draw_font_w1,
-draw_font_wi,
-draw_font_wh,
-draw_font_wq,
-draw_font_w1h,
-draw_font_wq3,
-draw_font_h1,
-draw_font_hi,
-draw_font_hh,
-draw_font_hq,
-draw_font_lhq,
-draw_font_lhh
-
-                  : integer;
-
-g_eids            : array[byte] of TEID;
-g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
-
-ms_eid_bio_death_uids
-                  : TSoB;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP client
+//
 
 map_mm_cx         : single;
 map_mm_CamW,
 map_mm_CamH       : integer;
 map_mm_gridW      : single;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CAMPAIN
+//
 
 campain_skill     : byte = 3;
 campain_seed      : cardinal = 0;
 campain_mission   : byte = 255;
 campain_mmap      : array[0..MaxMissions] of pTMWTexture;
 
-log_LastMesTimer  : integer = 0;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  NETWORK
+//
 
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
@@ -351,6 +291,11 @@ net_svsearch_scroll: integer = 0;
 net_svsearch_sel  : integer = 0;
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  SAVE/LOAD
+//
+
 svld_str_info1    : shortstring = '';
 svld_str_info2    : shortstring = '';
 svld_str_info3    : shortstring = '';
@@ -363,6 +308,11 @@ svld_list_size    : integer = 0;
 svld_list_sel     : integer = 0;
 svld_list_scroll  : integer = 0;
 svld_file_size    : cardinal = 0;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  REPLAYS
+//
 
 rpls_Recording    : boolean = false;
 rpls_StartRecordPause
@@ -395,131 +345,6 @@ rpls_ticks        : byte = 0;
 rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
-
-
-mouse_select_x0,
-mouse_select_y0,
-mouse_map_x,
-mouse_map_y,
-mouse_x,
-mouse_y           : integer;
-m_brushc          : TMWColor;
-mbrush_x,
-mbrush_y,
-m_brush           : integer;
-m_panelBtn_x,
-m_panelBtn_y              : integer;
-m_vmove           : boolean = false;
-m_action          : boolean = true;
-m_mmap_move       : boolean = false;
-
-
-// UID
-
-ui_ControlBar_x   : integer = 0;
-ui_ControlBar_y   : integer = 0;
-ui_ControlBar_w   : integer = 0;
-ui_ControlBar_h   : integer = 0;
-ui_ControlBar_sc  : single = 1;
-ui_MiniMap_x      : integer = 0;
-ui_MiniMap_y      : integer = 0;
-ui_MiniMap_w      : integer = 0;
-ui_MiniMap_sc     : single = 1.5;
-ui_MapView_cw     : integer = 0;
-ui_MapView_ch     : integer = 0;
-
-ui_FogView_grid,
-ui_FogView_pgrid  : array of array of boolean;
-ui_FogView_gridW  : integer = 0;
-ui_FogView_gridH  : integer = 0;
-ui_FogView_cw     : integer = 0;
-ui_FogView_ch     : integer = 0;
-ui_FogView_sx     : integer = 0;
-ui_FogView_sy     : integer = 0;
-ui_FogView_ex     : integer = 0;
-ui_FogView_ey     : integer = 0;
-
-ui_fog_tileset    : pTMWTileSet;
-
-ui_language       : boolean = false;
-
-ui_UnitSelectedNU : integer = 0;
-ui_UnitSelectedpU : integer = 0;
-ui_UnitSelectedn  : byte = 0;
-ui_tab            : TTabType = low(TTabType);
-ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
-ui_alarms         : array[0..ui_max_alarms] of TAlarm;
-ui_dPlayer        : TPlayer;
-
-ui_groups_d       : array[0..MaxUnitGroups] of TUnitGroup;
-ui_groups_f1      : TUnitGroup;
-ui_groups_f2      : TUnitGroup;
-
-// mouse click effect
-ui_mc_x,
-ui_mc_y,                        // mouse click effect
-ui_mc_a           : integer;
-ui_mc_c           : TMWColor;
-
-// ui panel counters
-ui_uprod_max,
-ui_uprod_cur,
-ui_uprod_first    : integer;
-ui_units_InTransport,
-ui_uprod_uid_max,
-ui_uprod_uid_time,
-ui_pprod_max,
-ui_pprod_time     : array[byte] of integer;
-ui_pprod_first    : integer;
-ui_bprod_possible : TSoB;
-ui_bprod_uid_count,
-ui_bprod_ucl_count,
-ui_bprod_ucl_time : array[byte] of integer;
-ui_bprod_first,
-ui_bprod_all      : integer;
-ui_uid_reload     : array[byte] of integer;
-ui_bucl_reload    : array[byte] of integer;
-ui_uibtn_move     : integer = 0;   // ui move buttons
-ui_uibtn_abilityu : PTUnit  = nil; // ui action unit
-ui_uhint          : integer = 0;
-ui_CursorUnit     : PTUnit;
-ui_umark_u        : integer = 0;
-ui_umark_t        : byte = 0;
-ui_color_max,                                       // unit max count color
-ui_color_cenergy,                                         // energy limit colors
-ui_color_limit,                                           // unit limit colors
-ui_color_blink2,
-ui_color_blink1   : array[false..true] of TMWColor;
-
-// panel text positions
-ui_uiuphx         : integer = 0;
-ui_uiuphy         : integer = 0;
-ui_uiplayery      : integer = 0;
-ui_ingamecl       : byte = 0;
-ui_textLUx        : integer = 0;  // timer/chat screen X
-ui_textLUy        : integer = 0;  // timer/chat screen Y
-ui_hinty1         : integer = 0;  // hints screen Y 1
-ui_hinty2         : integer = 0;  // hints screen Y 2
-ui_hinty3         : integer = 0;  // hints screen Y 3
-ui_hinty4         : integer = 0;  // hints screen Y 4
-ui_logy           : integer = 0;  // LOG screen Y
-ui_chaty          : integer = 0;  // chat screen Y
-ui_oicox          : integer = 0;  // order icons screen X
-ui_energx         : integer = 0;
-ui_energy         : integer = 0;
-ui_armyx          : integer = 0;
-ui_armyy          : integer = 0;
-ui_apmx           : integer = 0;
-ui_apmy           : integer = 0;
-ui_fpsx           : integer = 0;
-ui_fpsy           : integer = 0;
-ui_GameLogHeight  : integer = 0;
-
-// ui log
-ui_log_s          : array of shortstring;
-ui_log_t          : array of byte;
-ui_log_c          : array of TMWColor;
-ui_log_n          : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -632,6 +457,259 @@ hotkeyO2 : THotKeyTable = (0,0,0,
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  MOUSE
+//
+
+mouse_select_x0,
+mouse_select_y0,
+mouse_map_x,
+mouse_map_y,
+mouse_x,
+mouse_y           : integer;
+m_brushc          : TMWColor;
+mbrush_x,
+mbrush_y,
+m_brush           : integer;
+m_panelBtn_x,
+m_panelBtn_y      : integer;
+m_vmove           : boolean = false;
+m_action          : boolean = true;
+m_mmap_move       : boolean = false;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UI
+//
+
+PlayerColorSchemeFFA,
+PlayerColorSchemeTEAM,
+PlayerColorNormal,
+PlayerColorShadow : TPlayerColorArray;
+
+ui_LogLastMesTimer: integer = 0;
+ui_IngameChat     : byte = 0;
+
+ui_fog            : boolean = false;
+ui_player         : byte = 0;
+
+ui_Sprites_l      : array[0..ui_MaxScreenSprites-1] of pTVSprite;       // vid base
+ui_Sprites_n      : word = 0;
+ui_UIItem_l       : array[0..ui_MaxScreenSprites-1] of TUIItem;
+ui_UIItem_n       : word = 0;
+ui_blink_timer1   : integer = 0;
+ui_blink_timer2   : integer = 0;
+ui_PanelUpdTimer  : byte = 0;
+ui_PanelUpdNow    : boolean = false;
+
+ui_blink1_colorb,
+ui_blink2_colorb  : boolean;
+ui_blink1_color_BG,
+ui_blink1_color_BY,
+ui_blink2_color_BG,
+ui_blink2_color_BY: TMWColor;
+ui_blink3         : byte;
+
+ui_CamSpeedBase   : integer = 25;
+ui_CamSpeedScaled : integer = 25;
+ui_UnitHealthBars : TUIUnitHBarsOption  = low(TUIUnitHBarsOption);
+ui_PlayersColorSchema
+                  : TPlayersColorSchema = low(TPlayersColorSchema);
+ui_ShowAPM        : boolean = false;
+ui_ShowFPS        : boolean = false;
+ui_CamMSEScroll   : boolean = false;
+ui_ColoredShadow  : boolean = true;
+ui_CBarPos        : TUIControlBarPos = low(TUIControlBarPos);
+ui_MiniMapPos     : boolean = false;
+
+ui_minimap_scan_blink
+                  : boolean = false;
+
+ui_ControlBar_x   : integer = 0;
+ui_ControlBar_y   : integer = 0;
+ui_ControlBar_w   : integer = 0;
+ui_ControlBar_h   : integer = 0;
+ui_ControlBar_sc  : single = 1;
+ui_ControlBar_msc : integer = 100;
+ui_MiniMap_x      : integer = 0;
+ui_MiniMap_y      : integer = 0;
+ui_MiniMap_w      : integer = 0;
+ui_MiniMap_sc     : single = 1.5;
+ui_MiniMap_msc    : integer = 100;
+ui_MapView_cw     : integer = 0;
+ui_MapView_ch     : integer = 0;
+
+ui_FogView_grid,
+ui_FogView_pgrid  : array of array of boolean;
+ui_FogView_gridW  : integer = 0;
+ui_FogView_gridH  : integer = 0;
+ui_FogView_cw     : integer = 0;
+ui_FogView_ch     : integer = 0;
+ui_FogView_sx     : integer = 0;
+ui_FogView_sy     : integer = 0;
+ui_FogView_ex     : integer = 0;
+ui_FogView_ey     : integer = 0;
+
+ui_fog_tileset    : pTMWTileSet;
+
+ui_language       : boolean = false;
+
+ui_UnitSelectedNU : integer = 0;
+ui_UnitSelectedpU : integer = 0;
+ui_UnitSelectedn  : byte = 0;
+ui_tab            : TTabType = low(TTabType);
+ui_panel_uids     : array[0..race_num,0..2,0..ui_pButtonsCount] of byte;
+ui_alarms         : array[0..ui_max_alarms] of TAlarm;
+ui_dPlayer        : TPlayer;
+
+ui_groups_d       : array[0..MaxUnitGroups] of TUnitGroup;
+ui_groups_f1      : TUnitGroup;
+ui_groups_f2      : TUnitGroup;
+
+// mouse click effect
+ui_mc_x,
+ui_mc_y,                        // mouse click effect
+ui_mc_a           : integer;
+ui_mc_c           : TMWColor;
+
+// ui panel counters
+ui_uprod_max,
+ui_uprod_cur,
+ui_uprod_first    : integer;
+ui_units_InTransport,
+ui_uprod_uid_max,
+ui_uprod_uid_time,
+ui_pprod_max,
+ui_pprod_time     : array[byte] of integer;
+ui_pprod_first    : integer;
+ui_bprod_possible : TSoB;
+ui_bprod_uid_count,
+ui_bprod_ucl_count,
+ui_bprod_ucl_time : array[byte] of integer;
+ui_bprod_NearTime,
+ui_bprod_all      : integer;
+ui_uid_reload     : array[byte] of integer;
+ui_bucl_reload    : array[byte] of integer;
+ui_uibtn_move     : integer = 0;   // ui move buttons
+ui_uibtn_abilityu : PTUnit  = nil; // ui action unit
+ui_uhint          : integer = 0;
+ui_CursorUnit     : PTUnit;
+ui_umark_u        : integer = 0;
+ui_umark_t        : byte = 0;
+ui_color_max,                                       // unit max count color
+ui_color_cenergy,                                         // energy limit colors
+ui_color_limit,                                           // unit limit colors
+ui_color_blink2,
+ui_color_blink1   : array[false..true] of TMWColor;
+
+// panel text positions
+ui_uiuphx         : integer = 0;
+ui_uiuphy         : integer = 0;
+ui_uiplayery      : integer = 0;
+ui_ingamecl       : byte = 0;
+ui_textLUx        : integer = 0;  // timer/chat screen X
+ui_textLUy        : integer = 0;  // timer/chat screen Y
+ui_hinty1         : integer = 0;  // hints screen Y 1
+ui_hinty2         : integer = 0;  // hints screen Y 2
+ui_hinty3         : integer = 0;  // hints screen Y 3
+ui_hinty4         : integer = 0;  // hints screen Y 4
+ui_logy           : integer = 0;  // LOG screen Y
+ui_chaty          : integer = 0;  // chat screen Y
+ui_oicox          : integer = 0;  // order icons screen X
+ui_energx         : integer = 0;
+ui_energy         : integer = 0;
+ui_armyx          : integer = 0;
+ui_armyy          : integer = 0;
+ui_apmx           : integer = 0;
+ui_apmy           : integer = 0;
+ui_fpsx           : integer = 0;
+ui_fpsy           : integer = 0;
+ui_GameLogHeight  : integer = 0;
+
+// ui log
+ui_log_s          : array of shortstring;
+ui_log_t          : array of byte;
+ui_log_c          : array of TMWColor;
+ui_log_n          : integer = 0;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  video
+//
+
+vid_draw          : boolean = true;
+
+vid_SDLWindow     : pSDL_Window;
+vid_SDLRenderer   : pSDL_Renderer;
+
+vid_fullscreen    : boolean = false;
+
+vid_SDLRendererName: shortstring = '';
+vid_SDLRendererNameConfig
+                  : shortstring = '';
+vid_SDLRenderersN : integer = 0;
+vid_SDLRendererI  : integer = -1;
+
+vid_SDLRect       : pSDL_RECT;
+
+vid_SDLDisplayModeN: integer = 0;
+vid_SDLDisplayModes: array of TSDL_DisplayMode;
+vid_SDLDisplayModeC: TSDL_DisplayMode;
+vid_MinW          : integer = integer.MaxValue;
+vid_MinH          : integer = integer.MaxValue;
+vid_MaxW          : integer = integer.MinValue;
+vid_MaxH          : integer = integer.MinValue;
+
+vid_vw            : integer = 0;       // in game resolution
+vid_vhw           : integer = 0;
+vid_vh            : integer = 0;
+vid_vhh           : integer = 0;
+vid_cam_w         : integer = 0;       // in-game cam view
+vid_cam_hw        : integer = 0;
+vid_cam_h         : integer = 0;
+vid_cam_hh        : integer = 0;
+vid_cam_x         : integer = 0;
+vid_cam_y         : integer = 0;
+vid_cam_x1        : integer = 0;
+vid_cam_y1        : integer = 0;
+vid_cam_sc        : single = 1;
+vid_mmvx,
+vid_mmvy          : integer;
+vid_vmb_x0        : integer = 6;              // cam scroll by mouse screen edges
+vid_vmb_y0        : integer = 6;
+vid_vmb_x1        : integer = -6;
+vid_vmb_y1        : integer = -6;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  DRAW GLOBALS
+//
+
+draw_color        : TMWColor;
+draw_color_r,
+draw_color_g,
+draw_color_b,
+draw_color_a      : byte;
+draw_font         : PTFont;
+draw_font_size    : single = 0;
+draw_font_w1,
+draw_font_wi,
+draw_font_wh,
+draw_font_wq,
+draw_font_w1h,
+draw_font_wq3,
+draw_font_h1,
+draw_font_hi,
+draw_font_hh,
+draw_font_hq,
+draw_font_lhq,
+draw_font_lhh
+
+                  : integer;
+
+////////////////////////////////////////////////////////////////////////////////
+//
 //  COLORS
 //
 
@@ -730,11 +808,16 @@ theme_name            : array[0..theme_n-1] of shortstring;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  SPRITES
+//  GFX
 //
 
+font_Base,
+font_Doom          : PTFont;
 
-tex_temp,
+gfx_TileTemplate_crater_tech,
+gfx_TileTemplate_crater_nature: pTMWTileSet;
+gfx_TileTemplate_liquid       : array[0..theme_anim_step_n-1] of pTMWTileSet;
+
 tex_dummy         : TMWTexture;
 ptex_dummy        : PTMWTexture;
 
@@ -921,8 +1004,8 @@ spr_mback,
 spr_cursor        : pTMWTexture;
 
 spr_tabs          : array[0..3] of pTMWTexture;
-spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of pTMWTexture;
-spr_mp            : array[1..r_cnt] of pTMWTexture;
+spr_b_up          : array[1..race_num,0..spr_upgrade_icons] of pTMWTexture;
+spr_mp            : array[1..race_num] of pTMWTexture;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -933,9 +1016,10 @@ spr_mp            : array[1..r_cnt] of pTMWTexture;
 str_bool                : array[false..true   ] of shortstring;
 
 str_teams               : array[0..LastPlayer ] of shortstring;
-str_racel               : array[0..r_cnt      ] of shortstring;
+str_racel               : array[0..race_num   ] of shortstring;
 str_map_scenariol       : array[0..ms_count   ] of shortstring;
 
+str_map_Generatorsl     : array[0..gms_g_maxgens]of shortstring;
 str_map_typel           : array[0..gms_m_types] of shortstring;
 str_map_syml            : array[0..gms_m_symm ] of shortstring;
 str_map_Map,
@@ -990,13 +1074,14 @@ str_menu_ColoredShadow,
 str_menu_ScrollSpeed,
 str_menu_MouseScroll,
 str_menu_PlayerName,
-str_menu_PanelPos,
+str_menu_CtrlBarPos,
 str_menu_MiniMapPos,
+str_menu_CtrlBarScale,
+str_menu_MiniMapScale,
 str_menu_unitHBar,
 str_menu_PlayersColor,
 
-str_menu_ResolutionWidth,
-str_menu_ResolutionHeight,
+str_menu_Resolution,
 str_menu_Apply,
 str_menu_fullscreen,
 str_menu_SDLRenderer,
@@ -1045,9 +1130,8 @@ str_menu_FixedStarts
                         : shortstring;
 str_menu_PlayersColorl  : array[TPlayersColorSchema ] of shortstring;
 str_menu_unitHBarl      : array[TUIUnitHBarsOption  ] of shortstring;
-str_menu_PanelPosl      : array[TVidPannelPos       ] of shortstring;
+str_menu_PanelPosl      : array[TUIControlBarPos    ] of shortstring;
 str_menu_MiniMapPosl    : array[boolean,boolean     ] of shortstring;
-str_map_Generatorsl    : array[0..gms_g_maxgens    ] of shortstring;
 str_menu_NetQuality     : array[0..cl_UpT_arrayN    ] of shortstring;
 
 str_menu_ReplayPlay,
@@ -1206,7 +1290,7 @@ snd_mmap_last      : PTSoundSet = nil;
 snd_mmap_ticks     : integer = 0;
 
 
-snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
+snd_under_attack   : array[false..true,1..race_num] of PTSoundSet;
 snd_build_place,
 snd_building,
 snd_cannot_build,
@@ -1219,7 +1303,7 @@ snd_upgrade_complete,
 snd_victory,
 snd_unit_adv,
 snd_unit_promoted
-                   : array[1..r_cnt] of PTSoundSet;
+                   : array[1..race_num] of PTSoundSet;
 
 snd_radar,
 

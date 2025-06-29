@@ -417,7 +417,7 @@ begin
    SoundPlayUnit:=false;
    if(ss=nil)
    or(menu_state)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(visdata<>nil)then
    begin
@@ -434,7 +434,7 @@ end;
 procedure SoundPlayUI(ss:PTSoundSet);
 begin
    if(ss=nil)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    SoundPlay(ss,sss_ui,true);
 end;
@@ -443,7 +443,7 @@ procedure SoundPlayAnoncer(ss:PTSoundSet;checkpause,stopother:boolean);
 begin
    if(ss=nil)
    or(menu_state)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(checkpause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
 
@@ -458,7 +458,7 @@ procedure SoundPlayMMapAlarm(ss:PTSoundSet;checkpause:boolean);
 begin
    if(ss=nil)
    or(menu_state)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(checkpause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
 
@@ -472,7 +472,7 @@ procedure SoundPlayUnitCommand(ss:PTSoundSet);
 begin
    if(ss=nil)
    or(menu_state)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(snd_command_last=ss)and(snd_command_ticks>0)then exit;
 
@@ -566,7 +566,7 @@ end;
 procedure SoundMusicControll(ForceNextTreck:boolean);
 var current_music_ss: PTSoundSet;
 begin
-   if(G_Started)
+   if(g_Started)
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
 
@@ -586,11 +586,11 @@ end;
 
 procedure SoundControl;
 begin
-   if(vid_blink_timer1=0)then SoundMusicControll(false);
+   if(ui_blink_timer1=0)then SoundMusicControll(false);
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
 
-   if(G_Started)and(G_status=gs_running)and(not menu_state)
+   if(g_Started)and(G_status=gs_running)and(not menu_state)
    then SoundPlayUnitSelect;
 end;
 
@@ -659,7 +659,7 @@ begin
    snd_flyer_s              :=SoundSetLoad(missiles_folder+'flyer_s'         );
    snd_flyer_a              :=SoundSetLoad(missiles_folder+'flyer_a'         );
 
-   for r:=1 to r_cnt do
+   for r:=1 to race_num do
    begin
    snd_under_attack[true ,r]:=SoundSetLoad(race_dir[r]+'base_under_attack'         );
    snd_under_attack[false,r]:=SoundSetLoad(race_dir[r]+'unit_under_attack'         );

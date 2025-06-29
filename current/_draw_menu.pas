@@ -132,13 +132,13 @@ begin
    end;
 end;
 
-procedure D_menu_ValBar(mi:byte;val,max:integer;percentage:boolean);
+procedure D_menu_ValBar(mi:byte;val,min,max:integer;percentage:boolean);
 var tx0,tx1,ty:integer;
 begin
    with menu_items[mi] do
    begin
       tx1:=mi_x1-basefont_w2;
-      tx0:=tx1-max;
+      tx0:=tx1-(max-min);
       ty:=(mi_y0+mi_y1) div 2;
       draw_set_color(c_white);
       draw_line(tx0-basefont_w2+basefont_wh,ty,tx0-basefont_wq3,mi_y0+basefont_wq3);
@@ -152,7 +152,7 @@ begin
       draw_vline(tx0-basefont_w2,mi_y0+1,mi_y1);
 
       draw_set_color(c_lime);
-      draw_frect(tx0,mi_y0+basefont_w1+1,tx0+val,mi_y1-basefont_w1);
+      draw_frect(tx0,mi_y0+basefont_w1+1,tx0+val-min,mi_y1-basefont_w1);
 
       draw_set_color(c_white);
       tx0-=basefont_w2+basefont_wh;
@@ -302,11 +302,11 @@ begin
    with menu_items[mi] do D_menu_Panel(mi_x0,mi_y0,mi_x1,mi_y1,255);
    D_menu_EText(mi,ta_MM,text,listarrow,0,c_none);
 end;
-procedure D_menu_MButtonB(mi:byte;text:shortstring;val,max:integer;percentage:boolean);
+procedure D_menu_MButtonB(mi:byte;text:shortstring;min,val,max:integer;percentage:boolean);
 begin
    with menu_items[mi] do D_menu_Panel(mi_x0,mi_y0,mi_x1,mi_y1,255);
    D_menu_ETextD(mi,text,'',false,0,c_none);
-   D_menu_ValBar(mi,val,max,percentage);
+   D_menu_ValBar(mi,val,min,max,percentage);
 end;
 procedure D_menu_MButtonN(mi:byte;text1,text2:shortstring);
 begin
@@ -382,8 +382,8 @@ begin
    draw_set_alpha(255);
    draw_mwtexture2(0,0,spr_mback,menu_w,menu_h);
 
-   // x2 FONT ELEMENTS
-   draw_set_font(font_Base,basefont_w2);
+   // x2 DOOM FONT ELEMENTS
+   draw_set_font(font_Doom,basefont_H4);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
@@ -397,12 +397,74 @@ mi_title_AboutGame         : D_menu_MButtonS(i,str_menu_AboutGame     ,true);
 mi_title_ReplayPlayback    : D_menu_MButtonS(i,str_menu_ReplayPlayback,true);
          end;
 
-   // x1.5 FONT ELEMENTS
-   draw_set_font(font_Base,basefont_w1h);
+   // x1.5 BASE FONT ELEMENTS
+   draw_set_font(font_Base,basefont_H2);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
          case i of
+
+
+mi_settings_ColoredShadows : D_menu_MButtonD(i,str_menu_ColoredShadow   ,str_bool[ui_ColoredShadow]           ,false);
+mi_settings_ShowAPM        : D_menu_MButtonD(i,str_menu_APM             ,str_bool[ui_ShowAPM]                     ,false);
+mi_settings_HitBars        : D_menu_MButtonD(i,str_menu_unitHBar        ,str_menu_unitHBarl[ui_UnitHealthBars],true );
+mi_settings_MRBAction      : D_menu_MButtonD(i,str_menu_maction         ,str_menu_mactionl[m_action]           ,true );
+mi_settings_ScrollSpeed    : D_menu_MButtonB(i,str_menu_ScrollSpeed     ,1,ui_CamSpeedBase,max_CamSpeed       ,false);
+mi_settings_MouseScroll    : D_menu_MButtonD(i,str_menu_MouseScroll     ,str_bool[ui_CamMSEScroll]            ,false);
+mi_settings_PlayerName     : D_menu_MButtonN(i,str_menu_PlayerName      ,PlayerName                                  );
+mi_settings_Langugage      : D_menu_MButtonD(i,str_menu_language        ,str_menu_lang[ui_language]            ,true );
+mi_settings_CBarPosition   : D_menu_MButtonD(i,str_menu_CtrlBarPos      ,str_menu_PanelPosl[ui_CBarPos]     ,true );
+mi_settings_CBarScale      : D_menu_MButtonB(i,str_menu_CtrlBarScale    ,min_CBarScalePrc,ui_ControlBar_msc,max_CBarScalePrc   ,false );
+mi_settings_MMapPosition   : D_menu_MButtonD(i,str_menu_MiniMapPos      ,str_menu_MiniMapPosl[ui_CBarPos in VPPSet_Vertical][ui_MiniMapPos],true );
+mi_settings_MMapScale      : D_menu_MButtonB(i,str_menu_MiniMapScale    ,min_MMapScalePrc,ui_MiniMap_msc,max_MMapScalePrc      ,false );
+mi_settings_PlayerColors   : D_menu_MButtonD(i,str_menu_PlayersColor    ,str_menu_PlayersColorl[ui_PlayersColorSchema]  ,true );
+
+{
+if(rpls_rstate>rpls_state_none)and(g_cl_units>0)
+then D_menu_ETextD(mi_game_RecordQuality ,str_replay_Quality ,i2s(min2i(cl_UpT_array[rpls_Quality]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_Quality]
+                                                                                           ,true ,0,0)
+else D_menu_ETextD(mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_Quality]           ,true ,0,0);
+}
+
+//
+mi_settings_Replaying      : D_menu_MButtonD(i,str_menu_Recording       ,str_bool[rpls_Recording]             ,false);
+mi_settings_ReplayName     : D_menu_MButtonN(i,str_menu_ReplayName      ,rpls_str_prefix                            );
+mi_settings_ReplayQuality  : D_menu_MButtonD(i,str_menu_ReplayQuality   ,str_menu_NetQuality[rpls_Quality]    ,true );
+
+mi_settings_Client         : D_menu_EText   (i,ta_MM,str_menu_Client,false,0,c_white);
+mi_settings_ClientQuality  : D_menu_MButtonD(i,str_menu_clientQuality   ,str_menu_NetQuality[net_Quality]     ,true );
+
+mi_settings_Resolution     : D_menu_MButtonD(i,str_menu_Resolution ,i2s(menu_vid_vw)+'x'+i2s(menu_vid_vh),true );
+mi_settings_ResApply       : D_menu_MButton (i,str_menu_Apply           );
+mi_settings_Fullscreen     : D_menu_MButtonD(i,str_menu_fullscreen      ,str_bool[not vid_fullscreen]         ,false);
+mi_settings_SDLRenderer    : begin
+                             D_menu_MButtonD(i,str_menu_SDLRenderer     ,vid_SDLRendererName                  ,true );
+                             if(vid_SDLRendererName<>vid_SDLRendererNameConfig)then
+                             D_menu_EText   (i,ta_MM,str_menu_RestartReq,false,0,c_gray);
+                             end;
+mi_settings_ShowFPS        : D_menu_MButtonD(i,str_menu_FPS             ,str_bool[ui_ShowFPS]                    ,false);
+
+mi_settings_SoundVol       : D_menu_MButtonB(i,str_menu_SoundVolume     ,0,round(snd_svolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
+mi_settings_MusicVol       : D_menu_MButtonB(i,str_menu_MusicVolume     ,0,round(snd_mvolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
+mi_settings_NextTrack      : D_menu_MButton (i,str_menu_NextTrack       );
+mi_settings_PlayListSize   : D_menu_MButtonB(i,str_menu_PlayListSize    ,0,snd_PlayListSize,snd_PlayListSizeMax,false);
+mi_settings_MusicReload    : D_menu_MButton (i,str_menu_MusicReload     );
+         end;
+
+   // x1.5 DOOM FONT ELEMENTS
+   draw_set_font(font_Doom,basefont_H3);
+   for i:=0 to 255 do
+     with menu_items[i] do
+       if(mi_x1>0)then
+         case i of
+mi_title_players           : D_menu_MButtonT(i,str_menu_players         );
+mi_title_map               : D_menu_MButtonT(i,str_menu_map             );
+mi_title_GameOptions       : D_menu_MButtonT(i,str_menu_GameOptions     );
+mi_title_multiplayer       : D_menu_MButtonT(i,str_menu_multiplayer     );
+mi_title_ReplayInfo1,
+mi_title_ReplayInfo2       : D_menu_MButtonT(i,str_menu_ReplayInfo      );
+mi_title_SaveInfo          : D_menu_MButtonT(i,str_menu_SaveInfo        );
+
 mi_settings_game           : D_menu_MButtonS(i,str_menu_settingsGame    ,menu_settings_page=i);
 mi_settings_replay         : D_menu_MButtonS(i,str_menu_settingsReplay  ,menu_settings_page=i);
 mi_settings_network        : D_menu_MButtonS(i,str_menu_settingsNetwork ,menu_settings_page=i);
@@ -420,57 +482,6 @@ mi_exit                    : D_menu_MButton (i,str_menu_Exit             );
 mi_StartScirmish,
 mi_StartCampaing           : D_menu_MButton (i,str_menu_Start            );
 
-mi_settings_ColoredShadows : D_menu_MButtonD(i,str_menu_ColoredShadow   ,str_bool[vid_ColoredShadow]           ,false);
-mi_settings_ShowAPM        : D_menu_MButtonD(i,str_menu_APM             ,str_bool[vid_APM]                     ,false);
-mi_settings_HitBars        : D_menu_MButtonD(i,str_menu_unitHBar        ,str_menu_unitHBarl[vid_UnitHealthBars],true );
-mi_settings_MRBAction      : D_menu_MButtonD(i,str_menu_maction         ,str_menu_mactionl[m_action]           ,true );
-mi_settings_ScrollSpeed    : D_menu_MButtonB(i,str_menu_ScrollSpeed     ,vid_CamSpeedBase,max_CamSpeed             ,false);
-mi_settings_MouseScroll    : D_menu_MButtonD(i,str_menu_MouseScroll     ,str_bool[vid_CamMSEScroll]            ,false);
-mi_settings_PlayerName     : D_menu_MButtonN(i,str_menu_PlayerName      ,PlayerName                                  );
-mi_settings_Langugage      : D_menu_MButtonD(i,str_menu_language        ,str_menu_lang[ui_language]            ,true );
-mi_settings_PanelPosition  : D_menu_MButtonD(i,str_menu_PanelPos        ,str_menu_PanelPosl[vid_PannelPos]     ,true );
-mi_settings_MMapPosition   : D_menu_MButtonD(i,str_menu_MiniMapPos      ,str_menu_MiniMapPosl[vid_PannelPos in VPPSet_Vertical][vid_MiniMapPos],true );
-mi_settings_PlayerColors   : D_menu_MButtonD(i,str_menu_PlayersColor    ,str_menu_PlayersColorl[vid_PlayersColorSchema]  ,true );
-
-{
-if(rpls_rstate>rpls_state_none)and(g_cl_units>0)
-then D_menu_ETextD(mi_game_RecordQuality ,str_replay_Quality ,i2s(min2i(cl_UpT_array[rpls_Quality]*4,g_cl_units))+'/'+i2s(g_cl_units)+' '+str_pnua[rpls_Quality]
-                                                                                           ,true ,0,0)
-else D_menu_ETextD(mi_game_RecordQuality ,str_replay_Quality ,str_pnua[rpls_Quality]           ,true ,0,0);
-}
-
-//
-mi_settings_Replaying      : D_menu_MButtonD(i,str_menu_Recording       ,str_bool[rpls_Recording]             ,false);
-mi_settings_ReplayName     : D_menu_MButtonN(i,str_menu_ReplayName      ,rpls_str_prefix                            );
-mi_settings_ReplayQuality  : D_menu_MButtonD(i,str_menu_ReplayQuality   ,str_menu_NetQuality[rpls_Quality]    ,true );
-
-mi_settings_Client         : D_menu_EText   (i,ta_MM,str_menu_Client,false,0,c_white);
-mi_settings_ClientQuality  : D_menu_MButtonD(i,str_menu_clientQuality   ,str_menu_NetQuality[net_Quality]     ,true );
-
-mi_settings_Resolution     : D_menu_MButtonD(i,str_menu_ResolutionWidth ,i2s(menu_vid_vw)+'x'+i2s(menu_vid_vh),true );
-mi_settings_ResApply       : D_menu_MButton (i,str_menu_Apply           );
-mi_settings_Fullscreen     : D_menu_MButtonD(i,str_menu_fullscreen      ,str_bool[not vid_fullscreen]         ,false);
-mi_settings_SDLRenderer    : begin
-                             D_menu_MButtonD(i,str_menu_SDLRenderer     ,vid_SDLRendererName                  ,true );
-                             if(vid_SDLRendererName<>vid_SDLRendererNameConfig)then
-                             D_menu_EText   (i,ta_MM,str_menu_RestartReq,false,0,c_gray);
-                             end;
-mi_settings_ShowFPS        : D_menu_MButtonD(i,str_menu_FPS             ,str_bool[vid_fps]                    ,false);
-
-mi_settings_SoundVol       : D_menu_MButtonB(i,str_menu_SoundVolume     ,round(snd_svolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
-mi_settings_MusicVol       : D_menu_MButtonB(i,str_menu_MusicVolume     ,round(snd_mvolume1*snd_MaxSoundVolume),snd_MaxSoundVolume,true);
-mi_settings_NextTrack      : D_menu_MButton (i,str_menu_NextTrack       );
-mi_settings_PlayListSize   : D_menu_MButtonB(i,str_menu_PlayListSize    ,snd_PlayListSize,snd_PlayListSizeMax,false);
-mi_settings_MusicReload    : D_menu_MButton (i,str_menu_MusicReload     );
-
-mi_title_players           : D_menu_MButtonT(i,str_menu_players         );
-mi_title_map               : D_menu_MButtonT(i,str_menu_map             );
-mi_title_GameOptions       : D_menu_MButtonT(i,str_menu_GameOptions     );
-mi_title_multiplayer       : D_menu_MButtonT(i,str_menu_multiplayer     );
-mi_title_ReplayInfo1,
-mi_title_ReplayInfo2       : D_menu_MButtonT(i,str_menu_ReplayInfo      );
-mi_title_SaveInfo          : D_menu_MButtonT(i,str_menu_SaveInfo        );
-
 mi_mplay_NetSearchCaption  : D_menu_MButtonT(i,str_menu_LANSearching    );
 mi_mplay_NetSearchCon      : D_menu_MButton (i,str_menu_clientConnect   );
 mi_mplay_NetSearchStop     : D_menu_MButton (i,str_menu_LANSearchStop   );
@@ -483,8 +494,8 @@ mi_saveload_load           : D_menu_MButton (i,str_menu_load            );
 mi_saveload_delete         : D_menu_MButton (i,str_menu_DeleteFile      );
          end;
 
-   // x1 FONT ELEMENTS
-   draw_set_font(font_Base,basefont_w1);
+   // x1 BASE FONT ELEMENTS
+   draw_set_font(font_Base,basefont_H1);
    for i:=0 to 255 do
      with menu_items[i] do
        if(mi_x1>0)then
@@ -525,7 +536,7 @@ mi_player_color5,
 mi_player_color6,
 mi_player_color7           : D_menu_PlayerColor(i,i-mi_player_color0);
 
-mi_map_Map                 : D_menu_MButtonD(i,str_map_Map       ,map_presets[map_preset_cur].mapp_name,true );
+mi_map_Map                 : D_menu_MButtonD(i,str_map_Map       ,map_preset_l[map_preset_cur].mapp_name,true );
 mi_map_Scenario            : D_menu_MButtonD(i,str_map_scenario  ,str_map_scenariol[map_scenario]      ,true );
 mi_map_Generators          : D_menu_MButtonD(i,str_map_Generators,str_map_Generatorsl[map_generators]  ,true );
 mi_map_Seed                : D_menu_MButtonU(i,str_map_seed      ,c2s(map_seed)                              );
@@ -605,7 +616,7 @@ begin
    draw_frect(menu_list_x-menu_list_w,menu_list_y,menu_list_x,y);
    draw_set_color(c_white);
    draw_rect(menu_list_x-menu_list_w,menu_list_y,menu_list_x,y);
-   draw_set_font(font_base,menu_list_fontS);
+   draw_set_font(menu_list_font,menu_list_fontS);
    for i:=0 to menu_list_n-1 do
    with menu_list_items[i] do
    begin
@@ -676,10 +687,15 @@ begin
    //draw_mwtexture1(0,200,theme_tile_crater ,1,1);  draw_mwtexture1(100,200,theme_tileset_crater^[0]   ,1,1);
    //draw_mwtexture1(0,300,theme_tile_liquid ,1,1);  draw_mwtexture1(100,300,theme_tileset_liquid[0]^[0],1,1);
 
-   draw_mwtexture1(0,0            ,spr_b_up[r_hell,0],1,1);
-   draw_mwtexture1(0,ui_buttonw1  ,spr_b_up[r_hell,1],1,1);
-   draw_mwtexture1(0,ui_buttonw1*2,spr_b_up[r_uac ,2],1,1);
-   draw_mwtexture1(0,ui_buttonw1*3,spr_b_up[r_uac ,3],1,1);
+   {with spr_HSymbol1^ do
+     if(sm_listn>0)then
+       for i:=0 to sm_listi do draw_mwtexture1(0,i*100,sm_list[i],1,1);    }
+
+   {
+   draw_mwtexture1(0,ui_pButtonW1  ,g_uids[UID_Cyberdemon].uid_ui_button,1,1);
+   draw_mwtexture1(0,ui_pButtonW1*2,g_uids[UID_Mastermind].uid_ui_button,1,1);
+   draw_mwtexture1(0,ui_pButtonW1*3,g_uids[UID_ENgineer].uid_ui_button,1,1);
+   draw_mwtexture1(0,ui_pButtonW1*4,g_uids[UID_Flyer].uid_ui_button,1,1);}
 
 
 
@@ -689,7 +705,7 @@ begin
    draw_text(300,300,'12345'+tc_nl1+'67890',ta_LU,6,c_black);
    draw_text(500,300,'12345'+tc_nl2+'67890',ta_LU,6,c_black);}
 
-   if(vid_FPS)then
+   if(ui_ShowFPS)then
    begin
       draw_set_font(font_Base,basefont_w1);
       draw_set_color(c_white);  //

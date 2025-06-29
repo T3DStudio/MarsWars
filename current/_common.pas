@@ -57,7 +57,7 @@ end;
 
 procedure fr_init;
 begin
-   fr_LastTocks :=0;
+   fr_LastTicks :=0;
    fr_BaseTicks :=0;
    fr_FrameCount:=0;
    fr_FPSSecond :=0;
@@ -74,7 +74,7 @@ begin
 
    fr_CurrentTicks:=SDL_GetTicks;
 
-   fr_FPSSecondD  :=fr_CurrentTicks-fr_LastTocks;
+   fr_FPSSecondD  :=fr_CurrentTicks-fr_LastTicks;
    fr_FPSSecond   +=fr_FPSSecondD;
    fr_FPSSecondN  +=1;
    if(fr_FPSSecond>=1000)then
@@ -84,7 +84,7 @@ begin
       fr_FPSSecond :=fr_FPSSecond mod 1000;
    end;
 
-   fr_LastTocks   :=fr_CurrentTicks;
+   fr_LastTicks   :=fr_CurrentTicks;
 
    {$IFDEF _FULLGAME}
    if(sys_uncappedFPS)and(not menu_state)
@@ -271,7 +271,7 @@ begin
      end;
 
        {{if(map_preset_cur>0)then
-         with map_presets[map_preset_cur] do
+         with map_preset_l[map_preset_cur] do
            PlayerSlotGetTeam:=mapp_player_team[playeri]
        else}
          case mapScenario of
@@ -448,17 +448,17 @@ lmt_allies_attacked  : if(PlayerLogCheckNearEvent(PlayerTarget,[lmt_unit_attacke
       {$IFDEF _FULLGAME}
       if(net_status=ns_client)
       then PlayerReciever:=PlayerClient
-      else PlayerReciever:=UIPlayer;
+      else PlayerReciever:=ui_player;
       if(PlayerTarget=PlayerReciever)then
       begin
-         log_LastMesTimer:=min2i(log_LastMesTimer+log_LastMesTime,log_LastMesMaxN);
+         ui_LogLastMesTimer:=min2i(ui_LogLastMesTimer+log_LastMesTime,log_LastMesMaxN);
          menu_redraw:=true;
 
-         if(LogMes2UIAlarm)then SoundLogUIPlayer(UIPlayer);
+         if(LogMes2UIAlarm)then SoundLogUIPlayer(ui_player);
 
          if(amtype=lmt_player_defeated )
          or(amtype=lmt_player_surrender)then
-           if(g_deadobservers)and(aargx=UIPlayer)then ui_tab:=tt_controls;
+           if(g_deadobservers)and(aargx=ui_player)then ui_tab:=tt_controls;
       end;
       {$ENDIF}
    end;
@@ -491,39 +491,39 @@ begin
 end;
 procedure GameLogEndGame(wteam:byte);
 begin
-   if(not ServerSide)then exit;
+   if(not g_ServerSide)then exit;
    PlayersAddToLog(0,log_to_all,lmt_game_end,0,wteam,'',0,0,false);
 end;
 procedure GameLogPlayerDefeated(player:byte);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
+   if(player>LastPlayer)or(not g_ServerSide)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0,false);
 end;
 procedure GameLogPlayerLeave(player:byte);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
+   if(player>LastPlayer)or(not g_ServerSide)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_msg_PlayerLeave,0,0,false);
 end;
 procedure GameLogPlayerSurrender(player:byte);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
+   if(player>LastPlayer)or(not g_ServerSide)then exit;
    PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,player,'',0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
-   if(pu=nil)or(not ServerSide)then exit;
+   if(pu=nil)or(not g_ServerSide)then exit;
 
    with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y,false);
 end;
 procedure GameLogUnitPromoted(pu:PTunit);
 begin
-   if(pu=nil)or(not ServerSide)then exit;
+   if(pu=nil)or(not g_ServerSide)then exit;
 
    with pu^ do PlayersAddToLog(playeri,0,lmt_unit_promoted,0,uidi,'',x,y,false);
 end;
 procedure GameLogUpgradeComplete(player,upid:byte;x,y:integer);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
+   if(player>LastPlayer)or(not g_ServerSide)then exit;
 
    PlayersAddToLog(player,0,lmt_upgrade_complete,0,upid,'',x,y,false);
 end;
@@ -578,13 +578,13 @@ begin
 end;
 procedure GameLogMapMark(playeri:byte;x,y:integer);
 begin
-   if(playeri>LastPlayer)or(not ServerSide)then exit;
+   if(playeri>LastPlayer)or(not g_ServerSide)then exit;
 
    PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_map_mark,0,playeri,'',x,y,false);
 end;
 procedure GameLogUnitAttacked(pu:PTunit);
 begin
-   if(pu=nil)or(not ServerSide)then exit;
+   if(pu=nil)or(not g_ServerSide)then exit;
 
    with pu^ do
    begin
@@ -938,7 +938,7 @@ end;
 function CheckRoyalBattleRadiusPoint(x,y,d:integer):boolean;
 begin
    if(map_scenario=ms_royale)
-   then CheckRoyalBattleRadiusPoint:=(point_dist_int(x,y,map_phsize,map_phsize)+d)>=g_royal_r
+   then CheckRoyalBattleRadiusPoint:=(point_dist_int(x,y,map_phsize,map_phsize)+d)>=g_RoyalBattle_r
    else CheckRoyalBattleRadiusPoint:=false;
 end;
 
@@ -1189,9 +1189,9 @@ begin
       end;
 end; }
 
-function GameStatus_End:boolean;
+function GameStatus_IsEnded:boolean;
 begin
-   GameStatus_End:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
+   GameStatus_IsEnded:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
 end;
 
 procedure GameSetStatusWinnerTeam(team:byte);
@@ -1235,7 +1235,7 @@ var i,
 begin
    if(map_preset_n>1)then
     for i:=1 to map_preset_n-1 do
-     with map_presets[i] do
+     with map_preset_l[i] do
      begin
         pn:=0;
         //for p:=0 to LastPlayer do
@@ -1302,11 +1302,11 @@ begin
 end;
 
 
-function enum_val2TVidPannelPos(val:integer):TVidPannelPos;
+function enum_val2TUIControlBarPos(val:integer):TUIControlBarPos;
 begin
-   for result in TVidPannelPos do
+   for result in TUIControlBarPos do
      if(ord(result)=val)then exit;
-   result:=low(TVidPannelPos);
+   result:=low(TUIControlBarPos);
 end;
 function enum_val2TUIUnitHBarsOption(val:integer):TUIUnitHBarsOption;
 begin
@@ -1321,17 +1321,17 @@ begin
    result:=low(TPlayersColorSchema);
 end;
 
-function tab3PageType:TTab3PageType;
+function tabControlContent:TTabControlContent;
 begin
-   tab3PageType:=t3pt_none;
+   tabControlContent:=tcp_none;
    if(rpls_rstate>=rpls_state_read)
-   then tab3PageType:=t3pt_replay
+   then tabControlContent:=tcp_replay
    else
-     if(g_players[PlayerClient].isobserver)//or GameStatus_End
-     then tab3PageType:=t3pt_observer
+     if(g_players[PlayerClient].isobserver)or(GameStatus_IsEnded)
+     then tabControlContent:=tcp_observer
      else
        if(not g_players[PlayerClient].isdefeated)
-       then tab3PageType:=t3pt_controls;
+       then tabControlContent:=tcp_controls;
 end;
 
 function RoundN(x,n:integer):integer;
@@ -1427,7 +1427,7 @@ begin
 
    BlockRead(f,dbyte,SizeOf(map_preset_cur   ));
    if(dbyte>=map_preset_n         )then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
-                                   else       str_info1^+=' '+str_SpaceSize(str_map_Map       +dots,map_charsn)+map_presets[dbyte].mapp_name+tc_nl2;
+                                   else       str_info1^+=' '+str_SpaceSize(str_map_Map       +dots,map_charsn)+map_preset_l[dbyte].mapp_name+tc_nl2;
 
    BlockRead(f,dbyte,SizeOf(map_scenario     ));
    if not(dbyte in allmapscenarios)then begin str_info1^:=str_error_WrongVersion;close(f);exit; end
@@ -1583,13 +1583,13 @@ begin
 
    if(not ui_fog)then exit;
 
-   if(UIPlayer>LastPlayer)then
+   if(ui_player>LastPlayer)then
    begin
       if(rpls_rstate=rpls_state_read)
       or(g_players[PlayerClient].isobserver)then exit;
    end
    else
-      if(tu^.TeamVision[g_players[UIPlayer].team]>0)then exit;
+      if(tu^.TeamVision[g_players[ui_player].team]>0)then exit;
 
    ui_CheckUnitUIPlayerVision:=false;
 end;
@@ -1602,10 +1602,10 @@ begin
    if(rpls_rstate>=rpls_state_read)
    or(g_players[PlayerClient].isobserver)then
    begin
-      if(UIPlayer>LastPlayer)
+      if(ui_player>LastPlayer)
       then ui_CheckUnitFullFogVision:=true
       else
-        if(tu^.player^.team=g_players[UIPlayer].team)then ui_CheckUnitFullFogVision:=true;
+        if(tu^.player^.team=g_players[ui_player].team)then ui_CheckUnitFullFogVision:=true;
    end
    else ui_CheckUnitFullFogVision:=(tu^.player^.team=g_players[PlayerClient].team);
 end;
@@ -1624,9 +1624,9 @@ end;
 
 function ui_UIPlayerTeam(team:byte):boolean;
 begin
-   if(UIPlayer>LastPlayer)
+   if(ui_player>LastPlayer)
    then ui_UIPlayerTeam:=true
-   else ui_UIPlayerTeam:=team=g_players[UIPlayer].team;
+   else ui_UIPlayerTeam:=team=g_players[ui_player].team;
 end;
 
 function PlayerGetColor(player:byte):TMWColor;
@@ -1641,26 +1641,26 @@ begin
    }
    PlayerGetColor:=c_white;
    if(player<=LastPlayer)then
-     case vid_PlayersColorSchema of
+     case ui_PlayersColorSchema of
 pcs_default: PlayerGetColor:=PlayerColorSchemeFFA[player];
 pcs_LYR,
 pcs_WYR,
-pcs_WAR    : if(player=UIPlayer)then
-               case vid_PlayersColorSchema of
+pcs_WAR    : if(player=ui_player)then
+               case ui_PlayersColorSchema of
                pcs_LYR: PlayerGetColor:=c_lime;
                pcs_WYR,
                pcs_WAR: PlayerGetColor:=c_white;
                end
              else
-               if(PlayerSlotGetTeam(UIPlayer,255)=PlayerSlotGetTeam(player,255))then
-                 case vid_PlayersColorSchema of
+               if(PlayerSlotGetTeam(ui_player,255)=PlayerSlotGetTeam(player,255))then
+                 case ui_PlayersColorSchema of
                  pcs_LYR,
                  pcs_WYR: PlayerGetColor:=c_yellow;
                  pcs_WAR: PlayerGetColor:=c_aqua;
                  end
                else PlayerGetColor:=c_red;
 pcs_teams  : PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(player,255)];
-pcs_wTeams : if(player=UIPlayer)
+pcs_wTeams : if(player=ui_player)
              then PlayerGetColor:=c_white
              else PlayerGetColor:=PlayerColorSchemeTEAM[PlayerSlotGetTeam(player,255)];
      else
@@ -1694,10 +1694,10 @@ end;
 function GetCPColor(cp:byte):TMWColor;
 begin
    GetCPColor:=c_gray;
-   if(cp<=LastCPoint)then
-     with g_cpoints[cp] do
+   if(cp<=LastKeyPoint)then
+     with g_KeyPoints[cp] do
        if(cpCaptureR>0)then
-         if(cpTimer>0)and(vid_blink3=0)
+         if(cpTimer>0)and(ui_blink3=0)
          then GetCPColor:=PlayerColorNormal[cpTimerPlayer]
          else GetCPColor:=PlayerColorNormal[cpOwnerPlayer];
 end;
@@ -1785,11 +1785,11 @@ var x0,y0,x1,y1:integer;
 begin
    x0:=0;x1:=0;
    y0:=0;y1:=0;
-   case vid_PannelPos of
-vpp_left  : x0:=-round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
-vpp_right : x1:=+round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
-vpp_top   : y0:=-round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
-vpp_bottom: y1:=+round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
+   case ui_CBarPos of
+uicbp_left  : x0:=-round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
+uicbp_right : x1:=+round(max2i(ui_ControlBar_w,ui_MiniMap_w)/vid_cam_sc);
+uicbp_top   : y0:=-round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
+uicbp_bottom: y1:=+round(max2i(ui_ControlBar_h,ui_MiniMap_w)/vid_cam_sc);
    end;
 
    if(vid_cam_w>=map_psize)
@@ -1821,8 +1821,8 @@ end;
 procedure GameCameraMoveToLastEvent;
 var log_pi:cardinal;
 begin
-   if(UIPlayer<=LastPlayer)then
-   with g_players[UIPlayer] do
+   if(ui_player<=LastPlayer)then
+   with g_players[ui_player] do
    begin
       log_pi:=log_i;
       while true do
@@ -1893,8 +1893,8 @@ lmt_cant_build       : begin
 lmt_player_chat,
 lmt_game_message     ,
 lmt_player_leave     : LogMessage2StrColor:=str;//if(argx<=MaxPlayers)then LogMessage2StrColor:=g_players[argx].name+str_msg_PlayerLeave;
-lmt_game_end         : if(argx<=LastPlayer)and(UIPlayer<=LastPlayer)then
-                        if(argx=g_players[UIPlayer].team)
+lmt_game_end         : if(argx<=LastPlayer)and(ui_player<=LastPlayer)then
+                        if(argx=g_players[ui_player].team)
                         then LogMessage2StrColor:=str_win
                         else LogMessage2StrColor:=str_lose;
 lmt_player_surrender : if(argx<=LastPlayer)then LogMessage2StrColor:=g_players[argx].name+str_msg_PlayerSurrender;

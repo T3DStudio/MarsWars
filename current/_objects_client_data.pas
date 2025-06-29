@@ -782,7 +782,7 @@ end;
                            setEffectEID2(1,sm_uid2MWTexture(UID_UBarracks       ,0,1));
 
    // ui panel
-   for r:=1 to r_cnt do
+   for r:=1 to race_num do
    begin
       i:=0;
       for u:=0 to 255 do
@@ -791,7 +791,7 @@ end;
       begin
          ui_panel_uids[r,2,_up_btni]:=u;
          i+=1;
-         if(i>ui_ubtns)then break;
+         if(i>ui_pButtonsCount)then break;
       end;
    end;
 

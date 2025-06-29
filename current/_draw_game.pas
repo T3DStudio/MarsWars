@@ -9,20 +9,20 @@ function SpriteListNew:boolean;
 begin
    SpriteListNew:=false;
 
-   if(vid_Sprites_n>=vid_MaxScreenSprites)
+   if(ui_Sprites_n>=ui_MaxScreenSprites)
    or(menu_state)then exit;
 
    SpriteListNew:=true;
 
-   FillChar(vid_Sprites_l[vid_Sprites_n]^,SizeOf(TVSprite),0);
-   vid_Sprites_l[vid_Sprites_n]^.alpha:=255;
-   vid_Sprites_n+=1;
+   FillChar(ui_Sprites_l[ui_Sprites_n]^,SizeOf(TVSprite),0);
+   ui_Sprites_l[ui_Sprites_n]^.alpha:=255;
+   ui_Sprites_n+=1;
 end;
 
 procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
    if(SpriteListNew)then
-     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     with ui_Sprites_l[ui_Sprites_n-1]^ do
      begin
         x           := ax-vid_cam_x;
         y           := ay-vid_cam_y;
@@ -37,7 +37,7 @@ end;
 procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axflip:boolean);
 begin
    if(SpriteListNew)then
-     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     with ui_Sprites_l[ui_Sprites_n-1]^ do
      begin
         x           := ax-vid_cam_x;
         y           := ay-vid_cam_y;
@@ -52,7 +52,7 @@ end;
 procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
 begin
    if(SpriteListNew)then
-     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     with ui_Sprites_l[ui_Sprites_n-1]^ do
      begin
         x      := ax-vid_cam_x;
         y      := ay-vid_cam_y-aspr^.hh;
@@ -65,7 +65,7 @@ end;
 procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
    if(SpriteListNew)then
-     with vid_Sprites_l[vid_Sprites_n-1]^ do
+     with ui_Sprites_l[ui_Sprites_n-1]^ do
      begin
         x         := ax-vid_cam_x;
         y         := ay-vid_cam_y;
@@ -81,14 +81,14 @@ procedure SpriteListSort;
 var i,j:word;
     dum:PTVSprite;
 begin
-   if(vid_Sprites_n>1)then
-    for i:=0 to vid_Sprites_n-2 do
-     for j:=0 to (vid_Sprites_n-i-2) do
-      if(vid_Sprites_l[j]^.depth<vid_Sprites_l[j+1]^.depth)then
+   if(ui_Sprites_n>1)then
+    for i:=0 to ui_Sprites_n-2 do
+     for j:=0 to (ui_Sprites_n-i-2) do
+      if(ui_Sprites_l[j]^.depth<ui_Sprites_l[j+1]^.depth)then
       begin
-         dum:=vid_Sprites_l[j];
-         vid_Sprites_l[j  ]:=vid_Sprites_l[j+1];
-         vid_Sprites_l[j+1]:=dum;
+         dum:=ui_Sprites_l[j];
+         ui_Sprites_l[j  ]:=ui_Sprites_l[j+1];
+         ui_Sprites_l[j+1]:=dum;
       end;
 end;
 
@@ -96,10 +96,10 @@ procedure d_SpriteList;
 var sx,sy:integer;
 begin
    SpriteListSort;
-   while(vid_Sprites_n>0)do
+   while(ui_Sprites_n>0)do
    begin
-      vid_Sprites_n-=1;
-      with vid_Sprites_l[vid_Sprites_n]^ do
+      ui_Sprites_n-=1;
+      with ui_Sprites_l[ui_Sprites_n]^ do
       begin
          x+=-sprite^.hw;
          y+=-sprite^.hh;
@@ -164,19 +164,19 @@ function UIInfoItemNew:boolean;
 begin
    UIInfoItemNew:=false;
 
-   if(vid_UIItem_n>=vid_MaxScreenSprites)
+   if(ui_UIItem_n>=ui_MaxScreenSprites)
    or(menu_state)then exit;
 
    UIInfoItemNew:=true;
 
-   FillChar(vid_UIItem_l[vid_UIItem_n],SizeOf(TUIItem),0);
-   vid_UIItem_n+=1;
+   FillChar(ui_UIItem_l[ui_UIItem_n],SizeOf(TUIItem),0);
+   ui_UIItem_n+=1;
 end;
 
 procedure UIInfoItemAddLine(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind :=uinfo_line;
         x0   :=ax0;
@@ -189,7 +189,7 @@ end;
 procedure UIInfoItemAddRect(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind :=uinfo_rect;
         x0   :=ax0;
@@ -202,7 +202,7 @@ end;
 procedure UIInfoItemAddRectText(ax0,ay0,ax1,ay1:integer;acolor:TMWColor;slt,slt2,srt,srd,sld:string6);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind    :=uinfo_rect;
         x0      :=ax0;
@@ -220,7 +220,7 @@ end;
 procedure UIInfoItemAddBox(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind :=uinfo_box;
         x0   :=ax0;
@@ -233,7 +233,7 @@ end;
 procedure UIInfoItemAddCircle(ax0,ay0,ar:integer;acolor:TMWColor);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind :=uinfo_circle;
         x0   :=ax0;
@@ -245,7 +245,7 @@ end;
 procedure UIInfoItemAddText(ax0,ay0:integer;text:string6;acolor:TMWColor);
 begin
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind   :=uinfo_text;
         x0     :=ax0;
@@ -260,7 +260,7 @@ begin
    or(aspr=ptex_dummy)then exit;
 
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind    :=uinfo_rect;
         x0      :=ax0-aspr^.hw;
@@ -304,7 +304,7 @@ begin
    or(aspr=ptex_dummy)then exit;
 
    if(UIInfoItemNew)then
-     with vid_UIItem_l[vid_UIItem_n-1] do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
         kind   :=uinfo_sprite;
         x0     :=ax0-aspr^.hw;
@@ -409,9 +409,9 @@ begin
    begin
       acolor:=PlayerColorNormal[playeri];
 
-      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(vid_blink1_colorb);
+      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
 
-      srect :=((isselected)and(playeri=UIPlayer))
+      srect :=((isselected)and(playeri=ui_player))
             or(InputAction(iAct_alt))
             or(choosen);
 
@@ -419,7 +419,7 @@ begin
       if(srect)
       then hbar:=true
       else
-        case vid_UnitHealthBars of
+        case ui_UnitHealthBars of
 uhb_damaged : if(hits<_mhits)then hbar:=true;
 uhb_always  : hbar:=true;
 uhb_selected: ;
@@ -427,25 +427,25 @@ uhb_selected: ;
 
       if(srect)then
       begin
-         if(playeri=UIPlayer)
+         if(playeri=ui_player)
          then UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
          else UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
         // UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
       end;
       if(hbar)then UIInfoItemProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
 
-    //  if(reload>0)and(playeri=UIPlayer)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
+    //  if(reload>0)and(playeri=ui_player)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
 
      { if(speed<=0)or(not iscomplete)then
         case m_brush of
-   1..255: UIInfoItemAddCircle(x,y,_r,vid_blink2_color_BY);
+   1..255: UIInfoItemAddCircle(x,y,_r,ui_blink2_color_BY);
         end;   }
 
 
-     // if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UIInfoItemAddCircle(x,y,srange,vid_blink2_color_BG);
+      if(srect)and(_ukbuilding)and(UIUnitDrawRangeConditionals(pu))then UIInfoItemAddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
-      case vid_blink3 of
+      case ui_blink3 of
       0: if(buff[ub_Scaned]>0)then UIInfoItemAddBuff(vx,vy,@spr_scan );
       1: if(buff[ub_Decay ]>0)then UIInfoItemAddBuff(vx,vy,@spr_decay);
       2:;
@@ -477,15 +477,15 @@ var t:integer;
 begin
    case map_scenario of
 ms_royale: begin
-           draw_set_color(ui_color_max[vid_blink2_colorb]);
-           draw_circle(map_phsize-vid_cam_x,map_phsize-vid_cam_y,g_royal_r);
+           draw_set_color(ui_color_max[ui_blink2_colorb]);
+           draw_circle(map_phsize-vid_cam_x,map_phsize-vid_cam_y,g_RoyalBattle_r);
            end;
    end;
 
-   while(vid_UIItem_n>0)do
-     with vid_UIItem_l[vid_UIItem_n-1] do
+   while(ui_UIItem_n>0)do
+     with ui_UIItem_l[ui_UIItem_n-1] do
      begin
-        vid_UIItem_n-=1;
+        ui_UIItem_n-=1;
 
         x0-=vid_cam_x;
         y0-=vid_cam_y;
@@ -510,10 +510,37 @@ ms_royale: begin
         begin
            draw_set_color(color);
            case kind of
-uinfo_line   : draw_line  (x0,y0,x1,y1);
-uinfo_rect   : draw_rect  (x0,y0,x1,y1);
+uinfo_line   : begin
+               draw_line  (x0,y0,x1,y1);
+               {if(vid_cam_sc<1)then
+               begin
+                  if(y0<>y1)then
+                  begin
+                     draw_line(x0+1,y0,x1+1,y1);
+                     draw_line(x0+2,y0,x1+2,y1);
+                     draw_line(x0+3,y0,x1+3,y1);
+                  end
+                  else
+                  begin
+                     draw_line(x0,y0+1,x1,y1+1);
+                     draw_line(x0,y0+2,x1,y1+2);
+                     draw_line(x0,y0+3,x1,y1+3);
+                  end;
+               end; }
+               end;
+uinfo_rect   : begin
+               draw_rect  (x0,y0,x1,y1);
+               {if(vid_cam_sc<1)then
+               begin
+                  draw_rect(x0+1,y0+1,x1-1,y1-1);
+                  draw_rect(x0+2,y0+2,x1-2,y1-2);
+               end; }
+               end;
 uinfo_box    : draw_frect (x0,y0,x1,y1);
-uinfo_circle : draw_circle(x0,y0,x1   );
+uinfo_circle : begin
+               draw_circle(x0,y0,x1   );
+               //if(vid_cam_sc<1)then draw_circle(x0,y0,x1-1);
+               end;
 uinfo_text   : begin
                draw_text_line(x0,y0-basefont_wh,text_lt,ta_MU,255,c_black);
                continue;
@@ -611,15 +638,15 @@ begin
             begin
                b:=GridGetSolidLevel(gx,gy)>mgsl_free;
                if(b)<>(GridGetSolidLevel(gx+1,gy)>mgsl_free)
-               then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);
+               then UIInfoItemAddLine(mx+MapCellw,my         ,mx+MapCellw,my+MapCellw,ui_blink2_color_BY);
                if(b)<>(GridGetSolidLevel(gx,gy+1)>mgsl_free)
-               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,vid_blink2_color_BY);
+               then UIInfoItemAddLine(mx         ,my+MapCellw,mx+MapCellw,my+MapCellw,ui_blink2_color_BY);
 
                if(b)then
                begin
-               UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,vid_blink2_color_BY);
-               UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,vid_blink2_color_BY);
-               UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,vid_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellhw,my          ,mx          ,my+MapCellhw,ui_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my          ,mx          ,my+MapCellw ,ui_blink2_color_BY);
+               UIInfoItemAddLine(mx+MapCellw ,my+MapCellhw,mx+MapCellhw,my+MapCellw ,ui_blink2_color_BY);
                end;
             end;
 
@@ -709,8 +736,8 @@ var t,i:integer;
    ddir:single;
   color:TMWColor;
 begin
-   for t:=1 to LastCPoint do
-    with g_cpoints[t] do
+   for t:=1 to LastKeyPoint do
+    with g_KeyPoints[t] do
      if(cpCaptureR>0)then
      begin
         if(not RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then continue;
