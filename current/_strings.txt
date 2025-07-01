@@ -902,7 +902,7 @@ Max hits: 750
 Limit used: 1
 Size: 11
 Base movement speed: 14
-Base vision range: 175
+Base vision range: 200
 Build time: 15
 Energy required: 200
 PainState base threshold: 4
@@ -937,7 +937,7 @@ Places in transport: 1
 Requirements: Zombie Barracks(x3)
 Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +75, targets: [alive], impact 52*1, target priority: [fly], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
+- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +75, targets: [alive], impact 52*1, splash damage radius: 20, target priority: [fly], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;

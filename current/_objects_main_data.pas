@@ -717,7 +717,7 @@ begin
    _renergy   := 200;
    _r         := 11;
    _speed     := 14;
-   _srange    := 175;
+   _srange    := 200;
    _ucl       := 18;
    _painc     := 4;
    _btime     := ptime1mh;
@@ -745,7 +745,7 @@ begin
    _ruid1n    := 3;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiFlyRange:=75;
-   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_Fly,0,dm_AntiFly2);
+   _weapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocketS,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_Fly,0,dm_AntiFly2);
 end;
 UID_ZSiegeMarine:
 begin

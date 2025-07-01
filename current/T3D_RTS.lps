@@ -8,8 +8,7 @@
       <Unit0>
         <Filename Value="T3D_RTS.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="3" Y="4"/>
+        <CursorPos X="18" Y="9"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -31,9 +30,9 @@
       </Unit2>
       <Unit3>
         <Filename Value="_var.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="35"/>
-        <CursorPos Y="52"/>
+        <CursorPos X="124" Y="30"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -291,8 +290,8 @@
       <Unit36>
         <Filename Value="_objects_main_data.pas"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="1254"/>
-        <CursorPos X="15" Y="1271"/>
+        <TopLine Value="712"/>
+        <CursorPos X="56" Y="724"/>
         <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit36>
@@ -336,7 +335,7 @@
         <Loaded Value="True"/>
       </Unit41>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="_var.pas"/>
         <Caret Line="52" TopLine="35"/>
@@ -438,25 +437,17 @@
         <Caret Line="676" TopLine="649"/>
       </Position25>
       <Position26>
-        <Filename Value="_draw_objs_units.pas"/>
-        <Caret Line="250" Column="90" TopLine="421"/>
+        <Filename Value="_game.pas"/>
+        <Caret Line="640" TopLine="623"/>
       </Position26>
       <Position27>
         <Filename Value="_game.pas"/>
-        <Caret Line="636" Column="120" TopLine="650"/>
+        <Caret Line="634" Column="85" TopLine="612"/>
       </Position27>
       <Position28>
         <Filename Value="_game.pas"/>
-        <Caret Line="640" TopLine="623"/>
-      </Position28>
-      <Position29>
-        <Filename Value="_game.pas"/>
-        <Caret Line="634" Column="85" TopLine="612"/>
-      </Position29>
-      <Position30>
-        <Filename Value="_game.pas"/>
         <Caret Line="574" Column="10" TopLine="551"/>
-      </Position30>
+      </Position28>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
