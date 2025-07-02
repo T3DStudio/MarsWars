@@ -688,7 +688,7 @@ begin
            n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
 
            case aw_tarprior of
-           wtp_notme_hits: if(tu<>pu)then n_prio+=1;
+           //wtp_heal      : if(tu<>pu)then n_prio+=1;
            wtp_limit     : n_prio+=tu^.uid^._limituse;
            end;
 
@@ -713,6 +713,11 @@ wtp_Rmhits            : if(tu^.uid^._mhits<a_tarp^^.uid^._mhits)
                         else
                           if(tu^.uid^._mhits=a_tarp^^.uid^._mhits)then
                             if(ud           >a_tard^             )then exit;
+wtp_heal              : if(tu^.hits     >a_tarp^^.hits       )
+                        then exit
+                        else
+                          if(tu^.hits   =a_tarp^^.hits       )then
+                            if(ud       >a_tard^             )then exit;
            else
               if(aw_max_range<0)and(aw_type=wpt_directdmg)
               then begin if(ud  >a_tard^             )then exit; end

@@ -8,7 +8,7 @@ program T3D_RTS;
   {$APPTYPE CONSOLE}
   {$DEFINE DEBUG0}
   //{$DEFINE UNITDATA}
-  //{$APPTYPE GUI}
+  {$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}

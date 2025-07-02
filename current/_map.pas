@@ -417,7 +417,7 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
-   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+40))then         //_dec_min_r(t,td)
+   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+35))then         //_dec_min_r(t,td)
    begin
       _dnear:=true;
       break;
@@ -493,7 +493,7 @@ begin
 end;
 
 procedure map_make;
-const dpostime = 400;
+const dpostime = 200;
 var i,ix,iy,lqs,rks,ddc,cnt,ir:integer;
 begin
    map_ddn:=0;
@@ -515,10 +515,10 @@ begin
    rks :=0;
    lqs :=0;
 
-   i  :=(ddc div 8);
+   i  :=(ddc div 11);
    ix :=i*map_obs;
-   rks:=ix div 2;
-   lqs:=rks;
+   lqs:=ix div 4;
+   rks:=ix-lqs;
 
    ir :=base_1r+(map_mw div 100);
    ix :=map_seed;

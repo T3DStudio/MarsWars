@@ -434,7 +434,7 @@ wtp_Light              = 13;
 wtp_UnitLight          = 14;
 wtp_BuildingHeavy      = 15;
 wtp_Scout              = 16;
-wtp_notme_hits         = 17;
+wtp_heal               = 17;
 wtp_Fly                = 18;
 wtp_nolost_hits        = 19;
 wtp_max_hits           = 20;
@@ -520,7 +520,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
 MaxDIDs                = 7;
 
-DID_R                  : array[0..MaxDIDs] of smallint = (0,375,295,215,155,105,60,17);
+DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,105,60,17);
 
 //pi*_r*_r
 

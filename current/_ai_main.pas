@@ -120,13 +120,7 @@ begin
     with player^ do
      if(ai_unitp_cur<a)and(ai_unitp_cur<ai_maxcount_unitps)then
       if(ai_tech1_cur<=0)or(ai_unitp_cur_na=0)or(ai_unitp_cur<4)then
-      case race of
-      r_hell: if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3))then ddir:=-1;
-      r_uac : case uid_e[aiucl_tech1[race]]>0 of
-              true : if(SetBTA(aiucl_barrack1[race],aiucl_barrack0[race],1,3))then ddir:=-1;
-              false: if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3,3))then ddir:=-1;
-              end;
-      end;
+       if(SetBTA(aiucl_barrack0[race],aiucl_barrack1[race],3,1))then ddir:=-1;
 end;
 procedure BuildSmith(a:integer);  // Smiths
 begin
@@ -663,13 +657,13 @@ UID_UGenerator2,
 UID_UGenerator3,
 UID_UGenerator4: if(cenergy>_genergy)and(armylimit>ai_GeneratorsDestoryLimit)and(menergy>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
       else
-        if(uid_e[uidi]>1)then
+        if(uid_eb[uidi]>1)then
          if(_isbarrack)or(_issmith)then
           if(ai_isnoprod(pu))then
           begin
              i:=level+1;
 
-             if(_isbarrack)and(ai_unitp_cur>2)and(uid_e[uidi]>1)then
+             if(_isbarrack)and(ai_unitp_cur>2)and(uid_eb[uidi]>1)then
               if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
                if((ai_unitp_cur-i-5)>=ai_unitp_need)then exit;
              if(_issmith  )and(ai_upgrp_cur>1)then
@@ -730,7 +724,8 @@ UID_UGenerator3   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then 
       else
          if(_isbarrack)or(_issmith)then
            if(level<1)or((level>=1)and(ai_ReadyForAttack))then
-             if(level<MaxUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
+             if((uid_e[uidi]-uid_eb[uidi])<uid_eb[uidi])then
+               if(level<MaxUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
       end;
    end;
    ai_buildings_need_rebuild:=false;

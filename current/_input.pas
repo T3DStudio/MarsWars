@@ -757,8 +757,8 @@ begin
                            end;
       SDL_QUITEV         : GameCycle:=false;
       SDL_VIDEORESIZE    : begin
-                           vid_vw:=_event^.resize.w;m_vrx:=vid_vw;
-                           vid_vh:=_event^.resize.h;m_vrx:=vid_vw;
+                           vid_vw:=max2(vid_minw,_event^.resize.w);m_vrx:=vid_vw;
+                           vid_vh:=max2(vid_minh,_event^.resize.h);m_vrx:=vid_vw;
 
                            _MakeScreen;
                            theme_map_ptrt:=255;

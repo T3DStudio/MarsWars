@@ -658,7 +658,7 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_notme_hits,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_ZEngineer:
@@ -674,7 +674,7 @@ begin
    _attack    := atm_always;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_notme_hits,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_ZSergant :
@@ -1029,11 +1029,11 @@ end;
 UID_UGTurret:
 begin
    _mhits     := 6000;
-   _renergy   := 200;
+   _renergy   := 250;
    _r         := 15;
    _srange    := 300;
    _ucl       := 6;
-   _btime     := ptime1hh;
+   _btime     := ptime1;
    _attack    := atm_always;
    _ukbuilding:= true;
    _ukmech    := true;
@@ -1050,11 +1050,11 @@ end;
 UID_UATurret:
 begin
    _mhits     := 6000;
-   _renergy   := 200;
+   _renergy   := 250;
    _r         := 15;
    _srange    := 300;
    _ucl       := 7;
-   _btime     := ptime1hh;
+   _btime     := ptime1;
    _attack    := atm_always;
    _ukbuilding:= true;
    _ukmech    := true;
@@ -1227,7 +1227,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseRepairBonus1,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_notme_hits,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseRepairBonus1,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_Medic:
@@ -1245,7 +1245,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_notme_hits,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_UACDron:

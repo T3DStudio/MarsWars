@@ -1277,8 +1277,8 @@ Max hits: 6000
 Limit used: 1
 Size: 15
 Base vision range: 300
-Build time: 25
-Energy required: 200
+Build time: 20
+Energy required: 250
 
 Constructed by: Command Center,Advanced Command Center
 Arming/Abilities: 
@@ -1301,8 +1301,8 @@ Max hits: 6000
 Limit used: 1
 Size: 15
 Base vision range: 300
-Build time: 25
-Energy required: 200
+Build time: 20
+Energy required: 250
 
 Constructed by: Command Center,Advanced Command Center
 Arming/Abilities: 
