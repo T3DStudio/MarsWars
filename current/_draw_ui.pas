@@ -374,6 +374,7 @@ ucl,
 uid,
 ux,uy     : integer;
 req       : cardinal;
+pUIPlayer : PTPlayer;
 procedure PlayersButtoms;
 var p:byte;
 begin
@@ -429,17 +430,18 @@ uicbp_bottom : begin
    if(net_status>ns_single)then
    ui_pButtonTxt(2,ui_panel_bhi,'','','','','',str_pause         ,0,0,0,0,0,GetPlayerColor(g_status,c_white),false);
 
-   if(ui_player<=LastPlayer)then
-   with g_players[ui_player] do
+   if(ui_player<=LastPlayer)
+   then pUIPlayer:=@g_players[ui_player]
+   else pUIPlayer:=nil;
+
+   if(pUIPlayer<>nil)then
+   with pUIPlayer^ do
    begin
       // tabs
-      for tab in TTabType do
-        case tab of
-tt_buildings: ui_tButtonStr(ord(tab),ui_bprod_NearTime   ,ui_bprod_all,ucl_cs[true ],ucl_c[true ],c_white,c_yellow,c_lime,c_orange);
-tt_units    : ui_tButtonStr(ord(tab),it2s(ui_uprod_first),uproda      ,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange);
-tt_upgrades : ui_tButtonStr(ord(tab),it2s(ui_pprod_first),upproda     ,0            ,0           ,c_white,c_yellow,0     ,0       );
-tt_controls : ui_tButtonStr(ord(tab),0                   ,0           ,0            ,0           ,0      ,0       ,0     ,0       );
-        end;
+      ui_tButtonStr(ord(tt_buildings),     ui_bprod_first_time ,ui_bprod_all    ,ucl_cs[true ],ucl_c[true ],c_white,c_yellow,c_lime,c_orange);
+      ui_tButtonStr(ord(tt_units    ),it2s(ui_uprod_first_time),ui_uprod_all_now,ucl_cs[false],ucl_c[false],c_white,c_yellow,c_lime,c_orange);
+      ui_tButtonStr(ord(tt_upgrades ),it2s(ui_pprod_first_time),ui_pprod_all_now,0            ,0           ,c_white,c_yellow,0     ,0       );
+      //ui_tButtonStr(ord(tt_controls ),0                        ,0               ,0            ,0           ,0      ,0       ,0     ,0       );
 
       // main buttons
       case ui_tab of
@@ -452,16 +454,15 @@ tt_buildings: for ucl:=0 to ui_pButtonsCount do  // buildings
                  begin
                     if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
 
-                    ux:=(ucl mod ui_panel_bw);
-                    uy:=(ucl div ui_panel_bw);
+                    ux:=ucl mod ui_panel_bw;
+                    uy:=ucl div ui_panel_bw;
 
-                    ui_pButtonIco(ux,uy,uid_ui_button,m_brush=uid,(uid_CheckRequirements(@g_players[ui_player],uid)>0) or not(uid in ui_bprod_possible));
+                    ui_pButtonIco(ux,uy,uid_ui_button,m_brush=uid,
+                    (uid_CheckRequirements(pUIPlayer,uid)>0) or not(uid in ui_bprod_possible));
                     ui_pButtonTxt(ux,uy,
-                    i2s(ui_bprod_ucl_time[_ucl]),i2s(ui_bprod_ucl_count[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),ir2s(build_cd),
-                    ui_color_cenergy[cenergy<0] ,c_dyellow                   ,c_lime              ,ui_color_max[ucl_e[true,ucl]>=a_units[uid]],c_aqua                   ,c_red);
+                    i2s(ui_bprod_first_ucl[_ucl]),i2s(ui_bprod_ucl_now[ucl]),i2s(ucl_s[true,ucl]),i2s(ucl_e[true,ucl])                       ,ir2s(ui_bucl_reload[ucl]),ir2s(build_cd),
+                    ui_color_cenergy[cenergy<0]  ,c_dyellow                 ,c_lime              ,ui_color_max[ucl_e[true,ucl]>=a_units[uid]],c_aqua                   ,c_red         );
 
-                    ui_uid_reload [uid]:=-1;
-                    ui_bucl_reload[ucl]:=-1;
                  end;
               end;
 
@@ -474,13 +475,14 @@ tt_units    : for ucl:=0 to ui_pButtonsCount do  // units
                  begin
                     if(a_units[uid]<=0)and(uid_e[uid]<=0)and(ucl_e[_ukbuilding,_ucl]<=0)then continue;
 
-                    ux:=(ucl mod ui_panel_bw);
-                    uy:=(ucl div ui_panel_bw);
+                    ux:=ucl mod ui_panel_bw;
+                    uy:=ucl div ui_panel_bw;
 
-                    ui_pButtonIco(ux,uy,uid_ui_button,false,(uid_CheckRequirements(@g_players[ui_player],uid)>0) or (uproda>=uprodm) or (ui_uprod_cur>=ui_uprod_max) or(ui_uprod_uid_max[uid]<=0));
+                    ui_pButtonIco(ux,uy,uid_ui_button,false,  //or (uprod_now_all>=uprod_max)
+                    (uid_CheckRequirements(pUIPlayer,uid)>0)  or (ui_uprod_all_now>=ui_uprod_all_max) or(ui_uprod_uid_now[uid]>=ui_uprod_uid_max[uid]) );
                     ui_pButtonTxt(ux,uy,
-                    ir2s(ui_uprod_uid_time[uid]),i2s(uprodu[uid]),i2s(uid_s[uid]),i2s(   uid_e[uid])                    ,i2s(ui_units_InTransport[uid]),'',
-                    ui_color_cenergy[cenergy<0] ,c_dyellow       ,c_lime         ,ui_color_max[uid_e[uid]>=a_units[uid]],c_purple                      ,0 );
+                    ir2s(ui_uprod_uid_time[uid]),i2s(ui_uprod_uid_now[uid]),i2s(uid_s[uid]),i2s(uid_e[uid])                       ,i2s(ui_units_InTransport[uid]),'',
+                    ui_color_cenergy[cenergy<0] ,c_dyellow                 ,c_lime         ,ui_color_max[uid_e[uid]>=a_units[uid]],c_purple                      ,0 );
                  end;
               end;
 
@@ -493,24 +495,24 @@ tt_upgrades : for ucl:=0 to ui_pButtonsCount do  // upgrades
                  ux:=(ucl mod ui_panel_bw);
                  uy:=(ucl div ui_panel_bw);
 
-                 ui_pButtonIco(ux,uy,g_upids[uid]._up_btn,ui_pprod_time[uid]>0,
-                 (upid_CheckRequirements(@g_players[ui_player],uid)>0)or(upproda>=upprodm) or (upprodu[uid]>=ui_pprod_max[uid]) );
+                 ui_pButtonIco(ux,uy,g_upids[uid]._up_btn,ui_pprod_pid_time[uid]>0,   //or(pprod_now>=pprod_max)
+                 (upid_CheckRequirements(pUIPlayer,uid)>0) or (ui_pprod_all_now>=ui_pprod_all_max) or (ui_pprod_pid_now[uid]>=ui_pprod_pid_max[uid]) );
                  ui_pButtonTxt(ux,uy,
-                 ir2s(ui_pprod_time[uid])   ,i2s(upprodu[uid]),'',b2s(upgr[uid])                               ,'','',
-                 ui_color_cenergy[cenergy<0],c_dyellow        ,0 ,ui_color_max[upgr[uid]>=g_upids[uid]._up_max],0 ,0 );
+                 ir2s(ui_pprod_pid_time[uid]),i2s(pprod_now_uid[uid]),'',b2s(upgr[uid])                               ,'','',
+                 ui_color_cenergy[cenergy<0] ,c_dyellow              ,0 ,ui_color_max[upgr[uid]>=g_upids[uid]._up_max],0 ,0 );
               end;
 
 tt_controls : case tabControlContent of   // actions
               tcp_replay  : begin
-                            { ui_pButtonIco(tar,0,0,spr_b_rfast,sys_uncappedFPS,false);
-                             ui_pButtonIco(tar,1,0,spr_b_rback,false          ,false);
-                             ui_pButtonIco(tar,2,0,spr_b_rskip,false          ,false);
-                             ui_pButtonIco(tar,0,1,spr_b_rstop,g_status>0     ,false);
-                             ui_pButtonIco(tar,1,1,spr_b_rvis ,rpls_POVCam    ,false);
-                             ui_pButtonIco(tar,2,1,spr_b_rlog ,rpls_showlog   ,false);
-                             ui_pButtonIco(tar,0,2,spr_b_rfog ,ui_fog        ,false);
+                             ui_pButtonIco(0,0,spr_b_rfast,sys_uncappedFPS,false);
+                             ui_pButtonIco(1,0,spr_b_rback,false          ,false);
+                             ui_pButtonIco(2,0,spr_b_rskip,false          ,false);
+                             ui_pButtonIco(0,1,spr_b_rstop,g_status>0     ,false);
+                             ui_pButtonIco(1,1,spr_b_rvis ,rpls_POVCam    ,false);
+                             ui_pButtonIco(2,1,spr_b_rlog ,rpls_showlog   ,false);
+                             ui_pButtonIco(0,2,spr_b_rfog ,ui_fog         ,false);
 
-                             ux:=2;
+                            { ux:=2;
                              uy:=2;
                              PlayersButtoms; }
                              end;

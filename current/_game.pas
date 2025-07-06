@@ -1163,7 +1163,7 @@ begin
 
          UpdatePlayersStatusVars;
 
-         {GameModeCPoints;
+         {GameModeKeyPoints;
          case map_scenario of
          ms_royale    : begin
                            if(g_timer_UnitCycle=0)then

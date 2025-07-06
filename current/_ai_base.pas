@@ -450,9 +450,9 @@ begin
    with pu^ do
     with player^ do
      for i:=1 to 255 do
-      if(uprodu[i]>0)then
+      if(uprod_now_uid[i]>0)then
        with g_uids[i] do
-        if(_ukfly)and(not _ukbuilding)and(_transportM>0)then ai_transport_cur+=_transportM*uprodu[i];
+        if(_ukfly)and(not _ukbuilding)and(_transportM>0)then ai_transport_cur+=_transportM*uprod_now_uid[i];
 
    // enemy
    ai_enemy_u        := nil;
@@ -599,44 +599,44 @@ begin
       ai_cpoint_koth:=false;
       for i:=1 to LastKeyPoint do
        with g_KeyPoints[i] do
-         if(cpCaptureR>0)then
+         if(kp_CaptureR>0)then
          begin
-            if(cpOwnerTeam=team)then
+            if(kp_OwnerTeam=team)then
             begin
-               if(cpenergy>0)then
+               if(kp_energy>0)then
                begin
-                  ai_enrg_pot+=cpenergy;
-                  ai_enrg_cur+=cpenergy;
+                  ai_enrg_pot+=kp_energy;
+                  ai_enrg_cur+=kp_energy;
                end
                else ai_cpoint_n+=1;
             end;
 
             if(map_scenario=ms_royale)then
-              if(g_RoyalBattle_r<(cp_ToCenterD+100))then continue;
+              if(g_RoyalBattle_r<(kp_ToCenterD+100))then continue;
 
-            if(cpx<=0)
-            or(cpy<=0)
-            or(cpx>=map_psize)
-            or(cpy>=map_psize)then continue;
+            if(kp_x<=0)
+            or(kp_y<=0)
+            or(kp_x>=map_psize)
+            or(kp_y>=map_psize)then continue;
 
             if(ai_istransport)then
-              if(map_IsObstacleZone(cpZone))
-              or(cpOwnerTeam=team)then continue;
+              if(map_IsObstacleZone(kp_Zone))
+              or(kp_OwnerTeam=team)then continue;
 
-            d:=point_dist_int(cpx,cpy,x,y);
+            d:=point_dist_int(kp_x,kp_y,x,y);
 
-            if(d>cpCaptureR)then
-              if ai_BaseDestinationChecks(pu,cpZone)
+            if(d>kp_CaptureR)then
+              if ai_BaseDestinationChecks(pu,kp_Zone)
               then
               else continue;
 
             koth_point:=(i=1)and(map_scenario=ms_KotH)and(g_step>=g_step_koth_pause);
 
             if(not koth_point)then
-              if((cpunitst_pstate[team]>=ul3)and(d> cpCaptureR))
-              or((cpunitst_pstate[team]>=ul6)and(d<=cpCaptureR))then continue;
+              if((kp_TeamLimit_p[team]>=ul3)and(d> kp_CaptureR))
+              or((kp_TeamLimit_p[team]>=ul6)and(d<=kp_CaptureR))then continue;
 
-            if(cpenergy>0)and(not koth_point)then
+            if(kp_energy>0)and(not koth_point)then
             begin
                if(d<ai_generator_d)then
                begin
@@ -648,12 +648,12 @@ begin
               if(d<ai_cpoint_d)then
               begin
                  ai_cpoint_d   :=d;
-                 ai_cpoint_r   :=cpCaptureR;
+                 ai_cpoint_r   :=kp_CaptureR;
                  ai_cpoint_cp  :=@g_KeyPoints[i];
                  ai_cpoint_koth:=koth_point;
               end;
 
-            //if(d<cpCaptureR)then break; ??????????
+            //if(d<kp_CaptureR)then break; ??????????
          end;
    end;
 end;
@@ -1051,7 +1051,7 @@ begin
            else ai_timer(@ai_scout_timer,0);
 
          ai_ReadyForAttack:=(armylimit>=ai_limit_border)
-                          or((ucl_l[false]+uprodl)>=ai_maxlimit_blimit)
+                          or((ucl_l[false]+uprod_limit)>=ai_maxlimit_blimit)
                           or(ucl_l[true]<=0);
 
          if(not ai_ReadyForAttack)

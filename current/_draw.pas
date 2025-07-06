@@ -21,27 +21,35 @@ begin
       ui_uid_reload [u]:=-1;
       ui_bucl_reload[u]:=-1;
    end;
-   FillChar(ui_bprod_uid_count  ,SizeOf(ui_bprod_uid_count  ),0);
-   FillChar(ui_bprod_ucl_count  ,SizeOf(ui_bprod_ucl_count  ),0);
-   FillChar(ui_bprod_ucl_time   ,SizeOf(ui_bprod_ucl_time   ),0);
-   FillChar(ui_uprod_uid_time   ,SizeOf(ui_uprod_uid_time   ),0);
-   FillChar(ui_uprod_uid_max    ,SizeOf(ui_uprod_uid_max    ),0);
-   FillChar(ui_pprod_max        ,SizeOf(ui_pprod_max        ),0);
-   FillChar(ui_pprod_time       ,SizeOf(ui_pprod_time       ),0);
-   FillChar(ui_units_InTransport,SizeOf(ui_units_InTransport),0);
    FillChar(ui_groups_d         ,SizeOf(ui_groups_d         ),0);
    FillChar(ui_groups_f1        ,SizeOf(ui_groups_f1        ),0);
    FillChar(ui_groups_f2        ,SizeOf(ui_groups_f2        ),0);
 
-   ui_uprod_max      :=0;
-   ui_uprod_cur      :=0;
-   ui_uprod_first    :=0;
-   ui_pprod_first    :=0;
-   ui_uibtn_abilityu :=nil;
-   ui_uibtn_move     :=0;
-   ui_bprod_possible :=[];
-   ui_bprod_NearTime    :=0;
-   ui_bprod_all      :=0;
+   FillChar(ui_bprod_ucl_now    ,SizeOf(ui_bprod_ucl_now  ),0);
+   FillChar(ui_bprod_first_ucl  ,SizeOf(ui_bprod_first_ucl  ),0);
+
+   FillChar(ui_uprod_uid_time   ,SizeOf(ui_uprod_uid_time   ),0);
+   FillChar(ui_uprod_uid_max    ,SizeOf(ui_uprod_uid_max    ),0);
+   FillChar(ui_uprod_uid_now    ,SizeOf(ui_uprod_uid_now        ),0);
+
+   FillChar(ui_pprod_pid_max    ,SizeOf(ui_pprod_pid_max        ),0);
+   FillChar(ui_pprod_pid_now    ,SizeOf(ui_pprod_pid_now        ),0);
+   FillChar(ui_pprod_pid_time   ,SizeOf(ui_pprod_pid_time       ),0);
+
+   FillChar(ui_units_InTransport,SizeOf(ui_units_InTransport),0);
+
+   ui_uibtn_abilityu  :=nil;
+   ui_uibtn_move      :=0;
+   ui_bprod_possible  :=[];
+
+   ui_uprod_all_max   :=0;
+   ui_pprod_all_max   :=0;
+   ui_bprod_all       :=0;
+   ui_uprod_all_now   :=0;
+   ui_pprod_all_now   :=0;
+   ui_bprod_first_time:=0;
+   ui_uprod_first_time:=0;
+   ui_pprod_first_time:=0;
 
    if(ui_umark_t>0)then
    begin

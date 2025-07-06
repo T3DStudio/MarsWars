@@ -54,9 +54,18 @@ begin
    if(crater  >=0)then theme_cur_tile_crater_id  :=theme_cur_crater_l  [crater  ];
    if(liquid  >=0)then theme_cur_tile_liquid_id  :=theme_cur_liquid_l  [liquid  ];
 
-   SetThemeTES;
-
-   writeln('theme_cur_decal_n ',theme_cur_decal_n);
+   if(0<=theme_cur_tile_terrain_id)and(theme_cur_tile_terrain_id<theme_all_terrain_n)then
+   begin
+      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
+      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
+   end
+   else
+   begin
+      theme_cur_liquid_mmcolor  :=c_white;
+      theme_cur_liquid_tas      :=tas_ice;
+      theme_cur_liquid_tasPeriod:=fr_fpsd2;
+   end;
 end;
 
 procedure map_VisGridMake;
@@ -940,8 +949,9 @@ begin
       x0:=cx*MapCellW;
       y0:=cy*MapCellW;
       case players of
-true : if(map_MaxPlayers>0)then
-         for p:=0 to map_MaxPlayers-1 do
+true : for p:=0 to LastPlayer do
+         if (map_PlayerStartX[p]<>NOTSET)
+         and(map_PlayerStartY[p]<>NOTSET)then
          begin
             mgcell2NearestXY(map_PlayerStartX[p],map_PlayerStartY[p],x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
             if(point_dist_int(mx,my,map_PlayerStartX[p],map_PlayerStartY[p])<=baser)
@@ -949,13 +959,13 @@ true : if(map_MaxPlayers>0)then
          end;
 false: for p:=0 to LastKeyPoint do
         with g_KeyPoints[p] do
-         if(cpCaptureR>0)then
+         if(kp_CaptureR>0)then
          begin
             if(baser<0)
-            then tr:=cpCaptureR//+MapCellhW
+            then tr:=kp_CaptureR//+MapCellhW
             else tr:=baser;
-            mgcell2NearestXY(cpx,cpy,x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
-            if(point_dist_int(mx,my,cpx,cpy)<=tr)
+            mgcell2NearestXY(kp_x,kp_y,x0,y0,x0+MapCellW,y0+MapCellW,0,@mx,@my,nil);
+            if(point_dist_int(mx,my,kp_x,kp_y)<=tr)
             then map_IfHereObjectCell+=1;
          end;
       end;
@@ -979,23 +989,22 @@ begin
         exit;
      end;
 
-   if(map_MaxPlayers>0)then
-     for p:=0 to map_MaxPlayers-1 do
-       if (map_PlayerStartX[p]<>NOTSET)
-       and(map_PlayerStartY[p]<>NOTSET)then
-       begin
-          if(point_dist_int(basex,basey,map_PlayerStartX[p],map_PlayerStartY[p])<r)then
+   for p:=0 to map_MaxPlayers-1 do
+     if (map_PlayerStartX[p]<>NOTSET)
+     and(map_PlayerStartY[p]<>NOTSET)then
+     begin
+        if(point_dist_int(basex,basey,map_PlayerStartX[p],map_PlayerStartY[p])<r)then
+        begin
+           map_IfPlayerStartHere:=true;
+           break;
+        end;
+        if(map_InMapRange(symmx,symmy,0))then
+          if(point_dist_int(symmx,symmy,map_PlayerStartX[p],map_PlayerStartY[p])<r)then
           begin
              map_IfPlayerStartHere:=true;
              break;
           end;
-          if(map_InMapRange(symmx,symmy,0))then
-            if(point_dist_int(symmx,symmy,map_PlayerStartX[p],map_PlayerStartY[p])<r)then
-            begin
-               map_IfPlayerStartHere:=true;
-               break;
-            end;
-       end;
+     end;
 end;
 
 function map_IfKeyPointHere(basex,basey,symx,symy,r:integer):boolean;
@@ -1017,11 +1026,11 @@ begin
 
    for p:=0 to LastKeyPoint do
     with g_KeyPoints[p] do
-     if(cpCaptureR>0)then
+     if(kp_CaptureR>0)then
      begin
-        t:=r+max2i(cpsolidr,cpCaptureR);
-        if(point_dist_int(basex,basey,cpx,cpy)<t)
-        or(point_dist_int(symx ,symy ,cpx,cpy)<t)then
+        t:=r+max2i(kp_solidR,kp_CaptureR);
+        if(point_dist_int(basex,basey,kp_x,kp_y)<t)
+        or(point_dist_int(symx ,symy ,kp_x,kp_y)<t)then
         begin
            map_IfKeyPointHere:=true;
            break;
@@ -1039,7 +1048,38 @@ var pn:integer;
 begin
    for pn:=0 to LastKeyPoint do
     with g_KeyPoints[pn] do
-     if(cpCaptureR>0)then cpZone:=map_MapGetZone(cpx,cpy);
+     if(kp_CaptureR>0)then kp_Zone:=map_MapGetZone(kp_x,kp_y);
+end;
+
+function map_KeyPoints_Add(akpx,akpy,asolidR,aNoBuildR,aenergy,aCaptureR,atime:integer;alifetime:cardinal):boolean;
+var keyi:byte;
+begin
+   for keyi:=0 to LastKeyPoint do
+     if(g_KeyPoints[keyi].kp_CaptureR<=0)then break;
+
+   map_KeyPoints_Add:=false;
+
+   if(keyi>LastKeyPoint)then exit;
+
+   map_KeyPoints_Add:=true;
+
+   with g_KeyPoints[keyi] do
+   begin
+      kp_x          :=akpx;
+      kp_y          :=akpy;
+      kp_ToCenterD  :=point_dist_int(kp_x,kp_y,map_phsize,map_phsize);
+      kp_solidR     :=asolidR;
+      kp_NoBuildR   :=aNoBuildR;
+      kp_energy     :=aenergy;
+      kp_CaptureR   :=aCaptureR;
+      kp_CaptureTime:=atime;
+      kp_lifeTime   :=alifetime;
+      {$IFDEF _FULLGAME}
+      kp_MiniMapX:=round(map_mm_cx*kp_x);
+      kp_MiniMapY:=round(map_mm_cx*kp_y);
+      kp_MiniMapR:=round(map_mm_cx*kp_CaptureR);
+      {$ENDIF}
+   end;
 end;
 
 procedure map_KeyPoints_Default(num:byte;sr,cr,nr,energy,time,freeCenterR:integer;lifetime:cardinal;newpoints:boolean);
@@ -1051,40 +1091,14 @@ dst        :integer;
 function setkpoint(px,py:integer):boolean;
 var pn:byte;
 begin
-   for pn:=0 to LastKeyPoint do
-     if(g_KeyPoints[pn].cpCaptureR<=0)then break;
 
-   if(pn>LastKeyPoint)then
-   begin
-      setkpoint:=true;
-      exit;
-   end
-   else setkpoint:=false;
-
-   with g_KeyPoints[pn] do
-   begin
-      cpx          :=px;
-      cpy          :=py;
-      cp_ToCenterD :=point_dist_int(cpx,cpy,map_phsize,map_phsize);
-      cpsolidr     :=sr;
-      cpNoBuildR   :=nr;
-      cpenergy     :=energy;
-      cpCaptureR   :=cr;
-      cpCaptureTime:=time;
-      cplifetime   :=lifetime;
-      {$IFDEF _FULLGAME}
-      cpmx:=round(map_mm_cx*cpx);
-      cpmy:=round(map_mm_cx*cpy);
-      cpmr:=round(map_mm_cx*cpCaptureR);
-      {$ENDIF}
-   end;
 end;
 begin
    if(newpoints)then FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
    u:=map_psize div 50;
    b:=map_psize-(u*2);
 
-   i:=0;
+  { i:=0;
    while(i<num)do
    begin
       i+=1+byte(map_symmetry);
@@ -1112,7 +1126,7 @@ begin
               break;
            end;
       end;
-   end;
+   end;  }
 end;
 
 procedure map_KeyPoints;
@@ -1122,15 +1136,15 @@ begin
    case map_scenario of
 ms_KotH   : with g_KeyPoints[0] do
             begin
-               cpx:=map_phsize;
-               cpy:=map_phsize;
-               cpCaptureR   :=base_1r;
-               cpCaptureTime:=fr_fps1*60;
+               kp_x:=map_phsize;
+               kp_y:=map_phsize;
+               kp_CaptureR   :=base_1r;
+               kp_CaptureTime:=fr_fps1*60;
 
                {$IFDEF _FULLGAME}
-               cpmx:=round(cpx*map_mm_cx);
-               cpmy:=round(cpy*map_mm_cx);
-               cpmr:=round(cpCaptureR*map_mm_cx)+1;
+               kp_MiniMapX:=round(kp_x*map_mm_cx);
+               kp_MiniMapY:=round(kp_y*map_mm_cx);
+               kp_MiniMapR:=round(kp_CaptureR*map_mm_cx)+1;
                {$ENDIF}
             end;
 ms_capture: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,byte(map_type=mapt_clake)*(map_psize div 3),0,true);
@@ -1296,19 +1310,44 @@ begin
    map_PlayerStartsRandom:=true;
 end;
 
-procedure map_PlayerStartsScirmish;
-var i:byte;
+procedure map_SetEmptyPositions;
+var p:byte;
+basex,
+basey,
+//symx ,
+//symy ,
+c    :integer;
 begin
-   for i:=0 to LastPlayer do
-   if(i<map_MaxPlayers)then
+   for p:=0 to LastPlayer do
+     if(map_PlayerStartX[p]=NOTSET)
+     and(p>=map_MaxPlayers)then
+     begin
+        c:=50;
+        while(c>0)do
+        begin
+           c-=1;
+           basex:=g_random(map_psize);
+           basey:=g_random(map_psize);
+
+           //SymmetryXY(basex,basey,map_psize,@symx,@symy,map_symmetry);
+
+           if(map_IfPlayerStartHere(basex,basey,NOTSET,NOTSET,base_3r))then continue;
+           if(point_dist_int(basex,basey,map_phsize,map_phsize)<=map_FreeCenterR)then continue;
+
+           map_PlayerStartX[p]:=basex;
+           map_PlayerStartY[p]:=basey;
+           break;
+        end;
+     end;
+end;
+
+procedure map_PlayerStartsScirmish;
+var p:byte;
+begin
+   for p:=0 to LastPlayer do
    begin
-      map_PlayerStartX[i]:=NOTSET;
-      map_PlayerStartY[i]:=NOTSET;
-   end
-   else
-   begin
-      map_PlayerStartX[i]:=map_phsize;
-      map_PlayerStartY[i]:=map_phsize;
+      map_PlayerStartX[p]:=NOTSET;
+      map_PlayerStartY[p]:=NOTSET;
    end;
 
    case map_scenario of
@@ -1323,6 +1362,7 @@ ms_royale    : map_PlayerStartsCircle(map_phsize-(map_psize div 5));
    else if(not map_PlayerStartsRandom(map_FreeCenterR))
           then map_PlayerStartsCircle(map_phsize-(map_psize div 6));
    end;
+   map_SetEmptyPositions;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1484,9 +1524,9 @@ mapt_canyon : begin
               end;
 mapt_clake,
 mapt_ilake  : begin
-              map_GridFillR(map_chsize,map_chsize,(map_csize div 3),mgsl_liquid ,0,base_1r,false,false);
-              map_GridFillR(msrx,3, 0,mgsl_nobuild,18,base_1r,false,false);
-              map_GridFillR(msrx,4, 0,mgsl_rocks  ,18,base_1r,false,false);
+              map_GridFillR(map_chsize,map_chsize,map_csize div 3,mgsl_liquid ,0 ,base_1r,false,false);
+              map_GridFillR(msrx      ,3         ,0              ,mgsl_nobuild,10,base_1r,false,false);
+              map_GridFillR(msrx      ,4         ,0              ,mgsl_rocks  ,10,base_1r,false,false);
               end;
 mapt_island : begin
               px:=map_chsize div 4;
@@ -1499,8 +1539,8 @@ mapt_island : begin
                 map_GridFillR(map_chsize-px+integer(map_seed mod byte(py)),
                               map_chsize-px+integer(g_random_i mod py),
                              -round(map_csize/abs(2.5+(g_random_i mod 2))),mgsl_liquid ,0,base_1r,false,false);
-              map_GridFillR(msrx,5, 0,mgsl_nobuild,18,base_1r,false,false);
-              map_GridFillR(msrx,6, 0,mgsl_rocks  ,18,base_1r,false,false);
+              map_GridFillR(msrx,5, 0,mgsl_nobuild,10,base_1r,false,false);
+              map_GridFillR(msrx,6, 0,mgsl_rocks  ,10,base_1r,false,false);
               end;
 mapt_shore  : begin
               if(map_symmetry=maps_point)then
@@ -1510,9 +1550,9 @@ mapt_shore  : begin
               end
               else map_GridFillR(map_chsize+round(map_csize*10*cos(map_symmetryDir*degtorad)),
                                  map_chsize+round(map_csize*10*sin(map_symmetryDir*degtorad)),map_csize*10,mgsl_liquid ,0,base_1r,false,false);
-              map_GridFillR(msrx,7, 0,mgsl_nobuild,16,base_1r,false,false);
-              map_GridFillR(msrx,8, 0,mgsl_rocks  ,16,base_1r,false,false);
-              map_GridFillR(msrx,1, 0,mgsl_rocks  ,64,base_1r,true ,false);
+              map_GridFillR(msrx,7, 0,mgsl_nobuild,10,base_1r,false,false);
+              map_GridFillR(msrx,8, 0,mgsl_rocks  ,10,base_1r,false,false);
+              map_GridFillR(msrx,1, 0,mgsl_rocks  ,32,base_1r,true ,false);
               end;
 mapt_sea    : begin
               map_GridFillR(msrx,9, 0,mgsl_liquid ,0 ,base_1r,false,false);
@@ -1531,6 +1571,10 @@ procedure Map_randommap;
 begin
    Map_randomseed;
 
+   case random(2) of
+   0: map_generators:=random(gms_g_maxgens)+1;
+   1: map_generators:=0;
+   end;
    map_psize   :=MinMapSize+round(random(MaxMapSize-MinMapSize)/StepMapSize)*StepMapSize;
    map_type    :=random(gms_m_types+1);
    map_symmetry:=random(gms_m_symm +1);

@@ -24,7 +24,7 @@ g_cl_units        : integer  = 0;
 g_slot_state      : TPlayerSlots;
 
 g_RoyalBattle_r   : integer  = 0;
-g_KeyPoints       : array[0..LastKeyPoint] of TCTPoint;
+g_KeyPoints       : array[0..LastKeyPoint] of TKeyPoint;
 
 g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
@@ -573,20 +573,23 @@ ui_mc_a           : integer;
 ui_mc_c           : TMWColor;
 
 // ui panel counters
-ui_uprod_max,
-ui_uprod_cur,
-ui_uprod_first    : integer;
-ui_units_InTransport,
+ui_uprod_all_now,
+ui_uprod_all_max,
+ui_uprod_first_time: integer;
+ui_uprod_uid_now,
 ui_uprod_uid_max,
 ui_uprod_uid_time,
-ui_pprod_max,
-ui_pprod_time     : array[byte] of integer;
-ui_pprod_first    : integer;
+ui_units_InTransport,
+ui_pprod_pid_max,
+ui_pprod_pid_now,
+ui_pprod_pid_time : array[byte] of integer;
+ui_pprod_all_max,
+ui_pprod_all_now,
+ui_pprod_first_time: integer;
 ui_bprod_possible : TSoB;
-ui_bprod_uid_count,
-ui_bprod_ucl_count,
-ui_bprod_ucl_time : array[byte] of integer;
-ui_bprod_NearTime,
+ui_bprod_ucl_now,
+ui_bprod_first_ucl: array[byte] of integer;
+ui_bprod_first_time,
 ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;

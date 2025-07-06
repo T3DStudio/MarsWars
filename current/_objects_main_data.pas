@@ -510,8 +510,8 @@ begin
    _limituse         := ul3;
    _attack           := true;
    _ukmech           := true;
-   _upgr_regen       := upgr_race_regen_bio[r_hell];
-   _upgr_armor       := upgr_race_armor_bio[r_hell];
+   //_upgr_regen       := upgr_race_regen_bio[r_hell];
+   //_upgr_armor       := upgr_race_armor_bio[r_hell];
    _a_BonusRangeAntiUnit:=50;
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_YPlasma,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Arachnotron],[],0,0,wtp_UnitMech,0,dm_AntiUnitMech);
 end;
@@ -558,8 +558,8 @@ begin
    _limituse         := ul10;
    _splashresist     := true;
    _ukmech           := true;
-   _upgr_regen       := upgr_race_regen_bio[r_hell];
-   _upgr_armor       := upgr_race_armor_bio[r_hell];
+   //_upgr_regen       := upgr_race_regen_bio[r_hell];
+   //_upgr_armor       := upgr_race_armor_bio[r_hell];
    _a_BonusRangeAntiUnit:=50;
    _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsd6,MID_MChaingun,0,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Light,3,dm_AntiLight);
 end;
@@ -583,8 +583,8 @@ begin
    _limituse         := ul10;
    _splashresist     := true;
    _ukmech           := true;
-   _upgr_regen       := upgr_race_regen_bio[r_hell];
-   _upgr_armor       := upgr_race_armor_bio[r_hell];
+   //_upgr_regen       := upgr_race_regen_bio[r_hell];
+   //_upgr_armor       := upgr_race_armor_bio[r_hell];
    _a_BonusRangeAntiBuilding:=50;
    _weapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps1   ,MID_HRocket,0,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_Building,0,dm_Cyber);
 end;
@@ -1465,7 +1465,7 @@ begin
       _up_renerg_xpl:= enrgX;
       _up_renerg_apl:= enrgA;
       _up_max       := max;
-      _up_mfrg      := mfrg;
+      _up_multi      := mfrg;
       _up_btni      := u;
       u+=1;
    end;

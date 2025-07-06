@@ -537,7 +537,7 @@ begin
      TIME:='';
      INFO:='';
 
-     if(_up_max<=1)or(_up_mfrg)
+     if(_up_max<=1)or(_up_multi)
      then curlvl:=1
      else
        if(curlvl>_up_max)and(curlvl<255)then curlvl:=_up_max;
@@ -564,7 +564,7 @@ begin
      if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
      if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
      _ADDSTR(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
-     if(_up_max>1)and(_up_mfrg)then _ADDSTR(@INFO,tc_red+'*'+tc_default,sep_comma);
+     if(_up_max>1)and(_up_multi)then _ADDSTR(@INFO,tc_red+'*'+tc_default,sep_comma);
 
      _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+tc_nl1+_up_descr;
   end;
@@ -767,10 +767,10 @@ begin
    str_menu_SaveInfo                 := 'SAVE INFO';
 
    str_menu_CtrlBarPos               := 'Control bar position';
-   str_menu_PanelPosl[uicbp_left  ]    := tc_lime  +'left'  +tc_default;
-   str_menu_PanelPosl[uicbp_right ]    := tc_orange+'right' +tc_default;
-   str_menu_PanelPosl[uicbp_top   ]    := tc_yellow+'top'   +tc_default;
-   str_menu_PanelPosl[uicbp_bottom]    := tc_aqua  +'bottom'+tc_default;
+   str_menu_PanelPosl[uicbp_left  ]  := tc_lime  +'left'  +tc_default;
+   str_menu_PanelPosl[uicbp_right ]  := tc_orange+'right' +tc_default;
+   str_menu_PanelPosl[uicbp_top   ]  := tc_yellow+'top'   +tc_default;
+   str_menu_PanelPosl[uicbp_bottom]  := tc_aqua  +'bottom'+tc_default;
 
    str_menu_CtrlBarScale             := 'Control bar scale';
    str_menu_MiniMapScale             := 'Mini map scale';
@@ -807,7 +807,7 @@ begin
    for p:=pss_AI_1 to pss_AI_11 do
    str_menu_PlayerSlots[p]           :=ai_name(p-pss_AI_1+1);
 
-   str_menu_RandomScirmish           := 'Make Random Skirmish';
+   str_menu_RandomScirmish           := 'Random Skirmish';
    str_menu_AISlots                  := 'Fill empty slots';
    str_menu_DeadObservers            := 'Observer mode after lose';
    str_menu_FixedStarts              := 'Fixed player starts';

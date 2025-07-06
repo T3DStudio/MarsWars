@@ -336,25 +336,25 @@ begin
    wdcptime^:=(wdcptime^+1) mod 2;
 
    with g_KeyPoints[cpi] do
-    if(cpCaptureR<=0)
+    if(kp_CaptureR<=0)
     then wudata_byte(0,rpl)
     else
     begin
-       b:=b or (cpOwnerPlayer      shl 2) and %00011100;
-       b:=b or (cpTimerPlayer shl 5) and %11100000;
+       b:=b or (kp_OwnerPlayer      shl 2) and %00011100;
+       b:=b or (kp_TimerPlayer shl 5) and %11100000;
 
        case wdcptime^ of
 0       : begin
              wudata_byte(b or %00000010,rpl);
-             if(cpOwnerPlayer<>cpTimerPlayer)
-             then wudata_reload(@cpTimer,rpl);
+             if(kp_OwnerPlayer<>kp_TimerPlayer)
+             then wudata_reload(@kp_Timer,rpl);
           end;
-1       : if(cpLifeTime<=0)
+1       : if(kp_lifeTime<=0)
           then wudata_byte(b or %00000001,rpl)
           else
           begin
              wudata_byte(b or %00000011,rpl);
-             wudata_byte((cpLifeTime div fr_fps1) shr 2,rpl);
+             wudata_byte((kp_lifeTime div fr_fps1) shr 2,rpl);
           end;
        end;
     end;
@@ -488,10 +488,10 @@ begin
                 begin
                    _puid:=uprod_u[i];
 
-                   uprodl+=g_uids[_puid]._limituse;
-                   uproda+=1;
-                   uprodc[g_uids[_puid]._ucl]+=1;
-                   uprodu[       _puid      ]+=1;
+                   uprod_limit+=g_uids[_puid]._limituse;
+                   uprod_now_all+=1;
+                   uprod_now_ucl[g_uids[_puid]._ucl]+=1;
+                   uprod_now_uid[       _puid      ]+=1;
                    cenergy-=g_uids[_puid]._renergy;
                 end;
             if(_issmith)then
@@ -500,8 +500,8 @@ begin
                 begin
                    _puid:=pprod_u[i] ;
 
-                   upproda+=1;
-                   upprodu[_puid]+=1;
+                   pprod_now+=1;
+                   pprod_now_uid[_puid]+=1;
                    pprod_e[i]:=upid_CalcCostEnergy(_puid,upgr[_puid]+1);
                    cenergy-=pprod_e[i];
                 end;
@@ -549,10 +549,10 @@ begin
                 begin
                    _puid:=uprod_u[i];
 
-                   uprodl-=g_uids[_puid]._limituse;
-                   uproda-=1;
-                   uprodc[g_uids[_puid]._ucl]-=1;
-                   uprodu[       _puid      ]-=1;
+                   uprod_limit-=g_uids[_puid]._limituse;
+                   uprod_now_all-=1;
+                   uprod_now_ucl[g_uids[_puid]._ucl]-=1;
+                   uprod_now_uid[       _puid      ]-=1;
                    cenergy+=g_uids[_puid]._renergy;
                 end;
             if(_issmith)then
@@ -561,8 +561,8 @@ begin
                 begin
                    _puid:=pprod_u[i];
 
-                   upproda-=1;
-                   upprodu[_puid]-=1;
+                   pprod_now-=1;
+                   pprod_now_uid[_puid]-=1;
                    cenergy+=pprod_e[i];
                 end;
          end;
@@ -1146,31 +1146,31 @@ begin
       t:=b and %00000011;
       if(t=0)then
       begin
-         if(cpCaptureR>0)then
+         if(kp_CaptureR>0)then
          begin
             CPoint_ChangeOwner(cpi,0);
-            cpCaptureR:=-cpCaptureR;
+            kp_CaptureR:=-kp_CaptureR;
             if(not no_effect)
-            then effect_CPExplode(cpx,cpy);
+            then effect_CPExplode(kp_x,kp_y);
          end;
       end
       else
       begin
-         if(cpCaptureR<0)then cpCaptureR:=-cpCaptureR;
+         if(kp_CaptureR<0)then kp_CaptureR:=-kp_CaptureR;
          p:=(b and %00011100) shr 2;
          CPoint_ChangeOwner(cpi,p);
-         cpTimerPlayer:=(b and %11100000) shr 5;
-         if(cpTimerPlayer<=LastPlayer)
-         then cpTimerTeam:=g_players[cpTimerPlayer].team;
+         kp_TimerPlayer:=(b and %11100000) shr 5;
+         if(kp_TimerPlayer<=LastPlayer)
+         then kp_TimerTeam:=g_players[kp_TimerPlayer].team;
 
          case t of
 %00000001 : ;
 %00000010 : begin
-               if(cpOwnerPlayer<>cpTimerPlayer)
-               then rudata_reload(@cpTimer,rpl)
-               else cpTimer:=0;
+               if(kp_OwnerPlayer<>kp_TimerPlayer)
+               then rudata_reload(@kp_Timer,rpl)
+               else kp_Timer:=0;
             end;
-%00000011 : cpLifeTime:=(rudata_byte(rpl,0)*fr_fps1) shl 2;
+%00000011 : kp_lifeTime:=(rudata_byte(rpl,0)*fr_fps1) shl 2;
          end;
       end;
    end;

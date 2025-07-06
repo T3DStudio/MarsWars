@@ -24,6 +24,12 @@ begin
    end;
 end;
 
+function gfx_SDLTexture2Color():TMWColor;
+begin
+
+end;
+// theme_all_terrain_mmcolor
+
 procedure IntListAdd(intList:PTIntList;intListN:pinteger;value:integer);
 begin
    intListN^+=1;
@@ -414,21 +420,6 @@ begin
    end;
 end;
 
-procedure SetThemeTES;
-begin
-   if(0<=theme_cur_tile_terrain_id)and(theme_cur_tile_terrain_id<theme_all_terrain_n)then
-   begin
-      theme_cur_liquid_mmcolor  :=theme_all_terrain_mmcolor  [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tas      :=theme_all_terrain_tas      [theme_cur_tile_liquid_id];
-      theme_cur_liquid_tasPeriod:=theme_all_terrain_tasPeriod[theme_cur_tile_liquid_id];
-   end
-   else
-   begin
-      theme_cur_liquid_mmcolor  :=c_white;
-      theme_cur_liquid_tas      :=tas_ice;
-      theme_cur_liquid_tasPeriod:=fr_fpsd2;
-   end;
-end;
 
 
 

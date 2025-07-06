@@ -22,7 +22,6 @@ tmpSDLSurf: pSDL_Surface;
 begin
    s:=str_screenshot+str_NowDateTime+str_screenshotExt+#0;
 
-   writeln('screenshot');
    tmpSDLSurf := SDL_CreateRGBSurface(0, vid_vw, vid_vh, vid_BitsPerPixel, 0,0,0,0);
    if(tmpSDLSurf=nil)then
    begin
@@ -1025,7 +1024,7 @@ begin
    font_Base:=gfx_LoadFont(str_f_FontBase);
    font_Doom :=gfx_LoadFont(str_f_FontBig );
 
-   draw_set_font(font_Base,basefont_H1);
+   draw_set_font(font_Base,fontSize_BaseDefault);
 
 
 

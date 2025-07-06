@@ -132,7 +132,14 @@ gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
 gs_win_team7           = 27;
-gs_running             = 255;
+gs_gameCountDown1      = 247;
+gs_gameCountDown2      = 248;
+gs_gameCountDown3      = 249;
+gs_game                = 250;
+gs_lobbyCountDown1     = 252;
+gs_lobbyCountDown2     = 253;
+gs_lobbyCountDown3     = 254;
+gs_lobby               = 255;
 
 // races
 race_num               = 2;  // race num 0-r_cnt
@@ -685,12 +692,12 @@ upgr_fast_product      = 251;
 upgr_mult_product      = 252;
 upgr_invuln            = 255;
 
-// BASIC RACE UPGRADES                                      HELL                UAC
+// BASIC RACE UPGRADES                                         HELL                UAC
 upgr_race_armor_bio         : array[1..race_num] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
-upgr_race_armor_mech        : array[1..race_num] of byte    = (0                 , upgr_uac_mecharm );
+upgr_race_armor_mech        : array[1..race_num] of byte    = (upgr_hell_uarmor  , upgr_uac_mecharm );
 upgr_race_armor_build       : array[1..race_num] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
 upgr_race_regen_bio         : array[1..race_num] of byte    = (upgr_hell_regen   , 0                );
-upgr_race_regen_mech        : array[1..race_num] of byte    = (0                 , 0                );
+upgr_race_regen_mech        : array[1..race_num] of byte    = (upgr_hell_regen   , 0                );
 upgr_race_regen_build       : array[1..race_num] of byte    = (upgr_hell_bldrep  , 0                );
 upgr_race_mspeed_bio        : array[1..race_num] of byte    = (0                 , upgr_uac_mspeed  );
 upgr_race_mspeed_mech       : array[1..race_num] of byte    = (0                 , upgr_uac_mechspd );
@@ -1095,18 +1102,18 @@ uinfo_text             = 6;
 basefont_w1            = 8;
 basefont_w2            = basefont_w1*2;
 basefont_w3            = basefont_w1*3;
-basefont_w4            = basefont_w1*4;
 basefont_wh            = basefont_w1 div 2;
 basefont_wq            = basefont_w1 div 4;
 basefont_w1q           = basefont_w1+basefont_wq;
 basefont_wq3           = basefont_wq*3;
-basefont_w5            = basefont_w1*5;
 basefont_w1h           = basefont_w1+basefont_wh;
 
-basefont_H1            = basefont_w1;
-basefont_H2            = basefont_w1h;
-basefont_H3            = basefont_w1+basefont_wq3;
-basefont_H4            = basefont_w2+basefont_wq;
+fontSize_BaseDefault   = basefont_w1;
+fontSize_BaseBig       = basefont_w1h;
+fontSize_DoomMedium    = basefont_w1+basefont_wq3;
+fontSize_DoomSubTitle  = basefont_w2-(basefont_wq div 2);
+fontSize_DoomTitle     = basefont_w2+basefont_wh;
+
 
 chat_all               = 255;
 chat_allies            = 254;
@@ -1199,10 +1206,10 @@ menu_netsearch_lineh   = menu_main_mp_bh1;
 menu_netsearch_listh   = 11;
 
 menu_replays_lineh     = menu_main_mp_bhh;
-menu_replays_listh     = 23;
+menu_replays_listh     = 22;
 
 menu_saveload_lineh    = menu_main_mp_bhh;
-menu_saveload_listh    = 22;
+menu_saveload_listh    = 21;
 
 mwscroll_speed         = 5;
 

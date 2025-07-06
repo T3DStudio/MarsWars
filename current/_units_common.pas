@@ -688,11 +688,11 @@ begin
    if(not FlyLevel)then
     for u:=1 to LastKeyPoint do
      with g_KeyPoints[u] do
-      if(cpCaptureR>0)and(cpNoBuildR>0)then
+      if(kp_CaptureR>0)and(kp_NoBuildR>0)then
       begin
-         o:=tr+cpNoBuildR;
-         d:=point_dist_int(cpx,cpy,tx,ty);
-         if(d<o)then pTarAdd(cpx,cpy,o,0,d-o);
+         o:=tr+kp_NoBuildR;
+         d:=point_dist_int(kp_x,kp_y,tx,ty);
+         if(d<o)then pTarAdd(kp_x,kp_y,o,0,d-o);
       end;
 
    for u:=1 to MaxUnits do
@@ -761,7 +761,7 @@ begin
 end;
 
 
-procedure BuildingNewPlace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
+procedure BuildingNewPlace(tx,ty:integer;buid,bplayer:byte;newx,newy:pinteger);
 var
 aukfly  :boolean;
 dx,dy,o,tr,
@@ -771,7 +771,7 @@ begin
    begin
       aukfly:=_ukfly;
       tr:=_r;
-      //(g_players[pl].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=ua_Teleport)
+      //(g_players[bplayer].upgr[upgr_race_extbuilding[_urace]]=0)or(_isbarrack)or(_ability=ua_Teleport)
       pushOut_all(tx,ty,tr+1,0,@tx,@ty,aukfly);
    end;
 
@@ -782,18 +782,19 @@ begin
    for u:=1 to MaxUnits do
     with g_units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(isbuildarea)then
+      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=bplayer)and(isbuildarea)then
        if(buid in ups_builder)and(not IsIntUnitRange(transport,nil))then
-       begin
-          o:=point_dist_int(x,y,tx,ty)-srange;
-          if(o<dr)then
-          begin
-             dx:=x;
-             dy:=y;
-             dr:=o;
-             sr:=srange;
-          end;
-       end;
+         if(player^.s_builders<=0)or(isselected)then
+         begin
+            o:=point_dist_int(x,y,tx,ty)-srange;
+            if(o<dr)then
+            begin
+               dx:=x;
+               dy:=y;
+               dr:=o;
+               sr:=srange;
+            end;
+         end;
 
    if(dr<NOTSET)then
    begin
@@ -841,14 +842,14 @@ begin
 
    for u:=1 to LastKeyPoint do
     with g_KeyPoints[u] do
-     if(cpCaptureR>0)then
+     if(kp_CaptureR>0)then
      begin
         if(forBuild)
-        then gx:=max2i(cpsolidr,cpNoBuildR)
-        else gx:=cpsolidr;
+        then gx:=max2i(kp_solidR,kp_NoBuildR)
+        else gx:=kp_solidR;
         gx+=tr;
         if(gx<=0)then continue;
-        if(point_dist_int(tx,ty,cpx,cpy)<gx)then
+        if(point_dist_int(tx,ty,kp_x,kp_y)<gx)then
         begin
            CheckCollisionR:=cbr_cpoint;
            exit;
@@ -892,8 +893,8 @@ begin
 
    for u:=1 to LastKeyPoint do
     with g_KeyPoints[u] do
-     if(cpCaptureR>0)and(cpNoBuildR>0)then
-      if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
+     if(kp_CaptureR>0)and(kp_NoBuildR>0)then
+      if(point_dist_int(tx,ty,kp_x,kp_y)<kp_NoBuildR)then
       begin
          CheckBuildArea:=cba_NoBuildArea;
          exit;
@@ -911,15 +912,16 @@ begin
      with uid^ do
       if(hits>0)and(iscomplete)and(isbuildarea)and(playeri=playern)then
        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)and(tzone=zone)then
-        if(buid in ups_builder)and(not IsIntUnitRange(transport,nil))then
-         if(point_dist_int(x,y,tx,ty)<srange)then
-         begin
-            CheckBuildArea:=cba_inBuildArea; // inside build area
-            break;
-         end;
+        if(player^.s_builders<=0)or(isselected)then
+         if(buid in ups_builder)and(not IsIntUnitRange(transport,nil))then
+          if(point_dist_int(x,y,tx,ty)<srange)then
+          begin
+             CheckBuildArea:=cba_inBuildArea; // inside build area
+             break;
+          end;
 end;
 
-function CheckBuildPlace(tx,ty,tr,skip_unit:integer;playern,buid:byte):TCheckBuildPlace;
+function CheckBuildPlace(tx,ty,tr,skip_unit:integer;bplayer,buid:byte):TCheckBuildPlace;
 begin
    CheckBuildPlace:=cbp_good;
    {
@@ -929,12 +931,12 @@ begin
    else           m_brushc:=c_gray;
    }
 
-   case CheckBuildArea(tx,ty,0,buid,playern) of
+   case CheckBuildArea(tx,ty,0,buid,bplayer) of
 cba_inBuildArea : with g_uids[buid] do
                     if(CheckCollisionR(tx,ty,tr+_r,skip_unit,_ukbuilding,_ukfly,true)<>cbr_no)then CheckBuildPlace:=cbp_noplace;
-cba_NoBuildArea: CheckBuildPlace:=cbp_noplace;
-cba_outBuildArea  : CheckBuildPlace:=cbp_out;
-   else CheckBuildPlace:=cbp_unknown;
+cba_NoBuildArea : CheckBuildPlace:=cbp_noplace;
+cba_outBuildArea: CheckBuildPlace:=cbp_out;
+   else           CheckBuildPlace:=cbp_unknown;
    end;
 end;
 
@@ -1168,12 +1170,12 @@ begin
       if(_isbarrack  )then
       begin
          n_barracks-=1;
-         uprodm-=level+1;
+         uprod_max-=level+1;
       end;
       if(_issmith    )then
       begin
          n_smiths-=1;
-         upprodm-=level+1;
+         pprod_max-=level+1;
       end;
    end;
 end;
@@ -1195,12 +1197,12 @@ begin
       if(_isbarrack  )then
       begin
          n_barracks+=1;
-         uprodm+=level+1;
+         uprod_max+=level+1;
       end;
       if(_issmith    )then
       begin
          n_smiths+=1;
-         upprodm+=level+1;
+         pprod_max+=level+1;
       end;
    end;
 end;
@@ -1420,10 +1422,10 @@ begin
              if(not PlayerSetProdError(playeri,lmt_argt_unit,puid,uid_CheckRequirements(pu^.player,puid),pu))then
                with player^ do
                begin
-                  uproda+=1;
-                  uprodl+=g_uids[puid]._limituse;
-                  uprodc[g_uids[puid]._ucl]+=1;
-                  uprodu[ puid            ]+=1;
+                  uprod_now_all+=1;
+                  uprod_limit+=g_uids[puid]._limituse;
+                  uprod_now_ucl[g_uids[puid]._ucl]+=1;
+                  uprod_now_uid[ puid            ]+=1;
                   cenergy-=g_uids[puid]._renergy;
                   uprod_u[pn]:=puid;
                   uprod_r[pn]:=g_uids[puid]._tprod;
@@ -1457,10 +1459,10 @@ begin
          begin
             puid:=uprod_u[pn];
 
-            uproda-=1;
-            uprodl-=g_uids[puid]._limituse;
-            uprodc[g_uids[puid]._ucl]-=1;
-            uprodu[ puid            ]-=1;
+            uprod_now_all-=1;
+            uprod_limit-=g_uids[puid]._limituse;
+            uprod_now_ucl[g_uids[puid]._ucl]-=1;
+            uprod_now_uid[ puid            ]-=1;
             cenergy+=g_uids[puid]._renergy;
             uprod_r[pn]:=0;
 
@@ -1500,8 +1502,8 @@ begin
                with player^ do
                with g_upids[upid] do
                begin
-                  upproda+=1;
-                  upprodu[upid]+=1;
+                  pprod_now+=1;
+                  pprod_now_uid[upid]+=1;
                   pprod_e[pn]:=upid_CalcCostEnergy(upid,upgr[upid]+1);
                   cenergy-=pprod_e[pn];
                   pprod_r[pn]:=upid_CalcCostTime(upid,upgr[upid]+1);
@@ -1536,8 +1538,8 @@ begin
          begin
             upid:=pprod_u[pn];
 
-            upproda-=1;
-            upprodu[upid]-=1;
+            pprod_now-=1;
+            pprod_now_uid[upid]-=1;
             cenergy+=pprod_e[pn]; //g_upids[upid]._up_renerg;
             pprod_r[pn]:=0;
 
@@ -1659,8 +1661,8 @@ begin
            begin
               _uid:=uprod_u[i];
 
-              if((army     +uproda)>MaxPlayerUnits)
-              or((armylimit+uprodl)>MaxPlayerLimit)
+              if((army     +uprod_now_all)>MaxPlayerUnits)
+              or((armylimit+uprod_limit)>MaxPlayerLimit)
               or(cenergy<0)
               or(uid_e[_uid]>=a_units[_uid])
               then

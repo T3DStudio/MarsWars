@@ -403,7 +403,7 @@ begin
    draw_set_color(c_black);
    draw_set_alpha(127);
    draw_clear;
-   draw_set_font(font_Doom,basefont_H4);
+   draw_set_font(font_Doom,fontSize_DoomTitle);
    draw_set_color(color);
    draw_set_alpha(255);
    draw_text_line(w div 2,h div 2,CaptionString,ta_MM,255,0);
@@ -444,30 +444,49 @@ end;
 
 procedure map_MinimapBackground;
 var
-gx ,gy :integer;
+gx ,gy ,
+tx ,ty ,
+tw     :integer;
 mmx,mmy:single;
 begin
    draw_set_target(tex_map_bMiniMap);
    draw_set_color(c_black);
    draw_clear;
+   draw_set_color(c_gray);
+   tw:=trunc(map_mm_gridW)+1;//trunc(mmx+map_mm_gridW)-tx+1;
    mmx:=0;
    for gx:=0 to map_csize do
    begin
       mmy:=0;
       for gy:=0 to map_csize do
       begin
+         tx:=trunc(mmx);
+         ty:=trunc(mmy);
+
          case map_grid[gx,gy].tgc_solidlevel of
-mgsl_nobuild : begin
+mgsl_free    : begin
                draw_set_color(c_dgray);
-               draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
+               draw_mwtexture2(tx,ty,theme_all_terrain_l[theme_cur_tile_terrain_id],tw,tw);
+               end;
+mgsl_nobuild : begin
+               draw_set_color(c_ltgray);
+               draw_mwtexture2(tx,ty,theme_all_terrain_l[theme_cur_tile_crater_id],tw,tw);
+               //draw_set_color(c_dgray);
+               //draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
                end;
 mgsl_liquid  : begin
-               draw_set_color(c_gray);
-               draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
+               draw_set_color(c_white);
+               draw_mwtexture2(tx,ty,theme_all_terrain_l[theme_cur_tile_liquid_id],tw,tw);
+
+               //draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
                end;
 mgsl_rocks   : begin
                draw_set_color(c_ltgray);
-               draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
+               draw_mwtexture2(tx,ty,theme_all_terrain_l[theme_cur_tile_crater_id],tw,tw);
+
+               //draw_set_color(c_ltgray);
+               //draw_frect(trunc(mmx),trunc(mmy),trunc(mmx+map_mm_gridW),trunc(mmy+map_mm_gridW));
+
                end;
          end;
 
@@ -518,10 +537,10 @@ var i  :byte;
 begin
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
-     if(cpCaptureR>0)then
-      if((i=0)and(map_scenario=ms_KotH))or(cpenergy<=0)
-      then map_MinimapSpot(cpmx,cpmy,cpmr,char_cp ,c_purple)
-      else map_MinimapSpot(cpmx,cpmy,cpmr,char_gen,c_white );
+     if(kp_CaptureR>0)then
+      if((i=0)and(map_scenario=ms_KotH))or(kp_energy<=0)
+      then map_MinimapSpot(kp_MiniMapX,kp_MiniMapY,kp_MiniMapR,char_cp ,c_purple)
+      else map_MinimapSpot(kp_MiniMapX,kp_MiniMapY,kp_MiniMapR,char_gen,c_white );
 end;
 
 procedure map_RedrawMenuMinimap;

@@ -629,7 +629,7 @@ TUPID = record  // upgrade
    _up_time_xpl,
    _up_time_apl,
    _up_max      : integer;
-   _up_mfrg     : boolean;
+   _up_multi    : boolean;
 
    {$IFDEF _FULLGAME}
    _up_btn      : pTMWTexture;
@@ -660,59 +660,61 @@ end;
 PTLogMes = ^TLogMes;
 
 TPlayer = record
-   name    : shortstring;
+   name         : shortstring;
 
    team,
    race ,slot_race,
    player_type,
-   pnum    : byte;
+   pnum         : byte;
 
    build_cd,
    army,
    cenergy,
-   menergy : integer;
+   menergy      : integer;
    armylimit
-           : longint;
+                : longint;
 
    isdefeated,
    isobserver,
    isrevealed,
-   isready : boolean;
+   isready      : boolean;
 
-   o_id    : byte;
+   o_id         : byte;
    o_a0,
    o_x0,o_y0,
    o_x1,o_y1
-           : integer;
+                : integer;
 
-   ucl_e,                                        // existed class
-   ucl_eb,                                       // existed class iscomplete=true and hits>0
+   ucl_e,                                             // existed class
+   ucl_eb,                                            // existed class iscomplete=true and hits>0
    ucl_s,
-   ucl_x   : array[false..true,byte] of integer; // first unit class
+   ucl_x        : array[false..true,byte] of integer; // first unit class
 
    uid_e,
    uid_eb,
    uid_s,
-   uid_x   : array[byte] of integer;
+   uid_x        : array[byte] of integer;
 
-   ucl_c,                                        // count buildings/units
-   ucl_cs  : array[false..true] of integer;      // count selected buildings/units
-   ucl_l   : array[false..true] of longint;      // limit buildings/units
+   ucl_c,                                             // count buildings/units
+   ucl_cs       : array[false..true] of integer;      // count selected buildings/units
+   ucl_l        : array[false..true] of longint;      // limit buildings/units
 
-   uprodl  : longint;                            // current limit in production
-   uprodm,                                       // current max unit productions
-   uproda  : integer;                            // current productions
-   uprodc  : array[byte] of integer;
-   uprodu  : array[byte] of integer;
+   uprod_limit  : longint;                            // current limit in production
+   uprod_now_all,                                     // current max unit productions
+   uprod_max
+                : integer;                            // current productions
+   uprod_now_ucl,
+   uprod_now_uid
+                : array[byte] of integer;
 
-   upprodm,
-   upproda : integer;
-   upprodu,
-   upgr    : array[byte] of byte;
+   pprod_max,
+   pprod_now    : integer;
+   pprod_now_uid,
+   upgr         : array[byte] of byte;
 
-   a_upgrs,
-   a_units : array[byte] of integer;
-   a_builders: integer;
+   a_upgrs,                                           // allowed
+   a_units      : array[byte] of integer;
+   a_builders   : integer;
 
 
    ai_max_ulimit,
@@ -892,12 +894,12 @@ TUnit = record
    anim,animf,
    shadow
             : integer;
-   lvlstr_w,  // weapon upgrades
-   lvlstr_r,  // reload
-   lvlstr_b,  // buffs
-   lvlstr_l,  // level
-   lvlstr_a,  // armor
-   lvlstr_s   // other upgrs
+   statstr_WeaponUpgr, // weapon upgrades
+   statstr_ArmorUpgr,  // armor  upgrades
+   statstr_OtherUpgr,  // other  upgrades
+   statstr_Reload,     // reload
+   statstr_Buffs,      // buffs
+   statstr_Level       // level
             : string6;
    mmap_TickOrder
             : byte;
@@ -909,26 +911,26 @@ end;
 PTUnit = ^TUnit;
 PPTUnit = ^PTUnit;
 
-TCTPoint = record
-   cpx ,cpy ,
-   cpsolidr,cpCaptureR,cpNoBuildR,
-   cp_ToCenterD,
-   cpmx,cpmy,cpmr,
-   cpenergy,
-   cpCaptureTime,
-   cpTimer      : integer;
-   cplifetime   : cardinal;
-   cpTimerTeam,
-   cpTimerPlayer,
-   cpOwnerPlayer,
-   cpOwnerTeam  : byte;
-   cpZone       : word;
-   cpunitst_pstate,
-   cpUnitsTeam,
-   cpunitsp_pstate,
-   cpUnitsPlayer: array[0..LastPlayer] of longint;
+TKeyPoint = record
+   kp_x ,kp_y ,
+   kp_solidR,kp_CaptureR,kp_NoBuildR,
+   kp_ToCenterD,
+   kp_MiniMapX,kp_MiniMapY,kp_MiniMapR,
+   kp_energy,
+   kp_CaptureTime,
+   kp_Timer     : integer;
+   kp_lifeTime  : cardinal;
+   kp_TimerTeam,
+   kp_TimerPlayer,
+   kp_OwnerPlayer,
+   kp_OwnerTeam  : byte;
+   kp_Zone       : word;
+   kp_TeamLimit_p,
+   kp_TeamUnits,
+   kp_PlayerUnit_p,
+   kp_PlayerUnits: array[0..LastPlayer] of longint;
 end;
-PTCTPoint = ^TCTPoint;
+PTCTPoint = ^TKeyPoint;
 
 TMapPreset = record
    mapp_name    : shortstring;

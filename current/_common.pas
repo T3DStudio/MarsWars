@@ -979,7 +979,7 @@ begin
     with g_uids[uid] do
      if(_ukbuilding)and(menergy<=0)
      then uid_CheckPlayerLimit:=false
-     else uid_CheckPlayerLimit:=((uid_e[uid]+uprodu[uid])<a_units[uid])and((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+_limituse)<=MaxPlayerLimit);
+     else uid_CheckPlayerLimit:=((uid_e[uid]+uprod_now_uid[uid])<a_units[uid])and((army+uprod_now_all)<MaxPlayerUnits)and((armylimit+uprod_limit+_limituse)<=MaxPlayerLimit);
 end;
 
 function uid_CheckRequirements(pl:PTPlayer;uid:byte):cardinal;
@@ -990,15 +990,15 @@ begin
    with pl^ do
    with g_uids[uid] do
    begin
-      setr(ureq_unitlimit ,(army     +uproda          )>=MaxPlayerUnits);
-      setr(ureq_armylimit ,(armylimit+uprodl+_limituse)> MaxPlayerLimit);
+      setr(ureq_unitlimit ,(army     +uprod_now_all          )>=MaxPlayerUnits);
+      setr(ureq_armylimit ,(armylimit+uprod_limit+_limituse)> MaxPlayerLimit);
       setr(ureq_ruid      ,(_ruid1>0)and(uid_eb[_ruid1]<_ruid1n));
       setr(ureq_ruid      ,(_ruid2>0)and(uid_eb[_ruid2]<_ruid2n));
       setr(ureq_ruid      ,(_ruid3>0)and(uid_eb[_ruid3]<_ruid3n));
       setr(ureq_rupid     ,(_rupgr>0)and(upgr  [_rupgr]<_rupgrl));
       setr(ureq_energy    , cenergy<_renergy                     );
       setr(ureq_time      , _btime<=0                            );
-      setr(ureq_max       ,(uid_e[uid]+uprodu[uid])>=a_units[uid]);
+      setr(ureq_max       ,(uid_e[uid]+uprod_now_uid[uid])>=a_units[uid]);
 
       case _ukbuilding of
 true  : begin
@@ -1015,7 +1015,7 @@ begin
    upid_CalcCostEnergy:=0;
    with g_upids[upgr] do
     if(0<lvl)and(lvl<=_up_max)then
-     if(_up_mfrg)or((_up_renerg_xpl<=0)and(_up_renerg_apl<=0))
+     if(_up_multi)or((_up_renerg_xpl<=0)and(_up_renerg_apl<=0))
      then upid_CalcCostEnergy:=_up_renerg
      else
      begin
@@ -1029,7 +1029,7 @@ begin
    upid_CalcCostTime:=0;
    with g_upids[upgr] do
     if(0<lvl)and(lvl<=_up_max)then
-     if(_up_mfrg)or((_up_time_xpl<=0)and(_up_time_apl<=0))
+     if(_up_multi)or((_up_time_xpl<=0)and(_up_time_apl<=0))
      then upid_CalcCostTime:=_up_time
      else
      begin
@@ -1052,8 +1052,8 @@ begin
       setr(ureq_rupid  ,(_up_rupgr>0)and(upgr  [_up_rupgr]=0)  );
       setr(ureq_energy , cenergy<upid_CalcCostEnergy(up,upgr[up]+1)   );
       setr(ureq_time   , _up_time<=0                           );
-      setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2i(_up_max,a_upgrs[up])));
-      setr(ureq_product,(_up_mfrg=false)and(upprodu[up]>0)     );
+      setr(ureq_max    ,(integer(upgr[up]+pprod_now_uid[up])>=min2i(_up_max,a_upgrs[up])));
+      setr(ureq_product,(_up_multi=false)and(pprod_now_uid[up]>0)     );
       setr(ureq_smiths , n_smiths<=0                           );
    end;
 end;
@@ -1517,9 +1517,10 @@ var  f:Text;
 tmpStr:shortstring;
 begin
    Assign(f,str_outLogFName);
-   if FileExists(str_outLogFName)
-   then Append (f)
-   else Rewrite(f);
+   //if FileExists(str_outLogFName)
+   //then Append (f)
+   //else
+   Rewrite(f);
    tmpStr:=str_NowDateTime(true);
    if(str_outLogLastDate<>tmpStr)then
    begin
@@ -1696,10 +1697,10 @@ begin
    GetCPColor:=c_gray;
    if(cp<=LastKeyPoint)then
      with g_KeyPoints[cp] do
-       if(cpCaptureR>0)then
-         if(cpTimer>0)and(ui_blink3=0)
-         then GetCPColor:=PlayerColorNormal[cpTimerPlayer]
-         else GetCPColor:=PlayerColorNormal[cpOwnerPlayer];
+       if(kp_CaptureR>0)then
+         if(kp_Timer>0)and(ui_blink3=0)
+         then GetCPColor:=PlayerColorNormal[kp_TimerPlayer]
+         else GetCPColor:=PlayerColorNormal[kp_OwnerPlayer];
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

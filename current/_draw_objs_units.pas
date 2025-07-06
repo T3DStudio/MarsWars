@@ -7,7 +7,7 @@ begin
       draw_set_target(tex_ui_MiniMap0);
 
       draw_set_color(PlayerColorNormal[player^.pnum]);
-      if(uid^._ukbuilding)and(_mmr>0)
+      if(_ukbuilding)and(_mmr>0)
       then draw_frect(mmx-_mmr,mmy-_mmr,mmx+_mmr,mmy+_mmr)
       else draw_pixel(mmx,mmy                            );
 
@@ -20,14 +20,13 @@ begin
               exit;
            end;
 
-         if(_ability=ua_UScan)and(reload>radar_vision_time)then
-           if(ui_minimap_scan_blink)then
-           begin
-              draw_set_color(PlayerColorShadow[pnum]);
-              draw_fcircle(trunc(ua_x  *map_mm_cx),
-                           trunc(ua_y  *map_mm_cx),
-                           trunc(srange*map_mm_cx));
-           end;
+         if(_ability=ua_UScan)and(reload>radar_vision_time)and(ui_minimap_scan_blink)then
+         begin
+            draw_set_color(PlayerColorShadow[pnum]);
+            draw_fcircle(trunc(ua_x  *map_mm_cx),
+                         trunc(ua_y  *map_mm_cx),
+                         trunc(srange*map_mm_cx));
+         end;
       end;
       draw_set_target(nil);
    end;
@@ -92,9 +91,9 @@ begin
 end;
 
 
-procedure ui_ProductionCounters(pu:PTUnit;pn:integer);
-var i,t:byte;
-    pcurrent:boolean;
+procedure ui_ProductionCounters(pu:PTUnit;prod_line:integer);
+var i   :byte;
+pcurrent:boolean;
 begin
    with pu^     do
    with uid^    do
@@ -103,32 +102,41 @@ begin
       if(_isbarrack)then
       begin
          pcurrent:=(s_barracks<=0)or(isselected);
-         if(pcurrent)then ui_uprod_max+=1;
-
-         if(uprod_r[pn]>0)then
+         if(pcurrent)then
          begin
-            if(pcurrent)then ui_uprod_cur+=1;
-            i:=uprod_u[pn];
-            if(ui_uprod_first      <=0)or(uprod_r[pn]<ui_uprod_first      )then ui_uprod_first      :=uprod_r[pn];
-            if(ui_uprod_uid_time[i]<=0)or(uprod_r[pn]<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[pn];
-         end
-         else
-           for t:=1 to 255 do
-            if(pcurrent)then
-             if(t in ups_units)then ui_uprod_uid_max[t]+=1; // possible productions count of each unit type
+            ui_uprod_all_max+=1;
+            for i:=1 to 255 do
+              if(i in ups_units)then ui_uprod_uid_max[i]+=1; // possible productions count of each unit type
+
+            if(uprod_r[prod_line]>0)then
+            begin
+               ui_uprod_all_now+=1;
+               i:=uprod_u[prod_line];
+               ui_uprod_uid_now[i]+=1;
+               if(ui_uprod_first_time <=0)or(uprod_r[prod_line]<ui_uprod_first_time )then ui_uprod_first_time :=uprod_r[prod_line];
+               if(ui_uprod_uid_time[i]<=0)or(uprod_r[prod_line]<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[prod_line];
+            end;
+         end;
       end;
 
       if(_issmith)then
       begin
-         for t:=1 to 255 do
-          if(s_smiths<=0)or(isselected)then
-           if(t in ups_upgrades)then ui_pprod_max[t]+=1;    // possible productions count of each upgrade type
-
-         if(pprod_r[pn]>0)then
+         pcurrent:=(s_smiths<=0)or(isselected);
+         if(pcurrent)then
          begin
-            i:=pprod_u[pn];
-            if(ui_pprod_first  <=0)or(pprod_r[pn]<  ui_pprod_first)then ui_pprod_first  :=pprod_r[pn];
-            if(ui_pprod_time[i]<=0)or(pprod_r[pn]<ui_pprod_time[i])then ui_pprod_time[i]:=pprod_r[pn];
+            ui_pprod_all_max+=1;
+            for i:=1 to 255 do
+              if(i in ups_upgrades)then
+                if(g_upids[i]._up_multi)then
+                  ui_pprod_pid_max[i]+=1;
+
+            if(pprod_r[prod_line]>0)then
+            begin
+               ui_pprod_all_now+=1;
+               i:=pprod_u[prod_line];
+               if(ui_pprod_first_time <=0)or(pprod_r[prod_line]<ui_pprod_first_time )then ui_pprod_first_time :=pprod_r[prod_line];
+               if(ui_pprod_pid_time[i]<=0)or(pprod_r[prod_line]<ui_pprod_pid_time[i])then ui_pprod_pid_time[i]:=pprod_r[prod_line];
+            end;
          end;
       end;
    end;
@@ -166,45 +174,51 @@ var i:byte;
     t:integer;
 begin
    with pu^ do
-   if(playeri=ui_player)then
    with uid^ do
    with player^ do
    begin
       if(group<=MaxUnitGroups)then ui_IncGroupCounter(@ui_groups_d[group],x,y,uidi);
       if(UnitF2Select(pu)    )then ui_IncGroupCounter(@ui_groups_f2      ,x,y,uidi); // all battle units
-      if (_ukbuilding)
-      and(_isbuilder)         then ui_IncGroupCounter(@ui_groups_f1      ,x,y,uidi); // all builders
+      if(UnitF1Select(pu)    )then ui_IncGroupCounter(@ui_groups_f1      ,x,y,uidi); // all builders
 
       if(_ukbuilding)then
       begin
          if(iscomplete)then
          begin
             if(n_builders>0)and(isbuildarea)then
-            begin
-               ui_bprod_possible+=ups_builder;
-               if(0<m_brush)and(m_brush<=255)then
-                if(m_brush in ups_builder)then
-                 //if(RectInCam(x,y,srange,srange,0))then UIInfoItemAddCircle(x,y,srange,ui_color_blink1[ui_blink2_colorb]);
-            end;
+              if(s_builders<=0)or(isselected)then
+              begin
+                 ui_bprod_possible+=ups_builder;
+                 if(0<m_brush)and(m_brush<=255)then
+                   if(m_brush in ups_builder)then
+                     if(RectInCam(x,y,srange,srange,0))then UIInfoItemAddCircle(x,y,srange,ui_color_blink1[ui_blink2_colorb]);
+              end;
 
-            for i:=0 to MaxUnitLevel do
-             if(i>level)
-             then break
-             else ui_ProductionCounters(pu,i);
+            if(_issmith)then
+              for i:=1 to 255 do
+                if(i in ups_upgrades)then
+                  if(not g_upids[i]._up_multi)then
+                    ui_pprod_pid_max[i]:=1;
+
+            if(_isbarrack)or(_issmith)then
+              for i:=0 to MaxUnitLevel do
+                if(i>level)
+                then break
+                else ui_ProductionCounters(pu,i);
          end;
-         if(isselected)and(UnitHaveRPoint(pu^.uidi))then SpriteListAddMarker(ua_x,ua_y,@spr_mp[_urace]);
+         if(isselected)and(UnitHaveRPoint(pu^.uidi))then SpriteListAddMarker(ua_x,ua_y,spr_mp[_urace]);
       end;
 
       if(iscomplete)then
       begin
-         if(reload<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=reload;
+         if(reload<ui_uid_reload[uidi])or(ui_uid_reload[uidi]<0)then ui_uid_reload[uidi]:=reload;
          if(_ukbuilding)then
            if(reload<ui_bucl_reload[_ucl])or(ui_bucl_reload[_ucl]<0)then ui_bucl_reload[_ucl]:=reload;
 
          if(isselected)then
          begin
             if(speed>0)then ui_uibtn_move+=1;
-            {if (ua_id<>ua_ability1)
+            {if(ua_id<>ua_ability1)
             and(ua_id<>ua_ability2)
             and(ua_id<>ua_ability3)
             and(unit_canAbility(pu)=0)then ui_uibtn_abilityu :=pu; }
@@ -215,14 +229,13 @@ begin
          t:=min2i(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
          if(t>0)then
          begin
-            if(ui_bprod_ucl_time[_ucl]<=0)
-            or(ui_bprod_ucl_time[_ucl]> t)then ui_bprod_ucl_time[_ucl]:=t;
-            if(ui_bprod_NearTime<=0)
-            or(ui_bprod_NearTime> t)then ui_bprod_NearTime:=t;
+            if(ui_bprod_first_ucl[_ucl]<=0)
+            or(ui_bprod_first_ucl[_ucl]> t)then ui_bprod_first_ucl[_ucl]:=t;
+            if(ui_bprod_first_time<=0)
+            or(ui_bprod_first_time> t)then ui_bprod_first_time:=t;
          end;
-         ui_bprod_uid_count[uidi]+=1;
-         ui_bprod_ucl_count[_ucl]+=1;
-         ui_bprod_all            +=1;
+         ui_bprod_ucl_now[_ucl]+=1;
+         ui_bprod_all          +=1;
       end;
    end;
 end;
@@ -254,14 +267,18 @@ end;
 
 procedure unit_UpdateStatusStrings(pu:PTUnit);
 var i,
-al,wl,sl:integer;
-   atset:TSoB;
-procedure WeaponUpgrInc(upgr:byte);
+alevel,
+wlevel,
+slevel:integer;
+ apset,
+ wpset,
+ spset:TSoB;
+procedure UpgrInc(upgr:byte;plevel_var:pinteger;pupgrades_var:PTSoB);
 begin
-   if not(upgr in atset)then
+   if not(upgr in pupgrades_var^)then
    begin
-      wl+=pu^.player^.upgr[upgr];
-      atset+=[upgr];
+      plevel_var^+=pu^.player^.upgr[upgr];
+      pupgrades_var^+=[upgr];
    end;
 end;
 begin
@@ -270,64 +287,70 @@ begin
    with player^ do
    begin
       // buffs and level
-      lvlstr_b:='';
-      if(buff[ub_Detect  ]>0)then lvlstr_b+=char_detect;
+      statstr_Buffs:='';
+      if(buff[ub_Detect]>0)then statstr_Buffs+=char_detect;
 
-      lvlstr_l:='';
-      if(not _ukbuilding)or(_isbarrack)or(_issmith)then
-       case level of
-       1: lvlstr_l:='>';
-       2: lvlstr_l:='||';
-       3: lvlstr_l:='* * *';
-       end;
-     // else
-     //   if(level>0)then lvlstr_b+=char_advanced;
+      statstr_Level:='';
+      case level of
+      1: statstr_Level:='>';
+      2: statstr_Level:='||';
+      3: statstr_Level:='* * *';
+      end;
 
       // reload
       if(reload>0)
-      then lvlstr_r:=tc_aqua+i2s(it2s(reload))
-      else lvlstr_r:='';
+      then statstr_Reload:=tc_aqua+i2s(it2s(reload))
+      else statstr_Reload:='';
 
-      // weapon/attack
-      sl      :=0;
-      wl      :=0;
-      atset   :=[];
+      alevel:=0;
+      slevel:=0;
+      wlevel:=0;
+      apset :=[];
+      spset :=[];
+      wpset :=[];
+
+      // weapon
       for i:=0 to MaxUnitWeapons do
-       with _a_weap[i] do
-        if(aw_reload>0)then
-        begin
-           if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
-           if(aw_rupgr>0)and(aw_rupgr_l<=upgr[aw_rupgr])then sl+=1;
-        end;
-      lvlstr_w:=i2s6(wl,_attack);
-      if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w;
+        with _a_weap[i] do
+          if(aw_reload>0)then
+          begin
+             if(aw_dupgr>0)then UpgrInc(aw_dupgr,@wlevel,@wpset);
+             if(aw_rupgr>0)and(upgr[aw_rupgr]>=aw_rupgr_l)then UpgrInc(aw_dupgr,@slevel,@spset);
+          end;
+      statstr_WeaponUpgr:=i2s6(wlevel,_attack);
+      if(length(statstr_WeaponUpgr)>0)then statstr_WeaponUpgr:=tc_red+statstr_WeaponUpgr;
 
       // armor
-      al:=upgr[_upgr_armor];
+      UpgrInc(_upgr_armor,@alevel,@apset);
       if(_ukbuilding)
-      then al+=upgr[upgr_race_armor_build[_urace]]
+      then UpgrInc(upgr_race_armor_build[_urace],@alevel,@apset)
       else
         if(_ukmech)
-        then al+=upgr[upgr_race_armor_mech[_urace]]
-        else al+=upgr[upgr_race_armor_bio [_urace]];
-      lvlstr_a:=tc_lime+i2s6(al,true);
+        then UpgrInc(upgr_race_armor_mech[_urace],@alevel,@apset)
+        else UpgrInc(upgr_race_armor_bio [_urace],@alevel,@apset);
+      statstr_ArmorUpgr:=tc_lime+i2s6(alevel,true);
 
       // other
-      sl+=integer(upgr[_upgr_regen]+upgr[_upgr_srange]);
+      UpgrInc(_upgr_regen ,@slevel,@spset);
+      UpgrInc(_upgr_srange,@slevel,@spset);
       if(_ukbuilding)
-      then sl+=integer(upgr[upgr_race_regen_build[_urace]])
+      then UpgrInc(upgr_race_regen_build[_urace],@slevel,@spset)
       else
       begin
-         sl+=upgr[upgr_race_unit_srange[_urace]];
-         if(_ukmech)
-         then sl+=integer(upgr[upgr_race_regen_mech [_urace]]+upgr[upgr_race_mspeed_mech[_urace]])
+         UpgrInc(upgr_race_unit_srange[_urace],@slevel,@spset);
+         if(_ukmech)then
+         begin
+            UpgrInc(upgr_race_regen_mech [_urace],@slevel,@spset);
+            UpgrInc(upgr_race_mspeed_mech[_urace],@slevel,@spset);
+         end
          else
          begin
-            sl+=integer(upgr[upgr_race_regen_bio[_urace]]+upgr[upgr_race_mspeed_bio [_urace]]);
-            if(_urace=r_hell)then sl+=upgr[upgr_hell_pains];
+            UpgrInc(upgr_race_regen_bio [_urace],@slevel,@spset);
+            UpgrInc(upgr_race_mspeed_bio[_urace],@slevel,@spset);
+            if(_urace=r_hell)then UpgrInc(upgr_hell_pains,@slevel,@spset);
          end;
       end;
-      lvlstr_s:=tc_yellow+i2s6(sl,true);
+      statstr_OtherUpgr:=tc_yellow+i2s6(slevel,true);
    end;
 end;
 
@@ -357,7 +380,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      ui_counters(pu);
+      if(playeri=ui_player)then ui_counters(pu);
 
       if(unit_FogReveal(pu))then
       begin

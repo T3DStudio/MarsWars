@@ -428,13 +428,13 @@ uhb_selected: ;
       if(srect)then
       begin
          if(playeri=ui_player)
-         then UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a        ,lvlstr_s        );
-        // UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,lvlstr_l,c_white);
+         then UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,i2s6(group,false),'',statstr_Buffs,i2s6(transportM,false),i2s6(transportC,false))
+         else UIInfoItemAddRectText(vx-sm_sel_hw,vy-sm_sel_hh,vx+sm_sel_hw,vy+sm_sel_hh,acolor,statstr_WeaponUpgr         ,'',statstr_Buffs,statstr_ArmorUpgr        ,statstr_OtherUpgr        );
+        // UIInfoItemAddText(vx,vy-sm_sel_hh-basefont_w1,statstr_Level,c_white);
       end;
       if(hbar)then UIInfoItemProgressbar(vx-sm_sel_hw,vy-sm_sel_hh-4,vx+sm_sel_hw,vy-sm_sel_hh,hits/_mhits,acolor);
 
-    //  if(reload>0)and(playeri=ui_player)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,lvlstr_r,c_aqua);
+    //  if(reload>0)and(playeri=ui_player)then UIInfoItemAddText(vx,vy-sm_sel_hh+basefont_w1,statstr_Reload,c_aqua);
 
      { if(speed<=0)or(not iscomplete)then
         case m_brush of
@@ -738,9 +738,9 @@ var t,i:integer;
 begin
    for t:=1 to LastKeyPoint do
     with g_KeyPoints[t] do
-     if(cpCaptureR>0)then
+     if(kp_CaptureR>0)then
      begin
-        if(not RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then continue;
+        if(not RectInCam(kp_x,kp_y,kp_CaptureR,kp_CaptureR,0))then continue;
 
       //  color:=GetCPColor(t);
 
@@ -750,28 +750,28 @@ begin
            begin
               ddir:=(i*mark_step)*degtorad;
               {SpriteListAddEffect(
-              cpx+round(cpCaptureR*cos(ddir)),
-              cpy+round(cpCaptureR*sin(ddir)),
-              sd_ground+cpy,ShadowColor(color),@spr_cp_koth,255);}
+              kp_x+round(kp_CaptureR*cos(ddir)),
+              kp_y+round(kp_CaptureR*sin(ddir)),
+              sd_ground+kp_y,ShadowColor(color),@spr_cp_koth,255);}
            end;
         end
         else
-          {if(cpenergy<=0)
-          then SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_out,255)
+          {if(kp_energy<=0)
+          then SpriteListAddEffect(kp_x,kp_y,sd_tcraters+kp_y,ShadowColor(color),@spr_cp_out,255)
           else
           begin
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0                 ,@spr_cp_out,255);
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_gen,255);
+             SpriteListAddEffect(kp_x,kp_y,sd_tcraters+kp_y,0                 ,@spr_cp_out,255);
+             SpriteListAddEffect(kp_x,kp_y,sd_tcraters+kp_y,ShadowColor(color),@spr_cp_gen,255);
           end; }
 
-        if(ui_MapPointInRevealedInScreen(cpx,cpy))then
+        if(ui_MapPointInRevealedInScreen(kp_x,kp_y))then
         begin
-          // if(cpTimer   >0)then UIInfoItemAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
-        //   if(cplifetime>0)then UIInfoItemAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+          // if(kp_Timer   >0)then UIInfoItemAddText(kp_x,kp_y+10,ir2s(kp_CaptureTime-kp_Timer),color  );
+        //   if(kp_lifeTime>0)then UIInfoItemAddText(kp_x,kp_y   ,cr2s(kp_lifeTime           ),c_white);
         end;
 
        // for i:=0 to MaxPlayers do
-       //  UIInfoItemAddText(cpx,cpy+(i+2)*10,i2s(cpunitsp_pstate[i])+' '+i2s(cpunitst_pstate[i]),c_white);
+       //  UIInfoItemAddText(kp_x,kp_y+(i+2)*10,i2s(kp_PlayerUnit_p[i])+' '+i2s(kp_TeamLimit_p[i]),c_white);
      end;
 end;
 

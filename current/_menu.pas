@@ -665,7 +665,7 @@ begin
       if(menu_list_item_hh>=basefont_w1h)then
       begin
          menu_list_fontS:=basefont_w1h;
-         menu_list_font :=font_Doom;
+         menu_list_font :=font_Base;
       end
       else
       begin
@@ -978,6 +978,8 @@ mi_StartGame              : if(menu_list_selected>-1)then
                             else
                             begin
                                menu_list_SetCommonSettings(menu_item,nil);
+                               menu_list_fontS:=fontSize_DoomSubTitle;
+                               menu_list_font :=font_Doom;
                                menu_list_aleft:=true;
                                menu_list_current:=-1;
                                menu_list_AddItem(str_menu_Campaings ,mp_campaings ,true ,0);
@@ -1003,6 +1005,8 @@ mi_EndGame                : if(menu_list_selected>-1)then
                             else
                             begin
                                menu_list_SetCommonSettings(menu_item,nil);
+                               menu_list_fontS:=fontSize_DoomSubTitle;
+                               menu_list_font :=font_Doom;
                                menu_list_aleft:=true;
                                menu_list_current:=-1;
                                if(rpls_rstate=rpls_state_read)

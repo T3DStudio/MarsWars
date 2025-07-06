@@ -871,11 +871,11 @@ begin
    with pu^ do
     for i:=1 to LastKeyPoint do
      with g_KeyPoints[i] do
-      if(cpCaptureR>0)then
-       if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then
+      if(kp_CaptureR>0)then
+       if(point_dist_int(x,y,kp_x,kp_y)<=kp_CaptureR)then
        begin
-          cpUnitsPlayer[playeri     ]+=uid^._limituse;
-          cpUnitsTeam  [player^.team]+=uid^._limituse;
+          kp_PlayerUnits[playeri     ]+=uid^._limituse;
+          kp_TeamUnits  [player^.team]+=uid^._limituse;
        end;
 end;
 
