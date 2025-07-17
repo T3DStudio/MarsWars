@@ -37,22 +37,22 @@ ServerSide        : boolean = true; // only server side code
 
 UnitStepTicks     : byte = 8;
 
-_players          : TPList;
-_units            : array[0..MaxUnits   ] of TUnit;
-_punits           : array[0..MaxUnits   ] of PTUnit;
+g_players         : TPList;
+g_units           : array[0..MaxUnits   ] of TUnit;
+g_punits          : array[0..MaxUnits   ] of PTUnit;
 
-_missiles         : array[1..MaxMissiles] of TMissile;
+g_missiles        : array[1..MaxMissiles] of TMissile;
 
-_cycle_order      : integer = 0;
-_cycle_regen      : integer = 0;
+g_cycle_order     : integer = 0;
+g_cycle_regen     : integer = 0;
 
-_uids             : array[byte] of TUID;
-_upids            : array[byte] of TUPID;
-_mids             : array[byte] of TMID;
-_dmods            : array[byte] of TDamageMod;
+g_uids            : array[byte] of TUID;
+g_upids           : array[byte] of TUPID;
+g_mids            : array[byte] of TMID;
+g_dmods           : array[byte] of TDamageMod;
 
-_LastCreatedUnit  : integer = 0;
-_LastCreatedUnitP : PTUnit;
+LastCreatedUnit   : integer = 0;
+LastCreatedUnitP  : PTUnit;
 
 HPlayer           : byte = 1; // 'this' player
 
@@ -64,6 +64,7 @@ map_iseed         : word     = 0;
 map_rpos          : byte     = 0;
 map_mw            : integer  = 5000;
 map_hmw           : integer  = 2500;
+map_decor_gap     : integer  = 40;
 map_b1            : integer  = 0;
 map_obs           : byte     = 1;
 map_symmetry      : boolean  = true;
@@ -186,12 +187,13 @@ menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_scir;
 menu_s3           : byte = ms3_game;
 
-m_chat            : boolean = false;
+menu_ihint        : byte=0;
+menu_ihintpi      : byte=255;
+menu_ihintlx      : array[0..menu_ihintn] of integer = (228,570,228,570);
+menu_ihintly      : array[0..menu_ihintn] of integer = (76 ,76 ,307,271);
 
 m_vrx,
-m_vry,
-mv_x,
-mv_y              : integer;
+m_vry             : integer;
 
 PlayerName        : shortstring = 'DoomPlayer';
 PlayerTeam        : byte = 1;
@@ -220,6 +222,8 @@ vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
 vid_cam_x         : integer = 0;
 vid_cam_y         : integer = 0;
+vid_cam_cx        : integer = 0;
+vid_cam_cy        : integer = 0;
 vid_cam_fx        : integer = 0;
 vid_cam_fy        : integer = 0;
 vid_CamSpeed      : integer = 25;
@@ -260,7 +264,7 @@ ter_h             : integer;
 font_ca           : array[char] of TMWTexture;
 
 _eids             : array[byte] of TEID;
-_effects          : array[1..vid_mvs] of TEffect;
+g_effects          : array[1..vid_mvs] of TEffect;
 
 ms_eid_bio_death_uids
                   : TSoB;
@@ -273,14 +277,20 @@ map_mmvw,
 map_mmvh          : integer;
 
 cmp_skill         : byte = 3;
-cmp_mmap          : array[0..MaxMissions] of pSDL_Surface;
+cmp_data_b1       : byte = 0;
+cmp_data_b2       : byte = 0;
+cmp_data_b3       : byte = 0;
+cmp_data_c1       : cardinal = 0;
+cmp_mmap          : array[0..LastMission] of pSDL_Surface;
+cmp_minfo_page    : integer = 0;
+cmp_minfo_lpage   : integer = 0;
 
+net_error_timer   : byte = 0;
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
-net_cl_svpl       : byte = 0;
+net_cl_Hoster     : byte = 0;
 net_cl_svstr      : shortstring = '127.0.0.1:10666';
-net_m_error       : shortstring = '';
 net_sv_pstr       : shortstring = '10666';
 net_chat_shlm     : integer = 0;
 net_chat_str      : shortstring = '';
@@ -320,8 +330,8 @@ rpls_file_head_size
 rpls_file_size    : cardinal = 0;
 rpls_log_c        : cardinal = 0;
 
-_cmp_sm           : integer = 0;
-_cmp_sel          : integer = 0;
+cmp_scroll        : integer = 0;
+cmp_sel           : integer = 0;
 
 
 mouse_select_x0,
@@ -380,8 +390,14 @@ ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_sabilityu: PTUnit  = nil; // ui self ability order unit
+ui_uibtn_sabilityd: integer = integer.MaxValue;
+ui_uibtn_sabilitys: boolean = false;
 ui_uibtn_pabilityu: PTUnit  = nil; // ui point ability order unit
+ui_uibtn_pabilityd: integer = integer.MaxValue;
+ui_uibtn_pabilitys: boolean = false;
 ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
+ui_uibtn_rebuildd : integer = integer.MaxValue;
+ui_uibtn_rebuilds : boolean = false;
 ui_uhint          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -615,7 +631,7 @@ spr_HBarracks1,
 spr_HBarracks2,
 spr_HBarracks3,
 spr_HBarracks4,
-spr_HEye,
+spr_HEyeNest,
 
 spr_UCommandCenter,
 spr_UACommandCenter,
@@ -637,14 +653,26 @@ spr_UWeaponFactory3,
 spr_UWeaponFactory4,
 spr_UTurret,
 spr_URadar,
-//spr_UVehicleFactory,
+
 spr_UTechCenter,
 spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,
 spr_URocketL,
+
 spr_Mine,
-//spr_u_portal,
+spr_portal,
+spr_starport,
+spr_ubase0,
+spr_ubase1,
+spr_ubase2,
+spr_ubase3,
+spr_ubase4,
+spr_ubase5,
+spr_ubuild0,
+spr_ubuild1,
+spr_ubuild2,
+spr_ubuild3,
 
 spr_eff_bfg,
 spr_eff_eb,
@@ -717,6 +745,7 @@ spr_b_selall,
 spr_b_cancel,
 spr_b_delete,
 spr_mback,
+spr_mbtn,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_b_ab          : array[byte] of pSDL_Surface;
@@ -802,6 +831,7 @@ str_cant_execute,
 str_use_sability,
 str_use_spability,
 str_ability_reloading,
+str_invalid_target,
 str_cant_land,
 str_cpoint_captured,
 str_cpoint_lost,
@@ -885,6 +915,7 @@ str_sfull,
 str_sgst,
 str_udpport,
 str_connecting,
+str_portblocked,
 str_pnu,
 str_npnu,
 str_soundvol,
@@ -902,12 +933,21 @@ str_svld_errors_file,
 str_svld_errors_open,
 str_svld_errors_wdata,
 str_svld_errors_wver,
-str_rpls_errors_open,
+str_PTPlayer,
+str_PTState,
+str_PTRace,
+str_PTTeam,
+str_PTColor,
+str_PTPing,
 str_start,
 str_surrender,
 str_quit,
 str_exit,
 str_back,
+str_cmp_unk,
+str_cmp_Date,
+str_cmp_Location,
+str_cmp_Area,
 str_MObjectives,
 str_MMap,
 str_MPlayers      : shortstring;
@@ -923,9 +963,14 @@ str_hint_r,
 str_hint_o        : array[0.._mhkeys] of shortstring;
 str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
-{str_camp_t        : array[0..MaxMissions] of shortstring;
-str_camp_o        : array[0..MaxMissions] of shortstring;
-str_camp_m        : array[0..MaxMissions] of shortstring; }
+str_menu_hint     : array[byte] of shortstring;
+
+str_camp_name,
+//str_camp_obj,
+//str_camp_plot,
+str_camp_map      : array[0..LastMission] of shortstring;
+str_camp_infol    : array[0..LastMission] of TStringList;
+str_camp_infon    : array[0..LastMission] of integer;
 
 str_connect,
 str_svup,
@@ -981,6 +1026,7 @@ snd_unit_promoted
 
 snd_radar,
 
+snd_uac_mine,
 snd_uac_cc,
 snd_uac_barracks,
 snd_uac_generator,

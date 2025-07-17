@@ -9,14 +9,14 @@ un_eid_snd_set:boolean;
 procedure setMWSModel(level:byte;mwsm:PTMWSModel);
 var l:byte;
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for l:=level to MaxUnitLevel do
    un_smodel[l]:=mwsm;
 end;
 
 procedure setCommandSND(ready,move,attack,annoy,select:PTSoundSet); // command sounds
 begin
-   with _uids[u] do
+   with g_uids[u] do
    begin
       un_snd_ready :=ready;
       un_snd_move  :=move;
@@ -52,7 +52,7 @@ end;
 
 procedure _SetRLDA(aa:byte;rld:TSoB);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=aa to MaxUnitWeapons do
    with _a_weap[aa] do
    begin
@@ -65,7 +65,7 @@ begin setCommandSND(nil,s,s,s,s);end;
 
 procedure setEffectEID(aa:byte;summon,death,fdeath,pain:byte);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=aa to MaxUnitLevel do
    with _a_weap[aa] do
    begin
@@ -77,7 +77,7 @@ begin
 end;
 procedure setEffectEID2(aa:byte;summonspr:PTMWTexture);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=aa to MaxUnitLevel do
    with _a_weap[aa] do
    begin
@@ -86,7 +86,7 @@ begin
 end;
 procedure setEffectSND(summon,death,fdeath,pain:PTSoundSet);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    begin
       un_eid_snd_summon:=summon;
       un_eid_snd_death :=death;
@@ -98,7 +98,7 @@ end;
 
 procedure setFOOT(footsnd:PTSoundSet;footanim:integer);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    begin
       un_eid_snd_foot:=footsnd;
       un_foot_anim   :=footanim;
@@ -107,7 +107,7 @@ end;
 
 procedure setWeaponESND(aa:byte;snd_start,snd_shot:PTSoundSet;eid_start,eid_shot:byte);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=aa to MaxUnitWeapons do
    with _a_weap[aa] do
    begin
@@ -119,7 +119,7 @@ begin
 end;
 procedure setWeaponTEID(aa:byte;snd_target:PTSoundSet;eid_target:byte;rld_a:TSoB);
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=aa to MaxUnitWeapons do
    with _a_weap[aa] do
    begin
@@ -131,7 +131,7 @@ end;
 procedure setWeaponESND2(aaset:TSoB;snd_start,snd_shot:PTSoundSet;eid_start,eid_shot:byte);
 var aa:byte;
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=0 to MaxUnitWeapons do
    if(aa in aaset)then
    with _a_weap[aa] do
@@ -145,7 +145,7 @@ end;
 procedure setWeaponTEID2(aaset:TSoB;snd_target:PTSoundSet;eid_target:byte;rld_a:TSoB);
 var aa:byte;
 begin
-   with _uids[u] do
+   with g_uids[u] do
    for aa:=0 to MaxUnitWeapons do
    if(aa in aaset)then
    with _a_weap[aa] do
@@ -160,7 +160,7 @@ begin
    FillChar(ui_panel_uids,SizeOf(ui_panel_uids),0);
 
    for u:=0 to 255 do
-   with _uids[u] do
+   with g_uids[u] do
    begin
       un_eid_snd_set:=false;
       setMWSModel(0,@spr_dmodel);
@@ -497,13 +497,12 @@ begin
    setMWSModel(0,@spr_HFortress);
    setBuildingSND(snd_hell_hfort);
 end;
-UID_HEye:
+UID_HEyeNest:
 begin
-   setMWSModel(0,@spr_HEye);
+   setMWSModel(0,@spr_HEyeNest);
    setBuildingSND(snd_hell_eye);
-   un_eid_bcrater:=255;
-   setEffectEID(0,0  ,UID_HEye,UID_HEye,0  );
-   setEffectSND(  nil,snd_pexp,snd_pexp,nil);
+   setEffectEID(0,0  ,EID_Exp2,EID_Exp2,0  );
+   setEffectSND(  nil,snd_exp,snd_exp,nil);
 end;
 UID_HCommandCenter:
 begin
@@ -796,18 +795,81 @@ end;
 UID_UMine:
 begin
    setMWSModel   (0,@spr_Mine);
-   //setBuildingSND(snd_mine_place);
-   //un_snd_ready:=snd_mine_place;
+   setBuildingSND(snd_uac_mine);
+   un_snd_ready:=snd_uac_mine;
    setWeaponESND(0,nil,snd_electro,0,0);
    setEffectEID(0,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND(  nil,snd_exp,snd_exp,nil);
    un_eid_bcrater:=255;
 end;
 
+UID_UBaseMil:
+begin
+   setMWSModel(0,@spr_ubase0);
+   setBuildingSND(snd_uac_cc);
+end;
+UID_UBaseCom:
+begin
+   setMWSModel(0,@spr_ubase1);
+   setBuildingSND(snd_uac_cc);
+end;
+UID_UBaseGen:
+begin
+   setMWSModel(0,@spr_ubase2);
+   setBuildingSND(snd_uac_generator);
+end;
+UID_UBaseRef:
+begin
+   setMWSModel(0,@spr_ubase3);
+   setBuildingSND(snd_uac_cc);
+end;
+UID_UBaseNuc:
+begin
+   setMWSModel(0,@spr_ubase4);
+   setBuildingSND(snd_uac_cc);
+end;
+UID_UBaseLab:
+begin
+   setMWSModel(0,@spr_ubase5);
+   setBuildingSND(snd_uac_cc);
+end;
+
+UID_UCBuild0:
+begin
+   setMWSModel(0,@spr_ubuild0);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_UCBuild1:
+begin
+   setMWSModel(0,@spr_ubuild1);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_UCBuild2:
+begin
+   setMWSModel(0,@spr_ubuild2);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_UCBuild3:
+begin
+   setMWSModel(0,@spr_ubuild3);
+   setBuildingSND(snd_uac_suply);
+end;
+UID_USPort  :
+begin
+   setMWSModel(0,@spr_starport);
+   setBuildingSND(snd_uac_rls);
+end;
+UID_UPortal :
+begin
+   setMWSModel(0,@spr_portal);
+   setBuildingSND(snd_uac_rescc);
+end;
+
       end;
 
-      if  (ui_panel_uids[_urace,byte(not _ukbuilding),_ucl] =0)
-      then ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]:=u;
+      if(_ucl<=ui_ubtns)then
+        if  (ui_panel_uids[_urace,byte(not _ukbuilding),_ucl] =0)
+        then ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]:=u;
 
       if(_ukbuilding)then
       begin
@@ -862,7 +924,7 @@ end;
    begin
       i:=0;
       for u:=0 to 255 do
-      with _upids[u] do
+      with g_upids[u] do
       if(_up_race=r)then
       begin
          ui_panel_uids[r,2,_up_btni]:=u;
@@ -873,7 +935,7 @@ end;
 
    // upgrades
    for u:=0 to 255 do
-   with _upids[u] do
+   with g_upids[u] do
    begin
       _up_btn:=spr_dummy;
 

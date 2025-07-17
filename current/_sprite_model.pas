@@ -389,7 +389,7 @@ end;
 
 function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;
 begin
-   with _uids[_uid] do _uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
+   with g_uids[_uid] do _uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
 end;
 
 

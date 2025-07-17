@@ -6,7 +6,7 @@ begin
    (((c and $0000FF00) shr  9) shl 8 );
 end;
 
-procedure _draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
+procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
    begin
@@ -18,7 +18,7 @@ begin
    end;
 end;
 
-procedure _draw_surf(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
+procedure draw_sdlsurface(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
 begin
    r_RECT^.x:=x;
    r_RECT^.y:=y;
@@ -28,7 +28,7 @@ begin
 end;
 
 
-procedure _draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
+procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
 var strLen,
     i,
     chars :byte;
@@ -90,7 +90,7 @@ begin
          else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
          end;
 
-         _draw_mwtexture(sur,ix,y,@font_ca[charc]);
+         draw_mwtexture(sur,ix,y,@font_ca[charc]);
 
          chars+= 1;
          ix   += font_w;
@@ -116,7 +116,7 @@ begin
    end;
 end;
 
-procedure _bmm_draw(sd:TSob);
+procedure map_MinimapBackgroundObj(sd:TSob);
 var d:integer;
 begin
    for d:=1 to MaxDoodads do
@@ -127,11 +127,11 @@ begin
       else pixelColor       (r_bminimap,mmx,mmy,    mmc);
 end;
 
-procedure map_MinimapBackground;
+procedure map_MinimapUpdateBackground;
 begin
    sdl_FillRect(r_bminimap,nil,0);
-   _bmm_draw(dids_liquids);
-   _bmm_draw([DID_other,DID_srock,DID_brock]);
+   map_MinimapBackgroundObj(dids_liquids);
+   map_MinimapBackgroundObj([DID_other,DID_srock,DID_brock]);
 end;
 
 procedure map_minimap_cpoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
@@ -150,7 +150,7 @@ begin
       if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
 
       //if(g_ai_slots=0)then
-      // if(_players[i].state=ps_none)then continue;
+      // if(g_players[i].state=ps_none)then continue;
 
       x:=round(map_psx[i]*map_mmcx);
       y:=round(map_psy[i]*map_mmcx);
@@ -175,11 +175,11 @@ end;
 procedure map_RedrawMenuMinimap;
 begin
    sdl_FillRect(r_minimap,nil,0);
-   map_MinimapBackground;
-   _draw_surf(r_minimap,0,0,r_bminimap);
+   map_MinimapUpdateBackground;
+   draw_sdlsurface(r_minimap,0,0,r_bminimap);
    if(g_fixed_positions)then map_MinimapPlayerStarts;
    map_MinimapCPoints;
-   _draw_surf(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
+   draw_sdlsurface(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
    rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
    vid_menu_redraw:=vid_menu_redraw or MainMenu;
 end;
@@ -201,7 +201,7 @@ begin
    if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
    str:=str+ms+':'+ss;
-   _draw_text(tar,x,y,str,ta,255,color);
+   draw_text(tar,x,y,str,ta,255,color);
 end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;
@@ -266,18 +266,18 @@ begin
    // true  - need announcer sound
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
-   with _players[UIPlayer] do
+   with g_players[UIPlayer] do
     with log_l[log_i] do
      case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
-lmt_unit_ready       : if(_uids[argx]._ukbuilding)
+lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);
 lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
 lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
-                       if(_uids[argx]._ukbuilding)
+                       if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_attacked_b,false)
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
 

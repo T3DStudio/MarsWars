@@ -5,7 +5,7 @@ begin
    net_NewPlayer:=0;
    for i:=1 to MaxPlayers do
     if(i<>HPlayer)then
-     with _Players[i] do
+     with g_players[i] do
       if(state=PS_None)then
       begin
          net_NewPlayer:=i;
@@ -27,7 +27,7 @@ begin
    net_GetPlayer:=0;
    for i:=1 to MaxPlayers do
     if(i<>HPlayer)then
-     with _Players[i] do
+     with g_players[i] do
       if(state=PS_Play)and(nip=aip)and(nport=ap)then
       begin
          net_GetPlayer:=i;
@@ -43,7 +43,7 @@ procedure net_SvReadPlayerData(pid:byte);
 var   i:byte;
 oldname:shortstring;
 begin
-   with _Players[pid] do
+   with g_players[pid] do
    begin
       oldname:=name;
       name   :=net_readstring;
@@ -51,8 +51,8 @@ begin
       if(oldname<>name)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       i:=net_readbyte;
-      if(g_mode in [gm_3x3,gm_2x2x2,gm_invasion])and(i<>0)and(team<>0)
-      then i:=PlayerGetTeam(g_mode,pid);
+      if(g_mode in gm_fixed_teams)and(i<>0)and(team<>0)
+      then i:=PlayerValidateTeam(g_mode,pid);
 
       if(i<>team)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
       team:=i;
@@ -80,7 +80,7 @@ begin
    net_writebool(G_Started);
 
    for i:=0 to MaxPlayers do
-    with _Players[i] do
+    with g_players[i] do
     begin
        net_writestring(name );
        net_writebyte  (team );
@@ -146,7 +146,7 @@ begin
          net_writebool(g_addon  );
          net_writebyte(g_mode   );
          for i:=1 to MaxPlayers do
-          with _players[i] do
+          with g_players[i] do
            if(state>ps_none)
            then net_writestring(name)
            else net_writestring(''  );
@@ -190,12 +190,6 @@ begin
 nmid_log_chat    : begin
                       i:=net_readbyte;
                       GameLogChat(pid,i,net_readstring,false);    // chat
-                      {$IFNDEF _FULLGAME}
-                      if(G_Started=false)then
-                       with _players[pid] do
-                        with log_l[log_i] do
-                         if(mtype<=MaxPlayers)or(mtype=lmt_player_chat)then Dedicated_parseCmd(str,pid);
-                      {$ENDIF}
                       continue;
                    end;
 nmid_player_leave: begin
@@ -221,7 +215,7 @@ nmid_player_surrender
             else
                if(G_Started)then
                case mid of
-nmid_order       : with _players[pid]do
+nmid_order       : with g_players[pid]do
                    begin
                       o_x0:=net_readint;
                       o_y0:=net_readint;
@@ -231,20 +225,20 @@ nmid_order       : with _players[pid]do
                       o_id:=net_readbyte;
 
                       for u:=1 to MaxUnits do
-                        with _punits[u]^ do
-                          if(hits>0)and(pid=playeri)then _unit_desel(_punits[u]);
+                        with g_punits[u]^ do
+                          if(hits>0)and(pid=playeri)then unit_UnSelect(g_punits[u]);
                       i:=net_readbyte;
                       while(i>0)do
                       begin
                          u:=net_readint;
-                         if(_IsUnitRange(u,@pu))then
+                         if(IsUnitRange(u,@pu))then
                            with pu^ do
-                             if(hits>0)and(pid=playeri)and(not _isUnitRange(transport,nil))then _unit_sel(pu);
+                             if(hits>0)and(pid=playeri)and(not IsUnitRange(transport,nil))then unit_Select(pu);
                          i-=1;
                       end;
                    end;
 nmid_map_mark    : net_ReadMapMark(pid);
-nmid_client_info : with _players[pid] do
+nmid_client_info : with g_players[pid] do
                    begin
                       PNU     :=net_readbyte;
                       log_n_cl:=net_readcard;
@@ -291,7 +285,7 @@ nmid_pause       : begin
 
    for i:=1 to MaxPlayers do
     if(i<>HPlayer)then
-     with _players[i] do
+     with g_players[i] do
       if(state=PS_Play)and(ttl<ClientTTL)then
       begin
          if(G_Started)and(net_period_step)then
@@ -319,6 +313,12 @@ nmid_pause       : begin
 end;
 
 {$IFDEF _FULLGAME}
+
+procedure net_ErrorLog(msg:shortstring);
+begin
+   if(net_error_timer=0)then GameLogChat(255,255,msg,true);
+   net_error_timer:=fr_fps2;
+end;
 
 procedure net_ClReadMapData(StartGame:boolean);
 var
@@ -359,7 +359,7 @@ procedure net_ClReadPlayerData(pid:byte);
 var   i:integer;
 oldname:shortstring;
 begin
-   with _Players[pid] do
+   with g_players[pid] do
    begin
       oldname:=name;
       name   :=net_readstring;
@@ -403,20 +403,20 @@ begin
       mid:=net_readbyte;
       case mid of
 nmid_server_full : begin
-                      net_m_error:=str_sfull;
+                      net_ErrorLog(str_sfull);
                       vid_menu_redraw:=true;
                    end;
 nmid_wrong_ver   : begin
-                      net_m_error:=str_sver;
+                      net_ErrorLog(str_sver);
                       vid_menu_redraw:=true;
                    end;
 nmid_game_started: begin
-                      net_m_error:=str_sgst;
+                      net_ErrorLog(str_sgst);
                       vid_menu_redraw:=true;
                    end;
 nmid_notconnected: begin
-                      G_Started:=false;
-                      MainMenu:=true;
+                      G_Started  :=false;
+                      MainMenu   :=true;
                       PlayerReady:=false;
                       GameDefaultAll;
                    end;
@@ -429,7 +429,7 @@ nmid_lobby_info  : begin
                       gst:=net_readbool;
 
                       for i:=0 to MaxPlayers do
-                       with _Players[i] do
+                       with g_players[i] do
                        begin
                           net_ClReadPlayerData(i);
                           if(gst)
@@ -439,24 +439,25 @@ nmid_lobby_info  : begin
                        end;
 
                       i:=HPlayer;
-                      HPlayer    :=net_readbyte;if(HPlayer    <>i)then vid_menu_redraw:=true;
-                      i:=net_cl_svpl;
-                      net_cl_svpl:=net_readbyte;if(net_cl_svpl<>i)then vid_menu_redraw:=true;
+                      HPlayer:=net_readbyte;if(HPlayer    <>i)then vid_menu_redraw:=true;
+                      i:=net_cl_Hoster;
+                      net_cl_Hoster:=net_readbyte;
+                      if(net_cl_Hoster<>i)then vid_menu_redraw:=true;
 
                       net_ClReadMapData(gst);
-                      net_m_error:='';
+                      net_error_timer:=0;
 
                       if(gst<>G_Started)then
                       begin
                          G_Started:=gst;
                          if(G_Started)then
                          begin
-                            MainMenu:=false;
+                            MainMenu  :=false;
                             ServerSide:=false;
                             MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
-                            if(_players[HPlayer].team=0)then
+                            if(g_players[HPlayer].team=0)then
                             begin
-                               ui_tab:=3;
+                               ui_tab  :=3;
                                UIPlayer:=0;
                             end;
                          end

@@ -4,7 +4,7 @@ procedure InitMIDDataCL;
 var m:byte;
 begin
    for m:=0 to 255 do
-   with _mids[m] do
+   with g_mids[m] do
    begin
       ms_smodel   :=spr_pdmodel;
 
@@ -128,7 +128,7 @@ MID_SSShot   : begin
 
    ms_eid_bio_death_uids:=[];
    for m:=0 to 255 do
-     with _uids[m] do
+     with g_uids[m] do
        if(not _ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then ms_eid_bio_death_uids+=[m];
 end;
 
@@ -140,7 +140,7 @@ begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
      for i:=0 to MaxDamageModFactors do
-      with _dmods[dmod][i] do
+      with g_dmods[dmod][i] do
        if(dm_flags>0)then
         if(CheckUnitBaseFlags(tu,dm_flags))then
          case dm_factor of
@@ -160,12 +160,12 @@ begin
          end;
 end;
 
-procedure _missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
+procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
 var m,d:integer;
     tu:PTUnit;
 begin
     for m:=1 to MaxUnits do
-    with _missiles[m] do
+    with g_missiles[m] do
     if(vstep<=0)then
     begin
        x      := mxt;  // end point
@@ -185,17 +185,17 @@ begin
        d      := point_dist_rint(x,y,vx,vy);
 
        tu:=nil;
-       _IsUnitRange(tar,@tu);
+       IsUnitRange(tar,@tu);
 
        if(not ServerSide)then
          if(d>base_1rh)and(tu<>nil)then exit;
 
        damage:=adddmg;
        if(player<=MaxPlayers)and(tu<>nil)then
-        with _players[player] do
+        with g_players[player] do
          if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
 
-       with _mids[mid] do
+       with g_mids[mid] do
        begin
           damage+=mid_base_damage;
           homing:=mid_homing;
@@ -232,15 +232,15 @@ teams : boolean;
 ud,rdamage: integer;
      painX: byte;
 begin
-   with _missiles[m] do
-   with _mids[mid] do
-    if(_IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)and(not _IsUnitRange(tu^.transport,nil))then
+   with g_missiles[m] do
+   with g_mids[mid] do
+    if(IsUnitRange(tar,@tu))then
+     if(tu^.hits>0)and(not IsUnitRange(tu^.transport,nil))then
      begin
         if(not mid_noflycheck)and(mfs<>tu^.ukfly)then exit;
         if(tu^.uidi in mid_nodamage)then exit;
 
-        teams  :=_players[player].team=tu^.player^.team;
+        teams  :=g_players[player].team=tu^.player^.team;
 
         if(teams)then
           if(mid_base_splashr<=0)
@@ -254,7 +254,7 @@ begin
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
         if(player<=MaxPlayers)and(tu<>nil)then
-          with _players[player] do
+          with g_players[player] do
             case mid of
           MID_SSShot,
           MID_SShot  : painX+=upgr[upgr_uac_ssgup]*2;
@@ -270,13 +270,13 @@ begin
            dtars+=1;
 
            if(not fake)
-           then _unit_damage(tu,rdamage,painX,player,false);
+           then unit_damage(tu,rdamage,painX,player,false);
         end
         else
           if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^._splashresist)and(not tu^.uid^._ukmech)then // splash damage
           begin
              {$IFDEF _FULLGAME}
-             if(ms_eid_target_eff>0)then _effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
+             if(ms_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
              {$ENDIF}
 
              mtars-=1;
@@ -284,7 +284,7 @@ begin
              if(not fake)then
              begin
                 rdamage:=mm3(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
-                _unit_damage(tu,rdamage,painX,player,false);
+                unit_damage(tu,rdamage,painX,player,false);
              end;
           end;
      end;
@@ -297,12 +297,12 @@ var m,u:integer;
      tu:PTUnit;
 begin
    for m:=1 to MaxMissiles do
-   with _missiles[m] do
-   with _mids[mid] do
+   with g_missiles[m] do
+   with g_mids[mid] do
    if(vstep>0)then
    begin
       tu:=nil;
-      if(_IsUnitRange(tar,@tu))then
+      if(IsUnitRange(tar,@tu))then
        if(homing>mh_none)then
         if(tu^.buff[ub_teleport]>0)
         then homing:=mh_none
@@ -350,7 +350,7 @@ mh_homing   : begin
       if(vstep=0)then
       begin
          if(damage>0)and(mid_base_splashr>=0)then
-          if _IsUnitRange(tar,nil)and(mtars=1)
+          if IsUnitRange(tar,nil)and(mtars=1)
           then _missle_damage(m)
           else
             for u:=1 to MaxUnits do
@@ -361,14 +361,14 @@ mh_homing   : begin
             end;
 
          {$IFDEF _FULLGAME}
-         _missile_explode_effect(m);
+         missile_explode_effect(m);
          {$ENDIF}
       end
       {$IFDEF _FULLGAME}
       else
         if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
          if((vstep mod ms_eid_fly_st)=0)then
-           if(MapPointInScreenP(vx,vy,true))then _effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
+           if(MapPointInScreenP(vx,vy,true))then effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;

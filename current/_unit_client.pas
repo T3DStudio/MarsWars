@@ -68,7 +68,7 @@ var t,s:integer;
 begin
    _wudata_log:=false;
    if(p<=MaxPlayers)then
-    with _players[p] do
+    with g_players[p] do
     begin
        s:=0;
 
@@ -238,7 +238,7 @@ begin
 
       if(sel or not rpl)then
         if(_UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
-          if(_IsUnitRange(uo_tar,nil))
+          if(IsUnitRange(uo_tar,nil))
           then _wudata_int(-uo_tar,rpl)
           else
           begin
@@ -255,7 +255,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(_players[POVPlayer].team,pu,true))or(rpl)or(_players[POVPlayer].observer)
+      if(CheckUnitTeamVision(g_players[POVPlayer].team,pu,true))or(rpl)or(g_players[POVPlayer].observer)
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
@@ -284,7 +284,7 @@ begin
             if(a_tar_cl>0)and(a_rld>0)then
             begin
                wt:=0;
-               if(_IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
+               if(IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
                wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
                _wudata_word(wt,rpl);
             end;
@@ -297,7 +297,7 @@ begin
                  _wudata_byte(byte(uo_y shr 5),rpl);
               end;
 
-            if(playeri=POVPlayer)or(_players[POVPlayer].observer)then _wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then _wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
@@ -308,12 +308,12 @@ var p,n,bp,bv:byte;
 begin
    for p:=1 to MaxPlayers do
     if(GetBBit(@g_player_astatus,p))then
-     with _players[p] do
+     with g_players[p] do
      begin
         bp:=0;
 
         for n:=0 to 255 do
-         if(race=_upids[n]._up_race)then
+         if(race=g_upids[n]._up_race)then
           case bp of
           0: begin
                 bv:=upgr[n];
@@ -405,7 +405,7 @@ begin
    else wstepb1:=wstepb0;                // every second
 
    if(rpl=false)and(wstepb1)then
-    with _players[POVPlayer] do _wudata_rld(@build_cd,rpl);
+    with g_players[POVPlayer] do _wudata_rld(@build_cd,rpl);
 
    if(wstepb0)then
      if(g_mode=gm_capture)
@@ -430,14 +430,14 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
    end
    else
    begin
-      _PNU:= _players[POVPlayer].PNU;
-      _N_U:=@_players[POVPlayer].n_u;
+      _PNU:= g_players[POVPlayer].PNU;
+      _N_U:=@g_players[POVPlayer].n_u;
    end;
 
    if(not rpl)
    then UpdatePlayersStatus;
 
-   if(g_player_astatus>0)and(_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
+   if(g_player_astatus>0)and(g_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
 
    _wudata_byte(g_player_astatus,rpl);
    if(g_player_astatus>0)then
@@ -458,7 +458,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
             _N_U^+=1;
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
          until ( g_player_astatus and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
-         _wudata_main(@_units[_N_U^],rpl,POVPlayer);
+         _wudata_main(@g_units[_N_U^],rpl,POVPlayer);
       end;
    end;
 end;
@@ -485,28 +485,28 @@ begin
       if(_isbuilder)then e_builders+=1;
 
       ptransport:=nil;
-      if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
+      if(IsUnitRange(transport,@ptransport))then ptransport^.transportC+=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)and(rpl)then _unit_counters_inc_select(pu);
+         if(sel)and(rpl)then unit_counters_inc_select(pu);
          if(iscomplete=false)
          then cenergy-=_renergy
          else
          begin
-            _unit_bld_inc_cntrs(pu);
+            unit_bld_inc_cntrs(pu);
 
             p:=@ucl_x[_ukbuilding,_ucl];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
-                  if(_units[p^].uid^._ucl<>_ucl)then p^:=unum;
+                  if(g_units[p^].uid^._ucl<>_ucl)then p^:=unum;
 
             p:=@uid_x[uidi];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
-                  if(_units[p^].uidi<>uidi)then p^:=unum;
+                  if(g_units[p^].uidi<>uidi)then p^:=unum;
 
             if(_isbarrack)then
              for i:=0 to MaxUnitLevel do
@@ -514,11 +514,11 @@ begin
               begin
                  _puid:=uprod_u[i];
 
-                 uprodl+=_uids[_puid]._limituse;
+                 uprodl+=g_uids[_puid]._limituse;
                  uproda+=1;
-                 uprodc[_uids[_puid]._ucl]+=1;
+                 uprodc[g_uids[_puid]._ucl]+=1;
                  uprodu[      _puid      ]+=1;
-                 cenergy-=_uids[_puid]._renergy;
+                 cenergy-=g_uids[_puid]._renergy;
               end;
             if(_issmith)then
              for i:=0 to MaxUnitLevel do
@@ -528,7 +528,7 @@ begin
 
                  upproda+=1;
                  upprodu[_puid]+=1;
-                 pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                 pprod_e[i]:=GetUpgradeEnergy(_puid,upgr[_puid]+1);
                  cenergy-=pprod_e[i];
               end;
          end;
@@ -553,11 +553,11 @@ begin
       if(_isbuilder)then e_builders-=1;
 
       ptransport:=nil;
-      if(_IsUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;
+      if(IsUnitRange(transport,@ptransport))then ptransport^.transportC-=_transportS;
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)and(rpl)then _unit_counters_dec_select(pu);
+         if(sel)and(rpl)then unit_counters_dec_select(pu);
          if(iscomplete=false)
          then cenergy+=_renergy
          else
@@ -569,7 +569,7 @@ begin
             if(ucl_x[_ukbuilding,_ucl]=unum)then ucl_x[_ukbuilding,_ucl]:=0;
             if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
 
-            _unit_done_dec_cntrs(pu);
+            unit_done_dec_cntrs(pu);
 
             if(_isbarrack)then
              for i:=0 to MaxUnitLevel do
@@ -577,11 +577,11 @@ begin
               begin
                  _puid:=uprod_u[i];
 
-                 uprodl-=_uids[_puid]._limituse;
+                 uprodl-=g_uids[_puid]._limituse;
                  uproda-=1;
-                 uprodc[_uids[_puid]._ucl]-=1;
+                 uprodc[g_uids[_puid]._ucl]-=1;
                  uprodu[      _puid      ]-=1;
-                 cenergy+=_uids[_puid]._renergy;
+                 cenergy+=g_uids[_puid]._renergy;
               end;
             if(_issmith)then
              for i:=0 to MaxUnitLevel do
@@ -591,7 +591,7 @@ begin
 
                  upproda-=1;
                  upprodu[_puid]-=1;
-                 //pprod_e[i]:=_upid_energy(_puid,upgr[_puid]+1);
+                 //pprod_e[i]:=GetUpgradeEnergy(_puid,upgr[_puid]+1);
                  cenergy+=pprod_e[i];
               end;
          end;
@@ -634,7 +634,7 @@ procedure _unit_clear_a_tar(tar:integer);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
-     with _punits[u]^ do
+     with g_punits[u]^ do
        if(a_tar=tar)then a_tar:=0;
 end;
 
@@ -644,12 +644,12 @@ var pu,tu:PTUnit;
 begin
    // pu - previous state
    // uu - current state
-   pu:=@_units[0];
+   pu:=@g_units[0];
 
    if(not rpl)then
     if(pu^.uidi<>uu^.uidi)then
     begin
-       _unit_desel(pu);
+       unit_UnSelect(pu);
        uu^.group:=0;
        uu^.sel:=false;
     end
@@ -657,7 +657,7 @@ begin
       if(uu^.hits<=0)
       or(uu^.transport>0)then
       begin
-         _unit_desel(uu);
+         unit_UnSelect(uu);
          uu^.group:=0;
       end;
 
@@ -665,20 +665,20 @@ begin
     with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
-        _unit_default(uu,true);
-        _unit_reveal (uu,true);
+        unit_SetDefaults(uu,true);
+        unit_reveal (uu,true);
         vx:=x;
         vy:=y;
         vis:=CheckUnitUIVisionScreen(uu);
 
-        if(_IsUnitRange(transport,@tu))then
+        if(IsUnitRange(transport,@tu))then
         begin
            _unit_InTransportCode(uu,tu);
            vx:=x;
            vy:=y;
         end;
 
-        _unit_upgr(uu);
+        unit_Bonuses(uu);
 
         if(hits>0)then
         begin
@@ -695,7 +695,7 @@ begin
            end;
         end;
 
-        _missiles_clear_tar(unum,true);
+        missiles_clear_tar(unum,true);
         _unit_clear_a_tar(unum);
 
         _ucInc(uu,rpl);
@@ -703,7 +703,7 @@ begin
      else
        if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
        begin
-          _unit_upgr(pu);
+          unit_Bonuses(pu);
 
           vx:=x;
           vy:=y;
@@ -723,7 +723,7 @@ begin
 
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
-          _missiles_clear_tar(unum,true);
+          missiles_clear_tar(unum,true);
           _unit_clear_a_tar(unum);
 
           _ucDec(pu,rpl);
@@ -735,15 +735,15 @@ begin
             begin
                vx:=x;
                vy:=y;
-               _missiles_clear_tar(unum,true);
+               missiles_clear_tar(unum,true);
                _unit_clear_a_tar(unum);
             end;
             vis:=CheckUnitUIVisionScreen(uu);
 
-            _unit_upgr(pu);
+            unit_Bonuses(pu);
             _ucDec(pu,rpl);
 
-            _unit_upgr(uu);
+            unit_Bonuses(uu);
             _ucInc(uu,rpl);
 
             if(hits>0)then
@@ -768,11 +768,11 @@ begin
                   if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
                    case uid^._ability of
                0:;
-               uab_UACStrike   : _unit_umstrike_missile(uu);
-               uab_UACScan     : if(team=_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+               uab_UACStrike   : unit_UACStrike_missile(uu);
+               uab_UACScan     : if(team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
                uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
-                                 then _ability_unit_spawn(pu,UID_Phantom )
-                                 else _ability_unit_spawn(pu,UID_LostSoul);
+                                 then ability_unit_spawn(pu,UID_Phantom )
+                                 else ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then
@@ -799,14 +799,14 @@ begin
 
                  with uid^ do
                   if(_death_missile>0)
-                  then _missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
+                  then missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
 
                  if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 
-            if(not _IsUnitRange(pu^.transport,nil))then
-             if(_IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
+            if(not IsUnitRange(pu^.transport,nil))then
+             if(IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
 
             if(speed>0)then
             begin
@@ -816,7 +816,7 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               _unit_update_xy(uu);
+               unit_update_xy(uu);
 
                if(speed>0)then
                begin
@@ -825,7 +825,7 @@ begin
                end;
                if(speed<=0)or(buff[ub_Teleport]>0)then
                begin
-                  _missiles_clear_tar(unum,true);
+                  missiles_clear_tar(unum,true);
                   _unit_clear_a_tar(unum);
                end;
             end;
@@ -1006,8 +1006,8 @@ begin
          buff[ub_Decay   ]:=0;
       end;
 
-      if(not rpl)and(not _players[POVPlayer].observer)then
-       with _players[POVPlayer] do
+      if(not rpl)and(not g_players[POVPlayer].observer)then
+       with g_players[POVPlayer] do
         if(team>0)then
           _AddToInt(@vsnt[team],vistime);
    end;
@@ -1077,7 +1077,7 @@ begin
         if(_UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
         begin
            uo_x:=_rudata_int(rpl,0);
-           if(_IsUnitRange(-uo_x,@tu))then
+           if(IsUnitRange(-uo_x,@tu))then
            begin
               uo_tar:=-uo_x;
               uo_x  :=tu^.vx;
@@ -1101,16 +1101,16 @@ begin
    if(SkipRead)then
    begin
       ou:=uu;
-      _units[0].unum:=uu^.unum;
-      uu:=@_units[0];
+      g_units[0].unum:=uu^.unum;
+      uu:=@g_units[0];
    end
-   else _units[0]:=uu^;
+   else g_units[0]:=uu^;
 
    with uu^ do
    begin
       cycle_order:=unum mod order_period;
       playeri:=(unum-1) div MaxPlayerUnits;
-      player :=@_players[playeri];
+      player :=@g_players[playeri];
       if(not DEAD)
       then sh:=_rudata_sint(rpl,-128)
       else
@@ -1125,7 +1125,7 @@ begin
          if(i<>uidi)then
          begin
             _unit_apUID(uu);
-            _unit_default(uu,false);
+            unit_SetDefaults(uu,false);
             FillChar(buff,SizeOf(buff),0);
          end;
          hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
@@ -1134,7 +1134,7 @@ begin
          if(transport>0)then
          begin
             transport:=_rudata_int(rpl,0);
-            if(_IsUnitRange(transport,nil)=false)then transport:=0;
+            if(IsUnitRange(transport,nil)=false)then transport:=0;
          end
          else
            if(sh>0)then
@@ -1165,7 +1165,7 @@ begin
                  uo_y:=integer(_rudata_byte(rpl,0) shl 5);
               end;
 
-            if(playeri=POVPlayer)or(_players[POVPlayer].observer)then _rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then _rudata_OwnerUData(uu,rpl);
          end;
       end
       else
@@ -1180,7 +1180,7 @@ begin
       ou^.y :=uu^.y;
       ou^.vx:=uu^.x;
       ou^.vy:=uu^.y;
-      _unit_update_xy(ou);
+      unit_update_xy(ou);
    end
    else _netSetUcl(uu,rpl);
 end;
@@ -1191,12 +1191,12 @@ var p,n,bp,bv:byte;
 begin
    for p:=1 to MaxPlayers do
     if(GetBBit(@g_player_astatus,p))then
-     with _players[p] do
+     with g_players[p] do
      begin
         bp:=0;
 
         for n:=0 to 255 do
-        with _upids[n] do
+        with g_upids[n] do
          if(race=_up_race)then
          case bp of
          0: begin
@@ -1244,7 +1244,7 @@ begin
          CPoint_ChangeOwner(cpi,p);
          cpTimerOwnerPlayer:=(b and %11100000) shr 5;
          if(cpTimerOwnerPlayer<=MaxPlayers)
-         then cpTimerOwnerTeam:=_players[cpTimerOwnerPlayer].team;
+         then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team;
 
          case t of
 %00000001 : ;
@@ -1278,7 +1278,7 @@ begin
    else wstepb1:=wstepb0;
 
    if(rpl=false)and(wstepb1)then
-    with _players[POVPlayer] do
+    with g_players[POVPlayer] do
      _rudata_rld(@build_cd,rpl);
 
    if(wstepb0)then
@@ -1305,7 +1305,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
       if(g_mode=gm_invasion)then
         if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
 
-      _players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
+      g_players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
 
       _PNU:=_rudata_byte(rpl,0)*4;
 
@@ -1328,7 +1328,7 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
          _rpdata_upgr(rpl);
          g_player_rstatus:=_rudata_byte(rpl,0);
          for i:=0 to MaxPlayers do
-          with _players[i] do
+          with g_players[i] do
            revealed:=GetBBit(@g_player_rstatus,i);
       end;
 
@@ -1339,12 +1339,12 @@ gm_royale   : g_royal_r:=_rudata_int(rpl,0);
          begin
            _N_U+=1;
            if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
-           _units[_N_U].unum:=_N_U;
+           g_units[_N_U].unum:=_N_U;
            if( g_player_astatus and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0
            then break
-           else _rudata_main(@_units[_N_U],rpl,true,POVPlayer,fast_skip);
+           else _rudata_main(@g_units[_N_U],rpl,true,POVPlayer,fast_skip);
          end;
-         _rudata_main(@_units[_N_U],rpl,false,POVPlayer,fast_skip);
+         _rudata_main(@g_units[_N_U],rpl,false,POVPlayer,fast_skip);
       end;
    end;
 end;

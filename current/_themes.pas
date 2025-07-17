@@ -465,9 +465,9 @@ begin
 
    6: begin  // HELL
          SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'1,27'                  );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1,27'                  );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'1,27'                  );
+         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'1,27,23'               );
+         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1,27,23'               );
+         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'1,27,23'               );
          SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4,8_9,11'              );
          SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
          SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
@@ -489,9 +489,66 @@ begin
          theme_liquid_style:=0;
          theme_crater_style:=0;
       end;
+
+
    end;
    SetTLBlC;
 end;
 
+procedure SetThemeCampaing(theme_id:byte);
+begin
+   case theme_id of
+   0
+    : begin  // CAMPAINGS:  HELL
+         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
+         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
+         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,9,13,14,16,20,21,28,36,42_47');
+
+         theme_liquid_style:=0;
+         theme_crater_style:=0;
+
+         case theme_id of
+         0: begin
+            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'23');
+            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1' );
+            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'27');
+            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4' );
+            end;
+         end;
+      end;
+
+   1,2
+    : begin  // CAMPAINGS: PHOBOS
+         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4_17,23_25' );
+         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8,20_23'          );
+         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4,9_12'           );
+         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_12,18,22_27,29_34');
+
+         theme_liquid_style:=0;
+         theme_crater_style:=0;
+
+         case theme_id of
+         1: begin
+            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'3' );
+            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0' );
+            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'23');
+            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0' );
+            end;
+         2: begin
+            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'4' );
+            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'2' );
+            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'22');
+            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'1' );
+            end;
+         end;
+
+      end;
+   end;
+   theme_map_trt :=theme_terrains[0];
+   theme_map_blqt:=theme_bliquids[0];
+   theme_map_crt :=theme_craters [0];
+   theme_map_lqt :=theme_liquids [0];
+end;
 
 

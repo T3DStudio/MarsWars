@@ -138,7 +138,7 @@ begin
 end;
 procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
 begin
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       un_txt_name  :=NAME;
       un_txt_udescr:=DESCR;
@@ -147,7 +147,7 @@ end;
 
 procedure _mkHStrUpid(upid:byte;NAME,DESCR:shortstring);
 begin
-   with _upids[upid] do
+   with g_upids[upid] do
    begin
       _up_name :=NAME;
       _up_descr:=DESCR;
@@ -174,8 +174,8 @@ begin
    findprd:='';
    for i:=0 to 255 do
    begin
-      if(uid in _uids[i].ups_units  )then _ADDSTR(@up,_uids[i].un_txt_name,sep_comma);
-      if(uid in _uids[i].ups_builder)then _ADDSTR(@bp,_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_units  )then _ADDSTR(@up,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_builder)then _ADDSTR(@bp,g_uids[i].un_txt_name,sep_comma);
    end;
 
    if(length(up)>0)then _ADDSTR(@findprd,up,sep_comma);
@@ -187,12 +187,12 @@ function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
    begin
-      pu:=@_units[0];
+      pu:=@g_units[0];
       with pu^ do
       begin
          uidi:=auid;
          playeri:=0;
-         player :=@_players[playeri];
+         player :=@g_players[playeri];
          _unit_apUID(pu);
          hits:=-32000;
       end;
@@ -271,7 +271,7 @@ var i:byte;
 begin
    DamageStr:='';
    for i:=0 to MaxDamageModFactors do
-    with _dmods[dmod][i] do
+    with g_dmods[dmod][i] do
      if(dm_factor<>100)and(dm_flags>0)then
       _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
@@ -285,8 +285,8 @@ end;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 
@@ -294,12 +294,12 @@ function _MakeDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):
 function RebuildStr(uid:byte;levelup:boolean):shortstring;
 begin
   if(levelup)
-  then RebuildStr:='"'+_uids[uid].un_txt_name+'['+str_attr_level+'+1]"'
-  else RebuildStr:='"'+_uids[uid].un_txt_name+'"';
+  then RebuildStr:='"'+g_uids[uid].un_txt_name+'['+str_attr_level+'+1]"'
+  else RebuildStr:='"'+g_uids[uid].un_txt_name+'"';
 end;
 begin
    _MakeDefaultDescription:='';
-    with _uids[uid] do
+    with g_uids[uid] do
     begin
        if(not for_doc)then
        _ADDSTR(@_MakeDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
@@ -346,9 +346,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+_uids[UID_Cyberdemon].un_txt_name+','
-                                                                                +_uids[UID_Mastermind].un_txt_name+','
-                                                                                +_uids[UID_ArchVile  ].un_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
+                                                                                +g_uids[UID_Mastermind].un_txt_name+','
+                                                                                +g_uids[UID_ArchVile  ].un_txt_name+']'
     else
      if(tset= uids_demons)
      then instr:='['+str_demons+']'
@@ -375,14 +375,14 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           _ADDSTR(@instr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@instr,g_uids[u].un_txt_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           _ADDSTR(@exstr,_uids[u].un_txt_name,sep_comma);
+           _ADDSTR(@exstr,g_uids[u].un_txt_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
       end;
    end;
@@ -402,7 +402,7 @@ var BaseDmg,
     sps    : single;
 begin
   _MakeWeaponDPS:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   with _a_weap[wid] do
   begin
      BaseDmg:=0;
@@ -410,12 +410,12 @@ begin
      case aw_type of
      wpt_suicide   : if(_death_missile>0)then
                      begin
-                        BaseDmg:=_mids[_death_missile].mid_base_damage;
+                        BaseDmg:=g_mids[_death_missile].mid_base_damage;
                         ocount:=1;
                      end
                      else exit;       //wpt_suicide
      wpt_missle    : begin
-                     BaseDmg:=_mids[aw_oid].mid_base_damage;
+                     BaseDmg:=g_mids[aw_oid].mid_base_damage;
                      if(aw_count>=0)
                      then ocount:=aw_count
                      else ocount:=2;
@@ -457,7 +457,7 @@ const tab : array[false..true] of shortstring = ('-','- ');
 var
 dmod_str:shortstring;
 begin
-  with _uids[uid] do
+  with g_uids[uid] do
    with _a_weap[wid] do
    begin
       _MakeWeaponString:='';
@@ -470,7 +470,7 @@ begin
                       else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
       wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
       wpt_heal      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
       wpt_suicide   :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
       end;
 
@@ -516,11 +516,11 @@ begin
       if(docSTR)then
       begin
          if(aw_type=wpt_missle)then
-          with _mids[aw_oid] do
+          with g_mids[aw_oid] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_type=wpt_suicide)and(_death_missile>0)then
-          with _mids[_death_missile] do
+          with g_mids[_death_missile] do
            if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          dmod_str:='';
@@ -547,7 +547,7 @@ wtp_GroundLight  : dmod_str:='[ground,light]';
            _ADDSTR(@_MakeWeaponString,'target priority: '+dmod_str,sep_scomma);
 
          if(aw_dupgr>0)then
-           _ADDSTR(@_MakeWeaponString,'upgrade: '+_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
+           _ADDSTR(@_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
       end;
 
       dmod_str:='';
@@ -575,7 +575,7 @@ var w:byte;
 weapons_str:shortstring;
 begin
   _MakeWeaponsDescription:='';
-  with _uids[uid] do
+  with g_uids[uid] do
   begin
      weapons_str:='';
      if(_attack=atm_always)then
@@ -598,7 +598,7 @@ var HK,
     INFO:shortstring;
     i   :byte;
 begin
-  with _upids[upid] do
+  with g_upids[upid] do
   begin
      HK  :=_gHK(_up_btni);
      ENRG:='';
@@ -613,20 +613,20 @@ begin
      HK:=_gHK(_up_btni);
      if(_up_renerg>0)then
        if(curlvl<255)
-       then ENRG:=tc_aqua +i2s(_upid_energy(upid,curlvl))+tc_default
+       then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
        else
          if(_up_max>0)then
          begin
-            for i:=1 to _up_max do _ADDSTR(@ENRG,i2s(_upid_energy(upid,i)),'/');
+            for i:=1 to _up_max do _ADDSTR(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
             ENRG:=tc_aqua+ENRG+tc_default;
          end;
      if(_up_time  >0)then
        if(curlvl<255)
-       then TIME:=tc_white+i2s(_upid_time(upid,curlvl)div fr_fps1)+tc_default
+       then TIME:=tc_white+i2s(GetUpgradeTime(upid,curlvl)div fr_fps1)+tc_default
        else
          if(_up_max>0)then
          begin
-            for i:=1 to _up_max do _ADDSTR(@TIME,i2s(_upid_time(upid,i)div fr_fps1),'/');
+            for i:=1 to _up_max do _ADDSTR(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
             TIME:=tc_white+TIME+tc_default;
          end;
      if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
@@ -647,7 +647,7 @@ TIME,REQ    :shortstring;
 begin
    // units
    for uid:=0 to 255 do
-   with _uids[uid] do
+   with g_uids[uid] do
    begin
       REQ :='';
       PROD:='';
@@ -670,10 +670,10 @@ begin
          LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
 
          PROD:=findprd(uid);
-         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
-         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
-         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
-         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
+         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
+         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
+         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
+         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
 
          if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
          if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
@@ -699,20 +699,117 @@ begin
 
    // upgrades
    for uid:=0 to 255 do
-   with _upids[uid] do
+   with g_upids[uid] do
    begin
       REQ  :='';
 
-      if(_up_ruid  >0)then _ADDSTR(@REQ,_uids [_up_ruid ].un_txt_name,sep_comma);
-      if(_up_rupgr >0)then _ADDSTR(@REQ,_upids[_up_rupgr]._up_name   ,sep_comma);
+      if(_up_ruid  >0)then _ADDSTR(@REQ,g_uids [_up_ruid ].un_txt_name,sep_comma);
+      if(_up_rupgr >0)then _ADDSTR(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_requirements+tc_default+REQ;
    end;
 end;
 
+function str_Center0(src:shortstring;l:byte):shortstring;
+begin
+  str_Center0:=src ;
+   if(length(src)<l)then
+   begin
+      l-=length(src);
+      l:=l div 2;
+      if(l<1)then l:=1;
+      while(l>0)do
+      begin
+         str_Center0:=' '+str_Center0;
+         l-=1;
+      end;
+   end;
+end;
+
+function str_AddSpaces(src:shortstring;size:byte):shortstring;
+var l,i:byte;
+begin
+   src:=Trim(src);
+   l:=length(src);
+   i:=1;
+   if(l>0)and(l>((size div 3)*2))and(pos(' ',src)>0)then
+     while(l<size)do
+     begin
+        while(src[i]=' ') do
+          if(i=l)
+          then i:=1
+          else i+=1;
+
+        while(src[i]<>' ') do
+          if(i=l)
+          then i:=1
+          else i+=1;
+
+        insert(' ',src,i);
+        l+=1;
+     end;
+   str_AddSpaces:=src;
+end;
+
+procedure str_AddToStrList(pslist:PTStringList;psln:pinteger;size:integer;newPara:boolean;newstr:shortstring);
+var i,l,s:byte;
+procedure AddToList(s:shortstring);
+begin
+   psln^+=1;
+   setlength(pslist^,psln^);
+   pslist^[psln^-1]:=s;
+end;
+begin
+   if(psln^>0)and(newPara)then AddToList('');
+   newstr:=trim(newstr);
+   l:=length(newstr);
+   i:=1;
+   s:=255;
+   while(l>0)do
+   begin
+      if(l<=size)then
+      begin
+         AddToList(newstr);
+         break;
+      end;
+
+      if(i=size)or(i=l)then
+      begin
+         if(s=255)or(i=l)then s:=i;
+         AddToList(str_AddSpaces(copy(newstr,1,s),size));
+         delete(newstr,1,s);
+         l:=length(newstr);
+         i:=1;
+         s:=255;
+         continue;
+      end;
+
+      if(newstr[i]=' ')
+      or(newstr[i]='-')
+      or(newstr[i]=',')then s:=i;
+      i+=1;
+   end;
+end;
+
+procedure cmp_AddPlot(mission:byte;newPara:boolean;text:shortstring);
+begin
+   str_AddToStrList(@str_camp_infol[mission],@str_camp_infon[mission],37,newPara,text);
+end;
+
+function str_cmp_map(date,location,area:shortstring):shortstring;
+begin
+   str_cmp_map:=str_cmp_Date    +tc_nl2+
+                  str_Center0(date    ,14)+tc_nl2+
+                str_cmp_Location+tc_nl2+
+                  str_Center0(location,14)+tc_nl2+
+                str_cmp_Area    +tc_nl2+
+                  str_Center0(area    ,14);
+end;
+
 procedure lng_eng;
 var t: shortstring;
+    i:byte;
 begin
    str_MMap              := 'MAP';
    str_MPlayers          := 'PLAYERS';
@@ -751,7 +848,7 @@ begin
    str_race[r_random]    := tc_white +'RANDOM'+tc_default;
    str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
    str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
-   str_observer          := 'OBSERV.';
+   str_observer          := 'OBSERVER';
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
    str_gsunknown         := 'Unknown status!';
@@ -819,6 +916,12 @@ begin
    str_menu_controls     := '- use the left and right mouse buttons to manipulate the menu items -';
    str_RecordingStart    := 'Start recording: ';
    str_RecordingStop     := 'Stop recording: ';
+   str_PTPlayer          := 'PLAYER';
+   str_PTState           := 'STATUS';
+   str_PTRace            := 'RACE';
+   str_PTTeam            := 'TEAM';
+   str_PTColor           := 'COLOR';
+   str_PTPing            := 'PING+';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -866,6 +969,7 @@ begin
    str_ngen_captured     := 'The Neutral Generator was captured!';
    str_ngen_lost         := 'The Neutral Generator was lost!';
    str_ngen_exh          := 'The Neutral Generator was exhausted!';
+   str_invalid_target    := 'Invalid target!';
 
    str_attr_alive        := tc_lime  +'alive'       ;
    str_attr_dead         := tc_dgray +'dead'        ;
@@ -927,13 +1031,11 @@ begin
    str_npnua[8]          := tc_aqua  +'x9 ';
    str_npnua[9]          := tc_aqua  +'x10';
 
-   str_cmpd[0]           := tc_blue  +'I`m too young to die'+tc_default;
-   str_cmpd[1]           := tc_aqua  +'Hey, not too rough'  +tc_default;
-   str_cmpd[2]           := tc_lime  +'Hurt me plenty'      +tc_default;
-   str_cmpd[3]           := tc_yellow+'Ultra-Violence'      +tc_default;
-   str_cmpd[4]           := tc_orange+'Unholy massacre'     +tc_default;
-   str_cmpd[5]           := tc_red   +'Nightmare'           +tc_default;
-   str_cmpd[6]           := tc_purple+'HELL'                +tc_default;
+   str_cmpd[0]           := tc_aqua  +'I`m too young to die'+tc_default;
+   str_cmpd[1]           := tc_lime  +'Hey, not too rough'  +tc_default;
+   str_cmpd[2]           := tc_yellow+'Hurt me plenty'      +tc_default;
+   str_cmpd[3]           := tc_orange+'Ultra-Violence'      +tc_default;
+   str_cmpd[4]           := tc_red   +'Nightmare'           +tc_default;
 
    str_gmodet            := 'Game mode:';
    str_gmode[gm_scirmish]:= tc_lime  +'Skirmish'        +tc_default;
@@ -963,6 +1065,7 @@ begin
    str_pnu               := 'File size/quality: ';
    str_npnu              := 'Units update rate: ';
    str_connecting        := 'Connecting...';
+   str_portblocked       := 'Port is blocked!';
    str_sver              := 'Wrong version!';
    str_sfull             := 'Server full!';
    str_sgst              := 'Game started!';
@@ -1012,7 +1115,7 @@ begin
    _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
    _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
    _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
-   _mkHStrUid(UID_HEye           ,'Evil Eye'                    ,'Passive scouting and detection'   );
+   _mkHStrUid(UID_HEyeNest       ,'Evil Eye Nest'               ,'Detection structure. Reload time of the ability is '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' sec'   );
 
    _mkHStrUid(UID_LostSoul       ,'Lost Soul'                   ,'');
    _mkHStrUid(UID_Phantom        ,'Phantom'                     ,'');
@@ -1077,7 +1180,7 @@ begin
    _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
    _mkHStrUid(UID_UComputerStation ,'Computer Station'              ,'');
    _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
-   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
+   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
    _mkHStrUid(UID_UMine            ,'Mine'                          ,'');
 
    _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
@@ -1171,124 +1274,150 @@ begin
    _mkHStrOBS(7 ,'Player #5'  ,false);
    _mkHStrOBS(8 ,'Player #6'  ,false);
 
+   FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
 
-   {str_camp_t[0]         := 'Hell #1: Phobos invasion';
-   str_camp_t[1]         := 'Hell #2: Military base';
-   str_camp_t[2]         := 'Hell #3: Deimos invasion';
-   str_camp_t[3]         := 'Hell #4: Pentagram of Death';
-   str_camp_t[4]         := 'Hell #7: Quarry';
-   str_camp_t[5]         := 'Hell #8: Hell on Mars';
-   str_camp_t[6]         := 'Hell #5: Hell on Earth';
-   str_camp_t[7]         := 'Hell #6: Cosmodrome';
-   str_camp_t[8]         := '9. ';
-   str_camp_t[9]         := '10. ';
-   str_camp_t[10]        := '11. ';
-   str_camp_t[11]        := '12. ';
-   str_camp_t[12]        := '13. ';
-   str_camp_t[13]        := '14. ';
-   str_camp_t[14]        := '15. ';
-   str_camp_t[15]        := '16. ';
-   str_camp_t[16]        := '17. ';
-   str_camp_t[17]        := '18. ';
-   str_camp_t[18]        := '19. ';
-   str_camp_t[19]        := '20. ';
-   str_camp_t[20]        := '21. ';
-   str_camp_t[21]        := '22. ';
+   for i in byte do str_menu_hint[i]:=b2s(i);
 
-   str_camp_o[0]         := '-Destroy all human bases and armies'+tc_nl3+'-Protect the Portal';
-   str_camp_o[1]         := '-Destroy Military Base';
-   str_camp_o[2]         := '-Destroy all human bases and armies'+tc_nl3+'-Protect the Portal';
-   str_camp_o[3]         := '-Protect the altars for 20 minutes';
-   str_camp_o[4]         := '-Destroy all human bases and armies';
-   str_camp_o[5]         := '-Destroy all human bases and armies';
-   str_camp_o[6]         := '-Destroy all human bases and armies';
-   str_camp_o[7]         := '-Destroy Cosmodrome'+tc_nl3+'-No one human`s transport should escape';
+   {for i in [6,7,106,8,9,10,12,13,18,20,22,23,27,26,29,31,38,39,40,42,44,53,56,62,74,76,79,82,86,89] do
+   str_menu_hint[i]:='LMB';
 
-   str_camp_m[0]         := tc_lime+'Date:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'PHOBOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Anomaly Zone';
-   str_camp_m[1]         := tc_lime+'Date:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'PHOBOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hall crater';
-   str_camp_m[2]         := tc_lime+'Date:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'DEIMOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Anomaly Zone';
-   str_camp_m[3]         := tc_lime+'Date:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'DEIMOS'+tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Swift crater';
-   str_camp_m[4]         := tc_lime+'Date:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'MARS'  +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hellas Area';
-   str_camp_m[5]         := tc_lime+'Date:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'MARS'  +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Hellas Area';
-   str_camp_m[6]         := tc_lime+'Date:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'EARTH' +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Unknown';
-   str_camp_m[7]         := tc_lime+'Date:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Location:'+tc_default+tc_nl2+'EARTH' +tc_nl2+tc_lime+'Area:'+tc_default+tc_nl2+'Unknown';  }
+   for i in [14,116,117,16,30,51,52,63,77,78,84,91,193,194,92,97] do
+   str_menu_hint[i]:='LMB/RMB';
 
-   {
-   str_cmp_mn[1 ] := 'Hell #1: Invasion on Phobos';
-   str_cmp_mn[2 ] := 'Hell #2: Toxin Refinery';
-   str_cmp_mn[3 ] := 'Hell #3: Military Base';
-   str_cmp_mn[4 ] := 'Hell #4: Deimos Anomaly';
-   str_cmp_mn[5 ] := 'Hell #5: Nuclear Plant';
-   str_cmp_mn[6 ] := 'Hell #6: Science Center';
-   str_cmp_mn[7 ] := 'Hell #7: Quarry';
-   str_cmp_mn[8 ] := 'Hell #8: Hell on Mars';
-   str_cmp_mn[9 ] := 'Hell #9: Hell On Earth';
-   str_cmp_mn[10] := 'Hell #10: Industrial Zone';
-   str_cmp_mn[11] := 'Hell #11: Cosmodrome';
-   str_cmp_mn[12] := 'UAC #1: Command Center';
-   str_cmp_mn[13] := 'UAC #2: Super Generators';
-   str_cmp_mn[14] := 'UAC #3: Phobos Anomaly';
-   str_cmp_mn[15] := 'UAC #4: Deimos Anomaly 2';
-   str_cmp_mn[16] := 'UAC #5: Lab';
-   str_cmp_mn[17] := 'UAC #6: Fortress of Mystery';
-   str_cmp_mn[18] := 'UAC #7: City of the Damned';
-   str_cmp_mn[19] := 'UAC #8: Slough of Despair';
-   str_cmp_mn[20] := 'UAC #9: Mt. Erebus';
-   str_cmp_mn[21] := 'UAC #10: Dead Zone';
-   str_cmp_mn[22] := 'UAC #11: Battle For Mars';
+   for i in [87,90,11,83] do
+   str_menu_hint[i]:='LMB: select for edition';
 
-   str_cmp_ob[1 ] := '-Destroy all human bases and armies'+#13+'-Protect portal';
-   str_cmp_ob[2 ] := '-Destroy Toxin Refinery';
-   str_cmp_ob[3 ] := '-Destroy Military Base';
-   str_cmp_ob[4 ] := '-Destroy all human bases and armies'+#13+'-Cyberdemon must survive'+#13+'-Protect portal';
-   str_cmp_ob[5 ] := '-Destroy Nuclear Plant'+#13+'-Cyberdemon must survive';
-   str_cmp_ob[6 ] := '-Destroy Science Center'+#13+'-Cyberdemon must survive';
-   str_cmp_ob[7 ] := '-Destroy all human bases and armies';
-   str_cmp_ob[8 ] := '-Kill all humans!';
-   str_cmp_ob[9 ] := '-Protect Hell Fortess'+#13+'-Destroy all human towns and armies';
-   str_cmp_ob[10] := '-Destroy all industrial buildings'+#13+'-Destroy all command centers';
-   str_cmp_ob[11] := '-Destroy all military bases';
-   str_cmp_ob[12] := '-Find, protect and reapir'+#13+'Command Center'+#13+'-At least one engineer must survive';
-   str_cmp_ob[13] := '-Find and repair 5 Super Generators';
-   str_cmp_ob[14] := '-Destroy all bases and armies of hell'+#13+'around portal until the arrival of'+#13+'enemy reinforcements(for 20 minutes)';
-   str_cmp_ob[15] := '-Destroy all bases and armies of hell'+#13+'-Protect portal';
-   str_cmp_ob[16] := '-Repair and protect Science Center'+#13+'-Destroy all bases and armies of hell';
-   str_cmp_ob[17] := '-Destroy fortess of hell';
-   str_cmp_ob[18] := '-Destroy all altars of hell'+#13+'-Protect portal';
-   str_cmp_ob[19] := '-Reach the opposite side of the area';
-   str_cmp_ob[20] := '-Find and kill the Spiderdemon';
-   str_cmp_ob[21] := '-Cleanse the Quarry';
-   str_cmp_ob[22] := '-Destroy all bases and armies of hell';
+   str_menu_hint[50]:='LMB: select for edition; RMB: set random value';
+   str_menu_hint[60]:='LMB: change AI player skill; RMB: jump to position';
+   str_menu_hint[61]:='LMB: add/remove AI player';
+   str_menu_hint[80]:='LMB: make random scirmish settings, RMB: make&run game'; }
 
-   str_cmp_map[1 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[2 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Hall crater';
-   str_cmp_map[3 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Drunlo crater';
-   str_cmp_map[4 ] := 'Date:'+#12+'15.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[5 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Swift crater';
-   str_cmp_map[6 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[7 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[8 ] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[9 ] := 'Date:'+#12+'25.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[10] := 'Date:'+#12+'26.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[11] := 'Date:'+#12+'27.11.2145'+#12+'Location:'+#12+'EARTH' +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[12] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Todd crater';
-   str_cmp_map[13] := 'Date:'+#12+'16.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Roche crater';
-   str_cmp_map[14] := 'Date:'+#12+'17.11.2145'+#12+'Location:'+#12+'PHOBOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[15] := 'Date:'+#12+'17.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Anomaly Zone';
-   str_cmp_map[16] := 'Date:'+#12+'18.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[17] := 'Date:'+#12+'18.11.2145'+#12+'Location:'+#12+'DEIMOS'+#12+'Area:'+#12+'Voltaire Area';
-   str_cmp_map[18] := 'Date:'+#12+'20.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[19] := 'Date:'+#12+'21.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[20] := 'Date:'+#12+'22.11.2145'+#12+'Location:'+#12+'HELL'  +#12+'Area:'+#12+'Unknown';
-   str_cmp_map[21] := 'Date:'+#12+'21.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   str_cmp_map[22] := 'Date:'+#12+'22.11.2145'+#12+'Location:'+#12+'MARS'  +#12+'Area:'+#12+'Hellas Area';
-   }
+   /////////////////////////////////////////////////////////////////////////////
+
+   str_cmp_unk       := 'UNKNOWN';
+   str_cmp_Date      := tc_gray+'Date: '    +tc_default;
+   str_cmp_Location  := tc_gray+'Location: '+tc_default;
+   str_cmp_Area      := tc_gray+'Area: '    +tc_default;
+
+   str_camp_name[0 ] := 'Hell#1: And Hell Followed (Tutorial)';
+   str_camp_name[1 ] := 'Hell#2: Invasion to the Phobos';
+   str_camp_name[2 ] := 'Hell#3: The Military Industry';
+   str_camp_name[3 ] := 'Hell#4: the Deimos Anomaly';
+   str_camp_name[4 ] := 'Hell#5: Nuclear Moon';
+   str_camp_name[5 ] := 'Hell#6: Fear';
+   str_camp_name[6 ] := 'Hell#7: Ghosts of Mars';
+   str_camp_name[7 ] := 'Hell#8: ';
+   str_camp_name[8 ] := 'Hell#9: Hell on Mars';
+   str_camp_name[9 ] := 'Hell#10: Hell On Earth';
+   str_camp_name[10] := 'Hell#11: Industrial Zone';
+   str_camp_name[11] := 'Hell#12: Cosmodrome';
+
+   str_camp_name[12] := 'UAC#1: Command Center';
+   str_camp_name[13] := 'UAC#2: Super Generators';
+   str_camp_name[14] := 'UAC#3: Phobos Anomaly';
+   str_camp_name[15] := 'UAC#4: Deimos Anomaly 2';
+   str_camp_name[16] := 'UAC#5: Lab';
+   str_camp_name[17] := 'UAC#6: Fortress of Mystery';
+   str_camp_name[18] := 'UAC#7: City of the Damned';
+   str_camp_name[19] := 'UAC#8: Slough of Despair';
+   str_camp_name[20] := 'UAC#9: Mt. Erebus';
+   str_camp_name[21] := 'UAC#10: Dead Zone';
+   str_camp_name[22] := 'UAC#11:    ';
+   str_camp_name[23] := 'UAC#12: Battle For Mars';
+
+   str_camp_map [0 ] := str_cmp_map(str_cmp_unk ,'HELL WORLD','Portal valley');
+   str_camp_map [1 ] := str_cmp_map('15.11.2145','PHOBOS'    ,'Hall crater'   );
+   str_camp_map [2 ] := str_cmp_map('16.11.2145','PHOBOS'    ,'Drunlo crater' );
+   str_camp_map [3 ] := str_cmp_map('15.11.2145','DEIMOS'    ,'Anomaly Zone'  );
+   str_camp_map [4 ] := str_cmp_map('16.11.2145','DEIMOS'    ,'Swift crater'  );
+   str_camp_map [5 ] := str_cmp_map('16.11.2145','DEIMOS'    ,'Voltaire Area' );
+   str_camp_map [6 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
+   str_camp_map [7 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
+   str_camp_map [8 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
+   str_camp_map [9 ] := str_cmp_map('25.11.2145','EARTH'     ,'Unknown');
+   str_camp_map [10] := str_cmp_map('26.11.2145','EARTH'     ,'Unknown');
+   str_camp_map [11] := str_cmp_map('27.11.2145','EARTH'     ,'Unknown');
+
+   str_camp_map [12] := str_cmp_map('16.11.2145','PHOBOS'    ,'Todd crater'  );
+   str_camp_map [13] := str_cmp_map('16.11.2145','PHOBOS'    ,'Roche crater' );
+   str_camp_map [14] := str_cmp_map('17.11.2145','PHOBOS'    ,'Anomaly Zone' );
+   str_camp_map [15] := str_cmp_map('17.11.2145','DEIMOS'    ,'Anomaly Zone' );
+   str_camp_map [16] := str_cmp_map('18.11.2145','DEIMOS'    ,'Voltaire Area');
+   str_camp_map [17] := str_cmp_map('18.11.2145','DEIMOS'    ,'Voltaire Area');
+   str_camp_map [18] := str_cmp_map('20.11.2145','HELL'      ,'Portal valley');
+   str_camp_map [19] := str_cmp_map('21.11.2145','HELL'      ,'Unknown'      );
+   str_camp_map [20] := str_cmp_map('22.11.2145','HELL'      ,'Unknown'      );
+   str_camp_map [21] := str_cmp_map('21.11.2145','MARS'      ,'Hellas Area');
+   str_camp_map [22] := str_cmp_map('21.11.2145','MARS'      ,'Hellas Area');
+   str_camp_map [23] := str_cmp_map('22.11.2145','MARS'      ,'Hellas Area');
+
+   for i:=0 to LastMission do
+   begin
+      setlength(str_camp_infol[i],0);
+      str_camp_infon[i]:=0;
+   end;
+
+   ////   HELL #1 / Tutorial
+
+   cmp_AddPlot(0,false,
+'This planet looks terrifying: fire everywhere, molten lava, and eerie creatures. It is located far among thousands of other worlds belonging to a powerful galactic Empire. Everything here remained unchanged for many centuries after the conquest...');
+   cmp_AddPlot(0,false,
+'until suddenly the old teleporter, built by some ancient civilization, was activated. Technologically advanced aliens arrived from the portal, immediately starting to explore the new territory.');
+
+   cmp_AddPlot(0,true ,
+'You are one of the higher demons, whose calling is to lead the demonic army into battle. You were recently promoted to your current rank and have not yet had the chance to prove yourself.');
+   cmp_AddPlot(0,false,
+'Your first task is to study the aliens, infiltrate their world, and subjugate it to the will of the Empire.');
+
+   cmp_AddPlot(0,true,
+'The invaders have built a large camp near the Portal, and we don`t even have a small outpost in this region. It is necessary to quickly build a base, summon the army, and crush the violators!');
+
+   cmp_AddPlot(0,true ,'- Reach 2000 energy level');
+   cmp_AddPlot(0,false,'- Build 4 Demon`s Gates'  );
+   cmp_AddPlot(0,false,'- Summon 30 Hell warriors');
+   cmp_AddPlot(0,false,'- Do not lose Hell Keeps' );
+   cmp_AddPlot(0,false,'- Destroy all intruder creatures');
+
+
+  {
+
+
+   str_camp_obj [2 ] := '- Destroy Military Base';
+
+   str_camp_obj [3 ] := '- Destroy all human bases and armies'+tc_nl2+'-Cyberdemon must survive'+tc_nl2+'-Protect portal';
+   str_camp_obj [4 ] := '- Destroy Nuclear Plant'+tc_nl2+'-Cyberdemon must survive';
+   str_camp_obj [5 ] := '- Destroy Science Center'+tc_nl2+'-Cyberdemon must survive';
+
+   str_camp_obj [6 ] := '- Destroy all human bases and armies';
+   str_camp_obj [7 ] := '???';
+   str_camp_obj [8 ] := '- Kill all humans!';
+   str_camp_obj [9 ] := '- Protect Hell Fortess'+tc_nl2+'-Destroy all human towns and armies';
+   str_camp_obj [10] := '- Destroy all industrial buildings'+tc_nl2+'-Destroy all command centers';
+   str_camp_obj [11] := '- Destroy all military bases';
+
+   str_camp_obj [12] := '- Find, protect and reapir'+tc_nl2+'Command Center'+tc_nl2+'-At least one engineer must survive';
+   str_camp_obj [13] := '- Find and repair 5 Super Generators';
+   str_camp_obj [14] := '- Destroy all bases and armies of hell'+tc_nl2+'around portal until the arrival of'+tc_nl2+'enemy reinforcements(for 20 minutes)';
+
+   str_camp_obj [15] := '- Destroy all bases and armies of hell'+tc_nl2+'-Protect portal';
+   str_camp_obj [16] := '- Repair and protect Science Center'+tc_nl2+'-Destroy all bases and armies of hell';
+   str_camp_obj [17] := '- Destroy fortess of hell';
+
+   str_camp_obj [18] := '- Destroy all altars of hell'+tc_nl2+'-Protect portal';
+   str_camp_obj [19] := '- Reach the opposite side of the area';
+   str_camp_obj [20] := '- Find and kill the Spiderdemon';
+
+   str_camp_obj [21] := '- Cleanse the Quarry';
+   str_camp_obj [22] := '';
+   str_camp_obj [23] := '- Destroy all bases and armies of hell';  }
+
 
    _makeHints;
 end;
 
 procedure lng_rus;
 var t: shortstring;
+    i: byte;
 begin
   str_MMap              := 'КАРТА';
   str_MPlayers          := 'ИГРОКИ';
@@ -1391,6 +1520,12 @@ begin
   str_menu_controls     := '- используйте левую и правую кнопки мыши для управления пунктами меню -';
   str_RecordingStart    := 'Начало записи: ';
   str_RecordingStop     := 'Остановка записи: ';
+  str_PTPlayer          := 'ИГРОК';
+  str_PTState           := 'СТАТУС';
+  str_PTRace            := 'РАСА';
+  str_PTTeam            := 'КЛАН';
+  str_PTColor           := 'ЦВЕТ';
+  str_PTPing            := 'ПИНГ+';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
@@ -1438,6 +1573,7 @@ begin
   str_ngen_captured     := 'Нейтральный генератор захвачен!';
   str_ngen_lost         := 'Нейтральный генератор потерян!';
   str_ngen_exh          := 'Нейтральный генератор истощился!';
+  str_invalid_target    := 'Не подходящая цель!';
 
   str_attr_alive        := tc_lime  +'живой'         ;
   str_attr_dead         := tc_dgray +'мертвый'       ;
@@ -1505,6 +1641,7 @@ begin
   str_pnu               := 'Размер/качество: ';
   str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
+  str_portblocked       := 'Порт занят!';
   str_sver              := 'Другая версия!';
   str_sfull             := 'Нет мест!';
   str_sgst              := 'Игра началась!';
@@ -1552,7 +1689,7 @@ begin
   _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
   _mkHStrUid(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
   _mkHStrUid(UID_HBarracks       ,'Казармы Зомби'              ,''          );
-  _mkHStrUid(UID_HEye            ,'Око Зла'                    ,''          );
+  _mkHStrUid(UID_HEyeNest        ,'Гнездо Ока Зла'             ,'Обнаружение невидимых войск. Перезарядка способности - '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' сек');
 
   _mkHStrUid(UID_ZMedic          ,'Зомби Медик'                ,'');
   _mkHStrUid(UID_ZEngineer       ,'Зомби Инженер'              ,'');
@@ -1570,7 +1707,7 @@ begin
   _mkHStrUpid(upgr_hell_mattack   ,'Когти и зубы'                  ,'Увеличение урона от ближних атак'                                     );
   _mkHStrUpid(upgr_hell_regen     ,'Регенерация Плоти'             ,'Восстановление здоровья всех адских юнитов'                           );
   _mkHStrUpid(upgr_hell_pains     ,'Болевой Порог'                 ,'Адские юниты реже испытывают болевой паралич'                         );
-  _mkHStrUpid(upgr_hell_towers    ,'Демонические Призраки'         ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
+  _mkHStrUpid(upgr_hell_towers    ,'Демоническое Чутье'            ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
   _mkHStrUpid(upgr_hell_HKTeleport,'Телепортация Адской Крепости'  ,'Заряд для способности Адской Крепости'                                );
   _mkHStrUpid(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
   _mkHStrUpid(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
@@ -1602,7 +1739,7 @@ begin
   _mkHStrUid(UID_UTechCenter     ,'Научный Центр'              ,'');
   _mkHStrUid(UID_UComputerStation,'Компьютерная Станция'       ,'');
   _mkHStrUid(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
-  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
+  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
   _mkHStrUid(UID_UMine           ,'Мина'                       ,'');
 
   _mkHStrUid(UID_Sergant         ,'Сержант'                ,'');
@@ -1697,32 +1834,70 @@ begin
   _mkHStrOBS(8 ,'Игрок #6'   ,false);
 
 
-  {str_camp_t[0]         := 'Hell #1: Вторжение на Фобос';
-  str_camp_t[1]         := 'Hell #2: Военная база';
-  str_camp_t[2]         := 'Hell #3: Вторжение на Деймос';
-  str_camp_t[3]         := 'Hell #4: Пентаграмма смерти';
-  str_camp_t[4]         := 'Hell #7: Каньон';
-  str_camp_t[5]         := 'Hell #8: Ад на Марсе';
-  str_camp_t[6]         := 'Hell #5: Ад на Земле';
-  str_camp_t[7]         := 'Hell #6: Космодром';
+  FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
 
-  str_camp_o[0]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
-  str_camp_o[1]         := '-Уничтожь военную базу';
-  str_camp_o[2]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
-  str_camp_o[3]         := '-Защити алтари в течении 20 минут';
-  str_camp_o[4]         := '-Уничтожь все людские базы и армии';
-  str_camp_o[5]         := '-Уничтожь все людские базы и армии';
-  str_camp_o[6]         := '-Уничтожь все людские базы и армии';
-  str_camp_o[7]         := '-Уничтожь космодром'+tc_nl3+'-Ни один людской транспорт не должен'+tc_nl3+'уйти';
+  //for i in byte do str_menu_hint[i]:=b2s(i);
 
-  str_camp_m[0]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
-  str_camp_m[1]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Халл';
-  str_camp_m[2]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
-  str_camp_m[3]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Свифт';
-  str_camp_m[4]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
-  str_camp_m[5]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
-  str_camp_m[6]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';
-  str_camp_m[7]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';  }
+  /////////////////////////////////////////////////////////////////////////////
+
+
+  str_cmp_unk       := 'НЕИЗВЕСТНО';
+  str_cmp_Date      := tc_gray+'Дата: ' +tc_default;
+  str_cmp_Location  := tc_gray+'Место: '+tc_default;
+  str_cmp_Area      := tc_gray+'Район: '+tc_default;
+
+  for i:=0 to LastMission do
+  begin
+     setlength(str_camp_infol[i],0);
+     str_camp_infon[i]:=0;
+  end;
+
+
+  cmp_AddPlot(0,false,
+'Эта планета выглядит устрашающе: повсюду огонь, раскаленная лава и жуткие существа. Она находится далеко среди тысяч других миров, принадлежащих могущественной галактической империи. Здесь все оставалось неизменным долгие столетия после завоевания...');
+  cmp_AddPlot(0,false,
+'пока вдруг не заработал старый телепортатор, построенный какой-то древней цивилизацией. Из портала прибыли технически развитые пришельцы, сразу занявшиеся изучением новой местности.');
+
+  cmp_AddPlot(0,true ,
+'Вы - один из высших демонов, чье призвание - вести в бой демоническое воинство. Вы не так давно были повышены до своего нынешнего ранга и еще не успели проявить себя.');
+  cmp_AddPlot(0,false,
+'Ваше первое задание - изучить пришельцев, проникнуть в их мир и подчинить его власти Империи.');
+
+  cmp_AddPlot(0,true,
+'Захватчики построили крупный лагерь около Портала, а у нас в этом регионе нет даже небольшого форпоста. Необходимо быстро построить базу, призвать армию и сокрушить нарушителей!');
+
+  cmp_AddPlot(0,true ,'- Достичь уровня энергии 2000');
+  cmp_AddPlot(0,false,'- Построить 4 Врат Демонов'  );
+  cmp_AddPlot(0,false,'- Призвать 30 адских монстров');
+  cmp_AddPlot(0,false,'- Адская Крепость должна уцелеть' );
+  cmp_AddPlot(0,false,'- Уничтожить вторгшихся захватчиков');
+
+  {str_camp_name[0]         := 'Hell #1: Вторжение на Фобос';
+  str_camp_name[1]         := 'Hell #2: Военная база';
+  str_camp_name[2]         := 'Hell #3: Вторжение на Деймос';
+  str_camp_name[3]         := 'Hell #4: Пентаграмма смерти';
+  str_camp_name[4]         := 'Hell #7: Каньон';
+  str_camp_name[5]         := 'Hell #8: Ад на Марсе';
+  str_camp_name[6]         := 'Hell #5: Ад на Земле';
+  str_camp_name[7]         := 'Hell #6: Космодром';
+
+  str_camp_obj[0]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
+  str_camp_obj[1]         := '-Уничтожь военную базу';
+  str_camp_obj[2]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
+  str_camp_obj[3]         := '-Защити алтари в течении 20 минут';
+  str_camp_obj[4]         := '-Уничтожь все людские базы и армии';
+  str_camp_obj[5]         := '-Уничтожь все людские базы и армии';
+  str_camp_obj[6]         := '-Уничтожь все людские базы и армии';
+  str_camp_obj[7]         := '-Уничтожь космодром'+tc_nl3+'-Ни один людской транспорт не должен'+tc_nl3+'уйти';
+
+  str_camp_map[0]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
+  str_camp_map[1]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Халл';
+  str_camp_map[2]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
+  str_camp_map[3]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Свифт';
+  str_camp_map[4]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
+  str_camp_map[5]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
+  str_camp_map[6]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';
+  str_camp_map[7]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';  }
 
   _makeHints;
 end;
@@ -1737,7 +1912,7 @@ tmp:shortstring;
 procedure upgrLine(upid:byte;info:shortstring);
 begin
    if(upid>0)then
-    with _upids[upid] do
+    with g_upids[upid] do
       writeln(f,'- ',_up_name,' - ',info,';');
 end;
 
@@ -1746,7 +1921,7 @@ begin
    rewrite(f);
 
    for u:=0 to 255 do
-    with _uids[u] do
+    with g_uids[u] do
      if(length(un_txt_uihint1)>0)and(_r>0)then
      begin
         writeln(f,un_txt_name);
@@ -1776,7 +1951,7 @@ begin
         if(_zombie_uid>0)then
         if(_zombie_hits>0)or(_fastdeath_hits<0)then
         begin
-        writeln(f,'Zombie: ',_uids[_zombie_uid].un_txt_name );
+        writeln(f,'Zombie: ',g_uids[_zombie_uid].un_txt_name );
         writeln(f,'Zombification hits: ',_zombie_hits);
         end;
 
@@ -1843,7 +2018,7 @@ begin
    writeln(f);
 
    for u:=0 to 255 do
-    with _upids[u] do
+    with g_upids[u] do
      if(length(_up_name)>0)then
      begin
         writeln(f,RemoveSpecChars(_makeUpgrBaseHint(u,255)));
@@ -1854,7 +2029,7 @@ begin
 {
 s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;
-hs4:=@_upids[uid]._up_hint;
+hs4:=@g_upids[uid]._up_hint;
 }
 
    close(f);

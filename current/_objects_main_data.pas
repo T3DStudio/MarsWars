@@ -22,10 +22,9 @@ procedure _unit_apUID(pu:PTUnit);
 begin
    with pu^ do
    begin
-      uid:=@_uids[uidi];
+      uid:=@g_uids[uidi];
       with uid^ do
       begin
-         isbuildarea:=_isbuilder;
          srange     :=_r+_r;
          speed      :=_speed;
          ukfly      :=_ukfly;
@@ -56,7 +55,7 @@ var i,u:byte;
 
 procedure _weapon(aa,wtype:byte;max_range,min_range,count:integer;reload,oid,ruid,rupid,rupidl,dupgr:byte;dupgrs:integer;tarf,reqf:cardinal;uids,reload_s:TSoB;ax,ay:integer;atarprior:byte;afakeshots:byte;admod:byte);
 begin
-   with _uids[i] do
+   with g_uids[i] do
    if(aa<=MaxUnitWeapons)then
    with _a_weap[aa] do
    begin
@@ -85,10 +84,10 @@ begin
    end;
 end;
 begin
-   FillChar(_uids   ,SizeOf(_uids   ),0);
+   FillChar(g_uids   ,SizeOf(g_uids   ),0);
 
    for i:=0 to 255 do
-   with _uids[i] do
+   with g_uids[i] do
    begin
       _mhits     := 1000;
       _btime     := 1;
@@ -329,14 +328,14 @@ begin
    _a_BonusAntiUnitRange:=50;
    _weapon(0,wpt_missle,aw_fsr,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive,wpr_any+wpr_avis,uids_all,[fr_archvile_s],0,0,wtp_hits,0,0);
 end;
-UID_HEye:
+UID_HEyeNest:
 begin
-   _mhits     := 100;
-   _renergy   := 50;
-   _r         := 10;
+   _mhits     := 1000;
+   _renergy   := 100;
+   _r         := 15;
    _srange    := 300;
    _ucl       := 12;
-   _btime     := ptime1;
+   _btime     := ptime3;
    _ability   := uab_HellVision;
    _ukbuilding:= true;
    _issolid   := false;
@@ -346,8 +345,6 @@ begin
    _detector  := true;
    _upgr_srange     :=upgr_hell_heye;
    _upgr_srange_step:=50;
-
-   ups_builder:=[UID_HEye];
 end;
 
 //////////////////////////////
@@ -833,7 +830,7 @@ begin
    or(i=UID_HACommandCenter)then
    begin
       _ucl             := 3;
-      ups_builder      :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEye,UID_HBarracks];
+      ups_builder      :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEyeNest,UID_HBarracks];
       ups_transport    :=uids_demons;
 
       _upgr_srange     :=upgr_hell_buildr;
@@ -1068,15 +1065,14 @@ begin
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd3,MID_URocket ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,wtp_nolost_hits,0,dm_AntiFly2);
 end;
 
-{UID_UMine:
+UID_UMine:
 begin
    _mhits     := 100;
-   _renergy   := 10;
+   _renergy   := 50;
    _r         := 5;
    _srange    := 100;
-   _ucl       := 21;
-   _btime     := 2;
-   _ucl       := 21;
+   _ucl       := 19;
+   _btime     := 5;
    _attack    := atm_always;
    _ukbuilding:= true;
    _ukmech    := true;
@@ -1087,7 +1083,7 @@ begin
    _fastdeath_hits:=1;
 
    _weapon(0,wpt_suicide,-mine_r,0,0,fr_fps1,0,0,0,0,0,0,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_distance,0,0);
-end; }
+end;
 
 ///////////////////////////////////
 UID_Sergant:
@@ -1346,7 +1342,7 @@ begin
    _weapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsd2,MID_Flyer  ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_GroundLight,0,dm_AntiGroundLight2);
 end;
 
-{UID_APC:
+UID_APC:
 begin
    _mhits     := 3000;
    _renergy   := 200;
@@ -1362,35 +1358,63 @@ begin
    _slowturn  := true;
    _fastdeath_hits:=1;
    ups_transport    :=uids_marines;
-end; }
+end;
 
-UID_UBaseMil:
+UID_USPort  ,
+UID_UPortal :
 begin
+   _mhits     := 20000;
+   _renergy   := 2000;
+   _r         := 150;
+   _ucl       := 20;
+   _btime     := ptime5;
+   _ukbuilding:= true;
+   _ukmech    := true;
+   _issolid   := false;
 end;
-UID_UBaseCom:
-begin
-end;
-UID_UBaseGen:
-begin
-end;
-UID_UBaseRef:
-begin
-end;
-UID_UBaseNuc:
-begin
-end;
+
+UID_UBaseMil,
+UID_UBaseCom,
+UID_UBaseRef,
+UID_UBaseNuc,
 UID_UBaseLab:
 begin
+   _mhits     := 15000;
+   _renergy   := 1000;
+   _r         := 100;
+   _ucl       := 21;
+   _btime     := ptime5;
+   _ukbuilding:= true;
+   _ukmech    := true;
 end;
-UID_UCBuild:
+
+UID_UBaseGen:
 begin
+   _mhits     := 6000;
+   _genergy   := 1000;
+   _renergy   := 500;
+   _r         := 55;
+   _ucl       := 22;
+   _btime     := ptime2;
+   _ukbuilding:= true;
+   _ukmech    := true;
+   _limituse  := ul1;
 end;
-UID_USPort:
+
+UID_UCBuild0,
+UID_UCBuild1,
+UID_UCBuild2,
+UID_UCBuild3:
 begin
+   _mhits     := 15000;
+   _renergy   := 1000;
+   _r         := 100;
+   _ucl       := 23;
+   _btime     := ptime5;
+   _ukbuilding:= true;
+   _ukmech    := true;
 end;
-UID_UPortal:
-begin
-end;
+
       end;
 
       _square:=round(pi*_r*_r);
@@ -1419,7 +1443,7 @@ end;
 
       if(_issmith)and(ups_upgrades=[])then
        for u:=1 to 255 do
-        with _upids[u] do
+        with g_upids[u] do
          if(_up_time>0)and(_urace=_up_race)then ups_upgrades+=[u];
 
       if(_ukbuilding)then
@@ -1445,10 +1469,10 @@ end;
 procedure InitMIDs;
 var m:byte;
 begin
-   FillChar(_mids,SizeOf(_mids),0);
+   FillChar(g_mids,SizeOf(g_mids),0);
 
    for m:=0 to 255 do
-   with _mids[m] do
+   with g_mids[m] do
    begin
       mid_size      := 0;
       mid_homing    := mh_magnetic;
@@ -1559,7 +1583,7 @@ begin
   and((flags and f2)=0)then flags:=flags or f1 or f2;
 end;
 begin
-   with _dmods[dm][n] do
+   with g_dmods[dm][n] do
    begin
       CorrentFlags(wtr_unit ,wtr_building);
       CorrentFlags(wtr_bio  ,wtr_mech    );
@@ -1571,7 +1595,7 @@ begin
    end;
 end;
 begin
-   FillChar(_dmods,SizeOf(_dmods),0);
+   FillChar(g_dmods,SizeOf(g_dmods),0);
 
    SetDMOD(dm_AntiUnitBioHeavy2,0,200,wtr_unit    +wtr_bio +wtr_heavy           );
    SetDMOD(dm_SSGShot2         ,0,200,wtr_unit    +wtr_bio +wtr_heavy           );
@@ -1598,7 +1622,7 @@ procedure InitUpgrades;
 var u:byte;
 procedure _setUPGR(rc,upcl,stime,stimeX,stimeA,max,enrg,enrgX,enrgA:integer;rupgr,ruid:byte;mfrg:boolean);
 begin
-   with _upids[upcl] do
+   with g_upids[upcl] do
    begin
       _up_ruid      := ruid;
       _up_rupgr     := rupgr;
@@ -1616,7 +1640,7 @@ begin
    end;
 end;
 begin
-   FillChar(_upids,SizeOf(_upids),0);
+   FillChar(g_upids,SizeOf(g_upids),0);
 
    //                                  base X +
    //         race id                  time      lvl  enr  X +    rupgr         ruid                 multi
@@ -1673,7 +1697,7 @@ end;
 procedure GameObjectsInit;
 var u:integer;
 begin
-   for u:=0 to MaxUnits do _punits[u]:=@_units[u];
+   for u:=0 to MaxUnits do g_punits[u]:=@g_units[u];
 
    // weapon target requirements set
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy wtr_stun wtr_nostun;

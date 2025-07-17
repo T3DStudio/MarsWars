@@ -208,24 +208,24 @@ Special ability: "Teleportation". Immune to splash damage. Base teleportation co
 
 ---------------------------
 
-Evil Eye
+Evil Eye Nest
 
 Hotkey: J
 Categories/Attributes: [building,biological,light,ground,detector]
-Max hits: 100
+Max hits: 1000
 Limit used: 1
-Size: 10
+Size: 15
 Base vision range: 300
-Build time: 20
-Energy required: 50
+Build time: 60
+Energy required: 100
 
-Constructed by: Hell Keep,Great Hell Keep,Evil Eye,Hell Command Center,Advanced Hell Command Center
+Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Evil Eye Upgrade - vision range +50;
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Special ability: "Hell Vision". Immune to splash damage. Passive scouting and detection.
+Special ability: "Hell Vision". Immune to splash damage. Detection structure. Reload time of the ability is 60 sec.
 
 ---------------------------
 
@@ -1335,6 +1335,251 @@ Immune to splash damage.
 
 ---------------------------
 
+Mine
+
+Hotkey: Ctrl+G
+Categories/Attributes: [building,mechanical,light,ground,detector]
+Max hits: 100
+Limit used: 1
+Size: 5
+Base vision range: 100
+Build time: 5
+Energy required: 50
+
+
+Arming/Abilities: 
+- suicide, targets: [alive,ground], impact 520*1, splash damage radius: 80, target priority: distance;
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+H
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 20000
+Limit used: 1
+Size: 150
+Base vision range: 300
+Build time: 100
+Energy required: 2000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+V
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+V
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+B
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 6000
+Limit used: 1
+Size: 55
+Base vision range: 110
+Build time: 40
+Energy required: 500
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Increase energy level(+1000). Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+V
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+V
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+V
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+N
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+N
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+N
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+N
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 15000
+Limit used: 1
+Size: 100
+Base vision range: 200
+Build time: 100
+Energy required: 1000
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
+
+
+Hotkey: Ctrl+H
+Categories/Attributes: [building,mechanical,heavy,ground]
+Max hits: 20000
+Limit used: 1
+Size: 150
+Base vision range: 300
+Build time: 100
+Energy required: 2000
+
+
+Upgrades:
+- Concrete Walls - armor +18;
+
+Immune to splash damage.
+
+---------------------------
+
 Engineer
 
 Hotkey: B
@@ -1697,6 +1942,30 @@ Upgrades:
 - Advanced Engines - movement speed +2;
 
 Immune to splash damage.
+
+---------------------------
+
+Ground APC
+
+Hotkey: L
+Categories/Attributes: [unit,mechanical,heavy,ground,transport]
+Max hits: 3000
+Limit used: 1
+Size: 25
+Base movement speed: 15
+Base vision range: 225
+Build time: 40
+Energy required: 200
+Places in transport: 10
+Base transport capacity: 4
+
+Produced by: Vehicle Factory
+Upgrades:
+- Light Amplification Visors - vision range +25;
+- Mech Combat Armor Upgrade - armor +7;
+- Advanced Engines - movement speed +2;
+
+Special ability: "Unload". Immune to splash damage.
 
 ---------------------------
 

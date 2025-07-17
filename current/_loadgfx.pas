@@ -233,7 +233,7 @@ begin
       y:=ys;
       while (y<d) do
       begin
-         _draw_surf(surf,x,y,ts);
+         draw_sdlsurface(surf,x,y,ts);
          y+=ts^.h;
       end;
       x+=ts^.w;
@@ -390,7 +390,7 @@ begin
     end;
 end;
 
-procedure MakeTerrain;
+procedure gfx_MakeTerrain;
 var x,y,w,h:integer;
     ter_s  :pSDL_Surface;
 begin
@@ -425,7 +425,7 @@ begin
          y:=0;
          while (y<w) do
          begin
-            _draw_surf(vid_terrain,x,y,ter_s);
+            draw_sdlsurface(vid_terrain,x,y,ter_s);
             y+=ter_s^.h;
          end;
          x+=ter_s^.w;
@@ -443,8 +443,8 @@ begin
    ts:=loadIMG(fn,false,true);
    LoadBtn:=_createSurf(bw-1,bw-1);
    if(ts^.h>bw)
-   then _draw_surf(LoadBtn,hwb-(ts^.w div 2),0,ts)
-   else _draw_surf(LoadBtn,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
+   then draw_sdlsurface(LoadBtn,hwb-(ts^.w div 2),0,ts)
+   else draw_sdlsurface(LoadBtn,hwb-(ts^.w div 2),hwb-(ts^.h div 2),ts);
    _FreeSF(ts);
 end;
 
@@ -465,8 +465,8 @@ begin
    tst:=ROTOZOOMSURFACE(ts, 0, coff, 0);
    LoadBtnFS:=_createSurf(bw-1,bw-1);
    if(tst^.h>bw)
-   then _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),2,tst)
-   else _draw_surf(LoadBtnFS,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
+   then draw_sdlsurface(LoadBtnFS,hwb-(tst^.w div 2),2,tst)
+   else draw_sdlsurface(LoadBtnFS,hwb-(tst^.w div 2),hwb-(tst^.h div 2),tst);
    while(blackrect>0)do
    begin
       blackrect-=1;
@@ -517,7 +517,7 @@ begin
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
    vid_prims:=0;
-   setlength(vid_prim,vid_prims);
+   setlength(vid_prim,vid_mvs);
 
    with spr_dummy do
    begin
@@ -541,12 +541,6 @@ begin
 
    LoadFont;
 
-
-   {vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
-   boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
-   filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0)); }
-
    vid_fog_surf := _createSurf(fog_cr*2,fog_cr*2);
    boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
    filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
@@ -556,21 +550,24 @@ begin
      if((x+r)mod 4)=0 then
        pixelColor(vid_fog_surf,x,r,c_purple);
 
-   {vid_fog_surf:=_createSurf(fog_cw,fog_cw);
-   boxColor(vid_fog_surf,0,0,fog_cw,fog_cw,c_white);
-   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
-   for x:=0 to fog_cw-1 do
-   for r:=0 to fog_cw-1 do
-     if((x+r)mod 4)>0 then
-       pixelColor(vid_fog_surf,x,r,c_black);  }
+   with spr_cp_out do
+   begin
+      hw:=gm_cptp_r-6;
+      hh:=hw;
+      w:=hw*2;
+      h:=w;
+      surf:=_createSurf(1,1);
+      SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(surf,0,0));
+   end;
 
 
    spr_mback:= loadIMG('mback'   ,false,true);
+   spr_mbtn := loadIMG('mbtn'    ,false,true);
 
    r_menu:=_createSurf(max2(vid_minw,spr_mback^.w), max2(vid_minh,spr_mback^.h));
 
-   mv_x:=(vid_vw-r_menu^.w) div 2;
-   mv_y:=(vid_vh-r_menu^.h) div 2;
+   //mv_x:=(vid_vw-r_menu^.w) div 2;
+   //mv_y:=(vid_vh-r_menu^.h) div 2;
 
 
    spr_b_action   := LoadBtn('b_action' ,vid_bw);
@@ -676,7 +673,7 @@ begin
    _LoadMWSModel(@spr_HBarracks2     ,race_buildings[r_hell]+'h_hbara',smt_buiding,firstload);
    _LoadMWSModel(@spr_HBarracks3     ,race_buildings[r_hell]+'h_hbarb',smt_buiding,firstload);
    _LoadMWSModel(@spr_HBarracks4     ,race_buildings[r_hell]+'h_hbarc',smt_buiding,firstload);
-   _LoadMWSModel(@spr_HEye           ,race_buildings[r_hell]+'heye_'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_HEyeNest       ,race_buildings[r_hell]+'heyenest_',smt_buiding,firstload);
 
    _LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_' ,smt_buiding,firstload);
    _LoadMWSModel(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_',smt_buiding,firstload);
@@ -703,7 +700,20 @@ begin
    _LoadMWSModel(@spr_UFactory2      ,race_buildings[r_uac ] +'u_b12_',smt_buiding,firstload);
    _LoadMWSModel(@spr_UFactory3      ,race_buildings[r_uac ] +'u_b12a',smt_buiding,firstload);
    _LoadMWSModel(@spr_UFactory4      ,race_buildings[r_uac ] +'u_b12b',smt_buiding,firstload);
-   _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine',smt_buiding,firstload);
+
+   _LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine0'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_portal         ,race_buildings[r_uac ] +'u_portal0',smt_buiding,firstload);
+   _LoadMWSModel(@spr_starport       ,race_buildings[r_uac ] +'u_starport',smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase0         ,race_buildings[r_uac ] +'u_base00' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase1         ,race_buildings[r_uac ] +'u_base10' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase2         ,race_buildings[r_uac ] +'u_base20' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase3         ,race_buildings[r_uac ] +'u_base30' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase4         ,race_buildings[r_uac ] +'u_base40' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubase5         ,race_buildings[r_uac ] +'u_base50' ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubuild0        ,race_buildings[r_uac ] +'build00'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubuild1        ,race_buildings[r_uac ] +'build10'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubuild2        ,race_buildings[r_uac ] +'build20'  ,smt_buiding,firstload);
+   _LoadMWSModel(@spr_ubuild3        ,race_buildings[r_uac ] +'build30'  ,smt_buiding,firstload);
 
    _LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect ,firstload);
    _LoadMWSModel(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect ,firstload);
@@ -754,7 +764,6 @@ begin
 
 
    _lstr(@spr_cp_koth   ,'cp_koth',firstload,true);
-   _lstr(@spr_cp_out    ,'cp_out' ,firstload,true);
    _lstr(@spr_cp_gen    ,'cp_gen' ,firstload,true);
 
    for x:=0 to spr_upgrade_icons do
@@ -777,7 +786,7 @@ procedure MakeUnitIcons;
 var u:byte;
 begin
    for u:=0 to 255 do
-   with _uids[u] do
+   with g_uids[u] do
    begin
       with un_btn do
       begin
@@ -820,17 +829,17 @@ begin
    spr_b_ab[uab_HKeepBlink      ]:=spr_b_up[r_hell,9 ].surf;
    spr_b_ab[uab_RebuildInPoint  ]:=spr_b_paction;
    spr_b_ab[uab_HInvulnerability]:=spr_b_up[r_hell,22].surf;
-   spr_b_ab[uab_SpawnLost       ]:=_uids[UID_LostSoul].un_btn.surf;
+   spr_b_ab[uab_SpawnLost       ]:=g_uids[UID_LostSoul].un_btn.surf;
    spr_b_ab[uab_HellVision      ]:=spr_b_up[r_hell,6 ].surf;
    spr_b_ab[uab_CCFly           ]:=spr_b_up[r_uac ,9 ].surf;
-   spr_b_ab[uab_ToUACDron       ]:=_uids[UID_UACDron].un_btn.surf;
+   spr_b_ab[uab_ToUACDron       ]:=g_uids[UID_UACDron].un_btn.surf;
    spr_b_ab[uab_Unload          ]:=spr_b_paction;
 end;
 
 procedure Map_tdmake;
 var i,ix,iy,rn:integer;
 begin
-   _tdecaln:=(vid_cam_w*vid_cam_h) div 11000;
+   _tdecaln:=(vid_cam_w*vid_cam_h) div 19000;
    setlength(_tdecals,_tdecaln);
 
    vid_mwa:= vid_cam_w+vid_ab*2;
@@ -881,22 +890,18 @@ begin
 
    ui_menu_btnsy:= vid_panelll-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
-   if(spr_mback<>nil)then
-   begin
-      mv_x      :=(vid_vw-spr_mback^.w) div 2;
-      mv_y      :=(vid_vh-spr_mback^.h) div 2;
-   end;
+
    vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
    vid_fog_vfh  :=(vid_cam_h div fog_cw)+2;
 
    map_mmvw     := round(vid_cam_w*map_mmcx);
    map_mmvh     := round(vid_cam_h*map_mmcx);
-   CamBounds;
+   CameraBounds;
 
    Map_tdmake;
 end;
 
-procedure _ScreenSurfaces;
+procedure vid_RemakeScreenSurfaces;
 var i,y:integer;
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
@@ -979,14 +984,14 @@ begin
       y+=vid_BW;
    end;
 
-   _draw_surf(r_uipanel,0,0,r_panel);
+   draw_sdlsurface(r_uipanel,0,0,r_panel);
 
    r_dterrain:=_createSurf(vid_cam_w,vid_cam_h);
 
    _vidvars;
 end;
 
-procedure _MakeScreen;
+procedure vid_MakeScreen;
 begin
    if (r_screen<>nil) then sdl_freesurface(r_screen);
 
@@ -996,7 +1001,7 @@ begin
 
    if(r_screen=nil)then begin WriteSDLError; exit; end;
 
-   _ScreenSurfaces;
+   vid_RemakeScreenSurfaces;
 end;
 
 

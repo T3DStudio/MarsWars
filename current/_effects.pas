@@ -21,7 +21,6 @@ begin
         UID_Pain          : _setEID(@spr_pain          ,sms_death);
         UID_Phantom       : _setEID(@spr_Phantom       ,sms_death);
         UID_LostSoul      : _setEID(@spr_lostsoul      ,sms_death);
-        UID_HEye          : _setEID(@spr_h_p2          ,sms_death);
 
         MID_BPlasma       : _setEID(@spr_u_p0          ,sms_death);
         MID_SShot,
@@ -90,7 +89,7 @@ begin
    end;
 end;
 
-procedure _click_eff(cx,cy,ca:integer;cc:cardinal);
+procedure ui_click_eff(cx,cy,ca:integer;cc:cardinal);
 begin
    ui_mc_x:=cx;
    ui_mc_y:=cy;
@@ -98,14 +97,14 @@ begin
    ui_mc_c:=cc;
 end;
 
-procedure _effect_add(ex,ey,ed:integer;ee:byte);
+procedure effect_add(ex,ey,ed:integer;ee:byte);
 var e:integer;
 
 procedure _setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
 var sc:integer;
     sm:PTMWSModel;
 begin
-   with _effects[e] do
+   with g_effects[e] do
    begin
       x :=ex;
       y :=ey;
@@ -146,7 +145,7 @@ begin
    if not MapPointInScreenP(ex,ey,true)then exit;
 
    for e:=1 to vid_mvs do
-   with _effects[e] do
+   with g_effects[e] do
    if(anim_last_i_t=0)then
    begin
       case ee of
@@ -155,7 +154,6 @@ begin
 UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_Phantom,
 UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
-UID_HEye          : _setEff(6 ,0 ,8  ,-1       ,true ,0 );
 
 MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
@@ -225,34 +223,11 @@ EID_db_u1         : _setEff(0 ,0 ,0  ,dead_time,false,0 );
    end;
 end;
 
-{
-ms_smodel    : PTMWSModel;
-ms_eid_fly_st: integer;
-ms_snd_death_ch,
-ms_eid_fly,
-ms_eid_death : byte;
-ms_snd_death : PTSoundSet;
-
-x,y,
-vx,vy,
-dam,
-vst,
-tar,
-sr,
-dir,
-ystep,
-mtars,
-ntars    : integer;
-player,
-mid,mf   : byte;
-homing   : boolean;
-}
-
-procedure _missile_explode_effect(m:integer);
+procedure missile_explode_effect(m:integer);
 var i,o,r:byte;
 begin
-   with _missiles[m] do
-   with _mids[mid] do
+   with g_missiles[m] do
+   with g_mids[mid] do
    if(MapPointInScreenP(vx,vy,true))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
@@ -262,9 +237,9 @@ begin
          r:=0;
          o:=1;
       end;
-      for i:=1 to o do _effect_add(vx-_randomr(r),vy-_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
+      for i:=1 to o do effect_add(vx-_randomr(r),vy-_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
-      if(mfe=uf_ground)and(ms_eid_decal>0)then _effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
+      if(mfe=uf_ground)and(ms_eid_decal>0)then effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
 
       if(ms_snd_death_ch[ms_eid_bio_death]>0)then
        if(random(ms_snd_death_ch[ms_eid_bio_death])>0)then exit;
@@ -273,20 +248,16 @@ begin
    end;
 end;
 
-procedure missiles_sprites(draw:boolean);
+procedure missiles_sprites;
 var  m:integer;
    spr:PTMWTexture;
 begin
    for m:=1 to MaxMissiles do
-   with _missiles[m] do
-   with _mids[mid] do
+   with g_missiles[m] do
+   if(MapPointInScreenP(vx,vy,true))then
+   with g_mids[mid] do
    if(vstep>0)then
    begin
-      spr:=@spr_dummy;
-
-      if(not draw)then continue;
-      if(not MapPointInScreenP(vx,vy,true))then continue;
-
       spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
       SpriteListAddEffect(vx,vy,_SpriteDepth(vy,mfs)+100,0,spr,255);
    end;
@@ -297,8 +268,8 @@ procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte
 begin
    if MapPointInScreenP(vx,vy,true)
    or MapPointInScreenP(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
-   _effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),eidstart);
-   _effect_add(tx,ty,_SpriteDepth(ty+1,ukfly),eidend  );
+   effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),eidstart);
+   effect_add(tx,ty,_SpriteDepth(ty+1,ukfly),eidend  );
 end;
 
 procedure effects_sprites(noanim,draw:boolean);
@@ -308,7 +279,7 @@ var ei,
 anim_stat:byte;
 begin
    for ei:=1 to vid_mvs do
-    with _effects[ei] do
+    with g_effects[ei] do
      if(anim_last_i_t<>0)then
      with _eids[eid] do
      begin
@@ -346,7 +317,7 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
         else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
         if(draw)then
-         if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
+          if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
      end;
 end;
 

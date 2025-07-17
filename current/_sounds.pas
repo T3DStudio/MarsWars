@@ -459,7 +459,7 @@ procedure SoundPlayUnitSelect;
 const annoystart = 6;
       annoystop  = 12;
 begin
-   if(_IsUnitRange(ui_UnitSelectedNU,nil))then
+   if(IsUnitRange(ui_UnitSelectedNU,nil))then
    begin
       if(ui_UnitSelectedNU<>ui_UnitSelectedPU)
       then ui_UnitSelectedn:=0
@@ -468,7 +468,7 @@ begin
         then ui_UnitSelectedn+=1
         else ui_UnitSelectedn:=0;
 
-      with _units[ui_UnitSelectedNU] do
+      with g_units[ui_UnitSelectedNU] do
        with uid^ do
         if(_ukbuilding)and(iscomplete=false)
         then SoundPlayUnitCommand(snd_building[_urace])
@@ -484,7 +484,7 @@ end;
 
 procedure SoundLogUIPlayer(playern:byte);
 begin
-   with _players[playern] do
+   with g_players[playern] do
     with log_l[log_i] do
      case mtype of
 0..MaxPlayers         : if(mtype<>playern)
@@ -502,12 +502,13 @@ lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
-lmt_unit_ready        : with _uids[argx] do
+lmt_unit_ready        : with g_uids[argx] do
                         SoundPlayUnitCommand(un_snd_ready);
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,
 lmt_ngen_captured,
 lmt_cpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
+lmt_invalid_tar,
 lmt_ability_cantland,
 lmt_ability_reload,
 lmt_ability_needS ,
@@ -526,7 +527,7 @@ lmt_ngen_lost,
 lmt_cpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
 lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
-lmt_unit_attacked     : with _uids[argx] do
+lmt_unit_attacked     : with g_uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
      end;
 end;
@@ -663,6 +664,8 @@ begin
    snd_jetpon               :=SoundSetLoad(race_dir[r_uac]+'jetpon'    );
    snd_CCup                 :=SoundSetLoad(race_dir[r_uac]+'ccup'      );
    snd_bomblaunch           :=SoundSetLoad(race_dir[r_uac]+'bomblaunch');
+
+   snd_uac_mine             :=SoundSetLoad(race_buildings[r_uac ]+'mine' );
 
    snd_uac_cc               :=SoundSetLoad(race_buildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=SoundSetLoad(race_buildings[r_uac ]+'barraks'        );

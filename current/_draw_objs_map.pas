@@ -54,14 +54,13 @@ begin
    for d:=1 to MaxDoodads do
     with map_dds[d] do
      if(t>0)then
+     if(RectInCam(x,y,r,r,0))then
      begin
-        if(not RectInCam(x,y,r,r,0))then continue;
-
         ro:=0;
-        with _players[HPlayer] do
+        with g_players[HPlayer] do
          case m_brush of
 1..255         : ro:=r-bld_dec_mr;
-co_psability   : if(ui_uibtn_pabilityu<>nil)then
+co_pability    : if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^._ability of
                   uab_RebuildInPoint,
                   uab_HTowerBlink,
@@ -70,18 +69,18 @@ co_psability   : if(ui_uibtn_pabilityu<>nil)then
                   end;
          end;
 
-        if(noanim=false)or(sprite=pspr_dummy)then
-        case t of
-        DID_LiquidR1,
-        DID_LiquidR2,
-        DID_LiquidR3,
-        DID_LiquidR4 : if(theme_liquid_animt<2)
-                       then sprite:=@spr_liquid[((G_Step div theme_liquid_animm) mod LiquidAnim)+1,animn]
-                       else sprite:=@spr_liquid[1                                                 ,animn];
-        DID_Other    : DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
-        DID_SRock    : DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
-        DID_BRock    : DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
-        end;
+        if(not noanim)or(sprite=pspr_dummy)then
+          case t of
+          DID_LiquidR1,
+          DID_LiquidR2,
+          DID_LiquidR3,
+          DID_LiquidR4 : if(theme_liquid_animt<2)
+                         then sprite:=@spr_liquid[((G_Step div theme_liquid_animm) mod LiquidAnim)+1,animn]
+                         else sprite:=@spr_liquid[1                                                 ,animn];
+          DID_Other    : DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
+          DID_SRock    : DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
+          DID_BRock    : DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
+          end;
 
         if(RectInCam(x+ox,y+oy,sprite^.hw,sprite^.hh,0))then
         begin

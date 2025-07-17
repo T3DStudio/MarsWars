@@ -2,7 +2,7 @@
 
 procedure map_MakeThemeSprites;
 begin
-   MakeTerrain;
+   gfx_MakeTerrain;
    MakeCrater;
    MakeLiquid;
    MakeLiquidBack;
@@ -89,7 +89,7 @@ end;
 procedure map_vars;
 begin
    map_RandomBase;
-   //if(g_mode in gm_fixed_positions)then g_fixed_positions:=true;
+
    map_b1      := map_mw-map_b0;
    map_hmw     := map_mw div 2;
    {$IFDEF _FULLGAME}
@@ -391,7 +391,7 @@ gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
    end;
 
    if(g_generators>0)then
-    map_CPoints_Default(MaxCPoints,50,gm_cptp_r,gm_cptp_r div 2,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
+    map_CPoints_Default(MaxCPoints,50,gm_cptp_gr,gm_cptp_gr-25,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
 end;
 
 function _dnear(td:byte;ix,iy:pinteger):boolean;
@@ -417,7 +417,7 @@ begin
    for d:=0 to map_ddn do
    with map_dds[d] do
    if(t>0)then
-   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+35))then         //_dec_min_r(t,td)
+   if(point_dist_int(x,y,ix^,iy^)<(DID_R[t]+DID_R[td]+map_decor_gap))then         //_dec_min_r(t,td)
    begin
       _dnear:=true;
       break;
@@ -492,6 +492,51 @@ begin
     end;
 end;
 
+function map_FillSea:integer;
+var
+odd:boolean;
+cellw,
+cellhw,
+ix,iy,cx
+     :integer;
+begin
+   map_FillSea:=0;
+   cellhw:=round(did_r[1]/1.27);
+   cellw :=cellhw*2;
+
+   cx:=(map_hmw mod cellw);
+   if(cx>=cellhw)then cx-=cellw;
+   cx:=map_mw-cx;
+   odd:=false;
+
+   iy:=map_hmw;
+
+   while(iy>-cellhw)do
+   begin
+      if(odd)
+      then ix:=cx
+      else ix:=cx-cellhw;
+      odd:=not odd;
+      while(ix>-cellhw)do
+      begin
+         if(not _PlayerStartHere(ix,iy,base_1r+cellw,map_symmetry))then
+         begin
+            _dds_a(ix,iy,1);
+            map_FillSea+=1;
+         end;
+         if(iy<>0)then
+           if(not _PlayerStartHere(map_mw-ix,map_mw-iy,base_1r+cellw,map_symmetry))then
+           begin
+              _dds_a(map_mw-ix,map_mw-iy,1);
+              map_FillSea+=1;
+           end;
+         ix-=cellw;
+      end;
+
+      iy-=cellw;
+   end;
+end;
+
 procedure map_make;
 const dpostime = 200;
 var i,ix,iy,lqs,rks,ddc,cnt,ir:integer;
@@ -511,6 +556,9 @@ begin
    if(map_symmetry)
    then ddc:=mm3(1,round(ddc/2),MaxDoodads)
    else ddc:=mm3(1,      ddc   ,MaxDoodads);
+
+   //if(map_obs=7)then ddc-=map_FillSea;
+   //if(ddc<1)then ddc:=1;
 
    rks :=0;
    lqs :=0;
@@ -566,12 +614,22 @@ begin
    map_symmetry:=random(2)>0;
 end;
 
-procedure Map_premap;
+procedure Map_premap({$IFDEF _FULLGAME}camp_theme:boolean=false{$ENDIF});
 begin
+   {$IFDEF _FULLGAME}
+   if(not camp_theme)then
+   {$ENDIF}
+   begin
+   map_decor_gap:=40;
    map_vars;
    map_Starts;
+   end;
+
    {$IFDEF _FULLGAME}
-   map_seed2theme;
+   if(not camp_theme)
+   then map_seed2theme
+   else SetThemeCampaing(cmp_sel);
+
    map_MakeThemeSprites;
    {$ENDIF}
    map_Make;

@@ -9,7 +9,7 @@ begin
       if(cpOwnerTeam>0)then
       begin
          for p:=0 to MaxPlayers do
-          with _players[p] do
+          with g_players[p] do
            if(team=cpOwnerTeam)then
            begin
               cenergy-=cpenergy;
@@ -20,11 +20,11 @@ begin
       end;
 
       cpOwnerPlayer:=newOwnerPlayer;
-      cpOwnerTeam  :=_players[newOwnerPlayer].team;
+      cpOwnerTeam  :=g_players[newOwnerPlayer].team;
       if(cpOwnerTeam>0)then
       begin
          for p:=0 to MaxPlayers do
-          with _players[p] do
+          with g_players[p] do
            if(team=cpOwnerTeam)then
            begin
               cenergy+=cpenergy;
@@ -35,11 +35,11 @@ begin
    end;
 end;
 
-procedure GameModeCPoints;
-var i,p,iOwnerTeam,iOwnerPlayer,iArmy,iTeams,
-wteam  ,
-wteam_n,
-cp_captured_n :integer;
+procedure GameModeCPointsCode;
+var i,p,
+iOwnerTeam,
+iOwnerPlayer,
+iArmy,iTeams :integer;
 begin
    for i:=1 to MaxCPoints do
     with g_cpoints[i] do
@@ -91,7 +91,7 @@ begin
        begin
           iTeams:=1;
           iOwnerPlayer:=0;
-          iOwnerTeam  :=_players[iOwnerPlayer].team;
+          iOwnerTeam  :=g_players[iOwnerPlayer].team;
        end;
 
        if(iTeams=0)
@@ -118,7 +118,14 @@ begin
              end;
           end;
     end;
+end;
 
+procedure GameModeCPointsEndConditions;
+var i,
+wteam  ,
+wteam_n,
+cp_captured_n :integer;
+begin
    // VICTORY CONDITIONS
    wteam        :=0;
    wteam_n      :=0;

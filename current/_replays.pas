@@ -106,7 +106,7 @@ begin
                   +SizeOf(g_fixed_positions)
                   +SizeOf(g_generators     )
                   +sizeof(rpls_player      );
-   with _players[0] do
+   with g_players[0] do
    rpls_file_head_size
                  +=(sizeof(name )
                    +sizeof(state)
@@ -176,7 +176,7 @@ begin
    end;
    rpls_step:=2;
    for i:=1 to MaxUnits do
-    with _units[i] do
+    with g_units[i] do
     begin
        vx:=x;
        vy:=y;
@@ -249,7 +249,7 @@ begin
       {$I+}
 
       for p:=1 to MaxPlayers do
-       with _Players[p] do
+       with g_players[p] do
        begin
           {$I-}
           BlockWrite(rpls_file,name ,sizeof(name ));
@@ -395,7 +395,7 @@ begin
          end;
 
          for p:=1 to MaxPlayers do
-          with _Players[p] do
+          with g_players[p] do
           begin
              {$I-}
              BlockRead(rpls_file,name ,sizeof(name ));
@@ -430,7 +430,7 @@ begin
          map_premap;
          MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
 
-         CamBounds;
+         CameraBounds;
          ui_tab    :=3;
          G_Started :=true;
          MainMenu     :=false;
@@ -494,7 +494,7 @@ begin
    begin
       vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)-vid_cam_hw) div 2;
       vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)-vid_cam_hh) div 2;
-      CamBounds;
+      CameraBounds;
    end;
 
    if(gs=gs_replaypause)then G_Status:=gs;
@@ -503,7 +503,7 @@ end;
 
 begin
    rpls_ticks+=1;
-   if(G_Started=false)or(rpls_state=rpls_none)or(menu_s2=ms2_camp)
+   if(not G_Started)or(rpls_state=rpls_none)or(menu_s2=ms2_camp)
    then replay_Abort
    else
      if(G_Started)then
@@ -523,10 +523,10 @@ begin
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)
    then replay_MenuSelectedInfo
    else
-     if(g_started=false)then rpls_str_info:='';
+     if(not g_started)then rpls_str_info:='';
 end;
 
-procedure replay_MakeFolderList;
+procedure replay_MakeFolderList(resetSelect:boolean=true);
 var Info : TSearchRec;
        s : shortstring;
 begin
@@ -546,19 +546,50 @@ begin
     until (FindNext(info)<>0);
    FindClose(info);
 
-   replay_Select;
+   if(resetSelect)then
+   begin
+      rpls_list_sel:=-1;
+      rpls_str_info:='';
+   end;
+   if(not G_Started)then
+     replay_Select;
 end;
 
-procedure replay_Delete;
+function replay_Play(check:boolean):boolean;
+begin
+   replay_Play:=false;
+
+   if(not menu_ReplaysTab)
+   or(g_started)
+   or(rpls_list_sel<0)
+   or(rpls_list_sel>=rpls_list_size)then exit;
+
+   replay_Play:=true;
+   if(check)then exit;
+
+   menu_s2:=ms2_scir;
+   rpls_state:=rpls_read;
+   g_started:=true;
+end;
+
+function replay_Delete(check:boolean):boolean;
 var fn:shortstring;
 begin
-   if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
+   replay_Delete:=false;
+
+   if(not menu_ReplaysTab)
+   or(g_started)
+   or(rpls_list_sel<0)
+   or(rpls_list_sel>=rpls_list_size)then exit;
+
+   replay_Delete:=true;
+   if(check)then exit;
 
    fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
-      replay_MakeFolderList;
+      replay_MakeFolderList(false);
    end;
 end;
 

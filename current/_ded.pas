@@ -18,11 +18,11 @@ begin
 end;
 
 
-procedure Dedicated_NewAI(arace,ateam,aiskill:byte);
+{procedure Dedicated_NewAI(arace,ateam,aiskill:byte);
 var p:byte;
 begin
    for p:=1 to MaxPlayers do
-    with _Players[p] do
+    with g_Players[p] do
      if(state=ps_none)then
      begin
         if(g_mode in [gm_scirmish,gm_capture])then  team:=ateam;
@@ -194,7 +194,7 @@ begin
    else exit;
    end;
    screen_redraw:=true;
-end;
+end;  }
 
 procedure Dedicated_Code;
 begin
@@ -250,14 +250,14 @@ end;
 procedure ps(p:byte);
 begin
    if(p=0)
-   then        Dedicated_screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team                    ,35, '',0, '',0)   // captions
-   else with _players[p] do
+   then        Dedicated_screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team ,35, '',0, '',0)   // captions
+   else with g_players[p] do
         if(state=ps_none)
-        then   Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''                          ,35, '',0, '',0)
+        then   Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''       ,35, '',0, '',0)
         else
           if(team=0)
-          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0)
-          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(PlayerGetTeam(g_mode,p)),35, '',0, '',0);
+          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(team),35, '',0, '',0)
+          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(team),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;

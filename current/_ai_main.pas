@@ -67,7 +67,7 @@ begin
    if(bt=0)then
     if(buid in pu^.uid^.ups_builder)then
     begin
-       _c:=_uid_conditionals(pu^.player,buid);
+       _c:=CheckUnitReqs(pu^.player,buid);
        if(_c=0)or((_c=ureq_energy)and(skip_energy_check))then
        begin
           bt   :=buid;
@@ -156,7 +156,7 @@ begin
            r_hell: ddir:=point_dir(x,y,ai_alarm_x,ai_alarm_y)+_randomr(45);
            r_uac : ddir:=point_dir(ai_alarm_x,ai_alarm_y,x,y)+_randomr(45);
            end;
-          l:=srange-_uids[aiucl_detect[race]]._r;
+          l:=srange-g_uids[aiucl_detect[race]]._r;
        end;
     end;
 end;
@@ -285,9 +285,9 @@ begin
       bx  :=x+trunc(l*cos(rdir));
       by  :=y-trunc(l*sin(rdir));
 
-      _building_newplace(bx,by,bt,playeri,@bx,@by);
+      BuildingFindNewPlace(bx,by,bt,playeri,@bx,@by);
 
-      _unit_start_build(bx,by,bt,playeri);
+      unit_start_build(bx,by,bt,playeri);
    end;
 end;
 
@@ -314,7 +314,7 @@ var ut,i:byte;
 function CheckReq(_uid:byte):boolean;
 var c:cardinal;
 begin
-   c:=_uid_conditionals(pu^.player,_uid);
+   c:=CheckUnitReqs(pu^.player,_uid);
    CheckReq:=(c=0)or(c=ureq_energy);
 end;
 function tryTransport:boolean;
@@ -525,7 +525,7 @@ UID_Engineer     : up_m:=ai_max_specialist;
       else         up_m:=MaxUnits;
       end;
 
-      if(up_n<up_m)then ai_UnitProduction:=_unit_straining(pu,ut);
+      if(up_n<up_m)then ai_UnitProduction:=unit_ProdStartUnit(pu,ut,false)=0;
    end;
 end;
 
@@ -545,7 +545,7 @@ begin
      with player^ do
      begin
         uip:=upgr[upid]+upprodu[upid];
-        if(uip<lvl)and(uip<ai_maxcount_upgrlvl)then _unit_supgrade(pu,upid);
+        if(uip<lvl)and(uip<ai_maxcount_upgrlvl)then unit_ProdStartUpgrade(pu,upid,false);
      end;
 end;
 begin
@@ -756,7 +756,7 @@ begin
       ai_tech0_cur     :=uid_e[aiucl_tech0 [race]];
       ai_tech1_cur     :=uid_e[aiucl_tech1 [race]];
       ai_tech2_cur     :=uid_e[aiucl_tech2 [race]];
-      ai_detect_cur    :=uid_e[aiucl_detect[race]]*_uids[aiucl_detect[race]]._limituse;
+      ai_detect_cur    :=uid_e[aiucl_detect[race]]*g_uids[aiucl_detect[race]]._limituse;
       ai_spec1_cur     :=uid_e[aiucl_spec1 [race]];
       ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
 
@@ -828,13 +828,13 @@ begin
       if((ai_flags and aif_base_suicide)>0)then
         if(ai_buildings_need_suicide(pu))then
         begin
-           _unit_kill(pu,false,true,true,false,true);
+           unit_kill(pu,false,true,true,false,true);
            exit;
         end;
 
       if(ai_advanced_bld)then
         if(ai_buildings_need_rebuild(pu))then
-          _unit_rebuild(pu);
+          if(unit_rebuild(pu,false)=0)then exit;
 
       if(hits<=0)or(not iscomplete)then exit;
 
@@ -844,7 +844,7 @@ begin
       if(_isbarrack)then
       begin
          if(cenergy<0)
-         then _unit_ctraining(pu,255,false)
+         then unit_ProdStopUnit(pu,255,false,false)
          else
            if((ai_flags and aif_army_smart_order)>0)
            then ai_UnitProduction(pu,uprod_smart,MaxUnits)
@@ -858,7 +858,7 @@ begin
       end;
       if(_issmith  )then
         if(cenergy<0)and(uproda<=0)
-        then _unit_cupgrade(pu,255,false)
+        then unit_ProdStopUpgrade(pu,255,false,false)
         else ai_UpgrProduction(pu);
    end;
 end;
@@ -965,7 +965,7 @@ begin
              uo_tar:=tt;
           end
           else
-            if(_IsUnitRange(uo_tar,nil))then _ability_teleport(pu,ai_teleporterF_u,td);
+            if(IsUnitRange(uo_tar,nil))then _ability_teleport(pu,ai_teleporterF_u,td);
      end;
 end;
 function ai_TryTeleportR(pu:PTUnit):boolean;
@@ -1156,7 +1156,7 @@ begin
 UID_Pain       : begin
                ai_RunFromEnemy(pu,base_1r);
                if (base_1r<aiu_alarm_d)
-               and(aiu_alarm_d<base_1rh)then _unit_sability(pu);
+               and(aiu_alarm_d<base_1rh)then unit_sability(pu,false);
                end;
 //UID_ArchVile   : ai_RunFromEnemy(pu,base_1r);
 UID_SiegeMarine,
@@ -1396,14 +1396,14 @@ begin
            begin
               ai_RunTo(pu,u_royal_cd,map_hmw,map_hmw,base_1r,nil);
               if(u_royal_cd<min2(g_royal_r div 7,base_2r))
-              then _unit_sability(pu);
+              then unit_sability(pu,false);
            end
            else
              if(ai_choosen)and(ai_cpoint_koth)then
              begin
                 ai_RunTo(pu,ai_cpoint_d,ai_cpoint_cp^.cpx,ai_cpoint_cp^.cpy,base_1r,nil);
                 if(ai_cpoint_d<ai_cpoint_r)
-                then _unit_sability(pu);
+                then unit_sability(pu,false);
              end
              else
                if(ai_enemy_d<=base_3r)
@@ -1415,7 +1415,7 @@ begin
                   or(ai_base_d=NOTSET)
                   then
                     if(not pf_IfObstacleZone(pfzone))
-                    then _unit_sability(pu);
+                    then unit_sability(pu,false);
                   {with player^ do
                   with uid^ do
                     if(ai_base_d>0)then
@@ -1435,11 +1435,11 @@ begin
         or((    ai_choosen)and(g_mode=gm_royale)and(u_royal_cd>=min2(g_royal_r div 7,base_2r)))
         or((    ai_choosen)and(ai_cpoint_koth)and(ai_cpoint_d>=base_1r))
         or((not ai_choosen)and(aiu_FiledSquareNear>ai_FiledSquareBorder)and(ai_builders_count<2))
-        then _unit_sability(pu)
+        then unit_sability(pu,false)
         else
           if(not ai_cpoint_koth)or(ai_cpoint_d>base_1r)then
            if(aiu_limitaround_enemy>aiu_limitaround_ally)and(buff[ub_Damaged]>0)then
-            if(hits<uid^._hmhits)or(aiu_limitaround_enemy>ul15)then _unit_sability(pu);
+            if(hits<uid^._hmhits)or(aiu_limitaround_enemy>ul15)then unit_sability(pu,false);
    end;
 end;
 procedure ai_SaveMain_HK(pu:PTUnit);
@@ -1455,21 +1455,21 @@ begin
            if(g_mode=gm_royale)
            then w:=g_royal_r div 2
            else w:=map_hmw;
-           if(_unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w)))then exit;
+           if(unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false)=0)then exit;
         end;
 
       case g_mode of
 gm_koth  : if(ai_choosen)and(base_1r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
            begin
               w:=base_1r;
-              _unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+_random(w),ai_cpoint_cp^.cpx+_random(w));
+              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+_random(w),ai_cpoint_cp^.cpx+_random(w),false);
               exit;
            end;
 gm_royale: if(ai_choosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2(g_royal_r div 4,base_2r);
-              _unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w));
+              unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false);
               exit;
            end;
       end;
@@ -1480,9 +1480,9 @@ gm_royale: if(ai_choosen)
          then w:=point_dir(aiu_alarm_x,aiu_alarm_y,x,y)
          else w:=random(360);
          d:=w*degtorad;
-         _unit_ability_HKeepBlink(pu,
+         unit_ability_HKeepBlink(pu,
          x+trunc(srange*cos(d)),
-         y-trunc(srange*sin(d)));
+         y-trunc(srange*sin(d)),false);
       end;
    end;
 end;
@@ -1547,7 +1547,7 @@ begin
 
       aiu_alarm_timer:=ai_TowerLifeTime;
 
-      _unit_ability_HTowerBlink(pu,bx,by);
+      unit_ability_HTowerBlink(pu,bx,by,false);
    end;
 end;
 
@@ -1594,23 +1594,23 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
                        then uo_tar:=ai_teleporter_beacon_u^.unum
                        else uo_tar:=0;
       end;
-      if(unit_canAbility(pu)=0)then
+      if(unit_sability(pu,true)=0)or(unit_pability(pu,0,0,0,true)=0)then
       begin
          // other ability
          if((player^.ai_flags and aif_ability_other)>0)then
          begin
             case _ability of
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
-uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then _unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum);
-uab_UACStrike        : if(ai_strike_tar_u<>nil)then _unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y);
+uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
+uab_UACStrike        : if(ai_strike_tar_u<>nil)then unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y,false);
 uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_phantoms]>0)then
-                         if(srange<u_royal_d)or(g_royal_r<srange)then _unit_sability(pu);
+                         if(srange<u_royal_d)or(g_royal_r<srange)then unit_sability(pu,false);
 uab_ToUACDron        : if(ai_need_suicide_tower(pu))then
-                         if(_unit_sability(pu))then exit;
+                         if(unit_sability(pu,false)=0)then exit;
             end;
             case uidi of
 UID_UACDron           : if(ai_uab_Rebuild2Turret(pu))then
-                          if(_unit_rebuild(pu))then exit;
+                          if(unit_rebuild(pu,false)=0)then exit;
             end;
          end;
 
@@ -1629,17 +1629,17 @@ UID_UACDron           : if(ai_uab_Rebuild2Turret(pu))then
             case _ability of
 uab_UACScan          : begin
                           if(ai_enemy_inv_u<>nil)then
-                            if(_unit_ability_uradar(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
+                            if(unit_ability_UACScan(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,false)=0)then
                             begin
                                ai_detection_pause:=fr_fps1;
                                ai_enemy_inv_u^.buff[ub_Scaned]:=fr_fps1;
                             end;
                           if(ai_alarm_d=NOTSET)and(g_mode<>gm_invasion)then
                            if(ai_choosen)or(ai_ReadyForAttack)then
-                            if(_unit_ability_uradar(pu,_random(map_mw),_random(map_mw)))then ai_detection_pause:=fr_fps1;
+                            if(unit_ability_UACScan(pu,_random(map_mw),_random(map_mw),false)=0)then ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then
-                         if(_unit_ability_HellVision(pu,ai_need_heye_u^.unum))then ai_detection_pause:=fr_fps1;
+                         if(unit_ability_HellVision(pu,ai_need_heye_u^.unum,false)=0)then ai_detection_pause:=fr_fps1;
             end;
 
       if(speed<=0)or(_ukbuilding)then exit;

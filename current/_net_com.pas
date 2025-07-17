@@ -371,17 +371,6 @@ begin
    end;
 end;
 
-procedure net_swapp(p1:byte);
-begin
-   if(net_status=ns_client)then
-   begin
-      net_clearbuffer;
-      net_writebyte(nmid_swapp);
-      net_writebyte(p1);
-      net_send(net_cl_svip,net_cl_svport);
-   end;
-end;
-
 procedure net_SendMapMark(x,y:integer);
 begin
    if(net_status=ns_client)then

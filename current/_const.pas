@@ -63,7 +63,7 @@ gm_invasion            = 4;
 gm_KotH                = 5;
 gm_royale              = 6;
 
-gm_fixed_positions     : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
+gm_fixed_teams         : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
 
 allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
 gm_cnt                 = 6;
@@ -200,6 +200,7 @@ lmt_ngen_exh           = 38;
 lmt_ngen_captured      = 39;
 lmt_ngen_lost          = 40;
 lmt_koth_control       = 41;
+lmt_invalid_tar        = 42;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
@@ -258,6 +259,10 @@ nmid_order             = 15;
 nmid_player_leave      = 16;
 nmid_map_mark          = 17;
 nmid_player_surrender  = 18;
+nmid_lobby_AIUp        = 19;
+nmid_lobby_AIToggle    = 20;
+nmid_lobby_PRace       = 21;
+nmid_lobby_PTeam       = 22;
 nmid_getinfo           = 66;
 
 
@@ -296,6 +301,7 @@ ureq_usespability      : cardinal = 1 shl 18; // need use 'special ability at po
 ureq_usesability       : cardinal = 1 shl 19; // need use 'special ability' order
 ureq_reloading         : cardinal = 1 shl 20; // reloading
 ureq_landplace         : cardinal = 1 shl 21; // can't land here
+ureq_invalidtar        : cardinal = 1 shl 22; // invalid target
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -303,16 +309,16 @@ ureq_landplace         : cardinal = 1 shl 21; // can't land here
 //
 
 co_empty               = -32000;
-co_destroy             = -111;
 co_rcamove             = -101;
 co_rcmove              = -100;
+co_destroy             = -111;
 co_stand               = -90;
 co_move                = -91;
 co_patrol              = -92;
 co_astand              = -93;
 co_amove               = -94;
 co_apatrol             = -95;
-co_psability           = -79;
+co_pability            = -79;
 co_sability            = -80;
 co_supgrade            = -81;
 co_cupgrade            = -82;
@@ -520,7 +526,7 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 
 MaxDIDs                = 7;
 
-DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,105,60,17);
+DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,102,57,17);
 
 //pi*_r*_r
 
@@ -752,7 +758,7 @@ UID_HSymbol4           = 7;
 UID_HPools             = 8;
 UID_HTower             = 9;
 UID_HTeleport          = 10;
-UID_HEye               = 11;
+UID_HEyeNest           = 11;
 UID_HMonastery         = 12;
 UID_HPentagram         = 13;
 UID_HTotem             = 14;
@@ -806,15 +812,18 @@ UID_UATurret           = 63;
 UID_UComputerStation   = 64;
 UID_UMine              = 65;
 
-UID_UBaseMil           = 66;
-UID_UBaseCom           = 67;
-UID_UBaseGen           = 68;
-UID_UBaseRef           = 69;
-UID_UBaseNuc           = 70;
-UID_UBaseLab           = 71;
-UID_UCBuild            = 72;
-UID_USPort             = 73;
-UID_UPortal            = 74;
+UID_UPortal            = 66;
+UID_UBaseMil           = 67;
+UID_UBaseCom           = 68;
+UID_UBaseGen           = 69;
+UID_UBaseRef           = 70;
+UID_UBaseNuc           = 71;
+UID_UBaseLab           = 72;
+UID_UCBuild0           = 73;
+UID_UCBuild1           = 74;
+UID_UCBuild2           = 75;
+UID_UCBuild3           = 76;
+UID_USPort             = 77;
 
 UID_Engineer           = 80;
 UID_Medic              = 81;
@@ -864,21 +873,18 @@ uab_ToUACDron          = 11;
 uab_Unload             = 12;
 
 client_rld_abils       = [
-                         uab_Teleport
+                         uab_Teleport,uab_HellVision,uab_HInvulnerability
                          ];
-client_rld_uids        = [
-                          UID_HAltar
-                         ];
+client_rld_uids        = [];
 client_cast_abils      = [
                          uab_UACScan  ,
-                         uab_UACStrike,
-                         uab_HInvulnerability
+                         uab_UACStrike
                          ];
 
-uab_abilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
-uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
-                          uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
-                          uab_SpawnLost,uab_HellVision,uab_CCFly,uab_Unload];
+uab_sabilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
+uab_pabilityOrder       = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
+                           uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
+                           uab_SpawnLost,uab_HellVision,uab_CCFly,uab_Unload];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -918,11 +924,15 @@ regen_period           = fr_fps1;
 order_period           = fr_fpsd2+1;
 vistime                = fr_fps2;
 
+detection_time_sec     = 8;
+
 radar_reload_sec       = 60;
 radar_reload           = fr_fps1*radar_reload_sec;
-radar_vision_time      = radar_reload-(fr_fps1*8);
+radar_vision_time      = radar_reload-(fr_fps1*detection_time_sec);
 
-hell_vision_time       = fr_fps1*8;
+hell_vision_time       = fr_fps1*detection_time_sec;
+hell_vision_reload_sec = ptime3;
+hell_vision_reload     = fr_fps1*hell_vision_reload_sec;
 
 hteleport_rldPerLimit  = 5;
 
@@ -958,6 +968,7 @@ _d2shi                 = abs(dead_hits div 125)+1;   // 5
 gm_cptp_gtime          = fr_fps1*ptimehh;
 gm_cptp_time           = fr_fps1*ptimeh;
 gm_cptp_r              = 100;
+gm_cptp_gr             = gm_cptp_r-(gm_cptp_r div 3);
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
@@ -1223,7 +1234,7 @@ vid_wl                 : array[0..vid_wl_n-1] of Smallint = (vid_minw,960,1024,1
 vid_hl                 : array[0..vid_hl_n-1] of Smallint = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
 
 vid_ab                 = 128;
-vid_mvs                = 500; // max vis sprites;
+vid_mvs                = 1000; // max vis sprites;
 vid_blink_persecond    = 6;
 vid_blink_period1      = fr_fps1  div vid_blink_persecond;
 vid_blink_periodh      = vid_blink_period1 div 2;
@@ -1248,7 +1259,9 @@ vid_oisw               = vid_oiw-(vid_oiw div 4);
 vid_oips               = 2*vid_oiw+vid_oisw;
 vid_svld_m             = 7;
 vid_rpls_m             = 8;
-vid_camp_m             = 11;
+vid_camp_m             = 10;
+vid_campi_m            = 9;
+vid_campi_scrlstep     = vid_campi_m+1;
 
 ui_max_alarms          = 12;
 
@@ -1297,20 +1310,22 @@ ui_menu_pls_y1         = 253;
 ui_menu_pls_ys         = 18;
 ui_menu_pls_zh         = (MaxPlayers*ui_menu_pls_ys);
 ui_menu_pls_xc         = (ui_menu_pls_x0+ui_menu_pls_x1) div 2;
-ui_menu_pls_zy0        = ((ui_menu_pls_y0+ui_menu_pls_y1) div 2)-(ui_menu_pls_zh div 2);
+ui_menu_pls_zy0        = ((ui_menu_pls_y0+ui_menu_pls_y1) div 2)-(ui_menu_pls_zh div 2)-2;
 ui_menu_pls_zy1        = ui_menu_pls_zy0+ui_menu_pls_zh;
-ui_menu_pls_zxn        = ui_menu_pls_x0+16;   // name
-ui_menu_pls_zxs        = ui_menu_pls_zxn+130; // status
-ui_menu_pls_zxr        = ui_menu_pls_zxs+24;  // race
-ui_menu_pls_zxt        = ui_menu_pls_zxr+64;  // team
-ui_menu_pls_zxc        = ui_menu_pls_zxt+24;  // color box
-ui_menu_pls_zxe        = ui_menu_pls_x1-16;
+ui_menu_pls_zy2        = ui_menu_pls_zy1+ui_menu_pls_ys;
+ui_menu_pls_zxn        = ui_menu_pls_x0;      // start
+ui_menu_pls_zxs        = ui_menu_pls_zxn+130; // name
+ui_menu_pls_zxr        = ui_menu_pls_zxs+24;  // status
+ui_menu_pls_zxt        = ui_menu_pls_zxr+68;  // race
+ui_menu_pls_zxc        = ui_menu_pls_zxt+40;  // team
+ui_menu_pls_zxe        = ui_menu_pls_x1;      // color box
 ui_menu_pls_zxnt       =  ui_menu_pls_zxn+6;
 ui_menu_pls_zxst       = (ui_menu_pls_zxs+ui_menu_pls_zxr) div 2;
 ui_menu_pls_zxrt       = (ui_menu_pls_zxr+ui_menu_pls_zxt) div 2;
 ui_menu_pls_zxtt       = (ui_menu_pls_zxt+ui_menu_pls_zxc) div 2;
 ui_menu_pls_zxc1       = ui_menu_pls_zxc+8;
 ui_menu_pls_zxc2       = ui_menu_pls_zxe-8;
+ui_menu_pls_zxct       = (ui_menu_pls_zxc+ui_menu_pls_zxe) div 2;
 
 ui_menu_csm_x0         = 418;
 ui_menu_csm_y0         = 290;
@@ -1331,12 +1346,13 @@ ui_menu_csm_xt1        = ui_menu_csm_x0+24;
 ui_menu_csm_xt2        = ui_menu_csm_x1-8;
 ui_menu_csm_xt3        = ui_menu_csm_xc+8;
 
+menu_ihintn            = 3;
 
 chat_type              : array[false..true] of char = ('|',' ');
 chat_shlm_t            = fr_fps1*3;
 chat_shlm_max          = chat_shlm_t*6;
 
-ui_menu_chat_height    = 17; // lines
+ui_menu_chat_height    = 14; // lines
 ui_menu_chat_width     = 37; // chars
 
 ui_dBW                 = vid_BW-font_w-3;
@@ -1407,8 +1423,8 @@ ms3_game               = 0;
 ms3_vido               = 1;
 ms3_sond               = 2;
 
-MaxMissions            = 21;
-CMPMaxSkills           = 6;
+LastMission            = 23;
+CMPMaxSkills           = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -9,16 +9,13 @@ TSoc = set of char;
 
 string6 = string[6];
 
+TStringList = array of shortstring;
+PTStringList = ^TStringList;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   GRAPHIC
 //
-
-{TColor = record
-   r,g,b,a:byte;
-   c      :cardinal;
-end;
-PTColor = ^TColor;    }
 
 TMWTexture = record
    surf:pSDL_Surface;
@@ -472,6 +469,9 @@ o_x1,o_y1  : integer;
    upprodu,
    upgr    : array[byte] of byte;
 
+   a_rebuild,
+   a_ability: TSoB;
+
    a_upgrs,
    a_units : array[byte] of integer;
 
@@ -606,7 +606,6 @@ TUnit = record
 
    StayWaitForNewTarget:byte;
    ukfly,
-   isbuildarea,
    ukfloater,
    iscomplete,
    solid,

@@ -16,10 +16,10 @@ begin
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
    _GfxColors;
-   _MakeScreen;
+   vid_MakeScreen;
    _LoadingScreen(@str_loading_gfx,c_yellow);
    _LoadGraphics(true);
-   _cmp_Init;
+   cmp_Init;
 
    InitVideo:=true;
 end;
