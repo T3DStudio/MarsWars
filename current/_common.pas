@@ -40,6 +40,7 @@ function menu_NetServer(start  ,check:boolean):boolean;forward;
 function menu_NetClient(connect,check:boolean):boolean;forward;
 function menu_ReadyButtonEnabled:boolean;forward;
 
+function PlayersSlotEnabled:boolean;forward;
 function PlayerAIToggle  (player:byte;check:boolean):boolean;forward;
 function PlayerRaceChange(player:byte;check:boolean):boolean;forward;
 function PlayerTeamChange(player:byte;forward,check:boolean):boolean;forward;
@@ -1217,6 +1218,23 @@ begin
       end;
 end;
 
+procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
+begin
+   if(pset^=[])then exit;
+   repeat
+     if(fwrd)
+     then pb^+=1
+     else pb^-=1
+   until pb^ in pset^
+end;
+
+procedure ScrollInt(i:pinteger;s,min,max:integer);
+begin
+   i^+=s;
+   if(i^>max)then i^:=max;
+   if(i^<min)then i^:=min;
+end;
+
 {$IFDEF _FULLGAME}
 
 function GameCheckEndStatus:boolean;
@@ -1290,25 +1308,6 @@ begin
                     or(_isbuilder and not ukfly)
                     or(_ability=uab_UACScan)
                     or(_ability=uab_HellVision);
-end;
-
-procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
-begin
-   if(pset^=[])then exit;
-   repeat
-     if(fwrd)
-     then pb^+=1
-     else pb^-=1
-   until pb^ in pset^
-end;
-
-
-
-procedure ScrollInt(i:pinteger;s,min,max:integer);
-begin
-   i^+=s;
-   if(i^>max)then i^:=max;
-   if(i^<min)then i^:=min;
 end;
 
 procedure WriteLog(mess:shortstring);

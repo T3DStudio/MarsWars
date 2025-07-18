@@ -1,6 +1,6 @@
 
 
-procedure _unit_death(pu:PTUnit);
+procedure unit_death(pu:PTUnit);
 var tu  : PTUnit;
     uc  : integer;
 begin
@@ -202,7 +202,7 @@ begin
     end;
 end;
 
-procedure _unit_push(pu,tu:PTUnit;uds:single);
+procedure unit_push(pu,tu:PTUnit;uds:single);
 var t:single;
    ud:integer;
 shortcollision,
@@ -234,7 +234,7 @@ begin
             end;
          end
          else unit_SetXY(pu,x+round(uds*(tu^.x-x)/t)+_randomr(2),
-                             y+round(uds*(tu^.y-y)/t)+_randomr(2),mvxy_none);
+                            y+round(uds*(tu^.y-y)/t)+_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -257,7 +257,7 @@ begin
    end;
 end;
 
-procedure _unit_dpush(pu:PTUnit;td:PTDoodad);
+procedure unit_dpush(pu:PTUnit;td:PTDoodad);
 var t,uds:single;
       ud :integer;
 begin
@@ -280,12 +280,14 @@ begin
             end;
          end
          else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+_randomr(2),
-                             y+round(ud*(td^.y-y)/t)+_randomr(2),mvxy_none);
+                            y+round(ud*(td^.y-y)/t)+_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
          if(a_rld<=0)then
           if(vx<>x)or(vy<>y)then dir:=_DIR360(dir-(dir_diff(dir,point_dir(vx,vy,x,y)) div 2 ));
+
+         if(uo_id=ua_psability)then exit;
 
          ud:=point_dist_rint(uo_x,uo_y,td^.x,td^.y)-_r-td^.r;
          if(ud<=0)then
@@ -308,7 +310,7 @@ begin
      if(n>0)then
       for i:=0 to n-1 do
        with l[i]^ do
-        if(r>0)and(t>0)then _unit_dpush(pu,l[i]);
+        if(r>0)and(t>0)then unit_dpush(pu,l[i]);
 end;
 
 procedure _unit_npush_dcell(pu:PTUnit);
@@ -317,7 +319,7 @@ begin
     if(speed>0)and(ukfly=uf_ground)and(solid)and(iscomplete)and(not ukfloater)then _unit_npush(pu);
 end;
 
-procedure _unit_move(pu:PTUnit);
+procedure unit_move(pu:PTUnit);
 var mdist,ss:integer;
     ddir    :single;
 begin
@@ -660,11 +662,11 @@ wtp_Scout            : begin
    incPrio(highprio);
 end;
 
-function _unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;
+function unit_target(pu,tu:PTUnit;ud:integer;a_tard:pinteger;t_weap:pbyte;a_tarp:PPTUnit;t_prio:pinteger):boolean;
 var tw:byte;
 n_prio:integer;
 begin
-   _unit_target:=false;
+   unit_target:=false;
    with pu^ do
    with uid^ do
    begin
@@ -672,7 +674,7 @@ begin
 
       if(tw>MaxUnitWeapons)then exit;
 
-      _unit_target:=true;
+      unit_target:=true;
 
       if(tw>t_weap^)
       then exit
@@ -756,7 +758,7 @@ UID_HKeep     : if(ud<srange)
    end;
 end;
 
-procedure _unit_capture_point(pu:PTUnit);
+procedure unit_capture_point(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
@@ -770,7 +772,7 @@ begin
        end;
 end;
 
-procedure _unit_mcycle(pu:PTUnit);
+procedure unit_mcycle(pu:PTUnit);
 var uc,
 t_prio,
 a_tard,
@@ -843,7 +845,7 @@ uab_Teleport      : swtarget:=true;
       end;
       aiu_CollectData(pu,pu,0,nil);
 
-      if(attack_target)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(attack_target)then unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -860,7 +862,7 @@ uab_Teleport      : swtarget:=true;
 
             if(tu_transport=nil)then unit_detect(pu,tu,ud);
 
-            if(attack_target)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
+            if(attack_target)then unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
             aiu_CollectData(pu,tu,ud,tu_transport);
             if(aicode){or(sel)}then ai_CollectData(pu,tu,ud,tu_transport);
@@ -871,7 +873,7 @@ uab_Teleport      : swtarget:=true;
 
                if(pushout)then
                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.iscomplete)then
-                 if(tu^.solid)and(ukfly=tu^.ukfly)then _unit_push(pu,tu,uds);
+                 if(tu^.solid)and(ukfly=tu^.ukfly)then unit_push(pu,tu,uds);
 
                if(swtarget)then
                 if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)and(tu^.iscomplete)then
@@ -908,7 +910,7 @@ uab_Teleport      : swtarget:=true;
    end;
 end;
 
-procedure _unit_mcycle_cl(pu,au:PTUnit);
+procedure unit_mcycle_cl(pu,au:PTUnit);
 var uc,a_tard,
 t_prio,
     ud : integer;
@@ -944,7 +946,7 @@ begin
 
       if(udetect=false)and(ftarget=false)then exit;  // in apc & client side
 
-      if(ftarget)and(ServerSide)then _unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
+      if(ftarget)and(ServerSide)then unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
       for uc:=1 to MaxUnits do
       if(uc<>unum)then
@@ -960,7 +962,7 @@ begin
                if(au=nil)and(tu^.hits>0)then
                 if(tu^.transport<=0)or(MaxUnits<tu^.transport)then _unit_aura_effects(pu,tu,ud);
             end;
-            if(ftarget)then _unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
+            if(ftarget)then unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
          end;
       end;
    end;
@@ -1585,7 +1587,7 @@ wpt_heal       : begin
    end;
 end;
 
-procedure _unit_order(pu:PTUnit);
+procedure unit_order(pu:PTUnit);
 var apctu:PTUnit;
 begin
    with pu^ do
@@ -1858,7 +1860,7 @@ begin
    end;
 end;
 
-procedure _unit_prod(pu:PTUnit);
+procedure unit_prod(pu:PTUnit);
 var i:integer;
 procedure _uXCheck(pui:pinteger);
 var tu:PTUnit;
@@ -1940,14 +1942,14 @@ begin
          if(hits>0)then
          begin
             unit_Bonuses (pu);
-            _unit_order(pu);
+            unit_order(pu);
 
             if(hits<=0)then continue;
 
             if(ServerSide)then
             begin
-               _unit_move(pu);
-               _unit_prod(pu);
+               unit_move(pu);
+               unit_prod(pu);
 
                if(player^.state=ps_comp)then ai_scout_pick(pu);
             end;
@@ -1955,14 +1957,14 @@ begin
             transportu:=nil;
             if(cycle_order=g_cycle_order)and(hits>0)then
               if(ServerSide)and(not IsUnitRange(transport,@transportu))
-              then _unit_mcycle   (pu)
-              else _unit_mcycle_cl(pu,transportu);
+              then unit_mcycle   (pu)
+              else unit_mcycle_cl(pu,transportu);
 
             if(ServerSide)then
               if(not IsUnitRange(transport,nil))then
-                _unit_capture_point(pu);
+                unit_capture_point(pu);
          end
-         else _unit_death(pu);
+         else unit_death(pu);
 
          unit_MoveVis(pu);
       end;

@@ -2,10 +2,10 @@
 
 procedure map_MakeThemeSprites;
 begin
-   gfx_MakeTerrain;
-   MakeCrater;
-   MakeLiquid;
-   MakeLiquidBack;
+   gfx_MapMakeTerrain;
+   gfx_MapMakeCrater;
+   gfx_MapMakeLiquid;
+   gfx_MapMakeLiquidBack;
 end;
 
 procedure map_seed2theme;
@@ -596,7 +596,7 @@ begin
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
    map_RedrawMenuMinimap;
-   map_tdmake;
+   map_MakeDecals;
    {$ENDIF}
 end;
 

@@ -187,6 +187,8 @@ menu_s1           : byte = ms1_sett;
 menu_s2           : byte = ms2_scir;
 menu_s3           : byte = ms3_game;
 
+menu_cx           : integer;
+
 menu_ihint        : byte=0;
 menu_ihintpi      : byte=255;
 menu_ihintlx      : array[0..menu_ihintn] of integer = (228,570,228,570);
@@ -194,6 +196,8 @@ menu_ihintly      : array[0..menu_ihintn] of integer = (76 ,76 ,307,271);
 
 m_vrx,
 m_vry             : integer;
+menu_mseed        : shortstring = '1';
+menu_bmseed       : cardinal = 1;
 
 PlayerName        : shortstring = 'DoomPlayer';
 PlayerTeam        : byte = 1;
@@ -745,6 +749,7 @@ spr_b_selall,
 spr_b_cancel,
 spr_b_delete,
 spr_mback,
+spr_mlogo,
 spr_mbtn,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;

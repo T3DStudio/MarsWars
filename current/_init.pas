@@ -15,10 +15,10 @@ begin
 
    SDL_WM_SetCaption(@str_wcaption[1], nil );
 
-   _GfxColors;
+   gfx_InitColors;
    vid_MakeScreen;
    _LoadingScreen(@str_loading_gfx,c_yellow);
-   _LoadGraphics(true);
+   gfx_LoadAll(true);
    cmp_Init;
 
    InitVideo:=true;
@@ -81,8 +81,8 @@ begin
    SwitchLanguage;
    InitUIDDataCL;
    InitMIDDataCL;
-   MakeUnitIcons;
-   MakeAbilityIcons;
+   gfx_MakeUnitIcons;
+   gfx_MakeAbilityIcons;
 
    {$ENDIF}
 

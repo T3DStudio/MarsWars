@@ -781,7 +781,7 @@ begin
 
                            vid_MakeScreen;
                            theme_map_ptrt:=255;
-                           gfx_MakeTerrain;
+                           gfx_MapMakeTerrain;
                            vid_menu_redraw:=true;
                            end;
       SDL_KEYUP          : begin
@@ -816,7 +816,7 @@ begin
                                 sdlk_lctrl  : if(ks_ctrl =0)then ks_ctrl :=1;
                                 sdlk_ralt   : if(ks_alt  =0)then ks_alt  :=1;
                                 sdlk_lalt   : if(ks_alt  =0)then ks_alt  :=1;
-                                sdlk_print  : _screenshot;
+                                sdlk_print  : gfx_MakeScreenshot;
                                 sdlk_escape : input_key_escape;
                                 SDLK_KP_ENTER,
                                 sdlk_return : input_key_return;

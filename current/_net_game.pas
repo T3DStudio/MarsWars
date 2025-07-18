@@ -15,7 +15,6 @@ begin
          ttl          :=0;
          {$IFNDEF _FULLGAME}
          GameLogCommon(i,0,'MarsWars dedicated server, '+str_ver,false);
-         GameLogCommon(i,0,'Type -h/-help command'              ,false);
          {$ENDIF}
          break;
       end;
@@ -123,36 +122,22 @@ begin
 end;
 
 procedure net_Server;
-var mid,
-    pid,
-    i  : byte;
-net_period_step
-       : boolean;
+var
+mid,pid,
+i      : byte;
 u      : integer;
 pu     : PTUnit;
+net_period_step
+       : boolean;
+{$IFNDEF _FULLGAME}
+c      : cardinal;
+{$ENDIF}
 begin
    net_clearbuffer;
 
    while(net_Receive>0)do
    begin
       mid:=net_readbyte;
-
-      {if(mid=nmid_getinfo)then
-      begin
-         net_clearbuffer;
-         net_writebyte(nmid_getinfo);
-         net_writebyte(ver);
-         net_writebool(g_started);
-         net_writebool(g_addon  );
-         net_writebyte(g_mode   );
-         for i:=1 to MaxPlayers do
-          with g_players[i] do
-           if(state>ps_none)
-           then net_writestring(name)
-           else net_writestring(''  );
-         net_send(net_LastinIP,net_LastinPort);
-         continue;
-      end;}
 
       if(mid=nmid_connect)then
       begin
@@ -175,7 +160,7 @@ begin
             continue;
          end;
 
-         if(G_Started=false)then net_SvReadPlayerData(pid);
+         if(not G_Started)then net_SvReadPlayerData(pid);
 
          net_clearbuffer;
          net_WriteGameData(pid);
@@ -262,13 +247,47 @@ nmid_pause       : begin
                    end;
                end
                else
-                 if(mid=nmid_swapp)then
-                 begin
-                    i:=net_readbyte;
-                    PlayersSwap(i,pid);
-                    {$IFNDEF _FULLGAME}
-                    screen_redraw:=true;
-                    {$ENDIF}
+                 case mid of
+                 nmid_lobby_PPosSwap   : begin
+                                            i:=net_readbyte; // player
+                                            {$IFNDEF _FULLGAME}
+                                            screen_redraw:=screen_redraw or
+                                            {$ENDIF}
+                                            PlayersSwap(i,pid);
+                                         end;
+                 {$IFNDEF _FULLGAME}
+                 nmid_lobby_PAIUp,
+                 nmid_lobby_PAIToggle,
+                 nmid_lobby_PRace,
+                 nmid_lobby_PTeam      : begin
+                                            i:=net_readbyte; // player
+                                            case mid of
+                                            nmid_lobby_PAIUp    : screen_redraw:=screen_redraw or PlayerAILevelLoop(i);
+                                            nmid_lobby_PAIToggle: screen_redraw:=screen_redraw or PlayerAIToggle   (i,false);
+                                            nmid_lobby_PRace    : screen_redraw:=screen_redraw or PlayerRaceChange (i,false);
+                                            nmid_lobby_PTeam    : screen_redraw:=screen_redraw or PlayerTeamChange (i,net_readbool,false);
+                                            end;
+                                         end;
+                 nmid_lobby_MSeed      : begin
+                                            c:=net_readcard;
+                                            screen_redraw:=c<>map_seed;
+                                            map_seed:=c;
+                                            if(screen_redraw)then map_premap;
+                                         end;
+                 nmid_lobby_MSize,
+                 nmid_lobby_MObs,
+                 nmid_lobby_MSym,
+                 nmid_lobby_MRandom,
+                 nmid_lobby_GMode,
+                 nmid_lobby_GFixPos,
+                 nmid_lobby_GAISlots,
+                 nmid_lobby_GGen,
+                 nmid_lobby_GDeadObs,
+                 nmid_lobby_GRandomScir: begin
+                                         menu_GameMapSetting(mid,net_readbool);
+                                         screen_redraw:=true;
+                                         end;
+                 {$ENDIF}
                  end;
             end;
          end

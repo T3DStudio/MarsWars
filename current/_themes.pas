@@ -3,7 +3,7 @@ function _xasurf(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
-   _xasurf:=_createSurf(s^.w,s^.h);
+   _xasurf:=gfx_CreateSDLSurface(s^.w,s^.h);
    for x:=1 to s^.w do
     for y:=1 to s^.h do
     begin
@@ -27,7 +27,7 @@ begin
    begin
       with t do
       begin
-         surf:=LoadIMG(str+i2s(i),false,false);
+         surf:=gfx_LoadSDLSurface(str+i2s(i),false,false);
          if(surf=r_empty)then break;
          w   :=surf^.w;
          h   :=surf^.h;
@@ -188,7 +188,7 @@ end;
 
 procedure _liqAnim(i:integer;r,g,b:byte;atp,animt:byte);
 begin
-   theme_clr_liquids[i]:=rgba2c(r,g,b,255);
+   theme_clr_liquids[i]:=gfx_rgba2c(r,g,b,255);
    theme_anm_liquids[i]:=atp;
    theme_ant_liquids[i]:=animt;
 end;

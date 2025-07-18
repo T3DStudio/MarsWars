@@ -254,17 +254,26 @@ nmid_server_full       = 10;
 nmid_wrong_ver         = 11;
 nmid_game_started      = 12;
 nmid_notconnected      = 13;
-nmid_swapp             = 14;
-nmid_order             = 15;
-nmid_player_leave      = 16;
-nmid_map_mark          = 17;
-nmid_player_surrender  = 18;
-nmid_lobby_AIUp        = 19;
-nmid_lobby_AIToggle    = 20;
+nmid_order             = 14;
+nmid_player_leave      = 15;
+nmid_map_mark          = 16;
+nmid_player_surrender  = 17;
+nmid_lobby_PPosSwap    = 18;
+nmid_lobby_PAIUp       = 19;
+nmid_lobby_PAIToggle   = 20;
 nmid_lobby_PRace       = 21;
 nmid_lobby_PTeam       = 22;
-nmid_getinfo           = 66;
-
+nmid_lobby_MSeed       = 23;
+nmid_lobby_MSize       = 24;
+nmid_lobby_MObs        = 25;
+nmid_lobby_MSym        = 26;
+nmid_lobby_MRandom     = 27;
+nmid_lobby_GMode       = 28;
+nmid_lobby_GFixPos     = 29;
+nmid_lobby_GAISlots    = 30;
+nmid_lobby_GGen        = 31;
+nmid_lobby_GDeadObs    = 32;
+nmid_lobby_GRandomScir = 33;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

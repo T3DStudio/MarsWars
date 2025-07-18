@@ -51,7 +51,7 @@ begin
    if(net_status=ns_client)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_swapp);
+      net_writebyte(nmid_lobby_PPosSwap);
       net_writebyte(p0);
       net_send(net_cl_svip,net_cl_svport);
       exit;
@@ -363,56 +363,6 @@ begin
     end;
 end;
 
-procedure MakeRandomSkirmish(andstart:boolean);
-var p:byte;
-begin
-   if(G_Started)then exit;
-
-   Map_randommap;
-
-   case random(7) of
-   0:   g_mode:=gm_royale;
-   1:   g_mode:=gm_capture;
-   2:   g_mode:=gm_KotH;
-   else g_mode:=gm_scirmish;
-   end;
-
-   if(random(3)=0)
-   then g_generators:=random(gms_g_maxgens)+1
-   else g_generators:=0;
-
-   PlayersSwap(1,HPlayer);
-
-   for p:=2 to MaxPlayers do
-    with g_players[p] do
-    begin
-       race :=random(r_cnt+1);
-       mrace:=race;
-
-       if(p=4)
-       then team:=1+random(4)
-       else team:=2+random(3);
-
-       ai_skill:=random(6)+2;
-
-       if(random(2)=0)and(p>2)
-       then PlayerSetState(p,ps_none)
-       else PlayerSetState(p,ps_comp);
-    end;
-
-   PlayersSwap(random(MaxPlayers)+1,HPlayer);
-
-   if(random(3)=0)
-   then g_ai_slots:=0
-   else g_ai_slots:=random(player_default_ai_level+1);
-
-   g_fixed_positions:=random(2)=0;
-
-   Map_premap;
-
-   if(andstart)then GameMakeStartBreak;
-end;
-
 function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
 begin
    CheckSimpleClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
@@ -720,6 +670,51 @@ end;
 {$include _ded.pas}
 {$ENDIF}
 
+procedure MakeRandomSkirmish;
+var p:byte;
+begin
+   Map_randommap;
+
+   case random(7) of
+   0:   g_mode:=gm_royale;
+   1:   g_mode:=gm_capture;
+   2:   g_mode:=gm_KotH;
+   else g_mode:=gm_scirmish;
+   end;
+
+   if(random(3)=0)
+   then g_generators:=random(gms_g_maxgens)+1
+   else g_generators:=0;
+
+   for p:=HPlayer+1 to MaxPlayers do
+     with g_players[p] do
+       if(state<>ps_play)then
+       begin
+          race :=random(r_cnt+1);
+          mrace:=race;
+
+          team:=1+random(4);
+
+          ai_skill:=random(6)+2;
+
+          if(random(2)=0)
+          then PlayerSetState(p,ps_none)
+          else PlayerSetState(p,ps_comp);
+       end;
+
+   {$IFDEF _FULLGAME}
+   PlayersSwap(random(MaxPlayers)+1,HPlayer);
+   {$ENDIF}
+
+   if(random(3)=0)
+   then g_ai_slots:=0
+   else g_ai_slots:=random(player_default_ai_level+1);
+
+   g_fixed_positions:=random(2)=0;
+
+   Map_premap;
+end;
+
 procedure PlayerExecuteOrder(pl:byte);
 var
 _su,_eu: integer;
@@ -943,8 +938,10 @@ begin
    for p:=0 to MaxPlayers do PlayerAPMUpdate(p);
 end;
 
-procedure PlayerAILevelLoop(player:byte);
+function PlayerAILevelLoop(player:byte):boolean;
 begin
+   PlayerAILevelLoop:=false;
+
    if(g_started)
    {$IFDEF _FULLGAME}
    or(menu_s2=ms2_camp)
@@ -954,11 +951,12 @@ begin
      with g_players[player] do
        if(state=PS_Comp)then
        begin
+          PlayerAILevelLoop:=true;
           {$IFDEF _FULLGAME}
           if(net_status=ns_client)then
           begin
              net_clearbuffer;
-             net_writebyte(nmid_lobby_AIUp);
+             net_writebyte(nmid_lobby_PAIUp);
              net_writebyte(player);
              net_send(net_cl_svip,net_cl_svport);
              exit;
@@ -990,7 +988,7 @@ begin
           if(net_status=ns_client)then
           begin
              net_clearbuffer;
-             net_writebyte(nmid_lobby_AIToggle);
+             net_writebyte(nmid_lobby_PAIToggle);
              net_writebyte(player);
              net_send(net_cl_svip,net_cl_svport);
              exit;
@@ -1113,6 +1111,50 @@ begin
             if(race>r_cnt)then race:=0;
             mrace:=race;
          end;
+end;
+
+procedure menu_GameMapSetting(param_type:byte;forward:boolean);
+begin
+   {$IFDEF _FULLGAME}
+   if(net_status=ns_client)then
+   begin
+      case param_type of
+      nmid_lobby_MSeed,
+      nmid_lobby_MSize,
+      nmid_lobby_MObs,
+      nmid_lobby_MSym,
+      nmid_lobby_MRandom,
+      nmid_lobby_GMode,
+      nmid_lobby_GFixPos,
+      nmid_lobby_GAISlots,
+      nmid_lobby_GGen,
+      nmid_lobby_GDeadObs,
+      nmid_lobby_GRandomScir: net_SendGSettings(param_type,forward);
+      end;
+      exit;
+   end;
+   {$ENDIF}
+
+   case param_type of
+   nmid_lobby_MSeed      : if(not forward)then begin map_RandomSeed;Map_premap;end;
+   nmid_lobby_MSize      : begin
+                              case forward of
+                              true : ScrollInt(@map_mw, StepSMap,MinSMapW,MaxSMapW);
+                              false: ScrollInt(@map_mw,-StepSMap,MinSMapW,MaxSMapW);
+                              end;
+                              Map_premap;
+                           end;
+   nmid_lobby_MObs       : begin ScrollByte(@map_obs,forward,0,7); Map_premap; end;
+   nmid_lobby_MSym       : begin map_symmetry:=not map_symmetry; Map_premap; end;
+   nmid_lobby_MRandom    : begin Map_randommap; Map_premap;end;
+
+   nmid_lobby_GMode      : begin ScrollByteSet(@g_mode,forward,@allgamemodes);PlayersValidateTeam;Map_premap;end;
+   nmid_lobby_GFixPos    : begin g_fixed_positions:=not g_fixed_positions;         Map_premap;end;
+   nmid_lobby_GAISlots   : begin ScrollByte(@g_ai_slots  ,forward,0,gms_g_maxai  );Map_premap;end;
+   nmid_lobby_GGen       : begin ScrollByte(@g_generators,forward,0,gms_g_maxgens);Map_premap;end;
+   nmid_lobby_GDeadObs   : g_deadobservers:=not g_deadobservers;
+   nmid_lobby_GRandomScir: if(forward)then MakeRandomSkirmish;
+   end;
 end;
 
 {$include _net_game.pas}

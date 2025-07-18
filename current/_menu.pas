@@ -77,9 +77,9 @@ function menu_MultiplayerTab:boolean;
 begin
    menu_MultiplayerTab:=not(G_Started and(menu_s2=ms2_camp));
 end;
-function menu_PlayersTableEnabled:boolean;
+function PlayersSlotEnabled:boolean;
 begin
-   menu_PlayersTableEnabled:=(not G_Started)and(menu_s2<>ms2_camp);
+   PlayersSlotEnabled:=(not G_Started)and(menu_s2<>ms2_camp);
 end;
 function menu_PlayerNameEnabled:boolean;
 begin
@@ -175,17 +175,6 @@ begin
    menu_ReadyButtonEnabled:=(net_status=ns_client)and(not g_started);
 end;
 
-function menu_PlayersColName(ppos:byte):boolean;
-begin
-   menu_PlayersColName:=false;
-
-   if(g_started)
-   or(ppos=0)
-   or(ppos>MaxPlayers)then exit;
-
-
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 function menu_MouseXY2Item:byte;
@@ -210,7 +199,7 @@ begin
            case net_status  of
            ns_server,
            ns_none   : menu_MouseXY2Item:=114; // break game
-           ns_client : ;
+           ns_client : menu_MouseXY2Item:=110; // game quit
            end
          end
          else
@@ -287,8 +276,8 @@ begin
                           else menu_MouseXY2Item:=0;
 
                       case menu_MouseXY2Item of
-                      36: if(not G_Started)then menu_MouseXY2Item:=0;
-                      37,
+                      36,
+                      37: if(not G_Started)then menu_MouseXY2Item:=0;
                       38: if(not saveload_Save  (true))then menu_MouseXY2Item:=0;
                       39: if(not saveload_Load  (true))then menu_MouseXY2Item:=0;
                       40: if(not saveload_Delete(true))then menu_MouseXY2Item:=0;
@@ -317,24 +306,24 @@ begin
      if(ui_menu_map_rx0<mouse_x)and(mouse_x<ui_menu_map_rx1)and(ui_menu_map_y0<mouse_y)and(mouse_y<ui_menu_map_y1)then
        menu_MouseXY2Item:=50+((mouse_y-ui_menu_map_y0) div ui_menu_map_ys);
 
-   if(menu_PlayersTableEnabled)then // players
-     if(ui_menu_pls_zy0<mouse_y)and(mouse_y<ui_menu_pls_zy2)then
-     begin
-        p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys);
-        if(ui_menu_pls_zxn<mouse_x)and(mouse_x<ui_menu_pls_zxs)then menu_MouseXY2Item:=161+p;
-        if(ui_menu_pls_zxs<mouse_x)and(mouse_x<ui_menu_pls_zxr)then menu_MouseXY2Item:=171+p;
-        if(ui_menu_pls_zxr<mouse_x)and(mouse_x<ui_menu_pls_zxt)then menu_MouseXY2Item:=181+p;
-        if(ui_menu_pls_zxt<mouse_x)and(mouse_x<ui_menu_pls_zxc)then menu_MouseXY2Item:=191+p;
+   if (ui_menu_pls_zxn<mouse_x)and(mouse_x<ui_menu_pls_zxe)
+   and(ui_menu_pls_zy0<mouse_y)and(mouse_y<ui_menu_pls_zy2)then    // players
+   begin
+      p:=((mouse_y-ui_menu_pls_zy0) div ui_menu_pls_ys);
+      if(ui_menu_pls_zxn<mouse_x)and(mouse_x<ui_menu_pls_zxs)then menu_MouseXY2Item:=161+p;
+      if(ui_menu_pls_zxs<mouse_x)and(mouse_x<ui_menu_pls_zxr)then menu_MouseXY2Item:=171+p;
+      if(ui_menu_pls_zxr<mouse_x)and(mouse_x<ui_menu_pls_zxt)then menu_MouseXY2Item:=181+p;
+      if(ui_menu_pls_zxt<mouse_x)and(mouse_x<ui_menu_pls_zxc)then menu_MouseXY2Item:=191+p;
 
-        case menu_MouseXY2Item of
-        161..166: if(g_started)then menu_MouseXY2Item:=0;
-        171..176: if(not PlayerAIToggle  (menu_MouseXY2Item-170,true     ))then menu_MouseXY2Item:=0;
-        181..186: if(not PlayerRaceChange(menu_MouseXY2Item-180,true     ))then menu_MouseXY2Item:=0;
-        191..196: if(not PlayerTeamChange(menu_MouseXY2Item-190,true,true))then menu_MouseXY2Item:=0;
-        167     : if(not menu_ReadyButtonEnabled)then menu_MouseXY2Item:=0;
-        else menu_MouseXY2Item:=0;
-        end;
-     end;
+      case menu_MouseXY2Item of
+      161..166: if(not PlayersSlotEnabled)then menu_MouseXY2Item:=0;
+      171..176: if(not PlayerAIToggle  (menu_MouseXY2Item-170,true     ))then menu_MouseXY2Item:=0;
+      181..186: if(not PlayerRaceChange(menu_MouseXY2Item-180,true     ))then menu_MouseXY2Item:=0;
+      191..196: if(not PlayerTeamChange(menu_MouseXY2Item-190,true,true))then menu_MouseXY2Item:=0;
+      167     : if(not menu_ReadyButtonEnabled)then menu_MouseXY2Item:=0;
+      else menu_MouseXY2Item:=0;
+      end;
+   end;
 
    if(ui_menu_csm_x0<mouse_x)and(mouse_x<ui_menu_csm_x1)and(ui_menu_csm_y0<mouse_y)and(mouse_y<ui_menu_csm_y1)then
    begin
@@ -434,7 +423,7 @@ begin
    mouse_x:=round((mouse_x-r_menusc_x)*r_menusc_s);
    mouse_y:=round((mouse_y-r_menusc_y)*r_menusc_s);
 
-   p:=menu_MouseXY2Item;
+   p:=menu_MouseXY2Item; // menu hint
    if(p<>menu_ihint)then
    begin
       menu_ihint:=p;
@@ -447,18 +436,34 @@ begin
          else
            if(abs(menu_ihintly[p]-mouse_y)<abs(menu_ihintly[menu_ihintpi]-mouse_y))
            then menu_ihintpi:=p;
-
-//      and(<250)
-
       vid_menu_redraw:=true;
    end;
 
    if(ks_mleft=1)or(ks_mright=1) then   //right or left click
    begin
-      if(menu_item=90)then net_cl_saddr;
-      if(menu_item=11)then g_players[HPlayer].name:=PlayerName;
+      case menu_item of
+      90: net_cl_saddr;
+      11: g_players[HPlayer].name:=PlayerName;
+      50: if(not menu_GameSettingsEnabled)
+          then menu_mseed:=c2s(map_seed)
+          else
+            if(net_status=ns_client)then
+            begin
+               net_clearbuffer;
+               net_writebyte(nmid_lobby_MSeed);
+               net_writecard(s2c(menu_mseed));
+               net_send(net_cl_svip,net_cl_svport);
+            end
+            else
+            begin
+               map_seed:=s2c(menu_mseed);
+               menu_mseed:=c2s(map_seed);
+               map_premap;
+            end;
+      end;
+
       menu_item:=menu_MouseXY2Item;
-      if not(menu_item in [16,17])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
+      if not(menu_item in [116,117])then begin m_vrx:=vid_vw;m_vry:=vid_vh; end;
       vid_menu_redraw:=true;
       SoundPlayUI(snd_click);
    end;
@@ -496,7 +501,7 @@ begin
               vid_ppos:=vid_ppos mod 4;
               vid_RemakeScreenSurfaces;
               theme_map_ptrt:=255;
-              gfx_MakeTerrain;
+              gfx_MapMakeTerrain;
            end;
       14 : ScrollByte(@vid_plcolors,true,0,vid_maxplcolors);
 
@@ -510,7 +515,7 @@ begin
 
               vid_MakeScreen;
               theme_map_ptrt:=255;
-              gfx_MakeTerrain;
+              gfx_MapMakeTerrain;
            end;
 
       18 : begin vid_fullscreen:=not vid_fullscreen; vid_MakeScreen;end;
@@ -566,11 +571,10 @@ begin
 
       ///  MAP
       50 : ;
-      51 : begin ScrollInt (@map_mw,StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin ScrollByte(@map_obs,true,0,7); Map_premap;end;
-      53 : begin map_symmetry:=not map_symmetry;Map_premap;end;
-      56 : begin Map_randommap; Map_premap;end;
-
+      51 : menu_GameMapSetting(nmid_lobby_MSize  ,true);
+      52 : menu_GameMapSetting(nmid_lobby_MObs   ,true);
+      53 : menu_GameMapSetting(nmid_lobby_MSym   ,true);
+      56 : menu_GameMapSetting(nmid_lobby_MRandom,true);
 
       // PLAYERS table
       161..166: PlayerAILevelLoop(menu_item-160);
@@ -588,12 +592,12 @@ begin
       72 : menu_s2:=ms2_mult;
 
       // game options
-      74 : begin ScrollByteSet(@g_mode,true,@allgamemodes);PlayersValidateTeam;Map_premap;end;
-      75 : begin g_fixed_positions:=not g_fixed_positions;         Map_premap;end;
-      76 : begin ScrollByte   (@g_ai_slots,true,0,gms_g_maxai);    Map_premap;end;
-      77 : begin ScrollByte   (@g_generators,true,0,gms_g_maxgens);Map_premap;end;
-      78 : g_deadobservers:=not g_deadobservers;
-      79 : MakeRandomSkirmish(false);
+      74 : menu_GameMapSetting(nmid_lobby_GMode      ,true);
+      75 : menu_GameMapSetting(nmid_lobby_GFixPos    ,true);
+      76 : menu_GameMapSetting(nmid_lobby_GAISlots   ,true);
+      77 : menu_GameMapSetting(nmid_lobby_GGen       ,true);
+      78 : menu_GameMapSetting(nmid_lobby_GDeadObs   ,true);
+      79 : menu_GameMapSetting(nmid_lobby_GRandomScir,true);
 
       // replays
       82 : if(rpls_state=rpls_none)
@@ -641,9 +645,9 @@ begin
       30 : ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
 
       // MAP
-      50 : begin Map_randomseed;                                  Map_premap;end;
-      51 : begin ScrollInt (@map_mw,-StepSMap,MinSMapW,MaxSMapW); Map_premap;end;
-      52 : begin ScrollByte(@map_obs,false,0,7);                  Map_premap;end;
+      50 : menu_GameMapSetting(nmid_lobby_MSeed,false);
+      51 : menu_GameMapSetting(nmid_lobby_MSize,false);
+      52 : menu_GameMapSetting(nmid_lobby_MObs ,false);
 
       // players
       161..166: PlayersSwap     (menu_item-160,HPlayer);
@@ -651,10 +655,10 @@ begin
       191..196: PlayerTeamChange(menu_item-190,false,false);
 
       // game settings
-      74 : begin ScrollByteSet(@g_mode,false,@allgamemodes);PlayersValidateTeam;Map_premap;end;
-      76 : ScrollByte(@g_ai_slots  ,false,0,gms_g_maxai  );
-      77 : begin ScrollByte(@g_generators,false,0,gms_g_maxgens); Map_premap;end;
-      79 : if(net_status<>ns_client)and(not G_Started)then MakeRandomSkirmish(true);
+      74 : menu_GameMapSetting(nmid_lobby_GMode      ,false);
+      76 : menu_GameMapSetting(nmid_lobby_GAISlots   ,false);
+      77 : menu_GameMapSetting(nmid_lobby_GGen       ,false);
+      79 : menu_GameMapSetting(nmid_lobby_GRandomScir,false);
 
       84 : ScrollByte(@rpls_pnui,false,0,9);
 
@@ -665,7 +669,7 @@ begin
       end;
    end;
 
-   if(menu_s2=ms2_mult)and(net_status<>ns_none)then menu_item:=100;
+   if(menu_s2=ms2_mult)and(net_status<>ns_none)and(menu_item<>50)then menu_item:=100;
 
    if(length(k_keyboard_string)>0)then
    begin
@@ -673,8 +677,8 @@ begin
       11 : PlayerName:=StringApplyInput(PlayerName,k_kbstr,NameLen);
       37 : svld_str_fname:=StringApplyInput(svld_str_fname ,k_kbstr,SvRpLen);
       50 : begin
-              map_seed:=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
-              map_premap;
+              //map_seed:=s2c(StringApplyInput(c2s(map_seed),k_kbdig,10));
+              menu_mseed:=StringApplyInput(menu_mseed,k_kbdig,10);
            end;
       83 : rpls_str_name:=StringApplyInput(rpls_str_name,k_kbstr,SvRpLen);
       87 : begin

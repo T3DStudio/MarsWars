@@ -29,9 +29,15 @@ begin
          i+=ui_menu_map_ys;
       end;
 
+      if(menu_bmseed<>map_seed)then
+      begin
+         menu_bmseed:=map_seed;
+         menu_mseed:=c2s(map_seed);
+      end;
+
       c:=menu_GameSettingsEnabled;
 
-      draw_text(tar,ui_menu_map_tx1,_yt(0), c2s(map_seed)+chat_type[menu_item<>50], ta_middle,255, mic(c,menu_item=50));
+      draw_text(tar,ui_menu_map_tx1,_yt(0), menu_mseed+chat_type[menu_item<>50]   , ta_middle,255, mic(c,menu_item=50));
       draw_text(tar,ui_menu_map_tx0,_yt(1), str_m_siz+i2s(map_mw)                 , ta_left  ,255, mic(c,false));
       draw_text(tar,ui_menu_map_tx0,_yt(2), str_m_obs+_str_mx(map_obs)            , ta_left  ,255, mic(c,false));
       draw_text(tar,ui_menu_map_tx0,_yt(3), str_m_sym+b2cc[map_symmetry]          , ta_left  ,255, mic(c,false));
@@ -84,14 +90,14 @@ begin
 
           if(state<>ps_none)then
           begin
-             draw_text(tar,ui_menu_pls_zxnt, u,name                , ta_left  , 255, c_white);
-             draw_text(tar,ui_menu_pls_zxst, u,PlayerGetStatus(p)  , ta_middle, 255, mic(PlayerAIToggle(p,true),false));
+             draw_text(tar,ui_menu_pls_zxnt, u,name                , ta_left  , 255, mic(PlayersSlotEnabled           ,p=HPlayer));
+             draw_text(tar,ui_menu_pls_zxst, u,PlayerGetStatus(p)  , ta_middle, 255, mic(PlayerAIToggle(p,true)       ,p=HPlayer));
 
              if(team=0)
              then draw_text(tar,ui_menu_pls_zxrt, u,str_observer   , ta_middle, 255, c_gray)
-             else draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace], ta_middle, 255, mic(PlayerRaceChange(p,true     ),false));
+             else draw_text(tar,ui_menu_pls_zxrt, u,str_race[mrace], ta_middle, 255, mic(PlayerRaceChange(p,true     ),false    ));
 
-             draw_text(tar,ui_menu_pls_zxtt, u,t2c(team)           , ta_middle, 255, mic(PlayerTeamChange(p,true,true),false));
+             draw_text(tar,ui_menu_pls_zxtt, u,t2c(team)           , ta_middle, 255, mic(PlayerTeamChange(p,true,true),false    ));
 
              if(not GetBBit(@g_player_astatus,p))and(G_Started)then lineColor(tar,ui_menu_pls_zxnt,u+4,ui_menu_pls_zxs-6,u+4,c_red);
           end
@@ -554,12 +560,16 @@ end;
 procedure d_updmenu(tar:pSDL_Surface);
 begin
    draw_sdlsurface(tar,0,0,spr_mback);
+   draw_sdlsurface(tar,menu_cx-(spr_mlogo^.w div 2),0,spr_mlogo);
+
    draw_text(tar,spr_mback^.w,spr_mback^.h-font_w,str_ver,ta_right,255,c_white);
 
-   if(TestMode>0)then draw_text(tar,spr_mback^.w shr 1,0,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
-   draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_3w,str_menu_controls,ta_middle,255,c_white);
+   if(TestMode>0)then
+   draw_text(tar,menu_cx,0,'TEST MODE '+b2s(TestMode),ta_middle,255,c_white);
 
-   draw_text(tar,spr_mback^.w shr 1,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
+   draw_text(tar,menu_cx,spr_mback^.h-font_3w,str_menu_controls,ta_middle,255,c_white);
+
+   draw_text(tar,menu_cx,spr_mback^.h-font_w, str_cprt , ta_middle,255, c_white);
 
    if(menu_ihint>0)then
    begin
